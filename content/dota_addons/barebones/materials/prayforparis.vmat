@@ -1,0 +1,38 @@
+// THIS FILE IS AUTO-GENERATED
+
+Layer0
+{
+	shader "global_lit_simple.vfx"
+
+	//---- Color ----
+	g_vColorTint "[1.000000 1.000000 1.000000 0.000000]"
+	g_vTexCoordOffset "[0.000 0.000]"
+	g_vTexCoordScale "[1.000 1.000]"
+	TextureColor "materials/prayforparis.tga"
+
+	SystemAttributes
+	{
+		WorldMappingWidth "64"
+		WorldMappingHeight "64"
+	}
+
+	"StateHistory"
+	{
+		"State_0000"
+		{
+			"ThumbnailCRC32"		"0x41B0FD80"
+			"Thumbnail"		"/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAAgACADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDzCwsJfB07ahqDJLDIvkBbclm3Ehu+OMKaL+wl8YzrqGnskUMa+QVuCVbcCW7Z4wwosL+XxjO2n6gqRQxr54a3BVtwIXvnjDGi/v5fB066fp6pLDIvnlrgFm3Ele2OMKK+j/c+x6/V7/8Ab3N+drn1v7j2HX6pf/t7m/O1ye/v4vGMC6fp6vFNG3nlrgBV2gFe2ecsKLC/i8HQNp+oK8s0jeeGtwGXaQF745ypov7CLwdAuoaezyzSN5BW4IZdpBbtjnKiiwsIvGMDahqDPFNG3kBbchV2gBu+ecsa1/fe26fWLf8AbvL+V7G37/2/T63b/t3l/K9gv7+LxjAun6erxTRt55a4AVdoBXtnnLCiwv4vB0DafqCvLNI3nhrcBl2kBe+OcqaL+wi8HQLqGns8s0jeQVuCGXaQW7Y5yoosLCLxjA2oagzxTRt5AW3IVdoAbvnnLGj997bp9Yt/27y/lewfv/b9Prdv+3eX8r2ILCwl8HTtqGoMksMi+QFtyWbcSG744wpov7CXxjOuoaeyRQxr5BW4JVtwJbtnjDCiwv5fGM7afqCpFDGvnhrcFW3Ahe+eMMaL+/l8HTrp+nqksMi+eWuAWbcSV7Y4worL9z7Hr9Xv/wBvc352uY/uPYdfql/+3ub87XP/2Q=="
+			"Material"
+			{
+				"Layer0"
+				{
+					"shader"		"global_lit_simple.vfx"
+					"g_vColorTint"		"[1.000000 1.000000 1.000000 0.000000]"
+					"g_vTexCoordOffset"		"[0.000 0.000]"
+					"g_vTexCoordScale"		"[1.000 1.000]"
+					"TextureColor"		"materials/2e6dafa100000578-0-kim_kardashian_shared_a_viral_p.tga"
+				}
+			}
+		}
+	}
+}

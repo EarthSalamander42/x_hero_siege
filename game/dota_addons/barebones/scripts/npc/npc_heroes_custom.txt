@@ -1,0 +1,208 @@
+"DOTAHeroes"
+{
+	//========================================================================================================
+	// HERO: Archmage ( Crystal Maiden )
+	//========================================================================================================
+	"npc_dota_hero_crystal_maiden_holdout"
+	{
+		"override_hero"			"npc_dota_hero_crystal_maiden"
+		"AbilityLayout"			"5"
+
+		"Ability1"				"holdout_crushing_wave"
+		"Ability2"				"holdout_summon_water_elemental"
+		"Ability3"				"holdout_debilitation_aura"		
+		"Ability4"				"holdout_drain"
+		"Ability5"				"holdout_bonus"
+		"Ability6"				"holdout_elemental_wave"
+		"Ability16"				"ability_unit_died_ice"
+	}
+
+	//========================================================================================================
+	// HERO: Brewmaster
+	//========================================================================================================
+	"npc_dota_hero_brewmaster_holdout"
+	{
+		"override_hero"			"npc_dota_hero_brewmaster"
+		"AbilityLayout"			"5"
+
+		"Ability1"				"holdout_drunken_haze"
+		"Ability2"				"holdout_dragon_slave"
+		"Ability3"				"holdout_drunken_brawler"
+		"Ability4"				"holdout_permanent_immolation"
+		"Ability5"				"holdout_bonus"
+		"Ability6"				"holdout_earthquake"
+		"Ability16"				"ability_unit_died_fire"
+	}
+
+	//========================================================================================================
+	// HERO: Chieftain
+	//========================================================================================================
+	"npc_dota_hero_elder_titan_holdout"
+	{
+		"override_hero"			"npc_dota_hero_elder_titan"
+		"AbilityLayout"			"5"
+
+		"Ability1"				"holdout_war_stomp"
+		"Ability2"				"holdout_shockwave"
+		"Ability3"				"holdout_chieftain_endurance_aura"
+		"Ability4"				"holdout_pulverize"
+		"Ability5"				"holdout_bonus"
+		"Ability6"				"holdout_lightning_stroke"
+		"Ability16"				"ability_unit_died_light"
+	}
+
+	//========================================================================================================
+	// HERO: Enchantress
+	//========================================================================================================
+	"npc_dota_hero_enchantress_holdout"
+	{
+		"override_hero"			"npc_dota_hero_enchantress"
+		"AbilityLayout"			"5"
+
+		"Ability1"				"holdout_evasion"
+		"Ability2"				"holdout_multiple_arrows"
+		"Ability3"				"holdout_critical_arrows"
+		"Ability4"				"holdout_endurance_aura"
+		"Ability5"				"holdout_bonus"
+		"Ability6"				"holdout_trueshot_aura"
+		"Ability16"				"ability_unit_died_light"
+	}
+
+	//========================================================================================================
+	// HERO: Illidan, the Demon Hunter
+	//========================================================================================================
+	"npc_dota_hero_terrorblade_holdout"
+	{
+		"override_hero"			"npc_dota_hero_terrorblade"
+		"AbilityLayout"			"5"
+
+		"Ability1"				"holdout_negative_energy"
+		"Ability2"				"holdout_active_immolation"
+		"Ability3"				"holdout_thirst_aura"
+		"Ability4"				"holdout_illidan_evasion"
+		"Ability5"				"holdout_bonus"
+		"Ability6"				"holdout_metamorphosis"
+		"Ability16"				"ability_unit_died_light"
+	}
+
+	//========================================================================================================
+	// HERO: Juggernaut
+	//========================================================================================================
+	"npc_dota_hero_juggernaut_holdout"
+	{
+		"override_hero"			"npc_dota_hero_juggernaut"
+		"AbilityLayout"			"5"
+
+		"Ability1"				"holdout_blade_fury"
+		"Ability2"				"holdout_moment_of_courage"
+		"Ability3"				"holdout_healing_ward"
+		"Ability4"				"holdout_blade_dance"
+		"Ability5"				"holdout_bonus"
+		"Ability6"				"holdout_omnislash"
+		"Ability16"				"ability_unit_died_fire"
+	}
+
+	//========================================================================================================
+	// HERO: Lich
+	//========================================================================================================
+	"npc_dota_hero_lich_holdout"
+	{
+		"override_hero"			"npc_dota_hero_lich"
+		"AbilityLayout"			"5"
+
+		"Ability1"				"holdout_frost_nova"
+		"Ability2"				"holdout_frost_breath"
+		"Ability3"				"holdout_frost_armor"
+		"Ability4"				"holdout_frost_arrows"
+		"Ability5"				"holdout_bonus"
+		"Ability6"				"holdout_frost_beast"
+		"Ability16"				"ability_unit_died_ice"
+	}
+
+	//========================================================================================================
+	// HERO: Omniknight
+	//========================================================================================================
+	"npc_dota_hero_omniknight_holdout"
+	{
+		"override_hero"			"npc_dota_hero_omniknight"
+		"AbilityLayout"			"5"
+
+		"Ability1"				"holdout_healing_wave"
+		"Ability2"				"holdout_fan_of_light"
+		"Ability3"				"holdout_devotion_aura"
+		"Ability4"				"holdout_howl_of_terror"
+		"Ability5"				"holdout_bonus"
+		"Ability6"				"holdout_pure_light"
+		"Ability16"				"ability_unit_died_light"
+	}
+
+	//========================================================================================================
+	// HERO: Pugna ( Dreadlord )
+	//========================================================================================================
+	"npc_dota_hero_pugna_holdout"
+	{
+		"override_hero"			"npc_dota_hero_pugna"
+		"AbilityLayout"			"5"
+
+		"Ability1"				"holdout_carrion_swarm"
+		"Ability2"				"holdout_chaos"
+		"Ability3"				"holdout_aura_of_blight"
+		"Ability4"				"holdout_death_coil"
+		"Ability5"				"holdout_bonus"
+		"Ability6"				"holdout_inferno"
+		"Ability16"				"ability_unit_died_death"
+	}
+
+	//========================================================================================================
+	// HERO: Sven
+	//========================================================================================================
+	"npc_dota_hero_sven_holdout"
+	{
+		"override_hero"			"npc_dota_hero_sven"
+		"Ability1"				"holdout_storm_bolt"
+		"Ability2"				"holdout_great_cleave"
+		"Ability3"				"holdout_warcry"
+		"Ability4"				"holdout_gods_strength"
+		"Ability5"				"holdout_bonus"
+		"Ability16"				"ability_unit_died_light"
+	}
+
+	//========================================================================================================
+	// HERO: Warlock
+	//========================================================================================================
+	"npc_dota_hero_warlock_holdout"
+	{
+		"override_hero"			"npc_dota_hero_warlock"
+		"AbilityLayout"			"5"
+
+		"Ability1"				"holdout_dark_portal"
+		"Ability2"				"holdout_spiritual_beast"
+		"Ability3"				"holdout_evasion_and_critical_strike"
+		"Ability4"				"holdout_archimonde"
+		"Ability5"				"holdout_bonus"
+		"Ability6"				"holdout_gargoyle_swarm"
+		"Ability16"				"ability_unit_died_death"
+
+		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
+		"AttackRange"				"128"
+		"ProjectileModel"			""
+		"ProjectileSpeed"			"900"
+	}
+
+	//========================================================================================================
+	// HERO: Windrunner
+	//========================================================================================================
+	"npc_dota_hero_windrunner_holdout"
+	{
+		"override_hero"			"npc_dota_hero_windrunner"
+		"AbilityLayout"			"5"
+
+		"Ability1"				""
+		"Ability2"				""
+		"Ability3"				""
+		"Ability4"				""
+		"Ability5"				"holdout_bonus"
+		"Ability6"				""
+		"Ability16"				"ability_unit_died_light"
+	}
+}

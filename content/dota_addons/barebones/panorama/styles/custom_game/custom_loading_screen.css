@@ -1,0 +1,165 @@
+@define TotalLength: 40s;
+@define TimingFunc: linear;
+@define IterationCount: 1;
+
+.AddonLoadingRoot
+{
+    width: 100%;
+    height: 100%;
+    background-color: black;
+    overflow: clip;
+}
+
+#TitlePanel
+{
+  horizontal-align: left;
+  vertical-align: bottom;
+  margin-bottom: 150px;
+  margin-left: 100px;
+  flow-children: right;
+}
+
+#AddonTitle
+{
+  margin-bottom: -15px;
+  vertical-align: center;
+  text-transform: uppercase;
+  font-size: 0px;   /* Change to 80 for original size */
+  color: #cccccc;
+  text-shadow: 2px 2px 2px #000000;
+}
+
+#AddonObjectiveTitle
+{
+  margin-bottom: 920px;
+  margin-left: 20px;
+  vertical-align: center;
+  text-transform: uppercase;
+  font-size: 45px;
+  color: #cccccc;
+  text-shadow: 2px 2px 2px #000000;
+}
+
+#AddonObjective1
+{
+  margin-bottom: 830px;
+  margin-left: 10px;
+  vertical-align: center;
+  text-transform: uppercase;
+  font-size: 16px;
+  color: #cccccc;
+  text-shadow: 2px 2px 2px #000000;
+}
+
+#AddonObjective2
+{
+  margin-bottom: 800px;
+  margin-left: 10px;
+  vertical-align: center;
+  text-transform: uppercase;
+  font-size: 16px;
+  color: #cccccc;
+  text-shadow: 2px 2px 2px #000000;
+}
+
+#AddonObjective3
+{
+  margin-bottom: 770px;
+  margin-left: 10px;
+  vertical-align: center;
+  text-transform: uppercase;
+  font-size: 16px;
+  color: #cccccc;
+  text-shadow: 2px 2px 2px #000000;
+}
+
+#AddonObjective4
+{
+  margin-bottom: 740px;
+  margin-left: 10px;
+  vertical-align: center;
+  text-transform: uppercase;
+  font-size: 16px;
+  color: #cccccc;
+  text-shadow: 2px 2px 2px #000000;
+}
+
+#AddonObjective5
+{
+  margin-bottom: 710px;
+  margin-left: 10px;
+  vertical-align: center;
+  text-transform: uppercase;
+  font-size: 16px;
+  color: #cccccc;
+  text-shadow: 2px 2px 2px #000000;
+}
+
+#AddonObjective6
+{
+  margin-bottom: 680px;
+  margin-left: 10px;
+  vertical-align: center;
+  text-transform: uppercase;
+  font-size: 16px;
+  color: #cccccc;
+  text-shadow: 2px 2px 2px #000000;
+}
+
+#AddonObjective7
+{
+  margin-bottom: 650px;
+  margin-left: 10px;
+  vertical-align: center;
+  text-transform: uppercase;
+  font-size: 16px;
+  color: #cccccc;
+  text-shadow: 2px 2px 2px #000000;
+}
+
+#AddonObjective8
+{
+  margin-bottom: 620px;
+  margin-left: 10px;
+  vertical-align: center;
+  text-transform: uppercase;
+  font-size: 16px;
+  color: #cccccc;
+  text-shadow: 2px 2px 2px #000000;
+}
+
+.SeqImg
+{
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+  background-size: 200% 200%;
+}
+
+#CustomBg
+{
+  margin-left: -165px;
+  margin-top: 0px;
+    overflow: clip;
+  pre-transform-scale2d: 1.0;
+}
+
+#gamemode
+{
+  margin-left: 160px;
+  /*margin-bottom: 0px;*/
+  
+}
+
+@keyframes 'gamemode_anim'
+{
+  0%
+  {
+    transform: translateX( 0px ) translateY( 0px );
+    pre-transform-scale2d: .8;
+  }
+
+  100%
+  {
+    transform: translateX( 0px ) translateY( -200px );
+  }
+}

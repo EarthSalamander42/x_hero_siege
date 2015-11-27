@@ -1,0 +1,449 @@
+
+// Dota Abilities Override File
+"DOTAAbilities"
+{
+	"Version"	"1"
+
+	//=================================================================================================================
+	// Shiva's
+	//=================================================================================================================
+	"item_shivas_guard"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"ID"							"119"														// unique ID number for this item.  Do not change this once established or it will invalidate collected stats.
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IGNORE_CHANNEL"
+		"FightRecapLevel"				"1"
+
+		// Stats		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"30"
+
+		// Item Info
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"100"
+		"ItemCost"						"4700"
+		"ItemShopTags"					"int;armor;hard_to_tag"
+		"ItemQuality"					"epic"
+		"ItemAliases"					"shiva's guard"
+		"ItemDisassembleRule"			"DOTA_ITEM_DISASSEMBLE_ALWAYS"
+		"ItemDeclarations"				"DECLARE_PURCHASES_TO_TEAMMATES | DECLARE_PURCHASES_IN_SPEECH | DECLARE_PURCHASES_TO_SPECTATORS"
+		
+		// Special	
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_intellect"		"30"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_armor"			"15"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"aura_radius"			"900"
+			}
+			"04"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"aura_attack_speed"		"-10"
+			}
+			"05"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"blast_damage"			"200"
+			}
+			"06"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"blast_movement_speed"	"-40"
+			}
+			"07"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"blast_debuff_duration"	"4.0"
+			}
+			"08"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"blast_radius"			"900"
+			}
+			"09"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"blast_speed"			"350"
+			}
+		}
+	}
+
+
+	//=================================================================================================================
+	// Talisman of Evasion
+	//=================================================================================================================
+	"item_talisman_of_evasion"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"             		"item_talisman_of_evasion"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityTextureName"			"talisman_of_evasion"
+
+		// Item Info
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemCost"						"12500"
+		"ItemShopTags"					"evasion"
+		"ItemQuality"					"secret_shop"
+		"ItemAliases"					"talisman of evasion"
+		"SecretShop"					"1"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_evasion"			"15"
+			}
+		}
+	}
+
+	//========================================================================================================
+	// Mekansm
+	//========================================================================================================
+	"item_mekansm"
+	{
+		// General
+		//--------------------------------------------------------------------------------------------------
+		"BaseClass"						"item_mekansm"
+
+		// Item Info
+		//--------------------------------------------------------------------------------------------------
+		"ItemBaseLevel"					"1"
+		"MaxUpgradeLevel"				"5"
+	}
+
+	//=================================================================================================================
+	// Recipe: Mekansm
+	//=================================================================================================================
+	"item_recipe_mekansm"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"						"item_recipe_mekansm"
+		"Model"							"models/props_gameplay/recipe.mdl"
+		
+		// Item Info
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemCost"						"1800"	
+		"ItemShopTags"					""
+		
+		// Recipe
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemRecipe"					"1"
+		"ItemResult"					"item_mekansm"
+		"ItemRequirements"
+		{
+			"01"						"item_poor_mans_shield"
+		}
+	}
+
+	//======================================================================================================
+	// Heart of Tarrasque Override
+	//======================================================================================================
+	"item_heart"
+	{
+		// General
+		//--------------------------------------------------------------------------------------------------
+		"BaseClass"						"item_heart"
+
+		// Item Info
+		//--------------------------------------------------------------------------------------------------
+		"ItemBaseLevel"					"1"
+		"MaxUpgradeLevel"				"3"
+	}
+
+	//======================================================================================================
+	// Desolator Override
+	//======================================================================================================
+	"item_desolator"
+	{
+		// General
+		//--------------------------------------------------------------------------------------------------
+		"BaseClass"						"item_desolator"
+
+		// Item Info
+		//--------------------------------------------------------------------------------------------------
+		"ItemBaseLevel"					"1"
+		"MaxUpgradeLevel"				"3"
+	}
+
+	//======================================================================================================
+	// Maelstrom Override
+	//======================================================================================================
+	"item_maelstrom"
+	{
+		// General
+		//--------------------------------------------------------------------------------------------------
+		"BaseClass"						"item_maelstrom"
+
+		// Item Info
+		//--------------------------------------------------------------------------------------------------
+		"ItemBaseLevel"					"1"
+		"MaxUpgradeLevel"				"3"
+	}
+
+	//======================================================================================================
+	// Mjollnir Override
+	//======================================================================================================
+	"item_mjollnir"
+	{
+		// General
+		//--------------------------------------------------------------------------------------------------
+		"BaseClass"						"item_mjollnir"
+
+		// Item Info
+		//--------------------------------------------------------------------------------------------------
+		"ItemBaseLevel"					"2"
+		"MaxUpgradeLevel"				"3"
+	}
+
+	//=================================================================================================================
+	// Abyssal Blade
+	//=================================================================================================================
+	"item_abyssal_blade"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"ID"							"208"														// unique ID number for this item.  Do not change this once established or it will invalidate collected stats.
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+		"AbilityUnitTargetFlags"		"DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES"
+		"FightRecapLevel"				"1"
+
+		// Stats		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"45"
+		"AbilityCastRange"				"140"
+		"AbilityCastPoint"				"0.0"
+
+		// Item Info
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"150"
+		"ItemCost"						"5200"
+		"ItemShopTags"					"damage;str;hard_to_tag"
+		"ItemQuality"					"epic"
+		"ItemAliases"					"abyssal blade"
+		"ItemDisassembleRule"			"DOTA_ITEM_DISASSEMBLE_ALWAYS"
+		"ItemDeclarations"				"DECLARE_PURCHASES_TO_TEAMMATES | DECLARE_PURCHASES_IN_SPEECH | DECLARE_PURCHASES_TO_SPECTATORS"
+		
+		// Special	
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_damage"			"100"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_strength"		"10"
+			}
+			"06"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_chance_damage"	"200"
+			}
+			"08"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"stun_duration"			"2"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Recipe: Abyssal Blade
+	//=================================================================================================================
+	"item_recipe_abyssal_blade"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"ID"							"207"														// unique ID number for this item.  Do not change this once established or it will invalidate collected stats.
+
+		// Item Info
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemCost"						"0"	
+		"ItemShopTags"					""
+
+
+		// Recipe
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemRecipe"					"1"
+		"ItemResult"					"item_abyssal_blade"
+		"ItemRequirements"
+		{
+			"01"						"item_claymore;item_relic"
+		}
+	}
+
+	//=========================================================================================================
+	// Boots
+	//=========================================================================================================
+	"item_boots"
+	{
+		"ItemCost"						"50"
+	}
+
+	//=================================================================================================================
+	// Vitality Booster
+	//=================================================================================================================
+	"item_vitality_booster"
+	{
+		"SecretShop"					"0"
+	}
+
+	//=================================================================================================================
+	// Reaver
+	//=================================================================================================================
+	"item_reaver"
+	{
+		"SecretShop"					"0"
+	}
+
+	//=================================================================================================================
+	// Mystic Staff
+	//=================================================================================================================
+	"item_mystic_staff"
+	{
+		"SecretShop"					"0"
+	}
+
+	//=================================================================================================================
+	// Energy Booster
+	//=================================================================================================================
+	"item_energy_booster"
+	{
+		"SecretShop"					"0"
+	}
+
+	//=================================================================================================================
+	// Point Booster
+	//=================================================================================================================
+	"item_point_booster"
+	{
+		"SecretShop"					"0"
+	}
+
+	//=================================================================================================================
+	// Sacred Relic
+	//=================================================================================================================
+	"item_relic"
+	{
+		"SecretShop"					"0"
+	}
+
+	//=================================================================================================================
+	// Eaglesong
+	//=================================================================================================================
+	"item_eagle"
+	{
+		"SecretShop"					"0"
+	}
+
+	//=================================================================================================================
+	// Platemail
+	//=================================================================================================================
+	"item_platemail"
+	{
+		"SecretShop"					"0"
+	}
+
+	//=================================================================================================================
+	// Ultimate Orb
+	//=================================================================================================================
+	"item_ultimate_orb"
+	{
+		"SecretShop"					"0"
+	}
+
+	//=================================================================================================================
+	// Hyperstone
+	//=================================================================================================================
+	"item_hyperstone"
+	{
+		"SecretShop"					"0"
+	}
+
+	"item_clarity"					"REMOVE"
+	"item_flask"					"REMOVE"
+	"item_dust"						"REMOVE"
+	"item_bottle"					"REMOVE"
+	"item_courier"					"REMOVE"
+	"item_recipe_dagon"				"REMOVE"
+	"item_recipe_dagon_2"			"REMOVE"
+	"item_recipe_dagon_3"			"REMOVE"
+	"item_recipe_dagon_4"			"REMOVE"
+	"item_recipe_dagon_5"			"REMOVE"
+	"item_dagon"					"REMOVE"
+	"item_dagon_2"					"REMOVE"
+	"item_dagon_3"					"REMOVE"
+	"item_dagon_4"					"REMOVE"
+	"item_dagon_5"					"REMOVE"
+	"item_recipe_necronomicon"		"REMOVE"
+	"item_recipe_necronomicon_2"	"REMOVE"
+	"item_recipe_necronomicon_3"	"REMOVE"
+	"item_necronomicon"				"REMOVE"
+	"item_necronomicon_2"			"REMOVE"
+	"item_necronomicon_3"			"REMOVE"
+	"item_smoke_of_deceit"			"REMOVE"
+	"item_rapier"					"REMOVE"
+	"item_ankh"						"REMOVE"
+	"item_tpscroll"					"REMOVE"
+	"item_lesser_crit"				"REMOVE"
+	"item_greater_crit"				"REMOVE"
+	"item_bfury"					"REMOVE"
+	"item_vladmir"					"REMOVE"
+	"item_tango"					"REMOVE"
+	"item_moon_shard"				"REMOVE"
+	"item_mask_of_madness"			"REMOVE"
+	"item_enchanted_mango"			"REMOVE"
+	"item_basher"					"REMOVE"
+	"item_monkey_king_bar"			"REMOVE"
+	"item_guardian_greaves"			"REMOVE"
+	"item_assault"					"REMOVE"
+	"item_blink"					"REMOVE"
+	"item_force_staff"				"REMOVE"
+	"item_arcane_boots"				"REMOVE"
+	"item_tranquil_boots"			"REMOVE"
+	"item_power_treads"				"REMOVE"
+	"item_phase_boots"				"REMOVE"
+	"item_invis_sword"				"REMOVE"
+	"item_silver_edge"				"REMOVE"
+	"item_rod_of_atos"				"REMOVE"
+	"item_armlet"					"REMOVE"
+	"item_bloodstone"				"REMOVE"
+	"item_helm_of_the_dominator"	"REMOVE"
+	"item_satanic"					"REMOVE"
+	"item_branches"					"REMOVE"
+	"item_diffusal_blade"			"REMOVE"
+	"item_diffusal_blade_2"			"REMOVE"
+	"item_magic_stick"				"REMOVE"
+	"item_magic_wand"				"REMOVE"
+	"item_sphere"					"REMOVE" //Linken's Sphere
+	"item_demon_edge"				"REMOVE"
+	"item_butterfly"				"REMOVE"
+	"item_solar_crest"				"REMOVE"
+	"item_heavens_halberd"			"REMOVE"
+	"item_buckler"					"REMOVE"
+	"item_crimson_guard"			"REMOVE"
+	"item_shivas_guard3"			"REMOVE"
+}

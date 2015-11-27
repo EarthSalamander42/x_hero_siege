@@ -1,0 +1,66 @@
+</root>
+	<styles>
+		<include src="s2r://panorama/styles/dotastyles.vcss_c" />
+		<include src="s2r://panorama/styles/custom_game/gamesetup_options.vcss_c" />
+	</styles> 
+	<script>
+
+		function OnVoteButtonPressed(category, vote)
+		{
+			$.Msg("Category: ", category);
+			$.Msg("Vote: ", vote);
+			GameEvents.SendCustomGameEventToServer( "setting_vote", { "category":category, "vote":vote } );
+		}
+
+		// This function is called at the start
+		(function() {
+			if (GameUI.CustomUIConfig().DebugMessagesEnabled == true)
+			{
+				$.Msg("GameSetup Options Initialised");
+				Game.SetRemainingSetupTime( -1 );
+				Game.SetAutoLaunchEnabled( false );
+			}
+
+		})();
+		
+	</script>
+	
+	<Panel class="ContainerGameSetup" hittest="false">
+		<Panel class="CustomSettingsColumn" hittest="false" >
+			<Panel class="ContainerCustomGameSettingsPanels" hittest="false" >
+
+				<Panel class="ContainerCustomGameSettingsTitle" hittest="false" >
+					<Label class="CustomGameSettingsHeaderTitle" text="Custom Game Settings" hittest="false" />
+				</Panel>
+
+				<Panel class="CustomSettingPanel" hittest="false">
+
+					<Panel class="ContainerCustomGameLengthTitle" hittest="false">
+						<Label class="CustomGameSettingsTitle" id="CustomGameLengthTitle1" hittest="false" text="Hard Mode Setup" />
+					</Panel>
+
+					<Panel class="CustomGameSettingPanelDivider" hittest="false" />
+					<Panel class="ContainerCustomGameSettingOptions" hittest="false">
+						
+						<RadioButton class="CGSRadio" group="GameLength" text="Hard( 4 Lanes )" onactivate="OnVoteButtonPressed('difficulty', 1)" />
+						<RadioButton class="CGSRadio" group="GameLength" text="Extreme( 8 Lanes )" onactivate="OnVoteButtonPressed('difficulty', 2)" />
+
+					</Panel>
+				</Panel>
+				<!--
+				<Panel class="CustomSettingPanel" hittest="false">
+					<Panel class="ContainerCustomGameLengthTitle" hittest="false">
+						<Label class="CustomGameSettingsTitle" id="CustomGameLengthTitle1" hittest="false" text="Combat System" />
+					</Panel>
+					<Panel class="CustomGameSettingPanelDivider" hittest="false" />
+					<Panel class="ContainerCustomGameSettingOptions" hittest="false">
+						<RadioButton class="CGSRadio" group="CombatSystem" text="Simple" onactivate="OnVoteButtonPressed('combat_system', 1)" />
+						<RadioButton class="CGSRadio" group="CombatSystem" text="Triangle" onactivate="OnVoteButtonPressed('combat_system', 2)" />
+					</Panel>
+				</Panel>
+				-->
+			</Panel>
+		</Panel>
+	</Panel>
+
+</root>

@@ -1,0 +1,23 @@
+"addon"
+{
+//	"Unassigned"      					"Unassigned Team"
+//	"Spectator"       					"Spectator Team"
+//	"Neutrals"        					"Neutral Team"
+//	"NoTeam"          					"No Team"
+
+	"DOTA_GoodGuys"   					"Light Heroes"
+	"DOTA_BadGuys"    					"Dark Forces"
+	
+	"Addon_Game_Name"					"X Hero Siege"
+
+	"Loading_Objectives_Title"			"Objectives:"
+	"Loading_Objectives1"				"- Choose one lane to defend against incoming Forces of Darkness"
+	"Loading_Objectives2"				"- Destroy the Barrackment on your lane to release the Magnataur Destroyer"
+	"Loading_Objectives3"				"- Destroy Ice Towers on Secondary Lanes"
+	"Loading_Objectives4"				"- Defend your castle from the Final Wave"
+	"Loading_Objectives5"				"- Go to the green circle behind ice towers to teleport your team to Magtheridon arena and defeat him"
+	"Loading_Objectives6"				"- Once Magtheridon is dead, head to the green circle on top of the arena and survive to the Incoming Creep Waves"
+	"Loading_Objectives7"				"- Defeat Grom, Illidan, Balanar, Admiral Proudmoore in each corners. Once all dead, go into the green circle top to fight Arthas!"
+	"Loading_Objectives8"				"- Defeat Arthas to win the game!"
+
+}
