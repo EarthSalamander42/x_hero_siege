@@ -898,7 +898,7 @@ Gameplay:
 Fix:
 - Fixed Level 5 Creep Lanes not appearing on lane 2 to 8
 
-
+62214509
 //===========================================================================================================
 X Hero Siege ( BETA ) 0.9.8.3 Fix
 //===========================================================================================================
@@ -907,28 +907,103 @@ Fix:
 - Fixed Creeps not appearing from lane 3 to 8
 
 
+//===========================================================================================================
+X Hero Siege ( BETA ) 0.9.8.4 Fix
+//===========================================================================================================
+
+- Created a whole new map to replace the old one( Very bad designed, hope you'll like this one! )
+- Added Passive abilities to evcery creep lane levels( Listed under Gameplay )
+- Added a Shop at spawn( Goblin Shop )
+- Added German Translation
+- Modified Abaddon Chronosphere( Red-Color )
+- Reduced Dark Protectors size
+- Deleted unused files( -20mb )
+
+Gameplay:
+- Added Desolator for Death Revenant( Tower )
+- Increased Level 1 Creep Lane Gold Bounty from 70/60 to 90/75( First number represent the Melee creep, second number represent the ranged creep )
+- Increased Level 2 Creep Lane Gold Bounty from 105/95 to 140/125
+- Increased Level 3 Creep Lane Armor from 15 to 20
+- Increased Level 3 Creep Lane Gold Bounty from 140/130 to 175/150
+- Increased Level 4 Creep Lane Gold Bounty from 220/200 to 250/225 
+- Increased Level 4 Creep Lane Armor from 30 to 40
+- Increased Level 5 Creep Lane Gold Bounty from 350/200 to 355/315
+- Increased Level 5 Creep Lane Armor from 40 to 70
+- Increased Level 5 Creep Lane Miranas HP from 1465 to 1565
+- Reduced Level 1 Creep Lane Damage from 22/23 to 17/18
+- Reduced Banehallow Green Cranes Damage from 7500 to 2000
+- Reduced Juggernaut Healing Ward from 3/3.5/4/4.5/5/6/7 to 2.5/3/3.5/4/4.5/5/6
+
+New Creeps Abilities: ( All Passive )
+Level 1:
+- Lifesteal( Lifesteal based on enemy max HP )
+- Geminate( Double attack every 2 seconds )
+Level 2:
+- Aura of Blight( Grants +10 HP Regen )
+- Heartstoppper Aura( Reduce enemies HP Regen, -1 )
+Level 3:
+- Mana Break( Burn 15 mana each hit )
+- Presence of the Dark Lord( Reduce enemy armor, -5 )
+Level 4:
+- Blade Dance( Give a chance to deal critical damage )
+- Corrosive Skin( Deal damage and slow the enemy when he attack the unit )
+Level 5:
+- Juxtapose( Create illusions randomly, during 8 seconds )
+- Cold Skin( Deals 100 dmg per sec to near enemies )
+
+
+//===========================================================================================================
+X Hero Siege ( BETA ) 0.9.8.5 Fix
+//===========================================================================================================
+
+- 
+
 //================================================================================================================================================
 //================================================================================================================================================
 //================================================================================================================================================
 //================================================================================================================================================
 //================================================================================================================================================
+
+//Magnus Wars
+Reduce Shadow Walk 4/6
+tome of force gold 1600
+
+//Patreon To-Do-List( In Goal orders )
+//Reached Goals
+Finish Frost Infernal Event
+Finish Blademaster Hero
+Finish Priestess of the Moon Hero
+Finish Solo Mod
+Finish Rexxar Hero
+Finish Rifleman
+Finish French Translation
+
+//Non-Reached Goals
+Finish Sylvanas Windrunner Hero
+Finish Warden Hero
+Finish Custom Effects for Shiva's Guard 2 and 3
+Finish Hard Mod( DONE )
+Finish Lich King Boss
 
 //Major Fixes
-Finish Frost Infernal
+Fix lifesteal online not working, weird
 
 // Minor Fixes
+Nerf Banehallow Revenants HP + armor
+- Bounty Gold Final Wave
 - Added Incoming Wave 4 with the right model( WC3 Captain, Dragon Knight )
 - Improved Death Revenants Color( Was Blue, now Green )
 Buildings armor increase with time
-fix lifesteal online not working, weird
 Increase bounty gold final wave creeps
 Add a VIP Item only that spawns a group of hero with nice custom sets to fight and help
 Rework all shop icons border with rarity color
 Create a Ward Dispenser style for Potions heal + mana
-Finish Secret Boss ( Needs last work of the 3d modeler )
 Fix Firestorm Magtheridon
 
 //Ideas
-Rune:
+Lifesteal Boots
+
+//New Runes:
 Immolation
 Damage x4 ( purple )
+Double Farm

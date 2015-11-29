@@ -184,11 +184,13 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 	--//=================================================================================================================
 	--// Timer: Creeps Level 1, 5 West 1
 	--//=================================================================================================================
+	if GetMapName() == "x_hero_siege_8_players" then -- 8 Players Creep Lanes
 	local time_elapsed = 0
 	Timers:CreateTimer(0, function()
 	time_elapsed = time_elapsed + 30 -- with this system, the time_elapsed should be set to the Game Time + 30 sec, e.g: 5 Min = 300sec + 30 = 330
 	print( time_elapsed )
-		if GetMapName() == "x_hero_siege_8_players" and PlayerResource:GetPlayerCount() >= 1 and time_elapsed < 390 then -- Level 1 lower than 6 min
+--	Notifications:TopToAll({text="Creep Lane 1, West 1 spawning in Normal Mode", duration=6.0})
+		if PlayerResource:GetPlayerCount() >= 1 and time_elapsed < 390 then -- Level 1 lower than 6 min
 		local point = Entities:FindByName( nil, "npc_dota_spawner_1"):GetAbsOrigin()
 			for j = 1, 3 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_lifestealers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -196,7 +198,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			local unit = CreateUnitByName("npc_dota_creature_mini_weavers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		return CheckWestBarracks1() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "x_hero_siege_8_players" and PlayerResource:GetPlayerCount() >= 1 and time_elapsed >= 390 and time_elapsed < 750 then -- Level 2, higher or equal to 6 min
+		elseif PlayerResource:GetPlayerCount() >= 1 and time_elapsed >= 390 and time_elapsed < 750 then -- Level 2, higher or equal to 6 min
 		local point = Entities:FindByName( nil, "npc_dota_spawner_1"):GetAbsOrigin()
 			for j = 1, 4 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_undyings", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -205,7 +207,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			local unit = CreateUnitByName("npc_dota_creature_mini_necrolytes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		return CheckWestBarracks1() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "x_hero_siege_8_players" and PlayerResource:GetPlayerCount() >= 1 and time_elapsed >= 750 and time_elapsed < 1110 then -- Level 3, higher or equal to 12 min
+		elseif PlayerResource:GetPlayerCount() >= 1 and time_elapsed >= 750 and time_elapsed < 1110 then -- Level 3, higher or equal to 12 min
 		local point = Entities:FindByName( nil, "npc_dota_spawner_1"):GetAbsOrigin()
 			for j = 1, 5 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_nyxes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -215,7 +217,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			end
 		return CheckWestBarracks1() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "x_hero_siege_8_players" and PlayerResource:GetPlayerCount() >= 1 and time_elapsed >= 1110 and time_elapsed < 1470 then -- Level 4, higher or equal to 18 min
+		elseif PlayerResource:GetPlayerCount() >= 1 and time_elapsed >= 1110 and time_elapsed < 1470 then -- Level 4, higher or equal to 18 min
 		local point = Entities:FindByName( nil, "npc_dota_spawner_1"):GetAbsOrigin()
 			for j = 1, 5 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_dooms", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -225,7 +227,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			end
 		return CheckWestBarracks1() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "x_hero_siege_8_players" and PlayerResource:GetPlayerCount() >= 1 and time_elapsed >= 1470 then -- Level 4, higher or equal to 18 min
+		elseif PlayerResource:GetPlayerCount() >= 1 and time_elapsed >= 1470 then -- Level 4, higher or equal to 18 min
 		local point = Entities:FindByName( nil, "npc_dota_spawner_1"):GetAbsOrigin()
 			for j = 1, 6 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_lancers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -243,7 +245,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 	local time_elapsed = 0
 	local TimerWest2 = Timers:CreateTimer(0, function()
 		time_elapsed = time_elapsed + 30 -- with this system, the time_elapsed should be set to the Game Time + 30 sec, e.g: 5 Min = 300sec + 30 = 330
-		if GetMapName() == "x_hero_siege_8_players" and PlayerResource:GetPlayerCount() >= 2 and time_elapsed < 390 then -- Level 1 lower than 6 min
+		if PlayerResource:GetPlayerCount() >= 2 and time_elapsed < 390 then -- Level 1 lower than 6 min
 		local point = Entities:FindByName( nil, "npc_dota_spawner_2"):GetAbsOrigin()
 			for j = 1, 3 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_lifestealers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -251,7 +253,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			local unit = CreateUnitByName("npc_dota_creature_mini_weavers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		return CheckWestBarracks2() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "x_hero_siege_8_players" and PlayerResource:GetPlayerCount() >= 2 and time_elapsed >= 390 and time_elapsed < 750 then -- Level 2, higher or equal to 6 min
+		elseif PlayerResource:GetPlayerCount() >= 2 and time_elapsed >= 390 and time_elapsed < 750 then -- Level 2, higher or equal to 6 min
 		local point = Entities:FindByName( nil, "npc_dota_spawner_2"):GetAbsOrigin()
 			for j = 1, 4 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_undyings", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -260,7 +262,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			local unit = CreateUnitByName("npc_dota_creature_mini_necrolytes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		return CheckWestBarracks2() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "x_hero_siege_8_players" and PlayerResource:GetPlayerCount() >= 2 and time_elapsed >= 750 and time_elapsed < 1110 then -- Level 3, higher or equal to 12 min
+		elseif PlayerResource:GetPlayerCount() >= 2 and time_elapsed >= 750 and time_elapsed < 1110 then -- Level 3, higher or equal to 12 min
 			local point = Entities:FindByName( nil, "npc_dota_spawner_2"):GetAbsOrigin()
 			for j = 1, 5 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_nyxes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -270,7 +272,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			end
 		return CheckWestBarracks2() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "x_hero_siege_8_players" and PlayerResource:GetPlayerCount() >= 2 and time_elapsed >= 1110 and time_elapsed < 1470 then -- Level 4, higher or equal to 18 min
+		elseif PlayerResource:GetPlayerCount() >= 2 and time_elapsed >= 1110 and time_elapsed < 1470 then -- Level 4, higher or equal to 18 min
 			local point = Entities:FindByName( nil, "npc_dota_spawner_2"):GetAbsOrigin()
 			for j = 1, 5 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_dooms", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -280,7 +282,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			end
 		return CheckWestBarracks2() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "x_hero_siege_8_players" and PlayerResource:GetPlayerCount() >= 2 and time_elapsed >= 1470 then -- Level 5, higher or equal to 24 min
+		elseif PlayerResource:GetPlayerCount() >= 2 and time_elapsed >= 1470 then -- Level 5, higher or equal to 24 min
 			local point = Entities:FindByName( nil, "npc_dota_spawner_2"):GetAbsOrigin()
 			for j = 1, 6 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_lancers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -298,7 +300,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 	local time_elapsed = 0
 	Timers:CreateTimer(0, function()
 		time_elapsed = time_elapsed + 30 -- with this system, the time_elapsed should be set to the Game Time + 30 sec, e.g: 5 Min = 300sec + 30 = 330
-		if GetMapName() == "x_hero_siege_8_players" and PlayerResource:GetPlayerCount() >= 3 and time_elapsed < 390 then -- Level 1 lower than 6 min
+		if PlayerResource:GetPlayerCount() >= 3 and time_elapsed < 390 then -- Level 1 lower than 6 min
 		local point = Entities:FindByName( nil, "npc_dota_spawner_3"):GetAbsOrigin()
 			for j = 1, 3 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_lifestealers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -306,7 +308,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			local unit = CreateUnitByName("npc_dota_creature_mini_weavers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		return CheckNorthBarracks1() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "x_hero_siege_8_players" and PlayerResource:GetPlayerCount() >= 3 and time_elapsed >= 390 and time_elapsed < 750 then -- Level 2, higher or equal to 6 min
+		elseif PlayerResource:GetPlayerCount() >= 3 and time_elapsed >= 390 and time_elapsed < 750 then -- Level 2, higher or equal to 6 min
 		local point = Entities:FindByName( nil, "npc_dota_spawner_3"):GetAbsOrigin()
 			for j = 1, 4 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_undyings", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -315,7 +317,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			local unit = CreateUnitByName("npc_dota_creature_mini_necrolytes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		return CheckNorthBarracks1() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "x_hero_siege_8_players" and PlayerResource:GetPlayerCount() >= 3 and time_elapsed >= 750 and time_elapsed < 1110 then -- Level 3, higher or equal to 12 min
+		elseif PlayerResource:GetPlayerCount() >= 3 and time_elapsed >= 750 and time_elapsed < 1110 then -- Level 3, higher or equal to 12 min
 			local point = Entities:FindByName( nil, "npc_dota_spawner_3"):GetAbsOrigin()
 			for j = 1, 5 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_nyxes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -325,7 +327,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			end
 		return CheckNorthBarracks1() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "x_hero_siege_8_players" and PlayerResource:GetPlayerCount() >= 3 and time_elapsed >= 1110 and time_elapsed < 1470 then -- Level 4, higher or equal to 18 min
+		elseif PlayerResource:GetPlayerCount() >= 3 and time_elapsed >= 1110 and time_elapsed < 1470 then -- Level 4, higher or equal to 18 min
 			local point = Entities:FindByName( nil, "npc_dota_spawner_3"):GetAbsOrigin()
 			for j = 1, 5 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_dooms", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -335,7 +337,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			end
 		return CheckNorthBarracks1() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "x_hero_siege_8_players" and PlayerResource:GetPlayerCount() >= 3 and time_elapsed >= 1470 then -- Level 5, higher or equal to 24 min
+		elseif PlayerResource:GetPlayerCount() >= 3 and time_elapsed >= 1470 then -- Level 5, higher or equal to 24 min
 			local point = Entities:FindByName( nil, "npc_dota_spawner_3"):GetAbsOrigin()
 			for j = 1, 6 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_lancers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -353,7 +355,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 	local time_elapsed = 0
 	Timers:CreateTimer(0, function()
 		time_elapsed = time_elapsed + 30 -- with this system, the time_elapsed should be set to the Game Time + 30 sec, e.g: 5 Min = 300sec + 30 = 330
-		if GetMapName() == "x_hero_siege_8_players" and PlayerResource:GetPlayerCount() >= 4 and time_elapsed < 390 then -- Level 1 lower than 6 min
+		if PlayerResource:GetPlayerCount() >= 4 and time_elapsed < 390 then -- Level 1 lower than 6 min
 		local point = Entities:FindByName( nil, "npc_dota_spawner_4"):GetAbsOrigin()
 			for j = 1, 3 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_lifestealers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -361,7 +363,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			local unit = CreateUnitByName("npc_dota_creature_mini_weavers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		return CheckNorthBarracks2() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "x_hero_siege_8_players" and PlayerResource:GetPlayerCount() >= 4 and time_elapsed >= 390 and time_elapsed < 750 then -- Level 2, higher or equal to 6 min
+		elseif PlayerResource:GetPlayerCount() >= 4 and time_elapsed >= 390 and time_elapsed < 750 then -- Level 2, higher or equal to 6 min
 		local point = Entities:FindByName( nil, "npc_dota_spawner_4"):GetAbsOrigin()
 			for j = 1, 4 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_undyings", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -370,7 +372,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			local unit = CreateUnitByName("npc_dota_creature_mini_necrolytes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		return CheckNorthBarracks2() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "x_hero_siege_8_players" and PlayerResource:GetPlayerCount() >= 4 and time_elapsed >= 750 and time_elapsed < 1110 then -- Level 3, higher or equal to 12 min
+		elseif PlayerResource:GetPlayerCount() >= 4 and time_elapsed >= 750 and time_elapsed < 1110 then -- Level 3, higher or equal to 12 min
 			local point = Entities:FindByName( nil, "npc_dota_spawner_4"):GetAbsOrigin()
 			for j = 1, 5 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_nyxes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -380,7 +382,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			end
 		return CheckNorthBarracks2() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "x_hero_siege_8_players" and PlayerResource:GetPlayerCount() >= 4 and time_elapsed >= 1110 and time_elapsed < 1470 then -- Level 4, higher or equal to 18 min
+		elseif PlayerResource:GetPlayerCount() >= 4 and time_elapsed >= 1110 and time_elapsed < 1470 then -- Level 4, higher or equal to 18 min
 			local point = Entities:FindByName( nil, "npc_dota_spawner_4"):GetAbsOrigin()
 			for j = 1, 5 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_dooms", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -390,7 +392,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			end
 		return CheckNorthBarracks2() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "x_hero_siege_8_players" and PlayerResource:GetPlayerCount() >= 4 and time_elapsed >= 1470 then -- Level 5, higher or equal to 24 min
+		elseif PlayerResource:GetPlayerCount() >= 4 and time_elapsed >= 1470 then -- Level 5, higher or equal to 24 min
 			local point = Entities:FindByName( nil, "npc_dota_spawner_4"):GetAbsOrigin()
 			for j = 1, 6 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_lancers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -408,7 +410,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 	local time_elapsed = 0
 	Timers:CreateTimer(0, function()
 		time_elapsed = time_elapsed + 30 -- with this system, the time_elapsed should be set to the Game Time + 30 sec, e.g: 5 Min = 300sec + 30 = 330
-		if GetMapName() == "x_hero_siege_8_players" and PlayerResource:GetPlayerCount() >= 5 and time_elapsed < 390 then -- Level 1 lower than 6 min
+		if PlayerResource:GetPlayerCount() >= 5 and time_elapsed < 390 then -- Level 1 lower than 6 min
 		local point = Entities:FindByName( nil, "npc_dota_spawner_5"):GetAbsOrigin()
 			for j = 1, 3 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_lifestealers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -416,7 +418,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			local unit = CreateUnitByName("npc_dota_creature_mini_weavers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		return CheckEastBarracks1() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "x_hero_siege_8_players" and PlayerResource:GetPlayerCount() >= 5 and time_elapsed >= 390 and time_elapsed < 750 then -- Level 2, higher or equal to 6 min
+		elseif PlayerResource:GetPlayerCount() >= 5 and time_elapsed >= 390 and time_elapsed < 750 then -- Level 2, higher or equal to 6 min
 		local point = Entities:FindByName( nil, "npc_dota_spawner_5"):GetAbsOrigin()
 			for j = 1, 4 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_undyings", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -425,7 +427,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			local unit = CreateUnitByName("npc_dota_creature_mini_necrolytes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		return CheckEastBarracks1() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "x_hero_siege_8_players" and PlayerResource:GetPlayerCount() >= 5 and time_elapsed >= 750 and time_elapsed < 1110 then -- Level 3, higher or equal to 12 min
+		elseif PlayerResource:GetPlayerCount() >= 5 and time_elapsed >= 750 and time_elapsed < 1110 then -- Level 3, higher or equal to 12 min
 			local point = Entities:FindByName( nil, "npc_dota_spawner_5"):GetAbsOrigin()
 			for j = 1, 5 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_nyxes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -435,7 +437,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			end
 		return CheckEastBarracks1() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "x_hero_siege_8_players" and PlayerResource:GetPlayerCount() >= 5 and time_elapsed >= 1110 and time_elapsed < 1470 then -- Level 4, higher or equal to 18 min
+		elseif PlayerResource:GetPlayerCount() >= 5 and time_elapsed >= 1110 and time_elapsed < 1470 then -- Level 4, higher or equal to 18 min
 			local point = Entities:FindByName( nil, "npc_dota_spawner_5"):GetAbsOrigin()
 			for j = 1, 5 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_dooms", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -445,7 +447,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			end
 		return CheckEastBarracks1() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "x_hero_siege_8_players" and PlayerResource:GetPlayerCount() >= 5 and time_elapsed >= 1470 then -- Level 5, higher or equal to 24 min
+		elseif PlayerResource:GetPlayerCount() >= 5 and time_elapsed >= 1470 then -- Level 5, higher or equal to 24 min
 			local point = Entities:FindByName( nil, "npc_dota_spawner_5"):GetAbsOrigin()
 			for j = 1, 6 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_lancers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -463,7 +465,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 	local time_elapsed = 0
 	Timers:CreateTimer(0, function()
 		time_elapsed = time_elapsed + 30 -- with this system, the time_elapsed should be set to the Game Time + 30 sec, e.g: 5 Min = 300sec + 30 = 330
-		if GetMapName() == "x_hero_siege_8_players" and PlayerResource:GetPlayerCount() >= 6 and time_elapsed < 390 then -- Level 1 lower than 6 min
+		if PlayerResource:GetPlayerCount() >= 6 and time_elapsed < 390 then -- Level 1 lower than 6 min
 		local point = Entities:FindByName( nil, "npc_dota_spawner_6"):GetAbsOrigin()
 			for j = 1, 3 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_lifestealers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -471,7 +473,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			local unit = CreateUnitByName("npc_dota_creature_mini_weavers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		return CheckEastBarracks2() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "x_hero_siege_8_players" and PlayerResource:GetPlayerCount() >= 6 and time_elapsed >= 390 and time_elapsed < 750 then -- Level 2, higher or equal to 6 min
+		elseif PlayerResource:GetPlayerCount() >= 6 and time_elapsed >= 390 and time_elapsed < 750 then -- Level 2, higher or equal to 6 min
 		local point = Entities:FindByName( nil, "npc_dota_spawner_6"):GetAbsOrigin()
 			for j = 1, 4 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_undyings", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -480,7 +482,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			local unit = CreateUnitByName("npc_dota_creature_mini_necrolytes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		return CheckEastBarracks2() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "x_hero_siege_8_players" and PlayerResource:GetPlayerCount() >= 6 and time_elapsed >= 750 and time_elapsed < 1110 then -- Level 3, higher or equal to 12 min
+		elseif PlayerResource:GetPlayerCount() >= 6 and time_elapsed >= 750 and time_elapsed < 1110 then -- Level 3, higher or equal to 12 min
 			local point = Entities:FindByName( nil, "npc_dota_spawner_6"):GetAbsOrigin()
 			for j = 1, 5 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_nyxes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -490,7 +492,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			end
 		return CheckEastBarracks2() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "x_hero_siege_8_players" and PlayerResource:GetPlayerCount() >= 6 and time_elapsed >= 1110 and time_elapsed < 1470 then -- Level 4, higher or equal to 18 min
+		elseif PlayerResource:GetPlayerCount() >= 6 and time_elapsed >= 1110 and time_elapsed < 1470 then -- Level 4, higher or equal to 18 min
 			local point = Entities:FindByName( nil, "npc_dota_spawner_6"):GetAbsOrigin()
 			for j = 1, 5 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_dooms", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -500,7 +502,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			end
 		return CheckEastBarracks2() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "x_hero_siege_8_players" and PlayerResource:GetPlayerCount() >= 6 and time_elapsed >= 1470 then -- Level 5, higher or equal to 24 min
+		elseif PlayerResource:GetPlayerCount() >= 6 and time_elapsed >= 1470 then -- Level 5, higher or equal to 24 min
 			local point = Entities:FindByName( nil, "npc_dota_spawner_6"):GetAbsOrigin()
 			for j = 1, 6 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_lancers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -518,7 +520,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 	local time_elapsed = 0
 	Timers:CreateTimer(0, function()
 		time_elapsed = time_elapsed + 30 -- with this system, the time_elapsed should be set to the Game Time + 30 sec, e.g: 5 Min = 300sec + 30 = 330
-		if GetMapName() == "x_hero_siege_8_players" and PlayerResource:GetPlayerCount() >= 7 and time_elapsed < 390 then -- Level 1 lower than 6 min
+		if PlayerResource:GetPlayerCount() >= 7 and time_elapsed < 390 then -- Level 1 lower than 6 min
 		local point = Entities:FindByName( nil, "npc_dota_spawner_7"):GetAbsOrigin()
 			for j = 1, 3 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_lifestealers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -526,7 +528,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			local unit = CreateUnitByName("npc_dota_creature_mini_weavers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		return CheckSouthBarracks1() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "x_hero_siege_8_players" and PlayerResource:GetPlayerCount() >= 7 and time_elapsed >= 390 and time_elapsed < 750 then -- Level 2, higher or equal to 6 min
+		elseif PlayerResource:GetPlayerCount() >= 7 and time_elapsed >= 390 and time_elapsed < 750 then -- Level 2, higher or equal to 6 min
 		local point = Entities:FindByName( nil, "npc_dota_spawner_7"):GetAbsOrigin()
 			for j = 1, 4 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_undyings", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -535,7 +537,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			local unit = CreateUnitByName("npc_dota_creature_mini_necrolytes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		return CheckSouthBarracks1() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "x_hero_siege_8_players" and PlayerResource:GetPlayerCount() >= 7 and time_elapsed >= 750 and time_elapsed < 1110 then -- Level 3, higher or equal to 12 min
+		elseif PlayerResource:GetPlayerCount() >= 7 and time_elapsed >= 750 and time_elapsed < 1110 then -- Level 3, higher or equal to 12 min
 			local point = Entities:FindByName( nil, "npc_dota_spawner_7"):GetAbsOrigin()
 			for j = 1, 5 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_nyxes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -545,7 +547,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			end
 		return CheckSouthBarracks1() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "x_hero_siege_8_players" and PlayerResource:GetPlayerCount() >= 7 and time_elapsed >= 1110 and time_elapsed < 1470 then -- Level 4, higher or equal to 18 min
+		elseif PlayerResource:GetPlayerCount() >= 7 and time_elapsed >= 1110 and time_elapsed < 1470 then -- Level 4, higher or equal to 18 min
 			local point = Entities:FindByName( nil, "npc_dota_spawner_7"):GetAbsOrigin()
 			for j = 1, 5 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_dooms", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -555,7 +557,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			end
 		return CheckSouthBarracks1() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "x_hero_siege_8_players" and PlayerResource:GetPlayerCount() >= 7 and time_elapsed >= 1470 then -- Level 5, higher or equal to 24 min
+		elseif PlayerResource:GetPlayerCount() >= 7 and time_elapsed >= 1470 then -- Level 5, higher or equal to 24 min
 			local point = Entities:FindByName( nil, "npc_dota_spawner_7"):GetAbsOrigin()
 			for j = 1, 6 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_lancers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -573,7 +575,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 	local time_elapsed = 0
 	Timers:CreateTimer(0, function()
 		time_elapsed = time_elapsed + 30 -- with this system, the time_elapsed should be set to the Game Time + 30 sec, e.g: 5 Min = 300sec + 30 = 330
-		if GetMapName() == "x_hero_siege_8_players" and PlayerResource:GetPlayerCount() >= 8 and time_elapsed < 390 then -- Level 1 lower than 6 min
+		if PlayerResource:GetPlayerCount() >= 8 and time_elapsed < 390 then -- Level 1 lower than 6 min
 		local point = Entities:FindByName( nil, "npc_dota_spawner_8"):GetAbsOrigin()
 			for j = 1, 3 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_lifestealers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -581,7 +583,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			local unit = CreateUnitByName("npc_dota_creature_mini_weavers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		return CheckSouthBarracks2() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "x_hero_siege_8_players" and PlayerResource:GetPlayerCount() >= 8 and time_elapsed >= 390 and time_elapsed < 750 then -- Level 2, higher or equal to 6 min
+		elseif PlayerResource:GetPlayerCount() >= 8 and time_elapsed >= 390 and time_elapsed < 750 then -- Level 2, higher or equal to 6 min
 		local point = Entities:FindByName( nil, "npc_dota_spawner_8"):GetAbsOrigin()
 			for j = 1, 4 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_undyings", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -590,7 +592,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			local unit = CreateUnitByName("npc_dota_creature_mini_necrolytes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		return CheckSouthBarracks2() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "x_hero_siege_8_players" and PlayerResource:GetPlayerCount() >= 8 and time_elapsed >= 750 and time_elapsed < 1110 then -- Level 3, higher or equal to 12 min
+		elseif PlayerResource:GetPlayerCount() >= 8 and time_elapsed >= 750 and time_elapsed < 1110 then -- Level 3, higher or equal to 12 min
 			local point = Entities:FindByName( nil, "npc_dota_spawner_8"):GetAbsOrigin()
 			for j = 1, 5 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_nyxes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -600,7 +602,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			end
 		return CheckSouthBarracks2() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "x_hero_siege_8_players" and PlayerResource:GetPlayerCount() >= 8 and time_elapsed >= 1110 and time_elapsed < 1470 then -- Level 4, higher or equal to 18 min
+		elseif PlayerResource:GetPlayerCount() >= 8 and time_elapsed >= 1110 and time_elapsed < 1470 then -- Level 4, higher or equal to 18 min
 			local point = Entities:FindByName( nil, "npc_dota_spawner_8"):GetAbsOrigin()
 			for j = 1, 5 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_dooms", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -610,7 +612,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			end
 		return CheckSouthBarracks2() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "x_hero_siege_8_players" and PlayerResource:GetPlayerCount() >= 8 and time_elapsed >= 1470 then -- Level 5, higher or equal to 24 min
+		elseif PlayerResource:GetPlayerCount() >= 8 and time_elapsed >= 1470 then -- Level 5, higher or equal to 24 min
 			local point = Entities:FindByName( nil, "npc_dota_spawner_8"):GetAbsOrigin()
 			for j = 1, 6 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_lancers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -628,11 +630,15 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 	--//=================================================================================================================
 	--// Timer: Creeps Level 1, 5 West 1
 	--//=================================================================================================================
+	elseif GetMapName() == "hardmode" then -- 4 Players Creep Lanes, Hard Mode
+
 	local time_elapsed = 0
 	Timers:CreateTimer(0, function()
 	time_elapsed = time_elapsed + 30 -- with this system, the time_elapsed should be set to the Game Time + 30 sec, e.g: 5 Min = 300sec + 30 = 330
 	print( time_elapsed )
-		if GetMapName() == "xherosiege_hardmode" and PlayerResource:GetPlayerCount() >= 1 and time_elapsed < 390 then -- Level 1 lower than 6 min
+--	Notifications:TopToAll({text="Creep Lane 1, West 1 spawning in Hard Mode", duration=6.0})
+		if PlayerResource:GetPlayerCount() >= 1 and time_elapsed < 390 then -- Level 1 lower than 6 min
+		print( "Creep Lane 1, West 1 spawning in Hard Mode" )
 		local point = Entities:FindByName( nil, "npc_dota_spawner_1"):GetAbsOrigin()
 			for j = 1, 3 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_lifestealers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -640,7 +646,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			local unit = CreateUnitByName("npc_dota_creature_mini_weavers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		return CheckWestBarracks1() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "xherosiege_hardmode" and PlayerResource:GetPlayerCount() >= 1 and time_elapsed >= 390 and time_elapsed < 750 then -- Level 2, higher or equal to 6 min
+		elseif PlayerResource:GetPlayerCount() >= 1 and time_elapsed >= 390 and time_elapsed < 750 then -- Level 2, higher or equal to 6 min
 		local point = Entities:FindByName( nil, "npc_dota_spawner_1"):GetAbsOrigin()
 			for j = 1, 4 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_undyings", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -649,7 +655,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			local unit = CreateUnitByName("npc_dota_creature_mini_necrolytes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		return CheckWestBarracks1() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "xherosiege_hardmode" and PlayerResource:GetPlayerCount() >= 1 and time_elapsed >= 750 and time_elapsed < 1110 then -- Level 3, higher or equal to 12 min
+		elseif PlayerResource:GetPlayerCount() >= 1 and time_elapsed >= 750 and time_elapsed < 1110 then -- Level 3, higher or equal to 12 min
 		local point = Entities:FindByName( nil, "npc_dota_spawner_1"):GetAbsOrigin()
 			for j = 1, 5 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_nyxes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -659,7 +665,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			end
 		return CheckWestBarracks1() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "xherosiege_hardmode" and PlayerResource:GetPlayerCount() >= 1 and time_elapsed >= 1110 and time_elapsed < 1470 then -- Level 4, higher or equal to 18 min
+		elseif PlayerResource:GetPlayerCount() >= 1 and time_elapsed >= 1110 and time_elapsed < 1470 then -- Level 4, higher or equal to 18 min
 		local point = Entities:FindByName( nil, "npc_dota_spawner_1"):GetAbsOrigin()
 			for j = 1, 5 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_dooms", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -669,7 +675,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			end
 		return CheckWestBarracks1() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "xherosiege_hardmode" and PlayerResource:GetPlayerCount() >= 1 and time_elapsed >= 1470 then -- Level 4, higher or equal to 18 min
+		elseif PlayerResource:GetPlayerCount() >= 1 and time_elapsed >= 1470 then -- Level 4, higher or equal to 18 min
 		local point = Entities:FindByName( nil, "npc_dota_spawner_1"):GetAbsOrigin()
 			for j = 1, 6 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_lancers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -687,7 +693,8 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 	local time_elapsed = 0
 	local TimerWest2 = Timers:CreateTimer(0, function()
 		time_elapsed = time_elapsed + 30 -- with this system, the time_elapsed should be set to the Game Time + 30 sec, e.g: 5 Min = 300sec + 30 = 330
-		if GetMapName() == "xherosiege_hardmode" and PlayerResource:GetPlayerCount() >= 1 and time_elapsed < 390 then -- Level 1 lower than 6 min
+		if PlayerResource:GetPlayerCount() >= 1 and time_elapsed < 390 then -- Level 1 lower than 6 min
+		print( "Creep Lane 1, West 2 spawning in Hard Mode" )
 		local point = Entities:FindByName( nil, "npc_dota_spawner_2"):GetAbsOrigin()
 			for j = 1, 3 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_lifestealers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -695,7 +702,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			local unit = CreateUnitByName("npc_dota_creature_mini_weavers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		return CheckWestBarracks2() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "xherosiege_hardmode" and PlayerResource:GetPlayerCount() >= 1 and time_elapsed >= 390 and time_elapsed < 750 then -- Level 2, higher or equal to 6 min
+		elseif PlayerResource:GetPlayerCount() >= 1 and time_elapsed >= 390 and time_elapsed < 750 then -- Level 2, higher or equal to 6 min
 		local point = Entities:FindByName( nil, "npc_dota_spawner_2"):GetAbsOrigin()
 			for j = 1, 4 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_undyings", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -704,7 +711,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			local unit = CreateUnitByName("npc_dota_creature_mini_necrolytes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		return CheckWestBarracks2() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "xherosiege_hardmode" and PlayerResource:GetPlayerCount() >= 1 and time_elapsed >= 750 and time_elapsed < 1110 then -- Level 3, higher or equal to 12 min
+		elseif PlayerResource:GetPlayerCount() >= 1 and time_elapsed >= 750 and time_elapsed < 1110 then -- Level 3, higher or equal to 12 min
 			local point = Entities:FindByName( nil, "npc_dota_spawner_2"):GetAbsOrigin()
 			for j = 1, 5 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_nyxes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -714,7 +721,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			end
 		return CheckWestBarracks2() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "xherosiege_hardmode" and PlayerResource:GetPlayerCount() >= 1 and time_elapsed >= 1110 and time_elapsed < 1470 then -- Level 4, higher or equal to 18 min
+		elseif PlayerResource:GetPlayerCount() >= 1 and time_elapsed >= 1110 and time_elapsed < 1470 then -- Level 4, higher or equal to 18 min
 			local point = Entities:FindByName( nil, "npc_dota_spawner_2"):GetAbsOrigin()
 			for j = 1, 5 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_dooms", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -724,7 +731,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			end
 		return CheckWestBarracks2() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "xherosiege_hardmode" and PlayerResource:GetPlayerCount() >= 1 and time_elapsed >= 1470 then -- Level 5, higher or equal to 24 min
+		elseif PlayerResource:GetPlayerCount() >= 1 and time_elapsed >= 1470 then -- Level 5, higher or equal to 24 min
 			local point = Entities:FindByName( nil, "npc_dota_spawner_2"):GetAbsOrigin()
 			for j = 1, 6 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_lancers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -742,7 +749,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 	local time_elapsed = 0
 	Timers:CreateTimer(0, function()
 		time_elapsed = time_elapsed + 30 -- with this system, the time_elapsed should be set to the Game Time + 30 sec, e.g: 5 Min = 300sec + 30 = 330
-		if GetMapName() == "xherosiege_hardmode" and PlayerResource:GetPlayerCount() >= 2 and time_elapsed < 390 then -- Level 1 lower than 6 min
+		if PlayerResource:GetPlayerCount() >= 2 and time_elapsed < 390 then -- Level 1 lower than 6 min
 		local point = Entities:FindByName( nil, "npc_dota_spawner_3"):GetAbsOrigin()
 			for j = 1, 3 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_lifestealers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -750,7 +757,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			local unit = CreateUnitByName("npc_dota_creature_mini_weavers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		return CheckNorthBarracks1() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "xherosiege_hardmode" and PlayerResource:GetPlayerCount() >= 2 and time_elapsed >= 390 and time_elapsed < 750 then -- Level 2, higher or equal to 6 min
+		elseif PlayerResource:GetPlayerCount() >= 2 and time_elapsed >= 390 and time_elapsed < 750 then -- Level 2, higher or equal to 6 min
 		local point = Entities:FindByName( nil, "npc_dota_spawner_3"):GetAbsOrigin()
 			for j = 1, 4 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_undyings", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -759,7 +766,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			local unit = CreateUnitByName("npc_dota_creature_mini_necrolytes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		return CheckNorthBarracks1() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "xherosiege_hardmode" and PlayerResource:GetPlayerCount() >= 2 and time_elapsed >= 750 and time_elapsed < 1110 then -- Level 3, higher or equal to 12 min
+		elseif PlayerResource:GetPlayerCount() >= 2 and time_elapsed >= 750 and time_elapsed < 1110 then -- Level 3, higher or equal to 12 min
 			local point = Entities:FindByName( nil, "npc_dota_spawner_3"):GetAbsOrigin()
 			for j = 1, 5 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_nyxes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -769,7 +776,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			end
 		return CheckNorthBarracks1() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "xherosiege_hardmode" and PlayerResource:GetPlayerCount() >= 2 and time_elapsed >= 1110 and time_elapsed < 1470 then -- Level 4, higher or equal to 18 min
+		elseif PlayerResource:GetPlayerCount() >= 2 and time_elapsed >= 1110 and time_elapsed < 1470 then -- Level 4, higher or equal to 18 min
 			local point = Entities:FindByName( nil, "npc_dota_spawner_3"):GetAbsOrigin()
 			for j = 1, 5 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_dooms", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -779,7 +786,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			end
 		return CheckNorthBarracks1() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "xherosiege_hardmode" and PlayerResource:GetPlayerCount() >= 2 and time_elapsed >= 1470 then -- Level 5, higher or equal to 24 min
+		elseif PlayerResource:GetPlayerCount() >= 2 and time_elapsed >= 1470 then -- Level 5, higher or equal to 24 min
 			local point = Entities:FindByName( nil, "npc_dota_spawner_3"):GetAbsOrigin()
 			for j = 1, 6 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_lancers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -797,7 +804,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 	local time_elapsed = 0
 	Timers:CreateTimer(0, function()
 		time_elapsed = time_elapsed + 30 -- with this system, the time_elapsed should be set to the Game Time + 30 sec, e.g: 5 Min = 300sec + 30 = 330
-		if GetMapName() == "xherosiege_hardmode" and PlayerResource:GetPlayerCount() >= 2 and time_elapsed < 390 then -- Level 1 lower than 6 min
+		if PlayerResource:GetPlayerCount() >= 2 and time_elapsed < 390 then -- Level 1 lower than 6 min
 		local point = Entities:FindByName( nil, "npc_dota_spawner_4"):GetAbsOrigin()
 			for j = 1, 3 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_lifestealers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -805,7 +812,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			local unit = CreateUnitByName("npc_dota_creature_mini_weavers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		return CheckNorthBarracks2() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "xherosiege_hardmode" and PlayerResource:GetPlayerCount() >= 2 and time_elapsed >= 390 and time_elapsed < 750 then -- Level 2, higher or equal to 6 min
+		elseif PlayerResource:GetPlayerCount() >= 2 and time_elapsed >= 390 and time_elapsed < 750 then -- Level 2, higher or equal to 6 min
 		local point = Entities:FindByName( nil, "npc_dota_spawner_4"):GetAbsOrigin()
 			for j = 1, 4 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_undyings", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -814,7 +821,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			local unit = CreateUnitByName("npc_dota_creature_mini_necrolytes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		return CheckNorthBarracks2() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "xherosiege_hardmode" and PlayerResource:GetPlayerCount() >= 2 and time_elapsed >= 750 and time_elapsed < 1110 then -- Level 3, higher or equal to 12 min
+		elseif PlayerResource:GetPlayerCount() >= 2 and time_elapsed >= 750 and time_elapsed < 1110 then -- Level 3, higher or equal to 12 min
 			local point = Entities:FindByName( nil, "npc_dota_spawner_4"):GetAbsOrigin()
 			for j = 1, 5 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_nyxes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -824,7 +831,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			end
 		return CheckNorthBarracks2() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "xherosiege_hardmode" and PlayerResource:GetPlayerCount() >= 2 and time_elapsed >= 1110 and time_elapsed < 1470 then -- Level 4, higher or equal to 18 min
+		elseif PlayerResource:GetPlayerCount() >= 2 and time_elapsed >= 1110 and time_elapsed < 1470 then -- Level 4, higher or equal to 18 min
 			local point = Entities:FindByName( nil, "npc_dota_spawner_4"):GetAbsOrigin()
 			for j = 1, 5 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_dooms", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -834,7 +841,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			end
 		return CheckNorthBarracks2() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "xherosiege_hardmode" and PlayerResource:GetPlayerCount() >= 2 and time_elapsed >= 1470 then -- Level 5, higher or equal to 24 min
+		elseif PlayerResource:GetPlayerCount() >= 2 and time_elapsed >= 1470 then -- Level 5, higher or equal to 24 min
 			local point = Entities:FindByName( nil, "npc_dota_spawner_4"):GetAbsOrigin()
 			for j = 1, 6 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_lancers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -852,7 +859,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 	local time_elapsed = 0
 	Timers:CreateTimer(0, function()
 		time_elapsed = time_elapsed + 30 -- with this system, the time_elapsed should be set to the Game Time + 30 sec, e.g: 5 Min = 300sec + 30 = 330
-		if GetMapName() == "xherosiege_hardmode" and PlayerResource:GetPlayerCount() >= 3 and time_elapsed < 390 then -- Level 1 lower than 6 min
+		if PlayerResource:GetPlayerCount() >= 3 and time_elapsed < 390 then -- Level 1 lower than 6 min
 		local point = Entities:FindByName( nil, "npc_dota_spawner_5"):GetAbsOrigin()
 			for j = 1, 3 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_lifestealers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -860,7 +867,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			local unit = CreateUnitByName("npc_dota_creature_mini_weavers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		return CheckEastBarracks1() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "xherosiege_hardmode" and PlayerResource:GetPlayerCount() >= 3 and time_elapsed >= 390 and time_elapsed < 750 then -- Level 2, higher or equal to 6 min
+		elseif PlayerResource:GetPlayerCount() >= 3 and time_elapsed >= 390 and time_elapsed < 750 then -- Level 2, higher or equal to 6 min
 		local point = Entities:FindByName( nil, "npc_dota_spawner_5"):GetAbsOrigin()
 			for j = 1, 4 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_undyings", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -869,7 +876,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			local unit = CreateUnitByName("npc_dota_creature_mini_necrolytes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		return CheckEastBarracks1() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "xherosiege_hardmode" and PlayerResource:GetPlayerCount() >= 3 and time_elapsed >= 750 and time_elapsed < 1110 then -- Level 3, higher or equal to 12 min
+		elseif PlayerResource:GetPlayerCount() >= 3 and time_elapsed >= 750 and time_elapsed < 1110 then -- Level 3, higher or equal to 12 min
 			local point = Entities:FindByName( nil, "npc_dota_spawner_5"):GetAbsOrigin()
 			for j = 1, 5 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_nyxes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -879,7 +886,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			end
 		return CheckEastBarracks1() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "xherosiege_hardmode" and PlayerResource:GetPlayerCount() >= 3 and time_elapsed >= 1110 and time_elapsed < 1470 then -- Level 4, higher or equal to 18 min
+		elseif PlayerResource:GetPlayerCount() >= 3 and time_elapsed >= 1110 and time_elapsed < 1470 then -- Level 4, higher or equal to 18 min
 			local point = Entities:FindByName( nil, "npc_dota_spawner_5"):GetAbsOrigin()
 			for j = 1, 5 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_dooms", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -889,7 +896,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			end
 		return CheckEastBarracks1() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "xherosiege_hardmode" and PlayerResource:GetPlayerCount() >= 3 and time_elapsed >= 1470 then -- Level 5, higher or equal to 24 min
+		elseif PlayerResource:GetPlayerCount() >= 3 and time_elapsed >= 1470 then -- Level 5, higher or equal to 24 min
 			local point = Entities:FindByName( nil, "npc_dota_spawner_5"):GetAbsOrigin()
 			for j = 1, 6 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_lancers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -907,7 +914,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 	local time_elapsed = 0
 	Timers:CreateTimer(0, function()
 		time_elapsed = time_elapsed + 30 -- with this system, the time_elapsed should be set to the Game Time + 30 sec, e.g: 5 Min = 300sec + 30 = 330
-		if GetMapName() == "xherosiege_hardmode" and PlayerResource:GetPlayerCount() >= 3 and time_elapsed < 390 then -- Level 1 lower than 6 min
+		if PlayerResource:GetPlayerCount() >= 3 and time_elapsed < 390 then -- Level 1 lower than 6 min
 		local point = Entities:FindByName( nil, "npc_dota_spawner_6"):GetAbsOrigin()
 			for j = 1, 3 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_lifestealers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -915,7 +922,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			local unit = CreateUnitByName("npc_dota_creature_mini_weavers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		return CheckEastBarracks2() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "xherosiege_hardmode" and PlayerResource:GetPlayerCount() >= 3 and time_elapsed >= 390 and time_elapsed < 750 then -- Level 2, higher or equal to 6 min
+		elseif PlayerResource:GetPlayerCount() >= 3 and time_elapsed >= 390 and time_elapsed < 750 then -- Level 2, higher or equal to 6 min
 		local point = Entities:FindByName( nil, "npc_dota_spawner_6"):GetAbsOrigin()
 			for j = 1, 4 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_undyings", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -924,7 +931,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			local unit = CreateUnitByName("npc_dota_creature_mini_necrolytes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		return CheckEastBarracks2() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "xherosiege_hardmode" and PlayerResource:GetPlayerCount() >= 3 and time_elapsed >= 750 and time_elapsed < 1110 then -- Level 3, higher or equal to 12 min
+		elseif PlayerResource:GetPlayerCount() >= 3 and time_elapsed >= 750 and time_elapsed < 1110 then -- Level 3, higher or equal to 12 min
 			local point = Entities:FindByName( nil, "npc_dota_spawner_6"):GetAbsOrigin()
 			for j = 1, 5 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_nyxes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -934,7 +941,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			end
 		return CheckEastBarracks2() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "xherosiege_hardmode" and PlayerResource:GetPlayerCount() >= 3 and time_elapsed >= 1110 and time_elapsed < 1470 then -- Level 4, higher or equal to 18 min
+		elseif PlayerResource:GetPlayerCount() >= 3 and time_elapsed >= 1110 and time_elapsed < 1470 then -- Level 4, higher or equal to 18 min
 			local point = Entities:FindByName( nil, "npc_dota_spawner_6"):GetAbsOrigin()
 			for j = 1, 5 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_dooms", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -944,7 +951,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			end
 		return CheckEastBarracks2() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "xherosiege_hardmode" and PlayerResource:GetPlayerCount() >= 3 and time_elapsed >= 1470 then -- Level 5, higher or equal to 24 min
+		elseif PlayerResource:GetPlayerCount() >= 3 and time_elapsed >= 1470 then -- Level 5, higher or equal to 24 min
 			local point = Entities:FindByName( nil, "npc_dota_spawner_6"):GetAbsOrigin()
 			for j = 1, 6 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_lancers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -962,7 +969,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 	local time_elapsed = 0
 	Timers:CreateTimer(0, function()
 		time_elapsed = time_elapsed + 30 -- with this system, the time_elapsed should be set to the Game Time + 30 sec, e.g: 5 Min = 300sec + 30 = 330
-		if GetMapName() == "xherosiege_hardmode" and PlayerResource:GetPlayerCount() >= 4 and time_elapsed < 390 then -- Level 1 lower than 6 min
+		if PlayerResource:GetPlayerCount() >= 4 and time_elapsed < 390 then -- Level 1 lower than 6 min
 		local point = Entities:FindByName( nil, "npc_dota_spawner_7"):GetAbsOrigin()
 			for j = 1, 3 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_lifestealers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -970,7 +977,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			local unit = CreateUnitByName("npc_dota_creature_mini_weavers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		return CheckSouthBarracks1() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "xherosiege_hardmode" and PlayerResource:GetPlayerCount() >= 4 and time_elapsed >= 390 and time_elapsed < 750 then -- Level 2, higher or equal to 6 min
+		elseif PlayerResource:GetPlayerCount() >= 4 and time_elapsed >= 390 and time_elapsed < 750 then -- Level 2, higher or equal to 6 min
 		local point = Entities:FindByName( nil, "npc_dota_spawner_7"):GetAbsOrigin()
 			for j = 1, 4 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_undyings", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -979,7 +986,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			local unit = CreateUnitByName("npc_dota_creature_mini_necrolytes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		return CheckSouthBarracks1() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "xherosiege_hardmode" and PlayerResource:GetPlayerCount() >= 4 and time_elapsed >= 750 and time_elapsed < 1110 then -- Level 3, higher or equal to 12 min
+		elseif PlayerResource:GetPlayerCount() >= 4 and time_elapsed >= 750 and time_elapsed < 1110 then -- Level 3, higher or equal to 12 min
 			local point = Entities:FindByName( nil, "npc_dota_spawner_7"):GetAbsOrigin()
 			for j = 1, 5 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_nyxes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -989,7 +996,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			end
 		return CheckSouthBarracks1() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "xherosiege_hardmode" and PlayerResource:GetPlayerCount() >= 4 and time_elapsed >= 1110 and time_elapsed < 1470 then -- Level 4, higher or equal to 18 min
+		elseif PlayerResource:GetPlayerCount() >= 4 and time_elapsed >= 1110 and time_elapsed < 1470 then -- Level 4, higher or equal to 18 min
 			local point = Entities:FindByName( nil, "npc_dota_spawner_7"):GetAbsOrigin()
 			for j = 1, 5 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_dooms", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -999,7 +1006,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			end
 		return CheckSouthBarracks1() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "xherosiege_hardmode" and PlayerResource:GetPlayerCount() >= 4 and time_elapsed >= 1470 then -- Level 5, higher or equal to 24 min
+		elseif PlayerResource:GetPlayerCount() >= 4 and time_elapsed >= 1470 then -- Level 5, higher or equal to 24 min
 			local point = Entities:FindByName( nil, "npc_dota_spawner_7"):GetAbsOrigin()
 			for j = 1, 6 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_lancers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -1017,7 +1024,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 	local time_elapsed = 0
 	Timers:CreateTimer(0, function()
 		time_elapsed = time_elapsed + 30 -- with this system, the time_elapsed should be set to the Game Time + 30 sec, e.g: 5 Min = 300sec + 30 = 330
-		if GetMapName() == "xherosiege_hardmode" and PlayerResource:GetPlayerCount() >= 4 and time_elapsed < 390 then -- Level 1 lower than 6 min
+		if PlayerResource:GetPlayerCount() >= 4 and time_elapsed < 390 then -- Level 1 lower than 6 min
 		local point = Entities:FindByName( nil, "npc_dota_spawner_8"):GetAbsOrigin()
 			for j = 1, 3 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_lifestealers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -1025,7 +1032,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			local unit = CreateUnitByName("npc_dota_creature_mini_weavers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		return CheckSouthBarracks2() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "xherosiege_hardmode" and PlayerResource:GetPlayerCount() >= 4 and time_elapsed >= 390 and time_elapsed < 750 then -- Level 2, higher or equal to 6 min
+		elseif PlayerResource:GetPlayerCount() >= 4 and time_elapsed >= 390 and time_elapsed < 750 then -- Level 2, higher or equal to 6 min
 		local point = Entities:FindByName( nil, "npc_dota_spawner_8"):GetAbsOrigin()
 			for j = 1, 4 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_undyings", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -1034,7 +1041,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			local unit = CreateUnitByName("npc_dota_creature_mini_necrolytes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		return CheckSouthBarracks2() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "xherosiege_hardmode" and PlayerResource:GetPlayerCount() >= 4 and time_elapsed >= 750 and time_elapsed < 1110 then -- Level 3, higher or equal to 12 min
+		elseif PlayerResource:GetPlayerCount() >= 4 and time_elapsed >= 750 and time_elapsed < 1110 then -- Level 3, higher or equal to 12 min
 			local point = Entities:FindByName( nil, "npc_dota_spawner_8"):GetAbsOrigin()
 			for j = 1, 5 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_nyxes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -1044,7 +1051,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			end
 		return CheckSouthBarracks2() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "xherosiege_hardmode" and PlayerResource:GetPlayerCount() >= 4 and time_elapsed >= 1110 and time_elapsed < 1470 then -- Level 4, higher or equal to 18 min
+		elseif PlayerResource:GetPlayerCount() >= 4 and time_elapsed >= 1110 and time_elapsed < 1470 then -- Level 4, higher or equal to 18 min
 			local point = Entities:FindByName( nil, "npc_dota_spawner_8"):GetAbsOrigin()
 			for j = 1, 5 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_dooms", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -1054,7 +1061,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			end
 		return CheckSouthBarracks2() -- Rerun this timer every 30 game-time seconds
 
-		elseif GetMapName() == "xherosiege_hardmode" and PlayerResource:GetPlayerCount() >= 4 and time_elapsed >= 1470 then -- Level 5, higher or equal to 24 min
+		elseif PlayerResource:GetPlayerCount() >= 4 and time_elapsed >= 1470 then -- Level 5, higher or equal to 24 min
 			local point = Entities:FindByName( nil, "npc_dota_spawner_8"):GetAbsOrigin()
 			for j = 1, 6 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_lancers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -1065,6 +1072,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 		return CheckSouthBarracks2() -- Rerun this timer every 30 game-time seconds
 		end
 	end)
+	end -- end of if Map == Normal or Hard
 
 	--//=================================================================================================================
 	--// Timer: West Event 1 Spawn
@@ -1102,11 +1110,11 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 	--//=================================================================================================================
 	--// Timer: South Event 4 Spawn
 	--//=================================================================================================================
-	Timers:CreateTimer(1200, function() -- 20 Min: ENIGMA SOUTH EVENT 4
+	Timers:CreateTimer(1200, function() -- 20 Min: CAPTAIN SOUTH EVENT 4
 	local point = Entities:FindByName( nil, "npc_dota_spawner_south_event"):GetAbsOrigin()
 
 	for j = 1, 8 do
-		local unit = CreateUnitByName("npc_dota_creature_enigma_event_4", point, true, nil, nil, DOTA_TEAM_BADGUYS)
+		local unit = CreateUnitByName("npc_dota_creature_captain_event_4", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 	end
 	end)
 end

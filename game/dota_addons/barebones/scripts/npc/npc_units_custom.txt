@@ -13,20 +13,19 @@
 		"SoundSet" "Creep_Good_Range" // Name of sound set.
 		"Level" "0"
 		"UnitLabel" "healing_ward"
+
 		// Abilities
 		//----------------------------------------------------------------
 		"Ability1" "" // Ability 1.
 		"Ability2" "" // Ability 2.
 		"Ability3" "" // Ability 3.
 		"Ability4" "" // Ability 4.
-		"Ability5" "" // Ability 5.
-		"Ability6" "" // Ability 6 - Extra.
-		"Ability7" "" // Ability 7 - Extra.
-		"Ability8" "" // Ability 8 - Extra.
+
 		// Armor
 		//----------------------------------------------------------------
 		"ArmorPhysical" "0" // Physical protection.
 		"MagicalResistance" "0" // Magical protection.
+
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities" "DOTA_UNIT_CAP_NO_ATTACK" // Type of attack - melee, ranged, etc.
@@ -39,6 +38,7 @@
 		"AttackRange" "500" // Range within a target can be attacked.
 		"ProjectileModel" "" // Particle system model for projectile.
 		"ProjectileSpeed" "900" // Speed of projectile.
+
 		// Attributes
 		//----------------------------------------------------------------
 		"AttributePrimary" "DOTA_ATTRIBUTE_STRENGTH"
@@ -48,36 +48,43 @@
 		"AttributeIntelligenceGain" "0" // Intelligence bonus per level.
 		"AttributeBaseAgility" "0" // Base agility
 		"AttributeAgilityGain" "0" // Agility bonus per level.
+
 		// Bounty
 		//----------------------------------------------------------------
 		"BountyXP" "0" // Experience earn.
 		"BountyGoldMin" "0" // Gold earned min.
 		"BountyGoldMax" "0" // Gold earned max.
+
 		// Bounds
 		//----------------------------------------------------------------
 		"BoundsHullName" "DOTA_HULL_SIZE_SMALL" // Hull type used for navigation/locomotion.
+
 		// Movement
 		//----------------------------------------------------------------
 		"MovementCapabilities" "DOTA_UNIT_CAP_MOVE_GROUND" // Type of locomotion - ground, air
 		"MovementSpeed" "450" // Speed
 		"MovementTurnRate" "10" // Turning rate.
 		"FollowRange" "250" // Distance to keep when following
+
 		// Status
 		//----------------------------------------------------------------
 		"StatusHealth" "1" // Base health.
 		"StatusHealthRegen" "0" // Health regeneration rate.
 		"StatusMana" "0" // Base mana.
 		"StatusManaRegen" "0" // Mana regeneration rate.
+
 		// Team
 		//----------------------------------------------------------------
 		"TeamName" "DOTA_TEAM_GOODGUYS" // Team name.
 		"CombatClassAttack" "DOTA_COMBAT_CLASS_ATTACK_PIERCE"
 		"CombatClassDefend" "DOTA_COMBAT_CLASS_DEFEND_SOFT"
 		"UnitRelationshipClass" "DOTA_NPC_UNIT_RELATIONSHIP_TYPE_WARD"
+
 		// Vision
 		//----------------------------------------------------------------
 		"VisionDaytimeRange" "0" // Range of vision during day light.
 		"VisionNighttimeRange" "0" // Range of vision at night time.
+
 		// Bots
 		//----------------------------------------------------------------
 		"AttackDesire" "1.5" // How much bots want to attack them vs other non-hero things
@@ -120,10 +127,6 @@
 		"Ability2"					""			// Ability 2.
 		"Ability3"					""			// Ability 3.
 		"Ability4"					""			// Ability 4.
-		"Ability5"					""			// Ability 5.
-		"Ability6"					""			// Ability 6 - Extra.
-		"Ability7"					""			// Ability 7 - Extra.
-		"Ability8"					""			// Ability 8 - Extra.
 
 		// Armor
 		//----------------------------------------------------------------
@@ -201,10 +204,6 @@
 		"Ability2"					""			// Ability 2.
 		"Ability3"					""			// Ability 3.
 		"Ability4"					""			// Ability 4.
-		"Ability5"					""			// Ability 5.
-		"Ability6"					""			// Ability 6 - Extra.
-		"Ability7"					""			// Ability 7 - Extra.
-		"Ability8"					""			// Ability 8 - Extra.
 
 		// Armor
 		//----------------------------------------------------------------
@@ -295,10 +294,6 @@
 		"Ability2"					""	// Ability 2.
 		"Ability3"					""	// Ability 3.
 		"Ability4"					""	// Ability 4.
-		"Ability5"					""	// Ability 5.
-		"Ability6"					""	// Ability 6 - Extra.
-		"Ability7"					""	// Ability 7 - Extra.
-		"Ability8"					""	// Ability 8 - Extra.
 
 		// Armor
 		//----------------------------------------------------------------
@@ -1131,7 +1126,7 @@
 	"npc_dota_frozen_throne"
 	{
 		// General
-
+		//---------------------------------------------------------------
 		"BaseClass"					"npc_dota_building"		// Class of entity of link to.
 		"Model"						"models/props_structures/kings_chair.vmdl"			// Model.
 		"MinimapIcon"				"minimap_tower90"
@@ -1565,7 +1560,7 @@
 		// Abilities
 		//----------------------------------------------------------------
 		
-		"Ability1"					""		// Ability 1.
+		"Ability1"					"life_stealer_feast"		// Ability 1.
 		"Ability2"					""		// Ability 2.
 		"Ability3"					""		// Ability 3.
 		"Ability4"					""		// Ability 4.
@@ -1579,8 +1574,8 @@
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
-		"AttackDamageMin"			"19"						// Damage range min.
-		"AttackDamageMax"			"24"						// Damage range max.
+		"AttackDamageMin"			"14"						// Damage range min.
+		"AttackDamageMax"			"19"						// Damage range max.
 		"AttackRate"				"1.45"						// Speed of attack.
 		"AttackAnimationPoint"		"0.39"						// Normalized time in animation cycle to attack.
 		"AttackAcquisitionRange"	"1000"						// Range within a target can be acquired.
@@ -1591,8 +1586,8 @@
 		// Bounty
 		//----------------------------------------------------------------
 		"BountyXP"					"43"		// Experience earn.
-		"BountyGoldMin"				"65"		// Gold earned min.
-		"BountyGoldMax"				"80"		// Gold earned max.
+		"BountyGoldMin"				"85"		// Gold earned min.
+		"BountyGoldMax"				"95"		// Gold earned max.
 
 		// Bounds
 		//----------------------------------------------------------------
@@ -1629,39 +1624,6 @@
 		"VisionNighttimeRange"		"800"		// Range of vision at night time.
 
 		"vscripts"					"ai/creeps_ai.lua"
-
-//		"Creature"
-//		{
-//			"CanRespawn"					"0"
-
-//			"AttachWearables"
-//			{
-//				"Wearable1"
-//				{
-//					"ItemDef"			"7416" //Head - Wurmblood Set
-//				}
-//				"Wearable2"
-//				{
-//					"ItemDef"			"7417" //Shoulder
-//				}
-//				"Wearable3"
-//				{
-//					"ItemDef"			"7418" //Arms
-//				}
-//				"Wearable4"
-//				{
-//					"ItemDef"			"7419" //Back
-//				}
-//				"Wearable5"
-//				{
-//					"ItemDef"			"7420" //Offhand Weapon
-//				}
-//				"Wearable6"
-//				{
-//					"ItemDef"			"7421" //Weapon
-//				}
-//			}
-//		}
 	}
 
 	//=================================================================================
@@ -1679,7 +1641,7 @@
 		// Abilities
 		//----------------------------------------------------------------
 		
-		"Ability1"					""		// Ability 1.
+		"Ability1"					"weaver_geminate_attack"		// Ability 1.
 		"Ability2"					""		// Ability 2.
 		"Ability3"					""		// Ability 3.
 		"Ability4"					""		// Ability 4.
@@ -1693,8 +1655,8 @@
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
-		"AttackDamageMin"			"21"						// Damage range min.
-		"AttackDamageMax"			"26"						// Damage range max.
+		"AttackDamageMin"			"16"						// Damage range min.
+		"AttackDamageMax"			"21"						// Damage range max.
 		"AttackRate"				"1.45"						// Speed of attack.
 		"AttackAnimationPoint"		"0.64"						// Normalized time in animation cycle to attack.
 		"AttackAcquisitionRange"	"1000"						// Range within a target can be acquired.
@@ -1705,8 +1667,8 @@
 		// Bounty
 		//----------------------------------------------------------------
 		"BountyXP"					"35"		// Experience earn.
-		"BountyGoldMin"				"55"		// Gold earned min.
-		"BountyGoldMax"				"70"		// Gold earned max.
+		"BountyGoldMin"				"70"		// Gold earned min.
+		"BountyGoldMax"				"80"		// Gold earned max.
 
 		// Bounds
 		//----------------------------------------------------------------
@@ -1786,8 +1748,7 @@
 
 		// Abilities
 		//----------------------------------------------------------------
-		
-		"Ability1"					""		// Ability 1.
+		"Ability1"					"holdout_aura_of_blight"		// Ability 1.
 		"Ability2"					""		// Ability 2.
 		"Ability3"					""		// Ability 3.
 		"Ability4"					""		// Ability 4.
@@ -1813,8 +1774,8 @@
 		// Bounty
 		//----------------------------------------------------------------
 		"BountyXP"					"53"		// Experience earn.
-		"BountyGoldMin"				"100"		// Gold earned min.
-		"BountyGoldMax"				"115"		// Gold earned max.
+		"BountyGoldMin"				"135"		// Gold earned min.
+		"BountyGoldMax"				"145"		// Gold earned max.
 
 		// Bounds
 		//----------------------------------------------------------------
@@ -1891,7 +1852,7 @@
 		// Abilities
 		//----------------------------------------------------------------
 		
-		"Ability1"					""		// Ability 1.
+		"Ability1"					"necrolyte_heartstopper_aura"		// Ability 1.
 		"Ability2"					""		// Ability 2.
 		"Ability3"					""		// Ability 3.
 		"Ability4"					""		// Ability 4.
@@ -1916,8 +1877,8 @@
 		// Bounty
 		//----------------------------------------------------------------
 		"BountyXP"					"40"		// Experience earn.
-		"BountyGoldMin"				"90"		// Gold earned min.
-		"BountyGoldMax"				"105"		// Gold earned max.
+		"BountyGoldMin"				"120"		// Gold earned min.
+		"BountyGoldMax"				"130"		// Gold earned max.
 
 		// Bounds
 		//----------------------------------------------------------------
@@ -1928,7 +1889,7 @@
 		// Movement
 		//----------------------------------------------------------------
 		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"			// Type of locomotion - ground, air
-		"MovementSpeed"				"335"		// Speed
+		"MovementSpeed"				"345"		// Speed
 		"MovementTurnRate"			"0.5"		// Turning rate.
 		
 		"GameSoundsFile"			"soundevents/game_sounds_heroes/game_sounds_necrolyte.vsndevts"
@@ -1997,8 +1958,8 @@
 
 		// Abilities
 		//----------------------------------------------------------------
-		
-		"Ability1"					""		// Ability 1.
+
+		"Ability1"					"antimage_mana_break"		// Ability 1.
 		"Ability2"					""		// Ability 2.
 		"Ability3"					""		// Ability 3.
 		"Ability4"					""		// Ability 4.
@@ -2006,7 +1967,7 @@
 
 		// Armor
 		//----------------------------------------------------------------
-		"ArmorPhysical"				"15"	// Physical protection.
+		"ArmorPhysical"				"20"	// Physical protection.
 		"MagicalResistance"			"25"	// Magical protection.
 
 		// Attack
@@ -2024,8 +1985,8 @@
 		// Bounty
 		//----------------------------------------------------------------
 		"BountyXP"					"71"		// Experience earn.
-		"BountyGoldMin"				"135"		// Gold earned min.
-		"BountyGoldMax"				"150"		// Gold earned max.
+		"BountyGoldMin"				"170"		// Gold earned min.
+		"BountyGoldMax"				"180"		// Gold earned max.
 
 		// Bounds
 		//----------------------------------------------------------------
@@ -2106,7 +2067,7 @@
 		// Abilities
 		//----------------------------------------------------------------
 
-		"Ability1"					""		// Ability 1.
+		"Ability1"					"nevermore_dark_lord"		// Ability 1.
 		"Ability2"					""		// Ability 2.
 		"Ability3"					""		// Ability 3.
 		"Ability4"					""		// Ability 4.
@@ -2114,7 +2075,7 @@
 
 		// Armor
 		//----------------------------------------------------------------
-		"ArmorPhysical"				"15"	// Physical protection.
+		"ArmorPhysical"				"20"	// Physical protection.
 		"MagicalResistance"			"25"	// Magical protection.
 
 		// Attack
@@ -2131,9 +2092,9 @@
 
 		// Bounty
 		//----------------------------------------------------------------
-		"BountyXP"					"65"		// Experience earn.
-		"BountyGoldMin"				"125"		// Gold earned min.
-		"BountyGoldMax"				"140"		// Gold earned max.
+		"BountyXP"					"68"		// Experience earn.
+		"BountyGoldMin"				"145"		// Gold earned min.
+		"BountyGoldMax"				"155"		// Gold earned max.
 
 		// Bounds
 		//----------------------------------------------------------------
@@ -2144,7 +2105,7 @@
 		// Movement
 		//----------------------------------------------------------------
 		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"			// Type of locomotion - ground, air
-		"MovementSpeed"				"340"		// Speed
+		"MovementSpeed"				"350"		// Speed
 		"MovementTurnRate"			"0.5"		// Turning rate.
 
 		"GameSoundsFile"			"soundevents/game_sounds_heroes/game_sounds_bane.vsndevts"
@@ -2195,14 +2156,14 @@
 
 		// Abilities
 		//----------------------------------------------------------------
-		"Ability1"					""	// Ability 1.
+		"Ability1"					"juggernaut_blade_dance"	// Ability 1.
 		"Ability2"					""	// Ability 2.
 		"Ability3"					""	// Ability 3.
 		"Ability4"					""	// Ability 4.
 
 		// Armor
 		//----------------------------------------------------------------
-		"ArmorPhysical"				"30"	// Physical protection.
+		"ArmorPhysical"				"40"	// Physical protection.
 		"MagicalResistance"			"25"	// Magical protection.
 
 		// Attack
@@ -2220,8 +2181,8 @@
 		// Bounty
 		//----------------------------------------------------------------
 		"BountyXP"					"86"	// Experience earn.
-		"BountyGoldMin"				"215"		// Gold earned min.
-		"BountyGoldMax"				"230"		// Gold earned max.
+		"BountyGoldMin"				"245"		// Gold earned min.
+		"BountyGoldMax"				"255"		// Gold earned max.
 
 		// Bounds
 		//----------------------------------------------------------------
@@ -2314,14 +2275,14 @@
 
 		// Abilities
 		//----------------------------------------------------------------
-		"Ability1"					""			// Ability 1.
+		"Ability1"					"viper_corrosive_skin"			// Ability 1.
 		"Ability2"					""			// Ability 2.
 		"Ability3"					""			// Ability 3.
 		"Ability4"					""			// Ability 4.
 
 		// Armor
 		//----------------------------------------------------------------
-		"ArmorPhysical"				"30"	// Physical protection.
+		"ArmorPhysical"				"40"	// Physical protection.
 		"MagicalResistance"			"25"	// Magical protection.
 
 		// Attack
@@ -2339,8 +2300,8 @@
 		// Bounty
 		//----------------------------------------------------------------
 		"BountyXP"					"79"		// Experience earn.
-		"BountyGoldMin"				"195"		// Gold earned min.
-		"BountyGoldMax"				"210"		// Gold earned max.
+		"BountyGoldMin"				"220"		// Gold earned min.
+		"BountyGoldMax"				"230"		// Gold earned max.
 
 		// Bounds
 		//----------------------------------------------------------------
@@ -2409,14 +2370,14 @@
 
 		// Abilities
 		//----------------------------------------------------------------
-		"Ability1"					""	// Ability 1.
+		"Ability1"					"phantom_lancer_juxtapose"	// Ability 1.
 		"Ability2"					""	// Ability 2.
 		"Ability3"					""	// Ability 3.
 		"Ability4"					""	// Ability 4.
 
 		// Armor
 		//----------------------------------------------------------------
-		"ArmorPhysical"				"45"	// Physical protection.
+		"ArmorPhysical"				"70"	// Physical protection.
 		"MagicalResistance"			"35"	// Magical protection.
 
 		// Attack
@@ -2434,7 +2395,7 @@
 		// Bounty
 		//----------------------------------------------------------------
 		"BountyXP"					"105"	// Experience earn.
-		"BountyGoldMin"				"345"		// Gold earned min.
+		"BountyGoldMin"				"350"		// Gold earned min.
 		"BountyGoldMax"				"360"		// Gold earned max.
 
 		// Bounds
@@ -2449,8 +2410,8 @@
 		"MovementSpeed"				"380"		// Speed
 		"MovementTurnRate"			"0.5"		// Turning rate.
 		
-		"GameSoundsFile"			"soundevents/game_sounds_heroes/game_sounds_doombringer.vsndevts"
-		"VoiceFile"					"soundevents/voscripts/game_sounds_vo_doom_bringer.vsndevts"
+		"GameSoundsFile"			"soundevents/game_sounds_heroes/game_sounds_phantom_lancer.vsndevts"
+		"VoiceFile"					"soundevents/voscripts/game_sounds_vo_phantom_lancer.vsndevts"
 
 		// Status
 		//----------------------------------------------------------------
@@ -2516,14 +2477,14 @@
 
 		// Abilities
 		//----------------------------------------------------------------
-		"Ability1"					""			// Ability 1.
+		"Ability1"					"lich_frost_beast_cold_skin"			// Ability 1.
 		"Ability2"					""			// Ability 2.
 		"Ability3"					""			// Ability 3.
 		"Ability4"					""			// Ability 4.
 
 		// Armor
 		//----------------------------------------------------------------
-		"ArmorPhysical"				"40"	// Physical protection.
+		"ArmorPhysical"				"70"	// Physical protection.
 		"MagicalResistance"			"25"	// Magical protection.
 
 		// Attack
@@ -2541,8 +2502,8 @@
 		// Bounty
 		//----------------------------------------------------------------
 		"BountyXP"					"79"		// Experience earn.
-		"BountyGoldMin"				"195"		// Gold earned min.
-		"BountyGoldMax"				"210"		// Gold earned max.
+		"BountyGoldMin"				"310"		// Gold earned min.
+		"BountyGoldMax"				"320"		// Gold earned max.
 
 		// Bounds
 		//----------------------------------------------------------------
@@ -2561,7 +2522,7 @@
 
 		// Status
 		//----------------------------------------------------------------
-		"StatusHealth"				"1465"			// Base health.
+		"StatusHealth"				"1565"			// Base health.
 		"StatusHealthRegen"			"5.0"			// Health regeneration rate.
 		"StatusMana"				"625"			// Base mana.
 		"StatusManaRegen"			"2.0"			// Mana regeneration rate.
@@ -2572,7 +2533,7 @@
 		"CombatClassAttack"			"DOTA_COMBAT_CLASS_ATTACK_BASIC"
 		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_SOFT"
 		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
-		
+
 		// Vision
 		//----------------------------------------------------------------
 		"VisionDaytimeRange"		"1400"		// Range of vision during day light.
@@ -2984,13 +2945,13 @@
 	}
 
 	//=================================================================================
-	// Creature: Enigma South Event 4
+	// Creature: Captain South Event 4
 	//=================================================================================
-	"npc_dota_creature_enigma_event_4"
+	"npc_dota_creature_captain_event_4"
 	{
 		// General
 		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
-		"Model"						"models/heroes/enigma/enigma.vmdl"	// Model.
+		"Model"						"models/heroes/dragon_knight/dragon_knight.vmdl"	// Model.
 		"ModelScale"				"1.25"
 		"Level"						"50"
 		"ConsideredHero"			"1"
@@ -3078,19 +3039,23 @@
 			{
 				"Wearable1"
 				{
-					"ItemDef"			"8326" //Bracers - World Chasm Artifact
+					"ItemDef"			"5084" //Offhand Weapon - Crest of the Wyrm Lords
 				}
-			}
-
-			"EquippedItems"
-			{
-				"AghanimScepter"
+				"Wearable2"
 				{
-					"Item"					"item_ultimate_scepter"
+					"ItemDef"			"4731" //Weapon - Ember Edge
 				}
-				"OctarineCore"
+				"Wearable3"
 				{
-					"Item"					"item_octarine_core"
+					"ItemDef"			"6093" //Arms - Fire Tribunal Arms
+				}
+				"Wearable4"
+				{
+					"ItemDef"			"6099" //Helmet - Fire Tribunal Helm
+				}
+				"Wearable5"
+				{
+					"ItemDef"			"6104" //Shoulders - Fire Tribunal Shoulders
 				}
 			}
 		}
@@ -3266,6 +3231,7 @@
 		"ModelScale"				"1.45"
 		"Level"						"10"
 		"ConsideredHero"			"1"
+		"HasInventory"				"1"
 
 		"MinimapIcon"				"minimap_roshancamp"
 		"MinimapIconSize"			"300"
@@ -3353,6 +3319,14 @@
 				"Wearable3" { "ItemDef" "342" }
 				"Wearable4" { "ItemDef" "343" }
 				"Wearable5" { "ItemDef" "344" }
+			}
+
+			"EquippedItems"
+			{
+				"Desolator"
+				{
+					"Item"					"item_desolator"
+				}
 			}
 		}
 	}
@@ -3593,22 +3567,19 @@
 	  "npc_captain_final_wave"
 	  {
 		// General
-		"BaseClass"         "npc_dota_creature"  // Class of entity of link to.
-		"Model"             "models/heroes/dragon_knight/dragon_knight.vmdl"  // Model.
-		"SoundSet"          "lane_dire_ranged"          // Name of sound set.
-		"Level"             "3"
-		"ModelScale"                    "1.1"
+		//----------------------------------------------------------------
+		"BaseClass"			"npc_dota_creature"  // Class of entity of link to.
+		"Model"				"models/heroes/dragon_knight/dragon_knight.vmdl"  // Model.
+		"SoundSet"			"lane_dire_ranged"          // Name of sound set.
+		"Level"				"3"
+		"ModelScale"		"1.1"
+
 		// Abilities
 		//----------------------------------------------------------------
-		
-		"Ability1"          ""     // Ability 1.
-		"Ability2"          ""      // Ability 2.
-		"Ability3"          ""      // Ability 3.
-		"Ability4"          ""      // Ability 4.
-		"Ability5"          ""      // Ability 5.
-		"Ability6"          ""      // Ability 6 - Extra.
-		"Ability7"          ""      // Ability 7 - Extra.
-		"Ability8"          ""      // Ability 8 - Extra.
+		"Ability1"			""     // Ability 1.
+		"Ability2"			""      // Ability 2.
+		"Ability3"			""      // Ability 3.
+		"Ability4"			""      // Ability 4.
 	
 		// Armor
 		//----------------------------------------------------------------
@@ -7237,7 +7208,7 @@
 		"Model"						"models\creeps\lane_creeps\creep_radiant_hulk\creep_radiant_ancient_hulk.vmdl"	// Model.
 		"BaseClass"					"npc_dota_creep_neutral"
 		"SoundSet"					"Hero_WarlockGolem"
-		"ModelScale"				"1.5"
+		"ModelScale"				"1.25"
 		"IsNeutralUnitType"			"0"
 		"Level"						"6"
 		"IsAncient"					"1"
@@ -7320,7 +7291,7 @@
 		"Model"						"models\creeps\lane_creeps\creep_dire_hulk\creep_dire_ancient_hulk.vmdl"	// Model.
 		"BaseClass"					"npc_dota_creep_neutral"
 		"SoundSet"					"Hero_WarlockGolem"
-		"ModelScale"				"1.5"
+		"ModelScale"				"1.25"
 		"IsNeutralUnitType"			"0"
 		"Level"						"6"
 		"IsAncient"					"1"

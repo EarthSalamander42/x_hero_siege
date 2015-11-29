@@ -18,9 +18,9 @@
 	m_flConstantRadius = 1024.000000
 	m_ConstantColor =
 	[
+		170,
 		0,
-		66,
-		255,
+		0,
 		255,
 	]
 	m_bShouldSort = false
@@ -57,9 +57,9 @@
 			_class = "C_OP_ColorInterpolate"
 			m_ColorFade =
 			[
-				57,
-				76,
 				222,
+				54,
+				42,
 				255,
 			]
 		},
@@ -92,16 +92,16 @@
 			_class = "C_INIT_RandomColor"
 			m_ColorMin =
 			[
-				139,
-				250,
-				100,
+				255,
+				152,
+				62,
 				255,
 			]
 			m_ColorMax =
 			[
-				36,
-				216,
-				155,
+				255,
+				132,
+				24,
 				255,
 			]
 		},

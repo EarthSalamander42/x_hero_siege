@@ -1,13 +1,13 @@
 "AddonInfo"
 {
 	"TeamCount"					"1"
-	"maps"						"XHeroSiege_HardMode x_hero_siege_8_players"
+	"maps"						"x_hero_siege_8_players hardmode"
 	"IsPlayable"				"1"
 	"x_hero_siege_8_players"
 	{
 		"MaxPlayers"			"8"
 	}
-	"XHeroSiege_HardMode"
+	"hardmode"
 	{
 		"MaxPlayers"			"4"
 	}

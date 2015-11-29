@@ -35,9 +35,9 @@
 			_class = "C_OP_ColorInterpolate"
 			m_ColorFade =
 			[
-				15,
-				25,
-				159,
+				216,
+				45,
+				29,
 				255,
 			]
 		},
@@ -139,16 +139,16 @@
 			_class = "C_INIT_RandomColor"
 			m_ColorMin =
 			[
-				70,
-				36,
 				216,
+				13,
+				16,
 				255,
 			]
 			m_ColorMax =
 			[
-				74,
-				36,
 				216,
+				28,
+				53,
 				255,
 			]
 		},

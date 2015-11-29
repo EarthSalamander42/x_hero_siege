@@ -84,7 +84,7 @@ function Precache( context )
 	PrecacheUnitByNameSync( "npc_dota_creature_death_prophet_event_1", context)
 	PrecacheUnitByNameSync( "npc_dota_creature_naga_siren_event_2", context)
 	PrecacheUnitByNameSync( "npc_dota_creature_vengeful_spirit_event_3", context)
-	PrecacheUnitByNameSync( "npc_dota_creature_enigma_event_4", context)
+	PrecacheUnitByNameSync( "npc_dota_creature_captain_event_4", context)
 
 	-- PHASE 2
 	PrecacheUnitByNameSync( "npc_ghul_II", context)

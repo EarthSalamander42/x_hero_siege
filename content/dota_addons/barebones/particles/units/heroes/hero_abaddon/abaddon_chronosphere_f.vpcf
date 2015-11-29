@@ -6,9 +6,9 @@
 	m_flConstantRadius = 50.000000
 	m_ConstantColor =
 	[
-		112,
-		208,
 		244,
+		120,
+		78,
 		255,
 	]
 	m_flNoDrawTimeToGoToSleep = 12.000000
@@ -152,16 +152,16 @@
 			_class = "C_INIT_RandomColor"
 			m_ColorMax =
 			[
-				12,
-				12,
-				218,
+				216,
+				82,
+				48,
 				255,
 			]
 			m_ColorMin =
 			[
-				0,
-				0,
-				171,
+				216,
+				45,
+				29,
 				255,
 			]
 		},

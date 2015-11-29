@@ -7,9 +7,9 @@
 	m_flConstantLifespan = 0.900000
 	m_ConstantColor =
 	[
-		124,
-		84,
 		255,
+		132,
+		70,
 		255,
 	]
 	m_Renderers =
