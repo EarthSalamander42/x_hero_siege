@@ -911,13 +911,13 @@ Fix:
 X Hero Siege ( BETA ) 0.9.8.4 Fix
 //===========================================================================================================
 
-- Created a whole new map to replace the old one( Very bad designed, hope you'll like this one! )
-- Added Passive abilities to evcery creep lane levels( Listed under Gameplay )
+- Created a whole new map to replace the old one( For now thenew map is only playable in Hard Mode, still in testing phase )
+- Added Passive abilities to every creep lane levels( Listed under Gameplay )
 - Added a Shop at spawn( Goblin Shop )
 - Added German Translation
 - Modified Abaddon Chronosphere( Red-Color )
 - Reduced Dark Protectors size
-- Deleted unused files( -20mb )
+- Deleted unused files( -20mb, +50mb new map = +30mb in gamemode )
 
 Gameplay:
 - Added Desolator for Death Revenant( Tower )
@@ -931,8 +931,9 @@ Gameplay:
 - Increased Level 5 Creep Lane Armor from 40 to 70
 - Increased Level 5 Creep Lane Miranas HP from 1465 to 1565
 - Reduced Level 1 Creep Lane Damage from 22/23 to 17/18
-- Reduced Banehallow Green Cranes Damage from 7500 to 2000
+- Reduced Banehallow Green Cranes Damage from 7500 to 1000
 - Reduced Juggernaut Healing Ward from 3/3.5/4/4.5/5/6/7 to 2.5/3/3.5/4/4.5/5/6
+- Removed Etheral Blade( Gameplay Breaker, using it on boss was nearly killing them in 1 shot )
 
 New Creeps Abilities: ( All Passive )
 Level 1:
@@ -951,12 +952,15 @@ Level 5:
 - Juxtapose( Create illusions randomly, during 8 seconds )
 - Cold Skin( Deals 100 dmg per sec to near enemies )
 
+Fix:
+- Fixed Balanar Rain of Chaos
+
 
 //===========================================================================================================
 X Hero Siege ( BETA ) 0.9.8.5 Fix
 //===========================================================================================================
 
-- 
+- Fixed Level 2 Creeps Crash( Removed Heartstopper Aura )
 
 //================================================================================================================================================
 //================================================================================================================================================
@@ -965,8 +969,6 @@ X Hero Siege ( BETA ) 0.9.8.5 Fix
 //================================================================================================================================================
 
 //Magnus Wars
-Reduce Shadow Walk 4/6
-tome of force gold 1600
 
 //Patreon To-Do-List( In Goal orders )
 //Reached Goals

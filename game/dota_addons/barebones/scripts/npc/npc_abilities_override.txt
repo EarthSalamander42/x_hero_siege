@@ -446,6 +446,7 @@
 	"item_buckler"					"REMOVE"
 	"item_crimson_guard"			"REMOVE"
 	"item_shivas_guard3"			"REMOVE"
+	"item_ethereal_blade"			"REMOVE"
 
 	//============================================================================================================
 	//============================================================================================================
@@ -498,26 +499,26 @@
 	//=================================================================================================================
 	// Ability: Necrolyte's Heartstopper Aura
 	//=================================================================================================================
-	"necrolyte_heartstopper_aura"
-	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"MaxLevel"				"1"
+//	"necrolyte_heartstopper_aura"
+//	{
+//		// General
+//		//-------------------------------------------------------------------------------------------------------------
+//		"MaxLevel"				"1"
 
-		"AbilitySpecial"
-		{
-			"01"
-			{
-				"var_type"			"FIELD_INTEGER"
-				"aura_radius"		"1200"		// If you change this, also change the AbilityCastRange above
-			}
-			"02"
-			{
-				"var_type"			"FIELD_FLOAT"
-				"aura_damage"		"-1.0" 
-			} 
-		}
-	}
+//		"AbilitySpecial"
+//		{
+//			"01"
+//			{
+//				"var_type"			"FIELD_INTEGER"
+//				"aura_radius"		"1200"		// If you change this, also change the AbilityCastRange above
+//			}
+//			"02"
+//			{
+//				"var_type"			"FIELD_FLOAT"
+//				"aura_damage"		"-0.5" 
+//			}
+//		}
+//	}
 
 	//=================================================================================================================
 	// Ability: Antimage Mana Break

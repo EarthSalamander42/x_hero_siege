@@ -8835,7 +8835,7 @@
 		  "01"
 		  {
 			"var_type"      "FIELD_FLOAT"
-			"damage_per_skull"      "2000"
+			"damage_per_skull"      "1000"
 		  }
 		  "02"
 		  {
@@ -8860,12 +8860,12 @@
 		  "06"
 		  {
 			"var_type"      "FIELD_INTEGER"
-			"radius_skulls"      "150"
+			"radius_skulls"      "125"
 		  }
 		  "07"
 		  {
 			"var_type"      "FIELD_INTEGER"
-			"radius"      "1500"
+			"radius"      "1300"
 		  }
 		}
 	

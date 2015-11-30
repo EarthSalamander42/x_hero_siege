@@ -8,7 +8,6 @@ function Spawn( entityKeyValues )
 
 	Timers:CreateTimer(0,BalanarThink)
 	DebugPrint("Starting AI for "..thisEntity:GetUnitName().." "..thisEntity:GetEntityIndex())
-
 end
 
 function BalanarThink()
