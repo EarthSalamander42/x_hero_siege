@@ -962,6 +962,23 @@ X Hero Siege ( BETA ) 0.9.8.5 Fix
 
 - Fixed Level 2 Creeps Crash( Removed Heartstopper Aura )
 
+
+//===========================================================================================================
+X Hero Siege ( BETA ) 0.9.8.6 Fix
+//===========================================================================================================
+
+- Added Phase 1 of the Lich King Metamorphosis( Yet it's only visual )
+- Reduced Creep Lane Level 2 Aura of Blight Regen from 10 to 4
+- Reduced Banehallow Damage from 45000 to 35000
+- Reduced Death Revenants Banehallow Damage from 10500 to 5500
+- Reduced Death Revenants Banehallow Armor from 500 to 400
+- Tomes Use are now immediate
+
+Fix:
+- Attempt to fix Balanar Rain of Chaos
+- Fixed Phase 3 Teleporter not working( Blue Teleporter, near Frozen Throne )
+
+
 //================================================================================================================================================
 //================================================================================================================================================
 //================================================================================================================================================
@@ -969,6 +986,9 @@ X Hero Siege ( BETA ) 0.9.8.5 Fix
 //================================================================================================================================================
 
 //Magnus Wars
+Fix Bane LVL3 Passive Aura Nevermore
+Reduce Aura of Blight Undy to +4 regen
+
 
 //Patreon To-Do-List( In Goal orders )
 //Reached Goals

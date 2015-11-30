@@ -8,7 +8,7 @@ behaviorSystem = {} -- create the global so we can assign to it
 
 function Spawn( entityKeyValues )
 	thisEntity:SetContextThink( "AIThink", AIThink, 0.25 )
-    behaviorSystem = AICore:CreateBehaviorSystem( { BehaviorNone, BehaviorCarrionSwarm, BehaviorExorcism, BehaviorRunAway } ) 
+    behaviorSystem = AICore:CreateBehaviorSystem( { BehaviorNone, BehaviorCarrionSwarm, BehaviorRunAway } ) 
 end
 
 function AIThink() -- For some reason AddThinkToEnt doesn't accept member functions
@@ -113,44 +113,6 @@ end
 
 --------------------------------------------------------------------------------------------------------
 
-BehaviorExorcism = {}
-
-function BehaviorExorcism:Evaluate()
-	local desire = 0
-	
-	-- let's not choose this twice in a row
-	if currentBehavior == self then return desire end
-
-	ABILITY_exorcism = thisEntity:FindAbilityByName( "creature_exorcism" )
-	
-	local enemies = FindUnitsInRadius( DOTA_TEAM_BADGUYS, thisEntity:GetOrigin(), nil, 1500, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO, 0, 0, false )
-	if #enemies > 1 then
-		desire = 4
-		if ABILITY_exorcism and ABILITY_exorcism:IsFullyCastable() then
-			thisEntity:Stop()
-			thisEntity:CastAbilityNoTarget( ABILITY_exorcism, -1 )
-		end
-	end 
-
-	return desire
-end
-
-function BehaviorExorcism:Begin()
-	self.endTime = GameRules:GetGameTime() + 1
-
-	self.order =
-	{
-		UnitIndex = thisEntity:entindex(),
-		OrderType = DOTA_UNIT_ORDER_CAST_POSITION,
-		AbilityIndex = ABILITY_exorcism:entindex(),
-	}
-
-end
-
-BehaviorExorcism.Continue = BehaviorExorcism.Begin
-
---------------------------------------------------------------------------------------------------------
-
 BehaviorRunAway = {}
 
 function BehaviorRunAway:Evaluate()
@@ -182,4 +144,4 @@ BehaviorRunAway.Continue = BehaviorRunAway.Begin
 
 --------------------------------------------------------------------------------------------------------
 
-AICore.possibleBehaviors = { BehaviorNone, BehaviorCarrionSwarm, BehaviorExorcism, BehaviorRunAway }
+AICore.possibleBehaviors = { BehaviorNone, BehaviorCarrionSwarm, BehaviorRunAway }
