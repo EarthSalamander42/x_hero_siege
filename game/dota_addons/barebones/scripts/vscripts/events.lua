@@ -1,5 +1,4 @@
--- This file contains all barebones-registered events and has already set up the passed-in parameters for your use.
--- Do not remove the GameMode:_Function calls in these events as it will mess with the internal barebones systems.
+_G.nCOUNTDOWNTIMER = 30
 
 -- Cleanup a player when they leave
 function GameMode:OnDisconnect(keys)
@@ -22,10 +21,14 @@ function GameMode:OnGameRulesStateChange(keys)
 
 	local newState = GameRules:State_Get()
 
-	if newState == DOTA_GAMERULES_STATE_HERO_SELECTION then
-    GameRules:SetCustomGameDifficulty(1)
-    local mode  = GameMode
-    local votes = mode.VoteTable
+	if newState == DOTA_GAMERULES_STATE_PRE_GAME then
+	nCOUNTDOWNTIMER = 30
+	end
+
+	if newState == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
+		--print( "OnGameRulesStateChange: Game In Progress" )
+		self.countdownEnabled = true
+		CustomGameEventManager:Send_ServerToAllClients( "show_timer", {} )
 	end
 end
 
@@ -344,4 +347,62 @@ function GameMode:OnPlayerChat(keys)
 	local playerID = self.vUserIds[userID]:GetPlayerID()
 	local text = keys.text
 	local player = PlayerResource:GetPlayer(playerID)
+end
+
+function GameMode:OnThink()
+	for nPlayerID = 0, (DOTA_MAX_TEAM_PLAYERS-1) do
+		self:UpdatePlayerColor( nPlayerID )
+	end
+
+	self:UpdateScoreboard()
+	-- Stop thinking if game is paused
+	if GameRules:IsGamePaused() == true then
+		return 1
+	end
+
+	if self.countdownEnabled == true then
+		CountdownTimer()
+		if nCOUNTDOWNTIMER == 30 then
+			CustomGameEventManager:Send_ServerToAllClients( "timer_alert", {} )
+		end
+		if nCOUNTDOWNTIMER <= 0 then
+			Notifications:TopToAll({text="Muradin Should Spawn!", duration=10.0})
+		end
+	end
+
+	if GameRules:State_Get() == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
+		--Spawn Gold Bags
+		COverthrowGameMode:ThinkGoldDrop()
+		COverthrowGameMode:ThinkSpecialItemDrop()
+	end
+
+	return 1
+end
+
+function CountdownTimer()
+	nCOUNTDOWNTIMER = nCOUNTDOWNTIMER - 1
+	local t = nCOUNTDOWNTIMER
+	--print( t )
+	local minutes = math.floor(t / 60)
+	local seconds = t - (minutes * 60)
+	local m10 = math.floor(minutes / 10)
+	local m01 = minutes - (m10 * 10)
+	local s10 = math.floor(seconds / 10)
+	local s01 = seconds - (s10 * 10)
+	local broadcast_gametimer = 
+		{
+			timer_minute_10 = m10,
+			timer_minute_01 = m01,
+			timer_second_10 = s10,
+			timer_second_01 = s01,
+		}
+	CustomGameEventManager:Send_ServerToAllClients( "countdown", broadcast_gametimer )
+	if t <= 120 then
+		CustomGameEventManager:Send_ServerToAllClients( "time_remaining", broadcast_gametimer )
+	end
+end
+
+function SetTimer( cmdName, time )
+	print( "Set the timer to: " .. time )
+	nCOUNTDOWNTIMER = time
 end

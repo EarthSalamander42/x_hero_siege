@@ -1,0 +1,93 @@
+#AlertTimer
+{
+	flow-children: down;
+
+	color: white;
+	horizontal-align: center;
+	margin: 0px;
+	margin-top: 64px;
+	
+	font-size: 96px;
+	font-weight: bold;
+	opacity: 0;
+	visibility: collapse;
+	transition-property: transform, opacity;
+	transition-duration: 0.3s;
+	border: 0px solid white;
+	transform: scaleX(2) scaleY(2);
+}
+
+.time_notification #AlertTimer
+{
+	opacity: 1;
+	transform: scaleX(1) scaleY(1);
+	visibility: visible;
+}
+
+#AlertTimer_Text
+{
+	text-shadow: 4px 4px 4px #121212;
+	color: red;
+	horizontal-align: center;
+	font-size: 48px;
+}
+
+#AlertTimer_Remaining
+{
+	text-shadow: 4px 4px 4px #121212;
+	horizontal-align: center;
+	font-size: 24px;
+}
+
+.time_countdown #AlertTimer_Remaining
+{
+	opacity: 0;
+}
+
+#Overtime
+{
+	flow-children: down;
+
+	color: white;
+	horizontal-align: center;
+	margin: 0px;
+	margin-top: 64px;
+	
+	font-size: 96px;
+	font-weight: bold;
+	opacity: 0;
+	visibility: collapse;
+	transition-property: transform, opacity;
+	transition-duration: 0.3s;
+	border: 0px solid white;
+	transform: scaleX(2) scaleY(2);
+}
+
+#Overtime_Text
+{
+	text-shadow: 4px 4px 4px #121212;
+	color: red;
+	horizontal-align: center;
+	font-size: 48px;
+}
+
+#Overtime_Goal
+{
+	text-shadow: 4px 4px 4px #121212;
+	horizontal-align: center;
+	font-size: 24px;
+}
+
+#Overtime_Instructions
+{
+	text-shadow: 4px 4px 4px #121212;
+	horizontal-align: center;
+	font-size: 24px;
+}
+
+.overtime_visible #Overtime
+{
+	opacity: 1;
+	transform: scaleX(1) scaleY(1);
+	visibility: visible;
+}

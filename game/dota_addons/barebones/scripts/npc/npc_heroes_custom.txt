@@ -93,12 +93,12 @@
 		"override_hero"			"npc_dota_hero_juggernaut"
 		"AbilityLayout"			"5"
 
-		"Ability1"				"holdout_blade_fury"
-		"Ability2"				"holdout_moment_of_courage"
-		"Ability3"				"holdout_healing_ward"
-		"Ability4"				"holdout_blade_dance"
+		"Ability1"				"brewmaster_storm_wind_walk"
+		"Ability2"				"blademaster_mirror_image"
+		"Ability3"				"juggernaut_blade_dance"
+		"Ability4"				""
 		"Ability5"				"holdout_bonus"
-		"Ability6"				"holdout_omnislash"
+		"Ability6"				"juggernaut_blade_fury"
 		"Ability16"				"ability_unit_died_fire"
 	}
 

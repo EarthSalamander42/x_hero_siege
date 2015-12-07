@@ -124,65 +124,6 @@
 	}
 
 	//=================================================================================================================
-	// Teleport Scroll
-	//=================================================================================================================
-	"item_tpscroll_new"
-	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"BaseClass"             		"item_tpscroll"
-		"AbilityTextureName"			"tpscroll_new"
-		"ID"							"2502"														// unique ID number for this item.  Do not change this once established or it will invalidate collected stats.
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_CHANNELLED | DOTA_ABILITY_BEHAVIOR_NOASSIST | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK"
-		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
-		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_BUILDING"
-		"AbilityUnitTargetFlags"		"DOTA_UNIT_TARGET_FLAG_INVULNERABLE"
-		"Model"							"models/props_gameplay/tpscroll01.mdl"
-
-		// Stats
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCastRange"				"0"
-		"AbilityCooldown"				"50.0"
-		"AbilitySharedCooldown"			"teleport"
-		"AbilityChannelTime"			"3.0"
-		"AbilityCastPoint"				"0.0"
-
-		// Item Info
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityManaCost"				"75"
-		"ItemCost"						"50"
-		"ItemShopTags"					"consumable;tutorial"
-		"ItemQuality"					"consumable"
-		"ItemAliases"					"tp;town portal scroll"
-		"ItemStackable"					"1"
-		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
-		"ItemPermanent"					"0"
-		"ItemInitialCharges"			"1"
-		"SideShop"						"0"
-		
-		// Special	
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilitySpecial"
-		{
-			"01"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"minimun_distance"		"70"
-			}
-			"02"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"maximum_distance"		"525"
-			}
-			"03"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"vision_radius"			"200"
-			}
-		}
-	}
-
-	//=================================================================================================================
 	// Claws of Attack
 	//=================================================================================================================
 	"item_claws_of_attack"

@@ -967,7 +967,7 @@ X Hero Siege ( BETA ) 0.9.8.5 Fix
 X Hero Siege ( BETA ) 0.9.8.6 Fix
 //===========================================================================================================
 
-- Added Phase 1 of the Lich King Metamorphosis( Yet it's only visual )
+- Added Phase 1 of the Lich King Metamorphosis( Hard Mode Map, Yet it's only visual )
 - Reduced Creep Lane Level 2 Aura of Blight Regen from 10 to 4
 - Reduced Banehallow Damage from 45000 to 35000
 - Reduced Death Revenants Banehallow Damage from 10500 to 5500
@@ -976,7 +976,29 @@ X Hero Siege ( BETA ) 0.9.8.6 Fix
 
 Fix:
 - Attempt to fix Balanar Rain of Chaos
-- Fixed Phase 3 Teleporter not working( Blue Teleporter, near Frozen Throne )
+- Fixed Phase 3 Teleporter not working( Hard Mode Map, Blue Teleporter, near Frozen Throne )
+
+
+//===========================================================================================================
+X Hero Siege ( BETA ) 0.9.9 Fix
+//===========================================================================================================
+
+- Created Muradin Arena( Muradin coming really soon, few days )
+- Updated the new map into Normal Mode
+- Added Permanent vision upper Muradin Arena, and Magtheridon Arena
+
+Gameplay:
+- Increased level 4 ranged creep Corrosive Skin damage from 20 to 60
+- Reduced Banehallow HP from 160000 to 140000
+- Reduced Heart of Tarrasque health regen % from 4% to 3%
+- Reduced Heart of Tarrasque 2 health regen % from 4.25% to 3.5%
+- Reduced Heart of Tarrasque 3 health regen % from 4.5% to 4%
+- Reduced Undead Arthas HP from 220000 to 180000
+- Deleted Juggernaut( In order to add Blademaster soon )
+
+Fix:
+- Fixed Waves spawning 1 more time when barrack destroyed( or ice tower for Phase 2 )
+- Fixed Abyssal Blade bash in rare times
 
 
 //================================================================================================================================================
@@ -986,13 +1008,39 @@ Fix:
 //================================================================================================================================================
 
 //Magnus Wars
+
+//Faceless Void Wars
+Fix Red Chronosphere not particle bug, need to recreate
+
+//X Hero Siege
+Special Event: Muradin Bronzebeard
+if IsValidEntity(GameRules.currentBoss) and GameRules.currentBoss:IsAlive() then return CheckWestBarracks() end 
+
+
+Fix Doors opening for all lanes at the beginning of a game
+Doublé wave 3 incoming dmg hardmode
+final wave increase harmode
+Doublé wave 4 incoming hp hardmode
+increase razor hardmode
++30% lane 4 dmg hardmode
+Remove Drum of Endurance
 Fix Bane LVL3 Passive Aura Nevermore
 Reduce Aura of Blight Undy to +4 regen
+phase 2 hardmode double + dmg
+reduce ench evasion
+reduce ench crit%
+reduce mags xp
+magtheridon hp buff 10%
+dark protectors double dmg
+water elementals for proudmoore
+fix balanar beasts errors
 
+Terrorblade Hard Mode test:
+Phase 2 entering:
+15k hp, 950dmg, 255 armor
 
 //Patreon To-Do-List( In Goal orders )
 //Reached Goals
-Finish Frost Infernal Event
 Finish Blademaster Hero
 Finish Priestess of the Moon Hero
 Finish Solo Mod
@@ -1001,10 +1049,11 @@ Finish Rifleman
 Finish French Translation
 
 //Non-Reached Goals
+Finish Muradin BronzeBeard Event
 Finish Sylvanas Windrunner Hero
 Finish Warden Hero
 Finish Custom Effects for Shiva's Guard 2 and 3
-Finish Hard Mod( DONE )
+Finish Frost Infernal Event
 Finish Lich King Boss
 
 //Major Fixes

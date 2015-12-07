@@ -10,6 +10,8 @@
 	
 	"Addon_Game_Name"					"X Hero Siege"
 
+	"MuradinGoal"						"Muradin"
+
 	"Loading_Objectives_Title"			"Objectives:"
 	"Loading_Objectives1"				"- Choose one lane to defend against incoming Forces of Darkness"
 	"Loading_Objectives2"				"- Destroy the Barrackment on your lane to release the Magnataur Destroyer"

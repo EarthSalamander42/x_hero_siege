@@ -1058,259 +1058,6 @@
 		}
 	}
 
-	//========================================================================================================
-	// Holdout: Blade Fury
-	//========================================================================================================
-	"holdout_blade_fury"
-	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityTextureName"			"holdout_blade_fury"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_IGNORE_CHANNEL"
-		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"	
-		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
-		"MaxLevel"						"7"
-
-		// Casting
-		//----------------------------------------------------------------------------------------------------
-		"AbilityCastRange"				"0"
-		"AbilityCastPoint"				"0"
-
-		// Time		
-		//----------------------------------------------------------------------------------------------------
-		"AbilityCooldown"				"21"
-
-		// Cost
-		//----------------------------------------------------------------------------------------------------
-		"AbilityManaCost"				"100"		
-
-		// Special
-		//----------------------------------------------------------------------------------------------------
-		"AbilitySpecial"
-		{
-			"01"
-			{
-				"var_type"					"FIELD_FLOAT"
-				"blade_fury_damage_tick"	"0.2"
-			}
-			"02"
-			{
-				"var_type"					"FIELD_INTEGER"
-				"blade_fury_radius"			"275"
-			}
-			"03"
-			{
-				"var_type"					"FIELD_FLOAT"
-				"duration"					"6.0"
-			}
-			"04"
-			{
-				"var_type"					"FIELD_INTEGER"
-				"damage"					"75 90 105 120 150 200 350"
-			}
-			"05"
-			{
-				"var_type"					"FIELD_INTEGER"
-				"bonus_evasion"				"10 15 20 25 30 35 40"
-			}
-		}
-	}
-
-	//=================================================================================================================
-	// Juggernaut: Moment of Courage
-	//=================================================================================================================
-	"holdout_moment_of_courage"
-	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"BaseClass"             		"legion_commander_moment_of_courage"
-		"MaxLevel" 						"7"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-		
-		// Time		
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCooldown"				"4.0 3.4 2.8 2.2 1.6 1.0 0.75"
-
-		// Special
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilitySpecial"
-		{
-			"01"
-			{
-				"var_type"					"FIELD_INTEGER"
-				"trigger_chance"			"25"
-			}
-			"02"
-			{
-				"var_type"					"FIELD_FLOAT"
-				"buff_duration"				"1.0"
-			}
-			"03"
-			{
-				"var_type"					"FIELD_INTEGER"
-				"hp_leech_percent"			"35 45 55 65 75 85 95"
-			}
-		}
-	}
-
-	//=================================================================================================================
-	// Ability: Juggernaut Healing Ward
-	//=================================================================================================================
-	"holdout_healing_ward"
-	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"BaseClass"             		"juggernaut_healing_ward"
-		"MaxLevel" 						"7"
-		"RequiredLevel"					"5"
-		"LevelsBetweenUpgrades"			"3"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_AOE | DOTA_ABILITY_BEHAVIOR_POINT"
-		
-		// Casting
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCastRange"				"350"
-		"AbilityCastPoint"				"0.3"
-		
-		// Time		
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCooldown"				"60"
-		"AbilityDuration"				"30"
-	
-		// Cost
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityManaCost"				"145"
-
-		// Special
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilitySpecial"
-		{
-			"01"
-			{
-				"var_type"							"FIELD_FLOAT"
-				"healing_ward_heal_amount"			"2.5 3.0 3.5 4.0 4.5 5.0 6.0"
-			}
-			"02"
-			{
-				"var_type"							"FIELD_INTEGER"
-				"healing_ward_aura_radius"			"600"
-			}
-			"03"
-			{
-				"var_type"							"FIELD_INTEGER"
-				"healing_ward_movespeed_tooltip"	"420"
-			}
-			"04"
-			{
-				"var_type"							"FIELD_INTEGER"
-				"healing_ward_duration_tooltip"		"30"
-			}
-		}
-	}
-
-	//=================================================================================================================
-	// Ability: Juggernaut Blade Dance
-	//=================================================================================================================
-	"holdout_blade_dance"
-	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"BaseClass"             		"juggernaut_blade_dance"
-		"MaxLevel" 						"7"
-		"RequiredLevel"					"8"
-		"LevelsBetweenUpgrades"			"3"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-	
-		// Special
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilitySpecial"
-		{
-			"01"
-			{
-				"var_type"					"FIELD_INTEGER"
-				"blade_dance_crit_mult"		"200"
-			}
-			"02"
-			{
-				"var_type"					"FIELD_FLOAT"
-				"blade_dance_crit_chance"	"20 22.5 25 27.5 30 32.5 35"
-			}
-		}
-	}
-
-	//=====================================================================================================
-	// Juggernaut: Omnislash
-	//=====================================================================================================
-	"holdout_omnislash"
-	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"BaseClass"             		"juggernaut_omni_slash"
-		"AbilityTextureName"			"holdout_omnislash"
-		"MaxLevel" 						"2"
-		"RequiredLevel"					"10"
-		"LevelsBetweenUpgrades"			"5"
-		"AbilityType"					"DOTA_ABILITY_TYPE_ULTIMATE"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK"
-		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
-		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
-		"AbilityUnitTargetFlags"		"DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES | DOTA_UNIT_TARGET_FLAG_NOT_ANCIENTS"
-		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_YES"
-		"AbilityUnitDamageType"			"DAMAGE_TYPE_PURE"	
-
-		// Casting
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCastRange"				"450"
-		"AbilityCastPoint"				"0.25"
-
-		// Time		
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCooldown"				"120.0 100.0"
-
-		// Cost
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityManaCost"				"150 350"
-
-		// Stats
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityModifierSupportValue"	"0.0"	// damage only
-
-		// Special
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilitySpecial"
-		{
-			"01"
-			{
-				"var_type"					"FIELD_INTEGER"
-				"omni_slash_damage"			"500 1000"
-			}
-			"02"
-			{
-				"var_type"					"FIELD_INTEGER"
-				"omni_slash_jumps"			"6 12"
-			}
-			"03"
-			{
-				"var_type"					"FIELD_INTEGER"
-				"omni_slash_radius"			"575"
-			}
-			"04"
-			{
-				"var_type"					"FIELD_FLOAT"
-				"omni_slash_bounce_tick"	"0.3"
-			}
-			"05"
-			{
-				"var_type"						"FIELD_INTEGER"
-				"omni_slash_jumps_scepter"		"12 18"
-			}
-			"06"
-			{
-				"var_type"						"FIELD_FLOAT"
-				"omni_slash_cooldown_scepter"	"45"
-			}
-		}
-	}
-
 	//=================================================================================================================
 	// Holdout: Storm Bolt
 	//=================================================================================================================
@@ -5923,6 +5670,150 @@
 		}
 	}
 
+	//=================================================================================================================
+	// Blademaster: Mirror Image
+	//=================================================================================================================
+	"blademaster_mirror_image"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"             		"ability_datadriven"
+		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityType"                   "DOTA_ABILITY_TYPE_ULTIMATE"
+		"FightRecapLevel"               "2"
+		"AbilityTextureName"            "chaos_knight_phantasm"
+	
+		// Precache
+		//-------------------------------------------------------------------------------------------------------------
+		"precache"
+		{
+			"soundfile"     "soundevents/game_sounds_heroes/game_sounds_chaos_knight.vsndevts"
+			"particle"      "particles/units/heroes/hero_chaos_knight/chaos_knight_phantasm.vpcf"
+		}
+		
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastPoint"              "0.2"
+	
+		// Time     
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"               "140.0 140.0 140.0"
+	
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"               "125 200 275"
+	
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"                  "FIELD_INTEGER"
+				"images_count"              "1 2 3"
+			}
+			"02"
+			{
+				"var_type"              					"FIELD_INTEGER"
+				"extra_phantasm_chance_pct_tooltip"         "50"
+			}
+			"03"
+			{
+				"var_type"                  "FIELD_FLOAT"
+				"illusion_duration"         "34"
+			}   
+			"04"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"outgoing_damage"			"0 0 0"
+			}
+			"05"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"outgoing_damage_tooltip"	"100 100 100"
+			}   
+			"06"
+			{
+				"var_type"                  "FIELD_INTEGER"
+				"incoming_damage"           "100 100 100"
+			}
+			"07"
+			{
+				"var_type"                  "FIELD_INTEGER"
+				"incoming_damage_tooltip"   "200 200 200"
+			}           
+			"08"
+			{
+				"var_type"              "FIELD_FLOAT"
+				"invuln_duration"       "0.35"
+			}
+			"09"
+			{
+				"var_type"              "FIELD_INTEGER"
+				"vision_radius"         "400"
+			}           
+		}
+	
+		"OnSpellStart"
+		{
+			"RunScript"
+			{
+				"ScriptFile"    "heroes/hero_blademaster/mirror_image.lua"
+				"Function"      "PhantasmVision"
+			}
+	
+			"ApplyModifier"
+			{
+				"ModifierName"  "modifier_phantasm_datadriven"
+				"Target"        "CASTER"
+				"Duration"      "%invuln_duration"
+			}       
+		}
+	
+		"Modifiers"
+		{
+			"modifier_phantasm_datadriven"
+			{
+				"IsHidden"      "1"
+				"IsPurgable"    "0"
+	
+				"OnCreated"
+				{
+					"AttachEffect"
+					{
+						"EffectName"        "particles/units/heroes/hero_chaos_knight/chaos_knight_phantasm.vpcf"
+						"EffectAttachType"  "follow_origin"
+						"Target"            "CASTER"
+					}
+	
+					"FireSound"
+					{
+						"EffectName"    "Hero_ChaosKnight.Phantasm"
+						"Target"        "CASTER"
+					}
+				}
+	
+				"OnDestroy"
+				{
+					"RunScript"
+					{
+						"ScriptFile"    "heroes/hero_blademaster/mirror_image.lua"
+						"Function"      "Phantasm"
+						"sound"         "Hero_ChaosKnight.Phantasm.Plus"
+					}
+				}
+	
+				"States"
+				{
+					"MODIFIER_STATE_INVULNERABLE"           "MODIFIER_STATE_VALUE_ENABLED"
+					"MODIFIER_STATE_LOW_ATTACK_PRIORITY"    "MODIFIER_STATE_VALUE_ENABLED"
+					"MODIFIER_STATE_NO_HEALTH_BAR"          "MODIFIER_STATE_VALUE_ENABLED"
+					"MODIFIER_STATE_UNSELECTABLE"           "MODIFIER_STATE_VALUE_ENABLED"
+					"MODIFIER_STATE_STUNNED"                "MODIFIER_STATE_VALUE_ENABLED"
+				}
+			}
+		}
+	}
 
 //=================================================================================================================
 //=================================================================================================================
@@ -7585,6 +7476,289 @@
 			}
 		}
 	}
+
+	"roshan_clap"
+	  {
+	    // General
+	    //-------------------------------------------------------------------------------------------------------------
+	    "BaseClass"       "ability_datadriven"
+	    "AbilityBehavior"       "DOTA_ABILITY_BEHAVIOR_NO_TARGET  | DOTA_ABILITY_BEHAVIOR_AOE"
+	    "AOERadius"             "300"
+	    "AbilityTextureName"      "slardar_slithereen_crush"
+	    "AbilityUnitTargetTeam"   "DOTA_UNIT_TARGET_TEAM_ENEMY"
+	    "AbilityCastAnimation"    "ACT_DOTA_CAST_ABILITY_3" 
+	
+	    // Casting
+	    //-------------------------------------------------------------------------------------------------------------
+	    "AbilityCastPoint"        "0.25"
+	
+	    // Time   
+	    //-------------------------------------------------------------------------------------------------------------
+	    "AbilityCooldown"       "6"
+	
+	    // Cost
+	    //-------------------------------------------------------------------------------------------------------------
+	      "AbilityManaCost"       "100"
+	      "MaxLevel"              "1"
+	      "RequiredLevel"         "-1"
+	
+	    // Special  
+	    //-------------------------------------------------------------------------------------------------------------
+	      "AbilitySpecial"
+	      {
+	        "01"
+	        {
+	          "var_type"        "FIELD_FLOAT"
+	          "duration"        "5"
+	        }
+	        "02"
+	        {
+	          "var_type"        "FIELD_INTEGER"
+	          "radius"        "300"
+	        }
+	        "03"
+	        {
+	          "var_type"        "FIELD_FLOAT"
+	          "bonus_attack_speed"        "-100"
+	        }
+	        "04"
+	        {
+	          "var_type"        "FIELD_INTEGER"
+	          "bonus_movement_speed"        "-50"
+	        }
+	      }
+	
+	   //precache
+	      "precache"
+	      {
+	        "particle"  "particles/units/heroes/hero_slardar/slardar_crush_entity.vpcf"
+	        "particle"  "particles/units/heroes/hero_slardar/slardar_crush.vpcf"
+	      }
+	
+	    //SpellStart
+	    "OnSpellStart"
+	    {
+	        "ApplyModifier"
+	        {
+	          "ModifierName"  "modifier_clap"
+	          "Target"
+	          {
+	            "Center"    "CASTER"
+	            "Radius"   "%radius"
+	            "Teams"   "DOTA_UNIT_TARGET_TEAM_ENEMY"
+	            "Types"   "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+	          }
+	          "Duration"    "%duration"
+	        }
+	
+	        "FireEffect"
+	        {
+	          "EffectName"        "particles/units/heroes/hero_slardar/slardar_crush.vpcf"
+	          "EffectAttachType"  "follow_origin"
+	          "Target"            "CASTER"
+	        }
+	    }
+	    "Modifiers"
+	    {
+	      "modifier_clap"
+	      {
+	        "Passive"      "0"
+	        "IsHidden"      "0"
+	        "IsDebuff"      "1"
+	  
+	        "Properties"
+	        {
+	          "MODIFIER_PROPERTY_ATTACKSPEED_BONUS_CONSTANT" "%bonus_attack_speed"
+	          "MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE" "%bonus_movement_speed" 
+	        }
+	        "OnCreated"
+	        {
+	          "FireEffect"
+	          {
+	            "EffectName"        "particles/units/heroes/hero_slardar/slardar_crush_entity.vpcf"
+	            "EffectAttachType"  "follow_origin"
+	            "Target"            "TARGET"
+	          }
+	        }
+	      }
+	    }
+	  }
+	"roshan_grow"
+	  {
+	    // General
+	    //-------------------------------------------------------------------------------------
+	    "BaseClass" "ability_datadriven"
+	    "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+	    "MaxLevel"              "2"
+	    "RequiredLevel"        "10"
+	    "LevelsBetweenUpgrades" "5"
+	
+	    // Stats
+	    //-------------------------------------------------------------------------------------
+	    "AbilityCastPoint" "0.6"
+	    "AbilityCooldown"  "60"
+	    "AbilityManaCost"  "100"
+	    "AbilityTextureName" ""
+	    "AbilityUnitTargetTeam" "DOTA_UNIT_TARGET_TEAM_FRIENDLY"
+	
+	
+	    // Special
+	    //-------------------------------------------------------------------------------------
+	    "AbilitySpecial"
+	    {
+	        "01"
+	        {
+	          "var_type" "FIELD_FLOAT"
+	          "base_attack_rate" "0.5"
+	        }
+	        "02"
+	        {
+	          "var_type" "FIELD_FLOAT"
+	          "model_scale" "1.4"
+	        }           
+	    }
+	
+	    "precache"
+	    {
+	    }
+	
+	    // Data Driven
+	    //-------------------------------------------------------------------------------------
+	    "OnSpellStart"
+	    {
+	        "ApplyModifier"
+	        {
+	            "ModifierName" "modifier_grow"
+	            "Target"      "CASTER"
+	        }
+	
+	    }
+	
+	    "Modifiers"
+	    {
+	      
+	      "modifier_grow"
+	      {
+	
+	        "IsBuff" "1"
+	        "IsHidden" "0"
+	        "Passive" "0"
+	        "IsPurgable" "0"
+	        "Properties"
+	        {
+	          "MODIFIER_PROPERTY_BASE_ATTACK_TIME_CONSTANT" "%base_attack_rate"
+	          "MODIFIER_PROPERTY_COOLDOWN_REDUCTION_CONSTANT" "2"
+	
+	        }
+	        "OnCreated"
+	        {
+	          "RunScript"
+	          {
+	            "ScriptFile"  "heroes/npc_hero_roshan/roshan.lua"
+	            "Function"    "grow"
+	          }
+	        }
+	      }
+	    }    
+	  }
+	"roshan_invincible"
+	  {
+	    // General
+	    //-------------------------------------------------------------------------------------------------------------
+	    "BaseClass"       "ability_datadriven"
+	    "AbilityBehavior"       "DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+	    "AbilityTextureName"      "backdoor_protection"
+	    "MaxLevel"             "1"
+	    "RequiredLevel"        "-1"
+	    "AbilitySpecial"
+	    {
+	    }
+	
+	    "Modifiers"
+	    {
+	      "modifier_invincible"
+	      {
+	        "Passive"       "1"
+	        "IsHidden"      "0"
+	        "IsPurgable"    "0"
+	        "Properties"
+	        {
+	          "MODIFIER_PROPERTY_ABSOLUTE_NO_DAMAGE_PHYSICAL" "1"
+	          "MODIFIER_PROPERTY_ABSOLUTE_NO_DAMAGE_MAGICAL"  "1"
+	          "MODIFIER_PROPERTY_ABSOLUTE_NO_DAMAGE_PURE"     "1"
+	          "MODIFIER_PROPERTY_PROCATTACK_BONUS_DAMAGE_PURE"  "10000"
+	        }
+	      }
+	    }
+	  }
+	"roshan_stormbolt"
+	  {
+	    // General
+	    //-------------------------------------------------------------------------------------
+	    "BaseClass" "ability_datadriven"
+	    "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
+	    "MaxLevel"              "1"
+	    "RequiredLevel"        "-1"
+	
+	    // Stats
+	    //-------------------------------------------------------------------------------------
+	    "AbilityCastPoint" "0.5"
+	    "AbilityCooldown"  "20"
+	    "AbilityCastAnimation"    "ACT_DOTA_ATTACK" 
+	    "AbilityCastRange" "400"
+	    "AbilityManaCost"  "0"
+	    "AbilityTextureName" "sven_storm_bolt"
+	    "AbilityUnitDamageType" "DAMAGE_TYPE_MAGICAL"
+	    "AbilityUnitTargetTeam" "DOTA_UNIT_TARGET_TEAM_ENEMY"
+	    "AbilityUnitTargetType" "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+	    "AbilityDamage"         "1900"
+	    "AbilitySpecial"
+	    {
+	      "01"
+	      {
+	        "var_type"      "FIELD_FLOAT"
+	        "duration"      "2"
+	      }
+	      "02"
+	      {
+	        "var_type"      "FIELD_FLOAT"
+	        "projectile_speed"      "900"
+	      }
+	    }
+	
+	    "OnSpellStart"
+	    { 
+	      "TrackingProjectile"
+	      {
+	        "Target"             "TARGET"
+	        "EffectName"    "particles/units/heroes/hero_sven/sven_spell_storm_bolt.vpcf"
+	        "Dodgeable"      "1"
+	        "ProvidesVision"  "0"
+	        "MoveSpeed"          "%projectile_speed"
+	        "SourceAttachment"  "DOTA_PROJECTILE_ATTACHMENT_ATTACK_1"
+	      }
+	    }
+	
+	    "OnProjectileHitUnit"
+	    {
+	      "DeleteOnHit"  "1"
+	      "Stun"
+	      {
+	        "Duration"   "%duration"
+	        "Target"    "TARGET"
+	      }
+	      "Damage"
+	      {
+	        "Target"    "TARGET"
+	        "Type"      "DAMAGE_TYPE_MAGICAL"
+	        "Damage"    "%AbilityDamage"
+	      }
+	    }
+	    "precache"
+	    {
+	      "particle"  "particles/units/heroes/hero_sven/sven_spell_storm_bolt.vpcf"
+	    }
+	  }
 
 //====================================================================================================
 //====================================================================================================

@@ -1,3 +1,5 @@
+"use strict";
+
 //=============================================================================
 //=============================================================================
 function OnTeamGainingPoints( data )
@@ -31,6 +33,8 @@ function OnScoreChanged( data )
 (function () {
 	GameEvents.Subscribe( "team_points", OnScoreChanged );
 	GameEvents.Subscribe( "broadcast_team", OnTeamGainingPoints );
+	GameEvents.Subscribe( "show_timer", UpdateTimer );
+
 })();
 
 //=============================================================================
@@ -281,37 +285,49 @@ function _ScoreboardUpdater_UpdateTeamPanel( scoreboardConfig, containerPanel, t
 	return teamPanel;
 }
 
-function UpdateTimer()
+function UpdateTimer( data )
 {
-	var timerValue = Game.GetDOTATime( false, true );
+	//$.Msg( "UpdateTimer: ", data );
+	//var timerValue = Game.GetDOTATime( false, false );
+
+	//var sec = Math.floor( timerValue % 60 );
+	//var min = Math.floor( timerValue / 60 );
+
+	//var timerText = "";
+	//timerText += min;
+	//timerText += ":";
+
+	//if ( sec < 10 )
+	//{
+	//	timerText += "0";
+	//}
+	//timerText += sec;
+
 	var timerText = "";
+	timerText += data.timer_minute_10;
+	timerText += data.timer_minute_01;
+	timerText += ":";
+	timerText += data.timer_second_10;
+	timerText += data.timer_second_01;
 
-	if ( timerValue < 0 )
-	{
-		timerValue = -timerValue;
-	}
+	$( "#Timer" ).text = timerText;
 
-	var sec = Math.floor( timerValue % 60 );
-	var min = Math.floor( timerValue / 60 );
+	//$.Schedule( 0.1, UpdateTimer );
+}
 
-//	if ( min > 0 )
-	{
-		timerText += min;
-		timerText += ":";
+function ShowTimer( data )
+{
+	$( "#Timer" ).AddClass( "timer_visible" );
+}
 
-		if ( sec < 10 )
-		{
-			timerText += "0";
-		}
-	}
+function AlertTimer( data )
+{
+	$( "#Timer" ).AddClass( "timer_alert" );
+}
 
-	timerText += sec;
-
-	var timePanel = $( "#ScoreboardCurrentTime" );
-	if ( timePanel )
-	{
-		timePanel.text = timerText;
-	}
+function HideTimer( data )
+{
+	$( "#Timer" ).AddClass( "timer_hidden" );
 }
 
 //=============================================================================
@@ -334,12 +350,6 @@ function _ScoreboardUpdater_UpdateAllTeamsAndPlayers( scoreboardConfig, teamsCon
 		{
 			panelsByTeam[ teamsList[i].team_id ] = teamPanel;
 		}
-	}
-
-	var scoreGoal = $( "#ScoreboardGoal" );
-	if ( scoreGoal )
-	{
-		scoreGoal.text = "5000";
 	}
 
 	UpdateTimer();
