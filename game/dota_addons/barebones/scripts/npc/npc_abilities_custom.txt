@@ -2626,7 +2626,7 @@
 			"modifier_aura_of_blight"
 			{
 				"Passive"           "1"
-				"IsHidden"          "0"
+				"IsHidden"          "1"
 				"IsBuff"            "1"
 
 				"Aura"              "modifier_aura_of_blight_datadriven"
@@ -2638,7 +2638,7 @@
 			"modifier_aura_of_blight_datadriven"
 			{
 				"Passive"   "1"
-				"IsHidden"  "1"
+				"IsHidden"  "0"
 
 				"Properties"
 				{
@@ -4101,7 +4101,7 @@
 			"01"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"damage"					"120 200 260 340 500 850 1200"
+				"damage"					"150 250 350 450 650 950 1500"
 			}
 			"02"
 			{
@@ -7498,7 +7498,7 @@
 	
 	    // Cost
 	    //-------------------------------------------------------------------------------------------------------------
-	      "AbilityManaCost"       "100"
+	      "AbilityManaCost"       "0"
 	      "MaxLevel"              "1"
 	      "RequiredLevel"         "-1"
 	
@@ -7597,7 +7597,7 @@
 	    //-------------------------------------------------------------------------------------
 	    "AbilityCastPoint" "0.6"
 	    "AbilityCooldown"  "60"
-	    "AbilityManaCost"  "100"
+	    "AbilityManaCost"  "0"
 	    "AbilityTextureName" ""
 	    "AbilityUnitTargetTeam" "DOTA_UNIT_TARGET_TEAM_FRIENDLY"
 	
@@ -9436,7 +9436,7 @@
 			"modifier_aura_of_blight"
 			{
 				"Passive"           "1"
-				"IsHidden"          "0"
+				"IsHidden"          "1"
 				"IsBuff"            "1"
 
 				"Aura"              "modifier_aura_of_blight_datadriven"
@@ -9448,7 +9448,7 @@
 			"modifier_aura_of_blight_datadriven"
 			{
 				"Passive"   "1"
-				"IsHidden"  "1"
+				"IsHidden"  "0"
 
 				"Properties"
 				{

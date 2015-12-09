@@ -5,7 +5,6 @@ require("statcollection/init")
 -- Precache resources
 function Precache( context )
 	PrecacheItemByNameSync( "item_ankh_of_reincarnation", context )
-	PrecacheItemByNameSync( "item_salve_500", context )
 	PrecacheItemByNameSync( "item_assassins_blade", context )
 	PrecacheItemByNameSync( "item_claws_of_attack", context )
 
@@ -46,6 +45,7 @@ function Precache( context )
 	PrecacheResource( "particle_folder", "particles/units/heroes/hero_nevermore", context )
 	PrecacheResource( "particle_folder", "particles/units/heroes/hero_vengeful", context )
 	PrecacheResource( "particle_folder", "particles/units/heroes/hero_abaddon", context )
+	PrecacheResource( "particle_folder", "particles/units/heroes/hero_skeletonking", context )
 
 	-- PRECACHE SOUNDS
 	PrecacheResource( "soundfile", "soundevents/game_sounds_heroes/game_sounds_lina.vsndevts", context )
@@ -86,6 +86,9 @@ function Precache( context )
 	PrecacheUnitByNameSync( "npc_dota_creature_vengeful_spirit_event_3", context)
 	PrecacheUnitByNameSync( "npc_dota_creature_captain_event_4", context)
 
+	-- Special Events
+	PrecacheUnitByNameSync( "npc_dota_creature_muradin_bronzebeard", context)
+
 	-- PHASE 2
 	PrecacheUnitByNameSync( "npc_ghul_II", context)
 	PrecacheUnitByNameSync( "npc_orc_II", context)
@@ -107,8 +110,10 @@ function Precache( context )
 	-- PHASE 3
 	PrecacheUnitByNameSync( "npc_dota_creep_radiant_hulk", context)
 	PrecacheUnitByNameSync( "npc_dota_creep_dire_hulk", context)
+
 	-- 4 Bosses Arena
 	PrecacheUnitByNameSync( "npc_dota_hero_grom_hellscream", context)
+
 	-- Last Arena
 	PrecacheUnitByNameSync( "npc_dota_hero_arthas", context)
 	PrecacheUnitByNameSync( "npc_dota_hero_banehallow", context)

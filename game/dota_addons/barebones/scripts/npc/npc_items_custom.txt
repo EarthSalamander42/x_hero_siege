@@ -998,7 +998,7 @@
 			"03"
 			{
 				"var_type"				"FIELD_FLOAT"
-				"health_regen_rate"		"4.25"
+				"health_regen_rate"		"3.5"
 			}
 			"04"
 			{
@@ -1085,7 +1085,7 @@
 			"03"
 			{
 				"var_type"				"FIELD_FLOAT"
-				"health_regen_rate"		"4.5"
+				"health_regen_rate"		"4.0"
 			}
 			"04"
 			{

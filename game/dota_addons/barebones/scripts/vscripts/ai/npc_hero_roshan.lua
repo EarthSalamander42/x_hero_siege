@@ -15,10 +15,8 @@ function Spawn( entityKeyValues )
 
 	Timers:CreateTimer(0,RoshanThink)
 	Timers:CreateTimer(0,RoshanWalk)
-	Timers:CreateTimer(SpecialEventRoshanDuration/2,RoshanGrow)
 
 	DebugPrint("Starting AI for "..thisEntity:GetUnitName().." "..thisEntity:GetEntityIndex())
-
 end
 
 function RoshanThink()
@@ -40,7 +38,7 @@ function RoshanThink()
 		for _,v in pairs(units) do
 			number = number +1
 		end
-		
+
 		if number >= 1 then
 			thisEntity:CastAbilityNoTarget(Ability_clap,-1)
 		end

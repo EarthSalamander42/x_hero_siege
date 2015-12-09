@@ -10,7 +10,7 @@
 	
 	"Addon_Game_Name"					"X Hero Siege"
 
-	"MuradinGoal"						"Muradin"
+	"MuradinGoal"						"Muradin Countdown"
 
 	"Loading_Objectives_Title"			"Objectives:"
 	"Loading_Objectives1"				"- Choose one lane to defend against incoming Forces of Darkness"

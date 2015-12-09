@@ -28,7 +28,7 @@ GameMode.FrostTowers_killed = 0
 GameMode.Magtheridon_killed = 0
 GameMode.BossesTop_killed = 0
 GameMode.Arthas_killed = 0
-GameMode.Muradin_Event = false
+GameMode.Muradin_Event = 0
 end
 
 function GameMode:OnHeroInGame(hero)
@@ -57,23 +57,26 @@ function GameMode:OnGameInProgress()
 	--// Timer: Creeps Levels 2, 3, 4, 5 Whispering
 	--//=================================================================================================================
 	Timers:CreateTimer(360, function() -- 6 Min
-	Notifications:TopToAll({text="Creeps are now Level 2!", duration=6.0})
+	Notifications:TopToAll({hero="npc_dota_hero_undying", duration=6.0})
+	Notifications:TopToAll({text="Creeps are now Level 2!", style={color="green"}, continue=true})
 	end)
 	Timers:CreateTimer(720, function() -- 12 Min
-	Notifications:TopToAll({text="Creeps are now Level 3!", duration=6.0})
+	Notifications:TopToAll({hero="npc_dota_hero_nyx_assassin", duration=6.0})
+	Notifications:TopToAll({text="Creeps are now Level 3!", style={color="green"}, continue=true})
 	end)
 	Timers:CreateTimer(1080, function() -- 18 Min
-	Notifications:TopToAll({text="Creeps are now Level 4!", duration=6.0})
+	Notifications:TopToAll({hero="npc_dota_hero_doom", duration=6.0})
+	Notifications:TopToAll({text="Creeps are now Level 4!", style={color="green"}, continue=true})
 	end)
 	Timers:CreateTimer(1440, function() -- 24 Min
-	Notifications:TopToAll({text="Creeps are now Level 5!", duration=6.0})
+	Notifications:TopToAll({hero="npc_dota_hero_phantom_lancer", duration=6.0})
+	Notifications:TopToAll({text="Creeps are now Level 5!", style={color="green"}, continue=true})
 	end)
-
 	--//=================================================================================================================
 	--// Timer: West, North, East, South Event 1 Whispering
 	--//=================================================================================================================
 	Timers:CreateTimer(270, function() -- 4 Min 30 sec
-	Notifications:TopToAll({text="Incoming wave of Darkness from the West! You have 30 seconds!", duration=29.0})
+	Notifications:TopToAll({text="Incoming wave of Darkness from the West! You have 30 seconds!", duration=29.0, color="red"})
 	end)
 	Timers:CreateTimer(570, function() -- 9 Min 30 sec
 	Notifications:TopToAll({text="Incoming wave of Darkness from the North! You have 30 seconds!", duration=29.0})
@@ -88,62 +91,61 @@ function GameMode:OnGameInProgress()
 	--//=================================================================================================================
 	--// Timer: Creeps Level 1, 5 West 1
 	--//=================================================================================================================
-	if GetMapName() == "x_hero_siege_8_players" and GameMode.Muradin_Event == false then -- 8 Players Creep Lanes
+	if GetMapName() == "x_hero_siege_8_players" and GameMode.Muradin_Event == 0 then -- 8 Players Creep Lanes
 	local time_elapsed = 0
 	local EntBarrack = Entities:FindByName( nil, "dota_badguys_barracks_west_1" )
-	Timers:CreateTimer(0, function()
-	time_elapsed = time_elapsed + 30 -- with this system, the time_elapsed should be set to the Game Time + 30 sec, e.g: 5 Min = 300sec + 30 = 330
-	print( time_elapsed )
---	Notifications:TopToAll({text="Creep Lane 1, West 1 spawning in Normal Mode", duration=6.0})
-		if PlayerResource:GetPlayerCount() >= 1 and EntBarrack:IsAlive() and time_elapsed < 390 then -- Level 1 lower than 6 min
-		local point = Entities:FindByName( nil, "npc_dota_spawner_1"):GetAbsOrigin()
-			for j = 1, 3 do
-			local unit = CreateUnitByName("npc_dota_creature_mini_lifestealers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
-			end
-			local unit = CreateUnitByName("npc_dota_creature_mini_weavers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
-		return 30 -- Rerun this timer every 30 game-time seconds
+		Timers:CreateTimer(0, function()
+		time_elapsed = time_elapsed + 30 -- with this system, the time_elapsed should be set to the Game Time + 30 sec, e.g: 5 Min = 300sec + 30 = 330
+		print( time_elapsed )
+--		Notifications:TopToAll({text="Creep Lane 1, West 1 spawning in Normal Mode", duration=6.0})
+			if PlayerResource:GetPlayerCount() >= 1 and EntBarrack:IsAlive() and time_elapsed < 390 then -- Level 1 lower than 6 min
+			local point = Entities:FindByName( nil, "npc_dota_spawner_1"):GetAbsOrigin()
+				for j = 1, 3 do
+				local unit = CreateUnitByName("npc_dota_creature_mini_lifestealers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
+				end
+				local unit = CreateUnitByName("npc_dota_creature_mini_weavers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
+			return 30 -- Rerun this timer every 30 game-time seconds
 
-		elseif PlayerResource:GetPlayerCount() >= 1 and EntBarrack:IsAlive() and time_elapsed >= 390 and time_elapsed < 750 then -- Level 2, higher or equal to 6 min
-		local point = Entities:FindByName( nil, "npc_dota_spawner_1"):GetAbsOrigin()
-			for j = 1, 4 do
-			local unit = CreateUnitByName("npc_dota_creature_mini_undyings", point, true, nil, nil, DOTA_TEAM_BADGUYS)
-			end
-			local unit = CreateUnitByName("npc_dota_creature_mini_necrolytes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
-			local unit = CreateUnitByName("npc_dota_creature_mini_necrolytes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
-		return 30
+			elseif PlayerResource:GetPlayerCount() >= 1 and EntBarrack:IsAlive() and time_elapsed >= 390 and time_elapsed < 750 then -- Level 2, higher or equal to 6 min
+			local point = Entities:FindByName( nil, "npc_dota_spawner_1"):GetAbsOrigin()
+				for j = 1, 4 do
+				local unit = CreateUnitByName("npc_dota_creature_mini_undyings", point, true, nil, nil, DOTA_TEAM_BADGUYS)
+				end
+				local unit = CreateUnitByName("npc_dota_creature_mini_necrolytes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
+				local unit = CreateUnitByName("npc_dota_creature_mini_necrolytes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
+			return 30
 
-		elseif PlayerResource:GetPlayerCount() >= 1 and EntBarrack:IsAlive() and time_elapsed >= 750 and time_elapsed < 1110 then -- Level 3, higher or equal to 12 min
-		local point = Entities:FindByName( nil, "npc_dota_spawner_1"):GetAbsOrigin()
-			for j = 1, 5 do
-			local unit = CreateUnitByName("npc_dota_creature_mini_nyxes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
-			end
-			for j = 1, 3 do
-			local unit = CreateUnitByName("npc_dota_creature_mini_banes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
-			end
-		return 30
+			elseif PlayerResource:GetPlayerCount() >= 1 and EntBarrack:IsAlive() and time_elapsed >= 750 and time_elapsed < 1110 then -- Level 3, higher or equal to 12 min
+			local point = Entities:FindByName( nil, "npc_dota_spawner_1"):GetAbsOrigin()
+				for j = 1, 5 do
+				local unit = CreateUnitByName("npc_dota_creature_mini_nyxes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
+				end
+				for j = 1, 3 do
+				local unit = CreateUnitByName("npc_dota_creature_mini_banes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
+				end
+			return 30
 
-		elseif PlayerResource:GetPlayerCount() >= 1 and EntBarrack:IsAlive() and time_elapsed >= 1110 and time_elapsed < 1470 then -- Level 4, higher or equal to 18 min
-		local point = Entities:FindByName( nil, "npc_dota_spawner_1"):GetAbsOrigin()
-			for j = 1, 5 do
-			local unit = CreateUnitByName("npc_dota_creature_mini_dooms", point, true, nil, nil, DOTA_TEAM_BADGUYS)
-			end
-			for j = 1, 3 do
-			local unit = CreateUnitByName("npc_dota_creature_mini_phoenixes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
-			end
-		return 30
+			elseif PlayerResource:GetPlayerCount() >= 1 and EntBarrack:IsAlive() and time_elapsed >= 1110 and time_elapsed < 1470 then -- Level 4, higher or equal to 18 min
+			local point = Entities:FindByName( nil, "npc_dota_spawner_1"):GetAbsOrigin()
+				for j = 1, 5 do
+				local unit = CreateUnitByName("npc_dota_creature_mini_dooms", point, true, nil, nil, DOTA_TEAM_BADGUYS)
+				end
+				for j = 1, 3 do
+				local unit = CreateUnitByName("npc_dota_creature_mini_phoenixes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
+				end
+			return 30
 
-		elseif PlayerResource:GetPlayerCount() >= 1 and EntBarrack:IsAlive() and time_elapsed >= 1470 then -- Level 4, higher or equal to 18 min
-		local point = Entities:FindByName( nil, "npc_dota_spawner_1"):GetAbsOrigin()
-			for j = 1, 6 do
-			local unit = CreateUnitByName("npc_dota_creature_mini_lancers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
+			elseif PlayerResource:GetPlayerCount() >= 1 and EntBarrack:IsAlive() and time_elapsed >= 1470 then -- Level 4, higher or equal to 18 min
+			local point = Entities:FindByName( nil, "npc_dota_spawner_1"):GetAbsOrigin()
+				for j = 1, 6 do
+				local unit = CreateUnitByName("npc_dota_creature_mini_lancers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
+				end
+				for j = 1, 4 do
+				local unit = CreateUnitByName("npc_dota_creature_mini_miranas", point, true, nil, nil, DOTA_TEAM_BADGUYS)
+				end
+			return 30
 			end
-			for j = 1, 4 do
-			local unit = CreateUnitByName("npc_dota_creature_mini_miranas", point, true, nil, nil, DOTA_TEAM_BADGUYS)
-			end
-		return 30
-		else return nil
-		end
-	end)
+		end)
 
 	--//=================================================================================================================
 	--// Timer: Creeps Level 1, 4 West 2
@@ -198,7 +200,6 @@ function GameMode:OnGameInProgress()
 			local unit = CreateUnitByName("npc_dota_creature_mini_miranas", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 			end
 		return 30 -- Rerun this timer every 30 game-time seconds
-		else return nil
 		end
 	end)
 
@@ -255,7 +256,6 @@ function GameMode:OnGameInProgress()
 			local unit = CreateUnitByName("npc_dota_creature_mini_miranas", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 			end
 		return 30 -- Rerun this timer every 30 game-time seconds
-		else return nil
 		end
 	end)
 
@@ -312,7 +312,6 @@ function GameMode:OnGameInProgress()
 			local unit = CreateUnitByName("npc_dota_creature_mini_miranas", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 			end
 		return 30 -- Rerun this timer every 30 game-time seconds
-		else return nil
 		end
 	end)
 
@@ -369,7 +368,6 @@ function GameMode:OnGameInProgress()
 			local unit = CreateUnitByName("npc_dota_creature_mini_miranas", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 			end
 		return 30 -- Rerun this timer every 30 game-time seconds
-		else return nil
 		end
 	end)
 
@@ -426,7 +424,6 @@ function GameMode:OnGameInProgress()
 			local unit = CreateUnitByName("npc_dota_creature_mini_miranas", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 			end
 		return 30 -- Rerun this timer every 30 game-time seconds
-		else return nil
 		end
 	end)
 
@@ -483,7 +480,6 @@ function GameMode:OnGameInProgress()
 			local unit = CreateUnitByName("npc_dota_creature_mini_miranas", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 			end
 		return 30 -- Rerun this timer every 30 game-time seconds
-		else return nil
 		end
 	end)
 
@@ -540,9 +536,11 @@ function GameMode:OnGameInProgress()
 			local unit = CreateUnitByName("npc_dota_creature_mini_miranas", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 			end
 		return 30 -- Rerun this timer every 30 game-time seconds
-		else return nil
 		end
 	end)
+	elseif GameMode.Muradin_Event == 1 then
+		return 30 -- Return 30sec if Muradin Event is happening
+	end -- end of if Map == Normal and not Event Muradin Running
 
 	--//=================================================================================================================
 	--// HARD MODE
@@ -550,7 +548,7 @@ function GameMode:OnGameInProgress()
 	--//=================================================================================================================
 	--// Timer: Creeps Level 1, 5 West 1
 	--//=================================================================================================================
-	elseif GetMapName() == "hardmode" then -- 4 Players Creep Lanes, Hard Mode
+	if GetMapName() == "hardmode" and GameMode.Muradin_Event == 0 then -- 4 Players Creep Lanes, Hard Mode
 
 	local time_elapsed = 0
 	local EntBarrack = Entities:FindByName( nil, "dota_badguys_barracks_west_1" )
@@ -559,7 +557,6 @@ function GameMode:OnGameInProgress()
 	print( time_elapsed )
 --	Notifications:TopToAll({text="Creep Lane 1, West 1 spawning in Hard Mode", duration=6.0})
 		if PlayerResource:GetPlayerCount() >= 1 and EntBarrack:IsAlive() and time_elapsed < 390 then -- Level 1 lower than 6 min
-		print( "Creep Lane 1, West 1 spawning in Hard Mode" )
 		local point = Entities:FindByName( nil, "npc_dota_spawner_1"):GetAbsOrigin()
 			for j = 1, 3 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_lifestealers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -605,7 +602,6 @@ function GameMode:OnGameInProgress()
 			local unit = CreateUnitByName("npc_dota_creature_mini_miranas", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 			end
 		return 30 -- Rerun this timer every 30 game-time seconds
-		else return nil
 		end
 	end)
 
@@ -617,7 +613,6 @@ function GameMode:OnGameInProgress()
 	local TimerWest2 = Timers:CreateTimer(0, function()
 		time_elapsed = time_elapsed + 30 -- with this system, the time_elapsed should be set to the Game Time + 30 sec, e.g: 5 Min = 300sec + 30 = 330
 		if PlayerResource:GetPlayerCount() >= 1 and EntBarrack:IsAlive() and time_elapsed < 390 then -- Level 1 lower than 6 min
-		print( "Creep Lane 1, West 2 spawning in Hard Mode" )
 		local point = Entities:FindByName( nil, "npc_dota_spawner_2"):GetAbsOrigin()
 			for j = 1, 3 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_lifestealers", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -663,7 +658,6 @@ function GameMode:OnGameInProgress()
 			local unit = CreateUnitByName("npc_dota_creature_mini_miranas", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 			end
 		return 30 -- Rerun this timer every 30 game-time seconds
-		else return nil
 		end
 	end)
 
@@ -720,7 +714,6 @@ function GameMode:OnGameInProgress()
 			local unit = CreateUnitByName("npc_dota_creature_mini_miranas", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 			end
 		return 30 -- Rerun this timer every 30 game-time seconds
-		else return nil
 		end
 	end)
 
@@ -777,7 +770,6 @@ function GameMode:OnGameInProgress()
 			local unit = CreateUnitByName("npc_dota_creature_mini_miranas", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 			end
 		return 30 -- Rerun this timer every 30 game-time seconds
-		else return nil
 		end
 	end)
 
@@ -834,7 +826,6 @@ function GameMode:OnGameInProgress()
 			local unit = CreateUnitByName("npc_dota_creature_mini_miranas", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 			end
 		return 30 -- Rerun this timer every 30 game-time seconds
-		else return nil
 		end
 	end)
 
@@ -891,7 +882,6 @@ function GameMode:OnGameInProgress()
 			local unit = CreateUnitByName("npc_dota_creature_mini_miranas", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 			end
 		return 30 -- Rerun this timer every 30 game-time seconds
-		else return nil
 		end
 	end)
 
@@ -948,7 +938,6 @@ function GameMode:OnGameInProgress()
 			local unit = CreateUnitByName("npc_dota_creature_mini_miranas", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 			end
 		return 30 -- Rerun this timer every 30 game-time seconds
-		else return nil
 		end
 	end)
 
@@ -1005,10 +994,11 @@ function GameMode:OnGameInProgress()
 			local unit = CreateUnitByName("npc_dota_creature_mini_miranas", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 			end
 		return 30 -- Rerun this timer every 30 game-time seconds
-		else return nil
 		end
 	end)
-	end -- end of if Map == Normal or Hard
+	elseif GameMode.Muradin_Event == 1 then
+		return 30
+	end -- end of if Map == Hard
 
 	--//=================================================================================================================
 	--// Timer: West Event 1 Spawn
@@ -1055,12 +1045,79 @@ function GameMode:OnGameInProgress()
 	end)
 
 	--//=================================================================================================================
+	--// Timer: Muradin Bronzebeard Event 14 Min( End the Event )
+	--//=================================================================================================================
+	Timers:CreateTimer(830, function() -- 13:50 Min: MURADIN BRONZEBEARD EVENT 1, END
+	GameMode.Muradin_Event = 0
+	Notifications:TopToAll({text="All alive heroes have received 10 000 Gold!", duration=6.0})
+	Notifications:TopToAll({ability="alchemist_goblins_greed", continue=true})
+	end)
+
+	--//=================================================================================================================
 	--// Timer: Muradin Bronzebeard Event 12 Min( Freeze Creep Lanes )
 	--//=================================================================================================================
-	Timers:CreateTimer(300, function() -- 12 Min: MURADIN BRONZEBEARD EVENT 1
-	local point = Entities:FindByName( nil, "npc_dota_muradin_boss"):GetAbsOrigin()
-	local unit = CreateUnitByName("npc_dota_creature_muradin_bronzebeard", point, true, nil, nil, DOTA_TEAM_BADGUYS)
+	Timers:CreateTimer(710, function() -- 11:50 Min: MURADIN BRONZEBEARD EVENT 1
+	GameMode.Muradin_Event = 1
+	local point = Entities:FindByName(nil,"npc_dota_muradin_boss"):GetAbsOrigin()
+	local MuradinEvent = CreateUnitByName("npc_dota_creature_muradin_bronzebeard",Entities:FindByName(nil,"npc_dota_muradin_boss"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_BADGUYS)
+	local heroes = HeroList:GetAllHeroes()
+	MuradinEvent:SetAngles(0, 270, 0)
+	Notifications:TopToAll({hero="npc_dota_hero_zuus", duration=5.0})
+	Notifications:TopToAll({text="Muradin Event Begins!", continue=true})
+--	local towers = Entities:FindAllByName("npc_dota_creature_mini_lifestealers")
+	Timers:CreateTimer( 3.0, StartMuradinEvent )
+	Timers:CreateTimer( 120, EndMuradinEvent ) 
+--		for _,tower in pairs(towers)do
+--			tower:AddNewModifier(nil,nil,"modifier_invulnerable",nil)
+--			tower:AddNewModifier(nil, nil, "modifier_stunned",nil)
+--		end
+		Timers:CreateTimer(130, function() -- 2:30 Min
+		MuradinEvent:ForceKill(true)
+		end)
+		for _,hero in pairs(heroes) do
+			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
+				FindClearSpaceForUnit(hero, point, true)
+				hero:AddNewModifier(nil, nil, "modifier_stunned",nil)
+				hero:AddNewModifier(nil, nil, "modifier_invulnerable",nil)
+				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
+			end
+		end
 	end)
+end
+
+function StartMuradinEvent()
+	local heroes = HeroList:GetAllHeroes()
+		for _,hero in pairs(heroes) do
+			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
+			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil)
+			hero:RemoveModifierByName("modifier_stunned")
+			hero:RemoveModifierByName("modifier_invulnerable")
+			end
+		end
+	return nil
+end
+
+function EndMuradinEvent()
+	local heroes = HeroList:GetAllHeroes()
+	local point = Entities:FindByName(nil,"base_spawn"):GetAbsOrigin()
+	Timers:CreateTimer(5.0, function()
+		for _,hero in pairs(heroes) do
+			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
+				if hero:IsAlive() then
+				PlayerResource:ModifyGold( hero:GetPlayerOwnerID(), 10000, false,  DOTA_ModifyGold_Unspecified )
+				end
+			FindClearSpaceForUnit(hero, point, true)
+			Timers:CreateTimer(2.0, function()
+			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil)
+			hero:RemoveModifierByName("modifier_stunned")
+			end)
+			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
+			hero:AddNewModifier(nil, nil, "modifier_stunned",nil)
+			end
+		end
+	end)
+
+	return nil
 end
 
 XP_PER_LEVEL_TABLE = {
@@ -1124,26 +1181,27 @@ function GameMode:InitGameMode()
 	mode:SetCustomHeroMaxLevel( 50 )
 	mode:SetCustomXPRequiredToReachNextLevel( XP_PER_LEVEL_TABLE )
 	mode:SetUseCustomHeroLevels( true )
+	mode:SetFixedRespawnTime( 120 )
+	mode:SetBuybackEnabled( false )
 
 	GameMode:_InitGameMode()
 
 	Convars:RegisterCommand( "command_example", Dynamic_Wrap(GameMode, 'ExampleConsoleCommand'), "A console command example", FCVAR_CHEAT )
-	Convars:RegisterCommand( "overthrow_set_timer", function(...) return SetTimer( ... ) end, "Set the timer.", FCVAR_CHEAT )
 
 	DebugPrint('[BAREBONES] Done loading Barebones gamemode!\n\n')
 end
 
 -- This is an example console command
 function GameMode:ExampleConsoleCommand()
-  print( '******* Example Console Command ***************' )
-  local cmdPlayer = Convars:GetCommandClient()
-  if cmdPlayer then
-	local playerID = cmdPlayer:GetPlayerID()
-	if playerID ~= nil and playerID ~= -1 then
-	  -- Do something here for the player who called this command
-	  PlayerResource:ReplaceHeroWith(playerID, "npc_dota_hero_viper", 1000, 1000)
+	print( '******* Example Console Command ***************' )
+	local cmdPlayer = Convars:GetCommandClient()
+		if cmdPlayer then
+		local playerID = cmdPlayer:GetPlayerID()
+		if playerID ~= nil and playerID ~= -1 then
+		  -- Do something here for the player who called this command
+		  PlayerResource:ReplaceHeroWith(playerID, "npc_dota_hero_viper", 1000, 1000)
+		end
 	end
-  end
 
-  print( '*********************************************' )
+	print( '*********************************************' )
 end

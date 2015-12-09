@@ -6,14 +6,14 @@ function reincarnation( event )
 	local respawntime = ability:GetSpecialValueFor("reincarnation_time")
 
 	if hero:IsRealHero() then
-		hero:SetBuybackEnabled(false)
+--		hero:SetBuybackEnabled(false)
 		
 		hero.respawn_timer = Timers:CreateTimer(respawntime,function () 
 			hero:SetRespawnPosition(position)
 			hero:RespawnHero(false, false, false)
 			ParticleManager:CreateParticle("particles/items_fx/aegis_respawn.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
 			hero.ankh_respawn = false
-			hero:SetBuybackEnabled(true)
+--			hero:SetBuybackEnabled(true)
 			end)
 		hero.ankh_respawn = true
 

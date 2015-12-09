@@ -980,26 +980,42 @@ Fix:
 
 
 //===========================================================================================================
-X Hero Siege ( BETA ) 0.9.9 Fix
+X Hero Siege ( BETA ) 0.9.9 Update
 //===========================================================================================================
 
-- Created Muradin Arena( Muradin coming really soon, few days )
+- Created Muradin Arena, and Added Muradin Event( May have few bugs, i count on you to find them :P )
 - Updated the new map into Normal Mode
-- Added Permanent vision upper Muradin Arena, and Magtheridon Arena
+- Added Permanent vision at Runes, upper Muradin Arena and Magtheridon Arena
+- Map Improvements: Created paths in snow, top
+- Improved Global Messages
+- Disabled Buyback
 
 Gameplay:
 - Increased level 4 ranged creep Corrosive Skin damage from 20 to 60
+- Increased Demon Hunter Negative Energy damage from 120/200/260/340/500/850/1200 to 150/250/350/450/650/950/1500
+- Increased Incoming Wave 4 Armor from 40 to 50
 - Reduced Banehallow HP from 160000 to 140000
 - Reduced Heart of Tarrasque health regen % from 4% to 3%
 - Reduced Heart of Tarrasque 2 health regen % from 4.25% to 3.5%
+- Reduced Infernal Beast Damage from 5000 to 4000
 - Reduced Heart of Tarrasque 3 health regen % from 4.5% to 4%
+- Reduced Infernal Beast HP from 40000 to 20000
 - Reduced Undead Arthas HP from 220000 to 180000
 - Deleted Juggernaut( In order to add Blademaster soon )
+- Deleted Ghost Scepter
+- Deleted Orchid Malevolence
+- Deleted Vanguard
+- Deleted Urn of Shadows
 
 Fix:
-- Fixed Waves spawning 1 more time when barrack destroyed( or ice tower for Phase 2 )
+- Fixed Top Shops being in walls
+- Fixed Respawn Time not working, now 120 sec no matter your level( Like wc3 x hero siege )
+- Fixed Waves spawning 1 more time when barrack destroyed( Ice Tower for Phase 2 as well )
 - Fixed Abyssal Blade bash in rare times
-
+- Fixed TP stopped when using orders after( for players who have the teleport order queue enabled )
+- Fixed Banehallow Revenants being able to attack before the fight begins( they were only attacking units and not heroes )
+- Fixed Banhallow particles ability
+- Fixed Incoming Wave 4 having ranged attack speed
 
 //================================================================================================================================================
 //================================================================================================================================================
@@ -1008,13 +1024,18 @@ Fix:
 //================================================================================================================================================
 
 //Magnus Wars
+Tinus - Sandburg
+Fat Punk( French Fuse Remix )
+Deep Sense Demo( by me )
 
 //Faceless Void Wars
 Fix Red Chronosphere not particle bug, need to recreate
 
 //X Hero Siege
-Special Event: Muradin Bronzebeard
-if IsValidEntity(GameRules.currentBoss) and GameRules.currentBoss:IsAlive() then return CheckWestBarracks() end 
+Special Event: Muradin Bronzebeard:
+Fix Creeps shouldn't spawn
+Fix Creeps Freeze create Function
+Fix Creeps Ice Tower 2 spawn 1 wave after destroy
 
 
 Fix Doors opening for all lanes at the beginning of a game

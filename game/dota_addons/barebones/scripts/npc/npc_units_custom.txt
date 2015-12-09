@@ -3027,14 +3027,14 @@
 		"ConsideredHero"			"1"
 		"MinimapIcon"				"minimap_roshancamp"
 		"MinimapIconSize"			"500"
-		"SoundSet"					"Hero_Enigma"
+		"SoundSet"					"Hero_DragonKnight"
 
 		// Abilities
 		//----------------------------------------------------------------
 //		"Ability1"					"creature_malefice"				// Ability 1.
 //		"Ability2"					"creature_demonic_silence"		// Ability 2.
 //		"Ability3"					"creature_midnight_pulse"		// Ability 3.
-		"Ability4"					"creature_black_hole"			// Ability 4.
+		"Ability4"					"dragon_knight_dragon_blood"			// Ability 4.
 
 		// Inventory
 		//----------------------------------------------------------------
@@ -3042,26 +3042,26 @@
 
 		// Armor
 		//----------------------------------------------------------------
-		"ArmorPhysical"				"40"	// Physical protection.
+		"ArmorPhysical"				"50"	// Physical protection.
 		"MagicalResistance"			"25"	// Magical protection.
 
 		// Attack
 		//----------------------------------------------------------------
-		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
+		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
 		"AttackDamageMin"			"941"						// Damage range min.
 		"AttackDamageMax"			"945"						// Damage range max.
 		"AttackRate"				"1.0"						// Speed of attack.
 		"AttackAnimationPoint"		"0.4"						// Normalized time in animation cycle to attack.
 		"AttackAcquisitionRange"	"1000"						// Range within a target can be acquired.
-		"AttackRange"				"450"						// Range within a target can be attacked.
+		"AttackRange"				"150"						// Range within a target can be attacked.
 		"ProjectileModel"			"particles/units/heroes/hero_enigma/enigma_base_attack.vpcf"							// Particle system model for projectile.
 		"ProjectileSpeed"			"900"							// Speed of projectile.
 
 		// Bounty
 		//----------------------------------------------------------------
-		"BountyXP"					"150"		// Experience earn.
-		"BountyGoldMin"				"200"		// Gold earned min.
-		"BountyGoldMax"				"200"		// Gold earned max.
+		"BountyXP"					"175"		// Experience earn.
+		"BountyGoldMin"				"750"		// Gold earned min.
+		"BountyGoldMax"				"800"		// Gold earned max.
 
 		// Bounds
 		//----------------------------------------------------------------
@@ -3072,11 +3072,11 @@
 		// Movement
 		//----------------------------------------------------------------
 		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"			// Type of locomotion - ground, air
-		"MovementSpeed"				"350"		// Speed
+		"MovementSpeed"				"375"		// Speed
 		"MovementTurnRate"			"0.5"		// Turning rate.
-		
-		"GameSoundsFile"			"soundevents/game_sounds_heroes/game_sounds_enigma.vsndevts"
-		"VoiceFile"					"soundevents/voscripts/game_sounds_vo_enigma.vsndevts"
+
+		"GameSoundsFile"			"soundevents/game_sounds_heroes/game_sounds_dragon_knight.vsndevts"
+		"VoiceFile"					"soundevents/voscripts/game_sounds_vo_dragon_knight.vsndevts"
 
 		// Status
 		//----------------------------------------------------------------
@@ -3097,7 +3097,7 @@
 		"VisionDaytimeRange"		"1400"		// Range of vision during day light.
 		"VisionNighttimeRange"		"1400"		// Range of vision at night time.
 
-		"vscripts"					"enigma_ai.lua"
+		"vscripts"					"ai/creeps_ai.lua"
 
 		// Creature Data
 		//----------------------------------------------------------------------------------------------------------------------
@@ -5240,7 +5240,7 @@
 
 	"VisionDaytimeRange"		"1200"                  // Range of vision at night time.
 	"VisionNighttimeRange"		"1000"                  // Range of vision at night time.
-	"vscripts"					"grom_hellscream_ai.lua"
+	"vscripts"					"ai/grom_hellscream_ai.lua"
 	"Creature"
 	{
 		"AttachWearables"   
@@ -7840,8 +7840,8 @@
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"    "DOTA_UNIT_CAP_MELEE_ATTACK"    // Type of attack - melee, ranged, etc.
-		"AttackDamageMin"     "5001"     // Damage range min.
-		"AttackDamageMax"     "5012"     // Damage range max.
+		"AttackDamageMin"     "4899"     // Damage range min.
+		"AttackDamageMax"     "5099"     // Damage range max.
 		"AttackDamageType"      "DAMAGE_TYPE_ArmorPhysical"
 		"AttackRate"        "1.35"     // Speed of attack.
 		"AttackAnimationPoint"    "0.26"   // Normalized time in animation cycle to attack.
@@ -7850,9 +7850,9 @@
 
 		// Bounty
 		//----------------------------------------------------------------
-		"BountyXP"          "150"     // Experience earn.
-		"BountyGoldMin"       "1000"     // Gold earned min.
-		"BountyGoldMax"       "1000"     // Gold earned max.
+		"BountyXP"				"150"     // Experience earn.
+		"BountyGoldMin"			"1000"     // Gold earned min.
+		"BountyGoldMax"			"1000"     // Gold earned max.
 	
 		// Bounds
 		//----------------------------------------------------------------
@@ -7867,12 +7867,11 @@
 	
 		// Status
 		//----------------------------------------------------------------
-		"StatusHealth"        "40000"     // Base health.
+		"StatusHealth"        "20000"     // Base health.
 		"StatusHealthRegen"     "2"     // Health regeneration rate.
 		"StatusMana"        "5000"     // Base mana.
 		"StatusManaRegen"     "0.67"     // Mana regeneration rate.
-	
-		
+
 		// Vision
 		//----------------------------------------------------------------
 		"VisionDaytimeRange"    "1000"   // Range of vision during day light.
@@ -7883,17 +7882,16 @@
 		"AttackDesire"        "1.5"   // How much bots want to attack them vs other non-hero things
 	}
 
-	"npc_dota_muradin_boss"
+	"npc_dota_creature_muradin_bronzebeard"
 	{
-
 		"BaseClass"					"npc_dota_creature"
-		"Model"						"models/creeps/zuus/zuus.vmdl"			// Model.
-		"SoundSet"					"Hero_zuus"							// Name of sound set.
+		"Model"						"models/heroes/zuus/zuus.vmdl"			// Model.
+		"SoundSet"					"Hero_zuus"								// Name of sound set.
 		"ConsideredHero"			"1"
 		"ModelScale"				"1.5"
 		"AbilityLayout"				"6"
 		"Level"						"100"
-	
+
 		"Ability1"					"neutral_bash"
 		"Ability2"					"roshan_grow" 
 		"Ability3"					"roshan_stormbolt"
@@ -7911,17 +7909,18 @@
 		"AttackDamageMax"			"20012"                   // Damage range max.
 		"AttackRate"				"1.5"                                  // Speed of attack.
 		"AttackAnimationPoint"		"0.5"                                   // Normalized time in animation cycle to attack.
-		"AttackAcquisitionRange"	"300"                                   // Range within a target can be acquired.
+		"AttackAcquisitionRange"	"1000"                                   // Range within a target can be acquired.
 		"AttackRange"				"200"                                   // Range within a target can be attacked.
 		"ProjectileModel"			""                                     // Particle system model for projectile.
 		"ProjectileSpeed"			""                                     // Speed of projectile.
 
-		"BountyXP"          "0"                 // Experience earn.
-		"BountyGoldMin"       "0"                   // Gold earned min.
-		"BountyGoldMax"       "0"                   // Gold earned max.
+		"BountyXP"					"0"                 // Experience earn.
+		"BountyGoldMin"				"0"                   // Gold earned min.
+		"BountyGoldMax"				"0"                   // Gold earned max.
 
-		"BoundsHullName"      "DOTA_HULL_SIZE_HUGE"
-		"RingRadius"        "140"
+		"BoundsHullName"			"DOTA_HULL_SIZE_HUGE"
+		"RingRadius"				"130"
+		"HealthBarOffset"			"190"
 	
 		"MovementCapabilities"    "DOTA_UNIT_CAP_MOVE_GROUND"
 		"MovementSpeed"       "400"                 // Speed.

@@ -19,6 +19,37 @@
 	margin-right: 9px;
 }
 
+#Timer
+{
+	margin-top: 8px;
+    font-size: 48px;
+    color: #CCCCCC;
+	horizontal-align: center;
+}
+
+#TimerBg
+{
+	wash-color: #222222;
+}
+
+#TimerBg,
+#TimerRing
+{
+	width: 70px;
+	height: 70px;
+	margin-top: 2px;
+	horizontal-align: center;
+}
+
+#TimerLabel
+{
+	margin-top: 76px;
+    color: #a9aaaa;
+    font-size: 16px;
+	text-transform: uppercase;
+	horizontal-align: center;
+}
+
 .HeroSelectTeamRoot
 {
     margin-left: 9px;

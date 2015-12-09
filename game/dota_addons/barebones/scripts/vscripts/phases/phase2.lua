@@ -19,13 +19,18 @@ Timers:CreateTimer(3.5,spawn_second_phase_right)
 end
 
 function spawn_second_phase_left()
-  local point = Entities:FindByName(nil, "npc_dota_spawner_top_left_1"):GetAbsOrigin()
-	for j = 1,8 do
-	  Timers:CreateTimer(function()
-		local unit = CreateUnitByName("npc_ghul_II", point+RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_BADGUYS)
-	  end) 
-	end 
-  return CheckColdTower1() 
+	local EntIceTower = Entities:FindByName( nil, "npc_tower_cold_1" )
+	local point = Entities:FindByName( nil, "npc_dota_spawner_top_left_1"):GetAbsOrigin()
+	Timers:CreateTimer(0, function()
+		if EntIceTower:IsAlive() then -- Level 1 lower than 6 min
+			for j = 1, 8 do
+			local unit = CreateUnitByName("npc_ghul_II", point+RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_BADGUYS)
+			end
+		return 30 -- Rerun this timer every 30 game-time seconds
+		end
+		elseif not EntIceTower:IsAlive() then
+		return 30
+	end)
 end
 
 function spawn_second_phase_right()
@@ -84,30 +89,6 @@ function killed_frost_tower_right(keys)
 				PrecacheUnitByNameAsync(final_wave_creeps[direction][i], function() end) 
 			end
 		end
-	end
-end
-
-function CheckColdTower1()
-	EntTowerCold1 = Entities:FindByName( nil, "npc_tower_cold_1" )
-	if EntTowerCold1:IsAlive() then
-	print( "Cold Tower 1 is Alive!" )
-	return 30
-
-	else
-	print( "Cold Tower 1 is Dead." )
-	return nil
-	end
-end
-
-function CheckColdTower2()
-	EntTowerCold2 = Entities:FindByName( nil, "npc_tower_cold_2" )
-	if EntTowerCold2:IsAlive() then
-	print( "Cold Tower 2 is Alive!" )
-	return 30
-
-	else
-	print( "Cold Tower 2 is Dead." )
-	return nil
 	end
 end
 
