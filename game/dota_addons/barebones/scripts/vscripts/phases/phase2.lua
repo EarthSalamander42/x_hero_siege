@@ -27,21 +27,25 @@ function spawn_second_phase_left()
 			local unit = CreateUnitByName("npc_ghul_II", point+RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_BADGUYS)
 			end
 		return 30 -- Rerun this timer every 30 game-time seconds
-		end
 		elseif not EntIceTower:IsAlive() then
-		return 30
+		return nil
+		end
 	end)
 end
 
 function spawn_second_phase_right()
-local point = Entities:FindByName(nil, "npc_dota_spawner_top_right_1"):GetAbsOrigin()
-
-for j = 1,8 do
-	Timers:CreateTimer(function()
-	local unit = CreateUnitByName("npc_orc_II", point+RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_BADGUYS)
-	end) 
-	end
-	return CheckColdTower2()
+	local EntIceTower = Entities:FindByName( nil, "npc_tower_cold_2" )
+	local point = Entities:FindByName( nil, "npc_dota_spawner_top_right_1"):GetAbsOrigin()
+	Timers:CreateTimer(0, function()
+		if EntIceTower:IsAlive() then -- Level 1 lower than 6 min
+			for j = 1, 8 do
+			local unit = CreateUnitByName("npc_orc_II", point+RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_BADGUYS)
+			end
+		return 30 -- Rerun this timer every 30 game-time seconds
+		elseif not EntIceTower:IsAlive() then
+		return nil
+		end
+	end)
 end
 
 function killed_frost_tower_left(keys)
@@ -60,11 +64,6 @@ function killed_frost_tower_left(keys)
 		Notifications:TopToAll({text="WARNING! Final Wave incoming. Arriving in 60 seconds! Back to the Castle!" , duration=59.0})
 		Timers:CreateTimer(20,FinalWave)
 		local directions = {"west","north","east","south"}
-		for _,direction in pairs(directions) do
-			for i =1,21 do
-				PrecacheUnitByNameAsync(final_wave_creeps[direction][i], function() end) 
-			end
-		end
 	end
 end
 
@@ -83,12 +82,6 @@ function killed_frost_tower_right(keys)
 		DebugPrint("FinalWave timer started")
 		Notifications:TopToAll({text="WARNING! Final Wave incoming. Arriving in 60 seconds! Back to the Castle!" , duration=59.0})
 		Timers:CreateTimer(60,FinalWave)
-		local directions = {"west","north","east","south"}
-		for _,direction in pairs(directions) do
-			for i =1,5 do
-				PrecacheUnitByNameAsync(final_wave_creeps[direction][i], function() end) 
-			end
-		end
 	end
 end
 

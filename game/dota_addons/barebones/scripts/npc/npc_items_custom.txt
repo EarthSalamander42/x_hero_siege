@@ -1155,12 +1155,12 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"bonus_damage"			"120"
+				"bonus_damage"			"100"
 			}
 			"02"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"corruption_armor"		"-35"
+				"corruption_armor"		"-20"
 			}
 			"03"
 			{
@@ -1282,12 +1282,12 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"bonus_damage"			"200"
+				"bonus_damage"			"180"
 			}
 			"02"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"corruption_armor"		"-70"
+				"corruption_armor"		"-50"
 			}
 			"03"
 			{

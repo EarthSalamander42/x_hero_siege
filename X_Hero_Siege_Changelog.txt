@@ -1017,6 +1017,34 @@ Fix:
 - Fixed Banhallow particles ability
 - Fixed Incoming Wave 4 having ranged attack speed
 
+
+//===========================================================================================================
+X Hero Siege ( BETA ) 0.9.9.1 Fix
+//===========================================================================================================
+
+Gameplay:
+- Reduced Muradin Move Speed from 400 to 350
+- Reduced Muradin Follow Hero Radius from 1000 to 400
+- Reduced Desolator 2 Armor Reduction from 35 to 20
+- Reduced Desolator 2 Damage from 120 to 100
+- Reduced Desolator 3 Armor Reduction from 70 to 50
+- Reduced Desolator 3 Damage from 200 to 180
+
+Fix:
+- Fixed Lanes spawning during Muradin Event
+- Attempt to fix Phase 2( creeps stop spawning when killing 1 tower instead of 2 )
+
+Note: Muradin Event is coming tomorrow for Hard Mode
+
+
+//===========================================================================================================
+X Hero Siege ( BETA ) 0.9.9.2 Fix
+//===========================================================================================================
+
+Fix:
+- Fixed Phase 2 East Lane not spawning
+
+
 //================================================================================================================================================
 //================================================================================================================================================
 //================================================================================================================================================
@@ -1033,12 +1061,11 @@ Fix Red Chronosphere not particle bug, need to recreate
 
 //X Hero Siege
 Special Event: Muradin Bronzebeard:
-Fix Creeps shouldn't spawn
 Fix Creeps Freeze create Function
-Fix Creeps Ice Tower 2 spawn 1 wave after destroy
-
 
 Fix Doors opening for all lanes at the beginning of a game
+
+//Hardmode balance, need double check
 Doublé wave 3 incoming dmg hardmode
 final wave increase harmode
 Doublé wave 4 incoming hp hardmode

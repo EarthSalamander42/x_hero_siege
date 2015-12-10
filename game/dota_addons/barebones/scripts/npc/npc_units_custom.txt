@@ -7892,8 +7892,8 @@
 		"AbilityLayout"				"6"
 		"Level"						"100"
 
-		"Ability1"					"neutral_bash"
-		"Ability2"					"roshan_grow" 
+//		"Ability1"					"neutral_bash"
+//		"Ability2"					"roshan_grow" 
 		"Ability3"					"roshan_stormbolt"
 		"Ability4"					"roshan_clap"
 		"Ability5"					"roshan_invincible"
@@ -7909,8 +7909,8 @@
 		"AttackDamageMax"			"20012"                   // Damage range max.
 		"AttackRate"				"1.5"                                  // Speed of attack.
 		"AttackAnimationPoint"		"0.5"                                   // Normalized time in animation cycle to attack.
-		"AttackAcquisitionRange"	"1000"                                   // Range within a target can be acquired.
-		"AttackRange"				"200"                                   // Range within a target can be attacked.
+		"AttackAcquisitionRange"	"350"                                   // Range within a target can be acquired.
+		"AttackRange"				"150"                                   // Range within a target can be attacked.
 		"ProjectileModel"			""                                     // Particle system model for projectile.
 		"ProjectileSpeed"			""                                     // Speed of projectile.
 
@@ -7921,9 +7921,9 @@
 		"BoundsHullName"			"DOTA_HULL_SIZE_HUGE"
 		"RingRadius"				"130"
 		"HealthBarOffset"			"190"
-	
+
 		"MovementCapabilities"    "DOTA_UNIT_CAP_MOVE_GROUND"
-		"MovementSpeed"       "400"                 // Speed.
+		"MovementSpeed"       "350"                 // Speed.
 		"MovementTurnRate"      "0.4"                 // Turning rate.
 
 		"StatusHealth"			"10000"                 // Base health.
@@ -7931,8 +7931,8 @@
 		"StatusMana"			"1000"                   // Base mana.
 		"StatusManaRegen"		"0"                 // Mana regeneration rate.
 
-		"VisionDaytimeRange"    "1800"                  // Range of vision at night time.
-		"VisionNighttimeRange"    "1800"                  // Range of vision at night time.
+		"VisionDaytimeRange"    "1000"                  // Range of vision at night time.
+		"VisionNighttimeRange"    "1000"                  // Range of vision at night time.
 		"vscripts" "ai/npc_hero_roshan.lua"
 
 		"ParticleFile"				"particles/units/heroes/hero_zuus.vpcf"
