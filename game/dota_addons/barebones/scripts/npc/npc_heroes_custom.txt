@@ -7,6 +7,7 @@
 	{
 		"override_hero"			"npc_dota_hero_crystal_maiden"
 		"AbilityLayout"			"5"
+		"MovementSpeed"			"340"
 
 		"Ability1"				"holdout_crushing_wave"
 		"Ability2"				"holdout_summon_water_elemental"
@@ -24,6 +25,7 @@
 	{
 		"override_hero"			"npc_dota_hero_brewmaster"
 		"AbilityLayout"			"5"
+		"MovementSpeed"			"360"
 
 		"Ability1"				"holdout_drunken_haze"
 		"Ability2"				"holdout_dragon_slave"
@@ -41,6 +43,7 @@
 	{
 		"override_hero"			"npc_dota_hero_elder_titan"
 		"AbilityLayout"			"5"
+		"MovementSpeed"			"375"
 
 		"Ability1"				"holdout_war_stomp"
 		"Ability2"				"holdout_shockwave"
@@ -58,6 +61,7 @@
 	{
 		"override_hero"			"npc_dota_hero_enchantress"
 		"AbilityLayout"			"5"
+		"MovementSpeed"			"395"
 
 		"Ability1"				"holdout_evasion"
 		"Ability2"				"holdout_multiple_arrows"
@@ -75,6 +79,7 @@
 	{
 		"override_hero"			"npc_dota_hero_terrorblade"
 		"AbilityLayout"			"5"
+		"MovementSpeed"			"375"
 
 		"Ability1"				"holdout_negative_energy"
 		"Ability2"				"holdout_active_immolation"
@@ -92,6 +97,7 @@
 	{
 		"override_hero"			"npc_dota_hero_juggernaut"
 		"AbilityLayout"			"5"
+		"MovementSpeed"			"365"
 
 		"Ability1"				"brewmaster_storm_wind_walk"
 		"Ability2"				"blademaster_mirror_image"
@@ -109,6 +115,7 @@
 	{
 		"override_hero"			"npc_dota_hero_lich"
 		"AbilityLayout"			"5"
+		"MovementSpeed"			"375"
 
 		"Ability1"				"holdout_frost_nova"
 		"Ability2"				"holdout_frost_breath"
@@ -126,6 +133,7 @@
 	{
 		"override_hero"			"npc_dota_hero_omniknight"
 		"AbilityLayout"			"5"
+		"MovementSpeed"			"365"
 
 		"Ability1"				"holdout_healing_wave"
 		"Ability2"				"holdout_fan_of_light"
@@ -143,6 +151,7 @@
 	{
 		"override_hero"			"npc_dota_hero_pugna"
 		"AbilityLayout"			"5"
+		"MovementSpeed"			"380"
 
 		"Ability1"				"holdout_carrion_swarm"
 		"Ability2"				"holdout_chaos"
@@ -159,6 +168,8 @@
 	"npc_dota_hero_sven_holdout"
 	{
 		"override_hero"			"npc_dota_hero_sven"
+		"MovementSpeed"			"355"
+
 		"Ability1"				"holdout_storm_bolt"
 		"Ability2"				"holdout_great_cleave"
 		"Ability3"				"holdout_warcry"
@@ -174,6 +185,7 @@
 	{
 		"override_hero"			"npc_dota_hero_warlock"
 		"AbilityLayout"			"5"
+		"MovementSpeed"			"355"
 
 		"Ability1"				"holdout_dark_portal"
 		"Ability2"				"holdout_spiritual_beast"
@@ -196,13 +208,14 @@
 	{
 		"override_hero"			"npc_dota_hero_windrunner"
 		"AbilityLayout"			"5"
+		"MovementSpeed"			"355"
 
-		"Ability1"				""
-		"Ability2"				""
-		"Ability3"				""
-		"Ability4"				""
+		"Ability1"				"holdout_inner_fire"
+		"Ability2"				"clinkz_searing_arrows"
+		"Ability3"				"holdout_chieftain_endurance_aura"
+		"Ability4"				"holdout_critical_arrows"
 		"Ability5"				"holdout_bonus"
-		"Ability6"				""
+		"Ability6"				"holdout_splash_arrows"
 		"Ability16"				"ability_unit_died_light"
 	}
 }

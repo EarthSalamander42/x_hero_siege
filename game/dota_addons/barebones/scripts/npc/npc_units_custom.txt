@@ -3139,6 +3139,7 @@
 	"Model"             "models/heroes/life_stealer/life_stealer.vmdl"  // Model.
 	"Level"             "5"
 	"ModelScale"		"1"
+	"ConsideredHero"	"1"
 	// Abilities
 	//----------------------------------------------------------------
 	
@@ -3170,8 +3171,8 @@
 	// Bounty
 	//----------------------------------------------------------------
 	"BountyXP"          "100"     // Experience earn.
-	"BountyGoldMin"       "900"     // Gold earned min.
-	"BountyGoldMax"       "1100"     // Gold earned max.
+	"BountyGoldMin"       "1400"     // Gold earned min.
+	"BountyGoldMax"       "1600"     // Gold earned max.
 
 	// Bounds
 	//----------------------------------------------------------------
@@ -3220,7 +3221,8 @@
 	"BaseClass"         "npc_dota_creature"  // Class of entity of link to.
 	"Model"             "models/creeps/lane_creeps/creep_bad_melee_diretide/creep_bad_melee_diretide.vmdl"  // Model.
 	"Level"             "2"
-	"ModelScale"                    "1.2"
+	"ModelScale"		"1.2"
+	"ConsideredHero"	"1"
 	// Abilities
 	//----------------------------------------------------------------
 	
@@ -3252,8 +3254,8 @@
 	// Bounty
 	//----------------------------------------------------------------
 	"BountyXP"          "100"     // Experience earn.
-	"BountyGoldMin"       "900"     // Gold earned min.
-	"BountyGoldMax"       "1100"     // Gold earned max.
+	"BountyGoldMin"       "1400"     // Gold earned min.
+	"BountyGoldMax"       "1600"     // Gold earned max.
 
 	// Bounds
 	//----------------------------------------------------------------
@@ -7909,7 +7911,7 @@
 		"AttackDamageMax"			"20012"                   // Damage range max.
 		"AttackRate"				"1.5"                                  // Speed of attack.
 		"AttackAnimationPoint"		"0.5"                                   // Normalized time in animation cycle to attack.
-		"AttackAcquisitionRange"	"350"                                   // Range within a target can be acquired.
+		"AttackAcquisitionRange"	"450"                                   // Range within a target can be acquired.
 		"AttackRange"				"150"                                   // Range within a target can be attacked.
 		"ProjectileModel"			""                                     // Particle system model for projectile.
 		"ProjectileSpeed"			""                                     // Speed of projectile.
@@ -7922,9 +7924,9 @@
 		"RingRadius"				"130"
 		"HealthBarOffset"			"190"
 
-		"MovementCapabilities"    "DOTA_UNIT_CAP_MOVE_GROUND"
-		"MovementSpeed"       "350"                 // Speed.
-		"MovementTurnRate"      "0.4"                 // Turning rate.
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"
+		"MovementSpeed"				"375"                 // Speed.
+		"MovementTurnRate"			"0.4"                 // Turning rate.
 
 		"StatusHealth"			"10000"                 // Base health.
 		"StatusHealthRegen"		"0.0"                 // Health regeneration rate.
@@ -7936,8 +7938,7 @@
 		"vscripts" "ai/npc_hero_roshan.lua"
 
 		"ParticleFile"				"particles/units/heroes/hero_zuus.vpcf"
-		"GameSoundsFile"			"scripts/game_sounds_heroes/game_sounds_zuus.txt"
-		"VoiceFile"					"scripts/voscripts/game_sounds_vo_zuus.txt"
+		"GameSoundsFile"			"soundevents/game_sounds_heroes/game_sounds_omniknight.vsndevts"
+		"VoiceFile"					"scripts/voscripts/game_sounds_vo_zuus.vsndevts"
 	}
-
 } // End on npc_units_custom.txt

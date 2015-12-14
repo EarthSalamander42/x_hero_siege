@@ -1189,14 +1189,17 @@
 					"CastAttack"		"0"
 				}
 
-				"OnOrbImpact"
+				"OnOrbFire"
 				{
 					"ApplyModifier"
 					{
 						"ModifierName"	"modifier_item_desolator_corruption"
 						"Target" 		"TARGET"
 					}
+				}
 
+				"OnOrbImpact"
+				{
 					"FireSound"
 					{
 						"EffectName"	"Item_Desolator.Target"
@@ -1205,9 +1208,9 @@
 
 					"FireEffect"
 					{
-						"EffectName"        "particles/econ/items/antimage/antimage_weapon_basher_ti5_gold/am_manaburn_basher_ti_5_b_gold.vpcf"
-						"EffectAttachType"  "follow_origin"
-						"Target"            "TARGET"
+						"EffectName"			"particles/econ/items/antimage/antimage_weapon_basher_ti5_gold/am_manaburn_basher_ti_5_b_gold.vpcf"
+						"EffectAttachType"		"follow_origin"
+						"Target"				"TARGET"
 					}
 				}
 			}
@@ -1316,14 +1319,17 @@
 					"CastAttack"		"0"
 				}
 
-				"OnOrbImpact"
+				"OnOrbFire"
 				{
 					"ApplyModifier"
 					{
 						"ModifierName"	"modifier_item_desolator_corruption"
 						"Target" 		"TARGET"
 					}
+				}
 
+				"OnOrbImpact"
+				{
 					"FireSound"
 					{
 						"EffectName"	"Item_Desolator.Target"
@@ -1332,9 +1338,9 @@
 
 					"FireEffect"
 					{
-						"EffectName"        "particles/econ/items/antimage/antimage_weapon_basher_ti5_gold/antimage_manavoid_explode_b_b_ti_5_gold.vpcf"
-						"EffectAttachType"  "follow_origin"
-						"Target"            "TARGET"
+						"EffectName"			"particles/econ/items/antimage/antimage_weapon_basher_ti5_gold/antimage_manavoid_explode_b_b_ti_5_gold.vpcf"
+						"EffectAttachType"		"follow_origin"
+						"Target"				"TARGET"
 					}
 				}
 			}
@@ -1593,4 +1599,105 @@
 		}
 	}
 
-}
+	"item_cloak_of_flames" 
+	{
+		"ID"							"2530"
+		"BaseClass"						"item_datadriven"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
+		"Model"							"models/props_gameplay/red_box.vmdl" 
+		"Effect"						"particles/generic_gameplay/dropped_item.vpcf"
+		"ItemCost"						"5000"
+		"ItemKillable"					"1" 
+		"ItemSellable"					"1"
+		"ItemCastOnPickup"				"0"
+		"ItemPurchasable"				"1"
+		"ItemDroppable"					"1"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
+		"AbilityTextureName"			"x"
+
+		"SideShop"						"0" 
+		"SecretShop"					"1"
+
+		"ItemShopTags"					"artifact"
+		"ItemQuality"					"artifact"
+
+		"ItemStackable"					"0"
+		"ItemPermanent"					"1"
+
+		"ItemDisassembleRule"			"DOTA_ITEM_DISASSEMBLE_ALWAYS"
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"			"FIELD_INTEGER"
+				"radius"			"375"
+			}
+			"02"
+			{
+			  "var_type"			"FIELD_FLOAT"
+			  "damage_per_tick"		"100"
+			}
+			"03"
+			{
+			  "var_type"			"FIELD_FLOAT"
+			  "tick_time"			"1.0"
+			}
+		}
+
+		"precache"
+		{
+			"particle"		"particles/units/heroes/hero_ember_spirit/ember_spirit_flameguard.vpcf"
+		}
+
+		// Data Driven
+		//-------------------------------------------------------------------------------------
+		"Modifiers"
+		{
+			"modifier_immolation"
+			{
+				"IsBuff"			"1"
+				"IsHidden"			"0"
+				"Passive"			"1"
+				"ThinkInterval"		"%tick_time"
+				
+				// Modifier Events
+				//-----------------------------------------------------------------------------
+				"OnCreated"
+				{
+					"AttachEffect"
+					{
+						"Target"			"CASTER"
+						"EffectName"		"particles/units/heroes/hero_ember_spirit/ember_spirit_flameguard.vpcf"
+						"EffectAttachType"	"follow_origin"
+	
+						"ControlPoints"
+						{
+							"00"	"0 0 0"
+							"01"	"%radius 1 1"
+						}
+					}
+				}
+	
+				"OnIntervalThink"
+				{
+					"Damage"
+					{
+						"Type"			"DAMAGE_TYPE_MAGICAL"
+						"Damage"		"%damage_per_tick"
+						
+						"Target"
+						{
+							"Center"	"TARGET"
+							"Radius"	"%radius"
+							"Teams"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
+							"Types"		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+						}
+					}
+				}
+			}
+		}
+	}
+} // End of npc_items_custom.txt

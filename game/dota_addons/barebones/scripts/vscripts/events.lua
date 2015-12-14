@@ -348,3 +348,25 @@ function GameMode:OnPlayerChat(keys)
 	local text = keys.text
 	local player = PlayerResource:GetPlayer(playerID)
 end
+
+--function GameMode:DestroyDoor( keys )
+--	local door = Entities:FindByName(nil, "door_west_1")
+--	for _,hero in pairs(HeroList:GetAllHeroes()) do
+--		if IsValidEntity(hero:GetPlayerOwner()) then
+--		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),door)
+--			Timers:CreateTimer(1,function ()
+--				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil)
+--			end)
+--		end
+--	end
+--		if IsValidEntity(door) then
+--		AddFOWViewer(DOTA_TEAM_GOODGUYS, door:GetAbsOrigin(), 500, 5, true)
+--		end
+--	DoEntFire(keys.door_name,"SetAnimation","gate_entrance002_open",0,nil,nil)
+--
+--	local gridobs = Entities:FindAllByName(keys.obstruction_name)
+--
+--	for _,obs in pairs(gridobs) do
+--		obs:SetEnabled(false, true)
+--	end
+--end

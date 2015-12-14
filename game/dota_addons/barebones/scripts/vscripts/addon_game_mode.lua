@@ -46,7 +46,18 @@ function Precache( context )
 	PrecacheResource( "particle_folder", "particles/units/heroes/hero_vengeful", context )
 	PrecacheResource( "particle_folder", "particles/units/heroes/hero_abaddon", context )
 	PrecacheResource( "particle_folder", "particles/units/heroes/hero_skeletonking", context )
+	PrecacheResource( "particle_folder", "particles/units/heroes/hero_drow", context )
+	PrecacheResource( "particle_folder", "particles/units/heroes/hero_clinkz", context )
+	PrecacheResource( "particle_folder", "particles/units/heroes/hero_sven", context )
+	PrecacheResource( "particle_folder", "particles/units/heroes/hero_slardar", context )
 
+	-- JUGGERNAUT FINAL WAVE
+	PrecacheModel("models/heroes/juggernaut/jugg_bracers.vmdl", context)
+	PrecacheModel("models/heroes/juggernaut/jugg_cape.vmdl", context)
+	PrecacheModel("models/heroes/juggernaut/jugg_sword.vmdl", context)
+	PrecacheModel("models/heroes/juggernaut/jugg_mask.vmdl", context)
+	PrecacheModel("models/heroes/juggernaut/juggernaut.vmdl", context)
+	PrecacheModel("models/heroes/juggernaut/juggernaut_pants.vmdl", context)
 	-- PRECACHE SOUNDS
 	PrecacheResource( "soundfile", "soundevents/game_sounds_heroes/game_sounds_lina.vsndevts", context )
 	PrecacheResource( "soundfile", "soundevents/game_sounds_heroes/game_sounds_magnataur.vsndevts", context )
@@ -65,6 +76,10 @@ function Precache( context )
 	PrecacheResource( "soundfile", "soundevents/game_sounds_heroes/game_sounds_vengefulspirit.vsndevts", context )
 	PrecacheResource( "soundfile", "soundevents/game_sounds_heroes/game_sounds_ogre_magi.vsndevts", context )
 	PrecacheResource( "soundfile", "soundevents/game_sounds_heroes/game_sounds_abaddon.vsndevts", context )
+	PrecacheResource( "soundfile", "soundevents/game_sounds_heroes/game_sounds_drowranger.vsndevts", context )
+	PrecacheResource( "soundfile", "soundevents/game_sounds_heroes/game_sounds_clinkz.vsndevts", context )
+	PrecacheResource( "soundfile", "soundevents/game_sounds_heroes/game_sounds_sven.vsndevts", context )
+	PrecacheResource( "soundfile", "soundevents/game_sounds_heroes/game_sounds_slardar.vsndevts", context )
 
 	-- PHASE 1
 	PrecacheUnitByNameSync( "npc_dota_creature_mini_lifestealers", context)
@@ -123,6 +138,7 @@ function Precache( context )
 	-- X HEROES PRECACHING
 	PrecacheUnitByNameSync( "dark_portal_1", context)
 	PrecacheUnitByNameSync( "npc_dota_lich_frost_beast", context)
+	PrecacheUnitByNameSync( "npc_infernal_beast", context) -- Balanar Beasts
 end
 
 -- Create the game mode when we activate

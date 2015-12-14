@@ -1045,25 +1045,112 @@ Fix:
 - Fixed Phase 2 East Lane not spawning
 
 
+//===========================================================================================================
+X Hero Siege ( BETA ) 0.9.9.3 Fix
+//===========================================================================================================
+
+All Heroes Received a +60 move speed buff
+
+Castle Shop:
+- Added Cloak of Immolation
+- Removed Boots
+- Removed Boots of Travel
+
+
+//===========================================================================================================
+X Hero Siege ( BETA ) 0.9.9.4 Fix
+//===========================================================================================================
+
+Gameplay:
+- Increased Muradin Move Speed from 350 to 360
+- Increased Muradin Enemy Find Range from 350 to 400
+
+Fix:
+- Fixed Hardmode Map
+
+
+//===========================================================================================================
+X Hero Siege ( BETA ) 0.9.9.5 Fix
+//===========================================================================================================
+
+
+- Added Sylvanas Windrunner!
+- Added a message to alert Muradin Event
+
+Gameplay:
+- Increased Chieftain Endurance Aura Base Attack Speed from 1.6/1.6/1.5/1.5/1.4/1.4/1.3 to 1.5/1.5/1.4/1.4/1.3/1.3/1.2
+- Removed Veil of Discord
+
+Fix:
+- Fixed 4 Banehallow Revenants being invulnerable forever 
+- Fixed Balanar Infernal Beast Ability showing up as an error
+- Fixed a rare bug when deaths heroes that don't get teleported in muradin event(Because they are dead at this moment) and respawn before it ends would earn the gold.
+- Few Modifiers Tooltips added
+
+Note: Few players reported me: "I was dead but saw the gold message!". The message is displayed to everyone, and it says all 'alive' heroes...
+
+
+//===========================================================================================================
+X Hero Siege ( BETA ) 0.9.9.6 Fix
+//===========================================================================================================
+
+Gameplay:
+- Increased Muradin Event Attack Acquisition Range from 400 to 450
+- Increased Muradin Event Movespeed from 360 to 375
+- Increased Phase 2 Creeps Gold Bounty from 1000 to 1500
+- Reduced Enchantress and Windrunner Critical Arrows Chance from 5/5/10/10/15/15/20 to 4/6/8/10/12/14/16
+- Reduced Enchantress and Windrunner Critical Arrows Bonus from 200/250/300/350/400/450/500 to 200/240/280/320/360/400/450
+- Reduced Windrunner Splash Arrows Radius from 300/450 to 250/400
+- Reduced Windrunner Splash Arrows Splash Damage Percent from 30/50 to 40
+- Reduced Windrunner Splash Arrows Damage from 200/500 to 100/400
+- Removed Shadow Amulet
+- Removed Glimmer Cape
+- Removed Sange
+- Removed Sange & Yasha
+- Removed Null Talisman
+
+Fix:
+- Fixed Desolator 2 and 3 first shot woudln't apply the correct damage( was applying the damage without armor reduction )
+- Fixed leveling creeps alert being incorrect
+- Fixed Inner Fire Modifier Tooltip
+- Fixed Splash Arrows Modifier Tooltip
+- Fixed Balanar Revenants not moving
+
+
+//===========================================================================================================
+X Hero Siege ( BETA ) 0.9.9.7 Fix
+//===========================================================================================================
+
+Gameplay:
+
+
+Fix:
+- Fixed Windrunner's Inner Fire Particle Effect
+
 //================================================================================================================================================
 //================================================================================================================================================
 //================================================================================================================================================
 //================================================================================================================================================
 //================================================================================================================================================
 
-//Magnus Wars
+//Suggestion Note
+Give player gold every second they survive in Muradin Event
+
+//Remix Note
 Tinus - Sandburg
 Fat Punk( French Fuse Remix )
 Deep Sense Demo( by me )
+
+//Magnus Wars
 
 //Faceless Void Wars
 Fix Red Chronosphere not particle bug, need to recreate
 
 //X Hero Siege
-Special Event: Muradin Bronzebeard:
-Fix Creeps Freeze create Function
-
 Fix Doors opening for all lanes at the beginning of a game
+- Added Blademaster!
+Check if blademaster spawn duplicate items in a normal game
+Add Wardrums Aura Ability
 
 //Hardmode balance, need double check
 Doublé wave 3 incoming dmg hardmode

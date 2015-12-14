@@ -3,7 +3,7 @@
 	Creates illusions while shuffling the positions]]
 function Phantasm( keys )
 	local caster = keys.caster
-	local player = caster:GetPlayerID()
+	local player = caster:GetPlayerOwnerID()
 	local ability = keys.ability
 	local ability_level = ability:GetLevel() - 1
 
@@ -40,13 +40,15 @@ function Phantasm( keys )
 
 	-- Setup a table of potential spawn positions
 	local vRandomSpawnPos = {
-		Vector( 72, 0, 0 ),     -- North
-		Vector( 0, 72, 0 ),     -- East
-		Vector( -72, 0, 0 ),    -- South
-		Vector( 0, -72, 0 ),    -- West
+		Vector( 72, 0, 0 ),		-- North
+		Vector( 0, 72, 0 ),		-- East
+		Vector( -72, 0, 0 ),	-- South
+		Vector( 72, -72, 0 ),	-- West
+		Vector( -72, -72, 0 ),	-- West
+		Vector( -72, 0, 72 ),	-- West
 	}
 
-	for i=#vRandomSpawnPos, 2, -1 do    -- Simply shuffle them
+	for i=#vRandomSpawnPos, 2, -1 do	-- Simply shuffle them
 		local j = RandomInt( 1, i )
 		vRandomSpawnPos[i], vRandomSpawnPos[j] = vRandomSpawnPos[j], vRandomSpawnPos[i]
 	end
@@ -64,17 +66,21 @@ function Phantasm( keys )
 
 		-- handle_UnitOwner needs to be nil, else it will crash the game.
 		local illusion = CreateUnitByName(unit_name, origin, true, caster, nil, caster:GetTeamNumber())
-		illusion:SetPlayerID(caster:GetPlayerID())
 		illusion:SetControllableByPlayer(player, true)
 
 		illusion:SetAngles( casterAngles.x, casterAngles.y, casterAngles.z )
-		
+
+
 		-- Level Up the unit to the casters level
 		local casterLevel = caster:GetLevel()
 		for i=1,casterLevel-1 do
 			illusion:HeroLevelUp(false)
 		end
-
+		
+		illusion:SetBaseStrength(caster:GetBaseStrength())
+  		illusion:SetBaseIntellect(caster:GetBaseIntellect())
+  		illusion:SetBaseAgility(caster:GetBaseAgility())
+		
 		-- Set the skill points to 0 and learn the skills of the caster
 		illusion:SetAbilityPoints(0)
 		for abilitySlot=0,15 do
@@ -83,14 +89,16 @@ function Phantasm( keys )
 				local abilityLevel = ability:GetLevel()
 				local abilityName = ability:GetAbilityName()
 				local illusionAbility = illusion:FindAbilityByName(abilityName)
-				illusionAbility:SetLevel(abilityLevel)
+				if IsValidEntity(illusionAbility) then
+					illusionAbility:SetLevel(abilityLevel)
+				end
 			end
 		end
 
 		-- Recreate the items of the caster
 		for itemSlot=0,5 do
 			local item = caster:GetItemInSlot(itemSlot)
-			if item ~= nil then
+			if item ~= nil and item:GetName() ~= "item_cloak_of_flames" then
 				local itemName = item:GetName()
 				local newItem = CreateItem(itemName, illusion, illusion)
 				illusion:AddItem(newItem)
@@ -105,61 +113,7 @@ function Phantasm( keys )
 		illusion:MakeIllusion()
 		-- Set the illusion hp to be the same as the caster
 		illusion:SetHealth(caster:GetHealth())
-
-		-- Add the illusion created to a table within the caster handle, to remove the illusions on the next cast if necessary
-		table.insert(caster.phantasm_illusions, illusion)
-	end
-
-	-- Check is we got lucky with the chance and create an extra illusion if we did
-	if chance <= extra_illusion_chance then
-		-- Since its an extra illsuion then create it at a random point
-		local origin = casterOrigin + RandomVector(100)
-
-		-- handle_UnitOwner needs to be nil, else it will crash the game.
-		local illusion = CreateUnitByName(unit_name, origin, true, caster, nil, caster:GetTeamNumber())
-		illusion:SetPlayerID(caster:GetPlayerID())
-		illusion:SetControllableByPlayer(player, true)
-
-		illusion:SetAngles( casterAngles.x, casterAngles.y, casterAngles.z )
-		
-		-- Level Up the unit to the casters level
-		local casterLevel = caster:GetLevel()
-		for i=1,casterLevel-1 do
-			illusion:HeroLevelUp(false)
-		end
-
-		-- Set the skill points to 0 and learn the skills of the caster
-		illusion:SetAbilityPoints(0)
-		for abilitySlot=0,15 do
-			local ability = caster:GetAbilityByIndex(abilitySlot)
-			if ability ~= nil then 
-				local abilityLevel = ability:GetLevel()
-				local abilityName = ability:GetAbilityName()
-				local illusionAbility = illusion:FindAbilityByName(abilityName)
-				illusionAbility:SetLevel(abilityLevel)
-			end
-		end
-
-		-- Recreate the items of the caster
-		for itemSlot=0,5 do
-			local item = caster:GetItemInSlot(itemSlot)
-			if item ~= nil then
-				local itemName = item:GetName()
-				local newItem = CreateItem(itemName, illusion, illusion)
-				illusion:AddItem(newItem)
-			end
-		end
-
-		-- Set the unit as an illusion
-		-- modifier_illusion controls many illusion properties like +Green damage not adding to the unit damage, not being able to cast spells and the team-only blue particle
-		illusion:AddNewModifier(caster, ability, "modifier_illusion", { duration = duration, outgoing_damage = outgoingDamage, incoming_damage = incomingDamage })
-		
-		-- Without MakeIllusion the unit counts as a hero, e.g. if it dies to neutrals it says killed by neutrals, it respawns, etc.
-		illusion:MakeIllusion()
-		-- Set the illusion hp to be the same as the caster
-		illusion:SetHealth(caster:GetHealth())
-		EmitSoundOn(extra_illusion_sound, caster)
-
+		illusion:SetPlayerID(caster:GetPlayerOwnerID())
 		-- Add the illusion created to a table within the caster handle, to remove the illusions on the next cast if necessary
 		table.insert(caster.phantasm_illusions, illusion)
 	end
