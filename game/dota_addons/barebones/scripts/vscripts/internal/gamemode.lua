@@ -21,31 +21,6 @@ function GameMode:_InitGameMode()
   GameRules:SetFirstBloodActive( ENABLE_FIRST_BLOOD )
   GameRules:SetHideKillMessageHeaders( HIDE_KILL_BANNERS )
 
-
-  -- This is multiteam configuration stuff
-  if USE_AUTOMATIC_PLAYERS_PER_TEAM then
-    local num = math.floor(10 / MAX_NUMBER_OF_TEAMS)
-    local count = 0
-    for team,number in pairs(TEAM_COLORS) do
-      if count >= MAX_NUMBER_OF_TEAMS then
-        GameRules:SetCustomGameTeamMaxPlayers(team, 0)
-      else
-        GameRules:SetCustomGameTeamMaxPlayers(team, num)
-      end
-      count = count + 1
-    end
-  else
-    local count = 0
-    for team,number in pairs(CUSTOM_TEAM_PLAYER_COUNT) do
-      if count >= MAX_NUMBER_OF_TEAMS then
-        GameRules:SetCustomGameTeamMaxPlayers(team, 0)
-      else
-        GameRules:SetCustomGameTeamMaxPlayers(team, number)
-      end
-      count = count + 1
-    end
-  end
-
   if USE_CUSTOM_TEAM_COLORS then
     for team,color in pairs(TEAM_COLORS) do
       SetTeamCustomHealthbarColor(team, color[1], color[2], color[3])

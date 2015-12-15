@@ -8,7 +8,8 @@ function reincarnation( event )
 	if hero:IsRealHero() then
 --		hero:SetBuybackEnabled(false)
 		
-		hero.respawn_timer = Timers:CreateTimer(respawntime,function () 
+		hero.respawn_timer = Timers:CreateTimer(respawntime,function ()
+            hero:EmitSound("Hero_SkeletonKing.Reincarnate.Stinger")
 			hero:SetRespawnPosition(position)
 			hero:RespawnHero(false, false, false)
 			ParticleManager:CreateParticle("particles/items_fx/aegis_respawn.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
@@ -35,7 +36,7 @@ function shield( event )
 	if hero:IsRealHero() then
 
 		hero:SetRespawnsDisabled(true)
-		
+
 		hero.respawn_timer = Timers:CreateTimer(respawntime,function () 
 			hero:SetRespawnPosition(position)
 			hero:RespawnHero(false, false, false)

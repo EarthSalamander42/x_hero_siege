@@ -1246,6 +1246,14 @@ function GameMode:InitGameMode()
 	mode:SetFixedRespawnTime( 120 )
 	mode:SetBuybackEnabled( false )
 
+	if GetMapName() == "hardmode" then
+		GameRules:SetCustomGameTeamMaxPlayers( DOTA_TEAM_GOODGUYS, 4 )
+		GameRules:SetCustomGameTeamMaxPlayers( DOTA_TEAM_BADGUYS, 0 )
+	else
+		GameRules:SetCustomGameTeamMaxPlayers( DOTA_TEAM_GOODGUYS, 8 )
+		GameRules:SetCustomGameTeamMaxPlayers( DOTA_TEAM_BADGUYS, 0 )
+	end
+
 	GameMode:_InitGameMode()
 
 	Convars:RegisterCommand( "command_example", Dynamic_Wrap(GameMode, 'ExampleConsoleCommand'), "A console command example", FCVAR_CHEAT )

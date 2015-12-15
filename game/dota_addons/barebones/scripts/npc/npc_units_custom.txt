@@ -2037,7 +2037,7 @@
 
 		// Armor
 		//----------------------------------------------------------------
-		"ArmorPhysical"				"20"	// Physical protection.
+		"ArmorPhysical"				"30"	// Physical protection.
 		"MagicalResistance"			"25"	// Magical protection.
 
 		// Attack
@@ -2145,7 +2145,7 @@
 
 		// Armor
 		//----------------------------------------------------------------
-		"ArmorPhysical"				"20"	// Physical protection.
+		"ArmorPhysical"				"30"	// Physical protection.
 		"MagicalResistance"			"25"	// Magical protection.
 
 		// Attack
@@ -2233,7 +2233,7 @@
 
 		// Armor
 		//----------------------------------------------------------------
-		"ArmorPhysical"				"40"	// Physical protection.
+		"ArmorPhysical"				"45"	// Physical protection.
 		"MagicalResistance"			"25"	// Magical protection.
 
 		// Attack
@@ -2352,7 +2352,7 @@
 
 		// Armor
 		//----------------------------------------------------------------
-		"ArmorPhysical"				"40"	// Physical protection.
+		"ArmorPhysical"				"45"	// Physical protection.
 		"MagicalResistance"			"25"	// Magical protection.
 
 		// Attack
@@ -2447,7 +2447,7 @@
 
 		// Armor
 		//----------------------------------------------------------------
-		"ArmorPhysical"				"70"	// Physical protection.
+		"ArmorPhysical"				"75"	// Physical protection.
 		"MagicalResistance"			"35"	// Magical protection.
 
 		// Attack
@@ -2485,7 +2485,7 @@
 
 		// Status
 		//----------------------------------------------------------------
-		"StatusHealth"				"1990"			// Base health.
+		"StatusHealth"				"2490"			// Base health.
 		"StatusHealthRegen"			"5.0"			// Health regeneration rate.
 		"StatusMana"				"780"			// Base mana.
 		"StatusManaRegen"			"2.0"			// Mana regeneration rate.
@@ -2554,7 +2554,7 @@
 
 		// Armor
 		//----------------------------------------------------------------
-		"ArmorPhysical"				"70"	// Physical protection.
+		"ArmorPhysical"				"75"	// Physical protection.
 		"MagicalResistance"			"25"	// Magical protection.
 
 		// Attack
@@ -2592,7 +2592,7 @@
 
 		// Status
 		//----------------------------------------------------------------
-		"StatusHealth"				"1565"			// Base health.
+		"StatusHealth"				"1965"			// Base health.
 		"StatusHealthRegen"			"5.0"			// Health regeneration rate.
 		"StatusMana"				"625"			// Base mana.
 		"StatusManaRegen"			"2.0"			// Mana regeneration rate.

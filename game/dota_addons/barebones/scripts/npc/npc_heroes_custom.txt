@@ -64,7 +64,7 @@
 		"MovementSpeed"			"395"
 
 		"Ability1"				"holdout_evasion"
-		"Ability2"				"holdout_multiple_arrows"
+		"Ability2"				"tyrande_multiple_arrows"
 		"Ability3"				"holdout_critical_arrows"
 		"Ability4"				"holdout_endurance_aura"
 		"Ability5"				"holdout_bonus"

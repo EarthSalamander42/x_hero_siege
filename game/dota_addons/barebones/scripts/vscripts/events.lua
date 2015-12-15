@@ -37,10 +37,21 @@ function GameMode:OnNPCSpawned(keys)
 	DebugPrint("[BAREBONES] NPC Spawned")
 	DebugPrintTable(keys)
 
+	local npc = EntIndexToHScript(keys.entindex)
+	local normal_bounty = npc:GetGoldBounty()
+	local normal_xp = npc:GetDeathXP()
+
+	if GetMapName() == "x_hero_siege_8_players" then
+		npc:SetMinimumGoldBounty( normal_bounty*2 )
+		npc:SetMaximumGoldBounty( normal_bounty*2 )
+		npc:SetDeathXP( normal_xp )
+	else
+		npc:SetMinimumGoldBounty( normal_bounty )
+		npc:SetMaximumGoldBounty( normal_bounty )
+		npc:SetDeathXP( normal_xp )
+	end
 	-- This internal handling is used to set up main barebones functions
 	GameMode:_OnNPCSpawned(keys)
-
-	local npc = EntIndexToHScript(keys.entindex)
 end
 
 -- An entity somewhere has been hurt.  This event fires very often with many units so don't do too many expensive

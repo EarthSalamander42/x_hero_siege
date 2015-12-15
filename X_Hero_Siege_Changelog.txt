@@ -1121,11 +1121,24 @@ Fix:
 X Hero Siege ( BETA ) 0.9.9.7 Fix
 //===========================================================================================================
 
-Gameplay:
+- Normal Map has its Gold and XP increased by 2!( Every gold and xp earned from creeps are multiplied by 2 )
+- Updated Russian Translation
+- Changed Hero Names based on their Unique Names( instead of class )
+- Changed enemy colors from Yellow to Purple
 
+Gameplay:
+- Increased Creeps Level 3 Armor from 20 to 30
+- Increased Creeps Level 3 Mana Break Mana Per Hit from 15 to 18
+- Increased Creeps Level 4 Armor from 40 to 45
+- Increased Creeps Level 5 Armor from 70 to 75
+- Increased Creeps Level 5 HP from 1990/1565 to 2490/1965
+- Reduced Windrunner Inner Fire Bonus Armor from 10/20/30/40/60/90/150 to 5/10/15/20/30/45/75
 
 Fix:
+- Fixed Ankhs of Reincarnation sound not working
 - Fixed Windrunner's Inner Fire Particle Effect
+- Fixed some bosses tooltips
+
 
 //================================================================================================================================================
 //================================================================================================================================================
@@ -1149,6 +1162,7 @@ Fix Red Chronosphere not particle bug, need to recreate
 //X Hero Siege
 Fix Doors opening for all lanes at the beginning of a game
 - Added Blademaster!
+- Reworked Enchantress Ability 2: Multiple Arrows, now based on Enchantress base damage( with reduction % )
 Check if blademaster spawn duplicate items in a normal game
 Add Wardrums Aura Ability
 
