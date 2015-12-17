@@ -20,7 +20,6 @@ function Precache( context )
 	PrecacheResource( "particle_folder", "particles/units/heroes/hero_necrolyte", context )
 	PrecacheResource( "particle_folder", "particles/units/heroes/hero_nyx_assassin", context )
 	PrecacheResource( "particle_folder", "particles/units/heroes/hero_bane", context )
-	PrecacheResource( "particle_folder", "particles/units/heroes/hero_enigma", context )
 	PrecacheResource( "particle_folder", "particles/units/heroes/hero_phoenix", context )
 	PrecacheResource( "particle_folder", "particles/units/heroes/hero_doom", context )
 	PrecacheResource( "particle_folder", "particles/units/heroes/hero_razor", context )
@@ -49,15 +48,8 @@ function Precache( context )
 	PrecacheResource( "particle_folder", "particles/units/heroes/hero_drow", context )
 	PrecacheResource( "particle_folder", "particles/units/heroes/hero_clinkz", context )
 	PrecacheResource( "particle_folder", "particles/units/heroes/hero_sven", context )
-	PrecacheResource( "particle_folder", "particles/units/heroes/hero_slardar", context )
+	PrecacheResource( "particle_folder", "particles/units/heroes/hero_stormspirit", context )
 
-	-- JUGGERNAUT FINAL WAVE
-	PrecacheModel("models/heroes/juggernaut/jugg_bracers.vmdl", context)
-	PrecacheModel("models/heroes/juggernaut/jugg_cape.vmdl", context)
-	PrecacheModel("models/heroes/juggernaut/jugg_sword.vmdl", context)
-	PrecacheModel("models/heroes/juggernaut/jugg_mask.vmdl", context)
-	PrecacheModel("models/heroes/juggernaut/juggernaut.vmdl", context)
-	PrecacheModel("models/heroes/juggernaut/juggernaut_pants.vmdl", context)
 	-- PRECACHE SOUNDS
 	PrecacheResource( "soundfile", "soundevents/game_sounds_heroes/game_sounds_lina.vsndevts", context )
 	PrecacheResource( "soundfile", "soundevents/game_sounds_heroes/game_sounds_magnataur.vsndevts", context )
@@ -79,7 +71,9 @@ function Precache( context )
 	PrecacheResource( "soundfile", "soundevents/game_sounds_heroes/game_sounds_drowranger.vsndevts", context )
 	PrecacheResource( "soundfile", "soundevents/game_sounds_heroes/game_sounds_clinkz.vsndevts", context )
 	PrecacheResource( "soundfile", "soundevents/game_sounds_heroes/game_sounds_sven.vsndevts", context )
-	PrecacheResource( "soundfile", "soundevents/game_sounds_heroes/game_sounds_slardar.vsndevts", context )
+	PrecacheResource( "soundfile", "soundevents/game_sounds_heroes/game_sounds_stormspirit.vsndevts", context )
+	PrecacheResource( "soundfile", "soundevents/game_sounds_heroes/game_sounds_leshrac.vsndevts", context )
+	PrecacheResource( "soundfile", "soundevents/game_sounds_heroes/game_sounds_techies.vsndevts", context )
 
 	-- PHASE 1
 	PrecacheUnitByNameSync( "npc_dota_creature_mini_lifestealers", context)
@@ -119,8 +113,6 @@ function Precache( context )
 	PrecacheUnitByNameSync( "npc_dota_hero_illidan_final_wave", context)
 	PrecacheUnitByNameSync( "npc_dota_hero_proudmoore_final_wave", context)
 	PrecacheUnitByNameSync( "npc_knight_final_wave", context)
-	-- Magtheridon
-	PrecacheUnitByNameSync( "npc_dota_hero_magtheridon", context)
 
 	-- PHASE 3
 	PrecacheUnitByNameSync( "npc_dota_creep_radiant_hulk", context)
@@ -137,6 +129,8 @@ function Precache( context )
 
 	-- X HEROES PRECACHING
 	PrecacheUnitByNameSync( "dark_portal_1", context)
+	PrecacheUnitByNameSync( "serpent_ward_1", context)
+	PrecacheUnitByNameSync( "laser_trap_1", context)
 	PrecacheUnitByNameSync( "npc_dota_lich_frost_beast", context)
 	PrecacheUnitByNameSync( "npc_infernal_beast", context) -- Balanar Beasts
 end

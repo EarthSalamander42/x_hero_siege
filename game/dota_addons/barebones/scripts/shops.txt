@@ -17,9 +17,7 @@
 		"item"		"item_travel_boots"
 		"item"		"item_hand_of_midas"
 		"item"		"item_mekansm5"
-		"item"		"item_octarine_core"
 		"item"		"item_heart3"
-		"item"		"item_shivas_guard3"
 	}
 
 	"weapons_armor"
@@ -33,17 +31,8 @@
 
 	"misc"
 	{
-		"item"    "item_sobi_mask"
-		"item"    "item_ring_of_regen"
-		"item"    "item_boots"
-		"item"    "item_gloves"
-		"item"    "item_cloak"
-		"item"    "item_gem"
-		"item"    "item_ghost"
-		"item"    "item_blink"    
-		"item"    "item_shadow_amulet"  
-		"item"    "item_ring_of_health"
-		"item"    "item_void_stone"     
+		"item"		"item_octarine_core"
+		"item"		"item_shivas_guard3"  
 	} 
 
 	// Level 1 - Green Recipes
@@ -55,10 +44,10 @@
 	// Level 2 - Blue Recipes
 	"support"
 	{
- 
+
 	}
 		
-	"magics"      
+	"magics"
 	{
 
 	}
@@ -66,9 +55,9 @@
 	// Level 3 - Purple Recipes 
 	"defense"
 	{
-  
+
 	}
-	  
+
 	"weapons"
 	{
 
@@ -97,5 +86,6 @@
 		"item"		"item_talisman_of_evasion"
 		"item"		"item_claws_of_attack"
 		"item"		"item_cloak_of_flames"
+		"item"		"item_bracer_of_protection"
 	} 
 }

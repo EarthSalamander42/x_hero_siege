@@ -42,6 +42,19 @@ function GameMode:OnHeroInGame(hero)
 
 	local item3 = CreateItem("item_salve_1000", hero, hero)
 	hero:AddItem(item3)
+
+	-- List of innate abilities
+	local innate_abilities = {
+		"holdout_delightful_torment"
+	}
+
+	-- Cycle through any innate abilities found, then upgrade them
+	for i = 1, #innate_abilities do
+		local current_ability = hero:FindAbilityByName(innate_abilities[i])
+		if current_ability then
+			current_ability:SetLevel(1)
+		end
+	end
 end
 
 function GameMode:OnGameInProgress()
@@ -335,7 +348,7 @@ function GameMode:OnGameInProgress()
 	--// Timer: Creeps Level 1, 4 East 1
 	--//=================================================================================================================
 	local time_elapsed = 0
-	local EntBarrack = Entities:FindByName( nil, "dota_badguys_barracks_east_1" )
+	local EntBarrack = Entities:FindByName( nil, "dota_badguys_barracks_east_2" )
 	Timers:CreateTimer(0, function()
 		time_elapsed = time_elapsed + 30 -- with this system, the time_elapsed should be set to the Game Time + 30 sec, e.g: 5 Min = 300sec + 30 = 330
 		if PlayerResource:GetPlayerCount() >= 5 and EntBarrack:IsAlive() and time_elapsed < 390 then -- Level 1 lower than 6 min
@@ -394,7 +407,7 @@ function GameMode:OnGameInProgress()
 	--// Timer: Creeps Level 1, 4 East 2
 	--//=================================================================================================================
 	local time_elapsed = 0
-	local EntBarrack = Entities:FindByName( nil, "dota_badguys_barracks_east_2" )
+	local EntBarrack = Entities:FindByName( nil, "dota_badguys_barracks_east_1" )
 	Timers:CreateTimer(0, function()
 		time_elapsed = time_elapsed + 30 -- with this system, the time_elapsed should be set to the Game Time + 30 sec, e.g: 5 Min = 300sec + 30 = 330
 		if PlayerResource:GetPlayerCount() >= 6 and EntBarrack:IsAlive() and time_elapsed < 390 then -- Level 1 lower than 6 min
@@ -1156,7 +1169,7 @@ function StartMuradinEvent()
 			end
 
 			if hero:IsAlive() then
-				Timers:CreateTimer(120, function()
+				Timers:CreateTimer(115, function()
 					if hero:IsAlive() then
 						PlayerResource:ModifyGold( hero:GetPlayerOwnerID(), 10000, false,  DOTA_ModifyGold_Unspecified )
 					end
@@ -1172,11 +1185,18 @@ function EndMuradinEvent()
 
 	for _,hero in pairs(heroes) do
 		if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
-		FindClearSpaceForUnit(hero, point, true)
-		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil)
-		Timers:CreateTimer(5, function()
-		hero:RemoveModifierByName("modifier_stunned")
-		end)
+		hero:AddNewModifier(nil, nil, "modifier_stunned",nil)
+		hero:AddNewModifier(nil, nil, "modifier_invulnerable",nil)
+			Timers:CreateTimer(6, function()
+			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
+			FindClearSpaceForUnit(hero, point, true)
+			hero:RemoveModifierByName("modifier_stunned")
+			hero:RemoveModifierByName("modifier_invulnerable")
+			end)
+
+			Timers:CreateTimer(6.5, function()
+				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil)
+			end)
 		end
 	end
 	return nil

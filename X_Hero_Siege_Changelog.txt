@@ -1132,12 +1132,120 @@ Gameplay:
 - Increased Creeps Level 4 Armor from 40 to 45
 - Increased Creeps Level 5 Armor from 70 to 75
 - Increased Creeps Level 5 HP from 1990/1565 to 2490/1965
+- Reduced Phase 2 gold bounty from 1500 to 1000( 500 for Hardmode )
 - Reduced Windrunner Inner Fire Bonus Armor from 10/20/30/40/60/90/150 to 5/10/15/20/30/45/75
 
 Fix:
 - Fixed Ankhs of Reincarnation sound not working
 - Fixed Windrunner's Inner Fire Particle Effect
 - Fixed some bosses tooltips
+
+
+//===========================================================================================================
+X Hero Siege ( BETA ) 0.9.9.8 Fix
+//===========================================================================================================
+
+- Reduced Normal mode bounty multiplier from x2 to x1.5
+
+Gameplay:
+- Phase 1:
+- Increased Barrackments Armor from 150 to 200
+- Increased Level 4 Creeps Armor from 45 to 60
+- Increased Level 4 Creeps HP from 1410/995 to 1810/1495
+- Increased Level 4 Creeps Ranged Damage from 140 to 160
+- Reduced Destroyer Magnataur Gold Bounty from 10000 to 7500( 20000 to 10250 for Normal mode )
+
+- Phase 2:
+- Increased Creeps Damage from 2000 to 2500
+- Increased Creeps Armor from 100 to 125
+- Increased Creeps Magical Resistance from 0 to 10
+- Increased Creeps HP from 6000 to 8000
+- Increased Death Towers Armor from 250 to 300
+- Increased Death Towers HP from 10000 to 15000
+- Increased Ice Towers Armor from 350 to 400
+
+- Phase 3:
+- Increased Magtheridon Ankhs from 3 to 5
+- Increased Magtheridon HP from 90000 to 150000
+- Increased Magtheridon Armor from 650 to 750
+- Reduced Magtheridon Gold Bounty from 10000 to 7500( 20000 to 10250 for Normal mode )
+
+- Items:
+- Removed Eye of Skadi
+
+Fix:
+- Fixed a rare bug where dying at the exact same time Muradin Event ends with ankhs remaining would cause you to get stuck forever in his arena!
+- Fixed Magtheridon not casting Firestorm and Howl of Terror
+
+
+//===========================================================================================================
+X Hero Siege ( BETA ) 0.9.9.9 Fix
+//===========================================================================================================
+
+Gameplay:
+Heroes:
+- Increased Demon Hunter Negative Energy Damag from 150/250/350/450/650/950/1500 to 150/260/370/480/700/1050/1800
+
+Phase 2:
+- Increased Final Wave HP's( Every non-hero has it's hp multiplied by 2 )
+
+Phase 3:
+- Increased Illidan's Negative Energy Damage from 20000 to 25000
+
+- Items
+- Added Bracer of Protection!
+- Reduced Maelstrom's chain chance from 25% to 10%
+- Reduced Maelstrom's chain damage from 120 to 90
+- Reduced Maelstrom's chain strike from 4 to 3
+- Reduced Mjollnir's chain chance from 25% to 20%
+- Reduced Mjollnir's chain damage from 150 to 130
+- Reduced Mjollnir's chain strike from 8 to 6
+- Removed Drum of Endurance
+
+Fix:
+- Fixed Grom Hellscream Final Wave invisible model
+- Fixed Illidan Final Wave not using any spells
+- Fixed All Final Wave Gold Bounties
+
+Note: The 1.0 Update will not include all the events as presumed i didn't had enough time.. But, i will release 3 new heroes! Stay tuned to the Steam Group for mor info!
+
+
+//===========================================================================================================
+X Hero Siege ( BETA ) 1.0 Update
+//===========================================================================================================
+
+- Introducing Tarhunt( Arc Warden ):
+Lightning Storm( Reworked Leshrac Ability 1 )
+Magnetic Field( Arc Warden's Magnetic Field with armor bonus )
+Electric Vortex( Reworked Storm Spirit Ability 2 )
+Inner Lightning( 100% Physical Damage Resistance )
+Tempest Double( Arc Warden's Tempest Double )
+
+- Added Blademaster!
+- Added Shadow Hunter!
+
+Gameplay:
+Heroes:
+- Removed Sven
+
+Items:
+- Removed Iron Talon
+- Removed Oblivion Staff
+- Removed Eul's Scepter
+
+Note: Tarhunt is the first new hero to the X Hero Siege story, i hope you'll like it!
+
+
+//===========================================================================================================
+X Hero Siege ( BETA ) 1.0.1 Fix
+//===========================================================================================================
+
+- Added New Zeus Arcana to Muradin Bronzebeard
+
+Fix:
+- Fixed Magnetic Field would cause to allow heroes to move in Undead Arthas Chronoshpere
+- Fixed Iron Talon not being removed
+- Fixed Shadow Hunter Ultimate max level from 7 to 2
 
 
 //================================================================================================================================================
@@ -1161,28 +1269,17 @@ Fix Red Chronosphere not particle bug, need to recreate
 
 //X Hero Siege
 Fix Doors opening for all lanes at the beginning of a game
-- Added Blademaster!
 - Reworked Enchantress Ability 2: Multiple Arrows, now based on Enchantress base damage( with reduction % )
-Check if blademaster spawn duplicate items in a normal game
-Add Wardrums Aura Ability
 
-//Hardmode balance, need double check
-Doublé wave 3 incoming dmg hardmode
-final wave increase harmode
-Doublé wave 4 incoming hp hardmode
-increase razor hardmode
-+30% lane 4 dmg hardmode
-Remove Drum of Endurance
-Fix Bane LVL3 Passive Aura Nevermore
-Reduce Aura of Blight Undy to +4 regen
-phase 2 hardmode double + dmg
-reduce ench evasion
-reduce ench crit%
-reduce mags xp
-magtheridon hp buff 10%
-dark protectors double dmg
-water elementals for proudmoore
-fix balanar beasts errors
+// Gold Multiplier Balancing
+medium 45k hp +50 armor
+little 10k hp + 50 armor
+Arthas protectors +10k hp
+increase grom attack speed + 10k dmg +25k hp
+illidan +50k hp negative energy +20k dmg + attack speed
+balanar +100 armor + 50k hp
+proudmoore +200 armor +50k hp
+increase skull banehallow
 
 Terrorblade Hard Mode test:
 Phase 2 entering:
@@ -1190,7 +1287,6 @@ Phase 2 entering:
 
 //Patreon To-Do-List( In Goal orders )
 //Reached Goals
-Finish Blademaster Hero
 Finish Priestess of the Moon Hero
 Finish Solo Mod
 Finish Rexxar Hero
@@ -1198,7 +1294,6 @@ Finish Rifleman
 Finish French Translation
 
 //Non-Reached Goals
-Finish Muradin BronzeBeard Event
 Finish Sylvanas Windrunner Hero
 Finish Warden Hero
 Finish Custom Effects for Shiva's Guard 2 and 3

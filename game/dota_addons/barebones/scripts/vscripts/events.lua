@@ -42,8 +42,8 @@ function GameMode:OnNPCSpawned(keys)
 	local normal_xp = npc:GetDeathXP()
 
 	if GetMapName() == "x_hero_siege_8_players" then
-		npc:SetMinimumGoldBounty( normal_bounty*2 )
-		npc:SetMaximumGoldBounty( normal_bounty*2 )
+		npc:SetMinimumGoldBounty( normal_bounty*1.5 )
+		npc:SetMaximumGoldBounty( normal_bounty*1.5 )
 		npc:SetDeathXP( normal_xp )
 	else
 		npc:SetMinimumGoldBounty( normal_bounty )

@@ -4,7 +4,7 @@ require('libraries/timers')
 function Spawn( entityKeyValues )
 	Ability_Howl = thisEntity:FindAbilityByName("howl_of_terror")
 	Ability_firestorm = thisEntity:FindAbilityByName("magtheridon_firestorm")
-	Ability_thunderclap = thisEntity:FindAbilityByName("magtheridon_thunderclap")
+	Ability_thunderclap = thisEntity:FindAbilityByName("creature_thunder_clap")
 
 	Timers:CreateTimer(0,MagThink)
 	DebugPrint("Starting AI for "..thisEntity:GetUnitName().." "..thisEntity:GetEntityIndex())

@@ -98,7 +98,7 @@ function Phantasm( keys )
 		-- Recreate the items of the caster
 		for itemSlot=0,5 do
 			local item = caster:GetItemInSlot(itemSlot)
-			if item ~= nil and item:GetName() ~= "item_cloak_of_flames" then
+			if item ~= nil and item:GetName() ~= "item_cloak_of_flames" and item:GetName() ~= "item_ankh_of_reincarnation" and item:GetName() ~= "item_salve_1000" and item:GetName() ~= "item_mana_salve" then
 				local itemName = item:GetName()
 				local newItem = CreateItem(itemName, illusion, illusion)
 				illusion:AddItem(newItem)

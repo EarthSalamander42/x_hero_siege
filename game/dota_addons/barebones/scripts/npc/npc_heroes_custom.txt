@@ -1,7 +1,26 @@
 "DOTAHeroes"
 {
 	//========================================================================================================
-	// HERO: Archmage ( Crystal Maiden )
+	// HERO: Tarhunt - Storm God ( Arc Warden )
+	//========================================================================================================
+	"npc_dota_hero_arc_warden_holdout"
+	{
+		"override_hero"			"npc_dota_hero_arc_warden"
+		"AbilityLayout"			"5"
+		"MovementSpeed"			"345"
+
+		"Ability1"				"leshrac_lightning_storm"
+		"Ability2"				"holdout_magnetic_field"
+		"Ability3"				"holdout_electric_vortex"		
+//		"Ability4"				"holdout_delightful_torment"
+		"Ability4"				"holdout_inner_lightning"
+		"Ability5"				"holdout_bonus"
+		"Ability6"				"arc_warden_tempest_double"
+		"Ability16"				"ability_unit_died_ice"
+	}
+
+	//========================================================================================================
+	// HERO: Archmage - Naira ( Crystal Maiden )
 	//========================================================================================================
 	"npc_dota_hero_crystal_maiden_holdout"
 	{
@@ -16,6 +35,24 @@
 		"Ability5"				"holdout_bonus"
 		"Ability6"				"holdout_elemental_wave"
 		"Ability16"				"ability_unit_died_ice"
+	}
+
+	//========================================================================================================
+	// HERO: Shadow Hunter( Shadow Shaman )
+	//========================================================================================================
+	"npc_dota_hero_shadow_shaman_holdout"
+	{
+		"override_hero"			"npc_dota_hero_shadow_shaman"
+		"AbilityLayout"			"5"
+		"MovementSpeed"			"355"
+
+		"Ability1"				"techies_land_mines"
+		"Ability2"				"holdout_serpent_ward"
+		"Ability3"				"holdout_feedback"		
+		"Ability4"				"holdout_voodoo_eyes"
+		"Ability5"				"holdout_bonus"
+		"Ability6"				"holdout_laser_trap"
+		"Ability16"				"ability_unit_died_fire"
 	}
 
 	//========================================================================================================
@@ -73,7 +110,7 @@
 	}
 
 	//========================================================================================================
-	// HERO: Illidan, the Demon Hunter
+	// HERO: Wrath Bringer, the Demon Hunter
 	//========================================================================================================
 	"npc_dota_hero_terrorblade_holdout"
 	{
@@ -91,7 +128,7 @@
 	}
 
 	//========================================================================================================
-	// HERO: Juggernaut
+	// HERO: Blademaster( Juggernaut )
 	//========================================================================================================
 	"npc_dota_hero_juggernaut_holdout"
 	{
@@ -101,8 +138,8 @@
 
 		"Ability1"				"brewmaster_storm_wind_walk"
 		"Ability2"				"blademaster_mirror_image"
-		"Ability3"				"juggernaut_blade_dance"
-		"Ability4"				""
+		"Ability3"				"holdout_wardrums_aura"
+		"Ability4"				"juggernaut_blade_dance"
 		"Ability5"				"holdout_bonus"
 		"Ability6"				"juggernaut_blade_fury"
 		"Ability16"				"ability_unit_died_fire"
@@ -160,22 +197,6 @@
 		"Ability5"				"holdout_bonus"
 		"Ability6"				"holdout_inferno"
 		"Ability16"				"ability_unit_died_death"
-	}
-
-	//========================================================================================================
-	// HERO: Sven
-	//========================================================================================================
-	"npc_dota_hero_sven_holdout"
-	{
-		"override_hero"			"npc_dota_hero_sven"
-		"MovementSpeed"			"355"
-
-		"Ability1"				"holdout_storm_bolt"
-		"Ability2"				"holdout_great_cleave"
-		"Ability3"				"holdout_warcry"
-		"Ability4"				"holdout_gods_strength"
-		"Ability5"				"holdout_bonus"
-		"Ability16"				"ability_unit_died_light"
 	}
 
 	//========================================================================================================

@@ -777,204 +777,6 @@
 		}
 	}
 
-	//=================================================================================================================
-	// Holdout: Storm Bolt
-	//=================================================================================================================
-	"holdout_storm_bolt"
-	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"BaseClass"						"sven_storm_bolt"
-		"MaxLevel"						"7"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_AOE | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING"
-		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
-		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
-		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
-		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
-		
-		// Casting
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCastRange"				"600"
-		"AbilityCastPoint"				"0.3"
-
-		// Time		
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCooldown"				"12"
-
-		// Damage.
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityDamage"					"150 175 200 250 300 400 600"
-
-		// Cost
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityManaCost"				"140"
-
-		// Special
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilitySpecial"
-		{
-			"01"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bolt_speed"			"1000"
-			}
-			"02"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bolt_stun_duration"	"2"
-			}
-			"03"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bolt_aoe"				"255"
-			}
-			"04"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"vision_radius"			"250"
-			}
-		}
-	}
-
-	//=================================================================================================================
-	// Ability: Great Cleave
-	//=================================================================================================================
-	"holdout_great_cleave"
-	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-
-		"BaseClass"             		"sven_great_cleave"
-		"MaxLevel" 						"7"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_YES"
-				
-		// Special
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilitySpecial"
-		{
-			"01"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"great_cleave_radius"	"275"
-			}
-			
-			"02"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"great_cleave_damage"	"12 15 18 21 24 27 30"
-			}
-		}
-	}
-
-	//========================================================================================================
-	// Holdout: Warcry
-	//========================================================================================================
-	"holdout_warcry"
-	{
-		// General
-		//----------------------------------------------------------------------------------------------------
-		"BaseClass"						"sven_warcry"
-		"MaxLevel"						"7"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
-		
-		// Casting
-		//----------------------------------------------------------------------------------------------------
-		"AbilityCastPoint"				"0.1"
-
-		// Time		
-		//----------------------------------------------------------------------------------------------------
-		"AbilityCooldown"				"21"
-		"AbilityDuration"				"8"
-	
-		// Cost
-		//----------------------------------------------------------------------------------------------------
-		"AbilityManaCost"				"55"
-
-		// Special
-		//----------------------------------------------------------------------------------------------------
-		"AbilitySpecial"
-		{
-			"01"
-			{
-				"var_type"			"FIELD_INTEGER"
-				"warcry_armor"		"3 5 7 10 15 20 30"		
-			}
-			"02"
-			{
-				"var_type"			"FIELD_INTEGER"
-				"warcry_movespeed"	"6 7 8 9 10 11 12"
-			}
-			"03"
-			{
-				"var_type"			"FIELD_INTEGER"
-				"warcry_radius"		"900"
-			}
-			"04"
-			{
-				"var_type"			"FIELD_INTEGER"
-				"warcry_duration"	"10"
-			}
-		}
-	}
-
-	//========================================================================================================
-	// Holdout: God's Strength
-	//========================================================================================================
-	"holdout_gods_strength"
-	{
-		// General
-		//----------------------------------------------------------------------------------------------------
-		"AbilityTextureName"			"holdout_gods_strength"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING"
-		"AbilityType"					"DOTA_ABILITY_TYPE_ULTIMATE"
-		"MaxLevel"						"4"
-		
-		// Casting
-		//----------------------------------------------------------------------------------------------------
-		"AbilityCastPoint"				"0.3"
-
-		// Time		
-		//----------------------------------------------------------------------------------------------------
-		"AbilityCooldown"				"140"
-		"AbilityDuration"				"20"
-	
-		// Cost
-		//----------------------------------------------------------------------------------------------------
-		"AbilityManaCost"				"125 175 225 275"
-
-		// Special
-		//----------------------------------------------------------------------------------------------------
-		"AbilitySpecial"
-		{
-			"01"
-			{
-				"var_type"							"FIELD_INTEGER"
-				"bonus_strength"					"20 30 40 70"		
-			}
-			"02"
-			{
-				"var_type"							"FIELD_INTEGER"
-				"model_scale"						"25 35 45 55"		
-			}
-			"03"
-			{
-				"var_type"							"FIELD_FLOAT"
-				"cooldown_reduction_per_kill"		"8"		
-			}
-			"04"
-			{
-				"var_type"							"FIELD_INTEGER"
-				"gods_strength_damage"				"50 55 60 70"		
-			}
-			"05"
-			{
-				"var_type"							"FIELD_INTEGER"
-				"duration_tooltip"					"21"
-			}
-		}
-	}
-
 	//========================================================================================================
 	// Omniknight: Healing Wave
 	//========================================================================================================
@@ -2669,77 +2471,77 @@
 		}
 	}
 
-// Rewrite of the Venomancer Plague Ward ability
-// Author: Pizzalol and Rook
-// Date: 30.09.2015.
-"holdout_dark_portal"
-{
-	// General
-	//-------------------------------------------------------------------------------------------------------------
-	"BaseClass"                     "ability_datadriven"
-	"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_POINT"
-	"AbilityUnitDamageType"         "DAMAGE_TYPE_PHYSICAL"  
-	"SpellImmunityType"             "SPELL_IMMUNITY_ENEMIES_YES"
-	"AbilityTextureName"            "holdout_dark_portal"
-	"MaxLevel"						"7"
-
-	// Precache
-	//-------------------------------------------------------------------------------------------------------------
-	"precache"
+	// Rewrite of the Venomancer Plague Ward ability
+	// Author: Pizzalol and Rook
+	// Date: 30.09.2015.
+	"holdout_dark_portal"
 	{
-		"soundfile"         "soundevents/game_sounds_heroes/game_sounds_venomancer.vsndevts"
-		"particle"			"particles/units/heroes/hero_templar_assassin/templar_assassin_meld_attack_plasma.vpcf"
-		"particle"			"particles/units/heroes/hero_templar_assassin/templar_assassin_trap_rings_inner.vpcf"
-		"particle"			"particles/econ/items/puck/puck_alliance_set/puck_base_attack_aproset.vpcf"
-		"model"             "models/props_gameplay/temple_portal001.vmdl"
-//		"model"             "models/items/wards/portal_ward/portal_ward.vmdl"
-	}
-
-	// Casting
-	//-------------------------------------------------------------------------------------------------------------
-	"AbilityCastRange"              "850"
-	"AbilityCastPoint"              "0.3"
-
-	// Time     
-	//-------------------------------------------------------------------------------------------------------------
-	"AbilityCooldown"               "45.0"
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"                     "ability_datadriven"
+		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_POINT"
+		"AbilityUnitDamageType"         "DAMAGE_TYPE_PHYSICAL"  
+		"SpellImmunityType"             "SPELL_IMMUNITY_ENEMIES_YES"
+		"AbilityTextureName"            "holdout_dark_portal"
+		"MaxLevel"						"7"
 	
-	// Cost
-	//-------------------------------------------------------------------------------------------------------------
-	"AbilityManaCost"               "185"
+		// Precache
+		//-------------------------------------------------------------------------------------------------------------
+		"precache"
+		{
+			"soundfile"         "soundevents/game_sounds_heroes/game_sounds_venomancer.vsndevts"
+			"particle"			"particles/units/heroes/hero_templar_assassin/templar_assassin_meld_attack_plasma.vpcf"
+			"particle"			"particles/units/heroes/hero_templar_assassin/templar_assassin_trap_rings_inner.vpcf"
+			"particle"			"particles/econ/items/puck/puck_alliance_set/puck_base_attack_aproset.vpcf"
+			"model"             "models/props_gameplay/temple_portal001.vmdl"
+	//		"model"             "models/items/wards/portal_ward/portal_ward.vmdl"
+		}
 	
-	// Special  
-	//-------------------------------------------------------------------------------------------------------------
-	"AbilitySpecial"
-	{
-		"01"
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"              "850"
+		"AbilityCastPoint"              "0.3"
+	
+		// Time     
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"               "45.0"
+		
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"               "185"
+		
+		// Special  
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
 		{
-			"var_type"              "FIELD_FLOAT"
-			"duration"              "20.0"
+			"01"
+			{
+				"var_type"              "FIELD_FLOAT"
+				"duration"              "20.0"
+			}
+			"02"
+			{
+				"var_type"              "FIELD_INTEGER"
+				"ward_hp_tooltip"       "750 1000 1250 1500 1750 2250 3000"
+			}
+			"03"
+			{
+				"var_type"              "FIELD_INTEGER"
+				"ward_damage_tooltip"   "50 65 80 95 120 170 260"
+			}
 		}
-		"02"
-		{
-			"var_type"              "FIELD_INTEGER"
-			"ward_hp_tooltip"       "750 1000 1250 1500 1750 2250 3000"
-		}
-		"03"
-		{
-			"var_type"              "FIELD_INTEGER"
-			"ward_damage_tooltip"   "50 65 80 95 120 170 260"
+	
+		"OnSpellStart"
+		{           
+			"RunScript"
+			{
+				"ScriptFile"        "heroes/hero_warlock/dark_portal.lua"
+				"Function"          "venomancer_plague_ward_datadriven_on_spell_start"
+				"Target"            "POINT"
+				"Duration"          "%duration"
+			}
 		}
 	}
-
-	"OnSpellStart"
-	{           
-		"RunScript"
-		{
-			"ScriptFile"        "heroes/hero_warlock/dark_portal.lua"
-			"Function"          "venomancer_plague_ward_datadriven_on_spell_start"
-			"Target"            "POINT"
-			"Duration"          "%duration"
-		}
-	}
-}
 
 	//========================================================================================================
 	// Warlock: Spiritual Beast
@@ -3819,7 +3621,7 @@
 			"01"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"damage"					"150 250 350 450 650 950 1500"
+				"damage"					"150 260 370 480 700 1050 1800"
 			}
 			"02"
 			{
@@ -5370,7 +5172,7 @@
 				}
 			}
 		}
-		
+
 		"Modifiers"
 		{
 			"modifier_march_of_the_machines_dummy_datadriven"
@@ -5522,6 +5324,77 @@
 					"MODIFIER_STATE_NO_HEALTH_BAR"          "MODIFIER_STATE_VALUE_ENABLED"
 					"MODIFIER_STATE_UNSELECTABLE"           "MODIFIER_STATE_VALUE_ENABLED"
 					"MODIFIER_STATE_STUNNED"                "MODIFIER_STATE_VALUE_ENABLED"
+				}
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Blademaster: Wardrums Aura
+	//=================================================================================================================
+	"holdout_wardrums_aura"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"BaseClass"						"ability_datadriven"
+		"AbilityTextureName"			"holdout_wardrums_aura"
+		"MaxLevel"						"7"
+		"RequiredLevel"					"5"
+		"LevelsBetweenUpgrades"			"3"
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"				"1200"
+		
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"						"FIELD_INTEGER"
+				"bonus_damage_percentage"		"10 20 30 40 50 65 80 100"
+			}
+			"02"
+			{
+				"var_type"						"FIELD_INTEGER"
+				"aura_radius"					"1200"
+			}
+		}
+
+		"Modifiers"
+		{
+			"modifier_wardrums_aura"
+			{
+				"Passive"           "1"
+				"IsHidden"          "0"
+				"IsBuff"            "1"
+
+				"Aura"              "modifier_devotion_aura_hidden"
+				"Aura_Radius"       "%aura_radius"
+				"Aura_Teams"        "DOTA_UNIT_TARGET_TEAM_FRIENDLY"
+				"Aura_Types"        "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+			}
+
+			"modifier_wardrums_aura_hidden"
+			{
+				"Passive"   "1"
+				"IsHidden"  "1"
+
+				"OnCreated"
+				{
+					"AttachEffect"
+					{
+						"Target"			"TARGET"
+						"EffectName"		"particles/items_fx/aura_vlads.vpcf"
+						"EffectAttachType"	"follow_origin"
+					}
+				}
+
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_BASEDAMAGEOUTGOING_PERCENTAGE"   "%bonus_damage_percentage"
 				}
 			}
 		}
@@ -5708,6 +5581,638 @@
 						"Function"      "Splash"
 					}
 				}
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Tarhunt: Magnetic Field
+	//=================================================================================================================
+	"holdout_magnetic_field"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"						"ability_datadriven"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_AOE | DOTA_ABILITY_BEHAVIOR_POINT"
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_YES"
+		"AbilityTextureName"			"arc_warden_magnetic_field"
+		"AOERadius"						"%radius"
+		"MaxLevel"						"7"
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"              "550"
+		"AbilityCastPoint"              "0.35"
+
+		// Time     
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"               "23.0"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"               "80"
+
+		// Stats
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityModifierSupportBonus"	"50"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"radius"				"400"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"duration"				"4.0 4.5 5.0 6.0 7.5 8.0 9.0"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"aura_interval"			"0.1"
+			}
+			"04"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_armor"			"15 30 45 60 75 90 120"
+			}
+			"05"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_attack_speed"	"20 40 60 80 120 180 240"
+			}
+			"06"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_evasion"			"10 20 30 40 50 60 70"
+			}
+		}
+
+		"OnSpellStart"
+		{
+			"FireSound"
+			{
+				"EffectName"        "Hero_ArcWarden.MagneticField"
+				"Target"            "CASTER"
+			}
+
+			"RunScript"
+			{
+				"ScriptFile"        "scripts/vscripts/heroes/hero_arc_warden/magnetic_field.lua"
+				"Function"          "MagneticField"
+				"Target"            "POINT"
+				"dummy_aura"        "modifier_magnetic_field_datadriven"
+			}
+		}
+
+		"Modifiers"
+		{
+			// Cosmetic
+			"modifier_magnetic_field_tooltip_datadriven"
+			{
+				"IsBuff"		"1"
+				"IsPurgable"	"0"
+			}
+
+			"modifier_magnetic_field_datadriven"
+			{
+				"OnCreated"
+				{
+					"AttachEffect"
+					{
+						"EffectName"			"particles/units/heroes/hero_arc_warden/arc_warden_magnetic.vpcf"
+						"EffectAttachType"		"attach_origin"
+						"Target"				"TARGET"
+	
+						"ControlPoints"
+						{
+							"01"				"%radius %radius 0"
+						}
+					}
+				}
+
+				"ThinkInterval"     "%aura_interval"
+
+				"OnIntervalThink"
+				{
+					"ActOnTargets"
+					{
+						"Target"
+						{
+							"Center"    "TARGET"
+							"Types"     "DOTA_UNIT_TARGET_ALL"
+							"Teams"     "DOTA_UNIT_TARGET_TEAM_FRIENDLY"
+//							"Flags"     "DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES"
+							"Radius"    "%radius"
+						}
+
+						"Action"
+						{
+							"RunScript"
+							{
+								"ScriptFile"        "scripts/vscripts/heroes/hero_arc_warden/magnetic_field.lua"
+								"Function"          "MagneticFieldAura"
+								"Target"            "TARGET"
+								"aura_modifier"     "modifier_chronosphere_datadriven"
+							}
+						}
+					}
+				}
+
+				"States"
+				{
+					"MODIFIER_STATE_INVULNERABLE"   "MODIFIER_STATE_VALUE_ENABLED"
+					"MODIFIER_STATE_NO_HEALTH_BAR"  "MODIFIER_STATE_VALUE_ENABLED"              
+					"MODIFIER_STATE_NOT_ON_MINIMAP" "MODIFIER_STATE_VALUE_ENABLED"
+					"MODIFIER_STATE_UNSELECTABLE"   "MODIFIER_STATE_VALUE_ENABLED"
+				}
+			}
+
+			"modifier_chronosphere_datadriven"
+			{
+				"IsHidden"  "1"
+	
+				"OnCreated"
+				{
+					"ApplyModifier"
+					{
+						"ModifierName"  "modifier_magnetic_field_tooltip_datadriven"
+						"Target"        "TARGET"
+					}
+				}
+
+				"OnDestroy"
+				{
+					"RemoveModifier"
+					{
+						"ModifierName"  "modifier_magnetic_field_tooltip_datadriven"
+						"Target"        "TARGET"
+					}
+				}
+
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS"			"%bonus_armor"
+					"MODIFIER_PROPERTY_ATTACKSPEED_BONUS_CONSTANT"		"%bonus_attack_speed"
+					"MODIFIER_PROPERTY_EVASION_CONTANT"					"%bonus_evasion"
+				}
+			}
+		}
+	}
+
+	//========================================================================================================
+	// Holdout: Electric Vortex
+	//========================================================================================================
+	"holdout_electric_vortex"
+	{
+		// General
+		//----------------------------------------------------------------------------------------------------
+		"BaseClass"						"ability_datadriven"
+		"AbilityTextureName"			"storm_spirit_electric_vortex"	
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+		"AbilityUnitTargetFlags"		"DOTA_UNIT_TARGET_FLAG_NOT_ANCIENTS"
+		"MaxLevel"						"7"
+		"RequiredLevel"					"5"
+		"LevelsBetweenUpgrades"			"3"
+
+		// Casting
+		//----------------------------------------------------------------------------------------------------
+		"AbilityCastPoint"				"0.3"
+		"AbilityCastRange"				"300 325 350 375 425 500 650"
+
+		// Time		
+		//----------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"19"
+	
+		// Cost
+		//----------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"135"
+
+		// Special
+		//----------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"									"FIELD_INTEGER"
+				"electric_vortex_pull_units_per_second"		"15"		
+			}
+			"02"
+			{
+				"var_type"									"FIELD_FLOAT"
+				"electric_vortex_pull_tether_range"			"1200.0"		
+			}
+			"03"
+			{
+				"var_type"									"FIELD_INTEGER"
+				"electric_vortex_self_slow"					"-90 -80 -70 -60 -50 -40 -30"
+			}
+			"04"
+			{
+				"var_type"									"FIELD_FLOAT"
+				"electric_vortex_self_slow_duration"		"3.0 2.75 2.5 2.25 2.0 1.5 1.0"
+			}	
+			"05"
+			{
+				"var_type"									"FIELD_FLOAT"
+				"duration"									"2.0 2.5 3.0 3.5 4.0 4.5 5.0"
+			}	
+			"06"
+			{
+				"var_type"									"FIELD_INTEGER"
+				"radius"									"300 325 350 375 425 500 650"
+			}
+		}
+
+		"OnSpellStart"
+		{
+			"FireSound"
+			{
+				"EffectName"		"Hero_StormSpirit.ElectricVortexCast"
+				"Target"			"CASTER"
+			}
+
+			"ApplyModifier"
+			{
+				"Target"
+				{
+					"Center"			"CASTER"
+					"Teams"				"DOTA_UNIT_TARGET_TEAM_ENEMY"
+					"Types"				"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_CREEP"
+					"Radius"			"%radius"
+				}				
+				"Duration"				"%duration"
+				"ModifierName"			"modifier_storm_spirit_electric_vortex_pull"
+			}
+
+			"ApplyModifier"
+			{
+				"Target"				"CASTER"
+				"Duration"				"%electric_vortex_self_slow_duration"
+				"ModifierName"			"modifier_storm_spirit_electric_vortex_self_slow"
+			}
+
+			"FireSound"
+			{
+				"EffectName"		"Hero_StormSpirit.ElectricVortex"
+				"Target"			"CASTER"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Queen of Pain's Delightful Torment
+	//=================================================================================================================
+	"holdout_delightful_torment"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"							"ability_datadriven"
+		"AbilityBehavior"					"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE"
+		"AbilityUnitTargetType"				"DOTA_UNIT_TARGET_HERO"
+		"MaxLevel"							"1"
+		"AbilityTextureName"				"zuus_static_field"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"					"FIELD_FLOAT"
+				"cooldown_reduction"		"1.0"
+			}
+		}
+
+		"Modifiers"
+		{
+			"modifier_imba_delightful_torment"
+			{
+				"Passive"					"1"
+				"IsBuff"					"1"
+				"IsPurgable"				"0"
+				"IsHidden"					"1"
+
+				"OnDealDamage"
+				{
+					"RunScript"
+					{
+						"ScriptFile"		"heroes/hero_arc_warden/delightful_torment.lua"
+						"Function"			"Torment"
+					}
+				}
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Tarhunt: Inner Lightning
+	//=================================================================================================================
+	"holdout_inner_lightning"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"						"ability_datadriven"
+		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
+		"AbilityUnitTargetTeam"         "DOTA_UNIT_TARGET_TEAM_FRIENDLY"
+		"AbilityUnitTargetType"         "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC | DOTA_UNIT_TARGET_MECHANICAL"
+		"AbilityUnitTargetFlags"        "DOTA_UNIT_TARGET_FLAG_NOT_MAGIC_IMMUNE_ALLIES"
+		"SpellImmunityType"             "SPELL_IMMUNITY_ALLIES_YES"
+		"AbilityTextureName"            "holdout_inner_lightning"
+		"MaxLevel"						"7"
+		"RequiredLevel"					"8"
+		"LevelsBetweenUpgrades"			"3"
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"              "600"
+		"AbilityCastPoint"              "0.0"
+
+		// Time     
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"               "30 28 26 24 22 20 17"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"175"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"					"FIELD_FLOAT"
+				"duration"					"2.5 3.0 3.5 4.0 5.0 6.0 8.0"
+			}
+		}
+
+		"precache"
+		{
+			"soundfile" "soundevents/game_sounds_heroes/game_sounds_magnataur.vsndevts"
+			"particle"  "particles/econ/courier/courier_trail_international_2013_se/courier_international_2013_se.vpcf"
+		}
+
+		"OnSpellStart"
+		{
+			"FireSound"
+			{
+				"EffectName"    "Hero_Magnataur.Empower.Cast"
+				"Target"        "TARGET"
+
+				"AttachEffect"
+				{
+					"Duration"			"%duration"
+					"Target"			"TARGET"
+					"EffectName"		"particles/econ/courier/courier_trail_international_2013_se/courier_international_2013_se.vpcf"
+					"EffectAttachType"	"follow_overhead"
+				}
+			}
+
+			"ApplyModifier"
+			{
+				"ModifierName"	"modifier_inner_lightning"
+				"Target" 		"TARGET"
+				"Duration"		"%duration"
+			}
+		}
+
+		"Modifiers"
+		{
+			"modifier_inner_lightning"
+			{
+				"Passive"			"0"
+				"IsHidden"			"0"
+				"Isbuff"			"1"
+
+				"Properties"
+				{
+				    "MODIFIER_PROPERTY_ABSOLUTE_NO_DAMAGE_PHYSICAL"			"1" 
+				}
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Shadow Hunter: Serpent Ward
+	//=================================================================================================================
+	"holdout_serpent_ward"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"                     "ability_datadriven"
+		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_POINT"
+		"AbilityUnitDamageType"         "DAMAGE_TYPE_PHYSICAL"  
+		"SpellImmunityType"             "SPELL_IMMUNITY_ENEMIES_YES"
+		"AbilityTextureName"            "holdout_serpent_ward"
+		"MaxLevel"						"7"
+
+		// Precache
+		//-------------------------------------------------------------------------------------------------------------
+		"precache"
+		{
+			"soundfile"         "soundevents/game_sounds_heroes/game_sounds_venomancer.vsndevts"
+			"particle"			"particles/units/heroes/hero_templar_assassin/templar_assassin_meld_attack_plasma.vpcf"
+			"particle"			"particles/units/heroes/hero_templar_assassin/templar_assassin_trap_rings_inner.vpcf"
+			"particle"			"particles/econ/items/puck/puck_alliance_set/puck_base_attack_aproset.vpcf"
+			"model"             "models/props_gameplay/temple_portal001.vmdl"
+	//		"model"             "models/items/wards/portal_ward/portal_ward.vmdl"
+		}
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"              "650"
+		"AbilityCastPoint"              "0.3"
+
+		// Time     
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"               "10.0"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"               "165"
+
+		// Special  
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"              "FIELD_FLOAT"
+				"duration"              "40.0"
+			}
+			"02"
+			{
+				"var_type"              "FIELD_INTEGER"
+				"ward_hp_tooltip"       "750 1500 2500 4000 6000 12000 20000"
+			}
+			"03"
+			{
+				"var_type"              "FIELD_INTEGER"
+				"ward_damage_tooltip"   "70 90 120 150 200 310 550"
+			}
+		}
+	
+		"OnSpellStart"
+		{           
+			"RunScript"
+			{
+				"ScriptFile"		"heroes/hero_rhasta/serpent_ward.lua"
+				"Function"			"venomancer_plague_ward_datadriven_on_spell_start"
+				"Target"			"POINT"
+				"Duration"			"%duration"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Shadow Hunter: Feedback
+	//=================================================================================================================
+	"holdout_feedback"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"             		"antimage_mana_break"
+		"AbilityTextureName"			"holdout_feedback"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_PHYSICAL"		
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
+		"MaxLevel"						"7"
+		"RequiredLevel"					"5"
+		"LevelsBetweenUpgrades"			"3"
+
+		// Special	
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"damage_per_burn"		"5.0"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"mana_per_hit"			"5 10 15 20 25 30 40"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Shadow Hunter: Voodoo Eyes
+	//=================================================================================================================
+	"holdout_voodoo_eyes"
+	{
+		// General
+		//-------------------------------------------------------------------------------------
+		"BaseClass"					"ability_datadriven"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"MaxLevel"					"7"
+		"RequiredLevel"				"8"
+		"LevelsBetweenUpgrades"		"3"
+		"AbilityTextureName"		"holdout_voodoo_eyes"
+
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"			"FIELD_FLOAT"
+				"bonus_evasion"		"10 13 16 19 22 25 30"
+			}
+		}
+
+		"Modifiers"
+		{
+			"modifier_evasion"
+			{
+				"Passive" "1"
+				"IsHidden" "1"
+
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_EVASION_CONTANT" "%bonus_evasion" 
+				}
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Shadow Hunter: Laser Trap
+	//=================================================================================================================
+	"holdout_laser_trap"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"                     "ability_datadriven"
+		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_POINT"
+		"AbilityType"					"DOTA_ABILITY_TYPE_ULTIMATE"
+		"AbilityUnitDamageType"         "DAMAGE_TYPE_PHYSICAL"  
+		"SpellImmunityType"             "SPELL_IMMUNITY_ENEMIES_YES"
+		"AbilityTextureName"            "holdout_laser_trap"
+		"MaxLevel"						"2"
+		"RequiredLevel"					"10"
+		"LevelsBetweenUpgrades"			"5"
+
+		// Precache
+		//-------------------------------------------------------------------------------------------------------------
+		"precache"
+		{
+			"soundfile"         "soundevents/game_sounds_heroes/game_sounds_venomancer.vsndevts"
+			"particle"			"particles/units/heroes/hero_templar_assassin/templar_assassin_meld_attack_plasma.vpcf"
+			"particle"			"particles/units/heroes/hero_templar_assassin/templar_assassin_trap_rings_inner.vpcf"
+			"particle"			"particles/econ/items/puck/puck_alliance_set/puck_base_attack_aproset.vpcf"
+			"model"             "models/props_gameplay/temple_portal001.vmdl"
+	//		"model"             "models/items/wards/portal_ward/portal_ward.vmdl"
+		}
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"              "650"
+		"AbilityCastPoint"              "0.3"
+
+		// Time     
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"               "40.0"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"               "225 550"
+
+		// Special  
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"              "FIELD_FLOAT"
+				"duration"              "120.0"
+			}
+			"02"
+			{
+				"var_type"              "FIELD_INTEGER"
+				"ward_hp_tooltip"       "750 1000 1250 1500 1750 2250 3000"
+			}
+			"03"
+			{
+				"var_type"              "FIELD_INTEGER"
+				"ward_damage_tooltip"   "50 65 80 95 120 170 260"
+			}
+		}
+	
+		"OnSpellStart"
+		{           
+			"RunScript"
+			{
+				"ScriptFile"		"heroes/hero_rhasta/laser_trap.lua"
+				"Function"			"venomancer_plague_ward_datadriven_on_spell_start"
+				"Target"			"POINT"
+				"Duration"			"%duration"
 			}
 		}
 	}
@@ -8310,15 +8815,15 @@
 	
 		// Stats
 		//-------------------------------------------------------------------------------------
-		"AbilityCastPoint" "0.3"
-		"AbilityCooldown"  "15"
-		"AbilityCastRange" "800"
-		"AbilityManaCost"  "0"
-		"AbilityTextureName" "nyx_assassin_mana_burn"
-		"AbilityUnitDamageType" "DAMAGE_TYPE_MAGICAL"
-		"AbilityUnitTargetTeam" "DOTA_UNIT_TARGET_TEAM_ENEMY"
-		"AbilityUnitTargetType" "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
-		"AbilityDamage" "20000"
+		"AbilityCastPoint"			"0.3"
+		"AbilityCooldown"			"15"
+		"AbilityCastRange"			"800"
+		"AbilityManaCost"			"0"
+		"AbilityTextureName"		"nyx_assassin_mana_burn"
+		"AbilityUnitDamageType"		"DAMAGE_TYPE_MAGICAL"
+		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"AbilityUnitTargetType"		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+		"AbilityDamage"				"25000"
 		"AbilitySpecial"
 		{
 		  "01"
@@ -8385,6 +8890,93 @@
 		  "soundfile" "soundevents/game_sounds_heroes/game_sounds_lina.vsndevts"
 		}
 	  }
+
+	  "demonhunter_negative_energy_small"
+	  {
+		// General
+		//-------------------------------------------------------------------------------------
+		"BaseClass" "ability_datadriven"
+		"AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
+		"MaxLevel"              "1"
+	
+		// Stats
+		//-------------------------------------------------------------------------------------
+		"AbilityCastPoint" "0.3"
+		"AbilityCooldown"  "15"
+		"AbilityCastRange" "800"
+		"AbilityManaCost"  "0"
+		"AbilityTextureName" "nyx_assassin_mana_burn"
+		"AbilityUnitDamageType" "DAMAGE_TYPE_MAGICAL"
+		"AbilityUnitTargetTeam" "DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"AbilityUnitTargetType" "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+		"AbilityDamage" "10000"
+		"AbilitySpecial"
+		{
+		  "01"
+		  {
+			"var_type"      "FIELD_FLOAT"
+			"damage_delay"      "0.1"
+		  }
+		}
+	
+		"OnSpellStart"
+		{ 
+		  "FireEffect"
+		  {
+			"EffectName"  "particles/units/heroes/hero_lina/lina_spell_laguna_blade.vpcf"
+			"EffectAttachType"  "start_at_customorigin"   
+			"ControlPointEntities"
+			{
+			  "CASTER"  "attach_attack1"
+			  "TARGET"  "attach_hitloc"
+			}
+		  }
+	
+	
+		  "FireSound"
+		  {
+			"EffectName"  "Ability.LagunaBladeImpact"
+			"Target"    "TARGET"
+		  }
+	
+		  "FireSound"
+		  {
+			"EffectName"  "Ability.LagunaBlade"
+			"Target"    "CASTER"
+		  }
+		  "ApplyModifier"
+		  {
+			"ModifierName"    "modifier_laguna_blade_datadriven"
+			"Target"      "TARGET"
+		  }
+		}
+	
+		"Modifiers"
+		  {
+			"modifier_laguna_blade_datadriven"
+			{
+			  "IsHidden"  "1"
+			  "Duration"  "%damage_delay"
+	
+			  "OnDestroy"
+			  {
+				"Damage"
+				{
+				  "Target"  "TARGET"
+				  "Type"    "DAMAGE_TYPE_MAGICAL"
+				  "Damage"  "%AbilityDamage"
+				}
+			  }
+			}
+		  } 
+	
+		"precache"
+		{
+		  "particle"  "particles/units/heroes/hero_lina/lina_spell_laguna_blade.vpcf"
+		  "soundfile" "soundevents/game_sounds_heroes/game_sounds_lina.vsndevts"
+		}
+	  }
+
 	"demonhunter_roar"
 	  {
 		// General
