@@ -1,0 +1,33 @@
+"addon"
+{
+	"InstructionsTitle"								"X Hero Siege"
+	"InstructionsObjective"							"OBIETTIVO:"
+	"InstructionsObjectiveText"						"Difendi il tuo Castello! Si, la vecchia X Hero Siege è tornata, solo per te."
+	"InstructionsHowToPlay"							"COME GIOCARE:"
+	"InstructionsLines"								"- Difendi il tuo castello contro le lane di creep( scegli una lane per player ).<br>
+													- Distruggi le torri e risveglia i boss, poi vai dritto alle Caserme per impedire ai creep di spawnare.<br>
+													- Una volta che tutte le caserme sarano distrutte, combatti contro le torri ghiacciate e contro creep superiori, poi, distruggi le torri ghiacciate.<br>
+													- Torna al tuo castello per difenderlo, l'ondata finale sta arrivando!<br>
+													- Niente paura, dopo l'ondata finale il tuo castello è salvo!."
+
+	"DOTA_GoodGuys"   								"Forze della Luce"
+	"DOTA_BadGuys"    								"Forze dell'Oscurità"
+
+	"Remaining"										"RIMANENTE/I"
+	"Goal"											"Evento Speciale!:"
+	"CreepGoal"										"Potenziamento dei Creep!:"
+	"IncomingWaveGoal"								"Ondata in arrivo!:"
+
+	"addonname"										"X Hero Siege"
+	"overthrow_game_info_header_objective"			"Obiettivo:"
+	"overthrow_brief_description"					"DSconfiggi le forze oscure! Percorri la tua strada per combattere Arthas e per fermare la sua armata."
+	"overthrow_game_info_header_how_to_play"		"Come Giocare:"
+	"overthrow_game_info_throne"					"Difendi il tuo castello contro le lane di creep( scegli una lane per player )."
+	"overthrow_game_info_coins"						"Distruggi le torri e risveglia i boss, poi vai dritto alle Caserme per impedire ai creep di spawnare"
+	"overthrow_game_info_items"						"Una volta che tutte le caserme sarano distrutte, combatti contro le torri ghiacciate e contro creep superiori, poi, distruggi le torri ghiacciate."
+	"overthrow_game_info_tips_header"				"Tips:"
+	"overthrow_game_info_tip01"						"Non andare di corsa, farma, sii paziente."
+	"overthrow_game_info_tip02"						"Non entrare nella fase 2 dell'arena troppo presto o il tuo intero team fallirà( lane delle torri ghiacciate )."
+	"overthrow_game_info_tip03"						"Ricorda che questa modalità di gioco è basata sul gioco di squadra, se un tuo compagno è debole, compra qualche libro per lui."
+	"overthrow_game_info_tip04"						"Più tempo farmi, più facile sarà, giudica tu stesso quando sarà ora di affrontare i vari boss!."
+}

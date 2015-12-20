@@ -62,8 +62,8 @@ function UpdateTimerMuradin( data )
 	$( "#Timer" ).text = timerText;
 
 	UpdateTimer();
-	UpdateTimerCreep();
-	UpdateTimerIncomingWave();
+//	UpdateTimerCreep();
+//	UpdateTimerIncomingWave();
 }
 
 function UpdateTimerCreep( data )
@@ -85,11 +85,11 @@ function UpdateTimerCreep( data )
 	//timerText += sec;
 
 	var timerText = "";
-	timerText += data.timer_minute_10;
-	timerText += data.timer_minute_01;
+	timerText += data.timer_minute_10_2;
+	timerText += data.timer_minute_01_2;
 	timerText += ":";
-	timerText += data.timer_second_10;
-	timerText += data.timer_second_01;
+	timerText += data.timer_second_10_2;
+	timerText += data.timer_second_01_2;
 
 	$( "#CreepTimer" ).text = timerText;
 
@@ -114,11 +114,11 @@ function UpdateTimerIncomingWave( data )
 	//timerText += sec;
 
 	var timerText3 = "";
-	timerText3 += data.timer_minute_10;
-	timerText3 += data.timer_minute_01;
+	timerText3 += data.timer_minute_10_3;
+	timerText3 += data.timer_minute_01_3;
 	timerText3 += ":";
-	timerText3 += data.timer_second_10;
-	timerText3 += data.timer_second_01;
+	timerText3 += data.timer_second_10_3;
+	timerText3 += data.timer_second_01_3;
 
 	$( "#IncomingWaveTimer" ).text = timerText3;
 

@@ -148,7 +148,7 @@
 
 #CreepTimer
 {
-    margin-top: -6px;
+    margin-top: -4px;
     font-size: 20px;
     font-weight: bolder;
     color: #6f4d00;
@@ -160,7 +160,7 @@
 
 #IncomingWaveTimer
 {
-    margin-top: -6px;
+    margin-top: -2px;
     font-size: 20px;
     font-weight: bolder;
     color: #6f4d00;

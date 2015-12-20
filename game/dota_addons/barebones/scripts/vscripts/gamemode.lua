@@ -1,7 +1,7 @@
 BAREBONES_DEBUG_SPEW = false
-_G.nCOUNTDOWNTIMER = 30
-_G.nCOUNTDOWNCREEP = 30
-_G.nCOUNTDOWNINCWAVE = 30
+_G.nCOUNTDOWNTIMER = 720
+_G.nCOUNTDOWNCREEP = 720
+_G.nCOUNTDOWNINCWAVE = 720
 
 if GameMode == nil then
 	DebugPrint( '[BAREBONES] creating barebones game mode' )
@@ -51,6 +51,7 @@ function GameMode:OnGameInProgress()
 	Timers:CreateTimer(840, function() -- 12 Min + 2 Min with Muradin Event = 14 Min
 	Notifications:TopToAll({hero="npc_dota_hero_nyx_assassin", duration=6.0})
 	Notifications:TopToAll({text="Creeps are now Level 3!", style={color="green"}, continue=true})
+	nCOUNTDOWNCREEP = 361
 	end)
 	Timers:CreateTimer(1200, function() -- 18 Min + 2 Min with Muradin Event = 20 Min
 	Notifications:TopToAll({hero="npc_dota_hero_doom", duration=6.0})
@@ -1090,11 +1091,12 @@ function GameMode:OnGameInProgress()
 	--//=================================================================================================================
 	--// Timer: Muradin Bronzebeard Event 12 Min
 	--//=================================================================================================================
-	Timers:CreateTimer(0, function() -- 12:00 Min: MURADIN BRONZEBEARD EVENT 1
+	Timers:CreateTimer(720, function() -- 12:00 Min: MURADIN BRONZEBEARD EVENT 1
 	GameMode.MuradinTimeLapse = 1
 	local point = Entities:FindByName(nil,"npc_dota_muradin_boss"):GetAbsOrigin()
 	local MuradinEvent = CreateUnitByName("npc_dota_creature_muradin_bronzebeard",Entities:FindByName(nil,"npc_dota_muradin_boss"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_BADGUYS)
 	local heroes = HeroList:GetAllHeroes()
+	nCOUNTDOWNTIMER = 121
 
 --	local creeps = Entities:FindAllByName("npc_dota_creature_mini_lifestealers")
 
@@ -1112,7 +1114,8 @@ function GameMode:OnGameInProgress()
 
 	MuradinEvent:SetAngles(0, 270, 0)
 	Notifications:TopToAll({hero="npc_dota_hero_zuus", duration=5.0})
-	Notifications:TopToAll({text="Muradin Event Begins!", continue=true})
+	Notifications:TopToAll({text="You can't kill him! Just survive the Countdown", continue=true})
+	Notifications:TopToAll({text="Reward: 10 000 Gold.", continue=true})
 	Timers:CreateTimer( 5.0, StartMuradinEvent )
 	Timers:CreateTimer( 120, EndMuradinEvent )
 		Timers:CreateTimer(130, function() -- 2:10 Min
@@ -1271,13 +1274,12 @@ function GameMode:OnGameRulesStateChange(keys)
 	if newState == DOTA_GAMERULES_STATE_PRE_GAME then
 		self._fPreGameStartTime = GameRules:GetGameTime()
 		for _,hero in pairs(heroes) do
-			if hero:IsRealHero() and not hero:IsIllusion() then
+			if hero:IsRealHero() then
 				local item1 = CreateItem("item_ankh_of_reincarnation", hero, hero)
 				hero:AddItem(item1)
 
 				local item2 = CreateItem("item_salve_1000", hero, hero)
 				hero:AddItem(item2)
-			else return nil
 			end
 		end
 	end
@@ -1286,7 +1288,6 @@ function GameMode:OnGameRulesStateChange(keys)
 		nCOUNTDOWNTIMER = 721
 		nCOUNTDOWNCREEP = 361
 		nCOUNTDOWNINCWAVE = 301
-		print("Timer Set to 12 Min!")
 		print( "OnGameRulesStateChange: Game In Progress" )
 		self.countdownEnabled = true
 		CustomGameEventManager:Send_ServerToAllClients( "show_timer", {} )
@@ -1304,9 +1305,8 @@ function GameMode:OnThink()
 
 	if nCOUNTDOWNTIMER == 30 then
 		CustomGameEventManager:Send_ServerToAllClients( "timer_alert", {} )
-	elseif nCOUNTDOWNTIMER < -5 and GameMode.MuradinTimeLapse > 0 then
---		nCOUNTDOWNTIMER = nil
-		self.countdownEnabled = false
+	elseif nCOUNTDOWNTIMER < -5 --[[and GameMode.MuradinTimeLapse > 0--]] then
+		nCOUNTDOWNTIMER = 714
 	end
 
 	if nCOUNTDOWNCREEP < 1 then
@@ -1359,10 +1359,10 @@ function CountdownTimerCreep()
 	local s01 = seconds - (s10 * 10)
 	local broadcast_gametimer = 
 		{
-			timer_minute_10 = m10,
-			timer_minute_01 = m01,
-			timer_second_10 = s10,
-			timer_second_01 = s01,
+			timer_minute_10_2 = m10,
+			timer_minute_01_2 = m01,
+			timer_second_10_2 = s10,
+			timer_second_01_2 = s01,
 		}
 	CustomGameEventManager:Send_ServerToAllClients( "creepcountdown", broadcast_gametimer )
 end
@@ -1384,10 +1384,10 @@ function CountdownTimerIncomingWave()
 	local s01 = seconds - (s10 * 10)
 	local broadcast_gametimer = 
 		{
-			timer_minute_10 = m10,
-			timer_minute_01 = m01,
-			timer_second_10 = s10,
-			timer_second_01 = s01,
+			timer_minute_10_3 = m10,
+			timer_minute_01_3 = m01,
+			timer_second_10_3 = s10,
+			timer_second_01_3 = s01,
 		}
 	CustomGameEventManager:Send_ServerToAllClients( "incomingwavecountdown", broadcast_gametimer )
 end

@@ -1289,6 +1289,20 @@ X Hero Siege ( BETA ) 1.0.3 Fix
 - Added Creep Level Timer Countdown( WIP )
 - Added Incoming Waves Timer Countdown( WIP )
 
+
+//===========================================================================================================
+X Hero Siege ( BETA ) 1.0.4 Fix
+//===========================================================================================================
+
+- Added Italian Translation, by Phil
+- Updated Muradin Notifications
+
+Fix:
+- Fixed Timers
+- Fixed Alert Notifications
+- Fixed Blademaster illusions and Shadow Hunter wards can be cast in Muradin Water
+
+
 //================================================================================================================================================
 //================================================================================================================================================
 //================================================================================================================================================
@@ -1309,12 +1323,13 @@ Deep Sense Demo( by me )
 Fix Red Chronosphere not particle bug, need to recreate
 
 //X Hero Siege
+create magtheridon charge, 3 sec channeling and insta kill player
+increase tarhunt 2 attack speed
+remove blade mail
 prevent timer to re-run after muradin event
 create level creeps timer
 remove blades of attack
 increase blademaster damage taken to 250%
-check if barebones notifications are fixed
-notify at muradin event: u can't kill him just survive
 fix shadow hunter serpent tooltip dmg
 skip muradin water and check if serpent ward can still be cast on
 Fix Doors opening for all lanes at the beginning of a game

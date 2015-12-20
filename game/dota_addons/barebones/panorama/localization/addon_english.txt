@@ -10,17 +10,8 @@
 													- Head back to your castle to defend it, the Final Wave is coming!<br>
 													- Don't worry, after Final wave your castle is safe!."
 
-	"Unassigned"      								"Unassigned Team"
-	"Spectator"       								"Spectator Team"
-	"Neutrals"        								"Neutral Team"
-	"NoTeam"          								"No Team"
-
 	"DOTA_GoodGuys"   								"Light Forces"
 	"DOTA_BadGuys"    								"Dark Forces"
-	
-	"OverthrowHeroPickup"							"{s:hero_id}"
-	"OverthrowTextPickup"							"HAS PICKED UP"
-	"OverthrowItemPickup"							"{s:item_id}!"
 
 	"Remaining"										"REMAINING"
 	"Goal"											"Special Event:"
@@ -29,7 +20,7 @@
 
 	"addonname"										"X Hero Siege"
 	"overthrow_game_info_header_objective"			"Objective:"
-	"overthrow_brief_description"					"Slay your enemies! First team to hit the kill limit wins!"
+	"overthrow_brief_description"					"Defeat the dark forces! Make your way to fight Arthas and stop the dark force army."
 	"overthrow_game_info_header_how_to_play"		"How To Play:"
 	"overthrow_game_info_throne"					"Defend your castle against creep lanes( choose 1 lane per player )."
 	"overthrow_game_info_coins"						"Destroy towers to release bosses, and then head to the barrackment to stop creep spawns."
