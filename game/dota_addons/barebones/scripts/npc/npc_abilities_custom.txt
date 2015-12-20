@@ -5,7 +5,6 @@
 //-------------------
 // Dummy stuff
 //-------------------
-
 	"dummy_passive_vulnerable"
 	{
 		"BaseClass" 		"ability_datadriven"
@@ -5491,7 +5490,7 @@
 				"Properties"
 				{
 					"MODIFIER_PROPERTY_BASEDAMAGEOUTGOING_PERCENTAGE"	"%bonus_damage_percent"
-				    "MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS"			"%bonus_armor" 
+					"MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS"			"%bonus_armor" 
 				}
 			}
 		}
@@ -5542,6 +5541,91 @@
 			{
 				"var_type"					"FIELD_INTEGER"
 				"bonus_damage"				"100 400"
+			}
+		}
+
+		"Modifiers"
+		{
+			"modifier_splash_arrows"
+			{
+				"IsHidden"					"0"
+				"Passive"					"1"
+				"AllowIllusionDuplicate"    "1"
+
+				"OnCreated"
+				{		
+					"ApplyModifier"
+					{
+						"ModifierName"  "modifier_splash_attack_datadriven"
+						"Target"        "CASTER"
+					}
+				}
+
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_BASEATTACK_BONUSDAMAGE"		"%bonus_damage"		// MODIFIER_PROPERTY_BASEATTACK_BONUSDAMAGE     
+				}
+			}
+
+			"modifier_splash_attack_datadriven"
+			{
+				"IsHidden"					"1"
+				"Passive"					"1"
+
+				"OnAttackLanded"
+				{
+					"RunScript"
+					{
+						"ScriptFile"    "scripts/vscripts/heroes/hero_warlock/archimonde.lua"
+						"Function"      "Splash"
+					}
+				}
+			}
+		}
+	}
+
+	//========================================================================================================
+	// Windrunner: Splash Arrows
+	//========================================================================================================
+	"serpent_splash_arrows"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"             		"ability_datadriven"
+		"MaxLevel"						"1"
+		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"SpellImmunityType"             "SPELL_IMMUNITY_ENEMIES_YES"
+		"AbilityTextureName"            "holdout_splash_arrows"
+
+		// Precache
+		//-------------------------------------------------------------------------------------------------------------
+		"precache"
+		{
+			"soundfile"		"soundevents/game_sounds_heroes/game_sounds_dragon_knight.vsndevts"
+		}
+
+		// Stats
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityModifierSupportValue"   "0.35"  // Attacks are primarily about the damage
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"splash_radius"				"350"
+			}
+			"02"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"splash_damage_percent"		"35"
+			}
+			"03"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"bonus_damage"				"0"
 			}
 		}
 
@@ -5993,7 +6077,7 @@
 
 				"Properties"
 				{
-				    "MODIFIER_PROPERTY_ABSOLUTE_NO_DAMAGE_PHYSICAL"			"1" 
+					"MODIFIER_PROPERTY_ABSOLUTE_NO_DAMAGE_PHYSICAL"			"1" 
 				}
 			}
 		}
@@ -6191,17 +6275,17 @@
 			"01"
 			{
 				"var_type"              "FIELD_FLOAT"
-				"duration"              "120.0"
+				"duration"              "60.0"
 			}
 			"02"
 			{
 				"var_type"              "FIELD_INTEGER"
-				"ward_hp_tooltip"       "750 1000 1250 1500 1750 2250 3000"
+				"ward_hp_tooltip"       "10000 20000"
 			}
 			"03"
 			{
 				"var_type"              "FIELD_INTEGER"
-				"ward_damage_tooltip"   "50 65 80 95 120 170 260"
+				"ward_damage_tooltip"   "1000 2000"
 			}
 		}
 	
@@ -7037,7 +7121,7 @@
 		  "05"
 		  {
 			"var_type"      "FIELD_FLOAT"
-			"afterburn_duration"      "3"
+			"afterburn_duration"      "2"
 		  }
 		  "06"
 		  {
@@ -7048,6 +7132,12 @@
 
 		"OnSpellStart"
 		{
+			"FireSound"
+			{
+				"EffectName"        "Hero_Jakiro.Macropyre.Cast"
+				"Target"            "CASTER"
+			}
+
 			"SpawnUnit"
 			{
 				"UnitName"		"npc_dummy_target"
@@ -7067,13 +7157,14 @@
 				}
 			}
 		}
+
 		"OnChannelFinish"
 		{
-		  "RunScript"
-		  {
-			"ScriptFile"  "heroes/magtheridon/magtheridon.lua"
-			"Function"    "channel_end"
-		  }
+			"RunScript"
+			{
+				"ScriptFile"  "heroes/magtheridon/magtheridon.lua"
+				"Function"    "channel_end"
+			}
 		}
 
 		"Modifiers"

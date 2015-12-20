@@ -1,4 +1,6 @@
-BAREBONES_DEBUG_SPEW = false 
+BAREBONES_DEBUG_SPEW = false
+_G.nCOUNTDOWNTIMER = 0
+
 
 if GameMode == nil then
 	DebugPrint( '[BAREBONES] creating barebones game mode' )
@@ -19,52 +21,24 @@ require('settings')
 require('events')
 
 function GameMode:OnFirstPlayerLoaded()
-DebugPrint("[BAREBONES] First Player has loaded")
+	DebugPrint("[BAREBONES] First Player has loaded")
 end
 
 function GameMode:OnAllPlayersLoaded()
-DebugPrint("[BAREBONES] All Players have loaded into the game")
-GameMode.FrostTowers_killed = 0
-GameMode.Magtheridon_killed = 0
-GameMode.BossesTop_killed = 0
-GameMode.Arthas_killed = 0
-GameMode.Muradin_Event = 0
+	DebugPrint("[BAREBONES] All Players have loaded into the game")
+	GameMode.FrostTowers_killed = 0
+	GameMode.Magtheridon_killed = 0
+	GameMode.BossesTop_killed = 0
+	GameMode.Arthas_killed = 0
+	GameMode.Muradin_Event = 0
 end
 
 function GameMode:OnHeroInGame(hero)
 	DebugPrint("[BAREBONES] Hero spawned in game for first time -- " .. hero:GetUnitName())
-
---	local item = CreateItem("item_tpscroll", hero, hero)
---	hero:AddItem(item)
-
-	local item2 = CreateItem("item_ankh_of_reincarnation", hero, hero)
-	hero:AddItem(item2)
-
-	local item3 = CreateItem("item_salve_1000", hero, hero)
-	hero:AddItem(item3)
-
-	-- List of innate abilities
-	local innate_abilities = {
-		"holdout_delightful_torment"
-	}
-
-	-- Cycle through any innate abilities found, then upgrade them
-	for i = 1, #innate_abilities do
-		local current_ability = hero:FindAbilityByName(innate_abilities[i])
-		if current_ability then
-			current_ability:SetLevel(1)
-		end
-	end
 end
 
 function GameMode:OnGameInProgress()
 	DebugPrint("[BAREBONES] The game has officially begun")
-
-	--TEST COMMAND
---	Timers:CreateTimer(30, function() -- 30 Sec
---	local point = Entities:FindByName( nil, "npc_dota_spawner_west_event"):GetAbsOrigin()
---	local unit = CreateUnitByName("npc_dota_creature_abaddon", point, true, nil, nil, DOTA_TEAM_BADGUYS)
---	end)
 
 	--//=================================================================================================================
 	--// Timer: Creeps Levels 2, 3, 4, 5 Whispering
@@ -100,7 +74,6 @@ function GameMode:OnGameInProgress()
 	Timers:CreateTimer(1170, function() -- 19 Min 30 sec
 	Notifications:TopToAll({text="Incoming wave of Darkness from the South! You have 30 seconds!", duration=29.0})
 	end)
-
 	Timers:CreateTimer(660, function() -- 11 Min
 	Notifications:TopToAll({text="Warning, Muradin Event in 1 Min! Creeps will stop spawning at 11:30.", style={color="red"}, duration=59.0})
 	end)
@@ -1126,6 +1099,7 @@ function GameMode:OnGameInProgress()
 	local point = Entities:FindByName(nil,"npc_dota_muradin_boss"):GetAbsOrigin()
 	local MuradinEvent = CreateUnitByName("npc_dota_creature_muradin_bronzebeard",Entities:FindByName(nil,"npc_dota_muradin_boss"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_BADGUYS)
 	local heroes = HeroList:GetAllHeroes()
+
 --	local creeps = Entities:FindAllByName("npc_dota_creature_mini_lifestealers")
 
 --		for _,creep in pairs(creeps)do
@@ -1276,22 +1250,87 @@ function GameMode:InitGameMode()
 
 	GameMode:_InitGameMode()
 
-	Convars:RegisterCommand( "command_example", Dynamic_Wrap(GameMode, 'ExampleConsoleCommand'), "A console command example", FCVAR_CHEAT )
+	GameRules:GetGameModeEntity():SetThink( "OnThink", self, 1 )
+
+	self.countdownEnabled = false
+--	ListenToGameEvent( "game_rules_state_change", Dynamic_Wrap( GameMode, 'OnGameRulesStateChange' ), self )
+
+	Convars:RegisterCommand( "overthrow_set_timer", function(...) return SetTimerMuradin( ... ) end, "Set the timer.", FCVAR_CHEAT )
 
 	DebugPrint('[BAREBONES] Done loading Barebones gamemode!\n\n')
 end
 
--- This is an example console command
-function GameMode:ExampleConsoleCommand()
-	print( '******* Example Console Command ***************' )
-	local cmdPlayer = Convars:GetCommandClient()
-		if cmdPlayer then
-		local playerID = cmdPlayer:GetPlayerID()
-		if playerID ~= nil and playerID ~= -1 then
-		  -- Do something here for the player who called this command
-		  PlayerResource:ReplaceHeroWith(playerID, "npc_dota_hero_viper", 1000, 1000)
+function GameMode:OnGameRulesStateChange(keys)
+	DebugPrint("[BAREBONES] GameRules State Changed")
+	DebugPrintTable(keys)
+	local heroes = HeroList:GetAllHeroes()
+
+	-- This internal handling is used to set up main barebones functions
+	GameMode:_OnGameRulesStateChange(keys)
+
+	local newState = GameRules:State_Get()
+
+	if newState == DOTA_GAMERULES_STATE_PRE_GAME then
+		self._fPreGameStartTime = GameRules:GetGameTime()
+		for _,hero in pairs(heroes) do
+			if hero:IsRealHero() and not hero:IsIllusion() then
+				local item1 = CreateItem("item_ankh_of_reincarnation", hero, hero)
+				hero:AddItem(item1)
+
+				local item2 = CreateItem("item_salve_1000", hero, hero)
+				hero:AddItem(item2)
+			else return nil
+			end
 		end
 	end
 
-	print( '*********************************************' )
+	if newState == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
+		nCOUNTDOWNTIMER = 721
+		print("Timer Set to 12 Min!")
+		print( "OnGameRulesStateChange: Game In Progress" )
+		self.countdownEnabled = true
+		CustomGameEventManager:Send_ServerToAllClients( "show_timer", {} )
+	end
+end
+
+function GameMode:OnThink()	
+	-- Stop thinking if game is paused
+	if GameRules:IsGamePaused() == true then
+		return 1
+	end
+	CountdownTimerMuradin()
+	if nCOUNTDOWNTIMER == 30 then
+		CustomGameEventManager:Send_ServerToAllClients( "timer_alert", {} )
+	elseif nCOUNTDOWNTIMER < -5 then
+		nCOUNTDOWNTIMER = 714
+	end
+	return 1
+end
+
+function CountdownTimerMuradin()
+	nCOUNTDOWNTIMER = nCOUNTDOWNTIMER - 1
+	local t = nCOUNTDOWNTIMER
+--	print( "Countdown Timer Activated" )
+	local minutes = math.floor(t / 60)
+	local seconds = t - (minutes * 60)
+	local m10 = math.floor(minutes / 10)
+	local m01 = minutes - (m10 * 10)
+	local s10 = math.floor(seconds / 10)
+	local s01 = seconds - (s10 * 10)
+	local broadcast_gametimer = 
+		{
+			timer_minute_10 = m10,
+			timer_minute_01 = m01,
+			timer_second_10 = s10,
+			timer_second_01 = s01,
+		}
+	CustomGameEventManager:Send_ServerToAllClients( "countdown", broadcast_gametimer )
+	if t <= 120 then
+		CustomGameEventManager:Send_ServerToAllClients( "time_remaining", broadcast_gametimer )
+	end
+end
+
+function SetTimerMuradin( cmdName, time )
+	print( "Set the timer to: " .. time )
+	nCOUNTDOWNTIMER = time
 end

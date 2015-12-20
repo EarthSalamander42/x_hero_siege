@@ -6223,7 +6223,7 @@
 		"Model"						"models/items/shadowshaman/serpent_ward/dotapit_s3_wild_tempest_wards/dotapit_s3_wild_tempest_wards.vmdl"	// Model.
 		"SoundSet"					"ShadowShaman_Ward"					// Name of sound set.
 		"Level"						"1"
-		"ModelScale"				"1.15"
+		"ModelScale"				"0.8"
 		"SelectionGroup"			"Shaman_Wards"
 
 		// Abilities
@@ -6242,8 +6242,8 @@
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
-		"AttackDamageMin"			"68"			// Damage range min.
-		"AttackDamageMax"			"72"		// Damage range max.
+		"AttackDamageMin"			"48"			// Damage range min.
+		"AttackDamageMax"			"52"		// Damage range max.
 		"AttackDamageType"			"DAMAGE_TYPE_ArmorPhysical"
 		"AttackRate"				"1.25"		// Speed of attack.
 		"AttackAnimationPoint"		"0.3"		// Normalized time in animation cycle to attack.
@@ -6299,8 +6299,8 @@
 		"BaseClass"					"npc_dota_shadowshaman_serpentward"	// Class of entity of link to.
 		"Model"						"models/items/shadowshaman/serpent_ward/dotapit_s3_wild_tempest_wards/dotapit_s3_wild_tempest_wards.vmdl"	// Model.
 		"SoundSet"					"ShadowShaman_Ward"					// Name of sound set.
-		"Level"						"1"
-		"ModelScale"				"1.15"
+		"Level"						"2"
+		"ModelScale"				"0.95"
 		"SelectionGroup"			"Shaman_Wards"
 
 		// Abilities
@@ -6319,8 +6319,8 @@
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
-		"AttackDamageMin"			"88"			// Damage range min.
-		"AttackDamageMax"			"92"		// Damage range max.
+		"AttackDamageMin"			"68"			// Damage range min.
+		"AttackDamageMax"			"72"		// Damage range max.
 		"AttackDamageType"			"DAMAGE_TYPE_ArmorPhysical"
 		"AttackRate"				"1.25"		// Speed of attack.
 		"AttackAnimationPoint"		"0.3"		// Normalized time in animation cycle to attack.
@@ -6376,8 +6376,8 @@
 		"BaseClass"					"npc_dota_shadowshaman_serpentward"	// Class of entity of link to.
 		"Model"						"models/items/shadowshaman/serpent_ward/dotapit_s3_wild_tempest_wards/dotapit_s3_wild_tempest_wards.vmdl"	// Model.
 		"SoundSet"					"ShadowShaman_Ward"					// Name of sound set.
-		"Level"						"1"
-		"ModelScale"				"1.15"
+		"Level"						"3"
+		"ModelScale"				"1.05"
 		"SelectionGroup"			"Shaman_Wards"
 
 		// Abilities
@@ -6396,8 +6396,8 @@
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
-		"AttackDamageMin"			"118"			// Damage range min.
-		"AttackDamageMax"			"122"		// Damage range max.
+		"AttackDamageMin"			"88"			// Damage range min.
+		"AttackDamageMax"			"92"		// Damage range max.
 		"AttackDamageType"			"DAMAGE_TYPE_ArmorPhysical"
 		"AttackRate"				"1.25"		// Speed of attack.
 		"AttackAnimationPoint"		"0.3"		// Normalized time in animation cycle to attack.
@@ -6453,7 +6453,7 @@
 		"BaseClass"					"npc_dota_shadowshaman_serpentward"	// Class of entity of link to.
 		"Model"						"models/items/shadowshaman/serpent_ward/dotapit_s3_wild_tempest_wards/dotapit_s3_wild_tempest_wards.vmdl"	// Model.
 		"SoundSet"					"ShadowShaman_Ward"					// Name of sound set.
-		"Level"						"1"
+		"Level"						"4"
 		"ModelScale"				"1.15"
 		"SelectionGroup"			"Shaman_Wards"
 
@@ -6473,8 +6473,8 @@
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
-		"AttackDamageMin"			"148"			// Damage range min.
-		"AttackDamageMax"			"152"		// Damage range max.
+		"AttackDamageMin"			"124"			// Damage range min.
+		"AttackDamageMax"			"126"		// Damage range max.
 		"AttackDamageType"			"DAMAGE_TYPE_ArmorPhysical"
 		"AttackRate"				"1.25"		// Speed of attack.
 		"AttackAnimationPoint"		"0.3"		// Normalized time in animation cycle to attack.
@@ -6530,8 +6530,8 @@
 		"BaseClass"					"npc_dota_shadowshaman_serpentward"	// Class of entity of link to.
 		"Model"						"models/items/shadowshaman/serpent_ward/dotapit_s3_wild_tempest_wards/dotapit_s3_wild_tempest_wards.vmdl"	// Model.
 		"SoundSet"					"ShadowShaman_Ward"					// Name of sound set.
-		"Level"						"1"
-		"ModelScale"				"1.15"
+		"Level"						"5"
+		"ModelScale"				"1.25"
 		"SelectionGroup"			"Shaman_Wards"
 
 		// Abilities
@@ -6550,8 +6550,8 @@
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
-		"AttackDamageMin"			"198"			// Damage range min.
-		"AttackDamageMax"			"202"		// Damage range max.
+		"AttackDamageMin"			"188"			// Damage range min.
+		"AttackDamageMax"			"192"		// Damage range max.
 		"AttackDamageType"			"DAMAGE_TYPE_ArmorPhysical"
 		"AttackRate"				"1.25"		// Speed of attack.
 		"AttackAnimationPoint"		"0.3"		// Normalized time in animation cycle to attack.
@@ -6607,8 +6607,8 @@
 		"BaseClass"					"npc_dota_shadowshaman_serpentward"	// Class of entity of link to.
 		"Model"						"models/items/shadowshaman/serpent_ward/dotapit_s3_wild_tempest_wards/dotapit_s3_wild_tempest_wards.vmdl"	// Model.
 		"SoundSet"					"ShadowShaman_Ward"					// Name of sound set.
-		"Level"						"1"
-		"ModelScale"				"1.15"
+		"Level"						"6"
+		"ModelScale"				"1.35"
 		"SelectionGroup"			"Shaman_Wards"
 
 		// Abilities
@@ -6627,8 +6627,8 @@
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
-		"AttackDamageMin"			"308"			// Damage range min.
-		"AttackDamageMax"			"312"		// Damage range max.
+		"AttackDamageMin"			"299"			// Damage range min.
+		"AttackDamageMax"			"301"		// Damage range max.
 		"AttackDamageType"			"DAMAGE_TYPE_ArmorPhysical"
 		"AttackRate"				"1.25"		// Speed of attack.
 		"AttackAnimationPoint"		"0.3"		// Normalized time in animation cycle to attack.
@@ -6684,14 +6684,14 @@
 		"BaseClass"					"npc_dota_shadowshaman_serpentward"	// Class of entity of link to.
 		"Model"						"models/items/shadowshaman/serpent_ward/dotapit_s3_wild_tempest_wards/dotapit_s3_wild_tempest_wards.vmdl"	// Model.
 		"SoundSet"					"ShadowShaman_Ward"					// Name of sound set.
-		"Level"						"1"
-		"ModelScale"				"1.15"
+		"Level"						"7"
+		"ModelScale"				"1.5"
 		"SelectionGroup"			"Shaman_Wards"
 
 		// Abilities
 		//----------------------------------------------------------------
 		"Ability1"					"neutral_spell_immunity"			// Ability 1.
-		"Ability2"					"holdout_splash_arrows"			// Ability 2.
+		"Ability2"					"serpent_splash_arrows"			// Ability 2.
 		"Ability3"					""			// Ability 3.
 		"Ability4"					""			// Ability 4.
 		"Ability5"					""			// Ability 5.
@@ -6704,8 +6704,8 @@
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
-		"AttackDamageMin"			"448"			// Damage range min.
-		"AttackDamageMax"			"552"		// Damage range max.
+		"AttackDamageMin"			"424"			// Damage range min.
+		"AttackDamageMax"			"426"		// Damage range max.
 		"AttackDamageType"			"DAMAGE_TYPE_ArmorPhysical"
 		"AttackRate"				"1.25"		// Speed of attack.
 		"AttackAnimationPoint"		"0.3"		// Normalized time in animation cycle to attack.
@@ -6762,7 +6762,7 @@
 		"Model"						"models/heroes/techies/fx_techiesfx_stasis.vmdl"	// Model.
 		"SoundSet"					"ShadowShaman_Ward"					// Name of sound set.
 		"Level"						"1"
-		"ModelScale"				"1.15"
+		"ModelScale"				"0.9"
 		"SelectionGroup"			"Shaman_Wards"
 
 		// Abilities
@@ -6789,7 +6789,7 @@
 		"AttackAcquisitionRange"	"600"		// Range within a target can be acquired.
 		"AttackRange"				"600"		// Range within a target can be attacked.
 		"ProjectileModel"			"particles/items_fx/dagon.vpcf" // Particle system model for projectile.
-		"ProjectileSpeed"			"900"		// Speed of projectile.
+		"ProjectileSpeed"			"1200"		// Speed of projectile.
 
 		// Bounds
 		//----------------------------------------------------------------
@@ -6838,8 +6838,8 @@
 		"BaseClass"					"npc_dota_shadowshaman_serpentward"	// Class of entity of link to.
 		"Model"						"models/heroes/techies/fx_techiesfx_stasis.vmdl"	// Model.
 		"SoundSet"					"ShadowShaman_Ward"					// Name of sound set.
-		"Level"						"1"
-		"ModelScale"				"1.5"
+		"Level"						"2"
+		"ModelScale"				"1.25"
 		"SelectionGroup"			"Shaman_Wards"
 
 		// Abilities
@@ -6858,15 +6858,15 @@
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
-		"AttackDamageMin"			"998"			// Damage range min.
-		"AttackDamageMax"			"1098"		// Damage range max.
+		"AttackDamageMin"			"1998"			// Damage range min.
+		"AttackDamageMax"			"2098"		// Damage range max.
 		"AttackDamageType"			"DAMAGE_TYPE_ArmorPhysical"
-		"AttackRate"				"1.25"		// Speed of attack.
+		"AttackRate"				"0.75"		// Speed of attack.
 		"AttackAnimationPoint"		"0.3"		// Normalized time in animation cycle to attack.
 		"AttackAcquisitionRange"	"600"		// Range within a target can be acquired.
 		"AttackRange"				"600"		// Range within a target can be attacked.
 		"ProjectileModel"			"particles/items_fx/dagon.vpcf" // Particle system model for projectile.
-		"ProjectileSpeed"			"900"		// Speed of projectile.
+		"ProjectileSpeed"			"1200"		// Speed of projectile.
 
 		// Bounds
 		//----------------------------------------------------------------
@@ -6887,7 +6887,7 @@
 
 		// Status
 		//----------------------------------------------------------------
-		"StatusHealth"				"10000"		// Base health.
+		"StatusHealth"				"20000"		// Base health.
 		"StatusHealthRegen"			"0.25"		// Health regeneration rate.
 		"StatusMana"				"0"			// Base mana.
 		"StatusManaRegen"			"0"			// Mana regeneration rate.

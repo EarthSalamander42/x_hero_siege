@@ -501,6 +501,13 @@
 	"item_ancient_janggo"			"REMOVE"
 	"item_cyclone"					"REMOVE"
 	"item_iron_talon"				"REMOVE"
+	"item_faerie_fire"				"REMOVE"
+	"item_dragon_lance"				"REMOVE"
+	"item_yasha"					"REMOVE"
+	"item_manta"					"REMOVE"
+	"item_aether_lens"				"REMOVE"
+	"item_bracer"					"REMOVE"
+	"item_ultimate_scepter"			"REMOVE"
 
 	//============================================================================================================
 	//============================================================================================================
@@ -990,7 +997,7 @@
 
 		// Time		
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCooldown"				"15"
+		"AbilityCooldown"				"13"
 
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
@@ -1018,12 +1025,12 @@
 			"04"
 			{
 				"var_type"					"FIELD_FLOAT"
-				"activation_time"			"2.7"
+				"activation_time"			"2.25"
 			}
 			"05"
 			{
 				"var_type"					"FIELD_FLOAT"
-				"explode_delay"				"0.3"
+				"explode_delay"				"0.75"
 			}
 			"06"
 			{

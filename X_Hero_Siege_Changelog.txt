@@ -1248,6 +1248,40 @@ Fix:
 - Fixed Shadow Hunter Ultimate max level from 7 to 2
 
 
+//===========================================================================================================
+X Hero Siege ( BETA ) 1.0.2 Fix
+//===========================================================================================================
+
+- Added Muradin Timer Countdown( WIP )
+- Added Tutorials on top left of the screen( Little Grey Button, WIP )
+
+Gameplay:
+- Increased Shadow Hunter Mine Trap explosion delay from 0.3 to 0.75( Activation time from 2.7 to 2.25 )
+- Reduced Laser Trap lifetime from 2 min to 1 min
+- Reduced Shadow Hunter Serpent Ward damage from 70/90/120/150/200/310/450 to 50/70/90/125/190/300/425
+- Reduced Shadow Hunter Mine Trap cooldown from 15 to 13
+
+Shop:
+- Reduced Mekansm 3 stats from 75 to 50
+- Reduced Mekansm 4 stats from 200 to 150
+- Reduced Mekansm 5 stats from 400 to 300
+- Disabled Aghanim Scepter
+- Removed Faerie Fire
+- Removed Dragon Lance
+- Removed Yasha
+- Removed Manta Style
+- Removed Aether Lens
+- Removed Bracer
+
+Fix:
+- Fixed Blademaster duplicate items in spawn
+- Fixed Shadow Hunter Serpent Ward lvl 7 not having splash attack
+- Fixed Shadow Hunter Laser Trap lvl 2 doing 1000 damage instead of 2000
+- Fixed Shadow Hunter Laser Trap Lvl 2 not attacking at +100% attack speed
+- Fixed Shadow Hunter incorrect tooltips
+- Fixed Desolator 3 incorrect land effect
+
+
 //================================================================================================================================================
 //================================================================================================================================================
 //================================================================================================================================================
@@ -1268,8 +1302,11 @@ Deep Sense Demo( by me )
 Fix Red Chronosphere not particle bug, need to recreate
 
 //X Hero Siege
+check if barebones notifications are fixed
+check if <= 0 countdown timer works
 Fix Doors opening for all lanes at the beginning of a game
 - Reworked Enchantress Ability 2: Multiple Arrows, now based on Enchantress base damage( with reduction % )
+Reduce Serpent Ward early damage
 
 // Gold Multiplier Balancing
 medium 45k hp +50 armor
@@ -1322,3 +1359,5 @@ Lifesteal Boots
 Immolation
 Damage x4 ( purple )
 Double Farm
+
+//SAVE

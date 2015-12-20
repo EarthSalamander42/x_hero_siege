@@ -1,5 +1,3 @@
-_G.nCOUNTDOWNTIMER = 30
-
 -- Cleanup a player when they leave
 function GameMode:OnDisconnect(keys)
 	DebugPrint('[BAREBONES] Player Disconnected ' .. tostring(keys.userid))
@@ -9,27 +7,6 @@ function GameMode:OnDisconnect(keys)
 	local networkid = keys.networkid
 	local reason = keys.reason
 	local userid = keys.userid
-end
-
--- The overall game state has changed
-function GameMode:OnGameRulesStateChange(keys)
-	DebugPrint("[BAREBONES] GameRules State Changed")
-	DebugPrintTable(keys)
-
-	-- This internal handling is used to set up main barebones functions
-	GameMode:_OnGameRulesStateChange(keys)
-
-	local newState = GameRules:State_Get()
-
-	if newState == DOTA_GAMERULES_STATE_PRE_GAME then
-	nCOUNTDOWNTIMER = 30
-	end
-
-	if newState == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
-		--print( "OnGameRulesStateChange: Game In Progress" )
-		self.countdownEnabled = true
-		CustomGameEventManager:Send_ServerToAllClients( "show_timer", {} )
-	end
 end
 
 -- An NPC has spawned somewhere in game. This includes heroes
@@ -49,6 +26,20 @@ function GameMode:OnNPCSpawned(keys)
 		npc:SetMinimumGoldBounty( normal_bounty )
 		npc:SetMaximumGoldBounty( normal_bounty )
 		npc:SetDeathXP( normal_xp )
+	end
+
+	-- List of innate abilities
+	local innate_abilities = {
+		"serpent_splash_arrows",
+		"neutral_spell_immunity"
+	}
+
+	-- Cycle through any innate abilities found, then upgrade them
+	for i = 1, #innate_abilities do
+		local current_ability = npc:FindAbilityByName(innate_abilities[i])
+		if current_ability then
+			current_ability:SetLevel(1)
+		end
 	end
 	-- This internal handling is used to set up main barebones functions
 	GameMode:_OnNPCSpawned(keys)

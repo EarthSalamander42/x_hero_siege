@@ -1,10 +1,10 @@
 <root>
   <styles>
     <include src="s2r://panorama/styles/dotastyles.vcss_c" />
-    <include src="file://{resources}/styles/custom_game/barebones_notifications.css" />
+    <include src="s2r://panorama/styles/custom_game/barebones_notifications.vcss_c" />
   </styles>
   <scripts>
-    <include src="file://{resources}/scripts/custom_game/barebones_notifications.js" /> 
+    <include src="s2r://panorama/scripts/custom_game/barebones_notifications.vjs_c" /> 
   </scripts>
   <Panel hittest="false" class="BarebonesBaseHud">
     <Panel hittest="false" class="BarebonesTopNotifications">

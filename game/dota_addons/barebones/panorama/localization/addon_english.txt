@@ -1,25 +1,42 @@
 "addon"
 {
-//	"Unassigned"      					"Unassigned Team"
-//	"Spectator"       					"Spectator Team"
-//	"Neutrals"        					"Neutral Team"
-//	"NoTeam"          					"No Team"
+	"InstructionsTitle"								"X Hero Siege"
+	"InstructionsObjective"							"OBJECTIVE:"
+	"InstructionsObjectiveText"						"Defend your castle! Yes, the old X Hero Siege is brought back, just for you."
+	"InstructionsHowToPlay"							"HOW TO PLAY"
+	"InstructionsLines"								"- Defend your castle against creep lanes( choose 1 lane per player ).<br>
+													- Destroy towers to release bosses, and then head to the Barrackment to stop creep spawns.<br>
+													- Once every barrackment destroyed, head to the ice towers and fight harder creeps, ,destroy the ice towers.<br>
+													- Head back to your castle to defend it, the Final Wave is coming!<br>
+													- Don't worry, after Final wave your castle is safe!."
 
-	"DOTA_GoodGuys"   					"Light Heroes"
-	"DOTA_BadGuys"    					"Dark Forces"
+	"Unassigned"      								"Unassigned Team"
+	"Spectator"       								"Spectator Team"
+	"Neutrals"        								"Neutral Team"
+	"NoTeam"          								"No Team"
+
+	"DOTA_GoodGuys"   								"Light Forces"
+	"DOTA_BadGuys"    								"Dark Forces"
 	
-	"Addon_Game_Name"					"X Hero Siege"
+	"OverthrowHeroPickup"							"{s:hero_id}"
+	"OverthrowTextPickup"							"HAS PICKED UP"
+	"OverthrowItemPickup"							"{s:item_id}!"
 
-	"MuradinGoal"						"Muradin Countdown"
+	"Remaining"										"REMAINING"
+	"Goal"											"Special Event:"
 
-	"Loading_Objectives_Title"			"Objectives:"
-	"Loading_Objectives1"				"- Choose one lane to defend against incoming Forces of Darkness"
-	"Loading_Objectives2"				"- Destroy the Barrackment on your lane to release the Magnataur Destroyer"
-	"Loading_Objectives3"				"- Destroy Ice Towers on Secondary Lanes"
-	"Loading_Objectives4"				"- Defend your castle from the Final Wave"
-	"Loading_Objectives5"				"- Go to the green circle behind ice towers to teleport your team to Magtheridon arena and defeat him"
-	"Loading_Objectives6"				"- Once Magtheridon is dead, head to the green circle on top of the arena and survive to the Incoming Creep Waves"
-	"Loading_Objectives7"				"- Defeat Grom, Illidan, Balanar, Admiral Proudmoore in each corners. Once all dead, go into the green circle top to fight Arthas!"
-	"Loading_Objectives8"				"- Defeat Arthas to win the game!"
-
+	"Overtime"										"OVERTIME!"
+	
+	"addonname"										"X Hero Siege"
+	"overthrow_game_info_header_objective"			"Objective:"
+	"overthrow_brief_description"					"Slay your enemies! First team to hit the kill limit wins!"
+	"overthrow_game_info_header_how_to_play"		"How To Play:"
+	"overthrow_game_info_throne"					"Defend your castle against creep lanes( choose 1 lane per player )."
+	"overthrow_game_info_coins"						"Destroy towers to release bosses, and then head to the barrackment to stop creep spawns."
+	"overthrow_game_info_items"						"Once every barrackments are destroyed, head to the ice towers and fight harder creeps, then when you can destroy ice towers."
+	"overthrow_game_info_tips_header"				"Tips:"
+	"overthrow_game_info_tip01"						"Don't rush the game, farm, be patient."
+	"overthrow_game_info_tip02"						"Do not enter the phase 2 arena too early or you will make your whole team lose( ice towers lanes )."
+	"overthrow_game_info_tip03"						"Remember this gamemode is about team-play, if one of your mate is weak, buy some tomes for him."
+	"overthrow_game_info_tip04"						"The more time you farm, the more easier it will be, judge yourself when you want to head to the bosses."
 }

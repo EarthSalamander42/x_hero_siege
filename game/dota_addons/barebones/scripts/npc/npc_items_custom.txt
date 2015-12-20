@@ -682,7 +682,7 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"bonus_all_stats"		"75"
+				"bonus_all_stats"		"50"
 			}
 			"02"
 			{
@@ -784,7 +784,7 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"bonus_all_stats"		"200"
+				"bonus_all_stats"		"150"
 			}
 			"02"
 			{
@@ -886,7 +886,7 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"bonus_all_stats"		"400"
+				"bonus_all_stats"		"300"
 			}
 			"02"
 			{
@@ -1338,7 +1338,7 @@
 
 					"FireEffect"
 					{
-						"EffectName"			"particles/econ/items/antimage/antimage_weapon_basher_ti5_gold/antimage_manavoid_explode_b_b_ti_5_gold.vpcf"
+						"EffectName"			"particles/econ/items/antimage/antimage_weapon_basher_ti5_gold/am_manaburn_basher_ti_5_b_gold.vpcf"
 						"EffectAttachType"		"follow_origin"
 						"Target"				"TARGET"
 					}
