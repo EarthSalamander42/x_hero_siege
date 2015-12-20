@@ -15,6 +15,14 @@
 		<Panel hittest="false" id="ScoreboardCenter">
 			<Label hittest="false" id="ScoreboardCurrentTime" class="MonoNumbersFont" text="" />
 		</Panel>
+		<Panel id="ScoreboardCreepTime">
+			<Label id="CreepGoal" text="#CreepGoal" />
+			<Label id="CreepTimer" text="--:--" />
+		</Panel>
+		<Panel id="ScoreboardIncomingWaveTime">
+			<Label id="IncomingWaveGoal" text="#IncomingWaveGoal" />
+			<Label id="IncomingWaveTimer" text="--:--" />
+		</Panel>
 	</Panel>
 </root>
 

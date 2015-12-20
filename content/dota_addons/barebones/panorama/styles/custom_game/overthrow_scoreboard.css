@@ -1,7 +1,7 @@
 
 .ScoreboardLeft
 {
-    margin-left: 6px;
+    margin-left: -240px;
     margin-top: 0px;
     margin-right: -40px;
     flow-children: down;
@@ -12,7 +12,7 @@
     flow-children: down;
 	width: 100px;
 	height: 60px;
-    margin-left: 150px;
+    margin-left: 400px;
 
 	background-image: url("file://{images}/custom_game/goal_logo.psd");
 	background-repeat: no-repeat;
@@ -33,6 +33,36 @@
     height: 62px;
     margin-top: -62px;
     margin-left: -130px;
+}
+
+#ScoreboardIncomingWaveTime
+{
+    horizontal-align: center;
+    flow-children: down;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+    background-image: url("file://{images}/custom_game/goal_logo.psd");
+    horizontal-align: center;
+    width: 100px;
+    height: 62px;
+    margin-top: -62px;
+    margin-left: 200px;
+}
+
+#ScoreboardCreepTime
+{
+    horizontal-align: center;
+    flow-children: down;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+    background-image: url("file://{images}/custom_game/goal_logo.psd");
+    horizontal-align: center;
+    width: 100px;
+    height: 62px;
+    margin-top: -62px;
+    margin-left: 0px;
 }
 
 #ScoreboardCurrentTime
@@ -57,13 +87,37 @@
 
 #Goal
 {
-	margin-top: 2px;
+    margin-top: 2px;
     font-size: 14px;
     font-weight: bold;
     color: #9e7305;
     text-align: center;
-	width: 100%;
-	text-transform: uppercase;
+    width: 100%;
+    text-transform: uppercase;
+    text-overflow: clip;
+}
+
+#CreepGoal
+{
+    margin-top: 4px;
+    font-size: 13.5px;
+    font-weight: bold;
+    color: #9e7305;
+    text-align: center;
+    width: 100%;
+    text-transform: uppercase;
+    text-overflow: clip;
+}
+
+#IncomingWaveGoal
+{
+    margin-top: 4px;
+    font-size: 12.5px;
+    font-weight: bold;
+    color: #9e7305;
+    text-align: center;
+    width: 100%;
+    text-transform: uppercase;
     text-overflow: clip;
 }
 
@@ -82,13 +136,37 @@
 
 #Timer
 {
-	margin-top: -6px;
+    margin-top: -6px;
     font-size: 20px;
     font-weight: bolder;
     color: #6f4d00;
-	text-shadow: 2px 2px 2px #7b612b;
+    text-shadow: 2px 2px 2px #7b612b;
     text-align: center;
-	width: 100%;
+    width: 100%;
+    text-overflow: clip;
+}
+
+#CreepTimer
+{
+    margin-top: -6px;
+    font-size: 20px;
+    font-weight: bolder;
+    color: #6f4d00;
+    text-shadow: 2px 2px 2px #7b612b;
+    text-align: center;
+    width: 100%;
+    text-overflow: clip;
+}
+
+#IncomingWaveTimer
+{
+    margin-top: -6px;
+    font-size: 20px;
+    font-weight: bolder;
+    color: #6f4d00;
+    text-shadow: 2px 2px 2px #7b612b;
+    text-align: center;
+    width: 100%;
     text-overflow: clip;
 }
 

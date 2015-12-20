@@ -1282,6 +1282,13 @@ Fix:
 - Fixed Desolator 3 incorrect land effect
 
 
+//===========================================================================================================
+X Hero Siege ( BETA ) 1.0.3 Fix
+//===========================================================================================================
+
+- Added Creep Level Timer Countdown( WIP )
+- Added Incoming Waves Timer Countdown( WIP )
+
 //================================================================================================================================================
 //================================================================================================================================================
 //================================================================================================================================================
@@ -1302,11 +1309,16 @@ Deep Sense Demo( by me )
 Fix Red Chronosphere not particle bug, need to recreate
 
 //X Hero Siege
+prevent timer to re-run after muradin event
+create level creeps timer
+remove blades of attack
+increase blademaster damage taken to 250%
 check if barebones notifications are fixed
-check if <= 0 countdown timer works
+notify at muradin event: u can't kill him just survive
+fix shadow hunter serpent tooltip dmg
+skip muradin water and check if serpent ward can still be cast on
 Fix Doors opening for all lanes at the beginning of a game
 - Reworked Enchantress Ability 2: Multiple Arrows, now based on Enchantress base damage( with reduction % )
-Reduce Serpent Ward early damage
 
 // Gold Multiplier Balancing
 medium 45k hp +50 armor

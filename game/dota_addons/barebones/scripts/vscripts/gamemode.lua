@@ -1,6 +1,7 @@
 BAREBONES_DEBUG_SPEW = false
-_G.nCOUNTDOWNTIMER = 0
-
+_G.nCOUNTDOWNTIMER = 30
+_G.nCOUNTDOWNCREEP = 30
+_G.nCOUNTDOWNINCWAVE = 30
 
 if GameMode == nil then
 	DebugPrint( '[BAREBONES] creating barebones game mode' )
@@ -30,7 +31,7 @@ function GameMode:OnAllPlayersLoaded()
 	GameMode.Magtheridon_killed = 0
 	GameMode.BossesTop_killed = 0
 	GameMode.Arthas_killed = 0
-	GameMode.Muradin_Event = 0
+	GameMode.MuradinTimeLapse = 0
 end
 
 function GameMode:OnHeroInGame(hero)
@@ -81,7 +82,7 @@ function GameMode:OnGameInProgress()
 	--//=================================================================================================================
 	--// Timer: Creeps Level 1, 5 West 1
 	--//=================================================================================================================
-	if GetMapName() == "x_hero_siege_8_players" and GameMode.Muradin_Event == 0 then -- 8 Players Creep Lanes
+	if GetMapName() == "x_hero_siege_8_players" then -- 8 Players Creep Lanes
 	local time_elapsed = 0
 	local EntBarrack = Entities:FindByName( nil, "dota_badguys_barracks_west_1" )
 		Timers:CreateTimer(0, function()
@@ -552,8 +553,6 @@ function GameMode:OnGameInProgress()
 		return 30 -- Rerun this timer every 30 game-time seconds
 		end
 	end)
-	elseif GameMode.Muradin_Event == 1 then
-		return 30 -- Return 30sec if Muradin Event is happening
 	end -- end of if Map == Normal and not Event Muradin Running
 
 	--//=================================================================================================================
@@ -562,7 +561,7 @@ function GameMode:OnGameInProgress()
 	--//=================================================================================================================
 	--// Timer: Creeps Level 1, 5 West 1
 	--//=================================================================================================================
-	if GetMapName() == "hardmode" and GameMode.Muradin_Event == 0 then -- 4 Players Creep Lanes, Hard Mode
+	if GetMapName() == "hardmode" then -- 4 Players Creep Lanes, Hard Mode
 
 	local time_elapsed = 0
 	local EntBarrack = Entities:FindByName( nil, "dota_badguys_barracks_west_1" )
@@ -1034,8 +1033,6 @@ function GameMode:OnGameInProgress()
 		return 30 -- Rerun this timer every 30 game-time seconds
 		end
 	end)
-	elseif GameMode.Muradin_Event == 1 then
-		return 30
 	end -- end of if Map == Hard
 
 	--//=================================================================================================================
@@ -1086,7 +1083,6 @@ function GameMode:OnGameInProgress()
 	--// Timer: Muradin Bronzebeard Event 14 Min( End the Event )
 	--//=================================================================================================================
 	Timers:CreateTimer(845, function() -- 14:05 Min: MURADIN BRONZEBEARD EVENT 1, END
-	GameMode.Muradin_Event = 0
 	Notifications:TopToAll({text="All alive heroes have received 10 000 Gold!", duration=6.0})
 	Notifications:TopToAll({ability="alchemist_goblins_greed", continue=true})
 	end)
@@ -1094,8 +1090,8 @@ function GameMode:OnGameInProgress()
 	--//=================================================================================================================
 	--// Timer: Muradin Bronzebeard Event 12 Min
 	--//=================================================================================================================
-	Timers:CreateTimer(720, function() -- 12:00 Min: MURADIN BRONZEBEARD EVENT 1
-	GameMode.Muradin_Event = 1
+	Timers:CreateTimer(0, function() -- 12:00 Min: MURADIN BRONZEBEARD EVENT 1
+	GameMode.MuradinTimeLapse = 1
 	local point = Entities:FindByName(nil,"npc_dota_muradin_boss"):GetAbsOrigin()
 	local MuradinEvent = CreateUnitByName("npc_dota_creature_muradin_bronzebeard",Entities:FindByName(nil,"npc_dota_muradin_boss"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_BADGUYS)
 	local heroes = HeroList:GetAllHeroes()
@@ -1255,7 +1251,9 @@ function GameMode:InitGameMode()
 	self.countdownEnabled = false
 --	ListenToGameEvent( "game_rules_state_change", Dynamic_Wrap( GameMode, 'OnGameRulesStateChange' ), self )
 
-	Convars:RegisterCommand( "overthrow_set_timer", function(...) return SetTimerMuradin( ... ) end, "Set the timer.", FCVAR_CHEAT )
+	Convars:RegisterCommand( "muradin_set_timer", function(...) return SetTimerMuradin( ... ) end, "Set the timer.", FCVAR_CHEAT )
+	Convars:RegisterCommand( "creep_set_timer", function(...) return SetTimerCreep( ... ) end, "Set the timer.", FCVAR_CHEAT )
+	Convars:RegisterCommand( "wave_set_timer", function(...) return SetTimerIncomingWave( ... ) end, "Set the timer.", FCVAR_CHEAT )
 
 	DebugPrint('[BAREBONES] Done loading Barebones gamemode!\n\n')
 end
@@ -1286,6 +1284,8 @@ function GameMode:OnGameRulesStateChange(keys)
 
 	if newState == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
 		nCOUNTDOWNTIMER = 721
+		nCOUNTDOWNCREEP = 361
+		nCOUNTDOWNINCWAVE = 301
 		print("Timer Set to 12 Min!")
 		print( "OnGameRulesStateChange: Game In Progress" )
 		self.countdownEnabled = true
@@ -1299,10 +1299,22 @@ function GameMode:OnThink()
 		return 1
 	end
 	CountdownTimerMuradin()
+	CountdownTimerCreep()
+	CountdownTimerIncomingWave()
+
 	if nCOUNTDOWNTIMER == 30 then
 		CustomGameEventManager:Send_ServerToAllClients( "timer_alert", {} )
-	elseif nCOUNTDOWNTIMER < -5 then
-		nCOUNTDOWNTIMER = 714
+	elseif nCOUNTDOWNTIMER < -5 and GameMode.MuradinTimeLapse > 0 then
+--		nCOUNTDOWNTIMER = nil
+		self.countdownEnabled = false
+	end
+
+	if nCOUNTDOWNCREEP < 1 then
+		nCOUNTDOWNCREEP = 360
+	end
+
+	if nCOUNTDOWNINCWAVE < 1 then
+		nCOUNTDOWNINCWAVE = 300
 	end
 	return 1
 end
@@ -1333,4 +1345,54 @@ end
 function SetTimerMuradin( cmdName, time )
 	print( "Set the timer to: " .. time )
 	nCOUNTDOWNTIMER = time
+end
+
+function CountdownTimerCreep()
+	nCOUNTDOWNCREEP = nCOUNTDOWNCREEP - 1
+	local t = nCOUNTDOWNCREEP
+--	print( "Countdown Timer Activated" )
+	local minutes = math.floor(t / 60)
+	local seconds = t - (minutes * 60)
+	local m10 = math.floor(minutes / 10)
+	local m01 = minutes - (m10 * 10)
+	local s10 = math.floor(seconds / 10)
+	local s01 = seconds - (s10 * 10)
+	local broadcast_gametimer = 
+		{
+			timer_minute_10 = m10,
+			timer_minute_01 = m01,
+			timer_second_10 = s10,
+			timer_second_01 = s01,
+		}
+	CustomGameEventManager:Send_ServerToAllClients( "creepcountdown", broadcast_gametimer )
+end
+
+function SetTimerCreep( cmdName, time )
+	print( "Set the timer to: " .. time )
+	nCOUNTDOWNCREEP = time
+end
+
+function CountdownTimerIncomingWave()
+	nCOUNTDOWNINCWAVE = nCOUNTDOWNINCWAVE - 1
+	local t = nCOUNTDOWNINCWAVE
+--	print( "Countdown Timer Activated" )
+	local minutes = math.floor(t / 60)
+	local seconds = t - (minutes * 60)
+	local m10 = math.floor(minutes / 10)
+	local m01 = minutes - (m10 * 10)
+	local s10 = math.floor(seconds / 10)
+	local s01 = seconds - (s10 * 10)
+	local broadcast_gametimer = 
+		{
+			timer_minute_10 = m10,
+			timer_minute_01 = m01,
+			timer_second_10 = s10,
+			timer_second_01 = s01,
+		}
+	CustomGameEventManager:Send_ServerToAllClients( "incomingwavecountdown", broadcast_gametimer )
+end
+
+function SetTimerIncomingWave( cmdName, time )
+	print( "Set the timer to: " .. time )
+	nCOUNTDOWNINCWAVE = time
 end

@@ -24,9 +24,9 @@
 
 	"Remaining"										"REMAINING"
 	"Goal"											"Special Event:"
+	"CreepGoal"										"Creep Upgrade:"
+	"IncomingWaveGoal"								"Incoming Wave:"
 
-	"Overtime"										"OVERTIME!"
-	
 	"addonname"										"X Hero Siege"
 	"overthrow_game_info_header_objective"			"Objective:"
 	"overthrow_brief_description"					"Slay your enemies! First team to hit the kill limit wins!"
