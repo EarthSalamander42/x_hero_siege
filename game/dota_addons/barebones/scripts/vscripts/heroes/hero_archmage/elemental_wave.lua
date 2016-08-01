@@ -66,7 +66,7 @@ function march_of_the_machines_spawn( keys )
                 bReplaceExisting = false,
                 bProvidesVision = false,
                 iUnitTargetTeam = DOTA_UNIT_TARGET_TEAM_ENEMY,
-                iUnitTargetType = DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC + DOTA_UNIT_TARGET_MECHANICAL,
+                iUnitTargetType = DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC,
                 vVelocity = velocityVec * projectile_speed
             }
             ProjectileManager:CreateLinearProjectile( projectileTable )

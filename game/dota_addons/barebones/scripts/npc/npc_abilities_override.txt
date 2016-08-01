@@ -5,83 +5,6 @@
 	"Version"	"1"
 
 	//========================================================================================================
-	// Shiva's
-	//========================================================================================================
-	"item_shivas_guard"
-	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"ID"							"119"														// unique ID number for this item.  Do not change this once established or it will invalidate collected stats.
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IGNORE_CHANNEL"
-		"FightRecapLevel"				"1"
-
-		// Stats		
-		//----------------------------------------------------------------------------------------------------
-		"AbilityCooldown"				"30"
-
-		// Item Info
-		//----------------------------------------------------------------------------------------------------
-		"AbilityManaCost"				"100"
-		"ItemCost"						"4700"
-		"ItemShopTags"					"int;armor;hard_to_tag"
-		"ItemQuality"					"epic"
-		"ItemAliases"					"shiva's guard"
-		"ItemDisassembleRule"			"DOTA_ITEM_DISASSEMBLE_ALWAYS"
-		"ItemDeclarations"				"DECLARE_PURCHASES_TO_TEAMMATES | DECLARE_PURCHASES_IN_SPEECH | DECLARE_PURCHASES_TO_SPECTATORS"
-
-		// Special	
-		//----------------------------------------------------------------------------------------------------
-		"AbilitySpecial"
-		{
-			"01"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_intellect"		"30"
-			}
-			"02"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_armor"			"15"
-			}
-			"03"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"aura_radius"			"900"
-			}
-			"04"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"aura_attack_speed"		"-10"
-			}
-			"05"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"blast_damage"			"200"
-			}
-			"06"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"blast_movement_speed"	"-40"
-			}
-			"07"
-			{
-				"var_type"				"FIELD_FLOAT"
-				"blast_debuff_duration"	"4.0"
-			}
-			"08"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"blast_radius"			"900"
-			}
-			"09"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"blast_speed"			"350"
-			}
-		}
-	}
-
-	//========================================================================================================
 	// Talisman of Evasion
 	//========================================================================================================
 	"item_talisman_of_evasion"
@@ -125,6 +48,15 @@
 		//--------------------------------------------------------------------------------------------------
 		"ItemBaseLevel"					"1"
 		"MaxUpgradeLevel"				"5"
+
+		"AbilitySpecial"
+	    {
+			"04"
+			{
+				"var_type"              "FIELD_INTEGER"
+				"aura_health_regen"     "2"
+			}
+	    }
 	}
 
 	//========================================================================================================
@@ -173,7 +105,7 @@
 			"0"
 			{
 				"var_type"				"FIELD_FLOAT"
-				"health_regen_rate"		"3.0"
+				"health_regen_rate"		"2.5"
 			}
 		}
 	}
@@ -190,36 +122,6 @@
 		// Item Info
 		//--------------------------------------------------------------------------------------------------
 		"ItemBaseLevel"					"1"
-		"MaxUpgradeLevel"				"3"
-	}
-
-	//======================================================================================================
-	// Maelstrom Override
-	//======================================================================================================
-	"item_maelstrom"
-	{
-		// General
-		//--------------------------------------------------------------------------------------------------
-		"BaseClass"						"item_maelstrom"
-
-		// Item Info
-		//--------------------------------------------------------------------------------------------------
-		"ItemBaseLevel"					"1"
-		"MaxUpgradeLevel"				"3"
-	}
-
-	//======================================================================================================
-	// Mjollnir Override
-	//======================================================================================================
-	"item_mjollnir"
-	{
-		// General
-		//--------------------------------------------------------------------------------------------------
-		"BaseClass"						"item_mjollnir"
-
-		// Item Info
-		//--------------------------------------------------------------------------------------------------
-		"ItemBaseLevel"					"2"
 		"MaxUpgradeLevel"				"3"
 	}
 
@@ -331,55 +233,114 @@
 	}
 
 	//=================================================================================================================
-	// Maelstrom
+	// Faerie Fire
 	//=================================================================================================================
-	"item_maelstrom"
+	"item_faerie_fire"
 	{
+		// Stats
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"1.0"
+
+		// Item Info
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemCost"						"150"
+		"ItemShopTags"					"armor"
+		"ItemQuality"					"component"
+		"ItemAliases"					"faerie fire"
+		"SideShop"						"0"
+		"ItemStackable"					"1"
+		"ItemPermanent"					"0"
+		"ItemInitialCharges"			"15"
+		"SideShop"						"0"
+		"ItemHideCharges"				"0"
+
 		// Special	
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilitySpecial"
 		{
-			"03"
+			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"chain_chance"			"15"
+				"bonus_damage"			"25"
 			}
-			"04"
+			"02"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"chain_damage"			"90"
-			}
-			"05"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"chain_strikes"			"3"
+				"hp_restore"			"1000"
 			}
 		}
 	}
 
 	//=================================================================================================================
-	// Mjollnir
+	// Tome of Knowledge
 	//=================================================================================================================
-	"item_mjollnir"
+	"item_tome_of_knowledge"
 	{
-		// Special
+		// Item Info
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemCost"						"500"
+		"ItemShopTags"					"consumable"
+		"ItemQuality"					"consumable"
+		"ItemAliases"					"tome of knowledge"
+		"ItemStackable"					"1"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
+		"ItemPermanent"					"0"
+		"ItemInitialCharges"			"1"
+		"ItemDisplayCharges"			"1"
+		"ItemStockMax"					"5"
+		"ItemStockInitial"				"0"
+		"ItemStockTime"					"60.0"			  
+		"ItemInitialStockTime"			"120.0"
+		"ItemDeclarations"				"DECLARE_PURCHASES_TO_TEAMMATES | DECLARE_PURCHASES_TO_SPECTATORS"
+		"ItemSupport"					"1"	
+
+
+		// Special	
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilitySpecial"
 		{
-			"11"
+			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"chain_chance"			"20"
+				"xp_bonus"				"125"
 			}
-			"12"
+		}
+	}
+
+	//=================================================================================================================
+	// Teleport Scroll
+	//=================================================================================================================
+	"item_tpscroll"
+	{
+		// Stats
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"120.0"
+		"AbilityChannelTime"			"5.0"
+		
+		// Item Info
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"75"
+		"ItemCost"						"100"
+		"ItemInitialCharges"			"5"
+		
+		// Special	
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"chain_damage"			"130"
+				"minimun_distance"		"70"
 			}
-			"13"
+			"02"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"chain_strikes"			"6"
+				"maximum_distance"		"100"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"vision_radius"			"200"
 			}
 		}
 	}
@@ -399,9 +360,6 @@
 	"item_energy_booster"
 	{ "SecretShop"	"0" }
 
-	"item_point_booster"
-	{ "SecretShop"	"0" }
-
 	"item_relic"
 	{ "SecretShop"	"0" }
 
@@ -412,9 +370,6 @@
 	{ "SecretShop"	"0" }
 
 	"item_ultimate_orb"
-	{ "SecretShop"	"0" }
-
-	"item_hyperstone"
 	{ "SecretShop"	"0" }
 
 	//=================================================================================================================
@@ -489,7 +444,6 @@
 	"item_urn_of_shadows"			"REMOVE"
 	"item_travel_boots"				"REMOVE"
 	"item_travel_boots_2"			"REMOVE"
-	"item_tpscroll"					"REMOVE"
 	"item_boots"					"REMOVE"
 	"item_veil_of_discord"			"REMOVE"
 	"item_shadow_amulet"			"REMOVE"
@@ -501,13 +455,51 @@
 	"item_ancient_janggo"			"REMOVE"
 	"item_cyclone"					"REMOVE"
 	"item_iron_talon"				"REMOVE"
-	"item_faerie_fire"				"REMOVE"
 	"item_dragon_lance"				"REMOVE"
 	"item_yasha"					"REMOVE"
 	"item_manta"					"REMOVE"
 	"item_aether_lens"				"REMOVE"
 	"item_bracer"					"REMOVE"
 	"item_ultimate_scepter"			"REMOVE"
+	"item_ring_of_aquila"			"REMOVE"
+	"item_wraith_band"				"REMOVE"
+	"item_circlet"					"REMOVE"
+	"item_gauntlets"				"REMOVE"
+	"item_boots_of_elves"			"REMOVE"
+	"item_oblivion_staff"			"REMOVE"
+	"item_quarterstaff"				"REMOVE"
+	"item_mantle"					"REMOVE"
+	"item_hand_of_midas"			"REMOVE"
+	"item_octarine_core"			"REMOVE"
+	"item_ring_of_basilius"			"REMOVE"
+	"item_ring_of_protection"		"REMOVE"
+	"item_sobi_mask"				"REMOVE"
+	"item_medallion_of_courage"		"REMOVE"
+	"item_headdress"				"REMOVE"
+	"item_pipe"						"REMOVE"
+	"item_soul_ring"				"REMOVE"
+	"item_shivas_guard"				"REMOVE"
+	"item_hurricane_pike"			"REMOVE"
+	"item_bloodthorn"				"REMOVE"
+	"item_echo_sabre"				"REMOVE"
+	"item_wind_lace"				"REMOVE"
+	"item_blades_of_attack"			"REMOVE"
+	"item_belt_of_strength"			"REMOVE"
+	"item_flying_courier"			"REMOVE"
+	"item_quelling_blade"			"REMOVE"
+	"item_staff_of_wizardry"		"REMOVE"
+	"item_orb_of_venom"				"REMOVE"
+	"item_point_booster"			"REMOVE"
+	"item_blade_of_alacrity"		"REMOVE"
+	"item_soul_booster"				"REMOVE"
+	"item_lifesteal"				"REMOVE"
+	"item_refresher"				"REMOVE"
+	"item_radiance"					"REMOVE"
+	"item_blade_mail"				"REMOVE"
+	"item_maelstrom"				"REMOVE"
+	"item_mjollnir"					"REMOVE"
+	"item_hyperstone"				"REMOVE"
+	"item_abyssal_blade"			"REMOVE"
 
 	//============================================================================================================
 	//============================================================================================================
@@ -657,74 +649,12 @@
 	}
 
 	//=================================================================================================================
-	// Ability: Phantom Lancer's Juxtapose
-	//=================================================================================================================
-	"phantom_lancer_juxtapose"
-	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"MaxLevel"					"1"
-
-		// Special
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilitySpecial"
-		{
-			"01"
-			{
-				"var_type"								"FIELD_INTEGER"
-				"max_illusions"							"2"
-			}
-			"02"
-			{
-				"var_type"								"FIELD_INTEGER"
-				"proc_chance_pct"						"40"
-			}
-			"03"
-			{
-				"var_type"								"FIELD_INTEGER"
-				"illusion_proc_chance_pct"				"0"
-			}			
-			"04"
-			{
-				"var_type"								"FIELD_INTEGER"
-				"illusion_duration"						"8"
-			}
-			"05"
-			{
-				"var_type"								"FIELD_INTEGER"
-				"illusion_damage_out_pct"				"-84"
-			}
-			"06"
-			{
-				"var_type"								"FIELD_INTEGER"
-				"tooltip_illusion_damage"				"16"
-			}
-			"07"
-			{
-				"var_type"								"FIELD_INTEGER"
-				"illusion_damage_in_pct"				"400"
-			}
-			"08"
-			{
-				"var_type"								"FIELD_INTEGER"
-				"tooltip_total_illusion_damage_in_pct"	"500"
-			}
-			"09"
-			{
-				"var_type"								"FIELD_INTEGER"
-				"illusion_from_illusion_duration"		"0"
-			}
-		}
-	}
-
-	//=================================================================================================================
 	// Brewmaster Storm: Wind Walk
 	//=================================================================================================================
 	"brewmaster_storm_wind_walk"
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"MaxLevel"						"7"
 
 		// Time		
 		//-------------------------------------------------------------------------------------------------------------
@@ -732,7 +662,7 @@
 
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityManaCost"				"75"		
+		"AbilityManaCost"				"75 90 105 120"		
 
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
@@ -741,22 +671,22 @@
 			"01"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"bonus_damage"				"50 75 100 150 250 400 650"
+				"bonus_damage"				"100 250 500 950"
 			}
 			"02"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"bonus_movement_speeed"		"20 25 30 35 40 50 70"
+				"bonus_movement_speeed"		"20 30 50 80"
 			}
 			"03"
 			{
-				"var_type"					"FIELD_FLOAT"
-				"duration"					"10.0 15.0 20.0 25.0 30.0 40.0 60.0"
+				"var_type"					"FIELD_INTEGER"
+				"duration"					"10 20 35 60"
 			}
 			"04"
 			{
 				"var_type"					"FIELD_FLOAT"
-				"fade_time"					"0.6"
+				"fade_time"					"0.4"
 			}
 		}
 	}
@@ -768,7 +698,6 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"MaxLevel"					"7"
 		"RequiredLevel"				"8"
 		"LevelsBetweenUpgrades"		"3"
 		"AbilityTextureName"		"juggernaut_blade_dance"
@@ -780,12 +709,12 @@
 			"01"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"blade_dance_crit_mult"		"150 200 250 300 350 400 500"
+				"blade_dance_crit_mult"		"400"
 			}
 			"02"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"blade_dance_crit_chance"	"3 6 9 12 15 18 21"
+				"blade_dance_crit_chance"	"20"
 			}
 		}
 	}
@@ -815,11 +744,11 @@
 
 		// Damage
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityDamage"					"500 1000"
+		"AbilityDamage"					"600 1500"
 
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityManaCost"				"250 500"		
+		"AbilityManaCost"				"180 420"		
 
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
@@ -833,7 +762,7 @@
 			"02"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"blade_fury_radius"			"270"
+				"blade_fury_radius"			"280"
 			}
 		}
 	}
@@ -843,17 +772,6 @@
 	//=================================================================================================================
 	"clinkz_searing_arrows"
 	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"ID"							"5260"														// unique ID number for this ability.  Do not change this once established or it will invalidate collected stats.
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_AUTOCAST | DOTA_ABILITY_BEHAVIOR_ATTACK"
-		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
-		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC | DOTA_UNIT_TARGET_MECHANICAL | DOTA_UNIT_TARGET_BUILDING"
-		"AbilityUnitTargetFlags"		"DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES"
-		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_YES"
-		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
-		"MaxLevel"						"7"
-
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityCastRange"				"630"
@@ -865,7 +783,7 @@
 
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityManaCost"				"15"
+		"AbilityManaCost"				"10 20 30 40"
 
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
@@ -874,7 +792,7 @@
 			"01"
 			{
 				"var_type"						"FIELD_INTEGER"
-				"damage_bonus"					"20 40 60 90 150 220 350"
+				"damage_bonus"					"50 100 220 500"
 			}
 		}
 	}
@@ -988,7 +906,6 @@
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_YES"
-		"MaxLevel"						"7"
 
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
@@ -997,11 +914,11 @@
 
 		// Time		
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCooldown"				"13"
+		"AbilityCooldown"				"12"
 
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityManaCost"				"90"
+		"AbilityManaCost"				"60 80 100 120"
 
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
@@ -1010,7 +927,7 @@
 			"01"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"damage"					"200 250 300 350 400 550 700"
+				"damage"					"200 400 750 1200"
 			}
 			"02"
 			{
@@ -1039,4 +956,222 @@
 			}		
 		}
 	}
+
+	//=================================================================================================================
+	// Ability: Storm Bolt
+	//=================================================================================================================
+	"sven_storm_bolt"
+	{
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"				"700"
+		"AbilityCastPoint"				"0.25"
+
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"8.5"
+
+		// Damage.
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityDamage"					"250 500 800 1200"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"90 110 130 150"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bolt_speed"			"900"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"bolt_stun_duration"	"1.0 1.5 2.0 3.0"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bolt_aoe"				"0"
+			}
+			"04"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"vision_radius"			"275"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Brewmaster: Thunder Clap
+	//=================================================================================================================
+	"brewmaster_thunder_clap"
+	{
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"6.0"
+		
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastPoint"				"0.55"
+		"AbilityCastAnimation"          "ACT_DOTA_CAST_ABILITY_3"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"75 110 145 180"		
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"radius"					"350 400 450 500"
+			}
+			"02"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"damage"					"150 250 400 650"
+			}
+			"03"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"movement_slow"				"25 35 45 55"
+			}
+			"04"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"attack_speed_slow"			"25"
+			}			
+			"05"
+			{
+				"var_type"					"FIELD_FLOAT"
+				"duration"					"3.0"
+			}
+			"06"
+			{
+				"var_type"					"FIELD_FLOAT"
+				"duration_creeps"			"3.0"
+			}			
+		}
+	}
+
+	//=================================================================================================================
+	// Ability: Slardar Bash
+	//=================================================================================================================
+	"slardar_bash"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"RequiredLevel"						"8"
+		"LevelsBetweenUpgrades"				"3"
+		
+		// Stats
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityModifierSupportBonus"		"25"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"chance"				"15 20 25 30"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_damage"			"100 250 450 700"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"duration"				"0.05"
+			}
+			"04"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"duration_creep"		"0.05"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Chaos Knight: Chaos Strike
+	//=================================================================================================================
+	"chaos_knight_chaos_strike"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"MaxLevel"							"1"
+	
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"crit_chance"				"15"
+			}
+			"02"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"crit_damage"				"500"
+			}			
+			"03"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"armor_reduction"			"-20"
+			}
+			"04"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"armor_reduction_tooltip"	"20"
+			}			
+			"05"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"armor_duration"			"10"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Venomancer: Poison Sting
+	//=================================================================================================================
+	"venomancer_poison_sting"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"MaxLevel"					"1"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"duration"				"10.0"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"damage"				"250"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"movement_speed"		"-20"
+			}			
+		}
+	}
+
 }

@@ -8,14 +8,21 @@ function trigger_second_wave_left()
 print("Disabled trigger left")
 DoEntFire("trigger_phase2_left","Kill",nil,0,nil,nil)
 
-Timers:CreateTimer(3.5,spawn_second_phase_left)
+Timers:CreateTimer(3.0,spawn_second_phase_left)
 end
 
 function trigger_second_wave_right()
 print("Disabled trigger right")
 DoEntFire("trigger_phase2_right","Kill",nil,0,nil,nil)
 
-Timers:CreateTimer(3.5,spawn_second_phase_right)
+Timers:CreateTimer(3.0,spawn_second_phase_right)
+end
+
+function trigger_second_wave_solo()
+print("Disabled trigger solo")
+DoEntFire("trigger_phase2_solo","Kill",nil,0,nil,nil)
+
+Timers:CreateTimer(2.0,spawn_second_phase_solo)
 end
 
 function spawn_second_phase_left()
@@ -40,6 +47,21 @@ function spawn_second_phase_right()
 		if EntIceTower:IsAlive() then -- Level 1 lower than 6 min
 			for j = 1, 8 do
 			local unit = CreateUnitByName("npc_orc_II", point+RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_BADGUYS)
+			end
+		return 30 -- Rerun this timer every 30 game-time seconds
+		elseif not EntIceTower:IsAlive() then
+		return nil
+		end
+	end)
+end
+
+function spawn_second_phase_solo()
+	local EntIceTower = Entities:FindByName( nil, "npc_tower_cold_3" )
+	local point = Entities:FindByName( nil, "npc_dota_spawner_top_solo_1"):GetAbsOrigin()
+	Timers:CreateTimer(0, function()
+		if EntIceTower:IsAlive() then -- Level 1 lower than 6 min
+			for j = 1, 4 do
+			local unit = CreateUnitByName("npc_ghul_II", point+RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_BADGUYS)
 			end
 		return 30 -- Rerun this timer every 30 game-time seconds
 		elseif not EntIceTower:IsAlive() then
@@ -85,21 +107,37 @@ function killed_frost_tower_right(keys)
 	end
 end
 
+function killed_frost_tower_solo(keys)
+	caller = keys.caller
+	GameMode.FrostTowers_killed = GameMode.FrostTowers_killed + 2
+	print( GameMode.FrostTowers_killed )
+--	Timers:RemoveTimer(GameMode.timer_second_phase_left)
+	GameMode.timer_second_phase_left = nil
+
+	if GameMode.FrostTowers_killed >= 2 then
+--		Timers:RemoveTimer( timer_wave_spawn)
+--		timer_wave_spawn = nil
+--		Timers:RemoveTimer( timer_wave_message)
+--		timer_wave_message = nil
+		print("FinalWave timer started")
+		Notifications:TopToAll({text="WARNING! Final Wave incoming. Arriving in 60 seconds! Back to the Castle!" , duration=59.0})
+		Timers:CreateTimer(60, FinalWave)
+		local directions = {"west","north","east","south"}
+	end
+end
+
+
 final_wave_creeps = {
 	west = {
 	"npc_abomination_final_wave",
 	"npc_abomination_final_wave",
 	"npc_abomination_final_wave",
-	"npc_abomination_final_wave",
-	"npc_banshee_final_wave",
 	"npc_banshee_final_wave",
 	"npc_banshee_final_wave",
 	"npc_banshee_final_wave",
 	"npc_necro_final_wave",
 	"npc_necro_final_wave",
 	"npc_necro_final_wave",
-	"npc_necro_final_wave",
-	"npc_magnataur_final_wave",
 	"npc_magnataur_final_wave",
 	"npc_magnataur_final_wave",
 	"npc_magnataur_final_wave",
@@ -110,16 +148,12 @@ final_wave_creeps = {
 	"npc_tauren_final_wave",
 	"npc_tauren_final_wave",
 	"npc_tauren_final_wave",
-	"npc_tauren_final_wave",
-	"npc_chaos_orc_final_wave",
 	"npc_chaos_orc_final_wave",
 	"npc_chaos_orc_final_wave",
 	"npc_chaos_orc_final_wave",
 	"npc_warlock_final_wave",
 	"npc_warlock_final_wave",
 	"npc_warlock_final_wave",
-	"npc_warlock_final_wave",
-	"npc_orc_raider_final_wave",
 	"npc_orc_raider_final_wave",
 	"npc_orc_raider_final_wave",
 	"npc_orc_raider_final_wave",
@@ -130,16 +164,12 @@ final_wave_creeps = {
 	"npc_druid_final_wave",
 	"npc_druid_final_wave",
 	"npc_druid_final_wave",
-	"npc_druid_final_wave",
-	"npc_guard_final_wave",
 	"npc_guard_final_wave",
 	"npc_guard_final_wave",
 	"npc_guard_final_wave",
 	"npc_keeper_final_wave",
 	"npc_keeper_final_wave",
 	"npc_keeper_final_wave",
-	"npc_keeper_final_wave",
-	"npc_luna_final_wave",
 	"npc_luna_final_wave",
 	"npc_luna_final_wave",
 	"npc_luna_final_wave",
@@ -150,7 +180,6 @@ final_wave_creeps = {
 	"npc_captain_final_wave",
 	"npc_captain_final_wave",
 	"npc_captain_final_wave",
-	"npc_captain_final_wave",
 	"npc_marine_final_wave",
 	"npc_marine_final_wave",
 	"npc_marine_final_wave",
@@ -158,9 +187,6 @@ final_wave_creeps = {
 	"npc_marine_final_wave",
 	"npc_marine_final_wave",
 	"npc_marine_final_wave",
-	"npc_marine_final_wave",
-	"npc_marine_final_wave",
-	"npc_knight_final_wave",
 	"npc_knight_final_wave",
 	"npc_knight_final_wave",
 	"npc_knight_final_wave",
@@ -172,11 +198,16 @@ function FinalWave()
   -- body
 local final_spawn = nil
 local waypoint = Entities:FindByName(nil,"base")
-local directions = {"west","north","east","south"}
 DebugPrint("Final Wave spawn")
+		local directions = {"west","north","east","south"}
 	for _,direction in pairs(directions) do
-		for i = 1,21 do
-		final_spawn = Entities:FindAllByName("npc_dota_spawner_"..direction.."_event")
+		for i = 1,17 do
+			if GetMapName() == "solomode" then
+				final_spawn = Entities:FindAllByName("npc_dota_spawner_west_event")
+			else
+				final_spawn = Entities:FindAllByName("npc_dota_spawner_"..direction.."_event")
+			end
+
 			for _,point in pairs(final_spawn) do
 			DebugPrint("spawn unit")
 				Timers:CreateTimer(function()
@@ -196,6 +227,17 @@ DebugPrint("Final Wave spawn")
 return nil
 end
 
+function EndMuradinEvent(keys)
+	local caller = keys.caller
+	local activator = keys.activator
+	local point = Entities:FindByName(nil,"base_spawn"):GetAbsOrigin()
+
+	if activator:GetTeam() == DOTA_TEAM_GOODGUYS then
+	FindClearSpaceForUnit(activator, point, true)
+	PlayerResource:ModifyGold( activator:GetPlayerOwnerID(), 10000, false,  DOTA_ModifyGold_Unspecified )
+	end
+end
+
 function teleport_to_top(keys)
 	-- body
 	-- Spawn Magtheridon
@@ -204,10 +246,11 @@ function teleport_to_top(keys)
 	local activator = keys.activator
 	local point = Entities:FindByName(nil,"point_teleport_boss"):GetAbsOrigin()
 	local point_mag = Entities:FindByName(nil,"npc_dota_spawner_magtheridon_arena"):GetAbsOrigin()
+
 	if first_time_teleport then
 		local heroes = HeroList:GetAllHeroes()
 		print( "Magtheridon should appears now" )
-		magtheridon = CreateUnitByName("npc_dota_hero_magtheridon",Entities:FindByName(nil,"npc_dota_spawner_magtheridon_arena"):GetAbsOrigin()  ,true,nil,nil,DOTA_TEAM_BADGUYS)
+		magtheridon = CreateUnitByName("npc_dota_hero_magtheridon", point_mag  ,true,nil,nil,DOTA_TEAM_BADGUYS)
 		magtheridon:SetAngles(0, 180, 0)
 		local ankh = CreateItem("item_magtheridon_ankh", mag, mag)
 

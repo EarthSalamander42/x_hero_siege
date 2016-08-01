@@ -7,6 +7,8 @@ function Precache( context )
 	PrecacheItemByNameSync( "item_ankh_of_reincarnation", context )
 	PrecacheItemByNameSync( "item_assassins_blade", context )
 	PrecacheItemByNameSync( "item_claws_of_attack", context )
+	PrecacheItemByNameSync( "item_desolator2", context )
+	PrecacheItemByNameSync( "item_desolator3", context )
 
 	-- Desolator Custom Effect Precache
 	PrecacheResource( "particle_folder", "particles/econ/items/antimage/antimage_weapon_basher_ti5_gold", context )
@@ -34,12 +36,10 @@ function Precache( context )
 	PrecacheResource( "particle_folder", "particles/units/heroes/hero_death_prophet", context )
 	PrecacheResource( "particle_folder", "particles/units/heroes/hero_brewmaster", context )
 	PrecacheResource( "particle_folder", "particles/units/heroes/hero_skeletonking", context )
-	PrecacheResource( "particle_folder", "particles/units/heroes/hero_warlock", context )
 	PrecacheResource( "particle_folder", "particles/units/heroes/hero_terrorblade", context )
 	PrecacheResource( "particle_folder", "particles/units/heroes/hero_legion_commander", context )
 	PrecacheResource( "particle_folder", "particles/units/heroes/hero_omniknight", context )
 	PrecacheResource( "particle_folder", "particles/units/heroes/hero_tiny", context )
-	PrecacheResource( "particle_folder", "particles/units/heroes/hero_warlock", context )
 	PrecacheResource( "particle_folder", "particles/units/heroes/hero_naga_siren", context )
 	PrecacheResource( "particle_folder", "particles/units/heroes/hero_nevermore", context )
 	PrecacheResource( "particle_folder", "particles/units/heroes/hero_vengeful", context )
@@ -49,6 +49,9 @@ function Precache( context )
 	PrecacheResource( "particle_folder", "particles/units/heroes/hero_clinkz", context )
 	PrecacheResource( "particle_folder", "particles/units/heroes/hero_sven", context )
 	PrecacheResource( "particle_folder", "particles/units/heroes/hero_stormspirit", context )
+	PrecacheResource( "particle_folder", "particles/units/heroes/hero_ursa", context )
+	PrecacheResource( "particle_folder", "particles/units/heroes/hero_venomancer", context )
+	PrecacheResource( "particle_folder", "particles/items_fx", context )
 
 	-- PRECACHE SOUNDS
 	PrecacheResource( "soundfile", "soundevents/game_sounds_heroes/game_sounds_lina.vsndevts", context )
@@ -74,6 +77,7 @@ function Precache( context )
 	PrecacheResource( "soundfile", "soundevents/game_sounds_heroes/game_sounds_stormspirit.vsndevts", context )
 	PrecacheResource( "soundfile", "soundevents/game_sounds_heroes/game_sounds_leshrac.vsndevts", context )
 	PrecacheResource( "soundfile", "soundevents/game_sounds_heroes/game_sounds_techies.vsndevts", context )
+	PrecacheResource( "soundfile", "soundevents/game_sounds_heroes/game_sounds_ursa.vsndevts", context )
 
 	-- PHASE 1
 	PrecacheUnitByNameSync( "npc_dota_creature_mini_lifestealers", context)
@@ -117,6 +121,7 @@ function Precache( context )
 	-- PHASE 3
 	PrecacheUnitByNameSync( "npc_dota_creep_radiant_hulk", context)
 	PrecacheUnitByNameSync( "npc_dota_creep_dire_hulk", context)
+	PrecacheUnitByNameSync( "npc_dota_warlock_golem_3", context)
 
 	-- 4 Bosses Arena
 	PrecacheUnitByNameSync( "npc_dota_hero_grom_hellscream", context)

@@ -13,7 +13,7 @@ function venomancer_plague_ward_datadriven_on_spell_start(keys)
 	keys.caster:EmitSound("Hero_Venomancer.Plague_Ward")
 
 	local plague_ward_level = keys.ability:GetLevel()
-	if plague_ward_level >= 1 and plague_ward_level <= 7 then
+	if plague_ward_level >= 1 and plague_ward_level <= 4 then
 		local plague_ward_unit = CreateUnitByName("serpent_ward_" .. plague_ward_level, keys.target_points[1], false, keys.caster, keys.caster, keys.caster:GetTeam())
 		plague_ward_unit:SetForwardVector(direction)
 		plague_ward_unit:SetControllableByPlayer(keys.caster:GetPlayerID(), true)

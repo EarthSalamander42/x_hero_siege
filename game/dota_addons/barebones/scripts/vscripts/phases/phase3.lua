@@ -93,23 +93,6 @@ function LastArenaBossKillCount(keys)
 				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
 			end
 		end
-	elseif GameMode.Arthas_killed == 2 then
-	print( "Banehallow is Dead!" )
-
-	local point = Entities:FindByName(nil,"point_teleport_boss"):GetAbsOrigin()
-	local heroes = HeroList:GetAllHeroes()
-		Timers:CreateTimer(5, StartAbaddonArena)
-		for _,hero in pairs(heroes) do
-			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
-				FindClearSpaceForUnit(hero, point, true)
-				hero:AddNewModifier(nil, nil, "modifier_stunned",nil)
-				hero:AddNewModifier(nil, nil, "modifier_invulnerable",nil)
-				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
-			end
-		end
-	elseif GameMode.Arthas_killed == 3 then
-	print( "Abaddon is Dead!" )
-	GameRules:SetGameWinner( DOTA_TEAM_GOODGUYS )
 	end
 end
 
@@ -143,7 +126,7 @@ function teleport_to_arthas_arena(keys)
 				first_time_teleport_arthas = false
 			end
 		end
-		elseif activator:GetTeam() == DOTA_TEAM_GOODGUYS then
+	elseif activator:GetTeam() == DOTA_TEAM_GOODGUYS then
 		FindClearSpaceForUnit(activator, point, true)
 	end
 end
@@ -174,17 +157,7 @@ local point = Entities:FindByName(nil,"point_teleport_boss"):GetAbsOrigin()
 		local arthas = CreateUnitByName("npc_dota_hero_arthas",Entities:FindByName(nil,"npc_dota_spawner_magtheridon_arena"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_BADGUYS)
 		arthas:SetAngles(0, 270, 0)
 
-		Notifications:TopToAll({text="You are very courageous. Do you know who i am?" , duration=6.0})
-		Timers:CreateTimer(6,function()
-			Notifications:TopToAll({text="My name is Arthas Menethil, son of Terenas Menethil." , duration=6.0})
-		end)
-		Timers:CreateTimer(12,function()
-			Notifications:TopToAll({text="I have a question for you, Heroes of the light." , duration=6.0})
-		end)
-		Timers:CreateTimer(18,function()
-			Notifications:TopToAll({text="Do you think Light Forces is the Good Guys side? Mouahahahaha" , duration=5.0})
-		end)
-		Timers:CreateTimer(24,function()
+		Timers:CreateTimer(9,function()
 			arthas:RemoveModifierByName("modifier_stunned")
 			arthas:RemoveModifierByName("modifier_invulnerable")
 			arthas = nil
@@ -192,7 +165,7 @@ local point = Entities:FindByName(nil,"point_teleport_boss"):GetAbsOrigin()
 
 		arthas:AddNewModifier(nil, nil, "modifier_stunned",nil)
 		arthas:AddNewModifier(nil, nil, "modifier_invulnerable",nil)
-		Timers:CreateTimer(25,StartBossFight)
+		Timers:CreateTimer(10,StartBossFight)
 		for _,hero in pairs(heroes) do
 			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
 				FindClearSpaceForUnit(hero, point, true)
@@ -216,76 +189,62 @@ local point = Entities:FindByName(nil,"point_teleport_boss"):GetAbsOrigin()
 	local heroes = HeroList:GetAllHeroes()
 	print( "BaneHallow should appears now" )
 
+	Timers:CreateTimer(8,function()
 	local banehallow = CreateUnitByName("npc_dota_hero_banehallow",Entities:FindByName(nil,"npc_dota_spawner_magtheridon_arena"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_BADGUYS)
 	banehallow:SetAngles(0, 270, 0)
 	banehallow:AddNewModifier(nil, nil, "modifier_stunned",nil)
 	banehallow:AddNewModifier(nil, nil, "modifier_invulnerable",nil)
 
-	Timers:CreateTimer(5,function()
-		local green_revenant = CreateUnitByName("npc_death_revenant_banehallow",Entities:FindByName(nil,"npc_dota_spawner_green_revenant_1"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_BADGUYS)
-		green_revenant:SetAngles(0, 340, 0)
-		local green_revenant2 = CreateUnitByName("npc_death_revenant_banehallow",Entities:FindByName(nil,"npc_dota_spawner_green_revenant_7"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_BADGUYS)
-		green_revenant:SetAngles(0, 170, 0)
-	end)
-
-	Timers:CreateTimer(6,function()
-		local green_revenant = CreateUnitByName("npc_death_revenant_banehallow",Entities:FindByName(nil,"npc_dota_spawner_green_revenant_2"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_BADGUYS)
-		green_revenant:SetAngles(0, 320, 0)
-		local green_revenant2 = CreateUnitByName("npc_death_revenant_banehallow",Entities:FindByName(nil,"npc_dota_spawner_green_revenant_8"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_BADGUYS)
-		green_revenant:SetAngles(0, 150, 0)
-	end)
-
-	Timers:CreateTimer(7,function()
-		local green_revenant = CreateUnitByName("npc_death_revenant_banehallow",Entities:FindByName(nil,"npc_dota_spawner_green_revenant_3"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_BADGUYS)
-		green_revenant:SetAngles(0, 300, 0)
-		local green_revenant2 = CreateUnitByName("npc_death_revenant_banehallow",Entities:FindByName(nil,"npc_dota_spawner_green_revenant_9"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_BADGUYS)
-		green_revenant:SetAngles(0, 130, 0)
-	end)
-
-	Timers:CreateTimer(8,function()
-		local green_revenant = CreateUnitByName("npc_death_revenant_banehallow",Entities:FindByName(nil,"npc_dota_spawner_green_revenant_4"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_BADGUYS)
-		green_revenant:SetAngles(0, 240, 0)
-		local green_revenant2 = CreateUnitByName("npc_death_revenant_banehallow",Entities:FindByName(nil,"npc_dota_spawner_green_revenant_10"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_BADGUYS)
-		green_revenant:SetAngles(0, 50, 0)
-	end)
-
-	Timers:CreateTimer(9,function()
-		local green_revenant = CreateUnitByName("npc_death_revenant_banehallow",Entities:FindByName(nil,"npc_dota_spawner_green_revenant_5"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_BADGUYS)
-		green_revenant:SetAngles(0, 220, 0)
-		local green_revenant2 = CreateUnitByName("npc_death_revenant_banehallow",Entities:FindByName(nil,"npc_dota_spawner_green_revenant_11"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_BADGUYS)
-		green_revenant:SetAngles(0, 30, 0)
-	end)
-
-	Timers:CreateTimer(10,function()
-		local green_revenant = CreateUnitByName("npc_death_revenant_banehallow",Entities:FindByName(nil,"npc_dota_spawner_green_revenant_6"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_BADGUYS)
-		green_revenant:SetAngles(0, 200, 0)
-		local green_revenant2 = CreateUnitByName("npc_death_revenant_banehallow",Entities:FindByName(nil,"npc_dota_spawner_green_revenant_12"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_BADGUYS)
-		green_revenant:SetAngles(0, 10, 0)
-	end)
-
---	Timers:CreateTimer(9,function()
---		Notifications:TopToAll({text="Did you killed the King?" , duration=5.0})
---	end)
---
---	Timers:CreateTimer(14,function()
---		Notifications:TopToAll({text="You will pay for this!" , duration=5.0})
---	end)
-
-	Timers:CreateTimer(18,function()
+	Timers:CreateTimer(12,function()
 		banehallow:RemoveModifierByName("modifier_stunned")
 		banehallow:RemoveModifierByName("modifier_invulnerable")
 		banehallow = nil
 	end)
+	end)
 
-	Timers:CreateTimer(19,StartBossFight)
-	for _,hero in pairs(heroes) do
-		if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
-			FindClearSpaceForUnit(hero, point, true)
-			hero:AddNewModifier(nil, nil, "modifier_stunned",nil)
-			hero:AddNewModifier(nil, nil, "modifier_invulnerable",nil)
-			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
-		end
-	end
+	Timers:CreateTimer(12,function()
+		local green_revenant = CreateUnitByName("npc_death_revenant_banehallow",Entities:FindByName(nil,"npc_dota_spawner_green_revenant_1"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_BADGUYS)
+		green_revenant:SetAngles(0, 340, 0)
+		local green_revenant2 = CreateUnitByName("npc_death_revenant_banehallow",Entities:FindByName(nil,"npc_dota_spawner_green_revenant_7"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_BADGUYS)
+		green_revenant2:SetAngles(0, 170, 0)
+	end)
+
+	Timers:CreateTimer(13.5,function()
+		local green_revenant = CreateUnitByName("npc_death_revenant_banehallow",Entities:FindByName(nil,"npc_dota_spawner_green_revenant_2"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_BADGUYS)
+		green_revenant:SetAngles(0, 320, 0)
+		local green_revenant2 = CreateUnitByName("npc_death_revenant_banehallow",Entities:FindByName(nil,"npc_dota_spawner_green_revenant_8"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_BADGUYS)
+		green_revenant2:SetAngles(0, 150, 0)
+	end)
+
+	Timers:CreateTimer(15,function()
+		local green_revenant = CreateUnitByName("npc_death_revenant_banehallow",Entities:FindByName(nil,"npc_dota_spawner_green_revenant_3"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_BADGUYS)
+		green_revenant:SetAngles(0, 300, 0)
+		local green_revenant2 = CreateUnitByName("npc_death_revenant_banehallow",Entities:FindByName(nil,"npc_dota_spawner_green_revenant_9"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_BADGUYS)
+		green_revenant2:SetAngles(0, 130, 0)
+	end)
+
+	Timers:CreateTimer(16.5,function()
+		local green_revenant = CreateUnitByName("npc_death_revenant_banehallow",Entities:FindByName(nil,"npc_dota_spawner_green_revenant_4"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_BADGUYS)
+		green_revenant:SetAngles(0, 240, 0)
+		local green_revenant2 = CreateUnitByName("npc_death_revenant_banehallow",Entities:FindByName(nil,"npc_dota_spawner_green_revenant_10"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_BADGUYS)
+		green_revenant2:SetAngles(0, 50, 0)
+	end)
+
+	Timers:CreateTimer(18,function()
+		local green_revenant = CreateUnitByName("npc_death_revenant_banehallow",Entities:FindByName(nil,"npc_dota_spawner_green_revenant_5"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_BADGUYS)
+		green_revenant:SetAngles(0, 220, 0)
+		local green_revenant2 = CreateUnitByName("npc_death_revenant_banehallow",Entities:FindByName(nil,"npc_dota_spawner_green_revenant_11"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_BADGUYS)
+		green_revenant2:SetAngles(0, 30, 0)
+	end)
+
+	Timers:CreateTimer(19.5,function()
+		local green_revenant = CreateUnitByName("npc_death_revenant_banehallow",Entities:FindByName(nil,"npc_dota_spawner_green_revenant_6"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_BADGUYS)
+		green_revenant:SetAngles(0, 200, 0)
+		local green_revenant2 = CreateUnitByName("npc_death_revenant_banehallow",Entities:FindByName(nil,"npc_dota_spawner_green_revenant_12"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_BADGUYS)
+		green_revenant2:SetAngles(0, 10, 0)
+	end)
+
+	Timers:CreateTimer(23,StartBossFight)
 end
 
 function StartAbaddonArena(keys)
@@ -294,30 +253,27 @@ DebugPrint("teleport trigger")
 local caller = keys.caller
 local activator = keys.activator
 local point = Entities:FindByName(nil,"point_teleport_boss"):GetAbsOrigin()
-	local heroes = HeroList:GetAllHeroes()
-	print( "Abaddon should appears now" )
+local heroes = HeroList:GetAllHeroes()
+print( "Abaddon should appears now" )
 
-	local abaddon = CreateUnitByName("npc_dota_creature_abaddon",Entities:FindByName(nil,"npc_dota_spawner_magtheridon_arena"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_BADGUYS)
-	abaddon:SetAngles(0, 270, 0)
+	Timers:CreateTimer(5,function()
+		local abaddon = CreateUnitByName("npc_dota_creature_abaddon",Entities:FindByName(nil,"npc_dota_spawner_magtheridon_arena"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_BADGUYS)
+		abaddon:SetAngles(0, 270, 0)
+		abaddon:AddNewModifier(nil, nil, "modifier_stunned",nil)
+		abaddon:AddNewModifier(nil, nil, "modifier_invulnerable",nil)
 
---	Timers:CreateTimer(5,function()
---		local green_revenant = CreateUnitByName("npc_death_revenant_banehallow",Entities:FindByName(nil,"npc_dota_spawner_green_revenant_7"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_BADGUYS)
---		green_revenant:SetAngles(0, 170, 0)
---	end)
-
-	Timers:CreateTimer(7,function()
-		Notifications:TopToAll({text="From death, i grow stronger!" , duration=5.0})
-	end)
-
-	Timers:CreateTimer(15,function()
+		Timers:CreateTimer(7,function()
 		abaddon:RemoveModifierByName("modifier_stunned")
 		abaddon:RemoveModifierByName("modifier_invulnerable")
 		abaddon = nil
 	end)
+	end)
 
-	abaddon:AddNewModifier(nil, nil, "modifier_stunned",nil)
-	abaddon:AddNewModifier(nil, nil, "modifier_invulnerable",nil)
-	Timers:CreateTimer(17,StartBossFight)
+	Timers:CreateTimer(10,function()
+		Notifications:TopToAll({text="From death, i grow stronger!" , duration=5.0})
+	end)
+
+	Timers:CreateTimer(13,StartBossFight)
 	for _,hero in pairs(heroes) do
 		if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
 			FindClearSpaceForUnit(hero, point, true)

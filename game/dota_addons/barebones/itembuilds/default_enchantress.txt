@@ -1,0 +1,31 @@
+"itembuilds/test_alchemist.txt"
+{
+	"author"		"Valve"
+	"hero"			"npc_dota_hero_alchemist"
+	"Title"			"Recommended items for Alchemist in All Bosses Challenge"
+	
+	"Items"
+	{		
+		"#DOTA_Item_Build_Starting_Items"
+		{
+			"item"		"item_stout_shield"
+			"item"		"item_salve_1000"
+		}
+		
+		"#DOTA_Item_Build_Early_Game"
+		{	
+			"item"		"item_heart"
+			"item"		"item_mekansm"
+		}
+		
+		"#DOTA_Item_Build_Core_Items"
+		{
+			"item"		"item_mekansm3"
+			"item"		"item_desolator"
+		}
+		
+		"#DOTA_Item_Build_Luxury"
+		{
+		}
+	}
+}

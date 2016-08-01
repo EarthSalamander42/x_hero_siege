@@ -17,21 +17,36 @@ function GameMode:OnNPCSpawned(keys)
 	local npc = EntIndexToHScript(keys.entindex)
 	local normal_bounty = npc:GetGoldBounty()
 	local normal_xp = npc:GetDeathXP()
+	local normal_min_damage = npc:GetBaseDamageMin()
+	local normal_max_damage = npc:GetBaseDamageMax()
 
 	if GetMapName() == "x_hero_siege_8_players" then
 		npc:SetMinimumGoldBounty( normal_bounty*1.5 )
 		npc:SetMaximumGoldBounty( normal_bounty*1.5 )
 		npc:SetDeathXP( normal_xp )
+		npc:SetBaseDamageMin( normal_min_damage )
+		npc:SetBaseDamageMax( normal_max_damage )
+	elseif GetMapName() == "hardmode" then
+		npc:SetMinimumGoldBounty( normal_bounty/1.5 )
+		npc:SetMaximumGoldBounty( normal_bounty/1.5 )
+		npc:SetDeathXP( normal_xp*0.5 )
+		npc:SetBaseDamageMin( normal_min_damage*1.25 )
+		npc:SetBaseDamageMax( normal_max_damage*1.25 )
 	else
-		npc:SetMinimumGoldBounty( normal_bounty )
-		npc:SetMaximumGoldBounty( normal_bounty )
-		npc:SetDeathXP( normal_xp )
+		npc:SetMinimumGoldBounty( normal_bounty*1.25 )
+		npc:SetMaximumGoldBounty( normal_bounty*1.25 )
+		npc:SetDeathXP( normal_xp*0.9 )
+		npc:SetBaseDamageMin( normal_min_damage/1.25 )
+		npc:SetBaseDamageMax( normal_max_damage/1.25 )
 	end
 
 	-- List of innate abilities
 	local innate_abilities = {
 		"serpent_splash_arrows",
-		"neutral_spell_immunity"
+		"neutral_spell_immunity",
+		"holdout_innate_lunar_glaive",
+		"holdout_innate_great_cleave",
+		"holdout_blink"
 	}
 
 	-- Cycle through any innate abilities found, then upgrade them

@@ -3,15 +3,22 @@
 
 "CustomHeroList"
 {
-	"npc_dota_hero_arc_warden"			"1"
-	"npc_dota_hero_brewmaster"			"1"
+	"npc_dota_hero_arc_warden"			"0" //Tarhunt
+	"npc_dota_hero_brewmaster"			"1" //Pandaren Brewmaster
 	"npc_dota_hero_crystal_maiden"		"1"
+	"npc_dota_hero_dragon_knight"		"1" //Arthas
 	"npc_dota_hero_elder_titan"			"1"
-	"npc_dota_hero_enchantress"			"1"
-	"npc_dota_hero_juggernaut"			"1"
+	"npc_dota_hero_enchantress"			"1" //Tyrande
+	"npc_dota_hero_enigma"				"1"
+	"npc_dota_hero_juggernaut"			"1" //Blademaster
 	"npc_dota_hero_lich"				"1"
-	"npc_dota_hero_omniknight"			"1"
-	"npc_dota_hero_pugna"				"1"
+	"npc_dota_hero_luna"				"1"
+	"npc_dota_hero_night_stalker"		"1" //Abyssal Underlord
+	"npc_dota_hero_omniknight"			"1" //Paladin
+	"npc_dota_hero_phantom_assassin"	"1" //Warden
+	"npc_dota_hero_pugna"				"1" //Dread Lord
+	"npc_dota_hero_rattletrap"			"1" //Space Marine
+	"npc_dota_hero_sven"				"1"
 	"npc_dota_hero_shadow_shaman"		"1"
 	"npc_dota_hero_terrorblade"			"1"
 	"npc_dota_hero_warlock"				"1"

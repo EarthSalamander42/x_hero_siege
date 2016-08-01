@@ -104,3 +104,39 @@ function ShowWearables( event )
     v:RemoveEffects(EF_NODRAW)
   end
 end
+
+-- Adds [stack_amount] stacks to a modifier
+function AddStacks(ability, caster, unit, modifier, stack_amount, refresh)
+  if unit:HasModifier(modifier) then
+    if refresh then
+      ability:ApplyDataDrivenModifier(caster, unit, modifier, {})
+    end
+    unit:SetModifierStackCount(modifier, ability, unit:GetModifierStackCount(modifier, nil) + stack_amount)
+  else
+    ability:ApplyDataDrivenModifier(caster, unit, modifier, {})
+    unit:SetModifierStackCount(modifier, ability, stack_amount)
+  end
+end
+
+-- Removes [stack_amount] stacks from a modifier
+function RemoveStacks(ability, unit, modifier, stack_amount)
+  if unit:HasModifier(modifier) then
+    if unit:GetModifierStackCount(modifier, ability) > stack_amount then
+      unit:SetModifierStackCount(modifier, ability, unit:GetModifierStackCount(modifier, ability) - stack_amount)
+    else
+      unit:RemoveModifierByName(modifier)
+    end
+  end
+end
+
+-- Checks if a hero is wielding Aghanim's Scepter
+function HasScepter(hero)
+  for i=0,5 do
+    local item = hero:GetItemInSlot(i)
+    if item and item:GetAbilityName() == "item_ultimate_scepter" then
+      return true
+    end
+  end
+  
+  return false
+end
