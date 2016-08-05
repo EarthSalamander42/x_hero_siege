@@ -6,4 +6,6 @@ function tome_use(event)
 	hero:ModifyAgility(stats)
 	hero:ModifyStrength(stats)
 	hero:ModifyIntellect(stats)
+
+--	hero:SetBaseAgility( hero:GetAgility() + stats )
 end

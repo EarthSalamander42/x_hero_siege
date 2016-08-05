@@ -39,13 +39,58 @@ local heroes = HeroList:GetAllHeroes()
 local point = Entities:FindByName( nil, "spawner_phase3_creeps_west"):GetAbsOrigin()
 local point2 = Entities:FindByName( nil, "spawner_phase3_creeps_east"):GetAbsOrigin()
 
-	for j = 1,10 do
-	local unit = CreateUnitByName("npc_dota_creep_radiant_hulk", point+RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_BADGUYS)
+	if GetMapName() == "easymode" then
+		for j = 1,8 do
+			local unit = CreateUnitByName("npc_dota_creep_radiant_hulk", point+RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_BADGUYS)
+		end
+
+		for j = 1,8 do
+			local unit = CreateUnitByName("npc_dota_creep_dire_hulk", point2+RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_BADGUYS)
+		end
+
+		for _,hero in pairs(heroes) do
+			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
+			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil)
+			hero:RemoveModifierByName("modifier_stunned")
+			hero:RemoveModifierByName("modifier_invulnerable")
+			end
+		end
+
+		elseif GetMapName() == "hardmode" then
+		for j = 1,12 do
+			local unit = CreateUnitByName("npc_dota_creep_radiant_hulk", point+RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_BADGUYS)
+		end
+
+		for j = 1,12 do
+			local unit = CreateUnitByName("npc_dota_creep_dire_hulk", point2+RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_BADGUYS)
+		end
+
+		for _,hero in pairs(heroes) do
+			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
+			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil)
+			hero:RemoveModifierByName("modifier_stunned")
+			hero:RemoveModifierByName("modifier_invulnerable")
+			end
+		end
+
+		elseif GetMapName() == "solomode" then
+		for j = 1,4 do
+			local unit = CreateUnitByName("npc_dota_creep_radiant_hulk", point+RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_BADGUYS)
+		end
+
+		for j = 1,4 do
+			local unit = CreateUnitByName("npc_dota_creep_dire_hulk", point2+RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_BADGUYS)
+		end
 	end
 
-	for j = 1,10 do
-	local unit = CreateUnitByName("npc_dota_creep_dire_hulk", point2+RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_BADGUYS)
+	for _,hero in pairs(heroes) do
+		if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
+		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil)
+		hero:RemoveModifierByName("modifier_stunned")
+		hero:RemoveModifierByName("modifier_invulnerable")
+		end
 	end
+	
 
 	for _,hero in pairs(heroes) do
 		if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
@@ -67,8 +112,7 @@ print( GameMode.BossesTop_killed )
 		DebugPrint("enable teleport trigger")
 		v:Enable()
 		end
-	Notifications:TopToAll({text="You have killed Grom, Proudmoore, Illidan and Balanar. Arthas is waiting for you.." , duration=10.0})
-	Notifications:TopToAll({text="Teleporter Activated!" , duration=10.0})
+	Notifications:TopToAll({text="You have killed Grom, Proudmoore, Illidan and Balanar. Red Teleporters Activated" , duration=10.0})
 	print( "Teleporter to 4Bosses Activated!" )
 	else return nil
 	end

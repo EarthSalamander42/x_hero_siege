@@ -10,12 +10,12 @@
 		"AbilityLayout"			"5"
 		"MovementSpeed"			"365"
 		"ModelScale"			"1.15"
-		"AttackDamageMin"		"60"
+		"AttackDamageMin"		"65"
 		"AttackDamageMax"		"75"
 		"AttackRange"			"650"
 		"AttackCapabilities"	"DOTA_UNIT_CAP_RANGED_ATTACK"
 		"ProjectileModel"		"particles/econ/items/sniper/sniper_charlie/sniper_assassinate_charlie.vpcf"
-		"GameSoundsFile"		"soundevents/game_sounds_heroes/game_sounds_sniper.vsndevts"
+		"GameSoundsFile"		"soundevents/game_sounds_heroes/game_sounds_rattletrap.vsndevts"
 		"ProjectileSpeed"		"1750"
 		"HealthBarOffset"		"170"
 
@@ -37,8 +37,8 @@
 		"AbilityLayout"			"6"
 		"MovementSpeed"			"355"
 		"ModelScale"			"1.1"
-		"AttackDamageMin"		"65"
-		"AttackDamageMax"		"80"
+		"AttackDamageMin"		"55"
+		"AttackDamageMax"		"70"
 		"AttackRange"			"180"
 		"HealthBarOffset"		"190"
 		"GameSoundsFile"		"soundevents/game_sounds_heroes/game_sounds_sniper.vsndevts"
@@ -63,8 +63,8 @@
 		"AbilityLayout"			"6"
 		"MovementSpeed"			"335"
 		"ModelScale"			"1.15"
-		"AttackDamageMin"		"60"
-		"AttackDamageMax"		"75"
+		"AttackDamageMin"		"55"
+		"AttackDamageMax"		"70"
 		"AttackRange"			"180"
 		"HealthBarOffset"		"190"
 
@@ -115,6 +115,9 @@
 		"AbilityLayout"			"5"
 		"MovementSpeed"			"340"
 
+		"AttackDamageMin"				"55"
+		"AttackDamageMax"				"70"
+
 		"Ability1"				"holdout_crushing_wave"
 		"Ability2"				"holdout_summon_water_elemental"
 		"Ability3"				"holdout_debilitation_aura"		
@@ -131,7 +134,9 @@
 	{
 		"override_hero"			"npc_dota_hero_dragon_knight"
 		"AbilityLayout"			"6"
-		"MovementSpeed"			"375"
+		"MovementSpeed"			"350"
+		"AttackDamageMin"		"21"
+		"AttackDamageMax"		"27"
 
 		"Ability1"				"holdout_holy_light"
 		"Ability2"				"holdout_divine_shield"

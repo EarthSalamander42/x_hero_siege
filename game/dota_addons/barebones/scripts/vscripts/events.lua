@@ -20,22 +20,22 @@ function GameMode:OnNPCSpawned(keys)
 	local normal_min_damage = npc:GetBaseDamageMin()
 	local normal_max_damage = npc:GetBaseDamageMax()
 
-	if GetMapName() == "x_hero_siege_8_players" then
+	if GetMapName() == "easymode" and npc:GetTeam() == DOTA_TEAM_BADGUYS then
 		npc:SetMinimumGoldBounty( normal_bounty*1.5 )
 		npc:SetMaximumGoldBounty( normal_bounty*1.5 )
 		npc:SetDeathXP( normal_xp )
 		npc:SetBaseDamageMin( normal_min_damage )
 		npc:SetBaseDamageMax( normal_max_damage )
-	elseif GetMapName() == "hardmode" then
+	elseif GetMapName() == "hardmode" and npc:GetTeam() == DOTA_TEAM_BADGUYS then
 		npc:SetMinimumGoldBounty( normal_bounty/1.5 )
 		npc:SetMaximumGoldBounty( normal_bounty/1.5 )
 		npc:SetDeathXP( normal_xp*0.5 )
 		npc:SetBaseDamageMin( normal_min_damage*1.25 )
 		npc:SetBaseDamageMax( normal_max_damage*1.25 )
-	else
+	elseif GetMapName() == "solomode" and npc:GetTeam() == DOTA_TEAM_BADGUYS then
 		npc:SetMinimumGoldBounty( normal_bounty*1.25 )
 		npc:SetMaximumGoldBounty( normal_bounty*1.25 )
-		npc:SetDeathXP( normal_xp*0.9 )
+		npc:SetDeathXP( normal_xp*0.8 )
 		npc:SetBaseDamageMin( normal_min_damage/1.25 )
 		npc:SetBaseDamageMax( normal_max_damage/1.25 )
 	end

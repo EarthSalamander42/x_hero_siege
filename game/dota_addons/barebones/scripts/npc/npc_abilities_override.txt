@@ -51,6 +51,11 @@
 
 		"AbilitySpecial"
 	    {
+	    	"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_all_stats"		"6"
+			}
 			"04"
 			{
 				"var_type"              "FIELD_INTEGER"
@@ -126,113 +131,6 @@
 	}
 
 	//=================================================================================================================
-	// Abyssal Blade
-	//=================================================================================================================
-	"item_abyssal_blade"
-	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"ID"							"208"														// unique ID number for this item.  Do not change this once established or it will invalidate collected stats.
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
-		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
-		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
-		"AbilityUnitTargetFlags"		"DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES"
-		"FightRecapLevel"				"1"
-
-		// Stats		
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCooldown"				"45"
-		"AbilityCastRange"				"140"
-		"AbilityCastPoint"				"0.0"
-
-		// Item Info
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityManaCost"				"150"
-		"ItemCost"						"5200"
-		"ItemShopTags"					"damage;str;hard_to_tag"
-		"ItemQuality"					"epic"
-		"ItemAliases"					"abyssal blade"
-		"ItemDisassembleRule"			"DOTA_ITEM_DISASSEMBLE_ALWAYS"
-		"ItemDeclarations"				"DECLARE_PURCHASES_TO_TEAMMATES | DECLARE_PURCHASES_IN_SPEECH | DECLARE_PURCHASES_TO_SPECTATORS"
-		
-		// Special	
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilitySpecial"
-		{
-			"08"
-			{
-				"var_type"				"FIELD_FLOAT"
-				"stun_duration"			"2"
-			}
-			"01"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_damage"				"100"
-			}
-			"02"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_strength"		"10"
-			}
-			"03"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bash_chance_melee"		"0"
-			}
-			"04"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bash_chance_ranged"	"0"
-			}
-			"05"
-			{
-				"var_type"				"FIELD_FLOAT"
-				"bash_duration"			"0.0"
-			}
-			"06"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_chance_damage"	"0"
-			}	
-			"07"
-			{
-				"var_type"				"FIELD_FLOAT"
-				"bash_cooldown"			"0.0"
-			}
-			"08"
-			{
-				"var_type"				"FIELD_FLOAT"
-				"stun_duration"			"2.0"
-			}
-		}
-	}
-
-	//=================================================================================================================
-	// Recipe: Abyssal Blade
-	//=================================================================================================================
-	"item_recipe_abyssal_blade"
-	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"ID"							"207"														// unique ID number for this item.  Do not change this once established or it will invalidate collected stats.
-
-		// Item Info
-		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"						"0"	
-		"ItemShopTags"					""
-
-
-		// Recipe
-		//-------------------------------------------------------------------------------------------------------------
-		"ItemRecipe"					"1"
-		"ItemResult"					"item_abyssal_blade"
-		"ItemRequirements"
-		{
-			"01"						"item_claymore;item_relic"
-		}
-	}
-
-	//=================================================================================================================
 	// Faerie Fire
 	//=================================================================================================================
 	"item_faerie_fire"
@@ -290,7 +188,7 @@
 		"ItemStockMax"					"5"
 		"ItemStockInitial"				"0"
 		"ItemStockTime"					"60.0"			  
-		"ItemInitialStockTime"			"120.0"
+		"ItemInitialStockTime"			"180.0"
 		"ItemDeclarations"				"DECLARE_PURCHASES_TO_TEAMMATES | DECLARE_PURCHASES_TO_SPECTATORS"
 		"ItemSupport"					"1"	
 
@@ -856,47 +754,6 @@
 	}
 
 	//=================================================================================================================
-	// Arc warden: Tempest Double
-	//=================================================================================================================
-	"arc_warden_tempest_double"
-	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"MaxLevel"						"2"
-		"RequiredLevel"					"10"
-		"LevelsBetweenUpgrades"			"5"
-
-		// Casting
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCastPoint"				"0.0"
-
-		// Time		
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCooldown"				"120.0"
-
-		// Special	
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilitySpecial"
-		{
-			"01"
-			{
-				"var_type"				"FIELD_FLOAT"
-				"duration"				"25.0 40.0"
-			}
-			"02"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"health_cost_pct"		"25"
-			}
-			"03"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"mana_cost_pct"			"25"
-			}
-		}
-	}
-
-	//=================================================================================================================
 	// Shadow Hunter: Bomb Trap
 	//=================================================================================================================
 	"techies_land_mines"
@@ -1171,6 +1028,38 @@
 				"var_type"				"FIELD_INTEGER"
 				"movement_speed"		"-20"
 			}			
+		}
+	}
+
+	//=================================================================================================================
+	// Arc warden: Tempest Double
+	//=================================================================================================================
+	"arc_warden_tempest_double"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"MaxLevel"						"2"
+		"RequiredLevel"					"10"
+		"LevelsBetweenUpgrades"			"5"
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastPoint"				"0.15"
+
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"140 120"
+
+
+		// Special	
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"duration"				"40 60"
+			}
 		}
 	}
 

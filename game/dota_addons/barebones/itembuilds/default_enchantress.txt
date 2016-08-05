@@ -1,31 +1,36 @@
-"itembuilds/test_alchemist.txt"
+"itembuilds/test_enchantress.txt"
 {
-	"author"		"Valve"
-	"hero"			"npc_dota_hero_alchemist"
-	"Title"			"Recommended items for Alchemist in All Bosses Challenge"
-	
+	"author"		"[Bear] Cookies #42"
+	"hero"			"npc_dota_hero_enchantress"
+	"Title"			"Recommended items for Tyrande in X Hero Siege"
+
 	"Items"
 	{		
 		"#DOTA_Item_Build_Starting_Items"
 		{
 			"item"		"item_stout_shield"
-			"item"		"item_salve_1000"
+			"item"		"item_faerie_fire"
+			"item"		"item_mana_salve"
 		}
 		
 		"#DOTA_Item_Build_Early_Game"
 		{	
 			"item"		"item_heart"
 			"item"		"item_mekansm"
+			"item"		"item_desolator"
+
 		}
 		
 		"#DOTA_Item_Build_Core_Items"
 		{
-			"item"		"item_mekansm3"
-			"item"		"item_desolator"
+			"item"		"item_mekansm5"
+			"item"		"item_heart"
+			"item"		"item_desolator3"
 		}
 		
 		"#DOTA_Item_Build_Luxury"
 		{
+
 		}
 	}
 }

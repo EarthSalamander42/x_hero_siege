@@ -60,7 +60,7 @@ function spawn_second_phase_solo()
 	local point = Entities:FindByName( nil, "npc_dota_spawner_top_solo_1"):GetAbsOrigin()
 	Timers:CreateTimer(0, function()
 		if EntIceTower:IsAlive() then -- Level 1 lower than 6 min
-			for j = 1, 4 do
+			for j = 1, 5 do
 			local unit = CreateUnitByName("npc_ghul_II", point+RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_BADGUYS)
 			end
 		return 30 -- Rerun this timer every 30 game-time seconds
@@ -125,7 +125,6 @@ function killed_frost_tower_solo(keys)
 		local directions = {"west","north","east","south"}
 	end
 end
-
 
 final_wave_creeps = {
 	west = {
@@ -202,14 +201,10 @@ DebugPrint("Final Wave spawn")
 		local directions = {"west","north","east","south"}
 	for _,direction in pairs(directions) do
 		for i = 1,17 do
-			if GetMapName() == "solomode" then
-				final_spawn = Entities:FindAllByName("npc_dota_spawner_west_event")
-			else
-				final_spawn = Entities:FindAllByName("npc_dota_spawner_"..direction.."_event")
-			end
+			final_spawn = Entities:FindAllByName("npc_dota_spawner_"..direction.."_event")
 
 			for _,point in pairs(final_spawn) do
-			DebugPrint("spawn unit")
+				DebugPrint("spawn unit")
 				Timers:CreateTimer(function()
 				local unit = CreateUnitByName(final_wave_creeps[direction][i], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
 				unit:AddNewModifier(nil, nil, "modifier_stunned", {duration= 15,IsHidden = true})
@@ -246,19 +241,35 @@ function teleport_to_top(keys)
 	local activator = keys.activator
 	local point = Entities:FindByName(nil,"point_teleport_boss"):GetAbsOrigin()
 	local point_mag = Entities:FindByName(nil,"npc_dota_spawner_magtheridon_arena"):GetAbsOrigin()
+	local ankh = CreateItem("item_magtheridon_ankh", mag, mag)
 
 	if first_time_teleport then
 		local heroes = HeroList:GetAllHeroes()
 		print( "Magtheridon should appears now" )
-		magtheridon = CreateUnitByName("npc_dota_hero_magtheridon", point_mag  ,true,nil,nil,DOTA_TEAM_BADGUYS)
-		magtheridon:SetAngles(0, 180, 0)
-		local ankh = CreateItem("item_magtheridon_ankh", mag, mag)
 
-		ankh:SetCurrentCharges(3)
-		magtheridon:AddItem(ankh)
+		if GetMapName() == "easymode" then
+			magtheridon = CreateUnitByName("npc_dota_hero_magtheridon", point_mag  ,true,nil,nil,DOTA_TEAM_BADGUYS)
+			magtheridon:SetAngles(0, 180, 0)
+			ankh:SetCurrentCharges(3)
+			magtheridon:AddItem(ankh)
+		elseif GetMapName() == "hardmode" then
+			local point_mag2 = Entities:FindByName(nil,"npc_dota_spawner_magtheridon_arena2"):GetAbsOrigin()
+			magtheridon = CreateUnitByName("npc_dota_hero_magtheridon", point_mag  ,true,nil,nil,DOTA_TEAM_BADGUYS)
+			magtheridon2 = CreateUnitByName("npc_dota_hero_magtheridon", point_mag2  ,true,nil,nil,DOTA_TEAM_BADGUYS)
+			magtheridon:SetAngles(0, 180, 0)
+			magtheridon2:SetAngles(0, 0, 0)
+			magtheridon:AddItem(ankh)
+			magtheridon2:AddItem(ankh)
+			ankh:SetCurrentCharges(1)
+		elseif GetMapName() == "solomode" then
+			magtheridon = CreateUnitByName("npc_dota_hero_magtheridon", point_mag  ,true,nil,nil,DOTA_TEAM_BADGUYS)
+			magtheridon:SetAngles(0, 180, 0)
+		end
 
 		magtheridon:AddNewModifier(nil, nil, "modifier_stunned",nil)
 		magtheridon:AddNewModifier(nil, nil, "modifier_invulnerable",nil)
+		magtheridon2:AddNewModifier(nil, nil, "modifier_stunned",nil)
+		magtheridon2:AddNewModifier(nil, nil, "modifier_invulnerable",nil)
 		Timers:CreateTimer(10,StartMagtheridonFight)
 		for _,hero in pairs(heroes) do
 			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
@@ -280,8 +291,11 @@ function StartMagtheridonFight()
 
   magtheridon:RemoveModifierByName("modifier_stunned")
   magtheridon:RemoveModifierByName("modifier_invulnerable")
+  magtheridon2:RemoveModifierByName("modifier_stunned")
+  magtheridon2:RemoveModifierByName("modifier_invulnerable")
 
   magtheridon = nil
+  magtheridon2 = nil
 
   for _,hero in pairs(heroes) do
 	  if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
@@ -298,14 +312,25 @@ local teleporters2 = Entities:FindAllByName("trigger_teleport2")
 	GameMode.Magtheridon_killed = GameMode.Magtheridon_killed +1
 	print( GameMode.Magtheridon_killed )
 
-	if GameMode.Magtheridon_killed > 3 then
+	if GameMode.Magtheridon_killed > 3 and GetMapName() == "easymode" then
 		for _,v in pairs(teleporters2) do
-		DebugPrint("enable teleport trigger")
-		v:Enable()
+			DebugPrint("enable teleport trigger")
+			v:Enable()
 		end
-	Notifications:TopToAll({text="You have killed Magtheridon. Grom, Proudmoore, Illidan and Balanar are waiting for you.." , duration=10.0})
-	Notifications:TopToAll({text="Teleporter Activated!" , duration=10.0})
-	print( "Teleporter to 4Bosses Activated!" )
-	else return nil
+		Notifications:TopToAll({text="You have killed Magtheridon. Blue teleporters activated." , duration=10.0})
+
+	elseif GameMode.Magtheridon_killed > 2 and GetMapName() == "hardmode" then
+		for _,v in pairs(teleporters2) do
+			DebugPrint("enable teleport trigger")
+			v:Enable()
+		end
+		Notifications:TopToAll({text="You have killed Magtheridon. Blue teleporters activated." , duration=10.0})
+
+	elseif GameMode.Magtheridon_killed > 0 and GetMapName() == "solomode" then
+		for _,v in pairs(teleporters2) do
+			DebugPrint("enable teleport trigger")
+			v:Enable()
+		end
+		Notifications:TopToAll({text="You have killed Magtheridon. Blue teleporters activated." , duration=10.0})
 	end
 end

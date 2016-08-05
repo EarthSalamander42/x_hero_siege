@@ -89,7 +89,7 @@ function GameMode:OnGameInProgress()
 	--//=================================================================================================================
 	--// Timer: Creeps Level 1, 5 West 1
 	--//=================================================================================================================
-	if GetMapName() == "x_hero_siege_8_players" then -- 8 Players Creep Lanes
+	if GetMapName() == "easymode" then -- 8 Players Creep Lanes
 	local time_elapsed = 0
 	local EntBarrack = Entities:FindByName( nil, "dota_badguys_barracks_west_1" )
 		Timers:CreateTimer(0, function()
@@ -1111,7 +1111,7 @@ function GameMode:OnGameInProgress()
 	Timers:CreateTimer(301, function() -- 5 Min: DEATH PROPHET WEST EVENT 1
 	local point = Entities:FindByName( nil, "npc_dota_spawner_west_event"):GetAbsOrigin()
 
-	if GetMapName() == "x_hero_siege_8_players" then
+	if GetMapName() == "easymode" then
 		for j = 1, 10 do
 			local unit = CreateUnitByName("npc_dota_creature_necrolyte_event_1", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		end
@@ -1131,7 +1131,7 @@ function GameMode:OnGameInProgress()
 	--//=================================================================================================================
 	Timers:CreateTimer(601, function() -- 10 Min: NAGA SIREN NORTH EVENT 2
 	local point = Entities:FindByName( nil, "npc_dota_spawner_north_event"):GetAbsOrigin()
-	if GetMapName() == "x_hero_siege_8_players" then
+	if GetMapName() == "easymode" then
 		for j = 1, 10 do
 			local unit = CreateUnitByName("npc_dota_creature_naga_siren_event_2", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		end
@@ -1151,7 +1151,7 @@ function GameMode:OnGameInProgress()
 	--//=================================================================================================================
 	Timers:CreateTimer(901, function() -- 15 Min: VENGEFUL SPIRIT SOUTH EVENT 3
 	local point = Entities:FindByName( nil, "npc_dota_spawner_east_event"):GetAbsOrigin()
-	if GetMapName() == "x_hero_siege_8_players" then
+	if GetMapName() == "easymode" then
 		for j = 1, 10 do
 			local unit = CreateUnitByName("npc_dota_creature_vengeful_spirit_event_3", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		end
@@ -1171,7 +1171,7 @@ function GameMode:OnGameInProgress()
 	--//=================================================================================================================
 	Timers:CreateTimer(1201, function() -- 20 Min: CAPTAIN SOUTH EVENT 4
 	local point = Entities:FindByName( nil, "npc_dota_spawner_south_event"):GetAbsOrigin()
-	if GetMapName() == "x_hero_siege_8_players" then
+	if GetMapName() == "easymode" then
 		for j = 1, 10 do
 			local unit = CreateUnitByName("npc_dota_creature_captain_event_4", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		end
@@ -1191,7 +1191,7 @@ function GameMode:OnGameInProgress()
 	--//=================================================================================================================
 	Timers:CreateTimer(1501, function() -- 25 Min: SLARDARS EVENT 5
 	local point = Entities:FindByName( nil, "npc_dota_spawner_west_event"):GetAbsOrigin()
-	if GetMapName() == "x_hero_siege_8_players" then
+	if GetMapName() == "easymode" then
 		for j = 1, 10 do
 			local unit = CreateUnitByName("npc_dota_creature_slardar_event_5", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		end
@@ -1211,7 +1211,7 @@ function GameMode:OnGameInProgress()
 	--//=================================================================================================================
 	Timers:CreateTimer(1801, function() -- 30 Min: CHAOS KNIGHTS EVENT 6
 	local point = Entities:FindByName( nil, "npc_dota_spawner_north_event"):GetAbsOrigin()
-	if GetMapName() == "x_hero_siege_8_players" then
+	if GetMapName() == "easymode" then
 		for j = 1, 10 do
 			local unit = CreateUnitByName("npc_dota_creature_chaos_knight_event_6", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		end
@@ -1328,7 +1328,7 @@ function GameMode:InitGameMode()
 	mode:SetUseCustomHeroLevels( true )
 	mode:SetBuybackEnabled( false )
 
-	if GetMapName() == "x_hero_siege_8_players" then
+	if GetMapName() == "easymode" then
 		GameRules:SetCustomGameTeamMaxPlayers( DOTA_TEAM_GOODGUYS, 8 )
 		GameRules:SetCustomGameTeamMaxPlayers( DOTA_TEAM_BADGUYS, 0 )
 		mode:SetFixedRespawnTime( 45 )

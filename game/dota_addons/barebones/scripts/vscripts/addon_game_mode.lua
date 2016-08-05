@@ -51,6 +51,7 @@ function Precache( context )
 	PrecacheResource( "particle_folder", "particles/units/heroes/hero_stormspirit", context )
 	PrecacheResource( "particle_folder", "particles/units/heroes/hero_ursa", context )
 	PrecacheResource( "particle_folder", "particles/units/heroes/hero_venomancer", context )
+	PrecacheResource( "particle_folder", "particles/units/heroes/hero_arc_warden", context )
 	PrecacheResource( "particle_folder", "particles/items_fx", context )
 
 	-- PRECACHE SOUNDS
@@ -78,6 +79,7 @@ function Precache( context )
 	PrecacheResource( "soundfile", "soundevents/game_sounds_heroes/game_sounds_leshrac.vsndevts", context )
 	PrecacheResource( "soundfile", "soundevents/game_sounds_heroes/game_sounds_techies.vsndevts", context )
 	PrecacheResource( "soundfile", "soundevents/game_sounds_heroes/game_sounds_ursa.vsndevts", context )
+	PrecacheResource( "soundfile", "soundevents/game_sounds_heroes/game_sounds_arc_warden.vsndevts", context )
 
 	-- PHASE 1
 	PrecacheUnitByNameSync( "npc_dota_creature_mini_lifestealers", context)

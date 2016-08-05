@@ -2724,7 +2724,7 @@
 
 		// Status
 		//----------------------------------------------------------------
-		"StatusHealth"				"2975"			// Base health.
+		"StatusHealth"				"1975"			// Base health.
 		"StatusHealthRegen"			"5.0"			// Health regeneration rate.
 		"StatusMana"				"1360"			// Base mana.
 		"StatusManaRegen"			"1.5"			// Mana regeneration rate.
@@ -2800,7 +2800,7 @@
 
 		// Abilities
 		//----------------------------------------------------------------
-		"Ability1"					""			// Ability 1.
+		"Ability1"					"creature_starfall"			// Ability 1.
 		"Ability2"					""			// Ability 2.
 		"Ability3"					""			// Ability 3.
 		"Ability4"					""			// Ability 4.
@@ -2828,9 +2828,9 @@
 
 		// Bounty
 		//----------------------------------------------------------------
-		"BountyXP"					"110"	// Experience earn.
-		"BountyGoldMin"				"250"		// Gold earned min.
-		"BountyGoldMax"				"300"		// Gold earned max.
+		"BountyXP"					"110"		// Experience earn.
+		"BountyGoldMin"				"300"		// Gold earned min.
+		"BountyGoldMax"				"350"		// Gold earned max.
 
 		// Bounds
 		//----------------------------------------------------------------
@@ -2866,7 +2866,7 @@
 		"VisionDaytimeRange"		"1400"		// Range of vision during day light.
 		"VisionNighttimeRange"		"1400"		// Range of vision at night time.
 
-		"vscripts"					"ai/creeps_ai.lua"
+		"vscripts"					"ai/naga_ai.lua"
 
 		// Creature Data
 		//----------------------------------------------------------------------------------------------------------------------
@@ -2925,7 +2925,7 @@
 		// Abilities
 		//----------------------------------------------------------------
 		
-		"Ability1"					""			// Ability 1.
+		"Ability1"					"creature_spiked_carapace"			// Ability 1.
 		"Ability2"					""			// Ability 2.
 		"Ability3"					""			// Ability 3.
 		"Ability4"					""			// Ability 4.
@@ -2938,9 +2938,9 @@
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
-		"AttackDamageMin"			"450"		// Damage range min.
-		"AttackDamageMax"			"455"		// Damage range max.
-		"AttackRate"				"0.75"		// Speed of attack.
+		"AttackDamageMin"			"395"		// Damage range min.
+		"AttackDamageMax"			"405"		// Damage range max.
+		"AttackRate"				"0.95"		// Speed of attack.
 		"AttackAnimationPoint"		"0.33"		// Normalized time in animation cycle to attack.
 		"AttackAcquisitionRange"	"1000"		// Range within a target can be acquired.
 		"AttackRange"				"400"		// Range within a target can be attacked.
@@ -2988,7 +2988,7 @@
 		"VisionDaytimeRange"		"2000"		// Range of vision during day light.
 		"VisionNighttimeRange"		"2000"		// Range of vision at night time.
 
-		"vscripts"					"ai/creeps_ai.lua"
+		"vscripts"					"ai/vengeful_ai.lua"
 
 		// Creature Data
 		//----------------------------------------------------------------------------------------------------------------------
@@ -3039,10 +3039,10 @@
 
 		// Abilities
 		//----------------------------------------------------------------
-//		"Ability1"					"creature_malefice"				// Ability 1.
-//		"Ability2"					"creature_demonic_silence"		// Ability 2.
-//		"Ability3"					"creature_midnight_pulse"		// Ability 3.
-		"Ability4"					"dragon_knight_dragon_blood"			// Ability 4.
+//		"Ability1"					"dragon_knight_dragon_blood"				// Ability 1.
+//		"Ability2"					""		// Ability 2.
+//		"Ability3"					""		// Ability 3.
+		"Ability4"					""		// Ability 4.
 
 		// Inventory
 		//----------------------------------------------------------------
@@ -3411,9 +3411,9 @@
 
 	// Bounty
 	//----------------------------------------------------------------
-	"BountyXP"					"100"     // Experience earn.
-	"BountyGoldMin"				"600"     // Gold earned min.
-	"BountyGoldMax"				"800"     // Gold earned max.
+	"BountyXP"					"90"     // Experience earn.
+	"BountyGoldMin"				"900"     // Gold earned min.
+	"BountyGoldMax"				"1050"     // Gold earned max.
 
 	// Bounds
 	//----------------------------------------------------------------
@@ -3740,7 +3740,7 @@
 		
 			// Armor
 			//----------------------------------------------------------------
-			"ArmorPhysical"       "110"     // Physical protection.
+			"ArmorPhysical"       "175"     // Physical protection.
 			"MagicalResistance"       "0"     // Magical protection.
 		
 			// Attack
@@ -3773,7 +3773,7 @@
 
 			// Status
 			//----------------------------------------------------------------
-			"StatusHealth"        "56000"     // Base health.
+			"StatusHealth"        "23000"     // Base health.
 			"StatusHealthRegen"     "2"     // Health regeneration rate.
 			"StatusMana"        "0"     // Base mana.
 			"StatusManaRegen"     "0"     // Mana regeneration rate.
@@ -3822,7 +3822,7 @@
 	
 		// Armor
 		//----------------------------------------------------------------
-		"ArmorPhysical"       "100"     // Physical protection.
+		"ArmorPhysical"       "150"     // Physical protection.
 		"MagicalResistance"       "0"     // Magical protection.
 	
 		// Attack
@@ -3855,7 +3855,7 @@
 	
 		// Status
 		//----------------------------------------------------------------
-		"StatusHealth"        "56000"     // Base health.
+		"StatusHealth"        "23000"     // Base health.
 		"StatusHealthRegen"     "2"     // Health regeneration rate.
 		"StatusMana"        "600"     // Base mana.
 		"StatusManaRegen"     "0.67"     // Mana regeneration rate.
@@ -3902,7 +3902,7 @@
 	
 		// Armor
 		//----------------------------------------------------------------
-		"ArmorPhysical"       "90"     // Physical protection.
+		"ArmorPhysical"       "135"     // Physical protection.
 		"MagicalResistance"       "0"     // Magical protection.
 	
 		// Attack
@@ -3935,7 +3935,7 @@
 	
 		// Status
 		//----------------------------------------------------------------
-		"StatusHealth"        "56000"     // Base health.
+		"StatusHealth"        "23000"     // Base health.
 		"StatusHealthRegen"     "2"     // Health regeneration rate.
 		"StatusMana"        "300"     // Base mana.
 		"StatusManaRegen"     "0.67"     // Mana regeneration rate.
@@ -3989,7 +3989,7 @@
 	
 		// Armor
 		//----------------------------------------------------------------
-		"ArmorPhysical"       "70"     // Physical protection.
+		"ArmorPhysical"       "120"     // Physical protection.
 		"MagicalResistance"       "0"     // Magical protection.
 	
 		// Attack
@@ -4022,7 +4022,7 @@
 	
 		// Status
 		//----------------------------------------------------------------
-		"StatusHealth"        "56000"     // Base health.
+		"StatusHealth"        "23000"     // Base health.
 		"StatusHealthRegen"     "2"     // Health regeneration rate.
 		"StatusMana"        "600"     // Base mana.
 		"StatusManaRegen"     "0.67"     // Mana regeneration rate.
@@ -4059,7 +4059,7 @@
 		"SoundSet"					"Hero_NightStalker"							// Name of sound set.
 		"ConsideredHero"			"1"
 		"Portrait"					"vgui/hud/heroportraits/portrait_nightstalker"
-		"ModelScale"                "2.1"
+		"ModelScale"                "1.7"
 		"HealthBarOffset"			"200"
 		"Level"						"10"
 //		"AbilityLayout"             "6"
@@ -4082,11 +4082,11 @@
 		"Ability16"       ""
 	
 		"ArmorPhysical"       "220"                 // Physical protection.
-		"MagicalResistance"       "0"                 // Magical protection (percentage).
+		"MagicalResistance"       "20"                 // Magical protection (percentage).
 	
 		"AttackCapabilities"    "DOTA_UNIT_CAP_MELEE_ATTACK"
-		"AttackDamageMin"     "34999"                   // Damage range min.
-		"AttackDamageMax"     "35001"                   // Damage range max.
+		"AttackDamageMin"     "24999"                   // Damage range min.
+		"AttackDamageMax"     "25001"                   // Damage range max.
 		"AttackRate"                "1.0"                                  // Speed of attack.
 		"AttackAnimationPoint"      "0.33"                                   // Normalized time in animation cycle to attack.
 		"AttackAcquisitionRange"    "1000"                                   // Range within a target can be acquired.
@@ -4095,17 +4095,17 @@
 		"ProjectileSpeed"           ""                                     // Speed of projectile.
 
 		"BountyXP"          "300"                 // Experience earn.
-		"BountyGoldMin"       "7400"                   // Gold earned min.
-		"BountyGoldMax"       "7600"                   // Gold earned max.
+		"BountyGoldMin"       "8400"                   // Gold earned min.
+		"BountyGoldMax"       "8600"                   // Gold earned max.
 	
 		"BoundsHullName"      "DOTA_HULL_SIZE_HUGE"
 		//"RingRadius"        "70"
 	
 		"MovementCapabilities"    "DOTA_UNIT_CAP_MOVE_GROUND"
-		"MovementSpeed"       "400"                 // Speed.
+		"MovementSpeed"       "300"                 // Speed.
 		"MovementTurnRate"      "0.6"                 // Turning rate.
 	
-		"StatusHealth"        "80000"                 // Base health.
+		"StatusHealth"        "50000"                 // Base health.
 		"StatusHealthRegen"     "10.0"                 // Health regeneration rate.
 		"StatusMana"        "5000"                   // Base mana.
 		"StatusManaRegen"     "100"                 // Mana regeneration rate.
@@ -4132,7 +4132,7 @@
 		"SoundSet"					"Hero_Juggernaut"							// Name of sound set.
 		"ConsideredHero"			"1"
 		"Portrait"					"vgui/hud/heroportraits/portrait_juggernaut"
-		"ModelScale"                "2.1"
+		"ModelScale"                "1.7"
 		"HealthBarOffset"			"200"
 		"Level"						"10"
 		
@@ -4146,11 +4146,11 @@
 		"Ability8"        ""
 	
 		"ArmorPhysical"       "220"                 // Physical protection.
-		"MagicalResistance"       "0"                 // Magical protection (percentage).
+		"MagicalResistance"       "20"                 // Magical protection (percentage).
 	
 		"AttackCapabilities"    "DOTA_UNIT_CAP_MELEE_ATTACK"
-		"AttackDamageMin"     "20002"                   // Damage range min.
-		"AttackDamageMax"     "20012"                   // Damage range max.
+		"AttackDamageMin"     "14999"                   // Damage range min.
+		"AttackDamageMax"     "15001"                   // Damage range max.
 		"AttackRate"                "1.0"                                  // Speed of attack.
 		"AttackAnimationPoint"      "0.33"                                   // Normalized time in animation cycle to attack.
 		"AttackAcquisitionRange"    "1000"                                   // Range within a target can be acquired.
@@ -4166,7 +4166,7 @@
 		"RingRadius"					"100"
 	
 		"MovementCapabilities"    "DOTA_UNIT_CAP_MOVE_GROUND"
-		"MovementSpeed"       "400"                 // Speed.
+		"MovementSpeed"       "300"                 // Speed.
 		"MovementTurnRate"      "0.6"                 // Turning rate.
 	
 		"StatusHealth"        "80000"                 // Base health.
@@ -4201,7 +4201,7 @@
 		"IdleExpression"            "scenes/antimage/antimage_exp_idle_01.vcd"      // custom facial animation idle
 	
 		"Portrait"                  "vgui/hud/heroportraits/portrait_antimage"
-		"ModelScale"                "2.1"
+		"ModelScale"                "1.7"
 		"Level"						"10"
 		"NameAliases"               "demonhunter"
 		"url"						"Demonhunter"
@@ -4219,7 +4219,7 @@
 		"Ability8"        ""
 
 		"ArmorPhysical"       "220"                 // Physical protection.
-		"MagicalResistance"       "0"                 // Magical protection (percentage).
+		"MagicalResistance"       "20"                 // Magical protection (percentage).
 	
 		"AttackCapabilities"    "DOTA_UNIT_CAP_MELEE_ATTACK"
 		"AttackDamageMin"     "24999"                   // Damage range min.
@@ -4239,7 +4239,7 @@
 		"RingRadius"				"100"
 	
 		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"
-		"MovementSpeed"				"400"                 // Speed.
+		"MovementSpeed"				"300"                 // Speed.
 		"MovementTurnRate"			"0.5"                 // Turning rate.
 	
 		"StatusHealth"				"80000"                 // Base health.
@@ -4260,7 +4260,7 @@
 		"SoundSet"					"Hero_Kunka"							// Name of sound set.
 		"ConsideredHero"			"1"
 		"Portrait"					"vgui/hud/heroportraits/portrait_kunka"
-		"ModelScale"                "2.1"
+		"ModelScale"                "1.7"
 		"HealthBarOffset"			"200"
 		"Level"						"10"
 		
@@ -4282,11 +4282,11 @@
 		"Ability16"       ""
 	
 		"ArmorPhysical"       "150"                 // Physical protection.
-		"MagicalResistance"       "0"                 // Magical protection (percentage).
+		"MagicalResistance"       "20"                 // Magical protection (percentage).
 	
 		"AttackCapabilities"    "DOTA_UNIT_CAP_MELEE_ATTACK"
-		"AttackDamageMin"     "20002"                   // Damage range min.
-		"AttackDamageMax"     "20012"                   // Damage range max.
+		"AttackDamageMin"     "12499"                   // Damage range min.
+		"AttackDamageMax"     "12501"                   // Damage range max.
 		"AttackRate"                "1.0"                                  // Speed of attack.
 		"AttackAnimationPoint"      "0.33"                                   // Normalized time in animation cycle to attack.
 		"AttackAcquisitionRange"    "1000"                                   // Range within a target can be acquired.
@@ -4310,7 +4310,7 @@
 		//"RingRadius"        "70"
 	
 		"MovementCapabilities"    "DOTA_UNIT_CAP_MOVE_GROUND"
-		"MovementSpeed"       "400"                 // Speed.
+		"MovementSpeed"       "300"                 // Speed.
 		"MovementTurnRate"      "0.6"                 // Turning rate.
 	
 		"StatusHealth"        "40000"                 // Base health.
@@ -4356,7 +4356,7 @@
 		
 			// Armor
 			//----------------------------------------------------------------
-			"ArmorPhysical"			"100"     // Physical protection.
+			"ArmorPhysical"			"150"     // Physical protection.
 			"MagicalResistance"		"0"     // Magical protection.
 		
 			// Attack
@@ -4389,7 +4389,7 @@
 		
 			// Status
 			//----------------------------------------------------------------
-			"StatusHealth"        "56000"     // Base health.
+			"StatusHealth"        "23000"     // Base health.
 			"StatusHealthRegen"     "2"     // Health regeneration rate.
 			"StatusMana"        "300"     // Base mana.
 			"StatusManaRegen"     "1"     // Mana regeneration rate.
@@ -4471,7 +4471,7 @@
 	
 		// Status
 		//----------------------------------------------------------------
-		"StatusHealth"        "56000"     // Base health.
+		"StatusHealth"        "23000"     // Base health.
 		"StatusHealthRegen"     "2"     // Health regeneration rate.
 		"StatusMana"        "300"     // Base mana.
 		"StatusManaRegen"     "0.67"     // Mana regeneration rate.
@@ -4557,7 +4557,7 @@
 	
 		// Status
 		//----------------------------------------------------------------
-		"StatusHealth"        "56000"     // Base health.
+		"StatusHealth"        "23000"     // Base health.
 		"StatusHealthRegen"     "2"     // Health regeneration rate.
 		"StatusMana"        "600"     // Base mana.
 		"StatusManaRegen"     "0.67"     // Mana regeneration rate.
@@ -4601,7 +4601,7 @@
 		
 			// Armor
 			//----------------------------------------------------------------
-			"ArmorPhysical"       "120"     // Physical protection.
+			"ArmorPhysical"       "200"     // Physical protection.
 			"MagicalResistance"       "0"     // Magical protection.
 		
 			// Attack
@@ -4634,7 +4634,7 @@
 		
 			// Status
 			//----------------------------------------------------------------
-			"StatusHealth"        "56000"     // Base health.
+			"StatusHealth"        "23000"     // Base health.
 			"StatusHealthRegen"     "2"     // Health regeneration rate.
 			"StatusMana"        "0"     // Base mana.
 			"StatusManaRegen"     "0"     // Mana regeneration rate.
@@ -4687,7 +4687,7 @@
 	
 		// Armor
 		//----------------------------------------------------------------
-		"ArmorPhysical"       "100"     // Physical protection.
+		"ArmorPhysical"       "150"     // Physical protection.
 		"MagicalResistance"       "0"     // Magical protection.
 	
 		// Attack
@@ -4720,7 +4720,7 @@
 	
 		// Status
 		//----------------------------------------------------------------
-		"StatusHealth"        "56000"     // Base health.
+		"StatusHealth"        "23000"     // Base health.
 		"StatusHealthRegen"     "2"     // Health regeneration rate.
 		"StatusMana"        "600"     // Base mana.
 		"StatusManaRegen"     "0.67"     // Mana regeneration rate.
@@ -4772,7 +4772,7 @@
 		
 			// Armor
 			//----------------------------------------------------------------
-			"ArmorPhysical"       "100"     // Physical protection.
+			"ArmorPhysical"       "150"     // Physical protection.
 			"MagicalResistance"       "0"     // Magical protection.
 		
 			// Attack
@@ -4805,7 +4805,7 @@
 		
 			// Status
 			//----------------------------------------------------------------
-			"StatusHealth"        "56000"     // Base health.
+			"StatusHealth"        "23000"     // Base health.
 			"StatusHealthRegen"     "2"     // Health regeneration rate.
 			"StatusMana"        "0"     // Base mana.
 			"StatusManaRegen"     "0"     // Mana regeneration rate.
@@ -4833,7 +4833,7 @@
 				}
 			}
 		 }
-	//npc_captain_final_wave
+
 	"npc_marine_final_wave"
 	  {
 		// General
@@ -4854,7 +4854,7 @@
 	
 		// Armor
 		//----------------------------------------------------------------
-		"ArmorPhysical"       "100"     // Physical protection.
+		"ArmorPhysical"       "150"     // Physical protection.
 		"MagicalResistance"       "0"     // Magical protection.
 	
 		// Attack
@@ -4887,7 +4887,7 @@
 	
 		// Status
 		//----------------------------------------------------------------
-		"StatusHealth"        "56000"     // Base health.
+		"StatusHealth"        "23000"     // Base health.
 		"StatusHealthRegen"     "2"     // Health regeneration rate.
 		"StatusMana"        "600"     // Base mana.
 		"StatusManaRegen"     "0.67"     // Mana regeneration rate.
@@ -4940,7 +4940,7 @@
 	
 		// Armor
 		//----------------------------------------------------------------
-		"ArmorPhysical"       "90"     // Physical protection.
+		"ArmorPhysical"       "135"     // Physical protection.
 		"MagicalResistance"       "0"     // Magical protection.
 	
 		// Attack
@@ -4973,7 +4973,7 @@
 	
 		// Status
 		//----------------------------------------------------------------
-		"StatusHealth"        "56000"     // Base health.
+		"StatusHealth"        "23000"     // Base health.
 		"StatusHealthRegen"     "2"     // Health regeneration rate.
 		"StatusMana"        "300"     // Base mana.
 		"StatusManaRegen"     "0.67"     // Mana regeneration rate.
@@ -5019,7 +5019,7 @@
 	
 		// Armor
 		//----------------------------------------------------------------
-		"ArmorPhysical"       "75"     // Physical protection.
+		"ArmorPhysical"       "120"     // Physical protection.
 		"MagicalResistance"       "0"     // Magical protection.
 	
 		// Attack
@@ -5052,7 +5052,7 @@
 	
 		// Status
 		//----------------------------------------------------------------
-		"StatusHealth"        "56000"     // Base health.
+		"StatusHealth"        "23000"     // Base health.
 		"StatusHealthRegen"     "2"     // Health regeneration rate.
 		"StatusMana"        "600"     // Base mana.
 		"StatusManaRegen"     "0.67"     // Mana regeneration rate.
@@ -5104,7 +5104,7 @@
 		
 			// Armor
 			//----------------------------------------------------------------
-			"ArmorPhysical"       "130"     // Physical protection.
+			"ArmorPhysical"       "225"     // Physical protection.
 			"MagicalResistance"       "0"     // Magical protection.
 		
 			// Attack
@@ -5137,7 +5137,7 @@
 		
 			// Status
 			//----------------------------------------------------------------
-			"StatusHealth"        "56000"     // Base health.
+			"StatusHealth"        "23000"     // Base health.
 			"StatusHealthRegen"     "2"     // Health regeneration rate.
 			"StatusMana"        "0"     // Base mana.
 			"StatusManaRegen"     "0"     // Mana regeneration rate.
@@ -5220,7 +5220,7 @@
 	
 		// Status
 		//----------------------------------------------------------------
-		"StatusHealth"        "56000"     // Base health.
+		"StatusHealth"        "23000"     // Base health.
 		"StatusHealthRegen"     "2"     // Health regeneration rate.
 		"StatusMana"        "600"     // Base mana.
 		"StatusManaRegen"     "0.67"     // Mana regeneration rate.
@@ -5259,7 +5259,7 @@
 		"SoundSet"					"Hero_Magnataur"							// Name of sound set.
 		"ConsideredHero"			"1"
 		"Portrait"					"vgui/hud/heroportraits/portrait_centaur"
-		"ModelScale"                "2.5"
+		"ModelScale"                "2.3"
 		"Level"						"100"
 		"AbilityLayout"             "5"
 
@@ -5336,7 +5336,7 @@
 	"SoundSet"					"Hero_Juggernaut"							// Name of sound set.
 	"ConsideredHero"			"1"
 	"Portrait"					"vgui/hud/heroportraits/portrait_juggernaut"
-	"ModelScale"                "2.1"
+	"ModelScale"                "2.0"
 	"HealthBarOffset"			"200"
 	"Level"						"100"
 	
@@ -5650,7 +5650,7 @@
 		"SoundSet"					"Hero_Kunka"							// Name of sound set.
 		"ConsideredHero"			"1"
 		"Portrait"					"vgui/hud/heroportraits/portrait_kunka"
-		"ModelScale"                "2.1"
+		"ModelScale"                "2.0"
 		"HealthBarOffset"			"200"
 		"Level"						"10"
 
@@ -6787,7 +6787,7 @@
 		"IdleExpression"            "scenes/antimage/antimage_exp_idle_01.vcd"      // custom facial animation idle
 	
 		"Portrait"                  "vgui/hud/heroportraits/portrait_antimage"
-		"ModelScale"                "2.1"
+		"ModelScale"                "2.0"
 		"Level"						"100"
 		"NameAliases"               "demonhunter"
 		"url"               "Demonhunter"
@@ -6852,7 +6852,7 @@
 		"SoundSet"					"Hero_NightStalker"							// Name of sound set.
 		"ConsideredHero"			"1"
 		"Portrait"					"vgui/hud/heroportraits/portrait_nightstalker"
-		"ModelScale"                "2.1"
+		"ModelScale"                "2.0"
 		"HealthBarOffset"			"300"
 		"Level"						"100"
 		"AbilityLayout"             "6"
@@ -8102,7 +8102,7 @@
 		// Bounds
 		//----------------------------------------------------------------
 		"BoundsHullName"			"DOTA_HULL_SIZE_REGULAR"      // Hull type used for navigation/locomotion.
-		"RingRadius"				"160"
+		"RingRadius"				"120"
 		"HealthBarOffset"			"450"
 	
 		// Movement

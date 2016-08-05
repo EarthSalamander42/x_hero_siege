@@ -135,7 +135,7 @@ function ShadowWave( keys )
         end
 
         -- Find all the units in bounce radius
-        local units = FindUnitsInRadius(caster:GetTeam(), target_location, nil, bounce_radius, ability:GetAbilityTargetTeam(), DOTA_UNIT_TARGET_BASIC + DOTA_UNIT_TARGET_MECHANICAL, 0, FIND_CLOSEST, false)
+        local units = FindUnitsInRadius(caster:GetTeam(), target_location, nil, bounce_radius, ability:GetAbilityTargetTeam(), DOTA_UNIT_TARGET_BASIC, 0, FIND_CLOSEST, false)
         
         -- HURT UNITS --
         -- check for hurt units if we havent healed a unit yet

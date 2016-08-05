@@ -3,7 +3,7 @@ require('libraries/timers')
 
 function Spawn( entityKeyValues )
 	Ability_stormbolt = thisEntity:FindAbilityByName("roshan_stormbolt")
-	Ability_clap = thisEntity:FindAbilityByName("roshan_clap")
+	Ability_clap = thisEntity:FindAbilityByName("creature_thunder_clap")
 	roshan_grow = thisEntity:FindAbilityByName("roshan_grow")
 	waypoints = {
 				{Entities:FindByName(nil, "roshan_wp_"..1),Entities:FindByName(nil, "roshan_wp_"..2),Entities:FindByName(nil, "roshan_wp_"..3),Entities:FindByName(nil, "roshan_wp_"..4)},

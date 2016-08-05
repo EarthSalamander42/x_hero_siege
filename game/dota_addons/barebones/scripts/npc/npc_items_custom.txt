@@ -105,12 +105,12 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"bonus_damage"			"1000"
+				"bonus_damage"			"1200"
 			}
 			"02"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"consumed_damage"		"500"
+				"consumed_damage"		"600"
 			}
 		}
 
@@ -411,7 +411,7 @@
 	
 		"ItemShopTags"					"artifact"
 		"ItemQuality"					"artifact"
-		
+
 		"ItemStackable" "0"
 		"ItemInitialCharges"			"1"
 		"ItemPermanent" "0"
@@ -1825,7 +1825,7 @@
 	        "03"
 			{
 				"var_type"						"FIELD_INTEGER"
-				"extra_spell_damage_percent"	"-50"
+				"extra_spell_damage_percent"	"-100"
 			}
 			"04"
 			{
@@ -1835,7 +1835,7 @@
 			"05"
 			{
 				"var_type"						"FIELD_INTEGER"
-				"bonus_movement"				"-50"
+				"bonus_movement"				"-60"
 			}
 			"06"
 			{
@@ -1845,7 +1845,7 @@
 			"07"
 			{
 				"var_type"						"FIELD_INTEGER"
-				"slow_tooltip"					"50"
+				"slow_tooltip"					"60"
 			}
 	    }
 	    
