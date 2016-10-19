@@ -127,7 +127,7 @@ function arthas_boss_die(caster)
 	StartAnimation(caster, {duration=6.0, activity=ACT_DOTA_FLAIL, rate=0.75})
 
 	Timers:CreateTimer(6, function()
-		StartAnimation(caster, {duration=6.0, activity=ACT_DOTA_DIE, rate=0.40})
+		StartAnimation(caster, {duration=6.0, activity=ACT_DOTA_DIE, rate=0.45})
 		EmitSoundOn("skeleton_king_wraith_death_long_09", caster)
 		EmitSoundOn("skeleton_king_wraith_death_long_09", caster)
 	end)

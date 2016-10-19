@@ -5572,11 +5572,10 @@
 		"Ability3"					"unholy_aura"
 		"Ability4"					"creature_thunder_clap"
 		"Ability5"					"howl_of_terror"
-//		"Ability6"					"neutral_spell_immunity"
-		"Ability7"					"ability_unit_died_magtheridon_boss"
-		"Ability8"					"teleport_top_arthas"
+		"Ability6"					"ability_unit_died_magtheridon_boss"
+		"Ability7"					"teleport_top_arthas"
 
-		"ArmorPhysical"				"550"                 // Physical protection.
+		"ArmorPhysical"				"800"                 // Physical protection.
 		"MagicalResistance"			"0"                 // Magical protection (percentage).
 	
 		"AttackCapabilities"    "DOTA_UNIT_CAP_MELEE_ATTACK"
@@ -5598,8 +5597,8 @@
 		"AttributeAgilityGain"    "20"                   // Agility bonus per level.
 
 		"BountyXP"				"5000"                 // Experience earn.
-		"BountyGoldMin"			"7500"                   // Gold earned min.
-		"BountyGoldMax"			"7500"                   // Gold earned max.
+		"BountyGoldMin"			"15000"                   // Gold earned min.
+		"BountyGoldMax"			"15000"                   // Gold earned max.
 
 		"BoundsHullName"      "DOTA_HULL_SIZE_HUGE"
 		"RingRadius"        "250"
@@ -5646,9 +5645,8 @@
 		"Ability1"					"creature_blade_fury"
 		"Ability2"					"juggernaut_blade_dance" 
 		"Ability3"					"chaos_knight_chaos_strike"
-		"Ability4"					"teleport_arthas_gate"
-		"Ability5"					"boss_health"
-		"Ability6"					"cant_die_generic"
+		"Ability4"					"boss_health"
+		"Ability5"					"cant_die_generic"
 	
 		"HasInventory"				"1"
 		"ArmorPhysical"				"1000"                 // Physical protection.
@@ -5969,9 +5967,8 @@
 		"Ability1"					"lion_voodoo"
 		"Ability2"					"proudmoore_divine_shield" 
 		"Ability3"					"endurance_aura"
-		"Ability4"					"teleport_arthas_gate"
-		"Ability5"					"boss_health"
-		"Ability6"					"cant_die_generic"
+		"Ability4"					"boss_health"
+		"Ability5"					"cant_die_generic"
 	
 		"ArmorPhysical"				"1200"                 // Physical protection.
 		"MagicalResistance"			"10"                 // Magical protection (percentage).
@@ -7106,9 +7103,8 @@
 		"Ability1"				"demonhunter_negative_energy"
 		"Ability2"				"demonhunter_immolation" 
 		"Ability3"				"demonhunter_evasion"
-		"Ability4"				"teleport_arthas_gate"
-		"Ability5"				"cant_die_generic"
-		"Ability6"				"boss_health"
+		"Ability4"				"cant_die_generic"
+		"Ability5"				"boss_health"
 
 		"ArmorPhysical"				"1500"                 // Physical protection.
 		"MagicalResistance"			"10"                 // Magical protection (percentage).
@@ -7158,15 +7154,14 @@
 		"ModelScale"                "2.0"
 		"HealthBarOffset"			"300"
 		"Level"						"100"
-		"AbilityLayout"             "5"
+		"AbilityLayout"				"4"
 		
-		"Ability1"        "howl_of_terror"
-		"Ability2"        "teleport_arthas_gate"
-		"Ability3"        "demonhunter_vampiric_aura"
-		"Ability4"        "balanar_sleep"
-		"Ability5"        "balanar_rain_of_chaos"
-		"Ability6"        "boss_health"
-		"Ability7"        "cant_die_generic"
+		"Ability1"			"howl_of_terror"
+		"Ability2"			"demonhunter_vampiric_aura"
+		"Ability3"			"balanar_sleep"
+		"Ability4"			"balanar_rain_of_chaos"
+		"Ability5"			"boss_health"
+		"Ability6"			"cant_die_generic"
 	
 		"ArmorPhysical"			"1200"                 // Physical protection.
 		"MagicalResistance"		"10"                 // Magical protection (percentage).
@@ -8156,21 +8151,22 @@
 		"Level"						"999"
 		"ConsideredHero"			"1"
 		"SoundSet"					"Hero_Abaddon"
-		"AbilityLayout"				"6"
+		"AbilityLayout"				"4"
 
 		// Abilities
 		//----------------------------------------------------------------
-		"Ability1"					"endurance_aura"
-		"Ability2"					"command_aura"
-		"Ability3"					"creature_chronosphere"
-		"Ability4"					"boss_health"
-		"Ability5"					"cant_die_generic"
-		"Ability6"					"holdout_red_effect"
+		"Ability1"					"abaddon_aphotic_shield"
+		"Ability2"					"endurance_aura"
+		"Ability3"					"command_aura"
+		"Ability4"					"creature_chronosphere"
+		"Ability5"					"boss_health"
+		"Ability6"					"cant_die_generic"
+		"Ability7"					"holdout_red_effect"
 
 		// Armor
 		//----------------------------------------------------------------
-		"ArmorPhysical"				"2499"		// Physical protection.
-		"MagicalResistance"			"0"	// Magical protection.
+		"ArmorPhysical"				"2999"		// Physical protection.
+		"MagicalResistance"			"10"	// Magical protection.
 
 		// Attack
 		//----------------------------------------------------------------
@@ -8223,6 +8219,8 @@
 		//---------------------------------------------------------------
 		"VisionDaytimeRange"		"1400"		// Range of vision during day light.
 		"VisionNighttimeRange"		"1400"		// Range of vision at night time.
+
+		"vscripts"					"ai/abaddon.lua"
 
 		// Creature Data
 		//----------------------------------------------------------------------------------------------------------------------

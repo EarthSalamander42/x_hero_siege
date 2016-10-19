@@ -531,9 +531,8 @@ function trigger_second_wave_left()
 --	local skywrath = Entities:FindByName(nil, "SkywrathMage_Guardian1"):GetAbsOrigin()
 	print("Disabled trigger left")
 	DoEntFire("trigger_phase2_left", "Kill", nil ,0 ,nil ,nil)
---	skywrath:Destroy()
-	
-	
+--	skywrath:RemoveSelf()
+
 	Timers:CreateTimer(2.5, spawn_second_phase_left)
 end
 
@@ -542,13 +541,6 @@ function trigger_second_wave_right()
 	DoEntFire("trigger_phase2_right", "Kill", nil, 0, nil, nil)
 	
 	Timers:CreateTimer(2.5, spawn_second_phase_right)
-end
-
-function trigger_second_wave_solo()
-	print("Disabled trigger solo")
-	DoEntFire("trigger_phase2_solo", "Kill", nil, 0, nil, nil)
-	
-	Timers:CreateTimer(1.75, spawn_second_phase_solo)
 end
 
 function spawn_second_phase_left()
@@ -582,21 +574,6 @@ function spawn_second_phase_right()
 	end)
 end
 
-function spawn_second_phase_solo()
-	local EntIceTower = Entities:FindByName( nil, "npc_tower_cold_3" )
-	local point = Entities:FindByName( nil, "npc_dota_spawner_top_solo_1"):GetAbsOrigin()
-	Timers:CreateTimer(0, function()
-		if not EntIceTower:IsNull() then -- Level 1 lower than 6 min
-			for j = 1, 5 do
-			local unit = CreateUnitByName("npc_ghul_II", point+RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_BADGUYS)
-			end
-		return 30 -- Rerun this timer every 30 game-time seconds
-		elseif EntIceTower:IsNull() then
-		return nil
-		end
-	end)
-end
-
 function killed_frost_tower_left(keys)
 GameMode.FrostTowers_killed = GameMode.FrostTowers_killed +1
 print( GameMode.FrostTowers_killed )
@@ -604,7 +581,7 @@ print( GameMode.FrostTowers_killed )
 	if GameMode.FrostTowers_killed >= 2 then
 		print("FinalWave timer started")
 		Notifications:TopToAll({text="WARNING! Final Wave incoming. Arriving in 60 seconds! Back to the Castle!" , duration=10.0})
-		Timers:CreateTimer(20,FinalWave)
+		Timers:CreateTimer(60,FinalWave)
 		FrostTowersToFinalWave()
 	end
 end

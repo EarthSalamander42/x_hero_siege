@@ -1,4 +1,3 @@
-
 require('libraries/timers')
 
 function Spawn( entityKeyValues )
@@ -28,11 +27,11 @@ function ArthasThink()
 		end
 
 	elseif Ability_holy_light:IsFullyCastable() then		
-		if thisEntity:GetHealthPercent() <= 90 then
+		if thisEntity:GetHealthPercent() <= 85 then
 			thisEntity:CastAbilityOnTarget(thisEntity,Ability_holy_light,-1)
 		end
 	elseif Ability_light_roar:IsFullyCastable() then
-		local units = FindUnitsInRadius(thisEntity:GetTeamNumber(), thisEntity:GetAbsOrigin(), nil, 600, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO+DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)		
+		local units = FindUnitsInRadius(thisEntity:GetTeamNumber(), thisEntity:GetAbsOrigin(), nil, 700, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO+DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)		
 		local number = 0 
 		for _,v in pairs(units) do
 			number = number +1

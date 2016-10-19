@@ -907,8 +907,9 @@ local triggers_choice = Entities:FindAllByName("trigger_special_event_choice")
 	end
 
 	MuradinEvent:SetAngles(0, 270, 0)
+	MuradinEvent:EmitSound("Muradin.StormEarthFire")
 	Notifications:TopToAll({hero="npc_dota_hero_zuus", duration=5.0})
-	Notifications:TopToAll({text="You can't kill him! Just survive the Countdown", continue=true})
+	Notifications:TopToAll({text="You can't kill him! Just survive the Countdown. ", continue=true})
 	Notifications:TopToAll({text="Reward: 10 000 Gold.", continue=true})
 	Timers:CreateTimer( 3.0, StartMuradinEvent )
 	Timers:CreateTimer( 120, EndMuradinEvent )
@@ -916,16 +917,13 @@ local triggers_choice = Entities:FindAllByName("trigger_special_event_choice")
 			MuradinEvent:ForceKill(true)
 			for _,v in pairs(teleporters) do
 				v:Enable()
+				MuradinEvent:StopSound("Muradin.StormEarthFire")
 			end
 		end)
 
 		for _,hero in pairs(heroes) do
 			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
 				FindClearSpaceForUnit(hero, point, true)
-				hero:EmitSound("Muradin.StormEarthFire")
-				Timers:CreateTimer(120, function()
-					hero:StopSound("Muradin.StormEarthFire")
-				end)
 				hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun",nil)
 				hero:AddNewModifier(nil, nil, "modifier_invulnerable",nil)
 				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)

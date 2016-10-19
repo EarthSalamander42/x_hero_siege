@@ -3,16 +3,25 @@ require('gamemode')
 
 function spawn_deathghost(event)
 local caller = event.caller
-	Timers:CreateTimer(function()
-		local unit = CreateUnitByName("npc_death_ghost_tower", caller:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
-	end)
+	local unit = CreateUnitByName("npc_death_ghost_tower", caller:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
 end
 
 function spawn_magnataur(event)
 local caller = event.caller
-	Timers:CreateTimer(function()
-		local unit = CreateUnitByName("npc_magnataur_destroyer_crypt", caller:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
-	end)
+local trigger_left = Entities:FindAllByName("trigger_phase2_left")
+local trigger_right = Entities:FindAllByName("trigger_phase2_right")
+print( "Barrack Destroyed!" )
+
+Notifications:TopToAll({text="Phase 2 creeps can now be triggered!", duration = 11.0})
+local unit = CreateUnitByName("npc_magnataur_destroyer_crypt", caller:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
+
+	for _,v in pairs(trigger_left) do
+		v:Enable()
+	end
+
+	for _,v in pairs(trigger_right) do
+		v:Enable()
+	end
 end
 
 function SpecialEventTP(event)

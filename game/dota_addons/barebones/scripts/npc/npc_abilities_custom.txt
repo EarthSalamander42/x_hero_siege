@@ -1140,7 +1140,7 @@
 			"modifier_devotion_aura"
 			{
 				"Passive"           "1"
-				"IsHidden"          "0"
+				"IsHidden"          "1"
 				"IsBuff"            "1"
 
 				"Aura"              "modifier_devotion_aura_hidden"
@@ -1153,7 +1153,7 @@
 			"modifier_devotion_aura_hidden"
 			{
 				"Passive"   "1"
-				"IsHidden"  "1"
+				"IsHidden"  "0"
 
 				"OnCreated"
 				{
@@ -14821,7 +14821,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"       "ability_datadriven"
 		"AbilityBehavior"       "DOTA_ABILITY_BEHAVIOR_PASSIVE"
-		"AbilityTextureName"      "item_platemail"
+		"AbilityTextureName"      "centaur_return"
 		"MaxLevel"             "1"
 		"AbilitySpecial"
 		{
@@ -17038,7 +17038,7 @@
 		"AbilityCooldown"  "40"
 		"AbilityChannelTime"  "10"
 		"AbilityManaCost"  "200"
-		"AbilityTextureName"	""
+		"AbilityTextureName"	"holdout_stampede"
 		"AbilityUnitDamageType" "DAMAGE_TYPE_MAGICAL"
 		"AbilityUnitTargetTeam" "DOTA_UNIT_TARGET_TEAM_ENEMY"
 		"AbilityUnitTargetType" "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
@@ -17184,32 +17184,22 @@
 			}
 			"03"
 			{
-				"var_type"              "FIELD_FLOAT"
-				"duration_scepter"      "4.0 5.0 6.0"
-			}
-			"04"
-			{
-				"var_type"              "FIELD_FLOAT"
-				"cooldown_scepter"      "25.0"
-			}
-			"05"
-			{
 				"var_type"              "FIELD_INTEGER"
 				"vision_radius"         "675"
 			}
 			// Extra
-			"06"
+			"04"
 			{
 				"var_type"              "FIELD_FLOAT"
 				"aura_interval"         "0.1"
 			}
 			// If you want the Chronosphere to ignore Faceless Void then keep it at 1 otherwise set it to 0
-			"07"
+			"05"
 			{
 				"var_type"              "FIELD_INTEGER"
 				"ignore_void"           "1"
 			}
-			"08"
+			"06"
 			{
 				"var_type"              "FIELD_INTEGER"
 				"speed"                 "1000"
