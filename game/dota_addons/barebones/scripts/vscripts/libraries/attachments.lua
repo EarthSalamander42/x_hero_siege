@@ -73,7 +73,7 @@ function modifier_animation_freeze_stun:GetAttributes()
 end
 
 function modifier_animation_freeze_stun:IsHidden()
-  return true
+  return false
 end
 
 function modifier_animation_freeze_stun:IsDebuff() 

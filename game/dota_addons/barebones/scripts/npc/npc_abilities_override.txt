@@ -89,47 +89,6 @@
 		}
 	}
 
-	//======================================================================================================
-	// Heart of Tarrasque Override
-	//======================================================================================================
-	"item_heart"
-	{
-		// General
-		//--------------------------------------------------------------------------------------------------
-		"BaseClass"						"item_heart"
-
-		// Item Info
-		//--------------------------------------------------------------------------------------------------
-		"ItemBaseLevel"					"1"
-		"MaxUpgradeLevel"				"3"
-
-		// Special	
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilitySpecial"
-		{
-			"0"
-			{
-				"var_type"				"FIELD_FLOAT"
-				"health_regen_rate"		"2.5"
-			}
-		}
-	}
-
-	//======================================================================================================
-	// Desolator Override
-	//======================================================================================================
-	"item_desolator"
-	{
-		// General
-		//--------------------------------------------------------------------------------------------------
-		"BaseClass"						"item_desolator"
-
-		// Item Info
-		//--------------------------------------------------------------------------------------------------
-		"ItemBaseLevel"					"1"
-		"MaxUpgradeLevel"				"3"
-	}
-
 	//=================================================================================================================
 	// Faerie Fire
 	//=================================================================================================================
@@ -144,13 +103,14 @@
 		"ItemCost"						"150"
 		"ItemShopTags"					"armor"
 		"ItemQuality"					"component"
-		"ItemAliases"					"faerie fire"
+		"ItemAliases"					"healing salve"
 		"SideShop"						"0"
 		"ItemStackable"					"1"
 		"ItemPermanent"					"0"
 		"ItemInitialCharges"			"15"
 		"SideShop"						"0"
 		"ItemHideCharges"				"0"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
 
 		// Special	
 		//-------------------------------------------------------------------------------------------------------------
@@ -188,10 +148,10 @@
 		"ItemStockMax"					"5"
 		"ItemStockInitial"				"0"
 		"ItemStockTime"					"60.0"			  
-		"ItemInitialStockTime"			"180.0"
+		"ItemInitialStockTime"			"330.0"
 		"ItemDeclarations"				"DECLARE_PURCHASES_TO_TEAMMATES | DECLARE_PURCHASES_TO_SPECTATORS"
 		"ItemSupport"					"1"	
-
+		"SideShop"						"1"
 
 		// Special	
 		//-------------------------------------------------------------------------------------------------------------
@@ -213,13 +173,14 @@
 		// Stats
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityCooldown"				"120.0"
-		"AbilityChannelTime"			"5.0"
+		"AbilityChannelTime"			"4.0"
 		
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityManaCost"				"75"
 		"ItemCost"						"100"
 		"ItemInitialCharges"			"5"
+		"SideShop"						"1"
 		
 		// Special	
 		//-------------------------------------------------------------------------------------------------------------
@@ -244,31 +205,55 @@
 	}
 
 	//=================================================================================================================
-	// Items Moved from Secret Shop to Normal Shop
+	// Mana Salve
 	//=================================================================================================================
-	"item_vitality_booster"
-	{ "SecretShop"	"0" }
+	"item_enchanted_mango"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"ID"							"2509"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
+		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO"
+		"Model"							"models/props_gameplay/clarity.mdl"
+		"AbilityTextureName"			"item_enchanted_mango"
+		// Stats
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"				"0"
+		"AbilityCastPoint"				"0.0"
+		"AbilityCooldown"				"1.0"
 
-	"item_reaver"
-	{ "SecretShop"	"0" }
+		// Item Info
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemCost"						"150"
+		"ItemShopTags"					"consumable"
+		"ItemQuality"					"consumable"
+		"ItemDeclarations"				"DECLARE_PURCHASES_TO_SPECTATORS"
+		"ItemAlertable"					"0"
+		"ItemAliases"					"mana salve"
+		"ItemStackable"					"1"
+		"ItemPermanent"					"0"
+		"ItemInitialCharges"			"15"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE_STACKING"
+		"ItemHideCharges"				"0"
+		"ItemDisplayCharges"			"1"
 
-	"item_mystic_staff"
-	{ "SecretShop"	"0" }
-
-	"item_energy_booster"
-	{ "SecretShop"	"0" }
-
-	"item_relic"
-	{ "SecretShop"	"0" }
-
-	"item_eagle"
-	{ "SecretShop"	"0" }
-
-	"item_platemail"
-	{ "SecretShop"	"0" }
-
-	"item_ultimate_orb"
-	{ "SecretShop"	"0" }
+		// Special	
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"hp_regen"				"0.0"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"replenish_amount"		"500"
+			}	
+		}
+	}
 
 	//=================================================================================================================
 	// Removed Items
@@ -296,7 +281,6 @@
 	"item_necronomicon_3"			"REMOVE"
 	"item_smoke_of_deceit"			"REMOVE"
 	"item_rapier"					"REMOVE"
-	"item_ankh"						"REMOVE"
 	"item_lesser_crit"				"REMOVE"
 	"item_greater_crit"				"REMOVE"
 	"item_bfury"					"REMOVE"
@@ -304,7 +288,6 @@
 	"item_tango"					"REMOVE"
 	"item_moon_shard"				"REMOVE"
 	"item_mask_of_madness"			"REMOVE"
-	"item_enchanted_mango"			"REMOVE"
 	"item_basher"					"REMOVE"
 	"item_monkey_king_bar"			"REMOVE"
 	"item_guardian_greaves"			"REMOVE"
@@ -334,7 +317,6 @@
 	"item_heavens_halberd"			"REMOVE"
 	"item_buckler"					"REMOVE"
 	"item_crimson_guard"			"REMOVE"
-	"item_shivas_guard3"			"REMOVE"
 	"item_ethereal_blade"			"REMOVE"
 	"item_ghost"					"REMOVE"
 	"item_orchid"					"REMOVE"
@@ -398,6 +380,40 @@
 	"item_mjollnir"					"REMOVE"
 	"item_hyperstone"				"REMOVE"
 	"item_abyssal_blade"			"REMOVE"
+	"item_ward_sentry"				"REMOVE"
+	"item_ward_observer"			"REMOVE"
+	"item_infused_raindrop"			"REMOVE"
+	"item_robe"						"REMOVE"
+	"item_chainmail"				"REMOVE"
+	"item_cloak"					"REMOVE"
+	"item_ring_of_regen"			"REMOVE"
+	"item_gem"						"REMOVE"
+	"item_claymore"					"REMOVE"
+	"item_mystic_staff"				"REMOVE"
+	"item_ultimate_orb"				"REMOVE"
+	"item_sheepstick"				"REMOVE"
+	"item_ogre_axe"					"REMOVE"
+	"item_lotus_orb"				"REMOVE"
+	"item_platemail"				"REMOVE"
+	"item_energy_booster"			"REMOVE"
+	"item_pers"						"REMOVE"
+	"item_ring_of_health"			"REMOVE"
+	"item_void_stone"				"REMOVE"
+	"item_broadsword"				"REMOVE"
+	"item_relic"					"REMOVE"
+	"item_helm_of_iron_will"		"REMOVE"
+	"item_eagle"					"REMOVE"
+	"item_black_king_bar"			"REMOVE"
+	"item_hood_of_defiance"			"REMOVE"
+	"item_javelin"					"REMOVE"
+	"item_gloves"					"REMOVE"
+	"item_heart"					"REMOVE"
+	"item_desolator"				"REMOVE"
+	"item_vitality_booster"			"REMOVE"
+	"item_reaver"					"REMOVE"
+	"item_mithril_hammer"			"REMOVE"
+	"item_blight_stone"				"REMOVE"
+
 
 	//============================================================================================================
 	//============================================================================================================
@@ -468,7 +484,7 @@
 			"02"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"mana_per_hit"			"18"
+				"mana_per_hit"			"55"
 			}
 		}
 	}
@@ -556,11 +572,11 @@
 
 		// Time		
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCooldown"				"20.0"
+		"AbilityCooldown"				"25.0"
 
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityManaCost"				"75 90 105 120"		
+		"AbilityManaCost"				"90 180 270 360"		
 
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
@@ -569,12 +585,12 @@
 			"01"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"bonus_damage"				"100 250 500 950"
+				"bonus_damage"				"950 1650 3500 9000"
 			}
 			"02"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"bonus_movement_speeed"		"20 30 50 80"
+				"bonus_movement_speeed"		"20 30 40 50"
 			}
 			"03"
 			{
@@ -584,7 +600,7 @@
 			"04"
 			{
 				"var_type"					"FIELD_FLOAT"
-				"fade_time"					"0.4"
+				"fade_time"					"0.1"
 			}
 		}
 	}
@@ -607,18 +623,18 @@
 			"01"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"blade_dance_crit_mult"		"400"
+				"blade_dance_crit_mult"		"175 250 325 400"
 			}
 			"02"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"blade_dance_crit_chance"	"20"
+				"blade_dance_crit_chance"	"15"
 			}
 		}
 	}
 
 	//=================================================================================================================
-	// Ability: Juggernaut Blade Fury
+	// Blademaster: Juggernaut Blade Fury
 	//=================================================================================================================
 	"juggernaut_blade_fury"
 	{
@@ -637,12 +653,12 @@
 
 		// Time		
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCooldown"				"90"
+		"AbilityCooldown"				"80.0 60.0"
 		"AbilityDuration"				"8.0"
 
 		// Damage
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityDamage"					"600 1500"
+		"AbilityDamage"					"1000 2000"
 
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
@@ -661,36 +677,6 @@
 			{
 				"var_type"					"FIELD_INTEGER"
 				"blade_fury_radius"			"280"
-			}
-		}
-	}
-
-	//=================================================================================================================
-	// Sylvanas Windrunner: Fire Arrows
-	//=================================================================================================================
-	"clinkz_searing_arrows"
-	{
-		// Casting
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCastRange"				"630"
-		"AbilityCastPoint"				"0.0"
-
-		// Time		
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCooldown"				"0.0"
-
-		// Cost
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityManaCost"				"10 20 30 40"
-
-		// Special
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilitySpecial"
-		{
-			"01"
-			{
-				"var_type"						"FIELD_INTEGER"
-				"damage_bonus"					"50 100 220 500"
 			}
 		}
 	}
@@ -766,16 +752,16 @@
 
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCastRange"				"400"
+		"AbilityCastRange"				"500"
 		"AbilityCastPoint"				"0.15"
 
 		// Time		
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCooldown"				"12"
+		"AbilityCooldown"				"9.0"
 
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityManaCost"				"60 80 100 120"
+		"AbilityManaCost"				"100 150 200 250"
 
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
@@ -784,7 +770,7 @@
 			"01"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"damage"					"200 400 750 1200"
+				"damage"					"200 450 950 1850"
 			}
 			"02"
 			{
@@ -799,12 +785,12 @@
 			"04"
 			{
 				"var_type"					"FIELD_FLOAT"
-				"activation_time"			"2.25"
+				"activation_time"			"0.25"
 			}
 			"05"
 			{
 				"var_type"					"FIELD_FLOAT"
-				"explode_delay"				"0.75"
+				"explode_delay"				"1.0"
 			}
 			"06"
 			{
@@ -939,7 +925,7 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"chance"				"15 20 25 30"
+				"chance"				"15"
 			}
 			"02"
 			{
@@ -949,7 +935,7 @@
 			"03"
 			{
 				"var_type"				"FIELD_FLOAT"
-				"duration"				"0.05"
+				"duration"				"0.0"
 			}
 			"04"
 			{
@@ -980,7 +966,7 @@
 			"02"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"crit_damage"				"500"
+				"crit_damage"				"400"
 			}			
 			"03"
 			{
@@ -1032,35 +1018,672 @@
 	}
 
 	//=================================================================================================================
-	// Arc warden: Tempest Double
+	// Roshan: Bash
 	//=================================================================================================================
-	"arc_warden_tempest_double"
+	"roshan_bash"
+	{
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"			"FIELD_INTEGER"
+				"bash_chance"		"15"
+			}
+			"02"
+			{
+				"var_type"			"FIELD_INTEGER"
+				"bonus_damage"		"50"
+			}
+			"03"
+			{
+				"var_type"			"FIELD_FLOAT"
+				"stun_duration"		"0.95"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Forest Troll High Priest: Heal
+	//=================================================================================================================
+	"forest_troll_high_priest_heal"
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"MaxLevel"						"2"
-		"RequiredLevel"					"10"
-		"LevelsBetweenUpgrades"			"5"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK | DOTA_ABILITY_BEHAVIOR_AUTOCAST"
+		"AbilityTextureName"			"holdout_heal"
+		"AbilityCastAnimation"          "ACT_DOTA_CAST_ABILITY_1"
 
+		// Unit Targeting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
+		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+
+		// Stats
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"				"350"
+		"AbilityCastPoint"				"0.25"
+		"AbilityCooldown"				"2.0"
+		"AbilityManaCost"				"25"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"			"FIELD_INTEGER"
+				"health"			"100"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// POTM: Arc Lightning
+	//=================================================================================================================
+	"zuus_arc_lightning"
+	{
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCastPoint"				"0.15"
+		"AbilityCastRange"				"800"
+		"AbilityCastPoint"				"0.25"
+		"AbilityTextureName"			"holdout_chain_lightning"
+
+		// Damage.
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityDamage"					"110 220 440 880"
 
 		// Time		
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCooldown"				"140 120"
+		"AbilityCooldown"				"10"
 
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"65 90 115 140"
 
-		// Special	
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"radius"				"500"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"jump_count"			"4 8 12 16"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"jump_delay"			"0.3"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Sorceress: Lightning Shock
+	//=================================================================================================================
+	"pugna_life_drain"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_YES"
+		"HasScepterUpgrade"				"0"
+		"MaxLevel"						"2"
+		"RequiredLevel"					"10"
+		"LevelsBetweenUpgrades"			"5"
+		"AbilityTextureName"			"holdout_lightning_shock"
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"				"800 1000"
+		"AbilityCastPoint"				"0.2"
+		"AbilityChannelTime"			"6.0"
+
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"65.0"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"225 550"
+		
+		// Stats
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityModifierSupportValue"	"0.0"	// All about the damage
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"health_drain"				"300 700"
+			}
+			"02"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"cast_range_tooltip"		"800 1000"
+			}
+			"03"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"duration_tooltip"			"6"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Pandaren Brewmaster: Shackles
+	//=================================================================================================================
+	"shadow_shaman_shackles"
+	{
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"			"400"
+		"AbilityCastPoint"			"0.3"
+		"AbilityTextureName"		"shadow_shaman_shackles"
+		"MaxLevel"					"1"
+
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityChannelTime"		"5.0"
+		"AbilityCooldown"			"25"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"			"60"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"			"FIELD_FLOAT"
+				"tick_interval"		"0.1"
+			}
+			"02"
+			{
+				"var_type"			"FIELD_FLOAT"
+				"total_damage"		"250"
+			}
+			"03"
+			{
+				"var_type"			"FIELD_FLOAT"
+				"channel_time"		"5.0"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Ability: Juggernaut Healing Ward
+	//=================================================================================================================
+	"juggernaut_healing_ward"
+	{		
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"				"350"
+		"AbilityCastPoint"				"0.3"
+		"MaxLevel"						"1"
+		
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"60.0"
+		"AbilityDuration"				"25.0"
+	
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"90"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"							"FIELD_INTEGER"
+				"healing_ward_heal_amount"			"2"
+			}
+			"02"
+			{
+				"var_type"							"FIELD_INTEGER"
+				"healing_ward_aura_radius"			"500"
+			}
+			"03"
+			{
+				"var_type"							"FIELD_INTEGER"
+				"healing_ward_movespeed_tooltip"	"0"
+			}
+			"04"
+			{
+				"var_type"							"FIELD_INTEGER"
+				"healing_ward_duration_tooltip"		"25"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Lion: Voodoo
+	//=================================================================================================================
+	"lion_voodoo"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO"
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
+		"MaxLevel"						"1"
+		
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"				"600"
+
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"13.0"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"150"
+		
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"					"FIELD_FLOAT"
+				"duration"					"3.0"
+			}
+			"02"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"movespeed"					"150"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Paladin: Taunt
+	//=================================================================================================================
+	"axe_berserkers_call"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityTextureName"			"axe_berserkers_call"
+		"MaxLevel"						"1"
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastPoint"				"0.4"
+
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"20"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"75"	
+		
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"radius"				"500"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_armor"			"100"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"duration"				"5.0"
+			}	
+		}
+	}
+
+	//=================================================================================================================
+	// Crypt Lord: Impale
+	//=================================================================================================================
+	"nyx_assassin_impale"
+	{
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"				"1000"
+		"AbilityCastPoint"				"0.4"
+		"AbilityTextureName"			"nyx_assassin_impale"
+		
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"9.0"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"95 115 135 155"
+		
+		// Damage.
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityDamage"					"160 320 540 960"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"			"FIELD_INTEGER"
+				"width"				"175"
+			}
+			"02"
+			{	
+				"var_type"			"FIELD_FLOAT"
+				"duration"			"1.2 1.6 2.0 2.5"
+			}
+			"03"
+			{
+				"var_type"			"FIELD_INTEGER"
+				"length"			"1000"
+			}
+			"04"
+			{
+				"var_type"			"FIELD_INTEGER"
+				"speed"				"1600"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Ogre Magi: Bloodlust
+	//=================================================================================================================
+	"ogre_magi_bloodlust"
+	{
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"				"600"
+		"AbilityCastPoint"				"0.45"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK"
+		"MaxLevel"						"1"
+		"AbilityTextureName"			"ogre_magi_bloodlust"
+		
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"60"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"50"
+
+		// Special
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilitySpecial"
 		{
 			"01"
 			{
 				"var_type"				"FIELD_FLOAT"
-				"duration"				"40 60"
+				"modelscale"			"30"
+			}	
+			"02"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_movement_speed"	"20"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_attack_speed"	"60"
+			}
+			"04"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"duration"				"20"
 			}
 		}
 	}
 
+	//=================================================================================================================
+	// Paladin: Taunt
+	//=================================================================================================================
+	"axe_berserkers_call"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityTextureName"	"axe_berserkers_call"
+		"MaxLevel"				"1"
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastPoint"				"0.4"
+
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"20"
+
+		// Damage.
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityDamage"					"0"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"100"	
+		
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"radius"				"350"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_armor"			"50"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"duration"				"3.0"
+			}	
+		}
+	}
+
+	//=================================================================================================================
+	// Centurion: Pit of Malice
+	//=================================================================================================================
+	"abyssal_underlord_pit_of_malice"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"				"750"
+		"AbilityCastPoint"				"0.4"
+		
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"25 20 15 10"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"120 200 280 360"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"radius"					"275"
+			}
+			"02"
+			{
+				"var_type"					"FIELD_FLOAT"
+				"pit_duration"				"7.0"
+			}		
+			"03"
+			{
+				"var_type"					"FIELD_FLOAT"
+				"pit_interval"				"0.5"
+			}
+			"04"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"pit_damage"				"200 450 950 1600"
+			}
+			"05"
+			{
+				"var_type"					"FIELD_FLOAT"
+				"ensnare_duration"			"1.0 1.5 2.0 2.5"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Centurion: Necromastery
+	//=================================================================================================================
+	"nevermore_necromastery"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"OnCastbar"					"0" //Original = 0
+		"HasScepterUpgrade"			"0" //Original = 1
+		"RequiredLevel"				"5"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"							"FIELD_INTEGER"
+				"necromastery_damage_per_soul"		"1 2 3 4"
+			}
+			"02"
+			{
+				"var_type"							"FIELD_INTEGER"
+				"necromastery_max_souls"			"999"
+			}
+			"03"
+			{
+				"var_type"							"FIELD_FLOAT"
+				"necromastery_soul_release"			"1.0"
+			}
+			"04"
+			{
+				"var_type"							"FIELD_INTEGER"
+				"necromastery_souls_hero_bonus"		"11"
+			}
+			"05"
+			{
+				"var_type"							"FIELD_INTEGER"
+				"necromastery_max_souls_scepter"	"999"
+			}			
+		}
+	}
+
+	//=================================================================================================================
+	// Abyssal Underlord: Atrophy Aura
+	//=================================================================================================================
+	"abyssal_underlord_atrophy_aura"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"				"1200"
+		"RequiredLevel"					"8"
+		"LevelsBetweenUpgrades"			"3"	
+		
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"						"FIELD_INTEGER"
+				"radius"						"1200"
+			}
+			"02"
+			{
+				"var_type"						"FIELD_INTEGER"
+				"damage_reduction_pct"			"10 20 30 40"
+			}
+			"03"
+			{
+				"var_type"						"FIELD_INTEGER"
+				"bonus_damage_from_creep"		"5 10 15 20"
+			}
+			"04"
+			{
+				"var_type"						"FIELD_INTEGER"
+				"bonus_damage_from_hero"		"30"
+			}
+			"05"
+			{
+				"var_type"						"FIELD_FLOAT"
+				"bonus_damage_duration"			"65"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Black Dragon: Fireball
+	//=================================================================================================================
+	"black_dragon_fireball"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityType"					"DOTA_ABILITY_TYPE_BASIC"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"	
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
+		"MaxLevel"						"1"
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"				"1000"
+		"AbilityCastPoint"				"0.3"
+		
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"25"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"100"
+		
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"			"FIELD_INTEGER"
+				"radius"			"300"
+			}
+			"02"
+			{
+				"var_type"			"FIELD_INTEGER"
+				"damage"			"40"
+			}
+			"03"
+			{
+				"var_type"			"FIELD_FLOAT"
+				"duration"			"10.0"
+			}
+			"04"
+			{
+				"var_type"			"FIELD_FLOAT"
+				"burn_interval"		"0.5"
+			}
+		}
+	}
 }

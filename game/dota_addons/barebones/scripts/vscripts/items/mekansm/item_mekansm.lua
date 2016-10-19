@@ -12,6 +12,8 @@ function item_mekansm_datadriven_on_spell_start(keys)
 		
 		nearby_ally:EmitSound("DOTA_Item.Mekansm.Target")
 		ParticleManager:CreateParticle("particles/items2_fx/mekanism_recipient.vpcf", PATTACH_ABSORIGIN_FOLLOW, nearby_ally)
+		ParticleManager:CreateParticle("particles/econ/events/ti6/mekanism_ti6.vpcf", PATTACH_ABSORIGIN_FOLLOW, nearby_ally)
+
 		
 		keys.ability:ApplyDataDrivenModifier(keys.caster, nearby_ally, "modifier_item_mekansm_datadriven_heal_armor", nil)
 		keys.ability:ApplyDataDrivenModifier(keys.caster, nearby_ally, "modifier_item_mekansm_datadriven_heal_debuff", nil)

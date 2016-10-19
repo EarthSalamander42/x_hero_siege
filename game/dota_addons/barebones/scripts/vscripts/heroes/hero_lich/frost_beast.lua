@@ -15,7 +15,7 @@ function GrowModel( event )
 				end
 			end
 			model = model:NextMovePeer()
-			caster:AddNewModifier(caster, nil, "modifier_phased", {})
+			caster:AddNewModifier(caster, nil, "modifier_phased", {duration = 0.05})
 		end
 	end)
 end

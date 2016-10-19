@@ -18,7 +18,7 @@ function rain_of_chaos( event )
 		ParticleManager:SetParticleControl(meteor, 0, point + Vector(0,0,500))
 		ParticleManager:SetParticleControl(meteor, 1, point)
 		ParticleManager:SetParticleControl(meteor, 2, Vector(1.2,0,0))
-		local unit = CreateUnitByName("npc_dummy_target", point, true, nil, nil, caster:GetTeamNumber())
+		local unit = CreateUnitByName("dummy_unit_invulnerable", point, true, nil, nil, caster:GetTeamNumber())
 		ability:ApplyDataDrivenModifier(caster, unit, "modifier_dummy_target", {duration = 1.1})
 	end
 

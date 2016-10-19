@@ -1,169 +1,59 @@
 "DOTAHeroes"
 {
-
 	//========================================================================================================
-	// HERO: Space Marine (Clockwerk)
+	// HERO: Centurion, The Sea Dragon (Slardar)
 	//========================================================================================================
-	"npc_dota_hero_rattletrap_holdout"
+	"npc_dota_hero_slardar_holdout"
 	{
-		"override_hero"			"npc_dota_hero_rattletrap"
-		"AbilityLayout"			"5"
-		"MovementSpeed"			"365"
-		"ModelScale"			"1.15"
-		"AttackDamageMin"		"65"
-		"AttackDamageMax"		"75"
-		"AttackRange"			"650"
-		"AttackCapabilities"	"DOTA_UNIT_CAP_RANGED_ATTACK"
-		"ProjectileModel"		"particles/econ/items/sniper/sniper_charlie/sniper_assassinate_charlie.vpcf"
-		"GameSoundsFile"		"soundevents/game_sounds_heroes/game_sounds_rattletrap.vsndevts"
-		"ProjectileSpeed"		"1750"
-		"HealthBarOffset"		"170"
+		"override_hero"					"npc_dota_hero_slardar"
+		"AbilityLayout"					"6"
+		"MovementSpeed"					"380"
+		"ModelScale"					"1.4"
+		"AttackDamageMin"				"90"
+		"AttackDamageMax"				"100"
+		"AttackRange"					"190"
+		"HealthBarOffset"				"250"
+		"RingRadius"					"150"
+		"ProjectileSpeed"				"1200"
 
-		"Ability1"				"holdout_hurl_bomb"
-		"Ability2"				"holdout_fan_of_rockets"
-		"Ability3"				"holdout_aura_of_blight"		
-		"Ability4"				"holdout_metal_armor"
-		"Ability5"				"holdout_bonus"
-		"Ability6"				"holdout_clone"
-		"Ability16"				"ability_unit_died_fire"
+		"AttributeStrengthGain"			"20"
+		"AttributeAgilityGain"			"10"
+		"AttributeIntelligenceGain"		"10"
+
+		"Ability1"						"holdout_dark_pact"
+		"Ability2"						"abyssal_underlord_pit_of_malice"
+		"Ability3"						"nevermore_necromastery"		
+		"Ability4"						"abyssal_underlord_atrophy_aura"
+		"Ability5"						"black_dragon_fireball"
+		"Ability6"						"holdout_sea_dragon_form"
+		"Ability16"						"ability_unit_died_ice" //Make Water Deaths
 	}
 
 	//========================================================================================================
-	// HERO: Warden (Phantom Assassin)
+	// HERO: Pit Lord (Abyssal Underlord)
 	//========================================================================================================
-	"npc_dota_hero_phantom_assassin_holdout"
+	"npc_dota_hero_abyssal_underlord_holdout"
 	{
-		"override_hero"			"npc_dota_hero_phantom_assassin"
-		"AbilityLayout"			"6"
-		"MovementSpeed"			"355"
-		"ModelScale"			"1.1"
-		"AttackDamageMin"		"55"
-		"AttackDamageMax"		"70"
-		"AttackRange"			"180"
-		"HealthBarOffset"		"190"
-		"GameSoundsFile"		"soundevents/game_sounds_heroes/game_sounds_sniper.vsndevts"
-		"VoiceFile"				"soundevents/voscripts/game_sounds_vo_sniper.vsndevts"
+		"override_hero"					"npc_dota_hero_abyssal_underlord"
+		"AbilityLayout"					"6"
+		"MovementSpeed"					"340"
+		"ModelScale"					"1.0"
+		"AttackDamageMin"				"30"
+		"AttackDamageMax"				"40"
+		"AttackRange"					"180"
+		"HealthBarOffset"				"190"
 
-		"Ability1"				"holdout_heat_seeking_daggers"
-		"Ability2"				"holdout_shadow_strike"
-		"Ability3"				"holdout_permanent_stats"		
-		"Ability4"				"holdout_gust_pool"
-		"Ability5"				"holdout_bonus"
-		"Ability6"				"holdout_blink"
-		"Ability7"				"holdout_vengeance"
-		"Ability16"				"ability_unit_died_death"
-	}
+		"AttributeStrengthGain"			"10"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"5"
 
-	//========================================================================================================
-	// HERO: Abyssal Underlord (Night Stalker)
-	//========================================================================================================
-	"npc_dota_hero_night_stalker_holdout"
-	{
-		"override_hero"			"npc_dota_hero_night_stalker"
-		"AbilityLayout"			"6"
-		"MovementSpeed"			"335"
-		"ModelScale"			"1.15"
-		"AttackDamageMin"		"55"
-		"AttackDamageMax"		"70"
-		"AttackRange"			"180"
-		"HealthBarOffset"		"190"
-
-		"Ability1"				"holdout_abyssal_underlord_firestorm"
-		"Ability2"				"holdout_war_thunder"
-		"Ability3"				"holdout_unholy_aura"		
-		"Ability4"				"holdout_rain_of_chaos"
-		"Ability5"				"holdout_bonus"
-		"Ability6"				"holdout_innate_great_cleave"
-		"Ability7"				"holdout_doom"
-		"Ability16"				"ability_unit_died_death"
-	}
-
-	//========================================================================================================
-	// HERO: Banehallow (Enigma)
-	//========================================================================================================
-	"npc_dota_hero_enigma_holdout"
-	{
-		"override_hero"					"npc_dota_hero_enigma"
-		"AbilityLayout"					"5"
-		"MovementSpeed"					"365"
-
-		"ModelScale"					"1.1"
-		"AttackDamageMin"				"50"
-		"AttackDamageMax"				"65"
-		"AttackRange"					"600"
-		"AttributePrimary"				"DOTA_ATTRIBUTE_STRENGTH"
-		"AttributeBaseStrength"			"29"
-		"AttributeStrengthGain"			"2.90000"
-		"MovementTurnRate"				"0.500000"
-		"HealthBarOffset"				"230"
-
-		"Ability1"				"holdout_bane_death_coil"
-		"Ability2"				"holdout_bane_permanent_immolation"
-		"Ability3"				"holdout_bane_critical"		
-		"Ability4"				"holdout_bane_endurance_aura"
-		"Ability5"				"holdout_bonus"
-		"Ability6"				"holdout_stampede"
-		"Ability16"				"ability_unit_died_death"
-	}
-
-	//========================================================================================================
-	// HERO: Archmage - Naira ( Crystal Maiden )
-	//========================================================================================================
-	"npc_dota_hero_crystal_maiden_holdout"
-	{
-		"override_hero"			"npc_dota_hero_crystal_maiden"
-		"AbilityLayout"			"5"
-		"MovementSpeed"			"340"
-
-		"AttackDamageMin"				"55"
-		"AttackDamageMax"				"70"
-
-		"Ability1"				"holdout_crushing_wave"
-		"Ability2"				"holdout_summon_water_elemental"
-		"Ability3"				"holdout_debilitation_aura"		
-		"Ability4"				"holdout_drain"
-		"Ability5"				"holdout_bonus"
-		"Ability6"				"holdout_elemental_wave"
-		"Ability16"				"ability_unit_died_ice"
-	}
-
-	//========================================================================================================
-	// HERO: Arthas( Dragon Knight )
-	//========================================================================================================
-	"npc_dota_hero_dragon_knight_holdout"
-	{
-		"override_hero"			"npc_dota_hero_dragon_knight"
-		"AbilityLayout"			"6"
-		"MovementSpeed"			"350"
-		"AttackDamageMin"		"21"
-		"AttackDamageMax"		"27"
-
-		"Ability1"				"holdout_holy_light"
-		"Ability2"				"holdout_divine_shield"
-		"Ability3"				"holdout_endurance_aura_alt"		
-		"Ability4"				"holdout_frostmourne"
-		"Ability5"				"holdout_bonus"
-		"Ability6"				"holdout_innate_great_cleave"
-		"Ability7"				"holdout_light_roar"
-		"Ability16"				"ability_unit_died_fire"
-	}
-
-	//========================================================================================================
-	// HERO: Blademaster( Juggernaut )
-	//========================================================================================================
-	"npc_dota_hero_juggernaut_holdout"
-	{
-		"override_hero"			"npc_dota_hero_juggernaut"
-		"AbilityLayout"			"5"
-		"MovementSpeed"			"365"
-
-		"Ability1"				"brewmaster_storm_wind_walk"
-		"Ability2"				"blademaster_mirror_image"
-		"Ability3"				"holdout_wardrums_aura"
-		"Ability4"				"juggernaut_blade_dance"
-		"Ability5"				"holdout_bonus"
-		"Ability6"				"juggernaut_blade_fury"
-		"Ability16"				"ability_unit_died_fire"
+		"Ability1"						"holdout_firestorm"
+		"Ability2"						"holdout_war_thunder"
+		"Ability3"						"holdout_unholy_aura"		
+		"Ability4"						"holdout_rain_of_chaos"
+		"Ability5"						"holdout_innate_great_cleave"
+		"Ability6"						"holdout_doom"
+		"Ability16"						"ability_unit_died_death"
 	}
 
 	//========================================================================================================
@@ -171,35 +61,91 @@
 	//========================================================================================================
 	"npc_dota_hero_brewmaster_holdout"
 	{
-		"override_hero"			"npc_dota_hero_brewmaster"
-		"AbilityLayout"			"5"
-		"MovementSpeed"			"360"
+		"override_hero"					"npc_dota_hero_brewmaster"
+		"AbilityLayout"					"6"
+		"MovementSpeed"					"360"
 
-		"Ability1"				"holdout_drunken_haze"
-		"Ability2"				"holdout_dragon_slave"
-		"Ability3"				"holdout_drunken_brawler"
-		"Ability4"				"holdout_permanent_immolation"
-		"Ability5"				"holdout_bonus"
-		"Ability6"				"holdout_earthquake"
-		"Ability16"				"ability_unit_died_fire"
+		"AttributeStrengthGain"			"10"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"5"
+
+		"Ability1"						"holdout_drunken_haze"
+		"Ability2"						"holdout_dragon_slave"
+		"Ability3"						"holdout_drunken_brawler"
+		"Ability4"						"holdout_permanent_immolation"
+		"Ability5"						"shadow_shaman_shackles"
+		"Ability6"						"holdout_earthquake"
+		"Ability16"						"ability_unit_died_fire"
 	}
 
 	//========================================================================================================
-	// HERO: Chieftain( Tauren Chieftain )
+	// HERO: Archmage - Naira ( Crystal Maiden )
+	//========================================================================================================
+	"npc_dota_hero_crystal_maiden_holdout"
+	{
+		"override_hero"					"npc_dota_hero_crystal_maiden"
+		"AbilityLayout"					"6"
+		"MovementSpeed"					"360"
+
+		"AttackDamageMin"				"55"
+		"AttackDamageMax"				"70"
+		"AttributeStrengthGain"			"5"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"10"
+
+		"Ability1"						"holdout_crushing_wave"
+		"Ability2"						"holdout_summon_water_elemental"
+		"Ability3"						"holdout_debilitation_aura"		
+		"Ability4"						"holdout_drain"
+		"Ability5"						"holdout_mana_shield"
+		"Ability6"						"holdout_elemental_wave"
+		"Ability16"						"ability_unit_died_ice"
+	}
+
+	//========================================================================================================
+	// HERO: Arthas( Dragon Knight )
+	//========================================================================================================
+	"npc_dota_hero_dragon_knight_holdout"
+	{
+		"override_hero"					"npc_dota_hero_dragon_knight"
+		"AbilityLayout"					"6"
+		"MovementSpeed"					"350"
+
+		"AttackDamageMin"				"21"
+		"AttackDamageMax"				"27"
+		"AttributeStrengthGain"			"10"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"5"
+
+		"Ability1"						"holdout_holy_light"
+		"Ability2"						"holdout_divine_shield"
+		"Ability3"						"holdout_chieftain_endurance_aura"		
+		"Ability4"						"holdout_frostmourne"
+		"Ability5"						"holdout_innate_great_cleave"
+		"Ability6"						"holdout_light_roar"
+		"Ability16"						"ability_unit_died_fire"
+	}
+
+	//========================================================================================================
+	// HERO: Tauren Chieftain( Tauren Chieftain )
 	//========================================================================================================
 	"npc_dota_hero_elder_titan_holdout"
 	{
-		"override_hero"			"npc_dota_hero_elder_titan"
-		"AbilityLayout"			"5"
-		"MovementSpeed"			"375"
+		"override_hero"					"npc_dota_hero_elder_titan"
+		"AbilityLayout"					"6"
+		"MovementSpeed"					"375"
 
-		"Ability1"				"holdout_war_stomp"
-		"Ability2"				"holdout_shockwave"
-		"Ability3"				"holdout_chieftain_endurance_aura"
-		"Ability4"				"holdout_pulverize"
-		"Ability5"				"holdout_bonus"
-		"Ability6"				"holdout_lightning_stroke"
-		"Ability16"				"ability_unit_died_light"
+		"AttributeStrengthGain"			"10"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"5"
+
+		"Ability1"						"holdout_war_stomp"
+		"Ability2"						"holdout_shockwave"
+		"Ability3"						"holdout_chieftain_endurance_aura"
+		"Ability4"						"holdout_pulverize"
+		"Ability5"						"holdout_roar"
+		"Ability6"						"holdout_lightning_stroke"
+		"Ability16"						"ability_unit_died_light"
 	}
 
 	//========================================================================================================
@@ -207,36 +153,133 @@
 	//========================================================================================================
 	"npc_dota_hero_enchantress_holdout"
 	{
-		"override_hero"			"npc_dota_hero_enchantress"
-		"AbilityLayout"			"5"
-		"MovementSpeed"			"385"
+		"override_hero"					"npc_dota_hero_enchantress"
+		"AbilityLayout"					"6"
+		"MovementSpeed"					"355"
+		"AttackDamageMin"				"11"
+		"AttackDamageMax"				"21"
 
-		"Ability1"				"holdout_evasion"
-		"Ability2"				"tyrande_multiple_arrows"
-		"Ability3"				"holdout_critical_arrows"
-		"Ability4"				"holdout_endurance_aura"
-		"Ability5"				"holdout_bonus"
-		"Ability6"				"holdout_trueshot_aura"
-		"Ability16"				"ability_unit_died_light"
+		"AttributeStrengthGain"			"5"
+		"AttributeAgilityGain"			"10"
+		"AttributeIntelligenceGain"		"5"
+		"AttributePrimary"				"DOTA_ATTRIBUTE_AGILITY"
+
+		"Ability1"						"holdout_evasion"
+		"Ability2"						"tyrande_multiple_arrows"
+		"Ability3"						"holdout_critical_arrows"
+		"Ability4"						"holdout_endurance_aura"
+		"Ability5"						"holdout_poison_attack"
+		"Ability6"						"holdout_trueshot_aura"
+		"Ability16"						"ability_unit_died_light"
 	}
 
 	//========================================================================================================
-	// HERO: Huntress( Luna )
+	// HERO: Banehallow (Enigma)
 	//========================================================================================================
-	"npc_dota_hero_luna_holdout"
+	"npc_dota_hero_nevermore_holdout"
 	{
-		"override_hero"			"npc_dota_hero_luna"
-		"AbilityLayout"			"6"
-		"MovementSpeed"			"405"
+		"override_hero"					"npc_dota_hero_nevermore"
+		"AbilityLayout"					"6"
+		"MovementSpeed"					"365"
 
-		"Ability1"				"holdout_owl_lightning"
-		"Ability2"				"holdout_forked_lightning"
-		"Ability3"				"holdout_command_aura"
-		"Ability4"				"holdout_elunes_grace"
-		"Ability5"				"holdout_bonus"
-		"Ability6"				"holdout_innate_lunar_glaive"
-		"Ability7"				"holdout_moon_explosion"
-		"Ability16"				"ability_unit_died_light"
+		"ModelScale"					"1.1"
+		"AttackDamageMin"				"10"
+		"AttackDamageMax"				"15"
+		"AttackRange"					"600"
+		"AttributePrimary"				"DOTA_ATTRIBUTE_STRENGTH"
+		"AttributeBaseStrength"			"29"
+		"AttributeStrengthGain"			"10"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"5"
+		"MovementTurnRate"				"0.500000"
+		"HealthBarOffset"				"230"
+
+		"Ability1"						"holdout_bane_death_coil"
+		"Ability2"						"holdout_bane_permanent_immolation"
+		"Ability3"						"holdout_bane_critical"		
+		"Ability4"						"holdout_endurance_aura"
+		"Ability5"						"holdout_command_aura_innate"
+		"Ability6"						"holdout_stampede"
+		"Ability7"						"holdout_green_effect"
+		"Ability16"						"ability_unit_died_death"
+	}
+
+	//========================================================================================================
+	// HERO: Blood Mage (Invoker)
+	//========================================================================================================
+	"npc_dota_hero_invoker_holdout"
+	{
+		"override_hero"					"npc_dota_hero_invoker"
+		"ModelScale"					"0.9"
+		"AttackDamageMin"				"39"
+		"AttackDamageMax"				"45"
+		"AbilityLayout"					"6"
+		"MovementSpeed"					"360"
+//		"AttributePrimary"				"DOTA_ATTRIBUTE_AGILITY"
+		"ProjectileModel"				"particles/units/heroes/hero_rubick/rubick_base_attack.vpcf"
+
+		"AttributeStrengthGain"			"5"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"10"
+
+		"Ability1"						"holdout_burning_oil"
+		"Ability2"						"holdout_dragon_slave_alt"
+		"Ability3"						"holdout_incinerate"
+		"Ability4"						"holdout_firebolt"
+		"Ability5"						"shadow_shaman_shackles"
+		"Ability6"						"holdout_phoenix"
+		"Ability7"						"blood_mage_orbs"
+		"Ability16"						"ability_unit_died_fire"
+		"Ability17"						""
+	}
+
+	//========================================================================================================
+	// HERO: Blademaster( Juggernaut )
+	//========================================================================================================
+	"npc_dota_hero_juggernaut_holdout"
+	{
+		"override_hero"					"npc_dota_hero_juggernaut"
+		"AbilityLayout"					"6"
+		"MovementSpeed"					"365"
+		"AttributePrimary"				"DOTA_ATTRIBUTE_STRENGTH"
+
+		"AttributeStrengthGain"			"10"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"5"
+
+		"Ability1"						"brewmaster_storm_wind_walk"
+		"Ability2"						"blademaster_mirror_image"
+		"Ability3"						"holdout_wardrums_aura"
+		"Ability4"						"juggernaut_blade_dance"
+		"Ability5"						"holdout_berserkers_rage"
+		"Ability6"						"juggernaut_blade_fury"
+		"Ability16"						"ability_unit_died_fire"
+	}
+
+	//========================================================================================================
+	// HERO: Archimage( Keeper of the Light )
+	//========================================================================================================
+	"npc_dota_hero_keeper_of_the_light_holdout"
+	{
+		"override_hero"					"npc_dota_hero_keeper_of_the_light"
+		"AbilityLayout"					"6"
+		"MovementSpeed"					"370"
+
+		"AttributeBaseStrength"			"14"
+		"AttributeBaseAgility"			"25"
+		"AttributeBaseIntelligence"		"25"
+		"AttributeStrengthGain"			"5"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"10"
+
+		"Ability1"						"holdout_blizzard"
+		"Ability2"						"holdout_summon_water_elemental_alt"
+		"Ability3"						"holdout_debilitation_aura"
+		"Ability4"						"holdout_frostbolt"
+		"Ability5"						"holdout_magic_shield"
+		"Ability6"						"holdout_monsoon"
+		"Ability10"						""
+		"Ability16"						"ability_unit_died_ice"
 	}
 
 	//========================================================================================================
@@ -244,35 +287,171 @@
 	//========================================================================================================
 	"npc_dota_hero_lich_holdout"
 	{
-		"override_hero"			"npc_dota_hero_lich"
-		"AbilityLayout"			"5"
-		"MovementSpeed"			"375"
+		"override_hero"					"npc_dota_hero_lich"
+		"AbilityLayout"					"6"
+		"MovementSpeed"					"375"
 
-		"Ability1"				"holdout_frost_nova"
-		"Ability2"				"holdout_frost_breath"
-		"Ability3"				"holdout_frost_armor"
-		"Ability4"				"holdout_frost_arrows"
-		"Ability5"				"holdout_bonus"
-		"Ability6"				"holdout_frost_beast"
-		"Ability16"				"ability_unit_died_ice"
+		"AttributeStrengthGain"			"5"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"10"
+
+		"Ability1"						"holdout_frost_nova"
+		"Ability2"						"holdout_frost_breath"
+		"Ability3"						"holdout_frost_armor"
+		"Ability4"						"holdout_frost_arrows"
+		"Ability5"						"holdout_frost_frenzy"
+		"Ability6"						"holdout_frost_beast"
+		"Ability16"						"ability_unit_died_ice"
 	}
 
 	//========================================================================================================
-	// HERO: Uther Lightbringer( Omniknight )
+	// HERO: Sorceress (Lina)
+	//========================================================================================================
+	"npc_dota_hero_lina_holdout"
+	{
+		"override_hero"					"npc_dota_hero_lina"
+		"AbilityLayout"					"6"
+		"MovementSpeed"					"360"
+		"ModelScale"					"1.0"
+		"AttributePrimary"				"DOTA_ATTRIBUTE_AGILITY"
+
+		"AttributeStrengthGain"			"5"
+		"AttributeAgilityGain"			"10"
+		"AttributeIntelligenceGain"		"5"
+
+		"Ability1"						"holdout_monsoon_small"
+		"Ability2"						"holdout_phase_shift"
+		"Ability3"						"holdout_life_regeneration_aura"
+		"Ability4"						"holdout_permanent_lightning"
+		"Ability5"						"holdout_resistant_skin"
+		"Ability6"						"pugna_life_drain"
+		"Ability16"						"ability_unit_died_fire"
+	}
+
+	//========================================================================================================
+	// HERO: Huntress( Luna )
+	//========================================================================================================
+	"npc_dota_hero_luna_holdout"
+	{
+		"override_hero"					"npc_dota_hero_luna"
+		"ModelScale"					"1.1"
+		"AbilityLayout"					"6"
+		"MovementSpeed"					"335"
+		"ProjectileModel"				"particles/econ/items/luna/luna_crescent_moon/luna_attack_crescent_moon.vpcf"
+
+		"AttributeStrengthGain"			"5"
+		"AttributeAgilityGain"			"10"
+		"AttributeIntelligenceGain"		"5"
+
+		"Ability1"						"holdout_owl_lightning"
+		"Ability2"						"holdout_forked_lightning"
+		"Ability3"						"holdout_command_aura"
+		"Ability4"						"holdout_elunes_grace"
+		"Ability5"						"holdout_innate_lunar_glaive"
+		"Ability6"						"holdout_moon_explosion"
+		"Ability16"						"ability_unit_died_light"
+	}
+
+	//========================================================================================================
+	// HERO: Priestess of the Moon (Mirana)
+	//========================================================================================================
+	"npc_dota_hero_mirana_holdout"
+	{
+		"override_hero"					"npc_dota_hero_mirana"
+		"AbilityLayout"					"6"
+		"MovementSpeed"					"355"
+		"ModelScale"					"0.95"
+		"AttackDamageMin"				"70"
+		"AttackDamageMax"				"80"
+		"AttackRange"					"530"
+
+		"AttributeStrengthGain"			"5"
+		"AttributeAgilityGain"			"10"
+		"AttributeIntelligenceGain"		"5"
+
+		"Ability1"						"zuus_arc_lightning"
+		"Ability2"						"holdout_watery_minion"
+		"Ability3"						"holdout_distance_aura"		
+		"Ability4"						"holdout_storm_rain"
+		"Ability5"						"holdout_rejuvenation"
+		"Ability6"						"holdout_monsoon"
+		"Ability16"						"ability_unit_died_ice"
+	}
+
+	//========================================================================================================
+	// HERO: Crypt Lord( Nyx Assassin )
+	//========================================================================================================
+	"npc_dota_hero_nyx_assassin_holdout"
+	{
+		"override_hero"					"npc_dota_hero_nyx_assassin"
+		"AbilityLayout"					"6"
+		"MovementSpeed"					"355"
+		"AttackDamageMin"				"61"
+		"AttackDamageMax"				"71"
+
+		"AttributePrimary"				"DOTA_ATTRIBUTE_STRENGTH"
+		"AttributeStrengthGain"			"10"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"5"
+
+		"Ability2"						"holdout_carrion_beetles"
+		"Ability3"						"holdout_poison_sting"
+		"Ability4"						"holdout_spiked_carapace"
+		"Ability5"						"holdout_anubarak_claw"
+		"Ability6"						"holdout_locust_swarm"
+		"Ability7"						""
+		"Ability16"						"ability_unit_died_death"
+	}
+
+	//========================================================================================================
+	// HERO: Paladin( Omniknight )
 	//========================================================================================================
 	"npc_dota_hero_omniknight_holdout"
 	{
-		"override_hero"			"npc_dota_hero_omniknight"
-		"AbilityLayout"			"5"
-		"MovementSpeed"			"365"
+		"override_hero"					"npc_dota_hero_omniknight"
+		"AbilityLayout"					"6"
+		"MovementSpeed"					"365"
+		"AttackDamageMin"				"61"
+		"AttackDamageMax"				"71"
 
-		"Ability1"				"holdout_healing_wave"
-		"Ability2"				"holdout_fan_of_light"
-		"Ability3"				"holdout_devotion_aura"
-		"Ability4"				"holdout_howl_of_terror"
-		"Ability5"				"holdout_bonus"
-		"Ability6"				"holdout_pure_light"
-		"Ability16"				"ability_unit_died_light"
+		"AttributeStrengthGain"			"10"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"5"
+
+		"Ability1"						"holdout_healing_wave"
+		"Ability2"						"holdout_fan_of_light"
+		"Ability3"						"holdout_devotion_aura"
+		"Ability4"						"holdout_howl_of_terror"
+		"Ability5"						"axe_berserkers_call"
+		"Ability6"						"holdout_pure_light"
+		"Ability16"						"ability_unit_died_light"
+	}
+
+	//========================================================================================================
+	// HERO: Warden (Phantom Assassin)
+	//========================================================================================================
+	"npc_dota_hero_phantom_assassin_holdout"
+	{
+		"override_hero"					"npc_dota_hero_phantom_assassin"
+		"AbilityLayout"					"6"
+		"MovementSpeed"					"355"
+		"ModelScale"					"1.1"
+		"AttackDamageMin"				"55"
+		"AttackDamageMax"				"70"
+		"AttackRange"					"150"
+		"HealthBarOffset"				"190"
+
+		"AttributeStrengthGain"			"5"
+		"AttributeAgilityGain"			"10"
+		"AttributeIntelligenceGain"		"5"
+
+		"Ability1"						"holdout_heat_seeking_daggers"
+		"Ability2"						"holdout_shadow_strike"
+		"Ability3"						"holdout_permanent_stats"		
+		"Ability4"						"holdout_gust_pool"
+		"Ability5"						"holdout_blink"
+		"Ability6"						"holdout_vengeance"
+		"Ability16"						"ability_unit_died_death"
 	}
 
 	//========================================================================================================
@@ -280,17 +459,58 @@
 	//========================================================================================================
 	"npc_dota_hero_pugna_holdout"
 	{
-		"override_hero"			"npc_dota_hero_pugna"
-		"AbilityLayout"			"5"
-		"MovementSpeed"			"380"
+		"override_hero"					"npc_dota_hero_pugna"
+		"AbilityLayout"					"6"
+		"MovementSpeed"					"380"
+		"AttackCapabilities"			"DOTA_UNIT_CAP_MELEE_ATTACK"
+		"AttackRange"					"150"
+		"ProjectileModel"				""
+		"ProjectileSpeed"				""
 
-		"Ability1"				"holdout_carrion_swarm"
-		"Ability2"				"holdout_chaos"
-		"Ability3"				"holdout_aura_of_blight"
-		"Ability4"				"holdout_death_coil"
-		"Ability5"				"holdout_bonus"
-		"Ability6"				"holdout_inferno"
-		"Ability16"				"ability_unit_died_death"
+		"AttributePrimary"				"DOTA_ATTRIBUTE_STRENGTH"
+
+		"AttributeStrengthGain"			"10"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"5"
+
+		"Ability1"						"holdout_carrion_swarm"
+		"Ability2"						"holdout_chaos"
+		"Ability3"						"holdout_aura_of_blight"
+		"Ability4"						"holdout_death_coil"
+		"Ability5"						"holdout_sleep"
+		"Ability6"						"holdout_inferno"
+		"Ability16"						"ability_unit_died_death"
+	}
+
+	//========================================================================================================
+	// HERO: Space Marine (Clockwerk)
+	//========================================================================================================
+	"npc_dota_hero_rattletrap_holdout"
+	{
+		"override_hero"					"npc_dota_hero_rattletrap"
+		"AbilityLayout"					"6"
+		"MovementSpeed"					"365"
+		"ModelScale"					"1.15"
+		"AttackDamageMin"				"65"
+		"AttackDamageMax"				"75"
+		"AttackRange"					"650"
+		"AttackCapabilities"			"DOTA_UNIT_CAP_RANGED_ATTACK"
+		"ProjectileModel"				"particles/econ/items/sniper/sniper_charlie/sniper_assassinate_charlie.vpcf"
+		"GameSoundsFile"				"soundevents/game_sounds_heroes/game_sounds_rattletrap.vsndevts"
+		"ProjectileSpeed"				"1700"
+		"HealthBarOffset"				"170"
+
+		"AttributeStrengthGain"			"10"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"5"
+
+		"Ability1"						"holdout_hurl_bomb"
+		"Ability2"						"holdout_fan_of_rockets"
+		"Ability3"						"holdout_aura_of_blight"		
+		"Ability4"						"holdout_metal_armor"
+		"Ability5"						"pugna_decrepify"
+		"Ability6"						"holdout_clone"
+		"Ability16"						"ability_unit_died_fire"
 	}
 
 	//========================================================================================================
@@ -298,17 +518,51 @@
 	//========================================================================================================
 	"npc_dota_hero_shadow_shaman_holdout"
 	{
-		"override_hero"			"npc_dota_hero_shadow_shaman"
-		"AbilityLayout"			"5"
-		"MovementSpeed"			"355"
+		"override_hero"					"npc_dota_hero_shadow_shaman"
+		"AbilityLayout"					"6"
+		"AttackDamageMin"				"75"
+		"AttackDamageMax"				"85"
+		"MovementSpeed"					"355"
+		"AttributePrimary"				"DOTA_ATTRIBUTE_AGILITY"
 
-		"Ability1"				"techies_land_mines"
-		"Ability2"				"holdout_serpent_ward"
-		"Ability3"				"holdout_feedback"		
-		"Ability4"				"holdout_voodoo_eyes"
-		"Ability5"				"holdout_bonus"
-		"Ability6"				"holdout_laser_trap"
-		"Ability16"				"ability_unit_died_fire"
+		"AttributeStrengthGain"			"5"
+		"AttributeAgilityGain"			"10"
+		"AttributeIntelligenceGain"		"5"
+
+		"Ability1"						"techies_land_mines"
+		"Ability2"						"holdout_serpent_ward"
+		"Ability3"						"holdout_feedback"		
+		"Ability4"						"holdout_voodoo_eyes"
+		"Ability5"						"juggernaut_healing_ward"
+		"Ability6"						"holdout_laser_trap"
+		"Ability16"						"ability_unit_died_fire"
+	}
+
+	//========================================================================================================
+	// HERO: Rifleman( Sniper )
+	//========================================================================================================
+	"npc_dota_hero_sniper_holdout"
+	{
+		"override_hero"					"npc_dota_hero_sniper"
+		"AbilityLayout"					"6"
+		"AttackRange"					"600"
+		"AttackDamageMin"				"30"
+		"AttackDamageMax"				"40"
+		"ModelScale"					"1.1"
+		"MovementSpeed"					"350"
+		"AttributePrimary"				"DOTA_ATTRIBUTE_STRENGTH"
+
+		"AttributeStrengthGain"			"10"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"5"
+
+		"Ability1"						"holdout_rocket_launcher"
+		"Ability2"						"holdout_plasma_rifle"
+		"Ability3"						"holdout_distance_aura"		
+		"Ability4"						"holdout_shield"
+		"Ability5"						"ogre_magi_bloodlust"
+		"Ability6"						"holdout_laser"
+		"Ability16"						"ability_unit_died_fire"
 	}
 
 	//========================================================================================================
@@ -316,79 +570,22 @@
 	//========================================================================================================
 	"npc_dota_hero_sven_holdout"
 	{
-		"override_hero"			"npc_dota_hero_sven"
-		"AbilityLayout"			"5"
-		"MovementSpeed"			"355"
+		"override_hero"					"npc_dota_hero_sven"
+		"AbilityLayout"					"6"
+		"ModelScale"					"0.6"
+		"MovementSpeed"					"522"
 
-		"Ability1"				"sven_storm_bolt"
-		"Ability2"				"brewmaster_thunder_clap"
-		"Ability3"				"holdout_muradin_hammer"		
-		"Ability4"				"slardar_bash"
-		"Ability5"				"holdout_bonus"
-		"Ability6"				"holdout_avatar"
-		"Ability16"				"ability_unit_died_fire"
-	}
+		"AttributeStrengthGain"			"10"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"5"
 
-	//========================================================================================================
-	// HERO: Tarhunt - Storm God( Arc Warden )
-	//========================================================================================================
-	"npc_dota_hero_arc_warden_holdout"
-	{
-		"override_hero"			"npc_dota_hero_arc_warden"
-		"AbilityLayout"			"5"
-		"MovementSpeed"			"345"
-
-		"Ability1"				"leshrac_lightning_storm"
-		"Ability2"				"holdout_magnetic_field"
-		"Ability3"				"holdout_electric_vortex"		
-//		"Ability4"				"holdout_delightful_torment"
-		"Ability4"				"holdout_inner_lightning"
-		"Ability5"				"holdout_bonus"
-		"Ability6"				"arc_warden_tempest_double"
-		"Ability16"				"ability_unit_died_ice"
-	}
-
-	//========================================================================================================
-	// HERO: Archimonde( Warlock )
-	//========================================================================================================
-	"npc_dota_hero_warlock_holdout"
-	{
-		"override_hero"			"npc_dota_hero_warlock"
-		"AbilityLayout"			"5"
-		"MovementSpeed"			"355"
-
-		"Ability1"				"holdout_dark_portal"
-		"Ability2"				"holdout_spiritual_beast"
-		"Ability3"				"holdout_evasion_and_critical_strike"
-		"Ability4"				"holdout_archimonde"
-		"Ability5"				"holdout_bonus"
-		"Ability6"				"holdout_gargoyle_swarm"
-		"Ability16"				"ability_unit_died_death"
-
-		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
-		"AttackRange"				"140"
-		"ProjectileModel"			""
-		"ProjectileSpeed"			"900"
-	}
-
-	//========================================================================================================
-	// HERO: Windrunner
-	//========================================================================================================
-	"npc_dota_hero_windrunner_holdout"
-	{
-		"override_hero"			"npc_dota_hero_windrunner"
-		"AttributeBaseAgility"	"79" // Base agility Should have 206 Attack Speed, 0.77
-		"AttributeAgilityGain"	"2.8" // Agility bonus per level. Original is 1.4
-		"AbilityLayout"			"5"
-		"MovementSpeed"			"355"
-
-		"Ability1"				"holdout_inner_fire"
-		"Ability2"				"holdout_searing_arrows"
-		"Ability3"				"holdout_bash_arrows"
-		"Ability4"				"holdout_critical_arrows"
-		"Ability5"				"holdout_bonus"
-		"Ability6"				"holdout_splash_arrows"
-		"Ability16"				"ability_unit_died_light"
+		"Ability1"						"sven_storm_bolt"
+		"Ability2"						"brewmaster_thunder_clap"
+		"Ability3"						"holdout_muradin_hammer"		
+		"Ability4"						"slardar_bash"
+		"Ability5"						"holdout_thunder_spirit"
+		"Ability6"						"holdout_avatar"
+		"Ability16"						"ability_unit_died_fire"
 	}
 
 	//========================================================================================================
@@ -396,16 +593,107 @@
 	//========================================================================================================
 	"npc_dota_hero_terrorblade_holdout"
 	{
-		"override_hero"			"npc_dota_hero_terrorblade"
-		"AbilityLayout"			"5"
-		"MovementSpeed"			"375"
+		"override_hero"					"npc_dota_hero_terrorblade"
+		"AbilityLayout"					"6"
+		"MovementSpeed"					"375"
+		"ModelScale"					"1.05"
 
-		"Ability1"				"holdout_negative_energy"
-		"Ability2"				"holdout_active_immolation"
-		"Ability3"				"holdout_thirst_aura"
-		"Ability4"				"holdout_illidan_evasion"
-		"Ability5"				"holdout_bonus"
-		"Ability6"				"holdout_metamorphosis"
-		"Ability16"				"ability_unit_died_light"
+		"AttributeStrengthGain"			"5"
+		"AttributeAgilityGain"			"10"
+		"AttributeIntelligenceGain"		"5"
+
+		"Ability1"						"holdout_negative_energy"
+		"Ability2"						"holdout_active_immolation"
+		"Ability3"						"holdout_thirst_aura"
+		"Ability4"						"holdout_illidan_evasion"
+		"Ability5"						"holdout_roar"
+		"Ability6"						"holdout_metamorphosis"
+		"Ability16"						"ability_unit_died_light"
+	}
+
+	//========================================================================================================
+	// HERO: Archimonde( Warlock )
+	//========================================================================================================
+	"npc_dota_hero_warlock_holdout"
+	{
+		"override_hero"					"npc_dota_hero_warlock"
+		"AbilityLayout"					"6"
+		"MovementSpeed"					"355"
+		"AttributePrimary"				"DOTA_ATTRIBUTE_STRENGTH"
+
+		"AttributeStrengthGain"			"10"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"5"
+
+		"Ability1"						"holdout_dark_portal"
+		"Ability2"						"holdout_spiritual_beast"
+		"Ability3"						"holdout_evasion_and_critical_strike"
+		"Ability4"						"holdout_archimonde"
+		"Ability5"						"holdout_cripple"
+		"Ability6"						"holdout_gargoyle_swarm"
+		"Ability16"						"ability_unit_died_death"
+
+		"AttackCapabilities"			"DOTA_UNIT_CAP_MELEE_ATTACK"
+		"AttackRange"					"150"
+		"ProjectileModel"				""
+		"ProjectileSpeed"				"900"
+	}
+
+	//========================================================================================================
+	// HERO: Windrunner (Ranger)
+	//========================================================================================================
+	"npc_dota_hero_windrunner_holdout"
+	{
+		"override_hero"					"npc_dota_hero_windrunner"
+		"AttributeBaseAgility"			"44" // Base agility Should have 206 Attack Speed, 0.77
+		"AbilityLayout"					"6"
+		"MovementSpeed"					"355"
+		"AttributePrimary"				"DOTA_ATTRIBUTE_AGILITY"
+
+		"AttributeStrengthGain"			"5"
+		"AttributeAgilityGain"			"10"
+		"AttributeIntelligenceGain"		"5"
+
+		"Ability1"						"holdout_inner_fire"
+		"Ability2"						"holdout_searing_arrows"
+		"Ability3"						"holdout_bash_arrows"
+		"Ability4"						"holdout_critical_arrows_alt"
+		"Ability5"						"forest_troll_high_priest_heal"
+		"Ability6"						"holdout_splash_arrows"
+		"Ability16"						"ability_unit_died_light"
+	}
+
+	//========================================================================================================
+	// HERO: Wisp (Dummy Unit)
+	//========================================================================================================
+	"npc_dota_hero_wisp_holdout"
+	{
+		"override_hero"					"npc_dota_hero_wisp"
+		"IsAncient"						"1"
+		"AbilityLayout"					"4"
+		"ArmorPhysical"					"0"
+		"MovementSpeed"					"250"
+		"ModelScale"					"0.5"
+		"AttackDamageMin"				"0"
+		"AttackDamageMax"				"0"
+		"AttributeBaseStrength"			"0"
+		"AttributeStrengthGain"			"0"
+		"AttributeBaseAgility"			"0"
+		"AttributeAgilityGain"			"0"
+		"AttributeBaseIntelligence"		"0"
+		"AttributeIntelligenceGain"		"0"
+		"StatusHealth"					"1"
+		"StatusMana"					"0"
+
+		"Ability1"						"dummy_passive_vulnerable_wisp"
+		"Ability2"						""
+		"Ability3"						""
+		"Ability4"						""
+		"Ability5"						""
+		"Ability6"						""
+		"Ability7"						""
+		"Ability8"						""
+		"Ability9"						""
+		"Ability10"						""
 	}
 }

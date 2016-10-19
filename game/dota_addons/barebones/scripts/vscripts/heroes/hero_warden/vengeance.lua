@@ -7,7 +7,7 @@ function spawn_spirit( event )
 	local max_spirits = ability:GetLevelSpecialValueFor("max_units", ability:GetLevel()-1)
 	local number_spirits = ability:GetLevelSpecialValueFor("units", ability:GetLevel()-1)
 
-	if IsValidAlive(avatar) then
+	if not avatar:IsNull() then
 		if avatar.spirits == nil then
 			avatar.spirits = {}
 		end

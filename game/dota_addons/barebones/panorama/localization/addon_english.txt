@@ -1,33 +1,39 @@
 "addon"
 {
-	"InstructionsTitle"								"X Hero Siege"
-	"InstructionsObjective"							"OBJECTIVE:"
-	"InstructionsObjectiveText"						"Defend your castle! Yes, the old X Hero Siege is brought back, just for you."
-	"InstructionsHowToPlay"							"HOW TO PLAY"
-	"InstructionsLines"								"- Defend your castle against creep lanes( choose 1 lane per player ).<br>
-													- Destroy towers to release bosses, and then head to the Barrackment to stop creep spawns.<br>
-													- Once every barrackment destroyed, head to the ice towers and fight harder creeps, ,destroy the ice towers.<br>
-													- Head back to your castle to defend it, the Final Wave is coming!<br>
-													- Don't worry, after Final wave your castle is safe!."
+	"InstructionsTitle"							"X Hero Siege"
+	"InstructionsObjective"						"OBJECTIVE:"
+	"InstructionsObjectiveText"					"Defend your castle! Yes, the old X Hero Siege is brought back, just for you."
+	"InstructionsHowToPlay"						"HOW TO PLAY"
+//	"InstructionsLines"							"- Defend your castle against creep lanes( choose 1 lane per player ).<br>
+//												- Destroy towers to release bosses, and then head to the Barrackment to stop creep spawns.<br>
+//												- Once every barrackment destroyed, head to the ice towers and fight harder creeps, ,destroy the ice towers.<br>
+//												- Head back to your castle to defend it, the Final Wave is coming!<br>
+//												- Don't worry, after Final wave your castle is safe!."
 
-	"DOTA_GoodGuys"   								"Light Forces"
-	"DOTA_BadGuys"    								"Dark Forces"
+	"DOTA_GoodGuys"   							"Light Forces"
+	"DOTA_BadGuys"    							"Dark Forces"
 
-	"Remaining"										"REMAINING"
-	"Goal"											"Special Event:"
-	"CreepGoal"										"Creep Upgrade:"
-	"IncomingWaveGoal"								"Incoming Wave:"
+	"Remaining"									"REMAINING"
+	"Goal"										"Special Event:"
+	"CreepGoal"									"Creep Upgrade:"
+	"IncomingWaveGoal"							"Incoming Wave:"
 
-	"addonname"										"X Hero Siege"
-	"overthrow_game_info_header_objective"			"Objective:"
-	"overthrow_brief_description"					"Defeat the dark forces! Make your way to fight Arthas and stop the dark force army."
-	"overthrow_game_info_header_how_to_play"		"How To Play:"
-	"overthrow_game_info_throne"					"Defend your castle against creep lanes( choose 1 lane per player )."
-	"overthrow_game_info_coins"						"Destroy towers to release bosses, and then head to the barrackment to stop creep spawns."
-	"overthrow_game_info_items"						"Once every barrackments are destroyed, head to the ice towers and fight harder creeps, then when you can destroy ice towers."
-	"overthrow_game_info_tips_header"				"Tips:"
-	"overthrow_game_info_tip01"						"Don't rush the game, farm, be patient."
-	"overthrow_game_info_tip02"						"Do not enter the phase 2 arena too early or you will make your whole team lose( ice towers lanes )."
-	"overthrow_game_info_tip03"						"Remember this gamemode is about team-play, if one of your mate is weak, buy some tomes for him."
-	"overthrow_game_info_tip04"						"The more time you farm, the more easier it will be, judge yourself when you want to head to the bosses."
+	"addonname"									"X Hero Siege"
+	"overthrow_game_info_header_objective"		"Objective:"
+	"overthrow_brief_description"				"Defeat the dark forces! Make your way to fight Arthas!"
+	"overthrow_game_info_header_how_to_play"	"How To Play:"
+	"overthrow_game_info_throne"				"Defend your castle against creep lanes( choose 1 lane per player )."
+	"overthrow_game_info_coins"					"Destroy towers to release bosses, and then head to the barrackment to stop creep spawns."
+	"overthrow_game_info_items"					"Once every barrackments are destroyed, head to the ice towers and fight harder creeps, then when you can destroy ice towers."
+	"overthrow_game_info_tips_header"			"Tips:"
+	"overthrow_game_info_tip01"					"Don't rush the game, farm, be patient."
+	"overthrow_game_info_tip02"					"Do not enter the phase 2 arena too early or you will make your whole team lose( ice towers lanes )."
+	"overthrow_game_info_tip03"					"Remember this gamemode is about team-play, if one of your mate is weak, buy some tomes for him."
+	"overthrow_game_info_tip04"					"The more time you farm, the more easier it will be, judge yourself when you want to head to the bosses."
+
+	"AddonTitleDifficulty"						"Current Difficulty:"
+	"AddonDifficultyEasy"						"Easy: 150% Gold, 100% XP, 75% Damage."
+	"AddonDifficultyNormal"						"Normal: 100% Gold, 100% XP, 100% Damage."
+	"AddonDifficultyHard"						"Hard: 80% Gold, 90% XP, 120% Damage."
+	"AddonDifficultyExtreme"					"Extreme: 60% Gold, 70% XP, 150% Damage."
 }

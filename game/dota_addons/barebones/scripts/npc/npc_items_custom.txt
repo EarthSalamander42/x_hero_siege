@@ -14,12 +14,12 @@
 
 		// Item Info
 		//----------------------------------------------------------------------------------------------------
-		"ItemCost"						"10000"
+		"ItemCost"						"15000"
 		"ItemShopTags"					"unique"
 		"ItemQuality"					"component"
 		"ItemAliases"					"mask of death"
 		"SecretShop"					"1"
-		"ItemShareability"				"ITEM_NOT_SHAREABLE"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
 
 		// Special
 		//----------------------------------------------------------------------------------------------------
@@ -94,7 +94,7 @@
 		"ItemQuality"					"component"
 		"ItemAliases"					"assassins blade"
 		"ItemStackable"					"0"
-		"ItemShareability"				"ITEM_NOT_SHAREABLE"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
 		"ItemPermanent"					"0"
 		"SecretShop"					"1"
 
@@ -178,7 +178,7 @@
 		"ItemQuality"					"component"
 		"ItemAliases"					"claws of attack"
 		"ItemStackable"					"0"
-		"ItemShareability"				"ITEM_NOT_SHAREABLE"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
 		"ItemPermanent"					"0"
 		"SecretShop"					"1"
 
@@ -253,7 +253,7 @@
 			"01"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"reincarnation_time"		"6"
+				"reincarnation_time"		"5"
 			}
 		}
 
@@ -301,12 +301,13 @@
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO"
 		"Model"							"models/props_gameplay/red_box.vmdl" 
 		"Effect"						"particles/generic_gameplay/dropped_item.vpcf"
-		"ItemCost"						"1000"
+		"ItemCost"						"10000"
 		"ItemKillable"					"1" 
 		"ItemCastOnPickup"				"0"
 		"ItemSellable"					"1"
 		"ItemPurchasable"				"1"
 		"ItemDroppable"					"1"
+		"SideShop"						"1"
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
 		"AbilityTextureName"			"tome_small"
 	
@@ -335,7 +336,7 @@
 			"01"
 			{
 				"var_type"      "FIELD_FLOAT"
-				"stat_bonus" "5"
+				"stat_bonus" "50"
 			}
 		}  
 	}
@@ -352,7 +353,7 @@
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO"
 		"Model"        "models/props_gameplay/red_box.vmdl" 
 		"Effect"       "particles/generic_gameplay/dropped_item.vpcf"
-		"ItemCost"     "10000"
+		"ItemCost"     "50000"
 		"ItemKillable" "1" 
 		"ItemSellable" "1"
 		"ItemCastOnPickup" "0"
@@ -360,6 +361,7 @@
 		"ItemDroppable" "1"
 		"ItemShareability" "ITEM_FULLY_SHAREABLE"
 		"AbilityTextureName" "tome_big"
+		"SideShop"						"1"
 
 		"ItemShopTags"					"artifact"
 		"ItemQuality"					"artifact"
@@ -386,7 +388,7 @@
 			"01"
 			{
 				"var_type"		"FIELD_FLOAT"
-				"stat_bonus"	"50"
+				"stat_bonus"	"250"
 			}
 		}
 	}
@@ -406,7 +408,7 @@
 		"ItemSellable" "1"
 		"ItemPurchasable" "0"
 		"ItemDroppable" "1"
-		"ItemShareability" "ITEM_FULLY_SHAREABLE"
+		"ItemShareability" "ITEM_NOT_SHAREABLE"
 		"AbilityTextureName" "item_aegis"
 	
 		"ItemShopTags"					"artifact"
@@ -472,58 +474,6 @@
 			"particle"	"particles/items_fx/aegis_respawn.vpcf"
 			"particle"	"particles/generic_hero_status/death_tombstone_alt.vpcf"
 		}   
-	}
-
-	//=================================================================================================================
-	// Mana Salve
-	//=================================================================================================================
-	"item_mana_salve"
-	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"ID"							"2509"
-		"BaseClass"             		"item_enchanted_mango"		
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET| DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
-		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
-		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO"
-		"Model"							"models/props_gameplay/clarity.mdl"
-		"AbilityTextureName"			"item_enchanted_mango"
-		// Stats
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCastRange"				"500"
-		"AbilityCastPoint"				"0.0"
-		"AbilityCooldown"				"1.0"
-
-		// Item Info
-		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"						"150"
-		"ItemShopTags"					"consumable"
-		"ItemQuality"					"consumable"
-		"ItemDeclarations"				"DECLARE_PURCHASES_TO_SPECTATORS"
-		"ItemAlertable"					"0"
-		"ItemAliases"					"mana salve"
-		"ItemStackable"					"1"
-		"ItemPermanent"					"0"
-		"ItemInitialCharges"			"15"
-		"ItemShareability"				"ITEM_FULLY_SHAREABLE_STACKING"
-		"ItemHideCharges"				"0"
-		"ItemDisplayCharges"			"1"
-
-		// Special	
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilitySpecial"
-		{
-			"01"
-			{
-				"var_type"				"FIELD_FLOAT"
-				"hp_regen"				"0.0"
-			}
-			"02"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"replenish_amount"		"500"
-			}	
-		}
 	}
 
 	//========================================================================================================
@@ -598,7 +548,7 @@
 	        "08"
 	        {
 	            "var_type"              "FIELD_FLOAT"
-	            "heal_armor_duration"   "20.0"
+	            "heal_armor_duration"   "25.0"
 	        }
 	    }
 	    
@@ -778,7 +728,7 @@
 	        "08"
 	        {
 	            "var_type"              "FIELD_FLOAT"
-	            "heal_armor_duration"   "20.0"
+	            "heal_armor_duration"   "25.0"
 	        }
 	    }
 	    
@@ -904,7 +854,7 @@
 	    // Stats        
 	    //-------------------------------------------------------------------------------------------------------------
 	    "AbilityCastPoint"              "0.0"
-	    "AbilityCooldown"               "40"
+	    "AbilityCooldown"               "35"
 	    "AbilityManaCost"               "4000"
 	    
 	    // Item Info
@@ -943,7 +893,7 @@
 	        "05"
 	        {
 	            "var_type"              "FIELD_INTEGER"
-	            "heal_amount"           "5000"
+	            "heal_amount"           "4000"
 	        }
 	        "06"
 	        {
@@ -958,7 +908,7 @@
 	        "08"
 	        {
 	            "var_type"              "FIELD_FLOAT"
-	            "heal_armor_duration"   "20.0"
+	            "heal_armor_duration"   "25.0"
 	        }
 	    }
 	    
@@ -1123,7 +1073,7 @@
 	        "05"
 	        {
 	            "var_type"              "FIELD_INTEGER"
-	            "heal_amount"           "25000"
+	            "heal_amount"           "10000"
 	        }
 	        "06"
 	        {
@@ -1138,7 +1088,7 @@
 	        "08"
 	        {
 	            "var_type"              "FIELD_FLOAT"
-	            "heal_armor_duration"   "20.0"
+	            "heal_armor_duration"   "25.0"
 	        }
 	    }
 	    
@@ -1247,452 +1197,18 @@
 	}
 
 	//=================================================================================================================
-	// Heart of Tarrasque 2
+	// Mana Potion 1
 	//=================================================================================================================
-	"item_heart2"
-	{
-		"ID"							"2518"
-
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-		"BaseClass"						"item_heart"
-		"AbilityTextureName"			"item_heart2"
-
-		// Stats		
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCooldown"				"6.0"
-
-		// Item Info
-		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"						"10750"
-		"ItemShopTags"					"str;regen_health;health_pool"
-		"ItemQuality"					"epic"
-		"ItemDeclarations"				"DECLARE_PURCHASES_TO_SPECTATORS"
-		"ItemDisassembleRule"			"0"
-		"ItemAlertable"					"0"
-		"ItemAliases"					"hot 2;heart of tarrasque 2"
-		"ItemBaseLevel"					"2"
-		"MaxUpgradeLevel"				"3"
-
-		// Special	
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilitySpecial"
-		{
-			"01"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_strength"		"90"
-			}
-			"02"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_health"			"900"
-			}
-			"03"
-			{
-				"var_type"				"FIELD_FLOAT"
-				"health_regen_rate"		"3.0"
-			}
-			"04"
-			{
-				"var_type"				"FIELD_FLOAT"
-				"cooldown_melee"		"4.5"
-			}
-			"05"
-			{
-				"var_type"					"FIELD_FLOAT"
-				"cooldown_ranged_tooltip"	"6.5"
-			}
-		}
-	}
-
-	//=================================================================================================================
-	// Recipe: Heart of Tarrasque 2
-	//=================================================================================================================
-	"item_recipe_heart2"
-	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"BaseClass"						"item_recipe_heart"
-		"ID"							"2519"														// unique ID number for this item.  Do not change this once established or it will invalidate collected stats.
-		"Model"							"models/props_gameplay/recipe.mdl"
-
-		// Item Info
-		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"						"6250"	
-		"ItemShopTags"					""
-		
-		// Recipe
-		//-------------------------------------------------------------------------------------------------------------
-		"ItemRecipe"					"1"
-		"ItemResult"					"item_heart2"
-		"ItemRequirements"
-		{
-			"01"						"item_heart"
-		}
-	}
-
-	//=================================================================================================================
-	// Heart of Tarrasque 3
-	//=================================================================================================================
-	"item_heart3"
-	{
-		"ID"							"2520"
-
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-		"BaseClass"						"item_heart"
-		"AbilityTextureName"			"item_heart3"
-
-		// Stats		
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCooldown"				"5.0"
-
-		// Item Info
-		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"						"20750"
-		"ItemShopTags"					"str;regen_health;health_pool"
-		"ItemQuality"					"epic"
-		"ItemDeclarations"				"DECLARE_PURCHASES_TO_SPECTATORS"
-		"ItemDisassembleRule"			"0"
-		"ItemAlertable"					"0"
-		"ItemAliases"					"hot;heart of tarrasque"
-		"ItemBaseLevel"					"3"
-		"MaxUpgradeLevel"				"3"
-		
-		// Special	
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilitySpecial"
-		{
-			"01"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_strength"		"150"
-			}
-			"02"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_health"			"3600"
-			}
-			"03"
-			{
-				"var_type"				"FIELD_FLOAT"
-				"health_regen_rate"		"3.5"
-			}
-			"04"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"cooldown_melee"		"4"
-			}
-			"05"
-			{
-				"var_type"					"FIELD_INTEGER"
-				"cooldown_ranged_tooltip"	"6"
-			}
-		}
-	}
-
-	//=================================================================================================================
-	// Recipe: Heart of Tarrasque 3
-	//=================================================================================================================
-	"item_recipe_heart3"
-	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"BaseClass"						"item_recipe_heart"
-		"ID"							"2521"														// unique ID number for this item.  Do not change this once established or it will invalidate collected stats.
-		"Model"							"models/props_gameplay/recipe.mdl"
-		
-		// Item Info
-		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"						"10000"	
-		"ItemShopTags"					""
-		
-		// Recipe
-		//-------------------------------------------------------------------------------------------------------------
-		"ItemRecipe"					"1"
-		"ItemResult"					"item_heart3"
-		"ItemRequirements"
-		{
-			"01"						"item_heart2"
-		}
-	}
-
-	//=================================================================================================================
-	// Desolator 2
-	//=================================================================================================================
-	"item_desolator2"
-	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"ID"							"2522"
-		"BaseClass"						"item_datadriven"
-		"AbilityTextureName"			"desolator2"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-
-		// Item Info
-		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"						"11000"
-		"ItemShopTags"					"damage;unique"
-		"ItemQuality"					"artifact"
-		"ItemAliases"					"desolator 2"
-		"ItemDeclarations"				"DECLARE_PURCHASES_TO_TEAMMATES | DECLARE_PURCHASES_IN_SPEECH | DECLARE_PURCHASES_TO_SPECTATORS"
-		"ItemBaseLevel"					"2"
-		"MaxUpgradeLevel"				"3"
-
-		// Special	
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilitySpecial"
-		{
-			"01"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_damage"			"100"
-			}
-			"02"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"corruption_armor"		"-20"
-			}
-			"03"
-			{
-				"var_type"				"FIELD_FLOAT"
-				"corruption_duration"	"15.0"
-			}
-		}
-
-		"Modifiers"
-		{
-			"modifier_item_desolator"
-			{
-				"Passive"				"1"
-				"IsHidden"				"1"
-				"Attribures"			"MODIFIER_ATTRIBUTE_MULTIPLE"
-		
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_BASEATTACK_BONUSDAMAGE"		"%bonus_damage"
-				}
-
-				"Orb"
-				{
-					"Priority"			"DOTA_ORB_PRIORITY_ITEM"
-					"ProjectileName"	"particles/items_fx/desolator_projectile_2.vpcf"
-					"CastAttack"		"0"
-				}
-
-				"OnOrbFire"
-				{
-					"ApplyModifier"
-					{
-						"ModifierName"	"modifier_item_desolator_corruption"
-						"Target" 		"TARGET"
-					}
-				}
-
-				"OnOrbImpact"
-				{
-					"FireSound"
-					{
-						"EffectName"	"Item_Desolator.Target"
-						"Target" 		"TARGET"
-					}
-
-					"FireEffect"
-					{
-						"EffectName"			"particles/econ/items/antimage/antimage_weapon_basher_ti5_gold/am_manaburn_basher_ti_5_b_gold.vpcf"
-						"EffectAttachType"		"follow_origin"
-						"Target"				"TARGET"
-					}
-				}
-			}
-
-			"modifier_item_desolator_corruption"
-			{
-				"Duration"			"%corruption_duration"
-				"Passive"			"0"
-				"IsHidden"			"0"
-				"IsDebuff"			"1"
-			
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS"		"%corruption_armor"
-				}
-			}
-		}
-	}
-
-	//=================================================================================================================
-	// Recipe: Desolator 2
-	//=================================================================================================================
-	"item_recipe_desolator2"
-	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"ID"							"2523"
-		"BaseClass"						"item_recipe_desolator"
-		"Model"							"models/props_gameplay/recipe.mdl"
-		
-		// Item Info
-		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"						"7500"	
-		"ItemShopTags"					""
-		
-		// Recipe
-		//-------------------------------------------------------------------------------------------------------------
-		"ItemRecipe"					"1"
-		"ItemResult"					"item_desolator2"
-		"ItemRequirements"
-		{
-			"01"						"item_desolator"
-		}
-	}
-
-	//=================================================================================================================
-	// Desolator 3
-	//=================================================================================================================
-	"item_desolator3"
-	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"ID"							"2524"
-		"BaseClass"						"item_datadriven"
-		"AbilityTextureName"			"desolator3"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-
-		// Item Info
-		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"						"18500"
-		"ItemShopTags"					"damage;unique"
-		"ItemQuality"					"artifact"
-		"ItemAliases"					"desolator 3"
-		"ItemDeclarations"				"DECLARE_PURCHASES_TO_TEAMMATES | DECLARE_PURCHASES_IN_SPEECH | DECLARE_PURCHASES_TO_SPECTATORS"
-		"ItemBaseLevel"					"3"
-		"MaxUpgradeLevel"				"3"		
-
-		// Special	
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilitySpecial"
-		{
-			"01"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_damage"			"180"
-			}
-			"02"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"corruption_armor"		"-50"
-			}
-			"03"
-			{
-				"var_type"				"FIELD_FLOAT"
-				"corruption_duration"	"15.0"
-			}
-		}
-
-		"Modifiers"
-		{
-			"modifier_item_desolator"
-			{
-				"Passive"				"1"
-				"IsHidden"				"1"
-				"Attribures"			"MODIFIER_ATTRIBUTE_MULTIPLE"
-		
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_BASEATTACK_BONUSDAMAGE"		"%bonus_damage"
-				}
-
-				"Orb"
-				{
-					"Priority"			"DOTA_ORB_PRIORITY_ITEM"
-					"ProjectileName"	"particles/items_fx/desolator_projectile_3.vpcf"
-					"CastAttack"		"0"
-				}
-
-				"OnOrbFire"
-				{
-					"ApplyModifier"
-					{
-						"ModifierName"	"modifier_item_desolator_corruption"
-						"Target" 		"TARGET"
-					}
-				}
-
-				"OnOrbImpact"
-				{
-					"FireSound"
-					{
-						"EffectName"	"Item_Desolator.Target"
-						"Target" 		"TARGET"
-					}
-
-					"FireEffect"
-					{
-						"EffectName"			"particles/econ/items/antimage/antimage_weapon_basher_ti5_gold/am_manaburn_basher_ti_5_b_gold.vpcf"
-						"EffectAttachType"		"follow_origin"
-						"Target"				"TARGET"
-					}
-				}
-			}
-
-			"modifier_item_desolator_corruption"
-			{
-				"Duration"			"%corruption_duration"
-				"Passive"			"0"
-				"IsHidden"			"0"
-				"IsDebuff"			"1"
-			
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS"		"%corruption_armor"
-				}
-			}
-		}
-	}
-
-	//=================================================================================================================
-	// Recipe: Desolator 3
-	//=================================================================================================================
-	"item_recipe_desolator3"
-	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"ID"							"2525"
-		"BaseClass"						"item_recipe_desolator"
-		"Model"							"models/props_gameplay/recipe.mdl"
-		
-		// Item Info
-		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"						"15000"	
-		"ItemShopTags"					""
-		
-		// Recipe
-		//-------------------------------------------------------------------------------------------------------------
-		"ItemRecipe"					"1"
-		"ItemResult"					"item_desolator3"
-		"ItemRequirements"
-		{
-			"01"						"item_desolator2"
-		}
-	}
-
-	//=================================================================================================================
-	// Mana Salve 2
-	//=================================================================================================================
-	"item_mana_salve2"
+	"item_enchanted_mango1"
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"ID"							"2526"
 		"BaseClass"             		"item_enchanted_mango"		
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET| DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO"
-		"AbilityTextureName"			"mana_salve2"
+		"AbilityTextureName"			"item_enchanted_mango1"
 		"Model"							"models/props_gameplay/clarity.mdl"
 		// Stats
 		//-------------------------------------------------------------------------------------------------------------
@@ -1708,9 +1224,13 @@
 		"ItemStackable"					"1"
 		"ItemPermanent"					"0"
 		"ItemInitialCharges"			"10"
-		"ItemShareability"				"ITEM_FULLY_SHAREABLE_STACKING"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
 		"ItemHideCharges"				"0"
 		"ItemDisplayCharges"			"1"
+		"ItemStockMax"					"20"
+		"ItemStockInitial"				"0"
+		"ItemStockTime"					"30.0"			  
+		"ItemInitialStockTime"			"300.0"
 
 		// Special	
 		//-------------------------------------------------------------------------------------------------------------
@@ -1724,7 +1244,7 @@
 			"02"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"replenish_amount"		"5000"
+				"replenish_amount"		"3000"
 			}	
 		}
 	}
@@ -1734,7 +1254,6 @@
 	//=================================================================================================================
 	"item_faerie_fire2"
 	{
-
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"ID"							"2527"
@@ -1759,6 +1278,7 @@
 		"ItemStockInitial"				"0"
 		"ItemStockTime"					"30.0"			  
 		"ItemInitialStockTime"			"300.0"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
 
 		// Special	
 		//-------------------------------------------------------------------------------------------------------------
@@ -1772,7 +1292,7 @@
 			"02"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"hp_restore"			"10000"
+				"hp_restore"			"8000"
 			}
 		}
 	}
@@ -1937,16 +1457,16 @@
 	//=================================================================================================================
 	"item_amulet_of_the_wild" 
 	{
-		"ID"					"2529"
-		"BaseClass"				"item_datadriven"
-		"AbilityBehavior"		"DOTA_ABILITY_BEHAVIOR_NO_TARGET|DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
-		"Model"					"models/props_gameplay/red_box.vmdl" 
-		"Effect"				"particles/generic_gameplay/dropped_item.vpcf"
-		"ItemCost"				"2000"
-		"ItemKillable"			"1" 
-		"ItemSellable"			"1"
-		"ItemPurchasable"		"1"
-		"AbilityCooldown"		"60"
+		"ID"						"2529"
+		"BaseClass"					"item_datadriven"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
+		"Model"						"models/props_gameplay/red_box.vmdl" 
+		"Effect"					"particles/generic_gameplay/dropped_item.vpcf"
+		"ItemCost"					"2000"
+		"ItemKillable"				"1" 
+		"ItemSellable"				"0"
+		"ItemPurchasable"			"1"
+		"AbilityCooldown"			"90"
 		"ItemDroppable"				"1"
 		"ItemShareability"			"ITEM_FULLY_SHAREABLE"
 		"AbilityTextureName"		"amulet_of_the_wild"
@@ -1960,7 +1480,7 @@
 		"ItemPermanent"				"0"
 		"ItemDisassembleRule"		"DOTA_ITEM_DISASSEMBLE_ALWAYS"
 		"AbilityCastAnimation"		"ACT_DOTA_DISABLED"
-		"AbilityCastPoint"			"0.1"
+		"AbilityCastPoint"			"0.15"
 
 		"AbilitySpecial"
 		{
@@ -1981,7 +1501,7 @@
 				"UnitCount"		"1"
 				"GrantsGold"	"1"
 				"GrantsXP"		"1"
-				"SpawnRadius"	"35"
+				"SpawnRadius"	"50"
 				"OnSpawn"
 				{
 					"ApplyModifier"
@@ -2039,7 +1559,7 @@
 		"ItemQuality"					"component"
 		"ItemAliases"					"bracer of protection"
 		"ItemStackable"					"0"
-		"ItemShareability"				"ITEM_NOT_SHAREABLE"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
 		"ItemPermanent"					"0"
 		"SecretShop"					"1"
 
@@ -2083,6 +1603,117 @@
 					"MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS"		"%bonus_armor"
 					"MODIFIER_PROPERTY_STATS_STRENGTH_BONUS"		"%bonus_strength"
 					"MODIFIER_PROPERTY_HEALTH_REGEN_CONSTANT"		"%bonus_health_regen"
+				}
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Tome of Power
+	//=================================================================================================================
+	"item_tome_of_power" 
+	{
+		"ID"				"2532"
+		"BaseClass"			"item_datadriven"
+		"AbilityBehavior"	"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+
+		"Model"				"models/props_gameplay/red_box.vmdl" 
+		"Effect"			"particles/generic_gameplay/dropped_item.vpcf"
+		"ItemCost"			"3000"
+		"ItemKillable"		"1" 
+
+		"ItemInitialStockTime"	"1290.0"	//20 Min = 1200 + game beginning time = 90
+		"ItemStockMax"			"5" 
+		"ItemStockTime"			"120.0"
+		"ItemStockInitial"		"0"
+		"AbilityCooldown"		"60.0"
+
+		"ItemSellable"			"1"
+		"ItemCastOnPickup"		"0"
+		"ItemPurchasable"		"1"
+		"ItemDroppable"			"1"
+		"ItemShareability"		"ITEM_FULLY_SHAREABLE"
+		"AbilityTextureName"	"tome_of_power"
+
+		"SideShop"				"1"
+		"SecretShop"			"0"
+
+		"ItemShopTags"			"artifact"
+		"ItemQuality"			"artifact"
+
+		"ItemStackable"			"1"
+		"ItemInitialCharges"	"1"
+	
+		"ItemPermanent"			"0"
+		"ItemDisassembleRule"	"DOTA_ITEM_DISASSEMBLE_ALWAYS"
+
+		"OnSpellStart"
+		{
+			"RunScript"
+			{
+				"ScriptFile"	"items/tome_of_power/tome_of_power.lua"
+				"Function"		"tome_use"
+			}
+
+			"SpendCharge" {}
+		}
+	
+		"AbilitySpecial"
+		{
+		}
+	}
+
+	//=================================================================================================================
+	// Key of the 3 Moons
+	//=================================================================================================================
+	"item_key_of_the_three_moons"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"ID"							"2533"
+		"BaseClass"						"item_datadriven"
+		"AbilityTextureName" 			"key_of_the_three_moons"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityCastRange"				"0"
+		
+		// Item Info
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemCost"						"99999"
+		"ItemShopTags"					"attributes"
+		"ItemQuality"					"epic"
+		"ItemAliases"					"key of the 3 moons"
+		"ItemStackable"					"0"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
+		"ItemPermanent"					"0"
+		"ItemSellable"					"0"
+		"SideShop"						"0"
+		"SecretShop"					"0"
+
+		// Special	
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_stats"			"1000"
+			}
+		}
+
+		"Modifiers"
+		{
+			"modifier_key_of_the_three_moons"
+			{
+				"Passive"			"1"
+				"IsHidden"			"1"
+
+				"Attributes"		"MODIFIER_ATTRIBUTE_MULTIPLE"
+
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_STATS_STRENGTH_BONUS"	= "%bonus_stats"
+					"MODIFIER_PROPERTY_STATS_AGILITY_BONUS"		= "%bonus_stats"
+					"MODIFIER_PROPERTY_STATS_INTELLECT_BONUS"	= "%bonus_stats"
 				}
 			}
 		}

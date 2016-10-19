@@ -1,3 +1,5 @@
+require('label')
+
 -- Cleanup a player when they leave
 function GameMode:OnDisconnect(keys)
 	DebugPrint('[BAREBONES] Player Disconnected ' .. tostring(keys.userid))
@@ -9,44 +11,95 @@ function GameMode:OnDisconnect(keys)
 	local userid = keys.userid
 end
 
+function GameMode:OnSettingVote(keys)
+  --print("Custom Game Settings Vote.")
+  --PrintTable(keys)
+  local pid   = keys.PlayerID
+  local mode  = GameMode
+
+  -- VoteTable is initialised in InitGameMode()
+  if not mode.VoteTable[keys.category] then mode.VoteTable[keys.category] = {} end
+  mode.VoteTable[keys.category][pid] = keys.vote
+  
+  --PrintTable(mode.VoteTable)
+end
+
 -- An NPC has spawned somewhere in game. This includes heroes
 function GameMode:OnNPCSpawned(keys)
 	DebugPrint("[BAREBONES] NPC Spawned")
 	DebugPrintTable(keys)
 
+	local difficulty = GameRules:GetCustomGameDifficulty()
 	local npc = EntIndexToHScript(keys.entindex)
 	local normal_bounty = npc:GetGoldBounty()
+--	local normal_health = npc:GetMaxHealth()
 	local normal_xp = npc:GetDeathXP()
 	local normal_min_damage = npc:GetBaseDamageMin()
 	local normal_max_damage = npc:GetBaseDamageMax()
 
-	if GetMapName() == "easymode" and npc:GetTeam() == DOTA_TEAM_BADGUYS then
+	if difficulty == 1 and npc:GetTeam() == DOTA_TEAM_BADGUYS then
 		npc:SetMinimumGoldBounty( normal_bounty*1.5 )
 		npc:SetMaximumGoldBounty( normal_bounty*1.5 )
 		npc:SetDeathXP( normal_xp )
+		npc:SetBaseDamageMin( normal_min_damage*0.75 )
+		npc:SetBaseDamageMax( normal_max_damage*0.75 )
+--		npc:SetMaxHealth( normal_health )
+	elseif difficulty == 2 and npc:GetTeam() == DOTA_TEAM_BADGUYS then
+		npc:SetMinimumGoldBounty( normal_bounty )
+		npc:SetMaximumGoldBounty( normal_bounty )
+		npc:SetDeathXP( normal_xp )
 		npc:SetBaseDamageMin( normal_min_damage )
 		npc:SetBaseDamageMax( normal_max_damage )
-	elseif GetMapName() == "hardmode" and npc:GetTeam() == DOTA_TEAM_BADGUYS then
-		npc:SetMinimumGoldBounty( normal_bounty/1.5 )
-		npc:SetMaximumGoldBounty( normal_bounty/1.5 )
-		npc:SetDeathXP( normal_xp*0.5 )
-		npc:SetBaseDamageMin( normal_min_damage*1.25 )
-		npc:SetBaseDamageMax( normal_max_damage*1.25 )
-	elseif GetMapName() == "solomode" and npc:GetTeam() == DOTA_TEAM_BADGUYS then
-		npc:SetMinimumGoldBounty( normal_bounty*1.25 )
-		npc:SetMaximumGoldBounty( normal_bounty*1.25 )
-		npc:SetDeathXP( normal_xp*0.8 )
-		npc:SetBaseDamageMin( normal_min_damage/1.25 )
-		npc:SetBaseDamageMax( normal_max_damage/1.25 )
+--		npc:SetMaxHealth( normal_health*1.1 )
+	elseif difficulty == 3 and npc:GetTeam() == DOTA_TEAM_BADGUYS then
+		npc:SetMinimumGoldBounty( normal_bounty*0.8 )
+		npc:SetMaximumGoldBounty( normal_bounty*0.8 )
+		npc:SetDeathXP( normal_xp*0.9 )
+		npc:SetBaseDamageMin( normal_min_damage*1.2 )
+		npc:SetBaseDamageMax( normal_max_damage*1.2 )
+--		npc:SetMaxHealth( normal_health/1.5 )
+	elseif difficulty == 4 and npc:GetTeam() == DOTA_TEAM_BADGUYS then
+		npc:SetMinimumGoldBounty( normal_bounty*0.6 )
+		npc:SetMaximumGoldBounty( normal_bounty*0.6 )
+		npc:SetDeathXP( normal_xp*0.7 )
+		npc:SetBaseDamageMin( normal_min_damage*1.5 )
+		npc:SetBaseDamageMax( normal_max_damage*1.5 )
+--		npc:SetMaxHealth( normal_health/1.5 )
 	end
 
 	-- List of innate abilities
 	local innate_abilities = {
+		"dummy_passive_vulnerable_wisp",
 		"serpent_splash_arrows",
 		"neutral_spell_immunity",
 		"holdout_innate_lunar_glaive",
 		"holdout_innate_great_cleave",
-		"holdout_blink"
+		"holdout_blink",
+		"holdout_poison_attack",
+		"forest_troll_high_priest_heal",
+		"holdout_mana_shield",
+		"holdout_berserkers_rage",
+		"holdout_rejuvenation",
+		"holdout_resistant_skin",
+		"holdout_roar",
+		"shadow_shaman_shackles",
+		"holdout_command_aura_innate",
+		"holdout_frost_frenzy",
+		"holdout_sleep",
+		"juggernaut_healing_ward",
+		"holdout_thunder_spirit",
+		"holdout_cripple",
+		"blood_mage_orbs",
+		"axe_berserkers_call",
+		"holdout_banish",
+		"holdout_magic_shield",
+		"holdout_anubarak_claw",
+		"undead_burrow",
+		"ogre_magi_bloodlust",
+		"axe_berserkers_call",
+		"black_dragon_fireball",
+		"holdout_green_effect", --Banehallow boss + hero effect
+		"holdout_red_effect" --Abaddon boss
 	}
 
 	-- Cycle through any innate abilities found, then upgrade them
@@ -56,6 +109,7 @@ function GameMode:OnNPCSpawned(keys)
 			current_ability:SetLevel(1)
 		end
 	end
+
 	-- This internal handling is used to set up main barebones functions
 	GameMode:_OnNPCSpawned(keys)
 end
@@ -166,6 +220,12 @@ function GameMode:OnPlayerLevelUp(keys)
 
 	local player = EntIndexToHScript(keys.player)
 	local level = keys.level
+	local hero = player:GetAssignedHero()
+	local hero_level = hero:GetLevel()
+
+	if hero_level > 18 then
+		hero:SetAbilityPoints( hero:GetAbilityPoints() - 1 )
+	end
 end
 
 -- A player last hit a creep, a tower, or a hero
@@ -229,6 +289,10 @@ function GameMode:OnPlayerPickHero(keys)
 	local heroClass = keys.hero
 	local heroEntity = EntIndexToHScript(keys.heroindex)
 	local player = EntIndexToHScript(keys.player)
+	local heroes = HeroList:GetAllHeroes()
+
+	-- modifies the name/label of a player
+	GameMode:setPlayerHealthLabel(player)
 end
 
 -- A player killed another player in a multi-team context
@@ -267,8 +331,6 @@ if keys.entindex_inflictor ~= nil then
 end
 
 local damagebits = keys.damagebits -- This might always be 0 and therefore useless
-
--- Put code here to handle when an entity gets killed
 
 end
 

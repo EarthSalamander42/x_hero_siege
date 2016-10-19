@@ -1,4 +1,3 @@
-
 require('libraries/timers')
 
 function Spawn( entityKeyValues )
@@ -10,7 +9,7 @@ end
 
 function AvatarThink()
 	-- body
-	if not IsValidAlive(thisEntity) then
+	if not thisEntity:IsNull() then
 		return nil
 	elseif ability_summon:IsFullyCastable() and ability_summon:GetAutoCastState() then
 		DebugPrint("can cast spirit")

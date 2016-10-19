@@ -21,7 +21,8 @@ local point = Entities:FindByName(nil,"point_teleport_phase3_creeps"):GetAbsOrig
 		for _,hero in pairs(heroes) do
 			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
 				FindClearSpaceForUnit(hero, point, true)
-				hero:AddNewModifier(nil, nil, "modifier_stunned",nil)
+				hero:Stop()
+				hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun",nil)
 				hero:AddNewModifier(nil, nil, "modifier_invulnerable",nil)
 				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
 				first_time_teleport_phase3_creeps = false
@@ -51,7 +52,7 @@ local point2 = Entities:FindByName( nil, "spawner_phase3_creeps_east"):GetAbsOri
 		for _,hero in pairs(heroes) do
 			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
 			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil)
-			hero:RemoveModifierByName("modifier_stunned")
+			hero:RemoveModifierByName("modifier_animation_freeze_stun")
 			hero:RemoveModifierByName("modifier_invulnerable")
 			end
 		end
@@ -68,7 +69,7 @@ local point2 = Entities:FindByName( nil, "spawner_phase3_creeps_east"):GetAbsOri
 		for _,hero in pairs(heroes) do
 			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
 			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil)
-			hero:RemoveModifierByName("modifier_stunned")
+			hero:RemoveModifierByName("modifier_animation_freeze_stun")
 			hero:RemoveModifierByName("modifier_invulnerable")
 			end
 		end
@@ -86,7 +87,7 @@ local point2 = Entities:FindByName( nil, "spawner_phase3_creeps_east"):GetAbsOri
 	for _,hero in pairs(heroes) do
 		if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
 		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil)
-		hero:RemoveModifierByName("modifier_stunned")
+		hero:RemoveModifierByName("modifier_animation_freeze_stun")
 		hero:RemoveModifierByName("modifier_invulnerable")
 		end
 	end
@@ -95,27 +96,11 @@ local point2 = Entities:FindByName( nil, "spawner_phase3_creeps_east"):GetAbsOri
 	for _,hero in pairs(heroes) do
 		if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
 		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil)
-		hero:RemoveModifierByName("modifier_stunned")
+		hero:RemoveModifierByName("modifier_animation_freeze_stun")
 		hero:RemoveModifierByName("modifier_invulnerable")
 		end
 	end
 	return nil
-end
-
-function destroy_4bosses(keys)
-local teleporters3 = Entities:FindAllByName("trigger_teleport3")
-GameMode.BossesTop_killed = GameMode.BossesTop_killed +1
-print( GameMode.BossesTop_killed )
-
-	if GameMode.BossesTop_killed > 3 then
-		for _,v in pairs(teleporters3) do
-		DebugPrint("enable teleport trigger")
-		v:Enable()
-		end
-	Notifications:TopToAll({text="You have killed Grom, Proudmoore, Illidan and Balanar. Red Teleporters Activated" , duration=10.0})
-	print( "Teleporter to 4Bosses Activated!" )
-	else return nil
-	end
 end
 
 function LastArenaBossKillCount(keys)
@@ -132,7 +117,8 @@ function LastArenaBossKillCount(keys)
 		for _,hero in pairs(heroes) do
 			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
 				FindClearSpaceForUnit(hero, point, true)
-				hero:AddNewModifier(nil, nil, "modifier_stunned",nil)
+				hero:Stop()
+				hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun",nil)
 				hero:AddNewModifier(nil, nil, "modifier_invulnerable",nil)
 				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
 			end
@@ -164,7 +150,8 @@ function teleport_to_arthas_arena(keys)
 		for _,hero in pairs(heroes) do
 			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
 				FindClearSpaceForUnit(hero, point, true)
-				hero:AddNewModifier(nil, nil, "modifier_stunned",nil)
+				hero:Stop()
+				hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun",nil)
 				hero:AddNewModifier(nil, nil, "modifier_invulnerable",nil)
 				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
 				first_time_teleport_arthas = false
@@ -172,6 +159,7 @@ function teleport_to_arthas_arena(keys)
 		end
 	elseif activator:GetTeam() == DOTA_TEAM_GOODGUYS then
 		FindClearSpaceForUnit(activator, point, true)
+		activator:Stop()
 	end
 end
 
@@ -181,7 +169,7 @@ local heroes = HeroList:GetAllHeroes()
 for _,hero in pairs(heroes) do
 	if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
 		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil)
-		hero:RemoveModifierByName("modifier_stunned")
+		hero:RemoveModifierByName("modifier_animation_freeze_stun")
 		hero:RemoveModifierByName("modifier_invulnerable")
 	end
 end
@@ -202,25 +190,27 @@ local point = Entities:FindByName(nil,"point_teleport_boss"):GetAbsOrigin()
 		arthas:SetAngles(0, 270, 0)
 
 		Timers:CreateTimer(9,function()
-			arthas:RemoveModifierByName("modifier_stunned")
+			arthas:RemoveModifierByName("modifier_animation_freeze_stun")
 			arthas:RemoveModifierByName("modifier_invulnerable")
 			arthas = nil
 		end)
 
-		arthas:AddNewModifier(nil, nil, "modifier_stunned",nil)
+		arthas:AddNewModifier(nil, nil, "modifier_animation_freeze_stun",nil)
 		arthas:AddNewModifier(nil, nil, "modifier_invulnerable",nil)
 		Timers:CreateTimer(10,StartBossFight)
 		for _,hero in pairs(heroes) do
 			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
 				FindClearSpaceForUnit(hero, point, true)
-				hero:AddNewModifier(nil, nil, "modifier_stunned",nil)
+				hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun",nil)
 				hero:AddNewModifier(nil, nil, "modifier_invulnerable",nil)
+				hero:Stop()
 				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
 				first_time_teleport_arthas_real = false
 			end
 		end
 	elseif activator:GetTeam() == DOTA_TEAM_GOODGUYS then
 		FindClearSpaceForUnit(activator, point, true)
+		activator:Stop()
 	end
 end
 
@@ -236,11 +226,11 @@ local point = Entities:FindByName(nil,"point_teleport_boss"):GetAbsOrigin()
 	Timers:CreateTimer(8,function()
 	local banehallow = CreateUnitByName("npc_dota_hero_banehallow",Entities:FindByName(nil,"npc_dota_spawner_magtheridon_arena"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_BADGUYS)
 	banehallow:SetAngles(0, 270, 0)
-	banehallow:AddNewModifier(nil, nil, "modifier_stunned",nil)
+	banehallow:AddNewModifier(nil, nil, "modifier_animation_freeze_stun",nil)
 	banehallow:AddNewModifier(nil, nil, "modifier_invulnerable",nil)
 
 	Timers:CreateTimer(12,function()
-		banehallow:RemoveModifierByName("modifier_stunned")
+		banehallow:RemoveModifierByName("modifier_animation_freeze_stun")
 		banehallow:RemoveModifierByName("modifier_invulnerable")
 		banehallow = nil
 	end)
@@ -303,11 +293,11 @@ print( "Abaddon should appears now" )
 	Timers:CreateTimer(5,function()
 		local abaddon = CreateUnitByName("npc_dota_creature_abaddon",Entities:FindByName(nil,"npc_dota_spawner_magtheridon_arena"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_BADGUYS)
 		abaddon:SetAngles(0, 270, 0)
-		abaddon:AddNewModifier(nil, nil, "modifier_stunned",nil)
+		abaddon:AddNewModifier(nil, nil, "modifier_animation_freeze_stun",nil)
 		abaddon:AddNewModifier(nil, nil, "modifier_invulnerable",nil)
 
 		Timers:CreateTimer(7,function()
-		abaddon:RemoveModifierByName("modifier_stunned")
+		abaddon:RemoveModifierByName("modifier_animation_freeze_stun")
 		abaddon:RemoveModifierByName("modifier_invulnerable")
 		abaddon = nil
 	end)
@@ -321,7 +311,8 @@ print( "Abaddon should appears now" )
 	for _,hero in pairs(heroes) do
 		if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
 			FindClearSpaceForUnit(hero, point, true)
-			hero:AddNewModifier(nil, nil, "modifier_stunned",nil)
+			hero:Stop()
+			hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun",nil)
 			hero:AddNewModifier(nil, nil, "modifier_invulnerable",nil)
 			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
 		end

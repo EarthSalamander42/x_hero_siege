@@ -60,8 +60,6 @@ end
 
 -- This function is called once when the player fully connects and becomes "Ready" during Loading
 function GameMode:_OnConnectFull(keys)
-  GameMode:_CaptureGameMode()
-
   local entIndex = keys.index+1
   -- The Player entity of the joining user
   local ply = EntIndexToHScript(entIndex)

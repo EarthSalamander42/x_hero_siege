@@ -1,18 +1,10 @@
 "AddonInfo"
 {
 	"TeamCount"					"1"
-	"maps"						"easymode hardmode solomode"
+	"maps"						"easymode"
 	"IsPlayable"				"1"
 	"easymode"
 	{
 		"MaxPlayers"			"8"
-	}
-	"hardmode"
-	{
-		"MaxPlayers"			"4"
-	}
-	"solomode"
-	{
-		"MaxPlayers"			"1"
 	}
 }
