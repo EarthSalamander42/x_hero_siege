@@ -51,6 +51,12 @@ function grom_boss_die(caster)
 FourBossesKillCount()
 
 	Timers:CreateTimer(1.0, function()
+		local item = CreateItem("item_bag_of_gold", nil, nil)
+		local pos = caster:GetAbsOrigin()
+		local drop = CreateItemOnPositionSync( pos, item )
+		local pos_launch = pos+RandomVector(RandomFloat(150,200))
+		item:LaunchLoot(false, 300, 0.5, pos)
+		item:SetCurrentCharges(99999)
 		EmitGlobalSound("Loot_Drop_Stinger_Arcana")
 	end)
 
@@ -74,6 +80,12 @@ function proudmoore_boss_die(caster)
 FourBossesKillCount()
 
 	Timers:CreateTimer(1.0, function()
+		local item = CreateItem("item_bag_of_gold", nil, nil)
+		local pos = caster:GetAbsOrigin()
+		local drop = CreateItemOnPositionSync( pos, item )
+		local pos_launch = pos+RandomVector(RandomFloat(150,200))
+		item:LaunchLoot(false, 300, 0.5, pos)
+		item:SetCurrentCharges(99999)
 		EmitGlobalSound("Loot_Drop_Stinger_Arcana")
 	end)
 
@@ -97,6 +109,12 @@ function balanar_boss_die(caster)
 FourBossesKillCount()
 
 	Timers:CreateTimer(1.0, function()
+		local item = CreateItem("item_bag_of_gold", nil, nil)
+		local pos = caster:GetAbsOrigin()
+		local drop = CreateItemOnPositionSync( pos, item )
+		local pos_launch = pos+RandomVector(RandomFloat(150,200))
+		item:LaunchLoot(false, 300, 0.5, pos)
+		item:SetCurrentCharges(99999)
 		EmitGlobalSound("Loot_Drop_Stinger_Arcana")
 	end)
 
@@ -118,6 +136,12 @@ end
 
 function arthas_boss_die(caster)
 	Timers:CreateTimer(1.0, function()
+		local item = CreateItem("item_bag_of_gold", nil, nil)
+		local pos = caster:GetAbsOrigin()
+		local drop = CreateItemOnPositionSync( pos, item )
+		local pos_launch = pos+RandomVector(RandomFloat(150,200))
+		item:LaunchLoot(false, 300, 0.5, pos)
+		item:SetCurrentCharges(99999)
 		EmitGlobalSound("Loot_Drop_Stinger_Arcana")
 	end)
 
@@ -153,6 +177,12 @@ end
 
 function banehallow_boss_die(caster)
 	Timers:CreateTimer(1.0, function()
+		local item = CreateItem("item_bag_of_gold", nil, nil)
+		local pos = caster:GetAbsOrigin()
+		local drop = CreateItemOnPositionSync( pos, item )
+		local pos_launch = pos+RandomVector(RandomFloat(150,200))
+		item:LaunchLoot(false, 300, 0.5, pos)
+		item:SetCurrentCharges(99999)
 		EmitGlobalSound("Loot_Drop_Stinger_Arcana")
 	end)
 
@@ -188,6 +218,12 @@ end
 
 function abaddon_boss_die(caster)
 	Timers:CreateTimer(1.0, function()
+		local item = CreateItem("item_bag_of_gold", nil, nil)
+		local pos = caster:GetAbsOrigin()
+		local drop = CreateItemOnPositionSync( pos, item )
+		local pos_launch = pos+RandomVector(RandomFloat(150,200))
+		item:LaunchLoot(false, 300, 0.5, pos)
+		item:SetCurrentCharges(99999)
 		EmitGlobalSound("Loot_Drop_Stinger_Arcana")
 	end)
 
@@ -207,7 +243,7 @@ function abaddon_boss_die(caster)
 		UTIL_Remove(caster)
 	end)
 
-	Timers:CreateTimer(18, function()
+	Timers:CreateTimer(16, function()
 		GameRules:SetGameWinner( DOTA_TEAM_GOODGUYS )
 	end)
 end

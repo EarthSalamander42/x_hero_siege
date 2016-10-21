@@ -5563,7 +5563,7 @@
 		"SoundSet"					"Hero_AbyssalUnderlord"							// Name of sound set.
 		"ConsideredHero"			"1"
 		"Portrait"					"vgui/hud/heroportraits/portrait_centaur"
-		"ModelScale"                "2.3"
+		"ModelScale"                "2.2"
 		"Level"						"100"
 		"AbilityLayout"             "5"
 
@@ -5576,7 +5576,7 @@
 		"Ability7"					"teleport_top_arthas"
 
 		"ArmorPhysical"				"800"                 // Physical protection.
-		"MagicalResistance"			"0"                 // Magical protection (percentage).
+		"MagicalResistance"			"25"                 // Magical protection (percentage).
 	
 		"AttackCapabilities"    "DOTA_UNIT_CAP_MELEE_ATTACK"
 		"AttackDamageMin"     "20002"                   // Damage range min.
@@ -5647,10 +5647,11 @@
 		"Ability3"					"chaos_knight_chaos_strike"
 		"Ability4"					"boss_health"
 		"Ability5"					"cant_die_generic"
+		"Ability6"					"pudge_gold_bag_fountain"
 	
 		"HasInventory"				"1"
 		"ArmorPhysical"				"1000"                 // Physical protection.
-		"MagicalResistance"			"0"                 // Magical protection (percentage).
+		"MagicalResistance"			"25"                 // Magical protection (percentage).
 	
 		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
 		"AttackDamageMin"			"40002"                   // Damage range min.
@@ -5718,28 +5719,16 @@
 	"SoundSet"					"Hero_AbyssalUnderlord"							// Name of sound set.
 	"ConsideredHero"			"0"
 	"Portrait"					"vgui/hud/heroportraits/portrait_centaur"
-	"ModelScale"                "1.75"
+	"ModelScale"                "1.6"
 	"Level"						"7"
 
-	"Ability1"        "magtheridon_medium"
-	"Ability2"        "neutral_evasion" 
-	"Ability3"        "neutral_critical"
-	"Ability4"        ""
-	"Ability5"        ""
-	"Ability6"        ""
-	"Ability7"        ""
-	"Ability8"        ""
-	"Ability9"        ""
-	"Ability10"       ""
-	"Ability11"       ""
-	"Ability12"       ""
-	"Ability13"       ""
-	"Ability14"       ""
-	"Ability15"       ""
-	"Ability16"       ""
+	"Ability1"				"magtheridon_medium"
+	"Ability2"				"" 
+	"Ability3"				""
+	"Ability4"				""
 
-	"ArmorPhysical"       "300"                 // Physical protection.
-	"MagicalResistance"       "0"                 // Magical protection (percentage).
+	"ArmorPhysical"			"300"                 // Physical protection.
+	"MagicalResistance"		"50"                 // Magical protection (percentage).
 
 	"AttackCapabilities"    "DOTA_UNIT_CAP_MELEE_ATTACK"
 	"AttackDamageMin"     "7502"                   // Damage range min.
@@ -5793,33 +5782,21 @@
 "npc_dota_hero_magtheridon_small"
 {
 
-	"BaseClass"     "npc_dota_creature"
-	"Model"						"models/heroes/abyssal_underlord/abyssal_underlord_v2.mdl"			// Model.
+	"BaseClass"				"npc_dota_creature"
+	"Model"					"models/heroes/abyssal_underlord/abyssal_underlord_v2.mdl"			// Model.
 	"SoundSet"					"Hero_AbyssalUnderlord"							// Name of sound set.
 	"ConsideredHero"			"0"
 	"Portrait"					"vgui/hud/heroportraits/portrait_centaur"
-	"ModelScale"                "0.85"
-	"Level"						"7"
+	"ModelScale"                "0.75"
+	"Level"						"1"
 	
-	"Ability1"        "neutral_evasion"
-	"Ability2"        "neutral_critical" 
-	"Ability3"        ""
-	"Ability4"        ""
-	"Ability5"        ""
-	"Ability6"        ""
-	"Ability7"        ""
-	"Ability8"        ""
-	"Ability9"        ""
-	"Ability10"       ""
-	"Ability11"       ""
-	"Ability12"       ""
-	"Ability13"       ""
-	"Ability14"       ""
-	"Ability15"       ""
-	"Ability16"       ""
+	"Ability1"				""
+	"Ability2"				"" 
+	"Ability3"				""
+	"Ability4"				""
 
-	"ArmorPhysical"       "150"                 // Physical protection.
-	"MagicalResistance"       "0"                 // Magical protection (percentage).
+	"ArmorPhysical"			"150"                 // Physical protection.
+	"MagicalResistance"		"50"                 // Magical protection (percentage).
 
 	"AttackCapabilities"    "DOTA_UNIT_CAP_MELEE_ATTACK"
 	"AttackDamageMin"     "3001"                   // Damage range min.
@@ -5830,7 +5807,7 @@
 	"AttackRange"               "125"                                   // Range within a target can be attacked.
 	"ProjectileModel"           ""                                     // Particle system model for projectile.
 	"ProjectileSpeed"           ""                                     // Speed of projectile.
-	
+
 	"AttributePrimary"      "DOTA_ATTRIBUTE_STRENGTH"
 	"AttributeBaseStrength"   "100"                   // Base strength
 	"AttributeStrengthGain"   "20"                   // Strength bonus per level.
@@ -5969,6 +5946,7 @@
 		"Ability3"					"endurance_aura"
 		"Ability4"					"boss_health"
 		"Ability5"					"cant_die_generic"
+		"Ability6"					"pudge_gold_bag_fountain"
 	
 		"ArmorPhysical"				"1200"                 // Physical protection.
 		"MagicalResistance"			"10"                 // Magical protection (percentage).
@@ -7105,6 +7083,7 @@
 		"Ability3"				"demonhunter_evasion"
 		"Ability4"				"cant_die_generic"
 		"Ability5"				"boss_health"
+		"Ability6"				"pudge_gold_bag_fountain"
 
 		"ArmorPhysical"				"1500"                 // Physical protection.
 		"MagicalResistance"			"10"                 // Magical protection (percentage).
@@ -7162,6 +7141,7 @@
 		"Ability4"			"balanar_rain_of_chaos"
 		"Ability5"			"boss_health"
 		"Ability6"			"cant_die_generic"
+		"Ability7"			"pudge_gold_bag_fountain"
 	
 		"ArmorPhysical"			"1200"                 // Physical protection.
 		"MagicalResistance"		"10"                 // Magical protection (percentage).
@@ -8075,6 +8055,7 @@
 		"Ability6"					"arthas_kill_count"
 		"Ability7"					"boss_health"
 		"Ability8"					"cant_die_generic"
+		"Ability9"					"pudge_gold_bag_fountain"
 
 		"ArmorPhysical"				"2499"                  // Physical protection.
 		"MagicalResistance"			"10"                 // Magical protection (percentage).
@@ -8162,6 +8143,7 @@
 		"Ability5"					"boss_health"
 		"Ability6"					"cant_die_generic"
 		"Ability7"					"holdout_red_effect"
+		"Ability8"					"pudge_gold_bag_fountain"
 
 		// Armor
 		//----------------------------------------------------------------
@@ -8263,6 +8245,7 @@
 		"Ability6"					"boss_health"
 		"Ability7"					"cant_die_generic"
 		"Ability8"					"holdout_green_effect"
+		"Ability9"					"pudge_gold_bag_fountain"
 
 		"ArmorPhysical"				"2600"                  // Physical protection.
 		"MagicalResistance"			"20"                 // Magical protection (percentage).
@@ -8506,7 +8489,7 @@
 
 		"StatusHealth"			"100000"                 // Base health.
 		"StatusHealthRegen"		"50.0"                 // Health regeneration rate.
-		"StatusMana"			"1000"                   // Base mana.
+		"StatusMana"			"1500"                   // Base mana.
 		"StatusManaRegen"		"0"                 // Mana regeneration rate.
 
 		"VisionDaytimeRange"		"1000"                  // Range of vision at night time.
@@ -8750,6 +8733,14 @@
 
 		"Creature"
 		{
+			"EquippedItems"
+			{
+				"KeyOf3Moons"
+				{
+					"Item"					"item_key_of_the_three_moons"
+				}
+			}
+
 			"AttachWearables"
 			{
 				"Wearable1" { "ItemDef" "6866" } // Head

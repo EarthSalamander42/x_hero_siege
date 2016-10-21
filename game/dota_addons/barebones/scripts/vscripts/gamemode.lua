@@ -27,6 +27,8 @@ end
 function FrostTowersToFinalWave()
 	if GameMode.FrostTowers_killed >= 2 then
 		nCOUNTDOWNTIMER = 60
+		nCOUNTDOWNCREEP = 1
+		nCOUNTDOWNINCWAVE = 1
 	end
 end
 
@@ -43,19 +45,14 @@ function GameMode:OnAllPlayersLoaded()
 	GameMode.Magtheridon_killed = 0
 	GameMode.BossesTop_killed = 0
 	GameMode.Arthas_killed = 0
-	-- Debug
-	local triggers_choice = Entities:FindAllByName("trigger_special_event_choice")
-	for _,v in pairs(triggers_choice) do
-			v:Enable()
-	end
 end
 
 function GameMode:OnHeroInGame(hero)
 hero:SetGold(0, false)
 	if hero:GetUnitName() == "npc_dota_hero_wisp" then
 		hero:SetAbilityPoints(0)
-		hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {Duration = 4, IsHidden = true})
-		hero:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 4, IsHidden = true})
+		hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {Duration = 20, IsHidden = true})
+		hero:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 20, IsHidden = true})
 	end
 end
 
@@ -71,7 +68,7 @@ local triggers_choice = Entities:FindAllByName("trigger_special_event_choice")
 	Notifications:TopToAll({text="Creeps are now Level 2!", style={color="green"}, continue=true})
 	end)
 
-	Timers:CreateTimer(840, function() -- 12 Min 30 + 2 Min with Muradin Event = 14 Min 30
+	Timers:CreateTimer(840, function() -- 12 Min + 2 Min with Muradin Event = 14 Min
 	Notifications:TopToAll({hero="npc_dota_hero_nyx_assassin", duration=6.0})
 	Notifications:TopToAll({text="Creeps are now Level 3!", style={color="grey"}, continue=true})
 	Notifications:TopToAll({text="Frost Infernal is unlocked!", style={color="grey"}, continue=true})
@@ -82,17 +79,17 @@ local triggers_choice = Entities:FindAllByName("trigger_special_event_choice")
 		end
 	end)
 
-	Timers:CreateTimer(1200, function() -- 18 Min 30 + 2 Min with Muradin Event = 20 Min 30
+	Timers:CreateTimer(1200, function() -- 18 Min + 2 Min with Muradin Event = 20 Min
 	Notifications:TopToAll({hero="npc_dota_hero_doom_bringer", duration=6.0})
 	Notifications:TopToAll({text="Creeps are now Level 4!", style={color="red"}, continue=true})
 	end)
 
-	Timers:CreateTimer(1560, function() -- 24 Min 30 + 2 Min with Muradin Event = 26 Min 30
+	Timers:CreateTimer(1560, function() -- 24 Min + 2 Min with Muradin Event = 26 Min
 	Notifications:TopToAll({hero="npc_dota_hero_phantom_lancer", duration=6.0})
 	Notifications:TopToAll({text="Creeps are now Level 5!", style={color="blue"}, continue=true})
 	end)
 
-	Timers:CreateTimer(1920, function() -- 30 Min 30 + 2 Min with Muradin Event = 26 Min 30
+	Timers:CreateTimer(1920, function() -- 30 Min + 2 Min with Muradin Event = 32 Min
 	Notifications:TopToAll({hero="npc_dota_hero_tiny", duration=6.0})
 	Notifications:TopToAll({text="Creeps are now Level 6!", style={color="white"}, continue=true})
 	end)
@@ -150,10 +147,10 @@ local triggers_choice = Entities:FindAllByName("trigger_special_event_choice")
 				local unit = CreateUnitByName("npc_dota_creature_mini_necrolytes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 			return 30
 
-			elseif PlayerResource:GetPlayerCount() >= 1 and not EntBarrack:IsNull() and time_elapsed >= 750 and time_elapsed < 870 then -- Return 30 Muradin Event
+			elseif PlayerResource:GetPlayerCount() >= 1 and not EntBarrack:IsNull() and time_elapsed >= 750 and time_elapsed < 900 then -- Return 30 Muradin Event
 			return 30
 
-			elseif PlayerResource:GetPlayerCount() >= 1 and not EntBarrack:IsNull() and time_elapsed >= 870 and time_elapsed < 1230 then -- Level 3, higher or equal to 12 min
+			elseif PlayerResource:GetPlayerCount() >= 1 and not EntBarrack:IsNull() and time_elapsed >= 900 and time_elapsed < 1230 then -- Level 3, higher or equal to 12 min
 			local point = Entities:FindByName( nil, "npc_dota_spawner_1"):GetAbsOrigin()
 				for j = 1, 5 do
 				local unit = CreateUnitByName("npc_dota_creature_mini_nyxes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -219,10 +216,10 @@ local triggers_choice = Entities:FindAllByName("trigger_special_event_choice")
 			local unit = CreateUnitByName("npc_dota_creature_mini_necrolytes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		return 30 -- Rerun this timer every 30 game-time seconds
 
-		elseif PlayerResource:GetPlayerCount() >= 1 and not EntBarrack:IsNull() and time_elapsed >= 750 and time_elapsed < 870 then -- Return 30 Muradin Event
+		elseif PlayerResource:GetPlayerCount() >= 1 and not EntBarrack:IsNull() and time_elapsed >= 750 and time_elapsed < 900 then -- Return 30 Muradin Event
 		return 30
 
-		elseif PlayerResource:GetPlayerCount() >= 2 and not EntBarrack:IsNull() and time_elapsed >= 870 and time_elapsed < 1230 then -- Level 3, higher or equal to 12 min
+		elseif PlayerResource:GetPlayerCount() >= 2 and not EntBarrack:IsNull() and time_elapsed >= 900 and time_elapsed < 1230 then -- Level 3, higher or equal to 12 min
 			local point = Entities:FindByName( nil, "npc_dota_spawner_2"):GetAbsOrigin()
 			for j = 1, 5 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_nyxes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -288,10 +285,10 @@ local triggers_choice = Entities:FindAllByName("trigger_special_event_choice")
 			local unit = CreateUnitByName("npc_dota_creature_mini_necrolytes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		return 30 -- Rerun this timer every 30 game-time seconds
 
-		elseif PlayerResource:GetPlayerCount() >= 1 and not EntBarrack:IsNull() and time_elapsed >= 750 and time_elapsed < 870 then -- Return 30 Muradin Event
+		elseif PlayerResource:GetPlayerCount() >= 1 and not EntBarrack:IsNull() and time_elapsed >= 750 and time_elapsed < 900 then -- Return 30 Muradin Event
 		return 30
 
-		elseif PlayerResource:GetPlayerCount() >= 3 and not EntBarrack:IsNull() and time_elapsed >= 870 and time_elapsed < 1230 then -- Level 3, higher or equal to 12 min
+		elseif PlayerResource:GetPlayerCount() >= 3 and not EntBarrack:IsNull() and time_elapsed >= 900 and time_elapsed < 1230 then -- Level 3, higher or equal to 12 min
 			local point = Entities:FindByName( nil, "npc_dota_spawner_3"):GetAbsOrigin()
 			for j = 1, 5 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_nyxes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -357,10 +354,10 @@ local triggers_choice = Entities:FindAllByName("trigger_special_event_choice")
 			local unit = CreateUnitByName("npc_dota_creature_mini_necrolytes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		return 30 -- Rerun this timer every 30 game-time seconds
 
-		elseif PlayerResource:GetPlayerCount() >= 1 and not EntBarrack:IsNull() and time_elapsed >= 750 and time_elapsed < 870 then -- Return 30 Muradin Event
+		elseif PlayerResource:GetPlayerCount() >= 1 and not EntBarrack:IsNull() and time_elapsed >= 750 and time_elapsed < 900 then -- Return 30 Muradin Event
 		return 30
 
-		elseif PlayerResource:GetPlayerCount() >= 4 and not EntBarrack:IsNull() and time_elapsed >= 870 and time_elapsed < 1230 then -- Level 3, higher or equal to 12 min
+		elseif PlayerResource:GetPlayerCount() >= 4 and not EntBarrack:IsNull() and time_elapsed >= 900 and time_elapsed < 1230 then -- Level 3, higher or equal to 12 min
 			local point = Entities:FindByName( nil, "npc_dota_spawner_4"):GetAbsOrigin()
 			for j = 1, 5 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_nyxes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -426,10 +423,10 @@ local triggers_choice = Entities:FindAllByName("trigger_special_event_choice")
 			local unit = CreateUnitByName("npc_dota_creature_mini_necrolytes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		return 30 -- Rerun this timer every 30 game-time seconds
 
-		elseif PlayerResource:GetPlayerCount() >= 1 and not EntBarrack:IsNull() and time_elapsed >= 750 and time_elapsed < 870 then -- Return 30 Muradin Event
+		elseif PlayerResource:GetPlayerCount() >= 1 and not EntBarrack:IsNull() and time_elapsed >= 750 and time_elapsed < 900 then -- Return 30 Muradin Event
 		return 30
 
-		elseif PlayerResource:GetPlayerCount() >= 5 and not EntBarrack:IsNull() and time_elapsed >= 870 and time_elapsed < 1230 then -- Level 3, higher or equal to 12 min
+		elseif PlayerResource:GetPlayerCount() >= 5 and not EntBarrack:IsNull() and time_elapsed >= 900 and time_elapsed < 1230 then -- Level 3, higher or equal to 12 min
 			local point = Entities:FindByName( nil, "npc_dota_spawner_5"):GetAbsOrigin()
 			for j = 1, 5 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_nyxes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -495,10 +492,10 @@ local triggers_choice = Entities:FindAllByName("trigger_special_event_choice")
 			local unit = CreateUnitByName("npc_dota_creature_mini_necrolytes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		return 30 -- Rerun this timer every 30 game-time seconds
 
-		elseif PlayerResource:GetPlayerCount() >= 1 and not EntBarrack:IsNull() and time_elapsed >= 750 and time_elapsed < 870 then -- Return 30 Muradin Event
+		elseif PlayerResource:GetPlayerCount() >= 1 and not EntBarrack:IsNull() and time_elapsed >= 750 and time_elapsed < 900 then -- Return 30 Muradin Event
 		return 30
 
-		elseif PlayerResource:GetPlayerCount() >= 6 and not EntBarrack:IsNull() and time_elapsed >= 870 and time_elapsed < 1230 then -- Level 3, higher or equal to 12 min
+		elseif PlayerResource:GetPlayerCount() >= 6 and not EntBarrack:IsNull() and time_elapsed >= 900 and time_elapsed < 1230 then -- Level 3, higher or equal to 12 min
 			local point = Entities:FindByName( nil, "npc_dota_spawner_6"):GetAbsOrigin()
 			for j = 1, 5 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_nyxes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -564,10 +561,10 @@ local triggers_choice = Entities:FindAllByName("trigger_special_event_choice")
 			local unit = CreateUnitByName("npc_dota_creature_mini_necrolytes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		return 30 -- Rerun this timer every 30 game-time seconds
 
-		elseif PlayerResource:GetPlayerCount() >= 1 and not EntBarrack:IsNull() and time_elapsed >= 750 and time_elapsed < 870 then -- Return 30 Muradin Event
+		elseif PlayerResource:GetPlayerCount() >= 1 and not EntBarrack:IsNull() and time_elapsed >= 750 and time_elapsed < 900 then -- Return 30 Muradin Event
 		return 30
 
-		elseif PlayerResource:GetPlayerCount() >= 7 and not EntBarrack:IsNull() and time_elapsed >= 870 and time_elapsed < 1230 then -- Level 3, higher or equal to 12 min
+		elseif PlayerResource:GetPlayerCount() >= 7 and not EntBarrack:IsNull() and time_elapsed >= 900 and time_elapsed < 1230 then -- Level 3, higher or equal to 12 min
 			local point = Entities:FindByName( nil, "npc_dota_spawner_7"):GetAbsOrigin()
 			for j = 1, 5 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_nyxes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -633,10 +630,10 @@ local triggers_choice = Entities:FindAllByName("trigger_special_event_choice")
 			local unit = CreateUnitByName("npc_dota_creature_mini_necrolytes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		return 30 -- Rerun this timer every 30 game-time seconds
 
-		elseif PlayerResource:GetPlayerCount() >= 1 and not EntBarrack:IsNull() and time_elapsed >= 750 and time_elapsed < 870 then -- Return 30 Muradin Event
+		elseif PlayerResource:GetPlayerCount() >= 1 and not EntBarrack:IsNull() and time_elapsed >= 750 and time_elapsed < 900 then -- Return 30 Muradin Event
 		return 30
 
-		elseif PlayerResource:GetPlayerCount() >= 8 and not EntBarrack:IsNull() and time_elapsed >= 870 and time_elapsed < 1230 then -- Level 3, higher or equal to 12 min
+		elseif PlayerResource:GetPlayerCount() >= 8 and not EntBarrack:IsNull() and time_elapsed >= 900 and time_elapsed < 1230 then -- Level 3, higher or equal to 12 min
 			local point = Entities:FindByName( nil, "npc_dota_spawner_8"):GetAbsOrigin()
 			for j = 1, 5 do
 			local unit = CreateUnitByName("npc_dota_creature_mini_nyxes", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -1179,7 +1176,7 @@ function GameMode:OnThink()
 		nCOUNTDOWNCREEP = 361
 	elseif time_elapsed > 720 and time_elapsed < 870 then
 		nCOUNTDOWNCREEP = 1
-	elseif time_elapsed > 1950 then
+	elseif time_elapsed > 1920 then
 		nCOUNTDOWNCREEP = 1
 	end
 
