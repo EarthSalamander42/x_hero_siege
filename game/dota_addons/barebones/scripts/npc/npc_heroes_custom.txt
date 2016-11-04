@@ -9,11 +9,11 @@
 		"AbilityLayout"					"6"
 		"MovementSpeed"					"380"
 		"ModelScale"					"1.4"
-		"AttackDamageMin"				"90"
-		"AttackDamageMax"				"100"
+		"AttackDamageMin"				"70"
+		"AttackDamageMax"				"80"
 		"AttackRange"					"190"
 		"HealthBarOffset"				"250"
-		"RingRadius"					"150"
+		"RingRadius"					"140"
 		"ProjectileSpeed"				"1200"
 
 		"AttributeStrengthGain"			"20"
@@ -27,6 +27,34 @@
 		"Ability5"						"black_dragon_fireball"
 		"Ability6"						"holdout_sea_dragon_form"
 		"Ability16"						"ability_unit_died_ice" //Make Water Deaths
+	}
+
+	//========================================================================================================
+	// HERO: Lich King (Abaddon)
+	//========================================================================================================
+	"npc_dota_hero_abaddon_holdout"
+	{
+		"override_hero"					"npc_dota_hero_abaddon"
+		"AbilityLayout"					"6"
+		"ModelScale"					"1.2"
+		"AttackDamageMin"				"70"
+		"AttackDamageMax"				"80"
+		"MovementSpeed"					"350"
+		"HealthBarOffset"				"200"
+		"AttackRange"					"170"
+
+		"AttributeStrengthGain"			"20"
+		"AttributeAgilityGain"			"10"
+		"AttributeIntelligenceGain"		"10"
+
+		"Ability1"				"holdout_death_coil_alt"
+		"Ability2"				"holdout_howling_blast"		
+		"Ability3"				"holdout_frozen_tempest"
+		"Ability4"				"holdout_army_of_the_dead"
+		"Ability5"				"holdout_frostmourne_hungers"
+		"Ability6"				"holdout_sindragosa"
+		"Ability7"				"holdout_red_effect"
+		"Ability16"				"ability_unit_died_death"
 	}
 
 	//========================================================================================================
@@ -133,7 +161,8 @@
 	{
 		"override_hero"					"npc_dota_hero_elder_titan"
 		"AbilityLayout"					"6"
-		"MovementSpeed"					"375"
+		"MovementSpeed"					"365"
+		"AttackRange"					"150"
 
 		"AttributeStrengthGain"			"10"
 		"AttributeAgilityGain"			"5"
@@ -146,6 +175,42 @@
 		"Ability5"						"holdout_roar"
 		"Ability6"						"holdout_lightning_stroke"
 		"Ability16"						"ability_unit_died_light"
+	}
+
+	//========================================================================================================
+	// HERO: Beastmaster( Lone Druid )
+	//========================================================================================================
+	"npc_dota_hero_beastmaster_holdout"
+	{
+		"override_hero"					"npc_dota_hero_beastmaster"
+		"AbilityLayout"					"6"
+		"MovementSpeed"					"375"
+		"ModelScale"					"1.1"
+
+		"HealthBarOffset"				"190"
+		"AttackDamageMin"				"49"
+		"AttackDamageMax"				"61"
+		"AttackCapabilities"			"DOTA_UNIT_CAP_RANGED_ATTACK"
+		"ProjectileModel"				"particles/units/heroes/hero_lone_druid/lone_druid_base_attack.vpcf"
+		"ProjectileSpeed"				"900"
+		"AttackRange"					"550"
+
+		"AttributeStrengthGain"			"5"
+		"AttributeAgilityGain"			"10"
+		"AttributeIntelligenceGain"		"5"
+		"AttributePrimary"				"DOTA_ATTRIBUTE_AGILITY"
+
+		"Ability1"						"lone_druid_spirit_bear"
+		"Ability2"						"holdout_spiritual_beast"
+		"Ability3"						"holdout_battlecry"
+		"Ability4"						"holdout_rabid"
+		"Ability5"						"holdout_blink"
+		"Ability6"						"holdout_beastmaster_stampede"
+		"Ability7"						"holdout_beastmaster_misc"
+		"Ability16"						"ability_unit_died_death"
+
+		"GameSoundsFile"				"soundevents/game_sounds_heroes/game_sounds_lone_druid.vsndevts"
+		"VoiceFile"						"soundevents/voscripts/game_sounds_vo_lone_druid.vsndevts"
 	}
 
 	//========================================================================================================
@@ -174,7 +239,7 @@
 	}
 
 	//========================================================================================================
-	// HERO: Banehallow (Enigma)
+	// HERO: Banehallow (Shadow Fiend)
 	//========================================================================================================
 	"npc_dota_hero_nevermore_holdout"
 	{
@@ -230,7 +295,6 @@
 		"Ability6"						"holdout_phoenix"
 		"Ability7"						"blood_mage_orbs"
 		"Ability16"						"ability_unit_died_fire"
-		"Ability17"						""
 	}
 
 	//========================================================================================================
@@ -379,28 +443,34 @@
 	}
 
 	//========================================================================================================
-	// HERO: Crypt Lord( Nyx Assassin )
+	// HERO: Crypt Lord( Weaver )
 	//========================================================================================================
-	"npc_dota_hero_nyx_assassin_holdout"
+	"npc_dota_hero_weaver_holdout"
 	{
-		"override_hero"					"npc_dota_hero_nyx_assassin"
+		"override_hero"					"npc_dota_hero_weaver"
 		"AbilityLayout"					"6"
 		"MovementSpeed"					"355"
 		"AttackDamageMin"				"61"
 		"AttackDamageMax"				"71"
+		"ModelScale"					"1.1"
 
 		"AttributePrimary"				"DOTA_ATTRIBUTE_STRENGTH"
 		"AttributeStrengthGain"			"10"
 		"AttributeAgilityGain"			"5"
 		"AttributeIntelligenceGain"		"5"
+		"AttackCapabilities"			"DOTA_UNIT_CAP_MELEE_ATTACK"
+		"AttackRange"					"160"
+		"ProjectileModel"				""
+		"ProjectileSpeed"				""
 
+		"Ability1"						"nyx_assassin_impale"
 		"Ability2"						"holdout_carrion_beetles"
 		"Ability3"						"holdout_poison_sting"
 		"Ability4"						"holdout_spiked_carapace"
 		"Ability5"						"holdout_anubarak_claw"
 		"Ability6"						"holdout_locust_swarm"
-		"Ability7"						""
-		"Ability16"						"ability_unit_died_death"
+		"Ability7"						"ability_unit_died_death"
+//		"Ability16"						""
 	}
 
 	//========================================================================================================
@@ -496,7 +566,6 @@
 		"AttackRange"					"650"
 		"AttackCapabilities"			"DOTA_UNIT_CAP_RANGED_ATTACK"
 		"ProjectileModel"				"particles/econ/items/sniper/sniper_charlie/sniper_assassinate_charlie.vpcf"
-		"GameSoundsFile"				"soundevents/game_sounds_heroes/game_sounds_rattletrap.vsndevts"
 		"ProjectileSpeed"				"1700"
 		"HealthBarOffset"				"170"
 
@@ -596,7 +665,7 @@
 		"override_hero"					"npc_dota_hero_terrorblade"
 		"AbilityLayout"					"6"
 		"MovementSpeed"					"375"
-		"ModelScale"					"1.05"
+		"ModelScale"					"1.15"
 
 		"AttributeStrengthGain"			"5"
 		"AttributeAgilityGain"			"10"

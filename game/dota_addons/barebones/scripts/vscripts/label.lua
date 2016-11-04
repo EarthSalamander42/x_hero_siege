@@ -14,7 +14,7 @@ function GameMode:setPlayerHealthLabel( player )
 				end
 			end
 			-- Beast
-			if PlayerResource:GetSteamAccountID(player:GetPlayerID()) == 206464009 then
+			if PlayerResource:GetSteamAccountID(player:GetPlayerID()) == 206464009 or PlayerResource:GetSteamAccountID(player:GetPlayerID()) == 146805680 then -- beast + VIP Donator Uktail
 				if PlayerResource:GetPlayer(player:GetPlayerID()):GetAssignedHero() ~= nil then
 					PlayerResource:GetPlayer(player:GetPlayerID()):GetAssignedHero():SetCustomHealthLabel("VIP Member", 45, 200, 45)
 				end

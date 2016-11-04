@@ -13,7 +13,7 @@ function Return( event )
 	local attacker_damage = attacker:GetBaseDamageMin()
 
 	-- Damage
-	if attacker:GetTeamNumber() ~= caster:GetTeamNumber() then
+	if attacker:GetTeamNumber() ~= caster:GetTeamNumber() and not attacker:IsBuilding() then
 		ApplyDamage({ victim = attacker, attacker = caster, damage = attacker_damage, damage_type = damageType })
 		print("done "..attacker_damage/divided_damage)
 	end

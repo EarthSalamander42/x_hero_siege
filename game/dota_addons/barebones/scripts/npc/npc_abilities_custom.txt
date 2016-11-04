@@ -110,6 +110,887 @@
 		}
 	}
 
+	//=================================================================================================================
+	// Lich King: Death Coil
+	//=================================================================================================================
+	"holdout_death_coil_alt"
+	{
+		// General
+		//-------------------------------------------------------------------------------------
+		"BaseClass"						"ability_datadriven"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
+
+		// Stats
+		//-------------------------------------------------------------------------------------
+		"AbilityCastPoint"				"0.3"
+		"AbilityCooldown"				"15.0 13.0 11.0 9.0"
+		"AbilityCastRange"				"600"
+		"AbilityManaCost"				"90 140 190 240"
+		"AbilityTextureName"			"holdout_death_coil_alt"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_BOTH"
+		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"projectile_speed"		"900"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"target_damage"			"300 750 1000 1500"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"heal_amount"			"300 750 1000 1500"
+			}
+		}
+
+		"OnSpellStart"
+		{
+			"TrackingProjectile"
+			{
+				"Target"			"TARGET"
+				"EffectName"		"particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast.vpcf"
+				"Dodgeable"			"1"
+				"ProvidesVision"	"0"
+				"MoveSpeed"			"%projectile_speed"
+				"SourceAttachment"	"DOTA_PROJECTILE_ATTACHMENT_ATTACK_1"
+			}
+	
+			"FireSound"
+			{
+				"EffectName"		"Hero_SkeletonKing.Hellfire_Blast"
+				"Target"			"CASTER"
+			}
+		}
+
+		"OnProjectileHitUnit"
+		{ 
+			"RunScript"
+			{
+				"ScriptFile"		"heroes/hero_abaddon/death_coil.lua"
+				"Function"			"ProjectileHit"
+			}
+
+			"FireSound"
+			{
+				"EffectName"		"Hero_SkeletonKing.BlastImpact"
+				"Target"			"TARGET"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Lich King: Howling Blast
+	//=================================================================================================================
+	"holdout_howling_blast"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"						"abyssal_underlord_pit_of_malice"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"	
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_YES"
+		"AbilityCastRange"				"750"
+		"AbilityCastPoint"				"0.45"
+		"AbilityTextureName"			"holdout_howling_blast"
+
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"18 16 14 12"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"120 200 280 360"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"						"FIELD_INTEGER"
+				"radius"						"250 275 300 325"
+			}
+			"02"
+			{
+				"var_type"						"FIELD_FLOAT"
+				"pit_duration"					"7.0"
+			}		
+			"03"
+			{
+				"var_type"						"FIELD_FLOAT"
+				"pit_interval"					"0.5"
+			}
+			"04"
+			{
+				"var_type"						"FIELD_INTEGER"
+				"pit_damage"					"200 450 750 1300"
+			}
+			"05"
+			{
+				"var_type"						"FIELD_FLOAT"
+				"ensnare_duration"				"1.5 2.0 2.5 3.0"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Lich King: Frozen Tempest
+	//=================================================================================================================
+	"holdout_frozen_tempest"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"						"ability_datadriven"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_TOGGLE | DOTA_ABILITY_BEHAVIOR_IGNORE_CHANNEL"
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"	
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
+		"AbilityTextureName"			"holdout_frozen_tempest"
+		"RequiredLevel"					"5"
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastPoint"				"0"
+		"AbilityCooldown"				"1.0"
+		"AbilityCastRange"				"500"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"0"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"mana_cost_per_second"	"25 50 100 250"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"radius"				"450 500 550 600"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"damage"				"75 150 225 300"
+			}
+			"04"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"nova_tick"				"1.0"
+			}
+			"05"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"enemy_slow"			"-10 -13 -16 -20"
+			}
+			"06"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"enemy_slow_duration"	"3.0"
+			}
+		}
+	
+		"OnToggleOn"
+		{
+			"FireSound"
+			{
+				"EffectName"	"Hero_Leshrac.Pulse_Nova"
+				"Target"		"CASTER"
+			}
+	
+			"ActOnTargets"
+			{
+				"Target"
+				{
+					"Center" "CASTER"
+					"Radius" "%radius"
+					"Teams" "DOTA_UNIT_TARGET_TEAM_ENEMY" 
+					"Types" "DOTA_UNIT_TARGET_BASIC | DOTA_UNIT_TARGET_HERO"
+				}
+	
+				"Action"
+				{
+					"Damage"
+					{
+						"Target"	"TARGET"
+						"Type"		"DAMAGE_TYPE_MAGICAL"
+						"Damage"	"%damage"
+					}
+	
+					"FireEffect"
+					{
+						"EffectName"        "particles/units/heroes/hero_leshrac/leshrac_pulse_nova.vpcf"
+						"EffectAttachType"  "follow_origin"
+						"Target"            "TARGET"
+					}
+				}
+			}
+	
+			"ApplyModifier"
+			{
+				"ModifierName"	"modifier_pulse_nova_datadriven"
+				"Target"		"CASTER"
+			}
+	
+			"RunScript"
+			{
+				"ScriptFile"	"scripts/vscripts/heroes/hero_abaddon/frozen_tempest.lua"
+				"Function"		"pulse_nova_start"
+			}
+		}
+	
+		"OnToggleOff"
+		{
+			"RemoveModifier"
+			{
+				"ModifierName"	"modifier_pulse_nova_datadriven"
+				"Target"
+				{
+					"Center"	"CASTER"
+					"Flags" 	"DOTA_UNIT_TARGET_FLAG_DEAD"
+				}
+			}
+	
+			"RunScript"
+			{
+				"ScriptFile"	"scripts/vscripts/heroes/hero_abaddon/frozen_tempest.lua"
+				"Function"		"pulse_nova_stop"
+			}
+		}
+	
+		"Modifiers"
+		{
+			"modifier_pulse_nova_datadriven"
+			{
+				"Passive"			"0"
+				"IsHidden"			"0"
+				"IsDebuff"			"0"
+				
+				"ThinkInterval"  "%nova_tick"
+	
+				"OnIntervalThink"
+				{
+					"FireSound"
+					{
+						"EffectName"	"Hero_Leshrac.Pulse_Nova_Strike"
+						"Target" 		"CASTER"
+					}
+	
+					"ActOnTargets"
+					{
+						"Target"
+						{
+							"Center" "CASTER"
+							"Radius" "%radius"
+							"Teams" "DOTA_UNIT_TARGET_TEAM_ENEMY" 
+							"Types" "DOTA_UNIT_TARGET_BASIC | DOTA_UNIT_TARGET_HERO"
+						}
+	
+						"Action"
+						{
+							"FireEffect"
+							{
+								"EffectName"        "particles/units/heroes/hero_leshrac/leshrac_pulse_nova.vpcf"
+								"EffectAttachType"  "follow_origin"
+								"Target"            "TARGET"
+							}
+	
+							"Damage"
+							{
+								"Target"	"TARGET"
+								"Type"		"DAMAGE_TYPE_MAGICAL"
+								"Damage"	"%damage"
+							}
+
+							"ApplyModifier"
+							{
+								"ModifierName"	"modifier_pulse_nova_enemy"
+								"Target"		"TARGET"
+								"Duration"		"%enemy_slow_duration"
+							}	            	
+						}
+					}
+				}
+	
+				"OnCreated"
+				{
+					"AttachEffect"
+					{
+						"EffectName"		"particles/units/heroes/hero_leshrac/leshrac_pulse_nova_ambient.vpcf"
+						"EffectAttachType"	"follow_origin"
+						"Target"			"CASTER"
+	
+						"ControlPoints"
+						{
+							"00"	"0 0 0"
+							"01"	"%radius 0 0"
+						}
+					}
+				}
+			}
+
+			"modifier_pulse_nova_enemy"
+			{
+				"Passive"			"0"
+				"IsHidden"			"0"
+				"IsDebuff"			"1"
+			
+				"EffectName"		"particles/items3_fx/silver_edge_slow.vpcf"
+				"EffectAttachType"	"follow_origin"
+			
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE"		"%enemy_slow" 
+				}
+			}
+		}
+	}
+
+	//========================================================================================================
+	// Lich King: Army of the Dead
+	//========================================================================================================
+	"holdout_army_of_the_dead"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"             		"ability_datadriven"
+		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityTextureName"            "holdout_army_of_the_dead"
+		"LevelsBetweenUpgrades"			"3"
+		"RequiredLevel"					"8"  
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastPoint"              "0.3"
+	
+		// Time     
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"               "65.0"
+	
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"               "125 155 185 215"
+	
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"                  "FIELD_INTEGER"
+				"wolf_index"                "1 2 3 4"
+			}
+			"02"
+			{
+				"var_type"                  "FIELD_FLOAT"
+				"wolf_duration"             "25.0"
+			}
+			"03"
+			{
+				"var_type"                  "FIELD_FLOAT"
+				"wolf_bat"                  "1.25 1.2 1.15 1.1"
+			}
+			"04"
+			{
+				"var_type"                  "FIELD_INTEGER"
+				"wolf_damage"               "90 125 250 450"
+			}
+			"05"
+			{
+				"var_type"                  "FIELD_INTEGER"
+				"wolf_hp"                   "1200 2500 5000 9500"
+			}
+			"06" // Extra variables for "SpawnUnit" to decide which level of wolves will be used
+			{
+				"var_type"                  "FIELD_INTEGER"
+				"wolf_1_count"              "2 0 0 0"
+			}
+			"07"
+			{
+				"var_type"                  "FIELD_INTEGER"
+				"wolf_2_count"              "0 2 0 0"
+			}
+			"08"
+			{
+				"var_type"                  "FIELD_INTEGER"
+				"wolf_3_count"              "0 0 2 0"
+			}
+			"09"
+			{
+				"var_type"                  "FIELD_INTEGER"
+				"wolf_4_count"              "0 0 0 2"
+			}
+			"10"
+			{
+				"var_type"                  "FIELD_INTEGER"
+				"spawn_distance"            "150"   
+			}
+		}
+	
+		"OnSpellStart"
+		{
+			"FireSound"
+			{
+				"EffectName"    "Hero_Lycan.SummonWolves"
+				"Target"        "CASTER"
+			}
+
+			"AttachEffect"
+			{
+				"EffectName"    "particles/units/heroes/hero_lycan/lycan_summon_wolves_cast.vpcf"
+				"EffectName"    "start_at_customorigin"
+				"Target"        "CASTER"    
+			}   
+
+			"RunScript"
+			{
+				"ScriptFile"    "scripts/vscripts/heroes/hero_abaddon/army_of_the_dead.lua"
+				"Function"      "KillWolves"
+			}
+
+			"SpawnUnit"
+			{
+				"UnitName"      "npc_dota_lich_king_ghouls_1"
+				"Target"
+				{
+					"Center"    "CASTER"
+					"ScriptSelectPoints"
+					{
+						"ScriptFile"    "scripts/vscripts/heroes/hero_abaddon/army_of_the_dead.lua"
+						"Function"  "GetSummonPoints"
+						"Target"    "CASTER"
+						"Count" "1"
+						"distance"  "%spawn_distance"
+					}
+				}
+	
+				"Duration"  "%wolf_duration"
+				"UnitCount" "%wolf_1_count / 2"
+				"UnitLimit" "2"
+				"GrantsGold"    "0"
+				"GrantsXP"      "0"
+				"SpawnRadius"   "10"
+				"OnSpawn"
+				{
+					"RunScript"
+					{
+						"ScriptFile"    "scripts/vscripts/heroes/hero_abaddon/army_of_the_dead.lua"
+						"Function"      "SetUnitsMoveForward"
+					}
+	
+					"ApplyModifier"
+					{
+						"ModifierName"  "modifier_summon_wolves_datadriven"
+						"Target"        "TARGET"
+						"Duration"      "%duration"
+					}
+				}
+			}
+	
+			"SpawnUnit"
+			{
+				"UnitName"      "npc_dota_lich_king_ghouls_2"
+				"Target"
+				{
+					"Center"    "CASTER"
+					"ScriptSelectPoints"
+					{
+						"ScriptFile"    "scripts/vscripts/heroes/hero_abaddon/army_of_the_dead.lua"
+						"Function"  "GetSummonPoints"
+						"Target"    "CASTER"
+						"Count" "2"
+						"distance"  "%spawn_distance"
+					}
+				}
+	
+				"Duration"  "%wolf_duration"
+				"UnitCount" "%wolf_2_count / 2" 
+				"UnitLimit" "2"
+				"GrantsGold"    "0"
+				"GrantsXP"      "0"
+				"SpawnRadius"   "10"
+				"OnSpawn"
+				{
+					"RunScript"
+					{
+						"ScriptFile"    "scripts/vscripts/heroes/hero_abaddon/army_of_the_dead.lua"
+						"Function"      "SetUnitsMoveForward"
+					}
+	
+					"ApplyModifier"
+					{
+						"ModifierName"  "modifier_summon_wolves_datadriven"
+						"Target"        "TARGET"
+						"Duration"      "%duration"
+					}
+				}
+			}
+	
+			"SpawnUnit"
+			{
+				"UnitName"      "npc_dota_lich_king_ghouls_3"
+				"Target"
+				{
+					"Center"    "CASTER"
+					"ScriptSelectPoints"
+					{
+						"ScriptFile"    "scripts/vscripts/heroes/hero_abaddon/army_of_the_dead.lua"
+						"Function"  "GetSummonPoints"
+						"Target"    "CASTER"
+						"Count" "2"
+						"distance"  "%spawn_distance"
+					}
+				}
+	
+				"Duration"  "%wolf_duration"
+				"UnitCount" "%wolf_3_count / 2" 
+				"UnitLimit" "2"
+				"GrantsGold"    "0"
+				"GrantsXP"      "0"
+				"SpawnRadius"   "10"
+				"OnSpawn"
+				{
+					"RunScript"
+					{
+						"ScriptFile"    "scripts/vscripts/heroes/hero_abaddon/army_of_the_dead.lua"
+						"Function"      "SetUnitsMoveForward"
+					}
+	
+					"ApplyModifier"
+					{
+						"ModifierName"  "modifier_summon_wolves_datadriven"
+						"Target"        "TARGET"
+						"Duration"      "%duration"
+					}
+				}
+			}
+	
+			"SpawnUnit"
+			{
+				"UnitName"      "npc_dota_lich_king_ghouls_4"
+				"Target"
+				{
+					"Center"    "CASTER"
+					"ScriptSelectPoints"
+					{
+						"ScriptFile"    "scripts/vscripts/heroes/hero_abaddon/army_of_the_dead.lua"
+						"Function"  "GetSummonPoints"
+						"Target"    "CASTER"
+						"Count" "2"
+						"distance"  "%spawn_distance"
+					}
+				}
+	
+				"Duration"  "%wolf_duration"
+				"UnitCount" "%wolf_4_count / 2" 
+				"UnitLimit" "2"
+				"GrantsGold"    "0"
+				"GrantsXP"      "0"
+				"SpawnRadius"   "10"
+				"OnSpawn"
+				{
+					"RunScript"
+					{
+						"ScriptFile"    "scripts/vscripts/heroes/hero_abaddon/army_of_the_dead.lua"
+						"Function"      "SetUnitsMoveForward"
+					}
+	
+					"ApplyModifier"
+					{
+						"ModifierName"  "modifier_summon_wolves_datadriven"
+						"Target"        "TARGET"
+						"Duration"      "%duration"
+					}
+				}
+			}               
+		}
+	
+		"Modifiers"
+		{
+			"modifier_summon_wolves_datadriven"
+			{
+				"Passive" "0"
+				"IsHidden" "1"
+				"IsDebuff" "0"
+	
+				"OnCreated"
+				{
+					"FireEffect"
+					{
+						"EffectName" "particles/units/heroes/hero_lycan/lycan_summon_wolves_spawn.vpcf"
+						"EffectAttachType" "follow_origin"
+						"Target" "TARGET"
+					}
+				}
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Lich King: Frostmourne Hungers
+	//=================================================================================================================
+	"holdout_frostmourne_hungers"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"						"ability_datadriven"
+		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityUnitTargetTeam"         "DOTA_UNIT_TARGET_TEAM_FRIENDLY"
+		"AbilityUnitTargetType"         "DOTA_UNIT_TARGET_HERO"
+		"AbilityUnitTargetFlags"        "DOTA_UNIT_TARGET_FLAG_NOT_MAGIC_IMMUNE_ALLIES"
+		"SpellImmunityType"             "SPELL_IMMUNITY_ALLIES_NO"
+		"AbilityTextureName"			"holdout_frostmourne_hungers"
+		"MaxLevel"						"1"
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"              "0"
+		"AbilityCastPoint"              "0.35"
+
+		// Time     
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"               "45.0"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"0"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"mana_restore"				"200"
+			}
+			"02"
+			{
+				"var_type"					"FIELD_FLOAT"
+				"duration"					"20.0"
+			}
+		}
+
+		"OnSpellStart"
+		{
+			"FireSound"
+			{
+				"EffectName"    "Hero_Magnataur.Empower.Cast"
+				"Target"        "CASTER"
+			}
+
+			"RemoveModifier"
+			{
+				"ModifierName"	"modifier_frostmourne_hungers"
+				"Target" 		"CASTER"
+			}
+
+			"ApplyModifier"
+			{
+				"ModifierName"	"modifier_frostmourne_hungers"
+				"Target" 		"CASTER"
+				"Duration"		"%duration"
+			}
+		}
+
+		"Modifiers"
+		{
+			"modifier_frostmourne_hungers"
+			{
+				"IsBuff"			"1"
+				"Duration"			"%duration"
+
+				"EffectName"		"particles/units/heroes/hero_ancient_apparition/ancient_apparition_chilling_touch_buff.vpcf"
+				"EffectAttachType"	"attach_attack1"
+
+				"OnCreated"
+				{
+					"RunScript"
+					{
+						"ScriptFile"			"heroes/hero_abaddon/frostmourne_hungers.lua"
+						"Function"				"FrostmourneHungers"
+						"modifier_stack"		"modifier_frostmourne_hungers"
+					}
+				}
+
+				"OnAttackLanded"
+				{
+					"RunScript"
+					{
+						"ScriptFile"			"heroes/hero_abaddon/frostmourne_hungers.lua"
+						"Function"				"GiveMana"
+						"modifier_stack"		"modifier_frostmourne_hungers"
+
+						"particle_burn"			"particles/generic_gameplay/generic_manaburn.vpcf"
+						"sound_burn"			"Hero_Antimage.ManaBreak"
+					}
+				}
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Lich King: Summon Sindragosa
+	//=================================================================================================================
+	"holdout_sindragosa"
+	{
+		"BaseClass"             		"ability_datadriven"
+		"AbilityTextureName"			"holdout_sindragosa"
+		"LevelsBetweenUpgrades"			"5"
+		"RequiredLevel"					"10"
+		"AbilityType" 					"DOTA_ABILITY_TYPE_ULTIMATE"
+		"MaxLevel"						"2"
+
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE"
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
+		"AbilityCastAnimation"			"ACT_DOTA_CAST_ABILITY_1"
+
+		"AbilityCastRange"				"800"
+		"AbilityCastPoint"				"0.6"
+		"AbilityCooldown"				"140.0"
+
+		"AbilityManaCost"				"200 500"
+		"AbilityDamage"					"1500 3000"
+
+		"AOERadius"						"350"
+
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"radius"				"450"
+			}
+			"02"
+			{	
+				"var_type"				"FIELD_FLOAT"
+				"infernal_duration"		"60 60"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"stun_hero_duration"	"2.0"
+			}
+			"04"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"stun_creep_duration"	"4.0"
+			}
+			"05"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"inferno_count"			"1 2"
+			}
+		}
+
+		"OnSpellStart"
+		{
+			"FireSound"
+			{
+				"EffectName"			"Hero_Warlock.RainOfChaos_buildup"
+				"Target"				"CASTER"
+			}
+
+			"SpawnUnit"
+			{
+				"Target"            	"POINT"
+				"UnitName"              "npc_dota_lich_king_sindragosa"
+				"UnitCount"             "%inferno_count"
+				"Duration"				"60"
+				"OnSpawn"
+				{	
+					"FireEffect"
+					{
+						"EffectName"        "particles/econ/items/crystal_maiden/crystal_maiden_cowl_of_ice/maiden_crystal_nova_cowlofice.vpcf"
+						"EffectAttachType"  "follow_origin"
+						"Target"            "TARGET"
+					}
+
+					"ApplyModifier"
+					{
+						"ModifierName"		"modifier_phased"
+						"Target"			"TARGET"
+						"Duration"			"0.05"
+					}
+				}
+			}
+
+			"DestroyTrees"
+			{
+				"Target"	"POINT"
+				"Radius"	"%radius"
+			}
+
+			"ApplyModifier"
+			{
+				"ModifierName"    "modifier_inferno_stun"
+				"Target"
+				{
+					"Center"	"POINT"
+					"Radius"	"%radius"
+					"Teams"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
+					"Types"		"DOTA_UNIT_TARGET_HERO"
+				}
+				"Duration"		"%stun_hero_duration"
+			}
+
+			"ApplyModifier"
+			{
+				"ModifierName"    "modifier_inferno_stun"
+				"Target"
+				{
+					"Center"	"POINT"
+					"Radius"	"%radius"
+					"Teams"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
+					"Types"		"DOTA_UNIT_TARGET_BASIC"
+				}
+				"Duration"		"%stun_creep_duration"
+			}
+
+			"Damage"
+			{
+				"Type" 		"DAMAGE_TYPE_MAGICAL"
+				"Damage" 	"%AbilityDamage"
+				"Target"
+				{
+					"Center"	"POINT"
+					"Radius"	"%radius"
+					"Teams"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
+					"Types"		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+				}
+			}
+		}
+
+		"Modifiers"
+		{
+			"modifier_inferno_stun"
+			{
+				"IsDebuff"	"1"
+				"States"
+				{
+					"MODIFIER_STATE_STUNNED" "MODIFIER_STATE_VALUE_ENABLED"			
+				}
+				"OverrideAnimation"	"ACT_DOTA_DISABLED"
+				"EffectName"		"particles/generic_gameplay/generic_stunned.vpcf"
+				"EffectAttachType"	"follow_overhead"
+			}
+		}
+	}
+
 	//=======================================================================================================
 	// Lich: Frost Nova
 	//=======================================================================================================
@@ -2680,7 +3561,7 @@
 	
 		// Time     
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCooldown"               "35.0"
+		"AbilityCooldown"               "25.0"
 	
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
@@ -2708,12 +3589,12 @@
 			"04"
 			{
 				"var_type"                  "FIELD_INTEGER"
-				"wolf_damage"               "18 35 74 145"
+				"wolf_damage"               "18 45 84 150"
 			}
 			"05"
 			{
 				"var_type"                  "FIELD_INTEGER"
-				"wolf_hp"                   "600 1400 2400 4000"
+				"wolf_hp"                   "600 1900 3250 5000"
 			}
 			"06" // Extra variables for "SpawnUnit" to decide which level of wolves will be used
 			{
@@ -12601,6 +13482,7 @@
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_PHYSICAL"
 		"AbilityTextureName"			"holdout_spiked_carapace"
 		"RequiredLevel"					"8"
+		"LevelsBetweenUpgrades"			"3"
 
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
@@ -12609,12 +13491,12 @@
 			"01"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"damage_divided"			"10"
+				"return_percent"			"10"
 			}
 			"02"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"return_damage_pct_tooltip"	"10"
+				"bonus_armor"				"15 30 50 90"
 			}
 		}
 	
@@ -12646,7 +13528,12 @@
 							"ATTACKER" 		"attach_hitloc"
 						}
 					}
-				}	
+				}
+
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS"		"%bonus_armor"
+				}
 			}
 		}
 	}
@@ -12772,12 +13659,12 @@
 			"02"
 			{
 				"var_type"              "FIELD_INTEGER"
-				"spirits"               "12 21"
+				"spirits"               "15 30"
 			}
 			"03"
 			{
 				"var_type"              "FIELD_INTEGER"
-				"spirit_speed"          "500 500"
+				"spirit_speed"          "500"
 			}
 			"04"
 			{
@@ -12792,12 +13679,12 @@
 			"06"
 			{
 				"var_type"              "FIELD_INTEGER"
-				"min_damage"            "100 275"
+				"min_damage"            "225"
 			}
 			"07"
 			{
 				"var_type"              "FIELD_INTEGER"
-				"max_damage"            "150 350"
+				"max_damage"            "225"
 			}
 			"08"
 			{
@@ -12807,7 +13694,7 @@
 			"09"
 			{
 				"var_type"              "FIELD_INTEGER"
-				"average_damage"        "125 300"
+				"average_damage"        "250"
 			}
 			// Extra
 			"10"
@@ -14027,6 +14914,562 @@
 				"States"
 				{
 					"MODIFIER_STATE_STUNNED"    "MODIFIER_STATE_VALUE_ENABLED"
+				}
+			}
+		}
+	}
+
+	//=========================================================================================
+	// Beastmaster: Battlecry (Passive)
+	//=========================================================================================
+	"holdout_battlecry"
+	{
+	// General
+	//-------------------------------------------------------------------------------------
+		"BaseClass"					"ability_datadriven"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityTextureName"		"lone_druid_true_form_battle_cry"
+		"RequiredLevel"				"5"
+
+		// Stats
+		//-------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_damage"			"75 150 225 300"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_armor"			"15 30 50 80"
+			}
+		}
+
+		"Modifiers"
+		{
+			"modifier_battlecry_passive"
+			{ 
+				"Passive"	"1"
+				"IsHidden"	"0"
+
+				"OnCreated"
+				{
+					"AttachEffect" // Effect 1
+					{
+						"EffectName"		"particles/units/heroes/hero_lone_druid/lone_druid_rabid_buff.vpcf"
+						"EffectAttachType"	"follow_origin"
+						"Target"			"CASTER"
+					}
+				}
+
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_BASEATTACK_BONUSDAMAGE"		"%bonus_damage"
+					"MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS"		"%bonus_armor"
+				}
+			}
+		}
+	}
+
+	//=========================================================================================
+	// Beastmaster: Rabid (Passive)
+	//=========================================================================================
+	"holdout_rabid"
+	{
+	// General
+	//-------------------------------------------------------------------------------------
+		"BaseClass"					"ability_datadriven"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityTextureName"		"lone_druid_rabid"
+		"RequiredLevel"				"8"
+		"LevelsBetweenUpgrades"		"3"
+
+		// Stats
+		//-------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"bonus_attack_speed"		"50 100 150 200"
+			}
+			"02"
+			{
+				"var_type"							"FIELD_INTEGER"
+				"bonus_movement_speed_percentage"	"10 20 30 40"
+			}
+		}
+		
+		"Modifiers"
+		{
+			"modifier_rabid_passive"
+			{ 
+				"Passive"	"1"
+				"IsHidden"	"0"
+
+				"OnCreated"
+				{
+					"AttachEffect" // Effect 1
+					{
+						"EffectName"		"particles/units/heroes/hero_lone_druid/lone_druid_rabid_buff.vpcf"
+						"EffectAttachType"	"follow_origin"
+						"Target"			"CASTER"
+					}
+				}
+
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_ATTACKSPEED_BONUS_CONSTANT" "%bonus_attack_speed"
+					"MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE" "%bonus_movement_speed_percentage" 
+				}
+			}
+		}
+	}
+
+	//=========================================================================================
+	// Beastmaster: Battlecry (Passive) - Wolves
+	//=========================================================================================
+	"holdout_battlecry_alt"
+	{
+	// General
+	//-------------------------------------------------------------------------------------
+		"BaseClass"					"ability_datadriven"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityTextureName"		"lone_druid_true_form_battle_cry"
+		
+		// Stats
+		//-------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_damage"			"25 50 100 200"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_armor"			"5 10 20 40"
+			}
+		}
+
+		"Modifiers"
+		{
+			"modifier_battlecry_passive"
+			{ 
+				"Passive"	"1"
+				"IsHidden"	"0"
+
+				"OnCreated"
+				{
+					"AttachEffect" // Effect 1
+					{
+						"EffectName"		"particles/units/heroes/hero_lone_druid/lone_druid_rabid_buff.vpcf"
+						"EffectAttachType"	"follow_origin"
+						"Target"			"CASTER"
+					}
+				}
+
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_BASEATTACK_BONUSDAMAGE"		"%bonus_damage"
+					"MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS"		"%bonus_armor"
+				}
+			}
+		}
+	}
+
+	//=========================================================================================
+	// Beastmaster: Rabid (Passive) - Wolves
+	//=========================================================================================
+	"holdout_rabid_alt"
+	{
+	// General
+	//-------------------------------------------------------------------------------------
+		"BaseClass"					"ability_datadriven"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityTextureName"		"lone_druid_rabid"
+		
+		// Stats
+		//-------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"bonus_attack_speed"		"25 50 75 125"
+			}
+			"02"
+			{
+				"var_type"							"FIELD_INTEGER"
+				"bonus_movement_speed_percentage"	"5 10 15 20"
+			}
+		}
+		
+		"Modifiers"
+		{
+			"modifier_rabid_passive"
+			{ 
+				"Passive"	"1"
+				"IsHidden"	"0"
+
+				"OnCreated"
+				{
+					"AttachEffect" // Effect 1
+					{
+						"EffectName"		"particles/units/heroes/hero_lone_druid/lone_druid_rabid_buff.vpcf"
+						"EffectAttachType"	"follow_origin"
+						"Target"			"CASTER"
+					}
+				}
+
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_ATTACKSPEED_BONUS_CONSTANT" "%bonus_attack_speed"
+					"MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE" "%bonus_movement_speed_percentage" 
+				}
+			}
+		}
+	}
+
+	//=========================================================================================
+	// Beastmaster: Battlecry (Passive) - Bear
+	//=========================================================================================
+	"holdout_battlecry_alt2"
+	{
+	// General
+	//-------------------------------------------------------------------------------------
+		"BaseClass"					"ability_datadriven"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityTextureName"		"lone_druid_true_form_battle_cry"
+		"MaxLevel"					"1"
+		
+		// Stats
+		//-------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_damage"			"100"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_armor"			"10"
+			}
+		}
+
+		"Modifiers"
+		{
+			"modifier_battlecry_passive"
+			{ 
+				"Passive"	"1"
+				"IsHidden"	"0"
+
+				"OnCreated"
+				{
+					"AttachEffect" // Effect 1
+					{
+						"EffectName"		"particles/units/heroes/hero_lone_druid/lone_druid_rabid_buff.vpcf"
+						"EffectAttachType"	"follow_origin"
+						"Target"			"CASTER"
+					}
+				}
+
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_BASEATTACK_BONUSDAMAGE"		"%bonus_damage"
+					"MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS"		"%bonus_armor"
+				}
+			}
+		}
+	}
+
+	//=========================================================================================
+	// Beastmaster: Rabid (Passive) - Bear
+	//=========================================================================================
+	"holdout_rabid_alt2"
+	{
+	// General
+	//-------------------------------------------------------------------------------------
+		"BaseClass"					"ability_datadriven"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityTextureName"		"lone_druid_rabid"
+		"MaxLevel"					"1"
+		
+		// Stats
+		//-------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"bonus_attack_speed"		"50"
+			}
+			"02"
+			{
+				"var_type"							"FIELD_INTEGER"
+				"bonus_movement_speed_percentage"	"10"
+			}
+		}
+		
+		"Modifiers"
+		{
+			"modifier_rabid_passive"
+			{ 
+				"Passive"	"1"
+				"IsHidden"	"0"
+
+				"OnCreated"
+				{
+					"AttachEffect" // Effect 1
+					{
+						"EffectName"		"particles/units/heroes/hero_lone_druid/lone_druid_rabid_buff.vpcf"
+						"EffectAttachType"	"follow_origin"
+						"Target"			"CASTER"
+					}
+				}
+
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_ATTACKSPEED_BONUS_CONSTANT" "%bonus_attack_speed"
+					"MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE" "%bonus_movement_speed_percentage" 
+				}
+			}
+		}
+	}
+
+	//========================================================================================================
+	// Beastmaster Misc
+	//========================================================================================================
+	"holdout_beastmaster_misc"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"             		"ability_datadriven"
+		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_HIDDEN"
+		"MaxLevel"						"1"
+
+		"Modifiers"
+		{
+			"modifier_beastmaster_attack_sound"
+			{
+				"IsHidden"			"1"
+				"Passive"			"1"
+	
+				"OnAttack"
+				{
+					"FireSound"
+					{
+						"EffectName"		"Hero_LoneDruid.preAttack"
+						"Target"			"CASTER"
+					}
+				}
+	
+	
+				"OnAttacklanded"
+				{
+	
+					"FireSound"
+					{
+						"EffectName"		"Hero_LoneDruid.ProjectileImpact"
+						"Target"			"TARGET"
+					}
+				}
+			}
+		}
+	}
+
+	// Beastmaster Stampede
+	// Author: Noya
+	// Description: Calls down hordes of rampaging thunder lizards to explode upon the Beastmaster's enemies. Each exploding lizard does 60 damage.
+	"holdout_beastmaster_stampede"
+	{
+		"BaseClass"                     "ability_datadriven"
+		"AbilityTextureName"            "holdout_beastmaster_stampede"
+		"MaxLevel"                      "2"
+		"AbilityType"                   "DOTA_ABILITY_TYPE_ULTIMATE"
+		"LevelsBetweenUpgrades"			"5"
+		"RequiredLevel"					"10"
+		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_DIRECTIONAL | DOTA_ABILITY_BEHAVIOR_CHANNELING"
+		"AbilityUnitTargetTeam"         "DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"AbilityUnitTargetType"         "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC | DOTA_UNIT_TARGET_BUILDING"
+		"AbilityUnitDamageType"         "DAMAGE_TYPE_MAGICAL"
+		"AbilityCastAnimation"          "ACT_DOTA_CAST_ABILITY_3"
+		"AbilityCastRange"              "300"
+		"AbilityCastPoint"              "0.3"
+		"AbilityCooldown"               "180.0"
+		"AbilityManaCost"               "300 600"
+		"AbilityChannelTime"            "10.0"
+
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"			"FIELD_INTEGER"
+				"lizard_damage"		"180 360"
+			}
+			"02"
+			{
+				"var_type"			"FIELD_FLOAT"
+				"duration"			"10"
+			}
+			"03"
+			{
+				"var_type"			"FIELD_INTEGER"
+				"speed"				"600"
+			}
+			"04"
+			{
+				"var_type"			"FIELD_INTEGER"
+				"distance"			"2000"
+			}
+			"05"
+			{
+				"var_type"			"FIELD_INTEGER"
+				"collision_radius"	"100"
+			}
+			"06"
+			{
+				"var_type"			"FIELD_INTEGER"
+				"lizards_per_sec"	"25"
+			}
+			"07"
+			{
+				"var_type"			"FIELD_INTEGER"
+				"spawn_radius"		"900"
+			}
+			"08"
+			{
+				"var_type"			"FIELD_FLOAT"
+				"roar_interval"		"1.3"
+			}
+		}
+
+		"OnSpellStart"
+		{
+			"ApplyModifier"
+			{
+				"ModifierName"  "modifier_stampede"
+				"Target"        "CASTER"
+				"Duration"      "%duration"
+			}
+
+			"ApplyModifier"
+			{
+				"ModifierName"  "modifier_stampede_channeling"
+				"Target"        "CASTER"
+			}
+
+			"FireSound"
+			{
+				"EffectName"    "Hero_Beastmaster.Primal_Roar"
+				"Target"        "CASTER"
+			}
+
+			"RunScript"
+			{
+				"ScriptFile"    "heroes/hero_beastmaster/stampede.lua"
+				"Function"      "StampedeCast"
+				"Target"        "POINT"
+			}
+		}
+	
+		"OnChannelFinish"
+		{
+			"RemoveModifier"
+			{
+				"ModifierName"  "modifier_stampede"
+				"Target"        "CASTER"
+			}
+
+			"RemoveModifier"
+			{
+				"ModifierName"  "modifier_stampede_channeling"
+				"Target"        "CASTER"
+			}
+		}
+
+		"OnProjectileHitUnit"
+		{
+			"DeleteOnHit"   "1"
+			"Damage"
+			{
+				"Target"        "TARGET"
+				"Type"          "DAMAGE_TYPE_MAGICAL"
+				"Damage"        "%lizard_damage"
+			}
+
+			"FireSound"
+			{
+				"EffectName"    "Hero_Beastmaster.Wild_Axes_Damage"
+				"Target"        "TARGET"
+			}
+
+			"FireEffect"
+			{
+				"EffectName"        "particles/units/heroes/hero_riki/riki_backstab_hit_blood.vpcf"
+				"EffectAttachType"  "follow_origin"
+				"Target"            "TARGET"
+			}
+		}
+
+		"Modifiers"
+		{
+			"modifier_stampede"
+			{
+				"ThinkInterval"  "%roar_interval"
+				"OnIntervalThink"
+				{
+					"RunScript"
+					{
+						"ScriptFile"    "heroes/hero_beastmaster/stampede.lua"
+						"Function"      "Stampede"
+						"Target"        "POINT"
+					}
+				}
+			}
+
+			"modifier_stampede_channeling"
+			{
+				"IsHidden"              "1"
+				"ThinkInterval"         "%roar_interval"
+				"OnIntervalThink"
+				{
+					"ApplyModifier"
+					{
+						"ModifierName"  "modifier_channeling"
+						"Target"        "CASTER"
+						"Duration"      "1.25"
+					}
+
+					"FireSound"
+					{
+						"EffectName"    "Hero_Centaur.Stampede.Movement"
+						"Target"        "TARGET"
+					}
+				}
+			}
+
+			"modifier_channeling"
+			{   
+				"IsHidden"              "1"
+				"OverrideAnimation"     "ACT_DOTA_CAST_ABILITY_3"
+			}
+
+			"modifier_stampede_dummy"
+			{
+				"States"
+				{
+					"MODIFIER_STATE_INVULNERABLE"                   "MODIFIER_STATE_VALUE_ENABLED"
+					"MODIFIER_STATE_NO_HEALTH_BAR"                  "MODIFIER_STATE_VALUE_ENABLED"
+					"MODIFIER_STATE_NO_UNIT_COLLISION"              "MODIFIER_STATE_VALUE_ENABLED"
+					"MODIFIER_STATE_NOT_ON_MINIMAP"                 "MODIFIER_STATE_VALUE_ENABLED"
+					"MODIFIER_STATE_UNSELECTABLE"                   "MODIFIER_STATE_VALUE_ENABLED"
+					"MODIFIER_STATE_FLYING"                         "MODIFIER_STATE_VALUE_ENABLED"
 				}
 			}
 		}
@@ -16280,7 +17723,7 @@
 		"AbilityUnitDamageType"		"DAMAGE_TYPE_MAGICAL"
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
 		"AbilityUnitTargetType"		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
-		"AbilityDamage"				"25000"
+		"AbilityDamage"				"40000"
 		"AbilitySpecial"
 		{
 		  "01"
@@ -16360,7 +17803,7 @@
 		"AbilityUnitDamageType" "DAMAGE_TYPE_MAGICAL"
 		"AbilityUnitTargetTeam" "DOTA_UNIT_TARGET_TEAM_ENEMY"
 		"AbilityUnitTargetType" "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
-		"AbilityDamage" "10000"
+		"AbilityDamage" "20000"
 		"AbilitySpecial"
 		{
 		  "01"
@@ -16591,91 +18034,92 @@
 		}
 	}
 
+	//=================================================================================================================
+	// Magtheridon: Howl of Terror
+	//=================================================================================================================
 	"howl_of_terror"
-	  {
+	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"BaseClass"       "ability_datadriven"
-		"AbilityBehavior"       "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-		"AbilityTextureName"      "vengefulspirit_wave_of_terror"
-		"AbilityUnitTargetTeam"   "DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"BaseClass"					"ability_datadriven"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityTextureName"		"vengefulspirit_wave_of_terror"
+		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCastPoint"        "0.6"
+		"AbilityCastPoint"			"0.6"
 	
 		// Time   
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCooldown"       "20"
+		"AbilityCooldown"			"20"
 	
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
-		  "AbilityManaCost"       "100"
-		  "MaxLevel"              "1"
-		  "RequiredLevel"         "-1"
+		"AbilityManaCost"			"100"
 	
 		// Special  
 		//-------------------------------------------------------------------------------------------------------------
-		  "AbilitySpecial"
-		  {
+		"AbilitySpecial"
+		{
 			"01"
 			{
-			  "var_type"        "FIELD_FLOAT"
-			  "duration"        "35"
+				"var_type"			"FIELD_FLOAT"
+				"duration"			"35"
 			}
 			"02"
 			{
-			  "var_type"        "FIELD_INTEGER"
-			  "radius"        "1000"
+				"var_type"			"FIELD_INTEGER"
+				"radius"			"1000"
 			}
 			"03"
 			{
-			  "var_type"        "FIELD_INTEGER"
-			  "damage_percent"        "-50"
+				"var_type"			"FIELD_INTEGER"
+				"damage_percent"	"-50"
 			}
-		  }
+		}
 	
 		//SpellStart
 		"OnSpellStart"
 		{
 			"ApplyModifier"
 			{
-				"ModifierName" "modifier_howl_of_terror"
+				"ModifierName"		"modifier_howl_of_terror"
 				"Target"
 				{
-				  "Center"    "CASTER"
-				  "Radius"   "%radius"
-				  "Teams"   "DOTA_UNIT_TARGET_TEAM_ENEMY"
-				  "Types"   "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+					"Center"		"CASTER"
+					"Radius"		"%radius"
+					"Teams"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
+					"Types"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
 				}
 			}
 			"FireEffect"
 			{
-			  "EffectName"        "particles/units/heroes/hero_lycan/lycan_howl_cast.vpcf"
-			  "EffectAttachType"  "follow_overhead"
-			  "Target"            "CASTER"
+				"EffectName"		"particles/units/heroes/hero_lycan/lycan_howl_cast.vpcf"
+				"EffectAttachType"	"follow_overhead"
+				"Target"			"CASTER"
 			}
 		}
 	
 		"Modifiers"
 		{
-		  "modifier_howl_of_terror"
-		  {
-			"Duration" "%duration"
-			"EffectName" "particles/units/heroes/hero_vengeful/vengeful_wave_of_terror_recipient.vpcf"
-			"EffectAttachType" "attach_overhead"
-			"EffectDurationScale" "1"
-			"IsPurgable"    "1"
-			"IsBuff"      "0"
-			"IsHidden" "0"
-			"IsDebuff"      "1"
-			
-			"Properties"
+			"modifier_howl_of_terror"
 			{
-			  "MODIFIER_PROPERTY_BASEDAMAGEOUTGOING_PERCENTAGE" "%damage_percent"
+				"Duration"				"%duration"
+				"EffectName"			"particles/units/heroes/hero_vengeful/vengeful_wave_of_terror_recipient.vpcf"
+				"EffectAttachType"		"attach_overhead"
+				"EffectDurationScale"	"1"
+				"IsPurgable"			"1"
+				"IsBuff"				"0"
+				"IsHidden"				"0"
+				"IsDebuff"				"1"
+				
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_BASEDAMAGEOUTGOING_PERCENTAGE" "%damage_percent"
+				}
 			}
-		  }
 		}
-	  }
+	}
 
 	"balanar_rain_of_chaos"
 	{
@@ -16894,7 +18338,7 @@
 			"modifier_green"
 			{
 				"Passive"   "1"
-				"IsHidden"  "0"
+				"IsHidden"  "1"
 
 				"StatusEffectName"			"particles/status_fx/status_effect_holdout_borrowed_time_2.vpcf"
 				"StatusEffectPriority"		"15"
@@ -16935,10 +18379,10 @@
 
 		"Modifiers"
 		{
-			"modifier_green"
+			"modifier_red"
 			{
 				"Passive"   "1"
-				"IsHidden"  "0"
+				"IsHidden"  "1"
 
 				"StatusEffectName"			"particles/status_fx/status_effect_holdout_borrowed_time_3.vpcf"
 				"StatusEffectPriority"		"15"

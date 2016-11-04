@@ -98,6 +98,12 @@ function GameMode:OnNPCSpawned(keys)
 		"ogre_magi_bloodlust",
 		"axe_berserkers_call",
 		"black_dragon_fireball",
+		"holdout_beastmaster_misc",
+		"holdout_frostmourne_hungers",
+		"holdout_battlecry_alt2",
+		"holdout_rabid_alt2",
+		"lone_druid_spirit_bear_demolish",
+		"lone_druid_spirit_bear_entangle",
 		"holdout_green_effect", --Banehallow boss + hero effect
 		"holdout_red_effect" --Abaddon boss
 	}

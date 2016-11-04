@@ -51,8 +51,8 @@ function GameMode:OnHeroInGame(hero)
 hero:SetGold(0, false)
 	if hero:GetUnitName() == "npc_dota_hero_wisp" then
 		hero:SetAbilityPoints(0)
-		hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {Duration = 20, IsHidden = true})
-		hero:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 20, IsHidden = true})
+		hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {Duration = 19, IsHidden = true})
+		hero:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 19, IsHidden = true})
 	end
 end
 
@@ -878,7 +878,7 @@ local triggers_choice = Entities:FindAllByName("trigger_special_event_choice")
 	--//=================================================================================================================
 	--// Timer: Muradin Bronzebeard Event 12 Min 30
 	--//=================================================================================================================
-	Timers:CreateTimer(720, function() -- 12:30 Min: MURADIN BRONZEBEARD EVENT 1
+	Timers:CreateTimer(0, function() -- 12:30 Min: MURADIN BRONZEBEARD EVENT 1
 	nCOUNTDOWNTIMER = 121
 	local point = Entities:FindByName(nil,"npc_dota_muradin_player"):GetAbsOrigin()
 	local MuradinEvent = CreateUnitByName("npc_dota_creature_muradin_bronzebeard", Entities:FindByName(nil, "npc_dota_muradin_boss"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
@@ -911,9 +911,12 @@ local triggers_choice = Entities:FindAllByName("trigger_special_event_choice")
 	Timers:CreateTimer( 3.0, StartMuradinEvent )
 	Timers:CreateTimer( 120, EndMuradinEvent )
 		Timers:CreateTimer(120, function() -- 14:30 Min
-			MuradinEvent:ForceKill(true)
 			for _,v in pairs(teleporters) do
 				v:Enable()
+			end
+			
+			if MuradinEvent:IsAlive() then
+				MuradinEvent:ForceKill(true)
 				MuradinEvent:StopSound("Muradin.StormEarthFire")
 			end
 		end)
@@ -993,7 +996,7 @@ function GameMode:InitGameMode()
 	GameRules:SetUseBaseGoldBountyOnHeroes( true )
 	GameRules:SetHeroRespawnEnabled( true )
 	mode:SetUseCustomHeroLevels( true )
-	mode:SetRecommendedItemsDisabled( true )
+	mode:SetRecommendedItemsDisabled( false )
 	mode:SetTopBarTeamValuesOverride ( true )
 	mode:SetTopBarTeamValuesVisible( true )
 	mode:SetUnseenFogOfWarEnabled( false )

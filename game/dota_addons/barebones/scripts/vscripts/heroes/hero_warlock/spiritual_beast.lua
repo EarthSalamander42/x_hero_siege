@@ -21,7 +21,6 @@ end
 ]]
 
 function GetSummonPoints( event )
-
 	local caster = event.caster
 	local fv = caster:GetForwardVector()
 	local origin = caster:GetAbsOrigin()

@@ -104,9 +104,8 @@ local point2 = Entities:FindByName( nil, "spawner_phase3_creeps_east"):GetAbsOri
 end
 
 function LastArenaBossKillCount(keys)
-	GameMode.Arthas_killed = GameMode.Arthas_killed +1
-	print( GameMode.Arthas_killed )
-
+GameMode.Arthas_killed = GameMode.Arthas_killed +1
+print( GameMode.Arthas_killed )
 	if GameMode.Arthas_killed == 1 then
 	print( "Arthas is Dead!" )
 	Notifications:TopToAll({text="Who did this?.." , duration=5.0})
@@ -127,9 +126,9 @@ function LastArenaBossKillCount(keys)
 end
 
 function teleport_to_arthas_arena(keys)
-	local caller = keys.caller
-	local activator = keys.activator
-	local point = Entities:FindByName(nil,"point_teleport_arthas"):GetAbsOrigin()
+local caller = keys.caller
+local activator = keys.activator
+local point = Entities:FindByName(nil,"point_teleport_arthas"):GetAbsOrigin()
 	if first_time_teleport_arthas then
 		local heroes = HeroList:GetAllHeroes()
 		print( "Grom, Proudmoore, Illidan, Balanar should appears now" )
@@ -177,15 +176,12 @@ end
 end
 
 function StartArthasArena(keys)
--- Spawn Arthas 
-DebugPrint("teleport trigger")
 local caller = keys.caller
 local activator = keys.activator
 local point = Entities:FindByName(nil,"point_teleport_boss"):GetAbsOrigin()
+local heroes = HeroList:GetAllHeroes()
+print( "Arthas should appears now" )
 	if first_time_teleport_arthas_real then
-		local heroes = HeroList:GetAllHeroes()
-		print( "Arthas should appears now" )
-
 		local arthas = CreateUnitByName("npc_dota_hero_arthas",Entities:FindByName(nil,"npc_dota_spawner_magtheridon_arena"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_BADGUYS)
 		arthas:SetAngles(0, 270, 0)
 
@@ -215,22 +211,20 @@ local point = Entities:FindByName(nil,"point_teleport_boss"):GetAbsOrigin()
 end
 
 function StartBaneHallowArena(keys)
--- Spawn Arthas
-DebugPrint("teleport trigger")
 local caller = keys.caller
 local activator = keys.activator
 local point = Entities:FindByName(nil,"point_teleport_boss"):GetAbsOrigin()
-	local heroes = HeroList:GetAllHeroes()
-	print( "BaneHallow should appears now" )
+local heroes = HeroList:GetAllHeroes()
+print( "BaneHallow should appears now" )
 
 	Timers:CreateTimer(8,function()
 	local banehallow = CreateUnitByName("npc_dota_hero_banehallow",Entities:FindByName(nil,"npc_dota_spawner_magtheridon_arena"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_BADGUYS)
 	banehallow:SetAngles(0, 270, 0)
-	banehallow:AddNewModifier(nil, nil, "modifier_animation_freeze_stun",nil)
+	banehallow:AddNewModifier(nil, nil, "modifier_stunned",nil)
 	banehallow:AddNewModifier(nil, nil, "modifier_invulnerable",nil)
 
 	Timers:CreateTimer(12,function()
-		banehallow:RemoveModifierByName("modifier_animation_freeze_stun")
+		banehallow:RemoveModifierByName("modifier_stunned")
 		banehallow:RemoveModifierByName("modifier_invulnerable")
 		banehallow = nil
 	end)
@@ -282,8 +276,6 @@ local point = Entities:FindByName(nil,"point_teleport_boss"):GetAbsOrigin()
 end
 
 function StartAbaddonArena(keys)
--- Spawn Arthas 
-DebugPrint("teleport trigger")
 local caller = keys.caller
 local activator = keys.activator
 local point = Entities:FindByName(nil,"point_teleport_boss"):GetAbsOrigin()
@@ -293,11 +285,11 @@ print( "Abaddon should appears now" )
 	Timers:CreateTimer(5,function()
 		local abaddon = CreateUnitByName("npc_dota_creature_abaddon",Entities:FindByName(nil,"npc_dota_spawner_magtheridon_arena"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_BADGUYS)
 		abaddon:SetAngles(0, 270, 0)
-		abaddon:AddNewModifier(nil, nil, "modifier_animation_freeze_stun",nil)
+		abaddon:AddNewModifier(nil, nil, "modifier_stunned",nil)
 		abaddon:AddNewModifier(nil, nil, "modifier_invulnerable",nil)
 
 		Timers:CreateTimer(7,function()
-		abaddon:RemoveModifierByName("modifier_animation_freeze_stun")
+		abaddon:RemoveModifierByName("modifier_stunned")
 		abaddon:RemoveModifierByName("modifier_invulnerable")
 		abaddon = nil
 	end)

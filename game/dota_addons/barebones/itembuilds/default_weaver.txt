@@ -1,0 +1,38 @@
+"itembuilds/test_weaver.txt"
+{
+	"author"		"X Hero Siege Official"
+	"hero"			"npc_dota_hero_weaver"
+	"Title"			"Recommended items for Crypt Lord"
+
+	"Items"
+	{		
+		"#DOTA_Item_Build_Starting_Items"
+		{
+			"item"		"item_poor_mans_shield"
+			"item"		"item_faerie_fire"
+			"item"		"item_enchanted_mango"
+		}
+
+		"#DOTA_Item_Build_Early_Game"
+		{	
+			"item"		"item_amulet_of_the_wild"
+			"item"		"item_tome_small"
+			"item"		"item_bracer_of_endurance"
+			"item"		"item_gloom_blade"
+			"item"		"item_tome_big"
+		}
+
+		"#DOTA_Item_Build_Core_Items"
+		{
+			"item"		"item_bracer_of_protection"
+			"item"		"item_assassins_blade"
+			"item"		"item_assassins_blade"
+		}
+
+		"#DOTA_Item_Build_Luxury"
+		{
+			"item"		"item_tome_small"
+			"item"		"item_tome_big"
+		}
+	}
+}

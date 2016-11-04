@@ -83,7 +83,7 @@ function Purification( keys )
 		end
 
 		-- If the current radius is smaller than the maximum radius, keep going
-		if current_radius < blast_radius then
+		if current_radius < radius then
 			return tick_interval
 		else
 		end

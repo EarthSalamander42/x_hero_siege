@@ -16,22 +16,23 @@
 	{
 		"item"		"item_tome_small"
 		"item"		"item_tome_big"
-		"item"		"item_tome_of_knowledge"
 		"item"		"item_tome_of_power"
 	}
 
 	"weapons_armor"
+	{
+		"item"		"item_orb_of_lightning"
+		"item"		"item_orb_of_fire"
+		"item"		"item_orb_of_darkness"
+	}
+
+	"misc"
 	{
 		"item"		"item_mekansm"
 		"item"		"item_mekansm2"
 		"item"		"item_mekansm3"
 		"item"		"item_mekansm4"
 		"item"		"item_mekansm5"
-	}
-
-	"misc"
-	{
-		
 	} 
 
 	// Level 1 - Green Recipes
@@ -73,7 +74,6 @@
 		"item"		"item_tpscroll"
 		"item"		"item_tome_small"
 		"item"		"item_tome_big"
-		"item"		"item_tome_of_knowledge"
 		"item"		"item_tome_of_power"
 	}
 
@@ -83,12 +83,14 @@
 	}
 
 	"secretshop"
-	{             
+	{
+		"item"		"item_gloom_blade"
 		"item"		"item_assassins_blade"
 		"item"		"item_lifesteal_mask"
 		"item"		"item_talisman_of_evasion"
 		"item"		"item_claws_of_attack"
 //		"item"		"item_cloak_of_flames"
+		"item"		"item_bracer_of_endurance"
 		"item"		"item_bracer_of_protection"
 		"item"		"item_scepter_of_mastery"
 		"item"		"item_amulet_of_the_wild"

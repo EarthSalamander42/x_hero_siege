@@ -19,23 +19,26 @@ local heroes = HeroList:GetAllHeroes()
 		luna:SetAngles(0, 0, 0)
 
 		-- Outer West
+		local beastmaster = CreateUnitByName("npc_dota_hero_beastmaster_bis", Entities:FindByName(nil, "choose_beastmaster_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
+		beastmaster:SetAngles(0, 180, 0)
+
 		local pugna = CreateUnitByName("npc_dota_hero_pugna_bis", Entities:FindByName(nil, "choose_pugna_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
 		pugna:SetAngles(0, 180, 0)
 
 		local lich = CreateUnitByName("npc_dota_hero_lich_bis", Entities:FindByName(nil, "choose_lich_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
 		lich:SetAngles(0, 180, 0)
 
-		local nyx_assassin = CreateUnitByName("npc_dota_hero_nyx_assassin_bis", Entities:FindByName(nil, "choose_nyx_assassin_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
-		nyx_assassin:SetAngles(0, 180, 0)
+		local weaver = CreateUnitByName("npc_dota_hero_weaver_bis", Entities:FindByName(nil, "choose_weaver_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
+		weaver:SetAngles(0, 180, 0)
 
 		local abyssal_underlord = CreateUnitByName("npc_dota_hero_abyssal_underlord_bis", Entities:FindByName(nil, "choose_abyssal_underlord_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
 		abyssal_underlord:SetAngles(0, 180, 0)
 
-		for _,hero in pairs(heroes) do
-			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
-				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), lich)
-			end
-		end
+--		for _,hero in pairs(heroes) do
+--			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
+--				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), lich)
+--			end
+--		end
 	end)
 
 	Timers:CreateTimer(8, function()
@@ -56,11 +59,11 @@ local heroes = HeroList:GetAllHeroes()
 		local dragon_knight = CreateUnitByName("npc_dota_hero_dragon_knight_bis", Entities:FindByName(nil, "choose_dragon_knight_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
 		dragon_knight:SetAngles(0, 90, 0)
 
-		for _,hero in pairs(heroes) do
-			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
-				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), mirana)
-			end
-		end
+--		for _,hero in pairs(heroes) do
+--			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
+--				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), mirana)
+--			end
+--		end
 	end)
 
 	Timers:CreateTimer(11, function()
@@ -90,11 +93,11 @@ local heroes = HeroList:GetAllHeroes()
 		local keeper_of_the_light = CreateUnitByName("npc_dota_hero_keeper_of_the_light_bis", Entities:FindByName(nil, "choose_keeper_of_the_light_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
 		keeper_of_the_light:SetAngles(0, 0, 0)
 
-		for _,hero in pairs(heroes) do
-			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
-				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), invoker)
-			end
-		end
+--		for _,hero in pairs(heroes) do
+--			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
+--				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), invoker)
+--			end
+--		end
 	end)
 
 	Timers:CreateTimer(14, function()
@@ -115,11 +118,11 @@ local heroes = HeroList:GetAllHeroes()
 		local warlock = CreateUnitByName("npc_dota_hero_warlock_bis", Entities:FindByName(nil, "choose_warlock_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
 		warlock:SetAngles(0, 270, 0)
 
-		for _,hero in pairs(heroes) do
-			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
-				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), brewmaster)
-			end
-		end
+--		for _,hero in pairs(heroes) do
+--			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
+--				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), brewmaster)
+--			end
+--		end
 	end)
 
 	Timers:CreateTimer(17, function()
@@ -131,11 +134,14 @@ local heroes = HeroList:GetAllHeroes()
 		local slardar = CreateUnitByName("npc_dota_hero_slardar_bis", Entities:FindByName(nil, "choose_slardar_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
 		slardar:SetAngles(0, 270, 0)
 
-		for _,hero in pairs(heroes) do
-			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
-				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil)
-			end
-		end
+		local abaddon = CreateUnitByName("npc_dota_hero_abaddon_bis", Entities:FindByName(nil, "choose_abaddon_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
+		abaddon:SetAngles(0, 270, 0)
+
+--		for _,hero in pairs(heroes) do
+--			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
+--				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil)
+--			end
+--		end
 	end)
 end
 
@@ -154,14 +160,32 @@ local point = Entities:FindByName(nil,"point_teleport_choose_hero"):GetAbsOrigin
 	end
 end
 
+function choose_abaddon(keys)
+local activator = keys.activator
+local point = Entities:FindByName(nil,"base_spawn"):GetAbsOrigin()
+local msg = "This hero is only for <font color='#FF0000'>VIP Members!</font> Please choose another hero."
+
+	for playerID = 0, DOTA_MAX_TEAM_PLAYERS do
+		if PlayerResource:IsValidPlayer(playerID) and activator:GetUnitName() == "npc_dota_hero_wisp" and PlayerResource:GetSteamAccountID(activator:GetPlayerID()) == 54896080 or PlayerResource:GetSteamAccountID(activator:GetPlayerID()) == 295458357 or PlayerResource:GetSteamAccountID(activator:GetPlayerID()) == 61711140 or PlayerResource:GetSteamAccountID(activator:GetPlayerID()) == 206464009 or PlayerResource:GetSteamAccountID(activator:GetPlayerID()) == 146805680 then -- Cookies + X Hero Siege + Mugiwara + beast + [Patreon Gatiipz Gatiipz] SteamID64
+			PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(),activator)
+			Timers:CreateTimer(0.1, function()
+				PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(),nil)
+				FindClearSpaceForUnit(activator, point, true)
+				PlayerResource:ReplaceHeroWith(activator:GetPlayerID(), "npc_dota_hero_abaddon", STARTING_GOLD, 0)
+			end)
+		elseif PlayerResource:IsValidPlayer(playerID) and activator:GetUnitName() == "npc_dota_hero_wisp" then
+			Notifications:Top(activator:GetPlayerOwnerID(),{text=msg, duration=5.0})
+		end
+	end
+end
+
 function choose_slardar(keys)
 local activator = keys.activator
 local point = Entities:FindByName(nil,"base_spawn"):GetAbsOrigin()
 local msg = "This hero is only for <font color='#FF0000'>VIP Members!</font> Please choose another hero."
 
 	for playerID = 0, DOTA_MAX_TEAM_PLAYERS do
---		if PlayerResource:IsValidPlayer(playerID) and activator:GetUnitName() == "npc_dota_hero_wisp" and (PlayerResource:GetSteamAccountID(playerID)) == 54896080 or (PlayerResource:GetSteamAccountID(playerID)) == 295458357 or (PlayerResource:GetSteamAccountID(playerID)) == 61711140 or (PlayerResource:GetSteamAccountID(playerID)) == 206464009 then -- Cookies + X Hero Siege + Mugiwara +  beast SteamID64
-		if PlayerResource:IsValidPlayer(playerID) and activator:GetUnitName() == "npc_dota_hero_wisp" and PlayerResource:GetSteamAccountID(activator:GetPlayerID()) == 54896080 or PlayerResource:GetSteamAccountID(activator:GetPlayerID()) == 295458357 or  PlayerResource:GetSteamAccountID(activator:GetPlayerID()) == 61711140 or  PlayerResource:GetSteamAccountID(activator:GetPlayerID()) == 206464009 then -- Cookies + X Hero Siege + Mugiwara +  beast SteamID64
+		if PlayerResource:IsValidPlayer(playerID) and activator:GetUnitName() == "npc_dota_hero_wisp" and PlayerResource:GetSteamAccountID(activator:GetPlayerID()) == 54896080 or PlayerResource:GetSteamAccountID(activator:GetPlayerID()) == 295458357 or  PlayerResource:GetSteamAccountID(activator:GetPlayerID()) == 61711140 or  PlayerResource:GetSteamAccountID(activator:GetPlayerID()) == 206464009 or PlayerResource:GetSteamAccountID(activator:GetPlayerID()) == 146805680 then -- Cookies + X Hero Siege + Mugiwara + beast + [Patreon Gatiipz Gatiipz] SteamID64
 			PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(),activator)
 			Timers:CreateTimer(0.1, function()
 				PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(),nil)
@@ -366,6 +390,22 @@ local point = Entities:FindByName(nil,"base_spawn"):GetAbsOrigin()
 	end
 end
 
+function choose_beastmaster(keys)
+local activator = keys.activator
+local point = Entities:FindByName(nil,"base_spawn"):GetAbsOrigin()
+
+	for playerID = 0, DOTA_MAX_TEAM_PLAYERS do
+		if PlayerResource:IsValidPlayer(playerID) and activator:GetUnitName() == "npc_dota_hero_wisp" then
+			PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(),activator)
+			Timers:CreateTimer(0.1, function()
+				PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(),nil)
+				FindClearSpaceForUnit(activator, point, true)
+				PlayerResource:ReplaceHeroWith(activator:GetPlayerID(), "npc_dota_hero_beastmaster", STARTING_GOLD, 0)
+			end)
+		end
+	end
+end
+
 function choose_pugna(keys)
 local activator = keys.activator
 local point = Entities:FindByName(nil,"base_spawn"):GetAbsOrigin()
@@ -542,7 +582,7 @@ local point = Entities:FindByName(nil,"base_spawn"):GetAbsOrigin()
 	end
 end
 
-function choose_nyx_assassin(keys)
+function choose_weaver(keys)
 local activator = keys.activator
 local point = Entities:FindByName(nil,"base_spawn"):GetAbsOrigin()
 
@@ -552,7 +592,7 @@ local point = Entities:FindByName(nil,"base_spawn"):GetAbsOrigin()
 			Timers:CreateTimer(0.1, function()
 				PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(),nil)
 				FindClearSpaceForUnit(activator, point, true)
-				PlayerResource:ReplaceHeroWith(activator:GetPlayerID(), "npc_dota_hero_nyx_assassin", STARTING_GOLD, 0)
+				PlayerResource:ReplaceHeroWith(activator:GetPlayerID(), "npc_dota_hero_weaver", STARTING_GOLD, 0)
 			end)
 		end
 	end
@@ -886,18 +926,12 @@ local point_south_13 = Entities:FindByName(nil,"final_wave_south_13"):GetAbsOrig
 end
 
 function EndMuradinEvent(keys)
-	local caller = keys.caller
 	local activator = keys.activator
 	local point = Entities:FindByName(nil,"base_spawn"):GetAbsOrigin()
 
 	if activator:GetTeam() == DOTA_TEAM_GOODGUYS then
 	FindClearSpaceForUnit(activator, point, true)
-	activator:Stop()
-	PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
 	PlayerResource:ModifyGold( activator:GetPlayerOwnerID(), 10000, false,  DOTA_ModifyGold_Unspecified )
-	Timers:CreateTimer(0.1, function()
-		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil)
-	end)
 	end
 end
 
