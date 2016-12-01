@@ -39,6 +39,10 @@ ability:ApplyDataDrivenModifier(caster, caster.freezing_field_center, modifier_a
 	Timers:CreateTimer(0.4, function()
 		ability:ApplyDataDrivenModifier(caster, caster.freezing_field_center, modifier_sector_3, {} )
 	end)
+
+	Timers:CreateTimer(9.9, function()
+		caster.freezing_field_center:Kill()
+	end)
 end
 
 function FreezingFieldExplode( keys )
@@ -90,6 +94,12 @@ function FreezingFieldExplode( keys )
 
 	-- Destroy dummy
 	explosion_dummy:IsNull()
+
+	Timers:CreateTimer(9.0, function()
+		for _,v in pairs(explosion_dummy) do
+			UTIL_Remove(explosion_dummy)
+		end
+	end)
 end
 
 function FreezingFieldStopSound( keys )

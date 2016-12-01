@@ -120,6 +120,46 @@
 	text-shadow: 2px 2px 2px #000000;
 }
 
+#VIPTab
+{
+	horizontal-align: left;
+	vertical-align: bottom;
+	margin-bottom: 850px;
+	margin-left: 50px;
+	flow-children: right;
+}
+
+#VIPHeader
+{
+	margin-bottom: 17px;
+	margin-right: 65px;
+	vertical-align: center;
+	text-transform: uppercase;
+	font-size: 18px;
+	color: #009933;
+	text-shadow: 2px 2px 2px #000000;
+}
+
+#VIPTab2
+{
+	horizontal-align: left;
+	vertical-align: bottom;
+	margin-bottom: 830px;
+	margin-left: 50px;
+	flow-children: right;
+}
+
+#VIPHeader2
+{
+	margin-bottom: 17px;
+	margin-right: 65px;
+	vertical-align: center;
+	text-transform: uppercase;
+	font-size: 18px;
+	color: #009933;
+	text-shadow: 2px 2px 2px #000000;
+}
+
 .SeqImg
 {
 	background-repeat: no-repeat;

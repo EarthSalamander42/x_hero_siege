@@ -1,0 +1,45 @@
+"itembuilds/test_keeper_of_the_light.txt"
+{
+	"author"		"X Hero Siege Official"
+	"hero"			"npc_dota_hero_keeper_of_the_light"
+	"Title"			"Recommended items for Light Fundamental"
+
+	"Items"
+	{
+		"#DOTA_Item_Build_Title"
+		{
+		}
+
+		"#DOTA_Item_Build_Hero10"
+		{
+		}
+
+		"#DOTA_Item_Build_Starting_Items"
+		{
+			"item"		"item_poor_mans_shield"
+			"item"		"item_healing_potion"
+		}
+
+		"#DOTA_Item_Build_Early_Game"
+		{
+			"item"		"item_amulet_of_the_wild"
+			"item"		"item_tome_small"
+			"item"		"item_ankh_of_reincarnation"
+			"item"		"item_tome_small"
+			"item"		"item_scepter_of_mastery"
+			"item"		"item_lifesteal_mask"
+		}
+
+		"#DOTA_Item_Build_Core_Items"
+		{
+			"item"		"item_bracer_of_protection"
+			"item"		"item_tome_big"
+		}
+
+		"#DOTA_Item_Build_Luxury"
+		{
+			"item"		"item_tome_small"
+			"item"		"item_tome_big"
+		}
+	}
+}

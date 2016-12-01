@@ -12,7 +12,7 @@ end
 
 function ArthasThink()
 	-- body
-	if not thisEntity:IsAlive() then
+	if thisEntity:IsNull() then
 		return nil
 	elseif Ability_shield:IsFullyCastable() then
 		--FindUnitsInRadius( iTeamNumber, vPosition, hCacheUnit, flRadius, iTeamFilter, iTypeFilter, iFlagFilter, iOrder, bCanGrowCache )

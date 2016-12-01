@@ -1,5 +1,3 @@
-local point
-
 function SpawnDoomBeast(keys)
 	--The Plague Ward should initialize facing away from Venomancer, so find that direction.
 	local caster_origin = keys.caster:GetAbsOrigin()

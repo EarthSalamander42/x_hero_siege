@@ -1,0 +1,46 @@
+"itembuilds/test_juggernaut.txt"
+{
+	"author"		"X Hero Siege Official"
+	"hero"			"npc_dota_hero_juggernaut"
+	"Title"			"Recommended items for Blademaster"
+
+	"Items"
+	{
+		"#DOTA_Item_Build_Title"
+		{
+		}
+
+		"#DOTA_Item_Build_Hero3"
+		{
+		}
+
+		"#DOTA_Item_Build_Starting_Items"
+		{
+			"item"		"item_poor_mans_shield"
+			"item"		"item_healing_potion"
+			"item"		"item_mana_potion"
+		}
+
+		"#DOTA_Item_Build_Early_Game"
+		{
+			"item"		"item_amulet_of_the_wild"
+			"item"		"item_orb_of_fire"
+			"item"		"item_tome_small"
+			"item"		"item_ankh_of_reincarnation"
+			"item"		"item_gloom_blade"
+		}
+
+		"#DOTA_Item_Build_Core_Items"
+		{
+			"item"		"item_assassins_blade"
+			"item"		"item_bracer_of_protection"
+			"item"		"item_assassins_blade"
+		}
+
+		"#DOTA_Item_Build_Luxury"
+		{
+			"item"		"item_tome_small"
+			"item"		"item_tome_big"
+		}
+	}
+}

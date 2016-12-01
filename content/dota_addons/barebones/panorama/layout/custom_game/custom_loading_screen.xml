@@ -21,5 +21,11 @@
 	<Panel id="TitlePanelDifficulty4">
 	  <Label id="AddonDifficultyExtreme" text="#AddonDifficultyExtreme" style="" />
 	</Panel>
+	<Panel id="VIPTab">
+	  <Label id="VIPHeader" text="#VIPHeader" style="" />
+	</Panel>
+	<Panel id="VIPTab2">
+	  <Label id="VIPHeader2" text="#VIPHeader2" style="" />
+	</Panel>
   </Panel>
 </root>

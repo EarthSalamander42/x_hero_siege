@@ -31,7 +31,6 @@ function UpdateTimer()
 	{
 		timePanel.text = timerText;
 	}
-
 }
 
 function UpdateTimerMuradin( data )
@@ -62,8 +61,6 @@ function UpdateTimerMuradin( data )
 	$( "#Timer" ).text = timerText;
 
 	UpdateTimer();
-//	UpdateTimerCreep();
-//	UpdateTimerIncomingWave();
 }
 
 function UpdateTimerCreep( data )
@@ -92,7 +89,6 @@ function UpdateTimerCreep( data )
 	timerText += data.timer_second_01_2;
 
 	$( "#CreepTimer" ).text = timerText;
-
 }
 
 function UpdateTimerIncomingWave( data )
@@ -121,22 +117,39 @@ function UpdateTimerIncomingWave( data )
 	timerText3 += data.timer_second_01_3;
 
 	$( "#IncomingWaveTimer" ).text = timerText3;
+}
 
+function UpdateTimerSpecialEvents( data )
+{
+	//$.Msg( "UpdateTimer: ", data );
+	//var timerValue = Game.GetDOTATime( false, false );
+
+	//var sec = Math.floor( timerValue % 60 );
+	//var min = Math.floor( timerValue / 60 );
+
+	//var timerText = "";
+	//timerText += min;
+	//timerText += ":";
+
+	//if ( sec < 10 )
+	//{
+	//	timerText += "0";
+	//}
+	//timerText += sec;
+
+	var timerText3 = "";
+	timerText3 += data.timer_minute_10_3;
+	timerText3 += data.timer_minute_01_3;
+	timerText3 += ":";
+	timerText3 += data.timer_second_10_3;
+	timerText3 += data.timer_second_01_3;
+
+	$( "#SpecialEventsTimer" ).text = timerText3;
 }
 
 function ShowTimer( data )
 {
 	$( "#Timer" ).AddClass( "timer_visible" );
-}
-
-function AlertTimer( data )
-{
-	$( "#Timer" ).AddClass( "timer_alert" );
-}
-
-function HideTimer( data )
-{
-	$( "#Timer" ).AddClass( "timer_hidden" );
 }
 
 function UpdateKillsToWin()
@@ -161,12 +174,11 @@ function OnGameStateChanged( table, key, data )
 	UpdateKillsToWin();
 	CustomNetTables.SubscribeNetTableListener( "game_state", OnGameStateChanged );
 
-	GameEvents.Subscribe( "incomingwavecountdown", UpdateTimerIncomingWave );
+	GameEvents.Subscribe( "incomingwavecountdown", UpdateTimerSpecialEvents );
+	GameEvents.Subscribe( "specialeventscountdown", UpdateTimerIncomingWave );
 	GameEvents.Subscribe( "creepcountdown", UpdateTimerCreep );
 	GameEvents.Subscribe( "countdown", UpdateTimerMuradin );
 	GameEvents.Subscribe( "show_timer", ShowTimer );
-	GameEvents.Subscribe( "timer_alert", AlertTimer );
-	GameEvents.Subscribe( "overtime_alert", HideTimer );
 	//UpdateTimer();
 })();
 

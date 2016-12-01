@@ -2,6 +2,7 @@
 require('libraries/timers')
 
 function Spawn( entityKeyValues )
+	Ability_immolation = thisEntity:FindAbilityByName("demonhunter_immolation")
 	Ability_stampede = thisEntity:FindAbilityByName("banehallow_stampede")
 
 
@@ -19,6 +20,11 @@ function ArthasThink()
 		local units = FindUnitsInRadius(thisEntity:GetTeamNumber(), thisEntity:GetAbsOrigin(), nil, 1000, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO+DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)		
 		if units ~= nil and #units >= 1 then
 			thisEntity:CastAbilityNoTarget(Ability_stampede,-1)
+		end
+	elseif Ability_immolation:IsFullyCastable() and not Ability_immolation:GetToggleState() then
+		local units = FindUnitsInRadius(thisEntity:GetTeamNumber(), thisEntity:GetAbsOrigin(), nil, Ability_immolation:GetSpecialValueFor("radius"), DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)		
+		if units ~= nil then
+			thisEntity:CastAbilityToggle(Ability_immolation,-1)
 		end
 	end
 	return 1

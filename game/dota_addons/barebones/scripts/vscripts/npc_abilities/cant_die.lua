@@ -7,7 +7,7 @@ function death_check(event)
 	local caster = event.caster
 	local ability = event.ability
 	if not caster.deathStart then
-		if caster:GetHealth() < 50 then
+		if caster:GetHealth() < 100 and not caster:IsIllusion() then
 			ability:ApplyDataDrivenModifier(caster, caster, "modifier_dying_generic", {duration = 20})
 			CustomGameEventManager:Send_ServerToAllClients("hide_boss_health", {})
 			caster.deathStart = true
@@ -23,7 +23,7 @@ function death_check(event)
 				arthas_boss_die(caster)
 			elseif caster:GetUnitName() == "npc_dota_hero_banehallow" then
 				banehallow_boss_die(caster)
-			elseif caster:GetUnitName() == "npc_dota_creature_abaddon" then
+			elseif caster:GetUnitName() == "npc_dota_boss_lich_king" then
 				abaddon_boss_die(caster)
 			end
 		end
@@ -56,7 +56,7 @@ FourBossesKillCount()
 		local drop = CreateItemOnPositionSync( pos, item )
 		local pos_launch = pos+RandomVector(RandomFloat(150,200))
 		item:LaunchLoot(false, 300, 0.5, pos)
-		item:SetCurrentCharges(99999)
+		item:SetCurrentCharges(200000)
 		EmitGlobalSound("Loot_Drop_Stinger_Arcana")
 	end)
 
@@ -85,7 +85,7 @@ FourBossesKillCount()
 		local drop = CreateItemOnPositionSync( pos, item )
 		local pos_launch = pos+RandomVector(RandomFloat(150,200))
 		item:LaunchLoot(false, 300, 0.5, pos)
-		item:SetCurrentCharges(99999)
+		item:SetCurrentCharges(200000)
 		EmitGlobalSound("Loot_Drop_Stinger_Arcana")
 	end)
 
@@ -114,7 +114,7 @@ FourBossesKillCount()
 		local drop = CreateItemOnPositionSync( pos, item )
 		local pos_launch = pos+RandomVector(RandomFloat(150,200))
 		item:LaunchLoot(false, 300, 0.5, pos)
-		item:SetCurrentCharges(99999)
+		item:SetCurrentCharges(200000)
 		EmitGlobalSound("Loot_Drop_Stinger_Arcana")
 	end)
 
@@ -141,7 +141,7 @@ function arthas_boss_die(caster)
 		local drop = CreateItemOnPositionSync( pos, item )
 		local pos_launch = pos+RandomVector(RandomFloat(150,200))
 		item:LaunchLoot(false, 300, 0.5, pos)
-		item:SetCurrentCharges(99999)
+		item:SetCurrentCharges(200000)
 		EmitGlobalSound("Loot_Drop_Stinger_Arcana")
 	end)
 
@@ -151,7 +151,7 @@ function arthas_boss_die(caster)
 	StartAnimation(caster, {duration=6.0, activity=ACT_DOTA_FLAIL, rate=0.75})
 
 	Timers:CreateTimer(6, function()
-		StartAnimation(caster, {duration=6.0, activity=ACT_DOTA_DIE, rate=0.45})
+		StartAnimation(caster, {duration=6.0, activity=ACT_DOTA_DIE, rate=0.35})
 		EmitSoundOn("skeleton_king_wraith_death_long_09", caster)
 		EmitSoundOn("skeleton_king_wraith_death_long_09", caster)
 	end)
@@ -167,9 +167,12 @@ function arthas_boss_die(caster)
 		for _,hero in pairs(heroes) do
 			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
 				FindClearSpaceForUnit(hero, point, true)
-				hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun",nil)
-				hero:AddNewModifier(nil, nil, "modifier_invulnerable",nil)
+				hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {Duration = 27, IsHidden = true})
+				hero:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 27, IsHidden = true})
 				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
+				Timers:CreateTimer(0.1, function()
+					PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil)
+				end)
 			end
 		end
 	end)
@@ -180,9 +183,9 @@ function banehallow_boss_die(caster)
 		local item = CreateItem("item_bag_of_gold", nil, nil)
 		local pos = caster:GetAbsOrigin()
 		local drop = CreateItemOnPositionSync( pos, item )
-		local pos_launch = pos+RandomVector(RandomFloat(150,200))
+		local pos_launch = pos+RandomVector(RandomFloat(150, 200))
 		item:LaunchLoot(false, 300, 0.5, pos)
-		item:SetCurrentCharges(99999)
+		item:SetCurrentCharges(200000)
 		EmitGlobalSound("Loot_Drop_Stinger_Arcana")
 	end)
 
@@ -197,23 +200,11 @@ function banehallow_boss_die(caster)
 		EmitSoundOn("skeleton_king_wraith_death_long_09", caster)
 	end)
 
-	Timers:CreateTimer(12, function()
+	Timers:CreateTimer(12.5, function()
 		UTIL_Remove(caster)
 	end)
 
-	Timers:CreateTimer(19, function()
-	local point = Entities:FindByName(nil,"point_teleport_boss"):GetAbsOrigin()
-	local heroes = HeroList:GetAllHeroes()
-		Timers:CreateTimer(5, StartAbaddonArena)
-		for _,hero in pairs(heroes) do
-			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
-				FindClearSpaceForUnit(hero, point, true)
-				hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun",nil)
-				hero:AddNewModifier(nil, nil, "modifier_invulnerable",nil)
-				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
-			end
-		end
-	end)
+	Timers:CreateTimer(17, StartLichKingArena)
 end
 
 function abaddon_boss_die(caster)
@@ -223,7 +214,7 @@ function abaddon_boss_die(caster)
 		local drop = CreateItemOnPositionSync( pos, item )
 		local pos_launch = pos+RandomVector(RandomFloat(150,200))
 		item:LaunchLoot(false, 300, 0.5, pos)
-		item:SetCurrentCharges(99999)
+		item:SetCurrentCharges(200000)
 		EmitGlobalSound("Loot_Drop_Stinger_Arcana")
 	end)
 
@@ -245,6 +236,7 @@ function abaddon_boss_die(caster)
 
 	Timers:CreateTimer(16, function()
 		GameRules:SetGameWinner( DOTA_TEAM_GOODGUYS )
+		SendToConsole("dota_health_per_vertical_marker 250")
 	end)
 end
 

@@ -1,5 +1,4 @@
-function reincarnation( event )
-	-- body
+function Reincarnation( event )
 	local ability = event.ability
 	local hero = event.caster
 	local position = hero:GetAbsOrigin()

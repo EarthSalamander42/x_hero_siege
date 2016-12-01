@@ -34,7 +34,6 @@ function BlizzardWave( event )
 	ParticleManager:SetParticleControl( particle1, 0, target_position )
 
 	local fv = caster:GetForwardVector()
-	local distance = 100
 
 	Timers:CreateTimer(0.05,function()
 	local particle2 = ParticleManager:CreateParticle( particleName, PATTACH_CUSTOMORIGIN, caster )

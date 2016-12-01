@@ -1,18 +1,18 @@
 
 .ScoreboardLeft
 {
-    margin-left: 0px;
-    margin-top: 0px;
-    margin-right: -20px;
-    flow-children: down;
+	margin-left: 0px;
+	margin-top: 0px;
+	margin-right: -20px;
+	flow-children: down;
 }
 
 .VictoryPanel
 {
-    flow-children: down;
+	flow-children: down;
 	width: 100px;
 	height: 62px;
-    margin-left: 340px;
+	margin-left: 340px;
 
 	background-image: url("file://{images}/custom_game/goal_logo.psd");
 	background-repeat: no-repeat;
@@ -22,173 +22,212 @@
 
 #ScoreboardCenter
 {
-    horizontal-align: center;
-    flow-children: down;
-    background-size: 100%;
-    background-repeat: no-repeat;
-    background-position: 50% 50%;
-    background-image: url("s2r://panorama/images/custom_game/scoreboard_center_wedge_psd.vtex");
-    horizontal-align: center;
-    width: 128px;
-    height: 62px;
-    margin-top: -62px;
-    margin-left: -240px;
-}
-
-#ScoreboardIncomingWaveTime
-{
-    horizontal-align: center;
-    flow-children: down;
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-    background-position: 50% 50%;
-    background-image: url("file://{images}/custom_game/goal_logo.psd");
-    horizontal-align: center;
-    width: 100px;
-    height: 62px;
-    margin-top: -62px;
-    margin-left: 140px;
+	horizontal-align: center;
+	flow-children: down;
+	background-size: 100%;
+	background-repeat: no-repeat;
+	background-position: 50% 50%;
+	background-image: url("s2r://panorama/images/custom_game/scoreboard_center_wedge_psd.vtex");
+	horizontal-align: center;
+	width: 128px;
+	height: 62px;
+	margin-top: -62px;
+	margin-left: -240px;
 }
 
 #ScoreboardCreepTime
 {
-    horizontal-align: center;
-    flow-children: down;
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-    background-position: 50% 50%;
-    background-image: url("file://{images}/custom_game/goal_logo.psd");
-    horizontal-align: center;
-    width: 100px;
-    height: 62px;
-    margin-top: -62px;
-    margin-left: -30px;
+	horizontal-align: center;
+	flow-children: down;
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+	background-position: 50% 50%;
+	background-image: url("file://{images}/custom_game/goal_logo.psd");
+	horizontal-align: center;
+	width: 100px;
+	height: 62px;
+	margin-top: -62px;
+	margin-left: -30px;
+}
+
+#ScoreboardIncomingWaveTime
+{
+	horizontal-align: center;
+	flow-children: down;
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+	background-position: 50% 50%;
+	background-image: url("file://{images}/custom_game/goal_logo.psd");
+	horizontal-align: center;
+	width: 100px;
+	height: 62px;
+	margin-top: -62px;
+	margin-left: 140px;
+}
+
+#ScoreboardSpecialEventsTime
+{
+	horizontal-align: center;
+	flow-children: down;
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+	background-position: 50% 50%;
+	background-image: url("file://{images}/custom_game/goal_logo.psd");
+	horizontal-align: center;
+	width: 100px;
+	height: 62px;
+	margin-top: -62px;
+	margin-left: -130px;
 }
 
 #ScoreboardCurrentTime
 {
-    min-width: 46px;
-    padding-top: 2px;
-    padding-left: 2px;
-    padding-right: 2px;
-    color: #6f4d00;
-    margin-top: 10px;
-    margin-left: 0px;
-    horizontal-align: center;
-    text-align: center;
-    font-size: 16px;
-    font-weight: bold;
-    text-overflow: clip;
+	min-width: 46px;
+	padding-top: 2px;
+	padding-left: 2px;
+	padding-right: 2px;
+	color: #6f4d00;
+	margin-top: 10px;
+	margin-left: 0px;
+	horizontal-align: center;
+	text-align: center;
+	font-size: 16px;
+	font-weight: bold;
+	text-overflow: clip;
 
-    background-color: gradient( linear, 0% 0%, 0% 100%, from( #E9D048 ), color-stop( 0.5, #ffffff), color-stop( 0.5, #E3C948 ), to( #D7B129 ) );
-    box-shadow: #60000Caa -2px -2px 4px 4px;
-    border-radius: 4px;
+	background-color: gradient( linear, 0% 0%, 0% 100%, from( #E9D048 ), color-stop( 0.5, #ffffff), color-stop( 0.5, #E3C948 ), to( #D7B129 ) );
+	box-shadow: #60000Caa -2px -2px 4px 4px;
+	border-radius: 4px;
 }
 
 #Goal
 {
-    margin-top: 2px;
-    font-size: 14px;
-    font-weight: bold;
-    color: #9e7305;
-    text-align: center;
-    width: 100%;
-    text-transform: uppercase;
-    text-overflow: clip;
+	margin-top: 2px;
+	font-size: 14px;
+	font-weight: bold;
+	color: #9e7305;
+	text-align: center;
+	width: 100%;
+	text-transform: uppercase;
+	text-overflow: clip;
 }
 
 #CreepGoal
 {
-    margin-top: 4px;
-    font-size: 13.5px;
-    font-weight: bold;
-    color: #9e7305;
-    text-align: center;
-    width: 100%;
-    text-transform: uppercase;
-    text-overflow: clip;
+	margin-top: 4px;
+	font-size: 13.5px;
+	font-weight: bold;
+	color: #9e7305;
+	text-align: center;
+	width: 100%;
+	text-transform: uppercase;
+	text-overflow: clip;
 }
 
 #IncomingWaveGoal
 {
-    margin-top: 4px;
-    font-size: 12.5px;
-    font-weight: bold;
-    color: #9e7305;
-    text-align: center;
-    width: 100%;
-    text-transform: uppercase;
-    text-overflow: clip;
+	margin-top: 4px;
+	font-size: 12.5px;
+	font-weight: bold;
+	color: #9e7305;
+	text-align: center;
+	width: 100%;
+	text-transform: uppercase;
+	text-overflow: clip;
+}
+
+#SpecialEventsGoal
+{
+	margin-top: 4px;
+	font-size: 13.6px;
+	font-weight: bold;
+	color: #9e7305;
+	text-align: center;
+	width: 100%;
+	text-transform: uppercase;
+	text-overflow: clip;
 }
 
 #VictoryPoints
 {
 	margin-top: -80px;
-    horizontal-align: center;
-    vertical-align: middle;
-    font-weight: bold;
-    font-size: 60px;
-    color: white;
+	horizontal-align: center;
+	vertical-align: middle;
+	font-weight: bold;
+	font-size: 60px;
+	color: white;
 	text-shadow: 2px 2px 2px #7b612b;
 	color: gradient( linear, 0% 0%, 0% 100%, from( #c88423 ), color-stop( 0.25, #c88423 ), color-stop( 0.5, #fffb84 ), color-stop( 0.75, #c88423 ), to( #9a6717 ) );
-    text-overflow: clip;
+	text-overflow: clip;
 }
 
 #Timer
 {
-    margin-top: -6px;
-    font-size: 20px;
-    font-weight: bolder;
-    color: #6f4d00;
-    text-shadow: 2px 2px 2px #7b612b;
-    text-align: center;
-    width: 100%;
-    text-overflow: clip;
+	margin-top: -6px;
+	font-size: 20px;
+	font-weight: bolder;
+	color: #6f4d00;
+	text-shadow: 2px 2px 2px #7b612b;
+	text-align: center;
+	width: 100%;
+	text-overflow: clip;
 }
 
 #CreepTimer
 {
-    margin-top: -4px;
-    font-size: 20px;
-    font-weight: bolder;
-    color: #6f4d00;
-    text-shadow: 2px 2px 2px #7b612b;
-    text-align: center;
-    width: 100%;
-    text-overflow: clip;
+	margin-top: -4px;
+	font-size: 20px;
+	font-weight: bolder;
+	color: #6f4d00;
+	text-shadow: 2px 2px 2px #7b612b;
+	text-align: center;
+	width: 100%;
+	text-overflow: clip;
 }
 
 #IncomingWaveTimer
 {
-    margin-top: -2px;
-    font-size: 20px;
-    font-weight: bolder;
-    color: #6f4d00;
-    text-shadow: 2px 2px 2px #7b612b;
-    text-align: center;
-    width: 100%;
-    text-overflow: clip;
+	margin-top: -2px;
+	font-size: 20px;
+	font-weight: bolder;
+	color: #6f4d00;
+	text-shadow: 2px 2px 2px #7b612b;
+	text-align: center;
+	width: 100%;
+	text-overflow: clip;
+}
+
+#SpecialEventsTimer
+{
+	margin-top: -4px;
+	font-size: 21px;
+	font-weight: bolder;
+	color: #6f4d00;
+	text-shadow: 2px 2px 2px #7b612b;
+	text-align: center;
+	width: 100%;
+	text-overflow: clip;
 }
 
 #Timer.timer_visible
 {
-    opacity: 1;
+	opacity: 1;
 }
 
 #Timer.timer_hidden
 {
-    opacity: 0;
+	opacity: 0;
 }
 
 #Timer.timer_alert
 {
-    color: red;
+	color: red;
 }
 
 .TeamOverlay
 {
-    width: 100%;
-    height: 100%;
+	width: 100%;
+	height: 100%;
 }
 
 #TeamNotices
@@ -201,11 +240,11 @@
 
 #FirstPlaceIndicator
 {
-    margin-left: 56px;
-    horizontal-align: center;
-    visibility: collapse;
-    width: 32px;
-    height: 32px;
+	margin-left: 56px;
+	horizontal-align: center;
+	visibility: collapse;
+	width: 32px;
+	height: 32px;
 }
 
 .tied_for_first #FirstPlaceIndicator
@@ -215,43 +254,43 @@
 
 #VeryCloseIndicator
 {
-    width: 100%;
-    height: 100%;
-    background-color: rgba(255, 0, 255, 0.42);
+	width: 100%;
+	height: 100%;
+	background-color: rgba(255, 0, 255, 0.42);
 //    visibility: collapse;
 }
 
 .very_close_to_victory #VeryCloseIndicator
 {
-    visibility: visible;
+	visibility: visible;
 }
 
 #CloseIndicator
 {
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 255, 255, 0.42);
-    visibility: collapse;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 255, 255, 0.42);
+	visibility: collapse;
 }
 
 .close_to_victory #CloseIndicator
 {
-    visibility: visible;
+	visibility: visible;
 }
 
 #VictoryStatusRow
 {
-    width: 100%;
+	width: 100%;
 }
 
 #PointsToWin
 {
-    color: white;
-    horizontal-align: center;
-    font-size: 16px;
-    visibility: collapse;
-    overflow: noclip;
-    text-shadow: 2px 2px 2px black;
+	color: white;
+	horizontal-align: center;
+	font-size: 16px;
+	visibility: collapse;
+	overflow: noclip;
+	text-shadow: 2px 2px 2px black;
 
 	animation-duration: 0.3s;
 	animation-timing-function: linear;
@@ -260,19 +299,19 @@
 
 .close_to_victory #PointsToWin
 {
-    visibility: visible;
+	visibility: visible;
 	animation-name: CloseToVictoryAnim;
 }
 
 .very_close_to_victory #PointsToWin
 {
-    visibility: visible;
+	visibility: visible;
 	animation-name: VeryCloseToVictoryAnim;
 }
 
 .victory #PointsToWin
 {
-    visibility: visible;
+	visibility: visible;
 }
 
 
@@ -314,28 +353,28 @@
 
 #TempStatusRow
 {
-    width: 100%;
+	width: 100%;
 	margin-top: 34px;
 }
 
 #RecentScore
 {
 	margin-left: 72px;
-    horizontal-align: left;
-    color: white;
-    font-size: 32px;
-    font-weight: bold;
-    text-shadow: 3px 5px 5px black;
+	horizontal-align: left;
+	color: white;
+	font-size: 32px;
+	font-weight: bold;
+	text-shadow: 3px 5px 5px black;
 
 	transition-property: transform, opacity;
 	transition-duration: 0.15s;
-    transform: scaleX(2) scaleY(2);
-    opacity: 0;
+	transform: scaleX(2) scaleY(2);
+	opacity: 0;
 }
 
 #RecentScore.recent_score
 {
-    transform: scaleX(1) scaleY(1);
-    opacity: 1;
+	transform: scaleX(1) scaleY(1);
+	opacity: 1;
 }
 

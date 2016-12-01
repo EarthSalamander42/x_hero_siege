@@ -5,25 +5,34 @@
 	"Title"			"Recommended items for Crypt Lord"
 
 	"Items"
-	{		
+	{
+		"#DOTA_Item_Build_Title"
+		{
+		}
+
+		"#DOTA_Item_Build_Hero1"
+		{
+		}
+
 		"#DOTA_Item_Build_Starting_Items"
 		{
 			"item"		"item_poor_mans_shield"
-			"item"		"item_faerie_fire"
-			"item"		"item_enchanted_mango"
+			"item"		"item_healing_potion"
+			"item"		"item_mana_potion"
 		}
 
 		"#DOTA_Item_Build_Early_Game"
-		{	
+		{
 			"item"		"item_amulet_of_the_wild"
 			"item"		"item_tome_small"
+			"item"		"item_ankh_of_reincarnation"
 			"item"		"item_bracer_of_endurance"
 			"item"		"item_gloom_blade"
-			"item"		"item_tome_big"
 		}
 
 		"#DOTA_Item_Build_Core_Items"
 		{
+			"item"		"item_lifesteal_mask"
 			"item"		"item_bracer_of_protection"
 			"item"		"item_assassins_blade"
 			"item"		"item_assassins_blade"

@@ -78,7 +78,7 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"ID"							"2530"
+		"ID"							"2501"
 		"BaseClass"						"item_datadriven"
 		"AbilityTextureName" 			"assassins_blade"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING"
@@ -98,7 +98,7 @@
 		"ItemPermanent"					"0"
 		"SecretShop"					"1"
 
-		// Special	
+		// Special
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilitySpecial"
 		{
@@ -167,8 +167,8 @@
 		"BaseClass"						"item_datadriven"
 		"AbilityTextureName"			"claws_of_attack"		
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-		"ID"							"2503"
-		"Model"							"models/items/nerubian_assassin/shadow_claws/shadow_claws.vmdl"
+		"ID"							"2502"
+		"Model"							"models/heroes/lone_druid/lone_druid_claw_fx.vmdl"
 		"Effect"						"particles/generic_gameplay/dropped_item.vpcf"
 
 		// Item Info
@@ -198,8 +198,26 @@
 			}
 			"03"
 			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_agility"			"70"
+				"var_type"				"FIELD_FLOAT"
+				"bat_reduction"			"0.2"
+			}
+		}
+
+		"OnEquip"
+		{
+			"RunScript"
+			{
+				"ScriptFile"    "items/claws_of_attack.lua"
+				"Function"      "EquipClaws"
+			}
+		}
+
+		"OnUnequip"
+		{
+			"RunScript"
+			{
+				"ScriptFile"    "items/claws_of_attack.lua"
+				"Function"      "UnequipClaws"
 			}
 		}
 
@@ -214,7 +232,6 @@
 				"Properties"
 				{
 					"MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE"		"%bonus_damage"
-					"MODIFIER_PROPERTY_STATS_AGILITY_BONUS"			"%bonus_agility"
 					"MODIFIER_PROPERTY_MOVESPEED_BONUS_CONSTANT"	"%bonus_movespeed"
 				}
 			}
@@ -228,7 +245,7 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"ID"								"2504"
+		"ID"								"2503"
 		"BaseClass"							"item_datadriven"
 		"AbilityTextureName" 				"ankh_of_reincarnation"
 		"AbilityBehavior"					"DOTA_ABILITY_BEHAVIOR_PASSIVE"
@@ -257,17 +274,6 @@
 			}
 		}
 
-		"OnCreated"
-		{
-			"RunScript"
-			{
-				"ScriptFile"				"items/ankh/ankh.lua"
-				"Function"					"AegisPickup"
-
-				"modifier_aegis"			"modifier_item_imba_aegis"
-			}
-		}
-
 		"Modifiers"
 		{
 			"modifier_reincarnation"
@@ -280,11 +286,10 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"    "items/Ankh/ankh.lua"
-						"Function"      "reincarnation"
+						"ScriptFile"	"items/Ankh/ankh.lua"
+						"Function"		"Reincarnation"
 					}
-				
-			   }
+				}
 			}
 		}
 	}
@@ -294,12 +299,12 @@
 	//=================================================================================================================
 	"item_tome_small" 
 	{
-		"ID"							"2505"
+		"ID"							"2504"
 		"BaseClass"						"item_datadriven"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO"
-		"Model"							"models/props_gameplay/red_box.vmdl" 
+		"Model"							"models/props_gameplay/recipe.vmdl" 
 		"Effect"						"particles/generic_gameplay/dropped_item.vpcf"
 		"ItemCost"						"10000"
 		"ItemKillable"					"1" 
@@ -346,21 +351,21 @@
 	//=================================================================================================================
 	"item_tome_big"
 	{
-		"ID"           "2506"
-		"BaseClass"    "item_datadriven"
-		"AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
+		"ID"							"2505"
+		"BaseClass"						"item_datadriven"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO"
-		"Model"        "models/props_gameplay/red_box.vmdl" 
-		"Effect"       "particles/generic_gameplay/dropped_item.vpcf"
-		"ItemCost"     "50000"
-		"ItemKillable" "1" 
-		"ItemSellable" "1"
-		"ItemCastOnPickup" "0"
-		"ItemPurchasable" "1"
-		"ItemDroppable" "1"
-		"ItemShareability" "ITEM_FULLY_SHAREABLE"
-		"AbilityTextureName" "tome_big"
+		"Model"							"models/props_gameplay/recipe.vmdl" 
+		"Effect"						"particles/generic_gameplay/dropped_item.vpcf"
+		"ItemCost"						"50000"
+		"ItemKillable"					"1" 
+		"ItemSellable"					"1"
+		"ItemCastOnPickup"				"0"
+		"ItemPurchasable"				"1"
+		"ItemDroppable"					"1"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
+		"AbilityTextureName"			"tome_big"
 		"SideShop"						"1"
 
 		"ItemShopTags"					"artifact"
@@ -398,7 +403,7 @@
 	//=================================================================================================================
 	"item_magtheridon_ankh" 
 	{
-		"ID"           "2507"
+		"ID"           "2506"
 		"BaseClass"    "item_datadriven"
 		"AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"Model"        "models/heroes/bounty_hunter/bounty_hunter_bweapon.vmdl" 
@@ -476,761 +481,36 @@
 		}   
 	}
 
-	//========================================================================================================
-	// Mekansm 2
-	//========================================================================================================
-	"item_mekansm2"
+	//=================================================================================================================
+	// Mana Potion
+	//=================================================================================================================
+	"item_mana_potion"
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"BaseClass"                     "item_datadriven"
-		"ID"                            "2510"  //Valve's version of this item uses the ID "79".
-		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-		"Model"                         "models/props_gameplay/red_box.vmdl" 
-		"Effect"                        "particles/generic_gameplay/dropped_item.vpcf"
-		"AbilityTextureName"            "item_mekansm2"
-		"FightRecapLevel"               "2"
-		
-		// Stats        
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCastPoint"              "0.0"
-		"AbilityCooldown"               "45"
-		"AbilityManaCost"               "700"
-		
-		// Item Info
-		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"                      "5750"
-		"ItemShopTags"                  "agi;int;str;armor;boost_health"
-		"ItemQuality"                   "rare"
-		"ItemAliases"                   "mechanism;mekansm"
-		"ItemAlertable"                 "1"
-		"ItemDeclarations"              "DECLARE_PURCHASES_TO_TEAMMATES | DECLARE_PURCHASES_TO_SPECTATORS"
-		"ItemBaseLevel"					"2"
-		"MaxUpgradeLevel"				"5"
-		
-		"AbilitySpecial"
-		{
-			"01"
-			{
-				"var_type"              "FIELD_INTEGER"
-				"bonus_all_stats"       "20"
-			}
-			"02"
-			{
-				"var_type"              "FIELD_INTEGER"
-				"bonus_armor"           "10"
-			}
-			"03"
-			{
-				"var_type"              "FIELD_INTEGER"
-				"aura_radius"           "1000"
-			}
-			"04"
-			{
-				"var_type"              "FIELD_INTEGER"
-				"aura_health_regen"     "5"
-			}
-			"05"
-			{
-				"var_type"              "FIELD_INTEGER"
-				"heal_amount"           "750"
-			}
-			"06"
-			{
-				"var_type"              "FIELD_INTEGER"
-				"heal_radius"           "1000"
-			}
-			"07"
-			{
-				"var_type"              "FIELD_INTEGER"
-				"heal_bonus_armor"      "10"
-			}
-			"08"
-			{
-				"var_type"              "FIELD_FLOAT"
-				"heal_armor_duration"   "25.0"
-			}
-		}
-		
-		"OnSpellStart"
-		{
-			"RunScript"
-			{
-				"ScriptFile"            "items/mekansm/item_mekansm.lua"
-				"Function"				"item_mekansm_datadriven_on_spell_start"
-				"HealAmount"			"%heal_amount"
-				"HealRadius"			"%heal_radius"
-			}
-		}
-		
-		"Modifiers"
-		{
-			"modifier_item_mekansm_datadriven_2"
-			{
-				"Passive"           "1"
-				"IsHidden"          "1"
-				"Attributes"        "MODIFIER_ATTRIBUTE_MULTIPLE"
-				
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_STATS_STRENGTH_BONUS"        "%bonus_all_stats"
-					"MODIFIER_PROPERTY_STATS_AGILITY_BONUS"         "%bonus_all_stats"
-					"MODIFIER_PROPERTY_STATS_INTELLECT_BONUS"       "%bonus_all_stats"
-					"MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS"        "%bonus_armor"
-				}
-			}
-			"modifier_item_mekansm_datadriven_aura_emitter_2"
-			{
-				"Passive"               "1"
-				"IsHidden"              "1"
-				
-				"Aura"                  "modifier_item_mekansm_datadriven_aura_2"
-				"Aura_Radius"           "%aura_radius"
-				"Aura_Teams"            "DOTA_UNIT_TARGET_TEAM_FRIENDLY"
-				"Aura_Types"            "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
-				"Aura_Flags"            "DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES"
-				"Aura_ApplyToCaster"    "1"
-			}
-			"modifier_item_mekansm_datadriven_aura_2"
-			{
-				"Passive"           "0"
-				"IsHidden"          "0"
-				
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_HEALTH_REGEN_CONSTANT"       "%aura_health_regen"
-				}
-			}
-			"modifier_item_mekansm_datadriven_heal_armor"
-			{
-				"Duration"          "%heal_armor_duration"
-				"Passive"           "0"
-				"IsHidden"          "0"
-				"IsBuff"            "1"
-				"IsDebuff"          "0"
-				"IsPurgable"        "1"
-				"TextureName"       "item_mekansm2"
-				
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS_UNIQUE_ACTIVE"      "%heal_bonus_armor"
-				}
-			}
-			//Placed onto units when healed by Mekansm, and prevents further heals from Mekansm while it exists.
-			//A separate modifier is used because the armor buff from Restore can be dispelled, but this can't.
-			"imodifier_item_mekansm_datadriven_heal_debuff_2"
-			{
-				"Duration"          "heal_armor_duration"
-				"Passive"           "0"
-				"IsHidden"          "1"
-				"IsBuff"            "0"
-				"IsDebuff"          "1"
-				"IsPurgable"        "0"
-			}
-		}
-	}
-
-	//=================================================================================================================
-	// Recipe: Mekansm 2
-	//=================================================================================================================
-	"item_recipe_mekansm2"
-	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"ID"							"2511"
-		"BaseClass"             		"item_recipe_mekansm"
-		"Model"							"models/props_gameplay/recipe.mdl"
-		
-		// Item Info
-		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"						"3450"	
-		"ItemShopTags"					""
-		
-		// Recipe
-		//-------------------------------------------------------------------------------------------------------------
-		"ItemRecipe"					"1"
-		"ItemResult"					"item_mekansm2"
-		"ItemRequirements"
-		{
-			"01"						"item_mekansm"
-		}
-	}
-
-	//========================================================================================================
-	// Mekansm 3
-	//========================================================================================================
-	"item_mekansm3"
-	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"BaseClass"                     "item_datadriven"
-		"ID"                            "2512"  //Valve's version of this item uses the ID "79".
-		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-		"Model"                         "models/props_gameplay/red_box.vmdl" 
-		"Effect"                        "particles/generic_gameplay/dropped_item.vpcf"
-		"AbilityTextureName"            "item_mekansm3"
-		"FightRecapLevel"               "2"
-		
-		// Stats        
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCastPoint"              "0.0"
-		"AbilityCooldown"               "40"
-		"AbilityManaCost"               "2000"
-		
-		// Item Info
-		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"                      "15750"
-		"ItemShopTags"                  "agi;int;str;armor;boost_health"
-		"ItemQuality"                   "rare"
-		"ItemAliases"                   "mechanism;mekansm"
-		"ItemAlertable"                 "1"
-		"ItemDeclarations"              "DECLARE_PURCHASES_TO_TEAMMATES | DECLARE_PURCHASES_TO_SPECTATORS"
-		"ItemBaseLevel"					"3"
-		"MaxUpgradeLevel"				"5"
-		
-		"AbilitySpecial"
-		{
-			"01"
-			{
-				"var_type"              "FIELD_INTEGER"
-				"bonus_all_stats"       "50"
-			}
-			"02"
-			{
-				"var_type"              "FIELD_INTEGER"
-				"bonus_armor"           "25"
-			}
-			"03"
-			{
-				"var_type"              "FIELD_INTEGER"
-				"aura_radius"           "1000"
-			}
-			"04"
-			{
-				"var_type"              "FIELD_INTEGER"
-				"aura_health_regen"     "10"
-			}
-			"05"
-			{
-				"var_type"              "FIELD_INTEGER"
-				"heal_amount"           "1500"
-			}
-			"06"
-			{
-				"var_type"              "FIELD_INTEGER"
-				"heal_radius"           "1000"
-			}
-			"07"
-			{
-				"var_type"              "FIELD_INTEGER"
-				"heal_bonus_armor"      "25"
-			}
-			"08"
-			{
-				"var_type"              "FIELD_FLOAT"
-				"heal_armor_duration"   "25.0"
-			}
-		}
-		
-		"OnSpellStart"
-		{
-			"RunScript"
-			{
-				"ScriptFile"            "items/mekansm/item_mekansm.lua"
-				"Function"				"item_mekansm_datadriven_on_spell_start"
-				"HealAmount"			"%heal_amount"
-				"HealRadius"			"%heal_radius"
-			}
-		}
-
-		"Modifiers"
-		{
-			"modifier_item_mekansm_datadriven_3"
-			{
-				"Passive"           "1"
-				"IsHidden"          "1"
-				"Attributes"        "MODIFIER_ATTRIBUTE_MULTIPLE"
-				
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_STATS_STRENGTH_BONUS"        "%bonus_all_stats"
-					"MODIFIER_PROPERTY_STATS_AGILITY_BONUS"         "%bonus_all_stats"
-					"MODIFIER_PROPERTY_STATS_INTELLECT_BONUS"       "%bonus_all_stats"
-					"MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS"        "%bonus_armor"
-				}
-			}
-			"modifier_item_mekansm_datadriven_aura_emitter_3"
-			{
-				"Passive"               "1"
-				"IsHidden"              "1"
-				
-				"Aura"                  "modifier_item_mekansm_datadriven_aura_3"
-				"Aura_Radius"           "%aura_radius"
-				"Aura_Teams"            "DOTA_UNIT_TARGET_TEAM_FRIENDLY"
-				"Aura_Types"            "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
-				"Aura_Flags"            "DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES"
-				"Aura_ApplyToCaster"    "1"
-			}
-			"modifier_item_mekansm_datadriven_aura_3"
-			{
-				"Passive"           "0"
-				"IsHidden"          "0"
-				
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_HEALTH_REGEN_CONSTANT"       "%aura_health_regen"
-				}
-			}
-			"modifier_item_mekansm_datadriven_heal_armor"
-			{
-				"Duration"          "%heal_armor_duration"
-				"Passive"           "0"
-				"IsHidden"          "0"
-				"IsBuff"            "1"
-				"IsDebuff"          "0"
-				"IsPurgable"        "1"
-				"TextureName"       "item_mekansm3"
-				
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS_UNIQUE_ACTIVE"      "%heal_bonus_armor"
-				}
-			}
-			//Placed onto units when healed by Mekansm, and prevents further heals from Mekansm while it exists.
-			//A separate modifier is used because the armor buff from Restore can be dispelled, but this can't.
-			"imodifier_item_mekansm_datadriven_heal_debuff_3"
-			{
-				"Duration"          "heal_armor_duration"
-				"Passive"           "0"
-				"IsHidden"          "1"
-				"IsBuff"            "0"
-				"IsDebuff"          "1"
-				"IsPurgable"        "0"
-			}
-		}
-	}
-
-	//=================================================================================================================
-	// Recipe: Mekansm 3
-	//=================================================================================================================
-	"item_recipe_mekansm3"
-	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"ID"							"2513"
-		"BaseClass"             		"item_recipe_mekansm"
-		"Model"							"models/props_gameplay/recipe.mdl"
-		
-		// Item Info
-		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"						"10000"	
-		"ItemShopTags"					""
-		
-		// Recipe
-		//-------------------------------------------------------------------------------------------------------------
-		"ItemRecipe"					"1"
-		"ItemResult"					"item_mekansm3"
-		"ItemRequirements"
-		{
-			"01"						"item_mekansm2"
-		}
-	}
-
-	//========================================================================================================
-	// Mekansm 4
-	//========================================================================================================
-	"item_mekansm4"
-	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"BaseClass"                     "item_datadriven"
-		"ID"                            "2514"  //Valve's version of this item uses the ID "79".
-		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-		"Model"                         "models/props_gameplay/red_box.vmdl" 
-		"Effect"                        "particles/generic_gameplay/dropped_item.vpcf"
-		"AbilityTextureName"            "item_mekansm4"
-		"FightRecapLevel"               "2"
-		
-		// Stats        
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCastPoint"              "0.0"
-		"AbilityCooldown"               "35"
-		"AbilityManaCost"               "4000"
-		
-		// Item Info
-		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"                      "40750"
-		"ItemShopTags"                  "agi;int;str;armor;boost_health"
-		"ItemQuality"                   "rare"
-		"ItemAliases"                   "mechanism;mekansm"
-		"ItemAlertable"                 "1"
-		"ItemDeclarations"              "DECLARE_PURCHASES_TO_TEAMMATES | DECLARE_PURCHASES_TO_SPECTATORS"
-		"ItemBaseLevel"					"4"
-		"MaxUpgradeLevel"				"5"
-		
-		"AbilitySpecial"
-		{
-			"01"
-			{
-				"var_type"              "FIELD_INTEGER"
-				"bonus_all_stats"       "100"
-			}
-			"02"
-			{
-				"var_type"              "FIELD_INTEGER"
-				"bonus_armor"           "50"
-			}
-			"03"
-			{
-				"var_type"              "FIELD_INTEGER"
-				"aura_radius"           "1000"
-			}
-			"04"
-			{
-				"var_type"              "FIELD_INTEGER"
-				"aura_health_regen"     "20"
-			}
-			"05"
-			{
-				"var_type"              "FIELD_INTEGER"
-				"heal_amount"           "4000"
-			}
-			"06"
-			{
-				"var_type"              "FIELD_INTEGER"
-				"heal_radius"           "1000"
-			}
-			"07"
-			{
-				"var_type"              "FIELD_INTEGER"
-				"heal_bonus_armor"      "50"
-			}
-			"08"
-			{
-				"var_type"              "FIELD_FLOAT"
-				"heal_armor_duration"   "25.0"
-			}
-		}
-		
-		"OnSpellStart"
-		{
-			"RunScript"
-			{
-				"ScriptFile"            "items/mekansm/item_mekansm.lua"
-				"Function"				"item_mekansm_datadriven_on_spell_start"
-				"HealAmount"			"%heal_amount"
-				"HealRadius"			"%heal_radius"
-			}
-		}
-		
-		"Modifiers"
-		{
-			"modifier_item_mekansm_datadriven_4"
-			{
-				"Passive"           "1"
-				"IsHidden"          "1"
-				"Attributes"        "MODIFIER_ATTRIBUTE_MULTIPLE"
-				
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_STATS_STRENGTH_BONUS"        "%bonus_all_stats"
-					"MODIFIER_PROPERTY_STATS_AGILITY_BONUS"         "%bonus_all_stats"
-					"MODIFIER_PROPERTY_STATS_INTELLECT_BONUS"       "%bonus_all_stats"
-					"MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS"        "%bonus_armor"
-				}
-			}
-			"modifier_item_mekansm_datadriven_aura_emitter_4"
-			{
-				"Passive"               "1"
-				"IsHidden"              "1"
-				
-				"Aura"                  "modifier_item_mekansm_datadriven_aura_4"
-				"Aura_Radius"           "%aura_radius"
-				"Aura_Teams"            "DOTA_UNIT_TARGET_TEAM_FRIENDLY"
-				"Aura_Types"            "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
-				"Aura_Flags"            "DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES"
-				"Aura_ApplyToCaster"    "1"
-			}
-			"modifier_item_mekansm_datadriven_aura_4"
-			{
-				"Passive"           "0"
-				"IsHidden"          "0"
-				
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_HEALTH_REGEN_CONSTANT"       "%aura_health_regen"
-				}
-			}
-			"modifier_item_mekansm_datadriven_heal_armor"
-			{
-				"Duration"          "%heal_armor_duration"
-				"Passive"           "0"
-				"IsHidden"          "0"
-				"IsBuff"            "1"
-				"IsDebuff"          "0"
-				"IsPurgable"        "1"
-				"TextureName"       "item_mekansm4"
-				
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS_UNIQUE_ACTIVE"      "%heal_bonus_armor"
-				}
-			}
-			//Placed onto units when healed by Mekansm, and prevents further heals from Mekansm while it exists.
-			//A separate modifier is used because the armor buff from Restore can be dispelled, but this can't.
-			"imodifier_item_mekansm_datadriven_heal_debuff_4"
-			{
-				"Duration"          "heal_armor_duration"
-				"Passive"           "0"
-				"IsHidden"          "1"
-				"IsBuff"            "0"
-				"IsDebuff"          "1"
-				"IsPurgable"        "0"
-			}
-		}
-	}
-
-	//=================================================================================================================
-	// Recipe: Mekansm 4
-	//=================================================================================================================
-	"item_recipe_mekansm4"
-	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"ID"							"2515"
-		"BaseClass"             		"item_recipe_mekansm"
-		"Model"							"models/props_gameplay/recipe.mdl"
-		
-		// Item Info
-		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"						"25000"	
-		"ItemShopTags"					""
-		
-		// Recipe
-		//-------------------------------------------------------------------------------------------------------------
-		"ItemRecipe"					"1"
-		"ItemResult"					"item_mekansm4"
-		"ItemRequirements"
-		{
-			"01"						"item_mekansm3"
-		}
-	}
-	
-	//========================================================================================================
-	// Mekansm 5
-	//========================================================================================================
-	"item_mekansm5"
-	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"BaseClass"                     "item_datadriven"
-		"ID"                            "2516"  //Valve's version of this item uses the ID "79".
-		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-		"Model"                         "models/props_gameplay/red_box.vmdl" 
-		"Effect"                        "particles/generic_gameplay/dropped_item.vpcf"
-		"AbilityTextureName"            "item_mekansm5"
-		"FightRecapLevel"               "2"
-		
-		// Stats
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCastPoint"              "0.0"
-		"AbilityCooldown"               "25"
-		"AbilityManaCost"               "8000"
-		
-		// Item Info
-		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"                      "70750"
-		"ItemShopTags"                  "agi;int;str;armor;boost_health"
-		"ItemQuality"                   "rare"
-		"ItemAliases"                   "mechanism;mekansm"
-		"ItemAlertable"                 "1"
-		"ItemDeclarations"              "DECLARE_PURCHASES_TO_TEAMMATES | DECLARE_PURCHASES_TO_SPECTATORS"
-		"ItemBaseLevel"					"5"
-		"MaxUpgradeLevel"				"5"
-
-		"AbilitySpecial"
-		{
-			"01"
-			{
-				"var_type"              "FIELD_INTEGER"
-				"bonus_all_stats"       "200"
-			}
-			"02"
-			{
-				"var_type"              "FIELD_INTEGER"
-				"bonus_armor"           "75"
-			}
-			"03"
-			{
-				"var_type"              "FIELD_INTEGER"
-				"aura_radius"           "1000"
-			}
-			"04"
-			{
-				"var_type"              "FIELD_INTEGER"
-				"aura_health_regen"     "50"
-			}
-			"05"
-			{
-				"var_type"              "FIELD_INTEGER"
-				"heal_amount"           "10000"
-			}
-			"06"
-			{
-				"var_type"              "FIELD_INTEGER"
-				"heal_radius"           "1000"
-			}
-			"07"
-			{
-				"var_type"              "FIELD_INTEGER"
-				"heal_bonus_armor"      "75"
-			}
-			"08"
-			{
-				"var_type"              "FIELD_FLOAT"
-				"heal_armor_duration"   "25.0"
-			}
-		}
-		
-		"OnSpellStart"
-		{
-			"RunScript"
-			{
-				"ScriptFile"            "items/mekansm/item_mekansm.lua"
-				"Function"				"item_mekansm_datadriven_on_spell_start"
-				"HealAmount"			"%heal_amount"
-				"HealRadius"			"%heal_radius"
-			}
-		}
-		
-		"Modifiers"
-		{
-			"modifier_item_mekansm_datadriven_5"
-			{
-				"Passive"           "1"
-				"IsHidden"          "1"
-				"Attributes"        "MODIFIER_ATTRIBUTE_MULTIPLE"
-				
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_STATS_STRENGTH_BONUS"        "%bonus_all_stats"
-					"MODIFIER_PROPERTY_STATS_AGILITY_BONUS"         "%bonus_all_stats"
-					"MODIFIER_PROPERTY_STATS_INTELLECT_BONUS"       "%bonus_all_stats"
-					"MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS"        "%bonus_armor"
-				}
-			}
-			"modifier_item_mekansm_datadriven_aura_emitter_5"
-			{
-				"Passive"               "1"
-				"IsHidden"              "1"
-				
-				"Aura"                  "modifier_item_mekansm_datadriven_aura_5"
-				"Aura_Radius"           "%aura_radius"
-				"Aura_Teams"            "DOTA_UNIT_TARGET_TEAM_FRIENDLY"
-				"Aura_Types"            "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
-				"Aura_Flags"            "DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES"
-				"Aura_ApplyToCaster"    "1"
-			}
-			"modifier_item_mekansm_datadriven_aura_5"
-			{
-				"Passive"           "0"
-				"IsHidden"          "0"
-
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_HEALTH_REGEN_CONSTANT"       "%aura_health_regen"
-				}
-			}
-			"modifier_item_mekansm_datadriven_heal_armor"
-			{
-				"Duration"          "%heal_armor_duration"
-				"Passive"           "0"
-				"IsHidden"          "0"
-				"IsBuff"            "1"
-				"IsDebuff"          "0"
-				"IsPurgable"        "1"
-				"TextureName"       "item_mekansm5"
-				
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS_UNIQUE_ACTIVE"      "%heal_bonus_armor"
-				}
-			}
-			//Placed onto units when healed by Mekansm, and prevents further heals from Mekansm while it exists.
-			//A separate modifier is used because the armor buff from Restore can be dispelled, but this can't.
-			"imodifier_item_mekansm_datadriven_heal_debuff_5"
-			{
-				"Duration"          "heal_armor_duration"
-				"Passive"           "0"
-				"IsHidden"          "1"
-				"IsBuff"            "0"
-				"IsDebuff"          "1"
-				"IsPurgable"        "0"
-			}
-		}
-	}
-
-	//=================================================================================================================
-	// Recipe: Mekansm 5
-	//=================================================================================================================
-	"item_recipe_mekansm5"
-	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"ID"							"2517"
-		"BaseClass"             		"item_recipe_mekansm"
-		"Model"							"models/props_gameplay/recipe.mdl"
-		
-		// Item Info
-		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"						"30000"	
-		"ItemShopTags"					""
-		
-		// Recipe
-		//-------------------------------------------------------------------------------------------------------------
-		"ItemRecipe"					"1"
-		"ItemResult"					"item_mekansm5"
-		"ItemRequirements"
-		{
-			"01"						"item_mekansm4"
-		}
-	}
-
-	//=================================================================================================================
-	// Mana Potion 1
-	//=================================================================================================================
-	"item_enchanted_mango1"
-	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"ID"							"2526"
+		"ID"							"2507"
 		"BaseClass"             		"item_enchanted_mango"		
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO"
-		"AbilityTextureName"			"item_enchanted_mango1"
-		"Model"							"models/props_gameplay/clarity.mdl"
+		"AbilityTextureName"			"item_mana_potion"
+		"Model"							"models/props_gameplay/salve_red.vmdl"
 		// Stats
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCastRange"				"500"
 		"AbilityCastPoint"				"0.0"
-		"AbilityCooldown"				"5.0"
+		"AbilityCooldown"				"1.0"
 
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"						"500"
+		"ItemCost"						"150"
 		"ItemAlertable"					"0"
-		"ItemAliases"					"mana salve"
-		"ItemStackable"					"1"
+		"ItemAliases"					"mana potion"
+		"ItemStackable"					"0"
 		"ItemPermanent"					"0"
-		"ItemInitialCharges"			"10"
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
 		"ItemHideCharges"				"0"
 		"ItemDisplayCharges"			"1"
-		"ItemStockMax"					"20"
-		"ItemStockInitial"				"0"
-		"ItemStockTime"					"30.0"			  
-		"ItemInitialStockTime"			"300.0"
+		"ItemInitialCharges"			"15"
 
 		// Special	
 		//-------------------------------------------------------------------------------------------------------------
@@ -1252,32 +532,29 @@
 	//=================================================================================================================
 	// Faerie Fire
 	//=================================================================================================================
-	"item_faerie_fire2"
+	"item_healing_potion"
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"ID"							"2527"
+		"ID"							"2508"
 		"BaseClass"             		"item_faerie_fire"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET| DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
-		"AbilityTextureName"			"salve_1000"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
+		"AbilityTextureName"			"healing_potion"
+		"Model"							"models/props_gameplay/salve.vmdl"
 
 		// Stats
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCooldown"				"5.0"
+		"AbilityCooldown"				"1.0"
 
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"						"500"
-		"ItemAliases"					"faerie fire 2"
-		"ItemStackable"					"1"
+		"ItemCost"						"150"
+		"ItemAliases"					"healing potion"
+		"ItemStackable"					"0"
 		"ItemPermanent"					"0"
-		"ItemInitialCharges"			"10"
 		"SideShop"						"0"
 		"ItemHideCharges"				"0"
-		"ItemStockMax"					"20"
-		"ItemStockInitial"				"0"
-		"ItemStockTime"					"30.0"			  
-		"ItemInitialStockTime"			"300.0"
+		"ItemInitialCharges"			"15"
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
 
 		// Special	
@@ -1287,12 +564,12 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"bonus_damage"			"50"
+				"bonus_damage"			"0"
 			}
 			"02"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"hp_restore"			"8000"
+				"hp_restore"			"3000"
 			}
 		}
 	}
@@ -1306,7 +583,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"                     "item_datadriven"
-		"ID"                            "2528"
+		"ID"                            "2509"
 		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
@@ -1457,7 +734,7 @@
 	//=================================================================================================================
 	"item_amulet_of_the_wild" 
 	{
-		"ID"						"2529"
+		"ID"						"2510"
 		"BaseClass"					"item_datadriven"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
 		"Model"						"models/props_gameplay/red_box.vmdl" 
@@ -1493,44 +770,10 @@
 
 		"OnSpellStart"
 		{ 
-			"SpawnUnit"
+			"RunScript"
 			{
-				"UnitName"		"npc_dota_furbolg"
-				"Target"		"CASTER"
-				"Duration"		"%duration"
-				"UnitCount"		"1"
-				"GrantsGold"	"1"
-				"GrantsXP"		"1"
-				"SpawnRadius"	"50"
-				"OnSpawn"
-				{
-					"ApplyModifier"
-					{
-						"ModifierName"		"modifier_phased"
-						"Target"			"TARGET"
-						"Duration"			"0.2"
-					}
-	
-					"AttachEffect"
-					{
-						"EffectName"		"particles/units/heroes/hero_ursa/ursa_enrage_buff.vpcf"
-						"EffectAttachType"	"follow_origin"
-						"Target"			"TARGET"
-					}
-	
-					"FireEffect"
-					{
-						"EffectName"		"particles/units/heroes/hero_ursa/ursa_earthshock.vpcf"
-						"EffectAttachType"	"follow_origin"
-						"Target"			"TARGET"
-					}
-	
-					"FireSound"
-					{
-						"EffectName"	"Hero_Ursa.Earthshock"
-						"Target" 		"TARGET"
-					}
-				}
+				"ScriptFile"	"items/amulet_of_the_wild.lua"
+				"Function"		"Furbolg"
 			}
 
 			"SpendCharge"
@@ -1548,7 +791,7 @@
 		"BaseClass"						"item_datadriven"
 		"AbilityTextureName"			"bracer_of_protection"		
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-		"ID"							"2531"
+		"ID"							"2511"
 		"Model"							"models/props_gameplay/red_box.vmdl"
 		"Effect"						"particles/generic_gameplay/dropped_item.vpcf"
 
@@ -1570,7 +813,7 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"bonus_hp"				"12500"
+				"bonus_hp"				"13400"
 			}
 			"02"
 			{
@@ -1578,11 +821,6 @@
 				"bonus_armor"			"100"
 			}
 			"03"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_strength"		"75"
-			}
-			"04"
 			{
 				"var_type"				"FIELD_INTEGER"
 				"bonus_health_regen"	"20"
@@ -1601,7 +839,6 @@
 				{
 					"MODIFIER_PROPERTY_HEALTH_BONUS"				"%bonus_hp"
 					"MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS"		"%bonus_armor"
-					"MODIFIER_PROPERTY_STATS_STRENGTH_BONUS"		"%bonus_strength"
 					"MODIFIER_PROPERTY_HEALTH_REGEN_CONSTANT"		"%bonus_health_regen"
 				}
 			}
@@ -1613,14 +850,14 @@
 	//=================================================================================================================
 	"item_tome_of_power" 
 	{
-		"ID"				"2532"
+		"ID"				"2512"
 		"BaseClass"			"item_datadriven"
 		"AbilityBehavior"	"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 
 		"Model"				"models/props_gameplay/red_box.vmdl" 
 		"Effect"			"particles/generic_gameplay/dropped_item.vpcf"
-		"ItemCost"			"2500"
-		"ItemKillable"		"1" 
+		"ItemCost"			"5000"
+		"ItemKillable"		"0" 
 
 		"ItemInitialStockTime"	"930.0"	//14 Min = 1200 + game beginning time = 90
 		"ItemStockMax"			"5" 
@@ -1670,7 +907,7 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"ID"							"2533"
+		"ID"							"2513"
 		"BaseClass"						"item_datadriven"
 		"AbilityTextureName" 			"key_of_the_three_moons"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
@@ -1698,18 +935,9 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"bonus_stats"			"1000"
+				"bonus_stats"			"1500"
 			}
 		}
-
-//		"OnEquip"
-//		{
-//			"RunScript"
-//			{
-//				"ScriptFile"	"items/item_key_of_the_three_moons.lua"
-//				"Function"		"ItemCheck"
-//			}
-//		}
 
 		"Modifiers"
 		{
@@ -1737,7 +965,7 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"ID"							"2534"
+		"ID"							"2514"
 		"BaseClass"						"item_datadriven"
 		"AbilityTextureName" 			"gloom_blade"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
@@ -1788,7 +1016,7 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"ID"							"2535"
+		"ID"							"2515"
 		"BaseClass"             		"item_datadriven"
 		"Model"							"models/props_gameplay/recipe.mdl"
 		
@@ -1813,7 +1041,7 @@
 	//=================================================================================================================
 	"item_orb_of_lightning"
 	{
-		"ID"							"2536"
+		"ID"							"2516"
 		"BaseClass"						"item_datadriven"
 		"AbilityTextureName"			"orb_of_lightning"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
@@ -1828,7 +1056,7 @@
 		"ItemDroppable"					"1" 
 
 		// Shops
-		"ItemCost"						"5000"
+		"ItemCost"						"7500"
 		"StockMax"						"1" 
 		"StockTime"						"300.0"
 		"StockInitial"					"0"
@@ -1900,8 +1128,8 @@
 				"Passive"           "1"
 				"IsHidden"          "1"
 	
-//				"EffectName"        "particles/custom/items/orb/orb_of_lightning/orb.vpcf"
-//				"EffectAttachType"  "follow_origin"
+				"EffectName"        "particles/custom/items/orb/orb_of_lightning/orb.vpcf"
+				"EffectAttachType"  "follow_origin"
 	
 				"Properties"
 				{
@@ -1950,7 +1178,7 @@
 	//=================================================================================================================
 	"item_orb_of_fire"
 	{
-		"ID"							"2537"
+		"ID"							"2517"
 		"BaseClass"						"item_datadriven"
 		"AbilityTextureName"			"item_orb_of_fire"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
@@ -1965,7 +1193,7 @@
 		"ItemDroppable"					"1"
 	
 		// Shops
-		"ItemCost"						"5000"
+		"ItemCost"						"7500"
 		"StockMax"						"1" 
 		"StockTime"						"300.0"
 		"StockInitial"					"0"
@@ -1992,14 +1220,8 @@
 			"03"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"cleave_pct_tooltip"	"25"
+				"cleave_pct_tooltip"	"20"
 			}
-		}
-	
-		"precache"
-		{
-			"particle"  "particles/units/heroes/hero_sven/sven_spell_great_cleave.vpcf"
-			"particle"  "particles/custom/items/orb/orb_of_fire/exort_orb_fire.vpcf"
 		}
 	
 		"OnEquip"
@@ -2062,13 +1284,13 @@
 	//=================================================================================================================
 	"item_orb_of_darkness"
 	{
-		"ID"							"2538"
+		"ID"							"2518"
 		"BaseClass"                     "item_datadriven"
 		"AbilityTextureName"            "item_orb_of_darkness"
 		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_PASSIVE"
 	
 		// Shops
-		"ItemCost"						"5000"
+		"ItemCost"						"7500"
 		"StockMax"						"1" 
 		"StockTime"						"300.0"
 		"StockInitial"					"0"
@@ -2126,7 +1348,7 @@
 				"Function"      "UnequipOrb"
 			}
 		}
-	
+
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
 		// Adds 5 bonus damage to the attacks of a Hero when carried. 
@@ -2209,7 +1431,7 @@
 		"BaseClass"						"item_datadriven"
 		"AbilityTextureName"			"bracer_of_endurance"		
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-		"ID"							"2539"
+		"ID"							"2519"
 		"Model"							"models/props_gameplay/red_box.vmdl"
 		"Effect"						"particles/generic_gameplay/dropped_item.vpcf"
 
@@ -2231,17 +1453,12 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"bonus_hp"				"3125"
+				"bonus_hp"				"3425"
 			}
 			"02"
 			{
 				"var_type"				"FIELD_INTEGER"
 				"bonus_armor"			"25"
-			}
-			"03"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_strength"		"15"
 			}
 			"04"
 			{
@@ -2262,7 +1479,6 @@
 				{
 					"MODIFIER_PROPERTY_HEALTH_BONUS"				"%bonus_hp"
 					"MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS"		"%bonus_armor"
-					"MODIFIER_PROPERTY_STATS_STRENGTH_BONUS"		"%bonus_strength"
 					"MODIFIER_PROPERTY_HEALTH_REGEN_CONSTANT"		"%bonus_health_regen"
 				}
 			}
@@ -2276,7 +1492,7 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"ID"							"2540"
+		"ID"							"2520"
 		"BaseClass"             		"item_datadriven"
 		"Model"							"models/props_gameplay/recipe.mdl"
 		
@@ -2297,24 +1513,128 @@
 	}
 
 	//=================================================================================================================
+	// Shield of Invincibility (Spirit Beast Event)
+	//=================================================================================================================
+	"item_shield_of_invincibility"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"ID"							"2521"
+		"BaseClass"						"item_datadriven"
+		"AbilityTextureName" 			"shield_of_invincibility"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityCastRange"				"0"
+		"AbilityCooldown"				"60.0"
+
+		// Item Info
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemCost"						"0"
+		"ItemShopTags"					"attributes"
+		"ItemQuality"					"epic"
+		"ItemAliases"					"shield of invincibility"
+		"ItemStackable"					"0"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
+		"ItemPermanent"					"0"
+		"ItemPurchasable"				"0"
+		"ItemSellable"					"0"
+		"SideShop"						"0"
+		"SecretShop"					"0"
+		"ItemKillable"					"0"
+
+		// Special	
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_armor"			"100"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"damage_reduction"		"-20"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_hp"				"10000"
+			}
+			"04"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"reincarnation_time"	"5"
+			}
+//			"05"
+//			{
+//				"var_type"				"FIELD_INTEGER"
+//				"damage_return_pct"		"10"
+//			}
+//			"06"
+//			{
+//				"var_type"				"FIELD_INTEGER"
+//				"damage_return_divided"	"10"
+//			}
+		}
+
+		"Modifiers"
+		{
+			"modifier_shield_of_invincibility"
+			{
+				"Passive"			"1"
+				"IsHidden"			"0"
+				"TextureName"		"shield_of_invincibility"
+
+//				"OnTakeDamage"
+//				// "%attack_damage" is set to the damage value after mitigation
+//				{
+//					"Damage"
+//					{
+//						"Target"	"ATTACKER"
+//						"Type"		"DAMAGE_TYPE_PHYSICAL"
+//						"Damage"	"%attack_damage / %damage_return_divided"
+//					}
+//				}
+
+				"OnDeath"
+				{
+					"RunScript"
+					{
+						"ScriptFile"	"items/item_shield_of_invincibility.lua"
+						"Function"		"Reincarnation"
+					}
+				}
+
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS"		"%bonus_armor"
+					"MODIFIER_PROPERTY_INCOMING_DAMAGE_PERCENTAGE"	"%damage_reduction"
+					"MODIFIER_PROPERTY_HEALTH_BONUS"				"%bonus_hp"
+				}
+			}
+		}
+	}
+
+	//=================================================================================================================
 	// Bag of Gold
 	//=================================================================================================================
 	"item_bag_of_gold"
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
+		"ID"							"2522"
 		"AbilityName"					"item_bag_of_gold"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO"
-		"Model"							"models/props_gameplay/gold_bag.vmdl"
+		"Model"							"models/props_gameplay/gold_coin001.vmdl"
 		"ItemKillable"					"0"
-		
+
 		// Stats
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityCastRange"				"100"
 		"AbilityCastPoint"				"0.0"
-		
+
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
 		"ItemCost"						"99999"
@@ -2324,7 +1644,242 @@
 		"ItemStackable"					"1"
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
 		"ItemPermanent"					"0"
-		"ItemInitialCharges"			"1"
+		"ItemInitialCharges"			"0"
 		"ItemKillable"					"0"
+		"ItemCastOnPickup"				"1"
+	}
+
+	//========================================================================================================
+	// Talisman of Evasion
+	//========================================================================================================
+	"item_talisman_of_evasion_datadriven"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"						"item_datadriven"
+		"ID"							"2523"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"Model"							"models/props_gameplay/red_box.vmdl" 
+		"Effect"						"particles/generic_gameplay/dropped_item.vpcf"
+		"AbilityTextureName"			"talisman_of_evasion_datadriven"
+		
+		// Item Info
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemCost"						"12500"
+		"ItemShopTags"					"evasion"
+		"ItemQuality"					"epic"
+		"ItemAliases"					"talisman of evasion"
+		"ItemDeclarations"				"DECLARE_PURCHASES_TO_TEAMMATES | DECLARE_PURCHASES_IN_SPEECH | DECLARE_PURCHASES_TO_SPECTATORS"
+		"SecretShop"					"1"
+
+		// Special	
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"bonus_evasion"				"15"
+			}
+		}
+		
+		"Modifiers"
+		{
+			"modifier_talisman_of_evasion_datadriven"
+			{
+				"Passive"			"1"
+				"IsHidden"			"1"
+
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_EVASION_CONSTANT"	"%bonus_evasion" 
+				}
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Blink Boots
+	//=================================================================================================================
+	"item_boots_of_speed"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"ID"							"2524"
+		"BaseClass"						"item_datadriven"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_DIRECTIONAL | DOTA_ABILITY_BEHAVIOR_ROOT_DISABLES | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING"
+		"AbilityTextureName"			"boots_of_speed"
+		"Model"							"models/props_items/blinkdagger.vmdl"
+
+		// Stats		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"				"0"
+		"AbilityCastPoint"				"0.0"
+		"AbilityCooldown"				"9.0"
+		"AbilityManaCost"				"0"
+		"AbilitySharedCooldown"			"blink"
+		
+		// Item Info
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemCost"						"10000"
+		"ItemShopTags"					"boots"
+		"ItemQuality"					"common"
+		"ItemAliases"					"blink;boots"
+		"SecretShop"					"1"
+		"ItemDeclarations"				"DECLARE_PURCHASES_TO_TEAMMATES | DECLARE_PURCHASES_IN_SPEECH | DECLARE_PURCHASES_TO_SPECTATORS"
+	
+		// Special	
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"max_blink_range"			"750"
+			}
+			"03"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"bonus_movement_speed"		"75"
+			}
+		}
+
+		"OnSpellStart"
+		{
+			"RunScript"
+			{
+				"ScriptFile"				"items/item_boots_of_speed.lua"
+				"Function"					"blink_start"
+				
+				"Target"					"POINT"
+				
+				"blink_effect"				"particles/econ/events/ti6/blink_dagger_start_ti6.vpcf"
+				"blink_effect_end"			"particles/econ/events/ti6/blink_dagger_end_ti6.vpcf"
+			}
+		}
+
+		"Modifiers"
+		{
+			"modifier_item_imba_blink_boots"
+			{
+				"Passive"					"1"
+				"IsHidden"					"1"
+				
+				"Attributes" 				"MODIFIER_ATTRIBUTE_MULTIPLE"
+				
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_MOVESPEED_BONUS_UNIQUE"		"%bonus_movement_speed"
+				}
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Blades of Attack
+	//=================================================================================================================
+	"item_blades_of_attack2"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"						"item_datadriven"
+		"AbilityTextureName"			"blades_of_attack2"		
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"ID"							"2525"
+		"Model"							"models/items/bounty_hunter/twinblades_offhand/twinblades_offhand.vmdl"
+		"Effect"						"particles/generic_gameplay/dropped_item.vpcf"
+
+		// Item Info
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemCost"						"10000"
+		"ItemShopTags"					"damage"
+		"ItemQuality"					"component"
+		"ItemAliases"					"blades of attack"
+		"ItemStackable"					"0"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
+		"ItemPermanent"					"0"
+		"SecretShop"					"1"
+
+		// Special	
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_damage"			"110"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_movespeed"		"5"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"bat_reduction"			"0.05"
+			}
+		}
+
+		"OnEquip"
+		{
+			"RunScript"
+			{
+				"ScriptFile"    "items/claws_of_attack.lua"
+				"Function"      "EquipClaws"
+			}
+		}
+
+		"OnUnequip"
+		{
+			"RunScript"
+			{
+				"ScriptFile"    "items/claws_of_attack.lua"
+				"Function"      "UnequipClaws"
+			}
+		}
+
+		"Modifiers"
+		{
+			"modifier_claws_of_attack"
+			{
+				"Passive"			"1"
+				"IsHidden"			"1"
+				"Attributes"		"MODIFIER_ATTRIBUTE_MULTIPLE"
+
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE"		"%bonus_damage"
+					"MODIFIER_PROPERTY_MOVESPEED_BONUS_CONSTANT"	"%bonus_movespeed"
+				}
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Recipe: Claws of Attack
+	//=================================================================================================================
+	"item_recipe_claws_of_attack"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"ID"							"2526"
+		"BaseClass"             		"item_datadriven"
+		"Model"							"models/props_gameplay/recipe.mdl"
+		
+		// Item Info
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemCost"						"40000"	
+		"ItemShopTags"					""
+		
+		// Recipe
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemRecipe"					"1"
+		"SecretShop"					"1"
+		"ItemResult"					"item_claws_of_attack"
+		"ItemRequirements"
+		{
+			"01"						"item_blades_of_attack2"
+		}
 	}
 } // End of npc_items_custom.txt

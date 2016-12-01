@@ -8,12 +8,12 @@
 		"override_hero"					"npc_dota_hero_slardar"
 		"AbilityLayout"					"6"
 		"MovementSpeed"					"380"
-		"ModelScale"					"1.4"
+		"ModelScale"					"1.15"
 		"AttackDamageMin"				"70"
 		"AttackDamageMax"				"80"
 		"AttackRange"					"190"
 		"HealthBarOffset"				"250"
-		"RingRadius"					"140"
+		"RingRadius"					"120"
 		"ProjectileSpeed"				"1200"
 
 		"AttributeStrengthGain"			"20"
@@ -30,11 +30,11 @@
 	}
 
 	//========================================================================================================
-	// HERO: Lich King (Abaddon)
+	// HERO: Lich King (Skeleton King)
 	//========================================================================================================
-	"npc_dota_hero_abaddon_holdout"
+	"npc_dota_hero_skeleton_king_holdout"
 	{
-		"override_hero"					"npc_dota_hero_abaddon"
+		"override_hero"					"npc_dota_hero_skeleton_king"
 		"AbilityLayout"					"6"
 		"ModelScale"					"1.2"
 		"AttackDamageMin"				"70"
@@ -50,10 +50,10 @@
 		"Ability1"				"holdout_death_coil_alt"
 		"Ability2"				"holdout_howling_blast"		
 		"Ability3"				"holdout_frozen_tempest"
-		"Ability4"				"holdout_army_of_the_dead"
-		"Ability5"				"holdout_frostmourne_hungers"
+		"Ability4"				"holdout_icy_heartstopper"
+		"Ability5"				"holdout_frostmourne_innate"
 		"Ability6"				"holdout_sindragosa"
-		"Ability7"				"holdout_red_effect"
+		"Ability7"				"holdout_blue_effect"
 		"Ability16"				"ability_unit_died_death"
 	}
 
@@ -92,18 +92,85 @@
 		"override_hero"					"npc_dota_hero_brewmaster"
 		"AbilityLayout"					"6"
 		"MovementSpeed"					"360"
+		"ModelScale"					"1.0"
 
 		"AttributeStrengthGain"			"10"
 		"AttributeAgilityGain"			"5"
 		"AttributeIntelligenceGain"		"5"
 
 		"Ability1"						"holdout_drunken_haze"
-		"Ability2"						"holdout_dragon_slave"
+		"Ability2"						"holdout_dragon_slave_alt"
 		"Ability3"						"holdout_drunken_brawler"
 		"Ability4"						"holdout_permanent_immolation"
 		"Ability5"						"shadow_shaman_shackles"
 		"Ability6"						"holdout_earthquake"
 		"Ability16"						"ability_unit_died_fire"
+	}
+
+	//========================================================================================================
+	// HERO: Dark Fundamental( Chaos Knight )
+	//========================================================================================================
+	"npc_dota_hero_chaos_knight_holdout"
+	{
+		"override_hero"					"npc_dota_hero_chaos_knight"
+		"AbilityLayout"					"6"
+		"MovementSpeed"					"335"
+		"ModelScale"					"1.1"
+
+		"AttackDamageMin"				"40"
+		"AttackDamageMax"				"55"
+		"ArmorPhysical"					"7.0"
+		"AttributePrimary"				"DOTA_ATTRIBUTE_INTELLECT"
+		"AttributeBaseStrength"			"0"
+		"AttributeBaseAgility"			"0"
+		"AttributeBaseIntelligence"		"0"
+		"AttributeStrengthGain"			"0"
+		"AttributeAgilityGain"			"0"
+		"AttributeIntelligenceGain"		"0"
+
+		"Ability1"						"holdout_power_mount_str"
+		"Ability2"						"holdout_dark_cleave"
+		"Ability3"						"holdout_instakill"		
+		"Ability4"						"holdout_requiem"
+		"Ability5"						"holdout_skin_changer_caster"
+		"Ability6"						"holdout_odin"
+		"Ability7"						"holdout_power_mount_agi"
+		"Ability8"						"holdout_power_mount_int"
+		"Ability9"						"holdout_health_buff"
+		"Ability16"						"ability_unit_died_fire"
+	}
+
+	//========================================================================================================
+	// HERO: Light Fundamental( Keeper of the Light )
+	//========================================================================================================
+	"npc_dota_hero_keeper_of_the_light_holdout"
+	{
+		"override_hero"					"npc_dota_hero_keeper_of_the_light"
+		"AbilityLayout"					"6"
+		"MovementSpeed"					"375"
+		"ModelScale"					"1.1"
+
+		"AttackDamageMin"				"45"
+		"AttackDamageMax"				"55"
+		"ArmorPhysical"					"0.0"
+		"AttributePrimary"				"DOTA_ATTRIBUTE_INTELLECT"
+		"AttributeBaseStrength"			"0"
+		"AttributeBaseAgility"			"0"
+		"AttributeBaseIntelligence"		"0"
+		"AttributeStrengthGain"			"0"
+		"AttributeAgilityGain"			"0"
+		"AttributeIntelligenceGain"		"0"
+
+		"Ability1"						"holdout_power_mount_str"
+		"Ability2"						"holdout_mechanism"
+		"Ability3"						"holdout_light_stand"		
+		"Ability4"						"holdout_sacred_pool"
+		"Ability5"						"holdout_skin_changer_warrior"
+		"Ability6"						"holdout_guardian_angel"
+		"Ability7"						"holdout_power_mount_agi"
+		"Ability8"						"holdout_power_mount_int"
+		"Ability9"						"holdout_health_buff"
+		"Ability16"						"ability_unit_died_light"
 	}
 
 	//========================================================================================================
@@ -138,6 +205,7 @@
 		"override_hero"					"npc_dota_hero_dragon_knight"
 		"AbilityLayout"					"6"
 		"MovementSpeed"					"350"
+		"ModelScale"					"1.0" //0.84
 
 		"AttackDamageMin"				"21"
 		"AttackDamageMax"				"27"
@@ -168,8 +236,8 @@
 		"AttributeAgilityGain"			"5"
 		"AttributeIntelligenceGain"		"5"
 
-		"Ability1"						"holdout_war_stomp"
-		"Ability2"						"holdout_shockwave"
+		"Ability1"						"holdout_shockwave"
+		"Ability2"						"holdout_war_stomp"
 		"Ability3"						"holdout_chieftain_endurance_aura"
 		"Ability4"						"holdout_pulverize"
 		"Ability5"						"holdout_roar"
@@ -184,8 +252,8 @@
 	{
 		"override_hero"					"npc_dota_hero_beastmaster"
 		"AbilityLayout"					"6"
-		"MovementSpeed"					"375"
-		"ModelScale"					"1.1"
+		"MovementSpeed"					"350"
+		"ModelScale"					"1.0"
 
 		"HealthBarOffset"				"190"
 		"AttackDamageMin"				"49"
@@ -239,34 +307,37 @@
 	}
 
 	//========================================================================================================
-	// HERO: Banehallow (Shadow Fiend)
+	// HERO: Malfurion( Viper, one of the rare heroes not having custom atachments )
 	//========================================================================================================
-	"npc_dota_hero_nevermore_holdout"
+	"npc_dota_viper_holdout"
 	{
-		"override_hero"					"npc_dota_hero_nevermore"
+		"override_hero"					"npc_dota_hero_viper"
+		"Model"							"models/items/lone_druid/true_form/form_of_the_atniw/form_of_the_atniw.vmdl"
+		"Portrait"						"vgui/hud/heroportraits/portrait_treant"
+		"ModelScale"					"0.95"
 		"AbilityLayout"					"6"
-		"MovementSpeed"					"365"
+		"MovementSpeed"					"360"
+		"AttackDamageMin"				"46"
+		"AttackDamageMax"				"56"
+		"AttackCapabilities"			"DOTA_UNIT_CAP_MELEE_ATTACK"
+		"AttackRange"					"160"
+		"AttackRate"					"1.6"
+		"ProjectileModel"				""
+		"ProjectileSpeed"				""
 
-		"ModelScale"					"1.1"
-		"AttackDamageMin"				"10"
-		"AttackDamageMax"				"15"
-		"AttackRange"					"600"
-		"AttributePrimary"				"DOTA_ATTRIBUTE_STRENGTH"
-		"AttributeBaseStrength"			"29"
 		"AttributeStrengthGain"			"10"
 		"AttributeAgilityGain"			"5"
 		"AttributeIntelligenceGain"		"5"
-		"MovementTurnRate"				"0.500000"
-		"HealthBarOffset"				"230"
+		"AttributePrimary"				"DOTA_ATTRIBUTE_STRENGTH"
 
-		"Ability1"						"holdout_bane_death_coil"
-		"Ability2"						"holdout_bane_permanent_immolation"
-		"Ability3"						"holdout_bane_critical"		
-		"Ability4"						"holdout_endurance_aura"
-		"Ability5"						"holdout_command_aura_innate"
-		"Ability6"						"holdout_stampede"
-		"Ability7"						"holdout_green_effect"
-		"Ability16"						"ability_unit_died_death"
+		"Ability1"						"holdout_entrangling_roots"
+		"Ability2"						"holdout_rejuvenation_alt"
+		"Ability3"						"holdout_mark_of_the_claw"
+		"Ability4"						"holdout_hardened_skin"
+		"Ability5"						"holdout_strength_of_the_wild"
+		"Ability6"						"holdout_bear_form"
+		"Ability7"						"holdout_bear_form_druid"
+		"Ability16"						"ability_unit_died_light"
 	}
 
 	//========================================================================================================
@@ -323,9 +394,9 @@
 	//========================================================================================================
 	// HERO: Archimage( Keeper of the Light )
 	//========================================================================================================
-	"npc_dota_hero_keeper_of_the_light_holdout"
+	"npc_dota_hero_chen_holdout"
 	{
-		"override_hero"					"npc_dota_hero_keeper_of_the_light"
+		"override_hero"					"npc_dota_hero_chen"
 		"AbilityLayout"					"6"
 		"MovementSpeed"					"370"
 
@@ -354,10 +425,12 @@
 		"override_hero"					"npc_dota_hero_lich"
 		"AbilityLayout"					"6"
 		"MovementSpeed"					"375"
+		"ModelScale"					"1.0"
 
 		"AttributeStrengthGain"			"5"
 		"AttributeAgilityGain"			"5"
 		"AttributeIntelligenceGain"		"10"
+		"ProjectileSpeed"				"1000"
 
 		"Ability1"						"holdout_frost_nova"
 		"Ability2"						"holdout_frost_breath"
@@ -398,7 +471,7 @@
 	"npc_dota_hero_luna_holdout"
 	{
 		"override_hero"					"npc_dota_hero_luna"
-		"ModelScale"					"1.1"
+		"ModelScale"					"1.0"
 		"AbilityLayout"					"6"
 		"MovementSpeed"					"335"
 		"ProjectileModel"				"particles/econ/items/luna/luna_crescent_moon/luna_attack_crescent_moon.vpcf"
@@ -413,6 +486,29 @@
 		"Ability4"						"holdout_elunes_grace"
 		"Ability5"						"holdout_innate_lunar_glaive"
 		"Ability6"						"holdout_moon_explosion"
+		"Ability16"						"ability_unit_died_light"
+	}
+
+	//========================================================================================================
+	// HERO: Kobold Knight( Meepo )
+	//========================================================================================================
+	"npc_dota_hero_meepo_holdout"
+	{
+		"override_hero"					"npc_dota_hero_meepo"
+		"ModelScale"					"1.45"
+		"AbilityLayout"					"6"
+		"MovementSpeed"					"345"
+
+		"AttributeStrengthGain"			"10"
+		"AttributeAgilityGain"			"20"
+		"AttributeIntelligenceGain"		"10"
+
+		"Ability1"						"holdout_life_steal"
+		"Ability2"						"meepo_poof"
+		"Ability3"						"holdout_slow_pool"
+		"Ability4"						"holdout_divine_aura"
+		"Ability5"						"holdout_last_stand"
+		"Ability6"						"holdout_kobold_army"
 		"Ability16"						"ability_unit_died_light"
 	}
 
@@ -443,34 +539,34 @@
 	}
 
 	//========================================================================================================
-	// HERO: Crypt Lord( Weaver )
+	// HERO: Banehallow (Shadow Fiend)
 	//========================================================================================================
-	"npc_dota_hero_weaver_holdout"
+	"npc_dota_hero_nevermore_holdout"
 	{
-		"override_hero"					"npc_dota_hero_weaver"
+		"override_hero"					"npc_dota_hero_nevermore"
 		"AbilityLayout"					"6"
-		"MovementSpeed"					"355"
-		"AttackDamageMin"				"61"
-		"AttackDamageMax"				"71"
-		"ModelScale"					"1.1"
+		"MovementSpeed"					"365"
 
+		"ModelScale"					"1.1"
+		"AttackDamageMin"				"10"
+		"AttackDamageMax"				"15"
+		"AttackRange"					"600"
 		"AttributePrimary"				"DOTA_ATTRIBUTE_STRENGTH"
+		"AttributeBaseStrength"			"29"
 		"AttributeStrengthGain"			"10"
 		"AttributeAgilityGain"			"5"
 		"AttributeIntelligenceGain"		"5"
-		"AttackCapabilities"			"DOTA_UNIT_CAP_MELEE_ATTACK"
-		"AttackRange"					"160"
-		"ProjectileModel"				""
-		"ProjectileSpeed"				""
+		"MovementTurnRate"				"0.5"
+		"HealthBarOffset"				"230"
 
-		"Ability1"						"nyx_assassin_impale"
-		"Ability2"						"holdout_carrion_beetles"
-		"Ability3"						"holdout_poison_sting"
-		"Ability4"						"holdout_spiked_carapace"
-		"Ability5"						"holdout_anubarak_claw"
-		"Ability6"						"holdout_locust_swarm"
-		"Ability7"						"ability_unit_died_death"
-//		"Ability16"						""
+		"Ability1"						"holdout_bane_death_coil"
+		"Ability2"						"holdout_bane_permanent_immolation"
+		"Ability3"						"holdout_bane_critical"		
+		"Ability4"						"holdout_endurance_aura"
+		"Ability5"						"holdout_command_aura_innate"
+		"Ability6"						"holdout_stampede"
+		"Ability7"						"holdout_green_effect"
+		"Ability16"						"ability_unit_died_death"
 	}
 
 	//========================================================================================================
@@ -483,6 +579,7 @@
 		"MovementSpeed"					"365"
 		"AttackDamageMin"				"61"
 		"AttackDamageMax"				"71"
+		"ModelScale"					"0.85"
 
 		"AttributeStrengthGain"			"10"
 		"AttributeAgilityGain"			"5"
@@ -530,8 +627,9 @@
 	"npc_dota_hero_pugna_holdout"
 	{
 		"override_hero"					"npc_dota_hero_pugna"
+		"ModelScale"					"0.95"
 		"AbilityLayout"					"6"
-		"MovementSpeed"					"380"
+		"MovementSpeed"					"370"
 		"AttackCapabilities"			"DOTA_UNIT_CAP_MELEE_ATTACK"
 		"AttackRange"					"150"
 		"ProjectileModel"				""
@@ -648,8 +746,8 @@
 		"AttributeAgilityGain"			"5"
 		"AttributeIntelligenceGain"		"5"
 
-		"Ability1"						"sven_storm_bolt"
-		"Ability2"						"brewmaster_thunder_clap"
+		"Ability1"						"holdout_storm_bolt"
+		"Ability2"						"holdout_thunder_clap"
 		"Ability3"						"holdout_muradin_hammer"		
 		"Ability4"						"slardar_bash"
 		"Ability5"						"holdout_thunder_spirit"
@@ -706,6 +804,36 @@
 		"AttackRange"					"150"
 		"ProjectileModel"				""
 		"ProjectileSpeed"				"900"
+	}
+
+	//========================================================================================================
+	// HERO: Crypt Lord( Weaver )
+	//========================================================================================================
+	"npc_dota_hero_weaver_holdout"
+	{
+		"override_hero"					"npc_dota_hero_weaver"
+		"AbilityLayout"					"6"
+		"MovementSpeed"					"355"
+		"AttackDamageMin"				"61"
+		"AttackDamageMax"				"71"
+		"ModelScale"					"1.1"
+
+		"AttributePrimary"				"DOTA_ATTRIBUTE_STRENGTH"
+		"AttributeStrengthGain"			"10"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"5"
+		"AttackCapabilities"			"DOTA_UNIT_CAP_MELEE_ATTACK"
+		"AttackRange"					"160"
+		"ProjectileModel"				""
+		"ProjectileSpeed"				""
+
+		"Ability1"						"nyx_assassin_impale"
+		"Ability2"						"holdout_carrion_beetles"
+		"Ability3"						"holdout_poison_sting"
+		"Ability4"						"holdout_spiked_carapace"
+		"Ability5"						"holdout_anubarak_claw"
+		"Ability6"						"holdout_locust_swarm"
+		"Ability16"						"ability_unit_died_death"
 	}
 
 	//========================================================================================================

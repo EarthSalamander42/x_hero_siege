@@ -1,20 +1,20 @@
---[[
-	Author: Noya
-	Date: 9.1.2015.
-	Does base damage plus a percent of the hero strength
-]]
 function Return( event )
 	-- Variables
 	local caster = event.caster
 	local attacker = event.attacker
 	local ability = event.ability
 	local damageType = ability:GetAbilityDamageType()
-	local divided_damage = ability:GetLevelSpecialValueFor( "divided_damage" , ability:GetLevel() - 1  )
+	local hero_damage = ability:GetLevelSpecialValueFor( "hero_return_percent" , ability:GetLevel() - 1  )
+	local creep_damage = ability:GetLevelSpecialValueFor( "creep_return_percent" , ability:GetLevel() - 1  )
 	local attacker_damage = attacker:GetBaseDamageMin()
+	local divided_damage = attacker_damage / 100
 
 	-- Damage
-	if attacker:GetTeamNumber() ~= caster:GetTeamNumber() and not attacker:IsBuilding() then
-		ApplyDamage({ victim = attacker, attacker = caster, damage = attacker_damage, damage_type = damageType })
-		print("done "..attacker_damage/divided_damage)
+	if attacker:GetTeamNumber() ~= caster:GetTeamNumber() and attacker:IsHero() then
+		ApplyDamage({ victim = attacker, attacker = caster, damage = divided_damage * hero_damage, damage_type = damageType })
+		print("[CRYPT LORD] Hero Damage Returned: "..divided_damage)
+	elseif attacker:GetTeamNumber() ~= caster:GetTeamNumber() and attacker:IsCreature() then
+		ApplyDamage({ victim = attacker, attacker = caster, damage = divided_damage * creep_damage, damage_type = damageType })
+		print("[CRYPT LORD] Hero Damage Returned: "..divided_damage)
 	end
 end

@@ -6,7 +6,6 @@ function Spawn( entityKeyValues )
 
 	Timers:CreateTimer(0,IllidanThink)
 	DebugPrint("Starting AI for "..thisEntity:GetUnitName().." "..thisEntity:GetEntityIndex())
-
 end
 
 function IllidanThink()

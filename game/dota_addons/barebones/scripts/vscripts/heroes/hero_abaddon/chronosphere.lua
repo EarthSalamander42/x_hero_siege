@@ -43,13 +43,18 @@ function ChronosphereAura( keys )
 	local duration = ability:GetLevelSpecialValueFor("aura_interval", ability_level)
 
 	-- Variable for deciding if Chronosphere should affect Faceless Void
-	if ignore_void == 0 then ignore_void = false
-	else ignore_void = true end
+	if ignore_void == 0 then
+		ignore_void = false
+	else
+		ignore_void = true
+	end
 
 	-- Check if it is a caster controlled unit or not
 	-- Caster controlled units get the phasing and movement speed modifier DISABLED ERRORS
 	if (caster:GetPlayerOwner() == target:GetPlayerOwner()) or (target:GetName() == "npc_dota_hero_faceless_void" and ignore_void) then
 --		target:AddNewModifier(caster, ability, "modifier_chronosphere_speed_lua", {duration = duration})
+--	elseif target:IsIllusion() then --doesn't work
+--		target:Kill(ability, caster)
 	else
 	-- Everyone else gets immobilized and stunned
 		target:InterruptMotionControllers(false)

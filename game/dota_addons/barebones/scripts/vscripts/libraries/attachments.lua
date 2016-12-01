@@ -60,38 +60,8 @@ ATTACHMENTS_VERSION = "0.85"
 
 --LinkLuaModifier( "modifier_animation_freeze", "libraries/modifiers/modifier_animation_freeze.lua", LUA_MODIFIER_MOTION_NONE )
 
-LinkLuaModifier( "modifier_animation_freeze_stun", "libraries/attachments.lua", LUA_MODIFIER_MOTION_NONE )
-
-modifier_animation_freeze_stun = class({})
-
-function modifier_animation_freeze_stun:OnCreated(keys) 
-
-end
-
-function modifier_animation_freeze_stun:GetAttributes()
-  return MODIFIER_ATTRIBUTE_PERMANENT + MODIFIER_ATTRIBUTE_IGNORE_INVULNERABLE --+ MODIFIER_ATTRIBUTE_MULTIPLE
-end
-
-function modifier_animation_freeze_stun:IsHidden()
-  return false
-end
-
-function modifier_animation_freeze_stun:IsDebuff() 
-  return false
-end
-
-function modifier_animation_freeze_stun:IsPurgable() 
-  return false
-end
-
-function modifier_animation_freeze_stun:CheckState() 
-  local state = {
-    [MODIFIER_STATE_FROZEN] = true,
-    [MODIFIER_STATE_STUNNED] = true,
-  }
-
-  return state
-end
+LinkLuaModifier( "modifier_animation_freeze_stun", "libraries/modifiers/modifier_animation_freeze_stun.lua", LUA_MODIFIER_MOTION_NONE )
+LinkLuaModifier( "modifier_boss_stun", "libraries/modifiers/modifier_boss_stun.lua", LUA_MODIFIER_MOTION_NONE )
 
 -- Drop out of self-include to prevent execution of timers library and other code in modifier lua VM environment
 if not Entities or not Entities.CreateByClassname then

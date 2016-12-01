@@ -22,7 +22,7 @@ function Splash(event)
 	local splash_targets = FindUnitsInRadius(attacker:GetTeamNumber(), target:GetAbsOrigin(), nil, radius, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, FIND_ANY_ORDER, false)
 	for _,unit in pairs(splash_targets) do
 		if unit ~= target and not unit:IsBuilding() then
-			ApplyDamage({victim = unit, attacker = attacker, damage = full_damage/4, ability = ability, damage_type = DAMAGE_TYPE_PHYSICAL})
+			ApplyDamage({victim = unit, attacker = attacker, damage = full_damage/5, ability = ability, damage_type = DAMAGE_TYPE_PHYSICAL})
 		end
 	end
 end
@@ -40,13 +40,13 @@ function Purge(event)
 	local BuffsCreatedThisFrameOnly = false
 	local RemoveStuns = false
 	local RemoveExceptions = false
-	target:Purge( RemovePositiveBuffs, RemoveDebuffs, BuffsCreatedThisFrameOnly, RemoveStuns, RemoveExceptions)
-	ParticleManager:CreateParticle('particles/generic_gameplay/generic_purge.vpcf', PATTACH_ABSORIGIN_FOLLOW, target)
-	target:EmitSound("DOTA_Item.DiffusalBlade.Target")
 
-	ability:ApplyDataDrivenModifier(caster, target, 'modifier_purge', {duration = duration}) 
-
-	if bSummoned then
+	if not target:IsBuilding() then
+		target:Purge( RemovePositiveBuffs, RemoveDebuffs, BuffsCreatedThisFrameOnly, RemoveStuns, RemoveExceptions)
+		ParticleManager:CreateParticle('particles/generic_gameplay/generic_purge.vpcf', PATTACH_ABSORIGIN_FOLLOW, target)
+		target:EmitSound("DOTA_Item.DiffusalBlade.Target")
+		ability:ApplyDataDrivenModifier(caster, target, 'modifier_purge', {duration = duration})
+	elseif bSummoned then
 		ApplyDamage({victim = target, attacker = caster, damage = ability:GetSpecialValueFor('damage_to_summons'), damage_type = DAMAGE_TYPE_PURE, ability = ability})
 	end
 end

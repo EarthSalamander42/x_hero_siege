@@ -23,6 +23,9 @@
 			<Label id="IncomingWaveGoal" text="#IncomingWaveGoal" />
 			<Label id="IncomingWaveTimer" text="--:--" />
 		</Panel>
+		<Panel id="ScoreboardSpecialEventsTime">
+			<Label id="SpecialEventsGoal" text="#SpecialEventsGoal" />
+			<Label id="SpecialEventsTimer" text="--:--" />
+		</Panel>
 	</Panel>
 </root>
-

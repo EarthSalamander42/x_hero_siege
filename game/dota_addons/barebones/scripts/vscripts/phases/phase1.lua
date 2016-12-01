@@ -1,120 +1,77 @@
 require('libraries/timers')
-require('gamemode')
-
-function spawn_deathghost(event)
-local caller = event.caller
-	local unit = CreateUnitByName("npc_death_ghost_tower", caller:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
-end
-
-function spawn_magnataur(event)
-local caller = event.caller
-local trigger_left = Entities:FindAllByName("trigger_phase2_left")
-local trigger_right = Entities:FindAllByName("trigger_phase2_right")
-print( "Barrack Destroyed!" )
-
-Notifications:TopToAll({text="Phase 2 creeps can now be triggered!", duration = 11.0})
-local unit = CreateUnitByName("npc_magnataur_destroyer_crypt", caller:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
-
-	for _,v in pairs(trigger_left) do
-		v:Enable()
-	end
-
-	for _,v in pairs(trigger_right) do
-		v:Enable()
-	end
-end
 
 function SpecialEventTP(event)
 local hero = event.activator
+local point = Entities:FindByName(nil,"point_teleport_special_events"):GetAbsOrigin()
 print("Entering Special Event Choice")
 
-local triggers_choice = Entities:FindAllByName("trigger_special_event_choice")
-local triggers_events = Entities:FindAllByName("trigger_special_event_frost_infernal")
-local triggers_back = Entities:FindAllByName("trigger_special_event_back")
+	Entities:FindByName(nil, "trigger_special_event_choice"):Disable()
+	Entities:FindByName(nil, "trigger_special_event_back"):Enable()
 
-	for _,v in pairs(triggers_choice) do
-		v:Disable()
-	end
-
-	for _,v in pairs(triggers_back) do
-		v:Enable()
-	end
-
-	for _,v in pairs(triggers_events) do
-		v:Enable()
-	end
-
-	local point = Entities:FindByName(nil,"point_teleport_special_events"):GetAbsOrigin()
+--	if hero:GetUnitName() == "npc_dota_hero_meepo" then
+--		local meepo_table = Entities:FindAllByName("npc_dota_hero_meepo")
+--		if meepo_table then
+--			for i = 1, #meepo_table do
+--				FindClearSpaceForUnit(meepo_table[i], point, false)
+--				meepo_table[i]:Stop()
+--				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
+--				Timers:CreateTimer(0.1, function()
+--					PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil) 
+--				end)
+--			end
+--		end
+--	else
 	FindClearSpaceForUnit(hero, point, true)
 	hero:Stop()
 	PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
-	Timers:CreateTimer(0.5,function () PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil) 
-	end)
+		Timers:CreateTimer(0.1, function()
+			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil) 
+		end)
+--	end
 end
 
 function SpecialEventBack(event)
 local hero = event.activator
 print("Leaving Special Event Choice")
-local triggers_choice = Entities:FindAllByName("trigger_special_event_choice")
-local triggers_events = Entities:FindAllByName("trigger_special_event_frost_infernal")
 
-	for _,v in pairs(triggers_choice) do
-		v:Enable()
-	end
-
-	for _,v in pairs(triggers_events) do
-		v:Disable()
-	end
+	Entities:FindByName(nil, "trigger_special_event_choice"):Enable()
 
 	local point = Entities:FindByName(nil, "base_spawn"):GetAbsOrigin()
 	FindClearSpaceForUnit(hero, point, true)
 	hero:Stop()
 	PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
-	Timers:CreateTimer(0.5,function () PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil) 
+	Timers:CreateTimer(0.1,function()
+		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil) 
 	end)
 end
 
 function FrostInfernalEvent(event)
 local hero = event.activator
-print("Entering Frost Infernal")
-local triggers_choice = Entities:FindAllByName("trigger_special_event_choice")
-local triggers_events = Entities:FindAllByName("trigger_special_event")
-local triggers_back = Entities:FindAllByName("trigger_special_event_back")
-local triggers_back2 = Entities:FindAllByName("trigger_special_event_back2")
-local triggers_frost_infernal_duration = Entities:FindAllByName("trigger_frost_infernal_duration")
 local point_hero = Entities:FindByName(nil, "special_event_player_point"):GetAbsOrigin()
 local point_beast = Entities:FindByName(nil, "special_event_boss_point"):GetAbsOrigin()
-FrostInfernalTimer()
+print("Entering Frost Infernal")
 
-	for _,v in pairs(triggers_events) do
-		v:Disable()
-	end
-
-	for _,v in pairs(triggers_back) do
-		v:Disable()
-	end
-
-	for _,v in pairs(triggers_back2) do
-		v:Enable()
-	end
-
-	for _,v in pairs(triggers_choice) do
-		v:Disable()
-	end
-
-	for _,v in pairs(triggers_frost_infernal_duration) do
-		v:Enable()
-	end
+	SpecialEventsTimer()
+	Entities:FindByName(nil, "trigger_special_event_back"):Disable()
+	Entities:FindByName(nil, "trigger_special_event_back2"):Enable()
 
 	PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
-	Timers:CreateTimer(0.5,function () PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil) 
+	Timers:CreateTimer(0.1, function()
+		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil) 
 	end)
 
-	Timers:CreateTimer(120.0,function ()
-		GameMode.frost_infernal:RemoveSelf()
-		for _,v in pairs(triggers_choice) do
-			v:Enable()
+	Timers:CreateTimer(120.0,function()
+		if GameMode.FrostInfernal_killed == 0 then
+			Entities:FindByName(nil, "trigger_frost_infernal_duration"):Enable()
+
+			Timers:CreateTimer(3.5, function() --Debug time in case Frost Infernal kills the player at the very last second
+				Entities:FindByName(nil, "trigger_frost_infernal_duration"):Disable()
+			end)
 		end
+	end)
+
+	Timers:CreateTimer(125.0,function()
+		Entities:FindByName(nil, "trigger_special_event_choice"):Enable()
 	end)
 
 	GameMode.frost_infernal = CreateUnitByName("npc_frost_infernal", point_beast, true, nil, nil, DOTA_TEAM_CUSTOM_1)
@@ -125,19 +82,45 @@ FrostInfernalTimer()
 	if IsValidEntity(hero) then
 		--Fire the game event to teleport hero to the event
 		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
-		Timers:CreateTimer(0.5,function () PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil) 
+		Timers:CreateTimer(0.1, function()
+			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil) 
 		end)
 		FindClearSpaceForUnit(hero ,point_hero, true)
 		hero:Stop()
-		local msg = "Special Event: Kill Frost Infernal for a powerful item. You have 2 minutes."
+		local msg = "Special Event: Kill Frost Infernal for the Key of the 3 Moons. You have 2 minutes."
 		Notifications:Top(hero:GetPlayerOwnerID(),{text=msg, duration=5.0})
 	end
+end
+
+function FrostInfernalBack(event)
+local hero = event.activator
+print("Leaving Frost Infernal")
+--	SpecialEventsTimerEnd()
+
+	if not GameMode.frost_infernal:IsNull() then
+		GameMode.frost_infernal:RemoveSelf()
+	end
+
+--	Entities:FindByName(nil, "trigger_special_event_choice"):Enable()
+
+	local point = Entities:FindByName(nil, "base_spawn"):GetAbsOrigin()
+	FindClearSpaceForUnit(hero, point, true)
+	hero:Stop()
+	PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
+	Timers:CreateTimer(0.1, function()
+		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil) 
+	end)
 end
 
 function FrostInfernalDead(event)
 local hero = event.activator
 print("Frost Infernal Dead")
-FrostInfernalTimerEnd()
+SpecialEventsTimerEnd()
+
+	DoEntFire("trigger_special_event_frost_infernal", "Kill", nil ,0 ,nil ,nil)
+	DoEntFire("trigger_frost_infernal_duration", "Kill", nil ,0 ,nil ,nil)
+	Entities:FindByName(nil, "trigger_special_event_frost_infernal_killed"):Enable()
+	GameMode.FrostInfernal_killed = 1
 
 	Timers:CreateTimer(0.5,function ()
 		-- Create the item
@@ -146,33 +129,113 @@ FrostInfernalTimerEnd()
 		local drop = CreateItemOnPositionSync( pos, item )
 		local pos_launch = pos+RandomVector(RandomFloat(150,200))
 		item:LaunchLoot(false, 300, 0.5, pos)
-		print("Frost Infernal dead")
+	end)
+
+	Timers:CreateTimer(5.0, function()
+		Entities:FindByName(nil, "trigger_special_event_choice"):Enable()
 	end)
 end
 
-function SpecialEventFrostInfernalBack(event)
+function FrostInfernalKilled(event)
 local hero = event.activator
-print("Leaving Frost Infernal")
-local triggers_choice = Entities:FindAllByName("trigger_special_event_choice")
-local triggers_events = Entities:FindAllByName("trigger_special_event_frost_infernal")
-FrostInfernalTimerEnd()
+local msg = "Frost Infernal has already been killed!"
 
-	if not GameMode.frost_infernal:IsNull() then
-		GameMode.frost_infernal:RemoveSelf()
+	Notifications:Top(hero:GetPlayerOwnerID(), {text = msg, duration = 5.0})
+end
+
+function SpiritBeastEvent(event)
+local hero = event.activator
+print("Entering Spirit Beast")
+local point_hero = Entities:FindByName(nil, "special_event_player_point2"):GetAbsOrigin()
+local point_beast = Entities:FindByName(nil, "special_event_boss_point2"):GetAbsOrigin()
+
+	SpecialEventsTimer()
+	Entities:FindByName(nil, "trigger_special_event_back"):Disable()
+	Entities:FindByName(nil, "trigger_special_event_back3"):Enable()
+
+	PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
+	Timers:CreateTimer(0.1, function()
+		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil) 
+	end)
+
+	Timers:CreateTimer(120.0,function()
+		if GameMode.SpiritBeast_killed == 0 then
+			Entities:FindByName(nil, "trigger_spirit_beast_duration"):Enable()
+
+			Timers:CreateTimer(3.5, function() --Debug time in case Frost Infernal kills the player at the very last second
+				Entities:FindByName(nil, "trigger_spirit_beast_duration"):Disable()
+			end)
+		end
+	end)
+
+	Timers:CreateTimer(125.0,function()
+		Entities:FindByName(nil, "trigger_special_event_choice"):Enable()
+	end)
+
+	GameMode.spirit_beast = CreateUnitByName("npc_spirit_beast", point_beast, true, nil, nil, DOTA_TEAM_CUSTOM_1)
+	GameMode.spirit_beast:SetAngles(0, 210, 0)
+	GameMode.spirit_beast:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {Duration = 5,IsHidden = true})
+	GameMode.spirit_beast:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 5,IsHidden = true})
+
+	if IsValidEntity(hero) then
+		--Fire the game event to teleport hero to the event
+		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
+		Timers:CreateTimer(0.1, function()
+			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil) 
+		end)
+		FindClearSpaceForUnit(hero ,point_hero, true)
+		hero:Stop()
+		local msg = "Special Event: Kill Spirit Beast for the Shield of Invincibility. You have 2 minutes."
+		Notifications:Top(hero:GetPlayerOwnerID(), {text = msg, duration = 5.0})
+	end
+end
+
+function SpiritBeastBack(event)
+local hero = event.activator
+print("Leaving Spirit Beast")
+--	SpecialEventsTimerEnd()
+
+	if not GameMode.spirit_beast:IsNull() then
+		GameMode.spirit_beast:RemoveSelf()
 	end
 
-	for _,v in pairs(triggers_choice) do
-		v:Enable()
-	end
-
-	for _,v in pairs(triggers_events) do
-		v:Disable()
-	end
+--	Entities:FindByName(nil, "trigger_special_event_choice"):Enable()
 
 	local point = Entities:FindByName(nil, "base_spawn"):GetAbsOrigin()
 	FindClearSpaceForUnit(hero, point, true)
 	hero:Stop()
 	PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
-	Timers:CreateTimer(0.5,function () PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil) 
+	Timers:CreateTimer(0.1, function()
+		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil) 
 	end)
+end
+
+function SpiritBeastDead(event)
+local hero = event.activator
+print("Spirit Beast Dead")
+SpecialEventsTimerEnd()
+
+	DoEntFire("trigger_special_event_spirit_beast", "Kill", nil ,0 ,nil ,nil)
+	DoEntFire("trigger_spirit_beast_duration", "Kill", nil ,0 ,nil ,nil)
+	Entities:FindByName(nil, "trigger_special_event_spirit_beast_killed"):Enable()
+	GameMode.SpiritBeast_killed = 1
+
+	Timers:CreateTimer(0.5, function()
+		-- Create the item
+		local item = CreateItem("item_shield_of_invincibility", nil, nil)
+		local pos = GameMode.spirit_beast:GetAbsOrigin()
+		local drop = CreateItemOnPositionSync( pos, item )
+		local pos_launch = pos + RandomVector(RandomFloat(150, 200))
+		item:LaunchLoot(false, 300, 0.5, pos)
+	end)
+
+	Timers:CreateTimer(5.0, function()
+		Entities:FindByName(nil, "trigger_special_event_choice"):Enable()
+	end)
+end
+
+function SpiritBeastKilled(event)
+local hero = event.activator
+local msg = "Spirit Beast has already been killed!"
+	Notifications:Top(hero:GetPlayerOwnerID(), {text = msg, duration = 5.0})
 end

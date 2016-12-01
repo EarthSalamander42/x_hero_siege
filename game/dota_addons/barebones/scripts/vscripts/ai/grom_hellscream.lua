@@ -1,198 +1,43 @@
---[[
-Grom Hellscream AI
-]]
-
-require( "ai_core" )
-
-behaviorSystem = {} -- create the global so we can assign to it
+require('libraries/timers')
 
 function Spawn( entityKeyValues )
-	thisEntity:SetContextThink( "AIThink", AIThink, 0.25 )
-    behaviorSystem = AICore:CreateBehaviorSystem( { BehaviorNone, BehaviorBladeFury, BehaviorRunAway } ) 
+	Ability_mirror_image = thisEntity:FindAbilityByName("grom_hellscream_mirror_image")
+	Ability_blade_fury = thisEntity:FindAbilityByName("grom_hellscream_bladefury")
+
+	Timers:CreateTimer(0,GromThink)
+	DebugPrint("Starting AI for "..thisEntity:GetUnitName().." "..thisEntity:GetEntityIndex())
+
 end
 
-function AIThink() -- For some reason AddThinkToEnt doesn't accept member functions
-       return behaviorSystem:Think()
-end
-
-function CollectRetreatMarkers()
-	local result = {}
-	local i = 1
-	local wp = nil
-	while true do
-		wp = Entities:FindByName( nil, string.format("npc_dota_spawner_%d", i ) )
-		if not wp then
-			return result
-		end
-		table.insert( result, wp:GetOrigin() )
-		i = i + 1
+function GromThink()
+	-- body
+	if thisEntity:IsNull() or not thisEntity:IsAlive() then
+		return nil
 	end
-end
-POSITIONS_retreat = CollectRetreatMarkers()
-
---------------------------------------------------------------------------------------------------------
-
-BehaviorNone = {}
-
-function BehaviorNone:Evaluate()
-	return 1 -- must return a value > 0, so we have a default
-end
-
-function BehaviorNone:Begin()
-	self.endTime = GameRules:GetGameTime() + 1
-	
-	local ancient =  Entities:FindByName( nil, "spawn_grom_hellscream" )
-	
-	if ancient then
-		self.order =
-		{
-			UnitIndex = thisEntity:entindex(),
-			OrderType = DOTA_UNIT_ORDER_ATTACK_MOVE,
-			Position = ancient:GetOrigin()
-		}
-	else
-		self.order =
-		{
-			UnitIndex = thisEntity:entindex(),
-			OrderType = DOTA_UNIT_ORDER_STOP
-		}
-	end
-end
-
-function BehaviorNone:Continue()
-	self.endTime = GameRules:GetGameTime() + 1
-end
-
---------------------------------------------------------------------------------------------------------
-
-BehaviorBladeFury = {}
-
-function BehaviorBladeFury:Evaluate()
-	ABILITY_bladefury = thisEntity:FindAbilityByName("creature_blade_fury")
-	local desire = 0
-
-	-- let's not choose this twice in a row
-	if AICore.currentBehavior == self then return desire end
-
-	local enemies = FindUnitsInRadius( DOTA_TEAM_BADGUYS, thisEntity:GetOrigin(), nil, 1500, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_ALL, 0, 0, false )
-	if #enemies > 0 then
-		if ABILITY_bladefury and ABILITY_bladefury:IsFullyCastable() then
-			thisEntity:Stop()
-			thisEntity:CastAbilityNoTarget( ABILITY_bladefury, -1 )
+	if thisEntity:IsIllusion() and GameRules:GetCustomGameDifficulty() ~= 4 then
+		return nil
+	elseif Ability_mirror_image:IsFullyCastable() then
+		local units = FindUnitsInRadius(thisEntity:GetTeamNumber(), thisEntity:GetAbsOrigin(), nil, 300, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)
+		local number = 0 
+		for _,v in pairs(units) do
+			number = number +1
 		end
-	end
-
-	return desire
-end
-
-function BehaviorBladeFury:Begin()
-	self.endTime = GameRules:GetGameTime() + 5
-
-	self.order =
-	{
-		OrderType = DOTA_UNIT_ORDER_CAST_POSITION,
-		UnitIndex = thisEntity:entindex(),
-		TargetIndex = self.target:entindex(),
-		AbilityIndex = ABILITY_bladefury:entindex()
-	}
-end
-
-BehaviorBladeFury.Continue = BehaviorBladeFury.Begin --if we re-enter this ability, we might have a different target; might as well do a full reset
-
-function BehaviorBladeFury:Think(dt)
-	if not self.target:IsAlive() then
-		self.endTime = GameRules:GetGameTime()
-		return
-	end
-end
-
---------------------------------------------------------------------------------------------------------
-
-BehaviorRunAway = {}
-
-function BehaviorRunAway:Evaluate()
-	local desire = 0
-	local happyPlaceIndex =  RandomInt( 1, #POSITIONS_retreat )
-	escapePoint = POSITIONS_retreat[ happyPlaceIndex ]
-	-- let's not choose this twice in a row
-	if currentBehavior == self then return desire end
-	
-	local enemies = FindUnitsInRadius( DOTA_TEAM_BADGUYS, thisEntity:GetOrigin(), nil, 700, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO, 0, 0, false )
-	if #enemies > 0 then
-		desire = #enemies
-	end 
-	
-	for i=0,DOTA_ITEM_MAX-1 do
-		local item = thisEntity:GetItemInSlot( i )
-		if item and item:GetAbilityName() == "item_force_staff" then
-			self.forceAbility = item
-		end
-		if item and item:GetAbilityName() == "item_phase_boots" then
-			self.phaseAbility = item
-		end
-		if item and item:GetAbilityName() == "item_ancient_janggo" then
-			self.drumAbility = item
-		end
-		if item and item:GetAbilityName() == "item_urn_of_shadows" then
-			self.urnAbility = item
-		end
-	end
-	
-	return desire
-end
-
-
-function BehaviorRunAway:Begin()
-	self.endTime = GameRules:GetGameTime() + 6
-
-	self.order =
-	{
-		OrderType = DOTA_UNIT_ORDER_CAST_TARGET,
-		UnitIndex = thisEntity:entindex(),
-		TargetIndex = thisEntity:entindex(),
-		AbilityIndex = self.forceAbility:entindex()
-	}
-end
-
-function BehaviorRunAway:Think(dt)
-	
-	ExecuteOrderFromTable({
-			UnitIndex = thisEntity:entindex(),
-			OrderType = DOTA_UNIT_ORDER_CAST_TARGET,
-			TargetIndex = thisEntity:entindex(),
-			AbilityIndex = self.forceAbility:entindex()
-		})
 		
-	if self.forceAbility and not self.forceAbility:IsFullyCastable() then
-		ExecuteOrderFromTable({
-			UnitIndex = thisEntity:entindex(),
-			OrderType = DOTA_UNIT_ORDER_MOVE_TO_POSITION,
-			Position = escapePoint
-		})
-		ExecuteOrderFromTable({
-			UnitIndex = thisEntity:entindex(),
-			OrderType = DOTA_UNIT_ORDER_CAST_NO_TARGET,
-			AbilityIndex = self.drumAbility:entindex()
-		})
-		ExecuteOrderFromTable({
-			UnitIndex = thisEntity:entindex(),
-			OrderType = DOTA_UNIT_ORDER_CAST_NO_TARGET,
-			AbilityIndex = self.phaseAbility:entindex()
-		})
+		local units = FindUnitsInRadius(thisEntity:GetTeamNumber(), thisEntity:GetAbsOrigin(), nil, 1000, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)
+		local numberoffriends = 0 
+		for _,v in pairs(units) do
+			numberoffriends = numberoffriends +1
+
+		end
+		print(numberoffriends)
+		if number >= 1 and numberoffriends <= 15 then
+			thisEntity:CastAbilityNoTarget(Ability_mirror_image,-1)
+		end
+	elseif Ability_blade_fury:IsFullyCastable() then
+		local units = FindUnitsInRadius(thisEntity:GetTeamNumber(), thisEntity:GetAbsOrigin(), nil,  Ability_blade_fury:GetSpecialValueFor("radius")-5, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)		
+		if units ~= nil then
+			thisEntity:CastAbilityNoTarget(Ability_blade_fury,-1)
+		end
 	end
-	
-	if self.urnAbility and self.urnAbility:IsFullyCastable() and self.endTime < GameRules:GetGameTime() + 2 then
-		ExecuteOrderFromTable({
-			UnitIndex = thisEntity:entindex(),
-			OrderType = DOTA_UNIT_ORDER_CAST_TARGET,
-			TargetIndex = thisEntity:entindex(),
-			AbilityIndex = self.urnAbility:entindex()
-		})
-	end
+	return 2
 end
-
-BehaviorRunAway.Continue = BehaviorRunAway.Begin
-
---------------------------------------------------------------------------------------------------------
-
-AICore.possibleBehaviors = { BehaviorNone, BehaviorBladeFury, BehaviorRunAway }
