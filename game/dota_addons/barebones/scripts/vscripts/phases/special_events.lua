@@ -55,7 +55,6 @@ function EndMuradinEvent(keys)
 end
 
 function FarmEvent() -- 24 Min, lasts 3 Min.
-local point_back = Entities:FindByName(nil,"base_spawn"):GetAbsOrigin()
 local heroes = HeroList:GetAllHeroes()
 nCOUNTDOWNTIMER = 180
 nCOUNTDOWNCREEP = 1
@@ -81,7 +80,7 @@ BT_ENABLED = 0
 		elseif id == -1 then
 			return nil
 		else
-			for j = 1, 10 do
+			for j = 1, 5 do
 				FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
 				PlayerResource:SetCameraTarget(hero:GetPlayerID(), hero)
 --				hero:EmitSound("Muradin.StormEarthFire")
@@ -105,20 +104,16 @@ BT_ENABLED = 0
 
 	Timers:CreateTimer(180, function() -- 27:00 Min, teleport back to the spawn
 	local units = FindUnitsInRadius( DOTA_TEAM_NEUTRALS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE , FIND_ANY_ORDER, false )
-		for _,hero in pairs(heroes) do
-			FindClearSpaceForUnit(hero, point_back, true)
-			PlayerResource:SetCameraTarget(hero:GetPlayerID(), hero)
---			hero:StopSound("Muradin.StormEarthFire")
-			BT_ENABLED = 1
-
-			Timers:CreateTimer(0.1, function()
-				PlayerResource:SetCameraTarget(hero:GetPlayerID(), nil)
-			end)
-		end
+	local teleporters = Entities:FindAllByName("trigger_farm_event")
 
 		nCOUNTDOWNCREEP = 180
 		nCOUNTDOWNINCWAVE = 180
 		NEUTRAL_SPAWN = 0
+		BT_ENABLED = 1
+
+		for _,v in pairs(teleporters) do
+			v:Enable()
+		end
 
 		Timers:CreateTimer(0.1, function()
 			for _,v in pairs(units) do
@@ -126,6 +121,21 @@ BT_ENABLED = 0
 			end
 		end)
 	end)
+end
+
+function EndFarmEvent(keys)
+print("End Farm Event")
+local activator = keys.activator
+local point = Entities:FindByName(nil,"base_spawn"):GetAbsOrigin()
+
+	if activator:GetTeam() == DOTA_TEAM_GOODGUYS then
+	FindClearSpaceForUnit(activator, point, true)
+	PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(), activator)
+	Timers:CreateTimer(0.1, function()
+		PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(), nil)
+	end)
+	activator:Stop()
+	end
 end
 
 function FarmEventCreeps0()

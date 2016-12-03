@@ -91,51 +91,6 @@
 	}
 
 	//=================================================================================
-	// Dummy: Vision for allies, for Choose Hero section
-	//=================================================================================
-	"dummy_vision_choose_hero"
-	{
-		"BaseClass"					"npc_dota_creature"
-		"AttackCapabilities"		"DOTA_UNIT_CAP_NO_ATTACK"
-		"IsAncient"					"1"
-		"VisionDaytimeRange"		"15000"	
-		"VisionNighttimeRange"		"15000"
-		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_WARD"
-		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_NONE"
-		"Ability1"					"dummy_passive_invulnerable"
-	}
-
-	//=================================================================================
-	// Dummy: Vision for enemies
-	//=================================================================================
-	"dummy_vision_small"
-	{
-		"BaseClass"					"npc_dota_creature"
-		"AttackCapabilities"		"DOTA_UNIT_CAP_NO_ATTACK"
-		"IsAncient"					"1"
-		"VisionDaytimeRange"		"1500"	
-		"VisionNighttimeRange"		"1500"
-		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_WARD"
-		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_FLY"
-		"Ability1"					"dummy_passive_invulnerable"
-	}
-
-	//=================================================================================
-	// Dummy: Vision for enemies all around the map, weird bug fixing
-	//=================================================================================
-	"dummy_vision_enemy_all"
-	{
-		"BaseClass"					"npc_dota_creature"
-		"AttackCapabilities"		"DOTA_UNIT_CAP_NO_ATTACK"
-		"IsAncient"					"1"
-		"VisionDaytimeRange"		"15000"	
-		"VisionNighttimeRange"		"15000"
-		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_WARD"
-		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_FLY"
-		"Ability1"					"dummy_passive_invulnerable"
-	}
-
-	//=================================================================================
 	// Dummy: Unit Vulnerable (Used for Choose Hero System)
 	//=================================================================================
 	"dummy_unit_vulnerable"

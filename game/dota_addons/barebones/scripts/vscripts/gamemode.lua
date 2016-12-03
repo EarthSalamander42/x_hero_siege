@@ -437,7 +437,7 @@ local triggers_choice = Entities:FindAllByName("trigger_special_event_choice")
 		end)
 	end)
 
-	Timers:CreateTimer(1436, function() -- 1436 - 23:55 Min: FARM EVENT 2
+	Timers:CreateTimer(6, function() -- 1436 - 23:55 Min: FARM EVENT 2
 		PauseCreepsFarm()
 		PauseHeroes()
 		Timers:CreateTimer(5, function()
@@ -546,7 +546,7 @@ function GameMode:InitGameMode()
 	local difficulty = GameRules:GetCustomGameDifficulty()
 
 	-- Timer Rules
-	GameRules:SetPreGameTime( 20.0 )
+	GameRules:SetPreGameTime( 120.0 )
 	GameRules:SetPostGameTime( 30.0 )
 	GameRules:SetTreeRegrowTime( 60.0 )
 	GameRules:SetHeroSelectionTime( 0.0 ) --This is not dota bitch
