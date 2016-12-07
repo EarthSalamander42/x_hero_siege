@@ -3,7 +3,6 @@ require('libraries/timers')
 function SpecialEventTP(event)
 local hero = event.activator
 local point = Entities:FindByName(nil,"point_teleport_special_events"):GetAbsOrigin()
-print("Entering Special Event Choice")
 
 	Entities:FindByName(nil, "trigger_special_event_choice"):Disable()
 	Entities:FindByName(nil, "trigger_special_event_back"):Enable()
@@ -32,7 +31,6 @@ end
 
 function SpecialEventBack(event)
 local hero = event.activator
-print("Leaving Special Event Choice")
 
 	Entities:FindByName(nil, "trigger_special_event_choice"):Enable()
 
@@ -49,7 +47,6 @@ function FrostInfernalEvent(event)
 local hero = event.activator
 local point_hero = Entities:FindByName(nil, "special_event_player_point"):GetAbsOrigin()
 local point_beast = Entities:FindByName(nil, "special_event_boss_point"):GetAbsOrigin()
-print("Entering Frost Infernal")
 
 	SpecialEventsTimer()
 	Entities:FindByName(nil, "trigger_special_event_back"):Disable()
@@ -94,7 +91,6 @@ end
 
 function FrostInfernalBack(event)
 local hero = event.activator
-print("Leaving Frost Infernal")
 --	SpecialEventsTimerEnd()
 
 	if not GameMode.frost_infernal:IsNull() then
@@ -114,7 +110,6 @@ end
 
 function FrostInfernalDead(event)
 local hero = event.activator
-print("Frost Infernal Dead")
 SpecialEventsTimerEnd()
 
 	DoEntFire("trigger_special_event_frost_infernal", "Kill", nil ,0 ,nil ,nil)
@@ -145,7 +140,6 @@ end
 
 function SpiritBeastEvent(event)
 local hero = event.activator
-print("Entering Spirit Beast")
 local point_hero = Entities:FindByName(nil, "special_event_player_point2"):GetAbsOrigin()
 local point_beast = Entities:FindByName(nil, "special_event_boss_point2"):GetAbsOrigin()
 
@@ -192,7 +186,6 @@ end
 
 function SpiritBeastBack(event)
 local hero = event.activator
-print("Leaving Spirit Beast")
 --	SpecialEventsTimerEnd()
 
 	if not GameMode.spirit_beast:IsNull() then
@@ -212,7 +205,6 @@ end
 
 function SpiritBeastDead(event)
 local hero = event.activator
-print("Spirit Beast Dead")
 SpecialEventsTimerEnd()
 
 	DoEntFire("trigger_special_event_spirit_beast", "Kill", nil ,0 ,nil ,nil)

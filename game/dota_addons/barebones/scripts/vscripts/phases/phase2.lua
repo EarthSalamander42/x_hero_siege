@@ -121,12 +121,6 @@ local heroes = HeroList:GetAllHeroes()
 
 		local warlock = CreateUnitByName("npc_dota_hero_warlock_bis", Entities:FindByName(nil, "choose_warlock_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
 		warlock:SetAngles(0, 270, 0)
-
---		for _,hero in pairs(heroes) do
---			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
---				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), brewmaster)
---			end
---		end
 	end)
 
 	Timers:CreateTimer(17, function()
@@ -153,17 +147,22 @@ local heroes = HeroList:GetAllHeroes()
 		local skeleton_king = CreateUnitByName("npc_dota_hero_skeleton_king_bis", Entities:FindByName(nil, "choose_skeleton_king_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
 		skeleton_king:SetAngles(0, 180, 0)
 		StartAnimation(skeleton_king, {duration = 20000.0, activity = ACT_DOTA_IDLE, rate = 0.9})
+	end)
 
+	Timers:CreateTimer(20, function()
 		lich_king = CreateUnitByName("npc_dota_boss_lich_king_bis", Entities:FindByName(nil, "npc_dota_spawner_lich_king"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
 		lich_king:SetAngles(0, 270, 0)
 		lich_king:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
 		StartAnimation(lich_king, {duration = 20000.0, activity = ACT_DOTA_IDLE, rate = 0.9})
 
---		for _,hero in pairs(heroes) do
---			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
---				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil)
---			end
---		end
+		local ramero = CreateUnitByName("npc_ramero_bis", Entities:FindByName(nil, "point_special_arena_1"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
+		ramero:SetAngles(0, 270, 0)
+
+		local baristal = CreateUnitByName("npc_baristal_bis", Entities:FindByName(nil, "point_special_arena_2"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
+		baristal:SetAngles(0, 270, 0)
+
+		local ramero_alt = CreateUnitByName("npc_ramero_bis", Entities:FindByName(nil, "point_special_arena_3"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
+		ramero_alt:SetAngles(0, 270, 0)
 	end)
 end
 
@@ -795,15 +794,13 @@ end
 
 function trigger_second_wave_left()
 --	local skywrath = Entities:FindByName(nil, "SkywrathMage_Guardian1"):GetAbsOrigin()
-	print("Disabled trigger left")
 	DoEntFire("trigger_phase2_left", "Kill", nil ,0 ,nil ,nil)
---	skywrath:RemoveSelf()
+--	UTIL_REMOVE(skywrath)
 
 	Timers:CreateTimer(2.5, spawn_second_phase_left)
 end
 
 function trigger_second_wave_right()
-	print("Disabled trigger right")
 	DoEntFire("trigger_phase2_right", "Kill", nil, 0, nil, nil)
 	
 	Timers:CreateTimer(2.5, spawn_second_phase_right)
@@ -842,10 +839,8 @@ end
 
 function killed_frost_tower_left(keys)
 GameMode.FrostTowers_killed = GameMode.FrostTowers_killed +1
-print( GameMode.FrostTowers_killed )
 
 	if GameMode.FrostTowers_killed >= 2 then
-		print("FinalWave timer started")
 		Notifications:TopToAll({text="WARNING! Final Wave incoming. Arriving in 60 seconds! Back to the Castle!" , duration=10.0})
 		Timers:CreateTimer(60,FinalWave)
 		FrostTowersToFinalWave()
@@ -854,10 +849,8 @@ end
 
 function killed_frost_tower_right(keys)
 GameMode.FrostTowers_killed = GameMode.FrostTowers_killed +1
-print( GameMode.FrostTowers_killed )
 
 	if GameMode.FrostTowers_killed >= 2 then
-		DebugPrint("FinalWave timer started")
 		Notifications:TopToAll({text="WARNING! Final Wave incoming. Arriving in 60 seconds! Back to the Castle!" , duration=10.0})
 		Timers:CreateTimer(60,FinalWave)
 		FrostTowersToFinalWave()
@@ -866,7 +859,7 @@ end
 
 function FinalWave()
 local heroes = HeroList:GetAllHeroes()
-local point = Entities:FindByName(nil, "final_wave_player"):GetAbsOrigin()
+local difficulty = GameRules:GetCustomGameDifficulty()
 local teleporters = Entities:FindAllByName("trigger_teleport")
 local teleporters_2 = Entities:FindAllByName("trigger_teleport_phase3_creeps")
 local heroes = HeroList:GetAllHeroes()
@@ -928,12 +921,10 @@ local WaypointEast6 = Entities:FindByName(nil,"east1_6")
 local WaypointSouth6 = Entities:FindByName(nil,"south1_6")
 
 	for _,v in pairs(teleporters) do
-		DebugPrint("enable teleport trigger")
 		v:Enable()
 	end
 
 	for _,v in pairs(teleporters_2) do
-		DebugPrint("enable teleport trigger")
 		v:Enable()
 	end
 
@@ -1114,10 +1105,13 @@ local WaypointSouth6 = Entities:FindByName(nil,"south1_6")
 
 	for _,hero in pairs(heroes) do
 		if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
-			FindClearSpaceForUnit(hero, point, true)
+			local id = hero:GetPlayerID()
+			print(id)
+			local point = Entities:FindByName(nil, "final_wave_player_"..id)
+			FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
 			hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {duration= 30, IsHidden = true})
 			hero:AddNewModifier(nil, nil, "modifier_invulnerable", {duration= 25, IsHidden = true})
-			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
+			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
 		end
 
 		Timers:CreateTimer(30, function()
@@ -1127,7 +1121,6 @@ local WaypointSouth6 = Entities:FindByName(nil,"south1_6")
 end
 
 function teleport_to_top(keys)
-DebugPrint("Entering Magtheridon")
 local caller = keys.caller
 local activator = keys.activator
 local point = Entities:FindByName(nil,"point_teleport_boss"):GetAbsOrigin()
@@ -1139,7 +1132,6 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 
 	if first_time_teleport then
 		local heroes = HeroList:GetAllHeroes()
-		print( "Magtheridon should appears now" )
 		SendToConsole("dota_health_per_vertical_marker 2500")
 
 		if difficulty == 1 then
@@ -1196,7 +1188,6 @@ local teleporters2 = Entities:FindAllByName("trigger_teleport2")
 local difficulty = GameRules:GetCustomGameDifficulty()
 
 	GameMode.Magtheridon_killed = GameMode.Magtheridon_killed +1
-	print( GameMode.Magtheridon_killed )
 
 	if GameMode.Magtheridon_killed > 0 and difficulty == 1 then
 		MagtheridonDead()
@@ -1214,7 +1205,6 @@ local heroes = HeroList:GetAllHeroes()
 local teleporters2 = Entities:FindAllByName("trigger_teleport2")
 
 	for _,v in pairs(teleporters2) do
-		DebugPrint("enable teleport trigger")
 		v:Enable()
 	end
 

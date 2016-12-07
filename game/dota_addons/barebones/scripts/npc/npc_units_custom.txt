@@ -311,16 +311,6 @@
 		"ProjectileModel"			"particles/units/heroes/hero_viper/viper_poison_attack.vpcf"		// Particle system model for projectile.
 		"ProjectileSpeed"			"900"						// Speed of projectile.
 
-		// Attributes
-		//----------------------------------------------------------------
-		"AttributePrimary"			"DOTA_ATTRIBUTE_STRENGTH"
-		"AttributeBaseStrength"		"0"			// Base strength
-		"AttributeStrengthGain"		"0"			// Strength bonus per level.
-		"AttributeBaseIntelligence"	"0"			// Base intelligence
-		"AttributeIntelligenceGain"	"0"			// Intelligence bonus per level.
-		"AttributeBaseAgility"		"0"			// Base agility
-		"AttributeAgilityGain"		"0"			// Agility bonus per level.
-
 		// Bounty
 		//----------------------------------------------------------------
 		"BountyXP"					"0"		// Experience earn.
@@ -396,16 +386,6 @@
 		"ProjectileModel"			""		// Particle system model for projectile.
 		"ProjectileSpeed"			""						// Speed of projectile.
 
-		// Attributes
-		//----------------------------------------------------------------
-		"AttributePrimary"			"DOTA_ATTRIBUTE_STRENGTH"
-		"AttributeBaseStrength"		"0"			// Base strength
-		"AttributeStrengthGain"		"0"			// Strength bonus per level.
-		"AttributeBaseIntelligence"	"0"			// Base intelligence
-		"AttributeIntelligenceGain"	"0"			// Intelligence bonus per level.
-		"AttributeBaseAgility"		"0"			// Base agility
-		"AttributeAgilityGain"		"0"			// Agility bonus per level.
-
 		// Bounty
 		//----------------------------------------------------------------
 		"BountyXP"					"0"		// Experience earn.
@@ -480,16 +460,6 @@
 		"AttackRange"				"650"						// Range within a target can be attacked.
 		"ProjectileModel"			""		// Particle system model for projectile.
 		"ProjectileSpeed"			""						// Speed of projectile.
-
-		// Attributes
-		//----------------------------------------------------------------
-		"AttributePrimary"			"DOTA_ATTRIBUTE_STRENGTH"
-		"AttributeBaseStrength"		"0"			// Base strength
-		"AttributeStrengthGain"		"0"			// Strength bonus per level.
-		"AttributeBaseIntelligence"	"0"			// Base intelligence
-		"AttributeIntelligenceGain"	"0"			// Intelligence bonus per level.
-		"AttributeBaseAgility"		"0"			// Base agility
-		"AttributeAgilityGain"		"0"			// Agility bonus per level.
 
 		// Bounty
 		//----------------------------------------------------------------
@@ -567,16 +537,6 @@
 		"ProjectileModel"			""		// Particle system model for projectile.
 		"ProjectileSpeed"			""						// Speed of projectile.
 
-		// Attributes
-		//----------------------------------------------------------------
-		"AttributePrimary"			"DOTA_ATTRIBUTE_STRENGTH"
-		"AttributeBaseStrength"		"0"			// Base strength
-		"AttributeStrengthGain"		"0"			// Strength bonus per level.
-		"AttributeBaseIntelligence"	"0"			// Base intelligence
-		"AttributeIntelligenceGain"	"0"			// Intelligence bonus per level.
-		"AttributeBaseAgility"		"0"			// Base agility
-		"AttributeAgilityGain"		"0"			// Agility bonus per level.
-
 		// Bounty
 		//----------------------------------------------------------------
 		"BountyXP"					"0"		// Experience earn.
@@ -652,16 +612,6 @@
 		"AttackRange"				"650"						// Range within a target can be attacked.
 		"ProjectileModel"			""		// Particle system model for projectile.
 		"ProjectileSpeed"			""						// Speed of projectile.
-
-		// Attributes
-		//----------------------------------------------------------------
-		"AttributePrimary"			"DOTA_ATTRIBUTE_STRENGTH"
-		"AttributeBaseStrength"		"0"			// Base strength
-		"AttributeStrengthGain"		"0"			// Strength bonus per level.
-		"AttributeBaseIntelligence"	"0"			// Base intelligence
-		"AttributeIntelligenceGain"	"0"			// Intelligence bonus per level.
-		"AttributeBaseAgility"		"0"			// Base agility
-		"AttributeAgilityGain"		"0"			// Agility bonus per level.
 
 		// Bounty
 		//----------------------------------------------------------------
@@ -739,16 +689,6 @@
 		"ProjectileModel"			""		// Particle system model for projectile.
 		"ProjectileSpeed"			""						// Speed of projectile.
 
-		// Attributes
-		//----------------------------------------------------------------
-		"AttributePrimary"			"DOTA_ATTRIBUTE_STRENGTH"
-		"AttributeBaseStrength"		"0"			// Base strength
-		"AttributeStrengthGain"		"0"			// Strength bonus per level.
-		"AttributeBaseIntelligence"	"0"			// Base intelligence
-		"AttributeIntelligenceGain"	"0"			// Intelligence bonus per level.
-		"AttributeBaseAgility"		"0"			// Base agility
-		"AttributeAgilityGain"		"0"			// Agility bonus per level.
-
 		// Bounty
 		//----------------------------------------------------------------
 		"BountyXP"					"0"		// Experience earn.
@@ -824,16 +764,6 @@
 		"AttackRange"				"650"						// Range within a target can be attacked.
 		"ProjectileModel"			""		// Particle system model for projectile.
 		"ProjectileSpeed"			""						// Speed of projectile.
-
-		// Attributes
-		//----------------------------------------------------------------
-		"AttributePrimary"			"DOTA_ATTRIBUTE_STRENGTH"
-		"AttributeBaseStrength"		"0"			// Base strength
-		"AttributeStrengthGain"		"0"			// Strength bonus per level.
-		"AttributeBaseIntelligence"	"0"			// Base intelligence
-		"AttributeIntelligenceGain"	"0"			// Intelligence bonus per level.
-		"AttributeBaseAgility"		"0"			// Base agility
-		"AttributeAgilityGain"		"0"			// Agility bonus per level.
 
 		// Bounty
 		//----------------------------------------------------------------
@@ -911,16 +841,6 @@
 		"ProjectileModel"			""		// Particle system model for projectile.
 		"ProjectileSpeed"			""						// Speed of projectile.
 
-		// Attributes
-		//----------------------------------------------------------------
-		"AttributePrimary"			"DOTA_ATTRIBUTE_STRENGTH"
-		"AttributeBaseStrength"		"0"			// Base strength
-		"AttributeStrengthGain"		"0"			// Strength bonus per level.
-		"AttributeBaseIntelligence"	"0"			// Base intelligence
-		"AttributeIntelligenceGain"	"0"			// Intelligence bonus per level.
-		"AttributeBaseAgility"		"0"			// Base agility
-		"AttributeAgilityGain"		"0"			// Agility bonus per level.
-
 		// Bounty
 		//----------------------------------------------------------------
 		"BountyXP"					"0"		// Experience earn.
@@ -996,16 +916,6 @@
 		"AttackRange"				"650"						// Range within a target can be attacked.
 		"ProjectileModel"			""		// Particle system model for projectile.
 		"ProjectileSpeed"			""						// Speed of projectile.
-
-		// Attributes
-		//----------------------------------------------------------------
-		"AttributePrimary"			"DOTA_ATTRIBUTE_STRENGTH"
-		"AttributeBaseStrength"		"0"			// Base strength
-		"AttributeStrengthGain"		"0"			// Strength bonus per level.
-		"AttributeBaseIntelligence"	"0"			// Base intelligence
-		"AttributeIntelligenceGain"	"0"			// Intelligence bonus per level.
-		"AttributeBaseAgility"		"0"			// Base agility
-		"AttributeAgilityGain"		"0"			// Agility bonus per level.
 
 		// Bounty
 		//----------------------------------------------------------------
@@ -1129,7 +1039,7 @@
 		"Model"						"models/props_structures/kings_chair.vmdl"			// Model.
 		"MinimapIcon"				"minimap_tower90"
 		"MinimapIconSize"			"300"
-		"Level"						"100"
+		"Level"						"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -1236,16 +1146,6 @@
 		"ProjectileModel"			"particles/units/heroes/hero_lich/lich_chain_frost.vpcf"		// Particle system model for projectile.
 		"ProjectileSpeed"			"1000"		// Speed of projectile.
 
-		// Attributes
-		//----------------------------------------------------------------
-		"AttributePrimary"			"DOTA_ATTRIBUTE_STRENGTH"
-		"AttributeBaseStrength"		"0"			// Base strength
-		"AttributeStrengthGain"		"0"			// Strength bonus per level.
-		"AttributeBaseIntelligence"	"0"			// Base intelligence
-		"AttributeIntelligenceGain"	"0"			// Intelligence bonus per level.
-		"AttributeBaseAgility"		"0"			// Base agility
-		"AttributeAgilityGain"		"0"			// Agility bonus per level.
-
 		// Bounty
 		//----------------------------------------------------------------
 		"BountyXP"					"0"		// Experience earn.
@@ -1329,16 +1229,6 @@
 		"AttackRange"				"900"		// Range within a target can be attacked.
 		"ProjectileModel"			"particles/units/heroes/hero_lich/lich_chain_frost.vpcf"		// Particle system model for projectile.
 		"ProjectileSpeed"			"1000"		// Speed of projectile.
-
-		// Attributes
-		//----------------------------------------------------------------
-		"AttributePrimary"			"DOTA_ATTRIBUTE_STRENGTH"
-		"AttributeBaseStrength"		"0"			// Base strength
-		"AttributeStrengthGain"		"0"			// Strength bonus per level.
-		"AttributeBaseIntelligence"	"0"			// Base intelligence
-		"AttributeIntelligenceGain"	"0"			// Intelligence bonus per level.
-		"AttributeBaseAgility"		"0"			// Base agility
-		"AttributeAgilityGain"		"0"			// Agility bonus per level.
 
 		// Bounty
 		//----------------------------------------------------------------
@@ -1424,16 +1314,6 @@
 		"ProjectileModel"			"particles/units/heroes/hero_obsidian_destroyer/obsidian_destroyer_arcane_orb_core.vpcf"		// Particle system model for projectile.
 		"ProjectileSpeed"			"1000"		// Speed of projectile.
 
-		// Attributes
-		//----------------------------------------------------------------
-		"AttributePrimary"			"DOTA_ATTRIBUTE_STRENGTH"
-		"AttributeBaseStrength"		"0"			// Base strength
-		"AttributeStrengthGain"		"0"			// Strength bonus per level.
-		"AttributeBaseIntelligence"	"0"			// Base intelligence
-		"AttributeIntelligenceGain"	"0"			// Intelligence bonus per level.
-		"AttributeBaseAgility"		"0"			// Base agility
-		"AttributeAgilityGain"		"0"			// Agility bonus per level.
-
 		// Bounty
 		//----------------------------------------------------------------
 		"BountyXP"					"0"		// Experience earn.
@@ -1518,16 +1398,6 @@
 		"ProjectileModel"			"particles/units/heroes/hero_lich/lich_chain_frost.vpcf"		// Particle system model for projectile.
 		"ProjectileSpeed"			"1200"		// Speed of projectile.
 
-		// Attributes
-		//----------------------------------------------------------------
-		"AttributePrimary"			"DOTA_ATTRIBUTE_STRENGTH"
-		"AttributeBaseStrength"		"0"			// Base strength
-		"AttributeStrengthGain"		"0"			// Strength bonus per level.
-		"AttributeBaseIntelligence"	"0"			// Base intelligence
-		"AttributeIntelligenceGain"	"0"			// Intelligence bonus per level.
-		"AttributeBaseAgility"		"0"			// Base agility
-		"AttributeAgilityGain"		"0"			// Agility bonus per level.
-
 		// Bounty
 		//----------------------------------------------------------------
 		"BountyXP"					"0"		// Experience earn.
@@ -1549,7 +1419,7 @@
 
 		// Status
 		//----------------------------------------------------------------
-		"StatusHealth"				"15000"		// Base health.
+		"StatusHealth"				"20000"		// Base health.
 		"StatusHealthRegen"			"0"			// Health regeneration rate.
 		"StatusMana"				"0"			// Base mana.
 		"StatusStartingMana"		"0"			// Base mana.
@@ -1750,7 +1620,7 @@
 		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
 		"Model"						"models/heroes/undying/undying.vmdl"	// Model.
 		"ModelScale"				"0.8"
-		"Level"						"2"
+		"Level"						"1"
 		"ConsideredHero"			"0"
 
 		// Abilities
@@ -1851,7 +1721,7 @@
 		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
 		"Model"						"models/heroes/necrolyte/necrolyte.vmdl"	// Model.
 		"ModelScale"				"0.6"
-		"Level"						"2"
+		"Level"						"1"
 		"ConsideredHero"			"0"
 
 		// Abilities
@@ -2147,7 +2017,7 @@
 	}
 
 	//=================================================================================
-	// Creature: Mini Dooms Level 4
+	// Creature: Mini Dooms
 	//=================================================================================
 	"npc_dota_creature_mini_dooms"
 	{
@@ -2155,7 +2025,7 @@
 		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
 		"Model"						"models/heroes/doom/doom.vmdl"	// Model.
 		"ModelScale"				"0.9"
-		"Level"						"4"
+		"Level"						"1"
 		"ConsideredHero"			"0"
 		"SoundSet"					"Hero_Doom"
 
@@ -2272,7 +2142,7 @@
 		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
 		"Model"						"models/creeps/neutral_creeps/n_creep_black_dragon/n_creep_black_dragon.vmdl"	// Model.
 		"ModelScale"				"0.9"
-		"Level"						"5"
+		"Level"						"1"
 		"ConsideredHero"			"0"
 		"SoundSet"					"Hero_Jakiro"
 
@@ -2342,7 +2212,7 @@
 	}
 
 	//=================================================================================
-	// Creature: Mini Phantom Lancers Level 5
+	// Creature: Mini Phantom Lancers
 	//=================================================================================
 	"npc_dota_creature_mini_lancers"
 	{
@@ -2350,7 +2220,7 @@
 		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
 		"Model"						"models/heroes/phantom_lancer/phantom_lancer.vmdl"	// Model.
 		"ModelScale"				"1.1"
-		"Level"						"5"
+		"Level"						"1"
 		"ConsideredHero"			"0"
 		"SoundSet"					"Hero_PhantomLancer"
 
@@ -2443,7 +2313,7 @@
 		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
 		"Model"						"models/heroes/mirana/mirana.vmdl"	// Model.
 		"ModelScale"				"1.15"
-		"Level"						"5"
+		"Level"						"1"
 		"ConsideredHero"			"0"
 		"SoundSet"					"Hero_Mirana"
 
@@ -2552,7 +2422,7 @@
 	}
 
 	//=================================================================================
-	// Creature: Mini Tinys Level 6
+	// Creature: Mini Tinys
 	//=================================================================================
 	"npc_dota_creature_mini_tinys"
 	{
@@ -2560,7 +2430,7 @@
 		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
 		"Model"						"models/heroes/tiny_04/tiny_04.vmdl"	// Model.
 		"ModelScale"				"1.1"
-		"Level"						"6"
+		"Level"						"1"
 		"ConsideredHero"			"0"
 		"SoundSet"					"Hero_Tiny"
 
@@ -2643,7 +2513,7 @@
 	}
 
 	//=================================================================================
-	// Creature: Mini Wyverns Level 6
+	// Creature: Mini Wyverns
 	//=================================================================================
 	"npc_dota_creature_mini_wyverns"
 	{
@@ -2651,7 +2521,7 @@
 		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
 		"Model"						"models/heroes/winterwyvern/winterwyvern.vmdl"	// Model.
 		"ModelScale"				"1.15"
-		"Level"						"6"
+		"Level"						"1"
 		"ConsideredHero"			"0"
 		"SoundSet"					"Hero_WinterWyvern"
 
@@ -2749,7 +2619,7 @@
 		"Model"						"models/heroes/phoenix/phoenix_bird.vmdl"	// Model.
 		"BaseClass"					"npc_dota_creature"
 		"SoundSet"					"Hero_Phoenix"
-		"Level"						"2"
+		"Level"						"1"
 		"ConsideredHero"			"1"
 		"ModelScale" 				"1.3"
 		"UnitLabel"					"red_dragon"
@@ -2833,7 +2703,7 @@
 		"Model"						"models/creeps/neutral_creeps/n_creep_black_dragon/n_creep_black_dragon.vmdl"	// Model.
 		"BaseClass"					"npc_dota_creature"
 		"SoundSet"					"Hero_Phoenix"
-		"Level"						"3"
+		"Level"						"1"
 		"ConsideredHero"			"1"
 		"ModelScale" 				"1.45"
 		"UnitLabel"					"black_dragon"
@@ -3261,7 +3131,7 @@
 		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
 		"Model"						"models/heroes/dragon_knight/dragon_knight.vmdl"	// Model.
 		"ModelScale"				"1.25"
-		"Level"						"50"
+		"Level"						"1"
 		"ConsideredHero"			"1"
 		"MinimapIcon"				"minimap_roshancamp"
 		"MinimapIconSize"			"500"
@@ -3378,7 +3248,7 @@
 		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
 		"Model"						"models/heroes/slardar/slardar.vmdl"	// Model.
 		"ModelScale"				"1.15"
-		"Level"						"50"
+		"Level"						"1"
 		"ConsideredHero"			"1"
 		"MinimapIcon"				"minimap_roshancamp"
 		"MinimapIconSize"			"500"
@@ -3477,7 +3347,7 @@
 		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
 		"Model"						"models/heroes/chaos_knight/chaos_knight.vmdl"	// Model.
 		"ModelScale"				"1.35"
-		"Level"						"50"
+		"Level"						"1"
 		"ConsideredHero"			"1"
 		"MinimapIcon"				"minimap_roshancamp"
 		"MinimapIconSize"			"500"
@@ -3594,7 +3464,7 @@
 		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
 		"Model"						"models/heroes/luna/luna.vmdl"	// Model.
 		"ModelScale"				"1.45"
-		"Level"						"50"
+		"Level"						"1"
 		"ConsideredHero"			"1"
 		"MinimapIcon"				"minimap_roshancamp"
 		"MinimapIconSize"			"500"
@@ -3693,8 +3563,8 @@
 		// General
 		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
 		"Model"						"models/heroes/rattletrap/rattletrap.vmdl"	// Model.
-		"ModelScale"				"1.45"
-		"Level"						"50"
+		"ModelScale"				"1.55"
+		"Level"						"1"
 		"ConsideredHero"			"1"
 		"MinimapIcon"				"minimap_roshancamp"
 		"MinimapIconSize"			"500"
@@ -3793,7 +3663,7 @@
 		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
 		"Model"						"models/heroes/slark/slark.vmdl"	// Model.
 		"ModelScale"				"1.05"
-		"Level"						"50"
+		"Level"						"1"
 		"ConsideredHero"			"0"
 		"MinimapIcon"				"minimap_roshancamp"
 		"MinimapIconSize"			"250"
@@ -3814,8 +3684,8 @@
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
-		"AttackDamageMin"			"164"						// Damage range min.
-		"AttackDamageMax"			"176"						// Damage range max.
+		"AttackDamageMin"			"142"						// Damage range min.
+		"AttackDamageMax"			"148"						// Damage range max.
 		"AttackRate"				"0.7"						// Speed of attack.
 		"AttackAnimationPoint"		"0.33"						// Normalized time in animation cycle to attack.
 		"AttackAcquisitionRange"	"1000"						// Range within a target can be acquired.
@@ -3884,21 +3754,21 @@
 	"npc_ghul_II"
 	{
 	// General
-	"BaseClass"			"npc_dota_creature"  // Class of entity of link to.
-	"Model"				"models/heroes/life_stealer/life_stealer.vmdl"  // Model.
-	"Level"				"5"
-	"ModelScale"		"1"
-	"ConsideredHero"	"0"
+	"BaseClass"				"npc_dota_creature"  // Class of entity of link to.
+	"Model"					"models/heroes/life_stealer/life_stealer.vmdl"  // Model.
+	"Level"					"1"
+	"ModelScale"			"1"
+	"ConsideredHero"		"0"
 	// Abilities
 	//----------------------------------------------------------------
-	"Ability1"			"unholy_aura"     // Ability 1.
-	"Ability2"			"endurance_aura"      // Ability 2.
-	"Ability3"			""      // Ability 3.
-	"Ability4"			""      // Ability 4.
-	"Ability5"			""      // Ability 5.
-	"Ability6"			""      // Ability 6 - Extra.
-	"Ability7"			""      // Ability 7 - Extra.
-	"Ability8"			""      // Ability 8 - Extra.
+	"Ability1"				"unholy_aura"     // Ability 1.
+	"Ability2"				"endurance_aura"      // Ability 2.
+	"Ability3"				""      // Ability 3.
+	"Ability4"				""      // Ability 4.
+	"Ability5"				""      // Ability 5.
+	"Ability6"				""      // Ability 6 - Extra.
+	"Ability7"				""      // Ability 7 - Extra.
+	"Ability8"				""      // Ability 8 - Extra.
 
 	// Armor
 	//----------------------------------------------------------------
@@ -3969,21 +3839,21 @@
 	"npc_orc_II"
   {
 	// General
-	"BaseClass"         "npc_dota_creature"  // Class of entity of link to.
-	"Model"             "models/creeps/lane_creeps/creep_bad_melee_diretide/creep_bad_melee_diretide.vmdl"  // Model.
-	"Level"             "2"
-	"ModelScale"		"1.2"
-	"ConsideredHero"	"0"
+	"BaseClass"				"npc_dota_creature"  // Class of entity of link to.
+	"Model"					"models/creeps/lane_creeps/creep_bad_melee_diretide/creep_bad_melee_diretide.vmdl"  // Model.
+	"Level"					"1"
+	"ModelScale"			"1.2"
+	"ConsideredHero"		"0"
 	// Abilities
 	//----------------------------------------------------------------
-	"Ability1"          "unholy_aura"     // Ability 1.
-	"Ability2"          "endurance_aura"      // Ability 2.
-	"Ability3"          ""      // Ability 3.
-	"Ability4"          ""      // Ability 4.
-	"Ability5"          ""      // Ability 5.
-	"Ability6"          ""      // Ability 6 - Extra.
-	"Ability7"          ""      // Ability 7 - Extra.
-	"Ability8"          ""      // Ability 8 - Extra.
+	"Ability1"				"unholy_aura"     // Ability 1.
+	"Ability2"				"endurance_aura"      // Ability 2.
+	"Ability3"				""      // Ability 3.
+	"Ability4"				""      // Ability 4.
+	"Ability5"				""      // Ability 5.
+	"Ability6"				""      // Ability 6 - Extra.
+	"Ability7"				""      // Ability 7 - Extra.
+	"Ability8"				""      // Ability 8 - Extra.
 
 	// Armor
 	//----------------------------------------------------------------
@@ -4050,7 +3920,7 @@
 		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
 		"Model"						"models/heroes/razor/razor.vmdl"	// Model.
 		"ModelScale"				"1.45"
-		"Level"						"10"
+		"Level"						"1"
 		"ConsideredHero"			"1"
 		"HasInventory"				"1"
 		"MinimapIcon"				"minimap_roshancamp"
@@ -4155,7 +4025,7 @@
 		"ConsideredHero"			"1"
 		"Portrait"                  "vgui/hud/heroportraits/portrait_centaur"
 		"ModelScale"                "2.25"
-		"Level"                     "10"
+		"Level"                     "1"
 	
 		"Ability1"					"creature_thunder_clap_low"
 		"Ability2"					"command_aura"
@@ -4216,7 +4086,7 @@
 			// General
 			"BaseClass"         "npc_dota_creature"  // Class of entity of link to.
 			"Model"             "models/heroes/pudge/pudge.vmdl"  // Model.
-			"Level"             "4"
+			"Level"             "1"
 			"ModelScale"                    "0.95"
 			// Abilities
 			//----------------------------------------------------------------
@@ -4303,7 +4173,7 @@
 		"ProjectileModel"            "particles/units/heroes/hero_death_prophet/death_prophet_base_attack.vpcf"
 		"ProjectileSpeed"                   "900"
 		"SoundSet"          "Hero_DeathProphet"          // Name of sound set.
-		"Level"             "3"
+		"Level"             "1"
 		"ModelScale"                    "1.25"
 		"HealthBarOffset"			"280"
 		// Abilities
@@ -4384,7 +4254,7 @@
 		"BaseClass"			"npc_dota_creature"  // Class of entity of link to.
 		"Model"				"models/heroes/dragon_knight/dragon_knight.vmdl"  // Model.
 		"SoundSet"			"lane_dire_ranged"          // Name of sound set.
-		"Level"				"3"
+		"Level"				"1"
 		"ModelScale"		"1.1"
 		"HealthBarOffset"			"280"
 
@@ -4461,14 +4331,14 @@
 	  }
 
 	"npc_chaos_orc_final_wave"
-	  {
+	{
 		// General
 		"BaseClass"         "npc_dota_creature"  // Class of entity of link to.
 		"Model"             "models/heroes/sniper/sniper.vmdl"  // Model.
 		"ProjectileModel"            "particles/units/heroes/hero_jakiro/jakiro_base_attack_fire.vpcf"
 		"ProjectileSpeed"                   "1800"
 		"SoundSet"          "Hero_Sniper"          // Name of sound set.
-		"Level"             "3"
+		"Level"             "1"
 		"ModelScale"                    "1.25"
 		"HealthBarOffset"			"280"
 
@@ -4546,7 +4416,7 @@
 				"Wearable5" { "ItemDef" "285" }
 			} 
 		}
-	  }
+	}
 
 	//=================================================================================
 	// Balanar (Final Wave)
@@ -4561,7 +4431,6 @@
 		"Portrait"					"vgui/hud/heroportraits/portrait_nightstalker"
 		"ModelScale"				"1.7"
 		"HealthBarOffset"			"300"
-		"Level"						"10"
 		
 		"Ability1"					"neutral_spell_immunity"
 		"Ability2"					"demonhunter_vampiric_aura"
@@ -4620,7 +4489,7 @@
 		"Portrait"					"vgui/hud/heroportraits/portrait_juggernaut"
 		"ModelScale"				"1.7"
 		"HealthBarOffset"			"300"
-		"Level"						"10"
+		"Level"						"1"
 		
 		"Ability1"					"devotion_aura"
 		"Ability2"					"chaos_knight_chaos_strike"
@@ -4682,7 +4551,6 @@
 	
 		"Portrait"                  "vgui/hud/heroportraits/portrait_antimage"
 		"ModelScale"                "1.5"
-		"Level"						"10"
 		"NameAliases"               "demonhunter"
 		"url"						"Demonhunter"
 		"HealthBarOffset"			"300"
@@ -4744,7 +4612,7 @@
 		"ConsideredHero"			"1"
 		"ModelScale"				"1.5"
 		"HealthBarOffset"			"300"
-		"Level"						"10"
+		"Level"						"1"
 		
 		"Ability1"					"endurance_aura" 
 		"Ability2"					"proudmoore_divine_shield"
@@ -4801,7 +4669,7 @@
 			// General
 			"BaseClass"         "npc_dota_creature"  // Class of entity of link to.
 			"Model"             "models/heroes/lone_druid/lone_druid.vmdl"  // Model.
-			"Level"             "4"
+			"Level"             "1"
 			"ModelScale"                    "0.85"
 			// Abilities
 			//----------------------------------------------------------------
@@ -4884,7 +4752,7 @@
 		"BaseClass"         "npc_dota_creature"  // Class of entity of link to.
 		"Model"             "models/heroes/dark_seer/dark_seer.vmdl"  // Model.
 		"SoundSet"          "lane_dire_ranged"          // Name of sound set.
-		"Level"             "3"
+		"Level"             "1"
 		"ModelScale"                    "0.9"
 		// Abilities
 		//----------------------------------------------------------------
@@ -4971,7 +4839,7 @@
 			"ProjectileModel"            "particles/units/heroes/hero_templar_assassin/templar_assassin_base_attack.vpcf"
 		"ProjectileSpeed"                   "900"
 		"SoundSet"          "npc_dota_hero_templar_assassin"          // Name of sound set.
-		"Level"             "3"
+		"Level"             "1"
 		"ModelScale"                    "1.25"
 		// Abilities
 		//----------------------------------------------------------------
@@ -5053,7 +4921,7 @@
 			// General
 			"BaseClass"         "npc_dota_creature"  // Class of entity of link to.
 			"Model"             "models/heroes/chaos_knight/chaos_knight.vmdl"  // Model.
-			"Level"             "2"
+			"Level"             "1"
 			"ModelScale"                    "0.95"
 
 			// Abilities
@@ -5134,7 +5002,7 @@
 		"BaseClass"         "npc_dota_creature"  // Class of entity of link to.
 		"SoundSet"          "npc_dota_heroes_luna"          // Name of sound set.
 		"Model"             "models/heroes/luna/luna.vmdl"  // Model.
-		"Level"             "3"
+		"Level"             "1"
 		"ModelScale"                    "1.2"
 		"ProjectileModel"            "particles/econ/items/luna/luna_crescent_moon/luna_attack_crescent_moon.vpcf"
 		"ProjectileSpeed"                   "900"
@@ -5221,7 +5089,7 @@
 			// General
 			"BaseClass"         "npc_dota_creature"  // Class of entity of link to.
 			"Model"             "models/heroes/magnataur/magnataur.vmdl"  // Model.
-			"Level"             "4"
+			"Level"             "1"
 			"ModelScale"                    "0.95"
 			// Abilities
 			//----------------------------------------------------------------
@@ -5306,7 +5174,7 @@
 		"BaseClass"			"npc_dota_creature"  // Class of entity of link to.
 		"Model"				"models/heroes/sniper/sniper.vmdl"  // Model.
 		"SoundSet"			"Hero_Sniper"          // Name of sound set.
-		"Level"				"3"
+		"Level"				"1"
 		"ModelScale"		"1.3"
 		// Abilities
 		//----------------------------------------------------------------
@@ -5389,7 +5257,7 @@
 		"BaseClass"         "npc_dota_creature"  // Class of entity of link to.
 		"Model"             "models/heroes/necrolyte/necrolyte.vmdl"  // Model.
 		"SoundSet"          "lane_dire_ranged"          // Name of sound set.
-		"Level"             "3"
+		"Level"             "1"
 		"ModelScale"                    "0.9"
 		"ProjectileModel"            "particles/econ/items/necrolyte/necronub_base_attack/necrolyte_base_attack_ka.vpcf"
 		"ProjectileSpeed"                   "900"
@@ -5475,7 +5343,7 @@
 		"BaseClass"         "npc_dota_creature"  // Class of entity of link to.
 		"Model"             "models/heroes/centaur/centaur.vmdl"  // Model.
 		"SoundSet"          "npc_dota_heroes_centaur"          // Name of sound set.
-		"Level"             "2"
+		"Level"             "1"
 		"ModelScale"                    "1"
 		// Abilities
 		//----------------------------------------------------------------
@@ -5557,7 +5425,7 @@
 		// General
 		"BaseClass"         "npc_dota_creature"  // Class of entity of link to.
 		"Model"             "models/heroes/earthshaker/earthshaker.vmdl"  // Model.
-		"Level"             "2"
+		"Level"             "1"
 		"ModelScale"                    "0.95"
 		// Abilities
 		//----------------------------------------------------------------
@@ -5641,7 +5509,7 @@
 		"ProjectileModel"            "particles/units/heroes/hero_warlock/warlock_base_attack.vpcf"
 		"ProjectileSpeed"                   "900"
 		"SoundSet"          "npc_dota_hero_warlock"          // Name of sound set.
-		"Level"             "3"
+		"Level"             "1"
 		"ModelScale"                    "1.15"
 		// Abilities
 		//----------------------------------------------------------------
@@ -5731,8 +5599,8 @@
 		"ConsideredHero"			"1"
 		"Portrait"					"vgui/hud/heroportraits/portrait_centaur"
 		"ModelScale"                "2.0"
-		"Level"						"100"
-		"AbilityLayout"             "5"
+		"Level"						"1"
+		"AbilityLayout"             "1"
 
 		"Ability1"					"creature_firestorm"
 		"Ability2"					"creature_thunder_clap"
@@ -5752,16 +5620,6 @@
 		"AttackAnimationPoint"      "0.6"                                   // Normalized time in animation cycle to attack.
 		"AttackAcquisitionRange"    "1000"                                   // Range within a target can be acquired.
 		"AttackRange"               "300"                                   // Range within a target can be attacked.
-		"ProjectileModel"           ""                                     // Particle system model for projectile.
-		"ProjectileSpeed"           ""                                     // Speed of projectile.
-
-		"AttributePrimary"      "DOTA_ATTRIBUTE_STRENGTH"
-		"AttributeBaseStrength"   "100"                   // Base strength
-		"AttributeStrengthGain"   "20"                   // Strength bonus per level.
-		"AttributeBaseIntelligence" "100"                   // Base intelligence
-		"AttributeIntelligenceGain" "20"                   // Intelligence bonus per level.
-		"AttributeBaseAgility"    "100"                   // Base agility
-		"AttributeAgilityGain"    "20"                   // Agility bonus per level.
 
 		"BountyXP"				"0"                 // Experience earn.
 		"BountyGoldMin"			"0"                   // Gold earned min.
@@ -5808,7 +5666,7 @@
 		"Portrait"					"vgui/hud/heroportraits/portrait_juggernaut"
 		"ModelScale"                "1.8"
 		"HealthBarOffset"			"200"
-		"Level"						"100"
+		"Level"						"1"
 		
 		"Ability1"					"grom_hellscream_bladefury"
 		"Ability2"					"grom_hellscream_mirror_image" 
@@ -5872,7 +5730,7 @@
 	"ConsideredHero"			"0"
 	"Portrait"					"vgui/hud/heroportraits/portrait_centaur"
 	"ModelScale"                "1.5"
-	"Level"						"7"
+	"Level"						"1"
 
 	"Ability1"				"magtheridon_medium"
 	"Ability2"				"" 
@@ -5891,14 +5749,6 @@
 	"AttackRange"               "200"                                   // Range within a target can be attacked.
 	"ProjectileModel"           ""                                     // Particle system model for projectile.
 	"ProjectileSpeed"           ""                                     // Speed of projectile.
-	
-	"AttributePrimary"      "DOTA_ATTRIBUTE_STRENGTH"
-	"AttributeBaseStrength"   "100"                   // Base strength
-	"AttributeStrengthGain"   "20"                   // Strength bonus per level.
-	"AttributeBaseIntelligence" "100"                   // Base intelligence
-	"AttributeIntelligenceGain" "20"                   // Intelligence bonus per level.
-	"AttributeBaseAgility"    "100"                   // Base agility
-	"AttributeAgilityGain"    "20"                   // Agility bonus per level.
 
 	"BountyXP"          "200"                 // Experience earn.
 	"BountyGoldMin"       "2500"                   // Gold earned min.
@@ -6082,7 +5932,7 @@
 		"Portrait"					"vgui/hud/heroportraits/portrait_kunka"
 		"ModelScale"				"1.8"
 		"HealthBarOffset"			"200"
-		"Level"						"10"
+		"Level"						"1"
 
 		"Ability1"					"lion_voodoo"
 		"Ability2"					"proudmoore_divine_shield" 
@@ -6285,7 +6135,7 @@
 		"Model"						"models/items/beastmaster/boar/shrieking_razorback/shrieking_razorback.vmdl"	// Model.	// Model.
 		"BaseClass"					"npc_dota_creep_neutral"
 		"SoundSet"					"Lycan_Wolf"
-		"Level"						"1"
+		"Level"						"2"
 		"IsSummoned"				"1"
 		"ModelScale" 				"0.65"
 		"UnitLabel"					"lycan_wolf"
@@ -6359,7 +6209,7 @@
 		"Model"						"models/items/beastmaster/boar/shrieking_razorback/shrieking_razorback.vmdl"	// Model.
 		"BaseClass"					"npc_dota_creep_neutral"
 		"SoundSet"					"Lycan_Wolf"
-		"Level"						"2"
+		"Level"						"3"
 		"IsSummoned"				"1"
 		"ModelScale" 				"0.7"
 		"UnitLabel"					"lycan_wolf"
@@ -6433,7 +6283,7 @@
 		"BaseClass"					"npc_dota_creep_neutral"
 		"SoundSet"					"Lycan_Wolf"
 		"IsSummoned"				"1"
-		"Level"						"3"
+		"Level"						"4"
 		"ModelScale" 				"0.75"
 		"UnitLabel"					"lycan_wolf"
 
@@ -6668,7 +6518,7 @@
 		"BaseClass"					"npc_dota_venomancer_plagueward"	// Class of entity of link to.
 		"Model"						"models/heroes/witchdoctor/witchdoctor_ward.vmdl"	// Model.
 		"SoundSet"					"Hero_VenomancerWard"					// Name of sound set.
-		"Level"						"1"
+		"Level"						"2"
 		"ModelScale"				"0.75"
 		"SelectionGroup"			"Venomancer_Wards"
 
@@ -6746,7 +6596,7 @@
 		"BaseClass"					"npc_dota_venomancer_plagueward"	// Class of entity of link to.
 		"Model"						"models/heroes/witchdoctor/witchdoctor_ward.vmdl"	// Model.
 		"SoundSet"					"Hero_VenomancerWard"					// Name of sound set.
-		"Level"						"1"
+		"Level"						"3"
 		"ModelScale"				"0.85"
 		"SelectionGroup"			"Venomancer_Wards"
 
@@ -6824,7 +6674,7 @@
 		"BaseClass"					"npc_dota_venomancer_plagueward"	// Class of entity of link to.
 		"Model"						"models/heroes/witchdoctor/witchdoctor_ward.vmdl"	// Model.
 		"SoundSet"					"Hero_VenomancerWard"					// Name of sound set.
-		"Level"						"1"
+		"Level"						"4"
 		"ModelScale"				"0.95"
 		"SelectionGroup"			"Venomancer_Wards"
 
@@ -7366,7 +7216,7 @@
 		"Model"					"models/heroes/terrorblade/demon.mdl"		// Model.
 		"SoundSet"				"Hero_Terrorblade"							// Name of sound set.	
 		"ModelScale"			"1.8"
-		"Level"					"100"
+		"Level"					"1"
 		"NameAliases"			"demonhunter"
 		"url"					"Demonhunter"
 		"HealthBarOffset"		"300"
@@ -7424,7 +7274,6 @@
 		"ConsideredHero"			"1"
 		"ModelScale"				"1.9"
 		"HealthBarOffset"			"300"
-		"Level"						"100"
 		"AbilityLayout"				"5"
 
 		"Ability1"					"howl_of_terror"
@@ -7565,7 +7414,7 @@
 	}
 
 	//=================================================================================
-	// Abyssal Underlord: Doom Golem Level 1 ( Doom Fire )
+	// Abyssal Underlord: Doom Golem ( Doom Fire )
 	//=================================================================================
 	"npc_dota_doom_golem_1"
 	{										
@@ -7679,7 +7528,7 @@
 	}
 
 	//=================================================================================
-	// Abyssal Underlord: Doom Golem Level 2 ( Doom Fire )
+	// Abyssal Underlord: Doom Golem ( Doom Fire )
 	//=================================================================================
 	"npc_dota_doom_golem_2"
 	{										
@@ -8321,7 +8170,7 @@
 		"ConsideredHero"			"1"
 		"ModelScale"				"1.8"
 		"AbilityLayout"				"6"
-		"Level"						"999"
+		"Level"						"1"
 		"HasInventory"				"0"
 
 		"Ability1"					"arthas_holy_light"
@@ -8335,7 +8184,7 @@
 		"Ability9"					"cant_die_generic"
 
 		"ArmorPhysical"				"2499"                  // Physical protection.
-		"MagicalResistance"			"25"                 // Magical protection (percentage).
+		"MagicalResistance"			"35"                 // Magical protection (percentage).
 
 		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
 		"AttackDamageMin"			"59998"                   // Damage range min.
@@ -8390,7 +8239,7 @@
 		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
 		"Model"						"models/heroes/wraith_king/wraith_king.vmdl"	// Model.
 		"ModelScale"				"1.35"
-		"Level"						"999"
+		"Level"						"1"
 		"ConsideredHero"			"1"
 		"SoundSet"					"Hero_SkeletonKing"
 		"AbilityLayout"				"5"
@@ -8492,7 +8341,7 @@
 		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
 		"Model"						"models/heroes/wraith_king/wraith_king_prop.vmdl"	// Model.
 		"ModelScale"				"1.35"
-		"Level"						"999"
+		"Level"						"1"
 		"ConsideredHero"			"1"
 		"SoundSet"					"Hero_SkeletonKing"
 
@@ -8549,7 +8398,7 @@
 		"ConsideredHero"			"1"
 		"ModelScale"                "1.7"
 		"AbilityLayout"				"5"
-		"Level"						"999"
+		"Level"						"1"
 
 		"Ability1"					"banehallow_stampede"
 		"Ability2"					"endurance_aura" 
@@ -8616,7 +8465,7 @@
 		"ProjectileSpeed"			"1500"
 		"SoundSet"					"Hero_Razor"          // Name of sound set.
 		"ConsideredHero"			"1"
-		"Level"						"100"
+		"Level"						"1"
 		"ModelScale"				"1.35"
 		// Abilities
 		//----------------------------------------------------------------
@@ -8702,7 +8551,7 @@
 		"BaseClass"				"npc_dota_creature"  // Class of entity of link to.
 		"Model"					"models/items/warlock/golem/obsidian_golem/obsidian_golem.vmdl"  // Model.
 		"SoundSet"				"Roshan"          // Name of sound set.
-		"Level"					"10"
+		"Level"					"1"
 		"ModelScale"			"1.0"
 		// Abilities
 		//----------------------------------------------------------------
@@ -8768,12 +8617,11 @@
 		"SoundSet"					"Hero_zuus"								// Name of sound set.
 		"ConsideredHero"			"1"
 		"ModelScale"				"1.75"
-		"Level"						"100"
+		"Level"						"1"
 
 		"Ability1"					"roshan_stormbolt"
 		"Ability2"					"roshan_bash" 
 		"Ability3"					"creature_thunder_clap_low"
-		"Ability4"					"roshan_invincible"
 
 		"ArmorPhysical"				"80"                 // Physical protection.
 		"MagicalResistance"			"50"                 // Magical protection (percentage).
@@ -8832,7 +8680,6 @@
 		"BaseClass"			"npc_dota_creature"  // Class of entity of link to.
 		"Model"				"models/heroes/ursa/ursa.vmdl"  // Model.
 		"SoundSet"			"Hero_Ursa"          // Name of sound set.
-		"Level"				"5"
 		"ModelScale"		"1.05"
 		// Abilities
 		//----------------------------------------------------------------
@@ -9223,7 +9070,6 @@
 		"Model"						"models/heroes/tiny_04/tiny_04.vmdl"	// Model.
 		"SoundSet"					"Hero_Tiny"					// Name of sound set.
 		"ModelScale"				"1.55"
-		"Level"						"1"
 		"ConsideredHero"			"1"
 
 		// Abilities
@@ -9396,7 +9242,6 @@
 		"Model"						"models/items/warlock/archivist_golem/archivist_golem.vmdl"	// Model.
 		"SoundSet"					"Hero_Tiny"					// Name of sound set.
 		"ModelScale"				"1.55"
-		"Level"						"1"
 		"ConsideredHero"			"1"
 		"HasInventory"				"1"
 
@@ -9501,7 +9346,6 @@
 		//----------------------------------------------------------------
 		"AttackDamageMin"			"12495"		// Damage range min.
 		"AttackDamageMax"			"12505"		// Damage range max.
-		"AttackRate"				"0.8"			// Speed of attack.
 		"AttackRange"				"600"		// Range within a target can be attacked.
 
 		// Movement
@@ -9535,6 +9379,364 @@
 	}
 
 	//=================================================================================
+	// Special Event: Ramero
+	//=================================================================================
+	"npc_ramero"
+	{
+		// General
+		//----------------------------------------------------------------
+		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
+		"Model"						"models/heroes/sven/sven.vmdl"	// Model.
+		"ModelScale"				"1.55"
+		"ConsideredHero"			"1"
+		"HasInventory"				"1"
+		"SoundSet"					"Hero_Sven"
+
+		// Abilities
+		//----------------------------------------------------------------
+		"Ability1"					""	// Ability 1.
+		"Ability2"					""			// Ability 2.
+		"Ability3"					"endurance_aura"			// Ability 3.
+		"Ability4"					""						// Ability 6 - Extra.
+		"Ability5"					""						// Ability 7 - Extra.
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"				"150"			// Physical protection.
+		"MagicalResistance"			"40"			// Magical protection (percentage).
+
+		// Attack
+		//----------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
+		"AttackDamageMin"			"14990"		// Damage range min.
+		"AttackDamageMax"			"15010"		// Damage range max.
+		"AttackDamageType"			"DAMAGE_TYPE_ArmorPhysical"
+		"AttackRate"				"0.125"			// Speed of attack.
+		"AttackAnimationPoint"		"0.6"		// Normalized time in animation cycle to attack.
+		"AttackAcquisitionRange"	"1000"		// Range within a target can be acquired.
+		"AttackRange"				"160"		// Range within a target can be attacked.
+		"ProjectileModel"			"" // Particle system model for projectile.
+		"ProjectileSpeed"			""		// Speed of projectile.
+
+		// Bounty
+		//----------------------------------------------------------------
+		"BountyXP"					"0"		// Experience earn.
+		"BountyGoldMin"				"0"		// Gold earned min.
+		"BountyGoldMax"				"0"		// Gold earned max.
+
+		// Bounds
+		//----------------------------------------------------------------
+		"BoundsHullName"			"DOTA_HULL_SIZE_HERO"			// Hull type used for navigation/locomotion.
+		"RingRadius"				"160"
+		"HealthBarOffset"			"300"
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"			// Type of locomotion - ground, air
+		"MovementSpeed"				"360"		// Speed
+		"MovementTurnRate"			"1.0"		// Turning rate.
+
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"250000"		// Base health.
+		"StatusHealthRegen"			"20.0"		// Health regeneration rate.
+		"StatusMana"				"0.0"		// Base mana.
+		"StatusManaRegen"			"0.0"		// Mana regeneration rate.
+
+		// Team
+		//----------------------------------------------------------------
+		"TeamName"					"DOTA_TEAM_NEUTRALS"			// Team name.
+		"CombatClassAttack"			"DOTA_COMBAT_CLASS_ATTACK_HERO"
+		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_HERO"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
+
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"1400"		// Range of vision during day light.
+		"VisionNighttimeRange"		"1400"		// Range of vision at night time.
+
+//		"vscripts"					"ai/frost_infernal.lua"
+
+		// Inventory
+		//----------------------------------------------------------------
+		"HasInventory"				"1"
+
+		"Creature"
+		{
+			"EquippedItems"
+			{
+				"KeyOf3Moons"
+				{
+					"Item"					""
+				}
+			}
+
+			"AttachWearables"
+			{
+				"Wearable1" { "ItemDef" "7983" }	//Mask - Armature of the Belligerent Ram
+				"Wearable2" { "ItemDef" "7980" }	//Sword
+				"Wearable3" { "ItemDef" "7985" }	//Belt
+				"Wearable4" { "ItemDef" "7984" }	//Gauntlet
+				"Wearable5" { "ItemDef" "7982" }	//Shoulder
+				"Wearable6" { "ItemDef" "7981" }	//Back
+			}
+		}
+	}
+
+	//=================================================================================
+	// Special Event: Ramero Dummy
+	//=================================================================================
+	"npc_ramero_bis"
+	{
+		// General
+		//----------------------------------------------------------------
+		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
+		"Model"						"models/heroes/sven/sven.vmdl"	// Model.
+		"ModelScale"				"1.65"
+		"ConsideredHero"			"1"
+		"HasInventory"				"1"
+				
+		// Abilities
+		//----------------------------------------------------------------
+		"Ability1"					""	// Ability 1.
+		"Ability2"					""			// Ability 2.
+		"Ability4"					"endurance_aura"
+		"Ability5"					""						// Ability 6 - Extra.
+		"Ability6"					"dummy_passive_invulnerable_bis"						// Ability 7 - Extra.
+
+		// Attack
+		//----------------------------------------------------------------
+		"AttackDamageMin"			"9995"		// Damage range min.
+		"AttackDamageMax"			"10005"		// Damage range max.
+		"AttackRange"				"600"		// Range within a target can be attacked.
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"				"150"			// Physical protection.
+		"MagicalResistance"			"40"			// Magical protection (percentage).
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"
+		"MovementSpeed"				"360"
+		"MovementTurnRate"			"0.5"
+
+		// Bounds
+		//----------------------------------------------------------------
+		"BoundsHullName"			"DOTA_HULL_SIZE_HERO"			// Hull type used for navigation/locomotion.
+		"RingRadius"				"160"
+
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"250000"		// Base health.
+		
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"1400"		// Range of vision during day light.
+		"VisionNighttimeRange"		"1400"		// Range of vision at night time.
+
+		"Creature"
+		{
+			"EquippedItems"
+			{
+				"KeyOf3Moons"
+				{
+					"Item"					""
+				}
+			}
+
+			"AttachWearables"
+			{
+				"Wearable1" { "ItemDef" "7983" }	//Mask - Armature of the Belligerent Ram
+				"Wearable2" { "ItemDef" "7980" }	//Sword
+				"Wearable3" { "ItemDef" "7985" }	//Belt
+				"Wearable4" { "ItemDef" "7984" }	//Gauntlet
+				"Wearable5" { "ItemDef" "7982" }	//Shoulder
+				"Wearable6" { "ItemDef" "7981" }	//Back
+			}
+		}
+	}
+
+	//=================================================================================
+	// Special Event: Baristal
+	//=================================================================================
+	"npc_baristal"
+	{
+		// General
+		//----------------------------------------------------------------
+		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
+		"Model"						"models/heroes/sven/sven.vmdl"	// Model.
+		"ModelScale"				"1.55"
+		"ConsideredHero"			"1"
+		"HasInventory"				"1"
+		"SoundSet"					"Hero_Sven"
+
+		// Abilities
+		//----------------------------------------------------------------
+		"Ability1"					""	// Ability 1.
+		"Ability2"					""			// Ability 2.
+		"Ability3"					""			// Ability 3.
+		"Ability4"					""						// Ability 6 - Extra.
+		"Ability5"					""						// Ability 7 - Extra.
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"				"150"			// Physical protection.
+		"MagicalResistance"			"40"			// Magical protection (percentage).
+
+		// Attack
+		//----------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
+		"AttackDamageMin"			"14990"		// Damage range min.
+		"AttackDamageMax"			"15010"		// Damage range max.
+		"AttackDamageType"			"DAMAGE_TYPE_ArmorPhysical"
+		"AttackRate"				"0.125"			// Speed of attack.
+		"AttackAnimationPoint"		"0.6"		// Normalized time in animation cycle to attack.
+		"AttackAcquisitionRange"	"1000"		// Range within a target can be acquired.
+		"AttackRange"				"160"		// Range within a target can be attacked.
+		"ProjectileModel"			"" // Particle system model for projectile.
+		"ProjectileSpeed"			""		// Speed of projectile.
+
+		// Bounty
+		//----------------------------------------------------------------
+		"BountyXP"					"0"		// Experience earn.
+		"BountyGoldMin"				"0"		// Gold earned min.
+		"BountyGoldMax"				"0"		// Gold earned max.
+
+		// Bounds
+		//----------------------------------------------------------------
+		"BoundsHullName"			"DOTA_HULL_SIZE_HERO"			// Hull type used for navigation/locomotion.
+		"RingRadius"				"160"
+		"HealthBarOffset"			"300"
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"			// Type of locomotion - ground, air
+		"MovementSpeed"				"360"		// Speed
+		"MovementTurnRate"			"1.0"		// Turning rate.
+
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"250000"		// Base health.
+		"StatusHealthRegen"			"20.0"		// Health regeneration rate.
+		"StatusMana"				"0.0"		// Base mana.
+		"StatusManaRegen"			"0.0"		// Mana regeneration rate.
+
+		// Team
+		//----------------------------------------------------------------
+		"TeamName"					"DOTA_TEAM_NEUTRALS"			// Team name.
+		"CombatClassAttack"			"DOTA_COMBAT_CLASS_ATTACK_HERO"
+		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_HERO"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
+
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"1400"		// Range of vision during day light.
+		"VisionNighttimeRange"		"1400"		// Range of vision at night time.
+
+//		"vscripts"					"ai/frost_infernal.lua"
+
+		// Inventory
+		//----------------------------------------------------------------
+		"HasInventory"				"1"
+
+		"Creature"
+		{
+			"EquippedItems"
+			{
+				"KeyOf3Moons"
+				{
+					"Item"					""
+				}
+			}
+
+			"AttachWearables"
+			{
+				"Wearable1" { "ItemDef" "6082" }	//Mask - Iron Drakken Set
+				"Wearable2" { "ItemDef" "6080" }	//Sword
+				"Wearable3" { "ItemDef" "6077" }	//Belt
+				"Wearable4" { "ItemDef" "6081" }	//Gauntlet
+				"Wearable5" { "ItemDef" "6074" }	//Shoulder
+				"Wearable6" { "ItemDef" "581" }		//Back
+			}
+		}
+	}
+
+	//=================================================================================
+	// Special Event: Baristal Dummy
+	//=================================================================================
+	"npc_baristal_bis"
+	{
+		// General
+		//----------------------------------------------------------------
+		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
+		"Model"						"models/heroes/sven/sven.vmdl"	// Model.
+		"ModelScale"				"1.65"
+		"ConsideredHero"			"1"
+		"HasInventory"				"1"
+
+		// Abilities
+		//----------------------------------------------------------------
+		"Ability1"					""		// Ability 1
+		"Ability2"					""		// Ability 2
+		"Ability3"					""		// Ability 3
+		"Ability4"					""		// Ability 6 - Extra.
+		"Ability5"					"dummy_passive_invulnerable_bis"
+
+		// Attack
+		//----------------------------------------------------------------
+		"AttackDamageMin"			"9995"		// Damage range min.
+		"AttackDamageMax"			"10005"		// Damage range max.
+		"AttackRange"				"600"		// Range within a target can be attacked.
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"				"150"			// Physical protection.
+		"MagicalResistance"			"40"			// Magical protection (percentage).
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"
+		"MovementSpeed"				"360"
+		"MovementTurnRate"			"0.5"
+
+		// Bounds
+		//----------------------------------------------------------------
+		"BoundsHullName"			"DOTA_HULL_SIZE_HERO"			// Hull type used for navigation/locomotion.
+		"RingRadius"				"160"
+
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"250000"		// Base health.
+		
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"1400"		// Range of vision during day light.
+		"VisionNighttimeRange"		"1400"		// Range of vision at night time.
+
+		"Creature"
+		{
+			"EquippedItems"
+			{
+				"KeyOf3Moons"
+				{
+					"Item"					""
+				}
+			}
+
+			"AttachWearables"
+			{
+				"Wearable1" { "ItemDef" "6082" }	//Mask - Iron Drakken Set
+				"Wearable2" { "ItemDef" "6080" }	//Sword
+				"Wearable3" { "ItemDef" "6077" }	//Belt
+				"Wearable4" { "ItemDef" "6081" }	//Gauntlet
+				"Wearable5" { "ItemDef" "6074" }	//Shoulder
+				"Wearable6" { "ItemDef" "581" }		//Back
+			}
+		}
+	}
+
+	//=================================================================================
 	// Creature: Avatar of Vengeance
 	//=================================================================================
 	"npc_avatar_of_vengeance"
@@ -9544,7 +9746,6 @@
 		"BaseClass"					"npc_dota_creature"
 		"Model"						"models/heroes/spectre/spectre.vmdl"	 //Add model
 		"ModelScale"				"1.25"
-		"Level"						"1"
 		"BoundsHullName"			"DOTA_HULL_SIZE_HERO"
 		"HealthBarOffset"			"140"
 
@@ -9627,7 +9828,6 @@
 		"BaseClass"					"npc_dota_creature"
 		"Model"						"models/heroes/vengeful/vengeful.vmdl"	 //Add model
 		"ModelScale"				"0.85"
-		"Level"						"1"
 		"BoundsHullName"			"DOTA_HULL_SIZE_SMALL"
 		"HealthBarOffset"			"140"
 		
@@ -9870,7 +10070,7 @@
 		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
 		"Model"						"models/items/undying/idol_of_ruination/ruin_wight_minion_gold.vmdl"	// Model.
 		"SoundSet"					"Undying_Zombie"					// Name of sound set.
-		"Level"						"1"
+		"Level"						"2"
 		"ModelScale"				"1.30"
 		"SelectionGroup"			"Watery_Minion"
 
@@ -9948,7 +10148,7 @@
 		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
 		"Model"						"models/items/undying/idol_of_ruination/ruin_wight_minion_gold.vmdl"	// Model.
 		"SoundSet"					"Undying_Zombie"					// Name of sound set.
-		"Level"						"1"
+		"Level"						"3"
 		"ModelScale"				"1.45"
 		"SelectionGroup"			"Watery_Minion"
 
@@ -10026,7 +10226,7 @@
 		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
 		"Model"						"models/items/undying/idol_of_ruination/ruin_wight_minion_gold.vmdl"	// Model.
 		"SoundSet"					"Undying_Zombie"					// Name of sound set.
-		"Level"						"1"
+		"Level"						"4"
 		"ModelScale"				"1.60"
 		"SelectionGroup"			"Watery_Minion"
 
@@ -10308,7 +10508,7 @@
 		"BaseClass"					"npc_dota_creature"
 		"Model"						"models/heroes/weaver/weaver_bug.vmdl"
 		"ModelScale"				"1.5"
-		"Level"						"1"
+		"Level"						"2"
 		"IsSummoned"				"1"
 		
 		// Armor
@@ -10361,7 +10561,7 @@
 		"BaseClass"					"npc_dota_creature"
 		"Model"						"models/heroes/weaver/weaver_bug.vmdl"
 		"ModelScale"				"1.75"
-		"Level"						"1"
+		"Level"						"3"
 		"IsSummoned"				"1"
 		
 		// Armor
@@ -10414,7 +10614,7 @@
 		"BaseClass"					"npc_dota_creature"
 		"Model"						"models/heroes/weaver/weaver_bug.vmdl"
 		"ModelScale"				"2.0"
-		"Level"						"1"
+		"Level"						"4"
 		"IsSummoned"				"1"
 		
 		// Armor
@@ -10915,7 +11115,7 @@
 		//----------------------------------------------------------------
 		 "Creature"
 		{
-			"AttachWearables"   
+			"AttachWearables"
 			{
 				"Wearable1" { "ItemDef" "16" }		//Mask
 				"Wearable2" { "ItemDef" "17" }		//Sword

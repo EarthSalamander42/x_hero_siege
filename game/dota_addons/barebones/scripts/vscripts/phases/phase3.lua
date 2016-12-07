@@ -7,14 +7,12 @@ first_time_teleport_arthas_real = true
 
 function teleport_phase3_creeps(keys)
 -- Spawn Phase 3 Creeps
-DebugPrint("teleport trigger")
 local caller = keys.caller
 local activator = keys.activator
 local point = Entities:FindByName(nil,"point_teleport_phase3_creeps"):GetAbsOrigin()
 local stats = 250
 
 	if first_time_teleport_phase3_creeps then
-		print("Disabled trigger dark protectors")
 		DoEntFire("trigger_teleport_phase3_creeps","Kill",nil,0,nil,nil)
 		Notifications:TopToAll({text="Power Up: +250 to all stats!", style={color="green"}, duration=10.0})
 		activator:EmitSound("ui.trophy_levelup")
@@ -47,11 +45,11 @@ local heroes = HeroList:GetAllHeroes()
 local point = Entities:FindByName( nil, "spawner_phase3_creeps_west"):GetAbsOrigin()
 local point2 = Entities:FindByName( nil, "spawner_phase3_creeps_east"):GetAbsOrigin()
 
-	for j = 1,8 do
+	for j = 1, 8 do
 		local unit = CreateUnitByName("npc_dota_creep_radiant_hulk", point+RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_BADGUYS)
 	end
 
-	for j = 1,8 do
+	for j = 1, 8 do
 		local unit = CreateUnitByName("npc_dota_creep_dire_hulk", point2+RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_BADGUYS)
 	end
 	return nil
@@ -59,7 +57,6 @@ end
 
 function LastArenaBossKillCount(keys)
 GameMode.Arthas_killed = GameMode.Arthas_killed +1
-print( GameMode.Arthas_killed )
 	if GameMode.Arthas_killed == 1 then
 	print( "Arthas is Dead!" )
 	Notifications:TopToAll({text="Who did this?.." , duration=5.0})
@@ -87,10 +84,10 @@ end
 function teleport_to_arthas_arena(keys)
 local caller = keys.caller
 local activator = keys.activator
+local difficulty = GameRules:GetCustomGameDifficulty()
 local point = Entities:FindByName(nil,"point_teleport_arthas"):GetAbsOrigin()
 	if first_time_teleport_arthas then
 		local heroes = HeroList:GetAllHeroes()
-		print( "Grom, Proudmoore, Illidan, Balanar should appears now" )
 
 		local grom = CreateUnitByName("npc_dota_hero_grom_hellscream",Entities:FindByName(nil,"spawn_grom_hellscream"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_BADGUYS)
 		grom:SetAngles(0, 270, 0)
@@ -126,7 +123,6 @@ local caller = keys.caller
 local activator = keys.activator
 local point = Entities:FindByName(nil,"point_teleport_boss"):GetAbsOrigin()
 local heroes = HeroList:GetAllHeroes()
-print( "Arthas should appears now" )
 	if first_time_teleport_arthas_real then
 		local arthas = CreateUnitByName("npc_dota_hero_arthas",Entities:FindByName(nil,"npc_dota_spawner_magtheridon_arena"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_BADGUYS)
 		arthas:SetAngles(0, 270, 0)
@@ -159,8 +155,8 @@ end
 function StartBaneHallowArena(keys)
 local caller = keys.caller
 local activator = keys.activator
+local difficulty = GameRules:GetCustomGameDifficulty()
 local point = Entities:FindByName(nil,"point_teleport_boss"):GetAbsOrigin()
-print( "BaneHallow should appears now" )
 
 	Timers:CreateTimer(8,function()
 	local banehallow = CreateUnitByName("npc_dota_hero_banehallow",Entities:FindByName(nil,"npc_dota_spawner_magtheridon_arena"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_BADGUYS)
@@ -219,8 +215,7 @@ local point = Entities:FindByName(nil, "npc_dota_spawner_lich_king_bis")
 local point_abs = Entities:FindByName(nil, "npc_dota_spawner_lich_king_bis"):GetAbsOrigin()
 local point_hero = Entities:FindByName(nil, "point_teleport_boss"):GetAbsOrigin()
 local heroes = HeroList:GetAllHeroes()
-local reincarnate_time = 7.75
-print( "Lich King should appears now" )
+local reincarnate_time = 8.0
 
 	for _,hero in pairs(heroes) do
 		if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
@@ -236,15 +231,17 @@ print( "Lich King should appears now" )
 		end
 	end
 
-	StartAnimation(lich_king, {duration = reincarnate_time, activity = ACT_DOTA_SPAWN, rate = 1.0})
+	Timers:CreateTimer(2.0, function()
+		StartAnimation(lich_king, {duration = reincarnate_time, activity = ACT_DOTA_SPAWN, rate = 1.0})
 
-	Timers:CreateTimer(reincarnate_time, function()
-		UTIL_Remove(lich_king)
-		local lich_king2 = CreateUnitByName("npc_dota_boss_lich_king", point_abs, true, nil, nil, DOTA_TEAM_BADGUYS)
-		StartAnimation(lich_king2, {duration = 3.0, activity = ACT_DOTA_SPAWN, rate = 0.65})
-		lich_king2:SetAngles(0, 270, 0)
-		lich_king2:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 12, IsHidden = true})
-		lich_king2:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 12, IsHidden = true})
+		Timers:CreateTimer(reincarnate_time, function()
+			UTIL_Remove(lich_king)
+			local lich_king2 = CreateUnitByName("npc_dota_boss_lich_king", point_abs, true, nil, nil, DOTA_TEAM_BADGUYS)
+			StartAnimation(lich_king2, {duration = 3.0, activity = ACT_DOTA_SPAWN, rate = 0.65})
+			lich_king2:SetAngles(0, 270, 0)
+			lich_king2:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 12, IsHidden = true})
+			lich_king2:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 12, IsHidden = true})
+		end)
 	end)
 
 	Timers:CreateTimer(14,function()

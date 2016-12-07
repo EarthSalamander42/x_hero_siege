@@ -3,6 +3,7 @@ _G.nCOUNTDOWNCREEP = 0
 _G.nCOUNTDOWNINCWAVE = 0
 _G.nCOUNTDOWNEVENT = 0
 _G.BT_ENABLED = 1
+_G.RAMERO = 0
 
 _G.mod_creator = {
 		54896080, -- Cookies
@@ -14,30 +15,33 @@ _G.captain_baumi = {
 	}
 
 _G.mod_graphist = {
-		61711140 -- Mugiwara
+		61711140, -- Mugiwara
+		56352263 -- Flotos
 	}
 
 _G.vip_members = {
 		69533529, -- West [Unlimited]
 		206464009, -- beast [Unlimited]
 		86718505, -- Noya [Unlimited]
-		146805680, -- [UTAC] Rekail [Gatiipz Gatiipz on Patreon, Remove Date if not paid: 1/01/2017]
-		75034844, -- Specter [Tyrael on Patreon, Remove Date if not paid: 5/01/2017]
-		348253073, -- 禁断のゲーム [Alisia on Patreon, Remove Date if not paid: DECLINED. 7/11/2016]
-		110786327, -- MechJesus [Mauro Solares on Patreon, Remove Date if not paid: DECLINED. 7/11/2016]
+		146805680, -- [UTAC] Rekail [Gatiipz Gatiipz on Patreon, Remove Date if not paid: 01/01/2017]
+		75034844, -- Specter [Tyrael on Patreon, Remove Date if not paid: 05/01/2017]
+--		348253073, -- 禁断のゲーム [Alisia on Patreon, Remove Date if not paid: Removed for Fraud of 99.99$
+		110786327, -- MechJesus [Mauro Solares on Patreon, Remove Date if not paid: 07/01/2017]
 		93860661, -- Meteor [Supawit Enyord on Patreon, Remove Date if not paid: 10/01/2017]
-		190411200, -- Nojo [Nojo on Patreon, Remove Date if not paid: DECLINED. 23/11/2016]
+		190411200, -- Nojo [Nojo on Patreon, Remove Date if not paid: 23/01/2017]
 		97629656, -- jacobkahnji  [Jacob A Yow on Patreon, Remove Date if not paid: 23/01/2017]
-		136258650, -- Meliodas [Dinh Quang on Patreon, Remove Date if not paid: DECLINED. 25/11/2016]
-		55770641, -- Primeape [Filip Dingum on Patreon, Remove Date if not paid: DECLINED. 31/11/2016]
+		136258650, -- Meliodas [Dinh Quang on Patreon, Remove Date if not paid: 25/01/2017]
+		55770641, -- Primeape [Filip Dingum on Patreon, Remove Date if not paid: 31/01/2017]
 		5194446, -- Botd [Hugo Marques on Patreon, Remove Date if not paid: 31/01/2017]
+		27954291, -- Gengar [Christian Oversand Deildok on Patreon, Remove Date if not paid: 04/01/2017]
+		113777627, -- Mieu [phil lousbury on Patreon, Remove Date if not paid: 07/01/2017]
+		152511257, -- MasKe~🖕 [Jamie Vidler on Patreon, Remove Date if not paid: 07/01/2017]
 
 		312910864, -- breddybourne [Winner of the 21th November Day Event]
 		157808659, -- ST8 [Winner of the 21th November Day Event]
 		62993541, -- KennyCrazy [Winner of the 21th November Day Event]
 		331762743, -- Sterling8077 [Winner of the 21th November Day Event]
-		112182763, -- Mugiwara, not the graphist another one ^^ [Winner of the 21th November Day Event]
-		56352263 -- Flotos [Winner of the 21th November Day Event]
+		112182763 -- Mugiwara, not the graphist another one ^^ [Winner of the 21th November Day Event]
 	}
 
 _G.banned_players = {
@@ -157,7 +161,7 @@ function GameMode:OnHeroInGame(hero)
 	if hero:GetUnitName() == "npc_dota_hero_wisp" then
 		hero:SetAbilityPoints(0)
 		hero:SetGold(0, false)
-		hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {Duration = 20, IsHidden = true})
+		hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {Duration = 0, IsHidden = true})
 		hero:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
 	end
 end
@@ -241,22 +245,8 @@ local triggers_choice = Entities:FindAllByName("trigger_special_event_choice")
 	--//=================================================================================================================
 	Timers:CreateTimer(241, function() -- 4 Min: NECROLYTE WEST EVENT 1
 	local point = Entities:FindByName( nil, "npc_dota_spawner_west_event"):GetAbsOrigin()
-		if difficulty == 1 then
-			for j = 1, 6 do
-				local unit = CreateUnitByName("npc_dota_creature_necrolyte_event_1", point, true, nil, nil, DOTA_TEAM_BADGUYS)
-			end
-		elseif difficulty == 2 then
-			for j = 1, 8 do
-				local unit = CreateUnitByName("npc_dota_creature_necrolyte_event_1", point, true, nil, nil, DOTA_TEAM_BADGUYS)
-			end
-		elseif difficulty == 3 then
-			for j = 1, 10 do
-				local unit = CreateUnitByName("npc_dota_creature_necrolyte_event_1", point, true, nil, nil, DOTA_TEAM_BADGUYS)
-			end
-		elseif difficulty == 4 then
-			for j = 1, 14 do
-				local unit = CreateUnitByName("npc_dota_creature_necrolyte_event_1", point, true, nil, nil, DOTA_TEAM_BADGUYS)
-			end
+		for j = 1, 10 do
+			local unit = CreateUnitByName("npc_dota_creature_necrolyte_event_1", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		end
 	end)
 
@@ -265,22 +255,8 @@ local triggers_choice = Entities:FindAllByName("trigger_special_event_choice")
 	--//=================================================================================================================
 	Timers:CreateTimer(481, function() -- 8 Min: NAGA SIREN NORTH EVENT 2
 	local point = Entities:FindByName( nil, "npc_dota_spawner_north_event"):GetAbsOrigin()
-		if difficulty == 1 then
-			for j = 1, 6 do
-				local unit = CreateUnitByName("npc_dota_creature_naga_siren_event_2", point, true, nil, nil, DOTA_TEAM_BADGUYS)
-			end
-		elseif difficulty == 2 then
-			for j = 1, 8 do
-				local unit = CreateUnitByName("npc_dota_creature_naga_siren_event_2", point, true, nil, nil, DOTA_TEAM_BADGUYS)
-			end
-		elseif difficulty == 3 then
-			for j = 1, 10 do
-				local unit = CreateUnitByName("npc_dota_creature_naga_siren_event_2", point, true, nil, nil, DOTA_TEAM_BADGUYS)
-			end
-		elseif difficulty == 4 then
-			for j = 1, 14 do
-				local unit = CreateUnitByName("npc_dota_creature_naga_siren_event_2", point, true, nil, nil, DOTA_TEAM_BADGUYS)
-			end
+		for j = 1, 10 do
+			local unit = CreateUnitByName("npc_dota_creature_naga_siren_event_2", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		end
 	end)
 
@@ -289,22 +265,8 @@ local triggers_choice = Entities:FindAllByName("trigger_special_event_choice")
 	--//=================================================================================================================
 	Timers:CreateTimer(841, function() -- 12 Min: VENGEFUL SPIRIT SOUTH EVENT 3
 	local point = Entities:FindByName( nil, "npc_dota_spawner_east_event"):GetAbsOrigin()
-		if difficulty == 1 then
-			for j = 1, 6 do
-				local unit = CreateUnitByName("npc_dota_creature_vengeful_spirit_event_3", point, true, nil, nil, DOTA_TEAM_BADGUYS)
-			end
-		elseif difficulty == 2 then
-			for j = 1, 8 do
-				local unit = CreateUnitByName("npc_dota_creature_vengeful_spirit_event_3", point, true, nil, nil, DOTA_TEAM_BADGUYS)
-			end
-		elseif difficulty == 3 then
-			for j = 1, 10 do
-				local unit = CreateUnitByName("npc_dota_creature_vengeful_spirit_event_3", point, true, nil, nil, DOTA_TEAM_BADGUYS)
-			end
-		elseif difficulty == 4 then
-			for j = 1, 14 do
-				local unit = CreateUnitByName("npc_dota_creature_vengeful_spirit_event_3", point, true, nil, nil, DOTA_TEAM_BADGUYS)
-			end
+		for j = 1, 6 do
+			local unit = CreateUnitByName("npc_dota_creature_vengeful_spirit_event_3", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		end
 	end)
 
@@ -313,22 +275,8 @@ local triggers_choice = Entities:FindAllByName("trigger_special_event_choice")
 	--//=================================================================================================================
 	Timers:CreateTimer(1081, function() -- 16 Min: CAPTAIN SOUTH EVENT 4
 	local point = Entities:FindByName( nil, "npc_dota_spawner_south_event"):GetAbsOrigin()
-		if difficulty == 1 then
-			for j = 1, 6 do
-				local unit = CreateUnitByName("npc_dota_creature_captain_event_4", point, true, nil, nil, DOTA_TEAM_BADGUYS)
-			end
-			elseif difficulty == 2 then
-			for j = 1, 8 do
-				local unit = CreateUnitByName("npc_dota_creature_captain_event_4", point, true, nil, nil, DOTA_TEAM_BADGUYS)
-			end
-			elseif difficulty == 3 then
-			for j = 1, 10 do
-				local unit = CreateUnitByName("npc_dota_creature_captain_event_4", point, true, nil, nil, DOTA_TEAM_BADGUYS)
-			end
-			elseif difficulty == 4 then
-			for j = 1, 14 do
-				local unit = CreateUnitByName("npc_dota_creature_captain_event_4", point, true, nil, nil, DOTA_TEAM_BADGUYS)
-			end
+		for j = 1, 6 do
+			local unit = CreateUnitByName("npc_dota_creature_captain_event_4", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		end
 	end)
 
@@ -337,22 +285,8 @@ local triggers_choice = Entities:FindAllByName("trigger_special_event_choice")
 	--//=================================================================================================================
 	Timers:CreateTimer(1321, function() -- 20 Min: SLARDARS EVENT 5
 	local point = Entities:FindByName( nil, "npc_dota_spawner_west_event"):GetAbsOrigin()
-		if difficulty == 1 then
-			for j = 1, 6 do
-				local unit = CreateUnitByName("npc_dota_creature_slardar_event_5", point, true, nil, nil, DOTA_TEAM_BADGUYS)
-			end
-			elseif difficulty == 2 then
-			for j = 1, 8 do
-				local unit = CreateUnitByName("npc_dota_creature_slardar_event_5", point, true, nil, nil, DOTA_TEAM_BADGUYS)
-			end
-			elseif difficulty == 3 then
-			for j = 1, 10 do
-				local unit = CreateUnitByName("npc_dota_creature_slardar_event_5", point, true, nil, nil, DOTA_TEAM_BADGUYS)
-			end
-			elseif difficulty == 4 then
-			for j = 1, 14 do
-				local unit = CreateUnitByName("npc_dota_creature_slardar_event_5", point, true, nil, nil, DOTA_TEAM_BADGUYS)
-			end
+		for j = 1, 6 do
+			local unit = CreateUnitByName("npc_dota_creature_slardar_event_5", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		end
 	end)
 
@@ -361,22 +295,8 @@ local triggers_choice = Entities:FindAllByName("trigger_special_event_choice")
 	--//=================================================================================================================
 	Timers:CreateTimer(1621, function() -- 25 Min: CHAOS KNIGHTS EVENT 6
 	local point = Entities:FindByName( nil, "npc_dota_spawner_north_event"):GetAbsOrigin()
-		if difficulty == 1 then
-			for j = 1, 6 do
-				local unit = CreateUnitByName("npc_dota_creature_chaos_knight_event_6", point, true, nil, nil, DOTA_TEAM_BADGUYS)
-			end
-			elseif difficulty == 2 then
-			for j = 1, 8 do
-				local unit = CreateUnitByName("npc_dota_creature_chaos_knight_event_6", point, true, nil, nil, DOTA_TEAM_BADGUYS)
-			end
-			elseif difficulty == 3 then
-			for j = 1, 10 do
-				local unit = CreateUnitByName("npc_dota_creature_chaos_knight_event_6", point, true, nil, nil, DOTA_TEAM_BADGUYS)
-			end
-			elseif difficulty == 4 then
-			for j = 1, 14 do
-				local unit = CreateUnitByName("npc_dota_creature_chaos_knight_event_6", point, true, nil, nil, DOTA_TEAM_BADGUYS)
-			end
+		for j = 1, 6 do
+			local unit = CreateUnitByName("npc_dota_creature_chaos_knight_event_6", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		end
 	end)
 
@@ -385,22 +305,8 @@ local triggers_choice = Entities:FindAllByName("trigger_special_event_choice")
 	--//=================================================================================================================
 	Timers:CreateTimer(1861, function() -- 29 Min: LUNA EVENT 7
 	local point = Entities:FindByName( nil, "npc_dota_spawner_east_event"):GetAbsOrigin()
-		if difficulty == 1 then
-			for j = 1, 6 do
-				local unit = CreateUnitByName("npc_dota_creature_luna_event_7", point, true, nil, nil, DOTA_TEAM_BADGUYS)
-			end
-			elseif difficulty == 2 then
-			for j = 1, 8 do
-				local unit = CreateUnitByName("npc_dota_creature_luna_event_7", point, true, nil, nil, DOTA_TEAM_BADGUYS)
-			end
-			elseif difficulty == 3 then
-			for j = 1, 10 do
-				local unit = CreateUnitByName("npc_dota_creature_luna_event_7", point, true, nil, nil, DOTA_TEAM_BADGUYS)
-			end
-			elseif difficulty == 4 then
-			for j = 1, 14 do
-				local unit = CreateUnitByName("npc_dota_creature_luna_event_7", point, true, nil, nil, DOTA_TEAM_BADGUYS)
-			end
+		for j = 1, 6 do
+			local unit = CreateUnitByName("npc_dota_creature_luna_event_7", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		end
 	end)
 
@@ -409,22 +315,8 @@ local triggers_choice = Entities:FindAllByName("trigger_special_event_choice")
 	--//=================================================================================================================
 	Timers:CreateTimer(2101, function() -- 33 Min: CLOCKWERK EVENT 8
 	local point = Entities:FindByName( nil, "npc_dota_spawner_south_event"):GetAbsOrigin()
-		if difficulty == 1 then
-			for j = 1, 6 do
-				local unit = CreateUnitByName("npc_dota_creature_clockwerk_event_8", point, true, nil, nil, DOTA_TEAM_BADGUYS)
-			end
-			elseif difficulty == 2 then
-			for j = 1, 8 do
-				local unit = CreateUnitByName("npc_dota_creature_clockwerk_event_8", point, true, nil, nil, DOTA_TEAM_BADGUYS)
-			end
-			elseif difficulty == 3 then
-			for j = 1, 10 do
-				local unit = CreateUnitByName("npc_dota_creature_clockwerk_event_8", point, true, nil, nil, DOTA_TEAM_BADGUYS)
-			end
-			elseif difficulty == 4 then
-			for j = 1, 14 do
-				local unit = CreateUnitByName("npc_dota_creature_clockwerk_event_8", point, true, nil, nil, DOTA_TEAM_BADGUYS)
-			end
+		for j = 1, 6 do
+			local unit = CreateUnitByName("npc_dota_creature_clockwerk_event_8", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		end
 	end)
 
@@ -437,7 +329,7 @@ local triggers_choice = Entities:FindAllByName("trigger_special_event_choice")
 		end)
 	end)
 
-	Timers:CreateTimer(6, function() -- 1436 - 23:55 Min: FARM EVENT 2
+	Timers:CreateTimer(1436, function() -- 1436 - 23:55 Min: FARM EVENT 2
 		PauseCreepsFarm()
 		PauseHeroes()
 		Timers:CreateTimer(5, function()
@@ -546,7 +438,7 @@ function GameMode:InitGameMode()
 	local difficulty = GameRules:GetCustomGameDifficulty()
 
 	-- Timer Rules
-	GameRules:SetPreGameTime( 120.0 )
+	GameRules:SetPreGameTime( 20.0 ) --120.0
 	GameRules:SetPostGameTime( 30.0 )
 	GameRules:SetTreeRegrowTime( 60.0 )
 	GameRules:SetHeroSelectionTime( 0.0 ) --This is not dota bitch
@@ -745,7 +637,7 @@ local newState = GameRules:State_Get()
 		nCOUNTDOWNCREEP = 361
 	elseif time_elapsed > 720 and time_elapsed < 870 then
 		nCOUNTDOWNCREEP = 1
-	elseif time_elapsed > 1920 then
+	elseif time_elapsed > 2020 then
 		nCOUNTDOWNCREEP = 1
 	end
 
@@ -755,7 +647,7 @@ local newState = GameRules:State_Get()
 		nCOUNTDOWNINCWAVE = 241
 	elseif time_elapsed > 720 and time_elapsed < 870 then
 		nCOUNTDOWNINCWAVE = 1
-	elseif time_elapsed > 2040 then
+	elseif time_elapsed > 2140 then
 		nCOUNTDOWNINCWAVE = 1
 	end
 

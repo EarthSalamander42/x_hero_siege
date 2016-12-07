@@ -7,8 +7,8 @@ local heroes = HeroList:GetAllHeroes()
 nCOUNTDOWNTIMER = 121
 
 	local Muradin = CreateUnitByName("npc_dota_creature_muradin_bronzebeard", Entities:FindByName(nil, "npc_dota_muradin_boss"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_NEUTRALS)
-	Muradin:AddNewModifier( nil, nil, "modifier_boss_stun", {duration = 3})
-	Muradin:AddNewModifier( nil, nil, "modifier_invulnerable", {duration = 3})
+	Muradin:AddNewModifier( nil, nil, "modifier_boss_stun", {duration = 5})
+	Muradin:AddNewModifier( nil, nil, "modifier_invulnerable", {duration = 5})
 	Muradin:SetAngles(0, 270, 0)
 	Muradin:EmitSound("Muradin.StormEarthFire")
 	Notifications:TopToAll({hero="npc_dota_hero_zuus", duration=5.0})
@@ -30,12 +30,14 @@ nCOUNTDOWNTIMER = 121
 
 		UTIL_Remove(Muradin)
 		nCOUNTDOWNTIMER = 600
---		Muradin:StopSound("Muradin.StormEarthFire")
 	end)
 
-	Timers:CreateTimer(125, function() -- 14:05 Min: MURADIN BRONZEBEARD EVENT 1, END
+	Timers:CreateTimer(126, function() -- 14:05 Min: MURADIN BRONZEBEARD EVENT 1, END
 		Notifications:TopToAll({text="All heroes who survived Muradin received 15 000 Gold!", duration=6.0})
 		Notifications:TopToAll({ability="alchemist_goblins_greed", continue=true})
+		for _,v in pairs(teleporters) do
+			v:Disable()
+		end
 	end)
 end
 
@@ -67,7 +69,6 @@ BT_ENABLED = 0
 
 	for _,hero in pairs(heroes) do
 		local id = hero:GetPlayerID()
-		print(id)
 		local point = Entities:FindByName(nil, "farm_event_player_"..id)
 
 		if id == 0 then
@@ -107,7 +108,7 @@ BT_ENABLED = 0
 	local teleporters = Entities:FindAllByName("trigger_farm_event")
 
 		nCOUNTDOWNCREEP = 180
-		nCOUNTDOWNINCWAVE = 180
+		nCOUNTDOWNINCWAVE = 240
 		NEUTRAL_SPAWN = 0
 		BT_ENABLED = 1
 
@@ -124,7 +125,6 @@ BT_ENABLED = 0
 end
 
 function EndFarmEvent(keys)
-print("End Farm Event")
 local activator = keys.activator
 local point = Entities:FindByName(nil,"base_spawn"):GetAbsOrigin()
 
@@ -272,4 +272,52 @@ local number7 = 0
 		end
 	end
 	return 1
+end
+
+function RameroEvent() -- 960 kills
+local teleporters = Entities:FindAllByName("trigger_teleport_ramero_end")
+nCOUNTDOWNTIMER = 121
+
+	local Ramero = CreateUnitByName("npc_ramero", Entities:FindByName(nil, "roshan_wp_4"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_NEUTRALS)
+	Ramero:AddNewModifier( nil, nil, "modifier_boss_stun", {duration = 5})
+	Ramero:AddNewModifier( nil, nil, "modifier_invulnerable", {duration = 5})
+	Ramero:SetAngles(0, 45, 0)
+	local Baristal = CreateUnitByName("npc_baristal", Entities:FindByName(nil, "roshan_wp_2"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_NEUTRALS)
+	Baristal:AddNewModifier( nil, nil, "modifier_boss_stun", {duration = 5})
+	Baristal:AddNewModifier( nil, nil, "modifier_invulnerable", {duration = 5})
+	Baristal:SetAngles(0, 325, 0)
+--	Ramero:EmitSound("Muradin.StormEarthFire")
+	Notifications:TopToAll({hero="npc_dota_hero_sven", duration=5.0})
+	Notifications:TopToAll({text="Kill Ramero and Baristal to get special items! ", continue=true})
+	Notifications:TopToAll({text="Reward: Lightning Sword and Tome of Stats +250.", continue=true})
+
+	Timers:CreateTimer(120, function() -- Teleport back to the spawn
+		for _,v in pairs(teleporters) do
+			v:Enable()
+		end
+
+		UTIL_Remove(Ramero)
+		UTIL_Remove(Baristal)
+	end)
+
+	Timers:CreateTimer(126, function() -- 14:05 Min: MURADIN BRONZEBEARD EVENT 1, END
+--		Notifications:TopToAll({text="Ramero and Baristal won the duel!", duration = 6.0})
+		for _,v in pairs(teleporters) do
+			v:Disable()
+		end
+	end)
+end
+
+function EndRameroEvent(keys)
+	local activator = keys.activator
+	local point = Entities:FindByName(nil,"base_spawn"):GetAbsOrigin()
+
+	if activator:GetTeam() == DOTA_TEAM_GOODGUYS then
+	FindClearSpaceForUnit(activator, point, true)
+	PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(), activator)
+	Timers:CreateTimer(0.1, function()
+		PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(), nil)
+	end)
+	activator:Stop()
+	end
 end

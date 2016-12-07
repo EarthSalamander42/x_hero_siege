@@ -1882,4 +1882,92 @@
 			"01"						"item_blades_of_attack2"
 		}
 	}
+
+	//========================================================================================================
+	// Lightning Sword
+	//========================================================================================================
+	"item_lightning_sword"
+	{
+		// General
+		//----------------------------------------------------------------------------------------------------
+		"BaseClass"             		"item_datadriven"
+		"ID"							"2527"
+		"AbilityTextureName"			"lightning_sword"		
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+
+		// Item Info
+		//----------------------------------------------------------------------------------------------------
+		"ItemCost"						"0"
+		"ItemShopTags"					"unique"
+		"ItemQuality"					"epic"
+		"ItemAliases"					"lightning sword"
+		"ItemPurchasable"				"0"
+		"ItemSellable"					"0"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
+
+		// Special
+		//----------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"lifesteal_percent"		"50"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_damage"			"3000"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_armor"			"125"
+			}
+		}
+
+		"Modifiers"
+		{
+			"modifier_item_lightning_sword"
+			{
+				"Passive"						"1"
+				"IsHidden"						"1"
+				"Attributes"					"MODIFIER_ATTRIBUTE_MULTIPLE"
+				
+				"Orb"
+				{
+					"Priority"					"DOTA_ORB_PRIORITY_ITEM"
+				}
+
+				"OnOrbImpact"
+				{
+					"RunScript"
+					{
+						"ScriptFile"			"items/lifesteal_mask/mask_of_death.lua"
+						"Function"				"modifier_item_lifesteal_datadriven_on_orb_impact"
+					}
+				}
+
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE"		"%bonus_damage"
+					"MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS"		"%bonus_armor"
+				}
+			}
+			"modifier_item_lifesteal_mask_lifesteal"
+			{
+				"Passive"				"0"
+				"IsHidden"				"1"
+
+				"OnDealDamage"
+				{
+					"Lifesteal"
+					{
+						"Target"				"ATTACKER"
+						"LifestealPercent"		"%lifesteal_percent"
+					}
+				}
+			}
+		}
+	}
 } // End of npc_items_custom.txt

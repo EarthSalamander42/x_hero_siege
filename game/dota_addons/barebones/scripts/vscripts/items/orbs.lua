@@ -1,12 +1,14 @@
 function EquipOrb( event )
 local caster = event.caster
-	caster.hasOrb = (caster.hasOrb and caster.hasOrb + 1) or 1
+	if not caster:GetUnitName() == "npc_dota_courier" then
+		caster.hasOrb = (caster.hasOrb and caster.hasOrb + 1) or 1
+	end
 end
 
 function UnequipOrb( event )
 local caster = event.caster
 	caster.hasOrb = caster.hasOrb - 1
-	if caster.hasOrb == 0 then
+	if not caster:GetUnitName() == "npc_dota_courier" and caster.hasOrb == 0 then
 		caster.hasOrb = false
 	end
 end

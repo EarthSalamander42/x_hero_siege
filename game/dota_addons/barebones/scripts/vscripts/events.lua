@@ -20,7 +20,7 @@ function GameMode:OnSettingVote(keys)
   -- VoteTable is initialised in InitGameMode()
   if not mode.VoteTable[keys.category] then mode.VoteTable[keys.category] = {} end
   mode.VoteTable[keys.category][pid] = keys.vote
-  
+
   --PrintTable(mode.VoteTable)
 end
 
@@ -136,6 +136,57 @@ function GameMode:OnNPCSpawned(keys)
 		end
 	end
 
+	-- List of innate abilities
+	local difficulty_abilities = {
+		"life_stealer_feast",
+		"weaver_geminate_attack",
+		"creature_aura_of_blight",
+		"antimage_mana_break",
+		"nevermore_dark_lord",
+		"juggernaut_blade_dance",
+		"viper_corrosive_skin",
+		"creature_thunder_clap_low",
+		"creature_death_pulse",
+		"endurance_aura",
+		"unholy_aura",
+		"creature_thunder_clap",
+		"command_aura",
+		"grom_hellscream_mirror_image",
+		"grom_hellscream_bladefury",
+		"devotion_aura",
+		"divine_aura",
+		"proudmoore_divine_shield",
+		"arthas_holy_light",
+		"arthas_knights_armor",
+		"arthas_light_roar",
+		"roshan_stormbolt",
+		"creature_starfall",
+		"creature_firestorm",
+		"demonhunter_evasion",
+		"demonhunter_immolation",
+		"demonhunter_immolation_small",
+		"demonhunter_negative_energy",
+		"demonhunter_negative_energy_small",
+		"demonhunter_roar",
+		"demonhunter_vampiric_aura",
+		"howl_of_terror",
+		"balanar_rain_of_chaos",
+		"balanar_sleep",
+		"banehallow_stampede",
+		"creature_chronosphere",
+		"venomancer_poison_sting",
+		"lich_frost_armor"
+	}
+
+	-- Cycle through any innate abilities found, then upgrade them
+	for i = 1, #difficulty_abilities do
+		local current_ability = npc:FindAbilityByName(difficulty_abilities[i])
+		local difficulty = GameRules:GetCustomGameDifficulty()
+		if current_ability and npc:GetTeam() == DOTA_TEAM_BADGUYS then
+			current_ability:SetLevel(difficulty)
+		end
+	end
+
 --	if npc:GetUnitName() == "npc_dota_hero_furion" then -- This functions says it's working, print works no errors but Wearables still there..
 --		local model = npc:FirstMoveChild()
 --		while model ~= nil do
@@ -182,7 +233,7 @@ function GameMode:OnItemPickedUp(keys)
 	local itemname = keys.itemname
 end
 
--- A player has reconnected to the game.  This function can be used to repaint Player-based particles or change
+-- A player has reconnected to the game. This function can be used to repaint Player-based particles or change
 -- state as necessary
 function GameMode:OnPlayerReconnect(keys)
 	DebugPrint( '[BAREBONES] OnPlayerReconnect' )
@@ -478,6 +529,11 @@ local playerKills = PlayerResource:GetKills(KillerID)
 		killerEntity = killerEntity:GetPlayerOwner():GetAssignedHero()
 	end
 
+	-- if killed by illusion, change the killer to the owner of illusion instead
+	if killerEntity:IsIllusion() then
+		killerEntity = PlayerResource:GetPlayer(killerEntity:GetPlayerID()):GetAssignedHero()
+	end
+
 	-- Set Kill Count to the Player's Last Hit Count
 	if killerEntity:IsRealHero() and killedUnit:GetTeam() == DOTA_TEAM_BADGUYS then
 		if PlayerResource:HasSelectedHero(KillerID) then
@@ -490,30 +546,54 @@ local playerKills = PlayerResource:GetKills(KillerID)
 	else return nil
 	end
 
---	if killerEntity:GetKills() == 88 then -- 16 lvl1(64) + 4 lvl2(24) wave kills = 20 wave kills(88)
---		Notifications:Top(killerEntity:GetPlayerOwnerID(), {text="100 kills. You get 1000 gold.", duration=5.0, style={color="red"}})
---		PlayerResource:ModifyGold( killerEntity:GetPlayerOwnerID(), 1000, false,  DOTA_ModifyGold_Unspecified )
 	if killerEntity:GetKills() == 100 then
 		Notifications:Top(killerEntity:GetPlayerOwnerID(), {text="100 kills. You get 5000 gold.", duration=5.0, style={color="red"}})
 		PlayerResource:ModifyGold( killerEntity:GetPlayerOwnerID(), 5000, false,  DOTA_ModifyGold_Unspecified )
---	elseif killerEntity:GetKills() == 224 then -- 20 wave kills(88) + 12 lvl2(72) + 8 lvl3(64) wave kills = 40 wave kills(224)
---		Notifications:Top(killerEntity:GetPlayerOwnerID(), {text="100 kills. You get 1000 gold.", duration=5.0, style={color="red"}})
---		PlayerResource:ModifyGold( killerEntity:GetPlayerOwnerID(), 1000, false,  DOTA_ModifyGold_Unspecified )
 	elseif killerEntity:GetKills() == 500 then
 		Notifications:Top(killerEntity:GetPlayerOwnerID(), {text="500 kills. You get 25000 gold.", duration=5.0, style={color="red"}})
 		PlayerResource:ModifyGold( killerEntity:GetPlayerOwnerID(), 25000, false,  DOTA_ModifyGold_Unspecified )
---	elseif killerEntity:GetKills() == 384 then -- 40 wave kills(224) + 8 lvl3(64) + 12 lvl4(96) wave kills = 60 wave kills(384)
---		Notifications:Top(killerEntity:GetPlayerOwnerID(), {text="500 kills. You get 5000 gold.", duration=5.0, style={color="red"}})
---		PlayerResource:ModifyGold( killerEntity:GetPlayerOwnerID(), 5000, false,  DOTA_ModifyGold_Unspecified )
 	elseif killerEntity:GetKills() == 1000 then
 		Notifications:Top(killerEntity:GetPlayerOwnerID(), {text="1000 kills. You get 50000 gold.", duration=5.0, style={color="red"}})
 		PlayerResource:ModifyGold( killerEntity:GetPlayerOwnerID(), 50000, false,  DOTA_ModifyGold_Unspecified )
+	elseif killerEntity:GetKills() == 920 and RAMERO == 0 then -- 920
+	local point = Entities:FindByName(nil,"npc_dota_muradin_player"):GetAbsOrigin()
+		killerEntity:AddNewModifier( nil, nil, "modifier_animation_freeze_stun", nil)
+		killerEntity:AddNewModifier( nil, nil, "modifier_invulnerable", nil)
+		Notifications:TopToAll({text="A hero has reached 80 Wave kills and will fight Ramero and Baristal!", style={color="white"}, duration=5.0})
+		Timers:CreateTimer(5.0, function()
+			FindClearSpaceForUnit(killerEntity, point, true)
+			PlayerResource:SetCameraTarget(killerEntity:GetPlayerOwnerID(), killerEntity)
+			RameroEvent()
+			killerEntity:RemoveModifierByName("modifier_animation_freeze_stun")
+			killerEntity:RemoveModifierByName("modifier_invulnerable")
+			Timers:CreateTimer(0.1, function()
+				PlayerResource:SetCameraTarget(killerEntity:GetPlayerOwnerID(), nil)
+			end)
+		end)
+		RAMERO = 1
 	end
 
+	-- Ends lanes spawning when the linked barrackment is destroyed
 	for c = 1, 8 do
 		if killedUnit:GetUnitName() == "dota_badguys_barracks_"..c then
 			BARRACKMENTS[c] = 0
+		elseif killerEntity:IsIllusion() and killedUnit:GetUnitName() == "dota_badguys_barracks_"..c then
+			BARRACKMENTS[c] = 0
 		end
+	end
+
+	if killedUnit:GetUnitName() == "npc_ramero" then
+		local item = CreateItem("item_lightning_sword", nil, nil)
+		local pos = killedUnit:GetAbsOrigin()
+		local drop = CreateItemOnPositionSync( pos, item )
+		item:LaunchLoot(false, 300, 0.5, pos)
+	end
+
+	if killedUnit:GetUnitName() == "npc_baristal" then
+		local item = CreateItem("item_tome_big", nil, nil)
+		local pos = killedUnit:GetAbsOrigin()
+		local drop = CreateItemOnPositionSync( pos, item )
+		item:LaunchLoot(false, 300, 0.5, pos)
 	end
 end
 
@@ -537,7 +617,7 @@ function GameMode:OnConnectFull(keys)
 	-- The Player ID of the joining player
 	local playerID = ply:GetPlayerID()
 
-	-- If this is Mohammad Mehdi Akhondi, end the game
+	-- If this is Mohammad Mehdi Akhondi, end the game. Dota Imba ban system.
 	for i = 1, #banned_players do
 		if PlayerResource:GetSteamAccountID(ply:GetPlayerID()) == banned_players[i] then
 			Timers:CreateTimer(5.0, function()
