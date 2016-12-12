@@ -2639,8 +2639,8 @@
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
-		"AttackDamageMin"			"155"		// Damage range min.
-		"AttackDamageMax"			"155"		// Damage range max.	
+		"AttackDamageMin"			"115"		// Damage range min.
+		"AttackDamageMax"			"115"		// Damage range max.	
 		"AttackRate"				"0.95"		// Speed of attack.
 		"AttackAnimationPoint"		"0.35"		// Normalized time in animation cycle to attack.
 		"AttackAcquisitionRange"	"800"		// Range within a target can be acquired.
@@ -3695,7 +3695,7 @@
 
 		// Bounty
 		//----------------------------------------------------------------
-		"BountyXP"					"90"		// Experience earn.
+		"BountyXP"					"60"		// Experience earn.
 		"BountyGoldMin"				"250"		// Gold earned min.
 		"BountyGoldMax"				"300"		// Gold earned max.
 
@@ -7285,7 +7285,7 @@
 		"Ability7"					"cant_die_generic"
 	
 		"ArmorPhysical"				"1500"                 // Physical protection.
-		"MagicalResistance"			"25"                 // Magical protection (percentage).
+		"MagicalResistance"			"100"                 // Magical protection (percentage).
 	
 		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
 		"AttackDamageMin"			"50002"                   // Damage range min.
@@ -7448,7 +7448,7 @@
 		"AttackRate"				"0.75"		// Speed of attack.
 		"AttackAnimationPoint"		"0.49"		// Normalized time in animation cycle to attack.
 		"AttackAcquisitionRange"	"800"		// Range within a target can be acquired.
-		"AttackRange"				"260"		// Range within a target can be attacked.
+		"AttackRange"				"650"		// Range within a target can be attacked.
 		"ProjectileModel"			"particles/econ/items/rubick/rubick_staff_wandering/rubick_base_attack_whset.vpcf"			// Particle system model for projectile.
 		"ProjectileSpeed"			"900"			// Speed of projectile.		   
 
@@ -7562,7 +7562,7 @@
 		"AttackRate"				"0.6"		// Speed of attack.
 		"AttackAnimationPoint"		"0.49"		// Normalized time in animation cycle to attack.
 		"AttackAcquisitionRange"	"800"		// Range within a target can be acquired.
-		"AttackRange"				"260"		// Range within a target can be attacked.
+		"AttackRange"				"650"		// Range within a target can be attacked.
 		"ProjectileModel"			"particles/econ/items/rubick/rubick_staff_wandering/rubick_base_attack_whset.vpcf"			// Particle system model for projectile.
 		"ProjectileSpeed"			"900"			// Speed of projectile.		   
 
@@ -8004,7 +8004,7 @@
 	{										
 		// General
 		//----------------------------------------------------------------
-		"Model"						"models\creeps\lane_creeps\creep_radiant_hulk\creep_radiant_ancient_hulk.vmdl"	// Model.
+		"Model"						"models/items/warlock/warlock_fourleg_demon.vmdl"	// Model.
 		"BaseClass"					"npc_dota_creep_neutral"
 		"SoundSet"					"Hero_WarlockGolem"
 		"ModelScale"				"1.25"
@@ -8085,7 +8085,7 @@
 	{										
 		// General
 		//----------------------------------------------------------------
-		"Model"						"models\creeps\lane_creeps\creep_dire_hulk\creep_dire_ancient_hulk.vmdl"	// Model.
+		"Model"						"models/items/warlock/golem/mystery_of_the_lost_ores_golem/mystery_of_the_lost_ores_golem.vmdl"	// Model.
 		"BaseClass"					"npc_dota_creep_neutral"
 		"SoundSet"					"Hero_WarlockGolem"
 		"ModelScale"				"1.25"
@@ -8258,7 +8258,7 @@
 		// Armor
 		//----------------------------------------------------------------
 		"ArmorPhysical"				"2999"		// Physical protection.
-		"MagicalResistance"			"50"	// Magical protection.
+		"MagicalResistance"			"70"	// Magical protection.
 
 		// Attack
 		//----------------------------------------------------------------
@@ -8629,7 +8629,7 @@
 		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
 		"AttackDamageMin"			"7999"                   // Damage range min.
 		"AttackDamageMax"			"8001"                   // Damage range max.
-		"AttackRate"				"0.9"                                  // Speed of attack.
+		"AttackRate"				"0.7"                                  // Speed of attack.
 		"AttackAnimationPoint"		"0.5"                                   // Normalized time in animation cycle to attack.
 		"AttackAcquisitionRange"	"500"                                   // Range within a target can be acquired.
 		"AttackRange"				"160"                                   // Range within a target can be attacked.
@@ -9403,7 +9403,7 @@
 		// Armor
 		//----------------------------------------------------------------
 		"ArmorPhysical"				"150"			// Physical protection.
-		"MagicalResistance"			"40"			// Magical protection (percentage).
+		"MagicalResistance"			"25"			// Magical protection (percentage).
 
 		// Attack
 		//----------------------------------------------------------------
@@ -9413,7 +9413,7 @@
 		"AttackDamageType"			"DAMAGE_TYPE_ArmorPhysical"
 		"AttackRate"				"0.125"			// Speed of attack.
 		"AttackAnimationPoint"		"0.6"		// Normalized time in animation cycle to attack.
-		"AttackAcquisitionRange"	"1000"		// Range within a target can be acquired.
+		"AttackAcquisitionRange"	"2000"		// Range within a target can be acquired.
 		"AttackRange"				"160"		// Range within a target can be attacked.
 		"ProjectileModel"			"" // Particle system model for projectile.
 		"ProjectileSpeed"			""		// Speed of projectile.
@@ -9438,8 +9438,8 @@
 
 		// Status
 		//----------------------------------------------------------------
-		"StatusHealth"				"250000"		// Base health.
-		"StatusHealthRegen"			"20.0"		// Health regeneration rate.
+		"StatusHealth"				"150000"		// Base health.
+		"StatusHealthRegen"			"10.0"		// Health regeneration rate.
 		"StatusMana"				"0.0"		// Base mana.
 		"StatusManaRegen"			"0.0"		// Mana regeneration rate.
 
@@ -9513,7 +9513,7 @@
 		// Armor
 		//----------------------------------------------------------------
 		"ArmorPhysical"				"150"			// Physical protection.
-		"MagicalResistance"			"40"			// Magical protection (percentage).
+		"MagicalResistance"			"25"			// Magical protection (percentage).
 
 		// Movement
 		//----------------------------------------------------------------
@@ -9528,7 +9528,7 @@
 
 		// Status
 		//----------------------------------------------------------------
-		"StatusHealth"				"250000"		// Base health.
+		"StatusHealth"				"150000"		// Base health.
 		
 		// Vision
 		//----------------------------------------------------------------
@@ -9573,7 +9573,7 @@
 
 		// Abilities
 		//----------------------------------------------------------------
-		"Ability1"					""	// Ability 1.
+		"Ability1"					"demonhunter_vampiric_aura"	// Ability 1.
 		"Ability2"					""			// Ability 2.
 		"Ability3"					""			// Ability 3.
 		"Ability4"					""						// Ability 6 - Extra.
@@ -9582,17 +9582,17 @@
 		// Armor
 		//----------------------------------------------------------------
 		"ArmorPhysical"				"150"			// Physical protection.
-		"MagicalResistance"			"40"			// Magical protection (percentage).
+		"MagicalResistance"			"25"			// Magical protection (percentage).
 
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
-		"AttackDamageMin"			"14990"		// Damage range min.
-		"AttackDamageMax"			"15010"		// Damage range max.
+		"AttackDamageMin"			"9990"		// Damage range min.
+		"AttackDamageMax"			"10010"		// Damage range max.
 		"AttackDamageType"			"DAMAGE_TYPE_ArmorPhysical"
 		"AttackRate"				"0.125"			// Speed of attack.
 		"AttackAnimationPoint"		"0.6"		// Normalized time in animation cycle to attack.
-		"AttackAcquisitionRange"	"1000"		// Range within a target can be acquired.
+		"AttackAcquisitionRange"	"2000"		// Range within a target can be acquired.
 		"AttackRange"				"160"		// Range within a target can be attacked.
 		"ProjectileModel"			"" // Particle system model for projectile.
 		"ProjectileSpeed"			""		// Speed of projectile.
@@ -9617,8 +9617,8 @@
 
 		// Status
 		//----------------------------------------------------------------
-		"StatusHealth"				"250000"		// Base health.
-		"StatusHealthRegen"			"20.0"		// Health regeneration rate.
+		"StatusHealth"				"90000"		// Base health.
+		"StatusHealthRegen"			"10.0"		// Health regeneration rate.
 		"StatusMana"				"0.0"		// Base mana.
 		"StatusManaRegen"			"0.0"		// Mana regeneration rate.
 
@@ -9677,7 +9677,7 @@
 
 		// Abilities
 		//----------------------------------------------------------------
-		"Ability1"					""		// Ability 1
+		"Ability1"					"demonhunter_vampiric_aura"		// Ability 1
 		"Ability2"					""		// Ability 2
 		"Ability3"					""		// Ability 3
 		"Ability4"					""		// Ability 6 - Extra.
@@ -9692,7 +9692,7 @@
 		// Armor
 		//----------------------------------------------------------------
 		"ArmorPhysical"				"150"			// Physical protection.
-		"MagicalResistance"			"40"			// Magical protection (percentage).
+		"MagicalResistance"			"25"			// Magical protection (percentage).
 
 		// Movement
 		//----------------------------------------------------------------
@@ -9707,7 +9707,7 @@
 
 		// Status
 		//----------------------------------------------------------------
-		"StatusHealth"				"250000"		// Base health.
+		"StatusHealth"				"90000"		// Base health.
 		
 		// Vision
 		//----------------------------------------------------------------
@@ -10658,6 +10658,50 @@
 		
 		"BoundsHullName"			"DOTA_HULL_SIZE_HERO"
 		"HealthBarOffset"			"140"
+	}
+
+	"healing_ward"
+	{
+		// General
+		"BaseClass"					"npc_dota_creature"
+		"Model"						"models/heroes/juggernaut/jugg_healing_ward.vmdl"
+		"SoundSet"					""
+		"Level"						"1"
+		"ModelScale"				"1"
+		"IsAncient"					"1"
+		"MinimapIcon"				"minimap_ward_invis"
+		"MinimapIconSize"			"300"
+		"UnitLabel"					"ward"
+
+		// Abilities
+		//----------------------------------------------------------------
+		"Ability1"					"holdout_healing_ward"
+
+		// Bounds
+		//----------------------------------------------------------------
+		"BoundsHullName"			"DOTA_HULL_SIZE_SMALL"          // Hull type used for navigation/locomotion.
+		"HealthBarOffset"			"140"
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_NONE"           // Type of locomotion - ground,air
+
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"1000"			// Base health.
+		"StatusHealthRegen"			"0"			// Health regeneration rate.
+		"StatusMana"				"0"			// Base mana.
+		"StatusManaRegen"			"0"			// Mana regeneration rate.
+
+		// Attack Damage types
+		//----------------------------------------------------------------
+		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_HERO"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_WARD"
+
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"500"
+		"VisionNighttimeRange"		"500"
 	}
 
 //===========================================================================================================
@@ -12662,7 +12706,7 @@
 
 		// Abilities
 		//----------------------------------------------------------------
-		"Ability1"				"holdout_power_mount_str_tooltip"
+		"Ability1"				"holdout_power_mount_int_tooltip"
 		"Ability2"				"holdout_dark_cleave"
 		"Ability3"				"holdout_instakill"		
 		"Ability4"				"holdout_requiem"
@@ -12729,7 +12773,7 @@
 
 		// Abilities
 		//----------------------------------------------------------------
-		"Ability1"				"holdout_power_mount_str_tooltip"
+		"Ability1"				"holdout_power_mount_int_tooltip"
 		"Ability2"				"holdout_mechanism"
 		"Ability3"				"holdout_light_stand"		
 		"Ability4"				"holdout_sacred_pool"

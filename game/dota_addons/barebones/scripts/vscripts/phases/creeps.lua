@@ -33,7 +33,7 @@ function SpawnCreeps()
 				unit:SetInitialGoalEntity(Waypoint)
 				unit:MoveToPositionAggressive(Waypoint:GetAbsOrigin())
 			end
-		elseif CREEP_LANES[c] == 1 and BARRACKMENTS[c] == 1 and time_elapsed >= 1230 and time_elapsed < 1440 then -- Level 4, 20 to 24 Min
+		elseif CREEP_LANES[c] == 1 and BARRACKMENTS[c] == 1 and time_elapsed >= 1230 and time_elapsed < 1470 then -- Level 4, 20 to 24 Min
 			for j = 1, 5 do
 				local unit = CreateUnitByName("npc_dota_creature_mini_dooms", point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
 				unit:SetInitialGoalEntity(Waypoint)

@@ -161,7 +161,7 @@ function GameMode:OnHeroInGame(hero)
 	if hero:GetUnitName() == "npc_dota_hero_wisp" then
 		hero:SetAbilityPoints(0)
 		hero:SetGold(0, false)
-		hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {Duration = 0, IsHidden = true})
+		hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {Duration = 20, IsHidden = true})
 		hero:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
 	end
 end
@@ -265,7 +265,7 @@ local triggers_choice = Entities:FindAllByName("trigger_special_event_choice")
 	--//=================================================================================================================
 	Timers:CreateTimer(841, function() -- 12 Min: VENGEFUL SPIRIT SOUTH EVENT 3
 	local point = Entities:FindByName( nil, "npc_dota_spawner_east_event"):GetAbsOrigin()
-		for j = 1, 6 do
+		for j = 1, 10 do
 			local unit = CreateUnitByName("npc_dota_creature_vengeful_spirit_event_3", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		end
 	end)
@@ -275,7 +275,7 @@ local triggers_choice = Entities:FindAllByName("trigger_special_event_choice")
 	--//=================================================================================================================
 	Timers:CreateTimer(1081, function() -- 16 Min: CAPTAIN SOUTH EVENT 4
 	local point = Entities:FindByName( nil, "npc_dota_spawner_south_event"):GetAbsOrigin()
-		for j = 1, 6 do
+		for j = 1, 10 do
 			local unit = CreateUnitByName("npc_dota_creature_captain_event_4", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		end
 	end)
@@ -285,7 +285,7 @@ local triggers_choice = Entities:FindAllByName("trigger_special_event_choice")
 	--//=================================================================================================================
 	Timers:CreateTimer(1321, function() -- 20 Min: SLARDARS EVENT 5
 	local point = Entities:FindByName( nil, "npc_dota_spawner_west_event"):GetAbsOrigin()
-		for j = 1, 6 do
+		for j = 1, 10 do
 			local unit = CreateUnitByName("npc_dota_creature_slardar_event_5", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		end
 	end)
@@ -295,7 +295,7 @@ local triggers_choice = Entities:FindAllByName("trigger_special_event_choice")
 	--//=================================================================================================================
 	Timers:CreateTimer(1621, function() -- 25 Min: CHAOS KNIGHTS EVENT 6
 	local point = Entities:FindByName( nil, "npc_dota_spawner_north_event"):GetAbsOrigin()
-		for j = 1, 6 do
+		for j = 1, 10 do
 			local unit = CreateUnitByName("npc_dota_creature_chaos_knight_event_6", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		end
 	end)
@@ -305,7 +305,7 @@ local triggers_choice = Entities:FindAllByName("trigger_special_event_choice")
 	--//=================================================================================================================
 	Timers:CreateTimer(1861, function() -- 29 Min: LUNA EVENT 7
 	local point = Entities:FindByName( nil, "npc_dota_spawner_east_event"):GetAbsOrigin()
-		for j = 1, 6 do
+		for j = 1, 10 do
 			local unit = CreateUnitByName("npc_dota_creature_luna_event_7", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		end
 	end)
@@ -315,7 +315,7 @@ local triggers_choice = Entities:FindAllByName("trigger_special_event_choice")
 	--//=================================================================================================================
 	Timers:CreateTimer(2101, function() -- 33 Min: CLOCKWERK EVENT 8
 	local point = Entities:FindByName( nil, "npc_dota_spawner_south_event"):GetAbsOrigin()
-		for j = 1, 6 do
+		for j = 1, 10 do
 			local unit = CreateUnitByName("npc_dota_creature_clockwerk_event_8", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		end
 	end)
@@ -438,7 +438,7 @@ function GameMode:InitGameMode()
 	local difficulty = GameRules:GetCustomGameDifficulty()
 
 	-- Timer Rules
-	GameRules:SetPreGameTime( 20.0 ) --120.0
+	GameRules:SetPreGameTime( 120.0 ) --120.0
 	GameRules:SetPostGameTime( 30.0 )
 	GameRules:SetTreeRegrowTime( 60.0 )
 	GameRules:SetHeroSelectionTime( 0.0 ) --This is not dota bitch

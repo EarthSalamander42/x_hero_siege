@@ -850,53 +850,49 @@
 	//=================================================================================================================
 	"item_tome_of_power" 
 	{
-		"ID"				"2512"
-		"BaseClass"			"item_datadriven"
-		"AbilityBehavior"	"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"ID"						"2512"
+		"BaseClass"					"item_datadriven"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
 
-		"Model"				"models/props_gameplay/red_box.vmdl" 
-		"Effect"			"particles/generic_gameplay/dropped_item.vpcf"
-		"ItemCost"			"5000"
-		"ItemKillable"		"0" 
+		"Model"						"models/props_gameplay/red_box.vmdl" 
+		"Effect"					"particles/generic_gameplay/dropped_item.vpcf"
+		"ItemCost"					"5000"
+		"ItemKillable"				"0" 
 
-		"ItemInitialStockTime"	"930.0"	//14 Min = 1200 + game beginning time = 90
-		"ItemStockMax"			"5" 
-		"ItemStockTime"			"60.0"
-		"ItemStockInitial"		"0"
-		"AbilityCooldown"		"60.0"
+		"ItemInitialStockTime"		"930.0"	//14 Min = 1200 + game beginning time = 90
+		"ItemStockMax"				"5" 
+		"ItemStockTime"				"60.0"
+		"ItemStockInitial"			"0"
+		"AbilityCooldown"			"60.0"
 
-		"ItemSellable"			"1"
-		"ItemCastOnPickup"		"0"
-		"ItemPurchasable"		"1"
-		"ItemDroppable"			"1"
-		"ItemShareability"		"ITEM_FULLY_SHAREABLE"
-		"AbilityTextureName"	"tome_of_power"
+		"ItemSellable"				"1"
+		"ItemCastOnPickup"			"0"
+		"ItemPurchasable"			"1"
+		"ItemDroppable"				"1"
+		"ItemShareability"			"ITEM_FULLY_SHAREABLE"
+		"AbilityTextureName"		"tome_of_power"
 
-		"SideShop"				"1"
-		"SecretShop"			"0"
+		"SideShop"					"1"
+		"SecretShop"				"0"
 
-		"ItemShopTags"			"artifact"
-		"ItemQuality"			"artifact"
+		"ItemShopTags"				"artifact"
+		"ItemQuality"				"artifact"
 
-		"ItemStackable"			"1"
-		"ItemInitialCharges"	"1"
+		"ItemStackable"				"1"
+		"ItemInitialCharges"		"1"
 	
-		"ItemPermanent"			"0"
-		"ItemDisassembleRule"	"DOTA_ITEM_DISASSEMBLE_ALWAYS"
+		"ItemPermanent"				"0"
+		"ItemDisassembleRule"		"DOTA_ITEM_DISASSEMBLE_ALWAYS"
 
 		"OnSpellStart"
 		{
 			"RunScript"
 			{
-				"ScriptFile"	"items/tome_of_power/tome_of_power.lua"
-				"Function"		"tome_use"
+				"ScriptFile"		"items/tome_of_power/tome_of_power.lua"
+				"Function"			"tome_use"
 			}
 
 			"SpendCharge" {}
-		}
-	
-		"AbilitySpecial"
-		{
 		}
 	}
 
@@ -1966,6 +1962,221 @@
 						"Target"				"ATTACKER"
 						"LifestealPercent"		"%lifesteal_percent"
 					}
+				}
+			}
+		}
+	}
+
+	//========================================================================================================
+	// Healing Wards
+	//========================================================================================================
+	"item_healing_wards"
+	{
+		"BaseClass"						"item_datadriven"
+		"ID"							"2528"
+		"AbilityTextureName"			"healing_wards"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_AOE"
+
+		"AbilityCooldown"				"20.0"	
+		"AbilityCastRange"				"500"
+		"ItemCost"						"750"
+		"ItemQuality"					"rare"
+		"ItemStackable"					"0"
+		"ItemPermanent"					"0"
+		"ItemInitialCharges"			"3"
+		"AOERadius"						"500"
+
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"duration"				"30"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"radius"				"500"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"regeneration"			"2"
+			}
+		}
+
+		"OnSpellStart"
+		{
+			"SpendCharge"	{}
+			"RunScript"
+			{
+				"ScriptFile"			"items/wards.lua"
+				"Function"				"SummonHealingWard"
+				"Target"				"POINT"
+			}
+		}
+	}
+
+	//========================================================================================================
+	// Potion of Full Restauration
+	//========================================================================================================
+	"item_potion_full"
+	{
+		"BaseClass"						"item_datadriven"
+		"ID"							"2529"
+		"AbilityTextureName"			"potion_full"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
+		"AbilityCooldown"				"30.0"	
+		"AbilityCastRange"				"0"
+		"ItemCost"						"5000"
+		"ItemQuality"					"rare"
+		"ItemStackable"					"0"
+		"ItemPermanent"					"0"
+		"ItemInitialCharges"			"3"
+
+		"OnSpellStart"
+		{
+			"SpendCharge"		{}
+			"RunScript"
+			{
+				"ScriptFile"			"items/potion.lua"
+				"Function"				"FullRestauration"
+			}
+
+			"FireEffect"
+			{
+				"EffectName"			"particles/units/heroes/hero_abaddon/abaddon_borrowed_time_heal.vpcf"
+				"EffectAttachType"		"follow_origin"
+				"Target"				"CASTER"
+			}
+
+			"FireSound"
+			{
+				"EffectName"	"DOTA_Item.ClarityPotion.Activate"
+				"Target"		"CASTER"
+			}
+		}
+	}
+
+	//========================================================================================================
+	// Potion of Full Restauration
+	//========================================================================================================
+	"item_potion_of_invulnerability"
+	{
+		"BaseClass"						"item_datadriven"
+		"ID"							"2530"
+		"AbilityTextureName"			"potion_of_invulnerability"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
+		"AbilityCooldown"				"40.0"	
+		"AbilityCastRange"				"0"
+		"ItemCost"						"5000"
+		"ItemQuality"					"rare"
+		"ItemStackable"					"0"
+		"ItemPermanent"					"0"
+		"ItemInitialCharges"			"3"
+
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"duration"				"15"
+			}
+		}
+
+		"OnSpellStart"
+		{
+			"SpendCharge"		{}
+			"RunScript"
+			{
+				"ScriptFile"			"items/potion.lua"
+				"Function"				"Invulnerability"
+			}
+
+			"FireEffect"
+			{
+				"EffectName"			"particles/units/heroes/hero_omniknight/omniknight_repel_buff.vpcf"
+				"EffectAttachType"		"follow_origin"
+				"Target"				"CASTER"
+			}
+
+			"FireSound"
+			{
+				"EffectName"	"DOTA_Item.ClarityPotion.Activate"
+				"Target"		"CASTER"
+			}
+		}
+	}
+
+	//========================================================================================================
+	// Potion of Anti-Magic
+	//========================================================================================================
+	"item_potion_of_antimagic"
+	{
+		"BaseClass"						"item_datadriven"
+		"ID"							"2531"
+		"AbilityTextureName"			"potion_of_antimagic"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
+		"AbilityCooldown"				"30.0"	
+		"AbilityCastRange"				"0"
+		"ItemCost"						"5000"
+		"ItemQuality"					"rare"
+		"ItemStackable"					"0"
+		"ItemPermanent"					"0"
+		"ItemInitialCharges"			"3"
+
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"duration"				"15"
+			}
+		}
+
+		"OnSpellStart"
+		{
+			"SpendCharge"		{}
+
+			"RunScript"
+			{
+				"ScriptFile"			"items/potion.lua"
+				"Function"				"AntiMagic"
+			}
+
+			"FireSound"
+			{
+				"EffectName"	"DOTA_Item.ClarityPotion.Activate"
+				"Target"		"CASTER"
+			}
+
+//			"ApplyModifier"
+//			{
+//				"ModifierName"		"modifier_invulnerable" // Purge
+//				"Target"			"CASTER"
+//				"Duration"			"0.1"
+//			}
+
+			"ApplyModifier"
+			{
+				"ModifierName"		"modifier_anti_magic"
+				"Target"			"CASTER"
+				"Duration"			"%duration"
+			}
+		}
+
+		"Modifiers"
+		{
+			"modifier_anti_magic"
+			{
+				"Passive"					"0"
+				"IsHidden"					"0"
+				"EffectName"				"particles/items_fx/black_king_bar_avatar.vpcf"
+				"EffectAttachType"			"PATTACH_ABSORIGIN"
+
+				"States"
+				{
+					"MODIFIER_STATE_MAGIC_IMMUNE"		"MODIFIER_STATE_VALUE_ENABLED"
 				}
 			}
 		}

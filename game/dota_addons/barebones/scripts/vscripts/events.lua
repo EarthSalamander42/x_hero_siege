@@ -32,7 +32,6 @@ function GameMode:OnNPCSpawned(keys)
 	local difficulty = GameRules:GetCustomGameDifficulty()
 	local npc = EntIndexToHScript(keys.entindex)
 	local normal_bounty = npc:GetGoldBounty()
---	local normal_health = npc:GetMaxHealth()
 	local normal_xp = npc:GetDeathXP()
 	local normal_min_damage = npc:GetBaseDamageMin()
 	local normal_max_damage = npc:GetBaseDamageMax()
@@ -43,28 +42,24 @@ function GameMode:OnNPCSpawned(keys)
 		npc:SetDeathXP( normal_xp*1.25 )
 		npc:SetBaseDamageMin( normal_min_damage*0.75 )
 		npc:SetBaseDamageMax( normal_max_damage*0.75 )
---		npc:SetMaxHealth( normal_health )
 	elseif difficulty == 2 and npc:GetTeam() == DOTA_TEAM_BADGUYS then
 		npc:SetMinimumGoldBounty( normal_bounty )
 		npc:SetMaximumGoldBounty( normal_bounty )
 		npc:SetDeathXP( normal_xp )
 		npc:SetBaseDamageMin( normal_min_damage )
 		npc:SetBaseDamageMax( normal_max_damage )
---		npc:SetMaxHealth( normal_health*1.1 )
 	elseif difficulty == 3 and npc:GetTeam() == DOTA_TEAM_BADGUYS then
 		npc:SetMinimumGoldBounty( normal_bounty*0.9 )
 		npc:SetMaximumGoldBounty( normal_bounty*0.9 )
 		npc:SetDeathXP( normal_xp*0.9 )
 		npc:SetBaseDamageMin( normal_min_damage*1.25 )
 		npc:SetBaseDamageMax( normal_max_damage*1.25 )
---		npc:SetMaxHealth( normal_health/1.5 )
 	elseif difficulty == 4 and npc:GetTeam() == DOTA_TEAM_BADGUYS then
 		npc:SetMinimumGoldBounty( normal_bounty*0.75 )
 		npc:SetMaximumGoldBounty( normal_bounty*0.75 )
 		npc:SetDeathXP( normal_xp*0.75 )
 		npc:SetBaseDamageMin( normal_min_damage*1.5 )
 		npc:SetBaseDamageMax( normal_max_damage*1.5 )
---		npc:SetMaxHealth( normal_health/1.5 )
 	end
 
 	if npc:GetUnitName() == "npc_dota_hero_chaos_knight" then
@@ -184,6 +179,7 @@ function GameMode:OnNPCSpawned(keys)
 		local difficulty = GameRules:GetCustomGameDifficulty()
 		if current_ability and npc:GetTeam() == DOTA_TEAM_BADGUYS then
 			current_ability:SetLevel(difficulty)
+		elseif current_ability and npc:GetTeam() == DOTA_TEAM_NEUTRALS then
 		end
 	end
 
@@ -321,6 +317,9 @@ local AbilitiesHeroes_XX = {
 	npc_dota_hero_pugna = {{"holdout_rain_of_chaos_20", 4}},
 	npc_dota_hero_sniper ={{"holdout_rocket_launcher_20", 0}, {"holdout_plasma_rifle_20", 1}},
 	npc_dota_hero_sven = {{"holdout_storm_bolt_20", 0}, {"holdout_thunder_clap_20", 1}},
+	npc_dota_hero_terrorblade = {{"holdout_resistant_skin", 6}},
+	npc_dota_hero_brewmaster = {{"enraged_wildkin_tornado", 4}},
+	npc_dota_hero_phantom_assassin = {{"holdout_morph", 2}},
 
 --	npc_dota_hero_antimage = {{"demonhuner_spell_resistance_XX",3}},
 --	npc_dota_hero_luna = {{"luna_neutralisation_XX",5}},
@@ -330,12 +329,10 @@ local AbilitiesHeroes_XX = {
 --	npc_dota_hero_windrunner = {{"windrunner_rockethail_XX",2}},
 --	npc_dota_hero_sven = {{"paladin_light_frenzy_XX",3}},
 --	npc_dota_hero_shadow_shaman = {{"shadow_hunter_hex_XX",3}},
---	npc_dota_hero_phantom_assassin = {{"warden_morph_XX",3}},
 --	npc_dota_hero_keeper_of_the_light = {{"archmage_frost_shield_XX",2}},
 --	npc_dota_hero_night_stalker = {{"deardlord_rain_of_chaos_XX",2}},
 --	npc_dota_hero_juggernaut = {{"blademaster_partition_XX",3}},
 --	npc_dota_hero_lina = {{"shandris_lightning_attack_XX",2}},
---	npc_dota_hero_brewmaster ={{"panda_tornado_XX",3}},
 --	npc_dota_hero_bane ={{"bane_player_rain_of_chaos_XX",1}},
 --	npc_dota_hero_beastmaster ={{"rexxar_terror_wolf_XX",3}},
 --	npc_dota_hero_tinker ={{"marine_rocketswarm_XX",3}}
@@ -555,7 +552,7 @@ local playerKills = PlayerResource:GetKills(KillerID)
 	elseif killerEntity:GetKills() == 1000 then
 		Notifications:Top(killerEntity:GetPlayerOwnerID(), {text="1000 kills. You get 50000 gold.", duration=5.0, style={color="red"}})
 		PlayerResource:ModifyGold( killerEntity:GetPlayerOwnerID(), 50000, false,  DOTA_ModifyGold_Unspecified )
-	elseif killerEntity:GetKills() == 920 and RAMERO == 0 then -- 920
+	elseif killerEntity:GetKills() >= 920 and RAMERO == 0 and NEUTRAL_SPAWN == 0 then -- 920
 	local point = Entities:FindByName(nil,"npc_dota_muradin_player"):GetAbsOrigin()
 		killerEntity:AddNewModifier( nil, nil, "modifier_animation_freeze_stun", nil)
 		killerEntity:AddNewModifier( nil, nil, "modifier_invulnerable", nil)

@@ -128,14 +128,14 @@
 		"AttributeAgilityGain"			"0"
 		"AttributeIntelligenceGain"		"0"
 
-		"Ability1"						"holdout_power_mount_str"
+		"Ability1"						"holdout_power_mount_int"
 		"Ability2"						"holdout_dark_cleave"
 		"Ability3"						"holdout_instakill"		
 		"Ability4"						"holdout_requiem"
 		"Ability5"						"holdout_skin_changer_caster"
 		"Ability6"						"holdout_odin"
 		"Ability7"						"holdout_power_mount_agi"
-		"Ability8"						"holdout_power_mount_int"
+		"Ability8"						"holdout_power_mount_str"
 		"Ability9"						"holdout_health_buff"
 		"Ability16"						"ability_unit_died_fire"
 	}
@@ -161,14 +161,14 @@
 		"AttributeAgilityGain"			"0"
 		"AttributeIntelligenceGain"		"0"
 
-		"Ability1"						"holdout_power_mount_str"
+		"Ability1"						"holdout_power_mount_int"
 		"Ability2"						"holdout_mechanism"
 		"Ability3"						"holdout_light_stand"		
 		"Ability4"						"holdout_sacred_pool"
 		"Ability5"						"holdout_skin_changer_warrior"
 		"Ability6"						"holdout_guardian_angel"
 		"Ability7"						"holdout_power_mount_agi"
-		"Ability8"						"holdout_power_mount_int"
+		"Ability8"						"holdout_power_mount_str"
 		"Ability9"						"holdout_health_buff"
 		"Ability16"						"ability_unit_died_light"
 	}
@@ -618,6 +618,7 @@
 		"Ability4"						"holdout_gust_pool"
 		"Ability5"						"holdout_blink"
 		"Ability6"						"holdout_vengeance"
+		"Ability7"						"riki_permanent_invisibility"
 		"Ability16"						"ability_unit_died_death"
 	}
 
