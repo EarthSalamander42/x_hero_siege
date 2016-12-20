@@ -84,11 +84,16 @@ function Transform( keys )
 	local level = ability:GetLevel()
 	local modifier_one = keys.modifier_one
 	local modifier_two = keys.modifier_two
+	local modifier_three = keys.modifier_three
 
-	-- Deciding the transformation level
 	local modifier
-	if level == 1 then modifier = modifier_one
-	else modifier = modifier_two end
+	if level == 1 then
+		modifier = modifier_one
+	elseif level == 2 then
+		modifier = modifier_two
+	else
+		modifier = modifier_three
+	end
 
 	ability:ApplyDataDrivenModifier(caster, caster, modifier, {})
 end

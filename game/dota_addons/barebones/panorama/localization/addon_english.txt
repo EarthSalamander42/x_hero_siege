@@ -34,9 +34,9 @@
 
 	"AddonTitleDifficulty"						"Current Difficulty:"
 	"AddonDifficultyEasy"						"Easy: 150% Gold, 125% XP, 75% Damage."
-	"AddonDifficultyNormal"						"Normal: 100% Gold, 100% XP, 100% Damage."
-	"AddonDifficultyHard"						"Hard: 90% Gold, 90% XP, 125% Damage."
-	"AddonDifficultyExtreme"					"Extreme: 75% Gold, 75% XP, 150% Damage."
+	"AddonDifficultyNormal"						"Normal: 110% Gold, 100% XP, 100% Damage."
+	"AddonDifficultyHard"						"Hard: 100% Gold, 90% XP, 125% Damage."
+	"AddonDifficultyExtreme"					"Extreme: 100% Gold, 75% XP, 150% Damage."
 	"VIPTab"									"VIP Section:"
 	"VIPHeader"									"Get your access now to unlock Kobold Knight, Centurion and Lich King! \nDonate at Patreon to be a VIP (Link in mod description) \nMore VIP Heroes very soon!"
 	"VIPHeader2"								""

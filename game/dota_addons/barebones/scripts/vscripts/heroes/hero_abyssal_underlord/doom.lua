@@ -5,7 +5,7 @@ function SpawnDoomBeast(keys)
 	keys.caster:EmitSound("Hero_Venomancer.Plague_Ward")
 
 	local plague_ward_level = keys.ability:GetLevel()
-	if plague_ward_level >= 1 and plague_ward_level <= 2 then
+	if plague_ward_level >= 1 and plague_ward_level <= 3 then
 		local plague_ward_unit = CreateUnitByName("npc_dota_doom_golem_" .. plague_ward_level, caster_origin, false, keys.caster, keys.caster, keys.caster:GetTeam())
 		plague_ward_unit:SetControllableByPlayer(keys.caster:GetPlayerID(), true)
 		plague_ward_unit:SetOwner(keys.caster)

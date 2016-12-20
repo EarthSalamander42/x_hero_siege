@@ -1,5 +1,3 @@
-require('label')
-
 -- Cleanup a player when they leave
 function GameMode:OnDisconnect(keys)
 	DebugPrint('[BAREBONES] Player Disconnected ' .. tostring(keys.userid))
@@ -43,20 +41,20 @@ function GameMode:OnNPCSpawned(keys)
 		npc:SetBaseDamageMin( normal_min_damage*0.75 )
 		npc:SetBaseDamageMax( normal_max_damage*0.75 )
 	elseif difficulty == 2 and npc:GetTeam() == DOTA_TEAM_BADGUYS then
-		npc:SetMinimumGoldBounty( normal_bounty )
-		npc:SetMaximumGoldBounty( normal_bounty )
+		npc:SetMinimumGoldBounty( normal_bounty*1.1 )
+		npc:SetMaximumGoldBounty( normal_bounty*1.1 )
 		npc:SetDeathXP( normal_xp )
 		npc:SetBaseDamageMin( normal_min_damage )
 		npc:SetBaseDamageMax( normal_max_damage )
 	elseif difficulty == 3 and npc:GetTeam() == DOTA_TEAM_BADGUYS then
-		npc:SetMinimumGoldBounty( normal_bounty*0.9 )
-		npc:SetMaximumGoldBounty( normal_bounty*0.9 )
+--		npc:SetMinimumGoldBounty( normal_bounty*0.9 )
+--		npc:SetMaximumGoldBounty( normal_bounty*0.9 )
 		npc:SetDeathXP( normal_xp*0.9 )
 		npc:SetBaseDamageMin( normal_min_damage*1.25 )
 		npc:SetBaseDamageMax( normal_max_damage*1.25 )
 	elseif difficulty == 4 and npc:GetTeam() == DOTA_TEAM_BADGUYS then
-		npc:SetMinimumGoldBounty( normal_bounty*0.75 )
-		npc:SetMaximumGoldBounty( normal_bounty*0.75 )
+--		npc:SetMinimumGoldBounty( normal_bounty*0.75 )
+--		npc:SetMaximumGoldBounty( normal_bounty*0.75 )
 		npc:SetDeathXP( normal_xp*0.75 )
 		npc:SetBaseDamageMin( normal_min_damage*1.5 )
 		npc:SetBaseDamageMax( normal_max_damage*1.5 )
@@ -170,7 +168,8 @@ function GameMode:OnNPCSpawned(keys)
 		"banehallow_stampede",
 		"creature_chronosphere",
 		"venomancer_poison_sting",
-		"lich_frost_armor"
+		"lich_frost_armor",
+		"monkey_king_boundless_strike"
 	}
 
 	-- Cycle through any innate abilities found, then upgrade them
@@ -191,6 +190,66 @@ function GameMode:OnNPCSpawned(keys)
 --				print("Wearables for Furion hidden!")
 --			end
 --			model = model:NextMovePeer()
+--		end
+--	end
+
+	if npc:GetTeam() == DOTA_TEAM_GOODGUYS then
+		for i = 1, #vip_members do
+			-- Cookies or X Hero Siege
+			if npc:IsHero() then
+				if PlayerResource:GetSteamAccountID(npc:GetPlayerID()) == mod_creator[i] then
+					npc:SetCustomHealthLabel("Mod Creator", 200, 45, 45)
+					if not npc:HasAbility("holdout_vip") then
+						local vip_ability = npc:AddAbility("holdout_vip")
+						vip_ability:SetLevel(1)
+					end
+				end
+				-- Baumi
+				if PlayerResource:GetSteamAccountID(npc:GetPlayerID()) == captain_baumi[i] then
+					npc:SetCustomHealthLabel("Captain Baumi", 55, 55, 200)
+					if not npc:HasAbility("holdout_vip") then
+						local vip_ability = npc:AddAbility("holdout_vip")
+						vip_ability:SetLevel(1)
+					end
+				end
+				-- Mugiwara
+				if PlayerResource:GetSteamAccountID(npc:GetPlayerID()) == mod_graphist[i] then
+					npc:SetCustomHealthLabel("Mod Graphist", 55, 55, 200)
+					if not npc:HasAbility("holdout_vip") then
+						local vip_ability = npc:AddAbility("holdout_vip")
+						vip_ability:SetLevel(1)
+					end
+				end
+				-- See VIP List on Top
+				if PlayerResource:GetSteamAccountID(npc:GetPlayerID()) == vip_members[i] then
+					npc:SetCustomHealthLabel("VIP Member", 45, 200, 45)
+					if not npc:HasAbility("holdout_vip") then
+						local vip_ability = npc:AddAbility("holdout_vip")
+						vip_ability:SetLevel(1)
+					end
+				end
+				if PlayerResource:GetSteamAccountID(npc:GetPlayerID()) == golden_vip_members[i] then
+					npc:SetCustomHealthLabel("Golden VIP Member", 218, 165, 32)
+					if not npc:HasAbility("holdout_vip") then
+						local vip_ability = npc:AddAbility("holdout_vip")
+						vip_ability:SetLevel(1)
+					end
+				end
+			end
+		end
+	end
+
+	if npc:GetTeam() == DOTA_TEAM_BADGUYS then
+		if not npc:HasAbility("holdout_frost_effect") then
+			local frost_effect = npc:AddAbility("holdout_frost_effect")
+			frost_effect:SetLevel(1)
+		end
+	end
+
+--	if npc:GetTeam() == DOTA_TEAM_NEUTRALS then
+--		if not npc:HasAbility("holdout_frost_effect") then
+--			local frost_effect = npc:AddAbility("holdout_frost_effect")
+--			frost_effect:SetLevel(1)
 --		end
 --	end
 
@@ -307,39 +366,53 @@ local hero = player:GetAssignedHero()
 local hero_level = hero:GetLevel()
 
 local AbilitiesHeroes_XX = {
---	npc_dota_hero_mirana = {{"moon_priest_lightning_chaos_XX",4}},
---	npc_dota_hero_dragon_knight = {{"holdout_knight_armor", 4}},
-	npc_dota_hero_abyssal_underlord = {{"lion_finger_of_death", 4}, {"holdout_innate_great_cleave_20", 9}},
 	npc_dota_hero_elder_titan = {{"holdout_shockwave_20", 0}, {"holdout_war_stomp_20", 1}, {"holdout_roar_20", 4}, {"holdout_reincarnation", 6}},
-	npc_dota_hero_enchantress = {{"neutral_spell_immunity", 4}},
-	npc_dota_hero_lich ={{"holdout_frost_chaos", 4}},
+	npc_dota_hero_enchantress = {{"neutral_spell_immunity", 6}},
 	npc_dota_hero_omniknight = {{"holdout_light_frenzy", 4}},
-	npc_dota_hero_pugna = {{"holdout_rain_of_chaos_20", 4}},
 	npc_dota_hero_sniper ={{"holdout_rocket_launcher_20", 0}, {"holdout_plasma_rifle_20", 1}},
 	npc_dota_hero_sven = {{"holdout_storm_bolt_20", 0}, {"holdout_thunder_clap_20", 1}},
-	npc_dota_hero_terrorblade = {{"holdout_resistant_skin", 6}},
 	npc_dota_hero_brewmaster = {{"enraged_wildkin_tornado", 4}},
-	npc_dota_hero_phantom_assassin = {{"holdout_morph", 2}},
-
---	npc_dota_hero_antimage = {{"demonhuner_spell_resistance_XX",3}},
---	npc_dota_hero_luna = {{"luna_neutralisation_XX",5}},
---	npc_dota_hero_nyx_assassin = {{"crypt_lord_burrow_impale_XX",4}},
---	npc_dota_hero_crystal_maiden = {{"jaina_rain_of_ice_XX",4}},
---	npc_dota_hero_invoker = {{"bloodmage_rain_of_fire_XX",2}},
---	npc_dota_hero_windrunner = {{"windrunner_rockethail_XX",2}},
---	npc_dota_hero_sven = {{"paladin_light_frenzy_XX",3}},
---	npc_dota_hero_shadow_shaman = {{"shadow_hunter_hex_XX",3}},
---	npc_dota_hero_keeper_of_the_light = {{"archmage_frost_shield_XX",2}},
---	npc_dota_hero_night_stalker = {{"deardlord_rain_of_chaos_XX",2}},
---	npc_dota_hero_juggernaut = {{"blademaster_partition_XX",3}},
---	npc_dota_hero_lina = {{"shandris_lightning_attack_XX",2}},
---	npc_dota_hero_bane ={{"bane_player_rain_of_chaos_XX",1}},
---	npc_dota_hero_beastmaster ={{"rexxar_terror_wolf_XX",3}},
---	npc_dota_hero_tinker ={{"marine_rocketswarm_XX",3}}
+	npc_dota_hero_nevermore = {{"holdout_rain_of_chaos_20", 6}},
 	}
 
-	if hero_level > 18 then
+	if hero_level == 17 then -- Debug because 7.0
+		hero:SetAbilityPoints( hero:GetAbilityPoints() + 1 )
+	elseif hero_level > 19 then
 		hero:SetAbilityPoints( hero:GetAbilityPoints() - 1 )
+	end
+
+	if hero:GetUnitName() == "npc_dota_hero_elder_titan" then
+		if hero_level == 20 then
+			hero:RemoveAbility("holdout_shockwave")
+			hero:RemoveAbility("holdout_war_stomp")
+			hero:RemoveAbility("holdout_roar")
+		end
+	end
+
+	if hero:GetUnitName() == "npc_dota_hero_sven" then
+		if hero_level == 20 then
+			hero:RemoveAbility("holdout_storm_bolt")
+			hero:RemoveAbility("holdout_thunder_clap")
+		end
+	end
+
+	if hero:GetUnitName() == "npc_dota_hero_sniper" then
+		if hero_level == 20 then
+			hero:RemoveAbility("holdout_rocket_launcher")
+			hero:RemoveAbility("holdout_plasma_rifle")
+		end
+	end
+
+	if hero:GetUnitName() == "npc_dota_hero_brewmaster" then
+		if hero_level == 20 then
+			hero:RemoveAbility("shadow_shaman_shackles")
+		end
+	end
+
+	if hero:GetUnitName() == "npc_dota_hero_omniknight" then
+		if hero_level == 20 then
+			hero:RemoveAbility("axe_berserkers_call")
+		end
 	end
 
 	if hero:GetUnitName() == "npc_dota_hero_chaos_knight" then
@@ -400,9 +473,10 @@ local AbilitiesHeroes_XX = {
 			end
 		end
 
+		Notifications:Top(hero:GetPlayerOwnerID(), {text="You've reached level 20. Check out your new abilities! ",duration = 10})
+
 		for _,ability in pairs(AbilitiesHeroes_XX[hero:GetUnitName()]) do
 			if ability ~= nil then
-				Notifications:Top(hero:GetPlayerOwnerID(), {text="You've reached level 20. Check out your new abilities! ",duration = 10})
 				Notifications:Top(hero:GetPlayerOwnerID(), {ability=ability[1] ,continue=true})
 				hero:AddAbility(ability[1])
 				hero:UpgradeAbility(hero:FindAbilityByName(ability[1]))
@@ -480,7 +554,7 @@ function GameMode:OnPlayerPickHero(keys)
 	local heroes = HeroList:GetAllHeroes()
 
 	-- modifies the name/label of a player
-	GameMode:setPlayerHealthLabel(player)
+--	GameMode:setPlayerHealthLabel(player)
 end
 
 -- A player killed another player in a multi-team context
@@ -540,7 +614,8 @@ local playerKills = PlayerResource:GetKills(KillerID)
 		if PlayerResource:HasSelectedHero(KillerID) then
 			killerEntity:IncrementKills(1)
 		end
-	else return nil
+	else
+		return nil
 	end
 
 	if killerEntity:GetKills() == 100 then
@@ -552,8 +627,8 @@ local playerKills = PlayerResource:GetKills(KillerID)
 	elseif killerEntity:GetKills() == 1000 then
 		Notifications:Top(killerEntity:GetPlayerOwnerID(), {text="1000 kills. You get 50000 gold.", duration=5.0, style={color="red"}})
 		PlayerResource:ModifyGold( killerEntity:GetPlayerOwnerID(), 50000, false,  DOTA_ModifyGold_Unspecified )
-	elseif killerEntity:GetKills() >= 920 and RAMERO == 0 and NEUTRAL_SPAWN == 0 then -- 920
-	local point = Entities:FindByName(nil,"npc_dota_muradin_player"):GetAbsOrigin()
+	elseif killerEntity:GetKills() >= 940 and RAMERO == 0 and NEUTRAL_SPAWN == 0 then -- 940
+	local point = Entities:FindByName(nil, "npc_dota_muradin_player_1"):GetAbsOrigin()
 		killerEntity:AddNewModifier( nil, nil, "modifier_animation_freeze_stun", nil)
 		killerEntity:AddNewModifier( nil, nil, "modifier_invulnerable", nil)
 		Notifications:TopToAll({text="A hero has reached 80 Wave kills and will fight Ramero and Baristal!", style={color="white"}, duration=5.0})
@@ -574,8 +649,11 @@ local playerKills = PlayerResource:GetKills(KillerID)
 	for c = 1, 8 do
 		if killedUnit:GetUnitName() == "dota_badguys_barracks_"..c then
 			BARRACKMENTS[c] = 0
+			CREEP_LANES[c] = 0
+			print(BARRACKMENTS[c])
 		elseif killerEntity:IsIllusion() and killedUnit:GetUnitName() == "dota_badguys_barracks_"..c then
 			BARRACKMENTS[c] = 0
+			CREEP_LANES[c] = 0
 		end
 	end
 
@@ -591,6 +669,36 @@ local playerKills = PlayerResource:GetKills(KillerID)
 		local pos = killedUnit:GetAbsOrigin()
 		local drop = CreateItemOnPositionSync( pos, item )
 		item:LaunchLoot(false, 300, 0.5, pos)
+	end
+
+	if killedUnit:GetUnitName() == "npc_dota_hero_magtheridon" then
+	local teleporters2 = Entities:FindAllByName("trigger_teleport2")
+	local difficulty = GameRules:GetCustomGameDifficulty()
+
+		MAGTHERIDON = MAGTHERIDON + 1
+
+		if MAGTHERIDON > 0 and difficulty == 1 then
+			EndMagtheridonArena()
+		elseif MAGTHERIDON > 1 and difficulty == 2 then
+			EndMagtheridonArena()
+		elseif MAGTHERIDON > 3 and difficulty == 3 then
+			EndMagtheridonArena()
+		elseif MAGTHERIDON > 3 and difficulty == 4 then
+			EndMagtheridonArena()
+		end
+	end
+
+	if killedUnit:GetUnitName() == "npc_dota_boss_spirit_master_fire" then
+		SPIRIT_MASTER = SPIRIT_MASTER + 1
+	end
+	if killedUnit:GetUnitName() == "npc_dota_boss_spirit_master_storm" then
+		SPIRIT_MASTER = SPIRIT_MASTER + 1
+	end
+	if killedUnit:GetUnitName() == "npc_dota_boss_spirit_master_earth" then
+		SPIRIT_MASTER = SPIRIT_MASTER + 1
+	end
+	if SPIRIT_MASTER >= 3 then
+		GameRules:SetGameWinner(DOTA_TEAM_GOODGUYS)
 	end
 end
 
@@ -685,12 +793,10 @@ end
 
 -- This function is called whenever an NPC reaches its goal position/target
 function GameMode:OnNPCGoalReached(keys)
-	DebugPrint('[BAREBONES] OnNPCGoalReached')
-	DebugPrintTable(keys)
+local goalEntity = EntIndexToHScript(keys.goal_entindex)
+local nextGoalEntity = EntIndexToHScript(keys.next_goal_entindex)
+local npc = EntIndexToHScript(keys.npc_entindex)
 
-	local goalEntity = EntIndexToHScript(keys.goal_entindex)
-	local nextGoalEntity = EntIndexToHScript(keys.next_goal_entindex)
-	local npc = EntIndexToHScript(keys.npc_entindex)
 end
 
 function GameMode:OnPlayerChat(keys)
@@ -699,40 +805,71 @@ local userID = keys.userid
 local playerID = self.vUserIds[userID]:GetPlayerID()
 local text = keys.text
 local player = PlayerResource:GetPlayer(playerID)
-
 	for str in string.gmatch(text, "%S+") do
 		if GameRules:PlayerHasCustomGameHostPrivileges(player) then
 			if str == "-openway_1" or str == "-ow1" then
-				Notifications:TopToAll({text="Red Player opened lane 1!", style={color="white"}, duration=5.0})
-				CREEP_LANES[1] = 1
+				if BARRACKMENTS[1] == 1 then
+					Notifications:TopToAll({text="Red Player opened lane 1!", style={color="white"}, duration=5.0})
+					CREEP_LANES[1] = 1
+				elseif BARRACKMENTS[1] == 0 then
+					Notifications:TopToAll({text="Can't open Lane 1, barrackment destroyed!", style={color="white"}, duration=5.0})
+				end
 			end
 			if str == "-openway_2" or str == "-ow2" then
-				Notifications:TopToAll({text="Red Player opened lane 2!", style={color="white"}, duration=5.0})
-				CREEP_LANES[2] = 1
+				if BARRACKMENTS[2] == 1 then
+					Notifications:TopToAll({text="Red Player opened lane 2!", style={color="white"}, duration=5.0})
+					CREEP_LANES[2] = 1
+				elseif BARRACKMENTS[2] == 0 then
+					Notifications:TopToAll({text="Can't open Lane 2, barrackment destroyed!", style={color="white"}, duration=5.0})
+				end
 			end
 			if str == "-openway_3" or str == "-ow3" then
-				Notifications:TopToAll({text="Red Player opened lane 3!", style={color="white"}, duration=5.0})
-				CREEP_LANES[3] = 1
+				if BARRACKMENTS[3] == 1 then
+					Notifications:TopToAll({text="Red Player opened lane 3!", style={color="white"}, duration=5.0})
+					CREEP_LANES[3] = 1
+				elseif BARRACKMENTS[3] == 0 then
+					Notifications:TopToAll({text="Can't open Lane 3, barrackment destroyed!", style={color="white"}, duration=5.0})
+				end
 			end
 			if str == "-openway_4" or str == "-ow4" then
-				Notifications:TopToAll({text="Red Player opened lane 4!", style={color="white"}, duration=5.0})
-				CREEP_LANES[4] = 1
+				if BARRACKMENTS[4] == 1 then
+					Notifications:TopToAll({text="Red Player opened lane 4!", style={color="white"}, duration=5.0})
+					CREEP_LANES[4] = 1
+				elseif BARRACKMENTS[4] == 0 then
+					Notifications:TopToAll({text="Can't open Lane 4, barrackment destroyed!", style={color="white"}, duration=5.0})
+				end
 			end
 			if str == "-openway_5" or str == "-ow5" then
-				Notifications:TopToAll({text="Red Player opened lane 5!", style={color="white"}, duration=5.0})
-				CREEP_LANES[5] = 1
+				if BARRACKMENTS[5] == 1 then
+					Notifications:TopToAll({text="Red Player opened lane 5!", style={color="white"}, duration=5.0})
+					CREEP_LANES[5] = 1
+				elseif BARRACKMENTS[5] == 0 then
+					Notifications:TopToAll({text="Can't open Lane 5, barrackment destroyed!", style={color="white"}, duration=5.0})
+				end
 			end
 			if str == "-openway_6" or str == "-ow6" then
-				Notifications:TopToAll({text="Red Player opened lane 6!", style={color="white"}, duration=5.0})
-				CREEP_LANES[6] = 1
+				if BARRACKMENTS[6] == 1 then
+					Notifications:TopToAll({text="Red Player opened lane 6!", style={color="white"}, duration=5.0})
+					CREEP_LANES[6] = 1
+				elseif BARRACKMENTS[6] == 0 then
+					Notifications:TopToAll({text="Can't open Lane 6, barrackment destroyed!", style={color="white"}, duration=5.0})
+				end
 			end
 			if str == "-openway_7" or str == "-ow7" then
-				Notifications:TopToAll({text="Red Player opened lane 7!", style={color="white"}, duration=5.0})
-				CREEP_LANES[7] = 1
+				if BARRACKMENTS[7] == 1 then
+					Notifications:TopToAll({text="Red Player opened lane 7!", style={color="white"}, duration=5.0})
+					CREEP_LANES[7] = 1
+				elseif BARRACKMENTS[7] == 0 then
+					Notifications:TopToAll({text="Can't open Lane 7, barrackment destroyed!", style={color="white"}, duration=5.0})
+				end
 			end
 			if str == "-openway_8" or str == "-ow8" then
-				Notifications:TopToAll({text="Red Player opened lane 8!", style={color="white"}, duration=5.0})
-				CREEP_LANES[8] = 1
+				if BARRACKMENTS[8] == 1 then
+					Notifications:TopToAll({text="Red Player opened lane 8!", style={color="white"}, duration=5.0})
+					CREEP_LANES[8] = 1
+				elseif BARRACKMENTS[8] == 0 then
+					Notifications:TopToAll({text="Can't open Lane 8, barrackment destroyed!", style={color="white"}, duration=5.0})
+				end
 			end
 
 			if str == "-closeway_1" or str == "-cw1" then
@@ -808,10 +945,13 @@ local player = PlayerResource:GetPlayer(playerID)
 		local cost = 10000
 		local numberOfTomes = math.floor(gold / cost)
 			if numberOfTomes >= 1 and BT_ENABLED == 1 then
-				PlayerResource:SpendGold(playerID, (numberOfTomes)*cost, DOTA_ModifyGold_PurchaseItem)
-				hero:ModifyAgility(numberOfTomes*50)
-				hero:ModifyStrength(numberOfTomes*50)
-				hero:ModifyIntellect(numberOfTomes*50)
+				PlayerResource:SpendGold(playerID, (numberOfTomes) * cost, DOTA_ModifyGold_PurchaseItem)
+				hero:ModifyAgility(numberOfTomes * 50)
+				hero:ModifyStrength(numberOfTomes * 50)
+				hero:ModifyIntellect(numberOfTomes * 50)
+				hero:EmitSound("ui.trophy_levelup")
+				local particle1 = ParticleManager:CreateParticle("particles/econ/events/ti6/hero_levelup_ti6.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
+				ParticleManager:SetParticleControl(particle1, 0, hero:GetAbsOrigin())
 				Notifications:Top(player, {text="You've bought "..numberOfTomes.." Tomes!", duration=5.0, style={color="white"}})
 			elseif numberOfTomes < 1 then
 				Notifications:Top(player, {text="You don't have enough gold to afford tomes!", duration=5.0, style={color="white"}})

@@ -7,21 +7,19 @@ local modifier_sector_1 = keys.modifier_sector_1
 local modifier_sector_2 = keys.modifier_sector_2
 local modifier_sector_3 = keys.modifier_sector_3
 
--- Defines the center point (caster or dummy unit)
-caster.freezing_field_center = CreateUnitByName("dummy_unit_invulnerable", keys.target_points[1], false, nil, nil, caster:GetTeamNumber())
-caster.freezing_field_particle = ParticleManager:CreateParticle("particles/units/heroes/hero_razor_reduced_flash/razor_rain_storm_reduced_flash.vpcf", PATTACH_CUSTOMORIGIN, caster.freezing_field_center)
-ParticleManager:SetParticleControl(caster.freezing_field_particle, 0, keys.target_points[1])
-ParticleManager:SetParticleControl(caster.freezing_field_particle, 1, Vector (1000, 0, 0))
-ParticleManager:SetParticleControl(caster.freezing_field_particle, 5, Vector (1000, 0, 0))
+	-- Defines the center point (caster or dummy unit)
+	caster.freezing_field_center = CreateUnitByName("dummy_unit_invulnerable", keys.target_points[1], false, nil, nil, caster:GetTeamNumber())
+	caster.freezing_field_particle = ParticleManager:CreateParticle("particles/units/heroes/hero_razor_reduced_flash/razor_rain_storm_reduced_flash.vpcf", PATTACH_CUSTOMORIGIN, caster.freezing_field_center)
+	ParticleManager:SetParticleControl(caster.freezing_field_particle, 0, keys.target_points[1])
+	ParticleManager:SetParticleControl(caster.freezing_field_particle, 1, Vector (1000, 0, 0))
+	ParticleManager:SetParticleControl(caster.freezing_field_particle, 5, Vector (1000, 0, 0))
 
--- Plays the channeling animation
---StartAnimation(caster, {activity = ACT_DOTA_CAST_ABILITY_4, rate = 0.7})
+--	StartAnimation(caster, {activity = ACT_DOTA_CAST_ABILITY_4, rate = 0.7})
 
-caster.freezing_field_center:EmitSound("Hero_Razor.Storm.Cast")
---caster.freezing_field_center:EmitSound("Hero_Razor.Storm.Loop")
+	caster.freezing_field_center:EmitSound("Hero_Razor.Storm.Cast")
 
--- Grants the slowing aura to the center unit
-ability:ApplyDataDrivenModifier(caster, caster.freezing_field_center, modifier_aura, {})
+	-- Grants the slowing aura to the center unit
+	ability:ApplyDataDrivenModifier(caster, caster.freezing_field_center, modifier_aura, {})
 
 	-- Initializes each sector's thinkers
 	Timers:CreateTimer(0.1, function()
@@ -40,8 +38,8 @@ ability:ApplyDataDrivenModifier(caster, caster.freezing_field_center, modifier_a
 		ability:ApplyDataDrivenModifier(caster, caster.freezing_field_center, modifier_sector_3, {} )
 	end)
 
-	Timers:CreateTimer(9.9, function()
-		caster.freezing_field_center:Kill()
+	Timers:CreateTimer(9.0, function()
+		UTIL_Remove(caster.freezing_field_center)
 	end)
 end
 

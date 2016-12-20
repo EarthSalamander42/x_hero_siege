@@ -34,7 +34,7 @@
 
 		"Modifiers"
 		{
-			"modifier_item_lifesteal_mask"
+			"modifier_lifesteal_hidden"
 			{
 				"Passive"						"1"
 				"IsHidden"						"1"
@@ -47,14 +47,16 @@
 
 				"OnOrbImpact"
 				{
-					"RunScript"
+					"ApplyModifier"
 					{
-						"ScriptFile"			"items/lifesteal_mask/mask_of_death.lua"
-						"Function"				"modifier_item_lifesteal_datadriven_on_orb_impact"
+						"ModifierName"	"modifier_lifesteal"
+						"Target" 		"ATTACKER"
+						"Duration"		"0.03"
 					}
 				}
 			}
-			"modifier_item_lifesteal_mask_lifesteal"
+
+			"modifier_lifesteal"
 			{
 				"Passive"				"0"
 				"IsHidden"				"1"
@@ -251,7 +253,7 @@
 		"AbilityBehavior"					"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"Model"								"models/props_gameplay/aegis.mdl"
 
-		"ItemCost"							"3000"
+		"ItemCost"							"3500"
 		"ItemDeclarations"					"DECLARE_PURCHASES_TO_TEAMMATES | DECLARE_PURCHASES_TO_SPECTATORS"
 		"ItemQuality"						"epic"
 		"ItemDroppable" 					"1"
@@ -261,7 +263,7 @@
 		"ItemHideCharges"					"0"
 		"ItemDisplayCharges"				"1"
 		"ItemInitialCharges"				"3"
-		"ItemStackable"						"1"
+		"ItemStackable"						"0"
 
 		// Special	
 		//-------------------------------------------------------------------------------------------------------------
@@ -968,7 +970,7 @@
 
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"						"10000"
+		"ItemCost"						"12500"
 		"ItemShopTags"					"damage"
 		"ItemQuality"					"component"
 		"ItemAliases"					"gloom blade"
@@ -1093,30 +1095,6 @@
 			}
 		}
 
-		"precache"
-		{
-			"particle"  "particles/units/heroes/hero_stormspirit/stormspirit_overload_ambient.vpcf"
-			"particle"  "particles/units/heroes/hero_brewmaster/brewmaster_storm_attack.vpcf"
-		}
-
-		"OnEquip"
-		{
-			"RunScript"
-			{
-				"ScriptFile"    "items/orbs.lua"
-				"Function"      "EquipOrb"
-			}
-		}
-
-		"OnUnequip"
-		{
-			"RunScript"
-			{
-				"ScriptFile"    "items/orbs.lua"
-				"Function"      "UnequipOrb"
-			}
-		}
-
 		"Modifiers"
 		{
 			"modifier_orb_of_lightning"
@@ -1220,24 +1198,6 @@
 			}
 		}
 	
-		"OnEquip"
-		{
-			"RunScript"
-			{
-				"ScriptFile"    "items/orbs.lua"
-				"Function"      "EquipOrb"
-			}
-		}
-	
-		"OnUnequip"
-		{
-			"RunScript"
-			{
-				"ScriptFile"    "items/orbs.lua"
-				"Function"      "UnequipOrb"
-			}
-		}
-	
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
 		// Adds 5 bonus fire damage to the attacks of a Hero when carried. 
@@ -1267,8 +1227,8 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"    "items/orbs.lua"
-						"Function"      "Splash"
+						"ScriptFile"	"items/orbs.lua"
+						"Function"		"Splash"
 					}
 				}
 			}
@@ -1324,24 +1284,6 @@
 			{
 				"var_type"				"FIELD_INTEGER"
 				"duration"				"60"
-			}
-		}
-
-		"OnEquip"
-		{
-			"RunScript"
-			{
-				"ScriptFile"    "items/orbs.lua"
-				"Function"      "EquipOrb"
-			}
-		}
-
-		"OnUnequip"
-		{
-			"RunScript"
-			{
-				"ScriptFile"    "items/orbs.lua"
-				"Function"      "UnequipOrb"
 			}
 		}
 
@@ -1433,7 +1375,7 @@
 
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"						"10000"
+		"ItemCost"						"12500"
 		"ItemShopTags"					"damage"
 		"ItemQuality"					"artifact"
 		"ItemAliases"					"bracer of endurance"
@@ -1717,7 +1659,7 @@
 		
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"						"10000"
+		"ItemCost"						"12500"
 		"ItemShopTags"					"boots"
 		"ItemQuality"					"common"
 		"ItemAliases"					"blink;boots"
@@ -1731,12 +1673,12 @@
 			"01"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"max_blink_range"			"750"
+				"max_blink_range"			"725"
 			}
 			"03"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"bonus_movement_speed"		"75"
+				"bonus_movement_speed"		"60"
 			}
 		}
 
@@ -1756,7 +1698,7 @@
 
 		"Modifiers"
 		{
-			"modifier_item_imba_blink_boots"
+			"modifier_item_blink_boots"
 			{
 				"Passive"					"1"
 				"IsHidden"					"1"
@@ -1787,7 +1729,7 @@
 
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"						"10000"
+		"ItemCost"						"12500"
 		"ItemShopTags"					"damage"
 		"ItemQuality"					"component"
 		"ItemAliases"					"blades of attack"
@@ -1937,10 +1879,11 @@
 
 				"OnOrbImpact"
 				{
-					"RunScript"
+					"ApplyModifier"
 					{
-						"ScriptFile"			"items/lifesteal_mask/mask_of_death.lua"
-						"Function"				"modifier_item_lifesteal_datadriven_on_orb_impact"
+						"ModifierName"	"modifier_lifesteal"
+						"Target" 		"ATTACKER"
+						"Duration"		"0.03"
 					}
 				}
 
@@ -1950,9 +1893,9 @@
 					"MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS"		"%bonus_armor"
 				}
 			}
-			"modifier_item_lifesteal_mask_lifesteal"
+
+			"modifier_lifesteal"
 			{
-				"Passive"				"0"
 				"IsHidden"				"1"
 
 				"OnDealDamage"

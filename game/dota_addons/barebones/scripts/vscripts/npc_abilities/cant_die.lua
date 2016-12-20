@@ -24,7 +24,7 @@ function death_check(event)
 			elseif caster:GetUnitName() == "npc_dota_hero_banehallow" then
 				banehallow_boss_die(caster)
 			elseif caster:GetUnitName() == "npc_dota_boss_lich_king" then
-				abaddon_boss_die(caster)
+				LichKingEnd(caster)
 			end
 		end
 	end
@@ -151,22 +151,23 @@ function arthas_boss_die(caster)
 	StartAnimation(caster, {duration=6.0, activity=ACT_DOTA_FLAIL, rate=0.75})
 
 	Timers:CreateTimer(6, function()
-		StartAnimation(caster, {duration=6.0, activity=ACT_DOTA_DIE, rate=0.35})
+		StartAnimation(caster, {duration=6.0, activity=ACT_DOTA_DIE, rate=0.25})
 		EmitSoundOn("skeleton_king_wraith_death_long_09", caster)
 		EmitSoundOn("skeleton_king_wraith_death_long_09", caster)
 	end)
 
-	Timers:CreateTimer(12, function()
+	Timers:CreateTimer(11.0, function()
 		UTIL_Remove(caster)
 	end)
 
 	Timers:CreateTimer(19, function()
-	local point = Entities:FindByName(nil,"point_teleport_boss"):GetAbsOrigin()
 	local heroes = HeroList:GetAllHeroes()
 		Timers:CreateTimer(5, StartBaneHallowArena)
 		for _,hero in pairs(heroes) do
+		local id = hero:GetPlayerID()
+		local point = Entities:FindByName(nil, "point_teleport_boss_"..id)
 			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
-				FindClearSpaceForUnit(hero, point, true)
+				FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
 				hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {Duration = 27, IsHidden = true})
 				hero:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 27, IsHidden = true})
 				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
@@ -195,7 +196,7 @@ function banehallow_boss_die(caster)
 	StartAnimation(caster, {duration=6.0, activity=ACT_DOTA_FLAIL, rate=0.75})
 
 	Timers:CreateTimer(6, function()
-		StartAnimation(caster, {duration=6.0, activity=ACT_DOTA_DIE, rate=0.20})
+		StartAnimation(caster, {duration = 6.3, activity=ACT_DOTA_DIE, rate=0.17})
 		EmitSoundOn("skeleton_king_wraith_death_long_09", caster)
 		EmitSoundOn("skeleton_king_wraith_death_long_09", caster)
 	end)
@@ -207,7 +208,7 @@ function banehallow_boss_die(caster)
 	Timers:CreateTimer(17, StartLichKingArena)
 end
 
-function abaddon_boss_die(caster)
+function LichKingEnd(caster)
 	Timers:CreateTimer(1.0, function()
 		local item = CreateItem("item_bag_of_gold", nil, nil)
 		local pos = caster:GetAbsOrigin()
@@ -234,25 +235,7 @@ function abaddon_boss_die(caster)
 		UTIL_Remove(caster)
 	end)
 
-	Timers:CreateTimer(16, function()
-		GameRules:SetGameWinner( DOTA_TEAM_GOODGUYS )
-		SendToConsole("dota_health_per_vertical_marker 250")
+	Timers:CreateTimer(17, function()
+		StartSpiritMasterArena()
 	end)
-end
-
-function FourBossesKillCount()
-local teleporters3 = Entities:FindAllByName("trigger_teleport3")
-GameMode.BossesTop_killed = GameMode.BossesTop_killed +1
-print( GameMode.BossesTop_killed )
-
-	if GameMode.BossesTop_killed > 3 then
-		for _,v in pairs(teleporters3) do
-			DebugPrint("enable teleport trigger")
-			v:Enable()
-		end
-
-		Notifications:TopToAll({text="You have killed Grom, Proudmoore, Illidan and Balanar. Red Teleporters Activated" , duration=10.0})
-		print( "Teleporter to 4Bosses Activated!" )
-	else return nil
-	end
 end

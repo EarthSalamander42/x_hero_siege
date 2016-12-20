@@ -1,7 +1,3 @@
---[[
-Phoenix AI
-]]
-
 require( "ai_core" )
 
 behaviorSystem = {} -- create the global so we can assign to it

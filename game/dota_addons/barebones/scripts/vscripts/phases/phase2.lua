@@ -155,6 +155,12 @@ local heroes = HeroList:GetAllHeroes()
 		lich_king:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
 		StartAnimation(lich_king, {duration = 20000.0, activity = ACT_DOTA_IDLE, rate = 0.9})
 
+		spirit_master = CreateUnitByName("npc_dota_boss_spirit_master_bis", Entities:FindByName(nil, "spirit_master_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
+		spirit_master:SetAngles(0, 90, 0)
+		spirit_master:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
+		spirit_master:AddNewModifier(nil, nil, "modifier_boss_stun", nil)
+--		StartAnimation(spirit_master, {duration = 20000.0, activity = ACT_DOTA_VICTORY, rate = 1.0})
+
 		local ramero = CreateUnitByName("npc_ramero_bis", Entities:FindByName(nil, "point_special_arena_1"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
 		ramero:SetAngles(0, 270, 0)
 
@@ -168,17 +174,18 @@ end
 
 function SpawnTeleporterGoodGuys(keys)
 local activator = keys.activator
-local point = Entities:FindByName(nil,"point_teleport_choose_hero"):GetAbsOrigin()
-	for playerID = 0, DOTA_MAX_TEAM_PLAYERS do
-		if PlayerResource:IsValidPlayer(playerID) and activator:GetUnitName() == "npc_dota_hero_wisp" then
-			PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(),activator)
-			Timers:CreateTimer(3.0, function()
-				FindClearSpaceForUnit(activator, point, true)
-			end)
-			Timers:CreateTimer(19.0, function()
-				PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(),nil)
-			end)
-		end
+local heroes = HeroList:GetAllHeroes()
+	for _,hero in pairs(heroes) do
+	local id = hero:GetPlayerID()
+	local point = Entities:FindByName(nil, "point_teleport_choose_hero_"..id)
+		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
+		Timers:CreateTimer(3.0, function()
+			FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
+		end)
+		Timers:CreateTimer(19.0, function()
+			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil)
+			Entities:FindByName(nil, "trigger_teleport_spawn"):Disable()
+		end)
 	end
 end
 
@@ -189,18 +196,18 @@ local id = activator:GetPlayerID()
 local msg = "This hero is only for <font color='#FF0000'>VIP Members!</font> Please choose another hero."
 	for playerID = 0, DOTA_MAX_TEAM_PLAYERS do
 		for i = 1, #vip_members do
-			if PlayerResource:IsValidPlayer(playerID) and activator:GetUnitName() == "npc_dota_hero_wisp" and PlayerResource:GetSteamAccountID(activator:GetPlayerID()) == mod_creator[i] or PlayerResource:GetSteamAccountID(activator:GetPlayerID()) == captain_baumi[i] or PlayerResource:GetSteamAccountID(activator:GetPlayerID()) == mod_graphist[i] or PlayerResource:GetSteamAccountID(activator:GetPlayerID()) == vip_members[i] then
+			if PlayerResource:IsValidPlayer(playerID) and activator:GetUnitName() == "npc_dota_hero_wisp" and PlayerResource:GetSteamAccountID(activator:GetPlayerID()) == mod_creator[i] or PlayerResource:GetSteamAccountID(activator:GetPlayerID()) == captain_baumi[i] or PlayerResource:GetSteamAccountID(activator:GetPlayerID()) == mod_graphist[i] or PlayerResource:GetSteamAccountID(activator:GetPlayerID()) == vip_members[i] or PlayerResource:GetSteamAccountID(activator:GetPlayerID()) == golden_vip_members[i] then
 				PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(),activator)
 				Timers:CreateTimer(0.1, function()
 					PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(),nil)
 					FindClearSpaceForUnit(activator, point, true)
 					PlayerResource:ReplaceHeroWith(activator:GetPlayerID(), "npc_dota_hero_meepo", STARTING_GOLD, 0)
 					Timers:CreateTimer(2.0, function()
-					activator:SetPlayerID(id)
-				end)
+						activator:SetPlayerID(id)
+					end)
 				end)
 			elseif PlayerResource:IsValidPlayer(playerID) and activator:GetUnitName() == "npc_dota_hero_wisp" and not PlayerResource:GetSteamAccountID(activator:GetPlayerID()) == vip_members[i] then
-				Notifications:Top(activator:GetPlayerOwnerID(),{text=msg, duration=5.0})
+				Notifications:Top(activator:GetPlayerOwnerID(),{text = msg, duration=5.0})
 			end
 		end
 	end
@@ -213,15 +220,15 @@ local id = activator:GetPlayerID()
 local msg = "This hero is only for <font color='#FF0000'>VIP Members!</font> Please choose another hero."
 	for playerID = 0, DOTA_MAX_TEAM_PLAYERS do
 		for i = 1, #vip_members do
-			if PlayerResource:IsValidPlayer(playerID) and activator:GetUnitName() == "npc_dota_hero_wisp" and PlayerResource:GetSteamAccountID(activator:GetPlayerID()) == mod_creator[i] or PlayerResource:GetSteamAccountID(activator:GetPlayerID()) == captain_baumi[i] or PlayerResource:GetSteamAccountID(activator:GetPlayerID()) == mod_graphist[i] or PlayerResource:GetSteamAccountID(activator:GetPlayerID()) == vip_members[i] then
+			if PlayerResource:IsValidPlayer(playerID) and activator:GetUnitName() == "npc_dota_hero_wisp" and PlayerResource:GetSteamAccountID(activator:GetPlayerID()) == mod_creator[i] or PlayerResource:GetSteamAccountID(activator:GetPlayerID()) == captain_baumi[i] or PlayerResource:GetSteamAccountID(activator:GetPlayerID()) == mod_graphist[i] or PlayerResource:GetSteamAccountID(activator:GetPlayerID()) == vip_members[i] or PlayerResource:GetSteamAccountID(activator:GetPlayerID()) == golden_vip_members[i] then
 				PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(),activator)
 				Timers:CreateTimer(0.1, function()
 					PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(),nil)
 					FindClearSpaceForUnit(activator, point, true)
 					PlayerResource:ReplaceHeroWith(activator:GetPlayerID(), "npc_dota_hero_skeleton_king", STARTING_GOLD, 0)
 					Timers:CreateTimer(2.0, function()
-					activator:SetPlayerID(id)
-				end)
+						activator:SetPlayerID(id)
+					end)
 				end)
 			elseif PlayerResource:IsValidPlayer(playerID) and activator:GetUnitName() == "npc_dota_hero_wisp" and not PlayerResource:GetSteamAccountID(activator:GetPlayerID()) == vip_members[i] then
 				Notifications:Top(activator:GetPlayerOwnerID(),{text=msg, duration=5.0})
@@ -238,7 +245,7 @@ local msg = "This hero is only for <font color='#FF0000'>VIP Members!</font> Ple
 	for playerID = 0, DOTA_MAX_TEAM_PLAYERS do
 --		for i = 1, #vip_members do
 		if PlayerResource:IsValidPlayer(playerID) and activator:GetUnitName() == "npc_dota_hero_wisp" then
---			if PlayerResource:IsValidPlayer(playerID) and activator:GetUnitName() == "npc_dota_hero_wisp" and PlayerResource:GetSteamAccountID(activator:GetPlayerID()) == mod_creator[i] or PlayerResource:GetSteamAccountID(activator:GetPlayerID()) == captain_baumi[i] or PlayerResource:GetSteamAccountID(activator:GetPlayerID()) == mod_graphist[i] or PlayerResource:GetSteamAccountID(activator:GetPlayerID()) == vip_members[i] then
+--			if PlayerResource:IsValidPlayer(playerID) and activator:GetUnitName() == "npc_dota_hero_wisp" and PlayerResource:GetSteamAccountID(activator:GetPlayerID()) == mod_creator[i] or PlayerResource:GetSteamAccountID(activator:GetPlayerID()) == captain_baumi[i] or PlayerResource:GetSteamAccountID(activator:GetPlayerID()) == mod_graphist[i] or PlayerResource:GetSteamAccountID(activator:GetPlayerID()) == vip_members[i] or PlayerResource:GetSteamAccountID(activator:GetPlayerID()) == golden_vip_members[i] then
 				PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(),activator)
 				Timers:CreateTimer(0.1, function()
 					PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(),nil)
@@ -262,15 +269,15 @@ local id = activator:GetPlayerID()
 local msg = "This hero is only for <font color='#FF0000'>VIP Members!</font> Please choose another hero."
 	for playerID = 0, DOTA_MAX_TEAM_PLAYERS do
 		for i = 1, #vip_members do
-			if PlayerResource:IsValidPlayer(playerID) and activator:GetUnitName() == "npc_dota_hero_wisp" and PlayerResource:GetSteamAccountID(activator:GetPlayerID()) == mod_creator[i] or PlayerResource:GetSteamAccountID(activator:GetPlayerID()) == captain_baumi[i] or PlayerResource:GetSteamAccountID(activator:GetPlayerID()) == mod_graphist[i] or PlayerResource:GetSteamAccountID(activator:GetPlayerID()) == vip_members[i] then
+			if PlayerResource:IsValidPlayer(playerID) and activator:GetUnitName() == "npc_dota_hero_wisp" and PlayerResource:GetSteamAccountID(activator:GetPlayerID()) == mod_creator[i] or PlayerResource:GetSteamAccountID(activator:GetPlayerID()) == captain_baumi[i] or PlayerResource:GetSteamAccountID(activator:GetPlayerID()) == mod_graphist[i] or PlayerResource:GetSteamAccountID(activator:GetPlayerID()) == vip_members[i] or PlayerResource:GetSteamAccountID(activator:GetPlayerID()) == golden_vip_members[i] then
 				PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(),activator)
 				Timers:CreateTimer(0.1, function()
 					PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(),nil)
 					FindClearSpaceForUnit(activator, point, true)
 					PlayerResource:ReplaceHeroWith(activator:GetPlayerID(), "npc_dota_hero_slardar", STARTING_GOLD, 0)
 					Timers:CreateTimer(2.0, function()
-					activator:SetPlayerID(id)
-				end)
+						activator:SetPlayerID(id)
+					end)
 				end)
 			elseif PlayerResource:IsValidPlayer(playerID) and activator:GetUnitName() == "npc_dota_hero_wisp" and not PlayerResource:GetSteamAccountID(activator:GetPlayerID()) == vip_members[i] then
 				Notifications:Top(activator:GetPlayerOwnerID(),{text=msg, duration=5.0})
@@ -422,7 +429,7 @@ local id = activator:GetPlayerID()
 			Timers:CreateTimer(0.1, function()
 				PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(),nil)
 				FindClearSpaceForUnit(activator, point, true)
-				PlayerResource:ReplaceHeroWith(activator:GetPlayerID(), "npc_dota_hero_viper", STARTING_GOLD, 0)
+				PlayerResource:ReplaceHeroWith(activator:GetPlayerID(), "npc_dota_hero_jakiro", STARTING_GOLD, 0)
 				Timers:CreateTimer(2.0, function()
 					activator:SetPlayerID(id)
 				end)
@@ -860,7 +867,7 @@ end
 function FinalWave()
 local heroes = HeroList:GetAllHeroes()
 local difficulty = GameRules:GetCustomGameDifficulty()
-local teleporters = Entities:FindAllByName("trigger_teleport")
+local teleporters = Entities:FindAllByName("trigger_teleport_green")
 local teleporters_2 = Entities:FindAllByName("trigger_teleport_phase3_creeps")
 local heroes = HeroList:GetAllHeroes()
 local point_west_1 = Entities:FindByName(nil,"final_wave_west_1"):GetAbsOrigin()
@@ -929,32 +936,32 @@ local WaypointSouth6 = Entities:FindByName(nil,"south1_6")
 	end
 
 	Timers:CreateTimer(10, function()
-		local unit1 = CreateUnitByName("npc_abomination_final_wave", point_west_1, true, nil, nil, DOTA_TEAM_BADGUYS)
-		local unit2 = CreateUnitByName("npc_abomination_final_wave", point_west_2, true, nil, nil, DOTA_TEAM_BADGUYS)
-		local unit3 = CreateUnitByName("npc_abomination_final_wave", point_west_3, true, nil, nil, DOTA_TEAM_BADGUYS)
+		local unit1 = CreateUnitByName("npc_abomination_final_wave", point_west_1, true, nil, nil, DOTA_TEAM_NEUTRALS)
+		local unit2 = CreateUnitByName("npc_abomination_final_wave", point_west_2, true, nil, nil, DOTA_TEAM_NEUTRALS)
+		local unit3 = CreateUnitByName("npc_abomination_final_wave", point_west_3, true, nil, nil, DOTA_TEAM_NEUTRALS)
 
-		local unit4 = CreateUnitByName("npc_banshee_final_wave", point_west_4, true, nil, nil, DOTA_TEAM_BADGUYS)
-		local unit5 = CreateUnitByName("npc_banshee_final_wave", point_west_5, true, nil, nil, DOTA_TEAM_BADGUYS)
-		local unit6 = CreateUnitByName("npc_banshee_final_wave", point_west_6, true, nil, nil, DOTA_TEAM_BADGUYS)
+		local unit4 = CreateUnitByName("npc_banshee_final_wave", point_west_4, true, nil, nil, DOTA_TEAM_NEUTRALS)
+		local unit5 = CreateUnitByName("npc_banshee_final_wave", point_west_5, true, nil, nil, DOTA_TEAM_NEUTRALS)
+		local unit6 = CreateUnitByName("npc_banshee_final_wave", point_west_6, true, nil, nil, DOTA_TEAM_NEUTRALS)
 
-		local unit7 = CreateUnitByName("npc_necro_final_wave", point_west_7, true, nil, nil, DOTA_TEAM_BADGUYS)
-		local unit8 = CreateUnitByName("npc_necro_final_wave", point_west_8, true, nil, nil, DOTA_TEAM_BADGUYS)
-		local unit9 = CreateUnitByName("npc_necro_final_wave", point_west_9, true, nil, nil, DOTA_TEAM_BADGUYS)
+		local unit7 = CreateUnitByName("npc_necro_final_wave", point_west_7, true, nil, nil, DOTA_TEAM_NEUTRALS)
+		local unit8 = CreateUnitByName("npc_necro_final_wave", point_west_8, true, nil, nil, DOTA_TEAM_NEUTRALS)
+		local unit9 = CreateUnitByName("npc_necro_final_wave", point_west_9, true, nil, nil, DOTA_TEAM_NEUTRALS)
 
-		local unit10 = CreateUnitByName("npc_magnataur_final_wave", point_west_10, true, nil, nil, DOTA_TEAM_BADGUYS)
-		local unit11 = CreateUnitByName("npc_magnataur_final_wave", point_west_11, true, nil, nil, DOTA_TEAM_BADGUYS)
-		local unit12 = CreateUnitByName("npc_magnataur_final_wave", point_west_12, true, nil, nil, DOTA_TEAM_BADGUYS)
+		local unit10 = CreateUnitByName("npc_magnataur_final_wave", point_west_10, true, nil, nil, DOTA_TEAM_NEUTRALS)
+		local unit11 = CreateUnitByName("npc_magnataur_final_wave", point_west_11, true, nil, nil, DOTA_TEAM_NEUTRALS)
+		local unit12 = CreateUnitByName("npc_magnataur_final_wave", point_west_12, true, nil, nil, DOTA_TEAM_NEUTRALS)
 
-		local unit13 = CreateUnitByName("npc_dota_hero_balanar_final_wave", point_west_13, true, nil, nil, DOTA_TEAM_BADGUYS)
+		local unit13 = CreateUnitByName("npc_dota_hero_balanar_final_wave", point_west_13, true, nil, nil, DOTA_TEAM_NEUTRALS)
 		unit13:EmitSound("Hero_TemplarAssassin.Trap")
 		unit13:SetInitialGoalEntity(WaypointWest6)
 		unit13:MoveToPositionAggressive(WaypointWest6:GetAbsOrigin())
 
-		local units = FindUnitsInRadius( DOTA_TEAM_BADGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_NONE , FIND_ANY_ORDER, false )
+		local units = FindUnitsInRadius( DOTA_TEAM_NEUTRALS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_NONE , FIND_ANY_ORDER, false )
 		for _,v in pairs(units) do
 			if v:IsCreature() and v:HasMovementCapability() then
-				v:AddNewModifier(nil, nil, "modifier_boss_stun", {duration= 25, IsHidden = true})
-				v:AddNewModifier(nil, nil, "modifier_invulnerable", {duration= 25, IsHidden = true})
+				v:AddNewModifier(nil, nil, "modifier_boss_stun", {duration = 25, IsHidden = true})
+				v:AddNewModifier(nil, nil, "modifier_invulnerable", {duration = 25, IsHidden = true})
 			end
 		end
 	
@@ -966,37 +973,37 @@ local WaypointSouth6 = Entities:FindByName(nil,"south1_6")
 	end)
 
 	Timers:CreateTimer(15, function()
-		local unit1 = CreateUnitByName("npc_tauren_final_wave", point_north_1, true, nil, nil, DOTA_TEAM_BADGUYS)
+		local unit1 = CreateUnitByName("npc_tauren_final_wave", point_north_1, true, nil, nil, DOTA_TEAM_NEUTRALS)
 		unit1:SetAngles(0, 270, 0)
-		local unit2 = CreateUnitByName("npc_tauren_final_wave", point_north_2, true, nil, nil, DOTA_TEAM_BADGUYS)
+		local unit2 = CreateUnitByName("npc_tauren_final_wave", point_north_2, true, nil, nil, DOTA_TEAM_NEUTRALS)
 		unit2:SetAngles(0, 270, 0)
-		local unit3 = CreateUnitByName("npc_tauren_final_wave", point_north_3, true, nil, nil, DOTA_TEAM_BADGUYS)
+		local unit3 = CreateUnitByName("npc_tauren_final_wave", point_north_3, true, nil, nil, DOTA_TEAM_NEUTRALS)
 		unit3:SetAngles(0, 270, 0)
-		local unit4 = CreateUnitByName("npc_chaos_orc_final_wave", point_north_4, true, nil, nil, DOTA_TEAM_BADGUYS)
+		local unit4 = CreateUnitByName("npc_chaos_orc_final_wave", point_north_4, true, nil, nil, DOTA_TEAM_NEUTRALS)
 		unit4:SetAngles(0, 270, 0)
-		local unit5 = CreateUnitByName("npc_chaos_orc_final_wave", point_north_5, true, nil, nil, DOTA_TEAM_BADGUYS)
+		local unit5 = CreateUnitByName("npc_chaos_orc_final_wave", point_north_5, true, nil, nil, DOTA_TEAM_NEUTRALS)
 		unit5:SetAngles(0, 270, 0)
-		local unit6 = CreateUnitByName("npc_chaos_orc_final_wave", point_north_6, true, nil, nil, DOTA_TEAM_BADGUYS)
+		local unit6 = CreateUnitByName("npc_chaos_orc_final_wave", point_north_6, true, nil, nil, DOTA_TEAM_NEUTRALS)
 		unit6:SetAngles(0, 270, 0)
-		local unit7 = CreateUnitByName("npc_warlock_final_wave", point_north_7, true, nil, nil, DOTA_TEAM_BADGUYS)
+		local unit7 = CreateUnitByName("npc_warlock_final_wave", point_north_7, true, nil, nil, DOTA_TEAM_NEUTRALS)
 		unit7:SetAngles(0, 270, 0)
-		local unit8 = CreateUnitByName("npc_warlock_final_wave", point_north_8, true, nil, nil, DOTA_TEAM_BADGUYS)
+		local unit8 = CreateUnitByName("npc_warlock_final_wave", point_north_8, true, nil, nil, DOTA_TEAM_NEUTRALS)
 		unit8:SetAngles(0, 270, 0)
-		local unit9 = CreateUnitByName("npc_warlock_final_wave", point_north_9, true, nil, nil, DOTA_TEAM_BADGUYS)
+		local unit9 = CreateUnitByName("npc_warlock_final_wave", point_north_9, true, nil, nil, DOTA_TEAM_NEUTRALS)
 		unit9:SetAngles(0, 270, 0)
-		local unit10 = CreateUnitByName("npc_orc_raider_final_wave", point_north_10, true, nil, nil, DOTA_TEAM_BADGUYS)
+		local unit10 = CreateUnitByName("npc_orc_raider_final_wave", point_north_10, true, nil, nil, DOTA_TEAM_NEUTRALS)
 		unit10:SetAngles(0, 270, 0)
-		local unit11 = CreateUnitByName("npc_orc_raider_final_wave", point_north_11, true, nil, nil, DOTA_TEAM_BADGUYS)
+		local unit11 = CreateUnitByName("npc_orc_raider_final_wave", point_north_11, true, nil, nil, DOTA_TEAM_NEUTRALS)
 		unit11:SetAngles(0, 270, 0)
-		local unit12 = CreateUnitByName("npc_orc_raider_final_wave", point_north_12, true, nil, nil, DOTA_TEAM_BADGUYS)
+		local unit12 = CreateUnitByName("npc_orc_raider_final_wave", point_north_12, true, nil, nil, DOTA_TEAM_NEUTRALS)
 		unit12:SetAngles(0, 270, 0)
-		local unit13 = CreateUnitByName("npc_dota_hero_grom_hellscream_final_wave", point_north_13, true, nil, nil, DOTA_TEAM_BADGUYS)
+		local unit13 = CreateUnitByName("npc_dota_hero_grom_hellscream_final_wave", point_north_13, true, nil, nil, DOTA_TEAM_NEUTRALS)
 		unit13:EmitSound("Hero_TemplarAssassin.Trap")
 		unit13:SetAngles(0, 270, 0)
 		unit13:SetInitialGoalEntity(WaypointNorth6)
 		unit13:MoveToPositionAggressive(WaypointNorth6:GetAbsOrigin())
 	
-		local units = FindUnitsInRadius( DOTA_TEAM_BADGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_NONE , FIND_ANY_ORDER, false )
+		local units = FindUnitsInRadius( DOTA_TEAM_NEUTRALS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_NONE , FIND_ANY_ORDER, false )
 		for _,v in pairs(units) do
 			if v:IsCreature() and v:HasMovementCapability() then
 				v:AddNewModifier(nil, nil, "modifier_boss_stun", {duration= 20, IsHidden = true})
@@ -1012,37 +1019,37 @@ local WaypointSouth6 = Entities:FindByName(nil,"south1_6")
 	end)
 
 	Timers:CreateTimer(20, function()
-		local unit1 = CreateUnitByName("npc_druid_final_wave", point_east_1, true, nil, nil, DOTA_TEAM_BADGUYS)
+		local unit1 = CreateUnitByName("npc_druid_final_wave", point_east_1, true, nil, nil, DOTA_TEAM_NEUTRALS)
 		unit1:SetAngles(0, 180, 0)
-		local unit2 = CreateUnitByName("npc_druid_final_wave", point_east_2, true, nil, nil, DOTA_TEAM_BADGUYS)
+		local unit2 = CreateUnitByName("npc_druid_final_wave", point_east_2, true, nil, nil, DOTA_TEAM_NEUTRALS)
 		unit2:SetAngles(0, 180, 0)
-		local unit3 = CreateUnitByName("npc_druid_final_wave", point_east_3, true, nil, nil, DOTA_TEAM_BADGUYS)
+		local unit3 = CreateUnitByName("npc_druid_final_wave", point_east_3, true, nil, nil, DOTA_TEAM_NEUTRALS)
 		unit3:SetAngles(0, 180, 0)
-		local unit4 = CreateUnitByName("npc_guard_final_wave", point_east_4, true, nil, nil, DOTA_TEAM_BADGUYS)
+		local unit4 = CreateUnitByName("npc_guard_final_wave", point_east_4, true, nil, nil, DOTA_TEAM_NEUTRALS)
 		unit4:SetAngles(0, 180, 0)
-		local unit5 = CreateUnitByName("npc_guard_final_wave", point_east_5, true, nil, nil, DOTA_TEAM_BADGUYS)
+		local unit5 = CreateUnitByName("npc_guard_final_wave", point_east_5, true, nil, nil, DOTA_TEAM_NEUTRALS)
 		unit5:SetAngles(0, 180, 0)
-		local unit6 = CreateUnitByName("npc_guard_final_wave", point_east_6, true, nil, nil, DOTA_TEAM_BADGUYS)
+		local unit6 = CreateUnitByName("npc_guard_final_wave", point_east_6, true, nil, nil, DOTA_TEAM_NEUTRALS)
 		unit6:SetAngles(0, 180, 0)
-		local unit7 = CreateUnitByName("npc_keeper_final_wave", point_east_7, true, nil, nil, DOTA_TEAM_BADGUYS)
+		local unit7 = CreateUnitByName("npc_keeper_final_wave", point_east_7, true, nil, nil, DOTA_TEAM_NEUTRALS)
 		unit7:SetAngles(0, 180, 0)
-		local unit8 = CreateUnitByName("npc_keeper_final_wave", point_east_8, true, nil, nil, DOTA_TEAM_BADGUYS)
+		local unit8 = CreateUnitByName("npc_keeper_final_wave", point_east_8, true, nil, nil, DOTA_TEAM_NEUTRALS)
 		unit8:SetAngles(0, 180, 0)
-		local unit9 = CreateUnitByName("npc_keeper_final_wave", point_east_9, true, nil, nil, DOTA_TEAM_BADGUYS)
+		local unit9 = CreateUnitByName("npc_keeper_final_wave", point_east_9, true, nil, nil, DOTA_TEAM_NEUTRALS)
 		unit9:SetAngles(0, 180, 0)
-		local unit10 = CreateUnitByName("npc_luna_final_wave", point_east_10, true, nil, nil, DOTA_TEAM_BADGUYS)
+		local unit10 = CreateUnitByName("npc_luna_final_wave", point_east_10, true, nil, nil, DOTA_TEAM_NEUTRALS)
 		unit10:SetAngles(0, 180, 0)
-		local unit11 = CreateUnitByName("npc_luna_final_wave", point_east_11, true, nil, nil, DOTA_TEAM_BADGUYS)
+		local unit11 = CreateUnitByName("npc_luna_final_wave", point_east_11, true, nil, nil, DOTA_TEAM_NEUTRALS)
 		unit11:SetAngles(0, 180, 0)
-		local unit12 = CreateUnitByName("npc_luna_final_wave", point_east_12, true, nil, nil, DOTA_TEAM_BADGUYS)
+		local unit12 = CreateUnitByName("npc_luna_final_wave", point_east_12, true, nil, nil, DOTA_TEAM_NEUTRALS)
 		unit12:SetAngles(0, 180, 0)
-		local unit13 = CreateUnitByName("npc_dota_hero_illidan_final_wave", point_east_13, true, nil, nil, DOTA_TEAM_BADGUYS)
+		local unit13 = CreateUnitByName("npc_dota_hero_illidan_final_wave", point_east_13, true, nil, nil, DOTA_TEAM_NEUTRALS)
 		unit13:EmitSound("Hero_TemplarAssassin.Trap")
 		unit13:SetAngles(0, 180, 0)
 		unit13:SetInitialGoalEntity(WaypointEast6)
 		unit13:MoveToPositionAggressive(WaypointEast6:GetAbsOrigin())
 
-		local units = FindUnitsInRadius( DOTA_TEAM_BADGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_NONE , FIND_ANY_ORDER, false )
+		local units = FindUnitsInRadius( DOTA_TEAM_NEUTRALS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_NONE , FIND_ANY_ORDER, false )
 		for _,v in pairs(units) do
 			if v:IsCreature() and v:HasMovementCapability() then
 				v:AddNewModifier(nil, nil, "modifier_boss_stun", {duration= 15, IsHidden = true})
@@ -1058,37 +1065,37 @@ local WaypointSouth6 = Entities:FindByName(nil,"south1_6")
 	end)
 
 	Timers:CreateTimer(25, function()
-		local unit1 = CreateUnitByName("npc_captain_final_wave", point_south_1, true, nil, nil, DOTA_TEAM_BADGUYS)
+		local unit1 = CreateUnitByName("npc_captain_final_wave", point_south_1, true, nil, nil, DOTA_TEAM_NEUTRALS)
 		unit1:SetAngles(0, 90, 0)
-		local unit2 = CreateUnitByName("npc_captain_final_wave", point_south_2, true, nil, nil, DOTA_TEAM_BADGUYS)
+		local unit2 = CreateUnitByName("npc_captain_final_wave", point_south_2, true, nil, nil, DOTA_TEAM_NEUTRALS)
 		unit2:SetAngles(0, 90, 0)
-		local unit3 = CreateUnitByName("npc_captain_final_wave", point_south_3, true, nil, nil, DOTA_TEAM_BADGUYS)
+		local unit3 = CreateUnitByName("npc_captain_final_wave", point_south_3, true, nil, nil, DOTA_TEAM_NEUTRALS)
 		unit3:SetAngles(0, 90, 0)
-		local unit4 = CreateUnitByName("npc_marine_final_wave", point_south_4, true, nil, nil, DOTA_TEAM_BADGUYS)
+		local unit4 = CreateUnitByName("npc_marine_final_wave", point_south_4, true, nil, nil, DOTA_TEAM_NEUTRALS)
 		unit4:SetAngles(0, 90, 0)
-		local unit5 = CreateUnitByName("npc_marine_final_wave", point_south_5, true, nil, nil, DOTA_TEAM_BADGUYS)
+		local unit5 = CreateUnitByName("npc_marine_final_wave", point_south_5, true, nil, nil, DOTA_TEAM_NEUTRALS)
 		unit5:SetAngles(0, 90, 0)
-		local unit6 = CreateUnitByName("npc_marine_final_wave", point_south_6, true, nil, nil, DOTA_TEAM_BADGUYS)
+		local unit6 = CreateUnitByName("npc_marine_final_wave", point_south_6, true, nil, nil, DOTA_TEAM_NEUTRALS)
 		unit6:SetAngles(0, 90, 0)
-		local unit7 = CreateUnitByName("npc_marine_final_wave", point_south_7, true, nil, nil, DOTA_TEAM_BADGUYS)
+		local unit7 = CreateUnitByName("npc_marine_final_wave", point_south_7, true, nil, nil, DOTA_TEAM_NEUTRALS)
 		unit7:SetAngles(0, 90, 0)
-		local unit8 = CreateUnitByName("npc_marine_final_wave", point_south_8, true, nil, nil, DOTA_TEAM_BADGUYS)
+		local unit8 = CreateUnitByName("npc_marine_final_wave", point_south_8, true, nil, nil, DOTA_TEAM_NEUTRALS)
 		unit8:SetAngles(0, 90, 0)
-		local unit9 = CreateUnitByName("npc_marine_final_wave", point_south_9, true, nil, nil, DOTA_TEAM_BADGUYS)
+		local unit9 = CreateUnitByName("npc_marine_final_wave", point_south_9, true, nil, nil, DOTA_TEAM_NEUTRALS)
 		unit9:SetAngles(0, 90, 0)
-		local unit10 = CreateUnitByName("npc_knight_final_wave", point_south_10, true, nil, nil, DOTA_TEAM_BADGUYS)
+		local unit10 = CreateUnitByName("npc_knight_final_wave", point_south_10, true, nil, nil, DOTA_TEAM_NEUTRALS)
 		unit10:SetAngles(0, 90, 0)
-		local unit11 = CreateUnitByName("npc_knight_final_wave", point_south_11, true, nil, nil, DOTA_TEAM_BADGUYS)
+		local unit11 = CreateUnitByName("npc_knight_final_wave", point_south_11, true, nil, nil, DOTA_TEAM_NEUTRALS)
 		unit11:SetAngles(0, 90, 0)
-		local unit12 = CreateUnitByName("npc_knight_final_wave", point_south_12, true, nil, nil, DOTA_TEAM_BADGUYS)
+		local unit12 = CreateUnitByName("npc_knight_final_wave", point_south_12, true, nil, nil, DOTA_TEAM_NEUTRALS)
 		unit12:SetAngles(0, 90, 0)
-		local unit13 = CreateUnitByName("npc_dota_hero_proudmoore_final_wave", point_south_13, true, nil, nil, DOTA_TEAM_BADGUYS)
+		local unit13 = CreateUnitByName("npc_dota_hero_proudmoore_final_wave", point_south_13, true, nil, nil, DOTA_TEAM_NEUTRALS)
 		unit13:EmitSound("Hero_TemplarAssassin.Trap")
 		unit13:SetAngles(0, 90, 0)
 		unit13:SetInitialGoalEntity(WaypointSouth6)
 		unit13:MoveToPositionAggressive(WaypointSouth6:GetAbsOrigin())
 
-		local units = FindUnitsInRadius( DOTA_TEAM_BADGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_NONE , FIND_ANY_ORDER, false )
+		local units = FindUnitsInRadius( DOTA_TEAM_NEUTRALS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_NONE , FIND_ANY_ORDER, false )
 		for _,v in pairs(units) do
 			if v:IsCreature() and v:HasMovementCapability() then
 				v:AddNewModifier(nil, nil, "modifier_boss_stun", {duration= 10, IsHidden = true})
@@ -1118,95 +1125,4 @@ local WaypointSouth6 = Entities:FindByName(nil,"south1_6")
 			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil)
 		end)
 	end
-end
-
-function teleport_to_top(keys)
-local caller = keys.caller
-local activator = keys.activator
-local point = Entities:FindByName(nil,"point_teleport_boss"):GetAbsOrigin()
-local point_mag = Entities:FindByName(nil,"npc_dota_spawner_magtheridon_arena"):GetAbsOrigin()
-local point_mag2 = Entities:FindByName(nil,"npc_dota_spawner_magtheridon_arena2"):GetAbsOrigin()
-local ankh = CreateItem("item_magtheridon_ankh", mag, mag)
-local ankh2 = CreateItem("item_magtheridon_ankh", mag, mag)
-local difficulty = GameRules:GetCustomGameDifficulty()
-
-	if first_time_teleport then
-		local heroes = HeroList:GetAllHeroes()
-		SendToConsole("dota_health_per_vertical_marker 2500")
-
-		if difficulty == 1 then
-			magtheridon = CreateUnitByName("npc_dota_hero_magtheridon", point_mag  ,true,nil,nil,DOTA_TEAM_BADGUYS)
-			magtheridon:SetAngles(0, 180, 0)
-		elseif difficulty == 2 then
-			magtheridon = CreateUnitByName("npc_dota_hero_magtheridon", point_mag  ,true,nil,nil,DOTA_TEAM_BADGUYS)
-			magtheridon:SetAngles(0, 180, 0)
-			ankh:SetCurrentCharges(1)
-			magtheridon:AddItem(ankh)
-		elseif difficulty == 3 then
-			magtheridon = CreateUnitByName("npc_dota_hero_magtheridon", point_mag  ,true,nil,nil,DOTA_TEAM_BADGUYS)
-			magtheridon:SetAngles(0, 180, 0)
-			ankh:SetCurrentCharges(3)
-			magtheridon:AddItem(ankh)
-		elseif difficulty == 4 then
-			magtheridon = CreateUnitByName("npc_dota_hero_magtheridon", point_mag  ,true,nil,nil,DOTA_TEAM_BADGUYS)
-			magtheridon2 = CreateUnitByName("npc_dota_hero_magtheridon", point_mag2  ,true,nil,nil,DOTA_TEAM_BADGUYS)
-			magtheridon:SetAngles(0, 180, 0)
-			magtheridon2:SetAngles(0, 0, 0)
-			magtheridon:AddItem(ankh)
-			magtheridon2:AddItem(ankh2)
-			ankh2:SetCurrentCharges(1)
-		end
-
-		magtheridon:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 10, IsHidden = true})
-		magtheridon:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 10, IsHidden = true})
-
-		for _,hero in pairs(heroes) do
-			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
-				FindClearSpaceForUnit(hero, point, true)
-				activator:Stop()
-				hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {Duration = 10, IsHidden = true})
-				hero:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 10, IsHidden = true})
-				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
-				first_time_teleport = false
-				Timers:CreateTimer(0.1, function()
-					PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil)
-				end)
-			end
-		end
-	elseif activator:GetTeam() == DOTA_TEAM_GOODGUYS then
-		FindClearSpaceForUnit(activator, point, true)
-		activator:Stop()
-		PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(),activator)
-		Timers:CreateTimer(0.1, function()
-			PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(),nil)
-		end)
-	end
-end
-
-function kill_magtheridon_count(keys)
-local teleporters2 = Entities:FindAllByName("trigger_teleport2")
-local difficulty = GameRules:GetCustomGameDifficulty()
-
-	GameMode.Magtheridon_killed = GameMode.Magtheridon_killed +1
-
-	if GameMode.Magtheridon_killed > 0 and difficulty == 1 then
-		MagtheridonDead()
-	elseif GameMode.Magtheridon_killed > 1 and difficulty == 2 then
-		MagtheridonDead()
-	elseif GameMode.Magtheridon_killed > 3 and difficulty == 3 then
-		MagtheridonDead()
-	elseif GameMode.Magtheridon_killed > 3 and difficulty == 4 then
-		MagtheridonDead()
-	end
-end
-
-function MagtheridonDead(keys)
-local heroes = HeroList:GetAllHeroes()
-local teleporters2 = Entities:FindAllByName("trigger_teleport2")
-
-	for _,v in pairs(teleporters2) do
-		v:Enable()
-	end
-
-	Notifications:TopToAll({text="You have killed Magtheridon. Blue teleporters activated.", style={color="blue"}, continue=true})
 end

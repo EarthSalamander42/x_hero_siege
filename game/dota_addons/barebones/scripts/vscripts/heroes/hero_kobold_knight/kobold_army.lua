@@ -1,3 +1,5 @@
+require("libraries/timers")
+
 function KoboldArmy( keys )
 	local caster = keys.caster
 	local player = caster:GetPlayerOwnerID()
@@ -38,7 +40,7 @@ function KoboldArmy( keys )
 		Vector( -72, 0, 72 ),	-- West
 	}
 
-	for i=#vRandomSpawnPos, 2, -1 do	-- Simply shuffle them
+	for i = #vRandomSpawnPos, 2, -1 do	-- Simply shuffle them
 		local j = RandomInt( 1, i )
 		vRandomSpawnPos[i], vRandomSpawnPos[j] = vRandomSpawnPos[j], vRandomSpawnPos[i]
 	end
@@ -50,7 +52,7 @@ function KoboldArmy( keys )
 	FindClearSpaceForUnit( caster, casterOrigin + table.remove( vRandomSpawnPos, 1 ), true )
 
 	-- Spawn illusions
-	for i=1, kobold_count do
+	for i = 1, kobold_count do
 
 		local origin = casterOrigin + table.remove( vRandomSpawnPos, 1 )
 
@@ -83,10 +85,15 @@ function KoboldArmy( keys )
 		double:SetHasInventory(false)
 		double:SetCanSellItems(false)
 
+		Timers:CreateTimer(duration - 0.1, function()
+			UTIL_Remove(double)
+		end)
+
+		-- Useless since they are removed before, just shows duration of the illusions
 		ability:ApplyDataDrivenModifier(caster, double, "modifier_kill", {duration = duration})
 
 		-- Learn the skills of the caster
-		for abilitySlot=0,15 do
+		for abilitySlot = 0,15 do
 			local ability = caster:GetAbilityByIndex(abilitySlot)
 			if ability ~= nil then 
 				local abilityLevel = ability:GetLevel()

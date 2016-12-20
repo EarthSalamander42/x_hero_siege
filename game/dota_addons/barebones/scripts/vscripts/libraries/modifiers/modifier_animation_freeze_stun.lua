@@ -24,6 +24,7 @@ function modifier_animation_freeze_stun:CheckState()
 	local state = {
 		[MODIFIER_STATE_STUNNED] = true,
 		[MODIFIER_STATE_FROZEN] = true,
+		[MODIFIER_STATE_COMMAND_RESTRICTED] = true,
 	}
 
 	return state

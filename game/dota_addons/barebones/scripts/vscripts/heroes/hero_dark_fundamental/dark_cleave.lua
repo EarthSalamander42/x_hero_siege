@@ -3,7 +3,7 @@ require("libraries/timers")
 function DarkCleave( keys )
 local caster = keys.caster
 local target = keys.target
-local modifier_lifesteal = keys.modifier_lifesteal
+local modifier_dark_cleave = keys.modifier_dark_cleave
 local ability = keys.ability
 local ability_level = ability:GetLevel() - 1
 local cooldown = ability:GetCooldown(ability_level)
@@ -12,12 +12,12 @@ local bonus_damage = ability:GetLevelSpecialValueFor("bonus_damage", ability_lev
 local full_damage = bonus_damage * stacks -- 100 * caster Level
 
 	ability:StartCooldown(cooldown)
-	caster:RemoveModifierByName(modifier_lifesteal)
+	caster:RemoveModifierByName(modifier_dark_cleave)
 	ApplyDamage({attacker = caster, victim = target, ability = ability, damage = full_damage, damage_type = DAMAGE_TYPE_PHYSICAL})
 	SendOverheadEventMessage(nil, OVERHEAD_ALERT_CRITICAL, target, full_damage, nil)
 
 	Timers:CreateTimer(cooldown, function()
-		ability:ApplyDataDrivenModifier( caster, caster, modifier_lifesteal, {})
+		ability:ApplyDataDrivenModifier( caster, caster, modifier_dark_cleave, {})
 	end)
 end
 

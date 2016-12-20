@@ -3,7 +3,11 @@ _G.nCOUNTDOWNCREEP = 0
 _G.nCOUNTDOWNINCWAVE = 0
 _G.nCOUNTDOWNEVENT = 0
 _G.BT_ENABLED = 1
+_G.NEUTRAL_SPAWN = 0
 _G.RAMERO = 0
+_G.MAGTHERIDON = 0
+_G.FOUR_BOSSES = 0
+_G.SPIRIT_MASTER = 0
 
 _G.mod_creator = {
 		54896080, -- Cookies
@@ -20,12 +24,20 @@ _G.mod_graphist = {
 	}
 
 _G.vip_members = {
+		312910864, -- breddybourne [Winner of the 21th November Day Event]
+		157808659, -- ST8 [Winner of the 21th November Day Event]
+		62993541, -- KennyCrazy [Winner of the 21th November Day Event]
+		331762743, -- Sterling8077 [Winner of the 21th November Day Event]
+		112182763 -- Mugiwara, not the graphist another one ^^ [Winner of the 21th November Day Event]
+	}
+
+_G.golden_vip_members = {
 		69533529, -- West [Unlimited]
 		206464009, -- beast [Unlimited]
 		86718505, -- Noya [Unlimited]
+		62993541, -- KennyCrazy [Unlimited]
 		146805680, -- [UTAC] Rekail [Gatiipz Gatiipz on Patreon, Remove Date if not paid: 01/01/2017]
 		75034844, -- Specter [Tyrael on Patreon, Remove Date if not paid: 05/01/2017]
---		348253073, -- 禁断のゲーム [Alisia on Patreon, Remove Date if not paid: Removed for Fraud of 99.99$
 		110786327, -- MechJesus [Mauro Solares on Patreon, Remove Date if not paid: 07/01/2017]
 		93860661, -- Meteor [Supawit Enyord on Patreon, Remove Date if not paid: 10/01/2017]
 		190411200, -- Nojo [Nojo on Patreon, Remove Date if not paid: 23/01/2017]
@@ -85,7 +97,6 @@ end
 require('events')
 require('internal/gamemode')
 require('internal/events')
-require('label')
 require('libraries/timers')
 require('libraries/physics')
 require('libraries/projectiles')
@@ -96,6 +107,7 @@ require('phases/creeps')
 require('phases/special_events')
 require('phases/phase1')
 require('phases/phase2')
+require('phases/phase3')
 
 function GameMode:OnFirstPlayerLoaded()
 end
@@ -120,9 +132,7 @@ function GameMode:OnAllPlayersLoaded()
 GameMode.FrostInfernal_killed = 0
 GameMode.SpiritBeast_killed = 0
 GameMode.FrostTowers_killed = 0
-GameMode.Magtheridon_killed = 0
 GameMode.BossesTop_killed = 0
-GameMode.Arthas_killed = 0
 time_elapsed = 0
 
 	for playerID = 0, DOTA_MAX_TEAM_PLAYERS do
@@ -162,7 +172,6 @@ function GameMode:OnHeroInGame(hero)
 		hero:SetAbilityPoints(0)
 		hero:SetGold(0, false)
 		hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {Duration = 20, IsHidden = true})
-		hero:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
 	end
 end
 
@@ -355,8 +364,8 @@ local heroes = HeroList:GetAllHeroes()
 
 	for _,hero in pairs(heroes) do
 		if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
-			hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun",nil)
-			hero:AddNewModifier(nil, nil, "modifier_invulnerable",nil)
+			hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", nil)
+			hero:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
 		end
 	end
 end
@@ -438,7 +447,7 @@ function GameMode:InitGameMode()
 	local difficulty = GameRules:GetCustomGameDifficulty()
 
 	-- Timer Rules
-	GameRules:SetPreGameTime( 120.0 ) --120.0
+	GameRules:SetPreGameTime( 20.0 ) --120.0
 	GameRules:SetPostGameTime( 30.0 )
 	GameRules:SetTreeRegrowTime( 60.0 )
 	GameRules:SetHeroSelectionTime( 0.0 ) --This is not dota bitch
@@ -471,7 +480,7 @@ function GameMode:InitGameMode()
 
 	-- Value Rules
 	mode:SetCameraDistanceOverride( 1250 )
-	mode:SetMaximumAttackSpeed( 600 )
+	mode:SetMaximumAttackSpeed( 500 )
 	mode:SetMinimumAttackSpeed( 20 )
 	mode:SetCustomHeroMaxLevel( 30 )
 	GameRules:SetHeroMinimapIconScale( 1.25 )
@@ -494,16 +503,6 @@ function GameMode:InitGameMode()
 
 	-- Lua Modifiers
 	LinkLuaModifier("modifier_earthquake_aura", "heroes/hero_brewmaster/earthquake", LUA_MODIFIER_MOTION_NONE)
-
---	if difficulty == 1 then
---		mode:SetFixedRespawnTime( 30 )
---	elseif difficulty == 2 then
---		mode:SetFixedRespawnTime( 60 )
---	elseif difficulty == 3 then
---		mode:SetFixedRespawnTime( 90 )
---	elseif difficulty == 4 then
---		mode:SetFixedRespawnTime( 120 )
---	end
 
 	GameMode:_InitGameMode()
 	self:OnFirstPlayerLoaded()
