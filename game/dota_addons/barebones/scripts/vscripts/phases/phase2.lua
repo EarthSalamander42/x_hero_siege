@@ -124,13 +124,6 @@ local heroes = HeroList:GetAllHeroes()
 	end)
 
 	Timers:CreateTimer(17, function()
-		-- Special Events
-		local spirit_beast = CreateUnitByName("npc_spirit_beast_bis", Entities:FindByName(nil, "spirit_beast_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
-		spirit_beast:SetAngles(0, 270, 0)
-
-		local frost_infernal = CreateUnitByName("npc_frost_infernal_bis", Entities:FindByName(nil, "frost_infernal_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
-		frost_infernal:SetAngles(0, 270, 0)
-
 		-- VIP Hero
 		local chaos_knight = CreateUnitByName("npc_dota_hero_chaos_knight_bis", Entities:FindByName(nil, "choose_chaos_knight_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
 		chaos_knight:SetAngles(0, 0, 0)
@@ -150,6 +143,25 @@ local heroes = HeroList:GetAllHeroes()
 	end)
 
 	Timers:CreateTimer(20, function()
+		-- Special Events
+		local frost_infernal = CreateUnitByName("npc_frost_infernal_bis", Entities:FindByName(nil, "frost_infernal_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
+		frost_infernal:SetAngles(0, 270, 0)
+
+		local spirit_beast = CreateUnitByName("npc_spirit_beast_bis", Entities:FindByName(nil, "spirit_beast_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
+		spirit_beast:SetAngles(0, 270, 0)
+
+		local hero_image = CreateUnitByName("npc_hero_image_bis", Entities:FindByName(nil, "hero_image_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
+		hero_image:SetAngles(0, 270, 0)
+
+		local ramero = CreateUnitByName("npc_ramero_bis", Entities:FindByName(nil, "point_special_arena_1"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
+		ramero:SetAngles(0, 270, 0)
+
+		local baristal = CreateUnitByName("npc_baristal_bis", Entities:FindByName(nil, "point_special_arena_2"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
+		baristal:SetAngles(0, 270, 0)
+
+		local ramero_alt = CreateUnitByName("npc_ramero_bis", Entities:FindByName(nil, "point_special_arena_3"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
+		ramero_alt:SetAngles(0, 270, 0)
+
 		lich_king = CreateUnitByName("npc_dota_boss_lich_king_bis", Entities:FindByName(nil, "npc_dota_spawner_lich_king"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
 		lich_king:SetAngles(0, 270, 0)
 		lich_king:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
@@ -160,15 +172,6 @@ local heroes = HeroList:GetAllHeroes()
 		spirit_master:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
 		spirit_master:AddNewModifier(nil, nil, "modifier_boss_stun", nil)
 --		StartAnimation(spirit_master, {duration = 20000.0, activity = ACT_DOTA_VICTORY, rate = 1.0})
-
-		local ramero = CreateUnitByName("npc_ramero_bis", Entities:FindByName(nil, "point_special_arena_1"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
-		ramero:SetAngles(0, 270, 0)
-
-		local baristal = CreateUnitByName("npc_baristal_bis", Entities:FindByName(nil, "point_special_arena_2"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
-		baristal:SetAngles(0, 270, 0)
-
-		local ramero_alt = CreateUnitByName("npc_ramero_bis", Entities:FindByName(nil, "point_special_arena_3"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
-		ramero_alt:SetAngles(0, 270, 0)
 	end)
 end
 
@@ -429,7 +432,7 @@ local id = activator:GetPlayerID()
 			Timers:CreateTimer(0.1, function()
 				PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(),nil)
 				FindClearSpaceForUnit(activator, point, true)
-				PlayerResource:ReplaceHeroWith(activator:GetPlayerID(), "npc_dota_hero_jakiro", STARTING_GOLD, 0)
+				PlayerResource:ReplaceHeroWith(activator:GetPlayerID(), "npc_dota_hero_ursa", STARTING_GOLD, 0)
 				Timers:CreateTimer(2.0, function()
 					activator:SetPlayerID(id)
 				end)

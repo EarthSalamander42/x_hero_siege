@@ -873,20 +873,24 @@ local player = PlayerResource:GetPlayer(playerID)
 			end
 
 			if str == "-closeway_1" or str == "-cw1" then
-				Notifications:TopToAll({text="Lanes 1, 2, 3, 4 can't be closed!", style={color="white"}, duration=5.0})
---				CREEP_LANES[1] = 0
+				Notifications:TopToAll({text="Red Player closed lane 1!", style={color="white"}, duration=5.0})
+--				Notifications:TopToAll({text="Lanes 1, 2, 3, 4 can't be closed!", style={color="white"}, duration=5.0})
+				CREEP_LANES[1] = 0
 			end
 			if str == "-closeway_2" or str == "-cw2" then
-				Notifications:TopToAll({text="Lanes 1, 2, 3, 4 can't be closed", style={color="white"}, duration=5.0})
---				CREEP_LANES[2] = 0
+				Notifications:TopToAll({text="Red Player closed lane 2!", style={color="white"}, duration=5.0})
+--				Notifications:TopToAll({text="Lanes 1, 2, 3, 4 can't be closed", style={color="white"}, duration=5.0})
+				CREEP_LANES[2] = 0
 			end
 			if str == "-closeway_3" or str == "-cw3" then
-				Notifications:TopToAll({text="Lanes 1, 2, 3, 4 can't be closed", style={color="white"}, duration=5.0})
---				CREEP_LANES[3] = 0
+				Notifications:TopToAll({text="Red Player closed lane 3!", style={color="white"}, duration=5.0})
+--				Notifications:TopToAll({text="Lanes 1, 2, 3, 4 can't be closed", style={color="white"}, duration=5.0})
+				CREEP_LANES[3] = 0
 			end
 			if str == "-closeway_4" or str == "-cw4" then
-				Notifications:TopToAll({text="Lanes 1, 2, 3, 4 can't be closed", style={color="white"}, duration=5.0})
---				CREEP_LANES[4] = 0
+				Notifications:TopToAll({text="Red Player closed lane 4!", style={color="white"}, duration=5.0})
+--				Notifications:TopToAll({text="Lanes 1, 2, 3, 4 can't be closed", style={color="white"}, duration=5.0})
+				CREEP_LANES[4] = 0
 			end
 			if str == "-closeway_5" or str == "-cw5" then
 				Notifications:TopToAll({text="Red Player closed lane 5!", style={color="white"}, duration=5.0})
@@ -905,7 +909,7 @@ local player = PlayerResource:GetPlayer(playerID)
 				CREEP_LANES[8] = 0
 			end
 
-			if str == "-openway_all" then
+			if str == "-openway_all" or str == "-ow_all" then
 				Notifications:TopToAll({text="Red Player opened all lanes!", style={color="white"}, duration=5.0})
 				CREEP_LANES[1] = 1
 				CREEP_LANES[2] = 1
@@ -917,12 +921,13 @@ local player = PlayerResource:GetPlayer(playerID)
 				CREEP_LANES[8] = 1
 			end
 
-			if str == "-closeway_all" then
-				Notifications:TopToAll({text="Red Player closed all lanes (excluding 1, 2, 3, 4)!", style={color="white"}, duration=5.0})
---				CREEP_LANES[1] = 0
---				CREEP_LANES[2] = 0
---				CREEP_LANES[3] = 0
---				CREEP_LANES[4] = 0
+			if str == "-closeway_all" or str == "-cw_all" then
+				Notifications:TopToAll({text="Red Player closed all lanes!", style={color="white"}, duration=5.0})
+--				Notifications:TopToAll({text="Red Player closed all lanes (excluding 1, 2, 3, 4)!", style={color="white"}, duration=5.0})
+				CREEP_LANES[1] = 0
+				CREEP_LANES[2] = 0
+				CREEP_LANES[3] = 0
+				CREEP_LANES[4] = 0
 				CREEP_LANES[5] = 0
 				CREEP_LANES[6] = 0
 				CREEP_LANES[7] = 0
@@ -936,7 +941,7 @@ local player = PlayerResource:GetPlayer(playerID)
 
 		if str == "-difficulty" then
 			local diff = {"Easy","Normal","Hard","Extreme"}
-			Notifications:TopToAll({text="DIFFICULTY: "..diff[GameRules:GetCustomGameDifficulty()], duration=15.0})
+			Notifications:TopToAll({text="DIFFICULTY: "..diff[GameRules:GetCustomGameDifficulty()], duration=10.0})
 		end
 
 		if str == "-bt" then

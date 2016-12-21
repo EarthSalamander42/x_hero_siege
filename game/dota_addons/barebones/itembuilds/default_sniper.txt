@@ -1,8 +1,8 @@
-"itembuilds/test_enchantress.txt"
+"itembuilds/test_sniper.txt"
 {
 	"author"		"X Hero Siege Official"
-	"hero"			"npc_dota_hero_enchantress"
-	"Title"			"Recommended items for Dryad"
+	"hero"			"npc_dota_hero_sniper"
+	"Title"			"Recommended items for Rifleman"
 
 	"Items"
 	{
@@ -10,7 +10,7 @@
 		{
 		}
 
-		"#DOTA_Item_Build_Hero14"
+		"#DOTA_Item_Build_Hero17"
 		{
 		}
 

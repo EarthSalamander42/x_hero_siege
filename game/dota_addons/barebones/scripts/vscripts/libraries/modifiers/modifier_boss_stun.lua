@@ -23,6 +23,7 @@ end
 function modifier_boss_stun:CheckState() 
 	local state = {
 		[MODIFIER_STATE_STUNNED] = true,
+		[MODIFIER_STATE_COMMAND_RESTRICTED] = true,
 	}
 
 	return state

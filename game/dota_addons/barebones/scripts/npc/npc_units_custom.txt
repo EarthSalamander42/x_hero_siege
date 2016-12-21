@@ -1519,7 +1519,6 @@
 		//----------------------------------------------------------------
 		"VisionDaytimeRange"		"800"		// Range of vision during day light.
 		"VisionNighttimeRange"		"800"		// Range of vision at night time.
-
 	}
 
 	//=================================================================================
@@ -1577,12 +1576,9 @@
 
 		// Movement
 		//----------------------------------------------------------------
-		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"			// Type of locomotion - ground, air
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_FLY"			// Type of locomotion - ground, air
 		"MovementSpeed"				"330"		// Speed
 		"MovementTurnRate"			"0.5"		// Turning rate.
-		
-		"GameSoundsFile"			"soundevents/game_sounds_heroes/game_sounds_weaver.vsndevts"
-		"VoiceFile"					"soundevents/voscripts/game_sounds_vo_weaver.vsndevts"
 
 		// Status
 		//----------------------------------------------------------------
@@ -1609,10 +1605,10 @@
 		{
 			"AttachWearables"
 			{
-				"Wearable1" { "ItemDef" "277" }//Head
-				"Wearable2" { "ItemDef" "279" }//Arms
-				"Wearable3" { "ItemDef" "278" }//Legs
-				"Wearable4" { "ItemDef" "280" }//Back
+//				"Wearable1" { "ItemDef" "277" }//Head
+//				"Wearable2" { "ItemDef" "279" }//Arms
+//				"Wearable3" { "ItemDef" "278" }//Legs
+//				"Wearable4" { "ItemDef" "280" }//Back
 			}
 		}
 	}
@@ -3013,8 +3009,8 @@
 		"AttackDamageMax"			"405"		// Damage range max.
 		"AttackRate"				"0.95"		// Speed of attack.
 		"AttackAnimationPoint"		"0.33"		// Normalized time in animation cycle to attack.
-		"AttackAcquisitionRange"	"1000"		// Range within a target can be acquired.
-		"AttackRange"				"400"		// Range within a target can be attacked.
+		"AttackAcquisitionRange"	"2000"		// Range within a target can be acquired.
+		"AttackRange"				"450"		// Range within a target can be attacked.
 		"ProjectileModel"			"particles/units/heroes/hero_vengeful/vengeful_base_attack.vpcf"			// Particle system model for projectile.
 		"ProjectileSpeed"			"1500"			// Speed of projectile.
 
@@ -8798,7 +8794,7 @@
 		"VisionDaytimeRange"		"1400"		// Range of vision during day light.
 		"VisionNighttimeRange"		"1400"		// Range of vision at night time.
 
-//		"vscripts"					"ai/spirit_master_earth.lua"
+		"vscripts"					"ai/spirit_master_earth.lua"
 
 		// Creature Data
 		//----------------------------------------------------------------------------------------------------------------------
@@ -8920,14 +8916,14 @@
 
 		// Attack
 		//----------------------------------------------------------------
-		"AttackCapabilities"    "DOTA_UNIT_CAP_RANGED_ATTACK"    // Type of attack - melee, ranged, etc.
-		"AttackDamageMin"     "5499"     // Damage range min.
-		"AttackDamageMax"     "5501"     // Damage range max.
-		"AttackDamageType"      "DAMAGE_TYPE_ArmorPhysical"
-		"AttackRate"        "0.65"     // Speed of attack.
-		"AttackAnimationPoint"    "0.6"   // Normalized time in animation cycle to attack.
-		"AttackAcquisitionRange"  "1000"   // Range within a target can be acquired.
-		"AttackRange"       "500"   // Range within a target can be attacked.
+		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"    // Type of attack - melee, ranged, etc.
+		"AttackDamageMin"			"5499"     // Damage range min.
+		"AttackDamageMax"			"5501"     // Damage range max.
+		"AttackDamageType"			"DAMAGE_TYPE_ArmorPhysical"
+		"AttackRate"				"0.65"     // Speed of attack.
+		"AttackAnimationPoint"		"0.6"   // Normalized time in animation cycle to attack.
+		"AttackAcquisitionRange"	"2000"   // Range within a target can be acquired.
+		"AttackRange"				"550"   // Range within a target can be attacked.
 	
 		// Bounty
 		//----------------------------------------------------------------
@@ -9808,6 +9804,68 @@
 				{
 					"Item"					"item_shield_of_invincibility"
 				}
+			}
+		}
+	}
+
+	//=================================================================================
+	// Hero Image: Dummy
+	//=================================================================================
+	"npc_hero_image_bis"
+	{
+		// General
+		//----------------------------------------------------------------
+		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
+		"Model"						"models/heroes/morphling/morphling.vmdl"	// Model.
+		"ModelScale"				"1.45"
+		"ConsideredHero"			"1"
+		"HasInventory"				"1"
+				
+		// Abilities
+		//----------------------------------------------------------------
+		"Ability1"					""	// Ability 1.
+		"Ability2"					""			// Ability 2.
+		"Ability4"					""
+		"Ability5"					""						// Ability 6 - Extra.
+		"Ability6"					"dummy_passive_invulnerable"						// Ability 7 - Extra.
+
+		// Attack
+		//----------------------------------------------------------------
+		"AttackDamageMin"			"0"		// Damage range min.
+		"AttackDamageMax"			"0"		// Damage range max.
+		"AttackRange"				"0"		// Range within a target can be attacked.
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"				"0"			// Physical protection.
+		"MagicalResistance"			"0"			// Magical protection (percentage).
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementSpeed"				"0"		// Speed
+
+		// Bounds
+		//----------------------------------------------------------------
+		"BoundsHullName"			"DOTA_HULL_SIZE_HERO"			// Hull type used for navigation/locomotion.
+		"RingRadius"				"160"
+
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"100"		// Base health.
+		
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"1400"		// Range of vision during day light.
+		"VisionNighttimeRange"		"1400"		// Range of vision at night time.
+
+		"Creature"
+		{
+			"AttachWearables"
+			{
+				"Wearable1" { "ItemDef" "6866" } // Head
+				"Wearable2" { "ItemDef" "6867" } // Right Arm
+				"Wearable3" { "ItemDef" "6868" } // Left Arm
+				"Wearable4" { "ItemDef" "6869" } // Body
 			}
 		}
 	}
@@ -11493,7 +11551,8 @@
 		"Ability4"				"holdout_elunes_grace_tooltip"
 		"Ability5"				"holdout_innate_lunar_glaive"
 		"Ability6"				"holdout_moon_explosion"
-		"Ability7"				"dummy_passive_vulnerable"
+		"Ability7"				"holdout_neutralization"
+		"Ability8"				"dummy_passive_vulnerable"
 
 		// Armor
 		//----------------------------------------------------------------
@@ -12608,7 +12667,8 @@
 		"Ability4"				"holdout_frostmourne"
 		"Ability5"				"holdout_innate_great_cleave"
 		"Ability6"				"holdout_light_roar"
-		"Ability7"				"dummy_passive_vulnerable"
+		"Ability7"				"holdout_knights_armor"
+		"Ability8"				"dummy_passive_vulnerable"
 
 		// Armor
 		//----------------------------------------------------------------

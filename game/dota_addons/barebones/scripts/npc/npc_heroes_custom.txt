@@ -6,7 +6,7 @@
 	"npc_dota_hero_slardar_holdout"
 	{
 		"override_hero"					"npc_dota_hero_slardar"
-		"AbilityLayout"					"6"
+//		"DisableWearables"				"1"
 		"MovementSpeed"					"380"
 		"ModelScale"					"1.15"
 		"AttackDamageMin"				"70"
@@ -45,7 +45,7 @@
 	"npc_dota_hero_skeleton_king_holdout"
 	{
 		"override_hero"					"npc_dota_hero_skeleton_king"
-		"AbilityLayout"					"6"
+//		"DisableWearables"				"1"
 		"ModelScale"					"1.2"
 		"AttackDamageMin"				"70"
 		"AttackDamageMax"				"80"
@@ -82,7 +82,7 @@
 	"npc_dota_hero_abyssal_underlord_holdout"
 	{
 		"override_hero"					"npc_dota_hero_abyssal_underlord"
-		"AbilityLayout"					"6"
+//		"DisableWearables"				"1"
 		"MovementSpeed"					"340"
 		"ModelScale"					"1.0"
 		"AttackDamageMin"				"30"
@@ -119,7 +119,7 @@
 	"npc_dota_hero_brewmaster_holdout"
 	{
 		"override_hero"					"npc_dota_hero_brewmaster"
-		"AbilityLayout"					"6"
+//		"DisableWearables"				"1"
 		"MovementSpeed"					"360"
 		"ModelScale"					"1.0"
 
@@ -152,7 +152,7 @@
 	"npc_dota_hero_chaos_knight_holdout"
 	{
 		"override_hero"					"npc_dota_hero_chaos_knight"
-		"AbilityLayout"					"6"
+//		"DisableWearables"				"1"
 		"MovementSpeed"					"335"
 		"ModelScale"					"1.1"
 
@@ -192,7 +192,7 @@
 	"npc_dota_hero_keeper_of_the_light_holdout"
 	{
 		"override_hero"					"npc_dota_hero_keeper_of_the_light"
-		"AbilityLayout"					"6"
+//		"DisableWearables"				"1"
 		"MovementSpeed"					"375"
 		"ModelScale"					"1.1"
 
@@ -232,7 +232,7 @@
 	"npc_dota_hero_crystal_maiden_holdout"
 	{
 		"override_hero"					"npc_dota_hero_crystal_maiden"
-		"AbilityLayout"					"6"
+//		"DisableWearables"				"1"
 		"MovementSpeed"					"360"
 
 		"AttackDamageMin"				"55"
@@ -266,7 +266,7 @@
 	"npc_dota_hero_dragon_knight_holdout"
 	{
 		"override_hero"					"npc_dota_hero_dragon_knight"
-		"AbilityLayout"					"6"
+//		"DisableWearables"				"1"
 		"MovementSpeed"					"350"
 		"ModelScale"					"1.0" //0.84
 
@@ -282,7 +282,7 @@
 		"Ability4"						"holdout_frostmourne"
 		"Ability5"						"holdout_innate_great_cleave"
 		"Ability6"						"holdout_light_roar"
-		"Ability7"						""
+		"Ability7"						"holdout_knights_armor"
 		"Ability8"						""
 		"Ability9"						""
 		"Ability10"						""
@@ -301,7 +301,7 @@
 	"npc_dota_hero_elder_titan_holdout"
 	{
 		"override_hero"					"npc_dota_hero_elder_titan"
-		"AbilityLayout"					"6"
+//		"DisableWearables"				"1"
 		"MovementSpeed"					"365"
 		"AttackRange"					"150"
 
@@ -334,7 +334,7 @@
 	"npc_dota_hero_beastmaster_holdout"
 	{
 		"override_hero"					"npc_dota_hero_beastmaster"
-		"AbilityLayout"					"6"
+//		"DisableWearables"				"1"
 		"MovementSpeed"					"350"
 		"ModelScale"					"1.0"
 
@@ -376,7 +376,7 @@
 	"npc_dota_hero_enchantress_holdout"
 	{
 		"override_hero"					"npc_dota_hero_enchantress"
-		"AbilityLayout"					"6"
+//		"DisableWearables"				"1"
 		"MovementSpeed"					"355"
 		"AttackDamageMin"				"11"
 		"AttackDamageMax"				"21"
@@ -406,15 +406,15 @@
 	}
 
 	//=======================================================================================================
-	// HERO: Malfurion( Viper, one of the rare heroes not having custom atachments )
+	// HERO: Malfurion
 	//=======================================================================================================
-	"npc_dota_hero_jakiro_holdout"
+	"npc_dota_hero_ursa_holdout"
 	{
-		"override_hero"					"npc_dota_hero_jakiro"
+		"override_hero"					"npc_dota_hero_ursa"
 		"Model"							"models/items/lone_druid/true_form/form_of_the_atniw/form_of_the_atniw.vmdl"
 		"Portrait"						"vgui/hud/heroportraits/portrait_treant"
 		"ModelScale"					"0.95"
-		"AbilityLayout"					"6"
+		"DisableWearables"				"1"
 		"MovementSpeed"					"360"
 		"AttackDamageMin"				"46"
 		"AttackDamageMax"				"56"
@@ -457,7 +457,7 @@
 		"ModelScale"					"0.9"
 		"AttackDamageMin"				"39"
 		"AttackDamageMax"				"45"
-		"AbilityLayout"					"6"
+//		"DisableWearables"				"1"
 		"MovementSpeed"					"360"
 //		"AttributePrimary"				"DOTA_ATTRIBUTE_AGILITY"
 		"ProjectileModel"				"particles/units/heroes/hero_rubick/rubick_base_attack.vpcf"
@@ -498,7 +498,7 @@
 	"npc_dota_hero_juggernaut_holdout"
 	{
 		"override_hero"					"npc_dota_hero_juggernaut"
-		"AbilityLayout"					"6"
+//		"DisableWearables"				"1"
 		"MovementSpeed"					"365"
 		"AttributePrimary"				"DOTA_ATTRIBUTE_STRENGTH"
 
@@ -531,7 +531,7 @@
 	"npc_dota_hero_chen_holdout"
 	{
 		"override_hero"					"npc_dota_hero_chen"
-		"AbilityLayout"					"6"
+//		"DisableWearables"				"1"
 		"MovementSpeed"					"370"
 
 		"AttributeBaseStrength"			"14"
@@ -566,7 +566,7 @@
 	"npc_dota_hero_lich_holdout"
 	{
 		"override_hero"					"npc_dota_hero_lich"
-		"AbilityLayout"					"6"
+//		"DisableWearables"				"1"
 		"MovementSpeed"					"375"
 		"ModelScale"					"1.0"
 
@@ -600,7 +600,7 @@
 	"npc_dota_hero_lina_holdout"
 	{
 		"override_hero"					"npc_dota_hero_lina"
-		"AbilityLayout"					"6"
+//		"DisableWearables"				"1"
 		"MovementSpeed"					"360"
 		"ModelScale"					"1.0"
 		"AttributePrimary"				"DOTA_ATTRIBUTE_AGILITY"
@@ -635,7 +635,7 @@
 	{
 		"override_hero"					"npc_dota_hero_luna"
 		"ModelScale"					"1.0"
-		"AbilityLayout"					"6"
+//		"DisableWearables"				"1"
 		"MovementSpeed"					"335"
 		"ProjectileModel"				"particles/econ/items/luna/luna_crescent_moon/luna_attack_crescent_moon.vpcf"
 
@@ -649,7 +649,7 @@
 		"Ability4"						"holdout_elunes_grace"
 		"Ability5"						"holdout_innate_lunar_glaive"
 		"Ability6"						"holdout_moon_explosion"
-		"Ability7"						""
+		"Ability7"						"holdout_neutralization"
 		"Ability8"						""
 		"Ability9"						""
 		"Ability10"						""
@@ -669,7 +669,7 @@
 	{
 		"override_hero"					"npc_dota_hero_meepo"
 		"ModelScale"					"1.45"
-		"AbilityLayout"					"6"
+//		"DisableWearables"				"1"
 		"MovementSpeed"					"345"
 
 		"AttributeStrengthGain"			"10"
@@ -701,7 +701,7 @@
 	"npc_dota_hero_mirana_holdout"
 	{
 		"override_hero"					"npc_dota_hero_mirana"
-		"AbilityLayout"					"6"
+//		"DisableWearables"				"1"
 		"MovementSpeed"					"355"
 		"ModelScale"					"0.95"
 		"AttackDamageMin"				"70"
@@ -737,7 +737,7 @@
 	"npc_dota_hero_nevermore_holdout"
 	{
 		"override_hero"					"npc_dota_hero_nevermore"
-		"AbilityLayout"					"6"
+//		"DisableWearables"				"1"
 		"MovementSpeed"					"365"
 
 		"ModelScale"					"1.1"
@@ -777,7 +777,7 @@
 	"npc_dota_hero_omniknight_holdout"
 	{
 		"override_hero"					"npc_dota_hero_omniknight"
-		"AbilityLayout"					"6"
+//		"DisableWearables"				"1"
 		"MovementSpeed"					"365"
 		"AttackDamageMin"				"61"
 		"AttackDamageMax"				"71"
@@ -812,7 +812,7 @@
 	"npc_dota_hero_phantom_assassin_holdout"
 	{
 		"override_hero"					"npc_dota_hero_phantom_assassin"
-		"AbilityLayout"					"6"
+//		"DisableWearables"				"1"
 		"MovementSpeed"					"355"
 		"ModelScale"					"1.1"
 		"AttackDamageMin"				"55"
@@ -850,7 +850,7 @@
 	{
 		"override_hero"					"npc_dota_hero_pugna"
 		"ModelScale"					"0.95"
-		"AbilityLayout"					"6"
+//		"DisableWearables"				"1"
 		"MovementSpeed"					"370"
 		"AttackCapabilities"			"DOTA_UNIT_CAP_MELEE_ATTACK"
 		"AttackRange"					"150"
@@ -888,7 +888,7 @@
 	"npc_dota_hero_rattletrap_holdout"
 	{
 		"override_hero"					"npc_dota_hero_rattletrap"
-		"AbilityLayout"					"6"
+//		"DisableWearables"				"1"
 		"MovementSpeed"					"365"
 		"ModelScale"					"1.15"
 		"AttackDamageMin"				"65"
@@ -928,7 +928,7 @@
 	"npc_dota_hero_shadow_shaman_holdout"
 	{
 		"override_hero"					"npc_dota_hero_shadow_shaman"
-		"AbilityLayout"					"6"
+//		"DisableWearables"				"1"
 		"AttackDamageMin"				"75"
 		"AttackDamageMax"				"85"
 		"MovementSpeed"					"355"
@@ -963,7 +963,7 @@
 	"npc_dota_hero_sniper_holdout"
 	{
 		"override_hero"					"npc_dota_hero_sniper"
-		"AbilityLayout"					"6"
+//		"DisableWearables"				"1"
 		"AttackRange"					"600"
 		"AttackDamageMin"				"30"
 		"AttackDamageMax"				"40"
@@ -1000,7 +1000,7 @@
 	"npc_dota_hero_sven_holdout"
 	{
 		"override_hero"					"npc_dota_hero_sven"
-		"AbilityLayout"					"6"
+//		"DisableWearables"				"1"
 		"ModelScale"					"0.6"
 		"MovementSpeed"					"522"
 
@@ -1033,7 +1033,7 @@
 	"npc_dota_hero_terrorblade_holdout"
 	{
 		"override_hero"					"npc_dota_hero_terrorblade"
-		"AbilityLayout"					"6"
+//		"DisableWearables"				"1"
 		"MovementSpeed"					"375"
 		"ModelScale"					"1.15"
 
@@ -1066,7 +1066,7 @@
 	"npc_dota_hero_warlock_holdout"
 	{
 		"override_hero"					"npc_dota_hero_warlock"
-		"AbilityLayout"					"6"
+//		"DisableWearables"				"1"
 		"MovementSpeed"					"355"
 		"AttributePrimary"				"DOTA_ATTRIBUTE_STRENGTH"
 
@@ -1104,7 +1104,7 @@
 	"npc_dota_hero_weaver_holdout"
 	{
 		"override_hero"					"npc_dota_hero_weaver"
-		"AbilityLayout"					"6"
+//		"DisableWearables"				"1"
 		"MovementSpeed"					"355"
 		"AttackDamageMin"				"61"
 		"AttackDamageMax"				"71"
@@ -1145,7 +1145,7 @@
 	{
 		"override_hero"					"npc_dota_hero_windrunner"
 		"AttributeBaseAgility"			"44" // Base agility Should have 206 Attack Speed, 0.77
-		"AbilityLayout"					"6"
+//		"DisableWearables"				"1"
 		"MovementSpeed"					"355"
 		"AttributePrimary"				"DOTA_ATTRIBUTE_AGILITY"
 
@@ -1179,6 +1179,7 @@
 	{
 		"override_hero"					"npc_dota_hero_wisp"
 		"AttackCapabilities"			"DOTA_UNIT_CAP_NO_ATTACK"
+//		"DisableWearables"				"1"
 		"ArmorPhysical"					"0"
 		"MovementSpeed"					"250"
 		"ModelScale"					"0.5"
@@ -1210,5 +1211,6 @@
 		"Ability15"						""
 		"Ability16"						""
 		"Ability17"						""
+		"Ability18"						""
 	}
 }

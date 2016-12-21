@@ -8527,6 +8527,168 @@
 	}
 
 	//=================================================================================================================
+	// Huntress: Neutralization
+	//=================================================================================================================
+	"holdout_neutralization"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"						"ability_datadriven"
+		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
+		"AbilityUnitTargetTeam"         "DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"AbilityUnitTargetType"         "DOTA_UNIT_TARGET_HERO"
+		"AbilityType"					"DOTA_ABILITY_TYPE_ULTIMATE"
+		"SpellImmunityType"             "SPELL_IMMUNITY_ENEMIES_NO"
+		"AbilityUnitDamageType"         "DAMAGE_TYPE_MAGICAL"
+		"AbilityDamage"					"500"
+		"AbilityTextureName"            "holdout_doom"
+		"RequiredLevel"					"20"
+		"MaxLevel"						"1"
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"				"650"
+		"AbilityCastPoint"				"0.3"
+		
+		// Time     
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"               "140.0"
+	
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"               "0"
+		
+		// Special  
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"damage_percent"		"-50"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"projectile_speed"		"800"
+			}
+			"04"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"duration"				"20"
+			}
+
+		}
+	
+		"OnAbilityPhaseStart"
+		{
+			"FireEffect"
+			{
+				"EffectName"        "particles/units/heroes/hero_viper/viper_viper_strike_warmup.vpcf"
+				"EffectAttachType"  "attach_origin"
+	
+				"ControlPointEntities"
+				{
+					"CASTER"    "attach_attack1"
+					"CASTER"    "attach_attack1"
+				}
+			}
+		}
+
+		"OnSpellStart"
+		{
+			"TrackingProjectile"
+			{
+				"Target"			"TARGET"
+				"EffectName"		"particles/econ/items/shadow_fiend/sf_desolation/sf_base_attack_desolation.vpcf"
+				"Dodgeable"			"1"
+				"ProvidesVision"	"0"
+				"MoveSpeed"			"%projectile_speed"
+				"SourceAttachment"	"DOTA_PROJECTILE_ATTACHMENT_ATTACK_1"
+			}
+	
+			"FireSound"
+			{
+				"EffectName"		"DOTA_Item.GhostScepter.Activate"
+				"Target"			"TARGET"
+			}
+		}
+
+		"OnProjectileHitUnit"
+		{
+			"FireSound"
+			{
+				"EffectName"    "Hero_DoomBringer.Doom"
+				"Target"        "TARGET"
+			}
+
+			"ApplyModifier"
+			{
+				"ModifierName"  "modifier_viper_strike_debuff_datadriven"
+				"Target"        "TARGET"
+			}
+
+			// Slow Part
+			"ApplyModifier"
+			{
+				"ModifierName"  "modifier_viper_strike_slow_datadriven"
+				"Target"        "TARGET"
+			}
+		}
+
+		"Modifiers"
+		{
+			"modifier_viper_strike_debuff_datadriven"
+			{
+				"IsDebuff"		"1"
+				"Duration"		"%duration"
+	
+				"StatusEffectName"      "particles/status_fx/status_effect_poison_viper.vpcf"
+				"StatusEffectPriority"  "15"
+	
+				"OnCreated"
+				{
+					"AttachEffect"
+					{
+						"EffectName"        "particles/units/heroes/hero_doom_bringer/doom_bringer_doom_ring.vpcf"
+						"EffectAttachType"  "attach_hitloc" 
+						"Target"            "TARGET"
+					}
+				}
+	
+				"ThinkInterval" "1.0"
+				"OnIntervalThink"
+				{
+					"Damage"
+					{
+						"Target"        "TARGET"
+						"Type"          "DAMAGE_TYPE_MAGICAL"
+						"Damage"        "%AbilityDamage"
+					}
+				}
+			}
+
+			"modifier_viper_strike_slow_datadriven"
+			{
+				"IsHidden"		"1"
+				"IsPurgable"	"0"
+	
+				"Attributes"	"MODIFIER_ATTRIBUTE_MULTIPLE"
+	
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_BASEDAMAGEOUTGOING_PERCENTAGE" "%damage_percent"
+				}
+
+				"States"
+				{
+					"MODIFIER_STATE_SILENCED"		"MODIFIER_STATE_VALUE_ENABLED"
+				}
+			}
+		}
+	}
+
+	//=================================================================================================================
 	// Mountain King: Storm Bolt
 	//=================================================================================================================
 	"holdout_storm_bolt"
@@ -9467,6 +9629,87 @@
 						"EffectName"		"particles/units/heroes/hero_lone_druid/lone_druid_battle_cry_buff.vpcf"
 						"EffectAttachType"	"follow_origin"
 					}
+				}
+			}
+		}
+	}
+
+	//=====================================================================================================
+	// Arthas: Knight's Armor
+	//=====================================================================================================
+	"holdout_knights_armor"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"						"ability_datadriven"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
+		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_PHYSICAL"
+		"AbilityTextureName"			"holdout_spiked_carapace"
+		"RequiredLevel"					"20"
+		"MaxLevel"						"1"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"hero_return_percent"		"50"
+			}
+			"02"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"creep_return_percent"		"50"
+			}
+			"03"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"damage_reduction"			"-20"
+			}
+			"04"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"bonus_armor"				"200"
+			}
+		}
+
+		"precache"
+		{
+			"particle"	"particles/units/heroes/hero_centaur/centaur_return.vpcf"
+		}
+	
+		"Modifiers"
+		{
+			"modifier_knights_armor"
+			{
+				"Passive"	"1"
+				"OnAttacked"
+				{
+					"RunScript"
+					{
+						"ScriptFile"	"heroes/hero_crypt_lord/spiked_carapace.lua"
+						"Function"		"Return"
+					}
+					"FireEffect"
+					{
+						"EffectName"		"particles/units/heroes/hero_centaur/centaur_return.vpcf"
+						"EffectAttachType"  "attach_hitloc"
+						"Target" 			"CASTER"
+						"ControlPointEntities"
+						{
+							"CASTER" 		"attach_hitloc"
+							"ATTACKER" 		"attach_hitloc"
+						}
+					}
+				}
+
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS"			"%bonus_armor"
+					"MODIFIER_PROPERTY_INCOMING_DAMAGE_PERCENTAGE"		"%damage_reduction"
 				}
 			}
 		}
@@ -15453,34 +15696,29 @@
 			"02"
 			{
 				"var_type"			"FIELD_INTEGER"
-				"radius_full"		"200 225 250 300"
+				"splash_radius"		"200 225 250 300"
 			}
 			"03"
-			{
-				"var_type"			"FIELD_INTEGER"
-				"radius_half"		"100 110 125 150"
-			}
-			"04"
 			{
 				"var_type"			"FIELD_INTEGER"
 				"splash_damage_percent"		"20"
 			}
 		}
-		// Data Driven
-		//-------------------------------------------------------------------------------------
+
 		"Modifiers"
 		{ 
 			"modifier_orb_plasma_rifle"
 			{
 				"Passive"	"1"
 				"IsHidden"	"1"
+
 				"Orb"
 				{
 					"Priority"			"DOTA_ORB_PRIORITY_ABILITY"
 					"ProjectileName"	"particles/units/heroes/hero_warlock/warlock_base_attack.vpcf"
 					"CastAttack"		"1" //This ensures the effect doesn't fire every time
 				}
-	
+
 				"OnOrbFire"
 				{
 					"FireSound"
@@ -15494,32 +15732,27 @@
 						"Mana"	"%AbilityManaCost"
 					}
 				}
-	
+
 				"OnOrbImpact"
 				{
-					"Damage"
+					"FireEffect"
 					{
-						"Target"
-						{
-							"Center"      "TARGET"
-							"Radius"     "%radius_half"
-							"Teams"     "DOTA_UNIT_TARGET_TEAM_ENEMY"
-							"Types"     "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
-						}
-						"Type"            "DAMAGE_TYPE_PHYSICAL"
-						"Damage"        "%attack_damage/4"
+						"EffectName"		"particles/units/heroes/hero_sven/sven_spell_great_cleave.vpcf"
+						"EffectAttachType"	"follow_origin"
+						"Target"			"TARGET"
 					}
+
 					"Damage"
 					{
-						"Target"
-						{
-							"Center"      "TARGET"
-							"Radius"     "%radius_full"
-							"Teams"     "DOTA_UNIT_TARGET_TEAM_ENEMY"
-							"Types"     "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
-						}
-						"Type"            "DAMAGE_TYPE_PHYSICAL"
-						"Damage"        "%attack_damage/4"
+						"Target"		"TARGET"
+						"Type"			"DAMAGE_TYPE_PHYSICAL"
+						"Damage"		"%bonus_damage"
+					}
+
+					"RunScript"
+					{
+						"ScriptFile"	"scripts/vscripts/heroes/hero_centurion/sea_dragon_form.lua"
+						"Function"		"Splash"
 					}
 				}
 			}
@@ -15762,8 +15995,7 @@
 				"splash_damage_percent"		"25"
 			}
 		}
-		// Data Driven
-		//-------------------------------------------------------------------------------------
+
 		"Modifiers"
 		{ 
 			"modifier_orb_plasma_rifle"
@@ -15793,29 +16025,17 @@
 	
 				"OnOrbImpact"
 				{
-					"Damage"
+					"FireEffect"
 					{
-						"Target"
-						{
-							"Center"      "TARGET"
-							"Radius"     "%radius_half"
-							"Teams"     "DOTA_UNIT_TARGET_TEAM_ENEMY"
-							"Types"     "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
-						}
-						"Type"            "DAMAGE_TYPE_PHYSICAL"
-						"Damage"        "%attack_damage/4"
+						"EffectName"		"particles/units/heroes/hero_sven/sven_spell_great_cleave.vpcf"
+						"EffectAttachType"	"follow_origin"
+						"Target"			"TARGET"
 					}
-					"Damage"
+
+					"RunScript"
 					{
-						"Target"
-						{
-							"Center"      "TARGET"
-							"Radius"     "%radius_full"
-							"Teams"     "DOTA_UNIT_TARGET_TEAM_ENEMY"
-							"Types"     "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
-						}
-						"Type"            "DAMAGE_TYPE_PHYSICAL"
-						"Damage"        "%attack_damage/4"
+						"ScriptFile"	"scripts/vscripts/heroes/hero_centurion/sea_dragon_form.lua"
+						"Function"		"Splash"
 					}
 				}
 			}
@@ -17590,36 +17810,13 @@
 				"IsHidden"      "1"
 				"IsBuff"        "1"
 				"IsPurgable"    "0"
+
 				"OnAttacklanded"
 				{
-					"Damage"
+					"RunScript"
 					{
-						"Target"
-						{
-							"Center"	"TARGET"
-							"Teams"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
-							"Types"		"DOTA_UNIT_TARGET_HERO"
-						}
-						"Type"			"DAMAGE_TYPE_PHYSICAL"
-						"Damage"		"%attack_damage*0.25"
-					}
-
-					"Damage"
-					{
-						"Target"
-						{
-							"Center"	"TARGET"
-							"Teams"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
-							"Types"		"DOTA_UNIT_TARGET_BASIC"
-						}
-						"Type"			"DAMAGE_TYPE_PHYSICAL"
-						"Damage"		"%attack_damage*0.5"
-					}
-
-					"FireSound"
-					{
-						"EffectName"	"Hero_Ursa.Attack"
-						"Target" 		"CASTER"
+						"ScriptFile"	"heroes/hero_malfurion/strength_of_the_wild.lua"
+						"Function"		"StrengthOfTheWild"
 					}
 				}
 			}
@@ -19380,7 +19577,7 @@
 		}
 	}
 	//=================================================================================================================
-	// Arthas: Holy Light
+	// Arthas Boss: Holy Light
 	//=================================================================================================================
 	"arthas_holy_light"
 	{
@@ -22613,6 +22810,33 @@
 					{
 						"ScriptFile"	"phases/phase1.lua"
 						"Function"		"SpiritBeastDead"
+					}
+				}
+			}
+		}
+	}
+
+	"hero_image_death"
+	{
+		// General
+		//-------------------------------------------------------------------------------------
+		"BaseClass"			"ability_datadriven"
+		"AbilityBehavior"	"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_HIDDEN"
+		"MaxLevel"			"1"
+
+		"Modifiers"
+		{
+			"modifier_hero_image"
+			{
+				"Passive"	"1"
+				"IsHidden"	"0"
+				
+				"OnTakeDamage"
+				{
+					"RunScript"
+					{
+						"ScriptFile"	"phases/phase1.lua"
+						"Function"		"HeroImageDead"
 					}
 				}
 			}

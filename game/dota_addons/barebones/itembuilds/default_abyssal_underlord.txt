@@ -1,8 +1,8 @@
-"itembuilds/test_enchantress.txt"
+"itembuilds/test_abyssal_underlord.txt"
 {
 	"author"		"X Hero Siege Official"
-	"hero"			"npc_dota_hero_enchantress"
-	"Title"			"Recommended items for Dryad"
+	"hero"			"npc_dota_hero_abyssal_underlord"
+	"Title"			"Recommended items for Pit Lord"
 
 	"Items"
 	{
@@ -10,7 +10,7 @@
 		{
 		}
 
-		"#DOTA_Item_Build_Hero14"
+		"#DOTA_Item_Build_Hero15"
 		{
 		}
 
@@ -24,8 +24,9 @@
 		"#DOTA_Item_Build_Early_Game"
 		{
 			"item"		"item_amulet_of_the_wild"
-			"item"		"item_tome_small"
+			"item"		"item_orb_of_fire"
 			"item"		"item_ankh_of_reincarnation"
+			"item"		"item_tome_small"
 			"item"		"item_gloom_blade"
 		}
 
@@ -33,8 +34,6 @@
 		{
 			"item"		"item_assassins_blade"
 			"item"		"item_bracer_of_protection"
-			"item"		"item_lifesteal_mask"
-			"item"		"item_assassins_blade"
 			"item"		"item_assassins_blade"
 		}
 

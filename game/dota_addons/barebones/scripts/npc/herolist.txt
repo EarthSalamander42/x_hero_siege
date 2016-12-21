@@ -11,7 +11,6 @@
 	"npc_dota_hero_elder_titan"			"1"		//Tauren Chieftain
 	"npc_dota_hero_enchantress"			"1"		//Tyrande
 	"npc_dota_hero_invoker"				"1"		//Bloodmage
-	"npc_dota_hero_io"					"1"		//Wisp( Choose Hero Unit )
 	"npc_dota_hero_juggernaut"			"1"		//Blademaster
 	"npc_dota_hero_keeper_of_the_light"	"1"		//Keeper of the Light
 	"npc_dota_hero_lich"				"1"		//Lich
@@ -29,8 +28,9 @@
 	"npc_dota_hero_sven"				"1"		//Mountain King
 	"npc_dota_hero_shadow_shaman"		"1"		//Rhasta
 	"npc_dota_hero_terrorblade"			"1"		//Illidan
-	"npc_dota_hero_viper"				"1"		//Malfurion
+	"npc_dota_hero_ursa"				"1"		//Malfurion
 	"npc_dota_hero_warlock"				"1"		//Archimonde
 	"npc_dota_hero_weaver"				"1"		//Crypt Lord
 	"npc_dota_hero_windrunner"			"1"		//Windrunner
+	"npc_dota_hero_wisp"				"1"		//Wisp( Choose Hero Unit )
 }

@@ -26,7 +26,6 @@ _G.mod_graphist = {
 _G.vip_members = {
 		312910864, -- breddybourne [Winner of the 21th November Day Event]
 		157808659, -- ST8 [Winner of the 21th November Day Event]
-		62993541, -- KennyCrazy [Winner of the 21th November Day Event]
 		331762743, -- Sterling8077 [Winner of the 21th November Day Event]
 		112182763 -- Mugiwara, not the graphist another one ^^ [Winner of the 21th November Day Event]
 	}
@@ -47,13 +46,7 @@ _G.golden_vip_members = {
 		5194446, -- Botd [Hugo Marques on Patreon, Remove Date if not paid: 31/01/2017]
 		27954291, -- Gengar [Christian Oversand Deildok on Patreon, Remove Date if not paid: 04/01/2017]
 		113777627, -- Mieu [phil lousbury on Patreon, Remove Date if not paid: 07/01/2017]
-		152511257, -- MasKe~🖕 [Jamie Vidler on Patreon, Remove Date if not paid: 07/01/2017]
-
-		312910864, -- breddybourne [Winner of the 21th November Day Event]
-		157808659, -- ST8 [Winner of the 21th November Day Event]
-		62993541, -- KennyCrazy [Winner of the 21th November Day Event]
-		331762743, -- Sterling8077 [Winner of the 21th November Day Event]
-		112182763 -- Mugiwara, not the graphist another one ^^ [Winner of the 21th November Day Event]
+		152511257 -- MasKe~🖕 [Jamie Vidler on Patreon, Remove Date if not paid: 07/01/2017]
 	}
 
 _G.banned_players = {
@@ -89,6 +82,8 @@ BARRACKMENTS[5] = 1
 BARRACKMENTS[6] = 1
 BARRACKMENTS[7] = 1
 BARRACKMENTS[8] = 1
+
+timers = {}
 
 if GameMode == nil then
 	_G.GameMode = class({})
@@ -171,7 +166,7 @@ function GameMode:OnHeroInGame(hero)
 	if hero:GetUnitName() == "npc_dota_hero_wisp" then
 		hero:SetAbilityPoints(0)
 		hero:SetGold(0, false)
-		hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {Duration = 20, IsHidden = true})
+		hero:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 20, IsHidden = true})
 	end
 end
 
@@ -195,8 +190,8 @@ local triggers_choice = Entities:FindAllByName("trigger_special_event_choice")
 	end)
 	Timers:CreateTimer(840, function() -- 12 Min + 2 Min with Muradin Event = 14 Min
 		Notifications:TopToAll({hero="npc_dota_hero_nyx_assassin", duration=6.0})
-		Notifications:TopToAll({text="Creeps are now Level 3! ", style={color="grey"}, continue=true})
-		Notifications:TopToAll({text="Beasts Events are unlocked!", style={color="grey"}, continue=true})
+		Notifications:TopToAll({text="Creeps are now Level 3! ", style={color="DodgerBlue"}, continue=true})
+		Notifications:TopToAll({text="Special Events are unlocked!", style={color="DodgerBlue"}, continue=true})
 		nCOUNTDOWNCREEP = 361
 		nCOUNTDOWNINCWAVE = 241
 		SpawnBlackDragon()
@@ -447,7 +442,7 @@ function GameMode:InitGameMode()
 	local difficulty = GameRules:GetCustomGameDifficulty()
 
 	-- Timer Rules
-	GameRules:SetPreGameTime( 20.0 ) --120.0
+	GameRules:SetPreGameTime( 120.0 ) --120.0
 	GameRules:SetPostGameTime( 30.0 )
 	GameRules:SetTreeRegrowTime( 60.0 )
 	GameRules:SetHeroSelectionTime( 0.0 ) --This is not dota bitch

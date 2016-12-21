@@ -68,10 +68,7 @@
 
 	"sideshop1"
 	{
-		"item"		"item_tpscroll"
-		"item"		"item_tome_small"
-		"item"		"item_tome_big"
-		"item"		"item_tome_of_power"
+
 	}
 
 	"sideshop2"

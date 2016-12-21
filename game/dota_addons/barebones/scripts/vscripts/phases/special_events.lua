@@ -4,6 +4,7 @@ function MuradinEvent() -- 12 Min, lasts 2 Min.
 local teleporters = Entities:FindAllByName("trigger_teleport_muradin_end")
 local heroes = HeroList:GetAllHeroes()
 nCOUNTDOWNTIMER = 121
+BT_ENABLED = 0
 
 	local Muradin = CreateUnitByName("npc_dota_creature_muradin_bronzebeard", Entities:FindByName(nil, "npc_dota_muradin_boss"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
 	Muradin:AddNewModifier( nil, nil, "modifier_boss_stun", {duration = 5})
@@ -23,6 +24,23 @@ nCOUNTDOWNTIMER = 121
 		Timers:CreateTimer(0.1, function()
 			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
 		end)
+
+	timers.disabled_items = Timers:CreateTimer(0.0, function()
+		for itemSlot = 0, 5 do
+		local item = hero:GetItemInSlot(itemSlot)
+			if item ~= nil and item:GetName() == "item_tome_small" then
+				item:StartCooldown(3.0)
+			end
+			if item ~= nil and item:GetName() == "item_tome_big" then
+				item:StartCooldown(3.0)
+			end
+			if item ~= nil and item:GetName() == "item_tpscroll" then
+				item:StartCooldown(3.0)
+			end
+		end
+		return 1
+	end)
+
 	end
 
 	Timers:CreateTimer(120, function() -- 14:00 Min, teleport back to the spawn
@@ -32,11 +50,13 @@ nCOUNTDOWNTIMER = 121
 
 		UTIL_Remove(Muradin)
 		nCOUNTDOWNTIMER = 600
+		BT_ENABLED = 1
+		Timers:RemoveTimer(timers.disabled_items)
 	end)
 
 	Timers:CreateTimer(126, function() -- 14:05 Min: MURADIN BRONZEBEARD EVENT 1, END
 		Notifications:TopToAll({text="All heroes who survived Muradin received 15 000 Gold!", duration=6.0})
-		Notifications:TopToAll({ability="alchemist_goblins_greed", continue=true})
+		Notifications:TopToAll({ability="alchemist_goblins_greed", continue = true})
 		for _,v in pairs(teleporters) do
 			v:Disable()
 		end
@@ -103,6 +123,27 @@ BT_ENABLED = 0
 		Timers:CreateTimer(0.1, function()
 			PlayerResource:SetCameraTarget(hero:GetPlayerID(), nil)
 		end)
+
+		timers.disabled_items = Timers:CreateTimer(0.0, function()
+		local ability = hero:FindAbilityByName("holdout_blink")
+			ability:StartCooldown(3.0)
+			for itemSlot = 0, 5 do
+			local item = hero:GetItemInSlot(itemSlot)
+				if item ~= nil and item:GetName() == "item_tome_small" then
+					item:StartCooldown(3.0)
+				end
+				if item ~= nil and item:GetName() == "item_tome_big" then
+					item:StartCooldown(3.0)
+				end
+				if item ~= nil and item:GetName() == "item_boots_of_speed" then
+					item:StartCooldown(3.0)
+				end
+				if item ~= nil and item:GetName() == "item_tpscroll" then
+				item:StartCooldown(3.0)
+				end
+			end
+			return 1
+		end)
 	end
 
 	Timers:CreateTimer(180, function() -- 27:00 Min, teleport back to the spawn
@@ -113,6 +154,7 @@ BT_ENABLED = 0
 		nCOUNTDOWNINCWAVE = 240
 		NEUTRAL_SPAWN = 0
 		BT_ENABLED = 1
+		Timers:RemoveTimer(timers.disabled_items)
 
 		for _,v in pairs(teleporters) do
 			v:Enable()
@@ -280,11 +322,11 @@ function RameroEvent() -- 940 kills
 local teleporters = Entities:FindAllByName("trigger_teleport_ramero_end")
 nCOUNTDOWNTIMER = 121
 
-	local Ramero = CreateUnitByName("npc_ramero", Entities:FindByName(nil, "roshan_wp_4"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
+	local Ramero = CreateUnitByName("npc_ramero", Entities:FindByName(nil, "roshan_wp_4"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_NEUTRALS)
 	Ramero:AddNewModifier( nil, nil, "modifier_boss_stun", {duration = 5})
 	Ramero:AddNewModifier( nil, nil, "modifier_invulnerable", {duration = 5})
 	Ramero:SetAngles(0, 45, 0)
-	local Baristal = CreateUnitByName("npc_baristal", Entities:FindByName(nil, "roshan_wp_2"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
+	local Baristal = CreateUnitByName("npc_baristal", Entities:FindByName(nil, "roshan_wp_2"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_NEUTRALS)
 	Baristal:AddNewModifier( nil, nil, "modifier_boss_stun", {duration = 5})
 	Baristal:AddNewModifier( nil, nil, "modifier_invulnerable", {duration = 5})
 	Baristal:SetAngles(0, 325, 0)
