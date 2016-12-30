@@ -5,6 +5,8 @@ local teleporters = Entities:FindAllByName("trigger_teleport_muradin_end")
 local heroes = HeroList:GetAllHeroes()
 nCOUNTDOWNTIMER = 121
 BT_ENABLED = 0
+mode = GameRules:GetGameModeEntity()
+mode:SetFixedRespawnTime( 1 )
 
 	local Muradin = CreateUnitByName("npc_dota_creature_muradin_bronzebeard", Entities:FindByName(nil, "npc_dota_muradin_boss"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
 	Muradin:AddNewModifier( nil, nil, "modifier_boss_stun", {duration = 5})
@@ -25,22 +27,20 @@ BT_ENABLED = 0
 			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
 		end)
 
-	timers.disabled_items = Timers:CreateTimer(0.0, function()
-		for itemSlot = 0, 5 do
-		local item = hero:GetItemInSlot(itemSlot)
-			if item ~= nil and item:GetName() == "item_tome_small" then
-				item:StartCooldown(3.0)
+		timers.disabled_items = Timers:CreateTimer(0.0, function()
+			for itemSlot = 0, 5 do
+			local item = hero:GetItemInSlot(itemSlot)
+				if item ~= nil and item:GetName() == "item_tome_small" then
+					item:StartCooldown(120.0)
+				end
+				if item ~= nil and item:GetName() == "item_tome_big" then
+					item:StartCooldown(120.0)
+				end
+				if item ~= nil and item:GetName() == "item_tpscroll" then
+					item:StartCooldown(120.0)
+				end
 			end
-			if item ~= nil and item:GetName() == "item_tome_big" then
-				item:StartCooldown(3.0)
-			end
-			if item ~= nil and item:GetName() == "item_tpscroll" then
-				item:StartCooldown(3.0)
-			end
-		end
-		return 1
-	end)
-
+		end)
 	end
 
 	Timers:CreateTimer(120, function() -- 14:00 Min, teleport back to the spawn
@@ -51,7 +51,6 @@ BT_ENABLED = 0
 		UTIL_Remove(Muradin)
 		nCOUNTDOWNTIMER = 600
 		BT_ENABLED = 1
-		Timers:RemoveTimer(timers.disabled_items)
 	end)
 
 	Timers:CreateTimer(126, function() -- 14:05 Min: MURADIN BRONZEBEARD EVENT 1, END
@@ -64,13 +63,15 @@ BT_ENABLED = 0
 end
 
 function EndMuradinEvent(keys)
-	local activator = keys.activator
-	local point = Entities:FindByName(nil,"base_spawn"):GetAbsOrigin()
+local activator = keys.activator
+local point = Entities:FindByName(nil,"base_spawn"):GetAbsOrigin()
+mode = GameRules:GetGameModeEntity()
+mode:SetFixedRespawnTime( 40 )
 
 	if activator:GetTeam() == DOTA_TEAM_GOODGUYS then
 	FindClearSpaceForUnit(activator, point, true)
 	PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(), activator)
-	Timers:CreateTimer(0.1, function()
+	Timers:CreateTimer(0.2, function()
 		PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(), nil)
 	end)
 	activator:Stop()
@@ -126,23 +127,22 @@ BT_ENABLED = 0
 
 		timers.disabled_items = Timers:CreateTimer(0.0, function()
 		local ability = hero:FindAbilityByName("holdout_blink")
-			ability:StartCooldown(3.0)
 			for itemSlot = 0, 5 do
 			local item = hero:GetItemInSlot(itemSlot)
 				if item ~= nil and item:GetName() == "item_tome_small" then
-					item:StartCooldown(3.0)
+					item:StartCooldown(120.0)
 				end
 				if item ~= nil and item:GetName() == "item_tome_big" then
-					item:StartCooldown(3.0)
+					item:StartCooldown(120.0)
 				end
 				if item ~= nil and item:GetName() == "item_boots_of_speed" then
-					item:StartCooldown(3.0)
+					item:StartCooldown(120.0)
 				end
 				if item ~= nil and item:GetName() == "item_tpscroll" then
-				item:StartCooldown(3.0)
+				item:StartCooldown(120.0)
 				end
 			end
-			return 1
+		ability:StartCooldown(120.0)
 		end)
 	end
 
@@ -154,7 +154,6 @@ BT_ENABLED = 0
 		nCOUNTDOWNINCWAVE = 240
 		NEUTRAL_SPAWN = 0
 		BT_ENABLED = 1
-		Timers:RemoveTimer(timers.disabled_items)
 
 		for _,v in pairs(teleporters) do
 			v:Enable()
@@ -171,7 +170,6 @@ end
 function EndFarmEvent(keys)
 local activator = keys.activator
 local point = Entities:FindByName(nil,"base_spawn"):GetAbsOrigin()
-
 	if activator:GetTeam() == DOTA_TEAM_GOODGUYS then
 	FindClearSpaceForUnit(activator, point, true)
 	PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(), activator)
@@ -186,7 +184,6 @@ function FarmEventCreeps0()
 local point = Entities:FindByName(nil, "farm_event_player_0")
 local units = FindUnitsInRadius(DOTA_TEAM_BADGUYS, point:GetAbsOrigin(), nil, 1500, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)		
 local number0 = 0
-
 	for _,v in pairs(units) do
 		number0 = number0 +1
 	end
@@ -203,7 +200,6 @@ function FarmEventCreeps1()
 local point = Entities:FindByName(nil, "farm_event_player_1")
 local units = FindUnitsInRadius(DOTA_TEAM_BADGUYS, point:GetAbsOrigin(), nil, 1500, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)		
 local number1 = 0
-
 	for _,v in pairs(units) do
 		number1 = number1 +1
 	end
@@ -220,7 +216,6 @@ function FarmEventCreeps2()
 local point = Entities:FindByName(nil, "farm_event_player_2")
 local units = FindUnitsInRadius(DOTA_TEAM_BADGUYS, point:GetAbsOrigin(), nil, 1500, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)		
 local number2 = 0
-
 	for _,v in pairs(units) do
 		number2 = number2 +1
 	end
@@ -237,7 +232,6 @@ function FarmEventCreeps3()
 local point = Entities:FindByName(nil, "farm_event_player_3")
 local units = FindUnitsInRadius(DOTA_TEAM_BADGUYS, point:GetAbsOrigin(), nil, 1500, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)		
 local number3 = 0
-
 	for _,v in pairs(units) do
 		number3 = number3 +1
 	end
@@ -254,7 +248,6 @@ function FarmEventCreeps4()
 local point = Entities:FindByName(nil, "farm_event_player_4")
 local units = FindUnitsInRadius(DOTA_TEAM_BADGUYS, point:GetAbsOrigin(), nil, 1500, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)		
 local number4 = 0
-
 	for _,v in pairs(units) do
 		number4 = number4 +1
 	end
@@ -271,7 +264,6 @@ function FarmEventCreeps5()
 local point = Entities:FindByName(nil, "farm_event_player_5")
 local units = FindUnitsInRadius(DOTA_TEAM_BADGUYS, point:GetAbsOrigin(), nil, 1500, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)		
 local number5 = 0
-
 	for _,v in pairs(units) do
 		number5 = number5 +1
 	end
@@ -288,7 +280,6 @@ function FarmEventCreeps6()
 local point = Entities:FindByName(nil, "farm_event_player_6")
 local units = FindUnitsInRadius(DOTA_TEAM_BADGUYS, point:GetAbsOrigin(), nil, 1500, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)		
 local number6 = 0
-
 	for _,v in pairs(units) do
 		number6 = number6 +1
 	end
@@ -305,7 +296,6 @@ function FarmEventCreeps7()
 local point = Entities:FindByName(nil, "farm_event_player_7")
 local units = FindUnitsInRadius(DOTA_TEAM_BADGUYS, point:GetAbsOrigin(), nil, 1500, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)		
 local number7 = 0
-
 	for _,v in pairs(units) do
 		number7 = number7 +1
 	end
@@ -318,7 +308,36 @@ local number7 = 0
 	return 1
 end
 
-function RameroEvent() -- 940 kills
+function RameroEvent() -- 1500 kills
+local teleporters = Entities:FindAllByName("trigger_teleport_ramero_end")
+nCOUNTDOWNTIMER = 121
+
+	local Ramero = CreateUnitByName("npc_ramero_2", Entities:FindByName(nil, "roshan_wp_4"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_NEUTRALS)
+	Ramero:AddNewModifier( nil, nil, "modifier_boss_stun", {duration = 5})
+	Ramero:AddNewModifier( nil, nil, "modifier_invulnerable", {duration = 5})
+	Ramero:SetAngles(0, 45, 0)
+--	Ramero:EmitSound("Muradin.StormEarthFire")
+	Notifications:TopToAll({hero="npc_dota_hero_sven", duration=5.0})
+	Notifications:TopToAll({text="Kill Ramero and Baristal to get special items! ", continue=true})
+	Notifications:TopToAll({text="Reward: Ring of Superiority.", continue=true})
+
+	Timers:CreateTimer(120, function() -- Teleport back to the spawn
+		for _,v in pairs(teleporters) do
+			v:Enable()
+		end
+
+		UTIL_Remove(Ramero)
+	end)
+
+	Timers:CreateTimer(126, function() -- 14:05 Min: MURADIN BRONZEBEARD EVENT 1, END
+--		Notifications:TopToAll({text="Ramero and Baristal won the duel!", duration = 6.0})
+		for _,v in pairs(teleporters) do
+			v:Disable()
+		end
+	end)
+end
+
+function RameroAndBaristalEvent() -- 940 kills
 local teleporters = Entities:FindAllByName("trigger_teleport_ramero_end")
 nCOUNTDOWNTIMER = 121
 

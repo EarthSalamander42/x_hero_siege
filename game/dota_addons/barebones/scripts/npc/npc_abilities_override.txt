@@ -47,26 +47,8 @@
 	// Courier
 	//=================================================================================================================
 	"item_courier"
-	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"ID"							"45"														// unique ID number for this item.  Do not change this once established or it will invalidate collected stats.
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-		"ItemDeclarations"				"DECLARE_PURCHASES_TO_TEAMMATES"
-		
-		// Item Info
-		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"						"100"
+	{		
 		"ItemPurchasable"				"0"
-		"ItemShopTags"					"consumable"
-		"ItemQuality"					"consumable"
-		"ItemAliases"					"donkey;chicken;animal courier"
-		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
-		"ItemStockMax"					"1"
-		"ItemStockTime"					"120.0"
-		"ItemSupport"					"1"
-		"IsTempestDoubleClonable"		"0"
-
 	}
 
 	//=================================================================================================================
@@ -125,7 +107,7 @@
 	"item_diffusal_blade_2"			"REMOVE"
 	"item_magic_stick"				"REMOVE"
 	"item_magic_wand"				"REMOVE"
-	"item_sphere"					"REMOVE" //Linken's Sphere
+	"item_sphere"					"REMOVE"
 	"item_demon_edge"				"REMOVE"
 	"item_butterfly"				"REMOVE"
 	"item_solar_crest"				"REMOVE"
@@ -230,7 +212,6 @@
 	"item_talisman_of_evasion"		"REMOVE"
 	"item_faerie_fire"				"REMOVE"
 	"item_enchanted_mango"			"REMOVE"
-
 
 	//============================================================================================================
 	//============================================================================================================
@@ -600,12 +581,12 @@
 			"01"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"crit_chance"				"15"
+				"crit_chance"				"14"
 			}
 			"02"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"crit_damage"				"400"
+				"crit_damage"				"350"
 			}			
 			"03"
 			{
@@ -1200,7 +1181,7 @@
 			"03"
 			{
 				"var_type"						"FIELD_INTEGER"
-				"bonus_damage_from_creep"		"5 10 15 20"
+				"bonus_damage_from_creep"		"4 8 12 16"
 			}
 			"04"
 			{
@@ -1210,7 +1191,7 @@
 			"05"
 			{
 				"var_type"						"FIELD_FLOAT"
-				"bonus_damage_duration"			"65"
+				"bonus_damage_duration"			"40"
 			}
 		}
 	}

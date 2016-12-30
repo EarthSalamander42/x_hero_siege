@@ -25,7 +25,6 @@ function Splash( keys )
 	damage_table.damage_type = DAMAGE_TYPE_PHYSICAL
 	damage_table.damage = caster:GetAttackDamage() * splash_damage_small
 
-
 	--loop for doing the splash damage while ignoring the original target
 	for i,v in ipairs(splash_radius_small) do
 		if v ~= target then 
@@ -58,7 +57,7 @@ function Splash( keys )
 	for i,v in ipairs(splash_radius_big) do
 		if v ~= target then
 			--loop for checking if the found target is in the splash_radius_medium
-			for c,k in ipairs(splash_radius_medium) do              
+			for c,k in ipairs(splash_radius_medium) do
 				if v == k then
 					target_exists = true
 					break

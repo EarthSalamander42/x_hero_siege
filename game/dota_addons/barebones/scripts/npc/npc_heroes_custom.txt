@@ -16,9 +16,9 @@
 		"RingRadius"					"120"
 		"ProjectileSpeed"				"1200"
 
-		"AttributeStrengthGain"			"20"
-		"AttributeAgilityGain"			"10"
-		"AttributeIntelligenceGain"		"10"
+		"AttributeStrengthGain"			"10"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"5"
 
 		"Ability1"						"holdout_dark_pact"
 		"Ability2"						"abyssal_underlord_pit_of_malice"
@@ -53,9 +53,9 @@
 		"HealthBarOffset"				"200"
 		"AttackRange"					"170"
 
-		"AttributeStrengthGain"			"20"
-		"AttributeAgilityGain"			"10"
-		"AttributeIntelligenceGain"		"10"
+		"AttributeStrengthGain"			"10"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"5"
 
 		"Ability1"						"holdout_death_coil_alt"
 		"Ability2"						"holdout_howling_blast"		
@@ -526,7 +526,7 @@
 	}
 
 	//=======================================================================================================
-	// HERO: Archimage( Keeper of the Light )
+	// HERO: Archimage( Chen )
 	//=======================================================================================================
 	"npc_dota_hero_chen_holdout"
 	{
@@ -672,9 +672,9 @@
 //		"DisableWearables"				"1"
 		"MovementSpeed"					"345"
 
-		"AttributeStrengthGain"			"10"
-		"AttributeAgilityGain"			"20"
-		"AttributeIntelligenceGain"		"10"
+		"AttributeStrengthGain"			"5"
+		"AttributeAgilityGain"			"10"
+		"AttributeIntelligenceGain"		"5"
 
 		"Ability1"						"holdout_life_steal"
 		"Ability2"						"meepo_poof"
@@ -1047,7 +1047,7 @@
 		"Ability4"						"holdout_illidan_evasion"
 		"Ability5"						"holdout_roar"
 		"Ability6"						"holdout_metamorphosis"
-		"Ability7"						"holdout_resistant_skin"
+		"Ability7"						""
 		"Ability8"						""
 		"Ability9"						""
 		"Ability10"						""

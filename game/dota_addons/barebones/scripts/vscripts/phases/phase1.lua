@@ -283,9 +283,9 @@ local point_beast = Entities:FindByName(nil, "special_event_boss_point3"):GetAbs
 
 	GameMode.HeroImage = CreateUnitByName(hero:GetUnitName(), point_beast, true, nil, nil, DOTA_TEAM_CUSTOM_1)
 	GameMode.HeroImage:SetAngles(0, 210, 0)
-	GameMode.HeroImage:SetBaseStrength(hero:GetBaseStrength()*5)
-	GameMode.HeroImage:SetBaseIntellect(hero:GetBaseIntellect()*5)
-	GameMode.HeroImage:SetBaseAgility(hero:GetBaseAgility()*5)
+	GameMode.HeroImage:SetBaseStrength(hero:GetBaseStrength()*4)
+	GameMode.HeroImage:SetBaseIntellect(hero:GetBaseIntellect()*4)
+	GameMode.HeroImage:SetBaseAgility(hero:GetBaseAgility()*4)
 	GameMode.HeroImage:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 5,IsHidden = true})
 	GameMode.HeroImage:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 5,IsHidden = true})
 	GameMode.HeroImage:AddNewModifier(GameMode.HeroImage, nil, "modifier_illusion", { outgoing_damage = 100, incoming_damage = 100})

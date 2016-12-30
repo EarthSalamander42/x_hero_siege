@@ -24,29 +24,29 @@ _G.mod_graphist = {
 	}
 
 _G.vip_members = {
-		312910864, -- breddybourne [Winner of the 21th November Day Event]
-		157808659, -- ST8 [Winner of the 21th November Day Event]
-		331762743, -- Sterling8077 [Winner of the 21th November Day Event]
-		112182763 -- Mugiwara, not the graphist another one ^^ [Winner of the 21th November Day Event]
+		320774890,	-- Error [Han Gao on Patreon, Remove Date if not paid: 26/01/2017]
+		97490223	-- IllidanStormrage [Lucas Diao on Patreon, Removed Date if not paid: 29/01/2017]
 	}
 
 _G.golden_vip_members = {
-		69533529, -- West [Unlimited]
-		206464009, -- beast [Unlimited]
-		86718505, -- Noya [Unlimited]
-		62993541, -- KennyCrazy [Unlimited]
-		146805680, -- [UTAC] Rekail [Gatiipz Gatiipz on Patreon, Remove Date if not paid: 01/01/2017]
-		75034844, -- Specter [Tyrael on Patreon, Remove Date if not paid: 05/01/2017]
-		110786327, -- MechJesus [Mauro Solares on Patreon, Remove Date if not paid: 07/01/2017]
-		93860661, -- Meteor [Supawit Enyord on Patreon, Remove Date if not paid: 10/01/2017]
-		190411200, -- Nojo [Nojo on Patreon, Remove Date if not paid: 23/01/2017]
-		97629656, -- jacobkahnji  [Jacob A Yow on Patreon, Remove Date if not paid: 23/01/2017]
-		136258650, -- Meliodas [Dinh Quang on Patreon, Remove Date if not paid: 25/01/2017]
-		55770641, -- Primeape [Filip Dingum on Patreon, Remove Date if not paid: 31/01/2017]
-		5194446, -- Botd [Hugo Marques on Patreon, Remove Date if not paid: 31/01/2017]
-		27954291, -- Gengar [Christian Oversand Deildok on Patreon, Remove Date if not paid: 04/01/2017]
-		113777627, -- Mieu [phil lousbury on Patreon, Remove Date if not paid: 07/01/2017]
-		152511257 -- MasKe~🖕 [Jamie Vidler on Patreon, Remove Date if not paid: 07/01/2017]
+		69533529,	-- West [Unlimited]
+		206464009,	-- beast [Unlimited]
+		86718505,	-- Noya [Unlimited]
+		62993541,	-- KennyCrazy [Unlimited]
+		146805680,	-- [UTAC] Rekail [Gatiipz Gatiipz on Patreon, Remove Date if not paid: 01/01/2017]
+		75034844,	-- Specter [Tyrael on Patreon, Remove Date if not paid: 05/01/2017]
+		110786327,	-- MechJesus [Mauro Solares on Patreon, Remove Date if not paid: 07/01/2017]
+		93860661,	-- Meteor [Supawit Enyord on Patreon, Remove Date if not paid: 10/01/2017]
+		190411200,	-- Nojo [Nojo on Patreon, Remove Date if not paid: 23/01/2017]
+		97629656,	-- jacobkahnji  [Jacob A Yow on Patreon, Remove Date if not paid: 23/01/2017]
+		136258650,	-- Meliodas [Dinh Quang on Patreon, Remove Date if not paid: 25/01/2017]
+		55770641,	-- Primeape [Filip Dingum on Patreon, Remove Date if not paid: 31/01/2017]
+		5194446,	-- Botd [Hugo Marques on Patreon, Remove Date if not paid: 31/01/2017]
+		27954291,	-- Gengar [Christian Oversand Deildok on Patreon, Remove Date if not paid: 04/01/2017]
+		113777627,	-- Mieu [phil lousbury on Patreon, Remove Date if not paid: 07/01/2017]
+		152511257,	-- MasKe~🖕 [Jamie Vidler on Patreon, Remove Date if not paid: 07/01/2017]
+		80192910,	-- Cheshire [Nathan Perscott on Patreon, Removed Date if not paid: 29/01/2017]
+		28261641	-- Timoznn [Timo Nurnberg on Patreon, Removed Date if not paid: 29/01/2017]
 	}
 
 _G.banned_players = {
@@ -83,6 +83,76 @@ BARRACKMENTS[6] = 1
 BARRACKMENTS[7] = 1
 BARRACKMENTS[8] = 1
 
+HEROLIST = {}
+HEROLIST[1] = "enchantress"			-- Dryad
+HEROLIST[2] = "crystal_maiden"		-- Archmage
+HEROLIST[3] = "luna"				-- Huntress
+HEROLIST[4] = "beastmaster"			-- Beastmaster
+HEROLIST[5] = "pugna"				-- Dread Lord
+HEROLIST[6] = "lich"				-- Lich
+HEROLIST[7] = "weaver"				-- Crypt Lord
+HEROLIST[8] = "abyssal_underlord"	-- Pit Lord
+HEROLIST[9] = "terrorblade"			-- Demon Hunter
+HEROLIST[10] = "phantom_assassin"	-- Warden
+HEROLIST[11] = "elder_titan"		-- Tauren Chieftain
+HEROLIST[12] = "mirana"				-- Priestess of the Moon
+HEROLIST[13] = "dragon_knight"		-- Arthas
+HEROLIST[14] = "windrunner"			-- Sylvanas Windrunner
+HEROLIST[15] = "invoker"			-- Blood Mage
+HEROLIST[16] = "sniper"				-- Rifleman
+HEROLIST[17] = "shadow_shaman"		-- Shadow Hunter
+HEROLIST[18] = "juggernaut"			-- Blademaster
+HEROLIST[19] = "omniknight"			-- Paladin
+HEROLIST[20] = "rattletrap"			-- Space Marine
+HEROLIST[21] = "chen"				-- Archimage
+HEROLIST[22] = "lina"				-- Sorceress
+HEROLIST[23] = "sven"				-- Mountain King
+HEROLIST[24] = "ursa"				-- Malfurion
+HEROLIST[25] = "nevermore"			-- Banehallow
+HEROLIST[26] = "brewmaster"			-- Pandaren Brewmaster
+HEROLIST[27] = "warlock"			-- Archimonde
+
+HEROLIST_ALT = {}
+HEROLIST_ALT[1] = enchantress		-- Dryad
+HEROLIST_ALT[2] = crystal_maiden	-- Archmage
+HEROLIST_ALT[3] = luna				-- Huntress
+HEROLIST_ALT[4] = beastmaster		-- Beastmaster
+HEROLIST_ALT[5] = pugna				-- Dread Lord
+HEROLIST_ALT[6] = lich				-- Lich
+HEROLIST_ALT[7] = weaver			-- Crypt Lord
+HEROLIST_ALT[8] = abyssal_underlord	-- Pit Lord
+HEROLIST_ALT[9] = terrorblade		-- Demon Hunter
+HEROLIST_ALT[10] = phantom_assassin	-- Warden
+HEROLIST_ALT[11] = elder_titan		-- Tauren Chieftain
+HEROLIST_ALT[12] = mirana			-- Priestess of the Moon
+HEROLIST_ALT[13] = dragon_knight	-- Arthas
+HEROLIST_ALT[14] = windrunner		-- Sylvanas Windrunner
+HEROLIST_ALT[15] = invoker			-- Blood Mage
+HEROLIST_ALT[16] = sniper			-- Rifleman
+HEROLIST_ALT[17] = shadow_shaman	-- Shadow Hunter
+HEROLIST_ALT[18] = juggernaut		-- Blademaster
+HEROLIST_ALT[19] = omniknight		-- Paladin
+HEROLIST_ALT[20] = rattletrap		-- Space Marine
+HEROLIST_ALT[21] = chen				-- Archimage
+HEROLIST_ALT[22] = lina				-- Sorceress
+HEROLIST_ALT[23] = sven				-- Mountain King
+HEROLIST_ALT[24] = ursa				-- Malfurion
+HEROLIST_ALT[25] = nevermore		-- Banehallow
+HEROLIST_ALT[26] = brewmaster		-- Pandaren Brewmaster
+HEROLIST_ALT[27] = warlock			-- Archimonde
+
+HEROLIST_VIP = {}
+HEROLIST_VIP[1] = "slardar"				-- Centurion
+HEROLIST_VIP[2] = "skeleton_king"		-- Lich King
+HEROLIST_VIP[3] = "meepo"				-- Kobold Knight
+HEROLIST_VIP[4] = "chaos_knight"		-- Dark Fundamental
+
+HEROLIST_VIP_ALT = {}
+HEROLIST_VIP_ALT[1] = slardar			-- Centurion
+HEROLIST_VIP_ALT[2] = skeleton_king		-- Lich King
+HEROLIST_VIP_ALT[3] = meepo				-- Kobold Knight
+HEROLIST_VIP_ALT[4] = chaos_knight		-- Dark Fundamental
+
 timers = {}
 
 if GameMode == nil then
@@ -98,6 +168,7 @@ require('libraries/projectiles')
 require('libraries/notifications')
 require('libraries/animations')
 require('libraries/attachments')
+require('phases/choose_hero')
 require('phases/creeps')
 require('phases/special_events')
 require('phases/phase1')
@@ -176,7 +247,7 @@ local triggers_choice = Entities:FindAllByName("trigger_special_event_choice")
 
 	-- Timer: Creep Levels 1 to 6. Lanes 1 to 8.
 	Timers:CreateTimer(0, function()
-		print(time_elapsed)
+--		print(time_elapsed)
 		time_elapsed = time_elapsed + 30
 		SpawnCreeps()
 	return 30
@@ -439,7 +510,6 @@ end
 function GameMode:InitGameMode()
 	GameMode = self
 	mode = GameRules:GetGameModeEntity()
-	local difficulty = GameRules:GetCustomGameDifficulty()
 
 	-- Timer Rules
 	GameRules:SetPreGameTime( 120.0 ) --120.0
@@ -448,7 +518,7 @@ function GameMode:InitGameMode()
 	GameRules:SetHeroSelectionTime( 0.0 ) --This is not dota bitch
 	GameRules:SetGoldTickTime( 0.0 ) --This is not dota bitch
 	GameRules:SetGoldPerTick( 0.0 ) --This is not dota bitch
-	GameRules:SetCustomGameSetupAutoLaunchDelay( 10.0 ) --Vote Time
+	GameRules:SetCustomGameSetupAutoLaunchDelay( 15.0 ) --Vote Time
 
 	-- Boolean Rules
 	GameRules:LockCustomGameSetupTeamAssignment( true )
@@ -585,11 +655,7 @@ function GameMode:OnGameRulesStateChange(keys)
 		self._fPreGameStartTime = GameRules:GetGameTime()
 		for _,hero in pairs(heroes) do
 			if hero:IsRealHero() then
---				local item1 = CreateItem("item_ankh_of_reincarnation", hero, hero)
---				hero:AddItem(item1)
 
---				local item2 = CreateItem("item_faerie_fire", hero, hero)
---				hero:AddItem(item2)
 			end
 		end
 		SpawnHeroesBis()

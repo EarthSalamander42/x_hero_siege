@@ -5298,12 +5298,12 @@
 				{
 					"ApplyModifier"
 					{
-						"ModifierName"		"modifier_viper_poison_attack_debuff_datadriven"
+						"ModifierName"		"modifier_viper_poison_attack_debuff"
 						"Target"			"TARGET"
 					}
 				}
 			}
-	
+
 			"modifier_viper_poison_attack_debuff"
 			{
 				"IsDebuff"		"1"
@@ -7269,8 +7269,8 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"    "heroes/hero_blademaster/mirror_image.lua"
-				"Function"      "PhantasmVision"
+				"ScriptFile"    "heroes/hero_blademaster.lua"
+				"Function"      "MirrorImageVision"
 			}
 
 			"ApplyModifier"
@@ -7308,8 +7308,8 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"    "heroes/hero_blademaster/mirror_image.lua"
-						"Function"      "Phantasm"
+						"ScriptFile"    "heroes/hero_blademaster.lua"
+						"Function"      "MirrorImage"
 						"sound"         "Hero_ChaosKnight.Phantasm.Plus"
 					}
 				}
@@ -8747,7 +8747,7 @@
 	//=================================================================================================================
 	"holdout_thunder_clap"
 	{
-		"BaseClass"						"brewmaster_thunder_clap"
+		"BaseClass"						"brewmaster_thunder_clap_new"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"AbilityCooldown"				"6.0"
 		
@@ -9105,7 +9105,7 @@
 	//=================================================================================================================
 	"holdout_thunder_clap_20"
 	{
-		"BaseClass"						"brewmaster_thunder_clap"
+		"BaseClass"						"brewmaster_thunder_clap_new"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"AbilityCooldown"				"5.0"
 		"MaxLevel"						"1"
@@ -10228,7 +10228,7 @@
 	{
 		// Time		
 		//-------------------------------------------------------------------------------------------------------------
-		"BaseClass"						"brewmaster_thunder_clap"
+		"BaseClass"						"holdout_war_thunder"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"AbilityTextureName"			"holdout_war_thunder"
 		"AbilityCooldown"				"16.0"
@@ -10331,8 +10331,8 @@
 
 			"modifier_aura_of_blight_datadriven"
 			{
-				"Passive"   "1"
-				"IsHidden"  "0"
+				"Passive"		"1"
+				"IsHidden"		"0"
 
 				"OnCreated"
 				{
@@ -16398,7 +16398,7 @@
 			"model"         "models/items/dragon_knight/oblivion_blazer_dragon/oblivion_blazer_dragon.vmdl" //Blue Dragon
 			"model"         "models/items/dragon_knight/fireborn_dragon/fireborn_dragon.vmdl" //Purple Dragon
 		}
-	
+
 		// Time     
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityCooldown"			"140.0 130.0 120.0"
@@ -17761,11 +17761,10 @@
 								"Target"		"TARGET"
 							}
 
-							"CleaveAttack"
+							"RunScript"
 							{
-								"CleavePercent"         "%splash_percent"
-								"CleaveRadius"          "%radius"
-								"CleaveEffect"          "particles/units/heroes/hero_sven/sven_spell_great_cleave.vpcf"
+								"ScriptFile"	"heroes/hero_malfurion.lua"
+								"Function"		"MarkOfTheClaw"
 							}
 						}
 					}
@@ -17785,7 +17784,7 @@
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_BASIC | DOTA_UNIT_TARGET_HERO"
-		"AbilityTextureName"			"brewmaster_thunder_clap"
+		"AbilityTextureName"			"brewmaster_thunder_clap_new"
 		"MaxLevel"						"1"
 
 		"AbilitySpecial"
@@ -17815,7 +17814,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/hero_malfurion/strength_of_the_wild.lua"
+						"ScriptFile"	"heroes/hero_malfurion.lua"
 						"Function"		"StrengthOfTheWild"
 					}
 				}
@@ -17950,7 +17949,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"		"heroes/hero_malfurion/true_form.lua"
+				"ScriptFile"		"heroes/hero_malfurion.lua"
 				"Function"			"LevelUpAbility"
 				"ability_name"		"holdout_bear_form_druid"
 			}
@@ -17993,7 +17992,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"			"heroes/hero_malfurion/true_form.lua"
+						"ScriptFile"			"heroes/hero_malfurion.lua"
 						"Function"				"TrueFormStart"
 						"model"					"models/items/lone_druid/bear/spirit_of_the_atniw/spirit_of_the_atniw.vmdl"
 						"sub_ability_name"		"holdout_bear_form_druid"
@@ -18001,7 +18000,7 @@
 
 					"RunScript"
 					{
-						"ScriptFile"			"heroes/hero_malfurion/true_form.lua"
+						"ScriptFile"			"heroes/hero_malfurion.lua"
 						"Function"				"HideWearables"
 					}
 				}
@@ -18010,7 +18009,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"			"heroes/hero_malfurion/true_form.lua"
+						"ScriptFile"			"heroes/hero_malfurion.lua"
 						"Function"				"TrueFormEnd"
 						"main_ability_name"		"holdout_bear_form"
 						"remove_modifier_name"	"modifier_true_form"
@@ -18054,6 +18053,11 @@
 				"var_type"					"FIELD_FLOAT"
 				"transformation_time"		"1.933"
 			}
+			"02"
+			{
+				"var_type"					"FIELD_FLOAT"
+				"bat_reduction"				"0.35"
+			}
 		}
 	
 		"OnSpellStart"
@@ -18075,7 +18079,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"		"heroes/hero_malfurion/true_form.lua"
+				"ScriptFile"		"heroes/hero_malfurion.lua"
 				"Function"			"LevelUpAbility"
 				"ability_name"		"holdout_bear_form"
 			}
@@ -18121,7 +18125,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"			"heroes/hero_malfurion/true_form.lua"
+						"ScriptFile"			"heroes/hero_malfurion.lua"
 						"Function"				"TrueFormEnd"
 						"main_ability_name"		"holdout_bear_form"
 						"remove_modifier_name"	"modifier_true_form"
@@ -18822,7 +18826,7 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"BaseClass"             		"brewmaster_thunder_clap"
+		"BaseClass"             		"brewmaster_thunder_clap_new"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_PURE"
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
@@ -18884,7 +18888,7 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"BaseClass"             		"brewmaster_thunder_clap"
+		"BaseClass"             		"brewmaster_thunder_clap_new"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
@@ -25006,6 +25010,53 @@
 			{
 				"var_type"					"FIELD_INTEGER"
 				"bonus_armor"				"30 60 90 135"
+			}
+		}
+	}
+
+	//=========================================================================================
+	// Kobold Knight: Divine Aura Tooltip
+	//=========================================================================================
+	"holdout_divine_aura_tooltip"
+	{
+		// General
+		//-------------------------------------------------------------------------------------
+		"BaseClass"					"ability_datadriven"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_AURA"
+		"AbilityTextureName"		"holdout_divine_aura"
+		"RequiredLevel"				"8"
+		"LevelsBetweenUpgrades"		"3"
+		"AbilityCastRange"			"900"
+		"AbilityUnitTargetFlags"	"DOTA_UNIT_TARGET_FLAG_NOT_ANCIENTS"
+
+		// Stats
+		//-------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"bat_reduction"			"0.1 0.2 0.3 0.4"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_movement_speed_percentage"	"5 10 15 20"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_armor"			"10 25 50 100"
+			}
+			"04"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_health_regen"	"15 30 45 90"
+			}
+			"05"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"radius"				"900"
 			}
 		}
 	}

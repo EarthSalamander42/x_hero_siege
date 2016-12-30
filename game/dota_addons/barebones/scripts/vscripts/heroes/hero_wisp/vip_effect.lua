@@ -1,7 +1,7 @@
 function RedWisp(keys)
 local caster = keys.caster
 	if caster:GetUnitName() == "npc_dota_hero_wisp" then
-		for i = 1, #vip_members do
+		for i = 1, #golden_vip_members do
 			if PlayerResource:GetSteamAccountID(caster:GetPlayerID()) == mod_creator[i] then
 				local vip_effect = ParticleManager:CreateParticle("particles/status_fx/status_effect_holdout_borrowed_time_3.vpcf", PATTACH_ABSORIGIN_FOLLOW, caster)
 				ParticleManager:SetParticleControl(vip_effect, 0, caster:GetAbsOrigin())

@@ -16,14 +16,11 @@
 
 		"#DOTA_Item_Build_Starting_Items"
 		{
-			"item"		"item_poor_mans_shield"
-			"item"		"item_healing_potion"
-			"item"		"item_mana_potion"
+			"item"		"item_amulet_of_the_wild"
 		}
 
 		"#DOTA_Item_Build_Early_Game"
 		{
-			"item"		"item_amulet_of_the_wild"
 			"item"		"item_tome_small"
 			"item"		"item_ankh_of_reincarnation"
 			"item"		"item_claws_of_attack"

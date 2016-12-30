@@ -194,9 +194,9 @@ function GameMode:OnNPCSpawned(keys)
 --	end
 
 	if npc:GetTeam() == DOTA_TEAM_GOODGUYS then
-		for i = 1, #vip_members do
-			-- Cookies or X Hero Siege
-			if npc:IsHero() then
+		for i = 1, #golden_vip_members do
+			if npc:IsRealHero() then
+				-- Cookies or X Hero Siege Official
 				if PlayerResource:GetSteamAccountID(npc:GetPlayerID()) == mod_creator[i] then
 					npc:SetCustomHealthLabel("Mod Creator", 200, 45, 45)
 					if not npc:HasAbility("holdout_vip") then
@@ -212,7 +212,7 @@ function GameMode:OnNPCSpawned(keys)
 						vip_ability:SetLevel(1)
 					end
 				end
-				-- Mugiwara
+				-- Mugiwara or Flotos
 				if PlayerResource:GetSteamAccountID(npc:GetPlayerID()) == mod_graphist[i] then
 					npc:SetCustomHealthLabel("Mod Graphist", 55, 55, 200)
 					if not npc:HasAbility("holdout_vip") then
@@ -239,12 +239,12 @@ function GameMode:OnNPCSpawned(keys)
 		end
 	end
 
-	if npc:GetTeam() == DOTA_TEAM_BADGUYS then
-		if not npc:HasAbility("holdout_frost_effect") then
-			local frost_effect = npc:AddAbility("holdout_frost_effect")
-			frost_effect:SetLevel(1)
-		end
-	end
+--	if npc:GetTeam() == DOTA_TEAM_BADGUYS then
+--		if not npc:HasAbility("holdout_frost_effect") then
+--			local frost_effect = npc:AddAbility("holdout_frost_effect")
+--			frost_effect:SetLevel(1)
+--		end
+--	end
 
 --	if npc:GetTeam() == DOTA_TEAM_NEUTRALS then
 --		if not npc:HasAbility("holdout_frost_effect") then
@@ -260,9 +260,6 @@ end
 -- An entity somewhere has been hurt.  This event fires very often with many units so don't do too many expensive
 -- operations here
 function GameMode:OnEntityHurt(keys)
-	--DebugPrint("[BAREBONES] Entity Hurt")
-	--DebugPrintTable(keys)
-
 	local damagebits = keys.damagebits -- This might always be 0 and therefore useless
 	if keys.entindex_attacker ~= nil and keys.entindex_killed ~= nil then
 	local entCause = EntIndexToHScript(keys.entindex_attacker)
@@ -279,9 +276,6 @@ end
 
 -- An item was picked up off the ground
 function GameMode:OnItemPickedUp(keys)
-	DebugPrint( '[BAREBONES] OnItemPickedUp' )
-	DebugPrintTable(keys)
-
 	local heroEntity = EntIndexToHScript(keys.HeroEntityIndex)
 	local itemEntity = EntIndexToHScript(keys.ItemEntityIndex)
 	local player = PlayerResource:GetPlayer(keys.PlayerID)
@@ -291,15 +285,11 @@ end
 -- A player has reconnected to the game. This function can be used to repaint Player-based particles or change
 -- state as necessary
 function GameMode:OnPlayerReconnect(keys)
-	DebugPrint( '[BAREBONES] OnPlayerReconnect' )
-	DebugPrintTable(keys) 
+
 end
 
 -- An item was purchased by a player
 function GameMode:OnItemPurchased( keys )
-	DebugPrint( '[BAREBONES] OnItemPurchased' )
-	DebugPrintTable(keys)
-
 	-- The playerID of the hero who is buying something
 	local plyID = keys.PlayerID
 	if not plyID then return end
@@ -314,52 +304,35 @@ end
 
 -- An ability was used by a player
 function GameMode:OnAbilityUsed(keys)
-	DebugPrint('[BAREBONES] AbilityUsed')
-	DebugPrintTable(keys)
-
 	local player = PlayerResource:GetPlayer(keys.PlayerID)
 	local abilityname = keys.abilityname
 end
 
 -- A non-player entity (necro-book, chen creep, etc) used an ability
 function GameMode:OnNonPlayerUsedAbility(keys)
-	DebugPrint('[BAREBONES] OnNonPlayerUsedAbility')
-	DebugPrintTable(keys)
-
 	local abilityname=  keys.abilityname
 end
 
 -- A player changed their name
 function GameMode:OnPlayerChangedName(keys)
-	DebugPrint('[BAREBONES] OnPlayerChangedName')
-	DebugPrintTable(keys)
-
 	local newName = keys.newname
 	local oldName = keys.oldName
 end
 
 -- A player leveled up an ability
 function GameMode:OnPlayerLearnedAbility( keys)
-	DebugPrint('[BAREBONES] OnPlayerLearnedAbility')
-	DebugPrintTable(keys)
-
 	local player = EntIndexToHScript(keys.player)
 	local abilityname = keys.abilityname
 end
 
 -- A channelled ability finished by either completing or being interrupted
 function GameMode:OnAbilityChannelFinished(keys)
-	DebugPrint('[BAREBONES] OnAbilityChannelFinished')
-	DebugPrintTable(keys)
-
 	local abilityname = keys.abilityname
 	local interrupted = keys.interrupted == 1
 end
 
 -- A player leveled up
 function GameMode:OnPlayerLevelUp(keys)
-DebugPrint('[BAREBONES] OnPlayerLevelUp')
-DebugPrintTable(keys)
 local player = EntIndexToHScript(keys.player)
 local level = keys.level
 local hero = player:GetAssignedHero()
@@ -373,6 +346,7 @@ local AbilitiesHeroes_XX = {
 	npc_dota_hero_sven = {{"holdout_storm_bolt_20", 0}, {"holdout_thunder_clap_20", 1}},
 	npc_dota_hero_brewmaster = {{"enraged_wildkin_tornado", 4}},
 	npc_dota_hero_nevermore = {{"holdout_rain_of_chaos_20", 6}},
+	npc_dota_hero_terrorblade = {{"holdout_resistant_skin", 6}},
 	}
 
 	if hero_level == 17 then -- Debug because 7.0
@@ -462,7 +436,7 @@ local AbilitiesHeroes_XX = {
 
 	if hero_level == 20 then
 		-- level up all abilities, that are not leveled up
-		for i = 0,15 do 
+		for i = 0, 17 do 
 		local ability = hero:GetAbilityByIndex(i)
 			if IsValidEntity(ability) then
 				if ability:GetLevel() < ability:GetMaxLevel() then
@@ -492,9 +466,6 @@ end
 
 -- A player last hit a creep, a tower, or a hero
 function GameMode:OnLastHit(keys)
-	DebugPrint('[BAREBONES] OnLastHit')
-	DebugPrintTable(keys)
-
 	local isFirstBlood = keys.FirstBlood == 1
 	local isHeroKill = keys.HeroKill == 1
 	local isTowerKill = keys.TowerKill == 1
@@ -513,9 +484,6 @@ end
 
 -- A rune was activated by a player
 function GameMode:OnRuneActivated (keys)
-	DebugPrint('[BAREBONES] OnRuneActivated')
-	DebugPrintTable(keys)
-
 	local player = PlayerResource:GetPlayer(keys.PlayerID)
 	local rune = keys.rune
 
@@ -536,18 +504,12 @@ end
 
 -- A player took damage from a tower
 function GameMode:OnPlayerTakeTowerDamage(keys)
-	DebugPrint('[BAREBONES] OnPlayerTakeTowerDamage')
-	DebugPrintTable(keys)
-
 	local player = PlayerResource:GetPlayer(keys.PlayerID)
 	local damage = keys.damage
 end
 
 -- A player picked a hero
 function GameMode:OnPlayerPickHero(keys)
-	DebugPrint('[BAREBONES] OnPlayerPickHero')
-	DebugPrintTable(keys)
-
 	local heroClass = keys.hero
 	local heroEntity = EntIndexToHScript(keys.heroindex)
 	local player = EntIndexToHScript(keys.player)
@@ -643,6 +605,22 @@ local playerKills = PlayerResource:GetKills(KillerID)
 			end)
 		end)
 		RAMERO = 1
+	elseif killerEntity:GetKills() >= 1500 and RAMERO == 0 and NEUTRAL_SPAWN == 0 then -- 1500
+	local point = Entities:FindByName(nil, "npc_dota_muradin_player_1"):GetAbsOrigin()
+		killerEntity:AddNewModifier( nil, nil, "modifier_animation_freeze_stun", nil)
+		killerEntity:AddNewModifier( nil, nil, "modifier_invulnerable", nil)
+		Notifications:TopToAll({text="A hero has reached 1500 kills and will fight Ramero!", style={color="white"}, duration=5.0})
+		Timers:CreateTimer(5.0, function()
+			FindClearSpaceForUnit(killerEntity, point, true)
+			PlayerResource:SetCameraTarget(killerEntity:GetPlayerOwnerID(), killerEntity)
+			RameroEvent()
+			killerEntity:RemoveModifierByName("modifier_animation_freeze_stun")
+			killerEntity:RemoveModifierByName("modifier_invulnerable")
+			Timers:CreateTimer(0.1, function()
+				PlayerResource:SetCameraTarget(killerEntity:GetPlayerOwnerID(), nil)
+			end)
+		end)
+		RAMERO = 1
 	end
 
 	-- Ends lanes spawning when the linked barrackment is destroyed
@@ -666,6 +644,13 @@ local playerKills = PlayerResource:GetKills(KillerID)
 
 	if killedUnit:GetUnitName() == "npc_baristal" then
 		local item = CreateItem("item_tome_big", nil, nil)
+		local pos = killedUnit:GetAbsOrigin()
+		local drop = CreateItemOnPositionSync( pos, item )
+		item:LaunchLoot(false, 300, 0.5, pos)
+	end
+
+	if killedUnit:GetUnitName() == "npc_ramero_2" then
+		local item = CreateItem("item_ring_of_superiority", nil, nil)
 		local pos = killedUnit:GetAbsOrigin()
 		local drop = CreateItemOnPositionSync( pos, item )
 		item:LaunchLoot(false, 300, 0.5, pos)
@@ -710,9 +695,6 @@ end
 
 -- This function is called once when the player fully connects and becomes "Ready" during Loading
 function GameMode:OnConnectFull(keys)
-	DebugPrint('[BAREBONES] OnConnectFull')
-	DebugPrintTable(keys)
-
 	GameMode:_OnConnectFull(keys)
 	
 	local entIndex = keys.index+1
@@ -739,17 +721,11 @@ end
 
 -- This function is called whenever illusions are created and tells you which was/is the original entity
 function GameMode:OnIllusionsCreated(keys)
-	DebugPrint('[BAREBONES] OnIllusionsCreated')
-	DebugPrintTable(keys)
-
 	local originalEntity = EntIndexToHScript(keys.original_entindex)
 end
 
 -- This function is called whenever an item is combined to create a new item
 function GameMode:OnItemCombined(keys)
-	DebugPrint('[BAREBONES] OnItemCombined')
-	DebugPrintTable(keys)
-
 	-- The playerID of the hero who is buying something
 	local plyID = keys.PlayerID
 	if not plyID then return end
@@ -764,18 +740,12 @@ end
 
 -- This function is called whenever an ability begins its PhaseStart phase (but before it is actually cast)
 function GameMode:OnAbilityCastBegins(keys)
-	DebugPrint('[BAREBONES] OnAbilityCastBegins')
-	DebugPrintTable(keys)
-
 	local player = PlayerResource:GetPlayer(keys.PlayerID)
 	local abilityName = keys.abilityname
 end
 
 -- This function is called whenever a tower is killed
 function GameMode:OnTowerKill(keys)
-	DebugPrint('[BAREBONES] OnTowerKill')
-	DebugPrintTable(keys)
-
 	local gold = keys.gold
 	local killerPlayer = PlayerResource:GetPlayer(keys.killer_userid)
 	local team = keys.teamnumber
@@ -783,9 +753,6 @@ end
 
 -- This function is called whenever a player changes there custom team selection during Game Setup 
 function GameMode:OnPlayerSelectedCustomTeam(keys)
-	DebugPrint('[BAREBONES] OnPlayerSelectedCustomTeam')
-	DebugPrintTable(keys)
-
 	local player = PlayerResource:GetPlayer(keys.player_id)
 	local success = (keys.success == 1)
 	local team = keys.team_id

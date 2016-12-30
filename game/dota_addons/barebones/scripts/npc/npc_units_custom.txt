@@ -2624,7 +2624,7 @@
 
 		// Bounty
 		//----------------------------------------------------------------
-		"BountyXP"					"250"		// Experience earn.
+		"BountyXP"					"160"		// Experience earn.
 		"BountyGoldMin"				"2400"		// Gold earned min.
 		"BountyGoldMax"				"2600"		// Gold earned max.
 
@@ -5554,7 +5554,7 @@
 		"SoundSet"					"Hero_AbyssalUnderlord"							// Name of sound set.
 		"ConsideredHero"			"1"
 		"Portrait"					"vgui/hud/heroportraits/portrait_centaur"
-		"ModelScale"				"2.0"
+		"ModelScale"				"1.8"
 		"Level"						"1"
 
 		"Ability1"					"creature_firestorm"
@@ -9976,6 +9976,111 @@
 	}
 
 	//=================================================================================
+	// Special Event: Ramero 1500 Kills
+	//=================================================================================
+	"npc_ramero_2"
+	{
+		// General
+		//----------------------------------------------------------------
+		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
+		"Model"						"models/heroes/sven/sven.vmdl"	// Model.
+		"ModelScale"				"1.55"
+		"ConsideredHero"			"1"
+		"HasInventory"				"1"
+		"SoundSet"					"Hero_Sven"
+
+		// Abilities
+		//----------------------------------------------------------------
+		"Ability1"					""	// Ability 1.
+		"Ability2"					""			// Ability 2.
+		"Ability3"					"endurance_aura"			// Ability 3.
+		"Ability4"					""						// Ability 6 - Extra.
+		"Ability5"					""						// Ability 7 - Extra.
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"				"150"			// Physical protection.
+		"MagicalResistance"			"25"			// Magical protection (percentage).
+
+		// Attack
+		//----------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
+		"AttackDamageMin"			"9990"		// Damage range min.
+		"AttackDamageMax"			"10010"		// Damage range max.
+		"AttackDamageType"			"DAMAGE_TYPE_ArmorPhysical"
+		"AttackRate"				"0.125"			// Speed of attack.
+		"AttackAnimationPoint"		"0.6"		// Normalized time in animation cycle to attack.
+		"AttackAcquisitionRange"	"2000"		// Range within a target can be acquired.
+		"AttackRange"				"160"		// Range within a target can be attacked.
+		"ProjectileModel"			"" // Particle system model for projectile.
+		"ProjectileSpeed"			""		// Speed of projectile.
+
+		// Bounty
+		//----------------------------------------------------------------
+		"BountyXP"					"0"		// Experience earn.
+		"BountyGoldMin"				"0"		// Gold earned min.
+		"BountyGoldMax"				"0"		// Gold earned max.
+
+		// Bounds
+		//----------------------------------------------------------------
+		"BoundsHullName"			"DOTA_HULL_SIZE_HERO"			// Hull type used for navigation/locomotion.
+		"RingRadius"				"160"
+		"HealthBarOffset"			"300"
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"			// Type of locomotion - ground, air
+		"MovementSpeed"				"360"		// Speed
+		"MovementTurnRate"			"1.0"		// Turning rate.
+
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"150000"		// Base health.
+		"StatusHealthRegen"			"10.0"		// Health regeneration rate.
+		"StatusMana"				"0.0"		// Base mana.
+		"StatusManaRegen"			"0.0"		// Mana regeneration rate.
+
+		// Team
+		//----------------------------------------------------------------
+		"TeamName"					"DOTA_TEAM_BADGUYS"			// Team name.
+		"CombatClassAttack"			"DOTA_COMBAT_CLASS_ATTACK_HERO"
+		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_HERO"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
+
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"1400"		// Range of vision during day light.
+		"VisionNighttimeRange"		"1400"		// Range of vision at night time.
+
+//		"vscripts"					"ai/frost_infernal.lua"
+
+		// Inventory
+		//----------------------------------------------------------------
+		"HasInventory"				"1"
+
+		"Creature"
+		{
+			"EquippedItems"
+			{
+				"KeyOf3Moons"
+				{
+					"Item"					""
+				}
+			}
+
+			"AttachWearables"
+			{
+				"Wearable1" { "ItemDef" "7983" }	//Mask - Armature of the Belligerent Ram
+				"Wearable2" { "ItemDef" "7980" }	//Sword
+				"Wearable3" { "ItemDef" "7985" }	//Belt
+				"Wearable4" { "ItemDef" "7984" }	//Gauntlet
+				"Wearable5" { "ItemDef" "7982" }	//Shoulder
+				"Wearable6" { "ItemDef" "7981" }	//Back
+			}
+		}
+	}
+
+	//=================================================================================
 	// Special Event: Ramero Dummy
 	//=================================================================================
 	"npc_ramero_bis"
@@ -13241,7 +13346,7 @@
 		"Ability1"				"holdout_life_steal"
 		"Ability2"				"meepo_poof"
 		"Ability3"				"holdout_slow_pool"		
-		"Ability4"				"holdout_divine_aura"
+		"Ability4"				"holdout_divine_aura_tooltip"
 		"Ability5"				"holdout_last_stand"
 		"Ability6"				"holdout_kobold_army"
 		"Ability7"				"dummy_passive_vulnerable"

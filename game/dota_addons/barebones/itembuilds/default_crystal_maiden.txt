@@ -1,8 +1,8 @@
-"itembuilds/test_omniknight.txt"
+"itembuilds/test_crystal_maiden.txt"
 {
 	"author"		"X Hero Siege Official"
-	"hero"			"npc_dota_hero_omniknight"
-	"Title"			"Recommended items for Paladin"
+	"hero"			"npc_dota_hero_crystal_maiden"
+	"Title"			"Recommended items for Archmage"
 
 	"Items"
 	{
@@ -10,7 +10,7 @@
 		{
 		}
 
-		"#DOTA_Item_Build_Hero18"
+		"#DOTA_Item_Build_Hero20"
 		{
 		}
 
@@ -21,17 +21,16 @@
 
 		"#DOTA_Item_Build_Early_Game"
 		{
-			"item"		"item_orb_of_fire"
-			"item"		"item_ankh_of_reincarnation"
 			"item"		"item_tome_small"
-			"item"		"item_gloom_blade"
+			"item"		"item_ankh_of_reincarnation"
+			"item"		"item_bracer_of_endurance"
+			"item"		"item_scepter_of_mastery"
 		}
 
 		"#DOTA_Item_Build_Core_Items"
 		{
-			"item"		"item_assassins_blade"
+			"item"		"item_lifesteal_mask"
 			"item"		"item_bracer_of_protection"
-			"item"		"item_assassins_blade"
 		}
 
 		"#DOTA_Item_Build_Luxury"

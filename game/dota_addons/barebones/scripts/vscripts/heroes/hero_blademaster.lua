@@ -1,7 +1,7 @@
 --[[Author: Pizzalol, Noya, Ractidous
 	Date: 08.04.2015.
 	Creates illusions while shuffling the positions]]
-function Phantasm( keys )
+function MirrorImage( keys )
 	local caster = keys.caster
 	local player = caster:GetPlayerOwnerID()
 	local ability = keys.ability
@@ -98,29 +98,23 @@ function Phantasm( keys )
 		-- Recreate the items of the caster
 		for itemSlot=0,5 do
 			local item = caster:GetItemInSlot(itemSlot)
-			if item ~= nil and item:GetName() ~= "item_cloak_of_flames" and item:GetName() ~= "item_ankh_of_reincarnation" and item:GetName() ~= "item_salve_1000" and item:GetName() ~= "item_mana_salve" then
+			if item ~= nil and item:GetName() ~= "item_cloak_of_flames" and item:GetName() ~= "item_ankh_of_reincarnation" and item:GetName() ~= "item_healing_potion" and item:GetName() ~= "item_mana_potion" and item:GetName() ~= "item_orb_of_fire" then
 				local itemName = item:GetName()
 				local newItem = CreateItem(itemName, illusion, illusion)
 				illusion:AddItem(newItem)
 			end
 		end
 
-		-- Set the unit as an illusion
-		-- modifier_illusion controls many illusion properties like +Green damage not adding to the unit damage, not being able to cast spells and the team-only blue particle
 		illusion:AddNewModifier(caster, ability, "modifier_illusion", { duration = duration, outgoing_damage = outgoingDamage, incoming_damage = incomingDamage })
-
-		-- Without MakeIllusion the unit counts as a hero, e.g. if it dies to neutrals it says killed by neutrals, it respawns, etc.
 		illusion:MakeIllusion()
-		-- Set the illusion hp to be the same as the caster
 		illusion:SetHealth(caster:GetHealth())
 		illusion:SetPlayerID(caster:GetPlayerOwnerID())
-		-- Add the illusion created to a table within the caster handle, to remove the illusions on the next cast if necessary
 		table.insert(caster.phantasm_illusions, illusion)
 	end
 end
 
 --[[Creates vision around the caster while shuffling the illusions]]
-function PhantasmVision( keys )
+function MirrorImageVision( keys )
 	local caster = keys.caster
 	local caster_location = caster:GetAbsOrigin()
 	local ability = keys.ability
