@@ -9,7 +9,7 @@ function Reincarnation( event )
 		
 		hero.respawn_timer = Timers:CreateTimer(respawntime,function () 
 			hero:SetRespawnPosition(position)
-			hero:EmitSound("Hero_SkeletonKing.Reincarnate.Stinger")
+			hero:EmitSound("Ability.ReincarnationAlt")
 			hero:RespawnHero(false, false, false)
 			ParticleManager:CreateParticle("particles/items_fx/aegis_respawn.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
 			hero.ankh_respawn = false

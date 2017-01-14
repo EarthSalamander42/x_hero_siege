@@ -173,3 +173,39 @@ function HasScepter(hero)
 	
 	return false
 end
+
+function shallowcopy(orig)
+    local orig_type = type(orig)
+    local copy
+    if orig_type == 'table' then
+        copy = {}
+        for orig_key, orig_value in pairs(orig) do
+            copy[orig_key] = orig_value
+        end
+    else -- number, string, boolean, etc
+        copy = orig
+    end
+    return copy
+end
+
+function ShuffledList( orig_list )
+    local list = shallowcopy( orig_list )
+    local result = {}
+    local count = #list
+    for i = 1, count do
+        local pick = RandomInt( 1, #list )
+        result[ #result + 1 ] = list[ pick ]
+        table.remove( list, pick )
+    end
+    return result
+end
+
+function GenerateNumPointsAround(num, center, distance)
+    local points = {}
+    local angle = 360/num
+    for i=0,num-1 do
+        local rotate_pos = center + Vector(1,0,0) * distance
+        table.insert(points, RotatePosition(center, QAngle(0, angle*i, 0), rotate_pos) )
+    end
+    return points
+end

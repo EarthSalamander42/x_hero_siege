@@ -8,6 +8,7 @@ _G.RAMERO = 0
 _G.MAGTHERIDON = 0
 _G.FOUR_BOSSES = 0
 _G.SPIRIT_MASTER = 0
+_G.X_HERO_SIEGE_V = 3.33
 
 _G.mod_creator = {
 		54896080, -- Cookies
@@ -15,7 +16,8 @@ _G.mod_creator = {
 	}
 
 _G.captain_baumi = {
-		43305444 -- Baumi( Because why not? )
+		43305444, -- Baumi( Because why not? )
+		44022861 -- Padaa
 	}
 
 _G.mod_graphist = {
@@ -25,7 +27,9 @@ _G.mod_graphist = {
 
 _G.vip_members = {
 		320774890,	-- Error [Han Gao on Patreon, Remove Date if not paid: 26/01/2017]
-		97490223	-- IllidanStormrage [Lucas Diao on Patreon, Removed Date if not paid: 29/01/2017]
+		97490223,	-- IllidanStormrage [Lucas Diao on Patreon, Removed Date if not paid: 29/01/2017]
+		44364795,	-- Lyzer93 [Balraj McCoy on Patreon, Removed Date if not paid: 10/02/2017]
+		46744186	-- Captain Darian Frey [CaptainDarianFrey on Patreon, Removed Date if not paid: 10/02/2017]
 	}
 
 _G.golden_vip_members = {
@@ -37,16 +41,17 @@ _G.golden_vip_members = {
 		75034844,	-- Specter [Tyrael on Patreon, Remove Date if not paid: 05/01/2017]
 		110786327,	-- MechJesus [Mauro Solares on Patreon, Remove Date if not paid: 07/01/2017]
 		93860661,	-- Meteor [Supawit Enyord on Patreon, Remove Date if not paid: 10/01/2017]
-		190411200,	-- Nojo [Nojo on Patreon, Remove Date if not paid: 23/01/2017]
 		97629656,	-- jacobkahnji  [Jacob A Yow on Patreon, Remove Date if not paid: 23/01/2017]
 		136258650,	-- Meliodas [Dinh Quang on Patreon, Remove Date if not paid: 25/01/2017]
 		55770641,	-- Primeape [Filip Dingum on Patreon, Remove Date if not paid: 31/01/2017]
 		5194446,	-- Botd [Hugo Marques on Patreon, Remove Date if not paid: 31/01/2017]
 		27954291,	-- Gengar [Christian Oversand Deildok on Patreon, Remove Date if not paid: 04/01/2017]
-		113777627,	-- Mieu [phil lousbury on Patreon, Remove Date if not paid: 07/01/2017]
-		152511257,	-- MasKe~🖕 [Jamie Vidler on Patreon, Remove Date if not paid: 07/01/2017]
+--		113777627,	-- Mieu [phil lousbury on Patreon, Remove Date if not paid: 07/01/2017]
+--		152511257,	-- MasKe~🖕 [Jamie Vidler on Patreon, Remove Date if not paid: 07/01/2017]
 		80192910,	-- Cheshire [Nathan Perscott on Patreon, Removed Date if not paid: 29/01/2017]
-		28261641	-- Timoznn [Timo Nurnberg on Patreon, Removed Date if not paid: 29/01/2017]
+		28261641,	-- Timoznn [Timo Nurnberg on Patreon, Unlimited]
+		79258147,	-- Dyuss [Altynbek Duisenkul on Patreon, Removed Date if not paid: 10/02/2017]
+		66147815	-- FreshKiller23 [Unlimited]		
 	}
 
 _G.banned_players = {
@@ -111,6 +116,7 @@ HEROLIST[24] = "ursa"				-- Malfurion
 HEROLIST[25] = "nevermore"			-- Banehallow
 HEROLIST[26] = "brewmaster"			-- Pandaren Brewmaster
 HEROLIST[27] = "warlock"			-- Archimonde
+HEROLIST[28] = "axe"				-- Dota 2 Hero
 
 HEROLIST_ALT = {}
 HEROLIST_ALT[1] = enchantress		-- Dryad
@@ -140,18 +146,24 @@ HEROLIST_ALT[24] = ursa				-- Malfurion
 HEROLIST_ALT[25] = nevermore		-- Banehallow
 HEROLIST_ALT[26] = brewmaster		-- Pandaren Brewmaster
 HEROLIST_ALT[27] = warlock			-- Archimonde
+HEROLIST_ALT[28] = axe		-- Dota 2 Hero
 
 HEROLIST_VIP = {}
 HEROLIST_VIP[1] = "slardar"				-- Centurion
 HEROLIST_VIP[2] = "skeleton_king"		-- Lich King
 HEROLIST_VIP[3] = "meepo"				-- Kobold Knight
 HEROLIST_VIP[4] = "chaos_knight"		-- Dark Fundamental
+HEROLIST_VIP[5] = "tiny"				-- Stone Giant
+HEROLIST_VIP[6] = "sand_king"			-- Desert Wyrm
 
 HEROLIST_VIP_ALT = {}
 HEROLIST_VIP_ALT[1] = slardar			-- Centurion
 HEROLIST_VIP_ALT[2] = skeleton_king		-- Lich King
 HEROLIST_VIP_ALT[3] = meepo				-- Kobold Knight
 HEROLIST_VIP_ALT[4] = chaos_knight		-- Dark Fundamental
+HEROLIST_VIP_ALT[5] = tiny				-- Stone Giant
+HEROLIST_VIP_ALT[6] = sand_king			-- Desert Wyrm
+
 
 timers = {}
 
@@ -238,6 +250,9 @@ function GameMode:OnHeroInGame(hero)
 		hero:SetAbilityPoints(0)
 		hero:SetGold(0, false)
 		hero:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 20, IsHidden = true})
+		Timers:CreateTimer(3.0, function()
+			EmitGlobalSound("Global.InGame")
+		end)
 	end
 end
 
@@ -252,6 +267,8 @@ local triggers_choice = Entities:FindAllByName("trigger_special_event_choice")
 		SpawnCreeps()
 	return 30
 	end)
+
+--	EmitGlobalSound("Global.HumanMusic1") -- Lasts 4:33
 
 	-- Timer: Creeps Levels 2, 3, 4, 5, 6 Whispering
 	Timers:CreateTimer(360, function() -- 6 Min
@@ -368,7 +385,7 @@ local triggers_choice = Entities:FindAllByName("trigger_special_event_choice")
 	--//=================================================================================================================
 	--// Timer: North Event 6 Spawn
 	--//=================================================================================================================
-	Timers:CreateTimer(1621, function() -- 25 Min: CHAOS KNIGHTS EVENT 6
+	Timers:CreateTimer(1626, function() -- 25 Min: CHAOS KNIGHTS EVENT 6 - 1621
 	local point = Entities:FindByName( nil, "npc_dota_spawner_north_event"):GetAbsOrigin()
 		for j = 1, 10 do
 			local unit = CreateUnitByName("npc_dota_creature_chaos_knight_event_6", point, true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -514,7 +531,7 @@ function GameMode:InitGameMode()
 	-- Timer Rules
 	GameRules:SetPreGameTime( 120.0 ) --120.0
 	GameRules:SetPostGameTime( 30.0 )
-	GameRules:SetTreeRegrowTime( 60.0 )
+	GameRules:SetTreeRegrowTime( 120.0 )
 	GameRules:SetHeroSelectionTime( 0.0 ) --This is not dota bitch
 	GameRules:SetGoldTickTime( 0.0 ) --This is not dota bitch
 	GameRules:SetGoldPerTick( 0.0 ) --This is not dota bitch

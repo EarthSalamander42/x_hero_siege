@@ -61,3 +61,547 @@
         }
     }
 }
+
+"Blademaster.MirrorImage"
+{
+    "operator_stacks"
+    {
+        "update_stack"
+        {
+            "reference_operator"
+            {
+                "operator"              "sos_reference_stack"
+                "reference_stack"       "dota_update_default"
+                "operator_variables"
+                {
+                    "vsnd_files"
+                    {
+                        "value"
+                        {
+                            "value0"        "sounds/MirrorImage.vsnd"
+                        }
+                    }
+                    "volume"            {   "value"     "1.00000"  }
+                    "pitch_rand_min"    {   "value"     "0.00000"  }
+                    "pitch_rand_max"    {   "value"     "0.000000"  }
+                    "pitch"             {   "value"     "1.000000"  }
+                    "soundlevel"        {   "value"     "100.00000" }
+                    "distance_max"      {   "value"     "5000.000"  }
+                    "event_type"        {   "value"     "1.000000"  }
+                }
+            }
+        }
+    }
+}
+
+"Ability.Roar"
+{
+    "operator_stacks"
+    {
+        "update_stack"
+        {
+            "reference_operator"
+            {
+                "operator"              "sos_reference_stack"
+                "reference_stack"       "dota_update_default"
+                "operator_variables"
+                {
+                    "vsnd_files"
+                    {
+                        "value"
+                        {
+                            "value0"        "sounds/BattleRoar.vsnd"
+                        }
+                    }
+                    "volume"            {   "value"     "1.00000"  }
+                    "pitch_rand_min"    {   "value"     "0.00000"  }
+                    "pitch_rand_max"    {   "value"     "0.000000"  }
+                    "pitch"             {   "value"     "1.000000"  }
+                    "soundlevel"        {   "value"     "100.00000" }
+                    "distance_max"      {   "value"     "5000.000"  }
+                    "event_type"        {   "value"     "1.000000"  }
+                }
+            }
+        }
+    }
+}
+
+"Paladin.HealingWave"
+{
+    "operator_stacks"
+    {
+        "update_stack"
+        {
+            "reference_operator"
+            {
+                "operator"              "sos_reference_stack"
+                "reference_stack"       "dota_update_default"
+                "operator_variables"
+                {
+                    "vsnd_files"
+                    {
+                        "value"
+                        {
+                            "value0"        "sounds/HealingWave.vsnd"
+                        }
+                    }
+                    "volume"            {   "value"     "1.00000"  }
+                    "pitch_rand_min"    {   "value"     "0.00000"  }
+                    "pitch_rand_max"    {   "value"     "0.000000"  }
+                    "pitch"             {   "value"     "1.000000"  }
+                    "soundlevel"        {   "value"     "100.00000" }
+                    "distance_max"      {   "value"     "5000.000"  }
+                    "event_type"        {   "value"     "1.000000"  }
+                }
+            }
+        }
+    }
+}
+
+"Demon_Hunter.Immolation"
+{
+    "operator_stacks"
+    {
+        "update_stack"
+        {
+            "reference_operator"
+            {
+                "operator"              "sos_reference_stack"
+                "reference_stack"       "dota_update_default"
+                "operator_variables"
+                {
+                    "vsnd_files"
+                    {
+                        "value"
+                        {
+                            "value0"        "sounds/ImmolationDecay1.vsnd"
+                        }
+                    }
+                    "volume"            {   "value"     "1.00000"  }
+                    "pitch_rand_min"    {   "value"     "0.00000"  }
+                    "pitch_rand_max"    {   "value"     "0.000000"  }
+                    "pitch"             {   "value"     "1.000000"  }
+                    "soundlevel"        {   "value"     "100.00000" }
+                    "distance_max"      {   "value"     "5000.000"  }
+                    "event_type"        {   "value"     "1.000000"  }
+                }
+            }
+        }
+    }
+}
+
+"Arthas.Death"
+{
+    "operator_stacks"
+    {
+        "update_stack"
+        {
+            "reference_operator"
+            {
+                "operator"              "sos_reference_stack"
+                "reference_stack"       "dota_update_default"
+                "operator_variables"
+                {
+                    "vsnd_files"
+                    {
+                        "value"
+                        {
+                            "value0"        "sounds/HeroPaladinDeath.vsnd"
+                        }
+                    }
+                    "volume"            {   "value"     "1.00000"  }
+                    "pitch_rand_min"    {   "value"     "0.00000"  }
+                    "pitch_rand_max"    {   "value"     "0.000000"  }
+                    "pitch"             {   "value"     "1.000000"  }
+                    "soundlevel"        {   "value"     "100.00000" }
+                    "distance_max"      {   "value"     "5000.000"  }
+                    "event_type"        {   "value"     "1.000000"  }
+                }
+            }
+        }
+    }
+}
+
+"Arthas.Holy_Light"
+{
+    "operator_stacks"
+    {
+        "update_stack"
+        {
+            "reference_operator"
+            {
+                "operator"              "sos_reference_stack"
+                "reference_stack"       "dota_update_default"
+                "operator_variables"
+                {
+                    "vsnd_files"
+                    {
+                        "value"
+                        {
+                            "value0"        "sounds/HolyBolt.vsnd"
+                        }
+                    }
+                    "volume"            {   "value"     "1.00000"  }
+                    "pitch_rand_min"    {   "value"     "0.00000"  }
+                    "pitch_rand_max"    {   "value"     "0.000000"  }
+                    "pitch"             {   "value"     "1.000000"  }
+                    "soundlevel"        {   "value"     "100.00000" }
+                    "distance_max"      {   "value"     "5000.000"  }
+                    "event_type"        {   "value"     "1.000000"  }
+                }
+            }
+        }
+    }
+}
+
+"Ability.Reincarnation"
+{
+    "operator_stacks"
+    {
+        "update_stack"
+        {
+            "reference_operator"
+            {
+                "operator"              "sos_reference_stack"
+                "reference_stack"       "dota_update_default"
+                "operator_variables"
+                {
+                    "vsnd_files"
+                    {
+                        "value"
+                        {
+                            "value0"        "sounds/ResurrectTarget.vsnd"
+                        }
+                    }
+                    "volume"            {   "value"     "1.00000"  }
+                    "pitch_rand_min"    {   "value"     "0.00000"  }
+                    "pitch_rand_max"    {   "value"     "0.000000"  }
+                    "pitch"             {   "value"     "1.000000"  }
+                    "soundlevel"        {   "value"     "100.00000" }
+                    "distance_max"      {   "value"     "5000.000"  }
+                    "event_type"        {   "value"     "1.000000"  }
+                }
+            }
+        }
+    }
+}
+
+"Ability.ReincarnationAlt"
+{
+    "operator_stacks"
+    {
+        "update_stack"
+        {
+            "reference_operator"
+            {
+                "operator"              "sos_reference_stack"
+                "reference_stack"       "dota_update_default"
+                "operator_variables"
+                {
+                    "vsnd_files"
+                    {
+                        "value"
+                        {
+                            "value0"        "sounds/Reincarnation.vsnd"
+                        }
+                    }
+                    "volume"            {   "value"     "1.00000"  }
+                    "pitch_rand_min"    {   "value"     "0.00000"  }
+                    "pitch_rand_max"    {   "value"     "0.000000"  }
+                    "pitch"             {   "value"     "1.000000"  }
+                    "soundlevel"        {   "value"     "100.00000" }
+                    "distance_max"      {   "value"     "5000.000"  }
+                    "event_type"        {   "value"     "1.000000"  }
+                }
+            }
+        }
+    }
+}
+
+"Arthas.DivineShield"
+{
+    "operator_stacks"
+    {
+        "update_stack"
+        {
+            "reference_operator"
+            {
+                "operator"              "sos_reference_stack"
+                "reference_stack"       "dota_update_default"
+                "operator_variables"
+                {
+                    "vsnd_files"
+                    {
+                        "value"
+                        {
+                            "value0"        "sounds/DivineShield.vsnd"
+                        }
+                    }
+                    "volume"            {   "value"     "1.00000"  }
+                    "pitch_rand_min"    {   "value"     "0.00000"  }
+                    "pitch_rand_max"    {   "value"     "0.000000"  }
+                    "pitch"             {   "value"     "1.000000"  }
+                    "soundlevel"        {   "value"     "100.00000" }
+                    "distance_max"      {   "value"     "5000.000"  }
+                    "event_type"        {   "value"     "1.000000"  }
+                }
+            }
+        }
+    }
+}
+
+"Sorceress.PhaseShift"
+{
+    "operator_stacks"
+    {
+        "update_stack"
+        {
+            "reference_operator"
+            {
+                "operator"              "sos_reference_stack"
+                "reference_stack"       "dota_update_default"
+                "operator_variables"
+                {
+                    "vsnd_files"
+                    {
+                        "value"
+                        {
+                            "value0"        "sounds/PhaseShift1.vsnd"
+                        }
+                    }
+                    "volume"            {   "value"     "1.00000"  }
+                    "pitch_rand_min"    {   "value"     "0.00000"  }
+                    "pitch_rand_max"    {   "value"     "0.000000"  }
+                    "pitch"             {   "value"     "1.000000"  }
+                    "soundlevel"        {   "value"     "100.00000" }
+                    "distance_max"      {   "value"     "5000.000"  }
+                    "event_type"        {   "value"     "1.000000"  }
+                }
+            }
+        }
+    }
+}
+
+"DreadLord.Banish"
+{
+    "operator_stacks"
+    {
+        "update_stack"
+        {
+            "reference_operator"
+            {
+                "operator"              "sos_reference_stack"
+                "reference_stack"       "dota_update_default"
+                "operator_variables"
+                {
+                    "vsnd_files"
+                    {
+                        "value"
+                        {
+                            "value0"        "sounds/BanishCaster.vsnd"
+                        }
+                    }
+                    "volume"            {   "value"     "1.00000"  }
+                    "pitch_rand_min"    {   "value"     "0.00000"  }
+                    "pitch_rand_max"    {   "value"     "0.000000"  }
+                    "pitch"             {   "value"     "1.000000"  }
+                    "soundlevel"        {   "value"     "100.00000" }
+                    "distance_max"      {   "value"     "5000.000"  }
+                    "event_type"        {   "value"     "1.000000"  }
+                }
+            }
+        }
+    }
+}
+
+"MountainKing.StormBoltLaunch"
+{
+    "operator_stacks"
+    {
+        "update_stack"
+        {
+            "reference_operator"
+            {
+                "operator"              "sos_reference_stack"
+                "reference_stack"       "dota_update_default"
+                "operator_variables"
+                {
+                    "vsnd_files"
+                    {
+                        "value"
+                        {
+                            "value0"        "sounds/StormBoltLaunch.vsnd"
+                        }
+                    }
+                    "volume"            {   "value"     "1.00000"  }
+                    "pitch_rand_min"    {   "value"     "0.00000"  }
+                    "pitch_rand_max"    {   "value"     "0.000000"  }
+                    "pitch"             {   "value"     "1.000000"  }
+                    "soundlevel"        {   "value"     "100.00000" }
+                    "distance_max"      {   "value"     "5000.000"  }
+                    "event_type"        {   "value"     "1.000000"  }
+                }
+            }
+        }
+    }
+}
+
+"MountainKing.StormBoltHit"
+{
+    "operator_stacks"
+    {
+        "update_stack"
+        {
+            "reference_operator"
+            {
+                "operator"              "sos_reference_stack"
+                "reference_stack"       "dota_update_default"
+                "operator_variables"
+                {
+                    "vsnd_files"
+                    {
+                        "value"
+                        {
+                            "value0"        "sounds/ThunderBoltMissileDeath.vsnd"
+                        }
+                    }
+                    "volume"            {   "value"     "1.00000"  }
+                    "pitch_rand_min"    {   "value"     "0.00000"  }
+                    "pitch_rand_max"    {   "value"     "0.000000"  }
+                    "pitch"             {   "value"     "1.000000"  }
+                    "soundlevel"        {   "value"     "100.00000" }
+                    "distance_max"      {   "value"     "5000.000"  }
+                    "event_type"        {   "value"     "1.000000"  }
+                }
+            }
+        }
+    }
+}
+
+"Huntress.ForkedLightning"
+{
+    "operator_stacks"
+    {
+        "update_stack"
+        {
+            "reference_operator"
+            {
+                "operator"              "sos_reference_stack"
+                "reference_stack"       "dota_update_default"
+                "operator_variables"
+                {
+                    "vsnd_files"
+                    {
+                        "value"
+                        {
+                            "value0"        "sounds/ThunderBoltMissileDeath.vsnd"
+                        }
+                    }
+                    "volume"            {   "value"     "1.00000"  }
+                    "pitch_rand_min"    {   "value"     "0.00000"  }
+                    "pitch_rand_max"    {   "value"     "0.000000"  }
+                    "pitch"             {   "value"     "1.000000"  }
+                    "soundlevel"        {   "value"     "100.00000" }
+                    "distance_max"      {   "value"     "5000.000"  }
+                    "event_type"        {   "value"     "1.000000"  }
+                }
+            }
+        }
+    }
+}
+
+"MountainKing.Avatar"
+{
+    "operator_stacks"
+    {
+        "update_stack"
+        {
+            "reference_operator"
+            {
+                "operator"              "sos_reference_stack"
+                "reference_stack"       "dota_update_default"
+                "operator_variables"
+                {
+                    "vsnd_files"
+                    {
+                        "value"
+                        {
+                            "value0"        "sounds/Avatar.vsnd"
+                        }
+                    }
+                    "volume"            {   "value"     "1.00000"  }
+                    "pitch_rand_min"    {   "value"     "0.00000"  }
+                    "pitch_rand_max"    {   "value"     "0.000000"  }
+                    "pitch"             {   "value"     "1.000000"  }
+                    "soundlevel"        {   "value"     "100.00000" }
+                    "distance_max"      {   "value"     "5000.000"  }
+                    "event_type"        {   "value"     "1.000000"  }
+                }
+            }
+        }
+    }
+}
+
+"Ability.Ward"
+{
+    "operator_stacks"
+    {
+        "update_stack"
+        {
+            "reference_operator"
+            {
+                "operator"              "sos_reference_stack"
+                "reference_stack"       "dota_update_default"
+                "operator_variables"
+                {
+                    "vsnd_files"
+                    {
+                        "value"
+                        {
+                            "value0"        "sounds/SentryWard.vsnd"
+                        }
+                    }
+                    "volume"            {   "value"     "1.00000"  }
+                    "pitch_rand_min"    {   "value"     "0.00000"  }
+                    "pitch_rand_max"    {   "value"     "0.000000"  }
+                    "pitch"             {   "value"     "1.000000"  }
+                    "soundlevel"        {   "value"     "100.00000" }
+                    "distance_max"      {   "value"     "5000.000"  }
+                    "event_type"        {   "value"     "1.000000"  }
+                }
+            }
+        }
+    }
+}
+
+"Global.InGame"
+{
+    "operator_stacks"
+    {
+        "update_stack"
+        {
+            "reference_operator"
+            {
+                "operator"              "sos_reference_stack"
+                "reference_stack"       "dota_update_default"
+                "operator_variables"
+                {
+                    "vsnd_files"
+                    {
+                        "value"
+                        {
+                            "value0"        "sounds/GameFound.vsnd"
+                        }
+                    }
+                    "volume"            {   "value"     "1.00000"  }
+                    "pitch_rand_min"    {   "value"     "0.00000"  }
+                    "pitch_rand_max"    {   "value"     "0.000000"  }
+                    "pitch"             {   "value"     "1.000000"  }
+                    "soundlevel"        {   "value"     "100.00000" }
+                    "distance_max"      {   "value"     "5000.000"  }
+                    "event_type"        {   "value"     "1.000000"  }
+                }
+            }
+        }
+    }
+}

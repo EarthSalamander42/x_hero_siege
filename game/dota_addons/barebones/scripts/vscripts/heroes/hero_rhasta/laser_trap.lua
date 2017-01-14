@@ -10,7 +10,10 @@ local caster_origin = caster:GetAbsOrigin()
 local direction = (keys.target_points[1] - caster_origin):Normalized()
 direction.z = 0
 
-	caster:EmitSound("Hero_Venomancer.Plague_Ward")
+	caster:EmitSound("Ability.Ward")
+	Timers:CreateTimer(1.7, function()
+		caster:StopSound("Ability.Ward")
+	end)
 
 	local ability_level = keys.ability:GetLevel()
 	if ability_level >= 1 and ability_level <= 2 then

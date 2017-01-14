@@ -3,6 +3,7 @@
 	"item_backpack"
 	{
 		"BaseClass"					"item_datadriven"
+		"ID"						"2499"
 		"AbilityTextureName"		"backpack"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 	
@@ -58,11 +59,10 @@
 
 				"OnOrbImpact"
 				{
-					"ApplyModifier"
+					"RunScript"
 					{
-						"ModifierName"	"modifier_lifesteal"
-						"Target" 		"ATTACKER"
-						"Duration"		"0.03"
+						"ScriptFile"	"heroes/global.lua"
+						"Function"		"Lifesteal"
 					}
 				}
 			}
@@ -1028,6 +1028,7 @@
 		"ID"							"2515"
 		"BaseClass"             		"item_datadriven"
 		"Model"							"models/props_gameplay/recipe.mdl"
+		"AbilityTextureName"			"recipe"
 		
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
@@ -1444,6 +1445,7 @@
 		"ID"							"2520"
 		"BaseClass"             		"item_datadriven"
 		"Model"							"models/props_gameplay/recipe.mdl"
+		"AbilityTextureName"			"recipe"
 		
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
@@ -1815,7 +1817,8 @@
 		"ID"							"2526"
 		"BaseClass"             		"item_datadriven"
 		"Model"							"models/props_gameplay/recipe.mdl"
-		
+		"AbilityTextureName"			"recipe"
+
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
 		"ItemCost"						"40000"	
@@ -1890,11 +1893,10 @@
 
 				"OnOrbImpact"
 				{
-					"ApplyModifier"
+					"RunScript"
 					{
-						"ModifierName"	"modifier_lifesteal"
-						"Target" 		"ATTACKER"
-						"Duration"		"0.03"
+						"ScriptFile"	"heroes/global.lua"
+						"Function"		"Lifesteal"
 					}
 				}
 
@@ -2186,6 +2188,36 @@
 			{
 				"var_type"				"FIELD_FLOAT"
 				"bat_reduction"			"0.4"
+			}
+		}
+
+		"OnEquip"
+		{
+			"ApplyModifier"
+			{
+				"ModifierName"	"modifier_endurance_buff"
+				"Target" 		"CASTER"
+			}
+
+			"ApplyModifier"
+			{
+				"ModifierName"	"modifier_command_buff"
+				"Target" 		"CASTER"
+			}
+		}
+
+		"OnUnequip"
+		{
+			"RemoveModifier"
+			{
+				"ModifierName"	"modifier_endurance_buff"
+				"Target" 		"CASTER"
+			}
+
+			"RemoveModifier"
+			{
+				"ModifierName"	"modifier_command_buff"
+				"Target" 		"CASTER"
 			}
 		}
 

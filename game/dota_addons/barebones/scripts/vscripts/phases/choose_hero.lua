@@ -87,10 +87,10 @@ local heroes = HeroList:GetAllHeroes()
 		HEROLIST_ALT[23] = CreateUnitByName("npc_dota_hero_sven_bis", Entities:FindByName(nil, "choose_sven_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
 		HEROLIST_ALT[23]:SetAngles(0, 90, 0)
 
+		-- Outer South
 		HEROLIST_ALT[24] = CreateUnitByName("npc_dota_hero_furion_bis", Entities:FindByName(nil, "choose_furion_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
 		HEROLIST_ALT[24]:SetAngles(0, 90, 0)
 
-		-- Outer South
 		HEROLIST_ALT[25] = CreateUnitByName("npc_dota_hero_nevermore_bis", Entities:FindByName(nil, "choose_nevermore_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
 		HEROLIST_ALT[25]:SetAngles(0, 270, 0)
 
@@ -99,25 +99,34 @@ local heroes = HeroList:GetAllHeroes()
 
 		HEROLIST_ALT[27] = CreateUnitByName("npc_dota_hero_warlock_bis", Entities:FindByName(nil, "choose_warlock_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
 		HEROLIST_ALT[27]:SetAngles(0, 270, 0)
+
+		HEROLIST_ALT[28] = CreateUnitByName("npc_dota_hero_axe_bis", Entities:FindByName(nil, "choose_dota_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
+		HEROLIST_ALT[28]:SetAngles(0, 90, 0)
 	end)
 
 	Timers:CreateTimer(17, function()
 		-- VIP Hero
 		HEROLIST_VIP_ALT[4] = CreateUnitByName("npc_dota_hero_chaos_knight_bis", Entities:FindByName(nil, "choose_chaos_knight_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
-		HEROLIST_VIP_ALT[4]:SetAngles(0, 0, 0)
+		HEROLIST_VIP_ALT[4]:SetAngles(0, 270, 0)
 
 		HEROLIST_VIP_ALT[4] = CreateUnitByName("npc_dota_hero_keeper_of_the_light_bis", Entities:FindByName(nil, "choose_keeper_of_the_light_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
-		HEROLIST_VIP_ALT[4]:SetAngles(0, 0, 0)
+		HEROLIST_VIP_ALT[4]:SetAngles(0, 270, 0)
 
 		HEROLIST_VIP_ALT[3] = CreateUnitByName("npc_dota_hero_meepo_bis", Entities:FindByName(nil, "choose_meepo_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
-		HEROLIST_VIP_ALT[3]:SetAngles(0, 0, 0)
+		HEROLIST_VIP_ALT[3]:SetAngles(0, 270, 0)
 
 		HEROLIST_VIP_ALT[1] = CreateUnitByName("npc_dota_hero_slardar_bis", Entities:FindByName(nil, "choose_slardar_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
-		HEROLIST_VIP_ALT[1]:SetAngles(0, 180, 0)
+		HEROLIST_VIP_ALT[1]:SetAngles(0, 270, 0)
 
 		HEROLIST_VIP_ALT[2] = CreateUnitByName("npc_dota_hero_skeleton_king_bis", Entities:FindByName(nil, "choose_skeleton_king_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
-		HEROLIST_VIP_ALT[2]:SetAngles(0, 180, 0)
-		StartAnimation(HEROLIST_VIP_ALT[4], {duration = 20000.0, activity = ACT_DOTA_IDLE, rate = 0.9})
+		HEROLIST_VIP_ALT[2]:SetAngles(0, 270, 0)
+		StartAnimation(HEROLIST_VIP_ALT[2], {duration = 20000.0, activity = ACT_DOTA_IDLE, rate = 0.9})
+
+		HEROLIST_ALT_VIP[5] = CreateUnitByName("npc_dota_hero_tiny_bis", Entities:FindByName(nil, "choose_tiny_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
+		HEROLIST_ALT_VIP[5]:SetAngles(0, 90, 0)
+
+--		HEROLIST_ALT_VIP[6] = CreateUnitByName("npc_dota_hero_sand_king_bis", Entities:FindByName(nil, "choose_sand_king_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
+--		HEROLIST_ALT_VIP[6]:SetAngles(0, 90, 0)
 	end)
 
 	Timers:CreateTimer(20, function()
@@ -160,7 +169,7 @@ local heroes = HeroList:GetAllHeroes()
 	local id = hero:GetPlayerID()
 	local point = Entities:FindByName(nil, "point_teleport_choose_hero_"..id)
 		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
-		Timers:CreateTimer(3.0, function()
+		Timers:CreateTimer(13.0, function()
 			FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
 		end)
 		Timers:CreateTimer(19.0, function()

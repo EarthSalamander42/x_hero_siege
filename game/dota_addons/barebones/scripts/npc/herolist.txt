@@ -26,7 +26,9 @@
 	"npc_dota_hero_rattletrap"			"1"		//Space Marine
 	"npc_dota_hero_sniper"				"1"		//Rifleman
 	"npc_dota_hero_sven"				"1"		//Mountain King
+	"npc_dota_hero_sand_king"			"1"		//Desert Wyrm
 	"npc_dota_hero_shadow_shaman"		"1"		//Rhasta
+	"npc_dota_hero_tiny"				"1"		//Stone Giant
 	"npc_dota_hero_terrorblade"			"1"		//Illidan
 	"npc_dota_hero_ursa"				"1"		//Malfurion
 	"npc_dota_hero_warlock"				"1"		//Archimonde

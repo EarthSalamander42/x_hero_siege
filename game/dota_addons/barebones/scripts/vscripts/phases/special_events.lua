@@ -71,7 +71,7 @@ mode:SetFixedRespawnTime( 40 )
 	if activator:GetTeam() == DOTA_TEAM_GOODGUYS then
 	FindClearSpaceForUnit(activator, point, true)
 	PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(), activator)
-	Timers:CreateTimer(0.2, function()
+	Timers:CreateTimer(0.5, function()
 		PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(), nil)
 	end)
 	activator:Stop()
@@ -130,16 +130,16 @@ BT_ENABLED = 0
 			for itemSlot = 0, 5 do
 			local item = hero:GetItemInSlot(itemSlot)
 				if item ~= nil and item:GetName() == "item_tome_small" then
-					item:StartCooldown(120.0)
+					item:StartCooldown(180.0)
 				end
 				if item ~= nil and item:GetName() == "item_tome_big" then
-					item:StartCooldown(120.0)
+					item:StartCooldown(180.0)
 				end
 				if item ~= nil and item:GetName() == "item_boots_of_speed" then
-					item:StartCooldown(120.0)
+					item:StartCooldown(180.0)
 				end
 				if item ~= nil and item:GetName() == "item_tpscroll" then
-				item:StartCooldown(120.0)
+				item:StartCooldown(180.0)
 				end
 			end
 		ability:StartCooldown(120.0)

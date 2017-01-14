@@ -89,3 +89,13 @@ function Purification( keys )
 		end
 	end)
 end
+
+
+function DivineShield( event )
+local caster = event.caster
+	EmitSoundOnLocationForAllies(caster:GetAbsOrigin(), "Arthas.DivineShield", caster)
+
+	Timers:CreateTimer(1.9, function()
+		caster:StopSound("Arthas.DivineShield")
+	end)
+end

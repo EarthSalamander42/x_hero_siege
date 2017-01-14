@@ -5,9 +5,9 @@ local itemCharges = 0
 local point
 
 function reincarnation( event )
-	local unit = event.caster
-	if unit:GetHealth() == 0 then
+local unit = event.caster
 
+	if unit:GetHealth() == 0 then
 		point = unit:GetAbsOrigin()
 		local ability = event.ability
 		itemCharges = ability:GetCurrentCharges()
@@ -15,45 +15,25 @@ function reincarnation( event )
 		Timers:CreateTimer(respawntime,respawnMagtheridon)
 
 		for i = 1,6 do
-			CreateUnitByName("npc_dota_hero_magtheridon_medium",point,true,nil,nil,DOTA_TEAM_BADGUYS)
+			CreateUnitByName("npc_dota_hero_magtheridon_medium", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 		end
 	end
 end
 
 function respawnMagtheridon()
-	-- body
-	local mag = CreateUnitByName("npc_dota_hero_magtheridon",point,true,nil,nil,DOTA_TEAM_BADGUYS)
-  	local ankh = CreateItem("item_magtheridon_ankh", mag, mag)
-	  	
-	ankh:SetCurrentCharges(itemCharges-1)
-	
+local mag = CreateUnitByName("npc_dota_hero_magtheridon", point, true, nil, nil, DOTA_TEAM_BADGUYS)
+local ankh = CreateItem("item_magtheridon_ankh", mag, mag)
+
 	if itemCharges-1 ~= 0 then
 		mag:AddItem(ankh)
---	else
---		ankh:ApplyDataDrivenModifier(mag, mag, "modifier_delete_door", {})
 	end
-	
 
+	ankh:SetCurrentCharges(itemCharges-1)
+	mag:EmitSound("Ability.Reincarnation")
 end
 
 function respawnMagtheridonMedium()
-	-- body
 	for i = 1,2 do
-		CreateUnitByName("npc_dota_hero_magtheridon_small",point,true,nil,nil,DOTA_TEAM_BADGUYS)
+		CreateUnitByName("npc_dota_hero_magtheridon_small", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 	end
 end
-
---[[
-function delete_door( event)
-	-- body
-	local door = Entities:FindByName(nil, "door_magtheridon")
-	door:Kill()
-
-	local gridobs = Entities:FindAllByName("obstruction_magtheridon")
-	for _,obs in pairs(gridobs) do 
-		obs:SetEnabled(false, true)
-	end
-	local trigger = Entities:FindByName(nil, "trigger_top_waves_1")
-	trigger:Enable()
-end
---]]

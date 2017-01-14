@@ -1,6 +1,6 @@
+require("statcollection/init")
 require('internal/util')
 require('gamemode')
-require("statcollection/init")
 
 function Precache( context )
 -- Custom Effects Precache
@@ -96,6 +96,7 @@ function Precache( context )
 	PrecacheUnitByNameSync( "npc_dota_hero_magnataur", context)
 	PrecacheUnitByNameSync( "npc_dota_hero_meepo", context)
 	PrecacheUnitByNameSync( "npc_dota_hero_mirana", context)
+	PrecacheUnitByNameSync( "npc_dota_hero_monkey_king", context)
 	PrecacheUnitByNameSync( "npc_dota_hero_morphling", context)
 	PrecacheUnitByNameSync( "npc_dota_hero_naga_siren", context)
 	PrecacheUnitByNameSync( "npc_dota_hero_necrolyte", context)

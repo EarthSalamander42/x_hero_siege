@@ -7,12 +7,3 @@ function maintain_immolation_toggle( event )
 		event.ability:ToggleAbility()
 	end
 end
-
-function test(event)
-	event.caster:SetAttackCapability(DOTA_UNIT_CAP_RANGED_ATTACK)
-	event.caster:SetAttackRange(500)
-end
-
-function testoff( event )
-	event.caster:SetAttackCapability(DOTA_UNIT_CAP_MELEE_ATTACK)
-end

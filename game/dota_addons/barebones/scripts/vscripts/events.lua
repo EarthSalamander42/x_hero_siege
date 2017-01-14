@@ -60,6 +60,16 @@ function GameMode:OnNPCSpawned(keys)
 		npc:SetBaseDamageMax( normal_max_damage*1.5 )
 	end
 
+	if npc:GetUnitName() == "npc_dota_hero_tiny" then
+		print('Tiny is back to small state!')
+		npc:AddAbility("tiny_grow")
+		grow = npc:FindAbilityByName("tiny_grow")
+		grow:SetLevel(0)
+		Timers:CreateTimer(0.4, function()
+			npc:RemoveAbility("tiny_grow")
+		end)
+	end
+
 	if npc:GetUnitName() == "npc_dota_hero_chaos_knight" then
 		npc:SetAbilityPoints(0)
 	end
@@ -90,13 +100,12 @@ function GameMode:OnNPCSpawned(keys)
 		"holdout_thunder_spirit",
 		"holdout_cripple",
 		"blood_mage_orbs",
-		"axe_berserkers_call",
+		"holdout_taunt",
 		"holdout_banish",
 		"holdout_magic_shield",
 		"holdout_anubarak_claw",
 		"undead_burrow",
 		"ogre_magi_bloodlust",
-		"axe_berserkers_call",
 		"black_dragon_fireball",
 		"holdout_beastmaster_misc",
 		"holdout_frostmourne_hungers",
@@ -116,6 +125,9 @@ function GameMode:OnNPCSpawned(keys)
 		"holdout_skin_changer_caster",
 		"holdout_skin_changer_warrior",
 		"holdout_health_buff",
+		"pugna_decrepify",
+		"holdout_giant_form",
+		"holdout_monkey_king_bar",
 		"holdout_blue_effect", --Lich King boss + hero effect
 		"holdout_green_effect", --Banehallow boss + hero effect
 		"holdout_red_effect" --Abaddon boss
@@ -206,7 +218,7 @@ function GameMode:OnNPCSpawned(keys)
 				end
 				-- Baumi
 				if PlayerResource:GetSteamAccountID(npc:GetPlayerID()) == captain_baumi[i] then
-					npc:SetCustomHealthLabel("Captain Baumi", 55, 55, 200)
+					npc:SetCustomHealthLabel("Baumi Nation is real!", 55, 55, 200)
 					if not npc:HasAbility("holdout_vip") then
 						local vip_ability = npc:AddAbility("holdout_vip")
 						vip_ability:SetLevel(1)
@@ -299,39 +311,32 @@ function GameMode:OnItemPurchased( keys )
 	
 	-- The cost of the item purchased
 	local itemcost = keys.itemcost
-	
 end
 
--- An ability was used by a player
 function GameMode:OnAbilityUsed(keys)
 	local player = PlayerResource:GetPlayer(keys.PlayerID)
 	local abilityname = keys.abilityname
 end
 
--- A non-player entity (necro-book, chen creep, etc) used an ability
 function GameMode:OnNonPlayerUsedAbility(keys)
 	local abilityname=  keys.abilityname
 end
 
--- A player changed their name
 function GameMode:OnPlayerChangedName(keys)
 	local newName = keys.newname
 	local oldName = keys.oldName
 end
 
--- A player leveled up an ability
 function GameMode:OnPlayerLearnedAbility( keys)
 	local player = EntIndexToHScript(keys.player)
 	local abilityname = keys.abilityname
 end
 
--- A channelled ability finished by either completing or being interrupted
 function GameMode:OnAbilityChannelFinished(keys)
 	local abilityname = keys.abilityname
 	local interrupted = keys.interrupted == 1
 end
 
--- A player leveled up
 function GameMode:OnPlayerLevelUp(keys)
 local player = EntIndexToHScript(keys.player)
 local level = keys.level
@@ -366,7 +371,7 @@ local AbilitiesHeroes_XX = {
 	if hero:GetUnitName() == "npc_dota_hero_sven" then
 		if hero_level == 20 then
 			hero:RemoveAbility("holdout_storm_bolt")
-			hero:RemoveAbility("holdout_thunder_clap")
+			hero:RemoveAbility("holdout_war_thunder")
 		end
 	end
 
@@ -385,7 +390,7 @@ local AbilitiesHeroes_XX = {
 
 	if hero:GetUnitName() == "npc_dota_hero_omniknight" then
 		if hero_level == 20 then
-			hero:RemoveAbility("axe_berserkers_call")
+			hero:RemoveAbility("holdout_taunt")
 		end
 	end
 
@@ -435,7 +440,6 @@ local AbilitiesHeroes_XX = {
 	end
 
 	if hero_level == 20 then
-		-- level up all abilities, that are not leveled up
 		for i = 0, 17 do 
 		local ability = hero:GetAbilityByIndex(i)
 			if IsValidEntity(ability) then
@@ -464,7 +468,6 @@ local AbilitiesHeroes_XX = {
 	end
 end
 
--- A player last hit a creep, a tower, or a hero
 function GameMode:OnLastHit(keys)
 	local isFirstBlood = keys.FirstBlood == 1
 	local isHeroKill = keys.HeroKill == 1
@@ -473,7 +476,6 @@ function GameMode:OnLastHit(keys)
 	local killedEnt = EntIndexToHScript(keys.EntKilled)
 end
 
--- A tree was cut down by tango, quelling blade, etc
 function GameMode:OnTreeCut(keys)
 	DebugPrint('[BAREBONES] OnTreeCut')
 	DebugPrintTable(keys)
@@ -482,7 +484,6 @@ function GameMode:OnTreeCut(keys)
 	local treeY = keys.tree_y
 end
 
--- A rune was activated by a player
 function GameMode:OnRuneActivated (keys)
 	local player = PlayerResource:GetPlayer(keys.PlayerID)
 	local rune = keys.rune
@@ -502,13 +503,11 @@ function GameMode:OnRuneActivated (keys)
 	]]
 end
 
--- A player took damage from a tower
 function GameMode:OnPlayerTakeTowerDamage(keys)
 	local player = PlayerResource:GetPlayer(keys.PlayerID)
 	local damage = keys.damage
 end
 
--- A player picked a hero
 function GameMode:OnPlayerPickHero(keys)
 	local heroClass = keys.hero
 	local heroEntity = EntIndexToHScript(keys.heroindex)
@@ -519,7 +518,6 @@ function GameMode:OnPlayerPickHero(keys)
 --	GameMode:setPlayerHealthLabel(player)
 end
 
--- A player killed another player in a multi-team context
 function GameMode:OnTeamKillCredit(keys)
 	DebugPrint('[BAREBONES] OnTeamKillCredit')
 	DebugPrintTable(keys)
@@ -530,44 +528,41 @@ function GameMode:OnTeamKillCredit(keys)
 	local killerTeamNumber = keys.teamnumber
 end
 
--- An entity died
 function GameMode:OnEntityKilled( keys )
 DebugPrint( '[BAREBONES] OnEntityKilled Called' )
 DebugPrintTable( keys )
 
 GameMode:_OnEntityKilled( keys )
 
--- The Unit that was Killed
 local killedUnit = EntIndexToHScript( keys.entindex_killed )
--- The Killing entity
 local killerEntity = nil
 
 if keys.entindex_attacker ~= nil then
 	killerEntity = EntIndexToHScript( keys.entindex_attacker )
 end
 
--- The ability/item used to kill, or nil if not killed by an item/ability
 local killerAbility = nil
 
 if keys.entindex_inflictor ~= nil then
 	killerAbility = EntIndexToHScript( keys.entindex_inflictor )
 end
 
+	-- Tiny Debug, but will work with all other new heroes using aghanim modifiers
+	killedUnit:RemoveModifierByName("modifier_item_ultimate_scepter_consumed")
+	killedUnit:RemoveModifierByName("modifier_animation_translate")
+
 local damagebits = keys.damagebits -- This might always be 0 and therefore useless
 local KillerID = killerEntity:GetPlayerOwnerID()
 local playerKills = PlayerResource:GetKills(KillerID)
 
-	-- Should grants kills to the hero assigned to the unit
 	if IsValidEntity(killerEntity:GetPlayerOwner()) then
 		killerEntity = killerEntity:GetPlayerOwner():GetAssignedHero()
 	end
 
-	-- if killed by illusion, change the killer to the owner of illusion instead
 	if killerEntity:IsIllusion() then
 		killerEntity = PlayerResource:GetPlayer(killerEntity:GetPlayerID()):GetAssignedHero()
 	end
 
-	-- Set Kill Count to the Player's Last Hit Count
 	if killerEntity:IsRealHero() and killedUnit:GetTeam() == DOTA_TEAM_BADGUYS then
 		if PlayerResource:HasSelectedHero(KillerID) then
 			killerEntity:IncrementKills(1)
@@ -597,7 +592,7 @@ local playerKills = PlayerResource:GetKills(KillerID)
 		Timers:CreateTimer(5.0, function()
 			FindClearSpaceForUnit(killerEntity, point, true)
 			PlayerResource:SetCameraTarget(killerEntity:GetPlayerOwnerID(), killerEntity)
-			RameroEvent()
+			RameroAndBaristalEvent()
 			killerEntity:RemoveModifierByName("modifier_animation_freeze_stun")
 			killerEntity:RemoveModifierByName("modifier_invulnerable")
 			Timers:CreateTimer(0.1, function()
@@ -605,7 +600,7 @@ local playerKills = PlayerResource:GetKills(KillerID)
 			end)
 		end)
 		RAMERO = 1
-	elseif killerEntity:GetKills() >= 1500 and RAMERO == 0 and NEUTRAL_SPAWN == 0 then -- 1500
+	elseif killerEntity:GetKills() >= 1500 and RAMERO == 1 and NEUTRAL_SPAWN == 0 then -- 1500
 	local point = Entities:FindByName(nil, "npc_dota_muradin_player_1"):GetAbsOrigin()
 		killerEntity:AddNewModifier( nil, nil, "modifier_animation_freeze_stun", nil)
 		killerEntity:AddNewModifier( nil, nil, "modifier_invulnerable", nil)
@@ -620,10 +615,9 @@ local playerKills = PlayerResource:GetKills(KillerID)
 				PlayerResource:SetCameraTarget(killerEntity:GetPlayerOwnerID(), nil)
 			end)
 		end)
-		RAMERO = 1
+		RAMERO = 2
 	end
 
-	-- Ends lanes spawning when the linked barrackment is destroyed
 	for c = 1, 8 do
 		if killedUnit:GetUnitName() == "dota_badguys_barracks_"..c then
 			BARRACKMENTS[c] = 0
@@ -687,22 +681,16 @@ local playerKills = PlayerResource:GetKills(KillerID)
 	end
 end
 
--- This function is called 1 to 2 times as the player connects initially but before they have completely connected
 function GameMode:PlayerConnect(keys)
 	DebugPrint('[BAREBONES] PlayerConnect')
 	DebugPrintTable(keys)
 end
 
--- This function is called once when the player fully connects and becomes "Ready" during Loading
 function GameMode:OnConnectFull(keys)
-	GameMode:_OnConnectFull(keys)
-	
-	local entIndex = keys.index+1
-	-- The Player entity of the joining user
-	local ply = EntIndexToHScript(entIndex)
-	
-	-- The Player ID of the joining player
-	local playerID = ply:GetPlayerID()
+GameMode:_OnConnectFull(keys)
+local entIndex = keys.index+1
+local ply = EntIndexToHScript(entIndex)
+local playerID = ply:GetPlayerID()
 
 	-- If this is Mohammad Mehdi Akhondi, end the game. Dota Imba ban system.
 	for i = 1, #banned_players do
@@ -719,43 +707,33 @@ function GameMode:OnConnectFull(keys)
 	end
 end
 
--- This function is called whenever illusions are created and tells you which was/is the original entity
 function GameMode:OnIllusionsCreated(keys)
 	local originalEntity = EntIndexToHScript(keys.original_entindex)
 end
 
--- This function is called whenever an item is combined to create a new item
 function GameMode:OnItemCombined(keys)
-	-- The playerID of the hero who is buying something
-	local plyID = keys.PlayerID
-	if not plyID then return end
-	local player = PlayerResource:GetPlayer(plyID)
-
-	-- The name of the item purchased
-	local itemName = keys.itemname 
-	
-	-- The cost of the item purchased
-	local itemcost = keys.itemcost
+local plyID = keys.PlayerID
+if not plyID then return end
+local player = PlayerResource:GetPlayer(plyID)
+local itemName = keys.itemname 
+local itemcost = keys.itemcost
 end
 
--- This function is called whenever an ability begins its PhaseStart phase (but before it is actually cast)
 function GameMode:OnAbilityCastBegins(keys)
-	local player = PlayerResource:GetPlayer(keys.PlayerID)
-	local abilityName = keys.abilityname
+local player = PlayerResource:GetPlayer(keys.PlayerID)
+local abilityName = keys.abilityname
 end
 
--- This function is called whenever a tower is killed
 function GameMode:OnTowerKill(keys)
-	local gold = keys.gold
-	local killerPlayer = PlayerResource:GetPlayer(keys.killer_userid)
-	local team = keys.teamnumber
+local gold = keys.gold
+local killerPlayer = PlayerResource:GetPlayer(keys.killer_userid)
+local team = keys.teamnumber
 end
 
--- This function is called whenever a player changes there custom team selection during Game Setup 
 function GameMode:OnPlayerSelectedCustomTeam(keys)
-	local player = PlayerResource:GetPlayer(keys.player_id)
-	local success = (keys.success == 1)
-	local team = keys.team_id
+local player = PlayerResource:GetPlayer(keys.player_id)
+local success = (keys.success == 1)
+local team = keys.team_id
 end
 
 -- This function is called whenever an NPC reaches its goal position/target
@@ -763,7 +741,6 @@ function GameMode:OnNPCGoalReached(keys)
 local goalEntity = EntIndexToHScript(keys.goal_entindex)
 local nextGoalEntity = EntIndexToHScript(keys.next_goal_entindex)
 local npc = EntIndexToHScript(keys.npc_entindex)
-
 end
 
 function GameMode:OnPlayerChat(keys)
@@ -840,24 +817,24 @@ local player = PlayerResource:GetPlayer(playerID)
 			end
 
 			if str == "-closeway_1" or str == "-cw1" then
-				Notifications:TopToAll({text="Red Player closed lane 1!", style={color="white"}, duration=5.0})
---				Notifications:TopToAll({text="Lanes 1, 2, 3, 4 can't be closed!", style={color="white"}, duration=5.0})
-				CREEP_LANES[1] = 0
+--				Notifications:TopToAll({text="Red Player closed lane 1!", style={color="white"}, duration=5.0})
+				Notifications:TopToAll({text="Lanes 1, 2, 3, 4 can't be closed!", style={color="white"}, duration=5.0})
+--				CREEP_LANES[1] = 0
 			end
 			if str == "-closeway_2" or str == "-cw2" then
-				Notifications:TopToAll({text="Red Player closed lane 2!", style={color="white"}, duration=5.0})
---				Notifications:TopToAll({text="Lanes 1, 2, 3, 4 can't be closed", style={color="white"}, duration=5.0})
-				CREEP_LANES[2] = 0
+--				Notifications:TopToAll({text="Red Player closed lane 2!", style={color="white"}, duration=5.0})
+				Notifications:TopToAll({text="Lanes 1, 2, 3, 4 can't be closed", style={color="white"}, duration=5.0})
+--				CREEP_LANES[2] = 0
 			end
 			if str == "-closeway_3" or str == "-cw3" then
-				Notifications:TopToAll({text="Red Player closed lane 3!", style={color="white"}, duration=5.0})
---				Notifications:TopToAll({text="Lanes 1, 2, 3, 4 can't be closed", style={color="white"}, duration=5.0})
-				CREEP_LANES[3] = 0
+--				Notifications:TopToAll({text="Red Player closed lane 3!", style={color="white"}, duration=5.0})
+				Notifications:TopToAll({text="Lanes 1, 2, 3, 4 can't be closed", style={color="white"}, duration=5.0})
+--				CREEP_LANES[3] = 0
 			end
 			if str == "-closeway_4" or str == "-cw4" then
-				Notifications:TopToAll({text="Red Player closed lane 4!", style={color="white"}, duration=5.0})
---				Notifications:TopToAll({text="Lanes 1, 2, 3, 4 can't be closed", style={color="white"}, duration=5.0})
-				CREEP_LANES[4] = 0
+--				Notifications:TopToAll({text="Red Player closed lane 4!", style={color="white"}, duration=5.0})
+				Notifications:TopToAll({text="Lanes 1, 2, 3, 4 can't be closed", style={color="white"}, duration=5.0})
+--				CREEP_LANES[4] = 0
 			end
 			if str == "-closeway_5" or str == "-cw5" then
 				Notifications:TopToAll({text="Red Player closed lane 5!", style={color="white"}, duration=5.0})
@@ -889,12 +866,12 @@ local player = PlayerResource:GetPlayer(playerID)
 			end
 
 			if str == "-closeway_all" or str == "-cw_all" then
-				Notifications:TopToAll({text="Red Player closed all lanes!", style={color="white"}, duration=5.0})
---				Notifications:TopToAll({text="Red Player closed all lanes (excluding 1, 2, 3, 4)!", style={color="white"}, duration=5.0})
-				CREEP_LANES[1] = 0
-				CREEP_LANES[2] = 0
-				CREEP_LANES[3] = 0
-				CREEP_LANES[4] = 0
+--				Notifications:TopToAll({text="Red Player closed all lanes!", style={color="white"}, duration=5.0})
+				Notifications:TopToAll({text="Red Player closed all lanes (excluding 1, 2, 3, 4)!", style={color="white"}, duration=5.0})
+--				CREEP_LANES[1] = 0
+--				CREEP_LANES[2] = 0
+--				CREEP_LANES[3] = 0
+--				CREEP_LANES[4] = 0
 				CREEP_LANES[5] = 0
 				CREEP_LANES[6] = 0
 				CREEP_LANES[7] = 0

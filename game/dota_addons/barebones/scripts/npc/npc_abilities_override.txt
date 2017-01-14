@@ -212,6 +212,7 @@
 	"item_talisman_of_evasion"		"REMOVE"
 	"item_faerie_fire"				"REMOVE"
 	"item_enchanted_mango"			"REMOVE"
+	"item_tome_of_knowledge"		"REMOVE"
 
 	//============================================================================================================
 	//============================================================================================================
@@ -912,50 +913,6 @@
 				"var_type"					"FIELD_INTEGER"
 				"movespeed"					"100"
 			}
-		}
-	}
-
-	//=================================================================================================================
-	// Paladin: Taunt
-	//=================================================================================================================
-	"axe_berserkers_call"
-	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityTextureName"			"axe_berserkers_call"
-		"MaxLevel"						"1"
-
-		// Casting
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCastPoint"				"0.4"
-
-		// Time		
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCooldown"				"20"
-
-		// Cost
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityManaCost"				"75"	
-		
-		// Special
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilitySpecial"
-		{
-			"01"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"radius"				"500"
-			}
-			"02"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_armor"			"100"
-			}
-			"03"
-			{
-				"var_type"				"FIELD_FLOAT"
-				"duration"				"5.0"
-			}	
 		}
 	}
 
@@ -1662,10 +1619,6 @@
 	//=================================================================================================================
 	"monkey_king_boundless_strike"
 	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"MaxLevel"						"1"
-
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityCastPoint"				"0.4"
@@ -1677,7 +1630,7 @@
 
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityManaCost"				"0"		
+		"AbilityManaCost"				"145 205 265 325"		
 
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
@@ -1691,7 +1644,7 @@
 			"02"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"strike_crit_mult"			"200 250 300 350"
+				"strike_crit_mult"			"250 300 350 400"
 			}
 			"03"
 			{
@@ -1701,7 +1654,7 @@
 			"04"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"strike_cast_range"			"1200"
+				"strike_cast_range"			"1300"
 			}
 		}
 	}
@@ -1743,6 +1696,573 @@
 			{
 				"var_type"					"FIELD_FLOAT"
 				"split_duration"			"0.6"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Space Marine: Decrepify
+	//=================================================================================================================
+	"pugna_decrepify"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO"
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
+		"SpellDispellableType"			"SPELL_DISPELLABLE_YES"
+		"MaxLevel"						"1"
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"				"700 700 700 700"
+		"AbilityCastPoint"				"0.2 0.2 0.2 0.2"
+		
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"15.0 12.0 9.0 6.0"
+		"AbilityDuration"				"3.5"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"60"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"bonus_spell_damage_pct_allies"	"-25"
+			}
+			"02"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"bonus_movement_speed_allies"		"0"
+			}
+			"03"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"bonus_spell_damage_pct"	"-30 -40 -50 -60"
+			}
+			"04"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"bonus_movement_speed"		"-30 -40 -50 -60"
+			}			
+			"05"
+			{
+				"var_type"					"FIELD_FLOAT"
+				"tooltip_duration"		"3.5"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Elder Titan: Earth Splitter
+	//=================================================================================================================
+	"elder_titan_earth_splitter"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityType"					"DOTA_ABILITY_TYPE_BASIC"
+		"RequiredLevel"					"8"
+		"LevelsBetweenUpgrades"			"3"
+		"HasScepterUpgrade"				"0"
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"				"2400"
+		"AbilityCastPoint"				"0.4"
+
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"30.0"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"150 225 300 375"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"					"FIELD_FLOAT"
+				"crack_time"				"3.14"
+			}
+			"02"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"crack_width"				"350"
+			}
+			"03"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"crack_distance"			"2400"
+			}
+			"04"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"slow_pct"					"30 40 50"
+			}
+			"05"
+			{
+				"var_type"					"FIELD_FLOAT"
+				"slow_duration"				"4.0 6.0 8.0"
+			}
+			"06"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"speed"						"910"
+			}
+			"07"
+			{
+				"var_type"					"FIELD_FLOAT"
+				"damage_pct"				"15"
+			}
+			"08"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"vision_width"				"500"
+			}
+			"09"
+			{	
+				"var_type"					"FIELD_FLOAT"
+				"vision_interval"			"0.22"
+			}
+			"10"
+			{
+				"var_type"					"FIELD_FLOAT"
+				"vision_duration"			"4.0"
+			}
+			"11"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"vision_step"				"200"
+			}
+			"12"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"total_steps"				"12"
+			}
+			"13"
+			{
+				"var_type"					"FIELD_FLOAT"
+				"slow_duration_scepter"		"0.0"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Medusa: Stone Gaze
+	//=================================================================================================================
+	"medusa_stone_gaze"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"LevelsBetweenUpgrades"			"5"
+		"RequiredLevel"					"10"
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastPoint"				"0.4"
+		"AbilityCastRange"				"1000"
+
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"100.0"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"200 400 600"
+		
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"radius"					"1200 1200 1200"
+			}
+			"02"
+			{
+				"var_type"					"FIELD_FLOAT"
+				"duration"					"7"
+			}
+			"03"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"slow"						"25"
+			}
+			"04"
+			{
+				"var_type"					"FIELD_FLOAT"
+				"stone_duration"			"4.0 6.0 8.0"
+				"LinkedSpecialBonus"		"special_bonus_unique_medusa"
+			}
+			"05"
+			{
+				"var_type"					"FIELD_FLOAT"
+				"face_duration"				"2.0"
+			}
+			"06"
+			{
+				"var_type"					"FIELD_FLOAT"
+				"vision_cone"				"0.08715"		// 85 degree cone
+			}
+			"07"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"bonus_physical_damage"		"50 75 100"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Ancient Granite Golem: HP Aura
+	//=================================================================================================================
+	"granite_golem_hp_aura"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"MaxLevel"						"4"
+		"RequiredLevel"					"5"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"			"FIELD_FLOAT"
+				"bonus_hp"			"8 12 16 20"
+			}
+			"02"
+			{
+				"var_type"			"FIELD_INTEGER"
+				"radius"			"900"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Monkey King: Tree Dance
+	//=================================================================================================================
+	"monkey_king_tree_dance"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"ID"							"5721"														// unique ID number for this ability.  Do not change this once established or it will invalidate collected stats.
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_ROOT_DISABLES"
+		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_TREE"
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
+		
+		"FightRecapLevel"				"1"
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"				"1000"
+		"AbilityCastPoint"				"0.3"
+
+		// Time
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"1.4"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"0"
+		
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"leap_speed"				"700"
+			}
+			"02" // this should belong to Spring ability but for how it gets called it's simpler to have Tree Jump own it
+			{
+				"var_type"					"FIELD_INTEGER"
+				"spring_leap_speed"			"1300"
+			}
+			"03"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"give_up_distance"			"1850"
+			}
+			"04"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"ground_jump_distance"		"1250"
+			}
+			"05"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"perched_jump_distance"		"1250"
+			}
+			"06"
+			{
+				"var_type"					"FIELD_FLOAT"
+				"jump_damage_cooldown"		"3.0"
+			}
+			"07"
+			{
+				"var_type"					"FIELD_FLOAT"
+				"perched_vision"			"800"
+			}
+			"08"
+			{
+				"var_type"					"FIELD_FLOAT"
+				"perched_spot_height"		"192.0"
+			}
+			"09"
+			{
+				"var_type"					"FIELD_FLOAT"
+				"unperched_stunned_duration"	"4.0"
+			}
+			"10"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"top_level_height"			"500"
+			}
+			"11"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"impact_damage_tooltip"		"150 300 600 1200"
+			}
+			"12"
+			{
+				"var_type"						"FIELD_INTEGER"
+				"impact_movement_slow_tooltip"	"40 50 60 70"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Ability: Primal Spring
+	//=================================================================================================================
+	"monkey_king_primal_spring"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"ID"							"5724"														// unique ID number for this ability.  Do not change this once established or it will invalidate collected stats.
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE | DOTA_ABILITY_BEHAVIOR_CHANNELLED | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE | DOTA_ABILITY_BEHAVIOR_ROOT_DISABLES"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
+		"FightRecapLevel"				"1"
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastPoint"				"0.0"
+		"AbilityCastRange"				"0"
+		
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"16"
+		"AbilityChannelTime"			"1.6"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"100 170 240 310"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"impact_damage"			"150 300 600 1200"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"impact_movement_slow"	"40 50 60 70"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"impact_slow_duration"	"4.0"
+			}
+			"04"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"max_distance"			"1250"
+			}
+			"05"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"impact_radius"			"375"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Monkey King: Wukong's Command
+	//=================================================================================================================
+	"monkey_king_wukongs_command"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"RequiredLevel"					"10"
+		"LevelsBetweenUpgrades"			"5"
+		
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastPoint"				"1.2"
+		"AbilityCastRange"				"0"
+
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"100 90 80"
+		"AbilityDuration"				"12.0 14.0 16.0"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"150 300 450"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"							"FIELD_INTEGER"
+				"first_radius"						"300"
+			}
+			"02"
+			{
+				"var_type"							"FIELD_INTEGER"
+				"second_radius"						"750"
+			}
+			"03"
+			{
+				"var_type"							"FIELD_INTEGER"
+				"num_first_soldiers"				"5"
+			}
+			"04"
+			{
+				"var_type"							"FIELD_INTEGER"
+				"num_second_soldiers"				"9"
+			}
+			"05"
+			{
+				"var_type"							"FIELD_INTEGER"
+				"move_speed"						"900"
+			}
+			"06"
+			{
+				"var_type"							"FIELD_INTEGER"
+				"bonus_damage"						"300 600 900"
+			}
+			"07"
+			{
+				"var_type"							"FIELD_FLOAT"
+				"attack_speed"						"2.0 1.75 1.5"
+			}
+			"08"
+			{
+				"var_type"							"FIELD_FLOAT"
+				"duration"							"12.0 14.0 16.0"
+			}
+			"09"
+			{
+				"var_type"							"FIELD_INTEGER"
+				"leadership_radius"					"780"
+			}
+			"10"
+			{
+				"var_type"							"FIELD_INTEGER"
+				"cast_range"						"550"
+			}
+			"11"
+			{
+				"var_type"							"FIELD_INTEGER"
+				"outer_attack_buffer"				"0"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Ability: Axe Berserker's Call
+	//=================================================================================================================
+	"axe_berserkers_call"
+	{
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastPoint"				"0.4"
+
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"16.0 14.0 12.0 10.0"
+
+		// Damage.
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityDamage"					"0"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"60 80 100 120"	
+		
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"radius"				"325 350 375 400"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_armor"			"50 150 250 350"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"duration"				"2.0 2.6 3.2 3.8"
+			}	
+		}
+	}
+
+	//=================================================================================================================
+	// Ability: Axe Counter Helix
+	//=================================================================================================================
+	"axe_counter_helix"
+	{		
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"0.45 0.4 0.35 0.3"
+		
+		// Damage.
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityDamage"					"80 160 240 320"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"radius"					"285"	//275
+			}
+			"02"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"trigger_chance"			"16"
+			}
+			"03"
+			{
+				"var_type"					"FIELD_FLOAT"
+				"cooldown"					"0.45 0.4 0.35 0.3"
 			}
 		}
 	}

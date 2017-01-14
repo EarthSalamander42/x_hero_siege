@@ -114,6 +114,43 @@
 	}
 
 	//=======================================================================================================
+	// HERO: Axe
+	//=======================================================================================================
+	"npc_dota_hero_axe_holdout"
+	{
+		"override_hero"					"npc_dota_hero_axe"
+//		"DisableWearables"				"1"
+		"MovementSpeed"					"360"
+		"ModelScale"					"1.06"
+		"AttackDamageMin"				"25"
+		"AttackDamageMax"				"35"
+		"AttackRange"					"180"
+		"HealthBarOffset"				"190"
+
+		"AttributeStrengthGain"			"10"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"5"
+
+		"Ability1"						"axe_berserkers_call"
+		"Ability2"						"axe_counter_helix"
+		"Ability3"						"axe_battle_rage"		
+		"Ability4"						"holdout_spiked_carapace"
+		"Ability5"						"holdout_berserkers_rage"
+		"Ability6"						"holdout_culling_blade"
+		"Ability7"						""
+		"Ability8"						""
+		"Ability9"						""
+		"Ability10"						""
+		"Ability11"						""
+		"Ability12"						""
+		"Ability13"						""
+		"Ability14"						""
+		"Ability15"						""
+		"Ability16"						""
+		"Ability17"						"ability_unit_died_fire"
+	}
+
+	//=======================================================================================================
 	// HERO: Brewmaster( Brewmaster )
 	//=======================================================================================================
 	"npc_dota_hero_brewmaster_holdout"
@@ -732,6 +769,41 @@
 	}
 
 	//=======================================================================================================
+	// HERO: Monkey King
+	//=======================================================================================================
+	"npc_dota_hero_monkey_king_holdout"
+	{
+		"override_hero"					"npc_dota_hero_monkey_king"
+//		"DisableWearables"				"1"
+		"MovementSpeed"					"360"
+		"ModelScale"					"0.98"
+		"AttackDamageMin"				"50"
+		"AttackDamageMax"				"60"
+//		"AttackRange"					"530"
+
+		"AttributeStrengthGain"			"5"
+		"AttributeAgilityGain"			"10"
+		"AttributeIntelligenceGain"		"5"
+
+		"Ability1"						"monkey_king_boundless_strike"
+		"Ability2"						"monkey_king_tree_dance"
+		"Ability3"						"monkey_king_primal_spring"
+		"Ability4"						"monkey_king_primal_spring_early"
+		"Ability5"						"holdout_jingu_mastery"
+		"Ability6"						"holdout_monkey_king_bar"
+		"Ability7"						"monkey_king_wukongs_command"
+		"Ability9"						""
+		"Ability10"						""
+		"Ability11"						""
+		"Ability12"						""
+		"Ability13"						""
+		"Ability14"						""
+		"Ability15"						""
+		"Ability16"						""
+		"Ability17"						"ability_unit_died_fire"
+	}
+
+	//=======================================================================================================
 	// HERO: Banehallow (Shadow Fiend)
 	//=======================================================================================================
 	"npc_dota_hero_nevermore_holdout"
@@ -791,7 +863,7 @@
 		"Ability2"						"holdout_fan_of_light"
 		"Ability3"						"holdout_devotion_aura"
 		"Ability4"						"holdout_howl_of_terror"
-		"Ability5"						"axe_berserkers_call"
+		"Ability5"						"holdout_taunt"
 		"Ability6"						"holdout_pure_light"
 		"Ability7"						""
 		"Ability8"						""
@@ -923,6 +995,42 @@
 	}
 
 	//=======================================================================================================
+	// HERO: Desert Wyrm
+	//=======================================================================================================
+	"npc_dota_hero_sand_king_holdout"
+	{
+		"override_hero"					"npc_dota_hero_sand_king"
+//		"DisableWearables"				"1"
+		"ModelScale"					"1.06"
+		"AttackDamageMin"				"55"
+		"AttackDamageMax"				"65"
+		"MovementSpeed"					"350"
+		"AttributePrimary"				"DOTA_ATTRIBUTE_AGILITY"
+
+		"AttributeStrengthGain"			"5"
+		"AttributeAgilityGain"			"10"
+		"AttributeIntelligenceGain"		"5"
+
+		"Ability1"						""
+		"Ability2"						""
+		"Ability3"						""		
+		"Ability4"						""
+		"Ability5"						""
+		"Ability6"						""
+		"Ability7"						""
+		"Ability8"						""
+		"Ability9"						""
+		"Ability10"						""
+		"Ability11"						""
+		"Ability12"						""
+		"Ability13"						""
+		"Ability14"						""
+		"Ability15"						""
+		"Ability16"						""
+		"Ability17"						"ability_unit_died_light"
+	}
+
+	//=======================================================================================================
 	// HERO: Shadow Hunter( Shadow Shaman )
 	//=======================================================================================================
 	"npc_dota_hero_shadow_shaman_holdout"
@@ -1009,7 +1117,7 @@
 		"AttributeIntelligenceGain"		"5"
 
 		"Ability1"						"holdout_storm_bolt"
-		"Ability2"						"holdout_thunder_clap"
+		"Ability2"						"holdout_war_thunder"
 		"Ability3"						"holdout_muradin_hammer"		
 		"Ability4"						"slardar_bash"
 		"Ability5"						"holdout_thunder_spirit"
@@ -1047,6 +1155,41 @@
 		"Ability4"						"holdout_illidan_evasion"
 		"Ability5"						"holdout_roar"
 		"Ability6"						"holdout_metamorphosis"
+		"Ability7"						""
+		"Ability8"						""
+		"Ability9"						""
+		"Ability10"						""
+		"Ability11"						""
+		"Ability12"						""
+		"Ability13"						""
+		"Ability14"						""
+		"Ability15"						""
+		"Ability16"						""
+		"Ability17"						"ability_unit_died_light"
+	}
+
+	//=======================================================================================================
+	// HERO: Stone Giant (Tiny)
+	//=======================================================================================================
+	"npc_dota_hero_tiny_holdout"
+	{
+		"override_hero"					"npc_dota_hero_tiny"
+//		"DisableWearables"				"1"
+		"MovementSpeed"					"380"
+		"AttackRange"					"150"
+		"ModelScale"					"1.0"
+		"ArmorPhysical"					"4"
+
+		"AttributeStrengthGain"			"10"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"5"
+
+		"Ability1"						"holdout_war_club"
+		"Ability2"						"holdout_dwarf_toss"
+		"Ability3"						"holdout_second_wind"	//granite_golem_hp_aura
+		"Ability4"						"elder_titan_earth_splitter"
+		"Ability5"						"holdout_giant_form"
+		"Ability6"						"medusa_stone_gaze"
 		"Ability7"						""
 		"Ability8"						""
 		"Ability9"						""
@@ -1159,7 +1302,7 @@
 		"Ability4"						"holdout_critical_arrows_alt"
 		"Ability5"						"forest_troll_high_priest_heal"
 		"Ability6"						"holdout_splash_arrows"
-		"Ability7"						""
+		"Ability7"						"holdout_rocket_hail"
 		"Ability8"						""
 		"Ability9"						""
 		"Ability10"						""

@@ -2268,10 +2268,10 @@
 		{
 			"AttachWearables"
 			{
-				"Wearable1" { "ItemDef" "5555" }//Weapon - Spear of Teardrop Ice
-				"Wearable2" { "ItemDef" "6619" }//Arms
-				"Wearable3" { "ItemDef" "6617" }//Belt
-				"Wearable4" { "ItemDef" "6621" }//Shoulder
+				"Wearable1" { "ItemDef" "127" }//Head
+				"Wearable2" { "ItemDef" "128" }//Belt
+				"Wearable3" { "ItemDef" "129" }//Arms
+				"Wearable4" { "ItemDef" "130" }//Shoulder
 			}
 		}
 	}
@@ -8399,8 +8399,8 @@
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
-		"AttackDamageMin"			"88998"							// Damage range min.
-		"AttackDamageMax"			"98000"							// Damage range max.
+		"AttackDamageMin"			"109999"						// Damage range min.
+		"AttackDamageMax"			"110001"						// Damage range max.
 		"AttackRate"				"0.65"							// Speed of attack.
 		"AttackAnimationPoint"		"0.45"							// Normalized time in animation cycle to attack.
 		"AttackAcquisitionRange"	"2000"							// Range within a target can be acquired.
@@ -8410,7 +8410,7 @@
 
 		// Bounty
 		//----------------------------------------------------------------
-		"BountyXP"					"999999"		// Experience earn.
+		"BountyXP"					"99999"		// Experience earn.
 		"BountyGoldMin"				"1"		// Gold earned min.
 		"BountyGoldMax"				"1"		// Gold earned max.
 
@@ -8428,7 +8428,7 @@
 
 		// Status
 		//----------------------------------------------------------------
-		"StatusHealth"				"70000"			// Base health.
+		"StatusHealth"				"125000"		// Base health.
 		"StatusHealthRegen"			"100.0"			// Health regeneration rate.
 		"StatusMana"				"50000"			// Base mana.
 		"StatusManaRegen"			"15.0"			// Mana regeneration rate.
@@ -8585,7 +8585,7 @@
 
 		// Status
 		//----------------------------------------------------------------
-		"StatusHealth"				"70000"			// Base health.
+		"StatusHealth"				"125000"			// Base health.
 		"StatusHealthRegen"			"0.0"			// Health regeneration rate.
 		"StatusMana"				"50000"			// Base mana.
 		"StatusManaRegen"			"15.0"			// Mana regeneration rate.
@@ -8681,7 +8681,7 @@
 
 		// Status
 		//----------------------------------------------------------------
-		"StatusHealth"				"70000"			// Base health.
+		"StatusHealth"				"125000"			// Base health.
 		"StatusHealthRegen"			"0.0"			// Health regeneration rate.
 		"StatusMana"				"50000"			// Base mana.
 		"StatusManaRegen"			"15.0"			// Mana regeneration rate.
@@ -8777,7 +8777,7 @@
 
 		// Status
 		//----------------------------------------------------------------
-		"StatusHealth"				"70000"			// Base health.
+		"StatusHealth"				"125000"			// Base health.
 		"StatusHealthRegen"			"0.0"			// Health regeneration rate.
 		"StatusMana"				"50000"			// Base mana.
 		"StatusManaRegen"			"15.0"			// Mana regeneration rate.
@@ -10064,7 +10064,7 @@
 			{
 				"KeyOf3Moons"
 				{
-					"Item"					""
+					"Item"					"item_ring_of_superiority"
 				}
 			}
 
@@ -11905,7 +11905,7 @@
 		// Abilities
 		//----------------------------------------------------------------
 		"Ability1"				"holdout_storm_bolt"
-		"Ability2"				"holdout_thunder_clap"
+		"Ability2"				"holdout_war_thunder"
 		"Ability3"				"holdout_muradin_hammer_tooltip"		
 		"Ability4"				"slardar_bash"
 		"Ability5"				"holdout_thunder_spirit"
@@ -11978,7 +11978,8 @@
 		"Ability4"				"holdout_critical_arrows_alt"
 		"Ability5"				"forest_troll_high_priest_heal"
 		"Ability6"				"holdout_splash_arrows_tooltip"
-		"Ability7"				"dummy_passive_vulnerable"
+		"Ability7"				"holdout_rocket_hail"
+		"Ability8"				"dummy_passive_vulnerable"
 
 		// Armor
 		//----------------------------------------------------------------
@@ -13581,6 +13582,267 @@
 				"Wearable3" { "ItemDef" "254" } //Head
 				"Wearable4" { "ItemDef" "255" } //Skirt
 				"Wearable5" { "ItemDef" "256" } //Horse Armor
+			}
+		}
+	}
+
+	//=================================================================================
+	// HERO: Mountain Giant (Tiny)
+	//=================================================================================
+	"npc_dota_hero_tiny_bis"
+	{
+		// General
+		//----------------------------------------------------------------
+		"BaseClass"					"npc_dota_creature"
+		"Model"						"models/heroes/tiny_01/tiny_01.vmdl"	 //Add model
+		"ModelScale"				"1.0"
+		"Level"						"1"
+		"AttackDamageMin"			"66"
+		"AttackDamageMax"			"76"
+
+		// Abilities
+		//----------------------------------------------------------------
+		"Ability1"				"holdout_war_club"
+		"Ability2"				"holdout_dwarf_toss"
+		"Ability3"				"granite_golem_hp_aura"		
+		"Ability4"				"elder_titan_earth_splitter"
+		"Ability5"				"holdout_giant_form"
+		"Ability6"				"medusa_stone_gaze"
+		"Ability7"				"dummy_passive_vulnerable"
+//		"Ability8"				"nightelf_mountain_giant_model"
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"				"2.0"
+		"MagicalResistance"			"25"
+
+		// Attack
+		//-------------------------------------------------------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
+		"AttackRate"				"1.7"
+		"AttackRange"				"128"
+		"RingRadius"				"120"
+		"HealthBarOffset"			"195"
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementSpeed"				"380"
+
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"720"
+		"StatusMana"				"254"
+
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"1000"
+		"VisionNighttimeRange"		"1000"
+
+		// Creature Data
+		//----------------------------------------------------------------
+		"Creature"
+		{
+			"AttachWearables"
+			{
+				"Wearable1" { "ItemDef" "493" } //Head
+				"Wearable2" { "ItemDef" "494" } //Right Arm
+				"Wearable3" { "ItemDef" "495" } //Left Arm
+				"Wearable4" { "ItemDef" "496" } //Body
+			}
+		}
+	}
+
+	//=================================================================================
+	// HERO: Monkey King
+	//=================================================================================
+	"npc_dota_hero_monkey_king_bis"
+	{
+		// General
+		//----------------------------------------------------------------
+		"BaseClass"					"npc_dota_creature"
+		"Model"						"models/heroes/monkey_king/monkey_king.vmdl"	 //Add model
+		"ModelScale"				"0.98"
+		"Level"						"1"
+		"AttackDamageMin"			"66"
+		"AttackDamageMax"			"76"
+
+		// Abilities
+		//----------------------------------------------------------------
+		"Ability1"					"monkey_king_boundless_strike"
+		"Ability2"					"monkey_king_tree_dance"
+		"Ability3"					"monkey_king_primal_spring"
+		"Ability4"					"holdout_jingu_mastery"
+		"Ability5"					"holdout_monkey_king_bar"
+		"Ability6"					"monkey_king_wukongs_command"
+		"Ability7"					"dummy_passive_vulnerable"
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"				"2.0"
+		"MagicalResistance"			"25"
+
+		// Attack
+		//-------------------------------------------------------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
+		"AttackRate"				"1.7"
+		"AttackRange"				"128"
+		"RingRadius"				"120"
+		"HealthBarOffset"			"195"
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementSpeed"				"380"
+
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"720"
+		"StatusMana"				"254"
+
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"1000"
+		"VisionNighttimeRange"		"1000"
+
+		// Creature Data
+		//----------------------------------------------------------------
+		"Creature"
+		{
+			"AttachWearables"
+			{
+				"Wearable1" { "ItemDef" "609" } //Weapon
+				"Wearable2" { "ItemDef" "9050" } //Head - Great Sage's Reckoning
+				"Wearable3" { "ItemDef" "608" } //Armor
+			}
+		}
+	}
+
+	//=================================================================================
+	// HERO: Desert Wyrm (Sand King)
+	//=================================================================================
+	"npc_dota_hero_sand_king_bis"
+	{
+		// General
+		//----------------------------------------------------------------
+		"BaseClass"					"npc_dota_creature"
+		"Model"						"models/heroes/sand_king/sand_king.vmdl"	 //Add model
+		"ModelScale"				"1.06"
+		"Level"						"1"
+		"AttackDamageMin"			"66"
+		"AttackDamageMax"			"76"
+
+		// Abilities
+		//----------------------------------------------------------------
+		"Ability1"					""
+		"Ability2"					""
+		"Ability3"					""
+		"Ability4"					""
+		"Ability5"					""
+		"Ability6"					""
+		"Ability7"					"dummy_passive_vulnerable"
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"				"2.0"
+		"MagicalResistance"			"25"
+
+		// Attack
+		//-------------------------------------------------------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
+		"AttackRate"				"1.7"
+		"AttackRange"				"128"
+		"RingRadius"				"120"
+		"HealthBarOffset"			"195"
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementSpeed"				"380"
+
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"720"
+		"StatusMana"				"254"
+
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"1000"
+		"VisionNighttimeRange"		"1000"
+
+		// Creature Data
+		//----------------------------------------------------------------
+		"Creature"
+		{
+			"AttachWearables"
+			{
+				"Wearable1" { "ItemDef" "180" } //Head
+				"Wearable2" { "ItemDef" "198" } //Shoulders
+				"Wearable3" { "ItemDef" "199" } //Claws
+				"Wearable4" { "ItemDef" "200" } //Legs
+				"Wearable5" { "ItemDef" "201" } //Tail
+			}
+		}
+	}
+
+	//=================================================================================
+	// HERO: Axe (Dota 2 Hero)
+	//=================================================================================
+	"npc_dota_hero_axe_bis"
+	{
+		// General
+		//----------------------------------------------------------------
+		"BaseClass"					"npc_dota_creature"
+		"Model"						"models/heroes/axe/axe.vmdl"	 //Add model
+		"ModelScale"				"1.06"
+		"Level"						"1"
+		"AttackDamageMin"			"66"
+		"AttackDamageMax"			"76"
+
+		// Abilities
+		//----------------------------------------------------------------
+		"Ability1"					"axe_berserkers_call"
+		"Ability2"					"axe_counter_helix"
+		"Ability3"					"axe_battle_rage"		
+		"Ability4"					"holdout_spiked_carapace"
+		"Ability5"					"holdout_berserkers_rage"
+		"Ability6"					"holdout_culling_blade"
+		"Ability7"					"dummy_passive_vulnerable"
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"				"2.0"
+		"MagicalResistance"			"25"
+
+		// Attack
+		//-------------------------------------------------------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
+		"AttackRate"				"1.7"
+		"AttackRange"				"128"
+		"RingRadius"				"120"
+		"HealthBarOffset"			"195"
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementSpeed"				"360"
+
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"720"
+		"StatusMana"				"254"
+
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"1000"
+		"VisionNighttimeRange"		"1000"
+
+		// Creature Data
+		//----------------------------------------------------------------
+		"Creature"
+		{
+			"AttachWearables"
+			{
+				"Wearable1" { "ItemDef" "2" } //Axe
+				"Wearable2" { "ItemDef" "3" } //Armor
+				"Wearable3" { "ItemDef" "4" } //Head
+				"Wearable4" { "ItemDef" "5" } //Belt
 			}
 		}
 	}
