@@ -1944,6 +1944,35 @@
 		}
 	}
 
+	//=======================================================================================================
+	// Stone Giant Dummy: Grow Model
+	//=======================================================================================================
+	"nightelf_mountain_giant_model"
+	{
+		"BaseClass"						"ability_datadriven"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_HIDDEN"
+		"AbilityType"					"DOTA_ABILITY_TYPE_BASIC"
+		"MaxLevel"						"1"
+
+		"Modifiers"
+		{
+			"modifier_mountain_giant_model"
+			{
+				"Passive"			"1"
+				"IsHidden"			"1"
+
+				"OnCreated"
+				{
+					"RunScript"
+					{
+						"ScriptFile"	"heroes/hero_mountain_giant.lua"
+						"Function"		"GrowDummy"
+					}
+				}
+			}
+		}
+	}
+
 	//========================================================================================================
 	// Paladin: Healing Wave
 	//========================================================================================================
@@ -15378,7 +15407,7 @@
 			"01"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"hero_return_percent"		"40"
+				"hero_return_percent"		"30"
 			}
 			"02"
 			{
@@ -15396,7 +15425,7 @@
 		{
 			"particle"	"particles/units/heroes/hero_centaur/centaur_return.vpcf"
 		}
-	
+
 		"Modifiers"
 		{
 			"modifier_spiked_carapace"
@@ -18756,7 +18785,7 @@
 			"01"
 			{
 				"var_type"			"FIELD_INTEGER"
-				"strikes"			"7 10 13 16"
+				"strikes"			"8 12 16 20"
 			}
 			"02"
 			{
@@ -18781,7 +18810,7 @@
 			"06"
 			{
 				"var_type"			"FIELD_INTEGER"
-				"splash_damage_percent"	"60"
+				"splash_damage_percent"	"50"
 			}
 		}
 
@@ -18809,22 +18838,12 @@
 
 			"modifier_war_club_strikes"
 			{
-//				"OnAttackStart"
-//				{
-//					"FireSound"
-//					{
-//						"EffectName"	"Hero_Tiny_Tree.PreAttack"
-//						"Target" 		"CASTER"
-//					}
-//				}
-
 				"OnAttackLanded"
 				{
 					"RunScript"
 					{
 						"ScriptFile"	"heroes/hero_mountain_giant.lua"
 						"Function"		"WarClubStrike"
-						"Damage"		"%attack_damage"
 					}
 
 					"RunScript"
@@ -18832,12 +18851,90 @@
 						"ScriptFile"	"scripts/vscripts/heroes/hero_centurion/sea_dragon_form.lua"
 						"Function"		"Splash"
 					}
+				}
+			}
+		}
+	}
 
-//					"FireSound"
-//					{
-//						"EffectName"	"Hero_Tiny_Tree.Attack"
-//						"Target" 		"TARGET"
-//					}
+	//=================================================================================================================
+	// Stone Giant: War Club (Permanent)
+	//=================================================================================================================
+	"holdout_war_club_20"
+	{
+		"BaseClass"					"ability_datadriven"
+		"AbilityTextureName"		"treant_living_armor"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"MaxLevel"					"1"
+
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"			"FIELD_INTEGER"
+				"range"				"300"
+			}	
+			"02"
+			{
+				"var_type"			"FIELD_INTEGER"
+				"bonus_damage"		"450"
+			}
+			"03"
+			{
+				"var_type"			"FIELD_INTEGER"
+				"bonus_range"		"150"
+			}
+			"04"
+			{
+				"var_type"			"FIELD_INTEGER"
+				"splash_radius"		"350"
+			}
+			"05"
+			{
+				"var_type"			"FIELD_INTEGER"
+				"splash_damage_percent"	"50"
+			}
+		}
+
+		"OnUpgrade"
+		{
+			"ApplyModifier"
+			{
+				"ModifierName"	"modifier_war_club"
+				"Target"		"CASTER"
+			}
+
+			"ApplyModifier"
+			{
+				"ModifierName"	"modifier_war_club_strikes"
+				"Target"		"CASTER"
+			}
+		}
+
+		"Modifiers"
+		{
+			"modifier_war_club"
+			{
+				"IsHidden"			"1"
+				"Attributes"		"MODIFIER_ATTRIBUTE_PERMANENT"
+
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_ATTACK_RANGE_BONUS"		"%bonus_range"
+					"MODIFIER_PROPERTY_BASEATTACK_BONUSDAMAGE"	"%bonus_damage"
+				}
+			}
+
+			"modifier_war_club_strikes"
+			{
+				"Attributes"		"MODIFIER_ATTRIBUTE_PERMANENT"
+
+				"OnAttackLanded"
+				{
+					"RunScript"
+					{
+						"ScriptFile"	"scripts/vscripts/heroes/hero_centurion/sea_dragon_form.lua"
+						"Function"		"Splash"
+					}
 				}
 			}
 		}
@@ -19165,14 +19262,14 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"bonus_damage"			"25"
+				"bonus_damage"			"35"
 			}
 			"02"
 			{
 				"var_type"				"FIELD_FLOAT"
-				"bat_reduction"			"0.4"
+				"bat_reduction"			"0.2"
 			}
-			"02"
+			"03"
 			{
 				"var_type"				"FIELD_INTEGER"
 				"bonus_ms"				"-40"
@@ -19480,12 +19577,12 @@
 			"01"
 			{
 				"var_type"					"FIELD_FLOAT"
-				"duration"					"20.0"
+				"duration"					"15.0 20.0 25.0 30.0"
 			}
 			"02"
 			{
 				"var_type"					"FIELD_FLOAT"
-				"heal_multiplier"			"20.0 25.0 30.0 35.0"
+				"heal_multiplier"			"16.0 20.0 24.0 28.0"
 			}
 		}
 
@@ -19581,7 +19678,7 @@
 			"04"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"leap_radius"			"175 225 275"
+				"leap_radius"			"300 400 500"
 			}
 			"05"
 			{
@@ -19861,7 +19958,8 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"BaseClass"             		"brewmaster_thunder_clap_new"
+		"BaseClass"             		"brewmaster_thunder_clap"
+		"AbilityTextureName"			"brewmaster_thunder_clap_new"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_PURE"
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"

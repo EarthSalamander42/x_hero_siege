@@ -12,7 +12,7 @@ function Return( event )
 	-- Damage
 	if attacker:GetTeamNumber() ~= caster:GetTeamNumber() and attacker:IsHero() then
 		ApplyDamage({ victim = attacker, attacker = caster, damage = divided_damage * hero_damage, damage_type = damageType })
-	elseif attacker:GetTeamNumber() ~= caster:GetTeamNumber() and not attacker:IsHero() then
+	elseif attacker:GetTeamNumber() ~= caster:GetTeamNumber() and attacker:IsCreep() then
 		ApplyDamage({ victim = attacker, attacker = caster, damage = divided_damage * creep_damage, damage_type = damageType })
 	end
 end

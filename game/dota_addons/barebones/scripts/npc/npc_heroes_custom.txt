@@ -1177,7 +1177,7 @@
 //		"DisableWearables"				"1"
 		"MovementSpeed"					"380"
 		"AttackRange"					"150"
-		"ModelScale"					"1.0"
+		"ModelScale"					"1.1"
 		"ArmorPhysical"					"4"
 
 		"AttributeStrengthGain"			"10"

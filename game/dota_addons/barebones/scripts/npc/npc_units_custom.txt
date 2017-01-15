@@ -215,7 +215,7 @@
 
 		// Armor
 		//----------------------------------------------------------------
-		"ArmorPhysical"				"135"		// Physical protection.
+		"ArmorPhysical"				"110"		// Physical protection.
 		"MagicalResistance"			"100"			// Magical protection.
 
 		// Attack
@@ -2272,6 +2272,7 @@
 				"Wearable2" { "ItemDef" "128" }//Belt
 				"Wearable3" { "ItemDef" "129" }//Arms
 				"Wearable4" { "ItemDef" "130" }//Shoulder
+				"Wearable5" { "ItemDef" "132" }//Weapon
 			}
 		}
 	}
@@ -2765,7 +2766,7 @@
 
 		// Armor
 		//----------------------------------------------------------------
-		"ArmorPhysical"				"25"	// Physical protection.
+		"ArmorPhysical"				"40"	// Physical protection.
 		"MagicalResistance"			"0"	// Magical protection.
 
 		// Attack
@@ -2880,7 +2881,7 @@
 
 		// Armor
 		//----------------------------------------------------------------
-		"ArmorPhysical"				"25"	// Physical protection.
+		"ArmorPhysical"				"40"	// Physical protection.
 		"MagicalResistance"			"25"	// Magical protection.
 
 		// Attack
@@ -2999,7 +3000,7 @@
 
 		// Armor
 		//----------------------------------------------------------------
-		"ArmorPhysical"				"50"		// Physical protection.
+		"ArmorPhysical"				"60"		// Physical protection.
 		"MagicalResistance"			"25"		// Magical protection.
 
 		// Attack
@@ -3103,8 +3104,8 @@
 		// Abilities
 		//----------------------------------------------------------------
 //		"Ability1"					"dragon_knight_dragon_blood"				// Ability 1.
-//		"Ability2"					""		// Ability 2.
-//		"Ability3"					""		// Ability 3.
+		"Ability2"					""		// Ability 2.
+		"Ability3"					""		// Ability 3.
 		"Ability4"					""		// Ability 4.
 
 		// Inventory
@@ -3113,7 +3114,7 @@
 
 		// Armor
 		//----------------------------------------------------------------
-		"ArmorPhysical"				"75"	// Physical protection.
+		"ArmorPhysical"				"90"	// Physical protection.
 		"MagicalResistance"			"25"	// Magical protection.
 
 		// Attack
@@ -3228,7 +3229,7 @@
 
 		// Armor
 		//----------------------------------------------------------------
-		"ArmorPhysical"				"75"	// Physical protection.
+		"ArmorPhysical"				"90"	// Physical protection.
 		"MagicalResistance"			"25"	// Magical protection.
 
 		// Attack
@@ -13604,12 +13605,12 @@
 		//----------------------------------------------------------------
 		"Ability1"				"holdout_war_club"
 		"Ability2"				"holdout_dwarf_toss"
-		"Ability3"				"granite_golem_hp_aura"		
+		"Ability3"				"holdout_second_wind"		
 		"Ability4"				"elder_titan_earth_splitter"
 		"Ability5"				"holdout_giant_form"
 		"Ability6"				"medusa_stone_gaze"
 		"Ability7"				"dummy_passive_vulnerable"
-//		"Ability8"				"nightelf_mountain_giant_model"
+		"Ability8"				"nightelf_mountain_giant_model"
 
 		// Armor
 		//----------------------------------------------------------------

@@ -61,10 +61,10 @@ function GameMode:OnNPCSpawned(keys)
 	end
 
 	if npc:GetUnitName() == "npc_dota_hero_tiny" then
-		print('Tiny is back to small state!')
 		npc:AddAbility("tiny_grow")
 		grow = npc:FindAbilityByName("tiny_grow")
-		grow:SetLevel(0)
+		grow:SetLevel(1)
+		npc:SetModelScale( 1.1 )
 		Timers:CreateTimer(0.4, function()
 			npc:RemoveAbility("tiny_grow")
 		end)
@@ -344,20 +344,29 @@ local hero = player:GetAssignedHero()
 local hero_level = hero:GetLevel()
 
 local AbilitiesHeroes_XX = {
-	npc_dota_hero_elder_titan = {{"holdout_shockwave_20", 0}, {"holdout_war_stomp_20", 1}, {"holdout_roar_20", 4}, {"holdout_reincarnation", 6}},
-	npc_dota_hero_enchantress = {{"neutral_spell_immunity", 6}},
-	npc_dota_hero_omniknight = {{"holdout_light_frenzy", 4}},
-	npc_dota_hero_sniper ={{"holdout_rocket_launcher_20", 0}, {"holdout_plasma_rifle_20", 1}},
-	npc_dota_hero_sven = {{"holdout_storm_bolt_20", 0}, {"holdout_thunder_clap_20", 1}},
-	npc_dota_hero_brewmaster = {{"enraged_wildkin_tornado", 4}},
-	npc_dota_hero_nevermore = {{"holdout_rain_of_chaos_20", 6}},
-	npc_dota_hero_terrorblade = {{"holdout_resistant_skin", 6}},
+		npc_dota_hero_elder_titan = {{"holdout_shockwave_20", 0}, {"holdout_war_stomp_20", 1}, {"holdout_roar_20", 4}, {"holdout_reincarnation", 6}},
+		npc_dota_hero_enchantress = {{"neutral_spell_immunity", 6}},
+		npc_dota_hero_omniknight = {{"holdout_light_frenzy", 4}},
+		npc_dota_hero_sniper ={{"holdout_rocket_launcher_20", 0}, {"holdout_plasma_rifle_20", 1}},
+		npc_dota_hero_sven = {{"holdout_storm_bolt_20", 0}, {"holdout_thunder_clap_20", 1}},
+		npc_dota_hero_brewmaster = {{"enraged_wildkin_tornado", 4}},
+		npc_dota_hero_nevermore = {{"holdout_rain_of_chaos_20", 6}},
+		npc_dota_hero_terrorblade = {{"holdout_resistant_skin", 6}},
+		npc_dota_hero_tiny = {{"holdout_war_club_20", 0}},
 	}
 
 	if hero_level == 17 then -- Debug because 7.0
 		hero:SetAbilityPoints( hero:GetAbilityPoints() + 1 )
 	elseif hero_level > 19 then
 		hero:SetAbilityPoints( hero:GetAbilityPoints() - 1 )
+	end
+
+	if hero:GetUnitName() == "npc_dota_hero_tiny" then
+		if hero_level == 20 then
+			local ability = hero:FindAbilityByName("holdout_war_club_20")
+			hero:RemoveAbility("holdout_war_club")
+			hero:AddNewModifier(hero, ability, "modifier_item_ultimate_scepter_consumed", {})
+		end
 	end
 
 	if hero:GetUnitName() == "npc_dota_hero_elder_titan" then

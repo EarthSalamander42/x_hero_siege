@@ -8,28 +8,29 @@ _G.RAMERO = 0
 _G.MAGTHERIDON = 0
 _G.FOUR_BOSSES = 0
 _G.SPIRIT_MASTER = 0
-_G.X_HERO_SIEGE_V = 3.33
+_G.X_HERO_SIEGE_V = 3.32
 
 _G.mod_creator = {
-		54896080, -- Cookies
-		295458357 -- X Hero Siege
+		54896080,	-- Cookies
+		295458357	-- X Hero Siege
 	}
 
 _G.captain_baumi = {
-		43305444, -- Baumi( Because why not? )
-		44022861 -- Padaa
+		43305444,	-- Baumi( Because why not? )
+		44022861	-- Padaa
 	}
 
 _G.mod_graphist = {
-		61711140, -- Mugiwara
-		56352263 -- Flotos
+		61711140,	-- Mugiwara
+		56352263	-- Flotos
 	}
 
 _G.vip_members = {
 		320774890,	-- Error [Han Gao on Patreon, Remove Date if not paid: 26/01/2017]
 		97490223,	-- IllidanStormrage [Lucas Diao on Patreon, Removed Date if not paid: 29/01/2017]
 		44364795,	-- Lyzer93 [Balraj McCoy on Patreon, Removed Date if not paid: 10/02/2017]
-		46744186	-- Captain Darian Frey [CaptainDarianFrey on Patreon, Removed Date if not paid: 10/02/2017]
+		46744186,	-- Captain Darian Frey [CaptainDarianFrey on Patreon, Removed Date if not paid: 10/02/2017]
+		3180772		-- Yoshi [Fabian Rothmund on Patreon, Removed Date if not paid: 15/02/2017]
 	}
 
 _G.golden_vip_members = {
@@ -146,7 +147,7 @@ HEROLIST_ALT[24] = ursa				-- Malfurion
 HEROLIST_ALT[25] = nevermore		-- Banehallow
 HEROLIST_ALT[26] = brewmaster		-- Pandaren Brewmaster
 HEROLIST_ALT[27] = warlock			-- Archimonde
-HEROLIST_ALT[28] = axe		-- Dota 2 Hero
+HEROLIST_ALT[28] = axe				-- Dota 2 Hero
 
 HEROLIST_VIP = {}
 HEROLIST_VIP[1] = "slardar"				-- Centurion

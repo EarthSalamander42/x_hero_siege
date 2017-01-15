@@ -657,6 +657,11 @@
 				"var_type"						"FIELD_INTEGER"
 				"slow_tooltip"					"60"
 			}
+			"08"
+			{
+				"var_type"						"FIELD_INTEGER"
+				"mana_regen"					"90"
+			}
 		}
 		
 		"OnSpellStart"
@@ -711,6 +716,7 @@
 				"Properties"
 				{
 					"MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS"		"%bonus_armor"
+					"MODIFIER_PROPERTY_MANA_REGEN_CONSTANT"			"%mana_regen"
 				}
 			}
 			"modifier_item_ghost_datadriven_active"
