@@ -279,19 +279,6 @@ local triggers_frost_infernal = Entities:FindAllByName("trigger_special_event_fr
 	return 30
 	end)
 
-	for _,v in pairs(triggers_choice) do
-		v:Enable()
-	end
-	for _,v in pairs(triggers_hero_image) do
-		v:Enable()
-	end
-	for _,v in pairs(triggers_spirit_beast) do
-		v:Enable()
-	end
-	for _,v in pairs(triggers_frost_infernal) do
-		v:Enable()
-	end
-
 --	EmitGlobalSound("Global.HumanMusic1") -- Lasts 4:33
 
 	-- Timer: Creeps Levels 2, 3, 4, 5, 6 Whispering
@@ -308,11 +295,17 @@ local triggers_frost_infernal = Entities:FindAllByName("trigger_special_event_fr
 		nCOUNTDOWNINCWAVE = 241
 		SpawnBlackDragon()
 		for _,v in pairs(triggers_choice) do
+		v:Enable()
+		end
+		for _,v in pairs(triggers_hero_image) do
 			v:Enable()
 		end
-		triggers_hero_image:Enable()
-		triggers_spirit_beast:Enable()
-		triggers_frost_infernal:Enable()
+		for _,v in pairs(triggers_spirit_beast) do
+			v:Enable()
+		end
+		for _,v in pairs(triggers_frost_infernal) do
+			v:Enable()
+		end
 	end)
 	Timers:CreateTimer(1200, function() -- 18 Min + 2 Min with Muradin Event = 20 Min
 		Notifications:TopToAll({hero="npc_dota_hero_doom_bringer", duration=6.0})
