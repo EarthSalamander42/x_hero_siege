@@ -10,11 +10,13 @@ function SpawnCreeps()
 						unit:SetInitialGoalEntity(Waypoint)
 						unit:MoveToPositionAggressive(Waypoint:GetAbsOrigin())
 					end
-					local unit = CreateUnitByName("npc_dota_creature_mini_weavers", point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
-					unit:SetInitialGoalEntity(Waypoint)
-					unit:MoveToPositionAggressive(Waypoint:GetAbsOrigin())
+					for j = 1, 2 do
+						local unit = CreateUnitByName("npc_dota_creature_mini_weavers", point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
+						unit:SetInitialGoalEntity(Waypoint)
+						unit:MoveToPositionAggressive(Waypoint:GetAbsOrigin())
+					end
 				elseif time_elapsed >= 390 and time_elapsed < 750 then -- Level 2, 6 to 14 Min
-					for j = 1, 4 do
+					for j = 1, 3 do
 						local unit = CreateUnitByName("npc_dota_creature_mini_undyings", point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
 						unit:SetInitialGoalEntity(Waypoint)
 						unit:MoveToPositionAggressive(Waypoint:GetAbsOrigin())
@@ -25,56 +27,56 @@ function SpawnCreeps()
 						unit:MoveToPositionAggressive(Waypoint:GetAbsOrigin())
 					end
 				elseif time_elapsed >= 870 and time_elapsed < 1230 then -- Level 3, 14 to 20 Min
-					for j = 1, 5 do
+					for j = 1, 3 do
 						local unit = CreateUnitByName("npc_dota_creature_mini_nyxes", point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
 						unit:SetInitialGoalEntity(Waypoint)
 						unit:MoveToPositionAggressive(Waypoint:GetAbsOrigin())
 					end
-					for j = 1, 3 do
+					for j = 1, 2 do
 						local unit = CreateUnitByName("npc_dota_creature_mini_fiends", point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
 						unit:SetInitialGoalEntity(Waypoint)
 						unit:MoveToPositionAggressive(Waypoint:GetAbsOrigin())
 					end
 				elseif time_elapsed >= 1230 and time_elapsed < 1470 then -- Level 4, 20 to 24 Min
-					for j = 1, 5 do
+					for j = 1, 3 do
 						local unit = CreateUnitByName("npc_dota_creature_mini_dooms", point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
 						unit:SetInitialGoalEntity(Waypoint)
 						unit:MoveToPositionAggressive(Waypoint:GetAbsOrigin())
 					end
-					for j = 1, 3 do
+					for j = 1, 2 do
 						local unit = CreateUnitByName("npc_dota_creature_mini_black_dragons", point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
 						unit:SetInitialGoalEntity(Waypoint)
 						unit:MoveToPositionAggressive(Waypoint:GetAbsOrigin())
 					end
 				elseif time_elapsed >= 1650 and time_elapsed < 1830 then -- Level 4, 27 to 30 Min
-					for j = 1, 5 do
+					for j = 1, 3 do
 						local unit = CreateUnitByName("npc_dota_creature_mini_dooms", point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
 						unit:SetInitialGoalEntity(Waypoint)
 						unit:MoveToPositionAggressive(Waypoint:GetAbsOrigin())
 					end
-					for j = 1, 3 do
+					for j = 1, 2 do
 						local unit = CreateUnitByName("npc_dota_creature_mini_black_dragons", point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
 						unit:SetInitialGoalEntity(Waypoint)
 						unit:MoveToPositionAggressive(Waypoint:GetAbsOrigin())
 					end
 				elseif time_elapsed >= 1830 and time_elapsed < 2190 then -- Level 5, 30 to 36 Min
-					for j = 1, 5 do
+					for j = 1, 3 do
 						local unit = CreateUnitByName("npc_dota_creature_mini_lancers", point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
 						unit:SetInitialGoalEntity(Waypoint)
 						unit:MoveToPositionAggressive(Waypoint:GetAbsOrigin())
 					end
-					for j = 1, 3 do
+					for j = 1, 2 do
 						local unit = CreateUnitByName("npc_dota_creature_mini_miranas", point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
 						unit:SetInitialGoalEntity(Waypoint)
 						unit:MoveToPositionAggressive(Waypoint:GetAbsOrigin())
 					end
 				elseif time_elapsed >= 2190 then -- Level 6, 36 to Infinite.
-					for j = 1, 5 do
+					for j = 1, 3 do
 						local unit = CreateUnitByName("npc_dota_creature_mini_tinys", point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
 						unit:SetInitialGoalEntity(Waypoint)
 						unit:MoveToPositionAggressive(Waypoint:GetAbsOrigin())
 					end
-					for j = 1, 3 do
+					for j = 1, 2 do
 						local unit = CreateUnitByName("npc_dota_creature_mini_wyverns", point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
 						unit:SetInitialGoalEntity(Waypoint)
 						unit:MoveToPositionAggressive(Waypoint:GetAbsOrigin())

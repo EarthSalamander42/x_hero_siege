@@ -24,15 +24,16 @@ end
 
 -- An NPC has spawned somewhere in game. This includes heroes
 function GameMode:OnNPCSpawned(keys)
-	DebugPrint("[BAREBONES] NPC Spawned")
-	DebugPrintTable(keys)
+DebugPrint("[BAREBONES] NPC Spawned")
+DebugPrintTable(keys)
 
-	local difficulty = GameRules:GetCustomGameDifficulty()
-	local npc = EntIndexToHScript(keys.entindex)
-	local normal_bounty = npc:GetGoldBounty()
-	local normal_xp = npc:GetDeathXP()
-	local normal_min_damage = npc:GetBaseDamageMin()
-	local normal_max_damage = npc:GetBaseDamageMax()
+local difficulty = GameRules:GetCustomGameDifficulty()
+local npc = EntIndexToHScript(keys.entindex)
+local normal_bounty = npc:GetGoldBounty()
+local normal_xp = npc:GetDeathXP()
+local normal_min_damage = npc:GetBaseDamageMin()
+local normal_max_damage = npc:GetBaseDamageMax()
+local hero_level = npc:GetLevel()
 
 	if difficulty == 1 and npc:GetTeam() == DOTA_TEAM_BADGUYS then
 		npc:SetMinimumGoldBounty( normal_bounty*1.5 )
@@ -68,6 +69,11 @@ function GameMode:OnNPCSpawned(keys)
 		Timers:CreateTimer(0.4, function()
 			npc:RemoveAbility("tiny_grow")
 		end)
+	end
+
+	if npc:GetUnitName() == "npc_dota_hero_tiny" and hero_level >= 20 then
+		local ability = npc:FindAbilityByName("holdout_war_club_20")
+		npc:AddNewModifier(npc, ability, "modifier_item_ultimate_scepter_consumed", {})
 	end
 
 	if npc:GetUnitName() == "npc_dota_hero_chaos_knight" then
@@ -288,10 +294,11 @@ end
 
 -- An item was picked up off the ground
 function GameMode:OnItemPickedUp(keys)
-	local heroEntity = EntIndexToHScript(keys.HeroEntityIndex)
-	local itemEntity = EntIndexToHScript(keys.ItemEntityIndex)
-	local player = PlayerResource:GetPlayer(keys.PlayerID)
-	local itemname = keys.itemname
+local heroEntity = EntIndexToHScript(keys.HeroEntityIndex)
+local itemEntity = EntIndexToHScript(keys.ItemEntityIndex)
+local player = PlayerResource:GetPlayer(keys.PlayerID)
+local itemname = keys.itemname
+
 end
 
 -- A player has reconnected to the game. This function can be used to repaint Player-based particles or change
@@ -344,21 +351,41 @@ local hero = player:GetAssignedHero()
 local hero_level = hero:GetLevel()
 
 local AbilitiesHeroes_XX = {
+		npc_dota_hero_abyssal_underlord = {{"lion_finger_of_death", 2}},
+		npc_dota_hero_brewmaster = {{"enraged_wildkin_tornado", 4}},
+		npc_dota_hero_chen = {{"holdout_frost_shield", 2}},
+		npc_dota_hero_crystal_maiden = {{"holdout_rain_of_ice", 2}},
+		npc_dota_hero_dragon_knight = {{"holdout_knights_armor", 6}},
 		npc_dota_hero_elder_titan = {{"holdout_shockwave_20", 0}, {"holdout_war_stomp_20", 1}, {"holdout_roar_20", 4}, {"holdout_reincarnation", 6}},
 		npc_dota_hero_enchantress = {{"neutral_spell_immunity", 6}},
-		npc_dota_hero_omniknight = {{"holdout_light_frenzy", 4}},
+		npc_dota_hero_invoker = {{"holdout_rain_of_fire", 2}},
+		npc_dota_hero_juggernaut = {{"brewmaster_primal_split", 2}},
+		npc_dota_hero_lich = {{"holdout_frost_chaos", 4}},
+		npc_dota_hero_luna = {{"holdout_neutralization", 2}},
+		npc_dota_hero_nevermore = {{"holdout_rain_of_chaos_20", 6}},
+		npc_dota_hero_nyx_assassin = {{"holdout_burrow_impale", 2}},
+		npc_dota_hero_omniknight = {{"holdout_light_frenzy", 2}},
+		npc_dota_hero_phantom_assassin = {{"holdout_morph", 2}},
+		npc_dota_hero_pugna = {{"holdout_rain_of_chaos_20", 2}},
+		npc_dota_hero_rattletrap = {{"holdout_cluster_rockets", 2}},
+		npc_dota_hero_shadow_shaman = {{"holdout_hex", 2}},
 		npc_dota_hero_sniper ={{"holdout_rocket_launcher_20", 0}, {"holdout_plasma_rifle_20", 1}},
 		npc_dota_hero_sven = {{"holdout_storm_bolt_20", 0}, {"holdout_thunder_clap_20", 1}},
-		npc_dota_hero_brewmaster = {{"enraged_wildkin_tornado", 4}},
-		npc_dota_hero_nevermore = {{"holdout_rain_of_chaos_20", 6}},
 		npc_dota_hero_terrorblade = {{"holdout_resistant_skin", 6}},
 		npc_dota_hero_tiny = {{"holdout_war_club_20", 0}},
+		npc_dota_hero_windrunner = {{"holdout_rocket_hail", 2}}
 	}
 
 	if hero_level == 17 then -- Debug because 7.0
 		hero:SetAbilityPoints( hero:GetAbilityPoints() + 1 )
 	elseif hero_level > 19 then
 		hero:SetAbilityPoints( hero:GetAbilityPoints() - 1 )
+	end
+
+	if hero:GetUnitName() == "npc_dota_hero_lich" then
+		if hero_level == 20 then
+			hero:RemoveAbility("holdout_frost_frenzy")
+		end
 	end
 
 	if hero:GetUnitName() == "npc_dota_hero_tiny" then
@@ -585,15 +612,15 @@ local playerKills = PlayerResource:GetKills(KillerID)
 	end
 
 	if killerEntity:GetKills() == 100 then
-		Notifications:Top(killerEntity:GetPlayerOwnerID(), {text="100 kills. You get 5000 gold.", duration=5.0, style={color="red"}})
-		PlayerResource:ModifyGold( killerEntity:GetPlayerOwnerID(), 5000, false,  DOTA_ModifyGold_Unspecified )
-	elseif killerEntity:GetKills() == 500 then
-		Notifications:Top(killerEntity:GetPlayerOwnerID(), {text="500 kills. You get 25000 gold.", duration=5.0, style={color="red"}})
+		Notifications:Top(killerEntity:GetPlayerOwnerID(), {text="100 kills. You get 7500 gold.", duration=5.0, style={color="red"}})
+		PlayerResource:ModifyGold( killerEntity:GetPlayerOwnerID(), 7500, false,  DOTA_ModifyGold_Unspecified )
+	elseif killerEntity:GetKills() == 250 then
+		Notifications:Top(killerEntity:GetPlayerOwnerID(), {text="250 kills. You get 25000 gold.", duration=5.0, style={color="red"}})
 		PlayerResource:ModifyGold( killerEntity:GetPlayerOwnerID(), 25000, false,  DOTA_ModifyGold_Unspecified )
-	elseif killerEntity:GetKills() == 1000 then
-		Notifications:Top(killerEntity:GetPlayerOwnerID(), {text="1000 kills. You get 50000 gold.", duration=5.0, style={color="red"}})
+	elseif killerEntity:GetKills() == 500 then
+		Notifications:Top(killerEntity:GetPlayerOwnerID(), {text="500 kills. You get 50000 gold.", duration=5.0, style={color="red"}})
 		PlayerResource:ModifyGold( killerEntity:GetPlayerOwnerID(), 50000, false,  DOTA_ModifyGold_Unspecified )
-	elseif killerEntity:GetKills() >= 940 and RAMERO == 0 and NEUTRAL_SPAWN == 0 then -- 940
+	elseif killerEntity:GetKills() >= 666 and RAMERO == 0 and NEUTRAL_SPAWN == 0 then -- 666
 	local point = Entities:FindByName(nil, "npc_dota_muradin_player_1"):GetAbsOrigin()
 		killerEntity:AddNewModifier( nil, nil, "modifier_animation_freeze_stun", nil)
 		killerEntity:AddNewModifier( nil, nil, "modifier_invulnerable", nil)
@@ -601,7 +628,7 @@ local playerKills = PlayerResource:GetKills(KillerID)
 		Timers:CreateTimer(5.0, function()
 			FindClearSpaceForUnit(killerEntity, point, true)
 			PlayerResource:SetCameraTarget(killerEntity:GetPlayerOwnerID(), killerEntity)
-			RameroAndBaristalEvent()
+			RameroAndBaristolEvent()
 			killerEntity:RemoveModifierByName("modifier_animation_freeze_stun")
 			killerEntity:RemoveModifierByName("modifier_invulnerable")
 			Timers:CreateTimer(0.1, function()
@@ -609,7 +636,7 @@ local playerKills = PlayerResource:GetKills(KillerID)
 			end)
 		end)
 		RAMERO = 1
-	elseif killerEntity:GetKills() >= 1500 and RAMERO == 1 and NEUTRAL_SPAWN == 0 then -- 1500
+	elseif killerEntity:GetKills() >= 1332 and RAMERO == 1 and NEUTRAL_SPAWN == 0 then -- 1332
 	local point = Entities:FindByName(nil, "npc_dota_muradin_player_1"):GetAbsOrigin()
 		killerEntity:AddNewModifier( nil, nil, "modifier_animation_freeze_stun", nil)
 		killerEntity:AddNewModifier( nil, nil, "modifier_invulnerable", nil)
@@ -625,6 +652,12 @@ local playerKills = PlayerResource:GetKills(KillerID)
 			end)
 		end)
 		RAMERO = 2
+	end
+
+	-- Should remove the shop at the ancient, but doesn't
+	if killedUnit:GetUnitName() == "npc_dota_defender_fort" then
+		local Castle_Shop = Entities:FindByName(nil, "castle_shop")
+		UTIL_Remove(Castle_Shop)
 	end
 
 	for c = 1, 8 do

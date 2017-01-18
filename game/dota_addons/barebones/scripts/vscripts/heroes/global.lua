@@ -1,3 +1,5 @@
+require("libraries/timers")
+
 function Lifesteal( event )
 local attacker = event.attacker
 local target = event.target
@@ -8,7 +10,7 @@ local ability = event.ability
 	end
 end
 
-function Reincarnation( event )
+function Reincarnation(event)
 	local ability = event.ability
 	local hero = event.caster
 	local position = hero:GetAbsOrigin()
@@ -28,5 +30,21 @@ function Reincarnation( event )
 		hero.ankh_respawn = true
 
 		ability:StartCooldown(60.0)
+	end
+end
+
+function CastleMuradin(event)
+local caster = event.caster
+local ability = event.ability
+local Waypoint = Entities:FindByName(nil, "final_wave_player_1")
+local InvTime = ability:GetSpecialValueFor("invulnerability_time")
+
+	if ability:IsCooldownReady() then
+		local Muradin = CreateUnitByName("npc_dota_creature_muradin_bronzebeard", Waypoint:GetAbsOrigin(), false, nil, nil, DOTA_TEAM_GOODGUYS)
+		Muradin:SetInitialGoalEntity(Waypoint)
+		Muradin:MoveToPositionAggressive(Waypoint:GetAbsOrigin())
+		PauseCreepsCastle()
+		ability:StartCooldown(600.0)
+		caster:AddNewModifier(caster, nil, "modifier_invulnerable", {duration = InvTime + 10.0})
 	end
 end

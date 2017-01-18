@@ -4,38 +4,52 @@ function SpecialEventTP(event)
 local hero = event.activator
 local point = Entities:FindByName(nil,"point_teleport_special_events"):GetAbsOrigin()
 
---	if hero:GetUnitName() == "npc_dota_hero_meepo" then
---		local meepo_table = Entities:FindAllByName("npc_dota_hero_meepo")
---		if meepo_table then
---			for i = 1, #meepo_table do
---				FindClearSpaceForUnit(meepo_table[i], point, false)
---				meepo_table[i]:Stop()
---				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
---				Timers:CreateTimer(0.1, function()
---					PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil) 
---				end)
---			end
---		end
---	else
-	FindClearSpaceForUnit(hero, point, true)
-	hero:Stop()
-	PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
+	if hero:GetUnitName() == "npc_dota_hero_meepo" then
+		local meepo_table = Entities:FindAllByName("npc_dota_hero_meepo")
+		if meepo_table then
+			for i = 1, #meepo_table do
+				FindClearSpaceForUnit(meepo_table[i], point, false)
+				meepo_table[i]:Stop()
+				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
+				Timers:CreateTimer(0.1, function()
+					PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil) 
+				end)
+			end
+		end
+	else
+		FindClearSpaceForUnit(hero, point, true)
+		hero:Stop()
+		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
 		Timers:CreateTimer(0.1, function()
-			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil) 
+			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil) 
 		end)
---	end
+	end
 end
 
 function SpecialEventBack(event)
 local hero = event.activator
+local point = Entities:FindByName(nil, "base_spawn"):GetAbsOrigin()
 
-	local point = Entities:FindByName(nil, "base_spawn"):GetAbsOrigin()
-	FindClearSpaceForUnit(hero, point, true)
-	hero:Stop()
-	PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
-	Timers:CreateTimer(0.1,function()
-		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil) 
-	end)
+	if hero:GetUnitName() == "npc_dota_hero_meepo" then
+		local meepo_table = Entities:FindAllByName("npc_dota_hero_meepo")
+		if meepo_table then
+			for i = 1, #meepo_table do
+				FindClearSpaceForUnit(meepo_table[i], point, false)
+				meepo_table[i]:Stop()
+				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
+				Timers:CreateTimer(0.1, function()
+					PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil) 
+				end)
+			end
+		end
+	else
+		FindClearSpaceForUnit(hero, point, true)
+		hero:Stop()
+		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
+		Timers:CreateTimer(0.1, function()
+			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil) 
+		end)
+	end
 end
 
 function FrostInfernalEvent(event)
@@ -47,9 +61,9 @@ local point_beast = Entities:FindByName(nil, "special_event_boss_point"):GetAbsO
 	Entities:FindByName(nil, "trigger_special_event_frost_infernal"):Disable()
 	Entities:FindByName(nil, "trigger_special_event_back2"):Enable()
 
-	PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
+	PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
 	Timers:CreateTimer(0.1, function()
-		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil) 
+		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil) 
 	end)
 
 	Timers:CreateTimer(120.0,function()
@@ -65,19 +79,34 @@ local point_beast = Entities:FindByName(nil, "special_event_boss_point"):GetAbsO
 
 	GameMode.frost_infernal = CreateUnitByName("npc_frost_infernal", point_beast, true, nil, nil, DOTA_TEAM_CUSTOM_1)
 	GameMode.frost_infernal:SetAngles(0, 210, 0)
-	GameMode.frost_infernal:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {Duration = 5,IsHidden = true})
-	GameMode.frost_infernal:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 5,IsHidden = true})
+	GameMode.frost_infernal:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {Duration = 5, IsHidden = true})
+	GameMode.frost_infernal:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 5, IsHidden = true})
 
 	if IsValidEntity(hero) then
 		--Fire the game event to teleport hero to the event
-		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
+		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
 		Timers:CreateTimer(0.1, function()
-			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil) 
+			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil) 
 		end)
-		FindClearSpaceForUnit(hero ,point_hero, true)
-		hero:Stop()
-		local msg = "Special Event: Kill Frost Infernal for the Key of the 3 Moons. You have 2 minutes."
-		Notifications:Top(hero:GetPlayerOwnerID(),{text=msg, duration=5.0})
+
+		if hero:GetUnitName() == "npc_dota_hero_meepo" then
+		local meepo_table = Entities:FindAllByName("npc_dota_hero_meepo")
+			if meepo_table then
+				for i = 1, #meepo_table do
+					FindClearSpaceForUnit(meepo_table[i], point, false)
+					meepo_table[i]:Stop()
+					PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
+					Timers:CreateTimer(0.1, function()
+						PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil) 
+					end)
+				end
+			end
+		else
+			FindClearSpaceForUnit(hero ,point_hero, true)
+			hero:Stop()
+			local msg = "Special Event: Kill Frost Infernal for the Key of the 3 Moons. You have 2 minutes."
+			Notifications:Top(hero:GetPlayerOwnerID(),{text = msg, duration = 5.0})
+		end
 	end
 
 	timers.disabled_items = Timers:CreateTimer(0.0, function()
@@ -100,25 +129,39 @@ local point_beast = Entities:FindByName(nil, "special_event_boss_point"):GetAbsO
 		end
 		return 1
 	end)
-
 end
 
 function FrostInfernalBack(event)
 local hero = event.activator
+local point = Entities:FindByName(nil, "base_spawn"):GetAbsOrigin()
 --	SpecialEventsTimerEnd()
 
 	if not GameMode.frost_infernal:IsNull() then
 		GameMode.frost_infernal:RemoveSelf()
 	end
 
-	local point = Entities:FindByName(nil, "base_spawn"):GetAbsOrigin()
-	FindClearSpaceForUnit(hero, point, true)
-	Timers:RemoveTimer(timers.disabled_items)
-	hero:Stop()
-	PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
-	Timers:CreateTimer(0.1, function()
-		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil) 
-	end)
+	if hero:GetUnitName() == "npc_dota_hero_meepo" then
+		local meepo_table = Entities:FindAllByName("npc_dota_hero_meepo")
+		if meepo_table then
+			for i = 1, #meepo_table do
+				FindClearSpaceForUnit(meepo_table[i], point, false)
+				meepo_table[i]:Stop()
+				Timers:RemoveTimer(timers.disabled_items)
+				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
+				Timers:CreateTimer(0.1, function()
+					PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil) 
+				end)
+			end
+		end
+	else
+		FindClearSpaceForUnit(hero, point, true)
+		Timers:RemoveTimer(timers.disabled_items)
+		hero:Stop()
+		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
+		Timers:CreateTimer(0.1, function()
+			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil) 
+		end)
+	end
 end
 
 function FrostInfernalDead(event)
@@ -184,10 +227,25 @@ local point_beast = Entities:FindByName(nil, "special_event_boss_point2"):GetAbs
 		Timers:CreateTimer(0.1, function()
 			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil) 
 		end)
-		FindClearSpaceForUnit(hero ,point_hero, true)
-		hero:Stop()
-		local msg = "Special Event: Kill Spirit Beast for the Shield of Invincibility. You have 2 minutes."
-		Notifications:Top(hero:GetPlayerOwnerID(), {text = msg, duration = 5.0})
+
+		if hero:GetUnitName() == "npc_dota_hero_meepo" then
+		local meepo_table = Entities:FindAllByName("npc_dota_hero_meepo")
+			if meepo_table then
+				for i = 1, #meepo_table do
+					FindClearSpaceForUnit(meepo_table[i], point, false)
+					meepo_table[i]:Stop()
+					PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
+					Timers:CreateTimer(0.1, function()
+						PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil) 
+					end)
+				end
+			end
+		else
+			FindClearSpaceForUnit(hero ,point_hero, true)
+			hero:Stop()
+			local msg = "Special Event: Kill Spirit Beast for the Shield of Invincibility. You have 2 minutes."
+			Notifications:Top(hero:GetPlayerOwnerID(), {text = msg, duration = 5.0})
+		end
 	end
 
 	timers.disabled_items = Timers:CreateTimer(0.0, function()
@@ -221,13 +279,28 @@ local hero = event.activator
 	end
 
 	local point = Entities:FindByName(nil, "base_spawn"):GetAbsOrigin()
-	FindClearSpaceForUnit(hero, point, true)
-	Timers:RemoveTimer(timers.disabled_items)
-	hero:Stop()
-	PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
-	Timers:CreateTimer(0.1, function()
-		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil) 
-	end)
+	if hero:GetUnitName() == "npc_dota_hero_meepo" then
+		local meepo_table = Entities:FindAllByName("npc_dota_hero_meepo")
+		if meepo_table then
+			for i = 1, #meepo_table do
+				FindClearSpaceForUnit(meepo_table[i], point, false)
+				meepo_table[i]:Stop()
+				Timers:RemoveTimer(timers.disabled_items)
+				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
+				Timers:CreateTimer(0.1, function()
+					PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil) 
+				end)
+			end
+		end
+	else
+		FindClearSpaceForUnit(hero, point, true)
+		Timers:RemoveTimer(timers.disabled_items)
+		hero:Stop()
+		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
+		Timers:CreateTimer(0.1, function()
+			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil) 
+		end)
+	end
 end
 
 function SpiritBeastDead(event)
@@ -300,10 +373,25 @@ local point_beast = Entities:FindByName(nil, "special_event_boss_point3"):GetAbs
 		Timers:CreateTimer(0.1, function()
 			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil) 
 		end)
-		FindClearSpaceForUnit(hero , point_hero, true)
-		hero:Stop()
-		local msg = "Special Event: Kill Hero Image for +250 Stats. You have 2 minutes."
-		Notifications:Top(hero:GetPlayerOwnerID(), {text = msg, duration = 5.0})
+
+		if hero:GetUnitName() == "npc_dota_hero_meepo" then
+		local meepo_table = Entities:FindAllByName("npc_dota_hero_meepo")
+			if meepo_table then
+				for i = 1, #meepo_table do
+					FindClearSpaceForUnit(meepo_table[i], point, false)
+					meepo_table[i]:Stop()
+					PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
+					Timers:CreateTimer(0.1, function()
+						PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil) 
+					end)
+				end
+			end
+			else
+			FindClearSpaceForUnit(hero , point_hero, true)
+			hero:Stop()
+			local msg = "Special Event: Kill Hero Image for +250 Stats. You have 2 minutes."
+			Notifications:Top(hero:GetPlayerOwnerID(), {text = msg, duration = 5.0})
+		end
 	end
 
 	timers.disabled_items = Timers:CreateTimer(0.0, function()
@@ -333,13 +421,29 @@ local hero = event.activator
 --	SpecialEventsTimerEnd()
 
 	local point = Entities:FindByName(nil, "base_spawn"):GetAbsOrigin()
-	FindClearSpaceForUnit(hero, point, true)
-	hero:Stop()
-	Timers:RemoveTimer(timers.disabled_items)
-	PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
-	Timers:CreateTimer(0.1, function()
-		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil) 
-	end)
+
+	if hero:GetUnitName() == "npc_dota_hero_meepo" then
+		local meepo_table = Entities:FindAllByName("npc_dota_hero_meepo")
+		if meepo_table then
+			for i = 1, #meepo_table do
+				FindClearSpaceForUnit(meepo_table[i], point, false)
+				meepo_table[i]:Stop()
+				Timers:RemoveTimer(timers.disabled_items)
+				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
+				Timers:CreateTimer(0.1, function()
+					PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil) 
+				end)
+			end
+		end
+	else
+		FindClearSpaceForUnit(hero, point, true)
+		hero:Stop()
+		Timers:RemoveTimer(timers.disabled_items)
+		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
+		Timers:CreateTimer(0.1, function()
+			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil) 
+		end)
+	end
 
 	if not GameMode.HeroImage:IsNull() then
 		GameMode.HeroImage:RemoveSelf()

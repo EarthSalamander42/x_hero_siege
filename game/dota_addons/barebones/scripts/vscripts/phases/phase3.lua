@@ -328,3 +328,30 @@ local heroes = HeroList:GetAllHeroes()
 		spirit_master2:EmitSound("DOTAMusic_Diretide_Finale")
 	end)
 end
+
+--	function StartSecretArena(keys)
+--	local activator = keys.activator
+--	local point = Entities:FindByName(nil, "npc_dota_muradin_player_1")
+--	local difficulty = GameRules:GetCustomGameDifficulty()
+--	
+--		if difficulty == 4 then
+--			for itemSlot = 0, 5 do
+--				local item = activator:GetItemInSlot(itemSlot)
+--				if item:GetName() == "item_doom_artifact" then
+--					local secret = CreateUnitByName("npc_dota_hero_secret", Entities:FindByName(nil, "roshan_wp_4"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+--					secret:SetAngles(0, 270, 0)
+--					secret:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 10, IsHidden = true})
+--					secret:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 9, IsHidden = true})
+--	
+--					FindClearSpaceForUnit(activator, point:GetAbsOrigin(), true)
+--					activator:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {Duration = 10, IsHidden = true})
+--					activator:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 10, IsHidden = true})
+--					activator:Stop()
+--					PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(), activator)
+--					Timers:CreateTimer(0.1, function()
+--						PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(), nil)
+--					end)
+--				end
+--			end
+--		end
+--	end

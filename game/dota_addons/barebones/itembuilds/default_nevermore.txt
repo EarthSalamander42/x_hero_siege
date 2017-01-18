@@ -1,8 +1,8 @@
-"itembuilds/test_weaver.txt"
+"itembuilds/test_nevermore.txt"
 {
 	"author"		"X Hero Siege Official"
-	"hero"			"npc_dota_hero_weaver"
-	"Title"			"Recommended items for Crypt Lord"
+	"hero"			"npc_dota_hero_nevermore"
+	"Title"			"Recommended items for Banehallow"
 
 	"Items"
 	{
@@ -10,7 +10,7 @@
 		{
 		}
 
-		"#DOTA_Item_Build_Hero1"
+		"#DOTA_Item_Build_Hero22"
 		{
 		}
 
@@ -22,17 +22,16 @@
 		"#DOTA_Item_Build_Early_Game"
 		{
 			"item"		"item_tome_small"
-			"item"		"item_ankh_of_reincarnation"
-			"item"		"item_bracer_of_endurance"
 			"item"		"item_gloom_blade"
 		}
 
 		"#DOTA_Item_Build_Core_Items"
 		{
+			"item"		"item_assassins_blade"
 			"item"		"item_lifesteal_mask"
+			"item"		"item_assassins_blade"
+			"item"		"item_assassins_blade"
 			"item"		"item_bracer_of_protection"
-			"item"		"item_assassins_blade"
-			"item"		"item_assassins_blade"
 		}
 
 		"#DOTA_Item_Build_Luxury"

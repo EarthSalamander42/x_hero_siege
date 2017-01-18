@@ -25,7 +25,7 @@ local heroes = HeroList:GetAllHeroes()
 		HEROLIST_ALT[6] = CreateUnitByName("npc_dota_hero_lich_bis", Entities:FindByName(nil, "choose_lich_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
 		HEROLIST_ALT[6]:SetAngles(0, 180, 0)
 
-		HEROLIST_ALT[7] = CreateUnitByName("npc_dota_hero_weaver_bis", Entities:FindByName(nil, "choose_weaver_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
+		HEROLIST_ALT[7] = CreateUnitByName("npc_dota_hero_nyx_assassin_bis", Entities:FindByName(nil, "choose_nyx_assassin_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
 		HEROLIST_ALT[7]:SetAngles(0, 180, 0)
 
 		HEROLIST_ALT[8] = CreateUnitByName("npc_dota_hero_abyssal_underlord_bis", Entities:FindByName(nil, "choose_abyssal_underlord_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
@@ -122,32 +122,32 @@ local heroes = HeroList:GetAllHeroes()
 		HEROLIST_VIP_ALT[2]:SetAngles(0, 270, 0)
 		StartAnimation(HEROLIST_VIP_ALT[2], {duration = 20000.0, activity = ACT_DOTA_IDLE, rate = 0.9})
 
-		HEROLIST_ALT_VIP[5] = CreateUnitByName("npc_dota_hero_tiny_bis", Entities:FindByName(nil, "choose_tiny_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
-		HEROLIST_ALT_VIP[5]:SetAngles(0, 90, 0)
+		HEROLIST_VIP_ALT[5] = CreateUnitByName("npc_dota_hero_tiny_bis", Entities:FindByName(nil, "choose_tiny_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
+		HEROLIST_VIP_ALT[5]:SetAngles(0, 270, 0)
 
---		HEROLIST_ALT_VIP[6] = CreateUnitByName("npc_dota_hero_sand_king_bis", Entities:FindByName(nil, "choose_sand_king_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
---		HEROLIST_ALT_VIP[6]:SetAngles(0, 90, 0)
+		HEROLIST_VIP_ALT[6] = CreateUnitByName("npc_dota_hero_sand_king_bis", Entities:FindByName(nil, "choose_sand_king_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
+		HEROLIST_VIP_ALT[6]:SetAngles(0, 270, 0)
 	end)
 
 	Timers:CreateTimer(20, function()
 		-- Special Events
-		local frost_infernal = CreateUnitByName("npc_frost_infernal_bis", Entities:FindByName(nil, "frost_infernal_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
+		local frost_infernal = CreateUnitByName("npc_frost_infernal_bis", Entities:FindByName(nil, "frost_infernal_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
 		frost_infernal:SetAngles(0, 270, 0)
 
-		local spirit_beast = CreateUnitByName("npc_spirit_beast_bis", Entities:FindByName(nil, "spirit_beast_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
+		local spirit_beast = CreateUnitByName("npc_spirit_beast_bis", Entities:FindByName(nil, "spirit_beast_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
 		spirit_beast:SetAngles(0, 270, 0)
 
-		local hero_image = CreateUnitByName("npc_hero_image_bis", Entities:FindByName(nil, "hero_image_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
+		local hero_image = CreateUnitByName("npc_hero_image_bis", Entities:FindByName(nil, "hero_image_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
 		hero_image:SetAngles(0, 270, 0)
 
-		local ramero = CreateUnitByName("npc_ramero_bis", Entities:FindByName(nil, "point_special_arena_1"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
-		ramero:SetAngles(0, 270, 0)
+		RAMERO_DUMMY = CreateUnitByName("npc_ramero_bis", Entities:FindByName(nil, "point_special_arena_1"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
+		RAMERO_DUMMY:SetAngles(0, 270, 0)
 
-		local baristal = CreateUnitByName("npc_baristal_bis", Entities:FindByName(nil, "point_special_arena_2"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
-		baristal:SetAngles(0, 270, 0)
+		BARISTOL_DUMMY = CreateUnitByName("npc_baristol_bis", Entities:FindByName(nil, "point_special_arena_2"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
+		BARISTOL_DUMMY:SetAngles(0, 270, 0)
 
-		local ramero_alt = CreateUnitByName("npc_ramero_bis", Entities:FindByName(nil, "point_special_arena_3"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
-		ramero_alt:SetAngles(0, 270, 0)
+		RAMERO_BIS_DUMMY = CreateUnitByName("npc_ramero_bis", Entities:FindByName(nil, "point_special_arena_3"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
+		RAMERO_BIS_DUMMY:SetAngles(0, 270, 0)
 
 		lich_king = CreateUnitByName("npc_dota_boss_lich_king_bis", Entities:FindByName(nil, "npc_dota_spawner_lich_king"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
 		lich_king:SetAngles(0, 270, 0)

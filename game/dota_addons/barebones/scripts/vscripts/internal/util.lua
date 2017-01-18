@@ -209,3 +209,31 @@ function GenerateNumPointsAround(num, center, distance)
     end
     return points
 end
+
+function HasEpic1(hero)
+	if hero.has_epic_1 then
+		return true
+	end
+	return false
+end
+
+function HasEpic2(hero)
+	if hero.has_epic_2 then
+		return true
+	end
+	return false
+end
+
+function HasEpic3(hero)
+	if hero.has_epic_3 then
+		return true
+	end
+	return false
+end
+
+function HasEpic4(hero)
+	if hero.has_epic_4 then
+		return true
+	end
+	return false
+end

@@ -1,5 +1,21 @@
 require("libraries/timers")
 
+function LifeSteal( keys )
+local caster = keys.caster
+local modifier_lifesteal = keys.modifier_lifesteal
+local ability = keys.ability
+local ability_level = ability:GetLevel() - 1
+local cooldown = ability:GetCooldown(ability_level)
+
+	ability:StartCooldown(cooldown)
+	caster:RemoveModifierByName(modifier_lifesteal)
+
+	Timers:CreateTimer(cooldown, function()
+		ability:ApplyDataDrivenModifier( caster, caster, modifier_lifesteal, {})
+	end)
+end
+
+
 function KoboldArmy( keys )
 	local caster = keys.caster
 	local player = caster:GetPlayerOwnerID()
@@ -116,7 +132,7 @@ function KoboldArmy( keys )
 		-- Recreate the items of the caster
 		for itemSlot=0,5 do
 			local item = caster:GetItemInSlot(itemSlot)
-			if item ~= nil and item:GetName() ~= "item_ankh_of_reincarnation" and item:GetName() ~= "item_shield_of_invincibility" and item:GetName() ~= "item_assassins_blade" then
+			if item ~= nil and item:GetName() ~= "item_ankh_of_reincarnation" and item:GetName() ~= "item_shield_of_invincibility" and item:GetName() ~= "item_assassins_blade"  and item:GetName() ~= "item_cloak_of_flames"  and item:GetName() ~= "item_orb_of_fire" then
 				local itemName = item:GetName()
 				local newItem = CreateItem(itemName, double, double)
 				double:AddItem(newItem)

@@ -8,7 +8,8 @@ _G.RAMERO = 0
 _G.MAGTHERIDON = 0
 _G.FOUR_BOSSES = 0
 _G.SPIRIT_MASTER = 0
-_G.X_HERO_SIEGE_V = 3.32
+_G.key_first_time = true
+_G.X_HERO_SIEGE_V = 3.33
 
 _G.mod_creator = {
 		54896080,	-- Cookies
@@ -30,7 +31,8 @@ _G.vip_members = {
 		97490223,	-- IllidanStormrage [Lucas Diao on Patreon, Removed Date if not paid: 29/01/2017]
 		44364795,	-- Lyzer93 [Balraj McCoy on Patreon, Removed Date if not paid: 10/02/2017]
 		46744186,	-- Captain Darian Frey [CaptainDarianFrey on Patreon, Removed Date if not paid: 10/02/2017]
-		3180772		-- Yoshi [Fabian Rothmund on Patreon, Removed Date if not paid: 15/02/2017]
+		3180772,	-- Yoshi [Fabian Rothmund on Patreon, Removed Date if not paid: 15/02/2017]
+		54935523	-- The Patriarchy [Kevin Moore on Patreon, Removed Date if not paid: 17/02/2017]
 	}
 
 _G.golden_vip_members = {
@@ -52,7 +54,8 @@ _G.golden_vip_members = {
 		80192910,	-- Cheshire [Nathan Perscott on Patreon, Removed Date if not paid: 29/01/2017]
 		28261641,	-- Timoznn [Timo Nurnberg on Patreon, Unlimited]
 		79258147,	-- Dyuss [Altynbek Duisenkul on Patreon, Removed Date if not paid: 10/02/2017]
-		66147815	-- FreshKiller23 [Unlimited]		
+		66147815,	-- FreshKiller23 [Unlimited]		
+		33042578	-- ryusajin [Unlimited]		
 	}
 
 _G.banned_players = {
@@ -96,7 +99,7 @@ HEROLIST[3] = "luna"				-- Huntress
 HEROLIST[4] = "beastmaster"			-- Beastmaster
 HEROLIST[5] = "pugna"				-- Dread Lord
 HEROLIST[6] = "lich"				-- Lich
-HEROLIST[7] = "weaver"				-- Crypt Lord
+HEROLIST[7] = "nyx_assassin"		-- Crypt Lord
 HEROLIST[8] = "abyssal_underlord"	-- Pit Lord
 HEROLIST[9] = "terrorblade"			-- Demon Hunter
 HEROLIST[10] = "phantom_assassin"	-- Warden
@@ -126,7 +129,7 @@ HEROLIST_ALT[3] = luna				-- Huntress
 HEROLIST_ALT[4] = beastmaster		-- Beastmaster
 HEROLIST_ALT[5] = pugna				-- Dread Lord
 HEROLIST_ALT[6] = lich				-- Lich
-HEROLIST_ALT[7] = weaver			-- Crypt Lord
+HEROLIST_ALT[7] = nyx_assassin		-- Crypt Lord
 HEROLIST_ALT[8] = abyssal_underlord	-- Pit Lord
 HEROLIST_ALT[9] = terrorblade		-- Demon Hunter
 HEROLIST_ALT[10] = phantom_assassin	-- Warden
@@ -189,6 +192,7 @@ require('phases/phase2')
 require('phases/phase3')
 
 function GameMode:OnFirstPlayerLoaded()
+
 end
 
 function FrostTowersToFinalWave()
@@ -244,6 +248,12 @@ time_elapsed = 0
 	if PlayerResource:GetPlayerCount() >= 8 then
 		CREEP_LANES[8] = 1
 	end
+
+	Timers:CreateTimer(3.0, function()
+		EmitGlobalSound("Global.InGame")
+	end)
+
+	GameRules:GetGameModeEntity():SetItemAddedToInventoryFilter( Dynamic_Wrap(GameMode, "ItemAddedFilter"), self )
 end
 
 function GameMode:OnHeroInGame(hero)
@@ -251,15 +261,15 @@ function GameMode:OnHeroInGame(hero)
 		hero:SetAbilityPoints(0)
 		hero:SetGold(0, false)
 		hero:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 20, IsHidden = true})
-		Timers:CreateTimer(3.0, function()
-			EmitGlobalSound("Global.InGame")
-		end)
 	end
 end
 
 function GameMode:OnGameInProgress()
 local difficulty = GameRules:GetCustomGameDifficulty()
 local triggers_choice = Entities:FindAllByName("trigger_special_event_choice")
+local triggers_hero_image = Entities:FindAllByName("trigger_special_event_hero_image")
+local triggers_spirit_beast = Entities:FindAllByName("trigger_special_event_spirit_beast")
+local triggers_frost_infernal = Entities:FindAllByName("trigger_special_event_frost_infernal")
 
 	-- Timer: Creep Levels 1 to 6. Lanes 1 to 8.
 	Timers:CreateTimer(0, function()
@@ -268,6 +278,19 @@ local triggers_choice = Entities:FindAllByName("trigger_special_event_choice")
 		SpawnCreeps()
 	return 30
 	end)
+
+	for _,v in pairs(triggers_choice) do
+		v:Enable()
+	end
+	for _,v in pairs(triggers_hero_image) do
+		v:Enable()
+	end
+	for _,v in pairs(triggers_spirit_beast) do
+		v:Enable()
+	end
+	for _,v in pairs(triggers_frost_infernal) do
+		v:Enable()
+	end
 
 --	EmitGlobalSound("Global.HumanMusic1") -- Lasts 4:33
 
@@ -287,6 +310,9 @@ local triggers_choice = Entities:FindAllByName("trigger_special_event_choice")
 		for _,v in pairs(triggers_choice) do
 			v:Enable()
 		end
+		triggers_hero_image:Enable()
+		triggers_spirit_beast:Enable()
+		triggers_frost_infernal:Enable()
 	end)
 	Timers:CreateTimer(1200, function() -- 18 Min + 2 Min with Muradin Event = 20 Min
 		Notifications:TopToAll({hero="npc_dota_hero_doom_bringer", duration=6.0})
@@ -450,6 +476,25 @@ local heroes = HeroList:GetAllHeroes()
 		if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
 			hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", nil)
 			hero:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
+		end
+	end
+end
+
+function PauseCreepsCastle()
+local units = FindUnitsInRadius( DOTA_TEAM_BADGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_NONE , FIND_ANY_ORDER, false )
+local units2 = FindUnitsInRadius( DOTA_TEAM_GOODGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_NONE , FIND_ANY_ORDER, false )
+
+	for _,v in pairs(units) do
+		if v:IsCreature() and v:HasMovementCapability() then
+			v:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {duration = 10.0})
+			v:AddNewModifier(nil, nil, "modifier_invulnerable", {duration = 10.0})
+		end
+	end
+
+	for _,v in pairs(units2) do
+		if v:IsCreature() and v:HasMovementCapability() then
+			v:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {duration = 10.0})
+			v:AddNewModifier(nil, nil, "modifier_invulnerable", {duration = 10.0})
 		end
 	end
 end
@@ -836,4 +881,169 @@ end
 function SetTimerSpecialEvents( cmdName, time )
 	print( "Set the timer to: " .. time )
 	nCOUNTDOWNINCWAVE = time
+end
+
+-- Item added to inventory filter
+function GameMode:ItemAddedFilter( keys )
+local hero = EntIndexToHScript(keys.inventory_parent_entindex_const)
+local item = EntIndexToHScript(keys.item_entindex_const)
+local item_name = 0
+local point = Entities:FindByName(nil, "base_spawn"):GetAbsOrigin()
+local key = "item_key_of_the_three_moons"
+local shield = "item_shield_of_invincibility"
+local sword = "item_lightning_sword"
+local ring = "item_ring_of_superiority"
+
+if item:GetName() then
+	item_name = item:GetName()
+end
+
+	if hero:IsRealHero() then
+		if item_name == sword and key_first_time then
+			FindClearSpaceForUnit(hero, point, true)
+			key_first_time = false
+		end
+
+		if item_name == key then
+			hero.has_epic_1 = true
+		end
+
+		if item_name == shield then
+			hero.has_epic_2 = true
+		end
+
+		if item_name == sword then
+			hero.has_epic_3 = true
+		end
+
+		if item_name == ring then
+			hero.has_epic_4 = true
+		end
+
+		if hero.has_epic_1 and hero.has_epic_2 and hero.has_epic_3 and hero.has_epic_4 then
+			local line_duration = 10
+			Notifications:BottomToAll({hero = hero:GetName(), duration = line_duration})
+--			Notifications:BottomToAll({text = hero:GetUnitName().." ", duration = line_duration, continue = true})
+			Notifications:BottomToAll({text = PlayerResource:GetPlayerName(hero:GetPlayerID()).." ", duration = line_duration, continue = true})
+			Notifications:BottomToAll({text = "merged the 4 Epic items to create Doom Artifact!", duration = line_duration, style = {color = "Red"}, continue = true})
+
+			for itemSlot = 0, 5 do
+				Timers:CreateTimer(0.1, function()
+					local Item = hero:GetItemInSlot( itemSlot )
+					if not Item:IsNull() and Item:GetName() == key then
+						hero:EmitSound("Hero_TemplarAssassin.Trap")
+						hero:RemoveItem(Item)
+						hero.has_epic_1 = false
+					end
+				end)
+				Timers:CreateTimer(0.5, function()
+					local Item = hero:GetItemInSlot( itemSlot )
+					if not Item:IsNull() and Item:GetName() == shield then
+						hero:EmitSound("Hero_TemplarAssassin.Trap")
+						hero:RemoveItem(Item)
+						hero.has_epic_2 = false
+					end
+				end)
+				Timers:CreateTimer(0.9, function()
+					local Item = hero:GetItemInSlot( itemSlot )
+					if not Item:IsNull() and Item:GetName() == sword then
+						hero:EmitSound("Hero_TemplarAssassin.Trap")
+						hero:RemoveItem(Item)
+						hero.has_epic_3 = false
+					end
+				end)
+				Timers:CreateTimer(1.3, function()
+					local Item = hero:GetItemInSlot( itemSlot )
+					if not Item:IsNull() and Item:GetName() == ring then
+						hero:EmitSound("Hero_TemplarAssassin.Trap")
+						hero:RemoveItem(Item)
+						hero.has_epic_4 = false
+					end
+				end)
+			end
+
+			Timers:CreateTimer(1.3, function()
+				hero:AddItemByName("item_doom_artifact")
+			end)
+		end
+	end
+
+	-------------------------------------------------------------------------------------------------
+	-- Rune pickup logic
+	-------------------------------------------------------------------------------------------------
+--	if item_name == "item_imba_rune_bounty" or item_name == "item_imba_rune_double_damage" or item_name == "item_imba_rune_haste" or item_name == "item_imba_rune_regeneration" then
+--
+--		-- Only real heroes can pick up runes
+--		--if unit:IsRealHero() then
+--			if item_name == "item_imba_rune_bounty" then
+--				PickupBountyRune(item, unit)
+--				return false
+--			end
+--
+--			if item_name == "item_imba_rune_double_damage" then
+--				PickupDoubleDamageRune(item, unit)
+--				return false
+--			end
+--
+--			if item_name == "item_imba_rune_haste" then
+--				PickupHasteRune(item, unit)
+--				return false
+--			end
+--
+--			if item_name == "item_imba_rune_regeneration" then
+--				PickupRegenerationRune(item, unit)
+--				return false
+--			end
+
+		-- If this is not a real hero, drop another rune in place of the picked up one
+		-- else
+		-- 	local new_rune = CreateItem(item_name, nil, nil)
+		-- 	CreateItemOnPositionForLaunch(item:GetAbsOrigin(), new_rune)
+		-- 	return false
+		-- end
+--	end
+
+--	for itemSlot = 0, 5 do
+--		local item = heroEntity:GetItemInSlot(itemSlot)
+--		if item:GetName() == "item_key_of_the_three_moons" then
+--			print("Key of the 3 Moons")
+--			if item:GetName() == "item_shield_of_invincibility" then
+--				print("Shield of Invincibility")
+--				if item:GetName() == "item_lightning_sword" then
+--					print("Lightning Sword")
+--					if item:GetName() == "item_ring_of_superiority" then
+--						print("Ring of Superiority")
+--						RemoveItem("item_key_of_the_three_moons")
+--						RemoveItem("item_shield_of_invincibility")
+--						RemoveItem("item_lightning_sword")
+--						RemoveItem("item_ring_of_superiority")
+--						AddItem("item_doom_artifact")
+--					end
+--				end
+--			end
+--		end
+--	end
+
+	-------------------------------------------------------------------------------------------------
+	-- Illusions and Clones forbidden items
+	-------------------------------------------------------------------------------------------------
+	
+--	if unit:HasModifier("modifier_illusion") then
+--
+--		-- List of items the clone can't carry
+--		local illusion_forbidden_items = {
+--			"item_cloak_of_flames",
+--			"item_ankh_of_reincarnation",
+--			"item_orb_of_fire"
+--			}
+--
+--		-- If this item is forbidden, delete it
+--		for _, forbidden_item in pairs(illusion_forbidden_items) do
+--			if item_name == forbidden_item then
+--				return false
+--			end
+--		end
+--	end
+
+	return true
 end

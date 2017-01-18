@@ -26,9 +26,9 @@
 
 		// Item Info
 		//----------------------------------------------------------------------------------------------------
-		"ItemCost"						"15000"
+		"ItemCost"						"16500"
 		"ItemShopTags"					"unique"
-		"ItemQuality"					"component"
+		"ItemQuality"					"rare"
 		"ItemAliases"					"mask of death"
 		"SecretShop"					"1"
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
@@ -103,8 +103,8 @@
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
 		"ItemCost"						"50000"
-		"ItemShopTags"					"damage"
-		"ItemQuality"					"component"
+		"ItemShopTags"					"epic"
+		"ItemQuality"					"epic"
 		"ItemAliases"					"assassins blade"
 		"ItemStackable"					"0"
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
@@ -187,8 +187,8 @@
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
 		"ItemCost"						"50000"
-		"ItemShopTags"					"damage"
-		"ItemQuality"					"component"
+		"ItemShopTags"					"epic"
+		"ItemQuality"					"epic"
 		"ItemAliases"					"claws of attack"
 		"ItemStackable"					"0"
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
@@ -264,11 +264,11 @@
 		"AbilityBehavior"					"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"Model"								"models/props_gameplay/aegis.mdl"
 
-		"ItemCost"							"3500"
+		"ItemCost"							"3750"
 		"ItemDeclarations"					"DECLARE_PURCHASES_TO_TEAMMATES | DECLARE_PURCHASES_TO_SPECTATORS"
-		"ItemQuality"						"epic"
+		"ItemQuality"						"rare"
 		"ItemDroppable" 					"1"
-		"ItemKillable"						"1"
+		"ItemKillable"						"0"
 		"ItemPurchasable"					"1"
 		"ItemSellable"						"0"
 		"ItemHideCharges"					"0"
@@ -320,7 +320,7 @@
 		"Model"							"models/props_gameplay/recipe.vmdl" 
 		"Effect"						"particles/generic_gameplay/dropped_item.vpcf"
 		"ItemCost"						"10000"
-		"ItemKillable"					"1" 
+		"ItemKillable"					"0" 
 		"ItemCastOnPickup"				"0"
 		"ItemSellable"					"1"
 		"ItemPurchasable"				"1"
@@ -328,22 +328,20 @@
 		"SideShop"						"1"
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
 		"AbilityTextureName"			"tome_small"
+		"ItemQuality"					"artifact"
 	
-		"ItemShopTags"					"rare"
-		"ItemQuality"					"rare"
-	
-		"ItemStackable" "1"
+		"ItemStackable"					"1"
 		"ItemInitialCharges"			"1"
-		"ItemPermanent" "0"
-		"ItemDisassembleRule" "DOTA_ITEM_DISASSEMBLE_ALWAYS"
+		"ItemPermanent"					"0"
+		"ItemDisassembleRule"			"DOTA_ITEM_DISASSEMBLE_ALWAYS"
 	
 		"OnSpellStart"
 		{
 	
 			"RunScript"
 			{
-				"ScriptFile"    "items/Tome_All/tome_all"
-				"Function"        "tome_use"
+				"ScriptFile"		"items/Tome_All/tome_all"
+				"Function"			"tome_use"
 			}
 	
 			"SpendCharge" {}
@@ -353,10 +351,10 @@
 		{
 			"01"
 			{
-				"var_type"      "FIELD_FLOAT"
-				"stat_bonus" "50"
+				"var_type"		"FIELD_FLOAT"
+				"stat_bonus"	"50"
 			}
-		}  
+		}
 	}
 
 	//=================================================================================================================
@@ -372,7 +370,7 @@
 		"Model"							"models/props_gameplay/recipe.vmdl" 
 		"Effect"						"particles/generic_gameplay/dropped_item.vpcf"
 		"ItemCost"						"50000"
-		"ItemKillable"					"1" 
+		"ItemKillable"					"0" 
 		"ItemSellable"					"1"
 		"ItemCastOnPickup"				"0"
 		"ItemPurchasable"				"1"
@@ -381,8 +379,8 @@
 		"AbilityTextureName"			"tome_big"
 		"SideShop"						"1"
 
-		"ItemShopTags"					"artifact"
-		"ItemQuality"					"artifact"
+		"ItemShopTags"					"rare"
+		"ItemQuality"					"rare"
 
 		"ItemStackable"					"1"
 		"ItemInitialCharges"			"1"
@@ -394,8 +392,8 @@
 
 			"RunScript"
 			{
-				"ScriptFile"    "items/Tome_All/tome_all"
-				"Function"        "tome_use"
+				"ScriptFile"			"items/Tome_All/tome_all"
+				"Function"				"tome_use"
 			}
 
 			"SpendCharge" {}
@@ -405,8 +403,8 @@
 		{
 			"01"
 			{
-				"var_type"		"FIELD_FLOAT"
-				"stat_bonus"	"250"
+				"var_type"				"FIELD_FLOAT"
+				"stat_bonus"			"250"
 			}
 		}
 	}
@@ -416,26 +414,26 @@
 	//=================================================================================================================
 	"item_magtheridon_ankh" 
 	{
-		"ID"           "2506"
-		"BaseClass"    "item_datadriven"
-		"AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
-		"Model"        "models/heroes/bounty_hunter/bounty_hunter_bweapon.vmdl" 
-		"Effect"       "particles/generic_gameplay/dropped_item.vpcf"
-		"ItemCost"     "500"
-		"ItemKillable" "1" 
-		"ItemSellable" "1"
-		"ItemPurchasable" "0"
-		"ItemDroppable" "1"
-		"ItemShareability" "ITEM_NOT_SHAREABLE"
-		"AbilityTextureName" "item_aegis"
+		"ID"						"2506"
+		"BaseClass"					"item_datadriven"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"Model"						"models/heroes/bounty_hunter/bounty_hunter_bweapon.vmdl" 
+		"Effect"					"particles/generic_gameplay/dropped_item.vpcf"
+		"ItemCost"					"0"
+		"ItemKillable"				"0" 
+		"ItemSellable"				"0"
+		"ItemPurchasable"			"0"
+		"ItemDroppable"				"0"
+		"ItemShareability"			"ITEM_NOT_SHAREABLE"
+		"AbilityTextureName"		"ankh_of_reincarnation"
 	
-		"ItemShopTags"					"artifact"
-		"ItemQuality"					"artifact"
+		"ItemShopTags"				"artifact"
+		"ItemQuality"				"artifact"
 
-		"ItemStackable" "0"
-		"ItemInitialCharges"			"1"
-		"ItemPermanent" "0"
-		"ItemDisassembleRule" "DOTA_ITEM_DISASSEMBLE_ALWAYS"
+		"ItemStackable"				"0"
+		"ItemInitialCharges"		"1"
+		"ItemPermanent"				"0"
+		"ItemDisassembleRule"		"DOTA_ITEM_DISASSEMBLE_ALWAYS"
 
 		"AbilitySpecial"
 		{
@@ -462,36 +460,7 @@
 					}
 				}
 			}
-			"modifier_delete_door"
-			{
-				"Passive"           "0"
-				"IsHidden"          "0"
-				"IsDebuff"          "0"
-	
-				"OnDeath"
-				{
-					"RunScript"
-					{
-						"ScriptFile"    "items/Ankh_Magtheridon/magtheridon.lua"
-						"Function"      "delete_door"
-					}
-	
-					"FireSound"
-					{
-						"EffectName"	"valve_ti5.stinger.respawn"
-						"Target" 		"CASTER"
-					}
-				}
-			}
 		}
-	
-		"precache"
-		{
-			"particle"  "models/heroes/bounty_hunter/bounty_hunter_bweapon.vmdl"
-			"particle"	"particles/generic_gameplay/dropped_item.vpcf"
-			"particle"	"particles/items_fx/aegis_respawn.vpcf"
-			"particle"	"particles/generic_hero_status/death_tombstone_alt.vpcf"
-		}   
 	}
 
 	//=================================================================================================================
@@ -515,7 +484,7 @@
 
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"						"150"
+		"ItemCost"						"100"
 		"ItemAlertable"					"0"
 		"ItemAliases"					"mana potion"
 		"ItemStackable"					"0"
@@ -614,9 +583,9 @@
 
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"                      "25000"
+		"ItemCost"                      "30000"
 		"ItemShopTags"                  "int;agi;str;hard_to_tag"
-		"ItemQuality"                   "component"
+		"ItemQuality"                   "epic"
 		"ItemAliases"                   "scepter of mastery"
 		"SecretShop"					"1"
 
@@ -758,7 +727,7 @@
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
 		"Model"						"models/props_gameplay/red_box.vmdl" 
 		"Effect"					"particles/generic_gameplay/dropped_item.vpcf"
-		"ItemCost"					"3000"
+		"ItemCost"					"3450"
 		"ItemKillable"				"1" 
 		"ItemSellable"				"0"
 		"ItemPurchasable"			"1"
@@ -769,7 +738,7 @@
 		"SecretShop"				"1"
 
 		"ItemShopTags"				"consumable"
-		"ItemQuality"				"consumable"
+		"ItemQuality"				"artifact"
 
 		"ItemStackable"				"0"
 		"ItemInitialCharges"		"3"
@@ -818,7 +787,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"ItemCost"						"50000"
 		"ItemShopTags"					"damage"
-		"ItemQuality"					"component"
+		"ItemQuality"					"epic"
 		"ItemAliases"					"bracer of protection"
 		"ItemStackable"					"0"
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
@@ -954,6 +923,15 @@
 			}
 		}
 
+		"OnUnequip"
+		{
+			"RunScript"
+			{
+				"ScriptFile"	"items/global.lua"
+				"Function"		"KeyUnequip"
+			}
+		}
+
 		"Modifiers"
 		{
 			"modifier_key_of_the_three_moons"
@@ -987,9 +965,9 @@
 
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"						"12500"
+		"ItemCost"						"15000"
 		"ItemShopTags"					"damage"
-		"ItemQuality"					"component"
+		"ItemQuality"					"rare"
 		"ItemAliases"					"gloom blade"
 		"ItemStackable"					"0"
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
@@ -1038,7 +1016,7 @@
 		
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"						"40000"	
+		"ItemCost"						"35000"	
 		"ItemShopTags"					""
 		
 		// Recipe
@@ -1089,7 +1067,7 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"bonus_damage"			"100"
+				"bonus_damage"			"150"
 			}
 			"02"
 			{
@@ -1143,7 +1121,7 @@
 						{
 							"RunScript"
 							{
-								"ScriptFile"    "items/orbs.lua"
+								"ScriptFile"    "items/global.lua"
 								"Function"      "Purge"
 							}
 						}
@@ -1202,7 +1180,7 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"bonus_damage"			"100"
+				"bonus_damage"			"150"
 			}
 			"02"
 			{
@@ -1245,7 +1223,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"items/orbs.lua"
+						"ScriptFile"	"items/global.lua"
 						"Function"		"Splash"
 					}
 				}
@@ -1286,7 +1264,7 @@
 			"01"
 			{
 				"var_type"              "FIELD_INTEGER"
-				"bonus_damage"          "100"
+				"bonus_damage"          "150"
 			}
 			"02"
 			{
@@ -1393,9 +1371,9 @@
 
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"						"12500"
+		"ItemCost"						"15000"
 		"ItemShopTags"					"damage"
-		"ItemQuality"					"artifact"
+		"ItemQuality"					"rare"
 		"ItemAliases"					"bracer of endurance"
 		"ItemStackable"					"0"
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
@@ -1455,7 +1433,7 @@
 		
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"						"40000"	
+		"ItemCost"						"35000"	
 		"ItemShopTags"					""
 		
 		// Recipe
@@ -1522,16 +1500,20 @@
 				"var_type"				"FIELD_INTEGER"
 				"reincarnation_time"	"5"
 			}
-//			"05"
-//			{
-//				"var_type"				"FIELD_INTEGER"
-//				"damage_return_pct"		"10"
-//			}
-//			"06"
-//			{
-//				"var_type"				"FIELD_INTEGER"
-//				"damage_return_divided"	"10"
-//			}
+			"05"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"damage_return_pct"		"20"
+			}
+		}
+
+		"OnUnequip"
+		{
+			"RunScript"
+			{
+				"ScriptFile"	"items/global.lua"
+				"Function"		"ShieldUnequip"
+			}
 		}
 
 		"Modifiers"
@@ -1542,16 +1524,26 @@
 				"IsHidden"			"0"
 				"TextureName"		"shield_of_invincibility"
 
-//				"OnTakeDamage"
-//				// "%attack_damage" is set to the damage value after mitigation
-//				{
-//					"Damage"
-//					{
-//						"Target"	"ATTACKER"
-//						"Type"		"DAMAGE_TYPE_PHYSICAL"
-//						"Damage"	"%attack_damage / %damage_return_divided"
-//					}
-//				}
+				"OnAttacked"
+				{
+					"RunScript"
+					{
+						"ScriptFile"	"items/item_shield_of_invincibility.lua"
+						"Function"		"Return"
+					}
+
+					"FireEffect"
+					{
+						"EffectName"		"particles/units/heroes/hero_centaur/centaur_return.vpcf"
+						"EffectAttachType"  "attach_hitloc"
+						"Target" 			"CASTER"
+						"ControlPointEntities"
+						{
+							"CASTER" 		"attach_hitloc"
+							"ATTACKER" 		"attach_hitloc"
+						}
+					}
+				}
 
 				"OnDeath"
 				{
@@ -1585,7 +1577,6 @@
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO"
 		"Model"							"models/props_gameplay/gold_coin001.vmdl"
-		"ItemKillable"					"0"
 
 		// Stats
 		//-------------------------------------------------------------------------------------------------------------
@@ -1619,12 +1610,12 @@
 		"Model"							"models/props_gameplay/red_box.vmdl" 
 		"Effect"						"particles/generic_gameplay/dropped_item.vpcf"
 		"AbilityTextureName"			"talisman_of_evasion_datadriven"
-		
+
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
 		"ItemCost"						"12500"
 		"ItemShopTags"					"evasion"
-		"ItemQuality"					"epic"
+		"ItemQuality"					"rare"
 		"ItemAliases"					"talisman of evasion"
 		"ItemDeclarations"				"DECLARE_PURCHASES_TO_TEAMMATES | DECLARE_PURCHASES_IN_SPEECH | DECLARE_PURCHASES_TO_SPECTATORS"
 		"SecretShop"					"1"
@@ -1636,10 +1627,10 @@
 			"01"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"bonus_evasion"				"15"
+				"bonus_evasion"				"17"
 			}
 		}
-		
+
 		"Modifiers"
 		{
 			"modifier_talisman_of_evasion_datadriven"
@@ -1680,7 +1671,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"ItemCost"						"12500"
 		"ItemShopTags"					"boots"
-		"ItemQuality"					"common"
+		"ItemQuality"					"rare"
 		"ItemAliases"					"blink;boots"
 		"SecretShop"					"1"
 		"ItemDeclarations"				"DECLARE_PURCHASES_TO_TEAMMATES | DECLARE_PURCHASES_IN_SPEECH | DECLARE_PURCHASES_TO_SPECTATORS"
@@ -1750,7 +1741,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"ItemCost"						"12500"
 		"ItemShopTags"					"damage"
-		"ItemQuality"					"component"
+		"ItemQuality"					"rare"
 		"ItemAliases"					"blades of attack"
 		"ItemStackable"					"0"
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
@@ -1861,6 +1852,7 @@
 		"ItemAliases"					"lightning sword"
 		"ItemPurchasable"				"0"
 		"ItemSellable"					"0"
+		"ItemKillable"					"0"
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
 
 		// Special
@@ -1884,6 +1876,15 @@
 			}
 		}
 
+		"OnUnequip"
+		{
+			"RunScript"
+			{
+				"ScriptFile"	"items/global.lua"
+				"Function"		"SwordUnequip"
+			}
+		}
+
 		"Modifiers"
 		{
 			"modifier_item_lightning_sword"
@@ -1895,6 +1896,7 @@
 				"Orb"
 				{
 					"Priority"					"DOTA_ORB_PRIORITY_ITEM"
+					"ProjectileName"			"particles/econ/items/razor/razor_ti6/razor_base_attack_ti6.vpcf"
 				}
 
 				"OnOrbImpact"
@@ -2164,6 +2166,7 @@
 		"ItemAliases"					"ring of superiority"
 		"ItemPurchasable"				"0"
 		"ItemSellable"					"0"
+		"ItemKillable"					"0"
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
 
 		// Special
@@ -2173,7 +2176,7 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"bonus_damage_percentage"		"50"
+				"bonus_damage_percentage"	"50"
 			}
 			"02"
 			{
@@ -2188,7 +2191,7 @@
 			"04"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"bonus_movement_speed"	"125"
+				"bonus_movement_speed"	"90"
 			}
 			"05"
 			{
@@ -2224,6 +2227,12 @@
 			{
 				"ModifierName"	"modifier_command_buff"
 				"Target" 		"CASTER"
+			}
+
+			"RunScript"
+			{
+				"ScriptFile"	"items/global.lua"
+				"Function"		"RingUnequip"
 			}
 		}
 
@@ -2315,6 +2324,418 @@
 				"Properties"
 				{
 					"MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS"   "%bonus_armor"
+				}
+			}
+
+			"modifier_command_buff"
+			{
+				"IsBuff"			"1"
+				"TextureName"		"holdout_command_aura"
+
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_BASEDAMAGEOUTGOING_PERCENTAGE"	"%bonus_damage_percentage"
+				}
+			}
+		}
+	}
+
+	//========================================================================================================
+	// Cloak of Flames
+	//========================================================================================================
+	"item_cloak_of_flames" 
+	{
+		"ID"							"2533"
+		"BaseClass"						"item_datadriven"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
+		"Model"							"models/props_gameplay/red_box.vmdl" 
+		"Effect"						"particles/generic_gameplay/dropped_item.vpcf"
+		"ItemCost"						"3750"
+		"ItemKillable"					"1" 
+		"ItemSellable"					"1"
+		"ItemCastOnPickup"				"0"
+		"ItemPurchasable"				"1"
+		"ItemDroppable"					"1"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
+		"AbilityTextureName"			"cloak_of_flames"
+
+		"SideShop"						"0" 
+		"SecretShop"					"1"
+
+		"ItemShopTags"					"artifact"
+		"ItemQuality"					"artifact"
+
+		"ItemStackable"					"0"
+		"ItemPermanent"					"1"
+
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"			"FIELD_INTEGER"
+				"radius"			"375"
+			}
+			"02"
+			{
+				"var_type"			"FIELD_FLOAT"
+				"damage_per_tick"	"75"
+			}
+			"03"
+			{
+				"var_type"			"FIELD_FLOAT"
+				"tick_time"			"1.0"
+			}
+		}
+
+		"Modifiers"
+		{
+			"modifier_immolation"
+			{
+				"IsHidden"			"0"
+				"Passive"			"1"
+				"ThinkInterval"		"%tick_time"
+				
+				"OnCreated"
+				{
+					"AttachEffect"
+					{
+						"Target"			"CASTER"
+						"EffectName"		"particles/units/heroes/hero_ember_spirit/ember_spirit_flameguard.vpcf"
+						"EffectAttachType"	"follow_origin"
+	
+						"ControlPoints"
+						{
+							"00"	"0 0 0"
+							"01"	"%radius 1 1"
+						}
+					}
+				}
+
+				"OnIntervalThink"
+				{
+					"Damage"
+					{
+						"Type"			"DAMAGE_TYPE_MAGICAL"
+						"Damage"		"%damage_per_tick"
+						
+						"Target"
+						{
+							"Center"	"TARGET"
+							"Radius"	"%radius"
+							"Teams"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
+							"Types"		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+						}
+					}
+				}
+			}
+		}
+	}
+
+	//========================================================================================================
+	// Doom Artifact
+	//========================================================================================================
+	"item_doom_artifact"
+	{
+		// General
+		//----------------------------------------------------------------------------------------------------
+		"BaseClass"             		"item_datadriven"
+		"ID"							"2534"
+		"AbilityTextureName"			"doom_artifact"		
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+
+		// Item Info
+		//----------------------------------------------------------------------------------------------------
+		"ItemCost"						"0"
+		"ItemShopTags"					"unique"
+		"ItemQuality"					"epic"
+		"ItemAliases"					"doom artifact"
+		"ItemPurchasable"				"0"
+		"ItemSellable"					"0"
+		"ItemKillable"					"0"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
+
+		// Special
+		//----------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_stats"			"1500"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_armor"			"375"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"damage_reduction"		"-20"
+			}
+			"04"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_hp"				"10000"
+			}
+			"05"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"reincarnation_time"	"5"
+			}
+			"06"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"damage_return_pct"		"20"
+			}
+			"07"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"lifesteal_percent"		"50"
+			}
+			"08"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_damage"			"3000"
+			}
+			"09"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_damage_percentage"	"50"
+			}
+			"10"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_health_regen"	"125"
+			}
+			"11"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_movement_speed"	"90"
+			}
+			"12"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"bat_reduction"			"0.4"
+			}
+		}
+
+		"OnEquip"
+		{
+			"ApplyModifier"
+			{
+				"ModifierName"	"modifier_endurance_buff"
+				"Target" 		"CASTER"
+			}
+
+			"ApplyModifier"
+			{
+				"ModifierName"	"modifier_command_buff"
+				"Target" 		"CASTER"
+			}
+		}
+
+		"OnUnequip"
+		{
+			"RemoveModifier"
+			{
+				"ModifierName"	"modifier_endurance_buff"
+				"Target" 		"CASTER"
+			}
+
+			"RemoveModifier"
+			{
+				"ModifierName"	"modifier_command_buff"
+				"Target" 		"CASTER"
+			}
+		}
+
+		"Modifiers"
+		{
+			"modifier_key_of_the_three_moons"
+			{
+				"Passive"			"1"
+				"IsHidden"			"1"
+
+				"Attributes"		"MODIFIER_ATTRIBUTE_MULTIPLE"
+
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_STATS_STRENGTH_BONUS"	= "%bonus_stats"
+					"MODIFIER_PROPERTY_STATS_AGILITY_BONUS"		= "%bonus_stats"
+					"MODIFIER_PROPERTY_STATS_INTELLECT_BONUS"	= "%bonus_stats"
+				}
+			}
+
+			"modifier_shield_of_invincibility"
+			{
+				"Passive"			"1"
+				"IsHidden"			"0"
+				"TextureName"		"shield_of_invincibility"
+
+				"OnAttacked"
+				{
+					"RunScript"
+					{
+						"ScriptFile"	"items/item_shield_of_invincibility.lua"
+						"Function"		"Return"
+					}
+
+					"FireEffect"
+					{
+						"EffectName"		"particles/units/heroes/hero_centaur/centaur_return.vpcf"
+						"EffectAttachType"  "attach_hitloc"
+						"Target" 			"CASTER"
+						"ControlPointEntities"
+						{
+							"CASTER" 		"attach_hitloc"
+							"ATTACKER" 		"attach_hitloc"
+						}
+					}
+				}
+
+				"OnDeath"
+				{
+					"RunScript"
+					{
+						"ScriptFile"	"items/item_shield_of_invincibility.lua"
+						"Function"		"Reincarnation"
+					}
+				}
+
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS"		"%bonus_armor"
+					"MODIFIER_PROPERTY_INCOMING_DAMAGE_PERCENTAGE"	"%damage_reduction"
+					"MODIFIER_PROPERTY_HEALTH_BONUS"				"%bonus_hp"
+				}
+			}
+
+			"modifier_item_lightning_sword"
+			{
+				"Passive"						"1"
+				"IsHidden"						"1"
+				"Attributes"					"MODIFIER_ATTRIBUTE_MULTIPLE"
+				
+				"Orb"
+				{
+					"Priority"					"DOTA_ORB_PRIORITY_ITEM"
+					"ProjectileName"			"particles/econ/items/razor/razor_ti6/razor_base_attack_ti6.vpcf"
+				}
+
+				"OnOrbImpact"
+				{
+					"RunScript"
+					{
+						"ScriptFile"	"heroes/global.lua"
+						"Function"		"Lifesteal"
+					}
+				}
+
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE"		"%bonus_damage"
+				}
+			}
+
+			"modifier_lifesteal"
+			{
+				"IsHidden"				"1"
+
+				"OnDealDamage"
+				{
+					"Lifesteal"
+					{
+						"Target"				"ATTACKER"
+						"LifestealPercent"		"%lifesteal_percent"
+					}
+				}
+			}
+
+			"modifier_endurance_buff"
+			{
+				"IsBuff"		"1"
+				"IsHidden"		"0"
+				"TextureName"	"holdout_endurance_aura"
+
+				"OnCreated"
+				{
+					"AttachEffect"
+					{
+						"Target"			"TARGET"
+						"EffectName"		"particles/items_fx/aura_endurance.vpcf"
+						"EffectAttachType"	"follow_origin"
+					}
+
+					"RunScript"
+					{
+						"ScriptFile"	"heroes/hero_enchantress/endurance_aura.lua"
+						"Function"		"EnduranceAura"
+					}
+				}
+
+				"OnDestroy"
+				{
+					"RunScript"
+					{
+						"ScriptFile"	"heroes/hero_enchantress/endurance_aura.lua"
+						"Function"		"EnduranceAuraRemove"
+					}
+				}
+
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE"	"%bonus_movement_speed_percentage" 
+				}
+			}
+
+			"modifier_aura_of_blight_datadriven"
+			{
+				"Passive"		"1"
+				"IsHidden"		"0"
+				"TextureName"	"holdout_unholy_aura"
+
+				"OnCreated"
+				{
+					"AttachEffect"
+					{
+						"EffectName"			"particles/econ/courier/courier_faceless_rex/cour_rex_ground_a.vpcf"
+						"EffectAttachType"		"follow_origin"
+						"Target"				"TARGET"
+					}
+
+					"AttachEffect"
+					{
+						"EffectName"			"particles/econ/courier/courier_roshan_frost/courier_roshan_frost_steam.vpcf"
+						"EffectAttachType"		"follow_overhead"
+						"Target"				"TARGET"
+					}
+				}
+
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_HEALTH_REGEN_CONSTANT"		"%bonus_health_regen"
+					"MODIFIER_PROPERTY_MOVESPEED_BONUS_CONSTANT"	"%bonus_movement_speed"
+				}
+			}
+
+			"modifier_devotion_aura_hidden"
+			{
+				"Passive"   "1"
+				"IsHidden"  "0"
+				"TextureName"		"holdout_devotion_aura"
+
+				"OnCreated"
+				{
+					"AttachEffect"
+					{
+						"Target"			"TARGET"
+						"EffectName"		"particles/items_fx/aura_shivas.vpcf"
+						"EffectAttachType"	"follow_origin"
+					}
 				}
 			}
 
