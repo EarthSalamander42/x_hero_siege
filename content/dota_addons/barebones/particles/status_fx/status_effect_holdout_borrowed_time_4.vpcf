@@ -5,7 +5,7 @@
 	m_nMaxParticles = 1
 	m_nInitialParticles = 1
 	m_flConstantRadius = 0.0
-	m_ConstantColor = [ 0, 0, 0, 255 ]
+	m_ConstantColor = [ 218, 165, 32, 255 ]
 	m_nConstantSequenceNumber = 1
 	m_flMaxRecreationTime = -1.0
 	m_Operators = 
@@ -133,8 +133,8 @@
 		{
 			_class = "C_INIT_RandomColor"
 			m_nFieldOutput = 22
-			m_ColorMax = [ 0, 0, 0, 0 ]
-			m_ColorMin = [ 0, 0, 0, 0 ]
+			m_ColorMax = [ 218, 165, 32, 0 ]
+			m_ColorMin = [ 218, 165, 32, 0 ]
 		},
 		{
 			_class = "C_INIT_RandomScalar"

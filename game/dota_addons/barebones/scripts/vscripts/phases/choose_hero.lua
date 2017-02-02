@@ -100,7 +100,7 @@ local heroes = HeroList:GetAllHeroes()
 		HEROLIST_ALT[27] = CreateUnitByName("npc_dota_hero_warlock_bis", Entities:FindByName(nil, "choose_warlock_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
 		HEROLIST_ALT[27]:SetAngles(0, 270, 0)
 
-		HEROLIST_ALT[28] = CreateUnitByName("npc_dota_hero_axe_bis", Entities:FindByName(nil, "choose_dota_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
+		HEROLIST_ALT[28] = CreateUnitByName("npc_dota_hero_monkey_king_bis", Entities:FindByName(nil, "choose_dota_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
 		HEROLIST_ALT[28]:SetAngles(0, 90, 0)
 	end)
 
@@ -127,6 +127,9 @@ local heroes = HeroList:GetAllHeroes()
 
 		HEROLIST_VIP_ALT[6] = CreateUnitByName("npc_dota_hero_sand_king_bis", Entities:FindByName(nil, "choose_sand_king_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
 		HEROLIST_VIP_ALT[6]:SetAngles(0, 270, 0)
+
+		HEROLIST_VIP_ALT[7] = CreateUnitByName("npc_dota_hero_necrolyte_bis", Entities:FindByName(nil, "choose_pudge_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
+		HEROLIST_VIP_ALT[7]:SetAngles(0, 270, 0)
 	end)
 
 	Timers:CreateTimer(20, function()
@@ -188,14 +191,12 @@ local id = activator:GetPlayerID()
 			for i = 1, #HEROLIST do
 				if caller:GetName() == "trigger_hero_"..i then
 				local point = Entities:FindByName(nil, "base_spawn")
+					UTIL_Remove(Entities:FindByName(nil, "trigger_hero_"..i))
+					UTIL_Remove(HEROLIST_ALT[i])
 					PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(), nil)
 					FindClearSpaceForUnit(activator, point:GetAbsOrigin(), true)
-					Timers:CreateTimer(2.0, function()
-						activator:SetPlayerID(id)
-					end)
-					UTIL_Remove(HEROLIST_ALT[i])
-					UTIL_Remove(Entities:FindByName(nil, "trigger_hero_"..i))
 					local newHero = PlayerResource:ReplaceHeroWith(activator:GetPlayerID(), "npc_dota_hero_"..HEROLIST[i], STARTING_GOLD, 0)
+					activator:SetPlayerID(id)
 					local particle = ParticleManager:CreateParticle("particles/econ/events/ti6/hero_levelup_ti6.vpcf", PATTACH_ABSORIGIN_FOLLOW, newHero)
 					ParticleManager:SetParticleControl(particle, 0, newHero:GetAbsOrigin())
 					local item1 = newHero:AddItemByName("item_ankh_of_reincarnation")

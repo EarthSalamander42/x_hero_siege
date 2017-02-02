@@ -38,6 +38,15 @@ function Purge(event)
 	end
 end
 
+-- Orb of Earth
+function Bash(event)
+	local caster = event.caster
+	local target = event.target
+	local ability = event.ability
+
+	ability:StartCooldown(10.0)
+end
+
 -- Key of the 3 Moons
 function KeyUnequip(keys)
 local hero = keys.caster

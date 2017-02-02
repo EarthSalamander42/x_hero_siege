@@ -130,6 +130,8 @@ local WaypointNorth6 = Entities:FindByName(nil,"north1_6")
 local WaypointEast6 = Entities:FindByName(nil,"east1_6")
 local WaypointSouth6 = Entities:FindByName(nil,"south1_6")
 
+RefreshPlayers()
+
 	for _,v in pairs(teleporters) do
 		v:Enable()
 	end
@@ -316,7 +318,6 @@ local WaypointSouth6 = Entities:FindByName(nil,"south1_6")
 	for _,hero in pairs(heroes) do
 		if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
 			local id = hero:GetPlayerID()
-			print(id)
 			local point = Entities:FindByName(nil, "final_wave_player_"..id)
 			FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
 			hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {duration= 30, IsHidden = true})

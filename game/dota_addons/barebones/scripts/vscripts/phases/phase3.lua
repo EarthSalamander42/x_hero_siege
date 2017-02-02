@@ -15,6 +15,7 @@ local heroes = HeroList:GetAllHeroes()
 local difficulty = GameRules:GetCustomGameDifficulty()
 
 	if first_time_teleport then
+		RefreshPlayers()
 		if difficulty == 1 then
 			magtheridon = CreateUnitByName("npc_dota_hero_magtheridon", point_mag  ,true, nil, nil, DOTA_TEAM_BADGUYS)
 			magtheridon:SetAngles(0, 180, 0)
@@ -88,6 +89,7 @@ local point3 = Entities:FindByName( nil, "spawner_phase3_creeps_east"):GetAbsOri
 local stats = 250
 
 	if first_time_teleport_phase3_creeps then
+		RefreshPlayers()
 		DoEntFire("trigger_teleport_phase3_creeps","Kill",nil,0,nil,nil)
 		Notifications:TopToAll({text="Power Up: +250 to all stats!", style={color="green"}, duration=10.0})
 		activator:EmitSound("ui.trophy_levelup")
@@ -152,6 +154,9 @@ local point = Entities:FindByName(nil,"point_teleport_arthas"):GetAbsOrigin()
 		end
 	elseif activator:GetTeam() == DOTA_TEAM_GOODGUYS then
 		FindClearSpaceForUnit(activator, point, true)
+		Timers:CreateTimer(0.1, function()
+			PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(), nil)
+		end)
 		activator:Stop()
 	end
 end
@@ -172,6 +177,7 @@ function StartArthasArena(keys)
 local activator = keys.activator
 local heroes = HeroList:GetAllHeroes()
 	if first_time_teleport_arthas_real then
+		RefreshPlayers()
 		local arthas = CreateUnitByName("npc_dota_hero_arthas",Entities:FindByName(nil,"npc_dota_spawner_magtheridon_arena"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_BADGUYS)
 		arthas:SetAngles(0, 270, 0)
 
@@ -205,6 +211,7 @@ end
 
 function StartBaneHallowArena()
 local difficulty = GameRules:GetCustomGameDifficulty()
+RefreshPlayers()
 
 	Timers:CreateTimer(8,function()
 	local banehallow = CreateUnitByName("npc_dota_hero_banehallow",Entities:FindByName(nil,"npc_dota_spawner_magtheridon_arena"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_BADGUYS)
@@ -260,6 +267,7 @@ function StartLichKingArena()
 local point_boss = Entities:FindByName(nil, "npc_dota_spawner_lich_king_bis"):GetAbsOrigin()
 local heroes = HeroList:GetAllHeroes()
 local reincarnate_time = 8.0
+RefreshPlayers()
 
 	for _,hero in pairs(heroes) do
 	local id = hero:GetPlayerID()
@@ -297,6 +305,7 @@ end
 function StartSpiritMasterArena()
 local point_boss_1 = Entities:FindByName(nil, "spirit_master_point_bis"):GetAbsOrigin()
 local heroes = HeroList:GetAllHeroes()
+RefreshPlayers()
 
 	for _,hero in pairs(heroes) do
 	local id = hero:GetPlayerID()
@@ -329,29 +338,30 @@ local heroes = HeroList:GetAllHeroes()
 	end)
 end
 
---	function StartSecretArena(keys)
---	local activator = keys.activator
---	local point = Entities:FindByName(nil, "npc_dota_muradin_player_1")
---	local difficulty = GameRules:GetCustomGameDifficulty()
---	
---		if difficulty == 4 then
---			for itemSlot = 0, 5 do
---				local item = activator:GetItemInSlot(itemSlot)
---				if item:GetName() == "item_doom_artifact" then
---					local secret = CreateUnitByName("npc_dota_hero_secret", Entities:FindByName(nil, "roshan_wp_4"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
---					secret:SetAngles(0, 270, 0)
---					secret:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 10, IsHidden = true})
---					secret:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 9, IsHidden = true})
---	
---					FindClearSpaceForUnit(activator, point:GetAbsOrigin(), true)
---					activator:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {Duration = 10, IsHidden = true})
---					activator:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 10, IsHidden = true})
---					activator:Stop()
---					PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(), activator)
---					Timers:CreateTimer(0.1, function()
---						PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(), nil)
---					end)
---				end
---			end
---		end
---	end
+function StartSecretArena(keys)
+local activator = keys.activator
+local point = Entities:FindByName(nil, "npc_dota_muradin_player_1")
+local difficulty = GameRules:GetCustomGameDifficulty()
+local doomm_artifact = "item_doom_artifact"
+
+	if difficulty == 4 then
+		for itemSlot = 0, 5 do
+			local item = activator:GetItemInSlot(itemSlot)
+			if item:GetName() == doom_artifact then
+				local secret = CreateUnitByName("npc_dota_hero_secret", Entities:FindByName(nil, "roshan_wp_4"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+				secret:SetAngles(0, 270, 0)
+				secret:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 10, IsHidden = true})
+				secret:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 9, IsHidden = true})
+
+				FindClearSpaceForUnit(activator, point:GetAbsOrigin(), true)
+				activator:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {Duration = 10, IsHidden = true})
+				activator:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 10, IsHidden = true})
+				activator:Stop()
+				PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(), activator)
+				Timers:CreateTimer(0.1, function()
+					PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(), nil)
+				end)
+			end
+		end
+	end
+end

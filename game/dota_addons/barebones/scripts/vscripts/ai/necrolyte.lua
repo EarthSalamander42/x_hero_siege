@@ -8,27 +8,12 @@ behaviorSystem = {} -- create the global so we can assign to it
 
 function Spawn( entityKeyValues )
 	thisEntity:SetContextThink( "AIThink", AIThink, 0.25 )
-    behaviorSystem = AICore:CreateBehaviorSystem( { BehaviorNone, BehaviorDeathPulse, BehaviorRunAway } ) 
+	behaviorSystem = AICore:CreateBehaviorSystem( { BehaviorNone, BehaviorDeathPulse } ) 
 end
 
 function AIThink() -- For some reason AddThinkToEnt doesn't accept member functions
-       return behaviorSystem:Think()
+	return behaviorSystem:Think()
 end
-
-function CollectRetreatMarkers()
-	local result = {}
-	local i = 1
-	local wp = nil
-	while true do
-		wp = Entities:FindByName( nil, string.format("waypoint_%d", i ) )
-		if not wp then
-			return result
-		end
-		table.insert( result, wp:GetOrigin() )
-		i = i + 1
-	end
-end
-POSITIONS_retreat = CollectRetreatMarkers()
 
 --------------------------------------------------------------------------------------------------------
 
@@ -62,7 +47,6 @@ end
 function BehaviorNone:Continue()
 	self.endTime = GameRules:GetGameTime() + 1
 end
-
 
 --------------------------------------------------------------------------------------------------------
 
@@ -102,42 +86,4 @@ BehaviorDeathPulse.Continue = BehaviorDeathPulse.Begin
 
 --------------------------------------------------------------------------------------------------------
 
-BehaviorRunAway = {}
-
-function BehaviorRunAway:Evaluate()
-	local desire = 0
-	local happyPlaceIndex =  RandomInt( 1, #POSITIONS_retreat )
-	escapePoint = POSITIONS_retreat[ happyPlaceIndex ]
-	-- let's not choose this twice in a row
-	if currentBehavior == self then return desire end
-	
-	local enemies = FindUnitsInRadius( DOTA_TEAM_BADGUYS, thisEntity:GetOrigin(), nil, 700, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO, 0, 0, false )
-	if #enemies > 0 then
-		desire = #enemies
-	end
-	return desire
-end
-
-
-function BehaviorRunAway:Begin()
-	self.endTime = GameRules:GetGameTime() + 6
-
-	self.order =
-	{
-		OrderType = DOTA_UNIT_ORDER_CAST_TARGET,
-		UnitIndex = thisEntity:entindex(),
-		TargetIndex = thisEntity:entindex(),
-		AbilityIndex = self.forceAbility:entindex()
-	}
-end
-
-
-function BehaviorRunAway:Think(dt)
-
-end
-
-BehaviorRunAway.Continue = BehaviorRunAway.Begin
-
---------------------------------------------------------------------------------------------------------
-
-AICore.possibleBehaviors = { BehaviorNone, BehaviorDeathPulse, BehaviorRunAway }
+AICore.possibleBehaviors = { BehaviorNone, BehaviorDeathPulse }

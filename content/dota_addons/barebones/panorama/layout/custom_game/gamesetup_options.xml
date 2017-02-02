@@ -20,7 +20,6 @@
 				Game.SetRemainingSetupTime( -1 );
 				Game.SetAutoLaunchEnabled( false );
 			}
-
 		})();
 		
 	</script>
@@ -41,12 +40,10 @@
 
 					<Panel class="CustomGameSettingPanelDivider" hittest="false" />
 					<Panel class="ContainerCustomGameSettingOptions" hittest="false">
-						
 						<RadioButton class="CGSRadio" group="GameLength" text="Easy" onactivate="OnVoteButtonPressed('difficulty', 1)" />
 						<RadioButton class="CGSRadio" group="GameLength" text="Normal" onactivate="OnVoteButtonPressed('difficulty', 2)" />
 						<RadioButton class="CGSRadio" group="GameLength" text="Hard" onactivate="OnVoteButtonPressed('difficulty', 3)" />
 						<RadioButton class="CGSRadio" group="GameLength" text="Extreme" onactivate="OnVoteButtonPressed('difficulty', 4)" />
-
 					</Panel>
 				</Panel>
 				<!--

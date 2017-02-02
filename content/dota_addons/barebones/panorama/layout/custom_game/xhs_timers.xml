@@ -1,18 +1,15 @@
 <root>
 	<styles>
 		<include src="file://{resources}/styles/dotastyles.css" />
-		<include src="file://{resources}/styles/custom_game/overthrow_scoreboard.css" />
+		<include src="file://{resources}/styles/custom_game/xhs_timers.css" />
 	</styles>
 	<scripts>
-		<include src="file://{resources}/scripts/custom_game/overthrow_scoreboard.js" />
+		<include src="file://{resources}/scripts/custom_game/xhs_timers.js" />
 	</scripts>
 	<Panel class="ScoreboardLeft">
-		<Panel class="VictoryPanel">
+		<Panel id="ScoreboardSpecialEvent">
 			<Label id="Goal" text="#Goal" />
 			<Label id="Timer" text="--:--" />
-		</Panel>
-		<Panel hittest="false" id="ScoreboardCenter">
-			<Label hittest="false" id="ScoreboardCurrentTime" class="MonoNumbersFont" text="" />
 		</Panel>
 		<Panel id="ScoreboardCreepTime">
 			<Label id="CreepGoal" text="#CreepGoal" />

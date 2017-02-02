@@ -37,7 +37,7 @@ function MirrorImage( event )
 		illusion:SetControllableByPlayer(player, true)
 		illusion:Stop()
 		illusion:SetForwardVector(fv)
-		
+
 		-- Level Up the unit to the casters level
 		local casterLevel = caster:GetLevel()
 		for i = 1, casterLevel -1 do
@@ -61,7 +61,6 @@ function MirrorImage( event )
 		end
 
 		illusion:AddNewModifier(caster, ability, "modifier_illusion", { duration = duration, outgoing_damage = outgoingDamage, incoming_damage = incomingDamage })
-		illusion:AddNewModifier(caster, ability, "modifier_summoned", {})
 		illusion:MakeIllusion()
 		table.insert(caster.illusions, illusion)
 	end

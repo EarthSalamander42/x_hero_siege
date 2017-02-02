@@ -1108,21 +1108,21 @@
 
 				"Orb"
 				{
-					"Priority"          "DOTA_ORB_PRIORITY_ABILITY"
-					"ProjectileName"    "particles/units/heroes/hero_brewmaster/brewmaster_storm_attack.vpcf"
+					"Priority"			"DOTA_ORB_PRIORITY_ABILITY"
+					"ProjectileName"	"particles/units/heroes/hero_brewmaster/brewmaster_storm_attack.vpcf"
 				}
 
 				"OnOrbImpact"
 				{
 					"Random"
 					{
-						"Chance"            "%purge_chance"
+						"Chance"			"%purge_chance"
 						"OnSuccess"
 						{
 							"RunScript"
 							{
-								"ScriptFile"    "items/global.lua"
-								"Function"      "Purge"
+								"ScriptFile"	"items/global.lua"
+								"Function"		"Purge"
 							}
 						}
 					}
@@ -1340,7 +1340,7 @@
 							"Center"    "UNIT"
 							"Flags"     "DOTA_UNIT_TARGET_FLAG_DEAD"
 						}
-	
+
 						"OnSpawn"
 						{
 							"FireSound"
@@ -1350,6 +1350,130 @@
 							}
 						}
 					}
+				}
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Orb of Frost
+	//=================================================================================================================
+	"item_orb_of_frost"
+	{
+		"ID"							"2535"
+		"BaseClass"                     "item_datadriven"
+		"AbilityTextureName"            "item_orb_of_frost"
+		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+	
+		// Shops
+		"ItemCost"						"0"
+		"ItemShareability"				"ITEM_NOT_SHAREABLE"
+		"ItemPurchasable"				"0"
+		"ItemKillable"					"0"
+		"ItemSellable"					"0"
+		"ItemDroppable"					"1"
+		"ItemQuality"					"epic"
+		
+		"Model"							"models/props_gameplay/red_box.vmdl"
+		"Effect"						"particles/units/heroes/hero_winter_wyvern/wyvern_winters_curse.vpcf"
+	
+		"UIPickupSound"                 "Item.PickUpGemShop"
+		"UIDropSound"                   "Item.DropGemShop"
+		"WorldDropSound"                "Item.DropGemWorld"
+	
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_damage"			"4000"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"freeze_cooldown"		"0.1"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bash_chance"			"10"
+			}
+		}
+
+		"Modifiers"
+		{
+			"modifier_orb_of_frost"
+			{
+				"Passive"       "1"
+				"IsHidden"      "1"
+				"Orb"
+				{
+					"Priority"			"DOTA_ORB_PRIORITY_ABILITY"
+					"ProjectileName"	"particles/units/heroes/hero_ancient_apparition/ancient_apparition_base_attack.vpcf"
+				}
+	
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE"		"%bonus_damage"
+				}
+
+				"OnOrbImpact"
+				{
+					"Random"
+					{
+						"Chance"			"%bash_chance"
+						"OnSuccess"
+						{
+							"ApplyModifier"
+							{
+								"ModifierName"	"modifier_orb_of_frost_target"
+								"Duration"		"%freeze_cooldown"
+								"Target"
+								{
+									"Center"	"TARGET"
+									"Types"		"DOTA_UNIT_TARGET_BASIC | DOTA_UNIT_TARGET_HERO"
+								}
+							}
+						}
+					}
+				}
+			}
+
+			"modifier_orb_of_frost_target"
+			{
+				"IsDebuff"		"1"
+				"IsPurgable"	"0"
+	
+				"OnCreated"
+				{
+					"FireSound"
+					{
+						"EffectName"	"Hero_Invoker.ColdSnap.Freeze"
+						"Target" 		"TARGET"
+					}
+	
+					"AttachEffect"
+					{
+						"EffectName"        "particles/generic_gameplay/generic_stunned.vpcf"
+						"EffectAttachType"  "follow_overhead"
+						"Target"            "TARGET"
+					}
+	
+					"FireEffect"
+					{
+						"EffectName"        "particles/units/heroes/hero_invoker/invoker_cold_snap.vpcf"
+						"EffectAttachType"  "follow_origin"
+						"Target"            "TARGET"
+					}
+				}
+	
+				"StatusEffectName" 		"particles/status_fx/status_effect_frost.vpcf" 	   
+				"StatusEffectPriority"  "10"
+	
+				"States"
+				{
+					"MODIFIER_STATE_STUNNED"		"MODIFIER_STATE_VALUE_ENABLED"
+					"MODIFIER_STATE_FROZEN"			"MODIFIER_STATE_VALUE_ENABLED"
 				}
 			}
 		}
@@ -1661,7 +1785,6 @@
 
 		// Stats		
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCastRange"				"0"
 		"AbilityCastPoint"				"0.0"
 		"AbilityCooldown"				"9.0"
 		"AbilityManaCost"				"0"
@@ -1739,7 +1862,7 @@
 
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"						"12500"
+		"ItemCost"						"15000"
 		"ItemShopTags"					"damage"
 		"ItemQuality"					"rare"
 		"ItemAliases"					"blades of attack"
@@ -1818,7 +1941,7 @@
 
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"						"40000"	
+		"ItemCost"						"35000"	
 		"ItemShopTags"					""
 		
 		// Recipe
@@ -1949,6 +2072,7 @@
 		"ItemPermanent"					"0"
 		"ItemInitialCharges"			"3"
 		"AOERadius"						"500"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
 
 		"AbilitySpecial"
 		{
@@ -1997,6 +2121,7 @@
 		"ItemStackable"					"0"
 		"ItemPermanent"					"0"
 		"ItemInitialCharges"			"3"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
 
 		"OnSpellStart"
 		{
@@ -2038,6 +2163,7 @@
 		"ItemStackable"					"0"
 		"ItemPermanent"					"0"
 		"ItemInitialCharges"			"3"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
 
 		"AbilitySpecial"
 		{
@@ -2088,6 +2214,7 @@
 		"ItemStackable"					"0"
 		"ItemPermanent"					"0"
 		"ItemInitialCharges"			"3"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
 
 		"AbilitySpecial"
 		{
@@ -2747,6 +2874,188 @@
 				"Properties"
 				{
 					"MODIFIER_PROPERTY_BASEDAMAGEOUTGOING_PERCENTAGE"	"%bonus_damage_percentage"
+				}
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Armor Rune
+	//=================================================================================================================
+	"item_rune_armor"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"ID"									"2536"
+		"BaseClass"								"item_datadriven"
+		"Model"									"models/props_items/assault_cuirass.vmdl"
+		"Effect"								"particles/units/heroes/hero_dazzle/dazzle_armor_enemy_ring_sink.vpcf"
+
+		// Item Info
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemCost"								"0"
+		"ItemQuality"							"component"
+		"ItemPurchasable"						"0"
+		"ItemSellable"							"0"
+		"ItemKillable"							"1"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"bonus_armor"				"75"
+			}
+			"02"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"duration"					"45"
+			}
+		}
+
+		"Modifiers"
+		{
+			"modifier_rune_armor"
+			{
+				"TextureName"					"tower_armor_aura"
+				"Duration"						"%duration"
+				"Passive"						"0"
+				"IsHidden"						"0"
+				"IsBuff"						"1"
+				"IsPurgable"					"0"
+
+				"EffectName"					"particles/units/heroes/hero_dazzle/dazzle_armor_friend.vpcf"
+				"EffectAttachType"				"follow_overhead"
+
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS"	"%bonus_armor"
+				}
+			}
+		}	// awesome effect orange for a damage based rune
+	}		// particles/econ/items/dazzle/dazzle_dark_light_weapon/dazzle_dark_shallow_grave_ground.vpcf
+
+	//=================================================================================================================
+	// Orb of Earth
+	//=================================================================================================================
+	"item_orb_of_earth"
+	{
+		"ID"							"2537"
+		"BaseClass"                     "item_datadriven"
+		"AbilityTextureName"            "item_orb_of_earth"
+		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+	
+		// Shops
+		"ItemCost"						"7500"
+		"AbilityCooldown"				"10.0"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
+		"ItemPurchasable"				"1"
+		"ItemKillable"					"1"
+		"ItemSellable"					"1"
+		"ItemDroppable"					"1"
+		"ItemQuality"					"artifact"
+		
+		"Model"							"models/props_gameplay/red_box.vmdl"
+		"Effect"						"particles/units/heroes/hero_earth_spirit/espirit_geomagentic_target_sphere.vpcf"
+	
+		"UIPickupSound"                 "Item.PickUpGemShop"
+		"UIDropSound"                   "Item.DropGemShop"
+		"WorldDropSound"                "Item.DropGemWorld"
+	
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_damage"			"150"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"bash_duration"			"1.0"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bash_chance"			"10"
+			}
+		}
+
+		"Modifiers"
+		{
+			"modifier_orb_of_earth"
+			{
+				"Passive"       "1"
+				"IsHidden"      "1"
+				"Orb"
+				{
+					"Priority"			"DOTA_ORB_PRIORITY_ABILITY"
+					"ProjectileName"	"particles/units/heroes/hero_obsidian_destroyer/obsidian_destroyer_base_attack_energy.vpcf"
+				}
+	
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE"		"%bonus_damage"
+				}
+
+				"OnOrbImpact"
+				{
+					"Random"
+					{
+						"Chance"			"%bash_chance"
+						"OnSuccess"
+						{
+							"ApplyModifier"
+							{
+								"ModifierName"	"modifier_orb_of_earth_target"
+								"Duration"		"%bash_duration"
+								"Target"
+								{
+									"Center"	"TARGET"
+									"Types"		"DOTA_UNIT_TARGET_BASIC | DOTA_UNIT_TARGET_HERO"
+								}
+
+								"RunScript"
+								{
+									"ScriptFile"	"items/global.lua"
+									"Function"		"Bash"
+								}
+							}
+						}
+					}
+				}
+			}
+
+			"modifier_orb_of_earth_target"
+			{
+				"IsDebuff"		"1"
+				"IsPurgable"	"0"
+	
+				"OnCreated"
+				{
+					"FireSound"
+					{
+						"EffectName"	"Hero_EarthSpirit.BoulderSmash.Target"
+						"Target" 		"TARGET"
+					}
+
+					"AttachEffect"
+					{
+						"EffectName"		"particles/units/heroes/hero_medusa/medusa_stone_gaze_debuff_stoned.vpcf"
+						"EffectAttachType"	"follow_origin"
+						"Target"			"TARGET"
+					}
+				}
+	
+				"StatusEffectName" 		"particles/units/heroes/hero_medusa/status_effect_medusa_stone_gaze_backup.vpcf" 	   
+				"StatusEffectPriority"	"10"
+	
+				"States"
+				{
+					"MODIFIER_STATE_STUNNED"		"MODIFIER_STATE_VALUE_ENABLED"
+					"MODIFIER_STATE_FROZEN"			"MODIFIER_STATE_VALUE_ENABLED"
 				}
 			}
 		}

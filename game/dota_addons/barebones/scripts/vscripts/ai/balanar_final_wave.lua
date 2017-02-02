@@ -16,7 +16,7 @@ function BalanarThink()
 		--FindUnitsInRadius( iTeamNumber, vPosition, hCacheUnit, flRadius, iTeamFilter, iTypeFilter, iFlagFilter, iOrder, bCanGrowCache )
 		local units = FindUnitsInRadius(thisEntity:GetTeamNumber(), thisEntity:GetAbsOrigin(), nil, 500, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)
 
-		if units ~= nil then
+		if units ~= nil and units > 1 then
 			thisEntity:CastAbilityOnTarget(units[1],Ability_sleep,-1)
 		end
 	end

@@ -21,7 +21,7 @@
 		"AttributeIntelligenceGain"		"5"
 
 		"Ability1"						"holdout_dark_pact"
-		"Ability2"						"abyssal_underlord_pit_of_malice"
+		"Ability2"						"holdout_war_thunder"
 		"Ability3"						"nevermore_necromastery"		
 		"Ability4"						"abyssal_underlord_atrophy_aura"
 		"Ability5"						"black_dragon_fireball"
@@ -741,6 +741,7 @@
 	{
 		"override_hero"					"npc_dota_hero_mirana"
 //		"DisableWearables"				"1"
+		"AttributePrimary"				"DOTA_ATTRIBUTE_INTELLECT"
 		"MovementSpeed"					"355"
 		"ModelScale"					"0.95"
 		"AttackDamageMin"				"70"
@@ -748,8 +749,8 @@
 		"AttackRange"					"530"
 
 		"AttributeStrengthGain"			"5"
-		"AttributeAgilityGain"			"10"
-		"AttributeIntelligenceGain"		"5"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"10"
 
 		"Ability1"						"zuus_arc_lightning"
 		"Ability2"						"holdout_watery_minion"
@@ -793,7 +794,8 @@
 		"Ability4"						"monkey_king_primal_spring_early"
 		"Ability5"						"holdout_jingu_mastery"
 		"Ability6"						"holdout_monkey_king_bar"
-		"Ability7"						"monkey_king_wukongs_command"
+		"Ability7"						"holdout_wukong_army"
+		"Ability8"						""
 		"Ability9"						""
 		"Ability10"						""
 		"Ability11"						""
@@ -918,6 +920,41 @@
 	}
 
 	//=======================================================================================================
+	// HERO: The Butcher( Necrolyte )
+	//=======================================================================================================
+	"npc_dota_hero_necrolyte_holdout"
+	{
+		"override_hero"					"npc_dota_hero_necrolyte"
+		"ModelScale"					"0.95"
+//		"DisableWearables"				"1"
+		"MovementSpeed"					"355"
+
+		"AttributePrimary"				"DOTA_ATTRIBUTE_INTELLECT"
+
+		"AttributeStrengthGain"			"5"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"10"
+
+		"Ability1"						"holdout_shadow_bolt"
+		"Ability2"						"holdout_corruption"
+		"Ability3"						"holdout_malefice_aura"
+		"Ability4"						"holdout_consuming_flame"
+		"Ability5"						"holdout_stitch"
+		"Ability6"						"holdout_dark_king"
+		"Ability7"						""
+		"Ability8"						""
+		"Ability9"						""
+		"Ability10"						""
+		"Ability11"						""
+		"Ability12"						""
+		"Ability13"						""
+		"Ability14"						""
+		"Ability15"						""
+		"Ability16"						""
+		"Ability17"						"ability_unit_died_death"
+	}
+
+	//=======================================================================================================
 	// HERO: Dreadlord( Pugna )
 	//=======================================================================================================
 	"npc_dota_hero_pugna_holdout"
@@ -1006,21 +1043,57 @@
 		"ModelScale"					"1.06"
 		"AttackDamageMin"				"55"
 		"AttackDamageMax"				"65"
-		"MovementSpeed"					"350"
+		"MovementSpeed"					"360"
 		"AttributePrimary"				"DOTA_ATTRIBUTE_AGILITY"
 
 		"AttributeStrengthGain"			"5"
 		"AttributeAgilityGain"			"10"
 		"AttributeIntelligenceGain"		"5"
 
-		"Ability1"						""
-		"Ability2"						""
-		"Ability3"						""		
+		"Ability1"						"holdout_entrench"
+		"Ability2"						"holdout_tornado_tempest"
+		"Ability3"						"holdout_corrosive_skin"		
 		"Ability4"						""
 		"Ability5"						""
-		"Ability6"						""
-		"Ability7"						""
+		"Ability6"						"holdout_desert_dragon_form"
+		"Ability7"						"holdout_unentrench"
 		"Ability8"						""
+		"Ability9"						""
+		"Ability10"						""
+		"Ability11"						""
+		"Ability12"						""
+		"Ability13"						""
+		"Ability14"						""
+		"Ability15"						""
+		"Ability16"						""
+		"Ability17"						"ability_unit_died_light"
+	}
+
+	//=======================================================================================================
+	// HERO: Desert Wyrm
+	//=======================================================================================================
+	"npc_dota_hero_viper_holdout"
+	{
+		"override_hero"					"npc_dota_hero_viper"
+//		"DisableWearables"				"1"
+		"ModelScale"					"1.06"
+		"AttackDamageMin"				"55"
+		"AttackDamageMax"				"65"
+		"MovementSpeed"					"380"
+		"AttributePrimary"				"DOTA_ATTRIBUTE_AGILITY"
+
+		"AttributeStrengthGain"			"5"
+		"AttributeAgilityGain"			"10"
+		"AttributeIntelligenceGain"		"5"
+
+		"Ability1"						"holdout_entrench"
+		"Ability2"						"holdout_tornado_tempest"
+		"Ability3"						"holdout_corrosive_skin"		
+		"Ability4"						""
+		"Ability5"						""
+		"Ability6"						"holdout_desert_dragon_form"
+		"Ability7"						"holdout_unentrench"
+		"Ability8"						"holdout_yellow_effect"
 		"Ability9"						""
 		"Ability10"						""
 		"Ability11"						""

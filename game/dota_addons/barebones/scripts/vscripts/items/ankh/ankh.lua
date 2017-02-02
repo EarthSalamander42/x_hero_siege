@@ -4,7 +4,7 @@ function Reincarnation( event )
 	local position = hero:GetAbsOrigin()
 	local respawntime = ability:GetSpecialValueFor("reincarnation_time")
 
-	if hero:IsRealHero() and not hero.ankh_respawn then
+	if hero:IsRealHero() and not hero.ankh_respawn and ANKHS == 1 then
 		hero:SetRespawnsDisabled(true)
 		
 		hero.respawn_timer = Timers:CreateTimer(respawntime,function () 
@@ -14,6 +14,7 @@ function Reincarnation( event )
 			ParticleManager:CreateParticle("particles/items_fx/aegis_respawn.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
 			hero.ankh_respawn = false
 			hero:SetRespawnsDisabled(false)
+--			hero:IncrementDeaths(-1)
 			end)
 		hero.ankh_respawn = true
 

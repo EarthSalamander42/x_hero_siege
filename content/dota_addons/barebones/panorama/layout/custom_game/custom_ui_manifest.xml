@@ -1,18 +1,8 @@
 <root>
 	<script>
-		GameUI.CustomUIConfig().multiteam_top_scoreboard =
-		{
-			reorder_team_scores: true,
-			LeftInjectXMLFile: "file://{resources}/layout/custom_game/overthrow_scoreboard_left.xml",
-			TeamOverlayXMLFile: "file://{resources}/layout/custom_game/overthrow_scoreboard_team_overlay.xml"
-		};
-
-		GameUI.CustomUIConfig().team_logo_xml = "file://{resources}/layout/custom_game/overthrow_team_icon.xml";
-		GameUI.CustomUIConfig().team_logo_large_xml = "file://{resources}/layout/custom_game/overthrow_team_icon_large.xml";
-
-		GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_TOP_TIMEOFDAY, false );
-		GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_TOP_HEROES, false );
 //		GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_FLYOUT_SCOREBOARD, false );
+		GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_TOP_BAR_DIRE_TEAM, false );
+		GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_TOP_BAR_SCORE, false );
 		GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_INVENTORY_PROTECT, false );	//Glyph.
 		GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_INVENTORY_COURIER, false );
 
@@ -23,41 +13,83 @@
 		GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_ENDGAME, false );
 
 		GameUI.CustomUIConfig().team_colors = {}
-		GameUI.CustomUIConfig().team_colors[DOTATeam_t.DOTA_TEAM_GOODGUYS] = "#3455FF;"; // { 52, 52, 190 }		--		Blue
-		GameUI.CustomUIConfig().team_colors[DOTATeam_t.DOTA_TEAM_BADGUYS ] = "#F3C909;"; // { 190, 52, 52 }		--		Red
-
-		GameUI.CustomUIConfig().team_icons = {}
-		GameUI.CustomUIConfig().team_icons[DOTATeam_t.DOTA_TEAM_GOODGUYS] = "file://{images}/custom_game/team_icons/team_icon_tiger_01.png";
-		GameUI.CustomUIConfig().team_icons[DOTATeam_t.DOTA_TEAM_BADGUYS ] = "file://{images}/custom_game/team_icons/team_icon_monkey_01.png";
+		GameUI.CustomUIConfig().team_colors[DOTATeam_t.DOTA_TEAM_GOODGUYS] = "#004080;";
+		GameUI.CustomUIConfig().team_colors[DOTATeam_t.DOTA_TEAM_BADGUYS ] = "#802020;";
 
 		var newUI = $.GetContextPanel().GetParent().GetParent().FindChildTraverse("HUDElements").FindChildTraverse("lower_hud").FindChildTraverse("center_with_stats").FindChildTraverse("center_block");
-		//try the neat way to remove the tree itself
-		newUI.FindChildTraverse("StatBranch").AddClass("NonHero");
-		//you are not spawning the talent UI, fuck off (Disabling mouseover and onclick)
+		//Use this line if you want to keep 4 ability minimum size, and only use 160 if you want ~2 ability min size
+		newUI.FindChildTraverse("AbilitiesAndStatBranch").style.minWidth = "284px";
+		//newUI.FindChildTraverse("AbilitiesAndStatBranch").style.minWidth = "160px";
+
+		newUI.FindChildTraverse("StatBranch").style.visibility = "collapse";
+		//you are not spawning the talent UI, fuck off (Disabling mouseover and onactivate)
+		//We also don't want to crash, valve plz
 		newUI.FindChildTraverse("StatBranch").SetPanelEvent("onmouseover", function(){});
 		newUI.FindChildTraverse("StatBranch").SetPanelEvent("onactivate", function(){});
 		//Fuck that levelup button
 		newUI.FindChildTraverse("level_stats_frame").style.visibility = "collapse";
-		//that bar that grows from level 1 to 25 is annoying
-		newUI.FindChildTraverse("StatBranchChannel").style.visibility = "collapse";
 		//fuck backpack UI (We have Lua filling these slots with junk, and if the player can't touch them it should be effectively disabled)
 		newUI.FindChildTraverse("inventory").FindChildTraverse("inventory_items").FindChildTraverse("inventory_backpack_list").style.visibility = "collapse";
 
 		//Fuck Scanner, by Houthakker
 		var newUI = $.GetContextPanel().GetParent().GetParent().FindChildTraverse("HUDElements").FindChildTraverse("lower_hud");
 	    newUI.FindChildTraverse("GlyphScanContainer").style.visibility = "collapse";
-	</script>
-		
-	<Panel>
-		<CustomUIElement type="Hud" layoutfile="file://{resources}/layout/custom_game/barebones_notifications.xml" />
-		<CustomUIElement type="Hud" layoutfile="file://{resources}/layout/custom_game/barebones_attachments.xml" />
 
-		<CustomUIElement type="HudTopBar"			layoutfile="file://{resources}/layout/custom_game/multiteam_top_scoreboard.xml" />
+	    var hudElements = $.GetContextPanel().GetParent().GetParent().FindChildTraverse("HUDElements");
+		var newUI = hudElements.FindChildTraverse("center_block");
+
+		//Skin Killer - TopBar
+		var topbar = hudElements.FindChildTraverse("topbar");
+		topbar.FindChildTraverse("HUDSkinTopBarBG").style.visibility = "collapse";
+		for (var bg of topbar.FindChildrenWithClassTraverse("TopBarBackground")) {
+		    bg.style.opacity = "1";
+		}
+		topbar.style.width = "1192px";
+		//Skin Killer - Portrait
+		newUI.FindChildTraverse("HUDSkinPortrait").style.visibility = "collapse";
+		newUI.FindChildTraverse("HUDSkinXPBackground").style.visibility = "collapse";
+		newUI.FindChildTraverse("HUDSkinStatBranchBG").style.visibility = "collapse";
+		newUI.FindChildTraverse("HUDSkinStatBranchGlow").style.visibility = "collapse";
+		newUI.FindChildTraverse("unitname").style.transform = "translateY(0px)";
+		newUI.FindChildTraverse("unitname").style.width = "159px";
+		//Skin Killer - AbilityPanel
+		newUI.FindChildTraverse("HUDSkinAbilityContainerBG").style.visibility = "collapse";
+		newUI.FindChildTraverse("center_bg").style.backgroundImage = "url('s2r://panorama/images/hud/reborn/ability_bg_psd.vtex')";
+		//Skin Killer - inventory
+		newUI.FindChildTraverse("inventory").FindChildTraverse("HUDSkinInventoryBG").style.visibility = "collapse";
+		newUI.FindChildTraverse("inventory").FindChildTraverse("inventory_list_container").style.backgroundColor = "#ffffff00"; //0% opacity on colour
+		//Skin Killer - minimap
+		hudElements.FindChildTraverse("HUDSkinMinimap").style.visibility = "collapse";
+
+		var TopBarRadiantTeam = hudElements.FindChildTraverse("TopBarRadiantTeam");
+		TopBarRadiantTeam.style.width = "510px";
+		var topbarRadiantPlayers = hudElements.FindChildTraverse("TopBarRadiantPlayers");
+		topbarRadiantPlayers.style.width = "504px";
+		var topbarRadiantPlayersContainer = hudElements.FindChildTraverse("TopBarRadiantPlayersContainer");
+		topbarRadiantPlayersContainer.style.width = "504px";
+
+		var RadiantTeamContainer = hudElements.FindChildTraverse("RadiantTeamContainer");
+		RadiantTeamContainer.style.height = "610px";
+		var DireTeamContainer = hudElements.FindChildTraverse("DireTeamContainer");
+		DireTeamContainer.style.visibility = "collapse";
+		var DireHeader = hudElements.FindChildTraverse("DireHeader");
+		DireHeader.style.visibility = "collapse";
+		//Scoreboard
+		var ScoreboardBackground = hudElements.FindChildTraverse("scoreboard")
+		ScoreboardBackground.style.height = "520px";
+		var ScoreboardButtons = hudElements.FindChildTraverse("scoreboard").FindChildTraverse("Background").FindChildTraverse("NestedMenuButtons");
+		ScoreboardButtons.style.width = "710px";
+		ScoreboardButtons.style.margin = "-30px";
+	</script>
+
+	<Panel>
+		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/barebones_notifications.xml" />
+		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/barebones_attachments.xml" />
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/hud.xml" />
-		<CustomUIElement type="GameSetup"			layoutfile="file://{resources}/layout/custom_game/team_select.xml" />
+		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/xhs_adminmod.xml" />
+		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/xhs_timers.xml" />
 		<CustomUIElement type="GameSetup"			layoutfile="file://{resources}/layout/custom_game/gamesetup_options.xml" />
-		<CustomUIElement type="HeroSelection" 		layoutfile="file://{resources}/layout/custom_game/multiteam_hero_select_overlay.xml" />
+		<CustomUIElement type="GameSetup"			layoutfile="file://{resources}/layout/custom_game/team_select.xml" />
 		<CustomUIElement type="EndScreen" 			layoutfile="file://{resources}/layout/custom_game/multiteam_end_screen.xml" />
-		<CustomUIElement type="GameInfo" 			layoutfile="file://{resources}/layout/custom_game/overthrow_game_info.xml" />
 	</Panel>
 </root>

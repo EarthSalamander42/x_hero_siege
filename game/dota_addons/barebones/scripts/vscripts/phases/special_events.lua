@@ -6,8 +6,7 @@ local heroes = HeroList:GetAllHeroes()
 nCOUNTDOWNTIMER = 121
 BT_ENABLED = 0
 mode = GameRules:GetGameModeEntity()
-mode:SetFixedRespawnTime( 1 )
-
+mode:SetFixedRespawnTime(1)
 	local Muradin = CreateUnitByName("npc_dota_creature_muradin_bronzebeard", Entities:FindByName(nil, "npc_dota_muradin_boss"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
 	Muradin:AddNewModifier( nil, nil, "modifier_boss_stun", {duration = 5})
 	Muradin:AddNewModifier( nil, nil, "modifier_invulnerable", {duration = 5})
@@ -17,30 +16,31 @@ mode:SetFixedRespawnTime( 1 )
 	Notifications:TopToAll({hero="npc_dota_hero_zuus", duration=5.0})
 	Notifications:TopToAll({text=" You can't kill him! Just survive the Countdown. ", continue=true})
 	Notifications:TopToAll({text="Reward: 15 000 Gold.", continue=true})
-
 	for _,hero in pairs(heroes) do
 	local id = hero:GetPlayerID()
-	local point = Entities:FindByName(nil,"npc_dota_muradin_player_"..id)
-		FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
-		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
-		Timers:CreateTimer(0.1, function()
-			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
-		end)
+	if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
+		local point = Entities:FindByName(nil,"npc_dota_muradin_player_"..id)
+			FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
+			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
+			Timers:CreateTimer(0.1, function()
+				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
+			end)
 
-		timers.disabled_items = Timers:CreateTimer(0.0, function()
-			for itemSlot = 0, 5 do
-			local item = hero:GetItemInSlot(itemSlot)
-				if item ~= nil and item:GetName() == "item_tome_small" then
-					item:StartCooldown(120.0)
+			timers.disabled_items = Timers:CreateTimer(0.0, function()
+				for itemSlot = 0, 5 do
+				local item = hero:GetItemInSlot(itemSlot)
+					if item ~= nil and item:GetName() == "item_tome_small" then
+						item:StartCooldown(120.0)
+					end
+					if item ~= nil and item:GetName() == "item_tome_big" then
+						item:StartCooldown(120.0)
+					end
+					if item ~= nil and item:GetName() == "item_tpscroll" then
+						item:StartCooldown(120.0)
+					end
 				end
-				if item ~= nil and item:GetName() == "item_tome_big" then
-					item:StartCooldown(120.0)
-				end
-				if item ~= nil and item:GetName() == "item_tpscroll" then
-					item:StartCooldown(120.0)
-				end
-			end
-		end)
+			end)
+		end
 	end
 
 	Timers:CreateTimer(120, function() -- 14:00 Min, teleport back to the spawn
@@ -49,10 +49,10 @@ mode:SetFixedRespawnTime( 1 )
 		end
 
 		UTIL_Remove(Muradin)
+		mode:SetFixedRespawnTime(40)
 		nCOUNTDOWNTIMER = 600
 		BT_ENABLED = 1
 	end)
-
 	Timers:CreateTimer(126, function() -- 14:05 Min: MURADIN BRONZEBEARD EVENT 1, END
 		Notifications:TopToAll({text="All heroes who survived Muradin received 15 000 Gold!", duration=6.0})
 		Notifications:TopToAll({ability="alchemist_goblins_greed", continue = true})
@@ -65,9 +65,6 @@ end
 function EndMuradinEvent(keys)
 local activator = keys.activator
 local point = Entities:FindByName(nil,"base_spawn"):GetAbsOrigin()
-mode = GameRules:GetGameModeEntity()
-mode:SetFixedRespawnTime( 40 )
-
 	if activator:GetTeam() == DOTA_TEAM_GOODGUYS then
 	FindClearSpaceForUnit(activator, point, true)
 	PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(), activator)
@@ -94,21 +91,21 @@ BT_ENABLED = 0
 		local id = hero:GetPlayerID()
 		local point = Entities:FindByName(nil, "farm_event_player_"..id)
 
-		if id == 0 then
-			for j = 1, 5 do
-				FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
-				PlayerResource:SetCameraTarget(hero:GetPlayerID(), hero)
---				hero:EmitSound("Muradin.StormEarthFire") --Very loud, can't find why
-				local unit = CreateUnitByName("npc_dota_creature_murloc", point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_NEUTRALS)
-			end
-		elseif id == -1 then
-			return nil
-		else
-			for j = 1, 5 do
-				FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
-				PlayerResource:SetCameraTarget(hero:GetPlayerID(), hero)
---				hero:EmitSound("Muradin.StormEarthFire")
-				local unit = CreateUnitByName("npc_dota_creature_murloc", point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_NEUTRALS)
+		if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
+			if id == 0 then
+				for j = 1, 5 do
+					FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
+					PlayerResource:SetCameraTarget(hero:GetPlayerID(), hero)
+					local unit = CreateUnitByName("npc_dota_creature_murloc", point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+				end
+			elseif id == -1 then
+				return nil
+			else
+				for j = 1, 5 do
+					FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
+					PlayerResource:SetCameraTarget(hero:GetPlayerID(), hero)
+					local unit = CreateUnitByName("npc_dota_creature_murloc", point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+				end
 			end
 		end
 
@@ -142,16 +139,19 @@ BT_ENABLED = 0
 				item:StartCooldown(180.0)
 				end
 			end
-		ability:StartCooldown(120.0)
+			if ability then
+				ability:StartCooldown(120.0)
+			end
 		end)
 	end
 
 	Timers:CreateTimer(180, function() -- 27:00 Min, teleport back to the spawn
-	local units = FindUnitsInRadius( DOTA_TEAM_NEUTRALS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE , FIND_ANY_ORDER, false )
+	local units = FindUnitsInRadius( DOTA_TEAM_CUSTOM_1, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE , FIND_ANY_ORDER, false )
 	local teleporters = Entities:FindAllByName("trigger_farm_event")
 
 		nCOUNTDOWNCREEP = 180
 		nCOUNTDOWNINCWAVE = 240
+		nCOUNTDOWNTIMER = 540
 		NEUTRAL_SPAWN = 0
 		BT_ENABLED = 1
 
@@ -182,7 +182,7 @@ end
 
 function FarmEventCreeps0()
 local point = Entities:FindByName(nil, "farm_event_player_0")
-local units = FindUnitsInRadius(DOTA_TEAM_NEUTRALS, point:GetAbsOrigin(), nil, 1500, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)		
+local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_1, point:GetAbsOrigin(), nil, 1500, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)		
 local number0 = 0
 	for _,v in pairs(units) do
 		number0 = number0 +1
@@ -190,7 +190,7 @@ local number0 = 0
 
 	if number0 <= 1 and PlayerResource:GetPlayerCount() >= 1 and NEUTRAL_SPAWN == 1 then
 		for j = 1, 10 do
-			local unit = CreateUnitByName("npc_dota_creature_murloc", point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_NEUTRALS)
+			local unit = CreateUnitByName("npc_dota_creature_murloc", point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
 		end
 	end
 	return 1
@@ -198,7 +198,7 @@ end
 
 function FarmEventCreeps1()
 local point = Entities:FindByName(nil, "farm_event_player_1")
-local units = FindUnitsInRadius(DOTA_TEAM_NEUTRALS, point:GetAbsOrigin(), nil, 1500, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)		
+local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_1, point:GetAbsOrigin(), nil, 1500, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)		
 local number1 = 0
 	for _,v in pairs(units) do
 		number1 = number1 +1
@@ -206,7 +206,7 @@ local number1 = 0
 
 	if number1 <= 1 and PlayerResource:GetPlayerCount() >= 2 and NEUTRAL_SPAWN == 1 then
 		for j = 1, 10 do
-			local unit = CreateUnitByName("npc_dota_creature_murloc", point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_NEUTRALS)
+			local unit = CreateUnitByName("npc_dota_creature_murloc", point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
 		end
 	end
 	return 1
@@ -214,7 +214,7 @@ end
 
 function FarmEventCreeps2()
 local point = Entities:FindByName(nil, "farm_event_player_2")
-local units = FindUnitsInRadius(DOTA_TEAM_NEUTRALS, point:GetAbsOrigin(), nil, 1500, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)		
+local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_1, point:GetAbsOrigin(), nil, 1500, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)		
 local number2 = 0
 	for _,v in pairs(units) do
 		number2 = number2 +1
@@ -222,7 +222,7 @@ local number2 = 0
 
 	if number2 <= 1 and PlayerResource:GetPlayerCount() >= 3 and NEUTRAL_SPAWN == 1 then
 		for j = 1, 10 do
-			local unit = CreateUnitByName("npc_dota_creature_murloc", point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_NEUTRALS)
+			local unit = CreateUnitByName("npc_dota_creature_murloc", point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
 		end
 	end
 	return 1
@@ -230,7 +230,7 @@ end
 
 function FarmEventCreeps3()
 local point = Entities:FindByName(nil, "farm_event_player_3")
-local units = FindUnitsInRadius(DOTA_TEAM_NEUTRALS, point:GetAbsOrigin(), nil, 1500, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)		
+local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_1, point:GetAbsOrigin(), nil, 1500, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)		
 local number3 = 0
 	for _,v in pairs(units) do
 		number3 = number3 +1
@@ -238,7 +238,7 @@ local number3 = 0
 
 	if number3 <= 1 and PlayerResource:GetPlayerCount() >= 4 and NEUTRAL_SPAWN == 1 then
 		for j = 1, 10 do
-			local unit = CreateUnitByName("npc_dota_creature_murloc", point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_NEUTRALS)
+			local unit = CreateUnitByName("npc_dota_creature_murloc", point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
 		end
 	end
 	return 1
@@ -246,7 +246,7 @@ end
 
 function FarmEventCreeps4()
 local point = Entities:FindByName(nil, "farm_event_player_4")
-local units = FindUnitsInRadius(DOTA_TEAM_NEUTRALS, point:GetAbsOrigin(), nil, 1500, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)		
+local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_1, point:GetAbsOrigin(), nil, 1500, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)		
 local number4 = 0
 	for _,v in pairs(units) do
 		number4 = number4 +1
@@ -254,7 +254,7 @@ local number4 = 0
 
 	if number4 <= 1 and PlayerResource:GetPlayerCount() >= 5 and NEUTRAL_SPAWN == 1 then
 		for j = 1, 10 do
-			local unit = CreateUnitByName("npc_dota_creature_murloc", point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_NEUTRALS)
+			local unit = CreateUnitByName("npc_dota_creature_murloc", point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
 		end
 	end
 	return 1
@@ -262,7 +262,7 @@ end
 
 function FarmEventCreeps5()
 local point = Entities:FindByName(nil, "farm_event_player_5")
-local units = FindUnitsInRadius(DOTA_TEAM_NEUTRALS, point:GetAbsOrigin(), nil, 1500, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)		
+local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_1, point:GetAbsOrigin(), nil, 1500, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)		
 local number5 = 0
 	for _,v in pairs(units) do
 		number5 = number5 +1
@@ -270,7 +270,7 @@ local number5 = 0
 
 	if number5 <= 1 and PlayerResource:GetPlayerCount() >= 6 and NEUTRAL_SPAWN == 1 then
 		for j = 1, 10 do
-			local unit = CreateUnitByName("npc_dota_creature_murloc", point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_NEUTRALS)
+			local unit = CreateUnitByName("npc_dota_creature_murloc", point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
 		end
 	end
 	return 1
@@ -278,7 +278,7 @@ end
 
 function FarmEventCreeps6()
 local point = Entities:FindByName(nil, "farm_event_player_6")
-local units = FindUnitsInRadius(DOTA_TEAM_NEUTRALS, point:GetAbsOrigin(), nil, 1500, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)		
+local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_1, point:GetAbsOrigin(), nil, 1500, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)		
 local number6 = 0
 	for _,v in pairs(units) do
 		number6 = number6 +1
@@ -286,7 +286,7 @@ local number6 = 0
 
 	if number6 <= 1 and PlayerResource:GetPlayerCount() >= 7 and NEUTRAL_SPAWN == 1 then
 		for j = 1, 10 do
-			local unit = CreateUnitByName("npc_dota_creature_murloc", point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_NEUTRALS)
+			local unit = CreateUnitByName("npc_dota_creature_murloc", point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
 		end
 	end
 	return 1
@@ -294,7 +294,7 @@ end
 
 function FarmEventCreeps7()
 local point = Entities:FindByName(nil, "farm_event_player_7")
-local units = FindUnitsInRadius(DOTA_TEAM_NEUTRALS, point:GetAbsOrigin(), nil, 1500, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)		
+local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_1, point:GetAbsOrigin(), nil, 1500, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)		
 local number7 = 0
 	for _,v in pairs(units) do
 		number7 = number7 +1
@@ -302,17 +302,17 @@ local number7 = 0
 
 	if number7 <= 1 and PlayerResource:GetPlayerCount() >= 8 and NEUTRAL_SPAWN == 1 then
 		for j = 1, 10 do
-			local unit = CreateUnitByName("npc_dota_creature_murloc", point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_NEUTRALS)
+			local unit = CreateUnitByName("npc_dota_creature_murloc", point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
 		end
 	end
 	return 1
 end
 
-function RameroEvent() -- 1500 kills
+function RameroEvent() -- 750 kills
 local teleporters = Entities:FindAllByName("trigger_teleport_ramero_end")
 nCOUNTDOWNTIMER = 121
 
-	local Ramero = CreateUnitByName("npc_ramero_2", Entities:FindByName(nil, "roshan_wp_4"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_NEUTRALS)
+	local Ramero = CreateUnitByName("npc_ramero_2", Entities:FindByName(nil, "roshan_wp_4"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
 	Ramero:AddNewModifier( nil, nil, "modifier_boss_stun", {duration = 5})
 	Ramero:AddNewModifier( nil, nil, "modifier_invulnerable", {duration = 5})
 	Ramero:SetAngles(0, 45, 0)
@@ -339,15 +339,15 @@ nCOUNTDOWNTIMER = 121
 	UTIL_Remove(RAMERO_BIS_DUMMY)
 end
 
-function RameroAndBaristolEvent() -- 940 kills
+function RameroAndBaristolEvent() -- 500 kills
 local teleporters = Entities:FindAllByName("trigger_teleport_ramero_end")
 nCOUNTDOWNTIMER = 121
 
-	local Ramero = CreateUnitByName("npc_ramero", Entities:FindByName(nil, "roshan_wp_4"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_NEUTRALS)
+	local Ramero = CreateUnitByName("npc_ramero", Entities:FindByName(nil, "roshan_wp_4"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
 	Ramero:AddNewModifier( nil, nil, "modifier_boss_stun", {duration = 5})
 	Ramero:AddNewModifier( nil, nil, "modifier_invulnerable", {duration = 5})
 	Ramero:SetAngles(0, 45, 0)
-	local Baristol = CreateUnitByName("npc_baristol", Entities:FindByName(nil, "roshan_wp_2"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_NEUTRALS)
+	local Baristol = CreateUnitByName("npc_baristol", Entities:FindByName(nil, "roshan_wp_2"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
 	Baristol:AddNewModifier( nil, nil, "modifier_boss_stun", {duration = 5})
 	Baristol:AddNewModifier( nil, nil, "modifier_invulnerable", {duration = 5})
 	Baristol:SetAngles(0, 325, 0)
@@ -388,4 +388,135 @@ function EndRameroEvent(keys)
 	end)
 	activator:Stop()
 	end
+end
+
+function DuelEvent()
+local heroes = HeroList:GetAllHeroes()
+local duel = 1
+PlayerNumberRadiant = 0
+PlayerNumberDire = 0
+mode = GameRules:GetGameModeEntity()
+mode:SetFixedRespawnTime(1)
+
+	-- Initialize duel
+	for _, hero in pairs(heroes) do
+		local ID = hero:GetPlayerID()
+		local Gold = hero:GetGold()
+		if PlayerResource:IsValidPlayerID(hero:GetPlayerOwnerID()) then
+			if ID == 0 or ID == 2 or ID == 4 or ID == 6 then
+				hero:SetTeam(DOTA_TEAM_BADGUYS)
+				if hero:GetPlayerOwner() then
+					hero:GetPlayerOwner():SetTeam(DOTA_TEAM_BADGUYS)
+				end
+	--			PlayerResource:UpdateTeamSlot(hero:GetPlayerOwnerID(), DOTA_TEAM_BADDGUYS, 1)
+				hero:SetGold(Gold, false)
+				local point = Entities:FindByName(nil, "duel_event_"..ID)
+				FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
+				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
+				Timers:CreateTimer(0.1, function()
+					PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
+				end)
+			else
+				local point = Entities:FindByName(nil, "duel_event_"..ID)
+				FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
+--				PlayerResource:UpdateTeamSlot(hero:GetPlayerOwnerID(), DOTA_TEAM_GOODGUYS, 1)
+			end
+		else
+			return
+		end
+	end
+
+	-- Calculate the number of players in each teams
+	for nPlayerID = 0, DOTA_MAX_TEAM_PLAYERS-1 do
+		if PlayerResource:GetTeam( nPlayerID ) == DOTA_TEAM_GOODGUYS then
+			PlayerNumberRadiant = PlayerNumberRadiant + 1
+		end
+		if PlayerResource:GetTeam( nPlayerID ) == DOTA_TEAM_BADGUYS then
+			PlayerNumberDire = PlayerNumberDire + 1
+		end
+	end
+	print("Radiant: "..PlayerNumberRadiant)
+	print("Dire: "..PlayerNumberDire)
+
+	-- Win Conditions
+	Timers:CreateTimer(1.0, function()
+		print("Check Death")
+		if duel == 1 then
+			for _, hero in pairs(heroes) do
+				if PlayerResource:IsValidPlayerID(hero:GetPlayerOwnerID()) then
+					if PlayerNumberRadiant <= 0 then
+						local trigger_duel_dire = Entities:FindAllByName("trigger_duel_dire")
+						for _, v in pairs(trigger_duel_dire) do
+							v:Enable()
+						end
+					end
+					if PlayerNumberDire <= 0 then
+						local trigger_duel_radiant = Entities:FindAllByName("trigger_duel_radiant")
+						for _,v in pairs(trigger_duel_radiant) do
+							v:Enable()
+						end
+					end
+				else
+					return
+				end
+			end
+		else
+			return nil
+		end
+		return 1.0
+	end)
+end
+
+function DuelEventDireEnd(event)
+local activator = event.activator
+local point = Entities:FindByName(nil, "base_spawn"):GetAbsOrigin()
+print("Dire won the duel!")
+	FindClearSpaceForUnit(activator, point, true)
+	PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(), activator)
+	Timers:CreateTimer(0.2, function()
+		if activator:GetTeam() == DOTA_TEAM_BADGUYS then
+			activator:AddItemByName("item_orb_of_frost")
+			print("Frost Orb added")
+		end
+		activator:SetTeam(DOTA_TEAM_GOODGUYS)
+		if activator:GetPlayerOwner() then
+			activator:GetPlayerOwner():SetTeam(DOTA_TEAM_GOODGUYS)
+		end
+		PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(), nil)
+--		PlayerResource:UpdateTeamSlot(activator:GetPlayerOwnerID(), DOTA_TEAM_GOODGUYS, 1)
+	end)
+	duel = 0
+	mode:SetFixedRespawnTime(40)
+	SPECIAL_EVENT = 0
+	ANKHS = 1
+end
+
+function DuelEventRadiantEnd(event)
+local activator = event.activator
+local point = Entities:FindByName(nil, "base_spawn"):GetAbsOrigin()
+print("Radiant won the duel!")
+local triggers_duel_event = Entities:FindAllByName("trigger_duel_event")
+	for _,v in pairs(triggers_duel_event) do
+		v:Enable()
+	end
+	local point = Entities:FindByName(nil, "base_spawn")
+	activator:SetTeam(DOTA_TEAM_GOODGUYS)
+	FindClearSpaceForUnit(activator, point, true)
+	PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(), activator)
+	Timers:CreateTimer(0.2, function()
+		if activator:GetTeam() == DOTA_TEAM_GOODGUYS then
+			activator:AddItemByName("item_orb_of_frost")
+			print("Frost Orb added")
+		end
+		activator:SetTeam(DOTA_TEAM_GOODGUYS)
+		if activator:GetPlayerOwner() then
+			activator:GetPlayerOwner():SetTeam(DOTA_TEAM_GOODGUYS)
+		end
+		PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(), nil)
+--		PlayerResource:UpdateTeamSlot(activator:GetPlayerOwnerID(), DOTA_TEAM_GOODGUYS, 1)
+	end)
+	duel = 0
+	mode:SetFixedRespawnTime(40)
+	SPECIAL_EVENT = 0
+	ANKHS = 1
 end

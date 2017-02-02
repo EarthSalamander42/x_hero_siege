@@ -2,28 +2,25 @@
 	Date: 10.01.2015.
 	Deals splash auto attack damage to nearby targets depending on distance]]
 function Splash( keys )
-	-- Variables
-	local caster = keys.caster
-	local target = keys.target
-	local ability = keys.ability
-	local radius_small = ability:GetLevelSpecialValueFor("splash_radius", 0)
-	local radius_medium = ability:GetLevelSpecialValueFor("splash_radius", 1) 
-	local radius_big = ability:GetLevelSpecialValueFor("splash_radius", 2) 
-	local target_exists = false
-	local splash_damage_small = ability:GetLevelSpecialValueFor("splash_damage_percent", 0) / 100
-	local splash_damage_medium = ability:GetLevelSpecialValueFor("splash_damage_percent", 1) / 100
-	local splash_damage_big = ability:GetLevelSpecialValueFor("splash_damage_percent", 2) / 100
-	
-	-- Finding the units for each radius
-	local splash_radius_small = FindUnitsInRadius(caster:GetTeam(), target:GetAbsOrigin() , nil, radius_small , DOTA_UNIT_TARGET_TEAM_ENEMY , DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC, 0, 0, false) 
-	local splash_radius_medium = FindUnitsInRadius(caster:GetTeam() , target:GetAbsOrigin() , nil, radius_medium, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC, 0, 0, false)
-	local splash_radius_big = FindUnitsInRadius(caster:GetTeam(), target:GetAbsOrigin() , nil, radius_big, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC, 0, 0, false)
+local caster = keys.caster
+local target = keys.target
+local ability = keys.ability
+local radius_small = ability:GetLevelSpecialValueFor("splash_radius", 0)
+local radius_medium = ability:GetLevelSpecialValueFor("splash_radius", 1) 
+local radius_big = ability:GetLevelSpecialValueFor("splash_radius", 2) 
+local target_exists = false
+local splash_damage_small = ability:GetLevelSpecialValueFor("splash_damage_percent", 0) / 100
+local splash_damage_medium = ability:GetLevelSpecialValueFor("splash_damage_percent", 1) / 100
+local splash_damage_big = ability:GetLevelSpecialValueFor("splash_damage_percent", 2) / 100
 
-	-- Initializing the damage table
-	local damage_table = {}
-	damage_table.attacker = caster
-	damage_table.damage_type = DAMAGE_TYPE_PHYSICAL
-	damage_table.damage = caster:GetAttackDamage() * splash_damage_small
+local splash_radius_small = FindUnitsInRadius(caster:GetTeam(), target:GetAbsOrigin() , nil, radius_small , DOTA_UNIT_TARGET_TEAM_ENEMY , DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC, 0, 0, false) 
+local splash_radius_medium = FindUnitsInRadius(caster:GetTeam() , target:GetAbsOrigin() , nil, radius_medium, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC, 0, 0, false)
+local splash_radius_big = FindUnitsInRadius(caster:GetTeam(), target:GetAbsOrigin() , nil, radius_big, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC, 0, 0, false)
+
+local damage_table = {}
+damage_table.attacker = caster
+damage_table.damage_type = DAMAGE_TYPE_PHYSICAL
+damage_table.damage = caster:GetAttackDamage() * splash_damage_small
 
 
 	--loop for doing the splash damage while ignoring the original target

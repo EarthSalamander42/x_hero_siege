@@ -1,3 +1,6 @@
+require("libraries/playertables")
+require("libraries/selection")
+
 -- Cleanup a player when they leave
 function GameMode:OnDisconnect(keys)
 	DebugPrint('[BAREBONES] Player Disconnected ' .. tostring(keys.userid))
@@ -35,25 +38,25 @@ local normal_min_damage = npc:GetBaseDamageMin()
 local normal_max_damage = npc:GetBaseDamageMax()
 local hero_level = npc:GetLevel()
 
-	if difficulty == 1 and npc:GetTeam() == DOTA_TEAM_BADGUYS then
+	if difficulty == 1 and not npc:IsHero() and npc:GetTeam() == DOTA_TEAM_BADGUYS then
 		npc:SetMinimumGoldBounty( normal_bounty*1.5 )
 		npc:SetMaximumGoldBounty( normal_bounty*1.5 )
 		npc:SetDeathXP( normal_xp*1.25 )
 		npc:SetBaseDamageMin( normal_min_damage*0.75 )
 		npc:SetBaseDamageMax( normal_max_damage*0.75 )
-	elseif difficulty == 2 and npc:GetTeam() == DOTA_TEAM_BADGUYS then
+	elseif difficulty == 2 and not npc:IsHero() and npc:GetTeam() == DOTA_TEAM_BADGUYS then
 		npc:SetMinimumGoldBounty( normal_bounty*1.1 )
 		npc:SetMaximumGoldBounty( normal_bounty*1.1 )
 		npc:SetDeathXP( normal_xp )
 		npc:SetBaseDamageMin( normal_min_damage )
 		npc:SetBaseDamageMax( normal_max_damage )
-	elseif difficulty == 3 and npc:GetTeam() == DOTA_TEAM_BADGUYS then
+	elseif difficulty == 3 and not npc:IsHero() and npc:GetTeam() == DOTA_TEAM_BADGUYS then
 --		npc:SetMinimumGoldBounty( normal_bounty*0.9 )
 --		npc:SetMaximumGoldBounty( normal_bounty*0.9 )
 		npc:SetDeathXP( normal_xp*0.9 )
 		npc:SetBaseDamageMin( normal_min_damage*1.25 )
 		npc:SetBaseDamageMax( normal_max_damage*1.25 )
-	elseif difficulty == 4 and npc:GetTeam() == DOTA_TEAM_BADGUYS then
+	elseif difficulty == 4 and not npc:IsHero() and npc:GetTeam() == DOTA_TEAM_BADGUYS then
 --		npc:SetMinimumGoldBounty( normal_bounty*0.75 )
 --		npc:SetMaximumGoldBounty( normal_bounty*0.75 )
 		npc:SetDeathXP( normal_xp*0.75 )
@@ -134,6 +137,8 @@ local hero_level = npc:GetLevel()
 		"pugna_decrepify",
 		"holdout_giant_form",
 		"holdout_monkey_king_bar",
+		"holdout_stitch",
+		"holdout_yellow_effect", --Desert Wyrm Ultimate effect
 		"holdout_blue_effect", --Lich King boss + hero effect
 		"holdout_green_effect", --Banehallow boss + hero effect
 		"holdout_red_effect" --Abaddon boss
@@ -200,17 +205,6 @@ local hero_level = npc:GetLevel()
 		end
 	end
 
---	if npc:GetUnitName() == "npc_dota_hero_furion" then -- This functions says it's working, print works no errors but Wearables still there..
---		local model = npc:FirstMoveChild()
---		while model ~= nil do
---			if model:GetClassname() == "dota_item_wearable" then
---				model:AddEffects(EF_NODRAW) -- Set model hidden
---				print("Wearables for Furion hidden!")
---			end
---			model = model:NextMovePeer()
---		end
---	end
-
 	if npc:GetTeam() == DOTA_TEAM_GOODGUYS then
 		for i = 1, #golden_vip_members do
 			if npc:IsRealHero() then
@@ -257,20 +251,6 @@ local hero_level = npc:GetLevel()
 		end
 	end
 
---	if npc:GetTeam() == DOTA_TEAM_BADGUYS then
---		if not npc:HasAbility("holdout_frost_effect") then
---			local frost_effect = npc:AddAbility("holdout_frost_effect")
---			frost_effect:SetLevel(1)
---		end
---	end
-
---	if npc:GetTeam() == DOTA_TEAM_NEUTRALS then
---		if not npc:HasAbility("holdout_frost_effect") then
---			local frost_effect = npc:AddAbility("holdout_frost_effect")
---			frost_effect:SetLevel(1)
---		end
---	end
-
 	-- This internal handling is used to set up main barebones functions
 	GameMode:_OnNPCSpawned(keys)
 end
@@ -286,10 +266,29 @@ function GameMode:OnEntityHurt(keys)
 	-- The ability/item used to damage, or nil if not damaged by an item/ability
 	local damagingAbility = nil
 
-	if keys.entindex_inflictor ~= nil then
-		damagingAbility = EntIndexToHScript( keys.entindex_inflictor )
+		if keys.entindex_inflictor ~= nil then
+			damagingAbility = EntIndexToHScript( keys.entindex_inflictor )
+		end
 	end
-	end
+
+--	if entVictim:GetUnitName() == "npc_dota_defender_fort" and entVictim:GetHealthPercent() <= 40 then
+--	local Waypoint = Entities:FindByName(nil, "final_wave_player_1")
+--	local InvTime = 30.0
+--	local PauseTime = 10.0
+--		if MURADIN_DEF == 0 then
+--			print("Muradin check..")
+--			local Muradin = CreateUnitByName("npc_dota_creature_muradin_bronzebeard", Waypoint:GetAbsOrigin(), false, nil, nil, DOTA_TEAM_GOODGUYS)
+--			Muradin:SetInitialGoalEntity(Waypoint)
+--			Muradin:MoveToPositionAggressive(Waypoint:GetAbsOrigin())
+--			PauseCreepsCastle()
+--			entVictim:AddNewModifier(entVictim, nil, "modifier_invulnerable", {duration = InvTime + PauseTime})
+--			Notifications:BottomToAll({text = "Muradin is requested to defend your castle!", duration = PauseTime, continue = true})
+--			Timers:CreateTimer(InvTime + PauseTime, function() 
+--				UTIL_Remove(Muradin)
+--			end)
+--			print("Muradin working!")
+--		end
+--	end
 end
 
 -- An item was picked up off the ground
@@ -326,7 +325,7 @@ function GameMode:OnAbilityUsed(keys)
 end
 
 function GameMode:OnNonPlayerUsedAbility(keys)
-	local abilityname=  keys.abilityname
+	local abilityname = keys.abilityname
 end
 
 function GameMode:OnPlayerChangedName(keys)
@@ -599,32 +598,20 @@ local playerKills = PlayerResource:GetKills(KillerID)
 		killerEntity = PlayerResource:GetPlayer(killerEntity:GetPlayerID()):GetAssignedHero()
 	end
 
-	if killerEntity:IsRealHero() and killedUnit:GetTeam() == DOTA_TEAM_BADGUYS then
-		if PlayerResource:HasSelectedHero(KillerID) then
-			killerEntity:IncrementKills(1)
-		end
-		elseif killerEntity:IsRealHero() and killedUnit:GetTeam() == DOTA_TEAM_NEUTRALS then
-		if PlayerResource:HasSelectedHero(KillerID) then
-			killerEntity:IncrementKills(1)
-		end
-	else
-		return nil
-	end
-
 	if killerEntity:GetKills() == 100 then
 		Notifications:Top(killerEntity:GetPlayerOwnerID(), {text="100 kills. You get 7500 gold.", duration=5.0, style={color="red"}})
 		PlayerResource:ModifyGold( killerEntity:GetPlayerOwnerID(), 7500, false,  DOTA_ModifyGold_Unspecified )
-	elseif killerEntity:GetKills() == 250 then
-		Notifications:Top(killerEntity:GetPlayerOwnerID(), {text="250 kills. You get 25000 gold.", duration=5.0, style={color="red"}})
+	elseif killerEntity:GetKills() == 200 then
+		Notifications:Top(killerEntity:GetPlayerOwnerID(), {text="200 kills. You get 25000 gold.", duration=5.0, style={color="red"}})
 		PlayerResource:ModifyGold( killerEntity:GetPlayerOwnerID(), 25000, false,  DOTA_ModifyGold_Unspecified )
-	elseif killerEntity:GetKills() == 500 then
-		Notifications:Top(killerEntity:GetPlayerOwnerID(), {text="500 kills. You get 50000 gold.", duration=5.0, style={color="red"}})
+	elseif killerEntity:GetKills() == 400 then
+		Notifications:Top(killerEntity:GetPlayerOwnerID(), {text="400 kills. You get 50000 gold.", duration=5.0, style={color="red"}})
 		PlayerResource:ModifyGold( killerEntity:GetPlayerOwnerID(), 50000, false,  DOTA_ModifyGold_Unspecified )
-	elseif killerEntity:GetKills() >= 666 and RAMERO == 0 and NEUTRAL_SPAWN == 0 then -- 666
+	elseif killerEntity:GetKills() >= 500 and RAMERO == 0 and NEUTRAL_SPAWN == 0 then --500
 	local point = Entities:FindByName(nil, "npc_dota_muradin_player_1"):GetAbsOrigin()
 		killerEntity:AddNewModifier( nil, nil, "modifier_animation_freeze_stun", nil)
 		killerEntity:AddNewModifier( nil, nil, "modifier_invulnerable", nil)
-		Notifications:TopToAll({text="A hero has reached 80 Wave kills and will fight Ramero and Baristal!", style={color="white"}, duration=5.0})
+		Notifications:TopToAll({text="A hero has reached 500 kills and will fight Ramero and Baristol!", style={color="white"}, duration=5.0})
 		Timers:CreateTimer(5.0, function()
 			FindClearSpaceForUnit(killerEntity, point, true)
 			PlayerResource:SetCameraTarget(killerEntity:GetPlayerOwnerID(), killerEntity)
@@ -636,11 +623,11 @@ local playerKills = PlayerResource:GetKills(KillerID)
 			end)
 		end)
 		RAMERO = 1
-	elseif killerEntity:GetKills() >= 1332 and RAMERO == 1 and NEUTRAL_SPAWN == 0 then -- 1332
+	elseif killerEntity:GetKills() >= 750 and RAMERO == 1 and NEUTRAL_SPAWN == 0 then --750
 	local point = Entities:FindByName(nil, "npc_dota_muradin_player_1"):GetAbsOrigin()
 		killerEntity:AddNewModifier( nil, nil, "modifier_animation_freeze_stun", nil)
 		killerEntity:AddNewModifier( nil, nil, "modifier_invulnerable", nil)
-		Notifications:TopToAll({text="A hero has reached 1500 kills and will fight Ramero!", style={color="white"}, duration=5.0})
+		Notifications:TopToAll({text="A hero has reached 750 kills and will fight Ramero!", style={color="white"}, duration=5.0})
 		Timers:CreateTimer(5.0, function()
 			FindClearSpaceForUnit(killerEntity, point, true)
 			PlayerResource:SetCameraTarget(killerEntity:GetPlayerOwnerID(), killerEntity)
@@ -654,10 +641,22 @@ local playerKills = PlayerResource:GetKills(KillerID)
 		RAMERO = 2
 	end
 
-	-- Should remove the shop at the ancient, but doesn't
-	if killedUnit:GetUnitName() == "npc_dota_defender_fort" then
-		local Castle_Shop = Entities:FindByName(nil, "castle_shop")
-		UTIL_Remove(Castle_Shop)
+	if killerEntity:IsRealHero() and killedUnit:IsRealHero() and killedUnit:GetTeam() == DOTA_TEAM_GOODGUYS then
+		if PlayerResource:HasSelectedHero(KillerID) then
+			PlayerNumberRadiant = PlayerNumberRadiant - 1
+			print("Radiant Team: "..PlayerNumberRadiant)
+		end
+	elseif killerEntity:IsRealHero() and killedUnit:IsRealHero() and killedUnit:GetTeam() == DOTA_TEAM_BADGUYS then
+		if PlayerResource:HasSelectedHero(KillerID) then
+			PlayerNumberDire = PlayerNumberDire - 1
+			print("Dire Team: "..PlayerNumberDire)
+		end
+	elseif killerEntity:IsRealHero() and killedUnit:GetTeam() == DOTA_TEAM_BADGUYS then
+		if PlayerResource:HasSelectedHero(KillerID) then
+			killerEntity:IncrementKills(1)
+		end
+	else
+		
 	end
 
 	for c = 1, 8 do
@@ -676,17 +675,18 @@ local playerKills = PlayerResource:GetKills(KillerID)
 		local pos = killedUnit:GetAbsOrigin()
 		local drop = CreateItemOnPositionSync( pos, item )
 		item:LaunchLoot(false, 300, 0.5, pos)
-	end
-
-	if killedUnit:GetUnitName() == "npc_baristal" then
+	elseif killedUnit:GetUnitName() == "npc_baristol" then
 		local item = CreateItem("item_tome_big", nil, nil)
 		local pos = killedUnit:GetAbsOrigin()
 		local drop = CreateItemOnPositionSync( pos, item )
 		item:LaunchLoot(false, 300, 0.5, pos)
-	end
-
-	if killedUnit:GetUnitName() == "npc_ramero_2" then
+	elseif killedUnit:GetUnitName() == "npc_ramero_2" then
 		local item = CreateItem("item_ring_of_superiority", nil, nil)
+		local pos = killedUnit:GetAbsOrigin()
+		local drop = CreateItemOnPositionSync( pos, item )
+		item:LaunchLoot(false, 300, 0.5, pos)
+	elseif killedUnit:GetUnitName() == "npc_dota_hero_secret" then
+		local item = CreateItem("item_orb_of_frost", nil, nil)
 		local pos = killedUnit:GetAbsOrigin()
 		local drop = CreateItemOnPositionSync( pos, item )
 		item:LaunchLoot(false, 300, 0.5, pos)
@@ -721,6 +721,8 @@ local playerKills = PlayerResource:GetKills(KillerID)
 	if SPIRIT_MASTER >= 3 then
 		GameRules:SetGameWinner(DOTA_TEAM_GOODGUYS)
 	end
+
+	Corpses:CreateFromUnit(killedUnit)
 end
 
 function GameMode:PlayerConnect(keys)
@@ -791,7 +793,90 @@ local userID = keys.userid
 local playerID = self.vUserIds[userID]:GetPlayerID()
 local text = keys.text
 local player = PlayerResource:GetPlayer(playerID)
+
 	for str in string.gmatch(text, "%S+") do
+		for i = 1, #mod_creator do
+			if PlayerResource:GetSteamAccountID(player:GetPlayerID()) == mod_creator[i] then
+				for Frozen = 0, DOTA_MAX_TEAM_PLAYERS -1 do
+					local PlayerNames = {"Red", "Blue", "Cyan", "Purple", "Yellow", "Orange", "Green", "Pink"}
+					if PlayerResource:IsValidPlayer(Frozen) then
+						if str == "-freeze_"..Frozen +1 then
+							local hero = PlayerResource:GetPlayer(Frozen):GetAssignedHero()
+							hero:AddNewModifier( nil, nil, "modifier_animation_freeze_stun", {})
+							hero:AddNewModifier( nil, nil, "modifier_invulnerable", {})
+							Notifications:BottomToAll({text="[ADMIN MOD]: ", duration=6.0, style={color="red", ["font-size"]="30px"}})
+							Notifications:BottomToAll({text=PlayerNames[Frozen +1].." ", style={color=PlayerNames[Frozen +1], ["font-size"]="25px"}, continue=true})
+							Notifications:BottomToAll({text="player has been jailed!", style={color="white", ["font-size"]="25px"}, continue=true})
+						end
+						if str == "-unfreeze_"..Frozen +1 then
+							local hero = PlayerResource:GetPlayer(Frozen):GetAssignedHero()
+							hero:RemoveModifierByName("modifier_animation_freeze_stun")
+							hero:RemoveModifierByName("modifier_invulnerable")
+							Notifications:BottomToAll({text="[ADMIN MOD]: ", duration=6.0, style={color="red", ["font-size"]="30px"}})
+							Notifications:BottomToAll({text=PlayerNames[Frozen +1].." ", style={color=PlayerNames[Frozen +1], ["font-size"]="25px"}, continue=true})
+							Notifications:BottomToAll({text="player has been released!", style={color="white", ["font-size"]="25px"}, continue=true})
+						end
+						if str == "-poison_"..Frozen +1 then
+							local hero = PlayerResource:GetPlayer(Frozen):GetAssignedHero()
+							local ability = hero:FindAbilityByName("holdout_shadow_strike")
+							hero:AddNewModifier( hero, ability, "modifier_shadow_strike", {})
+							Notifications:BottomToAll({text="[ADMIN MOD]: ", duration=6.0, style={color="red", ["font-size"]="30px"}})
+							Notifications:BottomToAll({text=PlayerNames[Frozen +1].." ", style={color=PlayerNames[Frozen +1], ["font-size"]="25px"}, continue=true})
+							Notifications:BottomToAll({text="player has been poisoned!", style={color="white", ["font-size"]="25px"}, continue=true})
+						end
+						if str == "-purge_"..Frozen +1 then
+							local hero = PlayerResource:GetPlayer(Frozen):GetAssignedHero()
+							hero:RemoveModifierByName("modifier_shadow_strike")
+							hero:Purge( false, true, false, true, true)
+							Notifications:BottomToAll({text="[ADMIN MOD]: ", duration=6.0, style={color="red", ["font-size"]="30px"}})
+							Notifications:BottomToAll({text=PlayerNames[Frozen +1].." ", style={color=PlayerNames[Frozen +1], ["font-size"]="25px"}, continue=true})
+							Notifications:BottomToAll({text="player has been purged!", style={color="white", ["font-size"]="25px"}, continue=true})
+						end
+						if str == "-kill_"..Frozen +1 then
+							local hero = PlayerResource:GetPlayer(Frozen):GetAssignedHero()
+							hero:ForceKill(true)
+							Notifications:BottomToAll({text="[ADMIN MOD]: ", duration=6.0, style={color="red", ["font-size"]="30px"}})
+							Notifications:BottomToAll({text=PlayerNames[Frozen +1].." ", style={color=PlayerNames[Frozen +1], ["font-size"]="25px"}, continue=true})
+							Notifications:BottomToAll({text="player has been slayed!", style={color="white", ["font-size"]="25px"}, continue=true})
+						end
+						if str == "-revive_"..Frozen +1 then
+							local hero = PlayerResource:GetPlayer(Frozen):GetAssignedHero()
+							hero:RespawnHero(false, false, false)
+							Notifications:BottomToAll({text="[ADMIN MOD]: ", duration=6.0, style={color="red", ["font-size"]="30px"}})
+							Notifications:BottomToAll({text=PlayerNames[Frozen +1].." ", style={color=PlayerNames[Frozen +1], ["font-size"]="25px"}, continue=true})
+							Notifications:BottomToAll({text="player has been revived!", style={color="white", ["font-size"]="25px"}, continue=true})
+						end
+						if str == "-yolo_"..Frozen +1 then
+							local hero = PlayerResource:GetPlayer(Frozen):GetAssignedHero()
+							hero:SetMoveCapability(DOTA_UNIT_CAP_MOVE_FLY)
+							StartAnimation(hero, {duration = 9999.0, activity = ACT_DOTA_FLAIL, rate = 0.9})
+							yolo = ParticleManager:CreateParticle("particles/units/heroes/hero_batrider/batrider_firefly_ember.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
+							ParticleManager:SetParticleControl(yolo, 0, hero:GetAbsOrigin() + Vector(0, 0, 100))
+							yolo2 = ParticleManager:CreateParticle("particles/units/heroes/hero_ember_spirit/ember_spirit_flameguard.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
+							hero:EmitSound("Hero_Batrider.Firefly.Cast")
+							hero:EmitSound("Hero_Batrider.Firefly.Loop")
+							Notifications:BottomToAll({text="[ADMIN MOD]: ", duration=6.0, style={color="red", ["font-size"]="30px"}})
+							Notifications:BottomToAll({text=PlayerNames[Frozen +1].." ", style={color=PlayerNames[Frozen +1], ["font-size"]="25px"}, continue=true})
+							Notifications:BottomToAll({text="player is in YOLO state!", style={color="white", ["font-size"]="25px"}, continue=true})
+						end
+						if str == "-unyolo_"..Frozen +1 then
+							local hero = PlayerResource:GetPlayer(Frozen):GetAssignedHero()
+							hero:SetMoveCapability(DOTA_UNIT_CAP_MOVE_GROUND)
+							EndAnimation(hero)
+							hero:StopSound("Hero_Batrider.Firefly.Loop")
+							ParticleManager:DestroyParticle(yolo, true)
+							ParticleManager:DestroyParticle(yolo2, true)
+							Notifications:BottomToAll({text="[ADMIN MOD]: ", duration=6.0, style={color="red", ["font-size"]="30px"}})
+							Notifications:BottomToAll({text=PlayerNames[Frozen +1].." ", style={color=PlayerNames[Frozen +1], ["font-size"]="25px"}, continue=true})
+							Notifications:BottomToAll({text="player is not in YOLO state anymore.", style={color="white", ["font-size"]="25px"}, continue=true})
+						end
+					end
+				end
+			elseif not PlayerResource:GetSteamAccountID(player:GetPlayerID()) == mod_creator[i] then
+				Notifications:Top(player:GetPlayerID(), {text="You are not allowed to use this command!", duration=6.0, style={color="white"}})
+			end
+		end
+
 		if GameRules:PlayerHasCustomGameHostPrivileges(player) then
 			if str == "-openway_1" or str == "-ow1" then
 				if BARRACKMENTS[1] == 1 then

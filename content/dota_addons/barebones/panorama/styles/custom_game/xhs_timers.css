@@ -1,0 +1,65 @@
+
+.ScoreboardLeft
+{
+	margin-left: 1000px;
+	margin-top: 0px;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #25282a00 ), color-stop( .6, #25282acc), color-stop( .8, #25282a88), to( #00000022 ) );
+	margin-right: 0px;
+	width: 600px;
+	flow-children: right;
+}
+
+#ScoreboardSpecialEvent,
+#ScoreboardCreepTime,
+#ScoreboardIncomingWaveTime,
+#ScoreboardSpecialEventsTime
+{
+	flow-children: down;
+	width: 150px;
+	height: 40px;
+
+	background-repeat: no-repeat;
+}
+
+
+#Goal,
+#CreepGoal,
+#IncomingWaveGoal,
+#SpecialEventsGoal
+{
+	font-size: 13.0px;
+	font-weight: bold;
+	color: DodgerBlue;
+	text-align: center;
+	width: 100%;
+	text-transform: uppercase;
+}
+
+#Timer,
+#CreepTimer,
+#IncomingWaveTimer,
+#SpecialEventsTimer
+{
+	font-size: 18px;
+	font-weight: bold;
+	color: #ffffff;
+	text-align: center;
+	width: 100%;
+	text-transform: uppercase;
+	text-overflow: clip;
+}
+
+#Timer.timer_visible
+{
+	opacity: 1;
+}
+
+#Timer.timer_hidden
+{
+	opacity: 0;
+}
+
+#Timer.timer_alert
+{
+	color: red;
+}

@@ -51,11 +51,6 @@ function lightning_storm_repeat( params )
         ability = params.ability}
     ApplyDamage(damageTable)
 
-    -- if unit is still alive, apply slow with glow particle
-    if params.initial_target:IsAlive() then
-        params.ability:ApplyDataDrivenModifier(params.caster, params.initial_target, "lightning_storm_slow", {})
-    end
-
     params.bounceTable[params.initial_target] = 1
 
     -- find next target (closest one to previous one)

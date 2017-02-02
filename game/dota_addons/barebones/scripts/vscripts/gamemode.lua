@@ -8,8 +8,13 @@ _G.RAMERO = 0
 _G.MAGTHERIDON = 0
 _G.FOUR_BOSSES = 0
 _G.SPIRIT_MASTER = 0
-_G.key_first_time = true
-_G.X_HERO_SIEGE_V = 3.33
+_G.ANKHS = 1
+_G.SPECIAL_EVENT = 0
+_G.PlayerNumberRadiant = 0
+_G.PlayerNumberDire = 0
+_G.sword_first_time = true
+_G.ring_first_time = true
+_G.X_HERO_SIEGE_V = 3.35
 
 _G.mod_creator = {
 		54896080,	-- Cookies
@@ -23,7 +28,8 @@ _G.captain_baumi = {
 
 _G.mod_graphist = {
 		61711140,	-- Mugiwara
-		56352263	-- Flotos
+		56352263,	-- Flotos
+		231117589	-- Xero
 	}
 
 _G.vip_members = {
@@ -37,11 +43,12 @@ _G.vip_members = {
 
 _G.golden_vip_members = {
 		69533529,	-- West [Unlimited]
+		51728279,	-- mC [Unlimited]
 		206464009,	-- beast [Unlimited]
 		86718505,	-- Noya [Unlimited]
 		62993541,	-- KennyCrazy [Unlimited]
+		117327434,	-- Eren [Unlimited]
 		146805680,	-- [UTAC] Rekail [Gatiipz Gatiipz on Patreon, Remove Date if not paid: 01/01/2017]
-		75034844,	-- Specter [Tyrael on Patreon, Remove Date if not paid: 05/01/2017]
 		110786327,	-- MechJesus [Mauro Solares on Patreon, Remove Date if not paid: 07/01/2017]
 		93860661,	-- Meteor [Supawit Enyord on Patreon, Remove Date if not paid: 10/01/2017]
 		97629656,	-- jacobkahnji  [Jacob A Yow on Patreon, Remove Date if not paid: 23/01/2017]
@@ -49,13 +56,11 @@ _G.golden_vip_members = {
 		55770641,	-- Primeape [Filip Dingum on Patreon, Remove Date if not paid: 31/01/2017]
 		5194446,	-- Botd [Hugo Marques on Patreon, Remove Date if not paid: 31/01/2017]
 		27954291,	-- Gengar [Christian Oversand Deildok on Patreon, Remove Date if not paid: 04/01/2017]
---		113777627,	-- Mieu [phil lousbury on Patreon, Remove Date if not paid: 07/01/2017]
---		152511257,	-- MasKe~🖕 [Jamie Vidler on Patreon, Remove Date if not paid: 07/01/2017]
 		80192910,	-- Cheshire [Nathan Perscott on Patreon, Removed Date if not paid: 29/01/2017]
 		28261641,	-- Timoznn [Timo Nurnberg on Patreon, Unlimited]
 		79258147,	-- Dyuss [Altynbek Duisenkul on Patreon, Removed Date if not paid: 10/02/2017]
-		66147815,	-- FreshKiller23 [Unlimited]		
-		33042578	-- ryusajin [Unlimited]		
+		66147815,	-- FreshKiller23 [Unlimited]
+		33042578	-- ryusajin [Unlimited]
 	}
 
 _G.banned_players = {
@@ -120,7 +125,7 @@ HEROLIST[24] = "ursa"				-- Malfurion
 HEROLIST[25] = "nevermore"			-- Banehallow
 HEROLIST[26] = "brewmaster"			-- Pandaren Brewmaster
 HEROLIST[27] = "warlock"			-- Archimonde
-HEROLIST[28] = "axe"				-- Dota 2 Hero
+HEROLIST[28] = "monkey_king"		-- Dota 2 Hero [Axe, Monkey King]
 
 HEROLIST_ALT = {}
 HEROLIST_ALT[1] = enchantress		-- Dryad
@@ -150,7 +155,7 @@ HEROLIST_ALT[24] = ursa				-- Malfurion
 HEROLIST_ALT[25] = nevermore		-- Banehallow
 HEROLIST_ALT[26] = brewmaster		-- Pandaren Brewmaster
 HEROLIST_ALT[27] = warlock			-- Archimonde
-HEROLIST_ALT[28] = axe				-- Dota 2 Hero
+HEROLIST_ALT[28] = monkey_king		-- Dota 2 Hero [Axe, Monkey King]
 
 HEROLIST_VIP = {}
 HEROLIST_VIP[1] = "slardar"				-- Centurion
@@ -159,6 +164,7 @@ HEROLIST_VIP[3] = "meepo"				-- Kobold Knight
 HEROLIST_VIP[4] = "chaos_knight"		-- Dark Fundamental
 HEROLIST_VIP[5] = "tiny"				-- Stone Giant
 HEROLIST_VIP[6] = "sand_king"			-- Desert Wyrm
+HEROLIST_VIP[7] = "necrolyte"			-- Dark Summoner
 
 HEROLIST_VIP_ALT = {}
 HEROLIST_VIP_ALT[1] = slardar			-- Centurion
@@ -167,7 +173,7 @@ HEROLIST_VIP_ALT[3] = meepo				-- Kobold Knight
 HEROLIST_VIP_ALT[4] = chaos_knight		-- Dark Fundamental
 HEROLIST_VIP_ALT[5] = tiny				-- Stone Giant
 HEROLIST_VIP_ALT[6] = sand_king			-- Desert Wyrm
-
+HEROLIST_VIP_ALT[7] = necrolyte			-- Dark Summoner
 
 timers = {}
 
@@ -184,6 +190,7 @@ require('libraries/projectiles')
 require('libraries/notifications')
 require('libraries/animations')
 require('libraries/attachments')
+require('libraries/keyvalues')
 require('phases/choose_hero')
 require('phases/creeps')
 require('phases/special_events')
@@ -218,7 +225,7 @@ GameMode.FrostTowers_killed = 0
 GameMode.BossesTop_killed = 0
 time_elapsed = 0
 
-	for playerID = 0, DOTA_MAX_TEAM_PLAYERS do
+	for playerID = 0, DOTA_MAX_TEAM_PLAYERS -1 do
 		if PlayerResource:IsValidPlayer(playerID) then
 			PlayerResource:SetCustomPlayerColor( playerID, PLAYER_COLORS[playerID][1], PLAYER_COLORS[playerID][2], PLAYER_COLORS[playerID][3])
 		end
@@ -295,7 +302,7 @@ local triggers_frost_infernal = Entities:FindAllByName("trigger_special_event_fr
 		nCOUNTDOWNINCWAVE = 241
 		SpawnBlackDragon()
 		for _,v in pairs(triggers_choice) do
-		v:Enable()
+			v:Enable()
 		end
 		for _,v in pairs(triggers_hero_image) do
 			v:Enable()
@@ -323,34 +330,46 @@ local triggers_frost_infernal = Entities:FindAllByName("trigger_special_event_fr
 	-- Timer: West, North, East, South Event Whispering
 	Timers:CreateTimer(211, function() -- 3 Min 30 sec
 		Notifications:TopToAll({text="WARNING: Incoming wave of Darkness from the West!", duration=25.0, style={color="red"}})
+		SpawnRunes()
 	end)
 	Timers:CreateTimer(451, function() -- 7 Min 30 sec
 		Notifications:TopToAll({text="WARNING: Incoming wave of Darkness from the North!", duration=25.0, style={color="red"}})
+		SpawnRunes()
 	end)
 	Timers:CreateTimer(691, function() -- 11 Min 30 sec
 		Notifications:TopToAll({text="WARNING: Muradin Event in 30 sec!", duration=25.0, style={color="grey"}})
 	end)
 	Timers:CreateTimer(811, function() -- 13 Min 30 sec
 		Notifications:TopToAll({text="WARNING: Incoming wave of Darkness from the East!", duration=25.0, style={color="red"}})
+		SpawnRunes()
 	end)
 	Timers:CreateTimer(1051, function() -- 15 Min 30 sec
 		Notifications:TopToAll({text="WARNING: Incoming wave of Darkness from the South!", duration=25.0, style={color="red"}})
+		SpawnRunes()
 	end)
 	Timers:CreateTimer(1291, function() -- 19 Min 30 sec
 		Notifications:TopToAll({text="WARNING: Incoming wave of Darkness from the West!", duration=25.0, style={color="red"}})
+		SpawnRunes()
 	end)
 	Timers:CreateTimer(1411, function() -- 23 Min 30 sec
 		Notifications:TopToAll({text="WARNING: Farming Event in 30 sec!", duration=25.0, style={color="grey"}})
 	end)
 	Timers:CreateTimer(1591, function() -- 24 Min 30 sec
 		Notifications:TopToAll({text="WARNING: Incoming wave of Darkness from the North!", duration=25.0, style={color="red"}})
+		SpawnRunes()
 	end)
 	Timers:CreateTimer(1831, function() -- 27 Min 30 sec
 		Notifications:TopToAll({text="WARNING: Incoming wave of Darkness from the East!", duration=25.0, style={color="red"}})
+		SpawnRunes()
 	end)
 	Timers:CreateTimer(2071, function() -- 31 Min 30 sec
 		Notifications:TopToAll({text="WARNING: Incoming wave of Darkness from the South!", duration=25.0, style={color="red"}})
+		SpawnRunes()
 	end)
+--	Timers:CreateTimer(2131, function() -- 35 Min 30 sec
+--		Notifications:TopToAll({text="WARNING: Duel Event in 30 sec! (Ankhs will be disabled)", duration=25.0, style={color="red"}})
+--		SpawnRunes()
+--	end)
 
 	--//=================================================================================================================
 	--// Timer: West Event 1 Spawn
@@ -435,30 +454,41 @@ local triggers_frost_infernal = Entities:FindAllByName("trigger_special_event_fr
 	Timers:CreateTimer(716, function() -- 716 - 11:55 Min: MURADIN BRONZEBEARD EVENT 1
 		PauseCreepsMuradin()
 		PauseHeroes()
+		RefreshPlayers()
 		Timers:CreateTimer(5, function()
 			MuradinEvent()
 			Timers:CreateTimer(3, RestartHeroes())
 		end)
 	end)
-
 	Timers:CreateTimer(1436, function() -- 1436 - 23:55 Min: FARM EVENT 2
 		PauseCreepsFarm()
 		PauseHeroes()
+		RefreshPlayers()
 		Timers:CreateTimer(5, function()
 			FarmEvent()
 			Timers:CreateTimer(3, RestartHeroes())
 		end)
 	end)
+
+--	Timers:CreateTimer(6, function() -- 2156 - 35:55 Min: DUEL EVENT 3
+--		KillCreeps()
+--		PauseHeroes()
+--		RefreshPlayers()
+--		Timers:CreateTimer(5, function()
+--			ANKHS = 0
+--			SPECIAL_EVENT = 1
+--			DuelEvent()
+--			Timers:CreateTimer(3, RestartHeroes())
+--		end)
+--	end)
 end
 
 function RestartHeroes()
 local heroes = HeroList:GetAllHeroes()
 
 	for _,hero in pairs(heroes) do
-		if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
-			hero:RemoveModifierByName("modifier_animation_freeze_stun")
-			hero:RemoveModifierByName("modifier_invulnerable")
-		end
+		hero:RemoveModifierByName("modifier_animation_freeze_stun")
+		hero:RemoveModifierByName("modifier_invulnerable")
 	end
 end
 
@@ -466,9 +496,24 @@ function PauseHeroes()
 local heroes = HeroList:GetAllHeroes()
 
 	for _,hero in pairs(heroes) do
-		if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
-			hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", nil)
-			hero:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
+		hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", nil)
+		hero:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
+	end
+end
+
+function KillCreeps()
+local units = FindUnitsInRadius( DOTA_TEAM_BADGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_NONE , FIND_ANY_ORDER, false )
+local units2 = FindUnitsInRadius( DOTA_TEAM_GOODGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_NONE , FIND_ANY_ORDER, false )
+
+	for _,v in pairs(units) do
+		if v:IsCreature() and v:HasMovementCapability() then
+			UTIL_Remove(v)
+		end
+	end
+
+	for _,v in pairs(units2) do
+		if v:IsCreature() and v:HasMovementCapability() then
+			UTIL_Remove(v)
 		end
 	end
 end
@@ -568,59 +613,59 @@ function GameMode:InitGameMode()
 	mode = GameRules:GetGameModeEntity()
 
 	-- Timer Rules
-	GameRules:SetPreGameTime( 120.0 ) --120.0
-	GameRules:SetPostGameTime( 30.0 )
-	GameRules:SetTreeRegrowTime( 120.0 )
-	GameRules:SetHeroSelectionTime( 0.0 ) --This is not dota bitch
-	GameRules:SetGoldTickTime( 0.0 ) --This is not dota bitch
-	GameRules:SetGoldPerTick( 0.0 ) --This is not dota bitch
-	GameRules:SetCustomGameSetupAutoLaunchDelay( 15.0 ) --Vote Time
+	GameRules:SetPreGameTime(120.0) --120.0
+	GameRules:SetPostGameTime(30.0)
+	GameRules:SetTreeRegrowTime(180.0)
+	GameRules:SetHeroSelectionTime(0.0) --This is not dota bitch
+	GameRules:SetGoldTickTime(0.0) --This is not dota bitch
+	GameRules:SetGoldPerTick(0.0) --This is not dota bitch
+	GameRules:SetCustomGameSetupAutoLaunchDelay(15.0) --Vote Time
 
 	-- Boolean Rules
-	GameRules:LockCustomGameSetupTeamAssignment( true )
---	GameRules:EnableCustomGameSetupAutoLaunch( true )
-	GameRules:SetUseCustomHeroXPValues ( true )
-	GameRules:SetUseBaseGoldBountyOnHeroes( true )
-	GameRules:SetHeroRespawnEnabled( true )
-	mode:SetUseCustomHeroLevels( true )
-	mode:SetRecommendedItemsDisabled( false )
-	mode:SetTopBarTeamValuesOverride ( true )
-	mode:SetTopBarTeamValuesVisible( false )
-	mode:SetUnseenFogOfWarEnabled( false )
-	mode:SetStashPurchasingDisabled ( true )
+	GameRules:LockCustomGameSetupTeamAssignment(true)
+--	GameRules:EnableCustomGameSetupAutoLaunch(true)
+	GameRules:SetUseCustomHeroXPValues(true)
+	GameRules:SetUseBaseGoldBountyOnHeroes(false)
+	GameRules:SetHeroRespawnEnabled(true)
+	mode:SetUseCustomHeroLevels(true)
+	mode:SetRecommendedItemsDisabled(false)
+	mode:SetTopBarTeamValuesOverride(true)
+	mode:SetTopBarTeamValuesVisible(false)
+	mode:SetUnseenFogOfWarEnabled(false)
+	mode:SetStashPurchasingDisabled(true)
 
-	mode:SetBuybackEnabled( false )
-	mode:SetBotThinkingEnabled( false )
-	mode:SetTowerBackdoorProtectionEnabled( false )
-	mode:SetFogOfWarDisabled( true ) --FUCK YOU VOLVO
-	mode:SetGoldSoundDisabled( false )
-	mode:SetRemoveIllusionsOnDeath( false )
-	mode:SetAlwaysShowPlayerInventory( false )
-	mode:SetAnnouncerDisabled( false )
-	mode:SetLoseGoldOnDeath( false )
+	mode:SetBuybackEnabled(false)
+	mode:SetBotThinkingEnabled(false)
+	mode:SetTowerBackdoorProtectionEnabled(false)
+	mode:SetFogOfWarDisabled(false) --FUCK YOU VOLVO
+	mode:SetGoldSoundDisabled(false)
+	mode:SetRemoveIllusionsOnDeath(false)
+	mode:SetAlwaysShowPlayerInventory(false)
+	mode:SetAnnouncerDisabled(false)
+	mode:SetLoseGoldOnDeath(false)
 
 	-- Value Rules
-	mode:SetCameraDistanceOverride( 1250 )
-	mode:SetMaximumAttackSpeed( 500 )
-	mode:SetMinimumAttackSpeed( 20 )
-	mode:SetCustomHeroMaxLevel( 30 )
-	GameRules:SetHeroMinimapIconScale( 1.25 )
-	GameRules:SetCreepMinimapIconScale( 1 )
-	GameRules:SetRuneMinimapIconScale( 1 )
+	mode:SetCameraDistanceOverride(1250)
+	mode:SetMaximumAttackSpeed(500)
+	mode:SetMinimumAttackSpeed(20)
+	mode:SetCustomHeroMaxLevel(30)
+	GameRules:SetHeroMinimapIconScale(1.0)
+	GameRules:SetCreepMinimapIconScale(1)
+	GameRules:SetRuneMinimapIconScale(1)
 
 	-- Team Rules
-	SetTeamCustomHealthbarColor(DOTA_TEAM_GOODGUYS, 52, 52, 190) --Blue
-	SetTeamCustomHealthbarColor(DOTA_TEAM_BADGUYS, 190, 52, 52) --Red
+	SetTeamCustomHealthbarColor(DOTA_TEAM_GOODGUYS, 0, 64, 128) --Blue
+	SetTeamCustomHealthbarColor(DOTA_TEAM_BADGUYS, 128, 32, 32) --Red
 	SetTeamCustomHealthbarColor(DOTA_TEAM_CUSTOM_1, 255, 255, 0) --Yellow
 
 	-- Table Rules
 	mode:SetCustomXPRequiredToReachNextLevel( XP_PER_LEVEL_TABLE )
 
-	GameRules:SetCustomGameTeamMaxPlayers( DOTA_TEAM_GOODGUYS, 8 )
-	GameRules:SetCustomGameTeamMaxPlayers( DOTA_TEAM_BADGUYS, 0 )
-	GameRules:SetCustomGameTeamMaxPlayers( DOTA_TEAM_CUSTOM_1, 0 )
+	GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_GOODGUYS, 8)
+	GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_BADGUYS, 0)
+	GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_CUSTOM_1, 0)
 	mode:SetCustomGameForceHero( "npc_dota_hero_wisp" )
-	mode:SetFixedRespawnTime( 40 )
+	mode:SetFixedRespawnTime(40)
 
 	-- Lua Modifiers
 	LinkLuaModifier("modifier_earthquake_aura", "heroes/hero_brewmaster/earthquake", LUA_MODIFIER_MOTION_NONE)
@@ -632,14 +677,12 @@ function GameMode:InitGameMode()
 
 	self.countdownEnabled = false
 
-	Convars:RegisterCommand( "muradin_set_timer", function(...) return SetTimerMuradin( ... ) end, "Set the timer.", FCVAR_CHEAT )
-	Convars:RegisterCommand( "creep_set_timer", function(...) return SetTimerCreep( ... ) end, "Set the timer.", FCVAR_CHEAT )
-	Convars:RegisterCommand( "wave_set_timer", function(...) return SetTimerIncomingWave( ... ) end, "Set the timer.", FCVAR_CHEAT )
-	Convars:RegisterCommand( "beast_set_timer", function(...) return SetTimerSpecialEvents( ... ) end, "Set the timer.", FCVAR_CHEAT )
-end
+	Convars:RegisterCommand( "test_spirit_master", function() return StartSpiritMasterArena() end, "Test Spirit Master Arena", FCVAR_CHEAT )
+	mode:SetExecuteOrderFilter( Dynamic_Wrap( GameMode, "FilterExecuteOrder" ), self )
+end				
 
 function GameMode:OnGameRulesStateChange(keys)
-	local heroes = HeroList:GetAllHeroes()
+local heroes = HeroList:GetAllHeroes()
 
 	-- This internal handling is used to set up main barebones functions
 	GameMode:_OnGameRulesStateChange(keys)
@@ -709,12 +752,20 @@ function GameMode:OnGameRulesStateChange(keys)
 
 	if newState == DOTA_GAMERULES_STATE_PRE_GAME then
 		self._fPreGameStartTime = GameRules:GetGameTime()
-		for _,hero in pairs(heroes) do
+		for _, hero in pairs(heroes) do
 			if hero:IsRealHero() then
-
+--			local ID = hero:GetPlayerID()
+--			local Gold = hero:GetGold()
+--				if ID == 0 or ID == 2 or ID == 4 or ID == 6 then
+--					PlayerResource:UpdateTeamSlot(ID, DOTA_TEAM_BADGUYS, 1)
+--				else
+--					PlayerResource:UpdateTeamSlot(ID, DOTA_TEAM_GOODGUYS, 1)
+--				end
 			end
 		end
 		SpawnHeroesBis()
+		CustomGameEventManager:Send_ServerToAllClients( "disable_adminmod", broadcast_gametimer )
+		GameRules:SetCustomGameTeamMaxPlayers( DOTA_TEAM_BADGUYS, 4 )
 
 		local diff = {"Easy","Normal","Hard","Extreme"}
 		Notifications:TopToAll({text="DIFFICULTY: "..diff[GameRules:GetCustomGameDifficulty()], duration=15.0})
@@ -753,7 +804,7 @@ local newState = GameRules:State_Get()
 		nCOUNTDOWNCREEP = 361
 	elseif time_elapsed > 720 and time_elapsed < 870 then
 		nCOUNTDOWNCREEP = 1
-	elseif time_elapsed > 2020 then
+	elseif time_elapsed > 1990 then
 		nCOUNTDOWNCREEP = 1
 	end
 
@@ -776,7 +827,6 @@ end
 function CountdownTimerMuradin()
 	nCOUNTDOWNTIMER = nCOUNTDOWNTIMER - 1
 	local t = nCOUNTDOWNTIMER
---	print( "Countdown Timer Activated" )
 	local minutes = math.floor(t / 60)
 	local seconds = t - (minutes * 60)
 	local m10 = math.floor(minutes / 10)
@@ -794,11 +844,6 @@ function CountdownTimerMuradin()
 	if t <= 120 then
 		CustomGameEventManager:Send_ServerToAllClients( "time_remaining", broadcast_gametimer )
 	end
-end
-
-function SetTimerMuradin( cmdName, time )
-	print( "Set the timer to: " .. time )
-	nCOUNTDOWNTIMER = time
 end
 
 function CountdownTimerCreep()
@@ -821,11 +866,6 @@ function CountdownTimerCreep()
 	CustomGameEventManager:Send_ServerToAllClients( "creepcountdown", broadcast_gametimer )
 end
 
-function SetTimerCreep( cmdName, time )
-	print( "Set the timer to: " .. time )
-	nCOUNTDOWNCREEP = time
-end
-
 function CountdownTimerIncomingWave()
 	nCOUNTDOWNEVENT = nCOUNTDOWNEVENT - 1 -- They are somehow inverted, try to fix later incoming wave and beasts events
 	local t = nCOUNTDOWNEVENT
@@ -844,11 +884,6 @@ function CountdownTimerIncomingWave()
 			timer_second_01_3 = s01,
 		}
 	CustomGameEventManager:Send_ServerToAllClients( "incomingwavecountdown", broadcast_gametimer )
-end
-
-function SetTimerIncomingWave( cmdName, time )
-	print( "Set the timer to: " .. time )
-	nCOUNTDOWNEVENT = time
 end
 
 function CountdownTimerSpecialEvents()
@@ -871,13 +906,8 @@ function CountdownTimerSpecialEvents()
 	CustomGameEventManager:Send_ServerToAllClients( "specialeventscountdown", broadcast_gametimer )
 end
 
-function SetTimerSpecialEvents( cmdName, time )
-	print( "Set the timer to: " .. time )
-	nCOUNTDOWNINCWAVE = time
-end
-
 -- Item added to inventory filter
-function GameMode:ItemAddedFilter( keys )
+function GameMode:ItemAddedFilter(keys)
 local hero = EntIndexToHScript(keys.inventory_parent_entindex_const)
 local item = EntIndexToHScript(keys.item_entindex_const)
 local item_name = 0
@@ -892,9 +922,21 @@ if item:GetName() then
 end
 
 	if hero:IsRealHero() then
-		if item_name == sword and key_first_time then
+		if item_name == sword and sword_first_time then
 			FindClearSpaceForUnit(hero, point, true)
-			key_first_time = false
+			PlayerResource:SetCameraTarget(hero:GetPlayerID(), hero)
+			Timers:CreateTimer(0.1, function()
+				PlayerResource:SetCameraTarget(hero:GetPlayerID(), nil)
+			end)
+			sword_first_time = false
+		end
+		if item_name == ring and ring_first_time then
+			FindClearSpaceForUnit(hero, point, true)
+			PlayerResource:SetCameraTarget(hero:GetPlayerID(), hero)
+			Timers:CreateTimer(0.1, function()
+				PlayerResource:SetCameraTarget(hero:GetPlayerID(), nil)
+			end)
+			ring_first_time = false
 		end
 
 		if item_name == key then
@@ -939,7 +981,7 @@ end
 				end)
 				Timers:CreateTimer(0.9, function()
 					local Item = hero:GetItemInSlot( itemSlot )
-					if not Item:IsNull() and Item:GetName() == sword then
+					if not Item:IsNull() and Item:GetName() == ring then
 						hero:EmitSound("Hero_TemplarAssassin.Trap")
 						hero:RemoveItem(Item)
 						hero.has_epic_3 = false
@@ -947,7 +989,7 @@ end
 				end)
 				Timers:CreateTimer(1.3, function()
 					local Item = hero:GetItemInSlot( itemSlot )
-					if not Item:IsNull() and Item:GetName() == ring then
+					if not Item:IsNull() and Item:GetName() == sword then
 						hero:EmitSound("Hero_TemplarAssassin.Trap")
 						hero:RemoveItem(Item)
 						hero.has_epic_4 = false
@@ -964,79 +1006,186 @@ end
 	-------------------------------------------------------------------------------------------------
 	-- Rune pickup logic
 	-------------------------------------------------------------------------------------------------
---	if item_name == "item_imba_rune_bounty" or item_name == "item_imba_rune_double_damage" or item_name == "item_imba_rune_haste" or item_name == "item_imba_rune_regeneration" then
---
---		-- Only real heroes can pick up runes
---		--if unit:IsRealHero() then
---			if item_name == "item_imba_rune_bounty" then
---				PickupBountyRune(item, unit)
---				return false
---			end
---
---			if item_name == "item_imba_rune_double_damage" then
---				PickupDoubleDamageRune(item, unit)
---				return false
---			end
---
---			if item_name == "item_imba_rune_haste" then
---				PickupHasteRune(item, unit)
---				return false
---			end
---
---			if item_name == "item_imba_rune_regeneration" then
---				PickupRegenerationRune(item, unit)
---				return false
---			end
+	local unit = hero
+	if item_name == "item_rune_armor" then
 
+		-- Only real heroes can pick up runes
+		if unit:IsRealHero() then
+			if item_name == "item_rune_armor" then
+				PickupArmorRune(item, unit)
+				return false
+			end
 		-- If this is not a real hero, drop another rune in place of the picked up one
-		-- else
-		-- 	local new_rune = CreateItem(item_name, nil, nil)
-		-- 	CreateItemOnPositionForLaunch(item:GetAbsOrigin(), new_rune)
-		-- 	return false
-		-- end
---	end
+		else
+			local new_rune = CreateItem(item_name, nil, nil)
+			CreateItemOnPositionForLaunch(item:GetAbsOrigin() + Vector(0, 0, 50), new_rune)
+			return false
+		end
+	end
 
---	for itemSlot = 0, 5 do
---		local item = heroEntity:GetItemInSlot(itemSlot)
---		if item:GetName() == "item_key_of_the_three_moons" then
---			print("Key of the 3 Moons")
---			if item:GetName() == "item_shield_of_invincibility" then
---				print("Shield of Invincibility")
---				if item:GetName() == "item_lightning_sword" then
---					print("Lightning Sword")
---					if item:GetName() == "item_ring_of_superiority" then
---						print("Ring of Superiority")
---						RemoveItem("item_key_of_the_three_moons")
---						RemoveItem("item_shield_of_invincibility")
---						RemoveItem("item_lightning_sword")
---						RemoveItem("item_ring_of_superiority")
---						AddItem("item_doom_artifact")
+	return true
+end
+
+function GameMode:FilterDamage( filterTable )
+	--	for k, v in pairs( filterTable ) do
+		--  print("Damage: " .. k .. " " .. tostring(v) )
+	--	end
+local victim_index = filterTable["entindex_victim_const"]
+local attacker_index = filterTable["entindex_attacker_const"]
+if not victim_index or not attacker_index then
+  return true
+end
+
+local victim = EntIndexToHScript( victim_index )
+local attacker = EntIndexToHScript( attacker_index )
+local damagetype = filterTable["damagetype_const"]
+local damage = attacker:GetAttackDamage()
+local intMultiplierDota = 1+((attacker:GetIntellect()/16)/100)
+local intMultiplierNew = 1+((attacker:GetIntellect()/50)/100)
+
+	if attacker:IsHero() and attacker:GetUnitName() == "npc_dota_hero_nevermore" then
+		if damagetype == DAMAGE_TYPE_PHYSICAL then
+			DealDamage(attacker, victim, damage, DAMAGE_TYPE_PURE, nil)
+			print("Nevermore Damage: "..damage)
+		end
+	end
+	--	if damagetype == DAMAGE_TYPE_MAGICAL or damagetype == DAMAGE_TYPE_PURE then
+	--		filterTable["damage"] = filterTable["damage"]/(1+((attacker:GetIntellect()/16)/100)) -- Disable spell amp
+	--		filterTable["damage"] = (filterTable["damage"]/intMultiplierDota)*intMultiplierNew		-- re-enable
+	--	end
+	return true
+end
+
+--	DAMAGE_TYPES = {
+--	    [0] = "DAMAGE_TYPE_NONE",
+--	    [1] = "DAMAGE_TYPE_PHYSICAL",
+--	    [2] = "DAMAGE_TYPE_MAGICAL",
+--	    [4] = "DAMAGE_TYPE_PURE",
+--	    [7] = "DAMAGE_TYPE_ALL",
+--	    [8] = "DAMAGE_TYPE_HP_REMOVAL",
+--	}
+
+function RefreshPlayers()
+	for nPlayerID = 0, DOTA_MAX_TEAM_PLAYERS -1 do
+		if PlayerResource:GetTeam( nPlayerID ) == DOTA_TEAM_GOODGUYS then
+			if PlayerResource:HasSelectedHero( nPlayerID ) then
+				local hero = PlayerResource:GetSelectedHeroEntity(nPlayerID)
+				if not hero:IsAlive() then
+					hero.ankh_respawn = false
+					hero:SetRespawnsDisabled(false)
+					Timers:RemoveTimer(hero.respawn_timer)
+					hero:RespawnUnit()
+				end
+				hero:SetHealth(hero:GetMaxHealth())
+				hero:SetMana(hero:GetMaxMana())
+			end
+		end
+	end
+end
+
+function GameMode:FilterExecuteOrder( filterTable )
+	--[[
+	print("-----------------------------------------")
+	for k, v in pairs( filterTable ) do
+		print("Order: " .. k .. " " .. tostring(v) )
+	end
+	]]
+
+	local units = filterTable["units"]
+	local order_type = filterTable["order_type"]
+	local issuer = filterTable["issuer_player_id_const"]
+	local abilityIndex = filterTable["entindex_ability"]
+	local targetIndex = filterTable["entindex_target"]
+	local x = tonumber(filterTable["position_x"])
+	local y = tonumber(filterTable["position_y"])
+	local z = tonumber(filterTable["position_z"])
+	local point = Vector(x,y,z)
+	local queue = filterTable["queue"] == 1
+
+	local unit
+	local numUnits = 0
+	local numBuildings = 0
+	if units then
+		-- Skip Prevents order loops
+		unit = EntIndexToHScript(units["0"])
+		if unit then
+			if unit.skip then
+				unit.skip = false
+				return true
+			end
+		end
+
+		for n,unit_index in pairs(units) do
+			local unit = EntIndexToHScript(unit_index)
+			if unit and IsValidEntity(unit) then
+				unit.current_order = order_type -- Track the last executed order
+				unit.orderTable = filterTable -- Keep the whole order table, to resume it later if needed
+--				local bBuilding = IsCustomBuilding(unit) and not IsUprooted(unit)
+--				if bBuilding then
+--					numBuildings = numBuildings + 1
+--				else
+--					numUnits = numUnits + 1
+--				end
+			end
+		end
+	end
+
+	-- Don't need this.
+	if order_type == DOTA_UNIT_ORDER_RADAR or order_type == DOTA_UNIT_ORDER_GLYPH then return end
+
+	-- Deny No-Target Orders requirements
+	if order_type == DOTA_UNIT_ORDER_CAST_NO_TARGET then
+		local ability = EntIndexToHScript(abilityIndex)
+		if not ability then return true end
+		local playerID = unit:GetPlayerOwnerID()
+--		
+--		-- Check health/mana requirements
+--		local manaDeficit = unit:GetMana() ~= unit:GetMaxMana()
+--		local healthDeficit = unit:GetHealthDeficit() > 0
+--		local bNeedsAnyDeficit = ability:GetKeyValue("RequiresAnyDeficit")
+--		local requiresHealthDeficit = ability:GetKeyValue("RequiresHealthDeficit")
+--		local requiresManaDeficit = ability:GetKeyValue("RequiresManaDeficit")
+--
+--		if bNeedsAnyDeficit and not healthDeficit and not manaDeficit then
+--			if unit:GetMaxMana() > 0 then
+--				SendErrorMessage(issuer, "#error_full_mana_health")
+--			else
+--				SendErrorMessage(issuer, "#error_full_health")
+--			end
+--			return false
+--		elseif requiresHealthDeficit and not healthDeficit then
+--			SendErrorMessage(issuer, "#error_full_health")
+--			return false
+--		elseif requiresManaDeficit and not manaDeficit then
+--			SendErrorMessage(issuer, "#error_full_mana")
+--			return false
+--		end
+
+		-- Check corpse requirements
+--		local corpseRadius = ability:GetKeyValue("RequiresCorpsesAround")
+--		if corpseRadius then
+--			local corpseFlag = ability:GetKeyValue("CorpseFlag")
+--			if corpseFlag then
+--				if corpseFlag == "NotMeatWagon" then
+--					if not Corpses:AreAnyOutsideInRadius(playerID, unit:GetAbsOrigin(), corpseRadius) then
+--						SendErrorMessage(issuer, "#error_no_usable_corpses")
+--						return false
 --					end
 --				end
---			end
---		end
---	end
-
-	-------------------------------------------------------------------------------------------------
-	-- Illusions and Clones forbidden items
-	-------------------------------------------------------------------------------------------------
-	
---	if unit:HasModifier("modifier_illusion") then
---
---		-- List of items the clone can't carry
---		local illusion_forbidden_items = {
---			"item_cloak_of_flames",
---			"item_ankh_of_reincarnation",
---			"item_orb_of_fire"
---			}
---
---		-- If this item is forbidden, delete it
---		for _, forbidden_item in pairs(illusion_forbidden_items) do
---			if item_name == forbidden_item then
+--			elseif not Corpses:AreAnyInRadius(playerID, unit:GetAbsOrigin(), corpseRadius) then
+--			if not Corpses:AreAnyInRadius(playerID, unit:GetAbsOrigin(), corpseRadius) then
+--				Notifications:Bottom(playerID, {text="No corpses near!", duration=5.0, style={color="white"}})
 --				return false
 --			end
 --		end
---	end
+--		local alliedCorpseRadius = ability:GetKeyValue("RequiresAlliedCorpsesAround")
+--		if alliedCorpseRadius then
+--			if not Corpses:AreAnyAlliedInRadius(playerID, unit:GetAbsOrigin(), alliedCorpseRadius) then
+--				SendErrorMessage(issuer, "#error_no_usable_friendly_corpses")
+--				return false
+--			end
+--		end
+	end
 
 	return true
 end

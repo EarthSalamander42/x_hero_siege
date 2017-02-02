@@ -1,38 +1,5 @@
 "use strict";
 
-function UpdateTimer()
-{
-	var timerValue = Game.GetDOTATime( false, true );
-	var timerText = "";
-
-	if ( timerValue < 0 )
-	{
-		timerValue = -timerValue;
-	}
-
-	var sec = Math.floor( timerValue % 60 );
-	var min = Math.floor( timerValue / 60 );
-
-//	if ( min > 0 )
-	{
-		timerText += min;
-		timerText += ":";
-
-		if ( sec < 10 )
-		{
-			timerText += "0";
-		}
-	}
-
-	timerText += sec;
-
-	var timePanel = $( "#ScoreboardCurrentTime" );
-	if ( timePanel )
-	{
-		timePanel.text = timerText;
-	}
-}
-
 function UpdateTimerMuradin( data )
 {
 	//$.Msg( "UpdateTimer: ", data );
@@ -59,8 +26,6 @@ function UpdateTimerMuradin( data )
 	timerText += data.timer_second_01;
 
 	$( "#Timer" ).text = timerText;
-
-	UpdateTimer();
 }
 
 function UpdateTimerCreep( data )
@@ -165,7 +130,6 @@ function OnGameStateChanged( table, key, data )
 {
 	$.Msg( "Table '", table, "' changed: '", key, "' = ", data );
 	UpdateKillsToWin();
-	UpdateTimer();
 }
 
 (function()
@@ -179,6 +143,5 @@ function OnGameStateChanged( table, key, data )
 	GameEvents.Subscribe( "creepcountdown", UpdateTimerCreep );
 	GameEvents.Subscribe( "countdown", UpdateTimerMuradin );
 	GameEvents.Subscribe( "show_timer", ShowTimer );
-	//UpdateTimer();
 })();
 

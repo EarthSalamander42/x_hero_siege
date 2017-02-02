@@ -27,5 +27,14 @@
 	<Panel id="VIPTab2">
 	  <Label id="VIPHeader2" text="#VIPHeader2" style="" />
 	</Panel>
+	<Panel id="Community">
+		<Label id="community_description" class="CommunityText" html="true" text="#community_description" />
+		<Button id="CommunityImg" onactivate="DOTADisplayURL('discordapp.com/invite/dNMBSrJ');" >
+			<Image src="file://{images}/custom_game/loading_screen/community_discord_header.png" />
+		</Button>
+		<Button id="CommunityImg2" onactivate="DOTADisplayURL('http://steamcommunity.com/groups/x_hero_siege');" >
+			<Image src="file://{images}/custom_game/loading_screen/community_steam_group_header.png" />
+		</Button>
+	</Panel>
   </Panel>
 </root>

@@ -6,13 +6,13 @@
 	"npc_dota_hero_abyssal_underlord"	"1" 	//Underlord
 	"npc_dota_hero_beastmaster"			"1" 	//Beastmaster
 	"npc_dota_hero_brewmaster"			"1" 	//Pandaren Brewmaster
+	"npc_dota_hero_chen"				"1"		//Archmage
 	"npc_dota_hero_crystal_maiden"		"1"		//Archimage
 	"npc_dota_hero_dragon_knight"		"1" 	//Arthas
 	"npc_dota_hero_elder_titan"			"1"		//Tauren Chieftain
 	"npc_dota_hero_enchantress"			"1"		//Tyrande
 	"npc_dota_hero_invoker"				"1"		//Bloodmage
 	"npc_dota_hero_juggernaut"			"1"		//Blademaster
-	"npc_dota_hero_keeper_of_the_light"	"1"		//Keeper of the Light
 	"npc_dota_hero_lich"				"1"		//Lich
 	"npc_dota_hero_lina"				"1"		//Sorceress
 	"npc_dota_hero_luna"				"1"		//Huntress

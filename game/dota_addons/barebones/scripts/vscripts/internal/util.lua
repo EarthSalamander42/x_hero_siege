@@ -175,39 +175,39 @@ function HasScepter(hero)
 end
 
 function shallowcopy(orig)
-    local orig_type = type(orig)
-    local copy
-    if orig_type == 'table' then
-        copy = {}
-        for orig_key, orig_value in pairs(orig) do
-            copy[orig_key] = orig_value
-        end
-    else -- number, string, boolean, etc
-        copy = orig
-    end
-    return copy
+	local orig_type = type(orig)
+	local copy
+	if orig_type == 'table' then
+		copy = {}
+		for orig_key, orig_value in pairs(orig) do
+			copy[orig_key] = orig_value
+		end
+	else -- number, string, boolean, etc
+		copy = orig
+	end
+	return copy
 end
 
 function ShuffledList( orig_list )
-    local list = shallowcopy( orig_list )
-    local result = {}
-    local count = #list
-    for i = 1, count do
-        local pick = RandomInt( 1, #list )
-        result[ #result + 1 ] = list[ pick ]
-        table.remove( list, pick )
-    end
-    return result
+	local list = shallowcopy( orig_list )
+	local result = {}
+	local count = #list
+	for i = 1, count do
+		local pick = RandomInt( 1, #list )
+		result[ #result + 1 ] = list[ pick ]
+		table.remove( list, pick )
+	end
+	return result
 end
 
 function GenerateNumPointsAround(num, center, distance)
-    local points = {}
-    local angle = 360/num
-    for i=0,num-1 do
-        local rotate_pos = center + Vector(1,0,0) * distance
-        table.insert(points, RotatePosition(center, QAngle(0, angle*i, 0), rotate_pos) )
-    end
-    return points
+	local points = {}
+	local angle = 360/num
+	for i=0,num-1 do
+		local rotate_pos = center + Vector(1,0,0) * distance
+		table.insert(points, RotatePosition(center, QAngle(0, angle*i, 0), rotate_pos) )
+	end
+	return points
 end
 
 function HasEpic1(hero)
@@ -236,4 +236,230 @@ function HasEpic4(hero)
 		return true
 	end
 	return false
+end
+
+function HeroImage(hero)
+	if hero.hero_image then
+		return true
+	end
+	return false
+end
+
+-- IMBA Rune System
+function SpawnRunes()
+local powerup_rune_locations = Entities:FindAllByName("dota_item_rune_spawner_custom")
+local game_time = GameRules:GetDOTATime(false, false)
+
+	-- List of powerup rune types
+	local powerup_rune_types = {
+		"item_rune_armor"
+	}
+
+	for _, rune_loc in pairs(powerup_rune_locations) do
+		local Rune = CreateItemOnPositionForLaunch(rune_loc:GetAbsOrigin() + Vector(0, 0, 50), CreateItem(powerup_rune_types[RandomInt(1, #powerup_rune_types)], nil, nil))
+		Timers:CreateTimer(239.0, function()
+			for _, runes in pairs(Rune) do -- 3:59
+				UTIL_Remove(Rune)
+			end
+		end)
+	end
+end
+
+-- Picks up an Armor rune
+function PickupArmorRune(item, unit)
+
+	item:ApplyDataDrivenModifier(unit, unit, "modifier_rune_armor", {})
+	EmitSoundOnLocationForAllies(unit:GetAbsOrigin(), "Rune.Regen", unit)
+end
+
+if not Corpses then
+	Corpses = class({})
+end
+
+CORPSE_DURATION = 87.0
+CORPSE_APPEAR_DELAY = 3.0
+
+function Corpses:CreateFromUnit(killed)
+	if LeavesCorpse( killed ) then
+		local name = killed:GetUnitName()
+		local position = killed:GetAbsOrigin()
+		local fv = killed:GetForwardVector()
+		local team = killed:GetTeamNumber()
+		local corpse = Corpses:CreateByNameOnPosition(name, position, DOTA_TEAM_GOODGUYS)
+		corpse.playerID = killed:GetPlayerOwnerID()
+		corpse:SetForwardVector(fv)
+		corpse:AddNoDraw()
+		Timers:CreateTimer(CORPSE_APPEAR_DELAY, function()
+			if IsValidEntity(corpse) then
+				UTIL_Remove(killed)
+				corpse:RemoveNoDraw()
+			end
+		end)
+	end
+end
+
+function Corpses:CreateByNameOnPosition(name, position, team)
+	local corpse = CreateUnitByName("dotacraft_corpse", position, false, nil, nil, team)
+	corpse.unit_name = name -- Keep a reference to its name
+
+	-- Remove the corpse from the game at any point
+	function corpse:RemoveCorpse()
+		corpse:StopExpiration()
+		-- Remove the entity
+		UTIL_Remove(corpse)
+	end
+
+	-- Removes the removal timer
+	function corpse:StopExpiration()
+		if corpse.removal_timer then Timers:RemoveTimer(corpse.removal_timer) end
+	end
+
+	-- Remove itself after the corpse duration
+	function corpse:StartExpiration()
+		corpse.corpse_expiration = GameRules:GetGameTime() + CORPSE_DURATION
+
+		corpse.removal_timer = Timers:CreateTimer(CORPSE_DURATION, function()
+			if corpse and IsValidEntity(corpse) and not corpse.meat_wagon then
+				UTIL_Remove(corpse)
+			end
+		end)
+	end
+
+	corpse:StartExpiration()
+	
+	return corpse
+end
+
+function Corpses:AreAnyInRadius(playerID, origin, radius)
+	return self:FindClosestInRadius(playerID, origin, radius) ~= nil
+end
+
+function Corpses:AreAnyAlliedInRadius(playerID, origin, radius)
+	return self:FindAlliedInRadius(playerID, origin, radius)[1] ~= nil
+end
+
+function Corpses:AreAnyOutsideInRadius(playerID, origin, radius)
+	return self:FindInRadiusOutside(playerID, origin, radius)[1] ~= nil
+end
+
+function Corpses:FindClosestInRadius(playerID, origin, radius)
+	return self:FindInRadius(playerID, origin, radius)[1]
+end
+
+function Corpses:FindInRadius(playerID, origin, radius)
+	local targets = FindUnitsInRadius(PlayerResource:GetTeam(playerID), origin, nil, radius, DOTA_UNIT_TARGET_TEAM_BOTH, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_INVULNERABLE + DOTA_UNIT_TARGET_FLAG_OUT_OF_WORLD, FIND_CLOSEST, false)
+	local corpses = {}
+	for _, target in pairs(targets) do
+		if IsCorpse(target) and not target.meat_wagon then -- Ignore meat wagon corpses as first targets
+			table.insert(corpses, target)
+		end
+	end
+	for _,target in pairs(targets) do
+		if IsCorpse(target) and target.meat_wagon and target.meat_wagon:GetPlayerOwnerID() == playerID then -- Check meat wagon ownership
+			table.insert(corpses, target)
+		end
+	end
+	return corpses
+end
+
+-- Only Friendly corpses
+function Corpses:FindAlliedInRadius(playerID, origin, radius)
+	local targets = FindUnitsInRadius(PlayerResource:GetTeam(playerID), origin, nil, radius, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_INVULNERABLE + DOTA_UNIT_TARGET_FLAG_OUT_OF_WORLD, FIND_CLOSEST, false)
+	local corpses = {}
+	local teamNumber = PlayerResource:GetTeam(playerID)
+	for _,target in pairs(targets) do
+--		if IsCorpse(target) and not target.meat_wagon then -- Ignore meat wagon corpses
+		if IsCorpse(target) then
+			table.insert(corpses, target)
+		end
+	end
+	return corpses
+end
+
+-- Only corpses outside meat wagon
+function Corpses:FindInRadiusOutside(playerID, origin, radius)
+	local targets = FindUnitsInRadius(PlayerResource:GetTeam(playerID), origin, nil, radius, DOTA_UNIT_TARGET_TEAM_BOTH, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_INVULNERABLE + DOTA_UNIT_TARGET_FLAG_OUT_OF_WORLD, FIND_CLOSEST, false)
+	local corpses = {}
+	for _,target in pairs(targets) do
+		if IsCorpse(target) and not target.meat_wagon then -- Ignore meat wagon corpses
+			table.insert(corpses, target)
+		end
+	end
+	return corpses
+end
+
+function CDOTA_BaseNPC:SetNoCorpse()
+	self.no_corpse = true
+end
+
+function SetNoCorpse(event)
+	event.target:SetNoCorpse()
+end
+
+-- Needs a corpse_expiration and not being eaten by cannibalize
+function IsCorpse(unit)
+	return unit.corpse_expiration and not unit.being_eaten
+end
+
+-- Custom Corpse Mechanic
+function LeavesCorpse(unit)
+	
+	if not unit or not IsValidEntity(unit) then
+		return false
+
+	-- Heroes don't leave corpses (includes illusions)
+	elseif unit:IsHero() then
+		return false
+
+	-- Ignore buildings 
+	elseif unit.GetInvulnCount ~= nil then
+		return false
+
+	-- Ignore units that start with dummy keyword   
+	elseif unit:IsDummy() then
+		return false
+
+	-- Ignore units that were specifically set to leave no corpse
+--	elseif unit.no_corpse then
+--		return false
+
+	-- Air units
+--	elseif unit:GetKeyValue("MovementCapabilities") == "DOTA_UNIT_CAP_MOVE_FLY" then
+--		return false
+
+	-- Summoned units via permanent modifier
+	elseif unit:IsSummoned() then
+		return false
+
+	-- Read the LeavesCorpse KV
+	else
+		local leavesCorpse = unit:GetKeyValue("LeavesCorpse")
+		if leavesCorpse and leavesCorpse == 0 then
+			return false
+		else
+			-- Leave corpse     
+			return true
+		end
+	end
+end
+
+-- Overrides dota method, use modifier_summoned MODIFIER_STATE_DOMINATED
+function CDOTA_BaseNPC:IsSummoned()
+    return self:IsDominated()
+end
+
+function CDOTA_BaseNPC:IsDummy()
+    return self:GetUnitName():match("dummy_") or self:GetUnitLabel():match("dummy")
+end
+
+function SendErrorMessage(playerID, string)
+   CustomGameEventManager:Send_ServerToPlayer(PlayerResource:GetPlayer(playerID), "dotacraft_error_message", {message=string}) 
+end
+
+-- Similar to SendErrorMessage to the bottom, except it checks whether the source of error is currently selected unit/hero.
+function SendErrorMessageForSelectedUnit(playerID, string, unit)
+	local selected = PlayerResource:GetSelectedEntities(playerID)
+	if selected and selected["0"] == unit:GetEntityIndex() then
+		CustomGameEventManager:Send_ServerToPlayer(PlayerResource:GetPlayer(playerID), "dotacraft_error_message", {message=string})
+	end
 end
