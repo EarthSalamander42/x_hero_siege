@@ -1,4 +1,4 @@
-function EquipClaws( keys )
+function EquipClaws(keys)
 local caster = keys.caster
 local ability = keys.ability
 local BAT = caster:GetBaseAttackTime()
@@ -7,7 +7,7 @@ local BAT_Dec = ability:GetLevelSpecialValueFor("bat_reduction", ability:GetLeve
 	caster:SetBaseAttackTime( BAT - BAT_Dec )
 end
 
-function UnequipClaws( keys )
+function UnequipClaws(keys)
 local caster = keys.caster
 local ability = keys.ability
 local BAT = caster:GetBaseAttackTime()

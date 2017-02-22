@@ -1,0 +1,68 @@
+"addon"
+{
+	"InstructionsTitle"							"X Hero Siege"
+	"InstructionsObjective"						"ЗАДАНИЕ:"
+	"InstructionsObjectiveText"					"Защищайте свою крепость от волн зла! Да, старый добрый X Hero Siege возвращаеться для вас!"
+	"InstructionsHowToPlay"						"КАК ИГРАТЬ"
+//	"InstructionsLines"							"- Защищайте свою крепость от идущих на нее врагов по линиям (желательно по 1 человеку на линию).<br>
+//												- Разруште вражеские башни, чтобы выпустить кровожадных боссов, а затем уничтожте вражеский барак, чтобы остановить появление сил зла!<br>
+//												- После того как каждый барак юудет разрушен, откроються новые вражеские линии сверху. Разруште ледяные башни, чтобы остановить их навалу.<br>
+//												- Возвращайтесь к  крепости, чтобы сдержыть последнюю Финальную волну!<br>
+//												- Не беспокойтесь, после финальной волны ваша крепость в безопасности. Идите уничтожать предводителей зла!<br>"
+
+	"DOTA_GoodGuys"   							"Силы Ввета"
+	"DOTA_BadGuys"    							"Силы Тьмы"
+
+	"Remaining"									"REMAINING"
+	"Goal"										"Special Events:"
+	"CreepGoal"									"Creep Levels:"
+	"IncomingWaveGoal"							"Incoming Waves:"
+	"SpecialEventsGoal"							"Boss Events:"
+
+	"addonname"									"X Hero Siege"
+	"overthrow_game_info_header_objective"		"ЗАДАНИЕ:"
+	"overthrow_brief_description"				"Победите Силы Тьмы! И уничтожте их предвадителся Arthas!"
+	"overthrow_game_info_header_how_to_play"	"КАК ИГРАТЬ:"
+	"overthrow_game_info_throne"				"Защищайте свою крепость от идущих на нее врагов по линиям (желательно по 1 человеку на линию)."
+	"overthrow_game_info_coins"					"Разруште вражеские башни, чтобы выпустить кровожадных боссов, а затем уничтожте вражеский барак, чтобы остановить появление сил зла!"
+	"overthrow_game_info_items"					"После того как каждый барак юудет разрушен, откроються новые вражеские линии сверху. Разруште ледяные башни, чтобы остановить их навалу."
+	"overthrow_game_info_tips_header"			"Советы:"
+	"overthrow_game_info_tip01"					"Не спешите разрушать башни! Фармите и будьте терпеливы!"
+	"overthrow_game_info_tip02"					"Помните, что игра командная, и если один из ваших спутников не справляеться, то помогите ему книгами или артефактами."
+	"overthrow_game_info_tip03"					"Команды чата:"
+	"overthrow_game_info_tip04"					"-openway_(1 to 8): Открывает линию согласно номеру. -closeway_(1 to 8): Закрывает линию согласно номеру. -openway_all: Открывает все линии -closeway_all: Закрывает все линии. -credits: Показывает создателей карты. -difficulty: Показывает сложность игры. -bt: Покупает книги атрибутов, находясь в дали от магазина, нужно имееть 10000 золота как минимум!"
+
+	"AddonTitleDifficulty"						"Уровень сложности:"
+	"AddonDifficultyEasy"						"Easy: 150% Золота, 125% Опыта, 75% Урона."
+	"AddonDifficultyNormal"						"Normal: 110% Золота, 100% Опыта, 100% Урона."
+	"AddonDifficultyHard"						"Hard: 100% Золота, 90% Опыта, 125% Урона."
+	"AddonDifficultyExtreme"					"Extreme: 100% Золота, 75% Опыта, 150% Урона."
+	"VIPTab"									"VIP Колонка:"
+	"VIPHeader"									"Получить доступ сейчас, чтобы разблокировать:\n - Kobold Knight,\n - Centurion,\n - Lich King,\n - Stone Giant,\n - Dark Fundamental! \n\nПожертвуйте на Patreon чтобы быть VIP (ссылка в описании мода) \nБольше VIP Героев очень скоро!"
+	"VIPHeader2"								""
+	"community_header"							"Заходи в чат Discord!"
+	"community_description"						"Присоединяйся к чату в Discord, чтобы делиться впечетлениями от мода с другими игроками! И присоединяйся к группе Steam, чтобы сообщать об ошибках и багах и принимать участие в мероприятиях!"
+
+	// Admin Mod
+	"credits_command"							"Mod Created by [Bear] Cookies #42"
+	"admin_mod_description"						"Права Администратора"
+	"admin_command"								"Команды Администратора:"
+	"freeze_command"							"Заключение"
+	"unfreeze_command"							"Освобождение"
+	"poison_command"							"Отравление"
+	"purge_command"								"Очищение"
+	"kill_command"								"Убить"
+	"revive_command"							"Оживить"
+	"command"									"Команды:"
+	"host_command"								"Открыть или закрыть линии:"
+	"tome_command"								"Купить книги: -bt"
+	"unstuck_command"							""
+	"toggle_lane_command1"						"-ow1        -cw1"
+	"toggle_lane_command2"						"-ow2        -cw2"
+	"toggle_lane_command3"						"-ow3        -cw3"
+	"toggle_lane_command4"						"-ow4        -cw4"
+	"toggle_lane_command5"						"-ow5        -cw5"
+	"toggle_lane_command6"						"-ow6        -cw6"
+	"toggle_lane_command7"						"-ow7        -cw7"
+	"toggle_lane_command8"						"-ow8        -cw8"
+}

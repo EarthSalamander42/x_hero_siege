@@ -16,19 +16,20 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 
 	if first_time_teleport then
 		RefreshPlayers()
+--		MagtheridonHealtHBar()
 		if difficulty == 1 then
 			magtheridon = CreateUnitByName("npc_dota_hero_magtheridon", point_mag  ,true, nil, nil, DOTA_TEAM_BADGUYS)
 			magtheridon:SetAngles(0, 180, 0)
 		elseif difficulty == 2 then
 			magtheridon = CreateUnitByName("npc_dota_hero_magtheridon", point_mag  ,true, nil, nil, DOTA_TEAM_BADGUYS)
 			magtheridon:SetAngles(0, 180, 0)
-			ankh:SetCurrentCharges(1)
 			magtheridon:AddItem(ankh)
+			ankh:SetCurrentCharges(1)
 		elseif difficulty == 3 then
 			magtheridon = CreateUnitByName("npc_dota_hero_magtheridon", point_mag  ,true, nil, nil, DOTA_TEAM_BADGUYS)
 			magtheridon:SetAngles(0, 180, 0)
-			ankh:SetCurrentCharges(3)
 			magtheridon:AddItem(ankh)
+			ankh:SetCurrentCharges(3)
 		elseif difficulty == 4 then
 			magtheridon = CreateUnitByName("npc_dota_hero_magtheridon", point_mag  ,true, nil, nil, DOTA_TEAM_BADGUYS)
 			magtheridon2 = CreateUnitByName("npc_dota_hero_magtheridon", point_mag2  ,true, nil, nil, DOTA_TEAM_BADGUYS)
@@ -119,6 +120,14 @@ local stats = 250
 				end)
 			end
 		end
+
+		Timers:CreateTimer(10, function()
+			local DoorObs = Entities:FindAllByName("obstruction_grom")
+			for _, obs in pairs(DoorObs) do
+				obs:SetEnabled(false, true)
+			end
+			DoEntFire("door_grom", "SetAnimation", "gate_entrance002_open", 0, nil, nil)
+		end)
 	end
 end
 

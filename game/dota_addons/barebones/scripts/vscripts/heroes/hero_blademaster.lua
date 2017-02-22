@@ -33,6 +33,8 @@ function MirrorImage( event )
 	for i = 1, images_count do
 		-- handle_UnitOwner needs to be nil, else it will crash the game.
 		local illusion = CreateUnitByName(unit_name, positions[i+1], true, caster, nil, caster:GetTeamNumber())
+		illusion:SetHealth(caster:GetHealth())
+		illusion:SetMana(caster:GetMana())
 		illusion:SetPlayerID(caster:GetPlayerID())
 		illusion:SetControllableByPlayer(player, true)
 		illusion:Stop()
@@ -44,23 +46,35 @@ function MirrorImage( event )
 			illusion:HeroLevelUp(false)
 		end
 
+		illusion:SetBaseStrength(caster:GetBaseStrength())
+		illusion:SetBaseIntellect(caster:GetBaseIntellect())
+		illusion:SetBaseAgility(caster:GetBaseAgility())
+
 		-- Set the skill points to 0 and learn the skills of the caster
 		illusion:SetAbilityPoints(0)
 		for abilitySlot = 0, 15 do
 			local ability = caster:GetAbilityByIndex(abilitySlot)
+			if ability ~= nil then
+				local abilityLevel = ability:GetLevel()
+				local abilityName = ability:GetAbilityName()
+				local illusionAbility = illusion:FindAbilityByName(abilityName)
+				if IsValidEntity(illusionAbility) then
+					illusionAbility:SetLevel(abilityLevel)
+				end
+			end
 		end
 
 		-- Recreate the items of the caster
 		for itemSlot = 0, 5 do
 			local item = caster:GetItemInSlot(itemSlot)
-			if item ~= nil and item:GetName() ~= "item_orb_of_fire" and item:GetName() ~= "item_cloak_of_flames" then
+			if item ~= nil and item:GetName() ~= "item_orb_of_fire" and item:GetName() ~= "item_orb_of_fire2" and item:GetName() ~= "item_searing_blade" and item:GetName() ~= "item_cloak_of_flames" then
 				local itemName = item:GetName()
 				local newItem = CreateItem(itemName, illusion, illusion)
 				illusion:AddItem(newItem)
 			end
 		end
 
-		illusion:AddNewModifier(caster, ability, "modifier_illusion", { duration = duration, outgoing_damage = outgoingDamage, incoming_damage = incomingDamage })
+		illusion:AddNewModifier(caster, ability, "modifier_illusion", {duration = duration, outgoing_damage = outgoingDamage, incoming_damage = incomingDamage})
 		illusion:MakeIllusion()
 		table.insert(caster.illusions, illusion)
 	end

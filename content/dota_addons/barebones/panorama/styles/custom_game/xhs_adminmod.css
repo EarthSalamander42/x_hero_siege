@@ -1,9 +1,9 @@
 .ToggleAdminMod
 {
-	width: 225px;
-	height: 60px;
-	margin-top: 780px;
-	margin-left: 20px;
+	width: 250px;
+	height: 90px;
+	margin-top: 745px;
+	margin-left: 0px;
 	horizontal-align: left;
 	background-color: none;
 }
@@ -12,7 +12,7 @@
 .AdminModBorder
 {
 	width: 468px;
-	height: 328px;
+	height: 318px;
 	margin-top: 470px;
 	margin-left: 20px;
 	background-color: grey;
@@ -59,7 +59,7 @@
 	width: 200px;
 	height: 250px;
 	margin-left: 4px;
-	margin-top: -10px;
+	margin-top: -15px;
 	border-radius: 4px;
 	background-color: gradient( linear, 100% 0%, 100% 100%, from( #111111 ), color-stop( 0.01, #202327 ), color-stop( 0.2, #141619ff ), to( #000000dd ) );
 	box-shadow: black -2px -2px 4px 4px;

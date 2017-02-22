@@ -14,7 +14,7 @@ _G.PlayerNumberRadiant = 0
 _G.PlayerNumberDire = 0
 _G.sword_first_time = true
 _G.ring_first_time = true
-_G.X_HERO_SIEGE_V = 3.35
+_G.X_HERO_SIEGE_V = 3.37
 
 _G.mod_creator = {
 		54896080,	-- Cookies
@@ -33,12 +33,14 @@ _G.mod_graphist = {
 	}
 
 _G.vip_members = {
-		320774890,	-- Error [Han Gao on Patreon, Remove Date if not paid: 26/01/2017]
-		97490223,	-- IllidanStormrage [Lucas Diao on Patreon, Removed Date if not paid: 29/01/2017]
-		44364795,	-- Lyzer93 [Balraj McCoy on Patreon, Removed Date if not paid: 10/02/2017]
-		46744186,	-- Captain Darian Frey [CaptainDarianFrey on Patreon, Removed Date if not paid: 10/02/2017]
-		3180772,	-- Yoshi [Fabian Rothmund on Patreon, Removed Date if not paid: 15/02/2017]
-		54935523	-- The Patriarchy [Kevin Moore on Patreon, Removed Date if not paid: 17/02/2017]
+		320774890,	-- Error [Han Gao on Patreon, February Paid]
+		97490223,	-- IllidanStormrage [Lucas Diao on Patreon, February Paid]
+		44364795,	-- Lyzer93 [Balraj McCoy on Patreon, February Paid]
+		46744186,	-- Captain Darian Frey [CaptainDarianFrey on Patreon, February Paid]
+		54935523,	-- The Patriarchy [Kevin Moore on Patreon, February Paid]
+		3180772,	-- Yoshi [Fabian Rothmund on Patreon, February Paid]
+		61166985,	-- SpaceGauges [Nicholas Karlberg on Patreon, February Paid]
+		100304532	-- DoniLouMeI [Kyle Leong on Patreon, February Paid]
 	}
 
 _G.golden_vip_members = {
@@ -48,19 +50,14 @@ _G.golden_vip_members = {
 		86718505,	-- Noya [Unlimited]
 		62993541,	-- KennyCrazy [Unlimited]
 		117327434,	-- Eren [Unlimited]
-		146805680,	-- [UTAC] Rekail [Gatiipz Gatiipz on Patreon, Remove Date if not paid: 01/01/2017]
-		110786327,	-- MechJesus [Mauro Solares on Patreon, Remove Date if not paid: 07/01/2017]
-		93860661,	-- Meteor [Supawit Enyord on Patreon, Remove Date if not paid: 10/01/2017]
-		97629656,	-- jacobkahnji  [Jacob A Yow on Patreon, Remove Date if not paid: 23/01/2017]
-		136258650,	-- Meliodas [Dinh Quang on Patreon, Remove Date if not paid: 25/01/2017]
-		55770641,	-- Primeape [Filip Dingum on Patreon, Remove Date if not paid: 31/01/2017]
-		5194446,	-- Botd [Hugo Marques on Patreon, Remove Date if not paid: 31/01/2017]
-		27954291,	-- Gengar [Christian Oversand Deildok on Patreon, Remove Date if not paid: 04/01/2017]
-		80192910,	-- Cheshire [Nathan Perscott on Patreon, Removed Date if not paid: 29/01/2017]
-		28261641,	-- Timoznn [Timo Nurnberg on Patreon, Unlimited]
-		79258147,	-- Dyuss [Altynbek Duisenkul on Patreon, Removed Date if not paid: 10/02/2017]
-		66147815,	-- FreshKiller23 [Unlimited]
-		33042578	-- ryusajin [Unlimited]
+		146805680,	-- [UTAC] Rekail [Gatiipz Gatiipz on Patreon, Unlimited]
+		33042578,	-- ryusajin [Unlimited]
+		110786327,	-- MechJesus [Mauro Solares on Patreon, Unlimited]
+--		66147815,	-- FreshKiller23 [NOT PAID, Unlimited]
+		93860661,	-- Meteor [Supawit Enyord on Patreon, Unlimited]
+		136258650,	-- Meliodas [Dinh Quang on Patreon, Unlimited]
+		55770641,	-- Primeape [Filip Dingum on Patreon, Unlimited]
+		80192910	-- Cheshire [Nathan Perscott on Patreon, February Paid, 1 month left for Unlimited]
 	}
 
 _G.banned_players = {
@@ -74,7 +71,7 @@ PLAYER_COLORS[2] = { 0, 255, 255 } --Cyan
 PLAYER_COLORS[3] = { 100, 0, 100 } --Purple
 PLAYER_COLORS[4] = { 255, 255, 0 } --Yellow
 PLAYER_COLORS[5] = { 255, 150, 0 } --Orange
-PLAYER_COLORS[6] = { 50, 255, 50 } --Green
+PLAYER_COLORS[6] = { 0, 125, 0 } --Green (Dark)
 PLAYER_COLORS[7] = { 255, 100, 255 } --Pink
 
 CREEP_LANES = {}	-- Stores individual creep lanes
@@ -125,7 +122,7 @@ HEROLIST[24] = "ursa"				-- Malfurion
 HEROLIST[25] = "nevermore"			-- Banehallow
 HEROLIST[26] = "brewmaster"			-- Pandaren Brewmaster
 HEROLIST[27] = "warlock"			-- Archimonde
-HEROLIST[28] = "monkey_king"		-- Dota 2 Hero [Axe, Monkey King]
+HEROLIST[28] = "doom_bringer"		-- Dota 2 Hero [Axe, Monkey King, Troll Warlord, Doom]
 
 HEROLIST_ALT = {}
 HEROLIST_ALT[1] = enchantress		-- Dryad
@@ -155,7 +152,7 @@ HEROLIST_ALT[24] = ursa				-- Malfurion
 HEROLIST_ALT[25] = nevermore		-- Banehallow
 HEROLIST_ALT[26] = brewmaster		-- Pandaren Brewmaster
 HEROLIST_ALT[27] = warlock			-- Archimonde
-HEROLIST_ALT[28] = monkey_king		-- Dota 2 Hero [Axe, Monkey King]
+HEROLIST_ALT[28] = doom_bringer		-- Dota 2 Hero [Axe, Monkey King, Troll Warlord, Doom]
 
 HEROLIST_VIP = {}
 HEROLIST_VIP[1] = "slardar"				-- Centurion
@@ -174,6 +171,18 @@ HEROLIST_VIP_ALT[4] = chaos_knight		-- Dark Fundamental
 HEROLIST_VIP_ALT[5] = tiny				-- Stone Giant
 HEROLIST_VIP_ALT[6] = sand_king			-- Desert Wyrm
 HEROLIST_VIP_ALT[7] = necrolyte			-- Dark Summoner
+
+_G.FarmEvent_Creeps = {
+	"npc_dota_creature_murloc",
+	"npc_dota_creature_wildkin",
+	"npc_dota_creature_golem",
+	"npc_dota_creature_polar_furbolg",
+	"npc_dota_creature_centaur",
+	"npc_dota_creature_razormane",
+	"npc_dota_creature_revenant",
+	"npc_dota_creature_tuskarr",
+	"npc_dota_creature_satyrr"
+	}
 
 timers = {}
 
@@ -231,31 +240,6 @@ time_elapsed = 0
 		end
 	end
 
-	if PlayerResource:GetPlayerCount() >= 1 then
-		CREEP_LANES[1] = 1
-	end
-	if PlayerResource:GetPlayerCount() >= 2 then
-		CREEP_LANES[2] = 1
-	end
-	if PlayerResource:GetPlayerCount() >= 3 then
-		CREEP_LANES[3] = 1
-	end
-	if PlayerResource:GetPlayerCount() >= 4 then
-		CREEP_LANES[4] = 1
-	end
-	if PlayerResource:GetPlayerCount() >= 5 then
-		CREEP_LANES[5] = 1
-	end
-	if PlayerResource:GetPlayerCount() >= 6 then
-		CREEP_LANES[6] = 1
-	end
-	if PlayerResource:GetPlayerCount() >= 7 then
-		CREEP_LANES[7] = 1
-	end
-	if PlayerResource:GetPlayerCount() >= 8 then
-		CREEP_LANES[8] = 1
-	end
-
 	Timers:CreateTimer(3.0, function()
 		EmitGlobalSound("Global.InGame")
 	end)
@@ -278,11 +262,45 @@ local triggers_hero_image = Entities:FindAllByName("trigger_special_event_hero_i
 local triggers_spirit_beast = Entities:FindAllByName("trigger_special_event_spirit_beast")
 local triggers_frost_infernal = Entities:FindAllByName("trigger_special_event_frost_infernal")
 
+	-- Make towers invulnerable again
+	for Players = 1, 8 do
+		local towers = Entities:FindAllByName("dota_badguys_tower"..Players)
+		for _, tower in pairs(towers) do
+			tower:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
+		end
+		local raxes = Entities:FindAllByName("dota_badguys_barracks_"..Players)
+		for _, rax in pairs(raxes) do
+			rax:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
+		end
+	end
+
+	-- Make towers vulnerable depending player numbers
+	local Count = PlayerResource:GetPlayerCount()
+	for NumPlayers = 1, Count do
+		CREEP_LANES[NumPlayers] = 1
+		local DoorObs = Entities:FindAllByName("obstruction_lane"..NumPlayers)
+		for _, obs in pairs(DoorObs) do
+			obs:SetEnabled(false, true)
+		end
+		DoEntFire("door_lane"..NumPlayers, "SetAnimation", "gate_entrance002_open", 0, nil, nil)
+		local towers = Entities:FindAllByName("dota_badguys_tower"..NumPlayers)
+		for _, tower in pairs(towers) do
+			tower:RemoveModifierByName("modifier_invulnerable")
+		end
+		local raxes = Entities:FindAllByName("dota_badguys_barracks_"..NumPlayers)
+		for _, rax in pairs(raxes) do
+			rax:RemoveModifierByName("modifier_invulnerable")
+		end
+	end
+
 	-- Timer: Creep Levels 1 to 6. Lanes 1 to 8.
 	Timers:CreateTimer(0, function()
---		print(time_elapsed)
-		time_elapsed = time_elapsed + 30
-		SpawnCreeps()
+		if SPECIAL_EVENT == 0 then
+			time_elapsed = time_elapsed + 30
+			SpawnCreeps()
+		return 30
+		elseif SPECIAL_EVENT == 1 then
+		end
 	return 30
 	end)
 
@@ -452,18 +470,20 @@ local triggers_frost_infernal = Entities:FindAllByName("trigger_special_event_fr
 	end)
 
 	Timers:CreateTimer(716, function() -- 716 - 11:55 Min: MURADIN BRONZEBEARD EVENT 1
+		RefreshPlayers()
 		PauseCreepsMuradin()
 		PauseHeroes()
-		RefreshPlayers()
+		SPECIAL_EVENT = 1
 		Timers:CreateTimer(5, function()
 			MuradinEvent()
 			Timers:CreateTimer(3, RestartHeroes())
 		end)
 	end)
 	Timers:CreateTimer(1436, function() -- 1436 - 23:55 Min: FARM EVENT 2
+		RefreshPlayers()
 		PauseCreepsFarm()
 		PauseHeroes()
-		RefreshPlayers()
+		SPECIAL_EVENT = 1
 		Timers:CreateTimer(5, function()
 			FarmEvent()
 			Timers:CreateTimer(3, RestartHeroes())
@@ -637,7 +657,7 @@ function GameMode:InitGameMode()
 	mode:SetBuybackEnabled(false)
 	mode:SetBotThinkingEnabled(false)
 	mode:SetTowerBackdoorProtectionEnabled(false)
-	mode:SetFogOfWarDisabled(false) --FUCK YOU VOLVO
+	mode:SetFogOfWarDisabled(false)
 	mode:SetGoldSoundDisabled(false)
 	mode:SetRemoveIllusionsOnDeath(false)
 	mode:SetAlwaysShowPlayerInventory(false)
@@ -664,7 +684,7 @@ function GameMode:InitGameMode()
 	GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_GOODGUYS, 8)
 	GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_BADGUYS, 0)
 	GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_CUSTOM_1, 0)
-	mode:SetCustomGameForceHero( "npc_dota_hero_wisp" )
+	mode:SetCustomGameForceHero("npc_dota_hero_wisp")
 	mode:SetFixedRespawnTime(40)
 
 	-- Lua Modifiers
@@ -677,7 +697,8 @@ function GameMode:InitGameMode()
 
 	self.countdownEnabled = false
 
-	Convars:RegisterCommand( "test_spirit_master", function() return StartSpiritMasterArena() end, "Test Spirit Master Arena", FCVAR_CHEAT )
+	Convars:RegisterCommand( "test_magtheridon", function(keys) return StartMagtheridonArena() end, "Test Magtheridon Arena", FCVAR_CHEAT )
+--	Convars:RegisterCommand( "test_spirit_master", function() return StartSpiritMasterArena() end, "Test Spirit Master Arena", FCVAR_CHEAT )
 	mode:SetExecuteOrderFilter( Dynamic_Wrap( GameMode, "FilterExecuteOrder" ), self )
 end				
 
@@ -916,6 +937,20 @@ local key = "item_key_of_the_three_moons"
 local shield = "item_shield_of_invincibility"
 local sword = "item_lightning_sword"
 local ring = "item_ring_of_superiority"
+local doom = "item_doom_artifact"
+local Orbs = {
+	"item_orb_of_fire",
+	"item_orb_of_fire2",
+	"item_searing_blade",
+	"item_orb_of_darkness",
+	"item_orb_of_darkness2",
+	"item_bracer_of_the_void",
+	"item_orb_of_lightning",
+	"item_orb_of_lightning2",
+	"item_celestial_claws",
+	"item_orb_of_earth",
+	"item_orb_of_frost"
+	}
 
 if item:GetName() then
 	item_name = item:GetName()
@@ -941,65 +976,42 @@ end
 
 		if item_name == key then
 			hero.has_epic_1 = true
+			hero:EmitSound("Hero_TemplarAssassin.Trap")
 		end
 
 		if item_name == shield then
 			hero.has_epic_2 = true
+			hero:EmitSound("Hero_TemplarAssassin.Trap")
 		end
 
 		if item_name == sword then
 			hero.has_epic_3 = true
+			hero:EmitSound("Hero_TemplarAssassin.Trap")
 		end
 
 		if item_name == ring then
 			hero.has_epic_4 = true
+			hero:EmitSound("Hero_TemplarAssassin.Trap")
 		end
 
-		if hero.has_epic_1 and hero.has_epic_2 and hero.has_epic_3 and hero.has_epic_4 then
+		if item_name == doom then
+			hero.has_epic_5 = true
+			hero:EmitSound("Hero_TemplarAssassin.Trap")
 			local line_duration = 10
 			Notifications:BottomToAll({hero = hero:GetName(), duration = line_duration})
 --			Notifications:BottomToAll({text = hero:GetUnitName().." ", duration = line_duration, continue = true})
 			Notifications:BottomToAll({text = PlayerResource:GetPlayerName(hero:GetPlayerID()).." ", duration = line_duration, continue = true})
-			Notifications:BottomToAll({text = "merged the 4 Epic items to create Doom Artifact!", duration = line_duration, style = {color = "Red"}, continue = true})
+			Notifications:BottomToAll({text = "merged the 4 Boss items to create Doom Artifact!", duration = line_duration, style = {color = "Red"}, continue = true})
+		end
 
-			for itemSlot = 0, 5 do
-				Timers:CreateTimer(0.1, function()
-					local Item = hero:GetItemInSlot( itemSlot )
-					if not Item:IsNull() and Item:GetName() == key then
-						hero:EmitSound("Hero_TemplarAssassin.Trap")
-						hero:RemoveItem(Item)
-						hero.has_epic_1 = false
-					end
-				end)
-				Timers:CreateTimer(0.5, function()
-					local Item = hero:GetItemInSlot( itemSlot )
-					if not Item:IsNull() and Item:GetName() == shield then
-						hero:EmitSound("Hero_TemplarAssassin.Trap")
-						hero:RemoveItem(Item)
-						hero.has_epic_2 = false
-					end
-				end)
-				Timers:CreateTimer(0.9, function()
-					local Item = hero:GetItemInSlot( itemSlot )
-					if not Item:IsNull() and Item:GetName() == ring then
-						hero:EmitSound("Hero_TemplarAssassin.Trap")
-						hero:RemoveItem(Item)
-						hero.has_epic_3 = false
-					end
-				end)
-				Timers:CreateTimer(1.3, function()
-					local Item = hero:GetItemInSlot( itemSlot )
-					if not Item:IsNull() and Item:GetName() == sword then
-						hero:EmitSound("Hero_TemplarAssassin.Trap")
-						hero:RemoveItem(Item)
-						hero.has_epic_4 = false
-					end
-				end)
+		for i = 1, #Orbs do
+			if item_name == Orbs[i] then
+				hero:RemoveModifierByName("modifier_orb_of_fire")
+				hero:RemoveModifierByName("modifier_orb_of_lightning")
+				hero:RemoveModifierByName("modifier_orb_of_earth")
+				hero:RemoveModifierByName("modifier_orb_of_frost")
+				hero:RemoveModifierByName("modifier_orb_of_darkness")
 			end
-
-			Timers:CreateTimer(1.3, function()
-				hero:AddItemByName("item_doom_artifact")
-			end)
 		end
 	end
 
@@ -1022,7 +1034,6 @@ end
 			return false
 		end
 	end
-
 	return true
 end
 
@@ -1033,7 +1044,7 @@ function GameMode:FilterDamage( filterTable )
 local victim_index = filterTable["entindex_victim_const"]
 local attacker_index = filterTable["entindex_attacker_const"]
 if not victim_index or not attacker_index then
-  return true
+	return true
 end
 
 local victim = EntIndexToHScript( victim_index )
@@ -1043,16 +1054,17 @@ local damage = attacker:GetAttackDamage()
 local intMultiplierDota = 1+((attacker:GetIntellect()/16)/100)
 local intMultiplierNew = 1+((attacker:GetIntellect()/50)/100)
 
-	if attacker:IsHero() and attacker:GetUnitName() == "npc_dota_hero_nevermore" then
-		if damagetype == DAMAGE_TYPE_PHYSICAL then
-			DealDamage(attacker, victim, damage, DAMAGE_TYPE_PURE, nil)
-			print("Nevermore Damage: "..damage)
-		end
-	end
-	--	if damagetype == DAMAGE_TYPE_MAGICAL or damagetype == DAMAGE_TYPE_PURE then
-	--		filterTable["damage"] = filterTable["damage"]/(1+((attacker:GetIntellect()/16)/100)) -- Disable spell amp
-	--		filterTable["damage"] = (filterTable["damage"]/intMultiplierDota)*intMultiplierNew		-- re-enable
-	--	end
+--	if attacker:IsHero() and attacker:GetUnitName() == "npc_dota_hero_nevermore" then
+--		if damagetype == DAMAGE_TYPE_PHYSICAL then
+--			DealDamage(attacker, victim, damage, DAMAGE_TYPE_PURE, nil)
+--			print("Nevermore Damage: "..damage)
+--		end
+--	end
+
+--	if damagetype == DAMAGE_TYPE_MAGICAL or damagetype == DAMAGE_TYPE_PURE then
+--		filterTable["damage"] = filterTable["damage"]/(1+((attacker:GetIntellect()/16)/100))	-- Disable spell amp
+--		filterTable["damage"] = (filterTable["damage"]/intMultiplierDota)*intMultiplierNew		-- re-enable
+--	end
 	return true
 end
 
@@ -1072,9 +1084,12 @@ function RefreshPlayers()
 				local hero = PlayerResource:GetSelectedHeroEntity(nPlayerID)
 				if not hero:IsAlive() then
 					hero.ankh_respawn = false
-					hero:SetRespawnsDisabled(false)
-					Timers:RemoveTimer(hero.respawn_timer)
+					hero:SetRespawnsDisabled(true)
+					hero:SetFixedRespawnTime(0)
+--					Timers:RemoveTimer(hero.respawn_timer)
 					hero:RespawnUnit()
+					hero:SetRespawnsDisabled(false)
+					hero:SetFixedRespawnTime(40)
 				end
 				hero:SetHealth(hero:GetMaxHealth())
 				hero:SetMana(hero:GetMaxMana())
@@ -1189,3 +1204,12 @@ function GameMode:FilterExecuteOrder( filterTable )
 
 	return true
 end
+
+--	function MagtheridonHealtHBar()
+--		local netTable = {}
+--	
+--		netTable["invoker_hp"] = 0;
+--		netTable["invoker_hp"] = magtheridon:GetHealthPercent()
+--	
+--		CustomNetTables:SetTableValue( "round_data", string.format( "%d", 0 ), netTable )
+--	end

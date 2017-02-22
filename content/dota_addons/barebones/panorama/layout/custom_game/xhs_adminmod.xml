@@ -7,7 +7,6 @@
 		<include src="file://{resources}/scripts/custom_game/xhs_adminmod.js" />
 	</scripts>
 	<!-- ADMIN MOD, STILL IN DEV -->
-	<!--
 	<Panel hittest="false" class="AdminModBorder">
 		<Button id="ToggleAdminMod" class="ToggleAdminMod" onactivate="OnToggleAdminModButton();" >
 			<Image src="file://{images}/custom_game/adminmod/administrator.png" />
@@ -66,5 +65,4 @@
 			</Panel>
 		</Panel>
 	</Panel>
-	-->
 </root>

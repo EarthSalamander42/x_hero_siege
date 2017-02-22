@@ -1,4 +1,3 @@
-
 require('libraries/timers')
 
 function Spawn( entityKeyValues )

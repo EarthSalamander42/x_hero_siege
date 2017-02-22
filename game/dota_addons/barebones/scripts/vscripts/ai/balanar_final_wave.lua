@@ -9,15 +9,20 @@ function Spawn( entityKeyValues )
 end
 
 function BalanarThink()
-	-- body
 	if thisEntity:IsNull() or not thisEntity:IsAlive() then
-		return nil		
+		return nil
 	elseif Ability_sleep:IsFullyCastable() then
-		--FindUnitsInRadius( iTeamNumber, vPosition, hCacheUnit, flRadius, iTeamFilter, iTypeFilter, iFlagFilter, iOrder, bCanGrowCache )
-		local units = FindUnitsInRadius(thisEntity:GetTeamNumber(), thisEntity:GetAbsOrigin(), nil, 500, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)
-
-		if units ~= nil and units > 1 then
-			thisEntity:CastAbilityOnTarget(units[1],Ability_sleep,-1)
+		local units = FindUnitsInRadius(thisEntity:GetTeamNumber(), thisEntity:GetAbsOrigin(), nil, Ability_sleep:GetSpecialValueFor("radius")-5, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)		
+		if units ~= nil then
+			local numberOfTargets = 0
+			for _,unit in pairs(units) do
+				if not unit:HasModifier("modifier_sleep") then
+					numberOfTargets = numberOfTargets +1
+				end
+			end
+			if numberOfTargets >=2 then
+				thisEntity:CastAbilityOnTarget(units[1],Ability_sleep,-1)
+			end
 		end
 	end
 	return 2

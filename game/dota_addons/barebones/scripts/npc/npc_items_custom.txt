@@ -4,7 +4,7 @@
 	{
 		"BaseClass"					"item_datadriven"
 		"ID"						"2499"
-		"AbilityTextureName"		"backpack"
+		"AbilityTextureName"		"custom/backpack"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 	
 		"ItemDroppable"				"1"
@@ -21,7 +21,7 @@
 		//----------------------------------------------------------------------------------------------------
 		"BaseClass"             		"item_datadriven"
 		"ID"							"2500"
-		"AbilityTextureName"			"lifesteal_mask"		
+		"AbilityTextureName"			"custom/lifesteal_mask"		
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 
 		// Item Info
@@ -51,13 +51,8 @@
 				"Passive"						"1"
 				"IsHidden"						"1"
 				"Attributes"					"MODIFIER_ATTRIBUTE_MULTIPLE"
-				
-				"Orb"
-				{
-					"Priority"					"DOTA_ORB_PRIORITY_ITEM"
-				}
 
-				"OnOrbImpact"
+				"OnAttackLanded"
 				{
 					"RunScript"
 					{
@@ -85,31 +80,30 @@
 	}
 
 	//=================================================================================================================
-	// Assassin's Blade
+	// Searing Blade
 	//=================================================================================================================
-	"item_assassins_blade"
+	"item_searing_blade"
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"ID"							"2501"
 		"BaseClass"						"item_datadriven"
-		"AbilityTextureName" 			"assassins_blade"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING"
-		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
-		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_CUSTOM"
-
-		"AbilityCastRange"				"600"
+		"AbilityTextureName" 			"custom/searing_blade"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityCooldown"				"10.0"
 		
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
 		"ItemCost"						"50000"
 		"ItemShopTags"					"epic"
 		"ItemQuality"					"epic"
-		"ItemAliases"					"assassins blade"
+		"ItemAliases"					"searing blade"
 		"ItemStackable"					"0"
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
 		"ItemPermanent"					"0"
 		"SecretShop"					"1"
+		"ItemBaseLevel"					"3"
+		"MaxUpgradeLevel"				"3"
 
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
@@ -118,101 +112,17 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"bonus_damage"			"1200"
+				"bonus_damage"			"450"
 			}
 			"02"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"consumed_damage"		"600"
-			}
-		}
-
-		"OnSpellStart"
-		{
-			"RunScript"
-			{
-				"ScriptFile"			"items/item_assassins_blade.lua"
-				"Function"				"AssassinsBladeActive"
-
-				"modifier"				"modifier_assassins_blade_consumed"
-			}
-		}
-
-		"Modifiers"
-		{
-			"modifier_assassins_blade"
-			{
-				"Passive"			"1"
-				"IsHidden"			"1"
-
-				"Attributes"		"MODIFIER_ATTRIBUTE_MULTIPLE"
-
-				"Properties"
-				{
-				  "MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE"		"%bonus_damage"
-				}
-			}
-
-			"modifier_assassins_blade_consumed"
-			{
-				"IsBuff"			"1"
-				"IsPurgable"		"0"
-
-				"Attributes"		"MODIFIER_ATTRIBUTE_PERMANENT"
-
-				"TextureName"		"assassins_blade"
-
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE" 	"%consumed_damage"
-				}
-			}
-		}
-	}
-
-	//=================================================================================================================
-	// Claws of Attack
-	//=================================================================================================================
-	"item_claws_of_attack"
-	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"BaseClass"						"item_datadriven"
-		"AbilityTextureName"			"claws_of_attack"		
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-		"ID"							"2502"
-		"Model"							"models/heroes/lone_druid/lone_druid_claw_fx.vmdl"
-		"Effect"						"particles/generic_gameplay/dropped_item.vpcf"
-
-		// Item Info
-		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"						"50000"
-		"ItemShopTags"					"epic"
-		"ItemQuality"					"epic"
-		"ItemAliases"					"claws of attack"
-		"ItemStackable"					"0"
-		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
-		"ItemPermanent"					"0"
-		"SecretShop"					"1"
-
-		// Special	
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilitySpecial"
-		{
-			"01"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_damage"			"550"
-			}
-			"02"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_movespeed"		"20"
+				"full_damage_radius"	"325"
 			}
 			"03"
 			{
-				"var_type"				"FIELD_FLOAT"
-				"bat_reduction"			"0.2"
+				"var_type"				"FIELD_INTEGER"
+				"cleave_pct_tooltip"	"25"
 			}
 		}
 
@@ -220,32 +130,90 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"    "items/claws_of_attack.lua"
-				"Function"      "EquipClaws"
+				"ScriptFile"	"items/global.lua"
+				"Function"		"EquipOrbs"
+			}
+
+			"DelayedAction"
+			{
+				"Delay"		"0.1"
+				"Action"
+				{
+					"ApplyModifier"
+					{
+						"ModifierName"	"modifier_orb_of_fire"
+						"Target"		"CASTER"
+					}
+				}
 			}
 		}
 
-		"OnUnequip"
+		"OnSpellStart"
 		{
 			"RunScript"
 			{
-				"ScriptFile"    "items/claws_of_attack.lua"
-				"Function"      "UnequipClaws"
+				"ScriptFile"	"items/global.lua"
+				"Function"		"EquipOrbs"
+			}
+
+			"RunScript"
+			{
+				"ScriptFile"	"items/global.lua"
+				"Function"		"CooldownOrbs"
+			}
+
+			"DelayedAction"
+			{
+				"Delay"		"0.1"
+				"Action"
+				{
+					"ApplyModifier"
+					{
+						"ModifierName"	"modifier_orb_of_fire"
+						"Target"		"CASTER"
+					}
+				}
 			}
 		}
 
 		"Modifiers"
 		{
-			"modifier_claws_of_attack"
+			"modifier_orb_of_fire"
+			{
+				"Passive"				"1"
+				"IsHidden"				"1"
+
+				"EffectName"		"particles/custom/items/orb/orb_of_fire/orb.vpcf"
+				"EffectAttachType"	"follow_origin"
+
+				"OnAttackLanded"
+				{
+					"RunScript"
+					{
+						"ScriptFile"	"items/global.lua"
+						"Function"		"Splash"
+					}
+				}
+			}
+
+			"modifier_orb_attributes"
 			{
 				"Passive"			"1"
 				"IsHidden"			"1"
 				"Attributes"		"MODIFIER_ATTRIBUTE_MULTIPLE"
 
+				"OnCreated"
+				{
+					"RunScript"
+					{
+						"ScriptFile"	"items/global.lua"
+						"Function"		"EquipOrbs"
+					}
+				}
+
 				"Properties"
 				{
 					"MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE"		"%bonus_damage"
-					"MODIFIER_PROPERTY_MOVESPEED_BONUS_CONSTANT"	"%bonus_movespeed"
 				}
 			}
 		}
@@ -260,7 +228,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"ID"								"2503"
 		"BaseClass"							"item_datadriven"
-		"AbilityTextureName" 				"ankh_of_reincarnation"
+		"AbilityTextureName" 				"custom/ankh_of_reincarnation"
 		"AbilityBehavior"					"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"Model"								"models/props_gameplay/aegis.mdl"
 
@@ -299,7 +267,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"items/Ankh/ankh.lua"
+						"ScriptFile"	"heroes/global.lua"
 						"Function"		"Reincarnation"
 					}
 				}
@@ -327,7 +295,7 @@
 		"ItemDroppable"					"1"
 		"SideShop"						"1"
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
-		"AbilityTextureName"			"tome_small"
+		"AbilityTextureName"			"custom/tome_small"
 		"ItemQuality"					"artifact"
 	
 		"ItemStackable"					"1"
@@ -340,8 +308,8 @@
 	
 			"RunScript"
 			{
-				"ScriptFile"		"items/Tome_All/tome_all"
-				"Function"			"tome_use"
+				"ScriptFile"		"items/tomes.lua"
+				"Function"			"TomeOfStats"
 			}
 	
 			"SpendCharge" {}
@@ -376,7 +344,7 @@
 		"ItemPurchasable"				"1"
 		"ItemDroppable"					"1"
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
-		"AbilityTextureName"			"tome_big"
+		"AbilityTextureName"			"custom/tome_big"
 		"SideShop"						"1"
 
 		"ItemShopTags"					"rare"
@@ -392,8 +360,8 @@
 
 			"RunScript"
 			{
-				"ScriptFile"			"items/Tome_All/tome_all"
-				"Function"				"tome_use"
+				"ScriptFile"			"items/tomes.lua"
+				"Function"				"TomeOfStats"
 			}
 
 			"SpendCharge" {}
@@ -425,7 +393,7 @@
 		"ItemPurchasable"			"0"
 		"ItemDroppable"				"0"
 		"ItemShareability"			"ITEM_NOT_SHAREABLE"
-		"AbilityTextureName"		"ankh_of_reincarnation"
+		"AbilityTextureName"			"custom/ankh_of_reincarnation"
 	
 		"ItemShopTags"				"artifact"
 		"ItemQuality"				"artifact"
@@ -455,8 +423,8 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"items/Ankh_Magtheridon/magtheridon.lua"
-						"Function"		"reincarnation"
+						"ScriptFile"	"items/global.lua"
+						"Function"		"Magtheridon"
 					}
 				}
 			}
@@ -475,7 +443,7 @@
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO"
-		"AbilityTextureName"			"item_mana_potion"
+		"AbilityTextureName"			"custom/mana_potion"
 		"Model"							"models/props_gameplay/salve_red.vmdl"
 		// Stats
 		//-------------------------------------------------------------------------------------------------------------
@@ -521,7 +489,7 @@
 		"ID"							"2508"
 		"BaseClass"             		"item_faerie_fire"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
-		"AbilityTextureName"			"healing_potion"
+		"AbilityTextureName"			"custom/healing_potion"
 		"Model"							"models/props_gameplay/salve.vmdl"
 
 		// Stats
@@ -558,9 +526,9 @@
 
 
 	//=================================================================================================================
-	// Scepter of Mastery
+	// Staff of Mastery
 	//=================================================================================================================
-	"item_scepter_of_mastery"
+	"item_staff_of_mastery"
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
@@ -571,7 +539,7 @@
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
 		"Model"                         "models/props_gameplay/red_box.vmdl" 
 		"Effect"                        "particles/generic_gameplay/dropped_item.vpcf"
-		"AbilityTextureName"            "scepter_of_mastery"
+		"AbilityTextureName"			"custom/scepter_of_mastery"
 
 		// Stats        
 		//-------------------------------------------------------------------------------------------------------------
@@ -586,7 +554,7 @@
 		"ItemCost"                      "30000"
 		"ItemShopTags"                  "int;agi;str;hard_to_tag"
 		"ItemQuality"                   "epic"
-		"ItemAliases"                   "scepter of mastery"
+		"ItemAliases"                   "staff of mastery"
 		"SecretShop"					"1"
 
 		"AbilitySpecial"
@@ -734,7 +702,7 @@
 		"AbilityCooldown"			"90"
 		"ItemDroppable"				"1"
 		"ItemShareability"			"ITEM_FULLY_SHAREABLE"
-		"AbilityTextureName"		"amulet_of_the_wild"
+		"AbilityTextureName"			"custom/amulet_of_the_wild"
 		"SecretShop"				"1"
 
 		"ItemShopTags"				"consumable"
@@ -770,15 +738,16 @@
 	}
 
 	//=================================================================================================================
-	// Bracer of Protection
+	// Bracer of the Void
 	//=================================================================================================================
-	"item_bracer_of_protection"
+	"item_bracer_of_the_void"
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"item_datadriven"
-		"AbilityTextureName"			"bracer_of_protection"		
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityTextureName"			"custom/bracer_of_the_void"		
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityCooldown"				"10.0"
 		"ID"							"2511"
 		"Model"							"models/props_gameplay/red_box.vmdl"
 		"Effect"						"particles/generic_gameplay/dropped_item.vpcf"
@@ -788,11 +757,13 @@
 		"ItemCost"						"50000"
 		"ItemShopTags"					"damage"
 		"ItemQuality"					"epic"
-		"ItemAliases"					"bracer of protection"
+		"ItemAliases"					"bracer of the void"
 		"ItemStackable"					"0"
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
 		"ItemPermanent"					"0"
 		"SecretShop"					"1"
+		"ItemBaseLevel"					"3"
+		"MaxUpgradeLevel"				"3"
 
 		// Special	
 		//-------------------------------------------------------------------------------------------------------------
@@ -801,33 +772,173 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"bonus_hp"				"13400"
+				"bonus_hp"				"12500"
 			}
 			"02"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"bonus_armor"			"100"
+				"minion_hp"				"375"
 			}
 			"03"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"minion_damage"			"200"
+			}
+			"04"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"duration"				"40"
+			}
+			"05"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_damage"			"450"
+			}
+			"06"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_armor"			"100"
+			}
+			"07"
 			{
 				"var_type"				"FIELD_INTEGER"
 				"bonus_health_regen"	"20"
 			}
 		}
 
+		"OnEquip"
+		{
+			"RunScript"
+			{
+				"ScriptFile"	"items/global.lua"
+				"Function"		"EquipOrbs"
+			}
+
+			"DelayedAction"
+			{
+				"Delay"		"0.1"
+				"Action"
+				{
+					"ApplyModifier"
+					{
+						"ModifierName"	"modifier_orb_of_darkness"
+						"Target"		"CASTER"
+					}
+				}
+			}
+		}
+
+		"OnSpellStart"
+		{
+			"RunScript"
+			{
+				"ScriptFile"	"items/global.lua"
+				"Function"		"EquipOrbs"
+			}
+
+			"RunScript"
+			{
+				"ScriptFile"	"items/global.lua"
+				"Function"		"CooldownOrbs"
+			}
+
+			"DelayedAction"
+			{
+				"Delay"		"0.1"
+				"Action"
+				{
+					"ApplyModifier"
+					{
+						"ModifierName"	"modifier_orb_of_darkness"
+						"Target"		"CASTER"
+					}
+				}
+			}
+		}
+
 		"Modifiers"
 		{
-			"modifier_bracer_of_protection"
+			"modifier_orb_of_darkness"
+			{
+				"Passive"			"1"
+				"IsHidden"			"1"
+
+				"EffectName"		"particles/units/heroes/hero_ursa/ursa_enrage_buff_glow.vpcf"
+				"EffectAttachType"	"attach_attack1"
+
+				"OnAttackLanded"
+				{
+					"ApplyModifier"
+					{
+						"ModifierName"		"modifier_orb_of_darkness_spawn3"
+						"Target"
+						{
+							"Center"		"TARGET"
+							"Types"			"DOTA_UNIT_TARGET_BASIC"
+						}
+					}
+				}
+			}
+
+			"modifier_orb_attributes"
 			{
 				"Passive"			"1"
 				"IsHidden"			"1"
 				"Attributes"		"MODIFIER_ATTRIBUTE_MULTIPLE"
 
+				"OnCreated"
+				{
+					"RunScript"
+					{
+						"ScriptFile"	"items/global.lua"
+						"Function"		"EquipOrbs"
+					}
+				}
+
 				"Properties"
 				{
+					"MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE"		"%bonus_damage"
 					"MODIFIER_PROPERTY_HEALTH_BONUS"				"%bonus_hp"
 					"MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS"		"%bonus_armor"
 					"MODIFIER_PROPERTY_HEALTH_REGEN_CONSTANT"		"%bonus_health_regen"
+				}
+			}
+
+			"modifier_orb_of_darkness_spawn3"
+			{
+				"IsHidden"		"1"
+				"Duration"		"0.1"
+
+				"OnDeath"
+				{
+					"SpawnUnit"
+					{
+						"UnitName"			"undead_black_arrow_minion_3"
+						"UnitCount"			"1"
+						"SpawnRadius"		"1"
+						"Duration"			"%duration"
+						"Target"
+						{
+							"Center"	"UNIT"
+							"Flags"		"DOTA_UNIT_TARGET_FLAG_DEAD"
+						}
+
+						"OnSpawn"
+						{
+							"FireSound"
+							{
+								"EffectName"	"Hero_Medusa.MysticSnake.Return"
+								"Target"		"CASTER"
+							}
+
+							"ApplyModifier"
+							{
+								"ModifierName"	"modifier_phased"
+								"Target"		"TARGET"
+								"Duration"		"0.03"
+							}
+						}
+					}
 				}
 			}
 		}
@@ -858,7 +969,7 @@
 		"ItemPurchasable"			"1"
 		"ItemDroppable"				"1"
 		"ItemShareability"			"ITEM_FULLY_SHAREABLE"
-		"AbilityTextureName"		"tome_of_power"
+		"AbilityTextureName"		"custom/tome_of_power"
 
 		"SideShop"					"1"
 		"SecretShop"				"0"
@@ -876,8 +987,8 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"		"items/tome_of_power/tome_of_power.lua"
-				"Function"			"tome_use"
+				"ScriptFile"		"items/tomes.lua"
+				"Function"			"TomeOfPower"
 			}
 
 			"SpendCharge" {}
@@ -893,7 +1004,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"ID"							"2513"
 		"BaseClass"						"item_datadriven"
-		"AbilityTextureName" 			"key_of_the_three_moons"
+		"AbilityTextureName" 			"custom/key_of_the_three_moons"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"AbilityCastRange"				"0"
 		
@@ -952,81 +1063,30 @@
 	}
 
 	//=================================================================================================================
-	// Gloom Blade
+	// Recipe: Searing Blade
 	//=================================================================================================================
-	"item_gloom_blade"
-	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"ID"							"2514"
-		"BaseClass"						"item_datadriven"
-		"AbilityTextureName" 			"gloom_blade"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-
-		// Item Info
-		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"						"15000"
-		"ItemShopTags"					"damage"
-		"ItemQuality"					"rare"
-		"ItemAliases"					"gloom blade"
-		"ItemStackable"					"0"
-		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
-		"ItemPermanent"					"0"
-		"SecretShop"					"1"
-
-		// Special	
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilitySpecial"
-		{
-			"01"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_damage"			"300"
-			}
-		}
-
-		"Modifiers"
-		{
-			"modifier_gloom_blade"
-			{
-				"Passive"			"1"
-				"IsHidden"			"1"
-
-				"Attributes"		"MODIFIER_ATTRIBUTE_MULTIPLE"
-
-				"Properties"
-				{
-				  "MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE"		"%bonus_damage"
-				}
-			}
-		}
-	}
-
-	//=================================================================================================================
-	// Recipe: Assassin's Blade
-	//=================================================================================================================
-	"item_recipe_assassins_blade"
+	"item_recipe_searing_blade"
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"ID"							"2515"
 		"BaseClass"             		"item_datadriven"
 		"Model"							"models/props_gameplay/recipe.mdl"
-		"AbilityTextureName"			"recipe"
+		"AbilityTextureName"			"custom/recipe"
 		
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"						"35000"	
+		"ItemCost"						"32500"	
 		"ItemShopTags"					""
 		
 		// Recipe
 		//-------------------------------------------------------------------------------------------------------------
 		"ItemRecipe"					"1"
 		"SecretShop"					"1"
-		"ItemResult"					"item_assassins_blade"
+		"ItemResult"					"item_searing_blade"
 		"ItemRequirements"
 		{
-			"01"						"item_gloom_blade"
+			"01"						"item_orb_of_fire2"
 		}
 	}
 
@@ -1037,8 +1097,8 @@
 	{
 		"ID"							"2516"
 		"BaseClass"						"item_datadriven"
-		"AbilityTextureName"			"orb_of_lightning"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityTextureName"			"custom/orb_of_lightning"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"      
 		"ItemShopTags"					"purge"
 		"ItemQuality"					"artifact"
@@ -1047,7 +1107,10 @@
 		"ItemStackable"					"0"
 		"ItemKillable"					"1"
 		"ItemSellable"					"1"
-		"ItemDroppable"					"1" 
+		"ItemDroppable"					"1"
+		"AbilityCooldown"				"10.0"
+		"ItemBaseLevel"					"1"
+		"MaxUpgradeLevel"				"3"
 
 		// Shops
 		"ItemCost"						"7500"
@@ -1067,7 +1130,7 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"bonus_damage"			"150"
+				"bonus_damage"			"100"
 			}
 			"02"
 			{
@@ -1089,30 +1152,74 @@
 				"var_type"				"FIELD_INTEGER"
 				"damage_to_summons"		"150"
 			}
+			"06"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_movespeed"		"5"
+			}
+		}
+
+		"OnEquip"
+		{
+			"RunScript"
+			{
+				"ScriptFile"	"items/global.lua"
+				"Function"		"EquipOrbs"
+			}
+
+			"DelayedAction"
+			{
+				"Delay"		"0.1"
+				"Action"
+				{
+					"ApplyModifier"
+					{
+						"ModifierName"	"modifier_orb_of_lightning"
+						"Target"		"CASTER"
+					}
+				}
+			}
+		}
+
+		"OnSpellStart"
+		{
+			"RunScript"
+			{
+				"ScriptFile"	"items/global.lua"
+				"Function"		"EquipOrbs"
+			}
+
+			"RunScript"
+			{
+				"ScriptFile"	"items/global.lua"
+				"Function"		"CooldownOrbs"
+			}
+
+			"DelayedAction"
+			{
+				"Delay"		"0.1"
+				"Action"
+				{
+					"ApplyModifier"
+					{
+						"ModifierName"	"modifier_orb_of_lightning"
+						"Target"		"CASTER"
+					}
+				}
+			}
 		}
 
 		"Modifiers"
 		{
 			"modifier_orb_of_lightning"
 			{
-				"Passive"           "1"
-				"IsHidden"          "1"
-	
-				"EffectName"        "particles/custom/items/orb/orb_of_lightning/orb.vpcf"
-				"EffectAttachType"  "follow_origin"
-	
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE"      "%bonus_damage"
-				}
+				"Passive"			"1"
+				"IsHidden"			"1"
 
-				"Orb"
-				{
-					"Priority"			"DOTA_ORB_PRIORITY_ABILITY"
-					"ProjectileName"	"particles/units/heroes/hero_brewmaster/brewmaster_storm_attack.vpcf"
-				}
+				"EffectName"		"particles/custom/items/orb/orb_of_lightning/orb.vpcf"
+				"EffectAttachType"	"follow_origin"
 
-				"OnOrbImpact"
+				"OnAttackLanded"
 				{
 					"Random"
 					{
@@ -1129,9 +1236,31 @@
 				}
 			}
 
+			"modifier_orb_attributes"
+			{
+				"Passive"			"1"
+				"IsHidden"			"1"
+				"Attributes"		"MODIFIER_ATTRIBUTE_MULTIPLE"
+
+				"OnCreated"
+				{
+					"RunScript"
+					{
+						"ScriptFile"	"items/global.lua"
+						"Function"		"EquipOrbs"
+					}
+				}
+	
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE"		"%bonus_damage"
+					"MODIFIER_PROPERTY_MOVESPEED_BONUS_CONSTANT"	"%bonus_movespeed"
+				}
+			}
+
 			"modifier_purge"
 			{
-				"TextureName"       "orb_of_lightning"
+				"TextureName"       "modifiers/orb_of_lightning"
 				"IsDebuff"          "1"
 				"IsPurgable"        "1"
 
@@ -1150,8 +1279,9 @@
 	{
 		"ID"							"2517"
 		"BaseClass"						"item_datadriven"
-		"AbilityTextureName"			"item_orb_of_fire"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityTextureName"			"custom/orb_of_fire"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityCooldown"				"10.0"
 	
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"      
 		"ItemShopTags"					"cleave"
@@ -1161,6 +1291,8 @@
 		"ItemKillable"					"1"
 		"ItemSellable"					"1"
 		"ItemDroppable"					"1"
+		"ItemBaseLevel"					"1"
+		"MaxUpgradeLevel"				"3"
 	
 		// Shops
 		"ItemCost"						"7500"
@@ -1180,52 +1312,108 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"bonus_damage"			"150"
+				"bonus_damage"			"100"
 			}
 			"02"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"full_damage_radius"	"250"
+				"full_damage_radius"	"325"
 			}
 			"03"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"cleave_pct_tooltip"	"20"
+				"cleave_pct_tooltip"	"10"
 			}
 		}
-	
-		// Item Info
-		//-------------------------------------------------------------------------------------------------------------
-		// Adds 5 bonus fire damage to the attacks of a Hero when carried. 
-		// The Hero's attacks also do splash damage to nearby enemy units.
+
+		"OnEquip"
+		{
+			"RunScript"
+			{
+				"ScriptFile"	"items/global.lua"
+				"Function"		"EquipOrbs"
+			}
+
+			"DelayedAction"
+			{
+				"Delay"		"0.1"
+				"Action"
+				{
+					"ApplyModifier"
+					{
+						"ModifierName"	"modifier_orb_of_fire"
+						"Target"		"CASTER"
+					}
+				}
+			}
+		}
+
+		"OnSpellStart"
+		{
+			"RunScript"
+			{
+				"ScriptFile"	"items/global.lua"
+				"Function"		"EquipOrbs"
+			}
+
+			"RunScript"
+			{
+				"ScriptFile"	"items/global.lua"
+				"Function"		"CooldownOrbs"
+			}
+
+			"DelayedAction"
+			{
+				"Delay"		"0.1"
+				"Action"
+				{
+					"ApplyModifier"
+					{
+						"ModifierName"	"modifier_orb_of_fire"
+						"Target"		"CASTER"
+					}
+				}
+			}
+		}
+
 		"Modifiers"
 		{
 			"modifier_orb_of_fire"
 			{
-				"Passive"               "1"
-				"IsHidden"              "1"
+				"Passive"				"1"
+				"IsHidden"				"1"
+
+				"EffectName"		"particles/custom/items/orb/orb_of_fire/orb.vpcf"
+				"EffectAttachType"	"follow_origin"
 	
-//				"EffectName"            "particles/custom/items/orb/orb_of_fire/exort_orb_fire.vpcf"
-//				"EffectAttachType"      "follow_origin"
-	
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE"      "%bonus_damage"
-				}
-	
-				"Orb"
-				{
-					"Priority"          "DOTA_ORB_PRIORITY_ABILITY"
-					"ProjectileName"    "particles/econ/items/shadow_fiend/sf_fire_arcana/sf_fire_arcana_base_attack.vpcf"
-				}
-	
-				"OnOrbImpact"
+				"OnAttackLanded"
 				{
 					"RunScript"
 					{
 						"ScriptFile"	"items/global.lua"
 						"Function"		"Splash"
 					}
+				}
+			}
+
+			"modifier_orb_attributes"
+			{
+				"Passive"			"1"
+				"IsHidden"			"1"
+				"Attributes"		"MODIFIER_ATTRIBUTE_MULTIPLE"
+
+				"OnCreated"
+				{
+					"RunScript"
+					{
+						"ScriptFile"	"items/global.lua"
+						"Function"		"EquipOrbs"
+					}
+				}
+	
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE"		"%bonus_damage"
 				}
 			}
 		}
@@ -1238,8 +1426,9 @@
 	{
 		"ID"							"2518"
 		"BaseClass"                     "item_datadriven"
-		"AbilityTextureName"            "item_orb_of_darkness"
-		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityTextureName"			"custom/orb_of_darkness"
+		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityCooldown"				"10.0"
 	
 		// Shops
 		"ItemCost"						"7500"
@@ -1251,6 +1440,8 @@
 		"ItemSellable"					"1"
 		"ItemDroppable"					"1"
 		"ItemQuality"					"artifact"
+		"ItemBaseLevel"					"1"
+		"MaxUpgradeLevel"				"3"
 		
 		"Model"                         "models/props_gameplay/red_box.vmdl"
 		"Effect"                        "particles/econ/courier/courier_greevil_black/courier_greevil_black_ambient_3.vpcf"
@@ -1263,66 +1454,145 @@
 		{
 			"01"
 			{
-				"var_type"              "FIELD_INTEGER"
-				"bonus_damage"          "150"
+				"var_type"				"FIELD_INTEGER"
+				"bonus_hp"				"2000"
 			}
 			"02"
 			{
 				"var_type"              "FIELD_INTEGER"
-				"minion_hp"             "375"
+				"bonus_damage"          "100"
 			}
 			"03"
 			{
 				"var_type"              "FIELD_INTEGER"
-				"minion_damage"         "20"
+				"minion_hp"             "375"
 			}
 			"04"
 			{
+				"var_type"              "FIELD_INTEGER"
+				"minion_damage"         "20"
+			}
+			"05"
+			{
 				"var_type"				"FIELD_INTEGER"
-				"duration"				"60"
+				"duration"				"40"
+			}
+			"06"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_armor"			"10"
+			}
+			"07"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_health_regen"	"20"
 			}
 		}
 
-		// Item Info
-		//-------------------------------------------------------------------------------------------------------------
-		// Adds 5 bonus damage to the attacks of a Hero when carried. 
-		// The Hero's attack also will create a Dark Minion when it is the killing blow on an enemy unit. The Dark Minion lasts 80 seconds.
+		"OnEquip"
+		{
+			"RunScript"
+			{
+				"ScriptFile"	"items/global.lua"
+				"Function"		"EquipOrbs"
+			}
+
+			"DelayedAction"
+			{
+				"Delay"		"0.1"
+				"Action"
+				{
+					"ApplyModifier"
+					{
+						"ModifierName"	"modifier_orb_of_darkness"
+						"Target"		"CASTER"
+					}
+				}
+			}
+		}
+
+		"OnSpellStart"
+		{
+			"RunScript"
+			{
+				"ScriptFile"	"items/global.lua"
+				"Function"		"EquipOrbs"
+			}
+
+			"RunScript"
+			{
+				"ScriptFile"	"items/global.lua"
+				"Function"		"CooldownOrbs"
+			}
+
+			"DelayedAction"
+			{
+				"Delay"		"0.1"
+				"Action"
+				{
+					"ApplyModifier"
+					{
+						"ModifierName"	"modifier_orb_of_darkness"
+						"Target"		"CASTER"
+					}
+				}
+			}
+		}
+
 		"Modifiers"
 		{
 			"modifier_orb_of_darkness"
 			{
-				"Passive"       "1"
-				"IsHidden"      "1"
-				"Orb"
-				{
-					"Priority"          "DOTA_ORB_PRIORITY_ABILITY"
-					"ProjectileName"    "particles/units/heroes/hero_vengeful/vengeful_magic_missle.vpcf"
-				}
-	
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE"      "%bonus_damage"
-				}
-				
-				"OnOrbImpact"
+				"Passive"		"1"
+				"IsHidden"		"1"
+
+				"EffectName"		"particles/units/heroes/hero_ursa/ursa_enrage_buff_glow.vpcf"
+				"EffectAttachType"	"attach_attack1"
+
+				"OnAttackLanded"
 				{
 					"ApplyModifier"
 					{
-						"ModifierName"      "modifier_orb_of_darkness_spawn"
+						"ModifierName"		"modifier_orb_of_darkness_spawn"
 						"Target"
 						{
-							"Center"    "TARGET"
-							"Types"     "DOTA_UNIT_TARGET_BASIC"
+							"Center"		"TARGET"
+							"Types"			"DOTA_UNIT_TARGET_BASIC"
 						}
 					}
+
 					"FireSound"
 					{
-						"EffectName"        "Hero_Medusa.MysticSnake.Target"
-						"Target"            "CASTER"
+						"EffectName"		"Hero_Medusa.MysticSnake.Target"
+						"Target"			"CASTER"
 					}
 				}
 			}
-	
+
+			"modifier_orb_attributes"
+			{
+				"Passive"		"1"
+				"IsHidden"		"1"
+				"Attributes"	"MODIFIER_ATTRIBUTE_MULTIPLE"
+
+				"OnCreated"
+				{
+					"RunScript"
+					{
+						"ScriptFile"	"items/global.lua"
+						"Function"		"EquipOrbs"
+					}
+				}
+
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE"		"%bonus_damage"
+					"MODIFIER_PROPERTY_HEALTH_BONUS"				"%bonus_hp"
+					"MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS"		"%bonus_armor"
+					"MODIFIER_PROPERTY_HEALTH_REGEN_CONSTANT"		"%bonus_health_regen"
+				}
+			}
+
 			"modifier_orb_of_darkness_spawn"
 			{
 				"IsHidden"  "1"
@@ -1348,6 +1618,13 @@
 								"EffectName"    "Hero_Medusa.MysticSnake.Return"
 								"Target"        "CASTER"
 							}
+
+							"ApplyModifier"
+							{
+								"ModifierName"	"modifier_phased"
+								"Target"		"TARGET"
+								"Duration"		"0.03"
+							}
 						}
 					}
 				}
@@ -1362,8 +1639,9 @@
 	{
 		"ID"							"2535"
 		"BaseClass"                     "item_datadriven"
-		"AbilityTextureName"            "item_orb_of_frost"
-		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityTextureName"			"custom/orb_of_frost"
+		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityCooldown"				"10.0"
 	
 		// Shops
 		"ItemCost"						"0"
@@ -1400,24 +1678,67 @@
 			}
 		}
 
+		"OnEquip"
+		{
+			"RunScript"
+			{
+				"ScriptFile"	"items/global.lua"
+				"Function"		"EquipOrbs"
+			}
+
+			"DelayedAction"
+			{
+				"Delay"		"0.1"
+				"Action"
+				{
+					"ApplyModifier"
+					{
+						"ModifierName"	"modifier_orb_of_frost"
+						"Target"		"CASTER"
+					}
+				}
+			}
+		}
+
+		"OnSpellStart"
+		{
+			"RunScript"
+			{
+				"ScriptFile"	"items/global.lua"
+				"Function"		"EquipOrbs"
+			}
+
+			"RunScript"
+			{
+				"ScriptFile"	"items/global.lua"
+				"Function"		"CooldownOrbs"
+			}
+
+			"DelayedAction"
+			{
+				"Delay"		"0.1"
+				"Action"
+				{
+					"ApplyModifier"
+					{
+						"ModifierName"	"modifier_orb_of_frost"
+						"Target"		"CASTER"
+					}
+				}
+			}
+		}
+
 		"Modifiers"
 		{
 			"modifier_orb_of_frost"
 			{
-				"Passive"       "1"
-				"IsHidden"      "1"
-				"Orb"
-				{
-					"Priority"			"DOTA_ORB_PRIORITY_ABILITY"
-					"ProjectileName"	"particles/units/heroes/hero_ancient_apparition/ancient_apparition_base_attack.vpcf"
-				}
-	
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE"		"%bonus_damage"
-				}
+				"Passive"		"1"
+				"IsHidden"		"1"
 
-				"OnOrbImpact"
+				"EffectName"			"particles/units/heroes/hero_ancient_apparition/ancient_apparition_chilling_touch_buff.vpcf"
+				"EffectAttachType"		"attach_attack1"
+
+				"OnAttackLanded"
 				{
 					"Random"
 					{
@@ -1439,11 +1760,32 @@
 				}
 			}
 
+			"modifier_orb_attributes"
+			{
+				"Passive"		"1"
+				"IsHidden"		"1"
+				"Attributes"	"MODIFIER_ATTRIBUTE_MULTIPLE"
+
+				"OnCreated"
+				{
+					"RunScript"
+					{
+						"ScriptFile"	"items/global.lua"
+						"Function"		"EquipOrbs"
+					}
+				}
+
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE"		"%bonus_damage"
+				}
+			}
+
 			"modifier_orb_of_frost_target"
 			{
 				"IsDebuff"		"1"
 				"IsPurgable"	"0"
-	
+
 				"OnCreated"
 				{
 					"FireSound"
@@ -1451,14 +1793,14 @@
 						"EffectName"	"Hero_Invoker.ColdSnap.Freeze"
 						"Target" 		"TARGET"
 					}
-	
+
 					"AttachEffect"
 					{
 						"EffectName"        "particles/generic_gameplay/generic_stunned.vpcf"
 						"EffectAttachType"  "follow_overhead"
 						"Target"            "TARGET"
 					}
-	
+
 					"FireEffect"
 					{
 						"EffectName"        "particles/units/heroes/hero_invoker/invoker_cold_snap.vpcf"
@@ -1466,10 +1808,10 @@
 						"Target"            "TARGET"
 					}
 				}
-	
+
 				"StatusEffectName" 		"particles/status_fx/status_effect_frost.vpcf" 	   
 				"StatusEffectPriority"  "10"
-	
+
 				"States"
 				{
 					"MODIFIER_STATE_STUNNED"		"MODIFIER_STATE_VALUE_ENABLED"
@@ -1480,94 +1822,30 @@
 	}
 
 	//=================================================================================================================
-	// Bracer of Endurance
+	// Recipe: Bracer of the Void
 	//=================================================================================================================
-	"item_bracer_of_endurance"
-	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"BaseClass"						"item_datadriven"
-		"AbilityTextureName"			"bracer_of_endurance"		
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-		"ID"							"2519"
-		"Model"							"models/props_gameplay/red_box.vmdl"
-		"Effect"						"particles/generic_gameplay/dropped_item.vpcf"
-
-		// Item Info
-		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"						"15000"
-		"ItemShopTags"					"damage"
-		"ItemQuality"					"rare"
-		"ItemAliases"					"bracer of endurance"
-		"ItemStackable"					"0"
-		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
-		"ItemPermanent"					"0"
-		"SecretShop"					"1"
-
-		// Special	
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilitySpecial"
-		{
-			"01"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_hp"				"3425"
-			}
-			"02"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_armor"			"25"
-			}
-			"04"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_health_regen"	"5"
-			}
-		}
-
-		"Modifiers"
-		{
-			"modifier_bracer_of_endurance"
-			{
-				"Passive"			"1"
-				"IsHidden"			"1"
-				"Attributes"		"MODIFIER_ATTRIBUTE_MULTIPLE"
-
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_HEALTH_BONUS"				"%bonus_hp"
-					"MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS"		"%bonus_armor"
-					"MODIFIER_PROPERTY_HEALTH_REGEN_CONSTANT"		"%bonus_health_regen"
-				}
-			}
-		}
-	}
-
-	//=================================================================================================================
-	// Recipe: Bracer of Protection
-	//=================================================================================================================
-	"item_recipe_bracer_of_protection"
+	"item_recipe_bracer_of_the_void"
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"ID"							"2520"
 		"BaseClass"             		"item_datadriven"
 		"Model"							"models/props_gameplay/recipe.mdl"
-		"AbilityTextureName"			"recipe"
+		"AbilityTextureName"			"custom/recipe"
 		
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"						"35000"	
+		"ItemCost"						"32500"	
 		"ItemShopTags"					""
 		
 		// Recipe
 		//-------------------------------------------------------------------------------------------------------------
 		"ItemRecipe"					"1"
 		"SecretShop"					"1"
-		"ItemResult"					"item_bracer_of_protection"
+		"ItemResult"					"item_bracer_of_the_void"
 		"ItemRequirements"
 		{
-			"01"						"item_bracer_of_endurance"
+			"01"						"item_orb_of_darkness2"
 		}
 	}
 
@@ -1580,7 +1858,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"ID"							"2521"
 		"BaseClass"						"item_datadriven"
-		"AbilityTextureName" 			"shield_of_invincibility"
+		"AbilityTextureName" 			"custom/shield_of_invincibility"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"AbilityCastRange"				"0"
 		"AbilityCooldown"				"60.0"
@@ -1646,13 +1924,13 @@
 			{
 				"Passive"			"1"
 				"IsHidden"			"0"
-				"TextureName"		"shield_of_invincibility"
+				"TextureName"		"modifiers/shield_of_invincibility"
 
 				"OnAttacked"
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"items/item_shield_of_invincibility.lua"
+						"ScriptFile"	"items/shield_of_invincibility.lua"
 						"Function"		"Return"
 					}
 
@@ -1673,7 +1951,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"items/item_shield_of_invincibility.lua"
+						"ScriptFile"	"items/shield_of_invincibility.lua"
 						"Function"		"Reincarnation"
 					}
 				}
@@ -1733,7 +2011,7 @@
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"Model"							"models/props_gameplay/red_box.vmdl" 
 		"Effect"						"particles/generic_gameplay/dropped_item.vpcf"
-		"AbilityTextureName"			"talisman_of_evasion_datadriven"
+		"AbilityTextureName"			"custom/talisman_of_evasion_datadriven"
 
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
@@ -1780,7 +2058,7 @@
 		"ID"							"2524"
 		"BaseClass"						"item_datadriven"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_DIRECTIONAL | DOTA_ABILITY_BEHAVIOR_ROOT_DISABLES | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING"
-		"AbilityTextureName"			"boots_of_speed"
+		"AbilityTextureName"			"custom/boots_of_speed"
 		"Model"							"models/props_items/blinkdagger.vmdl"
 
 		// Stats		
@@ -1819,11 +2097,9 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"				"items/item_boots_of_speed.lua"
+				"ScriptFile"				"items/boots_of_speed.lua"
 				"Function"					"blink_start"
-				
 				"Target"					"POINT"
-				
 				"blink_effect"				"particles/econ/events/ti6/blink_dagger_start_ti6.vpcf"
 				"blink_effect_end"			"particles/econ/events/ti6/blink_dagger_end_ti6.vpcf"
 			}
@@ -1847,111 +2123,30 @@
 	}
 
 	//=================================================================================================================
-	// Blades of Attack
+	// Recipe: Celestial Claws
 	//=================================================================================================================
-	"item_blades_of_attack2"
-	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"BaseClass"						"item_datadriven"
-		"AbilityTextureName"			"blades_of_attack2"		
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-		"ID"							"2525"
-		"Model"							"models/items/bounty_hunter/twinblades_offhand/twinblades_offhand.vmdl"
-		"Effect"						"particles/generic_gameplay/dropped_item.vpcf"
-
-		// Item Info
-		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"						"15000"
-		"ItemShopTags"					"damage"
-		"ItemQuality"					"rare"
-		"ItemAliases"					"blades of attack"
-		"ItemStackable"					"0"
-		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
-		"ItemPermanent"					"0"
-		"SecretShop"					"1"
-
-		// Special	
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilitySpecial"
-		{
-			"01"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_damage"			"110"
-			}
-			"02"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_movespeed"		"5"
-			}
-			"03"
-			{
-				"var_type"				"FIELD_FLOAT"
-				"bat_reduction"			"0.05"
-			}
-		}
-
-		"OnEquip"
-		{
-			"RunScript"
-			{
-				"ScriptFile"    "items/claws_of_attack.lua"
-				"Function"      "EquipClaws"
-			}
-		}
-
-		"OnUnequip"
-		{
-			"RunScript"
-			{
-				"ScriptFile"    "items/claws_of_attack.lua"
-				"Function"      "UnequipClaws"
-			}
-		}
-
-		"Modifiers"
-		{
-			"modifier_claws_of_attack"
-			{
-				"Passive"			"1"
-				"IsHidden"			"1"
-				"Attributes"		"MODIFIER_ATTRIBUTE_MULTIPLE"
-
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE"		"%bonus_damage"
-					"MODIFIER_PROPERTY_MOVESPEED_BONUS_CONSTANT"	"%bonus_movespeed"
-				}
-			}
-		}
-	}
-
-	//=================================================================================================================
-	// Recipe: Claws of Attack
-	//=================================================================================================================
-	"item_recipe_claws_of_attack"
+	"item_recipe_celestial_claws"
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"ID"							"2526"
 		"BaseClass"             		"item_datadriven"
 		"Model"							"models/props_gameplay/recipe.mdl"
-		"AbilityTextureName"			"recipe"
+		"AbilityTextureName"			"custom/recipe"
 
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"						"35000"	
+		"ItemCost"						"32500"	
 		"ItemShopTags"					""
 		
 		// Recipe
 		//-------------------------------------------------------------------------------------------------------------
 		"ItemRecipe"					"1"
 		"SecretShop"					"1"
-		"ItemResult"					"item_claws_of_attack"
+		"ItemResult"					"item_celestial_claws"
 		"ItemRequirements"
 		{
-			"01"						"item_blades_of_attack2"
+			"01"						"item_orb_of_lightning2"
 		}
 	}
 
@@ -1964,7 +2159,7 @@
 		//----------------------------------------------------------------------------------------------------
 		"BaseClass"             		"item_datadriven"
 		"ID"							"2527"
-		"AbilityTextureName"			"lightning_sword"		
+		"AbilityTextureName"			"custom/lightning_sword"		
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 
 		// Item Info
@@ -2015,14 +2210,8 @@
 				"Passive"						"1"
 				"IsHidden"						"1"
 				"Attributes"					"MODIFIER_ATTRIBUTE_MULTIPLE"
-				
-				"Orb"
-				{
-					"Priority"					"DOTA_ORB_PRIORITY_ITEM"
-					"ProjectileName"			"particles/econ/items/razor/razor_ti6/razor_base_attack_ti6.vpcf"
-				}
 
-				"OnOrbImpact"
+				"OnAttackLanded"
 				{
 					"RunScript"
 					{
@@ -2061,7 +2250,7 @@
 	{
 		"BaseClass"						"item_datadriven"
 		"ID"							"2528"
-		"AbilityTextureName"			"healing_wards"
+		"AbilityTextureName"			"custom/healing_wards"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_AOE"
 
 		"AbilityCooldown"				"20.0"	
@@ -2112,11 +2301,11 @@
 	{
 		"BaseClass"						"item_datadriven"
 		"ID"							"2529"
-		"AbilityTextureName"			"potion_full"
+		"AbilityTextureName"			"custom/potion_full"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
 		"AbilityCooldown"				"30.0"	
 		"AbilityCastRange"				"0"
-		"ItemCost"						"5000"
+		"ItemCost"						"4750"
 		"ItemQuality"					"rare"
 		"ItemStackable"					"0"
 		"ItemPermanent"					"0"
@@ -2154,7 +2343,7 @@
 	{
 		"BaseClass"						"item_datadriven"
 		"ID"							"2530"
-		"AbilityTextureName"			"potion_of_invulnerability"
+		"AbilityTextureName"			"custom/potion_of_invulnerability"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
 		"AbilityCooldown"				"40.0"	
 		"AbilityCastRange"				"0"
@@ -2205,7 +2394,7 @@
 	{
 		"BaseClass"						"item_datadriven"
 		"ID"							"2531"
-		"AbilityTextureName"			"potion_of_antimagic"
+		"AbilityTextureName"			"custom/potion_of_antimagic"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
 		"AbilityCooldown"				"30.0"	
 		"AbilityCastRange"				"0"
@@ -2282,7 +2471,7 @@
 		//----------------------------------------------------------------------------------------------------
 		"BaseClass"             		"item_datadriven"
 		"ID"							"2532"
-		"AbilityTextureName"			"ring_of_superiority"		
+		"AbilityTextureName"			"custom/ring_of_superiority"		
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 
 		// Item Info
@@ -2369,7 +2558,7 @@
 			{
 				"IsBuff"		"1"
 				"IsHidden"		"0"
-				"TextureName"	"holdout_endurance_aura"
+				"TextureName"	"custom/holdout_endurance_aura"
 
 				"OnCreated"
 				{
@@ -2406,7 +2595,7 @@
 			{
 				"Passive"		"1"
 				"IsHidden"		"0"
-				"TextureName"	"holdout_unholy_aura"
+				"TextureName"	"custom/holdout_unholy_aura"
 
 				"OnCreated"
 				{
@@ -2436,7 +2625,7 @@
 			{
 				"Passive"   "1"
 				"IsHidden"  "0"
-				"TextureName"		"holdout_devotion_aura"
+				"TextureName"		"custom/holdout_devotion_aura"
 
 				"OnCreated"
 				{
@@ -2457,7 +2646,7 @@
 			"modifier_command_buff"
 			{
 				"IsBuff"			"1"
-				"TextureName"		"holdout_command_aura"
+				"TextureName"		"custom/holdout_command_aura"
 
 				"Properties"
 				{
@@ -2487,7 +2676,7 @@
 		"ItemPurchasable"				"1"
 		"ItemDroppable"					"1"
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
-		"AbilityTextureName"			"cloak_of_flames"
+		"AbilityTextureName"			"custom/cloak_of_flames"
 
 		"SideShop"						"0" 
 		"SecretShop"					"1"
@@ -2570,7 +2759,7 @@
 		//----------------------------------------------------------------------------------------------------
 		"BaseClass"             		"item_datadriven"
 		"ID"							"2534"
-		"AbilityTextureName"			"doom_artifact"		
+		"AbilityTextureName"			"custom/doom_artifact"		
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 
 		// Item Info
@@ -2701,7 +2890,7 @@
 			{
 				"Passive"			"1"
 				"IsHidden"			"0"
-				"TextureName"		"shield_of_invincibility"
+				"TextureName"		"modifiers/shield_of_invincibility"
 
 				"OnAttacked"
 				{
@@ -2746,14 +2935,8 @@
 				"Passive"						"1"
 				"IsHidden"						"1"
 				"Attributes"					"MODIFIER_ATTRIBUTE_MULTIPLE"
-				
-				"Orb"
-				{
-					"Priority"					"DOTA_ORB_PRIORITY_ITEM"
-					"ProjectileName"			"particles/econ/items/razor/razor_ti6/razor_base_attack_ti6.vpcf"
-				}
 
-				"OnOrbImpact"
+				"OnAttackLanded"
 				{
 					"RunScript"
 					{
@@ -2786,7 +2969,7 @@
 			{
 				"IsBuff"		"1"
 				"IsHidden"		"0"
-				"TextureName"	"holdout_endurance_aura"
+				"TextureName"	"custom/holdout_endurance_aura"
 
 				"OnCreated"
 				{
@@ -2823,7 +3006,7 @@
 			{
 				"Passive"		"1"
 				"IsHidden"		"0"
-				"TextureName"	"holdout_unholy_aura"
+				"TextureName"	"custom/holdout_unholy_aura"
 
 				"OnCreated"
 				{
@@ -2853,7 +3036,7 @@
 			{
 				"Passive"   "1"
 				"IsHidden"  "0"
-				"TextureName"		"holdout_devotion_aura"
+				"TextureName"		"custom/holdout_devotion_aura"
 
 				"OnCreated"
 				{
@@ -2869,7 +3052,7 @@
 			"modifier_command_buff"
 			{
 				"IsBuff"			"1"
-				"TextureName"		"holdout_command_aura"
+				"TextureName"		"custom/holdout_command_aura"
 
 				"Properties"
 				{
@@ -2944,9 +3127,9 @@
 	{
 		"ID"							"2537"
 		"BaseClass"                     "item_datadriven"
-		"AbilityTextureName"            "item_orb_of_earth"
-		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_PASSIVE"
-	
+		"AbilityTextureName"			"custom/orb_of_earth"
+		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+
 		// Shops
 		"ItemCost"						"7500"
 		"AbilityCooldown"				"10.0"
@@ -2956,7 +3139,9 @@
 		"ItemSellable"					"1"
 		"ItemDroppable"					"1"
 		"ItemQuality"					"artifact"
-		
+		"ItemBaseLevel"					"1"
+		"MaxUpgradeLevel"				"3"
+
 		"Model"							"models/props_gameplay/red_box.vmdl"
 		"Effect"						"particles/units/heroes/hero_earth_spirit/espirit_geomagentic_target_sphere.vpcf"
 	
@@ -2969,7 +3154,7 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"bonus_damage"			"150"
+				"bonus_damage"			"100"
 			}
 			"02"
 			{
@@ -2983,24 +3168,67 @@
 			}
 		}
 
+		"OnEquip"
+		{
+			"RunScript"
+			{
+				"ScriptFile"	"items/global.lua"
+				"Function"		"EquipOrbs"
+			}
+
+			"DelayedAction"
+			{
+				"Delay"		"0.1"
+				"Action"
+				{
+					"ApplyModifier"
+					{
+						"ModifierName"	"modifier_orb_of_earth"
+						"Target"		"CASTER"
+					}
+				}
+			}
+		}
+
+		"OnSpellStart"
+		{
+			"RunScript"
+			{
+				"ScriptFile"	"items/global.lua"
+				"Function"		"EquipOrbs"
+			}
+
+			"RunScript"
+			{
+				"ScriptFile"	"items/global.lua"
+				"Function"		"CooldownOrbs"
+			}
+
+			"DelayedAction"
+			{
+				"Delay"		"0.1"
+				"Action"
+				{
+					"ApplyModifier"
+					{
+						"ModifierName"	"modifier_orb_of_earth"
+						"Target"		"CASTER"
+					}
+				}
+			}
+		}
+
 		"Modifiers"
 		{
 			"modifier_orb_of_earth"
 			{
-				"Passive"       "1"
-				"IsHidden"      "1"
-				"Orb"
-				{
-					"Priority"			"DOTA_ORB_PRIORITY_ABILITY"
-					"ProjectileName"	"particles/units/heroes/hero_obsidian_destroyer/obsidian_destroyer_base_attack_energy.vpcf"
-				}
-	
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE"		"%bonus_damage"
-				}
+				"Passive"		"1"
+				"IsHidden"		"1"
 
-				"OnOrbImpact"
+				"EffectName"			"particles/units/heroes/hero_ancient_apparition/ancient_apparition_chilling_touch_buff_green.vpcf"
+				"EffectAttachType"		"attach_attack1"
+
+				"OnAttackLanded"
 				{
 					"Random"
 					{
@@ -3028,6 +3256,27 @@
 				}
 			}
 
+			"modifier_orb_attributes"
+			{
+				"Passive"		"1"
+				"IsHidden"		"1"
+				"Attributes"	"MODIFIER_ATTRIBUTE_MULTIPLE"
+
+				"OnCreated"
+				{
+					"RunScript"
+					{
+						"ScriptFile"	"items/global.lua"
+						"Function"		"EquipOrbs"
+					}
+				}		
+	
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE"		"%bonus_damage"
+				}
+			}
+
 			"modifier_orb_of_earth_target"
 			{
 				"IsDebuff"		"1"
@@ -3048,7 +3297,7 @@
 						"Target"			"TARGET"
 					}
 				}
-	
+
 				"StatusEffectName" 		"particles/units/heroes/hero_medusa/status_effect_medusa_stone_gaze_backup.vpcf" 	   
 				"StatusEffectPriority"	"10"
 	
@@ -3058,6 +3307,870 @@
 					"MODIFIER_STATE_FROZEN"			"MODIFIER_STATE_VALUE_ENABLED"
 				}
 			}
+		}
+	}
+
+	//=================================================================================================================
+	// Orb of Fire 2
+	//=================================================================================================================
+	"item_orb_of_fire2"
+	{
+		"ID"							"2538"
+		"BaseClass"						"item_datadriven"
+		"AbilityTextureName"			"custom/orb_of_fire2"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityCooldown"				"10.0"
+	
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"      
+		"ItemShopTags"					"cleave"
+		"ItemQuality"					"artifact"
+		"ItemPermanent"					"0"
+		"ItemStackable"					"0"
+		"ItemKillable"					"1"
+		"ItemSellable"					"1"
+		"ItemDroppable"					"1"
+		"ItemBaseLevel"					"2"
+		"MaxUpgradeLevel"				"3"
+
+		// Shops
+		"ItemCost"						"17500"
+		"StockMax"						"1"
+		"StockTime"						"300.0"
+		"StockInitial"					"0"
+		
+		"Model"                         "models/props_gameplay/red_box.vmdl"
+		"Effect"                        "particles/econ/courier/courier_greevil_red/courier_greevil_red_ambient_3.vpcf"
+	
+		"UIPickupSound"                 "Item.PickUpGemShop"
+		"UIDropSound"                   "Item.DropGemShop"
+		"WorldDropSound"                "Item.DropGemWorld"
+
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_damage"			"300"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"full_damage_radius"	"325"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"cleave_pct_tooltip"	"17.5"
+			}
+		}
+
+		"OnEquip"
+		{
+			"RunScript"
+			{
+				"ScriptFile"	"items/global.lua"
+				"Function"		"EquipOrbs"
+			}
+
+			"DelayedAction"
+			{
+				"Delay"		"0.1"
+				"Action"
+				{
+					"ApplyModifier"
+					{
+						"ModifierName"	"modifier_orb_of_fire"
+						"Target"		"CASTER"
+					}
+				}
+			}
+		}
+
+		"OnSpellStart"
+		{
+			"RunScript"
+			{
+				"ScriptFile"	"items/global.lua"
+				"Function"		"EquipOrbs"
+			}
+
+			"RunScript"
+			{
+				"ScriptFile"	"items/global.lua"
+				"Function"		"CooldownOrbs"
+			}
+
+			"DelayedAction"
+			{
+				"Delay"		"0.1"
+				"Action"
+				{
+					"ApplyModifier"
+					{
+						"ModifierName"	"modifier_orb_of_fire"
+						"Target"		"CASTER"
+					}
+				}
+			}
+		}
+
+		"Modifiers"
+		{
+			"modifier_orb_of_fire"
+			{
+				"Passive"			"1"
+				"IsHidden"			"1"
+
+				"EffectName"		"particles/custom/items/orb/orb_of_fire/orb.vpcf"
+				"EffectAttachType"	"follow_origin"
+	
+				"OnAttackLanded"
+				{
+					"RunScript"
+					{
+						"ScriptFile"	"items/global.lua"
+						"Function"		"Splash"
+					}
+				}
+			}
+
+			"modifier_orb_attributes"
+			{
+				"Passive"			"1"
+				"IsHidden"			"1"
+				"Attributes"		"MODIFIER_ATTRIBUTE_MULTIPLE"
+
+				"OnCreated"
+				{
+					"RunScript"
+					{
+						"ScriptFile"	"items/global.lua"
+						"Function"		"EquipOrbs"
+					}
+				}
+
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE"		"%bonus_damage"
+				}
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Recipe: Orb of Fire 2
+	//=================================================================================================================
+	"item_recipe_orb_of_fire2"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"ID"							"2539"
+		"BaseClass"             		"item_datadriven"
+		"Model"							"models/props_gameplay/recipe.mdl"
+		"AbilityTextureName"			"custom/recipe"
+		
+		// Item Info
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemCost"						"10000"	
+		"ItemShopTags"					""
+		
+		// Recipe
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemRecipe"					"1"
+		"ItemResult"					"item_orb_of_fire2"
+		"ItemRequirements"
+		{
+			"01"						"item_orb_of_fire"
+		}
+	}
+
+	//=================================================================================================================
+	// Recipe: Orb of Lightning 2
+	//=================================================================================================================
+	"item_recipe_orb_of_lightning2"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"ID"							"2540"
+		"BaseClass"             		"item_datadriven"
+		"Model"							"models/props_gameplay/recipe.mdl"
+		"AbilityTextureName"			"custom/recipe"
+		
+		// Item Info
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemCost"						"10000"	
+		"ItemShopTags"					""
+		
+		// Recipe
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemRecipe"					"1"
+		"ItemResult"					"item_orb_of_lightning2"
+		"ItemRequirements"
+		{
+			"01"						"item_orb_of_lightning"
+		}
+	}
+
+	//=================================================================================================================
+	// Orb of Lightning 2
+	//=================================================================================================================
+	"item_orb_of_lightning2"
+	{
+		"ID"							"2541"
+		"BaseClass"						"item_datadriven"
+		"AbilityTextureName"			"custom/orb_of_lightning2"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityCooldown"				"10.0"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"      
+		"ItemShopTags"					"purge"
+		"ItemQuality"					"artifact"
+		"ItemAliases"					"orb of lightning 2"
+		"ItemPermanent"					"0"
+		"ItemStackable"					"0"
+		"ItemKillable"					"1"
+		"ItemSellable"					"1"
+		"ItemDroppable"					"1"
+		"AbilityCooldown"				"10.0"
+		"ItemBaseLevel"					"2"
+		"MaxUpgradeLevel"				"3"
+
+		// Shops
+		"ItemCost"						"17500"
+		"StockMax"						"1" 
+		"StockTime"						"300.0"
+		"StockInitial"					"0"
+
+		"Model"							"models/props_gameplay/red_box.vmdl"
+		"Effect"						"particles/units/heroes/hero_stormspirit/stormspirit_overload_ambient.vpcf"
+
+		"UIPickupSound"					"Item.PickUpGemShop"
+		"UIDropSound"					"Item.DropGemShop"
+		"WorldDropSound"				"Item.DropGemWorld"
+
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_damage"			"300"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"purge_chance"			"10"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"movespeed_slow"		"-50"
+			}
+			"04"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"duration"				"3"
+			}
+			"05"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"damage_to_summons"		"300"
+			}
+			"06"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_movespeed"		"10"
+			}
+		}
+
+		"OnEquip"
+		{
+			"RunScript"
+			{
+				"ScriptFile"	"items/global.lua"
+				"Function"		"EquipOrbs"
+			}
+
+			"DelayedAction"
+			{
+				"Delay"		"0.1"
+				"Action"
+				{
+					"ApplyModifier"
+					{
+						"ModifierName"	"modifier_orb_of_lightning"
+						"Target"		"CASTER"
+					}
+				}
+			}
+		}
+
+		"OnSpellStart"
+		{
+			"RunScript"
+			{
+				"ScriptFile"	"items/global.lua"
+				"Function"		"EquipOrbs"
+			}
+
+			"RunScript"
+			{
+				"ScriptFile"	"items/global.lua"
+				"Function"		"CooldownOrbs"
+			}
+
+			"DelayedAction"
+			{
+				"Delay"		"0.1"
+				"Action"
+				{
+					"ApplyModifier"
+					{
+						"ModifierName"	"modifier_orb_of_lightning"
+						"Target"		"CASTER"
+					}
+				}
+			}
+		}
+
+		"Modifiers"
+		{
+			"modifier_orb_of_lightning"
+			{
+				"Passive"			"1"
+				"IsHidden"			"1"
+
+				"EffectName"		"particles/custom/items/orb/orb_of_lightning/orb.vpcf"
+				"EffectAttachType"	"follow_origin"
+
+				"OnAttackLanded"
+				{
+					"Random"
+					{
+						"Chance"			"%purge_chance"
+						"OnSuccess"
+						{
+							"RunScript"
+							{
+								"ScriptFile"	"items/global.lua"
+								"Function"		"Purge"
+							}
+						}
+					}
+				}
+			}
+
+			"modifier_orb_attributes"
+			{
+				"Passive"			"1"
+				"IsHidden"			"1"
+				"Attributes"		"MODIFIER_ATTRIBUTE_MULTIPLE"
+
+				"OnCreated"
+				{
+					"RunScript"
+					{
+						"ScriptFile"	"items/global.lua"
+						"Function"		"EquipOrbs"
+					}
+				}
+	
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE"		"%bonus_damage"
+					"MODIFIER_PROPERTY_MOVESPEED_BONUS_CONSTANT"	"%bonus_movespeed"
+				}
+			}
+
+			"modifier_purge"
+			{
+				"TextureName"       "modifiers/orb_of_lightning"
+				"IsDebuff"          "1"
+				"IsPurgable"        "1"
+
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE" "%movespeed_slow"
+				}
+
+				"States"
+				{
+					"MODIFIER_STATE_DISARMED"		"MODIFIER_STATE_VALUE_ENABLED"
+					"MODIFIER_STATE_ROOTED"			"MODIFIER_STATE_VALUE_ENABLED"
+				}
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Celestial Claws
+	//=================================================================================================================
+	"item_celestial_claws"
+	{
+		"ID"							"2542"
+		"BaseClass"						"item_datadriven"
+		"AbilityTextureName"			"custom/celestial_claws"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"      
+		"ItemShopTags"					"purge"
+		"ItemQuality"					"artifact"
+		"ItemAliases"					"celestial claws"
+		"ItemPermanent"					"0"
+		"ItemStackable"					"0"
+		"ItemKillable"					"1"
+		"ItemSellable"					"1"
+		"ItemDroppable"					"1"
+		"SecretShop"					"1"
+		"AbilityCooldown"				"10.0"
+		"ItemBaseLevel"					"3"
+		"MaxUpgradeLevel"				"3"
+
+		// Shops
+		"ItemCost"						"50000"
+
+		"Model"							"models/props_gameplay/red_box.vmdl"
+		"Effect"						"particles/units/heroes/hero_stormspirit/stormspirit_overload_ambient.vpcf"
+
+		"UIPickupSound"					"Item.PickUpGemShop"
+		"UIDropSound"					"Item.DropGemShop"
+		"WorldDropSound"				"Item.DropGemWorld"
+
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_damage"			"1350"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"purge_chance"			"10"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"movespeed_slow"		"-50"
+			}
+			"04"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"duration"				"3"
+			}
+			"05"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"damage_to_summons"		"600"
+			}
+			"06"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_movespeed"		"20"
+			}
+			"07"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"bat_reduction"			"0.2"
+			}
+		}
+
+		"OnEquip"
+		{
+			"RunScript"
+			{
+				"ScriptFile"    "items/claws_of_attack.lua"
+				"Function"      "EquipClaws"
+			}
+
+			"RunScript"
+			{
+				"ScriptFile"	"items/global.lua"
+				"Function"		"EquipOrbs"
+			}
+
+			"DelayedAction"
+			{
+				"Delay"		"0.1"
+				"Action"
+				{
+					"ApplyModifier"
+					{
+						"ModifierName"	"modifier_orb_of_lightning"
+						"Target"		"CASTER"
+					}
+				}
+			}
+		}
+
+		"OnSpellStart"
+		{
+			"RunScript"
+			{
+				"ScriptFile"	"items/global.lua"
+				"Function"		"EquipOrbs"
+			}
+
+			"RunScript"
+			{
+				"ScriptFile"	"items/global.lua"
+				"Function"		"CooldownOrbs"
+			}
+
+			"DelayedAction"
+			{
+				"Delay"		"0.1"
+				"Action"
+				{
+					"ApplyModifier"
+					{
+						"ModifierName"	"modifier_orb_of_lightning"
+						"Target"		"CASTER"
+					}
+				}
+			}
+		}
+
+		"OnUnequip"
+		{
+			"RunScript"
+			{
+				"ScriptFile"    "items/claws_of_attack.lua"
+				"Function"      "UnequipClaws"
+			}
+		}
+
+		"Modifiers"
+		{
+			"modifier_orb_of_lightning"
+			{
+				"Passive"			"1"
+				"IsHidden"			"1"
+	
+				"EffectName"		"particles/custom/items/orb/orb_of_lightning/orb.vpcf"
+				"EffectAttachType"	"follow_origin"
+
+				"OnAttackLanded"
+				{
+					"Random"
+					{
+						"Chance"			"%purge_chance"
+						"OnSuccess"
+						{
+							"RunScript"
+							{
+								"ScriptFile"	"items/global.lua"
+								"Function"		"Purge"
+							}
+						}
+					}
+				}
+			}
+
+			"modifier_orb_attributes"
+			{
+				"Passive"			"1"
+				"IsHidden"			"1"
+				"Attributes"		"MODIFIER_ATTRIBUTE_MULTIPLE"
+
+				"OnCreated"
+				{
+					"RunScript"
+					{
+						"ScriptFile"	"items/global.lua"
+						"Function"		"EquipOrbs"
+					}
+				}
+	
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE"		"%bonus_damage"
+					"MODIFIER_PROPERTY_MOVESPEED_BONUS_CONSTANT"	"%bonus_movespeed"
+				}
+			}
+
+			"modifier_purge"
+			{
+				"TextureName"		"modifiers/orb_of_lightning"
+				"IsDebuff"			"1"
+				"IsPurgable"		"1"
+
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE" "%movespeed_slow" 
+				}
+
+				"States"
+				{
+					"MODIFIER_STATE_DISARMED"		"MODIFIER_STATE_VALUE_ENABLED"
+					"MODIFIER_STATE_ROOTED"			"MODIFIER_STATE_VALUE_ENABLED"
+				}
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Orb of Darkness 2
+	//=================================================================================================================
+	"item_orb_of_darkness2"
+	{
+		"ID"							"2543"
+		"BaseClass"                     "item_datadriven"
+		"AbilityTextureName"			"custom/orb_of_darkness2"
+		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityCooldown"				"10.0"
+
+		// Shops
+		"ItemCost"						"17500"
+		"StockMax"						"1" 
+		"StockTime"						"300.0"
+		"StockInitial"					"0"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
+		"ItemKillable"					"1"
+		"ItemSellable"					"1"
+		"ItemDroppable"					"1"
+		"ItemQuality"					"artifact"
+		"ItemBaseLevel"					"2"
+		"MaxUpgradeLevel"				"3"
+
+		"Model"                         "models/props_gameplay/red_box.vmdl"
+		"Effect"                        "particles/econ/courier/courier_greevil_black/courier_greevil_black_ambient_3.vpcf"
+
+		"UIPickupSound"                 "Item.PickUpGemShop"
+		"UIDropSound"                   "Item.DropGemShop"
+		"WorldDropSound"                "Item.DropGemWorld"
+
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_hp"				"4000"
+			}
+			"02"
+			{
+				"var_type"              "FIELD_INTEGER"
+				"bonus_damage"          "300"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"minion_hp"				"375"
+			}
+			"04"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"minion_damage"			"80"
+			}
+			"05"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"duration"				"40"
+			}
+			"06"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_armor"			"20"
+			}
+			"07"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_health_regen"	"20"
+			}
+		}
+
+		"OnEquip"
+		{
+			"RunScript"
+			{
+				"ScriptFile"	"items/global.lua"
+				"Function"		"EquipOrbs"
+			}
+
+			"DelayedAction"
+			{
+				"Delay"		"0.1"
+				"Action"
+				{
+					"ApplyModifier"
+					{
+						"ModifierName"	"modifier_orb_of_darkness"
+						"Target"		"CASTER"
+					}
+				}
+			}
+		}
+
+		"OnSpellStart"
+		{
+			"RunScript"
+			{
+				"ScriptFile"	"items/global.lua"
+				"Function"		"EquipOrbs"
+			}
+
+			"RunScript"
+			{
+				"ScriptFile"	"items/global.lua"
+				"Function"		"CooldownOrbs"
+			}
+
+			"DelayedAction"
+			{
+				"Delay"		"0.1"
+				"Action"
+				{
+					"ApplyModifier"
+					{
+						"ModifierName"	"modifier_orb_of_darkness"
+						"Target"		"CASTER"
+					}
+				}
+			}
+		}
+
+		"Modifiers"
+		{
+			"modifier_orb_of_darkness"
+			{
+				"Passive"		"1"
+				"IsHidden"		"1"
+
+				"EffectName"		"particles/units/heroes/hero_ursa/ursa_enrage_buff_glow.vpcf"
+				"EffectAttachType"	"attach_attack1"
+
+				"OnAttackLanded"
+				{
+					"ApplyModifier"
+					{
+						"ModifierName"		"modifier_orb_of_darkness_spawn2"
+						"Target"
+						{
+							"Center"		"TARGET"
+							"Types"			"DOTA_UNIT_TARGET_BASIC"
+						}
+					}
+
+					"FireSound"
+					{
+						"EffectName"		"Hero_Medusa.MysticSnake.Target"
+						"Target"			"CASTER"
+					}
+				}
+			}
+
+			"modifier_orb_attributes"
+			{
+				"Passive"		"1"
+				"IsHidden"		"1"
+				"Attributes"	"MODIFIER_ATTRIBUTE_MULTIPLE"
+
+				"OnCreated"
+				{
+					"RunScript"
+					{
+						"ScriptFile"	"items/global.lua"
+						"Function"		"EquipOrbs"
+					}
+				}
+
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE"		"%bonus_damage"
+					"MODIFIER_PROPERTY_HEALTH_BONUS"				"%bonus_hp"
+					"MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS"		"%bonus_armor"
+					"MODIFIER_PROPERTY_HEALTH_REGEN_CONSTANT"		"%bonus_health_regen"
+				}
+			}
+
+			"modifier_orb_of_darkness_spawn2"
+			{
+				"IsHidden"		"1"
+				"Duration"		"0.1"
+
+				"OnDeath"
+				{
+					"SpawnUnit"
+					{
+						"UnitName"			"undead_black_arrow_minion_2"
+						"UnitCount"			"1"
+						"SpawnRadius"		"1"
+						"Duration"			"%duration"
+						"Target"
+						{
+							"Center"	"UNIT"
+							"Flags"		"DOTA_UNIT_TARGET_FLAG_DEAD"
+						}
+
+						"OnSpawn"
+						{
+							"FireSound"
+							{
+								"EffectName"	"Hero_Medusa.MysticSnake.Return"
+								"Target"		"CASTER"
+							}
+
+							"ApplyModifier"
+							{
+								"ModifierName"	"modifier_phased"
+								"Target"		"TARGET"
+								"Duration"		"0.03"
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Recipe: Orb of Darkness 2
+	//=================================================================================================================
+	"item_recipe_orb_of_darkness2"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"ID"							"2544"
+		"BaseClass"             		"item_datadriven"
+		"Model"							"models/props_gameplay/recipe.mdl"
+		"AbilityTextureName"			"custom/recipe"
+
+		// Item Info
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemCost"						"10000"	
+		"ItemShopTags"					""
+
+		// Recipe
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemRecipe"					"1"
+		"ItemResult"					"item_orb_of_darkness2"
+		"ItemRequirements"
+		{
+			"01"						"item_orb_of_darkness"
+		}
+	}
+
+	//=================================================================================================================
+	// Recipe: Doom Artifact
+	//=================================================================================================================
+	"item_recipe_doom_artifact"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"ID"							"2545"
+		"BaseClass"             		"item_datadriven"
+		"Model"							"models/props_gameplay/recipe.mdl"
+		"AbilityTextureName"			"custom/recipe"
+
+		// Item Info
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemCost"						"0"	
+		"ItemShopTags"					""
+
+		// Recipe
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemRecipe"					"1"
+		"ItemResult"					"item_doom_artifact"
+		"ItemRequirements"
+		{
+			"01"						"item_key_of_the_three_moons;item_shield_of_invincibility;item_lightning_sword;item_ring_of_superiority"
 		}
 	}
 } // End of npc_items_custom.txt

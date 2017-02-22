@@ -3,11 +3,13 @@ require('libraries/timers')
 function FullRestauration(event)
 local caster = event.caster
 local ability = event.ability
-local MaxHealth = caster:GetMaxHealth()
-local MaxMana = caster:GetMaxMana()
+local Health = 30000
+local Mana = 30000
 
-	caster:SetHealth(MaxHealth)
-	caster:SetMana(MaxMana)
+	caster:Heal(Health, caster)
+	SendOverheadEventMessage(nil, OVERHEAD_ALERT_HEAL, caster, Health, nil)
+	caster:SetMana(Mana)
+	SendOverheadEventMessage(nil, OVERHEAD_ALERT_MANA_ADD, caster, Mana, nil)
 end
 
 function Invulnerability(event)

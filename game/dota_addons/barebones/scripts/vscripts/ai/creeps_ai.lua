@@ -26,7 +26,7 @@ end
 function BehaviorNone:Begin()
 	self.endTime = GameRules:GetGameTime() + 10
 
-	local ancient =  Entities:FindByName( nil, "dota_goodguys_fort" )
+	local ancient = Entities:FindByName(nil, "dota_goodguys_fort")
 
 	if ancient then
 		self.order =

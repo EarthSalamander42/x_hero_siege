@@ -12,7 +12,7 @@ function death_check(event)
 			CustomGameEventManager:Send_ServerToAllClients("hide_boss_health", {})
 			caster.deathStart = true
 			if caster:GetUnitName() == "npc_dota_hero_illidan" then
-				grom_boss_die(caster)
+				illidan_boss_die(caster)
 			elseif caster:GetUnitName() == "npc_dota_hero_balanar" then
 				balanar_boss_die(caster)
 			elseif caster:GetUnitName() == "npc_dota_hero_proudmoore" then
@@ -73,6 +73,45 @@ FourBossesKillCount()
 
 	Timers:CreateTimer(12, function()
 		UTIL_Remove(caster)
+		local DoorObs = Entities:FindAllByName("obstruction_illidan")
+		for _, obs in pairs(DoorObs) do
+			obs:SetEnabled(false, true)
+		end
+		DoEntFire("door_illidan", "SetAnimation", "gate_entrance002_open", 0, nil, nil)
+	end)
+end
+
+function illidan_boss_die(caster)
+FourBossesKillCount()
+
+	Timers:CreateTimer(1.0, function()
+		local item = CreateItem("item_bag_of_gold", nil, nil)
+		local pos = caster:GetAbsOrigin()
+		local drop = CreateItemOnPositionSync( pos, item )
+		local pos_launch = pos+RandomVector(RandomFloat(150,200))
+		item:LaunchLoot(false, 300, 0.5, pos)
+		item:SetCurrentCharges(200000)
+		EmitGlobalSound("Loot_Drop_Stinger_Arcana")
+	end)
+
+	EmitSoundOn("skeleton_king_wraith_death_long_01", caster)
+	EmitSoundOn("skeleton_king_wraith_death_long_01", caster)
+	EmitSoundOn("skeleton_king_wraith_death_long_01", caster)
+	StartAnimation(caster, {duration=6.0, activity=ACT_DOTA_FLAIL, rate=0.75})
+
+	Timers:CreateTimer(6, function()
+		StartAnimation(caster, {duration=6.0, activity=ACT_DOTA_DIE, rate=0.25})
+		EmitSoundOn("skeleton_king_wraith_death_long_09", caster)
+		EmitSoundOn("skeleton_king_wraith_death_long_09", caster)
+	end)
+
+	Timers:CreateTimer(12, function()
+		UTIL_Remove(caster)
+		local DoorObs = Entities:FindAllByName("obstruction_balanar")
+		for _, obs in pairs(DoorObs) do
+			obs:SetEnabled(false, true)
+		end
+		DoEntFire("door_balanar", "SetAnimation", "gate_entrance002_open", 0, nil, nil)
 	end)
 end
 
@@ -102,6 +141,11 @@ FourBossesKillCount()
 
 	Timers:CreateTimer(12, function()
 		UTIL_Remove(caster)
+		local DoorObs = Entities:FindAllByName("obstruction_proudmoore2")
+		for _, obs in pairs(DoorObs) do
+			obs:SetEnabled(false, true)
+		end
+		DoEntFire("door_proudmoore2", "SetAnimation", "gate_entrance002_open", 0, nil, nil)
 	end)
 end
 
@@ -131,6 +175,11 @@ FourBossesKillCount()
 
 	Timers:CreateTimer(12, function()
 		UTIL_Remove(caster)
+		local DoorObs = Entities:FindAllByName("obstruction_proudmoore")
+		for _, obs in pairs(DoorObs) do
+			obs:SetEnabled(false, true)
+		end
+		DoEntFire("door_proudmoore", "SetAnimation", "gate_entrance002_open", 0, nil, nil)
 	end)
 end
 

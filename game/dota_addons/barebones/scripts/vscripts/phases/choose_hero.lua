@@ -100,7 +100,7 @@ local heroes = HeroList:GetAllHeroes()
 		HEROLIST_ALT[27] = CreateUnitByName("npc_dota_hero_warlock_bis", Entities:FindByName(nil, "choose_warlock_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
 		HEROLIST_ALT[27]:SetAngles(0, 270, 0)
 
-		HEROLIST_ALT[28] = CreateUnitByName("npc_dota_hero_monkey_king_bis", Entities:FindByName(nil, "choose_dota_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
+		HEROLIST_ALT[28] = CreateUnitByName("npc_dota_hero_doom_bringer_bis", Entities:FindByName(nil, "choose_dota_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
 		HEROLIST_ALT[28]:SetAngles(0, 90, 0)
 	end)
 
@@ -130,6 +130,9 @@ local heroes = HeroList:GetAllHeroes()
 
 		HEROLIST_VIP_ALT[7] = CreateUnitByName("npc_dota_hero_necrolyte_bis", Entities:FindByName(nil, "choose_pudge_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
 		HEROLIST_VIP_ALT[7]:SetAngles(0, 270, 0)
+
+		WEEKLY_HERO = CreateUnitByName("npc_dota_hero_sand_king_bis", Entities:FindByName(nil, "choose_vip_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
+		WEEKLY_HERO:SetAngles(0, 270, 0)
 	end)
 
 	Timers:CreateTimer(20, function()
@@ -186,11 +189,11 @@ function ChooseHero(event)
 local activator = event.activator
 local caller = event.caller
 local id = activator:GetPlayerID()
+local point = Entities:FindByName(nil, "base_spawn")
 	for playerID = 0, DOTA_MAX_TEAM_PLAYERS -1 do
 		if PlayerResource:IsValidPlayer(playerID) and activator:GetUnitName() == "npc_dota_hero_wisp" then
 			for i = 1, #HEROLIST do
 				if caller:GetName() == "trigger_hero_"..i then
-				local point = Entities:FindByName(nil, "base_spawn")
 					UTIL_Remove(Entities:FindByName(nil, "trigger_hero_"..i))
 					UTIL_Remove(HEROLIST_ALT[i])
 					PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(), nil)
@@ -210,6 +213,29 @@ local id = activator:GetPlayerID()
 					newHero:SwapItems(5, 8)
 				end
 			end
+			if caller:GetName() == "trigger_hero_weekly" then
+				if not activator:HasAbility("holdout_vip") then
+					UTIL_Remove(Entities:FindByName(nil, "trigger_hero_weekly"))
+					UTIL_Remove(WEEKLY_HERO)
+					PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(), nil)
+					FindClearSpaceForUnit(activator, point:GetAbsOrigin(), true)
+					local newHero = PlayerResource:ReplaceHeroWith(activator:GetPlayerID(), "npc_dota_hero_sand_king", STARTING_GOLD, 0)
+					activator:SetPlayerID(id)
+					local particle = ParticleManager:CreateParticle("particles/econ/events/ti6/hero_levelup_ti6.vpcf", PATTACH_ABSORIGIN_FOLLOW, newHero)
+					ParticleManager:SetParticleControl(particle, 0, newHero:GetAbsOrigin())
+					local item1 = newHero:AddItemByName("item_ankh_of_reincarnation")
+					local item2 = newHero:AddItemByName("item_healing_potion")
+					local item3 = newHero:AddItemByName("item_mana_potion")
+					local item4 = newHero:AddItemByName("item_backpack")
+					local item5 = newHero:AddItemByName("item_backpack")
+					local item6 = newHero:AddItemByName("item_backpack")
+					newHero:SwapItems(3, 6)
+					newHero:SwapItems(4, 7)
+					newHero:SwapItems(5, 8)
+				elseif activator:HasAbility("holdout_vip") then
+					Notifications:Bottom(activator:GetPlayerOwnerID(),{text = "You are VIP. Please select this hero on top!", duration = 5.0})
+				end
+			end
 		end
 	end
 end
@@ -219,11 +245,11 @@ local activator = event.activator
 local caller = event.caller
 local id = activator:GetPlayerID()
 local msg = "This hero is only for <font color='#FF0000'>VIP Members!</font> Please choose another hero."
+local point = Entities:FindByName(nil, "base_spawn")
 	for playerID = 0, DOTA_MAX_TEAM_PLAYERS -1 do
 		if PlayerResource:IsValidPlayer(playerID) and activator:GetUnitName() == "npc_dota_hero_wisp" and activator:HasAbility("holdout_vip") then
 			for i = 1, #HEROLIST_VIP do
 				if caller:GetName() == "trigger_hero_vip_"..i then
-				local point = Entities:FindByName(nil, "base_spawn")
 					PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(), nil)
 					FindClearSpaceForUnit(activator, point:GetAbsOrigin(), true)
 					Timers:CreateTimer(2.0, function()
@@ -244,7 +270,7 @@ local msg = "This hero is only for <font color='#FF0000'>VIP Members!</font> Ple
 				end
 			end
 		elseif PlayerResource:IsValidPlayer(playerID) and activator:GetUnitName() == "npc_dota_hero_wisp" then
-			Notifications:Bot(activator:GetPlayerOwnerID(),{text = msg, duration = 5.0})
+			Notifications:Bottom(activator:GetPlayerOwnerID(), {text = msg, duration = 5.0})
 		end
 	end
 end

@@ -74,8 +74,10 @@ local hero_level = npc:GetLevel()
 		end)
 	end
 
+	--debug
 	if npc:GetUnitName() == "npc_dota_hero_tiny" and hero_level >= 20 then
 		local ability = npc:FindAbilityByName("holdout_war_club_20")
+		npc:RemoveModifierByName("modifier_item_ultimate_scepter_consumed")
 		npc:AddNewModifier(npc, ability, "modifier_item_ultimate_scepter_consumed", {})
 	end
 
@@ -125,7 +127,7 @@ local hero_level = npc:GetLevel()
 		"holdout_divided_we_stand_hidden",
 		"holdout_frostmourne_innate",
 		"holdout_strength_of_the_wild",
-		"holdout_last_stand",
+		"holdout_reincarnation",
 		"holdout_power_mount_str",
 		"holdout_power_mount_int",
 		"holdout_power_mount_agi",
@@ -138,6 +140,10 @@ local hero_level = npc:GetLevel()
 		"holdout_giant_form",
 		"holdout_monkey_king_bar",
 		"holdout_stitch",
+		"troll_warlord_berserkers_rage",
+		"holdout_random_hero",
+--		"troll_warlord_whirling_axes_ranged",
+--		"troll_warlord_whirling_axes_melee",
 		"holdout_yellow_effect", --Desert Wyrm Ultimate effect
 		"holdout_blue_effect", --Lich King boss + hero effect
 		"holdout_green_effect", --Banehallow boss + hero effect
@@ -272,9 +278,11 @@ function GameMode:OnEntityHurt(keys)
 	end
 
 --	if entVictim:GetUnitName() == "npc_dota_defender_fort" and entVictim:GetHealthPercent() <= 40 then
---	local Waypoint = Entities:FindByName(nil, "final_wave_player_1")
---	local InvTime = 30.0
---	local PauseTime = 10.0
+--	if entVictim:IsAncient() then
+--		print("Ancient hurt!")
+--		local Waypoint = Entities:FindByName(nil, "final_wave_player_1")
+--		local InvTime = 30.0
+--		local PauseTime = 10.0
 --		if MURADIN_DEF == 0 then
 --			print("Muradin check..")
 --			local Muradin = CreateUnitByName("npc_dota_creature_muradin_bronzebeard", Waypoint:GetAbsOrigin(), false, nil, nil, DOTA_TEAM_GOODGUYS)
@@ -333,7 +341,7 @@ function GameMode:OnPlayerChangedName(keys)
 	local oldName = keys.oldName
 end
 
-function GameMode:OnPlayerLearnedAbility( keys)
+function GameMode:OnPlayerLearnedAbility(keys)
 	local player = EntIndexToHScript(keys.player)
 	local abilityname = keys.abilityname
 end
@@ -406,7 +414,7 @@ local AbilitiesHeroes_XX = {
 	if hero:GetUnitName() == "npc_dota_hero_sven" then
 		if hero_level == 20 then
 			hero:RemoveAbility("holdout_storm_bolt")
-			hero:RemoveAbility("holdout_war_thunder")
+			hero:RemoveAbility("holdout_thunder_clap")
 		end
 	end
 
@@ -504,24 +512,23 @@ local AbilitiesHeroes_XX = {
 end
 
 function GameMode:OnLastHit(keys)
-	local isFirstBlood = keys.FirstBlood == 1
-	local isHeroKill = keys.HeroKill == 1
-	local isTowerKill = keys.TowerKill == 1
-	local player = PlayerResource:GetPlayer(keys.PlayerID)
-	local killedEnt = EntIndexToHScript(keys.EntKilled)
+local isFirstBlood = keys.FirstBlood == 1
+local isHeroKill = keys.HeroKill == 1
+local isTowerKill = keys.TowerKill == 1
+local player = PlayerResource:GetPlayer(keys.PlayerID)
+local killedEnt = EntIndexToHScript(keys.EntKilled)
+
 end
 
 function GameMode:OnTreeCut(keys)
-	DebugPrint('[BAREBONES] OnTreeCut')
-	DebugPrintTable(keys)
+local treeX = keys.tree_x
+local treeY = keys.tree_y
 
-	local treeX = keys.tree_x
-	local treeY = keys.tree_y
 end
 
 function GameMode:OnRuneActivated (keys)
-	local player = PlayerResource:GetPlayer(keys.PlayerID)
-	local rune = keys.rune
+local player = PlayerResource:GetPlayer(keys.PlayerID)
+local rune = keys.rune
 
 	--[[ Rune Can be one of the following types
 	DOTA_RUNE_DOUBLEDAMAGE
@@ -539,34 +546,30 @@ function GameMode:OnRuneActivated (keys)
 end
 
 function GameMode:OnPlayerTakeTowerDamage(keys)
-	local player = PlayerResource:GetPlayer(keys.PlayerID)
-	local damage = keys.damage
+local player = PlayerResource:GetPlayer(keys.PlayerID)
+local damage = keys.damage
+
 end
 
 function GameMode:OnPlayerPickHero(keys)
-	local heroClass = keys.hero
-	local heroEntity = EntIndexToHScript(keys.heroindex)
-	local player = EntIndexToHScript(keys.player)
-	local heroes = HeroList:GetAllHeroes()
+local heroClass = keys.hero
+local heroEntity = EntIndexToHScript(keys.heroindex)
+local player = EntIndexToHScript(keys.player)
+local heroes = HeroList:GetAllHeroes()
 
 	-- modifies the name/label of a player
 --	GameMode:setPlayerHealthLabel(player)
 end
 
 function GameMode:OnTeamKillCredit(keys)
-	DebugPrint('[BAREBONES] OnTeamKillCredit')
-	DebugPrintTable(keys)
+local killerPlayer = PlayerResource:GetPlayer(keys.killer_userid)
+local victimPlayer = PlayerResource:GetPlayer(keys.victim_userid)
+local numKills = keys.herokills
+local killerTeamNumber = keys.teamnumber
 
-	local killerPlayer = PlayerResource:GetPlayer(keys.killer_userid)
-	local victimPlayer = PlayerResource:GetPlayer(keys.victim_userid)
-	local numKills = keys.herokills
-	local killerTeamNumber = keys.teamnumber
 end
 
 function GameMode:OnEntityKilled( keys )
-DebugPrint( '[BAREBONES] OnEntityKilled Called' )
-DebugPrintTable( keys )
-
 GameMode:_OnEntityKilled( keys )
 
 local killedUnit = EntIndexToHScript( keys.entindex_killed )
@@ -598,47 +601,49 @@ local playerKills = PlayerResource:GetKills(KillerID)
 		killerEntity = PlayerResource:GetPlayer(killerEntity:GetPlayerID()):GetAssignedHero()
 	end
 
-	if killerEntity:GetKills() == 100 then
-		Notifications:Top(killerEntity:GetPlayerOwnerID(), {text="100 kills. You get 7500 gold.", duration=5.0, style={color="red"}})
-		PlayerResource:ModifyGold( killerEntity:GetPlayerOwnerID(), 7500, false,  DOTA_ModifyGold_Unspecified )
-	elseif killerEntity:GetKills() == 200 then
-		Notifications:Top(killerEntity:GetPlayerOwnerID(), {text="200 kills. You get 25000 gold.", duration=5.0, style={color="red"}})
-		PlayerResource:ModifyGold( killerEntity:GetPlayerOwnerID(), 25000, false,  DOTA_ModifyGold_Unspecified )
-	elseif killerEntity:GetKills() == 400 then
-		Notifications:Top(killerEntity:GetPlayerOwnerID(), {text="400 kills. You get 50000 gold.", duration=5.0, style={color="red"}})
-		PlayerResource:ModifyGold( killerEntity:GetPlayerOwnerID(), 50000, false,  DOTA_ModifyGold_Unspecified )
-	elseif killerEntity:GetKills() >= 500 and RAMERO == 0 and NEUTRAL_SPAWN == 0 then --500
-	local point = Entities:FindByName(nil, "npc_dota_muradin_player_1"):GetAbsOrigin()
-		killerEntity:AddNewModifier( nil, nil, "modifier_animation_freeze_stun", nil)
-		killerEntity:AddNewModifier( nil, nil, "modifier_invulnerable", nil)
-		Notifications:TopToAll({text="A hero has reached 500 kills and will fight Ramero and Baristol!", style={color="white"}, duration=5.0})
-		Timers:CreateTimer(5.0, function()
-			FindClearSpaceForUnit(killerEntity, point, true)
-			PlayerResource:SetCameraTarget(killerEntity:GetPlayerOwnerID(), killerEntity)
-			RameroAndBaristolEvent()
-			killerEntity:RemoveModifierByName("modifier_animation_freeze_stun")
-			killerEntity:RemoveModifierByName("modifier_invulnerable")
-			Timers:CreateTimer(0.1, function()
-				PlayerResource:SetCameraTarget(killerEntity:GetPlayerOwnerID(), nil)
+	if killerEntity:IsRealHero() then
+		if killerEntity:GetKills() == 99 then
+			Notifications:Top(killerEntity:GetPlayerOwnerID(), {text="100 kills. You get 7500 gold.", duration=5.0, style={color="red"}})
+			PlayerResource:ModifyGold( killerEntity:GetPlayerOwnerID(), 7500, false,  DOTA_ModifyGold_Unspecified )
+		elseif killerEntity:GetKills() == 199 then
+			Notifications:Top(killerEntity:GetPlayerOwnerID(), {text="200 kills. You get 25000 gold.", duration=5.0, style={color="red"}})
+			PlayerResource:ModifyGold( killerEntity:GetPlayerOwnerID(), 25000, false,  DOTA_ModifyGold_Unspecified )
+		elseif killerEntity:GetKills() == 399 then
+			Notifications:Top(killerEntity:GetPlayerOwnerID(), {text="400 kills. You get 50000 gold.", duration=5.0, style={color="red"}})
+			PlayerResource:ModifyGold( killerEntity:GetPlayerOwnerID(), 50000, false,  DOTA_ModifyGold_Unspecified )
+		elseif killerEntity:GetKills() >= 499 and RAMERO == 0 and NEUTRAL_SPAWN == 0 then --500
+		local point = Entities:FindByName(nil, "npc_dota_muradin_player_1"):GetAbsOrigin()
+			killerEntity:AddNewModifier( nil, nil, "modifier_animation_freeze_stun", nil)
+			killerEntity:AddNewModifier( nil, nil, "modifier_invulnerable", nil)
+			Notifications:TopToAll({text="A hero has reached 500 kills and will fight Ramero and Baristol!", style={color="white"}, duration=5.0})
+			Timers:CreateTimer(5.0, function()
+				FindClearSpaceForUnit(killerEntity, point, true)
+				PlayerResource:SetCameraTarget(killerEntity:GetPlayerOwnerID(), killerEntity)
+				RameroAndBaristolEvent()
+				killerEntity:RemoveModifierByName("modifier_animation_freeze_stun")
+				killerEntity:RemoveModifierByName("modifier_invulnerable")
+				Timers:CreateTimer(0.1, function()
+					PlayerResource:SetCameraTarget(killerEntity:GetPlayerOwnerID(), nil)
+				end)
 			end)
-		end)
-		RAMERO = 1
-	elseif killerEntity:GetKills() >= 750 and RAMERO == 1 and NEUTRAL_SPAWN == 0 then --750
-	local point = Entities:FindByName(nil, "npc_dota_muradin_player_1"):GetAbsOrigin()
-		killerEntity:AddNewModifier( nil, nil, "modifier_animation_freeze_stun", nil)
-		killerEntity:AddNewModifier( nil, nil, "modifier_invulnerable", nil)
-		Notifications:TopToAll({text="A hero has reached 750 kills and will fight Ramero!", style={color="white"}, duration=5.0})
-		Timers:CreateTimer(5.0, function()
-			FindClearSpaceForUnit(killerEntity, point, true)
-			PlayerResource:SetCameraTarget(killerEntity:GetPlayerOwnerID(), killerEntity)
-			RameroEvent()
-			killerEntity:RemoveModifierByName("modifier_animation_freeze_stun")
-			killerEntity:RemoveModifierByName("modifier_invulnerable")
-			Timers:CreateTimer(0.1, function()
-				PlayerResource:SetCameraTarget(killerEntity:GetPlayerOwnerID(), nil)
+			RAMERO = 1
+		elseif killerEntity:GetKills() >= 749 and RAMERO == 1 and NEUTRAL_SPAWN == 0 then --750
+		local point = Entities:FindByName(nil, "npc_dota_muradin_player_1"):GetAbsOrigin()
+			killerEntity:AddNewModifier( nil, nil, "modifier_animation_freeze_stun", nil)
+			killerEntity:AddNewModifier( nil, nil, "modifier_invulnerable", nil)
+			Notifications:TopToAll({text="A hero has reached 750 kills and will fight Ramero!", style={color="white"}, duration=5.0})
+			Timers:CreateTimer(5.0, function()
+				FindClearSpaceForUnit(killerEntity, point, true)
+				PlayerResource:SetCameraTarget(killerEntity:GetPlayerOwnerID(), killerEntity)
+				RameroEvent()
+				killerEntity:RemoveModifierByName("modifier_animation_freeze_stun")
+				killerEntity:RemoveModifierByName("modifier_invulnerable")
+				Timers:CreateTimer(0.1, function()
+					PlayerResource:SetCameraTarget(killerEntity:GetPlayerOwnerID(), nil)
+				end)
 			end)
-		end)
-		RAMERO = 2
+			RAMERO = 2
+		end
 	end
 
 	if killerEntity:IsRealHero() and killedUnit:IsRealHero() and killedUnit:GetTeam() == DOTA_TEAM_GOODGUYS then
@@ -655,8 +660,8 @@ local playerKills = PlayerResource:GetKills(KillerID)
 		if PlayerResource:HasSelectedHero(KillerID) then
 			killerEntity:IncrementKills(1)
 		end
-	else
-		
+	elseif killerEntity:IsBuilding() and killedUnit:GetTeam() == DOTA_TEAM_BADGUYS then
+		return nil
 	end
 
 	for c = 1, 8 do
@@ -877,142 +882,110 @@ local player = PlayerResource:GetPlayer(playerID)
 			end
 		end
 
-		if GameRules:PlayerHasCustomGameHostPrivileges(player) then
-			if str == "-openway_1" or str == "-ow1" then
-				if BARRACKMENTS[1] == 1 then
-					Notifications:TopToAll({text="Red Player opened lane 1!", style={color="white"}, duration=5.0})
-					CREEP_LANES[1] = 1
-				elseif BARRACKMENTS[1] == 0 then
-					Notifications:TopToAll({text="Can't open Lane 1, barrackment destroyed!", style={color="white"}, duration=5.0})
+		local newState = GameRules:State_Get()
+		if newState == DOTA_GAMERULES_STATE_PRE_GAME then
+			Notifications:Bottom({player, text="Game has not started yet!", style={color="white"}, duration=5.0})
+		elseif newState == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
+			if GameRules:PlayerHasCustomGameHostPrivileges(player) or PlayerResource:GetSteamAccountID(player:GetPlayerID()) == mod_creator[i] then
+				for t = 1, 8 do
+					if str == "-openway_"..t or str == "-ow"..t then
+						if BARRACKMENTS[t] == 1 then
+							Notifications:TopToAll({text="Red Player opened lane "..t.."!", style={color="white"}, duration=5.0})
+							CREEP_LANES[t] = 1
+							local DoorObs = Entities:FindAllByName("obstruction_lane"..t)
+							for _, obs in pairs(DoorObs) do 
+								obs:SetEnabled(false, true)
+							end
+							DoEntFire("door_lane"..t, "SetAnimation", "gate_entrance002_open", 0, nil, nil)
+							local towers = Entities:FindAllByName("dota_badguys_tower"..t)
+							for _, tower in pairs(towers) do
+								tower:RemoveModifierByName("modifier_invulnerable")
+							end
+							local raxes = Entities:FindAllByName("dota_badguys_barracks_"..t)
+							for _, rax in pairs(raxes) do
+								rax:RemoveModifierByName("modifier_invulnerable")
+							end
+						elseif BARRACKMENTS[t] == 0 then
+							Notifications:TopToAll({text="Can't open Lane "..t..", barrackment destroyed!", style={color="white"}, duration=5.0})
+						end
+					end
 				end
-			end
-			if str == "-openway_2" or str == "-ow2" then
-				if BARRACKMENTS[2] == 1 then
-					Notifications:TopToAll({text="Red Player opened lane 2!", style={color="white"}, duration=5.0})
-					CREEP_LANES[2] = 1
-				elseif BARRACKMENTS[2] == 0 then
-					Notifications:TopToAll({text="Can't open Lane 2, barrackment destroyed!", style={color="white"}, duration=5.0})
-				end
-			end
-			if str == "-openway_3" or str == "-ow3" then
-				if BARRACKMENTS[3] == 1 then
-					Notifications:TopToAll({text="Red Player opened lane 3!", style={color="white"}, duration=5.0})
-					CREEP_LANES[3] = 1
-				elseif BARRACKMENTS[3] == 0 then
-					Notifications:TopToAll({text="Can't open Lane 3, barrackment destroyed!", style={color="white"}, duration=5.0})
-				end
-			end
-			if str == "-openway_4" or str == "-ow4" then
-				if BARRACKMENTS[4] == 1 then
-					Notifications:TopToAll({text="Red Player opened lane 4!", style={color="white"}, duration=5.0})
-					CREEP_LANES[4] = 1
-				elseif BARRACKMENTS[4] == 0 then
-					Notifications:TopToAll({text="Can't open Lane 4, barrackment destroyed!", style={color="white"}, duration=5.0})
-				end
-			end
-			if str == "-openway_5" or str == "-ow5" then
-				if BARRACKMENTS[5] == 1 then
-					Notifications:TopToAll({text="Red Player opened lane 5!", style={color="white"}, duration=5.0})
-					CREEP_LANES[5] = 1
-				elseif BARRACKMENTS[5] == 0 then
-					Notifications:TopToAll({text="Can't open Lane 5, barrackment destroyed!", style={color="white"}, duration=5.0})
-				end
-			end
-			if str == "-openway_6" or str == "-ow6" then
-				if BARRACKMENTS[6] == 1 then
-					Notifications:TopToAll({text="Red Player opened lane 6!", style={color="white"}, duration=5.0})
-					CREEP_LANES[6] = 1
-				elseif BARRACKMENTS[6] == 0 then
-					Notifications:TopToAll({text="Can't open Lane 6, barrackment destroyed!", style={color="white"}, duration=5.0})
-				end
-			end
-			if str == "-openway_7" or str == "-ow7" then
-				if BARRACKMENTS[7] == 1 then
-					Notifications:TopToAll({text="Red Player opened lane 7!", style={color="white"}, duration=5.0})
-					CREEP_LANES[7] = 1
-				elseif BARRACKMENTS[7] == 0 then
-					Notifications:TopToAll({text="Can't open Lane 7, barrackment destroyed!", style={color="white"}, duration=5.0})
-				end
-			end
-			if str == "-openway_8" or str == "-ow8" then
-				if BARRACKMENTS[8] == 1 then
-					Notifications:TopToAll({text="Red Player opened lane 8!", style={color="white"}, duration=5.0})
-					CREEP_LANES[8] = 1
-				elseif BARRACKMENTS[8] == 0 then
-					Notifications:TopToAll({text="Can't open Lane 8, barrackment destroyed!", style={color="white"}, duration=5.0})
-				end
-			end
 
-			if str == "-closeway_1" or str == "-cw1" then
---				Notifications:TopToAll({text="Red Player closed lane 1!", style={color="white"}, duration=5.0})
-				Notifications:TopToAll({text="Lanes 1, 2, 3, 4 can't be closed!", style={color="white"}, duration=5.0})
---				CREEP_LANES[1] = 0
-			end
-			if str == "-closeway_2" or str == "-cw2" then
---				Notifications:TopToAll({text="Red Player closed lane 2!", style={color="white"}, duration=5.0})
-				Notifications:TopToAll({text="Lanes 1, 2, 3, 4 can't be closed", style={color="white"}, duration=5.0})
---				CREEP_LANES[2] = 0
-			end
-			if str == "-closeway_3" or str == "-cw3" then
---				Notifications:TopToAll({text="Red Player closed lane 3!", style={color="white"}, duration=5.0})
-				Notifications:TopToAll({text="Lanes 1, 2, 3, 4 can't be closed", style={color="white"}, duration=5.0})
---				CREEP_LANES[3] = 0
-			end
-			if str == "-closeway_4" or str == "-cw4" then
---				Notifications:TopToAll({text="Red Player closed lane 4!", style={color="white"}, duration=5.0})
-				Notifications:TopToAll({text="Lanes 1, 2, 3, 4 can't be closed", style={color="white"}, duration=5.0})
---				CREEP_LANES[4] = 0
-			end
-			if str == "-closeway_5" or str == "-cw5" then
-				Notifications:TopToAll({text="Red Player closed lane 5!", style={color="white"}, duration=5.0})
-				CREEP_LANES[5] = 0
-			end
-			if str == "-closeway_6" or str == "-cw6" then
-				Notifications:TopToAll({text="Red Player closed lane 6!", style={color="white"}, duration=5.0})
-				CREEP_LANES[6] = 0
-			end
-			if str == "-closeway_7" or str == "-cw7" then
-				Notifications:TopToAll({text="Red Player closed lane 7!", style={color="white"}, duration=5.0})
-				CREEP_LANES[7] = 0
-			end
-			if str == "-closeway_8" or str == "-cw8" then
-				Notifications:TopToAll({text="Red Player closed lane 8!", style={color="white"}, duration=5.0})
-				CREEP_LANES[8] = 0
-			end
+				for t = 1, 4 do
+					if str == "-closeway_"..t or str == "-cw"..t then
+						Notifications:TopToAll({text="Lanes 1, 2, 3, 4 can't be closed!", style={color="white"}, duration=5.0})
+					end
+				end
 
-			if str == "-openway_all" or str == "-ow_all" then
-				Notifications:TopToAll({text="Red Player opened all lanes!", style={color="white"}, duration=5.0})
-				CREEP_LANES[1] = 1
-				CREEP_LANES[2] = 1
-				CREEP_LANES[3] = 1
-				CREEP_LANES[4] = 1
-				CREEP_LANES[5] = 1
-				CREEP_LANES[6] = 1
-				CREEP_LANES[7] = 1
-				CREEP_LANES[8] = 1
-			end
+				for t = 5, 8 do
+					if str == "-closeway_"..t or str == "-cw"..t then
+						Notifications:TopToAll({text="Red Player closed lane "..t.."!", style={color="white"}, duration=5.0})
+						CREEP_LANES[t] = 1
+						local DoorObs = Entities:FindAllByName("obstruction_lane"..t)
+						for _, obs in pairs(DoorObs) do 
+							obs:SetEnabled(true, true)
+						end
+						DoEntFire("door_lane"..t, "SetAnimation", "gate_entrance002_idle", 0, nil, nil)
+						local towers = Entities:FindAllByName("dota_badguys_tower"..t)
+						for _, tower in pairs(towers) do
+							tower:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
+						end
+						local raxes = Entities:FindAllByName("dota_badguys_barracks_"..t)
+						for _, rax in pairs(raxes) do
+							rax:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
+						end
+					end
+				end
 
-			if str == "-closeway_all" or str == "-cw_all" then
---				Notifications:TopToAll({text="Red Player closed all lanes!", style={color="white"}, duration=5.0})
-				Notifications:TopToAll({text="Red Player closed all lanes (excluding 1, 2, 3, 4)!", style={color="white"}, duration=5.0})
---				CREEP_LANES[1] = 0
---				CREEP_LANES[2] = 0
---				CREEP_LANES[3] = 0
---				CREEP_LANES[4] = 0
-				CREEP_LANES[5] = 0
-				CREEP_LANES[6] = 0
-				CREEP_LANES[7] = 0
-				CREEP_LANES[8] = 0
+				if str == "-openway_all" or str == "-ow_all" then
+					Notifications:TopToAll({text="Red Player opened all lanes!", style={color="white"}, duration=5.0})
+					for t = 1, 8 do
+						CREEP_LANES[t] = 1
+						local DoorObs = Entities:FindAllByName("obstruction_lane"..t)
+						for _, obs in pairs(DoorObs) do
+							obs:SetEnabled(false, true)
+						end
+						DoEntFire("door_lane"..t, "SetAnimation", "gate_entrance002_open", 0, nil, nil)
+						local towers = Entities:FindAllByName("dota_badguys_tower"..t)
+						for _, tower in pairs(towers) do
+							tower:RemoveModifierByName("modifier_invulnerable")
+						end
+						local raxes = Entities:FindAllByName("dota_badguys_barracks_"..t)
+						for _, rax in pairs(raxes) do
+							rax:RemoveModifierByName("modifier_invulnerable")
+						end
+					end
+				end
+
+				if str == "-closeway_all" or str == "-cw_all" then
+					Notifications:TopToAll({text="Red Player closed all lanes (excluding 1, 2, 3, 4)!", style={color="white"}, duration=5.0})
+					for t = 5, 8 do
+						CREEP_LANES[t] = 0
+						local DoorObs = Entities:FindAllByName("obstruction_lane"..t)
+						for _, obs in pairs(DoorObs) do 
+							obs:SetEnabled(true, true)
+						end
+						DoEntFire("door_lane"..t, "SetAnimation", "gate_entrance002_idle", 0, nil, nil)
+						local towers = Entities:FindAllByName("dota_badguys_tower"..t)
+						for _, tower in pairs(towers) do
+							tower:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
+						end
+						local raxes = Entities:FindAllByName("dota_badguys_barracks_"..t)
+						for _, rax in pairs(raxes) do
+							rax:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
+						end
+					end
+				end
 			end
 		end
 
 		if str == "-credits" then
-			Notifications:TopToAll({text="Mod created by [BEAR] Cookies #42, thanks to Noya for WC3 database ported to dota!", style={color="white"}, duration=5.0})
+			Notifications:Top(player, {text="Mod created by [BEAR] Cookies #42, thanks to Noya for WC3 database ported to dota!", style={color="white"}, duration=5.0})
 		end
 
 		if str == "-difficulty" then
-			local diff = {"Easy","Normal","Hard","Extreme"}
-			Notifications:TopToAll({text="DIFFICULTY: "..diff[GameRules:GetCustomGameDifficulty()], duration=10.0})
+			local diff = {"Easy", "Normal", "Hard", "Extreme"}
+			Notifications:Top(player, {text="DIFFICULTY: "..diff[GameRules:GetCustomGameDifficulty()], duration=10.0})
 		end
 
 		if str == "-bt" then

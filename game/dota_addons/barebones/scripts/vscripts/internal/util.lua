@@ -238,6 +238,13 @@ function HasEpic4(hero)
 	return false
 end
 
+function HasEpic5(hero)
+	if hero.has_epic_5 then
+		return true
+	end
+	return false
+end
+
 function HeroImage(hero)
 	if hero.hero_image then
 		return true

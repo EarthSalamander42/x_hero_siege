@@ -1,4 +1,4 @@
-function MarkOfTheClaw( keys )
+function MarkOfTheClaw(keys)
 local caster = keys.caster
 local target = keys.target
 local ability = keys.ability
@@ -28,7 +28,7 @@ local attack_damage = caster:GetAttackDamage() * splash_percent
 	end
 end
 
-function StrengthOfTheWild( keys )
+function StrengthOfTheWild(keys)
 local caster = keys.caster
 local target = keys.target
 local ability = keys.ability
@@ -45,7 +45,7 @@ local creep_damage = caster:GetAttackDamage() * creep_mult
 	end
 end
 
-function TrueFormStart( event )
+function TrueFormStart(event)
 local caster = event.caster
 local model = event.model
 local ability = event.ability
@@ -87,21 +87,4 @@ local modifier = event.remove_modifier_name
 	caster:SwapAbilities(sub_ability_name, main_ability_name, false, true)
 	caster:RemoveModifierByName(modifier)
 	caster:SetBaseAttackTime( BAT - BAT_Dec )
-end
-
-function LevelUpAbility( event )
-	local caster = event.caster
-	local this_ability = event.ability		
-	local this_abilityName = this_ability:GetAbilityName()
-	local this_abilityLevel = this_ability:GetLevel()
-
-	-- The ability to level up
-	local ability_name = event.ability_name
-	local ability_handle = caster:FindAbilityByName(ability_name)	
-	local ability_level = ability_handle:GetLevel()
-
-	-- Check to not enter a level up loop
-	if ability_level ~= this_abilityLevel then
-		ability_handle:SetLevel(this_abilityLevel)
-	end
 end

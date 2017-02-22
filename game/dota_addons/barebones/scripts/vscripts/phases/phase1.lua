@@ -167,7 +167,7 @@ local point = Entities:FindByName(nil, "base_spawn"):GetAbsOrigin()
 		end)
 	end
 
-	if not Entities:FindByName(nil, "trigger_special_event_frost_infernal"):Enable():IsNull() then
+	if not Entities:FindByName(nil, "trigger_special_event_frost_infernal"):IsNull() then
 		Entities:FindByName(nil, "trigger_special_event_frost_infernal"):Enable()
 	end
 	Timers:RemoveTimer(timers.FrostInfernal)
@@ -314,7 +314,7 @@ local hero = event.activator
 		end)
 	end
 
-	if not Entities:FindByName(nil, "trigger_special_event_spirit_beast"):Enable():IsNull() then
+	if not Entities:FindByName(nil, "trigger_special_event_spirit_beast"):IsNull() then
 		Entities:FindByName(nil, "trigger_special_event_spirit_beast"):Enable()
 	end
 	Timers:RemoveTimer(timers.SpiritBeastBack)
@@ -359,16 +359,6 @@ local point_beast = Entities:FindByName(nil, "special_event_boss_point3"):GetAbs
 		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
 		Timers:CreateTimer(0.1, function()
 			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil) 
-		end)
-
-		timers.HeroImage = Timers:CreateTimer(120.0,function()
-			Entities:FindByName(nil, "trigger_hero_image_duration"):Enable()
-
-			Timers:CreateTimer(5.5, function() --Debug time in case Frost Infernal kills the player at the very last second
-				Entities:FindByName(nil, "trigger_hero_image_duration"):Disable()
-				Entities:FindByName(nil, "trigger_special_event_hero_image"):Enable()
-			end)
-			GameMode.HeroImage:RemoveSelf()
 		end)
 
 		GameMode.HeroImage = CreateUnitByName(hero:GetUnitName(), point_beast, true, nil, nil, DOTA_TEAM_CUSTOM_1)
@@ -433,6 +423,17 @@ local point_beast = Entities:FindByName(nil, "special_event_boss_point3"):GetAbs
 			end
 			return 1
 		end)
+
+		timers.HeroImage = Timers:CreateTimer(120.0,function()
+			Entities:FindByName(nil, "trigger_hero_image_duration"):Enable()
+			Timers:RemoveTimer(timers.disabled_items)
+
+			Timers:CreateTimer(5.5, function() --Debug time in case Frost Infernal kills the player at the very last second
+				Entities:FindByName(nil, "trigger_hero_image_duration"):Disable()
+				Entities:FindByName(nil, "trigger_special_event_hero_image"):Enable()
+			end)
+			GameMode.HeroImage:RemoveSelf()
+		end)
 	elseif hero.hero_image then
 		print("Can't do this event twice!")
 	end
@@ -473,7 +474,7 @@ SpecialEventsTimerEnd()
 
 	if not GameMode.HeroImage:IsNull() then
 		GameMode.HeroImage:RemoveSelf()
-	else
+	elseif GameMode.HeroImage:IsNull() then
 		hero.hero_image = true
 		local msg = "You can do this event only 1 time!"
 		Notifications:Top(hero:GetPlayerOwnerID(), {text = msg, duration = 5.0})

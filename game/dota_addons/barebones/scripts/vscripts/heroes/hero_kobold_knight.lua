@@ -15,18 +15,15 @@ local cooldown = ability:GetCooldown(ability_level)
 	end)
 end
 
-
 function KoboldArmy( keys )
-	local caster = keys.caster
-	local player = caster:GetPlayerOwnerID()
-	local ability = keys.ability
-
-	-- Ability variables
-	local unit_name = caster:GetUnitName()
-	local kobold_count = ability:GetLevelSpecialValueFor( "kobold_count", (ability:GetLevel() - 1) )
-	local duration = ability:GetLevelSpecialValueFor("duration", (ability:GetLevel() - 1))
-	local casterOrigin = caster:GetAbsOrigin()
-	local casterAngles = caster:GetAngles()
+local caster = keys.caster
+local player = caster:GetPlayerOwnerID()
+local ability = keys.ability
+local unit_name = caster:GetUnitName()
+local kobold_count = ability:GetLevelSpecialValueFor("kobold_count", (ability:GetLevel() - 1))
+local duration = ability:GetLevelSpecialValueFor("duration", (ability:GetLevel() - 1))
+local casterOrigin = caster:GetAbsOrigin()
+local casterAngles = caster:GetAngles()
 
 	-- Stop any actions of the caster otherwise its obvious which unit is real
 	caster:Stop()
@@ -109,7 +106,7 @@ function KoboldArmy( keys )
 		ability:ApplyDataDrivenModifier(caster, double, "modifier_kill", {duration = duration})
 
 		-- Learn the skills of the caster
-		for abilitySlot = 0,15 do
+		for abilitySlot = 0, 15 do
 			local ability = caster:GetAbilityByIndex(abilitySlot)
 			if ability ~= nil then 
 				local abilityLevel = ability:GetLevel()
@@ -122,7 +119,6 @@ function KoboldArmy( keys )
 
 				if ability:GetName() == "holdout_kobold_army" then
 					doubleAbility:SetActivated(false)
-					double:RemoveAbility("holdout_last_stand")
 					double:RemoveModifierByName("modifier_reincarnation")
 					double:SetRespawnsDisabled(true)
 				end
@@ -130,9 +126,9 @@ function KoboldArmy( keys )
 		end
 
 		-- Recreate the items of the caster
-		for itemSlot=0,5 do
+		for itemSlot = 0, 5 do
 			local item = caster:GetItemInSlot(itemSlot)
-			if item ~= nil and item:GetName() ~= "item_ankh_of_reincarnation" and item:GetName() ~= "item_shield_of_invincibility" and item:GetName() ~= "item_assassins_blade"  and item:GetName() ~= "item_cloak_of_flames"  and item:GetName() ~= "item_orb_of_fire" then
+			if item ~= nil and item:GetName() ~= "item_ankh_of_reincarnation" and item:GetName() ~= "item_shield_of_invincibility" and item:GetName() ~= "item_cloak_of_flames" and item:GetName() ~= "item_orb_of_fire" and item:GetName() ~= "item_orb_of_fire2" and item:GetName() ~= "item_searing_blade" then
 				local itemName = item:GetName()
 				local newItem = CreateItem(itemName, double, double)
 				double:AddItem(newItem)

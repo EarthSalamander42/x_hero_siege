@@ -1,9 +1,9 @@
 "AddonInfo"
 {
 	"TeamCount"					"1"
-	"maps"						"easymode"
+	"maps"						"x_hero_siege"
 	"IsPlayable"				"1"
-	"easymode"
+	"x_hero_siege"
 	{
 		"MaxPlayers"			"8"
 	}

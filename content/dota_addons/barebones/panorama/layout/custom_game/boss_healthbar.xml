@@ -1,0 +1,24 @@
+<root>
+	<styles>
+		<include src="s2r://panorama/styles/dotastyles.vcss_c" />
+		<include src="s2r://panorama/styles/hud.vcss_c"/>
+		<include src="s2r://panorama/styles/hudstyles.vcss_c"/>
+		<include src="s2r://panorama/styles/dashboard_page_controlslibrary.vcss_c" />
+
+		<include src="s2r://panorama/styles/custom_game/boss_healthbar.css"/>
+	</styles>
+	<scripts>
+		<include src="s2r://panorama/scripts/custom_game/boss_healthbar.js" />
+	</scripts>
+	<Panel hittest="false" class="CustomHudRoot">
+		<Panel hittest="false" class="CustomHudContents">
+			<Panel id="InvokerHP" hittest="false">
+				<Label id="InvokerLabel" class="HoldoutLabelSmall" hittest="false" text="#npc_dota_hero_magtheridon"/>
+				<Panel id="InvokerProgressBarContainer" hittest="false">
+					<DOTAHeroImage id="InvokerIcon" heroname="npc_dota_hero_magnataur" heroimagestyle="icon" hittest="false"/>
+					<ProgressBar hittest="false" id="InvokerProgressBar" value="1.0"/>
+				</Panel>
+			</Panel>
+		</Panel>
+	</Panel>
+</root>

@@ -21,10 +21,13 @@
 
 	"weapons_armor"
 	{
+		"item"		"item_orb_of_earth"
 		"item"		"item_orb_of_lightning"
 		"item"		"item_orb_of_fire"
-		"item"		"item_orb_of_earth"
 		"item"		"item_orb_of_darkness"
+		"item"		"item_orb_of_lightning2"
+		"item"		"item_orb_of_fire2"
+		"item"		"item_orb_of_darkness2"
 	}
 
 	"misc"
@@ -83,12 +86,9 @@
 		"item"		"item_talisman_of_evasion_datadriven"
 		"item"		"item_boots_of_speed"
 		"item"		"item_lifesteal_mask"
-		"item"		"item_scepter_of_mastery"
-		"item"		"item_gloom_blade"
-		"item"		"item_assassins_blade"
-		"item"		"item_blades_of_attack2"
-		"item"		"item_claws_of_attack"
-		"item"		"item_bracer_of_endurance"
-		"item"		"item_bracer_of_protection"
+		"item"		"item_staff_of_mastery"
+		"item"		"item_searing_blade"
+		"item"		"item_celestial_claws"
+		"item"		"item_bracer_of_the_void"
 	} 
 }

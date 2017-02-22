@@ -1,41 +1,48 @@
+require("libraries/timers")
+
 function PhaseEntrench(keys)
 local caster = keys.caster
 
-	StartAnimation(caster, {duration = 0.55, activity = ACT_DOTA_SAND_KING_BURROW_IN, rate = 0.4})
+	StartAnimation(caster, {duration = 0.51, activity = ACT_DOTA_SAND_KING_BURROW_IN, rate = 0.3})
 	caster:SetAttackCapability(DOTA_UNIT_CAP_NO_ATTACK)
 	caster:SetMoveCapability(DOTA_UNIT_CAP_MOVE_NONE)
 end
 
 function Entrench(keys)
 local caster = keys.caster
-local point = caster:GetAbsOrigin()
+local fv = caster:GetForwardVector()
+local point = caster:GetAbsOrigin() + fv * 250
 local ability = keys.ability
 local sub_ability_name = keys.sub_ability_name
 local main_ability_name = ability:GetAbilityName()
+local ultimate = caster:FindAbilityByName("holdout_desert_dragon_form")
 
+	FindClearSpaceForUnit(caster, point, true)
 	caster:SwapAbilities(main_ability_name, sub_ability_name, false, true)
-end
+	ultimate:SetActivated(false)
 
-function PhaseUnEntrench(keys)
-local caster = keys.caster
-
-	StartAnimation(caster, {duration = 1.25, activity = ACT_DOTA_SAND_KING_BURROW_OUT, rate = 0.4})
+--	Timers:CreateTimer(10.0, function()
+--		UnEntrench(keys)
+--	end)
 end
 
 function UnEntrench(keys)
 local caster = keys.caster
 local ability = keys.ability
-local sub_ability_name = keys.sub_ability_name
-local main_ability_name = ability:GetAbilityName()
+local sub_ability = keys.sub_ability_name
+local main_ability = ability:GetAbilityName()
 local ability_main = caster:FindAbilityByName("holdout_entrench")
+local ultimate = caster:FindAbilityByName("holdout_desert_dragon_form")
 
 	caster:SetAttackCapability(DOTA_UNIT_CAP_MELEE_ATTACK)
 	caster:SetMoveCapability(DOTA_UNIT_CAP_MOVE_GROUND)
-	caster:SwapAbilities(main_ability_name, sub_ability_name, false, true)
+	caster:SwapAbilities(main_ability, sub_ability, false, true)
 	ability_main:StartCooldown(14.0)
+	ultimate:SetActivated(true)
+	StartAnimation(caster, {duration = 1.1, activity = ACT_DOTA_SAND_KING_BURROW_OUT, rate = 0.7})
 end
 
-function invoker_tornado_datadriven_on_spell_start(keys)
+function TornadoTempest(keys)
 local caster = keys.caster
 local caster_origin = keys.caster:GetAbsOrigin()
 local ability = keys.ability
@@ -52,6 +59,7 @@ tornado_lift_duration = ability:GetLevelSpecialValueFor("lift_duration", ability
 	local tornado_dummy_unit = CreateUnitByName("npc_dummy_unit", caster_origin, false, nil, nil, caster:GetTeam())
 	tornado_dummy_unit:SetOwner(caster)
 	tornado_dummy_unit:AddAbility("holdout_tornado_tempest")
+--	tornado_dummy_unit:SetBaseIntellect(caster:GetBaseIntellect()) -- Spell Amp
 	local emp_unit_ability = tornado_dummy_unit:FindAbilityByName("holdout_tornado_tempest")
 	if emp_unit_ability ~= nil then
 		emp_unit_ability:SetLevel(ability:GetLevel())
@@ -61,7 +69,7 @@ tornado_lift_duration = ability:GetLevelSpecialValueFor("lift_duration", ability
 	tornado_dummy_unit:EmitSound("Hero_Invoker.Tornado")  --Emit a sound that will follow the tornado.
 	tornado_dummy_unit:SetDayTimeVisionRange(keys.VisionDistance)
 	tornado_dummy_unit:SetNightTimeVisionRange(keys.VisionDistance)
-	
+
 	local projectile_information =  
 	{
 		EffectName = "particles/units/heroes/hero_invoker/invoker_tornado.vpcf",
@@ -93,19 +101,7 @@ tornado_lift_duration = ability:GetLevelSpecialValueFor("lift_duration", ability
 	projectile_information.vVelocity = point_difference_normalized * TravelSpeed
 	
 	local tornado_projectile = ProjectileManager:CreateLinearProjectile(projectile_information)
-	
-	--When the projectile ID can be passed into a OnProjectileHitUnit block, an array like this can be used to store the stats associated with the projectile.
-	--[[
-	--Store the lift duration and bonus landing damage associated with the projectile, using the Quas/Exort levels from when Tornado was cast.
-	if keys.caster.tornado_projectile_information == nil then
-		keys.caster.tornado_projectile_information = {}
-	end
-	local tornado_projectile_information = {}
-	tornado_projectile_information["tornado_lift_duration"] = tornado_lift_duration
-	tornado_projectile_information[tornado_projectile])["tornado_landing_damage_bonus"] = tornado_landing_damage_bonus
-	keys.caster.tornado_projectile_information[tornado_projectile] = tornado_projectile_information
-	]]
-	
+
 	tornado_dummy_unit.invoker_tornado_lift_duration = tornado_lift_duration
 	tornado_dummy_unit.invoker_tornado_landing_damage_bonus = tornado_landing_damage_bonus
 	
@@ -139,7 +135,7 @@ tornado_lift_duration = ability:GetLevelSpecialValueFor("lift_duration", ability
 	})
 end
 
-function invoker_tornado_datadriven_on_projectile_hit_unit(keys)
+function TornadoTempestHit(keys)
 local caster = keys.caster
 local target = keys.target
 local ability = keys.ability
@@ -161,7 +157,7 @@ local ability = keys.ability
 	end
 end
 
-function modifier_invoker_tornado_datadriven_cyclone_on_destroy(keys)
+function TornadoTempestDestroy(keys)
 local target = keys.target
 	target:EmitSound("Hero_Invoker.Tornado.LandDamage")
 	
@@ -175,7 +171,7 @@ local target = keys.target
 	target.invoker_tornado_degrees_to_spin = nil
 end
 
-function modifier_invoker_tornado_datadriven_cyclone_on_interval_think(keys)
+function TornadoTempestInterval(keys)
 local caster = keys.caster
 local target = keys.target
 local total_degrees = 20
@@ -193,7 +189,7 @@ local total_degrees = 20
 	target:SetForwardVector(RotatePosition(Vector(0,0,0), QAngle(0, target.invoker_tornado_degrees_to_spin, 0), target:GetForwardVector()))
 end
 
-function modifier_invoker_tornado_datadriven_cyclone_on_created(keys)
+function TornadoTempestCreated(keys)
 local caster = keys.caster
 local target = keys.target
 local ability = keys.ability
@@ -237,18 +233,15 @@ local time_to_stop_fly = duration - time_to_reach_initial_height
 
 -- Loop up and down
 local going_up = true
-
 	-- Loop every frame for the duration
 	Timers:CreateTimer(function()
 		local time_in_air = GameRules:GetGameTime() - tornado_start
-		
 		-- First send the target to the cyclone's initial height.
 		if position.z < cyclone_initial_height and time_in_air <= time_to_reach_initial_height then
 			--print("+",initial_ascent_height_per_frame,position.z)
 			position.z = position.z + initial_ascent_height_per_frame
 			target:SetAbsOrigin(position)
 			return 0.03
-
 		-- Go down until the target reaches the ground.
 		elseif time_in_air > time_to_stop_fly and time_in_air <= duration then
 			--Since the unit may be anywhere between the cyclone's min and max height values when they start descending to the ground,
@@ -259,12 +252,10 @@ local going_up = true
 				--print("position.z : " .. position.z)
 				final_descent_height_per_frame = (descent_initial_height_above_ground / time_to_reach_initial_height) * .03
 			end
-			
 			--print("-",final_descent_height_per_frame,position.z)
 			position.z = position.z - final_descent_height_per_frame
 			target:SetAbsOrigin(position)
 			return 0.03
-
 		-- Do Up and down cycles
 		elseif time_in_air <= duration then
 			-- Up
@@ -273,7 +264,6 @@ local going_up = true
 				position.z = position.z + up_down_cycle_height_per_frame
 				target:SetAbsOrigin(position)
 				return 0.03
-
 			-- Down
 			elseif position.z >= cyclone_min_height then
 				going_up = false
@@ -281,14 +271,12 @@ local going_up = true
 				position.z = position.z - up_down_cycle_height_per_frame
 				target:SetAbsOrigin(position)
 				return 0.03
-
 			-- Go up again
 			else
 				--print("going up again")
 				going_up = true
 				return 0.03
 			end
-
 		-- End
 		else
 			--print(GetGroundPosition(target:GetAbsOrigin(), target))
@@ -297,101 +285,88 @@ local going_up = true
 	end)
 end
 
-function SkinChangerDragon( keys )
+function AcidSkin(event)
+local caster = event.caster
+local attacker = event.attacker
+local ability = event.ability
+local duration = ability:GetLevelSpecialValueFor("duration", ability:GetLevel() -1)
+	if not attacker:IsBuilding() and ability:IsActivated() then
+		ability:ApplyDataDrivenModifier(caster, attacker, "modifier_acid_skin_debuff", {duration = duration})
+		attacker:EmitSound("Hero_Viper.CorrosiveSkin")	
+	end
+end
+
+function SkinChangerDragon(keys)
+local caster = keys.caster
+local model = keys.model
+local ability = keys.ability
+local range = caster:GetAttackRange()
+local bonus_range = ability:GetLevelSpecialValueFor("bonus_range", ability:GetLevel() -1)
+local Duration = keys.Duration
+
+	if caster.caster_model == nil then 
+		caster.caster_model = caster:GetModelName()
+	end
+
+	caster:SetAttackCapability(DOTA_UNIT_CAP_RANGED_ATTACK)
+	caster:SetOriginalModel(model)
+
+	local main_1 = caster:GetAbilityByIndex(0):GetName()
+	local sub_1 = keys.sub_ability_1
+	local main_2 = caster:GetAbilityByIndex(1):GetName()
+	local sub_2 = keys.sub_ability_2
+	local main_3 = caster:GetAbilityByIndex(2):GetName()
+	local main_3_alt = keys.main_ability_3
+	local sub_3 = keys.sub_ability_3
+--	local main_4 = caster:GetAbilityByIndex(3):GetName()
+--	local sub_4 = keys.sub_ability_4
+	caster:FindAbilityByName(main_3):SetActivated(false)
+	caster:FindAbilityByName(sub_3):SetActivated(true)
+
+	caster:SwapAbilities(main_1, sub_1, false, true)
+	caster:SwapAbilities(main_2, sub_2, false, true)
+	caster:SwapAbilities(main_3, sub_3, false, true)
+--	caster:SwapAbilities(main_4, sub_4, false, true)
+
+	Timers:CreateTimer(Duration, function()
+		caster:SetModel(caster.caster_model)
+		caster:SetOriginalModel(caster.caster_model)
+		caster:SetAttackCapability(DOTA_UNIT_CAP_MELEE_ATTACK)
+		caster:FindAbilityByName(main_3):SetActivated(true)
+		caster:FindAbilityByName(sub_3):SetActivated(false)
+		caster:SwapAbilities(sub_1, main_1, false, true)
+		caster:SwapAbilities(sub_2, main_2, false, true)
+		caster:SwapAbilities(sub_3, main_3, false, true)
+--		caster:SwapAbilities(sub_4, main_4, false, true)
+	end)
+end
+
+function Passives(keys)
 local caster = keys.caster
 local ability = keys.ability
-local ability_level = ability:GetLevel()
-local PlayerID = caster:GetPlayerID()
-local gold = caster:GetGold()
-local loc = caster:GetAbsOrigin()
-local Strength = caster:GetBaseStrength()
-local Intellect = caster:GetBaseIntellect()
-local Agility = caster:GetBaseAgility()
-local HP = caster:GetHealth()
-local Mana = caster:GetMana()
-local CURRENT_XP = caster:GetCurrentXP()
-local duration = ability:GetLevelSpecialValueFor("duration", ability:GetLevel() -1)
 
-	local hero = PlayerResource:ReplaceHeroWith( PlayerID, "npc_dota_hero_viper", gold, 0)
-	hero:AddExperience(CURRENT_XP, false, false)
-	local NewAbility = hero:FindAbilityByName("holdout_desert_dragon_form")
-	NewAbility:SetLevel(ability_level)
-	NewAbility:StartCooldown(120.0)
+	if caster:IsRealHero() and caster:GetUnitName() == "npc_dota_hero_sand_king" then
+		local unactive_passive = caster:FindAbilityByName(keys.unactive_passive)
 
-	local items = {}
-	for i = 0, 5 do
-		if caster:GetItemInSlot(i) ~= nil and caster:GetItemInSlot(i):GetName() ~= "item_classchange_reset" then
-			itemCopy = CreateItem(caster:GetItemInSlot(i):GetName(), nil, nil)
-			items[i] = itemCopy
-		end
-	end
-	for i = 0, 5 do
-		if items[i] ~= nil then
-			hero:AddItem(items[i])
-			items[i]:SetCurrentCharges(caster:GetItemInSlot(i):GetCurrentCharges())
-		end
-	end
-
-	hero:SetAbsOrigin(loc)
-	hero:SetBaseStrength(Strength)
-	hero:SetBaseIntellect(Intellect)
-	hero:SetBaseAgility(Agility)
-	hero:SetHealth(HP)
-	hero:SetMana(Mana)
-
-	Timers:CreateTimer(1.0, function()
-		if not caster:IsNull() then
-			UTIL_Remove(caster)
-		end
-	end)
-
-	Timers:CreateTimer(duration, function()
-		local Newhero = PlayerResource:ReplaceHeroWith( PlayerID, "npc_dota_hero_sand_king", gold, 0)
-		hero:AddExperience(CURRENT_XP, false, false)
-		NewAbility:SetLevel(ability_level)
-
-		local items = {}
-		for i = 0, 5 do
-			if Newhero:GetItemInSlot(i) ~= nil and Newhero:GetItemInSlot(i):GetName() ~= "item_classchange_reset" then
-				itemCopy = CreateItem(Newhero:GetItemInSlot(i):GetName(), nil, nil)
-				items[i] = itemCopy
-			end
-		end
-
-		for i = 0, 5 do
-			if items[i] ~= nil then
-				hero:AddItem(items[i])
-				items[i]:SetCurrentCharges(Newhero:GetItemInSlot(i):GetCurrentCharges())
-			end
-		end
-		hero:SetAbsOrigin(loc)
-		hero:SetBaseStrength(Strength)
-		hero:SetBaseIntellect(Intellect)
-		hero:SetBaseAgility(Agility)
-		hero:SetHealth(HP)
-		hero:SetMana(Mana)
-
-		Timers:CreateTimer(1.0, function()
-			if not Newhero:IsNull() then
-				UTIL_Remove(Newhero)
-			end
-		end)
-	end)
-end
-
-function LevelUpAbility(keys)
-	local caster = keys.caster
-	local this_ability = keys.ability		
-	local this_abilityName = this_ability:GetAbilityName()
-	local this_abilityLevel = this_ability:GetLevel()
-
-	-- The ability to level up
-	local ability_name = keys.ability_name
-	local ability_handle = caster:FindAbilityByName(ability_name)	
-	local ability_level = ability_handle:GetLevel()
-
-	-- Check to not enter a level up loop
-	if ability_level ~= this_abilityLevel then
-		ability_handle:SetLevel(this_abilityLevel)
+		ability:SetActivated(true)
+		unactive_passive:SetActivated(false)
 	end
 end
+
+--	function LevelUpAura(event)
+--	local caster = event.caster
+--	
+--		if caster:IsRealHero() and caster:GetUnitName() == "npc_dota_hero_sand_king" then
+--			local this_ability = event.ability		
+--			local this_abilityName = this_ability:GetAbilityName()
+--			local this_abilityLevel = this_ability:GetLevel()
+--	
+--			local ability_name = event.ability_name
+--			local ability_handle = caster:FindAbilityByName(ability_name)	
+--			local ability_level = ability_handle:GetLevel()
+--	
+--			if ability_level ~= this_abilityLevel then
+--				ability_handle:SetLevel(this_abilityLevel)
+--			end
+--		end
+--	end

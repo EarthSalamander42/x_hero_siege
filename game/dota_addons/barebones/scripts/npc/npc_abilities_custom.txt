@@ -3,7 +3,29 @@
 	"Version"   "1"
 
 	//=================================================================================================================
-	// VIP Effects
+	// Wisp: Random Hero
+	//=================================================================================================================
+	"holdout_random_hero"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"					"ability_datadriven"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityTextureName"		"wisp_relocate"
+		"MaxLevel"					"1"
+
+		"OnSpellStart"
+		{
+			"RunScript"
+			{
+				"ScriptFile"	"heroes/hero_wisp.lua"
+				"Function"		"ChooseRandomHero"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Wisp: VIP Effects
 	//=================================================================================================================
 	"holdout_vip"
 	{
@@ -11,7 +33,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"					"ability_datadriven"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-		"AbilityTextureName"		"holdout_vip"
+		"AbilityTextureName"		"custom/holdout_vip"
 		"MaxLevel"					"1"
 
 		"Modifiers"
@@ -25,8 +47,8 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/hero_wisp/vip_effect.lua"
-						"Function"		"RedWisp"
+						"ScriptFile"	"heroes/hero_wisp.lua"
+						"Function"		"WispEffects"
 					}
 				}
 			}
@@ -152,7 +174,7 @@
 		"AbilityCooldown"				"15.0 13.0 11.0 9.0"
 		"AbilityCastRange"				"600"
 		"AbilityManaCost"				"90 140 190 240"
-		"AbilityTextureName"			"holdout_death_coil_alt"
+		"AbilityTextureName"			"custom/holdout_death_coil_alt"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_BOTH"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
@@ -284,29 +306,24 @@
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_YES"
 //		"AbilityCastRange"				"300"
-		"AbilityTextureName"			"holdout_howling_blast"
+		"AbilityTextureName"			"custom/holdout_howling_blast"
 		"AbilityCooldown"				"1.0"
 
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilitySpecial"
 		{
-//			"01"
-//			{
-//				"var_type"						"FIELD_INTEGER"
-//				"radius"						"300"
-//			}
-			"02"
+			"01"
 			{
 				"var_type"						"FIELD_FLOAT"
 				"ensnare_duration"				"1.0 1.75 2.5 3.25"
 			}		
-			"03"
+			"02"
 			{
 				"var_type"						"FIELD_INTEGER"
 				"ensnare_damage"				"200 450 750 1300"
 			}
-			"04"
+			"03"
 			{
 				"var_type"						"FIELD_INTEGER"
 				"ensnare_chance"				"12"
@@ -332,6 +349,7 @@
 							{
 								"ScriptFile"	"heroes/hero_abaddon/howling_blast.lua"
 								"Function"		"HowlingBlast"
+								"modifier"		"modifier_disarmed"
 							}
 						}
 					}
@@ -353,7 +371,7 @@
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"	
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
-		"AbilityTextureName"			"holdout_frozen_tempest"
+		"AbilityTextureName"			"custom/holdout_frozen_tempest"
 		"RequiredLevel"					"5"
 
 		// Casting
@@ -568,7 +586,7 @@
 		"BaseClass"             		"ability_datadriven"
 		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_AURA"
 		"AbilityCastRange"				"900"
-		"AbilityTextureName"            "holdout_icy_heartstopper"
+		"AbilityTextureName"			"custom/holdout_icy_heartstopper"
 		"LevelsBetweenUpgrades"			"3"
 		"RequiredLevel"					"8"
 
@@ -705,7 +723,7 @@
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_BASIC | DOTA_UNIT_TARGET_HERO"
-		"AbilityTextureName"			"holdout_frostmourne"
+		"AbilityTextureName"			"custom/holdout_frostmourne"
 		"MaxLevel"						"1"
 
 		"AbilitySpecial"
@@ -858,7 +876,7 @@
 	"holdout_sindragosa"
 	{
 		"BaseClass"             		"ability_datadriven"
-		"AbilityTextureName"			"holdout_sindragosa"
+		"AbilityTextureName"			"custom/holdout_sindragosa"
 		"LevelsBetweenUpgrades"			"5"
 		"RequiredLevel"					"10"
 		"AbilityType" 					"DOTA_ABILITY_TYPE_ULTIMATE"
@@ -1009,7 +1027,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"             		"lich_frost_nova"
-		"AbilityTextureName"			"holdout_frost_nova"
+		"AbilityTextureName"			"custom/holdout_frost_nova"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_AOE"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
@@ -1076,7 +1094,7 @@
 	"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_POINT"
 	"SpellImmunityType"             "SPELL_IMMUNITY_ENEMIES_NO"
 	"FightRecapLevel"               "1"
-	"AbilityTextureName"            "holdout_frost_breath"
+	"AbilityTextureName"            "custom/holdout_frost_breath"
 
 	// Casting
 	//-------------------------------------------------------------------------------------------------------------
@@ -1256,7 +1274,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"             		"ability_datadriven"
-		"AbilityTextureName"			"holdout_frost_arrows"
+		"AbilityTextureName"			"custom/holdout_frost_arrows"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_AUTOCAST | DOTA_ABILITY_BEHAVIOR_ATTACK"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
@@ -1400,7 +1418,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"             		"lich_frost_armor"
-		"AbilityTextureName"			"holdout_frost_armor"
+		"AbilityTextureName"			"custom/holdout_frost_armor"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_AUTOCAST | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
@@ -1458,7 +1476,7 @@
 	"holdout_frost_frenzy"
 	{
 		"BaseClass"						"ability_datadriven"
-		"AbilityTextureName"			"holdout_frost_frenzy"
+		"AbilityTextureName"			"custom/holdout_frost_frenzy"
 		"MaxLevel" 						"1"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IGNORE_CHANNEL"
 		"AbilityCastAnimation"			"ACT_DOTA_CAST_ABILITY_3"
@@ -1546,7 +1564,7 @@
 	"holdout_frost_beast"
 	{
 		"BaseClass"             		"ability_datadriven"
-		"AbilityTextureName"			"holdout_frost_beast"
+		"AbilityTextureName"			"custom/holdout_frost_beast"
 		"LevelsBetweenUpgrades"			"5"
 		"RequiredLevel"					"10"
 		"AbilityType" 					"DOTA_ABILITY_TYPE_ULTIMATE"
@@ -1699,7 +1717,7 @@
 		"AoERadius" 					"550"
 		"MaxLevel"						"1"
 		"RequiredLevel"					"20"
-		"AbilityTextureName"			"holdout_frost_chaos"
+		"AbilityTextureName"			"custom/holdout_frost_chaos"
 		
 		// Precache
 		//-------------------------------------------------------------------------------------------------------------
@@ -1825,7 +1843,7 @@
 	"lich_frost_beast_cold_skin"
 	{
 		"BaseClass"             		"ability_datadriven"
-		"AbilityTextureName"			"crystal_maiden_crystal_nova"
+		"AbilityTextureName"			"custom/crystal_maiden_crystal_nova"
 		"MaxLevel" 						"1"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 
@@ -1982,7 +2000,7 @@
 		"AbilityUnitTargetType"         "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
 		"AbilityUnitDamageType"         "DAMAGE_TYPE_MAGICAL"  
 		"SpellImmunityType"             "SPELL_IMMUNITY_ENEMIES_YES"
-		"AbilityTextureName"            "holdout_healing_wave"
+		"AbilityTextureName"            "custom/holdout_healing_wave"
 	
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
@@ -2073,7 +2091,7 @@
 	"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 	"AbilityUnitDamageType"         "DAMAGE_TYPE_MAGICAL"   
 	"SpellImmunityType"             "SPELL_IMMUNITY_ENEMIES_NO"
-	"AbilityTextureName"            "holdout_fan_of_light"
+	"AbilityTextureName"            "custom/holdout_fan_of_light"
 
 	// Casting
 	//-------------------------------------------------------------------------------------------------------------
@@ -2164,7 +2182,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"BaseClass"						"ability_datadriven"
-		"AbilityTextureName"			"holdout_devotion_aura"
+		"AbilityTextureName"			"custom/holdout_devotion_aura"
 		"RequiredLevel"					"5"
 		"AbilityUnitTargetFlags"		"DOTA_UNIT_TARGET_FLAG_NOT_ANCIENTS"
 
@@ -2237,7 +2255,7 @@
 		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_POINT"
 		"AbilityUnitDamageType"         "DAMAGE_TYPE_MAGICAL"  
 		"SpellImmunityType"             "SPELL_IMMUNITY_ENEMIES_YES"
-		"AbilityTextureName"            "holdout_howl_of_terror"
+		"AbilityTextureName"            "custom/holdout_howl_of_terror"
 		"RequiredLevel"					"8"
 		"LevelsBetweenUpgrades"			"3"
 		
@@ -2356,7 +2374,7 @@
 	"holdout_taunt"
 	{
 		"BaseClass"					"ability_datadriven"
-		"AbilityTextureName"		"axe_berserkers_call"
+		"AbilityTextureName"		"custom/axe_berserkers_call"
 		"MaxLevel"					"1"
 
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_MOVEMENT"
@@ -2419,7 +2437,7 @@
 		"FightRecapLevel"               "1"
 		"RequiredLevel"					"10"
 		"LevelsBetweenUpgrades"			"5"
-		"AbilityTextureName"            "holdout_pure_light"
+		"AbilityTextureName"            "custom/holdout_pure_light"
 
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
@@ -2531,7 +2549,7 @@
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_YES"
 		"MaxLevel"						"1"
-		"AbilityTextureName"			"holdout_divine_shield"
+		"AbilityTextureName"			"custom/holdout_divine_shield"
 
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
@@ -2649,7 +2667,7 @@
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_CREEP"
 		"AbilityCastRange"				"850"
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
-		"AbilityTextureName"			"holdout_drunken_haze"
+		"AbilityTextureName"			"custom/holdout_drunken_haze"
 
 		"AoERadius"						"300"
 
@@ -2758,7 +2776,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"             		"brewmaster_drunken_brawler"
-		"AbilityTextureName"			"holdout_drunken_brawler"
+		"AbilityTextureName"			"custom/holdout_drunken_brawler"
 		"RequiredLevel"					"5"
 
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
@@ -2805,7 +2823,7 @@
 	
 		// Stats
 		//------------------------------------------------------------------------------------
-		"AbilityTextureName"			"holdout_permanent_immolation"
+		"AbilityTextureName"			"custom/holdout_permanent_immolation"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
 
@@ -2886,7 +2904,7 @@
 	"holdout_earthquake"
 	{
 		"BaseClass"             		"ability_datadriven"
-		"AbilityTextureName"			"holdout_earthquake"
+		"AbilityTextureName"			"custom/holdout_earthquake"
 		"RequiredLevel"					"10"
 		"LevelsBetweenUpgrades"			"5"
 		"AbilityType" 					"DOTA_ABILITY_TYPE_ULTIMATE"
@@ -2934,7 +2952,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"	"heroes/hero_brewmaster/earthquake.lua"
+				"ScriptFile"	"heroes/hero_brewmaster.lua"
 				"Function"		"EarthquakeStart"
 				"Target"		"POINT"
 			}
@@ -2944,7 +2962,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"	"heroes/hero_brewmaster/earthquake.lua"
+				"ScriptFile"	"heroes/hero_brewmaster.lua"
 				"Function"		"EarthquakeEnd"
 			}
 		}
@@ -2958,7 +2976,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"             		"death_prophet_carrion_swarm"
-		"AbilityTextureName"			"holdout_carrion_swarm"
+		"AbilityTextureName"			"custom/holdout_carrion_swarm"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_POINT"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
@@ -3020,7 +3038,7 @@
 		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_POINT"
 		"AbilityUnitDamageType"         "DAMAGE_TYPE_MAGICAL"
 		"SpellImmunityType"             "SPELL_IMMUNITY_ENEMIES_NO"
-		"AbilityTextureName"            "holdout_chaos"
+		"AbilityTextureName"            "custom/holdout_chaos"
 		"AbilityCastAnimation"          "ACT_DOTA_CAST_ABILITY_2"
 	
 		// Stats
@@ -3104,7 +3122,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"                                "heroes/hero_dreadlord/chaos.lua"
+				"ScriptFile"                                "heroes/hero_dreadlord.lua"
 				"Function"                                  "invoker_chaos_meteor_datadriven_on_spell_start"
 				"Target"                                    "POINT"
 				"LandTime"                                  "%land_time"
@@ -3194,7 +3212,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"            "heroes/hero_dreadlord/chaos.lua"
+						"ScriptFile"            "heroes/hero_dreadlord.lua"
 						"Function"              "modifier_invoker_chaos_meteor_datadriven_main_damage_on_interval_think"
 						"AreaOfEffect"          "%area_of_effect"
 						"BurnDuration"          "%burn_duration"
@@ -3205,7 +3223,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"            "heroes/hero_dreadlord/chaos.lua"
+						"ScriptFile"            "heroes/hero_dreadlord.lua"
 						"Function"              "modifier_invoker_chaos_meteor_datadriven_main_damage_on_interval_think"
 						"AreaOfEffect"          "%area_of_effect"
 					}
@@ -3227,7 +3245,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"            "heroes/hero_dreadlord/chaos.lua"
+						"ScriptFile"            "heroes/hero_dreadlord.lua"
 						"Function"              "modifier_invoker_chaos_meteor_datadriven_burn_damage_on_interval_think"
 						"BurnDPSInterval"       "%burn_dps_inverval"
 					}
@@ -3259,7 +3277,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"					"ability_datadriven"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-		"AbilityTextureName"		"holdout_aura_of_blight"
+		"AbilityTextureName"		"custom/holdout_aura_of_blight"
 		"RequiredLevel"				"5"
 		"AbilityCastRange"			"900"
 		"AbilityUnitTargetFlags"	"DOTA_UNIT_TARGET_FLAG_NOT_ANCIENTS"
@@ -3316,7 +3334,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"             		"skeleton_king_hellfire_blast"
-		"AbilityTextureName"			"holdout_death_coil"
+		"AbilityTextureName"			"custom/holdout_death_coil"
 		"MaxLevel" 						"4"
 		"LevelsBetweenUpgrades"			"3"
 		"RequiredLevel"					"8"
@@ -3397,7 +3415,7 @@
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_CREEP"
 		"SpellImmunityType"				"SPELL_IMMUNITY_ALLIES_NO"
-		"AbilityTextureName"			"holdout_sleep"
+		"AbilityTextureName"			"custom/holdout_sleep"
 		"MaxLevel"						"1"
 
 		// Precache
@@ -3522,7 +3540,7 @@
 
 					"RunScript"
 					{
-						"ScriptFile"		"heroes/hero_dreadlord/sleep.lua"
+						"ScriptFile"		"heroes/hero_dreadlord.lua"
 						"Function"			"NightmareEnd"
 
 						"loop_sound"		"Hero_Bane.Nightmare.Loop"
@@ -3559,7 +3577,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"			"hero/hero_dreadlord/sleep.lua"
+						"ScriptFile"			"hero/hero_dreadlord.lua"
 						"Function"				"NightmareInvulEnd"
 
 						"nightmare_modifier"	"modifier_imba_bane_nightmare"
@@ -3581,7 +3599,7 @@
 	"holdout_inferno"
 	{
 		"BaseClass"             		"ability_datadriven"
-		"AbilityTextureName"			"holdout_inferno"
+		"AbilityTextureName"			"custom/holdout_inferno"
 		"LevelsBetweenUpgrades"			"5"
 		"RequiredLevel"					"10"
 		"AbilityType" 					"DOTA_ABILITY_TYPE_ULTIMATE"
@@ -3648,7 +3666,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"    "heroes/hero_dreadlord/inferno.lua"
+						"ScriptFile"    "heroes/hero_dreadlord.lua"
 						"Function"      "RenderInferno"
 					}
 	
@@ -3727,7 +3745,7 @@
 	"dread_lord_inferno_immolation"
 	{
 		"BaseClass"             		"ability_datadriven"
-		"AbilityTextureName"			"dread_lord_inferno_immolation"
+		"AbilityTextureName"			"custom/dread_lord_inferno_immolation"
 		"MaxLevel" 						"1"
 	
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
@@ -3887,7 +3905,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"			"heroes/hero_abyssal_underlord/rain_of_chaos.lua"
+						"ScriptFile"			"heroes/hero_abyssal_underlord.lua"
 						"Function"				"rain_of_chaos"
 					}
 				}
@@ -3945,7 +3963,7 @@
 	
 				"RunScript"
 				{
-				  "ScriptFile"  "heroes/hero_abyssal_underlord/rain_of_chaos.lua"
+				  "ScriptFile"  "heroes/hero_abyssal_underlord.lua"
 				  "Function"    "target_modifier_remove"
 				  "Duration"	"%duration"
 				}
@@ -4053,7 +4071,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"		"heroes/hero_dreadlord/rain_of_chaos.lua"
+						"ScriptFile"		"heroes/hero_dreadlord.lua"
 						"Function"			"rain_of_chaos"
 						"Target"			"POINT"
 					}
@@ -4112,7 +4130,7 @@
 	
 				"RunScript"
 				{
-				  "ScriptFile"  "heroes/hero_dreadlord/rain_of_chaos.lua"
+				  "ScriptFile"  "heroes/hero_dreadlord.lua"
 				  "Function"    "target_modifier_remove"
 				  "Duration"	"%duration"
 				}
@@ -4133,7 +4151,7 @@
 		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_POINT"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_PHYSICAL"  
 		"SpellImmunityType"             "SPELL_IMMUNITY_ENEMIES_YES"
-		"AbilityTextureName"            "holdout_dark_portal"
+		"AbilityTextureName"            "custom/holdout_dark_portal"
 
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
@@ -4190,7 +4208,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"             		"ability_datadriven"
 		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-		"AbilityTextureName"            "holdout_spiritual_beast"
+		"AbilityTextureName"            "custom/holdout_spiritual_beast"
 
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
@@ -4495,7 +4513,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"             		"brewmaster_drunken_brawler"
-		"AbilityTextureName"			"holdout_evasion_and_critical_strike"
+		"AbilityTextureName"			"custom/holdout_evasion_and_critical_strike"
 		"RequiredLevel"					"5"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 
@@ -4536,7 +4554,7 @@
 		"BaseClass"             		"ability_datadriven"
 		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"SpellImmunityType"             "SPELL_IMMUNITY_ENEMIES_YES"
-		"AbilityTextureName"            "holdout_archimonde"
+		"AbilityTextureName"            "custom/holdout_archimonde"
 		"RequiredLevel"					"8"
 		"LevelsBetweenUpgrades"			"3"
 	
@@ -4668,7 +4686,7 @@
 	
 					"RunScript"
 					{
-						"ScriptFile"            "scripts/vscripts/heroes/hero_warlock/archimonde.lua"
+						"ScriptFile"            "heroes/global.lua"
 						"Function"              "HideWearables"
 					}
 	
@@ -4696,8 +4714,8 @@
 	
 					"RunScript"
 					{
-						"ScriptFile"            "scripts/vscripts/heroes/hero_warlock/archimonde.lua"
-						"Function"              "ShowWearables"
+						"ScriptFile"			"heroes/global.lua"
+						"Function"				"ShowWearables"
 					}
 				}
 	
@@ -4749,7 +4767,7 @@
 	"holdout_cripple"
 	{
 		"BaseClass"						"ability_datadriven"
-		"AbilityTextureName"			"holdout_howl_of_terror"
+		"AbilityTextureName"			"custom/holdout_howl_of_terror"
 		"MaxLevel" 						"1"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
@@ -4851,7 +4869,7 @@
 		"SpellImmunityType"             "SPELL_IMMUNITY_ENEMIES_YES"
 		"RequiredLevel"					"10"
 		"LevelsBetweenUpgrades"			"5"
-		"AbilityTextureName"            "holdout_gargoyle_swarm"
+		"AbilityTextureName"            "custom/holdout_gargoyle_swarm"
 		
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
@@ -5073,7 +5091,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"             		"phantom_assassin_blur"
-		"AbilityTextureName"			"holdout_evasion"
+		"AbilityTextureName"			"custom/holdout_evasion"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 	
 		// Special
@@ -5110,7 +5128,7 @@
 		"AbilityUnitDamageType"		"DAMAGE_TYPE_PHYSICAL"
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
 		"AbilityUnitTargetType"		"DOTA_UNIT_TARGET_BASIC | DOTA_UNIT_TARGET_HERO"
-		"AbilityTextureName"		"tyrande_multiple_arrows"
+		"AbilityTextureName"		"custom/tyrande_multiple_arrows"
 		"AbilityCastRange"			"700"
 
 		"AbilitySpecial"
@@ -5194,7 +5212,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"             		"phantom_assassin_coup_de_grace"
-		"AbilityTextureName"			"holdout_critical_arrows"
+		"AbilityTextureName"			"custom/holdout_critical_arrows"
 		"RequiredLevel"					"5"
 		
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
@@ -5226,7 +5244,7 @@
 		//-------------------------------------------------------------------------------------
 		"BaseClass"					"ability_datadriven"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_AURA"
-		"AbilityTextureName"		"holdout_endurance_aura"
+		"AbilityTextureName"		"custom/holdout_endurance_aura"
 		"RequiredLevel"				"8"
 		"LevelsBetweenUpgrades"		"3"
 		"AbilityCastRange"			"900"
@@ -5265,6 +5283,20 @@
 				"ScriptFile"	"heroes/hero_enchantress/endurance_aura.lua"
 				"Function"		"EnduranceAuraCaster"
 			}
+
+//			"RunScript"
+//			{
+//				"ScriptFile"		"heroes/hero_desert_wyrm.lua"
+//				"Function"			"LevelUpAura"
+//				"ability_name"		"holdout_divine_aura_alt"
+//			}
+
+//			"RunScript"
+//			{
+//				"ScriptFile"		"heroes/hero_desert_wyrm.lua"
+//				"Function"			"Passives"
+//				"unactive_passive"	"holdout_divine_aura_alt"
+//			}
 		}
 		
 		"Modifiers"
@@ -5416,7 +5448,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"             		"lina_laguna_blade"
-		"AbilityTextureName"			"holdout_negative_energy"
+		"AbilityTextureName"			"custom/holdout_negative_energy"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
@@ -5466,7 +5498,7 @@
 		// General
 		//-------------------------------------------------------------------------------------
 		"BaseClass"					"ability_datadriven"
-		"AbilityTextureName"		"holdout_active_immolation"
+		"AbilityTextureName"		"custom/holdout_active_immolation"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_TOGGLE"
 
 		// Stats
@@ -5475,7 +5507,7 @@
 		"AbilityCastRange"			"250 300 350 400"
 		"AbilityCooldown"			"0"
 		"AbilityManaCost"			"75 120 175 220"
-		"AbilityTextureName"		"brewmaster_fire_permanent_immolation"
+		"AbilityTextureName"		"custom/brewmaster_fire_permanent_immolation"
 		"AbilityUnitDamageType"		"DAMAGE_TYPE_MAGICAL"
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
 
@@ -5591,7 +5623,7 @@
 		"BaseClass"						"ability_datadriven"
 		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_AURA"
 		"AbilityUnitTargetTeam"         "DOTA_UNIT_TARGET_TEAM_FRIENDLY"
-		"AbilityTextureName"            "holdout_thirst_aura"
+		"AbilityTextureName"            "custom/holdout_thirst_aura"
 		"AbilityCastRange"				"900"
 		"RequiredLevel"					"5"
 		"AbilityUnitTargetFlags"		"DOTA_UNIT_TARGET_FLAG_NOT_ANCIENTS"
@@ -5670,7 +5702,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"             		"phantom_assassin_blur"
-		"AbilityTextureName"			"holdout_illidan_evasion"
+		"AbilityTextureName"			"custom/holdout_illidan_evasion"
 		"RequiredLevel"					"8"
 		"LevelsBetweenUpgrades"			"3"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
@@ -5705,7 +5737,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"             		"terrorblade_metamorphosis"
-		"AbilityTextureName"			"holdout_metamorphosis"
+		"AbilityTextureName"			"custom/holdout_metamorphosis"
 		"AbilityType"					"DOTA_ABILITY_TYPE_ULTIMATE"
 		"MaxLevel" 						"3"
 		"RequiredLevel"					"10"
@@ -5769,7 +5801,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"             		"drow_ranger_trueshot"
-		"AbilityTextureName"			"holdout_trueshot_aura"
+		"AbilityTextureName"			"custom/holdout_trueshot_aura"
 		"MaxLevel" 						"3"
 		"RequiredLevel"					"10"
 		"LevelsBetweenUpgrades"			"5"
@@ -5814,7 +5846,7 @@
 		"AbilityUnitTargetType"         "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
 		"AbilityUnitDamageType"         "DAMAGE_TYPE_MAGICAL"   
 		"SpellImmunityType"             "SPELL_IMMUNITY_ENEMIES_NO"
-		"AbilityTextureName"            "holdout_shockwave"
+		"AbilityTextureName"            "custom/holdout_shockwave"
 		"AbilityCastAnimation"			"ACT_DOTA_CAST_ABILITY_5"
 
 		// Casting
@@ -5908,7 +5940,7 @@
 		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"AbilityUnitDamageType"         "DAMAGE_TYPE_MAGICAL"
 		"SpellImmunityType"             "SPELL_IMMUNITY_ENEMIES_NO"
-		"AbilityTextureName"            "holdout_war_stomp"
+		"AbilityTextureName"            "custom/holdout_war_stomp"
 		"AbilityCastAnimation"			"ACT_DOTA_CAST_ABILITY_1"
 
 		// Stats
@@ -6012,7 +6044,7 @@
 		//-------------------------------------------------------------------------------------
 		"BaseClass"					"ability_datadriven"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_AURA"
-		"AbilityTextureName"		"holdout_endurance_aura"
+		"AbilityTextureName"		"custom/holdout_endurance_aura"
 		"RequiredLevel"				"5"
 		"AbilityCastRange"			"900"
 		"AbilityUnitTargetFlags"	"DOTA_UNIT_TARGET_FLAG_NOT_ANCIENTS"
@@ -6113,7 +6145,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"             		"earthshaker_aftershock"
-		"AbilityTextureName"			"holdout_pulverize"
+		"AbilityTextureName"			"custom/holdout_pulverize"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"	
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
@@ -6159,7 +6191,7 @@
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"   
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
-		"AbilityTextureName"			"holdout_lightning_stroke"
+		"AbilityTextureName"			"custom/holdout_lightning_stroke"
 		"AbilityCastRange"				"1000"
 
 		// Casting
@@ -6304,7 +6336,7 @@
 		"AbilityUnitTargetType"         "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
 		"AbilityUnitDamageType"         "DAMAGE_TYPE_MAGICAL"   
 		"SpellImmunityType"             "SPELL_IMMUNITY_ENEMIES_NO"
-		"AbilityTextureName"            "holdout_shockwave_20"
+		"AbilityTextureName"            "custom/holdout_shockwave_20"
 		"AbilityCastAnimation"			"ACT_DOTA_CAST_ABILITY_5"
 		"MaxLevel"						"1"
 
@@ -6399,7 +6431,7 @@
 		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"AbilityUnitDamageType"         "DAMAGE_TYPE_MAGICAL"
 		"SpellImmunityType"             "SPELL_IMMUNITY_ENEMIES_NO"
-		"AbilityTextureName"            "centaur_hoof_stomp"
+		"AbilityTextureName"            "custom/centaur_hoof_stomp"
 		"MaxLevel"						"1"
 		"AbilityCastAnimation"			"ACT_DOTA_CAST_ABILITY_1"
 
@@ -6512,7 +6544,7 @@
 		"AbilityCastRange"			"900"
 		"AbilityCooldown"			"60"
 		"AbilityManaCost"			"0"
-		"AbilityTextureName"		"holdout_roar"
+		"AbilityTextureName"		"custom/holdout_roar"
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
 
 		// Special
@@ -6618,7 +6650,7 @@
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_YES"
 		"MaxLevel"						"1"
-		"AbilityTextureName"			"holdout_last_stand"
+		"AbilityTextureName"			"custom/holdout_last_stand"
 
 		// Time		
 		//-------------------------------------------------------------------------------------------------------------
@@ -6669,7 +6701,7 @@
 		"AbilityUnitTargetType"         "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
 		"AbilityUnitDamageType"         "DAMAGE_TYPE_MAGICAL"   
 		"SpellImmunityType"             "SPELL_IMMUNITY_ENEMIES_NO"
-		"AbilityTextureName"            "holdout_crushing_wave"
+		"AbilityTextureName"            "custom/holdout_crushing_wave"
 
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
@@ -6757,7 +6789,7 @@
 	"holdout_summon_water_elemental"
 	{
 		"BaseClass"             		"ability_datadriven"
-		"AbilityTextureName"			"holdout_summon_water_elemental"
+		"AbilityTextureName"			"custom/holdout_summon_water_elemental"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"AbilityCooldown"				"35"
 		"AbilityManaCost"				"120 160 200 240"
@@ -6955,7 +6987,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"             		"nevermore_dark_lord"
-		"AbilityTextureName"			"holdout_debilitation_aura"
+		"AbilityTextureName"			"custom/holdout_debilitation_aura"
 		"RequiredLevel"					"5"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_AURA"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
@@ -6999,7 +7031,7 @@
 		"AbilityUnitDamageType"         "DAMAGE_TYPE_MAGICAL"   
 		"RequiredLevel"					"8"
 		"LevelsBetweenUpgrades"			"3"
-		"AbilityTextureName"            "holdout_drain"
+		"AbilityTextureName"            "custom/holdout_drain"
 
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
@@ -7078,7 +7110,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"    "heroes/hero_archmage/drain.lua"
+						"ScriptFile"    "heroes/hero_archmage.lua"
 						"Function"      "LifeDrainParticle"
 					}
 				}
@@ -7087,7 +7119,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"    "heroes/hero_archmage/drain.lua"
+						"ScriptFile"    "heroes/hero_archmage.lua"
 						"Function"      "LifeDrainParticleEnd"
 					}
 				}
@@ -7097,7 +7129,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"    "heroes/hero_archmage/drain.lua"
+						"ScriptFile"    "heroes/hero_archmage.lua"
 						"Function"      "LifeDrainHealthTransfer"
 					}
 				}
@@ -7114,7 +7146,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"medusa_mana_shield"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_TOGGLE | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
-		"AbilityTextureName"			"holdout_mana_shield"
+		"AbilityTextureName"			"custom/holdout_mana_shield"
 		"MaxLevel"						"1"
 
 		// Casting
@@ -7154,7 +7186,7 @@
 		"LevelsBetweenUpgrades"			"5"
 		"AbilityUnitDamageType"         "DAMAGE_TYPE_MAGICAL"   
 		"SpellImmunityType"             "SPELL_IMMUNITY_ENEMIES_NO"
-		"AbilityTextureName"            "holdout_elemental_wave"
+		"AbilityTextureName"            "custom/holdout_elemental_wave"
 		
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
@@ -7233,7 +7265,7 @@
 		
 			"RunScript"
 			{
-				"ScriptFile"            "heroes/hero_archmage/elemental_wave.lua"
+				"ScriptFile"            "heroes/hero_archmage.lua"
 				"Function"              "march_of_the_machines_spawn"
 				"Target"                "POINT"
 			}
@@ -7301,7 +7333,7 @@
 		"AbilityCastRange"			"1200"
 		"AbilityCooldown"			"120.0"
 		"AbilityManaCost"			"0"
-		"AbilityTextureName"		"holdout_rain_of_ice"
+		"AbilityTextureName"		"custom/holdout_rain_of_ice"
 		"AbilityUnitDamageType"		"DAMAGE_TYPE_MAGICAL"
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
 		"AbilityUnitTargetType"		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
@@ -7424,7 +7456,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"ability_datadriven"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-		"AbilityTextureName"			"blademaster_mirror_image"
+		"AbilityTextureName"			"custom/blademaster_mirror_image"
 
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
@@ -7546,7 +7578,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"BaseClass"						"ability_datadriven"
-		"AbilityTextureName"			"holdout_wardrums_aura"
+		"AbilityTextureName"			"custom/holdout_wardrums_aura"
 		"RequiredLevel"					"5"
 		"AbilityUnitTargetFlags"		"DOTA_UNIT_TARGET_FLAG_NOT_ANCIENTS"
 
@@ -7614,13 +7646,43 @@
 		}
 	}
 
+	//=================================================================================================================
+	// Ability: Juggernaut Blade Dance
+	//=================================================================================================================
+	"holdout_blade_dance"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"             	"juggernaut_blade_dance"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"RequiredLevel"				"8"
+		"LevelsBetweenUpgrades"		"3"
+		"AbilityTextureName"		"custom/juggernaut_blade_dance"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"blade_dance_crit_mult"		"175 250 325 400"
+			}
+			"02"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"blade_dance_crit_chance"	"10"
+			}
+		}
+	}
+
 	//=====================================================================================================
 	// Blademaster: Berserker's Rage
 	//=====================================================================================================
 	"holdout_berserkers_rage"
 	{
 		"BaseClass"						"ability_datadriven"
-		"AbilityTextureName"			"holdout_berserkers_rage"
+		"AbilityTextureName"			"custom/holdout_berserkers_rage"
 		"MaxLevel"						"1"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IGNORE_CHANNEL"
 
@@ -7699,7 +7761,7 @@
 		"AbilityUnitTargetType"         "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
 		"AbilityUnitTargetFlags"        "DOTA_UNIT_TARGET_FLAG_NOT_MAGIC_IMMUNE_ALLIES"
 		"SpellImmunityType"             "SPELL_IMMUNITY_ALLIES_YES"
-		"AbilityTextureName"			"holdout_inner_fire"
+		"AbilityTextureName"			"custom/holdout_inner_fire"
 
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
@@ -7790,7 +7852,7 @@
 		"AbilityUnitTargetFlags"		"DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES"
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_YES"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_PHYSICAL"
-		"AbilityTextureName"			"holdout_searing_arrows"
+		"AbilityTextureName"			"custom/holdout_searing_arrows"
 
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
@@ -7825,7 +7887,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"             		"slardar_bash"
-		"AbilityTextureName"			"slardar_bash"
+		"AbilityTextureName"			"custom/slardar_bash"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_PHYSICAL"	
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_YES"
@@ -7870,7 +7932,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"             		"phantom_assassin_coup_de_grace"
-		"AbilityTextureName"			"holdout_critical_arrows_alt"
+		"AbilityTextureName"			"custom/holdout_critical_arrows_alt"
 		"RequiredLevel"					"8"
 		"LevelsBetweenUpgrades"			"3"
 		
@@ -7905,7 +7967,7 @@
 		"BaseClass"             		"ability_datadriven"
 		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"SpellImmunityType"             "SPELL_IMMUNITY_ENEMIES_NO"
-		"AbilityTextureName"            "holdout_splash_arrows"
+		"AbilityTextureName"            "custom/holdout_splash_arrows"
 		"AbilityType"					"DOTA_ABILITY_TYPE_ULTIMATE"
 		"RequiredLevel"					"10"
 		"LevelsBetweenUpgrades"			"5"
@@ -7995,7 +8057,7 @@
 		"AbilityCooldown"			"120.0"
 		"AbilityChannelTime"		"15"
 		"AbilityManaCost"			"0"
-		"AbilityTextureName"		"holdout_stampede"
+		"AbilityTextureName"		"custom/holdout_stampede"
 		"AbilityUnitDamageType"		"DAMAGE_TYPE_MAGICAL"
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
 		"AbilityUnitTargetType"		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
@@ -8106,7 +8168,7 @@
 		"MaxLevel"						"1"
 		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"SpellImmunityType"             "SPELL_IMMUNITY_ENEMIES_YES"
-		"AbilityTextureName"            "holdout_splash_arrows"
+		"AbilityTextureName"            "custom/holdout_splash_arrows"
 
 		// Stats
 		//-------------------------------------------------------------------------------------------------------------
@@ -8184,7 +8246,7 @@
 		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_POINT"
 		"AbilityUnitDamageType"         "DAMAGE_TYPE_PHYSICAL"  
 		"SpellImmunityType"             "SPELL_IMMUNITY_ENEMIES_YES"
-		"AbilityTextureName"            "holdout_serpent_ward"
+		"AbilityTextureName"            "custom/holdout_serpent_ward"
 
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
@@ -8240,7 +8302,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"             		"antimage_mana_break"
-		"AbilityTextureName"			"holdout_feedback"
+		"AbilityTextureName"			"custom/holdout_feedback"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_PHYSICAL"		
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
@@ -8274,7 +8336,7 @@
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"RequiredLevel"				"8"
 		"LevelsBetweenUpgrades"		"3"
-		"AbilityTextureName"		"holdout_voodoo_eyes"
+		"AbilityTextureName"		"custom/holdout_voodoo_eyes"
 
 		"AbilitySpecial"
 		{
@@ -8312,7 +8374,7 @@
 		"AbilityType"					"DOTA_ABILITY_TYPE_ULTIMATE"
 		"AbilityUnitDamageType"         "DAMAGE_TYPE_PHYSICAL"  
 		"SpellImmunityType"             "SPELL_IMMUNITY_ENEMIES_YES"
-		"AbilityTextureName"            "holdout_laser_trap"
+		"AbilityTextureName"            "custom/holdout_laser_trap"
 		"RequiredLevel"					"10"
 		"LevelsBetweenUpgrades"			"5"
 
@@ -8480,7 +8542,7 @@
 		"AbilityUnitTargetType"         "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
 		"AbilityUnitDamageType"         "DAMAGE_TYPE_MAGICAL"   
 		"SpellImmunityType"             "SPELL_IMMUNITY_ENEMIES_NO"
-		"AbilityTextureName"            "holdout_owl_lightning"
+		"AbilityTextureName"            "custom/holdout_owl_lightning"
 
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
@@ -8616,7 +8678,7 @@
 		"BaseClass"					"ability_datadriven"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_AURA"
 		"RequiredLevel"				"5"
-		"AbilityTextureName"		"holdout_command_aura"
+		"AbilityTextureName"		"custom/holdout_command_aura"
 		"AbilityUnitTargetFlags"	"DOTA_UNIT_TARGET_FLAG_NOT_ANCIENTS"
 		"AbilityCastRange"			"900"
 
@@ -8671,7 +8733,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"					"ability_datadriven"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-		"AbilityTextureName"		"holdout_elunes_grace"
+		"AbilityTextureName"		"custom/holdout_elunes_grace"
 		"RequiredLevel"				"8"
 		"LevelsBetweenUpgrades"		"3"
 		"AbilitySpecial"
@@ -8736,7 +8798,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"             		"luna_moon_glaive"
-		"AbilityTextureName"			"holdout_innate_lunar_glaive"
+		"AbilityTextureName"			"custom/holdout_innate_lunar_glaive"
 		"MaxLevel" 						"1"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_YES"
@@ -8775,7 +8837,7 @@
 		"AbilityType"                   "DOTA_ABILITY_TYPE_ULTIMATE"
 		"AbilityUnitDamageType"         "DAMAGE_TYPE_MAGICAL"   
 		"SpellImmunityType"             "SPELL_IMMUNITY_ENEMIES_NO"
-		"AbilityTextureName"            "holdout_moon_explosion"
+		"AbilityTextureName"            "custom/holdout_moon_explosion"
 		"RequiredLevel"					"10"
 		"LevelsBetweenUpgrades"			"5"
 	
@@ -8871,7 +8933,7 @@
 		"SpellImmunityType"             "SPELL_IMMUNITY_ENEMIES_NO"
 		"AbilityUnitDamageType"         "DAMAGE_TYPE_MAGICAL"
 		"AbilityDamage"					"500"
-		"AbilityTextureName"            "holdout_doom"
+		"AbilityTextureName"            "custom/holdout_doom"
 		"RequiredLevel"					"20"
 		"MaxLevel"						"1"
 
@@ -9030,7 +9092,7 @@
 		"AbilityUnitTargetTeam"         "DOTA_UNIT_TARGET_TEAM_ENEMY"
 		"AbilityUnitTargetType"         "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
 		"AbilityUnitDamageType"         "DAMAGE_TYPE_MAGICAL"
-		"AbilityTextureName"			"sven_storm_bolt"
+		"AbilityTextureName"			"custom/sven_storm_bolt"
 		"AbilityCastRange"				"700"
 		"AbilityCastPoint"				"0.25"
 
@@ -9153,7 +9215,7 @@
 		"BaseClass"						"ability_datadriven"
 		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_AURA"
 		"AbilityUnitTargetTeam"         "DOTA_UNIT_TARGET_TEAM_FRIENDLY"
-		"AbilityTextureName"            "holdout_muradin_hammer"
+		"AbilityTextureName"            "custom/holdout_muradin_hammer"
 		"AbilityCastRange"				"900"
 		"RequiredLevel"					"5"
 
@@ -9237,7 +9299,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"					"ability_datadriven"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-		"AbilityTextureName"    	"holdout_thunder_spirit"
+		"AbilityTextureName"    	"custom/holdout_thunder_spirit"
 		"MaxLevel"					"1"
 
 		"OnSpellStart"
@@ -9280,7 +9342,7 @@
 		"BaseClass"						"ability_datadriven"
 		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING"
 		"AbilityType"                   "DOTA_ABILITY_TYPE_ULTIMATE"
-		"AbilityTextureName"            "holdout_avatar"
+		"AbilityTextureName"            "custom/holdout_avatar"
 		"RequiredLevel"					"10"
 		"LevelsBetweenUpgrades"			"5"
 		
@@ -9380,6 +9442,69 @@
 	}
 
 	//=================================================================================================================
+	// Brewmaster: Thunder Clap
+	//=================================================================================================================
+	"holdout_thunder_clap"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"						"brewmaster_thunder_clap"
+		"AbilityTextureName"			"custom/brewmaster_thunder_clap_new"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
+		"SpellDispellableType"			"SPELL_DISPELLABLE_YES"
+
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"5.0"
+		
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastPoint"				"0.4"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"120 170 220 270"		
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"radius"					"400"
+			}
+			"02"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"damage"					"150 350 550 750"
+			}
+			"03"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"movement_slow"				"20 30 40 50"
+			}
+			"04"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"attack_speed_slow"			"20 30 40 50"
+			}			
+			"05"
+			{
+				"var_type"					"FIELD_FLOAT"
+				"duration"					"4.0"
+			}
+			"06"
+			{
+				"var_type"					"FIELD_FLOAT"
+				"duration_creeps"			"4.0 4.5 5.0 5.5"
+			}			
+		}
+	}
+
+	//=================================================================================================================
 	// Mountain King: Storm Bolt
 	//=================================================================================================================
 	"holdout_storm_bolt_20"
@@ -9401,7 +9526,7 @@
 
 		// Damage.
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityDamage"					"2100"
+		"AbilityDamage"					"1800"
 
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
@@ -9435,6 +9560,70 @@
 	}
 
 	//=================================================================================================================
+	// Brewmaster: Thunder Clap
+	//=================================================================================================================
+	"holdout_thunder_clap_20"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"						"brewmaster_thunder_clap"
+		"AbilityTextureName"			"custom/brewmaster_thunder_clap_new"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
+		"SpellDispellableType"			"SPELL_DISPELLABLE_YES"
+		"MaxLevel"						"1"
+
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"4.0"
+		
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastPoint"				"0.4"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"0"		
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"radius"					"400"
+			}
+			"02"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"damage"					"1100"
+			}
+			"03"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"movement_slow"				"50"
+			}
+			"04"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"attack_speed_slow"			"50"
+			}			
+			"05"
+			{
+				"var_type"					"FIELD_FLOAT"
+				"duration"					"4.0"
+			}
+			"06"
+			{
+				"var_type"					"FIELD_FLOAT"
+				"duration_creeps"			"6.0"
+			}			
+		}
+	}
+
+	//=================================================================================================================
 	// Arthas: Holy Light
 	//=================================================================================================================
 	"holdout_holy_light"
@@ -9448,7 +9637,7 @@
 		"AbilityUnitTargetFlags"	"DOTA_UNIT_TARGET_FLAG_INVULNERABLE"
 		"AbilityUnitDamageType"		"DAMAGE_TYPE_MAGICAL"
 		"SpellImmunityType"			"SPELL_IMMUNITY_ALLIES_YES"
-		"AbilityTextureName"		"holdout_holy_light"
+		"AbilityTextureName"		"custom/holdout_holy_light"
 
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
@@ -9524,7 +9713,7 @@
 		"BaseClass"						"ability_datadriven"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
-		"AbilityTextureName"			"holdout_divine_shield"
+		"AbilityTextureName"			"custom/holdout_divine_shield"
 
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
@@ -9594,7 +9783,7 @@
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_BASIC | DOTA_UNIT_TARGET_HERO"
-		"AbilityTextureName"			"holdout_frostmourne"
+		"AbilityTextureName"			"custom/holdout_frostmourne"
 		"RequiredLevel"					"8"
 		"LevelsBetweenUpgrades"			"3"
 
@@ -9750,9 +9939,9 @@
 		"BaseClass"						"ability_datadriven"
 		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"SpellImmunityType"             "SPELL_IMMUNITY_ENEMIES_YES"
-		"AbilityTextureName"            "holdout_innate_great_cleave"
-		"MaxLevel"              "1"
-				
+		"AbilityTextureName"            "custom/holdout_innate_great_cleave"
+		"MaxLevel"						"1"
+
 		// Special
 		//------------------------------------------------------------------------------------------------------	-------
 		"AbilitySpecial"
@@ -9760,12 +9949,12 @@
 			"01"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"splash_radius"				"325"
+				"full_damage_radius"		"325"
 			}
 			"02"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"splash_damage_percent"		"25"
+				"cleave_pct_tooltip"		"25"
 			}
 		}
 
@@ -9787,7 +9976,7 @@
 
 					"RunScript"
 					{
-						"ScriptFile"	"scripts/vscripts/heroes/hero_centurion/sea_dragon_form.lua"
+						"ScriptFile"	"items/global.lua"
 						"Function"		"Splash"
 					}
 				}
@@ -9814,7 +10003,7 @@
 		"AbilityCooldown"			"160.0 150.0 140.0"
 		"AbilityManaCost"			"200 450 0"
 		"AbilityCastRange"			"900"
-		"AbilityTextureName"		"holdout_light_roar"
+		"AbilityTextureName"		"custom/holdout_light_roar"
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
 
 		// Special
@@ -9924,7 +10113,7 @@
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_PHYSICAL"
-		"AbilityTextureName"			"holdout_spiked_carapace"
+		"AbilityTextureName"			"custom/holdout_spiked_carapace"
 		"RequiredLevel"					"20"
 		"MaxLevel"						"1"
 
@@ -10010,7 +10199,7 @@
 		"AbilityCooldown"				"11"
 		"AbilityCastRange"				"800"
 		"AbilityManaCost"				"150 300 450 600"
-		"AbilityTextureName"			"holdout_bane_death_coil"
+		"AbilityTextureName"			"custom/holdout_bane_death_coil"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
@@ -10076,7 +10265,7 @@
 
 		// Stats
 		//-------------------------------------------------------------------------------------
-		"AbilityTextureName"		"holdout_bane_permanent_immolation"
+		"AbilityTextureName"		"custom/holdout_bane_permanent_immolation"
 		"AbilityCastRange"			"300 325 350 375"
 		"AbilityUnitDamageType"		"DAMAGE_TYPE_MAGICAL"
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
@@ -10163,7 +10352,7 @@
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
 		"AbilityUnitTargetType"		"DOTA_UNIT_TARGET_HERO"
-		"AbilityTextureName"		"holdout_bane_critical"
+		"AbilityTextureName"		"custom/holdout_bane_critical"
 		"RequiredLevel"				"5"
 		"LevelsBetweenUpgrades"		"3"
 	
@@ -10243,7 +10432,7 @@
 		"BaseClass"					"ability_datadriven"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_AURA"
 		"MaxLevel"					"1"
-		"AbilityTextureName"		"holdout_command_aura"
+		"AbilityTextureName"		"custom/holdout_command_aura"
 		"AbilityUnitTargetFlags"	"DOTA_UNIT_TARGET_FLAG_NOT_ANCIENTS"
 		"AbilityCastRange"			"900"
 
@@ -10325,7 +10514,7 @@
 		"AbilityCooldown"			"120"
 		"AbilityChannelTime"		"15"
 		"AbilityManaCost"			"250 500 0"
-		"AbilityTextureName"		"holdout_stampede"
+		"AbilityTextureName"		"custom/holdout_stampede"
 		"AbilityUnitDamageType"		"DAMAGE_TYPE_MAGICAL"
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
 		"AbilityUnitTargetType"		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
@@ -10460,17 +10649,17 @@
 			"02"
 			{
 				"var_type"						"FIELD_FLOAT"
-				"wave_duration"					"5.0"
+				"wave_duration"					"9.0"
 			}		
 			"03"
 			{
 				"var_type"						"FIELD_INTEGER"
-				"wave_count"					"4"
+				"wave_count"					"8"
 			}
 			"04"
 			{
 				"var_type"						"FIELD_INTEGER"
-				"wave_damage"					"75 150 225 300"
+				"wave_damage"					"35 75 115 155"
 			}
 			"05"
 			{
@@ -10480,7 +10669,7 @@
 			"06"
 			{
 				"var_type"						"FIELD_FLOAT"
-				"burn_damage"					"1.0"
+				"burn_damage"					"0.75"
 			}
 			"07"
 			{
@@ -10509,7 +10698,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"centaur_hoof_stomp"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-		"AbilityTextureName"			"holdout_war_thunder"
+		"AbilityTextureName"			"custom/holdout_war_thunder"
 		"SpellDispellableType"			"SPELL_DISPELLABLE_YES_STRONG"
 
 		// Stats
@@ -10550,7 +10739,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"					"ability_datadriven"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-		"AbilityTextureName"    	"holdout_unholy_aura"
+		"AbilityTextureName"    	"custom/holdout_unholy_aura"
 		"AbilityCastRange"			"900"
 		"RequiredLevel"				"5"
 		"AbilityUnitTargetFlags"	"DOTA_UNIT_TARGET_FLAG_NOT_ANCIENTS"
@@ -10813,7 +11002,7 @@
 		"SpellImmunityType"             "SPELL_IMMUNITY_ENEMIES_NO"
 		"AbilityUnitDamageType"         "DAMAGE_TYPE_MAGICAL"
 		"AbilityDamage"					"150 300 450"
-		"AbilityTextureName"            "holdout_doom"
+		"AbilityTextureName"            "custom/holdout_doom"
 		"RequiredLevel"					"10"
 		"LevelsBetweenUpgrades"			"5"
 
@@ -10981,7 +11170,7 @@
 	"doom_golem_hot_skin"
 	{
 		"BaseClass"             		"ability_datadriven"
-		"AbilityTextureName"			"warlock_golem_permanent_immolation"
+		"AbilityTextureName"			"custom/warlock_golem_permanent_immolation"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"MaxLevel" 						"1"
 
@@ -11057,7 +11246,7 @@
 	"doom_golem_hot_skin2"
 	{
 		"BaseClass"             		"ability_datadriven"
-		"AbilityTextureName"			"warlock_golem_permanent_immolation"
+		"AbilityTextureName"			"custom/warlock_golem_permanent_immolation"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"MaxLevel" 						"1"
 
@@ -11141,7 +11330,7 @@
 		"AbilityUnitTargetFlags"		"DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES | DOTA_UNIT_TARGET_FLAG_NOT_ILLUSIONS"
 		"AbilityUnitDamageType"         "DAMAGE_TYPE_MAGICAL"   
 		"SpellImmunityType"             "SPELL_IMMUNITY_ENEMIES_NO"
-		"AbilityTextureName"            "holdout_heat_seeking_daggers"
+		"AbilityTextureName"            "custom/holdout_heat_seeking_daggers"
 	
 		// Casting
 		//------------------------------------------------------------------------------------------------------
@@ -11288,7 +11477,7 @@
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"  
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
-		"AbilityTextureName"			"holdout_shadow_strike"
+		"AbilityTextureName"			"custom/holdout_shadow_strike"
 		"AbilityCastAnimation"			"ACT_DOTA_CAST_ABILITY_1"
 
 		// Casting
@@ -11443,7 +11632,7 @@
 		"BaseClass"						"ability_datadriven"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_ATTRIBUTES"
 		"RequiredLevel"					"5"
-		"AbilityTextureName"			"holdout_permanent_stats"
+		"AbilityTextureName"			"custom/holdout_permanent_stats"
 
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
@@ -11489,7 +11678,7 @@
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
 		"SpellImmunityType"             "SPELL_IMMUNITY_ENEMIES_NO"
 		"AbilityUnitDamageType"         "DAMAGE_TYPE_MAGICAL"
-		"AbilityTextureName"            "holdout_gust_pool"
+		"AbilityTextureName"            "custom/holdout_gust_pool"
 		"RequiredLevel"					"8"
 		"LevelsBetweenUpgrades"			"3"
 
@@ -11649,7 +11838,7 @@
 		"AbilityCastPoint"		"0.4"
 		"AbilityCooldown"		"220"
 		"AbilityManaCost"		"250 500"
-		"AbilityTextureName"	"holdout_vengeance"
+		"AbilityTextureName"	"custom/holdout_vengeance"
 
 		// Special
 		//-------------------------------------------------------------------------------------
@@ -11735,7 +11924,7 @@
 		"AbilityCastPoint" "0.5"
 		"AbilityCooldown"  "10"
 		"AbilityManaCost"  "100"
-		"AbilityTextureName" "spectre_haunt"
+		"AbilityTextureName" "custom/spectre_haunt"
 
 
 		// Special
@@ -11802,7 +11991,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"ability_datadriven"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_ROOT_DISABLES"
-		"AbilityTextureName"			"holdout_blink"
+		"AbilityTextureName"			"custom/holdout_blink"
 		"MaxLevel"						"1"
 		"AbilityCastAnimation"			"ACT_DOTA_CAST_ABILITY_2"
 		"AbilityCastRange"				"750"
@@ -11953,7 +12142,7 @@
 		"AbilityUnitDamageType"         "DAMAGE_TYPE_MAGICAL"   
 		"SpellImmunityType"             "SPELL_IMMUNITY_ENEMIES_NO"
 		"FightRecapLevel"               "1"
-		"AbilityTextureName"            "holdout_hurl_bomb"
+		"AbilityTextureName"            "custom/holdout_hurl_bomb"
 
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
@@ -12076,7 +12265,7 @@
 		"AbilityUnitTargetFlags"		"DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES | DOTA_UNIT_TARGET_FLAG_NOT_ILLUSIONS"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"   
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
-		"AbilityTextureName"			"holdout_fan_of_rockets"
+		"AbilityTextureName"			"custom/holdout_fan_of_rockets"
 	
 		// Casting
 		//------------------------------------------------------------------------------------------------------
@@ -12184,7 +12373,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"					"ability_datadriven"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-		"AbilityTextureName"		"holdout_metal_armor"
+		"AbilityTextureName"		"custom/holdout_metal_armor"
 		"RequiredLevel"				"8"
 		"LevelsBetweenUpgrades"		"3"
 		"AbilitySpecial"
@@ -12228,7 +12417,7 @@
 		"AbilityCastRange"			"900"
 		"AbilityCooldown"			"60"
 		"AbilityManaCost"			"40"
-		"AbilityTextureName"		"holdout_roar"
+		"AbilityTextureName"		"custom/holdout_roar"
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
 
 		// Special
@@ -12327,7 +12516,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"					"ability_datadriven"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
-		"AbilityTextureName"		"holdout_clone"
+		"AbilityTextureName"		"custom/holdout_clone"
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
 		"AbilityUnitTargetType"		"DOTA_UNIT_TARGET_HERO"
 		"AbilityUnitTargetFlag"		"DOTA_UNIT_TARGET_FLAG_NOT_ILLUSIONS"
@@ -12538,7 +12727,7 @@
 		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_POINT"
 		"AbilityUnitDamageType"         "DAMAGE_TYPE_PHYSICAL"  
 		"SpellImmunityType"             "SPELL_IMMUNITY_ENEMIES_NO"
-		"AbilityTextureName"            "holdout_watery_minion"
+		"AbilityTextureName"            "custom/holdout_watery_minion"
 
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
@@ -12601,7 +12790,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"BaseClass"						"ability_datadriven"
-		"AbilityTextureName"			"holdout_distance_aura"
+		"AbilityTextureName"			"custom/holdout_distance_aura"
 		"RequiredLevel"					"5"
 		"AbilityUnitTargetFlags"		"DOTA_UNIT_TARGET_FLAG_NOT_ANCIENTS"
 
@@ -12621,7 +12810,7 @@
 			"02"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"aura_radius"			"25000"
+				"aura_radius"			"50000"
 			}
 		}
 
@@ -12629,9 +12818,9 @@
 		{
 			"modifier_distance_aura"
 			{
-				"Passive"           "1"
-				"IsHidden"          "1"
-				"IsBuff"            "1"
+				"Passive"			"1"
+				"IsHidden"			"1"
+				"IsBuff"			"1"
 				"IsPurgeable"		"0"
 
 				"Aura"              "modifier_distance_aura_hidden"
@@ -12667,7 +12856,7 @@
 		"AbilityUnitTargetType"         "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
 		"AbilityUnitDamageType"         "DAMAGE_TYPE_MAGICAL"   
 		"SpellImmunityType"             "SPELL_IMMUNITY_ENEMIES_NO"
-		"AbilityTextureName"            "holdout_storm_rain"
+		"AbilityTextureName"            "custom/holdout_storm_rain"
 		"RequiredLevel"					"8"
 		"LevelsBetweenUpgrades"			"3"
 		
@@ -12739,7 +12928,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"ability_datadriven"
-		"AbilityTextureName"			"holdout_rejuvenation"
+		"AbilityTextureName"			"custom/holdout_rejuvenation"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
@@ -12846,7 +13035,7 @@
 		"AbilityUnitDamageType"							"DAMAGE_TYPE_MAGICAL"	
 		"SpellImmunityType"								"SPELL_IMMUNITY_ENEMIES_NO"
 		"FightRecapLevel"								"2"
-		"AbilityTextureName"							"holdout_monsoon"
+		"AbilityTextureName"							"custom/holdout_monsoon"
 		"RequiredLevel"									"10"
 		"LevelsBetweenUpgrades"							"5"
 
@@ -13090,7 +13279,7 @@
 		"AbilityBehavior"								"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE | DOTA_ABILITY_BEHAVIOR_CHANNELLED"
 		"AbilityUnitDamageType"							"DAMAGE_TYPE_MAGICAL"	
 		"SpellImmunityType"								"SPELL_IMMUNITY_ENEMIES_NO"
-		"AbilityTextureName"							"holdout_monsoon"
+		"AbilityTextureName"							"custom/holdout_monsoon"
 
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
@@ -13327,7 +13516,7 @@
 	"holdout_phase_shift"
 	{
 		"BaseClass"						"ability_datadriven"
-		"AbilityTextureName"			"holdout_phase_shift"
+		"AbilityTextureName"			"custom/holdout_phase_shift"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IGNORE_CHANNEL"
 
 		// Stats        
@@ -13412,7 +13601,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"					"ability_datadriven"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-		"AbilityTextureName"		"holdout_life_regeneration_aura"
+		"AbilityTextureName"		"custom/holdout_life_regeneration_aura"
 		"RequiredLevel"				"5"
 		"AbilityCastRange"			"900"
 		"AbilityUnitTargetFlags"	"DOTA_UNIT_TARGET_FLAG_NOT_ANCIENTS"
@@ -13476,7 +13665,7 @@
 	
 		// Stats
 		//------------------------------------------------------------------------------------
-		"AbilityTextureName"			"holdout_permanent_lightning"
+		"AbilityTextureName"			"custom/holdout_permanent_lightning"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
 	
@@ -13557,7 +13746,7 @@
 	"holdout_resistant_skin"
 	{
 		"BaseClass"					"ability_datadriven"
-		"AbilityTextureName"		"holdout_resistant_skin"
+		"AbilityTextureName"		"custom/holdout_resistant_skin"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"MaxLevel"					"1"
 		"RequiredLevel"				"20"
@@ -13595,7 +13784,7 @@
 	"holdout_burning_oil"
 	{
 		"BaseClass"						"ability_datadriven"
-		"AbilityTextureName"			"holdout_burning_oil"
+		"AbilityTextureName"			"custom/holdout_burning_oil"
 
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
@@ -13854,7 +14043,7 @@
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"	
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
 		"FightRecapLevel"				"1"
-		"AbilityTextureName"			"holdout_dragon_slave"	
+		"AbilityTextureName"			"custom/holdout_dragon_slave"	
 		
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
@@ -13995,7 +14184,7 @@
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"   
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
-		"AbilityTextureName"			"holdout_incinerate"
+		"AbilityTextureName"			"custom/holdout_incinerate"
 		"RequiredLevel"					"5"
 		"AbilityDuration"				"5.0"
 		"AbilityDamage"					"100 200 300 400"
@@ -14083,7 +14272,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"             		"ability_datadriven"
-		"AbilityTextureName"			"holdout_firebolt"
+		"AbilityTextureName"			"custom/holdout_firebolt"
 		"LevelsBetweenUpgrades"			"3"
 		"RequiredLevel"					"8"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
@@ -14252,7 +14441,7 @@
 	"holdout_phoenix"
 	{
 		"BaseClass"                     "ability_datadriven"
-		"AbilityTextureName"            "holdout_phoenix"
+		"AbilityTextureName"            "custom/holdout_phoenix"
 		"RequiredLevel"					"10"
 		"LevelsBetweenUpgrades"			"5"
 		"AbilityType"                   "DOTA_ABILITY_TYPE_ULTIMATE"
@@ -14347,7 +14536,7 @@
 	"blood_mage_phoenix_reborn"
 	{
 		"BaseClass"						"ability_datadriven"
-		"AbilityTextureName"			"holdout_phoenix"
+		"AbilityTextureName"			"custom/holdout_phoenix"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"MaxLevel"						"1"
 
@@ -14427,7 +14616,7 @@
 	"blood_mage_phoenix_egg"
 	{
 		"BaseClass"                     "ability_datadriven"
-		"AbilityTextureName"            "blood_mage_phoenix"
+		"AbilityTextureName"            "custom/blood_mage_phoenix"
 		"MaxLevel"                      "1"
 	
 		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_PASSIVE"
@@ -14734,7 +14923,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"	"heroes/hero_archimage/blizzard.lua"
+				"ScriptFile"	"heroes/hero_archimage.lua"
 				"Function"		"BlizzardStartPoint"
 				"Target"		"POINT"
 			}
@@ -14750,7 +14939,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"  "heroes/hero_archimage/blizzard.lua"
+				"ScriptFile"  "heroes/hero_archimage.lua"
 				"Function"    "BlizzardEnd"
 			}
 		}
@@ -14785,7 +14974,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"  "heroes/hero_archimage/blizzard.lua"
+						"ScriptFile"  "heroes/hero_archimage.lua"
 						"Function"    "ApplyAnimation"
 					}
 				}
@@ -14873,10 +15062,10 @@
 							}
 						}
 					}
-					
+
 					"RunScript"
 					{
-						"ScriptFile"  "heroes/hero_archimage/blizzard.lua"
+						"ScriptFile"  "heroes/hero_archimage.lua"
 						"Function"    "BlizzardWave"
 					}
 				}
@@ -14902,7 +15091,7 @@
 	"holdout_summon_water_elemental_alt"
 	{
 		"BaseClass"             		"ability_datadriven"
-		"AbilityTextureName"			"holdout_summon_water_elemental_alt"
+		"AbilityTextureName"			"custom/holdout_summon_water_elemental_alt"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"AbilityCooldown"				"35"
 		"AbilityManaCost"				"150 220 290 360"
@@ -15106,7 +15295,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"ability_datadriven"
-		"AbilityTextureName"			"holdout_frostbolt"
+		"AbilityTextureName"			"custom/holdout_frostbolt"
 		"LevelsBetweenUpgrades"			"3"
 		"RequiredLevel"					"8"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
@@ -15258,7 +15447,7 @@
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
 		"SpellImmunityType"				"SPELL_IMMUNITY_ALLIES_NO"
-		"AbilityTextureName"			"holdout_magic_shield"
+		"AbilityTextureName"			"custom/holdout_magic_shield"
 		"MaxLevel"						"1"
 
 		// Casting
@@ -15393,7 +15582,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"             		"ability_datadriven"
 		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-		"AbilityTextureName"            "holdout_carrion_beetles"
+		"AbilityTextureName"            "custom/holdout_carrion_beetles"
 		"AbilityCastAnimation"			"ACT_DOTA_CAST_ABILITY_2"
 
 		// Casting
@@ -15704,7 +15893,7 @@
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
-		"AbilityTextureName"			"holdout_poison_sting"
+		"AbilityTextureName"			"custom/holdout_poison_sting"
 		"RequiredLevel"					"5"
 
 		// Casting
@@ -15801,7 +15990,7 @@
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_PHYSICAL"
-		"AbilityTextureName"			"holdout_spiked_carapace"
+		"AbilityTextureName"			"custom/holdout_spiked_carapace"
 		"RequiredLevel"					"8"
 		"LevelsBetweenUpgrades"			"3"
 
@@ -15871,7 +16060,7 @@
 	"holdout_anubarak_claw"
 	{
 		"BaseClass"						"ability_datadriven"
-		"AbilityTextureName"			"holdout_berserkers_rage"
+		"AbilityTextureName"			"custom/holdout_berserkers_rage"
 		"MaxLevel"						"1"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IGNORE_CHANNEL"
 
@@ -15958,7 +16147,7 @@
 		"SpellImmunityType"             "SPELL_IMMUNITY_ENEMIES_YES"
 		"RequiredLevel"					"10"
 		"LevelsBetweenUpgrades"			"5"
-		"AbilityTextureName"            "holdout_locust_swarm"
+		"AbilityTextureName"            "custom/holdout_locust_swarm"
 		
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
@@ -16166,7 +16355,7 @@
 					"MODIFIER_STATE_NOT_ON_MINIMAP"     "MODIFIER_STATE_VALUE_ENABLED"
 					"MODIFIER_STATE_UNSELECTABLE"       "MODIFIER_STATE_VALUE_ENABLED"
 					"MODIFIER_STATE_FLYING"             "MODIFIER_STATE_VALUE_ENABLED"
-					"MODIFIER_STATE_DISARMED"           "MODIFIER_STATE_VALUE_ENABLED"
+					"MODIFIER_STATE_DISARMED"			"MODIFIER_STATE_VALUE_ENABLED"
 				}
 			}
 		}
@@ -16336,12 +16525,12 @@
 		// General
 		//-------------------------------------------------------------------------------------
 		"BaseClass"					"ability_datadriven"
-		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_AUTOCAST | DOTA_ABILITY_BEHAVIOR_ATTACK"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_TOGGLE | DOTA_ABILITY_BEHAVIOR_ATTACK"
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
 		"AbilityUnitTargetType"		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
 		"SpellImmunityType"			"SPELL_IMMUNITY_ENEMIES_NO"
 		"AbilityUnitDamageType"		"DAMAGE_TYPE_PHYSICAL" 
-		"AbilityTextureName"		"holdout_rocket_launcher"
+		"AbilityTextureName"		"custom/holdout_rocket_launcher"
 	
 		// Stats
 		//-------------------------------------------------------------------------------------
@@ -16357,22 +16546,54 @@
 				"bonus_damage"		"100 200 400 900"
 			}
 		}
-		// Data Driven
-		//-------------------------------------------------------------------------------------
+
+		"OnToggleOn"
+		{
+			"RunScript"
+			{
+				"ScriptFile"		"heroes/hero_rifleman.lua"
+				"Function"			"ToggleAbilities"
+				"ability_aux"		"holdout_plasma_rifle"
+				"ability_aux2"		"holdout_laser"
+				"projectile_model"	"particles/units/heroes/hero_clinkz/clinkz_searing_arrow.vpcf"
+			}
+
+			"ApplyModifier"
+			{
+				"ModifierName"	"modifier_orb_rocket_launcher"
+				"Target"		"CASTER"
+			}
+
+			"RemoveModifier"
+			{
+				"ModifierName"	"modifier_orb_plasma_rifle"
+				"Target"		"CASTER"
+			}
+
+			"RemoveModifier"
+			{
+				"ModifierName"	"modifier_orb_laser"
+				"Target"		"CASTER"
+			}
+		}
+
+		"OnToggleOff"
+		{
+			"RunScript"
+			{
+				"ScriptFile"	"heroes/hero_rifleman.lua"
+				"Function"		"SetOriginal"
+			}
+		}
+
 		"Modifiers"
 		{
 			"modifier_orb_rocket_launcher"
 			{
 				"Passive"	"1"
 				"IsHidden"	"1"
-				"Orb"
-				{
-					"Priority"			"DOTA_ORB_PRIORITY_ABILITY"
-					"ProjectileName"	"particles/units/heroes/hero_clinkz/clinkz_searing_arrow.vpcf"
-					"CastAttack"		"1" //This ensures the effect doesn't fire every time
-				}
 	
-				"OnOrbFire"
+				"OnAttack"
 				{
 					"FireSound"
 					{
@@ -16386,7 +16607,7 @@
 					}
 				}
 	
-				"OnOrbImpact"
+				"OnAttackLanded"
 				{
 	
 					"Damage"
@@ -16408,12 +16629,12 @@
 		// General
 		//-------------------------------------------------------------------------------------
 		"BaseClass"					"ability_datadriven"
-		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_AUTOCAST | DOTA_ABILITY_BEHAVIOR_ATTACK"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_TOGGLE | DOTA_ABILITY_BEHAVIOR_ATTACK"
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
 		"AbilityUnitTargetType"		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
 		"SpellImmunityType"			"SPELL_IMMUNITY_ENEMIES_NO"
 		"AbilityUnitDamageType"		"DAMAGE_TYPE_PHYSICAL"
-		"AbilityTextureName"		"holdout_plasma_rifle"
+		"AbilityTextureName"		"custom/holdout_plasma_rifle"
 	
 		// Stats
 		//-------------------------------------------------------------------------------------
@@ -16425,18 +16646,57 @@
 		{ 
 			"01"
 			{
-				"var_type"			"FIELD_INTEGER"
-				"bonus_damage"		"50 100 250 500"
+				"var_type"				"FIELD_INTEGER"
+				"bonus_damage"			"50 100 250 500"
 			}
 			"02"
 			{
-				"var_type"			"FIELD_INTEGER"
-				"splash_radius"		"200 225 250 300"
+				"var_type"				"FIELD_INTEGER"
+				"full_damage_radius"	"200 225 250 300"
 			}
 			"03"
 			{
-				"var_type"			"FIELD_INTEGER"
-				"splash_damage_percent"		"20"
+				"var_type"				"FIELD_INTEGER"
+				"cleave_pct_tooltip"	"25"
+			}
+		}
+
+		"OnToggleOn"
+		{
+			"RunScript"
+			{
+				"ScriptFile"		"heroes/hero_rifleman.lua"
+				"Function"			"ToggleAbilities"
+				"ability_aux"		"holdout_rocket_launcher"
+				"ability_aux2"		"holdout_laser"
+				"projectile_model"	"particles/units/heroes/hero_warlock/warlock_base_attack.vpcf"
+			}
+
+			"ApplyModifier"
+			{
+				"ModifierName"	"modifier_orb_plasma_rifle"
+				"Target"		"CASTER"
+			}
+
+			"RemoveModifier"
+			{
+				"ModifierName"	"modifier_orb_rocket_launcher"
+				"Target"		"CASTER"
+			}
+
+			"RemoveModifier"
+			{
+				"ModifierName"	"modifier_orb_laser"
+				"Target"		"CASTER"
+			}
+		}
+
+		"OnToggleOff"
+		{
+			"RunScript"
+			{
+				"ScriptFile"	"heroes/hero_rifleman.lua"
+				"Function"		"SetOriginal"
 			}
 		}
 
@@ -16447,28 +16707,21 @@
 				"Passive"	"1"
 				"IsHidden"	"1"
 
-				"Orb"
-				{
-					"Priority"			"DOTA_ORB_PRIORITY_ABILITY"
-					"ProjectileName"	"particles/units/heroes/hero_warlock/warlock_base_attack.vpcf"
-					"CastAttack"		"1" //This ensures the effect doesn't fire every time
-				}
-
-				"OnOrbFire"
+				"OnAttack"
 				{
 					"FireSound"
 					{
-						"EffectName"			"Hero_ObsidianDestroyer.ArcaneOrb"
-						"Target"				"CASTER"
+						"EffectName"		"Hero_ObsidianDestroyer.ArcaneOrb"
+						"Target"			"CASTER"
 					}
 
 					"SpendMana"
 					{
-						"Mana"	"%AbilityManaCost"
+						"Mana"				"%AbilityManaCost"
 					}
 				}
 
-				"OnOrbImpact"
+				"OnAttackLanded"
 				{
 					"FireEffect"
 					{
@@ -16486,7 +16739,7 @@
 
 					"RunScript"
 					{
-						"ScriptFile"	"scripts/vscripts/heroes/hero_centurion/sea_dragon_form.lua"
+						"ScriptFile"	"items/global.lua"
 						"Function"		"Splash"
 					}
 				}
@@ -16503,7 +16756,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"					"ability_datadriven"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-		"AbilityTextureName"		"holdout_shield"
+		"AbilityTextureName"		"custom/holdout_shield"
 		"RequiredLevel"				"8"
 		"LevelsBetweenUpgrades"		"3"
 		"AbilitySpecial"
@@ -16545,12 +16798,12 @@
 		// General
 		//-------------------------------------------------------------------------------------
 		"BaseClass"					"ability_datadriven"
-		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_AUTOCAST | DOTA_ABILITY_BEHAVIOR_ATTACK"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_TOGGLE | DOTA_ABILITY_BEHAVIOR_ATTACK"
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
 		"AbilityUnitTargetType"		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
 		"SpellImmunityType"			"SPELL_IMMUNITY_ENEMIES_NO"
 		"AbilityUnitDamageType"		"DAMAGE_TYPE_PHYSICAL" 
-		"AbilityTextureName"		"holdout_laser"
+		"AbilityTextureName"		"custom/holdout_laser"
 		"AbilityType"				"DOTA_ABILITY_TYPE_ULTIMATE"
 		"RequiredLevel"				"10"
 		"LevelsBetweenUpgrades"		"5"
@@ -16569,27 +16822,59 @@
 				"bonus_damage"		"1250 2500 4000"
 			}
 		}
-		// Data Driven
-		//-------------------------------------------------------------------------------------
+
+		"OnToggleOn"
+		{
+			"RunScript"
+			{
+				"ScriptFile"		"heroes/hero_rifleman.lua"
+				"Function"			"ToggleAbilities"
+				"ability_aux"		"holdout_rocket_launcher"
+				"ability_aux2"		"holdout_plasma_rifle"
+				"projectile_model"	"particles/econ/items/razor/razor_ti6/razor_base_attack_ti6.vpcf"
+			}
+
+			"ApplyModifier"
+			{
+				"ModifierName"	"modifier_orb_laser"
+				"Target"		"CASTER"
+			}
+
+			"RemoveModifier"
+			{
+				"ModifierName"	"modifier_orb_plasma_rifle"
+				"Target"		"CASTER"
+			}
+
+			"RemoveModifier"
+			{
+				"ModifierName"	"modifier_orb_rocket_launcher"
+				"Target"		"CASTER"
+			}
+		}
+
+		"OnToggleOff"
+		{
+			"RunScript"
+			{
+				"ScriptFile"	"heroes/hero_rifleman.lua"
+				"Function"		"SetOriginal"
+			}
+		}
+
 		"Modifiers"
 		{
 			"modifier_orb_laser"
 			{
 				"Passive"	"1"
 				"IsHidden"	"1"
-				"Orb"
-				{
-					"Priority"			"DOTA_ORB_PRIORITY_ABILITY"
-					"ProjectileName"	"particles/econ/items/razor/razor_ti6/razor_base_attack_ti6.vpcf"
-					"CastAttack"		"1" //This ensures the effect doesn't fire every time
-				}
 	
-				"OnOrbFire"
+				"OnAttack"
 				{
 					"FireSound"
 					{
 						"EffectName"		"Hero_Tinker.LaserImpact"
-						"Target"			"TARGET"	
+						"Target"			"TARGET"
 					}
 
 					"SpendMana"
@@ -16598,7 +16883,7 @@
 					}
 				}
 	
-				"OnOrbImpact"
+				"OnAttackLanded"
 				{
 	
 					"Damage"
@@ -16625,7 +16910,7 @@
 		"AbilityUnitTargetType"		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
 		"SpellImmunityType"			"SPELL_IMMUNITY_ENEMIES_NO"
 		"AbilityUnitDamageType"		"DAMAGE_TYPE_PHYSICAL" 
-		"AbilityTextureName"		"holdout_rocket_launcher"
+		"AbilityTextureName"		"custom/holdout_rocket_launcher"
 		"MaxLevel"					"1"
 	
 		// Stats
@@ -16698,7 +16983,7 @@
 		"AbilityUnitTargetType"		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
 		"SpellImmunityType"			"SPELL_IMMUNITY_ENEMIES_NO"
 		"AbilityUnitDamageType"		"DAMAGE_TYPE_PHYSICAL"
-		"AbilityTextureName"		"holdout_plasma_rifle"
+		"AbilityTextureName"		"custom/holdout_plasma_rifle"
 		"MaxLevel"					"1"
 	
 		// Stats
@@ -16711,23 +16996,18 @@
 		{ 
 			"01"
 			{
-				"var_type"			"FIELD_INTEGER"
-				"bonus_damage"		"1000"
+				"var_type"				"FIELD_INTEGER"
+				"bonus_damage"			"1000"
 			}
 			"02"
 			{
-				"var_type"			"FIELD_INTEGER"
-				"radius_full"		"400"
-			}
-			"03"
-			{
-				"var_type"			"FIELD_INTEGER"
-				"radius_half"		"200"
+				"var_type"				"FIELD_INTEGER"
+				"full_damage_radius"	"325"
 			}
 			"04"
 			{
-				"var_type"			"FIELD_INTEGER"
-				"splash_damage_percent"		"25"
+				"var_type"				"FIELD_INTEGER"
+				"cleave_pct_tooltip"	"25"
 			}
 		}
 
@@ -16769,7 +17049,7 @@
 
 					"RunScript"
 					{
-						"ScriptFile"	"scripts/vscripts/heroes/hero_centurion/sea_dragon_form.lua"
+						"ScriptFile"	"items/global.lua"
 						"Function"		"Splash"
 					}
 				}
@@ -16834,7 +17114,7 @@
 
 			"RunScript"
 			{
-				"ScriptFile"	"heroes/hero_centurion/dark_pact.lua"
+				"ScriptFile"	"heroes/hero_centurion.lua"
 				"Function"		"Purge"
 			}
 
@@ -17119,7 +17399,7 @@
 		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"AbilityType"                   "DOTA_ABILITY_TYPE_ULTIMATE"
 		"SpellImmunityType"             "SPELL_IMMUNITY_ENEMIES_YES"
-		"AbilityTextureName"            "holdout_elder_dragon_form"
+		"AbilityTextureName"            "custom/holdout_elder_dragon_form"
 	
 		// Precache
 		//-------------------------------------------------------------------------------------------------------------
@@ -17207,7 +17487,7 @@
 	
 			"RunScript"
 			{
-				"ScriptFile"			"scripts/vscripts/heroes/hero_centurion/sea_dragon_form.lua"
+				"ScriptFile"			"scripts/vscripts/heroes/hero_centurion.lua"
 				"Function"				"Transform"
 				"modifier_one"			"modifier_green_dragon_datadriven"
 				"modifier_two"			"modifier_red_dragon_datadriven"
@@ -17247,7 +17527,7 @@
 	
 					"RunScript"
 					{
-						"ScriptFile"			"scripts/vscripts/heroes/hero_centurion/sea_dragon_form.lua"
+						"ScriptFile"			"scripts/vscripts/heroes/hero_centurion.lua"
 						"Function"				"ModelSwapStart"
 						"model"					"models/items/dragon_knight/oblivion_blazer_dragon/oblivion_blazer_dragon.vmdl"
 						"projectile_model"		"particles/units/heroes/hero_dragon_knight/dragon_knight_elder_dragon_corrosive.vpcf"
@@ -17255,7 +17535,7 @@
 	
 					"RunScript"
 					{
-						"ScriptFile"            "scripts/vscripts/heroes/hero_centurion/sea_dragon_form.lua"
+						"ScriptFile"            "heroes/global.lua"
 						"Function"              "HideWearables"
 					}
 				}
@@ -17280,17 +17560,17 @@
 	
 					"RunScript"
 					{
-						"ScriptFile"            "scripts/vscripts/heroes/hero_centurion/sea_dragon_form.lua"
+						"ScriptFile"            "scripts/vscripts/heroes/hero_centurion.lua"
 						"Function"              "ModelSwapEnd"
 					}
 	
 					"RunScript"
 					{
-						"ScriptFile"            "scripts/vscripts/heroes/hero_centurion/sea_dragon_form.lua"
+						"ScriptFile"            "heroes/global.lua"
 						"Function"              "ShowWearables"
 					}
 				}
-	
+
 				"OnAttackLanded"
 				{
 					"FireSound"
@@ -17347,7 +17627,7 @@
 	
 					"RunScript"
 					{
-						"ScriptFile"            "scripts/vscripts/heroes/hero_centurion/sea_dragon_form.lua"
+						"ScriptFile"            "scripts/vscripts/heroes/hero_centurion.lua"
 						"Function"              "ModelSwapStart"
 						"model"                 "models/items/dragon_knight/fireborn_dragon/fireborn_dragon.vmdl"
 						"projectile_model"      "particles/units/heroes/hero_dragon_knight/dragon_knight_elder_dragon_fire.vpcf"
@@ -17355,8 +17635,8 @@
 	
 					"RunScript"
 					{
-						"ScriptFile"            "scripts/vscripts/heroes/hero_centurion/sea_dragon_form.lua"
-						"Function"              "HideWearables"
+						"ScriptFile"			"heroes/global.lua"
+						"Function"				"HideWearables"
 					}
 	
 					"ApplyModifier"
@@ -17383,14 +17663,14 @@
 	
 					"RunScript"
 					{
-						"ScriptFile"            "scripts/vscripts/heroes/hero_centurion/sea_dragon_form.lua"
+						"ScriptFile"            "scripts/vscripts/heroes/hero_centurion.lua"
 						"Function"              "ModelSwapEnd"
 					}
 	
 					"RunScript"
 					{
-						"ScriptFile"            "scripts/vscripts/heroes/hero_centurion/sea_dragon_form.lua"
-						"Function"              "ShowWearables"
+						"ScriptFile"			"heroes/global.lua"
+						"Function"				"ShowWearables"
 					}
 				}
 	
@@ -17461,7 +17741,7 @@
 	
 					"RunScript"
 					{
-						"ScriptFile"            "scripts/vscripts/heroes/hero_centurion/sea_dragon_form.lua"
+						"ScriptFile"            "scripts/vscripts/heroes/hero_centurion.lua"
 						"Function"              "ModelSwapStart"
 						"model"                 "models/creeps/neutral_creeps/n_creep_black_dragon/n_creep_black_dragon.vmdl"
 						"projectile_model"      "particles/units/heroes/hero_dragon_knight/dragon_knight_elder_dragon_fire.vpcf"
@@ -17469,8 +17749,8 @@
 	
 					"RunScript"
 					{
-						"ScriptFile"            "scripts/vscripts/heroes/hero_centurion/sea_dragon_form.lua"
-						"Function"              "HideWearables"
+						"ScriptFile"			"heroes/global.lua"
+						"Function"				"HideWearables"
 					}
 	
 					"ApplyModifier"
@@ -17503,14 +17783,14 @@
 	
 					"RunScript"
 					{
-						"ScriptFile"            "scripts/vscripts/heroes/hero_centurion/sea_dragon_form.lua"
+						"ScriptFile"            "scripts/vscripts/heroes/hero_centurion.lua"
 						"Function"              "ModelSwapEnd"
 					}
 	
 					"RunScript"
 					{
-						"ScriptFile"            "scripts/vscripts/heroes/hero_centurion/sea_dragon_form.lua"
-						"Function"              "ShowWearables"
+						"ScriptFile"			"heroes/global.lua"
+						"Function"				"ShowWearables"
 					}
 				}
 	
@@ -17564,7 +17844,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"scripts/vscripts/heroes/hero_centurion/sea_dragon_form.lua"
+						"ScriptFile"	"scripts/vscripts/heroes/hero_centurion.lua"
 						"Function"		"Splash"
 					}
 				}
@@ -17609,25 +17889,12 @@
 	
 							"ApplyModifier"
 							{
-								"ModifierName"  "modifier_bash_stun_datadriven"
+								"ModifierName"  "modifier_stunned"
 								"Target"        "TARGET"
+								"Duration"		"%stun_duration"
 							}
 						}
 					}
-				}
-			}
-	
-			"modifier_bash_stun_datadriven"
-			{
-				"IsDebuff"      "1"
-				"Duration"  "%stun_duration"
-	
-				"EffectName" "particles/custom/custom_stunned.vpcf"
-				"EffectAttachType" "follow_overhead"
-	
-				"States"
-				{
-					"MODIFIER_STATE_STUNNED"    "MODIFIER_STATE_VALUE_ENABLED"
 				}
 			}
 		}
@@ -18003,7 +18270,7 @@
 	"holdout_beastmaster_stampede"
 	{
 		"BaseClass"                     "ability_datadriven"
-		"AbilityTextureName"            "holdout_beastmaster_stampede"
+		"AbilityTextureName"            "custom/holdout_beastmaster_stampede"
 		"MaxLevel"                      "2"
 		"AbilityType"                   "DOTA_ABILITY_TYPE_ULTIMATE"
 		"LevelsBetweenUpgrades"			"5"
@@ -18086,7 +18353,7 @@
 
 			"RunScript"
 			{
-				"ScriptFile"    "heroes/hero_beastmaster/stampede.lua"
+				"ScriptFile"    "heroes/hero_beastmaster.lua"
 				"Function"      "StampedeCast"
 				"Target"        "POINT"
 			}
@@ -18140,7 +18407,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"    "heroes/hero_beastmaster/stampede.lua"
+						"ScriptFile"    "heroes/hero_beastmaster.lua"
 						"Function"      "Stampede"
 						"Target"        "POINT"
 					}
@@ -18200,7 +18467,7 @@
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_BASIC | DOTA_UNIT_TARGET_HERO"
-		"AbilityTextureName"			"holdout_entrangling_roots"
+		"AbilityTextureName"			"custom/holdout_entrangling_roots"
 		"AbilityCastRange"				"1000"
 		"AbilityCastPoint"				"0.35"
 		"AbilityCooldown"				"9.0"
@@ -18286,7 +18553,7 @@
 		"AbilityCastRange"			"900"
 		"AbilityCooldown"			"15"
 		"AbilityManaCost"			"115 230 345 460"
-		"AbilityTextureName"		"holdout_rejuvenation"
+		"AbilityTextureName"		"custom/holdout_rejuvenation"
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
 
 		// Special
@@ -18428,7 +18695,7 @@
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_BASIC | DOTA_UNIT_TARGET_HERO"
-		"AbilityTextureName"			"holdout_anubarak_claw"
+		"AbilityTextureName"			"custom/holdout_anubarak_claw"
 		"RequiredLevel"					"5"
 
 		"AbilitySpecial"
@@ -18519,7 +18786,7 @@
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_BASIC | DOTA_UNIT_TARGET_HERO"
-		"AbilityTextureName"			"brewmaster_thunder_clap_new"
+		"AbilityTextureName"			"custom/brewmaster_thunder_clap_new"
 		"MaxLevel"						"1"
 
 		"AbilitySpecial"
@@ -18566,7 +18833,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"					"ability_datadriven"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-		"AbilityTextureName"		"holdout_shield"
+		"AbilityTextureName"		"custom/holdout_shield"
 		"RequiredLevel"				"8"
 		"LevelsBetweenUpgrades"		"3"
 		"AbilitySpecial"
@@ -18604,7 +18871,7 @@
 		"BaseClass"						"ability_datadriven"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"AbilityType"					"DOTA_ABILITY_TYPE_ULTIMATE"
-		"AbilityTextureName"			"holdout_bear_form"
+		"AbilityTextureName"			"custom/holdout_bear_form"
 		"RequiredLevel"					"10"
 		"LevelsBetweenUpgrades"			"5"
 
@@ -18684,7 +18951,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"		"heroes/hero_malfurion.lua"
+				"ScriptFile"		"heroes/global.lua"
 				"Function"			"LevelUpAbility"
 				"ability_name"		"holdout_bear_form_druid"
 			}
@@ -18735,7 +19002,7 @@
 
 					"RunScript"
 					{
-						"ScriptFile"			"heroes/hero_malfurion.lua"
+						"ScriptFile"			"heroes/global.lua"
 						"Function"				"HideWearables"
 					}
 				}
@@ -18764,7 +19031,7 @@
 		"BaseClass"						"ability_datadriven"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_HIDDEN"
 		"AbilityType"					"DOTA_ABILITY_TYPE_ULTIMATE"
-		"AbilityTextureName"			"lone_druid_true_form_druid"
+		"AbilityTextureName"			"custom/lone_druid_true_form_druid"
 		"RequiredLevel"					"10"
 		"LevelsBetweenUpgrades"			"5"
 	
@@ -18814,7 +19081,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"		"heroes/hero_malfurion.lua"
+				"ScriptFile"		"heroes/global.lua"
 				"Function"			"LevelUpAbility"
 				"ability_name"		"holdout_bear_form"
 			}
@@ -19129,7 +19396,7 @@
 		//-------------------------------------------------------------------------------------
 		"BaseClass"					"ability_datadriven"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_AURA"
-		"AbilityTextureName"		"holdout_divine_aura"
+		"AbilityTextureName"		"custom/holdout_divine_aura"
 		"RequiredLevel"				"8"
 		"LevelsBetweenUpgrades"		"3"
 		"AbilityCastRange"			"900"
@@ -19221,50 +19488,119 @@
 		}
 	}
 
-	//=================================================================================================================
-	// Kobold Knight: Last Stand
-	//=================================================================================================================
-	"holdout_last_stand"
+	//=========================================================================================
+	// Kobold Knight: Divine Aura
+	//=========================================================================================
+	"holdout_divine_aura_alt"
 	{
 		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"BaseClass"						"ability_datadriven"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-		"AbilityType"					"DOTA_ABILITY_TYPE_ULTIMATE"
-		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
-		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
-		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_YES"
-		"MaxLevel"						"1"
-		"AbilityTextureName"			"holdout_last_stand"
-		"AbilityCooldown"				"60.0"
+		//-------------------------------------------------------------------------------------
+		"BaseClass"					"ability_datadriven"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_AURA | DOTA_ABILITY_BEHAVIOR_HIDDEN"
+		"AbilityTextureName"		"custom/holdout_divine_aura"
+		"RequiredLevel"				"8"
+		"LevelsBetweenUpgrades"		"3"
+		"AbilityCastRange"			"900"
+		"AbilityUnitTargetFlags"	"DOTA_UNIT_TARGET_FLAG_NOT_ANCIENTS"
 
-		// Special
-		//-------------------------------------------------------------------------------------------------------------
+		// Stats
+		//-------------------------------------------------------------------------------------
 		"AbilitySpecial"
 		{
 			"01"
 			{
+				"var_type"				"FIELD_FLOAT"
+				"bat_reduction"			"0.1 0.175 0.25 0.325"
+			}
+			"02"
+			{
 				"var_type"				"FIELD_INTEGER"
-				"reincarnation_time"	"5"
+				"bonus_movement_speed_percentage"	"5 10 15 20"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_armor"			"10 25 50 100"
+			}
+			"04"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_health_regen"	"15 30 45 90"
+			}
+			"05"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"radius"				"900"
+			}
+		}
+
+		"OnUpgrade"
+		{
+			"RunScript"
+			{
+				"ScriptFile"		"heroes/hero_desert_wyrm.lua"
+				"Function"			"LevelUpAura"
+				"ability_name"		"holdout_endurance_aura"
+			}
+
+			"RunScript"
+			{
+				"ScriptFile"		"heroes/hero_desert_wyrm.lua"
+				"Function"			"Passives"
+				"unactive_passive"	"holdout_endurance_aura"
 			}
 		}
 
 		"Modifiers"
-		{
-			"modifier_reincarnation"
+		{ 
+			"modifier_divine_aura"
 			{
-				"Passive"							"1"
-				"IsHidden"							"1"
-				"IsBuff"							"1"
-				"IsPurgable"						"0"
+				"Passive"			"1"
+				"IsHidden"			"1"
+				"IsBuff"			"1"
+	
+				"Aura"				"modifier_divine_aura_buff"
+				"Aura_Radius"		"%radius"
+				"Aura_Teams"		"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
+				"Aura_Types"		"DOTA_UNIT_TARGET_HERO"
+				"Aura_Flags"		"DOTA_UNIT_TARGET_FLAG_INVULNERABLE"
+			}
 
-				"OnDeath"
+			"modifier_divine_aura_buff"
+			{ 
+				"IsBuff"		"1"
+				"IsHidden"		"0"
+
+				"OnCreated"
+				{
+					"AttachEffect"
+					{
+						"Target"			"TARGET"
+						"EffectName"		"particles/items_fx/aura_assault.vpcf"
+						"EffectAttachType"	"follow_origin"
+					}
+
+					"RunScript"
+					{
+						"ScriptFile"	"heroes/hero_enchantress/endurance_aura.lua"
+						"Function"		"EnduranceAura"
+					}
+				}
+
+				"OnDestroy"
 				{
 					"RunScript"
 					{
-						"ScriptFile"				"heroes/global.lua"
-						"Function"					"Reincarnation"
+						"ScriptFile"	"heroes/hero_enchantress/endurance_aura.lua"
+						"Function"		"EnduranceAuraRemove"
 					}
+				}
+
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE"		"%bonus_movement_speed_percentage"
+					"MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS"			"%bonus_armor"
+					"MODIFIER_PROPERTY_HEALTH_REGEN_CONSTANT"			"%bonus_health_regen"
 				}
 			}
 		}
@@ -19335,32 +19671,32 @@
 		{
 			"01"
 			{
-				"var_type"			"FIELD_INTEGER"
-				"strikes"			"8 12 16 20"
+				"var_type"				"FIELD_INTEGER"
+				"strikes"				"8 12 16 20"
 			}
 			"02"
 			{
-				"var_type"			"FIELD_INTEGER"
-				"range"				"300"
+				"var_type"				"FIELD_INTEGER"
+				"range"					"300"
 			}	
 			"03"
 			{
-				"var_type"			"FIELD_INTEGER"
-				"bonus_damage"		"60 120 180 240"
+				"var_type"				"FIELD_INTEGER"
+				"bonus_damage_percentage"	"50"
 			}
 			"04"
 			{
-				"var_type"			"FIELD_INTEGER"
-				"bonus_range"		"150"
+				"var_type"				"FIELD_INTEGER"
+				"bonus_range"			"150"
 			}
 			"05"
 			{
-				"var_type"			"FIELD_INTEGER"
-				"splash_radius"		"350"
+				"var_type"				"FIELD_INTEGER"
+				"splash_radius"			"350"
 			}
 			"06"
 			{
-				"var_type"			"FIELD_INTEGER"
+				"var_type"				"FIELD_INTEGER"
 				"splash_damage_percent"	"50"
 			}
 		}
@@ -19382,8 +19718,8 @@
 
 				"Properties"
 				{
-					"MODIFIER_PROPERTY_ATTACK_RANGE_BONUS"		"%bonus_range"
-					"MODIFIER_PROPERTY_BASEATTACK_BONUSDAMAGE"	"%bonus_damage"
+					"MODIFIER_PROPERTY_ATTACK_RANGE_BONUS"				"%bonus_range"
+					"MODIFIER_PROPERTY_BASEDAMAGEOUTGOING_PERCENTAGE"	"%bonus_damage_percentage"
 				}
 			}
 
@@ -19399,7 +19735,7 @@
 
 					"RunScript"
 					{
-						"ScriptFile"	"scripts/vscripts/heroes/hero_centurion/sea_dragon_form.lua"
+						"ScriptFile"	"scripts/vscripts/heroes/hero_centurion.lua"
 						"Function"		"Splash"
 					}
 				}
@@ -19421,27 +19757,27 @@
 		{
 			"01"
 			{
-				"var_type"			"FIELD_INTEGER"
-				"range"				"300"
+				"var_type"				"FIELD_INTEGER"
+				"range"					"300"
 			}	
 			"02"
 			{
-				"var_type"			"FIELD_INTEGER"
-				"bonus_damage"		"450"
+				"var_type"				"FIELD_INTEGER"
+				"bonus_damage_percentage"		"50"
 			}
 			"03"
 			{
-				"var_type"			"FIELD_INTEGER"
-				"bonus_range"		"150"
+				"var_type"				"FIELD_INTEGER"
+				"bonus_range"			"150"
 			}
 			"04"
 			{
-				"var_type"			"FIELD_INTEGER"
-				"splash_radius"		"350"
+				"var_type"				"FIELD_INTEGER"
+				"splash_radius"			"350"
 			}
 			"05"
 			{
-				"var_type"			"FIELD_INTEGER"
+				"var_type"				"FIELD_INTEGER"
 				"splash_damage_percent"	"50"
 			}
 		}
@@ -19482,8 +19818,8 @@
 
 				"Properties"
 				{
-					"MODIFIER_PROPERTY_ATTACK_RANGE_BONUS"		"%bonus_range"
-					"MODIFIER_PROPERTY_BASEATTACK_BONUSDAMAGE"	"%bonus_damage"
+					"MODIFIER_PROPERTY_ATTACK_RANGE_BONUS"				"%bonus_range"
+					"MODIFIER_PROPERTY_BASEDAMAGEOUTGOING_PERCENTAGE"	"%bonus_damage_percentage"
 				}
 			}
 
@@ -19495,7 +19831,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"scripts/vscripts/heroes/hero_centurion/sea_dragon_form.lua"
+						"ScriptFile"	"scripts/vscripts/heroes/hero_centurion.lua"
 						"Function"		"Splash"
 					}
 				}
@@ -19696,7 +20032,6 @@
 				"States"
 				{
 					"MODIFIER_STATE_ROOTED"		"MODIFIER_STATE_VALUE_ENABLED"
-//					"MODIFIER_STATE_STUNNED"	"MODIFIER_STATE_VALUE_ENABLED"
 				}
 			}
 
@@ -19726,7 +20061,7 @@
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"SpellImmunityType"				"SPELL_IMMUNITY_ALLIES_YES"
 		"FightRecapLevel"				"1"
-		"AbilityTextureName"			"holdout_second_wind"
+		"AbilityTextureName"			"custom/holdout_second_wind"
 		"RequiredLevel"					"5"
 
 		// Time		
@@ -19825,7 +20160,7 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"bonus_damage"			"35"
+				"bonus_damage"			"50"
 			}
 			"02"
 			{
@@ -19927,7 +20262,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"ability_datadriven"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-		"AbilityTextureName"			"holdout_monkey_king_bar"
+		"AbilityTextureName"			"custom/holdout_monkey_king_bar"
 		"MaxLevel"						"1"
 
 		"AbilitySpecial"
@@ -20025,7 +20360,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"ability_datadriven"
-		"AbilityTextureName"			"monkey_king_jingu_mastery"
+		"AbilityTextureName"			"custom/monkey_king_jingu_mastery"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_YES"
 		"AbilityCooldown"				"21.0"
@@ -20163,7 +20498,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"ability_datadriven"
-		"AbilityTextureName"			"monkey_king_wukongs_command"
+		"AbilityTextureName"			"custom/monkey_king_wukongs_command"
 		"ItemBaseLevel"					"0"
 		"MaxLevel"						"3"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
@@ -20330,7 +20665,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"ability_datadriven"
-		"AbilityTextureName"			"axe_battle_rage"
+		"AbilityTextureName"			"custom/axe_battle_rage"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO"
@@ -20416,7 +20751,7 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityTextureName"			"axe_culling_blade"
+		"AbilityTextureName"			"custom/axe_culling_blade"
 		"AbilityType"					"DOTA_ABILITY_TYPE_ULTIMATE"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
@@ -20514,7 +20849,7 @@
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
-		"AbilityTextureName"			"holdout_entrench"
+		"AbilityTextureName"			"custom/holdout_entrench"
 		"AbilityCooldown"				"14.0"
 		"AbilityCastPoint"				"0.5"
 
@@ -20541,6 +20876,11 @@
 			{
 				"var_type"					"FIELD_FLOAT"
 				"stun_duration"				"1.0 1.5 2.0 2.5"
+			}
+			"05"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"max_duration"				"10"
 			}
 		}
 
@@ -20579,6 +20919,7 @@
 			{
 				"ModifierName"	"modifier_burrowed"
 				"Target" 		"CASTER"
+//				"Duration"		"%max_duration"
 			}
 		}
 
@@ -20586,9 +20927,16 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"		"heroes/hero_desert_wyrm.lua"
+				"ScriptFile"		"heroes/global.lua"
 				"Function"			"LevelUpAbility"
 				"ability_name"		"holdout_unentrench"
+			}
+
+			"RunScript"
+			{
+				"ScriptFile"		"heroes/global.lua"
+				"Function"			"LevelUpAbility"
+				"ability_name"		"holdout_arctic_flyout"
 			}
 		}
 
@@ -20597,7 +20945,7 @@
 			"modifier_burrowing"
 			{
 				"IsHidden"			"0"
-				"TextureName"		"holdout_unentrench"
+				"TextureName"		"custom/holdout_unentrench"
 		
 				"States"
 				{
@@ -20629,6 +20977,15 @@
 					}
 				}
 
+				"OnDestroy"
+				{
+					"RunScript"
+					{
+						"ScriptFile"			"heroes/hero_desert_wyrm.lua"
+						"Function"				"UnEntrench"
+					}
+				}
+
 				"States"
 				{
 					"MODIFIER_STATE_ATTACK_IMMUNE"		"MODIFIER_STATE_VALUE_ENABLED"
@@ -20650,7 +21007,7 @@
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
 		"AbilityCastAnimation"			"ACT_DOTA_IDLE"
-		"AbilityTextureName"			"holdout_unentrench"
+		"AbilityTextureName"			"custom/holdout_unentrench"
 		"AbilityCastRange"				"400"
 		"AbilityCooldown"				"14.0"
 		"AbilityCastPoint"				"0.5"
@@ -20694,12 +21051,6 @@
 			{
 				"EffectName"	"Hero_NyxAssassin.Burrow.Out"
 				"Target" 		"CASTER"
-			}
-
-			"RunScript"
-			{
-				"ScriptFile"	"heroes/hero_desert_wyrm.lua"
-				"Function"		"PhaseUnEntrench"
 			}
 		}
 
@@ -20770,7 +21121,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"		"heroes/hero_desert_wyrm.lua"
+				"ScriptFile"		"heroes/global.lua"
 				"Function"			"LevelUpAbility"
 				"ability_name"		"holdout_entrench"
 			}
@@ -20813,7 +21164,7 @@
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_POINT"
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
-		"AbilityTextureName"			"holdout_tornado_tempest"
+		"AbilityTextureName"			"custom/holdout_tornado_tempest"
 		"AbilityCastAnimation" 			"ACT_DOTA_SPAWN"
 	
 		// Stats
@@ -20878,13 +21229,23 @@
 				"cyclone_max_height"		"400"
 			}
 		}
-		
+
+		"OnUpgrade"
+		{
+			"RunScript"
+			{
+				"ScriptFile"		"heroes/global.lua"
+				"Function"			"LevelUpAbility"
+				"ability_name"		"holdout_arctic_breath"
+			}
+		}
+
 		"OnSpellStart"
 		{
 			"RunScript"
 			{
 				"ScriptFile"				"heroes/hero_desert_wyrm.lua"
-				"Function"					"invoker_tornado_datadriven_on_spell_start"
+				"Function"					"TornadoTempest"
 				"Target"					"POINT"
 				"TravelSpeed"				"%travel_speed"
 				"AreaOfEffect"				"%area_of_effect"
@@ -20900,7 +21261,7 @@
 			"RunScript"
 			{
 				"ScriptFile"		"heroes/hero_desert_wyrm.lua"
-				"Function"			"invoker_tornado_datadriven_on_projectile_hit_unit"
+				"Function"			"TornadoTempestHit"
 			}
 		}
 		
@@ -20954,7 +21315,7 @@
 					"RunScript"
 					{
 						"ScriptFile"				"heroes/hero_desert_wyrm.lua"
-						"Function"					"modifier_invoker_tornado_datadriven_cyclone_on_created"
+						"Function"					"TornadoTempestCreated"
 						"CycloneInitialHeight"		"%cyclone_initial_height"
 						"CycloneMinHeight"			"%cyclone_min_height"
 						"CycloneMaxHeight"			"%cyclone_max_height"
@@ -20967,7 +21328,7 @@
 					"RunScript"
 					{
 						"ScriptFile"    "heroes/hero_desert_wyrm.lua"
-						"Function"      "modifier_invoker_tornado_datadriven_cyclone_on_interval_think"
+						"Function"      "TornadoTempestInterval"
 					}
 				}
 
@@ -20976,7 +21337,7 @@
 					"RunScript"
 					{
 						"ScriptFile"	"heroes/hero_desert_wyrm.lua"
-						"Function"		"modifier_invoker_tornado_datadriven_cyclone_on_destroy"
+						"Function"		"TornadoTempestDestroy"
 						"BaseDamage"	"%base_damage"
 					}
 				}
@@ -20987,18 +21348,18 @@
 	}
 
 	//=====================================================================================================
-	// Desert Wyrm: Corrosive Skin
+	// Desert Wyrm: Acid Skin
 	//=====================================================================================================
-	"holdout_corrosive_skin"
+	"holdout_acid_skin"
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"BaseClass"						"viper_corrosive_skin"
+		"BaseClass"						"ability_datadriven"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"	
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
 		"SpellDispellableType"			"SPELL_DISPELLABLE_YES"
-		"AbilityTextureName"			"holdout_corrosive_skin"
+		"AbilityTextureName"			"custom/holdout_corrosive_skin"
 		"RequiredLevel"					"5"
 
 		// Stats
@@ -21040,6 +21401,73 @@
 				"max_range_tooltip"			"1400"
 			}
 		}
+
+		"OnUpgrade"
+		{
+			"RunScript"
+			{
+				"ScriptFile"		"heroes/global.lua"
+				"Function"			"LevelUpAbility"
+				"ability_name"		"holdout_arctic_skin"
+			}
+
+			"RunScript"
+			{
+				"ScriptFile"		"heroes/hero_desert_wyrm.lua"
+				"Function"			"Passives"
+				"unactive_passive"	"holdout_arctic_skin"
+			}
+		}
+
+		"Modifiers"
+		{
+			"modifier_acid_skin"
+			{
+				"Passive"	"1"
+				"IsHidden"	"1"
+
+				"OnTakeDamage"
+				{
+					"RunScript"
+					{
+						"ScriptFile"	"heroes/hero_desert_wyrm.lua"
+						"Function"		"AcidSkin"
+					}
+				}
+
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_MAGICAL_RESISTANCE_BONUS"	"%bonus_magic_resistance"
+				}
+			}
+
+			"modifier_acid_skin_debuff"
+			{
+				"Duration"	"%duration"
+				"IsDebuff"	"1"
+	
+				"EffectName"	"particles/units/heroes/hero_viper/viper_poison_debuff.vpcf"
+				"EffectAttachType"	"follow_origin"
+	
+				"ThinkInterval"		"1.0"
+	
+				"OnIntervalThink"
+				{
+					"Damage"
+					{
+						"Target"	"TARGET"
+						"Type"		"DAMAGE_TYPE_MAGICAL"
+						"Damage"	"%damage"
+					}
+				}
+	
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_ATTACKSPEED_BONUS_CONSTANT"	"%bonus_attack_speed"
+					"MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE"	"%bonus_movement_speed"
+				}
+			}
+		}
 	}
 
 	//========================================================================================================
@@ -21055,7 +21483,7 @@
 		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"AbilityType"                   "DOTA_ABILITY_TYPE_ULTIMATE"
 		"SpellImmunityType"             "SPELL_IMMUNITY_ENEMIES_YES"
-		"AbilityTextureName"            "holdout_desert_dragon_form"
+		"AbilityTextureName"            "winter_wyvern_winters_curse"
 
 		// Time
 		//-------------------------------------------------------------------------------------------------------------
@@ -21064,97 +21492,376 @@
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityManaCost"			"350 700 0"      
-	
+
 		// Stats
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityModifierSupportValue"	"0.35"  // Attacks are primarily about the damage
-	
+
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilitySpecial"
 		{
 			"01"
 			{
-				"var_type"					"FIELD_FLOAT"
-				"duration"					"40.0 50.0 60.0"
+				"var_type"					"FIELD_INTEGER"
+				"bonus_range"				"310 410 510"
 			}
 			"02"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"bonus_movement_speed"		"30"
+				"duration"					"40 50 60"
 			}
 			"03"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"bonus_attack_range"		"310 410 510"
+				"splash_radius"				"350"
 			}
 			"04"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"corrosive_breath_damage"	"20"
-			}
-			"05"
-			{
-				"var_type"					"FIELD_FLOAT"
-				"corrosive_breath_duration"	"5.0"
-			}
-			"08"
-			{
-				"var_type"					"FIELD_FLOAT"
-				"stun_duration"				"0.1"
-			}
-			"09"
-			{
-				"var_type"					"FIELD_FLOAT"
-				"bash_chance"				"10"
+				"splash_damage_percent"		"30 40 50"
 			}
 		}
 
 		"OnSpellStart"
 		{
+			"ApplyModifier"
+			{
+				"ModifierName"	"modifier_dragon_form"
+				"Target"		"CASTER"
+				"Duration"		"%duration"
+			}
+
 			"FireSound"
 			{
 				"EffectName"	"Hero_DragonKnight.ElderDragonForm"
 				"Target"		"CASTER"
 			}
-	
-			"RunScript"
+		}
+
+		"Modifiers"
+		{
+			"modifier_dragon_form"
 			{
-				"ScriptFile"			"heroes/hero_desert_wyrm.lua"
-				"Function"				"SkinChangerDragon"
+				"IsHidden"			"0"
+				"Attributes"		"MODIFIER_ATTRIBUTE_PERMANENT"
+
+				"OnCreated"
+				{
+					"RunScript"
+					{
+						"ScriptFile"			"heroes/hero_desert_wyrm.lua"
+						"Function"				"SkinChangerDragon"
+						"Duration"				"%duration"
+						"model"					"models/items/dragon_knight/dragon_immortal_1/dragon_immortal_1.vmdl"
+						"sub_ability_1"			"holdout_arctic_flyout"
+						"sub_ability_2"			"holdout_arctic_breath"
+						"main_ability_3"		"holdout_acid_skin"
+						"sub_ability_3"			"holdout_arctic_skin"
+//						"sub_ability_4"			"holdout_divine_aura_alt"
+					}
+
+					"RunScript"
+					{
+						"ScriptFile"			"heroes/global.lua"
+						"Function"				"HideWearables"
+					}
+				}
+
+				"OnAttackLanded"
+				{
+					"RunScript"
+					{
+						"ScriptFile"	"scripts/vscripts/heroes/hero_centurion.lua"
+						"Function"		"Splash"
+					}
+				}
+
+				"OnDestroy"
+				{
+					"RunScript"
+					{
+						"ScriptFile"			"heroes/global.lua"
+						"Function"				"ShowWearables"
+					}
+				}
+
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_ATTACK_RANGE_BONUS"			"%bonus_range"
+//					"MODIFIER_PROPERTY_MOVESPEED_BONUS_CONSTANT"	"%movespeed_loss"
+				}
 			}
 		}
 	}
 
 	//=================================================================================================================
-	// Desert Wyrm: Dragon Color
+	// Desert Wyrm: Arctic Flyout
 	//=================================================================================================================
-	"holdout_yellow_effect"
+	"holdout_arctic_flyout"
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"BaseClass"					"ability_datadriven"
-		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_HIDDEN"
-		"AbilityTextureName"		""
-		"MaxLevel"					"1"
+		"BaseClass"						"winter_wyvern_arctic_burn"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"		
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
+		"HasScepterUpgrade"				"0"
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastPoint"				"0.0"
+
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"15.0"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"120 160 200 240"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"duration"				"6.0"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"attack_range_bonus"	"100 150 200 250"
+			}			
+			"03"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"percent_damage"		"1.0"
+			}
+			"04"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"tick_rate"				"1.0"
+			}
+			"05"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"damage_duration"		"4.0"
+			}
+			"06"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"move_slow"				"19 26 33 40"
+				"LinkedSpecialBonus"	"special_bonus_unique_winter_wyvern_1"
+			}
+			"07"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"night_vision_bonus"	"400"
+			}
+			"08"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"projectile_speed_bonus"	"500"
+			}
+			"09"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"tree_destruction_radius"	"250"
+			}
+			"10"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"attack_point"			"0.1"
+			}
+			"11"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"max_attacks"			"5"
+			}
+			"12"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"mana_cost_scepter"		"0"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Desert Wyrm: Arctic Breath
+	//=================================================================================================================
+	"holdout_arctic_breath"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"						"ability_datadriven"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_HIDDEN"
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"	
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
+		"FightRecapLevel"				"1"
+		"AbilityTextureName"			"custom/holdout_dragon_slave"	
+		
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"				"900"
+		"AbilityCastPoint"				"0.35"	
+
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"18"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"100 200 300 400"	
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"			"FIELD_INTEGER"
+				"speed"				"1250"
+			}
+			"02"
+			{
+				"var_type"			"FIELD_INTEGER"
+				"start_width"		"250"
+			}
+			"03"
+			{
+				"var_type"			"FIELD_INTEGER"
+				"end_width"			"300"
+			}
+			"04"
+			{
+				"var_type"			"FIELD_INTEGER"
+				"distance"			"1100"
+			}
+			"05"
+			{
+				"var_type"			"FIELD_INTEGER"
+				"damage"			"175 350 850 1250"
+			}
+		}
+
+		"OnUpgrade"
+		{
+			"RunScript"
+			{
+				"ScriptFile"		"heroes/global.lua"
+				"Function"			"LevelUpAbility"
+				"ability_name"		"holdout_tornado_tempest"
+			}
+		}
+
+		"OnSpellStart"
+		{
+			"RunScript"
+			{
+				"ScriptFile"				"heroes/hero_blood_mage.lua"
+				"Function"					"DragonSlave"
+				"Target"					"POINT"
+
+				"particle_projectile"		"particles/units/heroes/hero_desert_wyrm/arctic_breath.vpcf"
+				"sound_cast"				"Hero_Lina.DragonSlave"
+			}
+		}
+
+		"OnProjectileHitUnit"
+		{
+			"DeleteOnHit"					"0"
+			"Damage"
+			{
+				"Target"					"TARGET"
+				"Type"						"DAMAGE_TYPE_MAGICAL"
+				"Damage"					"%damage"
+			}
+		}
+	}
+
+	//=====================================================================================================
+	// Desert Wyrm: Arctic Skin
+	//=====================================================================================================
+	"holdout_arctic_skin"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"						"ability_datadriven"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_HIDDEN"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"	
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
+		"SpellDispellableType"			"SPELL_DISPELLABLE_YES"
+		"AbilityTextureName"			"viper_corrosive_skin"
+		"RequiredLevel"					"5"
+
+		// Stats
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityModifierSupportBonus"	"10"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"						"FIELD_FLOAT"
+				"ensnare_duration"				"1.0 1.75 2.5 3.25"
+			}		
+			"02"
+			{
+				"var_type"						"FIELD_INTEGER"
+				"ensnare_damage"				"200 450 750 1300"
+			}
+			"03"
+			{
+				"var_type"						"FIELD_INTEGER"
+				"ensnare_chance"				"12"
+			}
+		}
+
+		"OnUpgrade"
+		{
+			"RunScript"
+			{
+				"ScriptFile"		"heroes/global.lua"
+				"Function"			"LevelUpAbility"
+				"ability_name"		"holdout_acid_skin"
+			}
+
+			"RunScript"
+			{
+				"ScriptFile"		"heroes/hero_desert_wyrm.lua"
+				"Function"			"Passives"
+				"unactive_passive"	"holdout_acid_skin"
+			}
+		}
 
 		"Modifiers"
 		{
-			"modifier_yellow"
+			"modifier_howling_blast"
 			{
-				"Passive"   "1"
-				"IsHidden"  "0"
+				"Passive"								"1"
+				"IsHidden"								"1"
+				"IsPurgable"							"0"
 
-				"StatusEffectName"			"particles/econ/items/effigies/status_fx_effigies/status_effect_effigy_gold.vpcf"
-				"StatusEffectPriority"		"15"
-
-				"OnCreated"
+				"OnAttacked"
 				{
-					"AttachEffect"
+					"Random"
 					{
-						"EffectName"			"particles/units/heroes/hero_abaddon/holdout_borrowed_time_4.vpcf"
-						"EffectAttachType"		"follow_origin"
-						"Target"				"CASTER"
+						"Chance"			"%ensnare_chance"
+						"OnSuccess"
+						{
+							"RunScript"
+							{
+								"ScriptFile"	"heroes/hero_abaddon/howling_blast.lua"
+								"Function"		"HowlingBlast"
+								"modifier"		"modifier_stunned"
+							}
+						}
 					}
 				}
 			}
@@ -21169,7 +21876,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"ability_datadriven"
-		"AbilityTextureName"			"holdout_shadow_bolt"
+		"AbilityTextureName"			"custom/holdout_shadow_bolt"
 		"AbilityCastAnimation"			"ACT_DOTA_ATTACK"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
@@ -21318,7 +22025,7 @@
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"	
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
-		"AbilityTextureName"			"holdout_corruption"
+		"AbilityTextureName"			"custom/holdout_corruption"
 
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
@@ -21388,7 +22095,7 @@
 		//-------------------------------------------------------------------------------------
 		"BaseClass"					"ability_datadriven"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_AURA"
-		"AbilityTextureName"		"holdout_divine_aura"
+		"AbilityTextureName"		"custom/holdout_divine_aura"
 		"RequiredLevel"				"5"
 		"AbilityCastRange"			"900"
 		"AbilityUnitTargetFlags"	"DOTA_UNIT_TARGET_FLAG_NOT_ANCIENTS"
@@ -21501,7 +22208,7 @@
 
 		// Stats
 		//-------------------------------------------------------------------------------------
-		"AbilityTextureName"		"holdout_bane_permanent_immolation"	//holdout_consuming_flame
+		"AbilityTextureName"		"custom/holdout_consuming_flame"	//holdout_consuming_flame
 		"AbilityCastRange"			"300 325 350 375"
 		"AbilityUnitDamageType"		"DAMAGE_TYPE_MAGICAL"
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
@@ -21627,7 +22334,7 @@
 	"holdout_stitch"
 	{
 		"BaseClass"						"ability_datadriven"
-		"AbilityTextureName"			"holdout_stitch"
+		"AbilityTextureName"			"custom/holdout_stitch"
 		"MaxLevel"						"1"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_BOTH"
@@ -21725,7 +22432,7 @@
 	"holdout_dark_king"
 	{
 		"BaseClass"             		"ability_datadriven"
-		"AbilityTextureName"			"holdout_sindragosa"
+		"AbilityTextureName"			"custom/holdout_dark_king"
 		"LevelsBetweenUpgrades"			"5"
 		"RequiredLevel"					"10"
 		"AbilityType" 					"DOTA_ABILITY_TYPE_ULTIMATE"
@@ -21882,6 +22589,145 @@
 		}
 	}
 
+	//=================================================================================================================
+	// Troll Warlord: Enchanted Axes
+	//=================================================================================================================
+	"holdout_enchanted_axes"
+	{
+		"BaseClass"             		"ability_datadriven"
+		"AbilityTextureName"			"custom/holdout_enchanted_axes"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"RequiredLevel"					"5"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"full_damage_radius"	"325"
+			}
+			"02"
+			{	
+				"var_type"				"FIELD_FLOAT"
+				"cleave_pct_tooltip"	"10 15 20 25"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"damage_multiplier"		"1.75 2.0 2.25 2.5"
+			}
+		}
+
+		"Modifiers"
+		{
+			"modifier_enchanted_axes"
+			{
+				"Passive"			"1"
+				"IsHidden"			"1"
+
+				"OnAttackLanded"
+				{
+					"RunScript"
+					{
+						"ScriptFile"	"heroes/hero_troll_warlord.lua"
+						"Function"		"EnchantedAxes"
+					}
+				}
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Troll Warlord: Battle Trance
+	//=================================================================================================================
+	"holdout_battle_trance"
+	{
+		"BaseClass"             		"ability_datadriven"
+		"AbilityTextureName"			"custom/troll_warlord_battle_trance"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
+		"RequiredLevel"					"10"
+		"LevelsBetweenUpgrades"			"5"
+		"AbilityType"					"DOTA_ABILITY_TYPE_ULTIMATE"
+		"AbilityCooldown"				"60.0"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"duration"				"7"
+			}
+			"02"
+			{	
+				"var_type"				"FIELD_FLOAT"
+				"bat_reduction"			"0.2 0.3 0.4"
+			}
+			"03"
+			{	
+				"var_type"				"FIELD_FLOAT"
+				"radius"				"50000"
+			}
+		}
+
+		"OnSpellStart"
+		{
+			"FireEffect"
+			{
+				"EffectName"        "particles/units/heroes/hero_troll_warlord/troll_warlord_battletrance_cast.vpcf"
+				"EffectAttachType"  "follow_origin"
+				"Target"            "CASTER"
+			}
+
+			"FireSound"
+			{
+				"EffectName"	"Hero_TrollWarlord.BattleTrance.Cast"
+				"Target" 		"CASTER"
+			}
+
+			"ApplyModifier"
+			{
+				"ModifierName"	"modifier_battle_trance"
+				"Target"
+				{
+					"Center"	"CASTER"
+					"Radius"	"%radius"
+					"Teams"		"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
+					"Types"		"DOTA_UNIT_TARGET_HERO"
+				}
+				"Duration"		"%duration"
+			}
+		}
+
+		"Modifiers"
+		{
+			"modifier_battle_trance"
+			{
+				"IsBuff"		"1"
+				"IsHidden"		"0"
+
+				"OnCreated"
+				{
+					"AttachEffect"
+					{
+						"Target"			"TARGET"
+						"EffectName"		"particles/units/heroes/hero_troll_warlord/troll_warlord_battletrance_buff.vpcf"
+						"EffectAttachType"	"follow_origin"
+					}
+
+					"RunScript"
+					{
+						"ScriptFile"	"heroes/hero_troll_warlord.lua"
+						"Function"		"BattleTrance"
+					}
+				}
+			}
+		}
+	}
+
 //===========================================================================================================
 //===========================================================================================================
 //===========================================================================================================
@@ -21962,12 +22808,12 @@
 	// General
 	//-------------------------------------------------------------------------------------
 		"BaseClass"					"ability_datadriven"
-		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_AURA"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_AURA | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE"
 		"AbilityUnitTargetFlags"	"DOTA_UNIT_TARGET_FLAG_NOT_ANCIENTS"
 
 		// Stats
 		//-------------------------------------------------------------------------------------
-		"AbilityTextureName"		"holdout_endurance_aura"
+		"AbilityTextureName"		"custom/holdout_endurance_aura"
 		
 		// Stats
 		//-------------------------------------------------------------------------------------
@@ -22039,7 +22885,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"					"ability_datadriven"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-		"AbilityTextureName"    	"holdout_unholy_aura"
+		"AbilityTextureName"    	"custom/holdout_unholy_aura"
 		"AbilityCastRange"			"900"
 		"AbilityUnitTargetFlags"	"DOTA_UNIT_TARGET_FLAG_NOT_ANCIENTS"
 
@@ -22118,7 +22964,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"             		"brewmaster_thunder_clap"
-		"AbilityTextureName"			"brewmaster_thunder_clap_new"
+		"AbilityTextureName"			"custom/brewmaster_thunder_clap_new"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_PURE"
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
@@ -22181,7 +23027,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"             		"brewmaster_thunder_clap"
-		"AbilityTextureName"			"brewmaster_thunder_clap_new"
+		"AbilityTextureName"			"custom/brewmaster_thunder_clap_new"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
@@ -22243,8 +23089,8 @@
 		// General
 		//-------------------------------------------------------------------------------------
 		"BaseClass"				"ability_datadriven"
-		"AbilityBehavior"		"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_AURA"
-		"AbilityTextureName"	"vengefulspirit_command_aura"
+		"AbilityBehavior"		"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_AURA | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE"
+		"AbilityTextureName"	"custom/holdout_command_aura"
 
 		// Stats
 		//-------------------------------------------------------------------------------------
@@ -22318,7 +23164,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"items/Ankh_Magtheridon/magtheridon.lua"
+						"ScriptFile"	"items/global.lua"
 						"Function"		"respawnMagtheridonMedium"
 					}
 				}
@@ -22333,7 +23179,7 @@
 		"BaseClass"						"ability_datadriven"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"AbilityType"					"DOTA_ABILITY_TYPE_ULTIMATE"
-		"AbilityTextureName"			"blademaster_mirror_image"
+		"AbilityTextureName"			"custom/blademaster_mirror_image"
 	
 		// Precache
 		//-------------------------------------------------------------------------------------------------------------
@@ -22524,7 +23370,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"BaseClass"						"ability_datadriven"
-		"AbilityTextureName"			"holdout_devotion_aura"
+		"AbilityTextureName"			"custom/holdout_devotion_aura"
 		"AbilityUnitTargetFlags"		"DOTA_UNIT_TARGET_FLAG_NOT_ANCIENTS"
 
 		// Casting
@@ -22594,7 +23440,7 @@
 		//-------------------------------------------------------------------------------------
 		"BaseClass"					"ability_datadriven"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_AURA"
-		"AbilityTextureName"		"holdout_divine_aura"
+		"AbilityTextureName"		"custom/holdout_divine_aura"
 		"AbilityCastRange"			"900"
 		"AbilityUnitTargetFlags"	"DOTA_UNIT_TARGET_FLAG_NOT_ANCIENTS"
 
@@ -23119,7 +23965,7 @@
 					}
 				}
 			}
-		}    
+		}
 	}
 
 	//====================================================================================================
@@ -23203,7 +24049,7 @@
 		"AbilityUnitDamageType"         "DAMAGE_TYPE_MAGICAL"   
 		"SpellImmunityType"             "SPELL_IMMUNITY_ENEMIES_NO"
 		"FightRecapLevel"               "1"
-		"AbilityTextureName"            "sven_storm_bolt"
+		"AbilityTextureName"            "custom/sven_storm_bolt"
 		"AOERadius"                     "%bolt_aoe"
 
 		// Casting
@@ -23536,7 +24382,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"ability_datadriven"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-		"AbilityTextureName"			"power_mount_int"
+		"AbilityTextureName"			"custom/power_mount_int"
 		"MaxLevel"						"1"
 
 		// Time		
@@ -23563,7 +24409,7 @@
 			"02"
 			{
 				"var_type"					"FIELD_FLOAT"
-				"transformation_time"		"1.45"
+				"transformation_time"		"1.1"
 			}
 		}
 
@@ -23582,8 +24428,8 @@
 
 					"RunScript"
 					{
-						"ScriptFile"		"heroes/hero_dark_fundamental/dark_cleave.lua"
-						"Function"			"DarkCleaveStack"
+						"ScriptFile"		"heroes/global.lua"
+						"Function"			"AbilityStack"
 						"modifier_stack"	"modifier_power_mount_int"
 					}
 				}
@@ -23636,7 +24482,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"			"heroes/hero_dark_fundamental/power_mount.lua"
+						"ScriptFile"			"heroes/hero_dark_fundamental.lua"
 						"Function"				"PowerMountPhaseCast"
 					}
 				}
@@ -23645,7 +24491,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"			"heroes/hero_dark_fundamental/power_mount.lua"
+						"ScriptFile"			"heroes/hero_dark_fundamental.lua"
 						"Function"				"PowerMountCast"
 						"sub_ability_name"		"holdout_power_mount_agi"
 					}
@@ -23664,8 +24510,8 @@
 
 					"RunScript"
 					{
-						"ScriptFile"		"heroes/hero_dark_fundamental/dark_cleave.lua"
-						"Function"			"DarkCleaveStack"
+						"ScriptFile"		"heroes/global.lua"
+						"Function"			"AbilityStack"
 						"modifier_stack"	"modifier_power_mount_agi"
 					}
 				}
@@ -23674,7 +24520,7 @@
 			"modifier_power_mount_int" //Level up for the first time
 			{
 				"IsHidden"			"0"
-				"TextureName"		"power_mount_int"
+				"TextureName"		"custom/power_mount_int"
 				"Attributes"		"MODIFIER_ATTRIBUTE_PERMANENT"
 
 				"EffectName"		"particles/units/heroes/hero_ancient_apparition/ancient_apparition_chilling_touch_buff.vpcf"
@@ -23689,7 +24535,7 @@
 			"modifier_power_mount_agi"
 			{
 				"IsHidden"			"0"
-				"TextureName"		"power_mount_agi"
+				"TextureName"		"custom/power_mount_agi"
 				"Attributes"		"MODIFIER_ATTRIBUTE_PERMANENT"
 
 				"EffectName"		"particles/units/heroes/hero_ancient_apparition/ancient_apparition_chilling_touch_buff_green.vpcf"
@@ -23712,7 +24558,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"ability_datadriven"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_HIDDEN"
-		"AbilityTextureName"			"power_mount_str"
+		"AbilityTextureName"			"custom/power_mount_str"
 		"MaxLevel"						"1"
 
 		// Time		
@@ -23739,7 +24585,7 @@
 			"02"
 			{
 				"var_type"					"FIELD_FLOAT"
-				"transformation_time"		"1.45"
+				"transformation_time"		"1.1"
 			}
 		}
 
@@ -23758,8 +24604,8 @@
 
 					"RunScript"
 					{
-						"ScriptFile"		"heroes/hero_dark_fundamental/dark_cleave.lua"
-						"Function"			"DarkCleaveStack"
+						"ScriptFile"		"heroes/global.lua"
+						"Function"			"AbilityStack"
 						"modifier_stack"	"modifier_power_mount_str"
 					}
 				}
@@ -23812,7 +24658,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"			"heroes/hero_dark_fundamental/power_mount.lua"
+						"ScriptFile"			"heroes/hero_dark_fundamental.lua"
 						"Function"				"PowerMountPhaseCast"
 					}
 				}
@@ -23821,7 +24667,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"			"heroes/hero_dark_fundamental/power_mount.lua"
+						"ScriptFile"			"heroes/hero_dark_fundamental.lua"
 						"Function"				"PowerMountCast"
 						"sub_ability_name"		"holdout_power_mount_int"
 					}
@@ -23840,8 +24686,8 @@
 
 					"RunScript"
 					{
-						"ScriptFile"		"heroes/hero_dark_fundamental/dark_cleave.lua"
-						"Function"			"DarkCleaveStack"
+						"ScriptFile"		"heroes/global.lua"
+						"Function"			"AbilityStack"
 						"modifier_stack"	"modifier_power_mount_int"
 					}
 				}
@@ -23850,7 +24696,7 @@
 			"modifier_power_mount_int"
 			{
 				"IsHidden"			"0"
-				"TextureName"		"power_mount_int"
+				"TextureName"		"custom/power_mount_int"
 				"Attributes"		"MODIFIER_ATTRIBUTE_PERMANENT"
 
 				"EffectName"		"particles/units/heroes/hero_ancient_apparition/ancient_apparition_chilling_touch_buff.vpcf"
@@ -23873,7 +24719,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"ability_datadriven"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_HIDDEN"
-		"AbilityTextureName"			"power_mount_agi"
+		"AbilityTextureName"			"custom/power_mount_agi"
 		"MaxLevel"						"1"
 
 		// Time		
@@ -23900,7 +24746,7 @@
 			"02"
 			{
 				"var_type"					"FIELD_FLOAT"
-				"transformation_time"		"1.45"
+				"transformation_time"		"1.1"
 			}
 		}
 
@@ -23919,8 +24765,8 @@
 
 					"RunScript"
 					{
-						"ScriptFile"		"heroes/hero_dark_fundamental/dark_cleave.lua"
-						"Function"			"DarkCleaveStack"
+						"ScriptFile"		"heroes/global.lua"
+						"Function"			"AbilityStack"
 						"modifier_stack"	"modifier_power_mount_agi"
 					}
 				}
@@ -23972,7 +24818,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"			"heroes/hero_dark_fundamental/power_mount.lua"
+						"ScriptFile"			"heroes/hero_dark_fundamental.lua"
 						"Function"				"PowerMountPhaseCast"
 					}
 				}
@@ -23981,7 +24827,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"			"heroes/hero_dark_fundamental/power_mount.lua"
+						"ScriptFile"			"heroes/hero_dark_fundamental.lua"
 						"Function"				"PowerMountCast"
 						"sub_ability_name"		"holdout_power_mount_str"
 					}
@@ -24000,8 +24846,8 @@
 
 					"RunScript"
 					{
-						"ScriptFile"		"heroes/hero_dark_fundamental/dark_cleave.lua"
-						"Function"			"DarkCleaveStack"
+						"ScriptFile"		"heroes/global.lua"
+						"Function"			"AbilityStack"
 						"modifier_stack"	"modifier_power_mount_str"
 					}
 				}
@@ -24010,7 +24856,7 @@
 			"modifier_power_mount_str"
 			{
 				"IsHidden"			"0"
-				"TextureName"		"power_mount_str"
+				"TextureName"		"custom/power_mount_str"
 				"Attributes"		"MODIFIER_ATTRIBUTE_PERMANENT"
 
 				"EffectName"		"particles/units/heroes/hero_ancient_apparition/ancient_apparition_chilling_touch_buff_red.vpcf"
@@ -24032,8 +24878,8 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"             		"ability_datadriven"
-		"AbilityTextureName"			"holdout_dark_cleave"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_AUTOCAST | DOTA_ABILITY_BEHAVIOR_ATTACK"
+		"AbilityTextureName"			"custom/holdout_dark_cleave"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_PHYSICAL"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
@@ -24065,17 +24911,17 @@
 			"01"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"cleave_percent"			"25"
+				"full_damage_radius"		"50"
 			}
 			"02"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"bonus_damage"				"100"
+				"bonus_damage"				"125"
 			}
 			"02"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"cleave_radius"				"300"
+				"cleave_pct_tooltip"		"350"
 			}
 		}
 
@@ -24088,8 +24934,8 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"		"heroes/hero_dark_fundamental/dark_cleave.lua"
-						"Function"			"DarkCleaveStack"
+						"ScriptFile"		"heroes/global.lua"
+						"Function"			"AbilityStack"
 						"modifier_stack"	"modifier_dark_cleave_dummy"
 					}
 				}
@@ -24103,37 +24949,21 @@
 				"Passive"						"1"
 				"IsHidden"						"1"
 				"IsPurgable"					"0"
-
-				"Orb"
-				{
-					"Priority"					"DOTA_ORB_PRIORITY_ABILITY"
-//					"ProjectileName"			""
-					"CastAttack"				"1"
-				}
-
-				"OnOrbFire"
-				{
-					"SpendMana"
-					{
-						"Mana"					"%AbilityManaCost"
-					}
-				}
 	
-				"OnOrbImpact"
+				"OnAttackLanded"
 				{
 					"RunScript"
 					{
-						"ScriptFile"			"heroes/hero_dark_fundamental/dark_cleave.lua"
+						"ScriptFile"			"heroes/hero_dark_fundamental.lua"
 						"Function"				"DarkCleave"
 						"modifier_dark_cleave"	"modifier_dark_cleave"
 						"Target"				"TARGET"
 					}
 
-					"CleaveAttack"
+					"RunScript"
 					{
-						"CleavePercent"			"%cleave_percent"
-						"CleaveRadius"			"%cleave_radius"
-//						"CleaveEffect"			""
+						"ScriptFile"	"items/global.lua"
+						"Function"		"Splash"
 					}
 
 					"FireSound"
@@ -24173,7 +25003,7 @@
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_CREEP"
-		"AbilityTextureName"			"holdout_instakill"
+		"AbilityTextureName"			"custom/holdout_instakill"
 		"RequiredLevel"					"5"
 		"MaxLevel"						"1"
 
@@ -24233,7 +25063,7 @@
 
 									"RunScript"
 									{
-										"ScriptFile"	"heroes/hero_dark_fundamental/instakill.lua"
+										"ScriptFile"	"heroes/hero_dark_fundamental.lua"
 										"Function"		"Instakill"
 										"Target"		"TARGET"
 										"Chance"		"%chance"
@@ -24279,15 +25109,9 @@
 		"precache"
 		{
 			"soundfile"		"soundevents/game_sounds_heroes/game_sounds_nevermore.vsndevts"
-
-			//Particle for shadows below caster on cast. Not sure when a or b are used, CP0 and CP2 should be origin, CP1 should be number of lines
 			"particle"		"particles/units/heroes/hero_nevermore/nevermore_requiemofsouls_a.vpcf"
 			"particle"		"particles/units/heroes/hero_nevermore/nevermore_requiemofsouls_b.vpcf"
-
-			//Line particles, CP0 is start point, CP1 is velocity
 			"particle"		"particles/units/heroes/hero_nevermore/nevermore_requiemofsouls_line.vpcf"
-
-			//More particles for caster origin when finished casting, CP0 is starting point and CP1 is number of lines
 			"particle"		"particles/units/heroes/hero_nevermore/nevermore_requiemofsouls.vpcf"
 			"particle"		"particles/hero/nevermore/screen_requiem_indicator.vpcf"
 		}
@@ -24363,7 +25187,7 @@
 
 			"RunScript"
 			{
-				"ScriptFile"			"heroes/hero_dark_fundamental/requiem.lua"
+				"ScriptFile"			"heroes/hero_dark_fundamental.lua"
 				"Function"				"RequiemPhaseCast"
 			}
 		}
@@ -24377,8 +25201,8 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"		"heroes/hero_dark_fundamental/dark_cleave.lua"
-						"Function"			"DarkCleaveStack"
+						"ScriptFile"		"heroes/global.lua"
+						"Function"			"AbilityStack"
 						"modifier_stack"	"modifier_requiem_dummy"
 					}
 				}
@@ -24389,7 +25213,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"					"heroes/hero_dark_fundamental/requiem.lua"
+				"ScriptFile"					"heroes/hero_dark_fundamental.lua"
 				"Function"						"RequiemCast"
 
 				"requiem_cast_sound"			"Hero_Nevermore.RequiemOfSouls"
@@ -24405,7 +25229,7 @@
 
 			"RunScript"
 			{
-				"ScriptFile"					"heroes/hero_dark_fundamental/requiem.lua"
+				"ScriptFile"					"heroes/hero_dark_fundamental.lua"
 				"Function"						"RequiemProjectileHitOutward"
 			}
 		}
@@ -24448,7 +25272,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"ability_datadriven"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-		"AbilityTextureName"			"holdout_skin_changer_caster"
+		"AbilityTextureName"			"custom/holdout_skin_changer_caster"
 		"MaxLevel"						"1"
 
 		// Time		
@@ -24525,7 +25349,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"			"heroes/hero_dark_fundamental/skin_changer.lua"
+						"ScriptFile"			"heroes/hero_dark_fundamental.lua"
 						"Function"				"SkinChangerPhaseCast"
 					}
 				}
@@ -24553,7 +25377,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"			"heroes/hero_dark_fundamental/skin_changer.lua"
+						"ScriptFile"			"heroes/hero_dark_fundamental.lua"
 						"Function"				"SkinChangerCaster"
 					}
 				}
@@ -24572,7 +25396,7 @@
 		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING"
 		"AbilityType"                   "DOTA_ABILITY_TYPE_ULTIMATE"
 		"AbilityCastAnimation"			"ACT_DOTA_CAST_ABILITY_4"
-		"AbilityTextureName"            "holdout_odin"
+		"AbilityTextureName"            "custom/holdout_odin"
 		"MaxLevel"						"3"
 		"RequiredLevel"					"10"
 
@@ -24722,7 +25546,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"ability_datadriven"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-		"AbilityTextureName"			"holdout_mechanism"
+		"AbilityTextureName"			"custom/holdout_mechanism"
 		"MaxLevel"						"1"
 
 		// Stats		
@@ -24823,7 +25647,7 @@
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_PURE"
 		"SpellImmunityType"				"SPELL_IMMUNITY_ALLIES_YES"
 		"FightRecapLevel"				"1"
-		"AbilityTextureName"			"holdout_light_stand"
+		"AbilityTextureName"			"custom/holdout_light_stand"
 		"AOEradius"						"%radius"
 		"MaxLevel"						"1"
 		"RequiredLevel"					"5"
@@ -24883,8 +25707,8 @@
 
 					"RunScript"
 					{
-						"ScriptFile"		"heroes/hero_dark_fundamental/dark_cleave.lua"
-						"Function"			"DarkCleaveStack"
+						"ScriptFile"		"heroes/global.lua"
+						"Function"			"AbilityStack"
 						"modifier_stack"	"modifier_light_stand_dummy"
 					}
 				}
@@ -25112,7 +25936,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"ability_datadriven"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-		"AbilityTextureName"			"holdout_skin_changer_warrior"
+		"AbilityTextureName"			"custom/holdout_skin_changer_warrior"
 		"MaxLevel"						"1"
 
 		// Time		
@@ -25189,7 +26013,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"			"heroes/hero_dark_fundamental/skin_changer.lua"
+						"ScriptFile"			"heroes/hero_dark_fundamental.lua"
 						"Function"				"SkinChangerPhaseCast"
 					}
 				}
@@ -25212,7 +26036,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"			"heroes/hero_dark_fundamental/skin_changer.lua"
+						"ScriptFile"			"heroes/hero_dark_fundamental.lua"
 						"Function"				"SkinChangerWarrior"
 					}
 				}
@@ -25590,6 +26414,104 @@
 		}
 	}
 
+	"holdout_devour"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"						"ability_datadriven"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK"
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_CREEP"
+		"AbilityUnitTargetFlags"		"DOTA_UNIT_TARGET_FLAG_NOT_CREEP_HERO"
+		"AbilityTextureName"			"doom_bringer_devour"
+		
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastPoint"				"0.3"
+	
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"				"300 300 300 300"
+		"AbilityCooldown"				"40.0 30.0 20.0 10.0"
+	
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"75 150 225 300"
+	
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_gold"			"250 500 750 1000"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"health_per_second"		"50 100 150 200"
+			}
+		}
+	
+		"OnAbilityPhaseStart"
+		{
+			"RunScript"
+			{
+				"ScriptFile"	"heroes/hero_doom_bringer.lua"
+				"Function"		"DevourCheck"
+				"modifier"		"modifier_devour_datadriven"
+			}
+		}
+
+		"OnSpellStart"
+		{
+			"FireSound"
+			{
+				"EffectName"	"Hero_DoomBringer.DevourCast"
+				"Target" 		"TARGET"
+			}
+
+			"FireEffect"
+			{
+				"EffectName"        "particles/units/heroes/hero_doom_bringer/doom_bringer_devour.vpcf"
+				"EffectAttachType"  "follow_origin"
+				
+				"ControlPointEntities"
+				{
+					"TARGET"	"attach_origin"
+					"CASTER"	"attach_origin"
+				}
+			}
+
+			"RunScript"
+			{
+				"ScriptFile"	"heroes/hero_doom_bringer.lua"
+				"Function"		"Devour"
+				"modifier"		"modifier_devour_datadriven"
+				"doom_empty1"	"doom_bringer_empty1"
+				"doom_empty2"	"doom_bringer_empty2"
+			}
+		}
+
+		"Modifiers"
+		{
+			"modifier_devour_datadriven"
+			{
+				"IsDebuff"			"1"
+	
+				"OnDestroy"
+				{
+					"RunScript"
+					{
+						"ScriptFile"	"heroes/hero_doom_bringer.lua"
+						"Function"		"DevourGold"
+					}				
+				}
+			}
+		}
+	}
+
 //====================================================================================================
 //====================================================================================================
 //====================================================================================================
@@ -25628,8 +26550,9 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------
-		"BaseClass"			"ability_datadriven"
-		"AbilityBehavior"	"DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"BaseClass"				"ability_datadriven"
+		"AbilityBehavior"		"DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityTextureName"	"rubick_empty1"
 		
 		"MaxLevel"			"1"
 
@@ -25744,8 +26667,9 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------
-		"BaseClass"			"ability_datadriven"
-		"AbilityBehavior"	"DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"BaseClass"				"ability_datadriven"
+		"AbilityBehavior"		"DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityTextureName"	"rubick_empty1"
 		
 		"MaxLevel"			"1"
 
@@ -25846,6 +26770,7 @@
 		//-------------------------------------------------------------------------------------
 		"BaseClass"				"ability_datadriven"
 		"AbilityBehavior"		"DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityTextureName"	"rubick_empty1"
 		"Level"					"1"
 		"MaxLevel"				"1"
 
@@ -25996,9 +26921,10 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------
-		"BaseClass"			"ability_datadriven"
-		"AbilityBehavior"	"DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_PASSIVE"
-		"MaxLevel"			"1"
+		"BaseClass"				"ability_datadriven"
+		"AbilityBehavior"		"DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityTextureName"	"rubick_empty1"
+		"MaxLevel"				"1"
 
 		"precache"
 		{
@@ -26058,10 +26984,11 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------
-		"BaseClass"			"ability_datadriven"
-		"AbilityBehavior"	"DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_PASSIVE"
-		"Level"				"1"
-		"MaxLevel"			"1"
+		"BaseClass"				"ability_datadriven"
+		"AbilityBehavior"		"DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityTextureName"	"rubick_empty1"
+		"Level"					"1"
+		"MaxLevel"				"1"
 
 		"precache"
 		{
@@ -26195,7 +27122,7 @@
 	
 		// Stats
 		//-------------------------------------------------------------------------------------
-		"AbilityTextureName"		"phantom_assassin_blur"
+		"AbilityTextureName"		"custom/phantom_assassin_blur"
 
 		"AbilitySpecial"
 		{
@@ -26348,7 +27275,7 @@
 		"AbilityCastPoint"			"0.5"
 		"AbilityCooldown"			"0.0"
 		"AbilityManaCost"			"10"
-		"AbilityTextureName"		"brewmaster_fire_permanent_immolation"
+		"AbilityTextureName"		"custom/brewmaster_fire_permanent_immolation"
 		"AbilityUnitDamageType"		"DAMAGE_TYPE_MAGICAL"
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
 	
@@ -26461,7 +27388,7 @@
 		"AbilityCooldown"			"13.0"
 		"AbilityCastRange"			"850"
 		"AbilityManaCost"			"0"
-		"AbilityTextureName"		"nyx_assassin_mana_burn"
+		"AbilityTextureName"		"custom/nyx_assassin_mana_burn"
 		"AbilityUnitDamageType"		"DAMAGE_TYPE_MAGICAL"
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
 		"AbilityUnitTargetType"		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
@@ -26541,7 +27468,7 @@
 		"AbilityCooldown"			"13.0"
 		"AbilityCastRange"			"800"
 		"AbilityManaCost"			"0"
-		"AbilityTextureName"		"nyx_assassin_mana_burn"
+		"AbilityTextureName"		"custom/nyx_assassin_mana_burn"
 		"AbilityUnitDamageType"		"DAMAGE_TYPE_MAGICAL"
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
 		"AbilityUnitTargetType"		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
@@ -26620,7 +27547,7 @@
 		"AbilityCastPoint"			"0.5"
 		"AbilityCooldown"			"35.0"
 		"AbilityManaCost"			"0"
-		"AbilityTextureName"		"lone_druid_true_form_battle_cry"
+		"AbilityTextureName"		"custom/lone_druid_true_form_battle_cry"
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
 	
 	
@@ -26786,7 +27713,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"					"ability_datadriven"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-		"AbilityTextureName"		"vengefulspirit_wave_of_terror"
+		"AbilityTextureName"		"custom/holdout_howl_of_terror"
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
@@ -26868,21 +27795,21 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------
-		"BaseClass" "ability_datadriven"
-		"AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_AOE |  DOTA_ABILITY_BEHAVIOR_CHANNELLED"
-	
+		"BaseClass"						"ability_datadriven"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_AOE |  DOTA_ABILITY_BEHAVIOR_CHANNELLED"
+
 		// Stats
 		//-------------------------------------------------------------------------------------
-		"AbilityCastPoint" "0.5"
-		"AnimationPlaybackRate" "0.5"
-		"AOERadius"         "1000"
-		"AbilityCooldown"  "20"
-		"AbilityChannelTime"  "10"
-		"AbilityManaCost"  "200"
-		"AbilityTextureName" "warlock_rain_of_chaos"
-		"AbilityUnitDamageType" "DAMAGE_TYPE_MAGICAL"
-		"AbilityUnitTargetTeam" "DOTA_UNIT_TARGET_TEAM_ENEMY"
-		"AbilityUnitTargetType" "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+		"AbilityCastPoint"				"0.5"
+		"AnimationPlaybackRate"			"0.5"
+		"AOERadius"						"1000"
+		"AbilityCooldown"				"20"
+		"AbilityChannelTime"			"10"
+		"AbilityManaCost"				"200"
+		"AbilityTextureName"			"warlock_rain_of_chaos"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
 
 		"AbilitySpecial"
 		{
@@ -26917,7 +27844,7 @@
 				"radius_explosion"		"250"
 			}
 		}
-	
+
 		"OnSpellStart"
 		{ 
 		  "ApplyModifier"
@@ -27026,7 +27953,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"					"ability_datadriven"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_HIDDEN"
-		"AbilityTextureName"    	""
+		"AbilityTextureName"    	"rubick_empty1"
 		"MaxLevel"					"1"
 
 		"OnSpellStart"
@@ -27210,7 +28137,7 @@
 		"AbilityCastRange"			"600"
 		"AbilityCastPoint"			"0.3"
 		"AbilityCastAnimation"		"ACT_DOTA_CAST_ABILITY_1"
-		"AbilityTextureName"		"holdout_sleep"
+		"AbilityTextureName"		"custom/holdout_sleep"
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
 		"AbilityUnitTargetType"		"DOTA_UNIT_TARGET_HERO"
 	
@@ -27274,7 +28201,7 @@
 		"AbilityCooldown"  "40"
 		"AbilityChannelTime"  "10"
 		"AbilityManaCost"  "200"
-		"AbilityTextureName"	"holdout_stampede"
+		"AbilityTextureName"	"custom/holdout_stampede"
 		"AbilityUnitDamageType" "DAMAGE_TYPE_MAGICAL"
 		"AbilityUnitTargetTeam" "DOTA_UNIT_TARGET_TEAM_ENEMY"
 		"AbilityUnitTargetType" "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
@@ -27554,6 +28481,176 @@
 	}
 
 	//=================================================================================================================
+	// Creature: War Stomp
+	//=================================================================================================================
+	"creature_war_stomp"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"						"ability_datadriven"
+		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE"
+		"AbilityUnitDamageType"         "DAMAGE_TYPE_MAGICAL"
+		"SpellImmunityType"             "SPELL_IMMUNITY_ENEMIES_NO"
+		"AbilityTextureName"            "custom/holdout_war_stomp"
+		"AbilityCastAnimation"			"ACT_DOTA_CAST_ABILITY_1"
+
+		// Stats
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastPoint"              "1.2"
+		"AbilityCooldown"               "16.0"
+		"AbilityManaCost"               "150 210 270 330"
+		"AbilityCastRange"				"300 350 400 450"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"                      "FIELD_INTEGER"
+				"radius"                        "300 350 400 450"
+			}
+			"02"
+			{
+				"var_type"                      "FIELD_FLOAT"
+				"stun_duration"                 "1.0 1.5 2.0 2.5"
+			}
+			"03"
+			{
+				"var_type"                      "FIELD_INTEGER"
+				"stomp_damage"                  "250 350 450 550"
+			}
+		}
+
+		"OnSpellStart"
+		{	
+			"FireEffect"
+			{
+				"EffectName"        "particles/units/heroes/hero_centaur/centaur_warstomp.vpcf"
+				"EffectAttachType"  "follow_origin"
+				"EffectRadius"      "%radius"
+				"Target"            "CASTER"
+				"ControlPoints"
+				{
+					"01"    "%radius 0 %radius"
+				}
+			}
+	
+			"FireSound"
+			{
+				"EffectName"        "Hero_Centaur.HoofStomp"
+				"Target"            "CASTER"
+			}
+			"ActOnTargets"
+			{
+				"Target"
+				{
+					"Center"                "CASTER"
+					"Radius"                "%radius"
+					"Teams"                 "DOTA_UNIT_TARGET_TEAM_ENEMY"
+					"Types"                 "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+				}
+	
+				"Action"
+				{
+					"Damage"
+					{
+						"Target"    "TARGET"
+						"Type"      "DAMAGE_TYPE_MAGICAL"
+						"Damage"    "%stomp_damage"
+					}
+	
+					"ApplyModifier"
+					{
+						"Target"        "TARGET"
+						"ModifierName"  "modifier_hoof_stomp"
+					}
+				}
+			}       
+		}
+	
+		"Modifiers"
+		{
+			"modifier_hoof_stomp"
+			{
+				"IsDebuff"  "1"
+				"Duration"  "%stun_duration"
+				"States"
+				{
+					"MODIFIER_STATE_STUNNED" "MODIFIER_STATE_VALUE_ENABLED"         
+				}
+				"OverrideAnimation" "ACT_DOTA_DISABLED"
+				"EffectName"        "particles/generic_gameplay/generic_stunned.vpcf"
+				"EffectAttachType"  "follow_overhead"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Creature: Howling Blast
+	//=================================================================================================================
+	"creature_howling_blast"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"						"ability_datadriven"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_YES"
+//		"AbilityCastRange"				"300"
+		"AbilityTextureName"			"custom/holdout_howling_blast"
+		"AbilityCooldown"				"1.0"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"						"FIELD_FLOAT"
+				"ensnare_duration"				"1.0 1.75 2.5 3.25"
+			}		
+			"02"
+			{
+				"var_type"						"FIELD_INTEGER"
+				"ensnare_damage"				"200 450 750 1300"
+			}
+			"03"
+			{
+				"var_type"						"FIELD_INTEGER"
+				"ensnare_chance"				"12"
+			}
+		}
+
+		"Modifiers"
+		{
+			"modifier_howling_blast"
+			{
+				"Passive"								"1"
+				"IsHidden"								"1"
+				"IsPurgable"							"0"
+
+				"OnAttacked"
+				{
+					"Random"
+					{
+						"Chance"			"%ensnare_chance"
+						"OnSuccess"
+						{
+							"RunScript"
+							{
+								"ScriptFile"	"heroes/hero_abaddon/howling_blast.lua"
+								"Function"		"HowlingBlast"
+								"modifier"		"modifier_disarmed"
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	//=================================================================================================================
 	// Undying: Aura of Blight
 	//=================================================================================================================
 	"creature_aura_of_blight"
@@ -27561,8 +28658,8 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"             	"ability_datadriven"
-		"AbilityBehavior"       	"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-		"AbilityTextureName"    	"holdout_aura_of_blight"
+		"AbilityBehavior"       	"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE"
+		"AbilityTextureName"    	"custom/holdout_aura_of_blight"
 		"AbilityCastRange"			"900"
 		"AbilityUnitTargetFlags"	"DOTA_UNIT_TARGET_FLAG_NOT_ANCIENTS"
 		
@@ -27578,7 +28675,7 @@
 			"02"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"bonus_health_regen"		"4 6 8 10"
+				"bonus_health_regen"		"5 10 15 20"
 			}
 		}
 
@@ -27614,7 +28711,7 @@
 	{
 		"AbilityBehavior"	"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_HIDDEN"
 		"BaseClass"	"ability_datadriven"
-		"AbilityTextureName"	"rubick_empty1"
+		"AbilityTextureName"	"custom/rubick_empty1"
 		"MaxLevel"	"1"
 		"Modifiers"
 		{
@@ -27639,7 +28736,7 @@
 	{
 		"AbilityBehavior"	"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_HIDDEN"
 		"BaseClass"	"ability_datadriven"
-		"AbilityTextureName"	"rubick_empty1"
+		"AbilityTextureName"	"custom/rubick_empty1"
 		"MaxLevel"	"1"
 		"Modifiers"
 		{
@@ -27749,7 +28846,7 @@
 		"BaseClass"					"ability_datadriven"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
 		"MaxLevel"					"1"
-		"AbilityTextureName"		"holdout_avatar"
+		"AbilityTextureName"		"custom/holdout_avatar"
 
 		// Time     
 		//-------------------------------------------------------------------------------------------------------------
@@ -27895,7 +28992,7 @@
 		//-------------------------------------------------------------------------------------
 		"BaseClass"					"ability_datadriven"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_AURA"
-		"AbilityTextureName"		"holdout_endurance_aura"
+		"AbilityTextureName"		"custom/holdout_endurance_aura"
 		"RequiredLevel"				"8"
 		"LevelsBetweenUpgrades"		"3"
 		"AbilityUnitTargetFlags"	"DOTA_UNIT_TARGET_FLAG_NOT_ANCIENTS"
@@ -27930,7 +29027,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"             		"ability_datadriven"
-		"AbilityTextureName"			"holdout_trueshot_aura"
+		"AbilityTextureName"			"custom/holdout_trueshot_aura"
 		"MaxLevel" 						"3"
 		"RequiredLevel"					"10"
 		"LevelsBetweenUpgrades"			"5"
@@ -27972,7 +29069,7 @@
 		"BaseClass"					"ability_datadriven"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_AURA"
 		"RequiredLevel"				"5"
-		"AbilityTextureName"		"holdout_command_aura"
+		"AbilityTextureName"		"custom/holdout_command_aura"
 		"AbilityUnitTargetFlags"	"DOTA_UNIT_TARGET_FLAG_NOT_ANCIENTS"
 
 		// Stats
@@ -28001,7 +29098,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"					"ability_datadriven"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-		"AbilityTextureName"		"holdout_elunes_grace"
+		"AbilityTextureName"		"custom/holdout_elunes_grace"
 		"RequiredLevel"				"8"
 		"LevelsBetweenUpgrades"		"3"
 		"AbilitySpecial"
@@ -28034,7 +29131,7 @@
 		"BaseClass"						"ability_datadriven"
 		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_AURA"
 		"AbilityUnitTargetTeam"         "DOTA_UNIT_TARGET_TEAM_FRIENDLY"
-		"AbilityTextureName"            "holdout_thirst_aura"
+		"AbilityTextureName"            "custom/holdout_thirst_aura"
 		"AbilityCastRange"				"900"
 		"RequiredLevel"					"5"
 		"AbilityUnitTargetFlags"		"DOTA_UNIT_TARGET_FLAG_NOT_ANCIENTS"
@@ -28064,7 +29161,7 @@
 		"BaseClass"						"ability_datadriven"
 		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_AURA"
 		"AbilityUnitTargetTeam"         "DOTA_UNIT_TARGET_TEAM_FRIENDLY"
-		"AbilityTextureName"            "holdout_muradin_hammer"
+		"AbilityTextureName"            "custom/holdout_muradin_hammer"
 		"AbilityCastRange"				"900"
 		"RequiredLevel"					"5"
 
@@ -28103,7 +29200,7 @@
 		"BaseClass"             		"ability_datadriven"
 		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"SpellImmunityType"             "SPELL_IMMUNITY_ENEMIES_NO"
-		"AbilityTextureName"            "holdout_splash_arrows"
+		"AbilityTextureName"            "custom/holdout_splash_arrows"
 		"AbilityType"					"DOTA_ABILITY_TYPE_ULTIMATE"
 		"RequiredLevel"					"10"
 		"LevelsBetweenUpgrades"			"5"
@@ -28143,7 +29240,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"BaseClass"						"ability_datadriven"
-		"AbilityTextureName"			"holdout_wardrums_aura"
+		"AbilityTextureName"			"custom/holdout_wardrums_aura"
 		"RequiredLevel"					"5"
 		"AbilityUnitTargetFlags"		"DOTA_UNIT_TARGET_FLAG_NOT_ANCIENTS"
 
@@ -28177,7 +29274,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"BaseClass"						"ability_datadriven"
-		"AbilityTextureName"			"holdout_devotion_aura"
+		"AbilityTextureName"			"custom/holdout_devotion_aura"
 		"RequiredLevel"					"5"
 		"AbilityUnitTargetFlags"		"DOTA_UNIT_TARGET_FLAG_NOT_ANCIENTS"
 
@@ -28211,7 +29308,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"					"ability_datadriven"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-		"AbilityTextureName"		"holdout_aura_of_blight"
+		"AbilityTextureName"		"custom/holdout_aura_of_blight"
 		"RequiredLevel"				"5"
 		"AbilityCastRange"			"900"
 		"AbilityUnitTargetFlags"	"DOTA_UNIT_TARGET_FLAG_NOT_ANCIENTS"
@@ -28242,7 +29339,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"					"ability_datadriven"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-		"AbilityTextureName"		"holdout_life_regeneration_aura"
+		"AbilityTextureName"		"custom/holdout_life_regeneration_aura"
 		"RequiredLevel"				"5"
 		"AbilityCastRange"			"900"
 		"AbilityUnitTargetFlags"	"DOTA_UNIT_TARGET_FLAG_NOT_ANCIENTS"
@@ -28273,7 +29370,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"BaseClass"						"ability_datadriven"
-		"AbilityTextureName"			"holdout_distance_aura"
+		"AbilityTextureName"			"custom/holdout_distance_aura"
 		"RequiredLevel"					"5"
 		"AbilityUnitTargetFlags"		"DOTA_UNIT_TARGET_FLAG_NOT_ANCIENTS"
 
@@ -28293,7 +29390,7 @@
 			"02"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"aura_radius"			"25000"
+				"aura_radius"			"50000"
 			}
 		}
 	}
@@ -28307,7 +29404,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"             	"ability_datadriven"
 		"AbilityBehavior"       	"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-		"AbilityTextureName"    	"holdout_unholy_aura"
+		"AbilityTextureName"    	"custom/holdout_unholy_aura"
 		"AbilityCastRange"			"900"
 		"RequiredLevel"				"5"
 		"AbilityUnitTargetFlags"	"DOTA_UNIT_TARGET_FLAG_NOT_ANCIENTS"
@@ -28343,7 +29440,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"					"ability_datadriven"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-		"AbilityTextureName"		"holdout_shield"
+		"AbilityTextureName"		"custom/holdout_shield"
 		"RequiredLevel"				"8"
 		"LevelsBetweenUpgrades"		"3"
 		"AbilitySpecial"
@@ -28371,7 +29468,7 @@
 		"BaseClass"						"ability_datadriven"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"AbilityType"					"DOTA_ABILITY_TYPE_ULTIMATE"
-		"AbilityTextureName"			"holdout_bear_form"
+		"AbilityTextureName"			"custom/holdout_bear_form"
 		"RequiredLevel"					"10"
 		"LevelsBetweenUpgrades"			"5"
 
@@ -28428,7 +29525,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"ability_datadriven"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-		"AbilityTextureName"			"power_mount_int"
+		"AbilityTextureName"			"custom/power_mount_int"
 		"MaxLevel"						"1"
 
 		// Time		
@@ -28472,7 +29569,7 @@
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_PHYSICAL"
-		"AbilityTextureName"			"holdout_spiked_carapace"
+		"AbilityTextureName"			"custom/holdout_spiked_carapace"
 		"RequiredLevel"					"8"
 		"LevelsBetweenUpgrades"			"3"
 
@@ -28507,7 +29604,7 @@
 		//-------------------------------------------------------------------------------------
 		"BaseClass"					"ability_datadriven"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_AURA"
-		"AbilityTextureName"		"holdout_divine_aura"
+		"AbilityTextureName"		"custom/holdout_divine_aura"
 		"RequiredLevel"				"8"
 		"LevelsBetweenUpgrades"		"3"
 		"AbilityCastRange"			"900"
@@ -28554,7 +29651,7 @@
 		//-------------------------------------------------------------------------------------
 		"BaseClass"					"ability_datadriven"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_AURA"
-		"AbilityTextureName"		"holdout_divine_aura"
+		"AbilityTextureName"		"custom/holdout_divine_aura"
 		"RequiredLevel"				"5"
 		"AbilityCastRange"			"900"
 		"AbilityUnitTargetFlags"	"DOTA_UNIT_TARGET_FLAG_NOT_ANCIENTS"
