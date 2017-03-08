@@ -8,15 +8,16 @@
 	"npc_dota_hero_brewmaster"			"1" 	//Pandaren Brewmaster
 	"npc_dota_hero_chen"				"1"		//Archmage
 	"npc_dota_hero_crystal_maiden"		"1"		//Archimage
+	"npc_dota_hero_doom_bringer"		"1" 	//Doom
 	"npc_dota_hero_dragon_knight"		"1" 	//Arthas
 	"npc_dota_hero_elder_titan"			"1"		//Tauren Chieftain
 	"npc_dota_hero_enchantress"			"1"		//Tyrande
 	"npc_dota_hero_invoker"				"1"		//Bloodmage
-	"npc_dota_hero_juggernaut"			"1"		//Blademaster
+//	"npc_dota_hero_juggernaut"			"1"		//Blademaster
 	"npc_dota_hero_lich"				"1"		//Lich
 	"npc_dota_hero_lina"				"1"		//Sorceress
 	"npc_dota_hero_luna"				"1"		//Huntress
-	"npc_dota_hero_meepo"				"1"		//Kobold Knight
+//	"npc_dota_hero_meepo"				"1"		//Kobold Knight
 	"npc_dota_hero_mirana"				"1"		//Priestess of the Moon
 	"npc_dota_hero_nevermore"			"1"		//Banehallow
 	"npc_dota_hero_nyx_assassin"		"1"		//Crypt Lord
@@ -24,15 +25,15 @@
 	"npc_dota_hero_phantom_assassin"	"1"		//Warden
 	"npc_dota_hero_pugna"				"1"		//Dread Lord
 	"npc_dota_hero_rattletrap"			"1"		//Space Marine
+	"npc_dota_hero_slardar"				"1"		//Centurion
 	"npc_dota_hero_sniper"				"1"		//Rifleman
-	"npc_dota_hero_sven"				"1"		//Mountain King
-	"npc_dota_hero_sand_king"			"1"		//Desert Wyrm
+//	"npc_dota_hero_sven"				"1"		//Mountain King
+//	"npc_dota_hero_sand_king"			"1"		//Desert Wyrm
 	"npc_dota_hero_shadow_shaman"		"1"		//Rhasta
 	"npc_dota_hero_tiny"				"1"		//Stone Giant
 	"npc_dota_hero_terrorblade"			"1"		//Illidan
 	"npc_dota_hero_ursa"				"1"		//Malfurion
 	"npc_dota_hero_warlock"				"1"		//Archimonde
-	"npc_dota_hero_weaver"				"1"		//Crypt Lord
 	"npc_dota_hero_windrunner"			"1"		//Windrunner
-	"npc_dota_hero_wisp"				"1"		//Wisp( Choose Hero Unit )
+//	"npc_dota_hero_wisp"				"1"		//Wisp( Choose Hero Unit )
 }

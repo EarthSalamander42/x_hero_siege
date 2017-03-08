@@ -71,7 +71,6 @@ end
 
 require('libraries/timers')
 
-
 local Notify = function(player, msg, duration)
   duration = duration or 2
   if Notifications then
@@ -503,7 +502,6 @@ function Attachments:AttachProp(unit, attachPoint, model, scale, properties)
         ParticleManager:SetParticleControlEnt(prop.fx, tonumber(k), prop, PATTACH_POINT_FOLLOW, ent_point, prop:GetAbsOrigin(), true)
       end
     end
-
 
     if Attachments.timer then
       Timers:RemoveTimer(Attachments.timer)

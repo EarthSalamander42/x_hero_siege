@@ -1,15 +1,9 @@
 <root>
 	<script>
-//		GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_FLYOUT_SCOREBOARD, false );
-		GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_TOP_BAR_DIRE_TEAM, false );
-		GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_TOP_BAR_SCORE, false );
+		GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_FLYOUT_SCOREBOARD, false );
+		GameUI.SetDefaultUIEnabled(DotaDefaultUIElement_t.DOTA_DEFAULT_UI_TOP_BAR_SCORE, false);
 		GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_INVENTORY_PROTECT, false );	//Glyph.
 		GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_INVENTORY_COURIER, false );
-
-		GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_HERO_SELECTION_TEAMS, false );
-		GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_HERO_SELECTION_GAME_NAME, false );
-		GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_HERO_SELECTION_CLOCK, false );
-
 		GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_ENDGAME, false );
 
 		GameUI.CustomUIConfig().team_colors = {}
@@ -61,25 +55,26 @@
 		//Skin Killer - minimap
 		hudElements.FindChildTraverse("HUDSkinMinimap").style.visibility = "collapse";
 
+		//Top Bar Radiant
 		var TopBarRadiantTeam = hudElements.FindChildTraverse("TopBarRadiantTeam");
 		TopBarRadiantTeam.style.width = "510px";
+
 		var topbarRadiantPlayers = hudElements.FindChildTraverse("TopBarRadiantPlayers");
 		topbarRadiantPlayers.style.width = "504px";
+
 		var topbarRadiantPlayersContainer = hudElements.FindChildTraverse("TopBarRadiantPlayersContainer");
 		topbarRadiantPlayersContainer.style.width = "504px";
 
-		var RadiantTeamContainer = hudElements.FindChildTraverse("RadiantTeamContainer");
-		RadiantTeamContainer.style.height = "610px";
-		var DireTeamContainer = hudElements.FindChildTraverse("DireTeamContainer");
-		DireTeamContainer.style.visibility = "collapse";
-		var DireHeader = hudElements.FindChildTraverse("DireHeader");
-		DireHeader.style.visibility = "collapse";
-		//Scoreboard
-		var ScoreboardBackground = hudElements.FindChildTraverse("scoreboard")
-		ScoreboardBackground.style.height = "520px";
-		var ScoreboardButtons = hudElements.FindChildTraverse("scoreboard").FindChildTraverse("Background").FindChildTraverse("NestedMenuButtons");
-		ScoreboardButtons.style.width = "710px";
-		ScoreboardButtons.style.margin = "-30px";
+		//Top Bar Dire
+		var TopBarDireTeam = hudElements.FindChildTraverse("TopBarDireTeam");
+		TopBarDireTeam.style.width = "510px";
+
+		var topbarDirePlayers = hudElements.FindChildTraverse("TopBarDirePlayers");
+		topbarDirePlayers.style.width = "504px";
+
+		var topbarDirePlayersContainer = hudElements.FindChildTraverse("TopBarDirePlayersContainer");
+		topbarDirePlayersContainer.style.width = "504px";
+//		topbarDirePlayersContainer.style.flowChildren = "left";
 	</script>
 
 	<Panel>
@@ -88,6 +83,7 @@
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/hud.xml" />
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/xhs_adminmod.xml" />
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/xhs_timers.xml" />
+		<CustomUIElement type="FlyoutScoreboard"	layoutfile="file://{resources}/layout/custom_game/multiteam_flyout_scoreboard.xml" />
 		<CustomUIElement type="GameSetup"			layoutfile="file://{resources}/layout/custom_game/gamesetup_options.xml" />
 		<CustomUIElement type="GameSetup"			layoutfile="file://{resources}/layout/custom_game/team_select.xml" />
 		<CustomUIElement type="EndScreen" 			layoutfile="file://{resources}/layout/custom_game/multiteam_end_screen.xml" />

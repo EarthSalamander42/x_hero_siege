@@ -337,6 +337,7 @@ end
 function RameroEvent() -- 750 kills
 local teleporters = Entities:FindAllByName("trigger_teleport_ramero_end")
 nCOUNTDOWNTIMER = 121
+SPECIAL_EVENT = 1
 
 	local Ramero = CreateUnitByName("npc_ramero_2", Entities:FindByName(nil, "roshan_wp_4"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
 	Ramero:AddNewModifier( nil, nil, "modifier_boss_stun", {duration = 5})
@@ -351,7 +352,7 @@ nCOUNTDOWNTIMER = 121
 		for _,v in pairs(teleporters) do
 			v:Enable()
 		end
-
+		SPECIAL_EVENT = 0
 		UTIL_Remove(Ramero)
 	end)
 
@@ -368,6 +369,7 @@ end
 function RameroAndBaristolEvent() -- 500 kills
 local teleporters = Entities:FindAllByName("trigger_teleport_ramero_end")
 nCOUNTDOWNTIMER = 121
+SPECIAL_EVENT = 1
 
 	local Ramero = CreateUnitByName("npc_ramero", Entities:FindByName(nil, "roshan_wp_4"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
 	Ramero:AddNewModifier( nil, nil, "modifier_boss_stun", {duration = 5})
@@ -386,7 +388,7 @@ nCOUNTDOWNTIMER = 121
 		for _,v in pairs(teleporters) do
 			v:Enable()
 		end
-
+		SPECIAL_EVENT = 0
 		UTIL_Remove(Ramero)
 		UTIL_Remove(Baristol)
 	end)
@@ -403,8 +405,8 @@ nCOUNTDOWNTIMER = 121
 end
 
 function EndRameroEvent(keys)
-	local activator = keys.activator
-	local point = Entities:FindByName(nil,"base_spawn"):GetAbsOrigin()
+local activator = keys.activator
+local point = Entities:FindByName(nil, "base_spawn"):GetAbsOrigin()
 
 	if activator:GetTeam() == DOTA_TEAM_GOODGUYS then
 	FindClearSpaceForUnit(activator, point, true)
@@ -416,13 +418,16 @@ function EndRameroEvent(keys)
 	end
 end
 
+dire_hero_list = {}
+radiant_hero_list = {}
+
 function DuelEvent()
 local heroes = HeroList:GetAllHeroes()
 local duel = 1
+local RADIANT
+local DIRE
 PlayerNumberRadiant = 0
 PlayerNumberDire = 0
-mode = GameRules:GetGameModeEntity()
-mode:SetFixedRespawnTime(1)
 
 	-- Initialize duel
 	for _, hero in pairs(heroes) do
@@ -431,69 +436,39 @@ mode:SetFixedRespawnTime(1)
 		hero:SetRespawnsDisabled(true)
 		if not hero:HasOwnerAbandoned() then
 			if PlayerResource:IsValidPlayerID(hero:GetPlayerOwnerID()) then
-				if ID == 0 or ID == 2 or ID == 4 or ID == 6 then 
+				if ID == 0 or ID == 2 or ID == 4 or ID == 6 then
 					hero:SetTeam(DOTA_TEAM_BADGUYS)
 					if hero:GetPlayerOwner() then
 						hero:GetPlayerOwner():SetTeam(DOTA_TEAM_BADGUYS)
 					end
-					hero:SetGold(Gold, false)
-					local point = Entities:FindByName(nil, "duel_event_"..ID)
-					FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
---					PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
---					Timers:CreateTimer(0.1, function()
---						PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
---					end)
-				elseif ID == 1 or ID == 3 or ID == 5 or ID == 7 then
-					local point = Entities:FindByName(nil, "duel_event_"..ID)
-					FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
---					PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
---					Timers:CreateTimer(0.1, function()
---						PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
---					end)
+					table.insert(dire_hero_list, hero)
+					PlayerNumberDire = PlayerNumberDire + 1
+				else
+					table.insert(radiant_hero_list, hero)
+					PlayerNumberRadiant = PlayerNumberRadiant + 1
 				end
-			else
-				return
+				hero:SetGold(Gold, false)
+				hero:SetPhysicalArmorBaseValue(0)
+				hero:SetBaseMagicalResistanceValue(0)
+				local point = Entities:FindByName(nil, "duel_event_"..ID)
+				FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
 			end
+		else
+			FindClearSpaceForUnit(hero, Entities:FindByName(nil, "choose_vip_point"):GetAbsOrigin(), true)
 		end
 	end
 
-	-- Calculate the number of players in each teams
-	for nPlayerID = 0, DOTA_MAX_TEAM_PLAYERS -1 do
-		if PlayerResource:GetTeam(nPlayerID) == DOTA_TEAM_GOODGUYS and not PlayerResource:HasOwnerAbandoned(nPlayerID) then
-			PlayerNumberRadiant = PlayerNumberRadiant + 1
-		end
-		if PlayerResource:GetTeam(nPlayerID) == DOTA_TEAM_BADGUYS and not PlayerResource:HasOwnerAbandoned(nPlayerID) then
-			PlayerNumberDire = PlayerNumberDire + 1
-		end
-	end
-	print("Radiant: "..PlayerNumberRadiant)
-	print("Dire: "..PlayerNumberDire)
-
-	-- Win Conditions
+	-- WIN Conditions
 	timers.Duel = Timers:CreateTimer(1.0, function()
 		print("Check Death")
 		if duel == 1 then
-			for _, hero in pairs(heroes) do
-				if PlayerResource:IsValidPlayerID(hero:GetPlayerOwnerID()) then
-					if PlayerNumberRadiant <= 0 then
-						local trigger_duel_dire = Entities:FindAllByName("trigger_duel_dire")
-						SPECIAL_EVENT = 0
-						ANKHS = 1
-						for _, v in pairs(trigger_duel_dire) do
-							v:Enable()
-						end
-					end
-					if PlayerNumberDire <= 0 then
-						local trigger_duel_radiant = Entities:FindAllByName("trigger_duel_radiant")
-						SPECIAL_EVENT = 0
-						ANKHS = 1
-						for _,v in pairs(trigger_duel_radiant) do
-							v:Enable()
-						end
-					end
-				else
-					return
-				end
+			if PlayerNumberRadiant <= 0 then
+--				DuelEnd(DIRE)
+				GameRules:SetGameWinner(DOTA_TEAM_BADGUYS)
+			end
+			if PlayerNumberDire <= 0 then
+--				DuelEnd(RADIANT)
+				GameRules:SetGameWinner(DOTA_TEAM_GOODGUYS)
 			end
 		else
 			return nil
@@ -502,46 +477,33 @@ mode:SetFixedRespawnTime(1)
 	end)
 end
 
-function DuelEventDireEnd(event)
-local activator = event.activator
-local point = Entities:FindByName(nil, "base_spawn"):GetAbsOrigin()
-print("Dire won the duel!")
---	PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(), activator)
-	Timers:CreateTimer(0.2, function()
-		if activator:GetTeam() == DOTA_TEAM_BADGUYS then
-			activator:AddItemByName("item_orb_of_frost")
-			FindClearSpaceForUnit(activator, point, true)
-			print("Frost Orb added")
-			activator:SetTeam(DOTA_TEAM_GOODGUYS)
-			if activator:GetPlayerOwner() then
-				activator:GetPlayerOwner():SetTeam(DOTA_TEAM_GOODGUYS)
-			end
-		end
-		Timers:RemoveTimer(timers.Duel)
-		duel = 0
-		mode:SetFixedRespawnTime(40)
-	end)
-end
-
-function DuelEventRadiantEnd(event)
-local activator = event.activator
-local point = Entities:FindByName(nil, "base_spawn"):GetAbsOrigin()
-print("Radiant won the duel!")
---	PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(), activator)
-	Timers:CreateTimer(0.2, function()
-		if activator:GetTeam() == DOTA_TEAM_GOODGUYS then
-			activator:AddItemByName("item_orb_of_frost")
-			FindClearSpaceForUnit(activator, point, true)
-			print("Frost Orb added")
-		end
-		if activator:GetTeam() == DOTA_TEAM_BADGUYS then
-			activator:SetTeam(DOTA_TEAM_GOODGUYS)
-			if activator:GetPlayerOwner() then
-				activator:GetPlayerOwner():SetTeam(DOTA_TEAM_GOODGUYS)
-			end
-		end
-		Timers:RemoveTimer(timers.Duel)
-		duel = 0
-		mode:SetFixedRespawnTime(40)
-	end)
-end
+--	function DuelEnd(winner)
+--		local point = Entities:FindByName(nil, "base_spawn"):GetAbsOrigin()
+--		print(winner.." has won!")
+--		for _, hero in pairs(radiant_hero_list) do
+--			if PlayerResource:IsValidPlayerID(hero:GetPlayerOwnerID()) then
+--				if winner == RADIANT then
+--					hero:AddItemByName("item_orb_of_frost")
+--				end
+--				FindClearSpaceForUnit(hero, point, true)
+--			end
+--		end
+--		for _, hero in pairs(dire_hero_list) do
+--			if PlayerResource:IsValidPlayerID(hero:GetPlayerOwnerID()) then
+--				if winner == DIRE then
+--					hero:AddItemByName("item_orb_of_frost")
+--				end
+--				hero:SetTeam(DOTA_TEAM_GOODGUYS)
+--				if hero:GetPlayerOwner() then
+--					hero:GetPlayerOwner():SetTeam(DOTA_TEAM_GOODGUYS)
+--				end
+--				FindClearSpaceForUnit(hero, point, true)
+--			end
+--		end
+--		radiant_hero_list = {}
+--		dire_hero_list = {}
+--		Timers:RemoveTimer(timers.Duel)
+--		duel = 0
+--		SPECIAL_EVENT = 0
+--		ANKHS = 1
+--	end

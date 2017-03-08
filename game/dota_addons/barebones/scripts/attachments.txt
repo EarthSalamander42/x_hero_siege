@@ -10,124 +10,61 @@
 	{
 		"attach_hitloc"
 		{
+			"models/heroes/wraith_king/wraith_king_chest.vmdl"
+			{
+				"scale"		"1"
+				"pitch"		"-4"
+				"roll"		"0"
+				"ZPos"		"-95"
+				"YPos"		"-2"
+				"yaw"		"0"
+				"XPos"		"22"
+			}
+			"models/heroes/wraith_king/wraith_king_shoulder.vmdl"
+			{
+				"scale"		"1"
+				"pitch"		"-20"
+				"roll"		"10"
+				"yaw"		"45"
+				"YPos"		"-3"
+				"ZPos"		"-111"
+				"XPos"		"20"
+			}
+			"models/items/wraith_king/regalia_of_the_bonelord_cape.vmdl"
+			{
+				"scale"		"1"
+				"pitch"		"-10"
+				"roll"		"0"
+				"ZPos"		"-108"
+				"YPos"		"-4"
+				"yaw"		"0"
+				"XPos"		"16"
+			}
 		}
 		"attach_head"
 		{
-			"models/heroes/skeleton_king/wraith_king_head.vmdl"
-			{
-				"scale"		"0.85"
-				"pitch"		"-101"
-				"roll"		"15"
-				"ZPos"		"0"
-				"YPos"		"0"
-				"yaw"		"-20"
-				"XPos"		"171"
-			}
-			"models/heroes/skeleton_king/wraith_king_shoulder.vmdl"
-			{
-				"scale"		"0.89999997615814"
-				"pitch"		"-101"
-				"roll"		"15"
-				"ZPos"		"0"
-				"YPos"		"0"
-				"yaw"		"-20"
-				"XPos"		"171"
-			}
-			"models/heroes/skeleton_king/wraith_king_cape.vmdl"
+			"models/items/wraith_king/kings_spite_head/kings_spite_head.vmdl"
 			{
 				"scale"		"1"
-				"pitch"		"-101"
-				"roll"		"15"
-				"ZPos"		"0"
-				"YPos"		"0"
-				"yaw"		"-20"
-				"XPos"		"173"
+				"pitch"		"-15"
+				"roll"		"0"
+				"ZPos"		"-169"
+				"YPos"		"1"
+				"yaw"		"5"
+				"XPos"		"10"
 			}
-		}
-		"attach_attack2"
-		{
 		}
 		"attach_attack1"
 		{
-			"models/items/skeleton_king/spine_splitter/spine_splitter.vmdl"
-			{
-				"scale"		"1"
-				"pitch"		"20"
-				"yaw"		"100"
-				"XPos"		"-16"
-				"YPos"		"58"
-				"ZPos"		"-57"
-				"roll"		"105"
-			}
-			"models/items/skeleton_king/regalia_of_the_bonelord_sword/regalia_of_the_bonelord_sword.vmdl"
-			{
-				"scale"		"1"
-				"pitch"		"20"
-				"yaw"		"100"
-				"XPos"		"-16"
-				"YPos"		"58"
-				"ZPos"		"-57"
-				"roll"		"105"
-			}
-			"models/heroes/skeleton_king/wraith_king_gauntlet.vmdl"
-			{
-				"scale"		"1"
-				"pitch"		"35"
-				"roll"		"-48"
-				"ZPos"		"-12"
-				"YPos"		"57"
-				"yaw"		"139"
-				"XPos"		"91"
-			}
-			"models/items/skeleton_king/weapon_backbone.vmdl"
-			{
-				"scale"		"1"
-				"pitch"		"20"
-				"yaw"		"100"
-				"XPos"		"-16"
-				"YPos"		"58"
-				"ZPos"		"-57"
-				"roll"		"105"
-			}
 			"models/items/skeleton_king/the_blood_shard/the_blood_shard.vmdl"
 			{
 				"scale"		"1"
 				"pitch"		"20"
+				"roll"		"105"
 				"yaw"		"100"
-				"XPos"		"-16"
 				"YPos"		"58"
 				"ZPos"		"-57"
-				"roll"		"105"
-			}
-			"models/items/skeleton_king/sk_dragon_jaw/sk_dragon_jaw.vmdl"
-			{
-				"scale"		"1"
-				"pitch"		"20"
-				"yaw"		"100"
 				"XPos"		"-16"
-				"YPos"		"58"
-				"ZPos"		"-57"
-				"roll"		"105"
-			}
-			"models/items/skeleton_king/weapon_spine_sword.vmdl"
-			{
-				"scale"		"1"
-				"pitch"		"20"
-				"yaw"		"100"
-				"XPos"		"-16"
-				"YPos"		"58"
-				"ZPos"		"-57"
-				"roll"		"105"
-			}
-			"models/items/skeleton_king/shattered_destroyer/shattered_destroyer.vmdl"
-			{
-				"scale"		"1"
-				"pitch"		"20"
-				"yaw"		"100"
-				"XPos"		"-16"
-				"YPos"		"58"
-				"ZPos"		"-57"
-				"roll"		"105"
 			}
 		}
 	}

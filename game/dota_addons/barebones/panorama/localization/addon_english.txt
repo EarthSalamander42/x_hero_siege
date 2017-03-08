@@ -38,10 +38,9 @@
 	"AddonDifficultyHard"						"Hard: 100% Gold, 90% XP, 125% Damage."
 	"AddonDifficultyExtreme"					"Extreme: 100% Gold, 75% XP, 150% Damage."
 	"VIPTab"									"VIP Section:"
-	"VIPHeader"									"Get your access now to unlock:\n - Kobold Knight,\n - Centurion,\n - Lich King,\n - Stone Giant,\n - Dark Fundamental! \n\nDonate on Patreon to be a VIP (Link in mod description) \nMore VIP Heroes very soon!"
-	"VIPHeader2"								""
+	"VIPHeader"									"Get your access now to unlock:\n - Desert Wyrm,\n - Dark Fundamental,\n - Kobold Knight,\n - Stone Giant,\n - Lich King,\n - Centurion,\n - Dark Summoner! \n\nDonate on Patreon to be a VIP \n(Link in mod description) \nMore VIP Heroes very soon!"
 	"community_header"							"Join Discord Chat"
-	"community_description"						"Join Discord Chat to talk about the mod with other players and the developer! And join Steam Group to report bugs and join events!"
+	"community_description"						"- Join Discord Chat to talk about the mod with other players and the developer! - Join the Steam Group to report bugs and join events! - Join the Facebook Page for recent infos about the mod!"
 
 	// Admin Mod
 	"credits_command"							"Mod Created by [Bear] Cookies #42"

@@ -78,12 +78,14 @@ local hero_level = npc:GetLevel()
 	if npc:GetUnitName() == "npc_dota_hero_tiny" and hero_level >= 20 then
 		local ability = npc:FindAbilityByName("holdout_war_club_20")
 		npc:RemoveModifierByName("modifier_item_ultimate_scepter_consumed")
+		npc:RemoveModifierByName("modifier_item_ultimate_scepter_consumed")
 		npc:AddNewModifier(npc, ability, "modifier_item_ultimate_scepter_consumed", {})
 	end
 
 	if npc:GetUnitName() == "npc_dota_hero_chaos_knight" then
 		npc:SetAbilityPoints(0)
 	end
+
 	if npc:GetUnitName() == "npc_dota_hero_keeper_of_the_light" then
 		npc:SetAbilityPoints(0)
 	end
@@ -142,12 +144,11 @@ local hero_level = npc:GetLevel()
 		"holdout_stitch",
 		"troll_warlord_berserkers_rage",
 		"holdout_random_hero",
---		"troll_warlord_whirling_axes_ranged",
---		"troll_warlord_whirling_axes_melee",
-		"holdout_yellow_effect", --Desert Wyrm Ultimate effect
-		"holdout_blue_effect", --Lich King boss + hero effect
-		"holdout_green_effect", --Banehallow boss + hero effect
-		"holdout_red_effect" --Abaddon boss
+		"holdout_spellsteal",
+		"holdout_yellow_effect",	--Desert Wyrm Ultimate effect
+		"holdout_blue_effect",		--Lich King boss + hero effect
+		"holdout_green_effect",		--Banehallow boss + hero effect
+		"holdout_red_effect"		--Abaddon boss
 	}
 
 	-- Cycle through any innate abilities found, then upgrade them
@@ -211,50 +212,65 @@ local hero_level = npc:GetLevel()
 		end
 	end
 
-	if npc:GetTeam() == DOTA_TEAM_GOODGUYS then
-		for i = 1, #golden_vip_members do
-			if npc:IsRealHero() then
-				-- Cookies or X Hero Siege Official
-				if PlayerResource:GetSteamAccountID(npc:GetPlayerID()) == mod_creator[i] then
-					npc:SetCustomHealthLabel("Mod Creator", 200, 45, 45)
-					if not npc:HasAbility("holdout_vip") then
-						local vip_ability = npc:AddAbility("holdout_vip")
-						vip_ability:SetLevel(1)
+	if npc:GetTeam() == DOTA_TEAM_GOODGUYS and npc:IsRealHero() then
+		if GetMapName() == "x_hero_siege" then
+			for i = 1, #permanent_vip do
+				if npc:IsRealHero() then
+					-- Cookies or X Hero Siege Official
+					if PlayerResource:GetSteamAccountID(npc:GetPlayerID()) == mod_creator[i] then
+						npc:SetCustomHealthLabel("Mod Creator", 200, 45, 45)
+						if not npc:HasAbility("holdout_vip") then
+							local vip_ability = npc:AddAbility("holdout_vip")
+							vip_ability:SetLevel(1)
+						end
 					end
-				end
-				-- Baumi
-				if PlayerResource:GetSteamAccountID(npc:GetPlayerID()) == captain_baumi[i] then
-					npc:SetCustomHealthLabel("Baumi Nation is real!", 55, 55, 200)
-					if not npc:HasAbility("holdout_vip") then
-						local vip_ability = npc:AddAbility("holdout_vip")
-						vip_ability:SetLevel(1)
+					-- Baumi
+					if PlayerResource:GetSteamAccountID(npc:GetPlayerID()) == captain_baumi[i] then
+						npc:SetCustomHealthLabel("Baumi Nation is real!", 55, 55, 200)
+						if not npc:HasAbility("holdout_vip") then
+							local vip_ability = npc:AddAbility("holdout_vip")
+							vip_ability:SetLevel(1)
+						end
 					end
-				end
-				-- Mugiwara or Flotos
-				if PlayerResource:GetSteamAccountID(npc:GetPlayerID()) == mod_graphist[i] then
-					npc:SetCustomHealthLabel("Mod Graphist", 55, 55, 200)
-					if not npc:HasAbility("holdout_vip") then
-						local vip_ability = npc:AddAbility("holdout_vip")
-						vip_ability:SetLevel(1)
+					-- Permanent VIP's
+					if PlayerResource:GetSteamAccountID(npc:GetPlayerID()) == permanent_vip[i] then
+						npc:SetCustomHealthLabel("Permanent VIP", 255, 100, 0)
+						if not npc:HasAbility("holdout_vip") then
+							local vip_ability = npc:AddAbility("holdout_vip")
+							vip_ability:SetLevel(1)
+						end
 					end
-				end
-				-- See VIP List on Top
-				if PlayerResource:GetSteamAccountID(npc:GetPlayerID()) == vip_members[i] then
-					npc:SetCustomHealthLabel("VIP Member", 45, 200, 45)
-					if not npc:HasAbility("holdout_vip") then
-						local vip_ability = npc:AddAbility("holdout_vip")
-						vip_ability:SetLevel(1)
+					-- Mugiwara or Flotos
+					if PlayerResource:GetSteamAccountID(npc:GetPlayerID()) == mod_graphist[i] then
+						npc:SetCustomHealthLabel("Mod Graphist", 55, 55, 200)
+						if not npc:HasAbility("holdout_vip") then
+							local vip_ability = npc:AddAbility("holdout_vip")
+							vip_ability:SetLevel(1)
+						end
 					end
-				end
-				if PlayerResource:GetSteamAccountID(npc:GetPlayerID()) == golden_vip_members[i] then
-					npc:SetCustomHealthLabel("Golden VIP Member", 218, 165, 32)
-					if not npc:HasAbility("holdout_vip") then
-						local vip_ability = npc:AddAbility("holdout_vip")
-						vip_ability:SetLevel(1)
+					-- See VIP List on Top
+					if PlayerResource:GetSteamAccountID(npc:GetPlayerID()) == vip_members[i] then
+						npc:SetCustomHealthLabel("VIP Member", 45, 200, 45)
+						if not npc:HasAbility("holdout_vip") then
+							local vip_ability = npc:AddAbility("holdout_vip")
+							vip_ability:SetLevel(1)
+						end
+					end
+					if PlayerResource:GetSteamAccountID(npc:GetPlayerID()) == golden_vip_members[i] then
+						npc:SetCustomHealthLabel("Golden VIP Member", 218, 165, 32)
+						if not npc:HasAbility("holdout_vip") then
+							local vip_ability = npc:AddAbility("holdout_vip")
+							vip_ability:SetLevel(1)
+						end
 					end
 				end
 			end
 		end
+	end
+
+	-- ARENA MODE BUFF
+	if GetMapName() == "arena_mode" and npc:IsRealHero() then
+		npc:SetBaseMagicalResistanceValue(50)
 	end
 
 	-- This internal handling is used to set up main barebones functions
@@ -646,22 +662,32 @@ local playerKills = PlayerResource:GetKills(KillerID)
 		end
 	end
 
-	if killerEntity:IsRealHero() and killedUnit:IsRealHero() and killedUnit:GetTeam() == DOTA_TEAM_GOODGUYS then
-		if PlayerResource:HasSelectedHero(KillerID) then
-			PlayerNumberRadiant = PlayerNumberRadiant - 1
-			print("Radiant Team: "..PlayerNumberRadiant)
+	if GetMapName() == "x_hero_siege" then
+		if killerEntity:IsRealHero() and killedUnit:IsRealHero() and killedUnit:GetTeam() == DOTA_TEAM_GOODGUYS then
+			if PlayerResource:HasSelectedHero(KillerID) then
+				PlayerNumberRadiant = PlayerNumberRadiant - 1
+				print("Radiant Team: "..PlayerNumberRadiant)
+			end
+		elseif killerEntity:IsRealHero() and killedUnit:IsRealHero() and killedUnit:GetTeam() == DOTA_TEAM_BADGUYS then
+			if PlayerResource:HasSelectedHero(KillerID) then
+				PlayerNumberDire = PlayerNumberDire - 1
+				print("Dire Team: "..PlayerNumberDire)
+			end
+		elseif killerEntity:IsRealHero() and killedUnit:IsCreep() and killedUnit:GetTeam() == DOTA_TEAM_BADGUYS then
+			if PlayerResource:HasSelectedHero(KillerID) then
+				killerEntity:IncrementKills(1)
+			end
 		end
-	elseif killerEntity:IsRealHero() and killedUnit:IsRealHero() and killedUnit:GetTeam() == DOTA_TEAM_BADGUYS then
-		if PlayerResource:HasSelectedHero(KillerID) then
-			PlayerNumberDire = PlayerNumberDire - 1
-			print("Dire Team: "..PlayerNumberDire)
+	else
+		if killedUnit:IsRealHero() then
+			KILLS_TO_WIN = KILLS_TO_WIN
+			if GetTeamHeroKills(killerEntity:GetTeam()) >= KILLS_TO_WIN then
+				GameRules:SetSafeToLeave(true)
+				GameRules:SetGameWinner(killerEntity:GetTeam())
+			end
+			GameRules:GetGameModeEntity():SetTopBarTeamValue(DOTA_TEAM_BADGUYS, GetTeamHeroKills(DOTA_TEAM_BADGUYS))
+			GameRules:GetGameModeEntity():SetTopBarTeamValue(DOTA_TEAM_GOODGUYS, GetTeamHeroKills(DOTA_TEAM_GOODGUYS))
 		end
-	elseif killerEntity:IsRealHero() and killedUnit:GetTeam() == DOTA_TEAM_BADGUYS then
-		if PlayerResource:HasSelectedHero(KillerID) then
-			killerEntity:IncrementKills(1)
-		end
-	elseif killerEntity:IsBuilding() and killedUnit:GetTeam() == DOTA_TEAM_BADGUYS then
-		return nil
 	end
 
 	for c = 1, 8 do
@@ -883,17 +909,67 @@ local player = PlayerResource:GetPlayer(playerID)
 		end
 
 		local newState = GameRules:State_Get()
-		if newState == DOTA_GAMERULES_STATE_PRE_GAME then
-			Notifications:Bottom({player, text="Game has not started yet!", style={color="white"}, duration=5.0})
-		elseif newState == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
-			if GameRules:PlayerHasCustomGameHostPrivileges(player) or PlayerResource:GetSteamAccountID(player:GetPlayerID()) == mod_creator[i] then
-				for t = 1, 8 do
-					if str == "-openway_"..t or str == "-ow"..t then
-						if BARRACKMENTS[t] == 1 then
-							Notifications:TopToAll({text="Red Player opened lane "..t.."!", style={color="white"}, duration=5.0})
+		if GetMapName() == "x_hero_siege" then
+			if newState == DOTA_GAMERULES_STATE_PRE_GAME then
+				Notifications:Bottom({player, text="Game has not started yet!", style={color="white"}, duration=5.0})
+			elseif newState == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
+				if GameRules:PlayerHasCustomGameHostPrivileges(player) or PlayerResource:GetSteamAccountID(player:GetPlayerID()) == mod_creator[i] then
+					for t = 1, 8 do
+						if str == "-openway_"..t or str == "-ow"..t then
+							if BARRACKMENTS[t] == 1 then
+								Notifications:TopToAll({text="Red Player opened lane "..t.."!", style={color="white"}, duration=5.0})
+								CREEP_LANES[t] = 1
+								local DoorObs = Entities:FindAllByName("obstruction_lane"..t)
+								for _, obs in pairs(DoorObs) do 
+									obs:SetEnabled(false, true)
+								end
+								DoEntFire("door_lane"..t, "SetAnimation", "gate_entrance002_open", 0, nil, nil)
+								local towers = Entities:FindAllByName("dota_badguys_tower"..t)
+								for _, tower in pairs(towers) do
+									tower:RemoveModifierByName("modifier_invulnerable")
+								end
+								local raxes = Entities:FindAllByName("dota_badguys_barracks_"..t)
+								for _, rax in pairs(raxes) do
+									rax:RemoveModifierByName("modifier_invulnerable")
+								end
+							elseif BARRACKMENTS[t] == 0 then
+								Notifications:TopToAll({text="Can't open Lane "..t..", barrackment destroyed!", style={color="white"}, duration=5.0})
+							end
+						end
+					end
+
+					for t = 1, 4 do
+						if str == "-closeway_"..t or str == "-cw"..t then
+							Notifications:TopToAll({text="Lanes 1, 2, 3, 4 can't be closed!", style={color="white"}, duration=5.0})
+						end
+					end
+
+					for t = 5, 8 do
+						if str == "-closeway_"..t or str == "-cw"..t then
+							Notifications:TopToAll({text="Red Player closed lane "..t.."!", style={color="white"}, duration=5.0})
 							CREEP_LANES[t] = 1
 							local DoorObs = Entities:FindAllByName("obstruction_lane"..t)
 							for _, obs in pairs(DoorObs) do 
+								obs:SetEnabled(true, true)
+							end
+							DoEntFire("door_lane"..t, "SetAnimation", "gate_entrance002_idle", 0, nil, nil)
+							local towers = Entities:FindAllByName("dota_badguys_tower"..t)
+							for _, tower in pairs(towers) do
+								tower:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
+							end
+							local raxes = Entities:FindAllByName("dota_badguys_barracks_"..t)
+							for _, rax in pairs(raxes) do
+								rax:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
+							end
+						end
+					end
+
+					if str == "-openway_all" or str == "-ow_all" then
+						Notifications:TopToAll({text="Red Player opened all lanes!", style={color="white"}, duration=5.0})
+						for t = 1, 8 do
+							CREEP_LANES[t] = 1
+							local DoorObs = Entities:FindAllByName("obstruction_lane"..t)
+							for _, obs in pairs(DoorObs) do
 								obs:SetEnabled(false, true)
 							end
 							DoEntFire("door_lane"..t, "SetAnimation", "gate_entrance002_open", 0, nil, nil)
@@ -905,76 +981,48 @@ local player = PlayerResource:GetPlayer(playerID)
 							for _, rax in pairs(raxes) do
 								rax:RemoveModifierByName("modifier_invulnerable")
 							end
-						elseif BARRACKMENTS[t] == 0 then
-							Notifications:TopToAll({text="Can't open Lane "..t..", barrackment destroyed!", style={color="white"}, duration=5.0})
+						end
+					end
+
+					if str == "-closeway_all" or str == "-cw_all" then
+						Notifications:TopToAll({text="Red Player closed all lanes (excluding 1, 2, 3, 4)!", style={color="white"}, duration=5.0})
+						for t = 5, 8 do
+							CREEP_LANES[t] = 0
+							local DoorObs = Entities:FindAllByName("obstruction_lane"..t)
+							for _, obs in pairs(DoorObs) do 
+								obs:SetEnabled(true, true)
+							end
+							DoEntFire("door_lane"..t, "SetAnimation", "gate_entrance002_idle", 0, nil, nil)
+							local towers = Entities:FindAllByName("dota_badguys_tower"..t)
+							for _, tower in pairs(towers) do
+								tower:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
+							end
+							local raxes = Entities:FindAllByName("dota_badguys_barracks_"..t)
+							for _, rax in pairs(raxes) do
+								rax:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
+							end
 						end
 					end
 				end
-
-				for t = 1, 4 do
-					if str == "-closeway_"..t or str == "-cw"..t then
-						Notifications:TopToAll({text="Lanes 1, 2, 3, 4 can't be closed!", style={color="white"}, duration=5.0})
-					end
-				end
-
-				for t = 5, 8 do
-					if str == "-closeway_"..t or str == "-cw"..t then
-						Notifications:TopToAll({text="Red Player closed lane "..t.."!", style={color="white"}, duration=5.0})
-						CREEP_LANES[t] = 1
-						local DoorObs = Entities:FindAllByName("obstruction_lane"..t)
-						for _, obs in pairs(DoorObs) do 
-							obs:SetEnabled(true, true)
-						end
-						DoEntFire("door_lane"..t, "SetAnimation", "gate_entrance002_idle", 0, nil, nil)
-						local towers = Entities:FindAllByName("dota_badguys_tower"..t)
-						for _, tower in pairs(towers) do
-							tower:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
-						end
-						local raxes = Entities:FindAllByName("dota_badguys_barracks_"..t)
-						for _, rax in pairs(raxes) do
-							rax:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
-						end
-					end
-				end
-
-				if str == "-openway_all" or str == "-ow_all" then
-					Notifications:TopToAll({text="Red Player opened all lanes!", style={color="white"}, duration=5.0})
-					for t = 1, 8 do
-						CREEP_LANES[t] = 1
-						local DoorObs = Entities:FindAllByName("obstruction_lane"..t)
-						for _, obs in pairs(DoorObs) do
-							obs:SetEnabled(false, true)
-						end
-						DoEntFire("door_lane"..t, "SetAnimation", "gate_entrance002_open", 0, nil, nil)
-						local towers = Entities:FindAllByName("dota_badguys_tower"..t)
-						for _, tower in pairs(towers) do
-							tower:RemoveModifierByName("modifier_invulnerable")
-						end
-						local raxes = Entities:FindAllByName("dota_badguys_barracks_"..t)
-						for _, rax in pairs(raxes) do
-							rax:RemoveModifierByName("modifier_invulnerable")
-						end
-					end
-				end
-
-				if str == "-closeway_all" or str == "-cw_all" then
-					Notifications:TopToAll({text="Red Player closed all lanes (excluding 1, 2, 3, 4)!", style={color="white"}, duration=5.0})
-					for t = 5, 8 do
-						CREEP_LANES[t] = 0
-						local DoorObs = Entities:FindAllByName("obstruction_lane"..t)
-						for _, obs in pairs(DoorObs) do 
-							obs:SetEnabled(true, true)
-						end
-						DoEntFire("door_lane"..t, "SetAnimation", "gate_entrance002_idle", 0, nil, nil)
-						local towers = Entities:FindAllByName("dota_badguys_tower"..t)
-						for _, tower in pairs(towers) do
-							tower:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
-						end
-						local raxes = Entities:FindAllByName("dota_badguys_barracks_"..t)
-						for _, rax in pairs(raxes) do
-							rax:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
-						end
-					end
+			end
+			if str == "-bt" then
+			local hero = PlayerResource:GetPlayer(playerID):GetAssignedHero()
+			local gold = hero:GetGold()
+			local cost = 10000
+			local numberOfTomes = math.floor(gold / cost)
+				if numberOfTomes >= 1 and BT_ENABLED == 1 then
+					PlayerResource:SpendGold(playerID, (numberOfTomes) * cost, DOTA_ModifyGold_PurchaseItem)
+					hero:ModifyAgility(numberOfTomes * 50)
+					hero:ModifyStrength(numberOfTomes * 50)
+					hero:ModifyIntellect(numberOfTomes * 50)
+					hero:EmitSound("ui.trophy_levelup")
+					local particle1 = ParticleManager:CreateParticle("particles/econ/events/ti6/hero_levelup_ti6.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
+					ParticleManager:SetParticleControl(particle1, 0, hero:GetAbsOrigin())
+					Notifications:Top(player, {text="You've bought "..numberOfTomes.." Tomes!", duration=5.0, style={color="white"}})
+				elseif numberOfTomes < 1 then
+					Notifications:Top(player, {text="You don't have enough gold to afford tomes!", duration=5.0, style={color="white"}})
+				elseif BT_ENABLED == 0 then
+					Notifications:Top(player, {text="You are not allowed to buy tomes in this arena!", duration=5.0, style={color="white"}})
 				end
 			end
 		end
@@ -986,27 +1034,6 @@ local player = PlayerResource:GetPlayer(playerID)
 		if str == "-difficulty" then
 			local diff = {"Easy", "Normal", "Hard", "Extreme"}
 			Notifications:Top(player, {text="DIFFICULTY: "..diff[GameRules:GetCustomGameDifficulty()], duration=10.0})
-		end
-
-		if str == "-bt" then
-		local hero = PlayerResource:GetPlayer(playerID):GetAssignedHero()
-		local gold = hero:GetGold()
-		local cost = 10000
-		local numberOfTomes = math.floor(gold / cost)
-			if numberOfTomes >= 1 and BT_ENABLED == 1 then
-				PlayerResource:SpendGold(playerID, (numberOfTomes) * cost, DOTA_ModifyGold_PurchaseItem)
-				hero:ModifyAgility(numberOfTomes * 50)
-				hero:ModifyStrength(numberOfTomes * 50)
-				hero:ModifyIntellect(numberOfTomes * 50)
-				hero:EmitSound("ui.trophy_levelup")
-				local particle1 = ParticleManager:CreateParticle("particles/econ/events/ti6/hero_levelup_ti6.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
-				ParticleManager:SetParticleControl(particle1, 0, hero:GetAbsOrigin())
-				Notifications:Top(player, {text="You've bought "..numberOfTomes.." Tomes!", duration=5.0, style={color="white"}})
-			elseif numberOfTomes < 1 then
-				Notifications:Top(player, {text="You don't have enough gold to afford tomes!", duration=5.0, style={color="white"}})
-			elseif BT_ENABLED == 0 then
-				Notifications:Top(player, {text="You are not allowed to buy tomes in this arena!", duration=5.0, style={color="white"}})
-			end
 		end
 	end
 end

@@ -1,23 +1,7 @@
 "use strict";
 
-function UpdateTimerMuradin( data )
+function UpdateTimerMuradin(data)
 {
-	//$.Msg( "UpdateTimer: ", data );
-	//var timerValue = Game.GetDOTATime( false, false );
-
-	//var sec = Math.floor( timerValue % 60 );
-	//var min = Math.floor( timerValue / 60 );
-
-	//var timerText = "";
-	//timerText += min;
-	//timerText += ":";
-
-	//if ( sec < 10 )
-	//{
-	//	timerText += "0";
-	//}
-	//timerText += sec;
-
 	var timerText = "";
 	timerText += data.timer_minute_10;
 	timerText += data.timer_minute_01;
@@ -25,27 +9,11 @@ function UpdateTimerMuradin( data )
 	timerText += data.timer_second_10;
 	timerText += data.timer_second_01;
 
-	$( "#Timer" ).text = timerText;
+	$("#Timer").text = timerText;
 }
 
-function UpdateTimerCreep( data )
+function UpdateTimerCreep(data)
 {
-	//$.Msg( "UpdateTimer: ", data );
-	//var timerValue = Game.GetDOTATime( false, false );
-
-	//var sec = Math.floor( timerValue % 60 );
-	//var min = Math.floor( timerValue / 60 );
-
-	//var timerText = "";
-	//timerText += min;
-	//timerText += ":";
-
-	//if ( sec < 10 )
-	//{
-	//	timerText += "0";
-	//}
-	//timerText += sec;
-
 	var timerText = "";
 	timerText += data.timer_minute_10_2;
 	timerText += data.timer_minute_01_2;
@@ -53,27 +21,11 @@ function UpdateTimerCreep( data )
 	timerText += data.timer_second_10_2;
 	timerText += data.timer_second_01_2;
 
-	$( "#CreepTimer" ).text = timerText;
+	$("#CreepTimer").text = timerText;
 }
 
-function UpdateTimerIncomingWave( data )
+function UpdateTimerIncomingWave(data)
 {
-	//$.Msg( "UpdateTimer: ", data );
-	//var timerValue = Game.GetDOTATime( false, false );
-
-	//var sec = Math.floor( timerValue % 60 );
-	//var min = Math.floor( timerValue / 60 );
-
-	//var timerText = "";
-	//timerText += min;
-	//timerText += ":";
-
-	//if ( sec < 10 )
-	//{
-	//	timerText += "0";
-	//}
-	//timerText += sec;
-
 	var timerText3 = "";
 	timerText3 += data.timer_minute_10_3;
 	timerText3 += data.timer_minute_01_3;
@@ -81,27 +33,11 @@ function UpdateTimerIncomingWave( data )
 	timerText3 += data.timer_second_10_3;
 	timerText3 += data.timer_second_01_3;
 
-	$( "#IncomingWaveTimer" ).text = timerText3;
+	$("#IncomingWaveTimer").text = timerText3;
 }
 
-function UpdateTimerSpecialEvents( data )
+function UpdateTimerSpecialEvents(data)
 {
-	//$.Msg( "UpdateTimer: ", data );
-	//var timerValue = Game.GetDOTATime( false, false );
-
-	//var sec = Math.floor( timerValue % 60 );
-	//var min = Math.floor( timerValue / 60 );
-
-	//var timerText = "";
-	//timerText += min;
-	//timerText += ":";
-
-	//if ( sec < 10 )
-	//{
-	//	timerText += "0";
-	//}
-	//timerText += sec;
-
 	var timerText3 = "";
 	timerText3 += data.timer_minute_10_3;
 	timerText3 += data.timer_minute_01_3;
@@ -109,39 +45,36 @@ function UpdateTimerSpecialEvents( data )
 	timerText3 += data.timer_second_10_3;
 	timerText3 += data.timer_second_01_3;
 
-	$( "#SpecialEventsTimer" ).text = timerText3;
+	$("#SpecialEventsTimer").text = timerText3;
 }
 
-function ShowTimer( data )
+function ShowTimer(data)	// if Map is X Hero Siege then
 {
-	$( "#Timer" ).AddClass( "timer_visible" );
+	$("#Timer").AddClass("timer_visible");
+	GameUI.SetDefaultUIEnabled(DotaDefaultUIElement_t.DOTA_DEFAULT_UI_TOP_BAR_SCORE, false);
+	GameUI.SetDefaultUIEnabled(DotaDefaultUIElement_t.DOTA_DEFAULT_UI_TOP_BAR_DIRE_TEAM, false);
+	$("#ScoreboardLeft_Parent").visible = true;
 }
 
-function UpdateKillsToWin()
+function OnGameStateChanged(table, key, data)
 {
-	var victory_condition = CustomNetTables.GetTableValue( "game_state", "victory_condition" );
-	if ( victory_condition )
-	{
-		$("#VictoryPoints").text = victory_condition.kills_to_win;
-	}
+	$.Msg("Table '", table, "' changed: '", key, "' = ", data);
 }
 
-function OnGameStateChanged( table, key, data )
+$.Schedule(0.025, visibleSwitch);
+function visibleSwitch()
 {
-	$.Msg( "Table '", table, "' changed: '", key, "' = ", data );
-	UpdateKillsToWin();
+	$("#ScoreboardLeft_Parent").visible = false;
 }
 
 (function()
 {
 	// We use a nettable to communicate victory conditions to make sure we get the value regardless of timing.
-	UpdateKillsToWin();
-	CustomNetTables.SubscribeNetTableListener( "game_state", OnGameStateChanged );
+	CustomNetTables.SubscribeNetTableListener("game_state", OnGameStateChanged);
 
-	GameEvents.Subscribe( "incomingwavecountdown", UpdateTimerSpecialEvents );
-	GameEvents.Subscribe( "specialeventscountdown", UpdateTimerIncomingWave );
-	GameEvents.Subscribe( "creepcountdown", UpdateTimerCreep );
-	GameEvents.Subscribe( "countdown", UpdateTimerMuradin );
-	GameEvents.Subscribe( "show_timer", ShowTimer );
+	GameEvents.Subscribe("incomingwavecountdown", UpdateTimerSpecialEvents);
+	GameEvents.Subscribe("specialeventscountdown", UpdateTimerIncomingWave);
+	GameEvents.Subscribe("creepcountdown", UpdateTimerCreep);
+	GameEvents.Subscribe("countdown", UpdateTimerMuradin);
+	GameEvents.Subscribe("show_timer", ShowTimer);
 })();
-

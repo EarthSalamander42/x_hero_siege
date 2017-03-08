@@ -7,21 +7,23 @@
 		<include src="file://{resources}/scripts/custom_game/xhs_timers.js" />
 	</scripts>
 	<Panel class="ScoreboardLeft">
-		<Panel id="ScoreboardSpecialEvent">
-			<Label id="Goal" text="#Goal" />
-			<Label id="Timer" text="--:--" />
-		</Panel>
-		<Panel id="ScoreboardCreepTime">
-			<Label id="CreepGoal" text="#CreepGoal" />
-			<Label id="CreepTimer" text="--:--" />
-		</Panel>
-		<Panel id="ScoreboardIncomingWaveTime">
-			<Label id="IncomingWaveGoal" text="#IncomingWaveGoal" />
-			<Label id="IncomingWaveTimer" text="--:--" />
-		</Panel>
-		<Panel id="ScoreboardSpecialEventsTime">
-			<Label id="SpecialEventsGoal" text="#SpecialEventsGoal" />
-			<Label id="SpecialEventsTimer" text="--:--" />
+		<Panel id="ScoreboardLeft_Parent">
+			<Panel id="ScoreboardSpecialEvent">
+				<Label id="Goal" text="#Goal" />
+				<Label id="Timer" text="--:--" />
+			</Panel>
+			<Panel id="ScoreboardCreepTime">
+				<Label id="CreepGoal" text="#CreepGoal" />
+				<Label id="CreepTimer" text="--:--" />
+			</Panel>
+			<Panel id="ScoreboardIncomingWaveTime">
+				<Label id="IncomingWaveGoal" text="#IncomingWaveGoal" />
+				<Label id="IncomingWaveTimer" text="--:--" />
+			</Panel>
+			<Panel id="ScoreboardSpecialEventsTime">
+				<Label id="SpecialEventsGoal" text="#SpecialEventsGoal" />
+				<Label id="SpecialEventsTimer" text="--:--" />
+			</Panel>
 		</Panel>
 	</Panel>
 </root>

@@ -267,10 +267,21 @@ local point = Entities:FindByName(nil, "base_spawn")
 					newHero:SwapItems(3, 6)
 					newHero:SwapItems(4, 7)
 					newHero:SwapItems(5, 8)
+					if newHero:GetUnitName() == "npc_dota_hero_skeleton_king" then
+						SkeletonKingWearables(newHero)
+						print("Skeleton King picked!")
+					end
 				end
 			end
 		elseif PlayerResource:IsValidPlayer(playerID) and activator:GetUnitName() == "npc_dota_hero_wisp" then
 			Notifications:Bottom(activator:GetPlayerOwnerID(), {text = msg, duration = 5.0})
 		end
 	end
+end
+
+function SpawnTeleporterLateGame(event)
+local activator = event.activator
+local point = Entities:FindByName(nil, "point_teleport_phase3_creeps")
+	FindClearSpaceForUnit(activator, point:GetAbsOrigin(), true)
+	print("Teleporting top!")
 end

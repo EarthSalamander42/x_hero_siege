@@ -45,7 +45,8 @@
 	"npc_dota_hero_skeleton_king_holdout"
 	{
 		"override_hero"					"npc_dota_hero_skeleton_king"
-//		"DisableWearables"				"1"
+		"DisableWearables"				"1"
+		"Model"							"models/heroes/skeleton_king/skeleton_king.vmdl"
 		"ModelScale"					"1.2"
 		"AttackDamageMin"				"70"
 		"AttackDamageMax"				"80"
@@ -632,6 +633,38 @@
 		"Ability15"						""
 		"Ability16"						""
 		"Ability17"						"ability_unit_died_light"
+	}
+
+	//=======================================================================================================
+	// HERO: Leshrac
+	//=======================================================================================================
+	"npc_dota_hero_leshrac_holdout"
+	{
+		"override_hero"					"npc_dota_hero_leshrac"
+//		"DisableWearables"				"1"
+		"MovementSpeed"					"370"
+
+		"AttributeStrengthGain"			"5"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"10"
+
+		"Ability1"						"leshrac_split_earth"
+		"Ability2"						"leshrac_diabolic_edict"
+		"Ability3"						"leshrac_lightning_storm"
+		"Ability4"						"leshrac_pulse_nova"
+		"Ability5"						"holdout_spellsteal"
+		"Ability6"						"holdout_earthquake"
+		"Ability7"						""
+		"Ability8"						""
+		"Ability9"						""
+		"Ability10"						""
+		"Ability11"						""
+		"Ability12"						""
+		"Ability13"						""
+		"Ability14"						""
+		"Ability15"						""
+		"Ability16"						""
+		"Ability17"						"ability_unit_died_fire"
 	}
 
 	//=======================================================================================================

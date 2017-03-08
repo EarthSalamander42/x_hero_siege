@@ -470,3 +470,30 @@ function SendErrorMessageForSelectedUnit(playerID, string, unit)
 		CustomGameEventManager:Send_ServerToPlayer(PlayerResource:GetPlayer(playerID), "dotacraft_error_message", {message=string})
 	end
 end
+
+-- Skeleton king cosmetics
+function SkeletonKingWearables(newHero)
+
+	-- Cape
+	Attachments:AttachProp(newHero, "attach_hitloc", "models/items/wraith_king/regalia_of_the_bonelord_cape.vmdl", 1.0)
+
+	-- Shoulderpiece
+	Attachments:AttachProp(newHero, "attach_hitloc", "models/heroes/wraith_king/wraith_king_shoulder.vmdl", 1.0)
+
+	-- Crown
+	Attachments:AttachProp(newHero, "attach_head", "models/items/wraith_king/kings_spite_head/kings_spite_head.vmdl", 1.0)
+
+	-- Chest
+	Attachments:AttachProp(newHero, "attach_hitloc", "models/heroes/wraith_king/wraith_king_chest.vmdl", 1.0)
+
+	-- Gauntlet
+--	Attachments:AttachProp(newHero, "attach_attack1", "models/heroes/wraith_king/wraith_king_gauntlet.vmdl", 1.0)
+
+	-- Weapon
+	Attachments:AttachProp(newHero, "attach_attack1", "models/items/skeleton_king/the_blood_shard/the_blood_shard.vmdl", 1.0)
+
+	-- Eye particles
+	local eye_pfx = ParticleManager:CreateParticle("particles/units/heroes/hero_skeletonking/skeletonking_eyes.vpcf", PATTACH_ABSORIGIN, newHero)
+	ParticleManager:SetParticleControlEnt(eye_pfx, 0, newHero, PATTACH_POINT_FOLLOW, "attach_eyeL", newHero:GetAbsOrigin(), true)
+	ParticleManager:SetParticleControlEnt(eye_pfx, 1, newHero, PATTACH_POINT_FOLLOW, "attach_eyeR", newHero:GetAbsOrigin(), true)
+end

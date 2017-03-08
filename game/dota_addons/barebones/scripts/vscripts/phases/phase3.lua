@@ -91,7 +91,8 @@ local stats = 250
 
 	if first_time_teleport_phase3_creeps then
 		RefreshPlayers()
-		DoEntFire("trigger_teleport_phase3_creeps","Kill",nil,0,nil,nil)
+		DoEntFire("trigger_teleport_phase3_creeps", "Kill", nil, 0, nil, nil)
+		Entities:FindByName(nil, "trigger_teleport_late"):Enable()
 		Notifications:TopToAll({text="Power Up: +250 to all stats!", style={color="green"}, duration=10.0})
 		activator:EmitSound("ui.trophy_levelup")
 		local heroes = HeroList:GetAllHeroes()
@@ -316,7 +317,7 @@ local point_boss_1 = Entities:FindByName(nil, "spirit_master_point_bis"):GetAbsO
 local heroes = HeroList:GetAllHeroes()
 RefreshPlayers()
 
-	for _,hero in pairs(heroes) do
+	for _, hero in pairs(heroes) do
 	local id = hero:GetPlayerID()
 	local point_hero = Entities:FindByName(nil, "point_teleport_boss_"..id)
 		if hero:GetTeam() == DOTA_TEAM_GOODGUYS then

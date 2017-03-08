@@ -100,6 +100,22 @@
 	}
 
 	//=================================================================================
+	// Dummy: XP Granter (Used for Arena Mode)
+	//=================================================================================
+	"npc_dota_xp_granter"
+	{
+		"BaseClass"					"npc_dota_creature"
+		"Model"						"models/development/invisiblebox.vmdl"
+		"Ability1"					"dota_ability_xp_granter"
+		"Ability2"					"dota_ability_xp_granter2"
+		"AttackCapabilities"		"DOTA_UNIT_CAP_NO_ATTACK"
+		"BountyXP"					"0"
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_NONE"
+		"StatusHealth"				"5000"
+		"TeamName"					"DOTA_TEAM_NEUTRALS"
+	}
+
+	//=================================================================================
 	// Building: Defender Fort
 	//=================================================================================
 	"npc_dota_defender_fort"
@@ -190,19 +206,14 @@
 		"Model"						"models/props_structures/dire_fountain002.vmdl"	// Model.
 		"SoundSet"					"dota_fountain"					// Name of sound set.
 		"MinimapIcon"				"minimap_ward_obs"
-		"MinimapIconSize"				"1"
+		"MinimapIconSize"			"1"
 		
 		// Abilities
 		//----------------------------------------------------------------
-		
-		"Ability1"					""			// Ability 1.
+//		"Ability1"					"imba_fountain_buffs"			// Ability 1.
 		"Ability2"					""			// Ability 2.
 		"Ability3"					""			// Ability 3.
 		"Ability4"					""			// Ability 4.
-		"Ability5"					""			// Ability 5.
-		"Ability6"					""			// Ability 6 - Extra.
-		"Ability7"					""			// Ability 7 - Extra.
-		"Ability8"					""			// Ability 8 - Extra.
 
 		// Armor
 		//----------------------------------------------------------------
@@ -212,8 +223,8 @@
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_NO_ATTACK"
-		"AttackDamageMin"			"0"		// Damage range min.
-		"AttackDamageMax"			"0"		// Damage range max.
+		"AttackDamageMin"			"85"		// Damage range min.
+		"AttackDamageMax"			"95"		// Damage range max.
 		"AttackDamageType"			"DAMAGE_TYPE_ArmorPhysical"
 		"AttackRate"				"0.15"		// Speed of attack.
 		"AttackAnimationPoint"		"0.0"		// Normalized time in animation cycle to attack.
@@ -1245,7 +1256,7 @@
 
 		// Status
 		//----------------------------------------------------------------
-		"StatusHealth"				"40000"		// Base health.
+		"StatusHealth"				"20000"		// Base health.
 		"StatusHealthRegen"			"0"			// Health regeneration rate.
 		"StatusMana"				"0"			// Base mana.
 		"StatusStartingMana"		"0"			// Base mana.
@@ -1329,7 +1340,7 @@
 
 		// Status
 		//----------------------------------------------------------------
-		"StatusHealth"				"40000"		// Base health.
+		"StatusHealth"				"20000"		// Base health.
 		"StatusHealthRegen"			"0"			// Health regeneration rate.
 		"StatusMana"				"0"			// Base mana.
 		"StatusStartingMana"		"0"			// Base mana.
@@ -1413,7 +1424,7 @@
 
 		// Status
 		//----------------------------------------------------------------
-		"StatusHealth"				"20000"		// Base health.
+		"StatusHealth"				"10000"		// Base health.
 		"StatusHealthRegen"			"0"			// Health regeneration rate.
 		"StatusMana"				"0"			// Base mana.
 		"StatusStartingMana"		"0"			// Base mana.
@@ -15230,5 +15241,165 @@
 		// Bounds
 		//----------------------------------------------------------------
 		"HealthBarOffset"			"140"
+	}
+
+	//=================================================================================
+	// Tower - Good
+	//=================================================================================
+	"npc_dota_goodguys_tower4"
+	{
+		// General
+
+		"BaseClass"					"npc_dota_holdout_tower_spawn_protection"		// Class of entity of link to.
+		"Model"						"models/props_structures/tower001.vmdl"			// Model.
+		"SoundSet"					"Tower.Fire"									// Name of sound set.
+		"MinimapIcon"				"minimap_tower90"
+		"MinimapIconSize"			"200"
+		"Level"						"1"
+		
+		// Abilities
+		//----------------------------------------------------------------
+		
+		"Ability1"					""	// Ability 1.
+		"Ability2"					"venomancer_poison_sting"	// Ability 2.
+		"Ability3"					""	// Ability 3.
+		"Ability4"					""	// Ability 4.
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"				"200"		// Physical protection.
+		"MagicalResistance"			"100"			// Magical protection.
+
+		// Attack
+		//----------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
+		"AttackDamageMin"			"1100"						// Damage range min.
+		"AttackDamageMax"			"1300"						// Damage range max.
+		"AttackDamageType"			"DAMAGE_TYPE_ArmorPhysical"
+		"AttackRate"				"0.8"						// Speed of attack.
+		"AttackAnimationPoint"		"0.3"						// Normalized time in animation cycle to attack.
+		"AttackAcquisitionRange"	"800"						// Range within a target can be acquired.
+		"AttackRange"				"800"						// Range within a target can be attacked.
+		"ProjectileModel"			"particles/units/heroes/hero_viper/viper_poison_attack.vpcf"		// Particle system model for projectile.
+		"ProjectileSpeed"			"900"						// Speed of projectile.
+
+		// Bounty
+		//----------------------------------------------------------------
+		"BountyXP"					"0"		// Experience earn.
+		"BountyGoldMin"				"950"		// Gold earned min.
+		"BountyGoldMax"				"1050"		// Gold earned max.
+
+		// Bounds
+		//----------------------------------------------------------------
+		"BoundsHullName"			"DOTA_HULL_SIZE_TOWER"			// Hull type used for navigation/locomotion.
+		"ProjectileCollisionSize"	"50"
+		"RingRadius"				"130"
+		"HealthBarOffset"			"260"
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_NONE"			// Type of locomotion - ground, air
+		"MovementSpeed"				"0"			// Speed
+		"MovementTurnRate"			"1.0"		// Turning rate.
+
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"5350"		// Base health.
+		"StatusHealthRegen"			"0"		// Health regeneration rate.
+		"StatusMana"				"0"			// Base mana.
+		"StatusStartingMana"		"0"			// Base mana.
+		"StatusManaRegen"			"0"			// Mana regeneration rate.
+
+		// Team
+		//----------------------------------------------------------------
+		"TeamName"					"DOTA_TEAM_BADGUYS"			// Team name.
+		"CombatClassAttack"			"DOTA_COMBAT_CLASS_ATTACK_SIEGE"
+		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_STRUCTURE"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_BUILDING"
+		
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"800"		// Range of vision during day light.
+		"VisionNighttimeRange"		"800"		// Range of vision at night time.
+	}
+
+	//=================================================================================
+	// Tower - Bad
+	//=================================================================================
+	"npc_dota_badguys_tower4"
+	{
+		// General
+
+		"BaseClass"					"npc_dota_holdout_tower_spawn_protection"		// Class of entity of link to.
+		"Model"						"models/props_structures/tower001.vmdl"			// Model.
+		"SoundSet"					"Tower.Fire"									// Name of sound set.
+		"MinimapIcon"				"minimap_tower90"
+		"MinimapIconSize"			"200"
+		"Level"						"1"
+		
+		// Abilities
+		//----------------------------------------------------------------
+		
+		"Ability1"					""	// Ability 1.
+		"Ability2"					"venomancer_poison_sting"	// Ability 2.
+		"Ability3"					""	// Ability 3.
+		"Ability4"					""	// Ability 4.
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"				"200"		// Physical protection.
+		"MagicalResistance"			"100"			// Magical protection.
+
+		// Attack
+		//----------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
+		"AttackDamageMin"			"1100"						// Damage range min.
+		"AttackDamageMax"			"1300"						// Damage range max.
+		"AttackDamageType"			"DAMAGE_TYPE_ArmorPhysical"
+		"AttackRate"				"0.8"						// Speed of attack.
+		"AttackAnimationPoint"		"0.3"						// Normalized time in animation cycle to attack.
+		"AttackAcquisitionRange"	"800"						// Range within a target can be acquired.
+		"AttackRange"				"800"						// Range within a target can be attacked.
+		"ProjectileModel"			"particles/units/heroes/hero_viper/viper_poison_attack.vpcf"		// Particle system model for projectile.
+		"ProjectileSpeed"			"900"						// Speed of projectile.
+
+		// Bounty
+		//----------------------------------------------------------------
+		"BountyXP"					"0"		// Experience earn.
+		"BountyGoldMin"				"950"		// Gold earned min.
+		"BountyGoldMax"				"1050"		// Gold earned max.
+
+		// Bounds
+		//----------------------------------------------------------------
+		"BoundsHullName"			"DOTA_HULL_SIZE_TOWER"			// Hull type used for navigation/locomotion.
+		"ProjectileCollisionSize"	"50"
+		"RingRadius"				"130"
+		"HealthBarOffset"			"260"
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_NONE"			// Type of locomotion - ground, air
+		"MovementSpeed"				"0"			// Speed
+		"MovementTurnRate"			"1.0"		// Turning rate.
+
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"5350"		// Base health.
+		"StatusHealthRegen"			"0"		// Health regeneration rate.
+		"StatusMana"				"0"			// Base mana.
+		"StatusStartingMana"		"0"			// Base mana.
+		"StatusManaRegen"			"0"			// Mana regeneration rate.
+
+		// Team
+		//----------------------------------------------------------------
+		"TeamName"					"DOTA_TEAM_BADGUYS"			// Team name.
+		"CombatClassAttack"			"DOTA_COMBAT_CLASS_ATTACK_SIEGE"
+		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_STRUCTURE"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_BUILDING"
+		
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"800"		// Range of vision during day light.
+		"VisionNighttimeRange"		"800"		// Range of vision at night time.
 	}
 } // End on npc_units_custom.txt

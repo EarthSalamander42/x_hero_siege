@@ -772,7 +772,7 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"bonus_hp"				"12500"
+				"bonus_hp"				"9000"
 			}
 			"02"
 			{
@@ -1455,7 +1455,7 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"bonus_hp"				"2000"
+				"bonus_hp"				"1500"
 			}
 			"02"
 			{
@@ -3942,7 +3942,7 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"bonus_hp"				"4000"
+				"bonus_hp"				"3000"
 			}
 			"02"
 			{

@@ -203,11 +203,10 @@ end
 
 -- Deal self damage over time, through magic immunity. This is needed because negative HP regen is not working.
 function PhoenixDegen( event )
-	local caster = event.caster
-	local ability = event.ability
-	local phoenix_damage_per_second = ability:GetLevelSpecialValueFor( "phoenix_damage_per_second", ability:GetLevel() - 1 )
-
-	local phoenixHP = caster:GetHealth()
+local caster = event.caster
+local ability = event.ability
+local phoenix_damage_per_second = ability:GetLevelSpecialValueFor( "phoenix_damage_per_second", ability:GetLevel() - 1 )
+local phoenixHP = caster:GetHealth()
 
 	caster:SetHealth(phoenixHP - phoenix_damage_per_second)
 

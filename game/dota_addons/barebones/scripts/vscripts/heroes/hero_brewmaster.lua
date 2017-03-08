@@ -28,7 +28,7 @@ end
 
 modifier_earthquake_aura = class({})
 
-LinkLuaModifier("modifier_earthquake", "heroes/hero_brewmaster/earthquake", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_earthquake", "heroes/hero_brewmaster", LUA_MODIFIER_MOTION_NONE)
 
 function modifier_earthquake_aura:OnCreated()
 	if IsServer() then
