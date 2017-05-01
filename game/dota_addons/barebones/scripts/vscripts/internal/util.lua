@@ -118,39 +118,6 @@ function AddStacks(ability, caster, unit, modifier, stack_amount, refresh)
 	end
 end
 
--- Skeleton king cosmetics
-function SkeletonKingWearables( hero )
-
-	-- Cape
-	Attachments:AttachProp(hero, "attach_head", "models/heroes/skeleton_king/wraith_king_cape.vmdl", 1.0)
-
-	-- Shoulderpiece
-	Attachments:AttachProp(hero, "attach_head", "models/heroes/skeleton_king/wraith_king_shoulder.vmdl", 1.0)
-
-	-- Crown
-	Attachments:AttachProp(hero, "attach_head", "models/heroes/skeleton_king/wraith_king_head.vmdl", 1.0)
-
-	-- Gauntlet
-	Attachments:AttachProp(hero, "attach_attack1", "models/heroes/skeleton_king/wraith_king_gauntlet.vmdl", 1.0)
-
-	-- Weapon (randomly chosen)
-	local random_weapon = {
-		"models/items/skeleton_king/spine_splitter/spine_splitter.vmdl",
-		"models/items/skeleton_king/regalia_of_the_bonelord_sword/regalia_of_the_bonelord_sword.vmdl",
-		"models/items/skeleton_king/weapon_backbone.vmdl",
-		"models/items/skeleton_king/the_blood_shard/the_blood_shard.vmdl",
-		"models/items/skeleton_king/sk_dragon_jaw/sk_dragon_jaw.vmdl",
-		"models/items/skeleton_king/weapon_spine_sword.vmdl",
-		"models/items/skeleton_king/shattered_destroyer/shattered_destroyer.vmdl"
-	}
-	Attachments:AttachProp(hero, "attach_attack1", random_weapon[RandomInt(1, #random_weapon)], 1.0)
-
-	-- Eye particles
-	local eye_pfx = ParticleManager:CreateParticle("particles/units/heroes/hero_skeletonking/skeletonking_eyes.vpcf", PATTACH_ABSORIGIN, hero)
-	ParticleManager:SetParticleControlEnt(eye_pfx, 0, hero, PATTACH_POINT_FOLLOW, "attach_eyeL", hero:GetAbsOrigin(), true)
-	ParticleManager:SetParticleControlEnt(eye_pfx, 1, hero, PATTACH_POINT_FOLLOW, "attach_eyeR", hero:GetAbsOrigin(), true)
-end
-
 -- Removes [stack_amount] stacks from a modifier
 function RemoveStacks(ability, unit, modifier, stack_amount)
 	if unit:HasModifier(modifier) then
@@ -238,15 +205,22 @@ function HasEpic4(hero)
 	return false
 end
 
-function HasEpic5(hero)
-	if hero.has_epic_5 then
+function HeroImage(hero)
+	if hero.hero_image then
 		return true
 	end
 	return false
 end
 
-function HeroImage(hero)
-	if hero.hero_image then
+function DualChoose(hero)
+	if hero.dual_choose then
+		return 1
+	end
+	return 0
+end
+
+function Lvl20Whispering(hero)
+	if hero.lvl_20 then
 		return true
 	end
 	return false
@@ -283,8 +257,8 @@ if not Corpses then
 	Corpses = class({})
 end
 
-CORPSE_DURATION = 87.0
-CORPSE_APPEAR_DELAY = 3.0
+CORPSE_DURATION = 50.0
+CORPSE_APPEAR_DELAY = 10.0
 
 function Corpses:CreateFromUnit(killed)
 	if LeavesCorpse( killed ) then
@@ -292,10 +266,11 @@ function Corpses:CreateFromUnit(killed)
 		local position = killed:GetAbsOrigin()
 		local fv = killed:GetForwardVector()
 		local team = killed:GetTeamNumber()
-		local corpse = Corpses:CreateByNameOnPosition(name, position, DOTA_TEAM_GOODGUYS)
+		local corpse = Corpses:CreateByNameOnPosition(name, position, DOTA_TEAM_CUSTOM_2)
 		corpse.playerID = killed:GetPlayerOwnerID()
 		corpse:SetForwardVector(fv)
 		corpse:AddNoDraw()
+		corpse:AddNewModifier(nil, nil, "modifier_invulnerable", {})
 		Timers:CreateTimer(CORPSE_APPEAR_DELAY, function()
 			if IsValidEntity(corpse) then
 				UTIL_Remove(killed)
@@ -337,24 +312,8 @@ function Corpses:CreateByNameOnPosition(name, position, team)
 	return corpse
 end
 
-function Corpses:AreAnyInRadius(playerID, origin, radius)
-	return self:FindClosestInRadius(playerID, origin, radius) ~= nil
-end
-
-function Corpses:AreAnyAlliedInRadius(playerID, origin, radius)
-	return self:FindAlliedInRadius(playerID, origin, radius)[1] ~= nil
-end
-
-function Corpses:AreAnyOutsideInRadius(playerID, origin, radius)
-	return self:FindInRadiusOutside(playerID, origin, radius)[1] ~= nil
-end
-
-function Corpses:FindClosestInRadius(playerID, origin, radius)
-	return self:FindInRadius(playerID, origin, radius)[1]
-end
-
 function Corpses:FindInRadius(playerID, origin, radius)
-	local targets = FindUnitsInRadius(PlayerResource:GetTeam(playerID), origin, nil, radius, DOTA_UNIT_TARGET_TEAM_BOTH, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_INVULNERABLE + DOTA_UNIT_TARGET_FLAG_OUT_OF_WORLD, FIND_CLOSEST, false)
+	local targets = FindUnitsInRadius(DOTA_TEAM_CUSTOM_2, origin, nil, radius, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_INVULNERABLE + DOTA_UNIT_TARGET_FLAG_OUT_OF_WORLD, FIND_CLOSEST, false)
 	local corpses = {}
 	for _, target in pairs(targets) do
 		if IsCorpse(target) and not target.meat_wagon then -- Ignore meat wagon corpses as first targets
@@ -363,32 +322,6 @@ function Corpses:FindInRadius(playerID, origin, radius)
 	end
 	for _,target in pairs(targets) do
 		if IsCorpse(target) and target.meat_wagon and target.meat_wagon:GetPlayerOwnerID() == playerID then -- Check meat wagon ownership
-			table.insert(corpses, target)
-		end
-	end
-	return corpses
-end
-
--- Only Friendly corpses
-function Corpses:FindAlliedInRadius(playerID, origin, radius)
-	local targets = FindUnitsInRadius(PlayerResource:GetTeam(playerID), origin, nil, radius, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_INVULNERABLE + DOTA_UNIT_TARGET_FLAG_OUT_OF_WORLD, FIND_CLOSEST, false)
-	local corpses = {}
-	local teamNumber = PlayerResource:GetTeam(playerID)
-	for _,target in pairs(targets) do
---		if IsCorpse(target) and not target.meat_wagon then -- Ignore meat wagon corpses
-		if IsCorpse(target) then
-			table.insert(corpses, target)
-		end
-	end
-	return corpses
-end
-
--- Only corpses outside meat wagon
-function Corpses:FindInRadiusOutside(playerID, origin, radius)
-	local targets = FindUnitsInRadius(PlayerResource:GetTeam(playerID), origin, nil, radius, DOTA_UNIT_TARGET_TEAM_BOTH, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_INVULNERABLE + DOTA_UNIT_TARGET_FLAG_OUT_OF_WORLD, FIND_CLOSEST, false)
-	local corpses = {}
-	for _,target in pairs(targets) do
-		if IsCorpse(target) and not target.meat_wagon then -- Ignore meat wagon corpses
 			table.insert(corpses, target)
 		end
 	end
@@ -460,7 +393,7 @@ function CDOTA_BaseNPC:IsDummy()
 end
 
 function SendErrorMessage(playerID, string)
-   CustomGameEventManager:Send_ServerToPlayer(PlayerResource:GetPlayer(playerID), "dotacraft_error_message", {message=string}) 
+	CustomGameEventManager:Send_ServerToPlayer(PlayerResource:GetPlayer(playerID), "memes_error_message", {message=string}) 
 end
 
 -- Similar to SendErrorMessage to the bottom, except it checks whether the source of error is currently selected unit/hero.
@@ -496,4 +429,20 @@ function SkeletonKingWearables(newHero)
 	local eye_pfx = ParticleManager:CreateParticle("particles/units/heroes/hero_skeletonking/skeletonking_eyes.vpcf", PATTACH_ABSORIGIN, newHero)
 	ParticleManager:SetParticleControlEnt(eye_pfx, 0, newHero, PATTACH_POINT_FOLLOW, "attach_eyeL", newHero:GetAbsOrigin(), true)
 	ParticleManager:SetParticleControlEnt(eye_pfx, 1, newHero, PATTACH_POINT_FOLLOW, "attach_eyeR", newHero:GetAbsOrigin(), true)
+end
+
+-- ITEMS
+function GetItemByID(id)
+	for k,v in pairs(GameMode.ItemKVs) do
+		if tonumber(v["ID"]) == id then return v end
+	end
+end
+
+function BossBar(unit, boss)
+	Timers:CreateTimer(0.0, function()
+		if unit:IsAlive() then
+			CustomNetTables:SetTableValue("round_data", "bossHealth", {boss = boss, hp = unit:GetHealthPercent()})
+			return 1.0
+		end
+	end)
 end

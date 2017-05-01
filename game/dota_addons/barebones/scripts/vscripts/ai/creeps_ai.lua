@@ -20,11 +20,11 @@ end
 BehaviorNone = {}
 
 function BehaviorNone:Evaluate()
-	return 10 -- must return a value > 0, so we have a default
+	return 1 -- must return a value > 0, so we have a default
 end
 
 function BehaviorNone:Begin()
-	self.endTime = GameRules:GetGameTime() + 10
+	self.endTime = GameRules:GetGameTime() + 1
 
 	local ancient = Entities:FindByName(nil, "dota_goodguys_fort")
 
@@ -35,17 +35,17 @@ function BehaviorNone:Begin()
 			OrderType = DOTA_UNIT_ORDER_ATTACK_MOVE,
 			Position = ancient:GetOrigin()
 		}
---	else
---		self.order =
---		{
---			UnitIndex = thisEntity:entindex(),
---			OrderType = DOTA_UNIT_ORDER_STOP
---		}
+	else
+		self.order =
+		{
+			UnitIndex = thisEntity:entindex(),
+			OrderType = DOTA_UNIT_ORDER_STOP
+		}
 	end
 end
 
 function BehaviorNone:Continue()
-	self.endTime = GameRules:GetGameTime() + 10
+	self.endTime = GameRules:GetGameTime() + 1
 end
 
 --------------------------------------------------------------------------------------------------------

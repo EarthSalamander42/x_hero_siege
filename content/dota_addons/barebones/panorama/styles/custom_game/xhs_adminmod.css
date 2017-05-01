@@ -1,36 +1,65 @@
 .ToggleAdminMod
 {
-	width: 250px;
-	height: 90px;
-	margin-top: 745px;
-	margin-left: 0px;
+	width: 200px;
+	height: 80px;
+	margin-top: 600px;
+	margin-left: 275px;
 	horizontal-align: left;
 	background-color: none;
+}
+
+.ToggleAdminMod:hover
+{
+	wash-color: #bbbbbb;
 }
 
 /* Grey Border */
 .AdminModBorder
 {
-	width: 468px;
-	height: 318px;
-	margin-top: 470px;
-	margin-left: 20px;
-	background-color: grey;
+	width: 670px;
+	height: 680px;
+	margin-top: 400px;
+	margin-left: 0px;
+	border-radius: 4px;
+	overflow: clip;
+}
+
+#AdminMod
+{
+	width: 285px;
+	height: 120px;
+	margin-top: 270px;
+	margin-left: -500px;
+	background-color: dodgerblue;
 	border-radius: 4px;
 	box-shadow: fill #00000088 -4px -4px 8px 8px;
 	overflow: clip;
 }
 
-.AdminModBorder #CreditsBorder
+.HidePanel
 {
-	width: 450px;
+	transform: translate3d( 750px, 200px, 0px );
+}
+
+#CreditsBorder
+{
+	width: 285px;
 	height: 20px;
 	opacity: 0.9;
-	margin-top: 0px;
+	margin-top: 99px;
 	margin-left: 0px;
-	background-color: dodgerblue;
+	background-color: none;
 	border-radius: 4px;
 	overflow: clip;
+}
+
+#CommandsLabel
+{
+	margin-top: 5px;
+	margin-left: 15px;
+	font-size: 20px;
+	color: red;
+	horizontal-align: left;
 }
 
 #CreditsBorderText
@@ -38,40 +67,6 @@
 	margin-left: 10px;
 	font-size: 18px;
 	color: white;
-}
-
-.admin_tab #AdminMod
-{
-	width: 450px;
-	height: 280px;
-	margin-top: 28px;
-	margin-left: 8px;
-	flow-children: down;
-	background-color: #d9d9d9;
-	box-shadow: black -1px -1px 4px 4px;
-	border-radius: 4px;
-	color: #fff000;
-}
-
-#AdminCommandsBox
-{
-	flow-children: down;
-	width: 200px;
-	height: 250px;
-	margin-left: 4px;
-	margin-top: -15px;
-	border-radius: 4px;
-	background-color: gradient( linear, 100% 0%, 100% 100%, from( #111111 ), color-stop( 0.01, #202327 ), color-stop( 0.2, #141619ff ), to( #000000dd ) );
-	box-shadow: black -2px -2px 4px 4px;
-}
-
-.admin_tab #CommandsLabel
-{
-	margin-top: 0px;
-	horizontal-align: left;
-	margin-left: 20px;
-	font-size: 20px;
-	color: red;
 }
 
 .CGSRadio
@@ -90,49 +85,22 @@
 RadioButton Label
 {
 	font-size: 18px;
-	letter-spacing: 1px;
+	letter-spacing: 3px;
 	text-shadow: 2px 2px 2px black;
 	color: #454545;
 	vertical-align: center;
 }
 
-#HostCommandsBox
-{
-	flow-children: down;
-	width: 200px;
-	height: 250px;
-	margin-left: 4px;
-	margin-top: -15px;
-	border-radius: 4px;
-	background-color: gradient( linear, 100% 0%, 100% 100%, from( #111111 ), color-stop( 0.01, #202327 ), color-stop( 0.2, #141619ff ), to( #000000dd ) );
-	box-shadow: black -2px -2px 4px 4px;
-}
-
 #PlayerCommandsBox
 {
 	flow-children: down;
-	width: 200px;
-	height: 250px;
-	margin-left: 209px;
-	margin-top: -250px;
+	width: 275px;
+	height: 90px;
+	margin-left: 5px;
+	margin-top: 5px;
 	border-radius: 4px;
-	background-color: gradient( linear, 100% 0%, 100% 100%, from( #111111 ), color-stop( 0.01, #202327 ), color-stop( 0.2, #141619ff ), to( #000000dd ) );
+	background-color: darkgrey;
 	box-shadow: black -2px -2px 4px 4px;
-}
-
-#CloseButton
-{
-	width: 25px;
-	height: 25px;
-	margin-top: 0px;
-	margin-bottom: 0px;
-	margin-left: 425px;
-	horizontal-align: left;
-	background-color: none;
-}
-
-#CloseButton:hover {
-	wash-color: #ff0000;
 }
 
 #Title
@@ -153,37 +121,42 @@ RadioButton Label
 	wash-color: #bbbbbb;
 }
 
-#AdminTabs
+#DualHero
 {
-	height: 30px;
-	width: 170px;
-	horizontal-align: left;
-	vertical-align: top;
-	color: darkgray;
-	font-size: 20px;
-	transition-timing-function: ease-in-out;
-	transition-property: transform;
-	transition-duration: 0.3s;
-
-	visibility: visible;
+	width: 150px;
+	height: 150px;
+	margin-top: 440px;
+	margin-left: 300px;
+	background-color: gradient( linear, 0% 0%, 100% 50%, from( #25282a00 ), color-stop( .6, #25282acc), color-stop( .8, #25282a88), to( #00000022 ) );
+	border-radius: 4px;
+	box-shadow: fill #00000088 -4px -4px 8px 8px;
+	overflow: clip;
+	visibility: collapse;
 }
 
-.admin_mod #TabSeparator
+#DualHero:hover
 {
-	height: 20px;
-	width: 20px;
-	horizontal-align: left;
-	vertical-align: top;
-	font-size: 20px;
-	color: darkgray;
-	transition-timing-function: ease-in-out;
-	transition-property: transform;
-	transition-duration: 0.3s;
-
-	visibility: visible;
+	wash-color: #bbbbbb;
 }
 
-.changelogDisplayHidden
+#DualHero:active
 {
-	transform: translate3d( -350px, 0px, 0px );
+	wash-color: #fff000;
+}
+
+#DualHeroText
+{
+	width: 150px;
+	height: 40px;
+	margin-top: 190px;
+	margin-left: 80px;
+	background-color: gradient( linear, 0% 0%, 100% 50%, from( #25282a00 ), color-stop( .6, #25282acc), color-stop( .8, #25282a88), to( #00000022 ) );
+	border-radius: 4px;
+	box-shadow: fill #00000088 -4px -4px 8px 8px;
+	overflow: clip;
+	font-size: 20px;
+	color: white;
+	horizontal-align: center;
+	vertical-align: center;
+	visibility: collapse;
 }

@@ -6,35 +6,5 @@
 		<Panel id="CustomBg" >
 		  	<Image id="gamemode" class="SeqImg" src="file://{images}/custom_game/loading_screen/gamemode.png" />
 		</Panel>
-		<Panel id="TitlePanel">
-		  	<Label id="AddonTitleDifficulty" text="#AddonTitleDifficulty" style="" />
-		</Panel>
-		<Panel id="TitlePanelDifficulty1">
-			<Label id="AddonDifficultyEasy" text="#AddonDifficultyEasy" style="" />
-		</Panel>
-		<Panel id="TitlePanelDifficulty2">
-			<Label id="AddonDifficultyNormal" text="#AddonDifficultyNormal" style="" />
-		</Panel>
-		<Panel id="TitlePanelDifficulty3">
-			<Label id="AddonDifficultyHard" text="#AddonDifficultyHard" style="" />
-		</Panel>
-		<Panel id="TitlePanelDifficulty4">
-			<Label id="AddonDifficultyExtreme" text="#AddonDifficultyExtreme" style="" />
-		</Panel>
-		<Panel id="VIPTab">
-			<Label id="VIPHeader" text="#VIPHeader" style="" />
-		</Panel>
-		<Panel id="Community">
-			<Label id="community_description" class="CommunityText" html="true" text="#community_description" />
-			<Button id="CommunityImg" onactivate="DOTADisplayURL('discordapp.com/invite/dNMBSrJ');" >
-				<Image src="file://{images}/custom_game/loading_screen/community_discord_header.png" />
-			</Button>
-			<Button id="CommunityImg2" onactivate="DOTADisplayURL('https://www.facebook.com/X-Hero-Siege-619117744926665');" >
-				<Image src="file://{images}/custom_game/loading_screen/community_facebook_header.png" />
-			</Button>
-			<Button id="CommunityImg3" onactivate="DOTADisplayURL('http://steamcommunity.com/groups/x_hero_siege');" >
-				<Image src="file://{images}/custom_game/loading_screen/community_steam_group_header.png" />
-			</Button>
-		</Panel>
 	</Panel>
 </root>

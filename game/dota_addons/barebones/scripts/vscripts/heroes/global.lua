@@ -18,39 +18,41 @@ local position = hero:GetAbsOrigin()
 local respawntime = ability:GetSpecialValueFor("reincarnation_time")
 
 	if hero:IsRealHero() and ANKHS == 1 then
+		hero:SetRespawnsDisabled(true)
+		hero.respawn_timer = Timers:CreateTimer(respawntime, function() 
+			hero:SetRespawnPosition(position)
+			hero:EmitSound("Ability.ReincarnationAlt")
+			hero:RespawnHero(false, false, false)
+			ParticleManager:CreateParticle("particles/items_fx/aegis_respawn.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
+			hero:SetRespawnsDisabled(false)
+			hero.ankh_respawn = false
+		end)
+
 		if ability_alt then
 			if ability_alt:IsCooldownReady() then
-			hero:SetRespawnsDisabled(true)
-			ability_alt:StartCooldown(60.0)
-			hero.respawn_timer = Timers:CreateTimer(respawntime, function() 
-				hero:SetRespawnPosition(position)
-				hero:EmitSound("Ability.ReincarnationAlt")
-				hero:RespawnHero(false, false, false)
-				ParticleManager:CreateParticle("particles/items_fx/aegis_respawn.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
-				hero:SetRespawnsDisabled(false)
-			end)
-			print("Ability Reincarnation")
-			elseif not ability_alt:IsCooldownReady() then
-				print("No Respawns Bitch!")
+				ability_alt:StartCooldown(60.0)
 			end
-		elseif not ability_alt or not ability_alt:IsCooldownReady() then
-			hero:SetRespawnsDisabled(true)
-			hero.respawn_timer = Timers:CreateTimer(respawntime, function() 
-				hero:SetRespawnPosition(position)
-				hero:EmitSound("Ability.ReincarnationAlt")
-				hero:RespawnHero(false, false, false)
-				ParticleManager:CreateParticle("particles/items_fx/aegis_respawn.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
-				hero.ankh_respawn = false
-				hero:SetRespawnsDisabled(false)
-				end)
-			hero.ankh_respawn = true
+		end
 
-			if ability:GetCurrentCharges() -1 >= 1 then
-				ability:SetCurrentCharges(ability:GetCurrentCharges() -1)
-			else
-				ability:RemoveSelf()
+		if not ability_alt or not ability_alt:IsCooldownReady() then
+			if ability then
+				hero:SetRespawnsDisabled(true)
+				hero.respawn_timer = Timers:CreateTimer(respawntime, function() 
+					hero:SetRespawnPosition(position)
+					hero:EmitSound("Ability.ReincarnationAlt")
+					hero:RespawnHero(false, false, false)
+					ParticleManager:CreateParticle("particles/items_fx/aegis_respawn.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
+					hero.ankh_respawn = false
+					hero:SetRespawnsDisabled(false)
+					end)
+				hero.ankh_respawn = true
+
+				if ability:GetCurrentCharges() -1 >= 1 then
+					ability:SetCurrentCharges(ability:GetCurrentCharges() -1)
+				else
+					ability:RemoveSelf()
+				end
 			end
-			print("Item Reincarnation")
 		end
 	end
 end
@@ -111,67 +113,41 @@ local stacks = caster:GetLevel()
 	caster:SetModifierStackCount(modifier_stack, ability, stacks)
 end
 
-function FountainThink( keys )
-	local caster = keys.caster
-	local ability = keys.ability
-	local particle_danger = keys.particle_danger
+function SwapAbilities(keys)
+local caster = keys.caster
+local ability = keys.ability
+local sub_ability = keys.sub_ability
+local main_ability = ability:GetAbilityName()
 
-	local danger_pfx = ParticleManager:CreateParticle(particle_danger, PATTACH_CUSTOMORIGIN, nil)
-	ParticleManager:SetParticleControl(danger_pfx, 0, caster:GetAbsOrigin())
-
-	-- If mega creeps are nearby on arena mode, disable fountain protection
-	if END_GAME_ON_KILLS and not caster.fountain_disabled then
-		local enemy_creeps = FindUnitsInRadius(caster:GetTeamNumber(), caster:GetAbsOrigin(), nil, 5000, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)
-		for	_,enemy in pairs(enemy_creeps) do
-			if enemy:GetTeam() ~= caster:GetTeam() and string.find(enemy:GetUnitName(), "mega") then
-				ability:ApplyDataDrivenModifier(caster, caster, "modifier_imba_fountain_disabled", {})
-				caster.fountain_disabled = true
-			end
-		end
-	end
+	caster:SwapAbilities(main_ability, sub_ability, false, true)
 end
 
-function FountainBash( keys )
-	local caster = keys.caster
-	local ability = keys.ability
-	local ability_level = ability:GetLevel() - 1
-	local particle_bash = keys.particle_bash
-	local sound_bash = keys.sound_bash
+function CastleMuradin(event)
+local caster = event.caster
+local ability = event.ability
+local heroes = HeroList:GetAllHeroes()
+local Waypoint = Entities:FindByName(nil, "final_wave_player_1")
+local Health = ability:GetSpecialValueFor("hp_tooltip")
+local InvTime = ability:GetSpecialValueFor("invulnerability_time")
+local PauseTime = 10.0
 
-	-- Parameters
-	local bash_radius = ability:GetLevelSpecialValueFor("bash_radius", ability_level)
-	local bash_duration = ability:GetLevelSpecialValueFor("bash_duration", ability_level)
-	local bash_distance = ability:GetLevelSpecialValueFor("bash_distance", ability_level)
-	local bash_height = ability:GetLevelSpecialValueFor("bash_height", ability_level)
-	local fountain_loc = caster:GetAbsOrigin()
-
-	-- Knockback table
-	local fountain_bash =	{
-		should_stun = 1,
-		knockback_duration = bash_duration,
-		duration = bash_duration,
-		knockback_distance = bash_distance,
-		knockback_height = bash_height,
-		center_x = fountain_loc.x,
-		center_y = fountain_loc.y,
-		center_z = fountain_loc.z
-	}
-
-	-- Find units to bash
-	local nearby_enemies = FindUnitsInRadius(caster:GetTeamNumber(), fountain_loc, nil, bash_radius, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, FIND_ANY_ORDER, false)
-
-	-- Bash all of them
-	for _,enemy in pairs(nearby_enemies) do
-
-		-- Bash
-		enemy:RemoveModifierByName("modifier_knockback")
-		enemy:AddNewModifier(caster, ability, "modifier_knockback", fountain_bash)
-
-		-- Play particle
-		local bash_pfx = ParticleManager:CreateParticle(particle_bash, PATTACH_ABSORIGIN, enemy)
-		ParticleManager:SetParticleControl(bash_pfx, 0, enemy:GetAbsOrigin())
-
-		-- Play sound
-		enemy:EmitSound(sound_bash)
+	if caster:GetHealthPercent() <= Health then
+		local Muradin = CreateUnitByName("npc_dota_creature_muradin_bronzebeard", Waypoint:GetAbsOrigin(), false, nil, nil, DOTA_TEAM_GOODGUYS)
+		Muradin:SetInitialGoalEntity(Waypoint)
+		Muradin:MoveToPositionAggressive(Waypoint:GetAbsOrigin())
+		Muradin:EmitSound("MountainKing.Avatar")
+		for _, hero in pairs(heroes) do
+			PlayerResource:SetCameraTarget(hero:GetPlayerID(), Muradin)
+			Timers:CreateTimer(5.0, function()
+				PlayerResource:SetCameraTarget(hero:GetPlayerID(), nil)
+			end)
+		end
+		PauseCreepsCastle()
+		caster:AddNewModifier(caster, nil, "modifier_invulnerable", {duration = InvTime + PauseTime})
+		Notifications:BottomToAll({text = "Muradin is requested to defend your castle!", duration = PauseTime, continue = true})
+		Timers:CreateTimer(InvTime + PauseTime, function()
+			UTIL_Remove(Muradin)
+		end)
+		caster:RemoveAbility("castle_muradin_defend")
 	end
 end

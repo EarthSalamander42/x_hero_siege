@@ -51,12 +51,18 @@ function grom_boss_die(caster)
 FourBossesKillCount()
 
 	Timers:CreateTimer(1.0, function()
-		local item = CreateItem("item_bag_of_gold", nil, nil)
-		local pos = caster:GetAbsOrigin()
-		local drop = CreateItemOnPositionSync( pos, item )
-		local pos_launch = pos+RandomVector(RandomFloat(150,200))
-		item:LaunchLoot(false, 300, 0.5, pos)
-		item:SetCurrentCharges(200000)
+		Notifications:TopToAll({text="Power Up: +250 to all stats!", style={color="green"}, duration=10.0})
+		caster:EmitSound("ui.trophy_levelup")
+		local heroes = HeroList:GetAllHeroes()
+		for _,hero in pairs(heroes) do
+			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
+				hero:ModifyAgility(250)
+				hero:ModifyStrength(250)
+				hero:ModifyIntellect(250)
+				local particle1 = ParticleManager:CreateParticle("particles/econ/events/ti6/hero_levelup_ti6.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
+				ParticleManager:SetParticleControl(particle1, 0, hero:GetAbsOrigin())
+			end
+		end
 		EmitGlobalSound("Loot_Drop_Stinger_Arcana")
 	end)
 
@@ -69,15 +75,12 @@ FourBossesKillCount()
 		StartAnimation(caster, {duration=6.0, activity=ACT_DOTA_DIE, rate=0.25})
 		EmitSoundOn("skeleton_king_wraith_death_long_09", caster)
 		EmitSoundOn("skeleton_king_wraith_death_long_09", caster)
-	end)
-
-	Timers:CreateTimer(12, function()
+		DoEntFire("door_illidan", "SetAnimation", "gate_entrance002_open", 0, nil, nil)
 		UTIL_Remove(caster)
 		local DoorObs = Entities:FindAllByName("obstruction_illidan")
 		for _, obs in pairs(DoorObs) do
 			obs:SetEnabled(false, true)
 		end
-		DoEntFire("door_illidan", "SetAnimation", "gate_entrance002_open", 0, nil, nil)
 	end)
 end
 
@@ -85,12 +88,18 @@ function illidan_boss_die(caster)
 FourBossesKillCount()
 
 	Timers:CreateTimer(1.0, function()
-		local item = CreateItem("item_bag_of_gold", nil, nil)
-		local pos = caster:GetAbsOrigin()
-		local drop = CreateItemOnPositionSync( pos, item )
-		local pos_launch = pos+RandomVector(RandomFloat(150,200))
-		item:LaunchLoot(false, 300, 0.5, pos)
-		item:SetCurrentCharges(200000)
+		Notifications:TopToAll({text="Power Up: +250 to all stats!", style={color="green"}, duration=10.0})
+		caster:EmitSound("ui.trophy_levelup")
+		local heroes = HeroList:GetAllHeroes()
+		for _,hero in pairs(heroes) do
+			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
+				hero:ModifyAgility(250)
+				hero:ModifyStrength(250)
+				hero:ModifyIntellect(250)
+				local particle1 = ParticleManager:CreateParticle("particles/econ/events/ti6/hero_levelup_ti6.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
+				ParticleManager:SetParticleControl(particle1, 0, hero:GetAbsOrigin())
+			end
+		end
 		EmitGlobalSound("Loot_Drop_Stinger_Arcana")
 	end)
 
@@ -100,18 +109,18 @@ FourBossesKillCount()
 	StartAnimation(caster, {duration=6.0, activity=ACT_DOTA_FLAIL, rate=0.75})
 
 	Timers:CreateTimer(6, function()
-		StartAnimation(caster, {duration=6.0, activity=ACT_DOTA_DIE, rate=0.25})
-		EmitSoundOn("skeleton_king_wraith_death_long_09", caster)
-		EmitSoundOn("skeleton_king_wraith_death_long_09", caster)
-	end)
-
-	Timers:CreateTimer(12, function()
 		UTIL_Remove(caster)
+		DoEntFire("door_balanar", "SetAnimation", "gate_entrance002_open", 0, nil, nil)
 		local DoorObs = Entities:FindAllByName("obstruction_balanar")
 		for _, obs in pairs(DoorObs) do
 			obs:SetEnabled(false, true)
 		end
-		DoEntFire("door_balanar", "SetAnimation", "gate_entrance002_open", 0, nil, nil)
+	end)
+
+	Timers:CreateTimer(6, function()
+		StartAnimation(caster, {duration=6.0, activity=ACT_DOTA_DIE, rate=0.25})
+		EmitSoundOn("skeleton_king_wraith_death_long_09", caster)
+		EmitSoundOn("skeleton_king_wraith_death_long_09", caster)
 	end)
 end
 
@@ -119,13 +128,28 @@ function proudmoore_boss_die(caster)
 FourBossesKillCount()
 
 	Timers:CreateTimer(1.0, function()
-		local item = CreateItem("item_bag_of_gold", nil, nil)
-		local pos = caster:GetAbsOrigin()
-		local drop = CreateItemOnPositionSync( pos, item )
-		local pos_launch = pos+RandomVector(RandomFloat(150,200))
-		item:LaunchLoot(false, 300, 0.5, pos)
-		item:SetCurrentCharges(200000)
+		Notifications:TopToAll({text="Power Up: +250 to all stats!", style={color="green"}, duration=10.0})
+		caster:EmitSound("ui.trophy_levelup")
+		local heroes = HeroList:GetAllHeroes()
+		for _,hero in pairs(heroes) do
+			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
+				hero:ModifyAgility(250)
+				hero:ModifyStrength(250)
+				hero:ModifyIntellect(250)
+				local particle1 = ParticleManager:CreateParticle("particles/econ/events/ti6/hero_levelup_ti6.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
+				ParticleManager:SetParticleControl(particle1, 0, hero:GetAbsOrigin())
+			end
+		end
 		EmitGlobalSound("Loot_Drop_Stinger_Arcana")
+	end)
+
+	Timers:CreateTimer(6, function()
+		DoEntFire("door_proudmoore2", "SetAnimation", "gate_entrance002_open", 0, nil, nil)
+		UTIL_Remove(caster)
+		local DoorObs = Entities:FindAllByName("obstruction_proudmoore2")
+		for _, obs in pairs(DoorObs) do
+			obs:SetEnabled(false, true)
+		end
 	end)
 
 	EmitSoundOn("skeleton_king_wraith_death_long_01", caster)
@@ -138,27 +162,24 @@ FourBossesKillCount()
 		EmitSoundOn("skeleton_king_wraith_death_long_09", caster)
 		EmitSoundOn("skeleton_king_wraith_death_long_09", caster)
 	end)
-
-	Timers:CreateTimer(12, function()
-		UTIL_Remove(caster)
-		local DoorObs = Entities:FindAllByName("obstruction_proudmoore2")
-		for _, obs in pairs(DoorObs) do
-			obs:SetEnabled(false, true)
-		end
-		DoEntFire("door_proudmoore2", "SetAnimation", "gate_entrance002_open", 0, nil, nil)
-	end)
 end
 
 function balanar_boss_die(caster)
 FourBossesKillCount()
 
 	Timers:CreateTimer(1.0, function()
-		local item = CreateItem("item_bag_of_gold", nil, nil)
-		local pos = caster:GetAbsOrigin()
-		local drop = CreateItemOnPositionSync( pos, item )
-		local pos_launch = pos+RandomVector(RandomFloat(150,200))
-		item:LaunchLoot(false, 300, 0.5, pos)
-		item:SetCurrentCharges(200000)
+		Notifications:TopToAll({text="Power Up: +250 to all stats!", style={color="green"}, duration=10.0})
+		caster:EmitSound("ui.trophy_levelup")
+		local heroes = HeroList:GetAllHeroes()
+		for _,hero in pairs(heroes) do
+			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
+				hero:ModifyAgility(250)
+				hero:ModifyStrength(250)
+				hero:ModifyIntellect(250)
+				local particle1 = ParticleManager:CreateParticle("particles/econ/events/ti6/hero_levelup_ti6.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
+				ParticleManager:SetParticleControl(particle1, 0, hero:GetAbsOrigin())
+			end
+		end
 		EmitGlobalSound("Loot_Drop_Stinger_Arcana")
 	end)
 
@@ -168,31 +189,34 @@ FourBossesKillCount()
 	StartAnimation(caster, {duration=6.0, activity=ACT_DOTA_FLAIL, rate=0.75})
 
 	Timers:CreateTimer(6, function()
-		StartAnimation(caster, {duration=6.0, activity=ACT_DOTA_DIE, rate=0.35})
-		EmitSoundOn("skeleton_king_wraith_death_long_09", caster)
-		EmitSoundOn("skeleton_king_wraith_death_long_09", caster)
-	end)
-
-	Timers:CreateTimer(12, function()
+		DoEntFire("door_proudmoore", "SetAnimation", "gate_entrance002_open", 0, nil, nil)
 		UTIL_Remove(caster)
 		local DoorObs = Entities:FindAllByName("obstruction_proudmoore")
 		for _, obs in pairs(DoorObs) do
 			obs:SetEnabled(false, true)
 		end
-		DoEntFire("door_proudmoore", "SetAnimation", "gate_entrance002_open", 0, nil, nil)
+		StartAnimation(caster, {duration=6.0, activity=ACT_DOTA_DIE, rate=0.35})
+		EmitSoundOn("skeleton_king_wraith_death_long_09", caster)
+		EmitSoundOn("skeleton_king_wraith_death_long_09", caster)
 	end)
 end
 
 function arthas_boss_die(caster)
+	EmitGlobalSound("Arthas.Death")
 	Timers:CreateTimer(1.0, function()
-		local item = CreateItem("item_bag_of_gold", nil, nil)
-		local pos = caster:GetAbsOrigin()
-		local drop = CreateItemOnPositionSync( pos, item )
-		local pos_launch = pos+RandomVector(RandomFloat(150,200))
-		item:LaunchLoot(false, 300, 0.5, pos)
-		item:SetCurrentCharges(200000)
+		Notifications:TopToAll({text="Power Up: +250 to all stats!", style={color="green"}, duration=10.0})
+		caster:EmitSound("ui.trophy_levelup")
+		local heroes = HeroList:GetAllHeroes()
+		for _,hero in pairs(heroes) do
+			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
+				hero:ModifyAgility(250)
+				hero:ModifyStrength(250)
+				hero:ModifyIntellect(250)
+				local particle1 = ParticleManager:CreateParticle("particles/econ/events/ti6/hero_levelup_ti6.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
+				ParticleManager:SetParticleControl(particle1, 0, hero:GetAbsOrigin())
+			end
+		end
 		EmitGlobalSound("Loot_Drop_Stinger_Arcana")
-		EmitGlobalSound("Arthas.Death")
 	end)
 
 	EmitSoundOn("skeleton_king_wraith_death_long_01", caster)
@@ -201,18 +225,20 @@ function arthas_boss_die(caster)
 	StartAnimation(caster, {duration=6.0, activity=ACT_DOTA_FLAIL, rate=0.75})
 
 	Timers:CreateTimer(6.2, function()
-		StartAnimation(caster, {duration=6.2, activity=ACT_DOTA_DIE, rate=0.25})
+		StartAnimation(caster, {duration=6.3, activity=ACT_DOTA_DIE, rate=0.22})
 		EmitSoundOn("skeleton_king_wraith_death_long_09", caster)
 		EmitSoundOn("skeleton_king_wraith_death_long_09", caster)
 	end)
 
-	Timers:CreateTimer(11.2, function()
+	Timers:CreateTimer(11.0, function()
 		UTIL_Remove(caster)
+		CustomGameEventManager:Send_ServerToAllClients("hide_ui", {})
+		RefreshPlayers()
 	end)
 
 	Timers:CreateTimer(19, function()
 	local heroes = HeroList:GetAllHeroes()
-		Timers:CreateTimer(5, StartBaneHallowArena)
+		Timers:CreateTimer(5, StartBanehallowArena)
 		for _,hero in pairs(heroes) do
 		local id = hero:GetPlayerID()
 		local point = Entities:FindByName(nil, "point_teleport_boss_"..id)
@@ -231,12 +257,18 @@ end
 
 function banehallow_boss_die(caster)
 	Timers:CreateTimer(1.0, function()
-		local item = CreateItem("item_bag_of_gold", nil, nil)
-		local pos = caster:GetAbsOrigin()
-		local drop = CreateItemOnPositionSync( pos, item )
-		local pos_launch = pos+RandomVector(RandomFloat(150, 200))
-		item:LaunchLoot(false, 300, 0.5, pos)
-		item:SetCurrentCharges(200000)
+		Notifications:TopToAll({text="Power Up: +250 to all stats!", style={color="green"}, duration=10.0})
+		caster:EmitSound("ui.trophy_levelup")
+		local heroes = HeroList:GetAllHeroes()
+		for _,hero in pairs(heroes) do
+			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
+				hero:ModifyAgility(250)
+				hero:ModifyStrength(250)
+				hero:ModifyIntellect(250)
+				local particle1 = ParticleManager:CreateParticle("particles/econ/events/ti6/hero_levelup_ti6.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
+				ParticleManager:SetParticleControl(particle1, 0, hero:GetAbsOrigin())
+			end
+		end
 		EmitGlobalSound("Loot_Drop_Stinger_Arcana")
 	end)
 
@@ -253,6 +285,8 @@ function banehallow_boss_die(caster)
 
 	Timers:CreateTimer(12.5, function()
 		UTIL_Remove(caster)
+		CustomGameEventManager:Send_ServerToAllClients("hide_ui", {})
+		RefreshPlayers()
 	end)
 
 	Timers:CreateTimer(17, StartLichKingArena)
@@ -260,12 +294,18 @@ end
 
 function LichKingEnd(caster)
 	Timers:CreateTimer(1.0, function()
-		local item = CreateItem("item_bag_of_gold", nil, nil)
-		local pos = caster:GetAbsOrigin()
-		local drop = CreateItemOnPositionSync( pos, item )
-		local pos_launch = pos+RandomVector(RandomFloat(150,200))
-		item:LaunchLoot(false, 300, 0.5, pos)
-		item:SetCurrentCharges(200000)
+		Notifications:TopToAll({text="Power Up: +250 to all stats!", style={color="green"}, duration=10.0})
+		caster:EmitSound("ui.trophy_levelup")
+		local heroes = HeroList:GetAllHeroes()
+		for _,hero in pairs(heroes) do
+			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
+				hero:ModifyAgility(250)
+				hero:ModifyStrength(250)
+				hero:ModifyIntellect(250)
+				local particle1 = ParticleManager:CreateParticle("particles/econ/events/ti6/hero_levelup_ti6.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
+				ParticleManager:SetParticleControl(particle1, 0, hero:GetAbsOrigin())
+			end
+		end
 		EmitGlobalSound("Loot_Drop_Stinger_Arcana")
 	end)
 
@@ -283,9 +323,21 @@ function LichKingEnd(caster)
 
 	Timers:CreateTimer(14, function()
 		UTIL_Remove(caster)
+		CustomGameEventManager:Send_ServerToAllClients("hide_ui", {})
+		RefreshPlayers()
 	end)
 
 	Timers:CreateTimer(17, function()
-		StartSpiritMasterArena()
+		SPIRIT_MASTER = 0
+		SPECIAL_EVENT = 1
+		RefreshPlayers()
+		Notifications:TopToAll({text="It's Duel Time!", duration=5.0, style={color="white"}})
+		Timers:CreateTimer(1, function()
+			PauseHeroes()
+			Timers:CreateTimer(5, function()
+				DuelEvent()
+				Timers:CreateTimer(3, RestartHeroes())
+			end)
+		end)
 	end)
 end

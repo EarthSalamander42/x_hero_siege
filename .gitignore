@@ -16,6 +16,7 @@
 
 # Map files
 *.vpk
+*.vmap
 
 # Map overviews
 content/dota_addons/barebones/materials/overviews/*

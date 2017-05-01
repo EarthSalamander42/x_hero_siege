@@ -5,7 +5,6 @@
 	z-index: -1;
 }
 
-
 .CustomSettingsColumn
 {
 	height: 100%;
@@ -75,15 +74,15 @@
 	font-size: 20px;
 	letter-spacing: 1px;
 	text-transform: uppercase;
-	margin-left: 1px;
-	margin-top: 1px;
+	margin-left: 10px;
+	margin-top: 0px;
 	text-shadow: 2px 2px 2px black;
 }
 
 .CustomGameSettingPanelDivider
 {
 	width: 100%;
-	margin: 2px;
+	margin: 1px;
 	height: 1px;
 	background-color: #49525555;
 }
@@ -94,20 +93,130 @@
 	width: 100%;
 }
 
-.CGSRadio
+.CGSRadio,
+.CGSRadio1,
+.CGSRadio2,
+.CGSRadio3,
+.CGSRadio4
 {
 	width: 100%;
 
-	margin: 2px;
-	margin-top: 6px;
+	margin: 0px;
+	margin-top: 4px;
 	margin-left: 5px;
 }
 
-RadioButton Label
+.CGSRadio Label,
+.CGSRadio1 Label,
+.CGSRadio2 Label,
+.CGSRadio3 Label,
+.CGSRadio4 Label
 {
-	font-size: 18px;
+	font-size: 16px;
 	letter-spacing: 1px;
 	text-shadow: 2px 2px 2px black;
-	color: #454545;
 	vertical-align: center;
+}
+
+.CGSRadio Label
+{
+	color: dodgerBlue;
+}
+
+.CGSRadio1 Label
+{
+	color: green;
+}
+
+.CGSRadio2 Label
+{
+	color: yellow;
+}
+
+.CGSRadio3 Label
+{
+	color: orange;
+}
+
+.CGSRadio4 Label
+{
+	color: red;
+}
+
+#Community
+{
+	width: 355px;
+	height: 310px;
+	margin-top: 5px;
+	margin-left: 6px;
+	flow-children: down;
+	background-color: gradient( linear, 100% 0%, 100% 100%, from( #111111 ), color-stop( 0.01, #202327 ), color-stop( 0.2, #141619ff ), to( #000000dd ) );
+	box-shadow: black -3px -3px 6px 6px;
+	color: #fff000;
+}
+
+#CommunityImg,
+#CommunityImg2,
+#CommunityImg3
+{
+	width: 190px;
+	height: 60px;
+	margin-top: 0px;
+	margin-bottom: 2px;
+	horizontal-align: center;
+}
+
+#CommunityImg:hover,
+#CommunityImg2:hover,
+#CommunityImg3:hover
+{
+	wash-color: #bbbbbb;
+}
+
+#CommunityImg:active,
+#CommunityImg2:active,
+#CommunityImg3:active
+{
+	wash-color: #fff000;
+}
+
+.CommunityText
+{
+	width: 100%;
+	margin-top: 5px;
+	margin-bottom: 0px;
+	margin-left: 10px;
+	font-size: 16px;
+	horizontal-align: left;
+}
+
+#VIP
+{
+	width: 355px;
+	height: 310px;
+	margin-top: 765px;
+	margin-left: 6px;
+	flow-children: down;
+	background-color: gradient( linear, 100% 0%, 100% 100%, from( #111111 ), color-stop( 0.01, #202327 ), color-stop( 0.2, #141619ff ), to( #000000dd ) );
+	box-shadow: black -3px -3px 6px 6px;
+	color: #ffffff;
+}
+
+#VIPImg
+{
+	width: 215px;
+	height: 80px;
+	margin-top: 0px;
+	margin-bottom: 1px;
+	horizontal-align: center;
+}
+
+#VIPImg:hover
+{
+	wash-color: #bbbbbb;
+}
+
+#VIPImg:active
+{
+	wash-color: #fff000;
 }

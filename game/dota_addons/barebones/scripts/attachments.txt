@@ -1,10 +1,20 @@
 "Attachments"
 {
-	"Particles"
+	"models/heroes/juggernaut/juggernaut.vmdl"
 	{
-	}
-	"Animations"
-	{
+		"attach_head"
+		{
+			"models/items/juggernaut/arcana/juggernaut_arcana_mask.vmdl"
+			{
+				"scale"		"1"
+				"pitch"		"0"
+				"roll"		"0"
+				"yaw"		"0"
+				"YPos"		"0"
+				"ZPos"		"-135"
+				"XPos"		"-5"
+			}
+		}
 	}
 	"models/heroes/skeleton_king/skeleton_king.vmdl"
 	{
@@ -15,10 +25,10 @@
 				"scale"		"1"
 				"pitch"		"-4"
 				"roll"		"0"
-				"ZPos"		"-95"
+				"ZPos"		"-98"
 				"YPos"		"-2"
 				"yaw"		"0"
-				"XPos"		"22"
+				"XPos"		"20"
 			}
 			"models/heroes/wraith_king/wraith_king_shoulder.vmdl"
 			{
@@ -67,5 +77,63 @@
 				"XPos"		"-16"
 			}
 		}
+	}
+	"Particles"
+	{
+	}
+	"models/heroes/juggernaut/juggernaut_arcana.vmdl"
+	{
+		"attach_hitloc"
+		{
+			"models/items/juggernaut/arcana/juggernaut_arcana_mask.vmdl"
+			{
+				"scale"		"1"
+				"pitch"		"0"
+				"roll"		"1"
+				"yaw"		"0"
+				"YPos"		"0"
+				"ZPos"		"-135"
+				"XPos"		"0"
+			}
+			"models/heroes/juggernaut/jugg_bracers.vmdl"
+			{
+				"scale"		"1"
+				"pitch"		"0"
+				"roll"		"0"
+				"yaw"		"0"
+				"YPos"		"0"
+				"ZPos"		"0"
+				"XPos"		"0"
+			}
+		}
+		"attach_head"
+		{
+			"models/items/juggernaut/arcana/juggernaut_arcana_mask.vmdl"
+			{
+				"scale"		"1"
+				"pitch"		"0"
+				"roll"		"1"
+				"ZPos"		"-135"
+				"YPos"		"0"
+				"yaw"		"0"
+				"XPos"		"0"
+			}
+		}
+		"attach_belt"
+		{
+			"models/items/juggernaut/arcana/juggernaut_arcana_mask.vmdl"
+			{
+				"scale"		"1"
+				"pitch"		"0"
+				"roll"		"1"
+				"yaw"		"0"
+				"YPos"		"0"
+				"ZPos"		"-135"
+				"XPos"		"0"
+			}
+		}
+	}
+	"Animations"
+	{
 	}
 }

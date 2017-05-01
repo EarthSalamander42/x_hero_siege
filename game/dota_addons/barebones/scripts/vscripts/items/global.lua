@@ -53,10 +53,24 @@ local cleave = ability:GetSpecialValueFor("cleave_pct_tooltip")
 local full_damage = attacker:GetAverageTrueAttackDamage(attacker)
 local cleave_pct = cleave * full_damage / 100
 
-	local splash_targets = FindUnitsInRadius(attacker:GetTeamNumber(), target:GetAbsOrigin(), nil, radius, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, FIND_ANY_ORDER, false)
-	for _, unit in pairs(splash_targets) do
-		if unit ~= target and not unit:IsBuilding() then
-			ApplyDamage({victim = unit, attacker = attacker, damage = cleave_pct, ability = ability, damage_type = DAMAGE_TYPE_PHYSICAL})
+	local splash_targets = FindUnitsInRadius(DOTA_TEAM_BADGUYS, target:GetAbsOrigin(), nil, radius, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, FIND_ANY_ORDER, false)
+	local splash_targets2 = FindUnitsInRadius(DOTA_TEAM_NEUTRALS, target:GetAbsOrigin(), nil, radius, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, FIND_ANY_ORDER, false)
+	local splash_targets3 = FindUnitsInRadius(DOTA_TEAM_CUSTOM_1, target:GetAbsOrigin(), nil, radius, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, FIND_ANY_ORDER, false)
+	if attacker:GetTeamNumber() == 2 then
+		for _, unit in pairs(splash_targets) do
+			if unit ~= target and not unit:IsBuilding() then
+				ApplyDamage({victim = unit, attacker = attacker, damage = cleave_pct, ability = ability, damage_type = DAMAGE_TYPE_PHYSICAL})
+			end
+		end
+		for _, unit in pairs(splash_targets2) do
+			if unit ~= target and not unit:IsBuilding() then
+				ApplyDamage({victim = unit, attacker = attacker, damage = cleave_pct, ability = ability, damage_type = DAMAGE_TYPE_PHYSICAL})
+			end
+		end
+		for _, unit in pairs(splash_targets3) do
+			if unit ~= target and not unit:IsBuilding() then
+				ApplyDamage({victim = unit, attacker = attacker, damage = cleave_pct, ability = ability, damage_type = DAMAGE_TYPE_PHYSICAL})
+			end
 		end
 	end
 end
@@ -80,10 +94,11 @@ local RemoveExceptions = false
 			ParticleManager:CreateParticle('particles/generic_gameplay/generic_purge.vpcf', PATTACH_ABSORIGIN_FOLLOW, target)
 			target:EmitSound("DOTA_Item.DiffusalBlade.Target")
 			ability:ApplyDataDrivenModifier(caster, target, 'modifier_purge', {duration = duration})
+			ability:StartCooldown(10.0)
 		elseif bSummoned then
 			ApplyDamage({victim = target, attacker = caster, damage = ability:GetSpecialValueFor('damage_to_summons'), damage_type = DAMAGE_TYPE_PURE, ability = ability})
+			ability:StartCooldown(10.0)
 		end
-		ability:StartCooldown(10.0)
 	end
 end
 
@@ -146,15 +161,17 @@ local ability = keys.ability
 end
 
 function respawnMagtheridon()
-local mag = CreateUnitByName("npc_dota_hero_magtheridon", point, true, nil, nil, DOTA_TEAM_BADGUYS)
-local ankh = CreateItem("item_magtheridon_ankh", mag, mag)
+
+	local magtheridon = CreateUnitByName("npc_dota_hero_magtheridon", point, true, nil, nil, DOTA_TEAM_BADGUYS)
+	local ankh = CreateItem("item_magtheridon_ankh", mag, mag)
 
 	if itemCharges -1 ~= 0 then
-		mag:AddItem(ankh)
+		magtheridon:AddItem(ankh)
 	end
 
 	ankh:SetCurrentCharges(itemCharges -1)
-	mag:EmitSound("Ability.Reincarnation")
+	magtheridon:EmitSound("Ability.Reincarnation")
+	BossBar(magtheridon, "mag")
 end
 
 function respawnMagtheridonMedium(keys)

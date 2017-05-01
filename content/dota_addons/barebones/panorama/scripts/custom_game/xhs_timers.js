@@ -56,6 +56,12 @@ function ShowTimer(data)	// if Map is X Hero Siege then
 	$("#ScoreboardLeft_Parent").visible = true;
 }
 
+function HideTimer(data)
+{
+//	$("#Timer").AddClass("timer_visible");
+	$("#ScoreboardLeft_Parent").visible = false;
+}
+
 function OnGameStateChanged(table, key, data)
 {
 	$.Msg("Table '", table, "' changed: '", key, "' = ", data);
@@ -77,4 +83,5 @@ function visibleSwitch()
 	GameEvents.Subscribe("creepcountdown", UpdateTimerCreep);
 	GameEvents.Subscribe("countdown", UpdateTimerMuradin);
 	GameEvents.Subscribe("show_timer", ShowTimer);
+	GameEvents.Subscribe("hide_timer", HideTimer);
 })();

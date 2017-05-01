@@ -7,7 +7,6 @@ function Spawn( entityKeyValues )
 
 	Timers:CreateTimer(0,ArthasThink)
 	DebugPrint("Starting AI for "..thisEntity:GetUnitName().." "..thisEntity:GetEntityIndex())
-
 end
 
 function ArthasThink()

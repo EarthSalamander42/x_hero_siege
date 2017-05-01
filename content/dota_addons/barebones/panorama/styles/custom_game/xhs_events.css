@@ -1,0 +1,156 @@
+.EventsPanel
+{
+	width: 30%;
+	height: 50%;
+	margin-top: 25%;
+	margin-left: 35%;
+	border-radius: 4px;
+	overflow: clip;
+	background-color: none;
+}
+
+#EventPanel
+{
+	width: 260px;
+	height: 400px;
+	margin-top: 50px;
+	margin-left: -800px;
+	background-color: gradient( linear, 0% 0%, 100% 50%, from( #25282a00 ), color-stop( .6, #25282acc), color-stop( .8, #25282a88), to( #00000022 ) );
+	border-radius: 4px;
+	box-shadow: fill #00000088 -4px -4px 8px 8px;
+	overflow: clip;
+}
+
+.HidePanel
+{
+	transform: translate3d( 1000px, 0px, 0px );
+}
+
+#Event1,
+#Event2,
+#Event3,
+#Event4
+{
+	width: 155px;
+	height: 45px;
+	horizontal-align: center;
+	background-color: gradient( linear, 0% 0%, 100% 50%, from( #25282a00 ), color-stop( .6, #25282acc), color-stop( .8, #25282a88), to( #00000022 ) );
+	border-radius: 4px;
+	box-shadow: fill #00000088 -4px -4px 8px 8px;
+	overflow: clip;
+/*	visibility: collapse;	*/
+}
+
+#Close
+{
+	width: 25px;
+	height: 25px;
+	margin-top: 5px;
+	margin-left: 230px;
+	background-color: none;
+}
+
+#Event1
+{
+	margin-top: 100px;
+	horizontal-align: center;
+}
+
+#Event2
+{
+	margin-top: 165px;
+	horizontal-align: center;
+}
+
+#Event3
+{
+	margin-top: 230px;
+	horizontal-align: center;
+}
+
+#Event4
+{
+	margin-top: 295px;
+	horizontal-align: center;
+}
+
+#Event1:hover,
+#Event2:hover,
+#Event3:hover,
+#Event4:hover,
+#Close:hover
+{
+	wash-color: #bbbbbb;
+}
+
+#Event1:active,
+#Event2:active,
+#Event3:active,
+#Event4:active,
+#Close:active
+{
+	wash-color: #fff000;
+}
+
+#EventTitle
+{
+	margin-top: 0px;
+	margin-left: 0px;
+	font-size: 20px;
+	color: white;
+	horizontal-align: center;
+	vertical-align: center;
+}
+
+#EventInfo
+{
+	margin-top: 10px;
+	margin-left: 5px;
+	font-size: 20px;
+	color: white;
+}
+
+#Event1_info,
+#Event2_info,
+#Event3_info,
+#Event4_info
+{
+	margin-left: 0px;
+	width: 400px;
+	background-color: gradient( linear, 0% 0%, 100% 50%, from( #25282a00 ), color-stop( .6, #25282acc), color-stop( .8, #25282a88), to( #00000022 ) );
+	visibility: collapse;
+}
+
+#Event1_info
+{
+	margin-top: 215px;
+	height: 80px;
+}
+
+#Event2_info
+{
+	margin-top: 260px;
+	height: 120px;
+}
+
+#Event3_info
+{
+	margin-top: 305px;
+	height: 150px;
+}
+
+#Event4_info
+{
+	margin-top: 350px;
+	height: 360px;
+}
+
+#EventsText
+{
+	margin-top: 10px;
+	margin-left: 0px;
+	font-size: 18px;
+	vertical-align: center;
+	horizontal-align: center;
+	color: dodgerblue;
+}

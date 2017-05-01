@@ -1,6 +1,5 @@
 <root>
 	<script>
-		GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_FLYOUT_SCOREBOARD, false );
 		GameUI.SetDefaultUIEnabled(DotaDefaultUIElement_t.DOTA_DEFAULT_UI_TOP_BAR_SCORE, false);
 		GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_INVENTORY_PROTECT, false );	//Glyph.
 		GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_INVENTORY_COURIER, false );
@@ -9,11 +8,20 @@
 		GameUI.CustomUIConfig().team_colors = {}
 		GameUI.CustomUIConfig().team_colors[DOTATeam_t.DOTA_TEAM_GOODGUYS] = "#004080;";
 		GameUI.CustomUIConfig().team_colors[DOTATeam_t.DOTA_TEAM_BADGUYS ] = "#802020;";
+		GameUI.CustomUIConfig().team_colors[DOTATeam_t.DOTA_TEAM_CUSTOM_3 ] = "#00b4c8;";
+		GameUI.CustomUIConfig().team_colors[DOTATeam_t.DOTA_TEAM_CUSTOM_4 ] = "#00963c;";
 
 		var newUI = $.GetContextPanel().GetParent().GetParent().FindChildTraverse("HUDElements").FindChildTraverse("lower_hud").FindChildTraverse("center_with_stats").FindChildTraverse("center_block");
 		//Use this line if you want to keep 4 ability minimum size, and only use 160 if you want ~2 ability min size
-		newUI.FindChildTraverse("AbilitiesAndStatBranch").style.minWidth = "284px";
+		newUI.FindChildTraverse("AbilitiesAndStatBranch").style.minWidth = "386px";
 		//newUI.FindChildTraverse("AbilitiesAndStatBranch").style.minWidth = "160px";
+
+		//Fuck Scanner, by Houthakker
+		var newUI = $.GetContextPanel().GetParent().GetParent().FindChildTraverse("HUDElements").FindChildTraverse("minimap_container");
+		newUI.FindChildTraverse("GlyphScanContainer").style.visibility = "collapse";
+
+		var hudElements = $.GetContextPanel().GetParent().GetParent().FindChildTraverse("HUDElements");
+		var newUI = hudElements.FindChildTraverse("center_block");
 
 		newUI.FindChildTraverse("StatBranch").style.visibility = "collapse";
 		//you are not spawning the talent UI, fuck off (Disabling mouseover and onactivate)
@@ -22,23 +30,15 @@
 		newUI.FindChildTraverse("StatBranch").SetPanelEvent("onactivate", function(){});
 		//Fuck that levelup button
 		newUI.FindChildTraverse("level_stats_frame").style.visibility = "collapse";
-		//fuck backpack UI (We have Lua filling these slots with junk, and if the player can't touch them it should be effectively disabled)
-		newUI.FindChildTraverse("inventory").FindChildTraverse("inventory_items").FindChildTraverse("inventory_backpack_list").style.visibility = "collapse";
-
-		//Fuck Scanner, by Houthakker
-		var newUI = $.GetContextPanel().GetParent().GetParent().FindChildTraverse("HUDElements").FindChildTraverse("lower_hud");
-	    newUI.FindChildTraverse("GlyphScanContainer").style.visibility = "collapse";
-
-	    var hudElements = $.GetContextPanel().GetParent().GetParent().FindChildTraverse("HUDElements");
-		var newUI = hudElements.FindChildTraverse("center_block");
 
 		//Skin Killer - TopBar
 		var topbar = hudElements.FindChildTraverse("topbar");
 		topbar.FindChildTraverse("HUDSkinTopBarBG").style.visibility = "collapse";
 		for (var bg of topbar.FindChildrenWithClassTraverse("TopBarBackground")) {
-		    bg.style.opacity = "1";
+			bg.style.opacity = "1";
 		}
-		topbar.style.width = "1192px";
+		topbar.style.width = "1188px";
+
 		//Skin Killer - Portrait
 		newUI.FindChildTraverse("HUDSkinPortrait").style.visibility = "collapse";
 		newUI.FindChildTraverse("HUDSkinXPBackground").style.visibility = "collapse";
@@ -74,16 +74,43 @@
 
 		var topbarDirePlayersContainer = hudElements.FindChildTraverse("TopBarDirePlayersContainer");
 		topbarDirePlayersContainer.style.width = "504px";
-//		topbarDirePlayersContainer.style.flowChildren = "left";
+		topbarDirePlayersContainer.style.flowChildren = "left";
+
+		var RadiantTeamContainer = hudElements.FindChildTraverse("RadiantTeamContainer");
+		RadiantTeamContainer.style.height = "610px";
+		var DireTeamContainer = hudElements.FindChildTraverse("DireTeamContainer");
+		DireTeamContainer.style.visibility = "collapse";
+		var DireHeader = hudElements.FindChildTraverse("DireHeader");
+		DireHeader.style.visibility = "collapse";
+
+		//Scoreboard
+		var ScoreboardBackground = hudElements.FindChildTraverse("scoreboard")
+		ScoreboardBackground.style.height = "490px";
+		var ScoreboardButtons = hudElements.FindChildTraverse("scoreboard").FindChildTraverse("Background").FindChildTraverse("NestedMenuButtons");
+		ScoreboardButtons.style.visibility = "collapse";
+
+		//Buff Bar
+		var BuffBar = hudElements.FindChildTraverse("lower_hud").FindChildTraverse("buffs")
+		BuffBar.style.width = "30%";
+		BuffBar.style.marginLeft = "38.5%";
+
+		//DeBuff Bar
+		var DeBuffBar = hudElements.FindChildTraverse("lower_hud").FindChildTraverse("debuffs")
+		DeBuffBar.style.width = "30%";
+		DeBuffBar.style.marginBottom = "40.5%";
+		DeBuffBar.style.marginRight = "31.5%";
+		DeBuffBar.style.flowChildren = "right";
 	</script>
 
 	<Panel>
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/barebones_notifications.xml" />
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/barebones_attachments.xml" />
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/hud.xml" />
+		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/boss_healthbar.xml" />
+		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/xhs_quests.xml" />
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/xhs_adminmod.xml" />
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/xhs_timers.xml" />
-		<CustomUIElement type="FlyoutScoreboard"	layoutfile="file://{resources}/layout/custom_game/multiteam_flyout_scoreboard.xml" />
+		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/xhs_events.xml" />
 		<CustomUIElement type="GameSetup"			layoutfile="file://{resources}/layout/custom_game/gamesetup_options.xml" />
 		<CustomUIElement type="GameSetup"			layoutfile="file://{resources}/layout/custom_game/team_select.xml" />
 		<CustomUIElement type="EndScreen" 			layoutfile="file://{resources}/layout/custom_game/multiteam_end_screen.xml" />

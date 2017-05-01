@@ -3,42 +3,44 @@ local caster = event.caster
 local ability = event.ability
 local point = event.target_points[1]
 
-	-- Remove first orb
-	local orbNumber
-	for i=1,3 do
-		if caster.orbs[i] then
-			ParticleManager:DestroyParticle(caster.orbs[i], true)
-			caster.orbs[i] = nil
-			orbNumber = i
-			break
-		end
-	end
-
-	-- Launch orb
-	local speed = 900
-	local orb = ParticleManager:CreateParticle("particles/units/heroes/hero_rubick/rubick_base_attack.vpcf", PATTACH_CUSTOMORIGIN, caster)
-	ParticleManager:SetParticleControl(orb, 0, caster:GetAttachmentOrigin(caster:ScriptLookupAttachment("attach_attack1")))
-	ParticleManager:SetParticleControl(orb, 1, point)
-	ParticleManager:SetParticleControl(orb, 2, Vector(speed, 0, 0))
-	ParticleManager:SetParticleControl(orb, 3, point)
-
-	local distanceToTarget = (caster:GetAbsOrigin() - point):Length2D()
-	Timers:CreateTimer(distanceToTarget/speed, function()
-		ParticleManager:DestroyParticle(orb, false)
-	end)
-
-	-- Restore orb
-	Timers:CreateTimer(1, function() 
-		if orbNumber then
-			caster.orbs[orbNumber] = ParticleManager:CreateParticle("particles/custom/human/blood_mage/exort_orb.vpcf", PATTACH_OVERHEAD_FOLLOW, caster)
-			ParticleManager:SetParticleControlEnt(caster.orbs[orbNumber], 1, caster, PATTACH_POINT_FOLLOW, "attach_orb"..orbNumber, caster:GetAbsOrigin(), false)
-		else
-			for i=1,3 do
-				caster.orbs[i] = ParticleManager:CreateParticle("particles/custom/human/blood_mage/exort_orb.vpcf", PATTACH_OVERHEAD_FOLLOW, caster)
-				ParticleManager:SetParticleControlEnt(caster.orbs[i], 1, caster, PATTACH_POINT_FOLLOW, "attach_orb"..i, caster:GetAbsOrigin(), false)
+	if caster:GetUnitName() == "npc_dota_hero_invoker" then
+		-- Remove first orb
+		local orbNumber
+		for i = 1, 3 do
+			if caster.orbs[i] then
+				ParticleManager:DestroyParticle(caster.orbs[i], true)
+				caster.orbs[i] = nil
+				orbNumber = i
+				break
 			end
 		end
-	end)
+
+		-- Launch orb
+		local speed = 900
+		local orb = ParticleManager:CreateParticle("particles/units/heroes/hero_rubick/rubick_base_attack.vpcf", PATTACH_CUSTOMORIGIN, caster)
+		ParticleManager:SetParticleControl(orb, 0, caster:GetAttachmentOrigin(caster:ScriptLookupAttachment("attach_attack1")))
+		ParticleManager:SetParticleControl(orb, 1, point)
+		ParticleManager:SetParticleControl(orb, 2, Vector(speed, 0, 0))
+		ParticleManager:SetParticleControl(orb, 3, point)
+
+		local distanceToTarget = (caster:GetAbsOrigin() - point):Length2D()
+		Timers:CreateTimer(distanceToTarget/speed, function()
+			ParticleManager:DestroyParticle(orb, false)
+		end)
+
+		-- Restore orb
+		Timers:CreateTimer(1, function() 
+			if orbNumber then
+				caster.orbs[orbNumber] = ParticleManager:CreateParticle("particles/custom/human/blood_mage/exort_orb.vpcf", PATTACH_OVERHEAD_FOLLOW, caster)
+				ParticleManager:SetParticleControlEnt(caster.orbs[orbNumber], 1, caster, PATTACH_POINT_FOLLOW, "attach_orb"..orbNumber, caster:GetAbsOrigin(), false)
+			else
+				for i=1,3 do
+					caster.orbs[i] = ParticleManager:CreateParticle("particles/custom/human/blood_mage/exort_orb.vpcf", PATTACH_OVERHEAD_FOLLOW, caster)
+					ParticleManager:SetParticleControlEnt(caster.orbs[i], 1, caster, PATTACH_POINT_FOLLOW, "attach_orb"..i, caster:GetAbsOrigin(), false)
+				end
+			end
+		end)
+	end
 end
 
 function FlameStrikeStart(event)

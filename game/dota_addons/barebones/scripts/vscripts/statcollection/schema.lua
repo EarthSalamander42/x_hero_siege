@@ -6,8 +6,7 @@ function customSchema:init()
 
 	-- Flag Example
 	statCollection:setFlags({
-		version = X_HERO_SIEGE_V,
-		difficulty = GameRules:GetCustomGameDifficulty()
+		version = X_HERO_SIEGE_V
 	})
 
 	-- Listen for changes in the current state
@@ -34,7 +33,15 @@ function customSchema:init()
 			end
 		end
 	end, nil)
+
+	-- Write 'test_schema' on the console to test your current functions instead of having to end the game
+	if Convars:GetBool('developer') then
+		Convars:RegisterCommand("test_schema", function() PrintSchema(BuildGameArray(), BuildPlayersArray()) end, "Test the custom schema arrays", 0)
+		Convars:RegisterCommand("test_end_game", function() GameRules:SetGameWinner(DOTA_TEAM_GOODGUYS) end, "Test the end game", 0)
+	end
 end
+
+
 
 -------------------------------------
 
@@ -46,7 +53,8 @@ function BuildGameArray()
 	local game = {}
 
 	-- Add game values here as game.someValue = GetSomeGameValue()
-	game.gl = GameRules:GetDOTATime(false, false) -- Tracks total game length, from the horn sound, in seconds
+	game.gl = math.floor(GameRules:GetDOTATime(false, false)) -- Tracks total game length, from the horn sound, in seconds
+	game.df = GameRules:GetCustomGameDifficulty()	-- Retrieve Difficulty of the mod
 
 	return game
 end
@@ -59,14 +67,16 @@ function BuildPlayersArray()
 			if not PlayerResource:IsBroadcaster(playerID) then
 
 				local hero = PlayerResource:GetSelectedHeroEntity(playerID)
+				local player_team = ""
+				if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
+					player_team = "Radiant"
+				else
+					player_team = "Dire"
+				end
 
 				table.insert(players, {
-
 					-- steamID32 required in here
 					steamID32 = PlayerResource:GetSteamAccountID(playerID),
-
-					-- Example functions for generic stats are defined in statcollection/lib/utilities.lua
-					-- Add player values here as someValue = GetSomePlayerValue(),
 
 					ph = GetHeroName(playerID), -- Hero by its short name
 --					pl = hero:GetLevel(),       -- Hero level at the end of the game
@@ -82,7 +92,12 @@ function BuildPlayersArray()
 					i3 = GetItemSlot(hero, 2),
 					i4 = GetItemSlot(hero, 3),
 					i5 = GetItemSlot(hero, 4),
-					i6 = GetItemSlot(hero, 5)
+					i6 = GetItemSlot(hero, 5),
+
+					s = SECRET
+
+					-- Example functions for generic stats are defined in statcollection/lib/utilities.lua
+					-- Add player values here as someValue = GetSomePlayerValue(),
 				})
 			end
 		end
@@ -100,26 +115,18 @@ function PrintSchema(gameArray, playerArray)
 	print("-------------------------------------")
 end
 
--- Write 'test_schema' on the console to test your current functions instead of having to end the game
-if Convars:GetBool('developer') then
-	Convars:RegisterCommand("test_schema", function() PrintSchema(BuildGameArray(), BuildPlayersArray()) end, "Test the custom schema arrays", 0)
-end
-
 -------------------------------------
 
 -- If your gamemode is round-based, you can use statCollection:submitRound(bLastRound) at any point of your main game logic code to send a round
 -- If you intend to send rounds, make sure your settings.kv has the 'HAS_ROUNDS' set to true. Each round will send the game and player arrays defined earlier
 -- The round number is incremented internally, lastRound can be marked to notify that the game ended properly
-function customSchema:submitRound(isLastRound)
+function customSchema:submitRound()
 
 	local winners = BuildRoundWinnerArray()
 	local game = BuildGameArray()
 	local players = BuildPlayersArray()
 
 	statCollection:sendCustom({ game = game, players = players })
-
-	isLastRound = isLastRound or false --If the function is passed with no parameter, default to false.
-	return { winners = winners, lastRound = isLastRound }
 end
 
 -- A list of players marking who won this round
@@ -136,39 +143,37 @@ function BuildRoundWinnerArray()
 	return winners
 end
 
--------------------------------------
-
 -- Schema Created by Firetoad
 -- String of item name
-function GetItemSlot(hero, slot)
-	local item = hero:GetItemInSlot(slot)
-	local itemName = "empty"
-
-	if item then
-		if string.find(item:GetAbilityName(), "item") then
-			itemName = string.gsub(item:GetAbilityName(), "item_", "")
-		end
-	end
-
-	return itemName
-end
-
--- Schema Created by Horde Mode devs
-function GetHeroName(hero)
-	local heroName = hero:GetUnitName()
-	heroName = string.gsub(heroName, "npc_dota_hero_", "") --Cuts the npc_dota_hero_ prefix
-	return heroName
-end
-
--- Schema Created by Horde Mode devs
-function GetNetworth(hero)
-	local gold = hero:GetGold()
-
-	-- Iterate over item slots adding up its gold cost
-	for i = 0, 15 do
-		local item = hero:GetItemInSlot(i)
-		if item then
-			gold = gold + item:GetCost()
-		end
-	end
-end
+--	function GetItemSlot(hero, slot)
+--		local item = hero:GetItemInSlot(slot)
+--		local itemName = "empty"
+--	
+--		if item then
+--			if string.find(item:GetAbilityName(), "item") then
+--				itemName = string.gsub(item:GetAbilityName(), "item_", "")
+--			end
+--		end
+--	
+--		return itemName
+--	end
+--	
+--	-- Schema Created by Horde Mode devs
+--	function GetHeroName(hero)
+--		local heroName = hero:GetUnitName()
+--		heroName = string.gsub(heroName, "npc_dota_hero_", "") --Cuts the npc_dota_hero_ prefix
+--		return heroName
+--	end
+--	
+--	-- Schema Created by Horde Mode devs
+--	function GetNetworth(hero)
+--		local gold = hero:GetGold()
+--	
+--		-- Iterate over item slots adding up its gold cost
+--		for i = 0, 15 do
+--			local item = hero:GetItemInSlot(i)
+--			if item then
+--				gold = gold + item:GetCost()
+--			end
+--		end
+--	end

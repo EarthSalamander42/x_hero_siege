@@ -20,8 +20,11 @@ function BalanarThink()
 		end
 	elseif Ability_Chaosrain:IsFullyCastable() then
 		local units = FindUnitsInRadius(thisEntity:GetTeamNumber(), thisEntity:GetAbsOrigin(), nil, 400, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO+DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)		
-		if units ~= nil and #units >=1 then
-			thisEntity:CastAbilityNoTarget(Ability_Chaosrain,-1)
+--		if units ~= nil and #units >=1 then
+		print("Chaos Rain Fully Castable")
+		if units ~= nil then
+			print("Valid units for Chaos Rain")
+			thisEntity:CastAbilityNoTarget(Ability_Chaosrain, -1)
 		end
 	elseif Ability_Sleep:IsFullyCastable() then
 		local units = FindUnitsInRadius(thisEntity:GetTeamNumber(), thisEntity:GetAbsOrigin(), nil, Ability_Sleep:GetSpecialValueFor("radius")-5, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)		
@@ -33,10 +36,12 @@ function BalanarThink()
 					numberOfTargets = numberOfTargets +1
 				end
 			end
-			if numberOfTargets >=2 then
-				thisEntity:CastAbilityOnTarget(units[1],Ability_Sleep,-1)
+			print("Targets: "..numberOfTargets)
+			
+			if numberOfTargets >= 0 then
+				thisEntity:CastAbilityOnTarget(units[1], Ability_Sleep, -1)
 			end
 		end
 	end
-	return 2
+	return 2.0
 end

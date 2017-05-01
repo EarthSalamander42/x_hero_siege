@@ -34,12 +34,15 @@ local BAT = caster:GetBaseAttackTime()
 local BAT_alt = target:GetBaseAttackTime()
 local BAT_Dec = ability:GetLevelSpecialValueFor("bat_reduction", ability:GetLevel() -1)
 local duration = ability:GetLevelSpecialValueFor("duration", ability:GetLevel() -1)
+local rage = caster:FindAbilityByName("troll_warlord_berserkers_rage")
 
 	caster:SetBaseAttackTime(BAT - BAT_Dec) --Doesn't work, find a fix
 	target:SetBaseAttackTime(BAT_alt - BAT_Dec)
+	rage:SetActivated(false)
 
 	Timers:CreateTimer(duration, function()
 		caster:SetBaseAttackTime(BAT)
 		target:SetBaseAttackTime(BAT_alt)
+		rage:SetActivated(true)
 	end)
 end

@@ -8,61 +8,23 @@
 	</scripts>
 	<!-- ADMIN MOD, STILL IN DEV -->
 	<Panel hittest="false" class="AdminModBorder">
-		<Button id="ToggleAdminMod" class="ToggleAdminMod" onactivate="OnToggleAdminModButton();" >
+		<Button id="ToggleAdminMod" class="ToggleAdminMod" onmouseover="OnMouseOver()" onmouseout="OnMouseOut();" >
 			<Image src="file://{images}/custom_game/adminmod/administrator.png" />
 		</Button>
 
 		<Panel id="AdminMod">
-			<Button id="CloseButton" class="CloseButton" onactivate="OnToggleAdminModButton();" >
-				<Image src="file://{images}/custom_game/adminmod/close.png" />
-			</Button>
-
-			<Panel id="HostCommandsBox">
-				<Label class="CommandsLabel" text="#host_command" id="CommandsLabel"/>
-				<RadioButton class="CGSRadio" id="host_commands_1" text="#toggle_lane_command1" onactivate="OnToggleLane1()" />
-				<RadioButton class="CGSRadio" id="host_commands_2" text="#toggle_lane_command2" onactivate="OnToggleLane2()" />
-				<RadioButton class="CGSRadio" id="host_commands_3" text="#toggle_lane_command3" onactivate="OnToggleLane3()" />
-				<RadioButton class="CGSRadio" id="host_commands_4" text="#toggle_lane_command4" onactivate="OnToggleLane4()" />
-				<RadioButton class="CGSRadio" id="host_commands_5" text="#toggle_lane_command5" onactivate="OnToggleLane5()" />
-				<RadioButton class="CGSRadio" id="host_commands_6" text="#toggle_lane_command6" onactivate="OnToggleLane6()" />
-				<RadioButton class="CGSRadio" id="host_commands_7" text="#toggle_lane_command7" onactivate="OnToggleLane7()" />
-				<RadioButton class="CGSRadio" id="host_commands_8" text="#toggle_lane_command8" onactivate="OnToggleLane8()" />
-			</Panel>
-
 			<Panel id="PlayerCommandsBox">
 				<Label class="CommandsLabel" text="#command" id="CommandsLabel"/>
-				<RadioButton class="CGSRadio" group="GameLength" id="player_commands_1" text="#tome_command" onactivate="OnBuyTomeCommand()" />
-				<RadioButton class="CGSRadio" group="GameLength" id="admin_commands_2" text="#unstuck_command" onactivate="OnKillCommand()" />
+				<RadioButton class="CGSRadio" group="GameLength" id="player_commands_1" text="#tome_command" onactivate="" />
+				<RadioButton class="CGSRadio" group="GameLength" id="player_commands_2" text="#info_command" onactivate="" />
 			</Panel>
-
-			<Panel id="AdminCommandsBox">
-				<Label class="CommandsLabel" text="#admin_command" id="CommandsLabel"/>
-				<RadioButton class="CGSRadio" group="GameLength" id="admin_commands_1" text="#freeze_command" onactivate="OnFreezeCommand()" />
-				<RadioButton class="CGSRadio" group="GameLength" id="admin_commands_2" text="#unfreeze_command" onactivate="OnUnfreezeCommand()" />
-				<RadioButton class="CGSRadio" group="GameLength" id="admin_commands_3" text="#poison_command" onactivate="OnPoisonCommand()" />
-				<RadioButton class="CGSRadio" group="GameLength" id="admin_commands_4" text="#purge_command" onactivate="OnPurgeCommand()" />
-				<RadioButton class="CGSRadio" group="GameLength" id="admin_commands_5" text="#kill_command" onactivate="OnKillCommand()" />
-				<RadioButton class="CGSRadio" group="GameLength" id="admin_commands_6" text="#revive_command" onactivate="OnReviveCommand()" />
-			</Panel>
-
 			<Panel id="CreditsBorder">
 				<Label class="CreditsLabel" text="#credits_command" id="CreditsBorderText"/>
 			</Panel>
 		</Panel>
-
-		<Panel id="AdminTabs" hittest="false">
-			<Panel id="Title">
-				<Panel id="OptionSelect" hittest="false">
-					<RadioButton id="PlayerButton" text="Players" onactivate="ToggleNormalTab()"/>
-					<Label id="ProfileContentRightTabOptionSeparator" tabindex="auto" text="/" />
-					<RadioButton id="AdminButton" text="Admins" onactivate="ToggleAdminTab()"/>
-				</Panel>
-				
-				<Panel class="displayPanel" id="creditsDisplay" hittest="false">
-					<Panel id="creditsPanel" class="creditsPanel" hittest="false">
-					</Panel>
-				</Panel>
-			</Panel>
-		</Panel>
+		<Label class="DualHeroTitle" text="Dual Hero Swap:" id="DualHeroText"/>
+		<Button class="DualHeroTitle" id="DualHero" onmouseactivate="ToggleDualHero();" >
+			<Image src="file://{images}/custom_game/adminmod/dual_hero.jpg" />
+		</Button>
 	</Panel>
 </root>

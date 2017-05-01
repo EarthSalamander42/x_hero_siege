@@ -1,17 +1,5 @@
 "DOTAAbilities"
 {
-	"item_backpack"
-	{
-		"BaseClass"					"item_datadriven"
-		"ID"						"2499"
-		"AbilityTextureName"		"custom/backpack"
-		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-	
-		"ItemDroppable"				"1"
-		"ItemPurchasable"			"0"
-		"ItemSellable"				"0"
-	}
-
 	//========================================================================================================
 	// Mask of Death Override of Lifesteal
 	//========================================================================================================
@@ -1007,6 +995,8 @@
 		"AbilityTextureName" 			"custom/key_of_the_three_moons"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"AbilityCastRange"				"0"
+		"Model"							"models/props_items/bloodstone.vmdl"
+		"Effect"						"particles/units/heroes/hero_morphling/morphling_morph_str.vpcf"
 		
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
@@ -1111,6 +1101,7 @@
 		"AbilityCooldown"				"10.0"
 		"ItemBaseLevel"					"1"
 		"MaxUpgradeLevel"				"3"
+		"Orb"							"1"
 
 		// Shops
 		"ItemCost"						"7500"
@@ -1862,6 +1853,8 @@
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"AbilityCastRange"				"0"
 		"AbilityCooldown"				"60.0"
+		"Model"							"models/props_items/poor_man_shield01.vmdl"
+		"Effect"						"particles/units/heroes/hero_ogre_magi/ogre_magi_ignite_debuff.vpcf"
 
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
@@ -2161,6 +2154,8 @@
 		"ID"							"2527"
 		"AbilityTextureName"			"custom/lightning_sword"		
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"Model"							"models/props_items/blinkdagger.vmdl"
+		"Effect"						"particles/units/heroes/hero_morphling/morphling_ambient_new.vpcf"
 
 		// Item Info
 		//----------------------------------------------------------------------------------------------------
@@ -2430,13 +2425,6 @@
 				"Target"		"CASTER"
 			}
 
-//			"ApplyModifier"
-//			{
-//				"ModifierName"		"modifier_invulnerable" // Purge
-//				"Target"			"CASTER"
-//				"Duration"			"0.1"
-//			}
-
 			"ApplyModifier"
 			{
 				"ModifierName"		"modifier_anti_magic"
@@ -2473,6 +2461,8 @@
 		"ID"							"2532"
 		"AbilityTextureName"			"custom/ring_of_superiority"		
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"Model"							"models/props_items/ring_health.vmdl"
+		"Effect"						"particles/units/heroes/hero_morphling/morphling_morph_agi.vpcf"
 
 		// Item Info
 		//----------------------------------------------------------------------------------------------------
@@ -2591,7 +2581,7 @@
 				}
 			}
 
-			"modifier_aura_of_blight_datadriven"
+			"modifier_unholy_aura_buff"
 			{
 				"Passive"		"1"
 				"IsHidden"		"0"
@@ -2713,6 +2703,7 @@
 				"IsHidden"			"0"
 				"Passive"			"1"
 				"ThinkInterval"		"%tick_time"
+				"TextureName"		"modifiers/cloak_of_flames"
 				
 				"OnCreated"
 				{
@@ -2771,7 +2762,8 @@
 		"ItemPurchasable"				"0"
 		"ItemSellable"					"0"
 		"ItemKillable"					"0"
-		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
+		"ItemShareability"				"ITEM_NOT_SHAREABLE"
+		"ItemDroppable"					"0"
 
 		// Special
 		//----------------------------------------------------------------------------------------------------
@@ -2896,7 +2888,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"items/item_shield_of_invincibility.lua"
+						"ScriptFile"	"items/shield_of_invincibility.lua"
 						"Function"		"Return"
 					}
 
@@ -2917,7 +2909,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"items/item_shield_of_invincibility.lua"
+						"ScriptFile"	"items/shield_of_invincibility.lua"
 						"Function"		"Reincarnation"
 					}
 				}
@@ -3002,7 +2994,7 @@
 				}
 			}
 
-			"modifier_aura_of_blight_datadriven"
+			"modifier_unholy_aura_buff"
 			{
 				"Passive"		"1"
 				"IsHidden"		"0"
@@ -3071,7 +3063,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"ID"									"2536"
 		"BaseClass"								"item_datadriven"
-		"Model"									"models/props_items/assault_cuirass.vmdl"
+		"Model"									"models/items/wraith_king/sundered_armor/sundered_armor.vmdl"
 		"Effect"								"particles/units/heroes/hero_dazzle/dazzle_armor_enemy_ring_sink.vpcf"
 
 		// Item Info
@@ -4172,5 +4164,79 @@
 		{
 			"01"						"item_key_of_the_three_moons;item_shield_of_invincibility;item_lightning_sword;item_ring_of_superiority"
 		}
+	}
+
+	//========================================================================================================
+	// Necklace of Spell Immunity
+	//========================================================================================================
+	"item_necklace_of_spell_immunity"
+	{
+		// General
+		//----------------------------------------------------------------------------------------------------
+		"BaseClass"             		"item_datadriven"
+		"ID"							"2546"
+		"AbilityTextureName"			"custom/necklace_of_spell_immunity"		
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"Model"							"models/props_items/staff_wizardry01.vmdl"
+		"Effect"						"particles/units/heroes/hero_doom_bringer/doom_bringer_doom_ring.vpcf"
+
+		// Item Info
+		//----------------------------------------------------------------------------------------------------
+		"ItemCost"						"0"
+		"ItemShopTags"					"unique"
+		"ItemQuality"					"epic"
+		"ItemAliases"					"necklace of spell immunity"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
+		"ItemPurchasable"				"0"
+		"ItemSellable"					"0"
+
+		"Modifiers"
+		{
+			"modifier_necklace_of_spell_immunity"
+			{
+				"Passive"						"1"
+				"IsHidden"						"0"
+				"TextureName"					"modifiers/necklace_of_spell_immunity"
+
+				"States"
+				{
+					"MODIFIER_STATE_MAGIC_IMMUNE"		"MODIFIER_STATE_VALUE_ENABLED"
+				}
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Tombstone
+	//=================================================================================================================
+	"item_tombstone"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"ID"							"2547"														// unique ID number for this item.  Do not change this once established or it will invalidate collected stats.
+		"AbilityName"					"item_tombstone"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_CHANNELLED | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK"
+		"Model"							"models/props_gameplay/tombstoneb01.mdl"
+		"PingOverrideText"				"DOTA_Chat_Tombstone_Pinged"
+
+		// Stats
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"				"100"
+		"AbilityCastPoint"				"0.0"
+		"AbilityChannelTime"			"6.0"
+		
+		// Item Info
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemCost"						"99999"
+		"ItemPurchasable"				"0"
+		"ItemShopTags"					"consumable"
+		"ItemQuality"					"consumable"
+		"ItemStackable"					"1"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
+		"ItemPermanent"					"0"
+		"ItemInitialCharges"			"1"
+		"ItemCastOnPickup"				"1"
+		"ItemKillable"					"0"
+
 	}
 } // End of npc_items_custom.txt

@@ -17,29 +17,36 @@ function trigger_second_wave_right()
 end
 
 function spawn_second_phase_left()
-	local EntIceTower = Entities:FindByName( nil, "npc_tower_cold_1" )
-	local point = Entities:FindByName( nil, "npc_dota_spawner_top_left_1"):GetAbsOrigin()
+	local EntIceTower = Entities:FindByName(nil, "npc_tower_cold_1")
+	local point = Entities:FindByName(nil, "npc_dota_spawner_top_left_1"):GetAbsOrigin()
 
 	Timers:CreateTimer(0, function()
-		if not EntIceTower:IsNull() then
+		if not EntIceTower:IsNull() and SPECIAL_EVENT == 0 then
 			for j = 1, 8 do
 			local unit = CreateUnitByName("npc_ghul_II", point+RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_BADGUYS)
 			end
+		print("Spawning Phase 2 Creeps")
+		return 30
+		elseif SPECIAL_EVENT == 1 then
+			print("Phase 2 Creeps paused")
 		return 30
 		elseif EntIceTower:IsNull() then
+			print("Phase 2 Creeps spawner killed")
 		return nil
 		end
 	end)
 end
 
 function spawn_second_phase_right()
-	local EntIceTower = Entities:FindByName( nil, "npc_tower_cold_2" )
-	local point = Entities:FindByName( nil, "npc_dota_spawner_top_right_1"):GetAbsOrigin()
+	local EntIceTower = Entities:FindByName(nil, "npc_tower_cold_2")
+	local point = Entities:FindByName(nil, "npc_dota_spawner_top_right_1"):GetAbsOrigin()
 	Timers:CreateTimer(0, function()
-		if not EntIceTower:IsNull() then
+		if not EntIceTower:IsNull() and SPECIAL_EVENT == 0 then
 			for j = 1, 8 do
 			local unit = CreateUnitByName("npc_orc_II", point+RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_BADGUYS)
 			end
+		return 30
+		elseif SPECIAL_EVENT == 1 then
 		return 30
 		elseif EntIceTower:IsNull() then
 		return nil
@@ -52,6 +59,7 @@ GameMode.FrostTowers_killed = GameMode.FrostTowers_killed +1
 
 	if GameMode.FrostTowers_killed >= 2 then
 		Notifications:TopToAll({text="WARNING! Final Wave incoming. Arriving in 60 seconds! Back to the Castle!" , duration=10.0})
+		Timers:CreateTimer(59, RefreshPlayers)
 		Timers:CreateTimer(60,FinalWave)
 		FrostTowersToFinalWave()
 	end
@@ -62,7 +70,8 @@ GameMode.FrostTowers_killed = GameMode.FrostTowers_killed +1
 
 	if GameMode.FrostTowers_killed >= 2 then
 		Notifications:TopToAll({text="WARNING! Final Wave incoming. Arriving in 60 seconds! Back to the Castle!" , duration=10.0})
-		Timers:CreateTimer(60,FinalWave)
+		Timers:CreateTimer(59, RefreshPlayers)
+		Timers:CreateTimer(60, FinalWave)
 		FrostTowersToFinalWave()
 	end
 end
@@ -71,7 +80,6 @@ function FinalWave()
 local heroes = HeroList:GetAllHeroes()
 local difficulty = GameRules:GetCustomGameDifficulty()
 local teleporters = Entities:FindAllByName("trigger_teleport_green")
-local teleporters_2 = Entities:FindAllByName("trigger_teleport_phase3_creeps")
 local heroes = HeroList:GetAllHeroes()
 local point_west_1 = Entities:FindByName(nil,"final_wave_west_1"):GetAbsOrigin()
 local point_west_2 = Entities:FindByName(nil,"final_wave_west_2"):GetAbsOrigin()
@@ -125,18 +133,12 @@ local point_south_10 = Entities:FindByName(nil,"final_wave_south_10"):GetAbsOrig
 local point_south_11 = Entities:FindByName(nil,"final_wave_south_11"):GetAbsOrigin()
 local point_south_12 = Entities:FindByName(nil,"final_wave_south_12"):GetAbsOrigin()
 local point_south_13 = Entities:FindByName(nil,"final_wave_south_13"):GetAbsOrigin()
-local WaypointWest6 = Entities:FindByName(nil,"west1_6")
-local WaypointNorth6 = Entities:FindByName(nil,"north1_6")
-local WaypointEast6 = Entities:FindByName(nil,"east1_6")
-local WaypointSouth6 = Entities:FindByName(nil,"south1_6")
-
-RefreshPlayers()
+local WaypointWest6 = Entities:FindByName(nil,"final_wave_player_2")
+local WaypointNorth6 = Entities:FindByName(nil,"final_wave_player_4")
+local WaypointEast6 = Entities:FindByName(nil,"final_wave_player_6")
+local WaypointSouth6 = Entities:FindByName(nil,"final_wave_player_0")
 
 	for _,v in pairs(teleporters) do
-		v:Enable()
-	end
-
-	for _,v in pairs(teleporters_2) do
 		v:Enable()
 	end
 
@@ -307,6 +309,10 @@ RefreshPlayers()
 				v:AddNewModifier(nil, nil, "modifier_invulnerable", {duration= 10, IsHidden = true})
 			end
 		end
+
+		Timers:CreateTimer(10, function()
+			RestartCreeps()
+		end)
 
 		for _,hero in pairs(heroes) do
 			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then

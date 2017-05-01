@@ -28,23 +28,6 @@ local attack_damage = caster:GetAttackDamage() * splash_percent
 	end
 end
 
-function StrengthOfTheWild(keys)
-local caster = keys.caster
-local target = keys.target
-local ability = keys.ability
-local ability_level = ability:GetLevel() - 1
-local hero_mult = ability:GetLevelSpecialValueFor("damage_mult_hero", ability_level) -1 -- -1 again to remove the base attack damage
-local creep_mult = ability:GetLevelSpecialValueFor("damage_mult_creep", ability_level) -1
-local hero_damage = caster:GetAttackDamage() * hero_mult
-local creep_damage = caster:GetAttackDamage() * creep_mult
-
-	if target:IsConsideredHero() or target:IsHero() then
-		ApplyDamage({ victim = target, attacker = caster, damage = hero_damage,	damage_type = DAMAGE_TYPE_PHYSICAL })
-	elseif target:IsCreep() then
-		ApplyDamage({ victim = target, attacker = caster, damage = creep_damage, damage_type = DAMAGE_TYPE_PHYSICAL })
-	end
-end
-
 function TrueFormStart(event)
 local caster = event.caster
 local model = event.model

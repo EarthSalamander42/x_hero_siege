@@ -151,7 +151,6 @@ local caster = keys.caster
 	end
 end
 
-
 function NightmareDamage( keys )
 	local caster = keys.caster
 	local ability = keys.ability

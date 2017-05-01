@@ -9,14 +9,15 @@
 	"addonauthorSteamID"			"jeizy261"
 	"addonContent_Campaign"			"0"
 
-	"maps"						"x_hero_siege arena_mode"
+//	"maps"						"x_hero_siege arena_mode"
+	"maps"						"x_hero_siege"
 	"IsPlayable"				"1"
 	"x_hero_siege"
 	{
 		"MaxPlayers"			"8"
 	}
-	"arena_mode"
-	{
-		"MaxPlayers"			"8"
-	}
+//	"arena_mode"
+//	{
+//		"MaxPlayers"			"8"
+//	}
 }

@@ -4,62 +4,74 @@
 		<include src="file://{resources}/styles/custom_game/gamesetup_options.css" />
 	</styles> 
 	<script>
-
 		function OnVoteButtonPressed(category, vote)
 		{
 			$.Msg("Category: ", category);
 			$.Msg("Vote: ", vote);
 			GameEvents.SendCustomGameEventToServer( "setting_vote", { "category":category, "vote":vote } );
 		}
-
-		// This function is called at the start
-		(function() {
-			if (GameUI.CustomUIConfig().DebugMessagesEnabled == true)
-			{
-				$.Msg("GameSetup Options Initialised");
-				Game.SetRemainingSetupTime( -1 );
-				Game.SetAutoLaunchEnabled( false );
-			}
-		})();
-		
 	</script>
-	
+
 	<Panel class="ContainerGameSetup" hittest="false">
 		<Panel class="CustomSettingsColumn" hittest="false" >
+		<Panel id="Community">
+			<Label id="community_description1" class="CommunityText" html="true" text="#community_description_1" />
+			<Label id="community_description2" class="CommunityText" html="true" text="#community_description_2" />
+			<Label id="community_description3" class="CommunityText" html="true" text="#community_description_3" />
+			<Button id="CommunityImg" onactivate="DOTADisplayURL('discordapp.com/invite/dNMBSrJ');" >
+				<Image src="file://{images}/custom_game/loading_screen/community_discord_header.png" />
+			</Button>
+			<Button id="CommunityImg2" onactivate="DOTADisplayURL('https://www.facebook.com/X-Hero-Siege-619117744926665');" >
+				<Image src="file://{images}/custom_game/loading_screen/community_facebook_header.png" />
+			</Button>
+			<Button id="CommunityImg3" onactivate="DOTADisplayURL('http://steamcommunity.com/groups/x_hero_siege');" >
+				<Image src="file://{images}/custom_game/loading_screen/community_steam_group_header.png" />
+			</Button>
+		</Panel>
+		<Panel id="VIP">
+			<Label id="VIPHeader" class="CommunityText" text="#VIPHeader" />
+			<Button id="VIPImg" onactivate="DOTADisplayURL('https://www.patreon.com/xherosiege');" >
+				<Image src="file://{images}/custom_game/loading_screen/patreonsupport.jpg" />
+			</Button>
+		</Panel>
 			<Panel class="ContainerCustomGameSettingsPanels" hittest="false" >
-
 				<Panel class="ContainerCustomGameSettingsTitle" hittest="false" >
 					<Label class="CustomGameSettingsHeaderTitle" text="Custom Game Settings" hittest="false" />
 				</Panel>
-
 				<Panel class="CustomSettingPanel" hittest="false">
-
 					<Panel class="ContainerCustomGameLengthTitle" hittest="false">
 						<Label class="CustomGameSettingsTitle" id="CustomGameLengthTitle1" hittest="false" text="Game Difficulty" />
 					</Panel>
-
 					<Panel class="CustomGameSettingPanelDivider" hittest="false" />
 					<Panel class="ContainerCustomGameSettingOptions" hittest="false">
-						<RadioButton class="CGSRadio" group="GameLength" text="Easy" onactivate="OnVoteButtonPressed('difficulty', 1)" />
-						<RadioButton class="CGSRadio" group="GameLength" text="Normal" onactivate="OnVoteButtonPressed('difficulty', 2)" />
-						<RadioButton class="CGSRadio" group="GameLength" text="Hard" onactivate="OnVoteButtonPressed('difficulty', 3)" />
-						<RadioButton class="CGSRadio" group="GameLength" text="Extreme" onactivate="OnVoteButtonPressed('difficulty', 4)" />
+						<RadioButton class="CGSRadio1" group="GameLength" text="Easy: 150% Gold, 125% XP, 75% Damage" onactivate="OnVoteButtonPressed('difficulty', 1)" />
+						<RadioButton class="CGSRadio2" group="GameLength" text="Normal: 110% Gold, 100% XP, 100% Damage" onactivate="OnVoteButtonPressed('difficulty', 2)" />
+						<RadioButton class="CGSRadio3" group="GameLength" text="Hard: 100% Gold, 90% XP, 125% Damage" onactivate="OnVoteButtonPressed('difficulty', 3)" />
+						<RadioButton class="CGSRadio4" group="GameLength" text="Extreme: 100% Gold, 75% XP, 150% Damage" onactivate="OnVoteButtonPressed('difficulty', 4)" />
 					</Panel>
 				</Panel>
-				<!--
 				<Panel class="CustomSettingPanel" hittest="false">
 					<Panel class="ContainerCustomGameLengthTitle" hittest="false">
-						<Label class="CustomGameSettingsTitle" id="CustomGameLengthTitle1" hittest="false" text="Combat System" />
+						<Label class="CustomGameSettingsTitle" id="CustomGameLengthTitle1" hittest="false" text="Creep Lanes" />
 					</Panel>
 					<Panel class="CustomGameSettingPanelDivider" hittest="false" />
 					<Panel class="ContainerCustomGameSettingOptions" hittest="false">
-						<RadioButton class="CGSRadio" group="CombatSystem" text="Simple" onactivate="OnVoteButtonPressed('combat_system', 1)" />
-						<RadioButton class="CGSRadio" group="CombatSystem" text="Triangle" onactivate="OnVoteButtonPressed('combat_system', 2)" />
+						<RadioButton class="CGSRadio" group="CreepLanes" text="Simple" onactivate="OnVoteButtonPressed('creep_lanes', 1)" />
+						<RadioButton class="CGSRadio" group="CreepLanes" text="Double" onactivate="OnVoteButtonPressed('creep_lanes', 2)" />
+						<RadioButton class="CGSRadio4" group="CreepLanes" text="Full" onactivate="OnVoteButtonPressed('creep_lanes', 3)" />
 					</Panel>
 				</Panel>
-				-->
+				<Panel class="CustomSettingPanel" hittest="false">
+					<Panel class="ContainerCustomGameLengthTitle" hittest="false">
+						<Label class="CustomGameSettingsTitle" id="CustomGameLengthTitle1" hittest="false" text="Dual Hero" />
+					</Panel>
+					<Panel class="CustomGameSettingPanelDivider" hittest="false" />
+					<Panel class="ContainerCustomGameSettingOptions" hittest="false">
+						<RadioButton class="CGSRadio" group="DualHero" text="Normal" onactivate="OnVoteButtonPressed('dual_hero', 1)" />
+						<RadioButton class="CGSRadio4" group="DualHero" text="Dual" onactivate="OnVoteButtonPressed('dual_hero', 2)" />
+					</Panel>
+				</Panel>
 			</Panel>
 		</Panel>
 	</Panel>
-
 </root>
