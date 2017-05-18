@@ -144,7 +144,7 @@ local PauseTime = 10.0
 		end
 		PauseCreepsCastle()
 		caster:AddNewModifier(caster, nil, "modifier_invulnerable", {duration = InvTime + PauseTime})
-		Notifications:BottomToAll({text = "Muradin is requested to defend your castle!", duration = PauseTime, continue = true})
+		Notifications:TopToAll({text = "Muradin is requested to defend your castle!", duration = PauseTime, continue = true})
 		Timers:CreateTimer(InvTime + PauseTime, function()
 			UTIL_Remove(Muradin)
 		end)

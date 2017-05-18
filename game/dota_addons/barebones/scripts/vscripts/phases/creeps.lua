@@ -67,30 +67,30 @@ function SpawnCreeps()
 	for c = 1, 8 do
 	local point = Entities:FindByName( nil, "npc_dota_spawner_"..c)
 	local Waypoint = Entities:FindByName( nil, "creep_path_"..c)
-		if CREEP_LANES[c] == 1 then
-			if BARRACKMENTS[c] == 1 then
-				if CREEP_LEVEL == 1 then
+		if CREEP_LANES[c][1] == 1 then -- Lane Activated?
+			if CREEP_LANES[c][3] == 1 then -- Barrack Alive?
+				if CREEP_LANES[c][2] == 1 then -- Lane Level
 					for j = 1, 4 do
 						local unit = CreateUnitByName(melee_1[GameMode.creep_roll["race"]], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
 					end
 					for j = 1, 2 do
 						local unit = CreateUnitByName(ranged_1[GameMode.creep_roll["race"]], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
 					end
-				elseif CREEP_LEVEL == 2 then
+				elseif CREEP_LANES[c][2] == 2 then
 					for j = 1, 4 do
 						local unit = CreateUnitByName(melee_2[GameMode.creep_roll["race"]], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
 					end
 					for j = 1, 2 do
 						local unit = CreateUnitByName(ranged_2[GameMode.creep_roll["race"]], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
 					end
-				elseif CREEP_LEVEL == 3 then
+				elseif CREEP_LANES[c][2] == 3 then
 					for j = 1, 4 do
 						local unit = CreateUnitByName(melee_3[GameMode.creep_roll["race"]], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
 					end
 					for j = 1, 2 do
 						local unit = CreateUnitByName(ranged_3[GameMode.creep_roll["race"]], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
 					end
-				elseif CREEP_LEVEL == 4 then
+				elseif CREEP_LANES[c][2] >= 4 then
 					for j = 1, 4 do
 						local unit = CreateUnitByName(melee_4[GameMode.creep_roll["race"]], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
 					end
@@ -103,36 +103,14 @@ function SpawnCreeps()
 	end
 end
 
-function SpawnRedDragon()
-local difficulty = GameRules:GetCustomGameDifficulty()
-
-	for c = 1, 8 do
-		if CREEP_LANES[c] == 1 and BARRACKMENTS[c] == 1 then
-		local point = Entities:FindByName( nil, "npc_dota_spawner_"..c)
-			for j = 1, difficulty do
-				local dragon = CreateUnitByName("npc_dota_creature_red_dragon", point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
-			end
-		end
-	end
-end
-
-function SpawnBlackDragon()
-local difficulty = GameRules:GetCustomGameDifficulty()
-
-	for c = 1, 8 do
-		if CREEP_LANES[c] == 1 and BARRACKMENTS[c] == 1 then
-		local point = Entities:FindByName( nil, "npc_dota_spawner_"..c)
-			for j = 1, difficulty do
-				local dragon = CreateUnitByName("npc_dota_creature_black_dragon", point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
-			end
-		end
-	end
-end
-
 function SpawnRevenant(event)
 local caller = event.caller
+local cn = string.gsub(caller:GetName(), "dota_badguys_tower", "")
 local difficulty = GameRules:GetCustomGameDifficulty()
+print(caller:GetName())
+print(cn)
 
+	CREEP_LANES[tonumber(cn)][2] = CREEP_LANES[tonumber(cn)][2] + 1
 	for j = 1, difficulty do
 		local unit = CreateUnitByName("npc_death_ghost_tower", caller:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
 	end

@@ -10,7 +10,6 @@ function Spawn( entityKeyValues )
 end
 
 function BalanarThink()
-	-- body
 	if thisEntity:IsNull() or not thisEntity:IsAlive() then
 		return nil
 	elseif Ability_Howl:IsFullyCastable() then
@@ -21,9 +20,7 @@ function BalanarThink()
 	elseif Ability_Chaosrain:IsFullyCastable() then
 		local units = FindUnitsInRadius(thisEntity:GetTeamNumber(), thisEntity:GetAbsOrigin(), nil, 400, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO+DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)		
 --		if units ~= nil and #units >=1 then
-		print("Chaos Rain Fully Castable")
 		if units ~= nil then
-			print("Valid units for Chaos Rain")
 			thisEntity:CastAbilityNoTarget(Ability_Chaosrain, -1)
 		end
 	elseif Ability_Sleep:IsFullyCastable() then
@@ -36,7 +33,6 @@ function BalanarThink()
 					numberOfTargets = numberOfTargets +1
 				end
 			end
-			print("Targets: "..numberOfTargets)
 			
 			if numberOfTargets >= 0 then
 				thisEntity:CastAbilityOnTarget(units[1], Ability_Sleep, -1)

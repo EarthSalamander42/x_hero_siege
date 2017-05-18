@@ -15,44 +15,54 @@ function UpdateTimerMuradin(data)
 function UpdateTimerCreep(data)
 {
 	var timerText = "";
-	timerText += data.timer_minute_10_2;
-	timerText += data.timer_minute_01_2;
+	timerText += data.timer_minute_10;
+	timerText += data.timer_minute_01;
 	timerText += ":";
-	timerText += data.timer_second_10_2;
-	timerText += data.timer_second_01_2;
+	timerText += data.timer_second_10;
+	timerText += data.timer_second_01;
 
 	$("#CreepTimer").text = timerText;
 }
 
 function UpdateTimerIncomingWave(data)
 {
-	var timerText3 = "";
-	timerText3 += data.timer_minute_10_3;
-	timerText3 += data.timer_minute_01_3;
-	timerText3 += ":";
-	timerText3 += data.timer_second_10_3;
-	timerText3 += data.timer_second_01_3;
+	var timerText = "";
+	timerText += data.timer_minute_10;
+	timerText += data.timer_minute_01;
+	timerText += ":";
+	timerText += data.timer_second_10;
+	timerText += data.timer_second_01;
 
-	$("#IncomingWaveTimer").text = timerText3;
+	$("#IncomingWaveTimer").text = timerText;
 }
 
 function UpdateTimerSpecialEvents(data)
 {
-	var timerText3 = "";
-	timerText3 += data.timer_minute_10_3;
-	timerText3 += data.timer_minute_01_3;
-	timerText3 += ":";
-	timerText3 += data.timer_second_10_3;
-	timerText3 += data.timer_second_01_3;
+	var timerText = "";
+	timerText += data.timer_minute_10;
+	timerText += data.timer_minute_01;
+	timerText += ":";
+	timerText += data.timer_second_10;
+	timerText += data.timer_second_01;
 
-	$("#SpecialEventsTimer").text = timerText3;
+	$("#SpecialEventsTimer").text = timerText;
+}
+
+function UpdateGameTimer(data)
+{
+	var timerText = "";
+	timerText += data.timer_minute_10;
+	timerText += data.timer_minute_01;
+	timerText += ":";
+	timerText += data.timer_second_10;
+	timerText += data.timer_second_01;
+
+	$("#GameTimer").text = timerText;
 }
 
 function ShowTimer(data)	// if Map is X Hero Siege then
 {
 	$("#Timer").AddClass("timer_visible");
-	GameUI.SetDefaultUIEnabled(DotaDefaultUIElement_t.DOTA_DEFAULT_UI_TOP_BAR_SCORE, false);
-	GameUI.SetDefaultUIEnabled(DotaDefaultUIElement_t.DOTA_DEFAULT_UI_TOP_BAR_DIRE_TEAM, false);
 	$("#ScoreboardLeft_Parent").visible = true;
 }
 
@@ -82,6 +92,7 @@ function visibleSwitch()
 	GameEvents.Subscribe("specialeventscountdown", UpdateTimerIncomingWave);
 	GameEvents.Subscribe("creepcountdown", UpdateTimerCreep);
 	GameEvents.Subscribe("countdown", UpdateTimerMuradin);
+	GameEvents.Subscribe("gametimer", UpdateGameTimer);
 	GameEvents.Subscribe("show_timer", ShowTimer);
 	GameEvents.Subscribe("hide_timer", HideTimer);
 })();

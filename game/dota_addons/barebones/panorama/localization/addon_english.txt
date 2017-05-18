@@ -14,6 +14,7 @@
 	"DOTA_BadGuys"    							"Dark Forces"
 
 	"Remaining"									"REMAINING"
+	"GameTime"									"Game Time:"
 	"Goal"										"Special Events:"
 	"CreepGoal"									"Creep Levels:"
 	"IncomingWaveGoal"							"Incoming Waves:"
@@ -38,7 +39,7 @@
 	"AddonDifficultyHard"						"Hard: 100% Gold, 90% XP, 125% Damage."
 	"AddonDifficultyExtreme"					"Extreme: 100% Gold, 75% XP, 150% Damage."
 	"VIPTab"									"VIP Section:"
-	"VIPHeader"									"Get your access now to unlock:\n - Desert Wyrm,\n - Dark Fundamental,\n - Kobold Knight,\n - Stone Giant,\n - Lich King,\n - Centurion,\n - Dark Summoner,\n - Spirit Master! \nDonate on Patreon to be a VIP! (Click Button below)"
+	"VIPHeader"									"Get your access now to unlock 8 VIP Heroes!\nDonate on Patreon to be a VIP! (Click Button below)"
 	"community_header"							"Join Discord Chat"
 	"community_description_1"					"- Join Discord Chat to talk about the mod with other players and the developer!"
 	"community_description_2"					"- Join the Steam Group to report bugs and join events!"

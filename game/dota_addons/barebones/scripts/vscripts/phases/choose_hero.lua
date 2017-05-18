@@ -140,14 +140,14 @@ local heroes = HeroList:GetAllHeroes()
 
 	Timers:CreateTimer(28, function()
 		-- Special Events
---		RAMERO_DUMMY = CreateUnitByName("npc_ramero_bis", Entities:FindByName(nil, "point_special_arena_1"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
---		RAMERO_DUMMY:SetAngles(0, 270, 0)
+		RAMERO_DUMMY = CreateUnitByName("npc_ramero_bis", Entities:FindByName(nil, "point_special_arena_1"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
+		RAMERO_DUMMY:SetAngles(0, 270, 0)
 
---		BARISTOL_DUMMY = CreateUnitByName("npc_baristol_bis", Entities:FindByName(nil, "point_special_arena_2"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
---		BARISTOL_DUMMY:SetAngles(0, 270, 0)
+		BARISTOL_DUMMY = CreateUnitByName("npc_baristol_bis", Entities:FindByName(nil, "point_special_arena_2"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
+		BARISTOL_DUMMY:SetAngles(0, 270, 0)
 
---		RAMERO_BIS_DUMMY = CreateUnitByName("npc_ramero_bis", Entities:FindByName(nil, "point_special_arena_3"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
---		RAMERO_BIS_DUMMY:SetAngles(0, 270, 0)
+		RAMERO_BIS_DUMMY = CreateUnitByName("npc_ramero_bis", Entities:FindByName(nil, "point_special_arena_3"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
+		RAMERO_BIS_DUMMY:SetAngles(0, 270, 0)
 
 		lich_king = CreateUnitByName("npc_dota_boss_lich_king_bis", Entities:FindByName(nil, "npc_dota_spawner_lich_king"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
 		lich_king:SetAngles(0, 90, 0)

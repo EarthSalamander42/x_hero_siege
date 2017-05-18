@@ -114,7 +114,7 @@ local point = Entities:FindByName(nil, "base_spawn"):GetAbsOrigin()
 		GameMode.HeroImage:RemoveSelf()
 	else
 		hero.hero_image = true
-		Notifications:Top(hero:GetPlayerOwnerID(), {text = "You can do this event only 1 time!", duration = 5.0})
+		Notifications:Bottom(hero:GetPlayerOwnerID(), {text = "You can do this event only 1 time!", duration = 5.0})
 	end
 end
 

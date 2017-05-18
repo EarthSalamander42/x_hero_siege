@@ -89,6 +89,23 @@ function EndMagtheridonArena()
 	for _, obs in pairs(DoorObs) do
 		obs:SetEnabled(false, true)
 	end
+
+	Timers:CreateTimer(1.0, function()
+		local grom = CreateUnitByName("npc_dota_hero_grom_hellscream",Entities:FindByName(nil,"spawn_grom_hellscream"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_BADGUYS)
+		grom:SetAngles(0, 270, 0)
+	end)
+	Timers:CreateTimer(2.0, function()
+		local illidan = CreateUnitByName("npc_dota_hero_illidan",Entities:FindByName(nil,"spawn_illidan"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_BADGUYS)
+		illidan:SetAngles(0, 0, 0)
+	end)
+	Timers:CreateTimer(3.0, function()
+		local balanar = CreateUnitByName("npc_dota_hero_balanar",Entities:FindByName(nil,"spawn_balanar"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_BADGUYS)
+		balanar:SetAngles(0, 90, 0)
+	end)
+	Timers:CreateTimer(4.0, function()
+		local proudmoore = CreateUnitByName("npc_dota_hero_proudmoore",Entities:FindByName(nil,"spawn_admiral_proudmore"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_BADGUYS)
+		proudmoore:SetAngles(0, 180, 0)
+	end)
 end
 
 function DarkProtectors(keys)
@@ -131,18 +148,6 @@ RefreshPlayers()
 					end)
 				end
 			end
-
-			local grom = CreateUnitByName("npc_dota_hero_grom_hellscream",Entities:FindByName(nil,"spawn_grom_hellscream"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_BADGUYS)
-			grom:SetAngles(0, 270, 0)
-
-			local illidan = CreateUnitByName("npc_dota_hero_illidan",Entities:FindByName(nil,"spawn_illidan"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_BADGUYS)
-			illidan:SetAngles(0, 0, 0)
-
-			local balanar = CreateUnitByName("npc_dota_hero_balanar",Entities:FindByName(nil,"spawn_balanar"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_BADGUYS)
-			balanar:SetAngles(0, 90, 0)
-
-			local proudmoore = CreateUnitByName("npc_dota_hero_proudmoore",Entities:FindByName(nil,"spawn_admiral_proudmore"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_BADGUYS)
-			proudmoore:SetAngles(0, 180, 0)
 
 			Timers:CreateTimer(10, function()
 				local DoorObs = Entities:FindAllByName("obstruction_grom")
@@ -333,25 +338,27 @@ function StartSecretArena(keys)
 local activator = keys.activator
 local point = Entities:FindByName(nil, "npc_dota_muradin_player_1")
 local difficulty = GameRules:GetCustomGameDifficulty()
-local doom_artifact = "item_doom_artifact"
 
 	if difficulty == 4 then
 		for itemSlot = 0, 5 do
 			local item = activator:GetItemInSlot(itemSlot)
-			if item:GetName() == doom_artifact and not Gamerules:IsCheatMode() then
-				local secret = CreateUnitByName("npc_dota_hero_secret", Entities:FindByName(nil, "roshan_wp_4"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-				secret:SetAngles(0, 270, 0)
-				secret:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 10, IsHidden = true})
-				secret:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 9, IsHidden = true})
+			print(item:GetName())
+			if item ~= nil and item:GetName() == "item_doom_artifact" then
+--				if not GameRules:IsCheatMode() then
+					local secret = CreateUnitByName("npc_dota_hero_secret", Entities:FindByName(nil, "roshan_wp_4"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+					secret:SetAngles(0, 270, 0)
+					secret:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 10, IsHidden = true})
+					secret:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 9, IsHidden = true})
 
-				FindClearSpaceForUnit(activator, point:GetAbsOrigin(), true)
-				activator:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {Duration = 10, IsHidden = true})
-				activator:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 10, IsHidden = true})
-				activator:Stop()
-				PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(), activator)
-				Timers:CreateTimer(0.1, function()
-					PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(), nil)
-				end)
+					FindClearSpaceForUnit(activator, point:GetAbsOrigin(), true)
+					activator:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {Duration = 10, IsHidden = true})
+					activator:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 10, IsHidden = true})
+					activator:Stop()
+					PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(), activator)
+					Timers:CreateTimer(0.1, function()
+						PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(), nil)
+					end)
+--				end
 			end
 		end
 	end

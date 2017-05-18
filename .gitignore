@@ -23,5 +23,8 @@ content/dota_addons/barebones/materials/overviews/*
 game/dota_addons/barebones/materials/overviews/*
 game/dota_addons/barebones/resource/overviews/*
 
+# Single Files
+game/dota_addons/barebones/panorama_debugger.cfg
+
 #Github dump
 *.stackdump

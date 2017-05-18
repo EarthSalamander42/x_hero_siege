@@ -144,12 +144,6 @@
 				"Function"		"EquipOrbs"
 			}
 
-			"RunScript"
-			{
-				"ScriptFile"	"items/global.lua"
-				"Function"		"CooldownOrbs"
-			}
-
 			"DelayedAction"
 			{
 				"Delay"		"0.1"
@@ -168,8 +162,9 @@
 		{
 			"modifier_orb_of_fire"
 			{
-				"Passive"				"1"
-				"IsHidden"				"1"
+				"Passive"			"0"
+				"IsHidden"			"1"
+				"Attributes"		"MODIFIER_ATTRIBUTE_PERMANENT"
 
 				"EffectName"		"particles/custom/items/orb/orb_of_fire/orb.vpcf"
 				"EffectAttachType"	"follow_origin"
@@ -189,15 +184,6 @@
 				"Passive"			"1"
 				"IsHidden"			"1"
 				"Attributes"		"MODIFIER_ATTRIBUTE_MULTIPLE"
-
-				"OnCreated"
-				{
-					"RunScript"
-					{
-						"ScriptFile"	"items/global.lua"
-						"Function"		"EquipOrbs"
-					}
-				}
 
 				"Properties"
 				{
@@ -824,12 +810,6 @@
 				"Function"		"EquipOrbs"
 			}
 
-			"RunScript"
-			{
-				"ScriptFile"	"items/global.lua"
-				"Function"		"CooldownOrbs"
-			}
-
 			"DelayedAction"
 			{
 				"Delay"		"0.1"
@@ -848,8 +828,9 @@
 		{
 			"modifier_orb_of_darkness"
 			{
-				"Passive"			"1"
+				"Passive"			"0"
 				"IsHidden"			"1"
+				"Attributes"		"MODIFIER_ATTRIBUTE_PERMANENT"
 
 				"EffectName"		"particles/units/heroes/hero_ursa/ursa_enrage_buff_glow.vpcf"
 				"EffectAttachType"	"attach_attack1"
@@ -873,15 +854,6 @@
 				"Passive"			"1"
 				"IsHidden"			"1"
 				"Attributes"		"MODIFIER_ATTRIBUTE_MULTIPLE"
-
-				"OnCreated"
-				{
-					"RunScript"
-					{
-						"ScriptFile"	"items/global.lua"
-						"Function"		"EquipOrbs"
-					}
-				}
 
 				"Properties"
 				{
@@ -1180,12 +1152,6 @@
 				"Function"		"EquipOrbs"
 			}
 
-			"RunScript"
-			{
-				"ScriptFile"	"items/global.lua"
-				"Function"		"CooldownOrbs"
-			}
-
 			"DelayedAction"
 			{
 				"Delay"		"0.1"
@@ -1204,8 +1170,9 @@
 		{
 			"modifier_orb_of_lightning"
 			{
-				"Passive"			"1"
+				"Passive"			"0"
 				"IsHidden"			"1"
+				"Attributes"		"MODIFIER_ATTRIBUTE_PERMANENT"
 
 				"EffectName"		"particles/custom/items/orb/orb_of_lightning/orb.vpcf"
 				"EffectAttachType"	"follow_origin"
@@ -1232,15 +1199,6 @@
 				"Passive"			"1"
 				"IsHidden"			"1"
 				"Attributes"		"MODIFIER_ATTRIBUTE_MULTIPLE"
-
-				"OnCreated"
-				{
-					"RunScript"
-					{
-						"ScriptFile"	"items/global.lua"
-						"Function"		"EquipOrbs"
-					}
-				}
 	
 				"Properties"
 				{
@@ -1347,12 +1305,6 @@
 				"Function"		"EquipOrbs"
 			}
 
-			"RunScript"
-			{
-				"ScriptFile"	"items/global.lua"
-				"Function"		"CooldownOrbs"
-			}
-
 			"DelayedAction"
 			{
 				"Delay"		"0.1"
@@ -1371,8 +1323,9 @@
 		{
 			"modifier_orb_of_fire"
 			{
-				"Passive"				"1"
-				"IsHidden"				"1"
+				"Passive"			"0"
+				"IsHidden"			"1"
+				"Attributes"		"MODIFIER_ATTRIBUTE_PERMANENT"
 
 				"EffectName"		"particles/custom/items/orb/orb_of_fire/orb.vpcf"
 				"EffectAttachType"	"follow_origin"
@@ -1392,15 +1345,6 @@
 				"Passive"			"1"
 				"IsHidden"			"1"
 				"Attributes"		"MODIFIER_ATTRIBUTE_MULTIPLE"
-
-				"OnCreated"
-				{
-					"RunScript"
-					{
-						"ScriptFile"	"items/global.lua"
-						"Function"		"EquipOrbs"
-					}
-				}
 	
 				"Properties"
 				{
@@ -1510,12 +1454,6 @@
 				"Function"		"EquipOrbs"
 			}
 
-			"RunScript"
-			{
-				"ScriptFile"	"items/global.lua"
-				"Function"		"CooldownOrbs"
-			}
-
 			"DelayedAction"
 			{
 				"Delay"		"0.1"
@@ -1534,8 +1472,9 @@
 		{
 			"modifier_orb_of_darkness"
 			{
-				"Passive"		"1"
-				"IsHidden"		"1"
+				"Passive"			"0"
+				"IsHidden"			"1"
+				"Attributes"		"MODIFIER_ATTRIBUTE_PERMANENT"
 
 				"EffectName"		"particles/units/heroes/hero_ursa/ursa_enrage_buff_glow.vpcf"
 				"EffectAttachType"	"attach_attack1"
@@ -1565,15 +1504,6 @@
 				"Passive"		"1"
 				"IsHidden"		"1"
 				"Attributes"	"MODIFIER_ATTRIBUTE_MULTIPLE"
-
-				"OnCreated"
-				{
-					"RunScript"
-					{
-						"ScriptFile"	"items/global.lua"
-						"Function"		"EquipOrbs"
-					}
-				}
 
 				"Properties"
 				{
@@ -1699,12 +1629,6 @@
 				"Function"		"EquipOrbs"
 			}
 
-			"RunScript"
-			{
-				"ScriptFile"	"items/global.lua"
-				"Function"		"CooldownOrbs"
-			}
-
 			"DelayedAction"
 			{
 				"Delay"		"0.1"
@@ -1723,8 +1647,9 @@
 		{
 			"modifier_orb_of_frost"
 			{
-				"Passive"		"1"
-				"IsHidden"		"1"
+				"Passive"			"0"
+				"IsHidden"			"1"
+				"Attributes"		"MODIFIER_ATTRIBUTE_PERMANENT"
 
 				"EffectName"			"particles/units/heroes/hero_ancient_apparition/ancient_apparition_chilling_touch_buff.vpcf"
 				"EffectAttachType"		"attach_attack1"
@@ -1756,15 +1681,6 @@
 				"Passive"		"1"
 				"IsHidden"		"1"
 				"Attributes"	"MODIFIER_ATTRIBUTE_MULTIPLE"
-
-				"OnCreated"
-				{
-					"RunScript"
-					{
-						"ScriptFile"	"items/global.lua"
-						"Function"		"EquipOrbs"
-					}
-				}
 
 				"Properties"
 				{
@@ -3190,12 +3106,6 @@
 				"Function"		"EquipOrbs"
 			}
 
-			"RunScript"
-			{
-				"ScriptFile"	"items/global.lua"
-				"Function"		"CooldownOrbs"
-			}
-
 			"DelayedAction"
 			{
 				"Delay"		"0.1"
@@ -3214,8 +3124,9 @@
 		{
 			"modifier_orb_of_earth"
 			{
-				"Passive"		"1"
-				"IsHidden"		"1"
+				"Passive"			"0"
+				"IsHidden"			"1"
+				"Attributes"		"MODIFIER_ATTRIBUTE_PERMANENT"
 
 				"EffectName"			"particles/units/heroes/hero_ancient_apparition/ancient_apparition_chilling_touch_buff_green.vpcf"
 				"EffectAttachType"		"attach_attack1"
@@ -3252,16 +3163,7 @@
 			{
 				"Passive"		"1"
 				"IsHidden"		"1"
-				"Attributes"	"MODIFIER_ATTRIBUTE_MULTIPLE"
-
-				"OnCreated"
-				{
-					"RunScript"
-					{
-						"ScriptFile"	"items/global.lua"
-						"Function"		"EquipOrbs"
-					}
-				}		
+				"Attributes"	"MODIFIER_ATTRIBUTE_MULTIPLE"	
 	
 				"Properties"
 				{
@@ -3386,12 +3288,6 @@
 				"Function"		"EquipOrbs"
 			}
 
-			"RunScript"
-			{
-				"ScriptFile"	"items/global.lua"
-				"Function"		"CooldownOrbs"
-			}
-
 			"DelayedAction"
 			{
 				"Delay"		"0.1"
@@ -3410,8 +3306,9 @@
 		{
 			"modifier_orb_of_fire"
 			{
-				"Passive"			"1"
+				"Passive"			"0"
 				"IsHidden"			"1"
+				"Attributes"		"MODIFIER_ATTRIBUTE_PERMANENT"
 
 				"EffectName"		"particles/custom/items/orb/orb_of_fire/orb.vpcf"
 				"EffectAttachType"	"follow_origin"
@@ -3431,15 +3328,6 @@
 				"Passive"			"1"
 				"IsHidden"			"1"
 				"Attributes"		"MODIFIER_ATTRIBUTE_MULTIPLE"
-
-				"OnCreated"
-				{
-					"RunScript"
-					{
-						"ScriptFile"	"items/global.lua"
-						"Function"		"EquipOrbs"
-					}
-				}
 
 				"Properties"
 				{
@@ -3603,12 +3491,6 @@
 				"Function"		"EquipOrbs"
 			}
 
-			"RunScript"
-			{
-				"ScriptFile"	"items/global.lua"
-				"Function"		"CooldownOrbs"
-			}
-
 			"DelayedAction"
 			{
 				"Delay"		"0.1"
@@ -3627,8 +3509,9 @@
 		{
 			"modifier_orb_of_lightning"
 			{
-				"Passive"			"1"
+				"Passive"			"0"
 				"IsHidden"			"1"
+				"Attributes"		"MODIFIER_ATTRIBUTE_PERMANENT"
 
 				"EffectName"		"particles/custom/items/orb/orb_of_lightning/orb.vpcf"
 				"EffectAttachType"	"follow_origin"
@@ -3655,15 +3538,6 @@
 				"Passive"			"1"
 				"IsHidden"			"1"
 				"Attributes"		"MODIFIER_ATTRIBUTE_MULTIPLE"
-
-				"OnCreated"
-				{
-					"RunScript"
-					{
-						"ScriptFile"	"items/global.lua"
-						"Function"		"EquipOrbs"
-					}
-				}
 	
 				"Properties"
 				{
@@ -3800,12 +3674,6 @@
 				"Function"		"EquipOrbs"
 			}
 
-			"RunScript"
-			{
-				"ScriptFile"	"items/global.lua"
-				"Function"		"CooldownOrbs"
-			}
-
 			"DelayedAction"
 			{
 				"Delay"		"0.1"
@@ -3833,8 +3701,9 @@
 		{
 			"modifier_orb_of_lightning"
 			{
-				"Passive"			"1"
+				"Passive"			"0"
 				"IsHidden"			"1"
+				"Attributes"		"MODIFIER_ATTRIBUTE_PERMANENT"
 	
 				"EffectName"		"particles/custom/items/orb/orb_of_lightning/orb.vpcf"
 				"EffectAttachType"	"follow_origin"
@@ -3861,15 +3730,6 @@
 				"Passive"			"1"
 				"IsHidden"			"1"
 				"Attributes"		"MODIFIER_ATTRIBUTE_MULTIPLE"
-
-				"OnCreated"
-				{
-					"RunScript"
-					{
-						"ScriptFile"	"items/global.lua"
-						"Function"		"EquipOrbs"
-					}
-				}
 	
 				"Properties"
 				{
@@ -3998,12 +3858,6 @@
 				"Function"		"EquipOrbs"
 			}
 
-			"RunScript"
-			{
-				"ScriptFile"	"items/global.lua"
-				"Function"		"CooldownOrbs"
-			}
-
 			"DelayedAction"
 			{
 				"Delay"		"0.1"
@@ -4022,8 +3876,9 @@
 		{
 			"modifier_orb_of_darkness"
 			{
-				"Passive"		"1"
-				"IsHidden"		"1"
+				"Passive"			"0"
+				"IsHidden"			"1"
+				"Attributes"		"MODIFIER_ATTRIBUTE_PERMANENT"
 
 				"EffectName"		"particles/units/heroes/hero_ursa/ursa_enrage_buff_glow.vpcf"
 				"EffectAttachType"	"attach_attack1"
@@ -4053,15 +3908,6 @@
 				"Passive"		"1"
 				"IsHidden"		"1"
 				"Attributes"	"MODIFIER_ATTRIBUTE_MULTIPLE"
-
-				"OnCreated"
-				{
-					"RunScript"
-					{
-						"ScriptFile"	"items/global.lua"
-						"Function"		"EquipOrbs"
-					}
-				}
 
 				"Properties"
 				{

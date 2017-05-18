@@ -1,22 +1,7 @@
 require('libraries/timers')
 require('phases/phase2')
 
-function EquipOrbs(keys)
-local caster = keys.caster
-
-	Timers:CreateTimer(0.05, function()
-		caster:RemoveModifierByName("modifier_orb_of_fire")
-		caster:RemoveModifierByName("modifier_orb_of_lightning")
-		caster:RemoveModifierByName("modifier_orb_of_earth")
-		caster:RemoveModifierByName("modifier_orb_of_frost")
-		caster:RemoveModifierByName("modifier_orb_of_darkness")
-	end)
-end
-
-function CooldownOrbs(keys)
-local caster = keys.caster
-local ability = keys.ability
-local Items = {
+Orbs = {
 	"item_orb_of_fire",
 	"item_orb_of_fire2",
 	"item_searing_blade",
@@ -28,19 +13,34 @@ local Items = {
 	"item_celestial_claws",
 	"item_orb_of_earth",
 	"item_orb_of_frost"
-	}
+}
 
-	for Item = 1, #Items do
+function EquipOrbs(keys)
+local caster = keys.caster
+
+	caster:RemoveModifierByName("modifier_orb_of_fire")
+	caster:RemoveModifierByName("modifier_orb_of_lightning")
+	caster:RemoveModifierByName("modifier_orb_of_earth")
+	caster:RemoveModifierByName("modifier_orb_of_frost")
+	caster:RemoveModifierByName("modifier_orb_of_darkness")
+
+	for Item = 1, #Orbs do
 		for itemSlot = 0, 5 do
 			local item = caster:GetItemInSlot(itemSlot)
 			if item ~= nil then
-				if item:GetName() == Items[Item] then
+				if item:GetName() == Orbs[Item] then
 					local itemName = item:GetName()
 					item:StartCooldown(10.0)
 				end
 			end
 		end
 	end
+
+--	for _, orb in pairs(Orbs) do
+--		if caster:HasItemInInventory(orb) then
+--			orb:SetActivated(false)
+--		end
+--	end
 end
 
 -- Orb of Fire

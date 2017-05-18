@@ -13,7 +13,7 @@
 	</script>
 
 	<Panel class="ContainerGameSetup" hittest="false">
-		<Panel class="CustomSettingsColumn" hittest="false" >
+		<Panel class="CustomSettingsColumn2" hittest="false" >
 		<Panel id="Community">
 			<Label id="community_description1" class="CommunityText" html="true" text="#community_description_1" />
 			<Label id="community_description2" class="CommunityText" html="true" text="#community_description_2" />
@@ -28,12 +28,8 @@
 				<Image src="file://{images}/custom_game/loading_screen/community_steam_group_header.png" />
 			</Button>
 		</Panel>
-		<Panel id="VIP">
-			<Label id="VIPHeader" class="CommunityText" text="#VIPHeader" />
-			<Button id="VIPImg" onactivate="DOTADisplayURL('https://www.patreon.com/xherosiege');" >
-				<Image src="file://{images}/custom_game/loading_screen/patreonsupport.jpg" />
-			</Button>
-		</Panel>
+	</Panel>
+		<Panel class="CustomSettingsColumn" hittest="false" >
 			<Panel class="ContainerCustomGameSettingsPanels" hittest="false" >
 				<Panel class="ContainerCustomGameSettingsTitle" hittest="false" >
 					<Label class="CustomGameSettingsHeaderTitle" text="Custom Game Settings" hittest="false" />
@@ -71,7 +67,17 @@
 						<RadioButton class="CGSRadio4" group="DualHero" text="Dual" onactivate="OnVoteButtonPressed('dual_hero', 2)" />
 					</Panel>
 				</Panel>
+				<Panel id="VIP">
+					<Label id="VIPHeader" class="CommunityText" text="#VIPHeader" />
+					<Button id="VIPImg" onactivate="DOTADisplayURL('https://www.patreon.com/xherosiege');" >
+						<Image src="file://{images}/custom_game/loading_screen/patreonsupport.jpg" />
+					</Button>
+				</Panel>
 			</Panel>
 		</Panel>
+
+		<Button id="ChangelogImg" onactivate="DOTADisplayURL('https://www.facebook.com/pg/X-Hero-Siege-619117744926665/notes/?ref=page_internal');" >
+			<Image src="file://{images}/custom_game/changelog.png" />
+		</Button>
 	</Panel>
 </root>

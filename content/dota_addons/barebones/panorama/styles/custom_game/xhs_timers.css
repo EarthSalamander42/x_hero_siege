@@ -1,20 +1,14 @@
 .ScoreboardLeft
 {
-	margin-left: 1000px;
-	margin-top: 0px;
+	margin-left: 46.5%;
 	background-color: gradient( linear, 0% 0%, 100% 0%, from( #25282a00 ), color-stop( .6, #25282acc), color-stop( .8, #25282a88), to( #00000022 ) );
 	margin-right: 0px;
-	width: 600px;
 	flow-children: right;
+	width: fit-children;
 }
 
 #ScoreboardLeft_Parent
 {
-	margin-left: 0px;
-	margin-top: 0px;
-	width: 600px;
-	height: 40px;
-
 	transform: translateY(0px);
 	transition-property: transform;
 	transition-duration: 1s;
@@ -22,46 +16,44 @@
 	transition-timing-function: ease-in-out;
 }
 
-#ScoreboardSpecialEvent
+#ScoreboardGameTime,
+#ScoreboardSpecialEvent,
+#ScoreboardCreepTime,
+#ScoreboardIncomingWaveTime,
+#ScoreboardSpecialEventsTime
 {
 	flow-children: down;
-	margin-left: 0px;
-	width: 150px;
+	width: 140px;
 	height: 40px;
-
 	background-repeat: no-repeat;
+}
+
+#ScoreboardGameTime
+{
+	margin-left: 0px;
+}
+
+#ScoreboardSpecialEvent
+{
+	margin-left: 140px;
 }
 
 #ScoreboardCreepTime
 {
-	flow-children: down;
-	margin-left: 150px;
-	width: 150px;
-	height: 40px;
-
-	background-repeat: no-repeat;
+	margin-left: 280px;
 }
 
 #ScoreboardIncomingWaveTime
 {
-	flow-children: down;
-	margin-left: 300px;
-	width: 150px;
-	height: 40px;
-
-	background-repeat: no-repeat;
+	margin-left: 420px;
 }
 
 #ScoreboardSpecialEventsTime
 {
-	flow-children: down;
-	margin-left: 450px;
-	width: 150px;
-	height: 40px;
-
-	background-repeat: no-repeat;
+	margin-left: 560px;
 }
 
+#GameTime,
 #Goal,
 #CreepGoal,
 #IncomingWaveGoal,
@@ -75,6 +67,7 @@
 	text-transform: uppercase;
 }
 
+#GameTimer,
 #Timer,
 #CreepTimer,
 #IncomingWaveTimer,

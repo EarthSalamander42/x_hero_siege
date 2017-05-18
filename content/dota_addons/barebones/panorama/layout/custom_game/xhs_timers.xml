@@ -8,6 +8,10 @@
 	</scripts>
 	<Panel class="ScoreboardLeft">
 		<Panel id="ScoreboardLeft_Parent">
+			<Panel id="ScoreboardGameTime">
+				<Label id="GameTime" text="#GameTime" />
+				<Label id="GameTimer" text="--:--" />
+			</Panel>
 			<Panel id="ScoreboardSpecialEvent">
 				<Label id="Goal" text="#Goal" />
 				<Label id="Timer" text="--:--" />

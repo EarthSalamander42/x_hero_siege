@@ -1,8 +1,11 @@
 <root>
 	<script>
+		GameUI.SetDefaultUIEnabled(DotaDefaultUIElement_t.DOTA_DEFAULT_UI_TOP_TIMEOFDAY, false);
 		GameUI.SetDefaultUIEnabled(DotaDefaultUIElement_t.DOTA_DEFAULT_UI_TOP_BAR_SCORE, false);
+		GameUI.SetDefaultUIEnabled(DotaDefaultUIElement_t.DOTA_DEFAULT_UI_TOP_BAR_DIRE_TEAM, false);
 		GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_INVENTORY_PROTECT, false );	//Glyph.
 		GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_INVENTORY_COURIER, false );
+		GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_TOP_MENU_BUTTONS, false );
 		GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_ENDGAME, false );
 
 		GameUI.CustomUIConfig().team_colors = {}
@@ -57,24 +60,17 @@
 
 		//Top Bar Radiant
 		var TopBarRadiantTeam = hudElements.FindChildTraverse("TopBarRadiantTeam");
-		TopBarRadiantTeam.style.width = "510px";
+		TopBarRadiantTeam.style.marginLeft = "100px";
+		TopBarRadiantTeam.style.width = "fit-children";
 
 		var topbarRadiantPlayers = hudElements.FindChildTraverse("TopBarRadiantPlayers");
+		topbarRadiantPlayers.style.marginLeft = "-60px";
 		topbarRadiantPlayers.style.width = "504px";
 
 		var topbarRadiantPlayersContainer = hudElements.FindChildTraverse("TopBarRadiantPlayersContainer");
+		topbarRadiantPlayersContainer.style.marginLeft = "0px";
 		topbarRadiantPlayersContainer.style.width = "504px";
-
-		//Top Bar Dire
-		var TopBarDireTeam = hudElements.FindChildTraverse("TopBarDireTeam");
-		TopBarDireTeam.style.width = "510px";
-
-		var topbarDirePlayers = hudElements.FindChildTraverse("TopBarDirePlayers");
-		topbarDirePlayers.style.width = "504px";
-
-		var topbarDirePlayersContainer = hudElements.FindChildTraverse("TopBarDirePlayersContainer");
-		topbarDirePlayersContainer.style.width = "504px";
-		topbarDirePlayersContainer.style.flowChildren = "left";
+		topbarRadiantPlayersContainer.style.flowChildren = "left"
 
 		var RadiantTeamContainer = hudElements.FindChildTraverse("RadiantTeamContainer");
 		RadiantTeamContainer.style.height = "610px";

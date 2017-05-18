@@ -446,3 +446,106 @@ function BossBar(unit, boss)
 		end
 	end)
 end
+
+function SpecialWave()
+local real_point = "npc_dota_spawner_"..point[poi].."_event"
+local point = {
+		"west",
+		"north",
+		"east",
+		"south"
+	}
+
+local unit = {
+		"npc_dota_creature_necrolyte_event_1",
+		"npc_dota_creature_naga_siren_event_2",
+		"npc_dota_creature_vengeful_spirit_event_3",
+		"npc_dota_creature_captain_event_4",
+		"npc_dota_creature_slardar_event_5",
+		"npc_dota_creature_chaos_knight_event_6",
+		"npc_dota_creature_luna_event_7",
+		"npc_dota_creature_clockwerk_event_8"
+	}
+
+	if PHASE_3 == 0 then
+		for j = 1, 10 do
+			CreateUnitByName(unit[reg-1], Entities:FindByName(nil, real_point):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
+		end
+	end
+	poi = poi + 1
+	if poi > 4 then
+		poi = 1
+	end
+	nCOUNTDOWNINCWAVE = 240
+end
+
+function CreepLevel(heroes, lane)
+local lvl = CREEP_LANES[lane][2]
+	if lvl == 4 then
+	else
+		lvl = lvl + 1
+	end
+	nCOUNTDOWNCREEP = 361
+	Notifications:TopToAll({hero="npc_dota_hero_"..heroes, duration=6.0})
+	Notifications:TopToAll({text="Creeps are now Level "..lvl.."!", style={color="green"}, continue=true})
+end
+
+function SpawnDragons(dragon)
+local difficulty = GameRules:GetCustomGameDifficulty()
+	for c = 1, 8 do
+		if CREEP_LANES[c][1] == 1 and CREEP_LANES[c][3] == 1 then
+		local point = Entities:FindByName( nil, "npc_dota_spawner_"..c)
+			for j = 1, difficulty do
+				local dragon = CreateUnitByName(dragon, point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
+			end
+		end
+	end
+end
+
+function OpenLane(PlayerID)
+local DoorObs = Entities:FindAllByName("obstruction_lane"..PlayerID)
+local towers = Entities:FindAllByName("dota_badguys_tower"..PlayerID)
+local raxes = Entities:FindAllByName("dota_badguys_barracks_"..PlayerID)
+	if PHASE_3 == 0 and CREEP_LANES_TYPE == 1 then
+		for _, obs in pairs(DoorObs) do
+			obs:SetEnabled(false, true)
+		end
+		for _, tower in pairs(towers) do
+			tower:RemoveModifierByName("modifier_invulnerable")
+		end
+		for _, rax in pairs(raxes) do
+			rax:RemoveModifierByName("modifier_invulnerable")
+		end
+		CREEP_LANES[PlayerID+1][1] = 1
+		DoEntFire("door_lane"..PlayerID+1, "SetAnimation", "open", 0, nil, nil)
+		print("Lane: "..PlayerID+1)
+	elseif PHASE_3 == 0 and CREEP_LANES_TYPE == 2 then
+
+	elseif CREEP_LANES_TYPE == 3 or PHASE_3 == 1 then
+		return
+	end
+end
+
+function CloseLane(PlayerID)
+local DoorObs = Entities:FindAllByName("obstruction_lane"..PlayerID)
+local towers = Entities:FindAllByName("dota_badguys_tower"..PlayerID)
+local raxes = Entities:FindAllByName("dota_badguys_barracks_"..PlayerID)
+	if PHASE_3 == 0 and CREEP_LANES_TYPE == 1 then
+		for _, obs in pairs(DoorObs) do
+			obs:SetEnabled(true, false)
+		end
+		for _, tower in pairs(towers) do
+			tower:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
+		end
+		for _, rax in pairs(raxes) do
+			rax:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
+		end
+		CREEP_LANES[PlayerID+1][1] = 0
+		DoEntFire("door_lane"..PlayerID+1, "SetAnimation", "close", 0, nil, nil)
+		print("Lane: "..PlayerID+1)
+	elseif PHASE_3 == 0 and CREEP_LANES_TYPE == 2 then
+		
+	elseif CREEP_LANES_TYPE == 3 or PHASE_3 == 1 then
+		return
+	end
+end

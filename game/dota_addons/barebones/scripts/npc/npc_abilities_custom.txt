@@ -4091,40 +4091,40 @@
 				"MODIFIER_STATE_NOT_ON_MINIMAP"			"MODIFIER_STATE_VALUE_ENABLED"
 			  }
 	
-			  "OnDestroy" 
-			  {
-				"Damage"
+				"OnDestroy" 
 				{
-				  "Target"
-				  {
-					"Center"    "TARGET"
-					"Radius"   "%radius_explosion"
-					"Teams"   "DOTA_UNIT_TARGET_TEAM_ENEMY"
-					"Types"   "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
-				  }
-				  "Type"      "DAMAGE_TYPE_MAGICAL"
-				  "Damage"    "%damage_per_unit"
+					"Damage"
+					{
+						"Target"
+						{
+							"Center"	"TARGET"
+							"Radius"	"%radius_explosion"
+							"Teams"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
+							"Types"		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+						}
+						"Type"			"DAMAGE_TYPE_MAGICAL"
+						"Damage"		"%damage_per_unit"
+					}
+
+					"Stun"
+					{
+						"Duration"		"%stun_duration"
+						"Target"
+						{
+							"Center"	"TARGET"
+							"Radius"	"%radius_explosion"
+							"Teams"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
+							"Types"		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+						}
+					}
+
+					"RunScript"
+					{
+						"ScriptFile"	"heroes/hero_pit_lord.lua"
+						"Function"		"target_modifier_remove"
+						"Duration"		"%duration"
+					}
 				}
-				"Stun"
-				{
-				  "Duration"   "%stun_duration"
-				  "Target"
-				  {
-					"Center"    "TARGET"
-					"Radius"   "%radius_explosion"
-					"Teams"   "DOTA_UNIT_TARGET_TEAM_ENEMY"
-					"Types"   "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
-				  }
-				}
-	
-				"RunScript"
-				{
-				  "ScriptFile"  "heroes/hero_pit_lord.lua"
-				  "Function"    "target_modifier_remove"
-				  "Duration"	"%duration"
-				}
-				
-			  }
 			}
 		}
 	}
@@ -10982,7 +10982,7 @@
 		// General
 		//-------------------------------------------------------------------------------------
 		"BaseClass"						"ability_datadriven"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_AOE"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"RequiredLevel"					"8"
 		"LevelsBetweenUpgrades"			"3"
 
@@ -13564,11 +13564,6 @@
 					"MODIFIER_PROPERTY_ATTACKSPEED_BONUS_CONSTANT"		"%bonus_attack_speed"
 					"MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE"		"%bonus_move_speed"
 					"MODIFIER_PROPERTY_EVASION_CONSTANT"				"%bonus_evasion"
-				}
-
-				"States"
-				{
-					"MODIFIER_STATE_MAGIC_IMMUNE"		"MODIFIER_STATE_VALUE_ENABLED"
 				}
 			}
 		}
@@ -28864,16 +28859,16 @@
 		// General
 		//-------------------------------------------------------------------------------------
 		"BaseClass"						"ability_datadriven"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_AOE |  DOTA_ABILITY_BEHAVIOR_CHANNELLED"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 
 		// Stats
 		//-------------------------------------------------------------------------------------
 		"AbilityCastPoint"				"0.5"
 		"AnimationPlaybackRate"			"0.5"
 		"AOERadius"						"1000"
-		"AbilityCooldown"				"20"
-		"AbilityChannelTime"			"10"
-		"AbilityManaCost"				"200"
+		"AbilityCooldown"				"35.0 30.0 25.0 20.0"
+		"AbilityChannelTime"			"10.0"
+		"AbilityManaCost"				"0"
 		"AbilityTextureName"			"warlock_rain_of_chaos"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
@@ -28884,17 +28879,17 @@
 			"01"
 			{
 				"var_type"				"FIELD_FLOAT"
-				"damage_per_unit"		"3000 4000 5000 6000"
+				"damage_per_unit"		"3000 5000 7000 9000"
 			}
 			"02"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"radius"				"600"
+				"radius"				"500"
 			}
 			"03"
 			{
-				"var_type"				"FIELD_INTEGER"
-				"stun_duration"			"3"
+				"var_type"				"FIELD_FLOAT"
+				"stun_duration"			"0.5 1.5 2.5 3.5"
 			}
 			"04"
 			{
@@ -28911,41 +28906,50 @@
 				"var_type"				"FIELD_INTEGER"
 				"radius_explosion"		"250"
 			}
+			"07"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"duration"				"10"
+			}
 		}
 
 		"OnSpellStart"
-		{ 
-		  "ApplyModifier"
-		  {
-			"ModifierName"  "modifier_spawn_meteor"
-			"Target"     "CASTER"
-		  }
-		}
-	
-		"OnChannelFinish"
 		{
-		  "RemoveModifier"
-		  {
-			"ModifierName"  "modifier_spawn_meteor"
-			"Target"     "CASTER"
-		  }
+			"ApplyModifier"
+			{
+				"ModifierName"	"modifier_spawn_meteor"
+				"Target"		"CASTER"
+			}
+
+			"FireSound"
+			{
+				"EffectName"	"DOTA_Item.BlackKingBar.Activate"
+				"Target"		"CASTER"
+			}
 		}
 
 		"Modifiers"
 		{
-			"modifier_spawn_meteor" 
+			"modifier_spawn_meteor"
 			{
-				"IsHidden" "1"
-				"ThinkInterval"  "%time_between_meteors"
-				"OverrideAnimation" "ACT_DOTA_TELEPORT"
-	
+				"IsHidden"			"0"
+				"ThinkInterval"		"%time_between_meteors"
+				"Duration"			"%duration"
+				"OverrideAnimation"	"ACT_DOTA_TELEPORT"
+
+				"AttachEffect"
+				{
+					"EffectName"			"particles/items_fx/black_king_bar_avatar.vpcf"
+					"EffectAttachType"		"follow_origin"
+					"Target"				"CASTER"
+				}
+
 				"OnIntervalThink"
 				{
 					"RunScript"
 					{
-						"ScriptFile"  "heroes/npc_hero_balanar/balanar_rain_of_chaos.lua"
-						"Function"    "rain_of_chaos"
-						"Duration"	"%duration"
+						"ScriptFile"			"heroes/npc_hero_balanar/balanar_rain_of_chaos.lua"
+						"Function"				"rain_of_chaos"
 					}
 				}
 
@@ -28959,55 +28963,54 @@
 
 			"modifier_dummy_target" 
 			{
-			  "IsHidden" "1"
-	
-			  "States"
-			  {
-				"MODIFIER_STATE_UNSELECTABLE"   "MODIFIER_STATE_VALUE_ENABLED"
-				"MODIFIER_STATE_NO_HEALTH_BAR"   "MODIFIER_STATE_VALUE_ENABLED"
-				"MODIFIER_STATE_NO_UNIT_COLLISION"  "MODIFIER_STATE_VALUE_ENABLED"
-				"MODIFIER_STATE_NO_TEAM_MOVE_TO"    "MODIFIER_STATE_VALUE_ENABLED"
-				"MODIFIER_STATE_NO_TEAM_SELECT"     "MODIFIER_STATE_VALUE_ENABLED"
-				"MODIFIER_STATE_COMMAND_RESTRICTED" "MODIFIER_STATE_VALUE_ENABLED"
-				"MODIFIER_STATE_ATTACK_IMMUNE"      "MODIFIER_STATE_VALUE_ENABLED"
-				"MODIFIER_STATE_MAGIC_IMMUNE"       "MODIFIER_STATE_VALUE_ENABLED"
-				"MODIFIER_STATE_NOT_ON_MINIMAP"     "MODIFIER_STATE_VALUE_ENABLED"
-	
-			  }
-	
-			  "OnDestroy" 
-			  {
-				"Damage"
+				"IsHidden" "1"
+
+				"States"
 				{
-				  "Target"
-				  {
-					"Center"    "TARGET"
-					"Radius"   "%radius_explosion"
-					"Teams"   "DOTA_UNIT_TARGET_TEAM_ENEMY"
-					"Types"   "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
-				  }
-				  "Type"      "DAMAGE_TYPE_MAGICAL"
-				  "Damage"    "%damage_per_unit"
+					"MODIFIER_STATE_UNSELECTABLE"		"MODIFIER_STATE_VALUE_ENABLED"
+					"MODIFIER_STATE_NO_HEALTH_BAR"		"MODIFIER_STATE_VALUE_ENABLED"
+					"MODIFIER_STATE_NO_UNIT_COLLISION"	"MODIFIER_STATE_VALUE_ENABLED"
+					"MODIFIER_STATE_NO_TEAM_MOVE_TO"	"MODIFIER_STATE_VALUE_ENABLED"
+					"MODIFIER_STATE_NO_TEAM_SELECT"		"MODIFIER_STATE_VALUE_ENABLED"
+					"MODIFIER_STATE_COMMAND_RESTRICTED"	"MODIFIER_STATE_VALUE_ENABLED"
+					"MODIFIER_STATE_ATTACK_IMMUNE"		"MODIFIER_STATE_VALUE_ENABLED"
+					"MODIFIER_STATE_MAGIC_IMMUNE"		"MODIFIER_STATE_VALUE_ENABLED"
+					"MODIFIER_STATE_NOT_ON_MINIMAP"		"MODIFIER_STATE_VALUE_ENABLED"
 				}
-				"Stun"
+
+				"OnDestroy" 
 				{
-				  "Duration"   "%stun_duration"
-				  "Target"
-				  {
-					"Center"    "TARGET"
-					"Radius"   "%radius_explosion"
-					"Teams"   "DOTA_UNIT_TARGET_TEAM_ENEMY"
-					"Types"   "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
-				  }
+					"Damage"
+					{
+						"Target"
+						{
+							"Center"	"TARGET"
+							"Radius"	"%radius_explosion"
+							"Teams"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
+							"Types"		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+						}
+						"Type"			"DAMAGE_TYPE_MAGICAL"
+						"Damage"		"%damage_per_unit"
+					}
+
+					"Stun"
+					{
+						"Duration"		"%stun_duration"
+						"Target"
+						{
+							"Center"	"TARGET"
+							"Radius"	"%radius_explosion"
+							"Teams"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
+							"Types"		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+						}
+					}
+
+					"RunScript"
+					{
+						"ScriptFile"	"heroes/npc_hero_balanar/balanar_rain_of_chaos.lua"
+						"Function"		"target_modifier_remove"
+					}
 				}
-	
-				"RunScript"
-				{
-				  "ScriptFile"  "heroes/npc_hero_balanar/balanar_rain_of_chaos.lua"
-				  "Function"    "target_modifier_remove"
-				}
-				
-			  }
 			}
 		}
 	}
