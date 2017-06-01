@@ -64,7 +64,7 @@
 					<Panel class="CustomGameSettingPanelDivider" hittest="false" />
 					<Panel class="ContainerCustomGameSettingOptions" hittest="false">
 						<RadioButton class="CGSRadio" group="DualHero" text="Normal" onactivate="OnVoteButtonPressed('dual_hero', 1)" />
-						<RadioButton class="CGSRadio4" group="DualHero" text="Dual" onactivate="OnVoteButtonPressed('dual_hero', 2)" />
+						<RadioButton class="CGSRadio4" group="DualHero" text="Dual (Experimental)" onactivate="OnVoteButtonPressed('dual_hero', 2)" />
 					</Panel>
 				</Panel>
 				<Panel id="VIP">

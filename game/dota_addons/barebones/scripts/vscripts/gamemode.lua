@@ -87,7 +87,8 @@ _G.golden_vip_members = {
 		80192910,	-- Cheshire [Nathan Perscott on Patreon]
 		89498388,	-- Sly
 		78356159,	-- [Sam Teo on Patreon, May paid, 2 months left for Permanent]
-		111692244	-- [Iris Von Everec on Steam, May paid, 2 months left for Permanent]
+		111692244,	-- [Iris Von Everec on Steam, May paid, 2 months left for Permanent]
+		101989646	-- [PraaNavi, Bug-Seeker, Permanent]
 	}
 
 _G.vip_members = {
@@ -749,9 +750,7 @@ local Region = {
 	GameTimer()
 
 	if newState == DOTA_GAMERULES_STATE_PRE_GAME then
-		if nGAMETIMER == 10 then
---			ChooseRandomHero(event)
-		end
+
 	elseif newState == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
 		CountdownTimerMuradin()
 		if SPECIAL_EVENT == 0 then
@@ -761,28 +760,18 @@ local Region = {
 		end
 
 		if PHASE_3 == 0 then
-			-- Timer: Creeps Levels 2, 3, 4 Whispering
 			if nGAMETIMER == 359 then -- 6 Min
 				NumPlayers = 1, Count * CREEP_LANES_TYPE
-				CreepLevel("undying", NumPlayers)
 				SpawnDragons("npc_dota_creature_red_dragon")
 			end
 			if nGAMETIMER == 839 then -- 12 Min
 				NumPlayers = 1, Count * CREEP_LANES_TYPE
-				CreepLevel("undying", NumPlayers)
 				SpawnDragons("npc_dota_creature_black_dragon")
 			end
 			if nGAMETIMER == 1079 then -- 18 Min
 				NumPlayers = 1, Count * CREEP_LANES_TYPE
-				CreepLevel("undying", NumPlayers)
 				SpawnDragons("npc_dota_creature_green_dragon")
 			end
-
---			print("------------------------")
---			print("Game Time: "..nGAMETIMER)
---			print("SE Time: "..nCOUNTDOWNTIMER)
---			print("Creep Time: "..nCOUNTDOWNCREEP)
---			print("IW Time: "..nCOUNTDOWNINCWAVE)
 
 			-- Timer: Special Events
 			if nGAMETIMER == 716 then -- 716 - 11:55 Min: MURADIN BRONZEBEARD EVENT 1
@@ -820,11 +809,11 @@ local Region = {
 			nCOUNTDOWNTIMER = 1
 		end
 
-		if nCOUNTDOWNCREEP <= 0 then -- Keep timers to 0 before game starts
+		if nCOUNTDOWNCREEP <= 0 then
 			nCOUNTDOWNCREEP = 1
 		end
 
-		if nCOUNTDOWNINCWAVE <= 0 then -- Keep timers to 0 before game starts
+		if nCOUNTDOWNINCWAVE <= 0 then
 			nCOUNTDOWNINCWAVE = 1
 		elseif nCOUNTDOWNINCWAVE == 1 then
 			Timers:CreateTimer(1.0, function()

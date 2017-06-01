@@ -448,13 +448,14 @@ function BossBar(unit, boss)
 end
 
 function SpecialWave()
-local real_point = "npc_dota_spawner_"..point[poi].."_event"
 local point = {
 		"west",
 		"north",
 		"east",
 		"south"
 	}
+
+local real_point = "npc_dota_spawner_"..point[poi].."_event"
 
 local unit = {
 		"npc_dota_creature_necrolyte_event_1",
@@ -477,17 +478,6 @@ local unit = {
 		poi = 1
 	end
 	nCOUNTDOWNINCWAVE = 240
-end
-
-function CreepLevel(heroes, lane)
-local lvl = CREEP_LANES[lane][2]
-	if lvl == 4 then
-	else
-		lvl = lvl + 1
-	end
-	nCOUNTDOWNCREEP = 361
-	Notifications:TopToAll({hero="npc_dota_hero_"..heroes, duration=6.0})
-	Notifications:TopToAll({text="Creeps are now Level "..lvl.."!", style={color="green"}, continue=true})
 end
 
 function SpawnDragons(dragon)
@@ -527,9 +517,10 @@ local raxes = Entities:FindAllByName("dota_badguys_barracks_"..PlayerID)
 end
 
 function CloseLane(PlayerID)
-local DoorObs = Entities:FindAllByName("obstruction_lane"..PlayerID)
-local towers = Entities:FindAllByName("dota_badguys_tower"..PlayerID)
-local raxes = Entities:FindAllByName("dota_badguys_barracks_"..PlayerID)
+local Lane = PlayerID+1
+local DoorObs = Entities:FindAllByName("obstruction_lane"..Lane)
+local towers = Entities:FindAllByName("dota_badguys_tower"..Lane)
+local raxes = Entities:FindAllByName("dota_badguys_barracks_"..Lane)
 	if PHASE_3 == 0 and CREEP_LANES_TYPE == 1 then
 		for _, obs in pairs(DoorObs) do
 			obs:SetEnabled(true, false)
@@ -540,9 +531,9 @@ local raxes = Entities:FindAllByName("dota_badguys_barracks_"..PlayerID)
 		for _, rax in pairs(raxes) do
 			rax:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
 		end
-		CREEP_LANES[PlayerID+1][1] = 0
-		DoEntFire("door_lane"..PlayerID+1, "SetAnimation", "close", 0, nil, nil)
-		print("Lane: "..PlayerID+1)
+		CREEP_LANES[Lane][1] = 0
+		DoEntFire("door_lane"..Lane, "SetAnimation", "close", 0, nil, nil)
+		print("Lane: "..Lane)
 	elseif PHASE_3 == 0 and CREEP_LANES_TYPE == 2 then
 		
 	elseif CREEP_LANES_TYPE == 3 or PHASE_3 == 1 then
