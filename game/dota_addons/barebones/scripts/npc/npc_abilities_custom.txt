@@ -6881,194 +6881,6 @@
 	}
 
 	//=================================================================================================================
-	// Archmage: Summon Water Elemental
-	//=================================================================================================================
-	"holdout_summon_water_elemental"
-	{
-		"BaseClass"             		"ability_datadriven"
-		"AbilityTextureName"			"custom/holdout_summon_water_elemental"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-		"AbilityCooldown"				"30.0"
-		"AbilityManaCost"				"120 160 200 240"
-		"AbilityCastPoint"				"0.2"
-
-		"AbilitySpecial"
-		{
-			"01"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"duration"				"30"
-			}
-			"02"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"hit_points"			"500 2000 3500 5000"
-			}
-			"03"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"damage"				"90 180 270 360"
-			}
-			"04"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"lvl1_unit_count"		"2 0 0 0"
-			}
-			"05"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"lvl2_unit_count"		"0 2 0 0"
-			}			
-			"06"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"lvl3_unit_count"		"0 0 2 0"
-			}
-			"07"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"lvl4_unit_count"		"0 0 0 2"
-			}
-		}
-
-		"OnSpellStart"
-		{
-			"SpawnUnit"
-			{
-				"UnitName"		"npc_water_elemental_1"
-				"UnitCount"		"%lvl1_unit_count"
-				"SpawnRadius"	"100"
-				"Duration"		"%duration"
-				"Target"		"CASTER"
-				"GrantsGold" 	"1"
-				"GrantsXP" 		"1"
-				"OnSpawn"
-				{
-					"AttachEffect"
-					{
-						"EffectName"		"particles/units/heroes/hero_morphling/morphling_replicate_finish.vpcf"
-						"EffectAttachType"	"follow_origin"
-						"Target"			"TARGET"
-					}
-					"FireSound"
-					{
-						"EffectName" "Hero_Morphling.Replicate"
-						"Target"			"CASTER"
-					}
-					"ApplyModifier"
-					{
-						"ModifierName"	"modifier_summoned"
-						"Target" 		"TARGET"
-					}
-				}
-			}
-	
-			"SpawnUnit"
-			{
-				"UnitName"		"npc_water_elemental_2"
-				"UnitCount"		"%lvl2_unit_count"
-				"SpawnRadius"	"100"
-				"Duration"		"%duration"
-				"Target"		"CASTER"
-				"GrantsGold" 	"1"
-				"GrantsXP" 		"1"
-				"OnSpawn"
-				{
-					"AttachEffect"
-					{
-						"EffectName"		"particles/units/heroes/hero_morphling/morphling_replicate_finish.vpcf"
-						"EffectAttachType"	"follow_origin"
-						"Target"			"TARGET"
-					}
-					"FireSound"
-					{
-						"EffectName" "Hero_Morphling.Replicate"
-						"Target"			"CASTER"
-					}
-					"ApplyModifier"
-					{
-						"ModifierName"	"modifier_summoned"
-						"Target" 		"TARGET"
-					}
-				}
-			}
-	
-			"SpawnUnit"
-			{
-				"UnitName"		"npc_water_elemental_3"
-				"UnitCount"		"%lvl3_unit_count"
-				"SpawnRadius"	"100"
-				"Duration"		"%duration"
-				"Target"		"CASTER"
-				"GrantsGold" 	"1"
-				"GrantsXP" 		"1"
-				"OnSpawn"
-				{
-					"AttachEffect"
-					{
-						"EffectName"		"particles/units/heroes/hero_morphling/morphling_replicate_finish.vpcf"
-						"EffectAttachType"	"follow_origin"
-						"Target"			"TARGET"
-					}
-					"FireSound"
-					{
-						"EffectName" "Hero_Morphling.Replicate"
-						"Target"			"CASTER"
-					}
-					"ApplyModifier"
-					{
-						"ModifierName"	"modifier_summoned"
-						"Target" 		"TARGET"
-					}
-				}
-			}
-
-			"SpawnUnit"
-			{
-				"UnitName"		"npc_water_elemental_4"
-				"UnitCount"		"%lvl4_unit_count"
-				"SpawnRadius"	"100"
-				"Duration"		"%duration"
-				"Target"		"CASTER"
-				"GrantsGold" 	"1"
-				"GrantsXP" 		"1"
-				"OnSpawn"
-				{
-					"AttachEffect"
-					{
-						"EffectName"		"particles/units/heroes/hero_morphling/morphling_replicate_finish.vpcf"
-						"EffectAttachType"	"follow_origin"
-						"Target"			"TARGET"
-					}
-					"FireSound"
-					{
-						"EffectName" "Hero_Morphling.Replicate"
-						"Target"			"CASTER"
-					}
-					"ApplyModifier"
-					{
-						"ModifierName"	"modifier_summoned"
-						"Target" 		"TARGET"
-					}
-				}
-			}
-		}
-
-		"Modifiers"
-		{
-			"modifier_summoned"
-			{
-				"IsHidden"			"1"
-				
-				"States"
-				{
-					"MODIFIER_STATE_DOMINATED"		"MODIFIER_STATE_VALUE_ENABLED"
-				}
-			}
-		}
-	}
-
-	//=================================================================================================================
 	// Archmage ( Naira ): Debilitation Aura
 	//=================================================================================================================
 	"holdout_debilitation_aura"
@@ -7793,7 +7605,7 @@
 				"Aura"              "modifier_wardrums_aura_hidden"
 				"Aura_Radius"       "%aura_radius"
 				"Aura_Teams"        "DOTA_UNIT_TARGET_TEAM_FRIENDLY"
-				"Aura_Types"        "DOTA_UNIT_TARGET_HERO"
+				"Aura_Types"        "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
 				"Aura_Flags"		"DOTA_UNIT_TARGET_FLAG_INVULNERABLE"
 			}
 
@@ -12748,19 +12560,19 @@
 		}
 	
 		"OnSpellStart"
-		{           
+		{
 			"RunScript"
 			{
-				"ScriptFile"        "heroes/hero_potm/watery_minion.lua"
-				"Function"          "WateryMinion"
-				"Target"            "POINT"
-				"Duration"          "%duration"
+				"ScriptFile"		"heroes/hero_potm/watery_minion.lua"
+				"Function"			"WateryMinion"
+				"Target"			"POINT"
+				"Duration"			"%duration"
 			}
 
 			"FireSound"
 			{
 				"EffectName"	"Hero_Lycan.SummonWolves"
-				"Target" 		"CASTER"
+				"Target"		"CASTER"
 			}
 		}
 	}
@@ -14811,24 +14623,21 @@
 	}
 
 	//=================================================================================================================
-	// Archimage ( Chen ): Blizzard
+	// Archimage (Chen): Blizzard
 	//=================================================================================================================
 	"holdout_blizzard"
 	{
 		"BaseClass"					"ability_datadriven"
 		"AbilityTextureName"		"crystal_maiden_freezing_field"
-
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_CHANNELLED | DOTA_ABILITY_BEHAVIOR_AOE"
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
 		"AbilityUnitTargetType"		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
 		"AbilityUnitDamageType"		"DAMAGE_TYPE_MAGICAL"
 		"AbilityCastAnimation"		"ACT_DOTA_CAST_ABILITY_5"
-
 		"AbilityCastRange"			"800"
 		"AbilityCastPoint"			"0.3"
 		"AbilityCooldown"			"19.0"
 		"AbilityManaCost"			"110 170 230 290"
-
 		"AOERadius"					"%radius"
 		"AbilityChannelTime"		"%wave_duration"
 
@@ -14843,31 +14652,31 @@
 			{
 				"var_type"		"FIELD_FLOAT"
 				"wave_duration"	"5.95"
-			}   
+			}
 			"03"
 			{
 				"var_type"		"FIELD_INTEGER"
-				"wave_count"	"6 8 10 12"
+				"wave_count"	"6"
 			}
 			"04"
 			{
 				"var_type"		"FIELD_INTEGER"
-				"wave_damage"	"55 60 70 120"
+				"wave_damage"	"60 100 140 180"
 			}
 			"05"
 			{
 				"var_type"		"FIELD_FLOAT"
-				"wave_interval"	"1.0 0.75 0.6 0.5" 
+				"wave_interval"	"1.0" 
 			}
 			"06"
 			{
 				"var_type"		"FIELD_INTEGER"
-				"total_damage"	"300 480 700 1440" 
+				"total_damage"	"360 600 840 1080" 
 			}
 			"07"
-			{											//Some Math, done by [Bear] Cookies #42
-				"var_type"		"FIELD_FLOAT"			//Channeling Animation Sync with Waves, Always keep more than 0.05 difference between these values and %wave_duration because the thinker is 0.05 time longer to prevent anim to not run.
-				"wps_thinker"	"0.97 0.73 0.58 0.48"	// 0.97*6: 5.82, 0.73*8: 5.84, 0.58*10: 5.8, 0.48*12: 5.76.
+			{									//Some Math, done by [Bear] Cookies #42
+				"var_type"		"FIELD_FLOAT"	//Channeling Animation Sync with Waves, Always keep more than 0.05 difference between these values and %wave_duration because the thinker is 0.05 time longer to prevent anim to not run.
+				"wps_thinker"	"0.97"			// 0.97*6: 5.82, 0.73*8: 5.84, 0.58*10: 5.8, 0.48*12: 5.76.
 			}
 			"08"
 			{
@@ -14884,15 +14693,6 @@
 				"var_type"		"FIELD_FLOAT"
 				"slow_duration"	"3.0" 
 			}
-		}
-
-		"precache"
-		{
-			"soundfile" "soundevents/game_sounds_heroes/game_sounds_crystalmaiden.vsndevts"
-			"particle"  "particles/units/heroes/hero_crystalmaiden/maiden_freezing_field_snow.vpcf"
-			"particle"  "particles/units/heroes/hero_crystalmaiden/maiden_freezing_field_explosion.vpcf"
-			"particle"  "particles/generic_gameplay/generic_slowed_cold.vpcf"
-			"particle"  "particles/status_fx/status_effect_frost_lich.vpcf"
 		}
 
 		"OnSpellStart"
@@ -15062,203 +14862,49 @@
 	}
 
 	//=================================================================================================================
-	// Archimage ( Chen ): Summon Water Elemental
+	// Archmage and Archimage (Crystal Maiden & Chen): Summon Water Elemental
 	//=================================================================================================================
-	"holdout_summon_water_elemental_alt"
+	"holdout_summon_water_elemental"
 	{
-		"BaseClass"             		"ability_datadriven"
-		"AbilityTextureName"			"custom/holdout_summon_water_elemental_alt"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-		"AbilityCooldown"				"35"
-		"AbilityManaCost"				"150 220 290 360"
-		"AbilityCastPoint"				"0.15"
+		"BaseClass"             	"ability_datadriven"
+		"AbilityTextureName"		"custom/holdout_summon_water_elemental_alt"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityCooldown"			"30.0"
+		"AbilityManaCost"			"150 220 290 360"
+		"AbilityCastPoint"			"0.25"
 
 		"AbilitySpecial"
 		{
 			"01"
 			{
-				"var_type"				"FIELD_INTEGER"
-				"duration"				"60"
+				"var_type"			"FIELD_INTEGER"
+				"duration"			"30"
 			}
 			"02"
 			{
-				"var_type"				"FIELD_INTEGER"
-				"hit_points"			"900 1925 4000 9000"
+				"var_type"			"FIELD_INTEGER"
+				"hit_points"		"850 2000 3500 5000"
 			}
 			"03"
 			{
-				"var_type"				"FIELD_INTEGER"
-				"damage"				"45 90 180 400"
-			}
-			"04"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"lvl1_unit_count"		"4 0 0 0"
-			}
-			"05"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"lvl2_unit_count"		"0 4 0 0"
-			}			
-			"06"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"lvl3_unit_count"		"0 0 5 0"
-			}
-			"07"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"lvl4_unit_count"		"0 0 0 6"
+				"var_type"			"FIELD_INTEGER"
+				"damage"			"90 190 270 360"
 			}
 		}
 
 		"OnSpellStart"
 		{
-			"SpawnUnit"
+			"RunScript"
 			{
-				"UnitName"		"npc_water_elemental_1"
-				"UnitCount"		"%lvl1_unit_count"
-				"SpawnRadius"	"100"
-				"Duration"		"%duration"
-				"Target"		"CASTER"
-				"GrantsGold" 	"1"
-				"GrantsXP" 		"1"
-				"OnSpawn"
-				{
-					"AttachEffect"
-					{
-						"EffectName"		"particles/units/heroes/hero_morphling/morphling_replicate_finish.vpcf"
-						"EffectAttachType"	"follow_origin"
-						"Target"			"TARGET"
-					}
-					"FireSound"
-					{
-						"EffectName" "Hero_Morphling.Replicate"
-						"Target"			"CASTER"
-					}
-					"ApplyModifier"
-					{
-						"ModifierName"	"modifier_summoned"
-						"Target" 		"TARGET"
-					}
-					"ApplyModifier"
-					{
-						"ModifierName"	"modifier_phased"
-						"Target" 		"TARGET"
-						"Duration"		"0.05"
-					}
-				}
-			}
-	
-			"SpawnUnit"
-			{
-				"UnitName"		"npc_water_elemental_2"
-				"UnitCount"		"%lvl2_unit_count"
-				"SpawnRadius"	"100"
-				"Duration"		"%duration"
-				"Target"		"CASTER"
-				"GrantsGold" 	"1"
-				"GrantsXP" 		"1"
-				"OnSpawn"
-				{
-					"AttachEffect"
-					{
-						"EffectName"		"particles/units/heroes/hero_morphling/morphling_replicate_finish.vpcf"
-						"EffectAttachType"	"follow_origin"
-						"Target"			"TARGET"
-					}
-					"FireSound"
-					{
-						"EffectName" "Hero_Morphling.Replicate"
-						"Target"			"CASTER"
-					}
-					"ApplyModifier"
-					{
-						"ModifierName"	"modifier_summoned"
-						"Target" 		"TARGET"
-					}
-				}
-			}
-	
-			"SpawnUnit"
-			{
-				"UnitName"		"npc_water_elemental_3"
-				"UnitCount"		"%lvl3_unit_count"
-				"SpawnRadius"	"100"
-				"Duration"		"%duration"
-				"Target"		"CASTER"
-				"GrantsGold" 	"1"
-				"GrantsXP" 		"1"
-				"OnSpawn"
-				{
-					"AttachEffect"
-					{
-						"EffectName"		"particles/units/heroes/hero_morphling/morphling_replicate_finish.vpcf"
-						"EffectAttachType"	"follow_origin"
-						"Target"			"TARGET"
-					}
-					"FireSound"
-					{
-						"EffectName" "Hero_Morphling.Replicate"
-						"Target"			"CASTER"
-					}
-					"ApplyModifier"
-					{
-						"ModifierName"	"modifier_summoned"
-						"Target" 		"TARGET"
-					}
-				}
+				"ScriptFile"		"heroes/hero_archimage.lua"
+				"Function"			"WaterElemental"
+				"Duration"			"%duration"
 			}
 
-		"SpawnUnit"
+			"FireSound"
 			{
-				"UnitName"		"npc_water_elemental_4"
-				"UnitCount"		"%lvl4_unit_count"
-				"SpawnRadius"	"100"
-				"Duration"		"%duration"
-				"Target"		"CASTER"
-				"GrantsGold" 	"1"
-				"GrantsXP" 		"1"
-				"OnSpawn"
-				{
-					"AttachEffect"
-					{
-						"EffectName"		"particles/units/heroes/hero_morphling/morphling_replicate_finish.vpcf"
-						"EffectAttachType"	"follow_origin"
-						"Target"			"TARGET"
-					}
-					"FireSound"
-					{
-						"EffectName" "Hero_Morphling.Replicate"
-						"Target"			"CASTER"
-					}
-					"ApplyModifier"
-					{
-						"ModifierName"	"modifier_summoned"
-						"Target" 		"TARGET"
-					}
-				}
-			}
-		}
-
-		"Modifiers"
-		{
-			"modifier_summoned"
-			{
-				"IsHidden"			"1"
-				
-				"States"
-				{
-					"MODIFIER_STATE_DOMINATED"		"MODIFIER_STATE_VALUE_ENABLED"
-				}
-				"OnCreated"
-				{
-//					"RunScript"
-//					{
-//						"ScriptFile"	"mechanics.lua"
-//						"Function"		"SetNoCorpse"
-//					}
-				}
+				"EffectName"		"Hero_Morphling.Replicate"
+				"Target"			"CASTER"
 			}
 		}
 	}
@@ -15292,7 +14938,7 @@
 
 		// Damage.
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityDamage"					"600 900 1200 1650"
+		"AbilityDamage"					"600 900 1200 1500"
 
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
@@ -15314,7 +14960,7 @@
 			"02"
 			{
 				"var_type"				"FIELD_FLOAT"
-				"blast_stun_duration"	"2.0"
+				"blast_stun_duration"	"1.0 1.5 2.0 2.5"
 			}		
 		}
 
@@ -15373,7 +15019,6 @@
 					}
 				}
 			}
-			
 
 			"FireEffect"
 			{
@@ -15429,7 +15074,7 @@
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityCastRange"				"500"
-		"AbilityCastPoint"				"0.5"
+		"AbilityCastPoint"				"0.3"
 
 		// Time     
 		//-------------------------------------------------------------------------------------------------------------
@@ -15454,12 +15099,6 @@
 			}
 		}
 
-		"precache"
-		{
-			"soundfile"		"soundevents/game_sounds_heroes/game_sounds_omniknight.vsndevts"
-			"particle"		"particles/units/heroes/hero_omniknight/omniknight_repel_buff.vpcf"
-		}
-
 		"OnSpellStart"
 		{
 			"FireSound"
@@ -15474,20 +15113,26 @@
 				"EffectAttachType"	"follow_origin"
 				"Target"			"TARGET"
 			}
-	
+
+			"RunScript"
+			{
+				"ScriptFile"	"heroes/hero_archimage.lua"
+				"Function"		"MagicShield"
+			}
+
 			"ApplyModifier"
 			{
-				"Target"			"TARGET"
-				"ModifierName"		"modifier_repel_datadriven"
+				"ModifierName"	"modifier_magic_shield"
+				"Target" 		"TARGET"
 			}
 		}
 
 		"Modifiers"
 		{
-			"modifier_repel_datadriven"
+			"modifier_magic_shield"
 			{
 				"IsBuff"			"1"
-				"IsPurgable"		"1"
+				"IsPurgable"		"0"
 				"Duration"			"%duration"
 				"EffectName"		"particles/units/heroes/hero_omniknight/omniknight_repel_buff.vpcf"
 				"EffectAttachType"	"follow_origin"
@@ -15529,7 +15174,7 @@
 			"01"
 			{
 				"var_type"        "FIELD_INTEGER"
-				"armor_bonus"     "300"
+				"armor_bonus"     "200"
 			}     
 			"02"
 			{
@@ -23336,7 +22981,7 @@
 		
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCastPoint"				"0.5"
+		"AbilityCastPoint"				"0.6"
 
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
@@ -23398,7 +23043,7 @@
 		
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCastPoint"				"0.2"
+		"AbilityCastPoint"				"0.6"
 
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
@@ -23568,7 +23213,7 @@
 			"01"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"images_count"				"3 4 5 6"
+				"images_count"				"4 8 12 16"
 			}
 			"02"
 			{
@@ -28910,6 +28555,11 @@
 			{
 				"var_type"				"FIELD_INTEGER"
 				"duration"				"10"
+			}
+			"08"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"golem_duration"		"30"
 			}
 		}
 

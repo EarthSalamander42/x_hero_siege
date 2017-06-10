@@ -1,6 +1,6 @@
 <root>
 	<styles>
-		<include src="file://{resources}/styles/dotastyles.css" />
+		<include src="file://{resources}/styles/dotastyles.vcss_c" />
 		<include src="file://{resources}/styles/custom_game/xhs_timers.css" />
 	</styles>
 	<scripts>
@@ -15,10 +15,6 @@
 			<Panel id="ScoreboardSpecialEvent">
 				<Label id="Goal" text="#Goal" />
 				<Label id="Timer" text="--:--" />
-			</Panel>
-			<Panel id="ScoreboardCreepTime">
-				<Label id="CreepGoal" text="#CreepGoal" />
-				<Label id="CreepTimer" text="--:--" />
 			</Panel>
 			<Panel id="ScoreboardIncomingWaveTime">
 				<Label id="IncomingWaveGoal" text="#IncomingWaveGoal" />

@@ -19,15 +19,13 @@ end
 	event.ability:ApplyDataDrivenModifier(caster, caster.blizzard_dummy_point, "modifier_blizzard_thinker", nil)
 end]]
 
--- -- Create the particles with small delays between each other
-function BlizzardWave( event )
-
-	local caster = event.caster
-	local ability = event.ability
-	
-	local target_position = event.target:GetAbsOrigin() --event.target_points[1]
-	local particleName = "particles/units/heroes/hero_crystalmaiden/maiden_freezing_field_explosion.vpcf"
-	local distance = 100
+-- Create the particles with small delays between each other
+function BlizzardWave(event)
+local caster = event.caster
+local ability = event.ability
+local target_position = event.target:GetAbsOrigin() --event.target_points[1]
+local particleName = "particles/units/heroes/hero_crystalmaiden/maiden_freezing_field_explosion.vpcf"
+local distance = 100
 
 	-- Center explosion
 	local particle1 = ParticleManager:CreateParticle( particleName, PATTACH_CUSTOMORIGIN, caster )
@@ -77,7 +75,7 @@ function ApplyAnimation( event )
 	end
 end
 
-function BlizzardEnd( event )
+function BlizzardEnd(event)
 	local caster = event.caster
 	caster.blizzard_dummy_point:RemoveModifierByName("modifier_blizzard_wave")
 	caster:RemoveModifierByName("modifier_blizzard_channelling")
@@ -85,4 +83,33 @@ function BlizzardEnd( event )
 
 	local blizzard_dummy_point_pointer = caster.blizzard_dummy_point
 	Timers:CreateTimer(0.4,function() blizzard_dummy_point_pointer:RemoveSelf() end)
+end
+
+function WaterElemental(keys)
+local caster_origin = keys.caster:GetAbsOrigin()
+local caster_fv = keys.caster:GetForwardVector()
+caster_origin.z = 0
+local level = keys.ability:GetLevel()
+
+	if level >= 1 and level <= 4 then
+		local unit = CreateUnitByName("npc_water_elemental_"..level, caster_origin, false, keys.caster, keys.caster, keys.caster:GetTeam())
+		unit:SetForwardVector(caster_fv)
+		unit:SetControllableByPlayer(keys.caster:GetPlayerID(), true)
+		unit:SetOwner(keys.caster)
+		unit:AddNewModifier(caster, nil, "modifier_phased", {duration = 0.05})
+		local plague_ward_spawn_particle = ParticleManager:CreateParticle("particles/units/heroes/hero_morphling/morphling_replicate_finish.vpcf", PATTACH_ABSORIGIN, unit)
+		unit:AddNewModifier(unit, nil, "modifier_kill", {duration = keys.Duration})
+	end
+end
+
+function MagicShield(keys)
+local caster = keys.caster
+local target = keys.target
+local ability = keys.ability
+local particle_cast = "particles/units/heroes/hero_omniknight/omniknight_repel_cast.vpcf"
+local Duration = ability:GetSpecialValueFor("duration")
+
+	local particle_cast_fx = ParticleManager:CreateParticle(particle_cast, PATTACH_ABSORIGIN_FOLLOW, caster)
+	ParticleManager:SetParticleControl(particle_cast_fx, 0, target:GetAbsOrigin())
+	target:Purge(false, true, false, true, true)
 end

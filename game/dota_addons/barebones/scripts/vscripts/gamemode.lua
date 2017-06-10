@@ -22,7 +22,6 @@ require('phases/phase3')
 _G.PREGAMETIME = 150
 _G.nGAMETIMER = 0
 _G.nCOUNTDOWNTIMER = 0
-_G.nCOUNTDOWNCREEP = 0
 _G.nCOUNTDOWNINCWAVE = 0
 _G.nCOUNTDOWNEVENT = 0
 _G.BT_ENABLED = 1
@@ -38,7 +37,7 @@ _G.sword_first_time = true
 _G.ring_first_time = true
 _G.doom_first_time = false
 _G.frost_first_time = false
-_G.X_HERO_SIEGE_V = 3.40
+_G.X_HERO_SIEGE_V = 3.42
 _G.SECRET = 0
 _G.RESPAWN_TIME = 40.0
 _G.ALL_HERO_IMAGE_DEAD = 0
@@ -276,7 +275,6 @@ end
 function FrostTowersToFinalWave()
 	if GameMode.FrostTowers_killed >= 2 then
 		nCOUNTDOWNTIMER = 60
-		nCOUNTDOWNCREEP = 1
 		nCOUNTDOWNINCWAVE = 1
 		nCOUNTDOWNEVENT = 1
 		PHASE_3 = 1
@@ -535,7 +533,7 @@ function GameMode:InitGameMode()
 	GameMode = self
 	mode = GameRules:GetGameModeEntity()
 
-	GameMode.ItemKVs = LoadKeyValues("scripts/npc/npc_items_custom.txt")
+--	GameMode.ItemKVs = LoadKeyValues("scripts/npc/npc_items_custom.txt")
 
 	-- Timer Rules
 	GameRules:SetPostGameTime(30.0)
@@ -544,6 +542,7 @@ function GameMode:InitGameMode()
 	GameRules:SetGoldTickTime(0.0) --This is not dota bitch
 	GameRules:SetGoldPerTick(0.0) --This is not dota bitch
 	GameRules:SetCustomGameSetupAutoLaunchDelay(20.0) --Vote Time
+	GameRules:SetPreGameTime(PREGAMETIME)
 
 	-- Boolean Rules
 	GameRules:SetUseCustomHeroXPValues(true)
@@ -581,8 +580,6 @@ function GameMode:InitGameMode()
 	SetTeamCustomHealthbarColor(DOTA_TEAM_CUSTOM_4, 0, 150, 60) --Green
 
 	mode:SetCustomGameForceHero("npc_dota_hero_wisp")
-	GameRules:SetPreGameTime(PREGAMETIME)
---	mode:SetStashPurchasingDisabled(true)
 	GameRules:LockCustomGameSetupTeamAssignment(true)
 	GameRules:SetHeroRespawnEnabled(true)
 	mode:SetFixedRespawnTime(RESPAWN_TIME)
@@ -591,7 +588,7 @@ function GameMode:InitGameMode()
 	GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_CUSTOM_1, 0)
 	GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_CUSTOM_3, 0)
 	GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_CUSTOM_4, 0)
-	mode:SetCustomXPRequiredToReachNextLevel( XP_PER_LEVEL_TABLE )
+	mode:SetCustomXPRequiredToReachNextLevel(XP_PER_LEVEL_TABLE)
 
 	-- Lua Modifiers
 	LinkLuaModifier("modifier_earthquake_aura", "heroes/hero_brewmaster", LUA_MODIFIER_MOTION_NONE)
@@ -603,7 +600,7 @@ function GameMode:InitGameMode()
 
 	self.countdownEnabled = false
 
---	Convars:RegisterCommand("duel_event", function(keys) return DuelEvent() end, "Test Duel Event", FCVAR_CHEAT)
+	Convars:RegisterCommand("duel_event", function(keys) return DuelEvent() end, "Test Duel Event", FCVAR_CHEAT)
 --	Convars:RegisterCommand("magtheridon", function(keys) return StartMagtheridonArena(keys) end, "Test Magtheridon Boss", FCVAR_CHEAT)
 
 	mode:SetExecuteOrderFilter(Dynamic_Wrap(GameMode, "FilterExecuteOrder"), self)
@@ -711,7 +708,6 @@ local heroes = HeroList:GetAllHeroes()
 
 	if newState == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
 		nCOUNTDOWNTIMER = 720
-		nCOUNTDOWNCREEP = 360
 		nCOUNTDOWNINCWAVE = 240
 		nCOUNTDOWNEVENT = 1
 		print("OnGameRulesStateChange: Game In Progress")
@@ -754,7 +750,6 @@ local Region = {
 	elseif newState == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
 		CountdownTimerMuradin()
 		if SPECIAL_EVENT == 0 then
-			CountdownTimerCreep()
 			CountdownTimerIncomingWave()
 			CountdownTimerSpecialEvents()
 		end
@@ -776,7 +771,6 @@ local Region = {
 			-- Timer: Special Events
 			if nGAMETIMER == 716 then -- 716 - 11:55 Min: MURADIN BRONZEBEARD EVENT 1
 				nGAMETIMER = 720 -1
-				nCOUNTDOWNCREEP = 360 +1
 				nCOUNTDOWNINCWAVE = 240 --	+1
 				RefreshPlayers()
 				Timers:CreateTimer(1, function()
@@ -807,10 +801,6 @@ local Region = {
 
 		if nCOUNTDOWNTIMER <= 0 then
 			nCOUNTDOWNTIMER = 1
-		end
-
-		if nCOUNTDOWNCREEP <= 0 then
-			nCOUNTDOWNCREEP = 1
 		end
 
 		if nCOUNTDOWNINCWAVE <= 0 then
@@ -856,25 +846,6 @@ function CountdownTimerMuradin()
 	if t <= 120 then
 		CustomGameEventManager:Send_ServerToAllClients( "time_remaining", broadcast_gametimer )
 	end
-end
-
-function CountdownTimerCreep()
-	nCOUNTDOWNCREEP = nCOUNTDOWNCREEP - 1
-	local t = nCOUNTDOWNCREEP
-	local minutes = math.floor(t / 60)
-	local seconds = t - (minutes * 60)
-	local m10 = math.floor(minutes / 10)
-	local m01 = minutes - (m10 * 10)
-	local s10 = math.floor(seconds / 10)
-	local s01 = seconds - (s10 * 10)
-	local broadcast_gametimer = 
-		{
-			timer_minute_10 = m10,
-			timer_minute_01 = m01,
-			timer_second_10 = s10,
-			timer_second_01 = s01,
-		}
-	CustomGameEventManager:Send_ServerToAllClients( "creepcountdown", broadcast_gametimer )
 end
 
 function CountdownTimerIncomingWave()
@@ -966,16 +937,16 @@ end
 			end
 			RestartCreeps()
 			sword_first_time = false
-				if hero.old_pos then
-					FindClearSpaceForUnit(hero, hero.old_pos, true)
-				else
-					FindClearSpaceForUnit(hero, base, true)
-				end
-				PlayerResource:SetCameraTarget(hero:GetPlayerID(), hero)
-				hero:EmitSound("Hero_TemplarAssassin.Trap")
-				Timers:CreateTimer(0.1, function()
-					PlayerResource:SetCameraTarget(hero:GetPlayerID(), nil)
-				end)
+			if hero.old_pos then
+				FindClearSpaceForUnit(hero, hero.old_pos, true)
+			else
+				FindClearSpaceForUnit(hero, base, true)
+			end
+			PlayerResource:SetCameraTarget(hero:GetPlayerID(), hero)
+			hero:EmitSound("Hero_TemplarAssassin.Trap")
+			Timers:CreateTimer(0.1, function()
+				PlayerResource:SetCameraTarget(hero:GetPlayerID(), nil)
+			end)
 		end
 		if item_name == ring and ring_first_time then
 			SPECIAL_EVENT = 0
@@ -1011,22 +982,22 @@ end
 			return false
 		end
 
-		if item_name == key then
+		if item_name == key and hero.has_epic_1 == false then
 			hero.has_epic_1 = true
 			hero:EmitSound("Hero_TemplarAssassin.Trap")
 		end
 
-		if item_name == shield then
+		if item_name == shield and hero.has_epic_2 == false then
 			hero.has_epic_2 = true
 			hero:EmitSound("Hero_TemplarAssassin.Trap")
 		end
 
-		if item_name == sword then
+		if item_name == sword and hero.has_epic_3 == false then
 			hero.has_epic_3 = true
 			hero:EmitSound("Hero_TemplarAssassin.Trap")
 		end
 
-		if item_name == ring then
+		if item_name == ring and hero.has_epic_4 == false then
 			hero.has_epic_4 = true
 			hero:EmitSound("Hero_TemplarAssassin.Trap")
 		end
@@ -1726,10 +1697,10 @@ end
 
 function GameMode:SpecialEventTPQuit(hero)
 	CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "quit_events", {})
-	
+	hero:Stop()
+	Entities:FindByName(nil, "trigger_special_event"):Enable()
 	hero:RemoveModifierByName("modifier_boss_stun")
 	hero:RemoveModifierByName("modifier_invulnerable")
-	hero:Stop()
 end
 
 function GameMode:SpecialEventTPQuit2(event)
@@ -1737,11 +1708,8 @@ local PlayerID = event.pID
 local player = PlayerResource:GetPlayer(PlayerID)
 local hero = player:GetAssignedHero()
 
+	hero:Stop()
+	Entities:FindByName(nil, "trigger_special_event"):Enable()
 	hero:RemoveModifierByName("modifier_boss_stun")
 	hero:RemoveModifierByName("modifier_invulnerable")
-	hero:Stop()
-
-	Timers:CreateTimer(3.0, function()
-		Entities:FindByName(nil, "trigger_special_event"):Enable()
-	end)
 end

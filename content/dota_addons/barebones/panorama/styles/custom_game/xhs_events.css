@@ -2,11 +2,10 @@
 {
 	width: 30%;
 	height: 50%;
-	margin-top: 25%;
-	margin-left: 35%;
 	border-radius: 4px;
 	overflow: clip;
 	background-color: none;
+	align: center center;
 }
 
 #EventPanel
@@ -14,16 +13,12 @@
 	width: 260px;
 	height: 400px;
 	margin-top: 50px;
-	margin-left: -800px;
+	margin-left: 200px;
 	background-color: gradient( linear, 0% 0%, 100% 50%, from( #25282a00 ), color-stop( .6, #25282acc), color-stop( .8, #25282a88), to( #00000022 ) );
 	border-radius: 4px;
 	box-shadow: fill #00000088 -4px -4px 8px 8px;
 	overflow: clip;
-}
-
-.HidePanel
-{
-	transform: translate3d( 1000px, 0px, 0px );
+	visibility: collapse;
 }
 
 #Event1,

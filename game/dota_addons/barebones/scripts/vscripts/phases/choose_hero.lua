@@ -1,10 +1,19 @@
 require('libraries/timers')
 
 STARTING_GOLD = 1000
+WeekHero = "npc_dota_hero_tiny"
+-- "npc_dota_hero_slardar"			-- Centurion
+-- "npc_dota_hero_skeleton_king"	-- Lich King
+-- "npc_dota_hero_meepo"			-- Kobold Knight
+-- "npc_dota_hero_chaos_knight"		-- Dark Fundamental
+-- "npc_dota_hero_tiny"				-- Stone Giant
+-- "npc_dota_hero_sand_king"		-- Desert Wyrm
+-- "npc_dota_hero_necrolyte"		-- Dark Summoner
+-- "npc_dota_hero_storm_spirit"		-- Spirit Master
 
 function SpawnHeroesBis()
 local heroes = HeroList:GetAllHeroes()
-	Timers:CreateTimer(8, function()
+	Timers:CreateTimer(10, function()
 		-- Inner West
 		HEROLIST_ALT[1] = CreateUnitByName("npc_dota_hero_enchantress_bis", Entities:FindByName(nil, "choose_enchantress_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
 		HEROLIST_ALT[1]:SetAngles(0, 0, 0)
@@ -50,11 +59,11 @@ local heroes = HeroList:GetAllHeroes()
 		HEROLIST_ALT[13] = CreateUnitByName("npc_dota_hero_dragon_knight_bis", Entities:FindByName(nil, "choose_dragon_knight_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
 		HEROLIST_ALT[13]:SetAngles(0, 90, 0)
 
-		WEEKLY_HERO = CreateUnitByName("npc_dota_hero_slardar_bis", Entities:FindByName(nil, "choose_vip_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
+		WEEKLY_HERO = CreateUnitByName(WeekHero.."_bis", Entities:FindByName(nil, "choose_vip_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
 		WEEKLY_HERO:SetAngles(0, 270, 0)
 	end)
 
-	Timers:CreateTimer(16, function()
+	Timers:CreateTimer(14, function()
 		-- Inner East
 		HEROLIST_ALT[14] = CreateUnitByName("npc_dota_hero_windrunner_bis", Entities:FindByName(nil, "choose_windrunner_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
 		HEROLIST_ALT[14]:SetAngles(0, 180, 0)
@@ -82,7 +91,7 @@ local heroes = HeroList:GetAllHeroes()
 		HEROLIST_ALT[21]:SetAngles(0, 0, 0)
 	end)
 
-	Timers:CreateTimer(20, function()
+	Timers:CreateTimer(16, function()
 		-- Inner South
 		HEROLIST_ALT[22] = CreateUnitByName("npc_dota_hero_lina_bis", Entities:FindByName(nil, "choose_lina_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
 		HEROLIST_ALT[22]:SetAngles(0, 90, 0)
@@ -104,7 +113,7 @@ local heroes = HeroList:GetAllHeroes()
 		HEROLIST_ALT[27]:SetAngles(0, 270, 0)
 	end)
 
-	Timers:CreateTimer(24, function()
+	Timers:CreateTimer(18, function()
 		-- VIP Hero
 		HEROLIST_VIP_ALT[4] = CreateUnitByName("npc_dota_hero_chaos_knight_bis", Entities:FindByName(nil, "choose_chaos_knight_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
 		HEROLIST_VIP_ALT[4]:SetAngles(0, 270, 0)
@@ -138,7 +147,7 @@ local heroes = HeroList:GetAllHeroes()
 		HEROLIST_VIP_ALT[8]:SetAngles(0, 270, 0)
 	end)
 
-	Timers:CreateTimer(28, function()
+	Timers:CreateTimer(20, function()
 		-- Special Events
 		RAMERO_DUMMY = CreateUnitByName("npc_ramero_bis", Entities:FindByName(nil, "point_special_arena_1"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
 		RAMERO_DUMMY:SetAngles(0, 270, 0)
@@ -155,7 +164,7 @@ local heroes = HeroList:GetAllHeroes()
 		StartAnimation(lich_king, {duration = 20000.0, activity = ACT_DOTA_IDLE, rate = 0.9})
 	end)
 
-	Timers:CreateTimer(32, function()
+	Timers:CreateTimer(22, function()
 		-- Special Events
 --		local iron_man = CreateUnitByName("npc_dota_hero_tinker_bis", Entities:FindByName(nil, "choose_tinker_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
 --		iron_man:SetAngles(0, 180, 0)
@@ -187,123 +196,121 @@ local id = hero:GetPlayerID()
 local point = Entities:FindByName(nil, "base_spawn")
 local difficulty = GameRules:GetCustomGameDifficulty()
 
-	for playerID = 0, DOTA_MAX_TEAM_PLAYERS -1 do
-		if PlayerResource:IsValidPlayer(playerID) and hero:GetUnitName() == "npc_dota_hero_wisp" and DUAL_HERO == 1 then
-			for i = 1, #HEROLIST do
-				if caller:GetName() == "trigger_hero_"..i then
-					local particle = ParticleManager:CreateParticle("particles/econ/events/ti6/hero_levelup_ti6.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
-					ParticleManager:SetParticleControl(particle, 0, hero:GetAbsOrigin())
-					EmitSoundOnClient("ui.trophy_levelup", PlayerResource:GetPlayer(playerID))
-					hero:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 3.0, IsHidden = true})
-					PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
-					Notifications:Bottom(hero:GetPlayerOwnerID(), {hero="npc_dota_hero_"..HEROLIST[i], duration = 5.0})
-					Notifications:Bottom(hero:GetPlayerOwnerID(), {text="HERO: ", duration = 5.0, style={color="white"}, continue=true})
-					Notifications:Bottom(hero:GetPlayerOwnerID(), {text="#npc_dota_hero_"..HEROLIST[i], duration = 5.0, style={color="white"}, continue=true})
-					Timers:CreateTimer(3.0, function()
-						UTIL_Remove(Entities:FindByName(nil, "trigger_hero_"..i))
-						UTIL_Remove(HEROLIST_ALT[i])
-						FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
-						local newHero = PlayerResource:ReplaceHeroWith(hero:GetPlayerID(), "npc_dota_hero_"..HEROLIST[i], STARTING_GOLD, 0)
-						PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
-						if difficulty < 4 then
-							local item = newHero:AddItemByName("item_ankh_of_reincarnation")
-						end
-						local item = newHero:AddItemByName("item_healing_potion")
-						local item = newHero:AddItemByName("item_mana_potion")
-						if difficulty == 1 then
-							local item = newHero:AddItemByName("item_lifesteal_mask")
-						end
-						Timers:CreateTimer(4.0, function()
-							if not hero:IsNull() then
-								UTIL_Remove(hero)
-							end
-						end)
-					end)
-				end
-			end
-			if caller:GetName() == "trigger_hero_weekly" then
-				if not hero:HasAbility("holdout_vip") then
-					local particle = ParticleManager:CreateParticle("particles/econ/events/ti6/hero_levelup_ti6.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
-					ParticleManager:SetParticleControl(particle, 0, hero:GetAbsOrigin())
-					EmitSoundOnClient("ui.trophy_levelup", PlayerResource:GetPlayer(playerID))
-					hero:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 3.0, IsHidden = true})
-					PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
-					Notifications:Bottom(hero:GetPlayerOwnerID(), {hero="npc_dota_hero_slardar", duration = 5.0})
-					Notifications:Bottom(hero:GetPlayerOwnerID(), {text="HERO: ", duration = 5.0, style={color="white"}, continue=true})
-					Notifications:Bottom(hero:GetPlayerOwnerID(), {text="#npc_dota_hero_slardar", duration = 5.0, style={color="white"}, continue=true})
-					Timers:CreateTimer(3.0, function()
-						UTIL_Remove(Entities:FindByName(nil, "trigger_hero_weekly"))
-						UTIL_Remove(WEEKLY_HERO)
-						FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
-						local newHero = PlayerResource:ReplaceHeroWith(hero:GetPlayerID(), "npc_dota_hero_slardar", STARTING_GOLD, 0)
-						PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
-						local particle = ParticleManager:CreateParticle("particles/econ/events/ti6/hero_levelup_ti6.vpcf", PATTACH_ABSORIGIN_FOLLOW, newHero)
-						ParticleManager:SetParticleControl(particle, 0, newHero:GetAbsOrigin())
-						if difficulty < 4 then
-							local item = newHero:AddItemByName("item_ankh_of_reincarnation")
-						end
-						local item = newHero:AddItemByName("item_healing_potion")
-						local item = newHero:AddItemByName("item_mana_potion")
-						if difficulty == 1 then
-							local item = newHero:AddItemByName("item_lifesteal_mask")
-						end
-						Timers:CreateTimer(4.0, function()
-							if not hero:IsNull() then
-								UTIL_Remove(hero)
-							end
-						end)
-					end)
-				elseif hero:HasAbility("holdout_vip") then
-					Notifications:Bottom(hero:GetPlayerOwnerID(),{text = "You are VIP. Please select this hero on top!", duration = 5.0})
-				end
-			end
-		elseif PlayerResource:IsValidPlayer(playerID) and hero:GetUnitName() == "npc_dota_hero_wisp" and DUAL_HERO == 2 then
-			for i = 1, #HEROLIST do
-				if caller:GetName() == "trigger_hero_"..i and hero.dual_choose == 0 then
-					local particle = ParticleManager:CreateParticle("particles/econ/events/ti6/hero_levelup_ti6.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
-					ParticleManager:SetParticleControl(particle, 0, hero:GetAbsOrigin())
-					EmitSoundOnClient("ui.trophy_levelup", PlayerResource:GetPlayer(playerID))
+	if PlayerResource:IsValidPlayer(id) and hero:GetUnitName() == "npc_dota_hero_wisp" and DUAL_HERO == 1 then
+		for i = 1, #HEROLIST do
+			if caller:GetName() == "trigger_hero_"..i then
+				local particle = ParticleManager:CreateParticle("particles/econ/events/ti6/hero_levelup_ti6.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
+				ParticleManager:SetParticleControl(particle, 0, hero:GetAbsOrigin())
+				EmitSoundOnClient("ui.trophy_levelup", PlayerResource:GetPlayer(id))
+				hero:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 3.0, IsHidden = true})
+				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
+				Notifications:Bottom(hero:GetPlayerOwnerID(), {hero="npc_dota_hero_"..HEROLIST[i], duration = 5.0})
+				Notifications:Bottom(hero:GetPlayerOwnerID(), {text="HERO: ", duration = 5.0, style={color="white"}, continue=true})
+				Notifications:Bottom(hero:GetPlayerOwnerID(), {text="#npc_dota_hero_"..HEROLIST[i], duration = 5.0, style={color="white"}, continue=true})
+				Timers:CreateTimer(3.0, function()
 					UTIL_Remove(Entities:FindByName(nil, "trigger_hero_"..i))
 					UTIL_Remove(HEROLIST_ALT[i])
-					Notifications:Bottom(hero:GetPlayerOwnerID(), {hero="npc_dota_hero_"..HEROLIST[i], duration = 5.0})
-					Notifications:Bottom(hero:GetPlayerOwnerID(), {text="HERO: ", duration = 5.0, style={color="white"}, continue=true})
-					Notifications:Bottom(hero:GetPlayerOwnerID(), {text="#npc_dota_hero_"..HEROLIST[i], duration = 5.0, style={color="white"}, continue=true})
-					Notifications:Bottom(hero:GetPlayerOwnerID(), {text="DUAL MODE: Please choose a second hero!", duration = 5.0, style={color="white"}})
-					DUAL_HERO_1[id] = "npc_dota_hero_"..HEROLIST[i]
-					hero.dual_choose = 1
-				end
-				if caller:GetName() == "trigger_hero_"..i and hero.dual_choose == 1 then
-					CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "show_dual", {})
-					DUAL_HERO_2[id] = "npc_dota_hero_"..HEROLIST[i]
-					local particle = ParticleManager:CreateParticle("particles/econ/events/ti6/hero_levelup_ti6.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
-					ParticleManager:SetParticleControl(particle, 0, hero:GetAbsOrigin())
-					EmitSoundOnClient("ui.trophy_levelup", PlayerResource:GetPlayer(playerID))
-					hero:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 3.0, IsHidden = true})
-					PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
-					Notifications:Bottom(hero:GetPlayerOwnerID(), {hero="npc_dota_hero_"..HEROLIST[i], duration = 5.0})
-					Notifications:Bottom(hero:GetPlayerOwnerID(), {text="HERO: ", duration = 5.0, style={color="white"}, continue=true})
-					Notifications:Bottom(hero:GetPlayerOwnerID(), {text="#npc_dota_hero_"..HEROLIST[i], duration = 5.0, style={color="white"}, continue=true})
-					Timers:CreateTimer(3.0, function()
-						UTIL_Remove(Entities:FindByName(nil, "trigger_hero_"..i))
-						UTIL_Remove(HEROLIST_ALT[i])
-						FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
-						local newHero = PlayerResource:ReplaceHeroWith(hero:GetPlayerID(), "npc_dota_hero_"..HEROLIST[i], STARTING_GOLD, 0)
-						PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
-						if difficulty < 4 then
-							local item = newHero:AddItemByName("item_ankh_of_reincarnation")
+					FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
+					local newHero = PlayerResource:ReplaceHeroWith(id, "npc_dota_hero_"..HEROLIST[i], STARTING_GOLD, 0)
+					PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
+					if difficulty < 4 then
+						local item = newHero:AddItemByName("item_ankh_of_reincarnation")
+					end
+					local item = newHero:AddItemByName("item_healing_potion")
+					local item = newHero:AddItemByName("item_mana_potion")
+					if difficulty == 1 then
+						local item = newHero:AddItemByName("item_lifesteal_mask")
+					end
+					Timers:CreateTimer(4.0, function()
+						if not hero:IsNull() then
+							UTIL_Remove(hero)
 						end
-						local item = newHero:AddItemByName("item_healing_potion")
-						local item = newHero:AddItemByName("item_mana_potion")
-						if difficulty == 1 then
-							local item = newHero:AddItemByName("item_lifesteal_mask")
-						end
-						Timers:CreateTimer(4.0, function()
-							if not hero:IsNull() then
-								UTIL_Remove(hero)
-							end
-						end)
 					end)
-				end
+				end)
+			end
+		end
+		if caller:GetName() == "trigger_hero_weekly" then
+			if not hero:HasAbility("holdout_vip") then
+				local particle = ParticleManager:CreateParticle("particles/econ/events/ti6/hero_levelup_ti6.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
+				ParticleManager:SetParticleControl(particle, 0, hero:GetAbsOrigin())
+				EmitSoundOnClient("ui.trophy_levelup", PlayerResource:GetPlayer(id))
+					hero:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 3.0, IsHidden = true})
+				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
+				Notifications:Bottom(hero:GetPlayerOwnerID(), {hero=WeekHero, duration = 5.0})
+				Notifications:Bottom(hero:GetPlayerOwnerID(), {text="HERO: ", duration = 5.0, style={color="white"}, continue=true})
+				Notifications:Bottom(hero:GetPlayerOwnerID(), {text="#"..WeekHero, duration = 5.0, style={color="white"}, continue=true})
+				Timers:CreateTimer(3.0, function()
+					UTIL_Remove(Entities:FindByName(nil, "trigger_hero_weekly"))
+					UTIL_Remove(WEEKLY_HERO)
+					FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
+					local newHero = PlayerResource:ReplaceHeroWith(id, WeekHero, STARTING_GOLD, 0)
+					PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
+					local particle = ParticleManager:CreateParticle("particles/econ/events/ti6/hero_levelup_ti6.vpcf", PATTACH_ABSORIGIN_FOLLOW, newHero)
+					ParticleManager:SetParticleControl(particle, 0, newHero:GetAbsOrigin())
+					if difficulty < 4 then
+						local item = newHero:AddItemByName("item_ankh_of_reincarnation")
+					end
+					local item = newHero:AddItemByName("item_healing_potion")
+					local item = newHero:AddItemByName("item_mana_potion")
+					if difficulty == 1 then
+						local item = newHero:AddItemByName("item_lifesteal_mask")
+					end
+					Timers:CreateTimer(4.0, function()
+						if not hero:IsNull() then
+							UTIL_Remove(hero)
+						end
+					end)
+				end)
+			elseif hero:HasAbility("holdout_vip") then
+				Notifications:Bottom(hero:GetPlayerOwnerID(),{text = "You are VIP. Please select this hero on top!", duration = 5.0})
+			end
+		end
+	elseif PlayerResource:IsValidPlayer(id) and hero:GetUnitName() == "npc_dota_hero_wisp" and DUAL_HERO == 2 then
+		for i = 1, #HEROLIST do
+			if caller:GetName() == "trigger_hero_"..i and hero.dual_choose == 0 then
+				local particle = ParticleManager:CreateParticle("particles/econ/events/ti6/hero_levelup_ti6.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
+				ParticleManager:SetParticleControl(particle, 0, hero:GetAbsOrigin())
+				EmitSoundOnClient("ui.trophy_levelup", PlayerResource:GetPlayer(id))
+				UTIL_Remove(Entities:FindByName(nil, "trigger_hero_"..i))
+				UTIL_Remove(HEROLIST_ALT[i])
+				Notifications:Bottom(hero:GetPlayerOwnerID(), {hero="npc_dota_hero_"..HEROLIST[i], duration = 5.0})
+				Notifications:Bottom(hero:GetPlayerOwnerID(), {text="HERO: ", duration = 5.0, style={color="white"}, continue=true})
+				Notifications:Bottom(hero:GetPlayerOwnerID(), {text="#npc_dota_hero_"..HEROLIST[i], duration = 5.0, style={color="white"}, continue=true})
+				Notifications:Bottom(hero:GetPlayerOwnerID(), {text="DUAL MODE: Please choose a second hero!", duration = 5.0, style={color="white"}})
+				DUAL_HERO_1[id] = "npc_dota_hero_"..HEROLIST[i]
+				hero.dual_choose = 1
+			end
+			if caller:GetName() == "trigger_hero_"..i and hero.dual_choose == 1 then
+				CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "show_dual", {})
+				DUAL_HERO_2[id] = "npc_dota_hero_"..HEROLIST[i]
+				local particle = ParticleManager:CreateParticle("particles/econ/events/ti6/hero_levelup_ti6.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
+				ParticleManager:SetParticleControl(particle, 0, hero:GetAbsOrigin())
+				EmitSoundOnClient("ui.trophy_levelup", PlayerResource:GetPlayer(id))
+				hero:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 3.0, IsHidden = true})
+				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
+				Notifications:Bottom(hero:GetPlayerOwnerID(), {hero="npc_dota_hero_"..HEROLIST[i], duration = 5.0})
+				Notifications:Bottom(hero:GetPlayerOwnerID(), {text="HERO: ", duration = 5.0, style={color="white"}, continue=true})
+				Notifications:Bottom(hero:GetPlayerOwnerID(), {text="#npc_dota_hero_"..HEROLIST[i], duration = 5.0, style={color="white"}, continue=true})
+				Timers:CreateTimer(3.0, function()
+					UTIL_Remove(Entities:FindByName(nil, "trigger_hero_"..i))
+					UTIL_Remove(HEROLIST_ALT[i])
+					FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
+					local newHero = PlayerResource:ReplaceHeroWith(id, "npc_dota_hero_"..HEROLIST[i], STARTING_GOLD, 0)
+					PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
+					if difficulty < 4 then
+						local item = newHero:AddItemByName("item_ankh_of_reincarnation")
+					end
+					local item = newHero:AddItemByName("item_healing_potion")
+					local item = newHero:AddItemByName("item_mana_potion")
+					if difficulty == 1 then
+						local item = newHero:AddItemByName("item_lifesteal_mask")
+					end
+					Timers:CreateTimer(4.0, function()
+						if not hero:IsNull() then
+							UTIL_Remove(hero)
+						end
+					end)
+				end)
 			end
 		end
 	end

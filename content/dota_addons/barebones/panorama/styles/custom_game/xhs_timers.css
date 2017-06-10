@@ -1,6 +1,6 @@
 .ScoreboardLeft
 {
-	margin-left: 46.5%;
+	margin-left: 47.4%;
 	background-color: gradient( linear, 0% 0%, 100% 0%, from( #25282a00 ), color-stop( .6, #25282acc), color-stop( .8, #25282a88), to( #00000022 ) );
 	margin-right: 0px;
 	flow-children: right;
@@ -18,7 +18,6 @@
 
 #ScoreboardGameTime,
 #ScoreboardSpecialEvent,
-#ScoreboardCreepTime,
 #ScoreboardIncomingWaveTime,
 #ScoreboardSpecialEventsTime
 {
@@ -38,24 +37,18 @@
 	margin-left: 140px;
 }
 
-#ScoreboardCreepTime
+#ScoreboardIncomingWaveTime
 {
 	margin-left: 280px;
 }
 
-#ScoreboardIncomingWaveTime
+#ScoreboardSpecialEventsTime
 {
 	margin-left: 420px;
 }
 
-#ScoreboardSpecialEventsTime
-{
-	margin-left: 560px;
-}
-
 #GameTime,
 #Goal,
-#CreepGoal,
 #IncomingWaveGoal,
 #SpecialEventsGoal
 {
@@ -69,7 +62,6 @@
 
 #GameTimer,
 #Timer,
-#CreepTimer,
 #IncomingWaveTimer,
 #SpecialEventsTimer
 {

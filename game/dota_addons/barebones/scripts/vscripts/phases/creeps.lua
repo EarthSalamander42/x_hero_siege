@@ -107,12 +107,16 @@ function SpawnRevenant(event)
 local caller = event.caller
 local cn = string.gsub(caller:GetName(), "dota_badguys_tower", "")
 local difficulty = GameRules:GetCustomGameDifficulty()
-print(caller:GetName())
-print(cn)
+local player = PlayerResource:GetPlayer(tonumber(cn)-1)
 
 	CREEP_LANES[tonumber(cn)][2] = CREEP_LANES[tonumber(cn)][2] + 1
+	Notifications:Bottom(player, {text="Your creep lane is now level "..CREEP_LANES[tonumber(cn)][2].."!", duration=5.0, style={color="green"}})
 	for j = 1, difficulty do
-		local unit = CreateUnitByName("npc_death_ghost_tower", caller:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
+		if caller:GetUnitName() == "xhs_tower_lane_1" then
+			local unit = CreateUnitByName("xhs_death_revenant", caller:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
+		elseif caller:GetUnitName() == "xhs_tower_lane_2" then
+			local unit = CreateUnitByName("xhs_death_revenant_2", caller:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
+		end
 	end
 end
 
@@ -124,7 +128,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 		local unit = CreateUnitByName("npc_magnataur_destroyer_crypt", caller:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
 	end
 
-	if first_rax then
+	if first_rax == true then
 		first_rax = false
 		Entities:FindByName(nil, "trigger_phase2_left"):Enable()
 		Entities:FindByName(nil, "trigger_phase2_right"):Enable()

@@ -136,6 +136,15 @@
 			}
 		}
 
+		"OnUnequip"
+		{
+			"RemoveModifier"
+			{
+				"ModifierName"	"modifier_orb_of_fire"
+				"Target" 		"CASTER"
+			}
+		}
+
 		"OnSpellStart"
 		{
 			"RunScript"
@@ -802,6 +811,15 @@
 			}
 		}
 
+		"OnUnequip"
+		{
+			"RemoveModifier"
+			{
+				"ModifierName"	"modifier_orb_of_darkness"
+				"Target" 		"CASTER"
+			}
+		}
+
 		"OnSpellStart"
 		{
 			"RunScript"
@@ -1144,6 +1162,15 @@
 			}
 		}
 
+		"OnUnequip"
+		{
+			"RemoveModifier"
+			{
+				"ModifierName"	"modifier_orb_of_lightning"
+				"Target" 		"CASTER"
+			}
+		}
+
 		"OnSpellStart"
 		{
 			"RunScript"
@@ -1297,6 +1324,15 @@
 			}
 		}
 
+		"OnUnequip"
+		{
+			"RemoveModifier"
+			{
+				"ModifierName"	"modifier_orb_of_fire"
+				"Target" 		"CASTER"
+			}
+		}
+
 		"OnSpellStart"
 		{
 			"RunScript"
@@ -1443,6 +1479,15 @@
 						"Target"		"CASTER"
 					}
 				}
+			}
+		}
+
+		"OnUnequip"
+		{
+			"RemoveModifier"
+			{
+				"ModifierName"	"modifier_orb_of_darkness"
+				"Target" 		"CASTER"
 			}
 		}
 
@@ -1618,6 +1663,15 @@
 						"Target"		"CASTER"
 					}
 				}
+			}
+		}
+
+		"OnUnequip"
+		{
+			"RemoveModifier"
+			{
+				"ModifierName"	"modifier_orb_of_frost"
+				"Target" 		"CASTER"
 			}
 		}
 
@@ -3098,6 +3152,15 @@
 			}
 		}
 
+		"OnUnequip"
+		{
+			"RemoveModifier"
+			{
+				"ModifierName"	"modifier_orb_of_earth"
+				"Target" 		"CASTER"
+			}
+		}
+
 		"OnSpellStart"
 		{
 			"RunScript"
@@ -3277,6 +3340,15 @@
 						"Target"		"CASTER"
 					}
 				}
+			}
+		}
+
+		"OnUnequip"
+		{
+			"RemoveModifier"
+			{
+				"ModifierName"	"modifier_orb_of_fire"
+				"Target" 		"CASTER"
 			}
 		}
 
@@ -3483,6 +3555,15 @@
 			}
 		}
 
+		"OnUnequip"
+		{
+			"RemoveModifier"
+			{
+				"ModifierName"	"modifier_orb_of_lightning"
+				"Target" 		"CASTER"
+			}
+		}
+
 		"OnSpellStart"
 		{
 			"RunScript"
@@ -3663,6 +3744,15 @@
 						"Target"		"CASTER"
 					}
 				}
+			}
+		}
+
+		"OnUnequip"
+		{
+			"RemoveModifier"
+			{
+				"ModifierName"	"modifier_orb_of_lightning"
+				"Target" 		"CASTER"
 			}
 		}
 
@@ -3847,6 +3937,15 @@
 						"Target"		"CASTER"
 					}
 				}
+			}
+		}
+
+		"OnUnequip"
+		{
+			"RemoveModifier"
+			{
+				"ModifierName"	"modifier_orb_of_darkness"
+				"Target" 		"CASTER"
 			}
 		}
 

@@ -32,32 +32,33 @@ Checks if the target is a unit owned by the player that cast the Chronosphere
 If it is then it applies the no collision and extra movementspeed modifier
 otherwise it applies the stun modifier]]
 function ChronosphereAura( keys )
-	local caster = keys.caster
-	local target = keys.target
-	local ability = keys.ability
-	local ability_level = ability:GetLevel() - 1
+local caster = keys.caster
+local target = keys.target
+local ability = keys.ability
+local ability_level = ability:GetLevel() - 1
+local aura_modifier = keys.aura_modifier
+local ignore_void = ability:GetLevelSpecialValueFor("ignore_void", ability_level)
+local duration = ability:GetLevelSpecialValueFor("aura_interval", ability_level)
 
-	-- Ability variables
-	local aura_modifier = keys.aura_modifier
-	local ignore_void = ability:GetLevelSpecialValueFor("ignore_void", ability_level)
-	local duration = ability:GetLevelSpecialValueFor("aura_interval", ability_level)
-
-	-- Variable for deciding if Chronosphere should affect Faceless Void
 	if ignore_void == 0 then
 		ignore_void = false
 	else
 		ignore_void = true
 	end
 
-	-- Check if it is a caster controlled unit or not
-	-- Caster controlled units get the phasing and movement speed modifier DISABLED ERRORS
 	if (caster:GetPlayerOwner() == target:GetPlayerOwner()) or (target:GetName() == "npc_dota_hero_faceless_void" and ignore_void) then
 --		target:AddNewModifier(caster, ability, "modifier_chronosphere_speed_lua", {duration = duration})
---	elseif target:IsIllusion() then --doesn't work
---		target:Kill(ability, caster)
 	else
-	-- Everyone else gets immobilized and stunned
 		target:InterruptMotionControllers(false)
-		ability:ApplyDataDrivenModifier(caster, target, aura_modifier, {duration = duration}) 
+		ability:ApplyDataDrivenModifier(caster, target, aura_modifier, {duration = duration})
+	end
+
+	if target:IsIllusion() then --doesn't work
+		UTIL_Remove(target)
+	end
+
+	if PlayerResource:GetConnectionState(target:GetPlayerID()) == 3 then
+		target:InterruptMotionControllers(false)
+		ability:ApplyDataDrivenModifier(caster, target, aura_modifier, {duration = duration})
 	end
 end

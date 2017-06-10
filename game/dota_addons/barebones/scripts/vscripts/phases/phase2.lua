@@ -25,14 +25,11 @@ function spawn_second_phase_left()
 			for j = 1, 8 do
 			local unit = CreateUnitByName("npc_ghul_II", point+RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_BADGUYS)
 			end
-		print("Spawning Phase 2 Creeps")
 		return 30
 		elseif SPECIAL_EVENT == 1 then
-			print("Phase 2 Creeps paused")
-		return 30
+			return 30
 		elseif EntIceTower:IsNull() then
-			print("Phase 2 Creeps spawner killed")
-		return nil
+			return nil
 		end
 	end)
 end

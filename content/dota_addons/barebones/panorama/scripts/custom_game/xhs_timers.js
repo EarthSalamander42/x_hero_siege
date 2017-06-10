@@ -12,18 +12,6 @@ function UpdateTimerMuradin(data)
 	$("#Timer").text = timerText;
 }
 
-function UpdateTimerCreep(data)
-{
-	var timerText = "";
-	timerText += data.timer_minute_10;
-	timerText += data.timer_minute_01;
-	timerText += ":";
-	timerText += data.timer_second_10;
-	timerText += data.timer_second_01;
-
-	$("#CreepTimer").text = timerText;
-}
-
 function UpdateTimerIncomingWave(data)
 {
 	var timerText = "";
@@ -90,7 +78,6 @@ function visibleSwitch()
 
 	GameEvents.Subscribe("incomingwavecountdown", UpdateTimerSpecialEvents);
 	GameEvents.Subscribe("specialeventscountdown", UpdateTimerIncomingWave);
-	GameEvents.Subscribe("creepcountdown", UpdateTimerCreep);
 	GameEvents.Subscribe("countdown", UpdateTimerMuradin);
 	GameEvents.Subscribe("gametimer", UpdateGameTimer);
 	GameEvents.Subscribe("show_timer", ShowTimer);

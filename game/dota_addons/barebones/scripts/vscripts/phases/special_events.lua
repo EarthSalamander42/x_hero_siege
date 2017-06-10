@@ -465,7 +465,6 @@ CustomGameEventManager:Send_ServerToAllClients("show_duel", {})
 		local Gold = hero:GetGold()
 		hero:SetRespawnsDisabled(true)
 		if not hero:HasOwnerAbandoned() then
---		if PlayerResource:GetConnectionState(ID) == 3 then -- Connected
 			if PlayerResource:IsValidPlayerID(hero:GetPlayerOwnerID()) and hero:IsRealHero() then
 				if ID == 0 or ID == 2 or ID == 4 or ID == 6 then
 					hero:SetTeam(DOTA_TEAM_CUSTOM_3)
@@ -489,58 +488,66 @@ CustomGameEventManager:Send_ServerToAllClients("show_duel", {})
 
 				-- Duel Settings
 				hero:SetPhysicalArmorBaseValue(0 - hero:GetPhysicalArmorValue()*0.80) -- Remove 80% of the heroes armor
+
+				for itemSlot = 0, 14 do
+					local item = hero:GetItemInSlot(itemSlot)
+					if item then
+						if item:GetName() == "item_healing_potion" or item:GetName() == "item_mana_potion" or item:GetName() == "item_ankh_of_reincarnation" then
+							hero:RemoveItem(item)
+						end
+					end
+				end
 			end
 		else
-		--		elseif PlayerResource:GetConnectionState(ID) == 4 then -- Disconnected
-			FindClearSpaceForUnit(hero, Entities:FindByName(nil, "choose_vip_point"):GetAbsOrigin(), true)
-			Notifications:TopToAll({text="Disconnected hero detected, teleporting them out of arena!", duration=5.0, style={color="white"}})
+			FindClearSpaceForUnit(hero, Entities:FindByName(nil, "base_spawn"):GetAbsOrigin(), true)
+			Notifications:TopToAll({text="Disconnected hero detected, teleporting out of arena!", duration=5.0, style={color="white"}})
 		end
 	end
 
 	-- WIN Conditions
+	local RadiantCheck = 0
+	local DireCheck = 0
 	timers.Duel = Timers:CreateTimer(1.0, function()
-		print("Check Death")
-		if duel == 1 then
-			if PlayerNumberRadiant <= 0 then
-				GameRules:SetGameWinner(DOTA_TEAM_CUSTOM_3)
+		local RadiantPlayers = FindUnitsInRadius( DOTA_TEAM_CUSTOM_3, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false )
+		local DirePlayers = FindUnitsInRadius( DOTA_TEAM_CUSTOM_4, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false )
+		local RadiantNumber = 0
+		local DireNumber = 0
+
+		--Count the number of players alive in each teams
+		for _, unit in pairs(RadiantPlayers) do
+			if unit:IsAlive() then
+				RadiantNumber = RadiantNumber +1
 			end
-			if PlayerNumberDire <= 0 then
-				print("Radiant Win!")
-			end
-		else
-			return nil
 		end
+		for _, unit in pairs(DirePlayers) do
+			if unit:IsAlive() then
+				DireNumber = DireNumber +1
+			end
+		end
+
+		if RadiantNumber == 0 then --if a whole team is dead then
+			RadiantCheck = RadiantCheck +1
+		elseif RadiantNumber > 0 then --elseif a player revives
+			RadiantCheck = 0
+		end
+		if RadiantCheck >= 7 then --if a whole team is dead during 7 seconds then
+			GameRules:SetGameWinner(DOTA_TEAM_CUSTOM_4)
+			print("Dire Win!")
+		end
+
+		if DireNumber == 0 then
+			DireCheck = DireCheck +1
+		elseif DireNumber > 0 then
+			DireCheck = 0
+		end
+		if DireCheck >= 7 then
+			GameRules:SetGameWinner(DOTA_TEAM_CUSTOM_3)
+			print("Radiant Win!")
+		end
+
+		print("Radiant Check: "..RadiantCheck)
+		print("Dire Check: "..DireCheck)
+		print("Duel Score: "..RadiantNumber.."/"..DireNumber)
 		return 1.0
 	end)
 end
-
---	function DuelEnd(winner)
---		local point = Entities:FindByName(nil, "base_spawn"):GetAbsOrigin()
---		print(winner.." has won!")
---		for _, hero in pairs(radiant_hero_list) do
---			if PlayerResource:IsValidPlayerID(hero:GetPlayerOwnerID()) then
---				if winner == RADIANT then
---					hero:AddItemByName("item_orb_of_frost")
---				end
---				FindClearSpaceForUnit(hero, point, true)
---			end
---		end
---		for _, hero in pairs(dire_hero_list) do
---			if PlayerResource:IsValidPlayerID(hero:GetPlayerOwnerID()) then
---				if winner == DIRE then
---					hero:AddItemByName("item_orb_of_frost")
---				end
---				hero:SetTeam(DOTA_TEAM_GOODGUYS)
---				if hero:GetPlayerOwner() then
---					hero:GetPlayerOwner():SetTeam(DOTA_TEAM_GOODGUYS)
---				end
---				FindClearSpaceForUnit(hero, point, true)
---			end
---		end
---		radiant_hero_list = {}
---		dire_hero_list = {}
---		Timers:RemoveTimer(timers.Duel)
---		duel = 0
---		SPECIAL_EVENT = 0
---		ANKHS = 1
---	end

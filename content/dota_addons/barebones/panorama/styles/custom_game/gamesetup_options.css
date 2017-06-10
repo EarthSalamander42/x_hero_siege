@@ -1,3 +1,21 @@
+@keyframes 'CustomSettingsAppear'
+{
+	0%
+	{
+		transform: translatey( 100% );
+	}
+
+	50%
+	{
+		transform: translatey( 50% );
+	}
+
+	100%
+	{
+		transform: translatey( 0% );
+	}
+}
+
 .ContainerGameSetup
 {
 	height: 100%;
@@ -8,50 +26,27 @@
 .CustomSettingsColumn,
 .CustomSettingsColumn2
 {
-	width: 20%;
-
-	horizontal-align: center;
 	vertical-align: center;
-
 	background-color: gradient( linear, 100% 0%, 100% 100%, from( #111111 ), color-stop( 0.01, #202327 ), color-stop( 0.2, #141619ff ), to( #000000dd ) );
 	box-shadow: black -4px -4px 8px 8px;
-   
 	animation-name: CustomSettingsAppear;
 	animation-duration: 1.5s;
-	border: 2px solid black;	
-	border-radius: 7px;
+	border: 2px solid black;
+	border-radius: 10px;
 }
 
 .CustomSettingsColumn
 {
+	width: 20%;
 	height: 52%;
-	margin-bottom: 16%;
-	margin-left: 80%;
+	horizontal-align: center;
 }
 
 .CustomSettingsColumn2
 {
+	width: 25%;
 	height: 32%;
-	margin-top: 68%;
-	margin-left: 80%;
-}
-
-@keyframes 'CustomSettingsAppear'
-{
-	0%
-	{
-		transform: translatex( 100% );
-	}
-
-	50%
-	{
-		transform: translatex( 100% );
-	}
-
-	100%
-	{
-		transform: translatex( 0px );
-	}
+	margin-bottom: 18%;
 }
 
 .ContainerCustomGameSettingsPanels
@@ -160,10 +155,10 @@
 	color: red;
 }
 
-#Community
+#CommunityLabels
 {
-	width: 100%;
-	height: 100%;
+	width: fit-children;
+	height: fit-children;
 	margin-top: 0.5%;
 	flow-children: down;
 	background-color: gradient( linear, 100% 0%, 100% 100%, from( #111111 ), color-stop( 0.01, #202327 ), color-stop( 0.2, #141619ff ), to( #000000dd ) );
@@ -171,15 +166,29 @@
 	color: #fff000;
 }
 
+#CommunityButtons1
+{
+	width: 50%;
+	height: fit-children;
+	margin-top: 31%;
+	flow-children: down;
+	background-color: gradient( linear, 100% 0%, 100% 100%, from( #111111 ), color-stop( 0.01, #202327 ), color-stop( 0.2, #141619ff ), to( #000000dd ) );
+	box-shadow: black -3px -3px 6px 6px;
+	color: #fff000;
+	align: center top;
+}
+
 #CommunityImg,
-#CommunityImg2,
 #CommunityImg3
 {
-	width: 55%;
-	height: 21%;
-	margin-top: 0px;
+	height: 75px;
 	margin-bottom: 2px;
-	horizontal-align: center;
+}
+
+#CommunityImg2
+{
+	height: 75px;
+	margin-bottom: 2px;
 }
 
 #CommunityImg:hover,
@@ -198,7 +207,6 @@
 
 .CommunityText
 {
-	width: 100%;
 	margin-top: 5px;
 	margin-bottom: 0px;
 	margin-left: 10px;
@@ -244,4 +252,5 @@
 	height: 18%;
 	margin-top: 1%;
 	margin-left: 34%;
+	visibility: collapse;
 }

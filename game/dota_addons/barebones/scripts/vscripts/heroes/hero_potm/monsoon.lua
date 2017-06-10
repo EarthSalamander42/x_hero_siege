@@ -9,6 +9,7 @@ local modifier_sector_3 = keys.modifier_sector_3
 
 	-- Defines the center point (caster or dummy unit)
 	caster.freezing_field_center = CreateUnitByName("dummy_unit_invulnerable", keys.target_points[1], false, nil, nil, caster:GetTeamNumber())
+	caster.freezing_field_center:AddNewModifier(nil, nil, "modifier_invulnerable", {})
 	caster.freezing_field_particle = ParticleManager:CreateParticle("particles/units/heroes/hero_razor_reduced_flash/razor_rain_storm_reduced_flash.vpcf", PATTACH_CUSTOMORIGIN, caster.freezing_field_center)
 	ParticleManager:SetParticleControl(caster.freezing_field_particle, 0, keys.target_points[1])
 	ParticleManager:SetParticleControl(caster.freezing_field_particle, 1, Vector (1000, 0, 0))
@@ -38,7 +39,7 @@ local modifier_sector_3 = keys.modifier_sector_3
 		ability:ApplyDataDrivenModifier(caster, caster.freezing_field_center, modifier_sector_3, {} )
 	end)
 
-	Timers:CreateTimer(9.0, function()
+	Timers:CreateTimer(20.0, function()
 		UTIL_Remove(caster.freezing_field_center)
 	end)
 end

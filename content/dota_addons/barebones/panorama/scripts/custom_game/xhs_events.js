@@ -2,7 +2,7 @@
 
 function OnShowEvents()
 {
-	$("#EventPanel").SetHasClass("HidePanel", !$("#EventPanel").BHasClass("HidePanel"));
+	$.GetContextPanel().FindChildTraverse("EventPanel").style.visibility = "visible";
 }
 
 function HeroImage()
@@ -32,14 +32,9 @@ function FrostInfernal()
 function OnQuit()
 {
 	var ID = Players.GetLocalPlayer()
-	$("#EventPanel").SetHasClass("HidePanel", !$("#EventPanel").BHasClass("HidePanel"));
+	$.GetContextPanel().FindChildTraverse("EventPanel").style.visibility = "collapse";
 	GameEvents.SendCustomGameEventToServer("quit_event", {pID: ID});
 }
-
-//	function ShowDuel()
-//	{
-//		$("#Duel_info").visible = true;
-//	}
 
 (function()
 {

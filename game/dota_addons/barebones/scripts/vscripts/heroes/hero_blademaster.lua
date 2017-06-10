@@ -95,24 +95,18 @@ function MirrorImage( keys )
 		-- Recreate the items of the caster
 		for itemSlot = 0, 5 do
 			local item = caster:GetItemInSlot(itemSlot)
-			if item ~= nil and item:GetName() ~= "item_orb_of_fire" and item:GetName() ~= "item_orb_of_fire2" and item:GetName() ~= "item_searing_blade" and item:GetName() ~= "item_cloak_of_flames" and item:GetName() ~= "item_orb_of_lightning" and item:GetName() ~= "item_orb_of_lightning2" and item:GetName() ~= "item_celestial_claws" then
+			if item and item:GetName() ~= "item_orb_of_fire" and item:GetName() ~= "item_orb_of_fire2" and item:GetName() ~= "item_searing_blade" and item:GetName() ~= "item_cloak_of_flames" and item:GetName() ~= "item_orb_of_lightning" and item:GetName() ~= "item_orb_of_lightning2" and item:GetName() ~= "item_celestial_claws" and item:GetName() ~= "item_orb_of_darkness" and item:GetName() ~= "item_orb_of_darkness2" and item:GetName() ~= "item_bracer_of_the_void" then
 				local itemName = item:GetName()
 				local newItem = CreateItem(itemName, illusion, illusion)
 				illusion:AddItem(newItem)
 			end
 		end
 
-		-- Set the unit as an illusion
-		-- modifier_illusion controls many illusion properties like +Green damage not adding to the unit damage, not being able to cast spells and the team-only blue particle
 		illusion:AddNewModifier(caster, ability, "modifier_illusion", { duration = duration, outgoing_damage = outgoingDamage, incoming_damage = incomingDamage })
-
-		-- Without MakeIllusion the unit counts as a hero, e.g. if it dies to neutrals it says killed by neutrals, it respawns, etc.
 		illusion:MakeIllusion()
-		-- Set the illusion hp to be the same as the caster
 		illusion:SetHealth(caster:GetHealth())
 		illusion:SetMana(caster:GetMana())
 		illusion:SetPlayerID(caster:GetPlayerOwnerID())
-		-- Add the illusion created to a table within the caster handle, to remove the illusions on the next cast if necessary
 		table.insert(caster.phantasm_illusions, illusion)
 	end
 end

@@ -52,6 +52,75 @@
 	}
 
 	//=================================================================================================================
+	// Courier
+	//=================================================================================================================
+	"item_bfury"
+	{		
+		"ItemPurchasable"				"0"
+
+		// Special	
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_damage"			"1000"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_health_regen"	"10"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_mana_regen"		"150"
+			}
+			"04"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"cleave_damage_percent"	"50"
+			}
+			"05"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"quelling_bonus"		"160"
+			}
+			"06"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"quelling_bonus_ranged"	"125"
+			}			
+			"07"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"cleave_starting_width"	"150"
+			}			
+			"08"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"cleave_ending_width"			"500"
+			}			
+			"09"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"cleave_distance"			"770"
+			}
+			"10"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"cast_range_tooltip"			"350"
+			}
+			"11"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"cast_range_ward"			"450"
+			}			
+		}
+	}
+
+	//=================================================================================================================
 	// Removed Items
 	//=================================================================================================================
 	"item_ward_observer"			"REMOVE"
@@ -80,7 +149,6 @@
 	"item_rapier"					"REMOVE"
 	"item_lesser_crit"				"REMOVE"
 	"item_greater_crit"				"REMOVE"
-	"item_bfury"					"REMOVE"
 	"item_vladmir"					"REMOVE"
 	"item_tango"					"REMOVE"
 	"item_moon_shard"				"REMOVE"

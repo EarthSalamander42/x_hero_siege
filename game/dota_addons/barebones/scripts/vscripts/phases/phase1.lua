@@ -2,10 +2,13 @@ require('libraries/timers')
 
 function SpecialEventTPEnabled(event)
 local hero = event.activator
-	hero:AddNewModifier(nil, nil, "modifier_boss_stun", nil)
-	hero:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
+local point = Entities:FindByName(nil, "event_tp_fix"):GetAbsOrigin()
+
 	CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "show_events", {})
 	Entities:FindByName(nil, "trigger_special_event"):Disable()
+	FindClearSpaceForUnit(hero, point, true)
+	hero:AddNewModifier(nil, nil, "modifier_boss_stun", {IsHidden = true})
+	hero:AddNewModifier(nil, nil, "modifier_invulnerable", {IsHidden = true})
 end
 
 function SpecialEventTPDisabled(event)
@@ -39,6 +42,7 @@ local point = Entities:FindByName(nil, "base_spawn"):GetAbsOrigin()
 				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil) 
 			end)
 		end
+		Entities:FindByName(nil, "trigger_special_event"):Enable()
 	end
 end
 
@@ -110,12 +114,11 @@ local point = Entities:FindByName(nil, "base_spawn"):GetAbsOrigin()
 	Timers:RemoveTimer(timers.HeroImage)
 	GameMode.HeroImage_occuring = 0
 
-	if not GameMode.HeroImage:IsNull() then
+	if GameMode.HeroImage then
 		GameMode.HeroImage:RemoveSelf()
-	else
-		hero.hero_image = true
-		Notifications:Bottom(hero:GetPlayerOwnerID(), {text = "You can do this event only 1 time!", duration = 5.0})
 	end
+	hero.hero_image = true
+	Notifications:Bottom(hero:GetPlayerOwnerID(), {text = "You can do this event only 1 time!", duration = 5.0})
 end
 
 function HeroImageDead(event)
@@ -145,7 +148,7 @@ ALL_HERO_IMAGE_DEAD = 0
 	GameMode.AllHeroImages_occuring = 0
 	SpecialEventBack(event)
 
-	local units = FindUnitsInRadius( DOTA_TEAM_CUSTOM_1, point_hero, nil, 2000, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_ALL, DOTA_UNIT_TARGET_FLAG_NONE , FIND_ANY_ORDER, false )
+	local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_1, point_hero, nil, 2400, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_ALL, DOTA_UNIT_TARGET_FLAG_NONE , FIND_ANY_ORDER, false)
 	for _, v in pairs(units) do
 		UTIL_Remove(v)
 	end

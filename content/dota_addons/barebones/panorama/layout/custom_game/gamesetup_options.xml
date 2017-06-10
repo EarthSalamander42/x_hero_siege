@@ -14,10 +14,12 @@
 
 	<Panel class="ContainerGameSetup" hittest="false">
 		<Panel class="CustomSettingsColumn2" hittest="false" >
-		<Panel id="Community">
+		<Panel id="CommunityLabels">
 			<Label id="community_description1" class="CommunityText" html="true" text="#community_description_1" />
 			<Label id="community_description2" class="CommunityText" html="true" text="#community_description_2" />
 			<Label id="community_description3" class="CommunityText" html="true" text="#community_description_3" />
+		</Panel>
+		<Panel id="CommunityButtons1">
 			<Button id="CommunityImg" onactivate="DOTADisplayURL('discordapp.com/invite/dNMBSrJ');" >
 				<Image src="file://{images}/custom_game/loading_screen/community_discord_header.png" />
 			</Button>

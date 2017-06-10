@@ -3,7 +3,6 @@ require('libraries/timers')
 
 function rain_of_chaos( event )
 local caster = event.caster
-local ability = event.ability
 local time_to_damage = 2.0
 local radius = ability:GetLevelSpecialValueFor("radius", ability:GetLevel()-1)
 
@@ -27,6 +26,8 @@ end
 function target_modifier_remove(event)
 local target = event.target
 local caster = event.caster
+local ability = event.ability
+local duration = ability:GetSpecialValueFor("golem_duration")
 
 	target:StopSound("Hero_Invoker.ChaosMeteor.Loop")
 	local unit = CreateUnitByName("npc_infernal_beast", target:GetAbsOrigin(), true, caster,caster, target:GetTeamNumber())
@@ -35,4 +36,5 @@ local caster = event.caster
 	local crumble = ParticleManager:CreateParticle("particles/units/heroes/hero_invoker/invoker_chaos_meteor_crumble.vpcf", PATTACH_CUSTOMORIGIN, caster)
 	ParticleManager:SetParticleControl(crumble, 3, target:GetAbsOrigin())
 	target:RemoveSelf()
+	unit:AddNewModifier(unit, nil, "modifier_kill", {duration = duration})
 end

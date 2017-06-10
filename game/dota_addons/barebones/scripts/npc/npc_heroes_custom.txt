@@ -239,7 +239,7 @@
 		"AttributeIntelligenceGain"		"10"
 
 		"Ability1"						"holdout_blizzard"
-		"Ability2"						"holdout_summon_water_elemental_alt"
+		"Ability2"						"holdout_summon_water_elemental"
 		"Ability3"						"holdout_debilitation_aura"
 		"Ability4"						"holdout_frostbolt"
 		"Ability5"						"holdout_magic_shield"
