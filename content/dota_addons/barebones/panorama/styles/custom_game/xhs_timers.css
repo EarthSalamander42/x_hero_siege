@@ -1,58 +1,63 @@
-.ScoreboardLeft
+.Timers
+{
+	flow-children: right;
+	width: 100%;
+}
+
+#TimerPanels
+{
+	margin-left: 1%;
+	flow-children: right;
+	box-shadow: fill #00000066 -4px -4px 8px 8px;
+	background-color: #000000da;
+	border: 2px solid #FF7800FF;
+	border-radius: 8px;
+}
+
+#GameTime
 {
 	margin-left: 47.4%;
-	background-color: gradient( linear, 0% 0%, 100% 0%, from( #25282a00 ), color-stop( .6, #25282acc), color-stop( .8, #25282a88), to( #00000022 ) );
-	margin-right: 0px;
-	flow-children: right;
-	width: fit-children;
-}
-
-#ScoreboardLeft_Parent
-{
-	transform: translateY(0px);
-	transition-property: transform;
-	transition-duration: 1s;
-	transition-delay: 2s;
-	transition-timing-function: ease-in-out;
-}
-
-#ScoreboardGameTime,
-#ScoreboardSpecialEvent,
-#ScoreboardIncomingWaveTime,
-#ScoreboardSpecialEventsTime
-{
 	flow-children: down;
-	width: 140px;
-	height: 40px;
-	background-repeat: no-repeat;
+	width: 100px;
+	height: 46px;
+	z-index: 2;
 }
 
-#ScoreboardGameTime
+.AspectRatio16x10 #GameTime
 {
-	margin-left: 0px;
+	margin-left: 47.1%;
 }
 
-#ScoreboardSpecialEvent
+.AspectRatio4x3 #GameTime
 {
-	margin-left: 140px;
+	margin-left: 46.5%;
 }
 
-#ScoreboardIncomingWaveTime
+#SpecialEvent,
+#IncomingWave,
+#SpecialEvents,
+#HeroImage,
+#SpiritBeast,
+#FrostInfernal,
+#AllHeroImage
 {
-	margin-left: 280px;
+	margin-left: 5px;
+	margin-right: 5px;
+	flow-children: down;
+	width: 100px;
+	height: 45px;
+	visibility: visible;
 }
 
-#ScoreboardSpecialEventsTime
+#SpecialEventsLabel,
+#IncomingWaveLabel,
+#HeroImageLabel,
+#SpiritBeastLabel,
+#FrostInfernalLabel,
+#AllHeroImageLabel
 {
-	margin-left: 420px;
-}
-
-#GameTime,
-#Goal,
-#IncomingWaveGoal,
-#SpecialEventsGoal
-{
-	font-size: 13.0px;
+	margin-top: 5px;
+	font-size: 12px;
 	font-weight: bold;
 	color: DodgerBlue;
 	text-align: center;
@@ -60,12 +65,39 @@
 	text-transform: uppercase;
 }
 
-#GameTimer,
+#GameTimer
+{
+	margin-top: 50%;
+	font-size: 14px;
+	font-weight: bold;
+	color: #ffffff;
+	text-align: center;
+	width: 100%;
+	text-transform: uppercase;
+	text-overflow: clip;
+}
+
+.AspectRatio16x10 #GameTimer
+{
+	margin-top: 52%;
+	font-size: 13px;
+}
+
+.AspectRatio4x3 #GameTimer
+{
+	margin-top: 53%;
+	font-size: 13px;
+}
+
 #Timer,
 #IncomingWaveTimer,
-#SpecialEventsTimer
+#SpecialEventsTimer,
+#HeroImageTimer,
+#SpiritBeastTimer,
+#FrostInfernalTimer,
+#AllHeroImageTimer
 {
-	font-size: 18px;
+	font-size: 15px;
 	font-weight: bold;
 	color: #ffffff;
 	text-align: center;

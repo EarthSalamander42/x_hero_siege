@@ -4,6 +4,7 @@ require('libraries/timers')
 function rain_of_chaos( event )
 local caster = event.caster
 local time_to_damage = 2.0
+local ability = event.ability
 local radius = ability:GetLevelSpecialValueFor("radius", ability:GetLevel()-1)
 
 	local meteors_per_tick = ability:GetLevelSpecialValueFor("meteors_per_tick", ability:GetLevel()-1)

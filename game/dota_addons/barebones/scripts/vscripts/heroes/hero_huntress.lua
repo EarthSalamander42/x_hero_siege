@@ -168,7 +168,7 @@ function GetEnemiesInCone( unit, start_radius, end_radius, end_distance)
 		end
 	end
 
-	DeepPrintTable(cone_units)
+--	DeepPrintTable(cone_units)
 	return cone_units
 
 end

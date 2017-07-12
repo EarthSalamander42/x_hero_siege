@@ -20,40 +20,19 @@ function DebugPrintTable(...)
 	end
 end
 
-function PrintTable(t, indent, done)
-	--print ( string.format ('PrintTable type %s', type(keys)) )
+function PrintTable( t, indent )
+	--print( "PrintTable( t, indent ): " )
 	if type(t) ~= "table" then return end
 
-	done = done or {}
-	done[t] = true
-	indent = indent or 0
-
-	local l = {}
-	for k, v in pairs(t) do
-		table.insert(l, k)
-	end
-
-	table.sort(l)
-	for k, v in ipairs(l) do
-		-- Ignore FDesc
-		if v ~= 'FDesc' then
-			local value = t[v]
-
-			if type(value) == "table" and not done[value] then
-				done [value] = true
-				print(string.rep ("\t", indent)..tostring(v)..":")
-				PrintTable (value, indent + 2, done)
-			elseif type(value) == "userdata" and not done[value] then
-				done [value] = true
-				print(string.rep ("\t", indent)..tostring(v)..": "..tostring(value))
-				PrintTable ((getmetatable(value) and getmetatable(value).__index) or getmetatable(value), indent + 2, done)
-			else
-				if t.FDesc and t.FDesc[v] then
-					print(string.rep ("\t", indent)..tostring(t.FDesc[v]))
-				else
-					print(string.rep ("\t", indent)..tostring(v)..": "..tostring(value))
-				end
+	for k,v in pairs( t ) do
+		if type( v ) == "table" then
+			if ( v ~= t ) then
+				print( indent .. tostring( k ) .. ":\n" .. indent .. "{" )
+				PrintTable( v, indent .. "  " )
+				print( indent .. "}" )
 			end
+		else
+		print( indent .. tostring( k ) .. ":" .. tostring(v) )
 		end
 	end
 end
@@ -477,7 +456,7 @@ local unit = {
 	if poi > 4 then
 		poi = 1
 	end
-	nCOUNTDOWNINCWAVE = 240
+	nTimer_IncomingWave = 240
 end
 
 function SpawnDragons(dragon)
@@ -538,5 +517,178 @@ local raxes = Entities:FindAllByName("dota_badguys_barracks_"..Lane)
 		
 	elseif CREEP_LANES_TYPE == 3 or PHASE_3 == 1 then
 		return
+	end
+end
+
+function PauseHeroes()
+local heroes = HeroList:GetAllHeroes()
+
+	for _,hero in pairs(heroes) do
+		hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", nil)
+		hero:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
+	end
+end
+
+function RestartHeroes()
+local heroes = HeroList:GetAllHeroes()
+
+	for _,hero in pairs(heroes) do
+		hero:RemoveModifierByName("modifier_animation_freeze_stun")
+		hero:RemoveModifierByName("modifier_invulnerable")
+	end
+end
+
+function PauseCreeps()
+local units = FindUnitsInRadius( DOTA_TEAM_BADGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false )
+local units2 = FindUnitsInRadius( DOTA_TEAM_GOODGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false )
+
+	for _,v in pairs(units) do
+		if v:IsCreature() and v:HasMovementCapability() then
+			v:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", nil)
+			v:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
+		end
+	end
+
+	for _,v in pairs(units2) do
+		if v:IsCreature() and v:HasMovementCapability() then
+			v:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", nil)
+			v:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
+		end
+	end
+end
+
+function RestartCreeps()
+local units = FindUnitsInRadius( DOTA_TEAM_BADGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false )
+local units2 = FindUnitsInRadius( DOTA_TEAM_GOODGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false )
+
+	for _,v in pairs(units) do
+		if v:IsCreature() and v:HasMovementCapability() then
+			v:RemoveModifierByName("modifier_animation_freeze_stun")
+			v:RemoveModifierByName("modifier_invulnerable")
+		end
+	end
+
+	for _,v in pairs(units2) do
+		if v:IsCreature() and v:HasMovementCapability() then
+			v:RemoveModifierByName("modifier_animation_freeze_stun")
+			v:RemoveModifierByName("modifier_invulnerable")
+		end
+	end
+end
+
+function PauseCreepsCastle()
+local units = FindUnitsInRadius( DOTA_TEAM_BADGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false )
+local units2 = FindUnitsInRadius( DOTA_TEAM_GOODGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false )
+
+	for _,v in pairs(units) do
+		if v:IsCreature() and v:HasMovementCapability() then
+			v:AddNewModifier(nil, nil, "modifier_boss_stun", {duration = 10.0})
+			v:AddNewModifier(nil, nil, "modifier_invulnerable", {duration = 10.0})
+		end
+	end
+
+	for _,v in pairs(units2) do
+		if v:IsCreature() and v:HasMovementCapability() then
+			v:AddNewModifier(nil, nil, "modifier_boss_stun", {duration = 10.0})
+			v:AddNewModifier(nil, nil, "modifier_invulnerable", {duration = 10.0})
+		end
+	end
+end
+
+function FinalWaveSpawner(creep1, creep2, creep3, creep4, boss_name, angles, direction, waypoint)
+local number = 1
+local waypoint = Entities:FindByName(nil,"final_wave_player_2")
+
+	local unit = CreateUnitByName(creep1.."_final_wave", Entities:FindByName(nil,"final_wave_"..direction.."_"..number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_NEUTRALS)
+	unit:SetAngles(0, angles, 0)
+	number = number + 1
+	local unit = CreateUnitByName(creep1.."_final_wave", Entities:FindByName(nil,"final_wave_"..direction.."_"..number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_NEUTRALS)
+	unit:SetAngles(0, angles, 0)
+	number = number + 1
+	local unit = CreateUnitByName(creep1.."_final_wave", Entities:FindByName(nil,"final_wave_"..direction.."_"..number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_NEUTRALS)
+	unit:SetAngles(0, angles, 0)
+	number = number + 1
+	local unit = CreateUnitByName(creep2.."_final_wave", Entities:FindByName(nil,"final_wave_"..direction.."_"..number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_NEUTRALS)
+	unit:SetAngles(0, angles, 0)
+	number = number + 1
+	local unit = CreateUnitByName(creep2.."_final_wave", Entities:FindByName(nil,"final_wave_"..direction.."_"..number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_NEUTRALS)
+	unit:SetAngles(0, angles, 0)
+	number = number + 1
+	local unit = CreateUnitByName(creep2.."_final_wave", Entities:FindByName(nil,"final_wave_"..direction.."_"..number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_NEUTRALS)
+	unit:SetAngles(0, angles, 0)
+	number = number + 1
+	local unit = CreateUnitByName(creep3.."_final_wave", Entities:FindByName(nil,"final_wave_"..direction.."_"..number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_NEUTRALS)
+	unit:SetAngles(0, angles, 0)
+	number = number + 1
+	local unit = CreateUnitByName(creep3.."_final_wave", Entities:FindByName(nil,"final_wave_"..direction.."_"..number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_NEUTRALS)
+	unit:SetAngles(0, angles, 0)
+	number = number + 1
+	local unit = CreateUnitByName(creep3.."_final_wave", Entities:FindByName(nil,"final_wave_"..direction.."_"..number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_NEUTRALS)
+	unit:SetAngles(0, angles, 0)
+	number = number + 1
+	local unit = CreateUnitByName(creep4.."_final_wave", Entities:FindByName(nil,"final_wave_"..direction.."_"..number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_NEUTRALS)
+	unit:SetAngles(0, angles, 0)
+	number = number + 1
+	local unit = CreateUnitByName(creep4.."_final_wave", Entities:FindByName(nil,"final_wave_"..direction.."_"..number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_NEUTRALS)
+	unit:SetAngles(0, angles, 0)
+	number = number + 1
+	local unit = CreateUnitByName(creep4.."_final_wave", Entities:FindByName(nil,"final_wave_"..direction.."_"..number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_NEUTRALS)
+	unit:SetAngles(0, angles, 0)
+	number = number + 1
+
+	local boss = CreateUnitByName(boss_name.."_final_wave", Entities:FindByName(nil,"final_wave_"..direction.."_"..number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_NEUTRALS)
+	boss:SetAngles(0, angles, 0)
+	boss:EmitSound("Hero_TemplarAssassin.Trap")
+	boss:SetInitialGoalEntity(waypoint)
+	boss:MoveToPositionAggressive(waypoint:GetAbsOrigin())
+
+	local final_wave_stun_time = 0
+	local units = FindUnitsInRadius(DOTA_TEAM_NEUTRALS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_NONE , FIND_ANY_ORDER, false)
+	for _,v in pairs(units) do
+		if v:IsCreature() and v:HasMovementCapability() then
+			v:AddNewModifier(nil, nil, "modifier_boss_stun", {duration = 25+final_wave_stun_time, IsHidden = true})
+			v:AddNewModifier(nil, nil, "modifier_invulnerable", {duration = 25+final_wave_stun_time, IsHidden = true})
+		end
+	end
+
+	final_wave_stun_time = final_wave_stun_time -5
+
+	for _, hero in pairs(HeroList:GetAllHeroes()) do
+		if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
+			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), boss)
+		end
+	end
+end
+
+function DisableItems(hero, time)
+	timers.disabled_items = Timers:CreateTimer(0.0, function()
+		for itemSlot = 0, 5 do
+		local item = hero:GetItemInSlot(itemSlot)
+			if item then
+				if item:GetName() == "item_tome_small" then
+					item:StartCooldown(time)
+				elseif item:GetName() == "item_tome_big" then
+					item:StartCooldown(time)
+				elseif item:GetName() == "item_tpscroll" then
+				item:StartCooldown(time)
+				end
+			end
+		end
+	end)
+end
+
+function EnableItems(hero)
+	Timers:RemoveTimer(timers.disabled_items)
+	for itemSlot = 0, 5 do
+	local item = hero:GetItemInSlot(itemSlot)
+		if item then
+			if item:GetName() == "item_tome_small" then
+				item:EndCooldown()
+			elseif item:GetName() == "item_tome_big" then
+				item:EndCooldown()
+			elseif item:GetName() == "item_tpscroll" then
+			item:EndCooldown()
+			end
+		end
 	end
 end

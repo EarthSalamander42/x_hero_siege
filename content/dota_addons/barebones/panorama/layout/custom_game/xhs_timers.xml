@@ -6,23 +6,35 @@
 	<scripts>
 		<include src="file://{resources}/scripts/custom_game/xhs_timers.js" />
 	</scripts>
-	<Panel class="ScoreboardLeft">
-		<Panel id="ScoreboardLeft_Parent">
-			<Panel id="ScoreboardGameTime">
-				<Label id="GameTime" text="#GameTime" />
-				<Label id="GameTimer" text="--:--" />
+	<Panel class="Timers">
+		<Panel id="GameTime">
+			<Label id="GameTimer" text="--:--" />
+		</Panel>
+
+		<Panel id="TimerPanels">
+			<Panel id="SpecialEvent">
+				<Label id="SpecialEventsLabel" text="#Goal" />
+				<Label id="SpecialEventsTimer" text="--:--" />
 			</Panel>
-			<Panel id="ScoreboardSpecialEvent">
-				<Label id="Goal" text="#Goal" />
-				<Label id="Timer" text="--:--" />
-			</Panel>
-			<Panel id="ScoreboardIncomingWaveTime">
-				<Label id="IncomingWaveGoal" text="#IncomingWaveGoal" />
+			<Panel id="IncomingWave">
+				<Label id="IncomingWaveLabel" text="#IncomingWaveGoal" />
 				<Label id="IncomingWaveTimer" text="--:--" />
 			</Panel>
-			<Panel id="ScoreboardSpecialEventsTime">
-				<Label id="SpecialEventsGoal" text="#SpecialEventsGoal" />
-				<Label id="SpecialEventsTimer" text="--:--" />
+			<Panel id="HeroImage">
+				<Label id="HeroImageLabel" text="Hero Image:" />
+				<Label id="HeroImageTimer" text="--:--" />
+			</Panel>
+			<Panel id="SpiritBeast">
+				<Label id="SpiritBeastLabel" text="Spirit Beast:" />
+				<Label id="SpiritBeastTimer" text="--:--" />
+			</Panel>
+			<Panel id="FrostInfernal">
+				<Label id="FrostInfernalLabel" text="Frost Infernal:" />
+				<Label id="FrostInfernalTimer" text="--:--" />
+			</Panel>
+			<Panel id="AllHeroImage">
+				<Label id="AllHeroImageLabel" text="All Hero Images:" />
+				<Label id="AllHeroImageTimer" text="--:--" />
 			</Panel>
 		</Panel>
 	</Panel>

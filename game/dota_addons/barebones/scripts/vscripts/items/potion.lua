@@ -8,7 +8,7 @@ local Mana = 30000
 
 	caster:Heal(Health, caster)
 	SendOverheadEventMessage(nil, OVERHEAD_ALERT_HEAL, caster, Health, nil)
-	caster:SetMana(Mana)
+	caster:SetMana(caster:GetMana()+Mana)
 	SendOverheadEventMessage(nil, OVERHEAD_ALERT_MANA_ADD, caster, Mana, nil)
 end
 

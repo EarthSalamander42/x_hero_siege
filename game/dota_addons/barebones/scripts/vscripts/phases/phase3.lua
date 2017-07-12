@@ -6,15 +6,18 @@ first_time_teleport_arthas = true
 first_time_teleport_arthas_real = true
 
 function StartMagtheridonArena(keys)
-local activator = keys.activator
 local point_mag = Entities:FindByName(nil,"npc_dota_spawner_magtheridon_arena"):GetAbsOrigin()
 local point_mag2 = Entities:FindByName(nil,"npc_dota_spawner_magtheridon_arena2"):GetAbsOrigin()
 local ankh = CreateItem("item_magtheridon_ankh", mag, mag)
 local ankh2 = CreateItem("item_magtheridon_ankh", mag, mag)
 local heroes = HeroList:GetAllHeroes()
 local difficulty = GameRules:GetCustomGameDifficulty()
-GameRules:SetHeroRespawnEnabled(false)
-RefreshPlayers()
+
+	GameRules:SetHeroRespawnEnabled(false)
+	RefreshPlayers()
+	Entities:FindByName(nil, "zonevolume_xhs_holdout"):Disable()
+	Entities:FindByName(nil, "zonevolume_xhs_bosses"):Enable()
+	PHASE_3 = 1
 
 	Timers:CreateTimer(0.5, function()
 		if first_time_teleport then

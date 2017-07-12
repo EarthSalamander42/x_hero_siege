@@ -152,7 +152,7 @@
 				"IsHidden"	"1"
 				"States"
 				{
-					"MODIFIER_STATE_NO_HEALTH_BAR"			"MODIFIER_STATE_VALUE_ENABLED"
+//					"MODIFIER_STATE_NO_HEALTH_BAR"			"MODIFIER_STATE_VALUE_ENABLED"
 					"MODIFIER_STATE_UNSELECTABLE"			"MODIFIER_STATE_VALUE_ENABLED"
 					"MODIFIER_STATE_NO_TEAM_MOVE_TO"		"MODIFIER_STATE_VALUE_ENABLED"
 					"MODIFIER_STATE_NO_TEAM_SELECT"			"MODIFIER_STATE_VALUE_ENABLED"
@@ -4274,222 +4274,19 @@
 				"EffectName"    "Hero_Lycan.SummonWolves"
 				"Target"        "CASTER"
 			}
-	
+
 			"AttachEffect"
 			{
 				"EffectName"    "particles/units/heroes/hero_lycan/lycan_summon_wolves_cast.vpcf"
 				"EffectName"    "start_at_customorigin"
 				"Target"        "CASTER"    
 			}   
-	
+
 			"RunScript"
 			{
-				"ScriptFile"    "scripts/vscripts/heroes/hero_warlock/spiritual_beast.lua"
-				"Function"      "KillWolves"
-			}
-	
-			"SpawnUnit"
-			{
-				"UnitName"      "npc_dota_warlock_spiritual_beast1"
-				"Target"
-				{
-					"Center"    "CASTER"
-					"ScriptSelectPoints"
-					{
-						"ScriptFile"    "scripts/vscripts/heroes/hero_warlock/spiritual_beast.lua"
-						"Function"  "GetSummonPoints"
-						"Target"    "CASTER"
-						"Count" "1"
-						"distance"  "%spawn_distance"
-					}
-				}
-	
-				"Duration"  "%wolf_duration"
-				"UnitCount" "%wolf_1_count"
-				"UnitLimit" "2"
-				"GrantsGold"    "1"
-				"GrantsXP"      "1"
-				"SpawnRadius"   "10"
-				"OnSpawn"
-				{
-					"RunScript"
-					{
-						"ScriptFile"    "scripts/vscripts/heroes/hero_warlock/spiritual_beast.lua"
-						"Function"      "SetUnitsMoveForward"
-					}
-	
-					"ApplyModifier"
-					{
-						"ModifierName"  "modifier_summon_wolves_datadriven"
-						"Target"        "TARGET"
-						"Duration"      "%duration"
-					}
-
-					"ApplyModifier"
-					{
-						"ModifierName"		"modifier_phased"
-						"Target"			"TARGET"
-						"Duration"			"0.05"
-					}
-				}
-			}
-	
-			"SpawnUnit"
-			{
-				"UnitName"      "npc_dota_warlock_spiritual_beast2"
-				"Target"
-				{
-					"Center"    "CASTER"
-					"ScriptSelectPoints"
-					{
-						"ScriptFile"    "scripts/vscripts/heroes/hero_warlock/spiritual_beast.lua"
-						"Function"  "GetSummonPoints"
-						"Target"    "CASTER"
-						"Count" "2"
-						"distance"  "%spawn_distance"
-					}
-				}
-	
-				"Duration"  "%wolf_duration"
-				"UnitCount" "%wolf_2_count" 
-				"UnitLimit" "2"
-				"GrantsGold"    "1"
-				"GrantsXP"      "1"
-				"SpawnRadius"   "10"
-				"OnSpawn"
-				{
-					"RunScript"
-					{
-						"ScriptFile"    "scripts/vscripts/heroes/hero_warlock/spiritual_beast.lua"
-						"Function"      "SetUnitsMoveForward"
-					}
-	
-					"ApplyModifier"
-					{
-						"ModifierName"  "modifier_summon_wolves_datadriven"
-						"Target"        "TARGET"
-						"Duration"      "%duration"
-					}
-
-					"ApplyModifier"
-					{
-						"ModifierName"		"modifier_phased"
-						"Target"			"TARGET"
-						"Duration"			"0.05"
-					}
-				}
-			}
-	
-			"SpawnUnit"
-			{
-				"UnitName"      "npc_dota_warlock_spiritual_beast3"
-				"Target"
-				{
-					"Center"    "CASTER"
-					"ScriptSelectPoints"
-					{
-						"ScriptFile"    "scripts/vscripts/heroes/hero_warlock/spiritual_beast.lua"
-						"Function"  "GetSummonPoints"
-						"Target"    "CASTER"
-						"Count" "2"
-						"distance"  "%spawn_distance"
-					}
-				}
-	
-				"Duration"  "%wolf_duration"
-				"UnitCount" "%wolf_3_count" 
-				"UnitLimit" "2"
-				"GrantsGold"    "1"
-				"GrantsXP"      "1"
-				"SpawnRadius"   "10"
-				"OnSpawn"
-				{
-					"RunScript"
-					{
-						"ScriptFile"    "scripts/vscripts/heroes/hero_warlock/spiritual_beast.lua"
-						"Function"      "SetUnitsMoveForward"
-					}
-	
-					"ApplyModifier"
-					{
-						"ModifierName"  "modifier_summon_wolves_datadriven"
-						"Target"        "TARGET"
-						"Duration"      "%duration"
-					}
-
-					"ApplyModifier"
-					{
-						"ModifierName"		"modifier_phased"
-						"Target"			"TARGET"
-						"Duration"			"0.05"
-					}
-				}
-			}
-	
-			"SpawnUnit"
-			{
-				"UnitName"      "npc_dota_warlock_spiritual_beast4"
-				"Target"
-				{
-					"Center"    "CASTER"
-					"ScriptSelectPoints"
-					{
-						"ScriptFile"    "scripts/vscripts/heroes/hero_warlock/spiritual_beast.lua"
-						"Function"  "GetSummonPoints"
-						"Target"    "CASTER"
-						"Count" "2"
-						"distance"  "%spawn_distance"
-					}
-				}
-	
-				"Duration"  "%wolf_duration"
-				"UnitCount" "%wolf_4_count" 
-				"UnitLimit" "2"
-				"GrantsGold"    "1"
-				"GrantsXP"      "1"
-				"SpawnRadius"   "10"
-				"OnSpawn"
-				{
-					"RunScript"
-					{
-						"ScriptFile"    "scripts/vscripts/heroes/hero_warlock/spiritual_beast.lua"
-						"Function"      "SetUnitsMoveForward"
-					}
-	
-					"ApplyModifier"
-					{
-						"ModifierName"  "modifier_summon_wolves_datadriven"
-						"Target"        "TARGET"
-						"Duration"      "%duration"
-					}
-
-					"ApplyModifier"
-					{
-						"ModifierName"		"modifier_phased"
-						"Target"			"TARGET"
-						"Duration"			"0.05"
-					}
-				}
-			}               
-		}
-	
-		"Modifiers"
-		{
-			"modifier_summon_wolves_datadriven"
-			{
-				"Passive" "0"
-				"IsHidden" "1"
-				"IsDebuff" "0"
-	
-				"OnCreated"
-				{
-					"FireEffect"
-					{
-						"EffectName" "particles/units/heroes/hero_lycan/lycan_summon_wolves_spawn.vpcf"
-						"EffectAttachType" "follow_origin"
-						"Target" "TARGET"
-					}
-				}
+				"ScriptFile"    "scripts/vscripts/heroes/hero_beastmaster.lua"
+				"Function"      "SpiritualBeasts"
+				"Duration"		"%wolf_duration"
 			}
 		}
 	}
@@ -5670,6 +5467,7 @@
 			"modifier_lifesteal"
 			{
 				"IsHidden"			"1"
+				"Attributes"		"MODIFIER_ATTRIBUTE_IGNORE_INVULNERABLE"
 
 				"OnDealDamage"
 				{
@@ -5781,13 +5579,13 @@
 			}
 			"07"
 			{
-				"var_type"					"FIELD_INTEGER"
-				"full_damage_radius"		"325"
+				"var_type"				"FIELD_INTEGER"
+				"radius"				"325"
 			}
 			"08"
 			{
-				"var_type"					"FIELD_INTEGER"
-				"cleave_pct_tooltip"		"25"
+				"var_type"				"FIELD_INTEGER"
+				"cleave_pct"			"25"
 			}
 		}
 
@@ -6768,10 +6566,10 @@
 		{
 			"modifier_reincarnation"
 			{
-				"Passive"							"1"
-				"IsHidden"							"0"
-				"IsBuff"							"1"
-				"IsPurgable"						"0"
+				"Passive"					"1"
+				"IsHidden"					"0"
+				"IsPurgable"				"0"
+				"TextureName"			"custom/holdout_last_stand"
 
 				"OnDeath"
 				{
@@ -7489,12 +7287,12 @@
 			"05"
 			{
 				"var_type"                  "FIELD_INTEGER"
-				"incoming_damage"           "100"
+				"incoming_damage"           "125"
 			}
 			"06"
 			{
 				"var_type"                  "FIELD_INTEGER"
-				"incoming_damage_tooltip"   "200"
+				"incoming_damage_tooltip"   "225"
 			}           
 			"07"
 			{
@@ -8232,24 +8030,24 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"BaseClass"                     "ability_datadriven"
-		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_POINT"
-		"AbilityUnitDamageType"         "DAMAGE_TYPE_PHYSICAL"  
-		"SpellImmunityType"             "SPELL_IMMUNITY_ENEMIES_YES"
-		"AbilityTextureName"            "custom/holdout_serpent_ward"
+		"BaseClass"						"ability_datadriven"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_POINT"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_PHYSICAL"  
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_YES"
+		"AbilityTextureName"			"custom/holdout_serpent_ward"
 
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCastRange"              "650"
-		"AbilityCastPoint"              "0.25"
+		"AbilityCastRange"				"650"
+		"AbilityCastPoint"				"0.25"
 
 		// Time     
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCooldown"               "10.0"
+		"AbilityCooldown"				"10.0"
 
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityManaCost"               "85 125 165 205"
+		"AbilityManaCost"				"85 125 165 205"
 
 		// Special  
 		//-------------------------------------------------------------------------------------------------------------
@@ -8257,23 +8055,23 @@
 		{
 			"01"
 			{
-				"var_type"              "FIELD_FLOAT"
-				"duration"              "40.0"
+				"var_type"				"FIELD_FLOAT"
+				"duration"				"40.0"
 			}
 			"02"
 			{
-				"var_type"              "FIELD_INTEGER"
-				"ward_hp_tooltip"       "1500 4000 12000 20000"
+				"var_type"				"FIELD_INTEGER"
+				"ward_hp_tooltip"		"1500 4000 12000 20000"
 			}
 			"03"
 			{
-				"var_type"              "FIELD_INTEGER"
-				"ward_damage_tooltip"   "130 210 410 850"
+				"var_type"				"FIELD_INTEGER"
+				"ward_damage_tooltip"	"130 210 410 850"
 			}
 		}
 
 		"OnSpellStart"
-		{           
+		{
 			"RunScript"
 			{
 				"ScriptFile"		"heroes/hero_rhasta/serpent_ward.lua"
@@ -8375,11 +8173,11 @@
 
 		// Time     
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCooldown"               "40.0"
+		"AbilityCooldown"               "40.0 35.0 30.0"
 
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityManaCost"               "225 550"
+		"AbilityManaCost"               "225 550 0"
 
 		// Special  
 		//-------------------------------------------------------------------------------------------------------------
@@ -9365,8 +9163,13 @@
 			}
 			"04"
 			{
-				"var_type"                      "FIELD_INTEGER"
-				"percentage_over_model_scale"   "30 40 60"
+				"var_type"						"FIELD_INTEGER"
+				"percentage_over_model_scale"	"30 40 60"
+			}
+			"04"
+			{
+				"var_type"						"FIELD_INTEGER"
+				"duration"						"20 25 30"
 			}
 		}
 
@@ -9934,12 +9737,12 @@
 			"01"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"full_damage_radius"		"325"
+				"radius"		"325"
 			}
 			"02"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"cleave_pct_tooltip"		"25"
+				"cleave_pct"		"25"
 			}
 		}
 
@@ -11776,87 +11579,6 @@
 						"Duration"			"0.05"
 					}
 				}
-			}
-		}
-	}
-
-	//=================================================================================================================
-	// Warden: Blink
-	//=================================================================================================================
-	"holdout_blink"
-	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"BaseClass"						"ability_datadriven"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_ROOT_DISABLES"
-		"AbilityTextureName"			"custom/holdout_blink"
-		"MaxLevel"						"1"
-		"AbilityCastAnimation"			"ACT_DOTA_CAST_ABILITY_2"
-		"AbilityCastRange"				"750"
-	
-		// Casting
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCastRange"              "0"
-		"AbilityCastPoint"              "0.35"
-	
-		// Time     
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCooldown"               "12.0"
-		
-		// Cost
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityManaCost"               "0"
-		
-		// Special  
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilitySpecial"
-		{
-			"01"
-			{
-				"var_type"              "FIELD_INTEGER"
-				"blink_range"           "725"
-			}
-			
-			"02"
-			{
-				"var_type"              "FIELD_INTEGER"
-				"min_blink_range"       "200"
-			}
-		}
-
-		"OnSpellStart"
-		{
-			"RunScript"
-			{
-				"ScriptFile"    "scripts/vscripts/heroes/hero_warden.lua"
-				"Function"      "Blink"
-				"Target"        "POINT"
-			}
-	
-			"FireSound"
-			{
-				"EffectName"    "Hero_QueenOfPain.Blink_out"
-				"Target"        "CASTER"
-			}
-	
-			"AttachEffect"
-			{
-				"EffectName"    "particles/units/heroes/hero_queenofpain/queen_blink_start.vpcf"
-				"Target"        "CASTER"
-				"EffectAttachType"  "attach_hitloc"
-			}
-	
-			"FireSound"
-			{
-				"EffectName"    "Hero_QueenOfPain.Blink_in"
-				"Target"        "CASTER"
-			}
-	
-			"AttachEffect"
-			{
-				"EffectName"    "particles/units/heroes/hero_queenofpain/queen_blink_end.vpcf"
-				"Target"        "CASTER"
-				"EffectAttachType"  "follow_origin"
 			}
 		}
 	}
@@ -16267,12 +15989,12 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"full_damage_radius"	"200 225 250 300"
+				"radius"	"200 225 250 300"
 			}
 			"02"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"cleave_pct_tooltip"	"25"
+				"cleave_pct"	"25"
 			}
 		}
 
@@ -16615,12 +16337,12 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"full_damage_radius"	"300"
+				"radius"	"300"
 			}
 			"02"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"cleave_pct_tooltip"	"25"
+				"cleave_pct"	"25"
 			}
 		}
 
@@ -16723,7 +16445,7 @@
 		//-------------------------------------------------------------------------------------
 		"AbilityCooldown"			"13.0"
 		"AbilityCastRange"			"400"
-		"AbilityManaCost"			"160 235 310 385"
+		"AbilityManaCost"			"160 220 280 340"
 
 		// Special
 		//-------------------------------------------------------------------------------------
@@ -17628,216 +17350,126 @@
 		}
 	}
 
-	//=========================================================================================
-	// Beastmaster: Battlecry (Passive)
-	//=========================================================================================
-	"holdout_battlecry"
+	//=================================================================================================================
+	// Beastmaster: Bear Stun
+	//=================================================================================================================
+	"holdout_bear_stun"
 	{
 		// General
-		//-------------------------------------------------------------------------------------
-		"BaseClass"					"ability_datadriven"
-		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-		"AbilityTextureName"		"lone_druid_true_form_battle_cry"
-		"RequiredLevel"				"5"
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"						"ability_datadriven"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_POINT"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"  
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_YES"
+		"AbilityTextureName"			"lone_druid_true_form"
 
-		// Stats
-		//-------------------------------------------------------------------------------------
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"				"500"
+		"AbilityCastPoint"				"0.0"
+
+		// Time     
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"10.0"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"85 125 165 205"
+
+		// Special  
+		//-------------------------------------------------------------------------------------------------------------
 		"AbilitySpecial"
 		{
 			"01"
 			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_damage"			"75 150 225 300"
+				"var_type"				"FIELD_FLOAT"
+				"duration"				"1.5 2.0 2.5 3.0"
 			}
 			"02"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"bonus_armor"			"15 30 50 80"
+				"damage"				"200 400 600 800"
 			}
-		}
-
-		"Modifiers"
-		{
-			"modifier_battlecry_passive"
-			{ 
-				"Passive"	"1"
-				"IsHidden"	"0"
-
-				"OnCreated"
-				{
-					"AttachEffect" // Effect 1
-					{
-						"EffectName"		"particles/units/heroes/hero_lone_druid/lone_druid_rabid_buff.vpcf"
-						"EffectAttachType"	"follow_origin"
-						"Target"			"CASTER"
-					}
-				}
-
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_BASEATTACK_BONUSDAMAGE"		"%bonus_damage"
-					"MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS"		"%bonus_armor"
-				}
-			}
-		}
-	}
-
-	//=========================================================================================
-	// Beastmaster: Rabid (Passive)
-	//=========================================================================================
-	"holdout_rabid"
-	{
-	// General
-	//-------------------------------------------------------------------------------------
-		"BaseClass"					"ability_datadriven"
-		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-		"AbilityTextureName"		"lone_druid_rabid"
-		"RequiredLevel"				"8"
-		"LevelsBetweenUpgrades"		"3"
-
-		// Stats
-		//-------------------------------------------------------------------------------------
-		"AbilitySpecial"
-		{
-			"01"
-			{
-				"var_type"					"FIELD_INTEGER"
-				"bonus_attack_speed"		"50 100 150 200"
-			}
-			"02"
-			{
-				"var_type"							"FIELD_INTEGER"
-				"bonus_movement_speed_percentage"	"10 20 30 40"
-			}
-		}
-		
-		"Modifiers"
-		{
-			"modifier_rabid_passive"
-			{ 
-				"Passive"	"1"
-				"IsHidden"	"0"
-
-				"OnCreated"
-				{
-					"AttachEffect" // Effect 1
-					{
-						"EffectName"		"particles/units/heroes/hero_lone_druid/lone_druid_rabid_buff.vpcf"
-						"EffectAttachType"	"follow_origin"
-						"Target"			"CASTER"
-					}
-				}
-
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_ATTACKSPEED_BONUS_CONSTANT" "%bonus_attack_speed"
-					"MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE" "%bonus_movement_speed_percentage" 
-				}
-			}
-		}
-	}
-
-	//=========================================================================================
-	// Beastmaster: Battlecry (Passive) - Wolves
-	//=========================================================================================
-	"holdout_battlecry_alt"
-	{
-	// General
-	//-------------------------------------------------------------------------------------
-		"BaseClass"					"ability_datadriven"
-		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-		"AbilityTextureName"		"lone_druid_true_form_battle_cry"
-		
-		// Stats
-		//-------------------------------------------------------------------------------------
-		"AbilitySpecial"
-		{
-			"01"
+			"03"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"bonus_damage"			"25 50 100 200"
+				"radius"				"300 350 400 450"
 			}
-			"02"
+			"04"
 			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_armor"			"5 10 20 40"
+				"var_type"				"FIELD_FLOAT"
+				"delay"					"1.0"
 			}
 		}
 
-		"Modifiers"
+		"OnSpellStart"
 		{
-			"modifier_battlecry_passive"
-			{ 
-				"Passive"	"1"
-				"IsHidden"	"0"
-
-				"OnCreated"
+			"SpawnUnit"
+			{
+				"UnitName"		"npc_xhs_lone_druid_bear_stun"
+				"Target" 		"POINT"
+				"Duration"		"%delay"
+				"UnitCount"		"1"
+				"UnitLimit"		"1"
+				"GrantsGold"	"0"
+				"GrantsXP"		"0"
+				"SpawnRadius"	"1"
+				"OnSpawn"
 				{
-					"AttachEffect" // Effect 1
+					"ApplyModifier"
 					{
-						"EffectName"		"particles/units/heroes/hero_lone_druid/lone_druid_rabid_buff.vpcf"
-						"EffectAttachType"	"follow_origin"
-						"Target"			"CASTER"
+						"ModifierName"	"modifier_phased"
+						"Target"		"TARGET"
+						"Duration"		"1.0"
+					}
+
+					"ApplyModifier"
+					{
+						"ModifierName"	"modifier_invulnerable"
+						"Target"		"TARGET"
+						"Duration"		"1.0"
 					}
 				}
-
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_BASEATTACK_BONUSDAMAGE"		"%bonus_damage"
-					"MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS"		"%bonus_armor"
-				}
 			}
-		}
-	}
 
-	//=========================================================================================
-	// Beastmaster: Rabid (Passive) - Wolves
-	//=========================================================================================
-	"holdout_rabid_alt"
-	{
-	// General
-	//-------------------------------------------------------------------------------------
-		"BaseClass"					"ability_datadriven"
-		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-		"AbilityTextureName"		"lone_druid_rabid"
-		
-		// Stats
-		//-------------------------------------------------------------------------------------
-		"AbilitySpecial"
-		{
-			"01"
+			"DelayedAction"
 			{
-				"var_type"					"FIELD_INTEGER"
-				"bonus_attack_speed"		"25 50 75 125"
-			}
-			"02"
-			{
-				"var_type"							"FIELD_INTEGER"
-				"bonus_movement_speed_percentage"	"5 10 15 20"
-			}
-		}
-		
-		"Modifiers"
-		{
-			"modifier_rabid_passive"
-			{ 
-				"Passive"	"1"
-				"IsHidden"	"0"
-
-				"OnCreated"
+				"Delay"		"%delay"
+				"Action"
 				{
-					"AttachEffect" // Effect 1
+					"ActOnTargets"
 					{
-						"EffectName"		"particles/units/heroes/hero_lone_druid/lone_druid_rabid_buff.vpcf"
-						"EffectAttachType"	"follow_origin"
-						"Target"			"CASTER"
-					}
-				}
+						"Target"
+						{
+							"Center"	"POINT"
+							"Radius"	"%radius"
+							"Teams"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
+							"Type"		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+						}
 
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_ATTACKSPEED_BONUS_CONSTANT" "%bonus_attack_speed"
-					"MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE" "%bonus_movement_speed_percentage" 
+						"Action"
+						{
+							"ApplyModifier"
+							{
+								"ModifierName"	"modifier_stunned"
+								"Target"		"TARGET"
+								"Duration"		"%duration"
+							}
+
+							"Damage"
+							{
+								"Target"		"TARGET"
+								"Type"			"DAMAGE_TYPE_MAGICAL"
+								"Damage"		"%damage"
+							}
+
+							"FireSound"
+							{
+								"EffectName"		"Hero_Centaur.HoofStomp"
+								"Target"			"POINT"
+							}
+						}
+					}
 				}
 			}
 		}
@@ -17951,47 +17583,6 @@
 		}
 	}
 
-	//========================================================================================================
-	// Beastmaster Misc
-	//========================================================================================================
-	"holdout_beastmaster_misc"
-	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"BaseClass"             		"ability_datadriven"
-		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_HIDDEN"
-		"MaxLevel"						"1"
-
-		"Modifiers"
-		{
-			"modifier_beastmaster_attack_sound"
-			{
-				"IsHidden"			"1"
-				"Passive"			"1"
-	
-				"OnAttack"
-				{
-					"FireSound"
-					{
-						"EffectName"		"Hero_LoneDruid.preAttack"
-						"Target"			"CASTER"
-					}
-				}
-	
-	
-				"OnAttacklanded"
-				{
-	
-					"FireSound"
-					{
-						"EffectName"		"Hero_LoneDruid.ProjectileImpact"
-						"Target"			"TARGET"
-					}
-				}
-			}
-		}
-	}
-
 	// Beastmaster Stampede
 	// Author: Noya
 	// Description: Calls down hordes of rampaging thunder lizards to explode upon the Beastmaster's enemies. Each exploding lizard does 60 damage.
@@ -17999,7 +17590,6 @@
 	{
 		"BaseClass"                     "ability_datadriven"
 		"AbilityTextureName"            "custom/holdout_beastmaster_stampede"
-		"MaxLevel"                      "2"
 		"AbilityType"                   "DOTA_ABILITY_TYPE_ULTIMATE"
 		"LevelsBetweenUpgrades"			"5"
 		"RequiredLevel"					"10"
@@ -18517,7 +18107,7 @@
 				"var_type"					"FIELD_INTEGER"
 				"bonus_damage_tooltip"		"200"
 			}
-			"01"
+			"02"
 			{
 				"var_type"					"FIELD_INTEGER"
 				"bonus_damage_percentage"	"100"
@@ -18586,7 +18176,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"ability_datadriven"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_TOGGLE"
 		"AbilityType"					"DOTA_ABILITY_TYPE_ULTIMATE"
 		"AbilityTextureName"			"custom/holdout_bear_form"
 		"RequiredLevel"					"10"
@@ -18598,11 +18188,11 @@
 
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCastPoint"				"0"
+		"AbilityCastPoint"				"0.0"
 	
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityManaCost"				"100 200 0"		
+		"AbilityManaCost"				"200 400 0"		
 
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
@@ -18611,17 +18201,17 @@
 			"01"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"bonus_armor"				"60 100 140"
+				"bonus_armor"				"50 100 150"
 			}
 			"02"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"hp_regen"					"50 75 100"
+				"hp_regen"					"50 100 150"
 			}
 			"03"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"movespeed_loss"			"-45 -35 -25"
+				"movespeed_loss"			"-60 -50 -40"
 			}
 			"04"
 			{
@@ -18631,15 +18221,15 @@
 			"05"
 			{
 				"var_type"					"FIELD_FLOAT"
-				"bat_reduction"				"0.35"
+				"bat_reduction"				"0.4"
 			}
 		}
 
-		"OnSpellStart"
+		"OnToggleOn"
 		{
 			"ApplyModifier"
 			{
-				"ModifierName" 	"modifier_true_form_transform"
+				"ModifierName" 	"modifier_true_form"
 				"Target"		"CASTER"
 			}
 	
@@ -18664,38 +18254,37 @@
 			}
 		}
 
-		"OnUpgrade"
+		"OnToggleOff"
 		{
-			"RunScript"
+			"RemoveModifier"
 			{
-				"ScriptFile"		"heroes/global.lua"
-				"Function"			"LevelUpAbility"
-				"ability_name"		"holdout_bear_form_druid"
+				"ModifierName" 	"modifier_true_form"
+				"Target"		"CASTER"
+			}
+	
+			"FireSound"
+			{
+				"EffectName"	"Hero_LoneDruid.TrueForm.Cast"
+				"Target"		"CASTER"
+			}
+
+			"FireEffect"
+			{
+				"Target"			"CASTER"
+				"EffectName"		"particles/units/heroes/hero_lone_druid/lone_druid_true_form.vpcf"
+				"EffectAttachType"	"follow_origin"
+				"ControlPointEntities"
+				{
+					"CASTER"		"attach_origin"
+					"CASTER"		"attach_origin"
+					"CASTER"		"attach_origin"
+					"CASTER"		"attach_origin"	//CP3
+				}
 			}
 		}
 
 		"Modifiers"
 		{
-			"modifier_true_form_transform"
-			{
-				"IsHidden"	"1"
-				"Duration"	"%transformation_time"
-
-				"States"
-				{
-					"MODIFIER_STATE_STUNNED"		"MODIFIER_STATE_VALUE_ENABLED"
-				}
-
-				"OnDestroy"
-				{
-					"ApplyModifier"
-					{
-						"ModifierName" 	"modifier_true_form"
-						"Target"		"CASTER"
-					}
-				}
-			}
-
 			"modifier_true_form"
 			{
 				"IsHidden"	"0"
@@ -18721,122 +18310,6 @@
 					{
 						"ScriptFile"			"heroes/global.lua"
 						"Function"				"HideWearables"
-					}
-				}
-
-				"OnDestroy"
-				{
-					"RunScript"
-					{
-						"ScriptFile"			"heroes/hero_malfurion.lua"
-						"Function"				"TrueFormEnd"
-						"main_ability_name"		"holdout_bear_form"
-						"remove_modifier_name"	"modifier_true_form"
-					}
-				}
-			}
-		}
-	}
-
-	//=================================================================================================================
-	// Malfurion: Bear Form Druid
-	//=================================================================================================================
-	"holdout_bear_form_druid"
-	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"BaseClass"						"ability_datadriven"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_HIDDEN"
-		"AbilityType"					"DOTA_ABILITY_TYPE_ULTIMATE"
-		"AbilityTextureName"			"lone_druid_true_form_druid"
-		"RequiredLevel"					"10"
-		"LevelsBetweenUpgrades"			"5"
-	
-		// Casting
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCastPoint"				"0"
-	
-		// Time		
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCooldown"				"0.0"
-		// Cost
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityManaCost"				"100 200 0"		
-	
-		// Special
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilitySpecial"
-		{
-			"01"
-			{
-				"var_type"					"FIELD_FLOAT"
-				"transformation_time"		"1.933"
-			}
-			"02"
-			{
-				"var_type"					"FIELD_FLOAT"
-				"bat_reduction"				"0.35"
-			}
-		}
-	
-		"OnSpellStart"
-		{
-			"ApplyModifier"
-			{
-				"ModifierName"	"modifier_druid_transform"
-				"Target"		"CASTER"
-			}
-	
-			"FireSound"
-			{
-				"EffectName"	"Hero_LoneDruid.TrueForm.Recast"
-				"Target"		"CASTER"
-			}
-		}
-
-		"OnUpgrade"
-		{
-			"RunScript"
-			{
-				"ScriptFile"		"heroes/global.lua"
-				"Function"			"LevelUpAbility"
-				"ability_name"		"holdout_bear_form"
-			}
-		}
-
-		"Modifiers"
-		{
-			"modifier_druid_transform"
-			{
-				"Duration"		"%transformation_time"
-				"Hidden"		"1"
-	
-				"States"
-				{
-					"MODIFIER_STATE_STUNNED"		"MODIFIER_STATE_VALUE_ENABLED"
-				}
-	
-				"OnCreated"
-				{
-					"ApplyModifier"
-					{
-						"ModifierName"	"modifier_invulnerable"
-						"Target"		"CASTER"
-						"Duration"		"0.03"
-					}
-
-					"FireEffect"
-					{
-						"Target"			"CASTER"
-						"EffectName"		"particles/units/heroes/hero_lone_druid/lone_druid_true_form.vpcf"
-						"EffectAttachType"	"follow_origin"
-						"ControlPointEntities"
-						{
-							"CASTER"		"attach_origin"
-							"CASTER"		"attach_origin"
-							"CASTER"		"attach_origin"
-							"CASTER"		"attach_origin"	//CP3
-						}
 					}
 				}
 
@@ -19409,12 +18882,12 @@
 			"05"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"full_damage_radius"	"350"
+				"radius"	"350"
 			}
 			"06"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"cleave_pct_tooltip"	"50"
+				"cleave_pct"	"50"
 			}
 		}
 
@@ -22323,12 +21796,12 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"full_damage_radius"	"325"
+				"radius"	"325"
 			}
 			"02"
 			{	
 				"var_type"				"FIELD_FLOAT"
-				"cleave_pct_tooltip"	"10 15 20 25"
+				"cleave_pct"	"10 15 20 25"
 			}
 			"03"
 			{
@@ -22977,7 +22450,7 @@
 
 		// Time		
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCooldown"				"17.0"
+		"AbilityCooldown"				"14.0"
 		
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
@@ -22999,7 +22472,7 @@
 			"02"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"damage"					"10000 15000 20000 25000"
+				"damage"					"20000 25000 30000 35000"
 			}
 			"03"
 			{
@@ -23039,7 +22512,7 @@
 
 		// Time		
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCooldown"				"17.0"
+		"AbilityCooldown"				"14.0"
 		
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
@@ -24850,7 +24323,7 @@
 			"01"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"full_damage_radius"		"350"
+				"radius"		"350"
 			}
 			"02"
 			{
@@ -24860,7 +24333,7 @@
 			"02"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"cleave_pct_tooltip"		"50"
+				"cleave_pct"		"50"
 			}
 		}
 
@@ -27536,12 +27009,12 @@
 			"02"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"cleave_pct_tooltip"	"20 35 50"
+				"cleave_pct"	"20 35 50"
 			}
 			"03"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"full_damage_radius"	"325"
+				"radius"	"325"
 			}
 			"04"
 			{
@@ -27669,22 +27142,22 @@
 			"01"
 			{
 				"var_type"						"FIELD_INTEGER"
-				"radius"						"500 550 600 650"
+				"radius"						"850"
 			}
 			"02"
 			{
 				"var_type"						"FIELD_FLOAT"
-				"wave_duration"					"7.0"
+				"wave_duration"					"8.0"
 			}		
 			"03"
 			{
 				"var_type"						"FIELD_INTEGER"
-				"wave_count"					"12"
+				"wave_count"					"8"
 			}
 			"04"
 			{
 				"var_type"						"FIELD_INTEGER"
-				"wave_damage"					"1250 2000 2750 3500"
+				"wave_damage"					"2000 4000 6000 8000"
 			}
 			"05"
 			{
@@ -28101,7 +27574,7 @@
 		"AbilityUnitDamageType"		"DAMAGE_TYPE_MAGICAL"
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
 		"AbilityUnitTargetType"		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
-		"AbilityDamage"				"20000 30000 40000 50000"
+		"AbilityDamage"				"25000 35000 45000 55000"
 		"AbilitySpecial"
 		{
 		  "01"
@@ -28524,7 +27997,7 @@
 			"01"
 			{
 				"var_type"				"FIELD_FLOAT"
-				"damage_per_unit"		"3000 5000 7000 9000"
+				"damage_per_unit"		"8000 12000 16000 20000"
 			}
 			"02"
 			{
@@ -29288,9 +28761,10 @@
 	
 			"FireSound"
 			{
-				"EffectName"        "Hero_Centaur.HoofStomp"
-				"Target"            "CASTER"
+				"EffectName"		"Hero_Centaur.HoofStomp"
+				"Target"			"CASTER"
 			}
+
 			"ActOnTargets"
 			{
 				"Target"

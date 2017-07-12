@@ -48,8 +48,8 @@ function Splash(event)
 local attacker = event.caster
 local target = event.target
 local ability = event.ability
-local radius = ability:GetSpecialValueFor("full_damage_radius")
-local cleave = ability:GetSpecialValueFor("cleave_pct_tooltip")
+local radius = ability:GetSpecialValueFor("radius")
+local cleave = ability:GetSpecialValueFor("cleave_pct")
 local full_damage = attacker:GetAverageTrueAttackDamage(attacker)
 local cleave_pct = cleave * full_damage / 100
 

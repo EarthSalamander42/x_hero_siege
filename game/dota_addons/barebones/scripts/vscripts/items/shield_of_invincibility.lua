@@ -5,6 +5,7 @@ function Reincarnation( event )
 	local respawntime = ability:GetSpecialValueFor("reincarnation_time")
 
 	if hero:IsRealHero() and not hero.ankh_respawn and ability:IsCooldownReady() then
+		hero.ankh_respawn = true
 		hero:SetRespawnsDisabled(true)
 		hero.respawn_timer = Timers:CreateTimer(respawntime, function() 
 			hero:SetRespawnPosition(position)
@@ -14,7 +15,6 @@ function Reincarnation( event )
 			hero.ankh_respawn = false
 			hero:SetRespawnsDisabled(false)
 			end)
-		hero.ankh_respawn = true
 		ability:StartCooldown(60.0)
 	end
 end

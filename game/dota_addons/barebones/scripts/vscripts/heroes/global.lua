@@ -12,45 +12,123 @@ end
 
 function Reincarnation(event)
 local hero = event.caster
-local ability = event.ability -- Item
-local ability_alt = hero:FindAbilityByName("holdout_reincarnation") -- Ability
+local item = event.ability -- Item
+local ability = hero:FindAbilityByName("holdout_reincarnation") -- Ability
+local shield = "item_shield_of_invincibility"
 local position = hero:GetAbsOrigin()
-local respawntime = ability:GetSpecialValueFor("reincarnation_time")
+local RespawnTime = 5.0
 
-	if hero:IsRealHero() and ANKHS == 1 then
-		hero:SetRespawnsDisabled(true)
-		hero.respawn_timer = Timers:CreateTimer(respawntime, function() 
-			hero:SetRespawnPosition(position)
-			hero:EmitSound("Ability.ReincarnationAlt")
-			hero:RespawnHero(false, false, false)
-			ParticleManager:CreateParticle("particles/items_fx/aegis_respawn.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
-			hero:SetRespawnsDisabled(false)
-			hero.ankh_respawn = false
-		end)
-
-		if ability_alt then
-			if ability_alt:IsCooldownReady() then
-				ability_alt:StartCooldown(60.0)
+	if ability and ability:IsCooldownReady() then
+		print("Reincarnation: Ability")
+		if hero:IsRealHero() then
+			print("Hero")
+			hero.ankh_respawn = true
+			hero:SetRespawnsDisabled(true)
+			hero.respawn_timer = Timers:CreateTimer(RespawnTime, function() 
+				hero:SetRespawnPosition(position)
+				hero:EmitSound("Ability.ReincarnationAlt")
+				hero:RespawnHero(false, false, false)
+				ParticleManager:CreateParticle("particles/items_fx/aegis_respawn.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
+				hero:SetRespawnsDisabled(false)
+				Timers:CreateTimer(0.1, function()
+					hero.ankh_respawn = false
+				end)
+			end)
+			ability:StartCooldown(60.0)
+		else
+			print("Non-Hero")
+--			hero.ankh_respawn = true
+			hero.respawn_timer = Timers:CreateTimer(RespawnTime, function() 
+				hero:EmitSound("Ability.ReincarnationAlt")
+				hero:RespawnUnit()
+				ParticleManager:CreateParticle("particles/items_fx/aegis_respawn.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
+				Timers:CreateTimer(0.1, function()
+--					hero.ankh_respawn = false
+				end)
+			end)
+			ability:StartCooldown(60.0)
+			if hero:GetOwner():FindAbilityByName("lone_druid_spirit_bear"):IsCooldownReady() then
+				hero:GetOwner():FindAbilityByName("lone_druid_spirit_bear"):StartCooldown(5.0)
 			end
 		end
-
-		if not ability_alt or not ability_alt:IsCooldownReady() then
-			if ability then
-				hero:SetRespawnsDisabled(true)
-				hero.respawn_timer = Timers:CreateTimer(respawntime, function() 
-					hero:SetRespawnPosition(position)
-					hero:EmitSound("Ability.ReincarnationAlt")
-					hero:RespawnHero(false, false, false)
-					ParticleManager:CreateParticle("particles/items_fx/aegis_respawn.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
+	return
+	elseif item then
+		print("Reincarnation: Ankh")
+		if hero:IsRealHero() then
+			print("Hero")
+			hero.ankh_respawn = true
+			hero:SetRespawnsDisabled(true)
+			hero.respawn_timer = Timers:CreateTimer(RespawnTime, function() 
+				hero:SetRespawnPosition(position)
+				hero:EmitSound("Ability.ReincarnationAlt")
+				hero:RespawnHero(false, false, false)
+				ParticleManager:CreateParticle("particles/items_fx/aegis_respawn.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
+				hero:SetRespawnsDisabled(false)
+				Timers:CreateTimer(0.1, function()
 					hero.ankh_respawn = false
-					hero:SetRespawnsDisabled(false)
+				end)
+			end)
+			if item:GetCurrentCharges() -1 >= 1 then
+				item:SetCurrentCharges(item:GetCurrentCharges() -1)
+			else
+				item:RemoveSelf()
+			end
+		else
+			print("Non-Hero")
+--			hero.ankh_respawn = true
+			hero.respawn_timer = Timers:CreateTimer(RespawnTime, function() 
+				hero:EmitSound("Ability.ReincarnationAlt")
+				hero:RespawnUnit()
+				ParticleManager:CreateParticle("particles/items_fx/aegis_respawn.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
+				Timers:CreateTimer(0.1, function()
+--					hero.ankh_respawn = false
+				end)
+			end)
+			if item:GetCurrentCharges() -1 >= 1 then
+				item:SetCurrentCharges(item:GetCurrentCharges() -1)
+			else
+				item:RemoveSelf()
+			end
+			if hero:GetOwner():FindAbilityByName("lone_druid_spirit_bear"):IsCooldownReady() then
+				hero:GetOwner():FindAbilityByName("lone_druid_spirit_bear"):StartCooldown(5.0)
+			end
+		end
+	return
+	elseif hero:HasItemInInventory(shield) then
+		print("Reincarnation: Shield")
+		for itemSlot = 0, 5 do
+			local item = hero:GetItemInSlot(itemSlot)
+			if item and item:GetName() == shield then
+				if hero:IsRealHero() then
+					print("Hero")
+					hero.ankh_respawn = true
+					hero:SetRespawnsDisabled(true)
+					hero.respawn_timer = Timers:CreateTimer(RespawnTime, function() 
+						hero:SetRespawnPosition(position)
+						hero:EmitSound("Ability.ReincarnationAlt")
+						hero:RespawnHero(false, false, false)
+						ParticleManager:CreateParticle("particles/items_fx/aegis_respawn.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
+						hero:SetRespawnsDisabled(false)
+						Timers:CreateTimer(0.1, function()
+							hero.ankh_respawn = false
+						end)
 					end)
-				hero.ankh_respawn = true
-
-				if ability:GetCurrentCharges() -1 >= 1 then
-					ability:SetCurrentCharges(ability:GetCurrentCharges() -1)
+					ability:StartCooldown(60.0)
 				else
-					ability:RemoveSelf()
+					print("Non-Hero")
+--					hero.ankh_respawn = true
+					hero.respawn_timer = Timers:CreateTimer(RespawnTime, function() 
+						hero:EmitSound("Ability.ReincarnationAlt")
+						hero:RespawnUnit()
+						ParticleManager:CreateParticle("particles/items_fx/aegis_respawn.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
+						Timers:CreateTimer(0.1, function()
+--							hero.ankh_respawn = false
+						end)
+					end)
+					ability:StartCooldown(60.0)
+					if hero:GetOwner():FindAbilityByName("lone_druid_spirit_bear"):IsCooldownReady() then
+						hero:GetOwner():FindAbilityByName("lone_druid_spirit_bear"):StartCooldown(5.0)
+					end
 				end
 			end
 		end

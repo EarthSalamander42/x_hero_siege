@@ -1,6 +1,8 @@
 # Cache crap that Valve autogenerates
 *.bin
 *.tmp
+*.soc
+*.tmp
 
 # Compiled formats
 *.vpcf_c

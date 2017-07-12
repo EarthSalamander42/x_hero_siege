@@ -1,11 +1,18 @@
 <root>
-	<script>
-		GameUI.SetDefaultUIEnabled(DotaDefaultUIElement_t.DOTA_DEFAULT_UI_TOP_TIMEOFDAY, false);
-		GameUI.SetDefaultUIEnabled(DotaDefaultUIElement_t.DOTA_DEFAULT_UI_TOP_BAR_SCORE, false);
-		GameUI.SetDefaultUIEnabled(DotaDefaultUIElement_t.DOTA_DEFAULT_UI_TOP_BAR_DIRE_TEAM, false);
-		GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_INVENTORY_PROTECT, false );	//Glyph.
+    <script>
+		// Turn off some default UI
+//		GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_TOP_BAR, false );
+//		GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_TOP_TIMEOFDAY, false );
+		GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_TOP_HEROES, false );
+		GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_FLYOUT_SCOREBOARD, false );
+		GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_INVENTORY_QUICKBUY, true );
 		GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_INVENTORY_COURIER, false );
+		GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_INVENTORY_PROTECT, false );
+		GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_SHOP_SUGGESTEDITEMS, false );
+		GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_QUICK_STATS, false );
 		GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_ENDGAME, false );
+		GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_PREGAME_STRATEGYUI, false );
+		GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_KILLCAM, false );
 
 		GameUI.CustomUIConfig().team_colors = {}
 		GameUI.CustomUIConfig().team_colors[DOTATeam_t.DOTA_TEAM_GOODGUYS] = "#004080;";
@@ -57,33 +64,6 @@
 		//Skin Killer - minimap
 		hudElements.FindChildTraverse("HUDSkinMinimap").style.visibility = "collapse";
 
-		//Top Bar Radiant
-		var TopBarRadiantTeam = hudElements.FindChildTraverse("TopBarRadiantTeam");
-		TopBarRadiantTeam.style.marginLeft = "100px";
-		TopBarRadiantTeam.style.width = "fit-children";
-
-		var topbarRadiantPlayers = hudElements.FindChildTraverse("TopBarRadiantPlayers");
-		topbarRadiantPlayers.style.marginLeft = "-60px";
-		topbarRadiantPlayers.style.width = "504px";
-
-		var topbarRadiantPlayersContainer = hudElements.FindChildTraverse("TopBarRadiantPlayersContainer");
-		topbarRadiantPlayersContainer.style.marginLeft = "0px";
-		topbarRadiantPlayersContainer.style.width = "504px";
-		topbarRadiantPlayersContainer.style.flowChildren = "left"
-
-		var RadiantTeamContainer = hudElements.FindChildTraverse("RadiantTeamContainer");
-		RadiantTeamContainer.style.height = "610px";
-		var DireTeamContainer = hudElements.FindChildTraverse("DireTeamContainer");
-		DireTeamContainer.style.visibility = "collapse";
-		var DireHeader = hudElements.FindChildTraverse("DireHeader");
-		DireHeader.style.visibility = "collapse";
-
-		//Scoreboard
-		var ScoreboardBackground = hudElements.FindChildTraverse("scoreboard")
-		ScoreboardBackground.style.height = "490px";
-		var ScoreboardButtons = hudElements.FindChildTraverse("scoreboard").FindChildTraverse("Background").FindChildTraverse("NestedMenuButtons");
-		ScoreboardButtons.style.visibility = "collapse";
-
 		//Buff Bar
 		var BuffBar = hudElements.FindChildTraverse("lower_hud").FindChildTraverse("buffs")
 		BuffBar.style.width = "30%";
@@ -95,19 +75,28 @@
 		DeBuffBar.style.marginBottom = "40.5%";
 		DeBuffBar.style.marginRight = "31.5%";
 		DeBuffBar.style.flowChildren = "right";
-	</script>
 
+		var HeroDisplay = $.GetContextPanel().GetParent().GetParent().FindChildTraverse("HeroDisplay")
+		var HeroDisplayContainer = $.GetContextPanel().GetParent().GetParent().FindChildTraverse("HeroDisplay").FindChildTraverse("HeroDisplayRowContainer")
+		HeroDisplay.style.marginTop = "17.5%"
+		HeroDisplay.style.marginLeft = "1%"
+		HeroDisplay.style.width = "500px"
+		HeroDisplay.style.height = "76px"
+		HeroDisplayContainer.style.width = "500px"
+		HeroDisplayContainer.style.flowChildren = "right"
+
+		$.GetContextPanel().GetParent().GetParent().FindChildTraverse("HUDElements").FindChildTraverse("topbar").FindChildTraverse("GameTime").style.visibility = "collapse";
+	</script>
 	<Panel>
-		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/barebones_notifications.xml" />
-		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/barebones_attachments.xml" />
-		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/hud.xml" />
-		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/boss_healthbar.xml" />
-		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/xhs_quests.xml" />
-		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/xhs_adminmod.xml" />
-		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/xhs_timers.xml" />
-		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/xhs_events.xml" />
 		<CustomUIElement type="GameSetup"			layoutfile="file://{resources}/layout/custom_game/gamesetup_options.xml" />
 		<CustomUIElement type="GameSetup"			layoutfile="file://{resources}/layout/custom_game/team_select.xml" />
-		<CustomUIElement type="EndScreen" 			layoutfile="file://{resources}/layout/custom_game/multiteam_end_screen.xml" />
+		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/barebones_notifications.xml" />
+		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/barebones_attachments.xml" />
+		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/boss_healthbar.xml" />
+		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/hud_main.xml" />
+		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/xhs_events.xml" />
+		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/xhs_timers.xml" />
+		<CustomUIElement type="FlyoutScoreboard"	layoutfile="file://{resources}/layout/custom_game/dungeon_scoreboard.xml" />
+		<CustomUIElement type="EndScreen"			layoutfile="file://{resources}/layout/custom_game/dungeon_complete.xml" />
 	</Panel>
 </root>

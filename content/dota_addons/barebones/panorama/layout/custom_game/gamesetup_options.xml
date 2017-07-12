@@ -59,7 +59,7 @@
 						<RadioButton class="CGSRadio4" group="CreepLanes" text="Full" onactivate="OnVoteButtonPressed('creep_lanes', 3)" />
 					</Panel>
 				</Panel>
-				<Panel class="CustomSettingPanel" hittest="false">
+<!--			<Panel id="DualHeroPanel" class="CustomSettingPanel" hittest="false">
 					<Panel class="ContainerCustomGameLengthTitle" hittest="false">
 						<Label class="CustomGameSettingsTitle" id="CustomGameLengthTitle1" hittest="false" text="Dual Hero" />
 					</Panel>
@@ -68,7 +68,7 @@
 						<RadioButton class="CGSRadio" group="DualHero" text="Normal" onactivate="OnVoteButtonPressed('dual_hero', 1)" />
 						<RadioButton class="CGSRadio4" group="DualHero" text="Dual (Experimental)" onactivate="OnVoteButtonPressed('dual_hero', 2)" />
 					</Panel>
-				</Panel>
+				</Panel> -->
 				<Panel id="VIP">
 					<Label id="VIPHeader" class="CommunityText" text="#VIPHeader" />
 					<Button id="VIPImg" onactivate="DOTADisplayURL('https://www.patreon.com/xherosiege');" >

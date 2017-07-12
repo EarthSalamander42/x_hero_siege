@@ -6,7 +6,6 @@ function OnClientCheckIn(args) {
 	var hostInfo = 0
 /*	if ( playerInfo )		 This makes crash Arena Mode for reasons
 		hostInfo = playerInfo.player_has_host_privileges
-
 	var payload = {
 		modIdentifier: args.modID,
 		steamID32: GetSteamID32(),
@@ -14,9 +13,7 @@ function OnClientCheckIn(args) {
 		matchID: args.matchID,
 		schemaVersion: args.schemaVersion
 	};
-
 	$.Msg('Sending: ', payload);
-
 	$.AsyncWebRequest('https://api.getdotastats.com/s2_check_in.php',
 	{
 		type: 'POST',

@@ -77,9 +77,9 @@
 	//=======================================================================================================
 	// HERO: Beastmaster( Lone Druid )
 	//=======================================================================================================
-	"npc_dota_hero_beastmaster_holdout"
+	"npc_dota_hero_lone_druid_holdout"
 	{
-		"override_hero"					"npc_dota_hero_beastmaster"
+		"override_hero"					"npc_dota_hero_lone_druid"
 //		"DisableWearables"				"1"
 		"MovementSpeed"					"350"
 		"ModelScale"					"1.0"
@@ -98,12 +98,12 @@
 		"AttributePrimary"				"DOTA_ATTRIBUTE_AGILITY"
 
 		"Ability1"						"lone_druid_spirit_bear"
-		"Ability2"						"holdout_spiritual_beast"
-		"Ability3"						"holdout_battlecry"
-		"Ability4"						"holdout_rabid"
-		"Ability5"						"holdout_blink"
+		"Ability2"						"holdout_bear_stun"
+		"Ability3"						"holdout_vampiric_aura"
+		"Ability4"						"holdout_endurance_aura"
+		"Ability5"						"holdout_roar"
 		"Ability6"						"holdout_beastmaster_stampede"
-		"Ability7"						"holdout_beastmaster_misc"
+		"Ability7"						""
 		"Ability8"						""
 		"Ability9"						""
 		"Ability10"						""
@@ -1031,7 +1031,7 @@
 		"Ability2"						"holdout_shadow_strike"
 		"Ability3"						"holdout_permanent_stats"		
 		"Ability4"						"holdout_gust_pool"
-		"Ability5"						"holdout_blink"
+		"Ability5"						"holdout_innate_great_cleave"
 		"Ability6"						"holdout_vengeance"
 		"Ability7"						""
 		"Ability8"						""

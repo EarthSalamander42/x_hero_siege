@@ -49,7 +49,6 @@ end
 function SpiritBeastBack(event)
 local hero = event.activator
 
-	SpecialEventsTimerEnd()
 	SpecialEventBack(event)
 	Timers:RemoveTimer(timers.SpiritBeast)
 	GameMode.SpiritBeast_occuring = 0
@@ -61,7 +60,6 @@ end
 
 function SpiritBeastDead(event)
 local hero = event.activator
-SpecialEventsTimerEnd()
 
 	DoEntFire("trigger_spirit_beast_duration", "Kill", nil ,0 ,nil ,nil)
 	GameMode.SpiritBeast_killed = 1
@@ -79,7 +77,6 @@ function FrostInfernalBack(event)
 local hero = event.activator
 local point = Entities:FindByName(nil, "base_spawn"):GetAbsOrigin()
 
-	SpecialEventsTimerEnd()
 	SpecialEventBack(event)
 	Timers:RemoveTimer(timers.FrostInfernal)
 	GameMode.FrostInfernal_occuring = 0
@@ -92,7 +89,6 @@ end
 function FrostInfernalDead(event)
 local hero = event.activator
 
-	SpecialEventsTimerEnd()
 	DoEntFire("trigger_frost_infernal_duration", "Kill", nil ,0 ,nil ,nil)
 	GameMode.FrostInfernal_killed = 1
 
@@ -109,7 +105,6 @@ function HeroImageBack(event)
 local hero = event.activator
 local point = Entities:FindByName(nil, "base_spawn"):GetAbsOrigin()
 
-	SpecialEventsTimerEnd()
 	SpecialEventBack(event)
 	Timers:RemoveTimer(timers.HeroImage)
 	GameMode.HeroImage_occuring = 0
@@ -126,7 +121,6 @@ local caster = event.caster
 local point_beast = Entities:FindByName(nil, "hero_image_boss"):GetAbsOrigin()
 
 	if caster:GetHealth() == 0 then
-		SpecialEventsTimerEnd()
 		Timers:CreateTimer(0.5, function()
 			local item = CreateItem("item_tome_big", nil, nil)
 			local pos = point_beast
@@ -143,7 +137,6 @@ local point = Entities:FindByName(nil, "base_spawn"):GetAbsOrigin()
 local point_hero = Entities:FindByName(nil, "all_hero_image_player"):GetAbsOrigin()
 ALL_HERO_IMAGE_DEAD = 0
 
-	SpecialEventsTimerEnd()
 	Timers:RemoveTimer(timers.AllHeroImage)
 	GameMode.AllHeroImages_occuring = 0
 	SpecialEventBack(event)
@@ -159,7 +152,6 @@ local caster = event.caster
 local point_beast = Entities:FindByName(nil, "all_hero_image_player"):GetAbsOrigin()
 
 	if caster:GetHealth() == 0 then
-		SpecialEventsTimerEnd()
 		ALL_HERO_IMAGE_DEAD = ALL_HERO_IMAGE_DEAD + 1
 
 		if ALL_HERO_IMAGE_DEAD == 8 then
