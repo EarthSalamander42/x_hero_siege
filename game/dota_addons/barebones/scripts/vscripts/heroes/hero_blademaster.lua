@@ -95,7 +95,7 @@ function MirrorImage( keys )
 		-- Recreate the items of the caster
 		for itemSlot = 0, 5 do
 			local item = caster:GetItemInSlot(itemSlot)
-			if item and item:GetName() ~= "item_orb_of_fire" and item:GetName() ~= "item_orb_of_fire2" and item:GetName() ~= "item_searing_blade" and item:GetName() ~= "item_cloak_of_flames" and item:GetName() ~= "item_orb_of_lightning" and item:GetName() ~= "item_orb_of_lightning2" and item:GetName() ~= "item_celestial_claws" and item:GetName() ~= "item_orb_of_darkness" and item:GetName() ~= "item_orb_of_darkness2" and item:GetName() ~= "item_bracer_of_the_void" then
+			if item and item:GetName() ~= "item_orb_of_fire" and item:GetName() ~= "item_orb_of_fire2" and item:GetName() ~= "item_searing_blade" and item:GetName() ~= "item_cloak_of_flames" and item:GetName() ~= "item_orb_of_lightning" and item:GetName() ~= "item_orb_of_lightning2" and item:GetName() ~= "item_celestial_claws" and item:GetName() ~= "item_orb_of_darkness" and item:GetName() ~= "item_orb_of_darkness2" and item:GetName() ~= "item_bracer_of_the_void" and item:GetName() ~= "item_ankh_of_reincarnation" then
 				local itemName = item:GetName()
 				local newItem = CreateItem(itemName, illusion, illusion)
 				illusion:AddItem(newItem)

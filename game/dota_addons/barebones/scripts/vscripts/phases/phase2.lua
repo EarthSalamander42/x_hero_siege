@@ -27,6 +27,7 @@ function spawn_second_phase_left()
 			end
 		return 30
 		elseif SPECIAL_EVENT == 1 then
+			print("Phase 2 creeps paused, special event!")
 			return 30
 		elseif EntIceTower:IsNull() then
 			return nil
@@ -44,9 +45,10 @@ function spawn_second_phase_right()
 			end
 		return 30
 		elseif SPECIAL_EVENT == 1 then
-		return 30
+			print("Phase 2 creeps paused, special event!")
+			return 30
 		elseif EntIceTower:IsNull() then
-		return nil
+			return nil
 		end
 	end)
 end

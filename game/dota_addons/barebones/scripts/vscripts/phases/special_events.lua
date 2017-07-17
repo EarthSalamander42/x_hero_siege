@@ -43,10 +43,6 @@ mode:SetFixedRespawnTime(1)
 	end)
 
 	Timers:CreateTimer(120, function() -- 14:00 Min, teleport back to the spawn
-		for _,v in pairs(teleporters) do
-			v:Enable()
-		end
-
 		SpecialWave()
 		UTIL_Remove(Muradin)
 		mode:SetFixedRespawnTime(40)
@@ -60,9 +56,6 @@ mode:SetFixedRespawnTime(1)
 		Notifications:TopToAll({text="All heroes who survived Muradin received 15 000 Gold!", duration=6.0})
 		Notifications:TopToAll({ability="alchemist_goblins_greed", continue = true})
 		RestartCreeps()
-		for _,v in pairs(teleporters) do
-			v:Disable()
-		end
 	end)
 end
 
@@ -284,18 +277,19 @@ end
 function EndFarmEvent(keys)
 local hero = keys.activator
 local base = Entities:FindByName(nil,"base_spawn"):GetAbsOrigin()
-
-	if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
+	if hero:IsIllusion() then
+		print("Illusion found, ignoring")
+	elseif hero:IsRealHero() then
 		if hero.old_pos then
 			FindClearSpaceForUnit(hero, hero.old_pos, true)
 		else
-		FindClearSpaceForUnit(hero, base, true)
+			FindClearSpaceForUnit(hero, base, true)
 		end
-	PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
-	Timers:CreateTimer(0.1, function()
-		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
-	end)
-	hero:Stop()
+		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
+		Timers:CreateTimer(0.1, function()
+			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
+		end)
+		hero:Stop()
 	end
 
 	local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_1, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_NONE , FIND_ANY_ORDER, false)

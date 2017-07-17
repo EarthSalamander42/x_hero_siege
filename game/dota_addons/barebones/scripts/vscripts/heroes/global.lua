@@ -17,6 +17,8 @@ local ability = hero:FindAbilityByName("holdout_reincarnation") -- Ability
 local shield = "item_shield_of_invincibility"
 local position = hero:GetAbsOrigin()
 local RespawnTime = 5.0
+if hero:GetUnitName() == "npc_spirit_beast" then return end
+if hero:IsIllusion() then return end
 
 	if ability and ability:IsCooldownReady() then
 		print("Reincarnation: Ability")

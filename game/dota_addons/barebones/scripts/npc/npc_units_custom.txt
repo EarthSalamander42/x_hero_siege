@@ -5613,8 +5613,8 @@
 		// Bounty
 		//----------------------------------------------------------------
 		"BountyXP"					"70"     // Experience earn.
-		"BountyGoldMin"				"950"     // Gold earned min.
-		"BountyGoldMax"				"1050"     // Gold earned max.
+		"BountyGoldMin"				"1250"     // Gold earned min.
+		"BountyGoldMax"				"1350"     // Gold earned max.
 
 		// Bounds
 		//----------------------------------------------------------------
@@ -5694,8 +5694,8 @@
 		// Bounty
 		//----------------------------------------------------------------
 		"BountyXP"					"70"     // Experience earn.
-		"BountyGoldMin"				"950"     // Gold earned min.
-		"BountyGoldMax"				"1050"     // Gold earned max.
+		"BountyGoldMin"				"1250"     // Gold earned min.
+		"BountyGoldMax"				"1350"     // Gold earned max.
 
 		// Bounds
 		//----------------------------------------------------------------
@@ -12118,80 +12118,6 @@
 	}
 
 	//=================================================================================
-	// Special Event: Ramero Dummy
-	//=================================================================================
-	"npc_ramero_bis"
-	{
-		// General
-		//----------------------------------------------------------------
-		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
-		"Model"						"models/heroes/sven/sven.vmdl"	// Model.
-		"ModelScale"				"1.65"
-		"ConsideredHero"			"1"
-		"HasInventory"				"1"
-				
-		// Abilities
-		//----------------------------------------------------------------
-		"Ability1"					"proudmoore_divine_shield"	// Ability 1.
-		"Ability2"					"endurance_aura"			// Ability 2.
-		"Ability4"					""
-		"Ability5"					""						// Ability 6 - Extra.
-		"Ability6"					"dummy_passive_invulnerable_bis"						// Ability 7 - Extra.
-
-		// Attack
-		//----------------------------------------------------------------
-		"AttackDamageMin"			"5995"		// Damage range min.
-		"AttackDamageMax"			"6005"		// Damage range max.
-		"AttackRange"				"600"		// Range within a target can be attacked.
-
-		// Armor
-		//----------------------------------------------------------------
-		"ArmorPhysical"				"200"			// Physical protection.
-		"MagicalResistance"			"25"			// Magical protection (percentage).
-
-		// Movement
-		//----------------------------------------------------------------
-		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"
-		"MovementSpeed"				"360"
-		"MovementTurnRate"			"0.5"
-
-		// Bounds
-		//----------------------------------------------------------------
-		"BoundsHullName"			"DOTA_HULL_SIZE_HERO"			// Hull type used for navigation/locomotion.
-		"RingRadius"				"160"
-
-		// Status
-		//----------------------------------------------------------------
-		"StatusHealth"				"100000"		// Base health.
-		
-		// Vision
-		//----------------------------------------------------------------
-		"VisionDaytimeRange"		"1400"		// Range of vision during day light.
-		"VisionNighttimeRange"		"1400"		// Range of vision at night time.
-
-		"Creature"
-		{
-			"EquippedItems"
-			{
-				"KeyOf3Moons"
-				{
-					"Item"					""
-				}
-			}
-
-			"AttachWearables"
-			{
-				"Wearable1" { "ItemDef" "7983" }	//Mask - Armature of the Belligerent Ram
-				"Wearable2" { "ItemDef" "7980" }	//Sword
-				"Wearable3" { "ItemDef" "7985" }	//Belt
-				"Wearable4" { "ItemDef" "7984" }	//Gauntlet
-				"Wearable5" { "ItemDef" "7982" }	//Shoulder
-				"Wearable6" { "ItemDef" "7981" }	//Back
-			}
-		}
-	}
-
-	//=================================================================================
 	// Special Event: Baristol
 	//=================================================================================
 	"npc_baristol"
@@ -12215,14 +12141,14 @@
 
 		// Armor
 		//----------------------------------------------------------------
-		"ArmorPhysical"				"150"			// Physical protection.
+		"ArmorPhysical"				"125"			// Physical protection.
 		"MagicalResistance"			"25"			// Magical protection (percentage).
 
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
-		"AttackDamageMin"			"4990"		// Damage range min.
-		"AttackDamageMax"			"5010"		// Damage range max.
+		"AttackDamageMin"			"3990"		// Damage range min.
+		"AttackDamageMax"			"4010"		// Damage range max.
 		"AttackDamageType"			"DAMAGE_TYPE_ArmorPhysical"
 		"AttackRate"				"0.125"			// Speed of attack.
 		"AttackAnimationPoint"		"0.6"		// Normalized time in animation cycle to attack.
@@ -12251,7 +12177,7 @@
 
 		// Status
 		//----------------------------------------------------------------
-		"StatusHealth"				"60000"		// Base health.
+		"StatusHealth"				"50000"		// Base health.
 		"StatusHealthRegen"			"10.0"		// Health regeneration rate.
 		"StatusMana"				"5.0"		// Base mana.
 		"StatusManaRegen"			"0.0"		// Mana regeneration rate.
@@ -12273,80 +12199,6 @@
 		// Inventory
 		//----------------------------------------------------------------
 		"HasInventory"				"1"
-
-		"Creature"
-		{
-			"EquippedItems"
-			{
-				"KeyOf3Moons"
-				{
-					"Item"					""
-				}
-			}
-
-			"AttachWearables"
-			{
-				"Wearable1" { "ItemDef" "6082" }	//Mask - Iron Drakken Set
-				"Wearable2" { "ItemDef" "6080" }	//Sword
-				"Wearable3" { "ItemDef" "6077" }	//Belt
-				"Wearable4" { "ItemDef" "6081" }	//Gauntlet
-				"Wearable5" { "ItemDef" "6074" }	//Shoulder
-				"Wearable6" { "ItemDef" "581" }		//Back
-			}
-		}
-	}
-
-	//=================================================================================
-	// Special Event: Baristol Dummy
-	//=================================================================================
-	"npc_baristol_bis"
-	{
-		// General
-		//----------------------------------------------------------------
-		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
-		"Model"						"models/heroes/sven/sven.vmdl"	// Model.
-		"ModelScale"				"1.65"
-		"ConsideredHero"			"1"
-		"HasInventory"				"1"
-
-		// Abilities
-		//----------------------------------------------------------------
-		"Ability1"					"arthas_holy_light"		// Ability 1
-		"Ability2"					"demonhunter_vampiric_aura"		// Ability 2
-		"Ability3"					""		// Ability 3
-		"Ability4"					""		// Ability 6 - Extra.
-		"Ability5"					"dummy_passive_invulnerable_bis"
-
-		// Attack
-		//----------------------------------------------------------------
-		"AttackDamageMin"			"9995"		// Damage range min.
-		"AttackDamageMax"			"10005"		// Damage range max.
-		"AttackRange"				"600"		// Range within a target can be attacked.
-
-		// Armor
-		//----------------------------------------------------------------
-		"ArmorPhysical"				"150"			// Physical protection.
-		"MagicalResistance"			"25"			// Magical protection (percentage).
-
-		// Movement
-		//----------------------------------------------------------------
-		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"
-		"MovementSpeed"				"360"
-		"MovementTurnRate"			"0.5"
-
-		// Bounds
-		//----------------------------------------------------------------
-		"BoundsHullName"			"DOTA_HULL_SIZE_HERO"			// Hull type used for navigation/locomotion.
-		"RingRadius"				"160"
-
-		// Status
-		//----------------------------------------------------------------
-		"StatusHealth"				"60000"		// Base health.
-		
-		// Vision
-		//----------------------------------------------------------------
-		"VisionDaytimeRange"		"1400"		// Range of vision during day light.
-		"VisionNighttimeRange"		"1400"		// Range of vision at night time.
 
 		"Creature"
 		{

@@ -553,10 +553,12 @@ local player = PlayerResource:GetPlayer(userID)
 						end
 						if str == "-kill_"..Frozen +1 then
 							local hero = PlayerResource:GetPlayer(Frozen):GetAssignedHero()
-							hero:ForceKill(true)
-							Notifications:TopToAll({text="[ADMIN MOD]: ", duration=6.0, style={color="red", ["font-size"]="30px"}})
-							Notifications:TopToAll({text=PlayerNames[Frozen +1].." ", style={color=PlayerNames[Frozen +1], ["font-size"]="25px"}, continue=true})
-							Notifications:TopToAll({text="player has been slayed!", style={color="white", ["font-size"]="25px"}, continue=true})
+							if hero:IsAlive() then
+								hero:ForceKill(true)
+								Notifications:TopToAll({text="[ADMIN MOD]: ", duration=6.0, style={color="red", ["font-size"]="30px"}})
+								Notifications:TopToAll({text=PlayerNames[Frozen +1].." ", style={color=PlayerNames[Frozen +1], ["font-size"]="25px"}, continue=true})
+								Notifications:TopToAll({text="player has been slayed!", style={color="white", ["font-size"]="25px"}, continue=true})
+							end
 						end
 						if str == "-revive_"..Frozen +1 then
 							local hero = PlayerResource:GetPlayer(Frozen):GetAssignedHero()
@@ -1041,61 +1043,100 @@ if killedUnit:FindModifierByName("modifier_breakable_container") then return end
 			end
 			Corpses:CreateFromUnit(killedUnit)
 		return
-		elseif killedUnit:IsTower() then
-			if killedUnit:GetUnitName() == "xhs_tower_lane_1" then
-				for j = 1, difficulty do
-					local unit = CreateUnitByName("xhs_death_revenant", killedUnit:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
-				end
-				CREEP_LANES[lane][2] = CREEP_LANES[lane][2] + 1
-				Notifications:TopToAll({text="Creep lane "..lane.." is now level "..CREEP_LANES[lane][2].."!", duration=5.0, style={color="lightgreen"}})
-			elseif killedUnit:GetUnitName() == "xhs_tower_lane_2" then
-				for j = 1, difficulty do
-					local unit = CreateUnitByName("xhs_death_revenant_2", killedUnit:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
-				end
-				CREEP_LANES[lane][2] = CREEP_LANES[lane][2] + 1
-				Notifications:TopToAll({text="Creep lane "..lane.." is now level "..CREEP_LANES[lane][2].."!", duration=5.0, style={color="lightgreen"}})
-			elseif killedUnit:GetUnitName() == "npc_tower_death" then
-
-			elseif killedUnit:GetUnitName() == "npc_tower_cold" then
-				FrostTowers_killed = FrostTowers_killed +1
-				if FrostTowers_killed >= 2 then
-					Notifications:TopToAll({text="WARNING! Final Wave incoming. Arriving in 60 seconds! Back to the Castle!" , duration=10.0})
-					nTimer_SpecialEvent = 60
-					nTimer_IncomingWave = 1
-					PHASE_3 = 1
-					PauseCreeps()
-					Timers:CreateTimer(59, RefreshPlayers)
-					Timers:CreateTimer(60, FinalWave)
-				end
-			end
-		return
-		elseif killedUnit:IsBarracks() then
-			for j = 1, difficulty do
-				local unit = CreateUnitByName("npc_magnataur_destroyer_crypt", killedUnit:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
-			end
-
-			for c = 1, 8 do
-				if killedUnit:GetName() == "dota_badguys_barracks_"..c then
-					CREEP_LANES[c][1] = 0
-					CREEP_LANES[c][3] = 0
-					if hero:IsIllusion() then
-						CREEP_LANES[c][1] = 0
-						CREEP_LANES[c][3] = 0
+		elseif killedUnit:IsBuilding() then
+			if killedUnit:GetTeamNumber() == 3 then
+				if hero:IsIllusion() then
+					hero = PlayerResource:GetPlayer(hero:GetPlayerID()):GetAssignedHero()
+					hero:IncrementKills(1)
+					for _, Zone in pairs(self.Zones) do
+						if Zone:ContainsUnit(hero) then
+							Zone:AddStat(hero:GetPlayerID(), ZONE_STAT_KILLS, 1)
+						end
+					end
+				elseif IsValidEntity(hero:GetPlayerOwner()) then
+					if not hero:IsRealHero() then
+						if hero:GetPlayerOwner() then
+							hero = hero:GetPlayerOwner():GetAssignedHero()
+							hero:IncrementKills(1)
+						end
+						for _, Zone in pairs(self.Zones) do
+							if Zone:ContainsUnit(hero) then
+								Zone:AddStat(hero:GetPlayerID(), ZONE_STAT_KILLS, 1)
+							end
+						end
+					--plays a particle and add a kill when a hero kills an enemy unit
+					elseif hero:IsRealHero() then
+						EmitSoundOnClient("Dungeon.LastHit", hero:GetPlayerOwner())
+						ParticleManager:ReleaseParticleIndex(ParticleManager:CreateParticleForPlayer("particles/darkmoon_last_hit_effect.vpcf", PATTACH_ABSORIGIN_FOLLOW, killedUnit, hero:GetPlayerOwner()))
+						if PlayerResource:HasSelectedHero(hero:GetPlayerOwnerID()) then
+							hero:IncrementKills(1)
+						end
+						for _, Zone in pairs(self.Zones) do
+							if Zone:ContainsUnit(hero) then
+								Zone:AddStat(hero:GetPlayerID(), ZONE_STAT_KILLS, 1)
+							end
+						end
 					end
 				end
 			end
+			
+			if killedUnit:IsTower() then
+				if killedUnit:GetUnitName() == "xhs_tower_lane_1" then
+					for j = 1, difficulty do
+						local unit = CreateUnitByName("xhs_death_revenant", killedUnit:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
+					end
+					CREEP_LANES[lane][2] = CREEP_LANES[lane][2] + 1
+					Notifications:TopToAll({text="Creep lane "..lane.." is now level "..CREEP_LANES[lane][2].."!", duration=5.0, style={color="lightgreen"}})
+				elseif killedUnit:GetUnitName() == "xhs_tower_lane_2" then
+					for j = 1, difficulty do
+						local unit = CreateUnitByName("xhs_death_revenant_2", killedUnit:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
+					end
+					CREEP_LANES[lane][2] = CREEP_LANES[lane][2] + 1
+					Notifications:TopToAll({text="Creep lane "..lane.." is now level "..CREEP_LANES[lane][2].."!", duration=5.0, style={color="lightgreen"}})
+				elseif killedUnit:GetUnitName() == "npc_tower_death" then
 
-			if first_rax == true then
-				first_rax = false
-				Entities:FindByName(nil, "trigger_phase2_left"):Enable()
-				Entities:FindByName(nil, "trigger_phase2_right"):Enable()
-				local DoorObs = Entities:FindAllByName("obstruction_phase2")
-				for _, obs in pairs(DoorObs) do 
-					obs:SetEnabled(false, true)
+				elseif killedUnit:GetUnitName() == "npc_tower_cold" then
+					FrostTowers_killed = FrostTowers_killed +1
+					if FrostTowers_killed >= 2 then
+						Notifications:TopToAll({text="WARNING! Final Wave incoming. Arriving in 60 seconds! Back to the Castle!" , duration=10.0})
+						nTimer_SpecialEvent = 60
+						nTimer_IncomingWave = 1
+						PHASE_3 = 1
+						PauseCreeps()
+						Timers:CreateTimer(59, RefreshPlayers)
+						Timers:CreateTimer(60, FinalWave)
+					end
 				end
-				DoEntFire("door_phase2_left", "SetAnimation", "gate_entrance002_open", 0, nil, nil)
-				DoEntFire("door_phase2_right", "SetAnimation", "gate_entrance002_open", 0, nil, nil)
-				Notifications:TopToAll({text = "Phase 2 creeps can now be triggered!", duration = 11.0, style={color="lightgreen"}})
+			return
+			elseif killedUnit:IsBarracks() then
+				for j = 1, difficulty do
+					local unit = CreateUnitByName("npc_magnataur_destroyer_crypt", killedUnit:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
+				end
+
+				for c = 1, 8 do
+					if killedUnit:GetName() == "dota_badguys_barracks_"..c then
+						CREEP_LANES[c][1] = 0
+						CREEP_LANES[c][3] = 0
+						if hero:IsIllusion() then
+							CREEP_LANES[c][1] = 0
+							CREEP_LANES[c][3] = 0
+						end
+					end
+				end
+
+				if first_rax == true then
+					first_rax = false
+					Entities:FindByName(nil, "trigger_phase2_left"):Enable()
+					Entities:FindByName(nil, "trigger_phase2_right"):Enable()
+					local DoorObs = Entities:FindAllByName("obstruction_phase2")
+					for _, obs in pairs(DoorObs) do 
+						obs:SetEnabled(false, true)
+					end
+					DoEntFire("door_phase2_left", "SetAnimation", "gate_entrance002_open", 0, nil, nil)
+					DoEntFire("door_phase2_right", "SetAnimation", "gate_entrance002_open", 0, nil, nil)
+					Notifications:TopToAll({text = "Phase 2 creeps can now be triggered!", duration = 11.0, style={color="lightgreen"}})
+				end
+			return
 			end
 		return
 		end

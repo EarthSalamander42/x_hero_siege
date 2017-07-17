@@ -2147,6 +2147,8 @@
 		"ItemDisassembleRule"		"DOTA_ITEM_DISASSEMBLE_ALWAYS"
 		"AbilityCastAnimation"		"ACT_DOTA_DISABLED"
 		"AbilityCastPoint"			"0.15"
+		"ItemDeclarations"			"DECLARE_PURCHASES_TO_TEAMMATES | DECLARE_PURCHASES_TO_SPECTATORS"
+
 
 		"AbilitySpecial"
 		{

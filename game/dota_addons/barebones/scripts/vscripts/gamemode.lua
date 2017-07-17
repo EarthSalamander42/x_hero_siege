@@ -352,12 +352,6 @@ local heroes = HeroList:GetAllHeroes()
 			end
 			return 30
 		end)
-
-		Timers:CreateTimer(839, function() -- 839, 12 Min + 2 Min with Muradin Event = 14 Min
-			Notifications:TopToAll({text="Special Events are unlocked!", style={color="DodgerBlue"}, continue=true})
-			Entities:FindByName(nil, "trigger_special_event_tp_off"):Disable()
-			Entities:FindByName(nil, "trigger_special_event"):Enable()
-		end)
 	end
 end
 
@@ -414,11 +408,16 @@ local Region = {
 				local Check = 0
 				Notifications:TopToAll({text="All heroes who survived Muradin received 15 000 Gold!", duration=5.0})
 				Notifications:TopToAll({ability="alchemist_goblins_greed", continue = true})
+				Notifications:TopToAll({text="Special Events are unlocked!", style={color="DodgerBlue"}, duration=5.0})
+				Entities:FindByName(nil, "trigger_special_event_tp_off"):Disable()
+				Entities:FindByName(nil, "trigger_special_event"):Enable()
 				Timers:CreateTimer(0.0, function()
 					if Check < 5 then
 						local MuradinCheck = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, Entities:FindByName(nil, "npc_dota_muradin_boss"):GetAbsOrigin(), nil, 2000, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false)
 						for _, hero in pairs(MuradinCheck) do
-							if hero:IsRealHero() then
+							if hero:IsIllusion() then
+								print("Illusion found, ignoring it")
+							elseif hero:IsRealHero() then
 								FindClearSpaceForUnit(hero, Entities:FindByName(nil, "base_spawn"):GetAbsOrigin(), true)
 								PlayerResource:ModifyGold(hero:GetPlayerOwnerID(), 15000, false,  DOTA_ModifyGold_Unspecified)
 							end

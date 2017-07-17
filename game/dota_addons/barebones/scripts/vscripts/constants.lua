@@ -231,7 +231,8 @@ _G.vip_members = {
 	87395017,	-- Fuzzy [Farzad Havaldar on Patreon]
 	432606463,	-- Thich An Cu [Harold Tang on Patreon]
 	53939628,	-- Bloodsplatr [taylor justus on Patreon]
-	52986304	-- RawkitLawnChair [CDarps on Patreon]
+	52986304,	-- RawkitLawnChair [CDarps on Patreon]
+	5671643		-- `btk [Aureo Neto on Patreon]
 }
 
 _G.banned_players = {

@@ -50,12 +50,15 @@ function SpawnHeroesBis()
 	vip_hero:AddAbility("dummy_passive_vulnerable")
 	vip_hero:FindAbilityByName("dummy_passive_vulnerable"):SetLevel(1)
 
-	RAMERO_DUMMY = CreateUnitByName("npc_ramero_bis", Entities:FindByName(nil, "point_special_arena_1"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
+	RAMERO_DUMMY = CreateUnitByName("npc_ramero", Entities:FindByName(nil, "point_special_arena_1"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
 	RAMERO_DUMMY:SetAngles(0, 270, 0)
-	BARISTOL_DUMMY = CreateUnitByName("npc_baristol_bis", Entities:FindByName(nil, "point_special_arena_2"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
+	RAMERO_DUMMY:AddNewModifier(nil, nil, "modifier_invulnerable", {})
+	BARISTOL_DUMMY = CreateUnitByName("npc_baristol", Entities:FindByName(nil, "point_special_arena_2"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
 	BARISTOL_DUMMY:SetAngles(0, 270, 0)
-	RAMERO_BIS_DUMMY = CreateUnitByName("npc_ramero_bis", Entities:FindByName(nil, "point_special_arena_3"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
+	BARISTOL_DUMMY:AddNewModifier(nil, nil, "modifier_invulnerable", {})
+	RAMERO_BIS_DUMMY = CreateUnitByName("npc_ramero", Entities:FindByName(nil, "point_special_arena_3"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
 	RAMERO_BIS_DUMMY:SetAngles(0, 270, 0)
+	RAMERO_BIS_DUMMY:AddNewModifier(nil, nil, "modifier_invulnerable", {})
 
 	-- Special Events
 	lich_king = CreateUnitByName("npc_dota_boss_lich_king_bis", Entities:FindByName(nil, "npc_dota_spawner_lich_king"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
