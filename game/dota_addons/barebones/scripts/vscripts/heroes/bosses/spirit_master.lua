@@ -6,9 +6,9 @@ local level = ability:GetLevel()
 local forwardV = caster:GetForwardVector()
 local origin = caster:GetAbsOrigin()
 
-	local Storm = CreateUnitByName("npc_dota_boss_spirit_master_storm", origin, true, nil, nil, DOTA_TEAM_BADGUYS)
-	local Earth = CreateUnitByName("npc_dota_boss_spirit_master_earth", origin, true, nil, nil, DOTA_TEAM_BADGUYS)
-	local Fire = CreateUnitByName("npc_dota_boss_spirit_master_fire", origin, true, nil, nil, DOTA_TEAM_BADGUYS)
+	local Storm = CreateUnitByName("npc_dota_boss_spirit_master_storm", origin, true, nil, nil, DOTA_TEAM_CUSTOM_1)
+	local Earth = CreateUnitByName("npc_dota_boss_spirit_master_earth", origin, true, nil, nil, DOTA_TEAM_CUSTOM_1)
+	local Fire = CreateUnitByName("npc_dota_boss_spirit_master_fire", origin, true, nil, nil, DOTA_TEAM_CUSTOM_1)
 
 	BossBar(Storm, "storm_spirit")
 	Timers:CreateTimer(1.0, function()

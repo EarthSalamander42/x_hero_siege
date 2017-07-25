@@ -11,16 +11,7 @@ local caster = keys.caster
 				ParticleManager:SetParticleControl(vip_effect2, 0, caster:GetAbsOrigin())
 				ParticleManager:SetParticleControl(vip_effect2, 1, caster:GetAbsOrigin())
 			end
-			if PlayerResource:GetSteamAccountID(caster:GetPlayerID()) == mod_graphist[i] then
-				local vip_effect = ParticleManager:CreateParticle("particles/status_fx/status_effect_holdout_borrowed_time.vpcf", PATTACH_ABSORIGIN_FOLLOW, caster)
-				ParticleManager:SetParticleControl(vip_effect, 0, caster:GetAbsOrigin())
-				ParticleManager:SetParticleControl(vip_effect, 1, caster:GetAbsOrigin())
-
-				local vip_effect2 = ParticleManager:CreateParticle("particles/units/heroes/hero_abaddon/holdout_borrowed_time.vpcf", PATTACH_ABSORIGIN_FOLLOW, caster)
-				ParticleManager:SetParticleControl(vip_effect2, 0, caster:GetAbsOrigin())
-				ParticleManager:SetParticleControl(vip_effect2, 1, caster:GetAbsOrigin())
-			end
-			if PlayerResource:GetSteamAccountID(caster:GetPlayerID()) == captain_baumi[i] then
+			if PlayerResource:GetSteamAccountID(caster:GetPlayerID()) == mod_graphist[i] or PlayerResource:GetSteamAccountID(caster:GetPlayerID()) == captain_baumi[i] or PlayerResource:GetSteamAccountID(caster:GetPlayerID()) == administrator[i] or PlayerResource:GetSteamAccountID(caster:GetPlayerID()) == moderator[i] then
 				local vip_effect = ParticleManager:CreateParticle("particles/status_fx/status_effect_holdout_borrowed_time.vpcf", PATTACH_ABSORIGIN_FOLLOW, caster)
 				ParticleManager:SetParticleControl(vip_effect, 0, caster:GetAbsOrigin())
 				ParticleManager:SetParticleControl(vip_effect, 1, caster:GetAbsOrigin())
@@ -64,22 +55,6 @@ local IsAvailableHero = Entities:FindByName(nil, "trigger_hero_"..random)
 		local particle = ParticleManager:CreateParticle("particles/econ/events/ti6/hero_levelup_ti6.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
 		ParticleManager:SetParticleControl(particle, 0, hero:GetAbsOrigin())
 		EmitSoundOnClient("ui.trophy_levelup", PlayerResource:GetPlayer(id))
-		local scroll = CreateItem("item_tpscroll", hero, hero)
-		scroll:SetPurchaseTime(0)
-		scroll:SetCurrentCharges(1)
-		scroll:SetPurchaser(hero)
-		hero:AddItem(scroll)
-		for i = 0, DOTA_ITEM_MAX - 1 do
-			local item = hero:GetItemInSlot(i)
-			if item and item:GetAbilityName() == "item_tpscroll" then
-				ExecuteOrderFromTable({
-					UnitIndex = hero:entindex(),
-					OrderType = DOTA_UNIT_ORDER_CAST_POSITION,
-					AbilityIndex = item:entindex(),
-					Position = point:GetAbsOrigin(),
-				})
-			end
-		end
 		hero:AddNewModifier(hero, nil, "modifier_command_restricted", {})
 --		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
 		Notifications:Bottom(hero:GetPlayerOwnerID(), {hero="npc_dota_hero_"..HEROLIST[random], duration = 5.0})
@@ -87,6 +62,7 @@ local IsAvailableHero = Entities:FindByName(nil, "trigger_hero_"..random)
 		Notifications:Bottom(hero:GetPlayerOwnerID(), {text="#npc_dota_hero_"..HEROLIST[random], duration = 5.0, style={color="white"}, continue=true})
 		Timers:CreateTimer(3.1, function()
 			local newHero = PlayerResource:ReplaceHeroWith(hero:GetPlayerID(), "npc_dota_hero_"..HEROLIST[random], STARTING_GOLD * 2, 0)
+			newHero:RespawnHero(false, false, false)
 			if difficulty < 4 then
 				local item = newHero:AddItemByName("item_ankh_of_reincarnation")
 			end

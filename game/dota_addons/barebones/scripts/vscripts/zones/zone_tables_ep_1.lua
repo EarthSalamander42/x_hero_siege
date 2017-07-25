@@ -81,7 +81,7 @@ _G.ZonesDefinition =
 					Type = QUEST_EVENT_ON_ENEMY_KILLED,
 					szNPCName ="npc_tower_cold",
 				},
-				nCompleteLimit = 2,
+				nCompleteLimit = ICE_TOWERS_REQUIRED,
 			},
 			{
 				szQuestName = "kill_final_wave",
@@ -100,17 +100,6 @@ _G.ZonesDefinition =
 				},
 				nCompleteLimit = 52,
 			},
-		},
-	},
-
-	{
-		szName = "xhs_bosses",
-		nZoneID = 1,
-		Type = ZONE_TYPE_EXPLORE,
---		szTeleportEntityName = "forest_holdout_zone_darkforest_death_maze",
---		bNoLeaderboard = true,
-		Quests = 
-		{
 			{
 				szQuestName = "kill_mag",
 				szQuestType = "Kill",
@@ -193,6 +182,57 @@ _G.ZonesDefinition =
 				{	
 					Type = QUEST_EVENT_ON_ENEMY_KILLED,
 					szNPCName ="npc_dota_hero_proudmoore",
+				},
+				nCompleteLimit = 1,
+			},
+			{
+				szQuestName = "kill_arthas",
+				szQuestType = "Kill",
+				Activators = 
+				{
+					{
+						Type = QUEST_EVENT_ON_QUEST_COMPLETE,
+						szQuestName = "kill_proudmoore",
+					},			
+				},
+				Completion = 
+				{	
+					Type = QUEST_EVENT_ON_ENEMY_KILLED,
+					szNPCName ="npc_dota_hero_arthas",
+				},
+				nCompleteLimit = 1,
+			},
+			{
+				szQuestName = "kill_banehallow",
+				szQuestType = "Kill",
+				Activators = 
+				{
+					{
+						Type = QUEST_EVENT_ON_QUEST_COMPLETE,
+						szQuestName = "kill_arthas",
+					},			
+				},
+				Completion = 
+				{	
+					Type = QUEST_EVENT_ON_ENEMY_KILLED,
+					szNPCName ="npc_dota_hero_banehallow",
+				},
+				nCompleteLimit = 1,
+			},
+			{
+				szQuestName = "kill_lich_king",
+				szQuestType = "Kill",
+				Activators = 
+				{
+					{
+						Type = QUEST_EVENT_ON_QUEST_COMPLETE,
+						szQuestName = "kill_banehallow",
+					},			
+				},
+				Completion = 
+				{	
+					Type = QUEST_EVENT_ON_ENEMY_KILLED,
+					szNPCName ="npc_dota_boss_lich_king",
 				},
 				nCompleteLimit = 1,
 			},

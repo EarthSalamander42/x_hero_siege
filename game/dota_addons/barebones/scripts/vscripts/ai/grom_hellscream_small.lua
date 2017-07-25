@@ -74,7 +74,7 @@ function BehaviorBladeFury:Evaluate()
 	-- let's not choose this twice in a row
 	if AICore.currentBehavior == self then return desire end
 
-	local enemies = FindUnitsInRadius( DOTA_TEAM_BADGUYS, thisEntity:GetOrigin(), nil, 600, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_ALL, 0, 0, false )
+	local enemies = FindUnitsInRadius( thisEntity:GetTeam(), thisEntity:GetOrigin(), nil, 600, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_ALL, 0, 0, false )
 	if #enemies > 0 then
 		if ABILITY_bladefury and ABILITY_bladefury:IsFullyCastable() then
 			thisEntity:Stop()
@@ -117,7 +117,7 @@ function BehaviorRunAway:Evaluate()
 	-- let's not choose this twice in a row
 	if currentBehavior == self then return desire end
 	
-	local enemies = FindUnitsInRadius( DOTA_TEAM_BADGUYS, thisEntity:GetOrigin(), nil, 700, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO, 0, 0, false )
+	local enemies = FindUnitsInRadius( thisEntity:GetTeam(), thisEntity:GetOrigin(), nil, 700, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO, 0, 0, false )
 	if #enemies > 0 then
 		desire = #enemies
 	end 

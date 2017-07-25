@@ -56,7 +56,9 @@ local cleave_pct = cleave * full_damage / 100
 	local splash_targets = FindUnitsInRadius(DOTA_TEAM_BADGUYS, target:GetAbsOrigin(), nil, radius, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, FIND_ANY_ORDER, false)
 	local splash_targets2 = FindUnitsInRadius(DOTA_TEAM_NEUTRALS, target:GetAbsOrigin(), nil, radius, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, FIND_ANY_ORDER, false)
 	local splash_targets3 = FindUnitsInRadius(DOTA_TEAM_CUSTOM_1, target:GetAbsOrigin(), nil, radius, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, FIND_ANY_ORDER, false)
-	if attacker:GetTeamNumber() == 2 then
+	local splash_targets4 = FindUnitsInRadius(DOTA_TEAM_CUSTOM_2, target:GetAbsOrigin(), nil, radius, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, FIND_ANY_ORDER, false)
+	local splash_targets5 = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, target:GetAbsOrigin(), nil, radius, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, FIND_ANY_ORDER, false)
+	if attacker:GetTeamNumber() == 2 or attacker:GetTeamNumber() == 3 then
 		for _, unit in pairs(splash_targets) do
 			if unit ~= target and not unit:IsBuilding() then
 				ApplyDamage({victim = unit, attacker = attacker, damage = cleave_pct, ability = ability, damage_type = DAMAGE_TYPE_PHYSICAL})
@@ -68,6 +70,16 @@ local cleave_pct = cleave * full_damage / 100
 			end
 		end
 		for _, unit in pairs(splash_targets3) do
+			if unit ~= target and not unit:IsBuilding() then
+				ApplyDamage({victim = unit, attacker = attacker, damage = cleave_pct, ability = ability, damage_type = DAMAGE_TYPE_PHYSICAL})
+			end
+		end
+		for _, unit in pairs(splash_targets4) do
+			if unit ~= target and not unit:IsBuilding() then
+				ApplyDamage({victim = unit, attacker = attacker, damage = cleave_pct, ability = ability, damage_type = DAMAGE_TYPE_PHYSICAL})
+			end
+		end
+		for _, unit in pairs(splash_targets5) do
 			if unit ~= target and not unit:IsBuilding() then
 				ApplyDamage({victim = unit, attacker = attacker, damage = cleave_pct, ability = ability, damage_type = DAMAGE_TYPE_PHYSICAL})
 			end
@@ -107,6 +119,7 @@ function Bash(event)
 local caster = event.caster
 local target = event.target
 local ability = event.ability
+if hero:IsIllusion() then return end
 
 	if ability:IsCooldownReady() then
 		ability:StartCooldown(10.0)
@@ -116,6 +129,7 @@ end
 -- Key of the 3 Moons
 function KeyUnequip(keys)
 local hero = keys.caster
+if hero:IsIllusion() then return end
 
 	hero.has_epic_1 = false
 end
@@ -123,6 +137,7 @@ end
 -- Shield of Invincibility
 function ShieldUnequip(keys)
 local hero = keys.caster
+if hero:IsIllusion() then return end
 
 	hero.has_epic_2 = false
 end
@@ -130,6 +145,7 @@ end
 -- Lightning Sword
 function SwordUnequip(keys)
 local hero = keys.caster
+if hero:IsIllusion() then return end
 
 	hero.has_epic_3 = false
 end
@@ -137,6 +153,7 @@ end
 -- Ring of Superiority
 function RingUnequip(keys)
 local hero = keys.caster
+if hero:IsIllusion() then return end
 
 	hero.has_epic_4 = false
 end
@@ -155,14 +172,14 @@ local ability = keys.ability
 		Timers:CreateTimer(respawntime,respawnMagtheridon)
 
 		for i = 1, 8 do
-			CreateUnitByName("npc_dota_hero_magtheridon_medium", point, true, nil, nil, DOTA_TEAM_BADGUYS)
+			CreateUnitByName("npc_dota_hero_magtheridon_medium", point, true, nil, nil, DOTA_TEAM_CUSTOM_2)
 		end
 	end
 end
 
 function respawnMagtheridon()
 
-	local magtheridon = CreateUnitByName("npc_dota_hero_magtheridon", point, true, nil, nil, DOTA_TEAM_BADGUYS)
+	local magtheridon = CreateUnitByName("npc_dota_hero_magtheridon", point, true, nil, nil, DOTA_TEAM_CUSTOM_2)
 	local ankh = CreateItem("item_magtheridon_ankh", mag, mag)
 
 	if itemCharges -1 ~= 0 then
@@ -178,6 +195,6 @@ function respawnMagtheridonMedium(keys)
 local caster = keys.caster
 
 	for i = 1, 2 do
-		CreateUnitByName("npc_dota_hero_magtheridon_small", caster:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
+		CreateUnitByName("npc_dota_hero_magtheridon_small", caster:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 	end
 end

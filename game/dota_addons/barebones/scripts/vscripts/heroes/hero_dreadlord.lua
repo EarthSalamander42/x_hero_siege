@@ -6,10 +6,13 @@ local caster_point_temp = Vector(caster_point.x, caster_point.y, 0)
 local target_point_temp = Vector(target_point.x, target_point.y, 0)
 local point_difference_normalized = (target_point_temp - caster_point_temp):Normalized()
 local velocity_per_second = point_difference_normalized * keys.TravelSpeed
-	
+
+	if caster:GetUnitName() == "npc_dota_hero_earth_spirit" then
+		StartAnimation(caster, {duration = 1.0, activity = ACT_DOTA_CAST_ABILITY_5, rate = 1.0})
+		print("Cast Animation")
+	end
 	caster:EmitSound("Hero_Invoker.ChaosMeteor.Cast")
 	caster:EmitSound("Hero_Invoker.ChaosMeteor.Loop")
-
 	local meteor_fly_original_point = (target_point - (velocity_per_second * keys.LandTime)) + Vector (0, 0, 1000)  --Start the meteor in the air in a place where it'll be moving the same speed when flying and when rolling.
 	local chaos_meteor_fly_particle_effect = ParticleManager:CreateParticle("particles/units/heroes/hero_dreadlord/chaos_2_fly.vpcf", PATTACH_ABSORIGIN, caster)
 	ParticleManager:SetParticleControl(chaos_meteor_fly_particle_effect, 0, meteor_fly_original_point)
@@ -19,7 +22,7 @@ local velocity_per_second = point_difference_normalized * keys.TravelSpeed
 	local exort_ability = caster:FindAbilityByName("holdout_chaos")
 	local main_damage = 0
 	local burn_dps = 0
-	if exort_ability ~= nil then
+	if exort_ability then
 		local exort_level = exort_ability:GetLevel()
 		main_damage = keys.ability:GetLevelSpecialValueFor("main_damage", exort_level - 1)
 		burn_dps = keys.ability:GetLevelSpecialValueFor("burn_dps", exort_level - 1)

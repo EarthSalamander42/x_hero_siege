@@ -50,20 +50,6 @@
 }
 
 .ZoneSelected_xhs_holdout .ScoreboardHeaderContainer { background-image: url("s2r://panorama/images/interface/zoneheader_02_psd.vtex"); }
-.ZoneSelected_xhs_bosses .ScoreboardHeaderContainer { background-image: url("s2r://panorama/images/interface/zoneheader_03_psd.vtex"); }
-
-.ZoneSelected_forest .ScoreboardHeaderContainer { background-image: url("s2r://panorama/images/interface/zoneheader_01_psd.vtex"); }
-.ZoneSelected_forest_holdout .ScoreboardHeaderContainer { background-image: url("s2r://panorama/images/interface/zoneheader_02_psd.vtex"); }
-.ZoneSelected_darkforest_rescue .ScoreboardHeaderContainer { background-image: url("s2r://panorama/images/interface/zoneheader_03_psd.vtex"); }
-.ZoneSelected_darkforest_death_maze .ScoreboardHeaderContainer { background-image: url("s2r://panorama/images/interface/zoneheader_04_psd.vtex"); }
-.ZoneSelected_darkforest_pass .ScoreboardHeaderContainer { background-image: url("s2r://panorama/images/interface/zoneheader_05_psd.vtex"); }
-.ZoneSelected_underground_temple .ScoreboardHeaderContainer { background-image: url("s2r://panorama/images/interface/zoneheader_06_psd.vtex"); }
-.ZoneSelected_desert_start .ScoreboardHeaderContainer { background-image: url("s2r://panorama/images/interface/zoneheader_07_psd.vtex"); }
-.ZoneSelected_desert_town .ScoreboardHeaderContainer { background-image: url("s2r://panorama/images/interface/zoneheader_08_psd.vtex"); }
-.ZoneSelected_desert_expanse .ScoreboardHeaderContainer { background-image: url("s2r://panorama/images/interface/zoneheader_09_psd.vtex"); }
-.ZoneSelected_desert_chasm .ScoreboardHeaderContainer { background-image: url("s2r://panorama/images/interface/zoneheader_10_psd.vtex"); }
-.ZoneSelected_desert_fortress .ScoreboardHeaderContainer { background-image: url("s2r://panorama/images/interface/zoneheader_11_psd.vtex"); }
-
 
 .OldBest.ZoneSubtitle,
 .NewBest.ZoneSubtitle
@@ -686,10 +672,6 @@
 .ZoneSelected_xhs_holdout .Tab1Selected #Zone01_1_Desc,
 .ZoneSelected_xhs_holdout .Tab2Selected #Zone01_2_Desc,
 .ZoneSelected_xhs_holdout .Tab3Selected #Zone01_3_Desc,
-
-.ZoneSelected_xhs_bosses .Tab1Selected #Zone02_1_Desc,
-.ZoneSelected_xhs_bosses .Tab2Selected #Zone02_2_Desc,
-.ZoneSelected_xhs_bosses .Tab3Selected #Zone02_3_Desc,
 {
 	opacity: 1;
 }

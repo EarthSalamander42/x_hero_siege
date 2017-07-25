@@ -2,23 +2,6 @@
 
 GameUI.SetCameraTerrainAdjustmentEnabled( false );
 
-//	function OnPlayerEnteredZone( data )
-//	{
-//		$.Msg( "OnPlayerEnteredZone" );
-//		Game.EmitSound("Dungeon.Stinger07");
-//		$( "#ZoneToastPanel" ).SetHasClass( "Visible", true );
-//		$( "#ZoneNameLabel" ).text = $.Localize( data["ZoneName"] );
-
-//		$.Schedule( 10.0, HideZoneNotification );
-//	}
-
-//	function HideZoneNotification()
-//	{
-//		$( "#ZoneToastPanel" ).SetHasClass( "Visible", false );
-//	}
-
-//	GameEvents.Subscribe( "zone_enter", OnPlayerEnteredZone );
-
 var g_flDialogAdvanceTime = -1;
 var g_nCurrentCharacter = 0;
 var g_flCharacterAdvanceRate = 0.0075;
@@ -196,325 +179,131 @@ var g_flAdditionalCameraOffset = 0.0;
 var g_flMaxLookDistance = 1200.0;
 var g_bSentGuideDisable = false;
 var g_szLastZoneLocation = null;
-var g_ZoneList = [	"xhs_holdout",
-					"xhs_bosses" ];
+var g_ZoneList = ["xhs_holdout"];
 
-//	(function HUDThink()
-//	{	
-//		var flThink = HUD_THINK;
-//		if ( g_bInBossIntro === false )
-//		{
-//			UpdateBossHP()
-//		}
-//		else
-//		{
-//			BossHPTickUp();
-//			flThink = 0.05;
-//		}
-//	
-//	//	if ( !g_bSentToAll && $( "#FloatingDialogPanel" ).BHasClass( "Visible") )
-//	//	{
-//	//		var vAbsOrigin = Entities.GetAbsOrigin( g_nCurrentDialogEnt );
-//	//		var nX = Game.WorldToScreenX( vAbsOrigin[0], vAbsOrigin[1], vAbsOrigin[2] );
-//	//		var nY = Game.WorldToScreenY( vAbsOrigin[0], vAbsOrigin[1], vAbsOrigin[2] );
-//	//		$( "#FloatingDialogPanel" ).style.x = ( nX / $( "#FloatingDialogPanel" ).actualuiscale_x ) + 25 + "px"; 
-//	//		$( "#FloatingDialogPanel" ).style.y = ( nY / $( "#FloatingDialogPanel" ).actualuiscale_y  ) - 100 + "px";
-//	//	}
-//	
-//		var playerZoneData = CustomNetTables.GetTableValue( "player_zone_locations", Players.GetLocalPlayer().toString() );
-//		if (  typeof(playerZoneData) !== "undefined" )
-//		{
-//			var zoneName = playerZoneData["ZoneName"];
-//		 	if ( g_szLastZoneLocation !== zoneName )
-//		 	{
-//		 		if ( g_szLastZoneLocation !== null )
-//		 		{
-//		 			$( "#DungeonHUDContents" ).RemoveClass( g_szLastZoneLocation );
-//		 		}
-//		 		$.Msg("ZONE NAME: ", zoneName)
-//		 		$( "#DungeonHUDContents" ).SetHasClass( zoneName, true );
-//		 		g_szLastZoneLocation = zoneName;
-//		 	}
-//		}
-//	
-//	//	$( "#DungeonHUDContents" ).SetHasClass( "HasAbilityToSpend", Entities.GetAbilityPoints( Players.GetLocalPlayerPortraitUnit() ) > 0 );
-//	
-//		if( !g_bSentGuideDisable )
-//		{
-//			$.DispatchEvent( 'DOTAShopSetGuideVisibility', false);
-//			g_bSentGuideDisable = true;
-//		}
-//	
-//		if ( Entities.GetUnitName( Players.GetLocalPlayerPortraitUnit() ) === "npc_dota_creature_invoker" && Game.IsShopOpen() === false )
-//		{
-//			Game.SetCustomShopEntityString( "invoker_shop" );
-//			$.DispatchEvent( "DOTAHUDShopOpened", DOTA_SHOP_TYPE.DOTA_SHOP_CUSTOM, true );
-//		}
-//		
-//		$.Schedule( flThink, HUDThink );
-//	})();
-//	
-//	(function CameraThink() {
-//	    if (g_bInBossIntro === false)
-//	    {
-//	    	if ( Game.GetState() < DOTA_GameState.DOTA_GAMERULES_STATE_POST_GAME )
-//	    	{
-//	        	UpdateCameraOffset();
-//	        }
-//	    }
-//	    $.Schedule(0, CameraThink);
-//	})();
-
-//	CustomNetTables.SubscribeNetTableListener( "boss", UpdateBossHP )
-
-//	function UpdateBossHP()
-//	{
-//		var key = 0;
-//		var bossData = CustomNetTables.GetTableValue( "boss", key.toString() );
-//		if ( typeof( bossData ) != "undefined" )
-//		{
-//			var nBossHP = bossData["boss_hp"];
-//			var bShowBossHP = bossData["boss_hp"] == 0 ? false : true;
-//			$( "#BossProgressBar" ).value = nBossHP / 100;
-//			$( "#BossHP").SetHasClass( "Visible", bShowBossHP );
-//		}
-//	}
-
-function BossHPTickUp()
-{
-	if ( $( "#BossProgressBar" ).value < 1.0 )
-	{
-		$( "#BossProgressBar" ).value = $( "#BossProgressBar" ).value + 0.025;
-	}
+//-----------------------------------------------------------------------------------------
+function intToARGB(i) 
+{ 
+	return ('00' + ( i & 0xFF).toString( 16 ) ).substr( -2 ) +
+	('00' + ( ( i >> 8 ) & 0xFF ).toString( 16 ) ).substr( -2 ) +
+	('00' + ( ( i >> 16 ) & 0xFF ).toString( 16 ) ).substr( -2 ) + 
+	('00' + ( ( i >> 24 ) & 0xFF ).toString( 16 ) ).substr( -2 );
 }
 
-function OnBossIntroBegin( data )
+function OnRoundDataUpdated( table_name, key, data )
 {
-	$( "#BossProgressBar" ).value = 0;
-	$( "#BossHP").SetHasClass( data["BossName"], true );
-	$( "#BossIcon" ).SetHasClass( data["BossName"], true );
-	$( "#BossLabel" ).text = $.Localize( data["BossName"] );
-	
-	if ( g_bInBossIntro === true )
-		return;
-
-	if ( data["SkipIntro"] )
-		return;
-
-	Game.EmitSound( "Dungeon.Stinger02" );
-	Game.EmitSound( "Dungeon.BossBar" );
-
-	$( "#BossHP").SetHasClass( "Visible", true );
-
-	$( "#DialogPanel" ).SetHasClass( "Visible", data["DialogText"] != "" );
-	$( "#DialogTitle" ).text = $.Localize( Entities.GetUnitName( data["DialogEntIndex"] ) );
-	g_nCurrentDialogEnt = data["DialogEntIndex"];
-	g_nCurrentDialogLine = data["DialogLine"];
-	$( "#DialogLabel" ).text = $.Localize( data["DialogText"] );
-	$( "#DialogLabelSizer" ).text = $.Localize( data["DialogText"] );
-	
-	g_bInBossIntro = true;
-	g_nBossCameraEntIndex = data["BossEntIndex"];
-
-	if ( typeof( data["CameraPitch"] ) != "undefined" )
-	{
-		GameUI.SetCameraPitchMin( data["CameraPitch"] );
-		GameUI.SetCameraPitchMax( data["CameraPitch"] );
-	}
-	if ( typeof( data["CameraDistance"] ) != "undefined" )
-	{
-		GameUI.SetCameraDistance( data["CameraDistance"] );
-	}
-	if ( typeof( data["CameraDistance"] ) != "undefined" )
-	{
-		GameUI.SetCameraLookAtPositionHeightOffset( data["CameraDistance"] );
-	}
-	
-	
-	UpdateCameraOffset();
+	UpdateRoundUI();
 }
+CustomNetTables.SubscribeNetTableListener( "round_data", OnRoundDataUpdated )
 
-GameEvents.Subscribe( "boss_intro_begin", OnBossIntroBegin );
-
-function OnBossIntroEnd( data )
+function UpdateRoundUI()
 {
-	g_bInBossIntro = false;
-	g_nBossCameraEntIndex = -1;
-	GameUI.SetCameraPitchMin( 38 );
-	GameUI.SetCameraPitchMax( 60 );
-	GameUI.SetCameraDistance( 1134.0 );
-	GameUI.SetCameraLookAtPositionHeightOffset( 0 );
-	$( "#DialogPanel" ).SetHasClass( "Visible", false );
-	UpdateCameraOffset();
-}
+	var key = "bossHealth"
+	var roundData = CustomNetTables.GetTableValue("round_data", key);
 
-GameEvents.Subscribe( "boss_intro_end", OnBossIntroEnd );
-
-function OnBossFightFinished( data )
-{
-	$( "#BossProgressBar" ).value = 0;
-	$( "#BossHP").SetHasClass( data["BossName"], false );
-	$( "#BossIcon" ).SetHasClass( data["BossName"], false );
-	Game.EmitSound( "Dungeon.Stinger01" );
-}
-
-GameEvents.Subscribe( "boss_fight_finished", OnBossFightFinished );
-
-var g_nCachedCameraEntIndex = -1;
-
-function UpdateCameraOffset()
-{
-	var localCamFollowIndex = Players.GetPlayerHeroEntityIndex( Players.GetLocalPlayer() );
-	//handle spectators
-	if ( Players.IsLocalPlayerInPerspectiveCamera() )
+	if ( roundData !== null )
 	{
-		localCamFollowIndex = Players.GetPerspectivePlayerEntityIndex();
-	}
-
-	if ( g_nBossCameraEntIndex !== -1 )
-	{
-		localCamFollowIndex = g_nBossCameraEntIndex;
-	}
-	if ( localCamFollowIndex !== -1 )
-	{
-		if ( Entities.IsAlive( localCamFollowIndex ) === false )
-			return;
-
-		var vDesiredLookAtPosition = Entities.GetAbsOrigin( localCamFollowIndex );
-		var vLookAtPos = GameUI.GetCameraLookAtPosition();
-		var flCurOffset = GameUI.GetCameraLookAtPositionHeightOffset();
-		var flCameraRawHeight = vLookAtPos[2] - flCurOffset;
-		var flEntityHeight = vDesiredLookAtPosition[2];
-		vDesiredLookAtPosition[1] = vDesiredLookAtPosition[1] - 180.0;
-		
-		var bMouseWheelDown = GameUI.IsMouseDown( 2 );
-		if ( bMouseWheelDown )
+		if (roundData.boss == "mag")
 		{
-			var vScreenWorldPos = GameUI.GetScreenWorldPosition( GameUI.GetCursorPosition() );
-			if ( vScreenWorldPos !== null )
-			{
-				var vToCursor = [];
-				vToCursor[0] = vScreenWorldPos[0] - vDesiredLookAtPosition[0];
-				vToCursor[1] = vScreenWorldPos[1] - vDesiredLookAtPosition[1];
-				vToCursor[2] = vScreenWorldPos[2] - vDesiredLookAtPosition[2];
-				vToCursor = Game.Normalized( vToCursor );
-				var flDistance = Math.min( Game.Length2D( vScreenWorldPos, vDesiredLookAtPosition ), g_flMaxLookDistance );
-				vDesiredLookAtPosition[0] = vDesiredLookAtPosition[0] + vToCursor[0] * flDistance;
-				vDesiredLookAtPosition[1] = vDesiredLookAtPosition[1] + vToCursor[1] * flDistance;
-				vDesiredLookAtPosition[2] = vDesiredLookAtPosition[2] + vToCursor[2] * flDistance;
-			}
+			var nBossHP = roundData.hp;
+			var bShowBossHP = roundData.hp == 0 ? false : true;
+			$("#MagtheridonProgressBar").value = nBossHP / 100;
+			$("#MagtheridonHP").visible = true;
 		}
 
-		var flHeightDiff = flCameraRawHeight - flEntityHeight;
-		var flNewOffset = g_flCameraDesiredOffset - flHeightDiff + 50;
-		var key = 0;
-		var bossData = CustomNetTables.GetTableValue("boss", key.toString());
-		var flAdditionalOffset = 0.0;
-		if ( typeof( bossData ) != "undefined" )
+		if (roundData.boss2 == "true")
 		{
-			var bShowBossHP = bossData["boss_hp"] == 0 ? false : true;
-			if ( bShowBossHP )
-			{
-			    flAdditionalOffset = 100.0;
-			}
+			var nBossHP = roundData.hp2;
+			var bShowBossHP = roundData.hp2 == 0 ? false : true;
+			$("#Magtheridon2ProgressBar").value = nBossHP / 100;
+			$("#Magtheridon2HP").visible = true;
+			$("#MagtheridonHP").style.position = "-300px 0px 0px";
 		}
 
-		var t = Game.GetGameFrameTime() / 1.5;
-		if ( t > 1.0 ) { t = 1.0; }
-
-		g_flAdditionalCameraOffset = g_flAdditionalCameraOffset * t + flAdditionalOffset * ( 1.0 - t ); 
-		flNewOffset = flNewOffset + g_flAdditionalCameraOffset;
-
-		var flLerp = 0.05;
-		if ( bMouseWheelDown )
+		if (roundData.boss == "arthas")
 		{
-			flLerp = 0.1;
-		}
-		if ( g_nCachedCameraEntIndex !== localCamFollowIndex )
-		{
-			flLerp = 1.5;
+			var nBossHP = roundData.hp;
+			var bShowBossHP = roundData.hp == 0 ? false : true;
+			$("#ArthasProgressBar").value = nBossHP / 100;
+			$("#ArthasHP").visible = true;
 		}
 
-		GameUI.SetCameraTargetPosition(vDesiredLookAtPosition, flLerp);
-		GameUI.SetCameraLookAtPositionHeightOffset( flNewOffset );
+		if (roundData.boss == "banehallow")
+		{
+			var nBossHP = roundData.hp;
+			var bShowBossHP = roundData.hp == 0 ? false : true;
+			$("#BanehallowProgressBar").value = nBossHP / 100;
+			$("#BanehallowHP").visible = true;
+		}
 
-		g_nCachedCameraEntIndex = localCamFollowIndex;
+		if (roundData.boss == "lich_king")
+		{
+			var nBossHP = roundData.hp;
+			var bShowBossHP = roundData.hp == 0 ? false : true;
+			$("#LichKingProgressBar").value = nBossHP / 100;
+			$("#LichKingHP").visible = true;
+		}
+
+		if (roundData.boss == "spirit_master")
+		{
+			var nBossHP = roundData.hp;
+			var bShowBossHP = roundData.hp == 0 ? false : true;
+			$("#SpiritMasterProgressBar").value = nBossHP / 100;
+			$("#SpiritMasterHP").visible = true;
+		}
+
+		if (roundData.boss == "storm_spirit")
+		{
+			var nBossHP = roundData.hp;
+			var bShowBossHP = roundData.hp == 0 ? false : true;
+			$("#SpiritMasterStormProgressBar").value = nBossHP / 100;
+			$("#SpiritMasterStormHP").visible = true;
+		}
+
+		if (roundData.boss3 == "true")
+		{
+			var nBossHP = roundData.hp3;
+			var bShowBossHP = roundData.hp3 == 0 ? false : true;
+			$("#SpiritMasterEarthProgressBar").value = nBossHP / 100;
+			$("#SpiritMasterEarthHP").visible = true;
+		}
+
+		if (roundData.boss4 == "true")
+		{
+			var nBossHP = roundData.hp4;
+			var bShowBossHP = roundData.hp4 == 0 ? false : true;
+			$("#SpiritMasterFireProgressBar").value = nBossHP / 100;
+			$("#SpiritMasterFireHP").visible = true;
+		}
 	}
-	else
-	{
-		GameUI.SetCameraLookAtPositionHeightOffset( 0.0 );
-	}
 }
 
-GameEvents.Subscribe( "boss_intro_end", OnBossIntroEnd );
-
-//	function HideScroll( data )
-//	{
-//		$.Msg( "HideScroll" );
-//		var hitBoxPanel = $( '#TPScrollHitbox' );
-//		hitBoxPanel.RemoveClass( "MakeVisible" );			
-//		var clickHint = $( '#ClickHint' );
-//		clickHint.AddClass( "QuickHide" );
-//	
-//		var scenePanelContainer = $( '#TPScrollContainer' );
-//		scenePanelContainer.AddClass( "CollapsePanel" );
-//	}
-
-//	GameEvents.Subscribe( "hide_scroll", HideScroll );
-
-function OnCheckpointActivated( data )
+function HideUI()
 {
-	$.Schedule( 3.0, HideCheckpointActivation );
+	$.GetContextPanel().FindChildTraverse("MagtheridonHP").style.visibility = "collapse";
+	$.GetContextPanel().FindChildTraverse("Magtheridon2HP").style.visibility = "collapse";
+	$.GetContextPanel().FindChildTraverse("ArthasHP").style.visibility = "collapse";
+	$.GetContextPanel().FindChildTraverse("BanehallowHP").style.visibility = "collapse";
+	$.GetContextPanel().FindChildTraverse("LichKingHP").style.visibility = "collapse";
+	$.GetContextPanel().FindChildTraverse("SpiritMasterHP").style.visibility = "collapse";
+	$.GetContextPanel().FindChildTraverse("SpiritMasterStormHP").style.visibility = "collapse";
+	$.GetContextPanel().FindChildTraverse("SpiritMasterEarthHP").style.visibility = "collapse";
+	$.GetContextPanel().FindChildTraverse("SpiritMasterFireHP").style.visibility = "collapse";
 }
 
-GameEvents.Subscribe( "checkpoint_activated", OnCheckpointActivated );
-
-function HideCheckpointActivation()
-{
+function CreateErrorMessage(msg){
+    var reason = msg.reason || 80;
+    if (msg.message){
+        GameEvents.SendEventClientSide("dota_hud_error_message", {"splitscreenplayer":0,"reason":reason ,"message":msg.message} );
+    }
+    else{
+        GameEvents.SendEventClientSide("dota_hud_error_message", {"splitscreenplayer":0,"reason":reason} );
+    }
 }
 
-function OnGainedLife( data )
-{
-	var panel = $( '#1UpPopup' );
-	panel.SetHasClass( "Play1Up", true );
-	var heroImage = $( '#1UpHeroIcon' );
-	var heroImageShadow = $( '#1UpHeroIconOutline' );
-	var localPlayerInfo = Game.GetLocalPlayerInfo();
-	var heroName = Players.GetPlayerSelectedHero( localPlayerInfo.player_id );
-	heroImage.heroname = heroName;
-	heroImageShadow.heroname = heroName;
-	Game.EmitSound( "Dungeon.Plus1" );
-	$.Schedule( 3.0, HideGainedLife );
-}
+GameUI.CreateErrorMessage = CreateErrorMessage;
 
-GameEvents.Subscribe( "gained_life", OnGainedLife );
-
-function HideGainedLife()
-{
-	var panel = $( '#1UpPopup' );
-	panel.SetHasClass( "Play1Up", false );
-}
-
-//	function OnLostLife( data )
-//	{
-//		var panel = $( '#1UpPopup' );
-//	//	panel.SetHasClass( "Play1Up", true );
-//	//	panel.SetHasClass( "LifeLost", true );
-//		var heroImage = $( '#1UpHeroIcon' );
-//		var heroImageShadow = $( '#1UpHeroIconOutline' );
-//		var localPlayerInfo = Game.GetLocalPlayerInfo();
-//		var heroName = Players.GetPlayerSelectedHero( localPlayerInfo.player_id );
-//		heroImage.heroname = heroName;
-//		heroImageShadow.heroname = heroName;
-//		//Game.EmitSound( "Dungeon.Plus1" );
-//		$.Schedule( 3.0, HideLostLife );
-//	}
-
-//	GameEvents.Subscribe( "life_lost", OnLostLife );
-
-function HideLostLife()
-{
-	var panel = $( '#1UpPopup' );
-//	panel.SetHasClass( "Play1Up", false );
-//	panel.SetHasClass( "LifeLost", false );
-}
+(function(){
+	GameEvents.Subscribe("hide_ui", HideUI);
+	GameEvents.Subscribe("dotacraft_error_message", CreateErrorMessage)
+})()

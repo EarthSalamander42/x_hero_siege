@@ -1,7 +1,4 @@
-require('libraries/timers')
-
-
-function rain_of_chaos( event )
+function rain_of_chaos(event)
 local caster = event.caster
 local time_to_damage = 2.0
 local ability = event.ability

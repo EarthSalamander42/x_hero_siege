@@ -5596,7 +5596,7 @@
 
 		// Armor
 		//----------------------------------------------------------------
-		"ArmorPhysical"				"90"     // Physical protection.
+		"ArmorPhysical"				"150"     // Physical protection.
 		"MagicalResistance"			"25"     // Magical protection.
 
 		// Attack
@@ -5630,7 +5630,7 @@
 
 		// Status
 		//----------------------------------------------------------------
-		"StatusHealth"				"10000"     // Base health.
+		"StatusHealth"				"7000"     // Base health.
 		"StatusHealthRegen"			"2.0"     // Health regeneration rate.
 		"StatusMana"				"900"     // Base mana.
 		"StatusManaRegen"			"1.0"     // Mana regeneration rate.
@@ -6445,7 +6445,7 @@
 		//----------------------------------------------------------------
 		"BaseClass"					"npc_dota_creature"
 		"Model"						"models/heroes/terrorblade/demon.mdl"           // Model.
-		"SoundSet"					"Hero_Antimage"                                 // Name of sound set.
+		"SoundSet"					"Hero_Terrorblade"                                 // Name of sound set.
 		"IdleExpression"			"scenes/antimage/antimage_exp_idle_01.vcd"      // custom facial animation idle
 		"Portrait"					"vgui/hud/heroportraits/portrait_antimage"
 		"ModelScale"				"1.5"
@@ -10423,8 +10423,8 @@
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
-		"AttackDamageMin"			"69998"							// Damage range min.
-		"AttackDamageMax"			"70000"							// Damage range max.
+		"AttackDamageMin"			"89998"							// Damage range min.
+		"AttackDamageMax"			"90000"							// Damage range max.
 		"AttackRate"				"0.70"							// Speed of attack.
 		"AttackAnimationPoint"		"0.56"							// Normalized time in animation cycle to attack.
 		"AttackAcquisitionRange"	"1000"							// Range within a target can be acquired.
@@ -10720,7 +10720,7 @@
 		"Model"					"models/items/warlock/golem/obsidian_golem/obsidian_golem.vmdl"  // Model.
 		"SoundSet"				"Roshan"          // Name of sound set.
 		"Level"					"1"
-		"ModelScale"			"1.0"
+		"ModelScale"			"0.85"
 		// Abilities
 		//----------------------------------------------------------------
 		

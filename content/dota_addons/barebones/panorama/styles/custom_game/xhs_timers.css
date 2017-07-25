@@ -46,7 +46,14 @@
 	flow-children: down;
 	width: 100px;
 	height: 45px;
-	visibility: visible;
+}
+
+#HeroImage,
+#SpiritBeast,
+#FrostInfernal,
+#AllHeroImage
+{
+	visibility: collapse;
 }
 
 #SpecialEventsLabel,

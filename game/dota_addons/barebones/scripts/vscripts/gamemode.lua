@@ -27,10 +27,9 @@ function GameMode:OnFirstPlayerLoaded()
 end
 
 function FrostTowersToFinalWave()
-	if GameMode.FrostTowers_killed >= 2 then
+	if GameMode.FrostTowers_killed >= ICE_TOWERS_REQUIRED then
 		nTimer_SpecialEvent = 60
 		nTimer_IncomingWave = 1
---		CustomGameEventManager:Send_ServerToAllClients("hide_timer", {})
 		PauseCreeps()
 	end
 end
@@ -64,22 +63,21 @@ end
 
 function GameMode:OnHeroInGame(hero)
 local id = hero:GetPlayerID()
-local point = Entities:FindByName(nil, "point_teleport_choose_hero_"..id)
+local point = Entities:FindByName(nil, "hero_selection_"..id)
 
 	if hero:GetUnitName() == "npc_dota_hero_wisp" then
 		hero:SetAbilityPoints(0)
 		hero:SetGold(0, false)
-		hero:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 30, IsHidden = true})
+		hero:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 5, IsHidden = true})
 		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
-		Timers:CreateTimer(23.0, function()
+		Timers:CreateTimer(5.0, function()
 			FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
-		end)
-		Timers:CreateTimer(29.0, function()
-			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil)
+			Timers:CreateTimer(0.1, function()
+				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
+			end)
 		end)
 	elseif hero:GetUnitName() == "npc_dota_hero_terrorblade" then
 		if IsInToolsMode() then
---			hero:AddExperience(100000, false, false)
 			hero:ModifyStrength(10000)
 			hero:ModifyAgility(10000)
 			hero:ModifyIntellect(10000)
@@ -137,6 +135,7 @@ function GameMode:InitGameMode()
 	SetTeamCustomHealthbarColor(DOTA_TEAM_GOODGUYS, 0, 64, 128) --Blue
 	SetTeamCustomHealthbarColor(DOTA_TEAM_BADGUYS, 128, 32, 32) --Red
 	SetTeamCustomHealthbarColor(DOTA_TEAM_CUSTOM_1, 255, 255, 0) --Yellow	
+	SetTeamCustomHealthbarColor(DOTA_TEAM_CUSTOM_2, 255, 255, 0) --Yellow	
 	SetTeamCustomHealthbarColor(DOTA_TEAM_CUSTOM_3, 0, 180, 200) --Cyan
 	SetTeamCustomHealthbarColor(DOTA_TEAM_CUSTOM_4, 0, 150, 60) --Green
 
@@ -144,9 +143,15 @@ function GameMode:InitGameMode()
 	GameRules:LockCustomGameSetupTeamAssignment(true)
 	GameRules:SetHeroRespawnEnabled(true)
 	mode:SetFixedRespawnTime(RESPAWN_TIME)
-	GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_GOODGUYS, 8)
-	GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_BADGUYS, 0)
+	if GetMapName() == "x_hero_siege" then
+		GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_GOODGUYS, 8)
+		GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_BADGUYS, 0)
+	else
+		GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_GOODGUYS, 2)
+		GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_BADGUYS, 2)
+	end
 	GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_CUSTOM_1, 0)
+	GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_CUSTOM_2, 0)
 	GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_CUSTOM_3, 0)
 	GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_CUSTOM_4, 0)
 	mode:SetCustomXPRequiredToReachNextLevel(XP_PER_LEVEL_TABLE)
@@ -258,7 +263,8 @@ local heroes = HeroList:GetAllHeroes()
 		local diff = {"Easy", "Normal", "Hard", "Extreme"}
 		local lanes = {"Simple", "Double", "Full"}
 		Timers:CreateTimer(3.0, function()
-			CustomGameEventManager:Send_ServerToAllClients("show_timer", {})
+			CustomGameEventManager:Send_ServerToAllClients("show_timer_bar", {})
+			CustomGameEventManager:Send_ServerToAllClients("hide_timer_hero_image", {}) -- no idea why i have to do it, should be collapsed by default
 			Notifications:TopToAll({text="DIFFICULTY: "..diff[GameRules:GetCustomGameDifficulty()], duration=10.0})
 			if FORCED_LANES == 0 then
 				Notifications:TopToAll({text="CREEP LANES: "..lanes[CREEP_LANES_TYPE], duration=10.0})
@@ -266,15 +272,19 @@ local heroes = HeroList:GetAllHeroes()
 				Notifications:TopToAll({text="CREEP LANES: SIMPLE, more than 4 players required to play Double Lanes!", duration=10.0})
 			end
 		end)
-		if GetMapName() == "x_hero_siege" then
-			require('zones/dialog_ep_1')
-			require('zones/zone_tables_ep_1')
-		end
+		
+		require('zones/dialog_ep_1')
+		require('zones/zone_tables_ep_1')
 		self:SetupZones()
 	end
 
 	if newState == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
 		print("OnGameRulesStateChange: Game In Progress")
+		-- debug
+		if IsInToolsMode() then
+			Entities:FindByName(nil, "trigger_special_event_tp_off"):Disable()
+			Entities:FindByName(nil, "trigger_special_event"):Enable()
+		end
 		nTimer_SpecialEvent = 720
 		nTimer_IncomingWave = 240
 --		ModifyLanes()
@@ -386,6 +396,15 @@ local Region = {
 		if SPECIAL_EVENT == 0 then
 			CountdownTimerIncomingWave()
 		end
+		if GameMode.HeroImage_occuring == 1 then
+			CountdownTimerHeroImage()
+		elseif GameMode.SpiritBeast_occuring == 1 then
+			CountdownTimerSpiritBeast()
+		elseif GameMode.FrostInfernal_occuring == 1 then
+			CountdownTimerFrostInfernal()
+		elseif GameMode.AllHeroImages_occuring == 1 then
+			CountdownTimerAllHeroImage()
+		end
 
 		if PHASE_3 == 0 then
 			if nTimer_GameTime == 359 then -- 6 Min
@@ -406,8 +425,6 @@ local Region = {
 				end)
 			elseif nTimer_GameTime == 721 then --12:00, Muradin End
 				local Check = 0
-				Notifications:TopToAll({text="All heroes who survived Muradin received 15 000 Gold!", duration=5.0})
-				Notifications:TopToAll({ability="alchemist_goblins_greed", continue = true})
 				Notifications:TopToAll({text="Special Events are unlocked!", style={color="DodgerBlue"}, duration=5.0})
 				Entities:FindByName(nil, "trigger_special_event_tp_off"):Disable()
 				Entities:FindByName(nil, "trigger_special_event"):Enable()
@@ -499,47 +516,6 @@ local Region = {
 	return 1
 end
 
-function CountdownTimerMuradin()
-	nTimer_SpecialEvent = nTimer_SpecialEvent - 1
-	local t = nTimer_SpecialEvent
-	local minutes = math.floor(t / 60)
-	local seconds = t - (minutes * 60)
-	local m10 = math.floor(minutes / 10)
-	local m01 = minutes - (m10 * 10)
-	local s10 = math.floor(seconds / 10)
-	local s01 = seconds - (s10 * 10)
-	local broadcast_gametimer = 
-		{
-			timer_minute_10 = m10,
-			timer_minute_01 = m01,
-			timer_second_10 = s10,
-			timer_second_01 = s01,
-		}
-	CustomGameEventManager:Send_ServerToAllClients( "timer_special_event", broadcast_gametimer )
---	if t <= 120 then
---		CustomGameEventManager:Send_ServerToAllClients( "time_remaining", broadcast_gametimer )
---	end
-end
-
-function CountdownTimerIncomingWave()
-	nTimer_IncomingWave = nTimer_IncomingWave - 1
-	local t = nTimer_IncomingWave
-	local minutes = math.floor(t / 60)
-	local seconds = t - (minutes * 60)
-	local m10 = math.floor(minutes / 10)
-	local m01 = minutes - (m10 * 10)
-	local s10 = math.floor(seconds / 10)
-	local s01 = seconds - (s10 * 10)
-	local broadcast_gametimer = 
-		{
-			timer_minute_10 = m10,
-			timer_minute_01 = m01,
-			timer_second_10 = s10,
-			timer_second_01 = s01,
-		}
-	CustomGameEventManager:Send_ServerToAllClients( "timer_incoming_wave", broadcast_gametimer )
-end
-
 function GameTimer()
 local newState = GameRules:State_Get()
 	if newState == DOTA_GAMERULES_STATE_PRE_GAME then
@@ -564,6 +540,123 @@ local newState = GameRules:State_Get()
 			timer_second_01 = s01,
 		}
 	CustomGameEventManager:Send_ServerToAllClients("timer_game", broadcast_gametimer)
+end
+
+function CountdownTimerMuradin()
+	nTimer_SpecialEvent = nTimer_SpecialEvent - 1
+	local t = nTimer_SpecialEvent
+	local minutes = math.floor(t / 60)
+	local seconds = t - (minutes * 60)
+	local m10 = math.floor(minutes / 10)
+	local m01 = minutes - (m10 * 10)
+	local s10 = math.floor(seconds / 10)
+	local s01 = seconds - (s10 * 10)
+	local broadcast_gametimer = 
+		{
+			timer_minute_10 = m10,
+			timer_minute_01 = m01,
+			timer_second_10 = s10,
+			timer_second_01 = s01,
+		}
+	CustomGameEventManager:Send_ServerToAllClients("timer_special_event", broadcast_gametimer)
+--	if t <= 120 then
+--		CustomGameEventManager:Send_ServerToAllClients("time_remaining", broadcast_gametimer)
+--	end
+end
+
+function CountdownTimerIncomingWave()
+	nTimer_IncomingWave = nTimer_IncomingWave - 1
+	local t = nTimer_IncomingWave
+	local minutes = math.floor(t / 60)
+	local seconds = t - (minutes * 60)
+	local m10 = math.floor(minutes / 10)
+	local m01 = minutes - (m10 * 10)
+	local s10 = math.floor(seconds / 10)
+	local s01 = seconds - (s10 * 10)
+	local broadcast_gametimer = 
+		{
+			timer_minute_10 = m10,
+			timer_minute_01 = m01,
+			timer_second_10 = s10,
+			timer_second_01 = s01,
+		}
+	CustomGameEventManager:Send_ServerToAllClients("timer_incoming_wave", broadcast_gametimer)
+end
+
+function CountdownTimerHeroImage()
+	nTimer_HeroImage = nTimer_HeroImage - 1
+	local t = nTimer_HeroImage
+	local minutes = math.floor(t / 60)
+	local seconds = t - (minutes * 60)
+	local m10 = math.floor(minutes / 10)
+	local m01 = minutes - (m10 * 10)
+	local s10 = math.floor(seconds / 10)
+	local s01 = seconds - (s10 * 10)
+	local broadcast_gametimer = 
+		{
+			timer_minute_10 = m10,
+			timer_minute_01 = m01,
+			timer_second_10 = s10,
+			timer_second_01 = s01,
+		}
+	CustomGameEventManager:Send_ServerToAllClients("timer_hero_image", broadcast_gametimer)
+end
+
+function CountdownTimerSpiritBeast()
+	nTimer_SpiritBeast = nTimer_SpiritBeast - 1
+	local t = nTimer_SpiritBeast
+	local minutes = math.floor(t / 60)
+	local seconds = t - (minutes * 60)
+	local m10 = math.floor(minutes / 10)
+	local m01 = minutes - (m10 * 10)
+	local s10 = math.floor(seconds / 10)
+	local s01 = seconds - (s10 * 10)
+	local broadcast_gametimer = 
+		{
+			timer_minute_10 = m10,
+			timer_minute_01 = m01,
+			timer_second_10 = s10,
+			timer_second_01 = s01,
+		}
+	CustomGameEventManager:Send_ServerToAllClients("timer_spirit_beast", broadcast_gametimer)
+end
+
+function CountdownTimerFrostInfernal()
+	nTimer_FrostInfernal = nTimer_FrostInfernal - 1
+	local t = nTimer_FrostInfernal
+	local minutes = math.floor(t / 60)
+	local seconds = t - (minutes * 60)
+	local m10 = math.floor(minutes / 10)
+	local m01 = minutes - (m10 * 10)
+	local s10 = math.floor(seconds / 10)
+	local s01 = seconds - (s10 * 10)
+	local broadcast_gametimer = 
+		{
+			timer_minute_10 = m10,
+			timer_minute_01 = m01,
+			timer_second_10 = s10,
+			timer_second_01 = s01,
+		}
+	CustomGameEventManager:Send_ServerToAllClients("timer_frost_infernal", broadcast_gametimer)
+end
+
+function CountdownTimerAllHeroImage()
+	nTimer_AllHeroImage = nTimer_AllHeroImage - 1
+	local t = nTimer_AllHeroImage
+	local minutes = math.floor(t / 60)
+	local seconds = t - (minutes * 60)
+	local m10 = math.floor(minutes / 10)
+	local m01 = minutes - (m10 * 10)
+	local s10 = math.floor(seconds / 10)
+	local s01 = seconds - (s10 * 10)
+	local broadcast_gametimer = 
+		{
+			timer_minute_10 = m10,
+			timer_minute_01 = m01,
+			timer_second_10 = s10,
+			timer_second_01 = s01,
+		}
+	CustomGameEventManager:Send_ServerToAllClients("timer_all_hero_image", broadcast_gametimer)
 end
 
 -- Item added to inventory filter
@@ -894,6 +987,8 @@ local point_beast = Entities:FindByName(nil, "hero_image_boss"):GetAbsOrigin()
 	if not hero.hero_image and GameMode.HeroImage_occuring == 0 then
 		GameMode.HeroImage_occuring = 1
 		Entities:FindByName(nil, "trigger_special_event_back4"):Enable()
+		CustomGameEventManager:Send_ServerToAllClients("show_timer_hero_image", {})
+		nTimer_HeroImage = 120
 
 		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
 		Timers:CreateTimer(0.1, function()
@@ -959,98 +1054,6 @@ local point_beast = Entities:FindByName(nil, "hero_image_boss"):GetAbsOrigin()
 	end
 end
 
-function GameMode:AllHeroImages(event)
-local PlayerID = event.pID
-local player = PlayerResource:GetPlayer(PlayerID)
-local hero = player:GetAssignedHero()
-local point_hero = Entities:FindByName(nil, "all_hero_image_player"):GetAbsOrigin()
-
-	if GameMode.AllHeroImages_occuring == 1 then
-		GameMode:SpecialEventTPQuit(hero)
-		Notifications:Bottom(hero:GetPlayerOwnerID(),{text = "All Hero Images is already occuring, please choose another event.", duration = 7.5})
-	elseif GameMode.AllHeroImages_occuring == 0 then
-		GameMode.AllHeroImages_occuring = 1
-		Entities:FindByName(nil, "trigger_special_event_back5"):Enable()
-
-		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
-		Timers:CreateTimer(0.1, function()
-			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil) 
-		end)
-
-		local illusion_spawn = 0
-		Timers:CreateTimer(0.25, function()
-			local random = RandomInt(1, #HEROLIST)
-			illusion_spawn = illusion_spawn + 1
-			local point_image = Entities:FindByName(nil, "special_event_all_"..illusion_spawn)
-			GameMode.AllHeroImage = CreateUnitByName("npc_dota_hero_"..HEROLIST[random], point_image:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-			GameMode.AllHeroImage:SetAngles(0, 45 - 45 * illusion_spawn, 0)
-			GameMode.AllHeroImage:SetBaseStrength(hero:GetBaseStrength()*2)
-			GameMode.AllHeroImage:SetBaseIntellect(hero:GetBaseIntellect()*2)
-			GameMode.AllHeroImage:SetBaseAgility(hero:GetBaseAgility()*2)
-			GameMode.AllHeroImage:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 5,IsHidden = true})
-			GameMode.AllHeroImage:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 5,IsHidden = true})
-			GameMode.AllHeroImage:MakeIllusion()
-			GameMode.AllHeroImage:AddAbility("all_hero_image_death")
-			local ability = GameMode.AllHeroImage:FindAbilityByName("all_hero_image_death")
-			ability:ApplyDataDrivenModifier(GameMode.AllHeroImage, GameMode.AllHeroImage, "modifier_hero_image", {})
-
-			if illusion_spawn < 8 then
-				return_time = 0.25
-			else
-				return_time = nil
-			end
-
-			return return_time
-		end)
-
-		if IsValidEntity(hero) then
-			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
-				GameMode:SpecialEventTPQuit(hero)
-				Notifications:Bottom(hero:GetPlayerOwnerID(), {text = "Special Event: Kill All Heroes for Necklace of Immunity. You have 2 minutes.", duration = 5.0})
-				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
-				Timers:CreateTimer(0.1, function()
-					PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil) 
-				end)
-
-				if hero:GetUnitName() == "npc_dota_hero_meepo" then
-				local meepo_table = Entities:FindAllByName("npc_dota_hero_meepo")
-					if meepo_table then
-						for i = 1, #meepo_table do
-							FindClearSpaceForUnit(meepo_table[i], point_hero, false)
-							meepo_table[i]:Stop()
-							PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
-							Timers:CreateTimer(0.1, function()
-								PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil) 
-							end)
-						end
-					end
-				else
-					FindClearSpaceForUnit(hero, point_hero, true)
-					hero:Stop()
-				end
-			end
-		end
-
-		DisableItems(hero, 120)
-
-		timers.AllHeroImage = Timers:CreateTimer(120.0, function()
-			Entities:FindByName(nil, "trigger_all_hero_image_duration"):Enable()
-			GameMode.AllHeroImages_occuring = 0
-
-			Timers:CreateTimer(5.5, function() --Debug time in case Frost Infernal kills the player at the very last second
-				Entities:FindByName(nil, "trigger_all_hero_image_duration"):Disable()
-			end)
-			
-			local units = FindUnitsInRadius( DOTA_TEAM_CUSTOM_1, point_hero, nil, 2000, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_ALL, DOTA_UNIT_TARGET_FLAG_NONE , FIND_ANY_ORDER, false )
-			for _, v in pairs(units) do
-				UTIL_Remove(v)
-			end
-		end)
-	elseif GameMode.AllHeroImagesDead == 1 then
-		Notifications:Bottom(hero:GetPlayerOwnerID(), {text = "All Hero Image has already been done!", duration = 5.0})
-	end
-end
-
 function GameMode:SpiritBeast(event)
 local PlayerID = event.pID
 local player = PlayerResource:GetPlayer(PlayerID)
@@ -1064,6 +1067,8 @@ local point_beast = Entities:FindByName(nil, "spirit_beast_boss"):GetAbsOrigin()
 	elseif GameMode.SpiritBeast_killed == 0 then
 		GameMode.SpiritBeast_occuring = 1
 		Entities:FindByName(nil, "trigger_special_event_back3"):Enable()
+		CustomGameEventManager:Send_ServerToAllClients("show_timer_spirit_beast", {})
+		nTimer_SpiritBeast = 120
 
 		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
 		Timers:CreateTimer(0.1, function()
@@ -1132,6 +1137,8 @@ local point_beast = Entities:FindByName(nil, "frost_infernal_boss"):GetAbsOrigin
 	elseif GameMode.FrostInfernal_killed == 0 then
 		GameMode.FrostInfernal_occuring = 1
 		Entities:FindByName(nil, "trigger_special_event_back2"):Enable()
+		CustomGameEventManager:Send_ServerToAllClients("show_timer_frost_infernal", {})
+		nTimer_FrostInfernal = 120
 
 		timers.FrostInfernal = Timers:CreateTimer(120.0,function()
 			Entities:FindByName(nil, "trigger_frost_infernal_duration"):Enable()
@@ -1178,6 +1185,100 @@ local point_beast = Entities:FindByName(nil, "frost_infernal_boss"):GetAbsOrigin
 		DisableItems(hero, 120)
 	else
 		Notifications:Bottom(hero:GetPlayerOwnerID(), {text = "Frost Infernal has already been killed!", duration = 5.0})
+	end
+end
+
+function GameMode:AllHeroImages(event)
+local PlayerID = event.pID
+local player = PlayerResource:GetPlayer(PlayerID)
+local hero = player:GetAssignedHero()
+local point_hero = Entities:FindByName(nil, "all_hero_image_player"):GetAbsOrigin()
+
+	if GameMode.AllHeroImages_occuring == 1 then
+		GameMode:SpecialEventTPQuit(hero)
+		Notifications:Bottom(hero:GetPlayerOwnerID(),{text = "All Hero Images is already occuring, please choose another event.", duration = 7.5})
+	elseif GameMode.AllHeroImages_occuring == 0 then
+		GameMode.AllHeroImages_occuring = 1
+		Entities:FindByName(nil, "trigger_special_event_back5"):Enable()
+		CustomGameEventManager:Send_ServerToAllClients("show_timer_all_hero_image", {})
+		nTimer_AllHeroImage = 120
+
+		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
+		Timers:CreateTimer(0.1, function()
+			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil) 
+		end)
+
+		local illusion_spawn = 0
+		Timers:CreateTimer(0.25, function()
+			local random = RandomInt(1, #HEROLIST)
+			illusion_spawn = illusion_spawn + 1
+			local point_image = Entities:FindByName(nil, "special_event_all_"..illusion_spawn)
+			GameMode.AllHeroImage = CreateUnitByName("npc_dota_hero_"..HEROLIST[random], point_image:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
+			GameMode.AllHeroImage:SetAngles(0, 45 - 45 * illusion_spawn, 0)
+			GameMode.AllHeroImage:SetBaseStrength(hero:GetBaseStrength()*2)
+			GameMode.AllHeroImage:SetBaseIntellect(hero:GetBaseIntellect()*2)
+			GameMode.AllHeroImage:SetBaseAgility(hero:GetBaseAgility()*2)
+			GameMode.AllHeroImage:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 5,IsHidden = true})
+			GameMode.AllHeroImage:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 5,IsHidden = true})
+			GameMode.AllHeroImage:MakeIllusion()
+			GameMode.AllHeroImage:AddAbility("all_hero_image_death")
+			local ability = GameMode.AllHeroImage:FindAbilityByName("all_hero_image_death")
+			ability:ApplyDataDrivenModifier(GameMode.AllHeroImage, GameMode.AllHeroImage, "modifier_hero_image", {})
+
+			if illusion_spawn < 8 then
+				return_time = 0.25
+			else
+				return_time = nil
+			end
+
+			return return_time
+		end)
+
+		if IsValidEntity(hero) then
+			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
+				GameMode:SpecialEventTPQuit(hero)
+				Notifications:Bottom(hero:GetPlayerOwnerID(), {text = "Special Event: Kill All Heroes for Necklace of Immunity. You have 2 minutes.", duration = 5.0})
+				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
+				Timers:CreateTimer(0.1, function()
+					PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil) 
+				end)
+
+				if hero:GetUnitName() == "npc_dota_hero_meepo" then
+				local meepo_table = Entities:FindAllByName("npc_dota_hero_meepo")
+					if meepo_table then
+						for i = 1, #meepo_table do
+							FindClearSpaceForUnit(meepo_table[i], point_hero, false)
+							meepo_table[i]:Stop()
+							PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
+							Timers:CreateTimer(0.1, function()
+								PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil) 
+							end)
+						end
+					end
+				else
+					FindClearSpaceForUnit(hero, point_hero, true)
+					hero:Stop()
+				end
+			end
+		end
+
+		DisableItems(hero, 120)
+
+		timers.AllHeroImage = Timers:CreateTimer(120.0, function()
+			Entities:FindByName(nil, "trigger_all_hero_image_duration"):Enable()
+			GameMode.AllHeroImages_occuring = 0
+
+			Timers:CreateTimer(5.5, function() --Debug time in case Frost Infernal kills the player at the very last second
+				Entities:FindByName(nil, "trigger_all_hero_image_duration"):Disable()
+			end)
+			
+			local units = FindUnitsInRadius( DOTA_TEAM_CUSTOM_2, point_hero, nil, 2500, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_ALL, DOTA_UNIT_TARGET_FLAG_NONE , FIND_ANY_ORDER, false )
+			for _, v in pairs(units) do
+				UTIL_Remove(v)
+			end
+		end)
+	elseif GameMode.AllHeroImagesDead == 1 then
+		Notifications:Bottom(hero:GetPlayerOwnerID(), {text = "All Hero Image has already been done!", duration = 5.0})
 	end
 end
 

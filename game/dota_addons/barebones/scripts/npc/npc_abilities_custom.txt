@@ -7592,14 +7592,6 @@
 			{
 				"EffectName"    "Hero_Magnataur.Empower.Cast"
 				"Target"        "TARGET"
-
-				"AttachEffect"
-				{
-					"Duration"			"%duration"
-					"Target"			"TARGET"
-					"EffectName"		"particles/econ/courier/courier_trail_international_2013_se/courier_international_2013_se.vpcf"
-					"EffectAttachType"	"follow_overhead"
-				}
 			}
 
 			"ApplyModifier"
@@ -7616,7 +7608,10 @@
 			{
 				"Passive"			"0"
 				"IsHidden"			"0"
-				"Isbuff"			"1"
+				"IsBuff"			"1"
+
+				"EffectName"		"particles/units/heroes/hero_magnataur/magnataur_empower.vpcf"
+				"EffectAttachType"	"attach_attack1"
 
 				"Properties"
 				{
@@ -7740,7 +7735,7 @@
 			"02"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"crit_chance"				"15"
+				"crit_chance"				"14"
 			}
 		}
 	}
@@ -9220,11 +9215,6 @@
 					"MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS"		"%gods_strength_armor"
 					"MODIFIER_PROPERTY_HEALTH_BONUS"				"%gods_strength_hp"
 				}
-
-				"States"
-				{
-					"MODIFIER_STATE_MAGIC_IMMUNE"			"MODIFIER_STATE_VALUE_ENABLED"
-				}
 			}
 		}
 	}
@@ -9773,7 +9763,7 @@
 	}
 
 	//=================================================================================================================
-	// Arthas: Light Roar( Arthas, Tauren Chieftain ) WC3: 25% DMG, 25 Armor.
+	// Arthas: Light Roar
 	//=================================================================================================================
 	"holdout_light_roar"
 	{
@@ -9793,7 +9783,7 @@
 		"AbilityCastRange"			"900"
 		"AbilityTextureName"		"custom/holdout_light_roar"
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
-		"AbilityUnitTargetFlags"	"DOTA_UNIT_TARGET_FLAG_INVULNERABLE"
+		"AbilityUnitTargetFlags"	"DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ALLIES"
 
 		// Special
 		//-------------------------------------------------------------------------------------
@@ -9836,10 +9826,11 @@
 	
 				"Target"
 				{
-				  "Center"    "CASTER"
-				  "Radius"   "%radius"
-				  "Teams"   "DOTA_UNIT_TARGET_TEAM_FRIENDLY"
-				  "Types"   "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+					"Center"		"CASTER"
+					"Radius"		"%radius"
+					"Teams"			"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
+					"Types"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+					"Flags"			"DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ALLIES"
 				}
 			}
 
@@ -12450,6 +12441,7 @@
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+		"AbilityUnitTargetFlags"		"DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ALLIES"
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_YES"
 		"MaxLevel"						"1"
 
@@ -17918,6 +17910,7 @@
 					"Radius"		"%radius"
 					"Teams"			"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
 					"Types"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+					"Flags"			"DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ALLIES"
 				}
 			}
 
@@ -18882,12 +18875,12 @@
 			"05"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"radius"	"350"
+				"radius"				"350"
 			}
 			"06"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"cleave_pct"	"50"
+				"cleave_pct"			"50"
 			}
 		}
 
@@ -18963,12 +18956,12 @@
 			"04"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"splash_radius"			"350"
+				"radius"				"350"
 			}
 			"05"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"splash_damage_percent"	"50"
+				"cleave_pct"			"50"
 			}
 		}
 
@@ -19021,7 +19014,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"scripts/vscripts/heroes/hero_centurion.lua"
+						"ScriptFile"	"items/global.lua"
 						"Function"		"Splash"
 					}
 				}
@@ -22726,13 +22719,7 @@
 		}
 
 		"OnSpellStart"
-		{
-			"RunScript"
-			{
-				"ScriptFile"	"heroes/hero_grom_hellscream/mirror_image.lua"
-				"Function"		"PhantasmVision"
-			}
-	
+		{	
 			"ApplyModifier"
 			{
 				"ModifierName"	"modifier_phantasm_datadriven"
@@ -24901,11 +24888,6 @@
 					"MODIFIER_PROPERTY_BASEATTACK_BONUSDAMAGE"		"%bonus_damage"
 					"MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS"		"%bonus_armor"
 					"MODIFIER_PROPERTY_HEALTH_BONUS"				"%bonus_hp"
-				}
-
-				"States"
-				{
-					"MODIFIER_STATE_MAGIC_IMMUNE"			"MODIFIER_STATE_VALUE_ENABLED"
 				}
 			}
 		}
@@ -27254,7 +27236,7 @@
 			"modifier_hero_image"
 			{
 				"Passive"	"1"
-				"IsHidden"	"0"
+				"IsHidden"	"1"
 				
 				"OnTakeDamage"
 				{
@@ -27281,7 +27263,7 @@
 			"modifier_hero_image"
 			{
 				"Passive"	"1"
-				"IsHidden"	"0"
+				"IsHidden"	"1"
 				
 				"OnTakeDamage"
 				{

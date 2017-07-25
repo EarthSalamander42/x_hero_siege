@@ -36,6 +36,9 @@ local hero_level = npc:GetLevel()
 local too_ez = 1.1 -- The mod is way too ez, to modify damage very easily i just silenly add + 10% everywhere
 local too_ez_gold = 0.9 -- The mod is way too ez, to modify gold very easily i just silenly remove 10% of it
 
+	-- This internal handling is used to set up main barebones functions
+	GameMode:_OnNPCSpawned(keys)
+
 	if npc then
 		--ALL NPC
 		for i = 1, #innate_abilities do
@@ -48,14 +51,6 @@ local too_ez_gold = 0.9 -- The mod is way too ez, to modify gold very easily i j
 		-- HERO NPC
 		if npc:IsRealHero() and npc:GetTeamNumber() == DOTA_TEAM_GOODGUYS then
 			if npc.bFirstSpawnComplete == nil then
-				if not IsDedicatedServer() and not PlayerResource:IsFakeClient( npc:GetPlayerOwnerID() ) then
---					self:OnPlayerHeroEnteredZone( npc, "xhs_holdout" )
-					CustomGameEventManager:Send_ServerToPlayer( PlayerResource:GetPlayer( npc:GetPlayerOwnerID() ), "hide_scroll", {} )
-				end
-
-				print("FIRST SPAWN!")
-				npc.CurrentZoneName = nil
-				self:OnPlayerHeroEnteredZone(npc, "xhs_holdout")
 				for i = 1, #golden_vip_members do
 					-- Cookies or X Hero Siege Official
 					if PlayerResource:GetSteamAccountID(npc:GetPlayerID()) == mod_creator[i] then
@@ -73,7 +68,6 @@ local too_ez_gold = 0.9 -- The mod is way too ez, to modify gold very easily i j
 							vip_ability:SetLevel(1)
 						end
 					end
-					-- Mugiwara or Flotos (Graphists)
 					if PlayerResource:GetSteamAccountID(npc:GetPlayerID()) == mod_graphist[i] then
 						npc:SetCustomHealthLabel("Mod Graphist", 55, 55, 200)
 						if not npc:HasAbility("holdout_vip") then
@@ -81,7 +75,20 @@ local too_ez_gold = 0.9 -- The mod is way too ez, to modify gold very easily i j
 							vip_ability:SetLevel(1)
 						end
 					end
-					-- See VIP List on Top
+					if PlayerResource:GetSteamAccountID(npc:GetPlayerID()) == administrator[i] then
+						npc:SetCustomHealthLabel("Administrator", 55, 55, 200)
+						if not npc:HasAbility("holdout_vip") then
+							local vip_ability = npc:AddAbility("holdout_vip")
+							vip_ability:SetLevel(1)
+						end
+					end
+					if PlayerResource:GetSteamAccountID(npc:GetPlayerID()) == moderator[i] then
+						npc:SetCustomHealthLabel("Moderator", 110, 110, 200)
+						if not npc:HasAbility("holdout_vip") then
+							local vip_ability = npc:AddAbility("holdout_vip")
+							vip_ability:SetLevel(1)
+						end
+					end
 					if PlayerResource:GetSteamAccountID(npc:GetPlayerID()) == vip_members[i] then
 						npc:SetCustomHealthLabel("VIP Member", 45, 200, 45)
 						if not npc:HasAbility("holdout_vip") then
@@ -98,17 +105,20 @@ local too_ez_gold = 0.9 -- The mod is way too ez, to modify gold very easily i j
 					end
 				end
 
-				if npc:GetUnitName() == "npc_dota_hero_lone_druid" then
-					npc:AddNewModifier(npc, nil, "modifier_item_ultimate_scepter_consumed", {})
-				elseif npc:GetUnitName() == "npc_dota_hero_wisp" then
+				if npc:GetUnitName() == "npc_dota_hero_chaos_knight" or npc:GetUnitName() == "npc_dota_hero_keeper_of_the_light" then
 					npc:SetAbilityPoints(0)
-					PlayerResource:SetGold(npc:GetPlayerID(), 0, false)
+				elseif npc:GetUnitName() == "npc_dota_hero_lone_druid" then
+					npc:AddNewModifier(npc, nil, "modifier_item_ultimate_scepter_consumed", {})
 				end
 
 				npc.bFirstSpawnComplete = true
 				self.bPlayerHasSpawned = true
+				npc.CurrentZoneName = nil
+				self:OnPlayerHeroEnteredZone(npc, "xhs_holdout")
 			elseif npc.bFirstSpawnComplete == true then
-				if npc:GetUnitName() == "npc_dota_hero_tiny" then
+				if npc:GetUnitName() == "npc_dota_hero_chaos_knight" or npc:GetUnitName() == "npc_dota_hero_keeper_of_the_light" then
+					npc:SetAbilityPoints(0)
+				elseif npc:GetUnitName() == "npc_dota_hero_tiny" then
 					npc:AddAbility("tiny_grow")
 					grow = npc:FindAbilityByName("tiny_grow")
 					grow:SetLevel(1)
@@ -123,16 +133,13 @@ local too_ez_gold = 0.9 -- The mod is way too ez, to modify gold very easily i j
 						npc:RemoveModifierByName("modifier_item_ultimate_scepter_consumed")
 						npc:AddNewModifier(npc, ability, "modifier_item_ultimate_scepter_consumed", {})
 					end
-				elseif npc:GetUnitName() == "npc_dota_hero_chaos_knight" or npc:GetUnitName() == "npc_dota_hero_keeper_of_the_light" then
-					npc:SetAbilityPoints(0)
 				end
-				CheckpointRespawn(npc)
 			end
 			return
 		end
 
 		-- CREATURES NPC
-		if not npc:IsRealHero() and (npc:GetTeamNumber() == DOTA_TEAM_BADGUYS or npc:GetTeamNumber() == DOTA_TEAM_NEUTRALS) then
+		if not npc:IsRealHero() and (npc:GetTeamNumber() == DOTA_TEAM_CUSTOM_1 or npc:GetTeamNumber() == DOTA_TEAM_NEUTRALS) then
 			if difficulty == 1 then
 				npc:SetMinimumGoldBounty( normal_bounty*1.5*too_ez_gold )
 				npc:SetMaximumGoldBounty( normal_bounty*1.5*too_ez_gold )
@@ -168,19 +175,12 @@ local too_ez_gold = 0.9 -- The mod is way too ez, to modify gold very easily i j
 				end
 			end
 
-			if npc:GetUnitName() == "npc_dota_hero_grom_hellscream" then
-				npc.zone = "xhs_bosses"
-			else
-				npc.zone = "xhs_holdout"
-			end
-			print("NPC:", npc:GetUnitName())
-			print("Zone:", npc.zone)
+			npc.zone = "xhs_holdout"
+--			print("NPC:", npc:GetUnitName())
+--			print("Zone:", npc.zone)
 			return
 		end
 	end
-
-	-- This internal handling is used to set up main barebones functions
-	GameMode:_OnNPCSpawned(keys)
 end
 
 -- An entity somewhere has been hurt.  This event fires very often with many units so don't do too many expensive
@@ -214,8 +214,13 @@ function GameMode:OnItemPurchased( keys )
 end
 
 function GameMode:OnAbilityUsed(keys)
-	local player = PlayerResource:GetPlayer(keys.PlayerID)
-	local abilityname = keys.abilityname
+local player = PlayerResource:GetPlayer(keys.PlayerID)
+local abilityname = keys.abilityname
+local k, v = string.find(abilityname, "item_")
+
+--	if a then
+--		print( "Item:", abilityname )
+--	end
 end
 
 function GameMode:OnNonPlayerUsedAbility(keys)
@@ -228,8 +233,18 @@ function GameMode:OnPlayerChangedName(keys)
 end
 
 function GameMode:OnPlayerLearnedAbility(keys)
-	local player = EntIndexToHScript(keys.player)
-	local abilityname = keys.abilityname
+local player = EntIndexToHScript(keys.player)
+local hero = player:GetAssignedHero()
+local abilityname = keys.abilityname
+local ability = hero:FindAbilityByName(abilityname)
+
+	if hero:GetUnitName() == "npc_dota_hero_doom_bringer" then
+		if ability:GetAbilityIndex() == 3 or ability:GetAbilityIndex() == 4 then
+			ability:SetLevel(ability:GetLevel() -1)
+			hero:SetAbilityPoints(hero:GetAbilityPoints() +1)
+			SendErrorMessage(hero:GetPlayerID(), "#error_cant_lvlup")
+		end
+	end
 end
 
 function GameMode:OnAbilityChannelFinished(keys)
@@ -382,7 +397,7 @@ local AbilitiesHeroes_XX = {
 			end
 		end
 
-		if hero:GetUnitName() == "npc_dota_hero_storm_spirit" or hero:GetUnitName() == "npc_dota_hero_earth_spirit" or hero:GetUnitName() == "npc_dota_hero_ember_spirit" or hero:GetUnitName() == "npc_dota_hero_ursa" or hero:GetUnitName() == "npc_dota_hero_troll_warlord" or hero:GetUnitName() == "npc_dota_hero_mirana" or hero:GetUnitName() == "npc_dota_hero_lina" or hero:GetUnitName() == "npc_dota_hero_monkey_king" then
+		if hero:GetUnitName() == "npc_dota_hero_storm_spirit" or hero:GetUnitName() == "npc_dota_hero_earth_spirit" or hero:GetUnitName() == "npc_dota_hero_ember_spirit" or hero:GetUnitName() == "npc_dota_hero_ursa" or hero:GetUnitName() == "npc_dota_hero_troll_warlord" or hero:GetUnitName() == "npc_dota_hero_mirana" or hero:GetUnitName() == "npc_dota_hero_lina" or hero:GetUnitName() == "npc_dota_hero_monkey_king" or hero:GetUnitName() == "npc_dota_hero_lone_druid" then
 			print("No Level 20 Ability")
 		else
 			print("Whisper Level 20 Ability")
@@ -448,7 +463,6 @@ function GameMode:OnPlayerPickHero(keys)
 local heroClass = keys.hero
 local heroEntity = EntIndexToHScript(keys.heroindex)
 local player = EntIndexToHScript(keys.player)
-local heroes = HeroList:GetAllHeroes()
 
 	-- modifies the name/label of a player
 --	GameMode:setPlayerHealthLabel(player)
@@ -475,7 +489,7 @@ local playerID = ply:GetPlayerID()
 	for i = 1, #banned_players do
 		if PlayerResource:GetSteamAccountID(ply:GetPlayerID()) == banned_players[i] then
 			Timers:CreateTimer(5.0, function()
-				GameRules:SetGameWinner(DOTA_TEAM_BADGUYS)
+				GameRules:SetGameWinner(DOTA_TEAM_CUSTOM_1)
 			end)
 			GameRules:SetHeroSelectionTime(1.0)
 			GameRules:SetPreGameTime(1.0)
@@ -530,7 +544,7 @@ local player = PlayerResource:GetPlayer(userID)
 
 	for str in string.gmatch(text, "%S+") do
 		for i = 1, #mod_creator do
-			if PlayerResource:GetSteamAccountID(player:GetPlayerID()) == mod_creator[i] then
+			if PlayerResource:GetSteamAccountID(player:GetPlayerID()) == mod_creator[i] or PlayerResource:GetSteamAccountID(player:GetPlayerID()) == administrator[i] or PlayerResource:GetSteamAccountID(player:GetPlayerID()) == moderator[i] then
 				for Frozen = 0, DOTA_MAX_TEAM_PLAYERS -1 do
 					local PlayerNames = {"Red", "Blue", "Cyan", "Purple", "Yellow", "Orange", "Green", "Pink"}
 					if PlayerResource:IsValidPlayer(Frozen) then
@@ -593,8 +607,8 @@ local player = PlayerResource:GetPlayer(userID)
 						end
 					end
 				end
-			elseif not PlayerResource:GetSteamAccountID(player:GetPlayerID()) == mod_creator[i] then
-				Notifications:Bottom(player:GetPlayerID(), {text="You are not allowed to use this command!", duration=6.0, style={color="white"}})
+--			else
+--				Notifications:Bottom(player:GetPlayerID(), {text="You are not allowed to use this command!", duration=6.0, style={color="white"}})
 			end
 		end
 
@@ -612,10 +626,10 @@ local player = PlayerResource:GetPlayer(userID)
 				local particle1 = ParticleManager:CreateParticle("particles/econ/events/ti6/hero_levelup_ti6.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
 				ParticleManager:SetParticleControl(particle1, 0, hero:GetAbsOrigin())
 				Notifications:Bottom(player, {text="You've bought "..numberOfTomes.." Tomes!", duration=5.0, style={color="white"}})
-			elseif numberOfTomes < 1 then
-				Notifications:Bottom(player, {text="You don't have enough gold to afford tomes!", duration=5.0, style={color="white"}})
 			elseif BT_ENABLED == 0 then
-				Notifications:Bottom(player, {text="You are not allowed to buy tomes in this arena!", duration=5.0, style={color="white"}})
+				SendErrorMessage(hero:GetPlayerID(), "#error_buy_tome_disabled")
+			elseif numberOfTomes < 1 then
+				SendErrorMessage(hero:GetPlayerID(), "#error_cant_afford_tomes")
 			end
 		end
 
@@ -641,17 +655,11 @@ function GameMode:OnTriggerStartTouch( triggerName, activator_entindex, caller_e
 --      print( "Zone Transition: " .. zone1Name .. zone2Name )
 			for _,zone in pairs( self.Zones ) do
 --        if zone and ( zone.szName == zone1Name or zone.szName == zone2Name ) then
-				if zone and (zone.szName == "xhs_holdout" or zone.szName == "xhs_bosses") then
+				if zone and (zone.szName == "xhs_holdout") then
 					zone:Precache()
 				end
 			end
 --    end
-
-		local k, l = string.find( triggerName, "checkpoint" )
-		if k then
-			self:OnCheckpointTouched( playerHero, triggerName )
-			return
-		end
 
 		local m, o = string.find( triggerName, "reveal_radius" )
 		if m then
@@ -661,30 +669,6 @@ function GameMode:OnTriggerStartTouch( triggerName, activator_entindex, caller_e
 				local nRevealRadius = TriggerEntity:Attribute_GetIntValue( "reveal_radius", 512 )
 			--  print( "GameMode - Setting FOW Reveal Radius to " .. nRevealRadius )
 				playerHero:SetRevealRadius( nRevealRadius )
-			end
-		end
-
-		if triggerName == "underground_temple_boss_spawn" then
-			local Zone = self:GetZoneByName( "underground_temple" )
-			if Zone then
-				local hSpawnerA = Entities:FindByName( nil, "underground_temple_boss_a" )
-				local hSpawnerB = Entities:FindByName( nil, "underground_temple_boss_b" )
-				if hSpawnerA and hSpawnerB then
-					local hUnitA = CreateUnitByName( "npc_dota_creature_temple_guardian", hSpawnerA:GetOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS )
-					local hUnitB = CreateUnitByName( "npc_dota_creature_temple_guardian", hSpawnerB:GetOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS )
-					if hUnitA and hUnitB then
-						hUnitA.bBoss = true
-						hUnitB.bBoss = true
-						hUnitA.bStarted = false
-						hUnitB.bStarted = false
-						hUnitA.bAwake = false
-						hUnitB.bAwake = false
-						hUnitA:AddNewModifier( hUnitA, nil, "modifier_temple_guardian_statue", {} )
-						hUnitB:AddNewModifier( hUnitB, nil, "modifier_temple_guardian_statue", {} )
-						Zone:AddEnemyToZone( hUnitA )
-						Zone:AddEnemyToZone( hUnitB )
-					end
-				end
 			end
 		end
 	end
@@ -754,18 +738,6 @@ DebugPrint('[BAREBONES] OnIllusionsCreated')
 DebugPrintTable(keys)
 
 local originalEntity = EntIndexToHScript(keys.original_entindex)
-end
-
--- This function is called whenever an item is combined to create a new item
-function GameMode:OnItemCombined(keys)
-DebugPrint('[BAREBONES] OnItemCombined')
-DebugPrintTable(keys)
-
-local plyID = keys.PlayerID
-local player = PlayerResource:GetPlayer(plyID)
-local itemName = keys.itemname 
-local itemcost = keys.itemcost
-if not plyID then return end
 end
 
 -- This function is called whenever an ability begins its PhaseStart phase (but before it is actually cast)
@@ -848,18 +820,6 @@ if killedUnit:FindModifierByName("modifier_breakable_container") then return end
 		end
 
 		if killedUnit:IsRealHero() and (killedUnit:GetTeamNumber() == DOTA_TEAM_GOODGUYS) then
-			if PHASE_3 == 1 then
-				if not killedUnit.ankh_respawn == true then
-					local newItem = CreateItem("item_tombstone", killedUnit, killedUnit)
-					newItem:SetPurchaseTime(0)
-					newItem:SetPurchaser(killedUnit)
-					local tombstone = SpawnEntityFromTableSynchronous("dota_item_tombstone_drop", {})
-					tombstone:SetContainedItem(newItem)
-					tombstone:SetAngles(0, RandomFloat(0, 360), 0)
-					FindClearSpaceForUnit(tombstone, killedUnit:GetAbsOrigin(), true)
-				end
-			end
-
 			local gameEvent = {}
 			gameEvent["player_id"] = killedUnit:GetPlayerID()
 			gameEvent["team_number"] = DOTA_TEAM_GOODGUYS
@@ -870,10 +830,10 @@ if killedUnit:FindModifierByName("modifier_breakable_container") then return end
 			local netTable = {}
 --			CustomGameEventManager:Send_ServerToPlayer( killedUnit:GetPlayerOwner(), "life_lost", netTable )
 
-			-- Lone Druid Bear death debug
 			if killedUnit:GetUnitName() == "npc_dota_hero_tiny" then
 				killedUnit:RemoveModifierByName("modifier_item_ultimate_scepter_consumed")
 				killedUnit:RemoveModifierByName("modifier_animation_translate")  
+			-- Lone Druid Bear death debug
 			elseif killedUnit:GetUnitName() == "npc_dota_hero_lone_druid" then
 				local Bears = FindUnitsInRadius( DOTA_TEAM_GOODGUYS, Vector( 0, 0, 0 ), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_ALL, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, 0, false )
 				for _, Bear in pairs(Bears) do
@@ -915,28 +875,39 @@ if killedUnit:FindModifierByName("modifier_breakable_container") then return end
 			end 
 		return
 		elseif killedUnit:IsCreature() then
+			local ramero_check = 0
 			if killedUnit:GetUnitName() == "npc_ramero" then
 				local item = CreateItem("item_lightning_sword", nil, nil)
 				local pos = killedUnit:GetAbsOrigin()
-				local drop = CreateItemOnPositionSync( pos, item )
+				local drop = CreateItemOnPositionSync(pos, item)
 				item:LaunchLoot(false, 300, 0.5, pos)
+				ramero_check = ramero_check +1
+				print("Ramero Check:", ramero_check)
 			elseif killedUnit:GetUnitName() == "npc_baristol" then
 				local item = CreateItem("item_tome_big", nil, nil)
 				local pos = killedUnit:GetAbsOrigin()
-				local drop = CreateItemOnPositionSync( pos, item )
+				local drop = CreateItemOnPositionSync(pos, item)
 				item:LaunchLoot(false, 300, 0.5, pos)
+				ramero_check = ramero_check +1
+				print("Ramero Check:", ramero_check)
 			elseif killedUnit:GetUnitName() == "npc_ramero_2" then
 				local item = CreateItem("item_ring_of_superiority", nil, nil)
 				local pos = killedUnit:GetAbsOrigin()
-				local drop = CreateItemOnPositionSync( pos, item )
+				local drop = CreateItemOnPositionSync(pos, item)
 				item:LaunchLoot(false, 300, 0.5, pos)
 				doom_first_time = true
+				Timers:RemoveTimer(timers.Ramero)
 			elseif killedUnit:GetUnitName() == "npc_dota_hero_secret" then
 				local item = CreateItem("item_orb_of_frost", nil, nil)
 				local pos = killedUnit:GetAbsOrigin()
-				local drop = CreateItemOnPositionSync( pos, item )
+				local drop = CreateItemOnPositionSync(pos, item)
 				item:LaunchLoot(false, 300, 0.5, pos)
 				frost_first_time = true
+			end
+
+			if ramero_check == 2 then
+				print("Removing Ramero Timer")
+				Timers:RemoveTimer(timers.RameroAndBaristol)
 			end
 
 			if killedUnit:GetUnitName() == "npc_dota_hero_magtheridon" then
@@ -956,7 +927,18 @@ if killedUnit:FindModifierByName("modifier_breakable_container") then return end
 
 			-- add kills to the hero who spawned a controlled unit, or an illusion
 			if hero:GetTeamNumber() == 2 then
-				if killedUnit:GetTeamNumber() == 3 then
+				if not gold_advertize then gold_advertize = 0 end
+				if hero:IsRealHero() then
+					if PlayerResource:GetGold(hero:GetPlayerID()) > 99900 and gold_advertize == 0 then
+						SendErrorMessage(hero:GetPlayerID(), "#error_gold_full")
+						gold_advertize = 1
+						Timers:CreateTimer(3.0, function()
+							gold_advertize = 0
+						end)
+					end
+				end
+
+				if killedUnit:GetTeamNumber() == 6 then
 					if hero:IsIllusion() then
 						hero = PlayerResource:GetPlayer(hero:GetPlayerID()):GetAssignedHero()
 						hero:IncrementKills(1)
@@ -1083,13 +1065,13 @@ if killedUnit:FindModifierByName("modifier_breakable_container") then return end
 			if killedUnit:IsTower() then
 				if killedUnit:GetUnitName() == "xhs_tower_lane_1" then
 					for j = 1, difficulty do
-						local unit = CreateUnitByName("xhs_death_revenant", killedUnit:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
+						local unit = CreateUnitByName("xhs_death_revenant", killedUnit:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
 					end
 					CREEP_LANES[lane][2] = CREEP_LANES[lane][2] + 1
 					Notifications:TopToAll({text="Creep lane "..lane.." is now level "..CREEP_LANES[lane][2].."!", duration=5.0, style={color="lightgreen"}})
 				elseif killedUnit:GetUnitName() == "xhs_tower_lane_2" then
 					for j = 1, difficulty do
-						local unit = CreateUnitByName("xhs_death_revenant_2", killedUnit:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
+						local unit = CreateUnitByName("xhs_death_revenant_2", killedUnit:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
 					end
 					CREEP_LANES[lane][2] = CREEP_LANES[lane][2] + 1
 					Notifications:TopToAll({text="Creep lane "..lane.." is now level "..CREEP_LANES[lane][2].."!", duration=5.0, style={color="lightgreen"}})
@@ -1110,7 +1092,7 @@ if killedUnit:FindModifierByName("modifier_breakable_container") then return end
 			return
 			elseif killedUnit:IsBarracks() then
 				for j = 1, difficulty do
-					local unit = CreateUnitByName("npc_magnataur_destroyer_crypt", killedUnit:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
+					local unit = CreateUnitByName("npc_magnataur_destroyer_crypt", killedUnit:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
 				end
 
 				for c = 1, 8 do
@@ -1171,35 +1153,6 @@ local hRevivedHero = EntIndexToHScript( event.target )
 	end
 end
 
-function CheckpointRespawn(npc)
-if npc:IsIllusion() then return end
-local vPos = npc:GetOrigin()
-print("Init CheckpointRespawn...")
-
-	if npc.ankh_respawn == true then -- Bug when last charge consumed
-    print("Reincarnation from Ability!")
-	else
-    print("Reincarnation from Checkpoint!")
-		if npc.DeathZone then
-			if npc.DeathZone:IsCheckpointActivated() == true then
-				vPos = npc.DeathZone:GetCheckpoint():GetOrigin()
-			else
-				if npc.hRespawnCheckpoint then
-					vPos = npc.hRespawnCheckpoint:GetOrigin()
-				end
-			end
-		else
-			if npc.hRespawnCheckpoint then
-				vPos = npc.hRespawnCheckpoint:GetOrigin()
-			end
-		end
-
-		FindClearSpaceForUnit(npc, vPos, true)
-		npc:AddNewModifier(npc, nil, "modifier_invulnerable", {duration = 2.5})
-		npc:AddNewModifier(npc, nil, "modifier_omninight_guardian_angel", {duration = 2.5})
-	end
-end
-
 ---------------------------------------------------------
 -- dota_player_gained_level
 -- * player (player entity index)
@@ -1238,8 +1191,7 @@ function GameMode:OnRelicSpawned( item, itemKV )
 	local PlayerIDs = {}
 	local nRelicItemDef = tonumber( itemKV["DungeonItemDef"] )
 	print( "GameMode:OnRelicSpawned - New Relic " .. item:GetAbilityName() .. " created of itemdef: " .. nRelicItemDef )
-	local Heroes = HeroList:GetAllHeroes()
-	for _,Hero in pairs ( Heroes ) do
+	for _, Hero in pairs (HeroList:GetAllHeroes()) do
 		if Hero and Hero:IsRealHero() and Hero:HasOwnerAbandoned() == false then
 			if GetItemDefOwnedCount( Hero:GetPlayerID(), nRelicItemDef ) == 0 then
 				print( "GameMode:OnRelicSpawned - PlayerID " .. Hero:GetPlayerID() .. " does not own item, adding to grant list." )
@@ -1335,8 +1287,7 @@ function GameMode:OnRelicSpawned( item, itemKV )
 	local PlayerIDs = {}
 	local nRelicItemDef = tonumber( itemKV["DungeonItemDef"] )
 	print( "GameMode:OnRelicSpawned - New Relic " .. item:GetAbilityName() .. " created of itemdef: " .. nRelicItemDef )
-	local Heroes = HeroList:GetAllHeroes()
-	for _,Hero in pairs ( Heroes ) do
+	for _,Hero in pairs (HeroList:GetAllHeroes()) do
 		if Hero ~= nil and Hero:IsRealHero() and Hero:HasOwnerAbandoned() == false then
 			if GetItemDefOwnedCount( Hero:GetPlayerID(), nRelicItemDef ) == 0 then
 				print( "GameMode:OnRelicSpawned - PlayerID " .. Hero:GetPlayerID() .. " does not own item, adding to grant list." )
@@ -1376,81 +1327,6 @@ function GameMode:OnRelicSpawned( item, itemKV )
 	gameEvent["locstring_value"] = "#DOTA_Tooltip_Ability_" .. item:GetAbilityName()
 	gameEvent["message"] = "#Dungeon_FoundNewRelic"
 	FireGameEvent( "dota_combat_event_message", gameEvent )
-end
-
----------------------------------------------------------
-
-function GameMode:OnCheckpointTouched( playerHero, szNewCheckpointName  )
-local bAlreadyInList = false
-
-	print("GameMode:OnCheckpointTouched")
-	for _, szCheckpointName in pairs( self.CheckpointsActivated ) do
-		if szCheckpointName == szNewCheckpointName then
-			bAlreadyInList = true
-		end
-	end
-
-	if bAlreadyInList == true then
-		return
-	end
-
-	if playerHero ~= nil then
-		local gameEvent = {}
-		gameEvent["player_id"] = playerHero:GetPlayerID()
-		gameEvent["team_number"] = DOTA_TEAM_GOODGUYS
-		gameEvent["message"] = "#Dungeon_ReachedCheckpoint"
-		FireGameEvent( "dota_combat_event_message", gameEvent )
-	end
-
-	print( "GameMode - Checkpoint " .. szNewCheckpointName .. " activated." )
-	table.insert( self.CheckpointsActivated, szNewCheckpointName )
-	local szZoneName = nil
-	local hBuilding = Entities:FindByName( nil, szNewCheckpointName .. "_building" )
-	if hBuilding then
-		hBuilding:SetTeam( DOTA_TEAM_GOODGUYS )
-		hBuilding:AddNewModifier( hBuilding, nil, "modifier_provide_vision", {} )
-		--hBuilding:AddNewModifier( hBuilding, nil, "modifier_fountain_glyph", {} )
-		--EmitSoundOn( "Aegis.Expire", hBuilding )
-
-		for _,zone in pairs( self.Zones ) do
-			if zone ~= nil and zone:ContainsUnit( playerHero ) and zone:GetCheckpoint() ~= hBuilding then
-				zone:SetCheckpoint( hBuilding )
-				szZoneName = zone.szName
-			end
-		end
-	else
-		print( "GameMode - failed to find checkpoint building named " .. szNewCheckpointName .. "_building" )
-		return
-	end
-
-	local Heroes = HeroList:GetAllHeroes()
-	for _,Hero in pairs ( Heroes ) do
-		if Hero ~= nil and Hero:IsRealHero() then
-			print( "GameMode - Setting checkpoint for " .. Hero:GetUnitName() )
-			Hero.hRespawnCheckpoint = hBuilding
-
-			local hPlayer = Hero:GetPlayerOwner()
-			if hPlayer then
-				PlayerResource:SetCustomBuybackCooldown( hPlayer:GetPlayerID(), 0 )
-				PlayerResource:SetCustomBuybackCost( hPlayer:GetPlayerID(), 0 )
-			end
-		
-			if not Hero:IsAlive() then
-				print( "GameMode - Reviving Hero " .. Hero:GetUnitName() )
-				Hero:RespawnHero( false, false, false )
-				FindClearSpaceForUnit( Hero, Hero.hRespawnCheckpoint:GetOrigin(), true )
-				Hero:AddNewModifier( Hero, nil, "modifier_invulnerable", { duration = 2.5 } )
-				Hero:AddNewModifier( Hero, nil, "modifier_omninight_guardian_angel", { duration = 2.5 } )
-				EmitSoundOn( "Dungeon.HeroRevived", Hero )
-			else
-				Hero:AddNewModifier( Hero, nil, "modifier_aegis_regen", { duration = 5.0 } )
-			end
-		end
-	end
-
-	local netTable = {}
-	netTable["CheckpointName"] = szZoneName
-	CustomGameEventManager:Send_ServerToAllClients( "checkpoint_activated", netTable )
 end
 
 ---------------------------------------------------------
@@ -1558,8 +1434,7 @@ function GameMode:OnQuestCompleted( questZone, quest )
 			hLogicRelay:Trigger()
 		end
 
-		local Heroes = HeroList:GetAllHeroes()
-		for _,Hero in pairs ( Heroes ) do
+		for _,Hero in pairs (HeroList:GetAllHeroes()) do
 			if Hero ~= nil and Hero:IsRealHero() and Hero:GetTeamNumber() == DOTA_TEAM_GOODGUYS then
 				if quest.RewardXP ~= nil and quest.RewardXP > 0 then
 					Hero:AddExperience( quest.RewardXP, DOTA_ModifyXP_Unspecified, false, true )
@@ -1818,8 +1693,7 @@ function GameMode:OnBossFightIntroEnd( hBoss )
 			hBoss:RemoveGesture( ACT_DOTA_CAST_ABILITY_7 )
 		end
 
-		local Heroes = HeroList:GetAllHeroes()
-		for _,Hero in pairs ( Heroes ) do
+		for _,Hero in pairs (HeroList:GetAllHeroes()) do
 			if Hero ~= nil and Hero:IsRealHero() and Hero:GetTeamNumber() == DOTA_TEAM_GOODGUYS then
 				local hPlayer = Hero:GetPlayerOwner()
 				if hPlayer ~= nil then

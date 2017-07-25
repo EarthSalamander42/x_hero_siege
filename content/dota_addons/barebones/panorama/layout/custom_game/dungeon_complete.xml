@@ -28,11 +28,7 @@
 					<Label id="FailedLabelDepth2" class="CompleteMainText TitleFont" text="#DOTA_Siltbreaker_Success" always-cache-composition-layer="true" require-composition-layer="true" hittest="false" html="true"/>
 					<Label id="FailedLabelDepth1" class="CompleteMainText TitleFont" text="#DOTA_Siltbreaker_Success" always-cache-composition-layer="true" require-composition-layer="true" hittest="false" html="true"/>
 					<Label id="FailedLabel" class="CompleteMainText TitleFont" text="#DOTA_Siltbreaker_Success"  html="true" hittest="false"/>
-				</Panel>				
-				<Label id="LoreLabel1" class="LoreLabel" text="#siltbreaker_acti_outro_02" hittest="false"/>
-				<Label id="LoreLabel2" class="LoreLabel" text="#siltbreaker_acti_outro_01" hittest="false"/>
-				
-				
+				</Panel>
 			</Panel>
 			<Panel id="DungeonCompleteFailure" hittest="false">
 				<DOTAScenePanel id="DeathFX" hittest="false" map="scenes/deathfx" camera="shot_camera" antialias="true" particleonly="false" light="scrolllight" renderdeferred="true" deferredalpha="true" always-cache-composition-layer="true" require-composition-layer="true" />		

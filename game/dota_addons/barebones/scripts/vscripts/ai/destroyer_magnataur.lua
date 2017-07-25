@@ -72,7 +72,7 @@ function BehaviorThunderClapLow:Evaluate()
 
 	ABILITY_ThunderClapLow = thisEntity:FindAbilityByName( "creature_thunder_clap_low" )
 	
-	local enemies = FindUnitsInRadius( DOTA_TEAM_BADGUYS, thisEntity:GetOrigin(), nil, 400, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO, 0, 0, false )
+	local enemies = FindUnitsInRadius( thisEntity:GetTeam(), thisEntity:GetOrigin(), nil, 400, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO, 0, 0, false )
 	if #enemies > 0 then
 		desire = 4
 		if ABILITY_ThunderClapLow and ABILITY_ThunderClapLow:IsFullyCastable() then
@@ -109,7 +109,7 @@ function BehaviorRunAway:Evaluate()
 	-- let's not choose this twice in a row
 	if currentBehavior == self then return desire end
 	
-	local enemies = FindUnitsInRadius( DOTA_TEAM_BADGUYS, thisEntity:GetOrigin(), nil, 700, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO, 0, 0, false )
+	local enemies = FindUnitsInRadius( thisEntity:GetTeam(), thisEntity:GetOrigin(), nil, 700, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO, 0, 0, false )
 	if #enemies > 0 then
 		desire = #enemies
 	end

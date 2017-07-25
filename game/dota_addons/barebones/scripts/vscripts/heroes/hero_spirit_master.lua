@@ -150,7 +150,7 @@ function findProjectileInfo(class_name)
 	return particle_names[class_name], projectile_speeds[class_name]
 end
 
-function moon_glaive_start_create_dummy( keys )
+function moon_glaive_start_create_dummy(keys)
 	local caster = keys.caster
 	local target = keys.target
 	local ability = keys.ability
@@ -291,7 +291,6 @@ function SpiritSwapPhaseCast(keys)
 local caster = keys.caster
 
 	CURRENT_XP = caster:GetCurrentXP()
-	print(CURRENT_XP)
 end
 
 function SpiritSwap(keys)
@@ -370,16 +369,13 @@ local ability = keys.ability
 		caster:RemoveModifierByName("modifier_enhanced_spirit_earth")
 		caster:RemoveModifierByName("modifier_enhanced_spirit_fire")
 		ability:ApplyDataDrivenModifier(caster, caster, "modifier_enhanced_spirit_storm", {})
-		print("Enhanced Spirit: Storm")
 	elseif caster:GetUnitName() == "npc_dota_hero_earth_spirit" then
 		caster:RemoveModifierByName("modifier_enhanced_spirit_storm")
 		caster:RemoveModifierByName("modifier_enhanced_spirit_fire")
 		ability:ApplyDataDrivenModifier(caster, caster, "modifier_enhanced_spirit_earth", {})
-		print("Enhanced Spirit: Earth")
 	elseif caster:GetUnitName() == "npc_dota_hero_ember_spirit" then
 		caster:RemoveModifierByName("modifier_enhanced_spirit_storm")
 		caster:RemoveModifierByName("modifier_enhanced_spirit_earth")
 		ability:ApplyDataDrivenModifier(caster, caster, "modifier_enhanced_spirit_fire", {})
-		print("Enhanced Spirit: Ember")
 	end
 end

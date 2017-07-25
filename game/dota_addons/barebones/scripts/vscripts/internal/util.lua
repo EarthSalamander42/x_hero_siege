@@ -372,7 +372,7 @@ function CDOTA_BaseNPC:IsDummy()
 end
 
 function SendErrorMessage(playerID, string)
-	CustomGameEventManager:Send_ServerToPlayer(PlayerResource:GetPlayer(playerID), "memes_error_message", {message=string}) 
+	CustomGameEventManager:Send_ServerToPlayer(PlayerResource:GetPlayer(playerID), "dotacraft_error_message", {message=string}) 
 end
 
 -- Similar to SendErrorMessage to the bottom, except it checks whether the source of error is currently selected unit/hero.
@@ -428,33 +428,41 @@ end
 
 function SpecialWave()
 local point = {
-		"west",
-		"north",
-		"east",
-		"south"
-	}
+	"west",
+	"north",
+	"east",
+	"south"
+}
 
 local real_point = "npc_dota_spawner_"..point[poi].."_event"
-
 local unit = {
-		"npc_dota_creature_necrolyte_event_1",
-		"npc_dota_creature_naga_siren_event_2",
-		"npc_dota_creature_vengeful_spirit_event_3",
-		"npc_dota_creature_captain_event_4",
-		"npc_dota_creature_slardar_event_5",
-		"npc_dota_creature_chaos_knight_event_6",
-		"npc_dota_creature_luna_event_7",
-		"npc_dota_creature_clockwerk_event_8"
-	}
+	"npc_dota_creature_necrolyte_event_1",
+	"npc_dota_creature_naga_siren_event_2",
+	"npc_dota_creature_vengeful_spirit_event_3",
+	"npc_dota_creature_captain_event_4",
+	"npc_dota_creature_slardar_event_5",
+	"npc_dota_creature_chaos_knight_event_6",
+	"npc_dota_creature_luna_event_7",
+	"npc_dota_creature_clockwerk_event_8"
+}
 
 	if PHASE_3 == 0 then
-		for j = 1, 10 do
-			CreateUnitByName(unit[reg-1], Entities:FindByName(nil, real_point):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
+		if GetMapName() == "x_hero_siege" then
+			for j = 1, 10 do
+				CreateUnitByName(unit[reg-1], Entities:FindByName(nil, real_point):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+			end
+			poi = poi + 1
+			if poi > 4 then
+				poi = 1
+			end
+		else
+			for j = 1, 10 do
+				CreateUnitByName(unit[reg-1], Entities:FindByName(nil, "npc_dota_spawner_west_event"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+			end
+			for j = 1, 10 do
+				CreateUnitByName(unit[reg-1], Entities:FindByName(nil, "npc_dota_spawner_east_event"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+			end
 		end
-	end
-	poi = poi + 1
-	if poi > 4 then
-		poi = 1
 	end
 	nTimer_IncomingWave = 240
 end
@@ -465,7 +473,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 		if CREEP_LANES[c][1] == 1 and CREEP_LANES[c][3] == 1 then
 		local point = Entities:FindByName( nil, "npc_dota_spawner_"..c)
 			for j = 1, difficulty do
-				local dragon = CreateUnitByName(dragon, point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
+				local dragon = CreateUnitByName(dragon, point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
 			end
 		end
 	end
@@ -539,18 +547,26 @@ local heroes = HeroList:GetAllHeroes()
 end
 
 function PauseCreeps()
-local units = FindUnitsInRadius( DOTA_TEAM_BADGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false )
+local units = FindUnitsInRadius( DOTA_TEAM_CUSTOM_1, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false )
 local units2 = FindUnitsInRadius( DOTA_TEAM_GOODGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false )
+local units3 = FindUnitsInRadius( DOTA_TEAM_BADGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false )
 
 	for _,v in pairs(units) do
-		if v:IsCreature() and v:HasMovementCapability() then
+		if v:HasMovementCapability() then
 			v:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", nil)
 			v:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
 		end
 	end
 
 	for _,v in pairs(units2) do
-		if v:IsCreature() and v:HasMovementCapability() then
+		if v:HasMovementCapability() then
+			v:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", nil)
+			v:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
+		end
+	end
+	
+	for _,v in pairs(units3) do
+		if v:HasMovementCapability() then
 			v:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", nil)
 			v:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
 		end
@@ -560,16 +576,24 @@ end
 function RestartCreeps()
 local units = FindUnitsInRadius( DOTA_TEAM_BADGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false )
 local units2 = FindUnitsInRadius( DOTA_TEAM_GOODGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false )
+local units3 = FindUnitsInRadius( DOTA_TEAM_CUSTOM_1, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false )
 
 	for _,v in pairs(units) do
-		if v:IsCreature() and v:HasMovementCapability() then
+		if v:HasMovementCapability() then
 			v:RemoveModifierByName("modifier_animation_freeze_stun")
 			v:RemoveModifierByName("modifier_invulnerable")
 		end
 	end
 
 	for _,v in pairs(units2) do
-		if v:IsCreature() and v:HasMovementCapability() then
+		if v:HasMovementCapability() then
+			v:RemoveModifierByName("modifier_animation_freeze_stun")
+			v:RemoveModifierByName("modifier_invulnerable")
+		end
+	end
+	
+	for _,v in pairs(units3) do
+		if v:HasMovementCapability() then
 			v:RemoveModifierByName("modifier_animation_freeze_stun")
 			v:RemoveModifierByName("modifier_invulnerable")
 		end
@@ -678,7 +702,9 @@ function DisableItems(hero, time)
 end
 
 function EnableItems(hero)
-	Timers:RemoveTimer(timers.disabled_items)
+	if timers.disabled_items then
+		Timers:RemoveTimer(timers.disabled_items)
+	end
 	for itemSlot = 0, 5 do
 	local item = hero:GetItemInSlot(itemSlot)
 		if item then
@@ -691,4 +717,8 @@ function EnableItems(hero)
 			end
 		end
 	end
+end
+
+function SendErrorMessage(playerID, string)
+	CustomGameEventManager:Send_ServerToPlayer(PlayerResource:GetPlayer(playerID), "dotacraft_error_message", {message=string}) 
 end

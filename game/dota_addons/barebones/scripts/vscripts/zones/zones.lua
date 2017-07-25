@@ -984,8 +984,8 @@ end
 
 --------------------------------------------------------------------
 
-function CDungeonZone:OnEnemyKilled( killedUnit, Zone )
-	print("OnEnemyKilled", killedUnit:GetUnitName())
+function CDungeonZone:OnEnemyKilled(killedUnit, Zone)
+--	print("OnEnemyKilled", killedUnit:GetUnitName())
 	for _,quest in pairs ( self.Quests ) do
 		if quest ~= nil and not quest.bCompleted == true then
 			if quest.bActivated == false then

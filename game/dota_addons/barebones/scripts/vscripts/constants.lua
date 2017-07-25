@@ -65,7 +65,7 @@ _G.sword_first_time = true
 _G.ring_first_time = true
 _G.doom_first_time = false
 _G.frost_first_time = false
-_G.X_HERO_SIEGE_V = 3.42
+_G.X_HERO_SIEGE_V = 3.43
 _G.SECRET = 0
 _G.PHASE_3 = 0
 _G.RESPAWN_TIME = 40.0
@@ -77,6 +77,11 @@ _G.MURADIN_DEFEND = false
 _G.STORM_SPIRIT = 0
 _G.FORCED_LANES = 0
 _G.ALL_HERO_IMAGE_DEAD = 0
+if GetMapName() == "x_hero_siege" then
+	_G.ICE_TOWERS_REQUIRED = 2
+else
+	_G.ICE_TOWERS_REQUIRED = 1
+end
 
 _G.FrostInfernal_killed = 0
 _G.FrostInfernal_occuring = 0
@@ -186,6 +191,14 @@ _G.mod_graphist = {
 	231117589	-- Xero
 }
 
+_G.administrator = {
+	101989646	-- PraaNavi
+}
+
+_G.moderator = {
+	117795386	-- Xtinian
+}
+
 _G.golden_vip_members = {
 	69533529,	-- West
 	51728279,	-- mC
@@ -209,8 +222,7 @@ _G.golden_vip_members = {
 	80192910,	-- Cheshire [Nathan Perscott on Patreon]
 	89498388,	-- Sly
 	111692244,	-- [Iris Von Everec on Steam, May paid, 2 months left for Permanent]
-	97490223,	-- IllidanStormrage [Lucas Diao on Patreon]
-	101989646	-- [PraaNavi, Bug-Seeker]
+	97490223	-- IllidanStormrage [Lucas Diao on Patreon]
 }
 
 _G.vip_members = {

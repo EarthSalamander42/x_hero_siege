@@ -9,7 +9,7 @@ BT_ENABLED = 0
 mode = GameRules:GetGameModeEntity()
 mode:SetFixedRespawnTime(1)
 
-	local Muradin = CreateUnitByName("npc_dota_creature_muradin_bronzebeard", Entities:FindByName(nil, "npc_dota_muradin_boss"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
+	local Muradin = CreateUnitByName("npc_dota_creature_muradin_bronzebeard", Entities:FindByName(nil, "npc_dota_muradin_boss"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 	Muradin:AddNewModifier( nil, nil, "modifier_boss_stun", {duration = 5})
 	Muradin:AddNewModifier( nil, nil, "modifier_invulnerable", {duration = 5})
 	Muradin:SetAngles(0, 270, 0)
@@ -78,7 +78,7 @@ local heroes = HeroList:GetAllHeroes()
 			for j = 1, 10 do
 				FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
 				PlayerResource:SetCameraTarget(hero:GetPlayerID(), hero)
-				local unit = CreateUnitByName(FarmEvent_Creeps[1], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+				local unit = CreateUnitByName(FarmEvent_Creeps[1], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 			end
 
 			for PlayerID = 0, 7 do
@@ -112,7 +112,7 @@ local heroes = HeroList:GetAllHeroes()
 	end)
 
 	Timers:CreateTimer(180, function() -- 27:00 Min, teleport back to the spawn
-		local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_1, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE , FIND_ANY_ORDER, false)
+		local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_2, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE , FIND_ANY_ORDER, false)
 		local teleporters = Entities:FindAllByName("trigger_farm_event")
 
 		SpecialWave()
@@ -140,7 +140,7 @@ end
 
 function FarmEventCreeps0()
 	local point = Entities:FindByName(nil, "farm_event_player_0")
-	local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_1, point:GetAbsOrigin(), nil, 1200, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)		
+	local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_2, point:GetAbsOrigin(), nil, 1200, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)		
 	local number = 0
 	for _,v in pairs(units) do
 		number = number +1
@@ -149,7 +149,7 @@ function FarmEventCreeps0()
 	if number <= 1 and SPECIAL_EVENT == 1 then
 		GameMode.hero_farm_event[0]["round"] = (GameMode.hero_farm_event[0]["round"] + 1) % 9
 		for j = 1, 10 do
-			local unit = CreateUnitByName(FarmEvent_Creeps[GameMode.hero_farm_event[0]["round"] + 1], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+			local unit = CreateUnitByName(FarmEvent_Creeps[GameMode.hero_farm_event[0]["round"] + 1], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 		end
 	end
 	return 1
@@ -157,7 +157,7 @@ end
 
 function FarmEventCreeps1()
 	local point = Entities:FindByName(nil, "farm_event_player_1")
-	local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_1, point:GetAbsOrigin(), nil, 1200, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)		
+	local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_2, point:GetAbsOrigin(), nil, 1200, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)		
 	local number = 0
 	for _,v in pairs(units) do
 		number = number +1
@@ -166,7 +166,7 @@ function FarmEventCreeps1()
 	if number <= 1 and SPECIAL_EVENT == 1 then
 		GameMode.hero_farm_event[1]["round"] = (GameMode.hero_farm_event[1]["round"] + 1) % 9
 		for j = 1, 10 do
-			local unit = CreateUnitByName(FarmEvent_Creeps[GameMode.hero_farm_event[1]["round"] + 1], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+			local unit = CreateUnitByName(FarmEvent_Creeps[GameMode.hero_farm_event[1]["round"] + 1], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 		end
 	end
 	return 1
@@ -174,7 +174,7 @@ end
 
 function FarmEventCreeps2()
 	local point = Entities:FindByName(nil, "farm_event_player_2")
-	local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_1, point:GetAbsOrigin(), nil, 1200, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)		
+	local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_2, point:GetAbsOrigin(), nil, 1200, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)		
 	local number = 0
 	for _,v in pairs(units) do
 		number = number +1
@@ -183,7 +183,7 @@ function FarmEventCreeps2()
 	if number <= 1 and SPECIAL_EVENT == 1 then
 		GameMode.hero_farm_event[2]["round"] = (GameMode.hero_farm_event[2]["round"] + 1) % 9
 		for j = 1, 10 do
-			local unit = CreateUnitByName(FarmEvent_Creeps[GameMode.hero_farm_event[2]["round"] + 1], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+			local unit = CreateUnitByName(FarmEvent_Creeps[GameMode.hero_farm_event[2]["round"] + 1], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 		end
 	end
 	return 1
@@ -191,7 +191,7 @@ end
 
 function FarmEventCreeps3()
 	local point = Entities:FindByName(nil, "farm_event_player_3")
-	local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_1, point:GetAbsOrigin(), nil, 1200, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)		
+	local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_2, point:GetAbsOrigin(), nil, 1200, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)		
 	local number = 0
 	for _,v in pairs(units) do
 		number = number +1
@@ -200,7 +200,7 @@ function FarmEventCreeps3()
 	if number <= 1 and SPECIAL_EVENT == 1 then
 		GameMode.hero_farm_event[3]["round"] = (GameMode.hero_farm_event[3]["round"] + 1) % 9
 		for j = 1, 10 do
-			local unit = CreateUnitByName(FarmEvent_Creeps[GameMode.hero_farm_event[3]["round"] + 1], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+			local unit = CreateUnitByName(FarmEvent_Creeps[GameMode.hero_farm_event[3]["round"] + 1], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 		end
 	end
 	return 1
@@ -208,7 +208,7 @@ end
 
 function FarmEventCreeps4()
 	local point = Entities:FindByName(nil, "farm_event_player_4")
-	local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_1, point:GetAbsOrigin(), nil, 1200, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)		
+	local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_2, point:GetAbsOrigin(), nil, 1200, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)		
 	local number = 0
 	for _,v in pairs(units) do
 		number = number +1
@@ -217,7 +217,7 @@ function FarmEventCreeps4()
 	if number <= 1 and SPECIAL_EVENT == 1 then
 		GameMode.hero_farm_event[4]["round"] = (GameMode.hero_farm_event[4]["round"] + 1) % 9
 		for j = 1, 10 do
-			local unit = CreateUnitByName(FarmEvent_Creeps[GameMode.hero_farm_event[4]["round"] + 1], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+			local unit = CreateUnitByName(FarmEvent_Creeps[GameMode.hero_farm_event[4]["round"] + 1], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 		end
 	end
 	return 1
@@ -225,7 +225,7 @@ end
 
 function FarmEventCreeps5()
 	local point = Entities:FindByName(nil, "farm_event_player_5")
-	local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_1, point:GetAbsOrigin(), nil, 1200, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)		
+	local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_2, point:GetAbsOrigin(), nil, 1200, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)		
 	local number = 0
 	for _,v in pairs(units) do
 		number = number +1
@@ -234,7 +234,7 @@ function FarmEventCreeps5()
 	if number <= 1 and SPECIAL_EVENT == 1 then
 		GameMode.hero_farm_event[5]["round"] = (GameMode.hero_farm_event[5]["round"] + 1) % 9
 		for j = 1, 10 do
-			local unit = CreateUnitByName(FarmEvent_Creeps[GameMode.hero_farm_event[5]["round"] + 1], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+			local unit = CreateUnitByName(FarmEvent_Creeps[GameMode.hero_farm_event[5]["round"] + 1], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 		end
 	end
 	return 1
@@ -242,7 +242,7 @@ end
 
 function FarmEventCreeps6()
 	local point = Entities:FindByName(nil, "farm_event_player_6")
-	local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_1, point:GetAbsOrigin(), nil, 1200, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)		
+	local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_2, point:GetAbsOrigin(), nil, 1200, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)		
 	local number = 0
 	for _,v in pairs(units) do
 		number = number +1
@@ -251,7 +251,7 @@ function FarmEventCreeps6()
 	if number <= 1 and SPECIAL_EVENT == 1 then
 		GameMode.hero_farm_event[6]["round"] = (GameMode.hero_farm_event[6]["round"] + 1) % 9
 		for j = 1, 10 do
-			local unit = CreateUnitByName(FarmEvent_Creeps[GameMode.hero_farm_event[6]["round"] + 1], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+			local unit = CreateUnitByName(FarmEvent_Creeps[GameMode.hero_farm_event[6]["round"] + 1], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 		end
 	end
 	return 1
@@ -259,7 +259,7 @@ end
 
 function FarmEventCreeps7()
 	local point = Entities:FindByName(nil, "farm_event_player_7")
-	local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_1, point:GetAbsOrigin(), nil, 1200, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)		
+	local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_2, point:GetAbsOrigin(), nil, 1200, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)		
 	local number = 0
 	for _,v in pairs(units) do
 		number = number +1
@@ -268,7 +268,7 @@ function FarmEventCreeps7()
 	if number <= 1 and SPECIAL_EVENT == 1 then
 		GameMode.hero_farm_event[7]["round"] = (GameMode.hero_farm_event[7]["round"] + 1) % 9
 		for j = 1, 10 do
-			local unit = CreateUnitByName(FarmEvent_Creeps[GameMode.hero_farm_event[7]["round"] + 1], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+			local unit = CreateUnitByName(FarmEvent_Creeps[GameMode.hero_farm_event[7]["round"] + 1], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 		end
 	end
 	return 1
@@ -276,9 +276,10 @@ end
 
 function EndFarmEvent(keys)
 local hero = keys.activator
-local base = Entities:FindByName(nil,"base_spawn"):GetAbsOrigin()
+local base = Entities:FindByName(nil, "base_spawn"):GetAbsOrigin()
 	if hero:IsIllusion() then
 		print("Illusion found, ignoring")
+		return
 	elseif hero:IsRealHero() then
 		if hero.old_pos then
 			FindClearSpaceForUnit(hero, hero.old_pos, true)
@@ -290,9 +291,14 @@ local base = Entities:FindByName(nil,"base_spawn"):GetAbsOrigin()
 			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
 		end)
 		hero:Stop()
+		return
+	else
+		Notifications:TopToAll({hero="npc_dota_hero_techies", duration = 5.0})
+		Notifications:TopToAll({text="Oops! a bug occured, please report it on Discord! ERROR CODE: #003", continue = true})
+		return
 	end
 
-	local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_1, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_NONE , FIND_ANY_ORDER, false)
+	local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_2, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_NONE , FIND_ANY_ORDER, false)
 	for _,v in pairs(units) do
 		if v:IsCreature() and v:HasMovementCapability() then
 			UTIL_Remove(v)
@@ -306,7 +312,7 @@ local teleporters = Entities:FindAllByName("trigger_teleport_ramero_end")
 nTimer_SpecialEvent = 120
 PauseCreeps()
 
-	local Ramero = CreateUnitByName("npc_ramero_2", Entities:FindByName(nil, "roshan_wp_4"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+	local Ramero = CreateUnitByName("npc_ramero_2", Entities:FindByName(nil, "roshan_wp_4"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 	Ramero:AddNewModifier( nil, nil, "modifier_boss_stun", {duration = 5})
 	Ramero:AddNewModifier( nil, nil, "modifier_invulnerable", {duration = 5})
 	Ramero:SetAngles(0, 45, 0)
@@ -344,11 +350,11 @@ local teleporters = Entities:FindAllByName("trigger_teleport_ramero_end")
 nTimer_SpecialEvent = 120
 SPECIAL_EVENT = 1
 
-	local Ramero = CreateUnitByName("npc_ramero", Entities:FindByName(nil, "roshan_wp_4"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+	local Ramero = CreateUnitByName("npc_ramero", Entities:FindByName(nil, "roshan_wp_4"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 	Ramero:AddNewModifier( nil, nil, "modifier_boss_stun", {duration = 5})
 	Ramero:AddNewModifier( nil, nil, "modifier_invulnerable", {duration = 5})
 	Ramero:SetAngles(0, 45, 0)
-	local Baristol = CreateUnitByName("npc_baristol", Entities:FindByName(nil, "roshan_wp_2"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+	local Baristol = CreateUnitByName("npc_baristol", Entities:FindByName(nil, "roshan_wp_2"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 	Baristol:AddNewModifier( nil, nil, "modifier_boss_stun", {duration = 5})
 	Baristol:AddNewModifier( nil, nil, "modifier_invulnerable", {duration = 5})
 	Baristol:SetAngles(0, 325, 0)

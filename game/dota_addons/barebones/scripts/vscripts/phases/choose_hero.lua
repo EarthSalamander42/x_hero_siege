@@ -61,7 +61,7 @@ function SpawnHeroesBis()
 	RAMERO_BIS_DUMMY:AddNewModifier(nil, nil, "modifier_invulnerable", {})
 
 	-- Special Events
-	lich_king = CreateUnitByName("npc_dota_boss_lich_king_bis", Entities:FindByName(nil, "npc_dota_spawner_lich_king"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_BADGUYS)
+	lich_king = CreateUnitByName("npc_dota_boss_lich_king_bis", Entities:FindByName(nil, "npc_dota_spawner_lich_king"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
 	lich_king:SetAngles(0, 90, 0)
 	lich_king:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
 	StartAnimation(lich_king, {duration = 20000.0, activity = ACT_DOTA_IDLE, rate = 0.9})
@@ -85,28 +85,13 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 				local particle = ParticleManager:CreateParticle("particles/econ/events/ti6/hero_levelup_ti6.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
 				ParticleManager:SetParticleControl(particle, 0, hero:GetAbsOrigin())
 				EmitSoundOnClient("ui.trophy_levelup", PlayerResource:GetPlayer(id))
-				local scroll = CreateItem("item_tpscroll", hero, hero)
-				scroll:SetPurchaseTime(0)
-				scroll:SetCurrentCharges(1)
-				scroll:SetPurchaser(hero)
-				hero:AddItem(scroll)
-				for i = 0, DOTA_ITEM_MAX - 1 do
-					local item = hero:GetItemInSlot(i)
-					if item and item:GetAbilityName() == "item_tpscroll" then
-						ExecuteOrderFromTable({
-							UnitIndex = hero:entindex(),
-							OrderType = DOTA_UNIT_ORDER_CAST_POSITION,
-							AbilityIndex = item:entindex(),
-							Position = point:GetAbsOrigin(),
-						})
-					end
-				end
 				hero:AddNewModifier(hero, nil, "modifier_command_restricted", {})
 				Notifications:Bottom(hero:GetPlayerOwnerID(), {hero="npc_dota_hero_"..HEROLIST[i], duration = 5.0})
 				Notifications:Bottom(hero:GetPlayerOwnerID(), {text="HERO: ", duration = 5.0, style={color="white"}, continue=true})
 				Notifications:Bottom(hero:GetPlayerOwnerID(), {text="#npc_dota_hero_"..HEROLIST[i], duration = 5.0, style={color="white"}, continue=true})
 				Timers:CreateTimer(3.1, function()
 					local newHero = PlayerResource:ReplaceHeroWith(id, "npc_dota_hero_"..HEROLIST[i], STARTING_GOLD, 0)
+					newHero:RespawnHero(false, false, false)
 					if difficulty < 4 then
 						local item = newHero:AddItemByName("item_ankh_of_reincarnation")
 					end
@@ -122,32 +107,21 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 					end)
 				end)
 			elseif caller:GetName() == "trigger_hero_weekly" then
+				if hero:HasAbility("holdout_vip") then
+					Notifications:Bottom(hero:GetPlayerOwnerID(), {text="You are VIP. Please choose this hero on top!", duration = 5.0})
+				return
+				end
 				UTIL_Remove(Entities:FindByName(nil, "trigger_hero_weekly"))
 				local particle = ParticleManager:CreateParticle("particles/econ/events/ti6/hero_levelup_ti6.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
 				ParticleManager:SetParticleControl(particle, 0, hero:GetAbsOrigin())
 				EmitSoundOnClient("ui.trophy_levelup", PlayerResource:GetPlayer(id))
-				local scroll = CreateItem("item_tpscroll", hero, hero)
-				scroll:SetPurchaseTime(0)
-				scroll:SetCurrentCharges(1)
-				scroll:SetPurchaser(hero)
-				hero:AddItem(scroll)
-				for i = 0, DOTA_ITEM_MAX - 1 do
-					local item = hero:GetItemInSlot(i)
-					if item and item:GetAbilityName() == "item_tpscroll" then
-						ExecuteOrderFromTable({
-							UnitIndex = hero:entindex(),
-							OrderType = DOTA_UNIT_ORDER_CAST_POSITION,
-							AbilityIndex = item:entindex(),
-							Position = point:GetAbsOrigin(),
-						})
-					end
-				end
 				hero:AddNewModifier(hero, nil, "modifier_command_restricted", {})
 				Notifications:Bottom(hero:GetPlayerOwnerID(), {hero=WeekHero, duration = 5.0})
 				Notifications:Bottom(hero:GetPlayerOwnerID(), {text="HERO: ", duration = 5.0, style={color="white"}, continue=true})
 				Notifications:Bottom(hero:GetPlayerOwnerID(), {text="#"..WeekHero, duration = 5.0, style={color="white"}, continue=true})
 				Timers:CreateTimer(3.1, function()
 					local newHero = PlayerResource:ReplaceHeroWith(id, WeekHero, STARTING_GOLD, 0)
+					newHero:RespawnHero(false, false, false)
 					if difficulty < 4 then
 						local item = newHero:AddItemByName("item_ankh_of_reincarnation")
 					end
@@ -181,22 +155,6 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 				local particle = ParticleManager:CreateParticle("particles/econ/events/ti6/hero_levelup_ti6.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
 				ParticleManager:SetParticleControl(particle, 0, hero:GetAbsOrigin())
 				EmitSoundOnClient("ui.trophy_levelup", PlayerResource:GetPlayer(id))
-				local scroll = CreateItem("item_tpscroll", hero, hero)
-				scroll:SetPurchaseTime(0)
-				scroll:SetCurrentCharges(1)
-				scroll:SetPurchaser(hero)
-				hero:AddItem(scroll)
-				for i = 0, DOTA_ITEM_MAX - 1 do
-					local item = hero:GetItemInSlot(i)
-					if item and item:GetAbilityName() == "item_tpscroll" then
-						ExecuteOrderFromTable({
-							UnitIndex = hero:entindex(),
-							OrderType = DOTA_UNIT_ORDER_CAST_POSITION,
-							AbilityIndex = item:entindex(),
-							Position = point:GetAbsOrigin(),
-						})
-					end
-				end
 				hero:AddNewModifier(hero, nil, "modifier_command_restricted", {})
 --				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
 				Notifications:Bottom(hero:GetPlayerOwnerID(), {hero="npc_dota_hero_"..HEROLIST_VIP[i], duration = 5.0})
@@ -204,6 +162,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 				Notifications:Bottom(hero:GetPlayerOwnerID(), {text="#npc_dota_hero_"..HEROLIST_VIP[i], duration = 5.0, style={color="white"}, continue=true})
 				Timers:CreateTimer(3.1, function()
 					local newHero = PlayerResource:ReplaceHeroWith(id, "npc_dota_hero_"..HEROLIST_VIP[i], STARTING_GOLD, 0)
+					newHero:RespawnHero(false, false, false)
 					if difficulty < 4 then
 						local item = newHero:AddItemByName("item_ankh_of_reincarnation")
 					end

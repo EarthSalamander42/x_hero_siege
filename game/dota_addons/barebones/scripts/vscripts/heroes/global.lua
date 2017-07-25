@@ -12,8 +12,8 @@ end
 
 function Reincarnation(event)
 local hero = event.caster
-local item = event.ability -- Item
 local ability = hero:FindAbilityByName("holdout_reincarnation") -- Ability
+local ankh = "item_ankh_of_reincarnation"
 local shield = "item_shield_of_invincibility"
 local position = hero:GetAbsOrigin()
 local RespawnTime = 5.0
@@ -54,7 +54,7 @@ if hero:IsIllusion() then return end
 			end
 		end
 	return
-	elseif item then
+	elseif hero:HasItemInInventory(ankh) then
 		print("Reincarnation: Ankh")
 		if hero:IsRealHero() then
 			print("Hero")
@@ -70,10 +70,15 @@ if hero:IsIllusion() then return end
 					hero.ankh_respawn = false
 				end)
 			end)
-			if item:GetCurrentCharges() -1 >= 1 then
-				item:SetCurrentCharges(item:GetCurrentCharges() -1)
-			else
-				item:RemoveSelf()
+			for itemSlot = 0, 5 do
+			local item = hero:GetItemInSlot(itemSlot)
+				if item and item:GetName() == ankh then
+					if item:GetCurrentCharges() -1 >= 1 then
+						item:SetCurrentCharges(item:GetCurrentCharges() -1)
+					else
+						item:RemoveSelf()
+					end
+				end
 			end
 		else
 			print("Non-Hero")
@@ -86,10 +91,15 @@ if hero:IsIllusion() then return end
 --					hero.ankh_respawn = false
 				end)
 			end)
-			if item:GetCurrentCharges() -1 >= 1 then
-				item:SetCurrentCharges(item:GetCurrentCharges() -1)
-			else
-				item:RemoveSelf()
+			for itemSlot = 0, 5 do
+			local item = hero:GetItemInSlot(itemSlot)
+				if item and item:GetName() == ankh then
+					if item:GetCurrentCharges() -1 >= 1 then
+						item:SetCurrentCharges(item:GetCurrentCharges() -1)
+					else
+						item:RemoveSelf()
+					end
+				end
 			end
 			if hero:GetOwner():FindAbilityByName("lone_druid_spirit_bear"):IsCooldownReady() then
 				hero:GetOwner():FindAbilityByName("lone_druid_spirit_bear"):StartCooldown(5.0)
@@ -101,35 +111,37 @@ if hero:IsIllusion() then return end
 		for itemSlot = 0, 5 do
 			local item = hero:GetItemInSlot(itemSlot)
 			if item and item:GetName() == shield then
-				if hero:IsRealHero() then
-					print("Hero")
-					hero.ankh_respawn = true
-					hero:SetRespawnsDisabled(true)
-					hero.respawn_timer = Timers:CreateTimer(RespawnTime, function() 
-						hero:SetRespawnPosition(position)
-						hero:EmitSound("Ability.ReincarnationAlt")
-						hero:RespawnHero(false, false, false)
-						ParticleManager:CreateParticle("particles/items_fx/aegis_respawn.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
-						hero:SetRespawnsDisabled(false)
-						Timers:CreateTimer(0.1, function()
-							hero.ankh_respawn = false
+				if item:IsCooldownReady() then
+					if hero:IsRealHero() then
+						print("Hero")
+						hero.ankh_respawn = true
+						hero:SetRespawnsDisabled(true)
+						hero.respawn_timer = Timers:CreateTimer(RespawnTime, function() 
+							hero:SetRespawnPosition(position)
+							hero:EmitSound("Ability.ReincarnationAlt")
+							hero:RespawnHero(false, false, false)
+							ParticleManager:CreateParticle("particles/items_fx/aegis_respawn.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
+							hero:SetRespawnsDisabled(false)
+							Timers:CreateTimer(0.1, function()
+								hero.ankh_respawn = false
+							end)
 						end)
-					end)
-					ability:StartCooldown(60.0)
-				else
-					print("Non-Hero")
---					hero.ankh_respawn = true
-					hero.respawn_timer = Timers:CreateTimer(RespawnTime, function() 
-						hero:EmitSound("Ability.ReincarnationAlt")
-						hero:RespawnUnit()
-						ParticleManager:CreateParticle("particles/items_fx/aegis_respawn.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
-						Timers:CreateTimer(0.1, function()
---							hero.ankh_respawn = false
+						item:StartCooldown(60.0)
+					else
+						print("Non-Hero")
+--						hero.ankh_respawn = true
+						hero.respawn_timer = Timers:CreateTimer(RespawnTime, function() 
+							hero:EmitSound("Ability.ReincarnationAlt")
+							hero:RespawnUnit()
+							ParticleManager:CreateParticle("particles/items_fx/aegis_respawn.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
+							Timers:CreateTimer(0.1, function()
+--								hero.ankh_respawn = false
+							end)
 						end)
-					end)
-					ability:StartCooldown(60.0)
-					if hero:GetOwner():FindAbilityByName("lone_druid_spirit_bear"):IsCooldownReady() then
-						hero:GetOwner():FindAbilityByName("lone_druid_spirit_bear"):StartCooldown(5.0)
+						item:StartCooldown(60.0)
+						if hero:GetOwner():FindAbilityByName("lone_druid_spirit_bear"):IsCooldownReady() then
+							hero:GetOwner():FindAbilityByName("lone_druid_spirit_bear"):StartCooldown(5.0)
+						end
 					end
 				end
 			end
@@ -203,6 +215,7 @@ local main_ability = ability:GetAbilityName()
 end
 
 function CastleMuradin(event)
+if GetMapName() == "ranked_2v2" then return end
 local caster = event.caster
 local ability = event.ability
 local heroes = HeroList:GetAllHeroes()

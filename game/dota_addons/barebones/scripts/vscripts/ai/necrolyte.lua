@@ -60,7 +60,7 @@ function BehaviorDeathPulse:Evaluate()
 
 	ABILITY_DeathPulse = thisEntity:FindAbilityByName( "creature_death_pulse" )
 	
-	local enemies = FindUnitsInRadius( DOTA_TEAM_BADGUYS, thisEntity:GetOrigin(), nil, 600, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO, 0, 0, false )
+	local enemies = FindUnitsInRadius( thisEntity:GetTeam(), thisEntity:GetOrigin(), nil, 600, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO, 0, 0, false )
 	if #enemies > 0 then
 		desire = 4
 		if ABILITY_DeathPulse and ABILITY_DeathPulse:IsFullyCastable() then

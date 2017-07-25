@@ -35,7 +35,7 @@ DOTA_UNIT_ORDER_CAST_RUNE
 AICore = {}
 
 function AICore:RandomEnemyHeroInRange( entity, range )
-	local enemies = FindUnitsInRadius( DOTA_TEAM_BADGUYS, entity:GetOrigin(), nil, range, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO, 0, 0, false )
+	local enemies = FindUnitsInRadius( thisEntity:GetTeam(), entity:GetOrigin(), nil, range, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO, 0, 0, false )
 	if #enemies > 0 then
 		local index = RandomInt( 1, #enemies )
 		return enemies[index]
@@ -45,7 +45,7 @@ function AICore:RandomEnemyHeroInRange( entity, range )
 end
 
 function AICore:WeakestEnemyHeroInRange( entity, range )
-	local enemies = FindUnitsInRadius( DOTA_TEAM_BADGUYS, entity:GetOrigin(), nil, range, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO, 0, 0, false )
+	local enemies = FindUnitsInRadius( thisEntity:GetTeam(), entity:GetOrigin(), nil, range, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO, 0, 0, false )
 
 	local minHP = nil
 	local target = nil

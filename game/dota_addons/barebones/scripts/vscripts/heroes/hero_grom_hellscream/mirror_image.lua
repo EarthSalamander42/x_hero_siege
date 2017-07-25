@@ -46,6 +46,30 @@ function Phantasm( keys )
 		Vector( 72, -72, 0 ),	-- West
 		Vector( -72, -72, 0 ),	-- West
 		Vector( -72, 0, 72 ),	-- West
+		Vector( 72, 0, 0 ),		-- North
+		Vector( 0, 72, 0 ),		-- East
+		Vector( -72, 0, 0 ),	-- South
+		Vector( 72, -72, 0 ),	-- West
+		Vector( -72, -72, 0 ),	-- West
+		Vector( -72, 0, 72 ),	-- West
+		Vector( 72, 0, 0 ),		-- North
+		Vector( 0, 72, 0 ),		-- East
+		Vector( -72, 0, 0 ),	-- South
+		Vector( 72, -72, 0 ),	-- West
+		Vector( -72, -72, 0 ),	-- West
+		Vector( -72, 0, 72 ),	-- West
+		Vector( 72, 0, 0 ),		-- North
+		Vector( 0, 72, 0 ),		-- East
+		Vector( -72, 0, 0 ),	-- South
+		Vector( 72, -72, 0 ),	-- West
+		Vector( -72, -72, 0 ),	-- West
+		Vector( -72, 0, 72 ),	-- West
+		Vector( 72, 0, 0 ),		-- North
+		Vector( 0, 72, 0 ),		-- East
+		Vector( -72, 0, 0 ),	-- South
+		Vector( 72, -72, 0 ),	-- West
+		Vector( -72, -72, 0 ),	-- West
+		Vector( -72, 0, 72 ),	-- West
 	}
 
 	for i=#vRandomSpawnPos, 2, -1 do	-- Simply shuffle them
@@ -78,7 +102,7 @@ function Phantasm( keys )
 
 		for abilitySlot=0,15 do
 		local ability = caster:GetAbilityByIndex(abilitySlot)
-			if ability ~= nil then 
+			if ability then
 				local abilityLevel = ability:GetLevel()
 				local abilityName = ability:GetAbilityName()
 				local illusionAbility = illusion:FindAbilityByName(abilityName)
@@ -88,15 +112,11 @@ function Phantasm( keys )
 				end
 
 				if ability:GetName() == "grom_hellscream_mirror_image" then
-					illusionAbility:SetActivated(false)
-					illusion:RemoveAbility("boss_health")
-					illusion:RemoveModifierByName("modifier_boss_health")
-					illusion:RemoveAbility("cant_die_generic")
-					illusion:RemoveModifierByName("modifier_dying_generic")
+					ability:SetActivated(false)
 				end
 			end
 		end
-		
+
 		-- Recreate the items of the caster
 		for itemSlot=0,5 do
 			local item = caster:GetItemInSlot(itemSlot)
@@ -107,29 +127,12 @@ function Phantasm( keys )
 			end
 		end
 
-		-- Set the unit as an illusion
-		-- modifier_illusion controls many illusion properties like +Green damage not adding to the unit damage, not being able to cast spells and the team-only blue particle
 		illusion:AddNewModifier(caster, ability, "modifier_illusion", { duration = duration, outgoing_damage = outgoingDamage, incoming_damage = incomingDamage })
-		
-		-- Without MakeIllusion the unit counts as a hero, e.g. if it dies to neutrals it says killed by neutrals, it respawns, etc.
 		illusion:MakeIllusion()
-		-- Set the illusion hp to be the same as the caster
 		illusion:SetHealth(caster:GetHealth())
-
-		-- Add the illusion created to a table within the caster handle, to remove the illusions on the next cast if necessary
 		table.insert(caster.phantasm_illusions, illusion)
+		illusion:RemoveAbility("boss_health")
+		illusion:RemoveAbility("cant_die_generic")
+		illusion:RemoveModifierByName("modifier_cant_die_generic")
 	end
-end
-
---[[Creates vision around the caster while shuffling the illusions]]
-function PhantasmVision( keys )
-	local caster = keys.caster
-	local caster_location = caster:GetAbsOrigin()
-	local ability = keys.ability
-	local ability_level = ability:GetLevel() - 1
-
-	local vision_radius = ability:GetLevelSpecialValueFor("vision_radius", ability_level) 
-	local vision_duration = ability:GetLevelSpecialValueFor("invuln_duration", ability_level)
-
-	ability:CreateVisibilityNode(caster_location, vision_radius, vision_duration)
 end

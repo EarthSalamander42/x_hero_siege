@@ -10,9 +10,14 @@
 	"addonContent_Campaign"			"0"
 
 	"maps"						"x_hero_siege"
+//	"maps"						"x_hero_siege ranked_2v2"
 	"IsPlayable"				"1"
 	"x_hero_siege"
 	{
 		"MaxPlayers"			"8"
 	}
+//	"ranked_2v2"
+//	{
+//		"MaxPlayers"			"4"
+//	}
 }

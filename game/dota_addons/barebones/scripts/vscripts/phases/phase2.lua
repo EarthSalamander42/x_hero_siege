@@ -23,7 +23,7 @@ function spawn_second_phase_left()
 	Timers:CreateTimer(0, function()
 		if not EntIceTower:IsNull() and SPECIAL_EVENT == 0 then
 			for j = 1, 8 do
-			local unit = CreateUnitByName("npc_ghul_II", point+RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_BADGUYS)
+			local unit = CreateUnitByName("npc_ghul_II", point+RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_CUSTOM_1)
 			end
 		return 30
 		elseif SPECIAL_EVENT == 1 then
@@ -41,7 +41,7 @@ function spawn_second_phase_right()
 	Timers:CreateTimer(0, function()
 		if not EntIceTower:IsNull() and SPECIAL_EVENT == 0 then
 			for j = 1, 8 do
-			local unit = CreateUnitByName("npc_orc_II", point+RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_BADGUYS)
+			local unit = CreateUnitByName("npc_orc_II", point+RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_CUSTOM_1)
 			end
 		return 30
 		elseif SPECIAL_EVENT == 1 then
@@ -56,7 +56,7 @@ end
 function killed_frost_tower_left(keys)
 GameMode.FrostTowers_killed = GameMode.FrostTowers_killed +1
 
-	if GameMode.FrostTowers_killed >= 2 then
+	if GameMode.FrostTowers_killed >= ICE_TOWERS_REQUIRED then
 		Notifications:TopToAll({text="WARNING! Final Wave incoming. Arriving in 60 seconds! Back to the Castle!" , duration=10.0})
 		Timers:CreateTimer(59, RefreshPlayers)
 		Timers:CreateTimer(60,FinalWave)
@@ -70,7 +70,7 @@ end
 function killed_frost_tower_right(keys)
 GameMode.FrostTowers_killed = GameMode.FrostTowers_killed +1
 
-	if GameMode.FrostTowers_killed >= 2 then
+	if GameMode.FrostTowers_killed >= ICE_TOWERS_REQUIRED then
 		Notifications:TopToAll({text="WARNING! Final Wave incoming. Arriving in 60 seconds! Back to the Castle!" , duration=10.0})
 		Timers:CreateTimer(59, RefreshPlayers)
 		Timers:CreateTimer(60, FinalWave)

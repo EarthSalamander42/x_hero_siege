@@ -84,9 +84,49 @@ function TimerAllHeroImage(data)
 	$("#AllHeroImageTimer").text = timerText;
 }
 
-function ShowTimer(data)
+function ShowTimerBar()
 {
-//	$("#ScoreboardLeft_Parent").style.visibility = "visible";
+	$("#TimerPanels").style.visibility = "visible";
+}
+
+function ShowTimerHeroImage()
+{
+	$("#HeroImage").style.visibility = "visible";
+}
+
+function ShowTimerSpiritBeast()
+{
+	$("#SpiritBeast").style.visibility = "visible";
+}
+
+function ShowTimerFrostInfernal()
+{
+	$("#FrostInfernal").style.visibility = "visible";
+}
+
+function ShowTimerAllHeroImage()
+{
+	$("#AllHeroImage").style.visibility = "visible";
+}
+
+function HideTimerHeroImage()
+{
+	$("#HeroImage").style.visibility = "collapse";
+}
+
+function HideTimerSpiritBeast()
+{
+	$("#SpiritBeast").style.visibility = "collapse";
+}
+
+function HideTimerFrostInfernal()
+{
+	$("#FrostInfernal").style.visibility = "collapse";
+}
+
+function HideTimerAllHeroImage()
+{
+	$("#AllHeroImage").style.visibility = "collapse";
 }
 
 function OnGameStateChanged(table, key, data)
@@ -100,16 +140,19 @@ function OnGameStateChanged(table, key, data)
 	CustomNetTables.SubscribeNetTableListener("game_state", OnGameStateChanged);
 
 	GameEvents.Subscribe("timer_game", GameTimer);
-	GameEvents.Subscribe("timer_incoming_wave", TimerIncomingWave);
 	GameEvents.Subscribe("timer_special_event", TimerSpecialEvents);
+	GameEvents.Subscribe("timer_incoming_wave", TimerIncomingWave);
 	GameEvents.Subscribe("timer_hero_image", TimerHeroImage);
 	GameEvents.Subscribe("timer_spirit_beast", TimerSpiritBeastHeroImage);
 	GameEvents.Subscribe("timer_frost_infernal", TimerFrostInfernalHeroImage);
 	GameEvents.Subscribe("timer_all_hero_image", TimerAllHeroImage);
-	GameEvents.Subscribe("show_timer", ShowTimer);
-
-	$("#HeroImage").style.visibility = "collapse";
-	$("#SpiritBeast").style.visibility = "collapse";
-	$("#FrostInfernal").style.visibility = "collapse";
-	$("#AllHeroImage").style.visibility = "collapse";
+	GameEvents.Subscribe("show_timer_bar", ShowTimerHeroImage);
+	GameEvents.Subscribe("show_timer_hero_image", ShowTimerHeroImage);
+	GameEvents.Subscribe("show_timer_spirit_beast", ShowTimerSpiritBeast);
+	GameEvents.Subscribe("show_timer_frost_infernal", ShowTimerFrostInfernal);
+	GameEvents.Subscribe("show_timer_all_hero_image", ShowTimerAllHeroImage);
+	GameEvents.Subscribe("hide_timer_hero_image", HideTimerHeroImage);
+	GameEvents.Subscribe("hide_timer_spirit_beast", HideTimerSpiritBeast);
+	GameEvents.Subscribe("hide_timer_frost_infernal", HideTimerFrostInfernal);
+	GameEvents.Subscribe("hide_timer_all_hero_image", HideTimerAllHeroImage);
 })();
