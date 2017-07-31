@@ -1632,7 +1632,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"items/global.lua"
+						"ScriptFile"	"heroes/global.lua"
 						"Function"		"Splash"
 					}
 				}
@@ -2212,29 +2212,19 @@
 			"02"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"minion_hp"				"375"
+				"duration"				"25"
 			}
 			"03"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"minion_damage"			"200"
+				"bonus_damage"			"450"
 			}
 			"04"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"duration"				"40"
-			}
-			"05"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_damage"			"450"
-			}
-			"06"
-			{
-				"var_type"				"FIELD_INTEGER"
 				"bonus_armor"			"100"
 			}
-			"07"
+			"05"
 			{
 				"var_type"				"FIELD_INTEGER"
 				"bonus_health_regen"	"20"
@@ -2306,18 +2296,7 @@
 				"EffectName"		"particles/units/heroes/hero_ursa/ursa_enrage_buff_glow.vpcf"
 				"EffectAttachType"	"attach_attack1"
 
-				"OnAttackLanded"
-				{
-					"ApplyModifier"
-					{
-						"ModifierName"		"modifier_orb_of_darkness_spawn3"
-						"Target"
-						{
-							"Center"		"TARGET"
-							"Types"			"DOTA_UNIT_TARGET_BASIC"
-						}
-					}
-				}
+				//Script is holded in events.lua, search for hero:HasModifier("modifier_orb_of_darkness").
 			}
 
 			"modifier_orb_attributes"
@@ -2332,44 +2311,6 @@
 					"MODIFIER_PROPERTY_HEALTH_BONUS"				"%bonus_hp"
 					"MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS"		"%bonus_armor"
 					"MODIFIER_PROPERTY_HEALTH_REGEN_CONSTANT"		"%bonus_health_regen"
-				}
-			}
-
-			"modifier_orb_of_darkness_spawn3"
-			{
-				"IsHidden"		"1"
-				"Duration"		"0.1"
-
-				"OnDeath"
-				{
-					"SpawnUnit"
-					{
-						"UnitName"			"undead_black_arrow_minion_3"
-						"UnitCount"			"1"
-						"SpawnRadius"		"1"
-						"Duration"			"%duration"
-						"Target"
-						{
-							"Center"	"UNIT"
-							"Flags"		"DOTA_UNIT_TARGET_FLAG_DEAD"
-						}
-
-						"OnSpawn"
-						{
-							"FireSound"
-							{
-								"EffectName"	"Hero_Medusa.MysticSnake.Return"
-								"Target"		"CASTER"
-							}
-
-							"ApplyModifier"
-							{
-								"ModifierName"	"modifier_phased"
-								"Target"		"TARGET"
-								"Duration"		"0.03"
-							}
-						}
-					}
 				}
 			}
 		}
@@ -2826,7 +2767,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"items/global.lua"
+						"ScriptFile"	"heroes/global.lua"
 						"Function"		"Splash"
 					}
 				}
@@ -2891,25 +2832,15 @@
 			}
 			"03"
 			{
-				"var_type"              "FIELD_INTEGER"
-				"minion_hp"             "375"
+				"var_type"				"FIELD_INTEGER"
+				"duration"				"25"
 			}
 			"04"
-			{
-				"var_type"              "FIELD_INTEGER"
-				"minion_damage"         "20"
-			}
-			"05"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"duration"				"40"
-			}
-			"06"
 			{
 				"var_type"				"FIELD_INTEGER"
 				"bonus_armor"			"11"
 			}
-			"07"
+			"05"
 			{
 				"var_type"				"FIELD_INTEGER"
 				"bonus_health_regen"	"20"
@@ -2981,24 +2912,7 @@
 				"EffectName"		"particles/units/heroes/hero_ursa/ursa_enrage_buff_glow.vpcf"
 				"EffectAttachType"	"attach_attack1"
 
-				"OnAttackLanded"
-				{
-					"ApplyModifier"
-					{
-						"ModifierName"		"modifier_orb_of_darkness_spawn"
-						"Target"
-						{
-							"Center"		"TARGET"
-							"Types"			"DOTA_UNIT_TARGET_BASIC"
-						}
-					}
-
-					"FireSound"
-					{
-						"EffectName"		"Hero_Medusa.MysticSnake.Target"
-						"Target"			"CASTER"
-					}
-				}
+				//Script is holded in events.lua, search for hero:HasModifier("modifier_orb_of_darkness").
 			}
 
 			"modifier_orb_attributes"
@@ -3013,43 +2927,6 @@
 					"MODIFIER_PROPERTY_HEALTH_BONUS"				"%bonus_hp"
 					"MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS"		"%bonus_armor"
 					"MODIFIER_PROPERTY_HEALTH_REGEN_CONSTANT"		"%bonus_health_regen"
-				}
-			}
-
-			"modifier_orb_of_darkness_spawn"
-			{
-				"IsHidden"  "1"
-				"Duration"  "0.1"
-				"OnDeath"
-				{
-					"SpawnUnit"
-					{
-						"UnitName"      "undead_black_arrow_minion_1"
-						"UnitCount"     "1"
-						"SpawnRadius"   "1"
-						"Duration"      "%duration"
-						"Target"
-						{
-							"Center"    "UNIT"
-							"Flags"     "DOTA_UNIT_TARGET_FLAG_DEAD"
-						}
-
-						"OnSpawn"
-						{
-							"FireSound"
-							{
-								"EffectName"    "Hero_Medusa.MysticSnake.Return"
-								"Target"        "CASTER"
-							}
-
-							"ApplyModifier"
-							{
-								"ModifierName"	"modifier_phased"
-								"Target"		"TARGET"
-								"Duration"		"0.03"
-							}
-						}
-					}
 				}
 			}
 		}
@@ -4826,7 +4703,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"items/global.lua"
+						"ScriptFile"	"heroes/global.lua"
 						"Function"		"Splash"
 					}
 				}
@@ -5323,24 +5200,14 @@
 			"03"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"minion_hp"				"375"
+				"duration"				"25"
 			}
 			"04"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"minion_damage"			"80"
-			}
-			"05"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"duration"				"40"
-			}
-			"06"
-			{
-				"var_type"				"FIELD_INTEGER"
 				"bonus_armor"			"33"
 			}
-			"07"
+			"05"
 			{
 				"var_type"				"FIELD_INTEGER"
 				"bonus_health_regen"	"20"
@@ -5412,24 +5279,7 @@
 				"EffectName"		"particles/units/heroes/hero_ursa/ursa_enrage_buff_glow.vpcf"
 				"EffectAttachType"	"attach_attack1"
 
-				"OnAttackLanded"
-				{
-					"ApplyModifier"
-					{
-						"ModifierName"		"modifier_orb_of_darkness_spawn2"
-						"Target"
-						{
-							"Center"		"TARGET"
-							"Types"			"DOTA_UNIT_TARGET_BASIC"
-						}
-					}
-
-					"FireSound"
-					{
-						"EffectName"		"Hero_Medusa.MysticSnake.Target"
-						"Target"			"CASTER"
-					}
-				}
+				//Script is holded in events.lua, search for hero:HasModifier("modifier_orb_of_darkness").
 			}
 
 			"modifier_orb_attributes"
@@ -5444,44 +5294,6 @@
 					"MODIFIER_PROPERTY_HEALTH_BONUS"				"%bonus_hp"
 					"MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS"		"%bonus_armor"
 					"MODIFIER_PROPERTY_HEALTH_REGEN_CONSTANT"		"%bonus_health_regen"
-				}
-			}
-
-			"modifier_orb_of_darkness_spawn2"
-			{
-				"IsHidden"		"1"
-				"Duration"		"0.1"
-
-				"OnDeath"
-				{
-					"SpawnUnit"
-					{
-						"UnitName"			"undead_black_arrow_minion_2"
-						"UnitCount"			"1"
-						"SpawnRadius"		"1"
-						"Duration"			"%duration"
-						"Target"
-						{
-							"Center"	"UNIT"
-							"Flags"		"DOTA_UNIT_TARGET_FLAG_DEAD"
-						}
-
-						"OnSpawn"
-						{
-							"FireSound"
-							{
-								"EffectName"	"Hero_Medusa.MysticSnake.Return"
-								"Target"		"CASTER"
-							}
-
-							"ApplyModifier"
-							{
-								"ModifierName"	"modifier_phased"
-								"Target"		"TARGET"
-								"Duration"		"0.03"
-							}
-						}
-					}
 				}
 			}
 		}

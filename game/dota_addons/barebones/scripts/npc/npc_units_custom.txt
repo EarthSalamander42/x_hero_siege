@@ -7801,7 +7801,7 @@
 	"npc_dota_hero_proudmoore"
 	{
 		"BaseClass"					"npc_dota_creature"
-		"Model"						"models/heroes/kunkka/kunkka.vmdl"			// Model.
+		"Model"						"models/heroes/kunkka/kunkka.vmdl"		// Model.
 		"SoundSet"					"Hero_Kunkka"							// Name of sound set.
 		"ConsideredHero"			"1"
 		"Portrait"					"vgui/hud/heroportraits/portrait_kunka"
@@ -7816,39 +7816,47 @@
 		"Ability4"					"boss_health"
 		"Ability5"					"cant_die_generic"
 
-		"ArmorPhysical"				"1800"                 // Physical protection.
-		"MagicalResistance"			"50"                 // Magical protection (percentage).
+		"ArmorPhysical"				"1800"			// Physical protection.
+		"MagicalResistance"			"50"			// Magical protection (percentage).
 	
 		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
-		"AttackDamageMin"			"70002"                   // Damage range min.
-		"AttackDamageMax"			"70012"                   // Damage range max.
-		"AttackRate"				"0.55"                                  // Speed of attack.
-		"AttackAnimationPoint"		"0.33"                                   // Normalized time in animation cycle to attack.
-		"AttackAcquisitionRange"	"1000"                                   // Range within a target can be acquired.
-		"AttackRange"				"200"                                   // Range within a target can be attacked.
+		"AttackDamageMin"			"70002"			// Damage range min.
+		"AttackDamageMax"			"70012"			// Damage range max.
+		"AttackRate"				"0.55"			// Speed of attack.
+		"AttackAnimationPoint"		"0.33"			// Normalized time in animation cycle to attack.
+		"AttackAcquisitionRange"	"1000"			// Range within a target can be acquired.
+		"AttackRange"				"200"			// Range within a target can be attacked.
 
-		"BountyXP"					"0"                 // Experience earn.
-		"BountyGoldMin"				"0"                   // Gold earned min.
-		"BountyGoldMax"				"0"                   // Gold earned max.
+		"BountyXP"					"0"			// Experience earn.
+		"BountyGoldMin"				"0"			// Gold earned min.
+		"BountyGoldMax"				"0"			// Gold earned max.
 
 		"BoundsHullName"			"DOTA_HULL_SIZE_HUGE"
 		"RingRadius"				"150"
 		"HealthBarOffset"			"200"
 
 		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"
-		"MovementSpeed"				"400"                 // Speed.
-		"MovementTurnRate"			"0.6"                 // Turning rate.
+		"MovementSpeed"				"400"			// Speed.
+		"MovementTurnRate"			"0.6"			// Turning rate.
 
-		"StatusHealth"				"100000"                 // Base health.
-		"StatusHealthRegen"			"30.0"                 // Health regeneration rate.
-		"StatusMana"				"5000"                   // Base mana.
-		"StatusManaRegen"			"10.0"                 // Mana regeneration rate.
+		"StatusHealth"				"100000"		// Base health.
+		"StatusHealthRegen"			"30.0"			// Health regeneration rate.
+		"StatusMana"				"5000"			// Base mana.
+		"StatusManaRegen"			"10.0"			// Mana regeneration rate.
 
-		"VisionDaytimeRange"		"1200"                  // Range of vision at night time.
-		"VisionNighttimeRange"		"1000"                  // Range of vision at night time.
+		"VisionDaytimeRange"		"1200"			// Range of vision at night time.
+		"VisionNighttimeRange"		"1000"			// Range of vision at night time.
 		"vscripts"					"ai/proudmoore.lua"
 		"Creature"
 		{
+			"EquippedItems"
+			{
+				"BattleFury"
+				{
+					"Item"					"item_bfury"
+				}
+			}
+
 		   "AttachWearables"
 			{
 				"Wearable1" { "ItemDef" "10" }
@@ -7857,227 +7865,6 @@
 				"Wearable4" { "ItemDef" "14" }
 				"Wearable5" { "ItemDef" "357" }
 				"Wearable6" { "ItemDef" "81" }
-			} 
-		}
-	}
-
-	//=================================================================================
-	// Dark Minion
-	//=================================================================================
-	"undead_black_arrow_minion_1"
-	{                                       
-		// General
-		//----------------------------------------------------------------
-		"Model"						"models/items/undying/idol_of_ruination/ruin_wight_minion_gold.vmdl"    // Model.
-		"BaseClass"					"npc_dota_creature"
-		"SoundSet"					"n_creep_Melee"
-		"Level"						"1"
-		"ModelScale"				"1"
-		"IsSummoned"				"1"
-	
-		// Abilities
-		//----------------------------------------------------------------
-		"Ability1"					""           // Ability 1
-	
-		// Armor
-		//----------------------------------------------------------------
-		"ArmorPhysical"				"5"         // Physical protection.
-	
-		// Attack
-		//----------------------------------------------------------------
-		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
-		"AttackDamageType"			"DAMAGE_TYPE_ArmorPhysical"
-		"AttackDamageMin"			"19"     // Damage range min.
-		"AttackDamageMax"			"21"        // Damage range max.    
-		"AttackRate"				"1.6"     // Speed of attack.
-		"AttackAnimationPoint"		"0.38"      // Normalized time in animation cycle to attack.
-		"AttackAcquisitionRange"	"500"       // Range within a target can be acquired.
-		"AttackRange"				"100"       // Range within a target can be attacked.
-		"ProjectileModel"			""          // Particle system model for projectile.
-		"ProjectileSpeed"			"900"         // Speed of projectile.        
-	
-		// Bounds
-		//----------------------------------------------------------------
-		"RingRadius"				"40"
-		"HealthBarOffset"			"150"
-	
-		// Movement
-		//----------------------------------------------------------------
-		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"
-		"MovementSpeed"				"315"       // Speed.
-	
-		// Status
-		//----------------------------------------------------------------
-		"StatusHealth"				"375"       // Base health.
-		"StatusHealthRegen"			"0.0"     // Health regeneration rate.
-		"StatusMana"				"0"         // Base mana.
-		"StatusManaRegen"			"0.0"       // Mana regeneration rate.       
-		
-		// Vision
-		//----------------------------------------------------------------
-		"VisionDaytimeRange"		"500"       // Range of vision during day light.
-		"VisionNighttimeRange"		"500"       // Range of vision at night time.
-	
-		// Attack Damage types
-		//----------------------------------------------------------------
-		"TeamName"					"DOTA_TEAM_GOODGUYS"
-		"BoundsHullName"			"DOTA_HULL_SIZE_SMALL"
-		"CombatClassAttack"			"DOTA_COMBAT_CLASS_ATTACK_BASIC"
-		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_HERO"
-		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
-	}
-
-	//=================================================================================
-	// Dark Minion
-	//=================================================================================
-	"undead_black_arrow_minion_2"
-	{                                       
-		// General
-		//----------------------------------------------------------------
-		"Model"						"models/heroes/shadow_demon/shadow_demon.vmdl"    // Model.
-		"BaseClass"					"npc_dota_creature"
-		"SoundSet"					"Hero_ShadowDemon"
-		"Level"						"1"
-		"ModelScale"				"0.95"
-		"IsSummoned"				"1"
-
-		// Abilities
-		//----------------------------------------------------------------
-		"Ability1"					""           // Ability 1
-	
-		// Armor
-		//----------------------------------------------------------------
-		"ArmorPhysical"				"20"         // Physical protection.
-	
-		// Attack
-		//----------------------------------------------------------------
-		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
-		"AttackDamageType"			"DAMAGE_TYPE_ArmorPhysical"
-		"AttackDamageMin"			"79"     // Damage range min.
-		"AttackDamageMax"			"81"        // Damage range max.    
-		"AttackRate"				"1.2"     // Speed of attack.
-		"AttackAnimationPoint"		"0.38"      // Normalized time in animation cycle to attack.
-		"AttackAcquisitionRange"	"500"       // Range within a target can be acquired.
-		"AttackRange"				"100"       // Range within a target can be attacked.
-		"ProjectileModel"			""          // Particle system model for projectile.
-		"ProjectileSpeed"			"900"         // Speed of projectile.        
-	
-		// Bounds
-		//----------------------------------------------------------------
-		"RingRadius"				"40"
-		"HealthBarOffset"			"150"
-
-		// Movement
-		//----------------------------------------------------------------
-		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"
-		"MovementSpeed"				"325"       // Speed.
-	
-		// Status
-		//----------------------------------------------------------------
-		"StatusHealth"				"875"       // Base health.
-		"StatusHealthRegen"			"0.0"     // Health regeneration rate.
-		"StatusMana"				"0"         // Base mana.
-		"StatusManaRegen"			"0.0"       // Mana regeneration rate.       
-		
-		// Vision
-		//----------------------------------------------------------------
-		"VisionDaytimeRange"		"500"       // Range of vision during day light.
-		"VisionNighttimeRange"		"500"       // Range of vision at night time.
-	
-		// Attack Damage types
-		//----------------------------------------------------------------
-		"TeamName"					"DOTA_TEAM_GOODGUYS"
-		"BoundsHullName"			"DOTA_HULL_SIZE_SMALL"
-		"CombatClassAttack"			"DOTA_COMBAT_CLASS_ATTACK_BASIC"
-		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_HERO"
-		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
-
-		"Creature"
-		{
-			"AttachWearables"
-			{
-				"Wearable1" { "ItemDef" "396" } //Cape
-				"Wearable2" { "ItemDef" "397" } //Armor
-				"Wearable3" { "ItemDef" "398" } //Belt
-				"Wearable4" { "ItemDef" "399" } //Tail
-			} 
-		}
-	}
-
-	//=================================================================================
-	// Dark Minion
-	//=================================================================================
-	"undead_black_arrow_minion_3"
-	{                                       
-		// General
-		//----------------------------------------------------------------
-		"Model"						"models/heroes/faceless_void/faceless_void.vmdl"    // Model.
-		"BaseClass"					"npc_dota_creature"
-		"SoundSet"					"Hero_FacelessVoid"
-		"Level"						"1"
-		"ModelScale"				"1"
-		"IsSummoned"				"1"
-
-		// Abilities
-		//----------------------------------------------------------------
-		"Ability1"					""           // Ability 1
-
-		// Armor
-		//----------------------------------------------------------------
-		"ArmorPhysical"				"30"         // Physical protection.
-
-		// Attack
-		//----------------------------------------------------------------
-		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
-		"AttackDamageType"			"DAMAGE_TYPE_ArmorPhysical"
-		"AttackDamageMin"			"199"     // Damage range min.
-		"AttackDamageMax"			"201"        // Damage range max.    
-		"AttackRate"				"1.6"     // Speed of attack.
-		"AttackAnimationPoint"		"0.38"      // Normalized time in animation cycle to attack.
-		"AttackAcquisitionRange"	"500"       // Range within a target can be acquired.
-		"AttackRange"				"100"       // Range within a target can be attacked.
-		"ProjectileModel"			""          // Particle system model for projectile.
-		"ProjectileSpeed"			"900"         // Speed of projectile.        
-
-		// Bounds
-		//----------------------------------------------------------------
-		"RingRadius"				"40"
-		"HealthBarOffset"			"150"
-
-		// Movement
-		//----------------------------------------------------------------
-		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"
-		"MovementSpeed"				"345"       // Speed.
-
-		// Status
-		//----------------------------------------------------------------
-		"StatusHealth"				"3075"       // Base health.
-		"StatusHealthRegen"			"1.0"     // Health regeneration rate.
-		"StatusMana"				"0"         // Base mana.
-		"StatusManaRegen"			"0.0"       // Mana regeneration rate.       
-
-		// Vision
-		//----------------------------------------------------------------
-		"VisionDaytimeRange"		"500"       // Range of vision during day light.
-		"VisionNighttimeRange"		"500"       // Range of vision at night time.
-
-		// Attack Damage types
-		//----------------------------------------------------------------
-		"TeamName"					"DOTA_TEAM_GOODGUYS"
-		"BoundsHullName"			"DOTA_HULL_SIZE_SMALL"
-		"CombatClassAttack"			"DOTA_COMBAT_CLASS_ATTACK_BASIC"
-		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_HERO"
-		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
-
-		"Creature"
-		{
-			"AttachWearables"
-			{
-				"Wearable1" { "ItemDef" "15" } //Weapon
-				"Wearable2" { "ItemDef" "90" } //Head
-				"Wearable3" { "ItemDef" "91" } //Shoulder
-				"Wearable4" { "ItemDef" "92" } //Bracer
-				"Wearable5" { "ItemDef" "93" } //Belt
 			} 
 		}
 	}
@@ -12949,6 +12736,7 @@
 		"ModelScale"				"1.25"
 		"Level"						"1"
 		"IsSummoned"				"1"
+		"LeavesCorpse"				"0"
 		
 		// Armor
 		//----------------------------------------------------------------
@@ -12976,7 +12764,7 @@
 		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"
 		"MovementSpeed"				"270"
 		"MovementTurnRate"			"0.6"
-		
+
 		// Status
 		//----------------------------------------------------------------
 		"StatusHealth"				"500"
@@ -13002,6 +12790,7 @@
 		"ModelScale"				"1.5"
 		"Level"						"2"
 		"IsSummoned"				"1"
+		"LeavesCorpse"				"0"
 		
 		// Armor
 		//----------------------------------------------------------------
@@ -13055,6 +12844,7 @@
 		"ModelScale"				"1.75"
 		"Level"						"3"
 		"IsSummoned"				"1"
+		"LeavesCorpse"				"0"
 		
 		// Armor
 		//----------------------------------------------------------------
@@ -13108,6 +12898,7 @@
 		"ModelScale"				"2.0"
 		"Level"						"4"
 		"IsSummoned"				"1"
+		"LeavesCorpse"				"0"
 		
 		// Armor
 		//----------------------------------------------------------------

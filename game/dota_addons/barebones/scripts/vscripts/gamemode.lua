@@ -435,7 +435,11 @@ local Region = {
 							if hero:IsIllusion() then
 								print("Illusion found, ignoring it")
 							elseif hero:IsRealHero() then
-								FindClearSpaceForUnit(hero, Entities:FindByName(nil, "base_spawn"):GetAbsOrigin(), true)
+								if hero:GetTeamNumber() == 2 then
+									FindClearSpaceForUnit(hero, Entities:FindByName(nil, "base_spawn_goodguys"):GetAbsOrigin(), true)
+								else
+									FindClearSpaceForUnit(hero, Entities:FindByName(nil, "base_spawn_badguys"):GetAbsOrigin(), true)
+								end
 								PlayerResource:ModifyGold(hero:GetPlayerOwnerID(), 15000, false,  DOTA_ModifyGold_Unspecified)
 							end
 						end
@@ -663,17 +667,19 @@ end
 function GameMode:ItemAddedFilter(keys)
 local hero = EntIndexToHScript(keys.inventory_parent_entindex_const)
 local item = EntIndexToHScript(keys.item_entindex_const)
-local item_name = 0
+if item:GetName() then
+	local item_name = 0
+	item_name = item:GetName()
+end
 local key = "item_key_of_the_three_moons"
 local shield = "item_shield_of_invincibility"
 local sword = "item_lightning_sword"
 local ring = "item_ring_of_superiority"
 local doom = "item_doom_artifact"
 local frost = "item_orb_of_frost"
-local base = Entities:FindByName(nil, "base_spawn"):GetAbsOrigin()
-
-if item:GetName() then
-	item_name = item:GetName()
+local base_good = Entities:FindByName(nil, "base_spawn_goodguys"):GetAbsOrigin()
+if GetMapName() == "ranked_2v2" then
+	local base_bad = Entities:FindByName(nil, "base_spawn_badguys"):GetAbsOrigin()
 end
 
 	if hero:IsRealHero() then
@@ -687,7 +693,11 @@ end
 			if hero.old_pos then
 				FindClearSpaceForUnit(hero, hero.old_pos, true)
 			else
-				FindClearSpaceForUnit(hero, base, true)
+				if hero:GetTeamNumber() == 2 then
+					FindClearSpaceForUnit(hero, base_good, true)
+				else
+					FindClearSpaceForUnit(hero, base_bad, true)
+				end
 			end
 			PlayerResource:SetCameraTarget(hero:GetPlayerID(), hero)
 			hero:EmitSound("Hero_TemplarAssassin.Trap")
@@ -705,7 +715,11 @@ end
 			if hero.old_pos then
 				FindClearSpaceForUnit(hero, hero.old_pos, true)
 			else
-				FindClearSpaceForUnit(hero, base, true)
+				if hero:GetTeamNumber() == 2 then
+					FindClearSpaceForUnit(hero, base_good, true)
+				else
+					FindClearSpaceForUnit(hero, base_bad, true)
+				end
 			end
 			PlayerResource:SetCameraTarget(hero:GetPlayerID(), hero)
 			hero:EmitSound("Hero_TemplarAssassin.Trap")
@@ -718,7 +732,11 @@ end
 			if hero.old_pos then
 				FindClearSpaceForUnit(hero, hero.old_pos, true)
 			else
-				FindClearSpaceForUnit(hero, base, true)
+				if hero:GetTeamNumber() == 2 then
+					FindClearSpaceForUnit(hero, base_good, true)
+				else
+					FindClearSpaceForUnit(hero, base_bad, true)
+				end
 			end
 			PlayerResource:SetCameraTarget(hero:GetPlayerID(), hero)
 			hero:EmitSound("Hero_TemplarAssassin.Trap")
@@ -749,7 +767,7 @@ end
 			hero:EmitSound("Hero_TemplarAssassin.Trap")
 		end
 
-		if item_name == doo and doom_first_time then
+		if item_name == doom and doom_first_time then
 			doom_first_time = false
 			hero:EmitSound("Hero_TemplarAssassin.Trap")
 			local line_duration = 10
@@ -766,20 +784,19 @@ end
 	-- Rune pickup logic
 	-------------------------------------------------------------------------------------------------
 	local unit = hero
-	if item_name == "item_rune_armor" then
-
-		-- Only real heroes can pick up runes
-		if unit:IsRealHero() or unit:IsConsideredHero() then
-			if item_name == "item_rune_armor" then
-				PickupArmorRune(item, unit)
-				return false
-			end
-		-- If this is not a real hero, drop another rune in place of the picked up one
-		else
-			local new_rune = CreateItem(item_name, nil, nil)
-			CreateItemOnPositionForLaunch(item:GetAbsOrigin() + Vector(0, 0, 50), new_rune)
+	-- Only real heroes can pick up runes
+	if unit:IsRealHero() or unit:IsConsideredHero() then
+		if item_name == "item_rune_armor" then
+			print("Armor Rune!")
+			PickupArmorRune(item, unit)
 			return false
 		end
+	-- If this is not a real hero, drop another rune in place of the picked up one
+	else
+		print("Recreating the rune...")
+		local new_rune = CreateItem(item_name, nil, nil)
+		CreateItemOnPositionForLaunch(item:GetAbsOrigin() + Vector(0, 0, 50), new_rune)
+		return false
 	end
 	return true
 end
@@ -1192,10 +1209,14 @@ function GameMode:AllHeroImages(event)
 local PlayerID = event.pID
 local player = PlayerResource:GetPlayer(PlayerID)
 local hero = player:GetAssignedHero()
-local point_hero = Entities:FindByName(nil, "all_hero_image_player"):GetAbsOrigin()
+local point = Entities:FindByName(nil, "all_hero_image_player"):GetAbsOrigin()
+
+	if GameMode.AllHeroImagesDead == 1 then
+		Notifications:Bottom(hero:GetPlayerOwnerID(), {text = "All Hero Image has already been done!", duration = 5.0})
+		return
+	end
 
 	if GameMode.AllHeroImages_occuring == 1 then
-		GameMode:SpecialEventTPQuit(hero)
 		Notifications:Bottom(hero:GetPlayerOwnerID(),{text = "All Hero Images is already occuring, please choose another event.", duration = 7.5})
 	elseif GameMode.AllHeroImages_occuring == 0 then
 		GameMode.AllHeroImages_occuring = 1
@@ -1221,12 +1242,9 @@ local point_hero = Entities:FindByName(nil, "all_hero_image_player"):GetAbsOrigi
 			GameMode.AllHeroImage:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 5,IsHidden = true})
 			GameMode.AllHeroImage:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 5,IsHidden = true})
 			GameMode.AllHeroImage:MakeIllusion()
-			GameMode.AllHeroImage:AddAbility("all_hero_image_death")
-			local ability = GameMode.AllHeroImage:FindAbilityByName("all_hero_image_death")
-			ability:ApplyDataDrivenModifier(GameMode.AllHeroImage, GameMode.AllHeroImage, "modifier_hero_image", {})
 
 			if illusion_spawn < 8 then
-				return_time = 0.25
+				return_time = 0.2
 			else
 				return_time = nil
 			end
@@ -1247,7 +1265,7 @@ local point_hero = Entities:FindByName(nil, "all_hero_image_player"):GetAbsOrigi
 				local meepo_table = Entities:FindAllByName("npc_dota_hero_meepo")
 					if meepo_table then
 						for i = 1, #meepo_table do
-							FindClearSpaceForUnit(meepo_table[i], point_hero, false)
+							FindClearSpaceForUnit(meepo_table[i], point, false)
 							meepo_table[i]:Stop()
 							PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
 							Timers:CreateTimer(0.1, function()
@@ -1256,7 +1274,7 @@ local point_hero = Entities:FindByName(nil, "all_hero_image_player"):GetAbsOrigi
 						end
 					end
 				else
-					FindClearSpaceForUnit(hero, point_hero, true)
+					FindClearSpaceForUnit(hero, point, true)
 					hero:Stop()
 				end
 			end
@@ -1264,7 +1282,32 @@ local point_hero = Entities:FindByName(nil, "all_hero_image_player"):GetAbsOrigi
 
 		DisableItems(hero, 120)
 
-		timers.AllHeroImage = Timers:CreateTimer(120.0, function()
+		timers.AllHeroImage = Timers:CreateTimer(0.5, function()
+			ALL_HERO_IMAGE_DEAD = 0
+			local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_2, point, nil, 2500, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_ALL, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false)
+			for _, unit in pairs(units) do
+				ALL_HERO_IMAGE_DEAD = ALL_HERO_IMAGE_DEAD +1
+			end
+
+			if ALL_HERO_IMAGE_DEAD == 0 then
+				GameMode.AllHeroImagesDead = 1
+				DoEntFire("trigger_all_hero_image_duration", "Kill", nil ,0 ,nil ,nil)
+				CustomGameEventManager:Send_ServerToAllClients("hide_timer_all_hero_image", {})
+				Timers:RemoveTimer(timers.AllHeroImage)
+				Timers:RemoveTimer(timers.AllHeroImage2)
+				Timers:CreateTimer(0.5, function()
+					local item = CreateItem("item_necklace_of_spell_immunity", nil, nil)
+					local pos = Entities:FindByName(nil, "all_hero_image_player"):GetAbsOrigin()
+					local drop = CreateItemOnPositionSync( pos, item )
+					local pos_launch = pos + RandomVector(RandomFloat(150, 200))
+					item:LaunchLoot(false, 300, 0.5, pos)
+				end)
+				return nil
+			end
+			return 1.0
+		end)
+
+		timers.AllHeroImage2 = Timers:CreateTimer(120.0, function()
 			Entities:FindByName(nil, "trigger_all_hero_image_duration"):Enable()
 			GameMode.AllHeroImages_occuring = 0
 
@@ -1272,13 +1315,10 @@ local point_hero = Entities:FindByName(nil, "all_hero_image_player"):GetAbsOrigi
 				Entities:FindByName(nil, "trigger_all_hero_image_duration"):Disable()
 			end)
 			
-			local units = FindUnitsInRadius( DOTA_TEAM_CUSTOM_2, point_hero, nil, 2500, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_ALL, DOTA_UNIT_TARGET_FLAG_NONE , FIND_ANY_ORDER, false )
 			for _, v in pairs(units) do
 				UTIL_Remove(v)
 			end
 		end)
-	elseif GameMode.AllHeroImagesDead == 1 then
-		Notifications:Bottom(hero:GetPlayerOwnerID(), {text = "All Hero Image has already been done!", duration = 5.0})
 	end
 end
 

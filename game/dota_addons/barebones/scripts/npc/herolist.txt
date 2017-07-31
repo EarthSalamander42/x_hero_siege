@@ -6,6 +6,7 @@
 	"npc_dota_hero_abyssal_underlord"	"1" 	//Underlord
 	"npc_dota_hero_lone_druid"			"1" 	//Beastmaster
 	"npc_dota_hero_brewmaster"			"1" 	//Pandaren Brewmaster
+	"npc_dota_hero_bristleback"			"1"
 	"npc_dota_hero_chen"				"1"		//Archmage
 	"npc_dota_hero_crystal_maiden"		"1"		//Archimage
 	"npc_dota_hero_doom_bringer"		"1" 	//Doom

@@ -90,21 +90,23 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 				Notifications:Bottom(hero:GetPlayerOwnerID(), {text="HERO: ", duration = 5.0, style={color="white"}, continue=true})
 				Notifications:Bottom(hero:GetPlayerOwnerID(), {text="#npc_dota_hero_"..HEROLIST[i], duration = 5.0, style={color="white"}, continue=true})
 				Timers:CreateTimer(3.1, function()
-					local newHero = PlayerResource:ReplaceHeroWith(id, "npc_dota_hero_"..HEROLIST[i], STARTING_GOLD, 0)
-					newHero:RespawnHero(false, false, false)
-					if difficulty < 4 then
-						local item = newHero:AddItemByName("item_ankh_of_reincarnation")
-					end
-					local item = newHero:AddItemByName("item_healing_potion")
-					local item = newHero:AddItemByName("item_mana_potion")
-					if difficulty == 1 then
-						local item = newHero:AddItemByName("item_lifesteal_mask")
-					end
-					Timers:CreateTimer(0.1, function()
-						if not hero:IsNull() then
-							UTIL_Remove(hero)
+					PrecacheUnitByNameAsync("npc_dota_hero_"..HEROLIST[i], function()
+						local newHero = PlayerResource:ReplaceHeroWith(id, "npc_dota_hero_"..HEROLIST[i], STARTING_GOLD, 0)
+						newHero:RespawnHero(false, false, false)
+						if difficulty < 4 then
+							local item = newHero:AddItemByName("item_ankh_of_reincarnation")
 						end
-					end)
+						local item = newHero:AddItemByName("item_healing_potion")
+						local item = newHero:AddItemByName("item_mana_potion")
+						if difficulty == 1 then
+							local item = newHero:AddItemByName("item_lifesteal_mask")
+						end
+						Timers:CreateTimer(0.1, function()
+							if not hero:IsNull() then
+								UTIL_Remove(hero)
+							end
+						end)
+					end, id)
 				end)
 			elseif caller:GetName() == "trigger_hero_weekly" then
 				if hero:HasAbility("holdout_vip") then
@@ -120,21 +122,23 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 				Notifications:Bottom(hero:GetPlayerOwnerID(), {text="HERO: ", duration = 5.0, style={color="white"}, continue=true})
 				Notifications:Bottom(hero:GetPlayerOwnerID(), {text="#"..WeekHero, duration = 5.0, style={color="white"}, continue=true})
 				Timers:CreateTimer(3.1, function()
-					local newHero = PlayerResource:ReplaceHeroWith(id, WeekHero, STARTING_GOLD, 0)
-					newHero:RespawnHero(false, false, false)
-					if difficulty < 4 then
-						local item = newHero:AddItemByName("item_ankh_of_reincarnation")
-					end
-					local item = newHero:AddItemByName("item_healing_potion")
-					local item = newHero:AddItemByName("item_mana_potion")
-					if difficulty == 1 then
-						local item = newHero:AddItemByName("item_lifesteal_mask")
-					end
-					Timers:CreateTimer(0.1, function()
-						if not hero:IsNull() then
-							UTIL_Remove(hero)
+					PrecacheUnitByNameAsync(WeekHero, function()
+						local newHero = PlayerResource:ReplaceHeroWith(id, WeekHero, STARTING_GOLD, 0)
+						newHero:RespawnHero(false, false, false)
+						if difficulty < 4 then
+							local item = newHero:AddItemByName("item_ankh_of_reincarnation")
 						end
-					end)
+						local item = newHero:AddItemByName("item_healing_potion")
+						local item = newHero:AddItemByName("item_mana_potion")
+						if difficulty == 1 then
+							local item = newHero:AddItemByName("item_lifesteal_mask")
+						end
+						Timers:CreateTimer(0.1, function()
+							if not hero:IsNull() then
+								UTIL_Remove(hero)
+							end
+						end)
+					end, id)
 				end)
 			end
 		end
@@ -161,25 +165,27 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 				Notifications:Bottom(hero:GetPlayerOwnerID(), {text="HERO: ", duration = 5.0, style={color="white"}, continue=true})
 				Notifications:Bottom(hero:GetPlayerOwnerID(), {text="#npc_dota_hero_"..HEROLIST_VIP[i], duration = 5.0, style={color="white"}, continue=true})
 				Timers:CreateTimer(3.1, function()
-					local newHero = PlayerResource:ReplaceHeroWith(id, "npc_dota_hero_"..HEROLIST_VIP[i], STARTING_GOLD, 0)
-					newHero:RespawnHero(false, false, false)
-					if difficulty < 4 then
-						local item = newHero:AddItemByName("item_ankh_of_reincarnation")
-					end
-					local item = newHero:AddItemByName("item_healing_potion")
-					local item = newHero:AddItemByName("item_mana_potion")
-					if difficulty == 1 then
-						local item = newHero:AddItemByName("item_lifesteal_mask")
-					end
-					if newHero:GetUnitName() == "npc_dota_hero_skeleton_king" then
-						SkeletonKingWearables(newHero)
-					end
-					PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
-					Timers:CreateTimer(0.1, function()
-						if not hero:IsNull() then
-							UTIL_Remove(hero)
+					PrecacheUnitByNameAsync("npc_dota_hero_"..HEROLIST[i], function()
+						local newHero = PlayerResource:ReplaceHeroWith(id, "npc_dota_hero_"..HEROLIST_VIP[i], STARTING_GOLD, 0)
+						newHero:RespawnHero(false, false, false)
+						if difficulty < 4 then
+							local item = newHero:AddItemByName("item_ankh_of_reincarnation")
 						end
-					end)
+						local item = newHero:AddItemByName("item_healing_potion")
+						local item = newHero:AddItemByName("item_mana_potion")
+						if difficulty == 1 then
+							local item = newHero:AddItemByName("item_lifesteal_mask")
+						end
+						if newHero:GetUnitName() == "npc_dota_hero_skeleton_king" then
+							SkeletonKingWearables(newHero)
+						end
+						PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
+						Timers:CreateTimer(0.1, function()
+							if not hero:IsNull() then
+								UTIL_Remove(hero)
+							end
+						end)
+					end, id)
 				end)
 			end
 		end

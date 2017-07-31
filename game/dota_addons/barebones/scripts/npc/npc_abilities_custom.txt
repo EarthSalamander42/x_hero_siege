@@ -5657,7 +5657,7 @@
 
 					"RunScript"
 					{
-						"ScriptFile"	"items/global.lua"
+						"ScriptFile"	"heroes/global.lua"
 						"Function"		"Splash"
 					}
 				}
@@ -9754,7 +9754,7 @@
 
 					"RunScript"
 					{
-						"ScriptFile"	"items/global.lua"
+						"ScriptFile"	"heroes/global.lua"
 						"Function"		"Splash"
 					}
 				}
@@ -16056,7 +16056,7 @@
 
 					"RunScript"
 					{
-						"ScriptFile"	"items/global.lua"
+						"ScriptFile"	"heroes/global.lua"
 						"Function"		"Splash"
 					}
 				}
@@ -16410,7 +16410,7 @@
 
 					"RunScript"
 					{
-						"ScriptFile"	"items/global.lua"
+						"ScriptFile"	"heroes/global.lua"
 						"Function"		"Splash"
 					}
 				}
@@ -18918,7 +18918,7 @@
 
 					"RunScript"
 					{
-						"ScriptFile"	"items/global.lua"
+						"ScriptFile"	"heroes/global.lua"
 						"Function"		"Splash"
 					}
 				}
@@ -19014,7 +19014,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"items/global.lua"
+						"ScriptFile"	"heroes/global.lua"
 						"Function"		"Splash"
 					}
 				}
@@ -24361,7 +24361,7 @@
 
 					"RunScript"
 					{
-						"ScriptFile"	"items/global.lua"
+						"ScriptFile"	"heroes/global.lua"
 						"Function"		"Splash"
 					}
 
@@ -27045,7 +27045,7 @@
 
 					"RunScript"
 					{
-						"ScriptFile"	"items/global.lua"
+						"ScriptFile"	"heroes/global.lua"
 						"Function"		"Splash"
 					}
 				}
@@ -27250,27 +27250,27 @@
 		}
 	}
 
-	"all_hero_image_death"
+	"orb_of_darkness_unit"
 	{
 		// General
 		//-------------------------------------------------------------------------------------
-		"BaseClass"			"ability_datadriven"
-		"AbilityBehavior"	"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_HIDDEN"
-		"MaxLevel"			"1"
+		"BaseClass"				"ability_datadriven"
+		"AbilityBehavior"		"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_HIDDEN"
+		"MaxLevel"				"1"
 
 		"Modifiers"
 		{
-			"modifier_hero_image"
-			{
-				"Passive"	"1"
-				"IsHidden"	"1"
+			"modifier_darkness_unit"
+			{	
+				"Passive"		"1"
+				"IsHidden"		"0"
 				
-				"OnTakeDamage"
+				"OnDeath"
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"phases/phase1.lua"
-						"Function"		"AllHeroImageDead"
+						"ScriptFile"	"heroes/global.lua"
+						"Function"		"OrbOfDarkness"
 					}
 				}
 			}

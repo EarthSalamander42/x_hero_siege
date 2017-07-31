@@ -244,3 +244,29 @@ local PauseTime = 10.0
 		caster:RemoveAbility("castle_muradin_defend")
 	end
 end
+
+-- Global Splash
+function Splash(event)
+local attacker = event.caster
+local target = event.target
+local ability = event.ability
+local radius = ability:GetSpecialValueFor("radius")
+local cleave = ability:GetSpecialValueFor("cleave_pct")
+local full_damage = attacker:GetAverageTrueAttackDamage(attacker)
+local cleave_pct = cleave * full_damage / 100
+
+	local splash_targets = FindUnitsInRadius(attacker:GetTeamNumber(), target:GetAbsOrigin(), nil, radius, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, FIND_ANY_ORDER, false)
+	for _, unit in pairs(splash_targets) do
+		if target:IsBuilding() then return end
+		if attacker:GetAttackCapability() == DOTA_UNIT_CAP_MELEE_ATTACK and unit ~= target and not unit:IsBuilding() then
+			ApplyDamage({victim = unit, attacker = attacker, damage = cleave_pct, ability = ability, damage_type = DAMAGE_TYPE_PHYSICAL})
+		end
+	end
+end
+
+function OrbOfDarkness(event)
+local unit = event.caster
+local caster = unit:GetPlayerOwner():GetAssignedHero()
+
+	caster:SetModifierStackCount("modifier_orb_of_darkness", caster, caster:GetModifierStackCount("modifier_orb_of_darkness", caster) -1)
+end

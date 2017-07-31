@@ -7,6 +7,8 @@ require( "ai_core" )
 behaviorSystem = {} -- create the global so we can assign to it
 
 function Spawn( entityKeyValues )
+if thisEntity:GetTeamNumber() == 2 or thisEntity:GetTeamNumber() == 3 then return end
+
 	thisEntity:SetContextThink( "AIThink", AIThink, 0.25 )
 	behaviorSystem = AICore:CreateBehaviorSystem( { BehaviorNone } ) 
 end

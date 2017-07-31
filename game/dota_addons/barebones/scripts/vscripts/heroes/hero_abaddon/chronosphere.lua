@@ -40,6 +40,10 @@ local aura_modifier = keys.aura_modifier
 local ignore_void = ability:GetLevelSpecialValueFor("ignore_void", ability_level)
 local duration = ability:GetLevelSpecialValueFor("aura_interval", ability_level)
 
+	if IsValidEntity(target:GetPlayerOwner()) then
+		target = target:GetPlayerOwner():GetAssignedHero()
+	end
+
 	if ignore_void == 0 then
 		ignore_void = false
 	else
@@ -55,6 +59,7 @@ local duration = ability:GetLevelSpecialValueFor("aura_interval", ability_level)
 
 	if target:IsIllusion() then --doesn't work
 		UTIL_Remove(target)
+		return
 	end
 
 	if PlayerResource:GetConnectionState(target:GetPlayerID()) == 3 then

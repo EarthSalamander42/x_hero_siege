@@ -12,7 +12,7 @@
 	}
 
 	//=================================================================================================================
-	// Courier
+	// Battle Fury
 	//=================================================================================================================
 	"item_bfury"
 	{		
@@ -2336,6 +2336,7 @@
 			{
 				"var_type"				"FIELD_INTEGER"
 				"damage_per_second"		"40 70 100 130"
+				"LinkedSpecialBonus"	"special_bonus_unique_doom_4"
 			}
 			"02"
 			{
@@ -2753,6 +2754,7 @@
 			{
 				"var_type"				"FIELD_INTEGER"
 				"stack_limit"			"5"
+				"LinkedSpecialBonus"	"special_bonus_unique_bristleback"
 			}
 			"07"
 			{

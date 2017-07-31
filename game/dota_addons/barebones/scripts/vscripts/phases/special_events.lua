@@ -115,7 +115,6 @@ local heroes = HeroList:GetAllHeroes()
 		local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_2, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE , FIND_ANY_ORDER, false)
 		local teleporters = Entities:FindAllByName("trigger_farm_event")
 
-		SpecialWave()
 		BT_ENABLED = 1
 		SPECIAL_EVENT = 0
 		RestartCreeps()
@@ -125,11 +124,10 @@ local heroes = HeroList:GetAllHeroes()
 		end
 
 		Timers:CreateTimer(1.1, function()
-			Timers:CreateTimer(0.0, function()
-				for _,v in pairs(units) do
-					UTIL_Remove(v)
-				end
-			end)
+			SpecialWave()
+			for _,v in pairs(units) do
+				UTIL_Remove(v)
+			end
 		end)
 
 		Timers:CreateTimer(10.0, function()

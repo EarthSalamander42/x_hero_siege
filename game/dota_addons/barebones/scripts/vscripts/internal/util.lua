@@ -236,11 +236,11 @@ if not Corpses then
 	Corpses = class({})
 end
 
-CORPSE_DURATION = 50.0
-CORPSE_APPEAR_DELAY = 10.0
+CORPSE_DURATION = 55.0
+CORPSE_APPEAR_DELAY = 5.0
 
 function Corpses:CreateFromUnit(killed)
-	if LeavesCorpse( killed ) then
+	if LeavesCorpse(killed) then
 		local name = killed:GetUnitName()
 		local position = killed:GetAbsOrigin()
 		local fv = killed:GetForwardVector()
