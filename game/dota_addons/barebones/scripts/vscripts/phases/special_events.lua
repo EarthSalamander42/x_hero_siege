@@ -274,15 +274,23 @@ end
 
 function EndFarmEvent(keys)
 local hero = keys.activator
-local base = Entities:FindByName(nil, "base_spawn"):GetAbsOrigin()
+local base_good = Entities:FindByName(nil, "base_spawn_goodguys"):GetAbsOrigin()
+if GetMapName() == "ranked_2v2" then
+	local base_bad = Entities:FindByName(nil, "base_spawn_badguys"):GetAbsOrigin()
+end
+
 	if hero:IsIllusion() then
-		print("Illusion found, ignoring")
+		print("Illusion found in Farm Event, ignoring")
 		return
 	elseif hero:IsRealHero() then
 		if hero.old_pos then
 			FindClearSpaceForUnit(hero, hero.old_pos, true)
 		else
-			FindClearSpaceForUnit(hero, base, true)
+			if hero:GetTeamNumber() == 2 then
+				FindClearSpaceForUnit(hero, base_good, true)
+			elseif hero:GetTeamNumber() == 3 then
+				FindClearSpaceForUnit(hero, base_bad, true)
+			end
 		end
 		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
 		Timers:CreateTimer(0.1, function()
@@ -331,7 +339,7 @@ PauseCreeps()
 				local RameroCheck = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, Entities:FindByName(nil, "npc_dota_muradin_boss"):GetAbsOrigin(), nil, 2000, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false)
 				for _, hero in pairs(RameroCheck) do
 					if hero:IsRealHero() then
-						FindClearSpaceForUnit(hero, Entities:FindByName(nil, "base_spawn"):GetAbsOrigin(), true)
+						FindClearSpaceForUnit(hero, base_good, true)
 					end
 				end
 				Check = Check +1
@@ -374,7 +382,7 @@ SPECIAL_EVENT = 1
 				local RameroAndBaristolCheck = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, Entities:FindByName(nil, "npc_dota_muradin_boss"):GetAbsOrigin(), nil, 2000, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false)
 				for _, hero in pairs(RameroAndBaristolCheck) do
 					if hero:IsRealHero() then
-						FindClearSpaceForUnit(hero, Entities:FindByName(nil, "base_spawn"):GetAbsOrigin(), true)
+						FindClearSpaceForUnit(hero, base_good, true)
 					end
 				end
 				Check = Check +1
@@ -389,10 +397,9 @@ end
 
 function EndRameroEvent(keys)
 local activator = keys.activator
-local point = Entities:FindByName(nil, "base_spawn"):GetAbsOrigin()
 
 	if activator:GetTeam() == DOTA_TEAM_GOODGUYS then
-	FindClearSpaceForUnit(activator, point, true)
+	FindClearSpaceForUnit(activator, base_good, true)
 	PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(), activator)
 	Timers:CreateTimer(0.1, function()
 		PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(), nil)
@@ -455,7 +462,11 @@ CustomGameEventManager:Send_ServerToAllClients("show_duel", {})
 				end
 			end
 		else
-			FindClearSpaceForUnit(hero, Entities:FindByName(nil, "base_spawn"):GetAbsOrigin(), true)
+			if hero:GetTeamNumber() == 2 then
+				FindClearSpaceForUnit(hero, base_good, true)
+			elseif hero:GetTeamNumber() == 3 then
+				FindClearSpaceForUnit(hero, base_bad, true)
+			end
 			Notifications:TopToAll({text="Disconnected hero detected, teleporting out of arena!", duration=5.0, style={color="white"}})
 		end
 	end

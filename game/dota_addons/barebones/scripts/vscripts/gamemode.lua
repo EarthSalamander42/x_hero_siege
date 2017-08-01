@@ -23,7 +23,10 @@ require('zones/zones')
 require('triggers')
 
 function GameMode:OnFirstPlayerLoaded()
-
+base_good = Entities:FindByName(nil, "base_spawn_goodguys"):GetAbsOrigin()
+	if GetMapName() == "ranked_2v2" then
+		base_bad = Entities:FindByName(nil, "base_spawn_badguys"):GetAbsOrigin()
+	end
 end
 
 function FrostTowersToFinalWave()
@@ -667,10 +670,6 @@ end
 function GameMode:ItemAddedFilter(keys)
 local hero = EntIndexToHScript(keys.inventory_parent_entindex_const)
 local item = EntIndexToHScript(keys.item_entindex_const)
-if item:GetName() then
-	local item_name = 0
-	item_name = item:GetName()
-end
 local key = "item_key_of_the_three_moons"
 local shield = "item_shield_of_invincibility"
 local sword = "item_lightning_sword"
@@ -683,7 +682,7 @@ if GetMapName() == "ranked_2v2" then
 end
 
 	if hero:IsRealHero() then
-		if item_name == sword and sword_first_time then
+		if item:GetName() == sword and sword_first_time then
 			SPECIAL_EVENT = 0
 			if timers.RameroAndBaristol then
 				Timers:RemoveTimer(timers.RameroAndBaristol)
@@ -695,7 +694,7 @@ end
 			else
 				if hero:GetTeamNumber() == 2 then
 					FindClearSpaceForUnit(hero, base_good, true)
-				else
+				elseif hero:GetTeamNumber() == 3 then
 					FindClearSpaceForUnit(hero, base_bad, true)
 				end
 			end
@@ -705,7 +704,7 @@ end
 				PlayerResource:SetCameraTarget(hero:GetPlayerID(), nil)
 			end)
 		end
-		if item_name == ring and ring_first_time then
+		if item:GetName() == ring and ring_first_time then
 			SPECIAL_EVENT = 0
 			if timers.Ramero then
 				Timers:RemoveTimer(timers.Ramero)
@@ -717,7 +716,7 @@ end
 			else
 				if hero:GetTeamNumber() == 2 then
 					FindClearSpaceForUnit(hero, base_good, true)
-				else
+				elseif hero:GetTeamNumber() == 3 then
 					FindClearSpaceForUnit(hero, base_bad, true)
 				end
 			end
@@ -727,7 +726,7 @@ end
 				PlayerResource:SetCameraTarget(hero:GetPlayerID(), nil)
 			end)
 		end
-		if item_name == frost and frost_first_time then
+		if item:GetName() == frost and frost_first_time then
 			frost_first_time = false
 			if hero.old_pos then
 				FindClearSpaceForUnit(hero, hero.old_pos, true)
@@ -743,31 +742,28 @@ end
 			Timers:CreateTimer(0.1, function()
 				PlayerResource:SetCameraTarget(hero:GetPlayerID(), nil)
 			end)
-		elseif item_name == frost and frost_first_time == false then
-			return false
+--		elseif item:GetName() == frost and frost_first_time == false then
+--			return false
 		end
 
-		if item_name == key and hero.has_epic_1 == false then
-			hero.has_epic_1 = true
-			hero:EmitSound("Hero_TemplarAssassin.Trap")
-		end
+--		if item:GetName() == key and hero.has_epic_1 == false then
+--			hero.has_epic_1 = true
+--			hero:EmitSound("Hero_TemplarAssassin.Trap")
+--		end
+--		if item:GetName() == shield and hero.has_epic_2 == false then
+--			hero.has_epic_2 = true
+--			hero:EmitSound("Hero_TemplarAssassin.Trap")
+--		end
+--		if item:GetName() == sword and hero.has_epic_3 == false then
+--			hero.has_epic_3 = true
+--			hero:EmitSound("Hero_TemplarAssassin.Trap")
+--		end
+--		if item:GetName() == ring and hero.has_epic_4 == false then
+--			hero.has_epic_4 = true
+--			hero:EmitSound("Hero_TemplarAssassin.Trap")
+--		end
 
-		if item_name == shield and hero.has_epic_2 == false then
-			hero.has_epic_2 = true
-			hero:EmitSound("Hero_TemplarAssassin.Trap")
-		end
-
-		if item_name == sword and hero.has_epic_3 == false then
-			hero.has_epic_3 = true
-			hero:EmitSound("Hero_TemplarAssassin.Trap")
-		end
-
-		if item_name == ring and hero.has_epic_4 == false then
-			hero.has_epic_4 = true
-			hero:EmitSound("Hero_TemplarAssassin.Trap")
-		end
-
-		if item_name == doom and doom_first_time then
+		if item:GetName() == doom and doom_first_time then
 			doom_first_time = false
 			hero:EmitSound("Hero_TemplarAssassin.Trap")
 			local line_duration = 10
@@ -775,28 +771,20 @@ end
 --			Notifications:TopToAll({text = hero:GetUnitName().." ", duration = line_duration, continue = true})
 			Notifications:TopToAll({text = PlayerResource:GetPlayerName(hero:GetPlayerID()).." ", duration = line_duration, continue = true})
 			Notifications:TopToAll({text = "merged the 4 Boss items to create Doom Artifact!", duration = line_duration, style = {color = "Red"}, continue = true})
-		elseif item_name == doom and frost_first_time == false then
-			return false
+--		elseif item:GetName() == doom and frost_first_time == false then
+--			return false
 		end
-	end
 
-	-------------------------------------------------------------------------------------------------
-	-- Rune pickup logic
-	-------------------------------------------------------------------------------------------------
-	local unit = hero
-	-- Only real heroes can pick up runes
-	if unit:IsRealHero() or unit:IsConsideredHero() then
-		if item_name == "item_rune_armor" then
+		-- Rune System
+		if item:GetName() == "item_rune_armor" then
+			PickupArmorRune(item, hero)
 			print("Armor Rune!")
-			PickupArmorRune(item, unit)
+			return false
+		elseif item:GetName() == "item_rune_immolation" then
+			PickupArmorRune(item, hero)
+			print("Immolation Rune!")
 			return false
 		end
-	-- If this is not a real hero, drop another rune in place of the picked up one
-	else
-		print("Recreating the rune...")
-		local new_rune = CreateItem(item_name, nil, nil)
-		CreateItemOnPositionForLaunch(item:GetAbsOrigin() + Vector(0, 0, 50), new_rune)
-		return false
 	end
 	return true
 end

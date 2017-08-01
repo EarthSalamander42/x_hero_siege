@@ -139,21 +139,6 @@ local caster_loc = caster:GetAbsOrigin()
 	ProjectileManager:CreateLinearProjectile(projectile)
 end
 
-function DragonSlaveBurn( keys )
-local caster = keys.caster
-local target = keys.target
-local ability = keys.ability
-local ability_level = ability:GetLevel() - 1
-local modifier_haze = keys.modifier_haze
-local modifier_burn = keys.modifier_burn
-
-	if target:HasModifier(modifier_haze) then --Apply normal damage + burn damage over 5 seconds
-		ability:ApplyDataDrivenModifier( caster, target, modifier_burn, {})
-	elseif not target:HasModifier(modifier_haze) then
-		return
-	end
-end
-
 function Incinerate( keys )
 	print( keys.target:GetHealth() )
 	if not keys.target:IsAlive() then
@@ -181,10 +166,10 @@ end
 
 -- Set the units looking at the same point of the caster
 function SetPhoenixMoveForward( event )
-	local caster = event.caster -- The Blood Mage
-	local target = event.target -- The Phoenix
-	local fv = caster:GetForwardVector()
-	local origin = caster:GetAbsOrigin()
+local caster = event.caster -- The Blood Mage
+local target = event.target -- The Phoenix
+local fv = caster:GetForwardVector()
+local origin = caster:GetAbsOrigin()
 	
 	target:SetForwardVector(fv)
 
@@ -195,19 +180,21 @@ end
 
 -- Kills the summoned units after a new spell start
 function KillPhoenix( event )
-	local caster = event.caster
-	local phoenix = caster.phoenix
-	local egg = caster.egg
+local caster = event.caster
+local phoenixes = FindUnitsInRadius(caster:GetTeamNumber(), Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_ALL, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, 0, false)
 
-	if IsValidEntity(phoenix) then phoenix:RemoveSelf() end
-	if IsValidEntity(egg) then egg:RemoveSelf() end
+	for _, v in pairs(phoenixes) do
+		if v:GetUnitName() == "npc_dota_creature_phoenix" or v:GetUnitName() == "human_phoenix_egg" then
+			v:RemoveSelf()
+		end
+	end
 end
 
 -- Deal self damage over time, through magic immunity. This is needed because negative HP regen is not working.
-function PhoenixDegen( event )
+function PhoenixDegen(event)
 local caster = event.caster
 local ability = event.ability
-local phoenix_damage_per_second = ability:GetLevelSpecialValueFor( "phoenix_damage_per_second", ability:GetLevel() - 1 )
+local phoenix_damage_per_second = ability:GetLevelSpecialValueFor("phoenix_damage_per_second", ability:GetLevel() - 1)
 local phoenixHP = caster:GetHealth()
 
 	caster:SetHealth(phoenixHP - phoenix_damage_per_second)
@@ -326,7 +313,9 @@ function RemoveOrbs(event)
 	local origin = hero:GetAbsOrigin()
 	
 	for i=1,3 do
-		ParticleManager:DestroyParticle(hero.orbs[i],false)
+		if hero.orbs[i] then
+			ParticleManager:DestroyParticle(hero.orbs[i],false)
+		end
 	end
 	hero.orbs = {}
 end

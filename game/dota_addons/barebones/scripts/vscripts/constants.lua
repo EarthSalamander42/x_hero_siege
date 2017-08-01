@@ -77,9 +77,10 @@ _G.MURADIN_DEFEND = false
 _G.STORM_SPIRIT = 0
 _G.FORCED_LANES = 0
 _G.ALL_HERO_IMAGE_DEAD = 0
+
 if GetMapName() == "x_hero_siege" then
 	_G.ICE_TOWERS_REQUIRED = 2
-else
+elseif GetMapName() == "ranked_2v2" then
 	_G.ICE_TOWERS_REQUIRED = 1
 end
 
@@ -222,7 +223,8 @@ _G.golden_vip_members = {
 	80192910,	-- Cheshire [Nathan Perscott on Patreon]
 	89498388,	-- Sly
 	111692244,	-- [Iris Von Everec on Steam, May paid, 2 months left for Permanent]
-	97490223	-- IllidanStormrage [Lucas Diao on Patreon]
+	97490223,	-- IllidanStormrage [Lucas Diao on Patreon]
+	34067920	-- Shush
 }
 
 _G.vip_members = {

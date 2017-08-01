@@ -4539,8 +4539,8 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"scripts/vscripts/heroes/hero_warlock/archimonde.lua"
-						"Function"		"Splash"
+						"ScriptFile"	"heroes/global.lua"
+						"Function"		"SplashAbility"
 					}
 				}
 			}
@@ -5658,7 +5658,7 @@
 					"RunScript"
 					{
 						"ScriptFile"	"heroes/global.lua"
-						"Function"		"Splash"
+						"Function"		"SplashAbility"
 					}
 				}
 
@@ -7812,8 +7812,8 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"    "scripts/vscripts/heroes/hero_warlock/archimonde.lua"
-						"Function"      "Splash"
+						"ScriptFile"	"heroes/global.lua"
+						"Function"		"SplashAbility"
 					}
 				}
 			}
@@ -8010,8 +8010,8 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"    "scripts/vscripts/heroes/hero_warlock/archimonde.lua"
-						"Function"      "Splash"
+						"ScriptFile"	"heroes/global.lua"
+						"Function"		"SplashAbility"
 					}
 				}
 			}
@@ -9726,12 +9726,12 @@
 		{
 			"01"
 			{
-				"var_type"					"FIELD_INTEGER"
-				"radius"		"325"
+				"var_type"			"FIELD_INTEGER"
+				"radius"			"325"
 			}
 			"02"
 			{
-				"var_type"					"FIELD_INTEGER"
+				"var_type"			"FIELD_INTEGER"
 				"cleave_pct"		"25"
 			}
 		}
@@ -9755,7 +9755,7 @@
 					"RunScript"
 					{
 						"ScriptFile"	"heroes/global.lua"
-						"Function"		"Splash"
+						"Function"		"SplashAbility"
 					}
 				}
 			}
@@ -13288,19 +13288,15 @@
 	{
 		"BaseClass"						"ability_datadriven"
 		"AbilityTextureName"			"custom/holdout_burning_oil"
-
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
 		"AbilityCastAnimation"			"ACT_DOTA_CAST_SUN_STRIKE"
-
 		"AbilityCastRange"				"800"
-		"AbilityCastPoint"				"0.5"
+		"AbilityCastPoint"				"0.3"
 		"AbilityCooldown"				"13.0"
-
-		"AbilityManaCost"				"120 240 360 480"
-
+		"AbilityManaCost"				"90 180 270 360"
 		"AoERadius"						"250"
 
 		"AbilitySpecial"
@@ -13313,7 +13309,7 @@
 			"02"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"first_strike_dps"		"50 100 200 300"
+				"first_strike_dps"		"60 140 220 300"
 			}
 			"03"
 			{
@@ -13323,7 +13319,7 @@
 			"04"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"burn_dps"				"10 20 35 50"
+				"burn_dps"				"15 30 45 60"
 			}
 			"05"
 			{
@@ -13338,7 +13334,7 @@
 			"07"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"total_damage"			"200 400 775 1150"
+				"total_damage"			"195 430 665 900"
 			}
 			"08"
 			{
@@ -13368,14 +13364,27 @@
 
 			"FireSound"
 			{
-				"EffectName"    "Hero_Invoker.SunStrike.Charge"
-				"Target"        "CASTER"
+				"EffectName"	"Hero_Invoker.SunStrike.Charge"
+				"Target"		"CASTER"
 			}
 
-			"DestroyTrees"
+			"DelayedAction"
 			{
-				"Target"        "POINT"
-				"Radius"        "%radius"
+				"Delay"     "%delay"
+				"Action"    
+				{
+					"FireSound"
+					{
+						"EffectName"	"Hero_Invoker.SunStrike.Ignite"
+						"Target"		"CASTER"
+					}
+
+					"DestroyTrees"
+					{
+						"Target"		"POINT"
+						"Radius"		"%radius"
+					}
+				}
 			}
 		}
 
@@ -13393,18 +13402,18 @@
 
 				"OnCreated"
 				{
-						"RunScript"
-						{
-						"ScriptFile"    "heroes/hero_blood_mage.lua"
-						"Function"      "FlameStrikeDamage"
+					"RunScript"
+					{
+						"ScriptFile"	"heroes/hero_blood_mage.lua"
+						"Function"		"FlameStrikeDamage"
 						"Target"
 						{
-							"Center"    "TARGET"
-							"Radius"    "%radius_tooltip"
-							"Teams"     "DOTA_UNIT_TARGET_TEAM_ENEMY"
-							"Types"     "DOTA_UNIT_TARGET_BASIC | DOTA_UNIT_TARGET_HERO"
+							"Center"	"TARGET"
+							"Radius"	"%radius_tooltip"
+							"Teams"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
+							"Types"		"DOTA_UNIT_TARGET_BASIC | DOTA_UNIT_TARGET_HERO"
 						}
-						"Damage"        "%first_strike_dps"
+						"Damage"		"%first_strike_dps"
 					}
 
 					"FireSound"
@@ -13543,14 +13552,15 @@
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
-		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"	
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
+		"AbilityCastAnimation"			"ACT_DOTA_CAST_EMP"
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
 		"AbilityTextureName"			"custom/holdout_dragon_slave"	
 		
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityCastRange"				"900"
-		"AbilityCastPoint"				"0.35"	
+		"AbilityCastPoint"				"0.15"	
 
 		// Time		
 		//-------------------------------------------------------------------------------------------------------------
@@ -13589,21 +13599,6 @@
 				"var_type"			"FIELD_INTEGER"
 				"damage"			"175 350 850 1250"
 			}
-			"06"
-			{
-				"var_type"			"FIELD_INTEGER"
-				"haze_damage"		"50 100 300 400"
-			}
-			"07"
-			{
-				"var_type"			"FIELD_INTEGER"
-				"haze_duration"		"5"
-			}
-			"07"
-			{
-				"var_type"			"FIELD_INTEGER"
-				"haze_total_damage_tooltip"		"250 500 750 1000"
-			}
 		}
 
 		"OnAbilityPhaseStart"
@@ -13637,40 +13632,6 @@
 				"Target"					"TARGET"
 				"Type"						"DAMAGE_TYPE_MAGICAL"
 				"Damage"					"%damage"
-			}
-
-			"RunScript"
-			{
-				"ScriptFile"		"heroes/hero_blood_mage.lua"
-				"Function"			"DragonSlaveBurn"
-				"Target"			"TARGET"
-				"modifier_haze"		"modifier_drunken_haze"
-				"modifier_burn"		"modifier_dragon_slave_burn"
-			}
-		}
-
-		"Modifiers"
-		{
-			"modifier_dragon_slave_burn"
-			{
-				"Passive"			"0"
-				"IsHidden"			"0"
-				"IsDebuff"			"1"
-				"Duration"			"%haze_duration"
-
-				"EffectName"		"particles/econ/items/wraith_king/wraith_king_ti6_bracer/wraith_king_ti6_hellfireblast_debuff.vpcf"
-				"EffectAttachType"	"follow_origin"
-		
-				"ThinkInterval"  "1.0"
-				"OnIntervalThink"
-				{
-					"Damage"
-					{
-						"Target"		"TARGET"
-						"Type"			"DAMAGE_TYPE_MAGICAL"
-						"Damage"		"%haze_damage"
-					}
-				}
 			}
 		}
 	}
@@ -13947,10 +13908,8 @@
 		"RequiredLevel"					"10"
 		"LevelsBetweenUpgrades"			"5"
 		"AbilityType"                   "DOTA_ABILITY_TYPE_ULTIMATE"
-
 		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"AbilityCastAnimation"          "ACT_DOTA_CAST_SUN_STRIKE"
-
 		"AbilityCastPoint"              "0.25"
 		"AbilityCooldown"               "180.0 170.0 160.0"
 		"AbilityManaCost"               "400 800 0"
@@ -13960,7 +13919,7 @@
 			"01"
 			{
 				"var_type"                  "FIELD_INTEGER"
-				"phoenix_damage_per_second" "110"
+				"phoenix_damage_per_second" "100"
 			}
 			"02"
 			{
@@ -14047,7 +14006,7 @@
 			"01"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"phoenix_damage_per_tick"	"10"
+				"phoenix_damage_per_second"	"10"
 			}
 			"02"
 			{
@@ -14099,7 +14058,7 @@
 							"Types"     "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
 						}
 						"Type"          "DAMAGE_TYPE_MAGICAL"
-						"Damage"        "%phoenix_damage_per_tick"
+						"Damage"        "%phoenix_damage_per_second"
 					}
 				}
 								
@@ -15924,7 +15883,7 @@
 		{
 			"modifier_rocket_launcher"
 			{
-				"IsHidden"	"1"
+				"IsHidden"	"0"
 	
 				"OnAttack"
 				{
@@ -15980,12 +15939,12 @@
 		{ 
 			"01"
 			{
-				"var_type"				"FIELD_INTEGER"
-				"radius"	"200 225 250 300"
+				"var_type"		"FIELD_INTEGER"
+				"radius"		"200 225 250 300"
 			}
 			"02"
 			{
-				"var_type"				"FIELD_INTEGER"
+				"var_type"		"FIELD_INTEGER"
 				"cleave_pct"	"25"
 			}
 		}
@@ -16032,7 +15991,7 @@
 		{ 
 			"modifier_plasma_rifle"
 			{
-				"IsHidden"	"1"
+				"IsHidden"	"0"
 
 				"OnAttack"
 				{
@@ -16057,7 +16016,7 @@
 					"RunScript"
 					{
 						"ScriptFile"	"heroes/global.lua"
-						"Function"		"Splash"
+						"Function"		"SplashAbility"
 					}
 				}
 			}
@@ -16411,7 +16370,7 @@
 					"RunScript"
 					{
 						"ScriptFile"	"heroes/global.lua"
-						"Function"		"Splash"
+						"Function"		"SplashAbility"
 					}
 				}
 			}
@@ -18919,7 +18878,7 @@
 					"RunScript"
 					{
 						"ScriptFile"	"heroes/global.lua"
-						"Function"		"Splash"
+						"Function"		"SplashAbility"
 					}
 				}
 			}
@@ -19015,7 +18974,7 @@
 					"RunScript"
 					{
 						"ScriptFile"	"heroes/global.lua"
-						"Function"		"Splash"
+						"Function"		"SplashAbility"
 					}
 				}
 			}
@@ -20756,8 +20715,8 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"scripts/vscripts/heroes/hero_centurion.lua"
-						"Function"		"Splash"
+						"ScriptFile"	"heroes/global.lua"
+						"Function"		"SplashAbility"
 					}
 				}
 
@@ -24362,7 +24321,7 @@
 					"RunScript"
 					{
 						"ScriptFile"	"heroes/global.lua"
-						"Function"		"Splash"
+						"Function"		"SplashAbility"
 					}
 
 					"FireSound"
@@ -27046,7 +27005,7 @@
 					"RunScript"
 					{
 						"ScriptFile"	"heroes/global.lua"
-						"Function"		"Splash"
+						"Function"		"SplashAbility"
 					}
 				}
 			}

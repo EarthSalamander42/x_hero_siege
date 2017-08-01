@@ -213,6 +213,7 @@ local game_time = GameRules:GetDOTATime(false, false)
 	-- List of powerup rune types
 	local powerup_rune_types = {
 		"item_rune_armor"
+--		"item_rune_immolation"
 	}
 
 	for _, rune_loc in pairs(powerup_rune_locations) do
@@ -230,6 +231,13 @@ function PickupArmorRune(item, unit)
 
 	item:ApplyDataDrivenModifier(unit, unit, "modifier_rune_armor", {})
 	EmitSoundOnLocationForAllies(unit:GetAbsOrigin(), "Rune.Regen", unit)
+end
+
+-- Picks up an Immolation rune
+function PickupImmolationRune(item, unit)
+
+	item:ApplyDataDrivenModifier(unit, unit, "modifier_immolation", {})
+	EmitSoundOnLocationForAllies(unit:GetAbsOrigin(), "Rune.Haste", unit)
 end
 
 if not Corpses then

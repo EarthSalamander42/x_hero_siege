@@ -75,7 +75,6 @@ function ChooseHero(event)
 local hero = event.activator
 local caller = event.caller
 local id = hero:GetPlayerID()
-local point = Entities:FindByName(nil, "base_spawn")
 local difficulty = GameRules:GetCustomGameDifficulty()
 
 	if PlayerResource:IsValidPlayer(id) and hero:GetUnitName() == "npc_dota_hero_wisp" then
@@ -149,7 +148,6 @@ function ChooseHeroVIP(event)
 local hero = event.activator
 local caller = event.caller
 local id = hero:GetPlayerID()
-local point = Entities:FindByName(nil, "base_spawn")
 local difficulty = GameRules:GetCustomGameDifficulty()
 
 	if PlayerResource:IsValidPlayer(id) and hero:GetUnitName() == "npc_dota_hero_wisp" and hero:HasAbility("holdout_vip") then

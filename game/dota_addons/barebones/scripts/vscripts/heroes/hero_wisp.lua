@@ -46,7 +46,6 @@ function ChooseRandomHero(event)
 local hero = event.caster
 local id = hero:GetPlayerID()
 local difficulty = GameRules:GetCustomGameDifficulty()
-local point = Entities:FindByName(nil, "base_spawn")
 local random = RandomInt(1, #HEROLIST)
 local IsAvailableHero = Entities:FindByName(nil, "trigger_hero_"..random)
 

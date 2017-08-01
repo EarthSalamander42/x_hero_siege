@@ -12587,7 +12587,7 @@
 		"SoundSet"					"Hero_Phoenix"
 		"Level"						"1"
 		"IsSummoned"				"1"
-		"ModelScale" 				"1.25"
+		"ModelScale" 				"1.05"
 		"UnitLabel"					"phoenix"
 
 		// Abilities
