@@ -12,6 +12,7 @@
 *.vjs_c
 *.vxml_c
 *.vcss_c
+*.cfg
 
 # Commit panorama compiled textures
 !game/dota_addons/barebones/panorama/images/*.vtex_c
