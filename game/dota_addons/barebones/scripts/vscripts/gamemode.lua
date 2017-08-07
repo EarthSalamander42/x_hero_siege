@@ -23,9 +23,9 @@ require('zones/zones')
 require('triggers')
 
 function GameMode:OnFirstPlayerLoaded()
-base_good = Entities:FindByName(nil, "base_spawn_goodguys"):GetAbsOrigin()
+base_good = Entities:FindByName(nil, "base_spawn_goodguys")
 	if GetMapName() == "ranked_2v2" then
-		base_bad = Entities:FindByName(nil, "base_spawn_badguys"):GetAbsOrigin()
+		base_bad = Entities:FindByName(nil, "base_spawn_badguys")
 	end
 end
 
@@ -71,9 +71,9 @@ local point = Entities:FindByName(nil, "hero_selection_"..id)
 	if hero:GetUnitName() == "npc_dota_hero_wisp" then
 		hero:SetAbilityPoints(0)
 		hero:SetGold(0, false)
-		hero:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 5, IsHidden = true})
+		hero:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 15.0, IsHidden = true})
 		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
-		Timers:CreateTimer(5.0, function()
+		Timers:CreateTimer(15.0, function()
 			FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
 			Timers:CreateTimer(0.1, function()
 				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
@@ -169,7 +169,9 @@ function GameMode:InitGameMode()
 	GameRules:GetGameModeEntity():SetThink( "OnThink", self, 1 )
 
 --	Convars:RegisterCommand("duel_event", function(keys) return DuelEvent() end, "Test Duel Event", FCVAR_CHEAT)
-	Convars:RegisterCommand("magtheridon", function(keys) return StartMagtheridonArena(keys) end, "Test Magtheridon Boss", FCVAR_CHEAT)
+--	Convars:RegisterCommand("magtheridon", function(keys) return StartMagtheridonArena(keys) end, "Test Magtheridon Boss", FCVAR_CHEAT)
+--	Convars:RegisterCommand("r&b", function(keys) return RameroAndBaristolEvent() end, "Test Ramero and Baristol Arena", FCVAR_CHEAT)
+	Convars:RegisterCommand("r", function(keys) return RameroEvent() end, "Test Ramero Arena", FCVAR_CHEAT)
 
 	mode:SetExecuteOrderFilter(Dynamic_Wrap(GameMode, "FilterExecuteOrder"), self)
 	mode:SetDamageFilter(Dynamic_Wrap(GameMode, "DamageFilter"), self)
@@ -427,36 +429,14 @@ local Region = {
 					end)
 				end)
 			elseif nTimer_GameTime == 721 then --12:00, Muradin End
-				local Check = 0
-				Notifications:TopToAll({text="Special Events are unlocked!", style={color="DodgerBlue"}, duration=5.0})
-				Entities:FindByName(nil, "trigger_special_event_tp_off"):Disable()
-				Entities:FindByName(nil, "trigger_special_event"):Enable()
-				Timers:CreateTimer(0.0, function()
-					if Check < 5 then
-						local MuradinCheck = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, Entities:FindByName(nil, "npc_dota_muradin_boss"):GetAbsOrigin(), nil, 2000, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false)
-						for _, hero in pairs(MuradinCheck) do
-							if hero:IsIllusion() then
-								print("Illusion found, ignoring it")
-							elseif hero:IsRealHero() then
-								if hero:GetTeamNumber() == 2 then
-									FindClearSpaceForUnit(hero, Entities:FindByName(nil, "base_spawn_goodguys"):GetAbsOrigin(), true)
-								else
-									FindClearSpaceForUnit(hero, Entities:FindByName(nil, "base_spawn_badguys"):GetAbsOrigin(), true)
-								end
-								PlayerResource:ModifyGold(hero:GetPlayerOwnerID(), 15000, false,  DOTA_ModifyGold_Unspecified)
-							end
-						end
-						Check = Check +1
-						return 1
-					end
-				end)
+				EndMuradinEvent()
 			elseif nTimer_GameTime == 839 then -- 12 Min
 				NumPlayers = 1, Count * CREEP_LANES_TYPE
 				SpawnDragons("npc_dota_creature_black_dragon")
 			elseif nTimer_GameTime == 1079 then -- 18 Min
 				NumPlayers = 1, Count * CREEP_LANES_TYPE
 				SpawnDragons("npc_dota_creature_green_dragon")
-			elseif nTimer_GameTime == 1436 then -- 1436 - 23:55 Min: FARM EVENT 2
+			elseif nTimer_GameTime == 1435 then -- 1435 - 23:55 Min: FARM EVENT 2
 				nTimer_GameTime = 1440 -1
 				nTimer_IncomingWave = 240 --	+1
 				RefreshPlayers()
@@ -676,10 +656,6 @@ local sword = "item_lightning_sword"
 local ring = "item_ring_of_superiority"
 local doom = "item_doom_artifact"
 local frost = "item_orb_of_frost"
-local base_good = Entities:FindByName(nil, "base_spawn_goodguys"):GetAbsOrigin()
-if GetMapName() == "ranked_2v2" then
-	local base_bad = Entities:FindByName(nil, "base_spawn_badguys"):GetAbsOrigin()
-end
 
 	if hero:IsRealHero() then
 		if item:GetName() == sword and sword_first_time then
@@ -690,12 +666,12 @@ end
 			RestartCreeps()
 			sword_first_time = false
 			if hero.old_pos then
-				FindClearSpaceForUnit(hero, hero.old_pos, true)
+				TeleportHero(hero, 0.0, hero.old_pos)
 			else
 				if hero:GetTeamNumber() == 2 then
-					FindClearSpaceForUnit(hero, base_good, true)
+					TeleportHero(hero, 0.0, base_good:GetAbsOrigin())
 				elseif hero:GetTeamNumber() == 3 then
-					FindClearSpaceForUnit(hero, base_bad, true)
+					TeleportHero(hero, 0.0, base_bad:GetAbsOrigin())
 				end
 			end
 			PlayerResource:SetCameraTarget(hero:GetPlayerID(), hero)
@@ -712,12 +688,12 @@ end
 			RestartCreeps()
 			ring_first_time = false
 			if hero.old_pos then
-				FindClearSpaceForUnit(hero, hero.old_pos, true)
+				TeleportHero(hero, 0.0, hero.old_pos)
 			else
 				if hero:GetTeamNumber() == 2 then
-					FindClearSpaceForUnit(hero, base_good, true)
+					TeleportHero(hero, 0.0, base_good:GetAbsOrigin())
 				elseif hero:GetTeamNumber() == 3 then
-					FindClearSpaceForUnit(hero, base_bad, true)
+					TeleportHero(hero, 0.0, base_bad:GetAbsOrigin())
 				end
 			end
 			PlayerResource:SetCameraTarget(hero:GetPlayerID(), hero)
@@ -729,12 +705,12 @@ end
 		if item:GetName() == frost and frost_first_time then
 			frost_first_time = false
 			if hero.old_pos then
-				FindClearSpaceForUnit(hero, hero.old_pos, true)
+				TeleportHero(hero, 0.0, hero.old_pos)
 			else
 				if hero:GetTeamNumber() == 2 then
-					FindClearSpaceForUnit(hero, base_good, true)
+					TeleportHero(hero, 0.0, base_good:GetAbsOrigin())
 				else
-					FindClearSpaceForUnit(hero, base_bad, true)
+					TeleportHero(hero, 0.0, base_bad:GetAbsOrigin())
 				end
 			end
 			PlayerResource:SetCameraTarget(hero:GetPlayerID(), hero)
@@ -778,11 +754,9 @@ end
 		-- Rune System
 		if item:GetName() == "item_rune_armor" then
 			PickupArmorRune(item, hero)
-			print("Armor Rune!")
 			return false
 		elseif item:GetName() == "item_rune_immolation" then
-			PickupArmorRune(item, hero)
-			print("Immolation Rune!")
+			PickupImmolationRune(item, hero)
 			return false
 		end
 	end
@@ -968,6 +942,7 @@ function GameMode:FilterExecuteOrder( filterTable )
 
 	if order_type == DOTA_UNIT_ORDER_PURCHASE_ITEM then
 		if SPECIAL_EVENT == 1 then
+			SendErrorMessage(unit:GetPlayerID(), "#error_shop_disabled")
 			return false
 		else
 			return true
@@ -1022,23 +997,7 @@ local point_beast = Entities:FindByName(nil, "hero_image_boss"):GetAbsOrigin()
 					PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil) 
 				end)
 
-				if hero:GetUnitName() == "npc_dota_hero_meepo" then
-				local meepo_table = Entities:FindAllByName("npc_dota_hero_meepo")
-					if meepo_table then
-						for i = 1, #meepo_table do
-							FindClearSpaceForUnit(meepo_table[i], point_hero, false)
-							meepo_table[i]:Stop()
-							PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
-							Timers:CreateTimer(0.1, function()
-								PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil) 
-							end)
-						end
-					end
-				else
-
-					FindClearSpaceForUnit(hero, point_hero, true)
-					hero:Stop()
-				end
+				TeleportHero(hero, 0.0, point_hero:GetAbsOrigin())
 			end
 		end
 
@@ -1104,22 +1063,7 @@ local point_beast = Entities:FindByName(nil, "spirit_beast_boss"):GetAbsOrigin()
 			end)
 
 			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
-				if hero:GetUnitName() == "npc_dota_hero_meepo" then
-				local meepo_table = Entities:FindAllByName("npc_dota_hero_meepo")
-					if meepo_table then
-						for i = 1, #meepo_table do
-							FindClearSpaceForUnit(meepo_table[i], point_hero, false)
-							meepo_table[i]:Stop()
-							PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
-							Timers:CreateTimer(0.1, function()
-								PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil) 
-							end)
-						end
-					end
-				else
-					FindClearSpaceForUnit(hero,point_hero, true)
-					hero:Stop()
-				end
+				TeleportHero(hero, 0.0, point_hero:GetAbsOrigin())
 			end
 		end
 
@@ -1169,21 +1113,7 @@ local point_beast = Entities:FindByName(nil, "frost_infernal_boss"):GetAbsOrigin
 
 		if IsValidEntity(hero) then
 			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
-				if hero:GetUnitName() == "npc_dota_hero_meepo" then
-				local meepo_table = Entities:FindAllByName("npc_dota_hero_meepo")
-					if meepo_table then
-						for i = 1, #meepo_table do
-							FindClearSpaceForUnit(meepo_table[i], point_hero, false)
-							meepo_table[i]:RemoveModifierByName("modifier_animation_freeze_stun")
-							PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
-							Timers:CreateTimer(0.1, function()
-								PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil) 
-							end)
-						end
-					end
-				else
-					FindClearSpaceForUnit(hero, point_hero, true)
-				end
+				TeleportHero(hero, 0.0, point_hero:GetAbsOrigin())
 			end
 		end
 
@@ -1249,22 +1179,7 @@ local point = Entities:FindByName(nil, "all_hero_image_player"):GetAbsOrigin()
 					PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil) 
 				end)
 
-				if hero:GetUnitName() == "npc_dota_hero_meepo" then
-				local meepo_table = Entities:FindAllByName("npc_dota_hero_meepo")
-					if meepo_table then
-						for i = 1, #meepo_table do
-							FindClearSpaceForUnit(meepo_table[i], point, false)
-							meepo_table[i]:Stop()
-							PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
-							Timers:CreateTimer(0.1, function()
-								PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil) 
-							end)
-						end
-					end
-				else
-					FindClearSpaceForUnit(hero, point, true)
-					hero:Stop()
-				end
+				TeleportHero(hero, 0.0, point_hero:GetAbsOrigin())
 			end
 		end
 

@@ -4378,12 +4378,12 @@
 			"04"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"splash_radius"				"150 250 350 450"
+				"radius"					"150 250 350 450"
 			}
 			"05"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"splash_damage_percent"		"60"
+				"cleave_pct"				"60"
 			}
 			"06"
 			{
@@ -7766,12 +7766,12 @@
 			"01"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"splash_radius"				"250 325 400"
+				"radius"					"250 325 400"
 			}
 			"02"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"splash_damage_percent"		"50"
+				"cleave_pct"				"50"
 			}
 			"03"
 			{
@@ -7964,12 +7964,12 @@
 			"01"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"splash_radius"				"350"
+				"radius"					"350"
 			}
 			"02"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"splash_damage_percent"		"35"
+				"cleave_pct"				"35"
 			}
 			"03"
 			{
@@ -13348,7 +13348,7 @@
 			"RunScript"
 			{
 				"ScriptFile"	"heroes/hero_blood_mage.lua"
-				"Function"		"FlameStrikeOrbThrow"
+				"Function"		"PointOrbThrow"
 				"Target"		"POINT"
 			}
 		}
@@ -13606,7 +13606,7 @@
 			"RunScript"
 			{
 				"ScriptFile"	"heroes/hero_blood_mage.lua"
-				"Function"		"FlameStrikeOrbThrow"
+				"Function"		"PointOrbThrow"
 				"Target"		"POINT"
 			}
 		}
@@ -13792,7 +13792,7 @@
 					"RunScript"
 					{
 						"ScriptFile"	"heroes/hero_blood_mage.lua"
-						"Function"		"FlameStrikeOrbThrow"
+						"Function"		"PointOrbThrow"
 						"Target"		"POINT"
 					}
 				}
@@ -13943,7 +13943,7 @@
 			"RunScript"
 			{
 				"ScriptFile"	"heroes/hero_blood_mage.lua"
-				"Function"		"FlameStrikeOrbThrow"
+				"Function"		"NoPointOrbThrow"
 				"Target"		"POINT"
 			}
 		}
@@ -14128,17 +14128,16 @@
 		// General
 		//-------------------------------------------------------------------------------------
 		"BaseClass"					"ability_datadriven"
-		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_AOE"
 		"MaxLevel"					"1"
 		"SpellImmunityType"			"SPELL_IMMUNITY_ENEMIES_YES"
-		"AOERadius"					"%radius"
 
 		// Stats
 		//-------------------------------------------------------------------------------------
-		"AbilityCastPoint"			"0.5"
-		"AbilityCooldown"			"120.0"
+		"AbilityCastPoint"			"0.3"
+		"AbilityCooldown"			"60.0"
 		"AbilityManaCost"			"0"
-		"AbilityCastRange"			"1200"
+		"AbilityCastRange"			"%radius"
 		"AbilityTextureName"		"lina_light_strike_array"
 		"AbilityUnitDamageType"		"DAMAGE_TYPE_MAGICAL"
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
@@ -14155,7 +14154,7 @@
 			"02"
 			{
 				"var_type"			"FIELD_INTEGER"
-				"radius"			"500"
+				"radius"			"650"
 			}
 			"03"
 			{
@@ -14164,91 +14163,57 @@
 			}
 			"04"
 			{
-				"var_type"			"FIELD_FLOAT"
+				"var_type"					"FIELD_FLOAT"
 				"time_between_explosions"	"0.25"
 			}
 			"05"
 			{
 				"var_type"			"FIELD_INTEGER"
-				"explosions_per_tick"	"1"
-			}
-			"06"
-			{
-				"var_type"			"FIELD_INTEGER"
 				"radius_explosion"	"250"
 			}
-			"07"
+			"06"
 			{
 				"var_type"			"FIELD_FLOAT"
 				"duration"			"2.1"
 			}
-			"08"
+			"07"
 			{
 				"var_type"			"FIELD_FLOAT"
 				"delay"				"1.6"
 			}
-			"09"
+			"08"
 			{
 				"var_type"			"FIELD_FLOAT"
 				"duration_total"	"3.7"
 			}
-			"10"
+			"09"
 			{
 				"var_type"			"FIELD_INTEGER"
 				"number_of_unit"	"8"
 			}
-			"11"
+			"10"
 			{
 				"var_type"			"FIELD_INTEGER"
 				"total_damage_tooltip"	"4000"
 			}
 		}
 
-		"OnSpellStart"
+		"OnAbilityPhaseStart"
 		{
-			"SpawnUnit"
+			"RunScript"
 			{
-				"UnitName"		"dummy_unit_invulnerable"
+				"ScriptFile"	"heroes/hero_blood_mage.lua"
+				"Function"		"NoPointOrbThrow"
 				"Target"		"POINT"
-				"Duration"		"%duration_total"
-				"UnitCount"		"1"
-				"UnitLimit"		"0"
-				"GrantsGold"	"0"
-				"GrantsXP"		"0"
-				"SpawnRadius"	"1"
-				"OnSpawn"
-				{
-					"ApplyModifier"
-					{
-						"ModifierName"	"modifier_rain_of_fire"
-						"Target"		"TARGET"
-						"Duration"		"%duration"
-					}
-				}
 			}
 		}
 
-		"Modifiers"
+		"OnSpellStart"
 		{
-			"modifier_rain_of_fire" 
+			"RunScript"
 			{
-				"IsHidden"		"1"
-
-				"ThinkInterval"		"%time_between_explosions"
-				"OnIntervalThink"
-				{
-					"RunScript"
-					{
-						"ScriptFile"	"heroes/hero_blood_mage.lua"
-						"Function"		"RainOfFire"
-					}
-
-					"FireSound"
-					{
-						"EffectName"	"Hero_Invoker.SunStrike.Charge"
-						"Target" 		"TARGET"
-					}
-				}
+				"ScriptFile"	"heroes/hero_blood_mage.lua"
+				"Function"		"RainOfFire"
 			}
 		}
 	}
@@ -14314,6 +14279,12 @@
 		"AOERadius"					"%radius"
 		"AbilityChannelTime"		"%wave_duration"
 
+		"precache"
+		{
+			"particle"		"particles/units/heroes/hero_crystalmaiden/maiden_freezing_field_snow.vpcf"
+			"particle"		"particles/units/heroes/hero_crystalmaiden/maiden_freezing_field_explosion.vpcf"
+		}
+
 		"AbilitySpecial"
 		{
 			"01"
@@ -14376,7 +14347,7 @@
 				"Function"		"BlizzardStartPoint"
 				"Target"		"POINT"
 			}
-	
+
 			"ApplyModifier"
 			{
 				"ModifierName"	"modifier_blizzard_channelling"
@@ -14545,6 +14516,11 @@
 		"AbilityCooldown"			"30.0"
 		"AbilityManaCost"			"150 220 290 360"
 		"AbilityCastPoint"			"0.25"
+
+		"precache"
+		{
+			"particle"		"particles/units/heroes/hero_morphling/morphling_replicate_finish.vpcf"
+		}
 
 		"AbilitySpecial"
 		{
@@ -27215,6 +27191,7 @@
 		//-------------------------------------------------------------------------------------
 		"BaseClass"				"ability_datadriven"
 		"AbilityBehavior"		"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_HIDDEN"
+		"AbilityTextureName"	"modifiers/orb_of_darkness2"
 		"MaxLevel"				"1"
 
 		"Modifiers"
@@ -29382,12 +29359,12 @@
 			"01"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"splash_radius"				"250 325 400"
+				"radius"					"250 325 400"
 			}
 			"02"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"splash_damage_percent"		"50"
+				"cleave_pct"				"50"
 			}
 			"03"
 			{

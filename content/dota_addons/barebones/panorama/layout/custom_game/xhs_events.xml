@@ -10,7 +10,7 @@
 	<Panel hittest="false" class="EventsPanel">
 		<Panel id="EventPanel">
 			<Button id="Event1" onmouseactivate="HeroImage();" >
-				<Label class="Event1_Title" text="Hero Image (x4 stats)" id="EventTitle"/>
+				<Label class="Event1_Title" text="Hero Image \n(x4 stats)" id="EventTitle"/>
 			</Button>
 
 			<Button id="Event2" onmouseactivate="SpiritBeast();" >
@@ -22,7 +22,7 @@
 			</Button>
 
 			<Button id="Event4" onmouseactivate="AllHeroImages();" >
-				<Label class="Event1_Title" text="All Hero Images (x2 stats)" id="EventTitle"/>
+				<Label class="Event1_Title" text="All Hero Images \n(x2 stats)" id="EventTitle"/>
 			</Button>
 
 			<Button id="Close" onmouseactivate="OnQuit();" >

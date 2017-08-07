@@ -1085,7 +1085,7 @@
 		"Model"						"models/creeps/neutral_creeps/n_creep_ogre_med/n_creep_ogre_med.vmdl"	// Model.
 		"ModelScale"				"0.55"
 		"Level"						"1"
-		"SoundSet"					""
+		"SoundSet"					"Hero_Ogre_Magi"
 		"vscripts"					"ai/creeps_ai.lua"
 
 		// Abilities
@@ -12587,7 +12587,7 @@
 		"SoundSet"					"Hero_Phoenix"
 		"Level"						"1"
 		"IsSummoned"				"1"
-		"ModelScale" 				"1.05"
+		"ModelScale" 				"0.95"
 		"UnitLabel"					"phoenix"
 
 		// Abilities
@@ -12599,14 +12599,14 @@
 
 		// Armor
 		//----------------------------------------------------------------
-		"ArmorPhysical"				"100"		// Physical protection.
+		"ArmorPhysical"				"200"		// Physical protection.
 		"MagicalResistance"			"100"		// Magical protection.
 
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
-		"AttackDamageMin"			"450"		// Damage range min.
-		"AttackDamageMax"			"475"		// Damage range max.	
+		"AttackDamageMin"			"650"		// Damage range min.
+		"AttackDamageMax"			"675"		// Damage range max.	
 		"AttackRate"				"0.7"		// Speed of attack.
 		"AttackAnimationPoint"		"0.35"		// Normalized time in animation cycle to attack.
 		"AttackAcquisitionRange"	"800"		// Range within a target can be acquired.
@@ -12633,7 +12633,7 @@
 
 		// Status
 		//----------------------------------------------------------------
-		"StatusHealth"				"10000"		// Base health.
+		"StatusHealth"				"9000"		// Base health.
 		"StatusHealthRegen"			"0.0"		// Health regeneration rate.
 		"StatusMana"				"0"			// Base mana.
 		"StatusManaRegen"			"0"			// Mana regeneration rate.		 

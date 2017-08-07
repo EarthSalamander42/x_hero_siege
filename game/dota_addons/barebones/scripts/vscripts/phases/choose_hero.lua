@@ -12,25 +12,34 @@ WeekHero = "npc_dota_hero_tiny"
 -- "npc_dota_hero_storm_spirit"		-- Spirit Master
 
 function SpawnHeroesBis()
-	for dummy = 1, #HEROLIST do
-		local point = Entities:FindByName(nil, "choose_"..HEROLIST[dummy].."_point"):GetAbsOrigin()
-		local dummy_hero = CreateUnitByName("npc_dota_hero_"..HEROLIST[dummy].."_bis", point, true, nil, nil, DOTA_TEAM_GOODGUYS)
+local hero = 1
+local hero_vip = 1
+
+	Timers:CreateTimer(2.0, function()
+		local point = Entities:FindByName(nil, "choose_"..HEROLIST[hero].."_point"):GetAbsOrigin()
+		local dummy_hero = CreateUnitByName("npc_dota_hero_"..HEROLIST[hero].."_bis", point, true, nil, nil, DOTA_TEAM_GOODGUYS)
 		dummy_hero:SetAngles(0, 270, 0)
 		dummy_hero:AddAbility("dummy_passive_vulnerable")
 		dummy_hero:FindAbilityByName("dummy_passive_vulnerable"):SetLevel(1)
-	end
+		if hero < #HEROLIST then
+			hero = hero +1
+			return 0.25
+		else
+			return nil
+		end
+	end)
 
-	for dummy = 1, #HEROLIST_VIP do
-		if dummy == 2 then
+	Timers:CreateTimer(10.0, function()
+		if hero_vip == 2 then
 			local dummy_hero = CreateUnitByName("npc_dota_hero_skeleton_king_bis", Entities:FindByName(nil, "choose_skeleton_king_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
 			dummy_hero:SetAngles(0, 270, 0)
 			StartAnimation(dummy_hero, {duration = 20000.0, activity = ACT_DOTA_IDLE, rate = 0.9})
-		elseif dummy == 4 then
+		elseif hero_vip == 4 then
 			local dummy_hero = CreateUnitByName("npc_dota_hero_chaos_knight_bis", Entities:FindByName(nil, "choose_chaos_knight_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
 			dummy_hero:SetAngles(0, 270, 0)
 			local dummy_hero = CreateUnitByName("npc_dota_hero_keeper_of_the_light_bis", Entities:FindByName(nil, "choose_keeper_of_the_light_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
 			dummy_hero:SetAngles(0, 270, 0)
-		elseif dummy == 8 then
+		elseif hero_vip == 8 then
 			local dummy_hero = CreateUnitByName("npc_dota_hero_storm_spirit_bis", Entities:FindByName(nil, "choose_storm_spirit_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
 			dummy_hero:SetAngles(0, 270, 0)
 			local dummy_hero = CreateUnitByName("npc_dota_hero_ember_spirit_bis", Entities:FindByName(nil, "choose_ember_spirit_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
@@ -38,11 +47,17 @@ function SpawnHeroesBis()
 			local dummy_hero = CreateUnitByName("npc_dota_hero_earth_spirit_bis", Entities:FindByName(nil, "choose_earth_spirit_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
 			dummy_hero:SetAngles(0, 270, 0)
 		else
-			local point = Entities:FindByName(nil, "choose_"..HEROLIST_VIP[dummy].."_point"):GetAbsOrigin()
-			local dummy_hero = CreateUnitByName("npc_dota_hero_"..HEROLIST_VIP[dummy].."_bis", point, true, nil, nil, DOTA_TEAM_GOODGUYS)
+			local point = Entities:FindByName(nil, "choose_"..HEROLIST_VIP[hero_vip].."_point"):GetAbsOrigin()
+			local dummy_hero = CreateUnitByName("npc_dota_hero_"..HEROLIST_VIP[hero_vip].."_bis", point, true, nil, nil, DOTA_TEAM_GOODGUYS)
 			dummy_hero:SetAngles(0, 270, 0)
 		end
-	end
+		if hero_vip < #HEROLIST_VIP then
+			hero_vip = hero_vip +1
+			return 0.5
+		else
+			return nil
+		end
+	end)
 
 	local vip_point = Entities:FindByName(nil, "choose_vip_point"):GetAbsOrigin()
 	local vip_hero = CreateUnitByName(WeekHero.."_bis", vip_point, true, nil, nil, DOTA_TEAM_GOODGUYS)
@@ -66,7 +81,7 @@ function SpawnHeroesBis()
 	lich_king:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
 	StartAnimation(lich_king, {duration = 20000.0, activity = ACT_DOTA_IDLE, rate = 0.9})
 
---	local i, j = string.find( HEROLIST[dummy], "" )
+--	local i, j = string.find(HEROLIST[dummy], "")
 --	print(HEROLIST_VIP[dummy])
 --	print(dummy)
 end
@@ -88,25 +103,28 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 				Notifications:Bottom(hero:GetPlayerOwnerID(), {hero="npc_dota_hero_"..HEROLIST[i], duration = 5.0})
 				Notifications:Bottom(hero:GetPlayerOwnerID(), {text="HERO: ", duration = 5.0, style={color="white"}, continue=true})
 				Notifications:Bottom(hero:GetPlayerOwnerID(), {text="#npc_dota_hero_"..HEROLIST[i], duration = 5.0, style={color="white"}, continue=true})
-				Timers:CreateTimer(3.1, function()
-					PrecacheUnitByNameAsync("npc_dota_hero_"..HEROLIST[i], function()
-						local newHero = PlayerResource:ReplaceHeroWith(id, "npc_dota_hero_"..HEROLIST[i], STARTING_GOLD, 0)
-						newHero:RespawnHero(false, false, false)
-						if difficulty < 4 then
-							local item = newHero:AddItemByName("item_ankh_of_reincarnation")
+				PrecacheUnitByNameAsync("npc_dota_hero_"..HEROLIST[i], function()
+--					PrecacheResource("soundfile", "soundevents/voscripts/game_sounds_vo_"..HEROLIST[i]..".vsndevts", function() end)
+					local newHero = PlayerResource:ReplaceHeroWith(id, "npc_dota_hero_"..HEROLIST[i], STARTING_GOLD, 0)
+					if difficulty < 4 then
+						local item = newHero:AddItemByName("item_ankh_of_reincarnation")
+					end
+					local item = newHero:AddItemByName("item_healing_potion")
+					local item = newHero:AddItemByName("item_mana_potion")
+					if difficulty == 1 then
+						local item = newHero:AddItemByName("item_lifesteal_mask")
+					end
+					if newHero:GetTeamNumber() == 2 then
+						TeleportHero(newHero, 3.0, base_good:GetAbsOrigin())
+					elseif newHero:GetTeamNumber() == 3 then
+						TeleportHero(newHero, 3.0, base_bad:GetAbsOrigin())
+					end
+					Timers:CreateTimer(0.1, function()
+						if not hero:IsNull() then
+							UTIL_Remove(hero)
 						end
-						local item = newHero:AddItemByName("item_healing_potion")
-						local item = newHero:AddItemByName("item_mana_potion")
-						if difficulty == 1 then
-							local item = newHero:AddItemByName("item_lifesteal_mask")
-						end
-						Timers:CreateTimer(0.1, function()
-							if not hero:IsNull() then
-								UTIL_Remove(hero)
-							end
-						end)
-					end, id)
-				end)
+					end)
+				end, id)
 			elseif caller:GetName() == "trigger_hero_weekly" then
 				if hero:HasAbility("holdout_vip") then
 					Notifications:Bottom(hero:GetPlayerOwnerID(), {text="You are VIP. Please choose this hero on top!", duration = 5.0})
@@ -123,7 +141,6 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 				Timers:CreateTimer(3.1, function()
 					PrecacheUnitByNameAsync(WeekHero, function()
 						local newHero = PlayerResource:ReplaceHeroWith(id, WeekHero, STARTING_GOLD, 0)
-						newHero:RespawnHero(false, false, false)
 						if difficulty < 4 then
 							local item = newHero:AddItemByName("item_ankh_of_reincarnation")
 						end
@@ -131,6 +148,11 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 						local item = newHero:AddItemByName("item_mana_potion")
 						if difficulty == 1 then
 							local item = newHero:AddItemByName("item_lifesteal_mask")
+						end
+						if newHero:GetTeamNumber() == 2 then
+							TeleportHero(newHero, 3.0, base_good:GetAbsOrigin())
+						elseif newHero:GetTeamNumber() == 3 then
+							TeleportHero(newHero, 3.0, base_bad:GetAbsOrigin())
 						end
 						Timers:CreateTimer(0.1, function()
 							if not hero:IsNull() then
@@ -165,7 +187,6 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 				Timers:CreateTimer(3.1, function()
 					PrecacheUnitByNameAsync("npc_dota_hero_"..HEROLIST[i], function()
 						local newHero = PlayerResource:ReplaceHeroWith(id, "npc_dota_hero_"..HEROLIST_VIP[i], STARTING_GOLD, 0)
-						newHero:RespawnHero(false, false, false)
 						if difficulty < 4 then
 							local item = newHero:AddItemByName("item_ankh_of_reincarnation")
 						end
@@ -173,6 +194,11 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 						local item = newHero:AddItemByName("item_mana_potion")
 						if difficulty == 1 then
 							local item = newHero:AddItemByName("item_lifesteal_mask")
+						end
+						if newHero:GetTeamNumber() == 2 then
+							TeleportHero(newHero, 3.0, base_good:GetAbsOrigin())
+						elseif newHero:GetTeamNumber() == 3 then
+							TeleportHero(newHero, 3.0, base_bad:GetAbsOrigin())
 						end
 						if newHero:GetUnitName() == "npc_dota_hero_skeleton_king" then
 							SkeletonKingWearables(newHero)

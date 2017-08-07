@@ -106,28 +106,12 @@
 		"ItemPermanent"					"0"
 		"ItemInitialCharges"			"1"
 		"ItemKillable"					"0"
-		"ItemCastOnPickup"				"0"
 
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilitySpecial"
 		{
 		}
-	}
-
-	"item_recipe_rapier"
-	{
-		"ItemRecipe"					"0"
-	}
-
-	"item_clarity"
-	{
-		"CustomShop"					"1"
-	}
-
-	"item_flask"
-	{
-		"CustomShop"					"1"
 	}
 
 	//=================================================================================================================
@@ -1722,7 +1706,6 @@
 		"Effect"						"particles/generic_gameplay/dropped_item.vpcf"
 		"ItemCost"						"10000"
 		"ItemKillable"					"0" 
-		"ItemCastOnPickup"				"0"
 		"ItemSellable"					"1"
 		"ItemPurchasable"				"1"
 		"ItemDroppable"					"1"
@@ -1773,7 +1756,6 @@
 		"ItemCost"						"50000"
 		"ItemKillable"					"0" 
 		"ItemSellable"					"1"
-		"ItemCastOnPickup"				"0"
 		"ItemPurchasable"				"1"
 		"ItemDroppable"					"1"
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
@@ -2331,13 +2313,12 @@
 		"ItemKillable"				"0" 
 
 		"ItemInitialStockTime"		"930.0"	//14 Min = 1200 + game beginning time = 90
-		"ItemStockMax"				"5" 
-		"ItemStockTime"				"60.0"
+		"ItemStockMax"				"2" 
+		"ItemStockTime"				"120.0"
 		"ItemStockInitial"			"0"
 		"AbilityCooldown"			"60.0"
 
 		"ItemSellable"				"1"
-		"ItemCastOnPickup"			"0"
 		"ItemPurchasable"			"1"
 		"ItemDroppable"				"1"
 		"ItemShareability"			"ITEM_FULLY_SHAREABLE"
@@ -3944,7 +3925,6 @@
 		"ItemCost"						"3750"
 		"ItemKillable"					"1" 
 		"ItemSellable"					"1"
-		"ItemCastOnPickup"				"0"
 		"ItemPurchasable"				"1"
 		"ItemDroppable"					"1"
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
@@ -4376,15 +4356,21 @@
 		{
 			"modifier_rune_armor"
 			{
-				"TextureName"					"tower_armor_aura"
-				"Duration"						"%duration"
-				"Passive"						"0"
-				"IsHidden"						"0"
-				"IsBuff"						"1"
-				"IsPurgable"					"0"
+				"Duration"				"%duration"
+				"TextureName"			"tower_armor_aura"
+				"IsHidden"				"0"
+				"IsBuff"				"1"
+				"IsPurgable"			"0"
 
-				"EffectName"					"particles/units/heroes/hero_dazzle/dazzle_armor_friend.vpcf"
-				"EffectAttachType"				"follow_origin"
+				"EffectName"			"particles/units/heroes/hero_dazzle/dazzle_armor_friend.vpcf"
+				"EffectAttachType"		"follow_overhead"
+
+				"AttachEffect"
+				{
+					"EffectName"		"particles/units/heroes/hero_dazzle/dazzle_armor_enemy_ring_sink.vpcf"
+					"EffectAttachType"	"follow_origin"
+					"Target"			"CASTER"
+				}
 
 				"Properties"
 				{
@@ -5433,18 +5419,18 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"ID"									"2548"
-		"BaseClass"								"item_datadriven"
-		"Model"									"models/items/juggernaut/arcana/juggernaut_arcana_mask.vmdl"
-		"Effect"								"particles/econ/items/dazzle/dazzle_dark_light_weapon/dazzle_dark_shallow_grave_ground.vpcf"
+		"ID"							"2548"
+		"BaseClass"						"item_datadriven"
+		"Model"							"models/items/juggernaut/arcana/juggernaut_arcana_mask.vmdl"
+		"Effect"						"particles/econ/items/dazzle/dazzle_dark_light_weapon/dazzle_dark_shallow_grave_ground.vpcf"
 
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"								"0"
-		"ItemQuality"							"component"
-		"ItemPurchasable"						"0"
-		"ItemSellable"							"0"
-		"ItemKillable"							"1"
+		"ItemCost"						"0"
+		"ItemQuality"					"component"
+		"ItemPurchasable"				"0"
+		"ItemSellable"					"0"
+		"ItemKillable"					"1"
 
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
@@ -5468,22 +5454,21 @@
 			"04"
 			{
 				"var_type"			"FIELD_INTEGER"
-				"tick_time"			"45"
+				"duration"			"45"
 			}
 		}
 
 		"Modifiers"
 		{
-			"modifier_immolation"
+			"modifier_rune_immolation"
 			{
 				"Duration"				"%duration"
-				"Passive"				"0"
-				"IsHidden"				"0"
 				"IsBuff"				"1"
+				"IsHidden"				"0"
 				"IsPurgable"			"0"
 				"ThinkInterval"			"%tick_time"
 				"TextureName"			"modifiers/cloak_of_flames"
-				
+
 				"OnCreated"
 				{
 					"AttachEffect"
@@ -5497,13 +5482,13 @@
 							"00"	"0 0 0"
 							"01"	"%radius 1 1"
 						}
+					}
 
-						"AttachEffect"
-						{
-							"EffectName"        "particles/units/heroes/hero_lone_druid/lone_druid_battle_cry_overhead_ember.vpcf"
-							"EffectAttachType"  "follow_overhead"
-							"Target"            "CASTER"
-						}
+					"AttachEffect"
+					{
+						"EffectName"		"particles/units/heroes/hero_lone_druid/lone_druid_battle_cry_overhead_ember.vpcf"
+						"EffectAttachType"	"follow_overhead"
+						"Target"			"CASTER"
 					}
 				}
 

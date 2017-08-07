@@ -1,4 +1,4 @@
-function FlameStrikeOrbThrow(event)
+function PointOrbThrow(event)
 local caster = event.caster
 local ability = event.ability
 local point = event.target_points[1]
@@ -41,6 +41,49 @@ local point = event.target_points[1]
 			end
 		end)
 	end
+end
+
+function NoPointOrbThrow(event)
+local caster = event.caster
+local ability = event.ability
+local point = caster:GetAbsOrigin() + Vector(0, 0, 1000)
+
+	-- Remove first orb
+	local orbNumber
+	for i = 1, 3 do
+		if caster.orbs[i] then
+			ParticleManager:DestroyParticle(caster.orbs[i], true)
+			caster.orbs[i] = nil
+			orbNumber = i
+			break
+		end
+	end
+
+	-- Launch orb
+	local speed = 900
+	local orb = ParticleManager:CreateParticle("particles/units/heroes/hero_rubick/rubick_base_attack.vpcf", PATTACH_CUSTOMORIGIN, caster)
+	ParticleManager:SetParticleControl(orb, 0, caster:GetAttachmentOrigin(caster:ScriptLookupAttachment("attach_attack1")))
+	ParticleManager:SetParticleControl(orb, 1, point)
+	ParticleManager:SetParticleControl(orb, 2, Vector(speed, 0, 0))
+	ParticleManager:SetParticleControl(orb, 3, point)
+
+	local distanceToTarget = (caster:GetAbsOrigin() - point):Length2D()
+	Timers:CreateTimer(distanceToTarget/speed, function()
+		ParticleManager:DestroyParticle(orb, false)
+	end)
+
+	-- Restore orb
+	Timers:CreateTimer(1, function() 
+		if orbNumber then
+			caster.orbs[orbNumber] = ParticleManager:CreateParticle("particles/custom/human/blood_mage/exort_orb.vpcf", PATTACH_OVERHEAD_FOLLOW, caster)
+			ParticleManager:SetParticleControlEnt(caster.orbs[orbNumber], 1, caster, PATTACH_POINT_FOLLOW, "attach_orb"..orbNumber, caster:GetAbsOrigin(), false)
+		else
+			for i=1,3 do
+				caster.orbs[i] = ParticleManager:CreateParticle("particles/custom/human/blood_mage/exort_orb.vpcf", PATTACH_OVERHEAD_FOLLOW, caster)
+				ParticleManager:SetParticleControlEnt(caster.orbs[i], 1, caster, PATTACH_POINT_FOLLOW, "attach_orb"..i, caster:GetAbsOrigin(), false)
+			end
+		end
+	end)
 end
 
 function FlameStrikeStart(event)
@@ -99,7 +142,7 @@ local damage = event.Damage
 	end 
 end
 
-function DragonSlave( keys )
+function DragonSlave(keys)
 local caster = keys.caster
 local ability = keys.ability
 local ability_level = ability:GetLevel() - 1
@@ -139,8 +182,7 @@ local caster_loc = caster:GetAbsOrigin()
 	ProjectileManager:CreateLinearProjectile(projectile)
 end
 
-function Incinerate( keys )
-	print( keys.target:GetHealth() )
+function Incinerate(keys)
 	if not keys.target:IsAlive() then
 		local particleName = "particles/units/heroes/hero_sandking/sandking_caustic_finale_explode.vpcf"
 		local soundEventName = "Ability.SandKing_CausticFinale"
@@ -256,34 +298,29 @@ function PhoenixEggCheckReborn( event )
 	unit:RemoveSelf()
 end
 
-function RainOfFire( event )
-local caster = event.target
-local ability = event.ability
+function RainOfFire(keys)
+local caster = keys.caster
+local ability = keys.ability
 local radius = ability:GetLevelSpecialValueFor("radius", ability:GetLevel()-1)
 local radius_explosion = ability:GetLevelSpecialValueFor("radius_explosion", ability:GetLevel() -1)
 local damage_per_unit = ability:GetLevelSpecialValueFor("damage_per_unit", ability:GetLevel()-1)
 local stun_duration = ability:GetLevelSpecialValueFor("stun_duration", ability:GetLevel()-1)
-local explosions_per_tick = ability:GetLevelSpecialValueFor("explosions_per_tick", ability:GetLevel()-1)
 local delay = ability:GetLevelSpecialValueFor("delay", ability:GetLevel()-1)
+local explode_time = ability:GetLevelSpecialValueFor("time_between_explosions", ability:GetLevel()-1)
+local sunstrike_number = ability:GetLevelSpecialValueFor("number_of_unit", ability:GetLevel()-1)
+local sunstrikes = 1
 
 	StartAnimation(caster, {duration = 1.0, activity = ACT_DOTA_CAST_TORNADO, rate = 1.0})
 
-	for i = 1, explosions_per_tick do
+	Timers:CreateTimer(0.0, function()
+		caster:EmitSound("Hero_Invoker.SunStrike.Charge")
 		local point = caster:GetAbsOrigin() + RandomInt(1,radius-(math.floor(radius_explosion/2.0)))*RandomVector(1)
 		local units = FindUnitsInRadius(caster:GetTeam(), point, nil, radius_explosion, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_BASIC + DOTA_UNIT_TARGET_HERO , DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, FIND_CLOSEST, false)
-		for _,unit in pairs(units) do
-			Timers:CreateTimer(delay, function()
-				ApplyDamage({victim = unit, attacker = caster, damage = damage_per_unit, damage_type = DAMAGE_TYPE_MAGICAL})
-				unit:AddNewModifier(caster, nil, "modifier_stunned", {duration = stun_duration})
-			end)
-		end
 
 		local sunstrike = ParticleManager:CreateParticle("particles/custom/human/blood_mage/invoker_sun_strike_team_immortal1.vpcf",PATTACH_CUSTOMORIGIN,caster)
 		ParticleManager:SetParticleControl(sunstrike, 0, point)
-
 		local suntrike_inner = ParticleManager:CreateParticle("particles/econ/items/shadow_fiend/sf_fire_arcana/sf_fire_arcana_requiemofsouls_line_ground.vpcf",PATTACH_CUSTOMORIGIN,caster)
 		ParticleManager:SetParticleControl(suntrike_inner, 0, point)
-
 		local sunstrike_outer = ParticleManager:CreateParticle("particles/neutral_fx/black_dragon_fireball_lava_scorch.vpcf", PATTACH_CUSTOMORIGIN, nil)
 		ParticleManager:SetParticleControl(sunstrike_outer, 0, point)
 		ParticleManager:SetParticleControl(sunstrike_outer, 2, Vector(11,0,0))
@@ -293,7 +330,21 @@ local delay = ability:GetLevelSpecialValueFor("delay", ability:GetLevel()-1)
 			ParticleManager:SetParticleControl(sunstrike, 0, point)
 			caster:EmitSound("Hero_Invoker.SunStrike.Ignite")
 		end)
-	end
+
+		for _, unit in pairs(units) do
+			Timers:CreateTimer(delay, function()
+				ApplyDamage({victim = unit, attacker = caster, damage = damage_per_unit, damage_type = DAMAGE_TYPE_MAGICAL})
+				unit:AddNewModifier(caster, nil, "modifier_stunned", {duration = stun_duration})
+			end)
+		end
+
+		if sunstrikes < sunstrike_number then
+			sunstrikes = sunstrikes +1
+			return explode_time
+		else
+			return nil
+		end
+	end)
 end
 
 function AttachOrbs( event )

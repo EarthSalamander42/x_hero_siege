@@ -178,6 +178,9 @@ local too_ez_gold = 0.9 -- The mod is way too ez, to modify gold very easily i j
 			end
 
 			npc.zone = "xhs_holdout"
+			if unit:GetUnitName() == "npc_dota_hero_magtheridon" then
+				print("Zone:", npc.zone)
+			end
 --			print("NPC:", npc:GetUnitName())
 --			print("Zone:", npc.zone)
 			return
@@ -961,10 +964,10 @@ local lane = tonumber(cn)
 			if hero:GetTeamNumber() == 2 then
 				if not gold_advertize then gold_advertize = 0 end
 				if hero:IsRealHero() then
-					if PlayerResource:GetGold(hero:GetPlayerID()) > 99900 and gold_advertize == 0 then
+					if PlayerResource:GetGold(hero:GetPlayerID()) > 99900 and gold_advertize == 0 and SPECIAL_EVENT == 0 then
 						SendErrorMessage(hero:GetPlayerID(), "#error_gold_full")
 						gold_advertize = 1
-						Timers:CreateTimer(3.0, function()
+						Timers:CreateTimer(5.0, function()
 							gold_advertize = 0
 						end)
 					end
@@ -1057,8 +1060,6 @@ local lane = tonumber(cn)
 			end
 			if killedUnit.no_corpse ~= true then
 				Corpses:CreateFromUnit(killedUnit)
-			else
-				print("NO FUCKING CORPSE")
 			end
 		return
 		elseif killedUnit:IsBuilding() then

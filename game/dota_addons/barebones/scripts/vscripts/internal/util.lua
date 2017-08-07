@@ -212,8 +212,8 @@ local game_time = GameRules:GetDOTATime(false, false)
 
 	-- List of powerup rune types
 	local powerup_rune_types = {
-		"item_rune_armor"
---		"item_rune_immolation"
+		"item_rune_armor",
+		"item_rune_immolation"
 	}
 
 	for _, rune_loc in pairs(powerup_rune_locations) do
@@ -226,18 +226,29 @@ local game_time = GameRules:GetDOTATime(false, false)
 	end
 end
 
+function PickupRune(item, unit)
+	local gameEvent = {}
+	gameEvent["player_id"] = unit:GetPlayerID()
+	gameEvent["team_number"] = unit:GetTeamNumber()
+	gameEvent["locstring_value"] = "#DOTA_Tooltip_Ability_" .. item:GetAbilityName()
+	gameEvent["message"] = "#Dungeon_Rune"
+	FireGameEvent("dota_combat_event_message", gameEvent)
+end
+
 -- Picks up an Armor rune
 function PickupArmorRune(item, unit)
 
 	item:ApplyDataDrivenModifier(unit, unit, "modifier_rune_armor", {})
 	EmitSoundOnLocationForAllies(unit:GetAbsOrigin(), "Rune.Regen", unit)
+	PickupRune(item, unit)
 end
 
 -- Picks up an Immolation rune
 function PickupImmolationRune(item, unit)
 
-	item:ApplyDataDrivenModifier(unit, unit, "modifier_immolation", {})
+	item:ApplyDataDrivenModifier(unit, unit, "modifier_rune_immolation", {})
 	EmitSoundOnLocationForAllies(unit:GetAbsOrigin(), "Rune.Haste", unit)
+	PickupRune(item, unit)
 end
 
 if not Corpses then
@@ -729,4 +740,37 @@ end
 
 function SendErrorMessage(playerID, string)
 	CustomGameEventManager:Send_ServerToPlayer(PlayerResource:GetPlayer(playerID), "dotacraft_error_message", {message=string}) 
+end
+
+function TeleportHero(hero, delay, point)
+-- +RandomVector(400)
+
+--	local TeleportEffect = ParticleManager:CreateParticle("particles/econ/events/ti7/teleport_end_ti7_lvl3.vpcf", PATTACH_ABSORIGIN, newHero)
+--	ParticleManager:SetParticleControl(TeleportEffect, 0, point)
+--	ParticleManager:SetParticleControl(TeleportEffect, 1, point)
+--	ParticleManager:SetParticleControl(TeleportEffect, 3, point)
+--	ParticleManager:SetParticleControl(TeleportEffect, 5, point)
+
+	PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
+	hero:AddNewModifier(hero, nil, "modifier_command_restricted", {})
+
+	Timers:CreateTimer(delay, function()
+		if hero:GetUnitName() == "npc_dota_hero_meepo" then
+		local meepo_table = Entities:FindAllByName("npc_dota_hero_meepo")
+			if meepo_table then
+				for i = 1, #meepo_table do
+					FindClearSpaceForUnit(meepo_table[i], point, false)
+					meepo_table[i]:Stop()
+				end
+			end
+		else
+			FindClearSpaceForUnit(hero, point, true)
+			hero:Stop()
+		end
+		Timers:CreateTimer(0.1, function()
+			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
+		end)
+--		ParticleManager:DestroyParticle(TeleportEffect, true)
+		hero:RemoveModifierByName("modifier_command_restricted")
+	end)
 end

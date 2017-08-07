@@ -13,7 +13,7 @@ if PlayerResource:GetConnectionState(hero:GetPlayerID()) == 3 then return end
 
 	CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "show_events", {})
 	Entities:FindByName(nil, "trigger_special_event"):Disable()
-	FindClearSpaceForUnit(hero, point, true)
+	TeleportHero(hero, 0.0, point)
 	hero:AddNewModifier(nil, nil, "modifier_boss_stun", {IsHidden = true})
 	hero:AddNewModifier(nil, nil, "modifier_invulnerable", {IsHidden = true})
 end
@@ -57,34 +57,12 @@ if GetMapName() == "ranked_2v2" then
 	local point_bad = Entities:FindByName(nil, "base_spawn_badguys"):GetAbsOrigin()
 end
 
-	if hero:GetUnitName() == "npc_dota_hero_meepo" then
-		local meepo_table = Entities:FindAllByName("npc_dota_hero_meepo")
-		if meepo_table then
-			for i = 1, #meepo_table do
-				if hero:GetTeamNumber() == 2 then
-					FindClearSpaceForUnit(meepo_table[i], point_good, false)
-				else
-					FindClearSpaceForUnit(meepo_table[i], point_bad, false)
-				end
-				meepo_table[i]:Stop()
-				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
-				Timers:CreateTimer(0.1, function()
-					PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil) 
-				end)
-			end
-		end
+	if hero:GetTeamNumber() == 2 then
+		TeleportHero(hero, 0.0, point_good)
 	else
-		if hero:GetTeamNumber() == 2 then
-			FindClearSpaceForUnit(hero, point_good, true)
-		else
-			FindClearSpaceForUnit(hero, point_bad, true)
-		end
-		hero:Stop()
-		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
-		Timers:CreateTimer(0.1, function()
-			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil) 
-		end)
+		TeleportHero(hero, 0.0, point_bad)
 	end
+
 	Entities:FindByName(nil, "trigger_special_event"):Enable()
 
 	if caller:GetName() == "trigger_hero_image_duration" then

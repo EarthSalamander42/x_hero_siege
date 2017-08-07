@@ -1,19 +1,8 @@
 "addon"
 {
-	"InstructionsTitle"							"X Hero Siege"
-	"InstructionsObjective"						"OBJECTIVE:"
-	"InstructionsObjectiveText"					"Defend your castle! Yes, the old X Hero Siege is brought back, just for you."
-	"InstructionsHowToPlay"						"HOW TO PLAY"
-//	"InstructionsLines"							"- Defend your castle against creep lanes( choose 1 lane per player ).<br>
-//												- Destroy towers to release bosses, and then head to the Barrackment to stop creep spawns.<br>
-//												- Once every barrackment destroyed, head to the ice towers and fight harder creeps, ,destroy the ice towers.<br>
-//												- Head back to your castle to defend it, the Final Wave is coming!<br>
-//												- Don't worry, after Final wave your castle is safe!."
-
 	"DOTA_GoodGuys"   							"Light Forces"
 	"DOTA_BadGuys"    							"Dark Forces"
 
-	"Remaining"									"REMAINING"
 	"GameTime"									"Game Time:"
 	"Goal"										"Special Events:"
 	"CreepGoal"									"Creep Levels:"
@@ -21,18 +10,6 @@
 	"SpecialEventsGoal"							"Boss Events:"
 
 	"addonname"									"X Hero Siege"
-	"overthrow_game_info_header_objective"		"Objective:"
-	"overthrow_brief_description"				"Defeat the dark forces! Make your way to fight Arthas!"
-	"overthrow_game_info_header_how_to_play"	"How To Play:"
-	"overthrow_game_info_throne"				"Defend your castle against creep lanes( choose 1 lane per player )."
-	"overthrow_game_info_coins"					"Destroy towers to release bosses, and then head to the barrackment to stop creep spawns."
-	"overthrow_game_info_items"					"Once every barrackments are destroyed, head to the ice towers and fight harder creeps, then when you can destroy ice towers."
-	"overthrow_game_info_tips_header"			"Tips:"
-	"overthrow_game_info_tip01"					"Don't rush the game, farm, be patient."
-	"overthrow_game_info_tip02"					"Remember this gamemode is about team-play, if one of your mate is weak, buy some tomes or items for him."
-	"overthrow_game_info_tip03"					"Chat Commands:"
-	"overthrow_game_info_tip04"					"-openway_(1 to 8): Opens the specified creep lane. -closeway_(1 to 8): Closes the specified creep lane. -openway_all: Opens all creep lanes -closeway_all: Closes all creep lanes. -credits: Shows mod credits. -difficulty: Shows game difficulty. -bt: Buy Tomes, need at least 10 000 gold (+50 stats for 10 000 gold)."
-
 	"AddonTitleDifficulty"						"Current Difficulty:"
 	"AddonDifficultyEasy"						"Easy: 150% Gold, 125% XP, 75% Damage."
 	"AddonDifficultyNormal"						"Normal: 110% Gold, 100% XP, 100% Damage."

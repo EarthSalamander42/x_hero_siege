@@ -162,11 +162,11 @@ RefreshPlayers()
 end
 
 function FourBossesKillCount()
-local teleporters3 = Entities:FindAllByName("trigger_teleport3")
+local teleporters = Entities:FindAllByName("trigger_teleport3")
 	FOUR_BOSSES = FOUR_BOSSES +1
 
 	if FOUR_BOSSES == 4 then
-		for _,v in pairs(teleporters3) do
+		for _,v in pairs(teleporters) do
 			v:Enable()
 		end
 		Notifications:TopToAll({text="You have killed Grom, Proudmoore, Illidan and Balanar. Red Teleporters Activated." , duration = 10.0})
