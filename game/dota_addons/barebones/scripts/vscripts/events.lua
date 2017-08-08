@@ -178,7 +178,7 @@ local too_ez_gold = 0.9 -- The mod is way too ez, to modify gold very easily i j
 			end
 
 			npc.zone = "xhs_holdout"
-			if unit:GetUnitName() == "npc_dota_hero_magtheridon" then
+			if npc:GetUnitName() == "npc_dota_hero_magtheridon" then
 				print("Zone:", npc.zone)
 			end
 --			print("NPC:", npc:GetUnitName())
@@ -402,7 +402,7 @@ local AbilitiesHeroes_XX = {
 			end
 		end
 
-		if hero:GetUnitName() == "npc_dota_hero_storm_spirit" or hero:GetUnitName() == "npc_dota_hero_earth_spirit" or hero:GetUnitName() == "npc_dota_hero_ember_spirit" or hero:GetUnitName() == "npc_dota_hero_ursa" or hero:GetUnitName() == "npc_dota_hero_troll_warlord" or hero:GetUnitName() == "npc_dota_hero_mirana" or hero:GetUnitName() == "npc_dota_hero_lina" or hero:GetUnitName() == "npc_dota_hero_monkey_king" or hero:GetUnitName() == "npc_dota_hero_lone_druid" then
+		if hero:GetUnitName() == "npc_dota_hero_storm_spirit" or hero:GetUnitName() == "npc_dota_hero_earth_spirit" or hero:GetUnitName() == "npc_dota_hero_ember_spirit" or hero:GetUnitName() == "npc_dota_hero_ursa" or hero:GetUnitName() == "npc_dota_hero_troll_warlord" or hero:GetUnitName() == "npc_dota_hero_mirana" or hero:GetUnitName() == "npc_dota_hero_lina" or hero:GetUnitName() == "npc_dota_hero_monkey_king" or hero:GetUnitName() == "npc_dota_hero_lone_druid" or hero:GetUnitName() == "npc_dota_hero_doom_bringer" then
 			print("No Level 20 Ability")
 		else
 			print("Whisper Level 20 Ability")

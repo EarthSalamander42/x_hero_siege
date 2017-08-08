@@ -139,8 +139,6 @@ function GameMode:InitGameMode()
 	SetTeamCustomHealthbarColor(DOTA_TEAM_BADGUYS, 128, 32, 32) --Red
 	SetTeamCustomHealthbarColor(DOTA_TEAM_CUSTOM_1, 255, 255, 0) --Yellow	
 	SetTeamCustomHealthbarColor(DOTA_TEAM_CUSTOM_2, 255, 255, 0) --Yellow	
-	SetTeamCustomHealthbarColor(DOTA_TEAM_CUSTOM_3, 0, 180, 200) --Cyan
-	SetTeamCustomHealthbarColor(DOTA_TEAM_CUSTOM_4, 0, 150, 60) --Green
 
 	mode:SetCustomGameForceHero("npc_dota_hero_wisp")
 	GameRules:LockCustomGameSetupTeamAssignment(true)
@@ -155,8 +153,6 @@ function GameMode:InitGameMode()
 	end
 	GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_CUSTOM_1, 0)
 	GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_CUSTOM_2, 0)
-	GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_CUSTOM_3, 0)
-	GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_CUSTOM_4, 0)
 	mode:SetCustomXPRequiredToReachNextLevel(XP_PER_LEVEL_TABLE)
 
 	-- Lua Modifiers
@@ -257,8 +253,6 @@ local heroes = HeroList:GetAllHeroes()
 			DoEntFire("door_lane"..i, "SetAnimation", "close_idle", 0, nil, nil)
 		end
 		SpawnHeroesBis()
-		GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_CUSTOM_3, 4)
-		GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_CUSTOM_4, 4)
 
 		if PlayerResource:GetPlayerCount() > 4 then
 			CREEP_LANES_TYPE = 1
@@ -956,7 +950,7 @@ function GameMode:HeroImage(event)
 local PlayerID = event.pID
 local player = PlayerResource:GetPlayer(PlayerID)
 local hero = player:GetAssignedHero()
-local point_hero = Entities:FindByName(nil, "hero_image_player"):GetAbsOrigin()
+local point_hero = Entities:FindByName(nil, "hero_image_player")
 local point_beast = Entities:FindByName(nil, "hero_image_boss"):GetAbsOrigin()
 
 	if GameMode.HeroImage_occuring == 1 then
@@ -1022,7 +1016,7 @@ function GameMode:SpiritBeast(event)
 local PlayerID = event.pID
 local player = PlayerResource:GetPlayer(PlayerID)
 local hero = player:GetAssignedHero()
-local point_hero = Entities:FindByName(nil, "spirit_beast_player"):GetAbsOrigin()
+local point_hero = Entities:FindByName(nil, "spirit_beast_player")
 local point_beast = Entities:FindByName(nil, "spirit_beast_boss"):GetAbsOrigin()
 
 	if GameMode.SpiritBeast_occuring == 1 then
@@ -1077,7 +1071,7 @@ function GameMode:FrostInfernal(event)
 local PlayerID = event.pID
 local player = PlayerResource:GetPlayer(PlayerID)
 local hero = player:GetAssignedHero()
-local point_hero = Entities:FindByName(nil, "frost_infernal_player"):GetAbsOrigin()
+local point_hero = Entities:FindByName(nil, "frost_infernal_player")
 local point_beast = Entities:FindByName(nil, "frost_infernal_boss"):GetAbsOrigin()
 
 	if GameMode.FrostInfernal_occuring == 1 then
@@ -1127,7 +1121,7 @@ function GameMode:AllHeroImages(event)
 local PlayerID = event.pID
 local player = PlayerResource:GetPlayer(PlayerID)
 local hero = player:GetAssignedHero()
-local point = Entities:FindByName(nil, "all_hero_image_player"):GetAbsOrigin()
+local point = Entities:FindByName(nil, "all_hero_image_player")
 
 	if GameMode.AllHeroImagesDead == 1 then
 		Notifications:Bottom(hero:GetPlayerOwnerID(), {text = "All Hero Image has already been done!", duration = 5.0})
@@ -1179,7 +1173,7 @@ local point = Entities:FindByName(nil, "all_hero_image_player"):GetAbsOrigin()
 					PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil) 
 				end)
 
-				TeleportHero(hero, 0.0, point_hero:GetAbsOrigin())
+				TeleportHero(hero, 0.0, point:GetAbsOrigin())
 			end
 		end
 

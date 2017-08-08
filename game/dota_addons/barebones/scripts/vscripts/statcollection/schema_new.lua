@@ -67,27 +67,14 @@ function BuildPlayersArray()
 	for playerID = 0, DOTA_MAX_PLAYERS do
 		if PlayerResource:IsValidPlayerID(playerID) then
 			if not PlayerResource:IsBroadcaster(playerID) then
-
+				if hero:GetUnitName() == "npc_dota_hero_wisp" then return end
 				local hero = PlayerResource:GetSelectedHeroEntity(playerID)
-				local player_team = ""
-				if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
-					player_team = "Radiant"
-				elseif hero:GetTeam() == DOTA_TEAM_BADGUYS then
-					player_team = "Dire"
-				elseif hero:GetTeam() == DOTA_TEAM_CUSTOM_3 then
-					player_team = "Light Warriors"
-				elseif hero:GetTeam() == DOTA_TEAM_CUSTOM_4 then
-					player_team = "Dark Warriors"
-				else
-					player_team = "No Team"
-				end
 
 				table.insert(players, {
 					-- steamID32 required in here
 					steamID32 = PlayerResource:GetSteamAccountID(playerID),
 
 					ph = "#"..hero:GetUnitName(), -- Hero by their Pseudos
-					pt = player_team,           -- Team this hero belongs to
 					pk = hero:GetKills(),       -- Number of kills this hero have
 
 					-- Item list

@@ -9,7 +9,7 @@ end
 function SpecialEventTPEnabled(event)
 local hero = event.activator
 local point = Entities:FindByName(nil, "event_tp_fix"):GetAbsOrigin()
-if PlayerResource:GetConnectionState(hero:GetPlayerID()) == 3 then return end
+if PlayerResource:GetConnectionState(hero:GetPlayerID()) ~= 2 then return end
 
 	CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "show_events", {})
 	Entities:FindByName(nil, "trigger_special_event"):Disable()
