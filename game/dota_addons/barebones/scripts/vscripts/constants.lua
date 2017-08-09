@@ -65,11 +65,10 @@ _G.sword_first_time = true
 _G.ring_first_time = true
 _G.doom_first_time = false
 _G.frost_first_time = false
-_G.X_HERO_SIEGE_V = 3.43
+_G.X_HERO_SIEGE_V = 3.44
 _G.SECRET = 0
 _G.PHASE_3 = 0
 _G.RESPAWN_TIME = 40.0
-_G.PLAYER_COUNT = 0
 _G.CREEP_LANES_TYPE = 1
 _G.STARTING_GOLD = 2000
 _G.BT_ENABLED = 1
@@ -77,12 +76,6 @@ _G.MURADIN_DEFEND = false
 _G.STORM_SPIRIT = 0
 _G.FORCED_LANES = 0
 _G.ALL_HERO_IMAGE_DEAD = 0
-
-if GetMapName() == "x_hero_siege" then
-	_G.ICE_TOWERS_REQUIRED = 2
-elseif GetMapName() == "ranked_2v2" then
-	_G.ICE_TOWERS_REQUIRED = 1
-end
 
 _G.FrostInfernal_killed = 0
 _G.FrostInfernal_occuring = 0
@@ -99,20 +92,16 @@ CREEP_LANES[1] = {0, 1, 1}
 CREEP_LANES[2] = {0, 1, 1}
 CREEP_LANES[3] = {0, 1, 1}
 CREEP_LANES[4] = {0, 1, 1}
-CREEP_LANES[5] = {0, 1, 1}
-CREEP_LANES[6] = {0, 1, 1}
-CREEP_LANES[7] = {0, 1, 1}
-CREEP_LANES[8] = {0, 1, 1}
 
-PLAYER_COLORS = {}	-- Stores individual player colors
-PLAYER_COLORS[0] = { 200, 0, 0 } --Red
-PLAYER_COLORS[1] = { 0, 50, 200 } --Blue
-PLAYER_COLORS[2] = { 0, 255, 255 } --Cyan
-PLAYER_COLORS[3] = { 100, 0, 100 } --Purple
-PLAYER_COLORS[4] = { 255, 255, 0 } --Yellow
-PLAYER_COLORS[5] = { 255, 150, 0 } --Orange
-PLAYER_COLORS[6] = { 0, 125, 0 } --Green (Dark)
-PLAYER_COLORS[7] = { 255, 100, 255 } --Pink
+PLAYER_COLORS = {}					-- Stores individual player colors
+PLAYER_COLORS[0] = {200, 0, 0}		--Red
+PLAYER_COLORS[1] = {0, 50, 200}		--Blue
+PLAYER_COLORS[2] = {0, 255, 255}	--Cyan
+PLAYER_COLORS[3] = {100, 0, 100}	--Purple
+PLAYER_COLORS[4] = {255, 255, 0}	--Yellow
+PLAYER_COLORS[5] = {255, 150, 0}	--Orange
+PLAYER_COLORS[6] = {0, 125, 0}		--Green (Dark)
+PLAYER_COLORS[7] = {255, 100, 255}	--Pink
 
 HEROLIST = {}
 HEROLIST[1] = "enchantress"			-- Dryad
@@ -159,6 +148,13 @@ HEROLIST_VIP[5] = "tiny"			-- Stone Giant
 HEROLIST_VIP[6] = "sand_king"		-- Desert Wyrm
 HEROLIST_VIP[7] = "necrolyte"		-- Dark Summoner
 HEROLIST_VIP[8] = "storm_spirit"	-- Spirit Master
+
+HEROLIST_RANKED = {}
+HEROLIST_RANKED[1] = "terrorblade"		-- Demon Hunter
+HEROLIST_RANKED[2] = "phantom_assassin"	-- Warden
+HEROLIST_RANKED[3] = "lich"				-- Lich
+HEROLIST_RANKED[4] = "brewmaster"		-- Brewmaster
+HEROLIST_RANKED[5] = "sven"				-- Mountain King
 
 timers = {}
 
@@ -394,3 +390,13 @@ _G.difficulty_abilities = {
 	"monkey_king_boundless_strike",
 	"ursa_fury_swipes"
 }
+
+if GetMapName() == "x_hero_siege" then
+	_G.ICE_TOWERS_REQUIRED = 2
+	CREEP_LANES[5] = {0, 1, 1}
+	CREEP_LANES[6] = {0, 1, 1}
+	CREEP_LANES[7] = {0, 1, 1}
+	CREEP_LANES[8] = {0, 1, 1}
+elseif GetMapName() == "ranked_2v2" then
+	_G.ICE_TOWERS_REQUIRED = 1
+end

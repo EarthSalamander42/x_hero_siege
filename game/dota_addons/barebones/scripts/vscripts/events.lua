@@ -48,6 +48,13 @@ local too_ez_gold = 0.9 -- The mod is way too ez, to modify gold very easily i j
 			end
 		end
 
+--		if GetMapName() == "x_hero_siege" then
+--			if npc:IsFort() then
+--				print("Add Muradin!")
+--				npc:AddAbility("castle_muradin_defend"):SetLevel(1)
+--			end
+--		end
+
 		-- HERO NPC
 		if npc:IsRealHero() and npc:GetTeamNumber() == DOTA_TEAM_GOODGUYS then
 			if npc.bFirstSpawnComplete == nil then
@@ -115,6 +122,7 @@ local too_ez_gold = 0.9 -- The mod is way too ez, to modify gold very easily i j
 				self.bPlayerHasSpawned = true
 				npc.CurrentZoneName = nil
 				self:OnPlayerHeroEnteredZone(npc, "xhs_holdout")
+				npc.ankh_respawn = false
 			elseif npc.bFirstSpawnComplete == true then
 				if npc:GetUnitName() == "npc_dota_hero_chaos_knight" or npc:GetUnitName() == "npc_dota_hero_keeper_of_the_light" then
 					npc:SetAbilityPoints(0)
@@ -248,6 +256,20 @@ local ability = hero:FindAbilityByName(abilityname)
 			ability:SetLevel(ability:GetLevel() -1)
 			hero:SetAbilityPoints(hero:GetAbilityPoints() +1)
 			SendErrorMessage(hero:GetPlayerID(), "#error_cant_lvlup")
+		end
+	elseif hero:GetUnitName() == "npc_dota_hero_lone_druid" then
+		if ability:GetAbilityIndex() == 0 then
+			local Bears = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_ALL, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, 0, false)
+			for _, Bear in pairs(Bears) do
+				for number = 1, 7 do
+					if Bear and Bear:GetUnitName() == "npc_dota_lone_druid_bear"..number then
+						Bear.ankh_respawn = true
+						Timers:CreateTimer(0.03, function()
+							Bear.ankh_respawn = false
+						end)
+					end
+				end
+			end
 		end
 	end
 end
@@ -727,6 +749,7 @@ local networkid = keys.networkid
 local reason = keys.reason
 local userid = keys.userid
 
+	CloseLane(userid)
 end
 
 -- A non-player entity (necro-book, chen creep, etc) used an ability
@@ -806,6 +829,7 @@ local cn = string.gsub(killedUnit:GetName(), "dota_badguys_tower", "")
 local lane = tonumber(cn)
 
 	if killedUnit then
+		-- Orb of Darkness
 		if killedUnit:IsCreep() then
 			if not killedUnit:IsConsideredHero() and LeavesCorpse(killedUnit) and killedUnit.no_corpse ~= true then
 				if hero:HasModifier("modifier_orb_of_darkness") and hero:GetModifierStackCount("modifier_orb_of_darkness", hero) < 10 then
@@ -870,7 +894,7 @@ local lane = tonumber(cn)
 				killedUnit:RemoveModifierByName("modifier_animation_translate")  
 			-- Lone Druid Bear death debug
 			elseif killedUnit:GetUnitName() == "npc_dota_hero_lone_druid" then
-				local Bears = FindUnitsInRadius( DOTA_TEAM_GOODGUYS, Vector( 0, 0, 0 ), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_ALL, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, 0, false )
+				local Bears = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_ALL, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, 0, false)
 				for _, Bear in pairs(Bears) do
 					for number = 1, 7 do
 						if Bear and Bear:GetUnitName() == "npc_dota_lone_druid_bear"..number then
@@ -1058,7 +1082,7 @@ local lane = tonumber(cn)
 					end
 				end
 			end
-			if killedUnit.no_corpse ~= true then
+			if killedUnit.no_corpse ~= true and GetMapName() == "x_hero_siege" then
 				Corpses:CreateFromUnit(killedUnit)
 			end
 		return
@@ -1275,14 +1299,17 @@ end
 -- * player_id
 ---------------------------------------------------------
 
-function GameMode:OnPlayerReconnected( event )
-	local hPlayer = PlayerResource:GetPlayer( event.player_id )
-	if hPlayer ~= nil then
+function GameMode:OnPlayerReconnected(event)
+local hPlayer = PlayerResource:GetPlayer(event.player_id)
+
+	if hPlayer then
 		local hPlayerHero = hPlayer:GetAssignedHero()
-		if hPlayerHero ~= nil and hPlayerHero.bHasClickedScroll == true then
+		if hPlayerHero and hPlayerHero.bHasClickedScroll == true then
 			CustomGameEventManager:Send_ServerToPlayer( hPlayer, "hide_scroll", {} )
 		end
 	end
+
+	OpenLane(event.player_id)
 end
 
 ---------------------------------------------------------

@@ -10880,8 +10880,6 @@
 		//----------------------------------------------------------------
 		"Ability1"					"lone_druid_spirit_bear_return"			// Ability 1
 		"Ability2"					"lone_druid_spirit_bear_entangle"			// Ability 2
-		"Ability3"					"holdout_battlecry_alt2"			// Ability 3
-		"Ability4"					"holdout_rabid_alt2"			// Ability 4
 
 		// Armor
 		//----------------------------------------------------------------
@@ -10956,8 +10954,6 @@
 		"Ability1"					"lone_druid_spirit_bear_return"			// Ability 1
 		"Ability2"					"lone_druid_spirit_bear_entangle"			// Ability 2
 		"Ability3"					"lone_druid_spirit_bear_demolish"			// Ability 4
-		"Ability4"					"holdout_battlecry_alt2"			// Ability 4
-		"Ability5"					"holdout_rabid_alt2"			// Ability 4
 
 		// Armor
 		//----------------------------------------------------------------
@@ -11032,8 +11028,6 @@
 		"Ability1"					"lone_druid_spirit_bear_return"			// Ability 1
 		"Ability2"					"lone_druid_spirit_bear_entangle"			// Ability 2
 		"Ability3"					"lone_druid_spirit_bear_demolish"			// Ability 4
-		"Ability4"					"holdout_battlecry_alt2"			// Ability 4
-		"Ability5"					"holdout_rabid_alt2"			// Ability 4
 
 		// Armor
 		//----------------------------------------------------------------
@@ -11108,8 +11102,6 @@
 		"Ability1"					"lone_druid_spirit_bear_return"			// Ability 1
 		"Ability2"					"lone_druid_spirit_bear_entangle"			// Ability 2
 		"Ability3"					"lone_druid_spirit_bear_demolish"			// Ability 4
-		"Ability4"					"holdout_battlecry_alt2"			// Ability 4
-		"Ability5"					"holdout_rabid_alt2"			// Ability 4
 
 		// Armor
 		//----------------------------------------------------------------
@@ -11182,10 +11174,8 @@
 		// Abilities
 		//----------------------------------------------------------------
 		"Ability1"					"lone_druid_spirit_bear_return"			// Ability 1
-		"Ability2"					"lone_druid_spirit_bear_entangle"			// Ability 2
-		"Ability3"					"lone_druid_spirit_bear_demolish"			// Ability 4
-		"Ability4"					"holdout_battlecry_alt2"			// Ability 4
-		"Ability5"					"holdout_rabid_alt2"			// Ability 4
+		"Ability2"					"lone_druid_spirit_bear_entangle"		// Ability 2
+		"Ability3"					"lone_druid_spirit_bear_demolish"		// Ability 3
 
 		// Armor
 		//----------------------------------------------------------------
@@ -11966,7 +11956,7 @@
 		//----------------------------------------------------------------
 		"StatusHealth"				"50000"		// Base health.
 		"StatusHealthRegen"			"10.0"		// Health regeneration rate.
-		"StatusMana"				"5.0"		// Base mana.
+		"StatusMana"				"2.0"		// Base mana.
 		"StatusManaRegen"			"0.0"		// Mana regeneration rate.
 
 		// Team

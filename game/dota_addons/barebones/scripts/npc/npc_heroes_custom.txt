@@ -131,7 +131,7 @@
 		"AttributeIntelligenceGain"		"5"
 
 		"Ability1"						"holdout_drunken_haze"
-		"Ability2"						"holdout_dragon_slave_alt"
+		"Ability2"						"holdout_dragon_slave"
 		"Ability3"						"holdout_drunken_brawler"
 		"Ability4"						"holdout_permanent_immolation"
 		"Ability5"						"shadow_shaman_shackles"

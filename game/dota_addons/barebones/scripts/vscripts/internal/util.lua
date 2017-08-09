@@ -217,18 +217,46 @@ local game_time = GameRules:GetDOTATime(false, false)
 	}
 
 	for _, rune_loc in pairs(powerup_rune_locations) do
-		local Rune = CreateItemOnPositionForLaunch(rune_loc:GetAbsOrigin() + Vector(0, 0, 50), CreateItem(powerup_rune_types[RandomInt(1, #powerup_rune_types)], nil, nil))
-		Timers:CreateTimer(239.0, function()
-			for _, runes in pairs(Rune) do -- 3:59
-				UTIL_Remove(Rune)
+		local rune = CreateItemOnPositionForLaunch(rune_loc:GetAbsOrigin() + Vector(0, 0, 50), CreateItem(powerup_rune_types[RandomInt(1, #powerup_rune_types)], nil, nil))
+		RegisterRune(rune)
+	end
+end
+
+function RegisterRune(rune)
+
+	-- Initialize table
+	if not rune_spawn_table then
+		rune_spawn_table = {}
+	end
+
+	-- Register rune into table
+	table.insert(rune_spawn_table, rune)
+end
+
+function RemoveRunes()
+	if rune_spawn_table then
+
+		-- Remove existing runes
+		for _, rune in pairs(rune_spawn_table) do
+			if not rune:IsNull() then								
+				local item = rune:GetContainedItem()
+				UTIL_Remove(item)
+				UTIL_Remove(rune)
 			end
-		end)
+		end
+
+		-- Clear the table
+		rune_spawn_table = {}
 	end
 end
 
 function PickupRune(item, unit)
 	local gameEvent = {}
-	gameEvent["player_id"] = unit:GetPlayerID()
+	if unit:IsRealHero() then
+		gameEvent["player_id"] = unit:GetPlayerID()
+	elseif unit:IsConsideredHero() then
+		gameEvent["player_id"] = unit:GetPlayerOwnerID()
+	end
 	gameEvent["team_number"] = unit:GetTeamNumber()
 	gameEvent["locstring_value"] = "#DOTA_Tooltip_Ability_" .. item:GetAbilityName()
 	gameEvent["message"] = "#Dungeon_Rune"
@@ -474,7 +502,7 @@ local unit = {
 			if poi > 4 then
 				poi = 1
 			end
-		else
+		elseif GetMapName() == "ranked_2v2" then
 			for j = 1, 10 do
 				CreateUnitByName(unit[reg-1], Entities:FindByName(nil, "npc_dota_spawner_west_event"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
 			end
@@ -487,11 +515,17 @@ local unit = {
 end
 
 function SpawnDragons(dragon)
-local difficulty = GameRules:GetCustomGameDifficulty()
-	for c = 1, 8 do
+local i = 0
+if GetMapName() == "x_hero_siege" then
+	i = 8
+elseif GetMapName() == "ranked_2v2" then
+	i = 4
+end
+
+	for c = 1, i do
 		if CREEP_LANES[c][1] == 1 and CREEP_LANES[c][3] == 1 then
 		local point = Entities:FindByName( nil, "npc_dota_spawner_"..c)
-			for j = 1, difficulty do
+			for j = 1, GameRules:GetCustomGameDifficulty() do
 				local dragon = CreateUnitByName(dragon, point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
 			end
 		end
@@ -502,6 +536,7 @@ function OpenLane(PlayerID)
 local DoorObs = Entities:FindAllByName("obstruction_lane"..PlayerID)
 local towers = Entities:FindAllByName("dota_badguys_tower"..PlayerID)
 local raxes = Entities:FindAllByName("dota_badguys_barracks_"..PlayerID)
+
 	if PHASE_3 == 0 and CREEP_LANES_TYPE == 1 then
 		for _, obs in pairs(DoorObs) do
 			obs:SetEnabled(false, true)
@@ -523,10 +558,12 @@ local raxes = Entities:FindAllByName("dota_badguys_barracks_"..PlayerID)
 end
 
 function CloseLane(PlayerID)
-local Lane = PlayerID+1
+--	local Lane = PlayerID+1
+local Lane = PlayerID
 local DoorObs = Entities:FindAllByName("obstruction_lane"..Lane)
 local towers = Entities:FindAllByName("dota_badguys_tower"..Lane)
 local raxes = Entities:FindAllByName("dota_badguys_barracks_"..Lane)
+
 	if PHASE_3 == 0 and CREEP_LANES_TYPE == 1 then
 		for _, obs in pairs(DoorObs) do
 			obs:SetEnabled(true, false)
@@ -740,6 +777,27 @@ end
 
 function SendErrorMessage(playerID, string)
 	CustomGameEventManager:Send_ServerToPlayer(PlayerResource:GetPlayer(playerID), "dotacraft_error_message", {message=string}) 
+end
+
+function RefreshPlayers()
+	for nPlayerID = 0, DOTA_MAX_TEAM_PLAYERS -1 do
+		if PlayerResource:GetTeam(nPlayerID) == DOTA_TEAM_GOODGUYS then
+			if PlayerResource:HasSelectedHero(nPlayerID) then
+				local hero = PlayerResource:GetSelectedHeroEntity(nPlayerID)
+				if not hero:IsAlive() then
+					hero:RespawnHero(false, false, false)
+					hero.ankh_respawn = false
+					hero:SetRespawnsDisabled(false)
+					if hero.respawn_timer ~= nil then
+						Timers:RemoveTimer(hero.respawn_timer)
+						hero.respawn_timer = nil
+					end
+				end
+				hero:SetHealth(hero:GetMaxHealth())
+				hero:SetMana(hero:GetMaxMana())
+			end
+		end
+	end
 end
 
 function TeleportHero(hero, delay, point)

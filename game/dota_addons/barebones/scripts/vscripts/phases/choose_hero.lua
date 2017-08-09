@@ -13,57 +13,90 @@ WeekHero = "npc_dota_hero_tiny"
 
 function SpawnHeroesBis()
 local hero = 1
+local hero_ranked = 1
 local hero_vip = 1
 
-	Timers:CreateTimer(2.0, function()
-		local point = Entities:FindByName(nil, "choose_"..HEROLIST[hero].."_point"):GetAbsOrigin()
-		local dummy_hero = CreateUnitByName("npc_dota_hero_"..HEROLIST[hero].."_bis", point, true, nil, nil, DOTA_TEAM_GOODGUYS)
-		dummy_hero:SetAngles(0, 270, 0)
-		dummy_hero:AddAbility("dummy_passive_vulnerable")
-		dummy_hero:FindAbilityByName("dummy_passive_vulnerable"):SetLevel(1)
-		if hero < #HEROLIST then
-			hero = hero +1
-			return 0.25
-		else
-			return nil
-		end
-	end)
+	if GetMapName() == "x_hero_siege" then
+		Timers:CreateTimer(2.0, function()
+			local point = Entities:FindByName(nil, "choose_"..HEROLIST[hero].."_point"):GetAbsOrigin()
+			local dummy_hero = CreateUnitByName("npc_dota_hero_"..HEROLIST[hero].."_bis", point, true, nil, nil, DOTA_TEAM_GOODGUYS)
+			dummy_hero:SetAngles(0, 270, 0)
+			dummy_hero:AddAbility("dummy_passive_vulnerable")
+			dummy_hero:FindAbilityByName("dummy_passive_vulnerable"):SetLevel(1)
+			if hero < #HEROLIST then
+				hero = hero +1
+				return 0.25
+			else
+				return nil
+			end
+		end)
+	elseif GetMapName() == "ranked_2v2" then
+		Timers:CreateTimer(2.0, function()
+			local point = Entities:FindByName(nil, "choose_"..HEROLIST_RANKED[hero].."_point"):GetAbsOrigin()
+			local dummy_hero = CreateUnitByName("npc_dota_hero_"..HEROLIST_RANKED[hero].."_bis", point, true, nil, nil, DOTA_TEAM_GOODGUYS)
+			dummy_hero:SetAngles(0, 270, 0)
+			dummy_hero:AddAbility("dummy_passive_vulnerable")
+			dummy_hero:FindAbilityByName("dummy_passive_vulnerable"):SetLevel(1)
+			if hero < #HEROLIST_RANKED then
+				hero = hero +1
+				return 0.25
+			else
+				return nil
+			end
+		end)
 
-	Timers:CreateTimer(10.0, function()
-		if hero_vip == 2 then
-			local dummy_hero = CreateUnitByName("npc_dota_hero_skeleton_king_bis", Entities:FindByName(nil, "choose_skeleton_king_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
+		Timers:CreateTimer(6.0, function()
+			local point = Entities:FindByName(nil, "choose_"..HEROLIST_RANKED[hero_ranked].."_point_enemy"):GetAbsOrigin()
+			local dummy_hero = CreateUnitByName("npc_dota_hero_"..HEROLIST_RANKED[hero_ranked].."_bis", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 			dummy_hero:SetAngles(0, 270, 0)
-			StartAnimation(dummy_hero, {duration = 20000.0, activity = ACT_DOTA_IDLE, rate = 0.9})
-		elseif hero_vip == 4 then
-			local dummy_hero = CreateUnitByName("npc_dota_hero_chaos_knight_bis", Entities:FindByName(nil, "choose_chaos_knight_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
-			dummy_hero:SetAngles(0, 270, 0)
-			local dummy_hero = CreateUnitByName("npc_dota_hero_keeper_of_the_light_bis", Entities:FindByName(nil, "choose_keeper_of_the_light_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
-			dummy_hero:SetAngles(0, 270, 0)
-		elseif hero_vip == 8 then
-			local dummy_hero = CreateUnitByName("npc_dota_hero_storm_spirit_bis", Entities:FindByName(nil, "choose_storm_spirit_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
-			dummy_hero:SetAngles(0, 270, 0)
-			local dummy_hero = CreateUnitByName("npc_dota_hero_ember_spirit_bis", Entities:FindByName(nil, "choose_ember_spirit_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
-			dummy_hero:SetAngles(0, 270, 0)
-			local dummy_hero = CreateUnitByName("npc_dota_hero_earth_spirit_bis", Entities:FindByName(nil, "choose_earth_spirit_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
-			dummy_hero:SetAngles(0, 270, 0)
-		else
-			local point = Entities:FindByName(nil, "choose_"..HEROLIST_VIP[hero_vip].."_point"):GetAbsOrigin()
-			local dummy_hero = CreateUnitByName("npc_dota_hero_"..HEROLIST_VIP[hero_vip].."_bis", point, true, nil, nil, DOTA_TEAM_GOODGUYS)
-			dummy_hero:SetAngles(0, 270, 0)
-		end
-		if hero_vip < #HEROLIST_VIP then
-			hero_vip = hero_vip +1
-			return 0.5
-		else
-			return nil
-		end
-	end)
+			dummy_hero:AddAbility("dummy_passive_vulnerable")
+			dummy_hero:FindAbilityByName("dummy_passive_vulnerable"):SetLevel(1)
+			if hero_ranked < #HEROLIST_RANKED then
+				hero_ranked = hero_ranked +1
+				return 0.25
+			else
+				return nil
+			end
+		end)
+	end
 
-	local vip_point = Entities:FindByName(nil, "choose_vip_point"):GetAbsOrigin()
-	local vip_hero = CreateUnitByName(WeekHero.."_bis", vip_point, true, nil, nil, DOTA_TEAM_GOODGUYS)
-	vip_hero:SetAngles(0, 270, 0)
-	vip_hero:AddAbility("dummy_passive_vulnerable")
-	vip_hero:FindAbilityByName("dummy_passive_vulnerable"):SetLevel(1)
+	if GetMapName() == "x_hero_siege" then
+		Timers:CreateTimer(10.0, function()
+			if hero_vip == 2 then
+				local dummy_hero = CreateUnitByName("npc_dota_hero_skeleton_king_bis", Entities:FindByName(nil, "choose_skeleton_king_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
+				dummy_hero:SetAngles(0, 270, 0)
+				StartAnimation(dummy_hero, {duration = 20000.0, activity = ACT_DOTA_IDLE, rate = 0.9})
+			elseif hero_vip == 4 then
+				local dummy_hero = CreateUnitByName("npc_dota_hero_chaos_knight_bis", Entities:FindByName(nil, "choose_chaos_knight_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
+				dummy_hero:SetAngles(0, 270, 0)
+				local dummy_hero = CreateUnitByName("npc_dota_hero_keeper_of_the_light_bis", Entities:FindByName(nil, "choose_keeper_of_the_light_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
+				dummy_hero:SetAngles(0, 270, 0)
+			elseif hero_vip == 8 then
+				local dummy_hero = CreateUnitByName("npc_dota_hero_storm_spirit_bis", Entities:FindByName(nil, "choose_storm_spirit_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
+				dummy_hero:SetAngles(0, 270, 0)
+				local dummy_hero = CreateUnitByName("npc_dota_hero_ember_spirit_bis", Entities:FindByName(nil, "choose_ember_spirit_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
+				dummy_hero:SetAngles(0, 270, 0)
+				local dummy_hero = CreateUnitByName("npc_dota_hero_earth_spirit_bis", Entities:FindByName(nil, "choose_earth_spirit_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
+				dummy_hero:SetAngles(0, 270, 0)
+			else
+				local point = Entities:FindByName(nil, "choose_"..HEROLIST_VIP[hero_vip].."_point"):GetAbsOrigin()
+				local dummy_hero = CreateUnitByName("npc_dota_hero_"..HEROLIST_VIP[hero_vip].."_bis", point, true, nil, nil, DOTA_TEAM_GOODGUYS)
+				dummy_hero:SetAngles(0, 270, 0)
+			end
+			if hero_vip < #HEROLIST_VIP then
+				hero_vip = hero_vip +1
+				return 0.5
+			else
+				return nil
+			end
+		end)
+
+		local vip_point = Entities:FindByName(nil, "choose_vip_point"):GetAbsOrigin()
+		local vip_hero = CreateUnitByName(WeekHero.."_bis", vip_point, true, nil, nil, DOTA_TEAM_GOODGUYS)
+		vip_hero:SetAngles(0, 270, 0)
+		vip_hero:AddAbility("dummy_passive_vulnerable")
+		vip_hero:FindAbilityByName("dummy_passive_vulnerable"):SetLevel(1)
+	end
 
 	RAMERO_DUMMY = CreateUnitByName("npc_ramero", Entities:FindByName(nil, "point_special_arena_1"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
 	RAMERO_DUMMY:SetAngles(0, 270, 0)

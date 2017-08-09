@@ -2,7 +2,12 @@
 	<styles>
 		<include src="s2r://panorama/styles/dotastyles.vcss_c" />
 		<include src="file://{resources}/styles/custom_game/gamesetup_options.css" />
-	</styles> 
+	</styles>
+
+	<scripts>
+		<include src="s2r://panorama/scripts/custom_game/custom_ui_manifest.js" />
+	</scripts>
+
 	<script>
 		function OnVoteButtonPressed(category, vote)
 		{
@@ -31,7 +36,7 @@
 			</Button>
 		</Panel>
 	</Panel>
-		<Panel class="CustomSettingsColumn" hittest="false" >
+		<Panel class="CustomSettingsColumn" id="VoteColumn" hittest="false" >
 			<Panel class="ContainerCustomGameSettingsPanels" hittest="false" >
 				<Panel class="ContainerCustomGameSettingsTitle" hittest="false" >
 					<Label class="CustomGameSettingsHeaderTitle" text="Custom Game Settings" hittest="false" />

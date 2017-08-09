@@ -3,7 +3,7 @@
 		// Turn off some default UI
 //		GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_TOP_BAR, false );
 //		GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_TOP_TIMEOFDAY, false );
-		GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_TOP_HEROES, false );
+//		GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_TOP_HEROES, false );
 		GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_FLYOUT_SCOREBOARD, false );
 		GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_INVENTORY_QUICKBUY, true );
 		GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_INVENTORY_COURIER, false );
@@ -86,6 +86,24 @@
 		HeroDisplayContainer.style.flowChildren = "right"
 
 		$.GetContextPanel().GetParent().GetParent().FindChildTraverse("HUDElements").FindChildTraverse("topbar").FindChildTraverse("GameTime").style.visibility = "collapse";
+
+		//Top Bar Radiant
+		var TopBarRadiantTeam = hudElements.FindChildTraverse("TopBarRadiantTeam");
+		TopBarRadiantTeam.style.width = "510px";
+
+		var topbarRadiantPlayers = hudElements.FindChildTraverse("TopBarRadiantPlayers");
+		topbarRadiantPlayers.style.width = "504px";
+
+		var topbarRadiantPlayersContainer = hudElements.FindChildTraverse("TopBarRadiantPlayersContainer");
+		topbarRadiantPlayersContainer.style.width = "504px";
+
+		var RadiantTeamContainer = hudElements.FindChildTraverse("RadiantTeamContainer");
+		RadiantTeamContainer.style.height = "610px";
+
+		//Top Bar Dire
+		var TopBarDireTeam = hudElements.FindChildTraverse("TopBarDireTeam");
+		TopBarDireTeam.style.visibility = "collapse";
+
 	</script>
 	<Panel>
 		<CustomUIElement type="GameSetup"			layoutfile="file://{resources}/layout/custom_game/gamesetup_options.xml" />

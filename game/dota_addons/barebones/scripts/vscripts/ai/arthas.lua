@@ -26,7 +26,7 @@ function ArthasThink()
 		end
 
 	elseif Ability_holy_light:IsFullyCastable() then		
-		if thisEntity:GetHealthPercent() <= 85 then
+		if thisEntity:GetHealthPercent() <= 70 then
 			thisEntity:CastAbilityOnTarget(thisEntity,Ability_holy_light,-1)
 		end
 	elseif Ability_light_roar:IsFullyCastable() then

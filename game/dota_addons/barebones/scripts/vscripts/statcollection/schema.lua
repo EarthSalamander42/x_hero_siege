@@ -41,8 +41,6 @@ function customSchema:init()
 	end
 end
 
-
-
 -------------------------------------
 
 -- In the statcollection/lib/utilities.lua, you'll find many useful functions to build your schema.
@@ -51,10 +49,14 @@ end
 -- Returns a table with our custom game tracking.
 function BuildGameArray()
 	local game = {}
+	local diff = {"Easy", "Normal", "Hard", "Extreme"}
+	local lanes = {"Simple", "Double"}
+	local dual = {"Normal", "Dual"}
 
 	-- Add game values here as game.someValue = GetSomeGameValue()
-	game.gl = math.floor(GameRules:GetDOTATime(false, false)) -- Tracks total game length, from the horn sound, in seconds
-	game.df = GameRules:GetCustomGameDifficulty()	-- Retrieve Difficulty of the mod
+	game.df = diff[GameRules:GetCustomGameDifficulty()]	-- Retrieve Difficulty of the mod
+	game.la = lanes[CREEP_LANES_TYPE]
+	game.dh = dual[DUAL_HERO]
 
 	return game
 end
@@ -65,40 +67,31 @@ function BuildPlayersArray()
 	for playerID = 0, DOTA_MAX_PLAYERS do
 		if PlayerResource:IsValidPlayerID(playerID) then
 			if not PlayerResource:IsBroadcaster(playerID) then
-
-				local hero = PlayerResource:GetSelectedHeroEntity(playerID)
-				local player_team = ""
-				if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
-					player_team = "Radiant"
+				if hero:GetUnitName() == "npc_dota_hero_wisp" then
 				else
-					player_team = "Dire"
+					local hero = PlayerResource:GetSelectedHeroEntity(playerID)
+
+					table.insert(players, {
+						-- steamID32 required in here
+						steamID32 = PlayerResource:GetSteamAccountID(playerID),
+
+						ph = "#"..hero:GetUnitName(), -- Hero by their Pseudos
+						pk = hero:GetKills(),       -- Number of kills this hero have
+
+						-- Item list
+						i1 = GetItemSlot(hero, 0),
+						i2 = GetItemSlot(hero, 1),
+						i3 = GetItemSlot(hero, 2),
+						i4 = GetItemSlot(hero, 3),
+						i5 = GetItemSlot(hero, 4),
+						i6 = GetItemSlot(hero, 5),
+
+						s = SECRET
+
+						-- Example functions for generic stats are defined in statcollection/lib/utilities.lua
+						-- Add player values here as someValue = GetSomePlayerValue(),
+					})
 				end
-
-				table.insert(players, {
-					-- steamID32 required in here
-					steamID32 = PlayerResource:GetSteamAccountID(playerID),
-
-					ph = GetHeroName(playerID), -- Hero by its short name
---					pl = hero:GetLevel(),       -- Hero level at the end of the game
-					pnw = GetNetworth(hero),    -- Sum of hero gold and item worth
-					pt = player_team,           -- Team this hero belongs to
-					pk = hero:GetKills(),       -- Number of kills of this players hero
-					pa = hero:GetAssists(),     -- Number of assists of this players hero
-					pd = hero:GetDeaths(),      -- Number of deaths of this players hero
-
-					-- Item list
-					i1 = GetItemSlot(hero, 0),
-					i2 = GetItemSlot(hero, 1),
-					i3 = GetItemSlot(hero, 2),
-					i4 = GetItemSlot(hero, 3),
-					i5 = GetItemSlot(hero, 4),
-					i6 = GetItemSlot(hero, 5),
-
-					s = SECRET
-
-					-- Example functions for generic stats are defined in statcollection/lib/utilities.lua
-					-- Add player values here as someValue = GetSomePlayerValue(),
-				})
 			end
 		end
 	end
@@ -145,35 +138,15 @@ end
 
 -- Schema Created by Firetoad
 -- String of item name
---	function GetItemSlot(hero, slot)
---		local item = hero:GetItemInSlot(slot)
---		local itemName = "empty"
---	
---		if item then
---			if string.find(item:GetAbilityName(), "item") then
---				itemName = string.gsub(item:GetAbilityName(), "item_", "")
---			end
---		end
---	
---		return itemName
---	end
---	
---	-- Schema Created by Horde Mode devs
---	function GetHeroName(hero)
---		local heroName = hero:GetUnitName()
---		heroName = string.gsub(heroName, "npc_dota_hero_", "") --Cuts the npc_dota_hero_ prefix
---		return heroName
---	end
---	
---	-- Schema Created by Horde Mode devs
---	function GetNetworth(hero)
---		local gold = hero:GetGold()
---	
---		-- Iterate over item slots adding up its gold cost
---		for i = 0, 15 do
---			local item = hero:GetItemInSlot(i)
---			if item then
---				gold = gold + item:GetCost()
---			end
---		end
---	end
+function GetItemSlot(hero, slot)
+	local item = hero:GetItemInSlot(slot)
+	local itemName = "empty"
+
+	if item then
+		if string.find(item:GetAbilityName(), "item") then
+			itemName = string.gsub(item:GetAbilityName(), "item_", "")
+		end
+	end
+
+	return itemName
+end

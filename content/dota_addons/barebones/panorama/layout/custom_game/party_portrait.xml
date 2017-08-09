@@ -53,7 +53,7 @@
 				return;  
 		}
 	</script>
-
+	<!--
 	<Panel hittest="false" class="PartyPortraitContainer TopBottomFlow">
 		<Label hittest="false" id="PlayerName" class="PartyPortraitName" text="" html="true"/>	
 		<Panel id="HeroIconContainer" onactivate="OnHeroIconClicked()">
@@ -64,5 +64,6 @@
 		<ProgressBar hittest="false" id="HealthBar" class="PartyPortraitHealthBar" min="0" max="100" value="100"/>
 		<ProgressBar hittest="false" id="ManaBar" class="PartyPortraitManaBar" min="0" max="100" value="100"/>
 		<Label hittest="false" id="HeroName" class="PartyPortraitName" text="" html="true"/>
-	</Panel>	
+	</Panel>
+	-->
 </root>
