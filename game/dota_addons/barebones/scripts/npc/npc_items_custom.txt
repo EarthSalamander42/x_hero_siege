@@ -74,47 +74,6 @@
 	}
 
 	//=================================================================================================================
-	// Life Rune
-	//=================================================================================================================
-	"item_life_rune"
-	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"BaseClass"						"item_lua"
-		"AbilityTextureName"			"item_life_rune"
-		"ScriptFile"					"items/item_life_rune"
-
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_IGNORE_CHANNEL"
-		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
-		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO"
-		"Model"							"models/gameplay/1up.vmdl"
-		"ItemKillable"					"0"
-
-		// Stats
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCastRange"				"100"
-		"AbilityCastPoint"				"0.0"
-
-		// Item Info
-		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"						"99999"
-		"ItemPurchasable"				"0"
-		"ItemShopTags"					"consumable"
-		"ItemQuality"					"consumable"
-		"ItemStackable"					"1"
-		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
-		"ItemPermanent"					"0"
-		"ItemInitialCharges"			"1"
-		"ItemKillable"					"0"
-
-		// Special
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilitySpecial"
-		{
-		}
-	}
-
-	//=================================================================================================================
 	// Orb of Passage
 	//=================================================================================================================
 	"item_orb_of_passage"
@@ -1433,69 +1392,41 @@
 		}
 	}
 
-	//========================================================================================================
-	// Mask of Death Override of Lifesteal
-	//========================================================================================================
+	//=================================================================================================================
+	// Morbid Mask
+	//=================================================================================================================
 	"item_lifesteal_mask"
 	{
-		// General
-		//----------------------------------------------------------------------------------------------------
-		"BaseClass"             		"item_datadriven"
 		"ID"							"2500"
-		"AbilityTextureName"			"custom/lifesteal_mask"		
+		"BaseClass"						"item_lua"
+		"AbilityTextureName"			"custom/lifesteal_mask"
+		"ScriptFile"					"modifiers/lifesteal.lua"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 
 		// Item Info
-		//----------------------------------------------------------------------------------------------------
-		"ItemCost"						"16500"
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemCost" 						"16500"
 		"ItemShopTags"					"unique"
 		"ItemQuality"					"rare"
 		"ItemAliases"					"mask of death"
 		"SecretShop"					"1"
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
 
-		// Special
-		//----------------------------------------------------------------------------------------------------
+		// Precache
+		//-------------------------------------------------------------------------------------------------------------
+		"precache"
+		{
+			"particle"					"particles/item/lifesteal_mask/lifesteal_particle.vpcf"
+		}
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
 		"AbilitySpecial"
 		{
 			"01"
 			{
-				"var_type"				"FIELD_INTEGER"
-				"lifesteal_percent"		"50"
-			}
-		}
-
-		"Modifiers"
-		{
-			"modifier_lifesteal_hidden"
-			{
-				"Passive"						"1"
-				"IsHidden"						"1"
-				"Attributes"					"MODIFIER_ATTRIBUTE_MULTIPLE"
-
-				"OnAttackLanded"
-				{
-					"RunScript"
-					{
-						"ScriptFile"	"heroes/global.lua"
-						"Function"		"Lifesteal"
-					}
-				}
-			}
-
-			"modifier_lifesteal"
-			{
-				"Passive"				"0"
-				"IsHidden"				"1"
-
-				"OnDealDamage"
-				{
-					"Lifesteal"
-					{
-						"Target"				"ATTACKER"
-						"LifestealPercent"		"%lifesteal_percent"
-					}
-				}
+				"var_type"					"FIELD_INTEGER"
+				"lifesteal_pct"				"50"
 			}
 		}
 	}

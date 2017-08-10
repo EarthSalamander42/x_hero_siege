@@ -220,12 +220,13 @@ _G.golden_vip_members = {
 	89498388,	-- Sly
 	111692244,	-- [Iris Von Everec on Steam, May paid, 2 months left for Permanent]
 	97490223,	-- IllidanStormrage [Lucas Diao on Patreon]
-	34067920	-- Shush
+	34067920,	-- Shush
+	84332517	-- The Great King 0f Tanga-Ray [morris_91 on Discord]
 }
 
 _G.vip_members = {
-	320774890,	-- Error [Han Gao on Patreon
-	44364795,	-- Lyzer93 [Balraj McCoy on Patreon
+	320774890,	-- Error [Han Gao on Patreon]
+	44364795,	-- Lyzer93 [Balraj McCoy on Patreon]
 	46744186,	-- Captain Darian Frey [CaptainDarianFrey on Patreon]
 	54935523,	-- The Patriarchy [Kevin Moore on Patreon]
 	3180772,	-- Yoshi [Fabian Rothmund on Patreon]

@@ -832,3 +832,22 @@ function TeleportHero(hero, delay, point)
 		hero:RemoveModifierByName("modifier_command_restricted")
 	end)
 end
+
+-- Ported from Dota IMBA
+-- Get the base projectile of a unit
+function GetBaseRangedProjectileName(unit)
+	local unit_name = unit:GetUnitName()
+	unit_name = string.gsub(unit_name, "dota", "imba")
+	local unit_table = unit:IsHero() and GameRules.HeroKV[unit_name] or GameRules.UnitKV[unit_name]
+	return unit_table and unit_table["ProjectileModel"] or ""
+end
+
+function ChangeAttackProjectile(unit)
+local particle_lifesteal = "particles/item/lifesteal_mask/lifesteal_particle.vpcf"
+
+	if unit:HasModifier("modifier_lifesteal_custom") then		
+		unit:SetRangedProjectileName(particle_lifesteal)
+	else
+		unit:SetRangedProjectileName(GetBaseRangedProjectileName(unit))
+	end
+end

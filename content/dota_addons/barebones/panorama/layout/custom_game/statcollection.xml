@@ -1,8 +1,6 @@
 <root>
-	<scripts>
-		<include src="file://{resources}/scripts/custom_game/statcollection.js" /> 
-	</scripts>
-	<Panel>
-		
-	</Panel>
+    <scripts>
+        <include src="file://{resources}/scripts/custom_game/statcollection.js" /> 
+    </scripts>
+    <Panel></Panel>
 </root>

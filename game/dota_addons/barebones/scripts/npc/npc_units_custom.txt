@@ -100,22 +100,6 @@
 	}
 
 	//=================================================================================
-	// Dummy: XP Granter (Used for Arena Mode)
-	//=================================================================================
-	"npc_dota_xp_granter"
-	{
-		"BaseClass"					"npc_dota_creature"
-		"Model"						"models/development/invisiblebox.vmdl"
-		"Ability1"					"dota_ability_xp_granter"
-		"Ability2"					"dota_ability_xp_granter2"
-		"AttackCapabilities"		"DOTA_UNIT_CAP_NO_ATTACK"
-		"BountyXP"					"0"
-		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_NONE"
-		"StatusHealth"				"5000"
-		"TeamName"					"DOTA_TEAM_NEUTRALS"
-	}
-
-	//=================================================================================
 	// Building: Defender Fort
 	//=================================================================================
 	"npc_dota_defender_fort"
@@ -13408,7 +13392,7 @@
 		//----------------------------------------------------------------
 		"Ability1"				"holdout_negative_energy"
 		"Ability2"				"holdout_active_immolation"
-		"Ability3"				"holdout_thirst_aura_tooltip"
+		"Ability3"				"xhs_vampiric_aura"
 		"Ability4"				"holdout_illidan_evasion"
 		"Ability5"				"holdout_roar"
 		"Ability6"				"holdout_metamorphosis"
@@ -14984,7 +14968,7 @@
 		//----------------------------------------------------------------
 		"Ability1"				"lone_druid_spirit_bear"
 		"Ability2"				"holdout_bear_stun"
-		"Ability3"				"holdout_vampiric_aura"		
+		"Ability3"				"xhs_vampiric_aura"		
 		"Ability4"				"holdout_endurance_aura_tooltip"
 		"Ability5"				"holdout_roar"
 		"Ability6"				"holdout_beastmaster_stampede"

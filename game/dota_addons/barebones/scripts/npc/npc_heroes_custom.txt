@@ -99,7 +99,7 @@
 
 		"Ability1"						"lone_druid_spirit_bear"
 		"Ability2"						"holdout_bear_stun"
-		"Ability3"						"holdout_vampiric_aura"
+		"Ability3"						"xhs_vampiric_aura"
 		"Ability4"						"holdout_endurance_aura"
 		"Ability5"						"holdout_roar"
 		"Ability6"						"holdout_beastmaster_stampede"
@@ -1401,7 +1401,7 @@
 
 		"Ability1"						"holdout_negative_energy"
 		"Ability2"						"holdout_active_immolation"
-		"Ability3"						"holdout_vampiric_aura"
+		"Ability3"						"xhs_vampiric_aura"
 		"Ability4"						"holdout_illidan_evasion"
 		"Ability5"						"holdout_roar"
 		"Ability6"						"holdout_metamorphosis"

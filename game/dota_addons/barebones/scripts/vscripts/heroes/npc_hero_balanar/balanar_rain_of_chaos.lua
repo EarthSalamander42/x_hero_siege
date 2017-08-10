@@ -1,8 +1,8 @@
 function rain_of_chaos(event)
 local caster = event.caster
-local time_to_damage = 2.0
 local ability = event.ability
 local radius = ability:GetLevelSpecialValueFor("radius", ability:GetLevel()-1)
+local radius_explosion = ability:GetLevelSpecialValueFor("radius_explosion", ability:GetLevel()-1)
 
 	local meteors_per_tick = ability:GetLevelSpecialValueFor("meteors_per_tick", ability:GetLevel()-1)
 
@@ -12,6 +12,14 @@ local radius = ability:GetLevelSpecialValueFor("radius", ability:GetLevel()-1)
 		ParticleManager:SetParticleControl(meteor, 0, point + Vector(0,0,500))
 		ParticleManager:SetParticleControl(meteor, 1, point)
 		ParticleManager:SetParticleControl(meteor, 2, Vector(1.2,0,0))
+
+		local warning = ParticleManager:CreateParticle("particles/econ/events/darkmoon_2017/darkmoon_generic_aoe.vpcf", PATTACH_CUSTOMORIGIN, caster)
+		ParticleManager:SetParticleControl(warning, 0, point)
+		ParticleManager:SetParticleControl(warning, 1, Vector(radius_explosion, 0, 0))
+		ParticleManager:SetParticleControl(warning, 2, Vector(6, 0, 1))
+		ParticleManager:SetParticleControl(warning, 3, Vector(200, 0, 0))
+		ParticleManager:SetParticleControl(warning, 4, point)
+
 		local unit = CreateUnitByName("dummy_unit_invulnerable", point, true, nil, nil, caster:GetTeamNumber())
 		unit:EmitSound("Hero_Invoker.ChaosMeteor.Loop")
 		local TimerDestroySound = Timers:CreateTimer(1.09, function()
