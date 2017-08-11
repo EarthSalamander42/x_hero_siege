@@ -49,6 +49,7 @@ _G.PREGAMETIME = 150
 _G.nTimer_GameTime = 0
 _G.nTimer_SpecialEvent = 0
 _G.nTimer_IncomingWave = 0
+_G.nTimer_CreepLevel = 0
 _G.nTimer_HeroImage = 0
 _G.nTimer_SpiritBeast = 0
 _G.nTimer_FrostInfernal = 0

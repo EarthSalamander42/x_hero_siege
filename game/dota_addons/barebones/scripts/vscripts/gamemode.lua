@@ -33,6 +33,7 @@ function FrostTowersToFinalWave()
 	if GameMode.FrostTowers_killed >= ICE_TOWERS_REQUIRED then
 		nTimer_SpecialEvent = 60
 		nTimer_IncomingWave = 1
+		nTimer_CreepLevel = 1
 		PauseCreeps()
 	end
 end
@@ -47,7 +48,6 @@ GameMode.AllHeroImages_occuring = 0
 GameMode.AllHeroImagesDead = 0
 GameMode.FrostTowers_killed = 0
 GameMode.BossesTop_killed = 0
-time_elapsed = 0
 GameMode.creep_roll = {}
 GameMode.creep_roll["race"] = 0
 
@@ -292,6 +292,7 @@ local heroes = HeroList:GetAllHeroes()
 		end
 		nTimer_SpecialEvent = 720
 		nTimer_IncomingWave = 240
+		nTimer_CreepLevel = 360
 --		ModifyLanes()
 
 		-- debug for quests about destroying buildings
@@ -371,7 +372,6 @@ local heroes = HeroList:GetAllHeroes()
 
 		-- Timer: Creep Levels 1 to 4. Lanes 1 to 8.
 		Timers:CreateTimer(0, function()
-			time_elapsed = time_elapsed + 30
 			if SPECIAL_EVENT == 0 then
 				SpawnCreeps()
 				return 30
@@ -425,6 +425,7 @@ end
 		CountdownTimerMuradin()
 		if SPECIAL_EVENT == 0 then
 			CountdownTimerIncomingWave()
+			CountdownTimerCreepLevel()
 		end
 		if GameMode.HeroImage_occuring == 1 then
 			CountdownTimerHeroImage()
@@ -440,9 +441,11 @@ end
 			if nTimer_GameTime == 359 then -- 6 Min
 				NumPlayers = 1, PlayerResource:GetPlayerCount() * CREEP_LANES_TYPE
 				SpawnDragons("npc_dota_creature_red_dragon")
+				CreepLevels(2)
 			elseif nTimer_GameTime == 715 then -- 715 - 11:55 Min: MURADIN BRONZEBEARD EVENT 1
 				nTimer_GameTime = 720 -1
 				nTimer_IncomingWave = 240 +1 --	+1
+				nTimer_CreepLevel = 360 +1
 				RefreshPlayers()
 				Timers:CreateTimer(1, function()
 					SPECIAL_EVENT = 1
@@ -455,17 +458,20 @@ end
 				end)
 			elseif nTimer_GameTime == 721 then --12:00, Muradin End
 				EndMuradinEvent()
-			elseif nTimer_GameTime == 726 then --12:05, Muradin End
-				EndMuradinEvent()
-			elseif nTimer_GameTime == 839 then -- 12 Min
 				NumPlayers = 1, PlayerResource:GetPlayerCount() * CREEP_LANES_TYPE
 				SpawnDragons("npc_dota_creature_black_dragon")
+				CreepLevels(3)
+			elseif nTimer_GameTime == 726 then --12:05, Muradin End
+				EndMuradinEvent()
+			elseif nTimer_GameTime == 839 then -- 14 Min
+				
 			elseif nTimer_GameTime == 1079 then -- 18 Min
 				NumPlayers = 1, PlayerResource:GetPlayerCount() * CREEP_LANES_TYPE
 				SpawnDragons("npc_dota_creature_green_dragon")
+				CreepLevels(4)
 			elseif nTimer_GameTime == 1435 then -- 1435 - 23:55 Min: FARM EVENT 2
 				nTimer_GameTime = 1440 -1
-				nTimer_IncomingWave = 240 --	+1
+				nTimer_IncomingWave = 240 +1 --	+1
 				RefreshPlayers()
 				Timers:CreateTimer(1, function()
 					SPECIAL_EVENT = 1
@@ -488,14 +494,16 @@ end
 			Timers:CreateTimer(1.0, function()
 				SpecialWave()
 			end)
-		elseif nTimer_IncomingWave == 30 then
+		elseif nTimer_IncomingWave == 30 and reg <= 8 then
 			Notifications:TopToAll({text="WARNING: "..Region[reg].."!", duration=25.0, style={color="red"}})
 			SpawnRunes()
 			reg = reg + 1
-		elseif time_elapsed > 720 and time_elapsed < 870 then
+		elseif nTimer_GameTime > 2140 then
 			nTimer_IncomingWave = 240
-		elseif time_elapsed > 2140 then
-			nTimer_IncomingWave = 240
+		end
+
+		if nTimer_CreepLevel <= 0 then
+			nTimer_CreepLevel = 1
 		end
 	end
 
@@ -595,6 +603,25 @@ function CountdownTimerIncomingWave()
 			timer_second_01 = s01,
 		}
 	CustomGameEventManager:Send_ServerToAllClients("timer_incoming_wave", broadcast_gametimer)
+end
+
+function CountdownTimerCreepLevel()
+	nTimer_CreepLevel = nTimer_CreepLevel - 1
+	local t = nTimer_CreepLevel
+	local minutes = math.floor(t / 60)
+	local seconds = t - (minutes * 60)
+	local m10 = math.floor(minutes / 10)
+	local m01 = minutes - (m10 * 10)
+	local s10 = math.floor(seconds / 10)
+	local s01 = seconds - (s10 * 10)
+	local broadcast_gametimer = 
+		{
+			timer_minute_10 = m10,
+			timer_minute_01 = m01,
+			timer_second_10 = s10,
+			timer_second_01 = s01,
+		}
+	CustomGameEventManager:Send_ServerToAllClients("timer_creep_level", broadcast_gametimer)
 end
 
 function CountdownTimerHeroImage()

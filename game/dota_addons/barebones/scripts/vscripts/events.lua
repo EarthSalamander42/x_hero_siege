@@ -189,8 +189,6 @@ local too_ez_gold = 0.9 -- The mod is way too ez, to modify gold very easily i j
 			if npc:GetUnitName() == "npc_dota_hero_magtheridon" then
 				print("Zone:", npc.zone)
 			end
---			print("NPC:", npc:GetUnitName())
---			print("Zone:", npc.zone)
 			return
 		end
 	end
@@ -228,7 +226,9 @@ end
 
 function GameMode:OnAbilityUsed(keys)
 local player = PlayerResource:GetPlayer(keys.PlayerID)
+local hero = player:GetAssignedHero()
 local abilityname = keys.abilityname
+local ability = hero:FindAbilityByName(abilityname)
 local k, v = string.find(abilityname, "item_")
 
 --	if a then
@@ -541,7 +541,13 @@ end
 
 function GameMode:OnAbilityCastBegins(keys)
 local player = PlayerResource:GetPlayer(keys.PlayerID)
+local hero = player:GetAssignedHero()
 local abilityName = keys.abilityname
+local ability = hero:FindAbilityByName(abilityname)
+
+	if hero:GetUnitName() == "npc_dota_hero_earth_spirit" then
+		StartAnimation(hero, {duration = 1.0, activity = ACT_DOTA_CAST_ABILITY_6, rate = 1.0})
+	end
 end
 
 function GameMode:OnTowerKill(keys)
@@ -768,15 +774,6 @@ DebugPrintTable(keys)
 local originalEntity = EntIndexToHScript(keys.original_entindex)
 end
 
--- This function is called whenever an ability begins its PhaseStart phase (but before it is actually cast)
-function GameMode:OnAbilityCastBegins(keys)
-DebugPrint('[BAREBONES] OnAbilityCastBegins')
-DebugPrintTable(keys)
-
-local player = PlayerResource:GetPlayer(keys.PlayerID)
-local abilityName = keys.abilityname
-end
-
 -- This function is called whenever a tower is killed
 function GameMode:OnTowerKill(keys)
 DebugPrint('[BAREBONES] OnTowerKill')
@@ -834,7 +831,6 @@ local lane = tonumber(cn)
 			if not killedUnit:IsConsideredHero() and LeavesCorpse(killedUnit) and killedUnit.no_corpse ~= true then
 				if hero:HasModifier("modifier_orb_of_darkness") and hero:GetModifierStackCount("modifier_orb_of_darkness", hero) < 10 then
 					--	local duration = ability:GetSpecialValueFor("duration")
-					print(killedUnit:GetUnitName())
 					hero:SetModifierStackCount("modifier_orb_of_darkness", hero, hero:GetModifierStackCount("modifier_orb_of_darkness", hero) +1)
 					local unit = CreateUnitByName(killedUnit:GetUnitName(), killedUnit:GetAbsOrigin(), true, hero, hero, hero:GetTeam())
 					unit:SetControllableByPlayer(hero:GetPlayerID(), true)
@@ -898,7 +894,6 @@ local lane = tonumber(cn)
 				for _, Bear in pairs(Bears) do
 					for number = 1, 7 do
 						if Bear and Bear:GetUnitName() == "npc_dota_lone_druid_bear"..number then
-							print("Found a bear!")
 							Timers:CreateTimer(0.03, function()
 								Bear:RespawnUnit()
 							end)
@@ -914,7 +909,6 @@ local lane = tonumber(cn)
 			--Drop Tombstone to be revived if dead after Castle Defense
 			if PHASE_3 == 1 then
 				if killedUnit.ankh_respawn == true then
-					print("Do not spawn tombstone")
 				else
 					local newItem = CreateItem("item_tombstone", killedUnit, killedUnit)
 					newItem:SetPurchaseTime(0)
@@ -941,14 +935,12 @@ local lane = tonumber(cn)
 				local drop = CreateItemOnPositionSync(pos, item)
 				item:LaunchLoot(false, 300, 0.5, pos)
 				ramero_check = ramero_check +1
-				print("Ramero Check:", ramero_check)
 			elseif killedUnit:GetUnitName() == "npc_baristol" then
 				local item = CreateItem("item_tome_big", nil, nil)
 				local pos = killedUnit:GetAbsOrigin()
 				local drop = CreateItemOnPositionSync(pos, item)
 				item:LaunchLoot(false, 300, 0.5, pos)
 				ramero_check = ramero_check +1
-				print("Ramero Check:", ramero_check)
 			elseif killedUnit:GetUnitName() == "npc_ramero_2" then
 				local item = CreateItem("item_ring_of_superiority", nil, nil)
 				local pos = killedUnit:GetAbsOrigin()
@@ -965,7 +957,6 @@ local lane = tonumber(cn)
 			end
 
 			if ramero_check == 2 then
-				print("Removing Ramero Timer")
 				Timers:RemoveTimer(timers.RameroAndBaristol)
 			end
 

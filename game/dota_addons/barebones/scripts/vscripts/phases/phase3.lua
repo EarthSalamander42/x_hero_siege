@@ -23,16 +23,19 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			if difficulty == 1 then
 				magtheridon = CreateUnitByName("npc_dota_hero_magtheridon", point_mag  ,true, nil, nil, DOTA_TEAM_CUSTOM_2)
 				magtheridon:SetAngles(0, 180, 0)
+				magtheridon.zone = "xhs_holdout"
 			elseif difficulty == 2 then
 				magtheridon = CreateUnitByName("npc_dota_hero_magtheridon", point_mag  ,true, nil, nil, DOTA_TEAM_CUSTOM_2)
 				magtheridon:SetAngles(0, 180, 0)
 				magtheridon:AddItem(ankh)
 				ankh:SetCurrentCharges(1)
+				magtheridon.zone = "xhs_holdout"
 			elseif difficulty == 3 then
 				magtheridon = CreateUnitByName("npc_dota_hero_magtheridon", point_mag  ,true, nil, nil, DOTA_TEAM_CUSTOM_2)
 				magtheridon:SetAngles(0, 180, 0)
 				magtheridon:AddItem(ankh)
 				ankh:SetCurrentCharges(3)
+				magtheridon.zone = "xhs_holdout"
 			elseif difficulty == 4 then
 				magtheridon = CreateUnitByName("npc_dota_hero_magtheridon", point_mag  ,true, nil, nil, DOTA_TEAM_CUSTOM_2)
 				magtheridon2 = CreateUnitByName("npc_dota_hero_magtheridon", point_mag2  ,true, nil, nil, DOTA_TEAM_CUSTOM_2)
@@ -44,6 +47,8 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 				ankh2:SetCurrentCharges(1)
 				magtheridon2:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 10, IsHidden = true})
 				magtheridon2:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 10, IsHidden = true})
+				magtheridon.zone = "xhs_holdout"
+				magtheridon2.zone = "xhs_holdout"
 
 				Timers:CreateTimer(0.0, function()
 					CustomNetTables:SetTableValue("round_data", "bossHealth", {boss = "mag", hp = magtheridon:GetHealthPercent(), boss2 = "true" , hp2 = magtheridon2:GetHealthPercent()})
@@ -93,18 +98,22 @@ function EndMagtheridonArena()
 
 	Timers:CreateTimer(1.0, function()
 		local grom = CreateUnitByName("npc_dota_hero_grom_hellscream",Entities:FindByName(nil,"spawn_grom_hellscream"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_CUSTOM_2)
+		grom.zone = "xhs_holdout"
 		grom:SetAngles(0, 270, 0)
 	end)
 	Timers:CreateTimer(2.0, function()
 		local illidan = CreateUnitByName("npc_dota_hero_illidan",Entities:FindByName(nil,"spawn_illidan"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_CUSTOM_2)
+		illidan.zone = "xhs_holdout"
 		illidan:SetAngles(0, 0, 0)
 	end)
 	Timers:CreateTimer(3.0, function()
 		local balanar = CreateUnitByName("npc_dota_hero_balanar",Entities:FindByName(nil,"spawn_balanar"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_CUSTOM_2)
+		balanar.zone = "xhs_holdout"
 		balanar:SetAngles(0, 90, 0)
 	end)
 	Timers:CreateTimer(4.0, function()
 		local proudmoore = CreateUnitByName("npc_dota_hero_proudmoore",Entities:FindByName(nil,"spawn_admiral_proudmore"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_CUSTOM_2)
+		proudmoore.zone = "xhs_holdout"
 		proudmoore:SetAngles(0, 180, 0)
 	end)
 end
@@ -188,6 +197,7 @@ local heroes = HeroList:GetAllHeroes()
 		arthas:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 10, IsHidden = true})
 		arthas:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 9, IsHidden = true})
 		BossBar(arthas, "arthas")
+		arthas.zone = "xhs_holdout"
 
 		for _,hero in pairs(heroes) do
 		local id = hero:GetPlayerID()
@@ -225,6 +235,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 	banehallow:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 14, IsHidden = true})
 	banehallow:EmitSound("shop_jbrice_01.stinger.radiant_lose")
 	BossBar(banehallow, "banehallow")
+	banehallow.zone = "xhs_holdout"
 	end)
 
 	Timers:CreateTimer(12,function()
@@ -327,6 +338,7 @@ local reincarnate_time = 8.0
 			lich_king2:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 12, IsHidden = true})
 			lich_king2:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 12, IsHidden = true})
 			BossBar(lich_king2, "lich_king")
+			lich_king2.zone = "xhs_holdout"
 		end)
 	end)
 

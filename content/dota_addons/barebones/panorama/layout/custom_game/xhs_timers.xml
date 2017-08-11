@@ -20,6 +20,10 @@
 				<Label id="IncomingWaveLabel" text="#IncomingWaveGoal" />
 				<Label id="IncomingWaveTimer" text="--:--" />
 			</Panel>
+			<Panel id="CreepLevel">
+				<Label id="CreepLevelLabel" text="#CreepLevelGoal" />
+				<Label id="CreepLevelTimer" text="--:--" />
+			</Panel>
 			<Panel id="HeroImage">
 				<Label id="HeroImageLabel" text="Hero Image:" />
 				<Label id="HeroImageTimer" text="--:--" />

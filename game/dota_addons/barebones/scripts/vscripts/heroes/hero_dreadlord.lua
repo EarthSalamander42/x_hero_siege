@@ -7,10 +7,6 @@ local target_point_temp = Vector(target_point.x, target_point.y, 0)
 local point_difference_normalized = (target_point_temp - caster_point_temp):Normalized()
 local velocity_per_second = point_difference_normalized * keys.TravelSpeed
 
-	if caster:GetUnitName() == "npc_dota_hero_earth_spirit" then
-		StartAnimation(caster, {duration = 1.0, activity = ACT_DOTA_CAST_ABILITY_5, rate = 1.0})
-		print("Cast Animation")
-	end
 	caster:EmitSound("Hero_Invoker.ChaosMeteor.Cast")
 	caster:EmitSound("Hero_Invoker.ChaosMeteor.Loop")
 	local meteor_fly_original_point = (target_point - (velocity_per_second * keys.LandTime)) + Vector (0, 0, 1000)  --Start the meteor in the air in a place where it'll be moving the same speed when flying and when rolling.

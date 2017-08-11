@@ -36,6 +36,18 @@ function TimerIncomingWave(data)
 	$("#IncomingWaveTimer").text = timerText;
 }
 
+function TimerCreepLevel(data)
+{
+	var timerText = "";
+	timerText += data.timer_minute_10;
+	timerText += data.timer_minute_01;
+	timerText += ":";
+	timerText += data.timer_second_10;
+	timerText += data.timer_second_01;
+
+	$("#CreepLevelTimer").text = timerText;
+}
+
 function TimerHeroImage(data)
 {
 	var timerText = "";
@@ -142,6 +154,7 @@ function OnGameStateChanged(table, key, data)
 	GameEvents.Subscribe("timer_game", GameTimer);
 	GameEvents.Subscribe("timer_special_event", TimerSpecialEvents);
 	GameEvents.Subscribe("timer_incoming_wave", TimerIncomingWave);
+	GameEvents.Subscribe("timer_creep_level", TimerCreepLevel);
 	GameEvents.Subscribe("timer_hero_image", TimerHeroImage);
 	GameEvents.Subscribe("timer_spirit_beast", TimerSpiritBeastHeroImage);
 	GameEvents.Subscribe("timer_frost_infernal", TimerFrostInfernalHeroImage);

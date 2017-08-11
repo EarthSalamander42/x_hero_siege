@@ -12,8 +12,8 @@ function Spawn( entityKeyValues )
 		{Entities:FindByName(nil, "roshan_wp_"..1),Entities:FindByName(nil, "roshan_wp_"..2),Entities:FindByName(nil, "roshan_wp_"..3)}
 	}
 
-	Timers:CreateTimer(0,RoshanThink)
-	Timers:CreateTimer(0,RoshanWalk)
+	Timers:CreateTimer(0, RoshanThink)
+	Timers:CreateTimer(0, RoshanWalk)
 
 	DebugPrint("Starting AI for "..thisEntity:GetUnitName().." "..thisEntity:GetEntityIndex())
 end
@@ -41,7 +41,7 @@ if thisEntity:IsNull() or not thisEntity:IsAlive() then return end
 			thisEntity:CastAbilityNoTarget(Ability_clap,-1)
 		end
 	end
-	return 1
+	return 2.0
 end
 
 function RoshanWalk()

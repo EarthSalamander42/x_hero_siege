@@ -36,6 +36,13 @@ local caster = keys.caster
 		end
 	end
 
+	local darkness_units = FindUnitsInRadius(caster:GetTeamNumber(), Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_NONE , FIND_ANY_ORDER, false)
+	for _, darkness_unit in pairs(darkness_units) do
+		if darkness_unit:HasAbility("orb_of_darkness_unit") then
+			darkness_unit:RemoveSelf()
+		end
+	end
+
 --	for _, orb in pairs(Orbs) do
 --		if caster:HasItemInInventory(orb) then
 --			orb:SetActivated(false)
@@ -145,6 +152,7 @@ function respawnMagtheridon()
 	ankh:SetCurrentCharges(itemCharges -1)
 	magtheridon:EmitSound("Ability.Reincarnation")
 	BossBar(magtheridon, "mag")
+	magtheridon.zone = "xhs_holdout"
 end
 
 function respawnMagtheridonMedium(keys)

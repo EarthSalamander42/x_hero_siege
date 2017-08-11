@@ -1,5 +1,3 @@
-require("libraries/timers")
-
 function SpiritRemnants(keys)
 local caster = keys.caster
 local caster_origin = caster:GetAbsOrigin()
@@ -17,9 +15,9 @@ ward[5] = { -55, -110, 0 }	-- South-West
 ward[6] = { 55, -110, 0 }	-- South-East
 
 	for count = 1, 6 do
-		local plague_ward_unit = CreateUnitByName("npc_dota_stormspirit_remnant", keys.target_points[1] + Vector( ward[count][1], ward[count][2], ward[count][3]), false, caster, caster, caster:GetTeam())
-		plague_ward_unit:SetForwardVector(direction)
-		plague_ward_unit:AddNewModifier(caster, nil, "modifier_phased", {})
+		local remnant = CreateUnitByName("npc_dota_stormspirit_remnant", keys.target_points[1] + Vector( ward[count][1], ward[count][2], ward[count][3]), false, caster, caster, caster:GetTeam())
+		remnant:SetForwardVector(direction)
+		remnant:AddNewModifier(caster, nil, "modifier_phased", {})
 	end
 end
 
@@ -30,7 +28,6 @@ local ability = keys.ability
 local model_name = caster:GetModelName()
 local dummyModifierName = "modifier_static_remnant_dummy_datadriven"
 local dummyFreezeModifierName = "modifier_static_remnant_dummy_freeze_datadriven"
-local remnant_timer = 0.0
 local remnant_interval_check = 0.1
 local delay = ability:GetLevelSpecialValueFor( "static_remnant_delay", ability:GetLevel() - 1 )
 local trigger_radius = ability:GetLevelSpecialValueFor( "static_remnant_radius", ability:GetLevel() - 1 )
@@ -46,6 +43,14 @@ ward[3] = { -200, 0, 0 }	-- West
 ward[4] = { 200, 0, 0 }		-- East
 ward[5] = { -100, -200, 0 }	-- South-West
 ward[6] = { 100, -200, 0 }	-- South-East
+
+local remnant_timer = {}
+remnant_timer[1] = {0}
+remnant_timer[2] = {0}
+remnant_timer[3] = {0}
+remnant_timer[4] = {0}
+remnant_timer[5] = {0}
+remnant_timer[6] = {0}
 
 	-- Dummy creation
 	for count = 1, 6 do
@@ -81,13 +86,15 @@ ward[6] = { 100, -200, 0 }	-- South-East
 					dummy:RemoveSelf()
 				end	
 				return nil
+			else
+				caster:RemoveModifierByName("modifier_static_remnant_check")
 			end
 
 			-- Update timer
-			remnant_timer = remnant_timer + remnant_interval_check /6	-- 6 Remnants, so the timer goes 6 times faster, so we divide by 6
+			remnant_timer[count][1] = remnant_timer[count][1] + remnant_interval_check	-- 6 Remnants, so the timer goes 6 times faster, so we divide by 6
 
 			-- Check if timer should be expired
-			if remnant_timer >= ability_duration then
+			if remnant_timer[count][1] >= ability_duration then
 				if not dummy:IsNull() then
 					EmitSoundOn("Hero_StormSpirit.StaticRemnantExplode", dummy)
 					dummy:RemoveSelf()
@@ -100,186 +107,197 @@ ward[6] = { 100, -200, 0 }	-- South-East
 	end
 end
 
-function overload_check_order(keys)
-	local caster = keys.caster
-	local ability = keys.ability
-	if caster:GetUnitName() == "npc_dota_hero_storm_spirit" then
-		ListenToGameEvent("dota_player_used_ability", function(event)
-			local ply = caster:GetPlayerOwner()
-			-- Check if player existed
-			if ply then
-				local hero = ply:GetAssignedHero()
-				-- Check if it is corrent hero
-				if hero == caster then
-					-- Check if ability on cast bar is casted
-					local ability_count = caster:GetAbilityCount()
-					for i = 0, (ability_count - 1) do
-						local ability_at_slot = caster:GetAbilityByIndex(i)
-						if ability_at_slot and ability_at_slot:GetAbilityName() == event.abilityname then
-							ability:ApplyDataDrivenModifier(caster, caster, "modifier_overload_damage_datadriven", {})
-							break
-						end
+-- Author: Fudge (Dota Imba)
+--------------------------------------
+---		   	  OVERLOAD		       ---
+--------------------------------------
+xhs_spirit_master_overload = xhs_spirit_master_overload or class({})
+LinkLuaModifier("modifier_imba_overload",			"heroes/hero_spirit_master.lua", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_imba_overload_buff",		"heroes/hero_spirit_master.lua", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_imba_overload_debuff",	"heroes/hero_spirit_master.lua", LUA_MODIFIER_MOTION_NONE)
+
+function xhs_spirit_master_overload:GetIntrinsicModifierName()
+	return "modifier_imba_overload"
+end
+
+function xhs_spirit_master_overload:GetAbilityTextureName()
+	return "storm_spirit_overload"
+end
+
+--- OVERLOAD PASSIVE MODIFIER
+modifier_imba_overload = modifier_imba_overload or class({})
+
+-- Modifier properties
+function modifier_imba_overload:IsPassive() return true end
+function modifier_imba_overload:IsDebuff() return false end
+function modifier_imba_overload:IsHidden() return true end
+function modifier_imba_overload:IsPurgable() return false end
+function modifier_imba_overload:RemoveOnDeath() return true end
+
+function modifier_imba_overload:DeclareFunctions()
+	local funcs	=	{
+		MODIFIER_EVENT_ON_ABILITY_EXECUTED
+	}
+	return funcs
+end
+
+function modifier_imba_overload:OnAbilityExecuted( keys )
+	if IsServer() then
+		if keys.ability then
+			-- When an actual ability was executed
+			local parent =	self:GetParent()
+			-- When the attacker is Storm then
+			if keys.unit == parent then
+				-- Doesn't work when Storm is broken
+				if not parent:PassivesDisabled() then
+					-- Ignore toggles and items
+					if ( not keys.ability:IsItem() and not keys.ability:IsToggle() )  then
+
+						parent:AddNewModifier(parent, self:GetAbility(), "modifier_imba_overload_buff",	{} )
 					end
 				end
-			end	
-		end, nil)
-	end
-end
-
-particle_names = {base = "particles/units/heroes/hero_stormspirit/stormspirit_base_attack.vpcf"}
-projectile_speeds = {base = 500}
-
--- this finds the units particle infomation, if they're melee then it'll just use lunas default glaives
--- the results are stored in partile_names and projectile_speeds so it doesn't have to reload the KV file each time
-function findProjectileInfo(class_name)
-	if particle_names[class_name] ~= nil then
-		return particle_names[class_name], projectile_speeds[class_name]
-	end
-
-	kv_heroes = LoadKeyValues("scripts/npc/npc_heroes.txt")
-	kv_hero = kv_heroes[class_name]
-
-	if kv_hero["ProjectileModel"] ~= nil and kv_hero["ProjectileModel"] ~= "" then
-		particle_names[class_name] = kv_hero["ProjectileModel"]
-		projectile_speeds[class_name] = kv_hero["ProjectileSpeed"]
-	else
-		particle_names[class_name] = particle_names["base"]
-		projectile_speeds[class_name] = projectile_speeds["base"]
-	end
-
-	return particle_names[class_name], projectile_speeds[class_name]
-end
-
-function moon_glaive_start_create_dummy(keys)
-	local caster = keys.caster
-	local target = keys.target
-	local ability = keys.ability
-	local ability_level = ability:GetLevel() - 1
-
-	-- Create the dummy unit which keeps track of bounces
-	local dummy = CreateUnitByName( "npc_dummy_unit", target:GetAbsOrigin(), false, caster, caster, caster:GetTeamNumber() )
-	dummy:AddAbility("holdout_overload_bounce")
-	local dummy_ability =  dummy:FindAbilityByName("holdout_overload_bounce")
-	local overload =  caster:FindAbilityByName("holdout_overload")
-	dummy_ability:SetLevel(overload:GetLevel())
-	dummy_ability:ApplyDataDrivenModifier( caster, dummy, "modifier_moon_glaive_dummy_unit", {} )
-
-	-- Ability variables
-	dummy_ability.damage = caster:GetAverageTrueAttackDamage(caster)
-	dummy_ability.bounceTable = {}
-	dummy_ability.bounceCount = 0
-	dummy_ability.maxBounces = ability:GetLevelSpecialValueFor("bounces", ability_level)
-	dummy_ability.bounceRange = ability:GetLevelSpecialValueFor("range", ability_level) 
-	dummy_ability.dmgMultiplier = ability:GetLevelSpecialValueFor("damage_reduction_percent", ability_level) / 100
-	dummy_ability.original_ability = ability
-
-	dummy_ability.particle_name, dummy_ability.projectile_speed = findProjectileInfo(caster:GetClassname())
-	dummy_ability.projectileFrom = target
-	dummy_ability.projectileTo = nil
-
-	-- Find the closest target that fits the search criteria
-	local iTeam = DOTA_UNIT_TARGET_TEAM_ENEMY
-	local iType = DOTA_UNIT_TARGET_BASIC + DOTA_UNIT_TARGET_HERO
-	local iFlag = DOTA_UNIT_TARGET_FLAG_NONE
-	local bounce_targets = FindUnitsInRadius(caster:GetTeamNumber(), dummy:GetAbsOrigin(), nil, dummy_ability.bounceRange, iTeam, iType, iFlag, FIND_CLOSEST, false)
-
-	-- It has to be a target different from the current one
-	for _,v in pairs(bounce_targets) do
-		if v ~= target then
-			dummy_ability.projectileTo = v
-			break
+			end
 		end
 	end
-
-	-- If we didnt find a new target then kill the dummy and end the function
-	if dummy_ability.projectileTo == nil then
-		killDummy(dummy, dummy)
-	else
-	-- Otherwise continue with creating a bounce projectile
-		dummy_ability.bounceCount = dummy_ability.bounceCount + 1
-		local info = {
-        Target = dummy_ability.projectileTo,
-        Source = dummy_ability.projectileFrom,
-        EffectName = dummy_ability.particle_name,
-        Ability = dummy_ability,
-        bDodgeable = false,
-        bProvidesVision = false,
-        iMoveSpeed = dummy_ability.projectile_speed,
-        iSourceAttachment = DOTA_PROJECTILE_ATTACHMENT_HITLOCATION
-    	}
-    	ProjectileManager:CreateTrackingProjectile( info )
-    end
 end
 
---[[Author: Pizzalol
-	Date: 29.09.2015.
-	Creates bounce projectiles to the nearest target if there is any]]
-function moon_glaive_bounce( keys )
-	local caster = keys.caster
-	local ability = keys.ability
-	local target = keys.target
 
-	-- Initialize the damage table
-	local damage_table = {}
-	damage_table.attacker = caster:GetOwner()
-	damage_table.victim = target
-	damage_table.ability = ability.original_ability
-	damage_table.damage_type = DAMAGE_TYPE_PHYSICAL
-	damage_table.damage = ability.damage * (1 - ability.dmgMultiplier)
+--------------------------------
+--- OVERLOAD "ACTIVE" MODIFIER
+--------------------------------
+modifier_imba_overload_buff = modifier_imba_overload_buff or class({})
 
-	ApplyDamage(damage_table)
-	-- Save the new damage for future bounces
-	ability.damage = damage_table.damage
+-- Modifier properties
+function modifier_imba_overload_buff:IsDebuff() return false end
+function modifier_imba_overload_buff:IsHidden() return false end
+function modifier_imba_overload_buff:IsPurgable() return true end
 
-	-- If we exceeded the bounce limit then remove the dummy and stop the function
-	if ability.bounceCount >= ability.maxBounces then
-		killDummy(caster,caster)
-		return
+function modifier_imba_overload_buff:OnCreated()
+	if IsServer() then
+		-- Attach the particle to Storm
+		local parent	=	self:GetParent()
+		local particle	=	"particles/units/heroes/hero_stormspirit/stormspirit_overload_ambient.vpcf"
+		self.particle_fx = ParticleManager:CreateParticle(particle, PATTACH_CUSTOMORIGIN, parent)
+		ParticleManager:SetParticleControlEnt(self.particle_fx, 0, parent, PATTACH_POINT_FOLLOW, "attach_attack1", parent:GetAbsOrigin(), true)
+
 	end
+end
 
-	-- Reset target data and find new targets
-	ability.projectileFrom = ability.projectileTo
-	ability.projectileTo = nil
+function modifier_imba_overload_buff:DeclareFunctions()
+	local funcs ={
+		MODIFIER_EVENT_ON_ATTACK_LANDED,
+		MODIFIER_PROPERTY_TRANSLATE_ACTIVITY_MODIFIERS,
+		MODIFIER_PROPERTY_OVERRIDE_ANIMATION
+	}
+	return funcs
+end
 
-	local iTeam = DOTA_UNIT_TARGET_TEAM_ENEMY
-	local iType = DOTA_UNIT_TARGET_BASIC + DOTA_UNIT_TARGET_HERO
-	local iFlag = DOTA_UNIT_TARGET_FLAG_NONE
-	local bounce_targets = FindUnitsInRadius(caster:GetTeamNumber(), target:GetAbsOrigin(), nil, ability.bounceRange, iTeam, iType, iFlag, FIND_CLOSEST, false)
+function modifier_imba_overload_buff:OnAttackLanded( keys )
+	if IsServer() then
+		-- When someone affected by overload buff has attacked
+		if keys.attacker == self:GetParent() then
+			-- Does not proc when attacking buildings or allies
+			if not keys.target:IsBuilding() and keys.target:GetTeamNumber() ~= keys.attacker:GetTeamNumber() then
 
-	-- Find a new target that is not the current one
-	for _,v in pairs(bounce_targets) do
-		if v ~= target then
-			ability.projectileTo = v
-			break
+				-- Ability properties
+				local parent	=	self:GetParent()
+				local ability	=	self:GetAbility()
+				local particle	=	"particles/units/heroes/hero_stormspirit/stormspirit_overload_discharge.vpcf"
+				-- Ability paramaters
+				local radius 		=	ability:GetSpecialValueFor("aoe")
+				local damage		=	ability:GetSpecialValueFor("damage")
+				local slow_duration	=	ability:GetSpecialValueFor("slow_duration")
+
+				-- Find enemies around the target
+				local enemies	=	FindUnitsInRadius(	parent:GetTeamNumber(),
+				keys.target:GetAbsOrigin(),
+				nil,
+				radius,
+				DOTA_UNIT_TARGET_TEAM_ENEMY,
+				DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_CREEP,
+				ability:GetAbilityTargetFlags(),
+				FIND_ANY_ORDER,
+				false)
+
+				-- Damage and apply slow to enemies near target
+				for _,enemy in pairs(enemies) do
+
+					-- Deal damage
+					local damageTable = {victim = enemy,
+						damage = damage,
+						damage_type = DAMAGE_TYPE_MAGICAL,
+						attacker = parent,
+						ability = ability
+					}
+
+					ApplyDamage(damageTable)
+
+					-- Apply debuff
+					enemy:AddNewModifier(parent, ability, "modifier_imba_overload_debuff",	{duration = slow_duration} )
+
+					-- Emit particle
+					local particle_fx = ParticleManager:CreateParticle(particle, PATTACH_ABSORIGIN, parent)
+					ParticleManager:SetParticleControl(particle_fx, 0, keys.target:GetAbsOrigin())
+					ParticleManager:ReleaseParticleIndex(particle_fx)
+					-- Remove overload buff
+					self:Destroy()
+				end
+			end
 		end
 	end
-
-	-- If we didnt find a new target then kill the dummy
-	if ability.projectileTo == nil then
-		killDummy(caster, caster)
-	else
-	-- Otherwise increase the bounce count and create a new bounce projectile
-		ability.bounceCount = ability.bounceCount + 1
-		local info = {
-        Target = ability.projectileTo,
-        Source = ability.projectileFrom,
-        EffectName = ability.particle_name,
-        Ability = ability,
-        bDodgeable = false,
-        bProvidesVision = false,
-        iMoveSpeed = ability.projectile_speed,
-        iSourceAttachment = DOTA_PROJECTILE_ATTACHMENT_HITLOCATION
-    	}
-    	ProjectileManager:CreateTrackingProjectile( info )
-    end
 end
 
-function killDummy(caster, target)
-	if caster:GetClassname() == "npc_dota_base_additive" then
-		caster:RemoveSelf()
-	elseif target:GetClassname() == "npc_dota_base_additive" then
-		target:RemoveSelf()
+function modifier_imba_overload_buff:GetActivityTranslationModifiers()
+	if self:GetParent():GetName() == "npc_dota_hero_storm_spirit" then
+		--return ACT_STORM_SPIRIT_OVERLOAD_RUN_OVERRIDE
+		return "overload"
 	end
+	return 0
+end
+
+function modifier_imba_overload_buff:GetOverrideAnimation()
+	return ACT_STORM_SPIRIT_OVERLOAD_RUN_OVERRIDE
+end
+
+function modifier_imba_overload_buff:OnDestroy()
+	if IsServer() then
+		-- Remove the particle
+		ParticleManager:DestroyParticle(self.particle_fx, false)
+		ParticleManager:ReleaseParticleIndex(self.particle_fx)
+	end
+end
+
+--- OVERLOAD DEBUFF MODIFIER
+modifier_imba_overload_debuff = modifier_imba_overload_debuff or class({})
+
+-- Modifier properties
+function modifier_imba_overload_debuff:IsDebuff() return true end
+function modifier_imba_overload_debuff:IsHidden() return false end
+function modifier_imba_overload_debuff:IsPurgable() return true end
+
+function modifier_imba_overload_debuff:OnCreated()
+	-- Ability properties
+	local ability	=	self:GetAbility()
+	-- Ability parmameters
+	self.move_slow		=	ability:GetSpecialValueFor("move_slow")
+	self.attack_slow	=	ability:GetSpecialValueFor("attack_slow")
+end
+
+function modifier_imba_overload_debuff:DeclareFunctions()
+	local funcs = {
+		MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE,
+		MODIFIER_PROPERTY_ATTACKSPEED_BONUS_CONSTANT
+	}
+	return funcs
+end
+
+-- Slow functions
+function modifier_imba_overload_debuff:GetModifierMoveSpeedBonus_Percentage()
+	return self.move_slow
+end
+
+function modifier_imba_overload_debuff:GetModifierAttackSpeedBonus_Constant()
+	return self.attack_slow
 end
 
 --[[
@@ -309,6 +327,12 @@ local cooldowns_caster = {}
 	if caster:GetUnitName() == "npc_dota_hero_storm_spirit" then
 		hero = PlayerResource:ReplaceHeroWith( PlayerID, "npc_dota_hero_earth_spirit", gold, 0)
 		local ability = hero:FindAbilityByName("holdout_spirit_str"):StartCooldown(20)
+		local remnants = FindUnitsInRadius(caster:GetTeamNumber(), Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_ALL, DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER, false)
+		for _, remnant in pairs(remnants) do
+			if remnant:GetUnitName() == "npc_dota_storm_spirit_remnant" then
+				remnant:RemoveSelf()
+			end
+		end
 	elseif caster:GetUnitName() == "npc_dota_hero_earth_spirit" then
 		hero = PlayerResource:ReplaceHeroWith( PlayerID, "npc_dota_hero_ember_spirit", gold, 0)
 		local ability = hero:FindAbilityByName("holdout_spirit_agi"):StartCooldown(20)

@@ -35,7 +35,7 @@
 
 #SpecialEvent,
 #IncomingWave,
-#SpecialEvents,
+#CreepLevel,
 #HeroImage,
 #SpiritBeast,
 #FrostInfernal,
@@ -58,6 +58,7 @@
 
 #SpecialEventsLabel,
 #IncomingWaveLabel,
+#CreepLevelLabel,
 #HeroImageLabel,
 #SpiritBeastLabel,
 #FrostInfernalLabel,
@@ -97,8 +98,9 @@
 }
 
 #Timer,
-#IncomingWaveTimer,
 #SpecialEventsTimer,
+#IncomingWaveTimer,
+#CreepLevelTimer,
 #HeroImageTimer,
 #SpiritBeastTimer,
 #FrostInfernalTimer,

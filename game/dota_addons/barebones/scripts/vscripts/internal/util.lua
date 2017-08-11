@@ -836,8 +836,9 @@ end
 -- Ported from Dota IMBA
 -- Get the base projectile of a unit
 function GetBaseRangedProjectileName(unit)
-	local unit_name = unit:GetUnitName()
-	unit_name = string.gsub(unit_name, "dota", "imba")
+local unit_name = unit:GetUnitName()
+unit_name = string.gsub(unit_name, "dota", "imba")
+
 	local unit_table = unit:IsHero() and GameRules.HeroKV[unit_name] or GameRules.UnitKV[unit_name]
 	return unit_table and unit_table["ProjectileModel"] or ""
 end
@@ -849,5 +850,25 @@ local particle_lifesteal = "particles/item/lifesteal_mask/lifesteal_particle.vpc
 		unit:SetRangedProjectileName(particle_lifesteal)
 	else
 		unit:SetRangedProjectileName(GetBaseRangedProjectileName(unit))
+	end
+end
+
+function CreepLevels(level)
+local i = 0
+
+	if GetMapName() == "x_hero_siege" then
+		i = 8
+	elseif GetMapName() == "ranked_2v2" then
+		i = 4
+	end
+
+	if level < 4 then
+		nTimer_CreepLevel = 360
+		Notifications:TopToAll({text="Creep Level "..level.." enabled!", style={color="lightgreen"}, duration=5.0})
+		for c = 1, i do
+			if CREEP_LANES[c][2] < level then
+				CREEP_LANES[c][2] = level
+			end
+		end
 	end
 end

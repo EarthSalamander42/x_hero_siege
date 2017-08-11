@@ -96,7 +96,7 @@ function modifier_lifesteal_custom:OnCreated()
 
 	if IsServer() then
 		-- Change to lifesteal projectile, if there's nothing "stronger"
-		ChangeAttackProjectile(self.caster)
+--		ChangeAttackProjectile(self.caster)
 	end
 end
 
@@ -146,7 +146,7 @@ end
 function modifier_lifesteal_custom:OnDestroy()
 	if IsServer() then
 		-- Remove lifesteal projectile
-		ChangeAttackProjectile(self.caster) 
+--		ChangeAttackProjectile(self.caster) 
 	end
 end
 

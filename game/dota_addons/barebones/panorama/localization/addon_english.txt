@@ -5,7 +5,7 @@
 
 	"GameTime"									"Game Time:"
 	"Goal"										"Special Events:"
-	"CreepGoal"									"Creep Levels:"
+	"CreepLevelGoal"							"Creep Levels:"
 	"IncomingWaveGoal"							"Incoming Waves:"
 	"SpecialEventsGoal"							"Boss Events:"
 

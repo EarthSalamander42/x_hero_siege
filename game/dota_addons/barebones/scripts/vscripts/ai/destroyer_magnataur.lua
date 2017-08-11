@@ -31,11 +31,11 @@ POSITIONS_retreat = CollectRetreatMarkers()
 BehaviorNone = {}
 
 function BehaviorNone:Evaluate()
-	return 1 -- must return a value > 0, so we have a default
+	return 2 -- must return a value > 0, so we have a default
 end
 
 function BehaviorNone:Begin()
-	self.endTime = GameRules:GetGameTime() + 1
+	self.endTime = GameRules:GetGameTime() + 2
 	
 	local ancient =  Entities:FindByName( nil, "dota_goodguys_fort" )
 	
@@ -56,7 +56,7 @@ function BehaviorNone:Begin()
 end
 
 function BehaviorNone:Continue()
-	self.endTime = GameRules:GetGameTime() + 1
+	self.endTime = GameRules:GetGameTime() + 2
 end
 
 
@@ -85,7 +85,7 @@ function BehaviorThunderClapLow:Evaluate()
 end
 
 function BehaviorThunderClapLow:Begin()
-	self.endTime = GameRules:GetGameTime() + 1
+	self.endTime = GameRules:GetGameTime() + 2
 	
 	self.order =
 	{

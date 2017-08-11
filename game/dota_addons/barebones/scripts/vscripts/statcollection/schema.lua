@@ -63,19 +63,24 @@ end
 
 -- Returns a table containing data for every player in the game
 function BuildPlayersArray()
-	local players = {}
+local players = {}
+
 	for playerID = 0, DOTA_MAX_PLAYERS do
 		if PlayerResource:IsValidPlayerID(playerID) then
+			local hero = PlayerResource:GetSelectedHeroEntity(playerID)
+			local heroName = hero:GetName()
+			print(heroName)
+			heroName = string.gsub(heroName, "npc_dota_hero_", "") --Cuts the npc_dota_hero_ prefix
+			print(heroName)
 			if not PlayerResource:IsBroadcaster(playerID) then
 				if hero:GetUnitName() == "npc_dota_hero_wisp" then
+					print("Ignoring wisp")
 				else
-					local hero = PlayerResource:GetSelectedHeroEntity(playerID)
-
 					table.insert(players, {
 						-- steamID32 required in here
 						steamID32 = PlayerResource:GetSteamAccountID(playerID),
 
-						ph = "#"..hero:GetUnitName(), -- Hero by their Pseudos
+						ph = heroName, -- Hero by their Pseudos
 						pk = hero:GetKills(),       -- Number of kills this hero have
 
 						-- Item list
@@ -114,18 +119,18 @@ end
 -- If you intend to send rounds, make sure your settings.kv has the 'HAS_ROUNDS' set to true. Each round will send the game and player arrays defined earlier
 -- The round number is incremented internally, lastRound can be marked to notify that the game ended properly
 function customSchema:submitRound()
+local winners = BuildRoundWinnerArray()
+local game = BuildGameArray()
+local players = BuildPlayersArray()
 
-	local winners = BuildRoundWinnerArray()
-	local game = BuildGameArray()
-	local players = BuildPlayersArray()
-
-	statCollection:sendCustom({ game = game, players = players })
+	statCollection:sendCustom({game = game, players = players})
 end
 
 -- A list of players marking who won this round
 function BuildRoundWinnerArray()
-	local winners = {}
-	local current_winner_team = GameRules.Winner or 0 --You'll need to provide your own way of determining which team won the round
+local winners = {}
+local current_winner_team = GameRules.Winner or 0 --You'll need to provide your own way of determining which team won the round
+
 	for playerID = 0, DOTA_MAX_PLAYERS do
 		if PlayerResource:IsValidPlayerID(playerID) then
 			if not PlayerResource:IsBroadcaster(playerID) then

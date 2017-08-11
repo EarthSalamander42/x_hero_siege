@@ -97,6 +97,7 @@ function Precache(context)
 	PrecacheUnitByNameAsync("npc_dota_hero_silencer", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_sniper", context) -- For creeps
 	PrecacheUnitByNameAsync("npc_dota_hero_sven", context) -- For Muradin Bronzebeard.
+	PrecacheUnitByNameAsync("npc_dota_hero_storm_spirit", context) -- For Spirit Master.
 	PrecacheUnitByNameAsync("npc_dota_hero_techies", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_templar_assassin", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_terrorblade", context) -- For creeps

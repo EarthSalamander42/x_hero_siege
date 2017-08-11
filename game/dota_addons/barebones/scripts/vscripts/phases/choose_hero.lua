@@ -1,7 +1,7 @@
 require('libraries/timers')
 
 STARTING_GOLD = 2000
-WeekHero = "npc_dota_hero_tiny"
+WeekHero = "npc_dota_hero_storm_spirit"
 -- "npc_dota_hero_slardar"			-- Centurion
 -- "npc_dota_hero_skeleton_king"	-- Lich King
 -- "npc_dota_hero_meepo"			-- Kobold Knight
@@ -92,10 +92,25 @@ local hero_vip = 1
 		end)
 
 		local vip_point = Entities:FindByName(nil, "choose_vip_point"):GetAbsOrigin()
-		local vip_hero = CreateUnitByName(WeekHero.."_bis", vip_point, true, nil, nil, DOTA_TEAM_GOODGUYS)
-		vip_hero:SetAngles(0, 270, 0)
-		vip_hero:AddAbility("dummy_passive_vulnerable")
-		vip_hero:FindAbilityByName("dummy_passive_vulnerable"):SetLevel(1)
+		if WeekHero == "npc_dota_hero_storm_spirit" then
+			local vip_hero = CreateUnitByName("npc_dota_hero_storm_spirit_bis", vip_point + Vector(0, 100, 0), true, nil, nil, DOTA_TEAM_GOODGUYS)
+			vip_hero:SetAngles(0, 270, 0)
+			vip_hero:AddAbility("dummy_passive_vulnerable")
+			vip_hero:FindAbilityByName("dummy_passive_vulnerable"):SetLevel(1)
+			local vip_hero2 = CreateUnitByName("npc_dota_hero_ember_spirit_bis", vip_point + Vector(-100, 0, 0), true, nil, nil, DOTA_TEAM_GOODGUYS)
+			vip_hero2:SetAngles(0, 270, 0)
+			vip_hero2:AddAbility("dummy_passive_vulnerable")
+			vip_hero2:FindAbilityByName("dummy_passive_vulnerable"):SetLevel(1)
+			local vip_hero3 = CreateUnitByName("npc_dota_hero_earth_spirit_bis", vip_point + Vector(100, 0, 0), true, nil, nil, DOTA_TEAM_GOODGUYS)
+			vip_hero3:SetAngles(0, 270, 0)
+			vip_hero3:AddAbility("dummy_passive_vulnerable")
+			vip_hero3:FindAbilityByName("dummy_passive_vulnerable"):SetLevel(1)
+		else
+			local vip_hero = CreateUnitByName(WeekHero.."_bis", vip_point, true, nil, nil, DOTA_TEAM_GOODGUYS)
+			vip_hero:SetAngles(0, 270, 0)
+			vip_hero:AddAbility("dummy_passive_vulnerable")
+			vip_hero:FindAbilityByName("dummy_passive_vulnerable"):SetLevel(1)
+		end
 	end
 
 	RAMERO_DUMMY = CreateUnitByName("npc_ramero", Entities:FindByName(nil, "point_special_arena_1"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)

@@ -1456,6 +1456,7 @@
 		"SecretShop"					"1"
 		"ItemBaseLevel"					"3"
 		"MaxUpgradeLevel"				"3"
+		"AllowedInBackpack"				"0"
 
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
@@ -2112,6 +2113,7 @@
 		"SecretShop"					"1"
 		"ItemBaseLevel"					"3"
 		"MaxUpgradeLevel"				"3"
+		"AllowedInBackpack"				"0"
 
 		// Special	
 		//-------------------------------------------------------------------------------------------------------------
@@ -4896,6 +4898,7 @@
 		"AbilityCooldown"				"10.0"
 		"ItemBaseLevel"					"3"
 		"MaxUpgradeLevel"				"3"
+		"AllowedInBackpack"				"0"
 
 		// Shops
 		"ItemCost"						"50000"
