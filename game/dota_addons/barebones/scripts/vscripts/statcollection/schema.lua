@@ -51,12 +51,11 @@ function BuildGameArray()
 	local game = {}
 	local diff = {"Easy", "Normal", "Hard", "Extreme"}
 	local lanes = {"Simple", "Double"}
-	local dual = {"Normal", "Dual"}
 
 	-- Add game values here as game.someValue = GetSomeGameValue()
 	game.df = diff[GameRules:GetCustomGameDifficulty()]	-- Retrieve Difficulty of the mod
 	game.la = lanes[CREEP_LANES_TYPE]
-	game.dh = dual[DUAL_HERO]
+	game.dh = 0
 
 	return game
 end

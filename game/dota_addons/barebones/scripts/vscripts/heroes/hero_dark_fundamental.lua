@@ -16,7 +16,7 @@ local main_ability_name = ability:GetAbilityName()
 	caster:SwapAbilities(main_ability_name, sub_ability_name, false, true)
 end
 
-function DarkCleave( keys )
+function DarkCleave(keys)
 local caster = keys.caster
 local target = keys.target
 local modifier_dark_cleave = keys.modifier_dark_cleave
@@ -25,12 +25,28 @@ local ability_level = ability:GetLevel() - 1
 local cooldown = ability:GetCooldown(ability_level)
 local stacks = caster:GetLevel()
 local bonus_damage = ability:GetLevelSpecialValueFor("bonus_damage", ability_level)
-local full_damage = bonus_damage * stacks -- 100 * caster Level
+local radius = ability:GetSpecialValueFor("radius")
+local cleave = ability:GetSpecialValueFor("cleave_pct")
+local full_damage = caster:GetAverageTrueAttackDamage(caster) + bonus_damage * stacks -- 100 * caster Level
+local cleave_pct = cleave * full_damage / 100
+print(full_damage)
+print(cleave_pct)
 
 	ability:StartCooldown(cooldown)
 	caster:RemoveModifierByName(modifier_dark_cleave)
 	ApplyDamage({attacker = caster, victim = target, ability = ability, damage = full_damage, damage_type = DAMAGE_TYPE_PHYSICAL})
 	SendOverheadEventMessage(nil, OVERHEAD_ALERT_CRITICAL, target, full_damage, nil)
+
+	local splash_targets = FindUnitsInRadius(caster:GetTeamNumber(), target:GetAbsOrigin(), nil, radius, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, FIND_ANY_ORDER, false)
+	for _, unit in pairs(splash_targets) do
+		if target:IsBuilding() then return end
+		if unit ~= target and not unit:IsBuilding() then
+			local target_armor = unit:GetPhysicalArmorValue()
+			local damage = cleave_pct * GetReductionFromArmor(target_armor) * 0.01
+--			print("Damage:", damage)
+			ApplyDamage({victim = unit, attacker = caster, damage = damage, ability = ability, damage_type = DAMAGE_TYPE_PURE})
+		end
+	end
 
 	Timers:CreateTimer(cooldown, function()
 		ability:ApplyDataDrivenModifier( caster, caster, modifier_dark_cleave, {})
@@ -159,7 +175,7 @@ CURRENT_XP = caster:GetCurrentXP()
 	StartAnimation(caster, {duration = 1.933, activity = ACT_DOTA_VICTORY, rate = 1.0})
 end
 
-function SkinChangerCaster( keys )
+function SkinChangerCaster(keys)
 local caster = keys.caster
 local PlayerID = caster:GetPlayerID()
 local gold = caster:GetGold()
@@ -175,13 +191,13 @@ local Mana = caster:GetMana()
 	hero:AddExperience(CURRENT_XP, false, false)
 
 	local items = {}
-	for i = 0, 5 do
+	for i = 0, 8 do
 		if caster:GetItemInSlot(i) ~= nil and caster:GetItemInSlot(i):GetName() ~= "item_classchange_reset" then
 			itemCopy = CreateItem(caster:GetItemInSlot(i):GetName(), nil, nil)
 			items[i] = itemCopy
 		end
 	end
-	for i = 0, 5 do
+	for i = 0, 8 do
 		if items[i] ~= nil then
 			hero:AddItem(items[i])
 			items[i]:SetCurrentCharges(caster:GetItemInSlot(i):GetCurrentCharges())
@@ -217,14 +233,14 @@ local Mana = caster:GetMana()
 	hero:AddExperience(CURRENT_XP, false, false)
 
 local items = {}
-	for i = 0, 5 do
+	for i = 0, 8 do
 		if caster:GetItemInSlot(i) ~= nil and caster:GetItemInSlot(i):GetName() ~= "item_classchange_reset" then
 			itemCopy = CreateItem(caster:GetItemInSlot(i):GetName(), nil, nil)
 			items[i] = itemCopy
 		end
 	end
 
-	for i = 0, 5 do
+	for i = 0, 8 do
 		if items[i] ~= nil then
 			hero:AddItem(items[i])
 			items[i]:SetCurrentCharges(caster:GetItemInSlot(i):GetCurrentCharges())

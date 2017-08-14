@@ -1,3 +1,18 @@
+function DragonSlaveBurn(keys)
+local caster = keys.caster
+local target = keys.target
+local ability = keys.ability
+local ability_level = ability:GetLevel() - 1
+local modifier_haze = keys.modifier_haze
+local modifier_burn = keys.modifier_burn
+
+	if target:HasModifier(modifier_haze) then --Apply normal damage + burn damage over 5 seconds
+		ability:ApplyDataDrivenModifier(caster, target, modifier_burn, {})
+	elseif not target:HasModifier(modifier_haze) then
+		return
+	end
+end
+
 -- Creates a dummy unit to apply the Earthquake aura
 function EarthquakeStart( event )
 	local ability = event.ability

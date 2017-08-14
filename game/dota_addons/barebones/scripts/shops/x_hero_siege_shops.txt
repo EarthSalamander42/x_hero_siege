@@ -13,9 +13,9 @@
 
 	"attributes"
 	{
-		"item"		"item_tome_of_power"
 		"item"		"item_tome_small"
 		"item"		"item_tome_big"
+		"item"		"item_tome_of_power"
 	}
 
 	"weapons_armor"

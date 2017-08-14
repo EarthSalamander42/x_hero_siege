@@ -17,7 +17,7 @@ local hero_ranked = 1
 local hero_vip = 1
 
 	if GetMapName() == "x_hero_siege" then
-		Timers:CreateTimer(2.0, function()
+		Timers:CreateTimer(5.0, function()
 			local point = Entities:FindByName(nil, "choose_"..HEROLIST[hero].."_point"):GetAbsOrigin()
 			local dummy_hero = CreateUnitByName("npc_dota_hero_"..HEROLIST[hero].."_bis", point, true, nil, nil, DOTA_TEAM_GOODGUYS)
 			dummy_hero:SetAngles(0, 270, 0)
@@ -25,13 +25,13 @@ local hero_vip = 1
 			dummy_hero:FindAbilityByName("dummy_passive_vulnerable"):SetLevel(1)
 			if hero < #HEROLIST then
 				hero = hero +1
-				return 0.25
+				return 0.5
 			else
 				return nil
 			end
 		end)
 	elseif GetMapName() == "ranked_2v2" then
-		Timers:CreateTimer(2.0, function()
+		Timers:CreateTimer(5.0, function()
 			local point = Entities:FindByName(nil, "choose_"..HEROLIST_RANKED[hero].."_point"):GetAbsOrigin()
 			local dummy_hero = CreateUnitByName("npc_dota_hero_"..HEROLIST_RANKED[hero].."_bis", point, true, nil, nil, DOTA_TEAM_GOODGUYS)
 			dummy_hero:SetAngles(0, 270, 0)
@@ -39,13 +39,13 @@ local hero_vip = 1
 			dummy_hero:FindAbilityByName("dummy_passive_vulnerable"):SetLevel(1)
 			if hero < #HEROLIST_RANKED then
 				hero = hero +1
-				return 0.25
+				return 0.5
 			else
 				return nil
 			end
 		end)
 
-		Timers:CreateTimer(6.0, function()
+		Timers:CreateTimer(15.0, function()
 			local point = Entities:FindByName(nil, "choose_"..HEROLIST_RANKED[hero_ranked].."_point_enemy"):GetAbsOrigin()
 			local dummy_hero = CreateUnitByName("npc_dota_hero_"..HEROLIST_RANKED[hero_ranked].."_bis", point, true, nil, nil, DOTA_TEAM_BADGUYS)
 			dummy_hero:SetAngles(0, 270, 0)
@@ -53,7 +53,7 @@ local hero_vip = 1
 			dummy_hero:FindAbilityByName("dummy_passive_vulnerable"):SetLevel(1)
 			if hero_ranked < #HEROLIST_RANKED then
 				hero_ranked = hero_ranked +1
-				return 0.25
+				return 0.5
 			else
 				return nil
 			end
@@ -141,7 +141,12 @@ local id = hero:GetPlayerID()
 local difficulty = GameRules:GetCustomGameDifficulty()
 
 	if PlayerResource:IsValidPlayer(id) and hero:GetUnitName() == "npc_dota_hero_wisp" then
-		for i = 1, #HEROLIST do
+		for i = 1, #HEROLIST do -- 12 = POTM, 19 = Paladin, 25 = Banehallow, 26 = Brewmaster, 27 = Archimonde.
+			if caller:GetName() == "trigger_hero_12" or caller:GetName() == "trigger_hero_19" or caller:GetName() == "trigger_hero_25" or caller:GetName() == "trigger_hero_26" or caller:GetName() == "trigger_hero_27" then
+				Notifications:Bottom(hero:GetPlayerOwnerID(), {text = "This hero is disabled! Please choose a hero with a blue circle!", duration = 6.0})
+				return
+			end
+
 			if caller:GetName() == "trigger_hero_"..i then
 				UTIL_Remove(Entities:FindByName(nil, "trigger_hero_"..i))
 				local particle = ParticleManager:CreateParticle("particles/econ/events/ti6/hero_levelup_ti6.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
@@ -173,7 +178,10 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 						end
 					end)
 				end, id)
-			elseif caller:GetName() == "trigger_hero_weekly" then
+				return
+			end
+
+			if caller:GetName() == "trigger_hero_weekly" then
 				if hero:HasAbility("holdout_vip") then
 					Notifications:Bottom(hero:GetPlayerOwnerID(), {text="You are VIP. Please choose this hero on top!", duration = 5.0})
 				return
@@ -209,6 +217,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 						end)
 					end, id)
 				end)
+				return
 			end
 		end
 	end
@@ -232,42 +241,34 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 				Notifications:Bottom(hero:GetPlayerOwnerID(), {hero="npc_dota_hero_"..HEROLIST_VIP[i], duration = 5.0})
 				Notifications:Bottom(hero:GetPlayerOwnerID(), {text="HERO: ", duration = 5.0, style={color="white"}, continue=true})
 				Notifications:Bottom(hero:GetPlayerOwnerID(), {text="#npc_dota_hero_"..HEROLIST_VIP[i], duration = 5.0, style={color="white"}, continue=true})
-				Timers:CreateTimer(3.1, function()
-					PrecacheUnitByNameAsync("npc_dota_hero_"..HEROLIST[i], function()
-						local newHero = PlayerResource:ReplaceHeroWith(id, "npc_dota_hero_"..HEROLIST_VIP[i], STARTING_GOLD, 0)
-						if difficulty < 4 then
-							local item = newHero:AddItemByName("item_ankh_of_reincarnation")
+				PrecacheUnitByNameAsync("npc_dota_hero_"..HEROLIST[i], function()
+					local newHero = PlayerResource:ReplaceHeroWith(id, "npc_dota_hero_"..HEROLIST_VIP[i], STARTING_GOLD, 0)
+					if difficulty < 4 then
+						local item = newHero:AddItemByName("item_ankh_of_reincarnation")
+					end
+					local item = newHero:AddItemByName("item_healing_potion")
+					local item = newHero:AddItemByName("item_mana_potion")
+					if difficulty == 1 then
+						local item = newHero:AddItemByName("item_lifesteal_mask")
+					end
+					if newHero:GetTeamNumber() == 2 then
+						TeleportHero(newHero, 3.0, base_good:GetAbsOrigin())
+					elseif newHero:GetTeamNumber() == 3 then
+						TeleportHero(newHero, 3.0, base_bad:GetAbsOrigin())
+					end
+					if newHero:GetUnitName() == "npc_dota_hero_skeleton_king" then
+						SkeletonKingWearables(newHero)
+					end
+					PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
+					Timers:CreateTimer(0.1, function()
+						if not hero:IsNull() then
+							UTIL_Remove(hero)
 						end
-						local item = newHero:AddItemByName("item_healing_potion")
-						local item = newHero:AddItemByName("item_mana_potion")
-						if difficulty == 1 then
-							local item = newHero:AddItemByName("item_lifesteal_mask")
-						end
-						if newHero:GetTeamNumber() == 2 then
-							TeleportHero(newHero, 3.0, base_good:GetAbsOrigin())
-						elseif newHero:GetTeamNumber() == 3 then
-							TeleportHero(newHero, 3.0, base_bad:GetAbsOrigin())
-						end
-						if newHero:GetUnitName() == "npc_dota_hero_skeleton_king" then
-							SkeletonKingWearables(newHero)
-						end
-						PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
-						Timers:CreateTimer(0.1, function()
-							if not hero:IsNull() then
-								UTIL_Remove(hero)
-							end
-						end)
-					end, id)
-				end)
+					end)
+				end, id)
 			end
 		end
 	elseif PlayerResource:IsValidPlayer(id) and hero:GetUnitName() == "npc_dota_hero_wisp" and not hero:HasAbility("holdout_vip") then
 		Notifications:Bottom(hero:GetPlayerOwnerID(), {text = "This hero is only for <font color='#FF0000'>VIP Members!</font> Please choose another hero.", duration = 5.0})
 	end
-end
-
-function DisabledHero(event)
-local hero = event.activator
-local msg = "This hero is disabled! Please choose a hero with a blue circle!"
-	Notifications:Bottom(hero:GetPlayerOwnerID(), {text = msg, duration = 6.0})
 end

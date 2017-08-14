@@ -52,15 +52,11 @@ end
 function SpecialEventBack(event)
 local caller = event.caller
 local hero = event.activator
-local point_good = Entities:FindByName(nil, "base_spawn_goodguys"):GetAbsOrigin()
-if GetMapName() == "ranked_2v2" then
-	local point_bad = Entities:FindByName(nil, "base_spawn_badguys"):GetAbsOrigin()
-end
 
 	if hero:GetTeamNumber() == 2 then
-		TeleportHero(hero, 0.0, point_good)
-	else
-		TeleportHero(hero, 0.0, point_bad)
+		TeleportHero(hero, 0.0, base_good)
+	elseif hero:GetTeamNumber() == 3 then
+		TeleportHero(hero, 0.0, base_bad)
 	end
 
 	Entities:FindByName(nil, "trigger_special_event"):Enable()

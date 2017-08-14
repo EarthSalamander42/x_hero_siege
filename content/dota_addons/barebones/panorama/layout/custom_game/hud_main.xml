@@ -18,33 +18,13 @@
 		<include src="s2r://panorama/scripts/custom_game/relic_courier.vjs_c" />
 	</scripts>
 
-	<script>
-		var KillScrollPanel = function()
-		{
-			var scenePanelContainer = $( '#TPScrollContainer' );
-			scenePanelContainer.AddClass( "CollapsePanel" );
-	  
-			var scenePanel = $( '#TPScroll' );
-			scenePanel.SetReadyForDisplay( false );
-		}
-
-		$.Schedule( 0.1, KillScrollPanel );
-	</script>
-
   <Panel hittest="false" class="CustomHudRoot">
 	<Panel id="DungeonHUDContents" hittest="false" class="CustomHudContents">
 		<Panel hittest="false" id="PartyPortraits" class="LeftRightFlow"/>
 	
 		<Panel hittest="false" id="ZoneToastPanel" always-cache-composition-layer="true" require-composition-layer="true" >
 		  <Label hittest="false" id="ZoneNameLabel" text="" class="TitleFont"/>
-		</Panel>
-		<Panel id="TPScrollContainer" onactivate="ImpatientClicks()">
-			<DOTAScenePanel id="TPScroll" hittest="false" map="scenes/tpscroll" antialias="true" particleonly="false" camera="scrollcamera" light="scrolllight" renderdeferred="true" deferredalpha="false" rotateonmousemove="true" yawmin="-30" yawmax="9" pitchmin="-8" pitchmax="15" acceleration="0.5" panoramasurfacexml="file://{resources}/layout/custom_game/tpscroll_texture.xml" panoramasurfacewidth="1024" panoramasurfaceheight="2048"/>
-			<Panel id="TPScrollHitbox" acceptsinput="true" onmouseover="ScrollHover()" onmouseout="ScrollUnHover()" onactivate="ScrollActivate()"/>
-			<Panel id="ClickHint">
-				<Label text="#DOTA_Siltbreaker_WhirlpoolSigilHelp"/>
-			</Panel>
-		</Panel>	  
+		</Panel>  
 		
 	<Panel id="DialogPanel" hittest="false">
 		<Panel id="DialogPanelBackground" hittest="false"/>

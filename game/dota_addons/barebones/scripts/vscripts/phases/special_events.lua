@@ -1,9 +1,10 @@
 require('libraries/timers')
 
-function MuradinEvent() -- 12 Min, lasts 2 Min.
+function MuradinEvent(time) -- 12 Min, lasts 2 Min.
 local teleporters = Entities:FindAllByName("trigger_teleport_muradin_end")
-nTimer_SpecialEvent = 120
+nTimer_SpecialEvent = time
 BT_ENABLED = 0
+StunBuildings(time)
 
 mode = GameRules:GetGameModeEntity()
 mode:SetFixedRespawnTime(1)
@@ -22,7 +23,7 @@ mode:SetFixedRespawnTime(1)
 		local id = hero:GetPlayerID()
 		if PlayerResource:IsValidPlayerID(id) then
 			local point = Entities:FindByName(nil,"npc_dota_muradin_player_"..id)
-			DisableItems(hero, 120)
+			DisableItems(hero, time)
 			if point then
 				FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
 			else
@@ -39,16 +40,16 @@ mode:SetFixedRespawnTime(1)
 		end
 	end
 
-	Timers:CreateTimer(90, function()
+	Timers:CreateTimer(time-30, function()
 		if GetMapName() == "x_hero_siege" then
 			Notifications:TopToAll({text="WARNING: Incoming Wave of Darkness from the East!", duration=25.0, style={color="red"}})
 		elseif GetMapName() == "ranked_2v2" then
-			Notifications:TopToAll({text="WARNING: Incoming Wave of Darkness from the East!", duration=25.0, style={color="red"}})
+			Notifications:TopToAll({text="WARNING: Incoming Wave of Darkness!", duration=25.0, style={color="red"}})
 		end
 		SpawnRunes()
 	end)
 
-	Timers:CreateTimer(120, function() -- 14:00 Min, teleport back to the spawn
+	Timers:CreateTimer(time, function() -- 14:00 Min, teleport back to the spawn
 		SpecialWave()
 		UTIL_Remove(Muradin)
 		mode:SetFixedRespawnTime(40)
@@ -56,9 +57,12 @@ mode:SetFixedRespawnTime(1)
 		BT_ENABLED = 1
 		SPECIAL_EVENT = 0
 		RestartCreeps()
+		Notifications:TopToAll({text="Special Events are unlocked!", style={color="DodgerBlue"}, duration=5.0})
+		Entities:FindByName(nil, "trigger_special_event_tp_off"):Disable()
+		Entities:FindByName(nil, "trigger_special_event"):Enable()
 	end)
 
-	Timers:CreateTimer(126, function() -- 14:05 Min: MURADIN BRONZEBEARD EVENT 1, END
+	Timers:CreateTimer(time+6, function() -- 14:05 Min: MURADIN BRONZEBEARD EVENT 1, END
 		Notifications:TopToAll({text="All heroes who survived Muradin received 15 000 Gold!", duration=6.0})
 		Notifications:TopToAll({ability="alchemist_goblins_greed", continue = true})
 		RestartCreeps()
@@ -66,11 +70,7 @@ mode:SetFixedRespawnTime(1)
 end
 
 function EndMuradinEvent()
-local MuradinCheck = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, Entities:FindByName(nil, "npc_dota_muradin_boss"):GetAbsOrigin(), nil, 2000, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false)
-
-	Notifications:TopToAll({text="Special Events are unlocked!", style={color="DodgerBlue"}, duration=5.0})
-	Entities:FindByName(nil, "trigger_special_event_tp_off"):Disable()
-	Entities:FindByName(nil, "trigger_special_event"):Enable()
+local MuradinCheck = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, Entities:FindByName(nil, "npc_dota_muradin_boss"):GetAbsOrigin(), nil, 2000, DOTA_UNIT_TARGET_TEAM_BOTH, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false)
 
 	for _, hero in pairs(MuradinCheck) do
 		Timers:CreateTimer(0.0, function()
@@ -93,10 +93,11 @@ local MuradinCheck = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, Entities:FindByName(n
 	end
 end
 
-function FarmEvent() -- 24 Min, lasts 3 Min.
-nTimer_SpecialEvent = 180
+function FarmEvent(time) -- 24 Min, lasts 3 Min.
+nTimer_SpecialEvent = time
 BT_ENABLED = 0
 GameMode.hero_farm_event = {}
+StunBuildings(time)
 
 	Notifications:TopToAll({hero="npc_dota_hero_alchemist", duration=5.0})
 	Notifications:TopToAll({text=" It's farming time! Kill as much creeps as you can!", continue = true})
@@ -124,7 +125,7 @@ GameMode.hero_farm_event = {}
 				PlayerResource:SetCameraTarget(hero:GetPlayerID(), nil)
 			end)
 
-			DisableItems(hero, 120)
+			DisableItems(hero, time)
 			FarmEventCreeps(id)
 		else
 			Notifications:TopToAll({text="Invalid Steam ID detected!! #ERROR 001 ", duration = 10.0})
@@ -137,12 +138,12 @@ GameMode.hero_farm_event = {}
 		GameMode.hero_farm_event[PlayerID]["round"] = 1
 	end
 
-	Timers:CreateTimer(160, function() -- 150
+	Timers:CreateTimer(time-20, function() -- 150
 		Notifications:TopToAll({text="WARNING: Incoming Wave of Darkness from the North!", duration=25.0, style={color="red"}})
 		SpawnRunes()
 	end)
 
-	Timers:CreateTimer(180, function() -- 27:00 Min, teleport back to the spawn
+	Timers:CreateTimer(time, function() -- 27:00 Min, teleport back to the spawn
 		BT_ENABLED = 1
 		SPECIAL_EVENT = 0
 		EndFarmEvent()
@@ -203,6 +204,8 @@ function EndFarmEvent()
 		end
 	end
 
+	nTimer_IncomingWave = nTimer_IncomingWave +10
+
 	local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_2, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_NONE , FIND_ANY_ORDER, false)
 	for _,v in pairs(units) do
 		if v:IsCreature() and v:HasMovementCapability() then
@@ -211,10 +214,11 @@ function EndFarmEvent()
 	end
 end
 
-function RameroAndBaristolEvent() -- 500 kills
+function RameroAndBaristolEvent(time) -- 500 kills
 local teleporters = Entities:FindAllByName("trigger_teleport_ramero_end")
-nTimer_SpecialEvent = 120
+nTimer_SpecialEvent = time
 SPECIAL_EVENT = 1
+StunBuildings(time)
 
 	local Ramero = CreateUnitByName("npc_ramero", Entities:FindByName(nil, "roshan_wp_4"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 	Ramero:AddNewModifier( nil, nil, "modifier_boss_stun", {duration = 5})
@@ -229,7 +233,7 @@ SPECIAL_EVENT = 1
 	Notifications:TopToAll({text="Kill Ramero and Baristol to get special items! ", continue=true})
 	Notifications:TopToAll({text="Reward: Lightning Sword and Tome of Stats +250.", continue=true})
 
-	timers.RameroAndBaristol = Timers:CreateTimer(120, function() -- Teleport back to the spawn
+	timers.RameroAndBaristol = Timers:CreateTimer(time, function() -- Teleport back to the spawn
 		SPECIAL_EVENT = 0
 		RestartCreeps()
 		UTIL_Remove(RAMERO_DUMMY)
@@ -259,11 +263,12 @@ SPECIAL_EVENT = 1
 	end)
 end
 
-function RameroEvent() -- 750 kills
+function RameroEvent(time) -- 750 kills
 SPECIAL_EVENT = 1
 local teleporters = Entities:FindAllByName("trigger_teleport_ramero_end")
-nTimer_SpecialEvent = 120
+nTimer_SpecialEvent = time
 PauseCreeps()
+StunBuildings(time)
 
 	local Ramero = CreateUnitByName("npc_ramero_2", Entities:FindByName(nil, "roshan_wp_4"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 	Ramero:AddNewModifier( nil, nil, "modifier_boss_stun", {duration = 5})
@@ -274,7 +279,7 @@ PauseCreeps()
 	Notifications:TopToAll({text="Kill Ramero to get special items! ", continue = true})
 	Notifications:TopToAll({text="Reward: Ring of Superiority.", continue = true})
 
-	timers.Ramero = Timers:CreateTimer(120, function() -- Teleport back to the spawn
+	timers.Ramero = Timers:CreateTimer(time, function() -- Teleport back to the spawn
 		SPECIAL_EVENT = 0
 		RestartCreeps()
 		UTIL_Remove(RAMERO_BIS_DUMMY)

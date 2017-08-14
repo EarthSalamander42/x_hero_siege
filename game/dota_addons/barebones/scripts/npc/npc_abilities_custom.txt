@@ -1476,11 +1476,6 @@
 				"var_type"							"FIELD_INTEGER"
 				"bonus_damage"						"150 350 550 750"
 			}
-			"04"
-			{
-				"var_type"							"FIELD_INTEGER"
-				"frost_arrows_attack_speed"			"0"
-			}
 		}
 	
 		"Modifiers"
@@ -1895,7 +1890,7 @@
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityManaCost"				"0"
-	
+
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilitySpecial"
@@ -1907,8 +1902,8 @@
 			}
 			"02"
 			{
-				"var_type"					"FIELD_FLOAT"
-				"damage_percent"			"0.7"
+				"var_type"						"FIELD_FLOAT"
+				"damage_percent"				"0.7"
 			}
 			"03"
 			{
@@ -2919,6 +2914,139 @@
 				{
 					"MODIFIER_PROPERTY_MISS_PERCENTAGE"				"%miss_chance"
 					"MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE"	"%movement_slow"
+				}
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Pandaren Brewmaster: Dragon Slave
+	//=================================================================================================================
+	"holdout_dragon_slave"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"						"ability_datadriven"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"	
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
+		"AbilityTextureName"			"custom/holdout_dragon_slave"	
+		
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"				"900"
+		"AbilityCastPoint"				"0.35"	
+
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"18"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"100 200 300 400"	
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"			"FIELD_INTEGER"
+				"speed"				"1250"
+			}
+			"02"
+			{
+				"var_type"			"FIELD_INTEGER"
+				"start_width"		"250"
+			}
+			"03"
+			{
+				"var_type"			"FIELD_INTEGER"
+				"end_width"			"300"
+			}
+			"04"
+			{
+				"var_type"			"FIELD_INTEGER"
+				"distance"			"1100"
+			}
+			"05"
+			{
+				"var_type"			"FIELD_INTEGER"
+				"damage"			"175 350 850 1250"
+			}
+			"06"
+			{
+				"var_type"			"FIELD_INTEGER"
+				"haze_damage"		"50 100 300 400"
+			}
+			"07"
+			{
+				"var_type"			"FIELD_INTEGER"
+				"haze_duration"		"5"
+			}
+			"07"
+			{
+				"var_type"			"FIELD_INTEGER"
+				"haze_total_damage_tooltip"		"250 500 750 1000"
+			}
+		}
+
+		"OnSpellStart"
+		{
+			"RunScript"
+			{
+				"ScriptFile"				"heroes/hero_blood_mage.lua"
+				"Function"					"DragonSlave"
+				"Target"					"POINT"
+
+				"particle_projectile"		"particles/units/heroes/hero_lina/lina_spell_dragon_slave.vpcf"
+				"sound_cast"				"Hero_Lina.DragonSlave"
+			}
+		}
+
+		"OnProjectileHitUnit"
+		{
+			"DeleteOnHit"					"0"
+			"Damage"
+			{
+				"Target"					"TARGET"
+				"Type"						"DAMAGE_TYPE_MAGICAL"
+				"Damage"					"%damage"
+			}
+
+			"RunScript"
+			{
+				"ScriptFile"		"heroes/hero_brewmaster.lua"
+				"Function"			"DragonSlaveBurn"
+				"Target"			"TARGET"
+				"modifier_haze"		"modifier_drunken_haze"
+				"modifier_burn"		"modifier_dragon_slave_burn"
+			}
+		}
+
+		"Modifiers"
+		{
+			"modifier_dragon_slave_burn"
+			{
+				"Passive"			"0"
+				"IsHidden"			"0"
+				"IsDebuff"			"1"
+				"Duration"			"%haze_duration"
+
+				"EffectName"		"particles/econ/items/wraith_king/wraith_king_ti6_bracer/wraith_king_ti6_hellfireblast_debuff.vpcf"
+				"EffectAttachType"	"follow_origin"
+		
+				"ThinkInterval"  "1.0"
+				"OnIntervalThink"
+				{
+					"Damage"
+					{
+						"Target"		"TARGET"
+						"Type"			"DAMAGE_TYPE_MAGICAL"
+						"Damage"		"%haze_damage"
+					}
 				}
 			}
 		}
@@ -22334,7 +22462,7 @@
 		
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCastPoint"				"1.4 1.3 1.2 1.1"
+		"AbilityCastPoint"				"1.5"
 
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
@@ -22352,7 +22480,7 @@
 			"02"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"damage"					"20000 35000 50000 65000"
+				"damage"					"25000 50000 75000 100000"
 			}
 			"03"
 			{
@@ -22496,7 +22624,7 @@
 		
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCastPoint"				"1.4 1.3 1.2 1.1"
+		"AbilityCastPoint"				"1.4"
 
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
@@ -24406,7 +24534,7 @@
 			"02"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"cleave_pct"		"50"
+				"cleave_pct"				"50"
 			}
 		}
 
@@ -24443,12 +24571,6 @@
 						"Function"				"DarkCleave"
 						"modifier_dark_cleave"	"modifier_dark_cleave"
 						"Target"				"TARGET"
-					}
-
-					"RunScript"
-					{
-						"ScriptFile"	"heroes/global.lua"
-						"Function"		"SplashAbility"
 					}
 
 					"FireSound"
@@ -25736,7 +25858,7 @@
 	}
 
 	//=================================================================================================================
-	// Brewmaster: Primal Split
+	// Spirit Master: Primal Split
 	//=================================================================================================================
 	"creature_primal_split"
 	{
@@ -27859,8 +27981,8 @@
 		{
 			"01"
 			{
-				"var_type"				"FIELD_FLOAT"
-				"damage_per_unit"		"10000 20000 30000 40000"
+				"var_type"				"FIELD_INTEGER"
+				"damage_per_unit"		"15000 30000 45000 60000"
 			}
 			"02"
 			{

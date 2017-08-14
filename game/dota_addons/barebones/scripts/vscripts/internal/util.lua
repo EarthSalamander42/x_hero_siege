@@ -629,6 +629,16 @@ local units3 = FindUnitsInRadius( DOTA_TEAM_BADGUYS, Vector(0, 0, 0), nil, FIND_
 	end
 end
 
+function KillCreeps(teamnumber)
+local units = FindUnitsInRadius(teamnumber, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false )
+	
+	for _,v in pairs(units) do
+		if v:HasMovementCapability() then
+			v:RemoveSelf()
+		end
+	end
+end
+
 function RestartCreeps()
 local units = FindUnitsInRadius( DOTA_TEAM_BADGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false )
 local units2 = FindUnitsInRadius( DOTA_TEAM_GOODGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false )
@@ -863,12 +873,43 @@ local i = 0
 	end
 
 	if level < 4 then
-		nTimer_CreepLevel = 360
+		nTimer_CreepLevel = 359
 		Notifications:TopToAll({text="Creep Level "..level.." enabled!", style={color="lightgreen"}, duration=5.0})
 		for c = 1, i do
 			if CREEP_LANES[c][2] < level then
 				CREEP_LANES[c][2] = level
 			end
+		end
+	end
+end
+
+function StunBuildings(time)
+	for Players = 1, 8 do
+		local towers = Entities:FindAllByName("dota_badguys_tower"..Players)
+		for _, tower in pairs(towers) do
+			if not tower:HasModifier("modifier_invulnerable") then
+				tower:AddNewModifier(nil, nil, "modifier_invulnerable", {duration=time})
+			end
+		end
+		local raxes = Entities:FindAllByName("dota_badguys_barracks_"..Players)
+		for _, rax in pairs(raxes) do
+			if not rax:HasModifier("modifier_invulnerable") then
+				rax:AddNewModifier(nil, nil, "modifier_invulnerable", {duration=time})
+			end
+		end
+	end
+	for TW = 1, 2 do
+		local ice_towers = Entities:FindAllByName("npc_tower_cold_"..TW)
+		for _, tower in pairs(ice_towers) do
+			if not tower:HasModifier("modifier_invulnerable") then
+				tower:AddNewModifier(nil, nil, "modifier_invulnerable", {duration=time})
+			end
+		end
+	end
+	local death_towers = Entities:FindAllByName("npc_tower_death")
+	for _, tower in pairs(death_towers) do
+		if not tower:HasModifier("modifier_invulnerable") then
+			tower:AddNewModifier(nil, nil, "modifier_invulnerable", {duration=time})
 		end
 	end
 end

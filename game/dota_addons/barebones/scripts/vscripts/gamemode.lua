@@ -34,7 +34,7 @@ function FrostTowersToFinalWave()
 		nTimer_SpecialEvent = 60
 		nTimer_IncomingWave = 1
 		nTimer_CreepLevel = 1
-		PauseCreeps()
+		KillCreeps(DOTA_TEAM_CUSTOM_1)
 	end
 end
 
@@ -71,9 +71,9 @@ local point = Entities:FindByName(nil, "hero_selection_"..id)
 	if hero:GetUnitName() == "npc_dota_hero_wisp" then
 		hero:SetAbilityPoints(0)
 		hero:SetGold(0, false)
-		hero:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 15.0, IsHidden = true})
+		hero:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 20.0, IsHidden = true})
 		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
-		Timers:CreateTimer(15.0, function()
+		Timers:CreateTimer(20.0, function()
 			FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
 			Timers:CreateTimer(0.1, function()
 				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
@@ -417,7 +417,6 @@ elseif GetMapName() == "ranked_2v2" then
 end
 
 	GameTimer()
---	print("Hero Count:", PlayerResource:GetPlayerCount())
 
 	if newState == DOTA_GAMERULES_STATE_PRE_GAME then
 
@@ -452,7 +451,7 @@ end
 					PauseCreeps()
 					PauseHeroes()
 					Timers:CreateTimer(5, function()
-						MuradinEvent()
+						MuradinEvent(120)
 						Timers:CreateTimer(3, RestartHeroes())
 					end)
 				end)
@@ -478,7 +477,7 @@ end
 					PauseCreeps()
 					PauseHeroes()
 					Timers:CreateTimer(5, function()
-						FarmEvent()
+						FarmEvent(180)
 						Timers:CreateTimer(3, RestartHeroes())
 					end)
 				end)
@@ -1222,7 +1221,7 @@ local point = Entities:FindByName(nil, "all_hero_image_player")
 
 		timers.AllHeroImage = Timers:CreateTimer(0.5, function()
 			ALL_HERO_IMAGE_DEAD = 0
-			local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_2, point, nil, 2500, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_ALL, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false)
+			local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_2, point:GetAbsOrigin(), nil, 2500, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_ALL, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false)
 			for _, unit in pairs(units) do
 				ALL_HERO_IMAGE_DEAD = ALL_HERO_IMAGE_DEAD +1
 			end
@@ -1252,7 +1251,8 @@ local point = Entities:FindByName(nil, "all_hero_image_player")
 			Timers:CreateTimer(5.5, function() --Debug time in case Frost Infernal kills the player at the very last second
 				Entities:FindByName(nil, "trigger_all_hero_image_duration"):Disable()
 			end)
-			
+
+			local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_2, point, nil, 2500, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_ALL, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false)
 			for _, v in pairs(units) do
 				UTIL_Remove(v)
 			end

@@ -68,6 +68,7 @@ function Precache(context)
 	PrecacheResource("model_folder", "models/items/furion/treant/the_ancient_guardian_the_ancient_treants", context)
 
 	-- PRECACHE HEROES (Particle effects for custom abilities)
+	PrecacheUnitByNameAsync("npc_dota_hero_abyssal_underlord", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_antimage", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_brewmaster", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_centaur", context)
@@ -79,7 +80,9 @@ function Precache(context)
 	PrecacheUnitByNameAsync("npc_dota_hero_ember_spirit", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_faceless_void", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_huskar", context) -- For creeps
+	PrecacheUnitByNameAsync("npc_dota_hero_invoker", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_juggernaut", context)
+	PrecacheUnitByNameAsync("npc_dota_hero_keeper_of_the_light", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_lifestealer", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_lina", context) -- For Blood Mage 2.
 	PrecacheUnitByNameAsync("npc_dota_hero_lion", context)
@@ -87,6 +90,7 @@ function Precache(context)
 	PrecacheUnitByNameAsync("npc_dota_hero_lycan", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_magnataur", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_morphling", context)
+	PrecacheUnitByNameAsync("npc_dota_hero_mirana", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_naga_siren", context) -- Special Wave 2
 	PrecacheUnitByNameAsync("npc_dota_hero_necrolyte", context) -- Special Wave 1
 	PrecacheUnitByNameAsync("npc_dota_hero_nevermore", context) -- Special Wave 1

@@ -53,6 +53,7 @@ if hero:IsIllusion() then return end
 			end
 		return
 		elseif hero:HasItemInInventory(ankh) then
+			print("Ankh")
 			if hero:IsRealHero() then
 				hero.ankh_respawn = true
 				hero:SetRespawnsDisabled(true)
@@ -102,6 +103,7 @@ if hero:IsIllusion() then return end
 			end
 		return
 		elseif hero:HasItemInInventory(shield) then
+			print("Shield")
 			for itemSlot = 0, 5 do
 				local item = hero:GetItemInSlot(itemSlot)
 				if item and item:GetName() == shield then
@@ -255,7 +257,7 @@ local cleave_pct = cleave * full_damage / 100
 			local target_armor = unit:GetPhysicalArmorValue()
 			local damage = cleave_pct * GetReductionFromArmor(target_armor) * 0.01
 			if attacker:GetAttackCapability() == DOTA_UNIT_CAP_MELEE_ATTACK then
-				print("Damage:", damage)
+--				print("Damage:", damage)
 				ApplyDamage({victim = unit, attacker = attacker, damage = damage/2, ability = ability, damage_type = DAMAGE_TYPE_PURE})
 			end
 		end
@@ -277,7 +279,7 @@ local cleave_pct = cleave * full_damage / 100
 		if unit ~= target and not unit:IsBuilding() then
 			local target_armor = unit:GetPhysicalArmorValue()
 			local damage = cleave_pct * GetReductionFromArmor(target_armor) * 0.01
-			print("Damage:", damage)
+--			print("Damage:", damage)
 			ApplyDamage({victim = unit, attacker = attacker, damage = damage/2, ability = ability, damage_type = DAMAGE_TYPE_PURE})
 		end
 	end

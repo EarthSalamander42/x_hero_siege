@@ -1447,6 +1447,10 @@
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
 		"ItemCost"						"50000"
+		"ItemInitialStockTime"			"1470.0"
+		"ItemStockMax"					"2" 
+		"ItemStockTime"					"30.0"
+		"ItemStockInitial"				"0"
 		"ItemShopTags"					"epic"
 		"ItemQuality"					"epic"
 		"ItemAliases"					"searing blade"
@@ -1592,6 +1596,7 @@
 		"ItemDisplayCharges"				"1"
 		"ItemInitialCharges"				"3"
 		"ItemStackable"						"0"
+		"AllowedInBackpack"					"0"
 
 		// Special	
 		//-------------------------------------------------------------------------------------------------------------
@@ -2104,6 +2109,10 @@
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
 		"ItemCost"						"50000"
+		"ItemInitialStockTime"			"1470.0"
+		"ItemStockMax"					"2" 
+		"ItemStockTime"					"30.0"
+		"ItemStockInitial"				"0"
 		"ItemShopTags"					"damage"
 		"ItemQuality"					"epic"
 		"ItemAliases"					"bracer of the void"
@@ -2245,7 +2254,7 @@
 		"ItemCost"					"5000"
 		"ItemKillable"				"0" 
 
-		"ItemInitialStockTime"		"930.0"	//14 Min = 1200 + game beginning time = 90
+		"ItemInitialStockTime"		"990.0"	//14 Min = 1200 + game beginning time = 150
 		"ItemStockMax"				"2" 
 		"ItemStockTime"				"120.0"
 		"ItemStockInitial"			"0"
@@ -2403,9 +2412,10 @@
 
 		// Shops
 		"ItemCost"						"7500"
-		"StockMax"						"1" 
-		"StockTime"						"300.0"
-		"StockInitial"					"0"
+		"ItemInitialStockTime"			"510.0"
+		"ItemStockMax"					"2" 
+		"ItemStockTime"					"30.0"
+		"ItemStockInitial"				"0"
 
 		"Model"							"models/props_gameplay/red_box.vmdl"
 		"Effect"						"particles/units/heroes/hero_stormspirit/stormspirit_overload_ambient.vpcf"
@@ -2582,9 +2592,10 @@
 	
 		// Shops
 		"ItemCost"						"7500"
-		"StockMax"						"1" 
-		"StockTime"						"300.0"
-		"StockInitial"					"0"
+		"ItemInitialStockTime"			"510.0"
+		"ItemStockMax"					"2" 
+		"ItemStockTime"					"30.0"
+		"ItemStockInitial"				"0"
 		
 		"Model"                         "models/props_gameplay/red_box.vmdl"
 		"Effect"                        "particles/econ/courier/courier_greevil_red/courier_greevil_red_ambient_3.vpcf"
@@ -2714,9 +2725,10 @@
 	
 		// Shops
 		"ItemCost"						"7500"
-		"StockMax"						"1" 
-		"StockTime"						"300.0"
-		"StockInitial"					"0"
+		"ItemInitialStockTime"			"510.0"
+		"ItemStockMax"					"2" 
+		"ItemStockTime"					"30.0"
+		"ItemStockInitial"				"0"
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
 		"ItemKillable"					"1"
 		"ItemSellable"					"1"
@@ -3116,8 +3128,8 @@
 			}
 			"05"
 			{
-				"var_type"				"FIELD_INTEGER"
-				"damage_return_pct"		"20"
+				"var_type"						"FIELD_INTEGER"
+				"damage_return_pct"				"20"
 			}
 		}
 
@@ -4325,6 +4337,10 @@
 
 		// Shops
 		"ItemCost"						"7500"
+		"ItemInitialStockTime"			"510.0"
+		"ItemStockMax"					"2" 
+		"ItemStockTime"					"30.0"
+		"ItemStockInitial"				"0"
 		"AbilityCooldown"				"10.0"
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
 		"ItemPurchasable"				"1"
@@ -4523,9 +4539,10 @@
 
 		// Shops
 		"ItemCost"						"17500"
-		"StockMax"						"1"
-		"StockTime"						"300.0"
-		"StockInitial"					"0"
+		"ItemInitialStockTime"			"990.0"
+		"ItemStockMax"					"2" 
+		"ItemStockTime"					"30.0"
+		"ItemStockInitial"				"0"
 		
 		"Model"                         "models/props_gameplay/red_box.vmdl"
 		"Effect"                        "particles/econ/courier/courier_greevil_red/courier_greevil_red_ambient_3.vpcf"
@@ -4721,9 +4738,10 @@
 
 		// Shops
 		"ItemCost"						"17500"
-		"StockMax"						"1" 
-		"StockTime"						"300.0"
-		"StockInitial"					"0"
+		"ItemInitialStockTime"			"990.0"
+		"ItemStockMax"					"2" 
+		"ItemStockTime"					"30.0"
+		"ItemStockInitial"				"0"
 
 		"Model"							"models/props_gameplay/red_box.vmdl"
 		"Effect"						"particles/units/heroes/hero_stormspirit/stormspirit_overload_ambient.vpcf"
@@ -4902,6 +4920,10 @@
 
 		// Shops
 		"ItemCost"						"50000"
+		"ItemInitialStockTime"			"1470.0"
+		"ItemStockMax"					"2" 
+		"ItemStockTime"					"30.0"
+		"ItemStockInitial"				"0"
 
 		"Model"							"models/props_gameplay/red_box.vmdl"
 		"Effect"						"particles/units/heroes/hero_stormspirit/stormspirit_overload_ambient.vpcf"
@@ -5087,9 +5109,10 @@
 
 		// Shops
 		"ItemCost"						"17500"
-		"StockMax"						"1" 
-		"StockTime"						"300.0"
-		"StockInitial"					"0"
+		"ItemInitialStockTime"			"990.0"
+		"ItemStockMax"					"2" 
+		"ItemStockTime"					"30.0"
+		"ItemStockInitial"				"0"
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
 		"ItemKillable"					"1"
 		"ItemSellable"					"1"
