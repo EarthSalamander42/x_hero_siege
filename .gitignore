@@ -32,3 +32,4 @@ game/dota_addons/barebones/panorama_debugger.cfg
 
 #Github dump
 *.stackdump
+game/dota_addons/barebones/scripts/vscripts/statcollection/settings.kv
