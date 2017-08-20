@@ -3,8 +3,7 @@ local caster = event.caster
 local ability = event.ability
 local radius = ability:GetLevelSpecialValueFor("radius", ability:GetLevel()-1)
 local radius_explosion = ability:GetLevelSpecialValueFor("radius_explosion", ability:GetLevel()-1)
-
-	local meteors_per_tick = ability:GetLevelSpecialValueFor("meteors_per_tick", ability:GetLevel()-1)
+local meteors_per_tick = ability:GetLevelSpecialValueFor("meteors_per_tick", ability:GetLevel()-1)
 
 	for i = 1, meteors_per_tick do
 		local point = caster:GetAbsOrigin()+ RandomInt(1,radius)*RandomVector(1)

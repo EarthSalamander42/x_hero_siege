@@ -142,7 +142,7 @@ local too_ez_gold = 0.9 -- The mod is way too ez, to modify gold very easily i j
 		end
 
 		-- CREATURES NPC
-		if not npc:IsRealHero() and (npc:GetTeamNumber() == DOTA_TEAM_CUSTOM_1 or npc:GetTeamNumber() == DOTA_TEAM_NEUTRALS) then
+		if not npc:IsRealHero() and (npc:GetTeamNumber() == DOTA_TEAM_CUSTOM_1 or npc:GetTeamNumber() == DOTA_TEAM_CUSTOM_2 or npc:GetTeamNumber() == DOTA_TEAM_NEUTRALS) then
 			if difficulty == 1 then
 				npc:SetMinimumGoldBounty(normal_bounty*1.5*too_ez_gold)
 				npc:SetMaximumGoldBounty(normal_bounty*1.5*too_ez_gold)
@@ -175,15 +175,10 @@ local too_ez_gold = 0.9 -- The mod is way too ez, to modify gold very easily i j
 				local difficulty = GameRules:GetCustomGameDifficulty()
 				if current_ability then
 					current_ability:SetLevel(difficulty)
-					print(current_ability:GetAbilityName())
-					print(current_ability:GetLevel())
 				end
 			end
 
 			npc.zone = "xhs_holdout"
-			if npc:GetUnitName() == "npc_dota_hero_magtheridon" then
-				print("Zone:", npc.zone)
-			end
 			return
 		end
 	end
@@ -580,6 +575,7 @@ local player = PlayerResource:GetPlayer(userID)
 							local hero = PlayerResource:GetPlayer(Frozen):GetAssignedHero()
 							hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {})
 							hero:AddNewModifier(nil, nil, "modifier_invulnerable", {})
+							PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
 							Notifications:TopToAll({text="[ADMIN MOD]: ", duration=6.0, style={color="red", ["font-size"]="30px"}})
 							Notifications:TopToAll({text=PlayerNames[Frozen +1].." ", style={color=PlayerNames[Frozen +1], ["font-size"]="25px"}, continue=true})
 							Notifications:TopToAll({text="player has been jailed!", style={color="white", ["font-size"]="25px"}, continue=true})
@@ -589,6 +585,8 @@ local player = PlayerResource:GetPlayer(userID)
 							hero:RemoveModifierByName("modifier_animation_freeze_stun")
 							hero:RemoveModifierByName("modifier_boss_stun")
 							hero:RemoveModifierByName("modifier_invulnerable")
+							hero:RemoveModifierByName("modifier_command_restricted")
+							PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
 							Notifications:TopToAll({text="[ADMIN MOD]: ", duration=6.0, style={color="red", ["font-size"]="30px"}})
 							Notifications:TopToAll({text=PlayerNames[Frozen +1].." ", style={color=PlayerNames[Frozen +1], ["font-size"]="25px"}, continue=true})
 							Notifications:TopToAll({text="player has been released!", style={color="white", ["font-size"]="25px"}, continue=true})
@@ -1114,14 +1112,14 @@ local lane = tonumber(cn)
 					for j = 1, difficulty do
 						local unit = CreateUnitByName("xhs_death_revenant", killedUnit:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
 					end
-					CREEP_LANES[lane][2] = CREEP_LANES[lane][2] + 1
-					Notifications:TopToAll({text="Creep lane "..lane.." is now level "..CREEP_LANES[lane][2].."!", duration=5.0, style={color="lightgreen"}})
+--					CREEP_LANES[lane][2] = CREEP_LANES[lane][2] + 1
+--					Notifications:TopToAll({text="Creep lane "..lane.." is now level "..CREEP_LANES[lane][2].."!", duration=5.0, style={color="lightgreen"}})
 				elseif killedUnit:GetUnitName() == "xhs_tower_lane_2" then
 					for j = 1, difficulty do
 						local unit = CreateUnitByName("xhs_death_revenant_2", killedUnit:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
 					end
-					CREEP_LANES[lane][2] = CREEP_LANES[lane][2] + 1
-					Notifications:TopToAll({text="Creep lane "..lane.." is now level "..CREEP_LANES[lane][2].."!", duration=5.0, style={color="lightgreen"}})
+--					CREEP_LANES[lane][2] = CREEP_LANES[lane][2] + 1
+--					Notifications:TopToAll({text="Creep lane "..lane.." is now level "..CREEP_LANES[lane][2].."!", duration=5.0, style={color="lightgreen"}})
 				elseif killedUnit:GetUnitName() == "npc_tower_death" then
 
 				elseif killedUnit:GetUnitName() == "npc_tower_cold" then

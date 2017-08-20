@@ -222,7 +222,10 @@ _G.golden_vip_members = {
 	111692244,	-- [Iris Von Everec on Steam, May paid, 2 months left for Permanent]
 	97490223,	-- IllidanStormrage [Lucas Diao on Patreon]
 	34067920,	-- Shush
-	84332517	-- The Great King 0f Tanga-Ray [morris_91 on Discord]
+	84332517,	-- The Great King 0f Tanga-Ray [morris_91 on Discord]
+	290718556,	-- Souka Blett [souris]
+	175063550,	-- Zambla [Cousin souris]
+	23993414	-- Séra Antares
 }
 
 _G.vip_members = {
@@ -244,7 +247,9 @@ _G.vip_members = {
 	432606463,	-- Thich An Cu [Harold Tang on Patreon]
 	53939628,	-- Bloodsplatr [taylor justus on Patreon]
 	52986304,	-- RawkitLawnChair [CDarps on Patreon]
-	5671643		-- `btk [Aureo Neto on Patreon]
+	5671643,	-- `btk [Aureo Neto on Patreon]
+	92290724	-- www.dick.com.kw	[Abdullah Al Zaben on Patreon]
+
 }
 
 _G.banned_players = {

@@ -54,9 +54,9 @@ local caller = event.caller
 local hero = event.activator
 
 	if hero:GetTeamNumber() == 2 then
-		TeleportHero(hero, 0.0, base_good)
+		TeleportHero(hero, 0.0, base_good:GetAbsOrigin())
 	elseif hero:GetTeamNumber() == 3 then
-		TeleportHero(hero, 0.0, base_bad)
+		TeleportHero(hero, 0.0, base_bad:GetAbsOrigin())
 	end
 
 	Entities:FindByName(nil, "trigger_special_event"):Enable()

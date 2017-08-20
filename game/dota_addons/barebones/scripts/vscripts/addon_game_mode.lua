@@ -48,7 +48,7 @@ function Precache(context)
 	PrecacheResource("particle", "particles/econ/items/dazzle/dazzle_dark_light_weapon/dazzle_dark_shallow_grave_ground.vpcf", context)
 	PrecacheResource("particle", "particles/units/heroes/hero_lone_druid/lone_druid_battle_cry_overhead_ember.vpcf", context)
 
---	PrecacheResource("model_folder", "models/heroes/skeleton_king", context) --Lich King Boss
+	PrecacheResource("model_folder", "models/heroes/skeleton_king", context) --Lich King Boss
 --	PrecacheResource("model_folder", "models/heroes/monkey_king", context) --Spirit Master Boss
 --	PrecacheResource("model_folder", "models/items/monkey_king/monkey_king_arcana_head", context) --Spirit Master Boss
 	PrecacheResource("model_folder", "models/items/dragon_knight/ascension_weapon", context) --Arthas Boss Set
@@ -105,6 +105,7 @@ function Precache(context)
 	PrecacheUnitByNameAsync("npc_dota_hero_techies", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_templar_assassin", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_terrorblade", context) -- For creeps
+	PrecacheUnitByNameAsync("npc_dota_hero_tiny", context) -- For Mountain Giant
 	PrecacheUnitByNameAsync("npc_dota_hero_treant", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_vengefulspirit", context) -- For Incoming Wave 3.
 	PrecacheUnitByNameAsync("npc_dota_hero_warlock", context)
@@ -112,7 +113,7 @@ function Precache(context)
 	PrecacheUnitByNameAsync("npc_dota_hero_wisp", context) -- For Connecting bug
 	PrecacheUnitByNameAsync("npc_dota_hero_zuus", context) -- Muradin Bronzebeard
 
---	PrecacheUnitByNameSync( "npc_dota_hero_skeleton_king_bis", context)
+	PrecacheUnitByNameSync( "npc_dota_hero_skeleton_king_bis", context)
 --	PrecacheUnitByNameSync( "npc_dota_hero_slardar_bis", context)
 --	PrecacheUnitByNameSync( "npc_dota_hero_meepo_bis", context)
 

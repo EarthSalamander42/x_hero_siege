@@ -274,7 +274,7 @@ local heroes = HeroList:GetAllHeroes()
 			if FORCED_LANES == 0 then
 				Notifications:TopToAll({text="CREEP LANES: "..lanes[CREEP_LANES_TYPE], duration=10.0})
 			elseif FORCED_LANES == 1 then
-				Notifications:TopToAll({text="CREEP LANES: SIMPLE, more than 4 players required to play Double Lanes!", duration=10.0})
+				Notifications:TopToAll({text="CREEP LANES: SIMPLE, less than 4 players required to play Double Lanes!", duration=10.0})
 			end
 		end)
 		
