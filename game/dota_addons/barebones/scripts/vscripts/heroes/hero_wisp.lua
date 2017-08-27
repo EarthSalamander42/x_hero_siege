@@ -77,8 +77,8 @@ local IsAvailableHero = Entities:FindByName(nil, "trigger_hero_"..random)
 				end
 			end)
 		end)
-	else
-		print("Re-rolls Random Hero")
+	elseif Entities:FindByName(nil, "trigger_hero_12") or Entities:FindByName(nil, "trigger_hero_19") or Entities:FindByName(nil, "trigger_hero_26") or Entities:FindByName(nil, "trigger_hero_27") then
+		print("This hero is either chosen or disabled! Re-rolls Random Hero")
 		ChooseRandomHero(event)
 	end
 end

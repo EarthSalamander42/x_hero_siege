@@ -1018,6 +1018,7 @@ local point_beast = Entities:FindByName(nil, "hero_image_boss"):GetAbsOrigin()
 		GameMode.HeroImage:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 5,IsHidden = true})
 		GameMode.HeroImage:MakeIllusion()
 		GameMode.HeroImage:AddAbility("hero_image_death")
+		GameMode.HeroImage.Boss = true
 		local ability = GameMode.HeroImage:FindAbilityByName("hero_image_death")
 		ability:ApplyDataDrivenModifier(GameMode.HeroImage, GameMode.HeroImage, "modifier_hero_image", {})
 
@@ -1085,8 +1086,9 @@ local point_beast = Entities:FindByName(nil, "spirit_beast_boss"):GetAbsOrigin()
 
 		GameMode.spirit_beast = CreateUnitByName("npc_spirit_beast", point_beast, true, nil, nil, DOTA_TEAM_CUSTOM_1)
 		GameMode.spirit_beast:SetAngles(0, 210, 0)
-		GameMode.spirit_beast:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {Duration = 5,IsHidden = true})
+		GameMode.spirit_beast:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 5,IsHidden = true})
 		GameMode.spirit_beast:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 5,IsHidden = true})
+		GameMode.spirit_beast.Boss = true
 
 		if IsValidEntity(hero) then
 			GameMode:SpecialEventTPQuit(hero)
@@ -1135,8 +1137,9 @@ local point_beast = Entities:FindByName(nil, "frost_infernal_boss"):GetAbsOrigin
 
 		GameMode.frost_infernal = CreateUnitByName("npc_frost_infernal", point_beast, true, nil, nil, DOTA_TEAM_CUSTOM_1)
 		GameMode.frost_infernal:SetAngles(0, 210, 0)
-		GameMode.frost_infernal:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {Duration = 5, IsHidden = true})
+		GameMode.frost_infernal:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 5, IsHidden = true})
 		GameMode.frost_infernal:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 5, IsHidden = true})
+		GameMode.frost_infernal.Boss = true
 
 		GameMode:SpecialEventTPQuit(hero)
 		Notifications:Bottom(hero:GetPlayerOwnerID(),{text = "Special Event: Kill Frost Infernal for the Key of the 3 Moons. You have 2 minutes.", duration = 5.0})
@@ -1194,6 +1197,7 @@ local point = Entities:FindByName(nil, "all_hero_image_player")
 			GameMode.AllHeroImage:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 5,IsHidden = true})
 			GameMode.AllHeroImage:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 5,IsHidden = true})
 			GameMode.AllHeroImage:MakeIllusion()
+			GameMode.AllHeroImage.Boss = true
 
 			if illusion_spawn < 8 then
 				return_time = 0.2

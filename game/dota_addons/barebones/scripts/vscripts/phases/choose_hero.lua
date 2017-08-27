@@ -142,7 +142,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 
 	if PlayerResource:IsValidPlayer(id) and hero:GetUnitName() == "npc_dota_hero_wisp" then
 		for i = 1, #HEROLIST do -- 12 = POTM, 19 = Paladin, 25 = Banehallow, 26 = Brewmaster, 27 = Archimonde.
-			if caller:GetName() == "trigger_hero_12" or caller:GetName() == "trigger_hero_19" or caller:GetName() == "trigger_hero_25" or caller:GetName() == "trigger_hero_26" or caller:GetName() == "trigger_hero_27" then
+			if caller:GetName() == "trigger_hero_12" or caller:GetName() == "trigger_hero_19" or caller:GetName() == "trigger_hero_26" or caller:GetName() == "trigger_hero_27" then
 				Notifications:Bottom(hero:GetPlayerOwnerID(), {text = "This hero is disabled! Please choose a hero with a blue circle!", duration = 6.0})
 				return
 			end

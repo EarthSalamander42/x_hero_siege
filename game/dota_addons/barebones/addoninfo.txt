@@ -2,7 +2,7 @@
 {
 	"addontitle"					"X Hero Siege"
 	"addon_game_name"				"X Hero Siege"
-	"addonversion"					"3.37"
+	"addonversion"					"3.44"
 	"addontagline"					"SIEGE"
 	"addonauthor"					"[Bear] Cookies #42"
 	"addonSteamGroupName"			"X_Hero_Siege"

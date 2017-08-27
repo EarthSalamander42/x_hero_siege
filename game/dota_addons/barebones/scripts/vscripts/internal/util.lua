@@ -608,7 +608,7 @@ local units2 = FindUnitsInRadius( DOTA_TEAM_GOODGUYS, Vector(0, 0, 0), nil, FIND
 local units3 = FindUnitsInRadius( DOTA_TEAM_BADGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false )
 
 	for _,v in pairs(units) do
-		if v:HasMovementCapability() then
+		if v:HasMovementCapability() and not v.Boss then
 			v:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", nil)
 			v:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
 		end

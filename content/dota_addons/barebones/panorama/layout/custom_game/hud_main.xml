@@ -65,12 +65,6 @@
 		<Panel id="QuestsContainer" class="TopBottomFlow"/>
 	</Panel>
 
-	<Panel id="1UpPopup" hittest="false" hittestchildren="false">
-		<Panel class="1UpIcon"/>
-		<DOTAHeroImage id="1UpHeroIconOutline" heroname="npc_dota_hero_lycan" heroimagestyle="icon" hittest="false"/>
-		<DOTAHeroImage id="1UpHeroIcon" heroname="npc_dota_hero_lycan" heroimagestyle="icon" hittest="false"/>
-	</Panel>
-
 	<Panel id="BossHP" hittest="false">
 		<Label id="BossLabel" class="HoldoutLabelSmall" hittest="false" text=""/>
 		<Panel id="BossProgressBarContainer" hittest="false">
@@ -98,18 +92,6 @@
 				<Button id="CloseFloatingDialogButton" class="ButtonBevel CloseButton" onactivate="OnCloseDialogButtonPressed()" hittest="true"/>	
 			</Panel>
 					
-		</Panel>
-	</Panel>
-
-	<Panel id="RelicCourier" hittest="false">
-		<Button id="RelicsButton" class="ButtonBevel" onactivate="OnRelicButtonClicked()" hittest="true">
-			<Label id="RelicButtonText" text="#DOTA_Siltbreaker_RelicsButton"/>
-		</Button>
-		<Label id="RelicCountViolator" text="30"/>
-
-		<Panel id="RelicsContainerBackground">
-			<Panel id="RelicsContainer" hittest="false" class="TopBottomFlow">
-			</Panel>	
 		</Panel>
 	</Panel>
 

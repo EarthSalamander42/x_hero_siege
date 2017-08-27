@@ -74,7 +74,9 @@ function Precache(context)
 	PrecacheUnitByNameAsync("npc_dota_hero_centaur", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_chaos_knight", context) -- Special Wave and creeps
 	PrecacheUnitByNameAsync("npc_dota_hero_clinkz", context)
+	PrecacheUnitByNameAsync("npc_dota_hero_clockwerk", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_dazzle", context)
+	PrecacheUnitByNameAsync("npc_dota_hero_doom_bringer", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_drow_ranger", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_earth_spirit", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_ember_spirit", context)
@@ -83,9 +85,11 @@ function Precache(context)
 	PrecacheUnitByNameAsync("npc_dota_hero_invoker", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_juggernaut", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_keeper_of_the_light", context)
+	PrecacheUnitByNameAsync("npc_dota_hero_lich", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_lifestealer", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_lina", context) -- For Blood Mage 2.
 	PrecacheUnitByNameAsync("npc_dota_hero_lion", context)
+	PrecacheUnitByNameAsync("npc_dota_hero_lone_druid", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_luna", context) -- For creeps
 	PrecacheUnitByNameAsync("npc_dota_hero_lycan", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_magnataur", context)
@@ -105,11 +109,13 @@ function Precache(context)
 	PrecacheUnitByNameAsync("npc_dota_hero_techies", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_templar_assassin", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_terrorblade", context) -- For creeps
+	PrecacheUnitByNameAsync("npc_dota_hero_tinker", context) -- For Windrunner Lvl 20 Ability
 	PrecacheUnitByNameAsync("npc_dota_hero_tiny", context) -- For Mountain Giant
 	PrecacheUnitByNameAsync("npc_dota_hero_treant", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_vengefulspirit", context) -- For Incoming Wave 3.
 	PrecacheUnitByNameAsync("npc_dota_hero_warlock", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_weaver", context)
+	PrecacheUnitByNameAsync("npc_dota_hero_windrunner", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_wisp", context) -- For Connecting bug
 	PrecacheUnitByNameAsync("npc_dota_hero_zuus", context) -- Muradin Bronzebeard
 

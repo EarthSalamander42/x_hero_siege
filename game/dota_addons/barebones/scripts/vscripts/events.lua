@@ -129,7 +129,9 @@ local too_ez_gold = 0.9 -- The mod is way too ez, to modify gold very easily i j
 					end)
 					--debug
 					if hero_level == 17 then
-						npc:SetAbilityPoints(npc:GetAbilityPoints()-1)
+						if not hero:GetUnitName() == "npc_dota_hero_lone_druid" then
+							npc:SetAbilityPoints(npc:GetAbilityPoints()-1)
+						end
 					elseif hero_level >= 20 then
 						local ability = npc:FindAbilityByName("holdout_war_club_20")
 						npc:RemoveModifierByName("modifier_item_ultimate_scepter_consumed")
@@ -868,12 +870,6 @@ local lane = tonumber(cn)
 		end
 
 		if killedUnit:IsRealHero() and (killedUnit:GetTeamNumber() == DOTA_TEAM_GOODGUYS) then
-			local gameEvent = {}
-			gameEvent["player_id"] = killedUnit:GetPlayerID()
-			gameEvent["team_number"] = DOTA_TEAM_GOODGUYS
-			gameEvent["locstring_value"] = hero:GetUnitName()
-			gameEvent["message"] = "#Dungeon_KilledByCreature"
-			FireGameEvent("dota_combat_event_message", gameEvent)
 
 			local netTable = {}
 --			CustomGameEventManager:Send_ServerToPlayer(killedUnit:GetPlayerOwner(), "life_lost", netTable)

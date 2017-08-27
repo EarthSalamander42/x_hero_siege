@@ -1595,7 +1595,7 @@
 		"ItemHideCharges"					"0"
 		"ItemDisplayCharges"				"1"
 		"ItemInitialCharges"				"3"
-		"ItemStackable"						"0"
+		"ItemStackable"						"1"
 		"AllowedInBackpack"					"0"
 
 		// Special	
