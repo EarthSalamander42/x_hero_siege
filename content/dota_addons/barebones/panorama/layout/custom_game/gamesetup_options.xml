@@ -59,9 +59,9 @@
 					</Panel>
 					<Panel class="CustomGameSettingPanelDivider" hittest="false" />
 					<Panel class="ContainerCustomGameSettingOptions" hittest="false">
-						<RadioButton class="CGSRadio" group="CreepLanes" text="Simple" onactivate="OnVoteButtonPressed('creep_lanes', 1)" />
-						<RadioButton class="CGSRadio" group="CreepLanes" text="Double" onactivate="OnVoteButtonPressed('creep_lanes', 2)" />
-						<RadioButton class="CGSRadio4" group="CreepLanes" text="Full" onactivate="OnVoteButtonPressed('creep_lanes', 3)" />
+						<RadioButton class="CGSRadio" group="CreepLanes" text="Simple (1 lane per player)" onactivate="OnVoteButtonPressed('creep_lanes', 1)" />
+						<RadioButton class="CGSRadio" group="CreepLanes" text="Double (2 lanes per player)" onactivate="OnVoteButtonPressed('creep_lanes', 2)" />
+						<RadioButton class="CGSRadio4" group="CreepLanes" text="Full (8 lanes opened)" onactivate="OnVoteButtonPressed('creep_lanes', 3)" />
 					</Panel>
 				</Panel>
 <!--			<Panel id="DualHeroPanel" class="CustomSettingPanel" hittest="false">

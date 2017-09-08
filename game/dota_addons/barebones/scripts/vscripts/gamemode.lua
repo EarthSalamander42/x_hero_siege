@@ -39,18 +39,6 @@ function FrostTowersToFinalWave()
 end
 
 function GameMode:OnAllPlayersLoaded()
-GameMode.FrostInfernal_killed = 0
-GameMode.FrostInfernal_occuring = 0
-GameMode.SpiritBeast_killed = 0
-GameMode.SpiritBeast_occuring = 0
-GameMode.HeroImage_occuring = 0
-GameMode.AllHeroImages_occuring = 0
-GameMode.AllHeroImagesDead = 0
-GameMode.FrostTowers_killed = 0
-GameMode.BossesTop_killed = 0
-GameMode.creep_roll = {}
-GameMode.creep_roll["race"] = 0
-
 	for playerID = 0, DOTA_MAX_TEAM_PLAYERS -1 do
 		if PlayerResource:IsValidPlayer(playerID) then
 			PlayerResource:SetCustomPlayerColor(playerID, PLAYER_COLORS[playerID][1], PLAYER_COLORS[playerID][2], PLAYER_COLORS[playerID][3])
@@ -58,7 +46,10 @@ GameMode.creep_roll["race"] = 0
 	end
 
 	Timers:CreateTimer(3.0, function()
-		EmitGlobalSound("Global.InGame")
+		EmitSoundOn("Global.InGame", base_good)
+		if base_bad then
+			EmitSoundOn("Global.InGame", base_bad)
+		end
 	end)
 
 	GameRules:GetGameModeEntity():SetItemAddedToInventoryFilter(Dynamic_Wrap(GameMode, "ItemAddedFilter"), self)
@@ -269,7 +260,6 @@ local heroes = HeroList:GetAllHeroes()
 		local lanes = {"Simple", "Double", "Full"}
 		Timers:CreateTimer(3.0, function()
 			CustomGameEventManager:Send_ServerToAllClients("show_timer_bar", {})
-			CustomGameEventManager:Send_ServerToAllClients("hide_timer_hero_image", {}) -- no idea why i have to do it, should be collapsed by default
 			Notifications:TopToAll({text="DIFFICULTY: "..diff[GameRules:GetCustomGameDifficulty()], duration=10.0})
 			if FORCED_LANES == 0 then
 				Notifications:TopToAll({text="CREEP LANES: "..lanes[CREEP_LANES_TYPE], duration=10.0})
@@ -421,18 +411,25 @@ end
 	if newState == DOTA_GAMERULES_STATE_PRE_GAME then
 
 	elseif newState == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
-		CountdownTimerMuradin()
 		if SPECIAL_EVENT == 0 then
 			CountdownTimerIncomingWave()
 			CountdownTimerCreepLevel()
 		end
+		if GameMode.SpecialArena_occuring == 1 then
+			CountdownTimerSpecialArena()
+		else
+			CountdownTimerMuradin()
+		end
 		if GameMode.HeroImage_occuring == 1 then
 			CountdownTimerHeroImage()
-		elseif GameMode.SpiritBeast_occuring == 1 then
+		end
+		if GameMode.SpiritBeast_occuring == 1 then
 			CountdownTimerSpiritBeast()
-		elseif GameMode.FrostInfernal_occuring == 1 then
+		end
+		if GameMode.FrostInfernal_occuring == 1 then
 			CountdownTimerFrostInfernal()
-		elseif GameMode.AllHeroImages_occuring == 1 then
+		end
+		if GameMode.AllHeroImages_occuring == 1 then
 			CountdownTimerAllHeroImage()
 		end
 
@@ -486,6 +483,9 @@ end
 
 		if nTimer_SpecialEvent <= 0 then
 			nTimer_SpecialEvent = 1
+		end
+		if nTimer_SpecialArena <= 0 then
+			nTimer_SpecialArena = 1
 		end
 		if nTimer_IncomingWave <= 0 then
 			nTimer_IncomingWave = 1
@@ -623,6 +623,25 @@ function CountdownTimerCreepLevel()
 	CustomGameEventManager:Send_ServerToAllClients("timer_creep_level", broadcast_gametimer)
 end
 
+function CountdownTimerSpecialArena()
+	nTimer_SpecialArena = nTimer_SpecialArena - 1
+	local t = nTimer_SpecialArena
+	local minutes = math.floor(t / 60)
+	local seconds = t - (minutes * 60)
+	local m10 = math.floor(minutes / 10)
+	local m01 = minutes - (m10 * 10)
+	local s10 = math.floor(seconds / 10)
+	local s01 = seconds - (s10 * 10)
+	local broadcast_gametimer = 
+		{
+			timer_minute_10 = m10,
+			timer_minute_01 = m01,
+			timer_second_10 = s10,
+			timer_second_01 = s01,
+		}
+	CustomGameEventManager:Send_ServerToAllClients("timer_special_arena", broadcast_gametimer)
+end
+
 function CountdownTimerHeroImage()
 	nTimer_HeroImage = nTimer_HeroImage - 1
 	local t = nTimer_HeroImage
@@ -714,6 +733,8 @@ local frost = "item_orb_of_frost"
 		if hero:GetTeamNumber() == 2 or hero:GetTeamNumber() == 3 then
 			if item:GetName() == sword and sword_first_time then
 				SPECIAL_EVENT = 0
+				CustomGameEventManager:Send_ServerToAllClients("hide_timer_special_arena", {})
+				GameMode.SpecialArena_occuring = 0
 				if timers.RameroAndBaristol then
 					Timers:RemoveTimer(timers.RameroAndBaristol)
 				end
@@ -736,6 +757,8 @@ local frost = "item_orb_of_frost"
 			end
 			if item:GetName() == ring and ring_first_time then
 				SPECIAL_EVENT = 0
+				CustomGameEventManager:Send_ServerToAllClients("hide_timer_special_arena", {})
+				GameMode.SpecialArena_occuring = 0
 				if timers.Ramero then
 					Timers:RemoveTimer(timers.Ramero)
 				end

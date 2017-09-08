@@ -1367,7 +1367,7 @@ function CDungeonZone:OnThink()
 		self:BossThink()
 	end
 
-	self.flCompletionTime = self.flCompletionTime + 0.5
+	self.flCompletionTime = self.flCompletionTime + 1.0
 	self.PlayerStats["CompletionTime"] = self.flCompletionTime
 	self.PlayerStats["ZoneStars"] = self.nStars
 	CustomNetTables:SetTableValue( "zone_scores", self.szName, self.PlayerStats )

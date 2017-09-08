@@ -36,6 +36,7 @@
 #SpecialEvent,
 #IncomingWave,
 #CreepLevel,
+#SpecialArena,
 #HeroImage,
 #SpiritBeast,
 #FrostInfernal,
@@ -48,6 +49,7 @@
 	height: 45px;
 }
 
+#SpecialArena,
 #HeroImage,
 #SpiritBeast,
 #FrostInfernal,
@@ -59,6 +61,7 @@
 #SpecialEventsLabel,
 #IncomingWaveLabel,
 #CreepLevelLabel,
+#SpecialArenaLabel,
 #HeroImageLabel,
 #SpiritBeastLabel,
 #FrostInfernalLabel,
@@ -101,6 +104,7 @@
 #SpecialEventsTimer,
 #IncomingWaveTimer,
 #CreepLevelTimer,
+#SpecialArenaTimer,
 #HeroImageTimer,
 #SpiritBeastTimer,
 #FrostInfernalTimer,

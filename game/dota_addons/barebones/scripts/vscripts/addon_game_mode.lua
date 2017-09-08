@@ -103,6 +103,7 @@ function Precache(context)
 	PrecacheUnitByNameAsync("npc_dota_hero_phoenix", context) -- Dragons Level 1
 	PrecacheUnitByNameAsync("npc_dota_hero_razor", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_silencer", context)
+	PrecacheUnitByNameAsync("npc_dota_hero_slardar", context) -- Slardar (Centurion)
 	PrecacheUnitByNameAsync("npc_dota_hero_sniper", context) -- For creeps
 	PrecacheUnitByNameAsync("npc_dota_hero_sven", context) -- For Muradin Bronzebeard.
 	PrecacheUnitByNameAsync("npc_dota_hero_storm_spirit", context) -- For Spirit Master.

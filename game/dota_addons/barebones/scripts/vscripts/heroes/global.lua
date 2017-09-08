@@ -14,6 +14,7 @@ function Reincarnation(event)
 local hero = event.caster
 local ability = hero:FindAbilityByName("holdout_reincarnation") -- Ability
 local ankh = "item_ankh_of_reincarnation"
+local doom = "item_doom_artifact"
 local shield = "item_shield_of_invincibility"
 local position = hero:GetAbsOrigin()
 local RespawnTime = 5.0
@@ -102,11 +103,11 @@ if hero:IsIllusion() then return end
 				end
 			end
 		return
-		elseif hero:HasItemInInventory(shield) then
+		elseif hero:HasItemInInventory(shield) or hero:HasItemInInventory(doom) then
 			print("Shield")
 			for itemSlot = 0, 5 do
 				local item = hero:GetItemInSlot(itemSlot)
-				if item and item:GetName() == shield then
+				if item and item:GetName() == shield or item:GetName() == doom then
 					if item:IsCooldownReady() then
 						if hero:IsRealHero() then
 							hero.ankh_respawn = true
@@ -290,4 +291,8 @@ local unit = event.caster
 local caster = unit:GetPlayerOwner():GetAssignedHero()
 
 	caster:SetModifierStackCount("modifier_orb_of_darkness", caster, caster:GetModifierStackCount("modifier_orb_of_darkness", caster) -1)
+end
+
+function EndChannel(keys)
+	EndAnimation(keys.caster)
 end

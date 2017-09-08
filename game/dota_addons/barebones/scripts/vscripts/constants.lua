@@ -50,6 +50,7 @@ _G.nTimer_GameTime = 0
 _G.nTimer_SpecialEvent = 0
 _G.nTimer_IncomingWave = 0
 _G.nTimer_CreepLevel = 0
+_G.nTimer_SpecialArena = 0
 _G.nTimer_HeroImage = 0
 _G.nTimer_SpiritBeast = 0
 _G.nTimer_FrostInfernal = 0
@@ -87,6 +88,19 @@ _G.AllHeroImages_occuring = 0
 _G.AllHeroImagesDead = 0
 _G.FrostTowers_killed = 0
 _G.BossesTop_killed = 0
+
+GameMode.FrostInfernal_killed = 0
+GameMode.FrostInfernal_occuring = 0
+GameMode.SpiritBeast_killed = 0
+GameMode.SpiritBeast_occuring = 0
+GameMode.SpecialArena_occuring = 0
+GameMode.HeroImage_occuring = 0
+GameMode.AllHeroImages_occuring = 0
+GameMode.AllHeroImagesDead = 0
+GameMode.FrostTowers_killed = 0
+GameMode.BossesTop_killed = 0
+GameMode.creep_roll = {}
+GameMode.creep_roll["race"] = 0
 
 CREEP_LANES = {} -- Stores individual creep lanes {enable/disable, creep level, rax alive}
 CREEP_LANES[1] = {0, 1, 1}
@@ -197,6 +211,10 @@ _G.moderator = {
 	117795386	-- Xtinian
 }
 
+_G.ember_vip_members = {
+	114707349	-- I AM BACK
+}
+
 _G.golden_vip_members = {
 	69533529,	-- West
 	51728279,	-- mC
@@ -225,7 +243,8 @@ _G.golden_vip_members = {
 	84332517,	-- The Great King 0f Tanga-Ray [morris_91 on Discord]
 	290718556,	-- Souka Blett [souris]
 	175063550,	-- Zambla [Cousin souris]
-	23993414	-- Séra Antares
+	23993414,	-- Séra Antares
+	284268524	-- Minibizz
 }
 
 _G.vip_members = {

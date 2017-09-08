@@ -4128,7 +4128,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"items/shield_of_invincibility.lua"
+						"ScriptFile"	"heroes/global.lua"
 						"Function"		"Reincarnation"
 					}
 				}

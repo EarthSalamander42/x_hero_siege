@@ -90,14 +90,21 @@ local too_ez_gold = 0.9 -- The mod is way too ez, to modify gold very easily i j
 						end
 					end
 					if PlayerResource:GetSteamAccountID(npc:GetPlayerID()) == vip_members[i] then
-						npc:SetCustomHealthLabel("VIP Member", 45, 200, 45)
+						npc:SetCustomHealthLabel("VIP", 45, 200, 45)
 						if not npc:HasAbility("holdout_vip") then
 							local vip_ability = npc:AddAbility("holdout_vip")
 							vip_ability:SetLevel(1)
 						end
 					end
 					if PlayerResource:GetSteamAccountID(npc:GetPlayerID()) == golden_vip_members[i] then
-						npc:SetCustomHealthLabel("Golden VIP Member", 218, 165, 32)
+						npc:SetCustomHealthLabel("Golden VIP", 218, 165, 32)
+						if not npc:HasAbility("holdout_vip") then
+							local vip_ability = npc:AddAbility("holdout_vip")
+							vip_ability:SetLevel(1)
+						end
+					end
+					if PlayerResource:GetSteamAccountID(npc:GetPlayerID()) == ember_vip_members[i] then
+						npc:SetCustomHealthLabel("Ember VIP", 180, 0, 0)
 						if not npc:HasAbility("holdout_vip") then
 							local vip_ability = npc:AddAbility("holdout_vip")
 							vip_ability:SetLevel(1)
@@ -289,7 +296,7 @@ local AbilitiesHeroes_XX = {
 		npc_dota_hero_juggernaut = {{"brewmaster_primal_split", 2}},
 		npc_dota_hero_lich = {{"holdout_frost_chaos", 4}},
 		npc_dota_hero_luna = {{"holdout_neutralization", 2}},
-		npc_dota_hero_nevermore = {{"holdout_rain_of_chaos_20", 6}},
+		npc_dota_hero_nevermore = {{"holdout_rain_of_chaos_20", 2}},
 		npc_dota_hero_nyx_assassin = {{"holdout_burrow_impale", 2}},
 		npc_dota_hero_omniknight = {{"holdout_light_frenzy", 2}},
 		npc_dota_hero_phantom_assassin = {{"holdout_morph", 2}},

@@ -55,10 +55,10 @@ function OnDialogReceived( data )
 			g_nCurrentCharacter = g_szPendingDialog.length;
 		}
 	}
-	
+
 	$( "#DialogLabelSizer" ).text = g_szPendingDialog;
 	$( "#FloatingDialogLabelSizer" ).text = g_szPendingDialog;
-	
+
 	$( "#DialogPanel" ).SetHasClass( "ConfirmStyle", data["DialogPlayerConfirm"] == 1 );
 	$( "#DialogPlayerConfirm" ).SetHasClass( "Visible", data["DialogPlayerConfirm"] == 1) ;
 	$( "#ConfirmButton" ).SetHasClass( "Visible", data["DialogPlayerConfirm"] == 1 );
@@ -67,8 +67,7 @@ function OnDialogReceived( data )
 	$("#DialogPanel").SetDialogVariableInt("player_id_1", 1);
 	$("#DialogPanel").SetDialogVariableInt("player_id_2", 2);
 	$("#DialogPanel").SetDialogVariableInt("player_id_3", 3);
-	
-	
+
 	for(var i = 0; i < 8; i++)
 	{	
 		var heroImage = $( '#Player' + i + 'ConfirmIcon' );

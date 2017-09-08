@@ -4,7 +4,6 @@
 	[
 		"round_data",
 		"containers_lua",
-		"game_state",
 		"zone_scores",
 		"player_zone_locations",
 		"zone_names",

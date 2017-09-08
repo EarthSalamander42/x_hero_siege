@@ -76,6 +76,7 @@ FourBossesKillCount()
 		EmitSoundOn("skeleton_king_wraith_death_long_09", caster)
 		EmitSoundOn("skeleton_king_wraith_death_long_09", caster)
 		DoEntFire("door_illidan", "SetAnimation", "gate_entrance002_open", 0, nil, nil)
+		DoEntFire("door_illidan2", "SetAnimation", "gate_entrance002_open", 0, nil, nil)
 		caster:ForceKill(true)
 		local DoorObs = Entities:FindAllByName("obstruction_illidan")
 		for _, obs in pairs(DoorObs) do
@@ -111,6 +112,7 @@ FourBossesKillCount()
 	Timers:CreateTimer(6, function()
 		caster:ForceKill(true)
 		DoEntFire("door_balanar", "SetAnimation", "gate_entrance002_open", 0, nil, nil)
+		DoEntFire("door_balanar2", "SetAnimation", "gate_entrance002_open", 0, nil, nil)
 		local DoorObs = Entities:FindAllByName("obstruction_balanar")
 		for _, obs in pairs(DoorObs) do
 			obs:SetEnabled(false, true)
@@ -145,8 +147,9 @@ FourBossesKillCount()
 
 	Timers:CreateTimer(6, function()
 		DoEntFire("door_proudmoore2", "SetAnimation", "gate_entrance002_open", 0, nil, nil)
+		DoEntFire("door_proudmoore3", "SetAnimation", "gate_entrance002_open", 0, nil, nil)
 		caster:ForceKill(true)
-		local DoorObs = Entities:FindAllByName("obstruction_proudmoore2")
+		local DoorObs = Entities:FindAllByName("obstruction_proudmoore")
 		for _, obs in pairs(DoorObs) do
 			obs:SetEnabled(false, true)
 		end
@@ -189,7 +192,8 @@ FourBossesKillCount()
 	StartAnimation(caster, {duration=6.0, activity=ACT_DOTA_FLAIL, rate=0.75})
 
 	Timers:CreateTimer(6, function()
-		DoEntFire("door_proudmoore", "SetAnimation", "gate_entrance002_open", 0, nil, nil)
+		DoEntFire("door_proudmoore0", "SetAnimation", "gate_entrance002_open", 0, nil, nil)
+		DoEntFire("door_proudmoore1", "SetAnimation", "gate_entrance002_open", 0, nil, nil)
 		caster:ForceKill(true)
 		local DoorObs = Entities:FindAllByName("obstruction_proudmoore")
 		for _, obs in pairs(DoorObs) do

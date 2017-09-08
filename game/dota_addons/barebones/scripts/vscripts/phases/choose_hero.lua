@@ -1,7 +1,7 @@
 require('libraries/timers')
 
 STARTING_GOLD = 2000
-WeekHero = "npc_dota_hero_storm_spirit"
+WeekHero = "npc_dota_hero_skeleton_king"
 -- "npc_dota_hero_slardar"			-- Centurion
 -- "npc_dota_hero_skeleton_king"	-- Lich King
 -- "npc_dota_hero_meepo"			-- Kobold Knight
@@ -141,7 +141,7 @@ local id = hero:GetPlayerID()
 local difficulty = GameRules:GetCustomGameDifficulty()
 
 	if PlayerResource:IsValidPlayer(id) and hero:GetUnitName() == "npc_dota_hero_wisp" then
-		for i = 1, #HEROLIST do -- 12 = POTM, 19 = Paladin, 25 = Banehallow, 26 = Brewmaster, 27 = Archimonde.
+		for i = 1, #HEROLIST do -- 12 = POTM, 19 = Paladin, 26 = Brewmaster, 27 = Archimonde.
 			if caller:GetName() == "trigger_hero_12" or caller:GetName() == "trigger_hero_19" or caller:GetName() == "trigger_hero_26" or caller:GetName() == "trigger_hero_27" then
 				Notifications:Bottom(hero:GetPlayerOwnerID(), {text = "This hero is disabled! Please choose a hero with a blue circle!", duration = 6.0})
 				return
@@ -157,7 +157,6 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 				Notifications:Bottom(hero:GetPlayerOwnerID(), {text="HERO: ", duration = 5.0, style={color="white"}, continue=true})
 				Notifications:Bottom(hero:GetPlayerOwnerID(), {text="#npc_dota_hero_"..HEROLIST[i], duration = 5.0, style={color="white"}, continue=true})
 				PrecacheUnitByNameAsync("npc_dota_hero_"..HEROLIST[i], function()
---					PrecacheResource("soundfile", "soundevents/voscripts/game_sounds_vo_"..HEROLIST[i]..".vsndevts", function() end)
 					local newHero = PlayerResource:ReplaceHeroWith(id, "npc_dota_hero_"..HEROLIST[i], STARTING_GOLD, 0)
 					if difficulty < 4 then
 						local item = newHero:AddItemByName("item_ankh_of_reincarnation")
@@ -166,6 +165,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 					local item = newHero:AddItemByName("item_mana_potion")
 					if difficulty == 1 then
 						local item = newHero:AddItemByName("item_lifesteal_mask")
+						item:SetSellable(false)
 					end
 					if newHero:GetTeamNumber() == 2 then
 						TeleportHero(newHero, 3.0, base_good:GetAbsOrigin())
@@ -204,6 +204,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 						local item = newHero:AddItemByName("item_mana_potion")
 						if difficulty == 1 then
 							local item = newHero:AddItemByName("item_lifesteal_mask")
+							item:SetSellable(false)
 						end
 						if newHero:GetTeamNumber() == 2 then
 							TeleportHero(newHero, 3.0, base_good:GetAbsOrigin())
@@ -250,6 +251,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 					local item = newHero:AddItemByName("item_mana_potion")
 					if difficulty == 1 then
 						local item = newHero:AddItemByName("item_lifesteal_mask")
+						item:SetSellable(false)
 					end
 					if newHero:GetTeamNumber() == 2 then
 						TeleportHero(newHero, 3.0, base_good:GetAbsOrigin())

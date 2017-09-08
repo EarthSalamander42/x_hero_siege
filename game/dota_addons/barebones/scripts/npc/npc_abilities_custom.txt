@@ -10068,10 +10068,15 @@
 		"AbilityManaCost"				"150 300 450 600"
 		"AbilityTextureName"			"custom/holdout_bane_death_coil"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
-		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_BOTH"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
 		"AbilityDamage"					"250 500 850 1350"
-		"AbilityCastAnimation"			"ACT_DOTA_CAST_ABILITY_1"
+
+		"precache"
+		{
+			"particle"		"particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast.vpcf"
+			"soundfile"		"soundevents/game_sounds_heroes/game_sounds_skeleton_king.vsndevts"
+		}
 
 		"AbilitySpecial"
 		{
@@ -10079,6 +10084,15 @@
 			{
 				"var_type"				"FIELD_FLOAT"
 				"projectile_speed"		"1200"
+			}
+		}
+
+		"OnAbilityPhaseStart"
+		{
+			"RunScript"
+			{
+				"ScriptFile"	"heroes/hero_banehallow.lua"
+				"Function"		"DeathCoil"
 			}
 		}
 
@@ -10110,11 +10124,26 @@
 			}
 
 			"DeleteOnHit"		"1"
+			"Heal"
+			{
+				"Target"
+				{
+					"Center"	"TARGET"
+					"Teams"		"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
+					"Types"		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+				}
+				"HealAmount"	"%AbilityDamage"
+			}
 			"Damage"
 			{
-				"Target"		"TARGET"
-				"Type"			"DAMAGE_TYPE_MAGICAL"
-				"Damage"		"%AbilityDamage"
+				"Target"
+				{
+					"Center"	"TARGET"
+					"Teams"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
+					"Types"		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+				}
+				"Type"		"DAMAGE_TYPE_MAGICAL"
+				"Damage"	"%AbilityDamage"
 			}
 		}
 	}
@@ -10419,36 +10448,42 @@
 	
 		"OnSpellStart"
 		{ 
-	
-		  "ApplyModifier"
-		  {
-			"ModifierName"  "modifier_spawn_skulls"
-			"Target"     "CASTER"
-		  }
+			"ApplyModifier"
+			{
+				"ModifierName"	"modifier_spawn_skulls"
+				"Target"		"CASTER"
+			}
 		}
+
 		"OnProjectileHitUnit"
 		{
-		  "DeleteOnHit"  "1"
-		  "Damage"
-		  {
-			"Target"
+			"DeleteOnHit"  "1"
+			"Damage"
 			{
-			  "Center"    "TARGET"
-			  "Radius"   "%radius_skulls"
-			  "Teams"   "DOTA_UNIT_TARGET_TEAM_ENEMY"
-			  "Types"   "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+				"Target"
+				{
+					"Center"	"TARGET"
+					"Radius"	"%radius_skulls"
+					"Teams"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
+					"Types"		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+				}
+			"Type"		"DAMAGE_TYPE_MAGICAL"
+			"Damage"	"%damage_per_skull"
 			}
-			"Type"      "DAMAGE_TYPE_MAGICAL"
-			"Damage"    "%damage_per_skull"
-		  }
 		}
 
 		"OnChannelFinish"
 		{
 			"RemoveModifier"
 			{
-				"ModifierName"  "modifier_spawn_skulls"
-				"Target"     "CASTER"
+				"ModifierName"		"modifier_spawn_skulls"
+				"Target"			"CASTER"
+			}
+
+			"RunScript"
+			{
+				"ScriptFile"	"heroes/global.lua"
+				"Function"		"EndChannel"
 			}
 		}
 
@@ -16460,6 +16495,11 @@
 		"AbilityCooldown"			"13.0"
 		"AbilityCastRange"			"400"
 		"AbilityManaCost"			"160 220 280 340"
+
+		"precache"
+		{
+			"soundfile"		"soundevents/game_sounds_heroes/game_sounds_slark.vsndevts"
+		}
 
 		// Special
 		//-------------------------------------------------------------------------------------
@@ -28057,6 +28097,16 @@
 					"EffectName"			"particles/items_fx/black_king_bar_avatar.vpcf"
 					"EffectAttachType"		"follow_origin"
 					"Target"				"CASTER"
+				}
+
+				"OnCreated"
+				{
+					"ApplyModifier"
+					{
+						"ModifierName"	"modifier_invulnerable"
+						"Target" 		"CASTER"
+						"Duration"		"%duration"
+					}
 				}
 
 				"OnIntervalThink"

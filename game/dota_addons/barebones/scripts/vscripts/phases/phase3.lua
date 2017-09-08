@@ -10,7 +10,6 @@ local point_mag = Entities:FindByName(nil,"npc_dota_spawner_magtheridon_arena"):
 local point_mag2 = Entities:FindByName(nil,"npc_dota_spawner_magtheridon_arena2"):GetAbsOrigin()
 local ankh = CreateItem("item_magtheridon_ankh", mag, mag)
 local ankh2 = CreateItem("item_magtheridon_ankh", mag, mag)
-local heroes = HeroList:GetAllHeroes()
 local difficulty = GameRules:GetCustomGameDifficulty()
 
 	GameRules:SetHeroRespawnEnabled(false)
@@ -60,7 +59,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			magtheridon:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 10, IsHidden = true})
 			magtheridon:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 10, IsHidden = true})
 
-			for _,hero in pairs(heroes) do
+			for _,hero in pairs(HeroList:GetAllHeroes()) do
 			local id = hero:GetPlayerID()
 			local point = Entities:FindByName(nil, "point_teleport_boss_"..id)
 				if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
@@ -120,7 +119,6 @@ end
 
 function DarkProtectors(keys)
 local activator = keys.activator
-local point = Entities:FindByName(nil,"point_teleport_phase3_creeps"):GetAbsOrigin()
 local point2 = Entities:FindByName(nil, "spawner_phase3_creeps_west"):GetAbsOrigin()
 local point3 = Entities:FindByName(nil, "spawner_phase3_creeps_east"):GetAbsOrigin()
 RefreshPlayers()
@@ -130,21 +128,26 @@ RefreshPlayers()
 			DoEntFire("trigger_teleport_phase3_creeps", "Kill", nil, 0, nil, nil)
 			Notifications:TopToAll({text="Power Up: +250 to all stats!", style={color="green"}, duration=10.0})
 			activator:EmitSound("ui.trophy_levelup")
-			local heroes = HeroList:GetAllHeroes()
+			first_time_teleport_phase3_creeps = false
 
-			for _,hero in pairs(heroes) do
+			for _,hero in pairs(HeroList:GetAllHeroes()) do
 				if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
-					FindClearSpaceForUnit(hero, point, true)
+					local id = hero:GetPlayerID()
+					local point = Entities:FindByName(nil,"point_teleport_phase3_creeps_"..id)
+					FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
 					hero:Stop()
 					hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {Duration = 5, IsHidden = true})
 					hero:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 5, IsHidden = true})
 					hero:ModifyAgility(250)
 					hero:ModifyStrength(250)
 					hero:ModifyIntellect(250)
+					hero.dayvision = hero:GetDayTimeVisionRange()
+					hero.nightvision = hero:GetNightTimeVisionRange()
+					hero:SetDayTimeVisionRange(300)
+					hero:SetNightTimeVisionRange(300)
 					local particle1 = ParticleManager:CreateParticle("particles/econ/events/ti6/hero_levelup_ti6.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
 					ParticleManager:SetParticleControl(particle1, 0, hero:GetAbsOrigin())
 					PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
-					first_time_teleport_phase3_creeps = false
 					Timers:CreateTimer(0.1, function()
 						PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil)
 					end)
@@ -159,12 +162,20 @@ RefreshPlayers()
 				end
 			end
 
+			Timers:CreateTimer(5.0, function()
+				for _,hero in pairs(HeroList:GetAllHeroes()) do
+					hero:SetDayTimeVisionRange(hero.dayvision)
+					hero:SetNightTimeVisionRange(hero.nightvision)
+				end
+			end)
+
 			Timers:CreateTimer(10, function()
 				local DoorObs = Entities:FindAllByName("obstruction_grom")
 				for _, obs in pairs(DoorObs) do
 					obs:SetEnabled(false, true)
 				end
 				DoEntFire("door_grom", "SetAnimation", "gate_entrance002_open", 0, nil, nil)
+				DoEntFire("door_grom2", "SetAnimation", "gate_entrance002_open", 0, nil, nil)
 			end)
 		end
 	end)
@@ -184,7 +195,6 @@ end
 
 function StartArthasArena(keys)
 local activator = keys.activator
-local heroes = HeroList:GetAllHeroes()
 	if first_time_teleport_arthas_real then
 		DoEntFire("door_magtheridon", "SetAnimation", "gate_entrance002_idle", 0, nil, nil)
 		local DoorObs = Entities:FindAllByName("obstruction_magtheridon")
@@ -199,7 +209,7 @@ local heroes = HeroList:GetAllHeroes()
 		BossBar(arthas, "arthas")
 		arthas.zone = "xhs_holdout"
 
-		for _,hero in pairs(heroes) do
+		for _,hero in pairs(HeroList:GetAllHeroes()) do
 		local id = hero:GetPlayerID()
 		local point = Entities:FindByName(nil, "point_teleport_boss_"..id)
 			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
@@ -307,10 +317,9 @@ end
 
 function StartLichKingArena()
 local point_boss = Entities:FindByName(nil, "npc_dota_spawner_lich_king_bis"):GetAbsOrigin()
-local heroes = HeroList:GetAllHeroes()
 local reincarnate_time = 8.0
 
-	for _, hero in pairs(heroes) do
+	for _, hero in pairs(HeroList:GetAllHeroes()) do
 	local id = hero:GetPlayerID()
 	local point = Entities:FindByName(nil, "point_teleport_boss_"..id)
 		if hero:GetTeam() == DOTA_TEAM_GOODGUYS then

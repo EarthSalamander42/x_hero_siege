@@ -60,6 +60,7 @@ mode:SetFixedRespawnTime(1)
 		Notifications:TopToAll({text="Special Events are unlocked!", style={color="DodgerBlue"}, duration=5.0})
 		Entities:FindByName(nil, "trigger_special_event_tp_off"):Disable()
 		Entities:FindByName(nil, "trigger_special_event"):Enable()
+		CustomGameEventManager:Send_ServerToAllClients("update_special_event_label_farm", {})
 	end)
 
 	Timers:CreateTimer(time+6, function() -- 14:05 Min: MURADIN BRONZEBEARD EVENT 1, END
@@ -147,6 +148,7 @@ StunBuildings(time)
 		BT_ENABLED = 1
 		SPECIAL_EVENT = 0
 		EndFarmEvent()
+		CustomGameEventManager:Send_ServerToAllClients("update_special_event_label_final", {})
 
 		Timers:CreateTimer(10.0, function()
 			RestartCreeps()
@@ -216,9 +218,11 @@ end
 
 function RameroAndBaristolEvent(time) -- 500 kills
 local teleporters = Entities:FindAllByName("trigger_teleport_ramero_end")
-nTimer_SpecialEvent = time
+nTimer_SpecialArena = time
 SPECIAL_EVENT = 1
 StunBuildings(time)
+CustomGameEventManager:Send_ServerToAllClients("show_timer_special_arena", {})
+GameMode.SpecialArena_occuring = 1
 
 	local Ramero = CreateUnitByName("npc_ramero", Entities:FindByName(nil, "roshan_wp_4"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 	Ramero:AddNewModifier( nil, nil, "modifier_boss_stun", {duration = 5})
@@ -238,6 +242,8 @@ StunBuildings(time)
 		RestartCreeps()
 		UTIL_Remove(RAMERO_DUMMY)
 		UTIL_Remove(BARISTOL_DUMMY)
+		CustomGameEventManager:Send_ServerToAllClients("hide_timer_special_arena", {})
+		GameMode.SpecialArena_occuring = 0
 
 		if Ramero:IsNull() and Baristol:IsNull() then
 			return
@@ -266,9 +272,11 @@ end
 function RameroEvent(time) -- 750 kills
 SPECIAL_EVENT = 1
 local teleporters = Entities:FindAllByName("trigger_teleport_ramero_end")
-nTimer_SpecialEvent = time
+nTimer_SpecialArena = time
 PauseCreeps()
 StunBuildings(time)
+CustomGameEventManager:Send_ServerToAllClients("show_timer_special_arena", {})
+GameMode.SpecialArena_occuring = 1
 
 	local Ramero = CreateUnitByName("npc_ramero_2", Entities:FindByName(nil, "roshan_wp_4"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 	Ramero:AddNewModifier( nil, nil, "modifier_boss_stun", {duration = 5})
@@ -283,6 +291,8 @@ StunBuildings(time)
 		SPECIAL_EVENT = 0
 		RestartCreeps()
 		UTIL_Remove(RAMERO_BIS_DUMMY)
+		CustomGameEventManager:Send_ServerToAllClients("hide_timer_special_arena", {})
+		GameMode.SpecialArena_occuring = 0
 
 		if Ramero:IsNull() then
 			return
@@ -306,7 +316,6 @@ StunBuildings(time)
 		end
 	end)
 end
-
 
 function DuelEvent()
 PauseCreeps()

@@ -48,6 +48,18 @@ function TimerCreepLevel(data)
 	$("#CreepLevelTimer").text = timerText;
 }
 
+function TimerSpecialArena(data)
+{
+	var timerText = "";
+	timerText += data.timer_minute_10;
+	timerText += data.timer_minute_01;
+	timerText += ":";
+	timerText += data.timer_second_10;
+	timerText += data.timer_second_01;
+
+	$("#SpecialArenaTimer").text = timerText;
+}
+
 function TimerHeroImage(data)
 {
 	var timerText = "";
@@ -96,76 +108,80 @@ function TimerAllHeroImage(data)
 	$("#AllHeroImageTimer").text = timerText;
 }
 
-function ShowTimerBar()
-{
+function ShowTimerBar() {
 	$("#TimerPanels").style.visibility = "visible";
 }
 
-function ShowTimerHeroImage()
-{
+function ShowTimerSpecialArena() {
+	$("#SpecialArena").style.visibility = "visible";
+}
+
+function ShowTimerHeroImage() {
 	$("#HeroImage").style.visibility = "visible";
 }
 
-function ShowTimerSpiritBeast()
-{
+function ShowTimerSpiritBeast() {
 	$("#SpiritBeast").style.visibility = "visible";
 }
 
-function ShowTimerFrostInfernal()
-{
+function ShowTimerFrostInfernal() {
 	$("#FrostInfernal").style.visibility = "visible";
 }
 
-function ShowTimerAllHeroImage()
-{
+function ShowTimerAllHeroImage() {
 	$("#AllHeroImage").style.visibility = "visible";
 }
 
-function HideTimerHeroImage()
-{
+function HideTimerSpecialArena() {
+	$("#SpecialArena").style.visibility = "collapse";
+}
+
+function HideTimerHeroImage() {
 	$("#HeroImage").style.visibility = "collapse";
 }
 
-function HideTimerSpiritBeast()
-{
+function HideTimerSpiritBeast() {
 	$("#SpiritBeast").style.visibility = "collapse";
 }
 
-function HideTimerFrostInfernal()
-{
+function HideTimerFrostInfernal() {
 	$("#FrostInfernal").style.visibility = "collapse";
 }
 
-function HideTimerAllHeroImage()
-{
+function HideTimerAllHeroImage() {
 	$("#AllHeroImage").style.visibility = "collapse";
 }
 
-function OnGameStateChanged(table, key, data)
-{
-	$.Msg("Table '", table, "' changed: '", key, "' = ", data);
+function SpecialEventLabelFarm() {
+	$("#SpecialEventsLabel").text = "FARM EVENT:";
+}
+
+function SpecialEventLabelFinal() {
+	$("#SpecialEventsLabel").text = "FINAL WAVE:";
 }
 
 (function()
 {
-	// We use a nettable to communicate victory conditions to make sure we get the value regardless of timing.
-	CustomNetTables.SubscribeNetTableListener("game_state", OnGameStateChanged);
-
 	GameEvents.Subscribe("timer_game", GameTimer);
 	GameEvents.Subscribe("timer_special_event", TimerSpecialEvents);
 	GameEvents.Subscribe("timer_incoming_wave", TimerIncomingWave);
 	GameEvents.Subscribe("timer_creep_level", TimerCreepLevel);
+	GameEvents.Subscribe("timer_special_arena", TimerSpecialArena);
 	GameEvents.Subscribe("timer_hero_image", TimerHeroImage);
 	GameEvents.Subscribe("timer_spirit_beast", TimerSpiritBeastHeroImage);
 	GameEvents.Subscribe("timer_frost_infernal", TimerFrostInfernalHeroImage);
 	GameEvents.Subscribe("timer_all_hero_image", TimerAllHeroImage);
-	GameEvents.Subscribe("show_timer_bar", ShowTimerHeroImage);
+	GameEvents.Subscribe("show_timer_bar", ShowTimerBar);
+	GameEvents.Subscribe("show_timer_special_arena", ShowTimerSpecialArena);
 	GameEvents.Subscribe("show_timer_hero_image", ShowTimerHeroImage);
 	GameEvents.Subscribe("show_timer_spirit_beast", ShowTimerSpiritBeast);
 	GameEvents.Subscribe("show_timer_frost_infernal", ShowTimerFrostInfernal);
 	GameEvents.Subscribe("show_timer_all_hero_image", ShowTimerAllHeroImage);
+	GameEvents.Subscribe("hide_timer_special_arena", HideTimerSpecialArena);
 	GameEvents.Subscribe("hide_timer_hero_image", HideTimerHeroImage);
 	GameEvents.Subscribe("hide_timer_spirit_beast", HideTimerSpiritBeast);
 	GameEvents.Subscribe("hide_timer_frost_infernal", HideTimerFrostInfernal);
 	GameEvents.Subscribe("hide_timer_all_hero_image", HideTimerAllHeroImage);
+	GameEvents.Subscribe("update_special_event_label_farm", SpecialEventLabelFarm);
+	GameEvents.Subscribe("update_special_event_label_final", SpecialEventLabelFinal);
 })();

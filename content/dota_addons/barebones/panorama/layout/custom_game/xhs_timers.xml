@@ -13,7 +13,7 @@
 
 		<Panel id="TimerPanels">
 			<Panel id="SpecialEvent">
-				<Label id="SpecialEventsLabel" text="#Goal" />
+				<Label id="SpecialEventsLabel" text="Muradin Event:" />
 				<Label id="SpecialEventsTimer" text="--:--" />
 			</Panel>
 			<Panel id="IncomingWave">
@@ -23,6 +23,10 @@
 			<Panel id="CreepLevel">
 				<Label id="CreepLevelLabel" text="#CreepLevelGoal" />
 				<Label id="CreepLevelTimer" text="--:--" />
+			</Panel>
+			<Panel id="SpecialArena">
+				<Label id="SpecialArenaLabel" text="Special Arena:" />
+				<Label id="SpecialArenaTimer" text="--:--" />
 			</Panel>
 			<Panel id="HeroImage">
 				<Label id="HeroImageLabel" text="Hero Image:" />
