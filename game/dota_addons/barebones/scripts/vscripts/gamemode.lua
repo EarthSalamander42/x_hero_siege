@@ -21,6 +21,7 @@ require('phases/phase2')
 require('phases/phase3')
 require('zones/zones')
 require('triggers')
+require('items/global')
 
 function GameMode:OnFirstPlayerLoaded()
 base_good = Entities:FindByName(nil, "base_spawn_goodguys")

@@ -828,43 +828,12 @@ local cn = string.gsub(killedUnit:GetName(), "dota_badguys_tower", "")
 local lane = tonumber(cn)
 
 	if killedUnit then
-		-- Orb of Darkness
-		if killedUnit:IsCreep() then
-			if not killedUnit:IsConsideredHero() and LeavesCorpse(killedUnit) and killedUnit.no_corpse ~= true then
-				if hero:HasModifier("modifier_orb_of_darkness") and hero:GetModifierStackCount("modifier_orb_of_darkness", hero) < 10 then
-					--	local duration = ability:GetSpecialValueFor("duration")
-					hero:SetModifierStackCount("modifier_orb_of_darkness", hero, hero:GetModifierStackCount("modifier_orb_of_darkness", hero) +1)
-					local unit = CreateUnitByName(killedUnit:GetUnitName(), killedUnit:GetAbsOrigin(), true, hero, hero, hero:GetTeam())
-					unit:SetControllableByPlayer(hero:GetPlayerID(), true)
-					unit:SetOwner(hero)
-					unit:SetForwardVector(killedUnit:GetForwardVector())
-					unit:AddAbility("holdout_blue_effect"):SetLevel(1)
-					unit:AddAbility("orb_of_darkness_unit"):SetLevel(1)
-					FindClearSpaceForUnit(unit, killedUnit:GetAbsOrigin(), true)
+		OrbOfDarkness(hero, killedUnit)
 
-					-- Apply modifiers for the summon properties
-					unit:AddNewModifier(hero, nil, "modifier_kill", {duration = 25.0})
-					unit:AddNewModifier(hero, nil, "modifier_summoned", {})
-					unit:SetNoCorpse()
-					unit.no_corpse = true
-
-					-- Remove non-passive abilities
-					for i = 0, 15 do
-						local a = unit:GetAbilityByIndex(i)
-						if a and not a:IsPassive() then
-							a:SetActivated(false)
-						end
-					end
-				end
-			end
-		end
-
-		-- Unit under control
 		if IsValidEntity(hero:GetPlayerOwner()) then
 			hero = hero:GetPlayerOwner():GetAssignedHero()
 		end
 
-		-- Illusion under control
 		if hero:IsIllusion() and hero:GetTeamNumber() == 2 then
 			hero = PlayerResource:GetPlayer(hero:GetPlayerID()):GetAssignedHero()
 		end
@@ -877,7 +846,6 @@ local lane = tonumber(cn)
 		end
 
 		if killedUnit:IsRealHero() and (killedUnit:GetTeamNumber() == DOTA_TEAM_GOODGUYS) then
-
 			local netTable = {}
 --			CustomGameEventManager:Send_ServerToPlayer(killedUnit:GetPlayerOwner(), "life_lost", netTable)
 

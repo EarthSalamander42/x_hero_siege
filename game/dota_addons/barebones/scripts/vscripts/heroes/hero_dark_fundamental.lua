@@ -29,8 +29,6 @@ local radius = ability:GetSpecialValueFor("radius")
 local cleave = ability:GetSpecialValueFor("cleave_pct")
 local full_damage = caster:GetAverageTrueAttackDamage(caster) + bonus_damage * stacks -- 100 * caster Level
 local cleave_pct = cleave * full_damage / 100
-print(full_damage)
-print(cleave_pct)
 
 	ability:StartCooldown(cooldown)
 	caster:RemoveModifierByName(modifier_dark_cleave)
@@ -49,7 +47,7 @@ print(cleave_pct)
 	end
 
 	Timers:CreateTimer(cooldown, function()
-		ability:ApplyDataDrivenModifier( caster, caster, modifier_dark_cleave, {})
+		ability:ApplyDataDrivenModifier(caster, caster, modifier_dark_cleave, {})
 	end)
 end
 
@@ -175,7 +173,7 @@ CURRENT_XP = caster:GetCurrentXP()
 	StartAnimation(caster, {duration = 1.933, activity = ACT_DOTA_VICTORY, rate = 1.0})
 end
 
-function SkinChangerCaster(keys)
+function SkinChanger(keys)
 local caster = keys.caster
 local PlayerID = caster:GetPlayerID()
 local gold = caster:GetGold()
@@ -186,72 +184,30 @@ local Agility = caster:GetBaseAgility()
 local HP = caster:GetHealth()
 local Mana = caster:GetMana()
 
-	local hero = PlayerResource:ReplaceHeroWith( PlayerID, "npc_dota_hero_keeper_of_the_light", gold, 0)
-	local ability = hero:FindAbilityByName("holdout_skin_changer_warrior"):StartCooldown(60)
+	local hero = PlayerResource:ReplaceHeroWith(PlayerID, keys.HeroSwap, gold, 0)
+	hero:GetAbilityByIndex(4):StartCooldown(60)
 	hero:AddExperience(CURRENT_XP, false, false)
+	hero:SetAbsOrigin(loc)
+	hero:SetBaseStrength(Strength)
+	hero:SetBaseIntellect(Intellect)
+	hero:SetBaseAgility(Agility)
+	hero:SetHealth(HP)
+	hero:SetMana(Mana)
 
 	local items = {}
 	for i = 0, 8 do
-		if caster:GetItemInSlot(i) ~= nil and caster:GetItemInSlot(i):GetName() ~= "item_classchange_reset" then
+		if caster:GetItemInSlot(i) and caster:GetItemInSlot(i):GetName() ~= "item_classchange_reset" then
 			itemCopy = CreateItem(caster:GetItemInSlot(i):GetName(), nil, nil)
 			items[i] = itemCopy
 		end
 	end
 	for i = 0, 8 do
-		if items[i] ~= nil then
+		if items[i] then
 			hero:AddItem(items[i])
 			items[i]:SetCurrentCharges(caster:GetItemInSlot(i):GetCurrentCharges())
+			items[i]:StartCooldown(caster:GetItemInSlot(i):GetCooldownTimeRemaining())
 		end
 	end
-	hero:SetAbsOrigin(loc)
-	hero:SetBaseStrength(Strength)
-	hero:SetBaseIntellect(Intellect)
-	hero:SetBaseAgility(Agility)
-	hero:SetHealth(HP)
-	hero:SetMana(Mana)
-
-	Timers:CreateTimer(1.0, function()
-		if not caster:IsNull() then
-			UTIL_Remove(caster)
-		end
-	end)
-end
-
-function SkinChangerWarrior( keys )
-local caster = keys.caster
-local PlayerID = caster:GetPlayerID()
-local gold = caster:GetGold()
-local loc = caster:GetAbsOrigin()
-local Strength = caster:GetBaseStrength()
-local Intellect = caster:GetBaseIntellect()
-local Agility = caster:GetBaseAgility()
-local HP = caster:GetHealth()
-local Mana = caster:GetMana()
-
-	local hero = PlayerResource:ReplaceHeroWith( PlayerID, "npc_dota_hero_chaos_knight", gold, 0)
-	local ability = hero:FindAbilityByName("holdout_skin_changer_caster"):StartCooldown(60)
-	hero:AddExperience(CURRENT_XP, false, false)
-
-local items = {}
-	for i = 0, 8 do
-		if caster:GetItemInSlot(i) ~= nil and caster:GetItemInSlot(i):GetName() ~= "item_classchange_reset" then
-			itemCopy = CreateItem(caster:GetItemInSlot(i):GetName(), nil, nil)
-			items[i] = itemCopy
-		end
-	end
-
-	for i = 0, 8 do
-		if items[i] ~= nil then
-			hero:AddItem(items[i])
-			items[i]:SetCurrentCharges(caster:GetItemInSlot(i):GetCurrentCharges())
-		end
-	end
-	hero:SetAbsOrigin(loc)
-	hero:SetBaseStrength(Strength)
-	hero:SetBaseIntellect(Intellect)
-	hero:SetBaseAgility(Agility)
-	hero:SetHealth(HP)
-	hero:SetMana(Mana)
 
 	Timers:CreateTimer(1.0, function()
 		if not caster:IsNull() then

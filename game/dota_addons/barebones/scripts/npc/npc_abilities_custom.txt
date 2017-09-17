@@ -24850,8 +24850,8 @@
 		{
 			"DelayedAction"
 			{
-				"Delay"     "0.2"
-				"Action"    
+				"Delay"		"0.2"
+				"Action"
 				{
 					"RunScript"
 					{
@@ -25032,7 +25032,8 @@
 					"RunScript"
 					{
 						"ScriptFile"			"heroes/hero_dark_fundamental.lua"
-						"Function"				"SkinChangerCaster"
+						"Function"				"SkinChanger"
+						"HeroSwap"				"npc_dota_hero_keeper_of_the_light"
 					}
 				}
 			}
@@ -25640,7 +25641,8 @@
 					"RunScript"
 					{
 						"ScriptFile"			"heroes/hero_dark_fundamental.lua"
-						"Function"				"SkinChangerWarrior"
+						"Function"				"SkinChanger"
+						"HeroSwap"				"npc_dota_hero_chaos_knight"
 					}
 				}
 			}

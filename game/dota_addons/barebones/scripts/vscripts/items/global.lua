@@ -162,3 +162,39 @@ local caster = keys.caster
 		CreateUnitByName("npc_dota_hero_magtheridon_small", caster:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 	end
 end
+
+function OrbOfDarkness(hero, killedUnit)
+local duration = 0
+
+	if killedUnit:IsCreep() then
+		if not killedUnit:IsConsideredHero() and LeavesCorpse(killedUnit) and killedUnit.no_corpse ~= true then
+			if hero:HasModifier("modifier_orb_of_darkness") and hero:GetModifierStackCount("modifier_orb_of_darkness", hero) < 10 then
+				if hero:FindAbilityByName("item_orb_of_darkness") then
+					print("Orb of Darkness 1")
+					local duration = hero:FindAbilityByName("item_orb_of_darkness"):GetSpecialValueFor("duration")
+					print(duration)
+				end
+				hero:SetModifierStackCount("modifier_orb_of_darkness", hero, hero:GetModifierStackCount("modifier_orb_of_darkness", hero) +1)
+				local unit = CreateUnitByName(killedUnit:GetUnitName(), killedUnit:GetAbsOrigin(), true, hero, hero, hero:GetTeam())
+				unit:SetControllableByPlayer(hero:GetPlayerID(), true)
+				unit:SetOwner(hero)
+				unit:SetForwardVector(killedUnit:GetForwardVector())
+				unit:AddAbility("holdout_blue_effect"):SetLevel(1)
+				unit:AddAbility("orb_of_darkness_unit"):SetLevel(1)
+				FindClearSpaceForUnit(unit, killedUnit:GetAbsOrigin(), true)
+	
+				unit:AddNewModifier(hero, nil, "modifier_kill", {duration = 25.0})
+				unit:AddNewModifier(hero, nil, "modifier_summoned", {})
+				unit:SetNoCorpse()
+				unit.no_corpse = true
+	
+				for i = 0, 15 do
+					local a = unit:GetAbilityByIndex(i)
+					if a and not a:IsPassive() then
+						a:SetActivated(false)
+					end
+				end
+			end
+		end
+	end
+end

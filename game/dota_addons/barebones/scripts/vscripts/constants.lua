@@ -212,7 +212,8 @@ _G.moderator = {
 }
 
 _G.ember_vip_members = {
-	114707349	-- I AM BACK
+	114707349,	-- I AM BACK
+	122360298	-- hu_5ky
 }
 
 _G.golden_vip_members = {
