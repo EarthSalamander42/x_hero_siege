@@ -268,7 +268,8 @@ _G.vip_members = {
 	53939628,	-- Bloodsplatr [taylor justus on Patreon]
 	52986304,	-- RawkitLawnChair [CDarps on Patreon]
 	5671643,	-- `btk [Aureo Neto on Patreon]
-	92290724	-- www.dick.com.kw	[Abdullah Al Zaben on Patreon]
+	92290724,	-- www.dick.com.kw	[Abdullah Al Zaben on Patreon]
+	110475852	-- gg [Geo Gaal on Patreon]
 
 }
 
