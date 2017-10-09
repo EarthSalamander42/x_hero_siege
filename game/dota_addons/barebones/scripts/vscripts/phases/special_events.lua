@@ -35,8 +35,8 @@ mode:SetFixedRespawnTime(1)
 			end)
 		else
 			print("Wrong Player?")
---			Notifications:TopToAll({text="Invalid Steam ID detected!! #ERROR 002 ", duration = 10.0})
---			Notifications:TopToAll({text="Please report this bug on Discord Chat!! #ERROR 002 ", continue = true})
+			Notifications:TopToAll({text="Invalid Steam ID detected!! #ERROR 002 ", duration = 10.0})
+			Notifications:TopToAll({text="Please report this bug on Discord Chat!! #ERROR 002 ", continue = true})
 		end
 	end
 
@@ -107,15 +107,18 @@ StunBuildings(time)
 		hero.old_pos = hero:GetAbsOrigin()
 		if hero:IsIllusion() then
 		elseif hero:IsRealHero() then
-			id = hero:GetPlayerID()
-			point = Entities:FindByName(nil, "farm_event_player_"..id)
+			local id = hero:GetPlayerID()
+			local point = Entities:FindByName(nil, "farm_event_player_"..id)
 
-			if point then
+			if id == nil then
+				Notifications:TopToAll({text="Invalid Steam ID detected!! #ERROR 003 ", duration = 10.0})
+				Notifications:TopToAll({text="Please report this bug on Discord!! #ERROR 003 ", continue = true})
+			elseif point == nil then
+				Notifications:TopToAll({text="Invalid teleport point detected!! #ERROR 004 ", duration = 10.0})
+				Notifications:TopToAll({text="Please report this bug on Discord!! #ERROR 004 ", continue = true})
+			else
 				FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
 				PlayerResource:SetCameraTarget(hero:GetPlayerID(), hero)
-			else
-				Notifications:TopToAll({text="Invalid Steam ID detected!! #ERROR 003 ", duration = 10.0})
-				Notifications:TopToAll({text="Please report this bug on Discord Chat!! #ERROR 003 ", continue = true})
 			end
 
 			for j = 1, 10 do
@@ -130,7 +133,7 @@ StunBuildings(time)
 			FarmEventCreeps(id)
 		else
 			Notifications:TopToAll({text="Invalid Steam ID detected!! #ERROR 001 ", duration = 10.0})
-			Notifications:TopToAll({text="Please report this bug on Discord Chat!! #ERROR 001 ", continue = true})
+			Notifications:TopToAll({text="Please report this bug on Discord!! #ERROR 001 ", continue = true})
 		end
 	end
 

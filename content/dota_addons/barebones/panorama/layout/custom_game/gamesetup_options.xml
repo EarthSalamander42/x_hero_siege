@@ -8,15 +8,6 @@
 		<include src="s2r://panorama/scripts/custom_game/custom_ui_manifest.js" />
 	</scripts>
 
-	<script>
-		function OnVoteButtonPressed(category, vote)
-		{
-			$.Msg("Category: ", category);
-			$.Msg("Vote: ", vote);
-			GameEvents.SendCustomGameEventToServer( "setting_vote", { "category":category, "vote":vote } );
-		}
-	</script>
-
 	<Panel class="ContainerGameSetup" hittest="false">
 		<Panel class="CustomSettingsColumn2" hittest="false" >
 		<Panel id="CommunityLabels">
@@ -47,10 +38,10 @@
 					</Panel>
 					<Panel class="CustomGameSettingPanelDivider" hittest="false" />
 					<Panel class="ContainerCustomGameSettingOptions" hittest="false">
-						<RadioButton class="CGSRadio1" group="GameLength" text="Easy: 150% Gold, 125% XP, 75% Damage" onactivate="OnVoteButtonPressed('difficulty', 1)" />
-						<RadioButton class="CGSRadio2" group="GameLength" text="Normal: 110% Gold, 100% XP, 100% Damage" onactivate="OnVoteButtonPressed('difficulty', 2)" />
-						<RadioButton class="CGSRadio3" group="GameLength" text="Hard: 100% Gold, 90% XP, 125% Damage" onactivate="OnVoteButtonPressed('difficulty', 3)" />
-						<RadioButton class="CGSRadio4" group="GameLength" text="Extreme: 100% Gold, 75% XP, 150% Damage" onactivate="OnVoteButtonPressed('difficulty', 4)" />
+						<RadioButton id="VoteDifficulty1" class="CGSRadio1" group="GameLength" text="#vote_difficulty_1" onactivate="OnVoteButtonPressed('difficulty', 1)" />
+						<RadioButton id="VoteDifficulty2" class="CGSRadio2" group="GameLength" text="#vote_difficulty_2" onactivate="OnVoteButtonPressed('difficulty', 2)" />
+						<RadioButton id="VoteDifficulty3" class="CGSRadio3" group="GameLength" text="#vote_difficulty_3" onactivate="OnVoteButtonPressed('difficulty', 3)" />
+						<RadioButton id="VoteDifficulty4" class="CGSRadio4" group="GameLength" text="#vote_difficulty_4" onactivate="OnVoteButtonPressed('difficulty', 4)" />
 					</Panel>
 				</Panel>
 				<Panel class="CustomSettingPanel" hittest="false">

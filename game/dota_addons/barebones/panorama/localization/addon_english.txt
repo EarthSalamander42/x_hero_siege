@@ -22,6 +22,11 @@
 	"community_description_2"					"- Join the Steam Group to report bugs and join events!"
 	"community_description_3"					"- Join the Facebook Page for Changelog and recent infos about the mod!"
 
+	"vote_difficulty_1"							"Easy: 150% Gold, 125% XP, 75% Damage"
+	"vote_difficulty_2"							"Normal: 110% Gold, 100% XP, 100% Damage"
+	"vote_difficulty_3"							"Hard: 100% Gold, 90% XP, 125% Damage"
+	"vote_difficulty_4"							"Extreme: 100% Gold, 75% XP, 150% Damage"
+
 	// Admin Mod
 	"credits_command"							"Mod Created by [Bear] Cookies #42"
 	"command"									"Commands:"

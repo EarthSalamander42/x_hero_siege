@@ -237,5 +237,14 @@ _G.ZonesDefinition =
 				nCompleteLimit = 1,
 			},
 		},
+		AlliedStructures =
+		{
+			{
+				fSpawnChance = 1.0,
+				szSpawnerName = "xhs_campfire",
+				szNPCName = "npc_dota_campfire",
+				nMaxSpawnDistance = 0,
+			},
+		},
 	},
 }

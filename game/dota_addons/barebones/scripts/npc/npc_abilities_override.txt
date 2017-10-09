@@ -2104,63 +2104,6 @@
 	}
 
 	//=================================================================================================================
-	// Troll Warlord: Berserker's Rage
-	//=================================================================================================================
-	"troll_warlord_berserkers_rage"
-	{		
-		// Casting
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCastPoint"				"0.2"
-		"MaxLevel"						"1"
-
-		// Special
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilitySpecial"
-		{
-			"01"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_hp"				"0"
-			}
-			"02"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_move_speed"		"25"
-			}
-			"03"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_armor"			"10"
-			}
-			"04"
-			{	
-				"var_type"				"FIELD_INTEGER"
-				"bonus_range"			"350"
-			}
-			"05"
-			{
-				"var_type"				"FIELD_FLOAT"
-				"base_attack_time"		"1.50"
-			}	
-			"07"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bash_chance"			"10"
-			}
-			"08"
-			{
-				"var_type"				"FIELD_FLOAT"
-				"bash_duration"			"0.25"
-			}
-			"09"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bash_damage"			"350"
-			}
-		}
-	}
-
-	//=================================================================================================================
 	// Troll Warlord: Whirling Axes (Ranged)
 	//=================================================================================================================
 	"troll_warlord_whirling_axes_ranged"
@@ -2168,11 +2111,11 @@
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityCastRange"				"1000"
-		"AbilityCastPoint"				"0.2 0.2 0.2 0.2"
+		"AbilityCastPoint"				"0.2"
 
 		// Time		
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCooldown"				"19 16 13 10"
+		"AbilityCooldown"				"19.0 16.0 13.0 10.0"
 
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
@@ -3374,7 +3317,82 @@
 				"var_type"						"FIELD_INTEGER"
 				"grow_bonus_damage_pct_scepter"	"0"
 			}
+		}
+	}
 
+	//=================================================================================================================
+	// Medusa: Split Shot
+	//=================================================================================================================
+	"medusa_split_shot"
+	{
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"damage_modifier"			"-20"
+			}
+			"02"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"damage_modifier_tooltip"	"80"
+			}
+			"03"
+			{	
+				"var_type"					"FIELD_INTEGER"
+				"arrow_count"				"2 4 6 8"
+			}
+			"04"
+			{	
+				"var_type"					"FIELD_INTEGER"
+				"total_arrow_count"			"3 5 7 9"
+				"LinkedSpecialBonus"		"special_bonus_unique_medusa_2"
+			}
+			"05"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"range"						"700"
+			}
+			"06"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"projectile_speed"			"1200"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Medusa: Mystic Snake
+	//=================================================================================================================
+	"medusa_mystic_snake"
+	{		
+		"HasScepterUpgrade"				"0"
+
+		"AbilityCastRange"				"800 900 1000 1100"
+		"AbilityManaCost"				"150 250 350 450"
+
+		"AbilitySpecial"
+		{
+			"02"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"snake_jumps"			"3 5 7 9"
+			}
+			"04"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"snake_damage"			"160 320 480 720"
+			}
+			"05"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"snake_mana_steal"		"10 15 20 25"
+			}
+			"06"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"snake_scale"			"50"
+			}
 		}
 	}
 }

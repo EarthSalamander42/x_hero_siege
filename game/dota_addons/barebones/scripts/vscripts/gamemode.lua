@@ -30,15 +30,6 @@ base_good = Entities:FindByName(nil, "base_spawn_goodguys")
 	end
 end
 
-function FrostTowersToFinalWave()
-	if GameMode.FrostTowers_killed >= ICE_TOWERS_REQUIRED then
-		nTimer_SpecialEvent = 60
-		nTimer_IncomingWave = 1
-		nTimer_CreepLevel = 1
-		KillCreeps(DOTA_TEAM_CUSTOM_1)
-	end
-end
-
 function GameMode:OnAllPlayersLoaded()
 	for playerID = 0, DOTA_MAX_TEAM_PLAYERS -1 do
 		if PlayerResource:IsValidPlayer(playerID) then

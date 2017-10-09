@@ -21,7 +21,8 @@ local mode = GameMode
 	end
 	mode.VoteTable[keys.category][pid] = keys.vote
 
-	--PrintTable(mode.VoteTable)
+	-- TODO: Finish votes show up
+	CustomGameEventManager:Send_ServerToAllClients("send_votes", {category = keys.category, vote = keys.vote, table = mode.VoteTable, table2 = mode.VoteTable[keys.category]})
 end
 
 -- An NPC has spawned somewhere in game. This includes heroes
@@ -123,6 +124,7 @@ local too_ez_gold = 0.9 -- The mod is way too ez, to modify gold very easily i j
 				npc.CurrentZoneName = nil
 				self:OnPlayerHeroEnteredZone(npc, "xhs_holdout")
 				npc.ankh_respawn = false
+				npc:AddNewModifier(npc, nil, "modifier_hero", {})
 			elseif npc.bFirstSpawnComplete == true then
 				if npc:GetUnitName() == "npc_dota_hero_chaos_knight" or npc:GetUnitName() == "npc_dota_hero_keeper_of_the_light" then
 					npc:SetAbilityPoints(0)
@@ -423,7 +425,7 @@ local AbilitiesHeroes_XX = {
 			end
 		end
 
-		if hero:GetUnitName() == "npc_dota_hero_storm_spirit" or hero:GetUnitName() == "npc_dota_hero_earth_spirit" or hero:GetUnitName() == "npc_dota_hero_ember_spirit" or hero:GetUnitName() == "npc_dota_hero_ursa" or hero:GetUnitName() == "npc_dota_hero_troll_warlord" or hero:GetUnitName() == "npc_dota_hero_mirana" or hero:GetUnitName() == "npc_dota_hero_lina" or hero:GetUnitName() == "npc_dota_hero_monkey_king" or hero:GetUnitName() == "npc_dota_hero_lone_druid" or hero:GetUnitName() == "npc_dota_hero_doom_bringer" or hero:GetUnitName() == "npc_dota_hero_leshrac" then
+		if hero:GetUnitName() == "npc_dota_hero_medusa" or hero:GetUnitName() == "npc_dota_hero_storm_spirit" or hero:GetUnitName() == "npc_dota_hero_earth_spirit" or hero:GetUnitName() == "npc_dota_hero_ember_spirit" or hero:GetUnitName() == "npc_dota_hero_ursa" or hero:GetUnitName() == "npc_dota_hero_troll_warlord" or hero:GetUnitName() == "npc_dota_hero_mirana" or hero:GetUnitName() == "npc_dota_hero_lina" or hero:GetUnitName() == "npc_dota_hero_monkey_king" or hero:GetUnitName() == "npc_dota_hero_lone_druid" or hero:GetUnitName() == "npc_dota_hero_doom_bringer" or hero:GetUnitName() == "npc_dota_hero_leshrac" then
 			print("No Level 20 Ability")
 		else
 			print("Whisper Level 20 Ability")
@@ -1100,7 +1102,7 @@ local lane = tonumber(cn)
 						nTimer_SpecialEvent = 60
 						nTimer_IncomingWave = 1
 						PHASE_3 = 1
-						PauseCreeps()
+						KillCreeps(DOTA_TEAM_CUSTOM_1)
 						Timers:CreateTimer(59, RefreshPlayers)
 						Timers:CreateTimer(60, FinalWave)
 					end

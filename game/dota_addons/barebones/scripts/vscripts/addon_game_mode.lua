@@ -33,7 +33,7 @@ function Precache(context)
 	PrecacheResource("particle_folder", "models/items/ancient_apparition/shatterblast_crown", context)
 	PrecacheResource("particle_folder", "particles/econ/items/nyx_assassin/nyx_assassin_ti6_witness", context)
 	PrecacheResource("particle_folder", "particles/econ/courier/courier_axolotl_ambient", context)
-	PrecacheResource("particle_folder", "particles/units/heroes/hero_earth_spirit/", context)
+	PrecacheResource("particle_folder", "particles/units/heroes/hero_earth_spirit", context)
 	PrecacheResource("particle_folder", "particles/econ/items/effigies/status_fx_effigies", context)
 	PrecacheResource("particle_folder", "particles/econ/items/shadow_fiend/sf_fire_arcana", context)
 	PrecacheResource("particle_folder", "particles/econ/items/abaddon/abaddon_alliance", context)
@@ -43,6 +43,7 @@ function Precache(context)
 	PrecacheResource("particle_folder", "particles/units/heroes/heroes_underlord", context)
 	PrecacheResource("particle_folder", "particles/frostivus_gameplay", context)
 	PrecacheResource("particle_folder", "particles/econ/events/ti7/teleport_end_ti7_lvl3.vpcf", context)
+	PrecacheResource("particle_folder", "particles/units/heroes/hero_shadow_shaman", context)
 
 	PrecacheResource("particle", "particles/units/heroes/hero_dazzle/dazzle_armor_enemy_ring_sink.vpcf", context)
 	PrecacheResource("particle", "particles/econ/items/dazzle/dazzle_dark_light_weapon/dazzle_dark_shallow_grave_ground.vpcf", context)
@@ -130,6 +131,7 @@ function Precache(context)
 --	PrecacheUnitByNameSync( "npc_frost_infernal_bis", context)
 
 --	-- PRECACHE SOUNDS
+	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_death_prophet.vsndevts", context) -- For Incoming Wave 4
 	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_dragon_knight.vsndevts", context) -- For Incoming Wave 4
 	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_elder_titan.vsndevts", context)
 	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_leshrac.vsndevts", context)

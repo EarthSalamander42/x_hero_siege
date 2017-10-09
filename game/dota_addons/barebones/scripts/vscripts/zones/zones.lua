@@ -58,9 +58,11 @@ function CDungeonZone:Init( data )
 	self.bSpawnedSquads = false
 	self.bSpawnedChests = false
 	self.bSpawnedBreakables = false
+	self.bSpawnedAlliedStructures = false
 	self.Squads = data.Squads or {}
 	self.Chests = data.Chests or {}
 	self.Breakables = data.Breakables or {}
+	self.AlliedStructures = data.AlliedStructures or {}
 	self.nVIPsKilled = 0
 	self.VIPsAlive = {}
 	self.VIPs = data.VIPs or {}
@@ -508,6 +510,62 @@ end
 
 --------------------------------------------------------------------
 
+function CDungeonZone:SpawnAlliedStructures()
+	if self.bSpawnedAlliedStructures == true then
+		return
+	end
+
+	self.bSpawnedAlliedStructures = true
+
+	--print( "-----------------------------------" )
+	--print( "CDungeonZone:SpawnAlliedStructures()" )
+	--print( string.format( "There are %d structure tables in zone \"%s\"", #self.AlliedStructures, self.szName ) )
+	--PrintTable( self.AlliedStructures, "   " )
+
+	for index, structureTable in ipairs( self.AlliedStructures ) do
+		--print( "" )
+		--print( "Looking at structureTable #" .. index )
+		if ( structureTable.szSpawnerName == nil ) then
+			print( string.format( "CDungeonZone:SpawnAlliedStructures() - ERROR: No szSpawnerName specified for this structure. [Zone: \"%s\"]", self.szName ) )
+		end
+
+		local fSpawnChance = structureTable.fSpawnChance
+		if fSpawnChance == nil or fSpawnChance <= 0 then
+			print( string.format( "CDungeonZone:SpawnAlliedStructures - ERROR: Structure spawn chance is not valid [Zone: \"%s\"]", self.szName ) )
+		end
+
+		if structureTable.nMaxSpawnDistance == nil or structureTable.nMaxSpawnDistance < 0 then
+			print( string.format( "CDungeonZone:SpawnAlliedStructures - WARNING: nMaxSpawnDistance is not valid. Defaulting to 0. [Zone: \"%s\"]", self.szName ) )
+			structureTable.nMaxSpawnDistance = 0
+		end
+
+		if ( structureTable.szSpawnerName ) then
+			--print( "structureTable.szSpawnerName == " .. structureTable.szSpawnerName )
+			local hSpawners = Entities:FindAllByName( structureTable.szSpawnerName )
+			for _, hSpawner in pairs( hSpawners ) do
+				local vSpawnLoc = hSpawner:GetOrigin() + RandomVector( RandomFloat( 0, structureTable.nMaxSpawnDistance ) )
+				-- Roll dice to determine whether to spawn structure at this spawner
+				local fThreshold = 1 - fSpawnChance
+				local bSpawnStructure = RandomFloat( 0, 1 ) >= fThreshold
+				if bSpawnStructure then
+					local hUnit = CreateUnitByName( structureTable.szNPCName, vSpawnLoc, true, nil, nil, DOTA_TEAM_GOODGUYS )
+					if hUnit then
+						local vSpawnerForward = hSpawner:GetForwardVector()
+						hUnit:SetForwardVector( vSpawnerForward )
+
+						--print( "Created allied structure unit named " .. hUnit:GetUnitName() )
+						hUnit.zone = self
+
+						--self:AddBreakableContainerToZone( hUnit )
+					end
+				end
+			end
+		end
+	end
+end
+
+--------------------------------------------------------------------
+
 function CDungeonZone:SpawnVIPs( vipsTable )
 	--print( "-----------------------------------" )
 	--print( "CDungeonZone:SpawnVIPs()" )
@@ -893,6 +951,10 @@ function CDungeonZone:Activate()
 
 	if self.bSpawnedBreakables == false and self.Breakables and #self.Breakables > 0 then
 		self:SpawnBreakables()
+	end
+
+	if self.bSpawnedAlliedStructures == false and self.AlliedStructures and #self.AlliedStructures > 0 then
+		self:SpawnAlliedStructures()
 	end
 
 	if not self.bSpawnedVIPs then

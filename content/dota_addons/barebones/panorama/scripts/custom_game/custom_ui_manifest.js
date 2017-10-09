@@ -1,9 +1,16 @@
 "use strict"
 
+var VotingOptionPanels = {};
+
+function OnVoteButtonPressed(category, vote)
+{
+//	$.Msg("Category: ", category);
+//	$.Msg("Vote: ", vote);
+	GameEvents.SendCustomGameEventToServer( "setting_vote", { "category":category, "vote":vote } );
+}
 
 function InitUI()
 {
-	$.Msg("Init UI!")
 	var map_info = Game.GetMapInfo();
 	if (map_info.map_display_name == "ranked_2v2") {
 		$.GetContextPanel().FindChildTraverse("VoteColumn").style.visibility = "collapse";
@@ -35,6 +42,30 @@ function InitUI()
 //		$.GetContextPanel().GetParent().GetParent().FindChildTraverse("HUDElements").FindChildTraverse("topbar").FindChildTraverse("TopBarDireTeam").style.visibility = "collapse";
 	}
 }
+
+function OnVotesReceived(data)
+{
+//	$.Msg(data.category)
+//	$.Msg(data.vote)
+	$.Msg(data.table) // Regroup all votes from a specific player ID.
+
+	var Players = Game.GetPlayerIDsOnTeam( DOTATeam_t.DOTA_TEAM_GOODGUYS );
+
+	$.Each( Players, function( player ) {
+		$.Msg("Player: " + player)
+		if (data.category == "difficulty") {
+			$.Msg(data.vote)
+			$("#VoteDifficulty" + data.vote).text = $.Localize("vote_difficulty_" + data.vote) + " (+1)"
+			$.Msg($("#VoteDifficulty" + data.vote).text)
+		}
+
+		if (data.category == "creep_lanes") {
+
+		}
+	});
+}
+
+GameEvents.Subscribe( "send_votes", OnVotesReceived );
 
 (function(){
 	InitUI()

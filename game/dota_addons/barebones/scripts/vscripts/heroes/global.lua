@@ -1,5 +1,3 @@
-require("libraries/timers")
-
 function Lifesteal(event)
 local attacker = event.attacker
 local target = event.target
@@ -296,3 +294,143 @@ end
 function EndChannel(keys)
 	EndAnimation(keys.caster)
 end
+
+
+campfire = class({})
+
+LinkLuaModifier( "modifier_campfire", "heroes/global", LUA_MODIFIER_MOTION_NONE )
+LinkLuaModifier( "modifier_campfire_effect", "heroes/global", LUA_MODIFIER_MOTION_NONE )
+
+function campfire:GetIntrinsicModifierName()
+	return "modifier_campfire"
+end
+
+
+modifier_campfire = class({})
+
+function modifier_campfire:IsHidden()
+	return true
+end
+
+function modifier_campfire:IsPurgable()
+	return false
+end
+
+function modifier_campfire:IsAura()
+	return true
+end
+
+function modifier_campfire:GetModifierAura()
+	return  "modifier_campfire_effect"
+end
+
+function modifier_campfire:GetAuraSearchTeam()
+	return DOTA_UNIT_TARGET_TEAM_FRIENDLY
+end
+
+function modifier_campfire:GetAuraSearchType()
+	return DOTA_UNIT_TARGET_ALL
+end
+
+function modifier_campfire:GetAuraRadius()
+	return self.aura_radius
+end
+
+function modifier_campfire:OnCreated( kv )
+	if IsServer() then
+		self.aura_radius = self:GetAbility():GetSpecialValueFor( "aura_radius" )
+
+		self:GetParent():AddNewModifier( nil, nil, "modifier_disable_aggro", { duration = -1 } )
+		self:GetParent():AddNewModifier( nil, nil, "modifier_provides_fow_position", { duration = -1 } )
+
+		EmitSoundOn( "Campfire.Warmth.Loop", self:GetParent() )
+
+		self:StartIntervalThink( 0.25 )
+	end
+end
+
+function modifier_campfire:CheckState()
+	local state = {}
+	if IsServer()  then
+		state[MODIFIER_STATE_ROOTED] = true
+		state[MODIFIER_STATE_NO_HEALTH_BAR] = true
+		state[MODIFIER_STATE_NOT_ON_MINIMAP] = true
+		state[MODIFIER_STATE_BLIND] = true
+		state[MODIFIER_STATE_INVULNERABLE] = true
+		state[MODIFIER_STATE_OUT_OF_GAME] = true
+	end
+
+	return state
+end
+
+function modifier_campfire:OnIntervalThink()
+	if IsServer() then
+		if ( not self.nFXIndex ) then
+			local vCasterPos = self:GetCaster():GetOrigin()
+			local vOffset = Vector( 0, 0, 50 )
+
+			self.nFXIndex = ParticleManager:CreateParticle( "particles/act_2/campfire_flame.vpcf", PATTACH_ABSORIGIN, self:GetCaster() )
+			ParticleManager:SetParticleControl( self.nFXIndex, 2, vCasterPos + vOffset )
+		end
+	end
+end
+
+function modifier_campfire:OnDestroy()
+	if IsServer() then
+		StopSoundOn( "Campfire.Warmth.Loop", self:GetParent() )
+	end
+end
+
+modifier_campfire_effect = class({})
+
+function modifier_campfire_effect:GetEffectName()
+	return "particles/camp_fire_buff.vpcf"
+end
+
+function modifier_campfire_effect:OnCreated( kv )
+
+end
+
+function modifier_campfire_effect:DeclareFunctions()
+	local funcs = 
+	{
+		MODIFIER_PROPERTY_HEALTH_REGEN_PERCENTAGE,
+		MODIFIER_PROPERTY_MANA_REGEN_TOTAL_PERCENTAGE
+	}
+	return funcs
+end
+
+function modifier_campfire_effect:GetModifierHealthRegenPercentage( params )
+	return self:GetAbility():GetSpecialValueFor( "aura_hp_regen" )
+end
+
+function modifier_campfire_effect:GetModifierTotalPercentageManaRegen( params )
+	return self:GetAbility():GetSpecialValueFor( "aura_mana_regen" )
+end
+
+LinkLuaModifier( "modifier_hero", "heroes/global", LUA_MODIFIER_MOTION_NONE )
+
+modifier_hero = class({})
+
+function modifier_hero:IsDebuff() return false end
+function modifier_hero:IsHidden() return true end
+function modifier_hero:IsPurgable() return false end
+function modifier_hero:IsPurgeException() return false end
+function modifier_hero:IsStunDebuff() return false end
+function modifier_hero:RemoveOnDeath() return false end
+
+--	function modifier_hero:GetAttackSound()
+--		local hero_name = self:GetParent():GetUnitName()
+--		hero_name = string.gsub(hero_name, "npc_dota_hero_", "")
+--	
+--		print("Hero_"..hero_name..".Attack")
+--		return "Hero_"..hero_name..".Attack"
+--	end
+--	
+--	function modifier_hero:DeclareFunctions()
+--		local decFuncs = 
+--		{
+--			MODIFIER_PROPERTY_TRANSLATE_ATTACK_SOUND
+--		}
+--		return decFuncs
+--	end

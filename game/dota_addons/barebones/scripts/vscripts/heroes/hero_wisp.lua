@@ -68,9 +68,8 @@ local IsAvailableHero = Entities:FindByName(nil, "trigger_hero_"..random)
 		Notifications:Bottom(hero:GetPlayerOwnerID(), {hero="npc_dota_hero_"..HEROLIST[random], duration = 5.0})
 		Notifications:Bottom(hero:GetPlayerOwnerID(), {text="HERO: ", duration = 5.0, style={color="white"}, continue=true})
 		Notifications:Bottom(hero:GetPlayerOwnerID(), {text="#npc_dota_hero_"..HEROLIST[random], duration = 5.0, style={color="white"}, continue=true})
-		Timers:CreateTimer(3.1, function()
-			local newHero = PlayerResource:ReplaceHeroWith(hero:GetPlayerID(), "npc_dota_hero_"..HEROLIST[random], STARTING_GOLD * 2, 0)
-			newHero:RespawnHero(false, false, false)
+		PrecacheUnitByNameAsync("npc_dota_hero_"..HEROLIST[i], function()
+			local newHero = PlayerResource:ReplaceHeroWith(id, "npc_dota_hero_"..HEROLIST[i], STARTING_GOLD, 0)
 			if difficulty < 4 then
 				local item = newHero:AddItemByName("item_ankh_of_reincarnation")
 			end
@@ -78,14 +77,20 @@ local IsAvailableHero = Entities:FindByName(nil, "trigger_hero_"..random)
 			local item = newHero:AddItemByName("item_mana_potion")
 			if difficulty == 1 then
 				local item = newHero:AddItemByName("item_lifesteal_mask")
+				item:SetSellable(false)
 			end
-			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
+			if newHero:GetTeamNumber() == 2 then
+				TeleportHero(newHero, 3.0, base_good:GetAbsOrigin())
+			elseif newHero:GetTeamNumber() == 3 then
+				TeleportHero(newHero, 3.0, base_bad:GetAbsOrigin())
+			end
 			Timers:CreateTimer(0.1, function()
 				if not hero:IsNull() then
 					UTIL_Remove(hero)
 				end
 			end)
-		end)
+		end, id)
+		return
 	elseif Entities:FindByName(nil, "trigger_hero_12") or Entities:FindByName(nil, "trigger_hero_19") or Entities:FindByName(nil, "trigger_hero_26") or Entities:FindByName(nil, "trigger_hero_27") then
 		print("This hero is either chosen or disabled! Re-rolls Random Hero")
 		ChooseRandomHero(event)

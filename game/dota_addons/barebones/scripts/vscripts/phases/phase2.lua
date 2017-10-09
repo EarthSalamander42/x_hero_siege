@@ -53,34 +53,6 @@ function spawn_second_phase_right()
 	end)
 end
 
-function killed_frost_tower_left(keys)
-GameMode.FrostTowers_killed = GameMode.FrostTowers_killed +1
-
-	if GameMode.FrostTowers_killed >= ICE_TOWERS_REQUIRED then
-		Notifications:TopToAll({text="WARNING! Final Wave incoming. Arriving in 60 seconds! Back to the Castle!" , duration=10.0})
-		Timers:CreateTimer(59, RefreshPlayers)
-		Timers:CreateTimer(60,FinalWave)
-		FrostTowersToFinalWave()
-		for _, hero in pairs(HeroList:GetAllHeroes()) do
-			hero:SetRespawnsDisabled(false)
-		end
-	end
-end
-
-function killed_frost_tower_right(keys)
-GameMode.FrostTowers_killed = GameMode.FrostTowers_killed +1
-
-	if GameMode.FrostTowers_killed >= ICE_TOWERS_REQUIRED then
-		Notifications:TopToAll({text="WARNING! Final Wave incoming. Arriving in 60 seconds! Back to the Castle!" , duration=10.0})
-		Timers:CreateTimer(59, RefreshPlayers)
-		Timers:CreateTimer(60, FinalWave)
-		FrostTowersToFinalWave()
-		for _, hero in pairs(HeroList:GetAllHeroes()) do
-			hero:SetRespawnsDisabled(false)
-		end
-	end
-end
-
 function FinalWave()
 	for _, hero in pairs(HeroList:GetAllHeroes()) do
 		if hero:GetTeam() == DOTA_TEAM_GOODGUYS then

@@ -631,7 +631,7 @@ end
 
 function KillCreeps(teamnumber)
 local units = FindUnitsInRadius(teamnumber, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false )
-	
+
 	for _,v in pairs(units) do
 		if v:HasMovementCapability() then
 			v:RemoveSelf()

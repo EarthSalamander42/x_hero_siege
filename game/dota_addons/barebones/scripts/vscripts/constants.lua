@@ -67,7 +67,7 @@ _G.sword_first_time = true
 _G.ring_first_time = true
 _G.doom_first_time = false
 _G.frost_first_time = false
-_G.X_HERO_SIEGE_V = 3.44
+_G.X_HERO_SIEGE_V = 3.45
 _G.SECRET = 0
 _G.PHASE_3 = 0
 _G.RESPAWN_TIME = 40.0
@@ -149,7 +149,7 @@ HEROLIST[27] = "warlock"			-- Archimonde
 -- DOTA 2
 HEROLIST[28] = "axe"
 HEROLIST[29] = "monkey_king"
-HEROLIST[30] = "troll_warlord"
+HEROLIST[30] = "medusa"
 HEROLIST[31] = "doom_bringer"
 HEROLIST[32] = "bristleback"
 HEROLIST[33] = "leshrac"
@@ -208,6 +208,7 @@ _G.administrator = {
 }
 
 _G.moderator = {
+	84332517,	-- Pentagon Solek [morris_91 on Discord]
 	117795386	-- Xtinian
 }
 
@@ -241,7 +242,6 @@ _G.golden_vip_members = {
 	111692244,	-- [Iris Von Everec on Steam, May paid, 2 months left for Permanent]
 	97490223,	-- IllidanStormrage [Lucas Diao on Patreon]
 	34067920,	-- Shush
-	84332517,	-- The Great King 0f Tanga-Ray [morris_91 on Discord]
 	290718556,	-- Souka Blett [souris]
 	175063550,	-- Zambla [Cousin souris]
 	23993414,	-- Séra Antares
@@ -269,7 +269,8 @@ _G.vip_members = {
 	52986304,	-- RawkitLawnChair [CDarps on Patreon]
 	5671643,	-- `btk [Aureo Neto on Patreon]
 	92290724,	-- www.dick.com.kw	[Abdullah Al Zaben on Patreon]
-	110475852	-- gg [Geo Gaal on Patreon]
+	110475852,	-- gg [Geo Gaal on Patreon]
+	78677276	-- Subject Zero [Yaroslav Kochevatkin on Patreon]
 
 }
 
@@ -321,6 +322,7 @@ _G.innate_abilities = {
 	"forest_troll_high_priest_heal",
 	"holdout_mana_shield",
 	"holdout_berserkers_rage",
+	"holdout_berserkers_rage_alt",
 	"holdout_rejuvenation",
 	"holdout_resistant_skin",
 	"holdout_roar",
