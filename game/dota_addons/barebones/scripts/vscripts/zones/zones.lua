@@ -499,6 +499,7 @@ function CDungeonZone:SpawnBreakables()
 						hUnit.nMinGold = breakableTable.nMinGold
 						hUnit.nMaxGold = breakableTable.nMaxGold
 						hUnit.fGoldChance = breakableTable.fGoldChance
+						hUnit:AddNewModifier( hUnit, nil, "modifier_breakable_container", {} )
 
 						self:AddBreakableContainerToZone( hUnit )
 					end

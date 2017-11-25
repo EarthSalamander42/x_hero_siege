@@ -68,12 +68,12 @@ local IsAvailableHero = Entities:FindByName(nil, "trigger_hero_"..random)
 		Notifications:Bottom(hero:GetPlayerOwnerID(), {hero="npc_dota_hero_"..HEROLIST[random], duration = 5.0})
 		Notifications:Bottom(hero:GetPlayerOwnerID(), {text="HERO: ", duration = 5.0, style={color="white"}, continue=true})
 		Notifications:Bottom(hero:GetPlayerOwnerID(), {text="#npc_dota_hero_"..HEROLIST[random], duration = 5.0, style={color="white"}, continue=true})
-		PrecacheUnitByNameAsync("npc_dota_hero_"..HEROLIST[i], function()
-			local newHero = PlayerResource:ReplaceHeroWith(id, "npc_dota_hero_"..HEROLIST[i], STARTING_GOLD, 0)
+		PrecacheUnitByNameAsync("npc_dota_hero_"..HEROLIST[random], function()
+			local newHero = PlayerResource:ReplaceHeroWith(id, "npc_dota_hero_"..HEROLIST[random], STARTING_GOLD, 0)
 			if difficulty < 4 then
 				local item = newHero:AddItemByName("item_ankh_of_reincarnation")
 			end
-			local item = newHero:AddItemByName("item_healing_potion")
+			local item = newHero:AddItemByName("item_health_potion")
 			local item = newHero:AddItemByName("item_mana_potion")
 			if difficulty == 1 then
 				local item = newHero:AddItemByName("item_lifesteal_mask")

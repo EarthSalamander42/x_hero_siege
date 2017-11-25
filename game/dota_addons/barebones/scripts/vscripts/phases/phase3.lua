@@ -1,5 +1,3 @@
-require('libraries/timers')
-
 first_time_teleport = true
 first_time_teleport_phase3_creeps = true
 first_time_teleport_arthas = true

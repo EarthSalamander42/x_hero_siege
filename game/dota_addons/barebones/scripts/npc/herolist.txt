@@ -1,7 +1,7 @@
 // <key>  <value>
 // Hero   currently on/off, will be # of instances (-1 = infinite)
 
-"CustomHeroList"
+"activelist"
 {
 	"npc_dota_hero_abyssal_underlord"	"1" 	//Underlord
 	"npc_dota_hero_lone_druid"			"1" 	//Beastmaster
@@ -30,8 +30,9 @@
 	"npc_dota_hero_sniper"				"0"		//Rifleman
 	"npc_dota_hero_sven"				"1"		//Mountain King
 	"npc_dota_hero_sand_king"			"1"		//Desert Wyrm
-	"npc_dota_hero_storm_spirit"		"1"		//Spirit Master
 	"npc_dota_hero_shadow_shaman"		"0"		//Rhasta
+	"npc_dota_hero_skeleton_king"		"1"		//Lich King
+	"npc_dota_hero_storm_spirit"		"1"		//Spirit Master
 	"npc_dota_hero_tinker"				"0"		//Iron Man
 	"npc_dota_hero_tiny"				"1"		//Stone Giant
 	"npc_dota_hero_terrorblade"			"1"		//Illidan

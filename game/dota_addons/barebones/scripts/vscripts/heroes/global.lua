@@ -27,7 +27,7 @@ if hero:IsIllusion() then return end
 				hero.respawn_timer = Timers:CreateTimer(RespawnTime, function() 
 					hero:SetRespawnPosition(position)
 					hero:EmitSound("Ability.ReincarnationAlt")
-					hero:RespawnHero(false, false, false)
+					hero:RespawnHero(false, false)
 					ParticleManager:CreateParticle("particles/items_fx/aegis_respawn.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
 					hero:SetRespawnsDisabled(false)
 					Timers:CreateTimer(0.1, function()
@@ -59,7 +59,7 @@ if hero:IsIllusion() then return end
 				hero.respawn_timer = Timers:CreateTimer(RespawnTime, function() 
 					hero:SetRespawnPosition(position)
 					hero:EmitSound("Ability.ReincarnationAlt")
-					hero:RespawnHero(false, false, false)
+					hero:RespawnHero(false, false)
 					ParticleManager:CreateParticle("particles/items_fx/aegis_respawn.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
 					hero:SetRespawnsDisabled(false)
 					Timers:CreateTimer(0.1, function()
@@ -113,7 +113,7 @@ if hero:IsIllusion() then return end
 							hero.respawn_timer = Timers:CreateTimer(RespawnTime, function() 
 								hero:SetRespawnPosition(position)
 								hero:EmitSound("Ability.ReincarnationAlt")
-								hero:RespawnHero(false, false, false)
+								hero:RespawnHero(false, false)
 								ParticleManager:CreateParticle("particles/items_fx/aegis_respawn.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
 								hero:SetRespawnsDisabled(false)
 								Timers:CreateTimer(0.1, function()
@@ -408,16 +408,16 @@ function modifier_campfire_effect:GetModifierTotalPercentageManaRegen( params )
 	return self:GetAbility():GetSpecialValueFor( "aura_mana_regen" )
 end
 
-LinkLuaModifier( "modifier_hero", "heroes/global", LUA_MODIFIER_MOTION_NONE )
+--	LinkLuaModifier( "modifier_hero", "heroes/global", LUA_MODIFIER_MOTION_NONE )
 
-modifier_hero = class({})
+--	modifier_hero = class({})
 
-function modifier_hero:IsDebuff() return false end
-function modifier_hero:IsHidden() return true end
-function modifier_hero:IsPurgable() return false end
-function modifier_hero:IsPurgeException() return false end
-function modifier_hero:IsStunDebuff() return false end
-function modifier_hero:RemoveOnDeath() return false end
+--	function modifier_hero:IsDebuff() return false end
+--	function modifier_hero:IsHidden() return true end
+--	function modifier_hero:IsPurgable() return false end
+--	function modifier_hero:IsPurgeException() return false end
+--	function modifier_hero:IsStunDebuff() return false end
+--	function modifier_hero:RemoveOnDeath() return false end
 
 --	function modifier_hero:GetAttackSound()
 --		local hero_name = self:GetParent():GetUnitName()

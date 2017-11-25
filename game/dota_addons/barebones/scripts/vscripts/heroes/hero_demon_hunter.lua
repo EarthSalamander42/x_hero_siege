@@ -1,5 +1,3 @@
-require('libraries/timers')
-
 function Immolation( event )
 local manacost_per_second = 10
 
@@ -9,6 +7,70 @@ local manacost_per_second = 10
 		event.ability:ToggleAbility()
 	end
 end
+
+--------------------------------------
+
+xhs_vampiric_aura = xhs_vampiric_aura or class({})
+LinkLuaModifier("modifier_xhs_vampiric_aura", "heroes/hero_demon_hunter.lua", LUA_MODIFIER_MOTION_NONE)
+
+function xhs_vampiric_aura:GetAbilityTextureName()
+	return "custom/holdout_thirst_aura"
+end
+
+function xhs_vampiric_aura:GetIntrinsicModifierName()
+	return "modifier_xhs_vampiric_aura"
+end
+
+-- Fountain aura 
+modifier_xhs_vampiric_aura = modifier_xhs_vampiric_aura or class({})
+
+function modifier_xhs_vampiric_aura:OnCreated()
+	self.caster = self:GetCaster()
+	self.ability = self:GetAbility()
+	if not self.ability or not self.caster:IsRealHero() then
+		self:Destroy()
+		return nil
+	end
+
+	-- Ability specials
+	self.aura_radius = self.ability:GetSpecialValueFor("aura_radius")
+	self.aura_stickyness = self.ability:GetSpecialValueFor("aura_stickyness")
+end
+
+--ability properties
+function modifier_xhs_vampiric_aura:OnRefresh()
+	self:OnCreated()
+end
+
+function modifier_xhs_vampiric_aura:GetAuraDuration()
+	return self.aura_stickyness
+end
+
+function modifier_xhs_vampiric_aura:GetAuraRadius()
+	return self.aura_radius
+end
+
+function modifier_xhs_vampiric_aura:GetAuraSearchFlags()
+	return DOTA_UNIT_TARGET_FLAG_PLAYER_CONTROLLED
+end
+
+function modifier_xhs_vampiric_aura:GetAuraSearchTeam()
+	return DOTA_UNIT_TARGET_TEAM_FRIENDLY
+end
+
+function modifier_xhs_vampiric_aura:GetAuraSearchType()
+	return DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC
+end
+
+function modifier_xhs_vampiric_aura:GetModifierAura()
+	return "modifier_lifesteal"
+end
+
+function modifier_xhs_vampiric_aura:IsAura() return true end
+function modifier_xhs_vampiric_aura:IsDebuff() return false end
+function modifier_xhs_vampiric_aura:IsHidden() return true end
+
+-------------------------------------------------------
 
 function Roar( event )
 local caster = event.caster
@@ -41,7 +103,6 @@ local caster = keys.caster
 	caster:SetOriginalModel(caster.caster_model)
 	caster:SetAttackCapability(caster.caster_attack)
 end
-
 
 function HideWearables( event )
 local hero = event.caster

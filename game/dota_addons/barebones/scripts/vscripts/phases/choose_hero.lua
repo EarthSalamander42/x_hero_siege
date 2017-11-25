@@ -42,11 +42,7 @@ local hero_vip_count = 1
 		end)
 
 		Timers:CreateTimer(15.0, function()
-			if hero_vip_count == 2 then
-				local dummy_hero = CreateUnitByName("npc_dota_hero_skeleton_king_bis", Entities:FindByName(nil, "choose_vip_2_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
-				dummy_hero:SetAngles(0, 270, 0)
-				StartAnimation(dummy_hero, {duration = 20000.0, activity = ACT_DOTA_IDLE, rate = 0.9})
-			elseif hero_vip_count == 4 then
+			if hero_vip_count == 4 then
 				local dummy_hero = CreateUnitByName("npc_dota_hero_chaos_knight_bis", Entities:FindByName(nil, "choose_vip_4_point"):GetAbsOrigin() + Vector(-100, 0, 0), true, nil, nil, DOTA_TEAM_GOODGUYS)
 				dummy_hero:SetAngles(0, 270, 0)
 				local dummy_hero = CreateUnitByName("npc_dota_hero_keeper_of_the_light_bis", Entities:FindByName(nil, "choose_vip_4_point"):GetAbsOrigin() + Vector(100, 0, 0), true, nil, nil, DOTA_TEAM_GOODGUYS)
@@ -124,7 +120,6 @@ local hero_vip_count = 1
 	lich_king = CreateUnitByName("npc_dota_boss_lich_king_bis", Entities:FindByName(nil, "npc_dota_spawner_lich_king"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
 	lich_king:SetAngles(0, 90, 0)
 	lich_king:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
-	StartAnimation(lich_king, {duration = 20000.0, activity = ACT_DOTA_IDLE, rate = 0.9})
 
 --	local i, j = string.find(HEROLIST[dummy], "")
 --	print(HEROLIST_VIP[dummy])
@@ -138,8 +133,8 @@ local id = hero:GetPlayerID()
 local difficulty = GameRules:GetCustomGameDifficulty()
 
 	if PlayerResource:IsValidPlayer(id) and hero:GetUnitName() == "npc_dota_hero_wisp" then
-		for i = 1, #HEROLIST do -- 12 = POTM, 19 = Paladin, 26 = Brewmaster, 27 = Archimonde.
-			if caller:GetName() == "trigger_hero_12" or caller:GetName() == "trigger_hero_19" or caller:GetName() == "trigger_hero_26" or caller:GetName() == "trigger_hero_27" then
+		for i = 1, #HEROLIST do -- 12 = POTM, 19 = Paladin, 27 = Archimonde.
+			if caller:GetName() == "trigger_hero_12" or caller:GetName() == "trigger_hero_19" or caller:GetName() == "trigger_hero_27" then
 				Notifications:Bottom(hero:GetPlayerOwnerID(), {text = "This hero is disabled! Please choose a hero with a blue circle!", duration = 6.0})
 				return
 			end
@@ -158,7 +153,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 					if difficulty < 4 then
 						local item = newHero:AddItemByName("item_ankh_of_reincarnation")
 					end
-					local item = newHero:AddItemByName("item_healing_potion")
+					local item = newHero:AddItemByName("item_health_potion")
 					local item = newHero:AddItemByName("item_mana_potion")
 					if difficulty == 1 then
 						local item = newHero:AddItemByName("item_lifesteal_mask")
@@ -197,7 +192,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 						if difficulty < 4 then
 							local item = newHero:AddItemByName("item_ankh_of_reincarnation")
 						end
-						local item = newHero:AddItemByName("item_healing_potion")
+						local item = newHero:AddItemByName("item_health_potion")
 						local item = newHero:AddItemByName("item_mana_potion")
 						if difficulty == 1 then
 							local item = newHero:AddItemByName("item_lifesteal_mask")
@@ -244,7 +239,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 					if difficulty < 4 then
 						local item = newHero:AddItemByName("item_ankh_of_reincarnation")
 					end
-					local item = newHero:AddItemByName("item_healing_potion")
+					local item = newHero:AddItemByName("item_health_potion")
 					local item = newHero:AddItemByName("item_mana_potion")
 					if difficulty == 1 then
 						local item = newHero:AddItemByName("item_lifesteal_mask")
@@ -255,9 +250,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 					elseif newHero:GetTeamNumber() == 3 then
 						TeleportHero(newHero, 3.0, base_bad:GetAbsOrigin())
 					end
-					if newHero:GetUnitName() == "npc_dota_hero_skeleton_king" then
-						SkeletonKingWearables(newHero)
-					end
+
 					PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
 					Timers:CreateTimer(0.1, function()
 						if not hero:IsNull() then

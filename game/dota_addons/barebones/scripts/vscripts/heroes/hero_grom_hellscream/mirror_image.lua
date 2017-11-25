@@ -2,6 +2,7 @@
 	Date: 08.04.2015.
 	Creates illusions while shuffling the positions]]
 function Phantasm( keys )
+	if keys.caster:IsIllusion() then return end
 	local caster = keys.caster
 	local player = caster:GetPlayerOwnerID()
 	local ability = keys.ability

@@ -12,15 +12,6 @@ _G.ZonesDefinition =
 		StarCriteria =
 		{
 			{
-				Type = ZONE_STAR_CRITERIA_TIME,
-				Values =
-				{
-					3000, -- 50 Minutes
-					2400, -- 40 Minutes
-					1800, -- 30 Minutes
-				},
-			},
-			{
 				Type = ZONE_STAR_CRITERIA_DEATHS,
 				Values =
 				{
@@ -63,7 +54,6 @@ _G.ZonesDefinition =
 					Type = QUEST_EVENT_ON_ENEMY_KILLED,
 					szNPCName ="dota_badguys_barracks",
 				},
-				bOptional = true,
 				nCompleteLimit = 1,
 			},
 			{
@@ -81,7 +71,7 @@ _G.ZonesDefinition =
 					Type = QUEST_EVENT_ON_ENEMY_KILLED,
 					szNPCName ="npc_tower_cold",
 				},
-				nCompleteLimit = ICE_TOWERS_REQUIRED,
+				nCompleteLimit = 1,
 			},
 			{
 				szQuestName = "kill_final_wave",
@@ -244,6 +234,70 @@ _G.ZonesDefinition =
 				szSpawnerName = "xhs_campfire",
 				szNPCName = "npc_dota_campfire",
 				nMaxSpawnDistance = 0,
+			},
+		},
+--[[	Chests =
+		{
+			--TreasureChest_A
+			{
+				fSpawnChance = 0.5,
+				szSpawnerName = "xhs_treasure_chest",
+				szNPCName = "npc_treasure_chest",
+				nMaxSpawnDistance = 0,
+				szTraps =
+				{
+					"creature_techies_land_mine",
+					"trap_sun_strike",
+				},
+				nTrapLevel = 1,
+				nMinGold = 250,
+				nMaxGold = 450,
+				Items =
+				{
+					"item_orb_of_lightning",
+					"item_orb_of_fire",
+					"item_orb_of_earth",
+					"item_orb_of_darkness",
+				},
+				Relics =
+				{
+					"item_orb_of_frost",
+				},
+				fRelicChance = 0.001,
+			},
+		}, --]]
+		Breakables =
+		{
+			-- Crate
+			{
+				fSpawnChance = 1.0,
+				szSpawnerName = "xhs_crate",
+				szNPCName = "npc_dota_crate",
+				nMaxSpawnDistance = 0,
+				nMinGold = 100,
+				nMaxGold = 200,
+				fGoldChance = 0.11,
+				CommonItems =
+				{
+					"item_health_potion",
+					"item_health_potion",
+					"item_mana_potion",
+					"item_mana_potion",
+					"item_potion_full",
+					"item_potion_of_invulnerability",
+					"item_potion_of_antimagic",
+					"item_cloak_of_flames",
+					"item_amulet_of_the_wild",
+					"item_talisman_of_evasion_datadriven",
+				},
+				fCommonItemChance = 0.07,
+				RareItems =
+				{
+					"item_tome_small",
+					"item_tome_big",
+					"item_tome_of_power",
+				},
+				fRareItemChance = 0.001,
 			},
 		},
 	},

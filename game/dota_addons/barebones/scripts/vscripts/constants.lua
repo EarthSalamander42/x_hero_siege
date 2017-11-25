@@ -107,6 +107,12 @@ CREEP_LANES[1] = {0, 1, 1}
 CREEP_LANES[2] = {0, 1, 1}
 CREEP_LANES[3] = {0, 1, 1}
 CREEP_LANES[4] = {0, 1, 1}
+if GetMapName() == "x_hero_siege" then
+	CREEP_LANES[5] = {0, 1, 1}
+	CREEP_LANES[6] = {0, 1, 1}
+	CREEP_LANES[7] = {0, 1, 1}
+	CREEP_LANES[8] = {0, 1, 1}
+end
 
 PLAYER_COLORS = {}					-- Stores individual player colors
 PLAYER_COLORS[0] = {200, 0, 0}		--Red
@@ -190,31 +196,35 @@ _G.FarmEvent_Creeps = {
 
 _G.mod_creator = {
 	54896080,	-- Cookies
-	295458357	-- X Hero Siege
+	295458357,	-- X Hero Siege
 }
 
 _G.captain_baumi = {
 	43305444,	-- Baumi(Because why not?)
-	44022861	-- Padaa
+	44022861,	-- Padaa
 }
 
 _G.mod_graphist = {
 	61711140,	-- Mugiwara
-	231117589	-- Xero
+	231117589,	-- Xero
 }
 
 _G.administrator = {
-	101989646	-- PraaNavi
+	101989646,	-- PraaNavi
 }
 
 _G.moderator = {
 	84332517,	-- Pentagon Solek [morris_91 on Discord]
-	117795386	-- Xtinian
+	117795386,	-- Xtinian
 }
 
 _G.ember_vip_members = {
 	114707349,	-- I AM BACK
-	122360298	-- hu_5ky
+	122360298,	-- hu_5ky
+	89768567,
+	72224874,	-- R3V4MP3D [Danial Tan on Patreon]
+	489514611,	-- R3V4MP3D secondary account for streaming
+	134153339,	-- jakehead20 [Some Random Dude on Patreon]
 }
 
 _G.golden_vip_members = {
@@ -239,7 +249,7 @@ _G.golden_vip_members = {
 	134026389,	-- Hypérion
 	80192910,	-- Cheshire [Nathan Perscott on Patreon]
 	89498388,	-- Sly
-	111692244,	-- [Iris Von Everec on Steam, May paid, 2 months left for Permanent]
+	111692244,	-- [Iris Von Everec on Steam]
 	97490223,	-- IllidanStormrage [Lucas Diao on Patreon]
 	34067920,	-- Shush
 	290718556,	-- Souka Blett [souris]
@@ -270,12 +280,19 @@ _G.vip_members = {
 	5671643,	-- `btk [Aureo Neto on Patreon]
 	92290724,	-- www.dick.com.kw	[Abdullah Al Zaben on Patreon]
 	110475852,	-- gg [Geo Gaal on Patreon]
-	78677276	-- Subject Zero [Yaroslav Kochevatkin on Patreon]
-
+	78677276,	-- Subject Zero [Yaroslav Kochevatkin on Patreon]
+	99567666,	-- Evgeny [Евгений Тумашов on Patreon]
+	87489501,	-- [Mccra on Patreon]
+	376882827,	-- Zero [Alvazar on Discord]
+	150116475,	-- 桔纸发货员 [OraNge on Discord]
+	18458957,	-- RufioGuy [RufioGuy on Discord]
+	53100383,	-- Ken [aznken on Discord]
+	26464251,	-- vk [Victor Kannebley Bittencourt on Patreon]
+	317042892,	-- mabuhaymgakalbo [Paul Santos on Patreon]
 }
 
 _G.banned_players = {
-	151018319 -- Mohammad Mehdi Akhondi
+	151018319, -- Mohammad Mehdi Akhondi
 }
 
 XP_PER_LEVEL_TABLE = {
@@ -420,13 +437,3 @@ _G.difficulty_abilities = {
 	"monkey_king_boundless_strike",
 	"ursa_fury_swipes"
 }
-
-if GetMapName() == "x_hero_siege" then
-	_G.ICE_TOWERS_REQUIRED = 2
-	CREEP_LANES[5] = {0, 1, 1}
-	CREEP_LANES[6] = {0, 1, 1}
-	CREEP_LANES[7] = {0, 1, 1}
-	CREEP_LANES[8] = {0, 1, 1}
-elseif GetMapName() == "ranked_2v2" then
-	_G.ICE_TOWERS_REQUIRED = 1
-end

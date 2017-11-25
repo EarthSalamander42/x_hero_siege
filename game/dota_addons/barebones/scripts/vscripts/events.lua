@@ -9,6 +9,7 @@ local reason = keys.reason
 local userid = keys.userid
 
 	CloseLane(userid)
+	Server_DisableToGainXpForPlayer(userid)
 end
 
 function GameMode:OnSettingVote(keys)
@@ -49,10 +50,16 @@ local too_ez_gold = 0.9 -- The mod is way too ez, to modify gold very easily i j
 			end
 		end
 
+		if npc:GetTeamNumber() ~= 2 then
+			if npc:GetKeyValue("UseAI") == 1 or npc:GetKeyValue("UseAI") == 2 or npc:GetKeyValue("UseAI") == 3 then
+				npc:AddNewModifier(npc, nil, "modifier_ai", {})
+			end
+		end
+
 		-- HERO NPC
 		if npc:IsRealHero() and npc:GetTeamNumber() == DOTA_TEAM_GOODGUYS then
 			if npc.bFirstSpawnComplete == nil then
-				for i = 1, #golden_vip_members do
+				for i = 1, #vip_members do
 					-- Cookies or X Hero Siege Official
 					if PlayerResource:GetSteamAccountID(npc:GetPlayerID()) == mod_creator[i] then
 						npc:SetCustomHealthLabel("Mod Creator", 200, 45, 45)
@@ -124,7 +131,7 @@ local too_ez_gold = 0.9 -- The mod is way too ez, to modify gold very easily i j
 				npc.CurrentZoneName = nil
 				self:OnPlayerHeroEnteredZone(npc, "xhs_holdout")
 				npc.ankh_respawn = false
-				npc:AddNewModifier(npc, nil, "modifier_hero", {})
+--				npc:AddNewModifier(npc, nil, "modifier_hero", {})
 			elseif npc.bFirstSpawnComplete == true then
 				if npc:GetUnitName() == "npc_dota_hero_chaos_knight" or npc:GetUnitName() == "npc_dota_hero_keeper_of_the_light" then
 					npc:SetAbilityPoints(0)
@@ -425,7 +432,7 @@ local AbilitiesHeroes_XX = {
 			end
 		end
 
-		if hero:GetUnitName() == "npc_dota_hero_medusa" or hero:GetUnitName() == "npc_dota_hero_storm_spirit" or hero:GetUnitName() == "npc_dota_hero_earth_spirit" or hero:GetUnitName() == "npc_dota_hero_ember_spirit" or hero:GetUnitName() == "npc_dota_hero_ursa" or hero:GetUnitName() == "npc_dota_hero_troll_warlord" or hero:GetUnitName() == "npc_dota_hero_mirana" or hero:GetUnitName() == "npc_dota_hero_lina" or hero:GetUnitName() == "npc_dota_hero_monkey_king" or hero:GetUnitName() == "npc_dota_hero_lone_druid" or hero:GetUnitName() == "npc_dota_hero_doom_bringer" or hero:GetUnitName() == "npc_dota_hero_leshrac" then
+		if hero:GetUnitName() == "npc_dota_hero_axe" or hero:GetUnitName() == "npc_dota_hero_medusa" or hero:GetUnitName() == "npc_dota_hero_storm_spirit" or hero:GetUnitName() == "npc_dota_hero_earth_spirit" or hero:GetUnitName() == "npc_dota_hero_ember_spirit" or hero:GetUnitName() == "npc_dota_hero_ursa" or hero:GetUnitName() == "npc_dota_hero_troll_warlord" or hero:GetUnitName() == "npc_dota_hero_mirana" or hero:GetUnitName() == "npc_dota_hero_lina" or hero:GetUnitName() == "npc_dota_hero_monkey_king" or hero:GetUnitName() == "npc_dota_hero_lone_druid" or hero:GetUnitName() == "npc_dota_hero_doom_bringer" or hero:GetUnitName() == "npc_dota_hero_leshrac" then
 			print("No Level 20 Ability")
 		else
 			print("Whisper Level 20 Ability")
@@ -462,7 +469,7 @@ local treeY = keys.tree_y
 
 end
 
-function GameMode:OnRuneActivated (keys)
+function GameMode:OnRuneActivated(keys)
 local player = PlayerResource:GetPlayer(keys.PlayerID)
 local rune = keys.rune
 
@@ -519,6 +526,7 @@ local playerID = ply:GetPlayerID()
 			Timers:CreateTimer(5.0, function()
 				GameRules:SetGameWinner(DOTA_TEAM_CUSTOM_1)
 			end)
+
 			GameRules:SetHeroSelectionTime(1.0)
 			GameRules:SetPreGameTime(1.0)
 			GameRules:SetPostGameTime(5.0)
@@ -526,6 +534,8 @@ local playerID = ply:GetPlayerID()
 			Say(nil, "<font color='#FF0000'>Mohammad Mehdi Akhondi</font> detected, game will not start. Please disconnect.", false)
 		end
 	end
+
+	Server_SendAndGetInfoForAll()
 end
 
 function GameMode:OnIllusionsCreated(keys)
@@ -613,7 +623,7 @@ local player = PlayerResource:GetPlayer(userID)
 						end
 						if str == "-revive_"..Frozen +1 then
 							local hero = PlayerResource:GetPlayer(Frozen):GetAssignedHero()
-							hero:RespawnHero(false, false, false)
+							hero:RespawnHero(false, false)
 							Notifications:TopToAll({text="[ADMIN MOD]: ", duration=6.0, style={color="red", ["font-size"]="30px"}})
 							Notifications:TopToAll({text=PlayerNames[Frozen +1].." ", style={color=PlayerNames[Frozen +1], ["font-size"]="25px"}, continue=true})
 							Notifications:TopToAll({text="player has been revived!", style={color="white", ["font-size"]="25px"}, continue=true})
@@ -675,6 +685,10 @@ local player = PlayerResource:GetPlayer(userID)
 			local lanes = {"Simple", "Double", "Full"}
 			Notifications:Bottom(player, {text="DIFFICULTY: "..diff[GameRules:GetCustomGameDifficulty()], duration=10.0})
 			Notifications:Bottom(player, {text="CREEP LANES: "..lanes[CREEP_LANES_TYPE], duration=10.0})
+		end
+
+		if str == "-printxpinfo" then
+			Server_PrintInfo() --print the XP system info
 		end
 	end
 end
@@ -818,6 +832,8 @@ end
 
 function GameMode:OnEntityKilled(keys)
 local killedUnit = EntIndexToHScript(keys.entindex_killed)
+if killedUnit == nil then return end
+if killedUnit:FindModifierByName( "modifier_breakable_container" ) then return end
 local hero = nil
 local killerAbility = nil
 if keys.entindex_attacker ~= nil then hero = EntIndexToHScript(keys.entindex_attacker) end
@@ -829,222 +845,134 @@ local playerKills = PlayerResource:GetKills(KillerID)
 local cn = string.gsub(killedUnit:GetName(), "dota_badguys_tower", "")
 local lane = tonumber(cn)
 
-	if killedUnit then
-		OrbOfDarkness(hero, killedUnit)
 
-		if IsValidEntity(hero:GetPlayerOwner()) then
-			hero = hero:GetPlayerOwner():GetAssignedHero()
+	OrbOfDarkness(hero, killedUnit)
+
+	if IsValidEntity(hero:GetPlayerOwner()) then
+		hero = hero:GetPlayerOwner():GetAssignedHero()
+	end
+
+	if hero:IsIllusion() and hero:GetTeamNumber() == 2 then
+		hero = PlayerResource:GetPlayer(hero:GetPlayerID()):GetAssignedHero()
+	end
+
+	local Zone = killedUnit.zone
+	if Zone then
+		for _,zone in pairs(self.Zones) do
+			zone:OnEnemyKilled(killedUnit, Zone)
 		end
+	end
 
-		if hero:IsIllusion() and hero:GetTeamNumber() == 2 then
-			hero = PlayerResource:GetPlayer(hero:GetPlayerID()):GetAssignedHero()
-		end
+	if killedUnit:IsRealHero() and (killedUnit:GetTeamNumber() == DOTA_TEAM_GOODGUYS) then
+		local netTable = {}
+--		CustomGameEventManager:Send_ServerToPlayer(killedUnit:GetPlayerOwner(), "life_lost", netTable)
 
-		local Zone = killedUnit.zone
-		if Zone then
-			for _,zone in pairs(self.Zones) do
-				zone:OnEnemyKilled(killedUnit, Zone)
-			end
-		end
-
-		if killedUnit:IsRealHero() and (killedUnit:GetTeamNumber() == DOTA_TEAM_GOODGUYS) then
-			local netTable = {}
---			CustomGameEventManager:Send_ServerToPlayer(killedUnit:GetPlayerOwner(), "life_lost", netTable)
-
-			if killedUnit:GetUnitName() == "npc_dota_hero_tiny" then
-				killedUnit:RemoveModifierByName("modifier_item_ultimate_scepter_consumed")
-				killedUnit:RemoveModifierByName("modifier_animation_translate")  
-			-- Lone Druid Bear death debug
-			elseif killedUnit:GetUnitName() == "npc_dota_hero_lone_druid" then
-				local Bears = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_ALL, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, 0, false)
-				for _, Bear in pairs(Bears) do
-					for number = 1, 7 do
-						if Bear and Bear:GetUnitName() == "npc_dota_lone_druid_bear"..number then
-							Timers:CreateTimer(0.03, function()
-								Bear:RespawnUnit()
-							end)
-							Timers:CreateTimer(0.17, function()
-								Bear:RespawnUnit()
-								Bear:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {duration=4.8})
-							end)
-						end
-					end
-				end
-			end
-
-			--Drop Tombstone to be revived if dead after Castle Defense
-			if PHASE_3 == 1 then
-				if killedUnit.ankh_respawn == true then
-				else
-					local newItem = CreateItem("item_tombstone", killedUnit, killedUnit)
-					newItem:SetPurchaseTime(0)
-					newItem:SetPurchaser(killedUnit)
-					local tombstone = SpawnEntityFromTableSynchronous("dota_item_tombstone_drop", {})
-					tombstone:SetContainedItem(newItem)
-					tombstone:SetAngles(0, RandomFloat(0, 360), 0)
-					FindClearSpaceForUnit(tombstone, killedUnit:GetAbsOrigin(), true)
-				end
-			end
-
-			for _,Zone in pairs(self.Zones) do
-				if Zone:ContainsUnit(killedUnit) then
-					Zone:AddStat(killedUnit:GetPlayerID(), ZONE_STAT_DEATHS, 1)
-					killedUnit.DeathZone = Zone
-				end
-			end 
-		return
-		elseif killedUnit:IsCreature() then
-			local ramero_check = 0
-			if killedUnit:GetUnitName() == "npc_ramero" then
-				local item = CreateItem("item_lightning_sword", nil, nil)
-				local pos = killedUnit:GetAbsOrigin()
-				local drop = CreateItemOnPositionSync(pos, item)
-				item:LaunchLoot(false, 300, 0.5, pos)
-				ramero_check = ramero_check +1
-			elseif killedUnit:GetUnitName() == "npc_baristol" then
-				local item = CreateItem("item_tome_big", nil, nil)
-				local pos = killedUnit:GetAbsOrigin()
-				local drop = CreateItemOnPositionSync(pos, item)
-				item:LaunchLoot(false, 300, 0.5, pos)
-				ramero_check = ramero_check +1
-			elseif killedUnit:GetUnitName() == "npc_ramero_2" then
-				local item = CreateItem("item_ring_of_superiority", nil, nil)
-				local pos = killedUnit:GetAbsOrigin()
-				local drop = CreateItemOnPositionSync(pos, item)
-				item:LaunchLoot(false, 300, 0.5, pos)
-				doom_first_time = true
-				Timers:RemoveTimer(timers.Ramero)
-			elseif killedUnit:GetUnitName() == "npc_dota_hero_secret" then
-				local item = CreateItem("item_orb_of_frost", nil, nil)
-				local pos = killedUnit:GetAbsOrigin()
-				local drop = CreateItemOnPositionSync(pos, item)
-				item:LaunchLoot(false, 300, 0.5, pos)
-				frost_first_time = true
-			end
-
-			if ramero_check == 2 then
-				Timers:RemoveTimer(timers.RameroAndBaristol)
-			end
-
-			if killedUnit:GetUnitName() == "npc_dota_hero_magtheridon" then
-				local teleporters2 = Entities:FindAllByName("trigger_teleport2")
-				local difficulty = GameRules:GetCustomGameDifficulty()
-				MAGTHERIDON = MAGTHERIDON + 1
-				if MAGTHERIDON > 0 and difficulty == 1 then
-					EndMagtheridonArena()
-				elseif MAGTHERIDON > 1 and difficulty == 2 then
-					EndMagtheridonArena()
-				elseif MAGTHERIDON > 3 and difficulty == 3 then
-					EndMagtheridonArena()
-				elseif MAGTHERIDON > 3 and difficulty == 4 then
-					EndMagtheridonArena()
-				end
-			end
-
-			-- add kills to the hero who spawned a controlled unit, or an illusion
-			if hero:GetTeamNumber() == 2 then
-				if not gold_advertize then gold_advertize = 0 end
-				if hero:IsRealHero() then
-					if PlayerResource:GetGold(hero:GetPlayerID()) > 99900 and gold_advertize == 0 and SPECIAL_EVENT == 0 then
-						SendErrorMessage(hero:GetPlayerID(), "#error_gold_full")
-						gold_advertize = 1
-						Timers:CreateTimer(5.0, function()
-							gold_advertize = 0
+		if killedUnit:GetUnitName() == "npc_dota_hero_tiny" then
+			killedUnit:RemoveModifierByName("modifier_item_ultimate_scepter_consumed")
+			killedUnit:RemoveModifierByName("modifier_animation_translate")  
+		-- Lone Druid Bear death debug
+		elseif killedUnit:GetUnitName() == "npc_dota_hero_lone_druid" then
+			local Bears = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_ALL, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, 0, false)
+			for _, Bear in pairs(Bears) do
+				for number = 1, 7 do
+					if Bear and Bear:GetUnitName() == "npc_dota_lone_druid_bear"..number then
+						Timers:CreateTimer(0.03, function()
+							Bear:RespawnUnit()
+						end)
+						Timers:CreateTimer(0.17, function()
+							Bear:RespawnUnit()
+							Bear:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {duration=4.8})
 						end)
 					end
 				end
+			end
+		end
 
-				if killedUnit:GetTeamNumber() == 6 then
-					if hero:IsIllusion() then
-						hero = PlayerResource:GetPlayer(hero:GetPlayerID()):GetAssignedHero()
-						hero:IncrementKills(1)
-						for _, Zone in pairs(self.Zones) do
-							if Zone:ContainsUnit(hero) then
-								Zone:AddStat(hero:GetPlayerID(), ZONE_STAT_KILLS, 1)
-							end
-						end
-					elseif IsValidEntity(hero:GetPlayerOwner()) then
-						if not hero:IsRealHero() then
-							if hero:GetPlayerOwner() then
-								hero = hero:GetPlayerOwner():GetAssignedHero()
-								hero:IncrementKills(1)
-							end
-							for _, Zone in pairs(self.Zones) do
-								if Zone:ContainsUnit(hero) then
-									Zone:AddStat(hero:GetPlayerID(), ZONE_STAT_KILLS, 1)
-								end
-							end
-						--plays a particle and add a kill when a hero kills an enemy unit
-						elseif hero:IsRealHero() then
-							EmitSoundOnClient("Dungeon.LastHit", hero:GetPlayerOwner())
-							ParticleManager:ReleaseParticleIndex(ParticleManager:CreateParticleForPlayer("particles/darkmoon_last_hit_effect.vpcf", PATTACH_ABSORIGIN_FOLLOW, killedUnit, hero:GetPlayerOwner()))
-							if PlayerResource:HasSelectedHero(hero:GetPlayerOwnerID()) then
-								hero:IncrementKills(1)
-							end
-							for _, Zone in pairs(self.Zones) do
-								if Zone:ContainsUnit(hero) then
-									Zone:AddStat(hero:GetPlayerID(), ZONE_STAT_KILLS, 1)
-								end
-							end
+		--Drop Tombstone to be revived if dead after Castle Defense
+		if PHASE_3 == 1 then
+			if killedUnit.ankh_respawn == true then
+			else
+				local newItem = CreateItem("item_tombstone", killedUnit, killedUnit)
+				newItem:SetPurchaseTime(0)
+				newItem:SetPurchaser(killedUnit)
+				local tombstone = SpawnEntityFromTableSynchronous("dota_item_tombstone_drop", {})
+				tombstone:SetContainedItem(newItem)
+				tombstone:SetAngles(0, RandomFloat(0, 360), 0)
+				FindClearSpaceForUnit(tombstone, killedUnit:GetAbsOrigin(), true)
+			end
+		end
 
-							-- reward system based on kills, including kill events
-							if hero:GetKills() == 99 then
-								Notifications:Bottom(hero:GetPlayerOwnerID(), {text="100 kills. You get 7500 gold.", duration=5.0, style={color="yellow"}})
-								PlayerResource:ModifyGold(hero:GetPlayerOwnerID(), 7500, false,  DOTA_ModifyGold_Unspecified)
-							elseif hero:GetKills() == 199 then
-								Notifications:Bottom(hero:GetPlayerOwnerID(), {text="200 kills. You get 25000 gold.", duration=5.0, style={color="yellow"}})
-								PlayerResource:ModifyGold(hero:GetPlayerOwnerID(), 25000, false,  DOTA_ModifyGold_Unspecified)
-							elseif hero:GetKills() == 399 then
-								Notifications:Bottom(hero:GetPlayerOwnerID(), {text="400 kills. You get 50000 gold.", duration=5.0, style={color="yellow"}})
-								PlayerResource:ModifyGold(hero:GetPlayerOwnerID(), 50000, false,  DOTA_ModifyGold_Unspecified)
-							elseif hero:GetKills() >= 499 and RAMERO == 0 then --500
-							local point = Entities:FindByName(nil, "npc_dota_muradin_player_1"):GetAbsOrigin()
-								hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", nil)
-								hero:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
-								Notifications:TopToAll({text="A hero has reached 500 kills and will fight Ramero and Baristol!", style={color="white"}, duration=5.0})
-								PauseCreeps()
-								Timers:CreateTimer(5.0, function()
-									FindClearSpaceForUnit(hero, point, true)
-									PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
-									RameroAndBaristolEvent(120)
-									hero:RemoveModifierByName("modifier_animation_freeze_stun")
-									hero:RemoveModifierByName("modifier_invulnerable")
-									Timers:CreateTimer(0.1, function()
-										PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
-									end)
-								end)
-								RAMERO = 1
-								hero.old_pos = hero:GetAbsOrigin()
-							elseif hero:GetKills() >= 749 and RAMERO == 1 then --750
-							local point = Entities:FindByName(nil, "npc_dota_muradin_player_1"):GetAbsOrigin()
-								hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", nil)
-								hero:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
-								Notifications:TopToAll({text="A hero has reached 750 kills and will fight Ramero!", style={color="white"}, duration=5.0})
-								PauseCreeps()
-								Timers:CreateTimer(5.0, function()
-									FindClearSpaceForUnit(hero, point, true)
-									PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
-									RameroEvent(120)
-									hero:RemoveModifierByName("modifier_animation_freeze_stun")
-									hero:RemoveModifierByName("modifier_invulnerable")
-									Timers:CreateTimer(0.1, function()
-										PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
-									end)
-								end)
-								RAMERO = 2
-								local hero = hero
-								hero.old_pos = hero:GetAbsOrigin()
-							end
-						end
-					end
+		for _,Zone in pairs(self.Zones) do
+			if Zone:ContainsUnit(killedUnit) then
+				Zone:AddStat(killedUnit:GetPlayerID(), ZONE_STAT_DEATHS, 1)
+				killedUnit.DeathZone = Zone
+			end
+		end 
+	return
+	elseif killedUnit:IsCreature() then
+		local ramero_check = 0
+		if killedUnit:GetUnitName() == "npc_ramero" then
+			local item = CreateItem("item_lightning_sword", nil, nil)
+			local pos = killedUnit:GetAbsOrigin()
+			local drop = CreateItemOnPositionSync(pos, item)
+			item:LaunchLoot(false, 300, 0.5, pos)
+			ramero_check = ramero_check +1
+		elseif killedUnit:GetUnitName() == "npc_baristol" then
+			local item = CreateItem("item_tome_big", nil, nil)
+			local pos = killedUnit:GetAbsOrigin()
+			local drop = CreateItemOnPositionSync(pos, item)
+			item:LaunchLoot(false, 300, 0.5, pos)
+			ramero_check = ramero_check +1
+		elseif killedUnit:GetUnitName() == "npc_ramero_2" then
+			local item = CreateItem("item_ring_of_superiority", nil, nil)
+			local pos = killedUnit:GetAbsOrigin()
+			local drop = CreateItemOnPositionSync(pos, item)
+			item:LaunchLoot(false, 300, 0.5, pos)
+			doom_first_time = true
+			Timers:RemoveTimer(timers.Ramero)
+		elseif killedUnit:GetUnitName() == "npc_dota_hero_secret" then
+			local item = CreateItem("item_orb_of_frost", nil, nil)
+			local pos = killedUnit:GetAbsOrigin()
+			local drop = CreateItemOnPositionSync(pos, item)
+			item:LaunchLoot(false, 300, 0.5, pos)
+			frost_first_time = true
+		elseif killedUnit:GetUnitName() == "npc_dota_boss_lich_king" then
+			GAME_WINNER_TEAM = "Radiant" 
+		end
+
+		if ramero_check == 2 then
+			Timers:RemoveTimer(timers.RameroAndBaristol)
+		end
+
+		if killedUnit:GetUnitName() == "npc_dota_hero_magtheridon" then
+			local teleporters2 = Entities:FindAllByName("trigger_teleport2")
+			local difficulty = GameRules:GetCustomGameDifficulty()
+			MAGTHERIDON = MAGTHERIDON + 1
+			if MAGTHERIDON > 0 and difficulty == 1 then
+				EndMagtheridonArena()
+			elseif MAGTHERIDON > 1 and difficulty == 2 then
+				EndMagtheridonArena()
+			elseif MAGTHERIDON > 3 and difficulty == 3 then
+				EndMagtheridonArena()
+			elseif MAGTHERIDON > 3 and difficulty == 4 then
+				EndMagtheridonArena()
+			end
+		end
+
+		-- add kills to the hero who spawned a controlled unit, or an illusion
+		if hero:GetTeamNumber() == 2 then
+			if not gold_advertize then gold_advertize = 0 end
+			if hero:IsRealHero() then
+				if PlayerResource:GetGold(hero:GetPlayerID()) > 99900 and gold_advertize == 0 and SPECIAL_EVENT == 0 then
+					SendErrorMessage(hero:GetPlayerID(), "#error_gold_full")
+					gold_advertize = 1
+					Timers:CreateTimer(5.0, function()
+						gold_advertize = 0
+					end)
 				end
 			end
-			if killedUnit.no_corpse ~= true and GetMapName() == "x_hero_siege" then
-				Corpses:CreateFromUnit(killedUnit)
-			end
-		return
-		elseif killedUnit:IsBuilding() then
-			if killedUnit:GetTeamNumber() == 3 then
+
+			if killedUnit:GetTeamNumber() == 6 then
 				if hero:IsIllusion() then
 					hero = PlayerResource:GetPlayer(hero:GetPlayerID()):GetAssignedHero()
 					hero:IncrementKills(1)
@@ -1076,73 +1004,144 @@ local lane = tonumber(cn)
 								Zone:AddStat(hero:GetPlayerID(), ZONE_STAT_KILLS, 1)
 							end
 						end
-					end
-				end
-			end
-			
-			if killedUnit:IsTower() then
-				if killedUnit:GetUnitName() == "xhs_tower_lane_1" then
-					for j = 1, difficulty do
-						local unit = CreateUnitByName("xhs_death_revenant", killedUnit:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-					end
---					CREEP_LANES[lane][2] = CREEP_LANES[lane][2] + 1
---					Notifications:TopToAll({text="Creep lane "..lane.." is now level "..CREEP_LANES[lane][2].."!", duration=5.0, style={color="lightgreen"}})
-				elseif killedUnit:GetUnitName() == "xhs_tower_lane_2" then
-					for j = 1, difficulty do
-						local unit = CreateUnitByName("xhs_death_revenant_2", killedUnit:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-					end
---					CREEP_LANES[lane][2] = CREEP_LANES[lane][2] + 1
---					Notifications:TopToAll({text="Creep lane "..lane.." is now level "..CREEP_LANES[lane][2].."!", duration=5.0, style={color="lightgreen"}})
-				elseif killedUnit:GetUnitName() == "npc_tower_death" then
 
-				elseif killedUnit:GetUnitName() == "npc_tower_cold" then
-					FrostTowers_killed = FrostTowers_killed +1
-					if FrostTowers_killed >= 2 then
-						Notifications:TopToAll({text="WARNING! Final Wave incoming. Arriving in 60 seconds! Back to the Castle!" , duration=10.0})
-						nTimer_SpecialEvent = 60
-						nTimer_IncomingWave = 1
-						PHASE_3 = 1
-						KillCreeps(DOTA_TEAM_CUSTOM_1)
-						Timers:CreateTimer(59, RefreshPlayers)
-						Timers:CreateTimer(60, FinalWave)
-					end
-				end
-			return
-			elseif killedUnit:IsBarracks() then
-				for j = 1, difficulty do
-					local unit = CreateUnitByName("npc_magnataur_destroyer_crypt", killedUnit:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-				end
-
-				for c = 1, 8 do
-					if killedUnit:GetName() == "dota_badguys_barracks_"..c then
-						CREEP_LANES[c][1] = 0
-						CREEP_LANES[c][3] = 0
-						if hero:IsIllusion() then
-							CREEP_LANES[c][1] = 0
-							CREEP_LANES[c][3] = 0
+						-- reward system based on kills, including kill events
+						if hero:GetKills() == 99 then
+							Notifications:Bottom(hero:GetPlayerOwnerID(), {text="100 kills. You get 7500 gold.", duration=5.0, style={color="yellow"}})
+							PlayerResource:ModifyGold(hero:GetPlayerOwnerID(), 7500, false,  DOTA_ModifyGold_Unspecified)
+						elseif hero:GetKills() == 199 then
+							Notifications:Bottom(hero:GetPlayerOwnerID(), {text="200 kills. You get 25000 gold.", duration=5.0, style={color="yellow"}})
+							PlayerResource:ModifyGold(hero:GetPlayerOwnerID(), 25000, false,  DOTA_ModifyGold_Unspecified)
+						elseif hero:GetKills() == 399 then
+							Notifications:Bottom(hero:GetPlayerOwnerID(), {text="400 kills. You get 50000 gold.", duration=5.0, style={color="yellow"}})
+							PlayerResource:ModifyGold(hero:GetPlayerOwnerID(), 50000, false,  DOTA_ModifyGold_Unspecified)
+						elseif hero:GetKills() >= 499 and RAMERO == 0 then --500
+						local point = Entities:FindByName(nil, "npc_dota_muradin_player_1"):GetAbsOrigin()
+							hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", nil)
+							hero:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
+							Notifications:TopToAll({text="A hero has reached 500 kills and will fight Ramero and Baristol!", style={color="white"}, duration=5.0})
+							PauseCreeps()
+							Timers:CreateTimer(5.0, function()
+								FindClearSpaceForUnit(hero, point, true)
+								PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
+								RameroAndBaristolEvent(120)
+								hero:RemoveModifierByName("modifier_animation_freeze_stun")
+								hero:RemoveModifierByName("modifier_invulnerable")
+								Timers:CreateTimer(0.1, function()
+									PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
+								end)
+							end)
+							RAMERO = 1
+							hero.old_pos = hero:GetAbsOrigin()
+						elseif hero:GetKills() >= 749 and RAMERO == 1 then --750
+						local point = Entities:FindByName(nil, "npc_dota_muradin_player_1"):GetAbsOrigin()
+							hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", nil)
+							hero:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
+							Notifications:TopToAll({text="A hero has reached 750 kills and will fight Ramero!", style={color="white"}, duration=5.0})
+							PauseCreeps()
+							Timers:CreateTimer(5.0, function()
+								FindClearSpaceForUnit(hero, point, true)
+								PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
+								RameroEvent(120)
+								hero:RemoveModifierByName("modifier_animation_freeze_stun")
+								hero:RemoveModifierByName("modifier_invulnerable")
+								Timers:CreateTimer(0.1, function()
+									PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
+								end)
+							end)
+							RAMERO = 2
+							local hero = hero
+							hero.old_pos = hero:GetAbsOrigin()
 						end
 					end
 				end
-
-				if first_rax == true then
-					first_rax = false
-					Entities:FindByName(nil, "trigger_phase2_left"):Enable()
-					Entities:FindByName(nil, "trigger_phase2_right"):Enable()
-					local DoorObs = Entities:FindAllByName("obstruction_phase2")
-					for _, obs in pairs(DoorObs) do 
-						obs:SetEnabled(false, true)
+			end
+		end
+		if killedUnit.no_corpse ~= true and GetMapName() == "x_hero_siege" then
+			Corpses:CreateFromUnit(killedUnit)
+		end
+	return
+	elseif killedUnit:IsBuilding() then
+		if killedUnit:GetTeamNumber() == 3 then
+			if hero:IsIllusion() then
+				hero = PlayerResource:GetPlayer(hero:GetPlayerID()):GetAssignedHero()
+				hero:IncrementKills(1)
+				for _, Zone in pairs(self.Zones) do
+					if Zone:ContainsUnit(hero) then
+						Zone:AddStat(hero:GetPlayerID(), ZONE_STAT_KILLS, 1)
 					end
-					DoEntFire("door_phase2_left", "SetAnimation", "gate_entrance002_open", 0, nil, nil)
-					DoEntFire("door_phase2_right", "SetAnimation", "gate_entrance002_open", 0, nil, nil)
-					Notifications:TopToAll({text = "Phase 2 creeps can now be triggered!", duration = 11.0, style={color="lightgreen"}})
 				end
-			return
+			elseif IsValidEntity(hero:GetPlayerOwner()) then
+				if not hero:IsRealHero() then
+					if hero:GetPlayerOwner() then
+						hero = hero:GetPlayerOwner():GetAssignedHero()
+						hero:IncrementKills(1)
+					end
+					for _, Zone in pairs(self.Zones) do
+						if Zone:ContainsUnit(hero) then
+							Zone:AddStat(hero:GetPlayerID(), ZONE_STAT_KILLS, 1)
+						end
+					end
+				--plays a particle and add a kill when a hero kills an enemy unit
+				elseif hero:IsRealHero() then
+					EmitSoundOnClient("Dungeon.LastHit", hero:GetPlayerOwner())
+					ParticleManager:ReleaseParticleIndex(ParticleManager:CreateParticleForPlayer("particles/darkmoon_last_hit_effect.vpcf", PATTACH_ABSORIGIN_FOLLOW, killedUnit, hero:GetPlayerOwner()))
+					if PlayerResource:HasSelectedHero(hero:GetPlayerOwnerID()) then
+						hero:IncrementKills(1)
+					end
+					for _, Zone in pairs(self.Zones) do
+						if Zone:ContainsUnit(hero) then
+							Zone:AddStat(hero:GetPlayerID(), ZONE_STAT_KILLS, 1)
+						end
+					end
+				end
+			end
+		end
+		
+		if killedUnit:IsTower() then
+			if killedUnit:GetUnitName() == "xhs_tower_lane_1" then
+				for j = 1, difficulty do
+					local unit = CreateUnitByName("xhs_death_revenant", killedUnit:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+				end
+--				CREEP_LANES[lane][2] = CREEP_LANES[lane][2] + 1
+--				Notifications:TopToAll({text="Creep lane "..lane.." is now level "..CREEP_LANES[lane][2].."!", duration=5.0, style={color="lightgreen"}})
+			elseif killedUnit:GetUnitName() == "xhs_tower_lane_2" then
+				for j = 1, difficulty do
+					local unit = CreateUnitByName("xhs_death_revenant_2", killedUnit:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+				end
+--				CREEP_LANES[lane][2] = CREEP_LANES[lane][2] + 1
+--				Notifications:TopToAll({text="Creep lane "..lane.." is now level "..CREEP_LANES[lane][2].."!", duration=5.0, style={color="lightgreen"}})
+			elseif killedUnit:GetUnitName() == "npc_tower_death" then
+
+			elseif killedUnit:GetUnitName() == "npc_tower_cold" then
+				FrostTowers_killed = FrostTowers_killed +1
+				if FrostTowers_killed >= 2 then
+					Notifications:TopToAll({text="WARNING! Final Wave incoming. Arriving in 60 seconds! Back to the Castle!" , duration=10.0})
+					nTimer_SpecialEvent = 60
+					nTimer_IncomingWave = 1
+					PHASE_3 = 1
+					KillCreeps(DOTA_TEAM_CUSTOM_1)
+					Timers:CreateTimer(59, RefreshPlayers)
+					Timers:CreateTimer(60, FinalWave)
+				end
+			end
+		return
+		elseif killedUnit:IsBarracks() then
+			for j = 1, difficulty do
+				local unit = CreateUnitByName("npc_magnataur_destroyer_crypt", killedUnit:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+			end
+
+			for c = 1, 8 do
+				if killedUnit:GetName() == "dota_badguys_barracks_"..c then
+					CREEP_LANES[c][1] = 0
+					CREEP_LANES[c][3] = 0
+				end
 			end
 		return
 		end
-		print("EntityKilled: Not Hero or Creature or Building.")
+	return
 	end
-	GameMode:_OnEntityKilled(keys)
+	print("EntityKilled: Not Hero or Creature or Building.")
 end
 
 ---------------------------------------------------------
@@ -1257,16 +1256,8 @@ end
 ---------------------------------------------------------
 
 function GameMode:OnPlayerReconnected(event)
-local hPlayer = PlayerResource:GetPlayer(event.player_id)
-
-	if hPlayer then
-		local hPlayerHero = hPlayer:GetAssignedHero()
-		if hPlayerHero and hPlayerHero.bHasClickedScroll == true then
-			CustomGameEventManager:Send_ServerToPlayer(hPlayer, "hide_scroll", {})
-		end
-	end
-
 	OpenLane(event.player_id)
+	Server_EnableToGainXPForPlyaer(event.player_id)
 end
 
 ---------------------------------------------------------

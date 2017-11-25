@@ -210,6 +210,8 @@ function SpawnRunes()
 local powerup_rune_locations = Entities:FindAllByName("dota_item_rune_spawner_custom")
 local game_time = GameRules:GetDOTATime(false, false)
 
+	RemoveRunes()
+
 	-- List of powerup rune types
 	local powerup_rune_types = {
 		"item_rune_armor",
@@ -493,23 +495,36 @@ local unit = {
 	"npc_dota_creature_clockwerk_event_8"
 }
 
-	if PHASE_3 == 0 then
-		if GetMapName() == "x_hero_siege" then
-			for j = 1, 10 do
-				CreateUnitByName(unit[reg-1], Entities:FindByName(nil, real_point):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-			end
-			poi = poi + 1
-			if poi > 4 then
-				poi = 1
-			end
-		elseif GetMapName() == "ranked_2v2" then
-			for j = 1, 10 do
-				CreateUnitByName(unit[reg-1], Entities:FindByName(nil, "npc_dota_spawner_west_event"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-			end
-			for j = 1, 10 do
-				CreateUnitByName(unit[reg-1], Entities:FindByName(nil, "npc_dota_spawner_east_event"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-			end
+	if GetMapName() == "x_hero_siege" then
+		for j = 1, 10 do
+			CreateUnitByName(unit[reg-1], Entities:FindByName(nil, real_point):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
 		end
+		poi = poi + 1
+		if poi > 4 then
+			poi = 1
+		end
+	elseif GetMapName() == "ranked_2v2" then
+		for j = 1, 10 do
+			CreateUnitByName(unit[reg-1], Entities:FindByName(nil, "npc_dota_spawner_west_event"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+		end
+		for j = 1, 10 do
+			CreateUnitByName(unit[reg-1], Entities:FindByName(nil, "npc_dota_spawner_east_event"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+		end
+	end
+
+	print("Current Wave:", reg-1)
+	if reg-1 == 8 then
+		local ice_towers = Entities:FindAllByName("npc_tower_death")
+		for _, tower in pairs(ice_towers) do
+			tower:ForceKill(false)
+		end
+
+		for TW = 1, 2 do
+			local ice_towers_main = Entities:FindByName(nil, "npc_tower_cold_"..TW)
+			ice_towers_main:ForceKill(false)
+		end
+		nTimer_IncomingWave = 0
+		return
 	end
 	nTimer_IncomingWave = 240
 end
@@ -548,7 +563,7 @@ local raxes = Entities:FindAllByName("dota_badguys_barracks_"..PlayerID)
 			rax:RemoveModifierByName("modifier_invulnerable")
 		end
 		CREEP_LANES[PlayerID+1][1] = 1
-		DoEntFire("door_lane"..PlayerID+1, "SetAnimation", "open", 0, nil, nil)
+		DoEntFire("door_lane"..PlayerID+1, "SetAnimation", "gate_02_open", 0, nil, nil)
 		print("Lane: "..PlayerID+1)
 	elseif PHASE_3 == 0 and CREEP_LANES_TYPE == 2 then
 
@@ -575,7 +590,7 @@ local raxes = Entities:FindAllByName("dota_badguys_barracks_"..Lane)
 			rax:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
 		end
 		CREEP_LANES[Lane][1] = 0
-		DoEntFire("door_lane"..Lane, "SetAnimation", "close", 0, nil, nil)
+		DoEntFire("door_lane"..Lane, "SetAnimation", "gate_02_close", 0, nil, nil)
 		print("Lane: "..Lane)
 	elseif PHASE_3 == 0 and CREEP_LANES_TYPE == 2 then
 		
@@ -790,22 +805,20 @@ function SendErrorMessage(playerID, string)
 end
 
 function RefreshPlayers()
-	for nPlayerID = 0, DOTA_MAX_TEAM_PLAYERS -1 do
-		if PlayerResource:GetTeam(nPlayerID) == DOTA_TEAM_GOODGUYS then
-			if PlayerResource:HasSelectedHero(nPlayerID) then
-				local hero = PlayerResource:GetSelectedHeroEntity(nPlayerID)
-				if not hero:IsAlive() then
-					hero:RespawnHero(false, false, false)
-					hero.ankh_respawn = false
-					hero:SetRespawnsDisabled(false)
-					if hero.respawn_timer ~= nil then
-						Timers:RemoveTimer(hero.respawn_timer)
-						hero.respawn_timer = nil
-					end
+	for nPlayerID = 0, PlayerResource:GetPlayerCount() -1 do
+		if PlayerResource:HasSelectedHero(nPlayerID) then
+			local hero = PlayerResource:GetSelectedHeroEntity(nPlayerID)
+			if not hero:IsAlive() then
+				hero:RespawnHero(false, false)
+				hero.ankh_respawn = false
+				hero:SetRespawnsDisabled(false)
+				if hero.respawn_timer ~= nil then
+					Timers:RemoveTimer(hero.respawn_timer)
+					hero.respawn_timer = nil
 				end
-				hero:SetHealth(hero:GetMaxHealth())
-				hero:SetMana(hero:GetMaxMana())
 			end
+			hero:SetHealth(hero:GetMaxHealth())
+			hero:SetMana(hero:GetMaxMana())
 		end
 	end
 end

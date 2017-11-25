@@ -39,6 +39,174 @@
 	}
 
 	//=================================================================================================================
+	// Building Unselectable
+	//=================================================================================================================
+	"ability_unselectable"
+	{
+		"BaseClass"                         "ability_datadriven"
+		"AbilityName"                       "ability_unselectable"
+		"AbilityBehavior"                   "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+
+		"IsOnCastBar"                   "0"
+
+		"Modifiers"
+		{
+			"modifier_unselectable"
+			{
+				"IsHidden"              "1"
+				"Passive"               "1"
+				
+				"States"
+				{
+					"MODIFIER_STATE_UNSELECTABLE"   "MODIFIER_STATE_VALUE_ENABLED"
+				}
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Treasure Chest
+	//=================================================================================================================
+	"treasure_chest"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"                     "ability_lua"
+		"ScriptFile"                    "abilities/treasure_chest"
+
+		"MaxLevel"                      "1"
+		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+
+		"IsOnCastBar"                   "0"
+	}
+
+	//=================================================================================================================
+	// Treasure Trap: Sun Strike
+	//=================================================================================================================
+	"trap_sun_strike"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"                     "invoker_sun_strike"
+		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE | DOTA_ABILITY_BEHAVIOR_AOE | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING"
+		"MaxLevel"                      "10"
+		"HotKeyOverride"                "T"
+		"AbilityUnitDamageType"         "DAMAGE_TYPE_PURE"
+		"SpellImmunityType"             "SPELL_IMMUNITY_ENEMIES_YES"
+		"FightRecapLevel"               "1"
+		"AbilitySound"                  "Hero_Invoker.SunStrike.Charge"
+
+		"IsOnCastBar"                   "0"
+
+		// Stats
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"              "0"
+		"AbilityCastPoint"              "0.05"
+		"AbilityCooldown"               "0"
+		"AbilityManaCost"               "0"
+			
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"              "FIELD_FLOAT"
+				"delay"                 "1.7"
+			}
+			"02"
+			{
+				"var_type"              "FIELD_INTEGER"
+				"area_of_effect"        "175"
+			}
+			"03"
+			{
+				"var_type"              "FIELD_FLOAT"
+				"damage"                "300 400 500 600 700 800 900 1000 1100 1200"
+				"levelkey"              "exortlevel"
+			}
+			"04"
+			{
+				"var_type"              "FIELD_INTEGER"
+				"vision_distance"       "400"
+			}
+			"05"
+			{
+				"var_type"              "FIELD_FLOAT"
+				"vision_duration"       "4.0"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Creature Techies: Land Mines
+	//=================================================================================================================
+	"creature_techies_land_mine"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"                     "ability_lua"
+		"ScriptFile"                    "abilities/creature_techies_land_mine"
+		"AbilityTextureName"            "techies_land_mines"
+		"MaxLevel"                      "10"
+
+		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE"
+		"AbilityUnitDamageType"         "DAMAGE_TYPE_MAGICAL"
+		"SpellImmunityType"             "SPELL_IMMUNITY_ENEMIES_YES"
+
+		"IsOnCastBar"                   "0"
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"              "210"
+		"AbilityCastPoint"              "0.0"
+		
+		// Time     
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"               "4"
+	
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"               "30"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"                  "FIELD_INTEGER"
+				"radius"                    "400"
+			}
+			"02"
+			{
+				"var_type"                  "FIELD_FLOAT"
+				"proximity_threshold"       "1.6"
+			}
+			"03"
+			{
+				"var_type"                  "FIELD_INTEGER"
+				"damage"                    "400 500 600 700 800 900 1000 1100 1200 1300"
+			}
+			"04"
+			{
+				"var_type"                  "FIELD_FLOAT"
+				"burn_duration"             "0.5"
+			}   
+			"05"
+			{
+				"var_type"                  "FIELD_INTEGER"
+				"building_damage_pct"       "25"
+			}   
+			"06"
+			{
+				"var_type"                  "FIELD_FLOAT"
+				"activation_delay"          "1.75"
+			}
+		}
+	}
+
+	//=================================================================================================================
 	// Castle: Muradin Defend
 	//=================================================================================================================
 	"castle_muradin_defend"
@@ -2844,32 +3012,32 @@
 	//=================================================================================================================
 	// Pandaren Brewmaster: Drunken Haze
 	//=================================================================================================================
-	"holdout_drunken_haze"
+	"xhs_brewmaster_drunken_haze"
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"BaseClass"						"ability_datadriven"
+		"BaseClass"						"ability_lua"
+		"ScriptFile"					"heroes/hero_brewmaster.lua"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_AOE"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_CREEP"
 		"AbilityCastRange"				"850"
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
 		"AbilityTextureName"			"custom/holdout_drunken_haze"
-
 		"AoERadius"						"300"
 
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityCastPoint"				"0.4"
-	
+
 		// Time		
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCooldown"				"10"
-	
+		"AbilityCooldown"				"13.0"
+
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityManaCost"				"50 75 100 125"		
-	
+
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilitySpecial"
@@ -2882,7 +3050,7 @@
 			"02"
 			{
 				"var_type"					"FIELD_FLOAT"
-				"duration"					"8.0"
+				"duration"					"4.0 5.0 6.0 7.0"
 			}
 			"03"
 			{
@@ -2894,63 +3062,25 @@
 				"var_type"					"FIELD_INTEGER"
 				"miss_chance"				"20 35 50 65"
 			}
-		}
-
-		"OnSpellStart"
-		{
-			"TrackingProjectile"
+			"05"
 			{
-				"Target"			"TARGET"
-				"EffectName"		"particles/units/heroes/hero_brewmaster/brewmaster_drunken_haze.vpcf"
-				"Dodgeable"			"0"
-				"ProvidesVision"	"0"
-				"MoveSpeed"			"1300"
-				"SourceAttachment"	"DOTA_PROJECTILE_ATTACHMENT_ATTACK_1"
+				"var_type"					"FIELD_INTEGER"
+				"projectile_speed"			"1200"
 			}
-
-			"FireSound"
+			"06"
 			{
-				"EffectName"	"Hero_Brewmaster.DrunkenHaze.Cast"
-				"Target"		"CASTER"
+				"var_type"					"FIELD_INTEGER"
+				"burn_damage"				"50 100 300 400"
 			}
-	
-			"ApplyModifier"
+			"07"
 			{
-				"ModifierName"    "modifier_drunken_haze"
-				"Target"
-				{
-					"Center"	"TARGET"
-					"Radius"	"%radius"
-					"Teams"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
-					"Types"		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
-				}
-				"Duration"		"%duration"
+				"var_type"					"FIELD_INTEGER"
+				"burn_duration"				"5"
 			}
-	
-			"FireSound"
+			"07"
 			{
-				"EffectName"	"Hero_Brewmaster.DrunkenHaze.Target"
-				"Target"		"CASTER"
-			}
-		}
-	
-		"Modifiers"
-		{
-			"modifier_drunken_haze"
-			{
-				"IsDebuff"	"1"
-	
-				"EffectName"			"particles/units/heroes/hero_brewmaster/brewmaster_drunken_haze_debuff.vpcf"
-				"EffectAttachType"		"follow_origin"
-	
-				"StatusEffectName"		"particles/status_fx/status_effect_brewmaster_drunken_haze.vpcf"
-				"StatusEffectPriority"	"5"
-	
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_MISS_PERCENTAGE"				"%miss_chance"
-					"MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE"	"%movement_slow"
-				}
+				"var_type"					"FIELD_INTEGER"
+				"total_damage_tooltip"		"250 500 750 1000"
 			}
 		}
 	}
@@ -3012,21 +3142,6 @@
 				"var_type"			"FIELD_INTEGER"
 				"damage"			"175 350 850 1250"
 			}
-			"06"
-			{
-				"var_type"			"FIELD_INTEGER"
-				"haze_damage"		"50 100 300 400"
-			}
-			"07"
-			{
-				"var_type"			"FIELD_INTEGER"
-				"haze_duration"		"5"
-			}
-			"07"
-			{
-				"var_type"			"FIELD_INTEGER"
-				"haze_total_damage_tooltip"		"250 500 750 1000"
-			}
 		}
 
 		"OnSpellStart"
@@ -3057,33 +3172,6 @@
 				"ScriptFile"		"heroes/hero_brewmaster.lua"
 				"Function"			"DragonSlaveBurn"
 				"Target"			"TARGET"
-				"modifier_haze"		"modifier_drunken_haze"
-				"modifier_burn"		"modifier_dragon_slave_burn"
-			}
-		}
-
-		"Modifiers"
-		{
-			"modifier_dragon_slave_burn"
-			{
-				"Passive"			"0"
-				"IsHidden"			"0"
-				"IsDebuff"			"1"
-				"Duration"			"%haze_duration"
-
-				"EffectName"		"particles/econ/items/wraith_king/wraith_king_ti6_bracer/wraith_king_ti6_hellfireblast_debuff.vpcf"
-				"EffectAttachType"	"follow_origin"
-		
-				"ThinkInterval"  "1.0"
-				"OnIntervalThink"
-				{
-					"Damage"
-					{
-						"Target"		"TARGET"
-						"Type"			"DAMAGE_TYPE_MAGICAL"
-						"Damage"		"%haze_damage"
-					}
-				}
 			}
 		}
 	}
@@ -5571,7 +5659,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"ability_lua"
-		"ScriptFile"					"modifiers/lifesteal.lua"
+		"ScriptFile"					"heroes/hero_demon_hunter.lua"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"AbilityTextureName"			"custom/holdout_thirst_aura"
 		"AbilityCastRange"				"900"
@@ -5766,7 +5854,7 @@
 				{
 					"FireEffect"
 					{
-						"EffectName"		"particles/units/heroes/hero_sven/sven_spell_great_cleave.vpcf"
+						"EffectName"		"particles/econ/items/faceless_void/faceless_void_weapon_bfury/faceless_void_weapon_bfury_cleave.vpcf"
 						"EffectAttachType"	"follow_origin"
 						"Target"			"TARGET"
 					}
@@ -9391,6 +9479,7 @@
 		"AbilityTextureName"			"custom/brewmaster_thunder_clap_new"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
+		"AbilityUnitTargetFlags"		"DOTA_UNIT_TARGET_FLAG_INVULNERABLE"
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
 		"SpellDispellableType"			"SPELL_DISPELLABLE_YES"
 
@@ -9893,7 +9982,7 @@
 			"02"
 			{
 				"var_type"			"FIELD_INTEGER"
-				"cleave_pct"		"25"
+				"cleave_pct"		"40"
 			}
 		}
 
@@ -9908,7 +9997,7 @@
 				{
 					"FireEffect"
 					{
-						"EffectName"		"particles/units/heroes/hero_sven/sven_spell_great_cleave.vpcf"
+						"EffectName"		"particles/econ/items/faceless_void/faceless_void_weapon_bfury/faceless_void_weapon_bfury_cleave.vpcf"
 						"EffectAttachType"	"follow_origin"
 						"Target"			"TARGET"
 					}
@@ -16117,7 +16206,7 @@
 			"02"
 			{
 				"var_type"		"FIELD_INTEGER"
-				"cleave_pct"	"25"
+				"cleave_pct"	"40"
 			}
 		}
 
@@ -16189,6 +16278,13 @@
 					{
 						"ScriptFile"	"heroes/global.lua"
 						"Function"		"SplashAbility"
+					}
+
+					"FireEffect"
+					{
+						"EffectName"		"particles/econ/items/faceless_void/faceless_void_weapon_bfury/faceless_void_weapon_bfury_cleave.vpcf"
+						"EffectAttachType"	"follow_origin"
+						"Target"			"TARGET"
 					}
 				}
 			}
@@ -16460,12 +16556,12 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"radius"	"300"
+				"radius"				"300"
 			}
 			"02"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"cleave_pct"	"25"
+				"cleave_pct"			"40"
 			}
 		}
 
@@ -16543,6 +16639,13 @@
 					{
 						"ScriptFile"	"heroes/global.lua"
 						"Function"		"SplashAbility"
+					}
+
+					"FireEffect"
+					{
+						"EffectName"		"particles/econ/items/faceless_void/faceless_void_weapon_bfury/faceless_void_weapon_bfury_cleave.vpcf"
+						"EffectAttachType"	"follow_origin"
+						"Target"			"TARGET"
 					}
 				}
 			}
@@ -18144,6 +18247,12 @@
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_BASIC | DOTA_UNIT_TARGET_HERO"
 		"AbilityTextureName"			"custom/holdout_anubarak_claw"
 		"RequiredLevel"					"5"
+
+		"precache"
+		{
+			"particle"  	"particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact.vpcf"
+			"soundfile" 	"soundevents/game_sounds_heroes/game_sounds_phantom_assassin.vsndevts"
+		}
 
 		"AbilitySpecial"
 		{
@@ -22226,12 +22335,13 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"necrolyte_death_pulse"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"	
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY" // the AI will cast the spell only if there's enemies around
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
 		
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCastRange"				"0.0"
+		"AbilityCastRange"				"775"
 		"AbilityCastPoint"				"0.0"
 
 		// Time		
@@ -22273,11 +22383,12 @@
 	//=========================================================================================
 	"endurance_aura"
 	{
-	// General
-	//-------------------------------------------------------------------------------------
+		// General
+		//-------------------------------------------------------------------------------------
 		"BaseClass"					"ability_datadriven"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_AURA | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE"
 		"AbilityUnitTargetFlags"	"DOTA_UNIT_TARGET_FLAG_NOT_ANCIENTS"
+		"AbilityCastRange"			"900"
 
 		// Stats
 		//-------------------------------------------------------------------------------------
@@ -22437,6 +22548,7 @@
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
 		"AbilityCastAnimation"			"ACT_DOTA_CAST_ABILITY_2"
+		"AbilityCastRange"				"500 600 700 800"
 
 		// Time		
 		//-------------------------------------------------------------------------------------------------------------
@@ -22599,6 +22711,7 @@
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
 		"AbilityCastAnimation"			"ACT_DOTA_CAST_ABILITY_2"
+		"AbilityCastRange"				"500 600 700 800"
 
 		// Time		
 		//-------------------------------------------------------------------------------------------------------------
@@ -22755,9 +22868,10 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------
-		"BaseClass"				"ability_datadriven"
-		"AbilityBehavior"		"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_AURA | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE"
-		"AbilityTextureName"	"custom/holdout_command_aura"
+		"BaseClass"					"ability_datadriven"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_AURA | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE"
+		"AbilityTextureName"		"custom/holdout_command_aura"
+		"AbilityCastRange"			"900"
 
 		// Stats
 		//-------------------------------------------------------------------------------------
@@ -22845,7 +22959,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"ability_datadriven"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-		"AbilityType"					"DOTA_ABILITY_TYPE_ULTIMATE"
+		"AbilityUnitTargetFlags"		"DOTA_UNIT_TARGET_FLAG_INVULNERABLE | DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES"
 		"AbilityTextureName"			"custom/blademaster_mirror_image"
 	
 		// Precache
@@ -22978,15 +23092,16 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"					"juggernaut_blade_fury"
 		"AbilityUnitDamageType"		"DAMAGE_TYPE_MAGICAL"
-		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
-		"AbilityUnitTargetType"		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC" 
+		"AbilityUnitTargetType"		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+		"AbilityUnitTargetFlags"	"DOTA_UNIT_TARGET_FLAG_INVULNERABLE | DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES"
 		"SpellImmunityType"			"SPELL_IMMUNITY_ENEMIES_NO"
 
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityCastRange"			"300"
-		"AbilityCastPoint"			"0"
+		"AbilityCastPoint"			"0.0"
 
 		// Time   
 		//-------------------------------------------------------------------------------------------------------------
@@ -23187,6 +23302,7 @@
 		"BaseClass"						"ability_datadriven"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"AbilityUnitTargetFlags"		"DOTA_UNIT_TARGET_FLAG_INVULNERABLE | DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES"
 		"AbilityTextureName"			"omniknight_guardian_angel"
 
 		// Casting
@@ -23537,7 +23653,7 @@
 		"AbilityManaCost"			"0"
 		"AbilityTextureName"		"fountain_glyph"
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
-
+		"AbilityUnitTargetFlags"	"DOTA_UNIT_TARGET_FLAG_INVULNERABLE | DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES"
 	
 		// Special
 		//-------------------------------------------------------------------------------------
@@ -23703,7 +23819,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"ability_datadriven"
-		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_AOE | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING"
+		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
 		"AbilityUnitTargetTeam"         "DOTA_UNIT_TARGET_TEAM_ENEMY"
 		"AbilityUnitTargetType"         "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
 		"AbilityUnitDamageType"         "DAMAGE_TYPE_MAGICAL"   
@@ -27024,7 +27140,7 @@
 				{
 					"FireEffect"
 					{
-						"EffectName"		"particles/units/heroes/hero_sven/sven_spell_great_cleave.vpcf"
+						"EffectName"		"particles/econ/items/faceless_void/faceless_void_weapon_bfury/faceless_void_weapon_bfury_cleave.vpcf"
 						"EffectAttachType"	"follow_origin"
 						"Target"			"TARGET"
 					}
@@ -27090,8 +27206,9 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"abyssal_underlord_firestorm"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE"
-		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"	
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_POINT"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
+		"AbilityUnitTargetFlags"		"DOTA_UNIT_TARGET_FLAG_INVULNERABLE | DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES"
 		"AbilityCastRange"				"750"
 		"AbilityCastPoint"				"0.45"
 
@@ -27865,6 +27982,8 @@
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"AbilityTextureName"		"custom/holdout_howl_of_terror"
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"AbilityUnitTargetFlags"	"DOTA_UNIT_TARGET_FLAG_INVULNERABLE | DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES"
+
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityCastPoint"			"0.6"
@@ -27947,6 +28066,7 @@
 		//-------------------------------------------------------------------------------------
 		"BaseClass"						"ability_datadriven"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityUnitTargetFlags"		"DOTA_UNIT_TARGET_FLAG_INVULNERABLE | DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES"
 
 		// Stats
 		//-------------------------------------------------------------------------------------
@@ -28394,7 +28514,7 @@
 		// General
 		//-------------------------------------------------------------------------------------
 		"BaseClass" "ability_datadriven"
-		"AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_AOE |  DOTA_ABILITY_BEHAVIOR_CHANNELLED"
+		"AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET |  DOTA_ABILITY_BEHAVIOR_CHANNELLED"
 	
 		// Stats
 		//-------------------------------------------------------------------------------------
@@ -28510,9 +28630,10 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"ability_datadriven"
-		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_AOE | DOTA_ABILITY_BEHAVIOR_POINT"
+		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_POINT"
 		"AbilityType"                   "DOTA_ABILITY_TYPE_ULTIMATE"
 		"SpellImmunityType"             "SPELL_IMMUNITY_ENEMIES_YES"
+		"AbilityUnitTargetFlags"		"DOTA_UNIT_TARGET_FLAG_INVULNERABLE | DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES"
 		"AbilityTextureName"            "faceless_void_chronosphere"
 		"AOERadius"                     "%radius"
 

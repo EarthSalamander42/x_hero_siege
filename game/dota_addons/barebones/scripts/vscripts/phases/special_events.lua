@@ -18,25 +18,21 @@ mode:SetFixedRespawnTime(1)
 	Notifications:TopToAll({hero="npc_dota_hero_zuus", duration=5.0})
 	Notifications:TopToAll({text=" You can't kill him! Just survive the Countdown. ", continue=true})
 	Notifications:TopToAll({text="Reward: 15 000 Gold.", continue=true})
-	for _, hero in pairs(HeroList:GetAllHeroes()) do
-		hero.old_pos = hero:GetAbsOrigin()
-		local id = hero:GetPlayerID()
-		if PlayerResource:IsValidPlayerID(id) then
+	for nPlayerID = 0, PlayerResource:GetPlayerCount() -1 do
+		if PlayerResource:HasSelectedHero(nPlayerID) then
+			local hero = PlayerResource:GetSelectedHeroEntity(nPlayerID)
+			hero.old_pos = hero:GetAbsOrigin()
+			local id = hero:GetPlayerID()
 			local point = Entities:FindByName(nil,"npc_dota_muradin_player_"..id)
+
+			print("Muradin Event Hero:", hero:GetUnitName())
 			DisableItems(hero, time)
-			if point then
-				FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
-			else
-				print("Wrong point?")
-			end
+			FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
 			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
+			
 			Timers:CreateTimer(0.1, function()
 				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
 			end)
-		else
-			print("Wrong Player?")
-			Notifications:TopToAll({text="Invalid Steam ID detected!! #ERROR 002 ", duration = 10.0})
-			Notifications:TopToAll({text="Please report this bug on Discord Chat!! #ERROR 002 ", continue = true})
 		end
 	end
 
@@ -103,14 +99,13 @@ StunBuildings(time)
 	Notifications:TopToAll({hero="npc_dota_hero_alchemist", duration=5.0})
 	Notifications:TopToAll({text=" It's farming time! Kill as much creeps as you can!", continue = true})
 
-	for _, hero in pairs(HeroList:GetAllHeroes()) do
-		hero.old_pos = hero:GetAbsOrigin()
-		if hero:IsIllusion() then
-		elseif hero:IsRealHero() then
-			local id = hero:GetPlayerID()
-			local point = Entities:FindByName(nil, "farm_event_player_"..id)
+	for nPlayerID = 0, PlayerResource:GetPlayerCount() -1 do
+		if PlayerResource:HasSelectedHero(nPlayerID) then
+			local hero = PlayerResource:GetSelectedHeroEntity(nPlayerID)
+			hero.old_pos = hero:GetAbsOrigin()
+			local point = Entities:FindByName(nil, "farm_event_player_"..nPlayerID)
 
-			if id == nil then
+			if nPlayerID == nil then
 				Notifications:TopToAll({text="Invalid Steam ID detected!! #ERROR 003 ", duration = 10.0})
 				Notifications:TopToAll({text="Please report this bug on Discord!! #ERROR 003 ", continue = true})
 			elseif point == nil then
@@ -130,10 +125,7 @@ StunBuildings(time)
 			end)
 
 			DisableItems(hero, time)
-			FarmEventCreeps(id)
-		else
-			Notifications:TopToAll({text="Invalid Steam ID detected!! #ERROR 001 ", duration = 10.0})
-			Notifications:TopToAll({text="Please report this bug on Discord!! #ERROR 001 ", continue = true})
+			FarmEventCreeps(nPlayerID)
 		end
 	end
 
@@ -193,10 +185,8 @@ function EndFarmEvent()
 --				TeleportHero(hero, 0.0, hero.old_pos)
 --			else
 				if hero:GetTeamNumber() == 2 then
-					print("tp back goodguy")
 					TeleportHero(hero, 0.0, base_good:GetAbsOrigin())
 				elseif hero:GetTeamNumber() == 3 then
-					print("tp back badguy")
 					TeleportHero(hero, 0.0, base_bad:GetAbsOrigin())
 				end
 --			end
@@ -216,6 +206,30 @@ function EndFarmEvent()
 		if v:IsCreature() and v:HasMovementCapability() then
 			UTIL_Remove(v)
 		end
+	end
+
+	-- Start Phase 2
+	for NumPlayers = 1, PlayerResource:GetPlayerCount() * CREEP_LANES_TYPE do
+		print("dota_badguys_barracks_"..NumPlayers)
+		local rax = Entities:FindByName(nil, "dota_badguys_barracks_"..NumPlayers)
+		rax:ForceKill(false)
+		Notifications:TopToAll({text="Phase 2 begins! (Destroyer Magnataur launched)", duration=10.0, style={color="red"}})
+	end
+
+	local DoorObs = Entities:FindAllByName("obstruction_phase2_1")
+	for _, obs in pairs(DoorObs) do 
+		obs:SetEnabled(false, true)
+	end
+	DoEntFire("door_phase2_left", "SetAnimation", "gate_entrance002_open", 0, nil, nil)
+	Phase2CreepsLeft()
+
+	if PlayerResource:GetPlayerCount() > 1 then
+		local DoorObs = Entities:FindAllByName("obstruction_phase2_2")
+		for _, obs in pairs(DoorObs) do 
+			obs:SetEnabled(false, true)
+		end
+		DoEntFire("door_phase2_right", "SetAnimation", "gate_entrance002_open", 0, nil, nil)
+		Phase2CreepsRight()
 	end
 end
 
@@ -356,7 +370,7 @@ CustomGameEventManager:Send_ServerToAllClients("show_duel", {})
 				for itemSlot = 0, 14 do
 					local item = hero:GetItemInSlot(itemSlot)
 					if item then
-						if item:GetName() == "item_healing_potion" or item:GetName() == "item_mana_potion" or item:GetName() == "item_ankh_of_reincarnation" then
+						if item:GetName() == "item_health_potion" or item:GetName() == "item_mana_potion" or item:GetName() == "item_ankh_of_reincarnation" then
 							hero:RemoveItem(item)
 						end
 					end
@@ -442,7 +456,7 @@ SpawnRunes()
 				for itemSlot = 0, 14 do
 					local item = hero:GetItemInSlot(itemSlot)
 					if item then
-						if item:GetName() == "item_healing_potion" or item:GetName() == "item_mana_potion" or item:GetName() == "item_ankh_of_reincarnation" then
+						if item:GetName() == "item_health_potion" or item:GetName() == "item_mana_potion" or item:GetName() == "item_ankh_of_reincarnation" then
 							hero:RemoveItem(item)
 						end
 					end

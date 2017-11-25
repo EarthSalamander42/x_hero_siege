@@ -1,5 +1,3 @@
-require('libraries/timers')
-
 function FullRestauration(event)
 local caster = event.caster
 local ability = event.ability

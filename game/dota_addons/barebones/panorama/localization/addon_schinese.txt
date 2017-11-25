@@ -1,0 +1,39 @@
+"addon"
+{
+	"DOTA_GoodGuys"   							"光明势力"
+	"DOTA_BadGuys"    							"黑暗势力"
+
+	"GameTime"									"游戏时间："
+	"Goal"										"特殊活动："
+	"CreepLevelGoal"							"怪物升级时间："
+	"IncomingWaveGoal"							"特殊怪物进攻："
+	"SpecialEventsGoal"							"BOSS："
+
+	"addonname"									"X Hero Siege"
+	"AddonTitleDifficulty"						"当前难度："
+	"AddonDifficultyEasy"						"简单：150% 金钱，125% 经验，75% 伤害"
+	"AddonDifficultyNormal"						"普通：110% 金钱，105% 经验，100% 伤害"
+	"AddonDifficultyHard"						"困难：100% 金钱，90% 经验，125% 伤害"
+	"AddonDifficultyExtreme"					"地狱：100% 金钱，75% 经验，150% 伤害"
+	"VIPTab"									"成为 VIP"
+	"VIPHeader"									"访问 Patreon 并赞助我们\n以获取 VIP 资格，即可解锁 8 个额外英雄的使用权！"
+	"community_header"							"加入 Discord 聊天组"
+	"community_description_1"					"- 通过 Discord 聊天组与其他玩家或作者讨论该地图"
+	"community_description_2"					"- 通过 Steam 组提交 Bug 并参与特殊活动"
+	"community_description_3"					"- 通过 Facebook 页面查看该地图的最新进展和更新历史"
+
+	"vote_difficulty_1"							"简单：150% 金钱，125% 经验，75% 伤害"
+	"vote_difficulty_2"							"普通：110% 金钱，105% 经验，100% 伤害"
+	"vote_difficulty_3"							"困难：100% 金钱，90% 经验，125% 伤害"
+	"vote_difficulty_4"							"地狱：100% 金钱，75% 经验，150% 伤害"
+
+	// Admin Mod
+	"credits_command"							"作者：[Bear] Cookies #42"
+	"command"									"命令："
+	"tome_command"								"购买卷轴：-bt"
+	"info_command"								"信息：-info"
+	"quest1_info"								"- 前往一条战线进行守护（0-40 分钟）.\n- 守护好水晶以免受到黑暗势力的侵害。"
+	"quest2_info"								"- 摧毁兵营后，即可前往并摧毁寒冰塔。\n\n- 然后准备好抵挡最后一波的攻势，守下后即可前往寒冰塔处使用绿色传送卷轴。"
+	"quest3_info"								"- 击败 玛瑟里顿，通过新开启的大门。\n\n- 击败 格罗姆·地狱咆哮，伊利丹·怒风，巴拉那，海军上将·普罗德摩尔后进入红色传送点。\n\n- 在此区域内，击败阿尔萨斯，贝恩霍勒，巫妖王和元素大师。"
+	"quest4_info"								"- 特殊剧情 1（穆拉丁）：\n 游戏进行到<font color='#00CC00'> 12 </font>分钟时自动开启，你无法击杀<font color='#00CC00'>穆拉丁</font>，坚持存活<font color='#00CC00'> 2 </font>分钟即可获得<font color='#00CC00'> 15,000 </font>金币奖励。\n\n- 特殊剧情 2（打怪时间）\n 游戏进行到<font color='#00CC00'> 24 </font>分钟时自动开始，尽你所能地击杀怪物，以获得金钱和经验奖励。\n\n- 特殊剧情 3（拉美罗 和 布里斯托）：\n击杀<font color='#00CC00'> 500 </font>个怪物后将会传送到一个特殊区域，击杀<font color='#00CC00'>拉美罗</font>后掉落<font color='#00CC00'>雷鸣之刃</font>。\n\n- 特殊剧情 4 (拉美罗 2):\n击杀<font color='#00CC00'> 750 </font>个怪物后将会传送到一个特殊区域，击杀<font color='#00CC00'>拉美罗</font>后掉落<font color='#00CC00'>优势之戒</font>，这对于通关游戏有很大的帮助。"
+}

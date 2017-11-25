@@ -5,18 +5,16 @@
 *.tmp
 
 # Compiled formats
-*.vpcf_c
-*.vtex_c
-*.vsndevts_c
-*.vmat_c
+*.vmdl
+*.fbx
+*.vmat
+*.vpcf
 *.vjs_c
 *.vxml_c
 *.vcss_c
 *.cfg
-
-# Commit panorama compiled textures
-!game/dota_addons/barebones/panorama/images/*.vtex_c
-!game/dota_addons/barebones/panorama/images/custom_game/*.vtex_c
+*.tga
+*.vtex_c
 
 # Map files
 *.vpk
@@ -29,8 +27,9 @@ game/dota_addons/barebones/models/*
 game/dota_addons/barebones/resource/overviews/*
 
 # Single Files
-game/dota_addons/barebones/panorama_debugger.cfg
+*.cfg
 
 #Github dump
 *.stackdump
 game/dota_addons/barebones/scripts/vscripts/statcollection/settings.kv
+game/dota_addons/barebones/scripts/vscripts/internal/auth.kv

@@ -18,7 +18,7 @@
 	{		
 		"ItemPurchasable"				"0"
 
-		// Special	
+		// Special
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilitySpecial"
 		{
@@ -245,7 +245,6 @@
 	"item_stout_shield"				"REMOVE"
 	"item_slippers"					"REMOVE"
 	"item_banana"					"REMOVE"
-	"item_tpscroll"					"REMOVE"
 
 	//============================================================================================================
 	//============================================================================================================
@@ -1260,15 +1259,15 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_AUTOCAST | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC | DOTA_UNIT_TARGET_BUILDING"
 		"SpellImmunityType"				"SPELL_IMMUNITY_ALLIES_YES"
 
 		// Time		
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCooldown"				"20.0"
-		"AbilityDuration"				"40.0"
+		"AbilityCooldown"				"30.0"
+		"AbilityDuration"				"20.0"
 
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
@@ -1285,9 +1284,9 @@
 			}
 			"02"
 			{
-				"var_type"								"FIELD_INTEGER"
-				"building_armor_bonus_tooltip"			"0"
-				"LinkedSpecialBonus"					"special_bonus_unique_lich_1"
+				"var_type"							"FIELD_INTEGER"
+				"building_armor_bonus_tooltip"		"0"
+				"LinkedSpecialBonus"				"special_bonus_unique_lich_1"
 			}
 			"03"
 			{
@@ -1385,11 +1384,13 @@
 			{
 				"var_type"					"FIELD_INTEGER"
 				"damage"					"1925"
+				"LinkedSpecialBonus"		"special_bonus_unique_lion_3"
 			}
 			"02"
 			{
 				"var_type"					"FIELD_INTEGER"
 				"damage_scepter"			"0"
+				"LinkedSpecialBonus"		"special_bonus_unique_lion_3"
 			}
 			"03"
 			{
@@ -2279,19 +2280,25 @@
 			{
 				"var_type"				"FIELD_INTEGER"
 				"damage_per_second"		"40 70 100 130"
-				"LinkedSpecialBonus"	"special_bonus_unique_doom_4"
+				"LinkedSpecialBonus"	"special_bonus_unique_doom_4"				
 			}
 			"02"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"radius"				"600"
+				"regen"					"40 70 100 130"
+				"LinkedSpecialBonus"	"special_bonus_unique_doom_4"				
 			}
 			"03"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"bonus_movement_speed_pct"	"8 12 16 20"
+				"radius"				"600"
 			}
 			"04"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"bonus_movement_speed_pct"	"8 12 16 20"
+			}
+			"05"
 			{
 				"var_type"				"FIELD_FLOAT"
 				"duration"				"10.0 14.0 16.0 20.0"
@@ -2616,23 +2623,22 @@
 				"var_type"				"FIELD_INTEGER"
 				"mana_cost_per_second"	"60 120 180"
 			}
-
 			"02"
 			{
-				"var_type"			"FIELD_INTEGER"
-				"radius"			"450"
+				"var_type"				"FIELD_INTEGER"
+				"radius"				"450"
 			}
-
 			"03"
 			{
-				"var_type"			"FIELD_INTEGER"
-				"damage"			"100 130 160"
+				"var_type"				"FIELD_INTEGER"
+				"damage"				"100 130 160"
+				"LinkedSpecialBonus"	"special_bonus_unique_leshrac_3"
 			}
-
 			"04"
 			{
-				"var_type"			"FIELD_INTEGER"
-				"damage_scepter"	"0"
+				"var_type"				"FIELD_INTEGER"
+				"damage_scepter"		"0"
+				"LinkedSpecialBonus"	"special_bonus_unique_leshrac_3"
 			}
 		}
 	}

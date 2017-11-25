@@ -7,5 +7,6 @@
 		"zone_scores",
 		"player_zone_locations",
 		"zone_names",
+		"game_options",
 	]
 }

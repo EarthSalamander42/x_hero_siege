@@ -20,8 +20,11 @@ require('phases/phase1')
 require('phases/phase2')
 require('phases/phase3')
 require('zones/zones')
+require('units/breakable_container_surprises')
+require('units/treasure_chest_surprises')
 require('triggers')
 require('items/global')
+require('server')
 
 function GameMode:OnFirstPlayerLoaded()
 base_good = Entities:FindByName(nil, "base_spawn_goodguys")
@@ -43,8 +46,6 @@ function GameMode:OnAllPlayersLoaded()
 			EmitSoundOn("Global.InGame", base_bad)
 		end
 	end)
-
-	GameRules:GetGameModeEntity():SetItemAddedToInventoryFilter(Dynamic_Wrap(GameMode, "ItemAddedFilter"), self)
 end
 
 function GameMode:OnHeroInGame(hero)
@@ -54,10 +55,11 @@ local point = Entities:FindByName(nil, "hero_selection_"..id)
 	if hero:GetUnitName() == "npc_dota_hero_wisp" then
 		hero:SetAbilityPoints(0)
 		hero:SetGold(0, false)
-		hero:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 20.0, IsHidden = true})
+		hero:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 25.0, IsHidden = true})
 		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
-		Timers:CreateTimer(20.0, function()
+		Timers:CreateTimer(25.0, function()
 			FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
+			hero:Stop()
 			Timers:CreateTimer(0.1, function()
 				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
 			end)
@@ -71,9 +73,6 @@ local point = Entities:FindByName(nil, "hero_selection_"..id)
 	end
 end
 
-function GameMode:OnGameInProgress()	
-end
-
 function GameMode:InitGameMode()
 	GameMode = self
 	mode = GameRules:GetGameModeEntity()
@@ -81,13 +80,23 @@ function GameMode:InitGameMode()
 --	GameMode.ItemKVs = LoadKeyValues("scripts/npc/npc_items_custom.txt")
 
 	-- Timer Rules
-	GameRules:SetPostGameTime(30.0)
+	GameRules:SetPostGameTime(60.0)
 	GameRules:SetTreeRegrowTime(240.0)
 	GameRules:SetHeroSelectionTime(0.0) --This is not dota bitch
 	GameRules:SetGoldTickTime(0.0) --This is not dota bitch
 	GameRules:SetGoldPerTick(0.0) --This is not dota bitch
-	GameRules:SetCustomGameSetupAutoLaunchDelay(20.0) --Vote Time
+	GameRules:SetCustomGameSetupAutoLaunchDelay(15.0) --Vote Time
 	GameRules:SetPreGameTime(PREGAMETIME)
+
+	--Disabling Derived Stats
+	mode:SetCustomAttributeDerivedStatValue(DOTA_ATTRIBUTE_STRENGTH_STATUS_RESISTANCE_PERCENT, 0)
+	mode:SetCustomAttributeDerivedStatValue(DOTA_ATTRIBUTE_AGILITY_MOVE_SPEED_PERCENT, 0)
+	mode:SetCustomAttributeDerivedStatValue(DOTA_ATTRIBUTE_INTELLIGENCE_MAGIC_RESISTANCE_PERCENT, 0)
+
+	-- Overriding Derived Stats
+	mode:SetCustomAttributeDerivedStatValue(DOTA_ATTRIBUTE_STRENGTH_HP_REGEN_PERCENT, 0.0025)
+	mode:SetCustomAttributeDerivedStatValue(DOTA_ATTRIBUTE_INTELLIGENCE_MANA_REGEN_PERCENT, 0.0025)
+	mode:SetCustomAttributeDerivedStatValue(DOTA_ATTRIBUTE_INTELLIGENCE_SPELL_AMP_PERCENT, 0.05)
 
 	-- Boolean Rules
 	GameRules:SetUseCustomHeroXPValues(true)
@@ -141,6 +150,10 @@ function GameMode:InitGameMode()
 	-- Lua Modifiers
 	LinkLuaModifier("modifier_earthquake_aura", "heroes/hero_brewmaster", LUA_MODIFIER_MOTION_NONE)
 	LinkLuaModifier("modifier_command_restricted", "modifiers/modifier_command_restricted", LUA_MODIFIER_MOTION_NONE)
+	LinkLuaModifier("modifier_ai", "modifiers/modifier_ai", LUA_MODIFIER_MOTION_NONE)
+	LinkLuaModifier("modifier_breakable_container", "modifiers/modifier_breakable_container", LUA_MODIFIER_MOTION_NONE)
+	LinkLuaModifier("modifier_creature_techies_land_mine", "modifiers/modifier_creature_techies_land_mine", LUA_MODIFIER_MOTION_NONE)
+	LinkLuaModifier("modifier_lifesteal", "modifiers/modifier_lifesteal.lua", LUA_MODIFIER_MOTION_NONE)
 
 	GameMode:_InitGameMode()
 	self:OnFirstPlayerLoaded()
@@ -169,6 +182,133 @@ function GameMode:InitGameMode()
 	self.CheckpointsActivated = {}
 	self.Zones = {}
 --	CustomGameEventManager:RegisterListener("scroll_clicked", function(...) return self:OnScrollClicked(...) end)
+
+	-- Item added to inventory filter
+	mode:SetItemAddedToInventoryFilter(function(ctx, event)
+		local hero = EntIndexToHScript(event.inventory_parent_entindex_const)
+		local item = EntIndexToHScript(event.item_entindex_const)
+		local key = "item_key_of_the_three_moons"
+		local shield = "item_shield_of_invincibility"
+		local sword = "item_lightning_sword"
+		local ring = "item_ring_of_superiority"
+		local doom = "item_doom_artifact"
+		local frost = "item_orb_of_frost"
+		if item:GetAbilityName() == "item_tpscroll" and item:GetPurchaser() == nil then return false end
+
+		if hero:IsRealHero() or hero:IsConsideredHero() then
+			if hero:GetUnitName() == "npc_baristol" then return end
+			if hero:GetTeamNumber() == 2 or hero:GetTeamNumber() == 3 then
+				if item:GetName() == sword and sword_first_time then
+					SPECIAL_EVENT = 0
+					CustomGameEventManager:Send_ServerToAllClients("hide_timer_special_arena", {})
+					GameMode.SpecialArena_occuring = 0
+					if timers.RameroAndBaristol then
+						Timers:RemoveTimer(timers.RameroAndBaristol)
+					end
+					RestartCreeps()
+					sword_first_time = false
+					if hero.old_pos then
+						TeleportHero(hero, 0.0, hero.old_pos)
+					else
+						if hero:GetTeamNumber() == 2 then
+							TeleportHero(hero, 0.0, base_good:GetAbsOrigin())
+						elseif hero:GetTeamNumber() == 3 then
+							TeleportHero(hero, 0.0, base_bad:GetAbsOrigin())
+						end
+					end
+					PlayerResource:SetCameraTarget(hero:GetPlayerID(), hero)
+					hero:EmitSound("Hero_TemplarAssassin.Trap")
+					Timers:CreateTimer(0.1, function()
+						PlayerResource:SetCameraTarget(hero:GetPlayerID(), nil)
+					end)
+				end
+				if item:GetName() == ring and ring_first_time then
+					SPECIAL_EVENT = 0
+					CustomGameEventManager:Send_ServerToAllClients("hide_timer_special_arena", {})
+					GameMode.SpecialArena_occuring = 0
+					if timers.Ramero then
+						Timers:RemoveTimer(timers.Ramero)
+					end
+					RestartCreeps()
+					ring_first_time = false
+					if hero.old_pos then
+						TeleportHero(hero, 0.0, hero.old_pos)
+					else
+						if hero:GetTeamNumber() == 2 then
+							TeleportHero(hero, 0.0, base_good:GetAbsOrigin())
+						elseif hero:GetTeamNumber() == 3 then
+							TeleportHero(hero, 0.0, base_bad:GetAbsOrigin())
+						end
+					end
+					PlayerResource:SetCameraTarget(hero:GetPlayerID(), hero)
+					hero:EmitSound("Hero_TemplarAssassin.Trap")
+					Timers:CreateTimer(0.1, function()
+						PlayerResource:SetCameraTarget(hero:GetPlayerID(), nil)
+					end)
+				end
+				if item:GetName() == frost and frost_first_time then
+					frost_first_time = false
+					if hero.old_pos then
+						TeleportHero(hero, 0.0, hero.old_pos)
+					else
+						if hero:GetTeamNumber() == 2 then
+							TeleportHero(hero, 0.0, base_good:GetAbsOrigin())
+						else
+							TeleportHero(hero, 0.0, base_bad:GetAbsOrigin())
+						end
+					end
+					PlayerResource:SetCameraTarget(hero:GetPlayerID(), hero)
+					hero:EmitSound("Hero_TemplarAssassin.Trap")
+					Timers:CreateTimer(0.1, function()
+						PlayerResource:SetCameraTarget(hero:GetPlayerID(), nil)
+					end)
+--				elseif item:GetName() == frost and frost_first_time == false then
+--					return false
+				end
+			end
+
+--			if item:GetName() == key and hero.has_epic_1 == false then
+--				hero.has_epic_1 = true
+--				hero:EmitSound("Hero_TemplarAssassin.Trap")
+--			end
+--			if item:GetName() == shield and hero.has_epic_2 == false then
+--				hero.has_epic_2 = true
+--				hero:EmitSound("Hero_TemplarAssassin.Trap")
+--			end
+--			if item:GetName() == sword and hero.has_epic_3 == false then
+--				hero.has_epic_3 = true
+--				hero:EmitSound("Hero_TemplarAssassin.Trap")
+--			end
+--			if item:GetName() == ring and hero.has_epic_4 == false then
+--				hero.has_epic_4 = true
+--				hero:EmitSound("Hero_TemplarAssassin.Trap")
+--			end
+
+			if item:GetName() == doom and doom_first_time then
+				doom_first_time = false
+				hero:EmitSound("Hero_TemplarAssassin.Trap")
+				local line_duration = 10
+				Notifications:TopToAll({hero = hero:GetName(), duration = line_duration})
+--				Notifications:TopToAll({text = hero:GetUnitName().." ", duration = line_duration, continue = true})
+				Notifications:TopToAll({text = PlayerResource:GetPlayerName(hero:GetPlayerID()).." ", duration = line_duration, continue = true})
+				Notifications:TopToAll({text = "merged the 4 Boss items to create Doom Artifact!", duration = line_duration, style = {color = "Red"}, continue = true})
+--			elseif item:GetName() == doom and frost_first_time == false then
+--				return false
+			end
+
+			-- Rune System
+			if item:GetName() == "item_rune_armor" then
+				print("Armor Rune!")
+				PickupArmorRune(item, hero)
+				return false
+			elseif item:GetName() == "item_rune_immolation" then
+				print("Immolation Rune!")
+				PickupImmolationRune(item, hero)
+				return false
+			end
+		end
+    	return true
+	end, self)
 end
 
 function FarmTest()
@@ -177,12 +317,7 @@ FarmEvent()
 end
 
 function GameMode:OnGameRulesStateChange(keys)
-local heroes = HeroList:GetAllHeroes()
-
-	-- This internal handling is used to set up main barebones functions
-	GameMode:_OnGameRulesStateChange(keys)
-
-	local newState = GameRules:State_Get()
+local newState = GameRules:State_Get()
 
 	if newState == DOTA_GAMERULES_STATE_HERO_SELECTION then
 		GameRules:SetCustomGameDifficulty(2)
@@ -239,7 +374,7 @@ local heroes = HeroList:GetAllHeroes()
 			ChooseRandomHero(event)
 		end
 		for i = 1, 8 do
-			DoEntFire("door_lane"..i, "SetAnimation", "close_idle", 0, nil, nil)
+			DoEntFire("door_lane"..i, "SetAnimation", "gate_02_close", 0, nil, nil)
 		end
 		SpawnHeroesBis()
 
@@ -272,17 +407,23 @@ local heroes = HeroList:GetAllHeroes()
 			Entities:FindByName(nil, "trigger_special_event_tp_off"):Disable()
 			Entities:FindByName(nil, "trigger_special_event"):Enable()
 		end
+
+		Server_WaitToEnableXpGain() -- Enable xp gain
+		GAME_WINNER_TEAM = "Dire"
 		nTimer_SpecialEvent = 720
 		nTimer_IncomingWave = 240
 		nTimer_CreepLevel = 360
 --		ModifyLanes()
 
-		-- debug for quests about destroying buildings
+		local ice_towers = Entities:FindAllByName("npc_tower_death")
+		for _, tower in pairs(ice_towers) do
+			tower:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
+		end
+
 		for TW = 1, 2 do
-			local ice_towers = Entities:FindAllByName("npc_tower_cold_"..TW)
-			for _, tower in pairs(ice_towers) do
-				tower.zone = "xhs_holdout"
-			end
+			local ice_towers_main = Entities:FindByName(nil, "npc_tower_cold_"..TW)
+			ice_towers_main:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
+			ice_towers_main.zone = "xhs_holdout"
 		end
 
 		-- Make towers invulnerable again
@@ -293,8 +434,8 @@ local heroes = HeroList:GetAllHeroes()
 			end
 			local raxes = Entities:FindAllByName("dota_badguys_barracks_"..Players)
 			for _, rax in pairs(raxes) do
-				rax:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
 				rax.zone = "xhs_holdout"
+				rax:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
 			end
 		end
 
@@ -306,14 +447,10 @@ local heroes = HeroList:GetAllHeroes()
 				for _, obs in pairs(DoorObs) do
 					obs:SetEnabled(false, true)
 				end
-				DoEntFire("door_lane"..NumPlayers, "SetAnimation", "open", 0, nil, nil)
+				DoEntFire("door_lane"..NumPlayers, "SetAnimation", "gate_02_open", 0, nil, nil)
 				local towers = Entities:FindAllByName("dota_badguys_tower"..NumPlayers)
 				for _, tower in pairs(towers) do
 					tower:RemoveModifierByName("modifier_invulnerable")
-				end
-				local raxes = Entities:FindAllByName("dota_badguys_barracks_"..NumPlayers)
-				for _, rax in pairs(raxes) do
-					rax:RemoveModifierByName("modifier_invulnerable")
 				end
 			end
 		elseif GetMapName() == "ranked_2v2" then
@@ -323,14 +460,10 @@ local heroes = HeroList:GetAllHeroes()
 				for _, obs in pairs(DoorObs) do
 					obs:SetEnabled(false, true)
 				end
-				DoEntFire("door_lane"..NumPlayers, "SetAnimation", "open", 0, nil, nil)
+				DoEntFire("door_lane"..NumPlayers, "SetAnimation", "gate_02_open", 0, nil, nil)
 				local towers = Entities:FindAllByName("dota_badguys_tower"..NumPlayers)
 				for _, tower in pairs(towers) do
 					tower:RemoveModifierByName("modifier_invulnerable")
-				end
-				local raxes = Entities:FindAllByName("dota_badguys_barracks_"..NumPlayers)
-				for _, rax in pairs(raxes) do
-					rax:RemoveModifierByName("modifier_invulnerable")
 				end
 			end
 		else
@@ -340,14 +473,10 @@ local heroes = HeroList:GetAllHeroes()
 				for _, obs in pairs(DoorObs) do
 					obs:SetEnabled(false, true)
 				end
-				DoEntFire("door_lane"..NumPlayers, "SetAnimation", "open", 0, nil, nil)
+				DoEntFire("door_lane"..NumPlayers, "SetAnimation", "gate_02_open", 0, nil, nil)
 				local towers = Entities:FindAllByName("dota_badguys_tower"..NumPlayers)
 				for _, tower in pairs(towers) do
 					tower:RemoveModifierByName("modifier_invulnerable")
-				end
-				local raxes = Entities:FindAllByName("dota_badguys_barracks_"..NumPlayers)
-				for _, rax in pairs(raxes) do
-					rax:RemoveModifierByName("modifier_invulnerable")
 				end
 			end
 		end
@@ -365,6 +494,16 @@ local heroes = HeroList:GetAllHeroes()
 			end
 			return 30
 		end)
+	end
+
+	if newState == DOTA_GAMERULES_STATE_POST_GAME then
+		CustomGameEventManager:Send_ServerToAllClients("end_game", {})
+		local winning_team = GAME_WINNER_TEAM
+		Server_CalculateXPForWinnerAndAll(winning_team)
+		local winning_team_number = 2
+		if winning_team == "Dire" then
+			winning_team_number = 3
+		end
 	end
 end
 
@@ -458,8 +597,8 @@ end
 				SpawnDragons("npc_dota_creature_green_dragon")
 				CreepLevels(4)
 			elseif nTimer_GameTime == 1435 then -- 1435 - 23:55 Min: FARM EVENT 2
-				nTimer_GameTime = 1440 -1
-				nTimer_IncomingWave = 240 +1 --	+1
+				nTimer_GameTime = 1439
+				nTimer_IncomingWave = 241 -- +1
 				RefreshPlayers()
 				Timers:CreateTimer(1, function()
 					SPECIAL_EVENT = 1
@@ -473,12 +612,10 @@ end
 			end
 		end
 
-		if nTimer_SpecialEvent <= 0 then
-			nTimer_SpecialEvent = 1
-		end
-		if nTimer_SpecialArena <= 0 then
-			nTimer_SpecialArena = 1
-		end
+		if nTimer_CreepLevel <= 0 then nTimer_CreepLevel = 1 end
+		if nTimer_SpecialEvent <= 0 then nTimer_SpecialEvent = 1 end
+		if nTimer_SpecialArena <= 0 then nTimer_SpecialArena = 1 end
+
 		if nTimer_IncomingWave <= 0 then
 			nTimer_IncomingWave = 1
 		elseif nTimer_IncomingWave == 1 then
@@ -491,10 +628,6 @@ end
 			reg = reg + 1
 		elseif nTimer_GameTime > 2140 then
 			nTimer_IncomingWave = 240
-		end
-
-		if nTimer_CreepLevel <= 0 then
-			nTimer_CreepLevel = 1
 		end
 	end
 
@@ -708,129 +841,6 @@ function CountdownTimerAllHeroImage()
 			timer_second_01 = s01,
 		}
 	CustomGameEventManager:Send_ServerToAllClients("timer_all_hero_image", broadcast_gametimer)
-end
-
--- Item added to inventory filter
-function GameMode:ItemAddedFilter(keys)
-local hero = EntIndexToHScript(keys.inventory_parent_entindex_const)
-local item = EntIndexToHScript(keys.item_entindex_const)
-local key = "item_key_of_the_three_moons"
-local shield = "item_shield_of_invincibility"
-local sword = "item_lightning_sword"
-local ring = "item_ring_of_superiority"
-local doom = "item_doom_artifact"
-local frost = "item_orb_of_frost"
-
-	if hero:IsRealHero() or hero:IsConsideredHero() then
-		if hero:GetTeamNumber() == 2 or hero:GetTeamNumber() == 3 then
-			if item:GetName() == sword and sword_first_time then
-				SPECIAL_EVENT = 0
-				CustomGameEventManager:Send_ServerToAllClients("hide_timer_special_arena", {})
-				GameMode.SpecialArena_occuring = 0
-				if timers.RameroAndBaristol then
-					Timers:RemoveTimer(timers.RameroAndBaristol)
-				end
-				RestartCreeps()
-				sword_first_time = false
-				if hero.old_pos then
-					TeleportHero(hero, 0.0, hero.old_pos)
-				else
-					if hero:GetTeamNumber() == 2 then
-						TeleportHero(hero, 0.0, base_good:GetAbsOrigin())
-					elseif hero:GetTeamNumber() == 3 then
-						TeleportHero(hero, 0.0, base_bad:GetAbsOrigin())
-					end
-				end
-				PlayerResource:SetCameraTarget(hero:GetPlayerID(), hero)
-				hero:EmitSound("Hero_TemplarAssassin.Trap")
-				Timers:CreateTimer(0.1, function()
-					PlayerResource:SetCameraTarget(hero:GetPlayerID(), nil)
-				end)
-			end
-			if item:GetName() == ring and ring_first_time then
-				SPECIAL_EVENT = 0
-				CustomGameEventManager:Send_ServerToAllClients("hide_timer_special_arena", {})
-				GameMode.SpecialArena_occuring = 0
-				if timers.Ramero then
-					Timers:RemoveTimer(timers.Ramero)
-				end
-				RestartCreeps()
-				ring_first_time = false
-				if hero.old_pos then
-					TeleportHero(hero, 0.0, hero.old_pos)
-				else
-					if hero:GetTeamNumber() == 2 then
-						TeleportHero(hero, 0.0, base_good:GetAbsOrigin())
-					elseif hero:GetTeamNumber() == 3 then
-						TeleportHero(hero, 0.0, base_bad:GetAbsOrigin())
-					end
-				end
-				PlayerResource:SetCameraTarget(hero:GetPlayerID(), hero)
-				hero:EmitSound("Hero_TemplarAssassin.Trap")
-				Timers:CreateTimer(0.1, function()
-					PlayerResource:SetCameraTarget(hero:GetPlayerID(), nil)
-				end)
-			end
-			if item:GetName() == frost and frost_first_time then
-				frost_first_time = false
-				if hero.old_pos then
-					TeleportHero(hero, 0.0, hero.old_pos)
-				else
-					if hero:GetTeamNumber() == 2 then
-						TeleportHero(hero, 0.0, base_good:GetAbsOrigin())
-					else
-						TeleportHero(hero, 0.0, base_bad:GetAbsOrigin())
-					end
-				end
-				PlayerResource:SetCameraTarget(hero:GetPlayerID(), hero)
-				hero:EmitSound("Hero_TemplarAssassin.Trap")
-				Timers:CreateTimer(0.1, function()
-					PlayerResource:SetCameraTarget(hero:GetPlayerID(), nil)
-				end)
---			elseif item:GetName() == frost and frost_first_time == false then
---				return false
-			end
-		end
-
---		if item:GetName() == key and hero.has_epic_1 == false then
---			hero.has_epic_1 = true
---			hero:EmitSound("Hero_TemplarAssassin.Trap")
---		end
---		if item:GetName() == shield and hero.has_epic_2 == false then
---			hero.has_epic_2 = true
---			hero:EmitSound("Hero_TemplarAssassin.Trap")
---		end
---		if item:GetName() == sword and hero.has_epic_3 == false then
---			hero.has_epic_3 = true
---			hero:EmitSound("Hero_TemplarAssassin.Trap")
---		end
---		if item:GetName() == ring and hero.has_epic_4 == false then
---			hero.has_epic_4 = true
---			hero:EmitSound("Hero_TemplarAssassin.Trap")
---		end
-
-		if item:GetName() == doom and doom_first_time then
-			doom_first_time = false
-			hero:EmitSound("Hero_TemplarAssassin.Trap")
-			local line_duration = 10
-			Notifications:TopToAll({hero = hero:GetName(), duration = line_duration})
---			Notifications:TopToAll({text = hero:GetUnitName().." ", duration = line_duration, continue = true})
-			Notifications:TopToAll({text = PlayerResource:GetPlayerName(hero:GetPlayerID()).." ", duration = line_duration, continue = true})
-			Notifications:TopToAll({text = "merged the 4 Boss items to create Doom Artifact!", duration = line_duration, style = {color = "Red"}, continue = true})
---		elseif item:GetName() == doom and frost_first_time == false then
---			return false
-		end
-
-		-- Rune System
-		if item:GetName() == "item_rune_armor" then
-			PickupArmorRune(item, hero)
-			return false
-		elseif item:GetName() == "item_rune_immolation" then
-			PickupImmolationRune(item, hero)
-			return false
-		end
-	end
-	return true
 end
 
 ---------------------------------------------------------------------------

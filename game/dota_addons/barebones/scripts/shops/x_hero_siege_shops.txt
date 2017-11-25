@@ -2,7 +2,7 @@
 {
 	"consumables"
 	{
-		"item"		"item_healing_potion"
+		"item"		"item_health_potion"
 		"item"		"item_mana_potion"
 		"item"		"item_healing_wards"
 		"item"		"item_potion_of_antimagic"

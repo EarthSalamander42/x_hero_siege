@@ -171,8 +171,6 @@
 		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_STRUCTURE"
 		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_BUILDING"
 
-//		"vscripts"					"ai/castle.lua"
-
 		// Vision
 		//----------------------------------------------------------------
 		"VisionDaytimeRange"		"2000"		// Range of vision during day light.
@@ -209,8 +207,8 @@
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
-		"AttackDamageMin"			"20"		// Damage range min.
-		"AttackDamageMax"			"20"		// Damage range max.
+		"AttackDamageMin"			"100"		// Damage range min.
+		"AttackDamageMax"			"125"		// Damage range max.
 		"AttackDamageType"			"DAMAGE_TYPE_ArmorPhysical"
 		"AttackRate"				"1.0"		// Speed of attack.
 		"AttackAnimationPoint"		"0.6"		// Normalized time in animation cycle to attack.
@@ -265,9 +263,8 @@
 	"xhs_tower_lane_1"
 	{
 		// General
-
 		"BaseClass"					"npc_dota_holdout_tower_spawn_protection"		// Class of entity of link to.
-		"Model"						"models/architecture/forest/slom_guardtower_dest.vmdl"			// Model.
+		"Model"						"models/architecture/forest/slom_guardtower.vmdl"			// Model.
 		"SoundSet"					"Tower.Water"									// Name of sound set.
 		"MinimapIcon"				"minimap_tower90"
 		"MinimapIconSize"			"200"
@@ -674,8 +671,8 @@
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
-		"AttackDamageMin"			"34000"		// Damage range min.
-		"AttackDamageMax"			"36000"		// Damage range max.
+		"AttackDamageMin"			"340000"		// Damage range min.
+		"AttackDamageMax"			"360000"		// Damage range max.
 		"AttackDamageType"			"DAMAGE_TYPE_ArmorPhysical"
 		"AttackRate"				"0.45"		// Speed of attack.
 		"AttackAnimationPoint"		"0.3"		// Normalized time in animation cycle to attack.
@@ -758,10 +755,10 @@
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
-		"AttackDamageMin"			"19000"		// Damage range min.
-		"AttackDamageMax"			"21000"		// Damage range max.
+		"AttackDamageMin"			"190000"		// Damage range min.
+		"AttackDamageMax"			"210000"		// Damage range max.
 		"AttackDamageType"			"DAMAGE_TYPE_ArmorPhysical"
-		"AttackRate"				"0.7"		// Speed of attack.
+		"AttackRate"				"0.8"		// Speed of attack.
 		"AttackAnimationPoint"		"0.3"		// Normalized time in animation cycle to attack.
 		"AttackAcquisitionRange"	"650"		// Range within a target can be acquired.
 		"AttackRange"				"650"		// Range within a target can be attacked.
@@ -820,7 +817,7 @@
 		"ModelScale"				"0.55"
 		"Level"						"1"
 		"SoundSet"					"Hero_Lifestealer"
-		"vscripts"					"ai/creeps_ai.lua"
+		"UseAI"						"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -895,7 +892,7 @@
 		"ModelScale"				"0.65"
 		"Level"						"1"
 		"SoundSet"					"Hero_Luna"
-		"vscripts"					"ai/creeps_ai.lua"
+		"UseAI"						"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -985,7 +982,7 @@
 		"ModelScale"				"0.55"
 		"Level"						"1"
 		"SoundSet"					"Hero_Ogre_Magi"
-		"vscripts"					"ai/creeps_ai.lua"
+		"UseAI"						"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -1060,7 +1057,7 @@
 		"ModelScale"				"0.55"
 		"Level"						"1"
 		"SoundSet"					"Hero_DragonKnight"
-		"vscripts"					"ai/creeps_ai.lua"
+		"UseAI"						"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -1147,9 +1144,8 @@
 		"Model"						"models/heroes/weaver/weaver.vmdl"	// Model.
 		"ModelScale"				"0.45"
 		"Level"						"1"
-		"ConsideredHero"			"0"
 		"SoundSet"					"Hero_Weaver"
-		"vscripts"					"ai/creeps_ai.lua"
+		"UseAI"						"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -1236,9 +1232,8 @@
 		"Model"						"models/heroes/huskar/huskar.vmdl"	// Model.
 		"ModelScale"				"0.65"
 		"Level"						"1"
-		"ConsideredHero"			"0"
 		"SoundSet"					"Hero_Huskar"
-		"vscripts"					"ai/creeps_ai.lua"
+		"UseAI"						"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -1326,9 +1321,8 @@
 		"Model"						"models/heroes/drow/drow.vmdl"	// Model.
 		"ModelScale"				"0.75"
 		"Level"						"1"
-		"ConsideredHero"			"0"
 		"SoundSet"					"Hero_DrowRanger"
-		"vscripts"					"ai/creeps_ai.lua"
+		"UseAI"						"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -1417,9 +1411,8 @@
 		"Model"						"models/heroes/sniper/sniper.vmdl"	// Model.
 		"ModelScale"				"0.65"
 		"Level"						"1"
-		"ConsideredHero"			"0"
 		"SoundSet"					"Hero_Sniper"
-		"vscripts"					"ai/creeps_ai.lua"
+		"UseAI"						"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -1507,9 +1500,8 @@
 		"Model"						"models/heroes/pudge/pudge.vmdl"	// Model.
 		"ModelScale"				"0.7"
 		"Level"						"1"
-		"ConsideredHero"			"0"
 		"SoundSet"					"Hero_Pudge"
-		"vscripts"					"ai/creeps_ai.lua"
+		"UseAI"						"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -1598,9 +1590,8 @@
 		"Model"						"models/heroes/earthshaker/earthshaker.vmdl"	// Model.
 		"ModelScale"				"0.8"
 		"Level"						"1"
-		"ConsideredHero"			"0"
 		"SoundSet"					"Hero_Earthshaker"
-		"vscripts"					"ai/creeps_ai.lua"
+		"UseAI"						"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -1686,9 +1677,8 @@
 		"Model"						"models/items/lone_druid/true_form/form_of_the_atniw/form_of_the_atniw.vmdl"	// Model.
 		"ModelScale"				"0.7"
 		"Level"						"1"
-		"ConsideredHero"			"0"
 		"SoundSet"					"Hero_Ursa"
-		"vscripts"					"ai/creeps_ai.lua"
+		"UseAI"						"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -1762,9 +1752,8 @@
 		"Model"						"models/heroes/keeper_of_the_light/keeper_of_the_light.vmdl"	// Model.
 		"ModelScale"				"0.7"
 		"Level"						"1"
-		"ConsideredHero"			"0"
-		"SoundSet"					""
-		"vscripts"					"ai/creeps_ai.lua"
+		"SoundSet"					"Creep_Good_Range"
+		"UseAI"						"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -1850,9 +1839,8 @@
 		"Model"						"models/heroes/necrolyte/necrolyte.vmdl"	// Model.
 		"ModelScale"				"0.55"
 		"Level"						"1"
-		"ConsideredHero"			"0"
 		"SoundSet"					"Hero_Necrolyte"
-		"vscripts"					"ai/creeps_ai.lua"
+		"UseAI"						"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -1940,9 +1928,8 @@
 		"Model"						"models/heroes/dazzle/dazzle.vmdl"	// Model.
 		"ModelScale"				"0.7"
 		"Level"						"1"
-		"ConsideredHero"			"0"
 		"SoundSet"					"Hero_Dazzle"
-		"vscripts"					"ai/creeps_ai.lua"
+		"UseAI"						"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -2030,9 +2017,8 @@
 		"Model"						"models/heroes/jakiro/jakiro.vmdl"	// Model.
 		"ModelScale"				"0.85"
 		"Level"						"1"
-		"ConsideredHero"			"0"
 		"SoundSet"					"Hero_Jakiro"
-		"vscripts"					"ai/creeps_ai.lua"
+		"UseAI"						"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -2106,9 +2092,8 @@
 		"Model"						"models/creeps/neutral_creeps/n_creep_forest_trolls/n_creep_forest_troll_high_priest.vmdl"	// Model.
 		"ModelScale"				"0.95"
 		"Level"						"1"
-		"ConsideredHero"			"0"
 		"SoundSet"					""
-		"vscripts"					"ai/creeps_ai.lua"
+		"UseAI"						"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -2182,9 +2167,8 @@
 		"Model"						"models/heroes/nerubian_assassin/nerubian_assassin.vmdl"	// Model.
 		"ModelScale"				"0.85"
 		"Level"						"1"
-		"ConsideredHero"			"0"
 		"SoundSet"					"Hero_NyxAssassin"
-		"vscripts"					"ai/creeps_ai.lua"
+		"UseAI"						"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -2283,9 +2267,8 @@
 		"Model"						"models/heroes/antimage/antimage.vmdl"	// Model.
 		"ModelScale"				"0.75"
 		"Level"						"1"
-		"ConsideredHero"			"0"
 		"SoundSet"					"Hero_Antimage"
-		"vscripts"					"ai/creeps_ai.lua"
+		"UseAI"						"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -2365,7 +2348,7 @@
 	}
 
 	//=================================================================================
-	// Creature: Mini Mages
+	// Creature: Mini Tonys
 	//=================================================================================
 	"npc_xhs_elf_creep_melee_3"
 	{
@@ -2374,9 +2357,8 @@
 		"Model"						"models/heroes/tiny_04/tiny_04.vmdl"	// Model.
 		"ModelScale"				"0.75"
 		"Level"						"1"
-		"ConsideredHero"			"0"
 		"SoundSet"					"Hero_Tiny"
-		"vscripts"					"ai/creeps_ai.lua"
+		"UseAI"						"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -2454,7 +2436,7 @@
 	}
 
 	//=================================================================================
-	// Creature: Mini Mages
+	// Creature: Mini Knights
 	//=================================================================================
 	"npc_xhs_orc_creep_melee_3"
 	{
@@ -2463,9 +2445,8 @@
 		"Model"						"models/heroes/chaos_knight/chaos_knight.vmdl"	// Model.
 		"ModelScale"				"0.75"
 		"Level"						"1"
-		"ConsideredHero"			"0"
 		"SoundSet"					"Hero_ChaosKnight"
-		"vscripts"					"ai/creeps_ai.lua"
+		"UseAI"						"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -2553,9 +2534,8 @@
 		"Model"						"models/heroes/shadow_fiend/shadow_fiend.vmdl"	// Model.
 		"ModelScale"				"0.8"
 		"Level"						"1"
-		"ConsideredHero"			"0"
 		"SoundSet"					"Hero_Nevermore"
-		"vscripts"					"ai/creeps_ai.lua"
+		"UseAI"						"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -2632,7 +2612,7 @@
 	}
 
 	//=================================================================================
-	// Creature: Mini Fiends
+	// Creature: Mini Trolls
 	//=================================================================================
 	"npc_xhs_orc_creep_ranged_3"
 	{
@@ -2641,9 +2621,8 @@
 		"Model"						"models/heroes/troll_warlord/troll_warlord.vmdl"	// Model.
 		"ModelScale"				"0.8"
 		"Level"						"1"
-		"ConsideredHero"			"0"
 		"SoundSet"					"Hero_TrollWarlord"
-		"vscripts"					"ai/creeps_ai.lua"
+		"UseAI"						"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -2724,7 +2703,7 @@
 	}
 
 	//=================================================================================
-	// Creature: Mini Fiends
+	// Creature: Mini Ranas
 	//=================================================================================
 	"npc_xhs_elf_creep_ranged_3"
 	{
@@ -2733,9 +2712,8 @@
 		"Model"						"models/heroes/mirana/mirana.vmdl"	// Model.
 		"ModelScale"				"0.8"
 		"Level"						"1"
-		"ConsideredHero"			"0"
 		"SoundSet"					"Hero_Mirana"
-		"vscripts"					"ai/creeps_ai.lua"
+		"UseAI"						"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -2837,7 +2815,7 @@
 	}
 
 	//=================================================================================
-	// Creature: Mini Fiends
+	// Creature: Mini Linas
 	//=================================================================================
 	"npc_xhs_human_creep_ranged_3"
 	{
@@ -2846,9 +2824,8 @@
 		"Model"						"models/heroes/lina/lina.vmdl"	// Model.
 		"ModelScale"				"0.7"
 		"Level"						"1"
-		"ConsideredHero"			"0"
 		"SoundSet"					"Hero_Lina"
-		"vscripts"					"ai/creeps_ai.lua"
+		"UseAI"						"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -2926,7 +2903,7 @@
 	}
 
 	//=================================================================================
-	// Creature: Mini Dooms
+	// Creature: Mini Beastmasters
 	//=================================================================================
 	"npc_xhs_human_creep_melee_4"
 	{
@@ -2935,9 +2912,8 @@
 		"Model"						"models/heroes/beastmaster/beastmaster.vmdl"	// Model.
 		"ModelScale"				"0.8"
 		"Level"						"1"
-		"ConsideredHero"			"0"
 		"SoundSet"					"Hero_Beastmaster"
-		"vscripts"					"ai/creeps_ai.lua"
+		"UseAI"						"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -3016,7 +2992,7 @@
 	}
 
 	//=================================================================================
-	// Creature: Mini Dooms
+	// Creature: Mini Lich Kings
 	//=================================================================================
 	"npc_xhs_undead_creep_melee_4"
 	{
@@ -3025,9 +3001,8 @@
 		"Model"						"models/heroes/wraith_king/wraith_king.vmdl"	// Model.
 		"ModelScale"				"0.8"
 		"Level"						"1"
-		"ConsideredHero"			"0"
 		"SoundSet"					"Hero_SkeletonKing"
-		"vscripts"					"ai/creeps_ai.lua"
+		"UseAI"						"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -3107,7 +3082,7 @@
 	}
 
 	//=================================================================================
-	// Creature: Mini Dooms
+	// Creature: Mini Illidans
 	//=================================================================================
 	"npc_xhs_elf_creep_melee_4"
 	{
@@ -3116,9 +3091,8 @@
 		"Model"						"models/heroes/terrorblade/terrorblade.vmdl"	// Model.
 		"ModelScale"				"0.8"
 		"Level"						"1"
-		"ConsideredHero"			"0"
 		"SoundSet"					"Hero_Terrorblade"
-		"vscripts"					"ai/creeps_ai.lua"
+		"UseAI"						"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -3196,7 +3170,7 @@
 	}
 
 	//=================================================================================
-	// Creature: Mini Dooms
+	// Creature: Mini Titans
 	//=================================================================================
 	"npc_xhs_orc_creep_melee_4"
 	{
@@ -3205,9 +3179,8 @@
 		"Model"						"models/heroes/elder_titan/elder_titan.vmdl"	// Model.
 		"ModelScale"				"0.8"
 		"Level"						"1"
-		"ConsideredHero"			"0"
 		"SoundSet"					"Hero_ElderTitan"
-		"vscripts"					"ai/creeps_ai.lua"
+		"UseAI"						"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -3295,9 +3268,8 @@
 		"Model"						"models/creeps/neutral_creeps/n_creep_black_dragon/n_creep_black_dragon.vmdl"	// Model.
 		"ModelScale"				"0.95"
 		"Level"						"1"
-		"ConsideredHero"			"0"
 		"SoundSet"					"Hero_Jakiro"
-		"vscripts"					"ai/creeps_ai.lua"
+		"UseAI"						"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -3362,7 +3334,7 @@
 	}
 
 	//=================================================================================
-	// Creature: Mini Black Dragons
+	// Creature: Mini Silencers
 	//=================================================================================
 	"npc_xhs_human_creep_ranged_4"
 	{
@@ -3371,9 +3343,8 @@
 		"Model"						"models/heroes/silencer/silencer.vmdl"	// Model.
 		"ModelScale"				"0.95"
 		"Level"						"1"
-		"ConsideredHero"			"0"
 		"SoundSet"					"Hero_Silencer"
-		"vscripts"					"ai/creeps_ai.lua"
+		"UseAI"						"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -3451,7 +3422,7 @@
 	}
 
 	//=================================================================================
-	// Creature: Mini Black Dragons
+	// Creature: Mini Furions
 	//=================================================================================
 	"npc_xhs_elf_creep_ranged_4"
 	{
@@ -3460,9 +3431,8 @@
 		"Model"						"models/heroes/furion/furion.vmdl"	// Model.
 		"ModelScale"				"0.95"
 		"Level"						"1"
-		"ConsideredHero"			"0"
 		"SoundSet"					"Hero_Furion"
-		"vscripts"					"ai/creeps_ai.lua"
+		"UseAI"						"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -3540,7 +3510,7 @@
 	}
 
 	//=================================================================================
-	// Creature: Mini Black Dragons
+	// Creature: Mini Wyverns
 	//=================================================================================
 	"npc_xhs_undead_creep_ranged_4"
 	{
@@ -3549,9 +3519,8 @@
 		"Model"						"models/heroes/winterwyvern/winterwyvern.vmdl"	// Model.
 		"ModelScale"				"0.95"
 		"Level"						"1"
-		"ConsideredHero"			"0"
 		"SoundSet"					"Hero_WynterWyvern"
-		"vscripts"					"ai/creeps_ai.lua"
+		"UseAI"						"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -3625,7 +3594,7 @@
 	}
 
 	//=================================================================================
-	// Level 2: Red Dragon
+	// Level 1: Red Dragon
 	//=================================================================================
 	"npc_dota_creature_red_dragon"
 	{										
@@ -3638,6 +3607,7 @@
 		"ConsideredHero"			"1"
 		"ModelScale" 				"1.3"
 		"UnitLabel"					"red_dragon"
+		"UseAI"						"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -3699,7 +3669,6 @@
 		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_HERO"
 		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
 
-		"vscripts"					"ai/creeps_ai.lua"
 
 		"Creature"
 		{
@@ -3712,7 +3681,7 @@
 	}
 
 	//=================================================================================
-	// Level 3: Black Dragon
+	// Level 2: Black Dragon
 	//=================================================================================
 	"npc_dota_creature_black_dragon"
 	{										
@@ -3725,6 +3694,7 @@
 		"ConsideredHero"			"1"
 		"ModelScale" 				"1.45"
 		"UnitLabel"					"black_dragon"
+		"UseAI"						"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -3786,11 +3756,10 @@
 		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_HERO"
 		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
 
-		"vscripts"					"ai/creeps_ai.lua"
 	}
 
 	//=================================================================================
-	// Level 4: Green Dragon
+	// Level 3: Green Dragon
 	//=================================================================================
 	"npc_dota_creature_green_dragon"
 	{										
@@ -3803,6 +3772,7 @@
 		"ConsideredHero"			"1"
 		"ModelScale" 				"1.45"
 		"UnitLabel"					"green_dragon"
+		"UseAI"						"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -3863,8 +3833,6 @@
 		"CombatClassAttack"			"DOTA_COMBAT_CLASS_ATTACK_BASIC"
 		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_HERO"
 		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
-
-		"vscripts"					"ai/creeps_ai.lua"
 	}
 
 	//=================================================================================
@@ -3880,6 +3848,7 @@
 		"ConsideredHero"			"1"
 		"MinimapIcon"				"minimap_roshancamp"
 		"MinimapIconSize"			"500"
+		"UseAI"						"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -3949,8 +3918,6 @@
 		"VisionDaytimeRange"		"1400"		// Range of vision during day light.
 		"VisionNighttimeRange"		"1400"		// Range of vision at night time.
 
-		"vscripts"					"ai/necrolyte.lua"
-
 		// Creature Data
 		//----------------------------------------------------------------------------------------------------------------------
 		"Creature"
@@ -3980,6 +3947,7 @@
 		"MinimapIcon"				"minimap_roshancamp"
 		"MinimapIconSize"			"500"
 		"SoundSet"					"Hero_Lion"
+		"UseAI"						"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -4049,8 +4017,6 @@
 		"VisionDaytimeRange"		"1400"		// Range of vision during day light.
 		"VisionNighttimeRange"		"1400"		// Range of vision at night time.
 
-		"vscripts"					"ai/naga_ai.lua"
-
 		// Creature Data
 		//----------------------------------------------------------------------------------------------------------------------
 		"Creature"
@@ -4097,12 +4063,11 @@
 		"ModelScale"				"1.15"
 		"Level"						"1"
 		"ConsideredHero"			"1"
-
 		"MinimapIcon"				"minimap_roshancamp"
 		"MinimapIconSize"			"300"
-		
 		"SoundSet"					"Hero_VengefulSpirit"								// Name of sound set.
-		
+		"UseAI"						"1"
+
 		// Abilities
 		//----------------------------------------------------------------
 		
@@ -4213,6 +4178,7 @@
 		"MinimapIcon"				"minimap_roshancamp"
 		"MinimapIconSize"			"500"
 		"SoundSet"					"Hero_DragonKnight"
+		"UseAI"						"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -4279,7 +4245,6 @@
 		"VisionDaytimeRange"		"1400"		// Range of vision during day light.
 		"VisionNighttimeRange"		"1400"		// Range of vision at night time.
 
-		"vscripts"					"ai/creeps_ai.lua"
 
 		// Creature Data
 		//----------------------------------------------------------------------------------------------------------------------
@@ -4325,6 +4290,7 @@
 		"MinimapIcon"				"minimap_roshancamp"
 		"MinimapIconSize"			"500"
 		"SoundSet"					"Hero_Slardar"
+		"UseAI"						"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -4390,7 +4356,6 @@
 		"VisionDaytimeRange"		"1400"		// Range of vision during day light.
 		"VisionNighttimeRange"		"1400"		// Range of vision at night time.
 
-		"vscripts"					"ai/creeps_ai.lua"
 
 		// Creature Data
 		//----------------------------------------------------------------------------------------------------------------------
@@ -4420,6 +4385,7 @@
 		"MinimapIcon"				"minimap_roshancamp"
 		"MinimapIconSize"			"500"
 		"SoundSet"					"Hero_ChaosKnight"
+		"UseAI"						"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -4485,7 +4451,6 @@
 		"VisionDaytimeRange"		"1400"		// Range of vision during day light.
 		"VisionNighttimeRange"		"1400"		// Range of vision at night time.
 
-		"vscripts"					"ai/creeps_ai.lua"
 
 		// Creature Data
 		//----------------------------------------------------------------------------------------------------------------------
@@ -4516,6 +4481,7 @@
 		"MinimapIcon"				"minimap_roshancamp"
 		"MinimapIconSize"			"500"
 		"SoundSet"					"Hero_Luna"
+		"UseAI"						"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -4581,7 +4547,6 @@
 		"VisionDaytimeRange"		"1400"		// Range of vision during day light.
 		"VisionNighttimeRange"		"1400"		// Range of vision at night time.
 
-		"vscripts"					"ai/creeps_ai.lua"
 
 		// Creature Data
 		//----------------------------------------------------------------------------------------------------------------------
@@ -4612,6 +4577,7 @@
 		"MinimapIcon"				"minimap_roshancamp"
 		"MinimapIconSize"			"500"
 		"SoundSet"					"Hero_Sniper"
+		"UseAI"						"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -4677,7 +4643,6 @@
 		"VisionDaytimeRange"		"1400"		// Range of vision during day light.
 		"VisionNighttimeRange"		"1400"		// Range of vision at night time.
 
-		"vscripts"					"ai/creeps_ai.lua"
 
 		// Creature Data
 		//----------------------------------------------------------------------------------------------------------------------
@@ -4703,7 +4668,6 @@
 		"Model"						"models/heroes/slark/slark.vmdl"	// Model.
 		"ModelScale"				"1.05"
 		"Level"						"1"
-		"ConsideredHero"			"0"
 		"LeavesCorpse"				"0"
 		"MinimapIcon"				"minimap_roshancamp"
 		"MinimapIconSize"			"250"
@@ -4797,7 +4761,6 @@
 		"Model"						"models/creeps/neutral_creeps/n_creep_vulture_a/n_creep_vulture_a.vmdl"	// Model.
 		"ModelScale"				"1.05"
 		"Level"						"1"
-		"ConsideredHero"			"0"
 		"LeavesCorpse"				"0"
 		"MinimapIcon"				"minimap_roshancamp"
 		"MinimapIconSize"			"250"
@@ -4878,7 +4841,6 @@
 		"Model"						"models/creeps/neutral_creeps/n_creep_golem_a/neutral_creep_golem_a.vmdl"	// Model.
 		"ModelScale"				"1.05"
 		"Level"						"1"
-		"ConsideredHero"			"0"
 		"LeavesCorpse"				"0"
 		"MinimapIcon"				"minimap_roshancamp"
 		"MinimapIconSize"			"250"
@@ -4959,7 +4921,6 @@
 		"Model"						"models/creeps/neutral_creeps/n_creep_furbolg/n_creep_furbolg_disrupter.vmdl"	// Model.
 		"ModelScale"				"1.05"
 		"Level"						"1"
-		"ConsideredHero"			"0"
 		"LeavesCorpse"				"0"
 		"MinimapIcon"				"minimap_roshancamp"
 		"MinimapIconSize"			"250"
@@ -5040,7 +5001,6 @@
 		"Model"						"models/creeps/neutral_creeps/n_creep_centaur_lrg/n_creep_centaur_lrg.vmdl"	// Model.
 		"ModelScale"				"1.05"
 		"Level"						"1"
-		"ConsideredHero"			"0"
 		"LeavesCorpse"				"0"
 		"MinimapIcon"				"minimap_roshancamp"
 		"MinimapIconSize"			"250"
@@ -5121,7 +5081,6 @@
 		"Model"						"models/heroes/bristleback/bristleback.vmdl"	// Model.
 		"ModelScale"				"1.05"
 		"Level"						"1"
-		"ConsideredHero"			"0"
 		"LeavesCorpse"				"0"
 		"MinimapIcon"				"minimap_roshancamp"
 		"MinimapIconSize"			"250"
@@ -5214,7 +5173,6 @@
 		"Model"						"models/heroes/razor/razor.vmdl"	// Model.
 		"ModelScale"				"1.05"
 		"Level"						"1"
-		"ConsideredHero"			"0"
 		"LeavesCorpse"				"0"
 		"MinimapIcon"				"minimap_roshancamp"
 		"MinimapIconSize"			"250"
@@ -5307,7 +5265,6 @@
 		"Model"						"models/heroes/tuskarr/tuskarr.vmdl"	// Model.
 		"ModelScale"				"1.05"
 		"Level"						"1"
-		"ConsideredHero"			"0"
 		"LeavesCorpse"				"0"
 		"MinimapIcon"				"minimap_roshancamp"
 		"MinimapIconSize"			"250"
@@ -5401,11 +5358,11 @@
 		"Model"						"models/creeps/neutral_creeps/n_creep_satyr_c/n_creep_satyr_c.vmdl"	// Model.
 		"ModelScale"				"1.05"
 		"Level"						"1"
-		"ConsideredHero"			"0"
 		"LeavesCorpse"				"0"
 		"MinimapIcon"				"minimap_roshancamp"
 		"MinimapIconSize"			"250"
-//		"SoundSet"					""
+		"SoundSet"					"Creep_Good_Melee"
+		"UseAI"						"2"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -5471,13 +5428,11 @@
 		"VisionDaytimeRange"		"1400"		// Range of vision during day light.
 		"VisionNighttimeRange"		"1400"		// Range of vision at night time.
 
-		"vscripts"					"ai/satyrr.lua"
 	}
 
 	//=================================================================================
 	// Creature: Lifestealers Phase 2
 	//=================================================================================
-	//SECONDPHASE
 	"npc_ghul_II"
 	{
 		// General
@@ -5486,6 +5441,8 @@
 		"Level"						"1"
 		"ModelScale"				"1"
 		"ConsideredHero"			"1"
+		"UseAI"						"1"
+
 		// Abilities
 		//----------------------------------------------------------------
 		"Ability1"					"unholy_aura"     // Ability 1.
@@ -5495,7 +5452,7 @@
 
 		// Armor
 		//----------------------------------------------------------------
-		"ArmorPhysical"				"150"     // Physical protection.
+		"ArmorPhysical"				"250"     // Physical protection.
 		"MagicalResistance"			"25"     // Magical protection.
 
 		// Attack
@@ -5524,12 +5481,12 @@
 		// Movement
 		//----------------------------------------------------------------
 		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"     // Type of locomotion - ground, air
-		"MovementSpeed"				"210"   // Speed
+		"MovementSpeed"				"275"   // Speed
 		"MovementTurnRate"			"0.5"   // Turning rate.
 
 		// Status
 		//----------------------------------------------------------------
-		"StatusHealth"				"7000"     // Base health.
+		"StatusHealth"				"15000"     // Base health.
 		"StatusHealthRegen"			"2.0"     // Health regeneration rate.
 		"StatusMana"				"900"     // Base mana.
 		"StatusManaRegen"			"1.0"     // Mana regeneration rate.
@@ -5540,7 +5497,6 @@
 		"VisionDaytimeRange"		"800"   // Range of vision during day light.
 		"VisionNighttimeRange"		"600"   // Range of vision at night time.
 
-		"vscripts"					"ai/creeps_ai.lua"
 
 		// Bots
 		//----------------------------------------------------------------
@@ -5567,6 +5523,8 @@
 		"Level"						"1"
 		"ModelScale"				"1.2"
 		"ConsideredHero"			"1"
+		"UseAI"						"1"
+
 		// Abilities
 		//----------------------------------------------------------------
 		"Ability1"					"unholy_aura"     // Ability 1.
@@ -5576,7 +5534,7 @@
 
 		// Armor
 		//----------------------------------------------------------------
-		"ArmorPhysical"				"90"     // Physical protection.
+		"ArmorPhysical"				"250"     // Physical protection.
 		"MagicalResistance"			"25"     // Magical protection.
 
 		// Attack
@@ -5605,13 +5563,13 @@
 		// Movement
 		//----------------------------------------------------------------
 		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"     // Type of locomotion - ground, air
-		"MovementSpeed"				"190"   // Speed
+		"MovementSpeed"				"275"   // Speed
 		"MovementTurnRate"			"0.5"   // Turning rate.
 
 		// Status
 		//----------------------------------------------------------------
-		"StatusHealth"				"10000"     // Base health.
-		"StatusHealthRegen"			"2.0"     // Health regeneration rate.
+		"StatusHealth"				"15000"     // Base health.
+		"StatusHealthRegen"			"10.0"     // Health regeneration rate.
 		"StatusMana"				"900"     // Base mana.
 		"StatusManaRegen"			"1.0"     // Mana regeneration rate.
 
@@ -5620,7 +5578,6 @@
 		"VisionDaytimeRange"		"800"   // Range of vision during day light.
 		"VisionNighttimeRange"		"600"   // Range of vision at night time.
 
-		"vscripts"					"ai/creeps_ai.lua"
 
 		// Bots
 		//----------------------------------------------------------------
@@ -5643,6 +5600,7 @@
 		"MinimapIcon"				"minimap_roshancamp"
 		"MinimapIconSize"			"300"
 		"SoundSet"					"Hero_Razor"								// Name of sound set.
+		"UseAI"						"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -5706,7 +5664,6 @@
 		"VisionDaytimeRange"		"2000"		// Range of vision during day light.
 		"VisionNighttimeRange"		"2000"		// Range of vision at night time.
 
-		"vscripts"					"ai/creeps_ai.lua"
 
 		// Creature Data
 		//----------------------------------------------------------------------------------------------------------------------
@@ -5737,6 +5694,8 @@
 		"ConsideredHero"			"1"
 		"Level"						"1"
 		"ModelScale"				"1.35"
+		"UseAI"						"1"
+
 		// Abilities
 		//----------------------------------------------------------------
 		
@@ -5792,7 +5751,6 @@
 		"VisionDaytimeRange"    "1000"   // Range of vision during day light.
 		"VisionNighttimeRange"    "1000"   // Range of vision at night time.
 
-		"vscripts"					"ai/creeps_ai.lua"
 	
 		// Bots
 		//----------------------------------------------------------------
@@ -5823,6 +5781,7 @@
 		"Portrait"                  "vgui/hud/heroportraits/portrait_centaur"
 		"ModelScale"                "2.1"
 		"Level"                     "1"
+		"UseAI"						"1"
 
 		"Ability1"					"creature_thunder_clap_low"
 		"Ability2"					"command_aura"
@@ -5862,8 +5821,6 @@
 		"VisionDaytimeRange"    "1800"                  // Range of vision at night time.
 		"VisionNighttimeRange"    "1800"                  // Range of vision at night time.
 
-		"vscripts"					"ai/destroyer_magnataur.lua"
-
 		"Creature"
 		{	
 		   "AttachWearables"   
@@ -5885,6 +5842,8 @@
 		"Model"						"models/heroes/pudge/pudge.vmdl"  // Model.
 		"Level"						"1"
 		"ModelScale"				"0.95"
+		"UseAI"						"1"
+
 		// Abilities
 		//----------------------------------------------------------------
 
@@ -5940,7 +5899,6 @@
 		"VisionDaytimeRange"		"1200"   // Range of vision during day light.
 		"VisionNighttimeRange"		"800"   // Range of vision at night time.
 
-		"vscripts"					"ai/creeps_ai.lua"
 	
 		// Bots
 		//----------------------------------------------------------------
@@ -5970,6 +5928,8 @@
 		"Level"						"1"
 		"ModelScale"				"1.25"
 		"HealthBarOffset"			"280"
+		"UseAI"						"1"
+
 		// Abilities
 		//----------------------------------------------------------------
 		"Ability1"					""     // Ability 1.
@@ -6023,7 +5983,6 @@
 		"VisionDaytimeRange"		"1200"   // Range of vision during day light.
 		"VisionNighttimeRange"		"800"   // Range of vision at night time.
 
-		"vscripts"					"ai/creeps_ai.lua"
 	
 		// Bots
 		//----------------------------------------------------------------
@@ -6050,6 +6009,7 @@
 		"Level"						"1"
 		"ModelScale"				"1.1"
 		"HealthBarOffset"			"280"
+		"UseAI"						"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -6104,7 +6064,6 @@
 		"VisionDaytimeRange"		"1200"   // Range of vision during day light.
 		"VisionNighttimeRange"		"800"   // Range of vision at night time.
 
-		"vscripts"					"ai/creeps_ai.lua"
 	
 		// Bots
 		//----------------------------------------------------------------
@@ -6136,6 +6095,7 @@
 		"Level"						"1"
 		"ModelScale"				"1.25"
 		"HealthBarOffset"			"280"
+		"UseAI"						"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -6190,7 +6150,6 @@
 		"VisionDaytimeRange"		"1200"   // Range of vision during day light.
 		"VisionNighttimeRange"		"800"   // Range of vision at night time.
 
-		"vscripts"					"ai/creeps_ai.lua"
 	
 		// Bots
 		//----------------------------------------------------------------
@@ -6223,6 +6182,7 @@
 		"ModelScale"				"1.7"
 		"HealthBarOffset"			"300"
 		"LeavesCorpse"				"0"
+		"UseAI"						"1"
 
 		"Ability1"					"neutral_spell_immunity"
 		"Ability2"					"demonhunter_vampiric_aura"
@@ -6259,7 +6219,7 @@
 	
 		"VisionDaytimeRange"		"1200"                  // Range of vision at night time.
 		"VisionNighttimeRange"		"1000"                  // Range of vision at night time.
-		"vscripts"					"ai/balanar_final_wave.lua"
+
 		"Creature"
 		{
 		   "AttachWearables"
@@ -6287,6 +6247,7 @@
 		"HealthBarOffset"			"300"
 		"Level"						"1"
 		"LeavesCorpse"				"0"
+		"UseAI"						"1"
 		
 		"Ability1"					"devotion_aura"
 		"Ability2"					"chaos_knight_chaos_strike"
@@ -6323,10 +6284,17 @@
 		"VisionDaytimeRange"		"1200"                  // Range of vision at night time.
 		"VisionNighttimeRange"		"800"                  // Range of vision at night time.
 
-		"vscripts"					"ai/creeps_ai.lua"
 
 		"Creature"
 		{
+			"EquippedItems"
+			{
+				"Cleave"
+				{
+					"Item"					"item_celestial_claws"
+				}
+			}
+
 			"AttachWearables"   
 			{
 				"Wearable1" { "ItemDef" "6" }
@@ -6351,6 +6319,7 @@
 		"HealthBarOffset"			"300"
 		"ConsideredHero"			"1"
 		"LeavesCorpse"				"0"
+		"UseAI"						"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -6390,7 +6359,6 @@
 	
 		"VisionDaytimeRange"		"1200"                  // Range of vision at night time.
 		"VisionNighttimeRange"		"1000"                  // Range of vision at night time.
-		"vscripts"					"ai/illidan_small.lua"
 	}
 
 	//=================================================================================
@@ -6408,6 +6376,7 @@
 		"HealthBarOffset"			"300"
 		"Level"						"1"
 		"LeavesCorpse"				"0"
+		"UseAI"						"1"
 		
 		// Abilities
 		//----------------------------------------------------------------
@@ -6447,14 +6416,14 @@
 	
 		"VisionDaytimeRange"		"1200"                  // Range of vision at night time.
 		"VisionNighttimeRange"		"1000"                  // Range of vision at night time.
-		"vscripts"					"ai/proudmoore.lua"
+
 		"Creature"
 		{
 			"EquippedItems"
 			{
-				"BattleFury"
+				"Cleave"
 				{
-					"Item"					"item_bfury"
+					"Item"					"item_searing_blade"
 				}
 			}
 
@@ -6478,6 +6447,7 @@
 		"Model"						"models/heroes/lone_druid/lone_druid.vmdl"  // Model.
 		"Level"						"1"
 		"ModelScale"				"0.85"
+		"UseAI"						"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -6532,7 +6502,6 @@
 		"VisionDaytimeRange"		"1200"   // Range of vision during day light.
 		"VisionNighttimeRange"		"800"   // Range of vision at night time.
 
-		"vscripts"					"ai/creeps_ai.lua"
 
 		// Bots
 		//----------------------------------------------------------------
@@ -6559,6 +6528,7 @@
 		"SoundSet"					"lane_dire_ranged"          // Name of sound set.
 		"Level"						"1"
 		"ModelScale"				"0.9"
+		"UseAI"						"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -6614,7 +6584,6 @@
 		"VisionDaytimeRange"		"1200"   // Range of vision during day light.
 		"VisionNighttimeRange"		"800"   // Range of vision at night time.
 
-		"vscripts"					"ai/creeps_ai.lua"
 	
 		// Bots
 		//----------------------------------------------------------------
@@ -6643,6 +6612,8 @@
 		"SoundSet"					"Hero_TemplarAssassin"          // Name of sound set.
 		"Level"						"1"
 		"ModelScale"				"1.25"
+		"UseAI"						"1"
+
 		// Abilities
 		//----------------------------------------------------------------
 		"Ability1"					""     // Ability 1.
@@ -6697,7 +6668,6 @@
 		"VisionDaytimeRange"		"800"   // Range of vision during day light.
 		"VisionNighttimeRange"		"600"   // Range of vision at night time.
 
-		"vscripts"					"ai/creeps_ai.lua"
 	
 		// Bots
 		//----------------------------------------------------------------
@@ -6721,6 +6691,7 @@
 		"Model"						"models/heroes/chaos_knight/chaos_knight.vmdl"  // Model.
 		"Level"						"1"
 		"ModelScale"				"0.95"
+		"UseAI"						"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -6775,7 +6746,6 @@
 		"VisionDaytimeRange"		"1200"   // Range of vision during day light.
 		"VisionNighttimeRange"		"800"   // Range of vision at night time.
 
-		"vscripts"					"ai/creeps_ai.lua"
 
 		// Bots
 		//----------------------------------------------------------------
@@ -6804,6 +6774,8 @@
 		"ModelScale"				"1.2"
 		"ProjectileModel"			"particles/econ/items/luna/luna_crescent_moon/luna_attack_crescent_moon.vpcf"
 		"ProjectileSpeed"			"900"
+		"UseAI"						"1"
+
 		// Abilities
 		//----------------------------------------------------------------
 		"Ability1"					""     // Ability 1.
@@ -6858,7 +6830,6 @@
 		"VisionDaytimeRange"		"1200"   // Range of vision during day light.
 		"VisionNighttimeRange"		"800"   // Range of vision at night time.
 
-		"vscripts"					"ai/creeps_ai.lua"
 
 		// Bots
 		//----------------------------------------------------------------
@@ -6885,6 +6856,7 @@
 		"Model"						"models/heroes/magnataur/magnataur.vmdl"  // Model.
 		"Level"						"1"
 		"ModelScale"				"0.95"
+		"UseAI"						"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -6939,7 +6911,6 @@
 		"VisionDaytimeRange"		"1200"   // Range of vision during day light.
 		"VisionNighttimeRange"		"800"   // Range of vision at night time.
 
-		"vscripts"					"ai/creeps_ai.lua"
 
 		// Bots
 		//----------------------------------------------------------------
@@ -6965,6 +6936,8 @@
 		"SoundSet"					"Hero_Sniper"          // Name of sound set.
 		"Level"						"1"
 		"ModelScale"				"1.3"
+		"UseAI"						"1"
+
 		// Abilities
 		//----------------------------------------------------------------
 		
@@ -7022,8 +6995,6 @@
 		"VisionDaytimeRange"		"1200"   // Range of vision during day light.
 		"VisionNighttimeRange"		"800"   // Range of vision at night time.
 
-		"vscripts"					"ai/creeps_ai.lua"
-	
 		// Bots
 		//----------------------------------------------------------------
 		"AttackDesire"				"1.5"   // How much bots want to attack them vs other non-hero things
@@ -7041,7 +7012,7 @@
 	}
 
 	"npc_necro_final_wave"
-	  {
+	{
 		// General
 		"BaseClass"					"npc_dota_creature"  // Class of entity of link to.
 		"Model"						"models/heroes/necrolyte/necrolyte.vmdl"  // Model.
@@ -7050,6 +7021,8 @@
 		"ModelScale"				"0.9"
 		"ProjectileModel"			"particles/econ/items/necrolyte/necronub_base_attack/necrolyte_base_attack_ka.vpcf"
 		"ProjectileSpeed"			"900"
+		"UseAI"						"1"
+
 		// Abilities
 		//----------------------------------------------------------------
 		
@@ -7105,7 +7078,6 @@
 		"VisionDaytimeRange"		"1200"   // Range of vision during day light.
 		"VisionNighttimeRange"		"800"   // Range of vision at night time.
 
-		"vscripts"					"ai/creeps_ai.lua"
 	
 		// Bots
 		//----------------------------------------------------------------
@@ -7131,6 +7103,7 @@
 		"SoundSet"					"Hero_Centaur"          // Name of sound set.
 		"Level"						"1"
 		"ModelScale"				"1"
+		"UseAI"						"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -7186,7 +7159,6 @@
 		"VisionDaytimeRange"		"1200"   // Range of vision during day light.
 		"VisionNighttimeRange"		"800"   // Range of vision at night time.
 
-		"vscripts"					"ai/creeps_ai.lua"
 	
 		// Bots
 		//----------------------------------------------------------------
@@ -7213,6 +7185,8 @@
 		"Model"						"models/heroes/earthshaker/earthshaker.vmdl"  // Model.
 		"Level"						"1"
 		"ModelScale"				"0.95"
+		"UseAI"						"1"
+
 		// Abilities
 		//----------------------------------------------------------------
 		
@@ -7267,7 +7241,6 @@
 		"VisionDaytimeRange"		"1200"   // Range of vision during day light.
 		"VisionNighttimeRange"		"800"   // Range of vision at night time.
 
-		"vscripts"					"ai/creeps_ai.lua"
 
 		// Bots
 		//----------------------------------------------------------------
@@ -7294,6 +7267,7 @@
 		"SoundSet"					"npc_dota_hero_warlock"          // Name of sound set.
 		"Level"						"1"
 		"ModelScale"				"1.15"
+		"UseAI"						"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -7348,7 +7322,6 @@
 		"VisionDaytimeRange"		"1200"   // Range of vision during day light.
 		"VisionNighttimeRange"		"800"   // Range of vision at night time.
 
-		"vscripts"					"ai/creeps_ai.lua"
 
 		// Bots
 		//----------------------------------------------------------------
@@ -7370,7 +7343,6 @@
 
 	"npc_dota_hero_magtheridon"
 	{
-	
 		"BaseClass"					"npc_dota_creature"
 		"Model"						"models/heroes/abyssal_underlord/abyssal_underlord_v2.mdl"			// Model.
 		"SoundSet"					"Hero_AbyssalUnderlord"							// Name of sound set.
@@ -7379,6 +7351,7 @@
 		"ModelScale"				"1.8"
 		"Level"						"1"
 		"LeavesCorpse"				"0"
+		"UseAI"						"2"
 
 		"Ability1"					"creature_firestorm"
 		"Ability2"					"creature_thunder_clap"
@@ -7418,8 +7391,6 @@
 		"VisionDaytimeRange"		"1200"                  // Range of vision at night time.
 		"VisionNighttimeRange"		"1200"                  // Range of vision at night time.
 
-		"vscripts" "ai/magtheridon.lua"
-
 		"Creature"
 		{
 		   "AttachWearables"   
@@ -7445,6 +7416,7 @@
 		"HealthBarOffset"			"200"
 		"Level"						"1"
 		"LeavesCorpse"				"0"
+		"UseAI"						"2"
 
 		"Ability1"					"grom_hellscream_mirror_image"
 		"Ability2"					"juggernaut_blade_dance" 
@@ -7485,9 +7457,17 @@
 	
 		"VisionDaytimeRange"		"1200"                  // Range of vision at night time.
 		"VisionNighttimeRange"		"1000"                  // Range of vision at night time.
-		"vscripts"					"ai/grom_hellscream.lua"
+
 		"Creature"
 		{
+			"EquippedItems"
+			{
+				"Cleave"
+				{
+					"Item"					"item_celestial_claws"
+				}
+			}
+
 			"AttachWearables"   
 			{
 				"Wearable1" { "ItemDef" "9059" }
@@ -7499,65 +7479,64 @@
 		}
 	}
 
-"npc_dota_hero_magtheridon_medium"
-{
-
-	"BaseClass"     "npc_dota_creature"
-	"Model"						"models/heroes/abyssal_underlord/abyssal_underlord_v2.mdl"			// Model.
-	"SoundSet"					"Hero_AbyssalUnderlord"							// Name of sound set.
-	"ConsideredHero"			"0"
-	"Portrait"					"vgui/hud/heroportraits/portrait_centaur"
-	"ModelScale"                "1.5"
-	"Level"						"1"
-
-	"Ability1"				"magtheridon_medium"
-	"Ability2"				"" 
-	"Ability3"				""
-	"Ability4"				""
-
-	"ArmorPhysical"			"300"                 // Physical protection.
-	"MagicalResistance"		"50"                 // Magical protection (percentage).
-
-	"AttackCapabilities"    "DOTA_UNIT_CAP_MELEE_ATTACK"
-	"AttackDamageMin"     "10002"                   // Damage range min.
-	"AttackDamageMax"     "10012"                   // Damage range max.
-	"AttackRate"                "0.75"                                  // Speed of attack.
-	"AttackAnimationPoint"      "0.6"                                   // Normalized time in animation cycle to attack.
-	"AttackAcquisitionRange"    "1000"                                   // Range within a target can be acquired.
-	"AttackRange"               "200"                                   // Range within a target can be attacked.
-	"ProjectileModel"           ""                                     // Particle system model for projectile.
-	"ProjectileSpeed"           ""                                     // Speed of projectile.
-
-	"BountyXP"					"200"                 // Experience earn.
-	"BountyGoldMin"				"5000"                   // Gold earned min.
-	"BountyGoldMax"				"5000"                   // Gold earned max.
-
-	"BoundsHullName"      "DOTA_HULL_SIZE_HUGE"
-	"RingRadius"        "80"
-	"HealthBarOffset"	"250"
-
-	"MovementCapabilities"    "DOTA_UNIT_CAP_MOVE_GROUND"
-	"MovementSpeed"       "400"                 // Speed.
-	"MovementTurnRate"      "0.4"                 // Turning rate.
-
-	"StatusHealth"        "30000"                 // Base health.
-	"StatusHealthRegen"     "10.0"                 // Health regeneration rate.
-	"StatusMana"        "5000"                   // Base mana.
-	"StatusManaRegen"     "100"                 // Mana regeneration rate.
-
-	"VisionDaytimeRange"    "1200"                  // Range of vision at night time.
-	"VisionNighttimeRange"    "1000"                  // Range of vision at night time.
-	"Creature"
+	"npc_dota_hero_magtheridon_medium"
 	{
-	   "AttachWearables"   
+
+		"BaseClass"     "npc_dota_creature"
+		"Model"						"models/heroes/abyssal_underlord/abyssal_underlord_v2.mdl"			// Model.
+		"SoundSet"					"Hero_AbyssalUnderlord"							// Name of sound set
+		"Portrait"					"vgui/hud/heroportraits/portrait_centaur"
+		"ModelScale"                "1.5"
+		"Level"						"1"
+
+		"Ability1"				"magtheridon_medium"
+		"Ability2"				"" 
+		"Ability3"				""
+		"Ability4"				""
+
+		"ArmorPhysical"			"300"                 // Physical protection.
+		"MagicalResistance"		"50"                 // Magical protection (percentage).
+
+		"AttackCapabilities"    "DOTA_UNIT_CAP_MELEE_ATTACK"
+		"AttackDamageMin"     "10002"                   // Damage range min.
+		"AttackDamageMax"     "10012"                   // Damage range max.
+		"AttackRate"                "0.75"                                  // Speed of attack.
+		"AttackAnimationPoint"      "0.6"                                   // Normalized time in animation cycle to attack.
+		"AttackAcquisitionRange"    "1000"                                   // Range within a target can be acquired.
+		"AttackRange"               "200"                                   // Range within a target can be attacked.
+		"ProjectileModel"           ""                                     // Particle system model for projectile.
+		"ProjectileSpeed"           ""                                     // Speed of projectile.
+
+		"BountyXP"					"200"                 // Experience earn.
+		"BountyGoldMin"				"5000"                   // Gold earned min.
+		"BountyGoldMax"				"5000"                   // Gold earned max.
+
+		"BoundsHullName"      "DOTA_HULL_SIZE_HUGE"
+		"RingRadius"        "80"
+		"HealthBarOffset"	"250"
+
+		"MovementCapabilities"    "DOTA_UNIT_CAP_MOVE_GROUND"
+		"MovementSpeed"       "400"                 // Speed.
+		"MovementTurnRate"      "0.4"                 // Turning rate.
+
+		"StatusHealth"        "30000"                 // Base health.
+		"StatusHealthRegen"     "10.0"                 // Health regeneration rate.
+		"StatusMana"        "5000"                   // Base mana.
+		"StatusManaRegen"     "100"                 // Mana regeneration rate.
+
+		"VisionDaytimeRange"    "1200"                  // Range of vision at night time.
+		"VisionNighttimeRange"    "1000"                  // Range of vision at night time.
+		"Creature"
 		{
-			"Wearable1" { "ItemDef" "619" } 	//Armor
-			"Wearable2" { "ItemDef" "620" }		//Head Item
-			"Wearable3" { "ItemDef" "621" }		//Weapon
-			"Wearable4" { "ItemDef" "622" }		//Head
+		   "AttachWearables"   
+			{
+				"Wearable1" { "ItemDef" "619" } 	//Armor
+				"Wearable2" { "ItemDef" "620" }		//Head Item
+				"Wearable3" { "ItemDef" "621" }		//Weapon
+				"Wearable4" { "ItemDef" "622" }		//Head
+			}
 		}
 	}
-}
 
 	"npc_dota_hero_magtheridon_small"
 	{
@@ -7565,7 +7544,6 @@
 		"BaseClass"					"npc_dota_creature"
 		"Model"						"models/heroes/abyssal_underlord/abyssal_underlord_v2.mdl"			// Model.
 		"SoundSet"					"Hero_AbyssalUnderlord"				// Name of sound set.
-		"ConsideredHero"			"0"
 		"Portrait"					"vgui/hud/heroportraits/portrait_centaur"
 		"ModelScale"				"0.75"
 		"Level"						"1"
@@ -7631,7 +7609,6 @@
 		"IsSummoned"				"1"
 		"IsAncient"					"1"
 		"ModelScale"				"1.4"
-		"ConsideredHero"			"0"
 		"UnitLabel"					"golem"
 
 		// Abilities
@@ -7708,6 +7685,7 @@
 		"HealthBarOffset"			"200"
 		"Level"						"1"
 		"LeavesCorpse"				"0"
+		"UseAI"						"2"
 
 		"Ability1"					"lion_voodoo"
 		"Ability2"					"proudmoore_divine_shield" 
@@ -7745,14 +7723,14 @@
 
 		"VisionDaytimeRange"		"1200"			// Range of vision at night time.
 		"VisionNighttimeRange"		"1000"			// Range of vision at night time.
-		"vscripts"					"ai/proudmoore.lua"
+
 		"Creature"
 		{
 			"EquippedItems"
 			{
-				"BattleFury"
+				"Cleave"
 				{
-					"Item"					"item_bfury"
+					"Item"					"item_searing_blade"
 				}
 			}
 
@@ -9013,6 +8991,7 @@
 		"HealthBarOffset"			"300"
 		"ConsideredHero"			"1"
 		"LeavesCorpse"				"0"
+		"UseAI"						"2"
 
 		"Ability1"					"demonhunter_negative_energy"
 		"Ability2"					"demonhunter_immolation"
@@ -9051,7 +9030,6 @@
 	
 		"VisionDaytimeRange"		"1200"                  // Range of vision at night time.
 		"VisionNighttimeRange"		"1000"                  // Range of vision at night time.
-		"vscripts"					"ai/illidan.lua"
 	}
 
 	//=================================================================================
@@ -9067,6 +9045,7 @@
 		"ModelScale"				"1.9"
 		"HealthBarOffset"			"300"
 		"LeavesCorpse"				"0"
+		"UseAI"						"2"
 
 		"Ability1"					"howl_of_terror"
 		"Ability2"					"demonhunter_vampiric_aura"
@@ -9105,7 +9084,6 @@
 	
 		"VisionDaytimeRange"		"1000"                  // Range of vision at night time.
 		"VisionNighttimeRange"		"1000"                  // Range of vision at night time.
-		"vscripts"					"ai/balanar.lua"
 
 		"Creature"
 		{
@@ -9919,7 +9897,6 @@
 
 		//Inventory
 		"HasInventory"				"0"
-		"vscripts"					"ai/behemoth.lua"
 	}
 
 	//=================================================================================
@@ -9928,13 +9905,14 @@
 	"npc_dota_hero_arthas"
 	{
 		"BaseClass"					"npc_dota_creature"
-		"Model"						"models/heroes/dragon_knight/dragon_knight.vmdl"			// Model.
+		"Model"						"models/heroes/arthas/arthas_prince/arthas_prince.vmdl"			// Model.
 		"SoundSet"					"Hero_DragonKnight"							// Name of sound set.
 		"ConsideredHero"			"1"
 		"ModelScale"				"1.8"
 		"Level"						"1"
 		"HasInventory"				"1"
 		"LeavesCorpse"				"0"
+		"UseAI"						"2"
 
 		"Ability1"					"arthas_holy_light"
 		"Ability2"					"proudmoore_divine_shield" 
@@ -9975,7 +9953,6 @@
 	
 		"VisionDaytimeRange"		"1000"                  // Range of vision at night time.
 		"VisionNighttimeRange"		"1000"                  // Range of vision at night time.
-		"vscripts"					"ai/arthas.lua"
 
 		"Creature"
 		{
@@ -9986,15 +9963,17 @@
 					"Item"					"item_ring_of_superiority"
 				}
 			}
-		   "AttachWearables"   
-			{
-				"Wearable1" { "ItemDef" "6787" } //Weapon - Dragon Ascension Set
-				"Wearable2" { "ItemDef" "6788" } //Back
-				"Wearable3" { "ItemDef" "6789" } //Offhand
-				"Wearable4" { "ItemDef" "6790" } //Arms
-				"Wearable5" { "ItemDef" "6791" } //Shoulder
-				"Wearable6" { "ItemDef" "6792" } //helm
-			}
+
+//		   "AttachWearables"   
+//			{
+//				"Wearable1" { "ItemDef" "6787" } //Weapon - Dragon Ascension Set
+//				"Wearable2" { "ItemDef" "6788" } //Back
+//				"Wearable3" { "ItemDef" "6789" } //Offhand
+//				"Wearable4" { "ItemDef" "6790" } //Arms
+//				"Wearable5" { "ItemDef" "6791" } //Shoulder
+//				"Wearable6" { "ItemDef" "6792" } //helm
+//			}
+
 			"DisableResistance"			"25.0"
 		}
 	}
@@ -10012,6 +9991,7 @@
 		"Level"						"777"
 		"HasInventory"				"0"
 		"LeavesCorpse"				"0"
+		"UseAI"						"2"
 
 		"Ability1"					"arthas_holy_light"
 		"Ability2"					"enigma_black_hole"
@@ -10054,7 +10034,7 @@
 
 		"VisionDaytimeRange"		"7777"                  // Range of vision at night time.
 		"VisionNighttimeRange"		"7777"                  // Range of vision at night time.
-		"vscripts"					"ai/secret.lua"
+
 		"HasInventory"				"1"
 
 		"Creature"
@@ -10083,11 +10063,12 @@
 	{
 		// General
 		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
-		"Model"						"models/heroes/wraith_king/wraith_king.vmdl"	// Model.
+		"Model"						"models/heroes/arthas/arthas.vmdl"	// Model.
 		"ModelScale"				"1.35"
 		"Level"						"1"
 		"ConsideredHero"			"1"
 		"SoundSet"					"Hero_SkeletonKing"
+		"UseAI"						"2"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -10158,8 +10139,6 @@
 		"VisionDaytimeRange"		"1400"		// Range of vision during day light.
 		"VisionNighttimeRange"		"1400"		// Range of vision at night time.
 
-		"vscripts"					"ai/lich_king.lua"
-
 		// Creature Data
 		//----------------------------------------------------------------------------------------------------------------------
 		"Creature"
@@ -10174,15 +10153,15 @@
 				}
 			}
 
-			"AttachWearables"
-			{
-				"Wearable1" { "ItemDef" "149" } //models/heroes/wraith_king/wraith_king_weapon.vmdl
-				"Wearable2" { "ItemDef" "150" } //models/heroes/wraith_king/wraith_king_shoulder.vmdl
-				"Wearable3" { "ItemDef" "151" } //models/heroes/wraith_king/wraith_king_gauntlet.vmdl
-				"Wearable4" { "ItemDef" "152" } //models/heroes/wraith_king/wraith_king_cape.vmdl
-				"Wearable5" { "ItemDef" "500" } //models/heroes/wraith_king/wraith_king_chest.vmdl
-				"Wearable6" { "ItemDef" "148" } //models/heroes/wraith_king/wraith_king_head.vmdl
-			}
+//			"AttachWearables"
+//			{
+//				"Wearable1" { "ItemDef" "149" } //models/heroes/wraith_king/wraith_king_weapon.vmdl
+//				"Wearable2" { "ItemDef" "150" } //models/heroes/wraith_king/wraith_king_shoulder.vmdl
+//				"Wearable3" { "ItemDef" "151" } //models/heroes/wraith_king/wraith_king_gauntlet.vmdl
+//				"Wearable4" { "ItemDef" "152" } //models/heroes/wraith_king/wraith_king_cape.vmdl
+//				"Wearable5" { "ItemDef" "500" } //models/heroes/wraith_king/wraith_king_chest.vmdl
+//				"Wearable6" { "ItemDef" "148" } //models/heroes/wraith_king/wraith_king_head.vmdl
+//			}
 		}
 	}
 
@@ -10193,7 +10172,7 @@
 	{
 		// General
 		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
-		"Model"						"models/heroes/wraith_king/wraith_king_prop.vmdl"	// Model.
+		"Model"						"models/heroes/arthas/arthas.vmdl"	// Model.
 		"ModelScale"				"1.35"
 		"Level"						"1"
 		"ConsideredHero"			"1"
@@ -10252,6 +10231,7 @@
 		"ConsideredHero"			"1"
 		"ModelScale"                "1.7"
 		"LeavesCorpse"				"0"
+		"UseAI"						"2"
 
 		"Ability1"					"banehallow_stampede"
 		"Ability2"					"demonhunter_immolation" 
@@ -10293,7 +10273,7 @@
 
 		"VisionDaytimeRange"		"1800"                  // Range of vision at night time.
 		"VisionNighttimeRange"		"1800"                  // Range of vision at night time.
-		"vscripts"					"ai/banehallow.lua"
+
 		"Creature"
 		{
 			"AttachWearables"   
@@ -10475,6 +10455,7 @@
 		"ConsideredHero"			"1"
 		"ModelScale"				"1.75"
 		"Level"						"1"
+		"UseAI"						"3"
 
 		"Ability1"					"roshan_stormbolt"
 		"Ability2"					"creature_thunder_clap_low" 
@@ -10511,7 +10492,6 @@
 
 		"VisionDaytimeRange"		"1000"                  // Range of vision at night time.
 		"VisionNighttimeRange"		"1000"                  // Range of vision at night time.
-		"vscripts"					"ai/muradin_bronzebeard.lua"
 
 		"DisableResistance"			"50.0"
 
@@ -10539,7 +10519,6 @@
 
 		// Abilities
 		//----------------------------------------------------------------
-
 		"Ability1"			"furbolg_earthshock"     // Ability 1.
 		"Ability2"			"antimage_blink"      // Ability 2.
 		"Ability3"			""      // Ability 3.
@@ -11132,7 +11111,6 @@
 		"HasInventory"				"1"
 	}
 
-	// Made by BMD
 	"npc_xhs_lone_druid_bear_stun"
 	{
 		// General
@@ -11215,6 +11193,7 @@
 		"LeavesCorpse"				"0"
 		"MinimapIcon"				"minimap_enemyicon"
 		"MinimapIconSize"			"300"
+		"UseAI"						"2"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -11279,8 +11258,6 @@
 		"VisionDaytimeRange"		"1400"		// Range of vision during day light.
 		"VisionNighttimeRange"		"1400"		// Range of vision at night time.
 
-		"vscripts"					"ai/frost_infernal.lua"
-
 		// Inventory
 		//----------------------------------------------------------------
 		"HasInventory"				"1"
@@ -11319,6 +11296,7 @@
 		"ConsideredHero"			"1"
 		"HasInventory"				"1"
 		"LeavesCorpse"				"0"
+		"UseAI"						"2"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -11406,6 +11384,7 @@
 		"ConsideredHero"			"1"
 		"HasInventory"				"1"
 		"SoundSet"					"Hero_Sven"
+		"UseAI"						"2"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -11470,8 +11449,6 @@
 		"VisionDaytimeRange"		"1400"		// Range of vision during day light.
 		"VisionNighttimeRange"		"1400"		// Range of vision at night time.
 
-		"vscripts"					"ai/ramero.lua"
-
 		// Inventory
 		//----------------------------------------------------------------
 		"HasInventory"				"1"
@@ -11480,9 +11457,9 @@
 		{
 			"EquippedItems"
 			{
-				"KeyOf3Moons"
+				"TomeStats"
 				{
-					"Item"					""
+					"Item"					"item_tome_big"
 				}
 			}
 
@@ -11511,6 +11488,7 @@
 		"ConsideredHero"			"1"
 		"HasInventory"				"1"
 		"SoundSet"					"Hero_Sven"
+		"UseAI"						"2"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -11575,8 +11553,6 @@
 		"VisionDaytimeRange"		"1400"		// Range of vision during day light.
 		"VisionNighttimeRange"		"1400"		// Range of vision at night time.
 
-		"vscripts"					"ai/ramero.lua"
-
 		// Inventory
 		//----------------------------------------------------------------
 		"HasInventory"				"1"
@@ -11616,6 +11592,7 @@
 		"ConsideredHero"			"1"
 		"HasInventory"				"1"
 		"SoundSet"					"Hero_Sven"
+		"UseAI"						"2"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -11680,8 +11657,6 @@
 		"VisionDaytimeRange"		"1400"		// Range of vision during day light.
 		"VisionNighttimeRange"		"1400"		// Range of vision at night time.
 
-		"vscripts"					"ai/baristol.lua"
-
 		// Inventory
 		//----------------------------------------------------------------
 		"HasInventory"				"1"
@@ -11690,9 +11665,9 @@
 		{
 			"EquippedItems"
 			{
-				"KeyOf3Moons"
+				"LightningSword"
 				{
-					"Item"					""
+					"Item"					"item_lightning_sword"
 				}
 			}
 
@@ -11774,7 +11749,7 @@
 		"CombatClassAttack"			"DOTA_COMBAT_CLASS_ATTACK_BASIC"
 		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_HERO"
 		"UnitRelationShipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
-		"vscripts"					"ai/npc_avatar.lua"
+
 		// Creature Data
 		//----------------------------------------------------------------
 		"Creature"
@@ -13910,7 +13885,7 @@
 
 		// Abilities
 		//----------------------------------------------------------------
-		"Ability1"				"holdout_drunken_haze"
+		"Ability1"				"xhs_brewmaster_drunken_haze"
 		"Ability2"				"holdout_dragon_slave_alt"
 		"Ability3"				"holdout_drunken_brawler"
 		"Ability4"				"holdout_permanent_immolation"
@@ -14167,8 +14142,8 @@
 		// General
 		//----------------------------------------------------------------
 		"BaseClass"					"npc_dota_creature"
-		"Model"						"models/heroes/dragon_knight/dragon_knight.vmdl"	 //Add model
-		"ModelScale"				"1.0"
+		"Model"						"models/heroes/arthas/arthas_prince/arthas_prince.vmdl"	 //Add model
+		"ModelScale"				"0.84"
 		"Level"						"1"
 		"AttackDamageMin"			"40"
 		"AttackDamageMax"			"46"
@@ -14212,18 +14187,18 @@
 
 		// Creature Data
 		//----------------------------------------------------------------
-		 "Creature"
-		{
-			"AttachWearables"   
-			{
-				"Wearable1" { "ItemDef" "63" }		//Helmet
-				"Wearable2" { "ItemDef" "64" }		//Shoulder Armor
-				"Wearable3" { "ItemDef" "65" }		//Bracers
-				"Wearable4" { "ItemDef" "66" }		//Weapon
-				"Wearable5" { "ItemDef" "67" }		//Offhand
-				"Wearable6" { "ItemDef" "68" }		//Skirt
-			} 
-		}
+//		"Creature"
+//		{
+//			"AttachWearables"   
+//			{
+//				"Wearable1" { "ItemDef" "63" }		//Helmet
+//				"Wearable2" { "ItemDef" "64" }		//Shoulder Armor
+//				"Wearable3" { "ItemDef" "65" }		//Bracers
+//				"Wearable4" { "ItemDef" "66" }		//Weapon
+//				"Wearable5" { "ItemDef" "67" }		//Offhand
+//				"Wearable6" { "ItemDef" "68" }		//Skirt
+//			} 
+//		}
 	}
 
 	//=================================================================================
@@ -14512,7 +14487,7 @@
 		"Ability3"				"holdout_distance_aura_tooltip"		
 		"Ability4"				"holdout_shield_tooltip"
 		"Ability5"				"ogre_magi_bloodlust"
-		"Ability6"				"holdout_laser"
+		"Ability6"				"rifleman_assassinate"
 		"Ability7"				"dummy_passive_vulnerable"
 
 		// Armor
@@ -14629,8 +14604,8 @@
 		// General
 		//----------------------------------------------------------------
 		"BaseClass"					"npc_dota_creature"
-		"Model"						"models/heroes/wraith_king/wraith_king_prop.vmdl"	 //Add model
-		"ModelScale"				"1.2"
+		"Model"						"models/heroes/arthas/arthas.vmdl"	 //Add model
+		"ModelScale"				"0.9"
 		"Level"						"1"
 		"AttackDamageMin"			"93"
 		"AttackDamageMax"			"103"
@@ -16276,6 +16251,256 @@
 		"VisionNighttimeRange"		"1"
 
 		"DisableDamageDisplay"      "1"
+	}
+
+	//=================================================================================================================
+	// Treasure Chest
+	//=================================================================================================================
+	"npc_treasure_chest"
+	{
+		// General
+		//----------------------------------------------------------------
+		"BaseClass"					"npc_dota_creature"
+		"Model"						"models/creeps/beetlejaws/mesh/beetlejaws.vmdl"
+		"SoundSet"					"Creep_Good_Melee"
+		"Level"						"1"
+		"ModelScale" 				"1.5"
+
+		// Abilities
+		//----------------------------------------------------------------
+		"Ability1"					"treasure_chest"
+		"Ability2"					"creature_techies_land_mine"
+		"Ability3"					"trap_sun_strike"
+		"Ability4"					""
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"				"20"
+		"MagicalResistance"			"0"
+
+		// Attack
+		//----------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_NO_ATTACK"
+		"AttackDamageMin"			"0"
+		"AttackDamageMax"			"0"
+		"AttackDamageType"			"DAMAGE_TYPE_ArmorPhysical"
+		"AttackRate"				"0"
+		"AttackAnimationPoint"		"0"
+		"AttackAcquisitionRange"	"0"
+		"AttackRange"				"0"
+		"ProjectileModel"			""
+		"ProjectileSpeed"			"0"
+
+		// Attributes
+		//----------------------------------------------------------------
+		"AttributePrimary"			"DOTA_ATTRIBUTE_STRENGTH"
+		"AttributeBaseStrength"		"0"
+		"AttributeStrengthGain"		"0"
+		"AttributeBaseIntelligence"	"0"
+		"AttributeIntelligenceGain"	"0"
+		"AttributeBaseAgility"		"0"
+		"AttributeAgilityGain"		"0"
+
+		// Bounty
+		//----------------------------------------------------------------
+		"BountyXP"					"0"
+		"BountyGoldMin"				"0"
+		"BountyGoldMax"				"0"
+
+		// Bounds
+		//----------------------------------------------------------------
+		"BoundsHullName"			"DOTA_HULL_SIZE_REGULAR"
+		"RingRadius"				"45"
+		"HealthBarOffset"			"110"
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_NONE"
+		"MovementSpeed"				"0"
+		"MovementTurnRate"			"1.0"
+
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"1000"
+		"StatusHealthRegen"			"3"
+		"StatusMana"				"500"
+		"StatusStartingMana"		"0"
+		"StatusManaRegen"			"0"
+
+		// Team
+		//----------------------------------------------------------------
+		"TeamName"					"DOTA_TEAM_GOODGUYS"
+		"CombatClassAttack"			"DOTA_COMBAT_CLASS_ATTACK_BASIC"
+		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_BASIC"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
+		
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"1"
+		"VisionNighttimeRange"		"1"
+	}
+
+	//=================================================================================================================
+	// Breakable Crate
+	//=================================================================================================================
+	"npc_dota_crate"
+	{
+		// General
+		//----------------------------------------------------------------
+		"BaseClass"					"npc_dota_creep"
+		"Model"						"models/gameplay/breakingcrate_dest.vmdl"
+		"SoundSet"					"Creep_Good_Melee"
+		"Level"						"1"
+		"ModelScale" 				"0.9"
+
+		// Abilities
+		//----------------------------------------------------------------
+		"Ability1"					""
+		"Ability2"					""
+		"Ability3"					""
+		"Ability4"					""
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"				"0"
+		"MagicalResistance"			"0"
+
+		// Attack
+		//----------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_NO_ATTACK"
+		"AttackDamageMin"			"0"
+		"AttackDamageMax"			"0"
+		"AttackDamageType"			"DAMAGE_TYPE_ArmorPhysical"
+		"AttackRate"				"0"
+		"AttackAnimationPoint"		"0"
+		"AttackAcquisitionRange"	"0"
+		"AttackRange"				"0"
+		"ProjectileModel"			""
+		"ProjectileSpeed"			"0"
+
+		// Attributes
+		//----------------------------------------------------------------
+		"AttributePrimary"			"DOTA_ATTRIBUTE_STRENGTH"
+		"AttributeBaseStrength"		"0"
+		"AttributeStrengthGain"		"0"
+		"AttributeBaseIntelligence"	"0"
+		"AttributeIntelligenceGain"	"0"
+		"AttributeBaseAgility"		"0"
+		"AttributeAgilityGain"		"0"
+
+		// Bounty
+		//----------------------------------------------------------------
+		"BountyXP"					"0"
+		"BountyGoldMin"				"0"
+		"BountyGoldMax"				"0"
+
+		// Bounds
+		//----------------------------------------------------------------
+		"BoundsHullName"			"DOTA_HULL_SIZE_REGULAR"
+		"RingRadius"				"45"
+		"HealthBarOffset"			"110"
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_NONE"
+		"MovementSpeed"				"0"
+		"MovementTurnRate"			"1.0"
+
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"30"
+		"StatusHealthRegen"			"0"
+		"StatusMana"				"0"
+		"StatusStartingMana"		"0"
+		"StatusManaRegen"			"0"
+
+		// Team
+		//----------------------------------------------------------------
+		"TeamName"					"DOTA_TEAM_BADGUYS"
+		"CombatClassAttack"			"DOTA_COMBAT_CLASS_ATTACK_BASIC"
+		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_BASIC"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
+		
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"1"
+		"VisionNighttimeRange"		"1"
+
+		"DisableDamageDisplay"              "1"
+		"PathfindingSearchDepthScale"		"0.0"
+	}
+
+	//=================================================================================
+	// Techies Land Mine
+	//=================================================================================
+	"npc_dota_creature_techies_land_mine"
+	{
+		// General
+		//----------------------------------------------------------------
+		"Model"						"models/heroes/techies/fx_techiesfx_mine.vmdl"
+		"BaseClass"					"npc_dota_techies_mines"
+		"SoundSet"					"0"
+		"Level"						"1"
+		"ModelScale"				"1.0"
+		"SelectionGroup"			"Techies_LandMines"
+		"BoundsHullName"			"DOTA_HULL_SIZE_SMALL"
+ 		"wearable"					"8644"
+
+		// Abilities
+		//----------------------------------------------------------------
+		"Ability1"					"ability_unselectable"
+		"Ability2"					""
+		"Ability3"					""
+		"Ability4"					""
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"				"0"
+
+		// Attack
+		//----------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_NO_ATTACK"
+		"AttackDamageMin"			"0"
+		"AttackDamageMax"			"0"
+		"AttackRate"				"1.0"
+		"AttackAnimationPoint"		"0.0"
+		"AttackAcquisitionRange"	"0"
+		"AttackRange"				"0"
+		"ProjectileModel"			""
+		"ProjectileSpeed"			"0"
+
+		// Bounds
+		//----------------------------------------------------------------
+		"HealthBarOffset"			"140"
+
+		// Bounty
+		//----------------------------------------------------------------
+		"BountyXP"					"0"
+		"BountyGoldMin"				"0"
+		"BountyGoldMax"				"0"
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_NONE"
+		"MovementSpeed"				"0"
+		"MovementTurnRate"			"0"
+
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"1"
+		"StatusHealthRegen"			"0.0"
+		
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"64"
+		"VisionNighttimeRange"		"64"
+
+		// Team
+		//----------------------------------------------------------------
+		"TeamName"					"DOTA_TEAM_NEUTRALS"
+		"CombatClassAttack"			"DOTA_COMBAT_CLASS_ATTACK_BASIC"
+		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_BASIC"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_WARD"
 	}
 
 	//=================================================================================

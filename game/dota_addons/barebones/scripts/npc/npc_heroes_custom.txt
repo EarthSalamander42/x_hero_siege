@@ -130,7 +130,7 @@
 		"AttributeAgilityGain"			"5"
 		"AttributeIntelligenceGain"		"5"
 
-		"Ability1"						"holdout_drunken_haze"
+		"Ability1"						"xhs_brewmaster_drunken_haze"
 		"Ability2"						"holdout_dragon_slave"
 		"Ability3"						"holdout_drunken_brawler"
 		"Ability4"						"holdout_permanent_immolation"
@@ -333,9 +333,11 @@
 	"npc_dota_hero_dragon_knight_holdout"
 	{
 		"override_hero"					"npc_dota_hero_dragon_knight"
-//		"DisableWearables"				"1"
+		"Model"							"models/heroes/arthas/arthas_prince/arthas_prince.vmdl"
+		"DisableWearables"				"1"
 		"MovementSpeed"					"350"
-		"ModelScale"					"1.0" //0.84
+		"ModelScale"					"0.84" //0.84
+		"AttackAnimationPoint"			"0.3" // 0.5
 
 		"AttackDamageMin"				"21"
 		"AttackDamageMax"				"27"
@@ -1240,8 +1242,8 @@
 	{
 		"override_hero"					"npc_dota_hero_skeleton_king"
 		"DisableWearables"				"1"
-		"Model"							"models/heroes/skeleton_king/skeleton_king.vmdl"
-		"ModelScale"					"1.2"
+		"Model"							"models/heroes/arthas/arthas.vmdl"
+		"ModelScale"					"0.9"
 		"AttackDamageMin"				"70"
 		"AttackDamageMax"				"80"
 		"MovementSpeed"					"350"
@@ -1647,11 +1649,12 @@
 	"npc_dota_hero_wisp_holdout"
 	{
 		"override_hero"					"npc_dota_hero_wisp"
-		"AttackCapabilities"			"DOTA_UNIT_CAP_NO_ATTACK"
+//		"AttackCapabilities"			"DOTA_UNIT_CAP_NO_ATTACK"
 //		"DisableWearables"				"1"
 		"ArmorPhysical"					"0"
 		"MovementSpeed"					"250"
 		"ModelScale"					"0.5"
+		"AttackRange"					"0"
 		"AttackDamageMin"				"0"
 		"AttackDamageMax"				"0"
 		"AttributeBaseStrength"			"0"

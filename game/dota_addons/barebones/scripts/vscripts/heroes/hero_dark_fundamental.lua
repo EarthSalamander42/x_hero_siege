@@ -201,17 +201,20 @@ local Mana = caster:GetMana()
 			items[i] = itemCopy
 		end
 	end
+
 	for i = 0, 8 do
 		if items[i] then
+			print(items[i])
 			hero:AddItem(items[i])
-			items[i]:SetCurrentCharges(caster:GetItemInSlot(i):GetCurrentCharges())
-			items[i]:StartCooldown(caster:GetItemInSlot(i):GetCooldownTimeRemaining())
+--			items[i]:StartCooldown(items[i]:GetCooldownTimeRemaining())
+--			if items[i]:GetCurrentCharges() ~= 0 then
+--				print(items[i]:GetCurrentCharges())
+--				items[i]:SetCurrentCharges(items[i]:GetCurrentCharges())
+--			end
 		end
 	end
 
-	Timers:CreateTimer(1.0, function()
-		if not caster:IsNull() then
-			UTIL_Remove(caster)
-		end
-	end)
+	if not caster:IsNull() then
+		UTIL_Remove(caster)
+	end
 end

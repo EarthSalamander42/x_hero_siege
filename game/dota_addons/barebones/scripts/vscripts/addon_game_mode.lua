@@ -86,6 +86,7 @@ function Precache(context)
 	PrecacheUnitByNameAsync("npc_dota_hero_invoker", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_juggernaut", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_keeper_of_the_light", context)
+	PrecacheUnitByNameAsync("npc_dota_hero_kunkka", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_lich", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_lifestealer", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_lina", context) -- For Blood Mage 2.

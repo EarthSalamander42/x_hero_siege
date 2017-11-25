@@ -45,6 +45,8 @@
 		topbar.FindChildTraverse("HUDSkinTopBarBG").style.visibility = "collapse";
 		for (var bg of topbar.FindChildrenWithClassTraverse("TopBarBackground")) {
 			bg.style.opacity = "1";
+			bg.style.backgroundImage = "none";
+			bg.style.backgroundColor = "#000000da";
 		}
 		topbar.style.width = "1188px";
 
@@ -103,7 +105,6 @@
 		//Top Bar Dire
 		var TopBarDireTeam = hudElements.FindChildTraverse("TopBarDireTeam");
 		TopBarDireTeam.style.visibility = "collapse";
-
 	</script>
 	<Panel>
 		<CustomUIElement type="GameSetup"			layoutfile="file://{resources}/layout/custom_game/gamesetup_options.xml" />

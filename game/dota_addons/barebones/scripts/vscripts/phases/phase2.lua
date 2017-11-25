@@ -1,22 +1,4 @@
-require('libraries/timers')
-
-first_time_teleport = true
-first_time_teleport_arthas = true
-first_time_teleport_arthas_real = true
-
-function trigger_second_wave_left()
---	local skywrath = Entities:FindByName(nil, "SkywrathMage_Guardian1"):GetAbsOrigin()
-	DoEntFire("trigger_phase2_left", "Kill", nil ,0 ,nil ,nil)
---	UTIL_REMOVE(skywrath)
-	Timers:CreateTimer(2.5, spawn_second_phase_left)
-end
-
-function trigger_second_wave_right()
-	DoEntFire("trigger_phase2_right", "Kill", nil, 0, nil, nil)
-	Timers:CreateTimer(2.5, spawn_second_phase_right)
-end
-
-function spawn_second_phase_left()
+function Phase2CreepsLeft()
 	local EntIceTower = Entities:FindByName(nil, "npc_tower_cold_1")
 	local point = Entities:FindByName(nil, "npc_dota_spawner_top_left_1"):GetAbsOrigin()
 
@@ -35,7 +17,7 @@ function spawn_second_phase_left()
 	end)
 end
 
-function spawn_second_phase_right()
+function Phase2CreepsRight()
 	local EntIceTower = Entities:FindByName(nil, "npc_tower_cold_2")
 	local point = Entities:FindByName(nil, "npc_dota_spawner_top_right_1"):GetAbsOrigin()
 	Timers:CreateTimer(0, function()
