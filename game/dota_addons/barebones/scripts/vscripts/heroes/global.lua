@@ -209,7 +209,6 @@ local main_ability = ability:GetAbilityName()
 end
 
 function CastleMuradin(event)
-if GetMapName() == "ranked_2v2" then return end
 local caster = event.caster
 local ability = event.ability
 local heroes = HeroList:GetAllHeroes()

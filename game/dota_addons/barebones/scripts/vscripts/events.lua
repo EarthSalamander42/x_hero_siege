@@ -8,7 +8,7 @@ local networkid = keys.networkid
 local reason = keys.reason
 local userid = keys.userid
 
-	CloseLane(userid)
+--	CloseLane(userid)
 	Server_DisableToGainXpForPlayer(userid)
 end
 
@@ -32,6 +32,10 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 local npc = EntIndexToHScript(keys.entindex)
 local normal_bounty = npc:GetGoldBounty()
 local normal_xp = npc:GetDeathXP()
+if GetMapName() == "x_hero_siege_8" then
+	local normal_bounty = npc:GetGoldBounty() * 2
+	local normal_xp = npc:GetDeathXP() * 2
+end
 local normal_min_damage = npc:GetBaseDamageMin()
 local normal_max_damage = npc:GetBaseDamageMax()
 local hero_level = npc:GetLevel()
@@ -589,7 +593,7 @@ local player = PlayerResource:GetPlayer(userID)
 	for str in string.gmatch(text, "%S+") do
 		for i = 1, #mod_creator do
 			if PlayerResource:GetSteamAccountID(player:GetPlayerID()) == mod_creator[i] or PlayerResource:GetSteamAccountID(player:GetPlayerID()) == administrator[i] or PlayerResource:GetSteamAccountID(player:GetPlayerID()) == moderator[i] then
-				for Frozen = 0, DOTA_MAX_TEAM_PLAYERS -1 do
+				for Frozen = 0, PlayerResource:GetPlayerCount() -1 do
 					local PlayerNames = {"Red", "Blue", "Cyan", "Purple", "Yellow", "Orange", "Green", "Pink"}
 					if PlayerResource:IsValidPlayer(Frozen) then
 						if str == "-freeze_"..Frozen +1 then
@@ -1057,7 +1061,7 @@ local lane = tonumber(cn)
 				end
 			end
 		end
-		if killedUnit.no_corpse ~= true and GetMapName() == "x_hero_siege" then
+		if killedUnit.no_corpse ~= true then
 			Corpses:CreateFromUnit(killedUnit)
 		end
 	return
@@ -1117,7 +1121,7 @@ local lane = tonumber(cn)
 				FrostTowers_killed = FrostTowers_killed +1
 				if FrostTowers_killed >= 2 then
 					Notifications:TopToAll({text="WARNING! Final Wave incoming. Arriving in 60 seconds! Back to the Castle!" , duration=10.0})
-					nTimer_SpecialEvent = 60
+					nTimer_SpecialEvent = 61
 					nTimer_IncomingWave = 1
 					PHASE_3 = 1
 					KillCreeps(DOTA_TEAM_CUSTOM_1)
@@ -1256,7 +1260,7 @@ end
 ---------------------------------------------------------
 
 function GameMode:OnPlayerReconnected(event)
-	OpenLane(event.player_id)
+--	OpenLane(event.player_id)
 	Server_EnableToGainXPForPlyaer(event.player_id)
 end
 
@@ -1360,15 +1364,15 @@ function GameMode:OnZoneActivated(Zone)
 		zone:OnZoneActivated(Zone)
 	end
 
-	if Zone.szName == "forest_holdout" then
-		local hTowers = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_BUILDING, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, 0, false)
-		for _,Tower in pairs(hTowers) do
-			if Tower ~= nil and Tower:GetUnitName() == "npc_dota_holdout_tower" then
-				Tower:RemoveAbility("building_no_vision")
-				Tower:RemoveModifierByName("modifier_no_vision")
-			end
-		end
-	end
+--	if Zone.szName == "forest_holdout" then
+--		local hTowers = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_BUILDING, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, 0, false)
+--		for _,Tower in pairs(hTowers) do
+--			if Tower ~= nil and Tower:GetUnitName() == "npc_dota_holdout_tower" then
+--				Tower:RemoveAbility("building_no_vision")
+--				Tower:RemoveModifierByName("modifier_no_vision")
+--			end
+--		end
+--	end
 end
 
 ---------------------------------------------------------
@@ -1389,6 +1393,10 @@ function GameMode:OnQuestStarted(zone, quest)
 
 	for _,zone in pairs(self.Zones) do
 		zone:OnQuestStarted(quest)
+	end
+
+	if quest.szQuestName == "kill_ice_towers" then
+		SPECIAL_EVENT = 0
 	end
 
 	if quest.Completion.Type == QUEST_EVENT_ON_DIALOG or quest.Completion.Type == QUEST_EVENT_ON_DIALOG_ALL_CONFIRMED then
@@ -1415,7 +1423,7 @@ end
 ---------------------------------------------------------
 
 function GameMode:OnQuestCompleted(questZone, quest)
-	print("GameMode:OnQuestCompleted - Quest " .. quest.szQuestName .. " in Zone " .. questZone.szName .. " completed.")
+--	print("GameMode:OnQuestCompleted - Quest " .. quest.szQuestName .. " in Zone " .. questZone.szName .. " completed.")
 	quest.nCompleted = quest.nCompleted + 1
 	if quest.nCompleted >= quest.nCompleteLimit then
 		quest.bCompleted = true

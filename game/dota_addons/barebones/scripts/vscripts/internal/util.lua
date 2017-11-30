@@ -495,21 +495,12 @@ local unit = {
 	"npc_dota_creature_clockwerk_event_8"
 }
 
-	if GetMapName() == "x_hero_siege" then
-		for j = 1, 10 do
-			CreateUnitByName(unit[reg-1], Entities:FindByName(nil, real_point):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-		end
-		poi = poi + 1
-		if poi > 4 then
-			poi = 1
-		end
-	elseif GetMapName() == "ranked_2v2" then
-		for j = 1, 10 do
-			CreateUnitByName(unit[reg-1], Entities:FindByName(nil, "npc_dota_spawner_west_event"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-		end
-		for j = 1, 10 do
-			CreateUnitByName(unit[reg-1], Entities:FindByName(nil, "npc_dota_spawner_east_event"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-		end
+	for j = 1, 10 do
+		CreateUnitByName(unit[reg-1], Entities:FindByName(nil, real_point):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+	end
+	poi = poi + 1
+	if poi > 4 then
+		poi = 1
 	end
 
 	print("Current Wave:", reg-1)
@@ -530,14 +521,7 @@ local unit = {
 end
 
 function SpawnDragons(dragon)
-local i = 0
-if GetMapName() == "x_hero_siege" then
-	i = 8
-elseif GetMapName() == "ranked_2v2" then
-	i = 4
-end
-
-	for c = 1, i do
+	for c = 1, 8 do
 		if CREEP_LANES[c][1] == 1 and CREEP_LANES[c][3] == 1 then
 		local point = Entities:FindByName( nil, "npc_dota_spawner_"..c)
 			for j = 1, GameRules:GetCustomGameDifficulty() do
@@ -552,23 +536,23 @@ local DoorObs = Entities:FindAllByName("obstruction_lane"..PlayerID)
 local towers = Entities:FindAllByName("dota_badguys_tower"..PlayerID)
 local raxes = Entities:FindAllByName("dota_badguys_barracks_"..PlayerID)
 
-	if PHASE_3 == 0 and CREEP_LANES_TYPE == 1 then
-		for _, obs in pairs(DoorObs) do
+	if PHASE_3 == 0 then
+		if CREEP_LANES_TYPE == 1 then
+			for _, obs in pairs(DoorObs) do
 			obs:SetEnabled(false, true)
+			end
+			for _, tower in pairs(towers) do
+				tower:RemoveModifierByName("modifier_invulnerable")
+			end
+			for _, rax in pairs(raxes) do
+				rax:RemoveModifierByName("modifier_invulnerable")
+			end
+			CREEP_LANES[PlayerID+1][1] = 1
+			DoEntFire("door_lane"..PlayerID+1, "SetAnimation", "gate_02_open", 0, nil, nil)
+			print("Lane: "..PlayerID+1)
+		elseif CREEP_LANES_TYPE == 2 then
+			
 		end
-		for _, tower in pairs(towers) do
-			tower:RemoveModifierByName("modifier_invulnerable")
-		end
-		for _, rax in pairs(raxes) do
-			rax:RemoveModifierByName("modifier_invulnerable")
-		end
-		CREEP_LANES[PlayerID+1][1] = 1
-		DoEntFire("door_lane"..PlayerID+1, "SetAnimation", "gate_02_open", 0, nil, nil)
-		print("Lane: "..PlayerID+1)
-	elseif PHASE_3 == 0 and CREEP_LANES_TYPE == 2 then
-
-	elseif CREEP_LANES_TYPE == 3 or PHASE_3 == 1 then
-		return
 	end
 end
 
@@ -877,18 +861,10 @@ local particle_lifesteal = "particles/item/lifesteal_mask/lifesteal_particle.vpc
 end
 
 function CreepLevels(level)
-local i = 0
-
-	if GetMapName() == "x_hero_siege" then
-		i = 8
-	elseif GetMapName() == "ranked_2v2" then
-		i = 4
-	end
-
 	if level < 4 then
-		nTimer_CreepLevel = 359
+		nTimer_CreepLevel = 360
 		Notifications:TopToAll({text="Creep Level "..level.." enabled!", style={color="lightgreen"}, duration=5.0})
-		for c = 1, i do
+		for c = 1, 8 do
 			if CREEP_LANES[c][2] < level then
 				CREEP_LANES[c][2] = level
 			end

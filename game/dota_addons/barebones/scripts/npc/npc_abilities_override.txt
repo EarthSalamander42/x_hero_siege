@@ -357,29 +357,27 @@
 			"01"
 			{
 				"var_type"					"FIELD_FLOAT"
-				"duration"					"3.0"
+				"duration"					"4.0"
 			}
 			"02"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"bonus_movement_speed"		"-5 -10 -15 -20"
+				"bonus_attack_speed"		"8 16 24 32"
+				"LinkedSpecialBonus"		"special_bonus_unique_viper_1"
 			}
 			"03"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"bonus_attack_speed"		"-10 -20 -30 -40"
+				"bonus_magic_resistance"	"10 15 20 25"
+				"LinkedSpecialBonus"		"special_bonus_unique_viper_1"
 			}
 			"04"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"bonus_magic_resistance"	"10"
+				"damage"					"8 16 24 32"
+				"LinkedSpecialBonus"		"special_bonus_unique_viper_1"
 			}
 			"05"
-			{
-				"var_type"					"FIELD_INTEGER"
-				"damage"					"40 60 80 100"
-			}
-			"06"
 			{
 				"var_type"					"FIELD_INTEGER"
 				"max_range_tooltip"			"1400"
@@ -1093,6 +1091,7 @@
 			{
 				"var_type"						"FIELD_INTEGER"
 				"bonus_damage_from_hero"		"30"
+				"LinkedSpecialBonus"			"special_bonus_unique_underlord_3"
 			}
 			"05"
 			{
@@ -1918,11 +1917,13 @@
 			{
 				"var_type"					"FIELD_INTEGER"
 				"ground_jump_distance"		"900"
+				"LinkedSpecialBonus"		"special_bonus_unique_monkey_king_7"
 			}
 			"05"
 			{
 				"var_type"					"FIELD_INTEGER"
 				"perched_jump_distance"		"900"
+				"LinkedSpecialBonus"		"special_bonus_unique_monkey_king_7"
 			}
 			"06"
 			{
@@ -1958,6 +1959,7 @@
 			{
 				"var_type"					"FIELD_INTEGER"
 				"impact_damage_tooltip"		"225 550 775 1050"
+				"LinkedSpecialBonus"		"special_bonus_unique_monkey_king_3"
 			}
 			"13"
 			{
@@ -2002,6 +2004,7 @@
 			{
 				"var_type"				"FIELD_INTEGER"
 				"impact_damage"			"225 550 775 1050"
+				"LinkedSpecialBonus"	"special_bonus_unique_monkey_king_3"
 			}
 			"02"
 			{
@@ -2761,12 +2764,12 @@
 			{
 				"var_type"				"FIELD_INTEGER"
 				"quill_stack_damage"	"30 50 70 90"
+				"LinkedSpecialBonus"	"special_bonus_unique_bristleback_2"
 			}
 			"04"
 			{
 				"var_type"				"FIELD_FLOAT"
 				"quill_stack_duration"	"14.0"
-				"LinkedSpecialBonus"	"special_bonus_unique_bristleback"
 			}
 			"05"
 			{
@@ -2854,7 +2857,7 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityType"					"DOTA_ABILITY_TYPE_ULTIMATE"
+		"AbilityType"					"DOTA_ABILITY_TYPE_BASIC"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"SpellDispellableType"			"SPELL_DISPELLABLE_NO"
 		"MaxLevel"						"1"
@@ -2870,29 +2873,20 @@
 			"01"
 			{
 				"var_type"						"FIELD_INTEGER"
-				"base_damage"					"20"
+				"damage_per_stack"				"30"
+				"LinkedSpecialBonus"			"special_bonus_unique_bristleback_3"
 			}
 			"02"
 			{
 				"var_type"						"FIELD_INTEGER"
-				"damage_per_stack"				"20"
+				"move_speed_per_stack"			"5"
 			}
 			"03"
-			{
-				"var_type"						"FIELD_INTEGER"
-				"base_move_speed"				"3"
-			}
-			"04"
-			{
-				"var_type"						"FIELD_INTEGER"
-				"move_speed_per_stack"			"3"
-			}
-			"05"
 			{
 				"var_type"						"FIELD_FLOAT"
 				"stack_duration"				"14.0"
 			}
-			"06"
+			"04"
 			{
 				"var_type"						"FIELD_INTEGER"
 				"max_stacks"					"10"
@@ -3157,6 +3151,7 @@
 			{
 				"var_type"						"FIELD_INTEGER"
 				"damage_per_second"				"25 50 75 100"
+				"LinkedSpecialBonus"			"special_bonus_unique_ember_spirit_3"
 			}
 		}
 	}
@@ -3252,78 +3247,55 @@
 	}
 
 	//=================================================================================================================
-	// Tiny: Grow
+	// Tiny: Craggy Exterior
 	//=================================================================================================================
-	"tiny_grow"
+	"tiny_craggy_exterior"
 	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"ID"							"5109"														// unique ID number for this ability.  Do not change this once established or it will invalidate collected stats.
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_HIDDEN"
-		"AbilityType"					"DOTA_ABILITY_TYPE_ULTIMATE"
-		"AbilitySound"					"Tiny.Grow"
-		"HasScepterUpgrade"				"1"
+		"AbilityCastRange"				"165"
+		"AbilityCastPoint"				"0.2"
+		"AbilityCooldown"				"0"
+		"AbilityManaCost"				"75 150 225 300"
+		"AbilityModifierSupportBonus"	"35"
 
-		// Special
-		//-------------------------------------------------------------------------------------------------------------
 		"AbilitySpecial"
 		{
 			"01"
 			{
-				"var_type"						"FIELD_INTEGER"
-				"bonus_damage"					"0"
+				"var_type"					"FIELD_INTEGER"
+				"attack_count"				"8 12 16 20"
 			}
 			"02"
 			{
-				"var_type"						"FIELD_INTEGER"
-				"bonus_attack_speed"			"0"
+				"var_type"					"FIELD_INTEGER"
+				"bonus_damage"				"50"
 			}
 			"03"
 			{
-				"var_type"						"FIELD_INTEGER"
-				"bonus_movement_speed"			"0"
+				"var_type"					"FIELD_INTEGER"
+				"bonus_damage_buildings"	"100"
 			}
 			"04"
 			{
-				"var_type"						"FIELD_INTEGER"
-				"grow_bonus_damage_pct"			"0"
+				"var_type"					"FIELD_INTEGER"
+				"attack_range"				"350"
 			}
 			"05"
 			{
-				"var_type"						"FIELD_INTEGER"
-				"bonus_range_scepter"			"0"
+				"var_type"					"FIELD_INTEGER"
+				"splash_width"				"200"
 			}
 			"06"
 			{
-				"var_type"						"FIELD_INTEGER"
-				"cleave_starting_width"			"0"
-			}			
+				"var_type"					"FIELD_INTEGER"
+				"splash_range"				"400"
+			}
 			"07"
 			{
-				"var_type"						"FIELD_INTEGER"
-				"cleave_ending_width"			"0"
-			}			
-			"08"
-			{
-				"var_type"						"FIELD_INTEGER"
-				"cleave_distance"				"0"
-			}
-			"09"
-			{
-				"var_type"						"FIELD_INTEGER"
-				"bonus_cleave_damage_scepter"	"0"
-			}
-			"10"
-			{
-				"var_type"						"FIELD_INTEGER"
-				"bonus_building_damage_scepter"	"0"
-			}
-			"11"
-			{
-				"var_type"						"FIELD_INTEGER"
-				"grow_bonus_damage_pct_scepter"	"0"
+				"var_type"					"FIELD_INTEGER"
+				"splash_pct"				"60"
 			}
 		}
+		"AbilityCastAnimation"		"ACT_DOTA_CAST_ABILITY_3"
 	}
 
 	//=================================================================================================================
@@ -3336,33 +3308,23 @@
 			"01"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"damage_modifier"			"-20"
+				"damage_modifier"			"-70 -55 -40 -25"
 			}
 			"02"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"damage_modifier_tooltip"	"80"
+				"damage_modifier_tooltip"	"30 45 60 75"
 			}
 			"03"
 			{	
 				"var_type"					"FIELD_INTEGER"
-				"arrow_count"				"2 4 6 8"
-			}
-			"04"
-			{	
-				"var_type"					"FIELD_INTEGER"
-				"total_arrow_count"			"3 5 7 9"
+				"arrow_count"				"3 5 7 9"
 				"LinkedSpecialBonus"		"special_bonus_unique_medusa_2"
 			}
-			"05"
+			"04"
 			{
-				"var_type"					"FIELD_INTEGER"
-				"range"						"700"
-			}
-			"06"
-			{
-				"var_type"					"FIELD_INTEGER"
-				"projectile_speed"			"1200"
+				"var_type"						"FIELD_INTEGER"
+				"split_shot_bonus_range"		"100"
 			}
 		}
 	}

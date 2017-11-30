@@ -45,7 +45,8 @@ _G.ZONE_STAR_CRITERIA_KILLS				= 2
 _G.ZONE_STAR_CRITERIA_QUEST_COMPLETE	= 3
 
 -- X Hero Siege
-_G.PREGAMETIME = 150
+_G.X_HERO_SIEGE_V = 3.46
+_G.PREGAMETIME = 125
 _G.nTimer_GameTime = 0
 _G.nTimer_SpecialEvent = 0
 _G.nTimer_IncomingWave = 0
@@ -67,16 +68,17 @@ _G.sword_first_time = true
 _G.ring_first_time = true
 _G.doom_first_time = false
 _G.frost_first_time = false
-_G.X_HERO_SIEGE_V = 3.45
 _G.SECRET = 0
 _G.PHASE_3 = 0
 _G.RESPAWN_TIME = 40.0
 _G.CREEP_LANES_TYPE = 1
+if GetMapName() == "x_hero_siege_4" then
+	_G.CREEP_LANES_TYPE = 2
+end
 _G.STARTING_GOLD = 2000
 _G.BT_ENABLED = 1
 _G.MURADIN_DEFEND = false
 _G.STORM_SPIRIT = 0
-_G.FORCED_LANES = 0
 _G.ALL_HERO_IMAGE_DEAD = 0
 
 _G.FrostInfernal_killed = 0
@@ -107,12 +109,10 @@ CREEP_LANES[1] = {0, 1, 1}
 CREEP_LANES[2] = {0, 1, 1}
 CREEP_LANES[3] = {0, 1, 1}
 CREEP_LANES[4] = {0, 1, 1}
-if GetMapName() == "x_hero_siege" then
-	CREEP_LANES[5] = {0, 1, 1}
-	CREEP_LANES[6] = {0, 1, 1}
-	CREEP_LANES[7] = {0, 1, 1}
-	CREEP_LANES[8] = {0, 1, 1}
-end
+CREEP_LANES[5] = {0, 1, 1}
+CREEP_LANES[6] = {0, 1, 1}
+CREEP_LANES[7] = {0, 1, 1}
+CREEP_LANES[8] = {0, 1, 1}
 
 PLAYER_COLORS = {}					-- Stores individual player colors
 PLAYER_COLORS[0] = {200, 0, 0}		--Red
@@ -225,6 +225,7 @@ _G.ember_vip_members = {
 	72224874,	-- R3V4MP3D [Danial Tan on Patreon]
 	489514611,	-- R3V4MP3D secondary account for streaming
 	134153339,	-- jakehead20 [Some Random Dude on Patreon]
+	372255713,	-- Mikheil Evangelista [Pmoigki on Discord]
 }
 
 _G.golden_vip_members = {
@@ -255,7 +256,8 @@ _G.golden_vip_members = {
 	290718556,	-- Souka Blett [souris]
 	175063550,	-- Zambla [Cousin souris]
 	23993414,	-- Séra Antares
-	284268524	-- Minibizz
+	284268524,	-- Minibizz
+	157908033,	-- memo [paid by Mikheil Evangelista]
 }
 
 _G.vip_members = {
@@ -289,6 +291,7 @@ _G.vip_members = {
 	53100383,	-- Ken [aznken on Discord]
 	26464251,	-- vk [Victor Kannebley Bittencourt on Patreon]
 	317042892,	-- mabuhaymgakalbo [Paul Santos on Patreon]
+	76137142,	-- l0N3IY [JasonDire on Patreon]
 }
 
 _G.banned_players = {

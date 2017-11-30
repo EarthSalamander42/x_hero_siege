@@ -27,14 +27,11 @@ require('items/global')
 require('server')
 
 function GameMode:OnFirstPlayerLoaded()
-base_good = Entities:FindByName(nil, "base_spawn_goodguys")
-	if GetMapName() == "ranked_2v2" then
-		base_bad = Entities:FindByName(nil, "base_spawn_badguys")
-	end
+	base_good = Entities:FindByName(nil, "base_spawn_goodguys")
 end
 
 function GameMode:OnAllPlayersLoaded()
-	for playerID = 0, DOTA_MAX_TEAM_PLAYERS -1 do
+	for playerID = 0, PlayerResource:GetPlayerCount() -1 do
 		if PlayerResource:IsValidPlayer(playerID) then
 			PlayerResource:SetCustomPlayerColor(playerID, PLAYER_COLORS[playerID][1], PLAYER_COLORS[playerID][2], PLAYER_COLORS[playerID][3])
 		end
@@ -55,9 +52,9 @@ local point = Entities:FindByName(nil, "hero_selection_"..id)
 	if hero:GetUnitName() == "npc_dota_hero_wisp" then
 		hero:SetAbilityPoints(0)
 		hero:SetGold(0, false)
-		hero:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 25.0, IsHidden = true})
+		hero:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 15.0, IsHidden = true})
 		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
-		Timers:CreateTimer(25.0, function()
+		Timers:CreateTimer(15.0, function()
 			FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
 			hero:Stop()
 			Timers:CreateTimer(0.1, function()
@@ -77,14 +74,12 @@ function GameMode:InitGameMode()
 	GameMode = self
 	mode = GameRules:GetGameModeEntity()
 
---	GameMode.ItemKVs = LoadKeyValues("scripts/npc/npc_items_custom.txt")
-
 	-- Timer Rules
 	GameRules:SetPostGameTime(60.0)
 	GameRules:SetTreeRegrowTime(240.0)
-	GameRules:SetHeroSelectionTime(0.0) --This is not dota bitch
-	GameRules:SetGoldTickTime(0.0) --This is not dota bitch
-	GameRules:SetGoldPerTick(0.0) --This is not dota bitch
+	GameRules:SetHeroSelectionTime(0.0)
+	GameRules:SetGoldTickTime(0.0)
+	GameRules:SetGoldPerTick(0.0)
 	GameRules:SetCustomGameSetupAutoLaunchDelay(15.0) --Vote Time
 	GameRules:SetPreGameTime(PREGAMETIME)
 
@@ -128,21 +123,19 @@ function GameMode:InitGameMode()
 
 	-- Team Rules
 	SetTeamCustomHealthbarColor(DOTA_TEAM_GOODGUYS, 0, 64, 128) --Blue
-	SetTeamCustomHealthbarColor(DOTA_TEAM_BADGUYS, 128, 32, 32) --Red
-	SetTeamCustomHealthbarColor(DOTA_TEAM_CUSTOM_1, 255, 255, 0) --Yellow	
-	SetTeamCustomHealthbarColor(DOTA_TEAM_CUSTOM_2, 255, 255, 0) --Yellow	
+--	SetTeamCustomHealthbarColor(DOTA_TEAM_BADGUYS, 255, 255, 0) --Yellow
+	SetTeamCustomHealthbarColor(DOTA_TEAM_CUSTOM_1, 128, 32, 32) --Red	
+	SetTeamCustomHealthbarColor(DOTA_TEAM_CUSTOM_2, 128, 32, 32) --Red	
 
 	mode:SetCustomGameForceHero("npc_dota_hero_wisp")
 	GameRules:LockCustomGameSetupTeamAssignment(true)
 	GameRules:SetHeroRespawnEnabled(true)
 	mode:SetFixedRespawnTime(RESPAWN_TIME)
-	if GetMapName() == "x_hero_siege" then
-		GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_GOODGUYS, 8)
-		GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_BADGUYS, 0)
-	else
-		GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_GOODGUYS, 2)
-		GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_BADGUYS, 2)
+	GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_GOODGUYS, 8)
+	if GetMapName() == "x_hero_siege_4" then
+		GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_GOODGUYS, 4)
 	end
+	GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_BADGUYS, 0)
 	GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_CUSTOM_1, 0)
 	GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_CUSTOM_2, 0)
 	mode:SetCustomXPRequiredToReachNextLevel(XP_PER_LEVEL_TABLE)
@@ -181,11 +174,11 @@ function GameMode:InitGameMode()
 	--Dungeon
 	self.CheckpointsActivated = {}
 	self.Zones = {}
---	CustomGameEventManager:RegisterListener("scroll_clicked", function(...) return self:OnScrollClicked(...) end)
 
 	-- Item added to inventory filter
 	mode:SetItemAddedToInventoryFilter(function(ctx, event)
 		local hero = EntIndexToHScript(event.inventory_parent_entindex_const)
+		if hero:IsRealHero() then if hero:GetPlayerID() == -1 then return end end
 		local item = EntIndexToHScript(event.item_entindex_const)
 		local key = "item_key_of_the_three_moons"
 		local shield = "item_shield_of_invincibility"
@@ -195,7 +188,7 @@ function GameMode:InitGameMode()
 		local frost = "item_orb_of_frost"
 		if item:GetAbilityName() == "item_tpscroll" and item:GetPurchaser() == nil then return false end
 
-		if hero:IsRealHero() or hero:IsConsideredHero() then
+		if hero:IsRealHero() then
 			if hero:GetUnitName() == "npc_baristol" then return end
 			if hero:GetTeamNumber() == 2 or hero:GetTeamNumber() == 3 then
 				if item:GetName() == sword and sword_first_time then
@@ -298,11 +291,20 @@ function GameMode:InitGameMode()
 
 			-- Rune System
 			if item:GetName() == "item_rune_armor" then
-				print("Armor Rune!")
 				PickupArmorRune(item, hero)
 				return false
 			elseif item:GetName() == "item_rune_immolation" then
-				print("Immolation Rune!")
+				PickupImmolationRune(item, hero)
+				return false
+			end
+		end
+
+		if hero:IsRealHero() or hero:IsConsideredHero() then
+			-- Rune System
+			if item:GetName() == "item_rune_armor" then
+				PickupArmorRune(item, hero)
+				return false
+			elseif item:GetName() == "item_rune_immolation" then
 				PickupImmolationRune(item, hero)
 				return false
 			end
@@ -360,9 +362,6 @@ local newState = GameRules:State_Get()
 			if category == "difficulty" then
 				GameRules:SetCustomGameDifficulty(highest_key)
 			end
-			if category == "creep_lanes" then
-				CREEP_LANES_TYPE = highest_key
-			end
 			print(category .. ": " .. highest_key)
 		end
 	end
@@ -378,23 +377,14 @@ local newState = GameRules:State_Get()
 		end
 		SpawnHeroesBis()
 
-		if PlayerResource:GetPlayerCount() > 4 then
-			CREEP_LANES_TYPE = 1
-			FORCED_LANES = 1			
-		end
-
 		local diff = {"Easy", "Normal", "Hard", "Extreme"}
 		local lanes = {"Simple", "Double", "Full"}
+		local Color = {"Green", "Yellow", "Orange", "Red"}
 		Timers:CreateTimer(3.0, function()
 			CustomGameEventManager:Send_ServerToAllClients("show_timer_bar", {})
-			Notifications:TopToAll({text="DIFFICULTY: "..diff[GameRules:GetCustomGameDifficulty()], duration=10.0})
-			if FORCED_LANES == 0 then
-				Notifications:TopToAll({text="CREEP LANES: "..lanes[CREEP_LANES_TYPE], duration=10.0})
-			elseif FORCED_LANES == 1 then
-				Notifications:TopToAll({text="CREEP LANES: SIMPLE, less than 4 players required to play Double Lanes!", duration=10.0})
-			end
+			Notifications:TopToAll({text="DIFFICULTY: "..diff[GameRules:GetCustomGameDifficulty()], color = Color[GameRules:GetCustomGameDifficulty()], duration=10.0})
 		end)
-		
+
 		require('zones/dialog_ep_1')
 		require('zones/zone_tables_ep_1')
 		self:SetupZones()
@@ -439,45 +429,16 @@ local newState = GameRules:State_Get()
 			end
 		end
 
-		-- Make towers vulnerable depending player numbers
-		if CREEP_LANES_TYPE == 3 then
-			for NumPlayers = 1, 8 do
-				CREEP_LANES[NumPlayers][1] = 1
-				local DoorObs = Entities:FindAllByName("obstruction_lane"..NumPlayers)
-				for _, obs in pairs(DoorObs) do
-					obs:SetEnabled(false, true)
-				end
-				DoEntFire("door_lane"..NumPlayers, "SetAnimation", "gate_02_open", 0, nil, nil)
-				local towers = Entities:FindAllByName("dota_badguys_tower"..NumPlayers)
-				for _, tower in pairs(towers) do
-					tower:RemoveModifierByName("modifier_invulnerable")
-				end
+		for NumPlayers = 1, PlayerResource:GetPlayerCount() * CREEP_LANES_TYPE do
+			CREEP_LANES[NumPlayers][1] = 1
+			local DoorObs = Entities:FindAllByName("obstruction_lane"..NumPlayers)
+			for _, obs in pairs(DoorObs) do
+				obs:SetEnabled(false, true)
 			end
-		elseif GetMapName() == "ranked_2v2" then
-			for NumPlayers = 1, 4 do
-				CREEP_LANES[NumPlayers][1] = 1
-				local DoorObs = Entities:FindAllByName("obstruction_lane"..NumPlayers)
-				for _, obs in pairs(DoorObs) do
-					obs:SetEnabled(false, true)
-				end
-				DoEntFire("door_lane"..NumPlayers, "SetAnimation", "gate_02_open", 0, nil, nil)
-				local towers = Entities:FindAllByName("dota_badguys_tower"..NumPlayers)
-				for _, tower in pairs(towers) do
-					tower:RemoveModifierByName("modifier_invulnerable")
-				end
-			end
-		else
-			for NumPlayers = 1, PlayerResource:GetPlayerCount() * CREEP_LANES_TYPE do
-				CREEP_LANES[NumPlayers][1] = 1
-				local DoorObs = Entities:FindAllByName("obstruction_lane"..NumPlayers)
-				for _, obs in pairs(DoorObs) do
-					obs:SetEnabled(false, true)
-				end
-				DoEntFire("door_lane"..NumPlayers, "SetAnimation", "gate_02_open", 0, nil, nil)
-				local towers = Entities:FindAllByName("dota_badguys_tower"..NumPlayers)
-				for _, tower in pairs(towers) do
-					tower:RemoveModifierByName("modifier_invulnerable")
-				end
+			DoEntFire("door_lane"..NumPlayers, "SetAnimation", "gate_02_open", 0, nil, nil)
+			local towers = Entities:FindAllByName("dota_badguys_tower"..NumPlayers)
+			for _, tower in pairs(towers) do
+				tower:RemoveModifierByName("modifier_invulnerable")
 			end
 		end
 
@@ -500,10 +461,6 @@ local newState = GameRules:State_Get()
 		CustomGameEventManager:Send_ServerToAllClients("end_game", {})
 		local winning_team = GAME_WINNER_TEAM
 		Server_CalculateXPForWinnerAndAll(winning_team)
-		local winning_team_number = 2
-		if winning_team == "Dire" then
-			winning_team_number = 3
-		end
 	end
 end
 
@@ -513,35 +470,20 @@ if GameRules:IsGamePaused() == true then return 1 end
 if not reg then reg = 1 end
 if not poi then poi = 1 end
 
-if GetMapName() == "x_hero_siege" then
-	Region = {
-		"Incoming wave of Darkness from the West",
-		"Incoming wave of Darkness from the North",
-		"Muradin Event in 30 sec",
-		"Incoming wave of Darkness from the South",
-		"Incoming wave of Darkness from the West",
-		"Farming Event in 30 sec",
-		"Incoming wave of Darkness from the East",
-		"Incoming wave of Darkness from the South"
-	}
-elseif GetMapName() == "ranked_2v2" then
-	Region = {
-		"Incoming wave of Darkness",
-		"Incoming wave of Darkness",
-		"Muradin Event in 30 sec",
-		"Incoming wave of Darkness",
-		"Incoming wave of Darkness",
-		"Farming Event in 30 sec",
-		"Incoming wave of Darkness",
-		"Incoming wave of Darkness"
-	}
-end
+local Region = {
+	"Incoming wave of Darkness from the West",
+	"Incoming wave of Darkness from the North",
+	"Muradin Event in 30 sec",
+	"Incoming wave of Darkness from the South",
+	"Incoming wave of Darkness from the West",
+	"Farming Event in 30 sec",
+	"Incoming wave of Darkness from the East",
+	"Incoming wave of Darkness from the South"
+}
 
 	GameTimer()
 
-	if newState == DOTA_GAMERULES_STATE_PRE_GAME then
-
-	elseif newState == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
+	if newState == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
 		if SPECIAL_EVENT == 0 then
 			CountdownTimerIncomingWave()
 			CountdownTimerCreepLevel()
@@ -645,7 +587,7 @@ end
 		end
 	end
 
-	for nPlayerID = 0, (DOTA_MAX_TEAM_PLAYERS - 1) do
+	for nPlayerID = 0, (PlayerResource:GetPlayerCount() - 1) do
 		if PlayerResource:GetTeam(nPlayerID) == DOTA_TEAM_GOODGUYS then
 			local Hero = PlayerResource:GetSelectedHeroEntity(nPlayerID)
 			if Hero then

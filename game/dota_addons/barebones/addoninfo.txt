@@ -2,22 +2,23 @@
 {
 	"addontitle"					"X Hero Siege"
 	"addon_game_name"				"X Hero Siege"
-	"addonversion"					"3.44"
-	"addontagline"					"SIEGE"
+	"addonversion"					"3.46"
+	"addontagline"					"X HERO SIEGE WARCRAFT"
 	"addonauthor"					"[Bear] Cookies #42"
 	"addonSteamGroupName"			"X_Hero_Siege"
 	"addonauthorSteamID"			"jeizy261"
 	"addonContent_Campaign"			"0"
 
-	"maps"						"x_hero_siege"
-//	"maps"						"x_hero_siege ranked_2v2"
+	"maps"						"x_hero_siege_4 x_hero_siege_8"
 	"IsPlayable"				"1"
-	"x_hero_siege"
+
+	"x_hero_siege_4"
+	{
+		"MaxPlayers"			"4"
+	}
+
+	"x_hero_siege_8"
 	{
 		"MaxPlayers"			"8"
 	}
-//	"ranked_2v2"
-//	{
-//		"MaxPlayers"			"4"
-//	}
 }

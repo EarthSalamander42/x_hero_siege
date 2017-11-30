@@ -3107,11 +3107,17 @@
 
 		// Time		
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCooldown"				"18"
+		"AbilityCooldown"				"14"
 
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityManaCost"				"100 200 300 400"	
+		"AbilityManaCost"				"100 200 300 400"
+
+		"precache"
+		{
+			"particle"  "particles/units/heroes/hero_lina/lina_spell_dragon_slave.vpcf"
+			"soundfile" "soundevents/game_sounds_heroes/game_sounds_lina.vsndevts"
+		}
 
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
@@ -5159,85 +5165,32 @@
 	//=================================================================================================================
 	"tyrande_multiple_arrows"
 	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"BaseClass"					"ability_datadriven"
+		"BaseClass"					"medusa_split_shot"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-		"AbilityUnitDamageType"		"DAMAGE_TYPE_PHYSICAL"
-		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
-		"AbilityUnitTargetType"		"DOTA_UNIT_TARGET_BASIC | DOTA_UNIT_TARGET_HERO"
 		"AbilityTextureName"		"custom/tyrande_multiple_arrows"
-		"AbilityCastRange"			"700"
 
 		"AbilitySpecial"
 		{
 			"01"
 			{
-				"var_type"			"FIELD_INTEGER"
-				"radius"			"700"
+				"var_type"					"FIELD_INTEGER"
+				"damage_modifier"			"-70 -55 -40 -25"
 			}
 			"02"
 			{
-				"var_type"			"FIELD_INTEGER"
-				"max_targets"		"3 5 7 9"
+				"var_type"					"FIELD_INTEGER"
+				"damage_modifier_tooltip"	"30 45 60 75"
 			}
 			"03"
-			{
-				"var_type"			"FIELD_INTEGER"
-				"damage"			"60 140 220 300"
+			{	
+				"var_type"					"FIELD_INTEGER"
+				"arrow_count"				"3 5 7 9"
+				"LinkedSpecialBonus"		"special_bonus_unique_medusa_2"
 			}
-		}
-
-		"OnProjectileHitUnit"
-		{
-			"Damage"
+			"04"
 			{
-				"Type"		"DAMAGE_TYPE_PHYSICAL"
-				"Damage"	"%damage"
-				"Target"	"TARGET"
-			}
-			"DeleteOnHit" "1"
-		}
-
-		"Modifiers"
-		{
-			"modifier_mutliple_arrows"
-			{
-				"Passive"      "1"
-				"IsHidden"      "1"
-				"IsDebuff"      "0"
-				"IsPurgable" "0"
-				// Data Driven
-				//-------------------------------------------------------------------------------------
-				"OnAttack"
-				{
-					"ActOnTargets"
-					{
-						"Target"
-						{
-							"Center" "CASTER"
-							"Radius" "%radius"
-							"Teams" "DOTA_UNIT_TARGET_TEAM_ENEMY" 
-							"Types" "DOTA_UNIT_TARGET_BASIC | DOTA_UNIT_TARGET_HERO"
-							"Flags"     "DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES"
-							"MaxTargets" "%max_targets"
-							"Random"     "1"
-						}
-						"Action"
-						{
-							"TrackingProjectile"
-							{
-								"Target" "TARGET"
-								"EffectName" "particles/units/heroes/hero_enchantress/enchantress_impetus.vpcf"
-								"Dodgeable" "1"
-								"ProvidesVision" "1"
-								"VisionRadius" "300"
-								"MoveSpeed" "900"
-								"SourceAttachment" "DOTA_PROJECTILE_ATTACHMENT_ATTACK_1"
-							}
-						}
-					}
-				}
+				"var_type"					"FIELD_INTEGER"
+				"split_shot_bonus_range"	"100"
 			}
 		}
 	}
@@ -13594,7 +13547,7 @@
 			"02"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"first_strike_dps"		"60 140 220 300"
+				"first_strike_dps"		"150 300 450 600"
 			}
 			"03"
 			{
@@ -13604,7 +13557,7 @@
 			"04"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"burn_dps"				"15 30 45 60"
+				"burn_dps"				"20 40 60 80"
 			}
 			"05"
 			{
@@ -13619,7 +13572,7 @@
 			"07"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"total_damage"			"195 430 665 900"
+				"total_damage"			"250 500 750 1000"
 			}
 			"08"
 			{
@@ -13849,11 +13802,17 @@
 
 		// Time		
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCooldown"				"18"
+		"AbilityCooldown"				"14"
 
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityManaCost"				"100 200 300 400"	
+
+		"precache"
+		{
+			"particle"  "particles/units/heroes/hero_lina/lina_spell_dragon_slave.vpcf"
+			"soundfile" "soundevents/game_sounds_heroes/game_sounds_lina.vsndevts"
+		}
 
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
@@ -21131,7 +21090,7 @@
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"	
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
 		"AbilityTextureName"			"custom/holdout_dragon_slave"	
-		
+
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityCastRange"				"900"
@@ -21143,7 +21102,13 @@
 
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityManaCost"				"100 200 300 400"	
+		"AbilityManaCost"				"100 200 300 400"
+
+		"precache"
+		{
+			"particle"  "particles/units/heroes/hero_lina/lina_spell_dragon_slave.vpcf"
+			"soundfile" "soundevents/game_sounds_heroes/game_sounds_lina.vsndevts"
+		}
 
 		// Special
 		//-------------------------------------------------------------------------------------------------------------

@@ -3618,14 +3618,14 @@
 
 		// Armor
 		//----------------------------------------------------------------
-		"ArmorPhysical"				"20"		// Physical protection.
+		"ArmorPhysical"				"40"		// Physical protection.
 		"MagicalResistance"			"25"		// Magical protection.
 
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
-		"AttackDamageMin"			"115"		// Damage range min.
-		"AttackDamageMax"			"115"		// Damage range max.	
+		"AttackDamageMin"			"145"		// Damage range min.
+		"AttackDamageMax"			"155"		// Damage range max.	
 		"AttackRate"				"0.95"		// Speed of attack.
 		"AttackAnimationPoint"		"0.35"		// Normalized time in animation cycle to attack.
 		"AttackAcquisitionRange"	"800"		// Range within a target can be acquired.
@@ -11457,9 +11457,9 @@
 		{
 			"EquippedItems"
 			{
-				"TomeStats"
+				"LightningSword"
 				{
-					"Item"					"item_tome_big"
+					"Item"					"item_lightning_sword"
 				}
 			}
 
@@ -11665,9 +11665,9 @@
 		{
 			"EquippedItems"
 			{
-				"LightningSword"
+				"TomeOfStats"
 				{
-					"Item"					"item_lightning_sword"
+					"Item"					"item_tome_big"
 				}
 			}
 

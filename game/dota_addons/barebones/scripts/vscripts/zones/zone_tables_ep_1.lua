@@ -57,13 +57,30 @@ _G.ZonesDefinition =
 				nCompleteLimit = 1,
 			},
 			{
-				szQuestName = "kill_ice_towers",
+				szQuestName = "kill_dest_mag",
 				szQuestType = "Kill",
 				Activators = 
 				{
 					{
 						Type = QUEST_EVENT_ON_QUEST_COMPLETE,
 						szQuestName = "kill_rax",
+					},			
+				},
+				Completion = 
+				{	
+					Type = QUEST_EVENT_ON_ENEMY_KILLED,
+					szNPCName ="npc_magnataur_destroyer_crypt",
+				},
+				nCompleteLimit = PlayerResource:GetPlayerCount() * GameRules:GetCustomGameDifficulty(),
+			},
+			{
+				szQuestName = "kill_ice_towers",
+				szQuestType = "Kill",
+				Activators = 
+				{
+					{
+						Type = QUEST_EVENT_ON_QUEST_COMPLETE,
+						szQuestName = "kill_dest_mag",
 					},			
 				},
 				Completion = 

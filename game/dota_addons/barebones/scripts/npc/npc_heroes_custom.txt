@@ -475,8 +475,8 @@
 		"override_hero"					"npc_dota_hero_enchantress"
 //		"DisableWearables"				"1"
 		"MovementSpeed"					"355"
-		"AttackDamageMin"				"11"
-		"AttackDamageMax"				"21"
+		"AttackDamageMin"				"31"
+		"AttackDamageMax"				"41"
 
 		"AttributeStrengthGain"			"5"
 		"AttributeAgilityGain"			"10"
@@ -1509,7 +1509,7 @@
 		"AttributeAgilityGain"			"5"
 		"AttributeIntelligenceGain"		"5"
 
-		"Ability1"						"holdout_war_club"
+		"Ability1"						"tiny_craggy_exterior"
 		"Ability2"						"holdout_dwarf_toss"
 		"Ability3"						"holdout_second_wind"	//granite_golem_hp_aura
 		"Ability4"						"elder_titan_earth_splitter"

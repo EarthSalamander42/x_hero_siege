@@ -28,7 +28,6 @@ function Precache(context)
 	PrecacheResource("particle_folder", "particles/econ/events/ti6", context)
 	PrecacheResource("particle_folder", "particles/econ/items/magnataur/shock_of_the_anvil", context)
 	PrecacheResource("particle_folder", "particles/econ/items/rubick/rubick_staff_wandering", context)
-	PrecacheResource("particle_folder", "particles/units/heroes/hero_monkey_king", context)
 	PrecacheResource("particle_folder", "particles/econ/courier/courier_roshan_frost", context)
 	PrecacheResource("particle_folder", "models/items/ancient_apparition/shatterblast_crown", context)
 	PrecacheResource("particle_folder", "particles/econ/items/nyx_assassin/nyx_assassin_ti6_witness", context)
@@ -48,10 +47,9 @@ function Precache(context)
 	PrecacheResource("particle", "particles/units/heroes/hero_dazzle/dazzle_armor_enemy_ring_sink.vpcf", context)
 	PrecacheResource("particle", "particles/econ/items/dazzle/dazzle_dark_light_weapon/dazzle_dark_shallow_grave_ground.vpcf", context)
 	PrecacheResource("particle", "particles/units/heroes/hero_lone_druid/lone_druid_battle_cry_overhead_ember.vpcf", context)
+	PrecacheResource("particle", "particles/units/heroes/hero_terrorblade/terrorblade_metamorphosis_base_attack.vpcf", context) -- Illidan boss attack projectile
 
 	PrecacheResource("model_folder", "models/heroes/skeleton_king", context) --Lich King Boss
---	PrecacheResource("model_folder", "models/heroes/monkey_king", context) --Spirit Master Boss
---	PrecacheResource("model_folder", "models/items/monkey_king/monkey_king_arcana_head", context) --Spirit Master Boss
 	PrecacheResource("model_folder", "models/items/dragon_knight/ascension_weapon", context) --Arthas Boss Set
 	PrecacheResource("model_folder", "models/items/dragon_knight/ascension_back", context) 
 	PrecacheResource("model_folder", "models/items/dragon_knight/ascension_offhand", context) 
@@ -69,89 +67,61 @@ function Precache(context)
 	PrecacheResource("model_folder", "models/items/furion/treant/the_ancient_guardian_the_ancient_treants", context)
 
 	-- PRECACHE HEROES (Particle effects for custom abilities)
-	PrecacheUnitByNameAsync("npc_dota_hero_abyssal_underlord", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_antimage", context)
-	PrecacheUnitByNameAsync("npc_dota_hero_brewmaster", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_centaur", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_chaos_knight", context) -- Special Wave and creeps
 	PrecacheUnitByNameAsync("npc_dota_hero_clinkz", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_clockwerk", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_dazzle", context)
-	PrecacheUnitByNameAsync("npc_dota_hero_doom_bringer", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_drow_ranger", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_earth_spirit", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_ember_spirit", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_faceless_void", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_huskar", context) -- For creeps
-	PrecacheUnitByNameAsync("npc_dota_hero_invoker", context)
-	PrecacheUnitByNameAsync("npc_dota_hero_juggernaut", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_keeper_of_the_light", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_kunkka", context)
-	PrecacheUnitByNameAsync("npc_dota_hero_lich", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_lifestealer", context)
-	PrecacheUnitByNameAsync("npc_dota_hero_lina", context) -- For Blood Mage 2.
 	PrecacheUnitByNameAsync("npc_dota_hero_lion", context)
-	PrecacheUnitByNameAsync("npc_dota_hero_lone_druid", context)
-	PrecacheUnitByNameAsync("npc_dota_hero_luna", context) -- For creeps
 	PrecacheUnitByNameAsync("npc_dota_hero_lycan", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_magnataur", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_morphling", context)
-	PrecacheUnitByNameAsync("npc_dota_hero_mirana", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_naga_siren", context) -- Special Wave 2
 	PrecacheUnitByNameAsync("npc_dota_hero_necrolyte", context) -- Special Wave 1
-	PrecacheUnitByNameAsync("npc_dota_hero_nevermore", context) -- Special Wave 1
-	PrecacheUnitByNameAsync("npc_dota_hero_nyx_assassin", context) -- For creeps
 	PrecacheUnitByNameAsync("npc_dota_hero_ogre_magi", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_phoenix", context) -- Dragons Level 1
 	PrecacheUnitByNameAsync("npc_dota_hero_razor", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_silencer", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_slardar", context) -- Slardar (Centurion)
-	PrecacheUnitByNameAsync("npc_dota_hero_sniper", context) -- For creeps
-	PrecacheUnitByNameAsync("npc_dota_hero_sven", context) -- For Muradin Bronzebeard.
 	PrecacheUnitByNameAsync("npc_dota_hero_storm_spirit", context) -- For Spirit Master.
 	PrecacheUnitByNameAsync("npc_dota_hero_techies", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_templar_assassin", context)
-	PrecacheUnitByNameAsync("npc_dota_hero_terrorblade", context) -- For creeps
 	PrecacheUnitByNameAsync("npc_dota_hero_tinker", context) -- For Windrunner Lvl 20 Ability
 	PrecacheUnitByNameAsync("npc_dota_hero_tiny", context) -- For Mountain Giant
 	PrecacheUnitByNameAsync("npc_dota_hero_treant", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_vengefulspirit", context) -- For Incoming Wave 3.
-	PrecacheUnitByNameAsync("npc_dota_hero_warlock", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_weaver", context)
-	PrecacheUnitByNameAsync("npc_dota_hero_windrunner", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_wisp", context) -- For Connecting bug
 	PrecacheUnitByNameAsync("npc_dota_hero_zuus", context) -- Muradin Bronzebeard
 
 	PrecacheUnitByNameSync( "npc_dota_hero_skeleton_king_bis", context)
---	PrecacheUnitByNameSync( "npc_dota_hero_slardar_bis", context)
---	PrecacheUnitByNameSync( "npc_dota_hero_meepo_bis", context)
 
---	PrecacheUnitByNameSync( "npc_spirit_beast", context)
---	PrecacheUnitByNameSync( "npc_frost_infernal", context)
---	PrecacheUnitByNameSync( "npc_spirit_beast_bis", context)
---	PrecacheUnitByNameSync( "npc_frost_infernal_bis", context)
+	PrecacheUnitByNameSync( "npc_spirit_beast_bis", context)
+	PrecacheUnitByNameSync( "npc_frost_infernal_bis", context)
 
 --	-- PRECACHE SOUNDS
 	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_death_prophet.vsndevts", context) -- For Incoming Wave 4
-	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_dragon_knight.vsndevts", context) -- For Incoming Wave 4
-	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_elder_titan.vsndevts", context)
-	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_leshrac.vsndevts", context)
 	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_lycan.vsndevts", context)
 	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_magnataur.vsndevts", context)
-	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_medusa.vsndevts", context)
-	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_monkey_king.vsndevts", context)
 	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_obsidian_destroyer.vsndevts", context)
-	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_omniknight.vsndevts", context)
 	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_ogre_magi.vsndevts", context)
 	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_queenofpain.vsndevts", context)
 	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_sandking.vsndevts", context)
-	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_shadowshaman.vsndevts", context)
 	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_skeletonking.vsndevts", context)
 	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_skywrath_mage.vsndevts", context)
 	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_spectre.vsndevts", context)
 	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_techies.vsndevts", context)
 	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_tinker.vsndevts", context)
-	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_ursa.vsndevts", context)
+	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_tiny.vsndevts", context)
 	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_zuus.vsndevts", context)
 
 	PrecacheResource("soundfile", "soundevents/game_sounds_custom.vsndevts", context)
@@ -166,6 +136,14 @@ function Precache(context)
 
 	-- Final Wave
 	PrecacheItemByNameSync("item_tombstone", context)
+
+	for _, hero in pairs(HEROLIST) do
+		PrecacheUnitByNameAsync("npc_dota_hero_"..hero, context)
+	end
+
+	for _, hero in pairs(HEROLIST_VIP) do
+		PrecacheUnitByNameAsync("npc_dota_hero_"..hero, context)
+	end
 end
 
 -- Create the game mode when we activate

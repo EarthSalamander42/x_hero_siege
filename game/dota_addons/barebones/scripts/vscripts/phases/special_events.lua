@@ -1,6 +1,6 @@
 require('libraries/timers')
 
-function MuradinEvent(time) -- 12 Min, lasts 2 Min.
+function MuradinEvent(time)
 local teleporters = Entities:FindAllByName("trigger_teleport_muradin_end")
 nTimer_SpecialEvent = time
 BT_ENABLED = 0
@@ -37,15 +37,11 @@ mode:SetFixedRespawnTime(1)
 	end
 
 	Timers:CreateTimer(time-30, function()
-		if GetMapName() == "x_hero_siege" then
-			Notifications:TopToAll({text="WARNING: Incoming Wave of Darkness from the East!", duration=25.0, style={color="red"}})
-		elseif GetMapName() == "ranked_2v2" then
-			Notifications:TopToAll({text="WARNING: Incoming Wave of Darkness!", duration=25.0, style={color="red"}})
-		end
+		Notifications:TopToAll({text="WARNING: Incoming Wave of Darkness from the East!", duration=25.0, style={color="red"}})
 		SpawnRunes()
 	end)
 
-	Timers:CreateTimer(time, function() -- 14:00 Min, teleport back to the spawn
+	Timers:CreateTimer(time, function()
 		SpecialWave()
 		UTIL_Remove(Muradin)
 		mode:SetFixedRespawnTime(40)
@@ -90,7 +86,7 @@ local MuradinCheck = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, Entities:FindByName(n
 	end
 end
 
-function FarmEvent(time) -- 24 Min, lasts 3 Min.
+function FarmEvent(time)
 nTimer_SpecialEvent = time
 BT_ENABLED = 0
 GameMode.hero_farm_event = {}
@@ -139,9 +135,8 @@ StunBuildings(time)
 		SpawnRunes()
 	end)
 
-	Timers:CreateTimer(time, function() -- 27:00 Min, teleport back to the spawn
+	Timers:CreateTimer(time, function()
 		BT_ENABLED = 1
-		SPECIAL_EVENT = 0
 		EndFarmEvent()
 		CustomGameEventManager:Send_ServerToAllClients("update_special_event_label_final", {})
 
@@ -213,8 +208,8 @@ function EndFarmEvent()
 		print("dota_badguys_barracks_"..NumPlayers)
 		local rax = Entities:FindByName(nil, "dota_badguys_barracks_"..NumPlayers)
 		rax:ForceKill(false)
-		Notifications:TopToAll({text="Phase 2 begins! (Destroyer Magnataur launched)", duration=10.0, style={color="red"}})
 	end
+	Notifications:TopToAll({text="Phase 2 begins! (Destroyer Magnataur launched)", duration=10.0, style={color="red"}})
 
 	local DoorObs = Entities:FindAllByName("obstruction_phase2_1")
 	for _, obs in pairs(DoorObs) do 
@@ -249,7 +244,7 @@ GameMode.SpecialArena_occuring = 1
 	Baristol:AddNewModifier( nil, nil, "modifier_boss_stun", {duration = 5})
 	Baristol:AddNewModifier( nil, nil, "modifier_invulnerable", {duration = 5})
 	Baristol:SetAngles(0, 325, 0)
---	Ramero:EmitSound("Muradin.StormEarthFire")
+	Ramero:EmitSound("Muradin.StormEarthFire")
 	Notifications:TopToAll({hero="npc_dota_hero_sven", duration=5.0})
 	Notifications:TopToAll({text="Kill Ramero and Baristol to get special items! ", continue=true})
 	Notifications:TopToAll({text="Reward: Lightning Sword and Tome of Stats +250.", continue=true})
@@ -299,7 +294,7 @@ GameMode.SpecialArena_occuring = 1
 	Ramero:AddNewModifier( nil, nil, "modifier_boss_stun", {duration = 5})
 	Ramero:AddNewModifier( nil, nil, "modifier_invulnerable", {duration = 5})
 	Ramero:SetAngles(0, 45, 0)
---	Ramero:EmitSound("Muradin.StormEarthFire")
+	Ramero:EmitSound("Muradin.StormEarthFire")
 	Notifications:TopToAll({hero="npc_dota_hero_sven", duration = 5.0})
 	Notifications:TopToAll({text="Kill Ramero to get special items! ", continue = true})
 	Notifications:TopToAll({text="Reward: Ring of Superiority.", continue = true})

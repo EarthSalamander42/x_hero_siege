@@ -64,13 +64,7 @@ function SpawnCreeps()
 		"npc_xhs_human_creep_ranged_4"
 	}
 
-	local Spawners = 0
-	if GetMapName() == "x_hero_siege" then
-		Spawners = 8
-	else
-		Spawners = 4
-	end
-	for c = 1, Spawners do -- replace 8 with player count, to open and close lanes super easily
+	for c = 1, 8 do -- replace 8 with player count, to open and close lanes super easily
 	local point = Entities:FindByName( nil, "npc_dota_spawner_"..c)
 	local Waypoint = Entities:FindByName( nil, "creep_path_"..c)
 		if CREEP_LANES[c][1] == 1 then -- Lane Activated?

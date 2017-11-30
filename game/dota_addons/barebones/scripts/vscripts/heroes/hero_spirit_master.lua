@@ -161,7 +161,6 @@ function modifier_imba_overload:OnAbilityExecuted( keys )
 	end
 end
 
-
 --------------------------------
 --- OVERLOAD "ACTIVE" MODIFIER
 --------------------------------
@@ -319,7 +318,8 @@ local loc = caster:GetAbsOrigin()
 local Strength = caster:GetBaseStrength()
 local Intellect = caster:GetBaseIntellect()
 local Agility = caster:GetBaseAgility()
-local HP = caster:GetMaxHealth() * caster:GetHealthPercent() / 100
+-- local HP = caster:GetMaxHealth() * caster:GetHealthPercent() / 100
+local HP = caster:GetHealth()
 local Mana = caster:GetMaxMana() * caster:GetManaPercent() / 100
 local AbPoints = caster:GetAbilityPoints()
 local cooldowns_caster = {}

@@ -1,48 +1,3 @@
-require('libraries/timers')
-
-function WarClub( event )
-local caster = event.caster
-local target = event.target
-local ability = event.ability
-
---	caster:StartGesture(ACT_DOTA_ATTACK)
-	caster:RemoveModifierByName("modifier_item_ultimate_scepter_consumed")
-	target:CutDown(caster:GetTeamNumber())
-
-	Timers:CreateTimer(0.1, function()
-		caster:AddNewModifier(caster, nil, "modifier_animation_translate", {translate="tree"})
-		caster:SetModifierStackCount("modifier_animation_translate", caster, 310)
-		ability:ApplyDataDrivenModifier(caster, caster, "modifier_war_club", {})
-		ability:ApplyDataDrivenModifier(caster, caster, "modifier_war_club_strikes", {})
-		caster:AddNewModifier(caster, ability, "modifier_item_ultimate_scepter_consumed", {})
-		local strikes = ability:GetSpecialValueFor("strikes")
-		caster:SetModifierStackCount("modifier_war_club_strikes", caster, strikes)
-	end)
-end
-
-function WarClubStrike( event )
-local caster = event.caster
-local ability = event.ability
-local target = event.target
-local strikes = ability:GetSpecialValueFor("strikes")
-local stack_count = caster:GetModifierStackCount("modifier_war_club_strikes", caster)
-
---	if target:IsBuilding() then
---		local particle = ParticleManager:CreateParticle("particles/units/heroes/hero_tiny/tiny_grow_cleave.vpcf", PATTACH_OVERHEAD_FOLLOW, target)
---	end
-
-	if stack_count > 1 then
-		caster:SetModifierStackCount("modifier_war_club_strikes", caster, stack_count - 1)
-	else
-		caster:RemoveModifierByName("modifier_war_club")
-		caster:RemoveModifierByName("modifier_war_club_strikes")
-		caster:RemoveModifierByName("modifier_animation_translate")
-		Timers:CreateTimer(0.1, function()
-			caster:RemoveModifierByName("modifier_item_ultimate_scepter_consumed")
-		end)
-	end 
-end
-
 function DwarfToss( keys )
 local caster = keys.caster
 local ability = keys.ability
@@ -163,15 +118,30 @@ local ability = keys.ability
 local BAT_alt = caster:GetBaseAttackTime()
 local BAT_Dec = ability:GetLevelSpecialValueFor("bat_reduction", ability:GetLevel() -1)
 
-	caster:AddAbility("tiny_grow")
-	grow = caster:FindAbilityByName("tiny_grow")
-	grow:SetLevel(1)
 	caster:SetModelScale( 1.1 )
 	caster:SetBaseAttackTime( BAT_alt - BAT_Dec )
 	ability:StartCooldown(10.0)
-	Timers:CreateTimer(0.4, function()
-		caster:RemoveAbility("tiny_grow")
-	end)
+	
+	-- Set new model
+	caster:SetOriginalModel("models/heroes/tiny_01/tiny_01.vmdl")
+	caster:SetModel("models/heroes/tiny_01/tiny_01.vmdl")
+	-- Remove old wearables
+	UTIL_Remove(caster.head)
+	UTIL_Remove(caster.rarm)
+	UTIL_Remove(caster.larm)
+	UTIL_Remove(caster.body)
+	-- Set new wearables
+	caster.head = SpawnEntityFromTableSynchronous("prop_dynamic", {model = "models/heroes/tiny_01/tiny_01_head.vmdl"})
+	caster.rarm = SpawnEntityFromTableSynchronous("prop_dynamic", {model = "models/heroes/tiny_01/tiny_01_right_arm.vmdl"})
+	caster.larm = SpawnEntityFromTableSynchronous("prop_dynamic", {model = "models/heroes/tiny_01/tiny_01_left_arm.vmdl"})
+	caster.body = SpawnEntityFromTableSynchronous("prop_dynamic", {model = "models/heroes/tiny_01/tiny_01_body.vmdl"})
+	-- lock to bone
+	caster.head:FollowEntity(caster, true)
+	caster.rarm:FollowEntity(caster, true)
+	caster.larm:FollowEntity(caster, true)
+	caster.body:FollowEntity(caster, true)
+
+	EmitSoundOn("Tiny.Grow", caster)
 end
 
 function ToggleOn( keys )
@@ -180,14 +150,29 @@ local ability = keys.ability
 local BAT_alt = caster:GetBaseAttackTime()
 local BAT_Dec = ability:GetLevelSpecialValueFor("bat_reduction", ability:GetLevel() -1)
 
-	caster:AddAbility("tiny_grow")
-	grow = caster:FindAbilityByName("tiny_grow")
-	grow:SetLevel(3)
 	caster:SetModelScale( 1.25 )
 	caster:SetBaseAttackTime( BAT_alt + BAT_Dec )
-	Timers:CreateTimer(0.4, function()
-		caster:RemoveAbility("tiny_grow")
-	end)
+	
+	-- Set new model
+	caster:SetOriginalModel("models/heroes/tiny_03/tiny_03.vmdl")
+	caster:SetModel("models/heroes/tiny_03/tiny_03.vmdl")
+	-- Remove old wearables
+	UTIL_Remove(caster.head)
+	UTIL_Remove(caster.rarm)
+	UTIL_Remove(caster.larm)
+	UTIL_Remove(caster.body)
+	-- Set new wearables
+	caster.head = SpawnEntityFromTableSynchronous("prop_dynamic", {model = "models/heroes/tiny_03/tiny_03_head.vmdl"})
+	caster.rarm = SpawnEntityFromTableSynchronous("prop_dynamic", {model = "models/heroes/tiny_03/tiny_03_right_arm.vmdl"})
+	caster.larm = SpawnEntityFromTableSynchronous("prop_dynamic", {model = "models/heroes/tiny_03/tiny_03_left_arm.vmdl"})
+	caster.body = SpawnEntityFromTableSynchronous("prop_dynamic", {model = "models/heroes/tiny_03/tiny_03_body.vmdl"})
+	-- lock to bone
+	caster.head:FollowEntity(caster, true)
+	caster.rarm:FollowEntity(caster, true)
+	caster.larm:FollowEntity(caster, true)
+	caster.body:FollowEntity(caster, true)
+
+	EmitSoundOn("Tiny.Grow", caster)
 end
 
 function Taunt( event )

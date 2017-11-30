@@ -140,7 +140,6 @@ function Server_DecodeForPlayer( t, nPlayerID )   --To deep-decode the Json code
 end
 
 function Server_GetPlayerLevelAndTitle(nPlayerID)
-	print(Server_GetPlayerLevelAndTitle)
 	for i = #table_rankXP, 1 do
 		if table_XP_has and table_XP_has[nPlayerID] and table_rankXP and table_rankXP[i] then
 			if tonumber(table_XP_has[nPlayerID]) >= table_rankXP[i] then
@@ -698,20 +697,16 @@ function Server_PrintInfo()
 				print("=============================")
 				print("PlayerID:"..nPlayerID)
 				print("SteamID64:"..table_SteamID64[nPlayerID])
-				print("Level:"..XP_level[nPlayerID])
-				print("Rank_title:"..XP_level_title_player[nPlayerID])
-				print("XP this level need:"..XP_this_level[nPlayerID])
-				print("XP has in this level:"..XP_has_this_level[nPlayerID])
-				print("XP need to level up:"..XP_need_to_next_level[nPlayerID])
+--				print("Level:"..XP_level[nPlayerID]) -- ERROR
+--				print("Rank_title:"..XP_level_title_player[nPlayerID]) -- ERROR
+--				print("XP this level need:"..XP_this_level[nPlayerID]) -- ERROR
+--				print("XP has in this level:"..XP_has_this_level[nPlayerID]) -- ERROR
+--				print("XP need to level up:"..XP_need_to_next_level[nPlayerID]) -- ERROR
 				print("player_key:"..table_player_key[nPlayerID])
 				print("If able to get XP:"..table_able[nPlayerID])
 				print("XP has:"..table_XP_has[nPlayerID])
 				print("XP to get this game:"..table_XP[nPlayerID])
 				print("Team(2 is Radiant, 3 is Dire):"..PlayerResource:GetTeam(nPlayerID))
-				print("Diretide Level record:", table_XHS_lvl[nPlayerID])
-				print("Diretide Health record:", table_XHS_pk[nPlayerID])
-				print("Diretide Game Time record:", table_XHS_gt[nPlayerID])
-				print("Diretide Player Hero record:", table_XHS_ph[nPlayerID])
 				print("=============================")
 			end
 		end
