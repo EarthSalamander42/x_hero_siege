@@ -1,11 +1,25 @@
 function Phase2CreepsLeft()
 	local EntIceTower = Entities:FindByName(nil, "npc_tower_cold_1")
 	local point = Entities:FindByName(nil, "npc_dota_spawner_top_left_1"):GetAbsOrigin()
+	local difficulty = GameRules:GetCustomGameDifficulty()
+	local wave_count = 0
 
 	Timers:CreateTimer(0, function()
 		if not EntIceTower:IsNull() and SPECIAL_EVENT == 0 then
+			wave_count = wave_count + 1
 			for j = 1, 8 do
-			local unit = CreateUnitByName("npc_ghul_II", point+RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+				local unit = CreateUnitByName("npc_ghul_II", point+RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+				unit:SetBaseDamageMin(unit:GetAverageTrueAttackDamage(unit) + (PHASE_2_UPGRADE["damage"][difficulty] * wave_count))
+				unit:SetBaseDamageMax(unit:GetAverageTrueAttackDamage(unit) + (PHASE_2_UPGRADE["damage"][difficulty] * wave_count) * 1.1)
+				unit:SetMaxHealth(unit:GetMaxHealth() + (PHASE_2_UPGRADE["health"][difficulty] * wave_count))
+				unit:SetHealth(unit:GetMaxHealth())
+				unit:SetPhysicalArmorBaseValue(unit:GetPhysicalArmorValue() + (PHASE_2_UPGRADE["armor"][difficulty] * wave_count))
+				if not unit.OverHeadCandy then 
+					unit.OverHeadCandy = ParticleManager:CreateParticle("particles/hw_fx/candy_carrying_stack.vpcf", PATTACH_OVERHEAD_FOLLOW, unit)
+					ParticleManager:SetParticleControl(unit.OverHeadCandy, 0, unit:GetAbsOrigin())
+				end
+				local stack_10 = math.floor(wave_count / 10)
+				ParticleManager:SetParticleControl(unit.OverHeadCandy, 2, Vector(stack_10, wave_count - stack_10*10, 0))
 			end
 		return 30
 		elseif SPECIAL_EVENT == 1 then
@@ -20,10 +34,24 @@ end
 function Phase2CreepsRight()
 	local EntIceTower = Entities:FindByName(nil, "npc_tower_cold_2")
 	local point = Entities:FindByName(nil, "npc_dota_spawner_top_right_1"):GetAbsOrigin()
+	local wave_count = 0
+
 	Timers:CreateTimer(0, function()
 		if not EntIceTower:IsNull() and SPECIAL_EVENT == 0 then
+			wave_count = wave_count + 1
 			for j = 1, 8 do
-			local unit = CreateUnitByName("npc_orc_II", point+RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+				local unit = CreateUnitByName("npc_orc_II", point+RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+				unit:SetBaseDamageMin(unit:GetAverageTrueAttackDamage(unit) + (PHASE_2_UPGRADE["damage"][difficulty] * wave_count))
+				unit:SetBaseDamageMax(unit:GetAverageTrueAttackDamage(unit) + (PHASE_2_UPGRADE["damage"][difficulty] * wave_count) * 1.1)
+				unit:SetMaxHealth(unit:GetMaxHealth() + (PHASE_2_UPGRADE["health"][difficulty] * wave_count))
+				unit:SetHealth(unit:GetMaxHealth())
+				unit:SetPhysicalArmorBaseValue(unit:GetPhysicalArmorValue() + (PHASE_2_UPGRADE["armor"][difficulty] * wave_count))
+				if not unit.OverHeadCandy then 
+					unit.OverHeadCandy = ParticleManager:CreateParticle("particles/hw_fx/candy_carrying_stack.vpcf", PATTACH_OVERHEAD_FOLLOW, unit)
+					ParticleManager:SetParticleControl(unit.OverHeadCandy, 0, unit:GetAbsOrigin())
+				end
+				local stack_10 = math.floor(wave_count / 10)
+				ParticleManager:SetParticleControl(unit.OverHeadCandy, 2, Vector(stack_10, wave_count - stack_10*10, 0))
 			end
 		return 30
 		elseif SPECIAL_EVENT == 1 then

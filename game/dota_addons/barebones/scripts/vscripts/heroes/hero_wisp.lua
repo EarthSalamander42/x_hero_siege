@@ -69,7 +69,7 @@ local IsAvailableHero = Entities:FindByName(nil, "trigger_hero_"..random)
 		Notifications:Bottom(hero:GetPlayerOwnerID(), {text="HERO: ", duration = 5.0, style={color="white"}, continue=true})
 		Notifications:Bottom(hero:GetPlayerOwnerID(), {text="#npc_dota_hero_"..HEROLIST[random], duration = 5.0, style={color="white"}, continue=true})
 
-		local newHero = PlayerResource:ReplaceHeroWith(id, "npc_dota_hero_"..HEROLIST[random], STARTING_GOLD, 0)
+		local newHero = PlayerResource:ReplaceHeroWith(id, "npc_dota_hero_"..HEROLIST[random], STARTING_GOLD * 2, 0)
 		if difficulty < 4 then
 			local item = newHero:AddItemByName("item_ankh_of_reincarnation")
 		end

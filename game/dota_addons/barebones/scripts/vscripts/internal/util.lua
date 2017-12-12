@@ -832,11 +832,11 @@ function TeleportHero(hero, delay, point)
 			FindClearSpaceForUnit(hero, point, true)
 			hero:Stop()
 		end
+--		ParticleManager:DestroyParticle(TeleportEffect, true)
+		hero:RemoveModifierByName("modifier_command_restricted")
 		Timers:CreateTimer(0.1, function()
 			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
 		end)
---		ParticleManager:DestroyParticle(TeleportEffect, true)
-		hero:RemoveModifierByName("modifier_command_restricted")
 	end)
 end
 

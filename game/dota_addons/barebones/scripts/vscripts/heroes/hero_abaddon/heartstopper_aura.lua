@@ -1,5 +1,6 @@
 function HeartstopperEnemy( keys )
 	local caster = keys.caster
+	if caster:IsIllusion() then return end
 	local target = keys.target
 	local ability = keys.ability
 	local ability_level = ability:GetLevel() - 1

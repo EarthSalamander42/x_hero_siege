@@ -71,7 +71,7 @@ _G.ZonesDefinition =
 					Type = QUEST_EVENT_ON_ENEMY_KILLED,
 					szNPCName ="npc_magnataur_destroyer_crypt",
 				},
-				nCompleteLimit = PlayerResource:GetPlayerCount() * GameRules:GetCustomGameDifficulty(),
+				nCompleteLimit = PlayerResource:GetPlayerCount() * GameRules:GetCustomGameDifficulty() * CREEP_LANES_TYPE,
 			},
 			{
 				szQuestName = "kill_ice_towers",
@@ -307,7 +307,7 @@ _G.ZonesDefinition =
 					"item_amulet_of_the_wild",
 					"item_talisman_of_evasion_datadriven",
 				},
-				fCommonItemChance = 0.07,
+				fCommonItemChance = 0.15,
 				RareItems =
 				{
 					"item_tome_small",

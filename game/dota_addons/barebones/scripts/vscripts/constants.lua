@@ -194,6 +194,16 @@ _G.FarmEvent_Creeps = {
 	"npc_dota_creature_satyrr"
 }
 
+FARM_EVENT_UPGRADE = {}
+FARM_EVENT_UPGRADE["damage"] =	{20, 40, 60, 80}
+FARM_EVENT_UPGRADE["health"] =	{200, 400, 600, 800}
+FARM_EVENT_UPGRADE["armor"] =	{10, 20, 30, 40}
+
+PHASE_2_UPGRADE = {}
+PHASE_2_UPGRADE["damage"] =	{25, 50, 75, 100}
+PHASE_2_UPGRADE["health"] =	{200, 400, 600, 800}
+PHASE_2_UPGRADE["armor"] =	{5, 10, 15, 20}
+
 _G.mod_creator = {
 	54896080,	-- Cookies
 	295458357,	-- X Hero Siege
@@ -226,6 +236,7 @@ _G.ember_vip_members = {
 	489514611,	-- R3V4MP3D secondary account for streaming
 	134153339,	-- jakehead20 [Some Random Dude on Patreon]
 	372255713,	-- Mikheil Evangelista [Pmoigki on Discord]
+	75585119,	-- fearxsoul [Lance Patterson on Patreon]
 }
 
 _G.golden_vip_members = {

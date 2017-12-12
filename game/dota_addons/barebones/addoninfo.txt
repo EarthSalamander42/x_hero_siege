@@ -8,6 +8,7 @@
 	"addonSteamGroupName"			"X_Hero_Siege"
 	"addonauthorSteamID"			"jeizy261"
 	"addonContent_Campaign"			"0"
+	"HeroGuidesSupported"			"1"
 
 	"maps"						"x_hero_siege_4 x_hero_siege_8"
 	"IsPlayable"				"1"

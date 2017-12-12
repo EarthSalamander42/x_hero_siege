@@ -10,7 +10,7 @@ local meteors_per_tick = ability:GetLevelSpecialValueFor("meteors_per_tick", abi
 
 	for i = 1, meteors_per_tick do
 
-		local point = caster:GetAbsOrigin()+ RandomInt(1,radius)*RandomVector(1)
+		local point = caster:GetAbsOrigin() + RandomInt(200, radius) * RandomVector(1)
 		local meteor = ParticleManager:CreateParticle("particles/units/heroes/hero_invoker/invoker_chaos_meteor_fly.vpcf", PATTACH_CUSTOMORIGIN, caster)
 		ParticleManager:SetParticleControl(meteor, 0, point + Vector(0,0,500))
 		ParticleManager:SetParticleControl(meteor, 1, point)

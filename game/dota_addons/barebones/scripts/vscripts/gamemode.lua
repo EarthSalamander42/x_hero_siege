@@ -153,11 +153,13 @@ function GameMode:InitGameMode()
 
 	GameRules:GetGameModeEntity():SetThink( "OnThink", self, 1 )
 
---	Convars:RegisterCommand("duel_event", function(keys) return DuelEvent() end, "Test Duel Event", FCVAR_CHEAT)
---	Convars:RegisterCommand("magtheridon", function(keys) return StartMagtheridonArena(keys) end, "Test Magtheridon Boss", FCVAR_CHEAT)
---	Convars:RegisterCommand("r&b", function(keys) return RameroAndBaristolEvent() end, "Test Ramero and Baristol Arena", FCVAR_CHEAT)
---	Convars:RegisterCommand("r", function(keys) return RameroEvent() end, "Test Ramero Arena", FCVAR_CHEAT)
-	Convars:RegisterCommand("farm_event", function(keys) return FarmTest() end, "Test Farm Event", FCVAR_CHEAT)
+	if IsInToolsMode() then
+		Convars:RegisterCommand("duel_event", function(keys) return DuelEvent() end, "Test Duel Event", FCVAR_CHEAT)
+		Convars:RegisterCommand("magtheridon", function(keys) return StartMagtheridonArena(keys) end, "Test Magtheridon Boss", FCVAR_CHEAT)
+		Convars:RegisterCommand("r&b", function(keys) return RameroAndBaristolEvent() end, "Test Ramero and Baristol Arena", FCVAR_CHEAT)
+		Convars:RegisterCommand("r", function(keys) return RameroEvent() end, "Test Ramero Arena", FCVAR_CHEAT)
+		Convars:RegisterCommand("farm_event", function(keys) return FarmTest() end, "Test Farm Event", FCVAR_CHEAT)
+	end
 
 	mode:SetExecuteOrderFilter(Dynamic_Wrap(GameMode, "FilterExecuteOrder"), self)
 	mode:SetDamageFilter(Dynamic_Wrap(GameMode, "DamageFilter"), self)
@@ -201,19 +203,15 @@ function GameMode:InitGameMode()
 					RestartCreeps()
 					sword_first_time = false
 					if hero.old_pos then
-						TeleportHero(hero, 0.0, hero.old_pos)
+						TeleportHero(hero, 3.0, hero.old_pos)
 					else
 						if hero:GetTeamNumber() == 2 then
-							TeleportHero(hero, 0.0, base_good:GetAbsOrigin())
+							TeleportHero(hero, 3.0, base_good:GetAbsOrigin())
 						elseif hero:GetTeamNumber() == 3 then
-							TeleportHero(hero, 0.0, base_bad:GetAbsOrigin())
+							TeleportHero(hero, 3.0, base_bad:GetAbsOrigin())
 						end
 					end
-					PlayerResource:SetCameraTarget(hero:GetPlayerID(), hero)
 					hero:EmitSound("Hero_TemplarAssassin.Trap")
-					Timers:CreateTimer(0.1, function()
-						PlayerResource:SetCameraTarget(hero:GetPlayerID(), nil)
-					end)
 				end
 				if item:GetName() == ring and ring_first_time then
 					SPECIAL_EVENT = 0
@@ -225,36 +223,28 @@ function GameMode:InitGameMode()
 					RestartCreeps()
 					ring_first_time = false
 					if hero.old_pos then
-						TeleportHero(hero, 0.0, hero.old_pos)
+						TeleportHero(hero, 3.0, hero.old_pos)
 					else
 						if hero:GetTeamNumber() == 2 then
-							TeleportHero(hero, 0.0, base_good:GetAbsOrigin())
+							TeleportHero(hero, 3.0, base_good:GetAbsOrigin())
 						elseif hero:GetTeamNumber() == 3 then
-							TeleportHero(hero, 0.0, base_bad:GetAbsOrigin())
+							TeleportHero(hero, 3.0, base_bad:GetAbsOrigin())
 						end
 					end
-					PlayerResource:SetCameraTarget(hero:GetPlayerID(), hero)
 					hero:EmitSound("Hero_TemplarAssassin.Trap")
-					Timers:CreateTimer(0.1, function()
-						PlayerResource:SetCameraTarget(hero:GetPlayerID(), nil)
-					end)
 				end
 				if item:GetName() == frost and frost_first_time then
 					frost_first_time = false
 					if hero.old_pos then
-						TeleportHero(hero, 0.0, hero.old_pos)
+						TeleportHero(hero, 3.0, hero.old_pos)
 					else
 						if hero:GetTeamNumber() == 2 then
-							TeleportHero(hero, 0.0, base_good:GetAbsOrigin())
+							TeleportHero(hero, 3.0, base_good:GetAbsOrigin())
 						else
-							TeleportHero(hero, 0.0, base_bad:GetAbsOrigin())
+							TeleportHero(hero, 3.0, base_bad:GetAbsOrigin())
 						end
 					end
-					PlayerResource:SetCameraTarget(hero:GetPlayerID(), hero)
 					hero:EmitSound("Hero_TemplarAssassin.Trap")
-					Timers:CreateTimer(0.1, function()
-						PlayerResource:SetCameraTarget(hero:GetPlayerID(), nil)
-					end)
 --				elseif item:GetName() == frost and frost_first_time == false then
 --					return false
 				end
@@ -314,8 +304,8 @@ function GameMode:InitGameMode()
 end
 
 function FarmTest()
-SPECIAL_EVENT = 1
-FarmEvent()
+	SPECIAL_EVENT = 1
+	FarmEvent(180)
 end
 
 function GameMode:OnGameRulesStateChange(keys)
@@ -384,6 +374,9 @@ local newState = GameRules:State_Get()
 			CustomGameEventManager:Send_ServerToAllClients("show_timer_bar", {})
 			Notifications:TopToAll({text="DIFFICULTY: "..diff[GameRules:GetCustomGameDifficulty()], color = Color[GameRules:GetCustomGameDifficulty()], duration=10.0})
 		end)
+
+		AddFOWViewer(DOTA_TEAM_GOODGUYS, Vector(6528, 1152, 192), 900, 99999, false)
+		AddFOWViewer(DOTA_TEAM_CUSTOM_2, Vector(6528, 1152, 192), 900, 99999, false)
 
 		require('zones/dialog_ep_1')
 		require('zones/zone_tables_ep_1')

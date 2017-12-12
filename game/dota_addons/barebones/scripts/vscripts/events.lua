@@ -149,14 +149,13 @@ local too_ez_gold = 0.9 -- The mod is way too ez, to modify gold very easily i j
 					end)
 					--debug
 					if hero_level == 17 then
-						if not hero:GetUnitName() == "npc_dota_hero_lone_druid" then
-							npc:SetAbilityPoints(npc:GetAbilityPoints()-1)
-						end
+						npc:SetAbilityPoints(npc:GetAbilityPoints()-1)
 					elseif hero_level >= 20 then
 						local ability = npc:FindAbilityByName("holdout_war_club_20")
 						npc:RemoveModifierByName("modifier_item_ultimate_scepter_consumed")
 						npc:RemoveModifierByName("modifier_item_ultimate_scepter_consumed")
 						npc:AddNewModifier(npc, ability, "modifier_item_ultimate_scepter_consumed", {})
+						npc:AddNewModifier(npc, nil, "modifier_tiny_craggy_exterior", {})
 					end
 				end
 			end

@@ -322,6 +322,28 @@
 	}
 
 	//=================================================================================================================
+	// Ability: No Health Bar
+	//=================================================================================================================
+	"ability_no_health_bar"
+	{
+		"BaseClass" 		"ability_datadriven"
+		"AbilityBehavior" 	"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_HIDDEN"
+		"Modifiers"
+		{
+			"modifier_no_health_bar"
+			{
+				"Passive"	"1"
+				"IsHidden"	"1"
+
+				"States"
+				{
+					"MODIFIER_STATE_NO_HEALTH_BAR"			"MODIFIER_STATE_VALUE_ENABLED"
+				}
+			}
+		}
+	}
+
+	//=================================================================================================================
 	// Dummy: Vulnerable (Clickable)
 	//=================================================================================================================
 	"dummy_passive_vulnerable"
@@ -9465,12 +9487,12 @@
 			"03"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"movement_slow"				"20 30 40 50"
+				"movement_slow"				"-20 -30 -40 -50"
 			}
 			"04"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"attack_speed_slow"			"20 30 40 50"
+				"attack_speed_slow"			"-20 -30 -40 -50"
 			}			
 			"05"
 			{
@@ -9584,12 +9606,12 @@
 			"03"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"movement_slow"				"50"
+				"movement_slow"				"-50"
 			}
 			"04"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"attack_speed_slow"			"50"
+				"attack_speed_slow"			"-50"
 			}			
 			"05"
 			{
@@ -23496,7 +23518,7 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"heal"					"8000 12000 16000 20000"
+				"heal"					"4000 6000 8000 10000"
 			}
 			"02"
 			{

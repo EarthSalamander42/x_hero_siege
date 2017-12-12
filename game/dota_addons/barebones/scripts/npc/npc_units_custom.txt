@@ -4672,6 +4672,7 @@
 		"MinimapIcon"				"minimap_roshancamp"
 		"MinimapIconSize"			"250"
 		"SoundSet"					"Hero_Slark"
+		"ConsideredHero"			"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -4765,6 +4766,7 @@
 		"MinimapIcon"				"minimap_roshancamp"
 		"MinimapIconSize"			"250"
 //		"SoundSet"					""
+		"ConsideredHero"			"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -4845,6 +4847,7 @@
 		"MinimapIcon"				"minimap_roshancamp"
 		"MinimapIconSize"			"250"
 //		"SoundSet"					""
+		"ConsideredHero"			"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -4924,7 +4927,8 @@
 		"LeavesCorpse"				"0"
 		"MinimapIcon"				"minimap_roshancamp"
 		"MinimapIconSize"			"250"
-//		"SoundSet"					""
+		"SoundSet"					"Hero_Ursa"
+		"ConsideredHero"			"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -5004,7 +5008,8 @@
 		"LeavesCorpse"				"0"
 		"MinimapIcon"				"minimap_roshancamp"
 		"MinimapIconSize"			"250"
-//		"SoundSet"					""
+		"SoundSet"					"Hero_Centaur"
+		"ConsideredHero"			"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -5085,6 +5090,7 @@
 		"MinimapIcon"				"minimap_roshancamp"
 		"MinimapIconSize"			"250"
 		"SoundSet"					"Hero_Bristleback"
+		"ConsideredHero"			"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -5177,6 +5183,7 @@
 		"MinimapIcon"				"minimap_roshancamp"
 		"MinimapIconSize"			"250"
 		"SoundSet"					"Hero_Razor"
+		"ConsideredHero"			"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -5269,6 +5276,7 @@
 		"MinimapIcon"				"minimap_roshancamp"
 		"MinimapIconSize"			"250"
 		"SoundSet"					"Hero_Tusk"
+		"ConsideredHero"			"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -5363,6 +5371,7 @@
 		"MinimapIconSize"			"250"
 		"SoundSet"					"Creep_Good_Melee"
 		"UseAI"						"2"
+		"ConsideredHero"			"1"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -10460,7 +10469,7 @@
 		"Ability1"					"roshan_stormbolt"
 		"Ability2"					"creature_thunder_clap_low" 
 		"Ability3"					"roshan_bash"
-		"Ability4"					""
+		"Ability4"					"ability_no_health_bar"
 
 		"ArmorPhysical"				"900"                 // Physical protection.
 		"MagicalResistance"			"50"                 // Magical protection (percentage).
@@ -11396,14 +11405,14 @@
 
 		// Armor
 		//----------------------------------------------------------------
-		"ArmorPhysical"				"200"			// Physical protection.
+		"ArmorPhysical"				"100"			// Physical protection.
 		"MagicalResistance"			"25"			// Magical protection (percentage).
 
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
-		"AttackDamageMin"			"6990"		// Damage range min.
-		"AttackDamageMax"			"7010"		// Damage range max.
+		"AttackDamageMin"			"4990"		// Damage range min.
+		"AttackDamageMax"			"5010"		// Damage range max.
 		"AttackDamageType"			"DAMAGE_TYPE_ArmorPhysical"
 		"AttackRate"				"0.125"			// Speed of attack.
 		"AttackAnimationPoint"		"0.6"		// Normalized time in animation cycle to attack.
@@ -11596,7 +11605,7 @@
 
 		// Abilities
 		//----------------------------------------------------------------
-		"Ability1"					"arthas_holy_light"	// Ability 1.
+		"Ability1"					"baristol_holy_light"	// Ability 1.
 		"Ability2"					"demonhunter_vampiric_aura"			// Ability 2.
 		"Ability3"					""						// Ability 3.
 		"Ability4"					""						// Ability 6 - Extra.
