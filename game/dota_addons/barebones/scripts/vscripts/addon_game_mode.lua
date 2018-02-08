@@ -4,49 +4,31 @@ require('internal/vanilla_extension')
 require('gamemode')
 
 function Precache(context)
--- Custom Effects Precache
-	PrecacheResource("particle_folder", "particles/econ/items/phantom_assassin/phantom_assassin_arcana_elder_smith", context)
-	PrecacheResource("particle_folder", "particles/econ/items/luna/luna_crescent_moon", context)
-	PrecacheResource("particle_folder", "particles/econ/items/gyrocopter/hero_gyrocopter_atomic_gold", context)
-	PrecacheResource("particle_folder", "particles/econ/items/clockwerk/clockwerk_paraflare", context)
-	PrecacheResource("particle_folder", "particles/econ/items/puck/puck_alliance_set", context)
-	PrecacheResource("particle_folder", "particles/econ/items/shadow_fiend/sf_desolation", context)
-	PrecacheResource("particle_folder", "particles/status_fx", context)
-	PrecacheResource("particle_folder", "particles/econ/items/gyrocopter/hero_gyrocopter_gyrotechnics", context)
-	PrecacheResource("particle_folder", "particles/econ/courier/courier_wyvern_hatchling", context)
-	PrecacheResource("particle_folder", "particles/econ/items/wraith_king/wraith_king_ti6_bracer", context)
-	PrecacheResource("particle_folder", "particles/econ/items/tinker/tinker_motm_rollermaw", context)
-	PrecacheResource("particle_folder", "particles/econ/items/abaddon/abaddon_alliance", context)
-	PrecacheResource("particle_folder", "particles/econ/items/razor/razor_ti6", context)
-	PrecacheResource("particle_folder", "particles/items2_fx", context)
+	-- Lua Modifiers
+	LinkLuaModifier("modifier_rune_armor", "modifiers/runes/modifier_rune_armor.lua", LUA_MODIFIER_MOTION_NONE)
+	LinkLuaModifier("modifier_rune_immolation", "modifiers/runes/modifier_rune_immolation.lua", LUA_MODIFIER_MOTION_NONE)
+
+	-- Not used currently
+--	PrecacheResource("particle", "particles/units/heroes/hero_dazzle/dazzle_armor_enemy_ring_sink.vpcf", context) -- Armor Rune Effect (not used)
+--	PrecacheResource("particle_folder", "particles/econ/items/phoenix/phoenix_solar_forge/phoenix_sunray_solar_forge", context) -- Iron Man ult
+--	PrecacheResource("particle_folder", "particles/econ/events/ti7/teleport_end_ti7_lvl3.vpcf", context) -- teleport effect for "TeleportHero" lua function
+
+	-- Not sure those are needed to be precached
+--	PrecacheResource("particle_folder", "particles/status_fx", context) (not sure this is needed)
+--	PrecacheResource("particle_folder", "particles/items2_fx", context)
+--	PrecacheResource("particle", "particles/units/heroes/hero_earth_spirit/espirit_geomagentic_target_sphere.vpcf", context)
+--	PrecacheResource("particle", "particles/units/heroes/hero_ember_spirit/ember_spirit_flameguard.vpcf", context) -- Immolation
 	PrecacheResource("particle_folder", "particles/custom", context)
-	PrecacheResource("particle_folder", "particles/econ/events/ti6", context)
-	PrecacheResource("particle_folder", "particles/units/heroes/hero_dragon_knight", context)
 	PrecacheResource("particle_folder", "particles/custom/items/orb", context)
 	PrecacheResource("particle_folder", "models/items/lone_druid/true_form/form_of_the_atniw", context)
 	PrecacheResource("particle_folder", "models/items/lone_druid/bear/spirit_of_the_atniw", context)
-	PrecacheResource("particle_folder", "particles/econ/events/ti6", context)
-	PrecacheResource("particle_folder", "particles/econ/items/magnataur/shock_of_the_anvil", context)
-	PrecacheResource("particle_folder", "particles/econ/items/rubick/rubick_staff_wandering", context)
-	PrecacheResource("particle_folder", "particles/econ/courier/courier_roshan_frost", context)
-	PrecacheResource("particle_folder", "models/items/ancient_apparition/shatterblast_crown", context)
-	PrecacheResource("particle_folder", "particles/econ/items/nyx_assassin/nyx_assassin_ti6_witness", context)
-	PrecacheResource("particle_folder", "particles/econ/courier/courier_axolotl_ambient", context)
-	PrecacheResource("particle_folder", "particles/units/heroes/hero_earth_spirit", context)
-	PrecacheResource("particle_folder", "particles/econ/items/effigies/status_fx_effigies", context)
-	PrecacheResource("particle_folder", "particles/econ/items/shadow_fiend/sf_fire_arcana", context)
-	PrecacheResource("particle_folder", "particles/econ/items/abaddon/abaddon_alliance", context)
-	PrecacheResource("particle_folder", "particles/units/heroes/hero_abaddon", context)
-	PrecacheResource("particle_folder", "particles/units/heroes/hero_desert_wyrm", context)
-	PrecacheResource("particle_folder", "particles/econ/items/phoenix/phoenix_solar_forge/phoenix_sunray_solar_forge", context)
-	PrecacheResource("particle_folder", "particles/units/heroes/heroes_underlord", context)
-	PrecacheResource("particle_folder", "particles/frostivus_gameplay", context)
-	PrecacheResource("particle_folder", "particles/econ/events/ti7/teleport_end_ti7_lvl3.vpcf", context)
-	PrecacheResource("particle_folder", "particles/units/heroes/hero_shadow_shaman", context)
 
-	PrecacheResource("particle", "particles/units/heroes/hero_dazzle/dazzle_armor_enemy_ring_sink.vpcf", context)
-	PrecacheResource("particle", "particles/econ/items/dazzle/dazzle_dark_light_weapon/dazzle_dark_shallow_grave_ground.vpcf", context)
-	PrecacheResource("particle", "particles/units/heroes/hero_lone_druid/lone_druid_battle_cry_overhead_ember.vpcf", context)
+	PrecacheResource("particle_folder", "particles/econ/items/puck/puck_alliance_set", context) -- Dark Portal attack projectile
+	PrecacheResource("particle_folder", "particles/econ/items/shadow_fiend/sf_desolation", context) -- Banehallow attack projectile
+	PrecacheResource("particle_folder", "particles/econ/items/rubick/rubick_staff_wandering", context) -- Doom Golem attack projectile
+
+	PrecacheResource("particle", "particles/econ/items/dazzle/dazzle_dark_light_weapon/dazzle_dark_shallow_grave_ground.vpcf", context) -- Armor Rune Overhead
+	PrecacheResource("particle", "particles/units/heroes/hero_lone_druid/lone_druid_battle_cry_overhead_ember.vpcf", context) -- Immolation Rune Overhead
 	PrecacheResource("particle", "particles/units/heroes/hero_terrorblade/terrorblade_metamorphosis_base_attack.vpcf", context) -- Illidan boss attack projectile
 
 	PrecacheResource("model_folder", "models/heroes/skeleton_king", context) --Lich King Boss
@@ -103,26 +85,20 @@ function Precache(context)
 	PrecacheUnitByNameAsync("npc_dota_hero_wisp", context) -- For Connecting bug
 	PrecacheUnitByNameAsync("npc_dota_hero_zuus", context) -- Muradin Bronzebeard
 
-	PrecacheUnitByNameSync( "npc_dota_hero_skeleton_king_bis", context)
+	PrecacheUnitByNameAsync( "npc_dota_hero_skeleton_king_bis", context)
 
 	PrecacheUnitByNameSync( "npc_spirit_beast_bis", context)
 	PrecacheUnitByNameSync( "npc_frost_infernal_bis", context)
 
 --	-- PRECACHE SOUNDS
 	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_death_prophet.vsndevts", context) -- For Incoming Wave 4
-	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_lycan.vsndevts", context)
-	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_magnataur.vsndevts", context)
+	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_juggernaut.vsndevts", context) -- For Grom boss (crit sounds?)
 	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_obsidian_destroyer.vsndevts", context)
-	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_ogre_magi.vsndevts", context)
 	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_queenofpain.vsndevts", context)
 	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_sandking.vsndevts", context)
 	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_skeletonking.vsndevts", context)
 	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_skywrath_mage.vsndevts", context)
 	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_spectre.vsndevts", context)
-	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_techies.vsndevts", context)
-	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_tinker.vsndevts", context)
-	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_tiny.vsndevts", context)
-	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_zuus.vsndevts", context)
 
 	PrecacheResource("soundfile", "soundevents/game_sounds_custom.vsndevts", context)
 	PrecacheResource("soundfile", "soundevents/game_sounds_dungeon.vsndevts", context)

@@ -3,6 +3,7 @@
 
 "activelist"
 {
+	"npc_dota_hero_axe"					"1" 	//Axe
 	"npc_dota_hero_abyssal_underlord"	"1" 	//Underlord
 	"npc_dota_hero_lone_druid"			"1" 	//Beastmaster
 	"npc_dota_hero_brewmaster"			"1" 	//Pandaren Brewmaster
@@ -36,6 +37,7 @@
 	"npc_dota_hero_tinker"				"0"		//Iron Man
 	"npc_dota_hero_tiny"				"1"		//Stone Giant
 	"npc_dota_hero_terrorblade"			"1"		//Illidan
+	"npc_dota_hero_troll_warlord"		"1"		//Troll Warlord
 	"npc_dota_hero_ursa"				"1"		//Malfurion
 	"npc_dota_hero_warlock"				"1"		//Archimonde
 	"npc_dota_hero_windrunner"			"1"		//Windrunner

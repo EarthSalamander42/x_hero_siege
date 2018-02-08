@@ -149,7 +149,7 @@ FourBossesKillCount()
 		DoEntFire("door_proudmoore2", "SetAnimation", "gate_entrance002_open", 0, nil, nil)
 		DoEntFire("door_proudmoore3", "SetAnimation", "gate_entrance002_open", 0, nil, nil)
 		caster:ForceKill(true)
-		local DoorObs = Entities:FindAllByName("obstruction_proudmoore")
+		local DoorObs = Entities:FindAllByName("obstruction_proudmoore2")
 		for _, obs in pairs(DoorObs) do
 			obs:SetEnabled(false, true)
 		end

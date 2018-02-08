@@ -5,7 +5,7 @@ function Phase2CreepsLeft()
 	local wave_count = 0
 
 	Timers:CreateTimer(0, function()
-		if not EntIceTower:IsNull() and SPECIAL_EVENT == 0 then
+		if not EntIceTower:IsNull() and SPECIAL_EVENT ~= 1 then
 			wave_count = wave_count + 1
 			for j = 1, 8 do
 				local unit = CreateUnitByName("npc_ghul_II", point+RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_CUSTOM_1)
@@ -37,7 +37,7 @@ function Phase2CreepsRight()
 	local wave_count = 0
 
 	Timers:CreateTimer(0, function()
-		if not EntIceTower:IsNull() and SPECIAL_EVENT == 0 then
+		if not EntIceTower:IsNull() and SPECIAL_EVENT ~= 1 then
 			wave_count = wave_count + 1
 			for j = 1, 8 do
 				local unit = CreateUnitByName("npc_orc_II", point+RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_CUSTOM_1)

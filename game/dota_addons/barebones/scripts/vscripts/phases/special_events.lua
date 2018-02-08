@@ -107,30 +107,28 @@ StunBuildings(time)
 				TeleportHero(hero, 0.0, point:GetAbsOrigin())
 			end
 
+			GameMode.hero_farm_event[nPlayerID] = {}
+			GameMode.hero_farm_event[nPlayerID]["round"] = 1
+			GameMode.hero_farm_event[nPlayerID]["level"] = 1
+
 			for j = 1, 10 do
 				local unit = CreateUnitByName(FarmEvent_Creeps[1], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
-				unit:SetBaseDamageMin(unit:GetAverageTrueAttackDamage(unit) + (FARM_EVENT_UPGRADE["damage"][difficulty] * GameMode.hero_farm_event[id]["level"]))
-					unit:SetBaseDamageMax(unit:GetAverageTrueAttackDamage(unit) + (FARM_EVENT_UPGRADE["damage"][difficulty] * GameMode.hero_farm_event[id]["level"]) * 1.1)
-					unit:SetMaxHealth(unit:GetMaxHealth() + (FARM_EVENT_UPGRADE["health"][difficulty] * GameMode.hero_farm_event[id]["level"]))
-					unit:SetHealth(unit:GetMaxHealth())
-					unit:SetPhysicalArmorBaseValue(unit:GetPhysicalArmorValue() + (FARM_EVENT_UPGRADE["armor"][difficulty] * GameMode.hero_farm_event[id]["level"]))
-					if not unit.OverHeadCandy then 
-						unit.OverHeadCandy = ParticleManager:CreateParticle("particles/hw_fx/candy_carrying_stack.vpcf", PATTACH_OVERHEAD_FOLLOW, unit)
-						ParticleManager:SetParticleControl(unit.OverHeadCandy, 0, unit:GetAbsOrigin())
-					end
-					local stack_10 = math.floor(GameMode.hero_farm_event[id]["level"] / 10)
-					ParticleManager:SetParticleControl(unit.OverHeadCandy, 2, Vector(stack_10, GameMode.hero_farm_event[id]["level"] - stack_10*10, 0))
+				unit:SetBaseDamageMin(unit:GetAverageTrueAttackDamage(unit) + (FARM_EVENT_UPGRADE["damage"][difficulty] * GameMode.hero_farm_event[nPlayerID]["level"]))
+				unit:SetBaseDamageMax(unit:GetAverageTrueAttackDamage(unit) + (FARM_EVENT_UPGRADE["damage"][difficulty] * GameMode.hero_farm_event[nPlayerID]["level"]) * 1.1)
+				unit:SetMaxHealth(unit:GetMaxHealth() + (FARM_EVENT_UPGRADE["health"][difficulty] * GameMode.hero_farm_event[nPlayerID]["level"]))
+				unit:SetHealth(unit:GetMaxHealth())
+				unit:SetPhysicalArmorBaseValue(unit:GetPhysicalArmorValue() + (FARM_EVENT_UPGRADE["armor"][difficulty] * GameMode.hero_farm_event[nPlayerID]["level"]))
+				if not unit.OverHeadCandy then 
+					unit.OverHeadCandy = ParticleManager:CreateParticle("particles/hw_fx/candy_carrying_stack.vpcf", PATTACH_OVERHEAD_FOLLOW, unit)
+					ParticleManager:SetParticleControl(unit.OverHeadCandy, 0, unit:GetAbsOrigin())
+				end
+				local stack_10 = math.floor(GameMode.hero_farm_event[nPlayerID]["level"] / 10)
+				ParticleManager:SetParticleControl(unit.OverHeadCandy, 2, Vector(stack_10, GameMode.hero_farm_event[nPlayerID]["level"] - stack_10*10, 0))
 			end
 
 			DisableItems(hero, time)
 			FarmEventCreeps(nPlayerID)
 		end
-	end
-
-	for PlayerID = 0, PlayerResource:GetPlayerCount() -1 do
-		GameMode.hero_farm_event[PlayerID] = {}
-		GameMode.hero_farm_event[PlayerID]["round"] = 1
-		GameMode.hero_farm_event[PlayerID]["level"] = 1
 	end
 
 	Timers:CreateTimer(time-20, function() -- 150
@@ -185,6 +183,8 @@ print("Farm Event Logic ID:", id)
 end
 
 function EndFarmEvent()
+	SPECIAL_EVENT = 2
+
 	for _, hero in pairs(HeroList:GetAllHeroes()) do
 		RefreshPlayers()
 

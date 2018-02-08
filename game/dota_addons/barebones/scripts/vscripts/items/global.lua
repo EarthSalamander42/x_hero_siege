@@ -17,6 +17,7 @@ Orbs = {
 
 function EquipOrbs(keys)
 local caster = keys.caster
+if caster:IsIllusion() then return end
 
 	caster:RemoveModifierByName("modifier_orb_of_fire")
 	caster:RemoveModifierByName("modifier_orb_of_lightning")
@@ -53,6 +54,7 @@ end
 -- Orb of Lightning
 function Purge(event)
 local caster = event.caster
+if caster:IsIllusion() then return end
 local target = event.target
 local ability = event.ability
 local duration = ability:GetSpecialValueFor('duration')
@@ -80,6 +82,7 @@ end
 -- Orb of Earth
 function Bash(event)
 local caster = event.caster
+if caster:IsIllusion() then return end
 local target = event.target
 local ability = event.ability
 if hero:IsIllusion() then return end
@@ -164,6 +167,7 @@ local caster = keys.caster
 end
 
 function OrbOfDarkness(hero, killedUnit)
+if hero:IsIllusion() then return end
 local duration = 0
 
 	if killedUnit:IsCreep() then

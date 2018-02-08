@@ -268,7 +268,7 @@ end
 -- Picks up an Armor rune
 function PickupArmorRune(item, unit)
 
-	item:ApplyDataDrivenModifier(unit, unit, "modifier_rune_armor", {})
+	unit:AddNewModifier(unit, nil, "modifier_rune_armor", {duration=45})
 	EmitSoundOnLocationForAllies(unit:GetAbsOrigin(), "Rune.Regen", unit)
 	PickupRune(item, unit)
 end
@@ -276,7 +276,7 @@ end
 -- Picks up an Immolation rune
 function PickupImmolationRune(item, unit)
 
-	item:ApplyDataDrivenModifier(unit, unit, "modifier_rune_immolation", {})
+	unit:AddNewModifier(unit, nil, "modifier_rune_immolation", {duration=45})
 	EmitSoundOnLocationForAllies(unit:GetAbsOrigin(), "Rune.Haste", unit)
 	PickupRune(item, unit)
 end
@@ -467,10 +467,10 @@ function GetItemByID(id)
 end
 
 function BossBar(unit, boss)
-	Timers:CreateTimer(0.0, function()
+	Timers:CreateTimer(function()
 		if unit:IsAlive() then
 			CustomNetTables:SetTableValue("round_data", "bossHealth", {boss = boss, hp = unit:GetHealthPercent()})
-			return 1.0
+			return 0.1
 		end
 	end)
 end
@@ -901,4 +901,13 @@ function StunBuildings(time)
 			tower:AddNewModifier(nil, nil, "modifier_invulnerable", {duration=time})
 		end
 	end
+end
+
+function getkvValues(tEntity, ...) -- KV Values look hideous in finished code, so this function will parse through all sent KV's for tEntity (typically self)
+	local values = {...}
+	local data = {}
+	for i,v in ipairs(values) do
+		table.insert(data,tEntity:GetSpecialValueFor(v))
+	end
+	return unpack(data)
 end

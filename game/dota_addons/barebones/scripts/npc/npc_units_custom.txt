@@ -6781,7 +6781,6 @@
 		"Model"						"models/heroes/luna/luna.vmdl"  // Model.
 		"Level"						"1"
 		"ModelScale"				"1.2"
-		"ProjectileModel"			"particles/econ/items/luna/luna_crescent_moon/luna_attack_crescent_moon.vpcf"
 		"ProjectileSpeed"			"900"
 		"UseAI"						"1"
 
@@ -11393,6 +11392,7 @@
 		"ConsideredHero"			"1"
 		"HasInventory"				"1"
 		"SoundSet"					"Hero_Sven"
+		"LeavesCorpse"				"0"
 		"UseAI"						"2"
 
 		// Abilities
@@ -11497,6 +11497,7 @@
 		"ConsideredHero"			"1"
 		"HasInventory"				"1"
 		"SoundSet"					"Hero_Sven"
+		"LeavesCorpse"				"0"
 		"UseAI"						"2"
 
 		// Abilities
@@ -11601,6 +11602,7 @@
 		"ConsideredHero"			"1"
 		"HasInventory"				"1"
 		"SoundSet"					"Hero_Sven"
+		"LeavesCorpse"				"0"
 		"UseAI"						"2"
 
 		// Abilities
@@ -12906,9 +12908,9 @@
 		"Ability1"				"holdout_evasion"
 		"Ability2"				"tyrande_multiple_arrows"
 		"Ability3"				"holdout_critical_arrows"
-		"Ability4"				"holdout_endurance_aura_tooltip"
+		"Ability4"				"holdout_endurance_aura"
 		"Ability5"				"holdout_poison_attack"
-		"Ability6"				"holdout_trueshot_aura_tooltip"
+		"Ability6"				"holdout_trueshot_aura"
 		"Ability7"				"neutral_spell_immunity"
 		"Ability8"				"dummy_passive_vulnerable"
 
@@ -13034,8 +13036,8 @@
 		//----------------------------------------------------------------
 		"Ability1"				"holdout_owl_lightning"
 		"Ability2"				"holdout_forked_lightning"
-		"Ability3"				"holdout_command_aura_tooltip"
-		"Ability4"				"holdout_elunes_grace_tooltip"
+		"Ability3"				"holdout_command_aura"
+		"Ability4"				"holdout_elunes_grace"
 		"Ability5"				"holdout_innate_lunar_glaive"
 		"Ability6"				"holdout_moon_explosion"
 		"Ability7"				"holdout_neutralization"
@@ -13228,7 +13230,7 @@
 		//----------------------------------------------------------------
 		"Ability1"				"holdout_monsoon_small"
 		"Ability2"				"holdout_phase_shift"
-		"Ability3"				"holdout_life_regeneration_aura_tooltip"
+		"Ability3"				"holdout_life_regeneration_aura"
 		"Ability4"				"holdout_permanent_lightning"
 		"Ability5"				"holdout_resistant_skin"
 		"Ability6"				"pugna_life_drain"
@@ -13290,7 +13292,7 @@
 		//----------------------------------------------------------------
 		"Ability1"				"holdout_storm_bolt"
 		"Ability2"				"holdout_thunder_clap"
-		"Ability3"				"holdout_muradin_hammer_tooltip"		
+		"Ability3"				"holdout_muradin_hammer"		
 		"Ability4"				"slardar_bash"
 		"Ability5"				"holdout_thunder_spirit"
 		"Ability6"				"holdout_avatar"
@@ -13361,7 +13363,7 @@
 		"Ability3"				"holdout_bash_arrows"
 		"Ability4"				"holdout_critical_arrows_alt"
 		"Ability5"				"forest_troll_high_priest_heal"
-		"Ability6"				"holdout_splash_arrows_tooltip"
+		"Ability6"				"holdout_splash_arrows"
 		"Ability7"				"holdout_rocket_hail"
 		"Ability8"				"dummy_passive_vulnerable"
 
@@ -13395,7 +13397,7 @@
 
 		// Creature Data
 		//----------------------------------------------------------------
-		 "Creature"
+		"Creature"
 		{
 			"AttachWearables"   
 			{
@@ -13426,8 +13428,8 @@
 		// Abilities
 		//----------------------------------------------------------------
 		"Ability1"				"holdout_windwalk"
-		"Ability2"				"blademaster_mirror_image"
-		"Ability3"				"holdout_wardrums_aura_tooltip"
+		"Ability2"				"xhs_blademaster_mirror_image"
+		"Ability3"				"holdout_wardrums_aura"
 		"Ability4"				"juggernaut_blade_dance"
 		"Ability5"				"holdout_berserkers_rage"
 		"Ability6"				"juggernaut_blade_fury"
@@ -13496,7 +13498,7 @@
 		//----------------------------------------------------------------
 		"Ability1"				"holdout_healing_wave"
 		"Ability2"				"holdout_fan_of_light"
-		"Ability3"				"holdout_devotion_aura_tooltip"
+		"Ability3"				"holdout_devotion_aura"
 		"Ability4"				"holdout_howl_of_terror"
 		"Ability5"				"axe_berserkers_call"
 		"Ability6"				"holdout_pure_light"
@@ -13566,7 +13568,7 @@
 		//----------------------------------------------------------------
 		"Ability1"				"holdout_hurl_bomb"
 		"Ability2"				"holdout_fan_of_rockets"
-		"Ability3"				"holdout_aura_of_blight_tooltip"		
+		"Ability3"				"holdout_aura_of_blight"		
 		"Ability4"				"holdout_metal_armor"
 		"Ability5"				"pugna_decrepify"
 		"Ability6"				"holdout_clone"
@@ -13699,7 +13701,7 @@
 		//----------------------------------------------------------------
 		"Ability1"				"holdout_carrion_swarm"
 		"Ability2"				"holdout_chaos"
-		"Ability3"				"holdout_aura_of_blight_tooltip"
+		"Ability3"				"holdout_aura_of_blight"
 		"Ability4"				"holdout_death_coil"
 		"Ability5"				"holdout_sleep"
 		"Ability6"				"holdout_inferno"
@@ -13766,7 +13768,7 @@
 		//----------------------------------------------------------------
 		"Ability1"				"holdout_firestorm"
 		"Ability2"				"holdout_war_thunder"
-		"Ability3"				"holdout_unholy_aura_tooltip"		
+		"Ability3"				"holdout_unholy_aura"		
 		"Ability4"				"holdout_rain_of_chaos"
 		"Ability5"				"holdout_innate_great_cleave"
 		"Ability6"				"holdout_doom"
@@ -13832,7 +13834,7 @@
 		"Ability1"				"holdout_bane_death_coil"
 		"Ability2"				"holdout_bane_permanent_immolation"
 		"Ability3"				"holdout_bane_critical"		
-		"Ability4"				"holdout_endurance_aura_tooltip"
+		"Ability4"				"holdout_endurance_aura"
 		"Ability5"				"holdout_command_aura_innate"
 		"Ability6"				"holdout_stampede"
 		"Ability7"				"holdout_rain_of_chaos_20"
@@ -14029,7 +14031,7 @@
 		//----------------------------------------------------------------
 		"Ability1"				"holdout_shockwave"
 		"Ability2"				"holdout_war_stomp"
-		"Ability3"				"holdout_endurance_aura_tooltip"
+		"Ability3"				"holdout_endurance_aura"
 		"Ability4"				"holdout_pulverize"
 		"Ability5"				"holdout_roar"
 		"Ability6"				"holdout_lightning_stroke"
@@ -14094,7 +14096,7 @@
 		//----------------------------------------------------------------
 		"Ability1"				"zuus_arc_lightning"
 		"Ability2"				"holdout_watery_minion"
-		"Ability3"				"holdout_distance_aura_tooltip"		
+		"Ability3"				"holdout_distance_aura"		
 		"Ability4"				"holdout_storm_rain"
 		"Ability5"				"holdout_rejuvenation"
 		"Ability6"				"holdout_monsoon"
@@ -14161,7 +14163,7 @@
 		//----------------------------------------------------------------
 		"Ability1"				"holdout_holy_light"
 		"Ability2"				"holdout_divine_shield"
-		"Ability3"				"holdout_endurance_aura_tooltip"		
+		"Ability3"				"holdout_endurance_aura"		
 		"Ability4"				"holdout_frostmourne"
 		"Ability5"				"holdout_innate_great_cleave"
 		"Ability6"				"holdout_light_roar"
@@ -14430,7 +14432,7 @@
 		"Ability1"				"nyx_assassin_impale"
 		"Ability2"				"holdout_carrion_beetles"
 		"Ability3"				"holdout_poison_sting"		
-		"Ability4"				"holdout_spiked_carapace_tooltip"
+		"Ability4"				"holdout_spiked_carapace"
 		"Ability5"				"holdout_anubarak_claw"
 		"Ability6"				"holdout_locust_swarm"
 		"Ability7"				"holdout_burrow_impale"
@@ -14493,8 +14495,8 @@
 		//----------------------------------------------------------------
 		"Ability1"				"holdout_rocket_launcher"
 		"Ability2"				"holdout_plasma_rifle"
-		"Ability3"				"holdout_distance_aura_tooltip"		
-		"Ability4"				"holdout_shield_tooltip"
+		"Ability3"				"holdout_distance_aura"		
+		"Ability4"				"holdout_shield"
 		"Ability5"				"ogre_magi_bloodlust"
 		"Ability6"				"rifleman_assassinate"
 		"Ability7"				"dummy_passive_vulnerable"
@@ -14678,7 +14680,7 @@
 		"Ability1"				"lone_druid_spirit_bear"
 		"Ability2"				"holdout_bear_stun"
 		"Ability3"				"xhs_vampiric_aura"		
-		"Ability4"				"holdout_endurance_aura_tooltip"
+		"Ability4"				"holdout_endurance_aura"
 		"Ability5"				"holdout_roar"
 		"Ability6"				"holdout_beastmaster_stampede"
 		"Ability7"				"dummy_passive_vulnerable"
@@ -14744,7 +14746,7 @@
 		"Ability1"				"holdout_life_steal"
 		"Ability2"				"meepo_poof"
 		"Ability3"				"holdout_slow_pool"		
-		"Ability4"				"holdout_divine_aura_tooltip"
+		"Ability4"				"holdout_divine_aura"
 		"Ability5"				"holdout_reincarnation"
 		"Ability6"				"holdout_kobold_army"
 		"Ability7"				"dummy_passive_vulnerable"
@@ -14820,7 +14822,7 @@
 		"Ability3"				"holdout_mark_of_the_claw"		
 		"Ability4"				"holdout_hardened_skin"
 		"Ability5"				"holdout_strength_of_the_wild"
-		"Ability6"				"holdout_bear_form_tooltip"
+		"Ability6"				"holdout_bear_form"
 		"Ability7"				"dummy_passive_vulnerable"
 
 		// Armor
@@ -14867,7 +14869,7 @@
 
 		// Abilities
 		//----------------------------------------------------------------
-		"Ability1"				"holdout_power_mount_int_tooltip"
+		"Ability1"				"holdout_power_mount_int"
 		"Ability2"				"holdout_dark_cleave"
 		"Ability3"				"holdout_instakill"		
 		"Ability4"				"holdout_requiem"
@@ -14933,7 +14935,7 @@
 
 		// Abilities
 		//----------------------------------------------------------------
-		"Ability1"				"holdout_power_mount_int_tooltip"
+		"Ability1"				"holdout_power_mount_int"
 		"Ability2"				"holdout_mechanism"
 		"Ability3"				"holdout_light_stand"		
 		"Ability4"				"holdout_sacred_pool"
@@ -15132,7 +15134,7 @@
 		"Ability1"					"holdout_entrench"
 		"Ability2"					"holdout_tornado_tempest"
 		"Ability3"					"holdout_acid_skin"
-		"Ability4"					"holdout_endurance_aura_tooltip"
+		"Ability4"					"holdout_endurance_aura"
 		"Ability5"					"holdout_roar"
 		"Ability6"					"holdout_desert_dragon_form"
 		"Ability7"					"dummy_passive_vulnerable"
@@ -15197,7 +15199,7 @@
 		//----------------------------------------------------------------
 		"Ability1"					"holdout_shadow_bolt"
 		"Ability2"					"holdout_corruption"
-		"Ability3"					"holdout_malefice_aura_tooltip"
+		"Ability3"					"holdout_malefice_aura"
 		"Ability4"					"holdout_consuming_flame"
 		"Ability5"					"holdout_stitch"
 		"Ability6"					"holdout_dark_king"
@@ -15329,7 +15331,7 @@
 		"Ability1"					"troll_warlord_whirling_axes_ranged"
 		"Ability2"					"troll_warlord_fervor"
 		"Ability3"					"holdout_enchanted_axes"
-		"Ability4"					"holdout_endurance_aura_tooltip"
+		"Ability4"					"holdout_endurance_aura"
 		"Ability5"					"holdout_berserkers_rage_alt"
 		"Ability6"					"holdout_battle_trance"
 		"Ability7"					"dummy_passive_vulnerable"
@@ -15529,7 +15531,7 @@
 		"Ability1"					"bristleback_viscous_nasal_goo"
 		"Ability2"					"bristleback_quill_spray"
 		"Ability3"					"holdout_bristleback"
-		"Ability4"					"holdout_command_aura_tooltip"
+		"Ability4"					"holdout_command_aura"
 		"Ability5"					"bristleback_warpath"
 		"Ability6"					"imba_sven_storm_bolt"
 		"Ability7"					"dummy_passive_vulnerable"
@@ -15579,55 +15581,55 @@
 	//=================================================================================
 	// HERO: Iron Man
 	//=================================================================================
-	"npc_dota_hero_tinker_bis"
-	{
-		// General
-		//----------------------------------------------------------------
-		"BaseClass"					"npc_dota_creature"
-		"Model"						"models/iron_man.vmdl"	 //Add model
-		"ModelScale"				"1.15"
-		"Level"						"1"
-		"AttackDamageMin"			"66"
-		"AttackDamageMax"			"76"
+//	"npc_dota_hero_tinker_bis"
+//	{
+//		// General
+//		//----------------------------------------------------------------
+//		"BaseClass"					"npc_dota_creature"
+//		"Model"						"models/iron_man.vmdl"	 //Add model
+//		"ModelScale"				"1.15"
+//		"Level"						"1"
+//		"AttackDamageMin"			"66"
+//		"AttackDamageMax"			"76"
 
-		// Abilities
-		//----------------------------------------------------------------
-		"Ability1"					"iron_man_laser"
-		"Ability2"					"iron_man_missile"
-		"Ability3"					"iron_man_red_laser"
-		"Ability4"					"iron_man_ark_beam"
-		"Ability5"					""
-		"Ability6"					""
-		"Ability7"					"iron_man_misc"
-		"Ability8"					"dummy_passive_vulnerable"
+//		// Abilities
+//		//----------------------------------------------------------------
+//		"Ability1"					"iron_man_laser"
+//		"Ability2"					"iron_man_missile"
+//		"Ability3"					"iron_man_red_laser"
+//		"Ability4"					"iron_man_ark_beam"
+//		"Ability5"					""
+//		"Ability6"					""
+//		"Ability7"					"iron_man_misc"
+//		"Ability8"					"dummy_passive_vulnerable"
 
-		// Armor
-		//----------------------------------------------------------------
-		"ArmorPhysical"				"2"
-		"MagicalResistance"			"25"
+//		// Armor
+//		//----------------------------------------------------------------
+//		"ArmorPhysical"				"2"
+//		"MagicalResistance"			"25"
 
-		// Attack
-		//-------------------------------------------------------------------------------------------------------------
-		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
-		"AttackRate"				"1.7"
-		"AttackRange"				"128"
-		"RingRadius"				"120"
-		"HealthBarOffset"			"195"
+//		// Attack
+//		//-------------------------------------------------------------------------------------------------------------
+//		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
+//		"AttackRate"				"1.7"
+//		"AttackRange"				"128"
+//		"RingRadius"				"120"
+//		"HealthBarOffset"			"195"
 
-		// Movement
-		//----------------------------------------------------------------
-		"MovementSpeed"				"365"
+//		// Movement
+//		//----------------------------------------------------------------
+//		"MovementSpeed"				"365"
 
-		// Status
-		//----------------------------------------------------------------
-		"StatusHealth"				"720"
-		"StatusMana"				"254"
+//		// Status
+//		//----------------------------------------------------------------
+//		"StatusHealth"				"720"
+//		"StatusMana"				"254"
 
-		// Vision
-		//----------------------------------------------------------------
-		"VisionDaytimeRange"		"1000"
-		"VisionNighttimeRange"		"1000"
-	}
+//		// Vision
+//		//----------------------------------------------------------------
+//		"VisionDaytimeRange"		"1000"
+//		"VisionNighttimeRange"		"1000"
+//	}
 
 	//=================================================================================
 	// HERO: Spirit Master (Storm Spirit)
@@ -15710,8 +15712,8 @@
 		//----------------------------------------------------------------
 		"Ability1"					"monkey_king_boundless_strike"
 		"Ability2"					"holdout_chaos"
-		"Ability3"					"holdout_command_aura_tooltip"
-		"Ability4"					"holdout_shield_tooltip"
+		"Ability3"					"holdout_command_aura"
+		"Ability4"					"holdout_shield"
 		"Ability5"					"holdout_spirit_str"
 		"Ability6"					"holdout_enhanced_spirit"
 		"Ability7"					"dummy_passive_vulnerable"
@@ -15776,7 +15778,7 @@
 		//----------------------------------------------------------------
 		"Ability1"					"ember_spirit_searing_chains"
 		"Ability2"					"ember_spirit_sleight_of_fist"
-		"Ability3"					"holdout_endurance_aura_tooltip"
+		"Ability3"					"holdout_endurance_aura"
 		"Ability4"					"ember_spirit_flame_guard"
 		"Ability5"					"holdout_spirit_agi"
 		"Ability6"					"holdout_enhanced_spirit"
@@ -15842,8 +15844,8 @@
 		//----------------------------------------------------------------
 		"Ability1"					"medusa_split_shot"
 		"Ability2"					"medusa_mystic_snake"
-		"Ability3"					"holdout_devotion_aura_tooltip"
-		"Ability4"					"holdout_trueshot_aura_tooltip"
+		"Ability3"					"holdout_devotion_aura"
+		"Ability4"					"holdout_trueshot_aura"
 		"Ability5"					"holdout_mana_shield"
 		"Ability6"					"medusa_stone_gaze"
 		"Ability7"					"dummy_passive_vulnerable"

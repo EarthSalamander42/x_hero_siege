@@ -13,6 +13,7 @@ require('libraries/notifications')
 require('libraries/animations')
 require('libraries/attachments')
 require('libraries/keyvalues')
+require('libraries/illusionmanager')
 require('phases/choose_hero')
 require('phases/creeps')
 require('phases/special_events')
@@ -90,8 +91,8 @@ function GameMode:InitGameMode()
 
 	-- Overriding Derived Stats
 	mode:SetCustomAttributeDerivedStatValue(DOTA_ATTRIBUTE_STRENGTH_HP_REGEN_PERCENT, 0.0025)
-	mode:SetCustomAttributeDerivedStatValue(DOTA_ATTRIBUTE_INTELLIGENCE_MANA_REGEN_PERCENT, 0.0025)
-	mode:SetCustomAttributeDerivedStatValue(DOTA_ATTRIBUTE_INTELLIGENCE_SPELL_AMP_PERCENT, 0.05)
+	mode:SetCustomAttributeDerivedStatValue(DOTA_ATTRIBUTE_INTELLIGENCE_MANA_REGEN_PERCENT, 0.010)
+	mode:SetCustomAttributeDerivedStatValue(DOTA_ATTRIBUTE_INTELLIGENCE_SPELL_AMP_PERCENT, 0.075)
 
 	-- Boolean Rules
 	GameRules:SetUseCustomHeroXPValues(true)
@@ -99,8 +100,6 @@ function GameMode:InitGameMode()
 	GameRules:SetHeroRespawnEnabled(true)
 	mode:SetUseCustomHeroLevels(true)
 	mode:SetRecommendedItemsDisabled(true)
-	mode:SetTopBarTeamValuesOverride(true)
-	mode:SetTopBarTeamValuesVisible(true)
 	mode:SetUnseenFogOfWarEnabled(false)
 	mode:SetBuybackEnabled(false)
 	mode:SetBotThinkingEnabled(false)
@@ -367,9 +366,9 @@ local newState = GameRules:State_Get()
 		end
 		SpawnHeroesBis()
 
-		local diff = {"Easy", "Normal", "Hard", "Extreme"}
+		local diff = {"Easy", "Normal", "Hard", "Extreme", "Divine"}
 		local lanes = {"Simple", "Double", "Full"}
-		local Color = {"Green", "Yellow", "Orange", "Red"}
+		local Color = {"green", "Yellow", "orange", "red", "darkred"}
 		Timers:CreateTimer(3.0, function()
 			CustomGameEventManager:Send_ServerToAllClients("show_timer_bar", {})
 			Notifications:TopToAll({text="DIFFICULTY: "..diff[GameRules:GetCustomGameDifficulty()], color = Color[GameRules:GetCustomGameDifficulty()], duration=10.0})
@@ -437,15 +436,15 @@ local newState = GameRules:State_Get()
 
 		-- Timer: Creep Levels 1 to 4. Lanes 1 to 8.
 		Timers:CreateTimer(0, function()
-			if SPECIAL_EVENT == 0 then
-				SpawnCreeps()
-				return 30
-			elseif SPECIAL_EVENT == 1 then
-				print("Creeps paused, Special Event.")
-			elseif PHASE_3 == 1 then
+			if PHASE_3 == 1 then
 				print("Creeps Timer killed, Phase 3.")
 				return nil
+			elseif SPECIAL_EVENT == 0 then
+				SpawnCreeps()
+			elseif SPECIAL_EVENT ~= 0 then
+				print("Creeps paused, Special Event.")
 			end
+
 			return 30
 		end)
 	end
@@ -457,7 +456,7 @@ local newState = GameRules:State_Get()
 	end
 end
 
-function GameMode:OnThink()	
+function GameMode:OnThink()
 local newState = GameRules:State_Get()
 if GameRules:IsGamePaused() == true then return 1 end
 if not reg then reg = 1 end

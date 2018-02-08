@@ -1,112 +1,91 @@
-function MirrorImage( keys )
-	local caster = keys.caster
-	local player = caster:GetPlayerOwnerID()
-	local ability = keys.ability
-	local ability_level = ability:GetLevel() - 1
+--[[
+			Author: MouJiaoZi / (MIRROR IMAGE)
+			Date: 2017/12/06 YYYY/MM/DD
+			Modified by: EarthSalamander #42
+]]--
 
-	-- Ability variables
-	local unit_name = caster:GetUnitName()
-	local images_count = ability:GetLevelSpecialValueFor( "images_count", ability_level )
-	local duration = ability:GetLevelSpecialValueFor( "illusion_duration", ability_level )
-	local outgoingDamage = ability:GetLevelSpecialValueFor( "outgoing_damage", ability_level )
-	local incomingDamage = ability:GetLevelSpecialValueFor( "incoming_damage", ability_level )
-	local extra_illusion_chance = ability:GetLevelSpecialValueFor("extra_phantasm_chance_pct_tooltip", ability_level)
-	local extra_illusion_sound = keys.sound
+xhs_blademaster_mirror_image = xhs_blademaster_mirror_image or class({})
 
-	local chance = RandomInt(1, 100)
-	local casterOrigin = caster:GetAbsOrigin()
-	local casterAngles = caster:GetAngles()
+LinkLuaModifier( "modifier_xhs_blademaster_mirror_image_invulnerable", "heroes/hero_blademaster.lua", LUA_MODIFIER_MOTION_NONE )
 
-	-- Stop any actions of the caster otherwise its obvious which unit is real
-	caster:Stop()
+function xhs_blademaster_mirror_image:IsHiddenWhenStolen() 		return false end
+function xhs_blademaster_mirror_image:IsRefreshable() 			return true  end
+function xhs_blademaster_mirror_image:IsStealable() 			return true  end
+function xhs_blademaster_mirror_image:IsNetherWardStealable() 	return false end
 
-	-- Initialize the illusion table to keep track of the units created by the spell
-	if not caster.phantasm_illusions then
-		caster.phantasm_illusions = {}
-	end
-
-	-- Kill the old images
-	for k,v in pairs(caster.phantasm_illusions) do
-		if v and IsValidEntity(v) then 
-			v:ForceKill(false)
-		end
-	end
-
-	-- Start a clean illusion table
-	caster.phantasm_illusions = {}
-
-	-- Setup a table of potential spawn positions
+function xhs_blademaster_mirror_image:OnSpellStart()
+	if not IsServer() then return end
+	local caster = self:GetCaster()
+	local caster_entid = caster:entindex()
+	local ability = self
+	local delay = ability:GetSpecialValueFor("invuln_duration")
+	local image_count = ability:GetSpecialValueFor("images_count")
+	local image_out_dmg = ability:GetSpecialValueFor("outgoing_damage")
+	local image_in_dmg = ability:GetSpecialValueFor("incoming_damage")
+	local image_duration = ability:GetSpecialValueFor("illusion_duration")
 	local vRandomSpawnPos = {
-		Vector( 72, 0, 0 ),		-- North
-		Vector( 0, 72, 0 ),		-- East
-		Vector( -72, 0, 0 ),	-- South
-		Vector( 72, -72, 0 ),	-- West
-		Vector( -72, -72, 0 ),	-- West
-		Vector( -72, 0, 72 ),	-- West
+		Vector( 72, 0, 0 ),
+		Vector( 72, 72, 0 ),
+		Vector( 72, 0, 0 ),
+		Vector( 0, 72, 0 ),
+		Vector( -72, 0, 0 ),
+		Vector( -72, 72, 0 ),
+		Vector( -72, -72, 0 ),
+		Vector( 0, -72, 0 ),
+	}
+	local particle = "particles/items2_fx/manta_phase.vpcf"
+--	local particle2 = "particles/units/heroes/hero_siren/blademaster_riptide_foam.vpcf"
+	local part = ParticleManager:CreateParticle(particle, PATTACH_ABSORIGIN, caster)
+	local buff = caster:AddNewModifier(caster, ability, "modifier_xhs_blademaster_mirror_image_invulnerable", {})
+	EmitSoundOn("Blademaster.MirrorImage", caster)
+	caster:SetContextThink( DoUniqueString("blademaster_mirror_image"), function ( )
+		for i=1, image_count do
+			local j = RandomInt(1, #vRandomSpawnPos)
+			local pos = caster:GetAbsOrigin() + vRandomSpawnPos[j]
+			local illusion = IllusionManager:CreateIllusion(caster, self, pos, caster, {damagein=image_in_dmg, damageout=image_out_dmg, unique=caster_entid.."_siren_image_"..i, duration=image_duration})
+			self:SetInventory(illusion) -- not working yet
+
+			table.remove(vRandomSpawnPos,j)
+--			local part2 = ParticleManager:CreateParticle(particle2, PATTACH_ABSORIGIN, illusion)
+--			ParticleManager:ReleaseParticleIndex(part2)
+		end
+		ParticleManager:DestroyParticle(part, true)
+		ParticleManager:ReleaseParticleIndex(part)
+		caster:Stop()
+		buff:Destroy()
+		return nil
+	end, delay)
+end
+
+function xhs_blademaster_mirror_image:SetInventory(illusion)
+if type(illusion) ~= "table" then return end
+	local shared_modifiers = {
+		"modifier_rune_armor",
+--		"modifier_rune_immolation",
 	}
 
-	for i=#vRandomSpawnPos, 2, -1 do	-- Simply shuffle them
-		local j = RandomInt( 1, i )
-		vRandomSpawnPos[i], vRandomSpawnPos[j] = vRandomSpawnPos[j], vRandomSpawnPos[i]
+	for _, v in pairs(shared_modifiers) do
+		if self:GetCaster():HasModifier(v) then
+			local duration = self:GetCaster():FindModifierByName(v):GetRemainingTime()
+			illusion:AddNewModifier(illusion, nil, v, {duration=duration})
+		end
 	end
+end
 
-	-- Insert the center position and make sure that at least one of the units will be spawned on there.
-	table.insert( vRandomSpawnPos, RandomInt( 1, images_count+1 ), Vector( 0, 0, 0 ) )
+modifier_xhs_blademaster_mirror_image_invulnerable = modifier_xhs_blademaster_mirror_image_invulnerable or class({})
 
-	-- At first, move the main hero to one of the random spawn positions.
-	FindClearSpaceForUnit( caster, casterOrigin + table.remove( vRandomSpawnPos, 1 ), true )
+function modifier_xhs_blademaster_mirror_image_invulnerable:IsHidden()
+	return true
+end
 
-	-- Spawn illusions
-	for i=1, images_count do
+function modifier_xhs_blademaster_mirror_image_invulnerable:CheckState()
+	local state = 
+	{
+		[MODIFIER_STATE_INVULNERABLE] = true,
+		[MODIFIER_STATE_NO_HEALTH_BAR] = true,
+		[MODIFIER_STATE_STUNNED] = true,
+		[MODIFIER_STATE_OUT_OF_GAME] = true,
+	}
 
-		local origin = casterOrigin + table.remove( vRandomSpawnPos, 1 )
-
-		-- handle_UnitOwner needs to be nil, else it will crash the game.
-		local illusion = CreateUnitByName(unit_name, origin, true, caster, nil, caster:GetTeamNumber())
-		illusion:SetControllableByPlayer(player, true)
-
-		illusion:SetAngles( casterAngles.x, casterAngles.y, casterAngles.z )
-
-
-		-- Level Up the unit to the casters level
-		local casterLevel = caster:GetLevel()
-		for i=1,casterLevel-1 do
-			illusion:HeroLevelUp(false)
-		end
-		
-		illusion:SetBaseStrength(caster:GetBaseStrength())
-  		illusion:SetBaseIntellect(caster:GetBaseIntellect())
-  		illusion:SetBaseAgility(caster:GetBaseAgility())
-		
-		-- Set the skill points to 0 and learn the skills of the caster
-		illusion:SetAbilityPoints(0)
-		for abilitySlot = 0, 15 do
-			local ability = caster:GetAbilityByIndex(abilitySlot)
-			if ability ~= nil then 
-				local abilityLevel = ability:GetLevel()
-				local abilityName = ability:GetAbilityName()
-				local illusionAbility = illusion:FindAbilityByName(abilityName)
-				if IsValidEntity(illusionAbility) then
-					illusionAbility:SetLevel(abilityLevel)
-				end
-			end
-		end
-
-		-- Recreate the items of the caster
-		for itemSlot = 0, 5 do
-			local item = caster:GetItemInSlot(itemSlot)
-			if item and item:GetName() ~= "item_orb_of_fire" and item:GetName() ~= "item_orb_of_fire2" and item:GetName() ~= "item_searing_blade" and item:GetName() ~= "item_cloak_of_flames" and item:GetName() ~= "item_orb_of_lightning" and item:GetName() ~= "item_orb_of_lightning2" and item:GetName() ~= "item_celestial_claws" and item:GetName() ~= "item_orb_of_darkness" and item:GetName() ~= "item_orb_of_darkness2" and item:GetName() ~= "item_bracer_of_the_void" and item:GetName() ~= "item_ankh_of_reincarnation" then
-				local itemName = item:GetName()
-				local newItem = CreateItem(itemName, illusion, illusion)
-				illusion:AddItem(newItem)
-			end
-		end
-
-		illusion:AddNewModifier(caster, ability, "modifier_illusion", { duration = duration, outgoing_damage = outgoingDamage, incoming_damage = incomingDamage })
-		illusion:MakeIllusion()
-		illusion:SetHealth(caster:GetHealth())
-		illusion:SetMana(caster:GetMana())
-		illusion:SetPlayerID(caster:GetPlayerOwnerID())
-		table.insert(caster.phantasm_illusions, illusion)
-	end
+	return state
 end

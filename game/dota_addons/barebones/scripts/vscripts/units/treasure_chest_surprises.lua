@@ -149,7 +149,7 @@ end
 
 function GameMode:CreateTreasureRuneDrop( hPlayerHero, hTreasureEnt )
 	local newItem = CreateItem( "item_life_rune", nil, nil )
-	newItem:SetPurchaseTime( 0 )
+	newItem:SetPurchaseTime(0)
 	local drop = CreateItemOnPositionSync( hTreasureEnt:GetAbsOrigin(), newItem )
 	local vPos = hTreasureEnt:GetAbsOrigin() + RandomVector( hTreasureEnt.nRewardSpawnDist )
 	newItem:LaunchLoot( false, 150, 0.75, vPos )
@@ -172,7 +172,7 @@ function GameMode:CreateTreasureGoldDrop( hPlayerHero, hTreasureEnt )
 	--print( "GameMode:OnTreasureOpen() - Drop a bag with " .. nGoldToDrop .. " gold.")
 	if nGoldToDrop > 0 then
 		local newItem = CreateItem( "item_bag_of_gold", nil, nil )
-		newItem:SetPurchaseTime( 0 )
+		newItem:SetPurchaseTime(0)
 		newItem:SetCurrentCharges( nGoldToDrop )
 		local drop = CreateItemOnPositionSync( hTreasureEnt:GetAbsOrigin(), newItem )
 

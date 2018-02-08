@@ -195,14 +195,14 @@ _G.FarmEvent_Creeps = {
 }
 
 FARM_EVENT_UPGRADE = {}
-FARM_EVENT_UPGRADE["damage"] =	{20, 40, 60, 80}
-FARM_EVENT_UPGRADE["health"] =	{200, 400, 600, 800}
-FARM_EVENT_UPGRADE["armor"] =	{10, 20, 30, 40}
+FARM_EVENT_UPGRADE["damage"] =	{20, 40, 60, 80, 100}
+FARM_EVENT_UPGRADE["health"] =	{200, 400, 600, 800, 1000}
+FARM_EVENT_UPGRADE["armor"] =	{10, 20, 30, 40, 50}
 
 PHASE_2_UPGRADE = {}
-PHASE_2_UPGRADE["damage"] =	{25, 50, 75, 100}
-PHASE_2_UPGRADE["health"] =	{200, 400, 600, 800}
-PHASE_2_UPGRADE["armor"] =	{5, 10, 15, 20}
+PHASE_2_UPGRADE["damage"] =	{25, 50, 75, 100, 125}
+PHASE_2_UPGRADE["health"] =	{200, 400, 600, 800, 1000}
+PHASE_2_UPGRADE["armor"] =	{5, 10, 15, 20, 25}
 
 _G.mod_creator = {
 	54896080,	-- Cookies
@@ -303,6 +303,13 @@ _G.vip_members = {
 	26464251,	-- vk [Victor Kannebley Bittencourt on Patreon]
 	317042892,	-- mabuhaymgakalbo [Paul Santos on Patreon]
 	76137142,	-- l0N3IY [JasonDire on Patreon]
+	220816145,	-- Lies [lovelove on Discord]
+	173960754,	-- knic [Tep Haban on Patreon]
+	106797937,	-- Mithat [Mithat Acargür on Patreon]
+	72492060,	-- woochitelj [Goran Vučić on Patreon]
+	45102618,	-- Plyouha [Gosha on Discord]
+	37651406,	-- FearSC [FaceIT FearSC on Discord]
+	110650700,	-- BESTOCE [EmberCookies on Discord]
 }
 
 _G.banned_players = {
@@ -394,6 +401,7 @@ _G.innate_abilities = {
 	"holdout_monkey_king_bar",
 	"holdout_stitch",
 	"troll_warlord_berserkers_rage",
+	"holdout_lich_king_effects",
 	"holdout_random_hero",
 	"holdout_spellsteal",
 	"bristleback_warpath",
@@ -447,7 +455,8 @@ _G.difficulty_abilities = {
 	"creature_chronosphere",
 	"venomancer_poison_sting",
 	"lich_frost_armor",
-	"holdout_lich_king_effects",
-	"monkey_king_boundless_strike",
-	"ursa_fury_swipes"
+	"ursa_fury_swipes",
+	"arthas_frostmourne",
+	"baristol_holy_light",
+	"chaos_knight_chaos_strike",
 }

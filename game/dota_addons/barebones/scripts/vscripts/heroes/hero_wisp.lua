@@ -54,44 +54,30 @@ end
 function ChooseRandomHero(event)
 local hero = event.caster
 local id = hero:GetPlayerID()
-local difficulty = GameRules:GetCustomGameDifficulty()
 local random = RandomInt(1, #HEROLIST)
 local IsAvailableHero = Entities:FindByName(nil, "trigger_hero_"..random)
 
-	if IsAvailableHero then
-		UTIL_Remove(IsAvailableHero)
-		local particle = ParticleManager:CreateParticle("particles/econ/events/ti6/hero_levelup_ti6.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
-		ParticleManager:SetParticleControl(particle, 0, hero:GetAbsOrigin())
-		EmitSoundOnClient("ui.trophy_levelup", PlayerResource:GetPlayer(id))
-		hero:AddNewModifier(hero, nil, "modifier_command_restricted", {})
---		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
-		Notifications:Bottom(hero:GetPlayerOwnerID(), {hero="npc_dota_hero_"..HEROLIST[random], duration = 5.0})
-		Notifications:Bottom(hero:GetPlayerOwnerID(), {text="HERO: ", duration = 5.0, style={color="white"}, continue=true})
-		Notifications:Bottom(hero:GetPlayerOwnerID(), {text="#npc_dota_hero_"..HEROLIST[random], duration = 5.0, style={color="white"}, continue=true})
-
-		local newHero = PlayerResource:ReplaceHeroWith(id, "npc_dota_hero_"..HEROLIST[random], STARTING_GOLD * 2, 0)
-		if difficulty < 4 then
-			local item = newHero:AddItemByName("item_ankh_of_reincarnation")
-		end
-		local item = newHero:AddItemByName("item_health_potion")
-		local item = newHero:AddItemByName("item_mana_potion")
-		if difficulty == 1 then
-			local item = newHero:AddItemByName("item_lifesteal_mask")
-			item:SetSellable(false)
-		end
-		if newHero:GetTeamNumber() == 2 then
-			TeleportHero(newHero, 3.0, base_good:GetAbsOrigin())
-		elseif newHero:GetTeamNumber() == 3 then
-			TeleportHero(newHero, 3.0, base_bad:GetAbsOrigin())
-		end
-		Timers:CreateTimer(0.1, function()
-			if not hero:IsNull() then
-				UTIL_Remove(hero)
-			end
-		end)
-		return
-	elseif Entities:FindByName(nil, "trigger_hero_12") or Entities:FindByName(nil, "trigger_hero_19") or Entities:FindByName(nil, "trigger_hero_26") or Entities:FindByName(nil, "trigger_hero_27") then
+	if random == 12 or random == 27 then
 		print("This hero is either chosen or disabled! Re-rolls Random Hero")
 		ChooseRandomHero(event)
+		return
 	end
+
+	UTIL_Remove(IsAvailableHero)
+	local particle = ParticleManager:CreateParticle("particles/econ/events/ti6/hero_levelup_ti6.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
+	ParticleManager:SetParticleControl(particle, 0, hero:GetAbsOrigin())
+	EmitSoundOnClient("ui.trophy_levelup", PlayerResource:GetPlayer(id))
+	hero:AddNewModifier(hero, nil, "modifier_command_restricted", {})
+	Notifications:Bottom(hero:GetPlayerOwnerID(), {hero="npc_dota_hero_"..HEROLIST[random], duration = 5.0})
+	Notifications:Bottom(hero:GetPlayerOwnerID(), {text="HERO: ", duration = 5.0, style={color="white"}, continue=true})
+	Notifications:Bottom(hero:GetPlayerOwnerID(), {text="#npc_dota_hero_"..HEROLIST[random], duration = 5.0, style={color="white"}, continue=true})
+
+	local newHero = PlayerResource:ReplaceHeroWith(id, "npc_dota_hero_"..HEROLIST[random], STARTING_GOLD * 2, 0)
+	StartingItems(hero, newHero)
+
+	Timers:CreateTimer(0.1, function()
+		if not hero:IsNull() then
+			UTIL_Remove(hero)
+		end
+	end)
 end

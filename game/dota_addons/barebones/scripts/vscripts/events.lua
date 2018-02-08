@@ -54,7 +54,7 @@ local too_ez_gold = 0.9 -- The mod is way too ez, to modify gold very easily i j
 			end
 		end
 
-		if npc:GetTeamNumber() ~= 2 then
+		if npc:GetTeamNumber() ~= 2 or npc:GetUnitName() == "npc_dota_creature_muradin_bronzebeard" then
 			if npc:GetKeyValue("UseAI") == 1 or npc:GetKeyValue("UseAI") == 2 or npc:GetKeyValue("UseAI") == 3 then
 				npc:AddNewModifier(npc, nil, "modifier_ai", {})
 			end
@@ -188,6 +188,12 @@ local too_ez_gold = 0.9 -- The mod is way too ez, to modify gold very easily i j
 				npc:SetDeathXP(normal_xp*0.75*too_ez_gold)
 				npc:SetBaseDamageMin(normal_min_damage*1.5*too_ez)
 				npc:SetBaseDamageMax(normal_max_damage*1.5*too_ez)
+			elseif difficulty == 5 then
+				npc:SetMinimumGoldBounty(normal_bounty*0.75*too_ez_gold)
+				npc:SetMaximumGoldBounty(normal_bounty*0.75*too_ez_gold)
+				npc:SetDeathXP(normal_xp*0.60*too_ez_gold)
+				npc:SetBaseDamageMin(normal_min_damage*2.0*too_ez)
+				npc:SetBaseDamageMax(normal_max_damage*2.0*too_ez)
 			end
 
 			-- Cycle through any innate abilities found, then upgrade them
@@ -425,15 +431,15 @@ local AbilitiesHeroes_XX = {
 
 	if hero_level == 20 then
 		for i = 0, 17 do 
-		local ability = hero:GetAbilityByIndex(i)
-			if IsValidEntity(ability) then
-				if ability:GetLevel() < ability:GetMaxLevel() then
-					for j = 1, ability:GetMaxLevel() - ability:GetLevel() do
-					hero:UpgradeAbility(ability)
+			local ability = hero:GetAbilityByIndex(i)
+				if IsValidEntity(ability) then
+					if ability:GetLevel() < ability:GetMaxLevel() then
+						for j = 1, ability:GetMaxLevel() - ability:GetLevel() do
+						hero:UpgradeAbility(ability)
+						end
 					end
 				end
 			end
-		end
 
 		if hero:GetUnitName() == "npc_dota_hero_axe" or hero:GetUnitName() == "npc_dota_hero_medusa" or hero:GetUnitName() == "npc_dota_hero_storm_spirit" or hero:GetUnitName() == "npc_dota_hero_earth_spirit" or hero:GetUnitName() == "npc_dota_hero_ember_spirit" or hero:GetUnitName() == "npc_dota_hero_ursa" or hero:GetUnitName() == "npc_dota_hero_troll_warlord" or hero:GetUnitName() == "npc_dota_hero_mirana" or hero:GetUnitName() == "npc_dota_hero_lina" or hero:GetUnitName() == "npc_dota_hero_monkey_king" or hero:GetUnitName() == "npc_dota_hero_lone_druid" or hero:GetUnitName() == "npc_dota_hero_doom_bringer" or hero:GetUnitName() == "npc_dota_hero_leshrac" then
 			print("No Level 20 Ability")
@@ -684,7 +690,7 @@ local player = PlayerResource:GetPlayer(userID)
 		end
 
 		if str == "-info" then
-			local diff = {"Easy", "Normal", "Hard", "Extreme"}
+			local diff = {"Easy", "Normal", "Hard", "Extreme", "Divine"}
 			local lanes = {"Simple", "Double", "Full"}
 			Notifications:Bottom(player, {text="DIFFICULTY: "..diff[GameRules:GetCustomGameDifficulty()], duration=10.0})
 			Notifications:Bottom(player, {text="CREEP LANES: "..lanes[CREEP_LANES_TYPE], duration=10.0})
@@ -959,6 +965,8 @@ local lane = tonumber(cn)
 				EndMagtheridonArena()
 			elseif MAGTHERIDON > 3 and difficulty == 4 then
 				EndMagtheridonArena()
+			elseif MAGTHERIDON > 5 and difficulty == 5 then
+				EndMagtheridonArena()
 			end
 		end
 
@@ -966,7 +974,7 @@ local lane = tonumber(cn)
 		if hero:GetTeamNumber() == 2 then
 			if not gold_advertize then gold_advertize = 0 end
 			if hero:IsRealHero() then
-				if PlayerResource:GetGold(hero:GetPlayerID()) > 99900 and gold_advertize == 0 and SPECIAL_EVENT == 0 then
+				if PlayerResource:GetGold(hero:GetPlayerID()) > 99900 and gold_advertize == 0 and SPECIAL_EVENT ~= 1 then
 					SendErrorMessage(hero:GetPlayerID(), "#error_gold_full")
 					gold_advertize = 1
 					Timers:CreateTimer(5.0, function()

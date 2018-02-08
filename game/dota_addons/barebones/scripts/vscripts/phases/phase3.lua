@@ -51,6 +51,24 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 					CustomNetTables:SetTableValue("round_data", "bossHealth", {boss = "mag", hp = magtheridon:GetHealthPercent(), boss2 = "true" , hp2 = magtheridon2:GetHealthPercent()})
 				return 1.0
 				end)
+			elseif difficulty == 5 then
+				magtheridon = CreateUnitByName("npc_dota_hero_magtheridon", point_mag  ,true, nil, nil, DOTA_TEAM_CUSTOM_2)
+				magtheridon2 = CreateUnitByName("npc_dota_hero_magtheridon", point_mag2  ,true, nil, nil, DOTA_TEAM_CUSTOM_2)
+				magtheridon:SetAngles(0, 180, 0)
+				magtheridon2:SetAngles(0, 0, 0)
+				magtheridon:AddItem(ankh)
+				ankh:SetCurrentCharges(2)
+				magtheridon2:AddItem(ankh2)
+				ankh2:SetCurrentCharges(2)
+				magtheridon2:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 10, IsHidden = true})
+				magtheridon2:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 10, IsHidden = true})
+				magtheridon.zone = "xhs_holdout"
+				magtheridon2.zone = "xhs_holdout"
+
+				Timers:CreateTimer(0.0, function()
+					CustomNetTables:SetTableValue("round_data", "bossHealth", {boss = "mag", hp = magtheridon:GetHealthPercent(), boss2 = "true" , hp2 = magtheridon2:GetHealthPercent()})
+				return 1.0
+				end)
 			end
 
 			BossBar(magtheridon, "mag")
@@ -234,8 +252,6 @@ local activator = keys.activator
 end
 
 function StartBanehallowArena()
-local difficulty = GameRules:GetCustomGameDifficulty()
-
 	Timers:CreateTimer(8,function()
 	local banehallow = CreateUnitByName("npc_dota_hero_banehallow",Entities:FindByName(nil,"npc_dota_spawner_magtheridon_arena"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_CUSTOM_2)
 	banehallow:SetAngles(0, 270, 0)
@@ -358,28 +374,34 @@ function StartSecretArena(keys)
 local activator = keys.activator
 local point = Entities:FindByName(nil, "npc_dota_muradin_player_1")
 local difficulty = GameRules:GetCustomGameDifficulty()
+local check = false
 
-	if difficulty == 4 then
+	if difficulty >= 4 then
 		for itemSlot = 0, 5 do
 			local item = activator:GetItemInSlot(itemSlot)
 			print(item:GetName())
-			if item ~= nil and item:GetName() == "item_doom_artifact" then
+			if item and item:GetName() == "item_doom_artifact" then
 --				if not GameRules:IsCheatMode() then
-					local secret = CreateUnitByName("npc_dota_hero_secret", Entities:FindByName(nil, "roshan_wp_4"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
-					secret:SetAngles(0, 270, 0)
-					secret:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 10, IsHidden = true})
-					secret:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 9, IsHidden = true})
-
-					FindClearSpaceForUnit(activator, point:GetAbsOrigin(), true)
-					activator:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {Duration = 10, IsHidden = true})
-					activator:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 10, IsHidden = true})
-					activator:Stop()
-					PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(), activator)
-					Timers:CreateTimer(0.1, function()
-						PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(), nil)
-					end)
+					check = true
 --				end
 			end
 		end
+	end
+	
+	if check == true then
+		local secret = CreateUnitByName("npc_dota_hero_secret", Entities:FindByName(nil, "roshan_wp_4"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
+		secret:SetAngles(0, 270, 0)
+		secret:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 10, IsHidden = true})
+		secret:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 9, IsHidden = true})
+
+		hero.old_pos = hero:GetAbsOrigin()
+		FindClearSpaceForUnit(activator, point:GetAbsOrigin(), true)
+		activator:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {Duration = 10, IsHidden = true})
+		activator:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 10, IsHidden = true})
+		activator:Stop()
+		PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(), activator)
+		Timers:CreateTimer(0.1, function()
+			PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(), nil)
+		end)
 	end
 end

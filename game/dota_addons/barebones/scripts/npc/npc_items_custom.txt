@@ -3519,6 +3519,11 @@
 		"ItemInitialCharges"			"3"
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
 
+		"precache"
+		{
+			"particle"		"particles/units/heroes/hero_abaddon/abaddon_borrowed_time_heal.vpcf"
+		}
+		
 		"OnSpellStart"
 		{
 			"SpendCharge"		{}
@@ -3898,7 +3903,7 @@
 			"02"
 			{
 				"var_type"			"FIELD_FLOAT"
-				"damage_per_tick"	"75"
+				"damage_per_tick"	"60"
 			}
 			"03"
 			{
@@ -4298,33 +4303,6 @@
 			{
 				"var_type"					"FIELD_INTEGER"
 				"duration"					"45"
-			}
-		}
-
-		"Modifiers"
-		{
-			"modifier_rune_armor"
-			{
-				"Duration"				"%duration"
-				"TextureName"			"tower_armor_aura"
-				"IsHidden"				"0"
-				"IsBuff"				"1"
-				"IsPurgable"			"0"
-
-				"EffectName"			"particles/units/heroes/hero_dazzle/dazzle_armor_friend.vpcf"
-				"EffectAttachType"		"follow_overhead"
-
-				"AttachEffect"
-				{
-					"EffectName"		"particles/units/heroes/hero_dazzle/dazzle_armor_enemy_ring_sink.vpcf"
-					"EffectAttachType"	"follow_origin"
-					"Target"			"CASTER"
-				}
-
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS"	"%bonus_armor"
-				}
 			}
 		}
 	}
@@ -5428,59 +5406,6 @@
 			{
 				"var_type"			"FIELD_INTEGER"
 				"duration"			"45"
-			}
-		}
-
-		"Modifiers"
-		{
-			"modifier_rune_immolation"
-			{
-				"Duration"				"%duration"
-				"IsBuff"				"1"
-				"IsHidden"				"0"
-				"IsPurgable"			"0"
-				"ThinkInterval"			"%tick_time"
-				"TextureName"			"modifiers/cloak_of_flames"
-
-				"OnCreated"
-				{
-					"AttachEffect"
-					{
-						"Target"			"CASTER"
-						"EffectName"		"particles/units/heroes/hero_ember_spirit/ember_spirit_flameguard.vpcf"
-						"EffectAttachType"	"follow_origin"
-	
-						"ControlPoints"
-						{
-							"00"	"0 0 0"
-							"01"	"%radius 1 1"
-						}
-					}
-
-					"AttachEffect"
-					{
-						"EffectName"		"particles/units/heroes/hero_lone_druid/lone_druid_battle_cry_overhead_ember.vpcf"
-						"EffectAttachType"	"follow_overhead"
-						"Target"			"CASTER"
-					}
-				}
-
-				"OnIntervalThink"
-				{
-					"Damage"
-					{
-						"Type"			"DAMAGE_TYPE_MAGICAL"
-						"Damage"		"%damage_per_tick"
-						
-						"Target"
-						{
-							"Center"	"TARGET"
-							"Radius"	"%radius"
-							"Teams"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
-							"Types"		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
-						}
-					}
-				}
 			}
 		}
 	}

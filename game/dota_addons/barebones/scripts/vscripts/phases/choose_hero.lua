@@ -110,8 +110,8 @@ local id = hero:GetPlayerID()
 local difficulty = GameRules:GetCustomGameDifficulty()
 
 	if PlayerResource:IsValidPlayer(id) and hero:GetUnitName() == "npc_dota_hero_wisp" then
-		for i = 1, #HEROLIST do -- 12 = POTM, 19 = Paladin, 27 = Archimonde.
-			if caller:GetName() == "trigger_hero_12" or caller:GetName() == "trigger_hero_19" or caller:GetName() == "trigger_hero_27" then
+		for i = 1, #HEROLIST do -- 12 = POTM, 27 = Archimonde.
+			if caller:GetName() == "trigger_hero_12" or caller:GetName() == "trigger_hero_27" then
 				Notifications:Bottom(hero:GetPlayerOwnerID(), {text = "This hero is disabled! Please choose a hero with a blue circle!", duration = 6.0})
 				return
 			end
@@ -127,20 +127,8 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 				Notifications:Bottom(hero:GetPlayerOwnerID(), {text="#npc_dota_hero_"..HEROLIST[i], duration = 5.0, style={color="white"}, continue=true})
 				
 				local newHero = PlayerResource:ReplaceHeroWith(id, "npc_dota_hero_"..HEROLIST[i], STARTING_GOLD, 0)
-				if difficulty < 4 then
-					local item = newHero:AddItemByName("item_ankh_of_reincarnation")
-				end
-				local item = newHero:AddItemByName("item_health_potion")
-				local item = newHero:AddItemByName("item_mana_potion")
-				if difficulty == 1 then
-					local item = newHero:AddItemByName("item_lifesteal_mask")
-					item:SetSellable(false)
-				end
-				if newHero:GetTeamNumber() == 2 then
-					TeleportHero(newHero, 3.0, base_good:GetAbsOrigin())
-				elseif newHero:GetTeamNumber() == 3 then
-					TeleportHero(newHero, 3.0, base_bad:GetAbsOrigin())
-				end
+				StartingItems(hero, newHero)
+
 				Timers:CreateTimer(0.1, function()
 					if not hero:IsNull() then
 						UTIL_Remove(hero)
@@ -164,20 +152,8 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 				Notifications:Bottom(hero:GetPlayerOwnerID(), {text="#"..WeekHero, duration = 5.0, style={color="white"}, continue=true})
 				Timers:CreateTimer(3.1, function()
 					local newHero = PlayerResource:ReplaceHeroWith(id, WeekHero, STARTING_GOLD, 0)
-					if difficulty < 4 then
-						local item = newHero:AddItemByName("item_ankh_of_reincarnation")
-					end
-					local item = newHero:AddItemByName("item_health_potion")
-					local item = newHero:AddItemByName("item_mana_potion")
-					if difficulty == 1 then
-						local item = newHero:AddItemByName("item_lifesteal_mask")
-						item:SetSellable(false)
-					end
-					if newHero:GetTeamNumber() == 2 then
-						TeleportHero(newHero, 3.0, base_good:GetAbsOrigin())
-					elseif newHero:GetTeamNumber() == 3 then
-						TeleportHero(newHero, 3.0, base_bad:GetAbsOrigin())
-					end
+					StartingItems(hero, newHero)
+
 					Timers:CreateTimer(0.1, function()
 						if not hero:IsNull() then
 							UTIL_Remove(hero)
@@ -194,7 +170,6 @@ function ChooseHeroVIP(event)
 local hero = event.activator
 local caller = event.caller
 local id = hero:GetPlayerID()
-local difficulty = GameRules:GetCustomGameDifficulty()
 
 	if PlayerResource:IsValidPlayer(id) and hero:GetUnitName() == "npc_dota_hero_wisp" and hero:HasAbility("holdout_vip") then
 		for i = 1, #HEROLIST_VIP do
@@ -210,30 +185,45 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 				Notifications:Bottom(hero:GetPlayerOwnerID(), {text="#npc_dota_hero_"..HEROLIST_VIP[i], duration = 5.0, style={color="white"}, continue=true})
 				
 				local newHero = PlayerResource:ReplaceHeroWith(id, "npc_dota_hero_"..HEROLIST_VIP[i], STARTING_GOLD, 0)
-				if difficulty < 4 then
-					local item = newHero:AddItemByName("item_ankh_of_reincarnation")
-				end
-				local item = newHero:AddItemByName("item_health_potion")
-				local item = newHero:AddItemByName("item_mana_potion")
-				if difficulty == 1 then
-					local item = newHero:AddItemByName("item_lifesteal_mask")
-					item:SetSellable(false)
-				end
-				if newHero:GetTeamNumber() == 2 then
-					TeleportHero(newHero, 3.0, base_good:GetAbsOrigin())
-				elseif newHero:GetTeamNumber() == 3 then
-					TeleportHero(newHero, 3.0, base_bad:GetAbsOrigin())
-				end
-
-				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
-				Timers:CreateTimer(0.1, function()
-					if not hero:IsNull() then
-						UTIL_Remove(hero)
-					end
-				end)
+				StartingItems(hero, newHero)
 			end
 		end
 	elseif PlayerResource:IsValidPlayer(id) and hero:GetUnitName() == "npc_dota_hero_wisp" and not hero:HasAbility("holdout_vip") then
 		Notifications:Bottom(hero:GetPlayerOwnerID(), {text = "This hero is only for <font color='#FF0000'>VIP Members!</font> Please choose another hero.", duration = 5.0})
 	end
+end
+
+function StartingItems(hero, newHero)
+	local difficulty = GameRules:GetCustomGameDifficulty()
+	if difficulty ~= 5 then
+		if difficulty < 4 then
+			local item = newHero:AddItemByName("item_ankh_of_reincarnation")
+			item:SetSellable(false)
+		end
+
+		local item = newHero:AddItemByName("item_health_potion")
+		item:SetPurchaseTime(0)
+
+		local item = newHero:AddItemByName("item_mana_potion")
+		item:SetPurchaseTime(0)
+
+		if difficulty == 1 then
+			local item = newHero:AddItemByName("item_lifesteal_mask")
+			item:SetSellable(false)
+		end
+	end
+
+	if newHero:GetTeamNumber() == 2 then
+		TeleportHero(newHero, 3.0, base_good:GetAbsOrigin())
+	elseif newHero:GetTeamNumber() == 3 then
+		TeleportHero(newHero, 3.0, base_bad:GetAbsOrigin())
+	end
+
+	PlayerResource:SetCameraTarget(newHero:GetPlayerOwnerID(), nil)
+
+	Timers:CreateTimer(0.1, function()
+		if not hero:IsNull() then
+			UTIL_Remove(hero)
+		end
+	end)
 end

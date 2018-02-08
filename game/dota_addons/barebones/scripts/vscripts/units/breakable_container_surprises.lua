@@ -145,7 +145,7 @@ function GameMode:CreateBreakableContainerGoldDrop( hAttacker, hBreakableEnt )
 	--print( "GameMode:CreateBreakableContainerGoldDrop() - Drop a bag with " .. nGoldToDrop .. " gold.")
 	if nGoldToDrop > 0 then
 		local newItem = CreateItem( "item_bag_of_gold", nil, nil )
-		newItem:SetPurchaseTime( 0 )
+		newItem:SetPurchaseTime(0)
 		newItem:SetCurrentCharges( nGoldToDrop )
 		local drop = CreateItemOnPositionSync( hBreakableEnt:GetAbsOrigin(), newItem )
 

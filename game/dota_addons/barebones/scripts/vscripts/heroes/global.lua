@@ -222,18 +222,25 @@ local PauseTime = 10.0
 		Muradin:SetInitialGoalEntity(Waypoint)
 		Muradin:MoveToPositionAggressive(Waypoint:GetAbsOrigin())
 		Muradin:EmitSound("MountainKing.Avatar")
+
 		for _, hero in pairs(heroes) do
 			PlayerResource:SetCameraTarget(hero:GetPlayerID(), Muradin)
+			hero:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 10, IsHidden = true})
+			hero:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 10, IsHidden = true})
+
 			Timers:CreateTimer(5.0, function()
 				PlayerResource:SetCameraTarget(hero:GetPlayerID(), nil)
 			end)
 		end
+
 		PauseCreepsCastle()
 		caster:AddNewModifier(caster, nil, "modifier_invulnerable", {duration = InvTime + PauseTime})
 		Notifications:TopToAll({text = "Muradin is requested to defend your castle!", duration = PauseTime, continue = true})
+
 		Timers:CreateTimer(InvTime + PauseTime, function()
 			UTIL_Remove(Muradin)
 		end)
+
 		caster:RemoveAbility("castle_muradin_defend")
 	end
 end

@@ -3,11 +3,11 @@
 modifier_lifesteal = class({})
 
 function modifier_lifesteal:GetAbilityTextureName()
-	return "custom/lifesteal_mask"
+	return "modifiers/lifesteal_mask"
 end
 
 function modifier_lifesteal:GetTexture()
-	return "custom/lifesteal_mask"
+	return "modifiers/lifesteal_mask"
 end
 
 function modifier_lifesteal:OnCreated()
