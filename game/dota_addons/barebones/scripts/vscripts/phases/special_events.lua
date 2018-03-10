@@ -216,22 +216,6 @@ function EndFarmEvent()
 		rax:ForceKill(false)
 	end
 	Notifications:TopToAll({text="Phase 2 begins! (Destroyer Magnataur launched)", duration=10.0, style={color="red"}})
-
-	local DoorObs = Entities:FindAllByName("obstruction_phase2_1")
-	for _, obs in pairs(DoorObs) do 
-		obs:SetEnabled(false, true)
-	end
-	DoEntFire("door_phase2_left", "SetAnimation", "gate_entrance002_open", 0, nil, nil)
-	Phase2CreepsLeft()
-
-	if PlayerResource:GetPlayerCount() > 1 then
-		local DoorObs = Entities:FindAllByName("obstruction_phase2_2")
-		for _, obs in pairs(DoorObs) do 
-			obs:SetEnabled(false, true)
-		end
-		DoEntFire("door_phase2_right", "SetAnimation", "gate_entrance002_open", 0, nil, nil)
-		Phase2CreepsRight()
-	end
 end
 
 function RameroAndBaristolEvent(time) -- 500 kills

@@ -43,7 +43,7 @@ end
 
 function modifier_ai:OnIntervalThink()
 if not IsServer() then return end
-if self.parent:IsIllusion() then print("NO AI ON ILLUSION") return end
+if self.parent:IsIllusion() then return end
 
 	self.is_casting = false
 
@@ -99,6 +99,7 @@ if self.parent:IsIllusion() then print("NO AI ON ILLUSION") return end
 				cast_range = cast_range * 0.9 -- 90% of the range to allow projectiles hit the target. e.g: Mirana's Starfall
 				if target_team == 0 then target_team = 2 end -- TEAM_ENEMY
 				if target_type == 0 then target_type = 19 end -- DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC
+				local allies = FindUnitsInRadius(self.parent:GetTeamNumber(), self.parent:GetAbsOrigin(), nil, cast_range, self.parent:GetTeamNumber(), target_type, ability:GetAbilityTargetFlags(), FIND_ANY_ORDER, false)
 				local enemies = FindUnitsInRadius(self.parent:GetTeamNumber(), self.parent:GetAbsOrigin(), nil, cast_range, target_team, target_type, ability:GetAbilityTargetFlags(), FIND_ANY_ORDER, false)
 
 				-- Bug with jugg boss, no behavior after first cast
@@ -127,9 +128,16 @@ if self.parent:IsIllusion() then print("NO AI ON ILLUSION") return end
 					end
 				elseif tonumber(ability_behavior) == DOTA_ABILITY_BEHAVIOR_UNIT_TARGET then
 --					print("Cast On Target:", ability:GetAbilityName())
-					for _, hero in pairs(enemies) do
-						self.parent:CastAbilityOnTarget(hero, ability, -1)
-						return
+					if self.parent:GetTeam() == ability:GetAbilityTargetTeam() then
+						for _, hero in pairs(allies) do
+							self.parent:CastAbilityOnTarget(hero, ability, -1)
+							return
+						end
+					else
+						for _, hero in pairs(enemies) do
+							self.parent:CastAbilityOnTarget(hero, ability, -1)
+							return
+						end
 					end
 				end
 			end

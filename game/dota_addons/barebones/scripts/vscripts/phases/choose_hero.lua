@@ -1,5 +1,5 @@
 STARTING_GOLD = 2000
-WeekHero = "npc_dota_hero_skeleton_king"
+WeekHero = "npc_dota_hero_necrolyte"
 -- "npc_dota_hero_slardar"			-- Centurion
 -- "npc_dota_hero_skeleton_king"	-- Lich King
 -- "npc_dota_hero_meepo"			-- Kobold Knight

@@ -2896,7 +2896,7 @@
 			"03"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"bash_chance"			"10"
+				"bash_chance"			"17"
 			}
 		}
 

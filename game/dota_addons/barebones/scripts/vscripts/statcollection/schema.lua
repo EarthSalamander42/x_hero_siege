@@ -49,7 +49,7 @@ end
 -- Returns a table with our custom game tracking.
 function BuildGameArray()
 	local game = {}
-	local diff = {"Easy", "Normal", "Hard", "Extreme"}
+	local diff = {"Easy", "Normal", "Hard", "Extreme", "Divine"}
 	local lanes = {"Simple", "Double"}
 
 	-- Add game values here as game.someValue = GetSomeGameValue()

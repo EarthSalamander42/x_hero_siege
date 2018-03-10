@@ -336,7 +336,7 @@
 		"Model"							"models/heroes/arthas/arthas_prince/arthas_prince.vmdl"
 		"DisableWearables"				"1"
 		"MovementSpeed"					"350"
-		"ModelScale"					"0.84" //0.84
+		"ModelScale"					"0.78" //0.84
 		"AttackAnimationPoint"			"0.3" // 0.5
 
 		"AttackDamageMin"				"21"
@@ -1554,7 +1554,7 @@
 		"Ability1"						"holdout_entrangling_roots"
 		"Ability2"						"holdout_rejuvenation_alt"
 		"Ability3"						"holdout_mark_of_the_claw"
-		"Ability4"						"holdout_hardened_skin"
+		"Ability4"						"holdout_shield"
 		"Ability5"						"holdout_strength_of_the_wild"
 		"Ability6"						"holdout_bear_form"
 		"Ability7"						"holdout_bear_form_druid"

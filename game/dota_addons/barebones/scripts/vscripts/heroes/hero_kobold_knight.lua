@@ -66,7 +66,6 @@ local casterAngles = caster:GetAngles()
 
 	-- Spawn illusions
 	for i = 1, kobold_count do
-
 		local origin = casterOrigin + table.remove( vRandomSpawnPos, 1 )
 
 		-- handle_UnitOwner needs to be nil, else it will crash the game.
@@ -95,7 +94,7 @@ local casterAngles = caster:GetAngles()
 		double:SetDeathXP(0)
 		double:SetAbilityPoints(0)
 
-		double:SetHasInventory(false)
+		double:SetHasInventory(true)
 		double:SetCanSellItems(false)
 
 		Timers:CreateTimer(duration - 0.1, function()
@@ -108,7 +107,7 @@ local casterAngles = caster:GetAngles()
 		-- Learn the skills of the caster
 		for abilitySlot = 0, 15 do
 			local ability = caster:GetAbilityByIndex(abilitySlot)
-			if ability ~= nil then 
+			if ability then 
 				local abilityLevel = ability:GetLevel()
 				local abilityName = ability:GetAbilityName()
 				local doubleAbility = double:FindAbilityByName(abilityName)
@@ -128,9 +127,8 @@ local casterAngles = caster:GetAngles()
 		-- Recreate the items of the caster
 		for itemSlot = 0, 5 do
 			local item = caster:GetItemInSlot(itemSlot)
-			if item ~= nil and item:GetName() ~= "item_ankh_of_reincarnation" and item:GetName() ~= "item_shield_of_invincibility" and item:GetName() ~= "item_cloak_of_flames" and item:GetName() ~= "item_orb_of_fire" and item:GetName() ~= "item_orb_of_fire2" and item:GetName() ~= "item_searing_blade" then
-				local itemName = item:GetName()
-				local newItem = CreateItem(itemName, double, double)
+			if item and item:GetName() ~= "item_ankh_of_reincarnation" and item:GetName() ~= "item_shield_of_invincibility" and item:GetName() ~= "item_cloak_of_flames" and item:GetName() ~= "item_orb_of_fire" and item:GetName() ~= "item_orb_of_fire2" and item:GetName() ~= "item_searing_blade" then
+				local newItem = CreateItem(item:GetName(), double, double)
 				double:AddItem(newItem)
 			end
 		end

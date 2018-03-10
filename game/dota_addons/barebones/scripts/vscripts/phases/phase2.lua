@@ -34,6 +34,7 @@ end
 function Phase2CreepsRight()
 	local EntIceTower = Entities:FindByName(nil, "npc_tower_cold_2")
 	local point = Entities:FindByName(nil, "npc_dota_spawner_top_right_1"):GetAbsOrigin()
+	local difficulty = GameRules:GetCustomGameDifficulty()
 	local wave_count = 0
 
 	Timers:CreateTimer(0, function()
@@ -55,7 +56,6 @@ function Phase2CreepsRight()
 			end
 		return 30
 		elseif SPECIAL_EVENT == 1 then
-			print("Phase 2 creeps paused, special event!")
 			return 30
 		elseif EntIceTower:IsNull() then
 			return nil

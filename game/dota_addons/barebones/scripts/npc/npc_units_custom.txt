@@ -4581,7 +4581,7 @@
 
 		// Abilities
 		//----------------------------------------------------------------
-		"Ability1"					"holdout_spiked_carapace"		// Ability 1.
+		"Ability1"					"holdout_spiked_carapace_arthas"		// Ability 1.
 		"Ability2"					""		// Ability 2.
 		"Ability3"					""		// Ability 3.
 		"Ability4"					""		// Ability 4.
@@ -4928,7 +4928,7 @@
 		"MinimapIcon"				"minimap_roshancamp"
 		"MinimapIconSize"			"250"
 		"SoundSet"					"Hero_Ursa"
-		"ConsideredHero"			"1"
+		"ConsideredHero"			"0"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -5801,8 +5801,8 @@
 		"MagicalResistance"			"25"                 // Magical protection (percentage).
 
 		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
-		"AttackDamageMin"			"5900"                   // Damage range min.
-		"AttackDamageMax"			"6100"                   // Damage range max.
+		"AttackDamageMin"			"4900"                   // Damage range min.
+		"AttackDamageMax"			"5100"                   // Damage range max.
 		"AttackRate"                "0.30"                                  // Speed of attack.
 		"AttackAnimationPoint"      "0.6"                                   // Normalized time in animation cycle to attack.
 		"AttackAcquisitionRange"    "1000"                                   // Range within a target can be acquired.
@@ -5822,7 +5822,7 @@
 		"MovementSpeed"				"395"                 // Speed.
 		"MovementTurnRate"			"0.5"                 // Turning rate.
 
-		"StatusHealth"				"50000"                 // Base health.
+		"StatusHealth"				"40000"                 // Base health.
 		"StatusHealthRegen"			"20.0"                 // Health regeneration rate.
 		"StatusMana"				"5000"                   // Base mana.
 		"StatusManaRegen"			"100"                 // Mana regeneration rate.
@@ -6432,7 +6432,7 @@
 			{
 				"Cleave"
 				{
-					"Item"					"item_searing_blade"
+					"Item"					"item_bfury"
 				}
 			}
 
@@ -9924,7 +9924,7 @@
 
 		"Ability1"					"arthas_holy_light"
 		"Ability2"					"proudmoore_divine_shield" 
-		"Ability3"					"holdout_spiked_carapace"
+		"Ability3"					"holdout_spiked_carapace_arthas"
 		"Ability4"					"arthas_frostmourne"
 		"Ability5"					"arthas_light_roar"
 		"Ability6"					"necronomicon_warrior_sight"
@@ -9996,7 +9996,7 @@
 		"SoundSet"					"Hero_Enigma"							// Name of sound set.
 		"ConsideredHero"			"1"
 		"ModelScale"				"1.7"
-		"Level"						"777"
+		"Level"						"7777"
 		"HasInventory"				"0"
 		"LeavesCorpse"				"0"
 		"UseAI"						"2"
@@ -10004,7 +10004,7 @@
 		"Ability1"					"arthas_holy_light"
 		"Ability2"					"enigma_black_hole"
 		"Ability3"					"divine_aura"
-		"Ability4"					"holdout_spiked_carapace"
+		"Ability4"					"holdout_spiked_carapace_arthas"
 		"Ability5"					"arthas_frostmourne"
 		"Ability6"					"arthas_light_roar"
 		"Ability7"					"necronomicon_warrior_sight"
@@ -10049,9 +10049,9 @@
 		{
 			"EquippedItems"
 			{
-				"KeyOf3Moons"
+				"FrostOrb"
 				{
-					"Item"					"item_key_of_the_three_moons"
+					"Item"					"item_orb_of_frost"
 				}
 			}
 
@@ -10098,8 +10098,8 @@
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
-		"AttackDamageMin"			"89998"							// Damage range min.
-		"AttackDamageMax"			"90000"							// Damage range max.
+		"AttackDamageMin"			"99998"							// Damage range min.
+		"AttackDamageMax"			"100000"						// Damage range max.
 		"AttackRate"				"0.70"							// Speed of attack.
 		"AttackAnimationPoint"		"0.56"							// Normalized time in animation cycle to attack.
 		"AttackAcquisitionRange"	"1000"							// Range within a target can be acquired.
@@ -10158,6 +10158,10 @@
 				"Ring"
 				{
 					"Item"					"item_ring_of_superiority"
+				}
+				"MKB"
+				{
+					"Item"					"item_monkey_king_bar"
 				}
 			}
 
@@ -10255,8 +10259,8 @@
 		"MagicalResistance"			"50"                 // Magical protection (percentage).
 
 		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
-		"AttackDamageMin"			"34999"                   // Damage range min.
-		"AttackDamageMax"			"45001"                   // Damage range max.
+		"AttackDamageMin"			"44999"                   // Damage range min.
+		"AttackDamageMax"			"55001"                   // Damage range max.
 		"AttackRate"                "0.9"                                  // Speed of attack.
 		"AttackAnimationPoint"      "0.5"                                   // Normalized time in animation cycle to attack.
 		"AttackAcquisitionRange"    "900"                                   // Range within a target can be acquired.

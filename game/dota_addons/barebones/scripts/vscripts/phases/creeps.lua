@@ -138,8 +138,8 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 		for _, obs in pairs(DoorObs) do 
 			obs:SetEnabled(false, true)
 		end
-		DoEntFire("door_phase2_left", "SetAnimation", "gate_entrance002_open", 0, nil, nil)
-		DoEntFire("door_phase2_right", "SetAnimation", "gate_entrance002_open", 0, nil, nil)
+		DoEntFire("door_phase2_left", "SetAnimation", "gate_02_open", 0, nil, nil)
+		DoEntFire("door_phase2_right", "SetAnimation", "gate_02_open", 0, nil, nil)
 		Notifications:TopToAll({text = "Phase 2 creeps can now be triggered!", duration = 11.0})
 	end
 end

@@ -63,61 +63,33 @@ local too_ez_gold = 0.9 -- The mod is way too ez, to modify gold very easily i j
 		-- HERO NPC
 		if npc:IsRealHero() and npc:GetTeamNumber() == DOTA_TEAM_GOODGUYS then
 			if npc.bFirstSpawnComplete == nil then
+				print("Donator?", IsDonator(npc))
+
+				if IsDonator(npc) then
+					if not npc:HasAbility("holdout_vip") then
+						if IsDonator(npc) == 1 then
+							npc:SetCustomHealthLabel("Mod Creator", 200, 45, 45)
+						elseif IsDonator(npc) == 2 then
+							npc:SetCustomHealthLabel("Administrator", 55, 55, 200)
+						elseif IsDonator(npc) == 3 then
+							npc:SetCustomHealthLabel("[MNI Crew]!", 55, 55, 200)
+						elseif IsDonator(npc) == 4 then
+							npc:SetCustomHealthLabel("Ember VIP", 180, 0, 0)
+						elseif IsDonator(npc) == 5 then
+							npc:SetCustomHealthLabel("Golden VIP", 218, 165, 32)
+						elseif IsDonator(npc) == 6 then
+							npc:SetCustomHealthLabel("VIP", 45, 200, 45)
+						end
+
+						local vip_ability = npc:AddAbility("holdout_vip")
+						vip_ability:SetLevel(1)
+					end
+				end
+
 				for i = 1, #vip_members do
-					-- Cookies or X Hero Siege Official
-					if PlayerResource:GetSteamAccountID(npc:GetPlayerID()) == mod_creator[i] then
-						npc:SetCustomHealthLabel("Mod Creator", 200, 45, 45)
-						if not npc:HasAbility("holdout_vip") then
-							local vip_ability = npc:AddAbility("holdout_vip")
-							vip_ability:SetLevel(1)
-						end
-					end
-					-- Baumi or his crew
-					if PlayerResource:GetSteamAccountID(npc:GetPlayerID()) == captain_baumi[i] then
-						npc:SetCustomHealthLabel("[MNI Crew]!", 55, 55, 200)
-						if not npc:HasAbility("holdout_vip") then
-							local vip_ability = npc:AddAbility("holdout_vip")
-							vip_ability:SetLevel(1)
-						end
-					end
-					if PlayerResource:GetSteamAccountID(npc:GetPlayerID()) == mod_graphist[i] then
-						npc:SetCustomHealthLabel("Mod Graphist", 55, 55, 200)
-						if not npc:HasAbility("holdout_vip") then
-							local vip_ability = npc:AddAbility("holdout_vip")
-							vip_ability:SetLevel(1)
-						end
-					end
-					if PlayerResource:GetSteamAccountID(npc:GetPlayerID()) == administrator[i] then
-						npc:SetCustomHealthLabel("Administrator", 55, 55, 200)
-						if not npc:HasAbility("holdout_vip") then
-							local vip_ability = npc:AddAbility("holdout_vip")
-							vip_ability:SetLevel(1)
-						end
-					end
-					if PlayerResource:GetSteamAccountID(npc:GetPlayerID()) == moderator[i] then
-						npc:SetCustomHealthLabel("Moderator", 110, 110, 200)
-						if not npc:HasAbility("holdout_vip") then
-							local vip_ability = npc:AddAbility("holdout_vip")
-							vip_ability:SetLevel(1)
-						end
-					end
 					if PlayerResource:GetSteamAccountID(npc:GetPlayerID()) == vip_members[i] then
-						npc:SetCustomHealthLabel("VIP", 45, 200, 45)
 						if not npc:HasAbility("holdout_vip") then
-							local vip_ability = npc:AddAbility("holdout_vip")
-							vip_ability:SetLevel(1)
-						end
-					end
-					if PlayerResource:GetSteamAccountID(npc:GetPlayerID()) == golden_vip_members[i] then
-						npc:SetCustomHealthLabel("Golden VIP", 218, 165, 32)
-						if not npc:HasAbility("holdout_vip") then
-							local vip_ability = npc:AddAbility("holdout_vip")
-							vip_ability:SetLevel(1)
-						end
-					end
-					if PlayerResource:GetSteamAccountID(npc:GetPlayerID()) == ember_vip_members[i] then
-						npc:SetCustomHealthLabel("Ember VIP", 180, 0, 0)
-						if not npc:HasAbility("holdout_vip") then
+							npc:SetCustomHealthLabel("VIP", 45, 200, 45)
 							local vip_ability = npc:AddAbility("holdout_vip")
 							vip_ability:SetLevel(1)
 						end
@@ -594,77 +566,74 @@ local teamonly = keys.teamonly
 local userID = keys.playerid
 local text = keys.text
 local player = PlayerResource:GetPlayer(userID)
+local hero = PlayerResource:GetPlayer(userID):GetAssignedHero()
 
 	for str in string.gmatch(text, "%S+") do
-		for i = 1, #mod_creator do
-			if PlayerResource:GetSteamAccountID(player:GetPlayerID()) == mod_creator[i] or PlayerResource:GetSteamAccountID(player:GetPlayerID()) == administrator[i] or PlayerResource:GetSteamAccountID(player:GetPlayerID()) == moderator[i] then
-				for Frozen = 0, PlayerResource:GetPlayerCount() -1 do
-					local PlayerNames = {"Red", "Blue", "Cyan", "Purple", "Yellow", "Orange", "Green", "Pink"}
-					if PlayerResource:IsValidPlayer(Frozen) then
-						if str == "-freeze_"..Frozen +1 then
-							local hero = PlayerResource:GetPlayer(Frozen):GetAssignedHero()
-							hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {})
-							hero:AddNewModifier(nil, nil, "modifier_invulnerable", {})
-							PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
+		if IsDonator(hero) == 1 or IsDonator(hero) == 2 then
+			for Frozen = 0, PlayerResource:GetPlayerCount() -1 do
+				local PlayerNames = {"Red", "Blue", "Cyan", "Purple", "Yellow", "Orange", "Green", "Pink"}
+				if PlayerResource:IsValidPlayer(Frozen) then
+					if str == "-freeze_"..Frozen +1 then
+						local hero = PlayerResource:GetPlayer(Frozen):GetAssignedHero()
+						hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {})
+						hero:AddNewModifier(nil, nil, "modifier_invulnerable", {})
+						PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
+						Notifications:TopToAll({text="[ADMIN MOD]: ", duration=6.0, style={color="red", ["font-size"]="30px"}})
+						Notifications:TopToAll({text=PlayerNames[Frozen +1].." ", style={color=PlayerNames[Frozen +1], ["font-size"]="25px"}, continue=true})
+						Notifications:TopToAll({text="player has been jailed!", style={color="white", ["font-size"]="25px"}, continue=true})
+					end
+					if str == "-unfreeze_"..Frozen +1 then
+						local hero = PlayerResource:GetPlayer(Frozen):GetAssignedHero()
+						hero:RemoveModifierByName("modifier_animation_freeze_stun")
+						hero:RemoveModifierByName("modifier_boss_stun")
+						hero:RemoveModifierByName("modifier_invulnerable")
+						hero:RemoveModifierByName("modifier_command_restricted")
+						PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
+						Notifications:TopToAll({text="[ADMIN MOD]: ", duration=6.0, style={color="red", ["font-size"]="30px"}})
+						Notifications:TopToAll({text=PlayerNames[Frozen +1].." ", style={color=PlayerNames[Frozen +1], ["font-size"]="25px"}, continue=true})
+						Notifications:TopToAll({text="player has been released!", style={color="white", ["font-size"]="25px"}, continue=true})
+					end
+					if str == "-kill_"..Frozen +1 then
+						local hero = PlayerResource:GetPlayer(Frozen):GetAssignedHero()
+						if hero:IsAlive() then
+							hero:ForceKill(true)
 							Notifications:TopToAll({text="[ADMIN MOD]: ", duration=6.0, style={color="red", ["font-size"]="30px"}})
 							Notifications:TopToAll({text=PlayerNames[Frozen +1].." ", style={color=PlayerNames[Frozen +1], ["font-size"]="25px"}, continue=true})
-							Notifications:TopToAll({text="player has been jailed!", style={color="white", ["font-size"]="25px"}, continue=true})
-						end
-						if str == "-unfreeze_"..Frozen +1 then
-							local hero = PlayerResource:GetPlayer(Frozen):GetAssignedHero()
-							hero:RemoveModifierByName("modifier_animation_freeze_stun")
-							hero:RemoveModifierByName("modifier_boss_stun")
-							hero:RemoveModifierByName("modifier_invulnerable")
-							hero:RemoveModifierByName("modifier_command_restricted")
-							PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
-							Notifications:TopToAll({text="[ADMIN MOD]: ", duration=6.0, style={color="red", ["font-size"]="30px"}})
-							Notifications:TopToAll({text=PlayerNames[Frozen +1].." ", style={color=PlayerNames[Frozen +1], ["font-size"]="25px"}, continue=true})
-							Notifications:TopToAll({text="player has been released!", style={color="white", ["font-size"]="25px"}, continue=true})
-						end
-						if str == "-kill_"..Frozen +1 then
-							local hero = PlayerResource:GetPlayer(Frozen):GetAssignedHero()
-							if hero:IsAlive() then
-								hero:ForceKill(true)
-								Notifications:TopToAll({text="[ADMIN MOD]: ", duration=6.0, style={color="red", ["font-size"]="30px"}})
-								Notifications:TopToAll({text=PlayerNames[Frozen +1].." ", style={color=PlayerNames[Frozen +1], ["font-size"]="25px"}, continue=true})
-								Notifications:TopToAll({text="player has been slayed!", style={color="white", ["font-size"]="25px"}, continue=true})
-							end
-						end
-						if str == "-revive_"..Frozen +1 then
-							local hero = PlayerResource:GetPlayer(Frozen):GetAssignedHero()
-							hero:RespawnHero(false, false)
-							Notifications:TopToAll({text="[ADMIN MOD]: ", duration=6.0, style={color="red", ["font-size"]="30px"}})
-							Notifications:TopToAll({text=PlayerNames[Frozen +1].." ", style={color=PlayerNames[Frozen +1], ["font-size"]="25px"}, continue=true})
-							Notifications:TopToAll({text="player has been revived!", style={color="white", ["font-size"]="25px"}, continue=true})
-						end
-						if str == "-yolo_"..Frozen +1 then
-							local hero = PlayerResource:GetPlayer(Frozen):GetAssignedHero()
-							hero:SetMoveCapability(DOTA_UNIT_CAP_MOVE_FLY)
-							StartAnimation(hero, {duration = 9999.0, activity = ACT_DOTA_FLAIL, rate = 0.9})
-							yolo = ParticleManager:CreateParticle("particles/units/heroes/hero_batrider/batrider_firefly_ember.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
-							ParticleManager:SetParticleControl(yolo, 0, hero:GetAbsOrigin() + Vector(0, 0, 100))
-							yolo2 = ParticleManager:CreateParticle("particles/units/heroes/hero_ember_spirit/ember_spirit_flameguard.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
-							hero:EmitSound("Hero_Batrider.Firefly.Cast")
-							hero:EmitSound("Hero_Batrider.Firefly.Loop")
-							Notifications:TopToAll({text="[ADMIN MOD]: ", duration=6.0, style={color="red", ["font-size"]="30px"}})
-							Notifications:TopToAll({text=PlayerNames[Frozen +1].." ", style={color=PlayerNames[Frozen +1], ["font-size"]="25px"}, continue=true})
-							Notifications:TopToAll({text="player is in YOLO state!", style={color="white", ["font-size"]="25px"}, continue=true})
-						end
-						if str == "-unyolo_"..Frozen +1 then
-							local hero = PlayerResource:GetPlayer(Frozen):GetAssignedHero()
-							hero:SetMoveCapability(DOTA_UNIT_CAP_MOVE_GROUND)
-							EndAnimation(hero)
-							hero:StopSound("Hero_Batrider.Firefly.Loop")
-							ParticleManager:DestroyParticle(yolo, true)
-							ParticleManager:DestroyParticle(yolo2, true)
-							Notifications:TopToAll({text="[ADMIN MOD]: ", duration=6.0, style={color="red", ["font-size"]="30px"}})
-							Notifications:TopToAll({text=PlayerNames[Frozen +1].." ", style={color=PlayerNames[Frozen +1], ["font-size"]="25px"}, continue=true})
-							Notifications:TopToAll({text="player is not in YOLO state anymore.", style={color="white", ["font-size"]="25px"}, continue=true})
+							Notifications:TopToAll({text="player has been slayed!", style={color="white", ["font-size"]="25px"}, continue=true})
 						end
 					end
+					if str == "-revive_"..Frozen +1 then
+						local hero = PlayerResource:GetPlayer(Frozen):GetAssignedHero()
+						hero:RespawnHero(false, false)
+						Notifications:TopToAll({text="[ADMIN MOD]: ", duration=6.0, style={color="red", ["font-size"]="30px"}})
+						Notifications:TopToAll({text=PlayerNames[Frozen +1].." ", style={color=PlayerNames[Frozen +1], ["font-size"]="25px"}, continue=true})
+						Notifications:TopToAll({text="player has been revived!", style={color="white", ["font-size"]="25px"}, continue=true})
+					end
+					if str == "-yolo_"..Frozen +1 then
+						local hero = PlayerResource:GetPlayer(Frozen):GetAssignedHero()
+						hero:SetMoveCapability(DOTA_UNIT_CAP_MOVE_FLY)
+						StartAnimation(hero, {duration = 9999.0, activity = ACT_DOTA_FLAIL, rate = 0.9})
+						yolo = ParticleManager:CreateParticle("particles/units/heroes/hero_batrider/batrider_firefly_ember.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
+						ParticleManager:SetParticleControl(yolo, 0, hero:GetAbsOrigin() + Vector(0, 0, 100))
+						yolo2 = ParticleManager:CreateParticle("particles/units/heroes/hero_ember_spirit/ember_spirit_flameguard.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
+						hero:EmitSound("Hero_Batrider.Firefly.Cast")
+						hero:EmitSound("Hero_Batrider.Firefly.Loop")
+						Notifications:TopToAll({text="[ADMIN MOD]: ", duration=6.0, style={color="red", ["font-size"]="30px"}})
+						Notifications:TopToAll({text=PlayerNames[Frozen +1].." ", style={color=PlayerNames[Frozen +1], ["font-size"]="25px"}, continue=true})
+						Notifications:TopToAll({text="player is in YOLO state!", style={color="white", ["font-size"]="25px"}, continue=true})
+					end
+					if str == "-unyolo_"..Frozen +1 then
+						local hero = PlayerResource:GetPlayer(Frozen):GetAssignedHero()
+						hero:SetMoveCapability(DOTA_UNIT_CAP_MOVE_GROUND)
+						EndAnimation(hero)
+						hero:StopSound("Hero_Batrider.Firefly.Loop")
+						ParticleManager:DestroyParticle(yolo, true)
+						ParticleManager:DestroyParticle(yolo2, true)
+						Notifications:TopToAll({text="[ADMIN MOD]: ", duration=6.0, style={color="red", ["font-size"]="30px"}})
+						Notifications:TopToAll({text=PlayerNames[Frozen +1].." ", style={color=PlayerNames[Frozen +1], ["font-size"]="25px"}, continue=true})
+						Notifications:TopToAll({text="player is not in YOLO state anymore.", style={color="white", ["font-size"]="25px"}, continue=true})
+					end
 				end
---			else
---				Notifications:Bottom(player:GetPlayerID(), {text="You are not allowed to use this command!", duration=6.0, style={color="white"}})
 			end
 		end
 
@@ -898,7 +867,7 @@ local lane = tonumber(cn)
 		end
 
 		--Drop Tombstone to be revived if dead after Castle Defense
-		if PHASE_3 == 1 then
+		if PHASE == 3 then
 			if killedUnit.ankh_respawn == true then
 			else
 				local newItem = CreateItem("item_tombstone", killedUnit, killedUnit)
@@ -967,6 +936,29 @@ local lane = tonumber(cn)
 				EndMagtheridonArena()
 			elseif MAGTHERIDON > 5 and difficulty == 5 then
 				EndMagtheridonArena()
+			end
+		end
+
+		if killedUnit:GetUnitName() == "npc_magnataur_destroyer_crypt" then
+			DESTROYER_MAGNATAUR = DESTROYER_MAGNATAUR -1
+			if PHASE == 2 and DESTROYER_MAGNATAUR == 0 then
+				local DoorObs = Entities:FindAllByName("obstruction_phase2_1")
+				for _, obs in pairs(DoorObs) do 
+					obs:SetEnabled(false, true)
+				end
+				DoEntFire("door_phase2_left", "SetAnimation", "gate_02_open", 0, nil, nil)
+				Phase2CreepsLeft()
+
+				if PlayerResource:GetPlayerCount() > 1 then
+					local DoorObs = Entities:FindAllByName("obstruction_phase2_2")
+					for _, obs in pairs(DoorObs) do 
+						obs:SetEnabled(false, true)
+					end
+					DoEntFire("door_phase2_right", "SetAnimation", "gate_02_open", 0, nil, nil)
+					Phase2CreepsRight()
+				end
+
+				Notifications:TopToAll({text="Destroyer Magnataurs killed! Phase 2 incoming...", style={color="white"}, duration=5.0})
 			end
 		end
 
@@ -1130,7 +1122,7 @@ local lane = tonumber(cn)
 					Notifications:TopToAll({text="WARNING! Final Wave incoming. Arriving in 60 seconds! Back to the Castle!" , duration=10.0})
 					nTimer_SpecialEvent = 61
 					nTimer_IncomingWave = 1
-					PHASE_3 = 1
+					PHASE = 3
 					KillCreeps(DOTA_TEAM_CUSTOM_1)
 					Timers:CreateTimer(59, RefreshPlayers)
 					Timers:CreateTimer(60, FinalWave)
@@ -1140,6 +1132,8 @@ local lane = tonumber(cn)
 		elseif killedUnit:IsBarracks() then
 			for j = 1, difficulty do
 				local unit = CreateUnitByName("npc_magnataur_destroyer_crypt", killedUnit:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+				DESTROYER_MAGNATAUR = DESTROYER_MAGNATAUR +1
+				print("Magnataurs:", DESTROYER_MAGNATAUR)
 			end
 
 			for c = 1, 8 do
@@ -1148,6 +1142,8 @@ local lane = tonumber(cn)
 					CREEP_LANES[c][3] = 0
 				end
 			end
+
+			PHASE = 2
 		return
 		end
 	return

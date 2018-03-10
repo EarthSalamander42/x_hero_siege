@@ -536,7 +536,7 @@ local DoorObs = Entities:FindAllByName("obstruction_lane"..PlayerID)
 local towers = Entities:FindAllByName("dota_badguys_tower"..PlayerID)
 local raxes = Entities:FindAllByName("dota_badguys_barracks_"..PlayerID)
 
-	if PHASE_3 == 0 then
+	if PHASE ~= 3 then
 		if CREEP_LANES_TYPE == 1 then
 			for _, obs in pairs(DoorObs) do
 			obs:SetEnabled(false, true)
@@ -563,7 +563,7 @@ local DoorObs = Entities:FindAllByName("obstruction_lane"..Lane)
 local towers = Entities:FindAllByName("dota_badguys_tower"..Lane)
 local raxes = Entities:FindAllByName("dota_badguys_barracks_"..Lane)
 
-	if PHASE_3 == 0 and CREEP_LANES_TYPE == 1 then
+	if PHASE ~= 3 and CREEP_LANES_TYPE == 1 then
 		for _, obs in pairs(DoorObs) do
 			obs:SetEnabled(true, false)
 		end
@@ -576,9 +576,9 @@ local raxes = Entities:FindAllByName("dota_badguys_barracks_"..Lane)
 		CREEP_LANES[Lane][1] = 0
 		DoEntFire("door_lane"..Lane, "SetAnimation", "gate_02_close", 0, nil, nil)
 		print("Lane: "..Lane)
-	elseif PHASE_3 == 0 and CREEP_LANES_TYPE == 2 then
+	elseif PHASE ~= 3 and CREEP_LANES_TYPE == 2 then
 		
-	elseif CREEP_LANES_TYPE == 3 or PHASE_3 == 1 then
+	elseif CREEP_LANES_TYPE == 3 or PHASE == 3 then
 		return
 	end
 end

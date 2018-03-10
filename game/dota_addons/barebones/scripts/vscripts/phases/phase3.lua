@@ -12,7 +12,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 
 	GameRules:SetHeroRespawnEnabled(false)
 	RefreshPlayers()
-	PHASE_3 = 1
+	PHASE = 3
 
 	Timers:CreateTimer(0.5, function()
 		if first_time_teleport then
@@ -105,7 +105,7 @@ function EndMagtheridonArena()
 	Entities:FindByName(nil, "trigger_teleport_phase3_creeps"):Enable()
 	CustomGameEventManager:Send_ServerToAllClients("hide_ui", {})
 	Notifications:TopToAll({text="Magtheridon has been killed! Door opened.", style={color="white"}, duration=10.0})
-	DoEntFire("door_magtheridon", "SetAnimation", "gate_entrance002_open", 0, nil, nil)
+	DoEntFire("door_magtheridon", "SetAnimation", "gate_02_open", 0, nil, nil)
 	local DoorObs = Entities:FindAllByName("obstruction_magtheridon")
 	for _, obs in pairs(DoorObs) do
 		obs:SetEnabled(false, true)
@@ -190,8 +190,8 @@ RefreshPlayers()
 				for _, obs in pairs(DoorObs) do
 					obs:SetEnabled(false, true)
 				end
-				DoEntFire("door_grom", "SetAnimation", "gate_entrance002_open", 0, nil, nil)
-				DoEntFire("door_grom2", "SetAnimation", "gate_entrance002_open", 0, nil, nil)
+				DoEntFire("door_grom", "SetAnimation", "gate_02_open", 0, nil, nil)
+				DoEntFire("door_grom2", "SetAnimation", "gate_02_open", 0, nil, nil)
 			end)
 		end
 	end)
@@ -212,7 +212,7 @@ end
 function StartArthasArena(keys)
 local activator = keys.activator
 	if first_time_teleport_arthas_real then
-		DoEntFire("door_magtheridon", "SetAnimation", "gate_entrance002_idle", 0, nil, nil)
+		DoEntFire("door_magtheridon", "SetAnimation", "gate_02_close", 0, nil, nil)
 		local DoorObs = Entities:FindAllByName("obstruction_magtheridon")
 		for _, obs in pairs(DoorObs) do
 			obs:SetEnabled(true, false)
@@ -379,7 +379,6 @@ local check = false
 	if difficulty >= 4 then
 		for itemSlot = 0, 5 do
 			local item = activator:GetItemInSlot(itemSlot)
-			print(item:GetName())
 			if item and item:GetName() == "item_doom_artifact" then
 --				if not GameRules:IsCheatMode() then
 					check = true
@@ -389,12 +388,12 @@ local check = false
 	end
 	
 	if check == true then
-		local secret = CreateUnitByName("npc_dota_hero_secret", Entities:FindByName(nil, "roshan_wp_4"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
+		local secret = CreateUnitByName("npc_dota_hero_secret", Entities:FindByName(nil, "npc_dota_muradin_boss"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 		secret:SetAngles(0, 270, 0)
 		secret:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 10, IsHidden = true})
 		secret:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 9, IsHidden = true})
 
-		hero.old_pos = hero:GetAbsOrigin()
+		activator.old_pos = activator:GetAbsOrigin()
 		FindClearSpaceForUnit(activator, point:GetAbsOrigin(), true)
 		activator:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {Duration = 10, IsHidden = true})
 		activator:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 10, IsHidden = true})
@@ -403,5 +402,7 @@ local check = false
 		Timers:CreateTimer(0.1, function()
 			PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(), nil)
 		end)
+		
+		Entities:FindByName(nil, "trigger_teleport_secret"):RemoveSelf()
 	end
 end

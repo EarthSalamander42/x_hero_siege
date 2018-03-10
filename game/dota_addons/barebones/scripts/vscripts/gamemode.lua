@@ -26,6 +26,7 @@ require('units/treasure_chest_surprises')
 require('triggers')
 require('items/global')
 require('server')
+require('api/api')
 
 function GameMode:OnFirstPlayerLoaded()
 	base_good = Entities:FindByName(nil, "base_spawn_goodguys")
@@ -310,6 +311,10 @@ end
 function GameMode:OnGameRulesStateChange(keys)
 local newState = GameRules:State_Get()
 
+	if newState == DOTA_GAMERULES_STATE_CUSTOM_GAME_SETUP then
+		ApiLoad()
+	end
+
 	if newState == DOTA_GAMERULES_STATE_HERO_SELECTION then
 		GameRules:SetCustomGameDifficulty(2)
 		local mode  = GameMode
@@ -436,7 +441,7 @@ local newState = GameRules:State_Get()
 
 		-- Timer: Creep Levels 1 to 4. Lanes 1 to 8.
 		Timers:CreateTimer(0, function()
-			if PHASE_3 == 1 then
+			if PHASE == 3 then
 				print("Creeps Timer killed, Phase 3.")
 				return nil
 			elseif SPECIAL_EVENT == 0 then
@@ -498,7 +503,7 @@ local Region = {
 			CountdownTimerAllHeroImage()
 		end
 
-		if PHASE_3 == 0 then
+		if PHASE ~= 3 then
 			if nTimer_GameTime == 359 then -- 6 Min
 				NumPlayers = 1, PlayerResource:GetPlayerCount() * CREEP_LANES_TYPE
 				SpawnDragons("npc_dota_creature_red_dragon")

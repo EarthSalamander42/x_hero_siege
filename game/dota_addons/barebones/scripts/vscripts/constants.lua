@@ -45,7 +45,7 @@ _G.ZONE_STAR_CRITERIA_KILLS				= 2
 _G.ZONE_STAR_CRITERIA_QUEST_COMPLETE	= 3
 
 -- X Hero Siege
-_G.X_HERO_SIEGE_V = 3.46
+_G.X_HERO_SIEGE_V = 3.47
 _G.PREGAMETIME = 125
 _G.nTimer_GameTime = 0
 _G.nTimer_SpecialEvent = 0
@@ -69,9 +69,10 @@ _G.ring_first_time = true
 _G.doom_first_time = false
 _G.frost_first_time = false
 _G.SECRET = 0
-_G.PHASE_3 = 0
+_G.PHASE = 1
 _G.RESPAWN_TIME = 40.0
 _G.CREEP_LANES_TYPE = 1
+_G.DESTROYER_MAGNATAUR = 0
 if GetMapName() == "x_hero_siege_4" then
 	_G.CREEP_LANES_TYPE = 2
 end
@@ -204,112 +205,10 @@ PHASE_2_UPGRADE["damage"] =	{25, 50, 75, 100, 125}
 PHASE_2_UPGRADE["health"] =	{200, 400, 600, 800, 1000}
 PHASE_2_UPGRADE["armor"] =	{5, 10, 15, 20, 25}
 
-_G.mod_creator = {
-	54896080,	-- Cookies
-	295458357,	-- X Hero Siege
-}
-
-_G.captain_baumi = {
-	43305444,	-- Baumi(Because why not?)
-	44022861,	-- Padaa
-}
-
-_G.mod_graphist = {
-	61711140,	-- Mugiwara
-	231117589,	-- Xero
-}
-
-_G.administrator = {
-	101989646,	-- PraaNavi
-}
-
-_G.moderator = {
-	84332517,	-- Pentagon Solek [morris_91 on Discord]
-	117795386,	-- Xtinian
-}
-
-_G.ember_vip_members = {
-	114707349,	-- I AM BACK
-	122360298,	-- hu_5ky
-	89768567,
-	72224874,	-- R3V4MP3D [Danial Tan on Patreon]
-	489514611,	-- R3V4MP3D secondary account for streaming
-	134153339,	-- jakehead20 [Some Random Dude on Patreon]
-	372255713,	-- Mikheil Evangelista [Pmoigki on Discord]
-	75585119,	-- fearxsoul [Lance Patterson on Patreon]
-}
-
-_G.golden_vip_members = {
-	69533529,	-- West
-	51728279,	-- mC
-	206464009,	-- beast
-	86718505,	-- Noya
-	62993541,	-- KennyCrazy
-	117327434,	-- Eren
-	146805680,	-- [UTAC] Rekail [Gatiipz Gatiipz on Patreon]
-	33042578,	-- ryusajin
-	110786327,	-- MechJesus [Mauro Solares on Patreon]
-	93860661,	-- Meteor [Supawit Enyord on Patreon]
-	136258650,	-- Meliodas [Dinh Quang on Patreon]
-	55770641,	-- Primeape [Filip Dingum on Patreon]
-	33529791,	-- Reo Speedwagon [Punito on Discord]
-	74297042,	-- отец молдун [Pascale on Discord]
-	46875732,	-- Firetoad
-	42452574,	-- FrenchDeath
-	59765927,	-- Champi
-	28496872,	-- Ou Sen
-	134026389,	-- Hypérion
-	80192910,	-- Cheshire [Nathan Perscott on Patreon]
-	89498388,	-- Sly
-	111692244,	-- [Iris Von Everec on Steam]
-	97490223,	-- IllidanStormrage [Lucas Diao on Patreon]
-	34067920,	-- Shush
-	290718556,	-- Souka Blett [souris]
-	175063550,	-- Zambla [Cousin souris]
-	23993414,	-- Séra Antares
-	284268524,	-- Minibizz
-	157908033,	-- memo [paid by Mikheil Evangelista]
-}
-
 _G.vip_members = {
-	320774890,	-- Error [Han Gao on Patreon]
-	44364795,	-- Lyzer93 [Balraj McCoy on Patreon]
-	46744186,	-- Captain Darian Frey [CaptainDarianFrey on Patreon]
-	54935523,	-- The Patriarchy [Kevin Moore on Patreon]
-	3180772,	-- Yoshi [Fabian Rothmund on Patreon]
-	61166985,	-- SpaceGauges [Nicholas Karlberg on Patreon]
-	100304532,	-- DoniLouMel [Kyle Leong on Patreon]
-	587665,		-- Yatzy [Yatzy on Patreon]
-	123433896,	-- Nikolai on Patreon, April Paid
-	142465613,	-- Four [Darell Tian on Patreon]
-	325760680,	-- I-Am-? [nieva06 on Discord]
-	130393455,	-- Achi Cirno, April Paid
-	177329557,	-- Pupuniko [spax28 on Patreon]
-	80662298,	-- The Dimenator [Michael Cloutier on Patreon]
-	87395017,	-- Fuzzy [Farzad Havaldar on Patreon]
-	432606463,	-- Thich An Cu [Harold Tang on Patreon]
-	53939628,	-- Bloodsplatr [taylor justus on Patreon]
-	52986304,	-- RawkitLawnChair [CDarps on Patreon]
-	5671643,	-- `btk [Aureo Neto on Patreon]
-	92290724,	-- www.dick.com.kw	[Abdullah Al Zaben on Patreon]
-	110475852,	-- gg [Geo Gaal on Patreon]
-	78677276,	-- Subject Zero [Yaroslav Kochevatkin on Patreon]
-	99567666,	-- Evgeny [Евгений Тумашов on Patreon]
-	87489501,	-- [Mccra on Patreon]
-	376882827,	-- Zero [Alvazar on Discord]
-	150116475,	-- 桔纸发货员 [OraNge on Discord]
-	18458957,	-- RufioGuy [RufioGuy on Discord]
-	53100383,	-- Ken [aznken on Discord]
-	26464251,	-- vk [Victor Kannebley Bittencourt on Patreon]
-	317042892,	-- mabuhaymgakalbo [Paul Santos on Patreon]
-	76137142,	-- l0N3IY [JasonDire on Patreon]
-	220816145,	-- Lies [lovelove on Discord]
-	173960754,	-- knic [Tep Haban on Patreon]
-	106797937,	-- Mithat [Mithat Acargür on Patreon]
-	72492060,	-- woochitelj [Goran Vučić on Patreon]
-	45102618,	-- Plyouha [Gosha on Discord]
-	37651406,	-- FearSC [FaceIT FearSC on Discord]
-	110650700,	-- BESTOCE [EmberCookies on Discord]
+	4173154700,
+	2086577350
+
 }
 
 _G.banned_players = {
