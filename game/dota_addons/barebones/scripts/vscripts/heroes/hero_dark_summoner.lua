@@ -124,10 +124,11 @@ local units_resurrected = 0
 			unit:SetControllableByPlayer(playerID, true)
 			unit:SetOwner(hero)
 			unit:SetForwardVector(corpse:GetForwardVector())
-			FindClearSpaceForUnit(corpse, corpse:GetAbsOrigin(),true)
+			FindClearSpaceForUnit(corpse, corpse:GetAbsOrigin(), true)
 
 			-- Apply modifiers for the summon properties
 			unit:AddNewModifier(caster, ability, "modifier_kill", {duration = duration})
+			unit:AddNewModifier(unit, nil, "modifier_phased", {duration = 1.0})
 
 			-- Remove non-passive abilities
 			for i = 0, 15 do

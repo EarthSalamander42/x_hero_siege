@@ -8,5 +8,7 @@
 		"player_zone_locations",
 		"zone_names",
 		"game_options",
+		"gold",
+		"game_state",
 	]
 }

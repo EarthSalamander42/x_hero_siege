@@ -7,6 +7,11 @@ function Precache(context)
 	-- Lua Modifiers
 	LinkLuaModifier("modifier_rune_armor", "modifiers/runes/modifier_rune_armor.lua", LUA_MODIFIER_MOTION_NONE)
 	LinkLuaModifier("modifier_rune_immolation", "modifiers/runes/modifier_rune_immolation.lua", LUA_MODIFIER_MOTION_NONE)
+	LinkLuaModifier("modifier_provides_fow_position", "modifiers/modifier_provides_fow_position", LUA_MODIFIER_MOTION_NONE)
+	LinkLuaModifier("modifier_npc_dialog", "modifiers/modifier_npc_dialog", LUA_MODIFIER_MOTION_NONE)
+	LinkLuaModifier("modifier_npc_dialog_notify", "modifiers/modifier_npc_dialog_notify", LUA_MODIFIER_MOTION_NONE)
+	LinkLuaModifier("modifier_stack_count_animation_controller", "modifiers/modifier_stack_count_animation_controller", LUA_MODIFIER_MOTION_NONE)
+	LinkLuaModifier("modifier_disable_aggro", "modifiers/modifier_disable_aggro", LUA_MODIFIER_MOTION_NONE)
 
 	-- Not used currently
 --	PrecacheResource("particle", "particles/units/heroes/hero_dazzle/dazzle_armor_enemy_ring_sink.vpcf", context) -- Armor Rune Effect (not used)
@@ -18,6 +23,10 @@ function Precache(context)
 --	PrecacheResource("particle_folder", "particles/items2_fx", context)
 --	PrecacheResource("particle", "particles/units/heroes/hero_earth_spirit/espirit_geomagentic_target_sphere.vpcf", context)
 --	PrecacheResource("particle", "particles/units/heroes/hero_ember_spirit/ember_spirit_flameguard.vpcf", context) -- Immolation
+	PrecacheResource("particle", "particles/items2_fx/teleport_start.vpcf", context) -- Immolation
+	PrecacheResource("particle", "particles/items2_fx/teleport_end.vpcf", context) -- Immolation
+	PrecacheResource("particle", "particles/econ/events/fall_major_2016/teleport_start_fm06_lvl3.vpcf", context) -- Immolation
+	PrecacheResource("particle", "particles/econ/events/fall_major_2016/teleport_end_fm06_lvl3.vpcf", context) -- Immolation
 	PrecacheResource("particle_folder", "particles/custom", context)
 	PrecacheResource("particle_folder", "particles/custom/items/orb", context)
 	PrecacheResource("particle_folder", "models/items/lone_druid/true_form/form_of_the_atniw", context)
@@ -47,6 +56,7 @@ function Precache(context)
 	PrecacheResource("model_folder", "models/items/chaos_knight/ck_esp_shoulder", context)
 	PrecacheResource("model_folder", "particles/units/heroes/hero_nyx_assassin", context)
 	PrecacheResource("model_folder", "models/items/furion/treant/the_ancient_guardian_the_ancient_treants", context)
+	PrecacheResource("model_folder", "particles/econ/events/fall_major_2015", context)
 
 	-- PRECACHE HEROES (Particle effects for custom abilities)
 	PrecacheUnitByNameAsync("npc_dota_hero_antimage", context)
@@ -89,6 +99,11 @@ function Precache(context)
 
 	PrecacheUnitByNameSync( "npc_spirit_beast_bis", context)
 	PrecacheUnitByNameSync( "npc_frost_infernal_bis", context)
+
+	PrecacheUnitByNameAsync("npc_dota_hero_grom_hellscream", context)
+	PrecacheUnitByNameAsync("npc_dota_hero_illidan", context)
+	PrecacheUnitByNameAsync("npc_dota_hero_balanar", context)
+	PrecacheUnitByNameAsync("npc_dota_hero_proudmoore", context)
 
 --	-- PRECACHE SOUNDS
 	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_death_prophet.vsndevts", context) -- For Incoming Wave 4

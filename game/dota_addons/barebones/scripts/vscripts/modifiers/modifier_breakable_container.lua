@@ -16,7 +16,7 @@ function modifier_breakable_container:OnCreated( kv )
 		elseif self:GetParent():GetUnitName() == "npc_dota_vase" then
 			self:GetParent():SetModelScale( RandomFloat( 0.4, 0.6 ) )
 		end
-		self:GetParent():AddNewModifier( nil, nil, "modifier_disable_aggro", { duration = -1 } )
+--		self:GetParent():AddNewModifier( nil, nil, "modifier_disable_aggro", { duration = -1 } )
 	end
 end
 

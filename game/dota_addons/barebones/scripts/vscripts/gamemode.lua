@@ -14,6 +14,11 @@ require('libraries/animations')
 require('libraries/attachments')
 require('libraries/keyvalues')
 require('libraries/illusionmanager')
+require('libraries/fun')()
+require('libraries/functional')
+require('libraries/playerresource')
+require('libraries/playertables')
+require('libraries/gold')
 require('phases/choose_hero')
 require('phases/creeps')
 require('phases/special_events')
@@ -25,7 +30,6 @@ require('units/breakable_container_surprises')
 require('units/treasure_chest_surprises')
 require('triggers')
 require('items/global')
-require('server')
 require('api/api')
 
 function GameMode:OnFirstPlayerLoaded()
@@ -82,7 +86,7 @@ function GameMode:InitGameMode()
 	GameRules:SetHeroSelectionTime(0.0)
 	GameRules:SetGoldTickTime(0.0)
 	GameRules:SetGoldPerTick(0.0)
-	GameRules:SetCustomGameSetupAutoLaunchDelay(15.0) --Vote Time
+	GameRules:SetCustomGameSetupAutoLaunchDelay(20.0) --Vote Time
 	GameRules:SetPreGameTime(PREGAMETIME)
 
 	--Disabling Derived Stats
@@ -129,7 +133,6 @@ function GameMode:InitGameMode()
 
 	mode:SetCustomGameForceHero("npc_dota_hero_wisp")
 	GameRules:LockCustomGameSetupTeamAssignment(true)
-	GameRules:SetHeroRespawnEnabled(true)
 	mode:SetFixedRespawnTime(RESPAWN_TIME)
 	GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_GOODGUYS, 8)
 	if GetMapName() == "x_hero_siege_4" then
@@ -151,7 +154,8 @@ function GameMode:InitGameMode()
 	GameMode:_InitGameMode()
 	self:OnFirstPlayerLoaded()
 
-	GameRules:GetGameModeEntity():SetThink( "OnThink", self, 1 )
+	mode:SetThink( "OnThink", self, 1 )
+	mode:SetModifyGoldFilter( Dynamic_Wrap(GameMode, "GoldFilter"), self )
 
 	if IsInToolsMode() then
 		Convars:RegisterCommand("duel_event", function(keys) return DuelEvent() end, "Test Duel Event", FCVAR_CHEAT)
@@ -171,9 +175,14 @@ function GameMode:InitGameMode()
 	CustomGameEventManager:RegisterListener("event_frost_infernal", Dynamic_Wrap(GameMode, "FrostInfernal"))
 	CustomGameEventManager:RegisterListener("quit_event", Dynamic_Wrap(GameMode, "SpecialEventTPQuit2"))
 
+	CustomGameEventManager:RegisterListener( "dialog_complete", function(...) return self:OnDialogEnded( ... ) end )
+	CustomGameEventManager:RegisterListener( "dialog_confirm", function(...) return self:OnDialogConfirm( ... ) end )
+	CustomGameEventManager:RegisterListener( "dialog_confirm_expire", function(...) return self:OnDialogConfirmExpired( ... ) end )
+
 	ListenToGameEvent("dota_holdout_revive_complete", Dynamic_Wrap(GameMode, "OnPlayerRevived"), self)
 
 	--Dungeon
+	self.PrecachedVIPs = {}
 	self.CheckpointsActivated = {}
 	self.Zones = {}
 
@@ -311,6 +320,10 @@ end
 function GameMode:OnGameRulesStateChange(keys)
 local newState = GameRules:State_Get()
 
+	CustomGameEventManager:Send_ServerToAllClients( 'game_state', {
+		newState = newState
+	})
+
 	if newState == DOTA_GAMERULES_STATE_CUSTOM_GAME_SETUP then
 		ApiLoad()
 	end
@@ -361,7 +374,7 @@ local newState = GameRules:State_Get()
 	end
 
 	if newState == DOTA_GAMERULES_STATE_PRE_GAME then
-		self._fPreGameStartTime = GameRules:GetGameTime()
+		Gold:Init()
 		nTimer_GameTime = PREGAMETIME
 		if nTimer_GameTime == 10 then
 			ChooseRandomHero(event)
@@ -369,7 +382,14 @@ local newState = GameRules:State_Get()
 		for i = 1, 8 do
 			DoEntFire("door_lane"..i, "SetAnimation", "gate_02_close", 0, nil, nil)
 		end
+
 		SpawnHeroesBis()
+
+		-- debug
+		if IsInToolsMode() then
+			Entities:FindByName(nil, "trigger_special_event_tp_off"):Disable()
+			Entities:FindByName(nil, "trigger_special_event"):Enable()
+		end
 
 		local diff = {"Easy", "Normal", "Hard", "Extreme", "Divine"}
 		local lanes = {"Simple", "Double", "Full"}
@@ -389,13 +409,7 @@ local newState = GameRules:State_Get()
 
 	if newState == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
 		print("OnGameRulesStateChange: Game In Progress")
-		-- debug
-		if IsInToolsMode() then
-			Entities:FindByName(nil, "trigger_special_event_tp_off"):Disable()
-			Entities:FindByName(nil, "trigger_special_event"):Enable()
-		end
 
-		Server_WaitToEnableXpGain() -- Enable xp gain
 		GAME_WINNER_TEAM = "Dire"
 		nTimer_SpecialEvent = 720
 		nTimer_IncomingWave = 240
@@ -455,9 +469,64 @@ local newState = GameRules:State_Get()
 	end
 
 	if newState == DOTA_GAMERULES_STATE_POST_GAME then
+		-- call imba api
+		api.imba.event(api.events.entered_post_game)
+
+		api.imba.complete(function (error, players)
+			safe(function ()
+				if error then
+					-- if we have an error we should display the scoreboard anyways, just with reduced data
+					CustomGameEventManager:Send_ServerToAllClients("end_game_scoreboard", {
+						players = {},
+						xp_info = {},
+						info = {
+							winner = GAME_WINNER_TEAM,
+							id = 0
+						},
+						error = true
+					})
+				else
+					-- everything went fine. use the old system for xp
+					local xp_info = {}
+
+					for i = 1, #players do
+						local player = players[i]
+
+						local level = GetXPLevelByXp(player.xp)
+						local title = GetTitleIXP(level)
+						local color = GetTitleColorIXP(title, true)
+						local progress = GetXpProgressToNextLevel(player.xp)
+
+						if level and title and color and progress then
+							table.insert(xp_info, {
+								steamid = player.steamid,
+								level = level,
+								title = title,
+								color = color,
+								progress = progress
+							})
+						end
+
+						-- i-1 should be replaced by player ID
+						player.potion = CustomNetTables:GetTableValue("zone_scores", "xhs_holdout")[i-1]["Potions"]
+					end
+
+					CustomGameEventManager:Send_ServerToAllClients("end_game", {
+						players = players,
+						xp_info = xp_info,
+						info = {
+							winner = GAME_WINNER_TEAM,
+							id = api.imba.data.id,
+							radiant_score = GetTeamHeroKills(2),
+						},
+						error = false
+					})
+				end
+			end)
+		end)
+
+--		CustomNetTables:SetTableValue("game_options", "game_count", {value = 0})
 		CustomGameEventManager:Send_ServerToAllClients("end_game", {})
-		local winning_team = GAME_WINNER_TEAM
-		Server_CalculateXPForWinnerAndAll(winning_team)
 	end
 end
 
@@ -1246,4 +1315,83 @@ local hero = player:GetAssignedHero()
 	Entities:FindByName(nil, "trigger_special_event"):Enable()
 	hero:RemoveModifierByName("modifier_boss_stun")
 	hero:RemoveModifierByName("modifier_invulnerable")
+end
+
+-- Gold gain filter function
+function GameMode:GoldFilter(keys)
+	-- reason_const		12
+	-- reliable			1
+	-- player_id_const	0
+	-- gold				141
+
+--	local hero = PlayerResource:GetPlayer(keys.player_id_const):GetAssignedHero()
+
+	-- Show gold earned message??
+--	if hero then
+--		hero:ModifyGold(keys.gold, reliable, keys.reason_const)
+--		if keys.reason_const == DOTA_ModifyGold_Unspecified then return true end
+--		SendOverheadEventMessage(PlayerResource:GetPlayer(keys.player_id_const), OVERHEAD_ALERT_GOLD, hero, keys.gold, nil)
+--	end
+
+	return true
+end
+
+function GameMode:HasDialog( hDialogEnt )
+	if hDialogEnt == nil or hDialogEnt:IsNull() then
+		return false
+	end
+	
+	for k,v in pairs ( DialogDefinition ) do
+		if k == hDialogEnt:GetUnitName() then
+			return true
+		end
+	end
+
+	return false
+end
+
+function GameMode:GetDialog( hDialogEnt )
+	if self:HasDialog( hDialogEnt ) == false then
+		return nil
+	end
+
+	local Dialog = DialogDefinition[hDialogEnt:GetUnitName()]
+	if Dialog == nil then
+		return nil
+	end
+
+	if hDialogEnt.nCurrentLine == nil then
+		hDialogEnt.nCurrentLine = 1
+	end
+
+ 	if Dialog[hDialogEnt.nCurrentLine] ~= nil and Dialog[hDialogEnt.nCurrentLine].szAdvanceQuestActive ~= nil then
+ 		if self:IsQuestActive( Dialog[hDialogEnt.nCurrentLine].szAdvanceQuestActive ) then
+			hDialogEnt.nCurrentLine = hDialogEnt.nCurrentLine + 1
+		end
+	end
+
+	return Dialog[hDialogEnt.nCurrentLine]
+end
+
+function GameMode:GetDialogLine( hDialogEnt, nLineNumber )
+	if self:HasDialog( hDialogEnt ) == false then
+		return nil
+	end
+
+	local Dialog = DialogDefinition[hDialogEnt:GetUnitName()]
+	if Dialog == nil then
+		return nil
+	end
+
+	return Dialog[nLineNumber]
+end
+
+function GameMode:IsQuestActive( szQuestName )
+	for _,zone in pairs( self.Zones ) do
+		if zone ~= nil and zone:IsQuestActive( szQuestName ) == true then
+			return true
+		end
+	end
+
+	return false
 end

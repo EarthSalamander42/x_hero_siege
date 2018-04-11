@@ -1,13 +1,3 @@
-function Lifesteal(event)
-local attacker = event.attacker
-local target = event.target
-local ability = event.ability
-
-	if target.GetInvulnCount == nil and not target:IsBuilding() then
-		ability:ApplyDataDrivenModifier(attacker, attacker, "modifier_lifesteal", {duration = 0.03})		
-	end
-end
-
 function Reincarnation(event)
 local hero = event.caster
 local ability = hero:FindAbilityByName("holdout_reincarnation") -- Ability
@@ -346,7 +336,7 @@ function modifier_campfire:OnCreated( kv )
 	if IsServer() then
 		self.aura_radius = self:GetAbility():GetSpecialValueFor( "aura_radius" )
 
-		self:GetParent():AddNewModifier( nil, nil, "modifier_disable_aggro", { duration = -1 } )
+--		self:GetParent():AddNewModifier( nil, nil, "modifier_disable_aggro", { duration = -1 } )
 		self:GetParent():AddNewModifier( nil, nil, "modifier_provides_fow_position", { duration = -1 } )
 
 		EmitSoundOn( "Campfire.Warmth.Loop", self:GetParent() )

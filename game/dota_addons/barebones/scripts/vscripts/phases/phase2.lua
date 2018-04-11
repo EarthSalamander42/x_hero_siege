@@ -78,22 +78,6 @@ function FinalWave()
 			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
 		end)
 	end
-	
-	Timers:CreateTimer(31, function()
-	local units = FindUnitsInRadius(DOTA_TEAM_NEUTRALS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_ALL, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false )
-	local number = 0
-
-		for _, v in pairs(units) do
-			number = number +1
-		end
-
-		print("Detecting neutrals...", number)
-		if number <= 0 then
-			StartMagtheridonArena()
-		else
-			return 1
-		end
-	end)
 
 	Timers:CreateTimer(10, function()
 		FinalWaveSpawner("npc_abomination", "npc_banshee", "npc_necro", "npc_magnataur", "npc_dota_hero_balanar", 0, "west", "final_wave_player_2")
@@ -109,5 +93,18 @@ function FinalWave()
 
 	Timers:CreateTimer(25, function()
 		FinalWaveSpawner("npc_captain", "npc_marine", "npc_marine", "npc_knight", "npc_dota_hero_proudmoore", 90, "south", "final_wave_player_0")
+	end)
+
+	Timers:CreateTimer(31, function()
+		local units = FindUnitsInRadius(DOTA_TEAM_NEUTRALS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_ALL, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false )
+		local number = 0
+
+		for _, v in pairs(units) do
+			number = number +1
+		end
+
+		if number > 0 then
+			return 1
+		end
 	end)
 end

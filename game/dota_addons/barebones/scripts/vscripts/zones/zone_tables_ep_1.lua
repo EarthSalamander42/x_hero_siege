@@ -108,13 +108,30 @@ _G.ZonesDefinition =
 				nCompleteLimit = 52,
 			},
 			{
+				szQuestName = "teleport_top",
+				szQuestType = "Speak",
+				Activators = 
+				{
+					{
+						Type = QUEST_EVENT_ON_QUEST_COMPLETE,
+						szQuestName = "kill_final_wave",
+					},			
+				},
+				Completion =
+				{	
+					Type = QUEST_EVENT_ON_DIALOG_ALL_CONFIRMED,
+					szNPCName = "npc_xhs_paladin",
+					nDialogLine = 1,
+				},
+			},
+			{
 				szQuestName = "kill_mag",
 				szQuestType = "Kill",
 				Activators = 
 				{
 					{
 						Type = QUEST_EVENT_ON_QUEST_COMPLETE,
-						szQuestName = "defend_castle",
+						szQuestName = "teleport_top",
 					},			
 				},
 				Completion = 
@@ -244,6 +261,15 @@ _G.ZonesDefinition =
 				nCompleteLimit = 1,
 			},
 		},
+		VIPs =
+		{
+			{
+				szVIPName = "npc_xhs_paladin",
+				szSpawnerName = "xhs_spawner_paladin_vip",
+				nCount = 1,
+				Activity = ACT_DOTA_IDLE,
+			},
+		},
 		AlliedStructures =
 		{
 			{
@@ -253,36 +279,36 @@ _G.ZonesDefinition =
 				nMaxSpawnDistance = 0,
 			},
 		},
---[[	Chests =
-		{
-			--TreasureChest_A
-			{
-				fSpawnChance = 0.5,
-				szSpawnerName = "xhs_treasure_chest",
-				szNPCName = "npc_treasure_chest",
-				nMaxSpawnDistance = 0,
-				szTraps =
-				{
-					"creature_techies_land_mine",
-					"trap_sun_strike",
-				},
-				nTrapLevel = 1,
-				nMinGold = 250,
-				nMaxGold = 450,
-				Items =
-				{
-					"item_orb_of_lightning",
-					"item_orb_of_fire",
-					"item_orb_of_earth",
-					"item_orb_of_darkness",
-				},
-				Relics =
-				{
-					"item_orb_of_frost",
-				},
-				fRelicChance = 0.001,
-			},
-		}, --]]
+--		Chests =
+--		{
+--			--TreasureChest_A
+--			{
+--				fSpawnChance = 0.5,
+--				szSpawnerName = "xhs_treasure_chest",
+--				szNPCName = "npc_treasure_chest",
+--				nMaxSpawnDistance = 0,
+--				szTraps =
+--				{
+--					"creature_techies_land_mine",
+--					"trap_sun_strike",
+--				},
+--				nTrapLevel = 1,
+--				nMinGold = 250,
+--				nMaxGold = 450,
+--				Items =
+--				{
+--					"item_orb_of_lightning",
+--					"item_orb_of_fire",
+--					"item_orb_of_earth",
+--					"item_orb_of_darkness",
+--				},
+--				Relics =
+--				{
+--					"item_orb_of_frost",
+--				},
+--				fRelicChance = 0.001,
+--			},
+--		},
 		Breakables =
 		{
 			-- Crate

@@ -30,10 +30,9 @@ end
 
 function modifier_ai:OnCreated()
 	if IsServer() then
-		self.parent = self:GetParent()
 		self.last_movement = 0.0
 		self.find_enemy_distance = 500
-		if self.parent:GetKeyValue("UseAI") == 3 then
+		if self:GetParent():GetKeyValue("UseAI") == 3 then
 			self:StartIntervalThink(RandomInt(2, 5))
 		else
 			self:StartIntervalThink(1.0)
@@ -43,7 +42,7 @@ end
 
 function modifier_ai:OnIntervalThink()
 if not IsServer() then return end
-if self.parent:IsIllusion() then return end
+if self:GetParent():IsIllusion() then return end
 
 	self.is_casting = false
 
@@ -53,12 +52,12 @@ if self.parent:IsIllusion() then return end
 --		print("Activating brain!")
 --	end
 
-	if self.parent:IsStunned() or self.parent:IsSilenced() or self.parent:IsHexed() or self.parent:IsChanneling() or self.is_casting == true then return end
+	if self:GetParent():IsStunned() or self:GetParent():IsSilenced() or self:GetParent():IsHexed() or self:GetParent():IsChanneling() or self.is_casting == true then return end
 
---	print("AI: Ready to work!:", self.parent:GetUnitName())
+--	print("AI: Ready to work!:", self:GetParent():GetUnitName())
 
-	for ability_index = 0, self.parent:GetAbilityCount() - 1 do
-		local ability = self.parent:GetAbilityByIndex(ability_index)
+	for ability_index = 0, self:GetParent():GetAbilityCount() - 1 do
+		local ability = self:GetParent():GetAbilityByIndex(ability_index)
 		if ability and not ability:IsPassive() and not ability:IsToggle() and ability:IsActivated() and ability:IsCooldownReady() then
 			if ability:IsInAbilityPhase() then
 				self.is_casting = true
@@ -67,40 +66,51 @@ if self.parent:IsIllusion() then return end
 		end
 	end
 
-	if self.parent:GetKeyValue("UseAI") == 1 then
-		if not self.parent:IsAttacking() then
+	if self:GetParent():GetKeyValue("UseAI") == 1 then
+		if not self:GetParent():IsAttacking() then
 			local ancient = Entities:FindByName(nil, "dota_goodguys_fort")
-			local distance = (self.parent:GetAbsOrigin() - ancient:GetAbsOrigin()):Length2D()
+			local distance = (self:GetParent():GetAbsOrigin() - ancient:GetAbsOrigin()):Length2D()
 
-			if distance < 400 then
-				self.parent:SetAttacking(ancient)
+			if distance < 500 then
+				self:GetParent():SetAttacking(ancient)
 				return
 			else
-				self.parent:MoveToPositionAggressive(ancient:GetAbsOrigin())
+--				for _, vip in pairs(GameRules.GameMode.PrecachedVIPs) do
+--					print(self:GetParent():GetAttackTarget())
+--					if self:GetParent():GetAttackTarget() then
+--						if self:GetParent():GetAttackTarget():GetUnitName() == vip or self:GetParent():GetAttackTarget():GetUnitName() == "npc_dota_crate" or self:GetParent():GetAttackTarget():GetUnitName() == "npc_treasure_chest" then -- error sometimes
+--							print(self:GetParent():GetAttackTarget():GetUnitName(), vip)
+--							self:GetParent():MoveToPosition(ancient:GetAbsOrigin())
+--						end
+--					end
+--				end
+
+				self:GetParent():MoveToPositionAggressive(ancient:GetAbsOrigin())
 			end
 		end
-	elseif self.parent:GetKeyValue("UseAI") == 3 then
+	elseif self:GetParent():GetKeyValue("UseAI") == 3 then
 		local random_int = RandomInt(1, 4)
 		if self.last_goal ~= random_int then
-			self.parent:MoveToPositionAggressive(Entities:FindByName(nil, "roshan_wp_"..random_int):GetAbsOrigin())
+			self:GetParent():MoveToPositionAggressive(Entities:FindByName(nil, "roshan_wp_"..random_int):GetAbsOrigin())
 			self.last_goal = random_int
 		end
 	end
 
-	if not self.parent:GetCurrentActiveAbility() then
-		for ability_index = 0, self.parent:GetAbilityCount() - 1 do
-			local ability = self.parent:GetAbilityByIndex(ability_index)
+	if not self:GetParent():GetCurrentActiveAbility() then
+		for ability_index = 0, self:GetParent():GetAbilityCount() - 1 do
+			local ability = self:GetParent():GetAbilityByIndex(ability_index)
 			if ability and not ability:IsInAbilityPhase() and not ability:IsPassive() and not ability:IsToggle() and ability:IsActivated() and ability:IsCooldownReady() then
 				local ability_behavior = tostring(ability:GetBehavior())
 				local cast_range = ability:GetCastRange()
 				local target_team = ability:GetAbilityTargetTeam()
 				local target_type = ability:GetAbilityTargetType()
+				local target_flags = ability:GetAbilityTargetFlags()
 				if cast_range == 0 then cast_range = self.find_enemy_distance end
 				cast_range = cast_range * 0.9 -- 90% of the range to allow projectiles hit the target. e.g: Mirana's Starfall
 				if target_team == 0 then target_team = 2 end -- TEAM_ENEMY
 				if target_type == 0 then target_type = 19 end -- DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC
-				local allies = FindUnitsInRadius(self.parent:GetTeamNumber(), self.parent:GetAbsOrigin(), nil, cast_range, self.parent:GetTeamNumber(), target_type, ability:GetAbilityTargetFlags(), FIND_ANY_ORDER, false)
-				local enemies = FindUnitsInRadius(self.parent:GetTeamNumber(), self.parent:GetAbsOrigin(), nil, cast_range, target_team, target_type, ability:GetAbilityTargetFlags(), FIND_ANY_ORDER, false)
+				local allies = FindUnitsInRadius(self:GetParent():GetTeamNumber(), self:GetParent():GetAbsOrigin(), nil, cast_range, self:GetParent():GetTeamNumber(), target_type, ability:GetAbilityTargetFlags(), FIND_ANY_ORDER, false)
+				local enemies = FindUnitsInRadius(self:GetParent():GetTeamNumber(), self:GetParent():GetAbsOrigin(), nil, cast_range, target_team, target_type, ability:GetAbilityTargetFlags(), FIND_ANY_ORDER, false)
 
 				-- Bug with jugg boss, no behavior after first cast
 --				print(ability_behavior)
@@ -117,25 +127,25 @@ if self.parent:IsIllusion() then return end
 				if tonumber(ability_behavior) == DOTA_ABILITY_BEHAVIOR_NO_TARGET then
 					if #enemies > 0 then
 --						print("Cast No Target:", ability:GetAbilityName())
-						self.parent:CastAbilityNoTarget(ability, -1)
+						self:GetParent():CastAbilityNoTarget(ability, -1)
 					end
 					return
 				elseif tonumber(ability_behavior) == DOTA_ABILITY_BEHAVIOR_POINT then
 --					print("Cast On Ground:", ability:GetAbilityName())
 					for _, hero in pairs(enemies) do
-						self.parent:CastAbilityOnPosition(hero:GetAbsOrigin(), ability, -1)
+						self:GetParent():CastAbilityOnPosition(hero:GetAbsOrigin(), ability, -1)
 						return
 					end
 				elseif tonumber(ability_behavior) == DOTA_ABILITY_BEHAVIOR_UNIT_TARGET then
 --					print("Cast On Target:", ability:GetAbilityName())
-					if self.parent:GetTeam() == ability:GetAbilityTargetTeam() then
+					if self:GetParent():GetTeam() == ability:GetAbilityTargetTeam() then
 						for _, hero in pairs(allies) do
-							self.parent:CastAbilityOnTarget(hero, ability, -1)
+							self:GetParent():CastAbilityOnTarget(hero, ability, -1)
 							return
 						end
 					else
 						for _, hero in pairs(enemies) do
-							self.parent:CastAbilityOnTarget(hero, ability, -1)
+							self:GetParent():CastAbilityOnTarget(hero, ability, -1)
 							return
 						end
 					end
@@ -169,7 +179,7 @@ function modifier_ai:OnTakeDamage(keys)
 		local unit = keys.unit
 		local attacker = keys.attacker
 
-		if unit == self.parent then
+		if unit == self:GetParent() then
 			if attacker == unit then return nil end
 			self.last_movement = GameRules:GetGameTime()
 			attacker.roshan_attacked_time = GameRules:GetGameTime()
@@ -182,9 +192,9 @@ function modifier_ai:OnAttackLanded(keys)
 		local target = keys.target
 		local attacker = keys.attacker
 		
-		if self.parent == target then
+		if self:GetParent() == target then
 			-- if attacked
-		elseif self.parent == attacker then
+		elseif self:GetParent() == attacker then
 			-- if attacker
 		end
 	end
@@ -192,7 +202,7 @@ end
 
 function modifier_ai:OnAttackStart(keys)
 	if IsServer() then
-		if self.parent == keys.attacker then
+		if self:GetParent() == keys.attacker then
 			
 		end
 	end

@@ -61,19 +61,21 @@ COLOR_GOLD = '\x1D'
 	Date: 09.08.2015.
 	Hides all dem hats
 ]]
-function HideWearables( event )
+function HideWearables(event)
 	local hero = event.caster
 	local ability = event.ability
+	local model = hero:FirstMoveChild()
 
 	hero.hiddenWearables = {} -- Keep every wearable handle in a table to show them later
-		local model = hero:FirstMoveChild()
-		while model ~= nil do
-				if model:GetClassname() == "dota_item_wearable" then
-						model:AddEffects(EF_NODRAW) -- Set model hidden
-						table.insert(hero.hiddenWearables, model)
-				end
-				model = model:NextMovePeer()
+
+	while model do
+		if model:GetClassname() == "dota_item_wearable" then
+			model:AddEffects(EF_NODRAW) -- Set model hidden
+			table.insert(hero.hiddenWearables, model)
 		end
+
+		model = model:NextMovePeer()
+	end
 end
 
 function ShowWearables( event )
@@ -433,30 +435,30 @@ function SendErrorMessageForSelectedUnit(playerID, string, unit)
 end
 
 -- Skeleton king cosmetics
-function SkeletonKingWearables(newHero)
+function SkeletonKingWearables(hero)
 
 	-- Cape
-	Attachments:AttachProp(newHero, "attach_hitloc", "models/items/wraith_king/regalia_of_the_bonelord_cape.vmdl", 1.0)
+	Attachments:AttachProp(hero, "attach_hitloc", "models/items/wraith_king/regalia_of_the_bonelord_cape.vmdl", 1.0)
 
 	-- Shoulderpiece
-	Attachments:AttachProp(newHero, "attach_hitloc", "models/heroes/wraith_king/wraith_king_shoulder.vmdl", 1.0)
+	Attachments:AttachProp(hero, "attach_hitloc", "models/heroes/wraith_king/wraith_king_shoulder.vmdl", 1.0)
 
 	-- Crown
-	Attachments:AttachProp(newHero, "attach_head", "models/items/wraith_king/kings_spite_head/kings_spite_head.vmdl", 1.0)
+	Attachments:AttachProp(hero, "attach_head", "models/items/wraith_king/kings_spite_head/kings_spite_head.vmdl", 1.0)
 
 	-- Chest
-	Attachments:AttachProp(newHero, "attach_hitloc", "models/heroes/wraith_king/wraith_king_chest.vmdl", 1.0)
+	Attachments:AttachProp(hero, "attach_hitloc", "models/heroes/wraith_king/wraith_king_chest.vmdl", 1.0)
 
 	-- Gauntlet
---	Attachments:AttachProp(newHero, "attach_attack1", "models/heroes/wraith_king/wraith_king_gauntlet.vmdl", 1.0)
+--	Attachments:AttachProp(hero, "attach_attack1", "models/heroes/wraith_king/wraith_king_gauntlet.vmdl", 1.0)
 
 	-- Weapon
-	Attachments:AttachProp(newHero, "attach_attack1", "models/items/skeleton_king/the_blood_shard/the_blood_shard.vmdl", 1.0)
+	Attachments:AttachProp(hero, "attach_attack1", "models/items/skeleton_king/the_blood_shard/the_blood_shard.vmdl", 1.0)
 
 	-- Eye particles
-	local eye_pfx = ParticleManager:CreateParticle("particles/units/heroes/hero_skeletonking/skeletonking_eyes.vpcf", PATTACH_ABSORIGIN, newHero)
-	ParticleManager:SetParticleControlEnt(eye_pfx, 0, newHero, PATTACH_POINT_FOLLOW, "attach_eyeL", newHero:GetAbsOrigin(), true)
-	ParticleManager:SetParticleControlEnt(eye_pfx, 1, newHero, PATTACH_POINT_FOLLOW, "attach_eyeR", newHero:GetAbsOrigin(), true)
+	local eye_pfx = ParticleManager:CreateParticle("particles/units/heroes/hero_skeletonking/skeletonking_eyes.vpcf", PATTACH_ABSORIGIN, hero)
+	ParticleManager:SetParticleControlEnt(eye_pfx, 0, hero, PATTACH_POINT_FOLLOW, "attach_eyeL", hero:GetAbsOrigin(), true)
+	ParticleManager:SetParticleControlEnt(eye_pfx, 1, hero, PATTACH_POINT_FOLLOW, "attach_eyeR", hero:GetAbsOrigin(), true)
 end
 
 -- ITEMS
@@ -792,6 +794,7 @@ function RefreshPlayers()
 	for nPlayerID = 0, PlayerResource:GetPlayerCount() -1 do
 		if PlayerResource:HasSelectedHero(nPlayerID) then
 			local hero = PlayerResource:GetSelectedHeroEntity(nPlayerID)
+
 			if not hero:IsAlive() then
 				hero:RespawnHero(false, false)
 				hero.ankh_respawn = false
@@ -801,6 +804,7 @@ function RefreshPlayers()
 					hero.respawn_timer = nil
 				end
 			end
+
 			hero:SetHealth(hero:GetMaxHealth())
 			hero:SetMana(hero:GetMaxMana())
 		end
@@ -808,18 +812,28 @@ function RefreshPlayers()
 end
 
 function TeleportHero(hero, delay, point)
--- +RandomVector(400)
+local pos = hero:GetAbsOrigin()
+-- local pos = hero:GetAbsOrigin() + RandomVector(400)
 
---	local TeleportEffect = ParticleManager:CreateParticle("particles/econ/events/ti7/teleport_end_ti7_lvl3.vpcf", PATTACH_ABSORIGIN, newHero)
---	ParticleManager:SetParticleControl(TeleportEffect, 0, point)
---	ParticleManager:SetParticleControl(TeleportEffect, 1, point)
---	ParticleManager:SetParticleControl(TeleportEffect, 3, point)
---	ParticleManager:SetParticleControl(TeleportEffect, 5, point)
+	local TeleportEffect
+	local TeleportEffectEnd
+	if delay > 0 then
+		TeleportEffect = ParticleManager:CreateParticle(hero.tp_effect, PATTACH_ABSORIGIN, hero)
+		ParticleManager:SetParticleControlEnt(TeleportEffect, PATTACH_ABSORIGIN, hero, PATTACH_ABSORIGIN, "attach_origin", pos, true)
+		hero:Attribute_SetIntValue( "effectsID", TeleportEffect )
 
+		TeleportEffectEnd = ParticleManager:CreateParticle(hero.tp_effect_end, PATTACH_ABSORIGIN, hero)
+		ParticleManager:SetParticleControlEnt(TeleportEffect, PATTACH_ABSORIGIN, hero, PATTACH_ABSORIGIN, "attach_origin", point, true)
+		ParticleManager:SetParticleControl(TeleportEffectEnd, 1, point)
+		hero:Attribute_SetIntValue( "effectsID", TeleportEffect )
+	end
 	PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
 	hero:AddNewModifier(hero, nil, "modifier_command_restricted", {})
+	hero:EmitSound("Portal.Loop_Appear")
 
 	Timers:CreateTimer(delay, function()
+		EmitSoundOnLocationWithCaster(pos, "Portal.Hero_Disappear", hero)
+		hero:StopSound("Portal.Loop_Appear")
 		if hero:GetUnitName() == "npc_dota_hero_meepo" then
 		local meepo_table = Entities:FindAllByName("npc_dota_hero_meepo")
 			if meepo_table then
@@ -832,8 +846,15 @@ function TeleportHero(hero, delay, point)
 			FindClearSpaceForUnit(hero, point, true)
 			hero:Stop()
 		end
---		ParticleManager:DestroyParticle(TeleportEffect, true)
+
+		EmitSoundOnLocationWithCaster(hero:GetAbsOrigin(), "Portal.Hero_Appear", hero)
 		hero:RemoveModifierByName("modifier_command_restricted")
+
+		ParticleManager:DestroyParticle(TeleportEffect, false)
+		ParticleManager:DestroyParticle(TeleportEffectEnd, false)
+		ParticleManager:ReleaseParticleIndex(TeleportEffect)
+		ParticleManager:ReleaseParticleIndex(TeleportEffectEnd)
+
 		Timers:CreateTimer(0.1, function()
 			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
 		end)
@@ -910,4 +931,28 @@ function getkvValues(tEntity, ...) -- KV Values look hideous in finished code, s
 		table.insert(data,tEntity:GetSpecialValueFor(v))
 	end
 	return unpack(data)
+end
+
+--[[
+  Credits:
+    Angel Arena Blackstar
+  Description:
+    Returns the player id from a given unit / player / table.
+    For example, you should be able to pass in a reference to a lycan wolf and get back the correct player's ID.
+    -- chrisinajar
+]]
+function UnitVarToPlayerID(unitvar)
+	if unitvar then
+		if type(unitvar) == "number" then
+			return unitvar
+		elseif type(unitvar) == "table" and not unitvar:IsNull() and unitvar.entindex and unitvar:entindex() then
+			if unitvar.GetPlayerID and unitvar:GetPlayerID() > -1 then
+				return unitvar:GetPlayerID()
+			elseif unitvar.GetPlayerOwnerID then
+				return unitvar:GetPlayerOwnerID()
+			end
+		end
+	end
+	
+	return -1
 end

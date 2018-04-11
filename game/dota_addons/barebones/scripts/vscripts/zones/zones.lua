@@ -169,7 +169,7 @@ function CDungeonZone:PrecacheNPCs( zoneTable )
 	if zoneTable == nil then
 		return
 	end
-	
+
 	for _, npcTable in pairs( zoneTable ) do
 		if npcTable ~= nil then
 		--	print( "CDungeonZone:PrecacheEnemies() - Precaching squad " .. tostring( enemyTable ) )
@@ -203,7 +203,7 @@ function CDungeonZone:PrecacheVIPs( vipTable )
 
 	local nVIPCount = 0
 	self.nPrecacheVIPCount = 0
-	
+
 	--print( "CDungeonZone:PrecacheVIPs() - Precaching VIPs " .. tostring( vipTable ) )
 	for _, unitTable in pairs( vipTable ) do
 		if unitTable ~= nil then
@@ -578,7 +578,7 @@ function CDungeonZone:SpawnVIPs( vipsTable )
 	for _, vip in pairs ( vipsTable ) do
 		local hSpawner = Entities:FindByName( nil, vip.szSpawnerName )
 		if hSpawner == nil then
-			print( "CDungeonZone:SpawnVIPs() - ERROR: No Spawners found" )
+			print( "CDungeonZone:SpawnVIPs() - ERROR: No Spawners found named:", vip.szSpawnerName )
 			return
 		end
 

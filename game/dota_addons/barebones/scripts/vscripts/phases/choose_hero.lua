@@ -1,5 +1,6 @@
-STARTING_GOLD = 2000
-WeekHero = "npc_dota_hero_necrolyte"
+STARTING_GOLD = {10000, 5000, 4000, 3000, 2000}
+
+WeekHero = "npc_dota_hero_skeleton_king"
 -- "npc_dota_hero_slardar"			-- Centurion
 -- "npc_dota_hero_skeleton_king"	-- Lich King
 -- "npc_dota_hero_meepo"			-- Kobold Knight
@@ -126,7 +127,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 				Notifications:Bottom(hero:GetPlayerOwnerID(), {text="HERO: ", duration = 5.0, style={color="white"}, continue=true})
 				Notifications:Bottom(hero:GetPlayerOwnerID(), {text="#npc_dota_hero_"..HEROLIST[i], duration = 5.0, style={color="white"}, continue=true})
 				
-				local newHero = PlayerResource:ReplaceHeroWith(id, "npc_dota_hero_"..HEROLIST[i], STARTING_GOLD, 0)
+				local newHero = PlayerResource:ReplaceHeroWith(id, "npc_dota_hero_"..HEROLIST[i], STARTING_GOLD[difficulty], 0)
 				StartingItems(hero, newHero)
 
 				Timers:CreateTimer(0.1, function()
@@ -134,6 +135,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 						UTIL_Remove(hero)
 					end
 				end)
+
 				return
 			end
 
@@ -150,16 +152,16 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 				Notifications:Bottom(hero:GetPlayerOwnerID(), {hero=WeekHero, duration = 5.0})
 				Notifications:Bottom(hero:GetPlayerOwnerID(), {text="HERO: ", duration = 5.0, style={color="white"}, continue=true})
 				Notifications:Bottom(hero:GetPlayerOwnerID(), {text="#"..WeekHero, duration = 5.0, style={color="white"}, continue=true})
-				Timers:CreateTimer(3.1, function()
-					local newHero = PlayerResource:ReplaceHeroWith(id, WeekHero, STARTING_GOLD, 0)
-					StartingItems(hero, newHero)
 
-					Timers:CreateTimer(0.1, function()
-						if not hero:IsNull() then
-							UTIL_Remove(hero)
-						end
-					end)
+				local newHero = PlayerResource:ReplaceHeroWith(id, WeekHero, STARTING_GOLD[difficulty], 0)
+				StartingItems(hero, newHero)
+
+				Timers:CreateTimer(0.1, function()
+					if not hero:IsNull() then
+						UTIL_Remove(hero)
+					end
 				end)
+
 				return
 			end
 		end
@@ -170,6 +172,7 @@ function ChooseHeroVIP(event)
 local hero = event.activator
 local caller = event.caller
 local id = hero:GetPlayerID()
+local difficulty = GameRules:GetCustomGameDifficulty()
 
 	if PlayerResource:IsValidPlayer(id) and hero:GetUnitName() == "npc_dota_hero_wisp" and hero:HasAbility("holdout_vip") then
 		for i = 1, #HEROLIST_VIP do
@@ -179,12 +182,11 @@ local id = hero:GetPlayerID()
 				ParticleManager:SetParticleControl(particle, 0, hero:GetAbsOrigin())
 				EmitSoundOnClient("ui.trophy_levelup", PlayerResource:GetPlayer(id))
 				hero:AddNewModifier(hero, nil, "modifier_command_restricted", {})
---				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
 				Notifications:Bottom(hero:GetPlayerOwnerID(), {hero="npc_dota_hero_"..HEROLIST_VIP[i], duration = 5.0})
 				Notifications:Bottom(hero:GetPlayerOwnerID(), {text="HERO: ", duration = 5.0, style={color="white"}, continue=true})
 				Notifications:Bottom(hero:GetPlayerOwnerID(), {text="#npc_dota_hero_"..HEROLIST_VIP[i], duration = 5.0, style={color="white"}, continue=true})
 				
-				local newHero = PlayerResource:ReplaceHeroWith(id, "npc_dota_hero_"..HEROLIST_VIP[i], STARTING_GOLD, 0)
+				local newHero = PlayerResource:ReplaceHeroWith(id, "npc_dota_hero_"..HEROLIST_VIP[i], STARTING_GOLD[difficulty], 0)
 				StartingItems(hero, newHero)
 			end
 		end

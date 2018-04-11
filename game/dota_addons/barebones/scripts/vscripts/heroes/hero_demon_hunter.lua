@@ -62,6 +62,16 @@ function modifier_xhs_vampiric_aura:GetAuraSearchType()
 	return DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC
 end
 
+function modifier_xhs_vampiric_aura:GetAuraEntityReject(target)
+	if IsServer() then
+		if target:HasModifier("modifier_lifesteal") then
+			return true
+		end
+	end
+
+	return false
+end
+
 function modifier_xhs_vampiric_aura:GetModifierAura()
 	return "modifier_lifesteal"
 end

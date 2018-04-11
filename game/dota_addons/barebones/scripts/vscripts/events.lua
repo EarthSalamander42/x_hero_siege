@@ -9,7 +9,6 @@ local reason = keys.reason
 local userid = keys.userid
 
 --	CloseLane(userid)
-	Server_DisableToGainXpForPlayer(userid)
 end
 
 function GameMode:OnSettingVote(keys)
@@ -83,7 +82,12 @@ local too_ez_gold = 0.9 -- The mod is way too ez, to modify gold very easily i j
 
 						local vip_ability = npc:AddAbility("holdout_vip")
 						vip_ability:SetLevel(1)
+						npc.tp_effect = "particles/econ/events/fall_major_2016/teleport_start_fm06_lvl3.vpcf"
+						npc.tp_effect_end = "particles/econ/events/fall_major_2016/teleport_end_fm06_lvl3.vpcf"
 					end
+				else
+					npc.tp_effect = "particles/items2_fx/teleport_start.vpcf"
+					npc.tp_effect_end = "particles/items2_fx/teleport_end.vpcf"
 				end
 
 				for i = 1, #vip_members do
@@ -515,8 +519,6 @@ local playerID = ply:GetPlayerID()
 			Say(nil, "<font color='#FF0000'>Mohammad Mehdi Akhondi</font> detected, game will not start. Please disconnect.", false)
 		end
 	end
-
-	Server_SendAndGetInfoForAll()
 end
 
 function GameMode:OnIllusionsCreated(keys)
@@ -639,7 +641,7 @@ local hero = PlayerResource:GetPlayer(userID):GetAssignedHero()
 
 		if str == "-bt" then
 		local hero = player:GetAssignedHero()
-		local gold = hero:GetGold()
+		local gold = Gold:GetGold(userID)
 		local cost = 10000
 		local numberOfTomes = math.floor(gold / cost)
 			if numberOfTomes >= 1 and BT_ENABLED == 1 then
@@ -663,10 +665,6 @@ local hero = PlayerResource:GetPlayer(userID):GetAssignedHero()
 			local lanes = {"Simple", "Double", "Full"}
 			Notifications:Bottom(player, {text="DIFFICULTY: "..diff[GameRules:GetCustomGameDifficulty()], duration=10.0})
 			Notifications:Bottom(player, {text="CREEP LANES: "..lanes[CREEP_LANES_TYPE], duration=10.0})
-		end
-
-		if str == "-printxpinfo" then
-			Server_PrintInfo() --print the XP system info
 		end
 	end
 end
@@ -946,7 +944,7 @@ local lane = tonumber(cn)
 				for _, obs in pairs(DoorObs) do 
 					obs:SetEnabled(false, true)
 				end
-				DoEntFire("door_phase2_left", "SetAnimation", "gate_02_open", 0, nil, nil)
+				DoEntFire("door_phase2_left", "SetAnimation", "gate_entrance002_open", 0, nil, nil)
 				Phase2CreepsLeft()
 
 				if PlayerResource:GetPlayerCount() > 1 then
@@ -954,7 +952,7 @@ local lane = tonumber(cn)
 					for _, obs in pairs(DoorObs) do 
 						obs:SetEnabled(false, true)
 					end
-					DoEntFire("door_phase2_right", "SetAnimation", "gate_02_open", 0, nil, nil)
+					DoEntFire("door_phase2_right", "SetAnimation", "gate_entrance002_open", 0, nil, nil)
 					Phase2CreepsRight()
 				end
 
@@ -964,13 +962,13 @@ local lane = tonumber(cn)
 
 		-- add kills to the hero who spawned a controlled unit, or an illusion
 		if hero:GetTeamNumber() == 2 then
-			if not gold_advertize then gold_advertize = 0 end
+			if not hero.gold_advertize then hero.gold_advertize = 0 end
 			if hero:IsRealHero() then
-				if PlayerResource:GetGold(hero:GetPlayerID()) > 99900 and gold_advertize == 0 and SPECIAL_EVENT ~= 1 then
+				if PlayerResource:GetGold(hero:GetPlayerID()) > 990000 and hero.gold_advertize == 0 and SPECIAL_EVENT ~= 1 then
 					SendErrorMessage(hero:GetPlayerID(), "#error_gold_full")
-					gold_advertize = 1
+					hero.gold_advertize = 1
 					Timers:CreateTimer(5.0, function()
-						gold_advertize = 0
+						hero.gold_advertize = 0
 					end)
 				end
 			end
@@ -1264,7 +1262,6 @@ end
 
 function GameMode:OnPlayerReconnected(event)
 --	OpenLane(event.player_id)
-	Server_EnableToGainXPForPlyaer(event.player_id)
 end
 
 ---------------------------------------------------------
@@ -1426,7 +1423,7 @@ end
 ---------------------------------------------------------
 
 function GameMode:OnQuestCompleted(questZone, quest)
---	print("GameMode:OnQuestCompleted - Quest " .. quest.szQuestName .. " in Zone " .. questZone.szName .. " completed.")
+	print("GameMode:OnQuestCompleted - Quest " .. quest.szQuestName .. " in Zone " .. questZone.szName .. " completed.")
 	quest.nCompleted = quest.nCompleted + 1
 	if quest.nCompleted >= quest.nCompleteLimit then
 		quest.bCompleted = true
@@ -1436,7 +1433,7 @@ function GameMode:OnQuestCompleted(questZone, quest)
 
 	if quest.bOptional ~= true then
 		questZone:CheckForZoneComplete()
-	end	
+	end
 
 	if quest.bCompleted == true then
 		for _,zone in pairs(self.Zones) do
@@ -1446,7 +1443,7 @@ function GameMode:OnQuestCompleted(questZone, quest)
 		if quest.Completion.Type == QUEST_EVENT_ON_DIALOG or quest.Completion.Type == QUEST_EVENT_ON_DIALOG_ALL_CONFIRMED then
 			local hDialogEntities = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_ALL, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, 0, false)
 			for _,DialogEnt in pairs (hDialogEntities) do
-				if DialogEnt ~= nil  and DialogEnt:GetUnitName() == quest.Completion.szNPCName and DialogEnt:FindModifierByName("modifier_npc_dialog_notify") then
+				if DialogEnt ~= nil and DialogEnt:GetUnitName() == quest.Completion.szNPCName and DialogEnt:FindModifierByName("modifier_npc_dialog_notify") then
 					DialogEnt:RemoveModifierByName("modifier_npc_dialog_notify")
 				end
 			end
@@ -1466,6 +1463,10 @@ function GameMode:OnQuestCompleted(questZone, quest)
 					Hero:ModifyGold(quest.RewardGold, true, DOTA_ModifyGold_Unspecified)
 				end
 			end
+		end
+
+		if quest.szQuestName == "teleport_top" then
+			StartMagtheridonArena()
 		end
 	end
 	
@@ -1489,7 +1490,6 @@ end
 function GameMode:OnDialogBegin(hPlayerHero, hDialogEnt)
 local Dialog = self:GetDialog(hDialogEnt)
 
-	print("GameMode:OnDialogBegin")
 	if Dialog == nil then
 		print("GameMode:OnDialogBegin - ERROR: No Dialog found for " .. hDialogEnt:GetUnitName())
 		return
@@ -1593,7 +1593,6 @@ local hPlayerHero = EntIndexToHScript(data.PlayerHeroEntIndex)
 local nDialogLine = data.DialogLine
 local bShowNextLine = data.ShowNextLine
 
-	print("GameMode:OnDialogEnded")
 	if hDialogEnt ~= nil and nDialogLine ~= nil then
 		local Dialog = self:GetDialogLine(hDialogEnt, nDialogLine)
 		if Dialog ~= nil then
@@ -1841,13 +1840,15 @@ function GameMode:OnDialogConfirm(eventSourceIndex, data)
 	CustomGameEventManager:Send_ServerToAllClients("dialog_player_confirm", netTable)
 
 	local nValid = 0;
-	for iPlayer = 0,4 do
+	for iPlayer = 0, PlayerResource:GetPlayerCount() - 1 do
 		if PlayerResource:GetSteamAccountID(iPlayer) ~= 0 then
 			nValid = nValid + 1
 		end
 	end
-		
-	if ConfirmCount[data.ConfirmToken] == nValid then
+
+	print("Check if everyone accepted dialog...")
+	print(ConfirmCount[data.ConfirmToken], nValid)
+	if ConfirmCount[data.ConfirmToken] >= nValid then
 		local netTable = {}
 		for _,zone in pairs(self.Zones) do
 			zone:OnDialogAllConfirmed(EntIndexToHScript(data["DialogEntIndex"]), data["DialogLine"])

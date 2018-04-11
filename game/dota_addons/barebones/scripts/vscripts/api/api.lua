@@ -9,7 +9,7 @@ local ApiConfig = {
 }
 
 local ApiEndpoints = {
-	donators = "/xhs/donators"
+	donators = "/xhs/meta/donators"
 }
 
 function ApiDebug(text, ignore)
@@ -18,28 +18,26 @@ function ApiDebug(text, ignore)
 	end
 end
 
-function ApiPerform(robj, endpoint, callback)
+function ApiPerform(data, endpoint, callback)
 
 	local payload = nil
 	local method = "GET"
 
-	-- build base request
-	if robj ~= nil then
-		local baseRequest = {
-			agent = ApiConfig.agent,
-			version = 1,
-			frames = tonumber(GetFrameCount()),
-			server_system_datetime = tostring(GetSystemDate()) .. " " .. tostring(GetSystemTime()),
-			server_time = tonumber(Time()),
-			data = robj
-		}
-
+	if data ~= nil then
 		method = "POST"
-
-		-- encode with json
-		payload = json.encode(baseRequest)
+		payload = json.encode({
+			agent = ApiConfig.agent,
+			time = {
+				frames = tonumber(GetFrameCount()),
+				server_time = tonumber(Time()),
+				dota_time = tonumber(GameRules:GetDOTATime(true, true)),
+				game_time = tonumber(GameRules:GetGameTime()),
+				server_system_date_time = tostring(GetSystemDate()) .. " " .. tostring(GetSystemTime()),
+			},
+			data = data
+		})
 	end
-
+	
 	ApiDebug("Performing " .. method .. " @ " .. endpoint, true)
 
 	if (method == "POST") then
@@ -90,7 +88,7 @@ function ApiLoad()
 		if (err) then
 			ApiDebug("Donators Request failed!", true)
 		else
-			ApiCache.donators = response.data
+			ApiCache.donators = response.data.players
 		end
 	end)
 end
@@ -101,8 +99,9 @@ end
 
 function IsDonator(hero)
 	if hero:GetPlayerID() == -1 or hero:IsIllusion() or ApiCache.donators == nil then return end
+
 	for i = 1, #ApiCache.donators do
-		if tostring(PlayerResource:GetSteamID(hero:GetPlayerID())) == ApiCache.donators[i].steamId64 then
+		if tostring(PlayerResource:GetSteamID(hero:GetPlayerID())) == ApiCache.donators[i].steamid then
 			return ApiCache.donators[i].status
 		elseif i == #ApiCache.donators then
 			return false
