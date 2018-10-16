@@ -663,19 +663,34 @@ local hero = PlayerResource:GetPlayer(userID):GetAssignedHero()
 		end
 
 		if str == "-bt" then
-		local hero = player:GetAssignedHero()
-		local gold = Gold:GetGold(userID)
-		local cost = 10000
-		local numberOfTomes = math.floor(gold / cost)
-			if numberOfTomes >= 1 and BT_ENABLED == 1 then
-				PlayerResource:SpendGold(player:GetPlayerID(), (numberOfTomes) * cost, DOTA_ModifyGold_PurchaseItem)
-				hero:ModifyAgility(numberOfTomes * 50)
-				hero:ModifyStrength(numberOfTomes * 50)
-				hero:ModifyIntellect(numberOfTomes * 50)
-				hero:EmitSound("ui.trophy_levelup")
-				local particle1 = ParticleManager:CreateParticle("particles/econ/events/ti6/hero_levelup_ti6.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
-				ParticleManager:SetParticleControl(particle1, 0, hero:GetAbsOrigin())
+			local hero = player:GetAssignedHero()
+			local gold = Gold:GetGold(userID)
+			local cost = 10000
+			local numberOfTomes = math.floor(gold / cost)
+
+			if BT_ENABLED == 1 then
+				local i = 0
+
 				Notifications:Bottom(player, {text="You've bought "..numberOfTomes.." Tomes!", duration=5.0, style={color="white"}})
+				PlayerResource:SpendGold(player:GetPlayerID(), (numberOfTomes) * cost, DOTA_ModifyGold_PurchaseItem)
+
+				Timers:CreateTimer(function()
+					hero:ModifyAgility(1 * 50)
+					hero:ModifyStrength(1 * 50)
+					hero:ModifyIntellect(1 * 50)
+					hero:EmitSound("ui.trophy_levelup")
+
+					local particle1 = ParticleManager:CreateParticle("particles/econ/events/ti6/hero_levelup_ti6.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
+					ParticleManager:SetParticleControl(particle1, 0, hero:GetAbsOrigin())
+
+					i = i + 1
+
+					if i >= numberOfTomes then
+						return nil
+					else
+						return 0.1
+					end
+				end)
 			elseif BT_ENABLED == 0 then
 				SendErrorMessage(hero:GetPlayerID(), "#error_buy_tome_disabled")
 			elseif numberOfTomes < 1 then
@@ -686,6 +701,7 @@ local hero = PlayerResource:GetPlayer(userID):GetAssignedHero()
 		if str == "-info" then
 			local diff = {"Easy", "Normal", "Hard", "Extreme", "Divine"}
 			local lanes = {"Simple", "Double", "Full"}
+
 			Notifications:Bottom(player, {text="DIFFICULTY: "..diff[GameRules:GetCustomGameDifficulty()], duration=10.0})
 			Notifications:Bottom(player, {text="CREEP LANES: "..lanes[CREEP_LANES_TYPE], duration=10.0})
 		end

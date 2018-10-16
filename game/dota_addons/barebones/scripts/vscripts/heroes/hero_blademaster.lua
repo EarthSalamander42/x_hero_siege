@@ -14,7 +14,7 @@ function xhs_blademaster_mirror_image:IsStealable() 			return true  end
 function xhs_blademaster_mirror_image:IsNetherWardStealable() 	return false end
 
 function xhs_blademaster_mirror_image:OnSpellStart()
-	if not IsServer() then return end
+	if IsClient() then return end
 	local caster = self:GetCaster()
 	local caster_entid = caster:entindex()
 	local ability = self
@@ -23,15 +23,16 @@ function xhs_blademaster_mirror_image:OnSpellStart()
 	local image_out_dmg = ability:GetSpecialValueFor("outgoing_damage")
 	local image_in_dmg = ability:GetSpecialValueFor("incoming_damage")
 	local image_duration = ability:GetSpecialValueFor("illusion_duration")
+	local distance_between_illusions = 150
 	local vRandomSpawnPos = {
-		Vector( 72, 0, 0 ),
-		Vector( 72, 72, 0 ),
-		Vector( 72, 0, 0 ),
-		Vector( 0, 72, 0 ),
-		Vector( -72, 0, 0 ),
-		Vector( -72, 72, 0 ),
-		Vector( -72, -72, 0 ),
-		Vector( 0, -72, 0 ),
+		Vector( distance_between_illusions, 0, 0 ),
+		Vector( distance_between_illusions, distance_between_illusions, 0 ),
+		Vector( distance_between_illusions, 0, 0 ),
+		Vector( 0, distance_between_illusions, 0 ),
+		Vector( -distance_between_illusions, 0, 0 ),
+		Vector( -distance_between_illusions, distance_between_illusions, 0 ),
+		Vector( -distance_between_illusions, -distance_between_illusions, 0 ),
+		Vector( 0, -distance_between_illusions, 0 ),
 	}
 	local particle = "particles/items2_fx/manta_phase.vpcf"
 --	local particle2 = "particles/units/heroes/hero_siren/blademaster_riptide_foam.vpcf"

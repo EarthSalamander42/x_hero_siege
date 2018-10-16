@@ -1405,7 +1405,7 @@
 
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost" 						"16500"
+		"ItemCost" 						"15000"
 		"ItemShopTags"					"unique"
 		"ItemQuality"					"rare"
 		"ItemAliases"					"mask of death"
@@ -2043,7 +2043,7 @@
 		"ItemKillable"				"1" 
 		"ItemSellable"				"0"
 		"ItemPurchasable"			"1"
-		"AbilityCooldown"			"90"
+		"AbilityCooldown"			"60.0"
 		"ItemDroppable"				"1"
 		"ItemShareability"			"ITEM_FULLY_SHAREABLE"
 		"AbilityTextureName"		"custom/amulet_of_the_wild"
@@ -2365,7 +2365,7 @@
 		
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"						"32500"	
+		"ItemCost"						"30000"	
 		"ItemShopTags"					""
 //		"ItemInitialStockTime"			"1470.0"
 //		"ItemStockMax"					"2" 
@@ -2407,7 +2407,7 @@
 		"Orb"							"1"
 
 		// Shops
-		"ItemCost"						"7500"
+		"ItemCost"						"10000"
 //		"ItemInitialStockTime"			"510.0"
 //		"ItemStockMax"					"2" 
 //		"ItemStockTime"					"30.0"
@@ -2587,7 +2587,7 @@
 		"MaxUpgradeLevel"				"3"
 	
 		// Shops
-		"ItemCost"						"7500"
+		"ItemCost"						"10000"
 //		"ItemInitialStockTime"			"510.0"
 //		"ItemStockMax"					"2" 
 //		"ItemStockTime"					"30.0"
@@ -2720,7 +2720,7 @@
 		"AbilityCooldown"				"10.0"
 	
 		// Shops
-		"ItemCost"						"7500"
+		"ItemCost"						"10000"
 //		"ItemInitialStockTime"			"510.0"
 //		"ItemStockMax"					"2" 
 //		"ItemStockTime"					"30.0"
@@ -3053,7 +3053,7 @@
 		
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"						"32500"	
+		"ItemCost"						"30000"	
 		"ItemShopTags"					""
 //		"ItemInitialStockTime"			"1470.0"
 //		"ItemStockMax"					"2" 
@@ -3337,7 +3337,7 @@
 
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"						"32500"	
+		"ItemCost"						"30000"	
 		"ItemShopTags"					""
 //		"ItemInitialStockTime"			"1470.0"
 //		"ItemStockMax"					"2" 
@@ -3462,7 +3462,7 @@
 
 		"AbilityCooldown"				"20.0"	
 		"AbilityCastRange"				"500"
-		"ItemCost"						"750"
+		"ItemCost"						"1000"
 		"ItemQuality"					"rare"
 		"ItemStackable"					"0"
 		"ItemPermanent"					"0"
@@ -3522,6 +3522,15 @@
 		"precache"
 		{
 			"particle"		"particles/units/heroes/hero_abaddon/abaddon_borrowed_time_heal.vpcf"
+		}
+
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"charges_tooltip"		"3"
+			}
 		}
 		
 		"OnSpellStart"
@@ -3610,7 +3619,7 @@
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
 		"AbilityCooldown"				"30.0"	
 		"AbilityCastRange"				"0"
-		"ItemCost"						"5000"
+		"ItemCost"						"2500"
 		"ItemQuality"					"rare"
 		"ItemStackable"					"0"
 		"ItemPermanent"					"0"
@@ -4318,7 +4327,7 @@
 		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 
 		// Shops
-		"ItemCost"						"7500"
+		"ItemCost"						"10000"
 //		"ItemInitialStockTime"			"510.0"
 //		"ItemStockMax"					"2" 
 //		"ItemStockTime"					"30.0"
@@ -4520,7 +4529,7 @@
 		"MaxUpgradeLevel"				"3"
 
 		// Shops
-		"ItemCost"						"17500"
+		"ItemCost"						"20000"
 //		"ItemInitialStockTime"			"990.0"
 //		"ItemStockMax"					"2" 
 //		"ItemStockTime"					"30.0"
@@ -4727,7 +4736,7 @@
 		"MaxUpgradeLevel"				"3"
 
 		// Shops
-		"ItemCost"						"17500"
+		"ItemCost"						"20000"
 //		"ItemInitialStockTime"			"990.0"
 //		"ItemStockMax"					"2" 
 //		"ItemStockTime"					"30.0"
@@ -5098,7 +5107,7 @@
 		"AbilityCooldown"				"10.0"
 
 		// Shops
-		"ItemCost"						"17500"
+		"ItemCost"						"20000"
 //		"ItemInitialStockTime"			"990.0"
 //		"ItemStockMax"					"2" 
 //		"ItemStockTime"					"30.0"

@@ -581,10 +581,18 @@ function OpenCreepLane(lane_number)
 end
 
 function CloseLane(lane_number)
+	if lane_number > PlayerResource:GetPlayerCount() then
+		SendErrorMessage(hero:GetPlayerID(), "#error_cant_close_lane_player_count")
+	end
+
 	if PHASE ~= 3 then
 		if CREEP_LANES_TYPE == 1 then
 			CloseCreepLane(lane_number)
 		elseif CREEP_LANES_TYPE == 2 then
+			if math.ceil(lane_number / 2) > PlayerResource:GetPlayerCount() then
+				SendErrorMessage(hero:GetPlayerID(), "#error_cant_close_lane_player_count")
+			end
+
 			if lane_number == 1 or lane_number == 2 then
 				for i = 1, 2 do
 					CloseCreepLane(i)
