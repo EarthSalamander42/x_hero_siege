@@ -29467,4 +29467,151 @@
 			}
 		}
 	}
+
+	//=================================================================================================================
+	// Nevermore: Necromastery
+	//=================================================================================================================
+	"frostivus_boss_necromastery"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"						"ability_lua"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityTextureName"			"nevermore_necromastery"
+		"ScriptFile"					"boss_scripts/boss_abilities/necromastery.lua"
+		"MaxLevel"						"1"
+	}
+
+	//=================================================================================================================
+	// Nevermore: Immolation
+	//=================================================================================================================
+	"frostivus_boss_immolation"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"						"ability_lua"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityTextureName"			"custom/immolation"
+		"MaxLevel"						"1"
+	}
+
+	//=================================================================================================================
+	// Nevermore: Ragna Blade
+	//=================================================================================================================
+	"frostivus_boss_ragna_blade"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"						"ability_lua"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityTextureName"			"custom/ragna_blade"
+		"MaxLevel"						"1"
+	}
+
+	//=================================================================================================================
+	// Nevermore: Meteor Rain
+	//=================================================================================================================
+	"frostivus_boss_meteorain"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"						"ability_lua"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityTextureName"			"custom/meteorain"
+		"MaxLevel"						"1"
+	}
+
+	//=================================================================================================================
+	// Nevermore: Shadowraze
+	//=================================================================================================================
+	"frostivus_boss_shadowraze"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"						"ability_lua"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityTextureName"			"nevermore_shadowraze2"
+		"MaxLevel"						"1"
+	}
+
+	//=================================================================================================================
+	// Nevermore: Soul Harvest
+	//=================================================================================================================
+	"frostivus_boss_soul_harvest"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"						"ability_lua"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityTextureName"			"custom/soul_harvest"
+		"ScriptFile"					"boss_scripts/boss_abilities/soul_harvest.lua"
+		"MaxLevel"						"1"
+	}
+
+	//=================================================================================================================
+	// Nevermore: Nevermore
+	//=================================================================================================================
+	"frostivus_boss_nevermore"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"						"ability_lua"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityTextureName"			"custom/nevermore"
+		"MaxLevel"						"1"
+	}
+
+	//=================================================================================================================
+	// Nevermore: Requiem of Souls
+	//=================================================================================================================
+	"frostivus_boss_requiem_of_souls"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"						"ability_lua"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityTextureName"			"nevermore_requiem"
+		"ScriptFile"					"boss_scripts/boss_abilities/requiem_of_souls.lua"
+		"MaxLevel"						"1"
+	}
+
+	//=================================================================================================================
+	// Bosses: passive buffs
+	//=================================================================================================================
+	"frostivus_boss_innate"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"						"ability_lua"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_HIDDEN"
+		"AbilityTextureName"			"attribute_bonus"
+		"ScriptFile"					"boss_scripts/boss_innate.lua"
+		"MaxLevel"						"1"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"armor_per_power"			"2"
+			}
+			"02"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"magic_resist_per_power"	"5"
+			}
+			"03"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"damage_per_power"			"25"
+			}
+			"04"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"health_per_power"			"50"
+			}
+		}
+	}
 } // End

@@ -181,7 +181,12 @@ local too_ez_gold = 0.9 -- The mod is way too ez, to modify gold very easily i j
 				end
 			end
 
+			if npc:GetUnitName() == "npc_dota_hero_banehallow" then
+				npc:AddNewModifier(npc, nil, "boss_thinker_nevermore", {})
+			end
+
 			npc.zone = "xhs_holdout"
+
 			return
 		end
 	end
@@ -637,6 +642,24 @@ local hero = PlayerResource:GetPlayer(userID):GetAssignedHero()
 					end
 				end
 			end
+
+			if str == "-replaceherowith" then
+						print("Replace hero!")
+						text = string.gsub(text, str, "")
+						text = string.gsub(text, " ", "")
+						if PlayerResource:GetSelectedHeroName(caster:GetPlayerID()) ~= "npc_dota_hero_"..text then
+							PrecacheUnitByNameAsync("npc_dota_hero_"..text, function()
+								local wisp = PlayerResource:GetSelectedHeroEntity(playerId)
+								local hero = PlayerResource:ReplaceHeroWith(playerId, "npc_dota_hero_"..text, 0, 0)
+
+								Timers:CreateTimer(1.0, function()
+									if wisp then
+										UTIL_Remove(wisp)
+									end
+								end)
+							end)
+						end
+					end
 		end
 
 		if str == "-bt" then
@@ -665,6 +688,64 @@ local hero = PlayerResource:GetPlayer(userID):GetAssignedHero()
 			local lanes = {"Simple", "Double", "Full"}
 			Notifications:Bottom(player, {text="DIFFICULTY: "..diff[GameRules:GetCustomGameDifficulty()], duration=10.0})
 			Notifications:Bottom(player, {text="CREEP LANES: "..lanes[CREEP_LANES_TYPE], duration=10.0})
+		end
+
+		if GameRules:State_Get() >= DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
+			if str == "-openlane_all" or str == "-ol_all" then
+				for i = 1, 8 do
+					OpenLane(i)
+				end
+			end
+
+			if str == "-closelane_all" or str == "-cl_all" then
+				for i = 1, 8 do
+					CloseLane(i)
+				end
+			end
+		end
+	end
+
+	if GameRules:State_Get() < DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then return end
+
+	local openlane_command = {
+		"openlane",
+		"ol",
+	}
+
+	for _, openlane in pairs(openlane_command) do
+		local i, j = string.find(text, openlane.."_%d")
+		local lane = nil
+
+		if i then
+			lane = string.sub(text, i, j)
+			local i,j = string.find(lane, "%d")
+			lane = tonumber(string.sub(lane, i, j))
+
+			if lane <= 8 then
+				print("Opening lane:", lane)
+				OpenLane(lane)
+			end
+		end
+	end
+
+	local closelane_command = {
+		"closelane",
+		"cl",
+	}
+
+	for _, openlane in pairs(openlane_command) do
+		local i, j = string.find(text, openlane.."_%d")
+		local lane = nil
+
+		if i then
+			lane = string.sub(text, i, j)
+			local i,j = string.find(lane, "%d")
+			lane = tonumber(string.sub(lane, i, j))
+
+			if lane <= 8 then
+				print("Opening lane:", lane)
+				OpenLane(lane)
+			end
 		end
 	end
 end
@@ -749,7 +830,7 @@ local networkid = keys.networkid
 local reason = keys.reason
 local userid = keys.userid
 
-	CloseLane(userid)
+--	CloseLane(userid)
 end
 
 -- A non-player entity (necro-book, chen creep, etc) used an ability
@@ -820,7 +901,6 @@ local KillerID = hero:GetPlayerOwnerID()
 local playerKills = PlayerResource:GetKills(KillerID)
 local cn = string.gsub(killedUnit:GetName(), "dota_badguys_tower", "")
 local lane = tonumber(cn)
-
 
 	OrbOfDarkness(hero, killedUnit)
 
@@ -1574,7 +1654,7 @@ local Dialog = self:GetDialog(hDialogEnt)
 		if szJournalNumber ~= nil then
 			local nJournalNumber = tonumber(szJournalNumber);
 			local nPlayerID = hPlayerHero:GetPlayerID()
-			self:OnPlayerFoundChefNote(nPlayerID, nJournalNumber)
+--			self:OnPlayerFoundChefNote(nPlayerID, nJournalNumber)
 		end
 	end
 
@@ -1907,24 +1987,6 @@ end
 
 ---------------------------------------------------------
 
-function GameMode:TrackPlayerAchievementEvent(trackingTable, nPlayerID, nIndex)
-	local szAccountID = tostring(PlayerResource:GetSteamAccountID(nPlayerID))
-
-	if trackingTable[ szAccountID ] == nil then
-		trackingTable[ szAccountID ] = {}
-	end
-
-	trackingTable[ szAccountID ][ nIndex ] = true
-end
-
----------------------------------------------------------
-
 function GameMode:OnPlayerFoundChefNote(nPlayerID, nChefNoteIndex)
-	self:TrackPlayerAchievementEvent(self.ChefNotesFound, nPlayerID, nChefNoteIndex)
-end
-
----------------------------------------------------------
-
-function GameMode:OnPlayerFoundInvoker(nPlayerID, nInvokerIndex)
-	self:TrackPlayerAchievementEvent(self.InvokerFound, nPlayerID, nInvokerIndex)
+--	self:TrackPlayerAchievementEvent(self.ChefNotesFound, nPlayerID, nChefNoteIndex)
 end

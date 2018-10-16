@@ -10232,11 +10232,80 @@
 	//=================================================================================
 	// Banehallow
 	//=================================================================================
+//	"npc_dota_hero_banehallow"
+//	{
+//		"BaseClass"					"npc_dota_creature"
+//		"Model"						"models/heroes/shadow_fiend/shadow_fiend_arcana.vmdl"	// Model.
+//		"SoundSet"					"Hero_Enigma"							// Name of sound set.
+//		"ProjectileModel"			"particles/econ/items/shadow_fiend/sf_desolation/sf_base_attack_desolation_fire_arcana.vpcf"
+//		"ProjectileSpeed"			"1200"
+//		"ConsideredHero"			"1"
+//		"ModelScale"                "1.7"
+//		"LeavesCorpse"				"0"
+
+		// Abilities
+		//----------------------------------------------------------------
+//		"Ability1"					"frostivus_boss_necromastery"
+//		"Ability2"					"frostivus_boss_immolation"
+//		"Ability3"					"frostivus_boss_ragna_blade"
+//		"Ability4"					"frostivus_boss_meteorain"
+//		"Ability5"					"frostivus_boss_shadowraze"
+//		"Ability6"					"frostivus_boss_soul_harvest"
+//		"Ability7"					"frostivus_boss_nevermore"
+//		"Ability8"					"frostivus_boss_requiem_of_souls"
+//		"Ability9"					"frostivus_boss_innate"
+
+//		"ArmorPhysical"				"2600"                  // Physical protection.
+//		"MagicalResistance"			"50"                 // Magical protection (percentage).
+
+//		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
+//		"AttackDamageMin"			"44999"                   // Damage range min.
+//		"AttackDamageMax"			"55001"                   // Damage range max.
+//		"AttackRate"                "0.9"                                  // Speed of attack.
+//		"AttackAnimationPoint"      "0.5"                                   // Normalized time in animation cycle to attack.
+//		"AttackAcquisitionRange"    "900"                                   // Range within a target can be acquired.
+//		"AttackRange"               "700"                                   // Range within a target can be attacked.
+
+//		"BountyXP"					"99999"                 // Experience earn.
+//		"BountyGoldMin"				"99999"                   // Gold earned min.
+//		"BountyGoldMax"				"99999"                   // Gold earned max.
+
+//		"BoundsHullName"			"DOTA_HULL_SIZE_HUGE"
+//		"RingRadius"				"200"
+//		"HealthBarOffset"			"450"
+
+//		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"
+//		"MovementSpeed"				"400"                 // Speed.
+//		"MovementTurnRate"			"0.5"                 // Turning rate.
+
+//		"StatusHealth"				"140000"                 // Base health.
+//		"StatusHealthRegen"			"30.0"                 // Health regeneration rate.
+//		"StatusMana"				"5000"                   // Base mana.
+//		"StatusManaRegen"			"100"                 // Mana regeneration rate.
+
+//		"VisionDaytimeRange"		"1800"                  // Range of vision at night time.
+//		"VisionNighttimeRange"		"1800"                  // Range of vision at night time.
+
+//		"Creature"
+//		{
+////			"AttachWearables"   
+////			{
+////				"Wearable1"	{ "ItemDef" "6996" } // Demon Eater/Head Slot/ Original = 387
+////				"Wearable2"	{ "ItemDef" "8259" } // Arms of Desolation/Arms Slot/ Original = 488
+////				"Wearable3"	{ "ItemDef" "486" }		//Shoulders
+////			}
+
+//			"DisableResistance"			"50.0"
+//		}
+//	}
+
+	//=================================================================================
+	// Banehallow
+	//=================================================================================
 	"npc_dota_hero_banehallow"
 	{
-
 		"BaseClass"					"npc_dota_creature"
-		"Model"						"models/heroes/shadow_fiend/shadow_fiend.vmdl"	// Model.
+		"Model"						"models/heroes/shadow_fiend/shadow_fiend_arcana.vmdl"	// Model.
 		"SoundSet"					"Hero_Enigma"							// Name of sound set.
 		"ProjectileModel"			"particles/econ/items/shadow_fiend/sf_desolation/sf_base_attack_desolation_fire_arcana.vpcf"
 		"ProjectileSpeed"			"1200"
@@ -10245,6 +10314,8 @@
 		"LeavesCorpse"				"0"
 		"UseAI"						"2"
 
+		// Abilities
+		//----------------------------------------------------------------
 		"Ability1"					"banehallow_stampede"
 		"Ability2"					"demonhunter_immolation" 
 		"Ability3"					"command_aura"

@@ -18,7 +18,7 @@ local delay = 3.0
 		local point = Entities:FindByName(nil, "point_teleport_boss_"..hero:GetPlayerID())
 
 		if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
-			TeleportHero(hero, delay, point)
+			TeleportHero(hero, delay, point:GetAbsOrigin())
 			hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {Duration = 10 + delay, IsHidden = true})
 			hero:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 10 + delay, IsHidden = true})
 		end

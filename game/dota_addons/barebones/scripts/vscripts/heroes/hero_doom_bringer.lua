@@ -14,9 +14,9 @@ local modifier_duration = target_hp/health_per_second
 	-- Apply the modifier and kill the target
 	ability:ApplyDataDrivenModifier(caster, caster, modifier, {duration = modifier_duration})
 	target:Kill(ability, caster)
-	caster:RemoveModifierByName("modifier_endurance_aura")
-	caster:RemoveModifierByName("modifier_command_aura")
-	caster:RemoveModifierByName("modifier_aura_of_blight")
+--	caster:RemoveModifierByName("modifier_endurance_aura")
+--	caster:RemoveModifierByName("modifier_command_aura")
+--	caster:RemoveModifierByName("modifier_aura_of_blight")
 
 -- Setting up the table for allowed devour targets
 local devour_table = {}
@@ -67,6 +67,7 @@ table.insert(devour_table, "npc_dota_creature_satyrr")
 			-- Get the first two abilities
 			local ability1 = target:GetAbilityByIndex(0)
 			local ability2 = target:GetAbilityByIndex(1)
+			if ability1 == nil then return end
 
 			-- If we already devoured a target and stole an ability from before then clear it
 			if caster.devour_ability1 then

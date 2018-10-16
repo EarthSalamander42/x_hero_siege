@@ -32,6 +32,9 @@ require('triggers')
 require('items/global')
 require('api/api')
 
+-- new bosses system
+require('boss_scripts/boss_functions')
+
 function GameMode:OnFirstPlayerLoaded()
 	base_good = Entities:FindByName(nil, "base_spawn_goodguys")
 end
@@ -45,9 +48,10 @@ function GameMode:OnAllPlayersLoaded()
 
 	Timers:CreateTimer(3.0, function()
 		EmitSoundOn("Global.InGame", base_good)
-		if base_bad then
-			EmitSoundOn("Global.InGame", base_bad)
-		end
+
+--		if base_bad then
+--			EmitSoundOn("Global.InGame", base_bad)
+--		end
 	end)
 end
 
@@ -92,7 +96,8 @@ function GameMode:InitGameMode()
 	--Disabling Derived Stats
 	mode:SetCustomAttributeDerivedStatValue(DOTA_ATTRIBUTE_STRENGTH_STATUS_RESISTANCE_PERCENT, 0)
 	mode:SetCustomAttributeDerivedStatValue(DOTA_ATTRIBUTE_AGILITY_MOVE_SPEED_PERCENT, 0)
-	mode:SetCustomAttributeDerivedStatValue(DOTA_ATTRIBUTE_INTELLIGENCE_MAGIC_RESISTANCE_PERCENT, 0)
+	mode:SetCustomAttributeDerivedStatValue(DOTA_ATTRIBUTE_STRENGTH_MAGIC_RESISTANCE_PERCENT, 0)
+--	print("MR per STR:", mode:GetCustomAttributeDerivedStatValue(DOTA_ATTRIBUTE_AGILITY_MOVE_SPEED_PERCENT, "i_dont_know_what_argument_should_be_there_doc_plis_volvo"))
 
 	-- Overriding Derived Stats
 	mode:SetCustomAttributeDerivedStatValue(DOTA_ATTRIBUTE_STRENGTH_HP_REGEN_PERCENT, 0.0025)
@@ -159,7 +164,8 @@ function GameMode:InitGameMode()
 
 	if IsInToolsMode() then
 		Convars:RegisterCommand("duel_event", function(keys) return DuelEvent() end, "Test Duel Event", FCVAR_CHEAT)
-		Convars:RegisterCommand("magtheridon", function(keys) return StartMagtheridonArena(keys) end, "Test Magtheridon Boss", FCVAR_CHEAT)
+		Convars:RegisterCommand("magtheridon", function(keys) return StartMagtheridonArena() end, "Test Magtheridon Boss", FCVAR_CHEAT)
+		Convars:RegisterCommand("banehallow", function(keys) return StartBanehallowArena() end, "Test Magtheridon Boss", FCVAR_CHEAT)
 		Convars:RegisterCommand("r&b", function(keys) return RameroAndBaristolEvent() end, "Test Ramero and Baristol Arena", FCVAR_CHEAT)
 		Convars:RegisterCommand("r", function(keys) return RameroEvent() end, "Test Ramero Arena", FCVAR_CHEAT)
 		Convars:RegisterCommand("farm_event", function(keys) return FarmTest() end, "Test Farm Event", FCVAR_CHEAT)
@@ -216,8 +222,8 @@ function GameMode:InitGameMode()
 					else
 						if hero:GetTeamNumber() == 2 then
 							TeleportHero(hero, 3.0, base_good:GetAbsOrigin())
-						elseif hero:GetTeamNumber() == 3 then
-							TeleportHero(hero, 3.0, base_bad:GetAbsOrigin())
+--						elseif hero:GetTeamNumber() == 3 then
+--							TeleportHero(hero, 3.0, base_bad:GetAbsOrigin())
 						end
 					end
 					hero:EmitSound("Hero_TemplarAssassin.Trap")
@@ -236,8 +242,8 @@ function GameMode:InitGameMode()
 					else
 						if hero:GetTeamNumber() == 2 then
 							TeleportHero(hero, 3.0, base_good:GetAbsOrigin())
-						elseif hero:GetTeamNumber() == 3 then
-							TeleportHero(hero, 3.0, base_bad:GetAbsOrigin())
+--						elseif hero:GetTeamNumber() == 3 then
+--							TeleportHero(hero, 3.0, base_bad:GetAbsOrigin())
 						end
 					end
 					hero:EmitSound("Hero_TemplarAssassin.Trap")
@@ -249,8 +255,8 @@ function GameMode:InitGameMode()
 					else
 						if hero:GetTeamNumber() == 2 then
 							TeleportHero(hero, 3.0, base_good:GetAbsOrigin())
-						else
-							TeleportHero(hero, 3.0, base_bad:GetAbsOrigin())
+--						else
+--							TeleportHero(hero, 3.0, base_bad:GetAbsOrigin())
 						end
 					end
 					hero:EmitSound("Hero_TemplarAssassin.Trap")

@@ -67,6 +67,7 @@ local hero_vip_count = 1
 			local dummy_hero = CreateUnitByName("npc_dota_hero_"..HEROLIST_VIP[hero_vip_count].."_bis", Entities:FindByName(nil, "choose_vip_"..hero_vip_count.."_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
 			dummy_hero:SetAngles(0, 270, 0)
 		end
+
 		if hero_vip_count < #HEROLIST_VIP then
 			hero_vip_count = hero_vip_count +1
 			return 0.3

@@ -63,7 +63,6 @@ COLOR_GOLD = '\x1D'
 ]]
 function HideWearables(event)
 	local hero = event.caster
-	local ability = event.ability
 	local model = hero:FirstMoveChild()
 
 	hero.hiddenWearables = {} -- Keep every wearable handle in a table to show them later
@@ -533,56 +532,100 @@ function SpawnDragons(dragon)
 	end
 end
 
-function OpenLane(PlayerID)
-local DoorObs = Entities:FindAllByName("obstruction_lane"..PlayerID)
-local towers = Entities:FindAllByName("dota_badguys_tower"..PlayerID)
-local raxes = Entities:FindAllByName("dota_badguys_barracks_"..PlayerID)
-
+function OpenLane(lane_number)
 	if PHASE ~= 3 then
 		if CREEP_LANES_TYPE == 1 then
-			for _, obs in pairs(DoorObs) do
-			obs:SetEnabled(false, true)
-			end
-			for _, tower in pairs(towers) do
-				tower:RemoveModifierByName("modifier_invulnerable")
-			end
-			for _, rax in pairs(raxes) do
-				rax:RemoveModifierByName("modifier_invulnerable")
-			end
-			CREEP_LANES[PlayerID+1][1] = 1
-			DoEntFire("door_lane"..PlayerID+1, "SetAnimation", "gate_02_open", 0, nil, nil)
-			print("Lane: "..PlayerID+1)
+			OpenCreepLane(lane_number)
 		elseif CREEP_LANES_TYPE == 2 then
-			
+			if lane_number == 1 or lane_number == 2 then
+				for i = 1, 2 do
+					OpenCreepLane(i)
+				end
+			elseif lane_number == 3 or lane_number == 4 then
+				for i = 3, 4 do
+					OpenCreepLane(i)
+				end
+			elseif lane_number == 5 or lane_number == 6 then
+				for i = 5, 6 do
+					OpenCreepLane(i)
+				end
+			elseif lane_number == 7 or lane_number == 8 then
+				for i = 7, 8 do
+					OpenCreepLane(i)
+				end
+			end
 		end
 	end
 end
 
-function CloseLane(PlayerID)
---	local Lane = PlayerID+1
-local Lane = PlayerID
-local DoorObs = Entities:FindAllByName("obstruction_lane"..Lane)
-local towers = Entities:FindAllByName("dota_badguys_tower"..Lane)
-local raxes = Entities:FindAllByName("dota_badguys_barracks_"..Lane)
+function OpenCreepLane(lane_number)
+	local DoorObs = Entities:FindAllByName("obstruction_lane"..lane_number)
+	local towers = Entities:FindAllByName("dota_badguys_tower"..lane_number)
+	local raxes = Entities:FindAllByName("dota_badguys_barracks_"..lane_number)
 
-	if PHASE ~= 3 and CREEP_LANES_TYPE == 1 then
-		for _, obs in pairs(DoorObs) do
-			obs:SetEnabled(true, false)
-		end
-		for _, tower in pairs(towers) do
-			tower:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
-		end
-		for _, rax in pairs(raxes) do
-			rax:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
-		end
-		CREEP_LANES[Lane][1] = 0
-		DoEntFire("door_lane"..Lane, "SetAnimation", "gate_02_close", 0, nil, nil)
-		print("Lane: "..Lane)
-	elseif PHASE ~= 3 and CREEP_LANES_TYPE == 2 then
-		
-	elseif CREEP_LANES_TYPE == 3 or PHASE == 3 then
-		return
+	for _, obs in pairs(DoorObs) do
+		obs:SetEnabled(false, true)
 	end
+
+	for _, tower in pairs(towers) do
+		tower:RemoveModifierByName("modifier_invulnerable")
+	end
+
+	for _, rax in pairs(raxes) do
+		rax:RemoveModifierByName("modifier_invulnerable")
+	end
+
+	Notifications:TopToAll({text="Host opened lane "..lane_number.."!", style={color="lightgreen"}, duration=5.0})
+	CREEP_LANES[lane_number][1] = 1
+	DoEntFire("door_lane"..lane_number, "SetAnimation", "gate_02_open", 0, nil, nil)
+end
+
+function CloseLane(lane_number)
+	if PHASE ~= 3 then
+		if CREEP_LANES_TYPE == 1 then
+			CloseCreepLane(lane_number)
+		elseif CREEP_LANES_TYPE == 2 then
+			if lane_number == 1 or lane_number == 2 then
+				for i = 1, 2 do
+					CloseCreepLane(i)
+				end
+			elseif lane_number == 3 or lane_number == 4 then
+				for i = 3, 4 do
+					CloseCreepLane(i)
+				end
+			elseif lane_number == 5 or lane_number == 6 then
+				for i = 5, 6 do
+					CloseCreepLane(i)
+				end
+			elseif lane_number == 7 or lane_number == 8 then
+				for i = 7, 8 do
+					CloseCreepLane(i)
+				end
+			end
+		end
+	end
+end
+
+function CloseCreepLane(lane_number)
+	local DoorObs = Entities:FindAllByName("obstruction_lane"..lane_number)
+	local towers = Entities:FindAllByName("dota_badguys_tower"..lane_number)
+	local raxes = Entities:FindAllByName("dota_badguys_barracks_"..lane_number)
+
+	for _, obs in pairs(DoorObs) do
+		obs:SetEnabled(true, false)
+	end
+
+	for _, tower in pairs(towers) do
+		tower:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
+	end
+
+	for _, rax in pairs(raxes) do
+		rax:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
+	end
+
+	Notifications:TopToAll({text="Host closed lane "..lane_number.."!", style={color="red"}, duration=5.0})
+	CREEP_LANES[lane_number][1] = 0
+	DoEntFire("door_lane"..lane_number, "SetAnimation", "gate_02_close", 0, nil, nil)
 end
 
 function PauseHeroes()
@@ -850,13 +893,16 @@ local pos = hero:GetAbsOrigin()
 		EmitSoundOnLocationWithCaster(hero:GetAbsOrigin(), "Portal.Hero_Appear", hero)
 		hero:RemoveModifierByName("modifier_command_restricted")
 
-		ParticleManager:DestroyParticle(TeleportEffect, false)
-		ParticleManager:DestroyParticle(TeleportEffectEnd, false)
-		ParticleManager:ReleaseParticleIndex(TeleportEffect)
-		ParticleManager:ReleaseParticleIndex(TeleportEffectEnd)
+		if delay > 0 then
+			ParticleManager:DestroyParticle(TeleportEffect, false)
+			ParticleManager:DestroyParticle(TeleportEffectEnd, false)
+			ParticleManager:ReleaseParticleIndex(TeleportEffect)
+			ParticleManager:ReleaseParticleIndex(TeleportEffectEnd)
+		end
 
 		Timers:CreateTimer(0.1, function()
 			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
+			hero:StopSound("Portal.Loop_Appear")
 		end)
 	end)
 end
@@ -955,4 +1001,16 @@ function UnitVarToPlayerID(unitvar)
 	end
 	
 	return -1
+end
+
+function UpdateBossBar(boss, team)
+	CustomNetTables:SetTableValue("game_options", "boss", {
+		level = boss:GetLevel(),
+		HP = boss:GetHealth(),
+		HP_alt = boss:GetHealthPercent(),
+		maxHP = boss:GetMaxHealth(),
+		label = boss:GetUnitName(),
+		short_label = string.gsub(boss:GetUnitName(), "npc_frostivus_boss_", ""),
+		team_contest = team
+	})
 end
