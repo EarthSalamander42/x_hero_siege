@@ -38,12 +38,11 @@ local teleporters = Entities:FindAllByName("trigger_teleport_muradin_end")
 
 	Timers:CreateTimer(time, function()
 		SpecialWave()
-		UTIL_Remove(Muradin)
-		mode:SetFixedRespawnTime(40)
+		mode:SetFixedRespawnTime(RESPAWN_TIME)
 		nTimer_SpecialEvent = 720
 		BT_ENABLED = 1
 		SPECIAL_EVENT = 0
-		RestartCreeps()
+		RestartCreeps(3.0)
 		Notifications:TopToAll({text="Special Events are unlocked!", style={color="DodgerBlue"}, duration=5.0})
 		Entities:FindByName(nil, "trigger_special_event_tp_off"):Disable()
 		Entities:FindByName(nil, "trigger_special_event"):Enable()
@@ -51,7 +50,8 @@ local teleporters = Entities:FindAllByName("trigger_teleport_muradin_end")
 		Timers:CreateTimer(6, function() -- 14:05 Min: MURADIN BRONZEBEARD EVENT 1, END
 			Notifications:TopToAll({text="All heroes who survived Muradin received 15 000 Gold!", duration=6.0})
 			Notifications:TopToAll({ability="alchemist_goblins_greed", continue = true})
-			RestartCreeps()
+			RestartCreeps(0.0)
+			UTIL_Remove(Muradin)
 		end)
 	end)
 end
@@ -142,7 +142,7 @@ StunBuildings(time)
 		CustomGameEventManager:Send_ServerToAllClients("update_special_event_label_final", {})
 
 		Timers:CreateTimer(10.0, function()
-			RestartCreeps()
+			RestartCreeps(0.0)
 			SpecialWave()
 		end)
 	end)
@@ -241,7 +241,8 @@ GameMode.SpecialArena_occuring = 1
 
 	timers.RameroAndBaristol = Timers:CreateTimer(time, function() -- Teleport back to the spawn
 		SPECIAL_EVENT = 0
-		RestartCreeps()
+		local teleport_time = 3.0
+		RestartCreeps(teleport_time + 3.0)
 		UTIL_Remove(RAMERO_DUMMY)
 		UTIL_Remove(BARISTOL_DUMMY)
 		CustomGameEventManager:Send_ServerToAllClients("hide_timer_special_arena", {})
@@ -260,7 +261,8 @@ GameMode.SpecialArena_occuring = 1
 					local RameroAndBaristolCheck = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, Entities:FindByName(nil, "npc_dota_muradin_boss"):GetAbsOrigin(), nil, 2000, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false)
 					for _, hero in pairs(RameroAndBaristolCheck) do
 						if hero:IsRealHero() then
-							TeleportHero(hero, 3.0, base_good:GetAbsOrigin())
+							TeleportHero(hero, teleport_time, base_good:GetAbsOrigin())
+							RestartCreeps(teleport_time + 3.0)
 						end
 					end
 					Check = Check +1
@@ -291,7 +293,8 @@ GameMode.SpecialArena_occuring = 1
 
 	timers.Ramero = Timers:CreateTimer(time, function() -- Teleport back to the spawn
 		SPECIAL_EVENT = 0
-		RestartCreeps()
+		local teleport_time = 3.0
+		RestartCreeps(teleport_time + 3.0)
 		UTIL_Remove(RAMERO_BIS_DUMMY)
 		CustomGameEventManager:Send_ServerToAllClients("hide_timer_special_arena", {})
 		GameMode.SpecialArena_occuring = 0

@@ -94,10 +94,9 @@ function GameMode:InitGameMode()
 	GameRules:SetPreGameTime(PREGAMETIME)
 
 	--Disabling Derived Stats
-	mode:SetCustomAttributeDerivedStatValue(DOTA_ATTRIBUTE_STRENGTH_STATUS_RESISTANCE_PERCENT, 0)
-	mode:SetCustomAttributeDerivedStatValue(DOTA_ATTRIBUTE_AGILITY_MOVE_SPEED_PERCENT, 0)
 	mode:SetCustomAttributeDerivedStatValue(DOTA_ATTRIBUTE_STRENGTH_MAGIC_RESISTANCE_PERCENT, 0)
---	print("MR per STR:", mode:GetCustomAttributeDerivedStatValue(DOTA_ATTRIBUTE_AGILITY_MOVE_SPEED_PERCENT, "i_dont_know_what_argument_should_be_there_doc_plis_volvo"))
+
+	mode:SetCustomAttributeDerivedStatValue(DOTA_ATTRIBUTE_AGILITY_MOVE_SPEED_PERCENT, 0)
 
 	-- Overriding Derived Stats
 	mode:SetCustomAttributeDerivedStatValue(DOTA_ATTRIBUTE_STRENGTH_HP_REGEN_PERCENT, 0.0025)
@@ -215,10 +214,11 @@ function GameMode:InitGameMode()
 					if timers.RameroAndBaristol then
 						Timers:RemoveTimer(timers.RameroAndBaristol)
 					end
-					RestartCreeps()
+					local teleport_time = 3.0
+					RestartCreeps(teleport_time + 3)
 					sword_first_time = false
 					if hero.old_pos then
-						TeleportHero(hero, 3.0, hero.old_pos)
+						TeleportHero(hero, teleport_time, hero.old_pos)
 					else
 						if hero:GetTeamNumber() == 2 then
 							TeleportHero(hero, 3.0, base_good:GetAbsOrigin())
@@ -235,10 +235,11 @@ function GameMode:InitGameMode()
 					if timers.Ramero then
 						Timers:RemoveTimer(timers.Ramero)
 					end
-					RestartCreeps()
+					local teleport_time = 3.0
+					RestartCreeps(teleport_time + 3)
 					ring_first_time = false
 					if hero.old_pos then
-						TeleportHero(hero, 3.0, hero.old_pos)
+						TeleportHero(hero, teleport_time, hero.old_pos)
 					else
 						if hero:GetTeamNumber() == 2 then
 							TeleportHero(hero, 3.0, base_good:GetAbsOrigin())
@@ -382,9 +383,11 @@ local newState = GameRules:State_Get()
 	if newState == DOTA_GAMERULES_STATE_PRE_GAME then
 		Gold:Init()
 		nTimer_GameTime = PREGAMETIME
+
 		if nTimer_GameTime == 10 then
 			ChooseRandomHero(event)
 		end
+
 		for i = 1, 8 do
 			DoEntFire("door_lane"..i, "SetAnimation", "gate_02_close", 0, nil, nil)
 		end
@@ -1050,14 +1053,28 @@ local point_beast = Entities:FindByName(nil, "hero_image_boss"):GetAbsOrigin()
 
 		GameMode.HeroImage = CreateUnitByName(hero:GetUnitName(), point_beast, true, nil, nil, DOTA_TEAM_CUSTOM_1)
 		GameMode.HeroImage:SetAngles(0, 210, 0)
-		GameMode.HeroImage:SetBaseStrength(hero:GetBaseStrength()*4)
-		GameMode.HeroImage:SetBaseIntellect(hero:GetBaseIntellect()*4)
-		GameMode.HeroImage:SetBaseAgility(hero:GetBaseAgility()*4)
+
+		GameMode.HeroImage:SetBaseStrength(hero:GetBaseStrength() * 4)
+		GameMode.HeroImage:SetBaseIntellect(hero:GetBaseIntellect() * 4)
+		GameMode.HeroImage:SetBaseAgility(hero:GetBaseAgility() * 4)
+
+		for _, ability in pairs(AbilitiesHeroes_XX[hero:GetUnitName()]) do
+			if ability then
+				hero:UpgradeAbility(ability)
+				local oldab = hero:GetAbilityByIndex(ability[2])
+				if oldab:GetAutoCastState() then 
+					oldab:ToggleAutoCast()
+				end
+				hero:SwapAbilities(oldab:GetName(),ability[1],true,true)
+			end
+		end
+
 		GameMode.HeroImage:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 5,IsHidden = true})
 		GameMode.HeroImage:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 5,IsHidden = true})
 		GameMode.HeroImage:MakeIllusion()
 		GameMode.HeroImage:AddAbility("hero_image_death")
 		GameMode.HeroImage.Boss = true
+
 		local ability = GameMode.HeroImage:FindAbilityByName("hero_image_death")
 		ability:ApplyDataDrivenModifier(GameMode.HeroImage, GameMode.HeroImage, "modifier_hero_image", {})
 

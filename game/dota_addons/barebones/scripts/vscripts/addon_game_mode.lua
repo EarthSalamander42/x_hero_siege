@@ -106,6 +106,7 @@ function Precache(context)
 	PrecacheUnitByNameAsync("npc_dota_hero_proudmoore", context)
 
 --	-- PRECACHE SOUNDS
+	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_abaddon.vsndevts", context) -- For Lich King shield spell
 	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_death_prophet.vsndevts", context) -- For Incoming Wave 4
 	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_enigma.vsndevts", context) -- For Incoming Wave 4
 	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_juggernaut.vsndevts", context) -- For Grom boss (crit sounds?)

@@ -311,7 +311,8 @@ _G.innate_abilities = {
 	"holdout_yellow_effect",	--Desert Wyrm Ultimate effect
 	"holdout_blue_effect",		--Lich King boss + hero effect
 	"holdout_green_effect",		--Banehallow boss + hero effect
-	"holdout_red_effect"		--Abaddon boss
+	"holdout_red_effect",		--Abaddon boss
+	"ghost_revenant_ghost_immolation",
 }
 
 _G.difficulty_abilities = {
@@ -358,4 +359,9 @@ _G.difficulty_abilities = {
 	"arthas_frostmourne",
 	"baristol_holy_light",
 	"chaos_knight_chaos_strike",
+}
+
+-- Abilities cast only if more than 1 player
+_G.multiplayer_abilities_cast = {
+	"balanar_sleep",
 }

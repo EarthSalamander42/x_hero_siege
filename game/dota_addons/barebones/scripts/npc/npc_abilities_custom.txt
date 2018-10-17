@@ -10826,6 +10826,11 @@
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
 
+		"precache"
+		{
+			"particle"  "particles/items_fx/black_king_bar_avatar.vpcf"
+		}
+
 		"AbilitySpecial"
 		{
 			"01"
@@ -22649,7 +22654,7 @@
 		
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCastPoint"				"1.5"
+		"AbilityCastPoint"				"1.0"
 
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
@@ -22813,7 +22818,7 @@
 
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCastPoint"				"1.4"
+		"AbilityCastPoint"				"1.0"
 
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
@@ -23090,7 +23095,7 @@
 			"02"
 			{
 				"var_type"					"FIELD_FLOAT"
-				"illusion_duration"			"10"
+				"illusion_duration"			"60"
 			}	
 			"03"
 			{
@@ -23684,6 +23689,11 @@
 			{
 				"var_type"				"FIELD_INTEGER"
 				"radius"				"900"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"health_threshold"		"80"
 			}
 		}
 	}
@@ -29206,6 +29216,16 @@
 			{
 				"Passive"	"1"
 				"IsHidden"	"1"
+
+				"OnCreated"
+				{
+					"RunScript"
+					{
+						"ScriptFile"		"npc_abilities/cant_die.lua"
+						"Function"			"OnCreated"
+					}
+				}
+
 				"OnTakeDamage"
 				{
 					"RunScript"
@@ -29225,6 +29245,7 @@
 		"BaseClass"	"ability_datadriven"
 		"AbilityTextureName"	"custom/rubick_empty1"
 		"MaxLevel"	"1"
+
 		"Modifiers"
 		{
 			"modifier_cant_die_generic"
@@ -29235,7 +29256,9 @@
 				{
 					"MODIFIER_PROPERTY_MIN_HEALTH" "1" 
 				}
+
 				"ThinkInterval"  "0.3"
+
 				"OnIntervalThink"
 				{
 					"RunScript"
@@ -29246,6 +29269,7 @@
 					}
 				}
 			}
+
 			"modifier_dying_generic"
 			{
 				"IsHidden"	"1"
@@ -29479,7 +29503,7 @@
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"AbilityTextureName"			"nevermore_necromastery"
 		"ScriptFile"					"boss_scripts/boss_abilities/necromastery.lua"
-		"MaxLevel"						"1"
+		"MaxLevel"						"5"
 	}
 
 	//=================================================================================================================
@@ -29492,7 +29516,28 @@
 		"BaseClass"						"ability_lua"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"AbilityTextureName"			"custom/immolation"
-		"MaxLevel"						"1"
+		"MaxLevel"						"5"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"								"FIELD_INTEGER"
+				"damage"								"1000 2000 3000 4000 6000"		
+			}	
+			"02"
+			{
+				"var_type"								"FIELD_INTEGER"
+				"radius"								"500 600 700 800 1000"
+			}
+			"03"
+			{
+				"var_type"								"FIELD_FLOAT"
+				"delay"									"2.5 2.0 1.5 1.0 0.0"
+			}
+		}
 	}
 
 	//=================================================================================================================
@@ -29505,7 +29550,28 @@
 		"BaseClass"						"ability_lua"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"AbilityTextureName"			"custom/ragna_blade"
-		"MaxLevel"						"1"
+		"MaxLevel"						"5"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"								"FIELD_INTEGER"
+				"damage_pct"							"10 20 30 40 60"		
+			}
+			"02"
+			{
+				"var_type"								"FIELD_FLOAT"
+				"delay"									"2.5 2.4 2.3 2.2 2.0"
+			}
+			"04"
+			{
+				"var_type"								"FIELD_INTEGER"
+				"target_amount"							"1 2 3 4 8"
+			}
+		}
 	}
 
 	//=================================================================================================================
@@ -29518,7 +29584,43 @@
 		"BaseClass"						"ability_lua"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"AbilityTextureName"			"custom/meteorain"
-		"MaxLevel"						"1"
+		"MaxLevel"						"5"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"							"FIELD_INTEGER"
+				"damage"							"10000 20000 30000 40000 60000"		
+			}	
+			"02"
+			{
+				"var_type"							"FIELD_INTEGER"
+				"radius"							"300 350 400 450 550"
+			}
+			"03"
+			{
+				"var_type"							"FIELD_FLOAT"
+				"delay"								"3.0"
+			}
+			"04"
+			{
+				"var_type"							"FIELD_INTEGER"
+				"duration"							"6 8 10 12 16"
+			}
+			"05"
+			{
+				"var_type"							"FIELD_FLOAT"
+				"spawn_delay"						"1.2 1.1 1.0 0.9 0.7"
+			}
+			"06"
+			{
+				"var_type"							"FIELD_INTEGER"
+				"spawn_amount"						"2 4 6 8 12"
+			}
+		}
 	}
 
 	//=================================================================================================================
@@ -29531,7 +29633,33 @@
 		"BaseClass"						"ability_lua"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"AbilityTextureName"			"nevermore_shadowraze2"
-		"MaxLevel"						"1"
+		"MaxLevel"						"5"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"								"FIELD_INTEGER"
+				"damage"								"5000 10000 15000 20000 30000"		
+			}	
+			"02"
+			{
+				"var_type"								"FIELD_INTEGER"
+				"radius"								"250 300 350 400 500"
+			}
+			"03"
+			{
+				"var_type"								"FIELD_FLOAT"
+				"delay"									"1.5 1.45 1.4 1.35 1.25"
+			}
+			"04"
+			{
+				"var_type"								"FIELD_INTEGER"
+				"spawn_distance"						"600 575 550 525 475"
+			}
+		}
 	}
 
 	//=================================================================================================================
@@ -29559,6 +29687,20 @@
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"AbilityTextureName"			"custom/nevermore"
 		"MaxLevel"						"1"
+
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"								"FIELD_INTEGER"
+				"delay"									"3"		
+			}
+			"02"
+			{
+				"var_type"								"FIELD_FLOAT"
+				"duration"								"1 2 3 4 6"
+			}
+		}
 	}
 
 	//=================================================================================================================
@@ -29573,20 +29715,180 @@
 		"AbilityTextureName"			"nevermore_requiem"
 		"ScriptFile"					"boss_scripts/boss_abilities/requiem_of_souls.lua"
 		"MaxLevel"						"1"
+
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"								"FIELD_INTEGER"
+				"delay"									"3.5 3.0 3.5 3.0 2.0"		
+			}
+			"02"
+			{
+				"var_type"								"FIELD_FLOAT"
+				"damage"								"1000 2000 3000 4000 6000"
+			}
+			"03"
+			{
+				"var_type"								"FIELD_FLOAT"
+				"line_amount"							"70"
+			}
+			"04"
+			{
+				"var_type"								"FIELD_FLOAT"
+				"distance"								"800 1000 1200 1400 1600"
+			}
+		}
 	}
 
 	//=================================================================================================================
-	// Bosses: passive buffs
+	// Ghost Revenant: Blackjack
 	//=================================================================================================================
-	"frostivus_boss_innate"
+	"ghost_revenant_blackjack"
 	{
-		// General
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"heroes/hero_ghost_revenant.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_POINT"
+		"AbilityCastRange"			"1600"
+		"AbilityTextureName"    	"custom/ghost_revenant_blackjack"
+		"MaxLevel"					"4"
+		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"AbilityUnitTargetType"		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+		"AbilityUnitDamageType"		"DAMAGE_TYPE_MAGICAL"
+
+		// Casting
 		//-------------------------------------------------------------------------------------------------------------
-		"BaseClass"						"ability_lua"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_HIDDEN"
-		"AbilityTextureName"			"attribute_bonus"
-		"ScriptFile"					"boss_scripts/boss_innate.lua"
-		"MaxLevel"						"1"
+		"AbilityCastPoint"				"0.3"
+
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"11.0"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"80 100 120 140"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"					"FIELD_FLOAT"
+				"stun_duration"				"2.0 2.5 3.0 3.5"
+			}
+			"02"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"damage"					"350 600 850 1100"
+			}
+			"03"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"projectile_radius"			"120"
+			}
+			"04"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"projectile_length"			"1600"
+			}
+			"05"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"projectile_speed"			"1000"
+			}
+			"06"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"projectile_cone"			"60"
+			}
+			"07"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"projectile_amount"			"6"
+				"LinkedSpecialBonus"		"special_bonus_imba_ghost_revenant_1"
+			}
+			"08"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"projectile_vision"			"300"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Ghost Revenant: Wraith
+	//=================================================================================================================
+	"ghost_revenant_wraith"
+	{
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"heroes/hero_ghost_revenant.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_IGNORE_PSEUDO_QUEUE"
+		"AbilityTextureName"    	"custom/ghost_revenant_wraith"
+		"MaxLevel"					"4"
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastPoint"				"0.0"
+
+		// Time
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"13.0"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"60 70 80 90"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"duration"				"3.0 4.0 5.0 6.0"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"res_reduction_pct"		"25"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_ms_pct"			"8 12 16 20"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Ghost Revenant: Miasma (Deal damage to all enemy units in an AoE and applies a buff. Buff reveals invis units and burn damage over time)
+	//=================================================================================================================
+	"ghost_revenant_miasma"
+	{
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"heroes/hero_ghost_revenant.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE"
+		"AbilityCastRange"			"900"
+		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"AbilityUnitTargetType"		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+		"AbilityUnitDamageType"		"DAMAGE_TYPE_MAGICAL"
+		"AbilityTextureName"		"custom/ghost_revenant_miasma"
+		"MaxLevel"					"4"
+		"RequiredLevel"				"5"
+		"AOERadius"					"%area_of_effect"
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastPoint"				"0.3"
+
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"17.0"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"130"
 
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
@@ -29595,22 +29897,111 @@
 			"01"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"armor_per_power"			"2"
+				"area_of_effect"			"500"
 			}
 			"02"
 			{
-				"var_type"					"FIELD_INTEGER"
-				"magic_resist_per_power"	"5"
+				"var_type"					"FIELD_FLOAT"
+				"tick"						"1.0"
 			}
 			"03"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"damage_per_power"			"25"
+				"dmg_per_sec"				"50 100 150 200"
 			}
-			"04"
+			"03"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"health_per_power"			"50"
+				"dmg_pct_per_sec"			"1"
+			}
+			"05"
+			{
+				"var_type"					"FIELD_FLOAT"
+				"duration"					"10.0"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Ghost Revenant: Ghost Immolation
+	//=================================================================================================================
+	"ghost_revenant_ghost_immolation"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"heroes/hero_ghost_revenant.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityCastRange"			"900"
+		"AbilityTextureName"    	"custom/ghost_revenant_ghost_immolation"
+		"MaxLevel"					"1"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"			"FIELD_INTEGER"
+				"radius"			"400"
+			}
+			"02"
+			{
+				"var_type"			"FIELD_INTEGER"
+				"tick_time"			"1"
+			}
+			"03"
+			{
+				"var_type"			"FIELD_INTEGER"
+				"damage"			"80 140 200 260"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"health_as_damage_pct"	"1"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Ghost Revenant: Exhaustion (Aghanim: Remove positive buffs)
+	//=================================================================================================================
+	"ghost_revenant_exhaustion"
+	{
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"heroes/hero_ghost_revenant.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityTextureName"    	"custom/ghost_revenant_exhaustion"
+		"AbilityType"				"DOTA_ABILITY_TYPE_ULTIMATE"
+		"MaxLevel"					"3"
+		"RequiredLevel"				"10"
+		"LevelsBetweenUpgrades"		"5"
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastPoint"				"0.5"
+
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"110.0"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"150 210 270"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"ms_reduction_pct"			"-25 -55 -85"
+			}
+			"02"
+			{
+				"var_type"					"FIELD_FLOAT"
+				"duration"					"7.0"
 			}
 		}
 	}

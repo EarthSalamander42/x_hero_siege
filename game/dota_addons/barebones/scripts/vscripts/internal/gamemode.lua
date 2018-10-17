@@ -52,11 +52,6 @@ function GameMode:_InitGameMode()
 	--ListenToGameEvent('dota_player_killed', Dynamic_Wrap(GameMode, 'OnPlayerKilled'), self)
 	--ListenToGameEvent('player_team', Dynamic_Wrap(GameMode, 'OnPlayerTeam'), self)
 
-	--[[This block is only used for testing events handling in the event that Valve adds more in the future
-	Convars:RegisterCommand('events_test', function()
-		GameMode:StartEventTest()
-	  end, "events test", 0)]]
-
 	local spew = 0
 	if BAREBONES_DEBUG_SPEW then
 	  spew = 1

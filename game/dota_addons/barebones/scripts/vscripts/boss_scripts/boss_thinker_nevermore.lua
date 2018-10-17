@@ -19,18 +19,17 @@ function boss_thinker_nevermore:OnCreated( params )
 		end
 
 		local boss = self:GetParent()
-		print("Nevermore boss has spawned!")
 
 		-- Abilities
-		boss:FindAbilityByName("frostivus_boss_necromastery"):SetLevel(1)
-		boss:FindAbilityByName("frostivus_boss_immolation"):SetLevel(1)
-		boss:FindAbilityByName("frostivus_boss_ragna_blade"):SetLevel(1)
-		boss:FindAbilityByName("frostivus_boss_meteorain"):SetLevel(1)
-		boss:FindAbilityByName("frostivus_boss_shadowraze"):SetLevel(1)
-		boss:FindAbilityByName("frostivus_boss_soul_harvest"):SetLevel(1)
-		boss:FindAbilityByName("frostivus_boss_nevermore"):SetLevel(1)
-		boss:FindAbilityByName("frostivus_boss_requiem_of_souls"):SetLevel(1)
-		boss:FindAbilityByName("frostivus_boss_innate"):SetLevel(1)
+		local difficulty = GameRules:GetCustomGameDifficulty()
+		boss:FindAbilityByName("frostivus_boss_necromastery"):SetLevel(difficulty)
+		boss:FindAbilityByName("frostivus_boss_immolation"):SetLevel(difficulty)
+		boss:FindAbilityByName("frostivus_boss_ragna_blade"):SetLevel(difficulty)
+		boss:FindAbilityByName("frostivus_boss_meteorain"):SetLevel(difficulty)
+		boss:FindAbilityByName("frostivus_boss_shadowraze"):SetLevel(difficulty)
+		boss:FindAbilityByName("frostivus_boss_soul_harvest"):SetLevel(difficulty)
+		boss:FindAbilityByName("frostivus_boss_nevermore"):SetLevel(difficulty)
+		boss:FindAbilityByName("frostivus_boss_requiem_of_souls"):SetLevel(difficulty)
 
 		-- Cosmetics
 		boss:SetRenderColor(0, 0, 0)
@@ -74,13 +73,9 @@ function boss_thinker_nevermore:OnCreated( params )
 		end
 
 		-- Boss script constants
-		self.altar_loc = Vector(-25, 7211, 1231)
+--		self.altar_loc = Vector(-25, 7211, 1231)
+		self.altar_loc = Vector(0, 7018, 128)
 		self.harvest_cooldown = 0
-		self.random_constants = {}
-		self.random_constants[1] = self.altar_loc + RandomVector(10):Normalized() * 850
-		self.random_constants[2] = self.altar_loc + RandomVector(10):Normalized() * 700
-		self.random_constants[3] = self.altar_loc + RandomVector(10):Normalized() * 700
-		self.random_constants[4] = self.altar_loc + RandomVector(10):Normalized() * 700
 
 		-- Start thinking
 		self.boss_timer = 0
@@ -95,13 +90,13 @@ function boss_thinker_nevermore:OnIntervalThink()
 		local boss = self:GetParent()
 
 		-- Sends boss health information to fighting team's clients
-		UpdateBossBar(boss, self.team)
+--		UpdateBossBar(boss, self.team)
 
 		-- Soul Harvest logic
 		if self.harvest_cooldown > 0 then
 			self.harvest_cooldown = self.harvest_cooldown - 0.1
 		else
-			local nearby_enemies = FindUnitsInRadius(DOTA_TEAM_NEUTRALS, boss:GetAbsOrigin(), nil, 550, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, FIND_CLOSEST, false)
+			local nearby_enemies = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, boss:GetAbsOrigin(), nil, 550, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, FIND_CLOSEST, false)
 			if #nearby_enemies >= 1 then
 
 				-- Attack first target
@@ -132,194 +127,206 @@ function boss_thinker_nevermore:OnIntervalThink()
 
 		-- Think
 		self.boss_timer = self.boss_timer + 0.1
+		self.random_position = self.altar_loc + RandomVector(10):Normalized() * 400
+
+		if self.boss_timer > 170 then
+			self.boss_timer = 0
+			self.events = {}
+		end
 
 		-- Boss move script
 		if self.boss_timer > 1 and not self.events[1] then
-			boss:MoveToPosition(self.random_constants[1])
-			self:LineRaze(self.altar_loc, 3.5, 250, 275, 10000, 1)
+			boss:MoveToPosition(RotatePosition(self.altar_loc, QAngle(0, 180, 0), self.random_position))
+			self:LineRaze(self.altar_loc)
 			self.events[1] = true
 		end
 
 		if self.boss_timer > 6.5 and not self.events[2] then
-			boss:MoveToPosition(RotatePosition(self.altar_loc, QAngle(0, 180, 0), self.random_constants[1]))
-			self:LineRaze(self.altar_loc, 3.5, 250, 275, 10000, 1)
+			boss:MoveToPosition(RotatePosition(self.altar_loc, QAngle(0, 180, 0), self.random_position))
+			self:Immolation(self.altar_loc)
 			self.events[2] = true
 		end
 
 		if self.boss_timer > 11 and not self.events[3] then
 			boss:MoveToPosition(self.altar_loc + Vector(0, 300, 0))
-			self:Meteorain(self.altar_loc, 3.5, 5.0, 1.0, 1, 250, 25000, 1)
+			self:Meteorain(self.altar_loc)
 			self.events[3] = true
 		end
 
 		if self.boss_timer > 21.5 and not self.events[4] then
 			boss:MoveToPosition(self.altar_loc + Vector(0, 300, 0))
-			self:RagnaBlade(self.altar_loc, 3.0, 1, 1)
+			self:RagnaBlade(self.altar_loc)
 			self.events[4] = true
 		end
 
 		if self.boss_timer > 26.5 and not self.events[5] then
 			boss:MoveToPosition(self.altar_loc)
-			self:CircleRaze(self.altar_loc, 3.0, 250, 110, 15000, 1)
+			self:CircleRaze(self.altar_loc)
 			self.events[5] = true
 		end
 
 		if self.boss_timer > 31.5 and not self.events[6] then
 			boss:MoveToPosition(self.altar_loc)
-			self:CircleRaze(self.altar_loc, 3.0, 250, 110, 15000, 1)
+			self:Immolation(self.altar_loc)
 			self.events[6] = true
 		end
 
 		if self.boss_timer > 36.5 and not self.events[7] then
 			boss:MoveToPosition(self.altar_loc)
-			self:RequiemOfSouls(self.altar_loc, 3.5, 6, 70, 1)
+			self:RequiemOfSouls(self.altar_loc)
 			self.events[7] = true
 		end
 
 		if self.boss_timer > 42 and not self.events[8] then
 			boss:MoveToPosition(self.altar_loc)
-			self:Meteorain(self.altar_loc, 3.5, 5.0, 1.0, 2, 250, 25000, 1)
+			self:Meteorain(self.altar_loc)
 			self.events[8] = true
 		end
 
 		if self.boss_timer > 52.5 and not self.events[9] then
 			boss:MoveToPosition(self.altar_loc)
-			self:CircleRaze(self.altar_loc, 4.0, 250, 110, 15000, 1)
+			self:CircleRaze(self.altar_loc)
 			self.events[9] = true
 		end
 
 		if self.boss_timer > 52.5 and not self.events[10] then
-			self:Nevermore(self.altar_loc, 3.0, 3.0, 2)
+			self:Nevermore(self.altar_loc)
 			self.events[10] = true
 		end
 
 		if self.boss_timer > 60.5 and not self.events[11] then
 			boss:MoveToPosition(self.altar_loc + Vector(0, 500, 0))
-			self:Immolation375(self.altar_loc, 3.5, 150, 1)
+			self:Immolation(self.altar_loc)
 			self.events[11] = true
 		end
 
 		if self.boss_timer > 66 and not self.events[12] then
 			boss:MoveToPosition(self.altar_loc + Vector(0, 500, 0))
-			self:RagnaBlade(self.altar_loc, 3.0, 2, 1)
+			self:RagnaBlade(self.altar_loc)
 			self.events[12] = true
 		end
 
 		if self.boss_timer > 71 and not self.events[13] then
 			boss:MoveToPosition(self.altar_loc + Vector(0, 500, 0))
-			self:MovingRaze(self.altar_loc, 3.0, 250, 110, 0.3, 1, self.random_constants[2], 1)
+			self:CircleRaze(self.altar_loc)
 			self.events[13] = true
 		end
 
 		if self.boss_timer > 76 and not self.events[14] then
 			boss:MoveToPosition(self.altar_loc + Vector(0, 500, 0))
-			self:MovingRaze(self.altar_loc, 3.0, 250, 110, 0.3, 2, self.random_constants[2], 1)
+			self:Immolation(self.altar_loc)
 			self.events[14] = true
 		end
 
 		if self.boss_timer > 81 and not self.events[15] then
 			boss:MoveToPosition(self.altar_loc + Vector(0, 500, 0))
-			self:Meteorain(self.altar_loc, 3.5, 5.0, 1.0, 3, 250, 25000, 1)
+			self:Meteorain(self.altar_loc)
 			self.events[15] = true
 		end
 
 		if self.boss_timer > 91.5 and not self.events[16] then
 			boss:MoveToPosition(self.altar_loc)
-			self:RequiemOfSouls(self.altar_loc, 3.5, 6, 70, 1)
+			self:RequiemOfSouls(self.altar_loc)
 			self.events[16] = true
 		end
 
 		if self.boss_timer > 97 and not self.events[17] then
 			boss:MoveToPosition(self.altar_loc + Vector(0, 500, 0))
-			self:MovingRaze(self.altar_loc, 3.0, 250, 110, 0.3, 1, self.altar_loc + RandomVector(10):Normalized() * 700, 1)
+			self:Meteorain(self.altar_loc)
 			self.events[17] = true
 		end
 
 		if self.boss_timer > 97 and not self.events[18] then
-			self:Nevermore(self.altar_loc, 2.5, 3.5, 2)
+			self:Nevermore(self.altar_loc)
 			self.events[18] = true
 		end
 
 		if self.boss_timer > 105 and not self.events[19] then
 			boss:MoveToPosition(self.altar_loc + Vector(0, 500, 0))
-			self:MovingRaze(self.altar_loc, 3.0, 250, 110, 0.5, 2, self.random_constants[3], 1)
+			self:RagnaBlade(self.altar_loc)
 			self.events[19] = true
 		end
 
 		if self.boss_timer > 105 and not self.events[20] then
 			boss:MoveToPosition(self.altar_loc + Vector(0, 500, 0))
-			self:MovingRaze(self.altar_loc, 3.0, 250, 110, 0.5, 2, RotatePosition(self.altar_loc, QAngle(0, 180, 0), self.random_constants[3]), 2)
+			self:RequiemOfSouls(self.altar_loc)
 			self.events[20] = true
 		end
 
 		if self.boss_timer > 110 and not self.events[21] then
 			boss:MoveToPosition(self.altar_loc + Vector(0, 500, 0))
-			self:RagnaBlade(self.altar_loc, 2.5, 2, 1)
+			self:RagnaBlade(self.altar_loc)
 			self.events[21] = true
 		end
 
 		if self.boss_timer > 114.5 and not self.events[22] then
 			boss:MoveToPosition(self.altar_loc + Vector(0, 500, 0))
-			self:Meteorain(self.altar_loc, 3.5, 6.0, 1.0, 2, 250, 25000, 1)
+			self:Meteorain(self.altar_loc)
 			self.events[22] = true
 		end
 
 		if self.boss_timer > 114.5 and not self.events[23] then
-			self:CircleRaze(self.altar_loc, 4.0, 250, 110, 15000, 2)
+			self:CircleRaze(self.altar_loc)
 			self.events[23] = true
 		end
 
 		if self.boss_timer > 120 and not self.events[24] then
 			boss:MoveToPosition(self.altar_loc + Vector(0, 500, 0))
-			self:CircleRaze(self.altar_loc, 3.0, 250, 110, 15000, 1)
+			self:CircleRaze(self.altar_loc)
 			self.events[24] = true
 		end
 
 		if self.boss_timer > 126 and not self.events[25] then
-			boss:MoveToPosition(self.altar_loc + Vector(0, 700, 0))
-			self:Immolation550(self.altar_loc, 3.5, 1500, 1)
+			boss:MoveToPosition(self.random_position)
+			self:Immolation(self.altar_loc)
 			self.events[25] = true
 		end
 
 		if self.boss_timer > 131.5 and not self.events[26] then
-			boss:MoveToPosition(self.altar_loc + Vector(0, 700, 0))
-			self:MovingRaze(self.altar_loc, 3.5, 250, 110, 0.5, 1, self.random_constants[4], 1)
+			boss:MoveToPosition(self.random_position)
+			self:CircleRaze(self.altar_loc)
 			self.events[26] = true
 		end
 
 		if self.boss_timer > 133.5 and not self.events[27] then
-			boss:MoveToPosition(self.altar_loc + Vector(0, 700, 0))
-			self:MovingRaze(self.altar_loc, 3.5, 250, 110, 0.5, 1, self.random_constants[4], 2)
+			boss:MoveToPosition(self.random_position)
+			self:RagnaBlade(self.altar_loc)
 			self.events[27] = true
 		end
 
 		if self.boss_timer > 135.5 and not self.events[28] then
-			boss:MoveToPosition(self.altar_loc + Vector(0, 700, 0))
-			self:MovingRaze(self.altar_loc, 3.5, 250, 110, 0.5, 1, self.random_constants[4], 1)
+			boss:MoveToPosition(self.random_position)
+			self:CircleRaze(self.altar_loc)
 			self.events[28] = true
 		end
 
 		if self.boss_timer > 137.5 and not self.events[29] then
-			boss:MoveToPosition(self.altar_loc + Vector(0, 700, 0))
-			self:Meteorain(self.altar_loc, 3.5, 10.0, 0.7, 3, 250, 25000, 2)
+			boss:MoveToPosition(self.random_position)
+			self:Meteorain(self.altar_loc)
 			self.events[29] = true
 		end
 
 		if self.boss_timer > 141 and not self.events[30] then
-			self:Nevermore(self.altar_loc, 2.0, 6.0, 1)
+			self:Nevermore(self.altar_loc)
 			self.events[30] = true
 		end
 
 		if self.boss_timer > 147 and not self.events[31] then
 			boss:MoveToPosition(self.altar_loc)
-			self:RequiemOfSouls(self.altar_loc, 2.0, 10, 70, 1)
+			self:RequiemOfSouls(self.altar_loc)
 			self.events[31] = true
 		end
 
 		if self.boss_timer > 151 and not self.events[32] then
-			boss:MoveToPosition(self.altar_loc + Vector(0, 700, 0))
-			self:Meteorain(self.altar_loc, 3.5, 30.0, 0.5, 5, 250, 25000, 2)
+			boss:MoveToPosition(self.random_position)
+			self:Meteorain(self.altar_loc)
 			self.events[32] = true
+		end
+
+		if self.boss_timer > 160 and not self.events[33] then
+			self:Immolation(self.altar_loc)
+			boss:MoveToPosition(self.random_position)
+			self.events[33] = true
 		end
 	end
 end
@@ -341,7 +348,11 @@ function boss_thinker_nevermore:ApplyNecromastery(amount)
 end
 
 -- Raze a target location
-function boss_thinker_nevermore:Raze(target, delay, radius, damage, play_impact_sound)
+function boss_thinker_nevermore:Raze(target, play_impact_sound)
+	local ability = self:GetParent():FindAbilityByName("frostivus_boss_shadowraze")
+	local delay = ability:GetSpecialValueFor("delay")
+	local damage = ability:GetSpecialValueFor("damage")
+	local radius = ability:GetSpecialValueFor("radius")
 	print("Raze damage:", damage)
 
 	-- Show warning pulses
@@ -363,11 +374,10 @@ function boss_thinker_nevermore:Raze(target, delay, radius, damage, play_impact_
 		ParticleManager:ReleaseParticleIndex(raze_pfx)
 
 		-- Hit enemies
-		local hit_enemies = FindUnitsInRadius(DOTA_TEAM_NEUTRALS, target, nil, radius, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)
+		local hit_enemies = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, target, nil, radius, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)
 		for _, enemy in pairs(hit_enemies) do
-
 			-- Deal damage
-			local damage_dealt = ApplyDamage({victim = enemy, attacker = self:GetParent(), ability = nil, damage = damage * RandomInt(90, 110) * 0.01, damage_type = DAMAGE_TYPE_MAGICAL})
+			local damage_dealt = ApplyDamage({victim = enemy, attacker = self:GetParent(), ability = nil, damage = damage, damage_type = DAMAGE_TYPE_PURE})
 			SendOverheadEventMessage(nil, OVERHEAD_ALERT_BONUS_SPELL_DAMAGE, enemy, damage_dealt, nil)
 
 			-- Apply Necromastery
@@ -378,8 +388,6 @@ end
 
 -- Meteor a target location
 function boss_thinker_nevermore:Meteor(altar_loc, target, radius, damage)
-	print("Meteor damage:", damage)
-
 	-- Warning particle & sound
 	self:GetParent():EmitSound("Hero_Invoker.ChaosMeteor.Cast")
 	local warning_pfx = ParticleManager:CreateParticle("particles/boss_nevermore/meteorain_pre.vpcf", PATTACH_WORLDORIGIN, nil)
@@ -400,11 +408,10 @@ function boss_thinker_nevermore:Meteor(altar_loc, target, radius, damage)
 		self:GetParent():EmitSound("Hero_Invoker.ChaosMeteor.Impact")
 
 		-- Hit enemies
-		local hit_enemies = FindUnitsInRadius(DOTA_TEAM_NEUTRALS, target, nil, radius, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)
+		local hit_enemies = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, target, nil, radius, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)
 		for _, enemy in pairs(hit_enemies) do
-
 			-- Deal damage
-			local damage_dealt = ApplyDamage({victim = enemy, attacker = self:GetParent(), ability = nil, damage = damage * RandomInt(90, 110) * 0.01, damage_type = DAMAGE_TYPE_MAGICAL})
+			local damage_dealt = ApplyDamage({victim = enemy, attacker = self:GetParent(), ability = nil, damage = damage, damage_type = DAMAGE_TYPE_PURE})
 			SendOverheadEventMessage(nil, OVERHEAD_ALERT_BONUS_SPELL_DAMAGE, enemy, damage_dealt, nil)
 
 			-- Apply Necromastery
@@ -418,18 +425,20 @@ end
 ---------------------------
 
 -- Inner Immolation
-function boss_thinker_nevermore:Immolation375(altar_loc, delay, damage, cast_bar)
+function boss_thinker_nevermore:Immolation(altar_loc)
 	if IsServer() then
 		local boss = self:GetParent()
-		local tick_damage = boss:GetAttackDamage() * damage * 0.01 * self:GetNecromasteryAmp()
-		print("Immolation375 damage:", tick_damage)
+			local ability = self:GetParent():FindAbilityByName("frostivus_boss_immolation")
+			local delay = ability:GetSpecialValueFor("delay")
+			local tick_damage = ability:GetSpecialValueFor("damage")
+			local radius = ability:GetSpecialValueFor("radius")
 
 		-- Send cast bar event
-		if cast_bar == 1 then
-			BossPhaseAbilityCast(self.team, "frostivus_boss_immolation", "boss_nevermore_immolation", delay)
-		elseif cast_bar == 2 then
-			BossPhaseAbilityCastAlt(self.team, "frostivus_boss_immolation", "boss_nevermore_immolation", delay)
-		end
+--		if cast_bar == 1 then
+--			BossPhaseAbilityCast(self.team, "frostivus_boss_immolation", "boss_nevermore_immolation", delay)
+--		elseif cast_bar == 2 then
+--			BossPhaseAbilityCastAlt(self.team, "frostivus_boss_immolation", "boss_nevermore_immolation", delay)
+--		end
 
 		-- Draw warning particle
 		local warning_pfx = ParticleManager:CreateParticle("particles/boss_nevermore/immolation_warning.vpcf", PATTACH_WORLDORIGIN, nil)
@@ -455,51 +464,7 @@ function boss_thinker_nevermore:Immolation375(altar_loc, delay, damage, cast_bar
 			boss:EmitSound("Hero_Lina.DragonSlave.FireHair")
 
 			-- Apply the modifier to the altar
-			boss:AddNewModifier(boss, nil, "modifier_frostivus_immolation", {damage = tick_damage, radius = 375})
-		end)
-	end
-end
-
--- Outer Immolation
-function boss_thinker_nevermore:Immolation550(altar_loc, delay, damage, cast_bar)
-	if IsServer() then
-		local boss = self:GetParent()
-		local tick_damage = boss:GetAttackDamage() * damage * 0.01 * self:GetNecromasteryAmp()
-		print("Immolation550 damage:", tick_damage)
-
-		-- Send cast bar event
-		if cast_bar == 1 then
-			BossPhaseAbilityCast(self.team, "frostivus_boss_immolation", "boss_nevermore_immolation", delay)
-		elseif cast_bar == 2 then
-			BossPhaseAbilityCastAlt(self.team, "frostivus_boss_immolation", "boss_nevermore_immolation", delay)
-		end
-
-		-- Draw warning particle
-		local warning_pfx = ParticleManager:CreateParticle("particles/boss_nevermore/immolation_warning.vpcf", PATTACH_WORLDORIGIN, nil)
-		ParticleManager:SetParticleControl(warning_pfx, 0, altar_loc)
-		ParticleManager:SetParticleControl(warning_pfx, 1, Vector(550, 0, 0))
-
-		-- Play warning sound
-		self:GetParent():EmitSound("Frostivus.AbilityWarning")
-
-		-- Animate boss cast
-		Timers:CreateTimer(delay - 2.0, function()
-			boss:FaceTowards(altar_loc)
-			StartAnimation(boss, {duration = 2.2, activity=ACT_DOTA_GENERIC_CHANNEL_1, rate=1.0})
-		end)
-
-		-- Wait [delay] seconds
-		Timers:CreateTimer(delay, function()
-			-- Destroy warning particle
-			ParticleManager:DestroyParticle(warning_pfx, true)
-			ParticleManager:ReleaseParticleIndex(warning_pfx)
-
-			-- Play cast sound
-			boss:EmitSound("Hero_Lina.DragonSlave.FireHair")
-
-			-- Apply the modifier to the altar
-			boss:RemoveModifierByName("modifier_frostivus_immolation")
-			boss:AddNewModifier(boss, nil, "modifier_frostivus_immolation", {damage = tick_damage, radius = 550})
+			boss:AddNewModifier(boss, nil, "modifier_frostivus_immolation", {damage = tick_damage, radius = radius})
 		end)
 	end
 end
@@ -519,13 +484,9 @@ function modifier_frostivus_immolation:OnCreated(keys)
 		self.tick_counter = 0
 
 		-- Play initial particle
-		if self.radius == 375 then
-			self.immolation_pfx = ParticleManager:CreateParticle("particles/boss_nevermore/immolation_loop.vpcf", PATTACH_WORLDORIGIN, nil)
-			ParticleManager:SetParticleControl(self.immolation_pfx, 0, self:GetParent():GetAbsOrigin())
-		elseif self.radius == 550 then
-			self.immolation_pfx = ParticleManager:CreateParticle("particles/boss_nevermore/immolation_loop_550.vpcf", PATTACH_WORLDORIGIN, nil)
-			ParticleManager:SetParticleControl(self.immolation_pfx, 0, self:GetParent():GetAbsOrigin())
-		end
+		self.immolation_pfx = ParticleManager:CreateParticle("particles/units/heroes/hero_ember_spirit/ember_spirit_flameguard.vpcf", PATTACH_ABSORIGIN_FOLLOW, nil)
+		ParticleManager:SetParticleControl(self.immolation_pfx, 0, self:GetParent():GetAbsOrigin())
+		ParticleManager:SetParticleControl(self.immolation_pfx, 1, Vector(self.radius, 1, 1))
 
 		self:StartIntervalThink(0.2)
 	end
@@ -542,10 +503,10 @@ function modifier_frostivus_immolation:OnIntervalThink()
 	if IsServer() then
 
 		-- Deal damage to enemies in the area
-		local nearby_enemies = FindUnitsInRadius(DOTA_TEAM_NEUTRALS, self:GetParent():GetAbsOrigin(), nil, self.radius, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, FIND_ANY_ORDER, false)
+		local nearby_enemies = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, self:GetParent():GetAbsOrigin(), nil, self.radius, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, FIND_ANY_ORDER, false)
 		for _, enemy in pairs(nearby_enemies) do
 			enemy:EmitSound("Hero_Invoker.ChaosMeteor.Damage")
-			local damage_dealt = ApplyDamage({victim = enemy, attacker = self:GetParent(), ability = nil, damage = self.tick_damage * RandomInt(90, 110) * 0.01, damage_type = DAMAGE_TYPE_MAGICAL})
+			local damage_dealt = ApplyDamage({victim = enemy, attacker = self:GetParent(), ability = nil, damage = self.tick_damage * RandomInt(90, 110) * 0.01, damage_type = DAMAGE_TYPE_PURE})
 			SendOverheadEventMessage(nil, OVERHEAD_ALERT_BONUS_SPELL_DAMAGE, enemy, damage_dealt, nil)
 		end
 
@@ -559,13 +520,17 @@ function modifier_frostivus_immolation:OnIntervalThink()
 end
 
 -- Ragna Blade
-function boss_thinker_nevermore:RagnaBlade(altar_loc, delay, target_amount, cast_bar)
+function boss_thinker_nevermore:RagnaBlade(altar_loc, delay)
 	if IsServer() then
 		local boss = self:GetParent()
+		local ability = boss:FindAbilityByName("frostivus_boss_ragna_blade")
+		local target_amount = ability:GetSpecialValueFor("target_amount")
+		local damage_pct = ability:GetSpecialValueFor("damage_pct")
+		local delay = ability:GetSpecialValueFor("delay")
 
 		-- Look for valid targets
 		local targets = {}
-		local nearby_enemies = FindUnitsInRadius(boss:GetTeam(), altar_loc, nil, 1800, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, FIND_ANY_ORDER, false)
+		local nearby_enemies = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, altar_loc, nil, 1800, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, FIND_ANY_ORDER, false)
 		for _,enemy in pairs(nearby_enemies) do
 			targets[#targets + 1] = enemy
 			if #targets >= target_amount then
@@ -579,11 +544,11 @@ function boss_thinker_nevermore:RagnaBlade(altar_loc, delay, target_amount, cast
 		end
 
 		-- Send cast bar event
-		if cast_bar == 1 then
-			BossPhaseAbilityCast(self.team, "frostivus_boss_ragna_blade", "boss_nevermore_ragna_blade", delay)
-		elseif cast_bar == 2 then
-			BossPhaseAbilityCastAlt(self.team, "frostivus_boss_ragna_blade", "boss_nevermore_ragna_blade", delay)
-		end
+--		if cast_bar == 1 then
+--			BossPhaseAbilityCast(self.team, "frostivus_boss_ragna_blade", "boss_nevermore_ragna_blade", delay)
+--		elseif cast_bar == 2 then
+--			BossPhaseAbilityCastAlt(self.team, "frostivus_boss_ragna_blade", "boss_nevermore_ragna_blade", delay)
+--		end
 
 		-- Draw warning particle on the targets' position
 		for _, target in pairs(targets) do
@@ -621,7 +586,8 @@ function boss_thinker_nevermore:RagnaBlade(altar_loc, delay, target_amount, cast
 				ParticleManager:ReleaseParticleIndex(impact_pfx)
 
 				-- Deal damage
-				local damage_dealt = ApplyDamage({victim = target, attacker = boss, ability = nil, damage = target:GetHealth() - RandomInt(1, 9), damage_type = DAMAGE_TYPE_PURE})
+				local damage = target:GetMaxHealth() / 100 * damage_pct
+				local damage_dealt = ApplyDamage({victim = target, attacker = boss, ability = nil, damage = damage, damage_type = DAMAGE_TYPE_PURE})
 				SendOverheadEventMessage(nil, OVERHEAD_ALERT_DAMAGE, target, damage_dealt, nil)
 
 				-- Apply Necromastery
@@ -632,17 +598,24 @@ function boss_thinker_nevermore:RagnaBlade(altar_loc, delay, target_amount, cast
 end
 
 -- Meteorain
-function boss_thinker_nevermore:Meteorain(altar_loc, delay, duration, spawn_delay, spawn_amount, radius, damage, cast_bar)
+function boss_thinker_nevermore:Meteorain(altar_loc)
 	if IsServer() then
 		local boss = self:GetParent()
-		local impact_damage = boss:GetAttackDamage() * damage * 0.01 * self:GetNecromasteryAmp()
+		local ability = self:GetParent():FindAbilityByName("frostivus_boss_meteorain")
+		local impact_damage = ability:GetSpecialValueFor("damage")
+		local radius = ability:GetSpecialValueFor("radius")
+		local duration = ability:GetSpecialValueFor("duration")
+		local delay = ability:GetSpecialValueFor("delay")
+		local spawn_delay = ability:GetSpecialValueFor("spawn_delay")
+		local spawn_amount = ability:GetSpecialValueFor("spawn_amount")
+		print("Meteor damage:", impact_damage)
 
 		-- Send cast bar event
-		if cast_bar == 1 then
-			BossPhaseAbilityCast(self.team, "frostivus_boss_meteorain", "boss_nevermore_meteorain", delay)
-		elseif cast_bar == 2 then
-			BossPhaseAbilityCastAlt(self.team, "frostivus_boss_meteorain", "boss_nevermore_meteorain", delay)
-		end
+--		if cast_bar == 1 then
+--			BossPhaseAbilityCast(self.team, "frostivus_boss_meteorain", "boss_nevermore_meteorain", delay)
+--		elseif cast_bar == 2 then
+--			BossPhaseAbilityCastAlt(self.team, "frostivus_boss_meteorain", "boss_nevermore_meteorain", delay)
+--		end
 
 		-- Play warning sound
 		boss:EmitSound("Hero_Invoker.ChaosMeteor.Cast")
@@ -663,12 +636,11 @@ function boss_thinker_nevermore:Meteorain(altar_loc, delay, duration, spawn_dela
 
 		-- Wait [delay] seconds
 		Timers:CreateTimer(delay, function()
-
 			local elapsed_duration = 0
 			local remaining_spawns = spawn_amount
 			Timers:CreateTimer(0, function()
 				-- Spawn meteors
-				local nearby_enemies = FindUnitsInRadius(boss:GetTeam(), altar_loc, nil, 900, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES + DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER, false)
+				local nearby_enemies = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, altar_loc, nil, 900, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES + DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER, false)
 				for _,enemy in pairs(nearby_enemies) do
 					self:Meteor(altar_loc, enemy:GetAbsOrigin(), radius, impact_damage)
 					remaining_spawns = remaining_spawns - 1
@@ -688,14 +660,18 @@ function boss_thinker_nevermore:Meteorain(altar_loc, delay, duration, spawn_dela
 end
 
 -- Line Raze (Sav Omoz)
-function boss_thinker_nevermore:LineRaze(altar_loc, delay, radius, spawn_distance, damage, cast_bar)
+function boss_thinker_nevermore:LineRaze(altar_loc)
 	if IsServer() then
 		local boss = self:GetParent()
-		local raze_damage = boss:GetAttackDamage() * damage * 0.01 * self:GetNecromasteryAmp()
+		local ability = boss:FindAbilityByName("frostivus_boss_shadowraze")
+		local raze_damage = ability:GetSpecialValueFor("damage")
+		local radius = ability:GetSpecialValueFor("radius")
+		local delay = ability:GetSpecialValueFor("delay")
+		local spawn_distance = ability:GetSpecialValueFor("spawn_distance")
 
 		-- Look for a valid target
 		local target = false
-		local nearby_enemies = FindUnitsInRadius(boss:GetTeam(), altar_loc, nil, 900, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, FIND_ANY_ORDER, false)
+		local nearby_enemies = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, altar_loc, nil, 900, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, FIND_ANY_ORDER, false)
 		for _,enemy in pairs(nearby_enemies) do
 			target = enemy
 			break
@@ -707,11 +683,11 @@ function boss_thinker_nevermore:LineRaze(altar_loc, delay, radius, spawn_distanc
 		end
 
 		-- Send cast bar event
-		if cast_bar == 1 then
-			BossPhaseAbilityCast(self.team, "frostivus_boss_shadowraze", "boss_nevermore_shadowraze_line", delay)
-		elseif cast_bar == 2 then
-			BossPhaseAbilityCastAlt(self.team, "frostivus_boss_shadowraze", "boss_nevermore_shadowraze_line", delay)
-		end
+--		if cast_bar == 1 then
+--			BossPhaseAbilityCast(self.team, "frostivus_boss_shadowraze", "boss_nevermore_shadowraze_line", delay)
+--		elseif cast_bar == 2 then
+--			BossPhaseAbilityCastAlt(self.team, "frostivus_boss_shadowraze", "boss_nevermore_shadowraze_line", delay)
+--		end
 
 		-- Face direction
 		Timers:CreateTimer(delay - 1.5, function()
@@ -727,7 +703,7 @@ function boss_thinker_nevermore:LineRaze(altar_loc, delay, radius, spawn_distanc
 
 			-- Raze
 			for _, raze_point in pairs(raze_points) do
-				self:Raze(raze_point, 1.5, radius, raze_damage, false)
+				self:Raze(raze_point, false)
 			end
 		end)
 
@@ -744,25 +720,29 @@ function boss_thinker_nevermore:LineRaze(altar_loc, delay, radius, spawn_distanc
 end
 
 -- Circle Raze (Sah/Voo Omoz)
-function boss_thinker_nevermore:CircleRaze(altar_loc, delay, radius, damage, distance, cast_bar)
+function boss_thinker_nevermore:CircleRaze(altar_loc)
 	if IsServer() then
 		local boss = self:GetParent()
-		local raze_damage = boss:GetAttackDamage() * damage * 0.01 * self:GetNecromasteryAmp()
+		local ability = self:GetParent():FindAbilityByName("frostivus_boss_shadowraze")
+		local raze_damage = ability:GetSpecialValueFor("damage")
+		local radius = ability:GetSpecialValueFor("radius")
+		local delay = ability:GetSpecialValueFor("delay")
+		local distance = ability:GetSpecialValueFor("spawn_distance")
 
 		-- Send cast bar event
-		if cast_bar == 1 then
-			if distance <= 450 then
-				BossPhaseAbilityCast(self.team, "frostivus_boss_shadowraze", "boss_nevermore_shadowraze_circle_near", delay)
-			else
-				BossPhaseAbilityCast(self.team, "frostivus_boss_shadowraze", "boss_nevermore_shadowraze_circle_far", delay)
-			end
-		elseif cast_bar == 2 then
-			if distance <= 450 then
-				BossPhaseAbilityCastAlt(self.team, "frostivus_boss_shadowraze", "boss_nevermore_shadowraze_circle_near", delay)
-			else
-				BossPhaseAbilityCastAlt(self.team, "frostivus_boss_shadowraze", "boss_nevermore_shadowraze_circle_far", delay)
-			end
-		end
+--		if cast_bar == 1 then
+--			if distance <= 450 then
+--				BossPhaseAbilityCast(self.team, "frostivus_boss_shadowraze", "boss_nevermore_shadowraze_circle_near", delay)
+--			else
+--				BossPhaseAbilityCast(self.team, "frostivus_boss_shadowraze", "boss_nevermore_shadowraze_circle_far", delay)
+--			end
+--		elseif cast_bar == 2 then
+--			if distance <= 450 then
+--				BossPhaseAbilityCastAlt(self.team, "frostivus_boss_shadowraze", "boss_nevermore_shadowraze_circle_near", delay)
+--			else
+--				BossPhaseAbilityCastAlt(self.team, "frostivus_boss_shadowraze", "boss_nevermore_shadowraze_circle_far", delay)
+--			end
+--		end
 
 		-- Raze
 		Timers:CreateTimer(delay - 1.5, function()
@@ -782,7 +762,7 @@ function boss_thinker_nevermore:CircleRaze(altar_loc, delay, radius, damage, dis
 
 			-- Raze
 			for _, raze_point in pairs(raze_points) do
-				self:Raze(raze_point, 1.5, radius, raze_damage, false)
+				self:Raze(raze_point, false)
 			end
 		end)
 
@@ -801,28 +781,33 @@ function boss_thinker_nevermore:CircleRaze(altar_loc, delay, radius, damage, dis
 		end)
 	end
 end
-
+--[[
 -- Moving Raze (Ala/Ula Omoz)
-function boss_thinker_nevermore:MovingRaze(altar_loc, delay, radius, damage, spawn_delay, direction, start_position, cast_bar)
+function boss_thinker_nevermore:MovingRaze(altar_loc, direction, start_position)
 	if IsServer() then
 		local boss = self:GetParent()
-		local raze_damage = boss:GetAttackDamage() * damage * 0.01 * self:GetNecromasteryAmp()
+		local ability = self:GetParent():FindAbilityByName("frostivus_boss_shadowraze")
+		local raze_damage = ability:GetSpecialValueFor("damage")
+		local radius = ability:GetSpecialValueFor("radius")
+		local delay = ability:GetSpecialValueFor("delay")
+		local distance = ability:GetSpecialValueFor("spawn_distance")
+		local spawn_delay = ability:GetSpecialValueFor("spawn_delay")
 		print("MovingRaze damage:", damage)
 
 		-- Send cast bar event
-		if cast_bar == 1 then
-			if direction == 1 then
-				BossPhaseAbilityCast(self.team, "frostivus_boss_shadowraze", "boss_nevermore_shadowraze_moving_clock", delay)
-			else
-				BossPhaseAbilityCast(self.team, "frostivus_boss_shadowraze", "boss_nevermore_shadowraze_moving_counterclock", delay)
-			end
-		elseif cast_bar == 2 then
-			if direction == 1 then
-				BossPhaseAbilityCastAlt(self.team, "frostivus_boss_shadowraze", "boss_nevermore_shadowraze_moving_clock", delay)
-			else
-				BossPhaseAbilityCastAlt(self.team, "frostivus_boss_shadowraze", "boss_nevermore_shadowraze_moving_counterclock", delay)
-			end
-		end
+--		if cast_bar == 1 then
+--			if direction == 1 then
+--				BossPhaseAbilityCast(self.team, "frostivus_boss_shadowraze", "boss_nevermore_shadowraze_moving_clock", delay)
+--			else
+--				BossPhaseAbilityCast(self.team, "frostivus_boss_shadowraze", "boss_nevermore_shadowraze_moving_counterclock", delay)
+--			end
+--		elseif cast_bar == 2 then
+--			if direction == 1 then
+--				BossPhaseAbilityCastAlt(self.team, "frostivus_boss_shadowraze", "boss_nevermore_shadowraze_moving_clock", delay)
+--			else
+--				BossPhaseAbilityCastAlt(self.team, "frostivus_boss_shadowraze", "boss_nevermore_shadowraze_moving_counterclock", delay)
+--			end
+--		end
 
 		-- Raze
 		Timers:CreateTimer(delay - 1.5, function()
@@ -843,7 +828,7 @@ function boss_thinker_nevermore:MovingRaze(altar_loc, delay, radius, damage, spa
 			-- Raze
 			local raze_count = 1
 			Timers:CreateTimer(0, function()
-				self:Raze(raze_points[raze_count], 1.5, radius, raze_damage, true)
+				self:Raze(raze_points[raze_count], true)
 				raze_count = raze_count + 1
 				if raze_count <= 12 then
 					return spawn_delay
@@ -857,18 +842,21 @@ function boss_thinker_nevermore:MovingRaze(altar_loc, delay, radius, damage, spa
 		end)
 	end
 end
-
+--]]
 -- Nevermore
-function boss_thinker_nevermore:Nevermore(altar_loc, delay, duration, cast_bar)
+function boss_thinker_nevermore:Nevermore(altar_loc)
 	if IsServer() then
 		local boss = self:GetParent()
+		local ability = self:GetParent():FindAbilityByName("frostivus_boss_shadowraze")
+		local delay = ability:GetSpecialValueFor("delay")
+		local duration = ability:GetSpecialValueFor("duration")
 
 		-- Send cast bar event
-		if cast_bar == 1 then
-			BossPhaseAbilityCast(self.team, "frostivus_boss_nevermore", "boss_nevermore_nevermore", delay)
-		elseif cast_bar == 2 then
-			BossPhaseAbilityCastAlt(self.team, "frostivus_boss_nevermore", "boss_nevermore_nevermore", delay)
-		end
+--		if cast_bar == 1 then
+--			BossPhaseAbilityCast(self.team, "frostivus_boss_nevermore", "boss_nevermore_nevermore", delay)
+--		elseif cast_bar == 2 then
+--			BossPhaseAbilityCastAlt(self.team, "frostivus_boss_nevermore", "boss_nevermore_nevermore", delay)
+--		end
 
 		-- Play warning sound
 		boss:EmitSound("Hero_Nevermore.RequiemOfSoulsCast")
@@ -895,18 +883,21 @@ function boss_thinker_nevermore:Nevermore(altar_loc, delay, duration, cast_bar)
 end
 
 -- Requiem of Souls
-function boss_thinker_nevermore:RequiemOfSouls(altar_loc, delay, line_amount, damage, cast_bar)
+function boss_thinker_nevermore:RequiemOfSouls(altar_loc)
 	if IsServer() then
 		local boss = self:GetParent()
-		local line_damage = boss:GetAttackDamage() * damage * 0.01 * self:GetNecromasteryAmp()
+		local ability = self:GetParent():FindAbilityByName("frostivus_boss_requiem_of_souls")
+		local delay = ability:GetSpecialValueFor("delay")
+		local line_amount = ability:GetSpecialValueFor("line_amount")
+		local line_damage = ability:GetSpecialValueFor("damage")
 		print("Ros damage:", line_damage)
 
 		-- Send cast bar event
-		if cast_bar == 1 then
-			BossPhaseAbilityCast(self.team, "frostivus_boss_requiem_of_souls", "boss_nevermore_requiem_of_souls", delay)
-		elseif cast_bar == 2 then
-			BossPhaseAbilityCastAlt(self.team, "frostivus_boss_requiem_of_souls", "boss_nevermore_requiem_of_souls", delay)
-		end
+--		if cast_bar == 1 then
+--			BossPhaseAbilityCast(self.team, "frostivus_boss_requiem_of_souls", "boss_nevermore_requiem_of_souls", delay)
+--		elseif cast_bar == 2 then
+--			BossPhaseAbilityCastAlt(self.team, "frostivus_boss_requiem_of_souls", "boss_nevermore_requiem_of_souls", delay)
+--		end
 
 		-- Animate boss cast
 		Timers:CreateTimer(delay - 1.65, function()
@@ -937,7 +928,7 @@ function boss_thinker_nevermore:RequiemOfSouls(altar_loc, delay, line_amount, da
 				Ability				= boss:FindAbilityByName("frostivus_boss_requiem_of_souls"),
 				EffectName			= "particles/units/heroes/hero_nevermore/nevermore_requiemofsouls_line.vpcf",
 				vSpawnOrigin		= boss_loc,
-				fDistance			= 900,
+				fDistance			= distance,
 				fStartRadius		= 125,
 				fEndRadius			= 300,
 				Source				= boss,

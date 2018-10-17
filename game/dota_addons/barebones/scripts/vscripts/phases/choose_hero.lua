@@ -1,6 +1,6 @@
 STARTING_GOLD = {10000, 5000, 4000, 3000, 2000}
 
-WeekHero = "npc_dota_hero_skeleton_king"
+WeekHero = "npc_dota_hero_razor"
 -- "npc_dota_hero_slardar"			-- Centurion
 -- "npc_dota_hero_skeleton_king"	-- Lich King
 -- "npc_dota_hero_meepo"			-- Kobold Knight
@@ -141,10 +141,12 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			end
 
 			if caller:GetName() == "trigger_hero_weekly" then
-				if hero:HasAbility("holdout_vip") then
-					Notifications:Bottom(hero:GetPlayerOwnerID(), {text="You are VIP. Please choose this hero on top!", duration = 5.0})
-				return
-				end
+--				if hero:HasAbility("holdout_vip") then
+--					Notifications:Bottom(hero:GetPlayerOwnerID(), {text="You are VIP. Please choose this hero on top!", duration = 5.0})
+
+--					return
+--				end
+
 				UTIL_Remove(Entities:FindByName(nil, "trigger_hero_weekly"))
 				local particle = ParticleManager:CreateParticle("particles/econ/events/ti6/hero_levelup_ti6.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
 				ParticleManager:SetParticleControl(particle, 0, hero:GetAbsOrigin())

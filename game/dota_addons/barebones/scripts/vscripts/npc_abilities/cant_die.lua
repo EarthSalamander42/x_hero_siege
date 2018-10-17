@@ -6,10 +6,12 @@ EXPLOSION_PARTICLE_TABLE = {"particles/econ/items/shadow_fiend/sf_fire_arcana/sf
 function death_check(event)
 	local caster = event.caster
 	local ability = event.ability
+
 	if not caster.deathStart then
 		if caster:GetHealth() < 100 and not caster:IsIllusion() then
+
 			ability:ApplyDataDrivenModifier(caster, caster, "modifier_dying_generic", {duration = 20})
-			CustomGameEventManager:Send_ServerToAllClients("hide_boss_health", {})
+			CustomGameEventManager:Send_ServerToAllClients("hide_boss_hp", {})
 			caster.deathStart = true
 			if caster:GetUnitName() == "npc_dota_hero_illidan" then
 				illidan_boss_die(caster)
@@ -30,11 +32,55 @@ function death_check(event)
 	end
 end
 
-function BossTakeDamage(event)
-	local caster = event.caster
-	local ability = event.ability
-	local damage = event.attack_damage
-	CustomGameEventManager:Send_ServerToAllClients("update_boss_health", {current_health = caster:GetHealth()})
+function OnCreated(keys)
+	print("Boss Bar created!")
+	ShowBossBar(keys.caster)
+end
+
+function ShowBossBar(caster)
+	local icon
+	local light_color = "#54BA07"
+	local dark_color = "#326114"
+
+	if caster:GetUnitName() == "npc_dota_hero_arthas" then
+		icon = "npc_dota_hero_abyssal_omniknight"
+		light_color = "#e6ac00"
+		dark_color = "#320000"
+	elseif caster:GetUnitName() == "npc_dota_hero_balanar" then
+		icon = "npc_dota_hero_pugna"
+	elseif caster:GetUnitName() == "npc_dota_hero_banehallow" then
+		icon = "npc_dota_hero_nevermore"
+		light_color = "#320000"
+		dark_color = "#ff6600"
+	elseif caster:GetUnitName() == "npc_dota_hero_grom_hellscream" then
+		icon = "npc_dota_hero_juggernaut"
+	elseif caster:GetUnitName() == "npc_dota_hero_illidan" then
+		icon = "npc_dota_hero_terrorblade"
+	elseif caster:GetUnitName() == "npc_dota_hero_lich_king" then
+		icon = "npc_dota_hero_abaddon"
+		light_color = "#000d33"
+		dark_color = "#0047b3"
+	elseif caster:GetUnitName() == "npc_dota_hero_magtheridon" then
+		icon = "npc_dota_hero_abyssal_underlord"
+	elseif caster:GetUnitName() == "npc_dota_hero_proudmoore" then
+		icon = "npc_dota_hero_kunkka"
+	end
+
+	print("Boss bar updated:", caster:GetUnitName(), GameRules:GetCustomGameDifficulty(), icon, light_color, dark_color)
+
+	CustomGameEventManager:Send_ServerToAllClients("show_boss_hp", {
+		boss_name = caster:GetUnitName(),
+		difficulty = GameRules:GetCustomGameDifficulty(),
+		boss_icon = icon,
+		light_color = light_color,
+		dark_color = dark_color,
+		boss_health = caster:GetHealth(),
+		boss_max_health = caster:GetMaxHealth()
+	})
+end
+
+function BossTakeDamage(keys)
+	ShowBossBar(keys.caster)
 end
 
 function death_animation(keys)

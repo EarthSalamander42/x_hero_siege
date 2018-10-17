@@ -154,7 +154,7 @@ function respawnMagtheridon()
 
 	ankh:SetCurrentCharges(itemCharges -1)
 	magtheridon:EmitSound("Ability.Reincarnation")
-	BossBar(magtheridon, "mag")
+--	BossBar(magtheridon, "mag")
 	magtheridon.zone = "xhs_holdout"
 end
 

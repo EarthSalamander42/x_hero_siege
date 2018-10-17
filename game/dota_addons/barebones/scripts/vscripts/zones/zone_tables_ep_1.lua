@@ -103,7 +103,7 @@ _G.ZonesDefinition =
 				Completion = 
 				{	
 					Type = QUEST_EVENT_ON_TEAM_ENEMY_KILLED,
-					szTeamName = DOTA_TEAM_NEUTRALS,
+					szTeamName = DOTA_TEAM_CUSTOM_1,
 				},
 				nCompleteLimit = 52,
 			},

@@ -1650,12 +1650,12 @@
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
 		"AbilityTextureName"			"custom/tome_small"
 		"ItemQuality"					"artifact"
-	
+
 		"ItemStackable"					"1"
 		"ItemInitialCharges"			"1"
 		"ItemPermanent"					"0"
 		"ItemDisassembleRule"			"DOTA_ITEM_DISASSEMBLE_ALWAYS"
-	
+
 		"OnSpellStart"
 		{
 	
@@ -1667,7 +1667,7 @@
 	
 			"SpendCharge" {}
 		}
-	
+
 		"AbilitySpecial"
 		{
 			"01"
@@ -1709,7 +1709,6 @@
 
 		"OnSpellStart"
 		{
-
 			"RunScript"
 			{
 				"ScriptFile"			"items/tomes.lua"
@@ -1944,10 +1943,10 @@
 				"mana_regen"					"10"
 			}
 		}
-		
+
 		"OnSpellStart"
 		{
-			 "TrackingProjectile"
+			"TrackingProjectile"
 			{
 				"Target"			"TARGET"
 				"EffectName"		"particles/items_fx/ethereal_blade.vpcf"
@@ -3464,7 +3463,7 @@
 		"AbilityCastRange"				"500"
 		"ItemCost"						"1000"
 		"ItemQuality"					"rare"
-		"ItemStackable"					"0"
+		"ItemStackable"					"1"
 		"ItemPermanent"					"0"
 		"ItemInitialCharges"			"3"
 		"AOERadius"						"500"
@@ -3621,7 +3620,7 @@
 		"AbilityCastRange"				"0"
 		"ItemCost"						"2500"
 		"ItemQuality"					"rare"
-		"ItemStackable"					"0"
+		"ItemStackable"					"1"
 		"ItemPermanent"					"0"
 		"ItemInitialCharges"			"3"
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"

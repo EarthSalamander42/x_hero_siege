@@ -207,6 +207,8 @@ local Health = ability:GetSpecialValueFor("hp_tooltip")
 local InvTime = ability:GetSpecialValueFor("invulnerability_time")
 local PauseTime = 10.0
 
+	if not ability then return end
+
 	if caster:GetHealthPercent() <= Health then
 		local Muradin = CreateUnitByName("npc_dota_creature_muradin_bronzebeard", Waypoint:GetAbsOrigin(), false, nil, nil, DOTA_TEAM_GOODGUYS)
 		Muradin:SetInitialGoalEntity(Waypoint)

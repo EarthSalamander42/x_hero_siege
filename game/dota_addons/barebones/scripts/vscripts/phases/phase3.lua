@@ -55,10 +55,11 @@ local delay = 3.0
 			magtheridon.zone = "xhs_holdout"
 			magtheridon2.zone = "xhs_holdout"
 
-			Timers:CreateTimer(0.0, function()
-				CustomNetTables:SetTableValue("round_data", "bossHealth", {boss = "mag", hp = magtheridon:GetHealthPercent(), boss2 = "true" , hp2 = magtheridon2:GetHealthPercent()})
-			return 1.0
-			end)
+--			Timers:CreateTimer(0.0, function()
+--				CustomNetTables:SetTableValue("round_data", "bossHealth", {boss = "mag", hp = magtheridon:GetHealthPercent(), boss2 = "true" , hp2 = magtheridon2:GetHealthPercent()})
+
+--				return 1.0
+--			end)
 		elseif difficulty == 5 then
 			magtheridon = CreateUnitByName("npc_dota_hero_magtheridon", point_mag  ,true, nil, nil, DOTA_TEAM_CUSTOM_2)
 			magtheridon2 = CreateUnitByName("npc_dota_hero_magtheridon", point_mag2  ,true, nil, nil, DOTA_TEAM_CUSTOM_2)
@@ -73,13 +74,13 @@ local delay = 3.0
 			magtheridon.zone = "xhs_holdout"
 			magtheridon2.zone = "xhs_holdout"
 
-			Timers:CreateTimer(0.0, function()
-				CustomNetTables:SetTableValue("round_data", "bossHealth", {boss = "mag", hp = magtheridon:GetHealthPercent(), boss2 = "true" , hp2 = magtheridon2:GetHealthPercent()})
-			return 1.0
-			end)
+--			Timers:CreateTimer(0.0, function()
+--				CustomNetTables:SetTableValue("round_data", "bossHealth", {boss = "mag", hp = magtheridon:GetHealthPercent(), boss2 = "true" , hp2 = magtheridon2:GetHealthPercent()})
+--			return 1.0
+--			end)
 		end
 
-		BossBar(magtheridon, "mag")
+--		BossBar(magtheridon, "mag")
 		magtheridon:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 10, IsHidden = true})
 		magtheridon:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 10, IsHidden = true})
 	end)
@@ -206,7 +207,7 @@ local activator = keys.activator
 		arthas:SetAngles(0, 270, 0)
 		arthas:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 10, IsHidden = true})
 		arthas:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 9, IsHidden = true})
-		BossBar(arthas, "arthas")
+--		BossBar(arthas, "arthas")
 		arthas.zone = "xhs_holdout"
 
 		for _,hero in pairs(HeroList:GetAllHeroes()) do
@@ -242,7 +243,7 @@ function StartBanehallowArena()
 	banehallow:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 26, IsHidden = true})
 	banehallow:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 14, IsHidden = true})
 	banehallow:EmitSound("shop_jbrice_01.stinger.radiant_lose")
-	BossBar(banehallow, "banehallow")
+--	BossBar(banehallow, "banehallow")
 	banehallow.zone = "xhs_holdout"
 	end)
 
@@ -344,7 +345,7 @@ local reincarnate_time = 8.0
 			lich_king2:SetAngles(0, 90, 0)
 			lich_king2:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 12, IsHidden = true})
 			lich_king2:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 12, IsHidden = true})
-			BossBar(lich_king2, "lich_king")
+--			BossBar(lich_king2, "lich_king")
 			lich_king2.zone = "xhs_holdout"
 		end)
 	end)

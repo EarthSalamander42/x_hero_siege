@@ -63,6 +63,7 @@ local too_ez_gold = 0.9 -- The mod is way too ez, to modify gold very easily i j
 		if npc:IsRealHero() and npc:GetTeamNumber() == DOTA_TEAM_GOODGUYS then
 			if npc.bFirstSpawnComplete == nil then
 				print("Donator?", IsDonator(npc))
+				print("MR PER STR:", mode:GetCustomAttributeDerivedStatValue(DOTA_ATTRIBUTE_STRENGTH_MAGIC_RESISTANCE_PERCENT, hero))
 
 				if IsDonator(npc) then
 					if not npc:HasAbility("holdout_vip") then
@@ -413,18 +414,17 @@ local AbilitiesHeroes_XX = {
 	if hero_level == 20 then
 		for i = 0, 17 do 
 			local ability = hero:GetAbilityByIndex(i)
-				if IsValidEntity(ability) then
-					if ability:GetLevel() < ability:GetMaxLevel() then
-						for j = 1, ability:GetMaxLevel() - ability:GetLevel() do
+
+			if IsValidEntity(ability) then
+				if ability:GetLevel() < ability:GetMaxLevel() then
+					for j = 1, ability:GetMaxLevel() - ability:GetLevel() do
 						hero:UpgradeAbility(ability)
-						end
 					end
 				end
 			end
+		end
 
-		if hero:GetUnitName() == "npc_dota_hero_axe" or hero:GetUnitName() == "npc_dota_hero_medusa" or hero:GetUnitName() == "npc_dota_hero_storm_spirit" or hero:GetUnitName() == "npc_dota_hero_earth_spirit" or hero:GetUnitName() == "npc_dota_hero_ember_spirit" or hero:GetUnitName() == "npc_dota_hero_ursa" or hero:GetUnitName() == "npc_dota_hero_troll_warlord" or hero:GetUnitName() == "npc_dota_hero_mirana" or hero:GetUnitName() == "npc_dota_hero_lina" or hero:GetUnitName() == "npc_dota_hero_monkey_king" or hero:GetUnitName() == "npc_dota_hero_lone_druid" or hero:GetUnitName() == "npc_dota_hero_doom_bringer" or hero:GetUnitName() == "npc_dota_hero_leshrac" then
-			print("No Level 20 Ability")
-		else
+		if hero:GetUnitName() == AbilitiesHeroes_XX[hero:GetUnitName()] then
 			print("Whisper Level 20 Ability")
 			hero.lvl_20 = true
 			Notifications:Bottom(hero:GetPlayerOwnerID(), {text="You've reached level 20. Check out your new abilities! ",duration = 10})
@@ -440,6 +440,8 @@ local AbilitiesHeroes_XX = {
 					hero:SwapAbilities(oldab:GetName(),ability[1],true,true)
 				end
 			end
+		else
+			print("No Level 20 Ability")			
 		end
 	end
 end
@@ -669,6 +671,11 @@ local hero = PlayerResource:GetPlayer(userID):GetAssignedHero()
 			local numberOfTomes = math.floor(gold / cost)
 
 			if BT_ENABLED == 1 then
+				if numberOfTomes < 1 then
+					SendErrorMessage(hero:GetPlayerID(), "#error_cant_afford_tomes")
+					return
+				end
+
 				local i = 0
 
 				Notifications:Bottom(player, {text="You've bought "..numberOfTomes.." Tomes!", duration=5.0, style={color="white"}})
@@ -693,8 +700,6 @@ local hero = PlayerResource:GetPlayer(userID):GetAssignedHero()
 				end)
 			elseif BT_ENABLED == 0 then
 				SendErrorMessage(hero:GetPlayerID(), "#error_buy_tome_disabled")
-			elseif numberOfTomes < 1 then
-				SendErrorMessage(hero:GetPlayerID(), "#error_cant_afford_tomes")
 			end
 		end
 
@@ -1010,6 +1015,12 @@ local lane = tonumber(cn)
 			frost_first_time = true
 		elseif killedUnit:GetUnitName() == "npc_dota_boss_lich_king" then
 			GAME_WINNER_TEAM = "Radiant" 
+			for _, hero in pairs(HeroList:GetAllHeroes()) do
+				hero:SetRespawnsDisabled(true)
+				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
+				hero:AddNewModifier(hero, nil, "modifier_command_restricted", {})
+				hero:Stop()
+			end
 		end
 
 		if ramero_check == 2 then
@@ -1119,6 +1130,7 @@ local lane = tonumber(cn)
 							Notifications:TopToAll({text="A hero has reached 500 kills and will fight Ramero and Baristol!", style={color="white"}, duration=5.0})
 							PauseCreeps()
 							Timers:CreateTimer(5.0, function()
+								PauseCreeps()
 								FindClearSpaceForUnit(hero, point, true)
 								PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
 								RameroAndBaristolEvent(120)
@@ -1217,7 +1229,7 @@ local lane = tonumber(cn)
 					nTimer_SpecialEvent = 61
 					nTimer_IncomingWave = 1
 					PHASE = 3
-					KillCreeps(DOTA_TEAM_CUSTOM_1)
+--					KillCreeps(DOTA_TEAM_CUSTOM_1)
 					Timers:CreateTimer(59, RefreshPlayers)
 					Timers:CreateTimer(60, FinalWave)
 				end

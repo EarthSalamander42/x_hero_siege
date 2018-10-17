@@ -112,6 +112,15 @@ if self:GetParent():IsIllusion() then return end
 				local allies = FindUnitsInRadius(self:GetParent():GetTeamNumber(), self:GetParent():GetAbsOrigin(), nil, cast_range, self:GetParent():GetTeamNumber(), target_type, ability:GetAbilityTargetFlags(), FIND_ANY_ORDER, false)
 				local enemies = FindUnitsInRadius(self:GetParent():GetTeamNumber(), self:GetParent():GetAbsOrigin(), nil, cast_range, target_team, target_type, ability:GetAbilityTargetFlags(), FIND_ANY_ORDER, false)
 
+				if #enemies == 1 then
+					for _, restricted_ab in pairs(_G.multiplayer_abilities_cast) do
+						if ability:GetAbilityName() == restricted_ab then
+							print("Casting this ability in solo mode is restricted!!")
+							break
+						end
+					end
+				end
+
 				-- Bug with jugg boss, no behavior after first cast
 --				print(ability_behavior)
 
@@ -127,7 +136,14 @@ if self:GetParent():IsIllusion() then return end
 				if tonumber(ability_behavior) == DOTA_ABILITY_BEHAVIOR_NO_TARGET then
 					if #enemies > 0 then
 --						print("Cast No Target:", ability:GetAbilityName())
-						self:GetParent():CastAbilityNoTarget(ability, -1)
+
+						if ability:GetAbilityName() == "arthas_holy_light" then
+							if self:GetParent():GetHealthPercent() <= ability:GetSpecialValueFor("health_threshold") then
+								self:GetParent():CastAbilityNoTarget(ability, -1)
+							end
+						else
+							self:GetParent():CastAbilityNoTarget(ability, -1)
+						end
 					end
 					return
 				elseif tonumber(ability_behavior) == DOTA_ABILITY_BEHAVIOR_POINT then
