@@ -89,8 +89,7 @@ function boss_thinker_nevermore:OnIntervalThink()
 		-- Parameters
 		local boss = self:GetParent()
 
-		-- Sends boss health information to fighting team's clients
---		UpdateBossBar(boss, self.team)
+		if boss.deathStart == true then return end
 
 		-- Soul Harvest logic
 		if self.harvest_cooldown > 0 then

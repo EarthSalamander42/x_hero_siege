@@ -45,7 +45,7 @@ _G.ZONE_STAR_CRITERIA_KILLS				= 2
 _G.ZONE_STAR_CRITERIA_QUEST_COMPLETE	= 3
 
 -- X Hero Siege
-_G.X_HERO_SIEGE_V = 3.47
+_G.X_HERO_SIEGE_V = 3.48
 _G.PREGAMETIME = 125
 _G.nTimer_GameTime = 0
 _G.nTimer_SpecialEvent = 0

@@ -24,10 +24,4 @@ function HideBossBar(args) {
 (function () {
 	GameEvents.Subscribe("show_boss_hp", ShowBossBar);
 	GameEvents.Subscribe("hide_boss_hp", HideBossBar);
-
-	if (Game.GetMapInfo().map_display_name != "cavern" && Game.GetMapInfo().map_display_name != "imba_overthrow") {
-		return;
-	} else {
-		$.GetContextPanel().DeleteAsync(0)
-	}
 })();

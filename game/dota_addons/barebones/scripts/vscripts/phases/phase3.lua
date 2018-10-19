@@ -10,7 +10,6 @@ local ankh2 = CreateItem("item_magtheridon_ankh", mag, mag)
 local difficulty = GameRules:GetCustomGameDifficulty()
 local delay = 3.0
 
-	GameRules:SetHeroRespawnEnabled(false)
 	RefreshPlayers()
 	PHASE = 3
 
@@ -88,6 +87,7 @@ end
 
 function EndMagtheridonArena()
 	Entities:FindByName(nil, "trigger_teleport_phase3_creeps"):Enable()
+	CustomGameEventManager:Send_ServerToAllClients("hide_boss_hp", {})
 	CustomGameEventManager:Send_ServerToAllClients("hide_ui", {})
 	Notifications:TopToAll({text="Magtheridon has been killed! Door opened.", style={color="white"}, duration=10.0})
 	DoEntFire("door_magtheridon", "SetAnimation", "gate_02_open", 0, nil, nil)

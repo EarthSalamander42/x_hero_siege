@@ -3282,7 +3282,7 @@
 			}
 			"02"
 			{
-				"var_type"			"FIELD_FLOAT"
+				"var_type"			"FIELD_INTEGER"
 				"damage_per_tick"	"75 150 225 300"
 			}
 			"03"
@@ -21741,7 +21741,7 @@
 			}
 			"02"
 			{
-				"var_type"			"FIELD_FLOAT"
+				"var_type"			"FIELD_INTEGER"
 				"damage_per_tick"	"25 50 100 220"
 			}
 			"03"
@@ -22759,7 +22759,7 @@
 					"Teams"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
 					"Types"		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
 				}
-				"Type"			"DAMAGE_TYPE_MAGICAL"
+				"Type"			"DAMAGE_TYPE_PURE"
 				"Damage"		"%damage"
 			}
 		}
@@ -22923,7 +22923,7 @@
 					"Teams"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
 					"Types"		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
 				}
-				"Type"			"DAMAGE_TYPE_MAGICAL"
+				"Type"			"DAMAGE_TYPE_PURE"
 				"Damage"		"%damage"
 			}
 		}
@@ -28207,7 +28207,7 @@
 		"AbilityChannelTime"			"10.0"
 		"AbilityManaCost"				"0"
 		"AbilityTextureName"			"warlock_rain_of_chaos"
-		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_PURE"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
 
@@ -28341,7 +28341,7 @@
 							"Teams"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
 							"Types"		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
 						}
-						"Type"			"DAMAGE_TYPE_MAGICAL"
+						"Type"			"DAMAGE_TYPE_PURE"
 						"Damage"		"%damage_per_unit"
 					}
 
@@ -29875,7 +29875,8 @@
 		"AbilityUnitDamageType"		"DAMAGE_TYPE_MAGICAL"
 		"AbilityTextureName"		"custom/ghost_revenant_miasma"
 		"MaxLevel"					"4"
-		"RequiredLevel"				"5"
+		"RequiredLevel"				"8"
+		"LevelsBetweenUpgrades"		"3"
 		"AOERadius"					"%area_of_effect"
 
 		// Casting
@@ -29932,7 +29933,7 @@
 		"BaseClass"					"ability_lua"
 		"ScriptFile"				"heroes/hero_ghost_revenant.lua"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-		"AbilityCastRange"			"900"
+		"AbilityCastRange"			"%radius"
 		"AbilityTextureName"    	"custom/ghost_revenant_ghost_immolation"
 		"MaxLevel"					"1"
 
@@ -29949,11 +29950,6 @@
 			{
 				"var_type"			"FIELD_INTEGER"
 				"tick_time"			"1"
-			}
-			"03"
-			{
-				"var_type"			"FIELD_INTEGER"
-				"damage"			"80 140 200 260"
 			}
 			"03"
 			{

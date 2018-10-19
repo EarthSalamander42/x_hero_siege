@@ -90,7 +90,7 @@ function GameMode:InitGameMode()
 	GameRules:SetHeroSelectionTime(0.0)
 	GameRules:SetGoldTickTime(0.0)
 	GameRules:SetGoldPerTick(0.0)
-	GameRules:SetCustomGameSetupAutoLaunchDelay(20.0) --Vote Time
+	GameRules:SetCustomGameSetupAutoLaunchDelay(10.0) --Vote Time
 	GameRules:SetPreGameTime(PREGAMETIME)
 
 	--Disabling Derived Stats
@@ -1058,14 +1058,10 @@ local point_beast = Entities:FindByName(nil, "hero_image_boss"):GetAbsOrigin()
 		GameMode.HeroImage:SetBaseIntellect(hero:GetBaseIntellect() * 4)
 		GameMode.HeroImage:SetBaseAgility(hero:GetBaseAgility() * 4)
 
-		for _, ability in pairs(AbilitiesHeroes_XX[hero:GetUnitName()]) do
+		for i = 0, hero:GetAbilityCount() - 1 do
+			local ability = hero:GetAbilityByIndex(i)
 			if ability then
-				hero:UpgradeAbility(ability)
-				local oldab = hero:GetAbilityByIndex(ability[2])
-				if oldab:GetAutoCastState() then 
-					oldab:ToggleAutoCast()
-				end
-				hero:SwapAbilities(oldab:GetName(),ability[1],true,true)
+				ability:SetLevel(4)
 			end
 		end
 

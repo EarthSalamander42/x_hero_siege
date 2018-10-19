@@ -15986,9 +15986,9 @@
 		//----------------------------------------------------------------
 		"Ability1"					"ghost_revenant_blackjack"
 		"Ability2"					"ghost_revenant_wraith"
-		"Ability3"					"ghost_revenant_miasma"
-		"Ability4"					"ghost_revenant_ghost_immolation"
-		"Ability5"					"generic_hidden"
+		"Ability3"					"holdout_second_wind"
+		"Ability4"					"ghost_revenant_miasma"
+		"Ability5"					"ghost_revenant_ghost_immolation"
 		"Ability6"					"ghost_revenant_exhaustion"
 
 		// Armor

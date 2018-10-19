@@ -3567,7 +3567,7 @@
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
 		"AbilityCooldown"				"40.0"	
 		"AbilityCastRange"				"0"
-		"ItemCost"						"5000"
+		"ItemCost"						"7500"
 		"ItemQuality"					"rare"
 		"ItemStackable"					"1"
 		"ItemPermanent"					"0"
@@ -3579,7 +3579,7 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"duration"				"15"
+				"duration"				"10"
 			}
 		}
 
@@ -3666,6 +3666,12 @@
 				"IsHidden"					"0"
 				"EffectName"				"particles/items_fx/black_king_bar_avatar.vpcf"
 				"EffectAttachType"			"PATTACH_ABSORIGIN"
+
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_ABSOLUTE_NO_DAMAGE_MAGICAL"     "1"
+					"MODIFIER_PROPERTY_ABSOLUTE_NO_DAMAGE_PURE"        "1"
+				}
 
 				"States"
 				{
@@ -5329,6 +5335,12 @@
 				"Passive"						"1"
 				"IsHidden"						"0"
 				"TextureName"					"modifiers/necklace_of_spell_immunity"
+
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_ABSOLUTE_NO_DAMAGE_MAGICAL"     "1"
+					"MODIFIER_PROPERTY_ABSOLUTE_NO_DAMAGE_PURE"        "1"
+				}
 
 				"States"
 				{

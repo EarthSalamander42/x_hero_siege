@@ -95,7 +95,8 @@ if hero:IsIllusion() then return end
 			print("Shield")
 			for itemSlot = 0, 5 do
 				local item = hero:GetItemInSlot(itemSlot)
-				if item and item:GetName() == shield or item:GetName() == doom then
+				if item == nil then return end
+				if item:GetName() == shield or item:GetName() == doom then
 					if item:IsCooldownReady() then
 						if hero:IsRealHero() then
 							hero.ankh_respawn = true

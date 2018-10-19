@@ -59,11 +59,14 @@ local too_ez_gold = 0.9 -- The mod is way too ez, to modify gold very easily i j
 			end
 		end
 
+		if npc:GetUnitName() == "npc_dota_hero_magtheridon" then
+			ShowBossBar(npc)
+		end
+
 		-- HERO NPC
 		if npc:IsRealHero() and npc:GetTeamNumber() == DOTA_TEAM_GOODGUYS then
 			if npc.bFirstSpawnComplete == nil then
 				print("Donator?", IsDonator(npc))
-				print("MR PER STR:", mode:GetCustomAttributeDerivedStatValue(DOTA_ATTRIBUTE_STRENGTH_MAGIC_RESISTANCE_PERCENT, hero))
 
 				if IsDonator(npc) then
 					if not npc:HasAbility("holdout_vip") then
@@ -106,6 +109,10 @@ local too_ez_gold = 0.9 -- The mod is way too ez, to modify gold very easily i j
 				elseif npc:GetUnitName() == "npc_dota_hero_lone_druid" then
 					npc:AddNewModifier(npc, nil, "modifier_item_ultimate_scepter_consumed", {})
 				end
+
+--				if npc:GetUnitName() ~= "npc_dota_hero_wisp" then
+--					npc:AddNewModifier(npc, nil, "modifier_magical_resistance_fix", {})
+--				end
 
 				npc.bFirstSpawnComplete = true
 				self.bPlayerHasSpawned = true
@@ -720,7 +727,7 @@ local hero = PlayerResource:GetPlayer(userID):GetAssignedHero()
 
 			if str == "-closelane_all" or str == "-cl_all" then
 				for i = 1, 8 do
-					CloseLane(i)
+					CloseLane(hero:GetPlayerID(), i)
 				end
 			end
 		end
@@ -754,8 +761,8 @@ local hero = PlayerResource:GetPlayer(userID):GetAssignedHero()
 		"cl",
 	}
 
-	for _, openlane in pairs(openlane_command) do
-		local i, j = string.find(text, openlane.."_%d")
+	for _, closelane in pairs(closelane_command) do
+		local i, j = string.find(text, closelane.."_%d")
 		local lane = nil
 
 		if i then
@@ -765,7 +772,7 @@ local hero = PlayerResource:GetPlayer(userID):GetAssignedHero()
 
 			if lane <= 8 then
 				print("Opening lane:", lane)
-				OpenLane(lane)
+				CloseLane(hero:GetPlayerID(), lane)
 			end
 		end
 	end
@@ -1016,7 +1023,6 @@ local lane = tonumber(cn)
 		elseif killedUnit:GetUnitName() == "npc_dota_boss_lich_king" then
 			GAME_WINNER_TEAM = "Radiant" 
 			for _, hero in pairs(HeroList:GetAllHeroes()) do
-				hero:SetRespawnsDisabled(true)
 				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
 				hero:AddNewModifier(hero, nil, "modifier_command_restricted", {})
 				hero:Stop()
@@ -1229,7 +1235,7 @@ local lane = tonumber(cn)
 					nTimer_SpecialEvent = 61
 					nTimer_IncomingWave = 1
 					PHASE = 3
---					KillCreeps(DOTA_TEAM_CUSTOM_1)
+					KillCreeps(DOTA_TEAM_CUSTOM_1)
 					Timers:CreateTimer(59, RefreshPlayers)
 					Timers:CreateTimer(60, FinalWave)
 				end

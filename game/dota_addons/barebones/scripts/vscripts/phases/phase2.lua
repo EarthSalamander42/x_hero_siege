@@ -74,6 +74,8 @@ function FinalWave()
 			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
 		end
 
+		GameRules:SetHeroRespawnEnabled(false)
+
 		Timers:CreateTimer(30, function()
 			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
 		end)

@@ -358,18 +358,8 @@ end
 -----------------------------------------------------------------------------------------------------------
 ghost_revenant_ghost_immolation = ghost_revenant_ghost_immolation or class({})
 
-function ghost_revenant_ghost_immolation:GetAbilityTextureName()
-	return "custom/ghost_revenant_ghost_immolation"
-end
-
 function ghost_revenant_ghost_immolation:GetIntrinsicModifierName()
 	return "modifier_ghost_revenant_ghost_immolation"
-end
-
-function ghost_revenant_ghost_immolation:IsInnateAbility() return true end
-
-function ghost_revenant_ghost_immolation:GetCastRange(location, target)
-	return self:GetSpecialValueFor("radius")
 end
 
 LinkLuaModifier("modifier_ghost_revenant_ghost_immolation", "heroes/hero_ghost_revenant", LUA_MODIFIER_MOTION_NONE)
@@ -418,7 +408,7 @@ function modifier_ghost_revenant_ghost_immolation:GetAuraSearchTeam()
 end
 
 function modifier_ghost_revenant_ghost_immolation:GetAuraSearchType()
-	return DOTA_UNIT_TARGET_HERO
+	return DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC
 end
 
 function modifier_ghost_revenant_ghost_immolation:GetAuraDuration()
@@ -449,6 +439,7 @@ function modifier_ghost_revenant_ghost_immolation:GetModifierAura()
 end
 
 modifier_ghost_revenant_ghost_immolation_debuff = modifier_ghost_revenant_ghost_immolation_debuff or class({})
+
 function modifier_ghost_revenant_ghost_immolation_debuff:IsHidden()
 	return false
 end
@@ -461,58 +452,26 @@ function modifier_ghost_revenant_ghost_immolation_debuff:IsPurgable()
 	return false
 end
 
+function modifier_ghost_revenant_ghost_immolation_debuff:GetEffectName()
+	return "particles/econ/events/ti8/radiance_owner_ti8.vpcf"
+end
+
+function modifier_ghost_revenant_ghost_immolation_debuff:GetEffectAttachType()
+	return PATTACH_ABSORIGIN_FOLLOW
+end
+
+
 function modifier_ghost_revenant_ghost_immolation_debuff:OnCreated()
 	if IsServer() then
-		self.interval_time = self:GetAbility():GetSpecialValueFor("tick_time") -- must be int
-		self.hp_loss_pct = self:GetAbility():GetSpecialValueFor("hp_loss_pct")
-		self:StartIntervalThink(self.interval_time)
-		self.lose_hp = false
+		print("Tick time:", self:GetAbility():GetSpecialValueFor("tick_time"))
+		self:StartIntervalThink(self:GetAbility():GetSpecialValueFor("tick_time"))
 	end
 end
 
 function modifier_ghost_revenant_ghost_immolation_debuff:OnIntervalThink()
 	if IsServer() then
-		local ghost_revenant = FindUnitsInRadius(self:GetCaster():GetTeamNumber(), self:GetParent():GetAbsOrigin(), nil, self:GetAbility():GetSpecialValueFor("radius"), DOTA_UNIT_TARGET_TEAM_FRIENDLY , DOTA_UNIT_TARGET_HERO , DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES + DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER , false)
-
-		self.lose_hp = false
-		for _, ghost in pairs(ghost_revenant) do
-			if ghost:GetUnitName() == self:GetCaster():GetUnitName() then
-				self.lose_hp = true
-			end
-		end
-
-		if self.lose_hp == true then
-			if self:GetStackCount() < 99 then
-				self:SetStackCount(self:GetStackCount() + self.hp_loss_pct)
-			end
-		else
-			self:SetStackCount(self:GetStackCount() - self.hp_loss_pct)
-		end
-
-		-- Re-calculate health stats
-		self:GetParent():CalculateStatBonus() -- spam a lot of errors, but works fine, lul?
-
-		if self:GetStackCount() <= 0 then
-			self:GetParent():RemoveModifierByName("modifier_ghost_revenant_ghost_immolation_debuff")
-		end
-	end
-end
-
-function modifier_ghost_revenant_ghost_immolation_debuff:DeclareFunctions()
-	local decFuncs = {MODIFIER_PROPERTY_EXTRA_HEALTH_PERCENTAGE}
-
-	return decFuncs
-end
-
-function modifier_ghost_revenant_ghost_immolation_debuff:GetModifierExtraHealthPercentage()
-	if IsServer() then
-		local hp_to_reduce = 0.01 * self:GetStackCount() * (-1)
-		-- Make sure you don't go over 100%
-		if hp_to_reduce < -0.99 then
-			return -0.99
-		end
-
-		return hp_to_reduce
+		print("Damage:", self:GetParent():GetMaxHealth() / 100 * self:GetAbility():GetSpecialValueFor("health_as_damage_pct"))
+		ApplyDamage({victim = self:GetParent(), attacker = self:GetCaster(), damage = self:GetParent():GetMaxHealth() / 100 * self:GetAbility():GetSpecialValueFor("health_as_damage_pct"), damage_type = DAMAGE_TYPE_MAGICAL})
 	end
 end
 

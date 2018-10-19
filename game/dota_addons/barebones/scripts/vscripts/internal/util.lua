@@ -561,6 +561,7 @@ function OpenLane(lane_number)
 end
 
 function OpenCreepLane(lane_number)
+	if CREEP_LANES[lane_number][1] == 1 then return end
 	local DoorObs = Entities:FindAllByName("obstruction_lane"..lane_number)
 	local towers = Entities:FindAllByName("dota_badguys_tower"..lane_number)
 	local raxes = Entities:FindAllByName("dota_badguys_barracks_"..lane_number)
@@ -582,17 +583,21 @@ function OpenCreepLane(lane_number)
 	DoEntFire("door_lane"..lane_number, "SetAnimation", "gate_02_open", 0, nil, nil)
 end
 
-function CloseLane(lane_number)
-	if lane_number > PlayerResource:GetPlayerCount() then
-		SendErrorMessage(hero:GetPlayerID(), "#error_cant_close_lane_player_count")
-	end
-
+function CloseLane(ID, lane_number)
 	if PHASE ~= 3 then
 		if CREEP_LANES_TYPE == 1 then
+			print(lane_number, PlayerResource:GetPlayerCount())
+			if lane_number <= PlayerResource:GetPlayerCount() then
+				SendErrorMessage(ID, "#error_cant_close_lane_player_count")
+				return
+			end
+
 			CloseCreepLane(lane_number)
 		elseif CREEP_LANES_TYPE == 2 then
-			if math.ceil(lane_number / 2) > PlayerResource:GetPlayerCount() then
-				SendErrorMessage(hero:GetPlayerID(), "#error_cant_close_lane_player_count")
+			print(math.ceil(lane_number / 2), PlayerResource:GetPlayerCount())
+			if math.ceil(lane_number / 2) <= PlayerResource:GetPlayerCount() then
+				SendErrorMessage(ID, "#error_cant_close_lane_player_count")
+				return
 			end
 
 			if lane_number == 1 or lane_number == 2 then
@@ -617,6 +622,7 @@ function CloseLane(lane_number)
 end
 
 function CloseCreepLane(lane_number)
+	if CREEP_LANES[lane_number][1] == 0 then return end
 	local DoorObs = Entities:FindAllByName("obstruction_lane"..lane_number)
 	local towers = Entities:FindAllByName("dota_badguys_tower"..lane_number)
 	local raxes = Entities:FindAllByName("dota_badguys_barracks_"..lane_number)
@@ -1014,23 +1020,52 @@ function UnitVarToPlayerID(unitvar)
 	
 	return -1
 end
---[[
-function UpdateBossBar(boss, team)
-	CustomNetTables:SetTableValue("game_options", "boss", {
-		level = boss:GetLevel(),
-		HP = boss:GetHealth(),
-		HP_alt = boss:GetHealthPercent(),
-		maxHP = boss:GetMaxHealth(),
-		label = boss:GetUnitName(),
-		short_label = string.gsub(boss:GetUnitName(), "npc_frostivus_boss_", ""),
-		team_contest = team
-	})
-end
---]]
+
 function CDOTA_BaseNPC:IsXHSReincarnating()
 	if self:IsReincarnating() then
 		return true
 	end
 
 	return self.ankh_respawn
+end
+
+function ShowBossBar(caster)
+	if caster.deathStart then return end
+	local icon
+	local light_color = "#009933"
+	local dark_color = "#003311"
+
+	if caster:GetUnitName() == "npc_dota_hero_arthas" then
+		icon = "npc_dota_hero_omniknight"
+		light_color = "#e6ac00"
+		dark_color = "#b34700"
+	elseif caster:GetUnitName() == "npc_dota_hero_balanar" then
+		icon = "npc_dota_hero_pugna"
+	elseif caster:GetUnitName() == "npc_dota_hero_banehallow" then
+		icon = "npc_dota_hero_nevermore"
+		light_color = "#320000"
+		dark_color = "#ff6600"
+	elseif caster:GetUnitName() == "npc_dota_hero_grom_hellscream" then
+		icon = "npc_dota_hero_juggernaut"
+	elseif caster:GetUnitName() == "npc_dota_hero_illidan" then
+		icon = "npc_dota_hero_terrorblade"
+	elseif caster:GetUnitName() == "npc_dota_boss_lich_king" then
+		icon = "npc_dota_hero_abaddon"
+		light_color = "#000d33"
+		dark_color = "#0047b3"
+	elseif caster:GetUnitName() == "npc_dota_hero_magtheridon" then
+		icon = "npc_dota_hero_abyssal_underlord"
+	elseif caster:GetUnitName() == "npc_dota_hero_proudmoore" then
+		icon = "npc_dota_hero_kunkka"
+	end
+
+	CustomGameEventManager:Send_ServerToAllClients("show_boss_hp", {
+		boss_name = caster:GetUnitName(),
+		difficulty = GameRules:GetCustomGameDifficulty(),
+		boss_icon = icon,
+		light_color = light_color,
+		dark_color = dark_color,
+		boss_health = caster:GetHealth(),
+		boss_max_health = caster:GetMaxHealth()
+	})
 end
