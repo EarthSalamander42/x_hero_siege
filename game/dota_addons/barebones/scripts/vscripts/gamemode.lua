@@ -1058,10 +1058,10 @@ local point_beast = Entities:FindByName(nil, "hero_image_boss"):GetAbsOrigin()
 		GameMode.HeroImage:SetBaseIntellect(hero:GetBaseIntellect() * 4)
 		GameMode.HeroImage:SetBaseAgility(hero:GetBaseAgility() * 4)
 
-		for i = 0, hero:GetAbilityCount() - 1 do
-			local ability = hero:GetAbilityByIndex(i)
+		for i = 0, GameMode.HeroImage:GetAbilityCount() - 1 do
+			local ability = GameMode.HeroImage:GetAbilityByIndex(i)
 			if ability then
-				ability:SetLevel(4)
+				ability:SetLevel(ability:GetMaxLevel())
 			end
 		end
 
