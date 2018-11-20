@@ -283,6 +283,8 @@ function IllusionManager:ResetIllusion(tEntity,tIllusion)  -- Wipe AND re-add sk
 			if individual_item.activestate then
 				illusion_individual_item:SetActiveState(individual_item.activestate)
 			end
+			illusion_individual_item:SetPurchaser(nil)
+			illusion_individual_item:SetStacksWithOtherOwners(true)
 		end
 	end
 --	print("Illusion bounty:", illusion_level*2)

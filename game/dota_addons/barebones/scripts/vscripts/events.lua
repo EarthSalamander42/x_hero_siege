@@ -110,9 +110,10 @@ local too_ez_gold = 0.9 -- The mod is way too ez, to modify gold very easily i j
 					npc:AddNewModifier(npc, nil, "modifier_item_ultimate_scepter_consumed", {})
 				end
 
---				if npc:GetUnitName() ~= "npc_dota_hero_wisp" then
+				if npc:GetUnitName() ~= "npc_dota_hero_wisp" then
+					npc:AddNewModifier(npc, nil, "modifier_armor_gain_fix", {})
 --					npc:AddNewModifier(npc, nil, "modifier_magical_resistance_fix", {})
---				end
+				end
 
 				npc.bFirstSpawnComplete = true
 				self.bPlayerHasSpawned = true
@@ -431,6 +432,7 @@ local AbilitiesHeroes_XX = {
 			end
 		end
 
+		print(hero:GetUnitName())
 		if hero:GetUnitName() == AbilitiesHeroes_XX[hero:GetUnitName()] then
 			print("Whisper Level 20 Ability")
 			hero.lvl_20 = true
@@ -653,25 +655,29 @@ local hero = PlayerResource:GetPlayer(userID):GetAssignedHero()
 			end
 
 			if str == "-replaceherowith" then
-						print("Replace hero!")
-						text = string.gsub(text, str, "")
-						text = string.gsub(text, " ", "")
-						if PlayerResource:GetSelectedHeroName(caster:GetPlayerID()) ~= "npc_dota_hero_"..text then
-							PrecacheUnitByNameAsync("npc_dota_hero_"..text, function()
-								local wisp = PlayerResource:GetSelectedHeroEntity(playerId)
-								local hero = PlayerResource:ReplaceHeroWith(playerId, "npc_dota_hero_"..text, 0, 0)
+				text = string.gsub(text, str, "")
+				text = string.gsub(text, " ", "")
+				if PlayerResource:GetSelectedHeroName(caster:GetPlayerID()) ~= "npc_dota_hero_"..text then
+					PrecacheUnitByNameAsync("npc_dota_hero_"..text, function()
+						local wisp = PlayerResource:GetSelectedHeroEntity(playerId)
+						local hero = PlayerResource:ReplaceHeroWith(playerId, "npc_dota_hero_"..text, 0, 0)
 
-								Timers:CreateTimer(1.0, function()
-									if wisp then
-										UTIL_Remove(wisp)
-									end
-								end)
-							end)
-						end
-					end
+						Timers:CreateTimer(1.0, function()
+							if wisp then
+								UTIL_Remove(wisp)
+							end
+						end)
+					end)
+				end
+			end
 		end
 
 		if str == "-bt" then
+			if GameRules:IsGamePaused() then
+				SendErrorMessage(hero:GetPlayerID(), "#error_buy_tome_pause")
+				return
+			end
+
 			local hero = player:GetAssignedHero()
 			local gold = Gold:GetGold(userID)
 			local cost = 10000

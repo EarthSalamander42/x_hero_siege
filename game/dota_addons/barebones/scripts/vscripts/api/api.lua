@@ -2,14 +2,14 @@
 require("api/json")
 
 local ApiConfig = {
-	endpoint = "http://api.dota2imba.org",
+	endpoint = "https://api.dota2imba.org",
 	agent = "xhs-"..tostring(X_HERO_SIEGE_V), -- Add the version AND UPDATE it here
 	timeout = 10000,
 	debug = false
 }
 
 local ApiEndpoints = {
-	donators = "/xhs/meta/donators"
+	donators = "/imba/donators"
 }
 
 function ApiDebug(text, ignore)

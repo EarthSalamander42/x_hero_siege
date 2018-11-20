@@ -1,7 +1,7 @@
 "use strict";
 
 function ShowBossBar(args) {
-	$.Msg(args)
+//	$.Msg(args)
 
 	$("#BossHP").style.visibility = "visible";
 	$("#BossLabel").text = $.Localize(args.boss_name);

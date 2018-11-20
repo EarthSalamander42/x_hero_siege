@@ -22,5 +22,5 @@ function modifier_rune_armor:DeclareFunctions()
 end
 
 function modifier_rune_armor:GetModifierPhysicalArmorBonusUnique()
-	return 75
+	return 30
 end

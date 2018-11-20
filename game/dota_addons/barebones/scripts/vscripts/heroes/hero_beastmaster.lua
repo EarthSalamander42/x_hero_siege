@@ -45,44 +45,44 @@ function Stampede( event )
 	
 	-- Create timer to spawn projectile
 	Timers:CreateTimer( function()
-			-- Get random location for projectile
-			local random_distance = RandomInt( -spawn_radius, spawn_radius )
-			local spawn_location = middlePoint + perpendicularVec * random_distance
+		-- Get random location for projectile
+		local random_distance = RandomInt( -spawn_radius, spawn_radius )
+		local spawn_location = middlePoint + perpendicularVec * random_distance
 	
-			local velocityVec = Vector( forwardVec.x, forwardVec.y, 0 )
-			DebugDrawLine(middlePoint, middlePoint, 255, 0, 0, true, 1)
+		local velocityVec = Vector( forwardVec.x, forwardVec.y, 0 )
+		DebugDrawLine(middlePoint, middlePoint, 255, 0, 0, true, 1)
 
 
-			-- Spawn projectiles
-			local projectileTable = {
-				Ability = ability,
-				EffectName = "particles/custom/tinker_machine.vpcf",
-				vSpawnOrigin = spawn_location,
-				fDistance = distance,
-				fStartRadius = collision_radius,
-				fEndRadius = collision_radius,
-				Source = caster,
-				bHasFrontalCone = false,
-				bReplaceExisting = false,
-				bProvidesVision = false,
-				iUnitTargetTeam = DOTA_UNIT_TARGET_TEAM_ENEMY,
-				iUnitTargetType = DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC + DOTA_UNIT_TARGET_BUILDING,
-				iUnitTargetFlags = DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES,
-				vVelocity = velocityVec * projectile_speed
-			}
-			ProjectileManager:CreateLinearProjectile( projectileTable )
-			
-			-- Increment the counter
-			dummy.lizards_num = dummy.lizards_num + 1
-			
-			-- Check if the number of lizards have been reached
-			if dummy.lizards_num == lizards_per_sec then
-				dummy:Destroy()
-				return nil
-			else
-				return 1 / lizards_per_sec
-			end
+		-- Spawn projectiles
+		local projectileTable = {
+			Ability = ability,
+			EffectName = "particles/custom/tinker_machine.vpcf",
+			vSpawnOrigin = spawn_location,
+			fDistance = distance,
+			fStartRadius = collision_radius,
+			fEndRadius = collision_radius,
+			Source = caster,
+			bHasFrontalCone = false,
+			bReplaceExisting = false,
+			bProvidesVision = false,
+			iUnitTargetTeam = DOTA_UNIT_TARGET_TEAM_ENEMY,
+			iUnitTargetType = DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC + DOTA_UNIT_TARGET_BUILDING,
+			iUnitTargetFlags = DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES,
+			vVelocity = velocityVec * projectile_speed
+		}
+		ProjectileManager:CreateLinearProjectile( projectileTable )
+		
+		-- Increment the counter
+		dummy.lizards_num = dummy.lizards_num + 1
+		
+		-- Check if the number of lizards have been reached
+		if dummy.lizards_num == lizards_per_sec then
+			dummy:Destroy()
+			return nil
+		else
+			return 1 / lizards_per_sec
 		end
+	end
 	)
 end
 

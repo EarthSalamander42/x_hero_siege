@@ -2581,7 +2581,7 @@
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityCastRange"				"900"
-		
+
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilitySpecial"
@@ -2589,7 +2589,7 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"bonus_armor"			"10 25 70 150"
+				"bonus_armor"			"10 18 26 34"
 			}
 			"02"
 			{
@@ -7745,7 +7745,7 @@
 			"02"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"bonus_armor"				"10 20 30 40"
+				"bonus_armor"				"10 17 24 31"
 			}
 			"03"
 			{
@@ -7855,23 +7855,18 @@
 		{
 			"01"
 			{
-				"var_type"				"FIELD_INTEGER"
-				"chance"				"10"
+				"var_type"			"FIELD_INTEGER"
+				"bonus_damage"		"200 400 600 800"
 			}
 			"02"
 			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_damage"			"200 400 600 800"
+				"var_type"			"FIELD_FLOAT"
+				"duration"			"0.05"
 			}
 			"03"
 			{
-				"var_type"				"FIELD_FLOAT"
-				"duration"				"0.05"
-			}
-			"04"
-			{
-				"var_type"				"FIELD_FLOAT"
-				"duration_creep"		"0.05"
+				"var_type"			"FIELD_INTEGER"
+				"attack_count"		"6"
 			}
 		}
 	}
@@ -27330,7 +27325,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"abyssal_underlord_firestorm"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_POINT"
-		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_PURE"
 		"AbilityUnitTargetFlags"		"DOTA_UNIT_TARGET_FLAG_INVULNERABLE | DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES"
 		"AbilityCastRange"				"750"
 		"AbilityCastPoint"				"0.45"
@@ -27842,7 +27837,7 @@
 					"Damage"
 					{
 						"Target"	"TARGET"
-						"Type"		"DAMAGE_TYPE_MAGICAL"
+						"Type"		"DAMAGE_TYPE_PURE"
 						"Damage"	"%AbilityDamage"
 					}
 				}
@@ -27923,7 +27918,7 @@
 					"Damage"
 					{
 						"Target"		"TARGET"
-						"Type"			"DAMAGE_TYPE_MAGICAL"
+						"Type"			"DAMAGE_TYPE_PURE"
 						"Damage"		"%AbilityDamage"
 					}
 				}

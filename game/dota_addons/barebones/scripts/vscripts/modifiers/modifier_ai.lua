@@ -116,7 +116,7 @@ if self:GetParent():IsIllusion() then return end
 					for _, restricted_ab in pairs(_G.multiplayer_abilities_cast) do
 						if ability:GetAbilityName() == restricted_ab then
 							print("Casting this ability in solo mode is restricted!!")
-							break
+							return
 						end
 					end
 				end

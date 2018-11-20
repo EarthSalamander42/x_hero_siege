@@ -580,24 +580,18 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"chance"				"10"
-				"LinkedSpecialBonus"	"special_bonus_unique_slardar"
-			}
-			"02"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_damage"			"100 250 450 700"
+				"bonus_damage"			"100 250 450 700 1000"
 				"LinkedSpecialBonus"	"special_bonus_unique_slardar_2"
 			}
-			"03"
+			"02"
 			{
 				"var_type"				"FIELD_FLOAT"
 				"duration"				"0.05"
 			}
-			"04"
+			"03"
 			{
-				"var_type"				"FIELD_FLOAT"
-				"duration_creep"		"0.05"
+				"var_type"				"FIELD_INTEGER"
+				"attack_count"			"6 5 4 3 2"
 			}
 		}
 	}

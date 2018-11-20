@@ -71,5 +71,10 @@ function modifier_lifesteal:IsDebuff() return false end
 --	function modifier_lifesteal:GetAttributes() return MODIFIER_ATTRIBUTE_MULTIPLE end
 
 function modifier_lifesteal:GetModifierLifesteal()
+	if self:GetAbility() == nil then
+		self:GetCaster():RemoveModifierByName("modifier_lifesteal")
+		return
+	end
+
 	return self:GetAbility():GetSpecialValueFor("lifesteal_pct")
 end

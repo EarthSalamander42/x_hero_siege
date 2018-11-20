@@ -1905,7 +1905,7 @@
 			"01"
 			{
 				"var_type"						"FIELD_INTEGER"
-				"bonus_armor"					"100"
+				"bonus_armor"					"50"
 			}
 			"02"
 			{
@@ -2137,7 +2137,7 @@
 			"04"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"bonus_armor"			"100"
+				"bonus_armor"			"30"
 			}
 			"05"
 			{
@@ -2759,7 +2759,7 @@
 			"04"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"bonus_armor"			"11"
+				"bonus_armor"			"5"
 			}
 			"05"
 			{
@@ -3108,7 +3108,7 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"bonus_armor"			"100"
+				"bonus_armor"			"50"
 			}
 			"02"
 			{
@@ -3396,7 +3396,7 @@
 			"03"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"bonus_armor"			"125"
+				"bonus_armor"			"60"
 			}
 		}
 
@@ -3718,7 +3718,7 @@
 			"02"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"bonus_armor"			"150"
+				"bonus_armor"			"75"
 			}
 			"03"
 			{
@@ -4311,7 +4311,7 @@
 			"01"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"bonus_armor"				"75"
+				"bonus_armor"				"30"
 			}
 			"02"
 			{
@@ -5152,7 +5152,7 @@
 			"04"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"bonus_armor"			"33"
+				"bonus_armor"			"15"
 			}
 			"05"
 			{

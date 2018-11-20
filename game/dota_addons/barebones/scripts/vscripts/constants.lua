@@ -198,12 +198,12 @@ _G.FarmEvent_Creeps = {
 FARM_EVENT_UPGRADE = {}
 FARM_EVENT_UPGRADE["damage"] =	{20, 40, 60, 80, 100}
 FARM_EVENT_UPGRADE["health"] =	{200, 400, 600, 800, 1000}
-FARM_EVENT_UPGRADE["armor"] =	{10, 20, 30, 40, 50}
+FARM_EVENT_UPGRADE["armor"] =	{0, 0, 0, 0, 0}
 
 PHASE_2_UPGRADE = {}
 PHASE_2_UPGRADE["damage"] =	{25, 50, 75, 100, 125}
 PHASE_2_UPGRADE["health"] =	{200, 400, 600, 800, 1000}
-PHASE_2_UPGRADE["armor"] =	{5, 10, 15, 20, 25}
+PHASE_2_UPGRADE["armor"] =	{0, 0, 0, 0, 0}
 
 _G.vip_members = {
 	4173154700,
