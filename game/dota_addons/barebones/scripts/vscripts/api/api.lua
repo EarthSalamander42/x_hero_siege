@@ -5,11 +5,11 @@ local ApiConfig = {
 	endpoint = "https://api.dota2imba.org",
 	agent = "xhs-"..tostring(X_HERO_SIEGE_V), -- Add the version AND UPDATE it here
 	timeout = 10000,
-	debug = false
+	debug = true
 }
 
 local ApiEndpoints = {
-	donators = "/imba/donators"
+	donators = "/xhs/meta/donators"
 }
 
 function ApiDebug(text, ignore)
@@ -37,7 +37,7 @@ function ApiPerform(data, endpoint, callback)
 			data = data
 		})
 	end
-	
+
 	ApiDebug("Performing " .. method .. " @ " .. endpoint, true)
 
 	if (method == "POST") then
@@ -59,6 +59,7 @@ function ApiPerform(data, endpoint, callback)
 	rqH:Send(function (result)
 		-- decode response (we should always get json)
 		-- 500 indi
+		ApiDebug("Status code: " .. result.StatusCode)
 		if result.StatusCode == 503 then
 			ApiDebug("Server not available!", true)
 			callback(true, nil)
@@ -79,7 +80,7 @@ function ApiPerform(data, endpoint, callback)
 	end)
 end
 
-ApiCache = {
+local ApiCache = {
 	donators = nil
 }
 
@@ -88,7 +89,7 @@ function ApiLoad()
 		if (err) then
 			ApiDebug("Donators Request failed!", true)
 		else
-			ApiCache.donators = response.data.players
+			ApiCache.donators = response.data
 		end
 	end)
 end
