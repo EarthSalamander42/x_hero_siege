@@ -11,7 +11,7 @@ end
 
 function modifier_armor_gain_fix:OnIntervalThink()
 	if IsServer() then
-		self:SetStackCount((self:GetParent():GetAgility() * 0.2007) * (-1)) -- Don't ask.
+		self:SetStackCount((self:GetParent():GetAgility() * 0.2005) * (-1)) -- Don't ask.
 	end
 end
 
