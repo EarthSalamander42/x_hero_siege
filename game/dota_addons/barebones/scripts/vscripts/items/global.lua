@@ -108,14 +108,6 @@ if hero:IsIllusion() then return end
 	hero.has_epic_2 = false
 end
 
--- Lightning Sword
-function SwordUnequip(keys)
-local hero = keys.caster
-if hero:IsIllusion() then return end
-
-	hero.has_epic_3 = false
-end
-
 -- Ring of Superiority
 function RingUnequip(keys)
 local hero = keys.caster

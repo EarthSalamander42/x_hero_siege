@@ -1,8 +1,6 @@
 require('libraries/timers')
 
 function MuradinEvent(time)
-local teleporters = Entities:FindAllByName("trigger_teleport_muradin_end")
-
 	nTimer_SpecialEvent = time
 	BT_ENABLED = 0
 	StunBuildings(time)
@@ -39,7 +37,7 @@ local teleporters = Entities:FindAllByName("trigger_teleport_muradin_end")
 	Timers:CreateTimer(time, function()
 		SpecialWave()
 		mode:SetFixedRespawnTime(RESPAWN_TIME)
-		nTimer_SpecialEvent = 720
+		nTimer_SpecialEvent = XHS_SPECIAL_EVENT_INTERVAL
 		BT_ENABLED = 1
 		SPECIAL_EVENT = 0
 		RestartCreeps(3.0)
@@ -48,7 +46,7 @@ local teleporters = Entities:FindAllByName("trigger_teleport_muradin_end")
 		Entities:FindByName(nil, "trigger_special_event"):Enable()
 		CustomGameEventManager:Send_ServerToAllClients("update_special_event_label_farm", {})
 		Timers:CreateTimer(6, function() -- 14:05 Min: MURADIN BRONZEBEARD EVENT 1, END
-			Notifications:TopToAll({text="All heroes who survived Muradin received 15 000 Gold!", duration=6.0})
+			Notifications:TopToAll({text="All heroes who survived Muradin received "..XHS_MURADIN_EVENT_GOLD.." Gold!", duration=6.0})
 			Notifications:TopToAll({ability="alchemist_goblins_greed", continue = true})
 			RestartCreeps(0.0)
 			UTIL_Remove(Muradin)
@@ -74,7 +72,8 @@ local MuradinCheck = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, Entities:FindByName(n
 						TeleportHero(hero, 3.0, base_bad:GetAbsOrigin())
 					end
 				end
-				PlayerResource:ModifyGold(hero:GetPlayerOwnerID(), 15000, false, DOTA_ModifyGold_Unspecified)
+
+				PlayerResource:ModifyGold(hero:GetPlayerOwnerID(), XHS_MURADIN_EVENT_GOLD, false, DOTA_ModifyGold_Unspecified)
 			end
 		end)
 	end
@@ -140,6 +139,7 @@ StunBuildings(time)
 		BT_ENABLED = 1
 		EndFarmEvent()
 		CustomGameEventManager:Send_ServerToAllClients("update_special_event_label_final", {})
+		nTimer_SpecialEvent = XHS_PHASE_2_DELAY + 10.0
 
 		Timers:CreateTimer(10.0, function()
 			RestartCreeps(0.0)
@@ -219,7 +219,6 @@ function EndFarmEvent()
 end
 
 function RameroAndBaristolEvent(time) -- 500 kills
-local teleporters = Entities:FindAllByName("trigger_teleport_ramero_end")
 nTimer_SpecialArena = time
 SPECIAL_EVENT = 1
 StunBuildings(time)
@@ -275,7 +274,6 @@ end
 
 function RameroEvent(time) -- 750 kills
 SPECIAL_EVENT = 1
-local teleporters = Entities:FindAllByName("trigger_teleport_ramero_end")
 nTimer_SpecialArena = time
 PauseCreeps()
 StunBuildings(time)

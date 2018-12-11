@@ -508,19 +508,11 @@ local unit = {
 
 	print("Current Wave:", reg-1)
 	if reg-1 == 8 then
-		local ice_towers = Entities:FindAllByName("npc_tower_death")
-		for _, tower in pairs(ice_towers) do
-			tower:ForceKill(false)
-		end
-
-		for TW = 1, 2 do
-			local ice_towers_main = Entities:FindByName(nil, "npc_tower_cold_"..TW)
-			ice_towers_main:ForceKill(false)
-		end
 		nTimer_IncomingWave = 0
 		return
 	end
-	nTimer_IncomingWave = 240
+
+	nTimer_IncomingWave = XHS_SPECIAL_WAVE_INTERVAL
 end
 
 function SpawnDragons(dragon)
@@ -584,18 +576,27 @@ function OpenCreepLane(lane_number)
 end
 
 function CloseLane(ID, lane_number)
+	local player_count = PlayerResource:GetPlayerCount()
+	for i = 0, PlayerResource:GetPlayerCount() - 1 do
+		if IsValidPlayer(i) then
+			if PlayerResource:GetConnectionState(i) ~= 2 then
+				player_count = player_count - 1
+			end
+		end
+	end
+
 	if PHASE ~= 3 then
 		if CREEP_LANES_TYPE == 1 then
-			print(lane_number, PlayerResource:GetPlayerCount())
-			if lane_number <= PlayerResource:GetPlayerCount() then
+			print(lane_number, player_count)
+			if lane_number <= player_count then
 				SendErrorMessage(ID, "#error_cant_close_lane_player_count")
 				return
 			end
 
 			CloseCreepLane(lane_number)
 		elseif CREEP_LANES_TYPE == 2 then
-			print(math.ceil(lane_number / 2), PlayerResource:GetPlayerCount())
-			if math.ceil(lane_number / 2) <= PlayerResource:GetPlayerCount() then
+			print(math.ceil(lane_number / 2), player_count)
+			if math.ceil(lane_number / 2) <= player_count then
 				SendErrorMessage(ID, "#error_cant_close_lane_player_count")
 				return
 			end
@@ -645,20 +646,20 @@ function CloseCreepLane(lane_number)
 end
 
 function PauseHeroes()
-local heroes = HeroList:GetAllHeroes()
-
-	for _,hero in pairs(heroes) do
-		hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", nil)
-		hero:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
+	for _,hero in pairs(HeroList:GetAllHeroes()) do
+		if hero:IsRealHero() then
+			hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", nil)
+			hero:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
+		end
 	end
 end
 
 function RestartHeroes()
-local heroes = HeroList:GetAllHeroes()
-
-	for _,hero in pairs(heroes) do
-		hero:RemoveModifierByName("modifier_animation_freeze_stun")
-		hero:RemoveModifierByName("modifier_invulnerable")
+	for _,hero in pairs(HeroList:GetAllHeroes()) do
+		if hero:IsRealHero() then
+			hero:RemoveModifierByName("modifier_animation_freeze_stun")
+			hero:RemoveModifierByName("modifier_invulnerable")
+		end
 	end
 end
 
@@ -706,23 +707,38 @@ local units3 = FindUnitsInRadius( DOTA_TEAM_CUSTOM_1, Vector(0, 0, 0), nil, FIND
 
 	Timers:CreateTimer(delay, function()
 		for _,v in pairs(units) do
-			if v and v:HasMovementCapability() then
-				v:RemoveModifierByName("modifier_animation_freeze_stun")
-				v:RemoveModifierByName("modifier_invulnerable")
+--			if v and v:HasMovementCapability() then
+			if IsValidEntity(v) then
+				if v:HasModifier("modifier_animation_freeze_stun") then
+					v:RemoveModifierByName("modifier_animation_freeze_stun")
+				end
+				if v:HasModifier("modifier_invulnerable") then
+					v:RemoveModifierByName("modifier_invulnerable")
+				end
 			end
 		end
 
 		for _,v in pairs(units2) do
-			if v and v:HasMovementCapability() then
-				v:RemoveModifierByName("modifier_animation_freeze_stun")
-				v:RemoveModifierByName("modifier_invulnerable")
+--			if v and v:HasMovementCapability() then
+			if IsValidEntity(v) then
+				if v:HasModifier("modifier_animation_freeze_stun") then
+					v:RemoveModifierByName("modifier_animation_freeze_stun")
+				end
+				if v:HasModifier("modifier_invulnerable") then
+					v:RemoveModifierByName("modifier_invulnerable")
+				end
 			end
 		end
 	
 		for _,v in pairs(units3) do
-			if v and v:HasMovementCapability() then
-				v:RemoveModifierByName("modifier_animation_freeze_stun")
-				v:RemoveModifierByName("modifier_invulnerable")
+--			if v and v:HasMovementCapability() then
+			if IsValidEntity(v) then
+				if v:HasModifier("modifier_animation_freeze_stun") then
+					v:RemoveModifierByName("modifier_animation_freeze_stun")
+				end
+				if v:HasModifier("modifier_invulnerable") then
+					v:RemoveModifierByName("modifier_invulnerable")
+				end
 			end
 		end
 	end)
@@ -806,7 +822,7 @@ local waypoint = Entities:FindByName(nil,"final_wave_player_2")
 	final_wave_stun_time = final_wave_stun_time -5
 
 	for _, hero in pairs(HeroList:GetAllHeroes()) do
-		if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
+		if hero:IsRealHero() and hero:GetTeam() == DOTA_TEAM_GOODGUYS then
 			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), boss)
 		end
 	end
@@ -945,18 +961,6 @@ local particle_lifesteal = "particles/item/lifesteal_mask/lifesteal_particle.vpc
 	end
 end
 
-function CreepLevels(level)
-	if level < 4 then
-		nTimer_CreepLevel = 360
-		Notifications:TopToAll({text="Creep Level "..level.." enabled!", style={color="lightgreen"}, duration=5.0})
-		for c = 1, 8 do
-			if CREEP_LANES[c][2] < level then
-				CREEP_LANES[c][2] = level
-			end
-		end
-	end
-end
-
 function StunBuildings(time)
 	for Players = 1, 8 do
 		local towers = Entities:FindAllByName("dota_badguys_tower"..Players)
@@ -1043,16 +1047,16 @@ function ShowBossBar(caster)
 		icon = "npc_dota_hero_pugna"
 	elseif caster:GetUnitName() == "npc_dota_hero_banehallow" then
 		icon = "npc_dota_hero_nevermore"
-		light_color = "#320000"
-		dark_color = "#ff6600"
+		light_color = "#ff6600"
+		dark_color = "#320000"
 	elseif caster:GetUnitName() == "npc_dota_hero_grom_hellscream" then
 		icon = "npc_dota_hero_juggernaut"
 	elseif caster:GetUnitName() == "npc_dota_hero_illidan" then
 		icon = "npc_dota_hero_terrorblade"
 	elseif caster:GetUnitName() == "npc_dota_boss_lich_king" then
 		icon = "npc_dota_hero_abaddon"
-		light_color = "#000d33"
-		dark_color = "#0047b3"
+		light_color = "#0047b3"
+		dark_color = "#000d33"
 	elseif caster:GetUnitName() == "npc_dota_hero_magtheridon" then
 		icon = "npc_dota_hero_abyssal_underlord"
 	elseif caster:GetUnitName() == "npc_dota_hero_proudmoore" then
@@ -1068,4 +1072,28 @@ function ShowBossBar(caster)
 		boss_health = caster:GetHealth(),
 		boss_max_health = caster:GetMaxHealth()
 	})
+end
+
+function IsNearEntity(entity_class, location, distance)
+	local entity = Entities:FindByName(nil, entity_class)
+	if (entity:GetAbsOrigin() - location):Length2D() <= distance then
+		return true
+	end
+
+	return false
+end
+
+-- credits to yahnich for the following
+function CDOTA_BaseNPC:IsRealHero()
+	if not self:IsNull() then
+		return self:IsHero() and not ( self:IsIllusion() or self:IsClone() ) and not self:IsFakeHero()
+	end
+end
+
+function CDOTA_BaseNPC:IsFakeHero()
+	if self:IsIllusion() or (self:HasModifier("modifier_monkey_king_fur_army_soldier") or self:HasModifier("modifier_monkey_king_fur_army_soldier_hidden")) or self:IsTempestDouble() or self:IsClone() or self:HasAbility("dummy_passive_vulnerable") then
+		return true
+	else
+		return false
+	end
 end

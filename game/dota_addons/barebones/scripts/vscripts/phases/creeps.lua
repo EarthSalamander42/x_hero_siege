@@ -1,5 +1,3 @@
-first_rax = true
-
 function SpawnCreeps()
 
 	if GameMode.creep_roll["race"] < 4 then
@@ -103,6 +101,24 @@ function SpawnCreeps()
 	end
 end
 
+function CreepLevels(level)
+	local dragons = {}
+	dragons[2] = "npc_dota_creature_red_dragon"
+	dragons[3] = "npc_dota_creature_black_dragon"
+	dragons[4] = "npc_dota_creature_green_dragon"
+
+	SpawnDragons(dragons[level])
+
+	for c = 1, 8 do
+		if CREEP_LANES[c][2] < level then
+			CREEP_LANES[c][2] = level
+		end
+	end
+
+	Notifications:TopToAll({text="Creep Level "..level.." enabled!", style={color="lightgreen"}, duration=5.0})
+end
+
+-- this function is not used anymore
 function SpawnRevenant(event)
 local caller = event.caller
 local cn = string.gsub(caller:GetName(), "dota_badguys_tower", "")
@@ -122,24 +138,11 @@ local player = PlayerResource:GetPlayer(tonumber(cn)-1)
 	end
 end
 
+-- this function is not used anymore
 function SpawnMagnataur(event)
 local caller = event.caller
-local difficulty = GameRules:GetCustomGameDifficulty()
 
-	for j = 1, difficulty do
-		local unit = CreateUnitByName("npc_magnataur_destroyer_crypt", caller:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-	end
-
-	if first_rax == true then
-		first_rax = false
-		Entities:FindByName(nil, "trigger_phase2_left"):Enable()
-		Entities:FindByName(nil, "trigger_phase2_right"):Enable()
-		local DoorObs = Entities:FindAllByName("obstruction_phase2")
-		for _, obs in pairs(DoorObs) do 
-			obs:SetEnabled(false, true)
-		end
-		DoEntFire("door_phase2_left", "SetAnimation", "gate_02_open", 0, nil, nil)
-		DoEntFire("door_phase2_right", "SetAnimation", "gate_02_open", 0, nil, nil)
-		Notifications:TopToAll({text = "Phase 2 creeps can now be triggered!", duration = 11.0})
+	for j = 1, GameRules:GetCustomGameDifficulty() do
+		CreateUnitByName("npc_magnataur_destroyer_crypt", caller:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
 	end
 end

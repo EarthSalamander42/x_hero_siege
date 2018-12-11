@@ -7,11 +7,26 @@
 xhs_blademaster_mirror_image = xhs_blademaster_mirror_image or class({})
 
 LinkLuaModifier( "modifier_xhs_blademaster_mirror_image_invulnerable", "heroes/hero_blademaster.lua", LUA_MODIFIER_MOTION_NONE )
+LinkLuaModifier( "modifier_xhs_blademaster_mirror_image_handler", "heroes/hero_blademaster.lua", LUA_MODIFIER_MOTION_NONE )
 
 function xhs_blademaster_mirror_image:IsHiddenWhenStolen() 		return false end
 function xhs_blademaster_mirror_image:IsRefreshable() 			return true  end
 function xhs_blademaster_mirror_image:IsStealable() 			return true  end
 function xhs_blademaster_mirror_image:IsNetherWardStealable() 	return false end
+
+function xhs_blademaster_mirror_image:GetIntrinsicModifierName()
+	return "modifier_xhs_blademaster_mirror_image_handler"
+end
+
+function xhs_blademaster_mirror_image:GetAbilityTextureName()
+	if IsServer() or not self:GetCaster().mirror_image_icon_client then return "" end
+
+	if self:GetCaster().mirror_image_icon_client == 1 then
+		return "custom/blademaster_mirror_image"
+	elseif self:GetCaster().mirror_image_icon_client == 2 then
+		return "naga_siren_mirror_image"
+	end
+end
 
 function xhs_blademaster_mirror_image:OnSpellStart()
 	if IsClient() then return end
@@ -38,7 +53,11 @@ function xhs_blademaster_mirror_image:OnSpellStart()
 --	local particle2 = "particles/units/heroes/hero_siren/blademaster_riptide_foam.vpcf"
 	local part = ParticleManager:CreateParticle(particle, PATTACH_ABSORIGIN, caster)
 	local buff = caster:AddNewModifier(caster, ability, "modifier_xhs_blademaster_mirror_image_invulnerable", {})
-	EmitSoundOn("Blademaster.MirrorImage", caster)
+	if caster:GetUnitName() == "npc_dota_hero_juggernaut" then
+		EmitSoundOn("Blademaster.MirrorImage", caster)
+	elseif caster:GetUnitName() == "npc_dota_hero_naga_siren" then
+		EmitSoundOn("Hero_NagaSiren.MirrorImage", caster)
+	end
 	caster:SetContextThink( DoUniqueString("blademaster_mirror_image"), function ( )
 		for i=1, image_count do
 			local j = RandomInt(1, #vRandomSpawnPos)
@@ -89,4 +108,35 @@ function modifier_xhs_blademaster_mirror_image_invulnerable:CheckState()
 	}
 
 	return state
+end
+
+if modifier_xhs_blademaster_mirror_image_handler == nil then modifier_xhs_blademaster_mirror_image_handler = class({}) end
+function modifier_xhs_blademaster_mirror_image_handler:IsHidden() return true end
+function modifier_xhs_blademaster_mirror_image_handler:IsDebuff() return false end
+function modifier_xhs_blademaster_mirror_image_handler:IsPurgable() return false end
+function modifier_xhs_blademaster_mirror_image_handler:RemoveOnDeath() return false end
+
+function modifier_xhs_blademaster_mirror_image_handler:OnCreated()
+	self:StartIntervalThink(1.0)
+	self:OnIntervalThink()
+
+	if IsServer() then
+		self:GetCaster():AddNewModifier(self:GetCaster(), self:GetAbility(), "modifier_imba_shiva_aura", {})
+	end
+end
+
+function modifier_xhs_blademaster_mirror_image_handler:OnIntervalThink()
+	if self:GetCaster():IsIllusion() then return end
+
+	if IsServer() then
+		if self:GetParent():GetUnitName() == "npc_dota_hero_juggernaut" then
+			self:SetStackCount(1)
+		elseif self:GetParent():GetUnitName() == "npc_dota_hero_naga_siren" then
+			self:SetStackCount(2)
+		end
+	end
+
+	if IsClient() then
+		self:GetCaster().mirror_image_icon_client = self:GetStackCount()
+	end
 end

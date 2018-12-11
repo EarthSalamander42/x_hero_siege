@@ -10,8 +10,10 @@ end
 
 --------------------------------------
 
-xhs_vampiric_aura = xhs_vampiric_aura or class({})
 LinkLuaModifier("modifier_xhs_vampiric_aura", "heroes/hero_demon_hunter.lua", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_xhs_vampiric_aura_buff", "heroes/hero_demon_hunter.lua", LUA_MODIFIER_MOTION_NONE)
+
+xhs_vampiric_aura = xhs_vampiric_aura or class({})
 
 function xhs_vampiric_aura:GetAbilityTextureName()
 	return "custom/holdout_thirst_aura"
@@ -64,8 +66,10 @@ end
 
 function modifier_xhs_vampiric_aura:GetAuraEntityReject(target)
 	if IsServer() then
-		if target:HasModifier("modifier_lifesteal") then
-			return true
+		for _, modifier in ipairs(_G.XHS_LIFESTEAL_MODIFIER_PRIORITY) do
+			if target:HasModifier(modifier) then
+				return true
+			end
 		end
 	end
 
@@ -73,12 +77,50 @@ function modifier_xhs_vampiric_aura:GetAuraEntityReject(target)
 end
 
 function modifier_xhs_vampiric_aura:GetModifierAura()
-	return "modifier_lifesteal"
+	return "modifier_xhs_vampiric_aura_buff"
 end
 
 function modifier_xhs_vampiric_aura:IsAura() return true end
 function modifier_xhs_vampiric_aura:IsDebuff() return false end
 function modifier_xhs_vampiric_aura:IsHidden() return true end
+
+modifier_xhs_vampiric_aura_buff = class({})
+
+function modifier_xhs_vampiric_aura_buff:IsHidden() return false end
+function modifier_xhs_vampiric_aura_buff:IsPurgable() return false end
+function modifier_xhs_vampiric_aura_buff:IsDebuff() return false end
+
+function modifier_xhs_vampiric_aura_buff:GetTexture()
+	return "custom/holdout_thirst_aura"
+end
+
+function modifier_xhs_vampiric_aura_buff:DeclareFunctions()
+	return {
+		MODIFIER_EVENT_ON_ATTACK_LANDED
+	}
+end
+
+function modifier_xhs_vampiric_aura_buff:OnAttackLanded(keys)
+	if IsServer() then
+		if self:GetParent() == keys.attacker then
+			self:GetParent():Lifesteal(keys.target, self)
+		end
+	end
+end
+
+function modifier_xhs_vampiric_aura_buff:GetModifierLifesteal()
+	return self:GetAbility():GetSpecialValueFor("lifesteal_pct")
+end
+
+function modifier_xhs_vampiric_aura_buff:OnDestroy()
+	if IsServer() then
+		-- fix with Vampiric Aura interaction
+		if self:GetParent():HasItemInInventory("item_lifesteal_mask") or self:GetParent():HasItemInInventory("item_lightning_sword") then
+			self:GetParent():AddNewModifier(self:GetParent(), self, "modifier_xhs_vampiric_aura_buff", {})
+		end
+	end
+end
+
 
 -------------------------------------------------------
 

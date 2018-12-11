@@ -125,13 +125,49 @@
 		//Top Bar Dire
 		var TopBarDireTeam = hudElements.FindChildTraverse("TopBarDireTeam");
 		TopBarDireTeam.style.visibility = "collapse";
+
+		function InitUI()
+		{
+			var TeamContainer = $.GetContextPanel().GetParent().GetParent().FindChildTraverse("TeamSelectContainer");
+			if (TeamContainer == null) {
+//				$.Msg("GameAndPlayersRoot == null, restart!")
+				$.Schedule(0.1, InitUI)
+				return;
+			}
+			var GamePlayerPanel = TeamContainer.FindChildTraverse("GameAndPlayersRoot")
+			var GameInfoPanel = TeamContainer.FindChildTraverse("GameInfoPanel")
+
+			GamePlayerPanel.style.width = "30%";
+			GamePlayerPanel.style.height = "20%";
+			GamePlayerPanel.style.marginRight = "35%";
+			GamePlayerPanel.style.align = "center top";
+			GamePlayerPanel.style.backgroundColor = "#000000da";
+			GamePlayerPanel.style.boxShadow = "black 0px 0px 0px 0px";
+
+			GameInfoPanel.style.width = "100%";
+			GameInfoPanel.FindChildTraverse("CustomGameModeName").style.align = "center center";
+			GameInfoPanel.FindChildTraverse("MapInfo").style.align = "center center";
+			GameInfoPanel.FindChildTraverse("StartGameCountdownTimer").style.width = "96px";
+			GameInfoPanel.FindChildTraverse("StartGameCountdownTimer").style.height = "96px";
+			GameInfoPanel.FindChildTraverse("StartGameCountdownTimer").style.marginTop = "16px";
+			GameInfoPanel.FindChildTraverse("StartGameCountdownTimer").style.align = "center center";
+
+			GameInfoPanel.FindChildTraverse("StartGameCountdownTimer").FindChildTraverse("TimerLabelBox").style.height = "40px";
+			GameInfoPanel.FindChildTraverse("StartGameCountdownTimer").FindChildTraverse("TimerLabelBox").FindChildTraverse("TimerLabelAutoStart").style.height = "40px";
+
+			TeamContainer.FindChildTraverse("TeamsList").style.visibility = "collapse";
+			GamePlayerPanel.FindChildTraverse("UnassignedPlayerPanel").style.visibility = "collapse";
+			GamePlayerPanel.FindChildTraverse("CancelAndUnlockButton").style.visibility = "collapse";
+//			$.GetContextPanel().GetParent().GetParent().FindChildTraverse("HUDElements").FindChildTraverse("topbar").FindChildTraverse("TopBarDireTeam").style.visibility = "collapse";
+		}
+
+		InitUI();
 	</script>
 
 	<Panel>
-		<CustomUIElement type="GameSetup"			layoutfile="file://{resources}/layout/custom_game/gamesetup_options.xml" />
 		<CustomUIElement type="GameSetup"			layoutfile="file://{resources}/layout/custom_game/team_select.xml" />
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/barebones_notifications.xml" />
-		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/barebones_attachments.xml" />
+<!--	<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/barebones_attachments.xml" /> -->
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/boss_healthbar.xml" />
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/hud_main.xml" />
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/xhs_events.xml" />

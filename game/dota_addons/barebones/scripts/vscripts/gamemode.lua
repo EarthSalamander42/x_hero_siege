@@ -7,8 +7,6 @@ require('internal/gamemode')
 require('internal/events')
 require('constants')
 require('libraries/timers')
-require('libraries/physics')
-require('libraries/projectiles')
 require('libraries/notifications')
 require('libraries/animations')
 require('libraries/attachments')
@@ -36,7 +34,7 @@ require('api/api')
 require('boss_scripts/boss_functions')
 
 function GameMode:OnFirstPlayerLoaded()
-	base_good = Entities:FindByName(nil, "base_spawn_goodguys")
+	base_good = Entities:FindByName(nil, "base_spawn")
 end
 
 function GameMode:OnAllPlayersLoaded()
@@ -153,7 +151,6 @@ function GameMode:InitGameMode()
 	LinkLuaModifier("modifier_ai", "modifiers/modifier_ai", LUA_MODIFIER_MOTION_NONE)
 	LinkLuaModifier("modifier_breakable_container", "modifiers/modifier_breakable_container", LUA_MODIFIER_MOTION_NONE)
 	LinkLuaModifier("modifier_creature_techies_land_mine", "modifiers/modifier_creature_techies_land_mine", LUA_MODIFIER_MOTION_NONE)
-	LinkLuaModifier("modifier_lifesteal", "modifiers/modifier_lifesteal.lua", LUA_MODIFIER_MOTION_NONE)
 
 	GameMode:_InitGameMode()
 	self:OnFirstPlayerLoaded()
@@ -162,6 +159,7 @@ function GameMode:InitGameMode()
 	mode:SetModifyGoldFilter( Dynamic_Wrap(GameMode, "GoldFilter"), self )
 
 	if IsInToolsMode() then
+		Convars:RegisterCommand("final_wave", function(keys) return FinalWave() end, "Test Final Wave", FCVAR_CHEAT)
 		Convars:RegisterCommand("duel_event", function(keys) return DuelEvent() end, "Test Duel Event", FCVAR_CHEAT)
 		Convars:RegisterCommand("magtheridon", function(keys) return StartMagtheridonArena() end, "Test Magtheridon Boss", FCVAR_CHEAT)
 		Convars:RegisterCommand("banehallow", function(keys) return StartBanehallowArena() end, "Test Magtheridon Boss", FCVAR_CHEAT)
@@ -320,6 +318,7 @@ function GameMode:InitGameMode()
 end
 
 function FarmTest()
+	nTimer_GameTime = XHS_SPECIAL_EVENT_INTERVAL * 2
 	SPECIAL_EVENT = 1
 	FarmEvent(180)
 end
@@ -337,6 +336,7 @@ local newState = GameRules:State_Get()
 
 	if newState == DOTA_GAMERULES_STATE_HERO_SELECTION then
 		GameRules:SetCustomGameDifficulty(2)
+
 		local mode  = GameMode
 		local votes = mode.VoteTable
 
@@ -405,6 +405,7 @@ local newState = GameRules:State_Get()
 		local Color = {"green", "Yellow", "orange", "red", "darkred"}
 		Timers:CreateTimer(3.0, function()
 			CustomGameEventManager:Send_ServerToAllClients("show_timer_bar", {})
+			CustomGameEventManager:Send_ServerToAllClients("game_difficulty", {difficulty = diff[GameRules:GetCustomGameDifficulty()]})
 			Notifications:TopToAll({text="DIFFICULTY: "..diff[GameRules:GetCustomGameDifficulty()], color = Color[GameRules:GetCustomGameDifficulty()], duration=10.0})
 		end)
 
@@ -420,9 +421,9 @@ local newState = GameRules:State_Get()
 		print("OnGameRulesStateChange: Game In Progress")
 
 		GAME_WINNER_TEAM = "Dire"
-		nTimer_SpecialEvent = 720
-		nTimer_IncomingWave = 240
-		nTimer_CreepLevel = 360
+		nTimer_SpecialEvent = XHS_SPECIAL_EVENT_INTERVAL
+		nTimer_IncomingWave = XHS_SPECIAL_INITIAL_WAVE_DELAY
+		nTimer_CreepLevel = XHS_CREEPS_UPGRADE_INTERVAL
 --		ModifyLanes()
 
 		local ice_towers = Entities:FindAllByName("npc_tower_death")
@@ -463,7 +464,7 @@ local newState = GameRules:State_Get()
 		end
 
 		-- Timer: Creep Levels 1 to 4. Lanes 1 to 8.
-		Timers:CreateTimer(0, function()
+		Timers:CreateTimer(function()
 			if PHASE == 3 then
 				print("Creeps Timer killed, Phase 3.")
 				return nil
@@ -473,7 +474,7 @@ local newState = GameRules:State_Get()
 				print("Creeps paused, Special Event.")
 			end
 
-			return 30
+			return XHS_CREEPS_INTERVAL
 		end)
 	end
 
@@ -582,40 +583,33 @@ local Region = {
 		end
 
 		if PHASE ~= 3 then
-			if nTimer_GameTime == 359 then -- 6 Min
-				NumPlayers = 1, PlayerResource:GetPlayerCount() * CREEP_LANES_TYPE
-				SpawnDragons("npc_dota_creature_red_dragon")
+			if nTimer_GameTime == XHS_CREEPS_UPGRADE_INTERVAL - 1 then -- 4:30 Min
+				nTimer_CreepLevel = XHS_CREEPS_UPGRADE_INTERVAL + 1
 				CreepLevels(2)
-			elseif nTimer_GameTime == 715 then -- 715 - 11:55 Min: MURADIN BRONZEBEARD EVENT 1
-				nTimer_GameTime = 720 -1
-				nTimer_IncomingWave = 240 +1 --	+1
-				nTimer_CreepLevel = 360 +1
+			elseif nTimer_GameTime == XHS_SPECIAL_EVENT_INTERVAL - 5 then -- 8:55 Min: MURADIN BRONZEBEARD EVENT 1
+				nTimer_GameTime = XHS_SPECIAL_EVENT_INTERVAL - 1
+				nTimer_IncomingWave = XHS_SPECIAL_WAVE_INTERVAL + 1
+				nTimer_CreepLevel = XHS_CREEPS_UPGRADE_INTERVAL + 1
 				RefreshPlayers()
 				Timers:CreateTimer(1, function()
 					SPECIAL_EVENT = 1
 					PauseCreeps()
 					PauseHeroes()
 					Timers:CreateTimer(5, function()
-						MuradinEvent(120)
+						MuradinEvent(XHS_MURADIN_EVENT_DURATION)
 						Timers:CreateTimer(3, RestartHeroes())
 					end)
 				end)
-			elseif nTimer_GameTime == 721 then --12:00, Muradin End
+			elseif nTimer_GameTime == XHS_SPECIAL_EVENT_INTERVAL + 1 then --9:00, Muradin End
 				EndMuradinEvent()
-				NumPlayers = 1, PlayerResource:GetPlayerCount() * CREEP_LANES_TYPE
-				SpawnDragons("npc_dota_creature_black_dragon")
 				CreepLevels(3)
-			elseif nTimer_GameTime == 726 then --12:05, Muradin End
-				EndMuradinEvent()
-			elseif nTimer_GameTime == 839 then -- 14 Min
-				
-			elseif nTimer_GameTime == 1079 then -- 18 Min
-				NumPlayers = 1, PlayerResource:GetPlayerCount() * CREEP_LANES_TYPE
-				SpawnDragons("npc_dota_creature_green_dragon")
+			elseif nTimer_GameTime == XHS_SPECIAL_EVENT_INTERVAL + 6 then --9:05, Muradin End
+				EndMuradinEvent()				
+			elseif nTimer_GameTime == XHS_SPECIAL_EVENT_INTERVAL + XHS_CREEPS_UPGRADE_INTERVAL then -- 1435 - 18:00 Min: FARM EVENT 2
 				CreepLevels(4)
-			elseif nTimer_GameTime == 1435 then -- 1435 - 23:55 Min: FARM EVENT 2
-				nTimer_GameTime = 1439
-				nTimer_IncomingWave = 241 -- +1
+			elseif nTimer_GameTime == XHS_SPECIAL_EVENT_INTERVAL * 2 - 5 then -- 1435 - 17:55 Min: FARM EVENT 2
+				nTimer_GameTime = XHS_SPECIAL_EVENT_INTERVAL * 2 - 1
+				nTimer_IncomingWave = XHS_SPECIAL_WAVE_INTERVAL + 1
 				RefreshPlayers()
 				Timers:CreateTimer(1, function()
 					SPECIAL_EVENT = 1
@@ -627,6 +621,13 @@ local Region = {
 					end)
 				end)
 			end
+		elseif nTimer_GameTime == XHS_SPECIAL_EVENT_INTERVAL * 2 + 1 then -- 1435 - 17:55 Min: FARM EVENT 2
+			PHASE = 2
+			-- no idea why this is not triggering
+--		elseif nTimer_GameTime == XHS_SPECIAL_EVENT_INTERVAL * 2 + XHS_PHASE_2_DELAY + 1 then
+--		elseif nTimer_GameTime == 1501 then
+--			print("END PHASE 2!!!")
+--			EndPhase2()
 		end
 
 		if nTimer_CreepLevel <= 0 then nTimer_CreepLevel = 1 end
@@ -643,8 +644,6 @@ local Region = {
 			Notifications:TopToAll({text="WARNING: "..Region[reg].."!", duration=25.0, style={color="red"}})
 			SpawnRunes()
 			reg = reg + 1
-		elseif nTimer_GameTime > 2140 then
-			nTimer_IncomingWave = 240
 		end
 	end
 
@@ -1022,6 +1021,29 @@ function GameMode:FilterExecuteOrder( filterTable )
 			return false
 		else
 			return true
+		end
+	end
+
+	if order_type == DOTA_UNIT_ORDER_CAST_POSITION then
+		local ability = EntIndexToHScript(filterTable["entindex_ability"])
+		if ability:GetName() == "item_tpscroll" then
+			if _G.SECRET == 1 then return end
+			_G.SECRET = 1
+			local target_loc = Vector(filterTable.position_x, filterTable.position_y, filterTable.position_z)
+			if IsNearEntity("npc_dota_muradin_boss", target_loc, 1200) then
+				if GameRules:GetCustomGameDifficulty() >= 4 then
+					for itemSlot = 0, 5 do
+						local item = unit:GetItemInSlot(itemSlot)
+						if item and item:GetName() == "item_doom_artifact" then
+							if not GameRules:IsCheatMode() or IsInToolsMode() then
+								StartSecretArena(unit)
+
+								return false
+							end
+						end
+					end
+				end
+			end
 		end
 	end
 

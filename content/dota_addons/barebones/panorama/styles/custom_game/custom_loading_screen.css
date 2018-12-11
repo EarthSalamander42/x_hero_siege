@@ -1,0 +1,243 @@
+@define COLOR_INFO_BACKGROUND_BLUE: #224470dd;
+@define COLOR_INFO_BACKGROUND_DARK_BLUE: #002233;
+@define COLOR_INFO_TEXT_BLUE: #66aaff;
+
+@define COLOR_INFO_BACKGROUND_GREEN: #004d1ada;
+@define COLOR_INFO_BACKGROUND_GREEN_SOCIAL: #003800da;
+@define COLOR_INFO_BACKGROUND_DARK_GREEN: #003312;
+@define COLOR_INFO_TEXT_GREEN: #00e64d;
+
+@define COLOR_INFO_BACKGROUND_ORANGE: #994d00ee;
+@define COLOR_INFO_BACKGROUND_DARK_ORANGE: #663300;
+@define COLOR_INFO_TEXT_ORANGE: #ffb366;
+
+.addon-root {
+	width: 39%;
+	height: 100%;
+/*	z-index: 1; /* disable if loading players are no longer visible */
+}
+
+.down {
+	flow-children: down;
+	width: 100%;
+	box-shadow: 0 0 10px #111;
+	padding: 20px 40px;
+}
+
+.large {
+	font-size: 28px;
+}
+
+.huge {
+	font-size: 36px;
+}
+
+.normal {
+	font-size: 20px;
+}
+
+.small {
+	font-size: 12px;
+}
+
+#imba-loading {
+	flow-children: down;
+	width: 100%;
+	height: 100%;
+	background-color: black;
+	background-position: center center;
+	background-size: cover;
+	background-image: url("file://{images}/custom_game/loading_screen/the_grand_magus.jpg");
+}
+
+#imba-loading-title,
+#imba-loading-title-patreon,
+#imba-loading-title-promote, {
+	width: 1250px;
+	margin-top: 30px;
+	margin-left: 120px;
+	flow-children: right;
+}
+
+#imba-loading-title {
+	background-color: COLOR_INFO_BACKGROUND_GREEN;
+	border: 2px solid COLOR_INFO_BACKGROUND_DARK_GREEN;
+}
+
+#imba-loading-title-patreon {
+	background-color: COLOR_INFO_BACKGROUND_ORANGE;
+	border: 2px solid COLOR_INFO_BACKGROUND_DARK_ORANGE;
+}
+
+#imba-loading-title-promote, {
+	background-color: COLOR_INFO_BACKGROUND_BLUE;
+	border: 2px solid COLOR_INFO_BACKGROUND_DARK_BLUE;
+}
+
+#imba-loading-title-text,
+#imba-loading-title-text-patreon,
+#imba-loading-title-text-promote {
+	font-size: 36px;
+}
+
+#imba-loading-title-text {
+	color: COLOR_INFO_TEXT_GREEN;
+}
+
+#imba-loading-title-text-patreon {
+	color: COLOR_INFO_TEXT_ORANGE;
+}
+
+#imba-loading-title-text-promote {
+	color: COLOR_INFO_TEXT_BLUE;
+}
+
+#imba-loading-content-text,
+#imba-loading-content-text-patreon,
+#imba-loading-content-text-promote, {
+	margin-bottom: 20px;
+	font-size: 20px;
+	color: #cccccc;
+	width: 100%;
+}
+
+#imba-loading-map-text {
+	margin: 20px 0px;
+	color: #ddddff;
+	font-size: 24px;
+}
+
+#imba-loading-link {
+	background-color: COLOR_INFO_BACKGROUND_DARK_GREEN;
+	border: 2px solid COLOR_INFO_BACKGROUND_DARK_GREEN;
+	box-shadow: 0 0 10px #111;
+}
+
+#imba-loading-link-promote {
+	background-color: COLOR_INFO_BACKGROUND_DARK_BLUE;
+	border: 2px solid COLOR_INFO_BACKGROUND_DARK_BLUE;
+	box-shadow: 0 0 10px #111;
+}
+
+#imba-loading-link-patreon {
+	width: 340px;
+	height: 80px;
+	background-image: url("file://{images}/custom_game/patreon.png");
+	background-size: cover;
+	border: 2px solid COLOR_INFO_BACKGROUND_DARK_ORANGE;
+	box-shadow: 0 0 10px #111;
+	transition-duration: 0.25s;
+	transition-property: box-shadow;
+}
+
+#imba-loading-link-patreon:hover {
+	box-shadow: 0 0 10px orange;
+}
+
+#imba-loading-link-text,
+#imba-loading-link-text-promote {
+	padding: 0px 10px;
+	font-size: 24px;
+	text-shadow: 0 0 5px #000;
+	color: #cccccc;	
+}
+
+#imba-loading-link-text:hover {
+	text-decoration: underline;
+	background-color: #003339;
+}
+
+#imba-loading-link-text-promote:hover {
+	text-decoration: underline;
+	background-color: #003339;
+}
+
+#ImbaLoadingSocial {
+	margin-left: 260px;
+	overflow: scroll;
+	flow-children: down;
+	background-color: COLOR_INFO_BACKGROUND_GREEN_SOCIAL;
+	border: 2px solid COLOR_INFO_BACKGROUND_DARK_GREEN;
+} 
+
+#ImbaLoadingSocial Panel {
+	padding: 0px 20px;
+	flow-children: right;
+}
+
+#ImbaLoadingSocial Button:hover {
+	box-shadow: 0 0 7px #333;
+}
+
+#ImbaLoadingSocial Button {
+	border: 1px solid #333;
+	padding: 5px 20px 3px;
+	margin: 4px 12px 4px 0px;
+	box-shadow: 0 0 5px  #222;
+}
+
+#ImbaLoadingSocial Label {
+	font-size: 20px;
+	color: #fff;
+}
+
+.SocialButtons {
+	transition-duration: 0.25s;
+	transition-property: pre-transform-scale2d;
+}
+
+.SocialButtons:hover {
+	pre-transform-scale2d: 1.05;
+}
+
+#ImbaLoadingSocialOfficialWebsite { background-color: gradient(linear, 0% 0%, 0% 100%, from(#333), to(#111)); }
+#ImbaLoadingSocialFacebook { background-color: gradient(linear, 0% 0%, 0% 100%, from(#22e), to(#111)); }
+#ImbaLoadingSocialDiscordEn { background-color: gradient(linear, 0% 0%, 0% 100%, from(#7289DA), to(#111)); }
+#ImbaLoadingSocialReddit { background-color: gradient(linear, 0% 0%, 0% 100%, from(#f00), to(#111)); }
+
+#vote-content {
+	width: 100%;
+	height: 170px;
+	flow-children: down;
+}
+
+.VoteButton {
+	padding: 5px;
+}
+
+.VoteDifficultyText {
+	margin-left: 27px;
+	font-size: 16px;
+	letter-spacing: 1px;
+	text-shadow: 2px 2px 2px black;
+}
+
+#VoteDifficultyText1
+{
+	color: green;
+}
+
+#VoteDifficultyText2
+{
+	color: yellow;
+}
+
+#VoteDifficultyText3
+{
+	color: orange;
+}
+
+#VoteDifficultyText4
+{
+	color: red;
+}
+
+#VoteDifficultyText5
+{
+	color: darkred;
+}
+
+.CGSRadio
+{
+	width: 100%;
+}

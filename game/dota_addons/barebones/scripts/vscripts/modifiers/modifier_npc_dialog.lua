@@ -16,7 +16,7 @@ end
 
 function modifier_npc_dialog:OnCreated( params )
 	if IsServer() then
-		self.flTalkDistance = 800.0
+		self.flTalkDistance = 1400.0
 	end
 end
 

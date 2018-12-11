@@ -1,5 +1,4 @@
 require("libraries/playertables")
-require("libraries/selection")
 
 -- Cleanup a player when they leave
 function GameMode:OnDisconnect(keys)
@@ -38,8 +37,6 @@ end
 local normal_min_damage = npc:GetBaseDamageMin()
 local normal_max_damage = npc:GetBaseDamageMax()
 local hero_level = npc:GetLevel()
-local too_ez = 1.1 -- The mod is way too ez, to modify damage very easily i just silenly add + 10% everywhere
-local too_ez_gold = 0.9 -- The mod is way too ez, to modify gold very easily i just silenly remove 10% of it
 
 	-- This internal handling is used to set up main barebones functions
 	GameMode:_OnNPCSpawned(keys)
@@ -64,63 +61,64 @@ local too_ez_gold = 0.9 -- The mod is way too ez, to modify gold very easily i j
 		end
 
 		-- HERO NPC
-		if npc:IsRealHero() and npc:GetTeamNumber() == DOTA_TEAM_GOODGUYS then
+		if npc:IsRealHero()  and npc:GetTeamNumber() == DOTA_TEAM_GOODGUYS then
 			if npc.bFirstSpawnComplete == nil then
-				print("Donator?", IsDonator(npc))
-
-				if IsDonator(npc) then
-					if not npc:HasAbility("holdout_vip") then
-						if IsDonator(npc) == 1 then
-							npc:SetCustomHealthLabel("Mod Creator", 200, 45, 45)
-						elseif IsDonator(npc) == 2 then
-							npc:SetCustomHealthLabel("Administrator", 55, 55, 200)
-						elseif IsDonator(npc) == 3 then
-							npc:SetCustomHealthLabel("[MNI Crew]!", 55, 55, 200)
-						elseif IsDonator(npc) == 4 then
-							npc:SetCustomHealthLabel("Ember VIP", 180, 0, 0)
-						elseif IsDonator(npc) == 5 then
-							npc:SetCustomHealthLabel("Golden VIP", 218, 165, 32)
-						elseif IsDonator(npc) == 6 then
-							npc:SetCustomHealthLabel("VIP", 45, 200, 45)
+				if npc:IsFakeHero() and AbilitiesHeroes_XX[npc:GetUnitName()] then
+					npc:AddAbility("ability_level_20"):SetLevel(1)
+					for _, ability in pairs(AbilitiesHeroes_XX[npc:GetUnitName()]) do
+						if ability ~= nil then
+							npc:AddAbility(ability[1])
+							npc:UpgradeAbility(npc:FindAbilityByName(ability[1]))
 						end
-
-						local vip_ability = npc:AddAbility("holdout_vip")
-						vip_ability:SetLevel(1)
-						npc.tp_effect = "particles/econ/events/fall_major_2016/teleport_start_fm06_lvl3.vpcf"
-						npc.tp_effect_end = "particles/econ/events/fall_major_2016/teleport_end_fm06_lvl3.vpcf"
 					end
 				else
-					npc.tp_effect = "particles/items2_fx/teleport_start.vpcf"
-					npc.tp_effect_end = "particles/items2_fx/teleport_end.vpcf"
-				end
+					local donator_level = IsDonator(npc)
+					print("Donator?", donator_level)
 
-				for i = 1, #vip_members do
-					if PlayerResource:GetSteamAccountID(npc:GetPlayerID()) == vip_members[i] then
+					if donator_level then
 						if not npc:HasAbility("holdout_vip") then
-							npc:SetCustomHealthLabel("VIP", 45, 200, 45)
-							local vip_ability = npc:AddAbility("holdout_vip")
-							vip_ability:SetLevel(1)
+							if donator_level >= 1 and donator_level <= 9 then
+								npc:SetCustomHealthLabel("#donator_tooltip_"..donator_level, DONATOR_COLOR[donator_level][1], DONATOR_COLOR[donator_level][2], DONATOR_COLOR[donator_level][3])
+
+								local vip_ability = npc:AddAbility("holdout_vip")
+								vip_ability:SetLevel(1)
+								npc.tp_effect = "particles/econ/events/fall_major_2016/teleport_start_fm06_lvl3.vpcf"
+								npc.tp_effect_end = "particles/econ/events/fall_major_2016/teleport_end_fm06_lvl3.vpcf"
+							end
+						end
+					else
+						npc.tp_effect = "particles/items2_fx/teleport_start.vpcf"
+						npc.tp_effect_end = "particles/items2_fx/teleport_end.vpcf"
+					end
+
+					for i = 1, #vip_members do
+						if PlayerResource:GetSteamAccountID(npc:GetPlayerID()) == vip_members[i] then
+							if not npc:HasAbility("holdout_vip") then
+								npc:SetCustomHealthLabel("VIP", 45, 200, 45)
+								local vip_ability = npc:AddAbility("holdout_vip")
+								vip_ability:SetLevel(1)
+							end
 						end
 					end
-				end
 
-				if npc:GetUnitName() == "npc_dota_hero_chaos_knight" or npc:GetUnitName() == "npc_dota_hero_keeper_of_the_light" then
-					npc:SetAbilityPoints(0)
-				elseif npc:GetUnitName() == "npc_dota_hero_lone_druid" then
-					npc:AddNewModifier(npc, nil, "modifier_item_ultimate_scepter_consumed", {})
-				end
+					if npc:GetUnitName() == "npc_dota_hero_chaos_knight" or npc:GetUnitName() == "npc_dota_hero_keeper_of_the_light" then
+						npc:SetAbilityPoints(0)
+					elseif npc:GetUnitName() == "npc_dota_hero_lone_druid" then
+						npc:AddNewModifier(npc, nil, "modifier_item_ultimate_scepter_consumed", {})
+					end
 
-				if npc:GetUnitName() ~= "npc_dota_hero_wisp" then
-					npc:AddNewModifier(npc, nil, "modifier_armor_gain_fix", {})
---					npc:AddNewModifier(npc, nil, "modifier_magical_resistance_fix", {})
-				end
+					if npc:GetUnitName() ~= "npc_dota_hero_wisp" then
+						npc:AddNewModifier(npc, nil, "modifier_armor_gain_fix", {})
+--						npc:AddNewModifier(npc, nil, "modifier_magical_resistance_fix", {})
+					end
 
-				npc.bFirstSpawnComplete = true
-				self.bPlayerHasSpawned = true
-				npc.CurrentZoneName = nil
-				self:OnPlayerHeroEnteredZone(npc, "xhs_holdout")
-				npc.ankh_respawn = false
---				npc:AddNewModifier(npc, nil, "modifier_hero", {})
+					npc.bFirstSpawnComplete = true
+					self.bPlayerHasSpawned = true
+					npc.CurrentZoneName = nil
+					self:OnPlayerHeroEnteredZone(npc, "xhs_holdout")
+					npc.ankh_respawn = false
+--					npc:AddNewModifier(npc, nil, "modifier_hero", {})
+				end
 			elseif npc.bFirstSpawnComplete == true then
 				if npc:GetUnitName() == "npc_dota_hero_chaos_knight" or npc:GetUnitName() == "npc_dota_hero_keeper_of_the_light" then
 					npc:SetAbilityPoints(0)
@@ -150,35 +148,35 @@ local too_ez_gold = 0.9 -- The mod is way too ez, to modify gold very easily i j
 		-- CREATURES NPC
 		if not npc:IsRealHero() and (npc:GetTeamNumber() == DOTA_TEAM_CUSTOM_1 or npc:GetTeamNumber() == DOTA_TEAM_CUSTOM_2 or npc:GetTeamNumber() == DOTA_TEAM_NEUTRALS) then
 			if difficulty == 1 then
-				npc:SetMinimumGoldBounty(normal_bounty*1.5*too_ez_gold)
-				npc:SetMaximumGoldBounty(normal_bounty*1.5*too_ez_gold)
-				npc:SetDeathXP(normal_xp*1.25*too_ez_gold)
-				npc:SetBaseDamageMin(normal_min_damage*0.75*too_ez)
-				npc:SetBaseDamageMax(normal_max_damage*0.75*too_ez)
+				npc:SetMinimumGoldBounty(normal_bounty*1.5)
+				npc:SetMaximumGoldBounty(normal_bounty*1.5)
+				npc:SetDeathXP(normal_xp*1.25)
+				npc:SetBaseDamageMin(normal_min_damage*0.75)
+				npc:SetBaseDamageMax(normal_max_damage*0.75)
 			elseif difficulty == 2 then
-				npc:SetMinimumGoldBounty(normal_bounty*1.1*too_ez_gold)
-				npc:SetMaximumGoldBounty(normal_bounty*1.1*too_ez_gold)
-				npc:SetDeathXP(normal_xp*too_ez_gold)
-				npc:SetBaseDamageMin(normal_min_damage*too_ez)
-				npc:SetBaseDamageMax(normal_max_damage*too_ez)
+				npc:SetMinimumGoldBounty(normal_bounty*1.1)
+				npc:SetMaximumGoldBounty(normal_bounty*1.1)
+				npc:SetDeathXP(normal_xp)
+				npc:SetBaseDamageMin(normal_min_damage)
+				npc:SetBaseDamageMax(normal_max_damage)
 			elseif difficulty == 3 then
-				npc:SetMinimumGoldBounty(normal_bounty*too_ez_gold)
-				npc:SetMaximumGoldBounty(normal_bounty*too_ez_gold)
-				npc:SetDeathXP(normal_xp*0.9*too_ez_gold)
-				npc:SetBaseDamageMin(normal_min_damage*1.25*too_ez)
-				npc:SetBaseDamageMax(normal_max_damage*1.25*too_ez)
+				npc:SetMinimumGoldBounty(normal_bounty)
+				npc:SetMaximumGoldBounty(normal_bounty)
+				npc:SetDeathXP(normal_xp*0.9)
+				npc:SetBaseDamageMin(normal_min_damage*1.25)
+				npc:SetBaseDamageMax(normal_max_damage*1.25)
 			elseif difficulty == 4 then
-				npc:SetMinimumGoldBounty(normal_bounty*too_ez_gold)
-				npc:SetMaximumGoldBounty(normal_bounty*too_ez_gold)
-				npc:SetDeathXP(normal_xp*0.75*too_ez_gold)
-				npc:SetBaseDamageMin(normal_min_damage*1.5*too_ez)
-				npc:SetBaseDamageMax(normal_max_damage*1.5*too_ez)
+				npc:SetMinimumGoldBounty(normal_bounty)
+				npc:SetMaximumGoldBounty(normal_bounty)
+				npc:SetDeathXP(normal_xp*0.75)
+				npc:SetBaseDamageMin(normal_min_damage*1.5)
+				npc:SetBaseDamageMax(normal_max_damage*1.5)
 			elseif difficulty == 5 then
-				npc:SetMinimumGoldBounty(normal_bounty*0.75*too_ez_gold)
-				npc:SetMaximumGoldBounty(normal_bounty*0.75*too_ez_gold)
-				npc:SetDeathXP(normal_xp*0.60*too_ez_gold)
-				npc:SetBaseDamageMin(normal_min_damage*2.0*too_ez)
-				npc:SetBaseDamageMax(normal_max_damage*2.0*too_ez)
+				npc:SetMinimumGoldBounty(normal_bounty*0.75)
+				npc:SetMaximumGoldBounty(normal_bounty*0.75)
+				npc:SetDeathXP(normal_xp*0.60)
+				npc:SetBaseDamageMin(normal_min_damage*2.0)
+				npc:SetBaseDamageMax(normal_max_damage*2.0)
 			end
 
 			-- Cycle through any innate abilities found, then upgrade them
@@ -251,7 +249,7 @@ function GameMode:OnPlayerChangedName(keys)
 	local newName = keys.newname
 	local oldName = keys.oldName
 end
-
+--[[
 function GameMode:OnPlayerLearnedAbility(keys)
 local player = EntIndexToHScript(keys.player)
 local hero = player:GetAssignedHero()
@@ -280,7 +278,7 @@ local ability = hero:FindAbilityByName(abilityname)
 		end
 	end
 end
-
+--]]
 function GameMode:OnAbilityChannelFinished(keys)
 	local abilityname = keys.abilityname
 	local interrupted = keys.interrupted == 1
@@ -291,34 +289,6 @@ local player = EntIndexToHScript(keys.player)
 local level = keys.level
 local hero = player:GetAssignedHero()
 local hero_level = hero:GetLevel()
-
-local AbilitiesHeroes_XX = {
-		npc_dota_hero_abyssal_underlord = {{"lion_finger_of_death", 2}},
-		npc_dota_hero_brewmaster = {{"enraged_wildkin_tornado", 4}},
-		npc_dota_hero_chen = {{"holdout_frost_shield", 2}},
-		npc_dota_hero_crystal_maiden = {{"holdout_rain_of_ice", 2}},
-		npc_dota_hero_dragon_knight = {{"holdout_knights_armor", 6}},
-		npc_dota_hero_elder_titan = {{"holdout_shockwave_20", 0}, {"holdout_war_stomp_20", 1}, {"holdout_roar_20", 4}, {"holdout_reincarnation", 6}},
-		npc_dota_hero_enchantress = {{"neutral_spell_immunity", 6}},
-		npc_dota_hero_invoker = {{"holdout_rain_of_fire", 2}},
-		npc_dota_hero_juggernaut = {{"brewmaster_primal_split", 2}},
-		npc_dota_hero_lich = {{"holdout_frost_chaos", 4}},
-		npc_dota_hero_luna = {{"holdout_neutralization", 2}},
-		npc_dota_hero_nevermore = {{"holdout_rain_of_chaos_20", 2}},
-		npc_dota_hero_nyx_assassin = {{"holdout_burrow_impale", 2}},
-		npc_dota_hero_omniknight = {{"holdout_light_frenzy", 2}},
-		npc_dota_hero_phantom_assassin = {{"holdout_morph", 2}},
-		npc_dota_hero_pugna = {{"holdout_rain_of_chaos_20", 2}},
-		npc_dota_hero_rattletrap = {{"holdout_cluster_rockets", 2}},
-		npc_dota_hero_shadow_shaman = {{"holdout_hex", 2}},
-		npc_dota_hero_skeleton_king = {{"holdout_lordaeron_smash", 3}},
-		npc_dota_hero_slardar = {{"holdout_dark_dimension", 2}},
-		npc_dota_hero_sniper ={{"holdout_laser", 0}, {"holdout_plasma_rifle_20", 1}},
-		npc_dota_hero_sven = {{"holdout_storm_bolt_20", 0}, {"holdout_thunder_clap_20", 1}},
-		npc_dota_hero_terrorblade = {{"holdout_resistant_skin", 6}},
-		npc_dota_hero_tiny = {{"holdout_war_club_20", 0}},
-		npc_dota_hero_windrunner = {{"holdout_rocket_hail", 2}}
-	}
 
 	if hero_level == 17 then -- Debug because 7.0
 		hero:SetAbilityPoints(hero:GetAbilityPoints() + 1)
@@ -432,8 +402,7 @@ local AbilitiesHeroes_XX = {
 			end
 		end
 
-		print(hero:GetUnitName())
-		if hero:GetUnitName() == AbilitiesHeroes_XX[hero:GetUnitName()] then
+		if AbilitiesHeroes_XX[hero:GetUnitName()] then
 			print("Whisper Level 20 Ability")
 			hero.lvl_20 = true
 			Notifications:Bottom(hero:GetPlayerOwnerID(), {text="You've reached level 20. Check out your new abilities! ",duration = 10})
@@ -657,7 +626,7 @@ local hero = PlayerResource:GetPlayer(userID):GetAssignedHero()
 			if str == "-replaceherowith" then
 				text = string.gsub(text, str, "")
 				text = string.gsub(text, " ", "")
-				if PlayerResource:GetSelectedHeroName(caster:GetPlayerID()) ~= "npc_dota_hero_"..text then
+				if PlayerResource:GetSelectedHeroName(hero:GetPlayerID()) ~= "npc_dota_hero_"..text then
 					PrecacheUnitByNameAsync("npc_dota_hero_"..text, function()
 						local wisp = PlayerResource:GetSelectedHeroEntity(playerId)
 						local hero = PlayerResource:ReplaceHeroWith(playerId, "npc_dota_hero_"..text, 0, 0)
@@ -921,6 +890,7 @@ end
 -- * damagebits
 ---------------------------------------------------------
 
+local first_rax = false
 function GameMode:OnEntityKilled(keys)
 local killedUnit = EntIndexToHScript(keys.entindex_killed)
 if killedUnit == nil then return end
@@ -1053,29 +1023,6 @@ local lane = tonumber(cn)
 				EndMagtheridonArena()
 			elseif MAGTHERIDON > 5 and difficulty == 5 then
 				EndMagtheridonArena()
-			end
-		end
-
-		if killedUnit:GetUnitName() == "npc_magnataur_destroyer_crypt" then
-			DESTROYER_MAGNATAUR = DESTROYER_MAGNATAUR -1
-			if PHASE == 2 and DESTROYER_MAGNATAUR == 0 then
-				local DoorObs = Entities:FindAllByName("obstruction_phase2_1")
-				for _, obs in pairs(DoorObs) do 
-					obs:SetEnabled(false, true)
-				end
-				DoEntFire("door_phase2_left", "SetAnimation", "gate_entrance002_open", 0, nil, nil)
-				Phase2CreepsLeft()
-
-				if PlayerResource:GetPlayerCount() > 1 then
-					local DoorObs = Entities:FindAllByName("obstruction_phase2_2")
-					for _, obs in pairs(DoorObs) do 
-						obs:SetEnabled(false, true)
-					end
-					DoEntFire("door_phase2_right", "SetAnimation", "gate_entrance002_open", 0, nil, nil)
-					Phase2CreepsRight()
-				end
-
-				Notifications:TopToAll({text="Destroyer Magnataurs killed! Phase 2 incoming...", style={color="white"}, duration=5.0})
 			end
 		end
 
@@ -1248,21 +1195,27 @@ local lane = tonumber(cn)
 			end
 		return
 		elseif killedUnit:IsBarracks() then
-			for j = 1, difficulty do
-				local unit = CreateUnitByName("npc_magnataur_destroyer_crypt", killedUnit:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-				DESTROYER_MAGNATAUR = DESTROYER_MAGNATAUR +1
-				print("Magnataurs:", DESTROYER_MAGNATAUR)
-			end
+			if first_rax == false then
+				first_rax = true
 
-			for c = 1, 8 do
-				if killedUnit:GetName() == "dota_badguys_barracks_"..c then
-					CREEP_LANES[c][1] = 0
-					CREEP_LANES[c][3] = 0
+--				Entities:FindByName(nil, "trigger_phase2_left"):Enable()
+--				Entities:FindByName(nil, "trigger_phase2_right"):Enable()
+
+				local DoorObs = Entities:FindAllByName("obstruction_phase2")
+				for _, obs in pairs(DoorObs) do 
+					obs:SetEnabled(false, true)
 				end
+
+				DoEntFire("door_phase2_left", "SetAnimation", "gate_02_open", 0, nil, nil)
+				DoEntFire("door_phase2_right", "SetAnimation", "gate_02_open", 0, nil, nil)
+--				Notifications:TopToAll({text = "Phase 2 creeps can now be triggered!", duration = 11.0})
+
+				PHASE = 2
+
+				return
 			end
 
-			PHASE = 2
-		return
+			return
 		end
 	return
 	end
@@ -1585,11 +1538,15 @@ function GameMode:OnQuestCompleted(questZone, quest)
 			end
 		end
 
-		if quest.szQuestName == "teleport_top" then
+		if quest.szQuestName == "kill_dest_mag" then
+			StartPhase2()
+		elseif quest.szQuestName == "teleport_top" then
 			StartMagtheridonArena()
+		elseif quest.szQuestName == "teleport_arthas" then
+			StartArthasArena()
 		end
 	end
-	
+
 	local netTable = {}
 	netTable["ZoneName"] = questZone.szName
 	netTable["QuestName"] = quest.szQuestName

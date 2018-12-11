@@ -1,3 +1,28 @@
+function StartPhase2()
+	local DoorObs = Entities:FindAllByName("obstruction_phase2_1")
+	for _, obs in pairs(DoorObs) do 
+		obs:SetEnabled(false, true)
+	end
+	DoEntFire("door_phase2_left", "SetAnimation", "gate_entrance002_open", 0, nil, nil)
+	Phase2CreepsLeft()
+
+	if PlayerResource:GetPlayerCount() > 1 then
+		local DoorObs = Entities:FindAllByName("obstruction_phase2_2")
+		for _, obs in pairs(DoorObs) do 
+			obs:SetEnabled(false, true)
+		end
+		DoEntFire("door_phase2_right", "SetAnimation", "gate_entrance002_open", 0, nil, nil)
+		Phase2CreepsRight()
+	end
+
+	for c = 1, 8 do
+		CREEP_LANES[c][1] = 0
+		CREEP_LANES[c][3] = 0
+	end
+
+	Notifications:TopToAll({text="Destroyer Magnataurs killed! Phase 2 incoming...", style={color="white"}, duration=5.0})
+end
+
 function Phase2CreepsLeft()
 	local EntIceTower = Entities:FindByName(nil, "npc_tower_cold_1")
 	local point = Entities:FindByName(nil, "npc_dota_spawner_top_left_1"):GetAbsOrigin()
@@ -6,6 +31,10 @@ function Phase2CreepsLeft()
 
 	Timers:CreateTimer(0, function()
 		if not EntIceTower:IsNull() and SPECIAL_EVENT ~= 1 then
+			if wave_count == 15 then
+				EndPhase2()
+				return nil
+			end
 			wave_count = wave_count + 1
 			for j = 1, 8 do
 				local unit = CreateUnitByName("npc_ghul_II", point+RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_CUSTOM_1)
@@ -63,11 +92,24 @@ function Phase2CreepsRight()
 	end)
 end
 
+function EndPhase2()
+	local ice_towers = Entities:FindAllByName("npc_tower_death")
+	for _, tower in pairs(ice_towers) do
+		tower:ForceKill(false)
+	end
+
+	for TW = 1, 2 do
+		local ice_towers_main = Entities:FindByName(nil, "npc_tower_cold_"..TW)
+		ice_towers_main:ForceKill(false)
+	end
+end
+
 function FinalWave()
+	print("Final Wave!")
 	for _, hero in pairs(HeroList:GetAllHeroes()) do
-		if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
+		if hero:IsRealHero() and hero:GetTeam() == DOTA_TEAM_GOODGUYS then
 			local id = hero:GetPlayerID()
-			local point = Entities:FindByName(nil, "final_wave_player_"..id)
+			local point = Entities:FindByName(nil, "final_wave_player_"..id) -- might cause error with Dark Fundamental?
 			FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
 			hero:AddNewModifier(nil, nil, "modifier_boss_stun", {duration= 30, IsHidden = true})
 			hero:AddNewModifier(nil, nil, "modifier_invulnerable", {duration= 30, IsHidden = true})

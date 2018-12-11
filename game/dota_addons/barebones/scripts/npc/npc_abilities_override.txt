@@ -237,7 +237,6 @@
 	"item_wind_lace"				"REMOVE"
 	"item_blades_of_attack"			"REMOVE"
 	"item_belt_of_strength"			"REMOVE"
-	"item_flying_courier"			"REMOVE"
 	"item_quelling_blade"			"REMOVE"
 	"item_staff_of_wizardry"		"REMOVE"
 	"item_orb_of_venom"				"REMOVE"
@@ -3481,5 +3480,61 @@
 			}
 		}
 		"AbilityCastAnimation"		"ACT_DOTA_CAST_ABILITY_3"
+	}
+
+	//=================================================================================================================
+	// Naga Siren: Rip Tide
+	//=================================================================================================================
+	"naga_siren_rip_tide"
+	{
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"chance"					"12"
+			}
+			"02"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"armor_reduction"			"-5 -10 -15 -20"
+				"LinkedSpecialBonus"		"special_bonus_unique_naga_siren_3"
+			}
+			"03"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"damage"					"80 160 240 320"
+			}
+			"04"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"radius"					"300"
+			}
+			"05"
+			{
+				"var_type"					"FIELD_FLOAT"
+				"duration"					"4.0"
+			}
+		}
+		"AbilityCastAnimation"		"ACT_DOTA_CAST_ABILITY_3"
+	}	
+
+	//=================================================================================================================
+	// Naga Siren: Song of the Siren
+	//=================================================================================================================
+	"naga_siren_song_of_the_siren"
+	{
+		"AbilityCastRange"				"2000"
+		"AbilityCooldown"				"160.0 120.0 80.0"
+		"AbilityManaCost"				"150 175 200"
+
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"radius"					"2000"
+			}
+		}
 	}
 }

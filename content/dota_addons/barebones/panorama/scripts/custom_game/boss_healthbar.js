@@ -9,7 +9,7 @@ function ShowBossBar(args) {
 	$("#BossIcon").heroname = args.boss_icon;
 	$("#BossHealth").text = args.boss_health + " / " + args.boss_max_health;
 	$("#BossProgressBar").value = args.boss_health / args.boss_max_health;
-	$("#BossProgressBar_Left").style.backgroundColor = "gradient( linear, 0% 0%, 0% 100%, from( " + args.light_color + " ), color-stop( 0.3, " + args.dark_color + " ), color-stop( .5, " + args.dark_color + " ), to( " + args.light_color + " ) )";
+	$("#BossProgressBar_Left").style.backgroundColor = "gradient( linear, 0% 0%, 0% 100%, from( " + args.dark_color + " ), color-stop( 0.3, " + args.light_color + " ), color-stop( .5, " + args.light_color + " ), to( " + args.dark_color + " ) )";
 }
 
 function HideBossBar(args) {

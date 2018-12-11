@@ -1808,7 +1808,7 @@
 		"ItemCost"						"150"
 		"ItemShopTags"					"consumable"
 		"ItemQuality"					"consumable"
-		"ItemStackable"					"0"
+		"ItemStackable"					"1"
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
 		"ItemPermanent"					"0"
 		"ItemInitialCharges"			"15"
@@ -1851,7 +1851,7 @@
 		"ItemCost"						"100"
 		"ItemShopTags"					"consumable"
 		"ItemQuality"					"consumable"
-		"ItemStackable"					"0"
+		"ItemStackable"					"1"
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
 		"ItemPermanent"					"0"
 		"ItemInitialCharges"			"15"
@@ -2885,7 +2885,7 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"bonus_damage"			"4000"
+				"bonus_damage"			"10000"
 			}
 			"02"
 			{
@@ -3361,7 +3361,8 @@
 	{
 		// General
 		//----------------------------------------------------------------------------------------------------
-		"BaseClass"             		"item_datadriven"
+		"BaseClass"             		"item_lua"
+		"ScriptFile"					"items/item_lightning_sword.lua"
 		"ID"							"2527"
 		"AbilityTextureName"			"custom/lightning_sword"		
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
@@ -3386,7 +3387,7 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"lifesteal_percent"		"50"
+				"lifesteal_pct"			"50"
 			}
 			"02"
 			{
@@ -3396,7 +3397,7 @@
 			"03"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"bonus_armor"			"60"
+				"bonus_armor"			"50"
 			}
 		}
 
@@ -3406,45 +3407,6 @@
 			{
 				"ScriptFile"	"items/global.lua"
 				"Function"		"SwordUnequip"
-			}
-		}
-
-		"Modifiers"
-		{
-			"modifier_item_lightning_sword"
-			{
-				"Passive"						"1"
-				"IsHidden"						"1"
-				"Attributes"					"MODIFIER_ATTRIBUTE_MULTIPLE"
-
-				"OnAttackLanded"
-				{
-					"RunScript"
-					{
-						"ScriptFile"	"heroes/global.lua"
-						"Function"		"Lifesteal"
-					}
-				}
-
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE"		"%bonus_damage"
-					"MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS"		"%bonus_armor"
-				}
-			}
-
-			"modifier_lifesteal"
-			{
-				"IsHidden"				"1"
-
-				"OnDealDamage"
-				{
-					"Lifesteal"
-					{
-						"Target"				"ATTACKER"
-						"LifestealPercent"		"%lifesteal_percent"
-					}
-				}
 			}
 		}
 	}
@@ -3718,7 +3680,7 @@
 			"02"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"bonus_armor"			"75"
+				"bonus_armor"			"40"
 			}
 			"03"
 			{

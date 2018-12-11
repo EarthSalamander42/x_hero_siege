@@ -72,11 +72,9 @@ _G.SECRET = 0
 _G.PHASE = 1
 _G.RESPAWN_TIME = 40.0
 _G.CREEP_LANES_TYPE = 1
-_G.DESTROYER_MAGNATAUR = 0
 if GetMapName() == "x_hero_siege_4" then
 	_G.CREEP_LANES_TYPE = 2
 end
-_G.STARTING_GOLD = 2000
 _G.BT_ENABLED = 1
 _G.MURADIN_DEFEND = false
 _G.STORM_SPIRIT = 0
@@ -153,13 +151,15 @@ HEROLIST[24] = "ursa"				-- Malfurion
 HEROLIST[25] = "nevermore"			-- Banehallow
 HEROLIST[26] = "brewmaster"			-- Pandaren Brewmaster
 HEROLIST[27] = "warlock"			-- Archimonde
+HEROLIST[28] = "razor"				-- Ghost Revenant
 -- DOTA 2
-HEROLIST[28] = "axe"
-HEROLIST[29] = "monkey_king"
-HEROLIST[30] = "medusa"
-HEROLIST[31] = "doom_bringer"
-HEROLIST[32] = "bristleback"
-HEROLIST[33] = "leshrac"
+HEROLIST[29] = "axe"
+HEROLIST[30] = "monkey_king"
+HEROLIST[31] = "medusa"
+HEROLIST[32] = "doom_bringer"
+HEROLIST[33] = "bristleback"
+HEROLIST[34] = "leshrac"
+HEROLIST[35] = "naga_siren"
 
 HEROLIST_VIP = {}
 HEROLIST_VIP[1] = "slardar"			-- Centurion
@@ -196,7 +196,7 @@ _G.FarmEvent_Creeps = {
 }
 
 FARM_EVENT_UPGRADE = {}
-FARM_EVENT_UPGRADE["damage"] =	{20, 40, 60, 80, 100}
+FARM_EVENT_UPGRADE["damage"] =	{10, 20, 30, 40, 50}
 FARM_EVENT_UPGRADE["health"] =	{200, 400, 600, 800, 1000}
 FARM_EVENT_UPGRADE["armor"] =	{0, 0, 0, 0, 0}
 
@@ -246,6 +246,34 @@ XP_PER_LEVEL_TABLE = {
 	92500,	-- 28 + 6000
 	100500,	-- 29 + 6000
 	106500	-- 30 + 6000
+}
+
+AbilitiesHeroes_XX = {
+	npc_dota_hero_abyssal_underlord = {{"lion_finger_of_death", 2}},
+	npc_dota_hero_brewmaster = {{"enraged_wildkin_tornado", 4}},
+	npc_dota_hero_chen = {{"holdout_frost_shield", 2}},
+	npc_dota_hero_crystal_maiden = {{"holdout_rain_of_ice", 2}},
+	npc_dota_hero_dragon_knight = {{"holdout_knights_armor", 6}},
+	npc_dota_hero_elder_titan = {{"holdout_shockwave_20", 0}, {"holdout_war_stomp_20", 1}, {"holdout_roar_20", 4}, {"holdout_reincarnation", 6}},
+	npc_dota_hero_enchantress = {{"neutral_spell_immunity", 6}},
+	npc_dota_hero_invoker = {{"holdout_rain_of_fire", 2}},
+	npc_dota_hero_juggernaut = {{"brewmaster_primal_split", 2}},
+	npc_dota_hero_lich = {{"holdout_frost_chaos", 4}},
+	npc_dota_hero_luna = {{"holdout_neutralization", 2}},
+	npc_dota_hero_nevermore = {{"holdout_rain_of_chaos_20", 2}},
+	npc_dota_hero_nyx_assassin = {{"holdout_burrow_impale", 2}},
+	npc_dota_hero_omniknight = {{"holdout_light_frenzy", 2}},
+	npc_dota_hero_phantom_assassin = {{"holdout_morph", 2}},
+	npc_dota_hero_pugna = {{"holdout_rain_of_chaos_20", 2}},
+	npc_dota_hero_rattletrap = {{"holdout_cluster_rockets", 2}},
+	npc_dota_hero_shadow_shaman = {{"holdout_hex", 2}},
+	npc_dota_hero_skeleton_king = {{"holdout_lordaeron_smash", 3}},
+	npc_dota_hero_slardar = {{"holdout_dark_dimension", 2}},
+	npc_dota_hero_sniper ={{"holdout_laser", 0}, {"holdout_plasma_rifle_20", 1}},
+	npc_dota_hero_sven = {{"holdout_storm_bolt_20", 0}, {"holdout_thunder_clap_20", 1}},
+	npc_dota_hero_terrorblade = {{"holdout_resistant_skin", 6}},
+	npc_dota_hero_tiny = {{"holdout_war_club_20", 0}},
+	npc_dota_hero_windrunner = {{"holdout_rocket_hail", 2}}
 }
 
 _G.innate_abilities = {
@@ -364,4 +392,33 @@ _G.difficulty_abilities = {
 -- Abilities cast only if more than 1 player
 _G.multiplayer_abilities_cast = {
 	"balanar_sleep",
+	"lion_voodoo",
 }
+
+_G.XHS_LIFESTEAL_MODIFIER_PRIORITY = {}
+_G.XHS_LIFESTEAL_MODIFIER_PRIORITY["modifier_lightning_sword_lifesteal"] = 1
+_G.XHS_LIFESTEAL_MODIFIER_PRIORITY["modifier_lifesteal"] = 2
+_G.XHS_LIFESTEAL_MODIFIER_PRIORITY["modifier_xhs_vampiric_aura"] = 3
+
+DONATOR_COLOR = {}
+DONATOR_COLOR[0] = {33, 39, 47} -- Not a donator
+DONATOR_COLOR[1] = {135, 20, 20} -- IMBA Lead-Developer
+DONATOR_COLOR[2] = {100, 20, 20} -- IMBA Developer
+DONATOR_COLOR[3] = {0, 102, 255} -- Administrator
+DONATOR_COLOR[4] = {220, 40, 40} -- Ember Donator
+DONATOR_COLOR[5] = {218, 165, 32} -- Golden Donator
+DONATOR_COLOR[6] = {0, 204, 0} -- Green Donator (basic)
+DONATOR_COLOR[8] = {47, 91, 151} -- Salamander Donator (blue)
+DONATOR_COLOR[7] = {153, 51, 153} -- Icefrog Donator (purple)
+DONATOR_COLOR[9] = {185, 75, 10} -- Gaben Donator
+DONATOR_COLOR[10] = {255, 255, 255}
+
+XHS_CREEPS_INTERVAL = 20.0
+XHS_SPECIAL_EVENT_INTERVAL = 540.0 -- 9 min (has to be a multiple of 3)
+XHS_SPECIAL_WAVE_INTERVAL = XHS_SPECIAL_EVENT_INTERVAL / 3 -- 3 min
+XHS_SPECIAL_INITIAL_WAVE_DELAY = XHS_SPECIAL_WAVE_INTERVAL -- 3 min
+XHS_CREEPS_UPGRADE_INTERVAL = XHS_SPECIAL_EVENT_INTERVAL / 2 -- 4:30
+XHS_PHASE_2_DELAY = 420.0 -- 7 min
+
+XHS_MURADIN_EVENT_GOLD = 20000
+XHS_MURADIN_EVENT_DURATION = 120.0

@@ -11,7 +11,7 @@ end
 
 function modifier_armor_gain_fix:OnIntervalThink()
 	if IsServer() then
-		self:SetStackCount((self:GetParent():GetAgility() * 0.2005) * (-1)) -- Don't ask.
+		self.armor_fix = (self:GetParent():GetAgility() * 0.19) * (-1) -- Don't ask.
 	end
 end
 
@@ -22,7 +22,7 @@ function modifier_armor_gain_fix:DeclareFunctions()
 end
 
 function modifier_armor_gain_fix:GetModifierPhysicalArmorBonus()
-	return self:GetStackCount()
+	return self.armor_fix
 end
 
 function modifier_armor_gain_fix:IsHidden() return true end

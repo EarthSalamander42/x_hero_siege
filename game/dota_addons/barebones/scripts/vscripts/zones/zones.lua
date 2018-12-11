@@ -1747,7 +1747,7 @@ function CDungeonZone:BossThink()
 					return
 				end
 			end
-			
+
 			if Boss.bIntroComplete == true then
 				nBossesIntroComplete = nBossesIntroComplete + 1
 				if Boss:IsAlive() then

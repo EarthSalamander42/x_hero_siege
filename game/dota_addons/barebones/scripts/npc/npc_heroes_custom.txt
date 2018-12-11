@@ -1666,8 +1666,8 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"AttributePrimary"			"DOTA_ATTRIBUTE_INTELLECT"	// Primary Attribute
 		"AttributeStrengthGain"		"5"						// Strength bonus per level.
-		"AttributeIntelligenceGain"	"5"						// Intelligence bonus per level.
-		"AttributeAgilityGain"		"10"						// Agility bonus per level.
+		"AttributeIntelligenceGain"	"10"						// Intelligence bonus per level.
+		"AttributeAgilityGain"		"5"						// Agility bonus per level.
 
 		// Abilities
 		//-------------------------------------------------------------------------------------------------------------
@@ -1693,6 +1693,54 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"
 		"MovementSpeed"				"360"									// Speed.
+		"MovementTurnRate"			"0.4"									// Turning rate.
+	}
+
+	//=================================================================================================================
+	// HERO: Ghost Revenant // Need to be duplicated in npc_units_custom.txt
+	//=================================================================================================================
+	"npc_dota_hero_naga_siren_holdout"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"override_hero"				"npc_dota_hero_naga_siren"
+		"ModelScale"				"0.88"
+
+		// Attack
+		//-------------------------------------------------------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
+		"AttackDamageMin"			"50"										// Damage range min.
+		"AttackDamageMax"			"60"										// Damage range max.
+
+		// Attributes
+		//-------------------------------------------------------------------------------------------------------------
+		"AttributeStrengthGain"		"5"						// Strength bonus per level.
+		"AttributeIntelligenceGain"	"5"						// Intelligence bonus per level.
+		"AttributeAgilityGain"		"10"					// Agility bonus per level.
+
+		// Abilities
+		//-------------------------------------------------------------------------------------------------------------
+		"Ability1"					"xhs_blademaster_mirror_image"
+		"Ability2"					"naga_siren_rip_tide"
+		"Ability3"					"holdout_chieftain_endurance_aura"
+		"Ability4"					"holdout_permanent_immolation"
+		"Ability5"					"holdout_command_aura_innate"
+		"Ability6"					"naga_siren_song_of_the_siren"
+		"Ability7"					"naga_siren_song_of_the_siren_cancel"
+
+		"Ability10"					"generic_hidden"
+		"Ability11"					"generic_hidden"
+		"Ability12"					"generic_hidden"
+		"Ability13"					"generic_hidden"
+		"Ability14"					"generic_hidden" 
+		"Ability15"					"generic_hidden"
+		"Ability16"					"generic_hidden"
+		"Ability17"					"generic_hidden"
+
+		// Movement
+		//-------------------------------------------------------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"
+		"MovementSpeed"				"350"									// Speed.
 		"MovementTurnRate"			"0.4"									// Turning rate.
 	}
 

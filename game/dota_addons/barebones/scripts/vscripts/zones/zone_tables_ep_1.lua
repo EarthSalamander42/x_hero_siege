@@ -210,6 +210,23 @@ _G.ZonesDefinition =
 				nCompleteLimit = 1,
 			},
 			{
+				szQuestName = "teleport_arthas",
+				szQuestType = "Speak",
+				Activators = 
+				{
+					{
+						Type = QUEST_EVENT_ON_QUEST_COMPLETE,
+						szQuestName = "kill_proudmoore",
+					},			
+				},
+				Completion =
+				{	
+					Type = QUEST_EVENT_ON_DIALOG_ALL_CONFIRMED,
+					szNPCName = "npc_xhs_paladin_2",
+					nDialogLine = 1,
+				},
+			},
+			{
 				szQuestName = "kill_arthas",
 				szQuestType = "Kill",
 				Activators = 
@@ -266,6 +283,12 @@ _G.ZonesDefinition =
 			{
 				szVIPName = "npc_xhs_paladin",
 				szSpawnerName = "xhs_spawner_paladin_vip",
+				nCount = 1,
+				Activity = ACT_DOTA_IDLE,
+			},
+			{
+				szVIPName = "npc_xhs_paladin_2",
+				szSpawnerName = "xhs_spawner_paladin_2_vip",
 				nCount = 1,
 				Activity = ACT_DOTA_IDLE,
 			},

@@ -1,21 +1,35 @@
 STARTING_GOLD = {10000, 5000, 4000, 3000, 2000}
 
-WeekHero = "npc_dota_hero_razor"
--- "npc_dota_hero_slardar"			-- Centurion
--- "npc_dota_hero_skeleton_king"	-- Lich King
--- "npc_dota_hero_meepo"			-- Kobold Knight
--- "npc_dota_hero_chaos_knight"		-- Dark Fundamental
--- "npc_dota_hero_tiny"				-- Stone Giant
--- "npc_dota_hero_sand_king"		-- Desert Wyrm
--- "npc_dota_hero_necrolyte"		-- Dark Summoner
--- "npc_dota_hero_storm_spirit"		-- Spirit Master
+-- WeekHero = "npc_dota_hero_slardar"			-- Centurion
+WeekHero = "npc_dota_hero_skeleton_king"	-- Lich King
+-- WeekHero = "npc_dota_hero_meepo"			-- Kobold Knight
+-- WeekHero = "npc_dota_hero_tiny"				-- Stone Giant
+-- WeekHero = "npc_dota_hero_sand_king"		-- Desert Wyrm
+-- WeekHero = "npc_dota_hero_necrolyte"		-- Dark Summoner
+
+-- the first hero will be selected by default when using a table
+--[[
+WeekHero = { -- Spirit Master
+	"npc_dota_hero_storm_spirit",
+	"npc_dota_hero_ember_spirit",
+	"npc_dota_hero_earth_spirit",
+}
+--]]
+
+-- WeekHero = { -- Dark Fundamental
+--	"npc_dota_hero_chaos_knight",
+--	"npc_dota_hero_keeper_of_the_light",
+-- }
+
 
 function SpawnHeroLoadout(hero_count)
 local left_angle = {4, 5, 6, 7, 8, 14, 15, 16}
 local top_angle = {11, 12, 13, 22, 23, 24, 28, 29, 30, 31, 32, 33}
-local bot_angle = {9, 10, 25, 26, 27}
+local bot_angle = {9, 10, 25, 26, 27, 28, 29}
 
-	local hero = CreateUnitByName("npc_dota_hero_"..HEROLIST[hero_count].."_bis", Entities:FindByName(nil, "choose_"..hero_count.."_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
+	local hero = CreateUnitByName("npc_dota_hero_"..HEROLIST[hero_count], Entities:FindByName(nil, "choose_"..hero_count.."_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
+	hero:AddAbility("dummy_passive_vulnerable"):SetLevel(1)
+	hero.is_fake_hero = true
 
 	for _, angle in pairs(left_angle) do
 		if angle == hero_count then
@@ -43,7 +57,7 @@ local hero_vip_count = 1
 	Timers:CreateTimer(5.0, function()
 		SpawnHeroLoadout(hero_count)
 		if hero_count < #HEROLIST then
-			hero_count = hero_count +1
+			hero_count = hero_count + 1
 			return 0.3
 		else
 			return nil
@@ -52,20 +66,32 @@ local hero_vip_count = 1
 
 	Timers:CreateTimer(10.0, function()
 		if hero_vip_count == 4 then
-			local dummy_hero = CreateUnitByName("npc_dota_hero_chaos_knight_bis", Entities:FindByName(nil, "choose_vip_4_point"):GetAbsOrigin() + Vector(-100, 0, 0), true, nil, nil, DOTA_TEAM_GOODGUYS)
+			local dummy_hero = CreateUnitByName("npc_dota_hero_chaos_knight", Entities:FindByName(nil, "choose_vip_4_point"):GetAbsOrigin() + Vector(-100, 0, 0), true, nil, nil, DOTA_TEAM_GOODGUYS)
 			dummy_hero:SetAngles(0, 270, 0)
-			local dummy_hero = CreateUnitByName("npc_dota_hero_keeper_of_the_light_bis", Entities:FindByName(nil, "choose_vip_4_point"):GetAbsOrigin() + Vector(100, 0, 0), true, nil, nil, DOTA_TEAM_GOODGUYS)
+			dummy_hero:AddAbility("dummy_passive_vulnerable"):SetLevel(1)
+			dummy_hero.is_fake_hero = true
+			local dummy_hero = CreateUnitByName("npc_dota_hero_keeper_of_the_light", Entities:FindByName(nil, "choose_vip_4_point"):GetAbsOrigin() + Vector(100, 0, 0), true, nil, nil, DOTA_TEAM_GOODGUYS)
 			dummy_hero:SetAngles(0, 270, 0)
+			dummy_hero:AddAbility("dummy_passive_vulnerable"):SetLevel(1)
+			dummy_hero.is_fake_hero = true
 		elseif hero_vip_count == 8 then
-			local dummy_hero = CreateUnitByName("npc_dota_hero_storm_spirit_bis", Entities:FindByName(nil, "choose_vip_8_point"):GetAbsOrigin() + Vector(0, 100, 0), true, nil, nil, DOTA_TEAM_GOODGUYS)
+			local dummy_hero = CreateUnitByName("npc_dota_hero_storm_spirit", Entities:FindByName(nil, "choose_vip_8_point"):GetAbsOrigin() + Vector(0, 100, 0), true, nil, nil, DOTA_TEAM_GOODGUYS)
 			dummy_hero:SetAngles(0, 270, 0)
-			local dummy_hero = CreateUnitByName("npc_dota_hero_ember_spirit_bis", Entities:FindByName(nil, "choose_vip_8_point"):GetAbsOrigin() + Vector(-100, 0, 0), true, nil, nil, DOTA_TEAM_GOODGUYS)
+			dummy_hero:AddAbility("dummy_passive_vulnerable"):SetLevel(1)
+			dummy_hero.is_fake_hero = true
+			local dummy_hero = CreateUnitByName("npc_dota_hero_ember_spirit", Entities:FindByName(nil, "choose_vip_8_point"):GetAbsOrigin() + Vector(-100, 0, 0), true, nil, nil, DOTA_TEAM_GOODGUYS)
 			dummy_hero:SetAngles(0, 270, 0)
-			local dummy_hero = CreateUnitByName("npc_dota_hero_earth_spirit_bis", Entities:FindByName(nil, "choose_vip_8_point"):GetAbsOrigin() + Vector(100, 0, 0), true, nil, nil, DOTA_TEAM_GOODGUYS)
+			dummy_hero:AddAbility("dummy_passive_vulnerable"):SetLevel(1)
+			dummy_hero.is_fake_hero = true
+			local dummy_hero = CreateUnitByName("npc_dota_hero_earth_spirit", Entities:FindByName(nil, "choose_vip_8_point"):GetAbsOrigin() + Vector(100, 0, 0), true, nil, nil, DOTA_TEAM_GOODGUYS)
 			dummy_hero:SetAngles(0, 270, 0)
+			dummy_hero:AddAbility("dummy_passive_vulnerable"):SetLevel(1)
+			dummy_hero.is_fake_hero = true
 		else
-			local dummy_hero = CreateUnitByName("npc_dota_hero_"..HEROLIST_VIP[hero_vip_count].."_bis", Entities:FindByName(nil, "choose_vip_"..hero_vip_count.."_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
+			local dummy_hero = CreateUnitByName("npc_dota_hero_"..HEROLIST_VIP[hero_vip_count], Entities:FindByName(nil, "choose_vip_"..hero_vip_count.."_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
+			dummy_hero:AddAbility("dummy_passive_vulnerable"):SetLevel(1)
 			dummy_hero:SetAngles(0, 270, 0)
+			dummy_hero.is_fake_hero = true
 		end
 
 		if hero_vip_count < #HEROLIST_VIP then
@@ -77,16 +103,23 @@ local hero_vip_count = 1
 	end)
 
 	local vip_point = Entities:FindByName(nil, "choose_vip_point"):GetAbsOrigin()
-	if WeekHero == "npc_dota_hero_storm_spirit" then
-		local vip_hero = CreateUnitByName("npc_dota_hero_storm_spirit_bis", vip_point + Vector(0, 100, 0), true, nil, nil, DOTA_TEAM_GOODGUYS)
-		vip_hero:SetAngles(0, 270, 0)
-		local vip_hero2 = CreateUnitByName("npc_dota_hero_ember_spirit_bis", vip_point + Vector(-100, 0, 0), true, nil, nil, DOTA_TEAM_GOODGUYS)
-		vip_hero2:SetAngles(0, 270, 0)
-		local vip_hero3 = CreateUnitByName("npc_dota_hero_earth_spirit_bis", vip_point + Vector(100, 0, 0), true, nil, nil, DOTA_TEAM_GOODGUYS)
-		vip_hero3:SetAngles(0, 270, 0)
+
+	if type(WeekHero) == "table" then
+		local pos = {}
+		pos[1] = Vector(0, 100, 0)
+		pos[2] = Vector(-100, 0, 0)
+		pos[3] = Vector(100, 0, 0)
+
+		for i, hero in ipairs(WeekHero) do
+			local vip_hero = CreateUnitByName(hero, vip_point + pos[i], true, nil, nil, DOTA_TEAM_GOODGUYS)
+			vip_hero:SetAngles(0, 270, 0)
+			vip_hero:AddAbility("dummy_passive_vulnerable"):SetLevel(1)
+			vip_hero.is_fake_hero = true
+		end
 	else
-		local vip_hero = CreateUnitByName(WeekHero.."_bis", vip_point, true, nil, nil, DOTA_TEAM_GOODGUYS)
+		local vip_hero = CreateUnitByName(WeekHero, vip_point, true, nil, nil, DOTA_TEAM_GOODGUYS)
 		vip_hero:SetAngles(0, 270, 0)
+		vip_hero:AddAbility("dummy_passive_vulnerable"):SetLevel(1)
 	end
 
 	RAMERO_DUMMY = CreateUnitByName("npc_ramero", Entities:FindByName(nil, "point_special_arena_1"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
@@ -141,22 +174,24 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			end
 
 			if caller:GetName() == "trigger_hero_weekly" then
---				if hero:HasAbility("holdout_vip") then
---					Notifications:Bottom(hero:GetPlayerOwnerID(), {text="You are VIP. Please choose this hero on top!", duration = 5.0})
+				if hero:HasAbility("holdout_vip") then
+					Notifications:Bottom(hero:GetPlayerOwnerID(), {text="You are VIP. Please choose this hero on top!", duration = 5.0})
 
---					return
---				end
+					return
+				end
 
 				UTIL_Remove(Entities:FindByName(nil, "trigger_hero_weekly"))
 				local particle = ParticleManager:CreateParticle("particles/econ/events/ti6/hero_levelup_ti6.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
 				ParticleManager:SetParticleControl(particle, 0, hero:GetAbsOrigin())
 				EmitSoundOnClient("ui.trophy_levelup", PlayerResource:GetPlayer(id))
 				hero:AddNewModifier(hero, nil, "modifier_command_restricted", {})
-				Notifications:Bottom(hero:GetPlayerOwnerID(), {hero=WeekHero, duration = 5.0})
+				local weekly_hero = WeekHero
+				if type(WeekHero) == "table" then weekly_hero = WeekHero[0] end
+				Notifications:Bottom(hero:GetPlayerOwnerID(), {hero=weekly_hero, duration = 5.0})
 				Notifications:Bottom(hero:GetPlayerOwnerID(), {text="HERO: ", duration = 5.0, style={color="white"}, continue=true})
-				Notifications:Bottom(hero:GetPlayerOwnerID(), {text="#"..WeekHero, duration = 5.0, style={color="white"}, continue=true})
+				Notifications:Bottom(hero:GetPlayerOwnerID(), {text="#"..weekly_hero, duration = 5.0, style={color="white"}, continue=true})
 
-				local newHero = PlayerResource:ReplaceHeroWith(id, WeekHero, STARTING_GOLD[difficulty], 0)
+				local newHero = PlayerResource:ReplaceHeroWith(id, weekly_hero, STARTING_GOLD[difficulty], 0)
 				StartingItems(hero, newHero)
 
 				Timers:CreateTimer(0.1, function()

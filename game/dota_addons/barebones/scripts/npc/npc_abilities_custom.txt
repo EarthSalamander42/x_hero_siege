@@ -291,6 +291,19 @@
 	}
 
 	//=================================================================================================================
+	// Heroes: Level 20 tooltips
+	//=================================================================================================================
+	"ability_level_20"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"					"ability_datadriven"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityTextureName"		"invoker_attribute_bonus"
+		"MaxLevel"					"1"
+	}
+
+	//=================================================================================================================
 	// Wisp: VIP Effects
 	//=================================================================================================================
 	"holdout_vip"
@@ -1843,7 +1856,7 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"armor_bonus"			"15 40 65 90"
+				"armor_bonus"			"15 25 35 45"
 			}			
 			"02"
 			{
@@ -2774,9 +2787,9 @@
 		"AbilityUnitTargetType"		"DOTA_UNIT_TARGET_BASIC | DOTA_UNIT_TARGET_HERO"
 		"SpellImmunityType"			"SPELL_IMMUNITY_ENEMIES_YES"
 			
-		"AbilityCastPoint"			"50"
+		"AbilityCastPoint"			"0.3"
 		"AbilityCooldown"			"20.0"
-		"AbilityManaCost"			"0"
+		"AbilityManaCost"			"50"
 			
 		"AbilityCastRange"			"%radius"
 		"AbilitySpecial"
@@ -4821,7 +4834,7 @@
 					"RunScript"
 					{
 						"ScriptFile"	"heroes/global.lua"
-						"Function"		"SplashAbility"
+						"Function"		"Splash"
 					}
 				}
 			}
@@ -5838,7 +5851,7 @@
 					"RunScript"
 					{
 						"ScriptFile"	"heroes/global.lua"
-						"Function"		"SplashAbility"
+						"Function"		"Splash"
 					}
 				}
 
@@ -7476,7 +7489,6 @@
 		"ScriptFile"					"heroes/hero_blademaster"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"AbilitySound"					"Blademaster.MirrorImage"
-		"AbilityTextureName"			"custom/blademaster_mirror_image"
 
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
@@ -7492,7 +7504,7 @@
 			"01"
 			{
 				"var_type"								"FIELD_FLOAT"
-				"illusion_duration"						"2000.0"
+				"illusion_duration"						"60.0"
 			}
 			"02"
 			{
@@ -7976,7 +7988,7 @@
 					"RunScript"
 					{
 						"ScriptFile"	"heroes/global.lua"
-						"Function"		"SplashAbility"
+						"Function"		"Splash"
 					}
 				}
 			}
@@ -8181,7 +8193,7 @@
 					"RunScript"
 					{
 						"ScriptFile"	"heroes/global.lua"
-						"Function"		"SplashAbility"
+						"Function"		"Splash"
 					}
 				}
 			}
@@ -8746,6 +8758,41 @@
 	// Huntress: Moon Glaive
 	//=================================================================================================================
 	"holdout_innate_lunar_glaive"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"             		"luna_moon_glaive"
+		"AbilityTextureName"			"custom/holdout_innate_lunar_glaive"
+		"MaxLevel" 						"1"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_YES"
+		
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"range"						"400"
+			}
+			"02"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"bounces"					"3"
+			}
+			"03"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"damage_reduction_percent"	"25"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Huntress: Moon Glaive
+	//=================================================================================================================
+	"holdout_lunar_glaive"
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
@@ -9324,7 +9371,7 @@
 			"03"
 			{
 				"var_type"						"FIELD_INTEGER"
-				"gods_strength_armor"			"50 150 300"
+				"gods_strength_armor"			"30 45 60"
 			}
 			"04"
 			{
@@ -9926,7 +9973,7 @@
 					"RunScript"
 					{
 						"ScriptFile"	"heroes/global.lua"
-						"Function"		"SplashAbility"
+						"Function"		"Splash"
 					}
 				}
 			}
@@ -9973,7 +10020,7 @@
 			"03"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"armor_bonus"				"50 100 150"
+				"armor_bonus"				"30 50 70"
 			}
 			"04"
 			{
@@ -10087,11 +10134,6 @@
 				"var_type"					"FIELD_INTEGER"
 				"damage_reduction"			"-20"
 			}
-			"04"
-			{
-				"var_type"					"FIELD_INTEGER"
-				"bonus_armor"				"150"
-			}
 		}
 
 		"precache"
@@ -10126,7 +10168,6 @@
 
 				"Properties"
 				{
-					"MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS"			"%bonus_armor"
 					"MODIFIER_PROPERTY_INCOMING_DAMAGE_PERCENTAGE"		"%damage_reduction"
 				}
 			}
@@ -15539,11 +15580,6 @@
 				"var_type"					"FIELD_INTEGER"
 				"creep_return_percent"		"35"
 			}
-			"03"
-			{
-				"var_type"					"FIELD_INTEGER"
-				"bonus_armor"				"35 70 105 140"
-			}
 		}
 
 		"precache"
@@ -15575,11 +15611,6 @@
 							"ATTACKER" 		"attach_hitloc"
 						}
 					}
-				}
-
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS"		"%bonus_armor"
 				}
 			}
 		}
@@ -15614,11 +15645,6 @@
 			{
 				"var_type"					"FIELD_INTEGER"
 				"creep_return_percent"		"50"
-			}
-			"03"
-			{
-				"var_type"					"FIELD_INTEGER"
-				"bonus_armor"				"50 100 150 200 250"
 			}
 		}
 
@@ -16329,7 +16355,7 @@
 					"RunScript"
 					{
 						"ScriptFile"	"heroes/global.lua"
-						"Function"		"SplashAbility"
+						"Function"		"Splash"
 					}
 
 					"FireEffect"
@@ -16695,7 +16721,7 @@
 					"RunScript"
 					{
 						"ScriptFile"	"heroes/global.lua"
-						"Function"		"SplashAbility"
+						"Function"		"Splash"
 					}
 
 					"FireEffect"
@@ -19236,7 +19262,7 @@
 					"RunScript"
 					{
 						"ScriptFile"	"heroes/global.lua"
-						"Function"		"SplashAbility"
+						"Function"		"Splash"
 					}
 				}
 			}
@@ -19332,7 +19358,7 @@
 					"RunScript"
 					{
 						"ScriptFile"	"heroes/global.lua"
-						"Function"		"SplashAbility"
+						"Function"		"Splash"
 					}
 				}
 			}
@@ -21074,7 +21100,7 @@
 					"RunScript"
 					{
 						"ScriptFile"	"heroes/global.lua"
-						"Function"		"SplashAbility"
+						"Function"		"Splash"
 					}
 				}
 
@@ -22672,7 +22698,7 @@
 			"03"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"movement_slow"				"20 35 50 65 80"
+				"movement_slow"				"-20 -35 -50 -65 -80"
 			}
 			"04"
 			{
@@ -22836,7 +22862,7 @@
 			"03"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"movement_slow"				"20 35 50 65 80"
+				"movement_slow"				"-20 -35 -50 -65 -80"
 			}
 			"04"
 			{
@@ -25254,7 +25280,7 @@
 			"03"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"bonus_armor"			"75 150 225"
+				"bonus_armor"			"30 50 70"
 			}
 			"04"
 			{
@@ -27266,7 +27292,7 @@
 					"RunScript"
 					{
 						"ScriptFile"	"heroes/global.lua"
-						"Function"		"SplashAbility"
+						"Function"		"Splash"
 					}
 				}
 			}
@@ -29530,7 +29556,7 @@
 			"03"
 			{
 				"var_type"								"FIELD_FLOAT"
-				"delay"									"2.5 2.0 1.5 1.0 0.0"
+				"delay"									"1.0"
 			}
 		}
 	}
@@ -29598,7 +29624,7 @@
 			"03"
 			{
 				"var_type"							"FIELD_FLOAT"
-				"delay"								"3.0"
+				"delay"								"3.0 2.5 2.0 1.5 1.0"
 			}
 			"04"
 			{

@@ -153,7 +153,6 @@ FourBossesKillCount()
 
 	Timers:CreateTimer(6, function()
 		DoEntFire("door_proudmoore2", "SetAnimation", "gate_02_open", 0, nil, nil)
-		DoEntFire("door_proudmoore3", "SetAnimation", "gate_02_open", 0, nil, nil)
 		caster:ForceKill(true)
 		local DoorObs = Entities:FindAllByName("obstruction_proudmoore2")
 		for _, obs in pairs(DoorObs) do
@@ -198,8 +197,7 @@ FourBossesKillCount()
 	StartAnimation(caster, {duration=6.0, activity=ACT_DOTA_FLAIL, rate=0.75})
 
 	Timers:CreateTimer(6, function()
-		DoEntFire("door_proudmoore0", "SetAnimation", "gate_02_open", 0, nil, nil)
-		DoEntFire("door_proudmoore1", "SetAnimation", "gate_02_open", 0, nil, nil)
+		DoEntFire("door_proudmoore", "SetAnimation", "gate_02_open", 0, nil, nil)
 		caster:ForceKill(true)
 		local DoorObs = Entities:FindAllByName("obstruction_proudmoore")
 		for _, obs in pairs(DoorObs) do

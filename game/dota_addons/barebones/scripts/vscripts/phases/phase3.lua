@@ -14,9 +14,8 @@ local delay = 3.0
 	PHASE = 3
 
 	for _,hero in pairs(HeroList:GetAllHeroes()) do
-		local point = Entities:FindByName(nil, "point_teleport_boss_"..hero:GetPlayerID())
-
-		if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
+		if hero:IsRealHero() and hero:GetTeam() == DOTA_TEAM_GOODGUYS then
+			local point = Entities:FindByName(nil, "point_teleport_boss_"..hero:GetPlayerID())
 			TeleportHero(hero, delay, point:GetAbsOrigin())
 			hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {Duration = 10 + delay, IsHidden = true})
 			hero:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 10 + delay, IsHidden = true})
@@ -122,17 +121,21 @@ function DarkProtectors(keys)
 local activator = keys.activator
 local point2 = Entities:FindByName(nil, "spawner_phase3_creeps_west"):GetAbsOrigin()
 local point3 = Entities:FindByName(nil, "spawner_phase3_creeps_east"):GetAbsOrigin()
+local play_sound = false
 RefreshPlayers()
 
 	Timers:CreateTimer(0.5, function()
 		if first_time_teleport_phase3_creeps then
 			DoEntFire("trigger_teleport_phase3_creeps", "Kill", nil, 0, nil, nil)
 			Notifications:TopToAll({text="Power Up: +250 to all stats!", style={color="green"}, duration=10.0})
-			activator:EmitSound("ui.trophy_levelup")
 			first_time_teleport_phase3_creeps = false
 
 			for _,hero in pairs(HeroList:GetAllHeroes()) do
-				if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
+				if hero:IsRealHero() and hero:GetTeam() == DOTA_TEAM_GOODGUYS then
+					if play_sound == false then
+						hero:EmitSound("ui.trophy_levelup")
+						play_sound = true
+					end
 					local id = hero:GetPlayerID()
 					local point = Entities:FindByName(nil,"point_teleport_phase3_creeps_"..id)
 					FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
@@ -165,8 +168,10 @@ RefreshPlayers()
 
 			Timers:CreateTimer(5.0, function()
 				for _,hero in pairs(HeroList:GetAllHeroes()) do
-					hero:SetDayTimeVisionRange(hero.dayvision)
-					hero:SetNightTimeVisionRange(hero.nightvision)
+					if hero:IsRealHero() then
+						hero:SetDayTimeVisionRange(hero.dayvision)
+						hero:SetNightTimeVisionRange(hero.nightvision)
+					end
 				end
 			end)
 
@@ -195,7 +200,6 @@ local teleporters = Entities:FindAllByName("trigger_teleport3")
 end
 
 function StartArthasArena(keys)
-local activator = keys.activator
 	if first_time_teleport_arthas_real then
 		DoEntFire("door_magtheridon", "SetAnimation", "gate_02_close", 0, nil, nil)
 		local DoorObs = Entities:FindAllByName("obstruction_magtheridon")
@@ -211,9 +215,9 @@ local activator = keys.activator
 		arthas.zone = "xhs_holdout"
 
 		for _,hero in pairs(HeroList:GetAllHeroes()) do
-		local id = hero:GetPlayerID()
-		local point = Entities:FindByName(nil, "point_teleport_boss_"..id)
-			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
+			if hero:IsRealHero() and hero:GetTeam() == DOTA_TEAM_GOODGUYS then
+				local id = hero:GetPlayerID()
+				local point = Entities:FindByName(nil, "point_teleport_boss_"..id)
 				FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
 				hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {Duration = 10, IsHidden = true})
 				hero:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 10, IsHidden = true})
@@ -225,14 +229,6 @@ local activator = keys.activator
 				first_time_teleport_arthas_real = false
 			end
 		end
-	elseif activator:GetTeam() == DOTA_TEAM_GOODGUYS then
-	local point_alt = Entities:FindByName(nil, "point_teleport_boss_0")
-		FindClearSpaceForUnit(activator, point_alt:GetAbsOrigin(), true)
-		PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(), activator)
-		Timers:CreateTimer(0.1, function()
-			PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(),nil)
-		end)
-		activator:Stop()
 	end
 end
 
@@ -319,9 +315,9 @@ local point_boss = Entities:FindByName(nil, "npc_dota_spawner_lich_king_bis"):Ge
 local reincarnate_time = 8.0
 
 	for _, hero in pairs(HeroList:GetAllHeroes()) do
-	local id = hero:GetPlayerID()
-	local point = Entities:FindByName(nil, "point_teleport_boss_"..id)
-		if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
+		if hero:IsRealHero() and hero:GetTeam() == DOTA_TEAM_GOODGUYS then
+			local id = hero:GetPlayerID()
+			local point = Entities:FindByName(nil, "point_teleport_boss_"..id)
 			FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
 			hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {Duration = 20, IsHidden = true})
 			hero:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 20, IsHidden = true})
@@ -355,39 +351,28 @@ local reincarnate_time = 8.0
 	end)
 end
 
-function StartSecretArena(keys)
-local activator = keys.activator
-local point = Entities:FindByName(nil, "npc_dota_muradin_player_1")
-local difficulty = GameRules:GetCustomGameDifficulty()
-local check = false
+function StartSecretArena(hero)
+	local point = Entities:FindByName(nil, "npc_dota_muradin_player_1")
 
-	if difficulty >= 4 then
-		for itemSlot = 0, 5 do
-			local item = activator:GetItemInSlot(itemSlot)
-			if item and item:GetName() == "item_doom_artifact" then
---				if not GameRules:IsCheatMode() then
-					check = true
---				end
-			end
-		end
-	end
-	
-	if check == true then
+	TeleportHero(hero, 3.0, point:GetAbsOrigin())
+
+	Timers:CreateTimer(3.0, function()
+		FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
+		hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {Duration = 10, IsHidden = true})
+		hero:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 10, IsHidden = true})
+		hero:Stop()
+		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
+		Timers:CreateTimer(0.1, function()
+			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
+		end)
+
+		Notifications:BottomToAll({ hero = hero:GetUnitName(), duration = 5.0 })
+		Notifications:BottomToAll({ text = PlayerResource:GetPlayerName(hero:GetPlayerID()) .. " ", duration = 5.0, continue = true })
+		Notifications:BottomToAll({ text = "found the secret arena!!! GOOD LUCK!", duration = 5.0, style = { color = "red" }, continue = true })
+
 		local secret = CreateUnitByName("npc_dota_hero_secret", Entities:FindByName(nil, "npc_dota_muradin_boss"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 		secret:SetAngles(0, 270, 0)
 		secret:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 10, IsHidden = true})
 		secret:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 9, IsHidden = true})
-
-		activator.old_pos = activator:GetAbsOrigin()
-		FindClearSpaceForUnit(activator, point:GetAbsOrigin(), true)
-		activator:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {Duration = 10, IsHidden = true})
-		activator:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 10, IsHidden = true})
-		activator:Stop()
-		PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(), activator)
-		Timers:CreateTimer(0.1, function()
-			PlayerResource:SetCameraTarget(activator:GetPlayerOwnerID(), nil)
-		end)
-		
-		Entities:FindByName(nil, "trigger_teleport_secret"):RemoveSelf()
-	end
+	end)
 end

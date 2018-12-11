@@ -1,6 +1,4 @@
 
-require("api/json")
-
 local ApiConfig = {
 	endpoint = "https://api.dota2imba.org",
 	agent = "xhs-"..tostring(X_HERO_SIEGE_V), -- Add the version AND UPDATE it here
