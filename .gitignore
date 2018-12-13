@@ -9,18 +9,12 @@
 *.fbx
 *.vmat
 *.vpcf
-*.vjs_c
-*.vxml_c
-*.vcss_c
 *.cfg
 *.tga
 *.vtex_c
 
 # Map files
 *.vmap
-
-# Map overviews
-content/dota_addons/barebones/materials/overviews/*
 
 # Single Files
 *.cfg
