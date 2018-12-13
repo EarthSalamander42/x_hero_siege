@@ -1,0 +1,8 @@
+x_hero_siege_4
+{
+	material materials/overviews/x_hero_siege_4.vmat
+	pos_x -12288
+	pos_y 12288
+	scale 24.000
+}
+

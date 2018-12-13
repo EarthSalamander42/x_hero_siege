@@ -17,14 +17,10 @@
 *.vtex_c
 
 # Map files
-*.vpk
 *.vmap
 
 # Map overviews
 content/dota_addons/barebones/materials/overviews/*
-game/dota_addons/barebones/materials/*
-game/dota_addons/barebones/models/*
-game/dota_addons/barebones/resource/overviews/*
 
 # Single Files
 *.cfg
