@@ -1027,8 +1027,7 @@ function GameMode:FilterExecuteOrder( filterTable )
 	if order_type == DOTA_UNIT_ORDER_CAST_POSITION then
 		local ability = EntIndexToHScript(filterTable["entindex_ability"])
 		if ability:GetName() == "item_tpscroll" then
-			if _G.SECRET == 1 then return end
-			_G.SECRET = 1
+			if _G.SECRET == 1 then return true end
 			local target_loc = Vector(filterTable.position_x, filterTable.position_y, filterTable.position_z)
 			if IsNearEntity("npc_dota_muradin_boss", target_loc, 1200) then
 				if GameRules:GetCustomGameDifficulty() >= 4 then
@@ -1036,6 +1035,7 @@ function GameMode:FilterExecuteOrder( filterTable )
 						local item = unit:GetItemInSlot(itemSlot)
 						if item and item:GetName() == "item_doom_artifact" then
 							if not GameRules:IsCheatMode() or IsInToolsMode() then
+								_G.SECRET = 1
 								StartSecretArena(unit)
 
 								return false
