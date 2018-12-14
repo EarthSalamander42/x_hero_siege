@@ -1,30 +1,163 @@
 -- Credits: EarthSalamander #42
 -- Date (DD/MM/YYYY): 14/12/2018
 
-LinkLuaModifier("modifier_lightning_sword_active", "items/item_lightning_sword.lua", LUA_MODIFIER_MOTION_NONE)
-LinkLuaModifier("modifier_lightning_sword_passive", "items/item_lightning_sword.lua", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_orb_of_darkness_active", "items/item_orb_of_darkness.lua", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_orb_of_darkness_passive", "items/item_orb_of_darkness.lua", LUA_MODIFIER_MOTION_NONE)
 
-item_lightning_sword = class({})
+local function StartSpell(caster, ability)
+	if caster:HasModifier("modifier_orb_of_darkness_active") then
+		-- kill units under control when disabling the orb
+		local darkness_units = FindUnitsInRadius(caster:GetTeamNumber(), Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_NONE , FIND_ANY_ORDER, false)
+		for _, darkness_unit in pairs(darkness_units) do
+			if darkness_unit:HasAbility("orb_of_darkness_unit") then
+				darkness_unit:ForceKill(false)
+			end
+		end
 
-function item_lightning_sword:GetIntrinsicModifierName()
-	return "modifier_lightning_sword_passive"
+		caster:RemoveModifierByName("modifier_orb_of_darkness_active")
+	else
+		caster:AddNewModifier(caster, ability, "modifier_orb_of_darkness_active", {})
+	end
+end
+
+item_orb_of_darkness = class({})
+
+function item_orb_of_darkness:GetIntrinsicModifierName()
+	return "modifier_orb_of_darkness_passive"
+end
+
+function item_orb_of_darkness:OnSpellStart()
+	if IsServer() then
+		StartSpell(self:GetCaster(), self)
+	end
+end
+
+function item_orb_of_darkness:GetAbilityTextureName()
+	if self:GetCaster():HasModifier("modifier_orb_of_darkness_active") then
+		return "custom/orb_of_darkness"
+	end
+
+	return "custom/orb_of_darkness_off"
 end
 
 --------------------------------------------------------------
 
-modifier_lightning_sword_active = class({})
+item_orb_of_darkness2 = class({})
 
-function modifier_lightning_sword_active:IsHidden() return false end
-function modifier_lightning_sword_active:IsPurgable() return false end
-function modifier_lightning_sword_active:IsPurgeException() return false end
-function modifier_lightning_sword_active:IsDebuff() return false end
+function item_orb_of_darkness2:GetIntrinsicModifierName()
+	return "modifier_orb_of_darkness_passive"
+end
+
+function item_orb_of_darkness2:OnSpellStart()
+	if IsServer() then
+		StartSpell(self:GetCaster(), self)
+	end
+end
+
+function item_orb_of_darkness2:GetAbilityTextureName()
+	if self:GetCaster():HasModifier("modifier_orb_of_darkness_active") then
+		return "custom/orb_of_darkness2"
+	end
+
+	return "custom/orb_of_darkness2_off"
+end
+
+--------------------------------------------------------------
+
+item_bracer_of_the_void = class({})
+
+function item_bracer_of_the_void:GetIntrinsicModifierName()
+	return "modifier_orb_of_darkness_passive"
+end
+
+function item_bracer_of_the_void:OnSpellStart()
+	if IsServer() then
+		StartSpell(self:GetCaster(), self)
+	end
+end
+
+function item_bracer_of_the_void:GetAbilityTextureName()
+	if self:GetCaster():HasModifier("modifier_orb_of_darkness_active") then
+		return "custom/bracer_of_the_void"
+	end
+
+	return "custom/bracer_of_the_void_off"
+end
+
+--------------------------------------------------------------
+
+modifier_orb_of_darkness_active = class({})
+
+function modifier_orb_of_darkness_active:IsHidden() return true end
+function modifier_orb_of_darkness_active:IsPurgable() return false end
+function modifier_orb_of_darkness_active:IsPurgeException() return false end
+function modifier_orb_of_darkness_active:IsDebuff() return false end
+
+function modifier_orb_of_darkness_active:GetEffectAttachType()
+	return "attach_attack1"
+end
+
+function modifier_orb_of_darkness_active:GetEffectName()
+	return "particles/units/heroes/hero_ursa/ursa_enrage_buff_glow.vpcf"
+end
+
+function modifier_orb_of_darkness_active:DeclareFunctions()
+	return {
+		MODIFIER_EVENT_ON_DEATH,
+	}
+end
+
+function modifier_orb_of_darkness_active:OnDeath( params )
+	if IsServer() then
+		if params.attacker == self:GetParent() and LeavesCorpse(params.unit) and params.unit.no_corpse ~= true then
+			if self:GetStackCount() < self:GetAbility():GetSpecialValueFor("max_units") then
+				local unit = CreateUnitByName(params.unit:GetUnitName(), params.unit:GetAbsOrigin(), true, self:GetParent(), self:GetParent(), self:GetParent():GetTeam())
+				unit:SetControllableByPlayer(self:GetParent():GetPlayerID(), true)
+				unit:SetOwner(self:GetParent())
+				unit:SetForwardVector(params.unit:GetForwardVector())
+				unit:AddAbility("holdout_blue_effect"):SetLevel(1)
+				unit:AddAbility("orb_of_darkness_unit"):SetLevel(1)
+				FindClearSpaceForUnit(unit, params.unit:GetAbsOrigin(), true)
+
+				unit:AddNewModifier(self:GetParent(), nil, "modifier_kill", {duration = self:GetAbility():GetSpecialValueFor("duration")})
+				unit:AddNewModifier(self:GetParent(), nil, "modifier_summoned", {})
+				unit:SetNoCorpse()
+				unit.no_corpse = true
+	
+				for i = 0, 15 do
+					local a = unit:GetAbilityByIndex(i)
+					if a and not a:IsPassive() then
+						a:SetActivated(false)
+					end
+				end
+
+				-- the unit is reincarnated, don't want to see the previous unit dying
+				params.unit:RemoveSelf()
+				-- increase the number of units under your control
+				self:SetStackCount(self:GetStackCount() + 1)
+			end
+		elseif params.unit:HasAbility("orb_of_darkness_unit") then
+			-- reduce unit count under control when 1 of them is dying
+			self:SetStackCount(self:GetStackCount() - 1)
+		end
+	end
+end
+
+--------------------------------------------------------------
+
+modifier_orb_of_darkness_passive = class({})
+
+function modifier_orb_of_darkness_passive:IsHidden() return true end
+function modifier_orb_of_darkness_passive:IsPurgable() return false end
+function modifier_orb_of_darkness_passive:IsPurgeException() return false end
+function modifier_orb_of_darkness_passive:IsDebuff() return false end
 
 -- allow multiple instances of that modifier
-function modifier_lightning_sword_active:GetAttributes()
+function modifier_orb_of_darkness_passive:GetAttributes()
 	return MODIFIER_ATTRIBUTE_MULTIPLE
 end
 
-function modifier_lightning_sword_active:DeclareFunctions()
+function modifier_orb_of_darkness_passive:DeclareFunctions()
 	return {
 		MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE,
 		MODIFIER_PROPERTY_HEALTH_BONUS,
@@ -33,57 +166,18 @@ function modifier_lightning_sword_active:DeclareFunctions()
 	}
 end
 
-function modifier_lightning_sword_active:GetModifierPreAttack_BonusDamage()
+function modifier_orb_of_darkness_passive:GetModifierPreAttack_BonusDamage()
 	return self:GetAbility():GetSpecialValueFor("bonus_damage")
 end
 
-function modifier_lightning_sword_active:GetModifierHealthBonus()
+function modifier_orb_of_darkness_passive:GetModifierHealthBonus()
 	return self:GetAbility():GetSpecialValueFor("bonus_hp")
 end
 
-function modifier_lightning_sword_active:GetModifierPhysicalArmorBonus()
+function modifier_orb_of_darkness_passive:GetModifierPhysicalArmorBonus()
 	return self:GetAbility():GetSpecialValueFor("bonus_armor")
 end
 
-function modifier_lightning_sword_active:GetModifierConstantHealthRegen()
-	return self:GetAbility():GetSpecialValueFor("bonus_health_regen")
-end
-
---------------------------------------------------------------
-
-modifier_lightning_sword_passive = class({})
-
-function modifier_lightning_sword_passive:IsHidden() return false end
-function modifier_lightning_sword_passive:IsPurgable() return false end
-function modifier_lightning_sword_passive:IsPurgeException() return false end
-function modifier_lightning_sword_passive:IsDebuff() return false end
-
--- allow multiple instances of that modifier
-function modifier_lightning_sword_passive:GetAttributes()
-	return MODIFIER_ATTRIBUTE_MULTIPLE
-end
-
-function modifier_lightning_sword_passive:DeclareFunctions()
-	return {
-		MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE,
-		MODIFIER_PROPERTY_HEALTH_BONUS,
-		MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS,
-		MODIFIER_PROPERTY_HEALTH_REGEN_CONSTANT,
-	}
-end
-
-function modifier_lightning_sword_passive:GetModifierPreAttack_BonusDamage()
-	return self:GetAbility():GetSpecialValueFor("bonus_damage")
-end
-
-function modifier_lightning_sword_passive:GetModifierHealthBonus()
-	return self:GetAbility():GetSpecialValueFor("bonus_hp")
-end
-
-function modifier_lightning_sword_passive:GetModifierPhysicalArmorBonus()
-	return self:GetAbility():GetSpecialValueFor("bonus_armor")
-end
-
-function modifier_lightning_sword_passive:GetModifierConstantHealthRegen()
+function modifier_orb_of_darkness_passive:GetModifierConstantHealthRegen()
 	return self:GetAbility():GetSpecialValueFor("bonus_health_regen")
 end

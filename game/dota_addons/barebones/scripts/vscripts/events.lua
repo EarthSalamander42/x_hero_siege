@@ -906,8 +906,6 @@ local playerKills = PlayerResource:GetKills(KillerID)
 local cn = string.gsub(killedUnit:GetName(), "dota_badguys_tower", "")
 local lane = tonumber(cn)
 
-	OrbOfDarkness(hero, killedUnit)
-
 	if IsValidEntity(hero:GetPlayerOwner()) then
 		hero = hero:GetPlayerOwner():GetAssignedHero()
 	end

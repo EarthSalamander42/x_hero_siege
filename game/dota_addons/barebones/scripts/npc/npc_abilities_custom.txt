@@ -10,7 +10,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"                     "ability_lua"
-		"ScriptFile"                    "heroes/global"
+		"ScriptFile"                    "heroes/creeps"
 		"AbilityTextureName"            "ogre_magi_ignite"
 		"MaxLevel"                      "1"
 		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_PASSIVE"
@@ -28419,8 +28419,9 @@
 		{
 			"modifier_blue"
 			{
-				"Passive"   "1"
-				"IsHidden"  "1"
+				"Passive"		"1"
+				"IsHidden"		"1"
+				"Attributes"	"MODIFIER_ATTRIBUTE_PERMANENT"
 
 				"StatusEffectName"			"particles/status_fx/status_effect_holdout_borrowed_time.vpcf"
 				"StatusEffectPriority"		"15"
