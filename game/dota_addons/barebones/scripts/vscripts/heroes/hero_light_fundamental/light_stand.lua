@@ -47,6 +47,7 @@ function PurificationDeath( keys )
 
 		-- Calculate damage
 		local damage = heal * damage_factor
+		print("Light Stand damage:", damage)
 
 		-- Damage nearby enemies
 		local enemies = FindUnitsInRadius(caster:GetTeamNumber(), caster_pos, nil, radius, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC, 0, 0, false)

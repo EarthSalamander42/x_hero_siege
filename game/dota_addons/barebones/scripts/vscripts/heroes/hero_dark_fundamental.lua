@@ -29,26 +29,17 @@ local radius = ability:GetSpecialValueFor("radius")
 local cleave = ability:GetSpecialValueFor("cleave_pct")
 local full_damage = caster:GetAverageTrueAttackDamage(caster) + bonus_damage * stacks -- 100 * caster Level
 local cleave_pct = cleave * full_damage / 100
+print("radius/cleave:", radius, cleave)
+    ability:StartCooldown(cooldown)
+    caster:RemoveModifierByName(modifier_dark_cleave)
+    ApplyDamage({attacker = caster, victim = target, ability = ability, damage = full_damage, damage_type = DAMAGE_TYPE_PHYSICAL})
+    SendOverheadEventMessage(nil, OVERHEAD_ALERT_CRITICAL, target, full_damage, nil)
 
-	ability:StartCooldown(cooldown)
-	caster:RemoveModifierByName(modifier_dark_cleave)
-	ApplyDamage({attacker = caster, victim = target, ability = ability, damage = full_damage, damage_type = DAMAGE_TYPE_PHYSICAL})
-	SendOverheadEventMessage(nil, OVERHEAD_ALERT_CRITICAL, target, full_damage, nil)
+    Splash(keys)
 
-	local splash_targets = FindUnitsInRadius(caster:GetTeamNumber(), target:GetAbsOrigin(), nil, radius, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, FIND_ANY_ORDER, false)
-	for _, unit in pairs(splash_targets) do
-		if target:IsBuilding() then return end
-		if unit ~= target and not unit:IsBuilding() then
-			local target_armor = unit:GetPhysicalArmorValue()
-			local damage = cleave_pct * GetReductionFromArmor(target_armor) * 0.01
---			print("Damage:", damage)
-			ApplyDamage({victim = unit, attacker = caster, damage = damage, ability = ability, damage_type = DAMAGE_TYPE_PURE})
-		end
-	end
-
-	Timers:CreateTimer(cooldown, function()
-		ability:ApplyDataDrivenModifier(caster, caster, modifier_dark_cleave, {})
-	end)
+    Timers:CreateTimer(cooldown, function()
+        ability:ApplyDataDrivenModifier(caster, caster, modifier_dark_cleave, {})
+    end)
 end
 
 function Instakill( keys )

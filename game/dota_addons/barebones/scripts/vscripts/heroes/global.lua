@@ -245,7 +245,7 @@ local target = event.target
 local ability = event.ability
 local radius = ability:GetSpecialValueFor("radius")
 local cleave = ability:GetSpecialValueFor("cleave_pct")
-
+print("radius/cleave:", radius, cleave)
 	local splash_targets = FindUnitsInRadius(attacker:GetTeamNumber(), target:GetAbsOrigin(), nil, radius, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, FIND_ANY_ORDER, false)
 	for _, unit in pairs(splash_targets) do
 		if target:IsBuilding() then return end
