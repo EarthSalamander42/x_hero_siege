@@ -1,0 +1,23 @@
+<root>
+	<styles>
+		<include src="file://{resources}/styles/dotastyles.vcss_c" />
+		<include src="file://{resources}/styles/custom_game/boss_healthbar.css" />
+	</styles>
+	<scripts>
+		<include src="file://{resources}/scripts/custom_game/boss_healthbar.js" />
+	</scripts>
+	
+	<Panel class="Diretide" hittest="false">
+		<Panel id="DiretidePanel">
+			<Panel id="BossHP" hittest="false">
+				<Label id="BossLabel" class="HoldoutLabelSmall" hittest="false" text=""/>
+				<Label id="BossLevel" class="HoldoutLabelSmall_alt" hittest="false" text=""/>
+				<Panel id="BossProgressBarContainer" hittest="false">
+					<DOTAHeroImage id="BossIcon" hittest="false"/>
+					<ProgressBar id="BossProgressBar" hittest="false" value="1.0"/>
+					<Label id="BossHealth" class="HoldoutLabelSmall" hittest="false" text=""/>
+				</Panel>
+			</Panel>
+		</Panel>
+	</Panel>
+</root>

@@ -24811,8 +24811,8 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"			"heroes/hero_dark_fundamental.lua"
-						"Function"				"DarkCleave"
+						"ScriptFile"            "heroes/global.lua"
+						"Function"				"Splash"
 						"modifier_dark_cleave"	"modifier_dark_cleave"
 						"Target"				"TARGET"
 					}
@@ -25485,12 +25485,12 @@
 			"02"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"heal_pct"				"5"
+				"heal_pct"				"2"
 			}
 			"03"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"damage_factor"			"10"
+				"damage_factor"			"5"
 			}
 			"04"
 			{

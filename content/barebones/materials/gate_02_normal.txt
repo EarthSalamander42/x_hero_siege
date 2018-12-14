@@ -1,0 +1,4 @@
+"settings"
+{
+	"clampw"		"1"
+}
