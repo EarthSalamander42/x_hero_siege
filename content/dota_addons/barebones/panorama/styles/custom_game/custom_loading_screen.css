@@ -193,7 +193,7 @@
 #ImbaLoadingSocialOfficialWebsite { background-color: gradient(linear, 0% 0%, 0% 100%, from(#333), to(#111)); }
 #ImbaLoadingSocialFacebook { background-color: gradient(linear, 0% 0%, 0% 100%, from(#22e), to(#111)); }
 #ImbaLoadingSocialDiscordEn { background-color: gradient(linear, 0% 0%, 0% 100%, from(#7289DA), to(#111)); }
-#ImbaLoadingSocialReddit { background-color: gradient(linear, 0% 0%, 0% 100%, from(#f00), to(#111)); }
+#ImbaLoadingSocialReddit { background-color: gradient(linear, 0% 0%, 0% 100%, from(orange), to(#111)); }
 
 #vote-content {
 	width: 100%;

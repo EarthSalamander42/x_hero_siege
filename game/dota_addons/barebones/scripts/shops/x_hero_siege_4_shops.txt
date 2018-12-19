@@ -24,11 +24,9 @@
 		"item"		"item_orb_of_lightning"
 		"item"		"item_orb_of_fire"
 		"item"		"item_orb_of_darkness"
-		"item"		"item_orb_of_rage"
 		"item"		"item_orb_of_lightning2"
 		"item"		"item_orb_of_fire2"
 		"item"		"item_orb_of_darkness2"
-		"item"		"item_orb_of_rage2"
 	}
 
 	"misc"
@@ -91,6 +89,5 @@
 		"item"		"item_searing_blade"
 		"item"		"item_celestial_claws"
 		"item"		"item_bracer_of_the_void"
-		"item"		"item_sword_of_rage"
 	} 
 }

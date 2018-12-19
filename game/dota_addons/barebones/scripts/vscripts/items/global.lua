@@ -37,13 +37,6 @@ if caster:IsIllusion() then return end
 		end
 	end
 
-	local darkness_units = FindUnitsInRadius(caster:GetTeamNumber(), Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_NONE , FIND_ANY_ORDER, false)
-	for _, darkness_unit in pairs(darkness_units) do
-		if darkness_unit:HasAbility("orb_of_darkness_unit") then
-			darkness_unit:RemoveSelf()
-		end
-	end
-
 --	for _, orb in pairs(Orbs) do
 --		if caster:HasItemInInventory(orb) then
 --			orb:SetActivated(false)
@@ -155,42 +148,5 @@ local caster = keys.caster
 
 	for i = 1, 2 do
 		CreateUnitByName("npc_dota_hero_magtheridon_small", caster:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
-	end
-end
-
-function OrbOfDarkness(hero, killedUnit)
-if hero:IsIllusion() then return end
-local duration = 0
-
-	if killedUnit:IsCreep() then
-		if not killedUnit:IsConsideredHero() and LeavesCorpse(killedUnit) and killedUnit.no_corpse ~= true then
-			if hero:HasModifier("modifier_orb_of_darkness") and hero:GetModifierStackCount("modifier_orb_of_darkness", hero) < 10 then
-				if hero:FindAbilityByName("item_orb_of_darkness") then
-					print("Orb of Darkness 1")
-					local duration = hero:FindAbilityByName("item_orb_of_darkness"):GetSpecialValueFor("duration")
-					print(duration)
-				end
-				hero:SetModifierStackCount("modifier_orb_of_darkness", hero, hero:GetModifierStackCount("modifier_orb_of_darkness", hero) +1)
-				local unit = CreateUnitByName(killedUnit:GetUnitName(), killedUnit:GetAbsOrigin(), true, hero, hero, hero:GetTeam())
-				unit:SetControllableByPlayer(hero:GetPlayerID(), true)
-				unit:SetOwner(hero)
-				unit:SetForwardVector(killedUnit:GetForwardVector())
-				unit:AddAbility("holdout_blue_effect"):SetLevel(1)
-				unit:AddAbility("orb_of_darkness_unit"):SetLevel(1)
-				FindClearSpaceForUnit(unit, killedUnit:GetAbsOrigin(), true)
-	
-				unit:AddNewModifier(hero, nil, "modifier_kill", {duration = 25.0})
-				unit:AddNewModifier(hero, nil, "modifier_summoned", {})
-				unit:SetNoCorpse()
-				unit.no_corpse = true
-	
-				for i = 0, 15 do
-					local a = unit:GetAbilityByIndex(i)
-					if a and not a:IsPassive() then
-						a:SetActivated(false)
-					end
-				end
-			end
-		end
 	end
 end
