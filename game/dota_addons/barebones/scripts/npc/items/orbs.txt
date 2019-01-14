@@ -6,7 +6,8 @@
 	"item_orb_of_lightning"
 	{
 		"ID"							"2516"
-		"BaseClass"						"item_datadriven"
+		"BaseClass"						"item_lua"
+		"ScriptFile"					"items/item_orb_of_lightning.lua"
 		"AbilityTextureName"			"custom/orb_of_lightning"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"      
@@ -18,7 +19,7 @@
 		"ItemKillable"					"1"
 		"ItemSellable"					"1"
 		"ItemDroppable"					"1"
-		"AbilityCooldown"				"10.0"
+		"AbilityCooldown"				"1.0"
 		"ItemBaseLevel"					"1"
 		"MaxUpgradeLevel"				"3"
 		"Orb"							"1"
@@ -52,131 +53,204 @@
 			"03"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"movespeed_slow"		"-50"
+				"duration"				"3"
 			}
 			"04"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"duration"				"3"
+				"bonus_movespeed"		"5"
 			}
 			"05"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"bonus_movespeed"		"5"
+				"purge_cooldown"		"10"
+			}
+			"06"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"damage_to_summons"		"300"
 			}
 		}
+	}
 
-		"OnEquip"
+	//=================================================================================================================
+	// Orb of Lightning 2
+	//=================================================================================================================
+	"item_orb_of_lightning2"
+	{
+		"ID"							"2541"
+		"BaseClass"						"item_lua"
+		"ScriptFile"					"items/item_orb_of_lightning.lua"
+		"AbilityTextureName"			"custom/orb_of_lightning2"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityCooldown"				"1.0"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"      
+		"ItemShopTags"					"purge"
+		"ItemQuality"					"artifact"
+		"ItemAliases"					"orb of lightning 2"
+		"ItemPermanent"					"0"
+		"ItemStackable"					"0"
+		"ItemKillable"					"1"
+		"ItemSellable"					"1"
+		"ItemDroppable"					"1"
+		"ItemBaseLevel"					"2"
+		"MaxUpgradeLevel"				"3"
+
+		// Shops
+		"ItemCost"						"20000"
+//		"ItemInitialStockTime"			"990.0"
+//		"ItemStockMax"					"2" 
+//		"ItemStockTime"					"30.0"
+//		"ItemStockInitial"				"0"
+
+		"Model"							"models/props_gameplay/red_box.vmdl"
+		"Effect"						"particles/units/heroes/hero_stormspirit/stormspirit_overload_ambient.vpcf"
+
+		"UIPickupSound"					"Item.PickUpGemShop"
+		"UIDropSound"					"Item.DropGemShop"
+		"WorldDropSound"				"Item.DropGemWorld"
+
+		"AbilitySpecial"
 		{
-			"RunScript"
+			"01"
 			{
-				"ScriptFile"	"items/global.lua"
-				"Function"		"EquipOrbs"
+				"var_type"				"FIELD_INTEGER"
+				"bonus_damage"			"450"
 			}
-
-			"DelayedAction"
+			"02"
 			{
-				"Delay"		"0.1"
-				"Action"
-				{
-					"ApplyModifier"
-					{
-						"ModifierName"	"modifier_orb_of_lightning"
-						"Target"		"CASTER"
-					}
-				}
+				"var_type"				"FIELD_INTEGER"
+				"purge_chance"			"10"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"duration"				"3"
+			}
+			"04"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_movespeed"		"10"
+			}
+			"05"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"purge_cooldown"		"10"
+			}
+			"06"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"damage_to_summons"		"300"
 			}
 		}
+	}
 
-		"OnUnequip"
+	//=================================================================================================================
+	// Recipe: Orb of Lightning 2
+	//=================================================================================================================
+	"item_recipe_orb_of_lightning2"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"ID"							"2540"
+		"BaseClass"             		"item_datadriven"
+		"Model"							"models/props_gameplay/recipe.mdl"
+		"AbilityTextureName"			"custom/recipe"
+		
+		// Item Info
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemCost"						"10000"	
+		"ItemShopTags"					""
+//		"ItemInitialStockTime"			"990.0"
+//		"ItemStockMax"					"2" 
+//		"ItemStockTime"					"30.0"
+//		"ItemStockInitial"				"0"
+		
+		// Recipe
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemRecipe"					"1"
+		"ItemResult"					"item_orb_of_lightning2"
+		"ItemRequirements"
 		{
-			"RemoveModifier"
-			{
-				"ModifierName"	"modifier_orb_of_lightning"
-				"Target" 		"CASTER"
-			}
+			"01"						"item_orb_of_lightning"
 		}
+	}
 
-		"OnSpellStart"
+	//=================================================================================================================
+	// Celestial Claws
+	//=================================================================================================================
+	"item_celestial_claws"
+	{
+		"ID"							"2542"
+		"BaseClass"						"item_lua"
+		"ScriptFile"					"items/item_orb_of_lightning.lua"
+		"AbilityTextureName"			"custom/celestial_claws"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"      
+		"ItemShopTags"					"purge"
+		"ItemQuality"					"artifact"
+		"ItemAliases"					"celestial claws"
+		"ItemPermanent"					"0"
+		"ItemStackable"					"0"
+		"ItemKillable"					"1"
+		"ItemSellable"					"1"
+		"ItemDroppable"					"1"
+		"SecretShop"					"1"
+		"AbilityCooldown"				"1.0"
+		"ItemBaseLevel"					"3"
+		"MaxUpgradeLevel"				"3"
+		"AllowedInBackpack"				"0"
+
+		// Shops
+		"ItemCost"						"50000"
+//		"ItemInitialStockTime"			"1470.0"
+//		"ItemStockMax"					"2" 
+//		"ItemStockTime"					"30.0"
+//		"ItemStockInitial"				"0"
+
+		"Model"							"models/props_gameplay/red_box.vmdl"
+		"Effect"						"particles/units/heroes/hero_stormspirit/stormspirit_overload_ambient.vpcf"
+
+		"UIPickupSound"					"Item.PickUpGemShop"
+		"UIDropSound"					"Item.DropGemShop"
+		"WorldDropSound"				"Item.DropGemWorld"
+
+		"AbilitySpecial"
 		{
-			"RunScript"
+			"01"
 			{
-				"ScriptFile"	"items/global.lua"
-				"Function"		"EquipOrbs"
+				"var_type"				"FIELD_INTEGER"
+				"bonus_damage"			"1350"
 			}
-
-			"DelayedAction"
+			"02"
 			{
-				"Delay"		"0.1"
-				"Action"
-				{
-					"ApplyModifier"
-					{
-						"ModifierName"	"modifier_orb_of_lightning"
-						"Target"		"CASTER"
-					}
-				}
+				"var_type"				"FIELD_INTEGER"
+				"purge_chance"			"10"
 			}
-		}
-
-		"Modifiers"
-		{
-			"modifier_orb_of_lightning"
+			"03"
 			{
-				"Passive"			"0"
-				"IsHidden"			"0"
-				"Attributes"		"MODIFIER_ATTRIBUTE_PERMANENT"
-				"TextureName"		"modifiers/orb_of_lightning"
-
-				"EffectName"		"particles/custom/items/orb/orb_of_lightning/orb.vpcf"
-				"EffectAttachType"	"follow_origin"
-
-				"OnAttackLanded"
-				{
-					"Random"
-					{
-						"Chance"			"%purge_chance"
-						"OnSuccess"
-						{
-							"RunScript"
-							{
-								"ScriptFile"	"items/global.lua"
-								"Function"		"Purge"
-							}
-						}
-					}
-				}
+				"var_type"				"FIELD_INTEGER"
+				"duration"				"3"
 			}
-
-			"modifier_orb_attributes"
+			"04"
 			{
-				"Passive"			"1"
-				"IsHidden"			"1"
-				"Attributes"		"MODIFIER_ATTRIBUTE_MULTIPLE"
-	
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE"		"%bonus_damage"
-					"MODIFIER_PROPERTY_MOVESPEED_BONUS_CONSTANT"	"%bonus_movespeed"
-				}
+				"var_type"				"FIELD_INTEGER"
+				"bonus_movespeed"		"20"
 			}
-
-			"modifier_purge"
+			"05"
 			{
-				"TextureName"       "modifiers/orb_of_lightning"
-				"IsDebuff"          "1"
-				"IsPurgable"        "1"
-
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE" "%movespeed_slow" 
-				}
-
-				"States"
-				{
-					"MODIFIER_STATE_DISARMED"		"MODIFIER_STATE_VALUE_ENABLED"
-					"MODIFIER_STATE_ROOTED"			"MODIFIER_STATE_VALUE_ENABLED"
-				}
+				"var_type"				"FIELD_INTEGER"
+				"purge_cooldown"		"10"
+			}
+			"06"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"damage_to_summons"		"300"
+			}
+			"07"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"bat_reduction"			"0.2"
 			}
 		}
 	}
@@ -1043,420 +1117,6 @@
 				{
 					"MODIFIER_STATE_STUNNED"		"MODIFIER_STATE_VALUE_ENABLED"
 					"MODIFIER_STATE_FROZEN"			"MODIFIER_STATE_VALUE_ENABLED"
-				}
-			}
-		}
-	}
-
-	//=================================================================================================================
-	// Orb of Lightning 2
-	//=================================================================================================================
-	"item_orb_of_lightning2"
-	{
-		"ID"							"2541"
-		"BaseClass"						"item_datadriven"
-		"AbilityTextureName"			"custom/orb_of_lightning2"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-		"AbilityCooldown"				"10.0"
-		"ItemShareability"				"ITEM_FULLY_SHAREABLE"      
-		"ItemShopTags"					"purge"
-		"ItemQuality"					"artifact"
-		"ItemAliases"					"orb of lightning 2"
-		"ItemPermanent"					"0"
-		"ItemStackable"					"0"
-		"ItemKillable"					"1"
-		"ItemSellable"					"1"
-		"ItemDroppable"					"1"
-		"AbilityCooldown"				"10.0"
-		"ItemBaseLevel"					"2"
-		"MaxUpgradeLevel"				"3"
-
-		// Shops
-		"ItemCost"						"20000"
-//		"ItemInitialStockTime"			"990.0"
-//		"ItemStockMax"					"2" 
-//		"ItemStockTime"					"30.0"
-//		"ItemStockInitial"				"0"
-
-		"Model"							"models/props_gameplay/red_box.vmdl"
-		"Effect"						"particles/units/heroes/hero_stormspirit/stormspirit_overload_ambient.vpcf"
-
-		"UIPickupSound"					"Item.PickUpGemShop"
-		"UIDropSound"					"Item.DropGemShop"
-		"WorldDropSound"				"Item.DropGemWorld"
-
-		"AbilitySpecial"
-		{
-			"01"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_damage"			"450"
-			}
-			"02"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"purge_chance"			"10"
-			}
-			"03"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"movespeed_slow"		"-50"
-			}
-			"04"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"duration"				"3"
-			}
-			"05"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_movespeed"		"10"
-			}
-		}
-
-		"OnEquip"
-		{
-			"RunScript"
-			{
-				"ScriptFile"	"items/global.lua"
-				"Function"		"EquipOrbs"
-			}
-
-			"DelayedAction"
-			{
-				"Delay"		"0.1"
-				"Action"
-				{
-					"ApplyModifier"
-					{
-						"ModifierName"	"modifier_orb_of_lightning"
-						"Target"		"CASTER"
-					}
-				}
-			}
-		}
-
-		"OnUnequip"
-		{
-			"RemoveModifier"
-			{
-				"ModifierName"	"modifier_orb_of_lightning"
-				"Target" 		"CASTER"
-			}
-		}
-
-		"OnSpellStart"
-		{
-			"RunScript"
-			{
-				"ScriptFile"	"items/global.lua"
-				"Function"		"EquipOrbs"
-			}
-
-			"DelayedAction"
-			{
-				"Delay"		"0.1"
-				"Action"
-				{
-					"ApplyModifier"
-					{
-						"ModifierName"	"modifier_orb_of_lightning"
-						"Target"		"CASTER"
-					}
-				}
-			}
-		}
-
-		"Modifiers"
-		{
-			"modifier_orb_of_lightning"
-			{
-				"Passive"			"0"
-				"IsHidden"			"0"
-				"Attributes"		"MODIFIER_ATTRIBUTE_PERMANENT"
-				"TextureName"		"modifiers/orb_of_lightning2"
-
-				"EffectName"		"particles/custom/items/orb/orb_of_lightning/orb.vpcf"
-				"EffectAttachType"	"follow_origin"
-
-				"OnAttackLanded"
-				{
-					"Random"
-					{
-						"Chance"			"%purge_chance"
-						"OnSuccess"
-						{
-							"RunScript"
-							{
-								"ScriptFile"	"items/global.lua"
-								"Function"		"Purge"
-							}
-						}
-					}
-				}
-			}
-
-			"modifier_orb_attributes"
-			{
-				"Passive"			"1"
-				"IsHidden"			"1"
-				"Attributes"		"MODIFIER_ATTRIBUTE_MULTIPLE"
-	
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE"		"%bonus_damage"
-					"MODIFIER_PROPERTY_MOVESPEED_BONUS_CONSTANT"	"%bonus_movespeed"
-				}
-			}
-
-			"modifier_purge"
-			{
-				"TextureName"       "modifiers/orb_of_lightning"
-				"IsDebuff"          "1"
-				"IsPurgable"        "1"
-
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE" "%movespeed_slow"
-				}
-
-				"States"
-				{
-					"MODIFIER_STATE_DISARMED"		"MODIFIER_STATE_VALUE_ENABLED"
-					"MODIFIER_STATE_ROOTED"			"MODIFIER_STATE_VALUE_ENABLED"
-				}
-			}
-		}
-	}
-
-	//=================================================================================================================
-	// Recipe: Orb of Lightning 2
-	//=================================================================================================================
-	"item_recipe_orb_of_lightning2"
-	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"ID"							"2540"
-		"BaseClass"             		"item_datadriven"
-		"Model"							"models/props_gameplay/recipe.mdl"
-		"AbilityTextureName"			"custom/recipe"
-		
-		// Item Info
-		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"						"10000"	
-		"ItemShopTags"					""
-//		"ItemInitialStockTime"			"990.0"
-//		"ItemStockMax"					"2" 
-//		"ItemStockTime"					"30.0"
-//		"ItemStockInitial"				"0"
-		
-		// Recipe
-		//-------------------------------------------------------------------------------------------------------------
-		"ItemRecipe"					"1"
-		"ItemResult"					"item_orb_of_lightning2"
-		"ItemRequirements"
-		{
-			"01"						"item_orb_of_lightning"
-		}
-	}
-
-	//=================================================================================================================
-	// Celestial Claws
-	//=================================================================================================================
-	"item_celestial_claws"
-	{
-		"ID"							"2542"
-		"BaseClass"						"item_datadriven"
-		"AbilityTextureName"			"custom/celestial_claws"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-		"ItemShareability"				"ITEM_FULLY_SHAREABLE"      
-		"ItemShopTags"					"purge"
-		"ItemQuality"					"artifact"
-		"ItemAliases"					"celestial claws"
-		"ItemPermanent"					"0"
-		"ItemStackable"					"0"
-		"ItemKillable"					"1"
-		"ItemSellable"					"1"
-		"ItemDroppable"					"1"
-		"SecretShop"					"1"
-		"AbilityCooldown"				"10.0"
-		"ItemBaseLevel"					"3"
-		"MaxUpgradeLevel"				"3"
-		"AllowedInBackpack"				"0"
-
-		// Shops
-		"ItemCost"						"50000"
-//		"ItemInitialStockTime"			"1470.0"
-//		"ItemStockMax"					"2" 
-//		"ItemStockTime"					"30.0"
-//		"ItemStockInitial"				"0"
-
-		"Model"							"models/props_gameplay/red_box.vmdl"
-		"Effect"						"particles/units/heroes/hero_stormspirit/stormspirit_overload_ambient.vpcf"
-
-		"UIPickupSound"					"Item.PickUpGemShop"
-		"UIDropSound"					"Item.DropGemShop"
-		"WorldDropSound"				"Item.DropGemWorld"
-
-		"AbilitySpecial"
-		{
-			"01"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_damage"			"1350"
-			}
-			"02"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"purge_chance"			"10"
-			}
-			"03"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"movespeed_slow"		"-50"
-			}
-			"04"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"duration"				"3"
-			}
-			"05"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_movespeed"		"20"
-			}
-			"07"
-			{
-				"var_type"				"FIELD_FLOAT"
-				"bat_reduction"			"0.2"
-			}
-		}
-
-		"OnEquip"
-		{
-			"RunScript"
-			{
-				"ScriptFile"    "items/claws_of_attack.lua"
-				"Function"      "EquipClaws"
-			}
-
-			"RunScript"
-			{
-				"ScriptFile"	"items/global.lua"
-				"Function"		"EquipOrbs"
-			}
-
-			"DelayedAction"
-			{
-				"Delay"		"0.1"
-				"Action"
-				{
-					"ApplyModifier"
-					{
-						"ModifierName"	"modifier_orb_of_lightning"
-						"Target"		"CASTER"
-					}
-				}
-			}
-		}
-
-		"OnUnequip"
-		{
-			"RemoveModifier"
-			{
-				"ModifierName"	"modifier_orb_of_lightning"
-				"Target" 		"CASTER"
-			}
-		}
-
-		"OnSpellStart"
-		{
-			"RunScript"
-			{
-				"ScriptFile"	"items/global.lua"
-				"Function"		"EquipOrbs"
-			}
-
-			"DelayedAction"
-			{
-				"Delay"		"0.1"
-				"Action"
-				{
-					"ApplyModifier"
-					{
-						"ModifierName"	"modifier_orb_of_lightning"
-						"Target"		"CASTER"
-					}
-				}
-			}
-		}
-
-		"OnUnequip"
-		{
-			"RunScript"
-			{
-				"ScriptFile"    "items/claws_of_attack.lua"
-				"Function"      "UnequipClaws"
-			}
-		}
-
-		"Modifiers"
-		{
-			"modifier_orb_of_lightning"
-			{
-				"Passive"			"0"
-				"IsHidden"			"0"
-				"Attributes"		"MODIFIER_ATTRIBUTE_PERMANENT"
-				"TextureName"		"modifiers/celestial_claws"
-	
-				"EffectName"		"particles/custom/items/orb/orb_of_lightning/orb.vpcf"
-				"EffectAttachType"	"follow_origin"
-
-				"OnAttackLanded"
-				{
-					"Random"
-					{
-						"Chance"			"%purge_chance"
-						"OnSuccess"
-						{
-							"RunScript"
-							{
-								"ScriptFile"	"items/global.lua"
-								"Function"		"Purge"
-							}
-						}
-					}
-				}
-			}
-
-			"modifier_orb_attributes"
-			{
-				"Passive"			"1"
-				"IsHidden"			"1"
-				"Attributes"		"MODIFIER_ATTRIBUTE_MULTIPLE"
-	
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE"		"%bonus_damage"
-					"MODIFIER_PROPERTY_MOVESPEED_BONUS_CONSTANT"	"%bonus_movespeed"
-				}
-			}
-
-			"modifier_purge"
-			{
-				"TextureName"		"modifiers/orb_of_lightning"
-				"IsDebuff"			"1"
-				"IsPurgable"		"1"
-
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE" "%movespeed_slow" 
-				}
-
-				"States"
-				{
-					"MODIFIER_STATE_DISARMED"		"MODIFIER_STATE_VALUE_ENABLED"
-					"MODIFIER_STATE_ROOTED"			"MODIFIER_STATE_VALUE_ENABLED"
 				}
 			}
 		}

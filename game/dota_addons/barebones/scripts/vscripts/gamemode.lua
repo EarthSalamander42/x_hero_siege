@@ -30,6 +30,8 @@ require('triggers')
 require('items/global')
 require('api/api')
 
+require('components/demo/init')
+
 -- new bosses system
 require('boss_scripts/boss_functions')
 
@@ -54,8 +56,12 @@ function GameMode:OnAllPlayersLoaded()
 end
 
 function GameMode:OnHeroInGame(hero)
-local id = hero:GetPlayerID()
-local point = Entities:FindByName(nil, "hero_selection_"..id)
+	local id = hero:GetPlayerID()
+	local point = Entities:FindByName(nil, "hero_selection_"..id)
+
+	if GetMapName() == "x_hero_siege_demo" then
+		point = Entities:FindByName(nil, "npc_dota_spawner_good_mid_staging")
+	end
 
 	if hero:GetUnitName() == "npc_dota_hero_wisp" then
 		hero:SetAbilityPoints(0)
@@ -225,8 +231,7 @@ function GameMode:InitGameMode()
 						end
 					end
 					hero:EmitSound("Hero_TemplarAssassin.Trap")
-				end
-				if item:GetName() == ring and ring_first_time then
+				elseif item:GetName() == ring and ring_first_time then
 					SPECIAL_EVENT = 0
 					CustomGameEventManager:Send_ServerToAllClients("hide_timer_special_arena", {})
 					GameMode.SpecialArena_occuring = 0
@@ -246,8 +251,7 @@ function GameMode:InitGameMode()
 						end
 					end
 					hero:EmitSound("Hero_TemplarAssassin.Trap")
-				end
-				if item:GetName() == frost and frost_first_time then
+				elseif item:GetName() == frost and frost_first_time then
 					frost_first_time = false
 					if hero.old_pos then
 						TeleportHero(hero, 3.0, hero.old_pos)
@@ -392,12 +396,15 @@ local newState = GameRules:State_Get()
 			DoEntFire("door_lane"..i, "SetAnimation", "gate_02_close", 0, nil, nil)
 		end
 
-		SpawnHeroesBis()
+		print(GetMapName())
+		if GetMapName() ~= "x_hero_siege_demo" then
+			SpawnHeroesBis()
 
-		-- debug
-		if IsInToolsMode() then
-			Entities:FindByName(nil, "trigger_special_event_tp_off"):Disable()
-			Entities:FindByName(nil, "trigger_special_event"):Enable()
+			-- debug
+			if IsInToolsMode() then
+				Entities:FindByName(nil, "trigger_special_event_tp_off"):Disable()
+				Entities:FindByName(nil, "trigger_special_event"):Enable()
+			end
 		end
 
 		local diff = {"Easy", "Normal", "Hard", "Extreme", "Divine"}
@@ -560,90 +567,92 @@ local Region = {
 	GameTimer()
 
 	if newState == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
-		if SPECIAL_EVENT == 0 then
-			CountdownTimerIncomingWave()
-			CountdownTimerCreepLevel()
-		end
-		if GameMode.SpecialArena_occuring == 1 then
-			CountdownTimerSpecialArena()
-		else
-			CountdownTimerMuradin()
-		end
-		if GameMode.HeroImage_occuring == 1 then
-			CountdownTimerHeroImage()
-		end
-		if GameMode.SpiritBeast_occuring == 1 then
-			CountdownTimerSpiritBeast()
-		end
-		if GameMode.FrostInfernal_occuring == 1 then
-			CountdownTimerFrostInfernal()
-		end
-		if GameMode.AllHeroImages_occuring == 1 then
-			CountdownTimerAllHeroImage()
-		end
-
-		if PHASE ~= 3 then
-			if nTimer_GameTime == XHS_CREEPS_UPGRADE_INTERVAL - 1 then -- 4:30 Min
-				nTimer_CreepLevel = XHS_CREEPS_UPGRADE_INTERVAL + 1
-				CreepLevels(2)
-			elseif nTimer_GameTime == XHS_SPECIAL_EVENT_INTERVAL - 5 then -- 8:55 Min: MURADIN BRONZEBEARD EVENT 1
-				nTimer_GameTime = XHS_SPECIAL_EVENT_INTERVAL - 1
-				nTimer_IncomingWave = XHS_SPECIAL_WAVE_INTERVAL + 1
-				nTimer_CreepLevel = XHS_CREEPS_UPGRADE_INTERVAL + 1
-				RefreshPlayers()
-				Timers:CreateTimer(1, function()
-					SPECIAL_EVENT = 1
-					PauseCreeps()
-					PauseHeroes()
-					Timers:CreateTimer(5, function()
-						MuradinEvent(XHS_MURADIN_EVENT_DURATION)
-						Timers:CreateTimer(3, RestartHeroes())
-					end)
-				end)
-			elseif nTimer_GameTime == XHS_SPECIAL_EVENT_INTERVAL + 1 then --9:00, Muradin End
-				EndMuradinEvent()
-				CreepLevels(3)
-			elseif nTimer_GameTime == XHS_SPECIAL_EVENT_INTERVAL + 6 then --9:05, Muradin End
-				EndMuradinEvent()				
-			elseif nTimer_GameTime == XHS_SPECIAL_EVENT_INTERVAL + XHS_CREEPS_UPGRADE_INTERVAL then -- 1435 - 18:00 Min: FARM EVENT 2
-				CreepLevels(4)
-			elseif nTimer_GameTime == XHS_SPECIAL_EVENT_INTERVAL * 2 - 5 then -- 1435 - 17:55 Min: FARM EVENT 2
-				nTimer_GameTime = XHS_SPECIAL_EVENT_INTERVAL * 2 - 1
-				nTimer_IncomingWave = XHS_SPECIAL_WAVE_INTERVAL + 1
-				RefreshPlayers()
-				Timers:CreateTimer(1, function()
-					SPECIAL_EVENT = 1
-					PauseCreeps()
-					PauseHeroes()
-					Timers:CreateTimer(5, function()
-						FarmEvent(180)
-						Timers:CreateTimer(3, RestartHeroes())
-					end)
-				end)
+		if GetMapName() ~= "x_hero_siege_demo" then
+			if SPECIAL_EVENT == 0 then
+				CountdownTimerIncomingWave()
+				CountdownTimerCreepLevel()
 			end
-		elseif nTimer_GameTime == XHS_SPECIAL_EVENT_INTERVAL * 2 + 1 then -- 1435 - 17:55 Min: FARM EVENT 2
-			PHASE = 2
-			-- no idea why this is not triggering
---		elseif nTimer_GameTime == XHS_SPECIAL_EVENT_INTERVAL * 2 + XHS_PHASE_2_DELAY + 1 then
---		elseif nTimer_GameTime == 1501 then
---			print("END PHASE 2!!!")
---			EndPhase2()
-		end
+			if GameMode.SpecialArena_occuring == 1 then
+				CountdownTimerSpecialArena()
+			else
+				CountdownTimerMuradin()
+			end
+			if GameMode.HeroImage_occuring == 1 then
+				CountdownTimerHeroImage()
+			end
+			if GameMode.SpiritBeast_occuring == 1 then
+				CountdownTimerSpiritBeast()
+			end
+			if GameMode.FrostInfernal_occuring == 1 then
+				CountdownTimerFrostInfernal()
+			end
+			if GameMode.AllHeroImages_occuring == 1 then
+				CountdownTimerAllHeroImage()
+			end
 
-		if nTimer_CreepLevel <= 0 then nTimer_CreepLevel = 1 end
-		if nTimer_SpecialEvent <= 0 then nTimer_SpecialEvent = 1 end
-		if nTimer_SpecialArena <= 0 then nTimer_SpecialArena = 1 end
+			if PHASE ~= 3 then
+				if nTimer_GameTime == XHS_CREEPS_UPGRADE_INTERVAL - 1 then -- 4:30 Min
+					nTimer_CreepLevel = XHS_CREEPS_UPGRADE_INTERVAL + 1
+					CreepLevels(2)
+				elseif nTimer_GameTime == XHS_SPECIAL_EVENT_INTERVAL - 5 then -- 8:55 Min: MURADIN BRONZEBEARD EVENT 1
+					nTimer_GameTime = XHS_SPECIAL_EVENT_INTERVAL - 1
+					nTimer_IncomingWave = XHS_SPECIAL_WAVE_INTERVAL + 1
+					nTimer_CreepLevel = XHS_CREEPS_UPGRADE_INTERVAL + 1
+					RefreshPlayers()
+					Timers:CreateTimer(1, function()
+						SPECIAL_EVENT = 1
+						PauseCreeps()
+						PauseHeroes()
+						Timers:CreateTimer(5, function()
+							MuradinEvent(XHS_MURADIN_EVENT_DURATION)
+							Timers:CreateTimer(3, RestartHeroes())
+						end)
+					end)
+				elseif nTimer_GameTime == XHS_SPECIAL_EVENT_INTERVAL + 1 then --9:00, Muradin End
+					EndMuradinEvent()
+					CreepLevels(3)
+				elseif nTimer_GameTime == XHS_SPECIAL_EVENT_INTERVAL + 6 then --9:05, Muradin End
+					EndMuradinEvent()				
+				elseif nTimer_GameTime == XHS_SPECIAL_EVENT_INTERVAL + XHS_CREEPS_UPGRADE_INTERVAL then -- 1435 - 18:00 Min: FARM EVENT 2
+					CreepLevels(4)
+				elseif nTimer_GameTime == XHS_SPECIAL_EVENT_INTERVAL * 2 - 5 then -- 1435 - 17:55 Min: FARM EVENT 2
+					nTimer_GameTime = XHS_SPECIAL_EVENT_INTERVAL * 2 - 1
+					nTimer_IncomingWave = XHS_SPECIAL_WAVE_INTERVAL + 1
+					RefreshPlayers()
+					Timers:CreateTimer(1, function()
+						SPECIAL_EVENT = 1
+						PauseCreeps()
+						PauseHeroes()
+						Timers:CreateTimer(5, function()
+							FarmEvent(180)
+							Timers:CreateTimer(3, RestartHeroes())
+						end)
+					end)
+				end
+			elseif nTimer_GameTime == XHS_SPECIAL_EVENT_INTERVAL * 2 + 1 then -- 1435 - 17:55 Min: FARM EVENT 2
+				PHASE = 2
+				-- no idea why this is not triggering
+--			elseif nTimer_GameTime == XHS_SPECIAL_EVENT_INTERVAL * 2 + XHS_PHASE_2_DELAY + 1 then
+--			elseif nTimer_GameTime == 1501 then
+--				print("END PHASE 2!!!")
+--				EndPhase2()
+			end
 
-		if nTimer_IncomingWave <= 0 then
-			nTimer_IncomingWave = 1
-		elseif nTimer_IncomingWave == 1 then
-			Timers:CreateTimer(1.0, function()
-				SpecialWave()
-			end)
-		elseif nTimer_IncomingWave == 30 and reg <= 8 then
-			Notifications:TopToAll({text="WARNING: "..Region[reg].."!", duration=25.0, style={color="red"}})
-			SpawnRunes()
-			reg = reg + 1
+			if nTimer_CreepLevel <= 0 then nTimer_CreepLevel = 1 end
+			if nTimer_SpecialEvent <= 0 then nTimer_SpecialEvent = 1 end
+			if nTimer_SpecialArena <= 0 then nTimer_SpecialArena = 1 end
+
+			if nTimer_IncomingWave <= 0 then
+				nTimer_IncomingWave = 1
+			elseif nTimer_IncomingWave == 1 then
+				Timers:CreateTimer(1.0, function()
+					SpecialWave()
+				end)
+			elseif nTimer_IncomingWave == 30 and reg <= 8 then
+				Notifications:TopToAll({text="WARNING: "..Region[reg].."!", duration=25.0, style={color="red"}})
+				SpawnRunes()
+				reg = reg + 1
+			end
 		end
 	end
 

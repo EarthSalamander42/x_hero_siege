@@ -160,6 +160,7 @@ HEROLIST[32] = "doom_bringer"
 HEROLIST[33] = "bristleback"
 HEROLIST[34] = "leshrac"
 HEROLIST[35] = "naga_siren"
+HEROLIST[36] = "magnataur"
 
 HEROLIST_VIP = {}
 HEROLIST_VIP[1] = "slardar"			-- Centurion

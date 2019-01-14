@@ -168,6 +168,7 @@
 		<CustomUIElement type="GameSetup"			layoutfile="file://{resources}/layout/custom_game/team_select.xml" />
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/barebones_notifications.xml" />
 <!--	<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/barebones_attachments.xml" /> -->
+		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/hud_hero_demo.xml" /> 
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/boss_healthbar.xml" />
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/hud_main.xml" />
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/xhs_events.xml" />

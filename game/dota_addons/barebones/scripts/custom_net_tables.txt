@@ -10,5 +10,6 @@
 		"game_options",
 		"gold",
 		"game_state",
+		"hero_selection"
 	]
 }

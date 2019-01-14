@@ -52,3 +52,40 @@ function CDOTA_BaseNPC:Lifesteal(hTarget, modifier)
 	ParticleManager:SetParticleControl(lifesteal_pfx, 0, self:GetAbsOrigin())
 	ParticleManager:ReleaseParticleIndex(lifesteal_pfx)
 end
+
+function CDOTA_BaseNPC:FindItemByName(ItemName, bStash)
+	local count = 8
+
+	if bStash == true then
+		count = 14
+	end
+
+	for slot = 0, count do
+		local item = self:GetItemInSlot(slot)
+		if item then
+			if item:GetName() == ItemName then
+				return item
+			end
+		end
+	end
+
+	return nil
+end
+
+function CDOTA_BaseNPC:RemoveItemByName(ItemName, bStash)
+	local count = 8
+
+	if bStash == true then
+		count = 14
+	end
+
+	for slot = 0, count do
+		local item = self:GetItemInSlot(slot)
+		if item then
+			if item:GetName() == ItemName then
+				self:RemoveItem(item)
+				break
+			end
+		end
+	end
+end
