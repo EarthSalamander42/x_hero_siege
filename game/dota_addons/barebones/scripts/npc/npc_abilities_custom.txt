@@ -30041,7 +30041,6 @@
 		"RequiredLevel"					"1"
 		"MaxLevel"						"4"
 
-		
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilitySpecial"
@@ -30066,9 +30065,8 @@
 				"var_type"						"FIELD_INTEGER"
 				"radius"						"325"
 			}
-
 		}
-		
+
 		"Modifiers"
 		{
 			"modifier_empower_aura"

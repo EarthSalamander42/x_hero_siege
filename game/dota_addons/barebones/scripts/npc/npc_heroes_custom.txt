@@ -1811,7 +1811,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"Ability1"					"magnataur_shockwave"
 		"Ability2"					"holdout_empower"
-		"Ability3"					"magnataur_skewer"
+		"Ability3"					"magnataur_skewer_winter"
 		"Ability4"					"holdout_endurance_aura"
 		"Ability5"					"holdout_roar"
 		"Ability6"					"magnataur_reverse_polarity"

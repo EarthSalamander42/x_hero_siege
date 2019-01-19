@@ -30,7 +30,10 @@ require('triggers')
 require('items/global')
 require('api/api')
 
-require('components/demo/init')
+if GetMapName() == "x_hero_siege_demo" then
+	require('components/hero_selection/init')
+	require('components/demo/init')
+end
 
 -- new bosses system
 require('boss_scripts/boss_functions')

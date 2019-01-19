@@ -3630,15 +3630,15 @@
 		"AbilityCastAnimation"		"ACT_DOTA_CAST_ABILITY_1"
 	}
 
-
 	//=================================================================================================================
 	// Magnataur: Skewer
 	//=================================================================================================================
-	"magnataur_skewer"
+	"magnataur_skewer_winter"
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"ID"							"5520"														// unique ID number for this ability.  Do not change this once established or it will invalidate collected stats.
+		"AbilityTextureName"			"custom/holdout_skewer"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_ROOT_DISABLES"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
@@ -3667,7 +3667,7 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"skewer_speed"					"950"
+				"skewer_speed"				"950"
 			}
 			"02"
 			{
@@ -3683,12 +3683,12 @@
 			"04"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"skewer_radius"				"135"
+				"skewer_radius"			"135"
 			}
 			"05"
 			{
 				"var_type"				"FIELD_FLOAT"
-				"slow_duration"				"3.25"
+				"slow_duration"			"3.25"
 			}			
 			"06"
 			{
@@ -3698,12 +3698,12 @@
 			"07"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"tree_radius"				"200"
+				"tree_radius"			"200"
 			}
 			"08"
 			{
-				"var_type"					"FIELD_INTEGER"
-				"strength_gain"				"1 2 3 4"
+				"var_type"				"FIELD_INTEGER"
+				"strength_gain"			"1 2 3 4"
 			}
 			"09"
 			{
