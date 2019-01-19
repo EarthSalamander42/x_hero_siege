@@ -1,0 +1,1836 @@
+"DOTAHeroes"
+{
+	//======================================================================================================
+	// HERO: Pit Lord (Abyssal Underlord)
+	//======================================================================================================
+	"npc_dota_hero_abyssal_underlord_holdout"
+	{
+		"override_hero"					"npc_dota_hero_abyssal_underlord"
+//		"DisableWearables"				"1"
+		"MovementSpeed"					"340"
+		"ModelScale"					"1.0"
+		"AttackDamageMin"				"30"
+		"AttackDamageMax"				"40"
+		"AttackRange"					"180"
+		"HealthBarOffset"				"190"
+
+		"AttributeStrengthGain"			"10"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"5"
+
+		"Ability1"						"holdout_firestorm"
+		"Ability2"						"holdout_war_thunder"
+		"Ability3"						"holdout_unholy_aura"		
+		"Ability4"						"holdout_rain_of_chaos"
+		"Ability5"						"holdout_innate_great_cleave"
+		"Ability6"						"holdout_doom"
+		"Ability7"						""
+		"Ability8"						""
+		"Ability9"						""
+		"Ability10"						""
+		"Ability11"						""
+		"Ability12"						""
+		"Ability13"						""
+		"Ability14"						""
+		"Ability15"						""
+		"Ability16"						""
+		"Ability17"						""
+	}
+
+	//======================================================================================================
+	// HERO: Axe
+	//======================================================================================================
+	"npc_dota_hero_axe_holdout"
+	{
+		"override_hero"					"npc_dota_hero_axe"
+//		"DisableWearables"				"1"
+		"MovementSpeed"					"360"
+		"ModelScale"					"1.06"
+		"AttackDamageMin"				"25"
+		"AttackDamageMax"				"35"
+		"AttackRange"					"180"
+		"HealthBarOffset"				"190"
+
+		"AttributeStrengthGain"			"10"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"5"
+
+		"Ability1"						"axe_berserkers_call"
+		"Ability2"						"axe_counter_helix"
+		"Ability3"						"axe_battle_rage"		
+		"Ability4"						"holdout_spiked_carapace"
+		"Ability5"						"holdout_berserkers_rage"
+		"Ability6"						"holdout_culling_blade"
+		"Ability7"						""
+		"Ability8"						""
+		"Ability9"						""
+		"Ability10"						""
+		"Ability11"						""
+		"Ability12"						""
+		"Ability13"						""
+		"Ability14"						""
+		"Ability15"						""
+		"Ability16"						""
+		"Ability17"						""
+	}
+
+	//======================================================================================================
+	// HERO: Beastmaster( Lone Druid )
+	//======================================================================================================
+	"npc_dota_hero_lone_druid_holdout"
+	{
+		"override_hero"					"npc_dota_hero_lone_druid"
+//		"DisableWearables"				"1"
+		"MovementSpeed"					"350"
+		"ModelScale"					"1.0"
+
+		"HealthBarOffset"				"190"
+		"AttackDamageMin"				"49"
+		"AttackDamageMax"				"61"
+		"AttackCapabilities"			"DOTA_UNIT_CAP_RANGED_ATTACK"
+		"ProjectileModel"				"particles/units/heroes/hero_lone_druid/lone_druid_base_attack.vpcf"
+		"ProjectileSpeed"				"900"
+		"AttackRange"					"550"
+
+		"AttributeStrengthGain"			"5"
+		"AttributeAgilityGain"			"10"
+		"AttributeIntelligenceGain"		"5"
+		"AttributePrimary"				"DOTA_ATTRIBUTE_AGILITY"
+
+		"Ability1"						"lone_druid_spirit_bear"
+		"Ability2"						"holdout_bear_stun"
+		"Ability3"						"xhs_vampiric_aura"
+		"Ability4"						"holdout_endurance_aura"
+		"Ability5"						"holdout_roar"
+		"Ability6"						"holdout_beastmaster_stampede"
+		"Ability7"						""
+		"Ability8"						""
+		"Ability9"						""
+		"Ability10"						""
+		"Ability11"						""
+		"Ability12"						""
+		"Ability13"						""
+		"Ability14"						""
+		"Ability15"						""
+		"Ability16"						""
+		"Ability17"						""
+	}
+
+	//======================================================================================================
+	// HERO: Brewmaster( Brewmaster )
+	//======================================================================================================
+	"npc_dota_hero_brewmaster_holdout"
+	{
+		"override_hero"					"npc_dota_hero_brewmaster"
+//		"DisableWearables"				"1"
+		"MovementSpeed"					"360"
+		"ModelScale"					"1.0"
+
+		"AttributeStrengthGain"			"10"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"5"
+
+		"Ability1"						"xhs_brewmaster_drunken_haze"
+		"Ability2"						"holdout_dragon_slave"
+		"Ability3"						"holdout_drunken_brawler"
+		"Ability4"						"holdout_permanent_immolation"
+		"Ability5"						"shadow_shaman_shackles"
+		"Ability6"						"holdout_earthquake"
+		"Ability7"						""
+		"Ability8"						""
+		"Ability9"						""
+		"Ability10"						""
+		"Ability11"						""
+		"Ability12"						""
+		"Ability13"						""
+		"Ability14"						""
+		"Ability15"						""
+		"Ability16"						""
+		"Ability17"						""
+	}
+
+	//======================================================================================================
+	// HERO: Brewmaster( Bristleback )
+	//======================================================================================================
+	"npc_dota_hero_bristleback_holdout"
+	{
+		"override_hero"					"npc_dota_hero_bristleback"
+//		"DisableWearables"				"1"
+		"MovementSpeed"					"340"
+		"ModelScale"					"1.1"
+
+		"AttributeStrengthGain"			"10"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"5"
+
+		"Ability1"						"bristleback_viscous_nasal_goo"
+		"Ability2"						"bristleback_quill_spray"
+		"Ability3"						"holdout_bristleback"
+		"Ability4"						"holdout_command_aura"
+		"Ability5"						"bristleback_warpath"
+		"Ability6"						"imba_sven_storm_bolt"
+		"Ability7"						""
+		"Ability8"						""
+		"Ability9"						""
+		"Ability10"						""
+		"Ability11"						""
+		"Ability12"						""
+		"Ability13"						""
+		"Ability14"						""
+		"Ability15"						""
+		"Ability16"						""
+		"Ability17"						""
+	}
+
+	//======================================================================================================
+	// HERO: Dark Fundamental( Chaos Knight )
+	//======================================================================================================
+	"npc_dota_hero_chaos_knight_holdout"
+	{
+		"override_hero"					"npc_dota_hero_chaos_knight"
+//		"DisableWearables"				"1"
+		"MovementSpeed"					"335"
+		"ModelScale"					"1.1"
+
+		"AttackDamageMin"				"40"
+		"AttackDamageMax"				"55"
+		"ArmorPhysical"					"7.0"
+		"AttributePrimary"				"DOTA_ATTRIBUTE_INTELLECT"
+		"AttributeBaseStrength"			"26"
+		"AttributeBaseAgility"			"21"
+		"AttributeBaseIntelligence"		"19"
+		"AttributeStrengthGain"			"5"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"5"
+
+		"Ability1"						"holdout_power_mount_int"
+		"Ability2"						"holdout_dark_cleave"
+		"Ability3"						"holdout_instakill"		
+		"Ability4"						"holdout_requiem"
+		"Ability5"						"holdout_skin_changer_caster"
+		"Ability6"						"holdout_odin"
+		"Ability7"						"holdout_power_mount_agi"
+		"Ability8"						"holdout_power_mount_str"
+		"Ability9"						""
+		"Ability10"						""
+		"Ability11"						""
+		"Ability12"						""
+		"Ability13"						""
+		"Ability14"						""
+		"Ability15"						""
+		"Ability16"						""
+		"Ability17"						""
+	}
+
+	//======================================================================================================
+	// HERO: Archimage( Chen )
+	//======================================================================================================
+	"npc_dota_hero_chen_holdout"
+	{
+		"override_hero"					"npc_dota_hero_chen"
+//		"DisableWearables"				"1"
+		"MovementSpeed"					"370"
+
+		"AttributeBaseStrength"			"14"
+		"AttributeBaseAgility"			"25"
+		"AttributeBaseIntelligence"		"25"
+		"AttributeStrengthGain"			"5"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"10"
+
+		"Ability1"						"holdout_blizzard"
+		"Ability2"						"holdout_summon_water_elemental"
+		"Ability3"						"holdout_debilitation_aura"
+		"Ability4"						"holdout_frostbolt"
+		"Ability5"						"holdout_magic_shield"
+		"Ability6"						"holdout_monsoon"
+		"Ability7"						""
+		"Ability8"						""
+		"Ability9"						""
+		"Ability10"						""
+		"Ability11"						""
+		"Ability12"						""
+		"Ability13"						""
+		"Ability14"						""
+		"Ability15"						""
+		"Ability16"						""
+		"Ability17"						""
+	}
+
+	//======================================================================================================
+	// HERO: Archmage - Naira ( Crystal Maiden )
+	//======================================================================================================
+	"npc_dota_hero_crystal_maiden_holdout"
+	{
+		"override_hero"					"npc_dota_hero_crystal_maiden"
+//		"DisableWearables"				"1"
+		"ModelScale"					"0.9"
+		"MovementSpeed"					"360"
+
+		"AttackDamageMin"				"55"
+		"AttackDamageMax"				"70"
+		"AttributeStrengthGain"			"5"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"10"
+
+		"Ability1"						"holdout_crushing_wave"
+		"Ability2"						"holdout_summon_water_elemental"
+		"Ability3"						"holdout_debilitation_aura"		
+		"Ability4"						"holdout_drain"
+		"Ability5"						"holdout_mana_shield"
+		"Ability6"						"holdout_elemental_wave"
+		"Ability7"						""
+		"Ability8"						""
+		"Ability9"						""
+		"Ability10"						""
+		"Ability11"						""
+		"Ability12"						""
+		"Ability13"						""
+		"Ability14"						""
+		"Ability15"						""
+		"Ability16"						""
+		"Ability17"						""
+	}
+
+	//======================================================================================================
+	// HERO: Doom (Dota 2 Hero)
+	//======================================================================================================
+	"npc_dota_hero_doom_holdout"
+	{
+		"override_hero"					"npc_dota_hero_doom_bringer"
+//		"DisableWearables"				"1"
+		"MovementSpeed"					"350"
+		"ModelScale"					"0.95" //0.84
+
+		"AttackDamageMin"				"31"
+		"AttackDamageMax"				"37"
+		"AttributeStrengthGain"			"10"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"5"
+
+		"Ability1"						"holdout_devour"
+		"Ability2"						"doom_bringer_scorched_earth"
+		"Ability3"						"doom_bringer_infernal_blade"		
+		"Ability4"						"doom_bringer_empty1"
+		"Ability5"						"doom_bringer_empty2"
+		"Ability6"						"doom_bringer_doom"
+		"Ability7"						""
+		"Ability8"						""
+		"Ability9"						""
+		"Ability10"						""
+		"Ability11"						""
+		"Ability12"						""
+		"Ability13"						""
+		"Ability14"						""
+		"Ability15"						""
+		"Ability16"						""
+		"Ability17"						""
+	}
+
+	//======================================================================================================
+	// HERO: Arthas( Dragon Knight )
+	//======================================================================================================
+	"npc_dota_hero_dragon_knight_holdout"
+	{
+		"override_hero"					"npc_dota_hero_dragon_knight"
+		"Model"							"models/heroes/arthas/arthas_prince/arthas_prince.vmdl"
+		"DisableWearables"				"1"
+		"MovementSpeed"					"350"
+		"ModelScale"					"0.78" //0.84
+		"AttackAnimationPoint"			"0.3" // 0.5
+
+		"AttackDamageMin"				"21"
+		"AttackDamageMax"				"27"
+		"AttributeStrengthGain"			"10"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"5"
+
+		"Ability1"						"holdout_holy_light"
+		"Ability2"						"holdout_divine_shield"
+		"Ability3"						"holdout_chieftain_endurance_aura"		
+		"Ability4"						"holdout_frostmourne"
+		"Ability5"						"holdout_innate_great_cleave"
+		"Ability6"						"holdout_light_roar"
+		"Ability7"						""
+		"Ability8"						""
+		"Ability9"						""
+		"Ability10"						""
+		"Ability11"						""
+		"Ability12"						""
+		"Ability13"						""
+		"Ability14"						""
+		"Ability15"						""
+		"Ability16"						""
+		"Ability17"						""
+	}
+
+	//======================================================================================================
+	// HERO: Spirit Master (Earth Spirit)
+	//======================================================================================================
+	"npc_dota_hero_earth_spirit_holdout"
+	{
+		"override_hero"					"npc_dota_hero_earth_spirit"
+		"ModelScale"					"1.1"
+//		"DisableWearables"				"1"
+		"MovementSpeed"					"350"
+		"AttackRange"					"250"
+
+		"AttributePrimary"				"DOTA_ATTRIBUTE_STRENGTH"
+		"AttributeStrengthGain"			"10"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"5"
+
+		"Ability1"						"monkey_king_boundless_strike"
+		"Ability2"						"holdout_chaos"
+		"Ability3"						"holdout_command_aura"
+		"Ability4"						"holdout_shield"
+		"Ability5"						"holdout_spirit_str"
+		"Ability6"						"holdout_enhanced_spirit"
+		"Ability7"						""
+		"Ability8"						""
+		"Ability9"						""
+		"Ability10"						""
+		"Ability11"						""
+		"Ability12"						""
+		"Ability13"						""
+		"Ability14"						""
+		"Ability15"						""
+		"Ability16"						""
+		"Ability17"						""
+	}
+
+	//======================================================================================================
+	// HERO: Tauren Chieftain( Tauren Chieftain )
+	//======================================================================================================
+	"npc_dota_hero_elder_titan_holdout"
+	{
+		"override_hero"					"npc_dota_hero_elder_titan"
+//		"DisableWearables"				"1"
+		"MovementSpeed"					"365"
+		"AttackRange"					"150"
+
+		"AttributeStrengthGain"			"10"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"5"
+
+		"Ability1"						"holdout_shockwave"
+		"Ability2"						"holdout_war_stomp"
+		"Ability3"						"holdout_chieftain_endurance_aura"
+		"Ability4"						"holdout_pulverize"
+		"Ability5"						"holdout_roar"
+		"Ability6"						"holdout_lightning_stroke"
+		"Ability7"						""
+		"Ability8"						""
+		"Ability9"						""
+		"Ability10"						""
+		"Ability11"						""
+		"Ability12"						""
+		"Ability13"						""
+		"Ability14"						""
+		"Ability15"						""
+		"Ability16"						""
+		"Ability17"						""
+	}
+
+	//======================================================================================================
+	// HERO: Spirit Master (Ember Spirit)
+	//======================================================================================================
+	"npc_dota_hero_ember_spirit_holdout"
+	{
+		"override_hero"					"npc_dota_hero_ember_spirit"
+		"ModelScale"					"1.1"
+//		"DisableWearables"				"1"
+		"MovementSpeed"					"365"
+		"AttackRange"					"150"
+
+		"AttributePrimary"				"DOTA_ATTRIBUTE_AGILITY"
+		"AttributeStrengthGain"			"5"
+		"AttributeAgilityGain"			"10"
+		"AttributeIntelligenceGain"		"5"
+
+		"Ability1"						"ember_spirit_searing_chains"
+		"Ability2"						"ember_spirit_sleight_of_fist"
+		"Ability3"						"holdout_chieftain_endurance_aura"
+		"Ability4"						"ember_spirit_flame_guard"
+		"Ability5"						"holdout_spirit_agi"
+		"Ability6"						"holdout_enhanced_spirit"
+		"Ability7"						""
+		"Ability8"						""
+		"Ability9"						""
+		"Ability10"						""
+		"Ability11"						""
+		"Ability12"						""
+		"Ability13"						""
+		"Ability14"						""
+		"Ability15"						""
+		"Ability16"						""
+		"Ability17"						""
+	}
+
+	//======================================================================================================
+	// HERO: Tyrande( Enchantress )
+	//======================================================================================================
+	"npc_dota_hero_enchantress_holdout"
+	{
+		"override_hero"					"npc_dota_hero_enchantress"
+//		"DisableWearables"				"1"
+		"MovementSpeed"					"355"
+		"AttackDamageMin"				"31"
+		"AttackDamageMax"				"41"
+
+		"AttributeStrengthGain"			"5"
+		"AttributeAgilityGain"			"10"
+		"AttributeIntelligenceGain"		"5"
+		"AttributePrimary"				"DOTA_ATTRIBUTE_AGILITY"
+
+		"Ability1"						"holdout_evasion"
+		"Ability2"						"tyrande_multiple_arrows"
+		"Ability3"						"holdout_critical_arrows"
+		"Ability4"						"holdout_endurance_aura"
+		"Ability5"						"holdout_poison_attack"
+		"Ability6"						"holdout_trueshot_aura"
+		"Ability7"						""
+		"Ability8"						""
+		"Ability9"						""
+		"Ability10"						""
+		"Ability11"						""
+		"Ability12"						""
+		"Ability13"						""
+		"Ability14"						""
+		"Ability15"						""
+		"Ability16"						""
+		"Ability17"						""
+	}
+
+	//======================================================================================================
+	// HERO: Blood Mage (Invoker)
+	//======================================================================================================
+	"npc_dota_hero_invoker_holdout"
+	{
+		"override_hero"					"npc_dota_hero_invoker"
+		"ModelScale"					"0.9"
+		"AttackDamageMin"				"39"
+		"AttackDamageMax"				"45"
+//		"DisableWearables"				"1"
+		"MovementSpeed"					"360"
+		"AttackRange"					"625"
+//		"AttributePrimary"				"DOTA_ATTRIBUTE_AGILITY"
+		"ProjectileModel"				"particles/units/heroes/hero_rubick/rubick_base_attack.vpcf"
+
+		"AttributeStrengthGain"			"5"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"10"
+
+		"Ability1"						"holdout_burning_oil"
+		"Ability2"						"holdout_dragon_slave_alt"
+		"Ability3"						"holdout_incinerate"
+		"Ability4"						"holdout_firebolt"
+		"Ability5"						"shadow_shaman_shackles"
+		"Ability6"						"holdout_phoenix"
+		"Ability7"						"blood_mage_orbs"
+		"Ability8"						""
+		"Ability9"						""
+		"Ability10"						""
+		"Ability11"						""
+		"Ability12"						""
+		"Ability13"						""
+		"Ability14"						""
+		"Ability15"						""
+		"Ability16"						""
+		"Ability17"						""
+		"Ability18"						""
+		"Ability19"						""
+		"Ability20"						""
+		"Ability21"						""
+		"Ability22"						""
+		"Ability23"						""
+		"Ability24"						""
+	}
+
+	//======================================================================================================
+	// HERO: Blademaster( Juggernaut )
+	//======================================================================================================
+	"npc_dota_hero_juggernaut_holdout"
+	{
+		"override_hero"					"npc_dota_hero_juggernaut"
+		"Model"							"models/heroes/juggernaut/juggernaut.vmdl"
+//		"DisableWearables"				"1"
+		"MovementSpeed"					"365"
+		"AttributePrimary"				"DOTA_ATTRIBUTE_STRENGTH"
+
+		"AttributeStrengthGain"			"10"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"5"
+
+		"Ability1"						"holdout_windwalk"
+		"Ability2"						"xhs_blademaster_mirror_image"
+		"Ability3"						"holdout_wardrums_aura"
+		"Ability4"						"holdout_blade_dance"
+		"Ability5"						"holdout_berserkers_rage"
+		"Ability6"						"juggernaut_blade_fury"
+		"Ability7"						""
+		"Ability8"						""
+		"Ability9"						""
+		"Ability10"						""
+		"Ability11"						""
+		"Ability12"						""
+		"Ability13"						""
+		"Ability14"						""
+		"Ability15"						""
+		"Ability16"						""
+		"Ability17"						""
+	}
+
+	//======================================================================================================
+	// HERO: Light Fundamental( Keeper of the Light )
+	//======================================================================================================
+	"npc_dota_hero_keeper_of_the_light_holdout"
+	{
+		"override_hero"					"npc_dota_hero_keeper_of_the_light"
+//		"DisableWearables"				"1"
+		"MovementSpeed"					"375"
+		"ModelScale"					"1.1"
+
+		"AttackDamageMin"				"45"
+		"AttackDamageMax"				"55"
+		"ArmorPhysical"					"0.0"
+		"AttributePrimary"				"DOTA_ATTRIBUTE_INTELLECT"
+		"AttributeBaseStrength"			"26"
+		"AttributeBaseAgility"			"21"
+		"AttributeBaseIntelligence"		"19"
+		"AttributeStrengthGain"			"5"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"5"
+
+		"Ability1"						"holdout_power_mount_int"
+		"Ability2"						"holdout_mechanism"
+		"Ability3"						"holdout_light_stand"		
+		"Ability4"						"holdout_sacred_pool"
+		"Ability5"						"holdout_skin_changer_warrior"
+		"Ability6"						"holdout_guardian_angel"
+		"Ability7"						"holdout_power_mount_agi"
+		"Ability8"						"holdout_power_mount_str"
+		"Ability9"						""
+		"Ability10"						""
+		"Ability11"						""
+		"Ability12"						""
+		"Ability13"						""
+		"Ability14"						""
+		"Ability15"						""
+		"Ability16"						""
+		"Ability17"						""
+	}
+
+	//======================================================================================================
+	// HERO: Leshrac
+	//======================================================================================================
+	"npc_dota_hero_leshrac_holdout"
+	{
+		"override_hero"					"npc_dota_hero_leshrac"
+//		"DisableWearables"				"1"
+		"MovementSpeed"					"370"
+
+		"AttributeStrengthGain"			"5"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"10"
+
+		"Ability1"						"leshrac_split_earth"
+		"Ability2"						"leshrac_diabolic_edict"
+		"Ability3"						"leshrac_lightning_storm"
+		"Ability4"						"leshrac_pulse_nova"
+		"Ability5"						"holdout_spellsteal"
+		"Ability6"						"holdout_earthquake"
+		"Ability7"						""
+		"Ability8"						""
+		"Ability9"						""
+		"Ability10"						""
+		"Ability11"						""
+		"Ability12"						""
+		"Ability13"						""
+		"Ability14"						""
+		"Ability15"						""
+		"Ability16"						""
+		"Ability17"						""
+	}
+
+	//======================================================================================================
+	// HERO: Lich( Lich )
+	//======================================================================================================
+	"npc_dota_hero_lich_holdout"
+	{
+		"override_hero"					"npc_dota_hero_lich"
+//		"DisableWearables"				"1"
+		"MovementSpeed"					"375"
+		"ModelScale"					"1.0"
+
+		"AttributeStrengthGain"			"5"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"10"
+		"ProjectileSpeed"				"1000"
+
+		"Ability1"						"holdout_frost_nova"
+		"Ability2"						"holdout_frost_breath"
+		"Ability3"						"holdout_frost_armor"
+		"Ability4"						"holdout_frost_arrows"
+		"Ability5"						"holdout_frost_frenzy"
+		"Ability6"						"holdout_frost_beast"
+		"Ability7"						""
+		"Ability8"						""
+		"Ability9"						""
+		"Ability10"						""
+		"Ability11"						""
+		"Ability12"						""
+		"Ability13"						""
+		"Ability14"						""
+		"Ability15"						""
+		"Ability16"						""
+		"Ability17"						""
+	}
+
+	//======================================================================================================
+	// HERO: Sorceress (Lina)
+	//======================================================================================================
+	"npc_dota_hero_lina_holdout"
+	{
+		"override_hero"					"npc_dota_hero_lina"
+//		"DisableWearables"				"1"
+		"MovementSpeed"					"360"
+		"ModelScale"					"1.0"
+		"AttributePrimary"				"DOTA_ATTRIBUTE_AGILITY"
+
+		"AttributeStrengthGain"			"5"
+		"AttributeAgilityGain"			"10"
+		"AttributeIntelligenceGain"		"5"
+
+		"Ability1"						"holdout_monsoon_small"
+		"Ability2"						"holdout_phase_shift"
+		"Ability3"						"holdout_life_regeneration_aura"
+		"Ability4"						"holdout_permanent_lightning"
+		"Ability5"						"holdout_resistant_skin"
+		"Ability6"						"pugna_life_drain"
+		"Ability7"						""
+		"Ability8"						""
+		"Ability9"						""
+		"Ability10"						""
+		"Ability11"						""
+		"Ability12"						""
+		"Ability13"						""
+		"Ability14"						""
+		"Ability15"						""
+		"Ability16"						""
+		"Ability17"						""
+	}
+
+	//======================================================================================================
+	// HERO: Huntress( Luna )
+	//======================================================================================================
+	"npc_dota_hero_luna_holdout"
+	{
+		"override_hero"					"npc_dota_hero_luna"
+		"ModelScale"					"1.0"
+//		"DisableWearables"				"1"
+		"MovementSpeed"					"335"
+
+		"AttributeStrengthGain"			"5"
+		"AttributeAgilityGain"			"10"
+		"AttributeIntelligenceGain"		"5"
+
+		"Ability1"						"holdout_owl_lightning"
+		"Ability2"						"holdout_forked_lightning"
+		"Ability3"						"holdout_command_aura"
+		"Ability4"						"holdout_elunes_grace"
+		"Ability5"						"holdout_innate_lunar_glaive"
+		"Ability6"						"holdout_moon_explosion"
+		"Ability7"						""
+		"Ability8"						""
+		"Ability9"						""
+		"Ability10"						""
+		"Ability11"						""
+		"Ability12"						""
+		"Ability13"						""
+		"Ability14"						""
+		"Ability15"						""
+		"Ability16"						""
+		"Ability17"						""
+	}
+
+	//======================================================================================================
+	// HERO: Kobold Knight( Meepo )
+	//======================================================================================================
+	"npc_dota_hero_meepo_holdout"
+	{
+		"override_hero"					"npc_dota_hero_meepo"
+		"ModelScale"					"1.45"
+//		"DisableWearables"				"1"
+		"MovementSpeed"					"345"
+
+		"AttributeStrengthGain"			"5"
+		"AttributeAgilityGain"			"10"
+		"AttributeIntelligenceGain"		"5"
+
+		"Ability1"						"holdout_life_steal"
+		"Ability2"						"meepo_poof"
+		"Ability3"						"holdout_slow_pool"
+		"Ability4"						"holdout_divine_aura"
+		"Ability5"						"holdout_reincarnation"
+		"Ability6"						"holdout_kobold_army"
+		"Ability7"						""
+		"Ability8"						""
+		"Ability9"						""
+		"Ability10"						""
+		"Ability11"						""
+		"Ability12"						""
+		"Ability13"						""
+		"Ability14"						""
+		"Ability15"						""
+		"Ability16"						""
+		"Ability17"						""
+	}
+
+	//======================================================================================================
+	// HERO: Medusa
+	//======================================================================================================
+	"npc_dota_hero_medusa_holdout"
+	{
+		"override_hero"					"npc_dota_hero_medusa"
+		"ModelScale"					"1.1"
+		"MovementSpeed"					"355"
+		"AttackDamageMin"				"65"
+		"AttackDamageMax"				"75"
+
+		"AttributeStrengthGain"			"5"
+		"AttributeAgilityGain"			"10"
+		"AttributeIntelligenceGain"		"5"
+
+		"Ability1"						"medusa_split_shot"
+		"Ability2"						"medusa_mystic_snake"
+		"Ability3"						"holdout_devotion_aura"		
+		"Ability4"						"holdout_trueshot_aura_alt"
+		"Ability5"						"holdout_mana_shield"
+		"Ability6"						"medusa_stone_gaze"
+		"Ability7"						""
+		"Ability8"						""
+		"Ability9"						""
+		"Ability10"						""
+		"Ability11"						""
+		"Ability12"						""
+		"Ability13"						""
+		"Ability14"						""
+		"Ability15"						""
+		"Ability16"						""
+		"Ability17"						""
+	}
+
+	//======================================================================================================
+	// HERO: Priestess of the Moon (Mirana)
+	//======================================================================================================
+	"npc_dota_hero_mirana_holdout"
+	{
+		"override_hero"					"npc_dota_hero_mirana"
+//		"DisableWearables"				"1"
+		"AttributePrimary"				"DOTA_ATTRIBUTE_INTELLECT"
+		"MovementSpeed"					"355"
+		"ModelScale"					"0.95"
+		"AttackDamageMin"				"70"
+		"AttackDamageMax"				"80"
+		"AttackRange"					"530"
+
+		"AttributeStrengthGain"			"5"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"10"
+
+		"Ability1"						"zuus_arc_lightning"
+		"Ability2"						"holdout_watery_minion"
+		"Ability3"						"holdout_distance_aura"		
+		"Ability4"						"holdout_storm_rain"
+		"Ability5"						"holdout_rejuvenation"
+		"Ability6"						"holdout_monsoon"
+		"Ability7"						""
+		"Ability8"						""
+		"Ability9"						""
+		"Ability10"						""
+		"Ability11"						""
+		"Ability12"						""
+		"Ability13"						""
+		"Ability14"						""
+		"Ability15"						""
+		"Ability16"						""
+		"Ability17"						""
+	}
+
+	//======================================================================================================
+	// HERO: Monkey King
+	//======================================================================================================
+	"npc_dota_hero_monkey_king_holdout"
+	{
+		"override_hero"					"npc_dota_hero_monkey_king"
+//		"DisableWearables"				"1"
+		"MovementSpeed"					"360"
+		"ModelScale"					"0.98"
+		"AttackDamageMin"				"50"
+		"AttackDamageMax"				"60"
+//		"AttackRange"					"530"
+
+		"AttributeStrengthGain"			"5"
+		"AttributeAgilityGain"			"10"
+		"AttributeIntelligenceGain"		"5"
+
+		"Ability1"						"monkey_king_boundless_strike"
+		"Ability2"						"monkey_king_tree_dance"
+		"Ability3"						"monkey_king_primal_spring"
+		"Ability4"						"holdout_jingu_mastery"
+		"Ability5"						"holdout_monkey_king_bar"
+		"Ability6"						"holdout_wukong_army"
+		"Ability7"						"monkey_king_primal_spring_early"
+		"Ability8"						""
+		"Ability9"						""
+		"Ability10"						""
+		"Ability11"						""
+		"Ability12"						""
+		"Ability13"						""
+		"Ability14"						""
+		"Ability15"						""
+		"Ability16"						""
+		"Ability17"						""
+	}
+
+	//======================================================================================================
+	// HERO: Dark Summoner (Necrolyte)
+	//======================================================================================================
+	"npc_dota_hero_necrolyte_holdout"
+	{
+		"override_hero"					"npc_dota_hero_necrolyte"
+		"ModelScale"					"0.95"
+//		"DisableWearables"				"1"
+		"MovementSpeed"					"355"
+
+		"AttributePrimary"				"DOTA_ATTRIBUTE_INTELLECT"
+
+		"AttributeStrengthGain"			"5"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"10"
+
+		"Ability1"						"holdout_shadow_bolt"
+		"Ability2"						"holdout_corruption"
+		"Ability3"						"holdout_malefice_aura"
+		"Ability4"						"holdout_consuming_flame"
+		"Ability5"						"holdout_stitch"
+		"Ability6"						"holdout_dark_king"
+		"Ability7"						""
+		"Ability8"						""
+		"Ability9"						""
+		"Ability10"						""
+		"Ability11"						""
+		"Ability12"						""
+		"Ability13"						""
+		"Ability14"						""
+		"Ability15"						""
+		"Ability16"						""
+		"Ability17"						""
+	}
+
+	//======================================================================================================
+	// HERO: Banehallow (Shadow Fiend)
+	//======================================================================================================
+	"npc_dota_hero_nevermore_holdout"
+	{
+		"override_hero"					"npc_dota_hero_nevermore"
+//		"DisableWearables"				"1"
+		"MovementSpeed"					"365"
+
+		"ModelScale"					"1.1"
+		"AttackDamageMin"				"10"
+		"AttackDamageMax"				"15"
+		"AttackRange"					"600"
+		"AttributePrimary"				"DOTA_ATTRIBUTE_STRENGTH"
+		"AttributeBaseStrength"			"29"
+		"AttributeStrengthGain"			"10"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"5"
+		"MovementTurnRate"				"0.5"
+		"HealthBarOffset"				"230"
+
+		"Ability1"						"holdout_bane_death_coil"
+		"Ability2"						"holdout_bane_permanent_immolation"
+		"Ability3"						"holdout_bane_critical"		
+		"Ability4"						"holdout_endurance_aura"
+		"Ability5"						"holdout_command_aura_innate"
+		"Ability6"						"holdout_stampede"
+		"Ability7"						"holdout_green_effect"
+		"Ability8"						""
+		"Ability9"						""
+		"Ability10"						""
+		"Ability11"						""
+		"Ability12"						""
+		"Ability13"						""
+		"Ability14"						""
+		"Ability15"						""
+		"Ability16"						""
+		"Ability17"						""
+	}
+
+	//======================================================================================================
+	// HERO: Crypt Lord( Nyx Assassin )
+	//======================================================================================================
+	"npc_dota_hero_nyx_assassin_holdout"
+	{
+		"override_hero"					"npc_dota_hero_nyx_assassin"
+//		"DisableWearables"				"1"
+		"MovementSpeed"					"355"
+		"AttackDamageMin"				"61"
+		"AttackDamageMax"				"71"
+		"ModelScale"					"1.2"
+
+		"AttributePrimary"				"DOTA_ATTRIBUTE_STRENGTH"
+		"AttributeStrengthGain"			"10"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"5"
+		"AttackCapabilities"			"DOTA_UNIT_CAP_MELEE_ATTACK"
+		"AttackRange"					"160"
+		"ProjectileModel"				""
+		"ProjectileSpeed"				""
+
+		"Ability1"						"nyx_assassin_impale"
+		"Ability2"						"holdout_carrion_beetles"
+		"Ability3"						"holdout_poison_sting"
+		"Ability4"						"holdout_spiked_carapace"
+		"Ability5"						"holdout_anubarak_claw"
+		"Ability6"						"holdout_locust_swarm"
+		"Ability7"						""
+		"Ability8"						""
+		"Ability9"						""
+		"Ability10"						""
+		"Ability11"						""
+		"Ability12"						""
+		"Ability13"						""
+		"Ability14"						""
+		"Ability15"						""
+		"Ability16"						""
+		"Ability17"						""
+	}
+
+	//======================================================================================================
+	// HERO: Paladin (Omniknight)
+	//======================================================================================================
+	"npc_dota_hero_omniknight_holdout"
+	{
+		"override_hero"					"npc_dota_hero_omniknight"
+//		"DisableWearables"				"1"
+		"MovementSpeed"					"365"
+		"AttackDamageMin"				"61"
+		"AttackDamageMax"				"71"
+		"ModelScale"					"0.85"
+
+		"AttributeStrengthGain"			"10"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"5"
+
+		"Ability1"						"holdout_healing_wave"
+		"Ability2"						"holdout_fan_of_light"
+		"Ability3"						"holdout_devotion_aura"
+		"Ability4"						"holdout_howl_of_terror"
+		"Ability5"						"holdout_taunt"
+		"Ability6"						"holdout_pure_light"
+		"Ability7"						""
+		"Ability8"						""
+		"Ability9"						""
+		"Ability10"						""
+		"Ability11"						""
+		"Ability12"						""
+		"Ability13"						""
+		"Ability14"						""
+		"Ability15"						""
+		"Ability16"						""
+		"Ability17"						""
+	}
+
+	//======================================================================================================
+	// HERO: Warden (Phantom Assassin)
+	//======================================================================================================
+	"npc_dota_hero_phantom_assassin_holdout"
+	{
+		"override_hero"					"npc_dota_hero_phantom_assassin"
+//		"DisableWearables"				"1"
+		"MovementSpeed"					"355"
+		"ModelScale"					"1.1"
+		"AttackDamageMin"				"55"
+		"AttackDamageMax"				"70"
+		"AttackRange"					"150"
+		"HealthBarOffset"				"190"
+
+		"AttributeStrengthGain"			"5"
+		"AttributeAgilityGain"			"10"
+		"AttributeIntelligenceGain"		"5"
+
+		"Ability1"						"holdout_heat_seeking_daggers"
+		"Ability2"						"holdout_shadow_strike"
+		"Ability3"						"holdout_permanent_stats"		
+		"Ability4"						"holdout_gust_pool"
+		"Ability5"						"holdout_innate_great_cleave"
+		"Ability6"						"holdout_vengeance"
+		"Ability7"						""
+		"Ability8"						""
+		"Ability9"						""
+		"Ability10"						""
+		"Ability11"						""
+		"Ability12"						""
+		"Ability13"						""
+		"Ability14"						""
+		"Ability15"						""
+		"Ability16"						""
+		"Ability17"						""
+	}
+
+	//======================================================================================================
+	// HERO: Dreadlord (Pugna)
+	//======================================================================================================
+	"npc_dota_hero_pugna_holdout"
+	{
+		"override_hero"					"npc_dota_hero_pugna"
+		"ModelScale"					"0.95"
+//		"DisableWearables"				"1"
+		"MovementSpeed"					"370"
+		"AttackCapabilities"			"DOTA_UNIT_CAP_MELEE_ATTACK"
+		"AttackRange"					"150"
+		"ProjectileModel"				""
+		"ProjectileSpeed"				""
+
+		"AttributePrimary"				"DOTA_ATTRIBUTE_STRENGTH"
+
+		"AttributeStrengthGain"			"10"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"5"
+
+		"Ability1"						"holdout_carrion_swarm"
+		"Ability2"						"holdout_chaos"
+		"Ability3"						"holdout_aura_of_blight"
+		"Ability4"						"holdout_death_coil"
+		"Ability5"						"holdout_sleep"
+		"Ability6"						"holdout_inferno"
+		"Ability7"						""
+		"Ability8"						""
+		"Ability9"						""
+		"Ability10"						""
+		"Ability11"						""
+		"Ability12"						""
+		"Ability13"						""
+		"Ability14"						""
+		"Ability15"						""
+		"Ability16"						""
+		"Ability17"						""
+	}
+
+	//======================================================================================================
+	// HERO: Space Marine (Clockwerk)
+	//======================================================================================================
+	"npc_dota_hero_rattletrap_holdout"
+	{
+		"override_hero"					"npc_dota_hero_rattletrap"
+//		"DisableWearables"				"1"
+		"MovementSpeed"					"365"
+		"ModelScale"					"1.15"
+		"AttackDamageMin"				"65"
+		"AttackDamageMax"				"75"
+		"AttackRange"					"650"
+		"AttackCapabilities"			"DOTA_UNIT_CAP_RANGED_ATTACK"
+		"ProjectileModel"				"particles/econ/items/sniper/sniper_charlie/sniper_assassinate_charlie.vpcf"
+		"ProjectileSpeed"				"1700"
+		"HealthBarOffset"				"170"
+
+		"AttributeStrengthGain"			"10"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"5"
+
+		"Ability1"						"holdout_hurl_bomb"
+		"Ability2"						"holdout_fan_of_rockets"
+		"Ability3"						"holdout_aura_of_blight"		
+		"Ability4"						"holdout_metal_armor"
+		"Ability5"						"pugna_decrepify"
+		"Ability6"						"holdout_clone"
+		"Ability7"						""
+		"Ability8"						""
+		"Ability9"						""
+		"Ability10"						""
+		"Ability11"						""
+		"Ability12"						""
+		"Ability13"						""
+		"Ability14"						""
+		"Ability15"						""
+		"Ability16"						""
+		"Ability17"						""
+	}
+
+	//======================================================================================================
+	// HERO: Desert Wyrm (Sand King)
+	//======================================================================================================
+	"npc_dota_hero_sand_king_holdout"
+	{
+		"override_hero"					"npc_dota_hero_sand_king"
+//		"DisableWearables"				"1"
+		"ModelScale"					"1.06"
+		"AttackDamageMin"				"55"
+		"AttackDamageMax"				"65"
+		"MovementSpeed"					"360"
+		"AttackRange"					"140"
+		"AttributePrimary"				"DOTA_ATTRIBUTE_AGILITY"
+		"ProjectileModel"				"particles/items2_fx/skadi_projectile.vpcf"
+		"ProjectileSpeed"				"900"
+
+		"AttributeStrengthGain"			"5"
+		"AttributeAgilityGain"			"10"
+		"AttributeIntelligenceGain"		"5"
+
+		"Ability1"						"holdout_entrench"
+		"Ability2"						"holdout_tornado_tempest"
+		"Ability3"						"holdout_acid_skin"		
+		"Ability4"						"holdout_endurance_aura"
+		"Ability5"						"holdout_roar"
+		"Ability6"						"holdout_desert_dragon_form"
+		"Ability7"						"holdout_unentrench"
+		"Ability8"						"holdout_arctic_flyout"
+		"Ability9"						"holdout_arctic_breath"
+		"Ability10"						"holdout_arctic_skin"
+		"Ability11"						""
+		"Ability12"						""
+		"Ability13"						""
+		"Ability14"						""
+		"Ability15"						""
+		"Ability16"						""
+		"Ability17"						""
+	}
+
+	//======================================================================================================
+	// HERO: Shadow Hunter( Shadow Shaman )
+	//======================================================================================================
+	"npc_dota_hero_shadow_shaman_holdout"
+	{
+		"override_hero"					"npc_dota_hero_shadow_shaman"
+//		"DisableWearables"				"1"
+		"AttackDamageMin"				"75"
+		"AttackDamageMax"				"85"
+		"MovementSpeed"					"355"
+		"AttributePrimary"				"DOTA_ATTRIBUTE_AGILITY"
+
+		"AttributeStrengthGain"			"5"
+		"AttributeAgilityGain"			"10"
+		"AttributeIntelligenceGain"		"5"
+
+		"Ability1"						"techies_land_mines"
+		"Ability2"						"holdout_serpent_ward"
+		"Ability3"						"holdout_feedback"		
+		"Ability4"						"holdout_voodoo_eyes"
+		"Ability5"						"juggernaut_healing_ward"
+		"Ability6"						"holdout_laser_trap"
+		"Ability7"						""
+		"Ability8"						""
+		"Ability9"						""
+		"Ability10"						""
+		"Ability11"						""
+		"Ability12"						""
+		"Ability13"						""
+		"Ability14"						""
+		"Ability15"						""
+		"Ability16"						""
+		"Ability17"						""
+	}
+
+	//======================================================================================================
+	// HERO: Lich King (Skeleton King)
+	//======================================================================================================
+	"npc_dota_hero_skeleton_king_holdout"
+	{
+		"override_hero"					"npc_dota_hero_skeleton_king"
+		"DisableWearables"				"1"
+		"Model"							"models/heroes/arthas/arthas.vmdl"
+		"ModelScale"					"0.9"
+		"AttackDamageMin"				"70"
+		"AttackDamageMax"				"80"
+		"MovementSpeed"					"350"
+		"HealthBarOffset"				"200"
+		"AttackRange"					"170"
+
+		"AttributeStrengthGain"			"10"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"5"
+
+		"Ability1"						"holdout_death_coil_alt"
+		"Ability2"						"holdout_howling_blast"		
+		"Ability3"						"holdout_frozen_tempest"
+		"Ability4"						"holdout_icy_heartstopper"
+		"Ability5"						"holdout_frostmourne_innate"
+		"Ability6"						"holdout_sindragosa"
+		"Ability7"						"holdout_blue_effect"
+		"Ability8"						""
+		"Ability9"						""
+		"Ability10"						""
+		"Ability11"						""
+		"Ability12"						""
+		"Ability13"						""
+		"Ability14"						""
+		"Ability15"						""
+		"Ability16"						""
+		"Ability17"						""
+	}
+
+	//======================================================================================================
+	// HERO: Centurion, The Sea Dragon (Slardar)
+	//======================================================================================================
+	"npc_dota_hero_slardar_holdout"
+	{
+		"override_hero"					"npc_dota_hero_slardar"
+//		"DisableWearables"				"1"
+		"MovementSpeed"					"380"
+		"ModelScale"					"1.15"
+		"AttackDamageMin"				"70"
+		"AttackDamageMax"				"80"
+		"AttackRange"					"190"
+		"HealthBarOffset"				"250"
+		"RingRadius"					"120"
+		"ProjectileSpeed"				"1200"
+
+		"AttributeStrengthGain"			"10"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"5"
+
+		"Ability1"						"holdout_dark_pact"
+		"Ability2"						"holdout_war_thunder"
+		"Ability3"						"nevermore_necromastery"		
+		"Ability4"						"abyssal_underlord_atrophy_aura"
+		"Ability5"						"holdout_innate_great_cleave"
+		"Ability6"						"holdout_sea_dragon_form"
+		"Ability7"						""
+		"Ability8"						""
+		"Ability9"						""
+		"Ability10"						""
+		"Ability11"						""
+		"Ability12"						""
+		"Ability13"						""
+		"Ability14"						""
+		"Ability15"						""
+		"Ability16"						""
+		"Ability17"						""
+	}
+
+	//======================================================================================================
+	// HERO: Rifleman( Sniper )
+	//======================================================================================================
+	"npc_dota_hero_sniper_holdout"
+	{
+		"override_hero"					"npc_dota_hero_sniper"
+//		"DisableWearables"				"1"
+		"ArmorPhysical"					"3"
+		"AttackRange"					"600"
+		"AttackDamageMin"				"40"
+		"AttackDamageMax"				"50"
+		"ModelScale"					"1.1"
+		"MovementSpeed"					"350"
+		"AttributePrimary"				"DOTA_ATTRIBUTE_AGILITY"
+
+		"AttributeStrengthGain"			"5"
+		"AttributeAgilityGain"			"10"
+		"AttributeIntelligenceGain"		"5"
+
+		"Ability1"						"holdout_rocket_launcher"
+		"Ability2"						"holdout_plasma_rifle"
+		"Ability3"						"holdout_distance_aura"		
+		"Ability4"						"holdout_shield"
+		"Ability5"						"ogre_magi_bloodlust"
+		"Ability6"						"rifleman_assassinate"
+		"Ability7"						""
+		"Ability8"						""
+		"Ability9"						""
+		"Ability10"						""
+		"Ability11"						""
+		"Ability12"						""
+		"Ability13"						""
+		"Ability14"						""
+		"Ability15"						""
+		"Ability16"						""
+		"Ability17"						""
+	}
+
+	//======================================================================================================
+	// HERO: Spirit Master (Storm Spirit)
+	//======================================================================================================
+	"npc_dota_hero_storm_spirit_holdout"
+	{
+		"override_hero"					"npc_dota_hero_storm_spirit"
+		"ModelScale"					"1.1"
+//		"DisableWearables"				"1"
+		"MovementSpeed"					"400"
+		"AttackRange"					"650"
+		"AttackCapabilities"			"DOTA_UNIT_CAP_RANGED_ATTACK"
+		"ProjectileModel"				"particles/units/heroes/hero_stormspirit/stormspirit_base_attack.vpcf"
+		"ProjectileSpeed"				"900"
+
+		"AttributePrimary"				"DOTA_ATTRIBUTE_INTELLECT"
+		"AttributeStrengthGain"			"5"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"10"
+
+		"Ability1"						"holdout_static_remnant"
+		"Ability2"						"holdout_electric_vortex"
+		"Ability3"						"xhs_spirit_master_overload"
+		"Ability4"						"storm_spirit_ball_lightning"
+		"Ability5"						"holdout_spirit_int"
+		"Ability6"						"holdout_enhanced_spirit"
+		"Ability7"						""
+		"Ability8"						""
+		"Ability9"						""
+		"Ability10"						""
+		"Ability11"						""
+		"Ability12"						""
+		"Ability13"						""
+		"Ability14"						""
+		"Ability15"						""
+		"Ability16"						""
+		"Ability17"						""
+	}
+
+	//======================================================================================================
+	// HERO: Mountain King( Sven )
+	//======================================================================================================
+	"npc_dota_hero_sven_holdout"
+	{
+		"override_hero"					"npc_dota_hero_sven"
+//		"DisableWearables"				"1"
+		"ModelScale"					"0.6"
+		"MovementSpeed"					"522"
+
+		"AttributeStrengthGain"			"10"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"5"
+
+		"Ability1"						"holdout_storm_bolt"
+		"Ability2"						"holdout_thunder_clap"
+		"Ability3"						"holdout_muradin_hammer"		
+		"Ability4"						"slardar_bash"
+		"Ability5"						"holdout_thunder_spirit"
+		"Ability6"						"holdout_avatar"
+		"Ability7"						""
+		"Ability8"						""
+		"Ability9"						""
+		"Ability10"						""
+		"Ability11"						""
+		"Ability12"						""
+		"Ability13"						""
+		"Ability14"						""
+		"Ability15"						""
+		"Ability16"						""
+		"Ability17"						""
+	}
+
+	//======================================================================================================
+	// HERO: Wrath Bringer, the Demon Hunter
+	//======================================================================================================
+	"npc_dota_hero_terrorblade_holdout"
+	{
+		"override_hero"					"npc_dota_hero_terrorblade"
+//		"DisableWearables"				"1"
+		"MovementSpeed"					"375"
+		"ModelScale"					"1.15"
+
+		"AttributeStrengthGain"			"5"
+		"AttributeAgilityGain"			"10"
+		"AttributeIntelligenceGain"		"5"
+
+		"Ability1"						"holdout_negative_energy"
+		"Ability2"						"holdout_active_immolation"
+		"Ability3"						"xhs_vampiric_aura"
+		"Ability4"						"holdout_illidan_evasion"
+		"Ability5"						"holdout_roar"
+		"Ability6"						"holdout_metamorphosis"
+		"Ability7"						""
+		"Ability8"						""
+		"Ability9"						""
+		"Ability10"						""
+		"Ability11"						""
+		"Ability12"						""
+		"Ability13"						""
+		"Ability14"						""
+		"Ability15"						""
+		"Ability16"						""
+		"Ability17"						""
+	}
+
+	//======================================================================================================
+	// HERO: Iron Man (Tinker)
+	//======================================================================================================
+//	"npc_dota_hero_tinker_holdout"
+//	{
+//		"override_hero"					"npc_dota_hero_tinker"
+//		"Model"							"models/iron_man.vmdl"
+//		"DisableWearables"				"1"
+//		"MovementSpeed"					"365"
+//		"ModelScale"					"1.15"
+//		"AttackDamageMin"				"50"
+//		"AttackDamageMax"				"60"
+//		"ProjectileSpeed"				"2500"
+//		"ProjectileModel"				""
+//		"AttackAnimationPoint"        	"0.44"
+
+//		"AttributeStrengthGain"			"5"
+//		"AttributeAgilityGain"			"5"
+//		"AttributeIntelligenceGain"		"10"
+
+//		"Ability1"						"iron_man_laser"
+//		"Ability2"						"iron_man_missile"
+//		"Ability3"						"iron_man_red_laser"
+//		"Ability4"						"iron_man_ark_beam"
+//		"Ability5"						"iron_man_misc"
+//		"Ability6"						""
+//		"Ability7"						""
+//		"Ability8"						""
+//		"Ability9"						""
+//		"Ability10"						""
+//		"Ability11"						""
+//		"Ability12"						""
+//		"Ability13"						""
+//		"Ability14"						""
+//		"Ability15"						""
+//		"Ability16"						""
+//		"Ability17"						""
+//	}
+
+	//======================================================================================================
+	// HERO: Stone Giant (Tiny)
+	//======================================================================================================
+	"npc_dota_hero_tiny_holdout"
+	{
+		"override_hero"					"npc_dota_hero_tiny"
+//		"DisableWearables"				"1"
+		"MovementSpeed"					"380"
+		"AttackRange"					"150"
+		"ModelScale"					"1.1"
+		"ArmorPhysical"					"4"
+
+		"AttributeStrengthGain"			"10"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"5"
+
+		"Ability1"						"tiny_craggy_exterior"
+		"Ability2"						"holdout_dwarf_toss"
+		"Ability3"						"holdout_second_wind"	//granite_golem_hp_aura
+		"Ability4"						"elder_titan_earth_splitter"
+		"Ability5"						"holdout_giant_form"
+		"Ability6"						"medusa_stone_gaze"
+		"Ability7"						""
+		"Ability8"						""
+		"Ability9"						""
+		"Ability10"						""
+		"Ability11"						""
+		"Ability12"						""
+		"Ability13"						""
+		"Ability14"						""
+		"Ability15"						""
+		"Ability16"						""
+		"Ability17"						""
+	}
+
+	//======================================================================================================
+	// HERO: Malfurion
+	//======================================================================================================
+	"npc_dota_hero_ursa_holdout"
+	{
+		"override_hero"					"npc_dota_hero_ursa"
+		"Model"							"models/items/lone_druid/true_form/form_of_the_atniw/form_of_the_atniw.vmdl"
+		"Portrait"						"vgui/hud/heroportraits/portrait_treant"
+		"ModelScale"					"0.95"
+		"DisableWearables"				"1"
+		"MovementSpeed"					"360"
+		"AttackDamageMin"				"46"
+		"AttackDamageMax"				"56"
+		"AttackCapabilities"			"DOTA_UNIT_CAP_MELEE_ATTACK"
+		"AttackRange"					"160"
+		"AttackRate"					"1.6"
+		"ProjectileModel"				""
+		"ProjectileSpeed"				""
+
+		"AttributeStrengthGain"			"10"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"5"
+		"AttributePrimary"				"DOTA_ATTRIBUTE_STRENGTH"
+
+		"Ability1"						"holdout_entrangling_roots"
+		"Ability2"						"holdout_rejuvenation_alt"
+		"Ability3"						"holdout_mark_of_the_claw"
+		"Ability4"						"holdout_shield"
+		"Ability5"						"holdout_strength_of_the_wild"
+		"Ability6"						"holdout_bear_form"
+		"Ability7"						"holdout_bear_form_druid"
+		"Ability8"						""
+		"Ability9"						""
+		"Ability10"						""
+		"Ability11"						""
+		"Ability12"						""
+		"Ability13"						""
+		"Ability14"						""
+		"Ability15"						""
+		"Ability16"						""
+		"Ability17"						""
+	}
+
+	//======================================================================================================
+	// HERO: Archimonde( Warlock )
+	//======================================================================================================
+	"npc_dota_hero_warlock_holdout"
+	{
+		"override_hero"					"npc_dota_hero_warlock"
+//		"DisableWearables"				"1"
+		"MovementSpeed"					"355"
+		"AttributePrimary"				"DOTA_ATTRIBUTE_STRENGTH"
+
+		"AttributeStrengthGain"			"10"
+		"AttributeAgilityGain"			"5"
+		"AttributeIntelligenceGain"		"5"
+
+		"Ability1"						"holdout_dark_portal"
+		"Ability2"						"holdout_spiritual_beast"
+		"Ability3"						"holdout_evasion_and_critical_strike"
+		"Ability4"						"holdout_archimonde"
+		"Ability5"						"holdout_cripple"
+		"Ability6"						"holdout_gargoyle_swarm"
+		"Ability7"						""
+		"Ability8"						""
+		"Ability9"						""
+		"Ability10"						""
+		"Ability11"						""
+		"Ability12"						""
+		"Ability13"						""
+		"Ability14"						""
+		"Ability15"						""
+		"Ability16"						""
+		"Ability17"						""
+
+		"AttackCapabilities"			"DOTA_UNIT_CAP_MELEE_ATTACK"
+		"AttackRange"					"150"
+		"ProjectileModel"				""
+		"ProjectileSpeed"				"900"
+	}
+
+	//======================================================================================================
+	// HERO: Windrunner (Ranger)
+	//======================================================================================================
+	"npc_dota_hero_windrunner_holdout"
+	{
+		"override_hero"					"npc_dota_hero_windrunner"
+		"AttributeBaseAgility"			"44" // Base agility Should have 206 Attack Speed, 0.77
+//		"DisableWearables"				"1"
+		"MovementSpeed"					"355"
+		"AttributePrimary"				"DOTA_ATTRIBUTE_AGILITY"
+
+		"AttributeStrengthGain"			"5"
+		"AttributeAgilityGain"			"10"
+		"AttributeIntelligenceGain"		"5"
+
+		"Ability1"						"holdout_inner_fire"
+		"Ability2"						"holdout_searing_arrows"
+		"Ability3"						"holdout_bash_arrows"
+		"Ability4"						"holdout_critical_arrows_alt"
+		"Ability5"						"forest_troll_high_priest_heal"
+		"Ability6"						"holdout_splash_arrows"
+		"Ability7"						""
+		"Ability8"						""
+		"Ability9"						""
+		"Ability10"						""
+		"Ability11"						""
+		"Ability12"						""
+		"Ability13"						""
+		"Ability14"						""
+		"Ability15"						""
+		"Ability16"						""
+		"Ability17"						""
+	}
+
+	//=================================================================================================================
+	// HERO: Ghost Revenant // Need to be duplicated in npc_units_custom.txt
+	//=================================================================================================================
+	"npc_dota_hero_ghost_revenant"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"override_hero"				"npc_dota_hero_razor"
+		"ModelScale"				"1.080000"
+
+		// Attack
+		//-------------------------------------------------------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
+		"AttackDamageMin"			"70"										// Damage range min.
+		"AttackDamageMax"			"80"										// Damage range max.
+		"AttackAcquisitionRange"	"600"									// Range within a target can be acquired.
+		"AttackRange"				"150"									// Range within a target can be attacked.
+		"ProjectileModel"			""
+		"ProjectileSpeed"			""
+
+		// Attributes
+		//-------------------------------------------------------------------------------------------------------------
+		"AttributePrimary"			"DOTA_ATTRIBUTE_INTELLECT"	// Primary Attribute
+		"AttributeStrengthGain"		"5"						// Strength bonus per level.
+		"AttributeIntelligenceGain"	"10"						// Intelligence bonus per level.
+		"AttributeAgilityGain"		"5"						// Agility bonus per level.
+
+		// Abilities
+		//-------------------------------------------------------------------------------------------------------------
+		"Ability1"					"ghost_revenant_blackjack"
+		"Ability2"					"ghost_revenant_wraith"
+		"Ability3"					"holdout_second_wind"
+		"Ability4"					"ghost_revenant_miasma"
+		"Ability5"					"ghost_revenant_ghost_immolation"
+		"Ability6"					"ghost_revenant_exhaustion"
+		"Ability7"					"generic_hidden"
+		"Ability8"					"generic_hidden"
+		"Ability9"					"generic_hidden"
+		"Ability10"					"generic_hidden"
+		"Ability11"					"generic_hidden"
+		"Ability12"					"generic_hidden"
+		"Ability13"					"generic_hidden"
+		"Ability14"					"generic_hidden" 
+		"Ability15"					"generic_hidden"
+		"Ability16"					"generic_hidden"
+		"Ability17"					"generic_hidden"
+
+		// Movement
+		//-------------------------------------------------------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"
+		"MovementSpeed"				"360"									// Speed.
+		"MovementTurnRate"			"0.4"									// Turning rate.
+	}
+
+	//=================================================================================================================
+	// HERO: Ghost Revenant // Need to be duplicated in npc_units_custom.txt
+	//=================================================================================================================
+	"npc_dota_hero_naga_siren_holdout"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"override_hero"				"npc_dota_hero_naga_siren"
+		"ModelScale"				"0.88"
+
+		// Attack
+		//-------------------------------------------------------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
+		"AttackDamageMin"			"50"										// Damage range min.
+		"AttackDamageMax"			"60"										// Damage range max.
+
+		// Attributes
+		//-------------------------------------------------------------------------------------------------------------
+		"AttributeStrengthGain"		"5"						// Strength bonus per level.
+		"AttributeIntelligenceGain"	"5"						// Intelligence bonus per level.
+		"AttributeAgilityGain"		"10"					// Agility bonus per level.
+
+		// Abilities
+		//-------------------------------------------------------------------------------------------------------------
+		"Ability1"					"xhs_blademaster_mirror_image"
+		"Ability2"					"naga_siren_rip_tide"
+		"Ability3"					"holdout_chieftain_endurance_aura"
+		"Ability4"					"holdout_permanent_immolation"
+		"Ability5"					"holdout_command_aura_innate"
+		"Ability6"					"naga_siren_song_of_the_siren"
+		"Ability7"					"naga_siren_song_of_the_siren_cancel"
+
+		"Ability10"					"generic_hidden"
+		"Ability11"					"generic_hidden"
+		"Ability12"					"generic_hidden"
+		"Ability13"					"generic_hidden"
+		"Ability14"					"generic_hidden" 
+		"Ability15"					"generic_hidden"
+		"Ability16"					"generic_hidden"
+		"Ability17"					"generic_hidden"
+
+		// Movement
+		//-------------------------------------------------------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"
+		"MovementSpeed"				"350"									// Speed.
+		"MovementTurnRate"			"0.4"									// Turning rate.
+	}
+
+	//======================================================================================================
+	// HERO: Wisp (Dummy Unit)
+	//======================================================================================================
+	"npc_dota_hero_wisp_holdout"
+	{
+		"override_hero"					"npc_dota_hero_wisp"
+//		"AttackCapabilities"			"DOTA_UNIT_CAP_NO_ATTACK"
+//		"DisableWearables"				"1"
+		"ArmorPhysical"					"0"
+		"MovementSpeed"					"250"
+		"ModelScale"					"0.5"
+		"AttackRange"					"0"
+		"AttackDamageMin"				"0"
+		"AttackDamageMax"				"0"
+		"AttributeBaseStrength"			"0"
+		"AttributeStrengthGain"			"0"
+		"AttributeBaseAgility"			"0"
+		"AttributeAgilityGain"			"0"
+		"AttributeBaseIntelligence"		"0"
+		"AttributeIntelligenceGain"		"0"
+		"StatusHealth"					"100"
+		"StatusMana"					"0"
+
+		"Ability1"						"holdout_random_hero"
+		"Ability2"						"dummy_passive_vulnerable_wisp"
+		"Ability3"						""
+		"Ability4"						""
+		"Ability5"						""
+		"Ability6"						""
+		"Ability7"						""
+		"Ability8"						""
+		"Ability9"						""
+		"Ability10"						""
+		"Ability11"						""
+		"Ability12"						""
+		"Ability13"						""
+		"Ability14"						""
+		"Ability15"						""
+		"Ability16"						""
+		"Ability17"						""
+		"Ability18"						""
+	}
+	//=================================================================================================================
+	// HERO: Magnus
+	//=================================================================================================================
+	"npc_dota_hero_magnataur_holdout"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"override_hero"				"npc_dota_hero_magnataur"
+
+		// Attack
+		//-------------------------------------------------------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
+		"AttackDamageMin"			"60"										// Damage range min.
+		"AttackDamageMax"			"70"										// Damage range max.
+
+		// Attributes
+		//-------------------------------------------------------------------------------------------------------------
+		"AttributeStrengthGain"		"10"						// Strength bonus per level.
+		"AttributeIntelligenceGain"	"5"						// Intelligence bonus per level.
+		"AttributeAgilityGain"		"5"					// Agility bonus per level.
+
+		// Abilities
+		//-------------------------------------------------------------------------------------------------------------
+		"Ability1"					"magnataur_shockwave"
+		"Ability2"					"holdout_empower"
+		"Ability3"					"magnataur_skewer"
+		"Ability4"					"holdout_endurance_aura"
+		"Ability5"					"holdout_roar"
+		"Ability6"					"magnataur_reverse_polarity"
+		"Ability7"					"generic_hidden"
+		"Ability8"					"generic_hidden"
+		"Ability9"					"generic_hidden"
+		"Ability10"					"generic_hidden"
+		"Ability11"					"generic_hidden"
+		"Ability12"					"generic_hidden"
+		"Ability13"					"generic_hidden"
+		"Ability14"					"generic_hidden" 
+		"Ability15"					"generic_hidden"
+		"Ability16"					"generic_hidden"
+		"Ability17"					"generic_hidden"
+
+		// Movement
+		//-------------------------------------------------------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"
+		"MovementSpeed"				"350"									// Speed.
+		"MovementTurnRate"			"0.4"									// Turning rate.
+	}
+}

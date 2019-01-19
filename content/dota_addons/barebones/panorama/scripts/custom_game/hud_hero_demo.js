@@ -34,15 +34,12 @@ function ToggleCheatMenu() {
 }
 
 (function () {
-	if (Game.GetMapInfo().map_display_name != "x_hero_siege_demo")
-		$.GetContextPanel().DeleteAsync(0)
+	if (Game.GetMapInfo().map_display_name != "imba_demo")
+	$.GetContextPanel().DeleteAsync(0)
 
 	var herolist = CustomNetTables.GetTableValue('hero_selection', 'herolist').herolist;
 
-	$.Msg(herolist)
-
 	Object.keys(herolist).sort().forEach(function (hero) {
-		$.Msg(hero)
 		var new_hero = $.CreatePanel('Panel', $("#" + herolist[hero]), hero);
 		new_hero.AddClass("HeroContainer")
 		new_hero.group = 'HeroChoises';

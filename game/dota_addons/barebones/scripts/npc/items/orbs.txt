@@ -1,0 +1,1362 @@
+"DOTAAbilities"
+{
+	//=================================================================================================================
+	// Orb of Lightning
+	//=================================================================================================================
+	"item_orb_of_lightning"
+	{
+		"ID"							"2516"
+		"BaseClass"						"item_lua"
+		"ScriptFile"					"items/item_orb_of_lightning.lua"
+		"AbilityTextureName"			"custom/orb_of_lightning"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"      
+		"ItemShopTags"					"purge"
+		"ItemQuality"					"artifact"
+		"ItemAliases"					"orb of lightning"
+		"ItemPermanent"					"0"
+		"ItemStackable"					"0"
+		"ItemKillable"					"1"
+		"ItemSellable"					"1"
+		"ItemDroppable"					"1"
+		"AbilityCooldown"				"1.0"
+		"ItemBaseLevel"					"1"
+		"MaxUpgradeLevel"				"3"
+		"Orb"							"1"
+
+		// Shops
+		"ItemCost"						"10000"
+//		"ItemInitialStockTime"			"510.0"
+//		"ItemStockMax"					"2" 
+//		"ItemStockTime"					"30.0"
+//		"ItemStockInitial"				"0"
+
+		"Model"							"models/props_gameplay/red_box.vmdl"
+		"Effect"						"particles/units/heroes/hero_stormspirit/stormspirit_overload_ambient.vpcf"
+
+		"UIPickupSound"					"Item.PickUpGemShop"
+		"UIDropSound"					"Item.DropGemShop"
+		"WorldDropSound"				"Item.DropGemWorld"
+
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_damage"			"150"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"purge_chance"			"10"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"duration"				"3"
+			}
+			"04"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_movespeed"		"5"
+			}
+			"05"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"purge_cooldown"		"10"
+			}
+			"06"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"damage_to_summons"		"300"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Orb of Lightning 2
+	//=================================================================================================================
+	"item_orb_of_lightning2"
+	{
+		"ID"							"2541"
+		"BaseClass"						"item_lua"
+		"ScriptFile"					"items/item_orb_of_lightning.lua"
+		"AbilityTextureName"			"custom/orb_of_lightning2"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityCooldown"				"1.0"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"      
+		"ItemShopTags"					"purge"
+		"ItemQuality"					"artifact"
+		"ItemAliases"					"orb of lightning 2"
+		"ItemPermanent"					"0"
+		"ItemStackable"					"0"
+		"ItemKillable"					"1"
+		"ItemSellable"					"1"
+		"ItemDroppable"					"1"
+		"ItemBaseLevel"					"2"
+		"MaxUpgradeLevel"				"3"
+
+		// Shops
+		"ItemCost"						"20000"
+//		"ItemInitialStockTime"			"990.0"
+//		"ItemStockMax"					"2" 
+//		"ItemStockTime"					"30.0"
+//		"ItemStockInitial"				"0"
+
+		"Model"							"models/props_gameplay/red_box.vmdl"
+		"Effect"						"particles/units/heroes/hero_stormspirit/stormspirit_overload_ambient.vpcf"
+
+		"UIPickupSound"					"Item.PickUpGemShop"
+		"UIDropSound"					"Item.DropGemShop"
+		"WorldDropSound"				"Item.DropGemWorld"
+
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_damage"			"450"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"purge_chance"			"10"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"duration"				"3"
+			}
+			"04"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_movespeed"		"10"
+			}
+			"05"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"purge_cooldown"		"10"
+			}
+			"06"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"damage_to_summons"		"300"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Recipe: Orb of Lightning 2
+	//=================================================================================================================
+	"item_recipe_orb_of_lightning2"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"ID"							"2540"
+		"BaseClass"             		"item_datadriven"
+		"Model"							"models/props_gameplay/recipe.mdl"
+		"AbilityTextureName"			"custom/recipe"
+		
+		// Item Info
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemCost"						"10000"	
+		"ItemShopTags"					""
+//		"ItemInitialStockTime"			"990.0"
+//		"ItemStockMax"					"2" 
+//		"ItemStockTime"					"30.0"
+//		"ItemStockInitial"				"0"
+		
+		// Recipe
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemRecipe"					"1"
+		"ItemResult"					"item_orb_of_lightning2"
+		"ItemRequirements"
+		{
+			"01"						"item_orb_of_lightning"
+		}
+	}
+
+	//=================================================================================================================
+	// Celestial Claws
+	//=================================================================================================================
+	"item_celestial_claws"
+	{
+		"ID"							"2542"
+		"BaseClass"						"item_lua"
+		"ScriptFile"					"items/item_orb_of_lightning.lua"
+		"AbilityTextureName"			"custom/celestial_claws"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"      
+		"ItemShopTags"					"purge"
+		"ItemQuality"					"artifact"
+		"ItemAliases"					"celestial claws"
+		"ItemPermanent"					"0"
+		"ItemStackable"					"0"
+		"ItemKillable"					"1"
+		"ItemSellable"					"1"
+		"ItemDroppable"					"1"
+		"SecretShop"					"1"
+		"AbilityCooldown"				"1.0"
+		"ItemBaseLevel"					"3"
+		"MaxUpgradeLevel"				"3"
+		"AllowedInBackpack"				"0"
+
+		// Shops
+		"ItemCost"						"50000"
+//		"ItemInitialStockTime"			"1470.0"
+//		"ItemStockMax"					"2" 
+//		"ItemStockTime"					"30.0"
+//		"ItemStockInitial"				"0"
+
+		"Model"							"models/props_gameplay/red_box.vmdl"
+		"Effect"						"particles/units/heroes/hero_stormspirit/stormspirit_overload_ambient.vpcf"
+
+		"UIPickupSound"					"Item.PickUpGemShop"
+		"UIDropSound"					"Item.DropGemShop"
+		"WorldDropSound"				"Item.DropGemWorld"
+
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_damage"			"1350"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"purge_chance"			"10"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"duration"				"3"
+			}
+			"04"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_movespeed"		"20"
+			}
+			"05"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"purge_cooldown"		"10"
+			}
+			"06"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"damage_to_summons"		"300"
+			}
+			"07"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"bat_reduction"			"0.2"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Orb of Fire
+	//=================================================================================================================
+	"item_orb_of_fire"
+	{
+		"ID"							"2517"
+		"BaseClass"						"item_datadriven"
+		"AbilityTextureName"			"custom/orb_of_fire"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityCooldown"				"10.0"
+	
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"      
+		"ItemShopTags"					"cleave"
+		"ItemQuality"					"artifact"
+		"ItemPermanent"					"0"
+		"ItemStackable"					"0"
+		"ItemKillable"					"1"
+		"ItemSellable"					"1"
+		"ItemDroppable"					"1"
+		"ItemBaseLevel"					"1"
+		"MaxUpgradeLevel"				"3"
+	
+		// Shops
+		"ItemCost"						"10000"
+//		"ItemInitialStockTime"			"510.0"
+//		"ItemStockMax"					"2" 
+//		"ItemStockTime"					"30.0"
+//		"ItemStockInitial"				"0"
+		
+		"Model"                         "models/props_gameplay/red_box.vmdl"
+		"Effect"                        "particles/econ/courier/courier_greevil_red/courier_greevil_red_ambient_3.vpcf"
+	
+		"UIPickupSound"                 "Item.PickUpGemShop"
+		"UIDropSound"                   "Item.DropGemShop"
+		"WorldDropSound"                "Item.DropGemWorld"
+
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_damage"			"100"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"radius"				"325"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"cleave_pct"			"15"
+			}
+		}
+
+		"OnEquip"
+		{
+			"RunScript"
+			{
+				"ScriptFile"	"items/global.lua"
+				"Function"		"EquipOrbs"
+			}
+
+			"DelayedAction"
+			{
+				"Delay"		"0.1"
+				"Action"
+				{
+					"ApplyModifier"
+					{
+						"ModifierName"	"modifier_orb_of_fire"
+						"Target"		"CASTER"
+					}
+				}
+			}
+		}
+
+		"OnUnequip"
+		{
+			"RemoveModifier"
+			{
+				"ModifierName"	"modifier_orb_of_fire"
+				"Target" 		"CASTER"
+			}
+		}
+
+		"OnSpellStart"
+		{
+			"RunScript"
+			{
+				"ScriptFile"	"items/global.lua"
+				"Function"		"EquipOrbs"
+			}
+
+			"DelayedAction"
+			{
+				"Delay"		"0.1"
+				"Action"
+				{
+					"ApplyModifier"
+					{
+						"ModifierName"	"modifier_orb_of_fire"
+						"Target"		"CASTER"
+					}
+				}
+			}
+		}
+
+		"Modifiers"
+		{
+			"modifier_orb_of_fire"
+			{
+				"Passive"			"0"
+				"IsHidden"			"0"
+				"Attributes"		"MODIFIER_ATTRIBUTE_PERMANENT"
+				"TextureName"		"modifiers/orb_of_fire"
+
+				"EffectName"		"particles/custom/items/orb/orb_of_fire/orb.vpcf"
+				"EffectAttachType"	"follow_origin"
+	
+				"OnAttackLanded"
+				{
+					"RunScript"
+					{
+						"ScriptFile"	"heroes/global.lua"
+						"Function"		"Splash"
+					}
+				}
+			}
+
+			"modifier_orb_attributes"
+			{
+				"Passive"			"1"
+				"IsHidden"			"1"
+				"Attributes"		"MODIFIER_ATTRIBUTE_MULTIPLE"
+	
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE"		"%bonus_damage"
+				}
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Orb of Fire 2
+	//=================================================================================================================
+	"item_orb_of_fire2"
+	{
+		"ID"							"2538"
+		"BaseClass"						"item_datadriven"
+		"AbilityTextureName"			"custom/orb_of_fire2"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityCooldown"				"10.0"
+	
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"      
+		"ItemShopTags"					"cleave"
+		"ItemQuality"					"artifact"
+		"ItemPermanent"					"0"
+		"ItemStackable"					"0"
+		"ItemKillable"					"1"
+		"ItemSellable"					"1"
+		"ItemDroppable"					"1"
+		"ItemBaseLevel"					"2"
+		"MaxUpgradeLevel"				"3"
+
+		// Shops
+		"ItemCost"						"20000"
+//		"ItemInitialStockTime"			"990.0"
+//		"ItemStockMax"					"2" 
+//		"ItemStockTime"					"30.0"
+//		"ItemStockInitial"				"0"
+		
+		"Model"                         "models/props_gameplay/red_box.vmdl"
+		"Effect"                        "particles/econ/courier/courier_greevil_red/courier_greevil_red_ambient_3.vpcf"
+	
+		"UIPickupSound"                 "Item.PickUpGemShop"
+		"UIDropSound"                   "Item.DropGemShop"
+		"WorldDropSound"                "Item.DropGemWorld"
+
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_damage"			"300"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"radius"				"325"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"cleave_pct"			"25"
+			}
+		}
+
+		"OnEquip"
+		{
+			"RunScript"
+			{
+				"ScriptFile"	"items/global.lua"
+				"Function"		"EquipOrbs"
+			}
+
+			"DelayedAction"
+			{
+				"Delay"		"0.1"
+				"Action"
+				{
+					"ApplyModifier"
+					{
+						"ModifierName"	"modifier_orb_of_fire"
+						"Target"		"CASTER"
+					}
+				}
+			}
+		}
+
+		"OnUnequip"
+		{
+			"RemoveModifier"
+			{
+				"ModifierName"	"modifier_orb_of_fire"
+				"Target" 		"CASTER"
+			}
+		}
+
+		"OnSpellStart"
+		{
+			"RunScript"
+			{
+				"ScriptFile"	"items/global.lua"
+				"Function"		"EquipOrbs"
+			}
+
+			"DelayedAction"
+			{
+				"Delay"		"0.1"
+				"Action"
+				{
+					"ApplyModifier"
+					{
+						"ModifierName"	"modifier_orb_of_fire"
+						"Target"		"CASTER"
+					}
+				}
+			}
+		}
+
+		"Modifiers"
+		{
+			"modifier_orb_of_fire"
+			{
+				"Passive"			"0"
+				"IsHidden"			"0"
+				"Attributes"		"MODIFIER_ATTRIBUTE_PERMANENT"
+				"TextureName"		"modifiers/orb_of_fire2"
+
+				"EffectName"		"particles/custom/items/orb/orb_of_fire/orb.vpcf"
+				"EffectAttachType"	"follow_origin"
+	
+				"OnAttackLanded"
+				{
+					"RunScript"
+					{
+						"ScriptFile"	"heroes/global.lua"
+						"Function"		"Splash"
+					}
+				}
+			}
+
+			"modifier_orb_attributes"
+			{
+				"Passive"			"1"
+				"IsHidden"			"1"
+				"Attributes"		"MODIFIER_ATTRIBUTE_MULTIPLE"
+
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE"		"%bonus_damage"
+				}
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Recipe: Orb of Fire 2
+	//=================================================================================================================
+	"item_recipe_orb_of_fire2"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"ID"							"2539"
+		"BaseClass"             		"item_datadriven"
+		"Model"							"models/props_gameplay/recipe.mdl"
+		"AbilityTextureName"			"custom/recipe"
+		
+		// Item Info
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemCost"						"10000"	
+		"ItemShopTags"					""
+//		"ItemInitialStockTime"			"990.0"
+//		"ItemStockMax"					"2" 
+//		"ItemStockTime"					"30.0"
+//		"ItemStockInitial"				"0"
+		
+		// Recipe
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemRecipe"					"1"
+		"ItemResult"					"item_orb_of_fire2"
+		"ItemRequirements"
+		{
+			"01"						"item_orb_of_fire"
+		}
+	}
+
+	//=================================================================================================================
+	// Searing Blade
+	//=================================================================================================================
+	"item_searing_blade"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"ID"							"2501"
+		"BaseClass"						"item_datadriven"
+		"AbilityTextureName" 			"custom/searing_blade"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityCooldown"				"10.0"
+		
+		// Item Info
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemCost"						"50000"
+//		"ItemInitialStockTime"			"1470.0"
+//		"ItemStockMax"					"2" 
+//		"ItemStockTime"					"30.0"
+//		"ItemStockInitial"				"0"
+		"ItemShopTags"					"epic"
+		"ItemQuality"					"epic"
+		"ItemAliases"					"searing blade"
+		"ItemStackable"					"0"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
+		"ItemPermanent"					"0"
+		"SecretShop"					"1"
+		"ItemBaseLevel"					"3"
+		"MaxUpgradeLevel"				"3"
+		"AllowedInBackpack"				"0"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_damage"			"450"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"radius"				"325"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"cleave_pct"			"40"
+			}
+		}
+
+		"OnEquip"
+		{
+			"RunScript"
+			{
+				"ScriptFile"	"items/global.lua"
+				"Function"		"EquipOrbs"
+			}
+
+			"DelayedAction"
+			{
+				"Delay"		"0.1"
+				"Action"
+				{
+					"ApplyModifier"
+					{
+						"ModifierName"	"modifier_orb_of_fire"
+						"Target"		"CASTER"
+					}
+				}
+			}
+		}
+
+		"OnUnequip"
+		{
+			"RemoveModifier"
+			{
+				"ModifierName"	"modifier_orb_of_fire"
+				"Target" 		"CASTER"
+			}
+		}
+
+		"OnSpellStart"
+		{
+			"RunScript"
+			{
+				"ScriptFile"	"items/global.lua"
+				"Function"		"EquipOrbs"
+			}
+
+			"DelayedAction"
+			{
+				"Delay"		"0.1"
+				"Action"
+				{
+					"ApplyModifier"
+					{
+						"ModifierName"	"modifier_orb_of_fire"
+						"Target"		"CASTER"
+					}
+				}
+			}
+		}
+
+		"Modifiers"
+		{
+			"modifier_orb_of_fire"
+			{
+				"Passive"			"0"
+				"IsHidden"			"0"
+				"Attributes"		"MODIFIER_ATTRIBUTE_PERMANENT"
+				"TextureName"		"modifiers/searing_blade"
+
+				"EffectName"		"particles/custom/items/orb/orb_of_fire/orb.vpcf"
+				"EffectAttachType"	"follow_origin"
+
+				"OnAttackLanded"
+				{
+					"RunScript"
+					{
+						"ScriptFile"	"heroes/global.lua"
+						"Function"		"Splash"
+					}
+				}
+			}
+
+			"modifier_orb_attributes"
+			{
+				"Passive"			"1"
+				"IsHidden"			"1"
+				"Attributes"		"MODIFIER_ATTRIBUTE_MULTIPLE"
+
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE"		"%bonus_damage"
+				}
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Recipe: Searing Blade
+	//=================================================================================================================
+	"item_recipe_searing_blade"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"ID"							"2515"
+		"BaseClass"             		"item_datadriven"
+		"Model"							"models/props_gameplay/recipe.mdl"
+		"AbilityTextureName"			"custom/recipe"
+		
+		// Item Info
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemCost"						"30000"	
+		"ItemShopTags"					""
+//		"ItemInitialStockTime"			"1470.0"
+//		"ItemStockMax"					"2" 
+//		"ItemStockTime"					"30.0"
+//		"ItemStockInitial"				"0"
+		
+		// Recipe
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemRecipe"					"1"
+		"SecretShop"					"1"
+		"ItemResult"					"item_searing_blade"
+		"ItemRequirements"
+		{
+			"01"						"item_orb_of_fire2"
+		}
+	}
+
+	//=================================================================================================================
+	// Orb of Frost
+	//=================================================================================================================
+	"item_orb_of_frost"
+	{
+		"ID"							"2535"
+		"BaseClass"                     "item_datadriven"
+		"AbilityTextureName"			"custom/orb_of_frost"
+		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityCooldown"				"10.0"
+	
+		// Shops
+		"ItemCost"						"0"
+		"ItemShareability"				"ITEM_NOT_SHAREABLE"
+		"ItemPurchasable"				"0"
+		"ItemKillable"					"0"
+		"ItemSellable"					"0"
+		"ItemDroppable"					"1"
+		"ItemQuality"					"epic"
+		
+		"Model"							"models/props_gameplay/red_box.vmdl"
+		"Effect"						"particles/units/heroes/hero_winter_wyvern/wyvern_winters_curse.vpcf"
+	
+		"UIPickupSound"                 "Item.PickUpGemShop"
+		"UIDropSound"                   "Item.DropGemShop"
+		"WorldDropSound"                "Item.DropGemWorld"
+	
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_damage"			"10000"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"freeze_cooldown"		"0.1"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bash_chance"			"17"
+			}
+		}
+
+		"OnEquip"
+		{
+			"RunScript"
+			{
+				"ScriptFile"	"items/global.lua"
+				"Function"		"EquipOrbs"
+			}
+
+			"DelayedAction"
+			{
+				"Delay"		"0.1"
+				"Action"
+				{
+					"ApplyModifier"
+					{
+						"ModifierName"	"modifier_orb_of_frost"
+						"Target"		"CASTER"
+					}
+				}
+			}
+		}
+
+		"OnUnequip"
+		{
+			"RemoveModifier"
+			{
+				"ModifierName"	"modifier_orb_of_frost"
+				"Target" 		"CASTER"
+			}
+		}
+
+		"OnSpellStart"
+		{
+			"RunScript"
+			{
+				"ScriptFile"	"items/global.lua"
+				"Function"		"EquipOrbs"
+			}
+
+			"DelayedAction"
+			{
+				"Delay"		"0.1"
+				"Action"
+				{
+					"ApplyModifier"
+					{
+						"ModifierName"	"modifier_orb_of_frost"
+						"Target"		"CASTER"
+					}
+				}
+			}
+		}
+
+		"Modifiers"
+		{
+			"modifier_orb_of_frost"
+			{
+				"Passive"			"0"
+				"IsHidden"			"0"
+				"Attributes"		"MODIFIER_ATTRIBUTE_PERMANENT"
+				"TextureName"		"modifiers/orb_of_frost"
+
+				"EffectName"			"particles/units/heroes/hero_ancient_apparition/ancient_apparition_chilling_touch_buff.vpcf"
+				"EffectAttachType"		"attach_attack1"
+
+				"OnAttackLanded"
+				{
+					"Random"
+					{
+						"Chance"			"%bash_chance"
+						"OnSuccess"
+						{
+							"ApplyModifier"
+							{
+								"ModifierName"	"modifier_orb_of_frost_target"
+								"Duration"		"%freeze_cooldown"
+								"Target"
+								{
+									"Center"	"TARGET"
+									"Types"		"DOTA_UNIT_TARGET_BASIC | DOTA_UNIT_TARGET_HERO"
+								}
+							}
+						}
+					}
+				}
+			}
+
+			"modifier_orb_attributes"
+			{
+				"Passive"		"1"
+				"IsHidden"		"1"
+				"Attributes"	"MODIFIER_ATTRIBUTE_MULTIPLE"
+
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE"		"%bonus_damage"
+				}
+			}
+
+			"modifier_orb_of_frost_target"
+			{
+				"IsDebuff"		"1"
+				"IsPurgable"	"0"
+
+				"OnCreated"
+				{
+					"FireSound"
+					{
+						"EffectName"	"Hero_Invoker.ColdSnap.Freeze"
+						"Target" 		"TARGET"
+					}
+
+					"AttachEffect"
+					{
+						"EffectName"        "particles/generic_gameplay/generic_stunned.vpcf"
+						"EffectAttachType"  "follow_overhead"
+						"Target"            "TARGET"
+					}
+
+					"FireEffect"
+					{
+						"EffectName"        "particles/units/heroes/hero_invoker/invoker_cold_snap.vpcf"
+						"EffectAttachType"  "follow_origin"
+						"Target"            "TARGET"
+					}
+				}
+
+				"StatusEffectName" 		"particles/status_fx/status_effect_frost.vpcf" 	   
+				"StatusEffectPriority"  "10"
+
+				"States"
+				{
+					"MODIFIER_STATE_STUNNED"		"MODIFIER_STATE_VALUE_ENABLED"
+					"MODIFIER_STATE_FROZEN"			"MODIFIER_STATE_VALUE_ENABLED"
+				}
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Orb of Earth
+	//=================================================================================================================
+	"item_orb_of_earth"
+	{
+		"ID"							"2537"
+		"BaseClass"                     "item_datadriven"
+		"AbilityTextureName"			"custom/orb_of_earth"
+		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+
+		// Shops
+		"ItemCost"						"10000"
+//		"ItemInitialStockTime"			"510.0"
+//		"ItemStockMax"					"2" 
+//		"ItemStockTime"					"30.0"
+//		"ItemStockInitial"				"0"
+		"AbilityCooldown"				"10.0"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
+		"ItemPurchasable"				"1"
+		"ItemKillable"					"1"
+		"ItemSellable"					"1"
+		"ItemDroppable"					"1"
+		"ItemQuality"					"artifact"
+		"ItemBaseLevel"					"1"
+		"MaxUpgradeLevel"				"3"
+
+		"Model"							"models/props_gameplay/red_box.vmdl"
+		"Effect"						"particles/units/heroes/hero_earth_spirit/espirit_geomagentic_target_sphere.vpcf"
+	
+		"UIPickupSound"                 "Item.PickUpGemShop"
+		"UIDropSound"                   "Item.DropGemShop"
+		"WorldDropSound"                "Item.DropGemWorld"
+	
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_damage"			"100"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"bash_duration"			"1.0"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bash_chance"			"10"
+			}
+		}
+
+		"OnEquip"
+		{
+			"RunScript"
+			{
+				"ScriptFile"	"items/global.lua"
+				"Function"		"EquipOrbs"
+			}
+
+			"DelayedAction"
+			{
+				"Delay"		"0.1"
+				"Action"
+				{
+					"ApplyModifier"
+					{
+						"ModifierName"	"modifier_orb_of_earth"
+						"Target"		"CASTER"
+					}
+				}
+			}
+		}
+
+		"OnUnequip"
+		{
+			"RemoveModifier"
+			{
+				"ModifierName"	"modifier_orb_of_earth"
+				"Target" 		"CASTER"
+			}
+		}
+
+		"OnSpellStart"
+		{
+			"RunScript"
+			{
+				"ScriptFile"	"items/global.lua"
+				"Function"		"EquipOrbs"
+			}
+
+			"DelayedAction"
+			{
+				"Delay"		"0.1"
+				"Action"
+				{
+					"ApplyModifier"
+					{
+						"ModifierName"	"modifier_orb_of_earth"
+						"Target"		"CASTER"
+					}
+				}
+			}
+		}
+
+		"Modifiers"
+		{
+			"modifier_orb_of_earth"
+			{
+				"Passive"			"0"
+				"IsHidden"			"0"
+				"Attributes"		"MODIFIER_ATTRIBUTE_PERMANENT"
+				"TextureName"		"modifiers/orb_of_earth"
+
+				"EffectName"			"particles/units/heroes/hero_ancient_apparition/ancient_apparition_chilling_touch_buff_green.vpcf"
+				"EffectAttachType"		"attach_attack1"
+
+				"OnAttackLanded"
+				{
+					"Random"
+					{
+						"Chance"			"%bash_chance"
+						"OnSuccess"
+						{
+							"ApplyModifier"
+							{
+								"ModifierName"	"modifier_orb_of_earth_target"
+								"Duration"		"%bash_duration"
+								"Target"
+								{
+									"Center"	"TARGET"
+									"Types"		"DOTA_UNIT_TARGET_BASIC | DOTA_UNIT_TARGET_HERO"
+								}
+
+								"RunScript"
+								{
+									"ScriptFile"	"items/global.lua"
+									"Function"		"Bash"
+								}
+							}
+						}
+					}
+				}
+			}
+
+			"modifier_orb_attributes"
+			{
+				"Passive"		"1"
+				"IsHidden"		"1"
+				"Attributes"	"MODIFIER_ATTRIBUTE_MULTIPLE"	
+	
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE"		"%bonus_damage"
+				}
+			}
+
+			"modifier_orb_of_earth_target"
+			{
+				"IsDebuff"		"1"
+				"IsPurgable"	"0"
+	
+				"OnCreated"
+				{
+					"FireSound"
+					{
+						"EffectName"	"Hero_EarthSpirit.BoulderSmash.Target"
+						"Target" 		"TARGET"
+					}
+
+					"AttachEffect"
+					{
+						"EffectName"		"particles/units/heroes/hero_medusa/medusa_stone_gaze_debuff_stoned.vpcf"
+						"EffectAttachType"	"follow_origin"
+						"Target"			"TARGET"
+					}
+				}
+
+				"StatusEffectName" 		"particles/units/heroes/hero_medusa/status_effect_medusa_stone_gaze_backup.vpcf" 	   
+				"StatusEffectPriority"	"10"
+	
+				"States"
+				{
+					"MODIFIER_STATE_STUNNED"		"MODIFIER_STATE_VALUE_ENABLED"
+					"MODIFIER_STATE_FROZEN"			"MODIFIER_STATE_VALUE_ENABLED"
+				}
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Orb of Darkness
+	//=================================================================================================================
+	"item_orb_of_darkness"
+	{
+		"ID"							"2518"
+		"BaseClass"						"item_lua"
+		"ScriptFile"					"items/item_orb_of_darkness.lua"
+		"AbilityTextureName"			"custom/orb_of_darkness"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+	
+		// Shops
+		"ItemCost"						"10000"
+		"AbilityCooldown"				"1.0"
+//		"ItemInitialStockTime"			"510.0"
+//		"ItemStockMax"					"2" 
+//		"ItemStockTime"					"30.0"
+//		"ItemStockInitial"				"0"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
+		"ItemKillable"					"1"
+		"ItemSellable"					"1"
+		"ItemDroppable"					"1"
+		"ItemQuality"					"artifact"
+		"ItemBaseLevel"					"1"
+		"MaxUpgradeLevel"				"3"
+		
+		"Model"                         "models/props_gameplay/red_box.vmdl"
+		"Effect"                        "particles/econ/courier/courier_greevil_black/courier_greevil_black_ambient_3.vpcf"
+	
+		"UIPickupSound"                 "Item.PickUpGemShop"
+		"UIDropSound"                   "Item.DropGemShop"
+		"WorldDropSound"                "Item.DropGemWorld"
+	
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_hp"				"1500"
+			}
+			"02"
+			{
+				"var_type"              "FIELD_INTEGER"
+				"bonus_damage"          "100"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"duration"				"25.0"
+			}
+			"04"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_armor"			"5"
+			}
+			"05"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_health_regen"	"20"
+			}
+			"06"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"max_units"				"10"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Orb of Darkness 2
+	//=================================================================================================================
+	"item_orb_of_darkness2"
+	{
+		"ID"							"2543"
+		"BaseClass"						"item_lua"
+		"ScriptFile"					"items/item_orb_of_darkness.lua"
+		"AbilityTextureName"			"custom/orb_of_darkness2"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+
+		// Shops
+		"ItemCost"						"20000"
+		"AbilityCooldown"				"1.0"
+//		"ItemInitialStockTime"			"990.0"
+//		"ItemStockMax"					"2" 
+//		"ItemStockTime"					"30.0"
+//		"ItemStockInitial"				"0"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
+		"ItemKillable"					"1"
+		"ItemSellable"					"1"
+		"ItemDroppable"					"1"
+		"ItemQuality"					"artifact"
+		"ItemBaseLevel"					"2"
+		"MaxUpgradeLevel"				"3"
+
+		"Model"                         "models/props_gameplay/red_box.vmdl"
+		"Effect"                        "particles/econ/courier/courier_greevil_black/courier_greevil_black_ambient_3.vpcf"
+
+		"UIPickupSound"                 "Item.PickUpGemShop"
+		"UIDropSound"                   "Item.DropGemShop"
+		"WorldDropSound"                "Item.DropGemWorld"
+
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_hp"				"3000"
+			}
+			"02"
+			{
+				"var_type"              "FIELD_INTEGER"
+				"bonus_damage"          "300"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"duration"				"25"
+			}
+			"04"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_armor"			"15"
+			}
+			"05"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_health_regen"	"20"
+			}
+			"06"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"max_units"				"10"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Recipe: Orb of Darkness 2
+	//=================================================================================================================
+	"item_recipe_orb_of_darkness2"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"ID"							"2544"
+		"BaseClass"             		"item_datadriven"
+		"Model"							"models/props_gameplay/recipe.mdl"
+		"AbilityTextureName"			"custom/recipe"
+
+		// Item Info
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemCost"						"10000"	
+		"ItemShopTags"					""
+//		"ItemInitialStockTime"			"990.0"
+//		"ItemStockMax"					"2" 
+//		"ItemStockTime"					"30.0"
+//		"ItemStockInitial"				"0"
+
+		// Recipe
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemRecipe"					"1"
+		"ItemResult"					"item_orb_of_darkness2"
+		"ItemRequirements"
+		{
+			"01"						"item_orb_of_darkness"
+		}
+	}
+
+	//=================================================================================================================
+	// Bracer of the Void
+	//=================================================================================================================
+	"item_bracer_of_the_void"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"ID"							"2511"
+		"BaseClass"						"item_lua"
+		"ScriptFile"					"items/item_orb_of_darkness.lua"
+		"AbilityTextureName"			"custom/bracer_of_the_void"		
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"Model"							"models/props_gameplay/red_box.vmdl"
+		"Effect"						"particles/generic_gameplay/dropped_item.vpcf"
+
+		// Item Info
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemCost"						"50000"
+		"AbilityCooldown"				"1.0"
+//		"ItemInitialStockTime"			"1470.0"
+//		"ItemStockMax"					"2" 
+//		"ItemStockTime"					"30.0"
+//		"ItemStockInitial"				"0"
+		"ItemShopTags"					"damage"
+		"ItemQuality"					"epic"
+		"ItemAliases"					"bracer of the void"
+		"ItemStackable"					"0"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
+		"ItemPermanent"					"0"
+		"SecretShop"					"1"
+		"ItemBaseLevel"					"3"
+		"MaxUpgradeLevel"				"3"
+		"AllowedInBackpack"				"0"
+
+		// Special	
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_hp"				"9000"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"duration"				"25"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_damage"			"450"
+			}
+			"04"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_armor"			"30"
+			}
+			"05"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"bonus_health_regen"	"20"
+			}
+			"06"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"max_units"				"10"
+			}
+		}
+	}
+}

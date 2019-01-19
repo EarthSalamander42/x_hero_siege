@@ -161,7 +161,7 @@ end
 --------------------------------------------------------------------------------
 function GameMode:OnLevelUpButtonPressed( eventSourceIndex, data )
 	local hPlayerHero = PlayerResource:GetSelectedHeroEntity(data.PlayerID)
-	if hPlayerHero:GetLevel() < #XP_PER_LEVEL_TABLE then
+	if hPlayerHero:GetLevel() < MAX_LEVEL[GetMapName()] then
 		hPlayerHero:HeroLevelUp( false )
 		self:BroadcastMsg( "#LevelUp_Msg" )
 	end
@@ -171,7 +171,7 @@ end
 --------------------------------------------------------------------------------
 function GameMode:OnMaxLevelButtonPressed( eventSourceIndex, data )
 	local hPlayerHero = PlayerResource:GetSelectedHeroEntity( data.PlayerID )
-	hPlayerHero:AddExperience( 1000000, false, false ) -- for some reason maxing your level this way fixes the bad interaction with OnHeroReplaced
+	hPlayerHero:AddExperience( 100000, false, false ) -- for some reason maxing your level this way fixes the bad interaction with OnHeroReplaced
 	--while hPlayerHero:GetLevel() < 25 do
 		--hPlayerHero:HeroLevelUp( false )
 	--end
