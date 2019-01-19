@@ -30023,4 +30023,91 @@
 			}
 		}
 	}
+	//=================================================================================================================
+	// Magnataur: Empower
+	//=================================================================================================================
+	"holdout_empower"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"						"ability_datadriven"
+		"AbilityTextureName"			"custom/holdout_empower"
+
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_AURA"
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
+		"AbilityUnitDamageType"			"DOTA_UNIT_TARGET_HERO"
+		"SpellImmunityType"				"SPELL_IMMUNITY_ALLIES_YES"
+
+		"RequiredLevel"					"1"
+		"MaxLevel"						"4"
+
+		
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"						"FIELD_INTEGER"
+				"bonus_damage_percentage"		"20 30 40 50"
+			}	
+			"02"
+			{
+				"var_type"						"FIELD_INTEGER"
+				"aura_radius"					"850 900 950 1000"
+			}
+			"03"
+			{
+				"var_type"						"FIELD_INTEGER"
+				"cleave_pct"					"40"
+			}
+			"04"
+			{
+				"var_type"						"FIELD_INTEGER"
+				"radius"						"325"
+			}
+
+		}
+		
+		"Modifiers"
+		{
+			"modifier_empower_aura"
+			{
+				"Passive"		"1"
+				"IsHidden"		"1"
+				"IsBuff"		"1"
+
+				"Aura"			"modifier_empower_buff"
+				"Aura_Radius"	"%aura_radius"
+				"Aura_Teams"	"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
+				"Aura_Types"	"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+				"Aura_Flags"	"DOTA_UNIT_TARGET_FLAG_INVULNERABLE"
+			}
+
+			"modifier_empower_buff"
+			{ 
+				"IsBuff" "1"
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_BASEDAMAGEOUTGOING_PERCENTAGE" "%bonus_damage_percentage"
+				}
+
+				"OnAttackLanded"
+				{
+					"FireEffect"
+					{
+						"EffectName"		"particles/econ/items/faceless_void/faceless_void_weapon_bfury/faceless_void_weapon_bfury_cleave.vpcf"
+						"EffectAttachType"	"follow_origin"
+						"Target"			"TARGET"
+					}
+
+					"RunScript"
+					{
+						"ScriptFile"	"heroes/global.lua"
+						"Function"		"Splash"
+					}
+				}
+			}
+		}
+	}
 } // End
