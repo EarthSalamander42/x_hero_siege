@@ -8,6 +8,7 @@ local function StartSpell(caster, ability)
 	if caster:HasModifier("modifier_orb_of_darkness_active") then
 		-- kill units under control when disabling the orb
 		local darkness_units = FindUnitsInRadius(caster:GetTeamNumber(), Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_NONE , FIND_ANY_ORDER, false)
+
 		for _, darkness_unit in pairs(darkness_units) do
 			if darkness_unit:HasAbility("orb_of_darkness_unit") then
 				darkness_unit:ForceKill(false)
@@ -88,10 +89,11 @@ end
 
 modifier_orb_of_darkness_active = class({})
 
-function modifier_orb_of_darkness_active:IsHidden() return true end
+function modifier_orb_of_darkness_active:IsHidden() return false end
 function modifier_orb_of_darkness_active:IsPurgable() return false end
 function modifier_orb_of_darkness_active:IsPurgeException() return false end
 function modifier_orb_of_darkness_active:IsDebuff() return false end
+function modifier_orb_of_darkness_active:RemoveOnDeath() return false end
 
 function modifier_orb_of_darkness_active:GetEffectAttachType()
 	return "attach_attack1"
@@ -107,10 +109,41 @@ function modifier_orb_of_darkness_active:DeclareFunctions()
 	}
 end
 
+function modifier_orb_of_darkness_active:OnCreated()
+--	self.ability = self:GetAbility()
+	self.duration = self:GetAbility():GetSpecialValueFor("duration")
+	self.max_units = self:GetAbility():GetSpecialValueFor("max_units")
+end
+
 function modifier_orb_of_darkness_active:OnDeath( params )
 	if IsServer() then
-		if params.attacker == self:GetParent() and LeavesCorpse(params.unit) and params.unit.no_corpse ~= true then
-			if self:GetStackCount() < self:GetAbility():GetSpecialValueFor("max_units") then
+--		if self:GetAbility() == nil then
+--			local items = {
+--				"item_bracer_of_the_void",
+--				"item_orb_of_darkness2",
+--				"item_orb_of_darkness",
+--			}
+
+--			local new_item = false
+--			for _, item_name in ipairs(items) do
+--				if self:GetParent():HasItemInInventory(item_name) then
+--					print("Change main item with:", item_name)
+--					self.ability = self:GetParent():FindItemByName(item_name, false)
+--					new_item = true
+--					break
+--				end
+--			end
+--		end
+
+--		if new_item == false then
+--			print("No item for this modifier, remove it!")
+--			self:GetParent():RemoveModifierByName("modifier_orb_of_darkness_active")
+--
+--			return
+--		end
+
+		if params.attacker == self:GetParent() and LeavesCorpse(params.unit) and params.unit.no_corpse ~= true and not params.unit:IsConsideredHero() then
+			if self:GetStackCount() < self.max_units then
 				local unit = CreateUnitByName(params.unit:GetUnitName(), params.unit:GetAbsOrigin(), true, self:GetParent(), self:GetParent(), self:GetParent():GetTeam())
 				unit:SetControllableByPlayer(self:GetParent():GetPlayerID(), true)
 				unit:SetOwner(self:GetParent())
@@ -119,7 +152,7 @@ function modifier_orb_of_darkness_active:OnDeath( params )
 				unit:AddAbility("orb_of_darkness_unit"):SetLevel(1)
 				FindClearSpaceForUnit(unit, params.unit:GetAbsOrigin(), true)
 
-				unit:AddNewModifier(self:GetParent(), nil, "modifier_kill", {duration = self:GetAbility():GetSpecialValueFor("duration")})
+				unit:AddNewModifier(self:GetParent(), nil, "modifier_kill", {duration = self.duration})
 				unit:AddNewModifier(self:GetParent(), nil, "modifier_summoned", {})
 				unit:SetNoCorpse()
 				unit.no_corpse = true
@@ -151,6 +184,7 @@ function modifier_orb_of_darkness_passive:IsHidden() return true end
 function modifier_orb_of_darkness_passive:IsPurgable() return false end
 function modifier_orb_of_darkness_passive:IsPurgeException() return false end
 function modifier_orb_of_darkness_passive:IsDebuff() return false end
+function modifier_orb_of_darkness_passive:RemoveOnDeath() return false end
 
 -- allow multiple instances of that modifier
 function modifier_orb_of_darkness_passive:GetAttributes()
