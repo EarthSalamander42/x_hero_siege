@@ -609,12 +609,12 @@
 			"01"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"crit_chance"				"14"
+				"crit_min"					"250"
 			}
 			"02"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"crit_damage"				"350"
+				"crit_max"					"350"
 			}			
 			"03"
 			{
@@ -1273,6 +1273,7 @@
 			{
 				"var_type"					"FIELD_FLOAT"
 				"bear_bat"					"1.4 1.3 1.2 1.1 1.0 0.9 0.8"
+				"LinkedSpecialBonus"		"special_bonus_unique_lone_druid_10"
 			}
 			"04"
 			{
@@ -1398,7 +1399,7 @@
 		"MaxLevel"					"1"
 		"RequiredLevel"				"20"
 		"AbilityType"				"DOTA_ABILITY_TYPE_BASIC"
-		
+
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityCastRange"				"900"
@@ -1435,19 +1436,24 @@
 			"03"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"mana_cost_scepter"			"0"
+				"damage_per_kill"			"50"
 			}
 			"04"
 			{
-				"var_type"					"FIELD_FLOAT"
-				"damage_delay"				"0.15"
+				"var_type"					"FIELD_INTEGER"
+				"mana_cost_scepter"			"0"
 			}
 			"05"
 			{
 				"var_type"					"FIELD_FLOAT"
-				"cooldown_scepter"			"0"
+				"damage_delay"				"0.15"
 			}
 			"06"
+			{
+				"var_type"					"FIELD_FLOAT"
+				"cooldown_scepter"			"0"
+			}
+			"07"
 			{
 				"var_type"					"FIELD_FLOAT"
 				"splash_radius_scepter"		"0"
@@ -2245,24 +2251,18 @@
 	//=================================================================================================================
 	"troll_warlord_fervor"
 	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-		"SpellDispellableType"			"SPELL_DISPELLABLE_NO"
-		
-		// Casting
 		"AbilitySpecial"
 		{
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"max_stacks"			"7"
-				"LinkedSpecialBonus"	"special_bonus_unique_troll_warlord_2"
+				"attack_speed"			"10 20 30 40"
 			}
 			"02"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"attack_speed"			"10 20 30 40"
+				"max_stacks"			"7"
+				"LinkedSpecialBonus"	"special_bonus_unique_troll_warlord_2"
 			}
 		}
 	}
@@ -2298,20 +2298,14 @@
 			"02"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"regen"					"40 70 100 130"
-				"LinkedSpecialBonus"	"special_bonus_unique_doom_4"				
-			}
-			"03"
-			{
-				"var_type"				"FIELD_INTEGER"
 				"radius"				"600"
 			}
-			"04"
+			"03"
 			{
 				"var_type"					"FIELD_INTEGER"
 				"bonus_movement_speed_pct"	"8 12 16 20"
 			}
-			"05"
+			"04"
 			{
 				"var_type"				"FIELD_FLOAT"
 				"duration"				"10.0 14.0 16.0 20.0"
@@ -3399,7 +3393,7 @@
 			"02"
 			{
 				"var_type"						"FIELD_INTEGER"
-				"maximum_resistance"			"20 30 40 50 60"
+				"maximum_health_regen"			"4 8 12 16 20"
 			}
 			"03"
 			{

@@ -1,13 +1,12 @@
-
 local ApiConfig = {
-	endpoint = "https://api.dota2imba.org",
+	endpoint = "http://api.dota2imba.fr",
 	agent = "xhs-"..tostring(X_HERO_SIEGE_V), -- Add the version AND UPDATE it here
 	timeout = 10000,
 	debug = true
 }
 
 local ApiEndpoints = {
-	donators = "/xhs/meta/donators"
+	donators = "/imba/donators"
 }
 
 function ApiDebug(text, ignore)
@@ -17,7 +16,6 @@ function ApiDebug(text, ignore)
 end
 
 function ApiPerform(data, endpoint, callback)
-
 	local payload = nil
 	local method = "GET"
 
@@ -87,20 +85,30 @@ function ApiLoad()
 		if (err) then
 			ApiDebug("Donators Request failed!", true)
 		else
-			ApiCache.donators = response.data
+			ApiCache.donators = response.data.players
 		end
 	end)
 end
 
-function ApiGetDonators()
-	return ApiCache.donators
-end
-
 function IsDonator(hero)
-	if hero:GetPlayerID() == -1 or hero:IsIllusion() or ApiCache.donators == nil then return end
+--	print(ApiCache.donators)
+
+	local player_id = nil
+
+	if string.find(hero:GetUnitName(), "npc_dota_lone_druid_bear") then
+		if hero:GetOwnerEntity():GetPlayerID() then
+			player_id = hero:GetOwnerEntity():GetPlayerID()
+		end
+	else
+		if hero.GetPlayerID == nil then return false end
+		if hero:GetPlayerID() == -1 or hero:IsIllusion() or ApiCache.donators == nil then return false end
+
+		player_id = hero:GetPlayerID()
+	end
 
 	for i = 1, #ApiCache.donators do
-		if tostring(PlayerResource:GetSteamID(hero:GetPlayerID())) == ApiCache.donators[i].steamid then
+--		print(PlayerResource:GetSteamID(player_id), ApiCache.donators[i].steamid)
+		if tostring(PlayerResource:GetSteamID(player_id)) == ApiCache.donators[i].steamid then
 			return ApiCache.donators[i].status
 		elseif i == #ApiCache.donators then
 			return false

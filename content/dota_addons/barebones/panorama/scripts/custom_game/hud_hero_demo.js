@@ -34,20 +34,18 @@ function ToggleCheatMenu() {
 }
 
 (function () {
-	if (Game.GetMapInfo().map_display_name != "x_hero_siege_demo")
-		$.GetContextPanel().DeleteAsync(0)
+	if (Game.GetMapInfo().map_display_name != "x_hero_siege_demo") {
+		$.GetContextPanel().DeleteAsync(0);
+		return;
+	}
 
-	var herolist = CustomNetTables.GetTableValue('hero_selection', 'herolist').herolist;
+	var herolist = CustomNetTables.GetTableValue('hero_selection', 'herolist');
 
-	$.Msg(herolist)
-
-	Object.keys(herolist).sort().forEach(function (hero) {
-		$.Msg(hero)
-		var new_hero = $.CreatePanel('Panel', $("#" + herolist[hero]), hero);
+	Object.keys(herolist.herolist).sort().forEach(function (hero) {
+//		$.Msg(hero)
+		var new_hero = $.CreatePanel('Panel', $("#" + herolist.herolist[hero]), hero);
 		new_hero.AddClass("HeroContainer")
 		new_hero.group = 'HeroChoises';
-
-
 		new_hero.SetPanelEvent('onactivate', function () { OnHeroSelected(hero); });
 
 		var new_hero_image = $.CreatePanel('DOTAHeroImage', new_hero, '');

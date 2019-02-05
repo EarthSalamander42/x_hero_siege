@@ -60,8 +60,16 @@ local hero_level = npc:GetLevel()
 			ShowBossBar(npc)
 		end
 
+		local donator_level = IsDonator(npc)
+
+		if string.find(npc:GetUnitName(), "npc_dota_lone_druid_bear") then
+			if donator_level then
+				npc:SetCustomHealthLabel("#donator_tooltip_"..donator_level, DONATOR_COLOR[donator_level][1], DONATOR_COLOR[donator_level][2], DONATOR_COLOR[donator_level][3])
+			end
+		end
+
 		-- HERO NPC
-		if npc:IsRealHero()  and npc:GetTeamNumber() == DOTA_TEAM_GOODGUYS then
+		if npc:IsRealHero() and npc:GetTeamNumber() == DOTA_TEAM_GOODGUYS then
 			if npc.bFirstSpawnComplete == nil then
 				if npc:IsFakeHero() and AbilitiesHeroes_XX[npc:GetUnitName()] then
 					npc:AddAbility("ability_level_20"):SetLevel(1)
