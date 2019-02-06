@@ -224,6 +224,7 @@ function modifier_orb_of_lightning_purge:IsDebuff() return true end
 function modifier_orb_of_lightning_purge:CheckState()
 	return {
 		[MODIFIER_STATE_ROOTED] = true,
+		[MODIFIER_STATE_DISARMED] = true,
 	}
 end
 

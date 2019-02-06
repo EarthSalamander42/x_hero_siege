@@ -2124,7 +2124,7 @@
 		"MaxLevel"						"1"
 		"RequiredLevel"					"20"
 		"AbilityTextureName"			"custom/holdout_frost_chaos"
-		
+
 		// Precache
 		//-------------------------------------------------------------------------------------------------------------
 		"precache"
@@ -2132,16 +2132,16 @@
 			"particle"		"particles/units/heroes/hero_enigma/enigma_midnight_pulse.vpcf"
 			"soundfile"		"sounds/weapons/hero/enigma/midnight_pulse.vsnd"
 		}
-	
+
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityCastRange"				"700"
 		"AbilityCastPoint"				"0.1"
-	
+
 		// Time		
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityCooldown"				"60.0"
-	
+
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityManaCost"				"0"
