@@ -62,41 +62,41 @@ function Precache(context)
 
 	-- TODO: remove all of those and precache them in abilities kv instead
 	-- PRECACHE HEROES (Particle effects for custom abilities)
-	PrecacheUnitByNameAsync("npc_dota_hero_antimage", context)
-	PrecacheUnitByNameAsync("npc_dota_hero_centaur", context)
-	PrecacheUnitByNameAsync("npc_dota_hero_chaos_knight", context) -- Special Wave and creeps
-	PrecacheUnitByNameAsync("npc_dota_hero_clinkz", context)
-	PrecacheUnitByNameAsync("npc_dota_hero_clockwerk", context)
-	PrecacheUnitByNameAsync("npc_dota_hero_dazzle", context)
-	PrecacheUnitByNameAsync("npc_dota_hero_drow_ranger", context)
-	PrecacheUnitByNameAsync("npc_dota_hero_earth_spirit", context)
-	PrecacheUnitByNameAsync("npc_dota_hero_ember_spirit", context)
-	PrecacheUnitByNameAsync("npc_dota_hero_faceless_void", context)
-	PrecacheUnitByNameAsync("npc_dota_hero_huskar", context) -- For creeps
-	PrecacheUnitByNameAsync("npc_dota_hero_keeper_of_the_light", context)
-	PrecacheUnitByNameAsync("npc_dota_hero_kunkka", context)
-	PrecacheUnitByNameAsync("npc_dota_hero_lifestealer", context)
-	PrecacheUnitByNameAsync("npc_dota_hero_lion", context)
-	PrecacheUnitByNameAsync("npc_dota_hero_lycan", context)
-	PrecacheUnitByNameAsync("npc_dota_hero_magnataur", context)
-	PrecacheUnitByNameAsync("npc_dota_hero_morphling", context)
-	PrecacheUnitByNameAsync("npc_dota_hero_naga_siren", context) -- Special Wave 2
-	PrecacheUnitByNameAsync("npc_dota_hero_necrolyte", context) -- Special Wave 1
-	PrecacheUnitByNameAsync("npc_dota_hero_ogre_magi", context)
-	PrecacheUnitByNameAsync("npc_dota_hero_phoenix", context) -- Dragons Level 1
-	PrecacheUnitByNameAsync("npc_dota_hero_razor", context)
-	PrecacheUnitByNameAsync("npc_dota_hero_silencer", context)
-	PrecacheUnitByNameAsync("npc_dota_hero_slardar", context) -- Slardar (Centurion)
-	PrecacheUnitByNameAsync("npc_dota_hero_storm_spirit", context) -- For Spirit Master.
-	PrecacheUnitByNameAsync("npc_dota_hero_techies", context)
-	PrecacheUnitByNameAsync("npc_dota_hero_templar_assassin", context)
-	PrecacheUnitByNameAsync("npc_dota_hero_tinker", context) -- For Windrunner Lvl 20 Ability
-	PrecacheUnitByNameAsync("npc_dota_hero_tiny", context) -- For Mountain Giant
-	PrecacheUnitByNameAsync("npc_dota_hero_treant", context)
-	PrecacheUnitByNameAsync("npc_dota_hero_vengefulspirit", context) -- For Incoming Wave 3.
-	PrecacheUnitByNameAsync("npc_dota_hero_weaver", context)
-	PrecacheUnitByNameAsync("npc_dota_hero_wisp", context) -- For Connecting bug
-	PrecacheUnitByNameAsync("npc_dota_hero_zuus", context) -- Muradin Bronzebeard
+--	PrecacheUnitByNameAsync("npc_dota_hero_antimage", context)		-- Shaman?
+--	PrecacheUnitByNameAsync("npc_dota_hero_centaur", context)		-- Beastmaster & Arthas & [creature?] & Tauren Chieftain & Pit Lord & Crypt Lord
+	PrecacheUnitByNameAsync("npc_dota_hero_chaos_knight", context) 	-- Special Wave and creeps [what about dark fundamental?]
+--	PrecacheUnitByNameAsync("npc_dota_hero_clinkz", context)		-- Windrunner
+	PrecacheUnitByNameAsync("npc_dota_hero_clockwerk", context)		-- Space Marine PC and NPC?
+	PrecacheUnitByNameAsync("npc_dota_hero_dazzle", context)		-- Creep - orc ranged 2
+--	PrecacheUnitByNameAsync("npc_dota_hero_drow_ranger", context)	-- Lich & Dryad [and apparently meepo wat]
+	PrecacheUnitByNameAsync("npc_dota_hero_earth_spirit", context) 	-- Earth Spirit
+--	PrecacheUnitByNameAsync("npc_dota_hero_ember_spirit", context) 	-- Ember Spirit & Cloak of Flames & Immolation etc.
+--	PrecacheUnitByNameAsync("npc_dota_hero_faceless_void", context) -- cleave? LK Chrono?
+	PrecacheUnitByNameAsync("npc_dota_hero_huskar", context) 		-- For creeps
+	PrecacheUnitByNameAsync("npc_dota_hero_keeper_of_the_light", context) -- Light Fundamental?
+	PrecacheUnitByNameAsync("npc_dota_hero_kunkka", context) 		-- last wave and 4 bosses kunkkas?
+	PrecacheUnitByNameAsync("npc_dota_hero_lifestealer", context) 	-- creep wave 4? Meepo?
+--	PrecacheUnitByNameAsync("npc_dota_hero_lion", context) 			-- Warden &  Pit Lord
+	PrecacheUnitByNameAsync("npc_dota_hero_lycan", context) 		-- Archimonde??
+--	PrecacheUnitByNameAsync("npc_dota_hero_magnataur", context) 	-- Magnataur & Tauren Chieftain
+--	PrecacheUnitByNameAsync("npc_dota_hero_morphling", context)		-- Archmage & Archimage
+	PrecacheUnitByNameAsync("npc_dota_hero_naga_siren", context) 	-- Special Wave 2
+	PrecacheUnitByNameAsync("npc_dota_hero_necrolyte", context)		-- Special Wave 1 & Tauren Chieftain & Dark Summoner & LK & Paladin & 
+	PrecacheUnitByNameAsync("npc_dota_hero_ogre_magi", context)		-- Sniper
+	PrecacheUnitByNameAsync("npc_dota_hero_phoenix", context) 		-- Dragons Level 1 & Invo
+	PrecacheUnitByNameAsync("npc_dota_hero_razor", context)			-- Ghost Revenant? & Sniper [prolly the NPC revenants too]
+--	PrecacheUnitByNameAsync("npc_dota_hero_silencer", context) 		-- Warden (PA) & Kobold (Meepo)
+	PrecacheUnitByNameAsync("npc_dota_hero_slardar", context) 		-- Slardar (Centurion) & wind & LK 
+	PrecacheUnitByNameAsync("npc_dota_hero_storm_spirit", context) 	-- For Spirit Master.
+	PrecacheUnitByNameAsync("npc_dota_hero_techies", context) 		-- Shaman most likely
+	PrecacheUnitByNameAsync("npc_dota_hero_templar_assassin", context) --
+--	PrecacheUnitByNameAsync("npc_dota_hero_tinker", context) 		-- For Windrunner Lvl 20 Ability & Banehallow
+--	PrecacheUnitByNameAsync("npc_dota_hero_tiny", context) 			-- For Mountain Giant
+--	PrecacheUnitByNameAsync("npc_dota_hero_treant", context) 		-- for Malfurion?
+	PrecacheUnitByNameAsync("npc_dota_hero_vengefulspirit", context)-- For Incoming Wave 3. & Paladin
+	PrecacheUnitByNameAsync("npc_dota_hero_weaver", context) 		-- for creeps?
+	PrecacheUnitByNameAsync("npc_dota_hero_wisp", context) 			-- For Connecting bug
+	PrecacheUnitByNameAsync("npc_dota_hero_zuus", context) 			-- Muradin Bronzebeard
 
 	PrecacheUnitByNameAsync( "npc_dota_hero_skeleton_king_bis", context)
 
