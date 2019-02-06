@@ -1519,6 +1519,7 @@
 		"precache"
 		{
 			"particle"		"particles/econ/courier/courier_wyvern_hatchling/courier_wyvern_hatchling_ice.vpcf"
+			"particle"		"particles/units/heroes/hero_drow/drow_silence_wave.vpcf"
 		}
 	
 		// Special
@@ -1711,6 +1712,12 @@
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityManaCost"				"10 20 30 40"
+
+		"precache"
+		{
+			"particle"		"particles/units/heroes/hero_drow/drow_silence_wave.vpcf"
+			"particle"		"particles/generic_gameplay/generic_slowed_cold.vpcf"
+		}
 
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
@@ -5538,6 +5545,11 @@
 		"AbilityUnitDamageType"		"DAMAGE_TYPE_MAGICAL"
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
 
+		"precache"
+		{
+			"particle"	"particles/units/heroes/hero_ember_spirit/ember_spirit_flameguard.vpcf"
+		}
+
 		// Special
 		//-------------------------------------------------------------------------------------
 		"AbilitySpecial"
@@ -5735,6 +5747,11 @@
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityManaCost"				"300 600 0"
+
+		"precache"
+		{
+			"particle"  "particles/econ/items/faceless_void/faceless_void_weapon_bfury/faceless_void_weapon_bfury_cleave.vpcf"
+		}
 
 		// Special	
 		//-------------------------------------------------------------------------------------------------------------
@@ -5994,6 +6011,8 @@
 		"precache"
 		{
 			"particle"		"particles/econ/items/magnataur/shock_of_the_anvil/magnataur_shockanvil.vpcf"
+			"soundfile" 	"soundevents/game_sounds_heroes/game_sounds_magnataur.vsndevts"
+
 		}
 
 		// Special
@@ -6079,6 +6098,12 @@
 		"AbilityCooldown"               "16.0"
 		"AbilityManaCost"               "150 210 270 330"
 		"AbilityCastRange"				"300 350 400 450"
+
+		"precache"
+		{
+			"particle"  "particles/units/heroes/hero_centaur/centaur_warstomp.vpcf"
+			"soundfile" "soundevents/game_sounds_heroes/game_sounds_centaur.vsndevts"
+		}
 
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
@@ -6491,6 +6516,7 @@
 		"precache"
 		{
 			"particle"		"particles/econ/items/magnataur/shock_of_the_anvil/magnataur_shockanvil.vpcf"
+			"soundfile" 	"soundevents/game_sounds_heroes/game_sounds_magnataur.vsndevts"
 		}
 
 		// Special
@@ -6855,6 +6881,12 @@
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityManaCost"               "75 150 225 300"       
+
+		"precache"
+		{
+			"particle"  "particles/units/heroes/hero_morphling/morphling_waveform.vpcf"
+			"soundfile" "soundevents/game_sounds_heroes/game_sounds_morphling.vsndevts"
+		}
 
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
@@ -7745,6 +7777,12 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityManaCost"				"75 85 95 105"
 
+		"precache"
+		{
+			"particle"  "particles/units/heroes/hero_magnataur/magnataur_empower.vpcf"
+			"soundfile" "soundevents/game_sounds_heroes/game_sounds_magnataur.vsndevts"
+		}
+
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilitySpecial"
@@ -7830,6 +7868,12 @@
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityManaCost"				"10 20 30 40"
+
+		"precache"
+		{
+			"particle"	"particles/units/heroes/hero_clinkz/clinkz_searing_arrow.vpcf"
+			"soundfile" "soundevents/game_sounds_heroes/game_sounds_clinkz.vsndevts"
+		}
 
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
@@ -8273,6 +8317,12 @@
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
 		"RequiredLevel"					"5"
 
+        "precache"
+        {
+        	"soundfile"      	"soundevents/game_sounds_heroes/game_sounds_antimage.vsndevts"
+            "particle"   		"particles/generic_gameplay/generic_manaburn.vpcf"
+        }
+
 		// Special	
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilitySpecial"
@@ -8423,6 +8473,12 @@
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityManaCost"				"0"
+
+		"precache"
+		{
+			"particle"  "particles/units/heroes/hero_lion/lion_spell_voodoo.vpcf"
+			"soundfile" "soundevents/game_sounds_heroes/game_sounds_lion.vsndevts"
+		}
 
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
@@ -9937,6 +9993,11 @@
 		"SpellImmunityType"             "SPELL_IMMUNITY_ENEMIES_YES"
 		"AbilityTextureName"            "custom/holdout_innate_great_cleave"
 		"MaxLevel"						"1"
+
+		"precache"
+		{
+			"particle"  "particles/econ/items/faceless_void/faceless_void_weapon_bfury/faceless_void_weapon_bfury_cleave.vpcf"
+		}
 
 		// Special
 		//------------------------------------------------------------------------------------------------------	-------
@@ -11664,6 +11725,13 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityModifierSupportValue"   "0.5"   // Mainly about damage
 
+		"precache"
+		{
+			"particle"  "particles/units/heroes/hero_silencer/silencer_curse_aoe.vpcf"
+			"particle"	"particles/units/heroes/hero_silencer/silencer_curse.vpcf"
+			"soundfile" "soundevents/game_sounds_heroes/game_sounds_silencer.vsndevts"
+		}
+
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilitySpecial"
@@ -11871,6 +11939,12 @@
 		"AbilityCastPoint"				"0.35"
 		"AbilityCooldown"				"40.0"
 		"AbilityCastAnimation"			"ACT_DOTA_CAST_ABILITY_1"
+
+		"precache"
+		{
+			"particle"  "particles/units/heroes/hero_lion/lion_spell_voodoo.vpcf"
+			"soundfile" "soundevents/game_sounds_heroes/game_sounds_lion.vsndevts"
+		}
 
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
@@ -16169,6 +16243,12 @@
 		//-------------------------------------------------------------------------------------
 		"AbilityManaCost"			"10 20 30 40"
 
+		"precache"
+		{
+			"particle"	"particles/units/heroes/hero_clinkz/clinkz_searing_arrow.vpcf"
+			"soundfile" "soundevents/game_sounds_heroes/game_sounds_clinkz.vsndevts"
+		}
+
 		// Special
 		//-------------------------------------------------------------------------------------
 		"AbilitySpecial"
@@ -16271,6 +16351,11 @@
 		// Stats
 		//-------------------------------------------------------------------------------------
 		"AbilityManaCost"			"10 20 30 40"
+
+		"precache"
+		{
+			"particle"  "particles/econ/items/faceless_void/faceless_void_weapon_bfury/faceless_void_weapon_bfury_cleave.vpcf"
+		}
 
 		// Special
 		//-------------------------------------------------------------------------------------
@@ -16520,6 +16605,7 @@
 		"precache"
 		{
 			"particle"		"particles/econ/items/razor/razor_ti6/razor_base_attack_ti6.vpcf"
+			"soundfile" "soundevents/game_sounds_heroes/game_sounds_lina.vsndevts"
 		}
 
 		// Special
@@ -16631,6 +16717,11 @@
 		// Stats
 		//-------------------------------------------------------------------------------------
 		"AbilityManaCost"			"0"
+
+		"precache"
+		{
+			"particle"  "particles/econ/items/faceless_void/faceless_void_weapon_bfury/faceless_void_weapon_bfury_cleave.vpcf"
+		}
 
 		// Special
 		//-------------------------------------------------------------------------------------
@@ -18110,6 +18201,12 @@
 		"AbilityCooldown"				"9.0"
 		"AbilityManaCost"				"90 170 250 330"
 
+		"precache"
+		{
+			"particle"  "particles/units/heroes/hero_treant/treant_overgrowth_vines.vpcf"
+			"soundfile" "soundevents/game_sounds_heroes/game_sounds_treant.vsndevts"
+		}
+
 		"AbilitySpecial"
 		{
 			"01"
@@ -18692,6 +18789,7 @@
 
 		"precache"
 		{
+			"particle"	"particles/units/heroes/hero_drow/drow_frost_arrow.vpcf"
 			"soundfile" "soundevents/game_sounds_heroes/game_sounds_lifestealer.vsndevts"
 		}
 
@@ -18797,6 +18895,12 @@
 		// Stats
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityModifierSupportValue"   "0.5"   // Mainly about damage
+
+		"precache"
+		{
+			"particle"  "particles/units/heroes/hero_disruptor/disruptor_thuderstrike_aoe_area.vpcf"
+			"soundfile" "soundevents/game_sounds_heroes/game_sounds_silencer.vsndevts"
+		}
 
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
@@ -19391,6 +19495,13 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityManaCost"				"100 160 220 260"	
 
+		"precache"
+		{
+			"particle"  "particles/units/heroes/hero_brewmaster/brewmaster_thunder_clap.vpcf"
+			"soundfile" "soundevents/game_sounds_heroes/game_sounds_tiny.vsndevts"
+			"soundfile" "soundevents/game_sounds_heroes/game_sounds_brewmaster.vsndevts"
+		}
+
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilitySpecial"
@@ -19679,6 +19790,11 @@
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_TOGGLE"
 		"MaxLevel"						"1"
 		"AbilityCooldown"				"0.0" //10.0 in Lua
+
+		"precache"
+		{
+			"soundfile" "soundevents/game_sounds_heroes/game_sounds_tiny.vsndevts"
+		}
 
 		"AbilitySpecial"
 		{
@@ -23897,6 +24013,7 @@
 			"particle"		"particles/econ/items/shadow_fiend/sf_fire_arcana/sf_fire_arcana_requiemofsouls_head.vpcf"
 			"particle"		"particles/econ/items/shadow_fiend/sf_fire_arcana/sf_fire_arcana_loadout_ribbon.vpcf"
 			"particle"		"particles/econ/items/invoker/invoker_apex/invoker_sun_strike_team_big_ray_immortal1.vpcf"
+			"soundfile"		"soundevents/game_sounds_heroes/game_sounds_slark.vsndevts"
 		}
 
 		// Data Driven
@@ -25593,6 +25710,11 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityManaCost"				"0"
 	
+		"precache"
+		{
+			"particle"  "particles/units/heroes/hero_keeper_of_the_light/sacred_pool.vpcf"
+		}
+
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilitySpecial"
@@ -26854,6 +26976,12 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityManaCost"				"100 160 220 280"
 
+		"precache"
+		{
+			"particle"  "particles/units/heroes/hero_stormspirit/stormspirit_static_remnant.vpcf"
+			"soundfile" "soundevents/game_sounds_heroes/game_sounds_stormspirit.vsndevts"
+		}
+
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilitySpecial"
@@ -27227,6 +27355,11 @@
 		"RequiredLevel"					"10"
 		"LevelsBetweenUpgrades"			"5"
 
+		"precache"
+		{
+			"particle"  "particles/econ/items/faceless_void/faceless_void_weapon_bfury/faceless_void_weapon_bfury_cleave.vpcf"
+		}
+
 		"AbilitySpecial"
 		{
 			"01"
@@ -27579,6 +27712,11 @@
 		"AbilityUnitDamageType"		"DAMAGE_TYPE_MAGICAL"
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
 
+		"precache"
+		{
+			"particle"	"particles/units/heroes/hero_ember_spirit/ember_spirit_flameguard.vpcf"
+		}
+
 		// Special
 		//-------------------------------------------------------------------------------------
 		"AbilitySpecial"
@@ -27693,6 +27831,11 @@
 		"AbilityTextureName"		"brewmaster_fire_permanent_immolation"
 		"AbilityUnitDamageType"		"DAMAGE_TYPE_MAGICAL"
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
+
+		"precache"
+		{
+			"particle"	"particles/units/heroes/hero_ember_spirit/ember_spirit_flameguard.vpcf"
+		}
 
 		// Special
 		//-------------------------------------------------------------------------------------
@@ -29035,6 +29178,12 @@
 			}
 		}
 
+		"precache"
+		{
+			"particle"  "particles/units/heroes/hero_centaur/centaur_warstomp.vpcf"
+			"soundfile" "soundevents/game_sounds_heroes/game_sounds_centaur.vsndevts"
+		}
+
 		"OnSpellStart"
 		{	
 			"FireEffect"
@@ -30040,6 +30189,11 @@
 
 		"RequiredLevel"					"1"
 		"MaxLevel"						"4"
+
+		"precache"
+		{
+			"particle"  "particles/econ/items/faceless_void/faceless_void_weapon_bfury/faceless_void_weapon_bfury_cleave.vpcf"
+		}
 
 		// Special
 		//-------------------------------------------------------------------------------------------------------------

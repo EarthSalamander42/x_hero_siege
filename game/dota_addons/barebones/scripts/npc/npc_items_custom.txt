@@ -2893,6 +2893,11 @@
 		"ItemStackable"					"0"
 		"ItemPermanent"					"1"
 
+		"precache"
+		{
+			"particle"	"particles/units/heroes/hero_ember_spirit/ember_spirit_flameguard.vpcf"
+		}
+
 		"AbilitySpecial"
 		{
 			"01"
@@ -2920,7 +2925,7 @@
 				"Passive"			"1"
 				"ThinkInterval"		"%tick_time"
 				"TextureName"		"modifiers/cloak_of_flames"
-				
+
 				"OnCreated"
 				{
 					"AttachEffect"
