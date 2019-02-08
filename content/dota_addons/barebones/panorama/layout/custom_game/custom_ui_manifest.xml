@@ -171,6 +171,7 @@
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/hud_hero_demo.xml" /> 
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/boss_healthbar.xml" />
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/hud_main.xml" />
+		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/xhs_battlepass.xml" />
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/xhs_events.xml" />
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/xhs_timers.xml" />
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/statcollection.xml" />

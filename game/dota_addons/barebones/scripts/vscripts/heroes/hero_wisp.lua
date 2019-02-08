@@ -2,7 +2,7 @@ function WispEffects(keys)
 local caster = keys.caster
 	if caster:GetUnitName() == "npc_dota_hero_wisp" then
 
-		if IsDonator(caster) == 1 then
+		if IsDonator(caster:GetPlayerID()) == 1 then
 			local vip_effect = ParticleManager:CreateParticle("particles/status_fx/status_effect_holdout_borrowed_time_3.vpcf", PATTACH_ABSORIGIN_FOLLOW, caster)
 			ParticleManager:SetParticleControl(vip_effect, 0, caster:GetAbsOrigin())
 			ParticleManager:SetParticleControl(vip_effect, 1, caster:GetAbsOrigin())
@@ -10,7 +10,7 @@ local caster = keys.caster
 			local vip_effect2 = ParticleManager:CreateParticle("particles/units/heroes/hero_abaddon/holdout_borrowed_time_3.vpcf", PATTACH_ABSORIGIN_FOLLOW, caster)
 			ParticleManager:SetParticleControl(vip_effect2, 0, caster:GetAbsOrigin())
 			ParticleManager:SetParticleControl(vip_effect2, 1, caster:GetAbsOrigin())
-		elseif IsDonator(caster) == 2 or IsDonator(caster) == 3 then
+		elseif IsDonator(caster:GetPlayerID()) == 2 or IsDonator(caster:GetPlayerID()) == 3 then
 			local vip_effect = ParticleManager:CreateParticle("particles/status_fx/status_effect_holdout_borrowed_time.vpcf", PATTACH_ABSORIGIN_FOLLOW, caster)
 			ParticleManager:SetParticleControl(vip_effect, 0, caster:GetAbsOrigin())
 			ParticleManager:SetParticleControl(vip_effect, 1, caster:GetAbsOrigin())
@@ -18,7 +18,7 @@ local caster = keys.caster
 			local vip_effect2 = ParticleManager:CreateParticle("particles/units/heroes/hero_abaddon/holdout_borrowed_time.vpcf", PATTACH_ABSORIGIN_FOLLOW, caster)
 			ParticleManager:SetParticleControl(vip_effect2, 0, caster:GetAbsOrigin())
 			ParticleManager:SetParticleControl(vip_effect2, 1, caster:GetAbsOrigin())
-		elseif IsDonator(caster) == 4 then
+		elseif IsDonator(caster:GetPlayerID()) == 4 then
 			local vip_effect = ParticleManager:CreateParticle("particles/status_fx/status_effect_holdout_borrowed_time_3.vpcf", PATTACH_ABSORIGIN_FOLLOW, caster)
 			ParticleManager:SetParticleControl(vip_effect, 0, caster:GetAbsOrigin())
 			ParticleManager:SetParticleControl(vip_effect, 1, caster:GetAbsOrigin())
@@ -26,7 +26,7 @@ local caster = keys.caster
 			local vip_effect2 = ParticleManager:CreateParticle("particles/units/heroes/hero_abaddon/holdout_borrowed_time_3.vpcf", PATTACH_ABSORIGIN_FOLLOW, caster)
 			ParticleManager:SetParticleControl(vip_effect2, 0, caster:GetAbsOrigin())
 			ParticleManager:SetParticleControl(vip_effect2, 1, caster:GetAbsOrigin())
-		elseif IsDonator(caster) == 5 then
+		elseif IsDonator(caster:GetPlayerID()) == 5 then
 			local vip_effect = ParticleManager:CreateParticle("particles/status_fx/status_effect_holdout_borrowed_time_4.vpcf", PATTACH_ABSORIGIN_FOLLOW, caster)
 			ParticleManager:SetParticleControl(vip_effect, 0, caster:GetAbsOrigin())
 			ParticleManager:SetParticleControl(vip_effect, 1, caster:GetAbsOrigin())
@@ -34,7 +34,7 @@ local caster = keys.caster
 			local vip_effect2 = ParticleManager:CreateParticle("particles/units/heroes/hero_abaddon/holdout_borrowed_time_4.vpcf", PATTACH_ABSORIGIN_FOLLOW, caster)
 			ParticleManager:SetParticleControl(vip_effect2, 0, caster:GetAbsOrigin())
 			ParticleManager:SetParticleControl(vip_effect2, 1, caster:GetAbsOrigin())
-		elseif IsDonator(caster) == 6 then
+		elseif IsDonator(caster:GetPlayerID()) == 6 then
 			local vip_effect = ParticleManager:CreateParticle("particles/status_fx/status_effect_holdout_borrowed_time_2.vpcf", PATTACH_ABSORIGIN_FOLLOW, caster)
 			ParticleManager:SetParticleControl(vip_effect, 0, caster:GetAbsOrigin())
 			ParticleManager:SetParticleControl(vip_effect, 1, caster:GetAbsOrigin())
