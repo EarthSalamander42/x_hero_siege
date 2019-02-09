@@ -3551,7 +3551,7 @@
 
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCastRange"				"1200 1300 1400 1500"
+		"AbilityCastRange"				"1200"
 		"AbilityCastPoint"				"0.3 0.3 0.3 0.3"
 
 		// Time		
@@ -3571,7 +3571,7 @@
 			"01"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"shock_speed"				"1050 1100 1150 1200"
+				"shock_speed"				"1050"
 			}
 			
 			"02"
@@ -3603,9 +3603,19 @@
 			"07"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"pull_distance"				"100"
+				"scepter_distance"			"1150"
 			}
 			"08"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"scepter_speed"				"1200"
+			}
+			"09"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"pull_distance"				"100"
+			}
+			"10"
 			{
 				"var_type"					"FIELD_FLOAT"
 				"basic_slow_duration"		"0.75"
@@ -3656,7 +3666,7 @@
 			"02"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"range"					"700"
+				"range"					"900"
 				"LinkedSpecialBonus"	"special_bonus_unique_magnus_3"
 			}
 			"03"
@@ -3667,7 +3677,7 @@
 			"04"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"skewer_radius"			"300"
+				"skewer_radius"			"135"
 			}
 			"05"
 			{
@@ -3687,7 +3697,7 @@
 			"08"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"strength_gain"			"4 8 12 16"
+				"strength_gain"			"1 2 3 4"
 			}
 			"09"
 			{
