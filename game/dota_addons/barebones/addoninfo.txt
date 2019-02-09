@@ -10,7 +10,7 @@
 	"addonContent_Campaign"			"0"
 	"HeroGuidesSupported"			"1"
 
-	"maps"						"x_hero_siege_4 x_hero_siege_8"
+	"maps"						"x_hero_siege_4 x_hero_siege_8 x_hero_siege_demo"
 	"IsPlayable"				"1"
 
 	"x_hero_siege_4"
@@ -21,5 +21,10 @@
 	"x_hero_siege_8"
 	{
 		"MaxPlayers"			"8"
+	}
+
+	"x_hero_siege_demo"
+	{
+		"MaxPlayers"			"1"
 	}
 }

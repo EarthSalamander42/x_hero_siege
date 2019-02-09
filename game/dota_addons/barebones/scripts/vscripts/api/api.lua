@@ -90,25 +90,14 @@ function ApiLoad()
 	end)
 end
 
-function IsDonator(hero)
+function IsDonator(id)
 --	print(ApiCache.donators)
 
-	local player_id = nil
-
-	if string.find(hero:GetUnitName(), "npc_dota_lone_druid_bear") then
-		if hero:GetOwnerEntity():GetPlayerID() then
-			player_id = hero:GetOwnerEntity():GetPlayerID()
-		end
-	else
-		if hero.GetPlayerID == nil then return false end
-		if hero:GetPlayerID() == -1 or hero:IsIllusion() or ApiCache.donators == nil then return false end
-
-		player_id = hero:GetPlayerID()
-	end
+	if id == nil then return false end
 
 	for i = 1, #ApiCache.donators do
---		print(PlayerResource:GetSteamID(player_id), ApiCache.donators[i].steamid)
-		if tostring(PlayerResource:GetSteamID(player_id)) == ApiCache.donators[i].steamid then
+--		print(PlayerResource:GetSteamID(id), ApiCache.donators[i].steamid)
+		if tostring(PlayerResource:GetSteamID(id)) == ApiCache.donators[i].steamid then
 			return ApiCache.donators[i].status
 		elseif i == #ApiCache.donators then
 			return false

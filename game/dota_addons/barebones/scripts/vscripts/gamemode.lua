@@ -29,6 +29,9 @@ require('units/treasure_chest_surprises')
 require('triggers')
 require('items/global')
 require('api/api')
+require('components/battlepass/battlepass')
+require('components/battlepass/donator')
+require('components/battlepass/experience')
 
 if GetMapName() == "x_hero_siege_demo" then
 	require('components/hero_selection/init')

@@ -60,14 +60,6 @@ local hero_level = npc:GetLevel()
 			ShowBossBar(npc)
 		end
 
-		local donator_level = IsDonator(npc)
-
-		if string.find(npc:GetUnitName(), "npc_dota_lone_druid_bear") then
-			if donator_level then
-				npc:SetCustomHealthLabel("#donator_tooltip_"..donator_level, DONATOR_COLOR[donator_level][1], DONATOR_COLOR[donator_level][2], DONATOR_COLOR[donator_level][3])
-			end
-		end
-
 		-- HERO NPC
 		if npc:IsRealHero() and npc:GetTeamNumber() == DOTA_TEAM_GOODGUYS then
 			if npc.bFirstSpawnComplete == nil then
@@ -80,35 +72,6 @@ local hero_level = npc:GetLevel()
 						end
 					end
 				else
-					local donator_level = IsDonator(npc)
-					print("Donator?", donator_level)
-
-					if donator_level then
-						if not npc:HasAbility("holdout_vip") then
-							if donator_level >= 1 and donator_level <= 9 then
-								npc:SetCustomHealthLabel("#donator_tooltip_"..donator_level, DONATOR_COLOR[donator_level][1], DONATOR_COLOR[donator_level][2], DONATOR_COLOR[donator_level][3])
-
-								local vip_ability = npc:AddAbility("holdout_vip")
-								vip_ability:SetLevel(1)
-								npc.tp_effect = "particles/econ/events/fall_major_2016/teleport_start_fm06_lvl3.vpcf"
-								npc.tp_effect_end = "particles/econ/events/fall_major_2016/teleport_end_fm06_lvl3.vpcf"
-							end
-						end
-					else
-						npc.tp_effect = "particles/items2_fx/teleport_start.vpcf"
-						npc.tp_effect_end = "particles/items2_fx/teleport_end.vpcf"
-					end
-
-					for i = 1, #vip_members do
-						if PlayerResource:GetSteamAccountID(npc:GetPlayerID()) == vip_members[i] then
-							if not npc:HasAbility("holdout_vip") then
-								npc:SetCustomHealthLabel("VIP", 45, 200, 45)
-								local vip_ability = npc:AddAbility("holdout_vip")
-								vip_ability:SetLevel(1)
-							end
-						end
-					end
-
 					if npc:GetUnitName() == "npc_dota_hero_chaos_knight" or npc:GetUnitName() == "npc_dota_hero_keeper_of_the_light" then
 						npc:SetAbilityPoints(0)
 					elseif npc:GetUnitName() == "npc_dota_hero_lone_druid" then
@@ -564,7 +527,7 @@ local player = PlayerResource:GetPlayer(userID)
 local hero = PlayerResource:GetPlayer(userID):GetAssignedHero()
 
 	for str in string.gmatch(text, "%S+") do
-		if IsDonator(hero) == 1 or IsDonator(hero) == 2 then
+		if IsDonator(userID) == 1 or IsDonator(userID) == 2 then
 			for Frozen = 0, PlayerResource:GetPlayerCount() -1 do
 				local PlayerNames = {"Red", "Blue", "Cyan", "Purple", "Yellow", "Orange", "Green", "Pink"}
 				if PlayerResource:IsValidPlayer(Frozen) then
