@@ -663,29 +663,29 @@ function RestartHeroes()
 	end
 end
 
-function PauseCreeps()
+function PauseCreeps(iTime)
 local units = FindUnitsInRadius( DOTA_TEAM_CUSTOM_1, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false )
 local units2 = FindUnitsInRadius( DOTA_TEAM_GOODGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false )
 local units3 = FindUnitsInRadius( DOTA_TEAM_BADGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false )
 
 	for _,v in pairs(units) do
 		if v:HasMovementCapability() and not v.Boss then
-			v:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", nil)
-			v:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
+			v:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {duration=iTime})
+			v:AddNewModifier(nil, nil, "modifier_invulnerable", {duration=iTime})
 		end
 	end
 
 	for _,v in pairs(units2) do
 		if v:HasMovementCapability() then
-			v:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", nil)
-			v:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
+			v:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {duration=iTime})
+			v:AddNewModifier(nil, nil, "modifier_invulnerable", {duration=iTime})
 		end
 	end
 	
 	for _,v in pairs(units3) do
 		if v:HasMovementCapability() then
-			v:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", nil)
-			v:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
+			v:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {duration=iTime})
+			v:AddNewModifier(nil, nil, "modifier_invulnerable", {duration=iTime})
 		end
 	end
 end
@@ -742,25 +742,6 @@ local units3 = FindUnitsInRadius( DOTA_TEAM_CUSTOM_1, Vector(0, 0, 0), nil, FIND
 			end
 		end
 	end)
-end
-
-function PauseCreepsCastle()
-local units = FindUnitsInRadius( DOTA_TEAM_BADGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false )
-local units2 = FindUnitsInRadius( DOTA_TEAM_GOODGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false )
-
-	for _,v in pairs(units) do
-		if v:IsCreature() and v:HasMovementCapability() then
-			v:AddNewModifier(nil, nil, "modifier_boss_stun", {duration = 10.0})
-			v:AddNewModifier(nil, nil, "modifier_invulnerable", {duration = 10.0})
-		end
-	end
-
-	for _,v in pairs(units2) do
-		if v:IsCreature() and v:HasMovementCapability() then
-			v:AddNewModifier(nil, nil, "modifier_boss_stun", {duration = 10.0})
-			v:AddNewModifier(nil, nil, "modifier_invulnerable", {duration = 10.0})
-		end
-	end
 end
 
 function FinalWaveSpawner(creep1, creep2, creep3, creep4, boss_name, angles, direction, waypoint)
@@ -1081,6 +1062,19 @@ function IsNearEntity(entity_class, location, distance)
 	end
 
 	return false
+end
+
+function CheatDetector()
+	if CustomNetTables:GetTableValue("game_options", "game_count").value == 1 then
+		if Convars:GetBool("sv_cheats") == true or GameRules:IsCheatMode() then
+--			if not IsInToolsMode() then
+				print("Cheats have been enabled, game don't count.")
+				CustomNetTables:SetTableValue("game_options", "game_count", {value = 0})
+				CustomGameEventManager:Send_ServerToAllClients("safe_to_leave", {})
+				GameRules:SetSafeToLeave(true)
+--			end
+		end
+	end
 end
 
 -- credits to yahnich for the following

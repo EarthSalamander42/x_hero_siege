@@ -525,9 +525,10 @@ local userID = keys.playerid
 local text = keys.text
 local player = PlayerResource:GetPlayer(userID)
 local hero = PlayerResource:GetPlayer(userID):GetAssignedHero()
+local donator_level = api:GetDonatorStatus(userID)
 
 	for str in string.gmatch(text, "%S+") do
-		if IsDonator(userID) == 1 or IsDonator(userID) == 2 then
+		if donator_level == 1 or donator_level == 2 then
 			for Frozen = 0, PlayerResource:GetPlayerCount() -1 do
 				local PlayerNames = {"Red", "Blue", "Cyan", "Purple", "Yellow", "Orange", "Green", "Pink"}
 				if PlayerResource:IsValidPlayer(Frozen) then
@@ -1134,7 +1135,7 @@ local lane = tonumber(cn)
 				end
 			end
 		end
-		
+
 		if killedUnit:IsTower() then
 			if killedUnit:GetUnitName() == "xhs_tower_lane_1" then
 				for j = 1, difficulty do
@@ -1188,7 +1189,8 @@ local lane = tonumber(cn)
 		end
 	return
 	end
-	print("EntityKilled: Not Hero or Creature or Building.")
+
+--	print("EntityKilled: Not Hero or Creature or Building.")
 end
 
 ---------------------------------------------------------

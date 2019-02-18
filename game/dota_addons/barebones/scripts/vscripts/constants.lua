@@ -1,3 +1,6 @@
+_G.GAME_VERSION = 3.48
+CustomNetTables:SetTableValue("game_options", "game_count", {value = 1})
+
 -- General
 _G.nBASE_GOLD_BAG_DROP_RATE = 30
 _G.nCHECKPOINT_REVIVES = 1
@@ -45,7 +48,6 @@ _G.ZONE_STAR_CRITERIA_KILLS				= 2
 _G.ZONE_STAR_CRITERIA_QUEST_COMPLETE	= 3
 
 -- X Hero Siege
-_G.X_HERO_SIEGE_V = 3.48
 _G.PREGAMETIME = 125
 _G.nTimer_GameTime = 0
 _G.nTimer_SpecialEvent = 0
@@ -205,12 +207,6 @@ PHASE_2_UPGRADE = {}
 PHASE_2_UPGRADE["damage"] =	{25, 50, 75, 100, 125}
 PHASE_2_UPGRADE["health"] =	{200, 400, 600, 800, 1000}
 PHASE_2_UPGRADE["armor"] =	{0, 0, 0, 0, 0}
-
-_G.vip_members = {
-	4173154700,
-	2086577350
-
-}
 
 _G.banned_players = {
 	151018319, -- Mohammad Mehdi Akhondi

@@ -103,17 +103,17 @@ function GetTitleColorIXP(title)
 	end
 end
 
-function GetPlayerInfoIXP() -- yet it has too much useless loops, format later. Need to be loaded in game setup
+function GetPlayerInfoXP() -- yet it has too much useless loops, format later. Need to be loaded in game setup
 	if not api.players then
---		print("IMBA API not ready! Retry...")
+--		print("XHS API not ready! Retry...")
 		Timers:CreateTimer(1.0, function()
-			GetPlayerInfoIXP()
+			GetPlayerInfoXP()
 		end)
 
 		return
 	end
 
---	print("IMBA API ready!")
+--	print("XHS API ready!")
 
 	local current_xp_in_level = {}
 
@@ -146,7 +146,7 @@ function GetPlayerInfoIXP() -- yet it has too much useless loops, format later. 
 
 		local color = PLAYER_COLORS[ID]
 
-		if IsDonator(ID) ~= 10 then
+		if api:IsDonator(ID) ~= 10 then
 			donator_color = DONATOR_COLOR[api:GetDonatorStatus(ID)]
 		end
 
@@ -162,12 +162,7 @@ function GetPlayerInfoIXP() -- yet it has too much useless loops, format later. 
 			ply_color = rgbToHex(color),
 			title = GetTitleIXP(level),
 			title_color = rgbToHex(GetTitleColorIXP(GetTitleIXP(level))),
---			IMR_5v5 = api.imba.get_player_info(PlayerResource:GetSteamID(ID)).imr5v5,
---			IMR_10v10 = api.imba.get_player_info(PlayerResource:GetSteamID(ID)).imr10v10,
---			IMR_5v5_calibrating = api.imba.get_player_info(PlayerResource:GetSteamID(ID)).imr5v5_calibrating,
---			IMR_10v10_calibrating = api.imba.get_player_info(PlayerResource:GetSteamID(ID)).imr10v10_calibrating,
 			XP_change = 0,
-			IMR_5v5_change = 0,
 			donator_level = api:GetDonatorStatus(ID),
 			donator_color = rgbToHex(donator_color),
 		})
@@ -175,9 +170,8 @@ function GetPlayerInfoIXP() -- yet it has too much useless loops, format later. 
 
 	-- TODO: fixdishit
 --	GetTopPlayersIXP()
---	GetTopPlayersIMR()
 end
---[[
+
 function GetTopPlayersIXP()
 	if not api.imba.ready then return end
 
@@ -210,45 +204,6 @@ function GetTopPlayersIXP()
 			Lvl = level,
 			title = GetTitleIXP(level),
 			title_color = rgbToHex(GetTitleColorIXP(level)),
-			IMR_5v5 = top_user.imr5v5,
 		})
 	end
 end
-
-function GetTopPlayersIMR()
-	if not api.imba.ready then return end
-
-	for _, top_user in pairs(api.imba.get_rankings_imr5v5()) do
-		local global_xp = top_user.xp
-		local level = GetXPLevelByXp(global_xp)
-		local current_xp_in_level
-		local max_xp
-
-		for i = 1, #XP_level_table do
-			if global_xp > XP_level_table[i] then
-				if global_xp > XP_level_table[#XP_level_table] then -- if max level
-					level = #XP_level_table
-					current_xp_in_level = XP_level_table[level] - XP_level_table[level]
-					max_xp = XP_level_table[level] - XP_level_table[level]
-				else
-					level = i +1 -- transform level 0 into level 1
-					current_xp_in_level = 0
-					current_xp_in_level = global_xp - XP_level_table[i]
-					max_xp = XP_level_table[level + 1] - XP_level_table[level]
-				end
-			end
-		end
-
-		CustomNetTables:SetTableValue("top_imr5v5", tostring(top_user.rank),
-		{
-			SteamID64 = top_user.steamid,
-			XP = current_xp_in_level,
-			MaxXP = max_xp,
-			Lvl = level,
-			title = GetTitleIXP(level),
-			title_color = rgbToHex(GetTitleColorIXP(GetTitleIXP(level))),
-			IMR_5v5 = top_user.imr5v5,
-		})
-	end
-end
---]]

@@ -6,7 +6,7 @@ function customSchema:init()
 
 	-- Flag Example
 	statCollection:setFlags({
-		version = X_HERO_SIEGE_V
+		version = GAME_VERSION
 	})
 
 	-- Listen for changes in the current state

@@ -43,6 +43,7 @@ end
 function modifier_ai:OnIntervalThink()
 if not IsServer() then return end
 if self:GetParent():IsIllusion() then return end
+if Entities:FindByName(nil, "dota_goodguys_fort") == nil then return end
 
 	self.is_casting = false
 

@@ -9,7 +9,6 @@
 		"zone_names",
 		"game_options",
 		"gold",
-		"game_state",
 		"battlepass",
 		"player_table",
 		"hero_selection"

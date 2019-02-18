@@ -17,6 +17,7 @@ require('libraries/functional')
 require('libraries/playerresource')
 require('libraries/playertables')
 require('libraries/gold')
+require('libraries/rgb_to_hex')
 require('phases/choose_hero')
 require('phases/creeps')
 require('phases/special_events')
@@ -29,9 +30,9 @@ require('units/treasure_chest_surprises')
 require('triggers')
 require('items/global')
 require('api/api')
-require('components/battlepass/battlepass')
-require('components/battlepass/donator')
-require('components/battlepass/experience')
+require('libraries/adv_log')
+require('components/battlepass/init')
+require('components/loading_screen/init')
 
 if GetMapName() == "x_hero_siege_demo" then
 	require('components/hero_selection/init')
@@ -95,7 +96,7 @@ function GameMode:InitGameMode()
 	mode = GameRules:GetGameModeEntity()
 
 	-- Timer Rules
-	GameRules:SetPostGameTime(60.0)
+	GameRules:SetPostGameTime(600.0)
 	GameRules:SetTreeRegrowTime(240.0)
 	GameRules:SetHeroSelectionTime(0.0)
 	GameRules:SetGoldTickTime(0.0)
@@ -334,15 +335,7 @@ function FarmTest()
 end
 
 function GameMode:OnGameRulesStateChange(keys)
-local newState = GameRules:State_Get()
-
-	CustomGameEventManager:Send_ServerToAllClients( 'game_state', {
-		newState = newState
-	})
-
-	if newState == DOTA_GAMERULES_STATE_CUSTOM_GAME_SETUP then
-		ApiLoad()
-	end
+	local newState = GameRules:State_Get()
 
 	if newState == DOTA_GAMERULES_STATE_HERO_SELECTION then
 		GameRules:SetCustomGameDifficulty(2)
@@ -492,64 +485,24 @@ local newState = GameRules:State_Get()
 	end
 
 	if newState == DOTA_GAMERULES_STATE_POST_GAME then
-		-- call imba api
-		api.imba.event(api.events.entered_post_game)
+		print("END THE GAME!")
 
-		api.imba.complete(function (error, players)
-			safe(function ()
-				if error then
-					-- if we have an error we should display the scoreboard anyways, just with reduced data
-					CustomGameEventManager:Send_ServerToAllClients("end_game_scoreboard", {
-						players = {},
-						xp_info = {},
-						info = {
-							winner = GAME_WINNER_TEAM,
-							id = 0
-						},
-						error = true
-					})
-				else
-					-- everything went fine. use the old system for xp
-					local xp_info = {}
+--		api:CompleteGame(function(data, payload)
+--			CustomGameEventManager:Send_ServerToAllClients("end_game", {
+--				players = payload.players,
+--				data = data,
+--				info = {
+--					game_time = nTimer_GameTime,
+--					id = api:GetApiGameId(),
+--				},
+--			})
+--		end)
 
-					for i = 1, #players do
-						local player = players[i]
-
-						local level = GetXPLevelByXp(player.xp)
-						local title = GetTitleIXP(level)
-						local color = GetTitleColorIXP(title, true)
-						local progress = GetXpProgressToNextLevel(player.xp)
-
-						if level and title and color and progress then
-							table.insert(xp_info, {
-								steamid = player.steamid,
-								level = level,
-								title = title,
-								color = color,
-								progress = progress
-							})
-						end
-
-						-- i-1 should be replaced by player ID
-						player.potion = CustomNetTables:GetTableValue("zone_scores", "xhs_holdout")[i-1]["Potions"]
-					end
-
-					CustomGameEventManager:Send_ServerToAllClients("end_game", {
-						players = players,
-						xp_info = xp_info,
-						info = {
-							winner = GAME_WINNER_TEAM,
-							id = api.imba.data.id,
-							radiant_score = GetTeamHeroKills(2),
-						},
-						error = false
-					})
-				end
-			end)
-		end)
-
---		CustomNetTables:SetTableValue("game_options", "game_count", {value = 0})
-		CustomGameEventManager:Send_ServerToAllClients("end_game", {})
+		CustomGameEventManager:Send_ServerToAllClients("end_game", {
+			info = {
+				game_time = nTimer_GameTime,
+			},
+		})
 	end
 end
 
@@ -571,6 +524,7 @@ local Region = {
 }
 
 	GameTimer()
+	CheatDetector()
 
 	if newState == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
 		if GetMapName() ~= "x_hero_siege_demo" then
