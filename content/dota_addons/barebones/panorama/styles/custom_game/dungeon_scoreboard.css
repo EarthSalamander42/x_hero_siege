@@ -502,22 +502,30 @@
 
 #ScoreLabelsContainer
 {
+	margin-left: 5%;
 	width: 100%;
 	vertical-align: middle;
 }
 
 .ScoreLabel,
 .ScoreLabelValue,
-.ScoreLabelsWidth
+.ScoreLabelsWidth,
+.ScoreXPBar
 {
-	width: fill-parent-flow(1);
+	width: 15%;
 	vertical-align: middle;
 	text-align: center;
 	font-size: 24px;
 	color: #888;
 }
 
-.ScoreLabel
+.ScoreXPBar
+{
+	width: 50%;
+}
+
+.ScoreLabel,
+.ScoreXPBar
 {
 	text-transform: uppercase;
 	font-size: 16px;
@@ -703,4 +711,48 @@
 .local_player .MuteButton
 {
 	visibility: collapse;
+}
+
+.es-player-xp {
+	flow-children: none; 
+	width: 250px;
+	vertical-align: center;
+	background-color: black;
+	border: 1px solid #222;
+	height: 26px;
+	box-shadow: 0 0 5px 0 #00000022 inset;
+}
+
+.es-player-xp-progress { 
+
+	background-color: gradient( linear, 0% 0%, 0% 100%, from( #006E2E ),  to( #00540E ) );
+	border-radius: 1px;
+	width: 0%;
+	height: 24px;
+	transition-property: width;
+	transition-duration: 2s;
+}
+
+.es-player-xp Label {
+	color: #fff;
+	width: 100%;
+	font-size: 16px;
+	vertical-align: center;
+	padding: 2px 5px;
+}
+
+.es-player-xp-rank { text-align: right; }
+.es-player-xp-level { text-align: left; }
+.es-player-xp-xp { text-align: right; }
+
+.es-player-xp-rank-name {
+	vertical-align: center;
+	text-align: center;
+}
+
+.es-player-xp-earned,
+.es-player-xp-booster {
+	width: 70px;
+	vertical-align: center;
+	text-align: center;
 }

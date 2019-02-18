@@ -1,45 +1,10 @@
-ListenToGameEvent('game_rules_state_change', function()
-	if GameRules:State_Get() == DOTA_GAMERULES_STATE_HERO_SELECTION then
-		InitDonatorTableJS()
-	end
-end, nil)
-
-ListenToGameEvent('npc_spawned', function(event)
-	local npc = EntIndexToHScript( event.entindex )
-	local donator_level
-
-	if npc.GetPlayerID then
-		donator_level = IsDonator(npc:GetPlayerID())
-	end
-
-	if donator_level then
-		if npc:IsRealHero() then
-			if not npc:HasAbility("holdout_vip") then
-				if donator_level >= 1 and donator_level <= 9 then
-					npc:SetCustomHealthLabel("#donator_tooltip_"..donator_level, DONATOR_COLOR[donator_level][1], DONATOR_COLOR[donator_level][2], DONATOR_COLOR[donator_level][3])
-
-					local vip_ability = npc:AddAbility("holdout_vip")
-					vip_ability:SetLevel(1)
-
-					if donator_level ~= 6 then
-						DonatorCompanion(npc:GetPlayerID())
-					end
-				end
-			end
-		else
-			if string.find(npc:GetUnitName(), "npc_dota_lone_druid_bear") then
-				npc:SetCustomHealthLabel("#donator_tooltip_"..donator_level, DONATOR_COLOR[donator_level][1], DONATOR_COLOR[donator_level][2], DONATOR_COLOR[donator_level][3])
-			end
-		end
-	end
-end, nil)
-
 function InitDonatorTableJS()
 	local developers = {}
 	local donators = {}
 
 	for i = 0, PlayerResource:GetPlayerCount() - 1 do
-		local donator_status = IsDonator(i)
+		local donator_status = api:GetDonatorStatus(i)
+
 		if donator_status ~= 0 then
 			if donator_status <= 2 then
 				table.insert(developers, tostring(PlayerResource:GetSteamID(i)))

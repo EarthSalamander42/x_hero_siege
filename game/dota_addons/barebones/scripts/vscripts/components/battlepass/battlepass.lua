@@ -37,20 +37,6 @@ BATTLEPASS_LEVEL_REWARD[15]	= "trail3"
 
 CustomNetTables:SetTableValue("game_options", "battlepass", {battlepass = BATTLEPASS_LEVEL_REWARD})
 
-ListenToGameEvent('game_rules_state_change', function()
-	if GameRules:State_Get() == DOTA_GAMERULES_STATE_CUSTOM_GAME_SETUP then
-		Battlepass:Init()
-	end
-end, nil)
-
-ListenToGameEvent('npc_spawned', function(event)
-	local npc = EntIndexToHScript( event.entindex )
-
-	if npc:IsRealHero() and npc:GetUnitName() ~= "npc_dota_hero_wisp" then
-		Battlepass:AddItemEffects(npc)
-	end
-end, nil)
-
 function Battlepass:Init()
 	BATTLEPASS_TELEPORT = {}
 	BATTLEPASS_TRAIL = {}

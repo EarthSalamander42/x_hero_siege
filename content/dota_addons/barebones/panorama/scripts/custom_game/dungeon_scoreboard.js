@@ -66,6 +66,11 @@ function UpdatePlayerImages()
 	var actualPlayerInfo = 1;
 	for(var i = 0; i < 8; i++)
 	{
+		var player_info = CustomNetTables.GetTableValue("player_table", i);
+		if (player_info) {
+			playerImage.style.border = "2px solid " + player_info.donator_color;
+		}
+
 		if(i == localPlayerId)
 		{
 			continue;
@@ -231,6 +236,75 @@ function UpdateZoneScores( zoneName )
 	}
 }
 
+function _ScoreboardUpdater_SetTextSafe(childName, textValue) {
+	var childPanel = $.GetContextPanel().FindChildInLayoutFile(childName)
+	if (childPanel === null)
+		return;
+
+	childPanel.text = textValue;
+}
+
+function _ScoreboardUpdater_SetValueSafe(childName, Value) {
+	var childPanel = $.GetContextPanel().FindChildInLayoutFile(childName)
+
+	if (childPanel === null)
+		return;
+
+	childPanel.value = Value;
+}
+
+function _ScoreboardUpdater_UpdatePlayerPanelXP(playerId, ImbaXP_Panel, player_info) {
+
+//	$.Msg("Updating player xp panel");
+
+	var ids = {
+		xpRank:  "es-player-xp-rank-name" + playerId,
+		xp: "es-player-xp-rank" + playerId,
+		xpEarned: "es-player-xp-progress" + playerId,
+		level: "es-player-xp-level" + playerId,
+		progress_bar: "es-player-xp-progress" + playerId,
+	};
+
+	// setup panels
+//	ImbaXP_Panel.BCreateChildren("<Panel id='XPProgressBarContainer" + playerId + "' value='0.0'/>");
+//	var Imbar = ImbaXP_Panel.BCreateChildren("<ProgressBar id='XPProgressBar" + playerId + "'/>");
+//	ImbaXP_Panel.BCreateChildren("<Label id='ImbaLvl" + playerId + "' text='999'/>");
+//	ImbaXP_Panel.BCreateChildren("<Label id='ImbaXPRank" + playerId + "' text='999'/>");
+//	ImbaXP_Panel.BCreateChildren("<Label id='ImbaXP" + playerId + "' text='999'/>");
+//	ImbaXP_Panel.BCreateChildren("<Label id='ImbaXPEarned" + playerId + "' text='+0'/>");
+
+	var steamid = Game.GetPlayerInfo(playerId).player_steamid;
+
+	// load player data from api
+//	LoadPlayerInfo(function (data) {
+//		var thisPlayerInfo = null;
+//		playerInfo.forEach(function (i) {
+//			if (i.steamid == steamid)
+//				thisPlayerInfo = i;
+//		});
+
+//		if (thisPlayerInfo == null) // wtf
+//			return;
+
+//		_ScoreboardUpdater_SetTextSafe(playerPanel, ids.xpRank, thisPlayerInfo.xp_rank_title);
+//		_ScoreboardUpdater_SetTextSafe(playerPanel, ids.xp, thisPlayerInfo.xp_in_current_level + "/" + thisPlayerInfo.total_xp_for_current_level);
+//		_ScoreboardUpdater_SetTextSafe(playerPanel, ids.level, thisPlayerInfo.xp_level);
+//		_ScoreboardUpdater_SetValueSafe(playerPanel, ids.progress_bar, thisPlayerInfo.xp_in_current_level / thisPlayerInfo.total_xp_for_current_level);
+//		playerPanel.FindChildTraverse(ids.xpRank).style.color = "#" + thisPlayerInfo.xp_rank_color;
+
+//	});
+
+	// xp shown fix (temporary?)
+	_ScoreboardUpdater_SetTextSafe(ids.xpRank, player_info.title);
+	_ScoreboardUpdater_SetTextSafe(ids.xp, player_info.XP + "/" + player_info.MaxXP);
+	_ScoreboardUpdater_SetTextSafe(ids.level, "Level: " + player_info.Lvl);
+	$.GetContextPanel().FindChildTraverse(ids.xpRank).style.color = player_info.title_color;
+
+	var progress_bar_value = player_info.XP / player_info.MaxXP * 100;
+	$("#" + ids.progress_bar).style.width = progress_bar_value + "%";
+//	_ScoreboardUpdater_SetValueSafe(ids.progress_bar, player_info.XP / player_info.MaxXP);
+}
+
 function UpdatePlayerZones()
 {
 	$.Msg( "UpdatePlayerZones" );
@@ -378,5 +452,20 @@ function SetFlyoutScoreboardChangeZone( nDir )
 	
 	$.RegisterEventHandler( "DOTACustomUI_SetFlyoutScoreboardVisible", $.GetContextPanel(), SetFlyoutScoreboardVisible );
 	$.RegisterEventHandler("DOTACustomUI_SetFlyoutScoreboardChangeZone", $.GetContextPanel(), SetFlyoutScoreboardChangeZone);
+
+	for(var i = 0; i < 8; i++)
+	{
+		var ImbaXP_Panel = $.GetContextPanel().FindChildTraverse("es-player-xp" + i);
+
+		if (ImbaXP_Panel != undefined) {
+			// get player data
+			var plyData = CustomNetTables.GetTableValue("player_table", i);
+
+			if (plyData != undefined) {
+				// set xp values
+				_ScoreboardUpdater_UpdatePlayerPanelXP(i, ImbaXP_Panel, plyData);
+			}
+		}
+	}
 })();
 

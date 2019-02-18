@@ -26,7 +26,7 @@
 					<Button id="CloseButton" onactivate="ToggleBattlepass();">
 						<Label id="CloseButtonImage" />
 					</Button>
-					<Label id="HoFTitle" class="HoldoutLabelSmall" hittest="false" text="imba game info" />
+					<Label id="HoFTitle" class="HoldoutLabelSmall" hittest="false" text="game info" />
 				</Panel>
 
 				<Panel class="GameModeValues">
