@@ -165,7 +165,9 @@ function modifier_orb_of_darkness_active:OnDeath( params )
 				end
 
 				-- the unit is reincarnated, don't want to see the previous unit dying
-				params.unit:RemoveSelf()
+--				params.unit:RemoveSelf()
+				-- replaced RemoveSelf because it prevents ending some quests when it requires killing units
+				params.unit:AddNoDraw()
 				-- increase the number of units under your control
 				self:SetStackCount(self:GetStackCount() + 1)
 			end
