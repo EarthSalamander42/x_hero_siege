@@ -1894,8 +1894,9 @@ function GameMode:OnDialogConfirm(eventSourceIndex, data)
 		end
 	end
 
-	print("Check if everyone accepted dialog...")
-	print(ConfirmCount[data.ConfirmToken], nValid)
+--	print("Check if everyone accepted dialog...")
+--	print(ConfirmCount[data.ConfirmToken], nValid)
+
 	if ConfirmCount[data.ConfirmToken] >= nValid then
 		local netTable = {}
 		for _,zone in pairs(self.Zones) do

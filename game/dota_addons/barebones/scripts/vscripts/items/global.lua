@@ -33,7 +33,9 @@ end
 
 -- Ring of Superiority
 function RingUnequip(keys)
+if not keys.caster then return end
 local hero = keys.caster
+
 if hero:IsIllusion() then return end
 
 	hero.has_epic_4 = false

@@ -132,10 +132,13 @@ local hero_vip_count = 1
 	RAMERO_BIS_DUMMY:SetAngles(0, 270, 0)
 	RAMERO_BIS_DUMMY:AddNewModifier(nil, nil, "modifier_command_restricted", {})
 
-	-- Special Events
-	lich_king = CreateUnitByName("npc_dota_boss_lich_king_bis", Entities:FindByName(nil, "npc_dota_spawner_lich_king"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-	lich_king:SetAngles(0, 90, 0)
-	lich_king:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
+	-- Special events
+	XHS_LICH_KING_BOSS = CreateUnitByName("npc_dota_boss_lich_king", Entities:FindByName(nil, "npc_dota_spawner_lich_king"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
+	XHS_LICH_KING_BOSS:SetAngles(0, 90, 0)
+
+	-- Suddenly non-vanilla modifiers are not working on Lich King
+	XHS_LICH_KING_BOSS:AddNewModifier(nil, nil, "modifier_invulnerable", {})
+	XHS_LICH_KING_BOSS:AddNewModifier(nil, nil, "modifier_stunned", {})
 end
 
 function ChooseHero(event)
@@ -258,8 +261,6 @@ function StartingItems(hero, newHero)
 	elseif newHero:GetTeamNumber() == 3 then
 		TeleportHero(newHero, 3.0, base_bad:GetAbsOrigin())
 	end
-
-	PlayerResource:SetCameraTarget(newHero:GetPlayerOwnerID(), nil)
 
 	Timers:CreateTimer(0.1, function()
 		if not hero:IsNull() then

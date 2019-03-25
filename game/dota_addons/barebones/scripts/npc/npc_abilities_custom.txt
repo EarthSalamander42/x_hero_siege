@@ -10968,7 +10968,7 @@
 			"08"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"damage_reduction"			"-50"
+				"damage_reduction"			"-50 -60 -70 -80"
 			}
 		}
 

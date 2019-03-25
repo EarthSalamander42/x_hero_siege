@@ -90,6 +90,19 @@ function CDOTA_BaseNPC:RemoveItemByName(ItemName, bStash)
 	end
 end
 
+-- credits to yahnich for the following
+function CDOTA_BaseNPC:IsFakeHero()
+	if self:IsIllusion() or (self:HasModifier("modifier_monkey_king_fur_army_soldier") or self:HasModifier("modifier_monkey_king_fur_army_soldier_hidden")) or self:IsTempestDouble() or self:IsClone() then
+		return true
+	else return false end
+end
+
+function CDOTA_BaseNPC:IsRealHero()
+	if not self:IsNull() then
+		return self:IsHero() and not ( self:IsIllusion() or self:IsClone() ) and not self:IsFakeHero()
+	end
+end
+
 function CDOTA_BaseNPC:Blink(position, bTeamOnlyParticle, bPlaySound)
 	if self:IsNull() then return end
 	local blink_effect = "particles/items_fx/blink_dagger_start.vpcf"

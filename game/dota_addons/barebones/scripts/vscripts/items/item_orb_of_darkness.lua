@@ -113,6 +113,31 @@ function modifier_orb_of_darkness_active:OnCreated()
 --	self.ability = self:GetAbility()
 	self.duration = self:GetAbility():GetSpecialValueFor("duration")
 	self.max_units = self:GetAbility():GetSpecialValueFor("max_units")
+
+	self:StartIntervalThink(0.1)
+end
+
+function modifier_orb_of_darkness_active:OnIntervalThink()
+	local has_parent_item = false
+
+	for i = 0, 5 do
+		local item = self:GetParent():GetItemInSlot(i)
+
+		for k, v in pairs(MODIFIER_ITEMS_WITH_LEVELS["modifier_orb_of_darkness_active"]) do
+			print(v, item:GetAbilityName())
+			if v == item:GetAbilityName() then
+				has_parent_item = true
+
+				break
+			end
+		end
+	end
+
+	print("Has parent item?", has_parent_item)
+	if has_parent_item == false then
+		print("has_parent_item:", has_parent_item)
+		self:GetParent():RemoveModifierByName("modifier_orb_of_darkness_active")
+	end
 end
 
 function modifier_orb_of_darkness_active:OnDeath( params )

@@ -28,11 +28,12 @@
 	"loading_screen_patreon_modlist5"		"- Hero Line Wars"
 	"loading_screen_patreon_modlist6"		"- Tourouk's Duel"
 
-	"vote_gamemode"								"Difficulty Vote:"
-	"vote_gamemode_1"							"Easy: 150% Gold, 125% XP, 75% Damage."
-	"vote_gamemode_2"							"Normal: 110% Gold, 100% XP, 100% Damage."
-	"vote_gamemode_3"							"Hard: 100% Gold, 90% XP, 125% Damage."
-	"vote_gamemode_4"							"Extreme: 100% Gold, 75% XP, 150% Damage."
+	"vote_difficulty"							"Difficulty Vote:"
+	"vote_difficulty_1"							"Easy: 150% Gold, 125% XP, 75% Damage."
+	"vote_difficulty_2"							"Normal: 110% Gold, 100% XP, 100% Damage."
+	"vote_difficulty_3"							"Hard: 100% Gold, 90% XP, 125% Damage."
+	"vote_difficulty_4"							"Extreme: 100% Gold, 75% XP, 150% Damage."
+	"vote_difficulty_5"							"Divine: 75% Gold, 60% XP, 200% Damage."
 
 	// Demo mode
 	"Refresh_Msg"								"Hero Refreshed"

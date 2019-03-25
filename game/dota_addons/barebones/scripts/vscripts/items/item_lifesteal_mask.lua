@@ -19,6 +19,7 @@ modifier_lifesteal = class({})
 function modifier_lifesteal:IsHidden() return false end
 function modifier_lifesteal:IsPurgable() return false end
 function modifier_lifesteal:IsDebuff() return false end
+function modifier_lifesteal:RemoveOnDeath() return false end
 
 function modifier_lifesteal:GetTexture()
 	return "modifiers/lifesteal_mask"

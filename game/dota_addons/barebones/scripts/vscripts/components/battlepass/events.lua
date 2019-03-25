@@ -11,13 +11,13 @@ ListenToGameEvent('npc_spawned', function(event)
 	local npc = EntIndexToHScript( event.entindex )
 
 	local npc = EntIndexToHScript( event.entindex )
-	local donator_level
+	local donator_level = nil
 
 	if npc.GetPlayerID then
 		donator_level = api:GetDonatorStatus(npc:GetPlayerID())
 	end
 
-	if donator_level then
+	if type(donator_level) == "number" and donator_level ~= 0 then
 		if npc:IsRealHero() then
 			if npc:GetUnitName() ~= "npc_dota_hero_wisp" then
 				Battlepass:AddItemEffects(npc)

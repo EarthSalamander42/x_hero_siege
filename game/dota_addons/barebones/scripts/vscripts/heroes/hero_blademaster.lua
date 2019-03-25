@@ -119,10 +119,6 @@ function modifier_xhs_blademaster_mirror_image_handler:RemoveOnDeath() return fa
 function modifier_xhs_blademaster_mirror_image_handler:OnCreated()
 	self:StartIntervalThink(1.0)
 	self:OnIntervalThink()
-
-	if IsServer() then
-		self:GetCaster():AddNewModifier(self:GetCaster(), self:GetAbility(), "modifier_imba_shiva_aura", {})
-	end
 end
 
 function modifier_xhs_blademaster_mirror_image_handler:OnIntervalThink()

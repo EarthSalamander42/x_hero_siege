@@ -133,7 +133,7 @@ function GameMode:InitGameMode()
 
 	-- Value Rules
 	mode:SetCameraDistanceOverride(1250)
-	mode:SetMaximumAttackSpeed(500)
+	mode:SetMaximumAttackSpeed(600)
 	mode:SetMinimumAttackSpeed(20)
 	mode:SetCustomHeroMaxLevel(20)
 	GameRules:SetHeroMinimapIconScale(1.0)
@@ -170,6 +170,7 @@ function GameMode:InitGameMode()
 
 	mode:SetThink( "OnThink", self, 1 )
 	mode:SetModifyGoldFilter( Dynamic_Wrap(GameMode, "GoldFilter"), self )
+	mode:SetModifierGainedFilter(Dynamic_Wrap(GameMode, "ModifierFilter"), self)
 
 	if IsInToolsMode() then
 		Convars:RegisterCommand("final_wave", function(keys) return FinalWave() end, "Test Final Wave", FCVAR_CHEAT)
@@ -184,6 +185,7 @@ function GameMode:InitGameMode()
 	mode:SetExecuteOrderFilter(Dynamic_Wrap(GameMode, "FilterExecuteOrder"), self)
 	mode:SetDamageFilter(Dynamic_Wrap(GameMode, "DamageFilter"), self)
 	mode:SetHealingFilter(Dynamic_Wrap(GameMode, "HealingFilter"), self)
+	mode:SetItemAddedToInventoryFilter(Dynamic_Wrap(GameMode, "ItemAddedFilter"), self)
 
 	CustomGameEventManager:RegisterListener("event_hero_image", Dynamic_Wrap(GameMode, "HeroImage"))
 	CustomGameEventManager:RegisterListener("event_all_hero_images", Dynamic_Wrap(GameMode, "AllHeroImages"))
@@ -201,131 +203,6 @@ function GameMode:InitGameMode()
 	self.PrecachedVIPs = {}
 	self.CheckpointsActivated = {}
 	self.Zones = {}
-
-	-- Item added to inventory filter
-	mode:SetItemAddedToInventoryFilter(function(ctx, event)
-		local hero = EntIndexToHScript(event.inventory_parent_entindex_const)
-		if hero:IsRealHero() then if hero:GetPlayerID() == -1 then return end end
-		local item = EntIndexToHScript(event.item_entindex_const)
-		local key = "item_key_of_the_three_moons"
-		local shield = "item_shield_of_invincibility"
-		local sword = "item_lightning_sword"
-		local ring = "item_ring_of_superiority"
-		local doom = "item_doom_artifact"
-		local frost = "item_orb_of_frost"
-		if item:GetAbilityName() == "item_tpscroll" and item:GetPurchaser() == nil then return false end
-
-		if hero:IsRealHero() then
-			if hero:GetUnitName() == "npc_baristol" then return end
-			if hero:GetTeamNumber() == 2 or hero:GetTeamNumber() == 3 then
-				if item:GetName() == sword and sword_first_time then
-					SPECIAL_EVENT = 0
-					CustomGameEventManager:Send_ServerToAllClients("hide_timer_special_arena", {})
-					GameMode.SpecialArena_occuring = 0
-					if timers.RameroAndBaristol then
-						Timers:RemoveTimer(timers.RameroAndBaristol)
-					end
-					local teleport_time = 3.0
-					RestartCreeps(teleport_time + 3)
-					sword_first_time = false
-					if hero.old_pos then
-						TeleportHero(hero, teleport_time, hero.old_pos)
-					else
-						if hero:GetTeamNumber() == 2 then
-							TeleportHero(hero, 3.0, base_good:GetAbsOrigin())
---						elseif hero:GetTeamNumber() == 3 then
---							TeleportHero(hero, 3.0, base_bad:GetAbsOrigin())
-						end
-					end
-					hero:EmitSound("Hero_TemplarAssassin.Trap")
-				elseif item:GetName() == ring and ring_first_time then
-					SPECIAL_EVENT = 0
-					CustomGameEventManager:Send_ServerToAllClients("hide_timer_special_arena", {})
-					GameMode.SpecialArena_occuring = 0
-					if timers.Ramero then
-						Timers:RemoveTimer(timers.Ramero)
-					end
-					local teleport_time = 3.0
-					RestartCreeps(teleport_time + 3)
-					ring_first_time = false
-					if hero.old_pos then
-						TeleportHero(hero, teleport_time, hero.old_pos)
-					else
-						if hero:GetTeamNumber() == 2 then
-							TeleportHero(hero, 3.0, base_good:GetAbsOrigin())
---						elseif hero:GetTeamNumber() == 3 then
---							TeleportHero(hero, 3.0, base_bad:GetAbsOrigin())
-						end
-					end
-					hero:EmitSound("Hero_TemplarAssassin.Trap")
-				elseif item:GetName() == frost and frost_first_time then
-					frost_first_time = false
-					if hero.old_pos then
-						TeleportHero(hero, 3.0, hero.old_pos)
-					else
-						if hero:GetTeamNumber() == 2 then
-							TeleportHero(hero, 3.0, base_good:GetAbsOrigin())
---						else
---							TeleportHero(hero, 3.0, base_bad:GetAbsOrigin())
-						end
-					end
-					hero:EmitSound("Hero_TemplarAssassin.Trap")
---				elseif item:GetName() == frost and frost_first_time == false then
---					return false
-				end
-			end
-
---			if item:GetName() == key and hero.has_epic_1 == false then
---				hero.has_epic_1 = true
---				hero:EmitSound("Hero_TemplarAssassin.Trap")
---			end
---			if item:GetName() == shield and hero.has_epic_2 == false then
---				hero.has_epic_2 = true
---				hero:EmitSound("Hero_TemplarAssassin.Trap")
---			end
---			if item:GetName() == sword and hero.has_epic_3 == false then
---				hero.has_epic_3 = true
---				hero:EmitSound("Hero_TemplarAssassin.Trap")
---			end
---			if item:GetName() == ring and hero.has_epic_4 == false then
---				hero.has_epic_4 = true
---				hero:EmitSound("Hero_TemplarAssassin.Trap")
---			end
-
-			if item:GetName() == doom and doom_first_time then
-				doom_first_time = false
-				hero:EmitSound("Hero_TemplarAssassin.Trap")
-				local line_duration = 10
-				Notifications:TopToAll({hero = hero:GetName(), duration = line_duration})
---				Notifications:TopToAll({text = hero:GetUnitName().." ", duration = line_duration, continue = true})
-				Notifications:TopToAll({text = PlayerResource:GetPlayerName(hero:GetPlayerID()).." ", duration = line_duration, continue = true})
-				Notifications:TopToAll({text = "merged the 4 Boss items to create Doom Artifact!", duration = line_duration, style = {color = "Red"}, continue = true})
---			elseif item:GetName() == doom and frost_first_time == false then
---				return false
-			end
-
-			-- Rune System
-			if item:GetName() == "item_rune_armor" then
-				PickupArmorRune(item, hero)
-				return false
-			elseif item:GetName() == "item_rune_immolation" then
-				PickupImmolationRune(item, hero)
-				return false
-			end
-		end
-
-		if hero:IsRealHero() or hero:IsConsideredHero() then
-			-- Rune System
-			if item:GetName() == "item_rune_armor" then
-				PickupArmorRune(item, hero)
-				return false
-			elseif item:GetName() == "item_rune_immolation" then
-				PickupImmolationRune(item, hero)
-				return false
-			end
-		end
-    	return true
-	end, self)
 end
 
 function FarmTest()
@@ -1404,4 +1281,175 @@ function GameMode:IsQuestActive( szQuestName )
 	end
 
 	return false
+end
+
+-- Modifier gained filter function
+function GameMode:ModifierFilter( keys )
+	-- entindex_parent_const	215
+	-- entindex_ability_const	610
+	-- duration					-1
+	-- entindex_caster_const	215
+	-- name_const				modifier_imba_roshan_rage_stack
+
+	if IsServer() then
+		local modifier_owner = EntIndexToHScript(keys.entindex_parent_const)
+		local modifier_name = keys.name_const
+		local modifier_caster
+		local modifier_class
+
+		if keys.entindex_caster_const then
+			modifier_caster = EntIndexToHScript(keys.entindex_caster_const)
+		else
+			return true
+		end
+
+		return true
+	end
+end
+
+function GameMode:ItemAddedFilter(event)
+	-- Item added to inventory filter
+	local hero = EntIndexToHScript(event.inventory_parent_entindex_const)
+	if hero:IsRealHero() then if hero:GetPlayerID() == -1 then return end end
+	local item = EntIndexToHScript(event.item_entindex_const)
+	local key = "item_key_of_the_three_moons"
+	local shield = "item_shield_of_invincibility"
+	local sword = "item_lightning_sword"
+	local ring = "item_ring_of_superiority"
+	local doom = "item_doom_artifact"
+	local frost = "item_orb_of_frost"
+	if item:GetAbilityName() == "item_tpscroll" and item:GetPurchaser() == nil then return false end
+
+	if hero:IsRealHero() and item.GetAbilityName then
+		if hero:GetUnitName() == "npc_baristol" then return end
+
+		print("An item was picked up:", item:GetAbilityName())
+
+		Timers:CreateTimer(FrameTime(), function()
+--			print("Has item in inventory?", hero:HasItemInInventory(item:GetAbilityName()))
+			if hero:HasItemInInventory(item:GetAbilityName()) then
+				for k, v in pairs(MODIFIER_ITEMS_WITH_LEVELS) do
+					for i, j in pairs(v) do
+						if j == item:GetAbilityName() then
+--							print("Add modifier:", k)
+--							print("Parent:", j)
+							if hero:HasModifier(k) then
+								hero:RemoveModifierByName(k)
+								hero:AddNewModifier(hero, item, k, {})
+							end
+						end
+					end
+				end
+			end
+		end)
+
+		if hero:GetTeamNumber() == 2 or hero:GetTeamNumber() == 3 then
+			if item:GetName() == sword and sword_first_time then
+				SPECIAL_EVENT = 0
+				CustomGameEventManager:Send_ServerToAllClients("hide_timer_special_arena", {})
+				GameMode.SpecialArena_occuring = 0
+				if timers.RameroAndBaristol then
+					Timers:RemoveTimer(timers.RameroAndBaristol)
+				end
+				local teleport_time = 3.0
+				RestartCreeps(teleport_time + 3)
+				sword_first_time = false
+				if hero.old_pos then
+					TeleportHero(hero, teleport_time, hero.old_pos)
+				else
+					if hero:GetTeamNumber() == 2 then
+						TeleportHero(hero, 3.0, base_good:GetAbsOrigin())
+--					elseif hero:GetTeamNumber() == 3 then
+--						TeleportHero(hero, 3.0, base_bad:GetAbsOrigin())
+					end
+				end
+				hero:EmitSound("Hero_TemplarAssassin.Trap")
+			elseif item:GetName() == ring and ring_first_time then
+				SPECIAL_EVENT = 0
+				CustomGameEventManager:Send_ServerToAllClients("hide_timer_special_arena", {})
+				GameMode.SpecialArena_occuring = 0
+				if timers.Ramero then
+					Timers:RemoveTimer(timers.Ramero)
+				end
+				local teleport_time = 3.0
+				RestartCreeps(teleport_time + 3)
+				ring_first_time = false
+				if hero.old_pos then
+					TeleportHero(hero, teleport_time, hero.old_pos)
+				else
+					if hero:GetTeamNumber() == 2 then
+						TeleportHero(hero, 3.0, base_good:GetAbsOrigin())
+--					elseif hero:GetTeamNumber() == 3 then
+--						TeleportHero(hero, 3.0, base_bad:GetAbsOrigin())
+					end
+				end
+				hero:EmitSound("Hero_TemplarAssassin.Trap")
+			elseif item:GetName() == frost and frost_first_time then
+				frost_first_time = false
+				if hero.old_pos then
+					TeleportHero(hero, 3.0, hero.old_pos)
+				else
+					if hero:GetTeamNumber() == 2 then
+						TeleportHero(hero, 3.0, base_good:GetAbsOrigin())
+--					else
+--						TeleportHero(hero, 3.0, base_bad:GetAbsOrigin())
+					end
+				end
+				hero:EmitSound("Hero_TemplarAssassin.Trap")
+--			elseif item:GetName() == frost and frost_first_time == false then
+--				return false
+			end
+		end
+
+--		if item:GetName() == key and hero.has_epic_1 == false then
+--			hero.has_epic_1 = true
+--			hero:EmitSound("Hero_TemplarAssassin.Trap")
+--		end
+--		if item:GetName() == shield and hero.has_epic_2 == false then
+--			hero.has_epic_2 = true
+--			hero:EmitSound("Hero_TemplarAssassin.Trap")
+--		end
+--		if item:GetName() == sword and hero.has_epic_3 == false then
+--			hero.has_epic_3 = true
+--			hero:EmitSound("Hero_TemplarAssassin.Trap")
+--		end
+--		if item:GetName() == ring and hero.has_epic_4 == false then
+--			hero.has_epic_4 = true
+--			hero:EmitSound("Hero_TemplarAssassin.Trap")
+--		end
+
+		if item:GetName() == doom and doom_first_time then
+			doom_first_time = false
+			hero:EmitSound("Hero_TemplarAssassin.Trap")
+			local line_duration = 10
+			Notifications:TopToAll({hero = hero:GetName(), duration = line_duration})
+--			Notifications:TopToAll({text = hero:GetUnitName().." ", duration = line_duration, continue = true})
+			Notifications:TopToAll({text = PlayerResource:GetPlayerName(hero:GetPlayerID()).." ", duration = line_duration, continue = true})
+			Notifications:TopToAll({text = "merged the 4 Boss items to create Doom Artifact!", duration = line_duration, style = {color = "Red"}, continue = true})
+--		elseif item:GetName() == doom and frost_first_time == false then
+--			return false
+		end
+
+		-- Rune System
+		if item:GetName() == "item_rune_armor" then
+			PickupArmorRune(item, hero)
+			return false
+		elseif item:GetName() == "item_rune_immolation" then
+			PickupImmolationRune(item, hero)
+			return false
+		end
+	end
+
+	if hero:IsRealHero() or hero:IsConsideredHero() then
+		-- Rune System
+		if item:GetName() == "item_rune_armor" then
+			PickupArmorRune(item, hero)
+			return false
+		elseif item:GetName() == "item_rune_immolation" then
+			PickupImmolationRune(item, hero)
+			return false
+		end
+	end
+
+    return true
 end

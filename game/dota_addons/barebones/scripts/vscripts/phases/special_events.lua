@@ -80,11 +80,11 @@ local MuradinCheck = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, Entities:FindByName(n
 end
 
 function FarmEvent(time)
-local difficulty = GameRules:GetCustomGameDifficulty()
-nTimer_SpecialEvent = time
-BT_ENABLED = 0
-GameMode.hero_farm_event = {}
-StunBuildings(time)
+	local difficulty = GameRules:GetCustomGameDifficulty()
+	nTimer_SpecialEvent = time
+	BT_ENABLED = 0
+	GameMode.hero_farm_event = {}
+	StunBuildings(time)
 
 	Notifications:TopToAll({hero="npc_dota_hero_alchemist", duration=5.0})
 	Notifications:TopToAll({text=" It's farming time! Kill as much creeps as you can!", continue = true})
@@ -126,6 +126,7 @@ StunBuildings(time)
 			end
 
 			DisableItems(hero, time)
+
 			FarmEventCreeps(nPlayerID)
 		end
 	end
@@ -149,9 +150,8 @@ StunBuildings(time)
 end
 
 function FarmEventCreeps(id)
-local point = Entities:FindByName(nil, "farm_event_player_"..id)
-local difficulty = GameRules:GetCustomGameDifficulty()
-print("Farm Event Logic ID:", id)
+	local point = Entities:FindByName(nil, "farm_event_player_"..id)
+	local difficulty = GameRules:GetCustomGameDifficulty()
 
 	Timers:CreateTimer(function()
 		local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_2, point:GetAbsOrigin(), nil, 1200, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)
@@ -159,24 +159,29 @@ print("Farm Event Logic ID:", id)
 		if SPECIAL_EVENT == 1 then
 			if #units <= 1 then
 				GameMode.hero_farm_event[id]["round"] = (GameMode.hero_farm_event[id]["round"] + 1) % 9
+
 				if GameMode.hero_farm_event[id]["round"] == 0 then
 					GameMode.hero_farm_event[id]["level"] = (GameMode.hero_farm_event[id]["level"] + 1)
 				end
+
 				for j = 1, 10 do
 					local unit = CreateUnitByName(FarmEvent_Creeps[GameMode.hero_farm_event[id]["round"] + 1], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
-					unit:SetBaseDamageMin(unit:GetAverageTrueAttackDamage(unit) + (FARM_EVENT_UPGRADE["damage"][difficulty] * GameMode.hero_farm_event[id]["level"]))
-					unit:SetBaseDamageMax(unit:GetAverageTrueAttackDamage(unit) + (FARM_EVENT_UPGRADE["damage"][difficulty] * GameMode.hero_farm_event[id]["level"]) * 1.1)
+					unit:SetBaseDamageMin(unit:GetAverageTrueAttackDamage(unit) + (FARM_EVENT_UPGRADE["damage"][difficulty] * GameMode.hero_farm_event[id]["level"]) * 0.95)
+					unit:SetBaseDamageMax(unit:GetAverageTrueAttackDamage(unit) + (FARM_EVENT_UPGRADE["damage"][difficulty] * GameMode.hero_farm_event[id]["level"]) * 1.05)
 					unit:SetMaxHealth(unit:GetMaxHealth() + (FARM_EVENT_UPGRADE["health"][difficulty] * GameMode.hero_farm_event[id]["level"]))
 					unit:SetHealth(unit:GetMaxHealth())
 					unit:SetPhysicalArmorBaseValue(unit:GetPhysicalArmorValue() + (FARM_EVENT_UPGRADE["armor"][difficulty] * GameMode.hero_farm_event[id]["level"]))
+
 					if not unit.OverHeadCandy then 
 						unit.OverHeadCandy = ParticleManager:CreateParticle("particles/hw_fx/candy_carrying_stack.vpcf", PATTACH_OVERHEAD_FOLLOW, unit)
 						ParticleManager:SetParticleControl(unit.OverHeadCandy, 0, unit:GetAbsOrigin())
 					end
+
 					local stack_10 = math.floor(GameMode.hero_farm_event[id]["level"] / 10)
 					ParticleManager:SetParticleControl(unit.OverHeadCandy, 2, Vector(stack_10, GameMode.hero_farm_event[id]["level"] - stack_10*10, 0))
 				end
 			end
+
 			return 1
 		end
 	end)
@@ -204,7 +209,7 @@ function EndFarmEvent()
 
 	local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_2, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_NONE , FIND_ANY_ORDER, false)
 	for _,v in pairs(units) do
-		if v:IsCreature() and v:HasMovementCapability() then
+		if v:IsCreature() and v:HasMovementCapability() and v:GetUnitName() ~= "npc_dota_boss_lich_king" then
 			UTIL_Remove(v)
 		end
 	end

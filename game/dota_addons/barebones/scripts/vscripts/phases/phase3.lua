@@ -314,6 +314,11 @@ function StartLichKingArena()
 local point_boss = Entities:FindByName(nil, "npc_dota_spawner_lich_king_bis"):GetAbsOrigin()
 local reincarnate_time = 8.0
 
+	if not XHS_LICH_KING_BOSS then
+		Notifications:TopToAll({text="Something went wrong, please report Lich King not spawning on Discord!" , duration = 5.0})		
+		return
+	end
+
 	for _, hero in pairs(HeroList:GetAllHeroes()) do
 		if hero:IsRealHero() and hero:GetTeam() == DOTA_TEAM_GOODGUYS then
 			local id = hero:GetPlayerID()
@@ -322,31 +327,32 @@ local reincarnate_time = 8.0
 			hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {Duration = 20, IsHidden = true})
 			hero:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 20, IsHidden = true})
 			hero:Stop()
-			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), lich_king)
+			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), XHS_LICH_KING_BOSS)
+
 			Timers:CreateTimer(0.5, function()
-				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil)
+				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
 			end)
 		end
 	end
 
 	Timers:CreateTimer(2.0, function()
-		StartAnimation(lich_king, {duration = reincarnate_time, activity = ACT_DOTA_SPAWN, rate = 1.0})
+		StartAnimation(XHS_LICH_KING_BOSS, {duration = reincarnate_time, activity = ACT_DOTA_SPAWN, rate = 1.0})
+
 		Timers:CreateTimer(5.0, function()
-			lich_king:EmitSound("Hero_SkeletonKing.Reincarnate")
+			XHS_LICH_KING_BOSS:EmitSound("Hero_SkeletonKing.Reincarnate")
 		end)
+
 		Timers:CreateTimer(reincarnate_time, function()
-			UTIL_Remove(lich_king)
-			local lich_king2 = CreateUnitByName("npc_dota_boss_lich_king", point_boss, true, nil, nil, DOTA_TEAM_CUSTOM_2)
-			StartAnimation(lich_king2, {duration = 3.0, activity = ACT_DOTA_SPAWN, rate = 0.65})
-			lich_king2:SetAngles(0, 90, 0)
-			lich_king2:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 12, IsHidden = true})
-			lich_king2:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 12, IsHidden = true})
---			BossBar(lich_king2, "lich_king")
-			lich_king2.zone = "xhs_holdout"
+			FindClearSpaceForUnit(XHS_LICH_KING_BOSS, point_boss, true)
+--			XHS_LICH_KING_BOSS:SetAngles(0, 90, 0)
+			XHS_LICH_KING_BOSS:RemoveModifierByName("modifier_invulnerable")
+			XHS_LICH_KING_BOSS:RemoveModifierByName("modifier_stunned")
+--			BossBar(XHS_LICH_KING_BOSS, "lich_king")
+			XHS_LICH_KING_BOSS.zone = "xhs_holdout"
 		end)
 	end)
 
-	Timers:CreateTimer(14,function()
+	Timers:CreateTimer(14.0, function()
 		Notifications:TopToAll({text="From death, i grow stronger!" , duration = 5.0})
 	end)
 end

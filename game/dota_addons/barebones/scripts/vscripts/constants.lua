@@ -397,6 +397,23 @@ _G.XHS_LIFESTEAL_MODIFIER_PRIORITY["modifier_lightning_sword_lifesteal"] = 1
 _G.XHS_LIFESTEAL_MODIFIER_PRIORITY["modifier_lifesteal"] = 2
 _G.XHS_LIFESTEAL_MODIFIER_PRIORITY["modifier_xhs_vampiric_aura"] = 3
 
+MODIFIER_ITEMS_WITH_LEVELS = {}
+MODIFIER_ITEMS_WITH_LEVELS["modifier_lifesteal"] = {
+	"item_doom_artifact",
+	"item_lightning_sword",
+	"item_lifesteal_mask",
+}
+MODIFIER_ITEMS_WITH_LEVELS["modifier_orb_of_darkness_active"] = {
+	"item_bracer_of_the_void",
+	"item_orb_of_darkness2",
+	"item_orb_of_darkness",
+}
+MODIFIER_ITEMS_WITH_LEVELS["modifier_orb_of_lightning_active"] = {
+	"item_celestial_claws",
+	"item_orb_of_lightning2",
+	"item_orb_of_lightning",
+}
+
 DONATOR_COLOR = {}
 DONATOR_COLOR[0] = {33, 39, 47} -- Not a donator
 DONATOR_COLOR[1] = {135, 20, 20} -- IMBA Lead-Developer

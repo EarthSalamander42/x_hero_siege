@@ -150,11 +150,8 @@ function modifier_orb_of_lightning_active:OnAttackLanded(params)
 			}
 
 			if ability == nil then
-				local new_item = false
-
 				for _, item_name in ipairs(items) do
 					if self:GetParent():HasItemInInventory(item_name) then
-						new_item = true
 						ability = self:GetParent():FindItemByName(item_name, false)
 
 						break
@@ -162,7 +159,8 @@ function modifier_orb_of_lightning_active:OnAttackLanded(params)
 				end
 			end
 
-			if new_item == false then
+			-- if it's still nil after item check
+			if ability == nil then
 				print("No item for this modifier, remove it!")
 				self:GetParent():RemoveModifierByName("modifier_orb_of_lightning_active")
 

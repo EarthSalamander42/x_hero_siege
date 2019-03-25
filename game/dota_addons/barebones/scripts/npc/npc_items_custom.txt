@@ -2151,8 +2151,8 @@
 			}
 			"05"
 			{
-				"var_type"						"FIELD_INTEGER"
-				"damage_return_pct"				"20"
+				"var_type"				"FIELD_INTEGER"
+				"damage_return_pct"		"20"
 			}
 		}
 
@@ -2495,9 +2495,9 @@
 		"ID"							"2529"
 		"AbilityTextureName"			"custom/potion_full"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
-		"AbilityCooldown"				"10.0"	
+		"AbilityCooldown"				"5.0"
 		"AbilityCastRange"				"0"
-		"ItemCost"						"4750"
+		"ItemCost"						"3500"
 		"ItemQuality"					"rare"
 		"ItemStackable"					"1"
 		"ItemPermanent"					"0"

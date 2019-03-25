@@ -32,7 +32,7 @@ end
 
 function api:GetDonatorStatus(player_id)
 	if not PlayerResource:IsValidPlayerID(player_id) then
-		native_print("api:GetDonatorStatus: Player ID not valid!")
+--		native_print("api:GetDonatorStatus: Player ID not valid!")
 		return 0
 	end
 

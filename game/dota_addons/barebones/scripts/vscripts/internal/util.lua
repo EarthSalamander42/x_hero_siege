@@ -1015,6 +1015,7 @@ function CDOTA_BaseNPC:IsXHSReincarnating()
 end
 
 function ShowBossBar(caster)
+	print("ShowBossBar", caster.deathStart)
 	if caster.deathStart then return end
 	local icon
 	local light_color = "#009933"

@@ -105,7 +105,6 @@ function EndPhase2()
 end
 
 function FinalWave()
-	print("Final Wave!")
 	for _, hero in pairs(HeroList:GetAllHeroes()) do
 		if hero:IsRealHero() and hero:GetTeam() == DOTA_TEAM_GOODGUYS then
 			local id = hero:GetPlayerID()
@@ -122,6 +121,8 @@ function FinalWave()
 			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
 		end)
 	end
+
+	EmitSoundOn("yaskar_01.music.ui_hero_select", Entities:FindByClassname(nil, "npc_dota_fort"))
 
 	Timers:CreateTimer(10, function()
 		FinalWaveSpawner("npc_abomination", "npc_banshee", "npc_necro", "npc_magnataur", "npc_dota_hero_balanar", 0, "west", "final_wave_player_2")
@@ -140,6 +141,8 @@ function FinalWave()
 	end)
 
 	Timers:CreateTimer(31, function()
+		StopSoundOn("yaskar_01.music.ui_hero_select", Entities:FindByClassname('npc_dota_fort'))
+
 		local units = FindUnitsInRadius(DOTA_TEAM_NEUTRALS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_ALL, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false )
 		local number = 0
 
