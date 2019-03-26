@@ -29,8 +29,8 @@ require('units/breakable_container_surprises')
 require('units/treasure_chest_surprises')
 require('triggers')
 require('items/global')
-require('api/api')
-require('libraries/adv_log')
+require('components/api/init')
+-- require('libraries/adv_log')
 require('components/battlepass/init')
 require('components/loading_screen/init')
 
@@ -177,6 +177,7 @@ function GameMode:InitGameMode()
 		Convars:RegisterCommand("duel_event", function(keys) return DuelEvent() end, "Test Duel Event", FCVAR_CHEAT)
 		Convars:RegisterCommand("magtheridon", function(keys) return StartMagtheridonArena() end, "Test Magtheridon Boss", FCVAR_CHEAT)
 		Convars:RegisterCommand("banehallow", function(keys) return StartBanehallowArena() end, "Test Magtheridon Boss", FCVAR_CHEAT)
+		Convars:RegisterCommand("lich_king", function(keys) return StartLichKingArena() end, "Test Magtheridon Boss", FCVAR_CHEAT)
 		Convars:RegisterCommand("r&b", function(keys) return RameroAndBaristolEvent() end, "Test Ramero and Baristol Arena", FCVAR_CHEAT)
 		Convars:RegisterCommand("r", function(keys) return RameroEvent() end, "Test Ramero Arena", FCVAR_CHEAT)
 		Convars:RegisterCommand("farm_event", function(keys) return FarmTest() end, "Test Farm Event", FCVAR_CHEAT)
@@ -363,17 +364,6 @@ function GameMode:OnGameRulesStateChange(keys)
 
 	if newState == DOTA_GAMERULES_STATE_POST_GAME then
 		print("END THE GAME!")
-
---		api:CompleteGame(function(data, payload)
---			CustomGameEventManager:Send_ServerToAllClients("end_game", {
---				players = payload.players,
---				data = data,
---				info = {
---					game_time = nTimer_GameTime,
---					id = api:GetApiGameId(),
---				},
---			})
---		end)
 
 		CustomGameEventManager:Send_ServerToAllClients("end_game", {
 			info = {

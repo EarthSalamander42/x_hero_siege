@@ -88,6 +88,7 @@
 	"quest4_info"								"- Special Event 1 (Muradin):\n Starts automatically after 12 minutes. You can't kill Muradin Bronzebeard. Just survive the 2 minutes countdown to receive 15 000 Bonus Gold.\n\n- Special Event 2 (Farm Event):\nStarts automatically after 24 minutes. Kill as many creeps as you can to earn gold and xp.\n\n- Special Event 3 (Ramero and Baristol):\nKill 500 creeps to enter the special arena. Kill Ramero for the 'Lightning Sword'.\n\n- Special Event 4 (Ramero 2):\nKill 750 creeps to enter the special arena. Kill Ramero for the 'Ring of Superiority'. This item is very helpful to complete the game."
 
 	// Battlepass
+	"battlepass_level"				"Level: "
 	"battlepass_xp"					"Battlepass XP"
 
 	//Donator Tab

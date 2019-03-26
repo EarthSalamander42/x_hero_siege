@@ -322,16 +322,19 @@ local reincarnate_time = 8.0
 	for _, hero in pairs(HeroList:GetAllHeroes()) do
 		if hero:IsRealHero() and hero:GetTeam() == DOTA_TEAM_GOODGUYS then
 			local id = hero:GetPlayerID()
-			local point = Entities:FindByName(nil, "point_teleport_boss_"..id)
-			FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
-			hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {Duration = 20, IsHidden = true})
-			hero:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 20, IsHidden = true})
-			hero:Stop()
-			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), XHS_LICH_KING_BOSS)
+			print("ID:", id)
+			if type(id) == "number" and id ~= -1 then
+				local point = Entities:FindByName(nil, "point_teleport_boss_"..id)
+				FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
+				hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {Duration = 20, IsHidden = true})
+				hero:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 20, IsHidden = true})
+				hero:Stop()
+				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), XHS_LICH_KING_BOSS)
 
-			Timers:CreateTimer(0.5, function()
-				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
-			end)
+				Timers:CreateTimer(0.5, function()
+					PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
+				end)
+			end
 		end
 	end
 

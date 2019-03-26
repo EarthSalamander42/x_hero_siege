@@ -32,7 +32,7 @@ end
 
 function api:GetDonatorStatus(player_id)
 	if not PlayerResource:IsValidPlayerID(player_id) then
---		native_print("api:GetDonatorStatus: Player ID not valid!")
+		native_print("api:GetDonatorStatus: Player ID not valid!")
 		return 0
 	end
 
@@ -46,6 +46,7 @@ function api:GetDonatorStatus(player_id)
 	if self.players[steamid] ~= nil then
 		return self.players[steamid].status
 	else
+		--		native_print("api:GetDonatorStatus: api players steamid not valid!")
 		return 0
 	end
 end
@@ -150,6 +151,7 @@ function api:Message(message, _type)
 			message = data
 		})
 	end , function(err)
+
 		if err == nil then
 			err = "Unknown Error"
 		end
@@ -183,7 +185,16 @@ function api:Request(endpoint, okCallback, failCallback, method, payload)
 	end
 
 	request:SetHTTPRequestAbsoluteTimeoutMS(timeout)
-	request:SetHTTPRequestHeaderValue("X-Dota-Server-Key", GetDedicatedServerKey("2"))
+
+	local header_key = nil
+
+	if IsDedicatedServer() then
+		header_key = GetDedicatedServerKeyV2("2")
+	else
+		header_key = LoadKeyValues("scripts/vscripts/components/api/backend_key.kv").server_key
+	end
+
+	request:SetHTTPRequestHeaderValue("X-Dota-Server-Key", header_key)
 
 	-- encode payload
 	if payload ~= nil then
@@ -192,7 +203,6 @@ function api:Request(endpoint, okCallback, failCallback, method, payload)
 	end
 
 	request:Send(function(result)
-
 		local code = result.StatusCode;
 
 		local fail = function(message)
@@ -236,6 +246,7 @@ function api:Request(endpoint, okCallback, failCallback, method, payload)
 end
 
 function api:RegisterGame(callback)
+
 	self:Request("game-register", function(data)
 		api.game_id = data.game_id
 		api.players = data.players
@@ -311,4 +322,4 @@ function api:CompleteGame(successCallback, failCallback)
 	end, failCallback, "POST", payload);
 end
 
-require("api/events")
+require("components/api/events")
