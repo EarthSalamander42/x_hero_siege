@@ -57,18 +57,7 @@ function grom_boss_die(caster)
 FourBossesKillCount()
 
 	Timers:CreateTimer(1.0, function()
-		Notifications:TopToAll({text="Power Up: +250 to all stats!", style={color="green"}, duration=10.0})
-		caster:EmitSound("ui.trophy_levelup")
-		local heroes = HeroList:GetAllHeroes()
-		for _,hero in pairs(heroes) do
-			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
-				hero:ModifyAgility(250)
-				hero:ModifyStrength(250)
-				hero:ModifyIntellect(250)
-				local particle1 = ParticleManager:CreateParticle("particles/econ/events/ti6/hero_levelup_ti6.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
-				ParticleManager:SetParticleControl(particle1, 0, hero:GetAbsOrigin())
-			end
-		end
+		GiveTomeToAllHeroes(250)
 		EmitGlobalSound("Loot_Drop_Stinger_Arcana")
 	end)
 
@@ -95,18 +84,7 @@ function illidan_boss_die(caster)
 FourBossesKillCount()
 
 	Timers:CreateTimer(1.0, function()
-		Notifications:TopToAll({text="Power Up: +250 to all stats!", style={color="green"}, duration=10.0})
-		caster:EmitSound("ui.trophy_levelup")
-		local heroes = HeroList:GetAllHeroes()
-		for _,hero in pairs(heroes) do
-			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
-				hero:ModifyAgility(250)
-				hero:ModifyStrength(250)
-				hero:ModifyIntellect(250)
-				local particle1 = ParticleManager:CreateParticle("particles/econ/events/ti6/hero_levelup_ti6.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
-				ParticleManager:SetParticleControl(particle1, 0, hero:GetAbsOrigin())
-			end
-		end
+		GiveTomeToAllHeroes(250)
 		EmitGlobalSound("Loot_Drop_Stinger_Arcana")
 	end)
 
@@ -136,18 +114,7 @@ function proudmoore_boss_die(caster)
 FourBossesKillCount()
 
 	Timers:CreateTimer(1.0, function()
-		Notifications:TopToAll({text="Power Up: +250 to all stats!", style={color="green"}, duration=10.0})
-		caster:EmitSound("ui.trophy_levelup")
-		local heroes = HeroList:GetAllHeroes()
-		for _,hero in pairs(heroes) do
-			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
-				hero:ModifyAgility(250)
-				hero:ModifyStrength(250)
-				hero:ModifyIntellect(250)
-				local particle1 = ParticleManager:CreateParticle("particles/econ/events/ti6/hero_levelup_ti6.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
-				ParticleManager:SetParticleControl(particle1, 0, hero:GetAbsOrigin())
-			end
-		end
+		GiveTomeToAllHeroes(250)
 		EmitGlobalSound("Loot_Drop_Stinger_Arcana")
 	end)
 
@@ -176,18 +143,7 @@ function balanar_boss_die(caster)
 FourBossesKillCount()
 
 	Timers:CreateTimer(1.0, function()
-		Notifications:TopToAll({text="Power Up: +250 to all stats!", style={color="green"}, duration=10.0})
-		caster:EmitSound("ui.trophy_levelup")
-		local heroes = HeroList:GetAllHeroes()
-		for _,hero in pairs(heroes) do
-			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
-				hero:ModifyAgility(250)
-				hero:ModifyStrength(250)
-				hero:ModifyIntellect(250)
-				local particle1 = ParticleManager:CreateParticle("particles/econ/events/ti6/hero_levelup_ti6.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
-				ParticleManager:SetParticleControl(particle1, 0, hero:GetAbsOrigin())
-			end
-		end
+		GiveTomeToAllHeroes(250)
 		EmitGlobalSound("Loot_Drop_Stinger_Arcana")
 	end)
 
@@ -212,18 +168,7 @@ end
 function arthas_boss_die(caster)
 	EmitGlobalSound("Arthas.Death")
 	Timers:CreateTimer(1.0, function()
-		Notifications:TopToAll({text="Power Up: +250 to all stats!", style={color="green"}, duration=10.0})
-		caster:EmitSound("ui.trophy_levelup")
-		local heroes = HeroList:GetAllHeroes()
-		for _,hero in pairs(heroes) do
-			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
-				hero:ModifyAgility(250)
-				hero:ModifyStrength(250)
-				hero:ModifyIntellect(250)
-				local particle1 = ParticleManager:CreateParticle("particles/econ/events/ti6/hero_levelup_ti6.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
-				ParticleManager:SetParticleControl(particle1, 0, hero:GetAbsOrigin())
-			end
-		end
+		GiveTomeToAllHeroes(250)
 		EmitGlobalSound("Loot_Drop_Stinger_Arcana")
 	end)
 
@@ -265,18 +210,7 @@ end
 
 function banehallow_boss_die(caster)
 	Timers:CreateTimer(1.0, function()
-		Notifications:TopToAll({text="Power Up: +250 to all stats!", style={color="green"}, duration=10.0})
-		caster:EmitSound("ui.trophy_levelup")
-		local heroes = HeroList:GetAllHeroes()
-		for _,hero in pairs(heroes) do
-			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
-				hero:ModifyAgility(250)
-				hero:ModifyStrength(250)
-				hero:ModifyIntellect(250)
-				local particle1 = ParticleManager:CreateParticle("particles/econ/events/ti6/hero_levelup_ti6.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
-				ParticleManager:SetParticleControl(particle1, 0, hero:GetAbsOrigin())
-			end
-		end
+		GiveTomeToAllHeroes(250)
 		EmitGlobalSound("Loot_Drop_Stinger_Arcana")
 	end)
 
@@ -302,18 +236,7 @@ end
 
 function LichKingEnd(caster)
 	Timers:CreateTimer(1.0, function()
-		Notifications:TopToAll({text="Power Up: +250 to all stats!", style={color="green"}, duration=10.0})
-		caster:EmitSound("ui.trophy_levelup")
-		local heroes = HeroList:GetAllHeroes()
-		for _,hero in pairs(heroes) do
-			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
-				hero:ModifyAgility(250)
-				hero:ModifyStrength(250)
-				hero:ModifyIntellect(250)
-				local particle1 = ParticleManager:CreateParticle("particles/econ/events/ti6/hero_levelup_ti6.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
-				ParticleManager:SetParticleControl(particle1, 0, hero:GetAbsOrigin())
-			end
-		end
+		GiveTomeToAllHeroes(250)
 		EmitGlobalSound("Loot_Drop_Stinger_Arcana")
 	end)
 

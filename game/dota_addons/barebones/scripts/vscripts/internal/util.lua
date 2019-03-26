@@ -870,8 +870,10 @@ function RefreshPlayers()
 end
 
 function TeleportHero(hero, delay, point)
-local pos = hero:GetAbsOrigin()
--- local pos = hero:GetAbsOrigin() + RandomVector(400)
+	if not hero.GetPlayerID then return end
+	if hero:GetPlayerID() == -1 then return end
+	local pos = hero:GetAbsOrigin()
+--	local pos = hero:GetAbsOrigin() + RandomVector(400)
 
 	local TeleportEffect
 	local TeleportEffectEnd
@@ -885,6 +887,7 @@ local pos = hero:GetAbsOrigin()
 		ParticleManager:SetParticleControl(TeleportEffectEnd, 1, point)
 		hero:Attribute_SetIntValue( "effectsID", TeleportEffect )
 	end
+
 	PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
 	hero:AddNewModifier(hero, nil, "modifier_command_restricted", {})
 	hero:EmitSound("Portal.Loop_Appear")
@@ -1075,6 +1078,46 @@ function CheatDetector()
 				GameRules:SetSafeToLeave(true)
 --			end
 		end
+	end
+end
+
+function TeleportAllHeroes(sEvent, iDelay)
+	for _, hero in pairs(HeroList:GetAllHeroes()) do
+		if hero:IsRealHero() and hero:GetTeam() == DOTA_TEAM_GOODGUYS then
+			local id = hero:GetPlayerID()
+			if hero:GetPlayerID() ~= -1 then
+				local point = Entities:FindByName(nil, sEvent..tostring(id)) -- might cause error with Dark Fundamental?
+
+				FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
+				hero:AddNewModifier(nil, nil, "modifier_boss_stun", {duration= iDelay, IsHidden = true})
+				hero:AddNewModifier(nil, nil, "modifier_invulnerable", {duration= iDelay, IsHidden = true})
+				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
+			end
+		end
+
+		Timers:CreateTimer(iDelay, function()
+			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
+		end)
+	end
+end
+
+function GiveTomeToAllHeroes(iCount)
+	local sound_played = false
+
+	Notifications:TopToAll({text="Power Up: +250 to all stats!", style={color="green"}, duration=10.0})
+
+	for _, hero in pairs(HeroList:GetAllHeroes()) do
+		if sound_played == false then
+			hero:EmitSound("ui.trophy_levelup")
+			sound_played = true
+		end
+
+		hero:ModifyAgility(iCount)
+		hero:ModifyStrength(iCount)
+		hero:ModifyIntellect(iCount)
+
+		local pfx = ParticleManager:CreateParticle("particles/econ/events/ti6/hero_levelup_ti6.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
+		ParticleManager:SetParticleControl(pfx, 0, hero:GetAbsOrigin())
 	end
 end
 

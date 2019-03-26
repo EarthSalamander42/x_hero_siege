@@ -105,22 +105,9 @@ function EndPhase2()
 end
 
 function FinalWave()
-	for _, hero in pairs(HeroList:GetAllHeroes()) do
-		if hero:IsRealHero() and hero:GetTeam() == DOTA_TEAM_GOODGUYS then
-			local id = hero:GetPlayerID()
-			local point = Entities:FindByName(nil, "final_wave_player_"..id) -- might cause error with Dark Fundamental?
-			FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
-			hero:AddNewModifier(nil, nil, "modifier_boss_stun", {duration= 30, IsHidden = true})
-			hero:AddNewModifier(nil, nil, "modifier_invulnerable", {duration= 30, IsHidden = true})
-			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
-		end
+	GameRules:SetHeroRespawnEnabled(false)
 
-		GameRules:SetHeroRespawnEnabled(false)
-
-		Timers:CreateTimer(30, function()
-			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
-		end)
-	end
+	TeleportAllHeroes("final_wave_player_", 30.0)
 
 	EmitSoundOn("yaskar_01.music.ui_hero_select", Entities:FindByClassname(nil, "npc_dota_fort"))
 

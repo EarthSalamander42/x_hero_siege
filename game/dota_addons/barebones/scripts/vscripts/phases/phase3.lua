@@ -1,7 +1,3 @@
-first_time_teleport_phase3_creeps = true
-first_time_teleport_arthas = true
-first_time_teleport_arthas_real = true
-
 function StartMagtheridonArena()
 local point_mag = Entities:FindByName(nil,"npc_dota_spawner_magtheridon_arena"):GetAbsOrigin()
 local point_mag2 = Entities:FindByName(nil,"npc_dota_spawner_magtheridon_arena2"):GetAbsOrigin()
@@ -13,14 +9,7 @@ local delay = 3.0
 	RefreshPlayers()
 	PHASE = 3
 
-	for _,hero in pairs(HeroList:GetAllHeroes()) do
-		if hero:IsRealHero() and hero:GetTeam() == DOTA_TEAM_GOODGUYS then
-			local point = Entities:FindByName(nil, "point_teleport_boss_"..hero:GetPlayerID())
-			TeleportHero(hero, delay, point:GetAbsOrigin())
-			hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {Duration = 10 + delay, IsHidden = true})
-			hero:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 10 + delay, IsHidden = true})
-		end
-	end
+	TeleportAllHeroes("point_teleport_boss_", 10.0 + delay)
 
 	Timers:CreateTimer(delay, function()
 		if difficulty == 1 then
@@ -90,6 +79,7 @@ function EndMagtheridonArena()
 	CustomGameEventManager:Send_ServerToAllClients("hide_ui", {})
 	Notifications:TopToAll({text="Magtheridon has been killed! Door opened.", style={color="white"}, duration=10.0})
 	DoEntFire("door_magtheridon", "SetAnimation", "gate_02_open", 0, nil, nil)
+
 	local DoorObs = Entities:FindAllByName("obstruction_magtheridon")
 	for _, obs in pairs(DoorObs) do
 		obs:SetEnabled(false, true)
@@ -125,65 +115,32 @@ local play_sound = false
 RefreshPlayers()
 
 	Timers:CreateTimer(0.5, function()
-		if first_time_teleport_phase3_creeps then
-			DoEntFire("trigger_teleport_phase3_creeps", "Kill", nil, 0, nil, nil)
-			Notifications:TopToAll({text="Power Up: +250 to all stats!", style={color="green"}, duration=10.0})
-			first_time_teleport_phase3_creeps = false
+		DoEntFire("trigger_teleport_phase3_creeps", "Kill", nil, 0, nil, nil)
+		TeleportAllHeroes("point_teleport_phase3_creeps_", 5.0)
+		GiveTomeToAllHeroes(250)
 
-			for _,hero in pairs(HeroList:GetAllHeroes()) do
-				if hero:IsRealHero() and hero:GetTeam() == DOTA_TEAM_GOODGUYS then
-					if play_sound == false then
-						hero:EmitSound("ui.trophy_levelup")
-						play_sound = true
-					end
-					local id = hero:GetPlayerID()
-					local point = Entities:FindByName(nil,"point_teleport_phase3_creeps_"..id)
-					FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
-					hero:Stop()
-					hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {Duration = 5, IsHidden = true})
-					hero:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 5, IsHidden = true})
-					hero:ModifyAgility(250)
-					hero:ModifyStrength(250)
-					hero:ModifyIntellect(250)
-					hero.dayvision = hero:GetDayTimeVisionRange()
-					hero.nightvision = hero:GetNightTimeVisionRange()
-					hero:SetDayTimeVisionRange(300)
-					hero:SetNightTimeVisionRange(300)
-					local particle1 = ParticleManager:CreateParticle("particles/econ/events/ti6/hero_levelup_ti6.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
-					ParticleManager:SetParticleControl(particle1, 0, hero:GetAbsOrigin())
-					PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
-					Timers:CreateTimer(0.1, function()
-						PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil)
-					end)
-					Timers:CreateTimer(3, function()
-						local unit = CreateUnitByName("npc_dota_creep_dire_hulk", point2 + RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_CUSTOM_2)
-						local unit = CreateUnitByName("npc_dota_creep_dire_hulk", point2 + RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_CUSTOM_2)
-					end)
-					Timers:CreateTimer(5, function()
-						local unit = CreateUnitByName("npc_dota_creep_dire_hulk", point3 + RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_CUSTOM_2)
-						local unit = CreateUnitByName("npc_dota_creep_dire_hulk", point3 + RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_CUSTOM_2)
-					end)
+		for i = 0, PlayerResource:GetPlayerCount() - 1 do
+			Timers:CreateTimer(3.0, function()
+				for i = 1, 2 do
+					local unit = CreateUnitByName("npc_dota_creep_dire_hulk", point2 + RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 				end
-			end
+			end)
 
 			Timers:CreateTimer(5.0, function()
-				for _,hero in pairs(HeroList:GetAllHeroes()) do
-					if hero:IsRealHero() then
-						hero:SetDayTimeVisionRange(hero.dayvision)
-						hero:SetNightTimeVisionRange(hero.nightvision)
-					end
+				for i = 1, 2 do
+					local unit = CreateUnitByName("npc_dota_creep_dire_hulk", point3 + RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 				end
-			end)
-
-			Timers:CreateTimer(10, function()
-				local DoorObs = Entities:FindAllByName("obstruction_grom")
-				for _, obs in pairs(DoorObs) do
-					obs:SetEnabled(false, true)
-				end
-				DoEntFire("door_grom", "SetAnimation", "gate_02_open", 0, nil, nil)
-				DoEntFire("door_grom2", "SetAnimation", "gate_02_open", 0, nil, nil)
 			end)
 		end
+
+		Timers:CreateTimer(10, function()
+			local DoorObs = Entities:FindAllByName("obstruction_grom")
+			for _, obs in pairs(DoorObs) do
+				obs:SetEnabled(false, true)
+			end
+			DoEntFire("door_grom", "SetAnimation", "gate_02_open", 0, nil, nil)
+			DoEntFire("door_grom2", "SetAnimation", "gate_02_open", 0, nil, nil)
+		end)
 	end)
 end
 
@@ -195,41 +152,25 @@ local teleporters = Entities:FindAllByName("trigger_teleport3")
 		for _,v in pairs(teleporters) do
 			v:Enable()
 		end
-		Notifications:TopToAll({text="You have killed Grom, Proudmoore, Illidan and Balanar. Red Teleporters Activated." , duration = 10.0})
+		Notifications:TopToAll({text="You have killed Grom, Proudmoore, Illidan and Balanar. Talk to Uther." , duration = 10.0})
 	end
 end
 
 function StartArthasArena(keys)
-	if first_time_teleport_arthas_real then
-		DoEntFire("door_magtheridon", "SetAnimation", "gate_02_close", 0, nil, nil)
-		local DoorObs = Entities:FindAllByName("obstruction_magtheridon")
-		for _, obs in pairs(DoorObs) do
-			obs:SetEnabled(true, false)
-		end
-
-		local arthas = CreateUnitByName("npc_dota_hero_arthas", Entities:FindByName(nil,"npc_dota_spawner_magtheridon_arena"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_CUSTOM_2)
-		arthas:SetAngles(0, 270, 0)
-		arthas:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 10, IsHidden = true})
-		arthas:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 9, IsHidden = true})
---		BossBar(arthas, "arthas")
-		arthas.zone = "xhs_holdout"
-
-		for _,hero in pairs(HeroList:GetAllHeroes()) do
-			if hero:IsRealHero() and hero:GetTeam() == DOTA_TEAM_GOODGUYS then
-				local id = hero:GetPlayerID()
-				local point = Entities:FindByName(nil, "point_teleport_boss_"..id)
-				FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
-				hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {Duration = 10, IsHidden = true})
-				hero:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 10, IsHidden = true})
-				hero:Stop()
-				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
-				Timers:CreateTimer(0.1, function()
-					PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil)
-				end)
-				first_time_teleport_arthas_real = false
-			end
-		end
+	DoEntFire("door_magtheridon", "SetAnimation", "gate_02_close", 0, nil, nil)
+	local DoorObs = Entities:FindAllByName("obstruction_magtheridon")
+	for _, obs in pairs(DoorObs) do
+		obs:SetEnabled(true, false)
 	end
+
+	local arthas = CreateUnitByName("npc_dota_hero_arthas", Entities:FindByName(nil,"npc_dota_spawner_magtheridon_arena"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_CUSTOM_2)
+	arthas:SetAngles(0, 270, 0)
+	arthas:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 10, IsHidden = true})
+	arthas:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 9, IsHidden = true})
+--	BossBar(arthas, "arthas")
+	arthas.zone = "xhs_holdout"
+
+	TeleportAllHeroes("point_teleport_boss_", 10.0)
 end
 
 function StartBanehallowArena()
@@ -347,9 +288,10 @@ local reincarnate_time = 8.0
 
 		Timers:CreateTimer(reincarnate_time, function()
 			FindClearSpaceForUnit(XHS_LICH_KING_BOSS, point_boss, true)
---			XHS_LICH_KING_BOSS:SetAngles(0, 90, 0)
 			XHS_LICH_KING_BOSS:RemoveModifierByName("modifier_invulnerable")
 			XHS_LICH_KING_BOSS:RemoveModifierByName("modifier_stunned")
+			XHS_LICH_KING_BOSS:SetAttackCapability(DOTA_UNIT_CAP_MELEE_ATTACK)
+			XHS_LICH_KING_BOSS:SetMoveCapability(DOTA_UNIT_CAP_MOVE_GROUND)
 --			BossBar(XHS_LICH_KING_BOSS, "lich_king")
 			XHS_LICH_KING_BOSS.zone = "xhs_holdout"
 		end)

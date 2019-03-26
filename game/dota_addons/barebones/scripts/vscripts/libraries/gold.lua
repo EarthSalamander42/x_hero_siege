@@ -11,7 +11,7 @@ if Gold == nil then
 	Gold = class({})
 end
 
-local GOLD_CAP = 999999
+local GOLD_CAP = 50000
 
 function Gold:Init()
 	-- a table for every player

@@ -140,6 +140,7 @@ function FarmEvent(time)
 		BT_ENABLED = 1
 		EndFarmEvent()
 		CustomGameEventManager:Send_ServerToAllClients("update_special_event_label_final", {})
+		nTimer_GameTime = XHS_SPECIAL_EVENT_INTERVAL * 2 - 1
 		nTimer_SpecialEvent = XHS_PHASE_2_DELAY + 10.0
 
 		Timers:CreateTimer(10.0, function()
@@ -223,6 +224,22 @@ function EndFarmEvent()
 	Notifications:TopToAll({text="Phase 2 begins! (Destroyer Magnataur launched)", duration=10.0, style={color="red"}})
 end
 
+function StartRameroAndBaristolEvent(hero)
+	local point = Entities:FindByName(nil, "npc_dota_muradin_player_1"):GetAbsOrigin()
+	local delay = 5.0
+
+	Notifications:TopToAll({text="A hero has reached 500 kills and will fight Ramero and Baristol!", style={color="white"}, duration=5.0})
+	TeleportHero(hero, delay, point)
+	PauseCreeps()
+
+	Timers:CreateTimer(delay, function()
+		RameroAndBaristolEvent(120)
+	end)
+
+	RAMERO = 1
+	hero.old_pos = hero:GetAbsOrigin()
+end
+
 function RameroAndBaristolEvent(time) -- 500 kills
 nTimer_SpecialArena = time
 SPECIAL_EVENT = 1
@@ -277,7 +294,23 @@ GameMode.SpecialArena_occuring = 1
 	end)
 end
 
-function RameroEvent(time) -- 750 kills
+function StartSogatEvent(hero)
+	local point = Entities:FindByName(nil, "npc_dota_muradin_player_1"):GetAbsOrigin()
+	local delay = 5.0
+
+	Notifications:TopToAll({text="A hero has reached 750 kills and will fight Ramero!", style={color="white"}, duration=5.0})
+	PauseCreeps()
+	TeleportHero(hero, delay, point)
+
+	Timers:CreateTimer(delay, function()
+		SogatEvent(120)
+	end)
+
+	RAMERO = 2
+	hero.old_pos = hero:GetAbsOrigin()
+end
+
+function SogatEvent(time) -- 750 kills
 SPECIAL_EVENT = 1
 nTimer_SpecialArena = time
 PauseCreeps()

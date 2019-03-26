@@ -10098,7 +10098,7 @@
 
 		// Attack
 		//----------------------------------------------------------------
-		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
+		"AttackCapabilities"		"DOTA_UNIT_CAP_NO_ATTACK"
 		"AttackDamageMin"			"99998"							// Damage range min.
 		"AttackDamageMax"			"100000"						// Damage range max.
 		"AttackRate"				"0.70"							// Speed of attack.
@@ -10122,7 +10122,7 @@
 
 		// Movement
 		//----------------------------------------------------------------
-		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"			// Type of locomotion - ground, air
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_NONE"			// Type of locomotion - ground, air
 		"MovementSpeed"				"399"		// Speed
 		"MovementTurnRate"			"0.5"		// Turning rate.
 		

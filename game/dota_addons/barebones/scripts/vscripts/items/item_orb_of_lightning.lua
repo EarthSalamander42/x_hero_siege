@@ -13,7 +13,13 @@ local function StartSpell(caster, ability)
 	end
 end
 
-local function StartLightningOrbsCooldown(hero, items, cooldown)
+local function StartLightningOrbsCooldown(hero, cooldown)
+	local items = {
+		"item_celestial_claws",
+		"item_orb_of_lightning2",
+		"item_orb_of_lightning",
+	}
+
 	for i = 0, 5 do
 		local item = hero:GetItemInSlot(i)
 
@@ -171,7 +177,7 @@ function modifier_orb_of_lightning_active:OnAttackLanded(params)
 				if ability:IsCooldownReady() then
 					if not params.target:IsBuilding() then
 						params.target:AddNewModifier(caster, ability, "modifier_orb_of_lightning_purge", {duration = self.duration})
-						StartLightningOrbsCooldown(params.attacker, items, self.purge_cooldown)
+						StartLightningOrbsCooldown(params.attacker, self.purge_cooldown)
 					end
 				end
 			end
@@ -247,7 +253,7 @@ function modifier_orb_of_lightning_purge:OnCreated()
 
 		if self:GetParent():IsSummoned() then
 			ApplyDamage({victim = self:GetParent(), attacker = self:GetCaster(), damage = self:GetAbility():GetSpecialValueFor('damage_to_summons'), damage_type = DAMAGE_TYPE_PURE, ability = self:GetAbility()})
-			StartLightningOrbsCooldown(params.attacker, items, 10.0)
+			StartLightningOrbsCooldown(self:GetCaster(), 10.0)
 		end
 	end
 end
