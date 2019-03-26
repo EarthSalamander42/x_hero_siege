@@ -123,12 +123,14 @@ function modifier_orb_of_darkness_active:OnIntervalThink()
 	for i = 0, 5 do
 		local item = self:GetParent():GetItemInSlot(i)
 
-		for k, v in pairs(MODIFIER_ITEMS_WITH_LEVELS["modifier_orb_of_darkness_active"]) do
-			print(v, item:GetAbilityName())
-			if v == item:GetAbilityName() then
-				has_parent_item = true
+		if item then
+			for k, v in pairs(MODIFIER_ITEMS_WITH_LEVELS["modifier_orb_of_darkness_active"]) do
+				print(v, item:GetAbilityName())
+				if v == item:GetAbilityName() then
+					has_parent_item = true
 
-				break
+					break
+				end
 			end
 		end
 	end
