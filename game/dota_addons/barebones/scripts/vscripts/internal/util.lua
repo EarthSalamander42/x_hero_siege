@@ -1121,6 +1121,10 @@ function GiveTomeToAllHeroes(iCount)
 	end
 end
 
+function WinGame()
+	GameRules:SetGameWinner(2)
+end
+
 -- credits to yahnich for the following
 function CDOTA_BaseNPC:IsRealHero()
 	if not self:IsNull() then
