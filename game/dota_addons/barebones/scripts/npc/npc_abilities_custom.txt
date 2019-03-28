@@ -5900,20 +5900,22 @@
 	//=================================================================================================================
 	// Dryad: Trueshot Aura
 	//=================================================================================================================
-	"holdout_trueshot_aura"
+	"xhs_trueshot_aura"
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"BaseClass"             		"drow_ranger_trueshot"
-		"AbilityTextureName"			"custom/holdout_trueshot_aura"
+		"BaseClass"             		"ability_lua"
+		"ScriptFile"					"heroes/hero_enchantress.lua"
+		"AbilityTextureName"			"custom/xhs_trueshot_aura"
 		"MaxLevel" 						"3"
 		"RequiredLevel"					"10"
 		"LevelsBetweenUpgrades"			"5"
 		"AbilityType"					"DOTA_ABILITY_TYPE_ULTIMATE"
 		
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
-		"AbilityUnitTargetFlags"		"DOTA_UNIT_TARGET_FLAG_NOT_ANCIENTS"
+		"AbilityUnitTargetFlags"		"DOTA_UNIT_TARGET_FLAG_RANGED_ONLY"
 
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
@@ -5932,7 +5934,7 @@
 			"01"
 			{
 				"var_type"					"FIELD_FLOAT"
-				"trueshot_ranged_damage"	"35 70 100"
+				"trueshot_ranged_damage"	"30 50 70"
 			}
 		}
 	}
@@ -5940,12 +5942,12 @@
 	//=================================================================================================================
 	// Dryad: Trueshot Aura
 	//=================================================================================================================
-	"holdout_trueshot_aura_alt"
+	"xhs_trueshot_aura_alt"
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"             		"drow_ranger_trueshot"
-		"AbilityTextureName"			"custom/holdout_trueshot_aura"
+		"AbilityTextureName"			"custom/xhs_trueshot_aura"
 		"RequiredLevel"					"8"
 		"LevelsBetweenUpgrades"			"3"
 		

@@ -32,7 +32,7 @@ end
 
 function api:GetDonatorStatus(player_id)
 	if not PlayerResource:IsValidPlayerID(player_id) then
-		native_print("api:GetDonatorStatus: Player ID not valid!")
+--		native_print("api:GetDonatorStatus: Player ID not valid!")
 		return 0
 	end
 
@@ -46,7 +46,7 @@ function api:GetDonatorStatus(player_id)
 	if self.players[steamid] ~= nil then
 		return self.players[steamid].status
 	else
-		--		native_print("api:GetDonatorStatus: api players steamid not valid!")
+--		native_print("api:GetDonatorStatus: api players steamid not valid!")
 		return 0
 	end
 end
