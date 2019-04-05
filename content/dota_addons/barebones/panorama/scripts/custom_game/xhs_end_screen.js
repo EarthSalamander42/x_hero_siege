@@ -23,8 +23,8 @@ function RawTimetoGameTime(time) {
 }
 
 function EndScoreboard(args) {
-	$.Msg("Hey this is the end of the game!")
-	$.Msg(args)
+//	$.Msg("Hey this is the end of the game!")
+//	$.Msg(args)
 
 	// Hide all other UI
 	var MainPanel = $.GetContextPanel().GetParent().GetParent().GetParent().GetParent()
@@ -37,7 +37,6 @@ function EndScoreboard(args) {
 
 	// Gather info
 	if (args) {
-//		var playerResults = args.players;
 		var serverInfo = args.info;
 		var mapInfo = Game.GetMapInfo();
 	}
@@ -70,18 +69,17 @@ function EndScoreboard(args) {
 //		$.Msg(info)
 
 		var result = null;
-//		for (var k in args.data.players) {
-//			if (k == info.player_steamid)
+		for (var k in args.data.players) {
+//			$.Msg(k)
+			if (k == info.player_steamid) {
 //				$.Msg(args.data.players[k])
 				return {
 					id: id,
 					info: info,
-//					result: args.data.players[k]
+					result: args.data.players[k]
 				};
-//		}
-
-//		$.Msg("WTF");
-//		$.Msg(playerResults);
+			}
+		}
 
 		return null;
 	};
@@ -121,7 +119,7 @@ function EndScoreboard(args) {
 			}
 		};
 
-		$.Msg(player.info.player_steamid);
+//		$.Msg(player.info.player_steamid);
 
 		// Avatar + Hero Image
 		values.avatar.steamid = player.info.player_steamid;
@@ -155,35 +153,11 @@ function EndScoreboard(args) {
 			values.xp.progress.style.width = progress + "%";
 		}
 
-		// IMR
-//		if (player.result != null) {
-//			values.imr.style.visibility = "visible";
-
-//			if (player.result.imr5v5_calibrating)
-//				values.imr.text = "TBD";
-//			else {
-//				var imr = Math.floor(player.result.imr5v5);
-//				var diff = Math.floor(player.result.imr5v5_difference);
-
-//				if (diff == 0) {
-//					values.imr.text = imr;
-//					values.imr.AddClass("es-text-white");
-//				} else if (diff > 0) {
-//					values.imr.text = imr + " (+" + diff + ")";
-//					values.imr.AddClass("es-text-green");
-//				} else {
-//					values.imr.text = imr + " (" + diff + ")";
-//					values.imr.AddClass("es-text-red");
-//				}
-//			}
-//		} else {
-//			values.imr.text = "N/A";
-//			values.rank1v1.text = "N/A";
-//		}
-
 //		$.Msg(player)
 		if (player.result != null) {
 			var xpDiff = Math.floor(player.result.xp_change);
+
+//			$.Msg(xpDiff)
 
 			if (xpDiff > 0) {
 				values.xp.earned.text = "+" + xpDiff;
@@ -213,6 +187,5 @@ function EndScoreboard(args) {
 	// Set Team Score
 	$("#es-team-score-radiant").text = new String(Game.GetTeamDetails(2).team_score);
 
-	if (serverInfo)
-		$("#es-game-time-text").text = RawTimetoGameTime(serverInfo.game_time);
+	$("#es-game-time-text").text = RawTimetoGameTime(Game.GetDOTATime(false, false));
 }

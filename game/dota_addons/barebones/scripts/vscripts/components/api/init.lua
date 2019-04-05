@@ -197,6 +197,7 @@ function api:Request(endpoint, okCallback, failCallback, method, payload)
 	CustomNetTables:SetTableValue("game_options", "server_key", {header_key})
 
 	request:SetHTTPRequestHeaderValue("X-Dota-Server-Key", header_key)
+	request:SetHTTPRequestHeaderValue("X-Dota-Game-Type", CUSTOM_GAME_TYPE)
 
 	-- encode payload
 	if payload ~= nil then
