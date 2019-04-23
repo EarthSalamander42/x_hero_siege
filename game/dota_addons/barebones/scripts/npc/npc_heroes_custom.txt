@@ -337,7 +337,7 @@
 		"DisableWearables"				"1"
 		"MovementSpeed"					"350"
 		"ModelScale"					"0.78" //0.84
-		"AttackAnimationPoint"			"0.3" // 0.5
+		"AttackAnimationPoint"			"0.6" // 0.5
 
 		"AttackDamageMin"				"21"
 		"AttackDamageMax"				"27"

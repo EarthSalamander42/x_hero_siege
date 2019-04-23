@@ -18827,37 +18827,6 @@
 					{
 						"ScriptFile"			"heroes/hero_kobold_knight.lua"
 						"Function"				"LifeSteal"
-						"modifier_lifesteal"	"modifier_life_steal"
-					}
-
-					"RunScript"
-					{
-						"ScriptFile"	"heroes/global.lua"
-						"Function"		"Lifesteal"
-					}
-				}
-			}
-
-			"modifier_lifesteal"
-			{
-				"IsHidden"			"1"
-				"OnDealDamage"
-				{
-					"Lifesteal"
-					{
-						"Target"				"CASTER"
-						"LifestealPercent"		"%lifesteal"
-					}
-
-					"SpendMana"
-					{
-						"Mana"					"%AbilityManaCost"
-					}
-
-					"FireSound"
-					{
-						"EffectName"	"Hero_LifeStealer.OpenWounds.Cast"
-						"Target" 		"CASTER"
 					}
 				}
 			}

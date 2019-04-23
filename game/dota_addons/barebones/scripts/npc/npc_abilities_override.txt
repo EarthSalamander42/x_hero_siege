@@ -3545,19 +3545,17 @@
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"	
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
 		"FightRecapLevel"				"1"
-
 		"HasScepterUpgrade"				"1"
-
 
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityCastRange"				"1200 1300 1400 1500"
-		"AbilityCastPoint"				"0.3 0.3 0.3 0.3"
+		"AbilityCastPoint"				"0.3"
 
 		// Time		
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityCooldown"				"14 13 12 11"
-		"AbilityDuration"				"0.6875 0.6875 0.6875 0.6875"
+		"AbilityDuration"				"0.6875"
 
 
 		// Cost
@@ -3603,9 +3601,19 @@
 			"07"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"pull_distance"				"100"
+				"scepter_distance"			"1725"
 			}
 			"08"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"scepter_speed"				"1200"
+			}
+			"09"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"pull_distance"				"100"
+			}
+			"10"
 			{
 				"var_type"					"FIELD_FLOAT"
 				"basic_slow_duration"		"0.75"
