@@ -48,11 +48,11 @@ function modifier_xhs_trueshot:IsPurgeException() return false end
 
 function modifier_xhs_trueshot:DeclareFunctions()
 	return {
-		MODIFIER_PROPERTY_DAMAGEOUTGOING_PERCENTAGE,
+		MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE,
 	}
 end
 
-function modifier_xhs_trueshot:GetModifierDamageOutgoing_Percentage()
+function modifier_xhs_trueshot:GetModifierPreAttack_BonusDamage()
 	if self:GetCaster().GetAgility then
 		self:SetStackCount(self:GetCaster():GetAgility() / 100 * self:GetAbility():GetSpecialValueFor("trueshot_ranged_damage"))
 	end
