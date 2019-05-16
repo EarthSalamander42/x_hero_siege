@@ -11238,14 +11238,14 @@
 
 		// Armor
 		//----------------------------------------------------------------
-		"ArmorPhysical"				"70"			// Physical protection.
+		"ArmorPhysical"				"50"			// Physical protection.
 		"MagicalResistance"			"40"			// Magical protection (percentage).
 
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
-		"AttackDamageMin"			"14990"		// Damage range min.
-		"AttackDamageMax"			"15010"		// Damage range max.
+		"AttackDamageMin"			"4500"		// Damage range min.
+		"AttackDamageMax"			"5500"		// Damage range max.
 		"AttackDamageType"			"DAMAGE_TYPE_ArmorPhysical"
 		"AttackRate"				"0.125"			// Speed of attack.
 		"AttackAnimationPoint"		"1.0"		// Normalized time in animation cycle to attack.

@@ -57,7 +57,8 @@
 		topbar.style.width = "685px";
 
 		var TopBarRadiantTeam = hudElements.FindChildTraverse("TopBarRadiantTeam");
-		TopBarRadiantTeam.style.width = "275px";
+		TopBarRadiantTeam.style.width = "320px";
+		TopBarRadiantTeam.style.marginRight = "191px";
 
 		var topbarRadiantPlayers = hudElements.FindChildTraverse("TopBarRadiantPlayers");
 		topbarRadiantPlayers.style.width = "275px";
@@ -67,11 +68,13 @@
 
 		var map_info = Game.GetMapInfo();
 		if (map_info.map_display_name == "x_hero_siege_8") {
-			topbar.style.width = "1188px";
+			topbar.style.width = "1112px";
 
 			//Top Bar Radiant
 			var TopBarRadiantTeam = hudElements.FindChildTraverse("TopBarRadiantTeam");
-			TopBarRadiantTeam.style.width = "510px";
+			TopBarRadiantTeam.style.width = "1000px";
+			TopBarRadiantTeam.style.marginLeft = "100px";
+			TopBarRadiantTeam.style.marginRight = "0px";
 
 			var topbarRadiantPlayers = hudElements.FindChildTraverse("TopBarRadiantPlayers");
 			topbarRadiantPlayers.style.width = "504px";
@@ -80,7 +83,11 @@
 			topbarRadiantPlayersContainer.style.width = "504px";
 
 			var RadiantTeamContainer = hudElements.FindChildTraverse("RadiantTeamContainer");
-			RadiantTeamContainer.style.height = "610px";
+			RadiantTeamContainer.style.height = "1000px";
+
+			var RadiantBackground = TopBarRadiantTeam.GetChild(0);
+			RadiantBackground.style.width = "1000px";
+			RadiantBackground.style.marginRight = "50px";
 		}
 
 		//Skin Killer - Portrait
@@ -154,10 +161,12 @@
 
 	<Panel>
 		<CustomUIElement type="GameSetup"			layoutfile="file://{resources}/layout/custom_game/team_select.xml" />
+		<CustomUIElement type="GameInfo" layoutfile="file://{resources}/layout/custom_game/game_info.xml" />
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/barebones_notifications.xml" />
 <!--	<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/barebones_attachments.xml" /> -->
-<!--		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/xhs_battlepass.xml" /> -->
+		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/battlepass.xml" />
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/hud_hero_demo.xml" /> 
+<!--	<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/precache.xml" /> -->
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/boss_healthbar.xml" />
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/hud_main.xml" />
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/xhs_events.xml" />

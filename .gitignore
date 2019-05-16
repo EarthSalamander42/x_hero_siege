@@ -4,6 +4,11 @@
 *.soc
 *.tmp
 
+#Uncompiled formats
+*.smd
+*.vta
+*.qc
+
 # Compiled formats
 *.vmdl
 *.fbx

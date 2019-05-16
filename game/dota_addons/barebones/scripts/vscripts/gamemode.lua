@@ -30,7 +30,7 @@ require('units/treasure_chest_surprises')
 require('triggers')
 require('items/global')
 require('components/api/init')
--- require('libraries/adv_log')
+require('libraries/adv_log')
 require('components/battlepass/init')
 require('components/loading_screen/init')
 
@@ -288,6 +288,11 @@ function GameMode:OnGameRulesStateChange(keys)
 		local diff = {"Easy", "Normal", "Hard", "Extreme", "Divine"}
 		local lanes = {"Simple", "Double", "Full"}
 		local Color = {"green", "Yellow", "orange", "red", "darkred"}
+
+		CustomNetTables:SetTableValue("game_options", "game_info", {
+			difficulty = diff[GameRules:GetCustomGameDifficulty()],
+		})
+
 		Timers:CreateTimer(3.0, function()
 			CustomGameEventManager:Send_ServerToAllClients("show_timer_bar", {})
 			CustomGameEventManager:Send_ServerToAllClients("game_difficulty", {difficulty = diff[GameRules:GetCustomGameDifficulty()]})
@@ -305,7 +310,7 @@ function GameMode:OnGameRulesStateChange(keys)
 	if newState == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
 		print("OnGameRulesStateChange: Game In Progress")
 
-		GAME_WINNER_TEAM = "Dire"
+		GAME_WINNER_TEAM = 3
 		nTimer_SpecialEvent = XHS_SPECIAL_EVENT_INTERVAL
 		nTimer_IncomingWave = XHS_SPECIAL_INITIAL_WAVE_DELAY
 		nTimer_CreepLevel = XHS_CREEPS_UPGRADE_INTERVAL

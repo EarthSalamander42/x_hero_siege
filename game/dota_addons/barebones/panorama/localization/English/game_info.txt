@@ -1,0 +1,36 @@
+"tutorial_intro_01"					"X Hero Siege is a castle defense custom game followed by boss fights. The goal in phase 1 and 2 is to defend the castle against wave creeps while the phase 3 is to defeat powerful bosses."
+"tutorial_intro_02"					"In phase 1 and 2 the goal is to defend and farm to be able to defeat the bosses in late game. Be careful, if you die in phase 3 you don't respawn! Your teammates can respawn you. You can also carry Ankhs of Reincarnations."
+
+"tutorial_heroes_title"				"SPECIAL EVENTS"
+"tutorial_heroes_01"				"There are 2 special events happening at minute 9 and 18:"
+"tutorial_heroes_02"				"Muradin Event: A powerful boss moving randomly in an arena. Avoid him and survive for 2 minutes to receive 15000 bonus gold."
+"tutorial_heroes_03"				"Farm Event: Creeps spawns periodically, kill as much as you can to get gold and xp!"
+
+"tutorial_items_title"				"OPTIONAL EVENTS"
+"tutorial_items_01"					"There are optional quests available at the bottom right of the castle through a teleporter to earn tomes or powerful artifacts. This teleporter is enabled after Muradin Event."
+"tutorial_items_02"					"Hero Image (x4 stats): An illusion of your hero wich have your stats multiplied by 4. The illusion doesn't cast spells. Reward: +250 tomes."
+"tutorial_items_03"					"Spirit Beast: A fire based boss, the guardian of the Shield of Invincibility. Reward: Shield of Invincibility."
+"tutorial_items_04"					"Frost Infernal: A frost based boss, the guardian of the Key of the 3 moons. Reward: Key of the 3 moons."
+"tutorial_items_05"					"All Hero Images (x2 stats): 8 illusions of random available to pick heroes, their stats are multiplied by 2 based on your stats. Reward: Necklace of Immunity."
+
+"tutorial_creeps_title"				"CREEPS"
+"tutorial_creeps_01"				"Creeps will grow more powerful as time passes. Do not be discouraged, however, as the reward for slaying them will also become greater!"
+
+"tutorial_roshan_title"				"Muradin Bronzebeard"
+"tutorial_roshan_01"				"If your castle's health drop below 40%, Muradin will defend it for a short time. Muradin is called once."
+
+// "tutorial_power_balance_title"		"POWER BALANCE"
+// "tutorial_power_balance_01"			"Often you will find yourself desperate, as your enemies grow stronger and stronger, and you are confined to your own base. Worry not, however, for not all is lost!"
+// "tutorial_power_balance_02"			"\nThe ancients' enmity is old, and the balance of their emissaries' power cannot be tipped easily. You will find that, the weaker your own team is, the greater the rewards will be for slaying your opposition."
+// "tutorial_power_balance_03"			"\nEven when one of your allies cowardly abandons the battlefield, worry not, for the Ancient's rage will only be fueled further, granting you and your remaining teammates even greater rewards when killing an enemy."
+// "tutorial_power_balance_04"			"\nBe wary, however, as the opposing ancient is just as crafty and full of tricks. Sometimes, a swift and decisive victory may be easier to achieve than a drawn-out, rollercoaster ride of a win."
+
+"developer_credits_title"			"DEVELOPERS"
+"developer_credits_01"				"Current list of developers:"
+"developer_credits_02"				"EarthSalamander (lead-developer), oaeide (backend) and Gafu Ji (backend)."
+
+"tutorial_credits_title"			"CONTRIBUTORS"
+"tutorial_credits_01"				"These people have contributed throughout X Hero Siege development:"
+"tutorial_credits_02"				"beast (alpha tester), Flotos (Dark and Light Fundamental custom icons), Mugiwara (custom icons pre-3.0), Sogat (Created X Hero Siege in Warcraft 3), Starboxx (Door models), Xero (custom icons post 3.0)."
+
+"tutorial_end"						"<font color='#FF7800'>HAVE FUN!</font>"

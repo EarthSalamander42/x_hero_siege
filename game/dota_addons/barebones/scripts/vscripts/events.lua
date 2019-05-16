@@ -967,7 +967,7 @@ local lane = tonumber(cn)
 			item:LaunchLoot(false, 300, 0.5, pos)
 			frost_first_time = true
 		elseif killedUnit:GetUnitName() == "npc_dota_boss_lich_king" then
-			GAME_WINNER_TEAM = "Radiant" 
+			GAME_WINNER_TEAM = 2 
 			for _, hero in pairs(HeroList:GetAllHeroes()) do
 				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
 				hero:AddNewModifier(hero, nil, "modifier_command_restricted", {})
