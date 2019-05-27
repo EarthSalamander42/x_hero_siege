@@ -30,7 +30,7 @@ require('units/treasure_chest_surprises')
 require('triggers')
 require('items/global')
 require('components/api/init')
-require('libraries/adv_log')
+-- require('libraries/adv_log') -- SUPER SPAM KILLING BACKEND LEAVE IT DISABLED
 require('components/battlepass/init')
 require('components/loading_screen/init')
 
