@@ -19,7 +19,7 @@ end
 
 function CDOTA_BaseNPC:GetRealDamageDone(hTarget)
 	local base_damage = self:GetAverageTrueAttackDamage(hTarget)
-	local armor_reduction = GetReductionFromArmor(hTarget:GetPhysicalArmorValue())
+	local armor_reduction = GetReductionFromArmor(hTarget:GetPhysicalArmorValue(false))
 	return base_damage - (base_damage * armor_reduction)
 end
 

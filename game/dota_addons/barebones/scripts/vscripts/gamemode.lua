@@ -361,7 +361,7 @@ function GameMode:OnGameRulesStateChange(keys)
 			elseif SPECIAL_EVENT == 0 then
 				SpawnCreeps()
 			elseif SPECIAL_EVENT ~= 0 then
-				print("Creeps paused, Special Event.")
+--				print("Creeps paused, Special Event.")
 			end
 
 			return XHS_CREEPS_INTERVAL
@@ -369,7 +369,7 @@ function GameMode:OnGameRulesStateChange(keys)
 	end
 
 	if newState == DOTA_GAMERULES_STATE_POST_GAME then
-		print("END THE GAME!")
+--		print("END THE GAME!")
 
 		CustomGameEventManager:Send_ServerToAllClients("end_game", {
 			info = {
@@ -872,12 +872,15 @@ function GameMode:FilterExecuteOrder( filterTable )
 			if _G.SECRET == 1 then return true end
 			local target_loc = Vector(filterTable.position_x, filterTable.position_y, filterTable.position_z)
 			if IsNearEntity("npc_dota_muradin_boss", target_loc, 1200) then
-				if GameRules:GetCustomGameDifficulty() >= 4 then
+				if GameRules:GetCustomGameDifficulty() >= 4 or IsInToolsMode() then
 					for itemSlot = 0, 5 do
 						local item = unit:GetItemInSlot(itemSlot)
 						if item and item:GetName() == "item_doom_artifact" then
-							if not GameRules:IsCheatMode() or IsInToolsMode() then
-								_G.SECRET = 1
+							if not GameRules:IsCheatMode() then
+								if not IsInToolsMode() then
+									_G.SECRET = 1
+								end
+
 								StartSecretArena(unit)
 
 								return false
@@ -1314,16 +1317,16 @@ function GameMode:ItemAddedFilter(event)
 	local ring = "item_ring_of_superiority"
 	local doom = "item_doom_artifact"
 	local frost = "item_orb_of_frost"
-	if item:GetAbilityName() == "item_tpscroll" and item:GetPurchaser() == nil then return false end
+--	if item:GetAbilityName() == "item_tpscroll" and item:GetPurchaser() == nil then return false end
 
 	if hero:IsRealHero() and item.GetAbilityName then
 		if hero:GetUnitName() == "npc_baristol" then return end
 
-		print("An item was picked up:", item:GetAbilityName())
+--		print("An item was picked up:", item:GetAbilityName())
 
 		Timers:CreateTimer(FrameTime(), function()
 --			print("Has item in inventory?", hero:HasItemInInventory(item:GetAbilityName()))
-			if hero:HasItemInInventory(item:GetAbilityName()) then
+			if item and hero:HasItemInInventory(item:GetAbilityName()) then
 				for k, v in pairs(MODIFIER_ITEMS_WITH_LEVELS) do
 					for i, j in pairs(v) do
 						if j == item:GetAbilityName() then
@@ -1335,6 +1338,15 @@ function GameMode:ItemAddedFilter(event)
 							end
 						end
 					end
+				end
+
+				-- fix for doom artifact not merged on first pick
+				if hero:HasItemInInventory(key) and hero:HasItemInInventory(shield) and hero:HasItemInInventory(sword) and hero:HasItemInInventory(ring) then
+					hero:RemoveItem(hero:FindItemInInventory(key))
+					hero:RemoveItem(hero:FindItemInInventory(shield))
+					hero:RemoveItem(hero:FindItemInInventory(sword))
+					hero:RemoveItem(hero:FindItemInInventory(ring))
+					hero:AddItemByName(doom)
 				end
 			end
 		end)

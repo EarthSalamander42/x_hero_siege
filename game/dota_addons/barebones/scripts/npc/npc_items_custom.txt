@@ -3164,7 +3164,7 @@
 				}
 			}
 
-			"modifier_lifesteal"
+			"modifier_lifesteal_doom_artifact"
 			{
 				"IsHidden"				"1"
 

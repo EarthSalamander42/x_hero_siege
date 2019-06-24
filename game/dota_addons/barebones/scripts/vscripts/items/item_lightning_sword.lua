@@ -77,6 +77,10 @@ end
 function modifier_lifesteal_lightning_sword:OnAttackLanded(keys)
 	if IsServer() then
 		if self:GetParent() == keys.attacker then
+			if self:GetParent():HasModifier("modifier_lifesteal_doom_artifact") then
+				return
+			end
+
 			self:GetParent():Lifesteal(keys.target, self)
 		end
 	end

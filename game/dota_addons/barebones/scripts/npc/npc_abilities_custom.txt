@@ -9538,22 +9538,24 @@
 			"03"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"movement_slow"				"-20 -30 -40 -50"
+				"movement_slow"				"20 30 40 50"
 			}
 			"04"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"attack_speed_slow"			"-20 -30 -40 -50"
+				"attack_speed_slow"			"20 30 40 50"
 			}			
 			"05"
 			{
 				"var_type"					"FIELD_FLOAT"
 				"duration"					"4.0"
+				"LinkedSpecialBonus"		"special_bonus_unique_brewmaster_3"
 			}
 			"06"
 			{
 				"var_type"					"FIELD_FLOAT"
 				"duration_creeps"			"4.0 4.5 5.0 5.5"
+				"LinkedSpecialBonus"		"special_bonus_unique_brewmaster_3"
 			}			
 		}
 	}
@@ -22944,7 +22946,7 @@
 			"02"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"damage"					"3000 4000 5000 6000 7000"
+				"damage"					"2000 3000 4000 5000 6000"
 			}
 			"03"
 			{

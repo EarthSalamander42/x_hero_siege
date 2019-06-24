@@ -116,7 +116,7 @@ if Entities:FindByName(nil, "dota_goodguys_fort") == nil then return end
 				if #enemies == 1 then
 					for _, restricted_ab in pairs(_G.multiplayer_abilities_cast) do
 						if ability:GetAbilityName() == restricted_ab then
-							print("Casting this ability in solo mode is restricted!!")
+--							print("Casting this ability in solo mode is restricted!!")
 							return
 						end
 					end

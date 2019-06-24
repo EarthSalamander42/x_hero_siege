@@ -41,8 +41,9 @@ function Phase2CreepsLeft()
 				unit:SetBaseDamageMin(unit:GetAverageTrueAttackDamage(unit) + (PHASE_2_UPGRADE["damage"][difficulty] * wave_count))
 				unit:SetBaseDamageMax(unit:GetAverageTrueAttackDamage(unit) + (PHASE_2_UPGRADE["damage"][difficulty] * wave_count) * 1.1)
 				unit:SetMaxHealth(unit:GetMaxHealth() + (PHASE_2_UPGRADE["health"][difficulty] * wave_count))
+				unit:SetBaseMaxHealth(unit:GetMaxHealth() + (PHASE_2_UPGRADE["health"][difficulty] * wave_count))
 				unit:SetHealth(unit:GetMaxHealth())
-				unit:SetPhysicalArmorBaseValue(unit:GetPhysicalArmorValue() + (PHASE_2_UPGRADE["armor"][difficulty] * wave_count))
+				unit:SetPhysicalArmorBaseValue(unit:GetPhysicalArmorValue(false) + (PHASE_2_UPGRADE["armor"][difficulty] * wave_count))
 				if not unit.OverHeadCandy then 
 					unit.OverHeadCandy = ParticleManager:CreateParticle("particles/hw_fx/candy_carrying_stack.vpcf", PATTACH_OVERHEAD_FOLLOW, unit)
 					ParticleManager:SetParticleControl(unit.OverHeadCandy, 0, unit:GetAbsOrigin())
@@ -52,7 +53,7 @@ function Phase2CreepsLeft()
 			end
 		return 30
 		elseif SPECIAL_EVENT == 1 then
-			print("Phase 2 creeps paused, special event!")
+--			print("Phase 2 creeps paused, special event!")
 			return 30
 		elseif EntIceTower:IsNull() then
 			return nil
@@ -74,8 +75,9 @@ function Phase2CreepsRight()
 				unit:SetBaseDamageMin(unit:GetAverageTrueAttackDamage(unit) + (PHASE_2_UPGRADE["damage"][difficulty] * wave_count))
 				unit:SetBaseDamageMax(unit:GetAverageTrueAttackDamage(unit) + (PHASE_2_UPGRADE["damage"][difficulty] * wave_count) * 1.1)
 				unit:SetMaxHealth(unit:GetMaxHealth() + (PHASE_2_UPGRADE["health"][difficulty] * wave_count))
+				unit:SetBaseMaxHealth(unit:GetMaxHealth() + (PHASE_2_UPGRADE["health"][difficulty] * wave_count))
 				unit:SetHealth(unit:GetMaxHealth())
-				unit:SetPhysicalArmorBaseValue(unit:GetPhysicalArmorValue() + (PHASE_2_UPGRADE["armor"][difficulty] * wave_count))
+				unit:SetPhysicalArmorBaseValue(unit:GetPhysicalArmorValue(false) + (PHASE_2_UPGRADE["armor"][difficulty] * wave_count))
 				if not unit.OverHeadCandy then 
 					unit.OverHeadCandy = ParticleManager:CreateParticle("particles/hw_fx/candy_carrying_stack.vpcf", PATTACH_OVERHEAD_FOLLOW, unit)
 					ParticleManager:SetParticleControl(unit.OverHeadCandy, 0, unit:GetAbsOrigin())
@@ -128,7 +130,7 @@ function FinalWave()
 	end)
 
 	Timers:CreateTimer(31, function()
-		StopSoundOn("yaskar_01.music.ui_hero_select", Entities:FindByClassname('npc_dota_fort'))
+		StopSoundOn("yaskar_01.music.ui_hero_select", Entities:FindByClassname(nil, 'npc_dota_fort'))
 
 		local units = FindUnitsInRadius(DOTA_TEAM_NEUTRALS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_ALL, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false )
 		local number = 0

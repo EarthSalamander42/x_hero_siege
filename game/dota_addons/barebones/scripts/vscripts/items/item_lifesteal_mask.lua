@@ -33,6 +33,30 @@ end
 
 function modifier_lifesteal:OnAttackLanded(keys)
 	if IsServer() then
+
+--	MODIFIER_ITEMS_WITH_LEVELS["modifier_lifesteal"] = {
+--		"item_doom_artifact",
+--		"item_lightning_sword",
+--		"item_lifesteal_mask",
+--	}
+
+--		print("Lifesteal item name:", self:GetAbilityName())
+
+		-- TODO: format me later
+--		if self:GetParent():HasItemInInventory("item_lifesteal_mask") and self:GetAbility():GetAbilityName() ~= "item_lifesteal_mask" then
+--			print("Lifesteal mask owned but ignored because there's a higher item.")
+--			return
+--		end
+
+--		if self:GetParent():HasItemInInventory("item_lightning_sword") and self:GetAbility():GetAbilityName() ~= "item_doom_artifact" or self:GetAbility():GetAbilityName() ~= "item_lightning_sword" then
+--			print("Lightning Sword owned but ignored because there's a higher item.")
+--			return
+--		end
+
+		if self:GetParent():HasModifier("modifier_lifesteal_lightning_sword") or self:GetParent():HasModifier("modifier_lifesteal_doom_artifact") then
+			return
+		end
+
 		if self:GetParent() == keys.attacker then
 			self:GetParent():Lifesteal(keys.target, self)
 		end

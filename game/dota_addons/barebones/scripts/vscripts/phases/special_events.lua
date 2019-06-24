@@ -115,8 +115,9 @@ function FarmEvent(time)
 				unit:SetBaseDamageMin(unit:GetAverageTrueAttackDamage(unit) + (FARM_EVENT_UPGRADE["damage"][difficulty] * GameMode.hero_farm_event[nPlayerID]["level"]))
 				unit:SetBaseDamageMax(unit:GetAverageTrueAttackDamage(unit) + (FARM_EVENT_UPGRADE["damage"][difficulty] * GameMode.hero_farm_event[nPlayerID]["level"]) * 1.1)
 				unit:SetMaxHealth(unit:GetMaxHealth() + (FARM_EVENT_UPGRADE["health"][difficulty] * GameMode.hero_farm_event[nPlayerID]["level"]))
+				unit:SetBaseMaxHealth(unit:GetMaxHealth() + (FARM_EVENT_UPGRADE["health"][difficulty] * GameMode.hero_farm_event[nPlayerID]["level"]))
 				unit:SetHealth(unit:GetMaxHealth())
-				unit:SetPhysicalArmorBaseValue(unit:GetPhysicalArmorValue() + (FARM_EVENT_UPGRADE["armor"][difficulty] * GameMode.hero_farm_event[nPlayerID]["level"]))
+				unit:SetPhysicalArmorBaseValue(unit:GetPhysicalArmorValue(false) + (FARM_EVENT_UPGRADE["armor"][difficulty] * GameMode.hero_farm_event[nPlayerID]["level"]))
 				if not unit.OverHeadCandy then 
 					unit.OverHeadCandy = ParticleManager:CreateParticle("particles/hw_fx/candy_carrying_stack.vpcf", PATTACH_OVERHEAD_FOLLOW, unit)
 					ParticleManager:SetParticleControl(unit.OverHeadCandy, 0, unit:GetAbsOrigin())
@@ -141,7 +142,7 @@ function FarmEvent(time)
 		EndFarmEvent()
 		CustomGameEventManager:Send_ServerToAllClients("update_special_event_label_final", {})
 		nTimer_GameTime = XHS_SPECIAL_EVENT_INTERVAL * 2 - 1
-		nTimer_SpecialEvent = XHS_PHASE_2_DELAY + 10.0
+		nTimer_SpecialEvent = XHS_PHASE_2_DELAY + 10.0 --[[idk why i have to add this should fix this someday -->]] + 60.0
 
 		Timers:CreateTimer(10.0, function()
 			RestartCreeps(0.0)
@@ -170,8 +171,9 @@ function FarmEventCreeps(id)
 					unit:SetBaseDamageMin(unit:GetAverageTrueAttackDamage(unit) + (FARM_EVENT_UPGRADE["damage"][difficulty] * GameMode.hero_farm_event[id]["level"]) * 0.95)
 					unit:SetBaseDamageMax(unit:GetAverageTrueAttackDamage(unit) + (FARM_EVENT_UPGRADE["damage"][difficulty] * GameMode.hero_farm_event[id]["level"]) * 1.05)
 					unit:SetMaxHealth(unit:GetMaxHealth() + (FARM_EVENT_UPGRADE["health"][difficulty] * GameMode.hero_farm_event[id]["level"]))
+					unit:SetBaseMaxHealth(unit:GetMaxHealth() + (FARM_EVENT_UPGRADE["health"][difficulty] * GameMode.hero_farm_event[id]["level"]))
 					unit:SetHealth(unit:GetMaxHealth())
-					unit:SetPhysicalArmorBaseValue(unit:GetPhysicalArmorValue() + (FARM_EVENT_UPGRADE["armor"][difficulty] * GameMode.hero_farm_event[id]["level"]))
+					unit:SetPhysicalArmorBaseValue(unit:GetPhysicalArmorValue(false) + (FARM_EVENT_UPGRADE["armor"][difficulty] * GameMode.hero_farm_event[id]["level"]))
 
 					if not unit.OverHeadCandy then 
 						unit.OverHeadCandy = ParticleManager:CreateParticle("particles/hw_fx/candy_carrying_stack.vpcf", PATTACH_OVERHEAD_FOLLOW, unit)
@@ -227,6 +229,7 @@ end
 function StartRameroAndBaristolEvent(hero)
 	local point = Entities:FindByName(nil, "npc_dota_muradin_player_1"):GetAbsOrigin()
 	local delay = 5.0
+	SPECIAL_EVENT = 1
 
 	Notifications:TopToAll({text="A hero has reached 500 kills and will fight Ramero and Baristol!", style={color="white"}, duration=5.0})
 	TeleportHero(hero, delay, point)
@@ -242,7 +245,6 @@ end
 
 function RameroAndBaristolEvent(time) -- 500 kills
 nTimer_SpecialArena = time
-SPECIAL_EVENT = 1
 StunBuildings(time)
 CustomGameEventManager:Send_ServerToAllClients("show_timer_special_arena", {})
 GameMode.SpecialArena_occuring = 1
@@ -389,7 +391,7 @@ CustomGameEventManager:Send_ServerToAllClients("show_duel", {})
 				TeleportHero(hero, 3.0, point:GetAbsOrigin())
 
 				-- Duel Settings
-				hero:SetPhysicalArmorBaseValue(0 - hero:GetPhysicalArmorValue()*0.80) -- Remove 80% of the heroes armor
+				hero:SetPhysicalArmorBaseValue(0 - hero:GetPhysicalArmorValue(false)*0.80) -- Remove 80% of the heroes armor
 
 				for itemSlot = 0, 14 do
 					local item = hero:GetItemInSlot(itemSlot)
@@ -475,7 +477,7 @@ SpawnRunes()
 				TeleportHero(hero, 3.0, point:GetAbsOrigin())
 
 				-- Duel Settings
---				hero:SetPhysicalArmorBaseValue(0 - hero:GetPhysicalArmorValue()*0.80) -- Remove 80% of the heroes armor
+--				hero:SetPhysicalArmorBaseValue(0 - hero:GetPhysicalArmorValue(false)*0.80) -- Remove 80% of the heroes armor
 
 				for itemSlot = 0, 14 do
 					local item = hero:GetItemInSlot(itemSlot)

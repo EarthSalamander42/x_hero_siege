@@ -34,7 +34,6 @@ end
 
 function OnCreated(keys)
 	if keys.caster:GetUnitName() ~= "npc_dota_hero_grom_hellscream" and keys.caster:GetUnitName() ~= "npc_dota_hero_illidan" and keys.caster:GetUnitName() ~= "npc_dota_hero_balanar" and keys.caster:GetUnitName() ~= "npc_dota_hero_proudmoore" then
-		print("Boss Bar created!")
 		ShowBossBar(keys.caster)
 	end
 end

@@ -1018,7 +1018,6 @@ function CDOTA_BaseNPC:IsXHSReincarnating()
 end
 
 function ShowBossBar(caster)
-	print("ShowBossBar", caster.deathStart)
 	if caster.deathStart then return end
 	local icon
 	local light_color = "#009933"
@@ -1081,21 +1080,20 @@ function CheatDetector()
 	end
 end
 
-function TeleportAllHeroes(sEvent, iDelay)
+function TeleportAllHeroes(sEvent, iInvulnDelay, iTPDelay)
 	for _, hero in pairs(HeroList:GetAllHeroes()) do
 		if hero:IsRealHero() and hero:GetTeam() == DOTA_TEAM_GOODGUYS then
 			local id = hero:GetPlayerID()
 			if hero:GetPlayerID() ~= -1 then
 				local point = Entities:FindByName(nil, sEvent..tostring(id)) -- might cause error with Dark Fundamental?
 
-				FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
-				hero:AddNewModifier(nil, nil, "modifier_boss_stun", {duration= iDelay, IsHidden = true})
-				hero:AddNewModifier(nil, nil, "modifier_invulnerable", {duration= iDelay, IsHidden = true})
-				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
+				TeleportHero(hero, iTPDelay, point:GetAbsOrigin())
+				hero:AddNewModifier(nil, nil, "modifier_boss_stun", {duration= iInvulnDelay, IsHidden = true})
+				hero:AddNewModifier(nil, nil, "modifier_invulnerable", {duration= iInvulnDelay, IsHidden = true})
 			end
 		end
 
-		Timers:CreateTimer(iDelay, function()
+		Timers:CreateTimer(iInvulnDelay, function()
 			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
 		end)
 	end

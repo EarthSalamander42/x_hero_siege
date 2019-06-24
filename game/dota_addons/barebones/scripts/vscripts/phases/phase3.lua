@@ -9,7 +9,7 @@ local delay = 3.0
 	RefreshPlayers()
 	PHASE = 3
 
-	TeleportAllHeroes("point_teleport_boss_", 10.0 + delay)
+	TeleportAllHeroes("point_teleport_boss_", 10.0 + delay, delay)
 
 	Timers:CreateTimer(delay, function()
 		if difficulty == 1 then
@@ -112,7 +112,9 @@ local activator = keys.activator
 local point2 = Entities:FindByName(nil, "spawner_phase3_creeps_west"):GetAbsOrigin()
 local point3 = Entities:FindByName(nil, "spawner_phase3_creeps_east"):GetAbsOrigin()
 local play_sound = false
-RefreshPlayers()
+
+	DoEntFire("door_magtheridon", "SetAnimation", "gate_02_close", 0, nil, nil)
+	RefreshPlayers()
 
 	Timers:CreateTimer(0.5, function()
 		DoEntFire("trigger_teleport_phase3_creeps", "Kill", nil, 0, nil, nil)
@@ -170,7 +172,7 @@ function StartArthasArena(keys)
 --	BossBar(arthas, "arthas")
 	arthas.zone = "xhs_holdout"
 
-	TeleportAllHeroes("point_teleport_boss_", 10.0)
+	TeleportAllHeroes("point_teleport_boss_", 10.0, 3.0)
 end
 
 function StartBanehallowArena()
