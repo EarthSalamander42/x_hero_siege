@@ -2,13 +2,11 @@ PLAYERTABLES_VERSION = "0.90"
 
 --[[
   PlayerTables: Player-specific shared state/nettable Library by BMD
-
   PlayerTables sets up a table that is shared between server (lua) and client (javascript) between specific (but changeable) clients.
   It is very similar in concept to nettables, but is built on being player-specific state (not sent to all players).
   Like nettables, PlayerTable state adjustments are mirrored to clients (that are currently subscribed).
   If players disconnect and then reconnect, PlayerTables automatically transmits their subscribed table states to them when they connect.
   PlayerTables only support sending numbers, strings, and tables of numbers/strings/tables to clients.
-
   Installation
   -"require" this file inside your code in order to gain access to the PlayerTables global table.
   -Ensure that you have the playertables/playertables_base.js in your panorama content scripts folder.
@@ -16,7 +14,6 @@ PLAYERTABLES_VERSION = "0.90"
     <scripts>
       <include src="file://{resources}/scripts/playertables/playertables_base.js" />
     </scripts>
-
   Library Usage
   -Lua
     -void PlayerTables:CreateTable(tableName, tableContents, pids)
@@ -44,8 +41,6 @@ PLAYERTABLES_VERSION = "0.90"
       Set a value for the given key.
     -void PlayerTables:SetTableValues(tableName, changes)
       Set a all of the given key-value pairs in the changes object.
-
-
   -Javascript: include the javascript API with "var PlayerTables = GameUI.CustomUIConfig().PlayerTables" at the top of your file.
     -void PlayerTables.GetAllTableValues(tableName)
       Returns the current keys and values of all keys within the table "tableName".
@@ -53,37 +48,31 @@ PLAYERTABLES_VERSION = "0.90"
     -void PlayerTables.GetTableValue(tableName, keyName)
       Returns the current value for the key given by "keyName" if it exists on the table given by "tableName".
       Returns null if no table exists, or undefined if the key does not exist.
-    -int PlayerTables.SubscribeNetTableListener(tableName, callback) 
+    -int PlayerTables.SubscribeNetTableListener(tableName, callback)
       Sets up a callback for when this playertable is changed.  The callback is of the form:
         function(tableName, changesObject, deletionsObject).
           changesObject contains the key-value pairs that were changed
           deletionsObject contains the keys that were deleted.
           If changesObject and deletionsObject are both null, then the entire table was deleted.
-
       Returns an integer value representing this subscription.
     -void PlayerTables.UnsubscribeNetTableListener(callbackID)
       Remvoes the existing subscription as given by the callbackID (the integer returned from SubscribeNetTableListener)
-
   Examples:
     --Create a Table and set a few values.
       PlayerTables:CreateTable("new_table", {initial="initial value"}, {0})
       PlayerTables:SetTableValue("new_table", "count", 0)
       PlayerTables:SetTableValues("new_table", {val1=1, val2=2})
-
     --Change player subscriptions
       PlayerTables:RemovePlayerSubscription("new_table", 0)
       PlayerTables:SetPlayerSubscriptions("new_table", {[1]=true,[3]=true})  -- the pids object can be a map or array type table
-
     --Retrieve values on the client
       var PlayerTables = GameUI.CustomUIConfig().PlayerTables;
       $.Msg(PlayerTables.GetTableVaue("new_table", "count"));
-
     --Subscribe to changes on the client
       var PlayerTables = GameUI.CustomUIConfig().PlayerTables;
       PlayerTables.SubscribeNetTableListener("new_table", function(tableName, changes, deletions){
         $.Msg(tableName + " changed: " + changes + " -- " + deletions);
       });
-
 ]]
 
 if not PlayerTables then
@@ -142,7 +131,7 @@ function PlayerTables:PlayerTables_Connected(args)
   --print('PlayerTables_Connected')
   --PrintTable(args)
 
-  local pid = args.pid
+  local pid = args.PlayerID
   if not pid then
     return
   end
@@ -153,7 +142,7 @@ function PlayerTables:PlayerTables_Connected(args)
 
   for k,v in pairs(PlayerTables.subscriptions) do
     if v[pid] then
-      if player then  
+      if player then
         CustomGameEventManager:Send_ServerToPlayer(player, "pt_fu", {name=k, table=PlayerTables.tables[k]} )
       end
     end
@@ -186,7 +175,7 @@ function PlayerTables:CreateTable(tableName, tableContents, pids)
     if pid >= 0 and pid < DOTA_MAX_TEAM_PLAYERS then
       self.subscriptions[tableName][pid] = true
       local player = PlayerResource:GetPlayer(pid)
-      if player then  
+      if player then
         CustomGameEventManager:Send_ServerToPlayer(player, "pt_fu", {name=tableName, table=tableContents} )
       end
     else
@@ -206,13 +195,13 @@ function PlayerTables:DeleteTable(tableName)
 
   for k,v in pairs(pids) do
     local player = PlayerResource:GetPlayer(k)
-    if player then  
+    if player then
       CustomGameEventManager:Send_ServerToPlayer(player, "pt_fu", {name=tableName, table=nil} )
     end
   end
 
   self.tables[tableName] = nil
-  self.subscriptions[tableName] = nil  
+  self.subscriptions[tableName] = nil
 end
 
 function PlayerTables:TableExists(tableName)
@@ -237,7 +226,7 @@ function PlayerTables:SetPlayerSubscriptions(tableName, pids)
     if pid >= 0 and pid < DOTA_MAX_TEAM_PLAYERS then
       self.subscriptions[tableName][pid] = true
       local player = PlayerResource:GetPlayer(pid)
-      if player and oldPids[pid] == nil then  
+      if player and oldPids[pid] == nil then
         CustomGameEventManager:Send_ServerToPlayer(player, "pt_fu", {name=tableName, table=table} )
       end
     else
@@ -259,7 +248,7 @@ function PlayerTables:AddPlayerSubscription(tableName, pid)
     if pid >= 0 and pid < DOTA_MAX_TEAM_PLAYERS then
       self.subscriptions[tableName][pid] = true
       local player = PlayerResource:GetPlayer(pid)
-      if player then  
+      if player then
         CustomGameEventManager:Send_ServerToPlayer(player, "pt_fu", {name=tableName, table=table} )
       end
     else
@@ -318,7 +307,7 @@ function PlayerTables:DeleteTableKey(tableName, key)
     table[key] = nil
     for pid,v in pairs(pids) do
       local player = PlayerResource:GetPlayer(pid)
-      if player then  
+      if player then
         CustomGameEventManager:Send_ServerToPlayer(player, "pt_kd", {name=tableName, keys={[key]=true}} )
       end
     end
@@ -356,7 +345,7 @@ function PlayerTables:DeleteTableKeys(tableName, keys)
   if notempty then
     for pid,v in pairs(pids) do
       local player = PlayerResource:GetPlayer(pid)
-      if player then  
+      if player then
         CustomGameEventManager:Send_ServerToPlayer(player, "pt_kd", {name=tableName, keys=deletions} )
       end
     end
@@ -366,7 +355,7 @@ end
 function PlayerTables:SetTableValue(tableName, key, value)
   if value == nil then
     self:DeleteTableKey(tableName, key)
-    return 
+    return
   end
   if not self.tables[tableName] then
     print("[playertables.lua] Warning: Table '" .. tableName .. "' does not exist.")
@@ -380,7 +369,7 @@ function PlayerTables:SetTableValue(tableName, key, value)
     table[key] = value
     for pid,v in pairs(pids) do
       local player = PlayerResource:GetPlayer(pid)
-      if player then  
+      if player then
         CustomGameEventManager:Send_ServerToPlayer(player, "pt_uk", {name=tableName, changes={[key]=value}} )
       end
     end
@@ -409,7 +398,7 @@ function PlayerTables:SetTableValues(tableName, changes)
   if notempty then
     for pid,v in pairs(pids) do
       local player = PlayerResource:GetPlayer(pid)
-      if player then  
+      if player then
         CustomGameEventManager:Send_ServerToPlayer(player, "pt_uk", {name=tableName, changes=changes} )
       end
     end

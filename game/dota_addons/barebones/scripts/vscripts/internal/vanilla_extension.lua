@@ -128,3 +128,9 @@ function CDOTA_BaseNPC:Blink(position, bTeamOnlyParticle, bPlaySound)
 	end
 	if bPlaySound == true then EmitSoundOn("DOTA_Item.BlinkDagger.NailedIt", self) end
 end
+
+function CDOTA_BaseNPC:IncrementAttributes(amount)
+	self:SetBaseStrength(self:GetBaseStrength() + amount)
+	self:SetBaseAgility(self:GetBaseAgility() + amount)
+	self:SetBaseIntellect(self:GetBaseIntellect() + amount)
+end

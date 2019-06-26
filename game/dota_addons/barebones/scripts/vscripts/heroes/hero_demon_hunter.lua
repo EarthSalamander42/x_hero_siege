@@ -63,7 +63,7 @@ end
 function modifier_xhs_vampiric_aura:GetAuraSearchType()
 	return DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC
 end
-
+--[[
 function modifier_xhs_vampiric_aura:GetAuraEntityReject(target)
 	if IsServer() then
 		for _, modifier in ipairs(_G.XHS_LIFESTEAL_MODIFIER_PRIORITY) do
@@ -75,7 +75,7 @@ function modifier_xhs_vampiric_aura:GetAuraEntityReject(target)
 
 	return false
 end
-
+--]]
 function modifier_xhs_vampiric_aura:GetModifierAura()
 	return "modifier_xhs_vampiric_aura_buff"
 end
@@ -103,7 +103,9 @@ end
 function modifier_xhs_vampiric_aura_buff:OnAttackLanded(keys)
 	if IsServer() then
 		if self:GetParent() == keys.attacker then
-			self:GetParent():Lifesteal(keys.target, self)
+			if not self:GetParent():HasItemInInventory("item_lifesteal_mask") or not self:GetParent():HasItemInInventory("item_lightning_sword") or not self:GetParent():HasItemInInventory("item_doom_artifact") then
+				self:GetParent():Lifesteal(keys.target, self)
+			end
 		end
 	end
 end
@@ -111,16 +113,6 @@ end
 function modifier_xhs_vampiric_aura_buff:GetModifierLifesteal()
 	return self:GetAbility():GetSpecialValueFor("lifesteal_pct")
 end
-
-function modifier_xhs_vampiric_aura_buff:OnDestroy()
-	if IsServer() then
-		-- fix with Vampiric Aura interaction
-		if self:GetParent():HasItemInInventory("item_lifesteal_mask") or self:GetParent():HasItemInInventory("item_lightning_sword") then
-			self:GetParent():AddNewModifier(self:GetParent(), self, "modifier_xhs_vampiric_aura_buff", {})
-		end
-	end
-end
-
 
 -------------------------------------------------------
 

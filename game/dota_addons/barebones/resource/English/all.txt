@@ -189,6 +189,9 @@
 "DOTA_Tooltip_ability_item_lightning_sword_Lore"						"A simple sword, enhanced by Muradin's powers, for Ramero to wield in combat."
 "DOTA_Tooltip_ability_item_lightning_sword_Description"					"<h1><font color='#FF0000'>Restrictions:</h1> Lifesteal effects from multiple sources don't stack.</font>"
 
+"DOTA_Tooltip_modifier_lifesteal_lightning_sword"						"Lifesteal"
+"DOTA_Tooltip_modifier_lifesteal_lightning_sword_Description"			"Healed when attacking enemies."
+
 "DOTA_Tooltip_modifier_lifesteal"										"Lifesteal"
 "DOTA_Tooltip_modifier_lifesteal_Description"							"Healed when attacking enemies."
 
@@ -1630,30 +1633,7 @@
 "DOTA_Tooltip_ability_holdout_frost_chaos_damage_percent"				"%DAMAGE:"
 "DOTA_Tooltip_ability_holdout_frost_chaos_duration"						"DURATION:"
 
-
 //MALFURION
-"DOTA_Tooltip_ability_holdout_entrangling_roots"						"Entrangling Roots"
-"DOTA_Tooltip_ability_holdout_entrangling_roots_Description"			"Entrangle an unit, dealing %dmg_per_sec% per second. lasts %duration% seconds."
-"DOTA_Tooltip_ability_holdout_entrangling_roots_Lore"					""
-"DOTA_Tooltip_ability_holdout_entrangling_roots_dmg_per_sec"			"DMG PER SEC:"
-"DOTA_Tooltip_ability_holdout_entrangling_roots_duration"				"DURATION:"
-"DOTA_Tooltip_ability_holdout_entrangling_roots_total_damage_tooltip"	"TOTAL DAMAGE:"
-
-"DOTA_Tooltip_ability_holdout_rejuvenation_alt"							"Rejuvenation"
-"DOTA_Tooltip_ability_holdout_rejuvenation_alt_Description"				"Heals all allies around Malfurion over time. lasts %duration% seconds."
-"DOTA_Tooltip_ability_holdout_rejuvenation_alt_Note0"					"Buildings are also healed, quarter of the amount."
-"DOTA_Tooltip_ability_holdout_rejuvenation_alt_heal_per_sec"			"HEAL PER SEC:"
-"DOTA_Tooltip_ability_holdout_rejuvenation_alt_total_damage_tooltip"	"TOTAL HEAL:"
-"DOTA_Tooltip_ability_holdout_rejuvenation_alt_duration"				"DURATION:"
-
-"DOTA_Tooltip_ability_holdout_mark_of_the_claw"							"Mark of the Claw"
-"DOTA_Tooltip_ability_holdout_mark_of_the_claw_Description"				"Gives a chance to trigger a Cleave attack, dealing bonus damage with."
-"DOTA_Tooltip_ability_holdout_mark_of_the_claw_Lore"					""
-"DOTA_Tooltip_ability_holdout_mark_of_the_claw_chance"					"%CHANCE:"
-"DOTA_Tooltip_ability_holdout_mark_of_the_claw_bonus_damage"			"BONUS DAMAGE:"
-"DOTA_Tooltip_ability_holdout_mark_of_the_claw_radius"					"CLEAVE RADIUS:"
-"DOTA_Tooltip_ability_holdout_mark_of_the_claw_splash_percent"			"%CLEAVE:"
-
 "DOTA_Tooltip_ability_holdout_hardened_skin"							"Hardened Skin"
 "DOTA_Tooltip_ability_holdout_hardened_skin_Description"				"Reduce the amount of damage received from all sources (excluding pure damage)."
 "DOTA_Tooltip_ability_holdout_hardened_skin_damage_reduction"			"%DAMAGE REDUCTION:"
@@ -1661,42 +1641,6 @@
 
 "DOTA_Tooltip_modifier_hardened_skin"						"Hardened Skin"
 "DOTA_Tooltip_modifier_hardened_skin_Description"			"Reduce damage taken by %dMODIFIER_PROPERTY_INCOMING_DAMAGE_PERCENTAGE% percent."
-
-"DOTA_Tooltip_ability_holdout_strength_of_the_wild"								"Strength of the Wild"
-"DOTA_Tooltip_ability_holdout_strength_of_the_wild_Description"					"Increase Malfurion's base attacks against enemies."
-"DOTA_Tooltip_ability_holdout_strength_of_the_wild_Lore"						""
-"DOTA_Tooltip_ability_holdout_strength_of_the_wild_bonus_damage_tooltip"		"%DAMAGE MULTIPLIER:"
-
-"DOTA_Tooltip_modifier_strength_of_the_wild"					"Strength of the Wild"
-"DOTA_Tooltip_modifier_strength_of_the_wild_Description"		"Increases Malfurion's attack damage. (200%)"
-
-"DOTA_Tooltip_modifier_rejuvenation"							"Rejuvenation"
-"DOTA_Tooltip_modifier_rejuvenation_Description"				"Healed periodically."
-
-"DOTA_Tooltip_modifier_rejuvenation_building"					"Rejuvenation"
-"DOTA_Tooltip_modifier_rejuvenation_building_Description"		"Healed periodically, quarter the amount on buildings."
-
-"DOTA_Tooltip_ability_holdout_bear_form"								"Bear Form"
-"DOTA_Tooltip_ability_holdout_bear_form_Description"					"Transforms into a bear, increasing life regen and armor but decreasing move speed and attack speed."
-"DOTA_Tooltip_ability_holdout_bear_form_Note0"							"Base Attack Time Bonus means attack speed reduced."
-"DOTA_Tooltip_ability_holdout_bear_form_bonus_armor"					"BONUS ARMOR:"
-"DOTA_Tooltip_ability_holdout_bear_form_hp_regen"						"HP REGEN:"
-"DOTA_Tooltip_ability_holdout_bear_form_movespeed_loss"					"MOVEMENT SLOW:"
-"DOTA_Tooltip_ability_holdout_bear_form_transformation_time"			"TRANSFORMATION TIME:"
-"DOTA_Tooltip_ability_holdout_bear_form_bat_reduction"					"BAT BONUS:"
-
-"DOTA_Tooltip_modifier_true_form"								"Bear Form"
-"DOTA_Tooltip_modifier_true_form_Description"					"Armor enhanced by %dMODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS%.\n HP Regen enhanced by %dMODIFIER_PROPERTY_HEALTH_REGEN_CONSTANT%.\n Base Attack Time reduced by 2.05.\n Move Speed reduced by %dMODIFIER_PROPERTY_MOVESPEED_BONUS_CONSTANT%."
-
-"DOTA_Tooltip_ability_holdout_bear_form_tooltip"							"Bear Form"
-"DOTA_Tooltip_ability_holdout_bear_form_tooltip_Description"				"Transforms into a bear, increasing life regen and armor but decreasing move speed and attack speed."
-"DOTA_Tooltip_ability_holdout_bear_form_tooltip_Note0"						"Base Attack Time Bonus means attack speed reduced."
-"DOTA_Tooltip_ability_holdout_bear_form_tooltip_bonus_armor"				"BONUS ARMOR:"
-"DOTA_Tooltip_ability_holdout_bear_form_tooltip_hp_regen"					"HP REGEN:"
-"DOTA_Tooltip_ability_holdout_bear_form_tooltip_movespeed_loss"				"MOVEMENT SLOW:"
-"DOTA_Tooltip_ability_holdout_bear_form_tooltip_transformation_time"		"TRANSFORMATION TIME:"
-"DOTA_Tooltip_ability_holdout_bear_form_tooltip_bat_reduction"				"BAT BONUS:"
-
 
 //STONE GIANT
 "DOTA_Tooltip_ability_holdout_war_club"								"War Club"

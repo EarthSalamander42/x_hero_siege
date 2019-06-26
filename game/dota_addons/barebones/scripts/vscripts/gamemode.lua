@@ -14,10 +14,13 @@ require('libraries/keyvalues')
 require('libraries/illusionmanager')
 require('libraries/fun')()
 require('libraries/functional')
+require('libraries/physics')
 require('libraries/playerresource')
 require('libraries/playertables')
 require('libraries/gold')
 require('libraries/rgb_to_hex')
+require('libraries/wearables')
+require('libraries/wearables_warmful_ancient')
 require('phases/choose_hero')
 require('phases/creeps')
 require('phases/special_events')
@@ -30,7 +33,9 @@ require('units/treasure_chest_surprises')
 require('triggers')
 require('items/global')
 require('components/api/init')
--- require('libraries/adv_log') -- SUPER SPAM KILLING BACKEND LEAVE IT DISABLED
+if IsInToolsMode() then
+	require('libraries/adv_log') -- SUPER SPAM KILLING BACKEND LEAVE IT DISABLED
+end
 require('components/battlepass/init')
 require('components/loading_screen/init')
 
@@ -84,9 +89,7 @@ function GameMode:OnHeroInGame(hero)
 		end)
 	elseif hero:GetUnitName() == "npc_dota_hero_terrorblade" then
 		if IsInToolsMode() then
-			hero:ModifyStrength(10000)
-			hero:ModifyAgility(10000)
-			hero:ModifyIntellect(10000)
+			hero:IncrementAttributes(10000)
 		end
 	end
 end
@@ -105,7 +108,7 @@ function GameMode:InitGameMode()
 	GameRules:SetPreGameTime(PREGAMETIME)
 
 	--Disabling Derived Stats
-	mode:SetCustomAttributeDerivedStatValue(DOTA_ATTRIBUTE_STRENGTH_MAGIC_RESISTANCE_PERCENT, 0)
+	mode:SetCustomAttributeDerivedStatValue(DOTA_ATTRIBUTE_STRENGTH_MAGIC_RESISTANCE_PERCENT, 0) -- not working
 
 	mode:SetCustomAttributeDerivedStatValue(DOTA_ATTRIBUTE_AGILITY_MOVE_SPEED_PERCENT, 0)
 
@@ -872,11 +875,15 @@ function GameMode:FilterExecuteOrder( filterTable )
 			if _G.SECRET == 1 then return true end
 			local target_loc = Vector(filterTable.position_x, filterTable.position_y, filterTable.position_z)
 			if IsNearEntity("npc_dota_muradin_boss", target_loc, 1200) then
+				print("Near muradin")
 				if GameRules:GetCustomGameDifficulty() >= 4 or IsInToolsMode() then
+					print("Right difficulty")
 					for itemSlot = 0, 5 do
 						local item = unit:GetItemInSlot(itemSlot)
 						if item and item:GetName() == "item_doom_artifact" then
-							if not GameRules:IsCheatMode() then
+							print("Doom artifact")
+							if not GameRules:IsCheatMode() or IsInToolsMode() then
+								print("Not cheat mode")
 								if not IsInToolsMode() then
 									_G.SECRET = 1
 								end

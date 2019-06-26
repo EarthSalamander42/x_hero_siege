@@ -54,7 +54,7 @@ local IsAvailableHero = Entities:FindByName(nil, "trigger_hero_"..random)
 local difficulty = GameRules:GetCustomGameDifficulty()
 local hero_name
 
-	if random == 12 or random == 27 then
+	if random == 12 then
 		print("This hero is either chosen or disabled! Re-rolls Random Hero")
 		ChooseRandomHero(event)
 		return

@@ -636,9 +636,7 @@ local donator_level = api:GetDonatorStatus(userID)
 				PlayerResource:SpendGold(player:GetPlayerID(), (numberOfTomes) * cost, DOTA_ModifyGold_PurchaseItem)
 
 				Timers:CreateTimer(function()
-					hero:ModifyAgility(1 * 50)
-					hero:ModifyStrength(1 * 50)
-					hero:ModifyIntellect(1 * 50)
+					hero:IncrementAttributes(50)
 					hero:EmitSound("ui.trophy_levelup")
 
 					local particle1 = ParticleManager:CreateParticle("particles/econ/events/ti6/hero_levelup_ti6.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
@@ -979,6 +977,10 @@ local lane = tonumber(cn)
 			Timers:RemoveTimer(timers.RameroAndBaristol)
 		end
 
+		if killedUnit:GetUnitName() == "npc_dota_creature_muradin_bronzebeard" and killedUnit:GetTeamNumber() ~= 2 then
+			Notifications:TopToAll({text="Muradin is dead! All heroes in the arena level increase to maximum, killer earned 50 000 gold bounty.", duration=5.0, style={color="lightgreen"}})
+		end
+
 		if killedUnit:GetUnitName() == "npc_dota_hero_magtheridon" then
 			local teleporters2 = Entities:FindAllByName("trigger_teleport2")
 			local difficulty = GameRules:GetCustomGameDifficulty()
@@ -998,17 +1000,6 @@ local lane = tonumber(cn)
 
 		-- add kills to the hero who spawned a controlled unit, or an illusion
 		if hero:GetTeamNumber() == 2 then
-			if not hero.gold_advertize then hero.gold_advertize = 0 end
-			if hero:IsRealHero() then
-				if PlayerResource:GetGold(hero:GetPlayerID()) > 990000 and hero.gold_advertize == 0 and SPECIAL_EVENT ~= 1 then
-					SendErrorMessage(hero:GetPlayerID(), "#error_gold_full")
-					hero.gold_advertize = 1
-					Timers:CreateTimer(5.0, function()
-						hero.gold_advertize = 0
-					end)
-				end
-			end
-
 			if killedUnit:GetTeamNumber() == 6 then
 				if hero:IsIllusion() then
 					hero = PlayerResource:GetPlayer(hero:GetPlayerID()):GetAssignedHero()

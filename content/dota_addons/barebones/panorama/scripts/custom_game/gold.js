@@ -6,20 +6,15 @@
     Noya
     Angel Arena Blackstar
 */
+
 'use strict';
 
 // settings
 var useFormatting = 'half';
 
-// subscribe only after the game start (fix loading problems)
-var eventHandler = GameEvents.Subscribe('game_state', function (args) {
-	if (args.newState >= DOTA_GameState.DOTA_GAMERULES_STATE_GAME_IN_PROGRESS) {
-		PlayerTables.SubscribeNetTableListener('gold', onGoldChange);
-		GameEvents.Subscribe('dota_player_update_query_unit', onQueryChange); // This doesn't work but I'm leaving it in
-		GameEvents.Subscribe('dota_player_update_selected_unit', onQueryChange);
-		GameEvents.Unsubscribe(eventHandler);
-	}
-});
+PlayerTables.SubscribeNetTableListener('gold', onGoldChange);
+GameEvents.Subscribe('dota_player_update_query_unit', onQueryChange); // This doesn't work but I'm leaving it in
+GameEvents.Subscribe('dota_player_update_selected_unit', onQueryChange);
 
 function onQueryChange () {
   onGoldChange('gold', PlayerTables.GetAllTableValues('gold'));

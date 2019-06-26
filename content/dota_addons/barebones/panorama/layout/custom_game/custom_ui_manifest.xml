@@ -1,8 +1,6 @@
 <root>
 	<scripts>
-    <include src="s2r://panorama/scripts/custom_game/util.vjs_c" />
-    <include src="s2r://panorama/scripts/custom_game/playertables/playertables_base.vjs_c" />
-    <include src="s2r://panorama/scripts/custom_game/gold.vjs_c" />
+    <include src="s2r://panorama/scripts/custom_game/util.js" />
   </scripts>
 	<script>
 		// Turn off some default UI
@@ -171,6 +169,7 @@
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/hud_main.xml" />
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/xhs_events.xml" />
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/xhs_timers.xml" />
+		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/gold.xml" />
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/statcollection.xml" />
 		<CustomUIElement type="EndScreen"			layoutfile="file://{resources}/layout/custom_game/xhs_end_screen.xml" />
 		<CustomUIElement type="FlyoutScoreboard"	layoutfile="file://{resources}/layout/custom_game/dungeon_scoreboard.xml" />

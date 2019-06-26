@@ -11,6 +11,8 @@
 		"gold",
 		"battlepass",
 		"player_table",
-		"hero_selection"
+		"hero_selection",
+		"battlepass_item_effects",
+		"other_available_items"
 	]
 }

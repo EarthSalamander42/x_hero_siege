@@ -7759,7 +7759,7 @@
 	//=================================================================================
 	// Lycan Wolves
 	//=================================================================================
-	"npc_dota_warlock_spiritual_beast1"
+	"npc_dota_lycan_wolf1"
 	{										
 		// General
 		//----------------------------------------------------------------
@@ -7832,7 +7832,7 @@
 		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
 	}
 
-	"npc_dota_warlock_spiritual_beast2"
+	"npc_dota_lycan_wolf2"
 	{										
 		// General
 		//----------------------------------------------------------------
@@ -7906,7 +7906,7 @@
 		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
 	}	
 
-	"npc_dota_warlock_spiritual_beast3"
+	"npc_dota_lycan_wolf3"
 	{										
 		// General
 		//----------------------------------------------------------------
@@ -7979,7 +7979,7 @@
 		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
 	}
 
-	"npc_dota_warlock_spiritual_beast4"
+	"npc_dota_lycan_wolf4"
 	{										
 		// General
 		//----------------------------------------------------------------
@@ -8233,92 +8233,14 @@
 
 		// Armor
 		//----------------------------------------------------------------
-		"ArmorPhysical"				"20"			// Physical protection.
+		"ArmorPhysical"				"25"			// Physical protection.
 		"MagicalResistance"			"100"			// Magical protection.
 
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
-		"AttackDamageMin"			"45"			// Damage range min.
-		"AttackDamageMax"			"55"		// Damage range max.
-		"AttackDamageType"			"DAMAGE_TYPE_ArmorPhysical"
-		"AttackRate"				"0.05"		// Speed of attack.
-		"AttackAnimationPoint"		"0.3"		// Normalized time in animation cycle to attack.
-		"AttackAcquisitionRange"	"600"		// Range within a target can be acquired.
-		"AttackRange"				"600"		// Range within a target can be attacked.
-		"ProjectileModel"			"particles/econ/items/puck/puck_alliance_set/puck_base_attack_aproset.vpcf" // Particle system model for projectile.
-		"ProjectileSpeed"			"1500"		// Speed of projectile.
-
-		// Bounds
-		//----------------------------------------------------------------
-		"BoundsHullName"			"DOTA_HULL_SIZE_SIEGE"			// Hull type used for navigation/locomotion.
-		"HealthBarOffset"			"170"
-		"RingRadius"				"100"
-
-		// Movement
-		//----------------------------------------------------------------
-		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_NONE"			// Type of locomotion - ground, air
-		"MovementSpeed"				"0"			// Speed
-		"MovementTurnRate"			"0.5"		// Turning rate.
-	
-		// Bounty
-		//----------------------------------------------------------------
-		"BountyXP"					"20"		// Experience earn.
-		"BountyGoldMin"				"14"		// Gold earned min.
-		"BountyGoldMax"				"17"		// Gold earned max.
-
-			// Status
-		//----------------------------------------------------------------
-		"StatusHealth"				"750"		// Base health.
-		"StatusHealthRegen"			"0.25"		// Health regeneration rate.
-		"StatusMana"				"0"			// Base mana.
-		"StatusManaRegen"			"0"			// Mana regeneration rate.
-
-		// Team
-		//----------------------------------------------------------------
-		"TeamName"					"DOTA_TEAM_GOODGUYS"			// Team name.
-		"CombatClassAttack"			"DOTA_COMBAT_CLASS_ATTACK_PIERCE"
-		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_HERO"
-		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
-		
-		// Vision
-		//----------------------------------------------------------------
-		"VisionDaytimeRange"		"1200"		// Range of vision during day light.
-		"VisionNighttimeRange"		"800"		// Range of vision at night time.
-
-		//Inventory
-		"HasInventory"				"0"
-	}
-
-	"dark_portal_2"
-	{
-		// General
-		//----------------------------------------------------------------
-		"BaseClass"					"npc_dota_venomancer_plagueward"	// Class of entity of link to.
-		"Model"						"models/heroes/witchdoctor/witchdoctor_ward.vmdl"	// Model.
-		"SoundSet"					"Hero_VenomancerWard"					// Name of sound set.
-		"Level"						"2"
-		"ModelScale"				"0.75"
-		"SelectionGroup"			"Venomancer_Wards"
-
-		// Abilities
-		//----------------------------------------------------------------
-		"Ability1"					""			// Ability 1.
-		"Ability2"					""			// Ability 2.
-		"Ability3"					""			// Ability 3.
-		"Ability4"					""			// Ability 4.
-		"Ability5"					""			// Ability 5.
-
-		// Armor
-		//----------------------------------------------------------------
-		"ArmorPhysical"				"50"			// Physical protection.
-		"MagicalResistance"			"100"			// Magical protection.
-
-		// Attack
-		//----------------------------------------------------------------
-		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
-		"AttackDamageMin"			"90"			// Damage range min.
-		"AttackDamageMax"			"100"		// Damage range max.
+		"AttackDamageMin"			"55"			// Damage range min.
+		"AttackDamageMax"			"65"		// Damage range max.
 		"AttackDamageType"			"DAMAGE_TYPE_ArmorPhysical"
 		"AttackRate"				"0.05"		// Speed of attack.
 		"AttackAnimationPoint"		"0.3"		// Normalized time in animation cycle to attack.
@@ -8368,15 +8290,15 @@
 		"HasInventory"				"0"
 	}
 
-	"dark_portal_3"
+	"dark_portal_2"
 	{
 		// General
 		//----------------------------------------------------------------
 		"BaseClass"					"npc_dota_venomancer_plagueward"	// Class of entity of link to.
 		"Model"						"models/heroes/witchdoctor/witchdoctor_ward.vmdl"	// Model.
 		"SoundSet"					"Hero_VenomancerWard"					// Name of sound set.
-		"Level"						"3"
-		"ModelScale"				"0.85"
+		"Level"						"2"
+		"ModelScale"				"0.8"
 		"SelectionGroup"			"Venomancer_Wards"
 
 		// Abilities
@@ -8389,14 +8311,14 @@
 
 		// Armor
 		//----------------------------------------------------------------
-		"ArmorPhysical"				"100"			// Physical protection.
+		"ArmorPhysical"				"50"			// Physical protection.
 		"MagicalResistance"			"100"			// Magical protection.
 
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
-		"AttackDamageMin"			"160"			// Damage range min.
-		"AttackDamageMax"			"180"		// Damage range max.
+		"AttackDamageMin"			"95"			// Damage range min.
+		"AttackDamageMax"			"105"		// Damage range max.
 		"AttackDamageType"			"DAMAGE_TYPE_ArmorPhysical"
 		"AttackRate"				"0.05"		// Speed of attack.
 		"AttackAnimationPoint"		"0.3"		// Normalized time in animation cycle to attack.
@@ -8425,7 +8347,85 @@
 
 			// Status
 		//----------------------------------------------------------------
-		"StatusHealth"				"2000"		// Base health.
+		"StatusHealth"				"1750"		// Base health.
+		"StatusHealthRegen"			"0.25"		// Health regeneration rate.
+		"StatusMana"				"0"			// Base mana.
+		"StatusManaRegen"			"0"			// Mana regeneration rate.
+
+		// Team
+		//----------------------------------------------------------------
+		"TeamName"					"DOTA_TEAM_GOODGUYS"			// Team name.
+		"CombatClassAttack"			"DOTA_COMBAT_CLASS_ATTACK_PIERCE"
+		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_HERO"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
+		
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"1200"		// Range of vision during day light.
+		"VisionNighttimeRange"		"800"		// Range of vision at night time.
+
+		//Inventory
+		"HasInventory"				"0"
+	}
+
+	"dark_portal_3"
+	{
+		// General
+		//----------------------------------------------------------------
+		"BaseClass"					"npc_dota_venomancer_plagueward"	// Class of entity of link to.
+		"Model"						"models/heroes/witchdoctor/witchdoctor_ward.vmdl"	// Model.
+		"SoundSet"					"Hero_VenomancerWard"					// Name of sound set.
+		"Level"						"3"
+		"ModelScale"				"0.95"
+		"SelectionGroup"			"Venomancer_Wards"
+
+		// Abilities
+		//----------------------------------------------------------------
+		"Ability1"					""			// Ability 1.
+		"Ability2"					""			// Ability 2.
+		"Ability3"					""			// Ability 3.
+		"Ability4"					""			// Ability 4.
+		"Ability5"					""			// Ability 5.
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"				"75"			// Physical protection.
+		"MagicalResistance"			"100"			// Magical protection.
+
+		// Attack
+		//----------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
+		"AttackDamageMin"			"175"			// Damage range min.
+		"AttackDamageMax"			"185"		// Damage range max.
+		"AttackDamageType"			"DAMAGE_TYPE_ArmorPhysical"
+		"AttackRate"				"0.05"		// Speed of attack.
+		"AttackAnimationPoint"		"0.3"		// Normalized time in animation cycle to attack.
+		"AttackAcquisitionRange"	"600"		// Range within a target can be acquired.
+		"AttackRange"				"600"		// Range within a target can be attacked.
+		"ProjectileModel"			"particles/econ/items/puck/puck_alliance_set/puck_base_attack_aproset.vpcf" // Particle system model for projectile.
+		"ProjectileSpeed"			"1500"		// Speed of projectile.
+
+		// Bounds
+		//----------------------------------------------------------------
+		"BoundsHullName"			"DOTA_HULL_SIZE_SIEGE"			// Hull type used for navigation/locomotion.
+		"HealthBarOffset"			"170"
+		"RingRadius"				"100"
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_NONE"			// Type of locomotion - ground, air
+		"MovementSpeed"				"0"			// Speed
+		"MovementTurnRate"			"0.5"		// Turning rate.
+	
+		// Bounty
+		//----------------------------------------------------------------
+		"BountyXP"					"20"		// Experience earn.
+		"BountyGoldMin"				"14"		// Gold earned min.
+		"BountyGoldMax"				"17"		// Gold earned max.
+
+			// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"2750"		// Base health.
 		"StatusHealthRegen"			"0.25"		// Health regeneration rate.
 		"StatusMana"				"0"			// Base mana.
 		"StatusManaRegen"			"0"			// Mana regeneration rate.
@@ -8454,7 +8454,7 @@
 		"Model"						"models/heroes/witchdoctor/witchdoctor_ward.vmdl"	// Model.
 		"SoundSet"					"Hero_VenomancerWard"					// Name of sound set.
 		"Level"						"4"
-		"ModelScale"				"0.95"
+		"ModelScale"				"1.1"
 		"SelectionGroup"			"Venomancer_Wards"
 
 		// Abilities
@@ -8467,14 +8467,14 @@
 
 		// Armor
 		//----------------------------------------------------------------
-		"ArmorPhysical"				"70"			// Physical protection.
+		"ArmorPhysical"				"100"			// Physical protection.
 		"MagicalResistance"			"100"			// Magical protection.
 
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
-		"AttackDamageMin"			"380"			// Damage range min.
-		"AttackDamageMax"			"400"		// Damage range max.
+		"AttackDamageMin"			"410"			// Damage range min.
+		"AttackDamageMax"			"430"		// Damage range max.
 		"AttackDamageType"			"DAMAGE_TYPE_ArmorPhysical"
 		"AttackRate"				"0.05"		// Speed of attack.
 		"AttackAnimationPoint"		"0.3"		// Normalized time in animation cycle to attack.
@@ -8501,9 +8501,9 @@
 		"BountyGoldMin"				"14"		// Gold earned min.
 		"BountyGoldMax"				"17"		// Gold earned max.
 
-			// Status
+		// Status
 		//----------------------------------------------------------------
-		"StatusHealth"				"4000"		// Base health.
+		"StatusHealth"				"4500"		// Base health.
 		"StatusHealthRegen"			"0.25"		// Health regeneration rate.
 		"StatusMana"				"0"			// Base mana.
 		"StatusManaRegen"			"0"			// Mana regeneration rate.
@@ -10507,8 +10507,8 @@
 		"AttackRange"				"180"                                   // Range within a target can be attacked.
 
 		"BountyXP"					"1000000"                 // Experience earn.
-		"BountyGoldMin"				"25000"                   // Gold earned min.
-		"BountyGoldMax"				"25000"                   // Gold earned max.
+		"BountyGoldMin"				"50000"                   // Gold earned min.
+		"BountyGoldMax"				"50000"                   // Gold earned max.
 
 		"BoundsHullName"			"DOTA_HULL_SIZE_HUGE"
 		"RingRadius"				"120"
@@ -13751,5 +13751,78 @@
 				"Wearable7" { "ItemDef" "562" }		//Miscellaneous
 			} 
 		}
+	}
+
+	//=================================================================================
+	// Living Tower (Radiant)
+	//=================================================================================
+	"npc_imba_malfurion_living_tower_radiant"
+	{
+		// General
+		//----------------------------------------------------------------
+		"BaseClass"                 "npc_dota_creature"
+		"Model"                     "models/props_structures/rock_golem/tower_radiant_rock_golem.vmdl" // models/props_structures/rock_golem/tower_dire_rock_golem.vmdl
+		"SoundSet"					"Tower.Water"					// Name of sound set.
+		"Level"                     "1"
+		"ModelScale"                "1.0"
+		"ConsideredHero"			"1"
+		"IsAncient"					"1"
+		"CanBeDominated"            "0"     
+		"UnitLabel"                 "living_tower"
+
+		// Abilities
+		//----------------------------------------------------------------
+		"Ability1"                  "neutral_spell_immunity"
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"             "0"
+		"MagicalResistance"         "100"
+
+		// Attack
+		//----------------------------------------------------------------
+		"AttackCapabilities"        "DOTA_UNIT_CAP_RANGED_ATTACK"
+		"AttackDamageMin"           "0"
+		"AttackDamageMax"           "0"
+		"AttackRate"				"2.0"		// Speed of attack.
+		"AttackAnimationPoint"		"0.1"		// Normalized time in animation cycle to attack.
+		"AttackAcquisitionRange"    "0"
+		"AttackRange"               "0"
+		"ProjectileModel"           "particles/econ/events/ti9/rock_golem_tower/radiant_tower_attack.vpcf" // particles/econ/events/ti9/rock_golem_tower/dire_tower_attack.vpcf
+		"ProjectileSpeed"           "900"
+
+		// Bounds
+		//----------------------------------------------------------------
+		"HealthBarOffset"           "240"
+		"BoundsHullName"            "DOTA_HULL_SIZE_HERO"
+
+		// Bounty
+		//----------------------------------------------------------------
+		"BountyXP"                  "0"
+		"BountyGoldMin"             "0"
+		"BountyGoldMax"             "0"
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementCapabilities"      "DOTA_UNIT_CAP_MOVE_NONE"
+		"MovementSpeed"             "0"
+		"MovementTurnRate"          "0.5"
+
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"              "10000"
+		"StatusHealthRegen"         "0.0"        
+
+		// Team
+		//----------------------------------------------------------------
+		"TeamName"                  "DOTA_TEAM_NEUTRALS"
+		"CombatClassAttack"         "DOTA_COMBAT_CLASS_ATTACK_HERO"
+		"CombatClassDefend"         "DOTA_COMBAT_CLASS_DEFEND_HERO"
+		"UnitRelationshipClass"     "DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
+		
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"        "1900"
+		"VisionNighttimeRange"      "800"
 	}
 } // End on npc_units_custom.txt

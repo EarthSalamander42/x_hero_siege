@@ -63,6 +63,7 @@ modifier_lifesteal_lightning_sword = class({})
 function modifier_lifesteal_lightning_sword:IsHidden() return false end
 function modifier_lifesteal_lightning_sword:IsPurgable() return false end
 function modifier_lifesteal_lightning_sword:IsDebuff() return false end
+function modifier_lifesteal_lightning_sword:RemoveOnDeath() return false end
 
 function modifier_lifesteal_lightning_sword:GetTexture()
 	return "modifiers/lightning_sword"

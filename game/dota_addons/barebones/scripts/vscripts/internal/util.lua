@@ -1110,11 +1110,9 @@ function GiveTomeToAllHeroes(iCount)
 			sound_played = true
 		end
 
-		hero:ModifyAgility(iCount)
-		hero:ModifyStrength(iCount)
-		hero:ModifyIntellect(iCount)
+		hero:IncrementAttributes(iCount)
 
-		local pfx = ParticleManager:CreateParticle("particles/econ/events/ti6/hero_levelup_ti6.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
+		local pfx = ParticleManager:CreateParticle(CustomNetTables:GetTableValue("battlepass_item_effects", tostring(hero:GetPlayerID())).tome_stats, PATTACH_ABSORIGIN_FOLLOW, hero)
 		ParticleManager:SetParticleControl(pfx, 0, hero:GetAbsOrigin())
 	end
 end

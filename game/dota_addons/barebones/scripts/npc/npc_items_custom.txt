@@ -3149,15 +3149,6 @@
 				"IsHidden"						"1"
 				"Attributes"					"MODIFIER_ATTRIBUTE_MULTIPLE"
 
-				"OnAttackLanded"
-				{
-					"RunScript"
-					{
-						"ScriptFile"	"heroes/global.lua"
-						"Function"		"Lifesteal"
-					}
-				}
-
 				"Properties"
 				{
 					"MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE"		"%bonus_damage"
