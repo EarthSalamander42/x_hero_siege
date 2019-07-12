@@ -66,9 +66,10 @@ function modifier_npc_dialog:OnOrder( params )
 		local hOrderedUnit = params.unit 
 		local hTargetUnit = params.target
 		local nOrderType = params.order_type
-		if nOrderType ~= 4 then
-			return
-		end
+
+--		if nOrderType ~= 4 then
+--			return
+--		end
 
 		if hTargetUnit == nil or hTargetUnit ~= self:GetParent() then
 			return

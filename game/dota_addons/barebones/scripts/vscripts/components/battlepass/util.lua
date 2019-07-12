@@ -13,7 +13,7 @@
 -- limitations under the License.
 --
 -- Editors:
---     Earth Salamander #42
+--     EarthSalamander #42
 
 LinkLuaModifier("modifier_companion", "components/battlepass/modifiers/modifier_companion.lua", LUA_MODIFIER_MOTION_NONE )
 LinkLuaModifier("modifier_patreon_donator", "components/battlepass/modifiers/modifier_patreon_donator.lua", LUA_MODIFIER_MOTION_NONE )
@@ -26,12 +26,13 @@ CustomGameEventManager:RegisterListener("change_player_xp", Dynamic_Wrap(Battlep
 CustomGameEventManager:RegisterListener("play_hero_taunt", Dynamic_Wrap(Battlepass, "PlayHeroTaunt"))
 
 function Battlepass:GetRewardUnlocked(ID)
-	if IsInToolsMode() then return 1000 end
-	if CustomNetTables:GetTableValue("battlepass", tostring(ID)) then
-		if CustomNetTables:GetTableValue("battlepass", tostring(ID)).Lvl then
-			return CustomNetTables:GetTableValue("battlepass", tostring(ID)).Lvl
-		end
-	end
+	-- temporary, show battlepass but keep it disabled until fixed
+--	if IsInToolsMode() then return 1000 end
+--	if CustomNetTables:GetTableValue("battlepass", tostring(ID)) then
+--		if CustomNetTables:GetTableValue("battlepass", tostring(ID)).Lvl then
+--			return CustomNetTables:GetTableValue("battlepass", tostring(ID)).Lvl
+--		end
+--	end
 
 	return 1
 end
@@ -60,7 +61,7 @@ function CDOTA_BaseNPC:SetupHealthBarLabel()
 	if api:IsDonator(self:GetPlayerOwnerID()) ~= false then
 		local donator_level = api:GetDonatorStatus(self:GetPlayerOwnerID())
 		if donator_level and donator_level > 0 then
-			self:SetCustomHealthLabel("#donator_label_" .. donator_level, DONATOR_COLOR[donator_level][1], DONATOR_COLOR[donator_level][2], DONATOR_COLOR[donator_level][3])
+			self:SetCustomHealthLabel("#donator_tooltip_" .. donator_level, DONATOR_COLOR[donator_level][1], DONATOR_COLOR[donator_level][2], DONATOR_COLOR[donator_level][3])
 		end
 	end
 end

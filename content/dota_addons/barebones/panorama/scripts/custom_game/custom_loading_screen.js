@@ -1,11 +1,11 @@
 "use strict";
 
 var view = {
-	title: $("#imba-loading-title-text"),
-	text: $("#imba-loading-content-text"),
-	map: $("#imba-loading-map-text"),
-	link: $("#imba-loading-link"),
-	link_text:  $("#imba-loading-link-text")
+	title: $("#loading-title-text"),
+	text: $("#loading-content-text"),
+	map: $("#loading-map-text"),
+	link: $("#loading-link"),
+	link_text:  $("#loading-link-text")
 };
 
 var link_targets = "";
@@ -20,6 +20,10 @@ function info_already_available() {
 	return Game.GetMapInfo().map_name != "";
 }
 
+function isInt(n) {
+   return n % 1 === 0;
+}
+
 function fetch() {
 	view.title.text = "X Hero Siege 3.48d: Ghost Revenant";
 	view.text.text = "X Hero Siege will get a 100% free battlepass soon. The goal is to reward regular players on the long term by unlocking cosmetics and more! (Those rewards are unlocked in X Hero Siege only.)";
@@ -31,20 +35,38 @@ function fetch() {
 		return;
 	}
 
-	$.Msg("Fetching and setting loading screen data");
+	var game_options = CustomNetTables.GetTableValue("game_options", "game_version");
+	if (game_options == undefined) {
+		$.Schedule(0.1, fetch);
+		return;
+	}
+
+	if (Game.GetMapInfo().map_display_name == "imba_1v1")
+		DisableVoting();
+
+	var game_version = game_options.value
+
+	if (isInt(game_version))
+		game_version = game_version.toString() + ".0";
+
+	view.title.text = $.Localize("#addon_game_name") + " " + game_version + " - " + $.Localize("#game_version_name");
+	view.text.text = $.Localize("#loading_screen_description");
+	view.link_text.text = $.Localize("#loading_screen_button");
+
+//	$.Msg("Fetching and setting loading screen data");
 	
 	var mapInfo = Game.GetMapInfo();
 	var map_name = ucwords(mapInfo.map_display_name.replace('_', " "));
- 
-//	api.resolve_map_name(mapInfo.map_display_name).then(function (data) {
-//		view.map.text = data;
-//	}).catch(function (err) {
-//		$.Msg("Failed to resolve map name: " + err.message);
-//		view.map.text = map_name;
-//	});
 
 	view.map.text = map_name;
 /*
+	api.resolve_map_name(mapInfo.map_display_name).then(function (data) {
+		view.map.text = data;
+	}).catch(function (err) {
+		$.Msg("Failed to resolve map name: " + err.message);
+		view.map.text = map_name;
+	});
+
 	api.loading_screen().then(function (data) {
 		var lang = $.Language();
 		var rdata = data.languages["en"];
@@ -58,14 +80,15 @@ function fetch() {
 
 		view.link.SetPanelEvent("onactivate", function() {
 			$.DispatchEvent("DOTADisplayURL", rdata.link_value || "");
-		});	
+		});
+		
 	}).catch(function (reason) {
 		$.Msg("Loading Loading screen information failed");
 		$.Msg(reason);
 
 		view.text.text = "News currently unavailable.";
 	});
-*/
+	*/
 	/*
 	var player_info = Game.GetPlayerInfo(Game.GetLocalPlayerID());
 	
@@ -97,7 +120,6 @@ function OnVotesReceived(data)
 //	$.Msg(data)
 //	$.Msg(data.vote.toString())
 //	$.Msg(data.table)
-	$.Msg(data.table2)
 
 	var vote_count = []
 	vote_count[1] = 0;
@@ -106,30 +128,54 @@ function OnVotesReceived(data)
 	vote_count[4] = 0;
 	vote_count[5] = 0;
 
+	var map_name_cut = Game.GetMapInfo().map_display_name.replace('_', " ");
+
 	// Reset tooltips
 	for (var i = 1; i <= 5; i++) {
-		$("#VoteDifficultyText" + i).text = $.Localize("#vote_difficulty_" + i);
+		$("#VoteGameModeText" + i).text = $.Localize("#vote_difficulty_" + i);
 	}
 
-	// Check number of votes for each difficulties
+	// Check number of votes for each gamemodes
 	for (var id in data.table2){
 		var difficulty = data.table2[id]
 		vote_count[difficulty]++;
 	}
 
-	// Modify tooltips based on voted difficulty
+	// Modify tooltips based on voted gamemode
 	for (var i = 1; i <= 5; i++) {
-		$("#VoteDifficultyText" + i).text = $.Localize("#vote_difficulty_" + i) + " (" + vote_count[i] + ")";
+		var vote_tooltip = "vote"
+		if (vote_count[i] > 1)
+			vote_tooltip = "votes"
+		$("#VoteGameModeText" + i).text = $.Localize("#vote_difficulty_" + i) + " (" + vote_count[i] + " "+ vote_tooltip +")";
 	}
 
-//	if (data.category == "creep_lanes") {
+//	if (data.category == "random_tower_abilities") {
 
 //	}
 }
+/*
+function SetGameModeTooltips() {
+	// if data is not available yet, reschedule
+	if (!info_already_available()) {
+		$.Schedule(0.1, SetGameModeTooltips);
+		return;
+	}
+
+	var map_name_cut = Game.GetMapInfo().map_display_name.replace('_', " ");
+	for (var i = 1; i <= 3; i++) {
+		$("#VoteGameModeText" + i).text = map_name_cut + " " + $.Localize("#vote_gamemode_" + i) + " (0 vote)";
+	}
+}
+*/
+
+function DisableVoting() {
+	$("#imba-loading-title-vote").style.visibility = "collapse";
+}
 
 (function(){
-	HoverableLoadingScreen()
+	HoverableLoadingScreen();
 	fetch();
+//	SetGameModeTooltips();
 
 	GameEvents.Subscribe("send_votes", OnVotesReceived);
 })();

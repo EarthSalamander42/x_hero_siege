@@ -869,20 +869,22 @@ function RefreshPlayers()
 	end
 end
 
-function TeleportHero(hero, delay, point)
+function TeleportHero(hero, point, delay)
 	if not hero.GetPlayerID then return end
 	if hero:GetPlayerID() == -1 then return end
+	if delay == nil then delay = 0 end
 	local pos = hero:GetAbsOrigin()
 --	local pos = hero:GetAbsOrigin() + RandomVector(400)
 
 	local TeleportEffect
 	local TeleportEffectEnd
 	if delay > 0 then
-		TeleportEffect = ParticleManager:CreateParticle(hero.tp_effect, PATTACH_ABSORIGIN, hero)
+--		print("TP effects:", CustomNetTables:GetTableValue("battlepass_item_effects", tostring(hero:GetPlayerID())).teleport)
+		TeleportEffect = ParticleManager:CreateParticle(CustomNetTables:GetTableValue("battlepass_item_effects", tostring(hero:GetPlayerID())).teleport["effect1"], PATTACH_ABSORIGIN, hero)
 		ParticleManager:SetParticleControlEnt(TeleportEffect, PATTACH_ABSORIGIN, hero, PATTACH_ABSORIGIN, "attach_origin", pos, true)
 		hero:Attribute_SetIntValue( "effectsID", TeleportEffect )
 
-		TeleportEffectEnd = ParticleManager:CreateParticle(hero.tp_effect_end, PATTACH_ABSORIGIN, hero)
+		TeleportEffectEnd = ParticleManager:CreateParticle(CustomNetTables:GetTableValue("battlepass_item_effects", tostring(hero:GetPlayerID())).teleport["effect2"], PATTACH_ABSORIGIN, hero)
 		ParticleManager:SetParticleControlEnt(TeleportEffect, PATTACH_ABSORIGIN, hero, PATTACH_ABSORIGIN, "attach_origin", point, true)
 		ParticleManager:SetParticleControl(TeleportEffectEnd, 1, point)
 		hero:Attribute_SetIntValue( "effectsID", TeleportEffect )
@@ -1087,7 +1089,7 @@ function TeleportAllHeroes(sEvent, iInvulnDelay, iTPDelay)
 			if hero:GetPlayerID() ~= -1 then
 				local point = Entities:FindByName(nil, sEvent..tostring(id)) -- might cause error with Dark Fundamental?
 
-				TeleportHero(hero, iTPDelay, point:GetAbsOrigin())
+				TeleportHero(hero, point:GetAbsOrigin(), iTPDelay)
 				hero:AddNewModifier(nil, nil, "modifier_boss_stun", {duration= iInvulnDelay, IsHidden = true})
 				hero:AddNewModifier(nil, nil, "modifier_invulnerable", {duration= iInvulnDelay, IsHidden = true})
 			end
@@ -1112,7 +1114,7 @@ function GiveTomeToAllHeroes(iCount)
 
 		hero:IncrementAttributes(iCount)
 
-		local pfx = ParticleManager:CreateParticle(CustomNetTables:GetTableValue("battlepass_item_effects", tostring(hero:GetPlayerID())).tome_stats, PATTACH_ABSORIGIN_FOLLOW, hero)
+		local pfx = ParticleManager:CreateParticle(CustomNetTables:GetTableValue("battlepass_item_effects", tostring(hero:GetPlayerID())).tome_stats["effect1"], PATTACH_ABSORIGIN_FOLLOW, hero)
 		ParticleManager:SetParticleControl(pfx, 0, hero:GetAbsOrigin())
 	end
 end

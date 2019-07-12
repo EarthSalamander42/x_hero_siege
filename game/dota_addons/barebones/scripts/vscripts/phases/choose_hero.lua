@@ -156,7 +156,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 
 			if caller:GetName() == "trigger_hero_"..i then
 				UTIL_Remove(Entities:FindByName(nil, "trigger_hero_"..i))
-				local particle = ParticleManager:CreateParticle("particles/econ/events/ti6/hero_levelup_ti6.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
+				local particle = ParticleManager:CreateParticle(CustomNetTables:GetTableValue("battlepass_item_effects", tostring(hero:GetPlayerID())).tome_stats["effect1"], PATTACH_ABSORIGIN_FOLLOW, hero)
 				ParticleManager:SetParticleControl(particle, 0, hero:GetAbsOrigin())
 				EmitSoundOnClient("ui.trophy_levelup", PlayerResource:GetPlayer(id))
 				hero:AddNewModifier(hero, nil, "modifier_command_restricted", {})
@@ -177,14 +177,14 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 			end
 
 			if caller:GetName() == "trigger_hero_weekly" then
-				if hero:HasAbility("holdout_vip") then
+				if api:IsDonator(hero:GetPlayerID()) then
 					Notifications:Bottom(hero:GetPlayerOwnerID(), {text="You are VIP. Please choose this hero on top!", duration = 5.0})
 
 					return
 				end
 
 				UTIL_Remove(Entities:FindByName(nil, "trigger_hero_weekly"))
-				local particle = ParticleManager:CreateParticle("particles/econ/events/ti6/hero_levelup_ti6.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
+				local particle = ParticleManager:CreateParticle(CustomNetTables:GetTableValue("battlepass_item_effects", tostring(hero:GetPlayerID())).tome_stats["effect1"], PATTACH_ABSORIGIN_FOLLOW, hero)
 				ParticleManager:SetParticleControl(particle, 0, hero:GetAbsOrigin())
 				EmitSoundOnClient("ui.trophy_levelup", PlayerResource:GetPlayer(id))
 				hero:AddNewModifier(hero, nil, "modifier_command_restricted", {})
@@ -209,17 +209,103 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 	end
 end
 
+function WispEffects(caster)
+	if caster:GetUnitName() == "npc_dota_hero_wisp" then
+		local donator_level = api:GetDonatorStatus(caster:GetPlayerID())
+
+		if donator_level == 1 then
+			local vip_effect = ParticleManager:CreateParticle("particles/status_fx/status_effect_holdout_borrowed_time_3.vpcf", PATTACH_ABSORIGIN_FOLLOW, caster)
+			ParticleManager:SetParticleControl(vip_effect, 0, caster:GetAbsOrigin())
+			ParticleManager:SetParticleControl(vip_effect, 1, caster:GetAbsOrigin())
+
+			local vip_effect2 = ParticleManager:CreateParticle("particles/units/heroes/hero_abaddon/holdout_borrowed_time_3.vpcf", PATTACH_ABSORIGIN_FOLLOW, caster)
+			ParticleManager:SetParticleControl(vip_effect2, 0, caster:GetAbsOrigin())
+			ParticleManager:SetParticleControl(vip_effect2, 1, caster:GetAbsOrigin())
+		elseif donator_level == 2 or donator_level == 3 then
+			local vip_effect = ParticleManager:CreateParticle("particles/status_fx/status_effect_holdout_borrowed_time.vpcf", PATTACH_ABSORIGIN_FOLLOW, caster)
+			ParticleManager:SetParticleControl(vip_effect, 0, caster:GetAbsOrigin())
+			ParticleManager:SetParticleControl(vip_effect, 1, caster:GetAbsOrigin())
+
+			local vip_effect2 = ParticleManager:CreateParticle("particles/units/heroes/hero_abaddon/holdout_borrowed_time.vpcf", PATTACH_ABSORIGIN_FOLLOW, caster)
+			ParticleManager:SetParticleControl(vip_effect2, 0, caster:GetAbsOrigin())
+			ParticleManager:SetParticleControl(vip_effect2, 1, caster:GetAbsOrigin())
+		elseif donator_level == 4 then
+			local vip_effect = ParticleManager:CreateParticle("particles/status_fx/status_effect_holdout_borrowed_time_3.vpcf", PATTACH_ABSORIGIN_FOLLOW, caster)
+			ParticleManager:SetParticleControl(vip_effect, 0, caster:GetAbsOrigin())
+			ParticleManager:SetParticleControl(vip_effect, 1, caster:GetAbsOrigin())
+
+			local vip_effect2 = ParticleManager:CreateParticle("particles/units/heroes/hero_abaddon/holdout_borrowed_time_3.vpcf", PATTACH_ABSORIGIN_FOLLOW, caster)
+			ParticleManager:SetParticleControl(vip_effect2, 0, caster:GetAbsOrigin())
+			ParticleManager:SetParticleControl(vip_effect2, 1, caster:GetAbsOrigin())
+		elseif donator_level == 5 then
+			local vip_effect = ParticleManager:CreateParticle("particles/status_fx/status_effect_holdout_borrowed_time_4.vpcf", PATTACH_ABSORIGIN_FOLLOW, caster)
+			ParticleManager:SetParticleControl(vip_effect, 0, caster:GetAbsOrigin())
+			ParticleManager:SetParticleControl(vip_effect, 1, caster:GetAbsOrigin())
+
+			local vip_effect2 = ParticleManager:CreateParticle("particles/units/heroes/hero_abaddon/holdout_borrowed_time_4.vpcf", PATTACH_ABSORIGIN_FOLLOW, caster)
+			ParticleManager:SetParticleControl(vip_effect2, 0, caster:GetAbsOrigin())
+			ParticleManager:SetParticleControl(vip_effect2, 1, caster:GetAbsOrigin())
+		elseif donator_level == 6 then
+			local vip_effect = ParticleManager:CreateParticle("particles/status_fx/status_effect_holdout_borrowed_time_2.vpcf", PATTACH_ABSORIGIN_FOLLOW, caster)
+			ParticleManager:SetParticleControl(vip_effect, 0, caster:GetAbsOrigin())
+			ParticleManager:SetParticleControl(vip_effect, 1, caster:GetAbsOrigin())
+
+			local vip_effect2 = ParticleManager:CreateParticle("particles/units/heroes/hero_abaddon/holdout_borrowed_time_2.vpcf", PATTACH_ABSORIGIN_FOLLOW, caster)
+			ParticleManager:SetParticleControl(vip_effect2, 0, caster:GetAbsOrigin())
+			ParticleManager:SetParticleControl(vip_effect2, 1, caster:GetAbsOrigin())
+		end
+	end
+end
+
+function ChooseRandomHero(event)
+local hero = event.caster
+local id = hero:GetPlayerID()
+local random = RandomInt(1, #HEROLIST + 1) -- Weekly hero
+local IsAvailableHero = Entities:FindByName(nil, "trigger_hero_"..random)
+local difficulty = GameRules:GetCustomGameDifficulty()
+local hero_name
+
+	if random == 12 then
+		print("This hero is disabled! Re-rolls Random Hero")
+		ChooseRandomHero(event)
+		return
+	elseif random == #HEROLIST + 1 then
+		hero_name = WeekHero
+	end
+
+	hero_name = "npc_dota_hero_"..HEROLIST[random]
+
+	UTIL_Remove(IsAvailableHero)
+	local particle = ParticleManager:CreateParticle(CustomNetTables:GetTableValue("battlepass_item_effects", tostring(hero:GetPlayerID())).tome_stats["effect1"], PATTACH_ABSORIGIN_FOLLOW, hero)
+	ParticleManager:SetParticleControl(particle, 0, hero:GetAbsOrigin())
+	EmitSoundOnClient("ui.trophy_levelup", PlayerResource:GetPlayer(id))
+	hero:AddNewModifier(hero, nil, "modifier_command_restricted", {})
+	Notifications:Bottom(hero:GetPlayerOwnerID(), {hero=hero_name, duration = 5.0})
+	Notifications:Bottom(hero:GetPlayerOwnerID(), {text="HERO: ", duration = 5.0, style={color="white"}, continue=true})
+	Notifications:Bottom(hero:GetPlayerOwnerID(), {text="#npc_dota_hero_"..HEROLIST[random], duration = 5.0, style={color="white"}, continue=true})
+
+	local newHero = PlayerResource:ReplaceHeroWith(id, hero_name, STARTING_GOLD[difficulty] * 2, 0)
+	StartingItems(hero, newHero)
+
+	Timers:CreateTimer(0.1, function()
+		if not hero:IsNull() then
+			UTIL_Remove(hero)
+		end
+	end)
+end
+
+
 function ChooseHeroVIP(event)
 local hero = event.activator
 local caller = event.caller
 local id = hero:GetPlayerID()
 local difficulty = GameRules:GetCustomGameDifficulty()
 
-	if PlayerResource:IsValidPlayer(id) and hero:GetUnitName() == "npc_dota_hero_wisp" and hero:HasAbility("holdout_vip") then
+	if PlayerResource:IsValidPlayer(id) and hero:GetUnitName() == "npc_dota_hero_wisp" and api:IsDonator(hero:GetPlayerID()) then
 		for i = 1, #HEROLIST_VIP do
 			if caller:GetName() == "trigger_hero_vip_"..i then
 				UTIL_Remove(Entities:FindByName(nil, "trigger_hero_vip_"..i))
-				local particle = ParticleManager:CreateParticle("particles/econ/events/ti6/hero_levelup_ti6.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
+				local particle = ParticleManager:CreateParticle(CustomNetTables:GetTableValue("battlepass_item_effects", tostring(hero:GetPlayerID())).tome_stats["effect1"], PATTACH_ABSORIGIN_FOLLOW, hero)
 				ParticleManager:SetParticleControl(particle, 0, hero:GetAbsOrigin())
 				EmitSoundOnClient("ui.trophy_levelup", PlayerResource:GetPlayer(id))
 				hero:AddNewModifier(hero, nil, "modifier_command_restricted", {})
@@ -231,7 +317,7 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 				StartingItems(hero, newHero)
 			end
 		end
-	elseif PlayerResource:IsValidPlayer(id) and hero:GetUnitName() == "npc_dota_hero_wisp" and not hero:HasAbility("holdout_vip") then
+	elseif PlayerResource:IsValidPlayer(id) and hero:GetUnitName() == "npc_dota_hero_wisp" and not api:IsDonator(hero:GetPlayerID()) then
 		Notifications:Bottom(hero:GetPlayerOwnerID(), {text = "This hero is only for <font color='#FF0000'>VIP Members!</font> Please choose another hero.", duration = 5.0})
 	end
 end
@@ -257,9 +343,9 @@ function StartingItems(hero, newHero)
 	end
 
 	if newHero:GetTeamNumber() == 2 then
-		TeleportHero(newHero, 3.0, base_good:GetAbsOrigin())
+		TeleportHero(newHero, base_good:GetAbsOrigin(), 3.0)
 	elseif newHero:GetTeamNumber() == 3 then
-		TeleportHero(newHero, 3.0, base_bad:GetAbsOrigin())
+		TeleportHero(newHero, base_bad:GetAbsOrigin(), 3.0)
 	end
 
 	Timers:CreateTimer(0.1, function()

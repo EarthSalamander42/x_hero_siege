@@ -25,7 +25,7 @@ function MuradinEvent(time)
 			local point = Entities:FindByName(nil,"npc_dota_muradin_player_"..id)
 
 			DisableItems(hero, time)
-			TeleportHero(hero, 0.0, point:GetAbsOrigin())
+			TeleportHero(hero, point:GetAbsOrigin())
 		end
 	end
 
@@ -64,12 +64,12 @@ local MuradinCheck = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, Entities:FindByName(n
 			elseif hero:IsRealHero() and not hero.paid then
 				hero.paid = true
 				if hero.old_pos then
-					TeleportHero(hero, 3.0, hero.old_pos)
+					TeleportHero(hero, hero.old_pos, 3.0)
 				else
 					if hero:GetTeamNumber() == 2 then
-						TeleportHero(hero, 3.0, base_good:GetAbsOrigin())
+						TeleportHero(hero, base_good:GetAbsOrigin(), 3.0)
 					elseif hero:GetTeamNumber() == 3 then
-						TeleportHero(hero, 3.0, base_bad:GetAbsOrigin())
+						TeleportHero(hero, base_bad:GetAbsOrigin(), 3.0)
 					end
 				end
 
@@ -103,7 +103,7 @@ function FarmEvent(time)
 				Notifications:TopToAll({text="Invalid teleport point detected!! #ERROR 004 ", duration = 10.0})
 				Notifications:TopToAll({text="Please report this bug on Discord!! #ERROR 004 ", continue = true})
 			else
-				TeleportHero(hero, 0.0, point:GetAbsOrigin())
+				TeleportHero(hero, point:GetAbsOrigin())
 			end
 
 			GameMode.hero_farm_event[nPlayerID] = {}
@@ -198,12 +198,12 @@ function EndFarmEvent()
 
 		if hero:IsRealHero() then
 			if hero.old_pos then
-				TeleportHero(hero, 3.0, hero.old_pos)
+				TeleportHero(hero, hero.old_pos, 3.0)
 			else
 				if hero:GetTeamNumber() == 2 then
-					TeleportHero(hero, 3.0, base_good:GetAbsOrigin())
+					TeleportHero(hero, base_good:GetAbsOrigin(), 3.0)
 				elseif hero:GetTeamNumber() == 3 then
-					TeleportHero(hero, 3.0, base_bad:GetAbsOrigin())
+					TeleportHero(hero, base_bad:GetAbsOrigin(), 3.0)
 				end
 			end
 			hero:Stop()
@@ -232,7 +232,7 @@ function StartRameroAndBaristolEvent(hero)
 	SPECIAL_EVENT = 1
 
 	Notifications:TopToAll({text="A hero has reached 500 kills and will fight Ramero and Baristol!", style={color="white"}, duration=5.0})
-	TeleportHero(hero, delay, point)
+	TeleportHero(hero, point, delay)
 	PauseCreeps()
 
 	Timers:CreateTimer(delay, function()
@@ -284,7 +284,7 @@ GameMode.SpecialArena_occuring = 1
 					local RameroAndBaristolCheck = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, Entities:FindByName(nil, "npc_dota_muradin_boss"):GetAbsOrigin(), nil, 2000, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false)
 					for _, hero in pairs(RameroAndBaristolCheck) do
 						if hero:IsRealHero() then
-							TeleportHero(hero, teleport_time, base_good:GetAbsOrigin())
+							TeleportHero(hero, base_good:GetAbsOrigin(), teleport_time)
 							RestartCreeps(teleport_time + 3.0)
 						end
 					end
@@ -302,7 +302,7 @@ function StartSogatEvent(hero)
 
 	Notifications:TopToAll({text="A hero has reached 750 kills and will fight Ramero!", style={color="white"}, duration=5.0})
 	PauseCreeps()
-	TeleportHero(hero, delay, point)
+	TeleportHero(hero, point, delay)
 
 	Timers:CreateTimer(delay, function()
 		SogatEvent(120)
@@ -388,7 +388,7 @@ CustomGameEventManager:Send_ServerToAllClients("show_duel", {})
 				hero:SetGold(Gold, false)
 
 				local point = Entities:FindByName(nil, "duel_event_"..ID)
-				TeleportHero(hero, 3.0, point:GetAbsOrigin())
+				TeleportHero(hero, point:GetAbsOrigin(), 3.0)
 
 				-- Duel Settings
 				hero:SetPhysicalArmorBaseValue(0 - hero:GetPhysicalArmorValue(false)*0.80) -- Remove 80% of the heroes armor
@@ -404,9 +404,9 @@ CustomGameEventManager:Send_ServerToAllClients("show_duel", {})
 			end
 		else
 			if hero:GetTeamNumber() == 2 then
-				TeleportHero(hero, 3.0, base_good:GetAbsOrigin())
+				TeleportHero(hero, base_good:GetAbsOrigin(), 3.0)
 			elseif hero:GetTeamNumber() == 3 then
-				TeleportHero(hero, 3.0, base_bad:GetAbsOrigin())
+				TeleportHero(hero, base_bad:GetAbsOrigin(), 3.0)
 			end
 			Notifications:TopToAll({text="Disconnected hero detected, teleporting out of arena!", duration=5.0, style={color="white"}})
 		end
@@ -474,7 +474,7 @@ SpawnRunes()
 		if PlayerResource:GetConnectionState() == 2 then
 			if PlayerResource:IsValidPlayerID(hero:GetPlayerOwnerID()) and hero:IsRealHero() then
 				local point = Entities:FindByName(nil, "duel_event_"..ID)
-				TeleportHero(hero, 3.0, point:GetAbsOrigin())
+				TeleportHero(hero, point:GetAbsOrigin(), 3.0)
 
 				-- Duel Settings
 --				hero:SetPhysicalArmorBaseValue(0 - hero:GetPhysicalArmorValue(false)*0.80) -- Remove 80% of the heroes armor
@@ -490,9 +490,9 @@ SpawnRunes()
 			end
 		else
 			if hero:GetTeamNumber() == 2 then
-				TeleportHero(hero, 3.0, base_good:GetAbsOrigin())
+				TeleportHero(hero, base_good:GetAbsOrigin(), 3.0)
 			elseif hero:GetTeamNumber() == 3 then
-				TeleportHero(hero, 3.0, base_bad:GetAbsOrigin())
+				TeleportHero(hero, base_bad:GetAbsOrigin(), 3.0)
 			end
 			Notifications:TopToAll({text="Disconnected hero detected, teleporting out of arena!", duration=5.0, style={color="white"}})
 		end

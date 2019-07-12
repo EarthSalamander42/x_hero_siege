@@ -66,7 +66,7 @@ function UpdatePlayerImages()
 	var actualPlayerInfo = 1;
 	for(var i = 0; i < 8; i++)
 	{
-		var player_info = CustomNetTables.GetTableValue("player_table", i);
+		var player_info = CustomNetTables.GetTableValue("battlepass", i);
 		if (player_info) {
 			playerImage.style.border = "2px solid " + player_info.donator_color;
 		}
@@ -459,7 +459,7 @@ function SetFlyoutScoreboardChangeZone( nDir )
 
 		if (ImbaXP_Panel != undefined) {
 			// get player data
-			var plyData = CustomNetTables.GetTableValue("player_table", i);
+			var plyData = CustomNetTables.GetTableValue("battlepass", i);
 
 			if (plyData != undefined) {
 				// set xp values

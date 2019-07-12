@@ -5,6 +5,10 @@
 --	Entrangling Roots	--
 --------------------------
 
+if IsServer() then
+	require("heroes/global")
+end
+
 LinkLuaModifier("modifier_entrangling_roots", "heroes/hero_malfurion", LUA_MODIFIER_MOTION_NONE)
 
 holdout_entrangling_roots = holdout_entrangling_roots or class({})
@@ -94,7 +98,7 @@ modifier_rejuvenation = modifier_rejuvenation or class({})
 
 function modifier_rejuvenation:OnCreated()
 	if IsServer() then
-		self.heal_per_sec = self:GetAbility():GetSpecialValueFor("heal_per_sec") + self:GetCaster():FindTalentValue("special_bonus_imba_malfurion_5")
+		self.heal_per_sec = self:GetAbility():GetSpecialValueFor("heal_per_sec")
 		self:StartIntervalThink(1.0)
 	end
 end
@@ -256,18 +260,6 @@ function imba_malfurion_living_tower:OnSpellStart()
 		self.living_tower:SetMinimumGoldBounty(self:GetSpecialValueFor("gold_bounty"))
 		self.living_tower:SetMaximumGoldBounty(self:GetSpecialValueFor("gold_bounty"))
 		self.living_tower:EmitSound("Hero_Treant.Overgrowth.Cast")
-		if self:GetCaster():HasTalent("special_bonus_imba_malfurion_1") then
-			self.living_tower:AddAbility("imba_tower_aegis"):SetLevel(self:GetLevel())
-		end
-		if self:GetCaster():HasTalent("special_bonus_imba_malfurion_2") then
-			self.living_tower:AddAbility("imba_tower_atrophy"):SetLevel(self:GetLevel())
-		end
-		if self:GetCaster():HasTalent("special_bonus_imba_malfurion_3") then
-			self.living_tower:AddAbility("imba_tower_soul_leech"):SetLevel(self:GetLevel())
-		end
-		if self:GetCaster():HasTalent("special_bonus_imba_malfurion_4") then
-			self.living_tower:AddAbility("imba_tower_barrier"):SetLevel(self:GetLevel())
-		end
 	end
 end
 

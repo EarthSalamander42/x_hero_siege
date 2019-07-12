@@ -15,6 +15,7 @@ var first_time = false;
 
 var secret_key = CustomNetTables.GetTableValue("game_options", "server_key")["1"];
 
+
 var api = {
 	base : "http://api.dota2imba.fr/",
 	urls : {
@@ -322,7 +323,7 @@ function Battlepass(retainSubTab, bRewardsDisabled) {
 		}
 	);
 
-//	GenerateBattlepassPanel(BattlepassRewards, Players.GetLocalPlayer(), bRewardsDisabled);
+	GenerateBattlepassPanel(BattlepassRewards, Players.GetLocalPlayer(), bRewardsDisabled);
 
 	var companions = CustomNetTables.GetTableValue("battlepass", "companions");
 	if (companions != undefined)
@@ -572,13 +573,13 @@ function GenerateBattlepassPanel(BattlepassRewards, player, bRewardsDisabled) {
 					reward_icon.AddClass("BattlepassRewardIcon_locked")
 					var reward_label_locked = $.CreatePanel("Label", reward_icon, bp_reward + "_label");
 					reward_label_locked.AddClass("BattlepassRewardLabelLocked");
-					reward_label_locked.text = $.Localize("battlepass_reward_locked") + $.Localize("#battlepass_" + bp_reward);
+					reward_label_locked.text = $.Localize("battlepass_reward_locked") + " " + $.Localize("#battlepass_" + bp_reward);
 				}
 			} else {
 				reward_icon.AddClass("BattlepassRewardIcon_locked")
 				var reward_label_locked = $.CreatePanel("Label", reward_icon, bp_reward + "_label");
 				reward_label_locked.AddClass("BattlepassRewardLabelLocked");
-				reward_label_locked.text = $.Localize("battlepass_reward_locked") + $.Localize("#battlepass_" + bp_reward);
+				reward_label_locked.text = $.Localize("battlepass_reward_locked") + " " + $.Localize("#battlepass_" + bp_reward);
 			}
 		}
 	}

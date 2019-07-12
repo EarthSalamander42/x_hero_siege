@@ -284,7 +284,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"	"heroes/hero_wisp.lua"
+				"ScriptFile"	"phases/choose_hero.lua"
 				"Function"		"ChooseRandomHero"
 			}
 		}
@@ -301,37 +301,6 @@
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"AbilityTextureName"		"invoker_attribute_bonus"
 		"MaxLevel"					"1"
-	}
-
-	//=================================================================================================================
-	// Wisp: VIP Effects
-	//=================================================================================================================
-	"holdout_vip"
-	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"BaseClass"					"ability_datadriven"
-		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-		"AbilityTextureName"		"custom/holdout_vip"
-		"MaxLevel"					"1"
-
-		"Modifiers"
-		{
-			"modifier_vip"
-			{
-				"Passive"   "1"
-				"IsHidden"  "0"
-
-				"OnCreated"
-				{
-					"RunScript"
-					{
-						"ScriptFile"	"heroes/hero_wisp.lua"
-						"Function"		"WispEffects"
-					}
-				}
-			}
-		}
 	}
 
 	//=================================================================================================================
@@ -4534,7 +4503,7 @@
 			"04"
 			{
 				"var_type"                  "FIELD_INTEGER"
-				"wolf_damage"               "18 40 84 120"
+				"wolf_damage"               "28 60 100 180"
 			}
 			"05"
 			{
@@ -18397,12 +18366,12 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"health"				"2000 3000 4000"
+				"health"				"2000 5000 15000"
 			}
 			"02"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"damage"				"100 200 300"
+				"damage"				"100 300 500"
 			}
 			"03"
 			{

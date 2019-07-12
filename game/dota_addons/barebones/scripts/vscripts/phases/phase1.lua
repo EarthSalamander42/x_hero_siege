@@ -13,7 +13,7 @@ if PlayerResource:GetConnectionState(hero:GetPlayerID()) ~= 2 then return end
 
 	CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "show_events", {})
 	Entities:FindByName(nil, "trigger_special_event"):Disable()
-	TeleportHero(hero, 0.0, point)
+	TeleportHero(hero, point)
 	hero:AddNewModifier(nil, nil, "modifier_boss_stun", {IsHidden = true})
 	hero:AddNewModifier(nil, nil, "modifier_invulnerable", {IsHidden = true})
 end
@@ -54,9 +54,9 @@ local caller = event.caller
 local hero = event.activator
 
 	if hero:GetTeamNumber() == 2 then
-		TeleportHero(hero, 0.0, base_good:GetAbsOrigin())
+		TeleportHero(hero, base_good:GetAbsOrigin())
 	elseif hero:GetTeamNumber() == 3 then
-		TeleportHero(hero, 0.0, base_bad:GetAbsOrigin())
+		TeleportHero(hero, base_bad:GetAbsOrigin())
 	end
 
 	Entities:FindByName(nil, "trigger_special_event"):Enable()

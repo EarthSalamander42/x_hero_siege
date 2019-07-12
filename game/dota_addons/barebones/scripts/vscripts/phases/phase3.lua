@@ -307,7 +307,7 @@ end
 function StartSecretArena(hero)
 	local point = Entities:FindByName(nil, "npc_dota_muradin_player_1")
 
-	TeleportHero(hero, 3.0, point:GetAbsOrigin())
+	TeleportHero(hero, point:GetAbsOrigin(), 3.0)
 
 	Timers:CreateTimer(3.0, function()
 		FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)

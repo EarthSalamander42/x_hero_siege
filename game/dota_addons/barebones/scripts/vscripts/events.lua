@@ -78,7 +78,9 @@ local hero_level = npc:GetLevel()
 						npc:AddNewModifier(npc, nil, "modifier_item_ultimate_scepter_consumed", {})
 					end
 
-					if npc:GetUnitName() ~= "npc_dota_hero_wisp" then
+					if npc:GetUnitName() == "npc_dota_hero_wisp" then
+						WispEffects(npc)
+					else
 						npc:AddNewModifier(npc, nil, "modifier_armor_gain_fix", {})
 --						npc:AddNewModifier(npc, nil, "modifier_magical_resistance_fix", {})
 					end
@@ -639,7 +641,7 @@ local donator_level = api:GetDonatorStatus(userID)
 					hero:IncrementAttributes(50)
 					hero:EmitSound("ui.trophy_levelup")
 
-					local particle1 = ParticleManager:CreateParticle("particles/econ/events/ti6/hero_levelup_ti6.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
+					local particle1 = ParticleManager:CreateParticle(CustomNetTables:GetTableValue("battlepass_item_effects", tostring(hero:GetPlayerID())).tome_stats["effect1"], PATTACH_ABSORIGIN_FOLLOW, hero)
 					ParticleManager:SetParticleControl(particle1, 0, hero:GetAbsOrigin())
 
 					i = i + 1

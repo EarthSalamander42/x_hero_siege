@@ -4,7 +4,7 @@ local ability = event.ability
 local stats = ability:GetSpecialValueFor("stat_bonus")
 
 	hero:IncrementAttributes(stats)
-	local particle1 = ParticleManager:CreateParticle("particles/econ/events/ti6/hero_levelup_ti6.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
+	local particle1 = ParticleManager:CreateParticle(CustomNetTables:GetTableValue("battlepass_item_effects", tostring(hero:GetPlayerID())).tome_stats["effect1"], PATTACH_ABSORIGIN_FOLLOW, hero)
 	ParticleManager:SetParticleControl(particle1, 0, hero:GetAbsOrigin())
 	hero:EmitSound("ui.trophy_levelup")
 end

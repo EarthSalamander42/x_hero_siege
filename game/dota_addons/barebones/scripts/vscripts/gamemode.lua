@@ -958,7 +958,7 @@ local point_beast = Entities:FindByName(nil, "hero_image_boss"):GetAbsOrigin()
 					PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil) 
 				end)
 
-				TeleportHero(hero, 0.0, point_hero:GetAbsOrigin())
+				TeleportHero(hero, point_hero:GetAbsOrigin())
 			end
 		end
 
@@ -1025,7 +1025,7 @@ local point_beast = Entities:FindByName(nil, "spirit_beast_boss"):GetAbsOrigin()
 			end)
 
 			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
-				TeleportHero(hero, 0.0, point_hero:GetAbsOrigin())
+				TeleportHero(hero, point_hero:GetAbsOrigin())
 			end
 		end
 
@@ -1076,7 +1076,7 @@ local point_beast = Entities:FindByName(nil, "frost_infernal_boss"):GetAbsOrigin
 
 		if IsValidEntity(hero) then
 			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
-				TeleportHero(hero, 0.0, point_hero:GetAbsOrigin())
+				TeleportHero(hero, point_hero:GetAbsOrigin())
 			end
 		end
 
@@ -1143,7 +1143,7 @@ local point = Entities:FindByName(nil, "all_hero_image_player")
 					PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil) 
 				end)
 
-				TeleportHero(hero, 0.0, point:GetAbsOrigin())
+				TeleportHero(hero, point:GetAbsOrigin())
 			end
 		end
 
@@ -1370,12 +1370,12 @@ function GameMode:ItemAddedFilter(event)
 				RestartCreeps(teleport_time + 3)
 				sword_first_time = false
 				if hero.old_pos then
-					TeleportHero(hero, teleport_time, hero.old_pos)
+					TeleportHero(hero, hero.old_pos, teleport_time)
 				else
 					if hero:GetTeamNumber() == 2 then
-						TeleportHero(hero, 3.0, base_good:GetAbsOrigin())
+						TeleportHero(hero, base_good:GetAbsOrigin(), 3.0)
 --					elseif hero:GetTeamNumber() == 3 then
---						TeleportHero(hero, 3.0, base_bad:GetAbsOrigin())
+--						TeleportHero(hero, base_bad:GetAbsOrigin(), 3.0)
 					end
 				end
 				hero:EmitSound("Hero_TemplarAssassin.Trap")
@@ -1390,24 +1390,24 @@ function GameMode:ItemAddedFilter(event)
 				RestartCreeps(teleport_time + 3)
 				ring_first_time = false
 				if hero.old_pos then
-					TeleportHero(hero, teleport_time, hero.old_pos)
+					TeleportHero(hero, hero.old_pos, teleport_time)
 				else
 					if hero:GetTeamNumber() == 2 then
-						TeleportHero(hero, 3.0, base_good:GetAbsOrigin())
+						TeleportHero(hero, base_good:GetAbsOrigin(), 3.0)
 --					elseif hero:GetTeamNumber() == 3 then
---						TeleportHero(hero, 3.0, base_bad:GetAbsOrigin())
+--						TeleportHero(hero, base_bad:GetAbsOrigin(), 3.0)
 					end
 				end
 				hero:EmitSound("Hero_TemplarAssassin.Trap")
 			elseif item:GetName() == frost and frost_first_time then
 				frost_first_time = false
 				if hero.old_pos then
-					TeleportHero(hero, 3.0, hero.old_pos)
+					TeleportHero(hero, hero.old_pos, 3.0)
 				else
 					if hero:GetTeamNumber() == 2 then
-						TeleportHero(hero, 3.0, base_good:GetAbsOrigin())
+						TeleportHero(hero, base_good:GetAbsOrigin(), 3.0)
 --					else
---						TeleportHero(hero, 3.0, base_bad:GetAbsOrigin())
+--						TeleportHero(hero, base_bad:GetAbsOrigin(), 3.0)
 					end
 				end
 				hero:EmitSound("Hero_TemplarAssassin.Trap")

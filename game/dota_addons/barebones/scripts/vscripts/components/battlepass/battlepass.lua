@@ -1,125 +1,52 @@
-BATTLEPASS_LEVEL_REWARD = {}
---[[
-BATTLEPASS_LEVEL_REWARD[2]	= {"vengefulspirit_taunt", "immortal"}
-BATTLEPASS_LEVEL_REWARD[4]	= {"fountain", "common"}
-BATTLEPASS_LEVEL_REWARD[6]	= {"bristleback_rare", "rare"}
-BATTLEPASS_LEVEL_REWARD[7]	= {"slark_taunt", "immortal"}
-BATTLEPASS_LEVEL_REWARD[9]	= {"blink", "common"}
-BATTLEPASS_LEVEL_REWARD[11]	= {"chen_mythical", "mythical"}
-BATTLEPASS_LEVEL_REWARD[13]	= {"fountain2", "common"}
-BATTLEPASS_LEVEL_REWARD[14]	= {"alchemist_taunt", "immortal"}
-BATTLEPASS_LEVEL_REWARD[15]	= {"vengefulspirit_immortal", "immortal"}
-BATTLEPASS_LEVEL_REWARD[16]	= {"force_staff", "common"}
-BATTLEPASS_LEVEL_REWARD[18]	= {"blink2", "common"}
-BATTLEPASS_LEVEL_REWARD[20]	= {"maelstorm", "common"}
-BATTLEPASS_LEVEL_REWARD[22]	= {"fountain3", "common"}
-BATTLEPASS_LEVEL_REWARD[23]	= {"enigma_taunt", "rare"}
--- BATTLEPASS_LEVEL_REWARD[26]	= "bottle"
-BATTLEPASS_LEVEL_REWARD[27]	= {"blink3", "common"}
-BATTLEPASS_LEVEL_REWARD[28]	= {"dark_seer_immortal", "immortal"}
-BATTLEPASS_LEVEL_REWARD[30]	= {"zuus_arcana", "arcana"}
-BATTLEPASS_LEVEL_REWARD[31]	= {"fountain4", "common"}
-BATTLEPASS_LEVEL_REWARD[32]	= {"force_staff2", "common"}
-BATTLEPASS_LEVEL_REWARD[33]	= {"skywrath_mage_immortal", "immortal"}
-BATTLEPASS_LEVEL_REWARD[35]	= {"mekansm", "common"}
-BATTLEPASS_LEVEL_REWARD[36]	= {"blink4", "common"}
-BATTLEPASS_LEVEL_REWARD[38]	= {"lion_taunt", "immortal"}
-BATTLEPASS_LEVEL_REWARD[39]	= {"bristleback_rare2", "rare"}
-BATTLEPASS_LEVEL_REWARD[40]	= {"fountain5", "common"}
-BATTLEPASS_LEVEL_REWARD[44]	= {"radiance", "common"}
-BATTLEPASS_LEVEL_REWARD[45]	= {"blink5", "common"}
-BATTLEPASS_LEVEL_REWARD[46]	= {"nyx_assassin_immortal", "immortal"}
-BATTLEPASS_LEVEL_REWARD[48]	= {"force_staff3", "common"}
-BATTLEPASS_LEVEL_REWARD[49]	= {"fountain6", "common"}
--- BATTLEPASS_LEVEL_REWARD[50]	= {"tidehunter_ancient", "ancient"}
--- BATTLEPASS_LEVEL_REWARD[50]	= "bottle2"
-BATTLEPASS_LEVEL_REWARD[51]	= {"maelstorm2", "common"}
-BATTLEPASS_LEVEL_REWARD[52]	= {"enigma_mythical", "mythical"}
-BATTLEPASS_LEVEL_REWARD[54]	= {"blink6", "common"}
-BATTLEPASS_LEVEL_REWARD[55]	= {"lina_arcana", "arcana"}
-BATTLEPASS_LEVEL_REWARD[56]	= {"huskar_immortal", "immortal"}
-BATTLEPASS_LEVEL_REWARD[58]	= {"fountain7", "common"}
-BATTLEPASS_LEVEL_REWARD[60]	= {"sheepstick", "common"}
-BATTLEPASS_LEVEL_REWARD[62]	= {"dark_willow_taunt", "immortal"}
-BATTLEPASS_LEVEL_REWARD[63]	= {"blink7", "common"}
-BATTLEPASS_LEVEL_REWARD[64]	= {"force_staff4", "common"}
-BATTLEPASS_LEVEL_REWARD[65]	= {"juggernaut_arcana", "arcana"}
-BATTLEPASS_LEVEL_REWARD[67]	= {"fountain8", "common"}
-BATTLEPASS_LEVEL_REWARD[68]	= {"axe_immortal", "immortal"}
-BATTLEPASS_LEVEL_REWARD[70]	= {"mekansm2", "common"}
-BATTLEPASS_LEVEL_REWARD[71]	= {"zuus_taunt", "mythical"}
-BATTLEPASS_LEVEL_REWARD[72]	= {"blink8", "common"}
--- BATTLEPASS_LEVEL_REWARD[74]	= "bottle3"
-BATTLEPASS_LEVEL_REWARD[75]	= {"pudge_arcana", "arcana"}
-BATTLEPASS_LEVEL_REWARD[76]	= {"fountain9", "common"}
-BATTLEPASS_LEVEL_REWARD[80]	= {"force_staff5", "common"}
-BATTLEPASS_LEVEL_REWARD[81]	= {"blink9", "common"}
-BATTLEPASS_LEVEL_REWARD[82]	= {"maelstorm3", "common"}
-BATTLEPASS_LEVEL_REWARD[84]	= {"pangolier_taunt", "immortal"}
-BATTLEPASS_LEVEL_REWARD[85]	= {"fountain10", "common"}
-BATTLEPASS_LEVEL_REWARD[88]	= {"radiance2", "common"}
-BATTLEPASS_LEVEL_REWARD[90]	= {"blink10", "common"}
-BATTLEPASS_LEVEL_REWARD[94]	= {"fountain11", "common"}
-BATTLEPASS_LEVEL_REWARD[95]	= {"furion_taunt", "immortal"}
-BATTLEPASS_LEVEL_REWARD[96]	= {"force_staff6", "common"}
-BATTLEPASS_LEVEL_REWARD[97]	= {"life_stealer_immortal", "immortal"}
--- BATTLEPASS_LEVEL_REWARD[98]	= "bottle4"
-BATTLEPASS_LEVEL_REWARD[99]	= {"blink11", "common"}
-BATTLEPASS_LEVEL_REWARD[100]	= {"shiva", "common"}
-BATTLEPASS_LEVEL_REWARD[103]	= {"fountain12", "common"}
-BATTLEPASS_LEVEL_REWARD[105]	= {"mekansm3", "common"}
-BATTLEPASS_LEVEL_REWARD[106]	= {"death_prophet_immortal", "immortal"}
-BATTLEPASS_LEVEL_REWARD[108]	= {"blink12", "common"}
-BATTLEPASS_LEVEL_REWARD[110]	= {"invoker_taunt", "immortal"}
-BATTLEPASS_LEVEL_REWARD[112]	= {"fountain13", "common"}
-BATTLEPASS_LEVEL_REWARD[113]	= {"maelstorm4", "common"}
-BATTLEPASS_LEVEL_REWARD[115]	= {"pudge_arcana2", "arcana"}
-BATTLEPASS_LEVEL_REWARD[116]	= {"centaur_immortal", "immortal"}
-BATTLEPASS_LEVEL_REWARD[117]	= {"blink13", "common"}
-BATTLEPASS_LEVEL_REWARD[120]	= {"sheepstick2", "common"}
-BATTLEPASS_LEVEL_REWARD[121]	= {"fountain14", "common"}
--- BATTLEPASS_LEVEL_REWARD[122]	= "bottle5"
-BATTLEPASS_LEVEL_REWARD[125]	= {"juggernaut_arcana2", "arcana"}
-BATTLEPASS_LEVEL_REWARD[126]	= {"blink14", "common"}
-BATTLEPASS_LEVEL_REWARD[128]	= {"dark_seer_immortal2", "immortal"}
-BATTLEPASS_LEVEL_REWARD[130]	= {"fountain15", "common"}
-BATTLEPASS_LEVEL_REWARD[132]	= {"radiance3", "common"}
-BATTLEPASS_LEVEL_REWARD[133]	= {"skywrath_mage_immortal2", "immortal"}
-BATTLEPASS_LEVEL_REWARD[139]	= {"fountain16", "common"}
-BATTLEPASS_LEVEL_REWARD[140]	= {"mekansm4", "common"}
-BATTLEPASS_LEVEL_REWARD[144]	= {"maelstorm5", "common"}
-BATTLEPASS_LEVEL_REWARD[145]	= {"wisp_arcana", "arcana"}
-BATTLEPASS_LEVEL_REWARD[146]	= {"earthshaker_immortal", "immortal"}
-BATTLEPASS_LEVEL_REWARD[148]	= {"fountain17", "common"}
-BATTLEPASS_LEVEL_REWARD[150]	= {"shiva2", "common"}
-BATTLEPASS_LEVEL_REWARD[152]	= {"leshrac_immortal", "immortal"}
-BATTLEPASS_LEVEL_REWARD[157]	= {"fountain18", "common"}
-BATTLEPASS_LEVEL_REWARD[165]	= {"earthshaker_arcana", "arcana"}
-BATTLEPASS_LEVEL_REWARD[166]	= {"fountain19", "common"}
-BATTLEPASS_LEVEL_REWARD[170]	= {"enigma_immortal", "immortal"}
-BATTLEPASS_LEVEL_REWARD[175]	= {"fountain20", "common"}
-BATTLEPASS_LEVEL_REWARD[176]	= {"radiance4", "common"}
-BATTLEPASS_LEVEL_REWARD[180]	= {"drow_ranger_immortal", "immortal"}
-BATTLEPASS_LEVEL_REWARD[184]	= {"fountain21", "common"}
-BATTLEPASS_LEVEL_REWARD[197]	= {"life_stealer_immortal2", "immortal"}
-BATTLEPASS_LEVEL_REWARD[200]	= {"shiva3", "common"}
-BATTLEPASS_LEVEL_REWARD[250]	= {"shiva4", "common"}
-BATTLEPASS_LEVEL_REWARD[265]	= {"earthshaker_arcana2", "arcana"}
-BATTLEPASS_LEVEL_REWARD[275]	= {"leshrac_taunt", "immortal"}
-BATTLEPASS_LEVEL_REWARD[280]	= {"pudge_immortal", "immortal"}
-BATTLEPASS_LEVEL_REWARD[295]	= {"windrunner_taunt", "immortal"}
-BATTLEPASS_LEVEL_REWARD[400]	= {"ursa_immortal", "immortal"}
---]]
-
-CustomNetTables:SetTableValue("game_options", "battlepass", {battlepass = BATTLEPASS_LEVEL_REWARD})
-
 function Battlepass:Init()
+	BATTLEPASS_LEVEL_REWARD = {}
+--[[ not working, #BATTLEPASS_LEVEL_REWARD returns 0 but the table show elements when being printed
+	BATTLEPASS_LEVEL_REWARD[5]		= {"teleport", "common"}
+	BATTLEPASS_LEVEL_REWARD[10]		= {"teleport2", "common"}
+	BATTLEPASS_LEVEL_REWARD[15]		= {"teleport3", "common"}
+	BATTLEPASS_LEVEL_REWARD[20]		= {"teleport4", "common"}
+	BATTLEPASS_LEVEL_REWARD[25]		= {"teleport5", "common"}
+	BATTLEPASS_LEVEL_REWARD[30]		= {"teleport6", "common"}
+	BATTLEPASS_LEVEL_REWARD[35]		= {"teleport7", "common"}
+	BATTLEPASS_LEVEL_REWARD[40]		= {"teleport8", "common"}
+	BATTLEPASS_LEVEL_REWARD[45]		= {"teleport9", "common"}
+	BATTLEPASS_LEVEL_REWARD[50]		= {"tome", "mythical"}
+	BATTLEPASS_LEVEL_REWARD[55]		= {"teleport10", "common"}
+	BATTLEPASS_LEVEL_REWARD[60]		= {"teleport11", "common"}
+	BATTLEPASS_LEVEL_REWARD[65]		= {"teleport12", "common"}
+	BATTLEPASS_LEVEL_REWARD[70]		= {"teleport13", "common"}
+	BATTLEPASS_LEVEL_REWARD[75]		= {"teleport14", "common"}
+	BATTLEPASS_LEVEL_REWARD[80]		= {"teleport15", "common"}
+	BATTLEPASS_LEVEL_REWARD[85]		= {"teleport16", "common"}
+	BATTLEPASS_LEVEL_REWARD[90]		= {"teleport17", "common"}
+	BATTLEPASS_LEVEL_REWARD[95]		= {"teleport18", "common"}
+	BATTLEPASS_LEVEL_REWARD[100]	= {"tome2", "mythical"}
+	BATTLEPASS_LEVEL_REWARD[105]	= {"teleport19", "common"}
+	BATTLEPASS_LEVEL_REWARD[110]	= {"teleport20", "common"}
+	BATTLEPASS_LEVEL_REWARD[115]	= {"teleport21", "common"}
+	BATTLEPASS_LEVEL_REWARD[120]	= {"teleport22", "common"}
+	BATTLEPASS_LEVEL_REWARD[125]	= {"teleport23", "common"}
+	BATTLEPASS_LEVEL_REWARD[130]	= {"teleport24", "common"}
+	BATTLEPASS_LEVEL_REWARD[135]	= {"teleport25", "common"}
+	BATTLEPASS_LEVEL_REWARD[140]	= {"teleport26", "common"}
+	BATTLEPASS_LEVEL_REWARD[145]	= {"teleport27", "common"}
+	BATTLEPASS_LEVEL_REWARD[150]	= {"tome3", "mythical"}
+	BATTLEPASS_LEVEL_REWARD[200]	= {"tome4", "mythical"}
+--]]
+	CustomNetTables:SetTableValue("game_options", "battlepass", {battlepass = BATTLEPASS_LEVEL_REWARD})
+
 	-- testing
 	BATTLEPASS = {}
-	BATTLEPASS["blink"] = {}
+--	BATTLEPASS["blink"] = {}
+	BATTLEPASS["teleport"] = {}
+	BATTLEPASS["tome"] = {}
 
+	print("Init battlepass")
 
-	for k, v in pairs(BATTLEPASS_LEVEL_REWARD) do
+	print(BATTLEPASS_LEVEL_REWARD, #BATTLEPASS_LEVEL_REWARD)
+
+	for k, v in ipairs(BATTLEPASS_LEVEL_REWARD) do
+		print("k, v", k, v)
 		local required_level = k
 		local category = string.gsub(v[1], "%d", "")
 		local reward_level = string.gsub(v[1], "%D", "")
@@ -131,34 +58,34 @@ function Battlepass:Init()
 		end
 	end
 
-	BATTLEPASS_JUGGERNAUT = {}
-	BATTLEPASS_LINA = {}
-	BATTLEPASS_WISP = {}
-	BATTLEPASS_CHEN = {}
-	BATTLEPASS_BRISTLEBACK = {}
-	BATTLEPASS_AXE = {}
-	BATTLEPASS_NYX_ASSASSIN = {}
-	BATTLEPASS_LESHRAC = {}
+--	BATTLEPASS_JUGGERNAUT = {}
+--	BATTLEPASS_LINA = {}
+--	BATTLEPASS_WISP = {}
+--	BATTLEPASS_CHEN = {}
+--	BATTLEPASS_BRISTLEBACK = {}
+--	BATTLEPASS_AXE = {}
+--	BATTLEPASS_NYX_ASSASSIN = {}
+--	BATTLEPASS_LESHRAC = {}
 
-	for k, v in pairs(BATTLEPASS_LEVEL_REWARD) do
-		if string.find(v[1], "juggernaut") then
-			BATTLEPASS_JUGGERNAUT[v[1]] = k
-		elseif string.find(v[1], "lina") then
-			BATTLEPASS_LINA[v[1]] = k
-		elseif string.find(v[1], "wisp") then
-			BATTLEPASS_WISP[v[1]] = k
-		elseif string.find(v[1], "chen") then
-			BATTLEPASS_CHEN[v[1]] = k
-		elseif string.find(v[1], "bristleback") then
-			BATTLEPASS_BRISTLEBACK[v[1]] = k
-		elseif string.find(v[1], "axe") then
-			BATTLEPASS_AXE[v[1]] = k
-		elseif string.find(v[1], "nyx_assassin") then
-			BATTLEPASS_NYX_ASSASSIN[v[1]] = k
-		elseif string.find(v[1], "leshrac") then
-			BATTLEPASS_LESHRAC[v[1]] = k
-		end
-	end
+--	for k, v in pairs(BATTLEPASS_LEVEL_REWARD) do
+--		if string.find(v[1], "juggernaut") then
+--			BATTLEPASS_JUGGERNAUT[v[1]] = k
+--		elseif string.find(v[1], "lina") then
+--			BATTLEPASS_LINA[v[1]] = k
+--		elseif string.find(v[1], "wisp") then
+--			BATTLEPASS_WISP[v[1]] = k
+--		elseif string.find(v[1], "chen") then
+--			BATTLEPASS_CHEN[v[1]] = k
+--		elseif string.find(v[1], "bristleback") then
+--			BATTLEPASS_BRISTLEBACK[v[1]] = k
+--		elseif string.find(v[1], "axe") then
+--			BATTLEPASS_AXE[v[1]] = k
+--		elseif string.find(v[1], "nyx_assassin") then
+--			BATTLEPASS_NYX_ASSASSIN[v[1]] = k
+--		elseif string.find(v[1], "leshrac") then
+--			BATTLEPASS_LESHRAC[v[1]] = k
+--		end
+--	end
 end
 
 function Battlepass:AddItemEffects(hero)
@@ -175,51 +102,86 @@ function Battlepass:AddItemEffects(hero)
 --	Battlepass:GetHeroEffect(hero)
 end
 
-function Battlepass:GetBlinkEffect(ID)
+function Battlepass:GetTeleportEffect(ID)
 	local effects = {}
 
 	effects["effect1"] = {}
-	effects["effect1"][0] = "particles/items_fx/blink_dagger_start.vpcf"
-	effects["effect1"][1] = "particles/econ/events/fall_major_2016/blink_dagger_start_fm06.vpcf"
-	effects["effect1"][2] = "particles/econ/events/nexon_hero_compendium_2014/blink_dagger_start_nexon_hero_cp_2014.vpcf"
-	effects["effect1"][3] = "particles/econ/events/ti7/blink_dagger_start_ti7.vpcf"
-	effects["effect1"][4] = "particles/econ/events/ti7/blink_dagger_start_ti7_lvl2.vpcf"
-	effects["effect1"][5] = "particles/econ/events/winter_major_2017/blink_dagger_start_wm07.vpcf"
-	effects["effect1"][6] = "particles/econ/events/ti4/blink_dagger_start_ti4.vpcf"
-	effects["effect1"][7] = "particles/econ/events/ti6/blink_dagger_start_ti6.vpcf"
-	effects["effect1"][8] = "particles/econ/events/ti6/blink_dagger_start_ti6_lvl2.vpcf"
-	effects["effect1"][9] = "particles/econ/events/ti5/blink_dagger_start_ti5.vpcf"
-	effects["effect1"][10] = "particles/econ/events/ti5/blink_dagger_start_lvl2_ti5.vpcf"
-	effects["effect1"][11] = "particles/econ/events/ti8/blink_dagger_ti8_start.vpcf"
-	effects["effect1"][12] = "particles/econ/events/ti8/blink_dagger_ti8_start_lvl2.vpcf"
-	effects["effect1"][13] = "particles/econ/events/ti9/blink_dagger_ti9_start.vpcf"
-	effects["effect1"][14] = "particles/econ/events/ti9/blink_dagger_ti9_start_lvl2.vpcf"
+	effects["effect1"][0] = "particles/items2_fx/teleport_start.vpcf"
+	effects["effect1"][1] = "particles/econ/events/ti4/teleport_start_ti4.vpcf"
+	effects["effect1"][2] = "particles/econ/events/league_teleport_2014/teleport_start_league.vpcf"
+	effects["effect1"][3] = "particles/econ/events/league_teleport_2014/teleport_start_league_bronze.vpcf"
+	effects["effect1"][4] = "particles/econ/events/league_teleport_2014/teleport_start_league_silver.vpcf"
+	effects["effect1"][5] = "particles/econ/events/league_teleport_2014/teleport_start_league_gold.vpcf"
+	effects["effect1"][6] = "particles/econ/events/ti5/teleport_start_ti5.vpcf"
+	effects["effect1"][7] = "particles/econ/events/ti5/teleport_start_lvl2_ti5.vpcf"
+	effects["effect1"][8] = "particles/econ/events/fall_major_2015/teleport_start_fallmjr_2015.vpcf"
+	effects["effect1"][9] = "particles/econ/events/fall_major_2015/teleport_start_fallmjr_2015_lvl2.vpcf"
+	effects["effect1"][10] = "particles/econ/events/fall_major_2016/teleport_start_fm06_lvl1.vpcf"
+	effects["effect1"][11] = "particles/econ/events/fall_major_2016/teleport_start_fm06_lvl2.vpcf"
+	effects["effect1"][12] = "particles/econ/events/fall_major_2016/teleport_start_fm06_lvl3.vpcf"
+	effects["effect1"][13] = "particles/econ/events/ti6/teleport_start_ti6.vpcf"
+	effects["effect1"][14] = "particles/econ/events/ti6/teleport_start_ti6_lvl2.vpcf"
+	effects["effect1"][15] = "particles/econ/events/ti6/teleport_start_ti6_lvl3.vpcf"
+	effects["effect1"][16] = "particles/econ/events/winter_major_2016/teleport_start_winter_major_2016_lvl1.vpcf"
+	effects["effect1"][17] = "particles/econ/events/winter_major_2016/teleport_start_winter_major_2016_lvl2.vpcf"
+	effects["effect1"][18] = "particles/econ/events/winter_major_2016/teleport_start_winter_major_2016_lvl3.vpcf"
+	effects["effect1"][19] = "particles/econ/events/ti7/teleport_start_ti7.vpcf"
+	effects["effect1"][20] = "particles/econ/events/ti7/teleport_start_ti7_lvl2.vpcf"
+	effects["effect1"][21] = "particles/econ/events/ti7/teleport_start_ti7_lvl3.vpcf"
+	effects["effect1"][22] = "particles/econ/events/ti8/teleport_start_ti8.vpcf"
+	effects["effect1"][23] = "particles/econ/events/ti8/teleport_start_ti8_lvl2.vpcf"
+	effects["effect1"][24] = "particles/econ/events/ti8/teleport_start_ti8_lvl3.vpcf"
+	effects["effect1"][25] = "particles/econ/events/ti9/teleport_start_ti9.vpcf"
+	effects["effect1"][26] = "particles/econ/events/ti9/teleport_start_ti9_lvl2.vpcf"
+	effects["effect1"][27] = "particles/econ/events/ti9/teleport_start_ti9_lvl3.vpcf"
+
+	-- particles/econ/items/tinker/boots_of_travel/teleport_start_bots.vpcf"
 
 	effects["effect2"] = {}
-	effects["effect2"][0] = "particles/items_fx/blink_dagger_end.vpcf"
-	effects["effect2"][1] = "particles/econ/events/fall_major_2016/blink_dagger_end_fm06.vpcf"
-	effects["effect2"][2] = "particles/econ/events/nexon_hero_compendium_2014/blink_dagger_end_nexon_hero_cp_2014.vpcf"
-	effects["effect2"][3] = "particles/econ/events/ti7/blink_dagger_end_ti7.vpcf"
-	effects["effect2"][4] = "particles/econ/events/ti7/blink_dagger_end_ti7_lvl2.vpcf"
-	effects["effect2"][5] = "particles/econ/events/winter_major_2017/blink_dagger_end_wm07.vpcf"
-	effects["effect2"][6] = "particles/econ/events/ti4/blink_dagger_end_ti4.vpcf"
-	effects["effect2"][7] = "particles/econ/events/ti6/blink_dagger_end_ti6.vpcf"
-	effects["effect2"][8] = "particles/econ/events/ti6/blink_dagger_end_ti6_lvl2.vpcf"
-	effects["effect2"][9] = "particles/econ/events/ti5/blink_dagger_end_ti5.vpcf"
-	effects["effect2"][10] = "particles/econ/events/ti5/blink_dagger_end_lvl2_ti5.vpcf"
-	effects["effect2"][11] = "particles/econ/events/ti8/blink_dagger_ti8_end.vpcf"
-	effects["effect2"][12] = "particles/econ/events/ti8/blink_dagger_ti8_end_lvl2.vpcf"
-	effects["effect2"][13] = "particles/econ/events/ti9/blink_dagger_ti9_end.vpcf"
-	effects["effect2"][14] = "particles/econ/events/ti9/blink_dagger_ti9_lvl2_end.vpcf"
+	effects["effect2"][0] = "particles/items2_fx/teleport_end.vpcf"
+	effects["effect2"][1] = "particles/econ/events/ti4/teleport_end_ti4.vpcf"
+	effects["effect2"][2] = "particles/econ/events/league_teleport_2014/teleport_end_league.vpcf"
+	effects["effect2"][3] = "particles/econ/events/league_teleport_2014/teleport_end_league_bronze.vpcf"
+	effects["effect2"][4] = "particles/econ/events/league_teleport_2014/teleport_end_league_silver.vpcf"
+	effects["effect2"][5] = "particles/econ/events/league_teleport_2014/teleport_end_league_gold.vpcf"
+	effects["effect2"][6] = "particles/econ/events/ti5/teleport_end_ti5.vpcf"
+	effects["effect2"][7] = "particles/econ/events/ti5/teleport_end_lvl2_ti5.vpcf"
+	effects["effect2"][8] = "particles/econ/events/fall_major_2015/teleport_end_fallmjr_2015.vpcf"
+	effects["effect2"][9] = "particles/econ/events/fall_major_2015/teleport_end_fallmjr_2015_lvl2.vpcf"
+	effects["effect2"][10] = "particles/econ/events/fall_major_2016/teleport_end_fm06.vpcf"
+	effects["effect2"][11] = "particles/econ/events/fall_major_2016/teleport_end_fm06_lvl2.vpcf"
+	effects["effect2"][12] = "particles/econ/events/fall_major_2016/teleport_end_fm06_lvl3.vpcf"
+	effects["effect2"][13] = "particles/econ/events/ti6/teleport_end_ti6.vpcf"
+	effects["effect2"][14] = "particles/econ/events/ti6/teleport_end_ti6_lvl2.vpcf"
+	effects["effect2"][15] = "particles/econ/events/ti6/teleport_end_ti6_lvl3.vpcf"
+	effects["effect2"][16] = "particles/econ/events/winter_major_2016/teleport_end_winter_major_2016_lvl1.vpcf"
+	effects["effect2"][17] = "particles/econ/events/winter_major_2016/teleport_end_winter_major_2016_lvl2.vpcf"
+	effects["effect2"][18] = "particles/econ/events/winter_major_2016/teleport_end_winter_major_2016_lvl3.vpcf"
+	effects["effect2"][19] = "particles/econ/events/ti7/teleport_end_ti7.vpcf"
+	effects["effect2"][20] = "particles/econ/events/ti7/teleport_end_ti7_lvl2.vpcf"
+	effects["effect2"][21] = "particles/econ/events/ti7/teleport_end_ti7_lvl3.vpcf"
+	effects["effect2"][22] = "particles/econ/events/ti8/teleport_end_ti8.vpcf"
+	effects["effect2"][23] = "particles/econ/events/ti8/teleport_end_ti8_lvl2.vpcf"
+	effects["effect2"][24] = "particles/econ/events/ti8/teleport_end_ti8_lvl3.vpcf"
+	effects["effect2"][25] = "particles/econ/events/ti9/teleport_end_ti9.vpcf"
+	effects["effect2"][26] = "particles/econ/events/ti9/teleport_end_ti9_lvl2.vpcf"
+	effects["effect2"][27] = "particles/econ/events/ti9/teleport_end_ti9_lvl3.vpcf"
+
+	-- particles/econ/items/natures_prophet/natures_prophet_weapon_sufferwood/furion_teleport_end_sufferwood.vpcf
+	-- particles/econ/items/tinker/boots_of_travel/teleport_end_bots.vpcf
+	-- add wisp relocate arcana?
 
 	local hero_item_effects = {}
 	hero_item_effects["level"] = 0
 	hero_item_effects["effect1"] = effects["effect1"][0]
 	hero_item_effects["effect2"] = effects["effect2"][0]
 
+--	print("Teleport BP table:", BATTLEPASS["teleport"], #BATTLEPASS["teleport"])
+
 	if Battlepass:GetRewardUnlocked(ID) ~= nil then
-		for i = #BATTLEPASS["blink"], 1, -1 do
-			if BATTLEPASS["blink"][i] and Battlepass:GetRewardUnlocked(ID) >= BATTLEPASS["blink"][i] then
+		for i = #BATTLEPASS["teleport"], 1, -1 do
+--			print(Battlepass:GetRewardUnlocked(ID), BATTLEPASS["teleport"][i])
+			if BATTLEPASS["teleport"][i] and Battlepass:GetRewardUnlocked(ID) >= BATTLEPASS["teleport"][i] then
 				hero_item_effects["level"] = i
 				hero_item_effects["effect1"] = effects["effect1"][i]
 				hero_item_effects["effect2"] = effects["effect2"][i]
@@ -246,8 +208,8 @@ function Battlepass:GetTomeEffect(ID)
 	hero_item_effects["effect1"] = effects["effect1"][0]
 
 	if Battlepass:GetRewardUnlocked(ID) ~= nil then
-		for i = #BATTLEPASS["blink"], 1, -1 do
-			if BATTLEPASS["blink"][i] and Battlepass:GetRewardUnlocked(ID) >= BATTLEPASS["blink"][i] then
+		for i = #BATTLEPASS["tome"], 1, -1 do
+			if BATTLEPASS["tome"][i] and Battlepass:GetRewardUnlocked(ID) >= BATTLEPASS["tome"][i] then
 				hero_item_effects["level"] = i
 				hero_item_effects["effect1"] = effects["effect1"][i]
 				break
@@ -260,7 +222,8 @@ end
 
 function Battlepass:SetItemEffects(ID)
 	CustomNetTables:SetTableValue("battlepass_item_effects", tostring(ID), {
-		blink = Battlepass:GetBlinkEffect(ID),
+--		blink = Battlepass:GetBlinkEffect(ID),
+		teleport = Battlepass:GetTeleportEffect(ID),
 		tome_stats = Battlepass:GetTomeEffect(ID),
 	})
 
