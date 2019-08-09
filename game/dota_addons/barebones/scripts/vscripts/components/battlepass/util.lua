@@ -13,7 +13,7 @@
 -- limitations under the License.
 --
 -- Editors:
---     EarthSalamander #42
+--     Earth Salamander #42
 
 LinkLuaModifier("modifier_companion", "components/battlepass/modifiers/modifier_companion.lua", LUA_MODIFIER_MOTION_NONE )
 LinkLuaModifier("modifier_patreon_donator", "components/battlepass/modifiers/modifier_patreon_donator.lua", LUA_MODIFIER_MOTION_NONE )
@@ -26,26 +26,52 @@ CustomGameEventManager:RegisterListener("change_player_xp", Dynamic_Wrap(Battlep
 CustomGameEventManager:RegisterListener("play_hero_taunt", Dynamic_Wrap(Battlepass, "PlayHeroTaunt"))
 
 function Battlepass:GetRewardUnlocked(ID)
-	-- temporary, show battlepass but keep it disabled until fixed
---	if IsInToolsMode() then return 1000 end
---	if CustomNetTables:GetTableValue("battlepass", tostring(ID)) then
---		if CustomNetTables:GetTableValue("battlepass", tostring(ID)).Lvl then
---			return CustomNetTables:GetTableValue("battlepass", tostring(ID)).Lvl
---		end
---	end
+	if IsInToolsMode() then return 1000 end
+	if CustomNetTables:GetTableValue("battlepass", tostring(ID)) then
+		if CustomNetTables:GetTableValue("battlepass", tostring(ID)).Lvl then
+			return CustomNetTables:GetTableValue("battlepass", tostring(ID)).Lvl
+		end
+	end
 
 	return 1
 end
 
---[[ need to rework bp hero tables from BATTLEPASS_PUDGE to BATTLEPASS["pudge"]!
-function Battlepass:HasArcana(ID, hero_name)
-	if Battlepass:GetRewardUnlocked(ID) >= BATTLEPASS[hero_name][hero_name.."_arcana"] then
-		return 0
+-- global functions shared across Frostrose Studio custom games
+
+function Battlepass:AddItemEffects(hero)
+	if hero.GetPlayerID == nil then return end
+
+	local ply_table = CustomNetTables:GetTableValue("battlepass", tostring(hero:GetPlayerID()))
+
+	if ply_table and ply_table.bp_rewards == 0 then
 	else
-		return nil
+		Battlepass:SetItemEffects(hero:GetPlayerID())
 	end
+
+	-- some effects override some items effects, need to call it after items setup
+	Battlepass:GetHeroEffect(hero)
 end
---]]
+
+function Battlepass:HasArcana(ID, hero_name)
+	if not Battlepass.GetRewardUnlocked or not BattlepassHeroes[hero_name] then return nil end
+
+	if BattlepassHeroes[hero_name][hero_name.."_arcana2"] then
+		if Battlepass:GetRewardUnlocked(ID) >= BattlepassHeroes[hero_name][hero_name.."_arcana2"] then
+			return 1
+		end
+	elseif BattlepassHeroes[hero_name][hero_name.."_arcana"] then
+		if Battlepass:GetRewardUnlocked(ID) >= BattlepassHeroes[hero_name][hero_name.."_arcana"] then
+			return 0
+		end
+	-- axe immortal topbar icon handling
+	elseif BattlepassHeroes[hero_name][hero_name.."_immortal"] then
+		if Battlepass:GetRewardUnlocked(ID) >= BattlepassHeroes[hero_name][hero_name.."_immortal"] then
+			return 0
+		end
+	end
+
+	return nil
+end
 
 -- vanilla extension
 function CDOTA_BaseNPC:SetupHealthBarLabel()
@@ -61,7 +87,7 @@ function CDOTA_BaseNPC:SetupHealthBarLabel()
 	if api:IsDonator(self:GetPlayerOwnerID()) ~= false then
 		local donator_level = api:GetDonatorStatus(self:GetPlayerOwnerID())
 		if donator_level and donator_level > 0 then
-			self:SetCustomHealthLabel("#donator_tooltip_" .. donator_level, DONATOR_COLOR[donator_level][1], DONATOR_COLOR[donator_level][2], DONATOR_COLOR[donator_level][3])
+			self:SetCustomHealthLabel("#donator_label_" .. donator_level, DONATOR_COLOR[donator_level][1], DONATOR_COLOR[donator_level][2], DONATOR_COLOR[donator_level][3])
 		end
 	end
 end

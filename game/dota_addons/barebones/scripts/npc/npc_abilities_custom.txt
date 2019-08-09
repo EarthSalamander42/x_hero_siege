@@ -16395,7 +16395,7 @@
 			"02"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"bonus_armor"			"10 20 40 75"
+				"bonus_armor"			"10 20 35 60"
 			}
 		}
 
@@ -18366,12 +18366,12 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"health"				"2000 5000 15000"
+				"health"				"10000 30000 80000"
 			}
 			"02"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"damage"				"100 300 500"
+				"damage"				"300 500 800"
 			}
 			"03"
 			{
@@ -18391,7 +18391,7 @@
 			"06"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"cleave_pct"			"50"
+				"cleave_pct"			"100"
 			}
 			"07"
 			{

@@ -286,8 +286,8 @@ if not Corpses then
 	Corpses = class({})
 end
 
-CORPSE_DURATION = 55.0
 CORPSE_APPEAR_DELAY = 5.0
+CORPSE_DURATION = 30.0 - CORPSE_APPEAR_DELAY
 
 function Corpses:CreateFromUnit(killed)
 	if LeavesCorpse(killed) then
@@ -1121,6 +1121,10 @@ end
 
 function WinGame()
 	GameRules:SetGameWinner(2)
+end
+
+function MapDemo()
+	return GetMapName() == "x_hero_siege_demo"
 end
 
 -- credits to yahnich for the following

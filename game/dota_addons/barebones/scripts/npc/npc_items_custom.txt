@@ -2421,7 +2421,7 @@
 			"03"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"bonus_armor"			"50"
+				"bonus_armor"			"0"
 			}
 		}
 

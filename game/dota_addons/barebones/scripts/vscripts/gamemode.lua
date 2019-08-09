@@ -931,6 +931,7 @@ local point_beast = Entities:FindByName(nil, "hero_image_boss"):GetAbsOrigin()
 		GameMode.HeroImage:SetBaseStrength(hero:GetBaseStrength() * 4)
 		GameMode.HeroImage:SetBaseIntellect(hero:GetBaseIntellect() * 4)
 		GameMode.HeroImage:SetBaseAgility(hero:GetBaseAgility() * 4)
+--		GameMode.HeroImage:SetHasInventory(true)
 
 		for i = 0, GameMode.HeroImage:GetAbilityCount() - 1 do
 			local ability = GameMode.HeroImage:GetAbilityByIndex(i)
@@ -938,7 +939,17 @@ local point_beast = Entities:FindByName(nil, "hero_image_boss"):GetAbsOrigin()
 				ability:SetLevel(ability:GetMaxLevel())
 			end
 		end
+--[[
+		for i = 0, 5 do
+			local item = hero:GetItemInSlot(i)
 
+			if item then
+				print("Item name:", item:GetName())
+				local newItem = CreateItem(item:GetName(), GameMode.HeroImage, GameMode.HeroImage)
+				GameMode.HeroImage:AddItem(newItem)
+			end
+		end
+--]]
 		GameMode.HeroImage:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 5,IsHidden = true})
 		GameMode.HeroImage:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 5,IsHidden = true})
 		GameMode.HeroImage:MakeIllusion()

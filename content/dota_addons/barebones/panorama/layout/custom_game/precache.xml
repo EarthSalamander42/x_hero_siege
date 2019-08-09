@@ -2,6 +2,40 @@
 	<Panel style="visibility:collapse;">
 		<Panel id="container" style="visibility:collapse;">
 			<Image src="file://panorama/images/custom_game/close.png" hittest="false" />
+
+			<Image src="file://panorama/images/custom_game/battlepass/teleport.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/teleport2.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/teleport3.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/teleport4.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/teleport5.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/teleport6.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/teleport7.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/teleport8.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/teleport.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/teleport9.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/teleport10.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/teleport11.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/teleport12.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/teleport13.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/teleport14.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/teleport15.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/teleport16.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/teleport17.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/teleport18.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/teleport19.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/teleport20.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/teleport21.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/teleport22.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/teleport23.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/teleport24.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/teleport25.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/teleport26.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/teleport27.png" hittest="false" />
+
+			<Image src="file://panorama/images/custom_game/battlepass/tome.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/tome2.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/tome3.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/tome4.png" hittest="false" />
 		</Panel>
 	</Panel>
 </root>

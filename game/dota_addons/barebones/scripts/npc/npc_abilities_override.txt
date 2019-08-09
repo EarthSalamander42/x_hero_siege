@@ -480,19 +480,20 @@
 		{
 			"01"
 			{
-				"var_type"					"FIELD_FLOAT"
-				"blade_fury_damage_tick"	"0.2"
+				"var_type"						"FIELD_FLOAT"
+				"blade_fury_damage_tick"		"0.2"
+				"CalculateSpellDamageTooltip"	"0"
 			}
 			"02"
 			{
-				"var_type"					"FIELD_INTEGER"
-				"blade_fury_radius"			"280"
+				"var_type"						"FIELD_INTEGER"
+				"blade_fury_radius"				"280"
 			}
 			"03"
 			{
-				"var_type"					"FIELD_INTEGER"
-				"blade_fury_damage"			"800 1600 2400"
-				"LinkedSpecialBonus"		"special_bonus_unique_juggernaut"
+				"var_type"						"FIELD_INTEGER"
+				"blade_fury_damage"				"800 1600 2400"
+				"LinkedSpecialBonus"			"special_bonus_unique_juggernaut_3"
 			}
 		}
 	}
@@ -1073,12 +1074,14 @@
 			{
 				"var_type"							"FIELD_INTEGER"
 				"necromastery_damage_per_soul"		"1 2 3 4"
+				"CalculateSpellDamageTooltip"		"0"
 				"LinkedSpecialBonus"				"special_bonus_unique_nevermore_1"
 			}
 			"02"
 			{
 				"var_type"							"FIELD_INTEGER"
 				"necromastery_max_souls"			"700"
+				"LinkedSpecialBonus"				"special_bonus_unique_nevermore_4"
 			}
 			"03"
 			{
@@ -1090,11 +1093,6 @@
 				"var_type"							"FIELD_INTEGER"
 				"necromastery_souls_hero_bonus"		"0"
 			}
-			"05"
-			{
-				"var_type"							"FIELD_INTEGER"
-				"necromastery_max_souls_scepter"	"700"
-			}			
 		}
 	}
 
@@ -1286,11 +1284,6 @@
 				"var_type"					"FIELD_FLOAT"
 				"backlash_damage"			"25.0"
 			}
-			"06"
-			{
-				"var_type"					"FIELD_FLOAT"
-				"cooldown_scepter"			"60.0"
-			}
 		}
 	}
 
@@ -1424,39 +1417,8 @@
 			"01"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"damage"					"1925"
+				"damage"					"2500"
 				"LinkedSpecialBonus"		"special_bonus_unique_lion_3"
-			}
-			"02"
-			{
-				"var_type"					"FIELD_INTEGER"
-				"damage_scepter"			"0"
-				"LinkedSpecialBonus"		"special_bonus_unique_lion_3"
-			}
-			"03"
-			{
-				"var_type"					"FIELD_INTEGER"
-				"damage_per_kill"			"50"
-			}
-			"04"
-			{
-				"var_type"					"FIELD_INTEGER"
-				"mana_cost_scepter"			"0"
-			}
-			"05"
-			{
-				"var_type"					"FIELD_FLOAT"
-				"damage_delay"				"0.15"
-			}
-			"06"
-			{
-				"var_type"					"FIELD_FLOAT"
-				"cooldown_scepter"			"0"
-			}
-			"07"
-			{
-				"var_type"					"FIELD_FLOAT"
-				"splash_radius_scepter"		"0"
 			}
 		}
 	}
@@ -2392,21 +2354,6 @@
 				"damage"				"100 200 300"
 				"LinkedSpecialBonus"	"special_bonus_unique_doom_5"				
 			}
-			"03"
-			{
-				"var_type"				"FIELD_FLOAT"
-				"duration_scepter"		"10.0"
-			}
-			"04"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"damage_scepter"		"100 200 300"
-			}
-			"05"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"deniable_pct"			"1"
-			}
 		}
 	}
 
@@ -2684,51 +2631,10 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilitySpecial"
 		{
-			"01"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"goo_speed"				"1000"
-			}
-			"02"
-			{
-				"var_type"				"FIELD_FLOAT"
-				"goo_duration"			"5.0"
-			}
-			"03"
-			{
-				"var_type"				"FIELD_FLOAT"
-				"base_armor"		"2"
-			}
 			"04"
 			{
 				"var_type"				"FIELD_FLOAT"
 				"armor_per_stack"		"1 2 3 4"
-			}
-			"05"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"base_move_slow"		"20"
-			}
-			"06"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"move_slow_per_stack"	"3 6 9 12"
-			}
-			"07"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"stack_limit"			"5"
-				"LinkedSpecialBonus"	"special_bonus_unique_bristleback"
-			}
-			"08"
-			{
-				"var_type"				"FIELD_FLOAT"
-				"goo_duration_creep"	"10.0"
-			}
-			"09"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"radius_scepter"		"750"
 			}
 		}
 	}
@@ -3275,11 +3181,13 @@
 			{
 				"var_type"					"FIELD_INTEGER"
 				"bonus_damage"				"50"
+				"CalculateSpellDamageTooltip"	"0"
 			}
 			"03"
 			{
 				"var_type"					"FIELD_INTEGER"
 				"bonus_damage_buildings"	"100"
+				"CalculateSpellDamageTooltip"	"0"
 			}
 			"04"
 			{
@@ -3599,21 +3507,25 @@
 			{
 				"var_type"					"FIELD_FLOAT"
 				"slow_duration"				"2"
+				"RequiresScepter"			"1"
 			}
 			"07"
 			{
 				"var_type"					"FIELD_INTEGER"
 				"scepter_distance"			"1725"
+				"RequiresScepter"			"1"
 			}
 			"08"
 			{
 				"var_type"					"FIELD_INTEGER"
 				"scepter_speed"				"1200"
+				"RequiresScepter"			"1"
 			}
 			"09"
 			{
 				"var_type"					"FIELD_INTEGER"
 				"pull_distance"				"100"
+				"RequiresScepter"			"1"
 			}
 			"10"
 			{

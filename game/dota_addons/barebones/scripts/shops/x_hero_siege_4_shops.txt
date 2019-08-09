@@ -20,10 +20,10 @@
 
 	"weapons_armor"
 	{
-		"item"		"item_orb_of_earth"
 		"item"		"item_orb_of_lightning"
 		"item"		"item_orb_of_fire"
 		"item"		"item_orb_of_darkness"
+		"item"		"item_orb_of_earth"
 		"item"		"item_orb_of_lightning2"
 		"item"		"item_orb_of_fire2"
 		"item"		"item_orb_of_darkness2"

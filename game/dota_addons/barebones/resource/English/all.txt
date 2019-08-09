@@ -183,11 +183,11 @@
 "DOTA_Tooltip_modifier_healing_ward_datadriven_Description"		"Heals all friendly units in radius."
 
 "DOTA_Tooltip_ability_item_lightning_sword"								"<font color='#2a7fbf'>Lightning Sword</font>"
-"DOTA_Tooltip_ability_item_lightning_sword_bonus_armor"					"BONUS ARMOR:"
+"DOTA_Tooltip_ability_item_lightning_sword_Description"					"<h1><font color='#FF0000'>Restrictions:</h1> Lifesteal effects from multiple sources don't stack.</font>"
+"DOTA_Tooltip_ability_item_lightning_sword_Lore"						"A simple sword, enhanced by Muradin's powers, for Ramero to wield in combat."
 "DOTA_Tooltip_ability_item_lightning_sword_bonus_damage"				"BONUS DAMAGE:"
 "DOTA_Tooltip_ability_item_lightning_sword_lifesteal_pct"				"%LIFESTEAL:"
-"DOTA_Tooltip_ability_item_lightning_sword_Lore"						"A simple sword, enhanced by Muradin's powers, for Ramero to wield in combat."
-"DOTA_Tooltip_ability_item_lightning_sword_Description"					"<h1><font color='#FF0000'>Restrictions:</h1> Lifesteal effects from multiple sources don't stack.</font>"
+// "DOTA_Tooltip_ability_item_lightning_sword_bonus_armor"					"BONUS ARMOR:"
 
 "DOTA_Tooltip_modifier_lifesteal_lightning_sword"						"Lifesteal"
 "DOTA_Tooltip_modifier_lifesteal_lightning_sword_Description"			"Healed when attacking enemies."

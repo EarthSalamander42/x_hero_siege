@@ -1,3 +1,12 @@
+@define COMMON_COLOR: #b0c3d9;
+@define UNCOMMON_COLOR: #5e98d9;
+@define RARE_COLOR: #4b69ff;
+@define MYTHICAL_COLOR: #8847ff;
+@define LEGENDARY_COLOR: #d32ce6;
+@define IMMORTAL_COLOR: #b28a33;
+@define ARCANA_COLOR: #ade55c;
+@define ANCIENT_COLOR: #eb4b4b;
+
 @keyframes 'fade_in'
 {
 	0%
@@ -20,12 +29,125 @@
 {
 	0%
 	{
-		border: 0px solid gold;
+		box-shadow: inset gold 0 0 0px 0;
+	}
+
+	50%
+	{
+		box-shadow: inset gold 0 0 5px 0;
 	}
 
 	100%
 	{
-		border: 2px solid gold;
+		box-shadow: inset gold 0 0 0px 0;
+	}
+}
+
+@keyframes 'level_rare'
+{
+	0%
+	{
+		box-shadow: inset RARE_COLOR 0 0 0px 0;
+	}
+
+	50%
+	{
+		box-shadow: inset RARE_COLOR 0 0 5px 0;
+	}
+
+	100%
+	{
+		box-shadow: inset RARE_COLOR 0 0 0px 0;
+	}
+}
+
+@keyframes 'level_mythical'
+{
+	0%
+	{
+		box-shadow: inset MYTHICAL_COLOR 0 0 0px 0;
+	}
+
+	50%
+	{
+		box-shadow: inset MYTHICAL_COLOR 0 0 5px 0;
+	}
+
+	100%
+	{
+		box-shadow: inset MYTHICAL_COLOR 0 0 0px 0;
+	}
+}
+
+@keyframes 'level_legendary'
+{
+	0%
+	{
+		box-shadow: inset LEGENDARY_COLOR 0 0 0px 0;
+	}
+
+	50%
+	{
+		box-shadow: inset LEGENDARY_COLOR 0 0 5px 0;
+	}
+
+	100%
+	{
+		box-shadow: inset LEGENDARY_COLOR 0 0 0px 0;
+	}
+}
+
+@keyframes 'level_immortal'
+{
+	0%
+	{
+		box-shadow: inset IMMORTAL_COLOR 0 0 0px 0;
+	}
+
+	50%
+	{
+		box-shadow: inset IMMORTAL_COLOR 0 0 5px 0;
+	}
+
+	100%
+	{
+		box-shadow: inset IMMORTAL_COLOR 0 0 0px 0;
+	}
+}
+
+@keyframes 'level_arcana'
+{
+	0%
+	{
+		box-shadow: inset ARCANA_COLOR 0 0 0px 0;
+	}
+
+	50%
+	{
+		box-shadow: inset ARCANA_COLOR 0 0 5px 0;
+	}
+
+	100%
+	{
+		box-shadow: inset ARCANA_COLOR 0 0 0px 0;
+	}
+}
+
+@keyframes 'level_ancient'
+{
+	0%
+	{
+		box-shadow: inset ANCIENT_COLOR 0 0 0px 0;
+	}
+
+	50%
+	{
+		box-shadow: inset ANCIENT_COLOR 0 0 5px 0;
+	}
+
+	100%
+	{
+		box-shadow: inset ANCIENT_COLOR 0 0 0px 0;
 	}
 }
 
@@ -62,7 +184,8 @@
 
 #es-victory-info,
 #es-teams,
-#es-buttons {
+#es-buttons
+.es-player-reward-container {
 	animation-name: fade_in;
 	animation-duration: 1.25s;
 	animation-timing-function: ease-in;
@@ -116,65 +239,61 @@
 	background-color: gradient( linear, 100% 0, 0 0, from( #13161aee ), color-stop( 0.4, #13161a ), to( #2b3139 ) );
 }
 
-#es-custom1,
-#es-custom2,
-#es-custom3,
-#es-custom4,
-#es-custom5,
-#es-custom6,
-#es-custom7,
-#es-custom8 {
+#es-3-team,
+#es-6-team,
+#es-7-team,
+#es-8-team {
 	visibility: collapse;
 }
 
-#es-radiant .es-team-name,
-#es-dire .es-team-name,
-#es-custom1 .es-team-name,
-#es-custom2 .es-team-name,
-#es-custom3 .es-team-name, {
+#es-2-team .es-team-name,
+#es-2-team .es-team-name,
+#es-6-team .es-team-name,
+#es-7-team .es-team-name,
+#es-8-team .es-team-name, {
 	text-shadow: 0 0 5px 2.0 #111;
 }
 
-#es-radiant .es-team-name {
+#es-2-team .es-team-name {
 	color: #326114;
 }
 
-#es-dire .es-team-name {
+#es-3-team .es-team-name {
 	color: #f03333;
 }
 
-#es-custom1 .es-team-name {
+#es-6-team .es-team-name {
 	color: #f3c909;
 }
 
-#es-custom2 .es-team-name {
+#es-7-team .es-team-name {
 	color: #FF6C00;
 }
 
-#es-custom3 .es-team-name {
+#es-8-team .es-team-name {
 	color: #3455FF;
 }
-
-#es-custom4 .es-team-name {
+/*
+#es-9-team .es-team-name {
 	color: #65d413;
 }
 
-#es-custom5 .es-team-name {
+#es-10-team .es-team-name {
 	color: #815336;
 }
 
-#es-custom6 .es-team-name {
+#es-11-team .es-team-name {
 	color: #1bc0d8;
 }
 
-#es-custom7 .es-team-name {
+#es-12-team .es-team-name {
 	color: #c7e40d;
 }
 
-#es-custom8 .es-team-name {
+#es-13-team .es-team-name {
 	color: #8c2af4;
 }
-
+*/
 .es-team-title {
 	width: 100%;
 }
@@ -295,7 +414,6 @@
 	width: 60px;
 	vertical-align: center;
 	text-align: center;
-	visibility: collapse;
 	margin-right: 15px;
 	visibility: collapse;
 }
@@ -334,6 +452,16 @@
 	transition-duration: 2s;
 }
 
+#es-player-xp-progress-diff { 
+
+	background-color: gradient( linear, 0% 0%, 0% 100%, from( #B2A603 ),  to( #857D05 ) );
+	border-radius: 1px;
+	width: 0%;
+	height: 24px;
+	transition-property: width;
+	transition-duration: 2s;
+}
+
 .es-player-xp Label {
 	color: #fff;
 	width: 100%;
@@ -356,6 +484,10 @@
 	width: 70px;
 	vertical-align: center;
 	text-align: center;
+}
+
+#es-player-xp-booster {
+	color: white;
 }
 
 #es-buttons {
@@ -839,4 +971,172 @@
 	text-align: center;	
 	text-shadow: 1px 1px 2px 3.0 #000000ee;
 	font-size: 22px;
+}
+
+#es-player-reward-panel {
+	width: 100%;
+	height: 40%;
+	align: center center;
+	flow-children: right;
+	z-index: 1;
+}
+
+.es-player-reward {
+	width: 25%;
+	height: 90%;
+	padding: 30px;
+	background-color: #000000da;
+	border-radius: 20px;
+	align: center center;
+	visibility: collapse;
+	flow-children: down;
+}
+
+.es-player-reward-name,
+.es-player-reward-description {
+	width: 100%;
+	height: 10%;
+	color: white;
+	text-align: center;
+	vertical-align: center;
+	font-size: 21px;
+}
+
+.es-player-reward-description {
+	font-size: 30px;
+}
+
+.es-player-reward-rarity {
+	width: 100%;
+	height: 10%;
+	text-align: center;
+	vertical-align: center;
+	font-size: 20px;
+}
+
+/*
+#es-player-reward-image-container {
+	width: 180px;
+	height: 180px;
+	margin-top: 30px;
+	align: center bottom;
+	background-image: url("s2r://panorama/images/hud/reborn/ability_bg_psd.vtex");
+}
+*/
+.es-player-reward-image {
+	width: 180px;
+	height: 120px;
+	margin-top: 30px;
+	align: center bottom;
+}
+
+.es-player-reward-button {
+	margin-top: 30px;
+	height: 30px;
+	width: fill-parent-flow(1.0);
+	background-position: 10px center;
+	background-repeat: no-repeat;
+	background-size: auto 32px;
+
+	background-color: gradient( linear, 0% 0%, 0% 100%, from( #404D65dd ), to( #2B3445dd ) );
+	box-shadow: #0000008f -6px -6px 12px 12px;
+	transition-property: brightness;
+	transition-duration: 0.2s;
+	margin-bottom: 20px;
+}
+
+.es-player-reward-button_label {
+	margin-top: 5px;
+	color: darkgrey;
+	align: center center;
+	text-transform: uppercase;
+}
+
+.es-player-reward-button:hover {
+  brightness: 2.0;
+  box-shadow: #999999ff -2px -2px 4px 4px;
+}
+
+.es-player-reward-button:active {
+  brightness: 0.5;
+  box-shadow: #999999ff -2px -2px 4px 4px;
+}
+
+.common {
+	color: COMMON_COLOR;
+}
+
+.uncommon {
+	color: UNCOMMON_COLOR;
+}
+
+.rare {
+	color: RARE_COLOR;
+}
+
+.mythical {
+	color: MYTHICAL_COLOR;
+}
+
+.legendary {
+	color: LEGENDARY_COLOR;
+}
+
+.immortal {
+	color: IMMORTAL_COLOR;
+}
+
+.arcana {
+	color: ARCANA_COLOR;
+}
+
+.ancient {
+	color: ANCIENT_COLOR;
+}
+
+.level-common,
+.level-uncommon {
+	
+}
+
+.level-rare {
+	animation-name: level_rare;
+	animation-duration: 2.0s;
+	animation-timing-function: ease-in;
+	animation-iteration-count: infinite;
+}
+
+.level-mythical {
+	animation-name: level_mythical;
+	animation-duration: 2.0s;
+	animation-timing-function: ease-in;
+	animation-iteration-count: infinite;
+}
+
+.level-legendary {
+	animation-name: level_legendary;
+	animation-duration: 2.0s;
+	animation-timing-function: ease-in;
+	animation-iteration-count: infinite;
+}
+
+.level-immortal {
+	animation-name: level_immortal;
+	animation-duration: 2.0s;
+	animation-timing-function: ease-in;
+	animation-iteration-count: infinite;
+}
+
+.level-arcana {
+	animation-name: level_arcana;
+	animation-duration: 2.0s;
+	animation-timing-function: ease-in;
+	animation-iteration-count: infinite;
+}
+
+.level-ancient {
+	animation-name: level_ancient;
+	animation-duration: 2.0s;
+	animation-timing-function: ease-in;
+	animation-iteration-count: infinite;
 }

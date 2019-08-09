@@ -1,5 +1,5 @@
 "imba_safe_to_leave"				"Cheat mode enabled, no battlepass experience earned"
-"coming_soon"						"Coming Soon: Battlepass rewards"
+"coming_soon"						"Coming Soon: Being able to choose Battlepass rewards"
 
 "battlepass_level"					"Level: "
 "battlepass_xp"						"Battlepass XP"
@@ -73,3 +73,9 @@
 
 // Game Info
 "gamemode_settings_difficulty"		"Difficulty:"
+
+// settings
+"toggle_ingame_tag"				"Toggle health bar label"
+"disable_companion"				"Disable companion"
+"toggle_bp_rewards"				"Toggle battlepass rewards"
+"toggle_player_xp"				"Toggle battlepass XP visibility (will take effect on next game)"

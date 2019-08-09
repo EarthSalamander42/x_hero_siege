@@ -1,106 +1,92 @@
+BATTLEPASS_LEVEL_REWARD = {}
+BATTLEPASS_LEVEL_REWARD[5]		= {"teleport", "common"}
+BATTLEPASS_LEVEL_REWARD[10]		= {"teleport2", "common"}
+BATTLEPASS_LEVEL_REWARD[15]		= {"teleport3", "common"}
+BATTLEPASS_LEVEL_REWARD[20]		= {"teleport4", "common"}
+BATTLEPASS_LEVEL_REWARD[25]		= {"teleport5", "common"}
+BATTLEPASS_LEVEL_REWARD[30]		= {"teleport6", "common"}
+BATTLEPASS_LEVEL_REWARD[35]		= {"teleport7", "common"}
+BATTLEPASS_LEVEL_REWARD[40]		= {"teleport8", "common"}
+BATTLEPASS_LEVEL_REWARD[45]		= {"teleport9", "common"}
+BATTLEPASS_LEVEL_REWARD[50]		= {"tome", "mythical"}
+BATTLEPASS_LEVEL_REWARD[55]		= {"teleport10", "common"}
+BATTLEPASS_LEVEL_REWARD[60]		= {"teleport11", "common"}
+BATTLEPASS_LEVEL_REWARD[65]		= {"teleport12", "common"}
+BATTLEPASS_LEVEL_REWARD[70]		= {"teleport13", "common"}
+BATTLEPASS_LEVEL_REWARD[75]		= {"teleport14", "common"}
+BATTLEPASS_LEVEL_REWARD[80]		= {"teleport15", "common"}
+BATTLEPASS_LEVEL_REWARD[85]		= {"teleport16", "common"}
+BATTLEPASS_LEVEL_REWARD[90]		= {"teleport17", "common"}
+BATTLEPASS_LEVEL_REWARD[95]		= {"teleport18", "common"}
+BATTLEPASS_LEVEL_REWARD[100]	= {"tome2", "mythical"}
+BATTLEPASS_LEVEL_REWARD[105]	= {"teleport19", "common"}
+BATTLEPASS_LEVEL_REWARD[110]	= {"teleport20", "common"}
+BATTLEPASS_LEVEL_REWARD[115]	= {"teleport21", "common"}
+BATTLEPASS_LEVEL_REWARD[120]	= {"teleport22", "common"}
+BATTLEPASS_LEVEL_REWARD[125]	= {"teleport23", "common"}
+BATTLEPASS_LEVEL_REWARD[130]	= {"teleport24", "common"}
+BATTLEPASS_LEVEL_REWARD[135]	= {"teleport25", "common"}
+BATTLEPASS_LEVEL_REWARD[140]	= {"teleport26", "common"}
+BATTLEPASS_LEVEL_REWARD[145]	= {"teleport27", "common"}
+BATTLEPASS_LEVEL_REWARD[150]	= {"tome3", "mythical"}
+BATTLEPASS_LEVEL_REWARD[200]	= {"tome4", "mythical"}
+
+CustomNetTables:SetTableValue("game_options", "battlepass", {battlepass = BATTLEPASS_LEVEL_REWARD})
+
 function Battlepass:Init()
-	BATTLEPASS_LEVEL_REWARD = {}
---[[ not working, #BATTLEPASS_LEVEL_REWARD returns 0 but the table show elements when being printed
-	BATTLEPASS_LEVEL_REWARD[5]		= {"teleport", "common"}
-	BATTLEPASS_LEVEL_REWARD[10]		= {"teleport2", "common"}
-	BATTLEPASS_LEVEL_REWARD[15]		= {"teleport3", "common"}
-	BATTLEPASS_LEVEL_REWARD[20]		= {"teleport4", "common"}
-	BATTLEPASS_LEVEL_REWARD[25]		= {"teleport5", "common"}
-	BATTLEPASS_LEVEL_REWARD[30]		= {"teleport6", "common"}
-	BATTLEPASS_LEVEL_REWARD[35]		= {"teleport7", "common"}
-	BATTLEPASS_LEVEL_REWARD[40]		= {"teleport8", "common"}
-	BATTLEPASS_LEVEL_REWARD[45]		= {"teleport9", "common"}
-	BATTLEPASS_LEVEL_REWARD[50]		= {"tome", "mythical"}
-	BATTLEPASS_LEVEL_REWARD[55]		= {"teleport10", "common"}
-	BATTLEPASS_LEVEL_REWARD[60]		= {"teleport11", "common"}
-	BATTLEPASS_LEVEL_REWARD[65]		= {"teleport12", "common"}
-	BATTLEPASS_LEVEL_REWARD[70]		= {"teleport13", "common"}
-	BATTLEPASS_LEVEL_REWARD[75]		= {"teleport14", "common"}
-	BATTLEPASS_LEVEL_REWARD[80]		= {"teleport15", "common"}
-	BATTLEPASS_LEVEL_REWARD[85]		= {"teleport16", "common"}
-	BATTLEPASS_LEVEL_REWARD[90]		= {"teleport17", "common"}
-	BATTLEPASS_LEVEL_REWARD[95]		= {"teleport18", "common"}
-	BATTLEPASS_LEVEL_REWARD[100]	= {"tome2", "mythical"}
-	BATTLEPASS_LEVEL_REWARD[105]	= {"teleport19", "common"}
-	BATTLEPASS_LEVEL_REWARD[110]	= {"teleport20", "common"}
-	BATTLEPASS_LEVEL_REWARD[115]	= {"teleport21", "common"}
-	BATTLEPASS_LEVEL_REWARD[120]	= {"teleport22", "common"}
-	BATTLEPASS_LEVEL_REWARD[125]	= {"teleport23", "common"}
-	BATTLEPASS_LEVEL_REWARD[130]	= {"teleport24", "common"}
-	BATTLEPASS_LEVEL_REWARD[135]	= {"teleport25", "common"}
-	BATTLEPASS_LEVEL_REWARD[140]	= {"teleport26", "common"}
-	BATTLEPASS_LEVEL_REWARD[145]	= {"teleport27", "common"}
-	BATTLEPASS_LEVEL_REWARD[150]	= {"tome3", "mythical"}
-	BATTLEPASS_LEVEL_REWARD[200]	= {"tome4", "mythical"}
+	BattlepassHeroes = {}
+--[[
+	BattlepassHeroes["axe"] = {}
+	BattlepassHeroes["bristleback"] = {}
+	BattlepassHeroes["chen"] = {}
+	BattlepassHeroes["juggernaut"] = {}
+	BattlepassHeroes["leshrac"] = {}
+	BattlepassHeroes["life_stealer"] = {}
+	BattlepassHeroes["lina"] = {}
+	BattlepassHeroes["nyx_assassin"] = {}
+	BattlepassHeroes["wisp"] = {}
 --]]
-	CustomNetTables:SetTableValue("game_options", "battlepass", {battlepass = BATTLEPASS_LEVEL_REWARD})
 
-	-- testing
-	BATTLEPASS = {}
---	BATTLEPASS["blink"] = {}
-	BATTLEPASS["teleport"] = {}
-	BATTLEPASS["tome"] = {}
+	BattlepassItems = {}
+--	BattlepassItems["blink"] = {}
+	BattlepassItems["teleport"] = {}
+	BattlepassItems["tome"] = {}
 
-	print("Init battlepass")
-
-	print(BATTLEPASS_LEVEL_REWARD, #BATTLEPASS_LEVEL_REWARD)
-
-	for k, v in ipairs(BATTLEPASS_LEVEL_REWARD) do
-		print("k, v", k, v)
+	for k, v in pairs(BATTLEPASS_LEVEL_REWARD) do
 		local required_level = k
-		local category = string.gsub(v[1], "%d", "")
-		local reward_level = string.gsub(v[1], "%D", "")
+		local reward_name = v[1]
+		local category = string.gsub(reward_name, "%d", "")
+		local reward_level = string.gsub(reward_name, "%D", "")
+
+		for i, j in pairs(BattlepassHeroes) do
+			local hero_name = i
+
+			if string.find(reward_name, hero_name) then
+				BattlepassHeroes[hero_name][reward_name] = required_level
+				break
+			end
+		end
 
 --		print(required_level, category, reward_level)
-		if BATTLEPASS[category] then
+		if BattlepassItems[category] then
 			if reward_level == "" then reward_level = 1 end
-			table.insert(BATTLEPASS[category], tonumber(reward_level), required_level)
+			table.insert(BattlepassItems[category], tonumber(reward_level), required_level)
 		end
 	end
-
---	BATTLEPASS_JUGGERNAUT = {}
---	BATTLEPASS_LINA = {}
---	BATTLEPASS_WISP = {}
---	BATTLEPASS_CHEN = {}
---	BATTLEPASS_BRISTLEBACK = {}
---	BATTLEPASS_AXE = {}
---	BATTLEPASS_NYX_ASSASSIN = {}
---	BATTLEPASS_LESHRAC = {}
-
---	for k, v in pairs(BATTLEPASS_LEVEL_REWARD) do
---		if string.find(v[1], "juggernaut") then
---			BATTLEPASS_JUGGERNAUT[v[1]] = k
---		elseif string.find(v[1], "lina") then
---			BATTLEPASS_LINA[v[1]] = k
---		elseif string.find(v[1], "wisp") then
---			BATTLEPASS_WISP[v[1]] = k
---		elseif string.find(v[1], "chen") then
---			BATTLEPASS_CHEN[v[1]] = k
---		elseif string.find(v[1], "bristleback") then
---			BATTLEPASS_BRISTLEBACK[v[1]] = k
---		elseif string.find(v[1], "axe") then
---			BATTLEPASS_AXE[v[1]] = k
---		elseif string.find(v[1], "nyx_assassin") then
---			BATTLEPASS_NYX_ASSASSIN[v[1]] = k
---		elseif string.find(v[1], "leshrac") then
---			BATTLEPASS_LESHRAC[v[1]] = k
---		end
---	end
 end
 
-function Battlepass:AddItemEffects(hero)
-	if hero.GetPlayerID == nil then return end
+--[[ -- instead of a flat BattlepassHeroes[hero_name] value, generate it by finding if there's a hero name in all reward names
+function Battlepass:IsHeroName(hero_name)
+	local herolist = LoadKeyValues("scripts/npc/herolist.txt")
 
-	local ply_table = CustomNetTables:GetTableValue("battlepass", tostring(hero:GetPlayerID()))
-
-	if ply_table and ply_table.bp_rewards == 0 then
-	else
-		Battlepass:SetItemEffects(hero:GetPlayerID())
+	print(herolist[hero_name])
+	if herolist[hero_name] then
+		return true
 	end
 
-	-- some effects override some items effects, need to call it after items setup
---	Battlepass:GetHeroEffect(hero)
+	return false
 end
+--]]
 
 function Battlepass:GetTeleportEffect(ID)
 	local effects = {}
@@ -176,12 +162,12 @@ function Battlepass:GetTeleportEffect(ID)
 	hero_item_effects["effect1"] = effects["effect1"][0]
 	hero_item_effects["effect2"] = effects["effect2"][0]
 
---	print("Teleport BP table:", BATTLEPASS["teleport"], #BATTLEPASS["teleport"])
+--	print("Teleport BP table:", BattlepassItems["teleport"], #BattlepassItems["teleport"])
 
 	if Battlepass:GetRewardUnlocked(ID) ~= nil then
-		for i = #BATTLEPASS["teleport"], 1, -1 do
---			print(Battlepass:GetRewardUnlocked(ID), BATTLEPASS["teleport"][i])
-			if BATTLEPASS["teleport"][i] and Battlepass:GetRewardUnlocked(ID) >= BATTLEPASS["teleport"][i] then
+		for i = #BattlepassItems["teleport"], 1, -1 do
+--			print(Battlepass:GetRewardUnlocked(ID), BattlepassItems["teleport"][i])
+			if BattlepassItems["teleport"][i] and Battlepass:GetRewardUnlocked(ID) >= BattlepassItems["teleport"][i] then
 				hero_item_effects["level"] = i
 				hero_item_effects["effect1"] = effects["effect1"][i]
 				hero_item_effects["effect2"] = effects["effect2"][i]
@@ -208,8 +194,8 @@ function Battlepass:GetTomeEffect(ID)
 	hero_item_effects["effect1"] = effects["effect1"][0]
 
 	if Battlepass:GetRewardUnlocked(ID) ~= nil then
-		for i = #BATTLEPASS["tome"], 1, -1 do
-			if BATTLEPASS["tome"][i] and Battlepass:GetRewardUnlocked(ID) >= BATTLEPASS["tome"][i] then
+		for i = #BattlepassItems["tome"], 1, -1 do
+			if BattlepassItems["tome"][i] and Battlepass:GetRewardUnlocked(ID) >= BattlepassItems["tome"][i] then
 				hero_item_effects["level"] = i
 				hero_item_effects["effect1"] = effects["effect1"][i]
 				break
@@ -229,8 +215,9 @@ function Battlepass:SetItemEffects(ID)
 
 --	print(CustomNetTables:GetTableValue("battlepass_item_effects", tostring(ID)))
 end
---[[
+
 function Battlepass:GetHeroEffect(hero)
+--[[
 	if hero:GetUnitName() == "npc_dota_hero_axe" then
 		hero.pre_attack_sound = "Hero_Axe.PreAttack"
 		hero.attack_sound = "Hero_Axe.Attack"
@@ -361,123 +348,5 @@ function Battlepass:GetHeroEffect(hero)
 --			end
 		end
 	end
-end
-
-function Battlepass:HasJuggernautArcana(ID)
-	if Battlepass:GetRewardUnlocked(ID) >= BATTLEPASS_JUGGERNAUT["juggernaut_arcana2"] then
-		return 1
-	elseif Battlepass:GetRewardUnlocked(ID) >= BATTLEPASS_JUGGERNAUT["juggernaut_arcana"] then
-		return 0
-	else
-		return nil
-	end
-end
-
-function Battlepass:HasLinaArcana(ID)
-	if Battlepass:GetRewardUnlocked(ID) >= BATTLEPASS_LINA["lina_arcana"] then
-		return 0
-	else
-		return nil
-	end
-end
-
-function Battlepass:HasWispArcana(ID)
-	if Battlepass:GetRewardUnlocked(ID) >= BATTLEPASS_LINA["lina_arcana"] then
-		return 0
-	else
-		return nil
-	end
-end
-
--- not an arcana, but this is used for replacing top bar icon (FORMAT ME PLEASE)
-function Battlepass:HasAxeArcana(ID)
-	if Battlepass:GetRewardUnlocked(ID) >= BATTLEPASS_AXE["axe_immortal"] then
-		return 0
-	else
-		return nil
-	end
-end
-
-function Battlepass:InitializeTowers()
-	local radiant_level = 0
-	local dire_level = 0
-
-	for ID = 0, PlayerResource:GetPlayerCount() - 1 do
-		if PlayerResource:GetPlayer(ID):GetTeamNumber() == 2 then
-			radiant_level = radiant_level + Battlepass:GetRewardUnlocked(ID)
-		else
-			dire_level = dire_level + Battlepass:GetRewardUnlocked(ID)
-		end
-	end
-
-	print("Team Battlepass Levels:", radiant_level, dire_level)
-
-	local towers = Entities:FindAllByClassname("npc_dota_tower")
-
-	for _, tower in pairs(towers) do
-		local level = dire_level
-		local particle = "particles/world_tower/tower_upgrade/ti7_dire_tower_orb.vpcf"
-		local team = "dire"
---		local max_particle = "particles/world_tower/tower_upgrade/ti7_radiant_tower_lvl11_orb.vpcf"
-
-		if tower:GetTeamNumber() == 2 then
-			level = radiant_level
-			particle = "particles/world_tower/tower_upgrade/ti7_radiant_tower_orb.vpcf"
-			team = "radiant"
-		end
-
-		tower:SetModel("models/props_structures/tower_upgrade/tower_upgrade.vmdl")
-		tower:SetOriginalModel("models/props_structures/tower_upgrade/tower_upgrade.vmdl")
-		tower:SetMaterialGroup(team.."_level"..Battlepass:CheckBattlepassTowerLevel(level).mg)
-		ParticleManager:CreateParticle(particle, PATTACH_ABSORIGIN_FOLLOW, tower)
-		StartAnimation(tower, {duration=9999, activity=ACT_DOTA_CAPTURE, rate=1.0, translate = 'level'..Battlepass:CheckBattlepassTowerLevel(level).anim})
-	end
-end
-
-function Battlepass:CheckBattlepassTowerLevel(level)
-	local animation
-	local material_group
-
-	if level < 25 then
-		material_group = "1"
-		animation = "1"
-	elseif level >= 25 then
-		material_group = "2"
-		animation = "1"
-	elseif level >= 50 then
-		material_group = "2"
-		animation = "2"
-	elseif level >= 75 then
-		material_group = "3"
-		animation = "2"
-	elseif level >= 100 then
-		material_group = "3"
-		animation = "3"
-	elseif level >= 150 then
-		material_group = "4"
-		animation = "3"
-	elseif level >= 200 then
-		material_group = "4"
-		animation = "4"
-	elseif level >= 300 then
-		material_group = "5"
-		animation = "4"
-	elseif level >= 500 then
-		material_group = "5"
-		animation = "5"
-	elseif level >= 1000 then
-		material_group = "6"
-		animation = "5"
-	elseif level >= 2000 then
-		material_group = "6"
-		animation = "6"
-	end
-
-	local params = {
-		anim = animation,
-		mg = material_group
-	}
-
-	return params
-end
 --]]
+end
