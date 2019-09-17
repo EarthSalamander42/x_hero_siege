@@ -135,7 +135,6 @@
 						<Panel id="RefreshBattlepass" onactivate="RefreshBattlepass();"/>
 						<Label id="RefreshLabel" text="#battlepass_refresh"/>
 					</Button>
-<!--
 				</Panel>
 
 				<Button id="CompanionNotification" onactivate="DOTADisplayURL('https://www.patreon.com/bePatron?u=2533325');">

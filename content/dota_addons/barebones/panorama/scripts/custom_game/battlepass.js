@@ -549,7 +549,7 @@ function HallOfFame(type) {
 	// temporary, implement in the for loop later
 	// local player stats
 	var plyData = CustomNetTables.GetTableValue("battlepass", Players.GetLocalPlayer());
-	$.Msg(plyData)
+//	$.Msg(plyData)
 
 	var player = $.CreatePanel("Panel", $('#LocalPlayerInfo'), "player_local");
 	player.AddClass("LeaderboardGames");
@@ -1040,20 +1040,15 @@ function SetupPanel() {
 
 (function() {
 	// Update the game options display
-	var bounty_multiplier = CustomNetTables.GetTableValue("game_options", "bounty_multiplier");
-	var exp_multiplier = CustomNetTables.GetTableValue("game_options", "exp_multiplier");
-	var initial_gold = CustomNetTables.GetTableValue("game_options", "initial_gold");
-	var initial_level = CustomNetTables.GetTableValue("game_options", "initial_level");
-	var max_level = CustomNetTables.GetTableValue("game_options", "max_level");
-	var frantic_mode = CustomNetTables.GetTableValue("game_options", "frantic_mode");
-	var gold_tick = CustomNetTables.GetTableValue("game_options", "gold_tick");
+	var game_info = CustomNetTables.GetTableValue("game_options", "game_info");
 
-	$("#BountyMultiplierValue").text = bounty_multiplier[1] + "%";
-	$("#ExpMultiplierValue").text = exp_multiplier[1] + "%";
-	$("#InitialGoldValue").text = initial_gold[1];
-	$("#InitialLevelValue").text = initial_level[1];
-	$("#MaxLevelValue").text = max_level[1];
-	$("#GoldTickValue").text = gold_tick[1].toFixed(1);
+//	$.Msg(game_info)
+
+	if (game_info) {
+		if (game_info["difficulty"]) {
+			$("#DifficultyText").text = game_info["difficulty"] + "";
+		}
+	}
 
 	GameEvents.Subscribe("hall_of_fame", HallOfFame);
 	GameEvents.Subscribe("safe_to_leave", SafeToLeave);
