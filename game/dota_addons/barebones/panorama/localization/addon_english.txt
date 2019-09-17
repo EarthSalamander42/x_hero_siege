@@ -112,6 +112,7 @@
 	"maxlevel_msg" "Hero Maxed Out"
 	"misc_buttoncategory" "Customize"
 	"pausedemo_button" "Pause"
+	"playback_buttoncategory" ""
 	"quest1_info" "- Head to a lane to farm (0-40 min).\n- Defend the Castle against Incoming Waves of Darkness."
 	"quest2_info" "- Once Barracks destroyed, head to the ice towers and destroy them.\n\n- Then prepare for the Final Wave, defeat it and go back to ice towers location to use Green Teleporters."
 	"quest3_info" "- Defeat Magtheridon, and go through the gate that just opened.\n\n- Defeat Grom Hellscream, Illidan, Balanar, Admiral Proudmoore and head to Red Teleporters.\n\n- In This arena, defeat Arthas, Banehallow, Lich King and Spirit Master."
