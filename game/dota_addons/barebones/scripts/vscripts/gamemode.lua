@@ -79,11 +79,12 @@ function GameMode:OnHeroInGame(hero)
 		hero:SetAbilityPoints(0)
 		hero:SetGold(0, false)
 		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
-		FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
-		hero:Stop()
-
-		Timers:CreateTimer(0.1, function()
-			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
+		Timers:CreateTimer(function()
+			FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
+			hero:Stop()
+			Timers:CreateTimer(0.1, function()
+				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
+			end)
 		end)
 	elseif hero:GetUnitName() == "npc_dota_hero_terrorblade" then
 		if IsInToolsMode() then
@@ -1330,7 +1331,10 @@ function GameMode:ItemAddedFilter(event)
 	local ring = "item_ring_of_superiority"
 	local doom = "item_doom_artifact"
 	local frost = "item_orb_of_frost"
---	if item:GetAbilityName() == "item_tpscroll" and item:GetPurchaser() == nil then return false end
+
+	if hero:GetUnitName() == "npc_dota_hero_wisp" then
+		if item:GetAbilityName() == "item_tpscroll" and item:GetPurchaser() == nil then return false end
+	end
 
 	if hero:IsRealHero() and item.GetAbilityName then
 		if hero:GetUnitName() == "npc_baristol" then return end
