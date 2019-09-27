@@ -25,7 +25,7 @@ function isInt(n) {
 }
 
 function fetch() {
-	view.title.text = "X Hero Siege 3.48d: Ghost Revenant";
+	view.title.text = "X Hero Siege";
 	view.text.text = "X Hero Siege will get a 100% free battlepass soon. The goal is to reward regular players on the long term by unlocking cosmetics and more! (Those rewards are unlocked in X Hero Siege only.)";
 	view.link_text.text = "COMING SOON: X Hero Siege website.";
 
@@ -44,12 +44,12 @@ function fetch() {
 	if (Game.GetMapInfo().map_display_name == "imba_1v1")
 		DisableVoting();
 
-	var game_version = game_options.value
+	var game_version = game_options["1"];
 
 	if (isInt(game_version))
 		game_version = game_version.toString() + ".0";
 
-	view.title.text = $.Localize("#addon_game_name") + " " + game_version + " - " + $.Localize("#game_version_name");
+	view.title.text = $.Localize("#addon_game_name") + " " + game_version + ": " + $.Localize("#game_version_name");
 	view.text.text = $.Localize("#loading_screen_description");
 	view.link_text.text = $.Localize("#loading_screen_button");
 

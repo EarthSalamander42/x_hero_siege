@@ -271,23 +271,23 @@
 	//=================================================================================================================
 	// Wisp: Random Hero
 	//=================================================================================================================
-	"holdout_random_hero"
+	"wisp_pick_random_hero"
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"BaseClass"					"ability_datadriven"
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"heroes/hero_wisp.lua"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"AbilityTextureName"		"wisp_relocate"
 		"MaxLevel"					"1"
+	}
 
-		"OnSpellStart"
-		{
-			"RunScript"
-			{
-				"ScriptFile"	"phases/choose_hero.lua"
-				"Function"		"ChooseRandomHero"
-			}
-		}
+	"wisp_passives"
+	{
+		"BaseClass" 				"ability_lua"
+		"ScriptFile"				"heroes/hero_wisp.lua"
+		"AbilityBehavior" 			"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_HIDDEN"
+		"MaxLevel"					"1"
 	}
 
 	//=================================================================================================================
@@ -343,29 +343,6 @@
 					"MODIFIER_STATE_NOT_ON_MINIMAP"			"MODIFIER_STATE_VALUE_ENABLED"
 					"MODIFIER_STATE_NO_HEALTH_BAR"			"MODIFIER_STATE_VALUE_ENABLED"
 					"MODIFIER_STATE_STUNNED"				"MODIFIER_STATE_VALUE_ENABLED"
-				}
-			}
-		}
-	}
-
-	"dummy_passive_vulnerable_wisp"
-	{
-		"BaseClass" 		"ability_datadriven"
-		"AbilityBehavior" 	"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_HIDDEN"
-		"Modifiers"
-		{
-			"modifier_dummy_vulnerable_wisp"
-			{
-				"Passive"	"1"
-				"IsHidden"	"1"
-				"States"
-				{
-//					"MODIFIER_STATE_NO_HEALTH_BAR"			"MODIFIER_STATE_VALUE_ENABLED"
-					"MODIFIER_STATE_UNSELECTABLE"			"MODIFIER_STATE_VALUE_ENABLED"
-					"MODIFIER_STATE_NO_TEAM_MOVE_TO"		"MODIFIER_STATE_VALUE_ENABLED"
-					"MODIFIER_STATE_NO_TEAM_SELECT"			"MODIFIER_STATE_VALUE_ENABLED"
-					"MODIFIER_STATE_ATTACK_IMMUNE"			"MODIFIER_STATE_VALUE_ENABLED"
-					"MODIFIER_STATE_MAGIC_IMMUNE"			"MODIFIER_STATE_VALUE_ENABLED"
 				}
 			}
 		}

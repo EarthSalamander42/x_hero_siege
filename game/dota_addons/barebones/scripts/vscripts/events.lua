@@ -78,13 +78,6 @@ local hero_level = npc:GetLevel()
 						npc:AddNewModifier(npc, nil, "modifier_item_ultimate_scepter_consumed", {})
 					end
 
-					if npc:GetUnitName() == "npc_dota_hero_wisp" then
-						WispEffects(npc)
---					else
---						npc:AddNewModifier(npc, nil, "modifier_armor_gain_fix", {})
---						npc:AddNewModifier(npc, nil, "modifier_magical_resistance_fix", {})
-					end
-
 					npc.bFirstSpawnComplete = true
 					self.bPlayerHasSpawned = true
 					npc.CurrentZoneName = nil

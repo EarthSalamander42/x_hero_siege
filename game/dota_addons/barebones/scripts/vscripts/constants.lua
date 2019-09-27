@@ -1,6 +1,6 @@
 CUSTOM_GAME_TYPE = "XHS"
 
-_G.GAME_VERSION = 3.48
+_G.GAME_VERSION = "3.49b"
 CustomNetTables:SetTableValue("game_options", "game_count", {value = 1})
 
 -- General
@@ -9,6 +9,7 @@ _G.nCHECKPOINT_REVIVES = 1
 _G.nREVIVE_COST = 1
 _G.nBUYBACK_COST = 1
 _G.nREVIVE_HP_PCT = 25
+_G.INIT_CHOOSE_HERO = false
 
 -- Creature
 _G.nROAMER_MAX_DIST_FROM_SPAWN = 2048
@@ -50,7 +51,7 @@ _G.ZONE_STAR_CRITERIA_KILLS				= 2
 _G.ZONE_STAR_CRITERIA_QUEST_COMPLETE	= 3
 
 -- X Hero Siege
-_G.PREGAMETIME = 125
+_G.PREGAMETIME = 90.0
 _G.nTimer_GameTime = 0
 _G.nTimer_SpecialEvent = 0
 _G.nTimer_IncomingWave = 0
@@ -276,7 +277,7 @@ AbilitiesHeroes_XX = {
 }
 
 _G.innate_abilities = {
-	"dummy_passive_vulnerable_wisp",
+	"wisp_passives",
 	"serpent_splash_arrows",
 	"neutral_spell_immunity",
 	"holdout_innate_lunar_glaive",
@@ -328,7 +329,7 @@ _G.innate_abilities = {
 	"holdout_stitch",
 	"troll_warlord_berserkers_rage",
 	"holdout_lich_king_effects",
-	"holdout_random_hero",
+	"wisp_pick_random_hero",
 	"holdout_spellsteal",
 	"bristleback_warpath",
 	"iron_man_misc",

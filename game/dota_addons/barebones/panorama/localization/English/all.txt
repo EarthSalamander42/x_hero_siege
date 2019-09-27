@@ -9,7 +9,7 @@
 
 "addonname"									"X Hero Siege"
 
-"game_version_name"						"[BETA]"
+"game_version_name"						"Archimonde"
 "loading_screen_description"			"X Hero Siege will get a 100% free battlepass soon. The goal is to reward regular players on the long term by unlocking cosmetics and more! (Those rewards are unlocked in X Hero Siege only)."
 "loading_screen_button"					"COMING SOON: X Hero Siege website."
 "vote_gamemode"							"Difficulty vote:"

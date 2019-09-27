@@ -16,6 +16,7 @@ if PlayerResource:GetConnectionState(hero:GetPlayerID()) ~= 2 then return end
 	TeleportHero(hero, point)
 	hero:AddNewModifier(nil, nil, "modifier_boss_stun", {IsHidden = true})
 	hero:AddNewModifier(nil, nil, "modifier_invulnerable", {IsHidden = true})
+	DoEntFire("special_event_piedestal", "SetAnimation", "ancient_trigger001_down_up", 0, nil, nil)
 end
 
 function HeroImageBack(event)

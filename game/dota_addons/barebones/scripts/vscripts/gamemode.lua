@@ -78,14 +78,12 @@ function GameMode:OnHeroInGame(hero)
 	if hero:GetUnitName() == "npc_dota_hero_wisp" then
 		hero:SetAbilityPoints(0)
 		hero:SetGold(0, false)
-		hero:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 15.0, IsHidden = true})
 		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
-		Timers:CreateTimer(15.0, function()
-			FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
-			hero:Stop()
-			Timers:CreateTimer(0.1, function()
-				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
-			end)
+		FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
+		hero:Stop()
+
+		Timers:CreateTimer(0.1, function()
+			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
 		end)
 	elseif hero:GetUnitName() == "npc_dota_hero_terrorblade" then
 		if IsInToolsMode() then
@@ -269,18 +267,12 @@ function GameMode:OnGameRulesStateChange(keys)
 		Gold:Init()
 		nTimer_GameTime = PREGAMETIME
 
-		if nTimer_GameTime == 10 then
-			ChooseRandomHero(event)
-		end
-
 		for i = 1, 8 do
 			DoEntFire("door_lane"..i, "SetAnimation", "gate_02_close", 0, nil, nil)
 		end
 
 		print(GetMapName())
 		if GetMapName() ~= "x_hero_siege_demo" then
-			SpawnHeroesBis()
-
 			-- debug
 			if IsInToolsMode() then
 				Entities:FindByName(nil, "trigger_special_event_tp_off"):Disable()
@@ -1012,7 +1004,10 @@ local point_beast = Entities:FindByName(nil, "spirit_beast_boss"):GetAbsOrigin()
 		end)
 
 		timers.SpiritBeast = Timers:CreateTimer(120.0,function()
-			Entities:FindByName(nil, "trigger_spirit_beast_duration"):Enable()
+			if Entities:FindByName(nil, "trigger_spirit_beast_duration") then
+				Entities:FindByName(nil, "trigger_spirit_beast_duration"):Enable()
+			end
+
 			GameMode.SpiritBeast_occuring = 0
 			GameMode.spirit_beast:RemoveSelf()
 
@@ -1344,7 +1339,7 @@ function GameMode:ItemAddedFilter(event)
 
 		Timers:CreateTimer(FrameTime(), function()
 --			print("Has item in inventory?", hero:HasItemInInventory(item:GetAbilityName()))
-			if item and hero:HasItemInInventory(item:GetAbilityName()) then
+			if item and item.GetAbilityName and hero and hero.HasItemInInventory and hero:HasItemInInventory(item:GetAbilityName()) then
 				for k, v in pairs(MODIFIER_ITEMS_WITH_LEVELS) do
 					for i, j in pairs(v) do
 						if j == item:GetAbilityName() then

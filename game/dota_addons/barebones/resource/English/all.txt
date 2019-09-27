@@ -115,11 +115,11 @@
 "DOTA_Tooltip_modifier_dummy_vulnerable_wisp"					"WISP"
 "DOTA_Tooltip_modifier_dummy_vulnerable_wisp_Description"		"Choose your hero!"
 "DOTA_Tooltip_modifier_dummy_invulnerable_bis"					"BEASTS"
-"DOTA_Tooltip_modifier_dummy_invulnerable_bis_Description"		"These aren't joking."
+"DOTA_Tooltip_modifier_dummy_invulnerable_bis_Description"		"These ain't joking."
 
 //VIP
-"DOTA_Tooltip_ability_holdout_random_hero"					"Random Hero"
-"DOTA_Tooltip_ability_holdout_random_hero_Description"		"Makes you choose a hero randomly, starting with double gold."
+"DOTA_Tooltip_ability_wisp_pick_random_hero"				"Random Hero"
+"DOTA_Tooltip_ability_wisp_pick_random_hero_Description"	"Pick a random hero. Starting gold multiplied by 2."
 "DOTA_Tooltip_ability_holdout_vip"							"<font color='#FFFFFF'>VIP Member</font>"
 "DOTA_Tooltip_ability_holdout_vip_description"				"You are able to pick <font color='#FFFFFF'>VIP</font> heroes. <br><font color='#35b42b'>Thank you for supporting!</font>"
 "DOTA_Tooltip_modifier_vip"									"VIP"

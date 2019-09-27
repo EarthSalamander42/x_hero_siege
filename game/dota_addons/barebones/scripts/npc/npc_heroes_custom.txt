@@ -1767,8 +1767,8 @@
 		"StatusHealth"					"100"
 		"StatusMana"					"0"
 
-		"Ability1"						"holdout_random_hero"
-		"Ability2"						"dummy_passive_vulnerable_wisp"
+		"Ability1"						"wisp_pick_random_hero"
+		"Ability2"						"wisp_passives"
 		"Ability3"						""
 		"Ability4"						""
 		"Ability5"						""
