@@ -73,7 +73,7 @@
 	"freespells_button" "Habilidades Livres"
 	"gamemode_settings_difficulty" "Dificuldade:"
 	"gametime" "Tempo de jogo:"
-	"game_version_name" "[BETA]"
+	"game_version_name" "Archimonde"
 	"goal" "Eventos especiais:"
 	"hero_buttoncategory" "Herói"
 	"imba_safe_to_leave" "Modo trapaça ativado, nenhuma experiência ganha no Passe de Batalha."

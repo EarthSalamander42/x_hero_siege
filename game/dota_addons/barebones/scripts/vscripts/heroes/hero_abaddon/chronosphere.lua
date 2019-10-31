@@ -32,22 +32,16 @@ Checks if the target is a unit owned by the player that cast the Chronosphere
 If it is then it applies the no collision and extra movementspeed modifier
 otherwise it applies the stun modifier]]
 function ChronosphereAura( keys )
-local caster = keys.caster
-local target = keys.target
-local ability = keys.ability
-local ability_level = ability:GetLevel() - 1
-local aura_modifier = keys.aura_modifier
-local ignore_void = ability:GetLevelSpecialValueFor("ignore_void", ability_level)
-local duration = ability:GetLevelSpecialValueFor("aura_interval", ability_level)
+	if IsClient() then return end
+	local caster = keys.caster
+	local target = keys.target
+	local ability = keys.ability
+	local ability_level = ability:GetLevel() - 1
+	local aura_modifier = keys.aura_modifier
+	local duration = ability:GetLevelSpecialValueFor("aura_interval", ability_level)
 
 	if IsValidEntity(target:GetPlayerOwner()) then
 		target = target:GetPlayerOwner():GetAssignedHero()
-	end
-
-	if ignore_void == 0 then
-		ignore_void = false
-	else
-		ignore_void = true
 	end
 
 	if (caster:GetPlayerOwner() == target:GetPlayerOwner()) or (target:GetName() == "npc_dota_hero_faceless_void" and ignore_void) then
@@ -62,8 +56,10 @@ local duration = ability:GetLevelSpecialValueFor("aura_interval", ability_level)
 		return
 	end
 
-	if PlayerResource:GetConnectionState(target:GetPlayerID()) == 3 then
-		target:InterruptMotionControllers(false)
-		ability:ApplyDataDrivenModifier(caster, target, aura_modifier, {duration = duration})
+	if target.GetPlayerID then
+		if PlayerResource:GetConnectionState(target:GetPlayerID()) == 3 then
+			target:InterruptMotionControllers(false)
+			ability:ApplyDataDrivenModifier(caster, target, aura_modifier, {duration = duration})
+		end
 	end
 end

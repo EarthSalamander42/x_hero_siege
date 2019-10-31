@@ -3,19 +3,40 @@
 		<include src="file://{resources}/styles/dotastyles.vcss_c" />
 		<include src="file://{resources}/styles/custom_game/boss_healthbar.css" />
 	</styles>
+
 	<scripts>
 		<include src="file://{resources}/scripts/custom_game/boss_healthbar.js" />
 	</scripts>
-	
+
 	<Panel class="Diretide" hittest="false">
 		<Panel id="DiretidePanel">
-			<Panel id="BossHP" hittest="false">
-				<Label id="BossLabel" class="HoldoutLabelSmall" hittest="false" text=""/>
-				<Label id="BossLevel" class="HoldoutLabelSmall_alt" hittest="false" text=""/>
-				<Panel id="BossProgressBarContainer" hittest="false">
-					<DOTAHeroImage id="BossIcon" hittest="false"/>
-					<ProgressBar id="BossProgressBar" hittest="false" value="1.0"/>
-					<Label id="BossHealth" class="HoldoutLabelSmall" hittest="false" text=""/>
+			<Panel id="BossHP1" class="HealthBarContainer" hittest="false">
+				<Label id="BossLabel1" class="HoldoutLabelSmall" hittest="false" text=""/>
+				<Label id="BossLevel1" class="HoldoutLabelSmall_alt" hittest="false" text=""/>
+				<Panel id="BossProgressBarContainer1" class="BossProgressBarContainer" hittest="false">
+					<Panel id="BossIcon1" class="BossIcon" hittest="false"/>
+					<ProgressBar id="BossProgressBar1" class="BossProgressBar" hittest="false" value="1.0"/>
+					<Label id="BossHealth1" class="HoldoutLabelSmall" hittest="false" text=""/>
+				</Panel>
+			</Panel>
+
+			<Panel id="BossHP2" class="HealthBarContainer" hittest="false">
+				<Label id="BossLabel2" class="HoldoutLabelSmall" hittest="false" text=""/>
+				<Label id="BossLevel2" class="HoldoutLabelSmall_alt" hittest="false" text=""/>
+				<Panel id="BossProgressBarContainer2" class="BossProgressBarContainer" hittest="false">
+					<Panel id="BossIcon2" class="BossIcon" hittest="false"/>
+					<ProgressBar id="BossProgressBar2" class="BossProgressBar" hittest="false" value="1.0"/>
+					<Label id="BossHealth2" class="HoldoutLabelSmall" hittest="false" text=""/>
+				</Panel>
+			</Panel>
+
+			<Panel id="BossHP3" class="HealthBarContainer" hittest="false">
+				<Label id="BossLabel3" class="HoldoutLabelSmall" hittest="false" text=""/>
+				<Label id="BossLevel3" class="HoldoutLabelSmall_alt" hittest="false" text=""/>
+				<Panel id="BossProgressBarContainer3" class="BossProgressBarContainer" hittest="false">
+					<Panel id="BossIcon3" class="BossIcon" hittest="false"/>
+					<ProgressBar id="BossProgressBar3" class="BossProgressBar" hittest="false" value="1.0"/>
+					<Label id="BossHealth3" class="HoldoutLabelSmall" hittest="false" text=""/>
 				</Panel>
 			</Panel>
 		</Panel>

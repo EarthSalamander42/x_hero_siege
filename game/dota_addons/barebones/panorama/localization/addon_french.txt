@@ -73,7 +73,7 @@
 	"freespells_button" "Free Spells"
 	"gamemode_settings_difficulty" "Difficulty:"
 	"gametime" "Game Time:"
-	"game_version_name" "[BETA]"
+	"game_version_name" "Archimonde"
 	"goal" "Special Events:"
 	"hero_buttoncategory" "Hero"
 	"imba_safe_to_leave" "Cheat mode enabled, no battlepass experience earned"

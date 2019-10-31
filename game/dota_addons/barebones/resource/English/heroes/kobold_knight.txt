@@ -1,0 +1,28 @@
+//KOBOLD KNIGHT
+"DOTA_Tooltip_ability_holdout_life_steal"							"Life Steal"
+"DOTA_Tooltip_ability_holdout_life_steal_Description"				"Gains hit points when attacking enemy units."
+"DOTA_Tooltip_ability_holdout_life_steal_lifesteal"					"%LIFESTEAL:"
+
+"DOTA_Tooltip_ability_holdout_slow_pool"							"Slow Pool"
+"DOTA_Tooltip_ability_holdout_slow_pool_Description"				"Slows enemies in a specific area, dealing damage/sec."
+"DOTA_Tooltip_ability_holdout_slow_pool_damage"						"DAMAGE:"
+"DOTA_Tooltip_ability_holdout_slow_pool_duration"					"DURATION:"
+"DOTA_Tooltip_ability_holdout_slow_pool_radius"						"RADIUS:"
+"DOTA_Tooltip_ability_holdout_slow_pool_movement_slow_pct"			"%MOVEMENT SLOW:"
+
+"DOTA_Tooltip_ability_holdout_divine_aura"										"Divine Aura"
+"DOTA_Tooltip_ability_holdout_divine_aura_Description"							"Increases the Movement Speed, Attack Rate, Armor and Life Regen of nearby friendly units."
+"DOTA_Tooltip_ability_holdout_divine_aura_Note0"								"Stacks with Endurance Aura ONLY!"
+"DOTA_Tooltip_ability_holdout_divine_aura_bat_reduction"						"BAT REDUCTION:"
+"DOTA_Tooltip_ability_holdout_divine_aura_bonus_movement_speed_percentage"		"%MOVEMENT SPEED:"
+"DOTA_Tooltip_ability_holdout_divine_aura_bonus_armor"							"BONUS ARMOR:"
+"DOTA_Tooltip_ability_holdout_divine_aura_bonus_health_regen"					"BONUS HP REGEN:"
+"DOTA_Tooltip_ability_holdout_divine_aura_radius"								"RADIUS:"
+
+"DOTA_Tooltip_modifier_divine_aura_buff"							"Divine Aura"
+"DOTA_Tooltip_modifier_divine_aura_buff_Description"				"Armor enhanced by %dMODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS%. \nLife Regen enhanced by %dMODIFIER_PROPERTY_HEALTH_REGEN_CONSTANT%. \nMovement Speed enhanced by %dMODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE% percent. \nBase Attack Time: %dMODIFIER_PROPERTY_BASE_ATTACK_TIME_CONSTANT%."
+
+"DOTA_Tooltip_ability_holdout_kobold_army"							"Kobold Army"
+"DOTA_Tooltip_ability_holdout_kobold_army_Description"				"Creates perfect copies of the Kobold Knight, wich can use items and abilities. Lasts 40 seconds."
+"DOTA_Tooltip_ability_holdout_kobold_army_kobold_count"				"NUMBER OF KOBOLDS:"
+"DOTA_Tooltip_ability_holdout_kobold_army_duration"					"DURATION:"

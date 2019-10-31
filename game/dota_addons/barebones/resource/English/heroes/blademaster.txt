@@ -1,0 +1,34 @@
+//BLADEMASTER
+"DOTA_Tooltip_ability_holdout_windwalk"							"Wind Walk"
+"DOTA_Tooltip_ability_holdout_windwalk_Description"				"The Blademaster goes invisible, allowing him to move faster. Next attack deal double damage."
+"DOTA_Tooltip_ability_holdout_windwalk_duration"				"DURATION:"
+"DOTA_Tooltip_ability_holdout_windwalk_bonus_movespeed"			"%BONUS MOVESPEED:"
+"DOTA_Tooltip_ability_holdout_windwalk_bonus_damage"			"%BONUS DAMAGE:"
+
+"DOTA_Tooltip_ability_xhs_blademaster_mirror_image"								"Mirror Image"
+"DOTA_Tooltip_ability_xhs_blademaster_mirror_image_Description"					"Create illusions of the Blademaster. Orb items are not copied to illusions."
+"DOTA_Tooltip_ability_xhs_blademaster_mirror_image_images_count"				"ILLUSIONS:"
+"DOTA_Tooltip_ability_xhs_blademaster_mirror_image_illusion_duration"			"DURATION:"
+"DOTA_Tooltip_ability_xhs_blademaster_mirror_image_outgoing_damage_tooltip"		"%DAMAGE DEALT:"
+"DOTA_Tooltip_ability_xhs_blademaster_mirror_image_incoming_damage_tooltip"		"%DAMAGE TAKEN:"
+
+"DOTA_Tooltip_ability_blademaster_wardrums_aura"								"War Drums"
+"DOTA_Tooltip_ability_blademaster_wardrums_aura_Description"					"Increase base damage of the blademaster."
+"DOTA_Tooltip_ability_blademaster_wardrums_aura_bonus_damage_percentage"		"%BONUS DAMAGE:"
+"DOTA_Tooltip_ability_blademaster_wardrums_aura_aura_radius"					"RADIUS:"
+
+"DOTA_Tooltip_modifier_wardrums_aura_hidden"						"Wardrums Aura"
+"DOTA_Tooltip_modifier_wardrums_aura_hidden_Description"			"Damage increased by %dMODIFIER_PROPERTY_DAMAGEOUTGOING_PERCENTAGE%%%."
+
+"DOTA_Tooltip_ability_holdout_berserkers_rage"								"Berserker's Rage"
+"DOTA_Tooltip_ability_holdout_berserkers_rage_Description"					"Blademaster is going into an incontrolable rage, attacking faster but receiving more damage."
+"DOTA_Tooltip_ability_holdout_berserkers_rage_Note0"						""
+"DOTA_Tooltip_ability_holdout_berserkers_rage_Lore"							""
+"DOTA_Tooltip_ability_holdout_berserkers_rage_duration"						"DURATION:"
+"DOTA_Tooltip_ability_holdout_berserkers_rage_extra_incoming_damage"		"%EXTRA DAMAGE TAKEN:"
+"DOTA_Tooltip_ability_holdout_berserkers_rage_bonus_attack_speed"			"BONUS ATTACK SPEED:"
+
+"DOTA_Tooltip_modifier_berserkers_rage"					"Berserker's Rage"
+"DOTA_Tooltip_modifier_berserkers_rage_Description"		"Sends the Blademaster into a rage, attacking faster but receiving more damage."
+
+"DOTA_Tooltip_ability_juggernaut_blade_fury"								"Bladestorm"

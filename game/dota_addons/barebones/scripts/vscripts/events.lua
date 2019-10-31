@@ -51,13 +51,17 @@ local hero_level = npc:GetLevel()
 		end
 
 		if npc:GetTeamNumber() ~= 2 or npc:GetUnitName() == "npc_dota_creature_muradin_bronzebeard" then
-			if npc:GetKeyValue("UseAI") == 1 or npc:GetKeyValue("UseAI") == 2 or npc:GetKeyValue("UseAI") == 3 then
-				npc:AddNewModifier(npc, nil, "modifier_ai", {})
+			local ai_state = npc:GetKeyValue("UseAI")
+			if ai_state then
+				npc:AddNewModifier(npc, nil, "modifier_ai", {state = ai_state})
 			end
 		end
 
 		if npc:GetUnitName() == "npc_dota_hero_magtheridon" then
-			ShowBossBar(npc)
+			-- in case there are 2, wait for npc.boss_count
+			Timers:CreateTimer(0.1, function()
+				ShowBossBar(npc)
+			end)
 		end
 
 		-- HERO NPC
@@ -162,6 +166,16 @@ local hero_level = npc:GetLevel()
 
 			return
 		end
+
+		if npc:IsIllusion() then
+			if npc:GetPlayerOwner() then
+				local main_hero = PlayerResource:GetSelectedHeroEntity(npc:GetPlayerOwnerID())
+
+				npc:SetBaseStrength(main_hero:GetStrength())
+				npc:SetBaseAgility(main_hero:GetAgility())
+				npc:SetBaseIntellect(main_hero:GetIntellect())
+			end
+		end
 	end
 end
 
@@ -170,11 +184,11 @@ end
 function GameMode:OnEntityHurt(keys)
 	local damagebits = keys.damagebits -- This might always be 0 and therefore useless
 	if keys.entindex_attacker ~= nil and keys.entindex_killed ~= nil then
-	local entCause = EntIndexToHScript(keys.entindex_attacker)
-	local entVictim = EntIndexToHScript(keys.entindex_killed)
+		local entCause = EntIndexToHScript(keys.entindex_attacker)
+		local entVictim = EntIndexToHScript(keys.entindex_killed)
 
-	-- The ability/item used to damage, or nil if not damaged by an item/ability
-	local damagingAbility = nil
+		-- The ability/item used to damage, or nil if not damaged by an item/ability
+		local damagingAbility = nil
 
 		if keys.entindex_inflictor ~= nil then
 			damagingAbility = EntIndexToHScript(keys.entindex_inflictor)
@@ -472,10 +486,6 @@ local playerID = ply:GetPlayerID()
 	end
 end
 
-function GameMode:OnIllusionsCreated(keys)
-	local originalEntity = EntIndexToHScript(keys.original_entindex)
-end
-
 function GameMode:OnItemCombined(keys)
 local plyID = keys.PlayerID
 if not plyID then return end
@@ -523,7 +533,7 @@ local hero = PlayerResource:GetPlayer(userID):GetAssignedHero()
 local donator_level = api:GetDonatorStatus(userID)
 
 	for str in string.gmatch(text, "%S+") do
-		if donator_level == 1 or donator_level == 2 then
+		if donator_level == 1 or donator_level == 2 or donator_level > 6 then
 			for Frozen = 0, PlayerResource:GetPlayerCount() -1 do
 				local PlayerNames = {"Red", "Blue", "Cyan", "Purple", "Yellow", "Orange", "Green", "Pink"}
 				if PlayerResource:IsValidPlayer(Frozen) then
@@ -593,17 +603,22 @@ local donator_level = api:GetDonatorStatus(userID)
 			if str == "-replaceherowith" then
 				text = string.gsub(text, str, "")
 				text = string.gsub(text, " ", "")
+				print(PlayerResource:GetSelectedHeroName(hero:GetPlayerID()), "npc_dota_hero_"..text, KeyValues.HeroKV["npc_dota_hero_"..text])
 				if PlayerResource:GetSelectedHeroName(hero:GetPlayerID()) ~= "npc_dota_hero_"..text then
-					PrecacheUnitByNameAsync("npc_dota_hero_"..text, function()
-						local wisp = PlayerResource:GetSelectedHeroEntity(playerId)
-						local hero = PlayerResource:ReplaceHeroWith(playerId, "npc_dota_hero_"..text, 0, 0)
+--					if KeyValues.HeroKV["npc_dota_hero_"..text] then
+						PrecacheUnitByNameAsync("npc_dota_hero_"..text, function()
+							local wisp = PlayerResource:GetSelectedHeroEntity(hero:GetPlayerID())
+							local new_hero = PlayerResource:ReplaceHeroWith(hero:GetPlayerID(), "npc_dota_hero_"..text, 0, 0)
 
-						Timers:CreateTimer(1.0, function()
-							if wisp then
-								UTIL_Remove(wisp)
-							end
+							Timers:CreateTimer(1.0, function()
+								if wisp then
+									UTIL_Remove(wisp)
+								end
+							end)
 						end)
-					end)
+--					else
+--						Notifications:TopToAll({text="Hero don't exist!", duration=6.0, style={color="red", ["font-size"]="30px"}})
+--					end
 				end
 			end
 		end
@@ -658,22 +673,22 @@ local donator_level = api:GetDonatorStatus(userID)
 			Notifications:Bottom(player, {text="CREEP LANES: "..lanes[CREEP_LANES_TYPE], duration=10.0})
 		end
 
-		if GameRules:State_Get() >= DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
-			if str == "-openlane_all" or str == "-ol_all" then
-				for i = 1, 8 do
-					OpenLane(i)
-				end
-			end
+		if str == "-openlane_all" or str == "-ol_all" then
+--			Notifications:TopToAll({text="Host opened every lanes!", style={color="lightgreen"}, duration=5.0})
 
-			if str == "-closelane_all" or str == "-cl_all" then
-				for i = 1, 8 do
-					CloseLane(hero:GetPlayerID(), i)
-				end
+			for i = 1, 8 do
+				OpenCreepLane(i)
+			end
+		end
+
+		if str == "-closelane_all" or str == "-cl_all" then
+--			Notifications:TopToAll({text="Host closed every lanes!", style={color="lightgreen"}, duration=5.0})
+
+			for i = 1, 8 do
+				CloseCreepLane(hero:GetPlayerID(), i)
 			end
 		end
 	end
-
-	if GameRules:State_Get() < DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then return end
 
 	local openlane_command = {
 		"openlane",
@@ -809,14 +824,6 @@ DebugPrintTable(keys)
 local abilityname = keys.abilityname
 end
 
--- This function is called whenever illusions are created and tells you which was/is the original entity
-function GameMode:OnIllusionsCreated(keys)
-DebugPrint('[BAREBONES] OnIllusionsCreated')
-DebugPrintTable(keys)
-
-local originalEntity = EntIndexToHScript(keys.original_entindex)
-end
-
 -- This function is called whenever a tower is killed
 function GameMode:OnTowerKill(keys)
 DebugPrint('[BAREBONES] OnTowerKill')
@@ -912,7 +919,7 @@ local lane = tonumber(cn)
 		end
 
 		--Drop Tombstone to be revived if dead after Castle Defense
-		if PHASE == 3 then
+		if CustomTimers.game_phase == 3 then
 			if killedUnit.ankh_respawn == true then
 			else
 				local newItem = CreateItem("item_tombstone", killedUnit, killedUnit)
@@ -959,13 +966,6 @@ local lane = tonumber(cn)
 			local drop = CreateItemOnPositionSync(pos, item)
 			item:LaunchLoot(false, 300, 0.5, pos)
 			frost_first_time = true
-		elseif killedUnit:GetUnitName() == "npc_dota_boss_lich_king" then
-			GAME_WINNER_TEAM = 2 
-			for _, hero in pairs(HeroList:GetAllHeroes()) do
-				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
-				hero:AddNewModifier(hero, nil, "modifier_command_restricted", {})
-				hero:Stop()
-			end
 		end
 
 		if ramero_check == 2 then
@@ -1101,47 +1101,9 @@ local lane = tonumber(cn)
 				end
 --				CREEP_LANES[lane][2] = CREEP_LANES[lane][2] + 1
 --				Notifications:TopToAll({text="Creep lane "..lane.." is now level "..CREEP_LANES[lane][2].."!", duration=5.0, style={color="lightgreen"}})
-			elseif killedUnit:GetUnitName() == "npc_tower_death" then
-
-			elseif killedUnit:GetUnitName() == "npc_tower_cold" then
-				FrostTowers_killed = FrostTowers_killed +1
-				if FrostTowers_killed >= 2 then
-					Notifications:TopToAll({text="WARNING! Final Wave incoming. Arriving in 60 seconds! Back to the Castle!" , duration=10.0})
-					nTimer_SpecialEvent = 61
-					nTimer_IncomingWave = 1
-					PHASE = 3
-					KillCreeps(DOTA_TEAM_CUSTOM_1)
-					Timers:CreateTimer(59, RefreshPlayers)
-					Timers:CreateTimer(60, FinalWave)
-				end
 			end
-		return
-		elseif killedUnit:IsBarracks() then
-			if first_rax == false then
-				first_rax = true
-
---				Entities:FindByName(nil, "trigger_phase2_left"):Enable()
---				Entities:FindByName(nil, "trigger_phase2_right"):Enable()
-
-				local DoorObs = Entities:FindAllByName("obstruction_phase2")
-				for _, obs in pairs(DoorObs) do 
-					obs:SetEnabled(false, true)
-				end
-
-				DoEntFire("door_phase2_left", "SetAnimation", "gate_02_open", 0, nil, nil)
-				DoEntFire("door_phase2_right", "SetAnimation", "gate_02_open", 0, nil, nil)
---				Notifications:TopToAll({text = "Phase 2 creeps can now be triggered!", duration = 11.0})
-
-				PHASE = 2
-
-				return
-			end
-
-			return
 		end
-	return
 	end
-
 --	print("EntityKilled: Not Hero or Creature or Building.")
 end
 
@@ -1152,7 +1114,7 @@ end
 ---------------------------------------------------------
 
 function GameMode:OnPlayerRevived(event)
-local hRevivedHero = EntIndexToHScript(event.target)
+	local hRevivedHero = EntIndexToHScript(event.target)
 
 	if hRevivedHero and hRevivedHero:IsRealHero() then
 		hRevivedHero:AddNewModifier(hRevivedHero, nil, "modifier_invulnerable", { duration = 2.5 })
@@ -1391,10 +1353,6 @@ function GameMode:OnQuestStarted(zone, quest)
 		zone:OnQuestStarted(quest)
 	end
 
-	if quest.szQuestName == "kill_ice_towers" then
-		SPECIAL_EVENT = 0
-	end
-
 	if quest.Completion.Type == QUEST_EVENT_ON_DIALOG or quest.Completion.Type == QUEST_EVENT_ON_DIALOG_ALL_CONFIRMED then
 		local hDialogEntities = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_ALL, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, 0, false)
 		for _,DialogEnt in pairs (hDialogEntities) do
@@ -1462,6 +1420,7 @@ function GameMode:OnQuestCompleted(questZone, quest)
 		end
 
 		if quest.szQuestName == "kill_dest_mag" then
+			-- timers remains paused until magnataurs are killed
 			StartPhase2()
 		elseif quest.szQuestName == "teleport_top" then
 			StartMagtheridonArena()

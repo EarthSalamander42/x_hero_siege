@@ -73,7 +73,7 @@
 	"freespells_button" "Freie Zauber"
 	"gamemode_settings_difficulty" "Difficulty:"
 	"gametime" "Spielzeit"
-	"game_version_name" "[BETA]"
+	"game_version_name" "Archimonde"
 	"goal" "Speziales Ereignis"
 	"hero_buttoncategory" "Held"
 	"imba_safe_to_leave" "Cheat mode enabled, no battlepass experience earned"

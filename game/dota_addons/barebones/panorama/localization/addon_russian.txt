@@ -73,7 +73,7 @@
 	"freespells_button" "Неограниченные навыки"
 	"gamemode_settings_difficulty" "Сложность"
 	"gametime" "Игровое время"
-	"game_version_name" "[БЕТА]"
+	"game_version_name" "Archimonde"
 	"goal" "Специальное событие"
 	"hero_buttoncategory" "Герой"
 	"imba_safe_to_leave" "Читы активированы , вы не получите опыта Battlepass"

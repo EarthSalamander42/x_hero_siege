@@ -60,7 +60,7 @@ function modifier_frostivus_boss:CheckState()
 			[MODIFIER_STATE_NOT_ON_MINIMAP] = true
 		}
 
---		if PHASE > 1 then
+--		if CustomTimers.game_phase > 1 then
 --			state[MODIFIER_STATE_INVULNERABLE] = true
 --		end
 

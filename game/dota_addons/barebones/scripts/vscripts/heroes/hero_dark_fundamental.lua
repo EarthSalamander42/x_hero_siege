@@ -27,7 +27,7 @@ local stacks = caster:GetLevel()
 local bonus_damage = ability:GetLevelSpecialValueFor("bonus_damage", ability_level)
 local radius = ability:GetSpecialValueFor("radius")
 local cleave = ability:GetSpecialValueFor("cleave_pct")
-local full_damage = caster:GetAverageTrueAttackDamage(caster) + bonus_damage * stacks -- 100 * caster Level
+local full_damage = caster:GetRealDamageDone(caster) + bonus_damage * stacks -- 100 * caster Level
 local cleave_pct = cleave * full_damage / 100
 
 	print("radius/cleave:", radius, cleave)

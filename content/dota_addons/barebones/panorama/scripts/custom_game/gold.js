@@ -31,6 +31,9 @@ function onGoldChange (table, data) {
 
   var gold = data.gold[playerID];
 
+  if (gold == undefined)
+    gold = 0;
+
   UpdateGoldHud(gold);
   UpdateGoldTooltip(gold);
 }

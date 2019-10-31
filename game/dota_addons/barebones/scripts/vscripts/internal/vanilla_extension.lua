@@ -1,5 +1,5 @@
 function GetReductionFromArmor(armor)
-	return ( 0.052 * armor ) / ( 0.9 + 0.048 * armor)
+	return ((0.052 * armor) / (0.9 + 0.048 * armor))
 end
 
 function CDOTA_BaseNPC:GetLifesteal()
@@ -90,6 +90,45 @@ function CDOTA_BaseNPC:RemoveItemByName(ItemName, bStash)
 	end
 end
 
+function CDOTA_BaseNPC:IncrementAttributes(amount, bAll)
+	local bSoundPlayed = false
+
+	if self:HasModifier("modifier_tome_of_stats") then
+		self:FindModifierByName("modifier_tome_of_stats"):SetStackCount(self:FindModifierByName("modifier_tome_of_stats"):GetStackCount() + amount)
+	else
+		self:AddNewModifier(self, nil, "modifier_tome_of_stats", {}):SetStackCount(amount)
+	end
+
+	if not self.GetPlayerID then return end
+
+	local tome_net_table = CustomNetTables:GetTableValue("battlepass_item_effects", tostring(self:GetPlayerID()))
+
+	if tome_net_table then
+--[[
+		if IsInToolsMode() then
+			print("Tome pfx:", tome_net_table.tome_stats["effect1"])
+
+			for k, v in pairs(tome_net_table) do
+				print(k, v)
+			end
+
+			for k, v in pairs(tome_net_table.tome_stats) do
+				print(k, v)
+			end
+		end
+--]]
+		local particle1 = ParticleManager:CreateParticle(tome_net_table.tome_stats["effect1"], PATTACH_ABSORIGIN_FOLLOW, self)
+		ParticleManager:SetParticleControl(particle1, 0, self:GetAbsOrigin())
+
+		if bAll == true and bSoundPlayed == false then
+			bSoundPlayed = true
+			self:EmitSound("ui.trophy_levelup")
+		end
+	end
+
+	self:CalculateStatBonus()
+end
+
 -- credits to yahnich for the following
 function CDOTA_BaseNPC:IsFakeHero()
 	if self:IsIllusion() or (self:HasModifier("modifier_monkey_king_fur_army_soldier") or self:HasModifier("modifier_monkey_king_fur_army_soldier_hidden")) or self:IsTempestDouble() or self:IsClone() then
@@ -127,10 +166,4 @@ function CDOTA_BaseNPC:Blink(position, bTeamOnlyParticle, bPlaySound)
 		ParticleManager:FireParticle(blink_effect_end, PATTACH_ABSORIGIN, self, {[0] = self:GetAbsOrigin()})
 	end
 	if bPlaySound == true then EmitSoundOn("DOTA_Item.BlinkDagger.NailedIt", self) end
-end
-
-function CDOTA_BaseNPC:IncrementAttributes(amount)
-	self:SetBaseStrength(self:GetBaseStrength() + amount)
-	self:SetBaseAgility(self:GetBaseAgility() + amount)
-	self:SetBaseIntellect(self:GetBaseIntellect() + amount)
 end

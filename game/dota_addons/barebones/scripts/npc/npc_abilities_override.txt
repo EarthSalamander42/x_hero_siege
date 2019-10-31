@@ -807,13 +807,14 @@
 			}
 			"02"
 			{
-				"var_type"						"FIELD_INTEGER"
-				"cast_range_tooltip"			"800 1000 1200"
+				"var_type"					"FIELD_FLOAT"
+				"scepter_cooldown"			"0.0 0.0 0.0"
+				"RequiresScepter"			"1"
 			}
 			"03"
 			{
-				"var_type"						"FIELD_INTEGER"
-				"duration_tooltip"				"7"
+				"var_type"					"FIELD_FLOAT"
+				"tick_rate"					"0.25 0.25 0.25"
 			}
 		}
 	}
@@ -1643,7 +1644,7 @@
 			"05"
 			{
 				"var_type"					"FIELD_FLOAT"
-				"tooltip_duration"			"5.0"
+				"abilityduration"			"5.0"
 				"LinkedSpecialBonus"		"special_bonus_unique_pugna_5"
 			}
 		}

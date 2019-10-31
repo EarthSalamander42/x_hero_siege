@@ -112,7 +112,7 @@
 		//DeBuff Bar
 		var DeBuffBar = hudElements.FindChildTraverse("lower_hud").FindChildTraverse("debuffs")
 		DeBuffBar.style.width = "30%";
-		DeBuffBar.style.marginBottom = "40.5%";
+		DeBuffBar.style.marginBottom = "45.5%";
 		DeBuffBar.style.marginRight = "31.5%";
 		DeBuffBar.style.flowChildren = "right";
 

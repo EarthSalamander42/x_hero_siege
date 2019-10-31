@@ -1,0 +1,118 @@
+//DARK FUNDAMENTAL
+"DOTA_Tooltip_ability_holdout_power_mount_str"						"Power Mount (Strength)"
+"DOTA_Tooltip_ability_holdout_power_mount_str_Description"			"Slightly increase the strengh of the hero. Will swap the bonus stats with Intelligence if casted.\n<font color='#FF7800'> Level up multiplying the Bonus Strength by the Dark Fundamental's Level!</font>"
+"DOTA_Tooltip_ability_holdout_power_mount_str_bonus_stats"			"BONUS STRENGTH:"
+"DOTA_Tooltip_ability_holdout_power_mount_str_transformation_time"	"TRANSFORMATION TIME:"
+
+"DOTA_Tooltip_ability_holdout_power_mount_int"						"Power Mount (Intellect)"
+"DOTA_Tooltip_ability_holdout_power_mount_int_Description"			"Slightly increase the intellect of the hero. Will swap the bonus stats with Agility if casted.\n<font color='#FF7800'> Level up multiplying the Bonus Intelligence by the Dark Fundamental's Level!</font>"
+"DOTA_Tooltip_ability_holdout_power_mount_int_bonus_stats"			"BONUS INTELLECT:"
+"DOTA_Tooltip_ability_holdout_power_mount_int_transformation_time"	"TRANSFORMATION TIME:"
+
+"DOTA_Tooltip_ability_holdout_power_mount_agi"						"Power Mount (Agility)"
+"DOTA_Tooltip_ability_holdout_power_mount_agi_Description"			"Slightly increase the agility of the hero. Will swap the bonus stats with Strength if casted.\n<font color='#FF7800'> Level up multiplying the Bonus Agility by the Dark Fundamental's Level!</font>"
+"DOTA_Tooltip_ability_holdout_power_mount_agi_bonus_stats"			"BONUS AGILITY:"
+"DOTA_Tooltip_ability_holdout_power_mount_agi_transformation_time"	"TRANSFORMATION TIME:"
+
+"DOTA_Tooltip_modifier_power_mount_str"					"Power Mount (Strength)"
+"DOTA_Tooltip_modifier_power_mount_str_Description"		"+80 Strength multiplied by the hero's level."
+"DOTA_Tooltip_modifier_power_mount_int"					"Power Mount (Intellect)"
+"DOTA_Tooltip_modifier_power_mount_int_Description"		"+80 Intelligence multiplied by the hero's level."
+"DOTA_Tooltip_modifier_power_mount_agi"					"Power Mount (Agility)"
+"DOTA_Tooltip_modifier_power_mount_agi_Description"		"+80 Agility multiplied by the hero's level."
+
+"DOTA_Tooltip_ability_holdout_dark_cleave"						"Dark Cleave"
+"DOTA_Tooltip_ability_holdout_dark_cleave_Description"			"Triggers a cleave attack when attacking an enemy unit, with bonus damage.\n<font color='#FF7800'> Level up multiplying the Damage by the Dark Fundamental's Level!</font>"
+"DOTA_Tooltip_ability_holdout_dark_cleave_cleave_pct"			"%CLEAVE:"
+"DOTA_Tooltip_ability_holdout_dark_cleave_radius"				"CLEAVE RADIUS:"
+"DOTA_Tooltip_ability_holdout_dark_cleave_bonus_damage"			"BONUS DAMAGE:"
+
+"DOTA_Tooltip_modifier_dark_cleave_dummy"				"Dark Cleave"
+"DOTA_Tooltip_modifier_dark_cleave_dummy_Description"	"+100 Damage multiplied by the hero's Level."
+
+"DOTA_Tooltip_ability_holdout_instakill"						"Insta-Kill"
+"DOTA_Tooltip_ability_holdout_instakill_Description"			"Gives a chance to instantly kill a non-heroic unit."
+"DOTA_Tooltip_ability_holdout_instakill_chance"					"%CHANCE:"
+
+"DOTA_Tooltip_ability_holdout_requiem"										"Requiem"
+"DOTA_Tooltip_ability_holdout_requiem_Description"							"Release death lines of demonic energy, units near Dark Fundamental can be damaged by several lines of energy. Any unit damaged by Requiem of Souls will have its movement speed and attack damage reduced. Releases lines based on Dark Fundamental's level * 2."
+"DOTA_Tooltip_ability_holdout_requiem_cast_time_tooltip"					"CAST DELAY:"
+"DOTA_Tooltip_ability_holdout_requiem_reduction_ms"							"%MOVEMENT REDUCTION:"
+"DOTA_Tooltip_ability_holdout_requiem_reduction_tooltip"					"%DAMAGE REDUCTION:"		
+"DOTA_Tooltip_ability_holdout_requiem_line_damage"							"LINE DAMAGE:"		
+"DOTA_Tooltip_ability_holdout_requiem_slow_duration"						"REDUCTION DURATION:"
+"DOTA_Tooltip_ability_holdout_requiem_Lore"									"The captured souls of those past slain are released to ravage their former allies."
+
+"DOTA_Tooltip_modifier_requiem_dummy"					"Requiem"
+"DOTA_Tooltip_modifier_requiem_dummy_Description"		"Number of lines, calculated by the Dark Fundamental's level * 2"
+
+"DOTA_Tooltip_ability_holdout_skin_changer_caster"							"Skin Changer (Caster)"
+"DOTA_Tooltip_ability_holdout_skin_changer_caster_Description"				"Calls back the Dark Fundamental to the Fundamental Plane, spawning the Light Fundamental instead.\n<font color='#FF7800'> WARNING: Purges all positive and negative debuff.</font>"
+"DOTA_Tooltip_ability_holdout_skin_changer_caster_bonus_movespeed"			"BONUS MOVE SPEED:"
+"DOTA_Tooltip_ability_holdout_skin_changer_caster_transformation_time"		"TRANSFORMATION TIME:"
+
+"DOTA_Tooltip_modifier_skin_changer_caster"						"Skin Changer (Caster)"
+"DOTA_Tooltip_modifier_skin_changer_caster_Description"			"Swaps the hero with a spell-caster."
+
+"DOTA_Tooltip_ability_holdout_odin"									"Odin"
+"DOTA_Tooltip_ability_holdout_odin_Description"						"Turns the Dark Fundamental into a powerful god, Odin, increasing damage, health and armor."
+"DOTA_Tooltip_ability_holdout_odin_Lore"							"Don't mess with Odin."
+"DOTA_Tooltip_ability_holdout_odin_bonus_damage"					"BONUS DAMAGE:"
+"DOTA_Tooltip_ability_holdout_odin_bonus_hp"						"BONUS HP:"
+"DOTA_Tooltip_ability_holdout_odin_bonus_armor"						"BONUS ARMOR:"
+"DOTA_Tooltip_ability_holdout_odin_duration"						"DURATION:"
+
+"DOTA_Tooltip_modifier_odin"							"Odin"
+"DOTA_Tooltip_modifier_odin_Description"				"Increases hero for a short duration."
+
+//LIGHT FUNDAMENTAL
+"DOTA_Tooltip_ability_holdout_mechanism"						"Mechanism"
+"DOTA_Tooltip_ability_holdout_mechanism_Description"			"Heal nearby ally units, increasing life regen and armor for a short duration.\n<font color='#FF7800'> Level up multiplying the Heal Amount by the Light Fundamental's Level!</font>"
+"DOTA_Tooltip_ability_holdout_mechanism_bonus_armor"			"BONUS ARMOR:"
+"DOTA_Tooltip_ability_holdout_mechanism_radius"					"RADIUS:"
+"DOTA_Tooltip_ability_holdout_mechanism_health_regen"			"HEALTH REGEN:"
+"DOTA_Tooltip_ability_holdout_mechanism_heal_amount"			"HEAL AMOUNT:"
+"DOTA_Tooltip_ability_holdout_mechanism_heal_armor_duration"	"BONUS ARMOR DURATION:"
+
+"DOTA_Tooltip_modifier_mechanism_armor"					"Mechanism"
+"DOTA_Tooltip_modifier_mechanism_armor_Description"		"Heals allies units for +300 multiplied by the hero's Level."
+
+"DOTA_Tooltip_ability_holdout_light_stand"						"Light Stand"
+"DOTA_Tooltip_ability_holdout_light_stand_Description"			"Heals the Light Fundamental whenever he takes fatal damage.<font color='#FF7800'> Level up multiplying the Base Heal value by the Light Fundamental's Level!</font>"
+"DOTA_Tooltip_ability_holdout_light_stand_Note0"				"Heal 1000 * Hero level + a percentage of hero's health."
+"DOTA_Tooltip_ability_holdout_light_stand_Lore"					"Priests of the Omniscience are adept at removing impurities from fellow warriors."
+"DOTA_Tooltip_ability_holdout_light_stand_heal_base"			"BASE HEAL:"
+"DOTA_Tooltip_ability_holdout_light_stand_heal_pct"				"%BONUS HEAL:"
+"DOTA_Tooltip_ability_holdout_light_stand_damage_factor"		"%DAMAGE:"
+"DOTA_Tooltip_ability_holdout_light_stand_radius"				"DAMAGE RADIUS:"
+
+"DOTA_Tooltip_modifier_light_stand_dummy"					"Light Stand"
+"DOTA_Tooltip_modifier_light_stand_dummy_Description"		"Saves the Light Fundamental's from death healing himself and damaging nearby enemies for 1000 * percentage of the Light Fundamental's * Light Fundamental's level."
+
+"DOTA_Tooltip_ability_holdout_sacred_pool"								"Sacred Pool"
+"DOTA_Tooltip_ability_holdout_sacred_pool_Description"					"Deal 1% of the target's max hp into pure damage, and heal allies from 5% of their max hp."
+"DOTA_Tooltip_ability_holdout_sacred_pool_radius"						"RADIUS:"
+"DOTA_Tooltip_ability_holdout_sacred_pool_damage_percent"				"%DAMAGE:"
+"DOTA_Tooltip_ability_holdout_sacred_pool_heal_percent"					"%HEAL:"
+"DOTA_Tooltip_ability_holdout_sacred_pool_duration"						"DURATION:"
+
+"DOTA_Tooltip_ability_holdout_skin_changer_warrior"							"Skin Changer (Warrior)"
+"DOTA_Tooltip_ability_holdout_skin_changer_warrior_Description"				"Calls back the Light Fundamental to the Fundamental Plane, spawning the Dark Fundamental instead.\n<font color='#FF7800'> WARNING: Purges all positive and negative debuff.</font>"
+"DOTA_Tooltip_ability_holdout_skin_changer_warrior_bonus_movespeed"			"MOVE SLOW:"
+"DOTA_Tooltip_ability_holdout_skin_changer_warrior_transformation_time"		"TRANSFORMATION TIME:"
+
+"DOTA_Tooltip_modifier_skin_changer_warrior"						"Skin Changer (Warrior)"
+"DOTA_Tooltip_modifier_skin_changer_warrior_Description"			"Swaps the hero with a warrior."
+
+"DOTA_Tooltip_ability_holdout_guardian_angel"							"Summon Guardian Angel"
+"DOTA_Tooltip_ability_holdout_guardian_angel_Description"				"Summons Guardian Angels that grants immunity from physical damage and greatly increases hit point regeneration of nearby allies. The Guardian Angels will fight enemy units nearby, but cannot be controlled by any player."
+"DOTA_Tooltip_ability_holdout_guardian_angel_Lore"						"The All Seeing One casts down his protection over those that Purist calls friend."
+"DOTA_Tooltip_ability_holdout_guardian_angel_Note0"						"Affects allies with magic immunity."
+"DOTA_Tooltip_ability_holdout_guardian_angel_Note1"						"Can be purged."
+"DOTA_Tooltip_ability_holdout_guardian_angel_duration"					"DURATION:"
+"DOTA_Tooltip_ability_holdout_guardian_angel_health_regen"				"HEALTH REGEN:"
+"DOTA_Tooltip_ability_holdout_guardian_angel_radius"					"RADIUS:"
+"DOTA_Tooltip_ability_holdout_guardian_angel_angel_damage"				"ANGEL DAMAGE:"
+"DOTA_Tooltip_ability_holdout_guardian_angel_notes"						"Notes:\n\nAffects allies with Magic Immunity."
+"DOTA_Tooltip_modifier_holdout_guardian_angel_buff"						"Wings of Omniscience"
+"DOTA_Tooltip_modifier_holdout_guardian_angel_buff_Description"			"Immune to physical damage and protected by Guardian Angel."

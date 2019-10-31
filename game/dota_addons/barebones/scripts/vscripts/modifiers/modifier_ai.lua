@@ -5,7 +5,6 @@ if modifier_ai == nil then modifier_ai = class({}) end
 function modifier_ai:GetAttributes() return MODIFIER_ATTRIBUTE_IGNORE_INVULNERABLE end
 function modifier_ai:IsPurgeException() return false end
 function modifier_ai:IsPurgable() return false end
-function modifier_ai:IsDebuff() return false end
 function modifier_ai:IsHidden() return true end
 
 function modifier_ai:GetPriority()
@@ -28,24 +27,20 @@ function modifier_ai:CheckState()
 	return state
 end
 
-function modifier_ai:OnCreated()
+function modifier_ai:OnCreated(params)
 	if IsServer() then
 		self.last_movement = 0.0
-		self.find_enemy_distance = 500
-		if self:GetParent():GetKeyValue("UseAI") == 3 then
-			self:StartIntervalThink(RandomInt(2, 5))
-		else
-			self:StartIntervalThink(1.0)
-		end
+		self.find_enemy_distance = 1000
+		self:StartIntervalThink(0.5)
+		self.ai_state = params.state
+
+--		print("Add AI to unit:", self:GetParent():GetUnitName())
 	end
 end
 
 function modifier_ai:OnIntervalThink()
-if not IsServer() then return end
-if self:GetParent():IsIllusion() then return end
-if Entities:FindByName(nil, "dota_goodguys_fort") == nil then return end
-
-	self.is_casting = false
+	if self:GetParent():IsIllusion() then return end
+	if Entities:FindByName(nil, "dota_goodguys_fort") == nil then return end
 
 --	if GameRules:GetGameTime() - self.last_movement >= 3.0 then
 --		print("Roshan is sleeping...")
@@ -53,21 +48,11 @@ if Entities:FindByName(nil, "dota_goodguys_fort") == nil then return end
 --		print("Activating brain!")
 --	end
 
-	if self:GetParent():IsStunned() or self:GetParent():IsSilenced() or self:GetParent():IsHexed() or self:GetParent():IsChanneling() or self.is_casting == true then return end
+	if self:GetParent():IsStunned() or self:GetParent():IsSilenced() or self:GetParent():IsHexed() or self:GetParent():IsChanneling() or self:GetParent():GetCurrentActiveAbility() then return end
 
 --	print("AI: Ready to work!:", self:GetParent():GetUnitName())
 
-	for ability_index = 0, self:GetParent():GetAbilityCount() - 1 do
-		local ability = self:GetParent():GetAbilityByIndex(ability_index)
-		if ability and not ability:IsPassive() and not ability:IsToggle() and ability:IsActivated() and ability:IsCooldownReady() then
-			if ability:IsInAbilityPhase() then
-				self.is_casting = true
-				return
-			end
-		end
-	end
-
-	if self:GetParent():GetKeyValue("UseAI") == 1 then
+	if self.ai_state == 1 then
 		if not self:GetParent():IsAttacking() then
 			local ancient = Entities:FindByName(nil, "dota_goodguys_fort")
 			local distance = (self:GetParent():GetAbsOrigin() - ancient:GetAbsOrigin()):Length2D()
@@ -89,31 +74,42 @@ if Entities:FindByName(nil, "dota_goodguys_fort") == nil then return end
 				self:GetParent():MoveToPositionAggressive(ancient:GetAbsOrigin())
 			end
 		end
-	elseif self:GetParent():GetKeyValue("UseAI") == 3 then
+	elseif self.ai_state == 3 then
 		local random_int = RandomInt(1, 4)
-		if self.last_goal ~= random_int then
+		if self.last_goal ~= random_int and not self:GetParent():IsMoving() and not self:GetParent():IsAttacking() then
 			self:GetParent():MoveToPositionAggressive(Entities:FindByName(nil, "roshan_wp_"..random_int):GetAbsOrigin())
 			self.last_goal = random_int
 		end
 	end
 
 	if not self:GetParent():GetCurrentActiveAbility() then
+--		print("Caster is not casting an ability")
 		for ability_index = 0, self:GetParent():GetAbilityCount() - 1 do
 			local ability = self:GetParent():GetAbilityByIndex(ability_index)
-			if ability and not ability:IsInAbilityPhase() and not ability:IsPassive() and not ability:IsToggle() and ability:IsActivated() and ability:IsCooldownReady() then
-				local ability_behavior = tostring(ability:GetBehavior())
-				local cast_range = ability:GetCastRange()
+			if ability and not ability:IsInAbilityPhase() and not ability:IsPassive() and ability:IsActivated() and ability:IsCooldownReady() then
+--				print("Ability is castable")
+				local cast_range = ability:GetCastRange() or self.find_enemy_distance
 				local target_team = ability:GetAbilityTargetTeam()
 				local target_type = ability:GetAbilityTargetType()
-				local target_flags = ability:GetAbilityTargetFlags()
-				if cast_range == 0 then cast_range = self.find_enemy_distance end
-				cast_range = cast_range * 0.9 -- 90% of the range to allow projectiles hit the target. e.g: Mirana's Starfall
 				if target_team == 0 then target_team = 2 end -- TEAM_ENEMY
 				if target_type == 0 then target_type = 19 end -- DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC
+				local target_flags = ability:GetAbilityTargetFlags()
+--				print("Cast Range:", cast_range)
+				if cast_range == 0 then cast_range = self.find_enemy_distance end
+				cast_range = cast_range * 0.9 -- 90% of the range to allow projectiles hit the target. e.g: Mirana's Starfall
 				local allies = FindUnitsInRadius(self:GetParent():GetTeamNumber(), self:GetParent():GetAbsOrigin(), nil, cast_range, self:GetParent():GetTeamNumber(), target_type, ability:GetAbilityTargetFlags(), FIND_ANY_ORDER, false)
 				local enemies = FindUnitsInRadius(self:GetParent():GetTeamNumber(), self:GetParent():GetAbsOrigin(), nil, cast_range, target_team, target_type, ability:GetAbilityTargetFlags(), FIND_ANY_ORDER, false)
 
-				if #enemies == 1 then
+				if #enemies == 0 then
+					print("range / enemies / behavior:", self:GetParent():GetUnitName(), ability:GetAbilityName(), cast_range, #enemies, target_team, target_type)
+					if bit.band(ability:GetBehavior(), DOTA_ABILITY_BEHAVIOR_TOGGLE) == DOTA_ABILITY_BEHAVIOR_TOGGLE then
+						if ability:GetToggleState() == true then
+							ability:ToggleAbility()
+						end
+					end
+
+					return
+				elseif #enemies == 1 then
 					for _, restricted_ab in pairs(_G.multiplayer_abilities_cast) do
 						if ability:GetAbilityName() == restricted_ab then
 --							print("Casting this ability in solo mode is restricted!!")
@@ -123,48 +119,40 @@ if Entities:FindByName(nil, "dota_goodguys_fort") == nil then return end
 				end
 
 				-- Bug with jugg boss, no behavior after first cast
---				print(ability_behavior)
+--				print("Behavior:", ability:GetBehavior())
 
---				if tonumber(ability_behavior) == DOTA_ABILITY_BEHAVIOR_TOGGLE or tonumber(ability_behavior) == 8 then
---					if #enemies > 0 then
---						print("Enemy!")
---						if ability:GetToggleState() == false then
---							print("Enable ability!")
---							ability:ToggleAbility()
---							return
---						end
---					end
-				if tonumber(ability_behavior) == DOTA_ABILITY_BEHAVIOR_NO_TARGET then
-					if #enemies > 0 then
---						print("Cast No Target:", ability:GetAbilityName())
+				if bit.band(ability:GetBehavior(), DOTA_ABILITY_BEHAVIOR_TOGGLE) == DOTA_ABILITY_BEHAVIOR_TOGGLE then
+					if ability:GetToggleState() == false then
+						ability:ToggleAbility()
+					end
+				elseif bit.band(ability:GetBehavior(), DOTA_ABILITY_BEHAVIOR_NO_TARGET) == DOTA_ABILITY_BEHAVIOR_NO_TARGET then
+					print("Cast No Target:", ability:GetAbilityName())
 
-						if ability:GetAbilityName() == "arthas_holy_light" then
-							if self:GetParent():GetHealthPercent() <= ability:GetSpecialValueFor("health_threshold") then
-								self:GetParent():CastAbilityNoTarget(ability, -1)
-							end
-						else
+					if ability:GetAbilityName() == "arthas_holy_light" then
+						if self:GetParent():GetHealthPercent() <= ability:GetSpecialValueFor("health_threshold") then
 							self:GetParent():CastAbilityNoTarget(ability, -1)
 						end
-					end
-					return
-				elseif tonumber(ability_behavior) == DOTA_ABILITY_BEHAVIOR_POINT then
---					print("Cast On Ground:", ability:GetAbilityName())
-					for _, hero in pairs(enemies) do
-						self:GetParent():CastAbilityOnPosition(hero:GetAbsOrigin(), ability, -1)
-						return
-					end
-				elseif tonumber(ability_behavior) == DOTA_ABILITY_BEHAVIOR_UNIT_TARGET then
---					print("Cast On Target:", ability:GetAbilityName())
-					if self:GetParent():GetTeam() == ability:GetAbilityTargetTeam() then
-						for _, hero in pairs(allies) do
-							self:GetParent():CastAbilityOnTarget(hero, ability, -1)
-							return
-						end
 					else
-						for _, hero in pairs(enemies) do
-							self:GetParent():CastAbilityOnTarget(hero, ability, -1)
-							return
-						end
+						self:GetParent():CastAbilityNoTarget(ability, -1)
+					end
+
+					return
+				elseif bit.band(ability:GetBehavior(), DOTA_ABILITY_BEHAVIOR_POINT) == DOTA_ABILITY_BEHAVIOR_POINT then
+					print("Cast On Ground:", ability:GetAbilityName())
+					self:GetParent():CastAbilityOnPosition(enemies[RandomInt(1, #enemies)]:GetAbsOrigin(), ability, -1)
+
+					return
+				elseif bit.band(ability:GetBehavior(), DOTA_ABILITY_BEHAVIOR_UNIT_TARGET) == DOTA_ABILITY_BEHAVIOR_UNIT_TARGET then
+					print("Cast On Target:", ability:GetAbilityName())
+
+					if self:GetParent():GetTeam() == ability:GetAbilityTargetTeam() then
+						self:GetParent():CastAbilityOnTarget(allies[RandomInt(1, #enemies)], ability, -1)
+
+						return
+					else
+						self:GetParent():CastAbilityOnTarget(enemies[RandomInt(1, #enemies)], ability, -1)
+
+						return
 					end
 				end
 			end

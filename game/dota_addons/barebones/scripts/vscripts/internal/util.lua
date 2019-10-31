@@ -466,68 +466,9 @@ function GetItemByID(id)
 		if tonumber(v["ID"]) == id then return v end
 	end
 end
---[[
-function BossBar(unit, boss)
-	Timers:CreateTimer(function()
-		if unit:IsAlive() then
-			CustomNetTables:SetTableValue("round_data", "bossHealth", {boss = boss, hp = unit:GetHealthPercent()})
-			return 0.1
-		end
-	end)
-end
---]]
-function SpecialWave()
-if not Entities:FindByName(nil, "npc_tower_death") then return end
-
-local point = {
-	"west",
-	"north",
-	"east",
-	"south"
-}
-
-local real_point = "npc_dota_spawner_"..point[poi].."_event"
-local unit = {
-	"npc_dota_creature_necrolyte_event_1",
-	"npc_dota_creature_naga_siren_event_2",
-	"npc_dota_creature_vengeful_spirit_event_3",
-	"npc_dota_creature_captain_event_4",
-	"npc_dota_creature_slardar_event_5",
-	"npc_dota_creature_chaos_knight_event_6",
-	"npc_dota_creature_luna_event_7",
-	"npc_dota_creature_clockwerk_event_8"
-}
-
-	for j = 1, 10 do
-		CreateUnitByName(unit[reg-1], Entities:FindByName(nil, real_point):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-	end
-	poi = poi + 1
-	if poi > 4 then
-		poi = 1
-	end
-
-	print("Current Wave:", reg-1)
-	if reg-1 == 8 then
-		nTimer_IncomingWave = 0
-		return
-	end
-
-	nTimer_IncomingWave = XHS_SPECIAL_WAVE_INTERVAL
-end
-
-function SpawnDragons(dragon)
-	for c = 1, 8 do
-		if CREEP_LANES[c][1] == 1 and CREEP_LANES[c][3] == 1 then
-		local point = Entities:FindByName( nil, "npc_dota_spawner_"..c)
-			for j = 1, GameRules:GetCustomGameDifficulty() do
-				local dragon = CreateUnitByName(dragon, point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-			end
-		end
-	end
-end
 
 function OpenLane(lane_number)
-	if PHASE ~= 3 then
+	if CustomTimers.game_phase == 1 then
 		if CREEP_LANES_TYPE == 1 then
 			OpenCreepLane(lane_number)
 		elseif CREEP_LANES_TYPE == 2 then
@@ -578,14 +519,12 @@ end
 function CloseLane(ID, lane_number)
 	local player_count = PlayerResource:GetPlayerCount()
 	for i = 0, PlayerResource:GetPlayerCount() - 1 do
-		if IsValidPlayer(i) then
-			if PlayerResource:GetConnectionState(i) ~= 2 then
-				player_count = player_count - 1
-			end
+		if PlayerResource:GetConnectionState(i) ~= 2 then
+			player_count = player_count - 1
 		end
 	end
 
-	if PHASE ~= 3 then
+	if CustomTimers.game_phase ~= 3 then
 		if CREEP_LANES_TYPE == 1 then
 			print(lane_number, player_count)
 			if lane_number <= player_count then
@@ -646,6 +585,9 @@ function CloseCreepLane(lane_number)
 end
 
 function PauseHeroes()
+	-- heal/revive heroes
+	RefreshPlayers()
+
 	for _,hero in pairs(HeroList:GetAllHeroes()) do
 		if hero:IsRealHero() then
 			hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", nil)
@@ -695,7 +637,8 @@ local units = FindUnitsInRadius(teamnumber, Vector(0, 0, 0), nil, FIND_UNITS_EVE
 
 	for _,v in pairs(units) do
 		if v:HasMovementCapability() then
-			v:RemoveSelf()
+--			v:RemoveSelf()
+			v:ForceKill(false) -- looks better visually, revert if causing new bugs
 		end
 	end
 end
@@ -744,46 +687,34 @@ local units3 = FindUnitsInRadius( DOTA_TEAM_CUSTOM_1, Vector(0, 0, 0), nil, FIND
 	end)
 end
 
+local final_wave_stun_time = 0
 function FinalWaveSpawner(creep1, creep2, creep3, creep4, boss_name, angles, direction, waypoint)
-local number = 1
-local waypoint = Entities:FindByName(nil,"final_wave_player_2")
+	local number = 1
+	local waypoint = Entities:FindByName(nil,"final_wave_player_2")
 
-	local unit = CreateUnitByName(creep1.."_final_wave", Entities:FindByName(nil,"final_wave_"..direction.."_"..number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-	unit:SetAngles(0, angles, 0)
-	number = number + 1
-	local unit = CreateUnitByName(creep1.."_final_wave", Entities:FindByName(nil,"final_wave_"..direction.."_"..number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-	unit:SetAngles(0, angles, 0)
-	number = number + 1
-	local unit = CreateUnitByName(creep1.."_final_wave", Entities:FindByName(nil,"final_wave_"..direction.."_"..number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-	unit:SetAngles(0, angles, 0)
-	number = number + 1
-	local unit = CreateUnitByName(creep2.."_final_wave", Entities:FindByName(nil,"final_wave_"..direction.."_"..number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-	unit:SetAngles(0, angles, 0)
-	number = number + 1
-	local unit = CreateUnitByName(creep2.."_final_wave", Entities:FindByName(nil,"final_wave_"..direction.."_"..number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-	unit:SetAngles(0, angles, 0)
-	number = number + 1
-	local unit = CreateUnitByName(creep2.."_final_wave", Entities:FindByName(nil,"final_wave_"..direction.."_"..number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-	unit:SetAngles(0, angles, 0)
-	number = number + 1
-	local unit = CreateUnitByName(creep3.."_final_wave", Entities:FindByName(nil,"final_wave_"..direction.."_"..number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-	unit:SetAngles(0, angles, 0)
-	number = number + 1
-	local unit = CreateUnitByName(creep3.."_final_wave", Entities:FindByName(nil,"final_wave_"..direction.."_"..number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-	unit:SetAngles(0, angles, 0)
-	number = number + 1
-	local unit = CreateUnitByName(creep3.."_final_wave", Entities:FindByName(nil,"final_wave_"..direction.."_"..number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-	unit:SetAngles(0, angles, 0)
-	number = number + 1
-	local unit = CreateUnitByName(creep4.."_final_wave", Entities:FindByName(nil,"final_wave_"..direction.."_"..number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-	unit:SetAngles(0, angles, 0)
-	number = number + 1
-	local unit = CreateUnitByName(creep4.."_final_wave", Entities:FindByName(nil,"final_wave_"..direction.."_"..number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-	unit:SetAngles(0, angles, 0)
-	number = number + 1
-	local unit = CreateUnitByName(creep4.."_final_wave", Entities:FindByName(nil,"final_wave_"..direction.."_"..number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-	unit:SetAngles(0, angles, 0)
-	number = number + 1
+	for i = 1, 3 do
+		local unit = CreateUnitByName(creep1.."_final_wave", Entities:FindByName(nil,"final_wave_"..direction.."_"..number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+		unit:SetAngles(0, angles, 0)
+		number = number + 1
+	end
+
+	for i = 1, 3 do
+		local unit = CreateUnitByName(creep2.."_final_wave", Entities:FindByName(nil,"final_wave_"..direction.."_"..number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+		unit:SetAngles(0, angles, 0)
+		number = number + 1
+	end
+
+	for i = 1, 3 do
+		local unit = CreateUnitByName(creep3.."_final_wave", Entities:FindByName(nil,"final_wave_"..direction.."_"..number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+		unit:SetAngles(0, angles, 0)
+		number = number + 1
+	end
+
+	for i = 1, 3 do
+		local unit = CreateUnitByName(creep4.."_final_wave", Entities:FindByName(nil,"final_wave_"..direction.."_"..number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+		unit:SetAngles(0, angles, 0)
+		number = number + 1
+	end
 
 	local boss = CreateUnitByName(boss_name.."_final_wave", Entities:FindByName(nil,"final_wave_"..direction.."_"..number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
 	boss:SetAngles(0, angles, 0)
@@ -791,7 +722,6 @@ local waypoint = Entities:FindByName(nil,"final_wave_player_2")
 	boss:SetInitialGoalEntity(waypoint)
 	boss:MoveToPositionAggressive(waypoint:GetAbsOrigin())
 
-	local final_wave_stun_time = 0
 	local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_1, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_NONE , FIND_ANY_ORDER, false)
 	for _,v in pairs(units) do
 		if v:IsCreature() and v:HasMovementCapability() then
@@ -800,7 +730,7 @@ local waypoint = Entities:FindByName(nil,"final_wave_player_2")
 		end
 	end
 
-	final_wave_stun_time = final_wave_stun_time -5
+	final_wave_stun_time = final_wave_stun_time - 5
 
 	for _, hero in pairs(HeroList:GetAllHeroes()) do
 		if hero:IsRealHero() and hero:GetTeam() == DOTA_TEAM_GOODGUYS then
@@ -1047,6 +977,20 @@ function ShowBossBar(caster)
 		icon = "npc_dota_hero_abyssal_underlord"
 	elseif caster:GetUnitName() == "npc_dota_hero_proudmoore" then
 		icon = "npc_dota_hero_kunkka"
+	elseif caster:GetUnitName() == "npc_dota_boss_spirit_master_storm" then
+		icon = "npc_dota_hero_storm_spirit"
+		light_color = "#0092B3"
+		dark_color = "#002B33"
+	elseif caster:GetUnitName() == "npc_dota_boss_spirit_master_earth" then
+		icon = "npc_dota_hero_earth_spirit"
+	elseif caster:GetUnitName() == "npc_dota_boss_spirit_master_fire" then
+		icon = "npc_dota_hero_ember_spirit"
+		light_color = "#ff6600"
+		dark_color = "#320000"
+	end
+
+	if caster.boss_count == nil then
+		caster.boss_count = 1
 	end
 
 	CustomGameEventManager:Send_ServerToAllClients("show_boss_hp", {
@@ -1056,7 +1000,8 @@ function ShowBossBar(caster)
 		light_color = light_color,
 		dark_color = dark_color,
 		boss_health = caster:GetHealth(),
-		boss_max_health = caster:GetMaxHealth()
+		boss_max_health = caster:GetMaxHealth(),
+		boss_count = caster.boss_count,
 	})
 end
 
@@ -1067,19 +1012,6 @@ function IsNearEntity(entity_class, location, distance)
 	end
 
 	return false
-end
-
-function CheatDetector()
-	if CustomNetTables:GetTableValue("game_options", "game_count").value == 1 then
-		if Convars:GetBool("sv_cheats") == true or GameRules:IsCheatMode() then
---			if not IsInToolsMode() then
-				print("Cheats have been enabled, game don't count.")
-				CustomNetTables:SetTableValue("game_options", "game_count", {value = 0})
-				CustomGameEventManager:Send_ServerToAllClients("safe_to_leave", {})
-				GameRules:SetSafeToLeave(true)
---			end
-		end
-	end
 end
 
 function TeleportAllHeroes(sEvent, iInvulnDelay, iTPDelay)
@@ -1107,15 +1039,7 @@ function GiveTomeToAllHeroes(iCount)
 	Notifications:TopToAll({text="Power Up: +250 to all stats!", style={color="green"}, duration=10.0})
 
 	for _, hero in pairs(HeroList:GetAllHeroes()) do
-		if sound_played == false then
-			hero:EmitSound("ui.trophy_levelup")
-			sound_played = true
-		end
-
 		hero:IncrementAttributes(iCount)
-
-		local pfx = ParticleManager:CreateParticle(CustomNetTables:GetTableValue("battlepass_item_effects", tostring(hero:GetPlayerID())).tome_stats["effect1"], PATTACH_ABSORIGIN_FOLLOW, hero)
-		ParticleManager:SetParticleControl(pfx, 0, hero:GetAbsOrigin())
 	end
 end
 

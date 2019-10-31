@@ -1496,7 +1496,8 @@
 	"item_tome_small" 
 	{
 		"ID"							"2504"
-		"BaseClass"						"item_datadriven"
+		"BaseClass"						"item_lua"
+		"ScriptFile"					"items/tomes.lua"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO"
@@ -1517,18 +1518,6 @@
 		"ItemPermanent"					"0"
 		"ItemDisassembleRule"			"DOTA_ITEM_DISASSEMBLE_ALWAYS"
 
-		"OnSpellStart"
-		{
-	
-			"RunScript"
-			{
-				"ScriptFile"		"items/tomes.lua"
-				"Function"			"TomeOfStats"
-			}
-	
-			"SpendCharge" {}
-		}
-
 		"AbilitySpecial"
 		{
 			"01"
@@ -1545,7 +1534,8 @@
 	"item_tome_big"
 	{
 		"ID"							"2505"
-		"BaseClass"						"item_datadriven"
+		"BaseClass"						"item_lua"
+		"ScriptFile"					"items/tomes.lua"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO"
@@ -1567,17 +1557,6 @@
 		"ItemInitialCharges"			"1"
 		"ItemPermanent"					"0"
 		"ItemDisassembleRule"			"DOTA_ITEM_DISASSEMBLE_ALWAYS"
-
-		"OnSpellStart"
-		{
-			"RunScript"
-			{
-				"ScriptFile"			"items/tomes.lua"
-				"Function"				"TomeOfStats"
-			}
-
-			"SpendCharge" {}
-		}
 
 		"AbilitySpecial"
 		{
@@ -2034,15 +2013,6 @@
 			}
 		}
 
-		"OnUnequip"
-		{
-			"RunScript"
-			{
-				"ScriptFile"	"items/global.lua"
-				"Function"		"KeyUnequip"
-			}
-		}
-
 		"Modifiers"
 		{
 			"modifier_key_of_the_three_moons"
@@ -2153,15 +2123,6 @@
 			{
 				"var_type"				"FIELD_INTEGER"
 				"damage_return_pct"		"20"
-			}
-		}
-
-		"OnUnequip"
-		{
-			"RunScript"
-			{
-				"ScriptFile"	"items/global.lua"
-				"Function"		"ShieldUnequip"
 			}
 		}
 
@@ -2751,12 +2712,6 @@
 				"ModifierName"	"modifier_command_buff"
 				"Target" 		"CASTER"
 			}
-
-			"RunScript"
-			{
-				"ScriptFile"	"items/global.lua"
-				"Function"		"RingUnequip"
-			}
 		}
 
 		"Modifiers"
@@ -2998,7 +2953,7 @@
 			"02"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"bonus_armor"			"375"
+				"bonus_armor"			"75"
 			}
 			"03"
 			{

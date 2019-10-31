@@ -26,7 +26,7 @@ function GetDotaHud() {
 	while (p !== null && p.id !== 'Hud') {
 		p = p.GetParent();
 	}
-	if (p === null) {
+	if (p === null && $.GetContextPanel()) {
 		throw new HudNotFoundException('Could not find Hud root as parent of panel with id: ' + $.GetContextPanel().id);
 	} else {
 		return p;

@@ -66,7 +66,7 @@ function SpawnHeroesBis()
 local hero_count = 1
 local hero_vip_count = 1
 
-	Timers:CreateTimer(5.0, function()
+	Timers:CreateTimer(function()
 		SpawnHeroLoadout(hero_count)
 		if hero_count < #HEROLIST then
 			hero_count = hero_count + 1
@@ -76,7 +76,7 @@ local hero_vip_count = 1
 		end
 	end)
 
-	Timers:CreateTimer(10.0, function()
+	Timers:CreateTimer(5.0, function()
 		if hero_vip_count == 4 then
 			local dummy_hero = CreateUnitByName("npc_dota_hero_chaos_knight", Entities:FindByName(nil, "choose_vip_4_point"):GetAbsOrigin() + Vector(-100, 0, 0), true, nil, nil, DOTA_TEAM_GOODGUYS)
 			dummy_hero:SetAngles(0, 270, 0)
@@ -145,12 +145,12 @@ local hero_vip_count = 1
 	RAMERO_BIS_DUMMY:AddNewModifier(nil, nil, "modifier_command_restricted", {})
 
 	-- Special events
-	XHS_LICH_KING_BOSS = CreateUnitByName("npc_dota_boss_lich_king", Entities:FindByName(nil, "npc_dota_spawner_lich_king"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
-	XHS_LICH_KING_BOSS:SetAngles(0, 90, 0)
+	local lich_king_boss = CreateUnitByName("npc_dota_boss_lich_king", Entities:FindByName(nil, "npc_dota_spawner_lich_king"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
+	lich_king_boss:SetAngles(0, 90, 0)
 
 	-- Suddenly non-vanilla modifiers are not working on Lich King
-	XHS_LICH_KING_BOSS:AddNewModifier(nil, nil, "modifier_invulnerable", {})
-	XHS_LICH_KING_BOSS:AddNewModifier(nil, nil, "modifier_stunned", {})
+	lich_king_boss:AddNewModifier(nil, nil, "modifier_invulnerable", {})
+	lich_king_boss:AddNewModifier(nil, nil, "modifier_stunned", {})
 end
 
 function ChooseHero(event)

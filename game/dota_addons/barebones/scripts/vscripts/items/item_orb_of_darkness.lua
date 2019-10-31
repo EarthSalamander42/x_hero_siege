@@ -94,6 +94,7 @@ function modifier_orb_of_darkness_active:IsPurgable() return false end
 function modifier_orb_of_darkness_active:IsPurgeException() return false end
 function modifier_orb_of_darkness_active:IsDebuff() return false end
 function modifier_orb_of_darkness_active:RemoveOnDeath() return false end
+function modifier_orb_of_darkness_active:GetTexture() return "modifiers/orb_of_darkness" end
 
 function modifier_orb_of_darkness_active:GetEffectAttachType()
 	return "attach_attack1"
@@ -118,6 +119,8 @@ function modifier_orb_of_darkness_active:OnCreated()
 end
 
 function modifier_orb_of_darkness_active:OnIntervalThink()
+	if not self or not self.GetParent or not self:GetParent().GetItemInSlot then return end
+
 	local has_parent_item = false
 
 	for i = 0, 5 do

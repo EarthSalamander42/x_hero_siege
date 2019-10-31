@@ -8,7 +8,7 @@
 	</scripts>
 	<Panel class="Timers">
 		<Panel id="GameTime">
-			<Label id="GameTimer" text="--:--" />
+			<Label id="GameTimer_game_time" text="--:--" />
 		</Panel>
 
 		<Panel id="TimerPanels">
@@ -18,35 +18,35 @@
 			</Panel>
 			<Panel id="SpecialEvent" class="TopbarPanel">
 				<Label id="SpecialEventsLabel" class="TopbarPanelLabel" text="Muradin Event:" />
-				<Label id="SpecialEventsTimer" class="TimerLabel" text="--:--" />
+				<Label id="GameTimer_special_event" class="TimerLabel" text="--:--" />
 			</Panel>
 			<Panel id="IncomingWave" class="TopbarPanel">
 				<Label id="IncomingWaveLabel" class="TopbarPanelLabel" text="#IncomingWaveGoal" />
-				<Label id="IncomingWaveTimer" class="TimerLabel" text="--:--" />
+				<Label id="GameTimer_special_wave" class="TimerLabel" text="--:--" />
 			</Panel>
 			<Panel id="CreepLevel" class="TopbarPanel">
 				<Label id="CreepLevelLabel" class="TopbarPanelLabel" text="#CreepLevelGoal" />
-				<Label id="CreepLevelTimer" class="TimerLabel" text="--:--" />
+				<Label id="GameTimer_creep_level" class="TimerLabel" text="--:--" />
 			</Panel>
 			<Panel id="SpecialArena" class="TopbarPanel">
 				<Label id="SpecialArenaLabel" class="TopbarPanelLabel" text="Special Arena:" />
-				<Label id="SpecialArenaTimer" class="TimerLabel" text="--:--" />
+				<Label id="GameTimer_special_arena" class="TimerLabel" text="--:--" />
 			</Panel>
 			<Panel id="HeroImage" class="TopbarPanel">
 				<Label id="HeroImageLabel" class="TopbarPanelLabel" text="Hero Image:" />
-				<Label id="HeroImageTimer" class="TimerLabel" text="--:--" />
+				<Label id="GameTimer_hero_image" class="TimerLabel" text="--:--" />
 			</Panel>
 			<Panel id="SpiritBeast" class="TopbarPanel">
 				<Label id="SpiritBeastLabel" class="TopbarPanelLabel" text="Spirit Beast:" />
-				<Label id="SpiritBeastTimer" class="TimerLabel" text="--:--" />
+				<Label id="GameTimer_spirit_beast" class="TimerLabel" text="--:--" />
 			</Panel>
 			<Panel id="FrostInfernal" class="TopbarPanel">
 				<Label id="FrostInfernalLabel" class="TopbarPanelLabel" text="Frost Infernal:" />
-				<Label id="FrostInfernalTimer" class="TimerLabel" text="--:--" />
+				<Label id="GameTimer_frost_infernal" class="TimerLabel" text="--:--" />
 			</Panel>
 			<Panel id="AllHeroImage" class="TopbarPanel">
 				<Label id="AllHeroImageLabel" class="TopbarPanelLabel" text="All Hero Images:" />
-				<Label id="AllHeroImageTimer" class="TimerLabel" text="--:--" />
+				<Label id="GameTimer_all_hero_images" class="TimerLabel" text="--:--" />
 			</Panel>
 		</Panel>
 	</Panel>

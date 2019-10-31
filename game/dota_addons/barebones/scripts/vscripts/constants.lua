@@ -1,6 +1,6 @@
 CUSTOM_GAME_TYPE = "XHS"
 
-_G.GAME_VERSION = "3.49b"
+_G.GAME_VERSION = "3.50"
 CustomNetTables:SetTableValue("game_options", "game_count", {value = 1})
 
 -- General
@@ -52,29 +52,16 @@ _G.ZONE_STAR_CRITERIA_QUEST_COMPLETE	= 3
 
 -- X Hero Siege
 _G.PREGAMETIME = 90.0
-_G.nTimer_GameTime = 0
-_G.nTimer_SpecialEvent = 0
-_G.nTimer_IncomingWave = 0
-_G.nTimer_CreepLevel = 0
-_G.nTimer_SpecialArena = 0
-_G.nTimer_HeroImage = 0
-_G.nTimer_SpiritBeast = 0
-_G.nTimer_FrostInfernal = 0
-_G.nTimer_AllHeroImage = 0
-_G.time_elapsed = 0
+_G.SPECIAL_ARENA_DURATION = 120.0
 _G.RAMERO = 0
 _G.MAGTHERIDON = 0
 _G.FOUR_BOSSES = 0
 _G.SPIRIT_MASTER = 0
-_G.SPECIAL_EVENT = 0
-_G.PlayerNumberRadiant = 0
-_G.PlayerNumberDire = 0
 _G.sword_first_time = true
 _G.ring_first_time = true
 _G.doom_first_time = false
 _G.frost_first_time = false
 _G.SECRET = 0
-_G.PHASE = 1
 _G.RESPAWN_TIME = 40.0
 _G.CREEP_LANES_TYPE = 1
 if GetMapName() == "x_hero_siege_4" then
@@ -82,17 +69,12 @@ if GetMapName() == "x_hero_siege_4" then
 end
 _G.BT_ENABLED = 1
 _G.MURADIN_DEFEND = false
-_G.STORM_SPIRIT = 0
+_G.STORM_SPIRIT = 0 -- removed boss
 _G.ALL_HERO_IMAGE_DEAD = 0
 
 _G.FrostInfernal_killed = 0
-_G.FrostInfernal_occuring = 0
 _G.SpiritBeast_killed = 0
-_G.SpiritBeast_occuring = 0
-_G.HeroImage_occuring = 0
-_G.AllHeroImages_occuring = 0
 _G.AllHeroImagesDead = 0
-_G.FrostTowers_killed = 0
 _G.BossesTop_killed = 0
 
 GameMode.FrostInfernal_killed = 0
@@ -103,7 +85,6 @@ GameMode.SpecialArena_occuring = 0
 GameMode.HeroImage_occuring = 0
 GameMode.AllHeroImages_occuring = 0
 GameMode.AllHeroImagesDead = 0
-GameMode.FrostTowers_killed = 0
 GameMode.BossesTop_killed = 0
 GameMode.creep_roll = {}
 GameMode.creep_roll["race"] = 0
@@ -387,6 +368,7 @@ _G.difficulty_abilities = {
 	"arthas_frostmourne",
 	"baristol_holy_light",
 	"chaos_knight_chaos_strike",
+	"muradin_avatar",
 }
 
 -- Abilities cast only if more than 1 player
@@ -420,7 +402,6 @@ MODIFIER_ITEMS_WITH_LEVELS["modifier_orb_of_lightning_active"] = {
 XHS_CREEPS_INTERVAL = 20.0
 XHS_SPECIAL_EVENT_INTERVAL = 540.0 -- 9 min (has to be a multiple of 3)
 XHS_SPECIAL_WAVE_INTERVAL = XHS_SPECIAL_EVENT_INTERVAL / 3 -- 3 min
-XHS_SPECIAL_INITIAL_WAVE_DELAY = XHS_SPECIAL_WAVE_INTERVAL -- 3 min
 XHS_CREEPS_UPGRADE_INTERVAL = XHS_SPECIAL_EVENT_INTERVAL / 2 -- 4:30
 XHS_PHASE_2_DELAY = 420.0 -- 7 min
 

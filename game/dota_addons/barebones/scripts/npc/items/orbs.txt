@@ -264,7 +264,8 @@
 	"item_orb_of_fire"
 	{
 		"ID"							"2517"
-		"BaseClass"						"item_datadriven"
+		"BaseClass"						"item_lua"
+		"ScriptFile"					"items/item_orb_of_fire.lua"
 		"AbilityTextureName"			"custom/orb_of_fire"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"AbilityCooldown"				"10.0"
@@ -313,94 +314,6 @@
 				"cleave_pct"			"15"
 			}
 		}
-
-		"OnEquip"
-		{
-			"RunScript"
-			{
-				"ScriptFile"	"items/global.lua"
-				"Function"		"EquipOrbs"
-			}
-
-			"DelayedAction"
-			{
-				"Delay"		"0.1"
-				"Action"
-				{
-					"ApplyModifier"
-					{
-						"ModifierName"	"modifier_orb_of_fire"
-						"Target"		"CASTER"
-					}
-				}
-			}
-		}
-
-		"OnUnequip"
-		{
-			"RemoveModifier"
-			{
-				"ModifierName"	"modifier_orb_of_fire"
-				"Target" 		"CASTER"
-			}
-		}
-
-		"OnSpellStart"
-		{
-			"RunScript"
-			{
-				"ScriptFile"	"items/global.lua"
-				"Function"		"EquipOrbs"
-			}
-
-			"DelayedAction"
-			{
-				"Delay"		"0.1"
-				"Action"
-				{
-					"ApplyModifier"
-					{
-						"ModifierName"	"modifier_orb_of_fire"
-						"Target"		"CASTER"
-					}
-				}
-			}
-		}
-
-		"Modifiers"
-		{
-			"modifier_orb_of_fire"
-			{
-				"Passive"			"0"
-				"IsHidden"			"0"
-				"Attributes"		"MODIFIER_ATTRIBUTE_PERMANENT"
-				"TextureName"		"modifiers/orb_of_fire"
-
-				"EffectName"		"particles/custom/items/orb/orb_of_fire/orb.vpcf"
-				"EffectAttachType"	"follow_origin"
-	
-				"OnAttackLanded"
-				{
-					"RunScript"
-					{
-						"ScriptFile"	"heroes/global.lua"
-						"Function"		"Splash"
-					}
-				}
-			}
-
-			"modifier_orb_attributes"
-			{
-				"Passive"			"1"
-				"IsHidden"			"1"
-				"Attributes"		"MODIFIER_ATTRIBUTE_MULTIPLE"
-	
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE"		"%bonus_damage"
-				}
-			}
-		}
 	}
 
 	//=================================================================================================================
@@ -409,7 +322,8 @@
 	"item_orb_of_fire2"
 	{
 		"ID"							"2538"
-		"BaseClass"						"item_datadriven"
+		"BaseClass"						"item_lua"
+		"ScriptFile"					"items/item_orb_of_fire.lua"
 		"AbilityTextureName"			"custom/orb_of_fire2"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"AbilityCooldown"				"10.0"
@@ -587,7 +501,8 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"ID"							"2501"
-		"BaseClass"						"item_datadriven"
+		"BaseClass"						"item_lua"
+		"ScriptFile"					"items/item_orb_of_fire.lua"
 		"AbilityTextureName" 			"custom/searing_blade"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"AbilityCooldown"				"10.0"
@@ -1115,7 +1030,7 @@
 			"04"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"bonus_armor"			"15"
+				"bonus_armor"			"10"
 			}
 			"05"
 			{
@@ -1208,7 +1123,7 @@
 			"02"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"duration"				"25"
+				"duration"				"20"
 			}
 			"03"
 			{
@@ -1218,7 +1133,7 @@
 			"04"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"bonus_armor"			"30"
+				"bonus_armor"			"20"
 			}
 			"05"
 			{

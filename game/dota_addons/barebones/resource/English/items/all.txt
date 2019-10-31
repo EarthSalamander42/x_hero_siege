@@ -1,0 +1,170 @@
+"DOTA_Tooltip_ability_item_potion_of_antimagic"					"Potion of Anti-Magic"
+"DOTA_Tooltip_ability_item_potion_of_antimagic_Description"		"<h1><font color='#00CC00'>Active:</font></h1> Renders the caster <font color='#cfa00a'>Spell Immune</font>."
+"DOTA_Tooltip_ability_item_potion_of_antimagic_duration"		"DURATION:"
+"DOTA_Tooltip_modifier_anti_magic"								"Anti-Magic"
+
+"DOTA_Tooltip_ability_item_potion_of_invulnerability"					"Potion of Invulnerability"
+"DOTA_Tooltip_ability_item_potion_of_invulnerability_Description"		"<h1><font color='#00CC00'>Active:</font></h1> Renders the caster <font color='#bb4610'>Invulnerable</font>."
+"DOTA_Tooltip_ability_item_potion_of_invulnerability_duration"			"DURATION:"
+
+"DOTA_Tooltip_ability_item_potion_full"						"Light Potion"
+"DOTA_Tooltip_ability_item_potion_full_Description"			"<h1><font color='#00CC00'>Active:</font></h1>Instantly regenerate 30000 <font color='#00CC00'>health</font> and <font color='#1ea7d7'>mana</font>."
+"DOTA_Tooltip_ability_item_potion_full_charges_tooltip"		"CHARGES:"
+
+"healing_ward"													"Healing Ward"
+"DOTA_Tooltip_ability_item_healing_wards"						"Healing Wards"
+"DOTA_Tooltip_ability_item_healing_wards_Description"			"<h1><font color='#00CC00'>Active:</font></h1> Heals all allied units around, based on a percentage of their max health."
+"DOTA_Tooltip_ability_item_healing_wards_duration"				"DURATION:"
+"DOTA_Tooltip_ability_item_healing_wards_radius"				"RADIUS:"
+"DOTA_Tooltip_ability_item_healing_wards_regeneration"			"%HEALTH REGEN:"
+
+"DOTA_Tooltip_ability_holdout_healing_ward"			"Healing Ward"
+
+"DOTA_Tooltip_modifier_healing_ward_datadriven"					"Healing Ward"
+"DOTA_Tooltip_modifier_healing_ward_datadriven_Description"		"Heals all friendly units in radius."
+
+"DOTA_Tooltip_ability_item_lightning_sword"								"<font color='#2a7fbf'>Lightning Sword</font>"
+"DOTA_Tooltip_ability_item_lightning_sword_Description"					"<h1><font color='#FF7800'>Passive:</h1> Grants lifesteal and bonus damage.</font>"
+"DOTA_Tooltip_ability_item_lightning_sword_Lore"						"A simple sword, enhanced by Muradin's powers, for Ramero to wield in combat."
+"DOTA_Tooltip_ability_item_lightning_sword_bonus_damage"				"BONUS DAMAGE:"
+"DOTA_Tooltip_ability_item_lightning_sword_lifesteal_pct"				"%LIFESTEAL:"
+// "DOTA_Tooltip_ability_item_lightning_sword_bonus_armor"					"BONUS ARMOR:"
+
+"DOTA_Tooltip_modifier_lifesteal_lightning_sword"						"Lifesteal"
+"DOTA_Tooltip_modifier_lifesteal_lightning_sword_Description"			"Healed when attacking enemies."
+
+"DOTA_Tooltip_modifier_lifesteal"										"Lifesteal"
+"DOTA_Tooltip_modifier_lifesteal_Description"							"Healed when attacking enemies."
+
+"DOTA_Tooltip_ability_item_ring_of_superiority"								"<font color='#901bc2'>Ring of Superiority</font>"
+"DOTA_Tooltip_ability_item_ring_of_superiority_Description"					"<h1><font color='#FF7800'>Passive:</font></h1> Grants Endurance Aura, Unholy Aura, Command Aura and Devotion aura to the carrier.\n<h1><font color='#FF0000'>Restrictions:</font></h1> Auras are granted for the caster only. <br>Auras do not stack."
+"DOTA_Tooltip_ability_item_ring_of_superiority_bonus_armor"					"BONUS ARMOR:"
+"DOTA_Tooltip_ability_item_ring_of_superiority_bonus_damage_percentage"		"%BONUS DAMAGE:"
+"DOTA_Tooltip_ability_item_ring_of_superiority_bonus_movement_speed"		"BONUS MOVE SPEED:"
+"DOTA_Tooltip_ability_item_ring_of_superiority_bat_reduction"				"BAT REDUCTION:"
+"DOTA_Tooltip_ability_item_ring_of_superiority_lore"						"The King's Ring, imbued with his will and essence, to ensure that only a true leader would wield it and become King."
+
+"DOTA_Tooltip_ability_item_doom_artifact"								"<font color='#FF0000'>Doom Artifact</font>"
+"DOTA_Tooltip_ability_item_doom_artifact_Description"					"<font color='#722095'><h1>Key of the 3 Moons:</h1></font> Grants +1500 for all stats when carried.\n<font color='#cb2d2d'><h1>Shield of Invincibility:</h1>	</font> Provides <font color='#cb2d2d'>Unlimited Reincarnation</font>, <font color='#cb2d2d'>Spiked Carpace</font>, armor and HP. \n<font color='#2a7fbf'><h1>Lightning Sword:</h1></font> Grants 3000 Damage and 50% Lifesteal. \n<font color='#ead61c'><h1>Ring of Superiority:</h1></font> Grants Endurance Aura, Unholy Aura, Command Aura and Devotion aura to the carrier."
+"DOTA_Tooltip_ability_item_doom_artifact_Note0"							"Provides same bonuses as the 4 Unique items, but merged in 1."
+"DOTA_Tooltip_ability_item_doom_artifact_lore"							"He, who has this artifact, shall unleash hell upon his enemies."
+
+"DOTA_Tooltip_ability_item_boots_of_speed"									"Boots of Speed"
+"DOTA_Tooltip_ability_item_boots_of_speed_bonus_movement_speed"				"+$move_speed"
+"DOTA_Tooltip_ability_item_boots_of_speed_datadriven_Lore"					"Winged Boots that grant mythical swiftness."
+
+"DOTA_Tooltip_ability_item_shield_of_invincibility"								"<font color='#cb2d2d'>Shield of Invincibility</font>"
+"DOTA_Tooltip_ability_item_shield_of_invincibility_Description"					"<h1><font color='#FF7800'>Passive:</font> <font color='#cb2d2d'>Reincarnation:</font></h1> Revives you with full Mana and Health after death.\n<h1><font color='#FF7800'>Passive:</font> <font color='#cb2d2d'>Spiked Carpace</font></h1> Reflects part of recieved damage to the attacker."
+"DOTA_Tooltip_ability_item_shield_of_invincibility_bonus_armor"					"BONUS ARMOR:"
+"DOTA_Tooltip_ability_item_shield_of_invincibility_bonus_hp"					"BONUS HP:"
+"DOTA_Tooltip_ability_item_shield_of_invincibility_reincarnation_time"			"REINCARNATE TIME:"
+"DOTA_Tooltip_ability_item_shield_of_invincibility_lore"						"A shield made out of the corpse of Anub'arak."
+
+"DOTA_Tooltip_modifier_shield_of_invincibility"						"<font color='#cb2d2d'>Shield of Invincibility</font>"
+"DOTA_Tooltip_modifier_shield_of_invincibility_Description"			"<font color='#cb2d2d'>Reincarnation</font></h1> and <font color='#cb2d2d'>Spiked Carpace</font>. <br>"
+
+"DOTA_Tooltip_ability_item_key_of_the_three_moons"					"<font color='#d5b61c'>Key of the 3 Moons</font>"
+"DOTA_Tooltip_ability_item_key_of_the_three_moons_bonus_stats"		"BONUS STATS:"
+"DOTA_Tooltip_ability_item_key_of_the_three_moons_Lore"				"Eons ago, Elune divided some of her essence into 3 entities, in case of a dire outcome. For protection, she put a seal, which requires all 3 of the moons to be aligned and connected and this Key to unlock."
+
+"DOTA_Tooltip_ability_item_necklace_of_spell_immunity"						"Necklace of Spell Immunity"
+"DOTA_Tooltip_ability_item_necklace_of_spell_immunity_Description"			"<h1><font color='#FF7800'>Passive:</font></h1> Renders the hero <font color='#FF7800'>Magic Immune</font>."
+
+"DOTA_Tooltip_modifier_necklace_of_spell_immunity"					"<font color='#cfa00a'>Spell Immunity</font>"
+"DOTA_Tooltip_modifier_necklace_of_spell_immunity_Description"		"Invulnerable to all spells or magical damage."
+
+"DOTA_Tooltip_Ability_item_magtheridon_ankh"			"Ankh of Reincarnation"
+
+"DOTA_Tooltip_ability_item_tome_small"					"Tome of Stats +50"
+"DOTA_Tooltip_ability_item_tome_small_Description"		"<h1><font color='#00CC00'>Active:</font></h1> Increase stats by: <font color='#00CC00'> +50</font>."
+
+"DOTA_Tooltip_ability_item_tome_big"					"Tome of Stats +250"
+"DOTA_Tooltip_ability_item_tome_big_Description"		"<h1><font color='#00CC00'>Active:</font></h1> Increase stats by: <font color='#00CC00'> +250</font>."
+
+"DOTA_Tooltip_ability_item_tome_of_power"					"Tome of Power"
+"DOTA_Tooltip_ability_item_tome_of_power_Description"		"<h1><font color='#00CC00'>Active:</font></h1> Increases the level of the Hero by 1 when used."
+
+"DOTA_Tooltip_ability_item_ankh_of_reincarnation"						"Ankh of Reincarnation"
+"DOTA_Tooltip_ability_item_ankh_of_reincarnation_Description"			"<h1><font color='#FF7800'>Passive:</font></h1> Reincarnate the Hero with full HP and Mana after death. Contains 3 charges.\n<h1><font color='#FF0000'>Restrictions:</h1> Consume 1 charge on death.</font>"
+"DOTA_Tooltip_ability_item_ankh_of_reincarnation_reincarnation_time"	"REINCARNATE TIME:"
+
+"DOTA_Tooltip_ability_item_talisman_of_evasion_datadriven"						"Talisman of Evasion"
+"DOTA_Tooltip_ability_item_talisman_of_evasion_datadriven_Lore"					"A necklace that allows you to anticipate enemy attacks."
+"DOTA_Tooltip_ability_item_talisman_of_evasion_datadriven_Note0"				"Talisman of Evasion doesn't stack with self."
+"DOTA_Tooltip_ability_item_talisman_of_evasion_datadriven_bonus_evasion"		"%+$evasion"
+
+"DOTA_Tooltip_Ability_item_orb_of_fire"								"Orb of Fire"
+"DOTA_Tooltip_ability_item_orb_of_fire_Description"					"<h1><font color='#00CC00'>Active:</font> Enable/Disable</h1>Fire Orb (Cleave).\n<h1><font color='#FF7800'>Passive:</font> Fire Orb (Cleave)</h1>Gives your basic attacks cleave.\n<h1><font color='#FF0000'>Restrictions:</h1></font> Does not stack with other cleave sources. <br>Does not work with ranged heroes."
+"DOTA_Tooltip_ability_item_orb_of_fire_Note0"						""
+"DOTA_Tooltip_ability_item_orb_of_fire_bonus_damage"				"BONUS DAMAGE:"
+"DOTA_Tooltip_ability_item_orb_of_fire_radius"						"CLEAVE RADIUS:"
+"DOTA_Tooltip_ability_item_orb_of_fire_cleave_pct"					"%CLEAVE DAMAGE:"
+
+"DOTA_Tooltip_Ability_item_orb_of_fire2"							"Blazing Gem"
+"DOTA_Tooltip_ability_item_orb_of_fire2_Description"				"<h1><font color='#00CC00'>Active:</font> Enable/Disable</h1>Blazing Gem (Cleave).\n<h1><font color='#FF7800'>Passive:</font> Fire Orb (Cleave)</h1>Gives your basic attacks cleave.\n<h1><font color='#FF0000'>Restrictions:</h1></font> Does not stack with other cleave sources. <br>Does not work with ranged heroes."
+"DOTA_Tooltip_ability_item_orb_of_fire2_Note0"						""
+"DOTA_Tooltip_ability_item_orb_of_fire2_bonus_damage"				"BONUS DAMAGE:"
+"DOTA_Tooltip_ability_item_orb_of_fire2_radius"						"CLEAVE RADIUS:"
+"DOTA_Tooltip_ability_item_orb_of_fire2_cleave_pct"					"%CLEAVE DAMAGE:"
+
+"DOTA_Tooltip_Ability_item_searing_blade"							"Searing Blade"
+"DOTA_Tooltip_ability_item_searing_blade_Description"				"<h1><font color='#00CC00'>Active:</font> Enable/Disable</h1>Searing Blade (Cleave).\n<h1><font color='#FF7800'>Passive:</font> Fire Orb (Cleave)</h1>Gives your basic attacks cleave.\n<h1><font color='#FF0000'>Restrictions:</h1></font> Does not stack with other cleave sources. <br>Does not work with ranged heroes."
+"DOTA_Tooltip_ability_item_searing_blade_bonus_damage"				"BONUS DAMAGE:"
+"DOTA_Tooltip_ability_item_searing_blade_radius"					"RADIUS:"
+"DOTA_Tooltip_ability_item_searing_blade_cleave_pct"				"%CLEAVE:"
+
+"DOTA_Tooltip_Ability_item_orb_of_earth"							"Orb of Earth"
+"DOTA_Tooltip_ability_item_orb_of_earth_Description"				"<h1><font color='#00CC00'>Active:</font> Enable/Disable</h1>Earth Orb (Bash).\n<h1><font color='#FF7800'>Passive:</font> Earth Orb (Bash)</h1> Grants a chance to bash the enemy for %bash_duration% seconds."
+"DOTA_Tooltip_ability_item_orb_of_earth_bonus_damage"				"BONUS DAMAGE:"
+"DOTA_Tooltip_ability_item_orb_of_earth_bash_chance"				"%BASH CHANCE:"
+"DOTA_Tooltip_ability_item_orb_of_earth_bash_duration"				"BASH DURATION:"
+
+"DOTA_Tooltip_Ability_item_orb_of_frost"							"Orb of Frost"
+"DOTA_Tooltip_ability_item_orb_of_frost_Description"				"<h1><font color='#00CC00'>Active:</font> Enable/Disable</h1>Frost Orb (Bash).\n<h1><font color='#FF7800'>Passive:</font> Frost Orb (Bash)</h1> Grants a chance to mini-bash attacked enemy unit."
+"DOTA_Tooltip_ability_item_orb_of_frost_bonus_damage"				"BONUS DAMAGE:"
+"DOTA_Tooltip_ability_item_orb_of_frost_freeze_cooldown"			"BASH DURATION:"
+"DOTA_Tooltip_ability_item_orb_of_frost_bash_chance"				"%BASH CHANCE:"
+
+"DOTA_Tooltip_modifier_orb_of_frost"							"Orb of Frost"
+"DOTA_Tooltip_modifier_orb_of_frost_Description"				"Grants chance for mini-bash."
+"DOTA_Tooltip_modifier_orb_of_earth"							"Orb of Earth"
+"DOTA_Tooltip_modifier_orb_of_earth_Description"				"Grants a chance to bash target (cooldown on success)"
+"DOTA_Tooltip_modifier_orb_of_fire"								"Orb of Fire"
+"DOTA_Tooltip_modifier_orb_of_fire_Description"					"Grants cleave to melee attacks."
+"DOTA_Tooltip_modifier_orb_of_darkness"							"Orb of Darkness"
+"DOTA_Tooltip_modifier_orb_of_darkness_Description"				"Raises enemy creeps that you slay."
+"DOTA_Tooltip_modifier_orb_of_lightning"						"Orb of Lightning"
+"DOTA_Tooltip_modifier_orb_of_lightning_Description"			"Grants a chance to root and disarm the target (cooldown on success)"
+"DOTA_Tooltip_modifier_orb_of_lightning_slow"					"Purge"
+"DOTA_Tooltip_modifier_orb_of_lightning_slow_Description"		"Rooted and disarmed!"
+
+"DOTA_Tooltip_Ability_item_lifesteal_mask"						"Mask of Death"
+"DOTA_Tooltip_ability_item_lifesteal_mask_Description"			"<h1><font color='#FF7800'>Passive:</h1> Grants lifesteal.</font>"
+"DOTA_Tooltip_Ability_item_lifesteal_mask_lifesteal_pct"		"%LIFESTEAL:"
+"DOTA_Tooltip_ability_item_lifesteal_mask_Note0"				"Lifesteal based on Damage Received by the Target. High Armor Target will give less Healing."
+
+"DOTA_Tooltip_modifier_imba_morbid_mask_unique"					"Lifesteal"
+"DOTA_Tooltip_modifier_imba_morbid_mask_unique_Description"		"Healing by attacking enemies."
+
+"DOTA_Tooltip_ability_item_cloak_of_flames"						"Cloak of Flames"
+"DOTA_Tooltip_ability_item_cloak_of_flames_Description"			"<h1><font color='#FF7800'>Passive:</font></h1> Engulfs the hero in fire which deals %damage_per_tick% damage per second to nearby enemy units."
+"DOTA_Tooltip_ability_item_cloak_of_flames_Note0"				"Does not stack with Immolation, Permanent Immolation, Permanent Lightning or Lightning Shield."
+"DOTA_Tooltip_ability_item_cloak_of_flames_radius"				"RADIUS:"
+
+"DOTA_Tooltip_modifier_immolation"								"Immolation"
+"DOTA_Tooltip_modifier_immolation_Description"					"Deals damage over the carrier."
+
+"DOTA_Tooltip_Ability_item_health_potion"						"Healing Potion"
+"DOTA_Tooltip_Ability_item_health_potion_Description"			"<h1><font color='#00CC00'>Active:</font></h1> Instantly regenerate 3000 <font color='#00CC00'>Health</font>."
+
+"DOTA_Tooltip_Ability_item_mana_potion"							"Mana Potion"
+"DOTA_Tooltip_Ability_item_mana_potion_Description"				"<h1><font color='#00CC00'>Active:</font></h1> Instantly regenerate 3000 <font color='#1ea7d7'>Mana</font>."
+
+"DOTA_Tooltip_Ability_item_staff_of_mastery"					"Staff of Mastery"
+"DOTA_Tooltip_Ability_item_staff_of_mastery_Description"		"<h1><font color='#00CC00'>Active:</font></h1> Converts the target unit to ethereal form, rendering them immune to physical damage, unable to attack, slowed by 60% and take 50% more magic damage for 5 seconds."
+"DOTA_Tooltip_Ability_item_staff_of_mastery_mana_regen"			"MANA REGEN:"
+"DOTA_Tooltip_Ability_item_staff_of_mastery_bonus_armor"		"BONUS ARMOR:"
+
+"DOTA_Tooltip_Ability_item_amulet_of_the_wild"					"Amulet of the Wild"
+"DOTA_Tooltip_Ability_item_amulet_of_the_wild_Description"		"<h1><font color='#00CC00'>Active:</font></h1> Summons a Furbolg to fight for you, contains 3 furbolgs."
+"DOTA_Tooltip_Ability_item_amulet_of_the_wild_duration"			"DURATION:"

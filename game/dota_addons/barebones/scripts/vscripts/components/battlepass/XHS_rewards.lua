@@ -165,7 +165,7 @@ function Battlepass:GetTeleportEffect(ID)
 --	print("Teleport BP table:", BattlepassItems["teleport"], #BattlepassItems["teleport"])
 
 	if Battlepass:GetRewardUnlocked(ID) ~= nil then
-		for i = #BattlepassItems["teleport"], 1, -1 do
+		for i = #BattlepassItems["teleport"] - 1, 1, -1 do
 --			print(Battlepass:GetRewardUnlocked(ID), BattlepassItems["teleport"][i])
 			if BattlepassItems["teleport"][i] and Battlepass:GetRewardUnlocked(ID) >= BattlepassItems["teleport"][i] then
 				hero_item_effects["level"] = i
@@ -194,7 +194,7 @@ function Battlepass:GetTomeEffect(ID)
 	hero_item_effects["effect1"] = effects["effect1"][0]
 
 	if Battlepass:GetRewardUnlocked(ID) ~= nil then
-		for i = #BattlepassItems["tome"], 1, -1 do
+		for i = #BattlepassItems["tome"] - 1, 1, -1 do
 			if BattlepassItems["tome"][i] and Battlepass:GetRewardUnlocked(ID) >= BattlepassItems["tome"][i] then
 				hero_item_effects["level"] = i
 				hero_item_effects["effect1"] = effects["effect1"][i]

@@ -50,7 +50,9 @@ function Battlepass:AddItemEffects(hero)
 
 	if ply_table and ply_table.bp_rewards == 0 then
 	else
-		Battlepass:SetItemEffects(hero:GetPlayerID())
+		if hero:IsRealHero() and hero:GetPlayerOwner() then
+			Battlepass:SetItemEffects(hero:GetPlayerID())
+		end
 	end
 
 	-- some effects override some items effects, need to call it after items setup

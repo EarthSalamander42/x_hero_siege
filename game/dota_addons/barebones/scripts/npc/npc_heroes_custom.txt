@@ -564,7 +564,7 @@
 
 		"Ability1"						"holdout_windwalk"
 		"Ability2"						"xhs_blademaster_mirror_image"
-		"Ability3"						"holdout_wardrums_aura"
+		"Ability3"						"blademaster_wardrums_aura"
 		"Ability4"						"holdout_blade_dance"
 		"Ability5"						"holdout_berserkers_rage"
 		"Ability6"						"juggernaut_blade_fury"
