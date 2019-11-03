@@ -30,7 +30,9 @@ ListenToGameEvent('npc_spawned', function(event)
 			return
 		end
 
+		-- The commented out lines here are what I used to test in tools mode
 		if api:IsDonator(npc:GetPlayerID()) and PlayerResource:GetConnectionState(npc:GetPlayerID()) ~= 1 then
+		-- if api:IsDonator(npc:GetPlayerID()) and PlayerResource:GetConnectionState(npc:GetPlayerID()) ~= 1 or (IsInToolsMode()) then
 			npc:SetupHealthBarLabel()
 
 			if api:GetDonatorStatus(npc:GetPlayerID()) == 10 then
@@ -43,12 +45,23 @@ ListenToGameEvent('npc_spawned', function(event)
 				if api:GetDonatorStatus(npc:GetPlayerID()) ~= 6 then
 					Timers:CreateTimer(1.5, function()
 						Battlepass:DonatorCompanion(npc:GetPlayerID(), api:GetPlayerCompanion(npc:GetPlayerID()).file)
+
+						-- if api and api.GetPlayerCompanion and api:GetPlayerCompanion(npc:GetPlayerID()) then
+							-- Battlepass:DonatorCompanion(npc:GetPlayerID(), api:GetPlayerCompanion(npc:GetPlayerID()).file)
+						-- else
+							-- Battlepass:DonatorCompanion(npc:GetPlayerID(), nil)
+						-- end
 					end)
 				end
 			end
 		end
 
+		if npc.bp_init == true then return end
+
+		npc.bp_init = true
+
 		CustomGameEventManager:Send_ServerToAllClients("override_hero_image", {
+			player_id = npc:GetPlayerID(),
 			hero_name = string.gsub(npc:GetUnitName(), "npc_dota_hero_", ""),
 		})
 	end

@@ -76,6 +76,7 @@
 	"game_version_name" "Archimonde"
 	"goal" "Special Events:"
 	"hero_buttoncategory" "Hero"
+	"imba_gamemode_settings_gold_multiplier" "Difficulty:"
 	"imba_safe_to_leave" "Cheat mode enabled, no battlepass experience earned"
 	"incomingwavegoal" "Incoming Waves:"
 	"info_command" "Info: -info"

@@ -37,7 +37,6 @@ if IsInToolsMode() then
 --	require('libraries/adv_log') -- SUPER SPAM KILLING BACKEND LEAVE IT DISABLED
 end
 require('components/battlepass/init')
-require('components/loading_screen/init')
 require('components/timers/init')
 
 if GetMapName() == "x_hero_siege_demo" then

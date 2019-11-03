@@ -101,7 +101,7 @@ function modifier_ai:OnIntervalThink()
 				local enemies = FindUnitsInRadius(self:GetParent():GetTeamNumber(), self:GetParent():GetAbsOrigin(), nil, cast_range, target_team, target_type, ability:GetAbilityTargetFlags(), FIND_ANY_ORDER, false)
 
 				if #enemies == 0 then
-					print("range / enemies / behavior:", self:GetParent():GetUnitName(), ability:GetAbilityName(), cast_range, #enemies, target_team, target_type)
+--					print("range / enemies / behavior:", self:GetParent():GetUnitName(), ability:GetAbilityName(), cast_range, #enemies, target_team, target_type)
 					if bit.band(ability:GetBehavior(), DOTA_ABILITY_BEHAVIOR_TOGGLE) == DOTA_ABILITY_BEHAVIOR_TOGGLE then
 						if ability:GetToggleState() == true then
 							ability:ToggleAbility()
