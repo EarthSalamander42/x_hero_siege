@@ -63,6 +63,7 @@ modifier_lifesteal_lightning_sword = class({})
 function modifier_lifesteal_lightning_sword:IsHidden() return false end
 function modifier_lifesteal_lightning_sword:IsPurgable() return false end
 function modifier_lifesteal_lightning_sword:IsDebuff() return false end
+function modifier_lifesteal_lightning_sword:RemoveOnDeath() return false end
 
 function modifier_lifesteal_lightning_sword:GetTexture()
 	return "modifiers/lightning_sword"
@@ -77,6 +78,10 @@ end
 function modifier_lifesteal_lightning_sword:OnAttackLanded(keys)
 	if IsServer() then
 		if self:GetParent() == keys.attacker then
+			if self:GetParent():HasModifier("modifier_lifesteal_doom_artifact") then
+				return
+			end
+
 			self:GetParent():Lifesteal(keys.target, self)
 		end
 	end

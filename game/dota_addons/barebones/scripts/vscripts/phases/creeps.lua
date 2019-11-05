@@ -64,7 +64,7 @@ function SpawnCreeps()
 
 	for c = 1, 8 do -- replace 8 with player count, to open and close lanes super easily
 	local point = Entities:FindByName( nil, "npc_dota_spawner_"..c)
-	local Waypoint = Entities:FindByName( nil, "creep_path_"..c)
+--	local Waypoint = Entities:FindByName( nil, "creep_path_"..c)
 		if CREEP_LANES[c][1] == 1 then -- Lane Activated?
 			if CREEP_LANES[c][3] == 1 then -- Barrack Alive?
 				if CREEP_LANES[c][2] == 1 then -- Lane Level
@@ -144,5 +144,16 @@ local caller = event.caller
 
 	for j = 1, GameRules:GetCustomGameDifficulty() do
 		CreateUnitByName("npc_magnataur_destroyer_crypt", caller:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+	end
+end
+
+function SpawnDragons(dragon)
+	for c = 1, 8 do
+		if CREEP_LANES[c][1] == 1 and CREEP_LANES[c][3] == 1 then
+		local point = Entities:FindByName( nil, "npc_dota_spawner_"..c)
+			for j = 1, GameRules:GetCustomGameDifficulty() do
+				local dragon = CreateUnitByName(dragon, point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+			end
+		end
 	end
 end

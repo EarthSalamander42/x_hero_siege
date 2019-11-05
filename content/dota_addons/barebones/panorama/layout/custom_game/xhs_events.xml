@@ -1,0 +1,33 @@
+<root>
+	<styles>
+		<include src="s2r://panorama/styles/custom_game/xhs_events.vcss_c" />
+	</styles>
+
+	<scripts>
+		<include src="s2r://panorama/scripts/custom_game/xhs_events.vjs_c" />
+	</scripts>
+
+	<Panel hittest="false" class="EventsPanel">
+		<Panel id="EventPanel">
+			<Button id="Event1" onmouseactivate="HeroImage();" >
+				<Label class="Event1_Title" text="#tooltip_event_hero_image" id="EventTitle"/>
+			</Button>
+
+			<Button id="Event2" onmouseactivate="SpiritBeast();" >
+				<Label class="Event1_Title" text="#tooltip_event_spirit_beast" id="EventTitle"/>
+			</Button>
+
+			<Button id="Event3" onmouseactivate="FrostInfernal();" >
+				<Label class="Event1_Title" text="#tooltip_event_frost_infernal" id="EventTitle"/>
+			</Button>
+
+			<Button id="Event4" onmouseactivate="AllHeroImages();" >
+				<Label class="Event1_Title" text="#tooltip_event_all_hero_images" id="EventTitle"/>
+			</Button>
+
+			<Button id="Close" onmouseactivate="OnQuit();" >
+				<Image src="s2r://panorama/images/custom_game/close.png" />
+			</Button>
+		</Panel>
+	</Panel>
+</root>

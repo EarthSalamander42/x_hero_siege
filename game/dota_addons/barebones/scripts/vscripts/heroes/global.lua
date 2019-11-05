@@ -200,6 +200,7 @@ local main_ability = ability:GetAbilityName()
 end
 
 function CastleMuradin(event)
+if event.ability == nil then return end
 local caster = event.caster
 local ability = event.ability
 local heroes = HeroList:GetAllHeroes()
@@ -208,9 +209,9 @@ local Health = ability:GetSpecialValueFor("hp_tooltip")
 local InvTime = ability:GetSpecialValueFor("invulnerability_time")
 local PauseTime = 10.0
 
-	if not ability then return end
-
 	if caster:GetHealthPercent() <= Health then
+		PauseCreeps(PauseTime)
+
 		local Muradin = CreateUnitByName("npc_dota_creature_muradin_bronzebeard", Waypoint:GetAbsOrigin(), false, nil, nil, DOTA_TEAM_GOODGUYS)
 		Muradin:SetInitialGoalEntity(Waypoint)
 		Muradin:MoveToPositionAggressive(Waypoint:GetAbsOrigin())
@@ -226,7 +227,6 @@ local PauseTime = 10.0
 			end)
 		end
 
-		PauseCreepsCastle()
 		caster:AddNewModifier(caster, nil, "modifier_invulnerable", {duration = InvTime + PauseTime})
 		Notifications:TopToAll({text = "Muradin is requested to defend your castle!", duration = PauseTime, continue = true})
 
@@ -247,6 +247,7 @@ local radius = ability:GetSpecialValueFor("radius")
 local cleave = ability:GetSpecialValueFor("cleave_pct")
 
 	local splash_targets = FindUnitsInRadius(attacker:GetTeamNumber(), target:GetAbsOrigin(), nil, radius, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, FIND_ANY_ORDER, false)
+
 	for _, unit in pairs(splash_targets) do
 		if target:IsBuilding() then return end
 		if unit ~= target and not unit:IsBuilding() then

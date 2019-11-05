@@ -1,5 +1,3 @@
--- Lifesteal modifier
-
 modifier_armor_gain_fix = class({})
 
 function modifier_armor_gain_fix:OnCreated()
@@ -11,7 +9,7 @@ end
 
 function modifier_armor_gain_fix:OnIntervalThink()
 	if IsServer() then
-		self.armor_fix = (self:GetParent():GetAgility() * 0.19) * (-1) -- Don't ask.
+		self.armor_fix = (self:GetParent():GetAgility() * 0.16) * (-1) -- Don't ask.
 	end
 end
 

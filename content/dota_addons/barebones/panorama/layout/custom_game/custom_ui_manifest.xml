@@ -1,8 +1,6 @@
 <root>
 	<scripts>
-    <include src="s2r://panorama/scripts/custom_game/util.vjs_c" />
-    <include src="s2r://panorama/scripts/custom_game/playertables/playertables_base.vjs_c" />
-    <include src="s2r://panorama/scripts/custom_game/gold.vjs_c" />
+    <include src="s2r://panorama/scripts/custom_game/util.js" />
   </scripts>
 	<script>
 		// Turn off some default UI
@@ -57,7 +55,8 @@
 		topbar.style.width = "685px";
 
 		var TopBarRadiantTeam = hudElements.FindChildTraverse("TopBarRadiantTeam");
-		TopBarRadiantTeam.style.width = "275px";
+		TopBarRadiantTeam.style.width = "320px";
+		TopBarRadiantTeam.style.marginRight = "191px";
 
 		var topbarRadiantPlayers = hudElements.FindChildTraverse("TopBarRadiantPlayers");
 		topbarRadiantPlayers.style.width = "275px";
@@ -67,11 +66,13 @@
 
 		var map_info = Game.GetMapInfo();
 		if (map_info.map_display_name == "x_hero_siege_8") {
-			topbar.style.width = "1188px";
+			topbar.style.width = "1112px";
 
 			//Top Bar Radiant
 			var TopBarRadiantTeam = hudElements.FindChildTraverse("TopBarRadiantTeam");
-			TopBarRadiantTeam.style.width = "510px";
+			TopBarRadiantTeam.style.width = "1000px";
+			TopBarRadiantTeam.style.marginLeft = "100px";
+			TopBarRadiantTeam.style.marginRight = "0px";
 
 			var topbarRadiantPlayers = hudElements.FindChildTraverse("TopBarRadiantPlayers");
 			topbarRadiantPlayers.style.width = "504px";
@@ -80,7 +81,11 @@
 			topbarRadiantPlayersContainer.style.width = "504px";
 
 			var RadiantTeamContainer = hudElements.FindChildTraverse("RadiantTeamContainer");
-			RadiantTeamContainer.style.height = "610px";
+			RadiantTeamContainer.style.height = "1000px";
+
+			var RadiantBackground = TopBarRadiantTeam.GetChild(0);
+			RadiantBackground.style.width = "1000px";
+			RadiantBackground.style.marginRight = "50px";
 		}
 
 		//Skin Killer - Portrait
@@ -107,7 +112,7 @@
 		//DeBuff Bar
 		var DeBuffBar = hudElements.FindChildTraverse("lower_hud").FindChildTraverse("debuffs")
 		DeBuffBar.style.width = "30%";
-		DeBuffBar.style.marginBottom = "40.5%";
+		DeBuffBar.style.marginBottom = "45.5%";
 		DeBuffBar.style.marginRight = "31.5%";
 		DeBuffBar.style.flowChildren = "right";
 
@@ -126,56 +131,47 @@
 		var TopBarDireTeam = hudElements.FindChildTraverse("TopBarDireTeam");
 		TopBarDireTeam.style.visibility = "collapse";
 
-		function InitUI()
-		{
-			var TeamContainer = $.GetContextPanel().GetParent().GetParent().FindChildTraverse("TeamSelectContainer");
-			if (TeamContainer == null) {
-//				$.Msg("GameAndPlayersRoot == null, restart!")
-				$.Schedule(0.1, InitUI)
-				return;
+		var Parent = $.GetContextPanel().GetParent().GetParent();
+		var PreGame = Parent.FindChildTraverse("PreGame")
+
+		// setup modified vanilla HUD
+		SetupLoadingScreen();
+
+		function SetupLoadingScreen() {
+			if (Parent.FindChildTraverse("GameAndPlayersRoot") == undefined || Parent.FindChildTraverse("TeamsList") == undefined || Parent.FindChildTraverse("TeamsListGroup") == undefined || Parent.FindChildTraverse("CancelAndUnlockButton") == undefined || Parent.FindChildTraverse("UnassignedPlayerPanel") == undefined || Parent.FindChildTraverse("ShuffleTeamAssignmentButton") == undefined)
+				$.Schedule(0.25, SetupLoadingScreen);
+			else {
+				Parent.FindChildTraverse("GameAndPlayersRoot").style.backgroundColor = "rgba(50, 50, 50, 0.5)";
+				Parent.FindChildTraverse("GameAndPlayersRoot").style.borderRadius = "3px";
+				Parent.FindChildTraverse("GameAndPlayersRoot").style.boxShadow = "black -4px -4px 8px 8px";
+				Parent.FindChildTraverse("TeamsList").style.visibility = "collapse";
+				Parent.FindChildTraverse("TeamsListGroup").SetParent(Parent.FindChildTraverse("GameAndPlayersRoot"))
+				Parent.FindChildTraverse("TeamsListGroup").style.verticalAlign = "top";
+				Parent.FindChildTraverse("TeamsListGroup").style.width = "99%";
+				if (Game.IsInToolsMode() == false) {
+					Parent.FindChildTraverse("UnassignedPlayerPanel").style.visibility = "collapse";
+					Parent.FindChildTraverse("CancelAndUnlockButton").style.visibility = "collapse";
+					Parent.FindChildTraverse("ShuffleTeamAssignmentButton").style.visibility = "collapse";
+				}
 			}
-			var GamePlayerPanel = TeamContainer.FindChildTraverse("GameAndPlayersRoot")
-			var GameInfoPanel = TeamContainer.FindChildTraverse("GameInfoPanel")
-
-			GamePlayerPanel.style.width = "30%";
-			GamePlayerPanel.style.height = "20%";
-			GamePlayerPanel.style.marginRight = "35%";
-			GamePlayerPanel.style.align = "center top";
-			GamePlayerPanel.style.backgroundColor = "#000000da";
-			GamePlayerPanel.style.boxShadow = "black 0px 0px 0px 0px";
-
-			GameInfoPanel.style.width = "100%";
-			GameInfoPanel.FindChildTraverse("CustomGameModeName").style.align = "center center";
-			GameInfoPanel.FindChildTraverse("MapInfo").style.align = "center center";
-			GameInfoPanel.FindChildTraverse("StartGameCountdownTimer").style.width = "96px";
-			GameInfoPanel.FindChildTraverse("StartGameCountdownTimer").style.height = "96px";
-			GameInfoPanel.FindChildTraverse("StartGameCountdownTimer").style.marginTop = "16px";
-			GameInfoPanel.FindChildTraverse("StartGameCountdownTimer").style.align = "center center";
-
-			GameInfoPanel.FindChildTraverse("StartGameCountdownTimer").FindChildTraverse("TimerLabelBox").style.height = "40px";
-			GameInfoPanel.FindChildTraverse("StartGameCountdownTimer").FindChildTraverse("TimerLabelBox").FindChildTraverse("TimerLabelAutoStart").style.height = "40px";
-
-			TeamContainer.FindChildTraverse("TeamsList").style.visibility = "collapse";
-			GamePlayerPanel.FindChildTraverse("UnassignedPlayerPanel").style.visibility = "collapse";
-			GamePlayerPanel.FindChildTraverse("CancelAndUnlockButton").style.visibility = "collapse";
-//			$.GetContextPanel().GetParent().GetParent().FindChildTraverse("HUDElements").FindChildTraverse("topbar").FindChildTraverse("TopBarDireTeam").style.visibility = "collapse";
 		}
-
-		InitUI();
 	</script>
 
 	<Panel>
 		<CustomUIElement type="GameSetup"			layoutfile="file://{resources}/layout/custom_game/team_select.xml" />
+		<CustomUIElement type="GameInfo" layoutfile="file://{resources}/layout/custom_game/game_info.xml" />
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/barebones_notifications.xml" />
 <!--	<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/barebones_attachments.xml" /> -->
+		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/battlepass.xml" />
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/hud_hero_demo.xml" /> 
+<!--	<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/precache.xml" /> -->
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/boss_healthbar.xml" />
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/hud_main.xml" />
-		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/xhs_battlepass.xml" />
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/xhs_events.xml" />
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/xhs_timers.xml" />
+		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/gold.xml" />
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/statcollection.xml" />
-		<CustomUIElement type="EndScreen"			layoutfile="file://{resources}/layout/custom_game/multiteam_end_screen.xml" />
+		<CustomUIElement type="EndScreen"			layoutfile="file://{resources}/layout/custom_game/frostrose_end_screen.xml" />
 		<CustomUIElement type="FlyoutScoreboard"	layoutfile="file://{resources}/layout/custom_game/dungeon_scoreboard.xml" />
 	</Panel>
 </root>

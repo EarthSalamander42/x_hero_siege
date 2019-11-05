@@ -311,6 +311,7 @@ local caster = keys.caster
 end
 
 function SpiritSwap(keys)
+	if not IsServer() then return end
 local caster = keys.caster
 local PlayerID = caster:GetPlayerID()
 local gold = caster:GetGold()
@@ -323,6 +324,18 @@ local HP = caster:GetHealth()
 local Mana = caster:GetMaxMana() * caster:GetManaPercent() / 100
 local AbPoints = caster:GetAbilityPoints()
 local cooldowns_caster = {}
+
+	local items = {}
+	for i = 0, 8 do
+		local item = caster:GetItemInSlot(i)
+
+		if item then
+			itemCopy = CreateItem(item:GetName(), nil, nil)
+			items[i] = {}
+			items[i].item = itemCopy
+			items[i].charges = item:GetCurrentCharges()
+		end
+	end
 
 	if caster:GetUnitName() == "npc_dota_hero_storm_spirit" then
 		hero = PlayerResource:ReplaceHeroWith( PlayerID, "npc_dota_hero_earth_spirit", gold, 0)
@@ -354,18 +367,13 @@ local cooldowns_caster = {}
 		end
 	end
 
-	local items = {}
 	for i = 0, 8 do
-		if caster:GetItemInSlot(i) ~= nil and caster:GetItemInSlot(i):GetName() ~= "item_classchange_reset" then
-			itemCopy = CreateItem(caster:GetItemInSlot(i):GetName(), nil, nil)
-			items[i] = itemCopy
-		end
-	end
+		if items[i] and items[i].item then
+			hero:AddItem(items[i].item)
 
-	for i = 0, 8 do
-		if items[i] ~= nil then
-			hero:AddItem(items[i])
-			items[i]:SetCurrentCharges(caster:GetItemInSlot(i):GetCurrentCharges())
+			if items[i].charges then
+				items[i].item:SetCurrentCharges(items[i].charges)
+			end
 		end
 	end
 

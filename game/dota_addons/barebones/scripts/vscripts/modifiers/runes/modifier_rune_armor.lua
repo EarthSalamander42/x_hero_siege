@@ -14,12 +14,9 @@ function modifier_rune_armor:GetEffectAttachType()
 	return PATTACH_OVERHEAD_FOLLOW
 end
 
-function modifier_rune_armor:DeclareFunctions()
-	local funcs = {
-		MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS_UNIQUE,
-	}
-	return funcs
-end
+function modifier_rune_armor:DeclareFunctions() return {
+	MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS_UNIQUE,
+} end
 
 function modifier_rune_armor:GetModifierPhysicalArmorBonusUnique()
 	return 30

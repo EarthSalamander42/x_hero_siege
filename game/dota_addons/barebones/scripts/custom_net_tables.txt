@@ -9,9 +9,10 @@
 		"zone_names",
 		"game_options",
 		"gold",
-		"game_state",
 		"battlepass",
 		"player_table",
-		"hero_selection"
+		"hero_selection",
+		"battlepass_item_effects",
+		"other_available_items"
 	]
 }

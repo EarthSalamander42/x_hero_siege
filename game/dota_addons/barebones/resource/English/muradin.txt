@@ -1,0 +1,8 @@
+"DOTA_Tooltip_ability_muradin_avatar"						"Avatar"
+"DOTA_Tooltip_ability_muradin_avatar_Description"			"Mountain King turns into a rage, giving him bonus armor, hp and damage."
+//	"DOTA_Tooltip_ability_muradin_avatar_Lore"					"The Angerfist will fist everyone."
+"DOTA_Tooltip_ability_muradin_avatar_bonus_ms"				"BONUS MOVEMENT SPEED:"
+"DOTA_Tooltip_ability_muradin_avatar_duration"				"DURATION:"
+
+"DOTA_Tooltip_modifier_muradin_avatar"					"Avatar"
+"DOTA_Tooltip_modifier_muradin_avatar_Description"		"Muradin turns into enrage mode for a short period."

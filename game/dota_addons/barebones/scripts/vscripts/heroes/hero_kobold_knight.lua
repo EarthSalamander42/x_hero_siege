@@ -2,17 +2,20 @@ require("libraries/timers")
 
 function LifeSteal( keys )
 local caster = keys.caster
-local modifier_lifesteal = keys.modifier_lifesteal
 local ability = keys.ability
 local ability_level = ability:GetLevel() - 1
 local cooldown = ability:GetCooldown(ability_level)
 
-	ability:StartCooldown(cooldown)
-	caster:RemoveModifierByName(modifier_lifesteal)
+	if ability:IsCooldownReady() then
+		ability:StartCooldown(cooldown)
+		caster:EmitSound("Hero_LifeStealer.OpenWounds.Cast")
+		caster:Heal(caster:GetAttackDamage() * ability:GetSpecialValueFor("lifesteal") / 100, caster)
+		SendOverheadEventMessage(nil, OVERHEAD_ALERT_HEAL, caster, caster:GetAttackDamage() * ability:GetSpecialValueFor("lifesteal") / 100, nil)
 
-	Timers:CreateTimer(cooldown, function()
-		ability:ApplyDataDrivenModifier( caster, caster, modifier_lifesteal, {})
-	end)
+		local lifesteal_pfx = ParticleManager:CreateParticle("particles/generic_gameplay/generic_lifesteal.vpcf", PATTACH_ABSORIGIN_FOLLOW, caster)
+		ParticleManager:SetParticleControl(lifesteal_pfx, 0, caster:GetAbsOrigin())
+		ParticleManager:ReleaseParticleIndex(lifesteal_pfx)
+	end
 end
 
 function KoboldArmy( keys )

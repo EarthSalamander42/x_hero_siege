@@ -1,16 +1,23 @@
 function StartPhase2()
+	CustomTimers:IncrementGamePhase() -- Phase 1 to Phase 2
+	CustomTimers.timers_paused = 0
+
 	local DoorObs = Entities:FindAllByName("obstruction_phase2_1")
+
 	for _, obs in pairs(DoorObs) do 
 		obs:SetEnabled(false, true)
 	end
+
 	DoEntFire("door_phase2_left", "SetAnimation", "gate_entrance002_open", 0, nil, nil)
 	Phase2CreepsLeft()
 
 	if PlayerResource:GetPlayerCount() > 1 then
 		local DoorObs = Entities:FindAllByName("obstruction_phase2_2")
+
 		for _, obs in pairs(DoorObs) do 
 			obs:SetEnabled(false, true)
 		end
+
 		DoEntFire("door_phase2_right", "SetAnimation", "gate_entrance002_open", 0, nil, nil)
 		Phase2CreepsRight()
 	end
@@ -19,8 +26,6 @@ function StartPhase2()
 		CREEP_LANES[c][1] = 0
 		CREEP_LANES[c][3] = 0
 	end
-
-	Notifications:TopToAll({text="Destroyer Magnataurs killed! Phase 2 incoming...", style={color="white"}, duration=5.0})
 end
 
 function Phase2CreepsLeft()
@@ -29,33 +34,31 @@ function Phase2CreepsLeft()
 	local difficulty = GameRules:GetCustomGameDifficulty()
 	local wave_count = 0
 
-	Timers:CreateTimer(0, function()
-		if not EntIceTower:IsNull() and SPECIAL_EVENT ~= 1 then
-			if wave_count == 15 then
-				EndPhase2()
-				return nil
-			end
+	Timers:CreateTimer(function()
+		if not EntIceTower:IsNull() and CustomTimers.timers_paused == 0 then
 			wave_count = wave_count + 1
+
 			for j = 1, 8 do
 				local unit = CreateUnitByName("npc_ghul_II", point+RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-				unit:SetBaseDamageMin(unit:GetAverageTrueAttackDamage(unit) + (PHASE_2_UPGRADE["damage"][difficulty] * wave_count))
-				unit:SetBaseDamageMax(unit:GetAverageTrueAttackDamage(unit) + (PHASE_2_UPGRADE["damage"][difficulty] * wave_count) * 1.1)
+				unit:SetBaseDamageMin(unit:GetRealDamageDone(unit) + (PHASE_2_UPGRADE["damage"][difficulty] * wave_count))
+				unit:SetBaseDamageMax(unit:GetRealDamageDone(unit) + (PHASE_2_UPGRADE["damage"][difficulty] * wave_count) * 1.1)
 				unit:SetMaxHealth(unit:GetMaxHealth() + (PHASE_2_UPGRADE["health"][difficulty] * wave_count))
+				unit:SetBaseMaxHealth(unit:GetMaxHealth() + (PHASE_2_UPGRADE["health"][difficulty] * wave_count))
 				unit:SetHealth(unit:GetMaxHealth())
-				unit:SetPhysicalArmorBaseValue(unit:GetPhysicalArmorValue() + (PHASE_2_UPGRADE["armor"][difficulty] * wave_count))
-				if not unit.OverHeadCandy then 
-					unit.OverHeadCandy = ParticleManager:CreateParticle("particles/hw_fx/candy_carrying_stack.vpcf", PATTACH_OVERHEAD_FOLLOW, unit)
-					ParticleManager:SetParticleControl(unit.OverHeadCandy, 0, unit:GetAbsOrigin())
+				unit:SetPhysicalArmorBaseValue(unit:GetPhysicalArmorValue(false) + (PHASE_2_UPGRADE["armor"][difficulty] * wave_count))
+				if not unit.GrowthOverheadPfx then 
+					unit.GrowthOverheadPfx = ParticleManager:CreateParticle("particles/hw_fx/candy_carrying_stack.vpcf", PATTACH_OVERHEAD_FOLLOW, unit)
+					ParticleManager:SetParticleControl(unit.GrowthOverheadPfx, 0, unit:GetAbsOrigin())
 				end
 				local stack_10 = math.floor(wave_count / 10)
-				ParticleManager:SetParticleControl(unit.OverHeadCandy, 2, Vector(stack_10, wave_count - stack_10*10, 0))
+				ParticleManager:SetParticleControl(unit.GrowthOverheadPfx, 2, Vector(stack_10, wave_count - stack_10*10, 0))
 			end
-		return 30
-		elseif SPECIAL_EVENT == 1 then
-			print("Phase 2 creeps paused, special event!")
-			return 30
+
+			return XHS_CREEPS_INTERVAL
 		elseif EntIceTower:IsNull() then
 			return nil
+		else -- if CustomTimers.timers_paused == 1 or 2
+			return XHS_CREEPS_INTERVAL
 		end
 	end)
 end
@@ -67,24 +70,25 @@ function Phase2CreepsRight()
 	local wave_count = 0
 
 	Timers:CreateTimer(0, function()
-		if not EntIceTower:IsNull() and SPECIAL_EVENT ~= 1 then
+		if not EntIceTower:IsNull() and CustomTimers.timers_paused ~= 1 then
 			wave_count = wave_count + 1
 			for j = 1, 8 do
 				local unit = CreateUnitByName("npc_orc_II", point+RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-				unit:SetBaseDamageMin(unit:GetAverageTrueAttackDamage(unit) + (PHASE_2_UPGRADE["damage"][difficulty] * wave_count))
-				unit:SetBaseDamageMax(unit:GetAverageTrueAttackDamage(unit) + (PHASE_2_UPGRADE["damage"][difficulty] * wave_count) * 1.1)
+				unit:SetBaseDamageMin(unit:GetRealDamageDone(unit) + (PHASE_2_UPGRADE["damage"][difficulty] * wave_count))
+				unit:SetBaseDamageMax(unit:GetRealDamageDone(unit) + (PHASE_2_UPGRADE["damage"][difficulty] * wave_count) * 1.1)
 				unit:SetMaxHealth(unit:GetMaxHealth() + (PHASE_2_UPGRADE["health"][difficulty] * wave_count))
+				unit:SetBaseMaxHealth(unit:GetMaxHealth() + (PHASE_2_UPGRADE["health"][difficulty] * wave_count))
 				unit:SetHealth(unit:GetMaxHealth())
-				unit:SetPhysicalArmorBaseValue(unit:GetPhysicalArmorValue() + (PHASE_2_UPGRADE["armor"][difficulty] * wave_count))
-				if not unit.OverHeadCandy then 
-					unit.OverHeadCandy = ParticleManager:CreateParticle("particles/hw_fx/candy_carrying_stack.vpcf", PATTACH_OVERHEAD_FOLLOW, unit)
-					ParticleManager:SetParticleControl(unit.OverHeadCandy, 0, unit:GetAbsOrigin())
+				unit:SetPhysicalArmorBaseValue(unit:GetPhysicalArmorValue(false) + (PHASE_2_UPGRADE["armor"][difficulty] * wave_count))
+				if not unit.GrowthOverheadPfx then 
+					unit.GrowthOverheadPfx = ParticleManager:CreateParticle("particles/hw_fx/candy_carrying_stack.vpcf", PATTACH_OVERHEAD_FOLLOW, unit)
+					ParticleManager:SetParticleControl(unit.GrowthOverheadPfx, 0, unit:GetAbsOrigin())
 				end
 				local stack_10 = math.floor(wave_count / 10)
-				ParticleManager:SetParticleControl(unit.OverHeadCandy, 2, Vector(stack_10, wave_count - stack_10*10, 0))
+				ParticleManager:SetParticleControl(unit.GrowthOverheadPfx, 2, Vector(stack_10, wave_count - stack_10*10, 0))
 			end
 		return 30
-		elseif SPECIAL_EVENT == 1 then
+		elseif CustomTimers.timers_paused == 1 then
 			return 30
 		elseif EntIceTower:IsNull() then
 			return nil
@@ -105,23 +109,12 @@ function EndPhase2()
 end
 
 function FinalWave()
-	print("Final Wave!")
-	for _, hero in pairs(HeroList:GetAllHeroes()) do
-		if hero:IsRealHero() and hero:GetTeam() == DOTA_TEAM_GOODGUYS then
-			local id = hero:GetPlayerID()
-			local point = Entities:FindByName(nil, "final_wave_player_"..id) -- might cause error with Dark Fundamental?
-			FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
-			hero:AddNewModifier(nil, nil, "modifier_boss_stun", {duration= 30, IsHidden = true})
-			hero:AddNewModifier(nil, nil, "modifier_invulnerable", {duration= 30, IsHidden = true})
-			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
-		end
+	RefreshPlayers()
+	GameRules:SetHeroRespawnEnabled(false)
 
-		GameRules:SetHeroRespawnEnabled(false)
+	TeleportAllHeroes("final_wave_player_", 30.0)
 
-		Timers:CreateTimer(30, function()
-			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
-		end)
-	end
+	EmitSoundOn("yaskar_01.music.ui_hero_select", Entities:FindByClassname(nil, "npc_dota_fort"))
 
 	Timers:CreateTimer(10, function()
 		FinalWaveSpawner("npc_abomination", "npc_banshee", "npc_necro", "npc_magnataur", "npc_dota_hero_balanar", 0, "west", "final_wave_player_2")
@@ -140,6 +133,8 @@ function FinalWave()
 	end)
 
 	Timers:CreateTimer(31, function()
+		StopSoundOn("yaskar_01.music.ui_hero_select", Entities:FindByClassname(nil, 'npc_dota_fort'))
+
 		local units = FindUnitsInRadius(DOTA_TEAM_NEUTRALS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_ALL, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false )
 		local number = 0
 

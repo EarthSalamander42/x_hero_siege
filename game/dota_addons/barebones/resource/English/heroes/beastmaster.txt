@@ -1,0 +1,18 @@
+//BEASTMASTER
+"DOTA_Tooltip_ability_holdout_bear_stun"						"Bear Stun"
+"DOTA_Tooltip_ability_holdout_bear_stun_Description"			"Stun all enemies around after a short delay."
+"DOTA_Tooltip_ability_holdout_bear_stun_delay"					"DELAY:"
+"DOTA_Tooltip_ability_holdout_bear_stun_radius"					"RADIUS:"
+"DOTA_Tooltip_ability_holdout_bear_stun_duration"				"STUN DURATION:"
+"DOTA_Tooltip_ability_holdout_bear_stun_damage"					"DAMAGE:"
+
+"DOTA_Tooltip_ability_holdout_beastmaster_stampede"						"Stampede"
+"DOTA_Tooltip_ability_holdout_beastmaster_stampede_Description"			"Calls down hordes of rampaging thunder lizards to explode upon the Beastmaster's enemies."
+"DOTA_Tooltip_ability_holdout_beastmaster_stampede_lizard_damage"		"LIZARD DAMAGE:"
+"DOTA_Tooltip_ability_holdout_beastmaster_stampede_duration"			"DURATION:"
+"DOTA_Tooltip_ability_holdout_beastmaster_stampede_speed"				"SPEED:"
+"DOTA_Tooltip_ability_holdout_beastmaster_stampede_distance"			"DISTANCE:"
+"DOTA_Tooltip_ability_holdout_beastmaster_stampede_collision_radius"	"COLLISION RADIUS:"
+"DOTA_Tooltip_ability_holdout_beastmaster_stampede_lizards_per_sec"		"LIZARDS PER SEC:"
+"DOTA_Tooltip_ability_holdout_beastmaster_stampede_spawn_radius"		"SPAWN RADIUS:"
+"DOTA_Tooltip_ability_holdout_beastmaster_stampede_roar_interval"		"ROAR INTERVAL:"

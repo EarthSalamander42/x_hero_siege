@@ -1,0 +1,4 @@
+"tooltip_event_hero_image"				"Hero Image \n(x4 stats)"
+"tooltip_event_spirit_beast"			"Spirit Beast"
+"tooltip_event_frost_infernal"			"Frost Infernal"
+"tooltip_event_all_hero_images"			"All Hero Images \n(x2 stats)"

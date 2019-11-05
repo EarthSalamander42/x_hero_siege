@@ -1,0 +1,9 @@
+<root>
+	<scripts>
+		<include src="file://{resources}/scripts/custom_game/util.js" />
+		<include src="s2r://panorama/scripts/custom_game/playertables/playertables_base.js" />
+		<include src="s2r://panorama/scripts/custom_game/gold.js" />
+	</scripts>
+
+	<Panel hittest="false"/>
+</root>

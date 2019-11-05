@@ -1,5 +1,5 @@
 function GetReductionFromArmor(armor)
-	return ( 0.052 * armor ) / ( 0.9 + 0.048 * armor)
+	return ((0.052 * armor) / (0.9 + 0.048 * armor))
 end
 
 function CDOTA_BaseNPC:GetLifesteal()
@@ -19,7 +19,7 @@ end
 
 function CDOTA_BaseNPC:GetRealDamageDone(hTarget)
 	local base_damage = self:GetAverageTrueAttackDamage(hTarget)
-	local armor_reduction = GetReductionFromArmor(hTarget:GetPhysicalArmorValue())
+	local armor_reduction = GetReductionFromArmor(hTarget:GetPhysicalArmorValue(false))
 	return base_damage - (base_damage * armor_reduction)
 end
 
@@ -87,6 +87,58 @@ function CDOTA_BaseNPC:RemoveItemByName(ItemName, bStash)
 				break
 			end
 		end
+	end
+end
+
+function CDOTA_BaseNPC:IncrementAttributes(amount, bAll)
+	local bSoundPlayed = false
+
+	if self:HasModifier("modifier_tome_of_stats") then
+		self:FindModifierByName("modifier_tome_of_stats"):SetStackCount(self:FindModifierByName("modifier_tome_of_stats"):GetStackCount() + amount)
+	else
+		self:AddNewModifier(self, nil, "modifier_tome_of_stats", {}):SetStackCount(amount)
+	end
+
+	if not self.GetPlayerID then return end
+
+	local tome_net_table = CustomNetTables:GetTableValue("battlepass_item_effects", tostring(self:GetPlayerID()))
+
+	if tome_net_table then
+--[[
+		if IsInToolsMode() then
+			print("Tome pfx:", tome_net_table.tome_stats["effect1"])
+
+			for k, v in pairs(tome_net_table) do
+				print(k, v)
+			end
+
+			for k, v in pairs(tome_net_table.tome_stats) do
+				print(k, v)
+			end
+		end
+--]]
+		local particle1 = ParticleManager:CreateParticle(tome_net_table.tome_stats["effect1"], PATTACH_ABSORIGIN_FOLLOW, self)
+		ParticleManager:SetParticleControl(particle1, 0, self:GetAbsOrigin())
+
+		if bAll == true and bSoundPlayed == false then
+			bSoundPlayed = true
+			self:EmitSound("ui.trophy_levelup")
+		end
+	end
+
+	self:CalculateStatBonus()
+end
+
+-- credits to yahnich for the following
+function CDOTA_BaseNPC:IsFakeHero()
+	if self:IsIllusion() or (self:HasModifier("modifier_monkey_king_fur_army_soldier") or self:HasModifier("modifier_monkey_king_fur_army_soldier_hidden")) or self:IsTempestDouble() or self:IsClone() then
+		return true
+	else return false end
+end
+
+function CDOTA_BaseNPC:IsRealHero()
+	if not self:IsNull() then
+		return self:IsHero() and not ( self:IsIllusion() or self:IsClone() ) and not self:IsFakeHero()
 	end
 end
 

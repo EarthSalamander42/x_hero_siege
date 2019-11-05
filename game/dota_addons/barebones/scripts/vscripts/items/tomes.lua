@@ -1,21 +1,41 @@
-function TomeOfStats(event)
-local hero = event.caster
-local ability = event.ability
-local stats = ability:GetSpecialValueFor("stat_bonus")
+item_tome_small = item_tome_small or class({})
 
-	hero:ModifyAgility(stats)
-	hero:ModifyStrength(stats)
-	hero:ModifyIntellect(stats)
-	local particle1 = ParticleManager:CreateParticle("particles/econ/events/ti6/hero_levelup_ti6.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
-	ParticleManager:SetParticleControl(particle1, 0, hero:GetAbsOrigin())
-	hero:EmitSound("ui.trophy_levelup")
+function item_tome_small:OnSpellStart()
+	if not IsServer() then return end
+
+	self:GetCaster():IncrementAttributes(self:GetSpecialValueFor("stat_bonus"))
+	self:SpendCharge()
+end
+
+item_tome_big = item_tome_big or class({})
+
+function item_tome_big:OnSpellStart()
+	if not IsServer() then return end
+
+	self:GetCaster():IncrementAttributes(self:GetSpecialValueFor("stat_bonus"))
+	self:SpendCharge()
 end
 
 function TomeOfPower(event)
-	local hero = event.caster
-	local level = hero:GetLevel()
-	print(level)
-	if IsValidEntity(hero) and level < 30 then 
-		hero:AddExperience(XP_PER_LEVEL_TABLE[level+1]-XP_PER_LEVEL_TABLE[level] , DOTA_ModifyXP_Unspecified , false, true)
+	if IsValidEntity(event.caster) and event.caster:GetLevel() < 30 then 
+		event.caster:AddExperience(XP_PER_LEVEL_TABLE[level+1]-XP_PER_LEVEL_TABLE[hero:GetLevel()] , DOTA_ModifyXP_Unspecified , false, true)
 	end
 end
+
+modifier_tome_of_stats = modifier_tome_of_stats or class({})
+
+function modifier_tome_of_stats:IsHidden() return true end
+function modifier_tome_of_stats:IsPurgable() return false end
+function modifier_tome_of_stats:IsPurgeException() return false end
+function modifier_tome_of_stats:IsDebuff() return false end
+function modifier_tome_of_stats:RemoveOnDeath() return false end
+
+function modifier_tome_of_stats:DeclareFunctions() return {
+	MODIFIER_PROPERTY_STATS_STRENGTH_BONUS,
+	MODIFIER_PROPERTY_STATS_AGILITY_BONUS,
+	MODIFIER_PROPERTY_STATS_INTELLECT_BONUS,
+} end
+
+function modifier_tome_of_stats:GetModifierBonusStats_Strength() return self:GetStackCount() end
+function modifier_tome_of_stats:GetModifierBonusStats_Agility() return self:GetStackCount() end
+function modifier_tome_of_stats:GetModifierBonusStats_Intellect() return self:GetStackCount() end

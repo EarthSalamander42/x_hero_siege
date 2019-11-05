@@ -1,0 +1,91 @@
+// Flyout Scoreboard
+"xhs_holdout"									"Azeroth"
+"xhs_bosses"									"Azeroth"
+
+"Dungeon_Zone"														"Zone"
+"Dungeon_ZoneTime"													"Zone Time"
+"Dungeon_Scoreboard_Kills"											"Kills"
+"Dungeon_Scoreboard_Deaths"											"Deaths"
+"Dungeon_Scoreboard_GoldBags"										"GoldBags"
+"Dungeon_Scoreboard_Potions"										"Potions"
+"Dungeon_Scoreboard_Total"											"Total"
+
+"Dungeon_ZoneDesc_xhs_holdout"					"Lich King's army is trying to destroy your basement, you must defend it!"
+
+"DOTA_TI7_CampaignDetails_Zone01_1_Req"			"Die less than 7 times."
+"DOTA_TI7_CampaignDetails_Zone01_2_Req"			"Die less than 4 times."
+"DOTA_TI7_CampaignDetails_Zone01_3_Req"			"Don't die once."
+
+// Quests
+"DOTA_XHS_Quests"								"Quests"
+
+"defend_castle"									"Defend the Castle"
+"kill_rax"										"Phase 1: Survive until Farm Event (18 minutes)"
+"kill_dest_mag"									"Survive the Destroyer Magnataurs wave"
+"kill_ice_towers"								"Phase 2: Survive until Final Wave (27 minutes)"
+"kill_final_wave"								"Defeat Final Wave"
+"teleport_top"									"Talk to Shal Lightbinder"
+"teleport_arthas"								"Talk to Uther Lightbringer"
+"kill_mag"										"Phase 3: Defeat Magtheridon"
+"kill_grom"										"Defeat Grom Hellscream"
+"kill_illidan"									"Defeat Illidan Stormrage"
+"kill_balanar"									"Defeat Balanar"
+"kill_proudmoore"								"Defeat Admiral Proudmoore"
+"kill_arthas"									"Defeat Arthas"
+"kill_banehallow"								"Defeat Banehallow"
+"kill_lich_king"								"Defeat Lich King (Undead Arthas)"
+"kill_spirit_master"							"Defeat Spirit Master"
+"kill_spirit_master_remnants"					"Defeat Spirit Master Remnants"
+
+//INTRO
+"DOTA_Siltbreaker_Quests"								"QUESTS"
+"DOTA_Siltbreaker_ContinueSpeechText"					"Ready"
+"DOTA_Siltbreaker_PreviousZone"							"Previous Zone"
+"DOTA_Siltbreaker_NextZone"								"Next Zone"
+"DOTA_Siltbreaker_Disconnect"							"Leave"
+"DOTA_Siltbreaker_Continue"								"Continue"
+"DOTA_Siltbreaker_Failure"								"Dark Warriors win!"
+"DOTA_Siltbreaker_Success"								"Light Warriors win!"
+"DOTA_Siltbreaker_RelicsButton"							"Artifacts"
+"DOTA_Siltbreaker_PersonalBestTime"						"Personal Best: {s:best_time}"
+
+// Items
+"npc_dota_crate"								"Wooden Crate"
+"DOTA_Tooltip_ability_item_tombstone"			"Revive Ally Hero!"
+"DOTA_Chat_Tombstone_Pinged"					"Fallen teammate here."
+
+"DOTA_Tooltip_ability_item_bag_of_gold"								"Bag of Gold"
+"DOTA_Tooltip_Ability_item_life_rune"								"Life Rune"
+"DOTA_Tooltip_ability_item_book_of_strength"						"Book of Strength"
+"DOTA_Tooltip_ability_item_book_of_strength_Description"			"Consume to gain 3 Strength permanently."
+"DOTA_Tooltip_ability_item_book_of_agility"							"Book of Agility"
+"DOTA_Tooltip_ability_item_book_of_agility_Description"				"Consume to gain 3 Agility permanently."
+"DOTA_Tooltip_ability_item_book_of_intelligence"					"Book of Intelligence"
+"DOTA_Tooltip_ability_item_book_of_intelligence_Description"		"Consume to gain 3 Intelligence permanently."
+
+"DOTA_Tooltip_modifier_campfire_effect"								"Campfire Warmth"
+"DOTA_Tooltip_modifier_campfire_effect_Description"					"The campfire warms you, warding off the Bonefrost as well as regenerating 30 health and 20 mana per second."
+
+"DOTA_Tooltip_modifier_book_of_strength"							"Book of Strength"
+"DOTA_Tooltip_modifier_book_of_strength_Description"				"Strength gained from consumed Books."
+"DOTA_Tooltip_modifier_book_of_agility"								"Book of Agility"
+"DOTA_Tooltip_modifier_book_of_agility_Description"					"Agility gained from consumed Books."
+"DOTA_Tooltip_modifier_book_of_intelligence"						"Book of Intelligence"
+"DOTA_Tooltip_modifier_book_of_intelligence_Description"			"Intelligence gained from consumed Books."
+
+// Pickup Messages
+"Dungeon_FoundChestItem"											"{s:player_name} found a treasure containing: {s:locstring_value}"
+"Dungeon_FoundChestGold"											"{s:player_name} found a treasure containing: <font color='#ffd825'>{d:int_value}</font><panel class='CombatEventGoldIcon'/>"
+"Dungeon_FoundChestTrap"											"{s:player_name} found a treasure containing: <font color='#ffd825'>{s:locstring_value}</font>!"
+"Dungeon_FoundLifeRune"												"{s:player_name} found a {s:locstring_value}!"
+"Dungeon_FoundNewRelic"												"{s:player_name} found a new Artifact: <font color='#4ae0bf'>{s:locstring_value}</font>!"
+"Dungeon_KilledByCreature"											"{s:player_name} was killed by {s:locstring_value}"
+"Dungeon_ReachedCheckpoint"											"{s:player_name} reached a new checkpoint!"
+"Dungeon_KeyItem"													"{s:player_name} found a Quest Item: {s:locstring_value}!"
+"Dungeon_Rune"														"{s:player_name} picked up a rune: {s:locstring_value}!"
+
+//VIPS
+"npc_xhs_paladin"						"Shal Lightbinder"
+"npc_xhs_paladin_2"						"Uther Lightbringer"
+"Dialog_ForestChief_DefendTheCamp"		"Good job on defending the Castle! The teleport spell is ready, tell me when you're ready."
+"Dialog_ForestChief_DefendTheCamp2"		"You have defeated the servants of Arthas! You are ready to face him. The teleport spell is ready, tell me when you're ready."

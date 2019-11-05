@@ -1,6 +1,6 @@
 "use strict";
 
-function GameTimer(data)
+function CountdownTimer(data)
 {
 	var timerText = "";
 	timerText += data.timer_minute_10;
@@ -9,103 +9,9 @@ function GameTimer(data)
 	timerText += data.timer_second_10;
 	timerText += data.timer_second_01;
 
-	$("#GameTimer").text = timerText;
-}
+//	$.Msg(data.timer_name)
 
-function TimerSpecialEvents(data)
-{
-	var timerText = "";
-	timerText += data.timer_minute_10;
-	timerText += data.timer_minute_01;
-	timerText += ":";
-	timerText += data.timer_second_10;
-	timerText += data.timer_second_01;
-
-	$("#SpecialEventsTimer").text = timerText;
-}
-
-function TimerIncomingWave(data)
-{
-	var timerText = "";
-	timerText += data.timer_minute_10;
-	timerText += data.timer_minute_01;
-	timerText += ":";
-	timerText += data.timer_second_10;
-	timerText += data.timer_second_01;
-
-	$("#IncomingWaveTimer").text = timerText;
-}
-
-function TimerCreepLevel(data)
-{
-	var timerText = "";
-	timerText += data.timer_minute_10;
-	timerText += data.timer_minute_01;
-	timerText += ":";
-	timerText += data.timer_second_10;
-	timerText += data.timer_second_01;
-
-	$("#CreepLevelTimer").text = timerText;
-}
-
-function TimerSpecialArena(data)
-{
-	var timerText = "";
-	timerText += data.timer_minute_10;
-	timerText += data.timer_minute_01;
-	timerText += ":";
-	timerText += data.timer_second_10;
-	timerText += data.timer_second_01;
-
-	$("#SpecialArenaTimer").text = timerText;
-}
-
-function TimerHeroImage(data)
-{
-	var timerText = "";
-	timerText += data.timer_minute_10;
-	timerText += data.timer_minute_01;
-	timerText += ":";
-	timerText += data.timer_second_10;
-	timerText += data.timer_second_01;
-
-	$("#HeroImageTimer").text = timerText;
-}
-
-function TimerSpiritBeastHeroImage(data)
-{
-	var timerText = "";
-	timerText += data.timer_minute_10;
-	timerText += data.timer_minute_01;
-	timerText += ":";
-	timerText += data.timer_second_10;
-	timerText += data.timer_second_01;
-
-	$("#SpiritBeastTimer").text = timerText;
-}
-
-function TimerFrostInfernalHeroImage(data)
-{
-	var timerText = "";
-	timerText += data.timer_minute_10;
-	timerText += data.timer_minute_01;
-	timerText += ":";
-	timerText += data.timer_second_10;
-	timerText += data.timer_second_01;
-
-	$("#FrostInfernalTimer").text = timerText;
-}
-
-function TimerAllHeroImage(data)
-{
-	var timerText = "";
-	timerText += data.timer_minute_10;
-	timerText += data.timer_minute_01;
-	timerText += ":";
-	timerText += data.timer_second_10;
-	timerText += data.timer_second_01;
-
-	$("#AllHeroImageTimer").text = timerText;
+	$("#GameTimer_" + data.timer_name).text = timerText;
 }
 
 function ShowTimerBar() {
@@ -161,22 +67,13 @@ function SpecialEventLabelFinal() {
 }
 
 function Difficulty(args) {
-	$.Msg(args.difficulty)
 	$("#DifficultyGame").color = "red";
 	$("#DifficultyGame").text = args.difficulty;
 }
 
 (function()
 {
-	GameEvents.Subscribe("timer_game", GameTimer);
-	GameEvents.Subscribe("timer_special_event", TimerSpecialEvents);
-	GameEvents.Subscribe("timer_incoming_wave", TimerIncomingWave);
-	GameEvents.Subscribe("timer_creep_level", TimerCreepLevel);
-	GameEvents.Subscribe("timer_special_arena", TimerSpecialArena);
-	GameEvents.Subscribe("timer_hero_image", TimerHeroImage);
-	GameEvents.Subscribe("timer_spirit_beast", TimerSpiritBeastHeroImage);
-	GameEvents.Subscribe("timer_frost_infernal", TimerFrostInfernalHeroImage);
-	GameEvents.Subscribe("timer_all_hero_image", TimerAllHeroImage);
+	GameEvents.Subscribe("countdown_timer", CountdownTimer);
 	GameEvents.Subscribe("show_timer_bar", ShowTimerBar);
 	GameEvents.Subscribe("show_timer_special_arena", ShowTimerSpecialArena);
 	GameEvents.Subscribe("show_timer_hero_image", ShowTimerHeroImage);

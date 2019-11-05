@@ -40,16 +40,13 @@ function modifier_lifesteal:OnAttackLanded(keys)
 
 		-- Calculate actual lifesteal amount
 		local damage = keys.damage
-		local target_armor = target:GetPhysicalArmorValue()
+		local target_armor = target:GetPhysicalArmorValue(false)
 		local heal = damage * lifesteal_amount * 0.01 * GetReductionFromArmor(target_armor) * 0.01
 		SendOverheadEventMessage(nil, OVERHEAD_ALERT_HEAL, parent, heal, nil)
 
-		-- Choose the particle to draw
-		local lifesteal_particle = "particles/generic_gameplay/generic_lifesteal.vpcf"
-
 		-- Heal and fire the particle
 		attacker:Heal(heal, attacker)
-		local lifesteal_pfx = ParticleManager:CreateParticle(lifesteal_particle, PATTACH_ABSORIGIN_FOLLOW, attacker)
+		local lifesteal_pfx = ParticleManager:CreateParticle(self.particle_lifesteal, PATTACH_ABSORIGIN_FOLLOW, attacker)
 		ParticleManager:SetParticleControl(lifesteal_pfx, 0, attacker:GetAbsOrigin())
 		ParticleManager:ReleaseParticleIndex(lifesteal_pfx)
 	end

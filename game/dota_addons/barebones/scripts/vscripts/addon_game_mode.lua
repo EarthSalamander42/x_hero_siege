@@ -13,8 +13,8 @@ function Precache(context)
 	LinkLuaModifier("modifier_stack_count_animation_controller", "modifiers/modifier_stack_count_animation_controller", LUA_MODIFIER_MOTION_NONE)
 	LinkLuaModifier("modifier_disable_aggro", "modifiers/modifier_disable_aggro", LUA_MODIFIER_MOTION_NONE)
 	LinkLuaModifier("modifier_magical_resistance_fix", "modifiers/modifier_magical_resistance_fix", LUA_MODIFIER_MOTION_NONE)
-	LinkLuaModifier("modifier_armor_gain_fix", "modifiers/modifier_armor_gain_fix", LUA_MODIFIER_MOTION_NONE)
-	LinkLuaModifier("modifier_companion", "modifiers/modifier_companion", LUA_MODIFIER_MOTION_NONE)
+	LinkLuaModifier("modifier_tome_of_stats", "items/tomes.lua", LUA_MODIFIER_MOTION_NONE)
+--	LinkLuaModifier("modifier_armor_gain_fix", "modifiers/modifier_armor_gain_fix", LUA_MODIFIER_MOTION_NONE)
 
 	-- Not used currently
 --	PrecacheResource("particle", "particles/units/heroes/hero_dazzle/dazzle_armor_enemy_ring_sink.vpcf", context) -- Armor Rune Effect (not used)

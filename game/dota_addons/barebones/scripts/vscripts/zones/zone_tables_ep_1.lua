@@ -277,6 +277,23 @@ _G.ZonesDefinition =
 				},
 				nCompleteLimit = 1,
 			},
+			{
+				szQuestName = "kill_spirit_master",
+				szQuestType = "Kill",
+				Activators = 
+				{
+					{
+						Type = QUEST_EVENT_ON_QUEST_COMPLETE,
+						szQuestName = "kill_lich_king",
+					},			
+				},
+				Completion = 
+				{	
+					Type = QUEST_EVENT_ON_ENEMY_KILLED,
+					szNPCName ="npc_dota_boss_spirit_master",
+				},
+				nCompleteLimit = 1,
+			},
 		},
 		VIPs =
 		{

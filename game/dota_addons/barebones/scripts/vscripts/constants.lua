@@ -1,9 +1,16 @@
+CUSTOM_GAME_TYPE = "XHS"
+
+_G.GAME_VERSION = "3.50"
+CustomNetTables:SetTableValue("game_options", "game_version", {game_version = GAME_VERSION, game_type = CUSTOM_GAME_TYPE})
+CustomNetTables:SetTableValue("game_options", "game_count", {value = 1})
+
 -- General
 _G.nBASE_GOLD_BAG_DROP_RATE = 30
 _G.nCHECKPOINT_REVIVES = 1
 _G.nREVIVE_COST = 1
 _G.nBUYBACK_COST = 1
 _G.nREVIVE_HP_PCT = 25
+_G.INIT_CHOOSE_HERO = false
 
 -- Creature
 _G.nROAMER_MAX_DIST_FROM_SPAWN = 2048
@@ -45,31 +52,17 @@ _G.ZONE_STAR_CRITERIA_KILLS				= 2
 _G.ZONE_STAR_CRITERIA_QUEST_COMPLETE	= 3
 
 -- X Hero Siege
-_G.X_HERO_SIEGE_V = 3.48
-_G.PREGAMETIME = 125
-_G.nTimer_GameTime = 0
-_G.nTimer_SpecialEvent = 0
-_G.nTimer_IncomingWave = 0
-_G.nTimer_CreepLevel = 0
-_G.nTimer_SpecialArena = 0
-_G.nTimer_HeroImage = 0
-_G.nTimer_SpiritBeast = 0
-_G.nTimer_FrostInfernal = 0
-_G.nTimer_AllHeroImage = 0
-_G.time_elapsed = 0
+_G.PREGAMETIME = 90.0
+_G.SPECIAL_ARENA_DURATION = 120.0
 _G.RAMERO = 0
 _G.MAGTHERIDON = 0
 _G.FOUR_BOSSES = 0
 _G.SPIRIT_MASTER = 0
-_G.SPECIAL_EVENT = 0
-_G.PlayerNumberRadiant = 0
-_G.PlayerNumberDire = 0
 _G.sword_first_time = true
 _G.ring_first_time = true
 _G.doom_first_time = false
 _G.frost_first_time = false
 _G.SECRET = 0
-_G.PHASE = 1
 _G.RESPAWN_TIME = 40.0
 _G.CREEP_LANES_TYPE = 1
 if GetMapName() == "x_hero_siege_4" then
@@ -77,17 +70,12 @@ if GetMapName() == "x_hero_siege_4" then
 end
 _G.BT_ENABLED = 1
 _G.MURADIN_DEFEND = false
-_G.STORM_SPIRIT = 0
+_G.STORM_SPIRIT = 0 -- removed boss
 _G.ALL_HERO_IMAGE_DEAD = 0
 
 _G.FrostInfernal_killed = 0
-_G.FrostInfernal_occuring = 0
 _G.SpiritBeast_killed = 0
-_G.SpiritBeast_occuring = 0
-_G.HeroImage_occuring = 0
-_G.AllHeroImages_occuring = 0
 _G.AllHeroImagesDead = 0
-_G.FrostTowers_killed = 0
 _G.BossesTop_killed = 0
 
 GameMode.FrostInfernal_killed = 0
@@ -98,7 +86,6 @@ GameMode.SpecialArena_occuring = 0
 GameMode.HeroImage_occuring = 0
 GameMode.AllHeroImages_occuring = 0
 GameMode.AllHeroImagesDead = 0
-GameMode.FrostTowers_killed = 0
 GameMode.BossesTop_killed = 0
 GameMode.creep_roll = {}
 GameMode.creep_roll["race"] = 0
@@ -206,12 +193,6 @@ PHASE_2_UPGRADE["damage"] =	{25, 50, 75, 100, 125}
 PHASE_2_UPGRADE["health"] =	{200, 400, 600, 800, 1000}
 PHASE_2_UPGRADE["armor"] =	{0, 0, 0, 0, 0}
 
-_G.vip_members = {
-	4173154700,
-	2086577350
-
-}
-
 _G.banned_players = {
 	151018319, -- Mohammad Mehdi Akhondi
 }
@@ -278,7 +259,7 @@ AbilitiesHeroes_XX = {
 }
 
 _G.innate_abilities = {
-	"dummy_passive_vulnerable_wisp",
+	"wisp_passives",
 	"serpent_splash_arrows",
 	"neutral_spell_immunity",
 	"holdout_innate_lunar_glaive",
@@ -330,7 +311,7 @@ _G.innate_abilities = {
 	"holdout_stitch",
 	"troll_warlord_berserkers_rage",
 	"holdout_lich_king_effects",
-	"holdout_random_hero",
+	"wisp_pick_random_hero",
 	"holdout_spellsteal",
 	"bristleback_warpath",
 	"iron_man_misc",
@@ -388,6 +369,7 @@ _G.difficulty_abilities = {
 	"arthas_frostmourne",
 	"baristol_holy_light",
 	"chaos_knight_chaos_strike",
+	"muradin_avatar",
 }
 
 -- Abilities cast only if more than 1 player
@@ -401,23 +383,26 @@ _G.XHS_LIFESTEAL_MODIFIER_PRIORITY["modifier_lightning_sword_lifesteal"] = 1
 _G.XHS_LIFESTEAL_MODIFIER_PRIORITY["modifier_lifesteal"] = 2
 _G.XHS_LIFESTEAL_MODIFIER_PRIORITY["modifier_xhs_vampiric_aura"] = 3
 
-DONATOR_COLOR = {}
-DONATOR_COLOR[0] = {33, 39, 47} -- Not a donator
-DONATOR_COLOR[1] = {135, 20, 20} -- IMBA Lead-Developer
-DONATOR_COLOR[2] = {100, 20, 20} -- IMBA Developer
-DONATOR_COLOR[3] = {0, 102, 255} -- Administrator
-DONATOR_COLOR[4] = {220, 40, 40} -- Ember Donator
-DONATOR_COLOR[5] = {218, 165, 32} -- Golden Donator
-DONATOR_COLOR[6] = {0, 204, 0} -- Green Donator (basic)
-DONATOR_COLOR[8] = {47, 91, 151} -- Salamander Donator (blue)
-DONATOR_COLOR[7] = {153, 51, 153} -- Icefrog Donator (purple)
-DONATOR_COLOR[9] = {185, 75, 10} -- Gaben Donator
-DONATOR_COLOR[10] = {255, 255, 255}
+MODIFIER_ITEMS_WITH_LEVELS = {}
+MODIFIER_ITEMS_WITH_LEVELS["modifier_lifesteal"] = {
+	"item_doom_artifact",
+	"item_lightning_sword",
+	"item_lifesteal_mask",
+}
+MODIFIER_ITEMS_WITH_LEVELS["modifier_orb_of_darkness_active"] = {
+	"item_bracer_of_the_void",
+	"item_orb_of_darkness2",
+	"item_orb_of_darkness",
+}
+MODIFIER_ITEMS_WITH_LEVELS["modifier_orb_of_lightning_active"] = {
+	"item_celestial_claws",
+	"item_orb_of_lightning2",
+	"item_orb_of_lightning",
+}
 
 XHS_CREEPS_INTERVAL = 20.0
 XHS_SPECIAL_EVENT_INTERVAL = 540.0 -- 9 min (has to be a multiple of 3)
 XHS_SPECIAL_WAVE_INTERVAL = XHS_SPECIAL_EVENT_INTERVAL / 3 -- 3 min
-XHS_SPECIAL_INITIAL_WAVE_DELAY = XHS_SPECIAL_WAVE_INTERVAL -- 3 min
 XHS_CREEPS_UPGRADE_INTERVAL = XHS_SPECIAL_EVENT_INTERVAL / 2 -- 4:30
 XHS_PHASE_2_DELAY = 420.0 -- 7 min
 

@@ -30,15 +30,8 @@ end
 
 function xhs_blademaster_mirror_image:OnSpellStart()
 	if IsClient() then return end
-	local caster = self:GetCaster()
-	local caster_entid = caster:entindex()
-	local ability = self
-	local delay = ability:GetSpecialValueFor("invuln_duration")
-	local image_count = ability:GetSpecialValueFor("images_count")
-	local image_out_dmg = ability:GetSpecialValueFor("outgoing_damage")
-	local image_in_dmg = ability:GetSpecialValueFor("incoming_damage")
-	local image_duration = ability:GetSpecialValueFor("illusion_duration")
-	local distance_between_illusions = 150
+
+	local distance_between_illusions = 108
 	local vRandomSpawnPos = {
 		Vector( distance_between_illusions, 0, 0 ),
 		Vector( distance_between_illusions, distance_between_illusions, 0 ),
@@ -49,36 +42,56 @@ function xhs_blademaster_mirror_image:OnSpellStart()
 		Vector( -distance_between_illusions, -distance_between_illusions, 0 ),
 		Vector( 0, -distance_between_illusions, 0 ),
 	}
-	local particle = "particles/items2_fx/manta_phase.vpcf"
---	local particle2 = "particles/units/heroes/hero_siren/blademaster_riptide_foam.vpcf"
-	local part = ParticleManager:CreateParticle(particle, PATTACH_ABSORIGIN, caster)
-	local buff = caster:AddNewModifier(caster, ability, "modifier_xhs_blademaster_mirror_image_invulnerable", {})
-	if caster:GetUnitName() == "npc_dota_hero_juggernaut" then
-		EmitSoundOn("Blademaster.MirrorImage", caster)
-	elseif caster:GetUnitName() == "npc_dota_hero_naga_siren" then
-		EmitSoundOn("Hero_NagaSiren.MirrorImage", caster)
-	end
-	caster:SetContextThink( DoUniqueString("blademaster_mirror_image"), function ( )
-		for i=1, image_count do
-			local j = RandomInt(1, #vRandomSpawnPos)
-			local pos = caster:GetAbsOrigin() + vRandomSpawnPos[j]
-			local illusion = IllusionManager:CreateIllusion(caster, self, pos, caster, {damagein=image_in_dmg, damageout=image_out_dmg, unique=caster_entid.."_siren_image_"..i, duration=image_duration})
-			self:SetInventory(illusion) -- not working yet
 
-			table.remove(vRandomSpawnPos,j)
---			local part2 = ParticleManager:CreateParticle(particle2, PATTACH_ABSORIGIN, illusion)
---			ParticleManager:ReleaseParticleIndex(part2)
+	local pfx = ParticleManager:CreateParticle("particles/items2_fx/manta_phase.vpcf", PATTACH_ABSORIGIN, self:GetCaster())
+	self:GetCaster():AddNewModifier(self:GetCaster(), self, "modifier_xhs_blademaster_mirror_image_invulnerable", {duration = self:GetSpecialValueFor("invuln_duration")})
+
+	if self:GetCaster():GetUnitName() == "npc_dota_hero_juggernaut" then
+		EmitSoundOn("Blademaster.MirrorImage", self:GetCaster())
+	elseif self:GetCaster():GetUnitName() == "npc_dota_hero_naga_siren" then
+		EmitSoundOn("Hero_NagaSiren.MirrorImage", self:GetCaster())
+	end
+
+	if self.illusions then
+		for _, illusion in pairs(self.illusions) do
+			if IsValidEntity(illusion) and illusion:IsAlive() then
+				illusion:ForceKill(false)
+			end
 		end
-		ParticleManager:DestroyParticle(part, true)
-		ParticleManager:ReleaseParticleIndex(part)
-		caster:Stop()
-		buff:Destroy()
+	end
+
+	self:GetCaster():SetContextThink(DoUniqueString("blademaster_mirror_image"), function()
+		-- "API Additions - Global (Server): * CreateIllusions( hOwner, hHeroToCopy, hModifierKeys, nNumIllusions, nPadding, bScramblePosition, bFindClearSpace ) Note: See script_help2 for supported modifier keys"
+		self.illusions = CreateIllusions(self:GetCaster(), self:GetCaster(), {
+			outgoing_damage 			= self:GetSpecialValueFor("outgoing_damage"),
+			incoming_damage				= self:GetSpecialValueFor("incoming_damage"),
+			bounty_base					= self:GetCaster():GetLevel() * 2,
+			bounty_growth				= nil,
+			outgoing_damage_structure	= nil,
+			outgoing_damage_roshan		= nil,
+			duration					= self:GetSpecialValueFor("illusion_duration")
+		}, self:GetSpecialValueFor("images_count"), self:GetCaster():GetHullRadius(), true, true)
+
+		for i = 1, #self.illusions do
+			local illusion = self.illusions[i]
+			local pos = self:GetCaster():GetAbsOrigin() + vRandomSpawnPos[i]
+			FindClearSpaceForUnit(illusion, pos, true)
+			local part2 = ParticleManager:CreateParticle("particles/units/heroes/hero_siren/naga_siren_riptide_foam.vpcf", PATTACH_ABSORIGIN, illusion)
+			ParticleManager:ReleaseParticleIndex(part2)
+			illusion:MoveToPositionAggressive(self:GetCaster():GetAbsOrigin())
+--			self:SetInventory(illusion) -- not working yet
+		end
+
+		ParticleManager:DestroyParticle(pfx, false)
+		ParticleManager:ReleaseParticleIndex(pfx)
+
+		self:GetCaster():Stop()
+
 		return nil
-	end, delay)
+	end, self:GetSpecialValueFor("invuln_duration"))
 end
 
 function xhs_blademaster_mirror_image:SetInventory(illusion)
-if type(illusion) ~= "table" then return end
 	local shared_modifiers = {
 		"modifier_rune_armor",
 --		"modifier_rune_immolation",
@@ -94,9 +107,7 @@ end
 
 modifier_xhs_blademaster_mirror_image_invulnerable = modifier_xhs_blademaster_mirror_image_invulnerable or class({})
 
-function modifier_xhs_blademaster_mirror_image_invulnerable:IsHidden()
-	return true
-end
+function modifier_xhs_blademaster_mirror_image_invulnerable:IsHidden() return true end
 
 function modifier_xhs_blademaster_mirror_image_invulnerable:CheckState()
 	local state = 
@@ -112,17 +123,12 @@ end
 
 if modifier_xhs_blademaster_mirror_image_handler == nil then modifier_xhs_blademaster_mirror_image_handler = class({}) end
 function modifier_xhs_blademaster_mirror_image_handler:IsHidden() return true end
-function modifier_xhs_blademaster_mirror_image_handler:IsDebuff() return false end
 function modifier_xhs_blademaster_mirror_image_handler:IsPurgable() return false end
 function modifier_xhs_blademaster_mirror_image_handler:RemoveOnDeath() return false end
 
 function modifier_xhs_blademaster_mirror_image_handler:OnCreated()
 	self:StartIntervalThink(1.0)
 	self:OnIntervalThink()
-
-	if IsServer() then
-		self:GetCaster():AddNewModifier(self:GetCaster(), self:GetAbility(), "modifier_imba_shiva_aura", {})
-	end
 end
 
 function modifier_xhs_blademaster_mirror_image_handler:OnIntervalThink()
@@ -139,4 +145,44 @@ function modifier_xhs_blademaster_mirror_image_handler:OnIntervalThink()
 	if IsClient() then
 		self:GetCaster().mirror_image_icon_client = self:GetStackCount()
 	end
+end
+
+LinkLuaModifier("modifier_blademaster_wardrums_aura", "heroes/hero_blademaster", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_blademaster_wardrums", "heroes/hero_blademaster", LUA_MODIFIER_MOTION_NONE)
+
+blademaster_wardrums_aura = blademaster_wardrums_aura or class({})
+
+function blademaster_wardrums_aura:GetIntrinsicModifierName() return "modifier_blademaster_wardrums_aura" end
+
+modifier_blademaster_wardrums_aura = modifier_blademaster_wardrums_aura or class({})
+
+-- Modifier properties
+function modifier_blademaster_wardrums_aura:IsAura() return true end
+function modifier_blademaster_wardrums_aura:IsAuraActiveOnDeath() return false end
+function modifier_blademaster_wardrums_aura:IsDebuff() return false end
+function modifier_blademaster_wardrums_aura:IsHidden() return true end
+function modifier_blademaster_wardrums_aura:IsPermanent() return true end
+function modifier_blademaster_wardrums_aura:IsPurgable() return false end
+
+-- Aura properties
+function modifier_blademaster_wardrums_aura:GetAuraRadius() return self:GetAbility():GetCastRange() end
+function modifier_blademaster_wardrums_aura:GetAuraSearchFlags() return self:GetAbility():GetAbilityTargetFlags() end
+function modifier_blademaster_wardrums_aura:GetAuraSearchTeam() return self:GetAbility():GetAbilityTargetTeam() end
+function modifier_blademaster_wardrums_aura:GetAuraSearchType() return self:GetAbility():GetAbilityTargetType() end
+function modifier_blademaster_wardrums_aura:GetModifierAura() return "modifier_blademaster_wardrums" end
+
+modifier_blademaster_wardrums = modifier_blademaster_wardrums or class({})
+
+-- Modifier properties
+function modifier_blademaster_wardrums:IsPurgable() return false end
+function modifier_blademaster_wardrums:IsPurgeException() return false end
+
+function modifier_blademaster_wardrums:DeclareFunctions()
+	return {
+		MODIFIER_PROPERTY_DAMAGEOUTGOING_PERCENTAGE,
+	}
+end
+
+function modifier_blademaster_wardrums:GetModifierDamageOutgoing_Percentage()
+	return self:GetStackCount()
 end
