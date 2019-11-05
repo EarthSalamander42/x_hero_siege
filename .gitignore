@@ -16,7 +16,6 @@
 *.vpcf
 *.cfg
 *.tga
-*.vtex_c
 
 # Map files
 *.vmap
