@@ -57,7 +57,6 @@
 "Hero_ButtonCategory"						"Hero"
 "Spawn_ButtonCategory"						"Spawn"
 "Misc_ButtonCategory"						"Customize"
-"Playback_ButtonCategory"					""
 
 "Refresh_Button"							"Refresh"
 "LevelUp_Button"							"Level Up"
@@ -78,7 +77,7 @@
 
 
 // Admin Mod
-"credits_command"							"Mod Created by [Bear] Cookies #42"
+"credits_command"							"Mod created by EarthSalamander."
 "command"									"Commands:"
 "tome_command"								"Buy Tomes: -bt"
 "info_command"								"Info: -info"
