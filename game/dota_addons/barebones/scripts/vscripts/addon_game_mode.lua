@@ -1,4 +1,3 @@
-require("statcollection/init")
 require('internal/util')
 require('internal/vanilla_extension')
 require('gamemode')
