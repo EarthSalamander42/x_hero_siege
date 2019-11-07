@@ -3,7 +3,7 @@
 var api = {
 
 	timeout: 5000,
-	base: "http://api.dota2imba.fr/imba/",
+	base: "http://api.frostrose-studio.com/imba/",
 	endpoints: {
 		meta: {
 			companions: "companions",

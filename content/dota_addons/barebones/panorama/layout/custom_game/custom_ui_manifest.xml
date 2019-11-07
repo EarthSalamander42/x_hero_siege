@@ -170,7 +170,6 @@
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/xhs_events.xml" />
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/xhs_timers.xml" />
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/gold.xml" />
-		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/statcollection.xml" />
 		<CustomUIElement type="EndScreen"			layoutfile="file://{resources}/layout/custom_game/frostrose_end_screen.xml" />
 		<CustomUIElement type="FlyoutScoreboard"	layoutfile="file://{resources}/layout/custom_game/dungeon_scoreboard.xml" />
 	</Panel>
