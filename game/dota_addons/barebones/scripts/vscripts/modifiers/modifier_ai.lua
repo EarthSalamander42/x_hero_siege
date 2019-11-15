@@ -126,7 +126,7 @@ function modifier_ai:OnIntervalThink()
 						ability:ToggleAbility()
 					end
 				elseif bit.band(ability:GetBehavior(), DOTA_ABILITY_BEHAVIOR_NO_TARGET) == DOTA_ABILITY_BEHAVIOR_NO_TARGET then
-					print("Cast No Target:", ability:GetAbilityName())
+--					print("Cast No Target:", ability:GetAbilityName())
 
 					if ability:GetAbilityName() == "arthas_holy_light" then
 						if self:GetParent():GetHealthPercent() <= ability:GetSpecialValueFor("health_threshold") then
@@ -138,12 +138,12 @@ function modifier_ai:OnIntervalThink()
 
 					return
 				elseif bit.band(ability:GetBehavior(), DOTA_ABILITY_BEHAVIOR_POINT) == DOTA_ABILITY_BEHAVIOR_POINT then
-					print("Cast On Ground:", ability:GetAbilityName())
+--					print("Cast On Ground:", ability:GetAbilityName())
 					self:GetParent():CastAbilityOnPosition(enemies[RandomInt(1, #enemies)]:GetAbsOrigin(), ability, -1)
 
 					return
 				elseif bit.band(ability:GetBehavior(), DOTA_ABILITY_BEHAVIOR_UNIT_TARGET) == DOTA_ABILITY_BEHAVIOR_UNIT_TARGET then
-					print("Cast On Target:", ability:GetAbilityName())
+--					print("Cast On Target:", ability:GetAbilityName())
 
 					if self:GetParent():GetTeam() == ability:GetAbilityTargetTeam() then
 						self:GetParent():CastAbilityOnTarget(allies[RandomInt(1, #enemies)], ability, -1)

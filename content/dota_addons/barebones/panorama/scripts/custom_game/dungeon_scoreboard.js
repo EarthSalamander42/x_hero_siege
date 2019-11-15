@@ -71,6 +71,13 @@ function UpdatePlayerImages()
 			playerImage.style.border = "2px solid " + player_info.donator_color;
 		}
 
+		var ImbaXP_Panel = $.GetContextPanel().FindChildTraverse("es-player-xp" + i);
+
+		if (ImbaXP_Panel != undefined && player_info != undefined) {
+			// set xp values
+			_ScoreboardUpdater_UpdatePlayerPanelXP(i, ImbaXP_Panel, player_info);
+		}
+
 		if(i == localPlayerId)
 		{
 			continue;
@@ -273,7 +280,7 @@ function _ScoreboardUpdater_UpdatePlayerPanelXP(playerId, ImbaXP_Panel, player_i
 //	ImbaXP_Panel.BCreateChildren("<Label id='ImbaXP" + playerId + "' text='999'/>");
 //	ImbaXP_Panel.BCreateChildren("<Label id='ImbaXPEarned" + playerId + "' text='+0'/>");
 
-	var steamid = Game.GetPlayerInfo(playerId).player_steamid;
+//	var steamid = Game.GetPlayerInfo(playerId).player_steamid;
 
 	// load player data from api
 //	LoadPlayerInfo(function (data) {
@@ -452,20 +459,4 @@ function SetFlyoutScoreboardChangeZone( nDir )
 	
 	$.RegisterEventHandler( "DOTACustomUI_SetFlyoutScoreboardVisible", $.GetContextPanel(), SetFlyoutScoreboardVisible );
 	$.RegisterEventHandler("DOTACustomUI_SetFlyoutScoreboardChangeZone", $.GetContextPanel(), SetFlyoutScoreboardChangeZone);
-
-	for(var i = 0; i < 8; i++)
-	{
-		var ImbaXP_Panel = $.GetContextPanel().FindChildTraverse("es-player-xp" + i);
-
-		if (ImbaXP_Panel != undefined) {
-			// get player data
-			var plyData = CustomNetTables.GetTableValue("battlepass", i);
-
-			if (plyData != undefined) {
-				// set xp values
-				_ScoreboardUpdater_UpdatePlayerPanelXP(i, ImbaXP_Panel, plyData);
-			}
-		}
-	}
 })();
-
