@@ -122,6 +122,7 @@ function modifier_orb_of_lightning_active:IsPurgable() return false end
 function modifier_orb_of_lightning_active:IsPurgeException() return false end
 function modifier_orb_of_lightning_active:IsDebuff() return false end
 function modifier_orb_of_lightning_active:RemoveOnDeath() return false end
+function modifier_orb_of_lightning_active:GetTexture() return "modifiers/orb_of_lightning" end
 
 function modifier_orb_of_lightning_active:GetEffectAttachType()
 	return "attach_attack1"

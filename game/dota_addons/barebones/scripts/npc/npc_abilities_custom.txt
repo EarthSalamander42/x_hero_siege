@@ -2893,6 +2893,7 @@
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_YES"
+		"RequiredLevel"					"20"
 		"MaxLevel"						"1"
 		"AbilityTextureName"			"custom/holdout_divine_shield"
 
@@ -3233,7 +3234,7 @@
 	
 		// Stats
 		//------------------------------------------------------------------------------------
-		"AbilityTextureName"			"custom/holdout_permanent_immolation"
+		"AbilityTextureName"			"custom/holdout_immolation"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
 
@@ -5424,7 +5425,7 @@
 		// General
 		//-------------------------------------------------------------------------------------
 		"BaseClass"					"ability_datadriven"
-		"AbilityTextureName"		"custom/holdout_active_immolation"
+		"AbilityTextureName"			"custom/holdout_immolation"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_TOGGLE"
 
 		// Stats
@@ -5433,7 +5434,6 @@
 		"AbilityCastRange"			"250 300 350 400"
 		"AbilityCooldown"			"0"
 		"AbilityManaCost"			"75 120 175 220"
-		"AbilityTextureName"		"custom/brewmaster_fire_permanent_immolation"
 		"AbilityUnitDamageType"		"DAMAGE_TYPE_MAGICAL"
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
 
@@ -10280,7 +10280,7 @@
 
 		// Stats
 		//-------------------------------------------------------------------------------------
-		"AbilityTextureName"		"custom/holdout_bane_permanent_immolation"
+		"AbilityTextureName"			"custom/holdout_immolation"
 		"AbilityCastRange"			"300 325 350 375"
 		"AbilityUnitDamageType"		"DAMAGE_TYPE_MAGICAL"
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
@@ -27355,7 +27355,7 @@
 		"AbilityCooldown"			"0"
 		"AbilityManaCost"			"10"
 		"AbilityCastRange"			"600"
-		"AbilityTextureName"		"brewmaster_fire_permanent_immolation"
+		"AbilityTextureName"		"holdout_immolation"
 		"AbilityUnitDamageType"		"DAMAGE_TYPE_MAGICAL"
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
 		"AbilityUnitTargetType"		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
@@ -27476,7 +27476,7 @@
 		"AbilityCastPoint"			"0.5"
 		"AbilityCooldown"			"0.0"
 		"AbilityManaCost"			"10"
-		"AbilityTextureName"		"brewmaster_fire_permanent_immolation"
+		"AbilityTextureName"			"custom/holdout_immolation"
 		"AbilityUnitDamageType"		"DAMAGE_TYPE_MAGICAL"
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
 		"AbilityUnitTargetType"		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
@@ -29336,7 +29336,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"ability_lua"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-		"AbilityTextureName"			"custom/immolation"
+		"AbilityTextureName"			"custom/holdout_immolation"
 		"MaxLevel"						"5"
 
 		// Special
@@ -29912,4 +29912,283 @@
 			}
 		}
 	}
+
+	//=================================================================================================================
+	// Kunkka's Torrent
+	//=================================================================================================================
+	"imba_kunkka_torrent"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"						"ability_lua"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
+		"FightRecapLevel"				"1"
+		"AbilityTextureName"			"kunkka_torrent"
+		"ScriptFile"					"heroes/hero_kunkka"
+		"MaxLevel"						"4"
+		"LevelsBetweenUpgrades"			"2"
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"				"1500"
+		"AbilityCastPoint"				"0.4"
+
+		// Time
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"16 14 12 10"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"80 100 120 140"
+
+		// Precache
+		//-------------------------------------------------------------------------------------------------------------
+		"precache"
+		{
+			"soundfile"						"soundevents/game_sounds_heroes/game_sounds_kunkka.vsndevts"
+			"particle"						"particles/hero/kunkka/torrent_bubbles.vpcf"
+			"particle"						"particles/hero/kunkka/torrent_splash.vpcf"
+			"particle"						"particles/econ/items/kunkka/kunkka_weapon_whaleblade/kunkka_spell_torrent_splash_whaleblade.vpcf"
+		}
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"radius"					"350 550 750 950"
+			}
+			"02"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"main_slow"					"35"
+			}
+			"03"
+			{
+				"var_type"					"FIELD_FLOAT"
+				"slow_duration"				"1.75 2.5 3.25 4.0"
+			}
+			"04"
+			{
+				"var_type"					"FIELD_FLOAT"
+				"stun_duration"				"1.6"
+			}
+			"05"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"damage"					"100 300 450 600"
+			}
+			"6"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"tick_count"				"10"
+			}
+			"7"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"torrent_height"			"400"
+			}
+			"8"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"tide_low_range"			"300"
+			}
+			"9"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"tide_red_slow"				"15"
+			}
+			"10"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"tide_flood_damage"			"80"
+			}
+			"11"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"tide_high_radius"			"125"
+			}
+			"12"
+			{
+				"var_type"					"FIELD_FLOAT"
+				"launch_delay"				"1.6"
+			}
+			"13"		// Delay + cast point
+			{
+				"var_type"					"FIELD_FLOAT"
+				"total_delay_tooltip"		"3.0"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Kunkka's Ghost Ship
+	//=================================================================================================================
+	"imba_kunkka_ghostship"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"						"ability_lua"
+		"ScriptFile"					"heroes/hero_kunkka"
+		"AbilityType"					"DOTA_ABILITY_TYPE_ULTIMATE"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_AOE | DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_BOTH"
+		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_CREEP"
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
+		"FightRecapLevel"				"2"
+		"MaxLevel"						"3"
+		"AbilityTextureName"			"custom/kunkka_immortal_ghost_ship"
+		"HasScepterUpgrade"				"1"
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"				"1000"
+		"AbilityCastPoint"				"0.3"
+		"AbilityCastAnimation"			"ACT_DOTA_CAST_GHOST_SHIP"
+
+		// Time
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"60 50 40"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"125 175 225"
+
+		//-------------------------------------------------------------------------------------------------------------
+		"precache"
+		{
+			"soundfile"						"soundevents/game_sounds_heroes/game_sounds_kunkka.vsndevts"
+			"particle"						"particles/econ/items/kunkka/kunkka_immortal/kunkka_immortal_ghost_ship_marker.vpcf"
+			"particle"						"particles/econ/items/kunkka/kunkka_immortal/kunkka_immortal_ghost_ship.vpcf"
+			"particle"						"particles/hero/kunkka/kunkka_ghost_ship.vpcf"
+			"particle"						"particles/status_fx/status_effect_rum.vpcf"
+			"particle"						"particles/hero/kunkka/torrent_bubbles.vpcf"
+		}
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"						"FIELD_INTEGER"
+				"damage"						"400 550 700"
+			}
+			"02"
+			{
+				"var_type"						"FIELD_INTEGER"
+				"ghostship_width"				"425"
+			}
+			"03"
+			{
+				"var_type"						"FIELD_INTEGER"
+				"ghostship_speed"				"650"
+			}
+			"04"
+			{
+				"var_type"						"FIELD_INTEGER"
+				"start_distance"				"1000"
+			}
+			"05"
+			{
+				"var_type"						"FIELD_FLOAT"
+				"stun_duration"					"1.4"
+			}
+			"06"
+			{
+				"var_type"						"FIELD_INTEGER"
+				"rum_speed"						"10"
+			}
+			"07"
+			{
+				"var_type"						"FIELD_INTEGER"
+				"rum_reduce_pct"				"40 50 60"
+			}
+			"08"
+			{
+				"var_type"						"FIELD_INTEGER"
+				"crash_distance"				"1000"
+			}
+			"09"
+			{
+				"var_type"						"FIELD_INTEGER"
+				"buff_duration"					"10"
+				"LinkedSpecialBonus"			"special_bonus_imba_kunkka_2"
+			}
+			"10"
+			{
+				"var_type"						"FIELD_INTEGER"
+				"damage_duration"				"10"
+			}
+			"11"
+			{
+				"var_type"						"FIELD_FLOAT"
+				"damage_interval"				"1.0"
+			}
+			"12"
+			{
+				"var_type"						"FIELD_INTEGER"
+				"tide_red_slow"					"25"
+			}
+			"13"
+			{
+				"var_type"						"FIELD_INTEGER"
+				"tide_red_slow_duration"		"2"
+			}
+			"14"
+			{
+				"var_type"						"FIELD_INTEGER"
+				"tide_flood_damage"				"100"
+			}
+			"15"
+			{
+				"var_type"						"FIELD_INTEGER"
+				"tide_high_radius"				"125"
+			}
+			"16"
+			{
+				"var_type"						"FIELD_INTEGER"
+				"tide_wave_speed"				"200"
+			}
+			"17"
+			{
+				"var_type"						"FIELD_FLOAT"
+				"tsunami_stun"					"0.6"
+			}
+			"18"
+			{
+				"var_type"						"FIELD_FLOAT"
+				"scepter_crash_delay"			"0.6"
+			}
+			"19"
+			{
+				"var_type"						"FIELD_INTEGER"
+				"scepter_tide_low_range"		"300"
+			}
+			"20"
+			{
+				"var_type"						"FIELD_INTEGER"
+				"scepter_tide_high_radius"		"125"
+			}
+			"21"
+			{
+				"var_type"						"FIELD_FLOAT"
+				"scepter_tide_wave_delay"		"0.1"
+			}
+			"22"
+			{
+				"var_type"						"FIELD_FLOAT"
+				"scepter_cast_range"			"1500"
+			}
+		}
+	}
+
+
 } // End
