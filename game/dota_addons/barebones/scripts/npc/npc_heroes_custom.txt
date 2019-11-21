@@ -1454,45 +1454,6 @@
 	}
 
 	//======================================================================================================
-	// HERO: Iron Man (Tinker)
-	//======================================================================================================
-//	"npc_dota_hero_tinker_holdout"
-//	{
-//		"override_hero"					"npc_dota_hero_tinker"
-//		"Model"							"models/iron_man.vmdl"
-//		"DisableWearables"				"1"
-//		"MovementSpeed"					"365"
-//		"ModelScale"					"1.15"
-//		"AttackDamageMin"				"50"
-//		"AttackDamageMax"				"60"
-//		"ProjectileSpeed"				"2500"
-//		"ProjectileModel"				""
-//		"AttackAnimationPoint"        	"0.44"
-
-//		"AttributeStrengthGain"			"5"
-//		"AttributeAgilityGain"			"5"
-//		"AttributeIntelligenceGain"		"10"
-
-//		"Ability1"						"iron_man_laser"
-//		"Ability2"						"iron_man_missile"
-//		"Ability3"						"iron_man_red_laser"
-//		"Ability4"						"iron_man_ark_beam"
-//		"Ability5"						"iron_man_misc"
-//		"Ability6"						""
-//		"Ability7"						""
-//		"Ability8"						""
-//		"Ability9"						""
-//		"Ability10"						""
-//		"Ability11"						""
-//		"Ability12"						""
-//		"Ability13"						""
-//		"Ability14"						""
-//		"Ability15"						""
-//		"Ability16"						""
-//		"Ability17"						""
-//	}
-
-	//======================================================================================================
 	// HERO: Stone Giant (Tiny)
 	//======================================================================================================
 	"npc_dota_hero_tiny_holdout"
@@ -1643,7 +1604,7 @@
 	}
 
 	//=================================================================================================================
-	// HERO: Ghost Revenant // Need to be duplicated in npc_units_custom.txt
+	// HERO: Ghost Revenant
 	//=================================================================================================================
 	"npc_dota_hero_ghost_revenant"
 	{

@@ -90,7 +90,6 @@ function Precache(context)
 	PrecacheUnitByNameAsync("npc_dota_hero_storm_spirit", context) 	-- For Spirit Master.
 	PrecacheUnitByNameAsync("npc_dota_hero_techies", context) 		-- Shaman most likely
 	PrecacheUnitByNameAsync("npc_dota_hero_templar_assassin", context) --
---	PrecacheUnitByNameAsync("npc_dota_hero_tinker", context) 		-- For Windrunner Lvl 20 Ability & Banehallow
 --	PrecacheUnitByNameAsync("npc_dota_hero_tiny", context) 			-- For Mountain Giant
 --	PrecacheUnitByNameAsync("npc_dota_hero_treant", context) 		-- for Malfurion?
 	PrecacheUnitByNameAsync("npc_dota_hero_vengefulspirit", context)-- For Incoming Wave 3. & Paladin
