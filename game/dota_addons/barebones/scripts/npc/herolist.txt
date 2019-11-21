@@ -14,6 +14,7 @@
 	// X heroes
 	"npc_dota_hero_abyssal_underlord"	"1" 	// Pit Lord
 	"npc_dota_hero_brewmaster"			"1" 	// Pandaren Brewmaster
+	"npc_dota_hero_chaos_knight"		"1"		// Dark Fundamental
 	"npc_dota_hero_chen"				"1"		// Archmage
 	"npc_dota_hero_crystal_maiden"		"1"		// Archimage
 	"npc_dota_hero_dragon_knight"		"1" 	// Arthas
@@ -27,12 +28,14 @@
 	"npc_dota_hero_luna"				"1"		// Huntress
 	"npc_dota_hero_meepo"				"1"		// Kobold Knight
 	"npc_dota_hero_mirana"				"1"		// Priestess of the Moon
+	"npc_dota_hero_necrolyte"			"1"		// Dark Summoner
 	"npc_dota_hero_nevermore"			"1"		// Banehallow
 	"npc_dota_hero_nyx_assassin"		"1"		// Crypt Lord
 	"npc_dota_hero_omniknight"			"1"		// Paladin
 	"npc_dota_hero_phantom_assassin"	"1"		// Warden
 	"npc_dota_hero_pugna"				"1"		// Dread Lord
 	"npc_dota_hero_rattletrap"			"1"		// Space Marine
+	"npc_dota_hero_razor"				"1"		// Ghost Revenant
 	"npc_dota_hero_slardar"				"1"		// Centurion
 	"npc_dota_hero_sniper"				"0"		// Rifleman
 	"npc_dota_hero_sven"				"1"		// Mountain King
@@ -40,10 +43,9 @@
 	"npc_dota_hero_shadow_shaman"		"0"		// Rhasta
 	"npc_dota_hero_skeleton_king"		"1"		// Lich King
 	"npc_dota_hero_storm_spirit"		"1"		// Spirit Master
-	"npc_dota_hero_tinker"				"0"		// Iron Man
 	"npc_dota_hero_tiny"				"1"		// Stone Giant
 	"npc_dota_hero_terrorblade"			"1"		// Illidan
-	"npc_dota_hero_troll_warlord"		"1"		// Troll Warlord
+	"npc_dota_hero_troll_warlord"		"0"		// Troll Warlord
 	"npc_dota_hero_ursa"				"1"		// Malfurion
 	"npc_dota_hero_warlock"				"1"		// Archimonde
 	"npc_dota_hero_windrunner"			"1"		// Windrunner
