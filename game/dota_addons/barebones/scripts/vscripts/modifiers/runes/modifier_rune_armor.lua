@@ -2,7 +2,7 @@ modifier_rune_armor = class({})
 
 function modifier_rune_armor:IsHidden() return false end
 
-function modifier_rune_armor:GetTextureName()
+function modifier_rune_armor:GetTexture()
 	return "tower_armor_aura"
 end
 

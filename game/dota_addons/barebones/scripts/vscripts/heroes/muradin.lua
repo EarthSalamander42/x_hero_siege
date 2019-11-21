@@ -7,6 +7,10 @@ function muradin_avatar:GetIntrinsicModifierName()
 	return "modifier_muradin_avatar"
 end
 
+function muradin_avatar:GetAbilityTextureName()
+	return "custom/holdout_avatar"
+end
+
 modifier_muradin_avatar = modifier_muradin_avatar or class({})
 
 function modifier_muradin_avatar:IsHidden() return true end
@@ -32,6 +36,7 @@ function modifier_muradin_avatar_buff:GetHeroEffectName() return "particles/unit
 function modifier_muradin_avatar_buff:HeroEffectPriority() return 10 end
 function modifier_muradin_avatar_buff:GetStatusEffectName() return "particles/status_fx/status_effect_gods_strength.vpcf" end
 function modifier_muradin_avatar_buff:StatusEffectPriority() return 10 end
+function modifier_muradin_avatar_buff:GetTexture() return "custom/holdout_avatar" end
 
 function modifier_muradin_avatar_buff:DeclareFunctions() return {
 	MODIFIER_PROPERTY_ATTACK_POINT_CONSTANT,

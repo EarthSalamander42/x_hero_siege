@@ -1031,6 +1031,7 @@
 		"Ability4"						"holdout_howl_of_terror"
 		"Ability5"						"holdout_taunt"
 		"Ability6"						"holdout_pure_light"
+
 		"Ability7"						""
 		"Ability8"						""
 		"Ability9"						""
@@ -1658,7 +1659,7 @@
 	}
 
 	//=================================================================================================================
-	// HERO: Ghost Revenant // Need to be duplicated in npc_units_custom.txt
+	// HERO: Naga Siren
 	//=================================================================================================================
 	"npc_dota_hero_naga_siren_holdout"
 	{
@@ -1776,6 +1777,7 @@
 		"Ability4"					"holdout_endurance_aura"
 		"Ability5"					"holdout_roar"
 		"Ability6"					"magnataur_reverse_polarity"
+
 		"Ability7"					"generic_hidden"
 		"Ability8"					"generic_hidden"
 		"Ability9"					"generic_hidden"
@@ -1794,4 +1796,54 @@
 		"MovementSpeed"				"350"									// Speed.
 		"MovementTurnRate"			"0.4"									// Turning rate.
 	}
+
+	//=================================================================================================================
+	// HERO: Tidehunter
+	//=================================================================================================================
+	"npc_dota_hero_tidehunter_holdout"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"override_hero"				"npc_dota_hero_tidehunter"
+
+		// Attack
+		//-------------------------------------------------------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
+		"AttackDamageMin"			"65"										// Damage range min.
+		"AttackDamageMax"			"75"										// Damage range max.
+
+		// Attributes
+		//-------------------------------------------------------------------------------------------------------------
+		"AttributeStrengthGain"		"10"						// Strength bonus per level.
+		"AttributeIntelligenceGain"	"5"						// Intelligence bonus per level.
+		"AttributeAgilityGain"		"5"					// Agility bonus per level.
+
+		// Abilities
+		//-------------------------------------------------------------------------------------------------------------
+		"Ability1"					"tidehunter_gush"
+		"Ability2"					"tidehunter_anchor_smash"
+		"Ability3"					"tidehunter_kraken_shell"
+		"Ability4"					"imba_kunkka_ghostship"
+		"Ability5"					"imba_kunkka_torrent"
+		"Ability6"					"tidehunter_ravage"
+
+		"Ability7"					"generic_hidden"
+		"Ability8"					"generic_hidden"
+		"Ability9"					"generic_hidden"
+		"Ability10"					"generic_hidden"
+		"Ability11"					"generic_hidden"
+		"Ability12"					"generic_hidden"
+		"Ability13"					"generic_hidden"
+		"Ability14"					"generic_hidden" 
+		"Ability15"					"generic_hidden"
+		"Ability16"					"generic_hidden"
+		"Ability17"					"generic_hidden"
+
+		// Movement
+		//-------------------------------------------------------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"
+		"MovementSpeed"				"350"									// Speed.
+		"MovementTurnRate"			"0.4"									// Turning rate.
+	}
+
 }

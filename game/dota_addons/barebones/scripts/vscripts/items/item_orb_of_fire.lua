@@ -85,6 +85,7 @@ function modifier_orb_of_fire_active:IsPurgable() return false end
 function modifier_orb_of_fire_active:IsPurgeException() return false end
 function modifier_orb_of_fire_active:IsDebuff() return false end
 function modifier_orb_of_fire_active:RemoveOnDeath() return false end
+function modifier_orb_of_fire_active:GetTexture() return "modifiers/orb_of_fire" end
 
 function modifier_orb_of_fire_active:GetEffectAttachType()
 	return "attach_attack1"

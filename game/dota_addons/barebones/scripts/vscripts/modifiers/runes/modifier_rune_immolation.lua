@@ -2,8 +2,8 @@ modifier_rune_immolation = class({})
 
 function modifier_rune_immolation:IsHidden() return false end
 
-function modifier_rune_immolation:GetTextureName()
-	return "modifiers/cloak_of_flames"
+function modifier_rune_immolation:GetTexture()
+	return "custom/holdout_immolation"
 end
 
 function modifier_rune_immolation:GetEffectName()

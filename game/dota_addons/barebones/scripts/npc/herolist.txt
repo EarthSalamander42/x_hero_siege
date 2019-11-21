@@ -9,6 +9,7 @@
 	"npc_dota_hero_doom_bringer"		"1" 	// Doom
 	"npc_dota_hero_magnataur"			"1"		// Magnus
 	"npc_dota_hero_naga_siren"			"1"		// Naga Siren
+	"npc_dota_hero_tidehunter"			"1"		// Tidehunter
 
 	// X heroes
 	"npc_dota_hero_abyssal_underlord"	"1" 	// Pit Lord

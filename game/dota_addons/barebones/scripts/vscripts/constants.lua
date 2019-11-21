@@ -244,7 +244,7 @@ AbilitiesHeroes_XX = {
 	npc_dota_hero_luna = {{"holdout_neutralization", 2}},
 	npc_dota_hero_nevermore = {{"holdout_rain_of_chaos_20", 2}},
 	npc_dota_hero_nyx_assassin = {{"holdout_burrow_impale", 2}},
-	npc_dota_hero_omniknight = {{"holdout_light_frenzy", 2}},
+	npc_dota_hero_omniknight = {{"holdout_light_frenzy", 4}},
 	npc_dota_hero_phantom_assassin = {{"holdout_morph", 2}},
 	npc_dota_hero_pugna = {{"holdout_rain_of_chaos_20", 2}},
 	npc_dota_hero_rattletrap = {{"holdout_cluster_rockets", 2}},
@@ -254,7 +254,7 @@ AbilitiesHeroes_XX = {
 	npc_dota_hero_sniper ={{"holdout_laser", 0}, {"holdout_plasma_rifle_20", 1}},
 	npc_dota_hero_sven = {{"holdout_storm_bolt_20", 0}, {"holdout_thunder_clap_20", 1}},
 	npc_dota_hero_terrorblade = {{"holdout_resistant_skin", 6}},
-	npc_dota_hero_tiny = {{"holdout_war_club_20", 0}},
+	npc_dota_hero_tiny = {{"holdout_war_club_20", 2}},
 	npc_dota_hero_windrunner = {{"holdout_rocket_hail", 2}}
 }
 
