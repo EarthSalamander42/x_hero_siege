@@ -985,7 +985,6 @@
 		"AttributeStrengthGain"			"10"
 		"AttributeAgilityGain"			"5"
 		"AttributeIntelligenceGain"		"5"
-		"AttackCapabilities"			"DOTA_UNIT_CAP_MELEE_ATTACK"
 		"AttackRange"					"160"
 		"ProjectileModel"				""
 		"ProjectileSpeed"				""
@@ -1502,7 +1501,6 @@
 		"MovementSpeed"					"360"
 		"AttackDamageMin"				"46"
 		"AttackDamageMax"				"56"
-		"AttackCapabilities"			"DOTA_UNIT_CAP_MELEE_ATTACK"
 		"AttackRange"					"160"
 		"AttackRate"					"1.6"
 		"ProjectileModel"				""
@@ -1653,7 +1651,6 @@
 
 		// Movement
 		//-------------------------------------------------------------------------------------------------------------
-		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"
 		"MovementSpeed"				"360"									// Speed.
 		"MovementTurnRate"			"0.4"									// Turning rate.
 	}
@@ -1670,7 +1667,6 @@
 
 		// Attack
 		//-------------------------------------------------------------------------------------------------------------
-		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
 		"AttackDamageMin"			"50"										// Damage range min.
 		"AttackDamageMax"			"60"										// Damage range max.
 
@@ -1701,7 +1697,6 @@
 
 		// Movement
 		//-------------------------------------------------------------------------------------------------------------
-		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"
 		"MovementSpeed"				"350"									// Speed.
 		"MovementTurnRate"			"0.4"									// Turning rate.
 	}
@@ -1759,7 +1754,6 @@
 
 		// Attack
 		//-------------------------------------------------------------------------------------------------------------
-		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
 		"AttackDamageMin"			"60"										// Damage range min.
 		"AttackDamageMax"			"70"										// Damage range max.
 
@@ -1792,7 +1786,6 @@
 
 		// Movement
 		//-------------------------------------------------------------------------------------------------------------
-		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"
 		"MovementSpeed"				"350"									// Speed.
 		"MovementTurnRate"			"0.4"									// Turning rate.
 	}
@@ -1808,7 +1801,6 @@
 
 		// Attack
 		//-------------------------------------------------------------------------------------------------------------
-		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
 		"AttackDamageMin"			"65"										// Damage range min.
 		"AttackDamageMax"			"75"										// Damage range max.
 
@@ -1840,8 +1832,7 @@
 		"Ability17"					"generic_hidden"
 
 		// Movement
-		//-------------------------------------------------------------------------------------------------------------
-		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"
+		//-------------------------------------------------------------------------------------------------------------		
 		"MovementSpeed"				"350"									// Speed.
 		"MovementTurnRate"			"0.4"									// Turning rate.
 	}
