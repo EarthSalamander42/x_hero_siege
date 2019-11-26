@@ -19,7 +19,7 @@ function modifier_orb_of_earth:IsPurgable() return false end
 function modifier_orb_of_earth:IsPurgeException() return false end
 function modifier_orb_of_earth:IsDebuff() return false end
 function modifier_orb_of_earth:RemoveOnDeath() return false end
-
+function modifier_orb_of_earth:GetTexture() return "modifiers/orb_of_earth" end
 function modifier_orb_of_earth:GetEffectAttachType()
 	return "attach_attack1"
 end
