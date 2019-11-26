@@ -1,0 +1,15 @@
+		"DOTA_Tooltip_ability_holdout_enchanted_axes"						"Enchanted Axes"
+		"DOTA_Tooltip_ability_holdout_enchanted_axes_Description"			"Adds Cleave effects if Troll is attacking melee, increase damage if ranged."
+		"DOTA_Tooltip_ability_holdout_enchanted_axes_full_damage_radius"	"RADIUS (MELEE):"
+		"DOTA_Tooltip_ability_holdout_enchanted_axes_cleave_pct_tooltip"	"%CLEAVE (MELEE):"
+		"DOTA_Tooltip_ability_holdout_enchanted_axes_damage_multiplier"		"DAMAGE MULTIPLIER (RANGED):"
+
+		"DOTA_Tooltip_ability_holdout_battle_trance"						"Battle Trance"
+		"DOTA_Tooltip_ability_holdout_battle_trance_Description"			"Troll's presence on the battlefield increases the attack speed of himself and all allied heroes."
+		"DOTA_Tooltip_ability_holdout_battle_trance_Lore"					"An adrenaline rush of pure hatred quickens your blades."
+		"DOTA_Tooltip_ability_holdout_battle_trance_Note0"					"Doesn't work on illusions."
+		"DOTA_Tooltip_ability_holdout_battle_trance_duration"				"TRANCE DURATION:"
+		"DOTA_Tooltip_ability_holdout_battle_trance_bat_reduction"			"BAT REDUCTION:"
+
+		"DOTA_Tooltip_modifier_battle_trance"					"Battle Trance"
+		"DOTA_Tooltip_modifier_battle_trance_Description"		"Base Attack Time reduced."
