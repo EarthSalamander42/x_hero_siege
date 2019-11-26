@@ -1862,8 +1862,9 @@
 		"Ability2"					"troll_warlord_whirling_axes_ranged"
 		"Ability3"					"troll_warlord_whirling_axes_melee"
 		"Ability4"					"troll_warlord_fervor"
-		"Ability5"					"generic_hidden"
-		"Ability6"					"troll_warlord_battle_trance"
+		"Ability5"					"holdout_enchanted_axes"
+		"Ability6"					"holdout_battle_trance"
+		
 		"Ability7"					"generic_hidden"
 		"Ability8"					"generic_hidden"
 		"Ability9"					"generic_hidden"

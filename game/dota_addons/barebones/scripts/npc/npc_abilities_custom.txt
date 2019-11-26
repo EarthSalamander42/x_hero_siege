@@ -29609,12 +29609,12 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"radius"	"325"
+				"radius"				"325"
 			}
 			"02"
 			{	
 				"var_type"				"FIELD_FLOAT"
-				"cleave_pct"	"10 15 20 25"
+				"splash_pct"			"10 15 20 25"
 			}
 			"03"
 			{
@@ -29627,8 +29627,8 @@
 		{
 			"modifier_enchanted_axes"
 			{
-				"Passive"			"1"
-				"IsHidden"			"1"
+				"Passive"				"1"
+				"IsHidden"				"1"
 
 				"OnAttackLanded"
 				{

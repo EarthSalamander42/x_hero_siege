@@ -3,9 +3,9 @@ local attacker = keys.caster
 local target = keys.target
 local ability = keys.ability
 local radius = ability:GetSpecialValueFor("radius")
-local cleave = ability:GetSpecialValueFor("cleave_pct")
+local splash = ability:GetSpecialValueFor("splash_pct")
 local full_damage = attacker:GetRealDamageDone(attacker)
-local cleave_pct = cleave * full_damage / 100
+local splash_pct = splash * full_damage / 100
 local splash_targets = FindUnitsInRadius(attacker:GetTeamNumber(), target:GetAbsOrigin(), nil, radius, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, FIND_ANY_ORDER, false)
 local ability_level = ability:GetLevel() - 1
 local multiplier = ability:GetLevelSpecialValueFor("damage_multiplier", ability_level) -1
@@ -14,7 +14,7 @@ local dmg_mult = full_damage * multiplier
 	if attacker:GetAttackCapability() == DOTA_UNIT_CAP_MELEE_ATTACK then
 		for _,unit in pairs(splash_targets) do
 			if unit ~= target and not unit:IsBuilding() then
-				ApplyDamage({victim = unit, attacker = attacker, damage = cleave_pct, ability = ability, damage_type = DAMAGE_TYPE_PHYSICAL})
+				ApplyDamage({victim = unit, attacker = attacker, damage = splash_pct, ability = ability, damage_type = DAMAGE_TYPE_PHYSICAL})
 			end
 		end
 	elseif attacker:GetAttackCapability() == DOTA_UNIT_CAP_RANGED_ATTACK then

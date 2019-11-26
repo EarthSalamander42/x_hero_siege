@@ -3930,7 +3930,11 @@
 	// Troll Warlord: Berserker's Rage
 	//=================================================================================================================
 	"troll_warlord_berserkers_rage"
-	{		
+	{	
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"ID"							"5526"		// unique ID number for this ability.  Do not change this once established or it will invalidate collected stats.
+
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityCastPoint"				"0.2"
@@ -3968,17 +3972,12 @@
 			"07"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"bash_chance"			"10"
+				"ensnare_chance"			"10"
 			}
 			"08"
 			{
 				"var_type"				"FIELD_FLOAT"
-				"bash_duration"			"0.25"
-			}
-			"09"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bash_damage"			"350"
+				"ensnare_duration"			"0.25"
 			}
 		}
 	}
@@ -4024,6 +4023,7 @@
 			{
 				"var_type"					"FIELD_INTEGER"
 				"axe_damage"				"150 300 450 600"
+				"LinkedSpecialBonus"		"special_bonus_unique_troll_warlord_3"
 			}
 			"05"
 			{
@@ -4073,6 +4073,7 @@
 			{
 				"var_type"					"FIELD_INTEGER"
 				"damage"					"200 400 600 800"
+				"LinkedSpecialBonus"		"special_bonus_unique_troll_warlord_3"
 			}
 			"02"
 			{
