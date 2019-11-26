@@ -29592,5 +29592,143 @@
 		}
 	}
 
+	//=================================================================================================================
+	// Troll Warlord: Enchanted Axes
+	//=================================================================================================================
+	"holdout_enchanted_axes"
+	{
+		"BaseClass"             		"ability_datadriven"
+		"AbilityTextureName"			"custom/holdout_enchanted_axes"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"RequiredLevel"					"5"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"radius"	"325"
+			}
+			"02"
+			{	
+				"var_type"				"FIELD_FLOAT"
+				"cleave_pct"	"10 15 20 25"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"damage_multiplier"		"1.75 2.0 2.25 2.5"
+			}
+		}
+
+		"Modifiers"
+		{
+			"modifier_enchanted_axes"
+			{
+				"Passive"			"1"
+				"IsHidden"			"1"
+
+				"OnAttackLanded"
+				{
+					"RunScript"
+					{
+						"ScriptFile"	"heroes/hero_troll_warlord.lua"
+						"Function"		"EnchantedAxes"
+					}
+				}
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Troll Warlord: Battle Trance
+	//=================================================================================================================
+	"holdout_battle_trance"
+	{
+		"BaseClass"             		"ability_datadriven"
+		"AbilityTextureName"			"troll_warlord_battle_trance"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
+		"RequiredLevel"					"10"
+		"LevelsBetweenUpgrades"			"5"
+		"AbilityType"					"DOTA_ABILITY_TYPE_ULTIMATE"
+		"AbilityCooldown"				"60.0"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"duration"				"7"
+			}
+			"02"
+			{	
+				"var_type"				"FIELD_FLOAT"
+				"bat_reduction"			"0.15 0.225 0.3"
+			}
+			"03"
+			{	
+				"var_type"				"FIELD_FLOAT"
+				"radius"				"50000"
+			}
+		}
+
+		"OnSpellStart"
+		{
+			"FireEffect"
+			{
+				"EffectName"        "particles/units/heroes/hero_troll_warlord/troll_warlord_battletrance_cast.vpcf"
+				"EffectAttachType"  "follow_origin"
+				"Target"            "CASTER"
+			}
+
+			"FireSound"
+			{
+				"EffectName"	"Hero_TrollWarlord.BattleTrance.Cast"
+				"Target" 		"CASTER"
+			}
+
+			"ApplyModifier"
+			{
+				"ModifierName"	"modifier_battle_trance"
+				"Target"
+				{
+					"Center"	"CASTER"
+					"Radius"	"%radius"
+					"Teams"		"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
+					"Types"		"DOTA_UNIT_TARGET_HERO"
+				}
+				"Duration"		"%duration"
+			}
+		}
+
+		"Modifiers"
+		{
+			"modifier_battle_trance"
+			{
+				"IsBuff"		"1"
+				"IsHidden"		"0"
+
+				"OnCreated"
+				{
+					"AttachEffect"
+					{
+						"Target"			"TARGET"
+						"EffectName"		"particles/units/heroes/hero_troll_warlord/troll_warlord_battletrance_buff.vpcf"
+						"EffectAttachType"	"follow_origin"
+					}
+
+					"RunScript"
+					{
+						"ScriptFile"	"heroes/hero_troll_warlord.lua"
+						"Function"		"BattleTrance"
+					}
+				}
+			}
+		}
+	}
 
 } // End
