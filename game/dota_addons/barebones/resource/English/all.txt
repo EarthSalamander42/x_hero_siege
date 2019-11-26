@@ -164,7 +164,7 @@
 "DOTA_Tooltip_modifier_unholy_aura_buff_Description"			"Grants %dMODIFIER_PROPERTY_HEALTH_REGEN_CONSTANT% HP Regen and %dMODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE% percent Movespeed."
 
 "DOTA_Tooltip_ability_holdout_rain_of_chaos"						"Rain Of Chaos"
-"DOTA_Tooltip_ability_holdout_rain_of_chaos_Description"			"Calls downs meteor around Abyssal Underlord, stunning enemy units. Abyssal Underlord receive 50% of the physical incoming damage during the process."
+"DOTA_Tooltip_ability_holdout_rain_of_chaos_Description"			"Calls down meteors around Abyssal Underlord, stunning enemy units. Abyssal Underlord receive 50% of the physical incoming damage during the process."
 "DOTA_Tooltip_ability_holdout_rain_of_chaos_damage_per_unit"		"DAMAGE PER METEOR:"
 "DOTA_Tooltip_ability_holdout_rain_of_chaos_radius"					"RADIUS:"
 "DOTA_Tooltip_ability_holdout_rain_of_chaos_stun_duration"			"STUN DURATION:"
@@ -696,7 +696,7 @@
 "DOTA_Tooltip_ability_dread_lord_inferno_immolation_dps"                          "DPS:"
 
 "DOTA_Tooltip_ability_holdout_rain_of_chaos_20"							"Rain Of Chaos"
-"DOTA_Tooltip_ability_holdout_rain_of_chaos_20_Description"				"Calls downs meteor around Dread Lord, stunning enemy units."
+"DOTA_Tooltip_ability_holdout_rain_of_chaos_20_Description"				"Calls down meteors around Dread Lord, stunning enemy units."
 "DOTA_Tooltip_ability_holdout_rain_of_chaos_20_damage_per_unit"			"DAMAGE PER METEOR:"
 "DOTA_Tooltip_ability_holdout_rain_of_chaos_20_radius"					"RADIUS:"
 "DOTA_Tooltip_ability_holdout_rain_of_chaos_20_stun_duration"			"STUN DURATION:"
@@ -1904,7 +1904,7 @@
 "DOTA_Tooltip_ability_balanar_sleep_duration"					"DURATION:"
 
 "DOTA_Tooltip_ability_balanar_rain_of_chaos"						"Rain of Chaos"
-"DOTA_Tooltip_ability_balanar_rain_of_chaos_Description"			"Calls downs meteor around Abyssal Underlord, stunning enemy units. Abyssal Underlord receive 50% of the physical incoming damage during the process."
+"DOTA_Tooltip_ability_balanar_rain_of_chaos_Description"			"Calls down meteors around Abyssal Underlord, stunning enemy units. Abyssal Underlord receive 50% of the physical incoming damage during the process."
 "DOTA_Tooltip_ability_balanar_rain_of_chaos_damage_per_unit"		"DAMAGE PER METEOR:"
 "DOTA_Tooltip_ability_balanar_rain_of_chaos_radius"					"RADIUS:"
 "DOTA_Tooltip_ability_balanar_rain_of_chaos_stun_duration"			"STUN DURATION:"
