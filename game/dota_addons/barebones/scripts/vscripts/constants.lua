@@ -1,3 +1,4 @@
+
 CUSTOM_GAME_TYPE = "XHS"
 
 _G.GAME_VERSION = "3.50"
@@ -65,9 +66,11 @@ _G.frost_first_time = false
 _G.SECRET = 0
 _G.RESPAWN_TIME = 40.0
 _G.CREEP_LANES_TYPE = 1
+
 if GetMapName() == "x_hero_siege_4" then
 	_G.CREEP_LANES_TYPE = 2
 end
+
 _G.BT_ENABLED = 1
 _G.MURADIN_DEFEND = false
 _G.STORM_SPIRIT = 0 -- removed boss

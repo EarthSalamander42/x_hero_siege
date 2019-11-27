@@ -1,18 +1,160 @@
-require("libraries/playertables")
+ListenToGameEvent('game_rules_state_change', function()
+	local newState = GameRules:State_Get()
+
+	if newState == DOTA_GAMERULES_STATE_HERO_SELECTION then
+		GameRules:SetCustomGameDifficulty(2)
+
+		local mode  = GameMode
+		local votes = mode.VoteTable
+
+		for category, pidVoteTable in pairs(votes) do
+			-- Tally the votes into a new table
+			local voteCounts = {}
+			for pid, vote in pairs(pidVoteTable) do
+				if not voteCounts[vote] then voteCounts[vote] = 0 end
+				voteCounts[vote] = voteCounts[vote] + 1
+			end
+
+			-- Find the key that has the highest value (key=vote value, value=number of votes)
+			local highest_vote = 0
+			local highest_key = ""
+			for k, v in pairs(voteCounts) do
+				if v > highest_vote then
+					highest_key = k
+					highest_vote = v
+				end
+			end
+
+			-- Check for a tie by counting how many values have the highest number of votes
+			local tieTable = {}
+			for k, v in pairs(voteCounts) do
+				if v == highest_vote then
+					table.insert(tieTable, k)
+				end
+			end
+
+			-- Resolve a tie by selecting a random value from those with the highest votes
+			if table.getn(tieTable) > 1 then
+				--print("TIE!")
+				highest_key = tieTable[math.random(table.getn(tieTable))]
+			end
+
+			-- Act on the winning vote
+			if category == "difficulty" then
+				GameRules:SetCustomGameDifficulty(highest_key)
+			end
+			print(category .. ": " .. highest_key)
+		end
+	end
+
+	if newState == DOTA_GAMERULES_STATE_PRE_GAME then
+		Gold:Init()
+
+		for i = 1, 8 do
+			DoEntFire("door_lane"..i, "SetAnimation", "gate_02_close", 0, nil, nil)
+		end
+
+		print(GetMapName())
+		if GetMapName() ~= "x_hero_siege_demo" then
+			-- debug
+			if IsInToolsMode() then
+				Entities:FindByName(nil, "trigger_special_event_tp_off"):Disable()
+				Entities:FindByName(nil, "trigger_special_event"):Enable()
+			end
+		end
+
+		local diff = {"Easy", "Normal", "Hard", "Extreme", "Divine"}
+		local lanes = {"Simple", "Double", "Full"}
+		local Color = {"green", "Yellow", "orange", "red", "darkred"}
+
+		CustomNetTables:SetTableValue("game_options", "game_info", {
+			difficulty = diff[GameRules:GetCustomGameDifficulty()],
+		})
+
+		Timers:CreateTimer(3.0, function()
+			CustomGameEventManager:Send_ServerToAllClients("show_timer_bar", {})
+			CustomGameEventManager:Send_ServerToAllClients("game_difficulty", {difficulty = diff[GameRules:GetCustomGameDifficulty()]})
+			Notifications:TopToAll({text="DIFFICULTY: "..diff[GameRules:GetCustomGameDifficulty()], color = Color[GameRules:GetCustomGameDifficulty()], duration=10.0})
+		end)
+
+		AddFOWViewer(DOTA_TEAM_GOODGUYS, Vector(6528, 1152, 192), 900, 99999, false)
+		AddFOWViewer(DOTA_TEAM_CUSTOM_2, Vector(6528, 1152, 192), 900, 99999, false)
+
+		require('zones/dialog_ep_1')
+		require('zones/zone_tables_ep_1')
+		GameMode:SetupZones()
+	end
+
+	if newState == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
+		print("OnGameRulesStateChange: Game In Progress")
+
+		GAME_WINNER_TEAM = 3
+--		ModifyLanes()
+
+		local ice_towers = Entities:FindAllByName("npc_tower_death")
+		for _, tower in pairs(ice_towers) do
+			tower:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
+		end
+
+		for TW = 1, 2 do
+			local ice_towers_main = Entities:FindByName(nil, "npc_tower_cold_"..TW)
+			ice_towers_main:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
+			ice_towers_main.zone = "xhs_holdout"
+		end
+
+		-- Make towers invulnerable again
+		for Players = 1, 8 do
+			local towers = Entities:FindAllByName("dota_badguys_tower"..Players)
+			for _, tower in pairs(towers) do
+				tower:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
+			end
+			local raxes = Entities:FindAllByName("dota_badguys_barracks_"..Players)
+			for _, rax in pairs(raxes) do
+				rax.zone = "xhs_holdout"
+				rax:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
+			end
+		end
+
+		for NumPlayers = 1, PlayerResource:GetPlayerCount() * CREEP_LANES_TYPE do
+			CREEP_LANES[NumPlayers][1] = 1
+			local DoorObs = Entities:FindAllByName("obstruction_lane"..NumPlayers)
+			for _, obs in pairs(DoorObs) do
+				obs:SetEnabled(false, true)
+			end
+			DoEntFire("door_lane"..NumPlayers, "SetAnimation", "gate_02_open", 0, nil, nil)
+			local towers = Entities:FindAllByName("dota_badguys_tower"..NumPlayers)
+			for _, tower in pairs(towers) do
+				tower:RemoveModifierByName("modifier_invulnerable")
+			end
+		end
+	end
+
+	if newState == DOTA_GAMERULES_STATE_POST_GAME then
+--		print("END THE GAME!")
+
+		CustomGameEventManager:Send_ServerToAllClients("end_game", {
+			info = {
+				game_time = CustomTimers.current_time["game_time"],
+			},
+		})
+	end
+end, nil)
 
 -- Cleanup a player when they leave
-function GameMode:OnDisconnect(keys)
-local name = keys.name
-local networkid = keys.networkid
-local reason = keys.reason
-local userid = keys.userid
+--[[
+ListenToGameEvent('player_disconnect', function(keys)
+	local name = keys.name
+	local networkid = keys.networkid
+	local reason = keys.reason
+	local userid = keys.userid
 
 --	CloseLane(userid)
-end
+end, nil)
+--]]
 
 function GameMode:OnSettingVote(keys)
-local pid = keys.PlayerID
-local mode = GameMode
+	local pid = keys.PlayerID
+	local mode = GameMode
 
 	-- VoteTable is initialised in InitGameMode()
 	if not mode.VoteTable[keys.category] then
@@ -25,21 +167,19 @@ local mode = GameMode
 end
 
 -- An NPC has spawned somewhere in game. This includes heroes
-function GameMode:OnNPCSpawned(keys)
-local difficulty = GameRules:GetCustomGameDifficulty()
-local npc = EntIndexToHScript(keys.entindex)
-local normal_bounty = npc:GetGoldBounty()
-local normal_xp = npc:GetDeathXP()
-if GetMapName() == "x_hero_siege_8" then
-	local normal_bounty = npc:GetGoldBounty() * 2
-	local normal_xp = npc:GetDeathXP() * 2
-end
-local normal_min_damage = npc:GetBaseDamageMin()
-local normal_max_damage = npc:GetBaseDamageMax()
-local hero_level = npc:GetLevel()
+ListenToGameEvent('npc_spawned', function(keys)
+	local difficulty = GameRules:GetCustomGameDifficulty()
+	local npc = EntIndexToHScript(keys.entindex)
+	local normal_bounty = npc:GetGoldBounty()
+	local normal_xp = npc:GetDeathXP()
+	local normal_min_damage = npc:GetBaseDamageMin()
+	local normal_max_damage = npc:GetBaseDamageMax()
+	local hero_level = npc:GetLevel()
 
-	-- This internal handling is used to set up main barebones functions
-	GameMode:_OnNPCSpawned(keys)
+	if GetMapName() == "x_hero_siege_8" then
+		local normal_bounty = npc:GetGoldBounty() * 2
+		local normal_xp = npc:GetDeathXP() * 2
+	end
 
 	if npc then
 		--ALL NPC
@@ -76,6 +216,12 @@ local hero_level = npc:GetLevel()
 						end
 					end
 				else
+					-- This internal handling is used to set up main barebones functions
+					if npc:IsRealHero() and npc.bFirstSpawned == nil then
+						npc.bFirstSpawned = true
+						GameMode:OnHeroInGame(npc)
+					end
+
 					if npc:GetUnitName() == "npc_dota_hero_chaos_knight" or npc:GetUnitName() == "npc_dota_hero_keeper_of_the_light" then
 						npc:SetAbilityPoints(0)
 					elseif npc:GetUnitName() == "npc_dota_hero_lone_druid" then
@@ -83,9 +229,9 @@ local hero_level = npc:GetLevel()
 					end
 
 					npc.bFirstSpawnComplete = true
-					self.bPlayerHasSpawned = true
+					GameMode.bPlayerHasSpawned = true
 					npc.CurrentZoneName = nil
-					self:OnPlayerHeroEnteredZone(npc, "xhs_holdout")
+					GameMode:OnPlayerHeroEnteredZone(npc, "xhs_holdout")
 					npc.ankh_respawn = false
 --					npc:AddNewModifier(npc, nil, "modifier_hero", {})
 				end
@@ -177,7 +323,9 @@ local hero_level = npc:GetLevel()
 			end
 		end
 	end
-end
+end, nil)
+
+--[[
 
 -- An entity somewhere has been hurt.  This event fires very often with many units so don't do too many expensive
 -- operations here
@@ -229,8 +377,10 @@ function GameMode:OnPlayerChangedName(keys)
 	local newName = keys.newname
 	local oldName = keys.oldName
 end
---[[
-function GameMode:OnPlayerLearnedAbility(keys)
+
+--]]
+
+ListenToGameEvent('dota_player_learned_ability', function(keys)
 local player = EntIndexToHScript(keys.player)
 local hero = player:GetAssignedHero()
 local abilityname = keys.abilityname
@@ -257,18 +407,21 @@ local ability = hero:FindAbilityByName(abilityname)
 			end
 		end
 	end
-end
---]]
+end, nil)
+
+--[[
+
 function GameMode:OnAbilityChannelFinished(keys)
 	local abilityname = keys.abilityname
 	local interrupted = keys.interrupted == 1
 end
+--]]
 
-function GameMode:OnPlayerLevelUp(keys)
-local player = EntIndexToHScript(keys.player)
-local level = keys.level
-local hero = player:GetAssignedHero()
-local hero_level = hero:GetLevel()
+ListenToGameEvent('dota_player_gained_level', function(keys)
+	local player = EntIndexToHScript(keys.player)
+	local level = keys.level
+	local hero = player:GetAssignedHero()
+	local hero_level = hero:GetLevel()
 
 	if hero_level == 17 then -- Debug because 7.0
 		hero:SetAbilityPoints(hero:GetAbilityPoints() + 1)
@@ -402,7 +555,9 @@ local hero_level = hero:GetLevel()
 			print("No Level 20 Ability")			
 		end
 	end
-end
+end, nil)
+
+--[[
 
 function GameMode:OnLastHit(keys)
 local isFirstBlood = keys.FirstBlood == 1
@@ -419,38 +574,10 @@ local treeY = keys.tree_y
 
 end
 
-function GameMode:OnRuneActivated(keys)
-local player = PlayerResource:GetPlayer(keys.PlayerID)
-local rune = keys.rune
-
-	--[[ Rune Can be one of the following types
-	DOTA_RUNE_DOUBLEDAMAGE
-	DOTA_RUNE_HASTE
-	DOTA_RUNE_HAUNTED
-	DOTA_RUNE_ILLUSION
-	DOTA_RUNE_INVISIBILITY
-	DOTA_RUNE_BOUNTY
-	DOTA_RUNE_MYSTERY
-	DOTA_RUNE_RAPIER
-	DOTA_RUNE_REGENERATION
-	DOTA_RUNE_SPOOKY
-	DOTA_RUNE_TURBO
-	]]
-end
-
 function GameMode:OnPlayerTakeTowerDamage(keys)
 local player = PlayerResource:GetPlayer(keys.PlayerID)
 local damage = keys.damage
 
-end
-
-function GameMode:OnPlayerPickHero(keys)
-local heroClass = keys.hero
-local heroEntity = EntIndexToHScript(keys.heroindex)
-local player = EntIndexToHScript(keys.player)
-
-	-- modifies the name/label of a player
---	GameMode:setPlayerHealthLabel(player)
 end
 
 function GameMode:OnTeamKillCredit(keys)
@@ -524,16 +651,18 @@ local nextGoalEntity = EntIndexToHScript(keys.next_goal_entindex)
 local npc = EntIndexToHScript(keys.npc_entindex)
 end
 
-function GameMode:OnPlayerChat(keys)
-local teamonly = keys.teamonly
-local userID = keys.playerid
-local text = keys.text
-local player = PlayerResource:GetPlayer(userID)
-local hero = PlayerResource:GetPlayer(userID):GetAssignedHero()
-local donator_level = api:GetDonatorStatus(userID)
+--]]
+
+ListenToGameEvent("player_chat", function(keys)
+	local teamonly = keys.teamonly
+	local userID = keys.playerid
+	local text = keys.text
+	local player = PlayerResource:GetPlayer(userID)
+	local hero = PlayerResource:GetPlayer(userID):GetAssignedHero()
+	local donator_level = api:GetDonatorStatus(userID)
 
 	for str in string.gmatch(text, "%S+") do
-		if donator_level == 1 or donator_level == 2 or donator_level > 6 then
+		if donator_level == 1 or donator_level == 2 or donator_level == 3 then
 			for Frozen = 0, PlayerResource:GetPlayerCount() -1 do
 				local PlayerNames = {"Red", "Blue", "Cyan", "Purple", "Yellow", "Orange", "Green", "Pink"}
 				if PlayerResource:IsValidPlayer(Frozen) then
@@ -731,7 +860,7 @@ local donator_level = api:GetDonatorStatus(userID)
 			end
 		end
 	end
-end
+end, nil)
 
 --DUNGEON
 function GameMode:OnTriggerStartTouch(triggerName, activator_entindex, caller_entindex)
@@ -863,20 +992,21 @@ end
 ---------------------------------------------------------
 
 local first_rax = false
-function GameMode:OnEntityKilled(keys)
-local killedUnit = EntIndexToHScript(keys.entindex_killed)
-if killedUnit == nil then return end
-if killedUnit:FindModifierByName( "modifier_breakable_container" ) then return end
-local hero = nil
-local killerAbility = nil
-if keys.entindex_attacker ~= nil then hero = EntIndexToHScript(keys.entindex_attacker) end
-if keys.entindex_inflictor ~= nil then killerAbility = EntIndexToHScript(keys.entindex_inflictor) end
-local difficulty = GameRules:GetCustomGameDifficulty()
-local damagebits = keys.damagebits -- This might always be 0 and therefore useless
-local KillerID = hero:GetPlayerOwnerID()
-local playerKills = PlayerResource:GetKills(KillerID)
-local cn = string.gsub(killedUnit:GetName(), "dota_badguys_tower", "")
-local lane = tonumber(cn)
+
+ListenToGameEvent('entity_killed', function(keys)
+	local killedUnit = EntIndexToHScript(keys.entindex_killed)
+	if killedUnit == nil then return end
+	if killedUnit:FindModifierByName( "modifier_breakable_container" ) then return end
+	local hero = nil
+	local killerAbility = nil
+	if keys.entindex_attacker ~= nil then hero = EntIndexToHScript(keys.entindex_attacker) end
+	if keys.entindex_inflictor ~= nil then killerAbility = EntIndexToHScript(keys.entindex_inflictor) end
+	local difficulty = GameRules:GetCustomGameDifficulty()
+	local damagebits = keys.damagebits -- This might always be 0 and therefore useless
+	local KillerID = hero:GetPlayerOwnerID()
+	local playerKills = PlayerResource:GetKills(KillerID)
+	local cn = string.gsub(killedUnit:GetName(), "dota_badguys_tower", "")
+	local lane = tonumber(cn)
 
 	if IsValidEntity(hero:GetPlayerOwner()) then
 		hero = hero:GetPlayerOwner():GetAssignedHero()
@@ -1105,7 +1235,7 @@ local lane = tonumber(cn)
 		end
 	end
 --	print("EntityKilled: Not Hero or Creature or Building.")
-end
+end, nil)
 
 ---------------------------------------------------------
 -- dota_holdout_revive_complete
@@ -1218,9 +1348,11 @@ end
 -- * player_id
 ---------------------------------------------------------
 
-function GameMode:OnPlayerReconnected(event)
+--[[
+ListenToGameEvent("player_reconnected", function(event)
 --	OpenLane(event.player_id)
-end
+end, nil)
+--]]
 
 ---------------------------------------------------------
 -- entity_killed
