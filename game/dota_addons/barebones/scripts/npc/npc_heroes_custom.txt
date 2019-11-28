@@ -1882,4 +1882,99 @@
 		"MovementSpeed"				"360"									// Speed.
 		"MovementTurnRate"			"0.4"									// Turning rate.
 	}
+
+	//=================================================================================================================
+	// HERO: Void Spirit
+	//=================================================================================================================
+	"npc_dota_hero_void_spirit_holdout"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"override_hero"				"npc_dota_hero_void_spirit"
+
+		// Attack
+		//-------------------------------------------------------------------------------------------------------------
+		"AttackDamageMin"			"65"										// Damage range min.
+		"AttackDamageMax"			"75"										// Damage range max.
+
+		// Attributes
+		//-------------------------------------------------------------------------------------------------------------
+		"AttributeStrengthGain"		"5"				// Strength bonus per level.
+		"AttributeAgilityGain"		"5"			// Agility bonus per level.
+		"AttributeIntelligenceGain"	"10"				// Intelligence bonus per level.
+
+		// Abilities
+		//-------------------------------------------------------------------------------------------------------------
+		"Ability1"					"void_spirit_aether_remnant"
+		"Ability2"					"void_spirit_dissimilate"
+		"Ability3"					"void_spirit_astral_step"
+		"Ability4"					""
+		"Ability5"					""
+		"Ability6"					"void_spirit_resonant_pulse"
+		
+		"Ability7"					"generic_hidden"
+		"Ability8"					"generic_hidden"
+		"Ability9"					"generic_hidden"
+		"Ability10"					"generic_hidden"
+		"Ability11"					"generic_hidden"
+		"Ability12"					"generic_hidden"
+		"Ability13"					"generic_hidden"
+		"Ability14"					"generic_hidden" 
+		"Ability15"					"generic_hidden"
+		"Ability16"					"generic_hidden"
+		"Ability17"					"generic_hidden"
+
+		// Movement
+		//-------------------------------------------------------------------------------------------------------------
+		"MovementSpeed"				"360"									// Speed.
+		"MovementTurnRate"			"0.4"									// Turning rate.
+	}
+
+	//=================================================================================================================
+	// HERO: Snapfire
+	//=================================================================================================================
+	"npc_dota_hero_snapfire_holdout"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"override_hero"				"npc_dota_hero_snapfire"
+
+		// Attack
+		//-------------------------------------------------------------------------------------------------------------
+		"AttackDamageMin"			"60"										// Damage range min.
+		"AttackDamageMax"			"70"										// Damage range max.
+
+		// Attributes
+		//-------------------------------------------------------------------------------------------------------------
+		"AttributeStrengthGain"		"10"				// Strength bonus per level.
+		"AttributeAgilityGain"		"5"			// Agility bonus per level.
+		"AttributeIntelligenceGain"	"5"				// Intelligence bonus per level.
+
+		// Abilities
+		//-------------------------------------------------------------------------------------------------------------
+		"Ability1"					"snapfire_scatterblast"
+		"Ability2"					"snapfire_mortimer_kisses"
+		"Ability3"					"snapfire_firesnap_cookie"
+		"Ability4"					"dazzle_bad_juju"
+		"Ability5"					"holdout_snappy_aura"
+		"Ability6"					"snapfire_lil_shredder"
+		
+		"Ability7"					"generic_hidden"
+		"Ability8"					"generic_hidden"
+		"Ability9"					"generic_hidden"
+		"Ability10"					"generic_hidden"
+		"Ability11"					"generic_hidden"
+		"Ability12"					"generic_hidden"
+		"Ability13"					"generic_hidden"
+		"Ability14"					"generic_hidden" 
+		"Ability15"					"generic_hidden"
+		"Ability16"					"generic_hidden"
+		"Ability17"					"generic_hidden"
+
+		// Movement
+		//-------------------------------------------------------------------------------------------------------------
+		"MovementSpeed"				"360"									// Speed.
+		"MovementTurnRate"			"0.4"									// Turning rate.
+	}
+
 }
