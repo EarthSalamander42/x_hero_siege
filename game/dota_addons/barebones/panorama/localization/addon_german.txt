@@ -56,6 +56,7 @@
 	"disable_companion" "Disable companion"
 	"donator_companion" "Companion"
 	"donator_companion_wrapper_label" "Select a Companion"
+	"donator_emblem" "Emblem"
 	"donator_info" "Select a Companion"
 	"donator_patreon" "Patreon"
 	"donator_patreon_wrapper_label" "Become a Patron"
