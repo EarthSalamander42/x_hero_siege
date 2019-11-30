@@ -29793,9 +29793,9 @@
 
 				"Properties"
 				{
-					"MODIFIER_PROPERTY_HEALTH_REGEN_CONSTANT"	"%bonus_health_regen"
-					"MODIFIER_PROPERTY_HEALTH_REGEN_CONSTANT"	"%bonus_armor"
-					"MODIFIER_PROPERTY_HEALTH_REGEN_CONSTANT"	"%bonus_damage_percent"
+					"MODIFIER_PROPERTY_HEALTH_REGEN_CONSTANT"			"%bonus_health_regen"
+					"MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS" 			"%bonus_armor"
+					"MODIFIER_PROPERTY_BASEDAMAGEOUTGOING_PERCENTAGE"	"%bonus_damage_percent"
 				}
 			}
 		}
