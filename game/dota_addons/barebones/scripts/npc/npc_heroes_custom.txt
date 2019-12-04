@@ -1954,10 +1954,10 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"Ability1"					"snapfire_scatterblast"
 		"Ability2"					"snapfire_mortimer_kisses"
-		"Ability3"					"snapfire_firesnap_cookie"
+		"Ability3"					"snapfire_lil_shredder"
 		"Ability4"					"dazzle_bad_juju"
 		"Ability5"					"holdout_snappy_aura"
-		"Ability6"					"snapfire_lil_shredder"
+		"Ability6"					"snapfire_firesnap_cookie"
 		
 		"Ability7"					"generic_hidden"
 		"Ability8"					"generic_hidden"

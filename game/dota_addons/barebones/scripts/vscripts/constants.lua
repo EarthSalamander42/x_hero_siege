@@ -142,6 +142,9 @@ HEROLIST[33] = "bristleback"
 HEROLIST[34] = "leshrac"
 HEROLIST[35] = "naga_siren"
 HEROLIST[36] = "magnataur"
+HEROLIST[37] = "troll_warlord"
+HEROLIST[38] = "snapfire"
+HEROLIST[39] = "void_spirit"
 
 HEROLIST_VIP = {}
 HEROLIST_VIP[1] = "slardar"			-- Centurion
@@ -317,6 +320,7 @@ _G.innate_abilities = {
 	"holdout_green_effect",		--Banehallow boss + hero effect
 	"holdout_red_effect",		--Abaddon boss
 	"ghost_revenant_ghost_immolation",
+	"holdout_snappy_aura",
 }
 
 _G.difficulty_abilities = {
