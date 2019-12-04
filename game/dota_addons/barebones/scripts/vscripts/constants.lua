@@ -142,9 +142,11 @@ HEROLIST[33] = "bristleback"
 HEROLIST[34] = "leshrac"
 HEROLIST[35] = "naga_siren"
 HEROLIST[36] = "magnataur"
-HEROLIST[37] = "troll_warlord"
-HEROLIST[38] = "snapfire"
-HEROLIST[39] = "void_spirit"
+if IsInToolsMode() then
+	HEROLIST[37] = "troll_warlord"
+	HEROLIST[38] = "snapfire"
+	HEROLIST[39] = "void_spirit"
+end
 
 HEROLIST_VIP = {}
 HEROLIST_VIP[1] = "slardar"			-- Centurion
