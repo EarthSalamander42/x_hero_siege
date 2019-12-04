@@ -11,6 +11,8 @@
 	"npc_dota_hero_naga_siren"			"1"		// Naga Siren
 	"npc_dota_hero_tidehunter"			"1"		// Tidehunter
 	"npc_dota_hero_troll_warlord"		"1"		// Troll Warlord
+	"npc_dota_hero_void_spirit"			"1"		// Void Spirit
+	"npc_dota_hero_snapfire"			"1"		// Snapfire
 
 	// X heroes
 	"npc_dota_hero_abyssal_underlord"	"1" 	// Pit Lord

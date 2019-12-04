@@ -29731,4 +29731,74 @@
 		}
 	}
 
+	//=================================================================================================================
+	// Snapfire: Snappy Aura
+	//=================================================================================================================
+	"holdout_snappy_aura"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"					"ability_datadriven"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityTextureName"		"custom/snapfire_snapfire"
+		"MaxLevel"					"1"
+		"AbilityCastRange"			"900"
+		"AbilityUnitTargetFlags"	"DOTA_UNIT_TARGET_FLAG_NOT_ANCIENTS"
+		
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"aura_radius"				"900"
+			}
+			"02"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"bonus_health_regen"		"25"
+			}
+			"03"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"bonus_armor"				"10"
+			}
+			"04"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"bonus_damage_percent"		"75"
+			}
+		}
+
+		"Modifiers"
+		{
+			"modifier_snappy_aura"
+			{
+				"Passive"			"1"
+				"IsHidden"			"1"
+				"IsBuff"			"1"
+
+				"Aura"				"modifier_snappy_aura_datadriven"
+				"Aura_Radius"		"%aura_radius"
+				"Aura_Teams"		"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
+				"Aura_Types"		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+				"Aura_Flags"		"DOTA_UNIT_TARGET_FLAG_INVULNERABLE"
+			}
+
+			"modifier_snappy_aura_datadriven"
+			{
+				"Passive"   "1"
+				"IsHidden"  "0"
+
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_HEALTH_REGEN_CONSTANT"			"%bonus_health_regen"
+					"MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS" 			"%bonus_armor"
+					"MODIFIER_PROPERTY_BASEDAMAGEOUTGOING_PERCENTAGE"	"%bonus_damage_percent"
+				}
+			}
+		}
+	}
+
 } // End

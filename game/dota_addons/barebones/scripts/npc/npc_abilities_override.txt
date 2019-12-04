@@ -1456,7 +1456,6 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"ID"							"5310"														// unique ID number for this ability.  Do not change this once established or it will invalidate collected stats.
 		"MaxLevel"						"1"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
@@ -1849,7 +1848,6 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"ID"							"5721"														// unique ID number for this ability.  Do not change this once established or it will invalidate collected stats.
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_ROOT_DISABLES"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_TREE"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
@@ -1951,7 +1949,6 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"ID"							"5724"														// unique ID number for this ability.  Do not change this once established or it will invalidate collected stats.
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE | DOTA_ABILITY_BEHAVIOR_CHANNELLED | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE | DOTA_ABILITY_BEHAVIOR_ROOT_DISABLES"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
@@ -2820,7 +2817,6 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"ID"							"5603"														// unique ID number for this ability.  Do not change this once established or it will invalidate collected stats.
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
@@ -2880,7 +2876,6 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"ID"							"5604"														// unique ID number for this ability.  Do not change this once established or it will invalidate collected stats.
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_PHYSICAL"	
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_YES"
@@ -2932,7 +2927,6 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"ID"							"5101"														// unique ID number for this ability.  Do not change this once established or it will invalidate collected stats.
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_ROOT_DISABLES"
 		"AbilityType"					"DOTA_ABILITY_TYPE_BASIC"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"	
@@ -3013,7 +3007,6 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"ID"							"5605"														// unique ID number for this ability.  Do not change this once established or it will invalidate collected stats.
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
@@ -3288,7 +3281,6 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"ID"							"5273"														// unique ID number for this ability.  Do not change this once established or it will invalidate collected stats.
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE"
 		"MaxLevel"						"5"
 				
@@ -3322,7 +3314,6 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"ID"							"5228"							// unique ID number for this ability.  Do not change this once established or it will invalidate collected stats.
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE"
 		"MaxLevel"						"5"
 
@@ -3355,7 +3346,6 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"ID"							"5359"														// unique ID number for this ability.  Do not change this once established or it will invalidate collected stats.
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_PHYSICAL"
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_YES"
@@ -3449,7 +3439,6 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"ID"							"5518"														// unique ID number for this ability.  Do not change this once established or it will invalidate collected stats.
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_POINT"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
@@ -3544,7 +3533,6 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"ID"							"5520"														// unique ID number for this ability.  Do not change this once established or it will invalidate collected stats.
 		"AbilityTextureName"			"custom/holdout_skewer"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_ROOT_DISABLES"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
@@ -3628,7 +3616,6 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"ID"							"5521"														// unique ID number for this ability.  Do not change this once established or it will invalidate collected stats.
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
 		"AbilityType"					"DOTA_ABILITY_TYPE_ULTIMATE"
@@ -3689,7 +3676,6 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"ID"							"5522"		// unique ID number for this ability.  Do not change this once established or it will invalidate collected stats.
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
@@ -3775,7 +3761,6 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"ID"							"5523"		// unique ID number for this ability.  Do not change this once established or it will invalidate collected stats.
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_PHYSICAL"	
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
@@ -3833,7 +3818,6 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"ID"							"5524"		// unique ID number for this ability.  Do not change this once established or it will invalidate collected stats.
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"AbilitySound"					"Hero_Tidehunter.KrakenShell"
 
@@ -3873,7 +3857,6 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"ID"							"5525"		// unique ID number for this ability.  Do not change this once established or it will invalidate collected stats.
 		"AbilityType"					"DOTA_ABILITY_TYPE_ULTIMATE"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"	
@@ -3931,10 +3914,6 @@
 	//=================================================================================================================
 	"troll_warlord_berserkers_rage"
 	{	
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"ID"							"5526"		// unique ID number for this ability.  Do not change this once established or it will invalidate collected stats.
-
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityCastPoint"				"0.2"
@@ -4107,5 +4086,697 @@
 			}
 		}
 	}
+
+	//=================================================================================================================
+	// Void Spirit: Aether Remnant
+	//=================================================================================================================
+	"void_spirit_aether_remnant"
+	{
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastPoint"				"0.0"
+		"AbilityCastRange"				"1000"
+
+		// Time
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"17.0 15.0 13.0 11.0"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"85 90 95 100"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"start_radius"				"90"
+			}
+			"02"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"end_radius"				"90"
+			}
+			"03"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"radius"					"300"
+			}
+			"04"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"projectile_speed"			"900"
+			}
+			"05"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"remnant_watch_distance"	"450"
+			}
+			"06"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"remnant_watch_radius"		"130"
+			}
+			"07"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"watch_path_vision_radius"	"200"
+			}
+			"08"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"activation_delay"		"0.4"
+			}
+			"09"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"impact_damage"			"110 250 510 970"
+			}
+			"10"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"pull_duration"			"1.2 1.4 1.6 1.8"
+			}
+			"11"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"pull_destination"		"44 50 56 62"
+			}
+			"12"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"duration"				"20.0"
+			}
+			"13"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"think_interval"		"0.1"
+			}
+		}
+		"AbilityCastAnimation"			"ACT_DOTA_CAST_ABILITY_1"
+		"AbilityCastGestureSlot"		"DEFAULT"
+	}
+
+	//=================================================================================================================
+	// Void Spirit: Dissimilate
+	//=================================================================================================================
+	"void_spirit_dissimilate"
+	{
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastPoint"				"0.2"
+
+		// Time
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"20 17 14 11"
+
+		// Damage
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityDamage"					"220 560 890 1280"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"100 110 120 130"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"phase_duration"		"1.3"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"destination_fx_radius"	"183" // proportional to distance_offset
+			}
+			"03"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"portals_per_ring"		"6"
+			}
+			"04"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"angle_per_ring_portal"	"60"
+			}
+			"05"
+			{
+				"var_type"						"FIELD_INTEGER"
+				"first_ring_distance_offset"	"520"
+			}
+			"06"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"damage_radius"			"325" // proportional to distance_offset
+			}
+			//"07"
+			//{
+				//"var_type"						"FIELD_INTEGER"
+				//"second_ring_distance_offset"	"1040"
+			//}
+		}
+		"AbilityCastAnimation"		"ACT_DOTA_CAST_ABILITY_3"
+	}
+
+	//=================================================================================================================
+	// Ability: Void Spirit Pulse
+	//=================================================================================================================
+	"void_spirit_resonant_pulse"
+	{
+		// General
+		//------------------------------------------------------------------------------------------------------------
+		"RequiredLevel"					"5"
+	
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"				"0"
+		"AbilityCastPoint"				"0.0"
+
+		// Time
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"14 13 12 11"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"110 150 190 230"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"radius"				"500 600 700 800"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"speed"					"1200"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"damage"				"230 490 800 1090"
+				"LinkedSpecialBonus"	"special_bonus_unique_void_spirit_4"
+			}
+			"04"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"buff_duration"			"10.0"
+			}
+			"05"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"base_absorb_amount"	"300 750 1500 5000"
+			}
+			"06"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"absorb_per_hero_hit"	"30 45 60 75"
+			}
+			"07"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"return_projectile_speed"	"900"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Void Spirit: Astral Step
+	//=================================================================================================================
+	"void_spirit_astral_step"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		//"AbilityUnitDamageType"			"DAMAGE_TYPE_PHYSICAL"
+
+		"RequiredLevel"					"10"
+		"LevelsBetweenUpgrades"			"5"
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastPoint"				"0.4"
+
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"1"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"80 90 100"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"radius"				"225 300 375"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"max_charges"			"2"
+				"LinkedSpecialBonus"	"special_bonus_unique_void_spirit_9"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"charge_restore_time"	"25 20 15"
+				"LinkedSpecialBonus"	"special_bonus_unique_void_spirit_1"
+			}
+			"04"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"min_travel_distance"	"200"
+			}
+			"05"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"max_travel_distance"	"700"
+			}
+			"06"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"pop_damage_delay"		"1.25"
+			}
+			"07"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"pop_damage"			"500 800 1200"
+			}
+			"08"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"movement_slow_pct"		"40 60 80"
+			}
+		}
+		"AbilityCastAnimation"			"ACT_DOTA_CAST_ABILITY_2"
+	}
+
+	//=================================================================================================================
+	// Ability: Snapfire Scatterblast
+	//=================================================================================================================
+	"snapfire_scatterblast"
+	{
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"				"800 900 1000 1100"
+		"AbilityCastPoint"				"0.4"
+		"AnimationPlaybackRate"			"1.2" // 1.0 corresponds to cast point of 0.45 or so
+
+		// Time
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"12 11 10 9"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"80 110 160 200"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"damage"					"80 150 220 290"
+				"LinkedSpecialBonus"		"special_bonus_unique_snapfire_7"
+			}
+			"02"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"blast_speed"				"3000"
+			}
+			"03"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"blast_width_initial"		"225"
+			}
+			"04"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"blast_width_end"			"400"
+			}
+			"05"
+			{
+				"var_type"					"FIELD_FLOAT"
+				"debuff_duration"			"1.0"
+			}
+			"06"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"movement_slow_pct"			"100"
+			}
+			"07"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"point_blank_range"			"450"
+			}
+			"08"
+			{
+				"var_type"					"FIELD_FLOAT"
+				"point_blank_dmg_bonus_pct"	"50.0"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Ability: Snapfire Firesnap Cookie
+	//=================================================================================================================
+	"snapfire_firesnap_cookie"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
+		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_BASIC"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"	
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"				"500"
+		"AbilityCastPoint"				"0.2"
+		"AbilityCastAnimation"			"ACT_DOTA_CAST_ABILITY_2"
+
+		// Time
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"19 16 13 10"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"150 200 250 300"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"projectile_speed"		"800"
+			}
+			"04"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"jump_height"			"257" //"228 257 285 314" // proportional to horizontal distance
+			}
+			"05"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"jump_horizontal_distance"	"600" //"400 450 500 550"
+			"08"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"impact_radius"			"325 375 450 550"
+			}
+			"09"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"impact_damage"			"110 220 440 880"
+			}
+			"10"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"impact_stun_duration"	"1.8 2.3 2.8 3.3"
+			}
+			"11"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"self_cast_delay"		"0.0"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Ability: Snapfire Lil Shredder
+	//=================================================================================================================
+	"snapfire_lil_shredder"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"RequiredLevel"					"5"
+
+		// Time
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"18 15 12 9"
+		"AbilityDuration"				"8"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"75 100 125 150"
+		
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"damage"					"120 240 480 960"
+			}
+			"02"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"buffed_attacks"			"6 7 8 9"
+			}
+			"03"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"attack_speed_bonus"		"300"
+			}
+			"04"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"attack_range_bonus"		"75 150 225 300"
+			}
+			"05"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"buff_duration_tooltip"		"8"
+			}
+			"06"
+			{
+				"var_type"					"FIELD_FLOAT"
+				"base_attack_time"			"1.0"
+			}
+			"07"
+			{
+				"var_type"						"FIELD_INTEGER"
+				"attack_speed_slow_per_stack"	"20 40 60 80"
+			}
+			"08"
+			{
+				"var_type"					"FIELD_FLOAT"
+				"slow_duration"				"3.0 3.5 4.0 4.5"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Ability: Snapfire Mortimer Kisses
+	//=================================================================================================================
+	"snapfire_mortimer_kisses"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_MOVEMENT | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK"
+		"AbilityType"					"DOTA_ABILITY_TYPE_ULTIMATE"
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+		"AbilitySound"					"Hero_Snapfire.MortimerBlob.Launch"
+
+		"RequiredLevel"					"10"
+		"LevelsBetweenUpgrades"			"5"
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"				"3000"
+		"AbilityCastPoint"				"0.5"
+
+		// Damage
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
+
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"90 80 70"
+		"AbilityDuration"				"6.0"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"450 900 0"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"projectile_count"		"8"
+				"LinkedSpecialBonus"	"special_bonus_unique_snapfire_1"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"projectile_speed"		"1300"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"projectile_width"		"130"
+			}
+			"04"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"impact_radius"			"275 350 400"
+			}
+			"05"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"damage_per_impact"		"500 1000 2000"
+			}
+			"06"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"duration_tooltip"		"6.0"
+			}
+			"07"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"projectile_vision"		"500"
+			}
+			"08"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"turn_rate"				"75"
+			}
+			"09"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"burn_interval"			"0.5"
+			}
+			"10"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"burn_damage"			"150 500 1000"
+			}
+			"11"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"move_slow_pct"			"35"
+				"LinkedSpecialBonus"	"special_bonus_unique_snapfire_4"
+			}
+			"12"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"burn_ground_duration"	"3.0"
+			}
+			"13"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"dist_change_speed"		"75"
+			}
+			"14"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"min_range"				"600"
+			}
+			"15"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"min_lob_travel_time"	"1.0"
+			}
+			"16"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"max_lob_travel_time"	"2.5"
+			}
+			"17"
+			{
+				"var_type"						"FIELD_FLOAT"
+				"delay_after_last_projectile"	"0.5"
+			}
+			"18"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"burn_linger_duration"	"1.0"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Dazzle: Bad Juju
+	//=================================================================================================================
+	"dazzle_bad_juju"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityType"					"DOTA_ABILITY_TYPE_ULTIMATE"
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
+		"SpellDispellableType"			"SPELL_DISPELLABLE_NO"
+		"FightRecapLevel"				"2"
+		"AbilitySound"					"Hero_Dazzle.Weave"
+
+		"AbilityTextureName"			"custom/snapfire_snapfire"
+
+		
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"				"1200"
+		
+		
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{	
+				"var_type"					"FIELD_INTEGER"
+				"cooldown_reduction"		"26 38 50"
+			}
+			"02"
+			{	
+				"var_type"					"FIELD_FLOAT"
+				"armor_reduction"			"2 2.25 2.5"
+				"LinkedSpecialBonus"	"special_bonus_unique_dazzle_4"
+			}
+			"03"
+			{	
+				"var_type"					"FIELD_FLOAT"
+				"duration"					"8.0"
+			}
+			"04"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"radius"					"1200"
+			}
+			"05"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"scepter_radius"			"1000"
+				"RequiresScepter"			"1"
+			}
+			"06"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"scepter_count"				"8"
+				"RequiresScepter"			"1"
+			}
+		}
+	}
+
 }
 
