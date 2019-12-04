@@ -1,7 +1,23 @@
 ListenToGameEvent('game_rules_state_change', function()
 	local newState = GameRules:State_Get()
 
-	if newState == DOTA_GAMERULES_STATE_HERO_SELECTION then
+	if newState == DOTA_GAMERULES_STATE_CUSTOM_GAME_SETUP then
+		for playerID = 0, PlayerResource:GetPlayerCount() -1 do
+			if PlayerResource:IsValidPlayer(playerID) then
+				PlayerResource:SetCustomPlayerColor(playerID, PLAYER_COLORS[playerID][1], PLAYER_COLORS[playerID][2], PLAYER_COLORS[playerID][3])
+			end
+		end
+
+		Timers:CreateTimer(3.0, function()
+			EmitSoundOn("Global.InGame", base_good)
+
+--			if base_bad then
+--				EmitSoundOn("Global.InGame", base_bad)
+--			end
+		end)
+	elseif newState == DOTA_GAMERULES_STATE_HERO_SELECTION then
+		-- if called in gamemode init, crash game (since 7.23)
+		GameRules:GetGameModeEntity():SetItemAddedToInventoryFilter(Dynamic_Wrap(GameMode, "ItemAddedFilter"), self)
 		GameRules:SetCustomGameDifficulty(2)
 
 		local mode  = GameMode

@@ -2,8 +2,8 @@ if GameMode == nil then
 	_G.GameMode = class({})
 end
 
-require('events')
-require('constants')
+require('events') -- not in cause
+require('constants') -- in cause?
 require('libraries/timers')
 require('libraries/notifications')
 --	require('libraries/animations')
@@ -15,22 +15,22 @@ require('libraries/playerresource')
 require('libraries/playertables')
 require('libraries/gold')
 require('libraries/rgb_to_hex')
---	require('libraries/wearables')
---	require('libraries/wearables_warmful_ancient')
-require('phases/choose_hero')
-require('phases/creeps')
-require('phases/special_events')
-require('phases/phase1')
-require('phases/phase2')
-require('phases/phase3')
-require('zones/zones')
+require('libraries/wearables')
+require('libraries/wearables_warmful_ancient')
+require('phases/choose_hero') -- not in cause
+require('phases/creeps') -- not in cause
+require('phases/special_events') -- not in cause
+require('phases/phase1') -- not in cause
+require('phases/phase2') -- not in cause
+require('phases/phase3') -- not in cause
+require('zones/zones') -- not in cause
 require('units/breakable_container_surprises')
 require('units/treasure_chest_surprises')
 require('triggers')
 require('items/global')
-require('components/api/init')
+require('components/api/init') -- not in cause
 if IsInToolsMode() then
---	require('libraries/adv_log') -- SUPER SPAM KILLING BACKEND LEAVE IT DISABLED
+	require('libraries/adv_log') -- SUPER SPAM KILLING BACKEND LEAVE IT DISABLED
 end
 require('components/battlepass/init')
 require('components/timers/init')
@@ -45,22 +45,6 @@ require('boss_scripts/boss_functions')
 
 function GameMode:OnFirstPlayerLoaded()
 	base_good = Entities:FindByName(nil, "base_spawn")
-end
-
-function GameMode:OnAllPlayersLoaded()
-	for playerID = 0, PlayerResource:GetPlayerCount() -1 do
-		if PlayerResource:IsValidPlayer(playerID) then
-			PlayerResource:SetCustomPlayerColor(playerID, PLAYER_COLORS[playerID][1], PLAYER_COLORS[playerID][2], PLAYER_COLORS[playerID][3])
-		end
-	end
-
-	Timers:CreateTimer(3.0, function()
-		EmitSoundOn("Global.InGame", base_good)
-
---		if base_bad then
---			EmitSoundOn("Global.InGame", base_bad)
---		end
-	end)
 end
 
 function GameMode:OnHeroInGame(hero)
@@ -92,7 +76,6 @@ end
 function GameMode:InitGameMode()
 	GameMode = self
 	mode = GameRules:GetGameModeEntity()
-
 	-- Timer Rules
 	GameRules:SetPostGameTime(600.0)
 	GameRules:SetTreeRegrowTime(240.0)
@@ -176,8 +159,9 @@ function GameMode:InitGameMode()
 	self.bSeenWaitForPlayers = false
 	self.vUserIds = {}
 	self.VoteTable = {}
-	-- 7.23 test >
 
+	-- 7.23 test >
+	
 	self:OnFirstPlayerLoaded()
 
 	mode:SetThink( "OnThink", self, 1 )
@@ -200,7 +184,6 @@ function GameMode:InitGameMode()
 	mode:SetExecuteOrderFilter(Dynamic_Wrap(GameMode, "FilterExecuteOrder"), self)
 	mode:SetDamageFilter(Dynamic_Wrap(GameMode, "DamageFilter"), self)
 	mode:SetHealingFilter(Dynamic_Wrap(GameMode, "HealingFilter"), self)
-	mode:SetItemAddedToInventoryFilter(Dynamic_Wrap(GameMode, "ItemAddedFilter"), self)
 
 	CustomGameEventManager:RegisterListener("event_hero_image", Dynamic_Wrap(GameMode, "HeroImage"))
 	CustomGameEventManager:RegisterListener("event_all_hero_images", Dynamic_Wrap(GameMode, "AllHeroImages"))
@@ -891,11 +874,22 @@ function GameMode:ModifierFilter( keys )
 	end
 end
 
+-- Item added to inventory filter
 function GameMode:ItemAddedFilter(event)
-	-- Item added to inventory filter
-	local hero = EntIndexToHScript(event.inventory_parent_entindex_const)
+	if GameRules:State_Get() < DOTA_GAMERULES_STATE_PRE_GAME then return end
+
+	local hero
+	if event.inventory_parent_entindex_const then
+		hero = EntIndexToHScript(event.inventory_parent_entindex_const)
+	end
+
 	if hero:IsRealHero() then if hero:GetPlayerID() == -1 then return end end
-	local item = EntIndexToHScript(event.item_entindex_const)
+
+	local item
+	if event.item_entindex_const then
+		item = EntIndexToHScript(event.item_entindex_const)
+	end
+
 	local key = "item_key_of_the_three_moons"
 	local shield = "item_shield_of_invincibility"
 	local sword = "item_lightning_sword"
