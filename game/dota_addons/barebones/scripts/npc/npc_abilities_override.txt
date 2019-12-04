@@ -4397,11 +4397,11 @@
 
 		// Time
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCooldown"				"12 11 10 9"
+		"AbilityCooldown"				"8.0"
 
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityManaCost"				"80 110 160 200"
+		"AbilityManaCost"				"80 120 160 200"
 
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
@@ -4458,9 +4458,8 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+//		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
-		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_BASIC"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"	
 
 		// Casting
@@ -4471,11 +4470,11 @@
 
 		// Time
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCooldown"				"19 16 13 10"
+		"AbilityCooldown"				"10.0"
 
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityManaCost"				"150 200 250 300"
+		"AbilityManaCost"				"125 150 175 200"
 
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
@@ -4494,7 +4493,7 @@
 			"05"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"jump_horizontal_distance"	"600" //"400 450 500 550"
+				"jump_horizontal_distance"	"400" //"400 450 500 550"
 			}
 			"08"
 			{
@@ -4511,11 +4510,11 @@
 				"var_type"				"FIELD_FLOAT"
 				"impact_stun_duration"	"1.8 2.3 2.8 3.3"
 			}
-			"11"
-			{
-				"var_type"				"FIELD_FLOAT"
-				"self_cast_delay"		"0.0"
-			}
+//			"11"
+//			{
+//				"var_type"				"FIELD_FLOAT"
+//				"self_cast_delay"		"0.0"
+//			}
 		}
 	}
 

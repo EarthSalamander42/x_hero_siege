@@ -36,8 +36,8 @@ end, nil)
 
 function SpawnHeroLoadout(hero_count)
 local left_angle = {4, 5, 6, 7, 8, 14, 15, 16}
-local top_angle = {11, 12, 13, 22, 23, 24, 28, 29, 30, 31, 32, 33, 34, 35, 36}
-local bot_angle = {9, 10, 25, 26, 27, 29}
+local top_angle = {11, 12, 13, 22, 23, 24, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39}
+local bot_angle = {9, 10, 25, 26, 27}
 
 	local hero = CreateUnitByName("npc_dota_hero_"..HEROLIST[hero_count], Entities:FindByName(nil, "choose_"..hero_count.."_point"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
 	hero:AddAbility("dummy_passive_vulnerable"):SetLevel(1)
