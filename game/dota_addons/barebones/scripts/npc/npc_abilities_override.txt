@@ -4495,6 +4495,7 @@
 			{
 				"var_type"					"FIELD_INTEGER"
 				"jump_horizontal_distance"	"600" //"400 450 500 550"
+			}
 			"08"
 			{
 				"var_type"				"FIELD_INTEGER"
@@ -4777,6 +4778,4 @@
 			}
 		}
 	}
-
 }
-

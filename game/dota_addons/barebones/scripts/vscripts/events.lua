@@ -1034,7 +1034,7 @@ ListenToGameEvent('entity_killed', function(keys)
 
 	local Zone = killedUnit.zone
 	if Zone then
-		for _,zone in pairs(self.Zones) do
+		for _,zone in pairs(GameMode.Zones) do
 			zone:OnEnemyKilled(killedUnit, Zone)
 		end
 	end
@@ -1078,7 +1078,7 @@ ListenToGameEvent('entity_killed', function(keys)
 			end
 		end
 
-		for _,Zone in pairs(self.Zones) do
+		for _,Zone in pairs(GameMode.Zones) do
 			if Zone:ContainsUnit(killedUnit) then
 				Zone:AddStat(killedUnit:GetPlayerID(), ZONE_STAT_DEATHS, 1)
 				killedUnit.DeathZone = Zone
@@ -1145,7 +1145,7 @@ ListenToGameEvent('entity_killed', function(keys)
 				if hero:IsIllusion() then
 					hero = PlayerResource:GetPlayer(hero:GetPlayerID()):GetAssignedHero()
 					hero:IncrementKills(1)
-					for _, Zone in pairs(self.Zones) do
+					for _, Zone in pairs(GameMode.Zones) do
 						if Zone:ContainsUnit(hero) then
 							Zone:AddStat(hero:GetPlayerID(), ZONE_STAT_KILLS, 1)
 						end
@@ -1156,7 +1156,7 @@ ListenToGameEvent('entity_killed', function(keys)
 							hero = hero:GetPlayerOwner():GetAssignedHero()
 							hero:IncrementKills(1)
 						end
-						for _, Zone in pairs(self.Zones) do
+						for _, Zone in pairs(GameMode.Zones) do
 							if Zone:ContainsUnit(hero) then
 								Zone:AddStat(hero:GetPlayerID(), ZONE_STAT_KILLS, 1)
 							end
@@ -1168,7 +1168,7 @@ ListenToGameEvent('entity_killed', function(keys)
 						if PlayerResource:HasSelectedHero(hero:GetPlayerOwnerID()) then
 							hero:IncrementKills(1)
 						end
-						for _, Zone in pairs(self.Zones) do
+						for _, Zone in pairs(GameMode.Zones) do
 							if Zone:ContainsUnit(hero) then
 								Zone:AddStat(hero:GetPlayerID(), ZONE_STAT_KILLS, 1)
 							end
@@ -1202,7 +1202,7 @@ ListenToGameEvent('entity_killed', function(keys)
 			if hero:IsIllusion() then
 				hero = PlayerResource:GetPlayer(hero:GetPlayerID()):GetAssignedHero()
 				hero:IncrementKills(1)
-				for _, Zone in pairs(self.Zones) do
+				for _, Zone in pairs(GameMode.Zones) do
 					if Zone:ContainsUnit(hero) then
 						Zone:AddStat(hero:GetPlayerID(), ZONE_STAT_KILLS, 1)
 					end
@@ -1213,7 +1213,7 @@ ListenToGameEvent('entity_killed', function(keys)
 						hero = hero:GetPlayerOwner():GetAssignedHero()
 						hero:IncrementKills(1)
 					end
-					for _, Zone in pairs(self.Zones) do
+					for _, Zone in pairs(GameMode.Zones) do
 						if Zone:ContainsUnit(hero) then
 							Zone:AddStat(hero:GetPlayerID(), ZONE_STAT_KILLS, 1)
 						end
@@ -1225,7 +1225,7 @@ ListenToGameEvent('entity_killed', function(keys)
 					if PlayerResource:HasSelectedHero(hero:GetPlayerOwnerID()) then
 						hero:IncrementKills(1)
 					end
-					for _, Zone in pairs(self.Zones) do
+					for _, Zone in pairs(GameMode.Zones) do
 						if Zone:ContainsUnit(hero) then
 							Zone:AddStat(hero:GetPlayerID(), ZONE_STAT_KILLS, 1)
 						end
