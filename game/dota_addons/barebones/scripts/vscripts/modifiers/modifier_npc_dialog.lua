@@ -29,6 +29,7 @@ function modifier_npc_dialog:CheckState()
 		[MODIFIER_STATE_DISARMED] = true,
 		[MODIFIER_STATE_NO_HEALTH_BAR] = true,
 		[MODIFIER_STATE_STUNNED] = true,
+		[MODIFIER_STATE_LOW_ATTACK_PRIORITY] = true,
 	}
 	
 	return state
