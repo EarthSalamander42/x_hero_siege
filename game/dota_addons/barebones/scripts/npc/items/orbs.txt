@@ -375,12 +375,6 @@
 
 		"OnEquip"
 		{
-			"RunScript"
-			{
-				"ScriptFile"	"items/global.lua"
-				"Function"		"EquipOrbs"
-			}
-
 			"DelayedAction"
 			{
 				"Delay"		"0.1"
@@ -406,12 +400,6 @@
 
 		"OnSpellStart"
 		{
-			"RunScript"
-			{
-				"ScriptFile"	"items/global.lua"
-				"Function"		"EquipOrbs"
-			}
-
 			"DelayedAction"
 			{
 				"Delay"		"0.1"
@@ -549,12 +537,6 @@
 
 		"OnEquip"
 		{
-			"RunScript"
-			{
-				"ScriptFile"	"items/global.lua"
-				"Function"		"EquipOrbs"
-			}
-
 			"DelayedAction"
 			{
 				"Delay"		"0.1"
@@ -580,12 +562,6 @@
 
 		"OnSpellStart"
 		{
-			"RunScript"
-			{
-				"ScriptFile"	"items/global.lua"
-				"Function"		"EquipOrbs"
-			}
-
 			"DelayedAction"
 			{
 				"Delay"		"0.1"
@@ -716,12 +692,6 @@
 
 		"OnEquip"
 		{
-			"RunScript"
-			{
-				"ScriptFile"	"items/global.lua"
-				"Function"		"EquipOrbs"
-			}
-
 			"DelayedAction"
 			{
 				"Delay"		"0.1"
@@ -747,12 +717,6 @@
 
 		"OnSpellStart"
 		{
-			"RunScript"
-			{
-				"ScriptFile"	"items/global.lua"
-				"Function"		"EquipOrbs"
-			}
-
 			"DelayedAction"
 			{
 				"Delay"		"0.1"
@@ -778,6 +742,15 @@
 
 				"EffectName"			"particles/units/heroes/hero_ancient_apparition/ancient_apparition_chilling_touch_buff.vpcf"
 				"EffectAttachType"		"attach_attack1"
+
+				"OnCreated"
+				{
+					"RunScript"
+					{
+						"ScriptFile"	"items/item_orb_of_frost.lua"
+						"Function"		"Equip"
+					}
+				}
 
 				"OnAttackLanded"
 				{

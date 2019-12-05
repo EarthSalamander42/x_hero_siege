@@ -16,8 +16,8 @@ ListenToGameEvent('game_rules_state_change', function()
 --			end
 		end)
 	elseif newState == DOTA_GAMERULES_STATE_HERO_SELECTION then
-		-- if called in gamemode init, crash game (since 7.23)
-		GameRules:GetGameModeEntity():SetItemAddedToInventoryFilter(Dynamic_Wrap(GameMode, "ItemAddedFilter"), self)
+		-- crash game (since 7.23)
+--		GameRules:GetGameModeEntity():SetItemAddedToInventoryFilter(Dynamic_Wrap(GameMode, "ItemAddedFilter"), GameMode)
 		GameRules:SetCustomGameDifficulty(2)
 
 		local mode  = GameMode
@@ -539,6 +539,11 @@ ListenToGameEvent('dota_player_gained_level', function(keys)
 	end
 
 	if hero_level == 20 then
+		-- 7.23 outpost capture ability fix
+		if hero:HasAbility("ability_capture") then
+			hero:RemoveAbility("ability_capture")
+		end
+
 		for i = 0, 17 do 
 			local ability = hero:GetAbilityByIndex(i)
 
@@ -684,7 +689,7 @@ ListenToGameEvent("player_chat", function(keys)
 				if PlayerResource:IsValidPlayer(Frozen) then
 					if str == "-freeze_"..Frozen +1 then
 						local hero = PlayerResource:GetPlayer(Frozen):GetAssignedHero()
-						hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {})
+						hero:AddNewModifier(nil, nil, "modifier_pause_creeps", {})
 						hero:AddNewModifier(nil, nil, "modifier_invulnerable", {})
 						PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
 						Notifications:TopToAll({text="[ADMIN MOD]: ", duration=6.0, style={color="red", ["font-size"]="30px"}})
@@ -693,7 +698,7 @@ ListenToGameEvent("player_chat", function(keys)
 					end
 					if str == "-unfreeze_"..Frozen +1 then
 						local hero = PlayerResource:GetPlayer(Frozen):GetAssignedHero()
-						hero:RemoveModifierByName("modifier_animation_freeze_stun")
+						hero:RemoveModifierByName("modifier_pause_creeps")
 						hero:RemoveModifierByName("modifier_boss_stun")
 						hero:RemoveModifierByName("modifier_invulnerable")
 						hero:RemoveModifierByName("modifier_command_restricted")
@@ -1057,7 +1062,7 @@ ListenToGameEvent('entity_killed', function(keys)
 						end)
 						Timers:CreateTimer(0.17, function()
 							Bear:RespawnUnit()
-							Bear:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {duration=4.8})
+							Bear:AddNewModifier(nil, nil, "modifier_pause_creeps", {duration=4.8})
 						end)
 					end
 				end

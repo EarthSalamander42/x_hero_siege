@@ -1441,7 +1441,8 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"ID"								"2503"
-		"BaseClass"							"item_datadriven"
+		"BaseClass"							"item_lua"
+		"ScriptFile"						"items/ankh_of_reincarnation.lua"
 		"AbilityTextureName" 				"custom/ankh_of_reincarnation"
 		"AbilityBehavior"					"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"Model"								"models/props_gameplay/aegis.mdl"
@@ -1466,26 +1467,12 @@
 			"01"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"reincarnation_time"		"5"
+				"reincarnation_time"		"5" // using global var atm
 			}
-		}
-
-		"Modifiers"
-		{
-			"modifier_reincarnation"
+			"02"
 			{
-				"Passive"			"1"
-				"IsHidden"			"1"
-				"IsDebuff"			"0"
-	
-				"OnDeath"
-				{
-					"RunScript"
-					{
-						"ScriptFile"	"heroes/global.lua"
-						"Function"		"Reincarnation"
-					}
-				}
+				"var_type"								"FIELD_FLOAT"
+				"magtheridon_reincarnation_time"		"10.0"
 			}
 		}
 	}
@@ -1564,60 +1551,6 @@
 			{
 				"var_type"				"FIELD_FLOAT"
 				"stat_bonus"			"250"
-			}
-		}
-	}
-
-	//=================================================================================================================
-	// Ankh of Reincarnation ( Magtheridon )
-	//=================================================================================================================
-	"item_magtheridon_ankh" 
-	{
-		"ID"						"2506"
-		"BaseClass"					"item_datadriven"
-		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-		"Model"						"models/heroes/bounty_hunter/bounty_hunter_bweapon.vmdl" 
-		"Effect"					"particles/generic_gameplay/dropped_item.vpcf"
-		"ItemCost"					"0"
-		"ItemKillable"				"0" 
-		"ItemSellable"				"0"
-		"ItemPurchasable"			"0"
-		"ItemDroppable"				"0"
-		"ItemShareability"			"ITEM_NOT_SHAREABLE"
-		"AbilityTextureName"			"custom/ankh_of_reincarnation"
-	
-		"ItemShopTags"				"artifact"
-		"ItemQuality"				"artifact"
-
-		"ItemStackable"				"0"
-		"ItemInitialCharges"		"1"
-		"ItemPermanent"				"0"
-		"ItemDisassembleRule"		"DOTA_ITEM_DISASSEMBLE_ALWAYS"
-
-		"AbilitySpecial"
-		{
-			"01"
-			{
-				"var_type"					"FIELD_FLOAT"
-				"reincarnation_time"		"10.0"
-			}
-		}
-
-		"Modifiers"
-		{
-			"modifier_reincarnation"
-			{
-				"Passive"			"1"
-				"IsHidden"			"1"
-				"IsDebuff"			"0"
-				"OnTakeDamage"
-				{
-					"RunScript"
-					{
-						"ScriptFile"	"items/global.lua"
-						"Function"		"Magtheridon"
-					}
-				}
 			}
 		}
 	}
@@ -1980,7 +1913,8 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"ID"							"2513"
-		"BaseClass"						"item_datadriven"
+		"BaseClass"						"item_lua"
+		"ScriptFile"					"items/item_key_of_the_three_moons.lua"
 		"AbilityTextureName" 			"custom/key_of_the_three_moons"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"AbilityCastRange"				"0"
@@ -2010,24 +1944,6 @@
 			{
 				"var_type"				"FIELD_INTEGER"
 				"bonus_stats"			"1500"
-			}
-		}
-
-		"Modifiers"
-		{
-			"modifier_key_of_the_three_moons"
-			{
-				"Passive"			"1"
-				"IsHidden"			"1"
-
-				"Attributes"		"MODIFIER_ATTRIBUTE_MULTIPLE"
-
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_STATS_STRENGTH_BONUS"	= "%bonus_stats"
-					"MODIFIER_PROPERTY_STATS_AGILITY_BONUS"		= "%bonus_stats"
-					"MODIFIER_PROPERTY_STATS_INTELLECT_BONUS"	= "%bonus_stats"
-				}
 			}
 		}
 	}
@@ -2072,7 +1988,8 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"ID"							"2521"
-		"BaseClass"						"item_datadriven"
+		"BaseClass"						"item_lua"
+		"ScriptFile"					"items/shield_of_invincibility.lua"
 		"AbilityTextureName" 			"custom/shield_of_invincibility"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"AbilityCastRange"				"0"
@@ -2102,76 +2019,17 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"bonus_armor"			"50"
+				"damage_reduction"		"20"
 			}
 			"02"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"damage_reduction"		"-20"
+				"bonus_hp"				"10000"
 			}
 			"03"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"bonus_hp"				"10000"
-			}
-			"04"
-			{
-				"var_type"				"FIELD_INTEGER"
 				"reincarnation_time"	"5"
-			}
-			"05"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"damage_return_pct"		"20"
-			}
-		}
-
-		"Modifiers"
-		{
-			"modifier_shield_of_invincibility"
-			{
-				"Passive"			"1"
-				"IsHidden"			"0"
-				"TextureName"		"modifiers/shield_of_invincibility"
-				"EffectName"		"particles/items_fx/blademail.vpcf"
-				"EffectAttachType"	"attach_hitloc"
-
-				"OnAttacked"
-				{
-					"RunScript"
-					{
-						"ScriptFile"	"items/shield_of_invincibility.lua"
-						"Function"		"Return"
-					}
-
-					"FireEffect"
-					{
-						"EffectName"		"particles/units/heroes/hero_centaur/centaur_return.vpcf"
-						"EffectAttachType"  "attach_hitloc" // follow_origin
-						"Target" 			"CASTER"
-						"ControlPointEntities"
-						{
-							"CASTER" 		"attach_hitloc"
-							"ATTACKER" 		"attach_hitloc"
-						}
-					}
-				}
-
-				"OnDeath"
-				{
-					"RunScript"
-					{
-						"ScriptFile"	"heroes/global.lua"
-						"Function"		"Reincarnation"
-					}
-				}
-
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS"		"%bonus_armor"
-					"MODIFIER_PROPERTY_INCOMING_DAMAGE_PERCENTAGE"	"%damage_reduction"
-					"MODIFIER_PROPERTY_HEALTH_BONUS"				"%bonus_hp"
-				}
 			}
 		}
 	}
@@ -2383,15 +2241,6 @@
 			{
 				"var_type"				"FIELD_INTEGER"
 				"bonus_armor"			"0"
-			}
-		}
-
-		"OnUnequip"
-		{
-			"RunScript"
-			{
-				"ScriptFile"	"items/global.lua"
-				"Function"		"SwordUnequip"
 			}
 		}
 	}
@@ -2635,7 +2484,8 @@
 	{
 		// General
 		//----------------------------------------------------------------------------------------------------
-		"BaseClass"             		"item_datadriven"
+		"BaseClass"             		"item_lua"
+		"ScriptFile"					"items/ring_of_superiority.lua"
 		"ID"							"2532"
 		"AbilityTextureName"			"custom/ring_of_superiority"		
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
@@ -2682,129 +2532,15 @@
 				"var_type"				"FIELD_FLOAT"
 				"bat_reduction"			"0.4"
 			}
-		}
-
-		"OnEquip"
-		{
-			"ApplyModifier"
+			"06"
 			{
-				"ModifierName"	"modifier_endurance_buff"
-				"Target" 		"CASTER"
-			}
-
-			"ApplyModifier"
-			{
-				"ModifierName"	"modifier_command_buff"
-				"Target" 		"CASTER"
-			}
-		}
-
-		"OnUnequip"
-		{
-			"RemoveModifier"
-			{
-				"ModifierName"	"modifier_endurance_buff"
-				"Target" 		"CASTER"
-			}
-
-			"RemoveModifier"
-			{
-				"ModifierName"	"modifier_command_buff"
-				"Target" 		"CASTER"
+				"var_type"							"FIELD_INTEGER"
+				"endurance_bonus_movement_speed"	"20"
 			}
 		}
 
 		"Modifiers"
 		{
-			"modifier_endurance_buff"
-			{
-				"IsBuff"		"1"
-				"IsHidden"		"0"
-				"TextureName"	"custom/holdout_endurance_aura"
-
-				"OnCreated"
-				{
-					"AttachEffect"
-					{
-						"Target"			"TARGET"
-						"EffectName"		"particles/items_fx/aura_endurance.vpcf"
-						"EffectAttachType"	"follow_origin"
-					}
-
-					"RunScript"
-					{
-						"ScriptFile"	"heroes/hero_enchantress/endurance_aura.lua"
-						"Function"		"EnduranceAura"
-					}
-				}
-
-				"OnDestroy"
-				{
-					"RunScript"
-					{
-						"ScriptFile"	"heroes/hero_enchantress/endurance_aura.lua"
-						"Function"		"EnduranceAuraRemove"
-					}
-				}
-
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE"	"%bonus_movement_speed_percentage" 
-				}
-			}
-
-			"modifier_unholy_aura_buff"
-			{
-				"Passive"		"1"
-				"IsHidden"		"0"
-				"TextureName"	"custom/holdout_unholy_aura"
-
-				"OnCreated"
-				{
-					"AttachEffect"
-					{
-						"EffectName"			"particles/econ/courier/courier_faceless_rex/cour_rex_ground_a.vpcf"
-						"EffectAttachType"		"follow_origin"
-						"Target"				"TARGET"
-					}
-
-					"AttachEffect"
-					{
-						"EffectName"			"particles/econ/courier/courier_roshan_frost/courier_roshan_frost_steam.vpcf"
-						"EffectAttachType"		"follow_overhead"
-						"Target"				"TARGET"
-					}
-				}
-
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_HEALTH_REGEN_CONSTANT"		"%bonus_health_regen"
-					"MODIFIER_PROPERTY_MOVESPEED_BONUS_CONSTANT"	"%bonus_movement_speed"
-				}
-			}
-
-			"modifier_devotion_aura_hidden"
-			{
-				"Passive"   "1"
-				"IsHidden"  "0"
-				"TextureName"		"custom/holdout_devotion_aura"
-
-				"OnCreated"
-				{
-					"AttachEffect"
-					{
-						"Target"			"TARGET"
-						"EffectName"		"particles/items_fx/aura_shivas.vpcf"
-						"EffectAttachType"	"follow_origin"
-					}
-				}
-
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS"   "%bonus_armor"
-				}
-			}
-
 			"modifier_command_buff"
 			{
 				"IsBuff"			"1"
@@ -3146,15 +2882,6 @@
 					}
 				}
 
-				"OnDestroy"
-				{
-					"RunScript"
-					{
-						"ScriptFile"	"heroes/hero_enchantress/endurance_aura.lua"
-						"Function"		"EnduranceAuraRemove"
-					}
-				}
-
 				"Properties"
 				{
 					"MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE"	"%bonus_movement_speed_percentage" 
@@ -3229,7 +2956,8 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"ID"									"2536"
-		"BaseClass"								"item_datadriven"
+		"BaseClass"								"item_lua"
+		"ScriptFile"							"items/item_rune_armor.lua"
 		"Model"									"models/props_items/assault_cuirass.vmdl"
 		"Effect"								"particles/units/heroes/hero_dazzle/dazzle_armor_enemy_ring_sink.vpcf"
 
@@ -3240,6 +2968,7 @@
 		"ItemPurchasable"						"0"
 		"ItemSellable"							"0"
 		"ItemKillable"							"1"
+		"ItemCastOnPickup"						"1"
 
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
@@ -3372,7 +3101,8 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"ID"							"2548"
-		"BaseClass"						"item_datadriven"
+		"BaseClass"						"item_lua"
+		"ScriptFile"					"items/item_rune_immolation.lua"
 		"Model"							"models/items/juggernaut/arcana/juggernaut_arcana_mask.vmdl"
 		"Effect"						"particles/econ/items/dazzle/dazzle_dark_light_weapon/dazzle_dark_shallow_grave_ground.vpcf"
 
@@ -3383,6 +3113,7 @@
 		"ItemPurchasable"				"0"
 		"ItemSellable"					"0"
 		"ItemKillable"					"1"
+		"ItemCastOnPickup"				"1"
 
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
@@ -3405,8 +3136,8 @@
 			}
 			"04"
 			{
-				"var_type"			"FIELD_INTEGER"
-				"duration"			"45"
+				"var_type"			"FIELD_FLOAT"
+				"duration"			"45.0"
 			}
 		}
 	}

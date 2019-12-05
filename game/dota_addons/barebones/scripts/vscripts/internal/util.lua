@@ -266,22 +266,6 @@ function PickupRune(item, unit)
 	FireGameEvent("dota_combat_event_message", gameEvent)
 end
 
--- Picks up an Armor rune
-function PickupArmorRune(item, unit)
-
-	unit:AddNewModifier(unit, nil, "modifier_rune_armor", {duration=45})
-	EmitSoundOnLocationForAllies(unit:GetAbsOrigin(), "Rune.Regen", unit)
-	PickupRune(item, unit)
-end
-
--- Picks up an Immolation rune
-function PickupImmolationRune(item, unit)
-
-	unit:AddNewModifier(unit, nil, "modifier_rune_immolation", {duration=45})
-	EmitSoundOnLocationForAllies(unit:GetAbsOrigin(), "Rune.Haste", unit)
-	PickupRune(item, unit)
-end
-
 if not Corpses then
 	Corpses = class({})
 end
@@ -590,7 +574,7 @@ function PauseHeroes()
 
 	for _,hero in pairs(HeroList:GetAllHeroes()) do
 		if hero:IsRealHero() then
-			hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", nil)
+			hero:AddNewModifier(nil, nil, "modifier_pause_creeps", nil)
 			hero:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
 		end
 	end
@@ -599,7 +583,7 @@ end
 function RestartHeroes()
 	for _,hero in pairs(HeroList:GetAllHeroes()) do
 		if hero:IsRealHero() then
-			hero:RemoveModifierByName("modifier_animation_freeze_stun")
+			hero:RemoveModifierByName("modifier_pause_creeps")
 			hero:RemoveModifierByName("modifier_invulnerable")
 		end
 	end
@@ -612,21 +596,21 @@ local units3 = FindUnitsInRadius( DOTA_TEAM_BADGUYS, Vector(0, 0, 0), nil, FIND_
 
 	for _,v in pairs(units) do
 		if v:HasMovementCapability() and not v.Boss then
-			v:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {duration=iTime})
+			v:AddNewModifier(nil, nil, "modifier_pause_creeps", {duration=iTime})
 			v:AddNewModifier(nil, nil, "modifier_invulnerable", {duration=iTime})
 		end
 	end
 
 	for _,v in pairs(units2) do
 		if v:HasMovementCapability() then
-			v:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {duration=iTime})
+			v:AddNewModifier(nil, nil, "modifier_pause_creeps", {duration=iTime})
 			v:AddNewModifier(nil, nil, "modifier_invulnerable", {duration=iTime})
 		end
 	end
 	
 	for _,v in pairs(units3) do
 		if v:HasMovementCapability() then
-			v:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {duration=iTime})
+			v:AddNewModifier(nil, nil, "modifier_pause_creeps", {duration=iTime})
 			v:AddNewModifier(nil, nil, "modifier_invulnerable", {duration=iTime})
 		end
 	end
@@ -652,8 +636,8 @@ local units3 = FindUnitsInRadius( DOTA_TEAM_CUSTOM_1, Vector(0, 0, 0), nil, FIND
 		for _,v in pairs(units) do
 --			if v and v:HasMovementCapability() then
 			if IsValidEntity(v) then
-				if v:HasModifier("modifier_animation_freeze_stun") then
-					v:RemoveModifierByName("modifier_animation_freeze_stun")
+				if v:HasModifier("modifier_pause_creeps") then
+					v:RemoveModifierByName("modifier_pause_creeps")
 				end
 				if v:HasModifier("modifier_invulnerable") then
 					v:RemoveModifierByName("modifier_invulnerable")
@@ -664,8 +648,8 @@ local units3 = FindUnitsInRadius( DOTA_TEAM_CUSTOM_1, Vector(0, 0, 0), nil, FIND
 		for _,v in pairs(units2) do
 --			if v and v:HasMovementCapability() then
 			if IsValidEntity(v) then
-				if v:HasModifier("modifier_animation_freeze_stun") then
-					v:RemoveModifierByName("modifier_animation_freeze_stun")
+				if v:HasModifier("modifier_pause_creeps") then
+					v:RemoveModifierByName("modifier_pause_creeps")
 				end
 				if v:HasModifier("modifier_invulnerable") then
 					v:RemoveModifierByName("modifier_invulnerable")
@@ -676,8 +660,8 @@ local units3 = FindUnitsInRadius( DOTA_TEAM_CUSTOM_1, Vector(0, 0, 0), nil, FIND
 		for _,v in pairs(units3) do
 --			if v and v:HasMovementCapability() then
 			if IsValidEntity(v) then
-				if v:HasModifier("modifier_animation_freeze_stun") then
-					v:RemoveModifierByName("modifier_animation_freeze_stun")
+				if v:HasModifier("modifier_pause_creeps") then
+					v:RemoveModifierByName("modifier_pause_creeps")
 				end
 				if v:HasModifier("modifier_invulnerable") then
 					v:RemoveModifierByName("modifier_invulnerable")
@@ -1064,4 +1048,26 @@ function CDOTA_BaseNPC:IsFakeHero()
 	else
 		return false
 	end
+end
+
+function ReturnFromSpecialArena(hero)
+	CustomTimers.timers_paused = 0
+	CustomGameEventManager:Send_ServerToAllClients("hide_timer_special_arena", {})
+	GameMode.SpecialArena_occuring = 0
+
+	local teleport_time = 3.0
+
+	RestartCreeps(teleport_time + 3)
+
+	if hero.old_pos then
+		TeleportHero(hero, hero.old_pos, teleport_time)
+	else
+		if hero:GetTeamNumber() == 2 then
+			TeleportHero(hero, base_good:GetAbsOrigin(), 3.0)
+--		elseif hero:GetTeamNumber() == 3 then
+--			TeleportHero(hero, base_bad:GetAbsOrigin(), 3.0)
+		end
+	end
+
+	hero:EmitSound("Hero_TemplarAssassin.Trap")
 end

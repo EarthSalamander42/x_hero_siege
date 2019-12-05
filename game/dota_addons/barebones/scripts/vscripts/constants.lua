@@ -57,6 +57,9 @@ _G.frost_first_time = false
 _G.SECRET = 0
 _G.RESPAWN_TIME = 40.0
 _G.CREEP_LANES_TYPE = 1
+_G.RAMERO_ARTIFACT_PICKED = false
+_G.SOGAT_ARTIFACT_PICKED = false
+_G.DOOM_ARTIFACT_MERGED = false
 
 if GetMapName() == "x_hero_siege_4" then
 	_G.CREEP_LANES_TYPE = 2
@@ -336,7 +339,7 @@ _G.difficulty_abilities = {
 	"viper_corrosive_skin",
 	"creature_thunder_clap_low",
 	"creature_death_pulse",
-	"endurance_aura",
+	"xhs_creeps_phase_2_endurance_aura",
 	"unholy_aura",
 	"creature_thunder_clap",
 	"command_aura",
@@ -408,3 +411,5 @@ XHS_PHASE_2_DELAY = 420.0 -- 7 min
 
 XHS_MURADIN_EVENT_GOLD = 20000
 XHS_MURADIN_EVENT_DURATION = 120.0
+
+XHS_GLOBAL_RESPAWN_TIME = 5.0

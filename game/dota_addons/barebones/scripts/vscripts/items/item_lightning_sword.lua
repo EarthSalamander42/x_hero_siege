@@ -8,7 +8,7 @@
 LinkLuaModifier("modifier_lightning_sword_unique", "items/item_lightning_sword.lua", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_lifesteal_lightning_sword", "items/item_lightning_sword.lua", LUA_MODIFIER_MOTION_NONE)
 
-item_lightning_sword = class({})
+item_lightning_sword = item_lightning_sword or class({})
 
 function item_lightning_sword:GetIntrinsicModifierName()
 	return "modifier_lightning_sword_unique"
@@ -22,10 +22,20 @@ function modifier_lightning_sword_unique:IsPurgable() return false end
 function modifier_lightning_sword_unique:RemoveOnDeath() return false end
 
 function modifier_lightning_sword_unique:OnCreated()
-	if IsServer() then
-		if not self:GetParent():HasModifier("modifier_lifesteal_lightning_sword") then
-			self:GetParent():AddNewModifier(self:GetParent(), self:GetAbility(), "modifier_lifesteal_lightning_sword", {})
+	if not IsServer() then return end
+
+	if self:GetParent():IsRealHero() and _G.RAMERO_ARTIFACT_PICKED == false then
+		_G.RAMERO_ARTIFACT_PICKED = true
+
+		if timers.RameroAndBaristol then
+			Timers:RemoveTimer(timers.RameroAndBaristol)
 		end
+
+		ReturnFromSpecialArena(self:GetParent())
+	end
+
+	if not self:GetParent():HasModifier("modifier_lifesteal_lightning_sword") then
+		self:GetParent():AddNewModifier(self:GetParent(), self:GetAbility(), "modifier_lifesteal_lightning_sword", {})
 	end
 end
 

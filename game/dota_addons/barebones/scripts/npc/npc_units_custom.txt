@@ -5098,7 +5098,7 @@
 		// Abilities
 		//----------------------------------------------------------------
 		"Ability1"					"creature_war_stomp"	// Ability 1.
-		"Ability2"					"endurance_aura"		// Ability 2.
+		"Ability2"					"xhs_creeps_phase_2_endurance_aura"		// Ability 2.
 		"Ability3"					""		// Ability 3.
 		"Ability4"					""		// Ability 4.
 
@@ -5458,7 +5458,7 @@
 		// Abilities
 		//----------------------------------------------------------------
 		"Ability1"					"unholy_aura"     // Ability 1.
-		"Ability2"					"endurance_aura"      // Ability 2.
+		"Ability2"					"xhs_creeps_phase_2_endurance_aura"      // Ability 2.
 		"Ability3"					""      // Ability 3.
 		"Ability4"					""      // Ability 4.
 
@@ -5540,7 +5540,7 @@
 		// Abilities
 		//----------------------------------------------------------------
 		"Ability1"					"unholy_aura"     // Ability 1.
-		"Ability2"					"endurance_aura"      // Ability 2.
+		"Ability2"					"xhs_creeps_phase_2_endurance_aura"      // Ability 2.
 		"Ability3"					""      // Ability 3.
 		"Ability4"					""      // Ability 4.
 
@@ -6391,7 +6391,7 @@
 		
 		// Abilities
 		//----------------------------------------------------------------
-		"Ability1"					"endurance_aura" 
+		"Ability1"					"xhs_creeps_phase_2_endurance_aura" 
 		"Ability2"					"proudmoore_divine_shield"
 		"Ability3"					"lion_voodoo"
 		"Ability4"					""
@@ -7699,7 +7699,7 @@
 
 		"Ability1"					"proudmoore_divine_shield" 
 		"Ability2"					"lion_voodoo"
-		"Ability3"					"endurance_aura"
+		"Ability3"					"xhs_creeps_phase_2_endurance_aura"
 		"Ability4"					"boss_health"
 		"Ability5"					"cant_die_generic"
 
@@ -10452,7 +10452,7 @@
 		//----------------------------------------------------------------
 		"Ability1"					"cant_die_generic"
 		"Ability2"					"demonhunter_immolation"
-		"Ability3"					"endurance_aura"
+		"Ability3"					"xhs_creeps_phase_2_endurance_aura"
 		"Ability4"					"arthas_frostmourne"
 		"Ability5"					"boss_health"
 		"Ability6"					"holdout_red_effect"
@@ -11567,7 +11567,7 @@
 		//----------------------------------------------------------------
 		"Ability1"					"lich_frost_armor"	// Ability 1.
 		"Ability2"					"slardar_bash"			// Ability 2.
-		"Ability3"					"endurance_aura"			// Ability 3.
+		"Ability3"					"xhs_creeps_phase_2_endurance_aura"			// Ability 3.
 		"Ability4"					"nightelf_mountain_giant_model"						// Ability 6 - Extra.
 		"Ability5"					"frost_infernal_death"						// Ability 7 - Extra.
 
@@ -11669,7 +11669,7 @@
 		// Abilities
 		//----------------------------------------------------------------
 		"Ability1"					"spirit_beast_death"						// Ability 7 - Extra.
-		"Ability2"					"endurance_aura"						// Ability 7 - Extra.
+		"Ability2"					"xhs_creeps_phase_2_endurance_aura"						// Ability 7 - Extra.
 		"Ability3"					"unholy_aura"						// Ability 7 - Extra.
 
 		// Armor
@@ -11758,7 +11758,7 @@
 		// Abilities
 		//----------------------------------------------------------------
 		"Ability1"					"proudmoore_divine_shield"	// Ability 1.
-		"Ability2"					"endurance_aura"		// Ability 2.
+		"Ability2"					"xhs_creeps_phase_2_endurance_aura"		// Ability 2.
 		"Ability3"					""						// Ability 3.
 		"Ability4"					""						// Ability 6 - Extra.
 		"Ability5"					""						// Ability 7 - Extra.
@@ -11863,7 +11863,7 @@
 		// Abilities
 		//----------------------------------------------------------------
 		"Ability1"					"proudmoore_divine_shield"		// Ability 1.
-		"Ability2"					"endurance_aura"			// Ability 2.
+		"Ability2"					"xhs_creeps_phase_2_endurance_aura"			// Ability 2.
 		"Ability3"					""							// Ability 3.
 		"Ability4"					""							// Ability 6 - Extra.
 		"Ability5"					""							// Ability 7 - Extra.

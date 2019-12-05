@@ -1,8 +1,8 @@
 function StartMagtheridonArena()
 local point_mag = Entities:FindByName(nil,"npc_dota_spawner_magtheridon_arena"):GetAbsOrigin()
 local point_mag2 = Entities:FindByName(nil,"npc_dota_spawner_magtheridon_arena2"):GetAbsOrigin()
-local ankh = CreateItem("item_magtheridon_ankh", mag, mag)
-local ankh2 = CreateItem("item_magtheridon_ankh", mag, mag)
+local ankh = CreateItem("item_ankh_of_reincarnation", mag, mag)
+local ankh2 = CreateItem("item_ankh_of_reincarnation", mag, mag)
 local difficulty = GameRules:GetCustomGameDifficulty()
 local delay = 3.0
 
@@ -331,7 +331,7 @@ function StartSecretArena(hero)
 
 	Timers:CreateTimer(3.0, function()
 		FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
-		hero:AddNewModifier(nil, nil, "modifier_animation_freeze_stun", {Duration = 10, IsHidden = true})
+		hero:AddNewModifier(nil, nil, "modifier_pause_creeps", {Duration = 10, IsHidden = true})
 		hero:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 10, IsHidden = true})
 		hero:Stop()
 		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)

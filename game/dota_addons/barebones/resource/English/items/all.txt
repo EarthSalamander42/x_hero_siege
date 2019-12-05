@@ -55,7 +55,7 @@
 
 "DOTA_Tooltip_ability_item_shield_of_invincibility"								"<font color='#cb2d2d'>Shield of Invincibility</font>"
 "DOTA_Tooltip_ability_item_shield_of_invincibility_Description"					"<h1><font color='#FF7800'>Passive:</font> <font color='#cb2d2d'>Reincarnation:</font></h1> Revives you with full Mana and Health after death.\n<h1><font color='#FF7800'>Passive:</font> <font color='#cb2d2d'>Spiked Carpace</font></h1> Reflects part of recieved damage to the attacker."
-"DOTA_Tooltip_ability_item_shield_of_invincibility_bonus_armor"					"BONUS ARMOR:"
+"DOTA_Tooltip_ability_item_shield_of_invincibility_damage_reduction"			"DAMAGE REDUCTION:"
 "DOTA_Tooltip_ability_item_shield_of_invincibility_bonus_hp"					"BONUS HP:"
 "DOTA_Tooltip_ability_item_shield_of_invincibility_reincarnation_time"			"REINCARNATE TIME:"
 "DOTA_Tooltip_ability_item_shield_of_invincibility_lore"						"A shield made out of the corpse of Anub'arak."

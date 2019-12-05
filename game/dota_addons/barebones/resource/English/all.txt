@@ -210,7 +210,7 @@
 "DOTA_Tooltip_ability_holdout_endurance_aura_alt_Description"							"Increases the Movement Speed and Attack Rate of nearby friendly units."
 "DOTA_Tooltip_ability_holdout_endurance_aura_alt_Note0"									"Stacks with Divine aura ONLY!"
 "DOTA_Tooltip_ability_holdout_endurance_aura_alt_bat_reduction"							"BASE ATTACK TIME:"
-"DOTA_Tooltip_ability_holdout_endurance_aura_alt_bonus_movement_speed_percentage"		"%MOVEMENT SPEED:"
+"DOTA_Tooltip_ability_holdout_endurance_aura_alt_endurance_bonus_movement_speed"		"%MOVEMENT SPEED:"
 "DOTA_Tooltip_ability_holdout_endurance_aura_alt_radius"								"RADIUS:"
 
 "DOTA_Tooltip_ability_holdout_frostmourne"								"Frostmourne"
@@ -603,7 +603,7 @@
 "DOTA_Tooltip_ability_holdout_chieftain_endurance_aura_Description"							"Increases the Movement Speed and Attack Rate of nearby friendly units."
 "DOTA_Tooltip_ability_holdout_chieftain_endurance_aura_Note0"								"Stacks with Divine aura ONLY!"
 "DOTA_Tooltip_ability_holdout_chieftain_endurance_aura_bat_reduction"						"BASE ATTACK TIME:"
-"DOTA_Tooltip_ability_holdout_chieftain_endurance_aura_bonus_movement_speed_percentage"		"%MOVEMENT SPEED:"
+"DOTA_Tooltip_ability_holdout_chieftain_endurance_aura_endurance_bonus_movement_speed"		"%MOVEMENT SPEED:"
 "DOTA_Tooltip_ability_holdout_chieftain_endurance_aura_radius"								"RADIUS:"
 
 "DOTA_Tooltip_ability_holdout_pulverize"									"Pulverize"
@@ -1856,11 +1856,11 @@
 "DOTA_Tooltip_ability_proudmoore_divine_shield_Description"			"Provides a total invulnerability, being untargettable by any attacks or spells for a short duration."
 "DOTA_Tooltip_ability_proudmoore_divine_shield_duration"			"DURATION:"
 
-"DOTA_Tooltip_ability_endurance_aura"									"Endurance Aura"
-"DOTA_Tooltip_ability_endurance_aura_Description"						"Increases the Movement Speed and Attack Rate of nearby friendly units."
-"DOTA_Tooltip_ability_endurance_aura_bonus_attack_speed"				"BONUS ATTACK SPEED:"
-"DOTA_Tooltip_ability_endurance_aura_bonus_movement_speed_percentage"	"%BONUS MOVEMENT SPEED:"
-"DOTA_Tooltip_ability_endurance_aura_radius"							"RADIUS:"
+"DOTA_Tooltip_ability_xhs_creeps_phase_2_endurance_aura"									"Endurance Aura"
+"DOTA_Tooltip_ability_xhs_creeps_phase_2_endurance_aura_Description"						"Increases the Movement Speed and Attack Rate of nearby friendly units."
+"DOTA_Tooltip_ability_xhs_creeps_phase_2_endurance_aura_bonus_attack_speed"					"BONUS ATTACK SPEED:"
+"DOTA_Tooltip_ability_xhs_creeps_phase_2_endurance_aura_bonus_movement_speed_percentage"	"%BONUS MOVEMENT SPEED:"
+"DOTA_Tooltip_ability_xhs_creeps_phase_2_endurance_aura_radius"								"RADIUS:"
 
 //DEMON HUNTER
 "DOTA_Tooltip_ability_demonhunter_negative_energy"						"Negative Energy"
