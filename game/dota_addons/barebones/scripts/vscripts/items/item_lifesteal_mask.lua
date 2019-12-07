@@ -64,6 +64,7 @@ function modifier_lifesteal:OnAttackLanded(keys)
 end
 
 function modifier_lifesteal:GetModifierLifesteal()
+	if self:GetAbility() == nil then self:Destroy() return end
 	return self:GetAbility():GetSpecialValueFor("lifesteal_pct")
 end
 

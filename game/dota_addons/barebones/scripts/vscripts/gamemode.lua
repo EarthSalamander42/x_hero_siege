@@ -6,7 +6,7 @@ require('events') -- not in cause
 require('constants') -- in cause?
 require('libraries/timers')
 require('libraries/notifications')
---	require('libraries/animations')
+require('libraries/animations')
 require('libraries/keyvalues')
 --	require('libraries/illusionmanager')
 require('libraries/fun')()

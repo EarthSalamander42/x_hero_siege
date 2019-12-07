@@ -671,58 +671,6 @@ local units3 = FindUnitsInRadius( DOTA_TEAM_CUSTOM_1, Vector(0, 0, 0), nil, FIND
 	end)
 end
 
-local final_wave_stun_time = 0
-function FinalWaveSpawner(creep1, creep2, creep3, creep4, boss_name, angles, direction, waypoint)
-	local number = 1
-	local waypoint = Entities:FindByName(nil,"final_wave_player_2")
-
-	for i = 1, 3 do
-		local unit = CreateUnitByName(creep1.."_final_wave", Entities:FindByName(nil,"final_wave_"..direction.."_"..number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-		unit:SetAngles(0, angles, 0)
-		number = number + 1
-	end
-
-	for i = 1, 3 do
-		local unit = CreateUnitByName(creep2.."_final_wave", Entities:FindByName(nil,"final_wave_"..direction.."_"..number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-		unit:SetAngles(0, angles, 0)
-		number = number + 1
-	end
-
-	for i = 1, 3 do
-		local unit = CreateUnitByName(creep3.."_final_wave", Entities:FindByName(nil,"final_wave_"..direction.."_"..number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-		unit:SetAngles(0, angles, 0)
-		number = number + 1
-	end
-
-	for i = 1, 3 do
-		local unit = CreateUnitByName(creep4.."_final_wave", Entities:FindByName(nil,"final_wave_"..direction.."_"..number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-		unit:SetAngles(0, angles, 0)
-		number = number + 1
-	end
-
-	local boss = CreateUnitByName(boss_name.."_final_wave", Entities:FindByName(nil,"final_wave_"..direction.."_"..number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-	boss:SetAngles(0, angles, 0)
-	boss:EmitSound("Hero_TemplarAssassin.Trap")
-	boss:SetInitialGoalEntity(waypoint)
-	boss:MoveToPositionAggressive(waypoint:GetAbsOrigin())
-
-	local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_1, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_NONE , FIND_ANY_ORDER, false)
-	for _,v in pairs(units) do
-		if v:IsCreature() and v:HasMovementCapability() then
-			v:AddNewModifier(nil, nil, "modifier_pause_creeps", {duration = 25+final_wave_stun_time, IsHidden = true})
-			v:AddNewModifier(nil, nil, "modifier_invulnerable", {duration = 25+final_wave_stun_time, IsHidden = true})
-		end
-	end
-
-	final_wave_stun_time = final_wave_stun_time - 5
-
-	for _, hero in pairs(HeroList:GetAllHeroes()) do
-		if hero:IsRealHero() and hero:GetTeam() == DOTA_TEAM_GOODGUYS then
-			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), boss)
-		end
-	end
-end
-
 function DisableItems(hero, time)
 	timers.disabled_items = Timers:CreateTimer(0.0, function()
 		for itemSlot = 0, 5 do

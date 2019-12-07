@@ -1,6 +1,20 @@
 -- Author: Cookies
 -- Date: 05.12.2019
 
+local function RespawnMagtheridon(iBossCount, vPosition, iAnkhCharges)
+	local magtheridon = CreateUnitByName("npc_dota_hero_magtheridon", vPosition, true, nil, nil, DOTA_TEAM_CUSTOM_2)
+	magtheridon.boss_count = iBossCount
+	local ankh = CreateItem("item_ankh_of_reincarnation", magtheridon, magtheridon)
+
+	if iAnkhCharges -1 ~= 0 then
+		magtheridon:AddItem(ankh)
+	end
+
+	ankh:SetCurrentCharges(iAnkhCharges -1)
+	magtheridon:EmitSound("Ability.Reincarnation")
+--	BossBar(magtheridon, "mag")
+	magtheridon.zone = "xhs_holdout"
+end
 
 LinkLuaModifier("modifier_ankh_passives", "items/ankh_of_reincarnation.lua", LUA_MODIFIER_MOTION_NONE)
 
@@ -75,8 +89,22 @@ function modifier_ankh_passives:OnDeath(params)
 			self:GetParent():SetRespawnsDisabled(true)
 		else
 			-- Prevent Beastmaster's bear ability to be cast while reincarnating
-			if self:GetParent():GetOwner():FindAbilityByName("lone_druid_spirit_bear"):IsCooldownReady() then
+			if self:GetParent():GetOwner() and self:GetParent():GetOwner():FindAbilityByName("lone_druid_spirit_bear"):IsCooldownReady() then
 				self:GetParent():GetOwner():FindAbilityByName("lone_druid_spirit_bear"):StartCooldown(5.0)
+			end
+
+			if string.find(self:GetParent():GetUnitName(), "magtheridon") then
+				for i = 1, 8 do
+					CreateUnitByName("npc_dota_hero_magtheridon_medium", self.position + RandomVector(200), true, nil, nil, DOTA_TEAM_CUSTOM_2)
+				end
+
+				local boss_count = self:GetParent().boss_count
+				local position = self.position
+				local charges = self:GetAbility():GetCurrentCharges()
+
+				Timers:CreateTimer(reincarnate_time, function()
+					RespawnMagtheridon(boss_count, position, charges)
+				end)
 			end
 		end
 
@@ -95,6 +123,7 @@ function modifier_ankh_passives:OnDeath(params)
 			end
 		end
 
+		print("Unit name (pre):", self:GetParent():GetUnitName())
 		self:StartIntervalThink(reincarnate_time)
 	end
 end
@@ -109,7 +138,13 @@ function modifier_ankh_passives:OnIntervalThink()
 		self:GetParent():RespawnHero(false, false)
 		self:GetParent():SetRespawnsDisabled(false)
 	else
-		self:GetParent():RespawnUnit()
+		print("Unit name:", self:GetParent():GetUnitName())
+		-- useless fail-safe, just in case (shouldn't proc as the unit is removed before the interval think occurs)
+		if string.find(self:GetParent():GetUnitName(), "magtheridon") then
+			print("MAGTHERIDON RESPAWN!")
+		else
+			self:GetParent():RespawnUnit()
+		end
 	end
 
 	-- requires 0.1 timer?
