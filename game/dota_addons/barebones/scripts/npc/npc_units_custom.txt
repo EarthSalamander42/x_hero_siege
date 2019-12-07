@@ -5457,7 +5457,7 @@
 
 		// Abilities
 		//----------------------------------------------------------------
-		"Ability1"					"unholy_aura"     // Ability 1.
+		"Ability1"					"xhs_creeps_phase_2_unholy_aura"     // Ability 1.
 		"Ability2"					"xhs_creeps_phase_2_endurance_aura"      // Ability 2.
 		"Ability3"					""      // Ability 3.
 		"Ability4"					""      // Ability 4.
@@ -5539,7 +5539,7 @@
 
 		// Abilities
 		//----------------------------------------------------------------
-		"Ability1"					"unholy_aura"     // Ability 1.
+		"Ability1"					"xhs_creeps_phase_2_unholy_aura"     // Ability 1.
 		"Ability2"					"xhs_creeps_phase_2_endurance_aura"      // Ability 2.
 		"Ability3"					""      // Ability 3.
 		"Ability4"					""      // Ability 4.
@@ -7364,7 +7364,7 @@
 
 		"Ability1"					"creature_firestorm"
 		"Ability2"					"creature_thunder_clap"
-		"Ability3"					"unholy_aura"
+		"Ability3"					"xhs_creeps_phase_2_unholy_aura"
 		"Ability4"					"command_aura"
 		"Ability5"					"howl_of_terror"
 		"Ability6"					"necronomicon_warrior_sight"
@@ -10555,7 +10555,7 @@
 		//----------------------------------------------------------------
 		"Ability1"					"cant_die_generic"
 		"Ability2"					"holdout_electric_vortex"
-		"Ability3"					"unholy_aura"
+		"Ability3"					"xhs_creeps_phase_2_unholy_aura"
 		"Ability4"					"boss_health"
 		"Ability5"					"holdout_blue_effect"
 
@@ -11670,7 +11670,7 @@
 		//----------------------------------------------------------------
 		"Ability1"					"spirit_beast_death"						// Ability 7 - Extra.
 		"Ability2"					"xhs_creeps_phase_2_endurance_aura"						// Ability 7 - Extra.
-		"Ability3"					"unholy_aura"						// Ability 7 - Extra.
+		"Ability3"					"xhs_creeps_phase_2_unholy_aura"						// Ability 7 - Extra.
 
 		// Armor
 		//----------------------------------------------------------------

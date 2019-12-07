@@ -1077,8 +1077,8 @@
 "DOTA_Tooltip_ability_holdout_devotion_aura_aura_radius"				"RADIUS:"
 "DOTA_Tooltip_ability_holdout_devotion_aura_bonus_armor"				"BONUS ARMOR:"
 
-"DOTA_Tooltip_modifier_devotion_aura_hidden"							"Devotion Aura"
-"DOTA_Tooltip_modifier_devotion_aura_hidden_Description"				"Grants Additional Armor"
+"DOTA_Tooltip_modifier_devotion_buff"									"Devotion Aura"
+"DOTA_Tooltip_modifier_devotion_buff_Description"						"Grants Additional Armor"
 
 "DOTA_Tooltip_ability_holdout_howl_of_terror"								"Howl of Terror"
 "DOTA_Tooltip_ability_holdout_howl_of_terror_Description"					"The Lightbringer lets loose a wicked cry, weakening the damage and armor of enemies and giving vision of the path ahead."
@@ -1808,14 +1808,14 @@
 "DOTA_Tooltip_modifier_thunder_clap"					"Thunder Clap"
 "DOTA_Tooltip_modifier_thunder_clap_Description"		"Attack and Move speed slowed!"
 
-"DOTA_Tooltip_ability_unholy_aura"									"Unholy Aura"
-"DOTA_Tooltip_ability_unholy_aura_Description"						"Increases the Movement Speed and HP Regen of nearby friendly units."
-"DOTA_Tooltip_ability_unholy_aura_bonus_movement_speed"				"BONUS MOVEMENT SPEED:"
-"DOTA_Tooltip_ability_unholy_aura_bonus_health_regen"				"BONUS HP REGEN:"
-"DOTA_Tooltip_ability_unholy_aura_radius"							"RADIUS:"
+"DOTA_Tooltip_ability_xhs_creeps_phase_2_unholy_aura"									"Unholy Aura"
+"DOTA_Tooltip_ability_xhs_creeps_phase_2_unholy_aura_Description"						"Increases the Movement Speed and HP Regen of nearby friendly units."
+"DOTA_Tooltip_ability_xhs_creeps_phase_2_unholy_aura_bonus_movement_speed"				"BONUS MOVEMENT SPEED:"
+"DOTA_Tooltip_ability_xhs_creeps_phase_2_unholy_aura_bonus_health_regen"				"BONUS HP REGEN:"
+"DOTA_Tooltip_ability_xhs_creeps_phase_2_unholy_aura_radius"							"RADIUS:"
 
-"DOTA_Tooltip_modifier_unholy_aura_buff"					"Unholy Aura"
-"DOTA_Tooltip_modifier_unholy_aura_buff_Description"		"increase move speed and hp regen."
+"DOTA_Tooltip_modifier_unholy_buff"					"Unholy Aura"
+"DOTA_Tooltip_modifier_unholy_buff_Description"		"increase move speed and hp regen."
 
 "DOTA_Tooltip_ability_creature_thunder_clap_low"					"Thunder Clap"
 "DOTA_Tooltip_ability_creature_thunder_clap_low_Description"		"Stuns all enemy units in a specific radius, slowing attack speed and movement speed."

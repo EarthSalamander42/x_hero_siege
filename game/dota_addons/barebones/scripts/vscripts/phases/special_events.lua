@@ -9,7 +9,7 @@ function MuradinEvent(time)
 	mode:SetFixedRespawnTime(1)
 
 	local Muradin = CreateUnitByName("npc_dota_creature_muradin_bronzebeard", Entities:FindByName(nil, "npc_dota_muradin_boss"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
-	Muradin:AddNewModifier( nil, nil, "modifier_boss_stun", {duration = stun_duration})
+	Muradin:AddNewModifier( nil, nil, "modifier_pause_creeps", {duration = stun_duration})
 	Muradin:AddNewModifier( nil, nil, "modifier_invulnerable", {duration = stun_duration})
 	Muradin:SetAngles(0, 270, 0)
 --	Muradin:EmitSound("SantaClaus.StartArena")
@@ -268,11 +268,11 @@ function RameroAndBaristolEvent(time) -- 500 kills
 	GameMode.SpecialArena_occuring = 1
 
 	local Ramero = CreateUnitByName("npc_ramero", Entities:FindByName(nil, "roshan_wp_4"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
-	Ramero:AddNewModifier( nil, nil, "modifier_boss_stun", {duration = stun_duration})
+	Ramero:AddNewModifier( nil, nil, "modifier_pause_creeps", {duration = stun_duration})
 	Ramero:AddNewModifier( nil, nil, "modifier_invulnerable", {duration = stun_duration})
 	Ramero:SetAngles(0, 45, 0)
 	local Baristol = CreateUnitByName("npc_baristol", Entities:FindByName(nil, "roshan_wp_2"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
-	Baristol:AddNewModifier( nil, nil, "modifier_boss_stun", {duration = stun_duration})
+	Baristol:AddNewModifier( nil, nil, "modifier_pause_creeps", {duration = stun_duration})
 	Baristol:AddNewModifier( nil, nil, "modifier_invulnerable", {duration = stun_duration})
 	Baristol:SetAngles(0, 325, 0)
 	EmitSoundOn("Muradin.StormEarthFire", Ramero)
@@ -323,7 +323,7 @@ function StartSogatEvent(hero)
 	TeleportHero(hero, point, delay)
 
 	Timers:CreateTimer(delay, function()
-		SogatEvent(120)
+		SogatEvent(120.0)
 	end)
 
 	RAMERO = 2
@@ -331,16 +331,15 @@ function StartSogatEvent(hero)
 end
 
 function SogatEvent(time) -- 750 kills
-local stun_duration = 5.0
-CustomTimers.timers_paused = 2
-CustomTimers.current_time["special_arena"] = time + stun_duration
-PauseCreeps()
-StunBuildings(time)
-CustomGameEventManager:Send_ServerToAllClients("show_timer_special_arena", {})
-GameMode.SpecialArena_occuring = 1
+	local stun_duration = 5.0
+	CustomTimers.timers_paused = 2
+	CustomTimers.current_time["special_arena"] = time + stun_duration
+	StunBuildings(time)
+	CustomGameEventManager:Send_ServerToAllClients("show_timer_special_arena", {})
+	GameMode.SpecialArena_occuring = 1
 
 	local Ramero = CreateUnitByName("npc_ramero_2", Entities:FindByName(nil, "roshan_wp_4"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
-	Ramero:AddNewModifier( nil, nil, "modifier_boss_stun", {duration = stun_duration})
+	Ramero:AddNewModifier( nil, nil, "modifier_pause_creeps", {duration = stun_duration})
 	Ramero:AddNewModifier( nil, nil, "modifier_invulnerable", {duration = stun_duration})
 	Ramero:SetAngles(0, 45, 0)
 	EmitSoundOn("Muradin.StormEarthFire", Ramero)

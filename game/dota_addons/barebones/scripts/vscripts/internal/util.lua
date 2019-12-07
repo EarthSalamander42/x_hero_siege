@@ -709,7 +709,7 @@ function FinalWaveSpawner(creep1, creep2, creep3, creep4, boss_name, angles, dir
 	local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_1, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_NONE , FIND_ANY_ORDER, false)
 	for _,v in pairs(units) do
 		if v:IsCreature() and v:HasMovementCapability() then
-			v:AddNewModifier(nil, nil, "modifier_boss_stun", {duration = 25+final_wave_stun_time, IsHidden = true})
+			v:AddNewModifier(nil, nil, "modifier_pause_creeps", {duration = 25+final_wave_stun_time, IsHidden = true})
 			v:AddNewModifier(nil, nil, "modifier_invulnerable", {duration = 25+final_wave_stun_time, IsHidden = true})
 		end
 	end
@@ -1006,7 +1006,7 @@ function TeleportAllHeroes(sEvent, iInvulnDelay, iTPDelay)
 				local point = Entities:FindByName(nil, sEvent..tostring(id)) -- might cause error with Dark Fundamental?
 
 				TeleportHero(hero, point:GetAbsOrigin(), iTPDelay)
-				hero:AddNewModifier(nil, nil, "modifier_boss_stun", {duration= iInvulnDelay, IsHidden = true})
+				hero:AddNewModifier(nil, nil, "modifier_pause_creeps", {duration= iInvulnDelay, IsHidden = true})
 				hero:AddNewModifier(nil, nil, "modifier_invulnerable", {duration= iInvulnDelay, IsHidden = true})
 			end
 		end

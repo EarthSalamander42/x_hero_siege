@@ -5152,7 +5152,7 @@
 		// General
 		//-------------------------------------------------------------------------------------
 		"BaseClass"					"ability_lua"
-		"ScriptFile"				"heroes/hero_lone_druid.lua"
+		"ScriptFile"				"heroes/creeps.lua"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_AURA"
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
 		"AbilityUnitTargetType"		"DOTA_UNIT_TARGET_HERO"
@@ -8430,11 +8430,14 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------
-		"BaseClass"					"ability_datadriven"
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"heroes/creeps.lua"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_AURA"
+		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
+		"AbilityUnitTargetType"		"DOTA_UNIT_TARGET_HERO"
+		"AbilityUnitTargetFlags"	"DOTA_UNIT_TARGET_FLAG_INVULNERABLE"
 		"RequiredLevel"				"5"
 		"AbilityTextureName"		"custom/holdout_command_aura"
-		"AbilityUnitTargetFlags"	"DOTA_UNIT_TARGET_FLAG_NOT_ANCIENTS"
 		"AbilityCastRange"			"900"
 
 		// Stats
@@ -8450,31 +8453,6 @@
 			{
 				"var_type"						"FIELD_INTEGER"
 				"radius"						"900"
-			}
-		}
-
-		"Modifiers"
-		{
-			"modifier_command_aura"
-			{
-				"Passive"		"1"
-				"IsHidden"		"1"
-				"IsBuff"		"1"
-
-				"Aura"			"modifier_command_buff"
-				"Aura_Radius"	"%radius"
-				"Aura_Teams"	"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
-				"Aura_Types"	"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
-				"Aura_Flags"	"DOTA_UNIT_TARGET_FLAG_INVULNERABLE"
-			}
-
-			"modifier_command_buff"
-			{ 
-				"IsBuff" "1"
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_BASEDAMAGEOUTGOING_PERCENTAGE" "%bonus_damage_percentage"
-				}
 			}
 		}
 	}
@@ -10277,11 +10255,14 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------
-		"BaseClass"					"ability_datadriven"
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"heroes/creeps.lua"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_AURA"
+		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
+		"AbilityUnitTargetType"		"DOTA_UNIT_TARGET_HERO"
+		"AbilityUnitTargetFlags"	"DOTA_UNIT_TARGET_FLAG_INVULNERABLE"
 		"MaxLevel"					"1"
 		"AbilityTextureName"		"custom/holdout_command_aura"
-		"AbilityUnitTargetFlags"	"DOTA_UNIT_TARGET_FLAG_NOT_ANCIENTS"
 		"AbilityCastRange"			"900"
 
 		// Stats
@@ -10302,32 +10283,6 @@
 			{
 				"var_type"						"FIELD_INTEGER"
 				"radius"						"900"
-			}
-		}
-
-		"Modifiers"
-		{
-			"modifier_command_aura"
-			{
-				"Passive"		"1"
-				"IsHidden"		"1"
-				"IsBuff"		"1"
-
-				"Aura"			"modifier_command_buff"
-				"Aura_Radius"	"%radius"
-				"Aura_Teams"	"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
-				"Aura_Types"	"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
-				"Aura_Flags"	"DOTA_UNIT_TARGET_FLAG_INVULNERABLE"
-			}
-
-			"modifier_command_buff"
-			{
-				"IsBuff" "1"
-
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_BASEDAMAGEOUTGOING_PERCENTAGE"	"%bonus_damage_percentage"
-				}
 			}
 		}
 	}
@@ -22066,6 +22021,7 @@
 		// General
 		//-------------------------------------------------------------------------------------
 		"BaseClass"					"ability_lua"
+		"ScriptFile"				"heroes/creeps.lua"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_AURA | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE"
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
 		"AbilityUnitTargetType"		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
@@ -22102,15 +22058,18 @@
 	//=================================================================================================================
 	// Magtheridon: Unholy Aura
 	//=================================================================================================================
-	"unholy_aura"
+	"xhs_creeps_phase_2_unholy_aura"
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"BaseClass"					"ability_datadriven"
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"heroes/creeps.lua"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
+		"AbilityUnitTargetType"		"DOTA_UNIT_TARGET_HERO"
+		"AbilityUnitTargetFlags"	"DOTA_UNIT_TARGET_FLAG_INVULNERABLE"
 		"AbilityTextureName"    	"custom/holdout_unholy_aura"
 		"AbilityCastRange"			"900"
-		"AbilityUnitTargetFlags"	"DOTA_UNIT_TARGET_FLAG_NOT_ANCIENTS"
 		"RequiredLevel"				"5"
 
 		"precache"
@@ -22126,7 +22085,7 @@
 			"01"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"aura_radius"				"900"
+				"radius"				"900"
 			}
 			"02"
 			{
@@ -22137,51 +22096,6 @@
 			{
 				"var_type"					"FIELD_INTEGER"
 				"bonus_movement_speed"		"30 40 50 60 70"
-			}
-		}
-
-		"Modifiers"
-		{
-			"modifier_unholy_aura"
-			{
-				"Passive"           "1"
-				"IsHidden"          "1"
-				"IsBuff"            "1"
-
-				"Aura"              "modifier_unholy_aura_buff"
-				"Aura_Radius"       "%aura_radius"
-				"Aura_Teams"        "DOTA_UNIT_TARGET_TEAM_FRIENDLY"
-				"Aura_Types"        "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
-				"Aura_Flags"		"DOTA_UNIT_TARGET_FLAG_INVULNERABLE"
-			}
-
-			"modifier_unholy_aura_buff"
-			{
-				"Passive"   "1"
-				"IsHidden"  "0"
-
-				"OnCreated"
-				{
-					"AttachEffect"
-					{
-						"EffectName"			"particles/econ/courier/courier_faceless_rex/cour_rex_ground_a.vpcf"
-						"EffectAttachType"		"follow_origin"
-						"Target"				"TARGET"
-					}
-
-					"AttachEffect"
-					{
-						"EffectName"			"particles/econ/courier/courier_roshan_frost/courier_roshan_frost_steam.vpcf"
-						"EffectAttachType"		"follow_overhead"
-						"Target"				"TARGET"
-					}
-				}
-
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_HEALTH_REGEN_CONSTANT"		"%bonus_health_regen"
-					"MODIFIER_PROPERTY_MOVESPEED_BONUS_CONSTANT"	"%bonus_movement_speed"
-				}
 			}
 		}
 	}
@@ -22525,8 +22439,12 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------
-		"BaseClass"					"ability_datadriven"
-		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_AURA | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE"
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"heroes/creeps.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_AURA"
+		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
+		"AbilityUnitTargetType"		"DOTA_UNIT_TARGET_HERO"
+		"AbilityUnitTargetFlags"	"DOTA_UNIT_TARGET_FLAG_INVULNERABLE"
 		"AbilityTextureName"		"custom/holdout_command_aura"
 		"AbilityCastRange"			"900"
 		"MaxLevel"					"5"
@@ -22544,34 +22462,6 @@
 			{
 				"var_type"				"FIELD_INTEGER"
 				"radius"				"900"
-			}
-		}
-
-		"Modifiers"
-		{
-			"modifier_command_aura"
-			{
-				"Passive"		"1"
-				"IsHidden"		"1"
-				"IsBuff"		"1"
-
-				"Aura"			"modifier_command_buff"
-				"Aura_Radius"	"%radius"
-				"Aura_Teams"	"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
-				"Aura_Types"	"DOTA_UNIT_TARGET_ALL"
-				"Aura_Flags"	"DOTA_UNIT_TARGET_FLAG_INVULNERABLE"
-			}
-
-			"modifier_command_buff"
-			{
-				"Passive"		"1"
-				"IsBuff"		"1"
-				"IsPurgable"	"0"
-
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_BASEDAMAGEOUTGOING_PERCENTAGE" "%bonus_damage_percentage"
-				}
 			}
 		}
 	}

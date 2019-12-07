@@ -107,6 +107,7 @@ function modifier_ankh_passives:OnIntervalThink()
 
 	if self:GetParent():IsRealHero() then
 		self:GetParent():RespawnHero(false, false)
+		self:GetParent():SetRespawnsDisabled(false)
 	else
 		self:GetParent():RespawnUnit()
 	end

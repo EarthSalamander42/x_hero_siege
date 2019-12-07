@@ -699,7 +699,7 @@ ListenToGameEvent("player_chat", function(keys)
 					if str == "-unfreeze_"..Frozen +1 then
 						local hero = PlayerResource:GetPlayer(Frozen):GetAssignedHero()
 						hero:RemoveModifierByName("modifier_pause_creeps")
-						hero:RemoveModifierByName("modifier_boss_stun")
+						hero:RemoveModifierByName("modifier_pause_creeps")
 						hero:RemoveModifierByName("modifier_invulnerable")
 						hero:RemoveModifierByName("modifier_command_restricted")
 						PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)

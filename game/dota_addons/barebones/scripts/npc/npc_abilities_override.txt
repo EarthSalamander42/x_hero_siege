@@ -4729,15 +4729,16 @@
 		"SpellDispellableType"			"SPELL_DISPELLABLE_NO"
 		"FightRecapLevel"				"2"
 		"AbilitySound"					"Hero_Dazzle.Weave"
+		"RequiredLevel"					"8"
+		"LevelsBetweenUpgrades"			"3"
+		"MaxLevel"						"4"
 
 		"AbilityTextureName"			"custom/snapfire_snapfire"
 
-		
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityCastRange"				"1200"
-		
-		
+
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilitySpecial"
@@ -4745,13 +4746,13 @@
 			"01"
 			{	
 				"var_type"					"FIELD_INTEGER"
-				"cooldown_reduction"		"26 38 50"
+				"cooldown_reduction"		"20 30 40 50"
 			}
 			"02"
 			{	
 				"var_type"					"FIELD_FLOAT"
-				"armor_reduction"			"2 2.25 2.5"
-				"LinkedSpecialBonus"	"special_bonus_unique_dazzle_4"
+				"armor_reduction"			"2.25 2.5 2.7 3.0"
+				"LinkedSpecialBonus"		"special_bonus_unique_dazzle_4"
 			}
 			"03"
 			{	

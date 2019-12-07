@@ -59,7 +59,7 @@ ATTACHMENTS_VERSION = "0.85"
 ]]
 
 LinkLuaModifier("modifier_animation_freeze_stun", "libraries/modifiers/modifier_animation_freeze_stun.lua", LUA_MODIFIER_MOTION_NONE )
-LinkLuaModifier("modifier_boss_stun", "libraries/modifiers/modifier_boss_stun.lua", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_pause_creeps", "libraries/modifiers/modifier_pause_creeps.lua", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_voodoo_lua", "libraries/modifiers/modifier_voodoo_lua.lua", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_souls", "libraries/modifiers/modifier_souls.lua", LUA_MODIFIER_MOTION_NONE)
 

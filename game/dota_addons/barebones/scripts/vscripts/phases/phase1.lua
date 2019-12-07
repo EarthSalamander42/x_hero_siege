@@ -14,7 +14,7 @@ if PlayerResource:GetConnectionState(hero:GetPlayerID()) ~= 2 then return end
 	CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "show_events", {})
 	Entities:FindByName(nil, "trigger_special_event"):Disable()
 	TeleportHero(hero, point)
-	hero:AddNewModifier(nil, nil, "modifier_boss_stun", {IsHidden = true})
+	hero:AddNewModifier(nil, nil, "modifier_pause_creeps", {IsHidden = true})
 	hero:AddNewModifier(nil, nil, "modifier_invulnerable", {IsHidden = true})
 	DoEntFire("special_event_piedestal", "SetAnimation", "ancient_trigger001_down_up", 0, nil, nil)
 end

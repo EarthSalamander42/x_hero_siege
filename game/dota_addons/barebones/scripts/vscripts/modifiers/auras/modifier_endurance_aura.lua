@@ -30,8 +30,6 @@ function modifier_endurance_buff:DeclareFunctions() return {
 function modifier_endurance_buff:OnCreated()
 	if not IsServer() then return end
 
-	print("Bonus MS:", self:GetAbility():GetSpecialValueFor("endurance_bonus_movement_speed"))
-
 	self.pfx = ParticleManager:CreateParticle("particles/items_fx/aura_endurance.vpcf", PATTACH_ABSORIGIN_FOLLOW, self:GetParent())
 end
 

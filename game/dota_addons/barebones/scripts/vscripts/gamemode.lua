@@ -496,7 +496,7 @@ function GameMode:HeroImage(event)
 			end
 		end
 --]]
-		GameMode.HeroImage:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 5,IsHidden = true})
+		GameMode.HeroImage:AddNewModifier(nil, nil, "modifier_pause_creeps", {Duration = 5,IsHidden = true})
 		GameMode.HeroImage:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 5,IsHidden = true})
 		GameMode.HeroImage:MakeIllusion()
 		GameMode.HeroImage:AddAbility("hero_image_death")
@@ -572,7 +572,7 @@ local point_beast = Entities:FindByName(nil, "spirit_beast_boss"):GetAbsOrigin()
 
 		GameMode.spirit_beast = CreateUnitByName("npc_spirit_beast", point_beast, true, nil, nil, DOTA_TEAM_CUSTOM_1)
 		GameMode.spirit_beast:SetAngles(0, 210, 0)
-		GameMode.spirit_beast:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 5,IsHidden = true})
+		GameMode.spirit_beast:AddNewModifier(nil, nil, "modifier_pause_creeps", {Duration = 5,IsHidden = true})
 		GameMode.spirit_beast:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 5,IsHidden = true})
 		GameMode.spirit_beast.Boss = true
 
@@ -623,7 +623,7 @@ local point_beast = Entities:FindByName(nil, "frost_infernal_boss"):GetAbsOrigin
 
 		GameMode.frost_infernal = CreateUnitByName("npc_frost_infernal", point_beast, true, nil, nil, DOTA_TEAM_CUSTOM_1)
 		GameMode.frost_infernal:SetAngles(0, 210, 0)
-		GameMode.frost_infernal:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 5, IsHidden = true})
+		GameMode.frost_infernal:AddNewModifier(nil, nil, "modifier_pause_creeps", {Duration = 5, IsHidden = true})
 		GameMode.frost_infernal:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 5, IsHidden = true})
 		GameMode.frost_infernal.Boss = true
 
@@ -680,7 +680,7 @@ local point = Entities:FindByName(nil, "all_hero_image_player")
 			GameMode.AllHeroImage:SetBaseStrength(hero:GetBaseStrength()*2)
 			GameMode.AllHeroImage:SetBaseIntellect(hero:GetBaseIntellect()*2)
 			GameMode.AllHeroImage:SetBaseAgility(hero:GetBaseAgility()*2)
-			GameMode.AllHeroImage:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 5,IsHidden = true})
+			GameMode.AllHeroImage:AddNewModifier(nil, nil, "modifier_pause_creeps", {Duration = 5,IsHidden = true})
 			GameMode.AllHeroImage:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 5,IsHidden = true})
 			GameMode.AllHeroImage:MakeIllusion()
 			GameMode.AllHeroImage.Boss = true
@@ -754,7 +754,7 @@ function GameMode:SpecialEventTPQuit(hero)
 	CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "quit_events", {})
 	hero:Stop()
 	Entities:FindByName(nil, "trigger_special_event"):Enable()
-	hero:RemoveModifierByName("modifier_boss_stun")
+	hero:RemoveModifierByName("modifier_pause_creeps")
 	hero:RemoveModifierByName("modifier_invulnerable")
 	EnableItems(hero)
 end
@@ -766,7 +766,7 @@ local hero = player:GetAssignedHero()
 
 	hero:Stop()
 	Entities:FindByName(nil, "trigger_special_event"):Enable()
-	hero:RemoveModifierByName("modifier_boss_stun")
+	hero:RemoveModifierByName("modifier_pause_creeps")
 	hero:RemoveModifierByName("modifier_invulnerable")
 end
 

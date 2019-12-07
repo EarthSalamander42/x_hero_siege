@@ -83,7 +83,7 @@ local PauseTime = 10.0
 
 		for _, hero in pairs(heroes) do
 			PlayerResource:SetCameraTarget(hero:GetPlayerID(), Muradin)
-			hero:AddNewModifier(nil, nil, "modifier_boss_stun", {Duration = 10, IsHidden = true})
+			hero:AddNewModifier(nil, nil, "modifier_pause_creeps", {Duration = 10, IsHidden = true})
 			hero:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 10, IsHidden = true})
 
 			Timers:CreateTimer(5.0, function()
