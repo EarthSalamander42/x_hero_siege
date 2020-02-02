@@ -25844,6 +25844,11 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityManaCost"				"0"		
 
+		"precache"
+		{
+			"particle"		"particles/units/heroes/hero_lone_druid/lone_druid_true_form.vpcf"
+		}
+
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilitySpecial"
@@ -25918,6 +25923,12 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityManaCost"				"0"		
 
+		"precache"
+		{
+			"particle"		"particles/units/heroes/hero_lone_druid/lone_druid_true_form.vpcf"
+			"soundfile"		"soundevents/game_sounds_heroes/game_sounds_earth_spirit.vsndevts"
+		}
+
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilitySpecial"
@@ -25991,6 +26002,12 @@
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityManaCost"				"0"		
+
+		"precache"
+		{
+			"particle"		"particles/units/heroes/hero_lone_druid/lone_druid_true_form.vpcf"
+			"soundfile"		"soundevents/game_sounds_heroes/game_sounds_ember_spirit.vsndevts"
+		}
 
 		// Special
 		//-------------------------------------------------------------------------------------------------------------

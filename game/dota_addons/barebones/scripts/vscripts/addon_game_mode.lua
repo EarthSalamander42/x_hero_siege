@@ -68,7 +68,6 @@ function Precache(context)
 	PrecacheUnitByNameAsync("npc_dota_hero_clockwerk", context)		-- Space Marine PC and NPC?
 	PrecacheUnitByNameAsync("npc_dota_hero_dazzle", context)		-- Creep - orc ranged 2
 --	PrecacheUnitByNameAsync("npc_dota_hero_drow_ranger", context)	-- Lich & Dryad [and apparently meepo wat]
-	PrecacheUnitByNameAsync("npc_dota_hero_earth_spirit", context) 	-- Earth Spirit
 --	PrecacheUnitByNameAsync("npc_dota_hero_ember_spirit", context) 	-- Ember Spirit & Cloak of Flames & Immolation etc.
 --	PrecacheUnitByNameAsync("npc_dota_hero_faceless_void", context) -- cleave? LK Chrono?
 	PrecacheUnitByNameAsync("npc_dota_hero_huskar", context) 		-- For creeps
@@ -110,6 +109,7 @@ function Precache(context)
 	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_abaddon.vsndevts", context) -- For Lich King shield spell
 	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_death_prophet.vsndevts", context) -- For Incoming Wave 4
 	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_enigma.vsndevts", context) -- For Incoming Wave 4
+	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_faceless_void.vsndevts", context) -- Lich King Chronosphere (boss)
 	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_juggernaut.vsndevts", context) -- For Grom boss (crit sounds?)
 	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_obsidian_destroyer.vsndevts", context)
 	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_queenofpain.vsndevts", context)
