@@ -167,15 +167,27 @@ CURRENT_XP = caster:GetCurrentXP()
 end
 
 function SkinChanger(keys)
-local caster = keys.caster
-local PlayerID = caster:GetPlayerID()
-local gold = caster:GetGold()
-local loc = caster:GetAbsOrigin()
-local Strength = caster:GetBaseStrength()
-local Intellect = caster:GetBaseIntellect()
-local Agility = caster:GetBaseAgility()
-local HP = caster:GetHealth()
-local Mana = caster:GetMana()
+	local caster = keys.caster
+	local PlayerID = caster:GetPlayerID()
+	local gold = caster:GetGold()
+	local loc = caster:GetAbsOrigin()
+	local Strength = caster:GetBaseStrength()
+	local Intellect = caster:GetBaseIntellect()
+	local Agility = caster:GetBaseAgility()
+	local HP = caster:GetHealth()
+	local Mana = caster:GetMana()
+
+	local items = {}
+
+	for i = 0, 14 do
+		if caster:GetItemInSlot(i) then
+			items[i] = {
+				caster:GetItemInSlot(i):GetName(),
+				caster:GetItemInSlot(i):GetCooldownTimeRemaining(),
+				caster:GetItemInSlot(i):GetCurrentCharges(),
+			}
+		end
+	end
 
 	local hero = PlayerResource:ReplaceHeroWith(PlayerID, keys.HeroSwap, gold, 0)
 	hero:GetAbilityByIndex(4):StartCooldown(60)
@@ -187,23 +199,16 @@ local Mana = caster:GetMana()
 	hero:SetHealth(HP)
 	hero:SetMana(Mana)
 
-	local items = {}
-	for i = 0, 8 do
-		if caster:GetItemInSlot(i) and caster:GetItemInSlot(i):GetName() ~= "item_classchange_reset" then
-			itemCopy = CreateItem(caster:GetItemInSlot(i):GetName(), nil, nil)
-			items[i] = itemCopy
-		end
-	end
-
-	for i = 0, 8 do
+	for i = 0, 14 do
 		if items[i] then
-			print(items[i])
-			hero:AddItem(items[i])
---			items[i]:StartCooldown(items[i]:GetCooldownTimeRemaining())
---			if items[i]:GetCurrentCharges() ~= 0 then
---				print(items[i]:GetCurrentCharges())
---				items[i]:SetCurrentCharges(items[i]:GetCurrentCharges())
---			end
+			local item = CreateItem(items[i][1], nil, nil)
+			hero:AddItem(item)
+
+			item:StartCooldown(items[i][2])
+
+			if item:GetCurrentCharges() ~= 0 then
+				item:SetCurrentCharges(items[i][3])
+			end
 		end
 	end
 

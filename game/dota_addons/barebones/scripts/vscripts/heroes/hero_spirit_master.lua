@@ -312,28 +312,29 @@ end
 
 function SpiritSwap(keys)
 	if not IsServer() then return end
-local caster = keys.caster
-local PlayerID = caster:GetPlayerID()
-local gold = caster:GetGold()
-local loc = caster:GetAbsOrigin()
-local Strength = caster:GetBaseStrength()
-local Intellect = caster:GetBaseIntellect()
-local Agility = caster:GetBaseAgility()
--- local HP = caster:GetMaxHealth() * caster:GetHealthPercent() / 100
-local HP = caster:GetHealth()
-local Mana = caster:GetMaxMana() * caster:GetManaPercent() / 100
-local AbPoints = caster:GetAbilityPoints()
-local cooldowns_caster = {}
+
+	local caster = keys.caster
+	local PlayerID = caster:GetPlayerID()
+	local gold = caster:GetGold()
+	local loc = caster:GetAbsOrigin()
+	local Strength = caster:GetBaseStrength()
+	local Intellect = caster:GetBaseIntellect()
+	local Agility = caster:GetBaseAgility()
+--	local HP = caster:GetMaxHealth() * caster:GetHealthPercent() / 100
+	local HP = caster:GetHealth()
+	local Mana = caster:GetMaxMana() * caster:GetManaPercent() / 100
+	local AbPoints = caster:GetAbilityPoints()
+	local cooldowns_caster = {}
 
 	local items = {}
-	for i = 0, 8 do
-		local item = caster:GetItemInSlot(i)
 
-		if item then
-			itemCopy = CreateItem(item:GetName(), nil, nil)
-			items[i] = {}
-			items[i].item = itemCopy
-			items[i].charges = item:GetCurrentCharges()
+	for i = 0, 14 do
+		if caster:GetItemInSlot(i) then
+			items[i] = {
+				caster:GetItemInSlot(i):GetName(),
+				caster:GetItemInSlot(i):GetCooldownTimeRemaining(),
+				caster:GetItemInSlot(i):GetCurrentCharges(),
+			}
 		end
 	end
 
@@ -355,25 +356,17 @@ local cooldowns_caster = {}
 	end
 
 	for i = 0, 5 do 
-	caster_ability = caster:GetAbilityByIndex(i)
-	hero_ability = hero:GetAbilityByIndex(i)
+		local caster_ability = caster:GetAbilityByIndex(i)
+		local hero_ability = hero:GetAbilityByIndex(i)
+
 		if IsValidEntity(caster_ability) then
 			if i == 4 then -- Ignores Spirit Swap Ability
 			else
 				hero_ability:SetLevel(caster_ability:GetLevel())
 			end
+
 			cooldowns_caster[i] = caster_ability:GetCooldownTimeRemaining()
 			hero_ability:StartCooldown(cooldowns_caster[i])
-		end
-	end
-
-	for i = 0, 8 do
-		if items[i] and items[i].item then
-			hero:AddItem(items[i].item)
-
-			if items[i].charges then
-				items[i].item:SetCurrentCharges(items[i].charges)
-			end
 		end
 	end
 
@@ -386,11 +379,22 @@ local cooldowns_caster = {}
 	hero:SetMana(Mana)
 	hero:SetAbilityPoints(AbPoints)
 
-	Timers:CreateTimer(1.0, function()
-		if not caster:IsNull() then
-			UTIL_Remove(caster)
+	for i = 0, 14 do
+		if items[i] then
+			local item = CreateItem(items[i][1], nil, nil)
+			hero:AddItem(item)
+
+			item:StartCooldown(items[i][2])
+
+			if item:GetCurrentCharges() ~= 0 then
+				item:SetCurrentCharges(items[i][3])
+			end
 		end
-	end)
+	end
+
+	if not caster:IsNull() then
+		UTIL_Remove(caster)
+	end
 end
 
 function EnhancedSpirit(keys)
