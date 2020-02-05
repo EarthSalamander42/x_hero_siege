@@ -12,11 +12,6 @@ end
 
 modifier_ring_of_superiority = modifier_ring_of_superiority or class({})
 
---[[
-function modifier_ring_of_superiority:DeclareFunctions() return {
-} end
---]]
-
 function modifier_ring_of_superiority:OnCreated()
 	if not IsServer() then return end
 
@@ -34,6 +29,15 @@ function modifier_ring_of_superiority:OnCreated()
 	self:GetParent():AddNewModifier(self:GetParent(), self:GetAbility(), "modifier_unholy_buff", {})
 	self:GetParent():AddNewModifier(self:GetParent(), self:GetAbility(), "modifier_devotion_buff", {})
 	self:GetParent():AddNewModifier(self:GetParent(), self:GetAbility(), "modifier_command_buff", {})
+end
+
+function modifier_ring_of_superiority:OnRemoved()
+	if not IsServer() then return end
+
+	self:GetParent():RemoveModifierByName("modifier_endurance_buff")
+	self:GetParent():RemoveModifierByName("modifier_unholy_buff")
+	self:GetParent():RemoveModifierByName("modifier_devotion_buff")
+	self:GetParent():RemoveModifierByName("modifier_command_buff")
 end
 
 modifier_devotion_buff = modifier_devotion_buff or class({})

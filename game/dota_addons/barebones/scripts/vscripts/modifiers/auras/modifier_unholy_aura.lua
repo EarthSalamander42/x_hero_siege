@@ -34,10 +34,14 @@ function modifier_unholy_buff:OnCreated()
 end
 
 function modifier_unholy_buff:GetModifierConstantHealthRegen()
+	if not self:GetAbility() then return end
+
 	return self:GetAbility():GetSpecialValueFor("bonus_health_regen")
 end
 
 function modifier_unholy_buff:GetModifierMoveSpeedBonus_Constant()
+	if not self:GetAbility() then return end
+
 	return self:GetAbility():GetSpecialValueFor("bonus_movement_speed")
 end
 

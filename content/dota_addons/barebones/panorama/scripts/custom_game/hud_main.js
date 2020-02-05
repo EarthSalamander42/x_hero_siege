@@ -31,7 +31,7 @@ function OnDialogReceived( data )
 	$( "#FloatingDialogPanel" ).SetHasClass( "Visible", !g_bSentToAll && !data["JournalEntry"] );
 	$( "#DialogPanel" ).SetHasClass( "JournalEntry", data["JournalEntry"] );
 	$( "#DialogTitle" ).text = $.Localize( Entities.GetUnitName( data["DialogEntIndex"] ) );
-	$( "#DialogPortrait" ).SetUnit(Entities.GetUnitName( data["DialogEntIndex"] ), ""); 
+	$( "#DialogPortrait" ).SetUnit(Entities.GetUnitName( data["DialogEntIndex"] ), "", false);
 	$( "#DialogPanel" ).SetHasClass( "ShowAdvanceButton", true );
 	$( "#FloatingDialogPanel" ).SetHasClass( "ShowAdvanceButton", true );
 

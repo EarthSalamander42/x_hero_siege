@@ -208,6 +208,8 @@ function FarmTest()
 	FarmEvent(180)
 end
 
+local CheckTeamDeath = 0
+
 function GameMode:OnThink()
 	if GameRules:IsGamePaused() == true then return 1 end
 	local newState = GameRules:State_Get()
@@ -232,10 +234,21 @@ function GameMode:OnThink()
 		end
 	end
 
+	local IsTeamAlive = false
+
 	for nPlayerID = 0, (PlayerResource:GetPlayerCount() - 1) do
 		if PlayerResource:GetTeam(nPlayerID) == DOTA_TEAM_GOODGUYS then
 			local Hero = PlayerResource:GetSelectedHeroEntity(nPlayerID)
+
 			if Hero then
+				-- Check for all players death in Phase 3
+				if CustomTimers.game_phase == 3 then
+					if Hero:IsAlive() then
+						IsTeamAlive = true
+					end
+				end
+
+				-- Dungeon stuff
 				for _,Zone in pairs(self.Zones) do
 					if Zone and Zone:ContainsUnit(Hero) then
 						local netTable = {}
@@ -245,6 +258,19 @@ function GameMode:OnThink()
 				end
 			end
 		end
+	end
+
+	if CustomTimers.game_phase == 3 then
+		if IsTeamAlive == false then
+			CheckTeamDeath = CheckTeamDeath + 1
+		else
+			CheckTeamDeath = 0
+		end
+	end
+
+	-- after 6 seconds of death for the whole team, end the game
+	if CheckTeamDeath == 6 then
+		GameRules:SetGameWinner(3)
 	end
 
 	return 1
