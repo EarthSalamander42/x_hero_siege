@@ -129,6 +129,21 @@ function CDOTA_BaseNPC:IncrementAttributes(amount, bAll)
 	self:CalculateStatBonus()
 end
 
+function CDOTA_BaseNPC:GetNetworth()
+	if not self:IsRealHero() then return 0 end
+	local gold = self:GetGold()
+
+	-- Iterate over item slots adding up its gold cost
+	for i = 0, 15 do
+		local item = self:GetItemInSlot(i)
+		if item then
+			gold = gold + item:GetCost()
+		end
+	end
+
+	return gold
+end
+
 -- credits to yahnich for the following
 function CDOTA_BaseNPC:IsFakeHero()
 	if self:IsIllusion() or (self:HasModifier("modifier_monkey_king_fur_army_soldier") or self:HasModifier("modifier_monkey_king_fur_army_soldier_hidden")) or self:IsTempestDouble() or self:IsClone() then
