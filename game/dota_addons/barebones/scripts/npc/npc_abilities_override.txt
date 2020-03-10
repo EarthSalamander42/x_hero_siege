@@ -92,39 +92,34 @@
 			}
 			"05"
 			{
-				"var_type"				"FIELD_INTEGER"
-				"quelling_bonus"		"160"
+				"var_type"						"FIELD_INTEGER"
+				"cleave_damage_percent_creep"	"50"
 			}
 			"06"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"quelling_bonus_ranged"	"125"
-			}			
+				"quelling_bonus"		"160"
+			}
 			"07"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"cleave_starting_width"	"150"
+				"quelling_bonus_ranged"	"125"
 			}			
 			"08"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"cleave_ending_width"			"500"
+				"cleave_starting_width"	"150"
 			}			
 			"09"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"cleave_distance"			"770"
-			}
+				"cleave_ending_width"			"500"
+			}			
 			"10"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"cast_range_tooltip"			"350"
-			}
-			"11"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"cast_range_ward"			"450"
-			}			
+				"cleave_distance"			"770"
+			}		
 		}
 	}
 
@@ -325,7 +320,7 @@
 	//=================================================================================================================
 	"antimage_mana_break"
 	{
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE"
+		"AbilityBehavior"		"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE"
 		"MaxLevel"				"5"
 
 		// Special	
@@ -334,8 +329,8 @@
 		{
 			"01"
 			{
-				"var_type"				"FIELD_FLOAT"
-				"damage_per_burn"		"0.25"
+				"var_type"					"FIELD_FLOAT"
+				"percent_damage_per_burn"	"50"
 			}
 			"02"
 			{
@@ -969,10 +964,6 @@
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityManaCost"				"90 120 150 180"
-		
-		// Damage.
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityDamage"					"160 410 660 910"
 
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
@@ -987,6 +978,7 @@
 			{	
 				"var_type"			"FIELD_FLOAT"
 				"duration"			"1.2 1.6 2.0 2.4"
+				"LinkedSpecialBonus"	"special_bonus_unique_nyx_4"
 			}
 			"03"
 			{
@@ -997,6 +989,17 @@
 			{
 				"var_type"			"FIELD_INTEGER"
 				"speed"				"2600"
+			}
+//			"05"
+//			{
+//				"var_type"			"FIELD_INTEGER"
+//				"cooldown_upgrade"	"7"
+//			}
+			"06"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"impale_damage"			"160 410 660 910"
+				"LinkedSpecialBonus"	"special_bonus_unique_nyx_2"
 			}
 		}
 	}
@@ -2266,6 +2269,7 @@
 			{
 				"var_type"					"FIELD_INTEGER"
 				"bonus_movement_speed_pct"	"8 12 16 20"
+				"LinkedSpecialBonus"		"special_bonus_unique_doom_6"	
 			}
 			"04"
 			{
@@ -2902,8 +2906,9 @@
 			}
 			"02"
 			{
-				"var_type"					"FIELD_INTEGER"
-				"bonus_hero_damage"			"500 100 1500 2000"
+				"var_type"						"FIELD_INTEGER"
+				"bonus_hero_damage"				"500 100 1500 2000"
+				"LinkedSpecialBonus"			"special_bonus_unique_ember_spirit_6"
 				"CalculateSpellDamageTooltip"	"0"
 			}		
 			"03"
@@ -3154,9 +3159,9 @@
 	}
 
 	//=================================================================================================================
-	// Tiny: Craggy Exterior
+	// Tiny: Tree Grab
 	//=================================================================================================================
-	"tiny_craggy_exterior"
+	"tiny_tree_grab"
 	{
 		"AbilityCastRange"				"165"
 		"AbilityCastPoint"				"0.2"
@@ -3169,36 +3174,31 @@
 			"01"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"attack_count"				"8 12 16 20"
-			}
-			"02"
-			{
-				"var_type"					"FIELD_INTEGER"
 				"bonus_damage"				"50"
 				"CalculateSpellDamageTooltip"	"0"
 			}
-			"03"
+			"02"
 			{
 				"var_type"					"FIELD_INTEGER"
 				"bonus_damage_buildings"	"100"
 				"CalculateSpellDamageTooltip"	"0"
 			}
-			"04"
+			"03"
 			{
 				"var_type"					"FIELD_INTEGER"
 				"attack_range"				"350"
 			}
-			"05"
+			"04"
 			{
 				"var_type"					"FIELD_INTEGER"
 				"splash_width"				"200"
 			}
-			"06"
+			"05"
 			{
 				"var_type"					"FIELD_INTEGER"
 				"splash_range"				"400"
 			}
-			"07"
+			"06"
 			{
 				"var_type"					"FIELD_INTEGER"
 				"splash_pct"				"60"
@@ -4346,14 +4346,14 @@
 			"02"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"max_charges"			"2"
+				"AbilityCharges"		"2"
 				"LinkedSpecialBonus"	"special_bonus_unique_void_spirit_9"
 			}
 			"03"
 			{
-				"var_type"				"FIELD_INTEGER"
-				"charge_restore_time"	"25 20 15"
-				"LinkedSpecialBonus"	"special_bonus_unique_void_spirit_1"
+				"var_type"					"FIELD_INTEGER"
+				"AbilityChargeRestoreTime"	""
+				"LinkedSpecialBonus"		"special_bonus_unique_void_spirit_1"
 			}
 			"04"
 			{

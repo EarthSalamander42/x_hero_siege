@@ -91,6 +91,7 @@
 	horizontal-align: center;
 	vertical-align: center;
 	text-align: center;
+	text-overflow: shrink;
 }
 
 #EventInfo

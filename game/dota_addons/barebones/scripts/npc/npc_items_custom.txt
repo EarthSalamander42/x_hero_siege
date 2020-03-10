@@ -2677,6 +2677,7 @@
 		"ItemKillable"					"0"
 		"ItemShareability"				"ITEM_NOT_SHAREABLE"
 		"ItemDroppable"					"0"
+		"AbilityCooldown"				"60.0"
 
 		// Special
 		//----------------------------------------------------------------------------------------------------

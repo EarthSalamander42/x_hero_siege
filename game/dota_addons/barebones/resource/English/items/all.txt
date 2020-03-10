@@ -28,7 +28,7 @@
 "DOTA_Tooltip_ability_item_lightning_sword_Lore"						"A simple sword, enhanced by Muradin's powers, for Ramero to wield in combat."
 "DOTA_Tooltip_ability_item_lightning_sword_bonus_damage"				"BONUS DAMAGE:"
 "DOTA_Tooltip_ability_item_lightning_sword_lifesteal_pct"				"%LIFESTEAL:"
-// "DOTA_Tooltip_ability_item_lightning_sword_bonus_armor"					"BONUS ARMOR:"
+// "DOTA_Tooltip_ability_item_lightning_sword_bonus_armor"				"BONUS ARMOR:"
 
 "DOTA_Tooltip_modifier_lifesteal_lightning_sword"						"Lifesteal"
 "DOTA_Tooltip_modifier_lifesteal_lightning_sword_Description"			"Healed when attacking enemies."
@@ -45,8 +45,8 @@
 "DOTA_Tooltip_ability_item_ring_of_superiority_lore"						"The King's Ring, imbued with his will and essence, to ensure that only a true leader would wield it and become King."
 
 "DOTA_Tooltip_ability_item_doom_artifact"								"<font color='#FF0000'>Doom Artifact</font>"
-"DOTA_Tooltip_ability_item_doom_artifact_Description"					"<font color='#722095'><h1>Key of the 3 Moons:</h1></font> Grants +1500 for all stats when carried.\n<font color='#cb2d2d'><h1>Shield of Invincibility:</h1>	</font> Provides <font color='#cb2d2d'>Unlimited Reincarnation</font>, <font color='#cb2d2d'>Spiked Carpace</font>, armor and HP. \n<font color='#2a7fbf'><h1>Lightning Sword:</h1></font> Grants 3000 Damage and 50% Lifesteal. \n<font color='#ead61c'><h1>Ring of Superiority:</h1></font> Grants Endurance Aura, Unholy Aura, Command Aura and Devotion aura to the carrier."
-"DOTA_Tooltip_ability_item_doom_artifact_Note0"							"Provides same bonuses as the 4 Unique items, but merged in 1."
+"DOTA_Tooltip_ability_item_doom_artifact_Description"					"<font color='#722095'><h1>Key of the 3 Moons:</h1></font> Grants +%bonus_stats% for all stats when carried.\n<font color='#cb2d2d'><h1>Shield of Invincibility:</h1></font> Provides <font color='#cb2d2d'>Unlimited Reincarnation</font>, <font color='#cb2d2d'>Spiked Carpace</font> which reduces all incoming damage by %damage_reduction%&, %bonus_armor% armor and %bonus_hp% health. \n<font color='#2a7fbf'><h1>Lightning Sword:</h1></font> Grants %bonus_damage% damage and %lifesteal_percent%%  lifesteal. \n<font color='#ead61c'><h1>Ring of Superiority:</h1></font> Grants Endurance Aura, Unholy Aura, Command Aura and Devotion aura to the carrier."
+"DOTA_Tooltip_ability_item_doom_artifact_Note0"							"Provides the same bonuses as the 4 Unique items, but merged in 1."
 "DOTA_Tooltip_ability_item_doom_artifact_lore"							"He, who has this artifact, shall unleash hell upon his enemies."
 
 "DOTA_Tooltip_ability_item_boots_of_speed"									"Boots of Speed"

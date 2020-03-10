@@ -289,9 +289,10 @@ _G.ZonesDefinition =
 				},
 				Completion = 
 				{	
-					Type = QUEST_EVENT_ON_ENEMY_KILLED,
-					szNPCName ="npc_dota_boss_spirit_master",
+					Type = QUEST_EVENT_ON_TEAM_ENEMY_KILLED,
+					szTeamName = DOTA_TEAM_CUSTOM_1,
 				},
+				nCompleteLimit = 4,
 				nCompleteLimit = 1,
 			},
 		},

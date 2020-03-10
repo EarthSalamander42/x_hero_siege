@@ -157,8 +157,8 @@ function StartArthasArena(keys)
 
 	local arthas = CreateUnitByName("npc_dota_hero_arthas", Entities:FindByName(nil,"npc_dota_spawner_magtheridon_arena"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_CUSTOM_2)
 	arthas:SetAngles(0, 270, 0)
-	arthas:AddNewModifier(nil, nil, "modifier_pause_creeps", {Duration = 10, IsHidden = true}):SetStackCount(1)
-	arthas:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 9, IsHidden = true})
+	arthas:AddNewModifier(nil, nil, "modifier_pause_creeps", {Duration = 7, IsHidden = true}):SetStackCount(1)
+	arthas:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 7, IsHidden = true})
 --	BossBar(arthas, "arthas")
 	arthas.zone = "xhs_holdout"
 
