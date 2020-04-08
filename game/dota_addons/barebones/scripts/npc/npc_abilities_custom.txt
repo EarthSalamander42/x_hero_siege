@@ -28195,18 +28195,30 @@
 	}
 
 	//=================================================================================================================
-	// Ursa: Earthshock
+	// Ursa's Earthshock
 	//=================================================================================================================
 	"furbolg_earthshock"
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"BaseClass"             		"ursa_earthshock"
-		"MaxLevel" 						"1"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING"
-		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
+		"BaseClass"						"ability_lua"
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
-		
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING"
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
+		"SpellDispellableType"			"SPELL_DISPELLABLE_YES"
+		"AbilityTextureName"			"ursa_earthshock"
+		"ScriptFile"					"abilities/furbolg.lua"
+		"FightRecapLevel"				"1"
+		"MaxLevel"						"1"
+
+		"precache"
+		{
+			"particle"		"particles/hero/ursa/enrage_ursa_earthshock.vpcf"
+			"soundfile"		"soundevents/game_sounds_heroes/game_sounds_ursa.vsndevts"
+		}
+
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityCastRange"				"0"
@@ -28214,30 +28226,35 @@
 
 		// Time		
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCooldown"				"17"
-		"AbilityDuration"				"3.0"
-
-		// Damage.
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityDamage"					"350"
+		"AbilityCooldown"				"17.0"
 
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityManaCost"				"90"
-		
+
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilitySpecial"
 		{
 			"01"
 			{
-				"var_type"					"FIELD_INTEGER"
-				"shock_radius"				"385"
+				"var_type"				"FIELD_INTEGER"
+				"radius"				"385"
 			}
 			"02"
 			{
-				"var_type"					"FIELD_INTEGER"
-				"movement_slow"				"-25"
+				"var_type"				"FIELD_FLOAT"
+				"duration"				"3.0"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"base_damage"			"350"
+			}
+			"04"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"slow_pct"				"25"
 			}
 		}
 	}

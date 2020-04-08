@@ -1,28 +1,28 @@
 <root>
 	<styles>
-		<include src="s2r://panorama/styles/custom_game/xhs_events.vcss_c" />
+		<include src="s2r://panorama/styles/custom_game/xhs_events.css" />
 	</styles>
 
 	<scripts>
-		<include src="s2r://panorama/scripts/custom_game/xhs_events.vjs_c" />
+		<include src="s2r://panorama/scripts/custom_game/xhs_events.js" />
 	</scripts>
 
 	<Panel hittest="false" class="EventsPanel">
 		<Panel id="EventPanel">
 			<Button id="Event1" onmouseactivate="HeroImage();" >
-				<Label class="Event1_Title" text="#tooltip_event_hero_image" id="EventTitle"/>
+				<Label class="EventTitle" text="#tooltip_event_hero_image"/>
 			</Button>
 
 			<Button id="Event2" onmouseactivate="SpiritBeast();" >
-				<Label class="Event1_Title" text="#tooltip_event_spirit_beast" id="EventTitle"/>
+				<Label class="EventTitle" text="#tooltip_event_spirit_beast"/>
 			</Button>
 
 			<Button id="Event3" onmouseactivate="FrostInfernal();" >
-				<Label class="Event1_Title" text="#tooltip_event_frost_infernal" id="EventTitle"/>
+				<Label class="EventTitle" text="#tooltip_event_frost_infernal"/>
 			</Button>
 
 			<Button id="Event4" onmouseactivate="AllHeroImages();" >
-				<Label class="Event1_Title" text="#tooltip_event_all_hero_images" id="EventTitle"/>
+				<Label class="EventTitle" text="#tooltip_event_all_hero_images"/>
 			</Button>
 
 			<Button id="Close" onmouseactivate="OnQuit();" >

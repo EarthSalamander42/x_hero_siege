@@ -82,10 +82,11 @@
 	wash-color: #aaaaaa;
 }
 
-#EventTitle
+.EventTitle
 {
 	margin-top: 0px;
 	margin-left: 0px;
+	width: 90%;
 	font-size: 20px;
 	color: white;
 	horizontal-align: center;
