@@ -88,10 +88,6 @@ end
 function modifier_lifesteal_lightning_sword:OnAttackLanded(keys)
 	if IsServer() then
 		if self:GetParent() == keys.attacker then
-			if self:GetParent():HasModifier("modifier_lifesteal_doom_artifact") then
-				return
-			end
-
 			self:GetParent():Lifesteal(keys.target, self)
 		end
 	end
@@ -104,7 +100,7 @@ end
 function modifier_lifesteal_lightning_sword:OnDestroy()
 	if IsServer() then
 		-- fix with Vampiric Aura interaction
-		if self:GetParent():HasItemInInventory("item_lifesteal_mask") or self:GetParent():HasItemInInventory("item_lightning_sword") then
+		if self:GetParent():HasItemInInventory("item_lifesteal_mask") or self:GetParent():HasItemInInventory("item_lightning_sword") or self:GetParent():HasItemInInventory("item_doom_artifact") then
 			self:GetParent():AddNewModifier(self:GetParent(), self, "modifier_lifesteal_lightning_sword", {})
 		end
 	end

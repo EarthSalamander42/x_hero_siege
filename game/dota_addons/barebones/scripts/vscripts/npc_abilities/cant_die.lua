@@ -81,11 +81,15 @@ FourBossesKillCount()
 		EmitSoundOn("skeleton_king_wraith_death_long_09", caster)
 		DoEntFire("door_illidan", "SetAnimation", "gate_02_open", 0, nil, nil)
 		DoEntFire("door_illidan2", "SetAnimation", "gate_02_open", 0, nil, nil)
-		caster:ForceKill(true)
 		local DoorObs = Entities:FindAllByName("obstruction_illidan")
 		for _, obs in pairs(DoorObs) do
 			obs:SetEnabled(false, true)
 		end
+	end)
+
+	Timers:CreateTimer(12.0, function()
+		caster:AddNoDraw()
+		caster:ForceKill(true)
 	end)
 end
 
@@ -103,7 +107,6 @@ FourBossesKillCount()
 	StartAnimation(caster, {duration=6.0, activity=ACT_DOTA_FLAIL, rate=0.75})
 
 	Timers:CreateTimer(6, function()
-		caster:ForceKill(true)
 		DoEntFire("door_balanar", "SetAnimation", "gate_02_open", 0, nil, nil)
 		DoEntFire("door_balanar2", "SetAnimation", "gate_02_open", 0, nil, nil)
 		local DoorObs = Entities:FindAllByName("obstruction_balanar")
@@ -117,6 +120,11 @@ FourBossesKillCount()
 		EmitSoundOn("skeleton_king_wraith_death_long_09", caster)
 		EmitSoundOn("skeleton_king_wraith_death_long_09", caster)
 	end)
+
+	Timers:CreateTimer(12.0, function()
+		caster:AddNoDraw()
+		caster:ForceKill(true)
+	end)
 end
 
 function proudmoore_boss_die(caster)
@@ -128,8 +136,7 @@ FourBossesKillCount()
 	end)
 
 	Timers:CreateTimer(6, function()
-		DoEntFire("door_proudmoore2", "SetAnimation", "gate_02_open", 0, nil, nil)
-		caster:ForceKill(true)
+		DoEntFire("door_proudmoore3", "SetAnimation", "gate_02_open", 0, nil, nil)
 		local DoorObs = Entities:FindAllByName("obstruction_proudmoore2")
 		for _, obs in pairs(DoorObs) do
 			obs:SetEnabled(false, true)
@@ -145,6 +152,11 @@ FourBossesKillCount()
 		StartAnimation(caster, {duration=6.0, activity=ACT_DOTA_DIE, rate=0.3})
 		EmitSoundOn("skeleton_king_wraith_death_long_09", caster)
 		EmitSoundOn("skeleton_king_wraith_death_long_09", caster)
+	end)
+
+	Timers:CreateTimer(12.0, function()
+		caster:AddNoDraw()
+		caster:ForceKill(true)
 	end)
 end
 
@@ -163,7 +175,7 @@ FourBossesKillCount()
 
 	Timers:CreateTimer(6, function()
 		DoEntFire("door_proudmoore", "SetAnimation", "gate_02_open", 0, nil, nil)
-		caster:ForceKill(true)
+		DoEntFire("door_proudmoore2", "SetAnimation", "gate_02_open", 0, nil, nil)
 		local DoorObs = Entities:FindAllByName("obstruction_proudmoore")
 		for _, obs in pairs(DoorObs) do
 			obs:SetEnabled(false, true)
@@ -172,10 +184,16 @@ FourBossesKillCount()
 		EmitSoundOn("skeleton_king_wraith_death_long_09", caster)
 		EmitSoundOn("skeleton_king_wraith_death_long_09", caster)
 	end)
+
+	Timers:CreateTimer(12.0, function()
+		caster:AddNoDraw()
+		caster:ForceKill(true)
+	end)
 end
 
 function arthas_boss_die(caster)
 	EmitGlobalSound("Arthas.Death")
+
 	Timers:CreateTimer(1.0, function()
 		GiveTomeToAllHeroes(250)
 		EmitGlobalSound("Loot_Drop_Stinger_Arcana")
@@ -193,6 +211,7 @@ function arthas_boss_die(caster)
 	end)
 
 	Timers:CreateTimer(11.0, function()
+		caster:AddNoDraw()
 		caster:ForceKill(true)
 		CustomGameEventManager:Send_ServerToAllClients("hide_ui", {})
 		RefreshPlayers()
@@ -221,6 +240,7 @@ function banehallow_boss_die(caster)
 	end)
 
 	Timers:CreateTimer(12.5, function()
+		caster:AddNoDraw()
 		caster:ForceKill(true)
 		CustomGameEventManager:Send_ServerToAllClients("hide_ui", {})
 		RefreshPlayers()
@@ -241,13 +261,14 @@ function LichKingEnd(caster)
 	StartAnimation(caster, {duration=4.9, activity=ACT_DOTA_FLAIL, rate=0.75})
 
 	Timers:CreateTimer(5, function()
-		StartAnimation(caster, {duration=10.0, activity=ACT_DOTA_DIE, rate=0.30})
+		StartAnimation(caster, {duration=10.0, activity=ACT_DOTA_DIE, rate=0.10})
 		EmitSoundOn("razor_raz_death_05", caster)
 		EmitSoundOn("razor_raz_death_05", caster)
 		EmitSoundOn("razor_raz_death_05", caster)
 	end)
 
 	Timers:CreateTimer(14, function()
+		caster:AddNoDraw()
 		caster:ForceKill(true)
 		CustomGameEventManager:Send_ServerToAllClients("hide_ui", {})
 		RefreshPlayers()
@@ -288,6 +309,7 @@ function spirit_master_boss_die(caster)
 	end)
 
 	Timers:CreateTimer(12.5, function()
+		caster:AddNoDraw()
 		caster:ForceKill(true)
 	end)
 end

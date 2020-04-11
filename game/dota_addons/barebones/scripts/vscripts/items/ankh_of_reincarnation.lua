@@ -26,7 +26,7 @@ end
 
 modifier_ankh_passives = modifier_ankh_passives or class({})
 
-function modifier_ankh_passives:IsHidden() return not IsInToolsMode() end
+function modifier_ankh_passives:IsHidden() return true end
 function modifier_ankh_passives:RemoveOnDeath() return false end
 function modifier_ankh_passives:IsPurgable() return false end
 function modifier_ankh_passives:IsPurgeException() return false end

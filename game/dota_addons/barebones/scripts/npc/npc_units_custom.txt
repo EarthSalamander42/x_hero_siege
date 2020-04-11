@@ -7436,7 +7436,7 @@
 		"Ability6"					"cant_die_generic"
 	
 		"HasInventory"				"0"
-		"ArmorPhysical"				"120"                 // Physical protection.
+		"ArmorPhysical"				"200"                 // Physical protection.
 		"MagicalResistance"			"50"                 // Magical protection (percentage).
 
 		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
@@ -7703,7 +7703,7 @@
 		"Ability4"					"boss_health"
 		"Ability5"					"cant_die_generic"
 
-		"ArmorPhysical"				"120"			// Physical protection.
+		"ArmorPhysical"				"200"			// Physical protection.
 		"MagicalResistance"			"50"			// Magical protection (percentage).
 	
 		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
@@ -9009,7 +9009,7 @@
 		"Ability4"					"cant_die_generic"
 		"Ability5"					"boss_health"
 
-		"ArmorPhysical"				"120"                 // Physical protection.
+		"ArmorPhysical"				"200"                 // Physical protection.
 		"MagicalResistance"			"50"                 // Magical protection (percentage).
 
 		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
@@ -9064,7 +9064,7 @@
 		"Ability6"					"boss_health"
 		"Ability7"					"cant_die_generic"
 
-		"ArmorPhysical"				"120"                 // Physical protection.
+		"ArmorPhysical"				"150"                 // Physical protection.
 		"MagicalResistance"			"100"                 // Magical protection (percentage).
 
 		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
@@ -9932,7 +9932,7 @@
 		"Ability7"					"boss_health"
 		"Ability8"					"cant_die_generic"
 
-		"ArmorPhysical"				"100"                  // Physical protection.
+		"ArmorPhysical"				"160"                  // Physical protection.
 		"MagicalResistance"			"50"                 // Magical protection (percentage).
 
 		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
@@ -11765,7 +11765,7 @@
 
 		// Armor
 		//----------------------------------------------------------------
-		"ArmorPhysical"				"0"			// Physical protection.
+		"ArmorPhysical"				"60"			// Physical protection.
 		"MagicalResistance"			"25"			// Magical protection (percentage).
 
 		// Attack
@@ -11975,7 +11975,7 @@
 
 		// Armor
 		//----------------------------------------------------------------
-		"ArmorPhysical"				"40"			// Physical protection.
+		"ArmorPhysical"				"50"			// Physical protection.
 		"MagicalResistance"			"25"			// Magical protection (percentage).
 
 		// Attack

@@ -1253,6 +1253,13 @@ ListenToGameEvent('entity_killed', function(keys)
 --				CREEP_LANES[lane][2] = CREEP_LANES[lane][2] + 1
 --				Notifications:TopToAll({text="Creep lane "..lane.." is now level "..CREEP_LANES[lane][2].."!", duration=5.0, style={color="lightgreen"}})
 			end
+		elseif killedUnit:IsAncient() then
+			local castle_shop = Entities:FindByName(nil, "castle_shop")
+
+			if castle_shop then
+				print("Ancient destroyed, removed secret shop")
+				castle_shop:RemoveSelf()
+			end
 		end
 	end
 --	print("EntityKilled: Not Hero or Creature or Building.")

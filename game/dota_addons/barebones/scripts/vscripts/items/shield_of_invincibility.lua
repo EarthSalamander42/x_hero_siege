@@ -17,6 +17,7 @@ function modifier_shield_of_invincibility:IsPurgable() return false end
 function modifier_shield_of_invincibility:IsPurgeException() return false end
 function modifier_shield_of_invincibility:GetEffectName() return "particles/items_fx/blademail.vpcf" end
 function modifier_shield_of_invincibility:GetEffectAttachType() return PATTACH_ABSORIGIN_FOLLOW end
+function modifier_shield_of_invincibility:GetTexture() return "modifiers/shield_of_invincibility" end
 
 function modifier_shield_of_invincibility:DeclareFunctions() return {
 	MODIFIER_EVENT_ON_ATTACKED,

@@ -29,7 +29,7 @@ function modifier_npc_dialog:CheckState()
 		[MODIFIER_STATE_DISARMED] = true,
 		[MODIFIER_STATE_NO_HEALTH_BAR] = true,
 		[MODIFIER_STATE_STUNNED] = true,
-		[MODIFIER_STATE_LOW_ATTACK_PRIORITY] = true,
+		[MODIFIER_STATE_INVULNERABLE] = true,
 	}
 	
 	return state
@@ -37,28 +37,9 @@ end
 
 -----------------------------------------------------------------------
 
-function modifier_npc_dialog:DeclareFunctions()
-	local funcs = 
-	{
-		MODIFIER_PROPERTY_ABSOLUTE_NO_DAMAGE_MAGICAL,
-        MODIFIER_PROPERTY_ABSOLUTE_NO_DAMAGE_PHYSICAL,
-        MODIFIER_PROPERTY_ABSOLUTE_NO_DAMAGE_PURE,
-		MODIFIER_EVENT_ON_ORDER,
-	}
-	return funcs
-end
-
-function modifier_npc_dialog:GetAbsoluteNoDamageMagical()
-	return 1
-end
-
-function modifier_npc_dialog:GetAbsoluteNoDamagePhysical()
-	return 1
-end
-
-function modifier_npc_dialog:GetAbsoluteNoDamagePure()
-	return 1
-end
+function modifier_npc_dialog:DeclareFunctions() return {
+	MODIFIER_EVENT_ON_ORDER
+} end
 
 -----------------------------------------------------------------------
 
@@ -87,7 +68,6 @@ function modifier_npc_dialog:OnOrder( params )
 
 	return 0
 end
-
 
 -----------------------------------------------------------------------
 

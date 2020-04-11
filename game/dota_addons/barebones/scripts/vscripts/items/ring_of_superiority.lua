@@ -42,6 +42,8 @@ end
 
 modifier_devotion_buff = modifier_devotion_buff or class({})
 
+function modifier_devotion_buff:GetTexture() return "omniknight_degen_aura" end
+
 function modifier_devotion_buff:DeclareFunctions() return {
 	MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS,
 } end

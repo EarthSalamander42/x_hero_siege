@@ -1993,7 +1993,7 @@
 		"AbilityTextureName" 			"custom/shield_of_invincibility"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"AbilityCastRange"				"0"
-		"AbilityCooldown"				"60.0"
+		"AbilityCooldown"				"0.0"
 		"Model"							"models/props_items/poor_man_shield01.vmdl"
 		"Effect"						"particles/units/heroes/hero_ogre_magi/ogre_magi_ignite_debuff.vpcf"
 
@@ -2677,7 +2677,7 @@
 		"ItemKillable"					"0"
 		"ItemShareability"				"ITEM_NOT_SHAREABLE"
 		"ItemDroppable"					"0"
-		"AbilityCooldown"				"60.0"
+		"AbilityCooldown"				"0.0"
 
 		// Special
 		//----------------------------------------------------------------------------------------------------
@@ -2716,7 +2716,7 @@
 			"07"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"lifesteal_percent"		"50"
+				"lifesteal_pct"			"50"
 			}
 			"08"
 			{

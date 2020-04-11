@@ -101,9 +101,7 @@ function DarkProtectors(keys)
 local activator = keys.activator
 local point2 = Entities:FindByName(nil, "spawner_phase3_creeps_west"):GetAbsOrigin()
 local point3 = Entities:FindByName(nil, "spawner_phase3_creeps_east"):GetAbsOrigin()
-local play_sound = false
 
-	DoEntFire("door_magtheridon", "SetAnimation", "gate_02_close", 0, nil, nil)
 	RefreshPlayers()
 
 	Timers:CreateTimer(0.5, function()

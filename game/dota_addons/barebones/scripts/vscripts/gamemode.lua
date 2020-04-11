@@ -527,6 +527,8 @@ function GameMode:HeroImage(event)
 		GameMode.HeroImage:MakeIllusion()
 		GameMode.HeroImage:AddAbility("hero_image_death")
 		GameMode.HeroImage.Boss = true
+		GameMode.HeroImage:SetHealth(99999)
+		GameMode.HeroImage:Mana(99999)
 
 		local ability = GameMode.HeroImage:FindAbilityByName("hero_image_death")
 		ability:ApplyDataDrivenModifier(GameMode.HeroImage, GameMode.HeroImage, "modifier_hero_image", {})
@@ -710,6 +712,8 @@ local point = Entities:FindByName(nil, "all_hero_image_player")
 			GameMode.AllHeroImage:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 5,IsHidden = true})
 			GameMode.AllHeroImage:MakeIllusion()
 			GameMode.AllHeroImage.Boss = true
+			GameMode.AllHeroImage:SetHealth(99999)
+			GameMode.AllHeroImage:Mana(99999)
 
 			if illusion_spawn < 8 then
 				return_time = 0.2
