@@ -23,7 +23,7 @@ ListenToGameEvent('game_rules_state_change', function()
 		local mode  = GameMode
 		local votes = mode.VoteTable
 
-		for category, pidVoteTable in pairs(votes) do
+		for category, pidVoteTable in pairs(votes or {}) do
 			-- Tally the votes into a new table
 			local voteCounts = {}
 			for pid, vote in pairs(pidVoteTable) do
@@ -1517,8 +1517,12 @@ function GameMode:OnQuestStarted(zone, quest)
 		local hDialogEntities = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_ALL, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, 0, false)
 		for _,DialogEnt in pairs (hDialogEntities) do
 			if DialogEnt ~= nil  and DialogEnt:GetUnitName() == quest.Completion.szNPCName and DialogEnt:FindModifierByName("modifier_npc_dialog_notify") == nil then
-			print("DIALOG: Adding modifier: modifier_npc_dialog_notify")
-			DialogEnt:AddNewModifier(DialogEnt, nil, "modifier_npc_dialog_notify", {})
+				if DialogEnt:FindModifierByName("modifier_invulnerable") then
+					DialogEnt:RemoveModifierByName("modifier_invulnerable")
+				end
+
+				print("DIALOG: Adding modifier: modifier_npc_dialog_notify")
+				DialogEnt:AddNewModifier(DialogEnt, nil, "modifier_npc_dialog_notify", {})
 			end
 		end
 	end

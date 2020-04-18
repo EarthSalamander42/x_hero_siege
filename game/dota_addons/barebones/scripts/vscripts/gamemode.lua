@@ -83,7 +83,7 @@ function GameMode:InitGameMode()
 	GameRules:SetGoldPerTick(0.0)
 	GameRules:SetCustomGameSetupAutoLaunchDelay(10.0) --Vote Time
 	GameRules:SetPreGameTime(PREGAMETIME)
-
+--[[
 	--Disabling Derived Stats
 	mode:SetCustomAttributeDerivedStatValue(DOTA_ATTRIBUTE_STRENGTH_MAGIC_RESISTANCE_PERCENT, 0) -- not working
 
@@ -93,7 +93,7 @@ function GameMode:InitGameMode()
 --	mode:SetCustomAttributeDerivedStatValue(DOTA_ATTRIBUTE_STRENGTH_HP_REGEN_PERCENT, 0.0025)
 	mode:SetCustomAttributeDerivedStatValue(DOTA_ATTRIBUTE_AGILITY_ARMOR, 0) -- default: 0.016 armor per agility point
 	mode:SetCustomAttributeDerivedStatValue(DOTA_ATTRIBUTE_INTELLIGENCE_SPELL_AMP_PERCENT, 0.075)
-
+--]]
 	-- Boolean Rules
 	GameRules:SetUseCustomHeroXPValues(true)
 	GameRules:SetUseBaseGoldBountyOnHeroes(false)

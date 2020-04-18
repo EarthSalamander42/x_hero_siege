@@ -17,6 +17,7 @@ end
 function modifier_npc_dialog:OnCreated( params )
 	if IsServer() then
 		self.flTalkDistance = 1400.0
+		self:GetParent():AddNewModifier(self:GetParent(), nil, "modifier_invulnerable", {})
 	end
 end
 
@@ -29,7 +30,7 @@ function modifier_npc_dialog:CheckState()
 		[MODIFIER_STATE_DISARMED] = true,
 		[MODIFIER_STATE_NO_HEALTH_BAR] = true,
 		[MODIFIER_STATE_STUNNED] = true,
-		[MODIFIER_STATE_INVULNERABLE] = true,
+--		[MODIFIER_STATE_INVULNERABLE] = true,
 	}
 	
 	return state
