@@ -61,16 +61,15 @@ ListenToGameEvent('game_rules_state_change', function()
 			end
 			print(category .. ": " .. highest_key)
 		end
-	end
 
-	if newState == DOTA_GAMERULES_STATE_PRE_GAME then
+		GameMode:SetupZones()
+	elseif newState == DOTA_GAMERULES_STATE_PRE_GAME then
 		Gold:Init()
 
 		for i = 1, 8 do
 			DoEntFire("door_lane"..i, "SetAnimation", "gate_02_close", 0, nil, nil)
 		end
 
-		print(GetMapName())
 		if GetMapName() ~= "x_hero_siege_demo" then
 			-- debug
 			if IsInToolsMode() then
@@ -1466,7 +1465,9 @@ end
 ---------------------------------------------------------
 
 function GameMode:OnPlayerHeroEnteredZone(playerHero, zoneName)
---	print("GameMode:OnPlayerHeroEnteredZone - PlayerHero " .. playerHero:GetUnitName() .. " entered " .. zoneName)
+	if not playerHero:GetPlayerOwner() then return end
+
+	print("GameMode:OnPlayerHeroEnteredZone - PlayerHero " .. playerHero:GetUnitName() .. " entered " .. zoneName)
 
 	local netTable = {}
 	netTable["ZoneName"] = zoneName

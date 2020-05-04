@@ -73,6 +73,8 @@ function CDungeonZone:Init( data )
 		print( "CDungeonZone:Init() - ERROR - No Zone Volume found for zone " .. self.szName )
 	end
 
+	print(self.Quests)
+
 	for _,quest in pairs ( self.Quests ) do
 		if quest ~= nil then
 			quest.bActivated = false
@@ -87,7 +89,7 @@ function CDungeonZone:Init( data )
 
 	self.PlayerStats = {}
 
-	for nPlayerID = 0,3 do
+	for nPlayerID = 0, PlayerResource:GetPlayerCount() - 1 do
 		self.PlayerStats[nPlayerID] = {}
 		self.PlayerStats[nPlayerID]["Kills"] = 0
 		self.PlayerStats[nPlayerID]["Items"] = 0

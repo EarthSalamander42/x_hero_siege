@@ -2,8 +2,9 @@ if GameMode == nil then
 	_G.GameMode = class({})
 end
 
-require('events') -- not in cause
+require('events')
 require('constants') -- in cause?
+
 require('libraries/timers')
 require('libraries/notifications')
 require('libraries/animations')
@@ -17,17 +18,18 @@ require('libraries/gold')
 require('libraries/rgb_to_hex')
 require('libraries/wearables')
 require('libraries/wearables_warmful_ancient')
-require('phases/choose_hero') -- not in cause
-require('phases/creeps') -- not in cause
-require('phases/special_events') -- not in cause
-require('phases/phase1') -- not in cause
-require('phases/phase2') -- not in cause
-require('phases/phase3') -- not in cause
-require('zones/zones') -- not in cause
+
+require('phases/choose_hero')
+require('phases/creeps')
+require('phases/special_events')
+require('phases/phase1')
+require('phases/phase2')
+require('phases/phase3')
+require('zones/zones')
 require('units/breakable_container_surprises')
 require('units/treasure_chest_surprises')
 require('triggers')
-require('components/api/init') -- not in cause
+require('components/api/init')
 if IsInToolsMode() then
 	require('libraries/adv_log') -- SUPER SPAM KILLING BACKEND LEAVE IT DISABLED
 end
@@ -73,8 +75,7 @@ function GameMode:OnHeroInGame(hero)
 end
 
 function GameMode:InitGameMode()
-	GameMode = self
-	mode = GameRules:GetGameModeEntity()
+	local mode = GameRules:GetGameModeEntity()
 	-- Timer Rules
 	GameRules:SetPostGameTime(600.0)
 	GameRules:SetTreeRegrowTime(240.0)
@@ -83,6 +84,9 @@ function GameMode:InitGameMode()
 	GameRules:SetGoldPerTick(0.0)
 	GameRules:SetCustomGameSetupAutoLaunchDelay(10.0) --Vote Time
 	GameRules:SetPreGameTime(PREGAMETIME)
+
+	mode:SetCustomAttributeDerivedStatValue(DOTA_ATTRIBUTE_AGILITY_ARMOR, 0) -- default: 0.016 armor per agility point
+
 --[[
 	--Disabling Derived Stats
 	mode:SetCustomAttributeDerivedStatValue(DOTA_ATTRIBUTE_STRENGTH_MAGIC_RESISTANCE_PERCENT, 0) -- not working
@@ -91,9 +95,9 @@ function GameMode:InitGameMode()
 
 	-- Overriding Derived Stats
 --	mode:SetCustomAttributeDerivedStatValue(DOTA_ATTRIBUTE_STRENGTH_HP_REGEN_PERCENT, 0.0025)
-	mode:SetCustomAttributeDerivedStatValue(DOTA_ATTRIBUTE_AGILITY_ARMOR, 0) -- default: 0.016 armor per agility point
 	mode:SetCustomAttributeDerivedStatValue(DOTA_ATTRIBUTE_INTELLIGENCE_SPELL_AMP_PERCENT, 0.075)
 --]]
+
 	-- Boolean Rules
 	GameRules:SetUseCustomHeroXPValues(true)
 	GameRules:SetUseBaseGoldBountyOnHeroes(false)
@@ -145,8 +149,7 @@ function GameMode:InitGameMode()
 	LinkLuaModifier("modifier_breakable_container", "modifiers/modifier_breakable_container", LUA_MODIFIER_MOTION_NONE)
 	LinkLuaModifier("modifier_creature_techies_land_mine", "modifiers/modifier_creature_techies_land_mine", LUA_MODIFIER_MOTION_NONE)
 
-	-- 7.23 test <
-	CustomGameEventManager:RegisterListener("setting_vote", Dynamic_Wrap(GameMode, "OnSettingVote"))
+	CustomGameEventManager:RegisterListener("setting_vote", Dynamic_Wrap(self, "OnSettingVote"))
 
 	local spew = 0
 	if BAREBONES_DEBUG_SPEW then
@@ -158,14 +161,12 @@ function GameMode:InitGameMode()
 	self.bSeenWaitForPlayers = false
 	self.vUserIds = {}
 	self.VoteTable = {}
-
-	-- 7.23 test >
 	
 	self:OnFirstPlayerLoaded()
 
 	mode:SetThink( "OnThink", self, 1 )
-	mode:SetModifyGoldFilter( Dynamic_Wrap(GameMode, "GoldFilter"), self )
-	mode:SetModifierGainedFilter(Dynamic_Wrap(GameMode, "ModifierFilter"), self)
+	mode:SetModifyGoldFilter( Dynamic_Wrap(self, "GoldFilter"), self )
+	mode:SetModifierGainedFilter(Dynamic_Wrap(self, "ModifierFilter"), self)
 
 	if IsInToolsMode() then
 		Convars:RegisterCommand("final_wave", function(keys) return FinalWave() end, "Test Final Wave", FCVAR_CHEAT)
@@ -180,21 +181,21 @@ function GameMode:InitGameMode()
 		Convars:RegisterCommand("farm_event", function(keys) return FarmTest() end, "Test Farm Event", FCVAR_CHEAT)
 	end
 
-	mode:SetExecuteOrderFilter(Dynamic_Wrap(GameMode, "FilterExecuteOrder"), self)
-	mode:SetDamageFilter(Dynamic_Wrap(GameMode, "DamageFilter"), self)
-	mode:SetHealingFilter(Dynamic_Wrap(GameMode, "HealingFilter"), self)
+	mode:SetExecuteOrderFilter(Dynamic_Wrap(self, "FilterExecuteOrder"), self)
+	mode:SetDamageFilter(Dynamic_Wrap(self, "DamageFilter"), self)
+	mode:SetHealingFilter(Dynamic_Wrap(self, "HealingFilter"), self)
 
-	CustomGameEventManager:RegisterListener("event_hero_image", Dynamic_Wrap(GameMode, "HeroImage"))
-	CustomGameEventManager:RegisterListener("event_all_hero_images", Dynamic_Wrap(GameMode, "AllHeroImages"))
-	CustomGameEventManager:RegisterListener("event_spirit_beast", Dynamic_Wrap(GameMode, "SpiritBeast"))
-	CustomGameEventManager:RegisterListener("event_frost_infernal", Dynamic_Wrap(GameMode, "FrostInfernal"))
-	CustomGameEventManager:RegisterListener("quit_event", Dynamic_Wrap(GameMode, "SpecialEventTPQuit2"))
+	CustomGameEventManager:RegisterListener("event_hero_image", Dynamic_Wrap(self, "HeroImage"))
+	CustomGameEventManager:RegisterListener("event_all_hero_images", Dynamic_Wrap(self, "AllHeroImages"))
+	CustomGameEventManager:RegisterListener("event_spirit_beast", Dynamic_Wrap(self, "SpiritBeast"))
+	CustomGameEventManager:RegisterListener("event_frost_infernal", Dynamic_Wrap(self, "FrostInfernal"))
+	CustomGameEventManager:RegisterListener("quit_event", Dynamic_Wrap(self, "SpecialEventTPQuit2"))
 
 	CustomGameEventManager:RegisterListener( "dialog_complete", function(...) return self:OnDialogEnded( ... ) end )
 	CustomGameEventManager:RegisterListener( "dialog_confirm", function(...) return self:OnDialogConfirm( ... ) end )
 	CustomGameEventManager:RegisterListener( "dialog_confirm_expire", function(...) return self:OnDialogConfirmExpired( ... ) end )
 
-	ListenToGameEvent("dota_holdout_revive_complete", Dynamic_Wrap(GameMode, "OnPlayerRevived"), self)
+	ListenToGameEvent("dota_holdout_revive_complete", Dynamic_Wrap(self, "OnPlayerRevived"), self)
 
 	--Dungeon
 	self.PrecachedVIPs = {}
@@ -236,7 +237,7 @@ function GameMode:OnThink()
 
 	local IsTeamAlive = false
 
-	for nPlayerID = 0, (PlayerResource:GetPlayerCount() - 1) do
+	for nPlayerID = 0, PlayerResource:GetPlayerCount() - 1 do
 		if PlayerResource:GetTeam(nPlayerID) == DOTA_TEAM_GOODGUYS then
 			local Hero = PlayerResource:GetSelectedHeroEntity(nPlayerID)
 
@@ -250,9 +251,11 @@ function GameMode:OnThink()
 
 				-- Dungeon stuff
 				for _,Zone in pairs(self.Zones) do
+					print(Zone, Zone:ContainsUnit(Hero))
 					if Zone and Zone:ContainsUnit(Hero) then
 						local netTable = {}
 						netTable["ZoneName"] = Zone.szName
+						print("ZONE NAME:", Zone.szName)
 						CustomNetTables:SetTableValue("player_zone_locations", string.format("%d", nPlayerID), netTable)
 					end
 				end

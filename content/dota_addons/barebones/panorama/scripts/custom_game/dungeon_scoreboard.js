@@ -390,6 +390,7 @@ function SetFlyoutScoreboardVisible( bVisible )
 		var localPlayerId = GetLocalPlayerId();
 
 		var zonePlayerEntry = CustomNetTables.GetTableValue( "player_zone_locations", localPlayerId.toString());
+		$.Msg(zonePlayerEntry)
 		var zoneName = zonePlayerEntry["ZoneName"];
 		var zoneData = CustomNetTables.GetTableValue( "zone_scores", zoneName );
 		if ( typeof(zoneData) == "undefined" )
