@@ -62,7 +62,8 @@ ListenToGameEvent('game_rules_state_change', function()
 			print(category .. ": " .. highest_key)
 		end
 
-		GameMode:SetupZones()
+		require('zones/dialog_ep_1')
+		require('zones/zone_tables_ep_1')
 	elseif newState == DOTA_GAMERULES_STATE_PRE_GAME then
 		Gold:Init()
 
@@ -95,8 +96,6 @@ ListenToGameEvent('game_rules_state_change', function()
 		AddFOWViewer(DOTA_TEAM_GOODGUYS, Vector(6528, 1152, 192), 900, 99999, false)
 		AddFOWViewer(DOTA_TEAM_CUSTOM_2, Vector(6528, 1152, 192), 900, 99999, false)
 
-		require('zones/dialog_ep_1')
-		require('zones/zone_tables_ep_1')
 		GameMode:SetupZones()
 	end
 
@@ -893,7 +892,7 @@ function GameMode:OnTriggerStartTouch(triggerName, activator_entindex, caller_en
 --      local zone1Name = string.sub(triggerName, 1, i-1)
 --      local zone2Name = string.sub(triggerName, j+1, string.len(triggerName))
 --      print("Zone Transition: " .. zone1Name .. zone2Name)
-			for _,zone in pairs(self.Zones) do
+			for _,zone in pairs(GameMode.Zones) do
 --        if zone and (zone.szName == zone1Name or zone.szName == zone2Name) then
 				if zone and (zone.szName == "xhs_holdout") then
 					zone:Precache()
@@ -941,14 +940,14 @@ function GameMode:OnTriggerEndTouch(triggerName, activator_entindex, caller_enti
 end
 
 function GameMode:SetupZones()
-	self.Zones = {}
+	GameMode.Zones = {}
 --	PrintTable(ZonesDefinition, "  ")
 	for _, zone in pairs(ZonesDefinition) do
 		if zone then
 			print("GameMode:SetupZones() - Setting up zone " .. zone.szName .. " from definition.")
 			local newZone = CDungeonZone()
 			newZone:Init(zone)
-			table.insert(self.Zones, newZone)
+			table.insert(GameMode.Zones, newZone)
 		end
 	end
 end
@@ -1281,7 +1280,7 @@ function GameMode:OnPlayerRevived(event)
 		local hReviver = EntIndexToHScript(event.caster)
 		local flChannelTime = event.channel_time
 		if hReviver and flChannelTime > 0.0 then
-			for _,Zone in pairs(self.Zones) do
+			for _,Zone in pairs(GameMode.Zones) do
 				if Zone:ContainsUnit(hReviver) then
 					Zone:AddStat(hReviver:GetPlayerID(), ZONE_STAT_REVIVE_TIME, flChannelTime)
 				end
@@ -1407,7 +1406,7 @@ local hRevivedHero = EntIndexToHScript(event.target)
 		local hReviver = EntIndexToHScript(event.caster)
 		local flChannelTime = event.channel_time
 		if hReviver ~= nil and flChannelTime > 0.0 then
-			for _,Zone in pairs(self.Zones) do
+			for _,Zone in pairs(GameMode.Zones) do
 				if Zone:ContainsUnit(hReviver) then
 					Zone:AddStat(hReviver:GetPlayerID(), ZONE_STAT_REVIVE_TIME, flChannelTime)
 				end
@@ -1479,7 +1478,7 @@ end
 function GameMode:OnZoneActivated(Zone)
 
 --	print("GameMode:OnZoneActivated")
-	for _,zone in pairs(self.Zones) do
+	for _,zone in pairs(GameMode.Zones) do
 		zone:OnZoneActivated(Zone)
 	end
 
@@ -1499,7 +1498,7 @@ end
 function GameMode:OnZoneEventComplete(Zone)
 
 	print("GameMode:OnZoneEventComplete")
-	for _,zone in pairs(self.Zones) do
+	for _,zone in pairs(GameMode.Zones) do
 		zone:OnZoneEventComplete(Zone)
 	end
 end
@@ -1510,7 +1509,7 @@ function GameMode:OnQuestStarted(zone, quest)
 --	print("GameMode:OnQuestStarted - Quest " .. quest.szQuestName .. " in Zone " .. zone.szName .. " started.")
 	quest.bActivated = true
 
-	for _,zone in pairs(self.Zones) do
+	for _,zone in pairs(GameMode.Zones) do
 		zone:OnQuestStarted(quest)
 	end
 
@@ -1555,7 +1554,7 @@ function GameMode:OnQuestCompleted(questZone, quest)
 	end
 
 	if quest.bCompleted == true then
-		for _,zone in pairs(self.Zones) do
+		for _,zone in pairs(GameMode.Zones) do
 			zone:OnQuestCompleted(quest)
 		end
 
@@ -1651,7 +1650,7 @@ local Dialog = self:GetDialog(hDialogEnt)
 
 	hDialogEnt:RemoveModifierByName("modifier_npc_dialog_notify")
 
-	for _,zone in pairs(self.Zones) do
+	for _,zone in pairs(GameMode.Zones) do
 		zone:OnDialogBegin(hDialogEnt)
 	end
 
@@ -1877,7 +1876,7 @@ function GameMode:UpdateGameEndTables()
 	signoutTable["chef_notes"] = self.ChefNotesFound;
 	signoutTable["invoker_found"] = self.InvokerFound;
 
-	for _,zone in pairs(self.Zones) do
+	for _,zone in pairs(GameMode.Zones) do
 		if not zone.bNoLeaderboard and zone.flCompletionTime > 0 then
 			local zoneTable = {}
 
@@ -1975,7 +1974,7 @@ function GameMode:OnDialogConfirm(eventSourceIndex, data)
 
 	if ConfirmCount[data.ConfirmToken] >= nValid then
 		local netTable = {}
-		for _,zone in pairs(self.Zones) do
+		for _,zone in pairs(GameMode.Zones) do
 			zone:OnDialogAllConfirmed(EntIndexToHScript(data["DialogEntIndex"]), data["DialogLine"])
 		end
 		CustomGameEventManager:Send_ServerToAllClients("dialog_player_all_confirmed", netTable)
@@ -1988,7 +1987,7 @@ end
 function GameMode:OnDialogConfirmExpired(eventSourceIndex, data)
 	ConfirmCount[data.ConfirmToken] = 4
 
-	for _,zone in pairs(self.Zones) do
+	for _,zone in pairs(GameMode.Zones) do
 		zone:OnDialogAllConfirmed(EntIndexToHScript(data["DialogEntIndex"]), data["DialogLine"])
 	end
 	CustomGameEventManager:Send_ServerToAllClients("dialog_player_all_confirmed", netTable)

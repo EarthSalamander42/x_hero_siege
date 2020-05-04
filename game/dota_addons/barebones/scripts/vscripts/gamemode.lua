@@ -221,13 +221,15 @@ function GameMode:OnThink()
 		end
 	end
 
-	for _,Zone in pairs(self.Zones) do
+	if not GameMode.Zones then GameMode.Zones = {} end
+
+	for _,Zone in pairs(GameMode.Zones) do
 		if Zone ~= nil then
 			Zone:OnThink()
 		end
 	end
 
-	for i,Zone in pairs(self.Zones) do
+	for i,Zone in pairs(GameMode.Zones) do
 		if not Zone.bNoLeaderboard then
 			local netTable = {}
 			netTable["ZoneName"] = Zone.szName
@@ -250,12 +252,10 @@ function GameMode:OnThink()
 				end
 
 				-- Dungeon stuff
-				for _,Zone in pairs(self.Zones) do
-					print(Zone, Zone:ContainsUnit(Hero))
+				for _,Zone in pairs(GameMode.Zones) do
 					if Zone and Zone:ContainsUnit(Hero) then
 						local netTable = {}
 						netTable["ZoneName"] = Zone.szName
-						print("ZONE NAME:", Zone.szName)
 						CustomNetTables:SetTableValue("player_zone_locations", string.format("%d", nPlayerID), netTable)
 					end
 				end
@@ -294,7 +294,7 @@ function GameMode:HealingFilter( filterTable )
 
 	local hHealingHero = EntIndexToHScript( filterTable["entindex_healer_const"] )
 	if nHeal > 0 and hHealingHero ~= nil and hHealingHero:IsRealHero() then
-		for _,Zone in pairs( self.Zones ) do
+		for _,Zone in pairs( GameMode.Zones ) do
 			if Zone:ContainsUnit( hHealingHero ) then
 				Zone:AddStat( hHealingHero:GetPlayerID(), ZONE_STAT_HEALING, nHeal )
 				return true
@@ -319,7 +319,7 @@ function GameMode:DamageFilter( filterTable )
 	end
 	local hAttackerHero = EntIndexToHScript( filterTable["entindex_attacker_const"] )
 	if flDamage > 0 and hAttackerHero ~= nil and hAttackerHero:IsRealHero() then
-		for _,Zone in pairs( self.Zones ) do
+		for _,Zone in pairs( GameMode.Zones ) do
 			if Zone:ContainsUnit( hAttackerHero ) then
 				Zone:AddStat( hAttackerHero:GetPlayerID(), ZONE_STAT_DAMAGE, flDamage )
 				return true
@@ -873,7 +873,7 @@ function GameMode:GetDialogLine( hDialogEnt, nLineNumber )
 end
 
 function GameMode:IsQuestActive( szQuestName )
-	for _,zone in pairs( self.Zones ) do
+	for _,zone in pairs( GameMode.Zones ) do
 		if zone ~= nil and zone:IsQuestActive( szQuestName ) == true then
 			return true
 		end

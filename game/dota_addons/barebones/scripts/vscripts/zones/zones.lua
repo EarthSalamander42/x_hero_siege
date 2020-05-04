@@ -73,8 +73,6 @@ function CDungeonZone:Init( data )
 		print( "CDungeonZone:Init() - ERROR - No Zone Volume found for zone " .. self.szName )
 	end
 
-	print(self.Quests)
-
 	for _,quest in pairs ( self.Quests ) do
 		if quest ~= nil then
 			quest.bActivated = false
