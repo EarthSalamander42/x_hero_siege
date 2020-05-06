@@ -1618,7 +1618,7 @@ local Dialog = self:GetDialog(hDialogEnt)
 		return
 	end
 
-	if self.bConfirmPending == true then
+	if GameMode.bConfirmPending == true then
 		print("GameMode:OnDialogBegin - Cannot dialog, a confirm dialog is pending.")
 		return
 	end
@@ -1655,7 +1655,7 @@ local Dialog = self:GetDialog(hDialogEnt)
 	end
 
 	if Dialog.bPlayersConfirm == true then
-		self.bConfirmPending = true
+		GameMode.bConfirmPending = true
 	end
 
 	if Dialog.bSkipFacePlayer ~= true then 
@@ -1978,7 +1978,7 @@ function GameMode:OnDialogConfirm(eventSourceIndex, data)
 			zone:OnDialogAllConfirmed(EntIndexToHScript(data["DialogEntIndex"]), data["DialogLine"])
 		end
 		CustomGameEventManager:Send_ServerToAllClients("dialog_player_all_confirmed", netTable)
-		self.bConfirmPending = false
+		GameMode.bConfirmPending = false
 	end
 end
 
@@ -1991,7 +1991,7 @@ function GameMode:OnDialogConfirmExpired(eventSourceIndex, data)
 		zone:OnDialogAllConfirmed(EntIndexToHScript(data["DialogEntIndex"]), data["DialogLine"])
 	end
 	CustomGameEventManager:Send_ServerToAllClients("dialog_player_all_confirmed", netTable)
-	self.bConfirmPending = false
+	GameMode.bConfirmPending = false
 end
 
 ---------------------------------------------------------
