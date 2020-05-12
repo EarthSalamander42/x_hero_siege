@@ -149,7 +149,7 @@ function GameMode:InitGameMode()
 	LinkLuaModifier("modifier_breakable_container", "modifiers/modifier_breakable_container", LUA_MODIFIER_MOTION_NONE)
 	LinkLuaModifier("modifier_creature_techies_land_mine", "modifiers/modifier_creature_techies_land_mine", LUA_MODIFIER_MOTION_NONE)
 
-	CustomGameEventManager:RegisterListener("setting_vote", Dynamic_Wrap(self, "OnSettingVote"))
+	CustomGameEventManager:RegisterListener("setting_vote", Dynamic_Wrap(GameMode, "OnSettingVote"))
 
 	local spew = 0
 	if BAREBONES_DEBUG_SPEW then
@@ -158,15 +158,15 @@ function GameMode:InitGameMode()
 	Convars:RegisterConvar('barebones_spew', tostring(spew), 'Set to 1 to start spewing barebones debug info.  Set to 0 to disable.', 0)
 
 	-- Initialized tables for tracking state
-	self.bSeenWaitForPlayers = false
-	self.vUserIds = {}
-	self.VoteTable = {}
+	GameMode.bSeenWaitForPlayers = false
+	GameMode.vUserIds = {}
+	GameMode.VoteTable = {}
 	
-	self:OnFirstPlayerLoaded()
+	GameMode:OnFirstPlayerLoaded()
 
-	mode:SetThink( "OnThink", self, 1 )
-	mode:SetModifyGoldFilter( Dynamic_Wrap(self, "GoldFilter"), self )
-	mode:SetModifierGainedFilter(Dynamic_Wrap(self, "ModifierFilter"), self)
+	mode:SetThink( "OnThink", GameMode, 1 )
+	mode:SetModifyGoldFilter( Dynamic_Wrap(GameMode, "GoldFilter"), GameMode )
+	mode:SetModifierGainedFilter(Dynamic_Wrap(GameMode, "ModifierFilter"), GameMode)
 
 	if IsInToolsMode() then
 		Convars:RegisterCommand("final_wave", function(keys) return FinalWave() end, "Test Final Wave", FCVAR_CHEAT)
@@ -181,26 +181,26 @@ function GameMode:InitGameMode()
 		Convars:RegisterCommand("farm_event", function(keys) return FarmTest() end, "Test Farm Event", FCVAR_CHEAT)
 	end
 
-	mode:SetExecuteOrderFilter(Dynamic_Wrap(self, "FilterExecuteOrder"), self)
-	mode:SetDamageFilter(Dynamic_Wrap(self, "DamageFilter"), self)
-	mode:SetHealingFilter(Dynamic_Wrap(self, "HealingFilter"), self)
+	mode:SetExecuteOrderFilter(Dynamic_Wrap(GameMode, "FilterExecuteOrder"), GameMode)
+	mode:SetDamageFilter(Dynamic_Wrap(GameMode, "DamageFilter"), GameMode)
+	mode:SetHealingFilter(Dynamic_Wrap(GameMode, "HealingFilter"), GameMode)
 
-	CustomGameEventManager:RegisterListener("event_hero_image", Dynamic_Wrap(self, "HeroImage"))
-	CustomGameEventManager:RegisterListener("event_all_hero_images", Dynamic_Wrap(self, "AllHeroImages"))
-	CustomGameEventManager:RegisterListener("event_spirit_beast", Dynamic_Wrap(self, "SpiritBeast"))
-	CustomGameEventManager:RegisterListener("event_frost_infernal", Dynamic_Wrap(self, "FrostInfernal"))
-	CustomGameEventManager:RegisterListener("quit_event", Dynamic_Wrap(self, "SpecialEventTPQuit2"))
+	CustomGameEventManager:RegisterListener("event_hero_image", Dynamic_Wrap(GameMode, "HeroImage"))
+	CustomGameEventManager:RegisterListener("event_all_hero_images", Dynamic_Wrap(GameMode, "AllHeroImages"))
+	CustomGameEventManager:RegisterListener("event_spirit_beast", Dynamic_Wrap(GameMode, "SpiritBeast"))
+	CustomGameEventManager:RegisterListener("event_frost_infernal", Dynamic_Wrap(GameMode, "FrostInfernal"))
+	CustomGameEventManager:RegisterListener("quit_event", Dynamic_Wrap(GameMode, "SpecialEventTPQuit2"))
 
-	CustomGameEventManager:RegisterListener( "dialog_complete", function(...) return self:OnDialogEnded( ... ) end )
-	CustomGameEventManager:RegisterListener( "dialog_confirm", function(...) return self:OnDialogConfirm( ... ) end )
-	CustomGameEventManager:RegisterListener( "dialog_confirm_expire", function(...) return self:OnDialogConfirmExpired( ... ) end )
+	CustomGameEventManager:RegisterListener( "dialog_complete", function(...) return GameMode:OnDialogEnded( ... ) end )
+	CustomGameEventManager:RegisterListener( "dialog_confirm", function(...) return GameMode:OnDialogConfirm( ... ) end )
+	CustomGameEventManager:RegisterListener( "dialog_confirm_expire", function(...) return GameMode:OnDialogConfirmExpired( ... ) end )
 
-	ListenToGameEvent("dota_holdout_revive_complete", Dynamic_Wrap(self, "OnPlayerRevived"), self)
+	ListenToGameEvent("dota_holdout_revive_complete", Dynamic_Wrap(GameMode, "OnPlayerRevived"), GameMode)
 
 	--Dungeon
-	self.PrecachedVIPs = {}
-	self.CheckpointsActivated = {}
-	self.Zones = {}
+	GameMode.PrecachedVIPs = {}
+	GameMode.CheckpointsActivated = {}
+	GameMode.Zones = {}
 end
 
 function FarmTest()
@@ -837,7 +837,7 @@ function GameMode:HasDialog( hDialogEnt )
 end
 
 function GameMode:GetDialog( hDialogEnt )
-	if self:HasDialog( hDialogEnt ) == false then
+	if GameMode:HasDialog( hDialogEnt ) == false then
 		return nil
 	end
 
@@ -851,7 +851,7 @@ function GameMode:GetDialog( hDialogEnt )
 	end
 
  	if Dialog[hDialogEnt.nCurrentLine] ~= nil and Dialog[hDialogEnt.nCurrentLine].szAdvanceQuestActive ~= nil then
- 		if self:IsQuestActive( Dialog[hDialogEnt.nCurrentLine].szAdvanceQuestActive ) then
+ 		if GameMode:IsQuestActive( Dialog[hDialogEnt.nCurrentLine].szAdvanceQuestActive ) then
 			hDialogEnt.nCurrentLine = hDialogEnt.nCurrentLine + 1
 		end
 	end
@@ -860,7 +860,7 @@ function GameMode:GetDialog( hDialogEnt )
 end
 
 function GameMode:GetDialogLine( hDialogEnt, nLineNumber )
-	if self:HasDialog( hDialogEnt ) == false then
+	if GameMode:HasDialog( hDialogEnt ) == false then
 		return nil
 	end
 
