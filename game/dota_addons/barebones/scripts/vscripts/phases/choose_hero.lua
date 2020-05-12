@@ -140,7 +140,7 @@ local hero_vip_count = 1
 	BARISTOL_DUMMY = CreateUnitByName("npc_baristol", Entities:FindByName(nil, "point_special_arena_2"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
 	BARISTOL_DUMMY:SetAngles(0, 270, 0)
 	BARISTOL_DUMMY:AddNewModifier(nil, nil, "modifier_command_restricted", {})
-	RAMERO_BIS_DUMMY = CreateUnitByName("npc_ramero", Entities:FindByName(nil, "point_special_arena_3"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
+	RAMERO_BIS_DUMMY = CreateUnitByName("npc_ramero_2", Entities:FindByName(nil, "point_special_arena_3"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
 	RAMERO_BIS_DUMMY:SetAngles(0, 270, 0)
 	RAMERO_BIS_DUMMY:AddNewModifier(nil, nil, "modifier_command_restricted", {})
 
