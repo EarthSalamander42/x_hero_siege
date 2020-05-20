@@ -7,7 +7,7 @@ function CDOTA_BaseNPC:GetLifesteal()
 
 	-- useless atm because modifier can't have multiple instances, find a way to call lifefsteal attack once
 	for _, parent_modifier in pairs(self:FindAllModifiers()) do
-		if parent_modifier.GetModifierLifesteal then
+		if parent_modifier and parent_modifier.GetModifierLifesteal and parent_modifier:GetModifierLifesteal() and lifesteal then
 			if parent_modifier:GetModifierLifesteal() > lifesteal then
 				lifesteal = parent_modifier:GetModifierLifesteal()
 			end

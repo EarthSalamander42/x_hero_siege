@@ -34,14 +34,20 @@ function modifier_endurance_buff:OnCreated()
 end
 
 function modifier_endurance_buff:GetModifierMoveSpeedBonus_Percentage()
+	if not self or not self:GetAbility() then self:OnDestroy() return end
+
 	return self:GetAbility():GetSpecialValueFor("endurance_bonus_movement_speed")
 end
 
 function modifier_endurance_buff:GetModifierBaseAttackTimeConstant()
+	if not self or not self:GetAbility() then self:OnDestroy() return end
+
 	return self:GetAbility():GetSpecialValueFor("bat_reduction") * (-1)
 end
 
 function modifier_endurance_buff:GetModifierAttackSpeedBonus_Constant()
+	if not self or not self:GetAbility() then self:OnDestroy() return end
+
 	return self:GetAbility():GetSpecialValueFor("bonus_attack_speed")
 end
 

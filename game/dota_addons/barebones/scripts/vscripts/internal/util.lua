@@ -647,7 +647,7 @@ local units3 = FindUnitsInRadius( DOTA_TEAM_CUSTOM_1, Vector(0, 0, 0), nil, FIND
 
 		for _,v in pairs(units2) do
 --			if v and v:HasMovementCapability() then
-			if IsValidEntity(v) then
+			if IsValidEntity(v) and not string.find(v:GetUnitName(), "npc_xhs_paladin") then
 				if v:HasModifier("modifier_pause_creeps") then
 					v:RemoveModifierByName("modifier_pause_creeps")
 				end

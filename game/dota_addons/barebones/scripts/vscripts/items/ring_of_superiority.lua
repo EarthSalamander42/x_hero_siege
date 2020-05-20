@@ -12,6 +12,8 @@ end
 
 modifier_ring_of_superiority = modifier_ring_of_superiority or class({})
 
+function modifier_ring_of_superiority:IsHidden() return true end
+
 function modifier_ring_of_superiority:OnCreated()
 	if not IsServer() then return end
 

@@ -21,17 +21,28 @@ function modifier_lightning_sword_unique:IsDebuff() return false end
 function modifier_lightning_sword_unique:IsPurgable() return false end
 function modifier_lightning_sword_unique:RemoveOnDeath() return false end
 
+function modifier_lightning_sword_unique:DeclareFunctions()
+	local funcs = {
+		MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS,
+		MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE,
+	}
+
+	return funcs
+end
+
 function modifier_lightning_sword_unique:OnCreated()
 	if not IsServer() then return end
 
-	if self:GetParent():IsRealHero() and _G.RAMERO_ARTIFACT_PICKED == false then
-		_G.RAMERO_ARTIFACT_PICKED = true
+	if _G.RAMERO_ARTIFACT_PICKED == false then
+		if self:GetParent():IsRealHero() then
+			_G.RAMERO_ARTIFACT_PICKED = true
 
-		if timers.RameroAndBaristol then
-			Timers:RemoveTimer(timers.RameroAndBaristol)
+			if timers.RameroAndBaristol then
+				Timers:RemoveTimer(timers.RameroAndBaristol)
+			end
+
+			ReturnFromSpecialArena(self:GetParent())
 		end
-
-		ReturnFromSpecialArena(self:GetParent())
 	end
 
 	if not self:GetParent():HasModifier("modifier_lifesteal_lightning_sword") then
@@ -39,7 +50,7 @@ function modifier_lightning_sword_unique:OnCreated()
 	end
 end
 
-function modifier_lightning_sword_unique:OnRemoved()
+function modifier_lightning_sword_unique:OnDestroy()
 	if IsServer() then
 		if not self:GetParent():IsIllusion() then
 			self:GetParent().has_epic_3 = false
@@ -49,15 +60,6 @@ function modifier_lightning_sword_unique:OnRemoved()
 			self:GetParent():RemoveModifierByName("modifier_lifesteal_lightning_sword")
 		end
 	end
-end
-
-function modifier_lightning_sword_unique:DeclareFunctions()
-	local funcs = {
-		MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS,
-		MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE,
-	}
-
-	return funcs
 end
 
 function modifier_lightning_sword_unique:GetModifierPhysicalArmorBonus()
@@ -87,6 +89,9 @@ end
 
 function modifier_lifesteal_lightning_sword:OnAttackLanded(keys)
 	if IsServer() then
+
+		if not self or not self:GetParent() or not keys.target then self:OnDestroy() return end
+
 		if self:GetParent() == keys.attacker then
 			self:GetParent():Lifesteal(keys.target, self)
 		end
@@ -94,6 +99,8 @@ function modifier_lifesteal_lightning_sword:OnAttackLanded(keys)
 end
 
 function modifier_lifesteal_lightning_sword:GetModifierLifesteal()
+	if not self or not self:GetAbility() then self:OnDestroy() return end
+
 	return self:GetAbility():GetSpecialValueFor("lifesteal_pct")
 end
 

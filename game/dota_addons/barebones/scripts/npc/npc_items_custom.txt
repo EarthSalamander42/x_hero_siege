@@ -1935,6 +1935,7 @@
 		"SideShop"						"0"
 		"SecretShop"					"0"
 		"ItemKillable"					"0"
+		"ItemIsNeutralDrop"				"1"
 
 		// Special	
 		//-------------------------------------------------------------------------------------------------------------
@@ -2011,6 +2012,7 @@
 		"SideShop"						"0"
 		"SecretShop"					"0"
 		"ItemKillable"					"0"
+		"ItemIsNeutralDrop"				"1"
 
 		// Special	
 		//-------------------------------------------------------------------------------------------------------------
@@ -2222,6 +2224,7 @@
 		"ItemSellable"					"0"
 		"ItemKillable"					"0"
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
+		"ItemIsNeutralDrop"				"1"
 
 		// Special
 		//----------------------------------------------------------------------------------------------------
@@ -2502,6 +2505,7 @@
 		"ItemSellable"					"0"
 		"ItemKillable"					"0"
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
+		"ItemIsNeutralDrop"				"1"
 
 		// Special
 		//----------------------------------------------------------------------------------------------------
@@ -2788,29 +2792,29 @@
 	//=================================================================================================================
 	// Recipe: Doom Artifact
 	//=================================================================================================================
-	"item_recipe_doom_artifact"
-	{
+//	"item_recipe_doom_artifact"
+//	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"ID"							"2545"
-		"BaseClass"             		"item_datadriven"
-		"Model"							"models/props_gameplay/recipe.mdl"
-		"AbilityTextureName"			"custom/recipe"
+//		"ID"							"2545"
+//		"BaseClass"             		"item_datadriven"
+//		"Model"							"models/props_gameplay/recipe.mdl"
+//		"AbilityTextureName"			"custom/recipe"
 
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"						"0"	
-		"ItemShopTags"					""
+//		"ItemCost"						"0"	
+//		"ItemShopTags"					""
 
 		// Recipe
 		//-------------------------------------------------------------------------------------------------------------
-		"ItemRecipe"					"1"
-		"ItemResult"					"item_doom_artifact"
-		"ItemRequirements"
-		{
-			"01"						"item_key_of_the_three_moons;item_shield_of_invincibility;item_lightning_sword;item_ring_of_superiority"
-		}
-	}
+//		"ItemRecipe"					"1"
+//		"ItemResult"					"item_doom_artifact"
+//		"ItemRequirements"
+//		{
+//			"01"						"item_key_of_the_three_moons;item_shield_of_invincibility;item_lightning_sword;item_ring_of_superiority"
+//		}
+//	}
 
 	//========================================================================================================
 	// Necklace of Spell Immunity

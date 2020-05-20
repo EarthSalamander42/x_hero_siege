@@ -32,6 +32,8 @@ function modifier_command_buff:OnCreated()
 end
 
 function modifier_command_buff:GetModifierDamageOutgoing_Percentage()
+	if not self or not self:GetAbility() then self:OnDestroy() return end
+
 	if self:GetAbility():GetSpecialValueFor("bonus_damage_percentage_self") ~= 0 and self:GetCaster() == self:GetParent() then
 		return self:GetAbility():GetSpecialValueFor("bonus_damage_percentage_self")
 	else

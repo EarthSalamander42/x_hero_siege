@@ -17,7 +17,7 @@ end
 function modifier_npc_dialog:OnCreated( params )
 	if IsServer() then
 		self.flTalkDistance = 1400.0
-		self:GetParent():AddNewModifier(self:GetParent(), nil, "modifier_invulnerable", {})
+--		self:GetParent():AddNewModifier(self:GetParent(), nil, "modifier_invulnerable", {})
 	end
 end
 

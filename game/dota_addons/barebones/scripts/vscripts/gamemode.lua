@@ -496,9 +496,6 @@ function GameMode:HeroImage(event)
 		CustomTimers.current_time["hero_image"] = SPECIAL_ARENA_DURATION
 
 		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
-		Timers:CreateTimer(0.1, function()
-			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil) 
-		end)
 
 		GameMode.HeroImage = CreateUnitByName(hero:GetUnitName(), point_beast, true, nil, nil, DOTA_TEAM_CUSTOM_1)
 		GameMode.HeroImage:SetAngles(0, 210, 0)
@@ -530,8 +527,8 @@ function GameMode:HeroImage(event)
 		GameMode.HeroImage:MakeIllusion()
 		GameMode.HeroImage:AddAbility("hero_image_death")
 		GameMode.HeroImage.Boss = true
-		GameMode.HeroImage:SetHealth(99999)
-		GameMode.HeroImage:Mana(99999)
+		GameMode.HeroImage:SetHealth(99999999)
+		GameMode.HeroImage:SetMana(99999999)
 
 		local ability = GameMode.HeroImage:FindAbilityByName("hero_image_death")
 		ability:ApplyDataDrivenModifier(GameMode.HeroImage, GameMode.HeroImage, "modifier_hero_image", {})
@@ -549,6 +546,10 @@ function GameMode:HeroImage(event)
 				TeleportHero(hero, point_hero:GetAbsOrigin())
 			end
 		end
+
+		Timers:CreateTimer(0.1, function()
+			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil) 
+		end)
 
 		timers.HeroImage = Timers:CreateTimer(SPECIAL_ARENA_DURATION, function()
 			Entities:FindByName(nil, "trigger_hero_image_duration"):Enable()
@@ -643,12 +644,17 @@ local point_beast = Entities:FindByName(nil, "frost_infernal_boss"):GetAbsOrigin
 		CustomTimers.current_time["frost_infernal"] = SPECIAL_ARENA_DURATION
 
 		timers.FrostInfernal = Timers:CreateTimer(SPECIAL_ARENA_DURATION, function()
-			Entities:FindByName(nil, "trigger_frost_infernal_duration"):Enable()
+			if Entities:FindByName(nil, "trigger_frost_infernal_duration") then
+				Entities:FindByName(nil, "trigger_frost_infernal_duration"):Enable()
+			end
+
 			GameMode.FrostInfernal_occuring = 0
 			GameMode.frost_infernal:RemoveSelf()
 
 			Timers:CreateTimer(5.5, function() --Debug time in case Frost Infernal kills the player at the very last second
-				Entities:FindByName(nil, "trigger_frost_infernal_duration"):Disable()
+				if Entities:FindByName(nil, "trigger_frost_infernal_duration") then
+					Entities:FindByName(nil, "trigger_frost_infernal_duration"):Disable()
+				end
 			end)
 		end)
 
@@ -697,9 +703,6 @@ local point = Entities:FindByName(nil, "all_hero_image_player")
 		CustomTimers.current_time["all_hero_images"] = SPECIAL_ARENA_DURATION
 
 		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
-		Timers:CreateTimer(0.1, function()
-			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil) 
-		end)
 
 		local illusion_spawn = 0
 		Timers:CreateTimer(0.25, function()
@@ -715,8 +718,8 @@ local point = Entities:FindByName(nil, "all_hero_image_player")
 			GameMode.AllHeroImage:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 5,IsHidden = true})
 			GameMode.AllHeroImage:MakeIllusion()
 			GameMode.AllHeroImage.Boss = true
-			GameMode.AllHeroImage:SetHealth(99999)
-			GameMode.AllHeroImage:Mana(99999)
+			GameMode.AllHeroImage:SetHealth(99999999)
+			GameMode.AllHeroImage:SetMana(99999999)
 
 			if illusion_spawn < 8 then
 				return_time = 0.2
@@ -741,6 +744,10 @@ local point = Entities:FindByName(nil, "all_hero_image_player")
 		end
 
 		DisableItems(hero, SPECIAL_ARENA_DURATION)
+
+		Timers:CreateTimer(0.1, function()
+			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil) 
+		end)
 
 		timers.AllHeroImage = Timers:CreateTimer(0.5, function()
 			ALL_HERO_IMAGE_DEAD = 0
@@ -775,7 +782,7 @@ local point = Entities:FindByName(nil, "all_hero_image_player")
 				Entities:FindByName(nil, "trigger_all_hero_image_duration"):Disable()
 			end)
 
-			local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_2, point, nil, 2500, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_ALL, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false)
+			local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_2, point:GetAbsOrigin(), nil, 2500, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_ALL, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false)
 			for _, v in pairs(units) do
 				UTIL_Remove(v)
 			end

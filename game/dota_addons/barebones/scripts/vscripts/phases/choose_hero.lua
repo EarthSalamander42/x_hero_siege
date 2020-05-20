@@ -134,15 +134,15 @@ local hero_vip_count = 1
 		vip_hero:AddAbility("dummy_passive_vulnerable"):SetLevel(1)
 	end
 
-	RAMERO_DUMMY = CreateUnitByName("npc_ramero", Entities:FindByName(nil, "point_special_arena_1"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
-	RAMERO_DUMMY:SetAngles(0, 270, 0)
-	RAMERO_DUMMY:AddNewModifier(nil, nil, "modifier_command_restricted", {})
-	BARISTOL_DUMMY = CreateUnitByName("npc_baristol", Entities:FindByName(nil, "point_special_arena_2"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
-	BARISTOL_DUMMY:SetAngles(0, 270, 0)
-	BARISTOL_DUMMY:AddNewModifier(nil, nil, "modifier_command_restricted", {})
-	RAMERO_BIS_DUMMY = CreateUnitByName("npc_ramero_2", Entities:FindByName(nil, "point_special_arena_3"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
-	RAMERO_BIS_DUMMY:SetAngles(0, 270, 0)
-	RAMERO_BIS_DUMMY:AddNewModifier(nil, nil, "modifier_command_restricted", {})
+	_G.RAMERO_DUMMY = CreateUnitByName("npc_ramero", Entities:FindByName(nil, "point_special_arena_1"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
+	_G.RAMERO_DUMMY:SetAngles(0, 270, 0)
+	_G.RAMERO_DUMMY:AddNewModifier(nil, nil, "modifier_command_restricted", {})
+	_G.BARISTOL_DUMMY = CreateUnitByName("npc_baristol", Entities:FindByName(nil, "point_special_arena_2"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
+	_G.BARISTOL_DUMMY:SetAngles(0, 270, 0)
+	_G.BARISTOL_DUMMY:AddNewModifier(nil, nil, "modifier_command_restricted", {})
+	_G.RAMERO_BIS_DUMMY = CreateUnitByName("npc_ramero_2", Entities:FindByName(nil, "point_special_arena_3"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
+	_G.RAMERO_BIS_DUMMY:SetAngles(0, 270, 0)
+	_G.RAMERO_BIS_DUMMY:AddNewModifier(nil, nil, "modifier_command_restricted", {})
 
 	-- Special events
 	local lich_king_boss = CreateUnitByName("npc_dota_boss_lich_king", Entities:FindByName(nil, "npc_dota_spawner_lich_king"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)

@@ -88,7 +88,7 @@ function modifier_ai:OnIntervalThink()
 			local ability = self:GetParent():GetAbilityByIndex(ability_index)
 			if ability and not ability:IsInAbilityPhase() and not ability:IsPassive() and ability:IsActivated() and ability:IsCooldownReady() then
 --				print("Ability is castable")
-				local cast_range = ability:GetCastRange() or self.find_enemy_distance
+				local cast_range = ability:GetCastRange(self:GetParent():GetCursorPosition(), self:GetParent()) or self.find_enemy_distance
 				local target_team = ability:GetAbilityTargetTeam()
 				local target_type = ability:GetAbilityTargetType()
 				if target_team == 0 then target_team = 2 end -- TEAM_ENEMY

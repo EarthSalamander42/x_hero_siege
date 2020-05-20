@@ -284,8 +284,8 @@ function RameroAndBaristolEvent(time) -- 500 kills
 		CustomTimers.timers_paused = 0
 		local teleport_time = 3.0
 		RestartCreeps(teleport_time + 3.0)
-		UTIL_Remove(RAMERO_DUMMY)
-		UTIL_Remove(BARISTOL_DUMMY)
+		UTIL_Remove(_G.RAMERO_DUMMY)
+		UTIL_Remove(_G.BARISTOL_DUMMY)
 		CustomGameEventManager:Send_ServerToAllClients("hide_timer_special_arena", {})
 		GameMode.SpecialArena_occuring = 0
 
@@ -351,7 +351,7 @@ function SogatEvent(time) -- 750 kills
 		CustomTimers.timers_paused = 0
 		local teleport_time = 3.0
 		RestartCreeps(teleport_time + 3.0)
-		UTIL_Remove(RAMERO_BIS_DUMMY)
+		UTIL_Remove(_G.RAMERO_BIS_DUMMY)
 		CustomGameEventManager:Send_ServerToAllClients("hide_timer_special_arena", {})
 		GameMode.SpecialArena_occuring = 0
 
