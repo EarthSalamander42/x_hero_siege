@@ -42,15 +42,10 @@ ListenToGameEvent('npc_spawned', function(event)
 				npc:AddNewModifier(npc, nil, "modifier_patreon_donator", {})
 
 				if GetMapName() == "imba_demo" then return end
-				if api:GetDonatorStatus(npc:GetPlayerID()) ~= 6 then
+				if api:GetDonatorStatus(npc:GetPlayerID()) ~= 6 and api:GetPlayerCompanion(npc:GetPlayerID()) then
 					Timers:CreateTimer(1.5, function()
+						print(api:GetPlayerCompanion(npc:GetPlayerID()))
 						Battlepass:DonatorCompanion(npc:GetPlayerID(), api:GetPlayerCompanion(npc:GetPlayerID()).file)
-
-						-- if api and api.GetPlayerCompanion and api:GetPlayerCompanion(npc:GetPlayerID()) then
-							-- Battlepass:DonatorCompanion(npc:GetPlayerID(), api:GetPlayerCompanion(npc:GetPlayerID()).file)
-						-- else
-							-- Battlepass:DonatorCompanion(npc:GetPlayerID(), nil)
-						-- end
 					end)
 				end
 			end

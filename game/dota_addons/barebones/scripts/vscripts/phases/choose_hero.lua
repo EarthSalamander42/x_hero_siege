@@ -31,6 +31,22 @@ ListenToGameEvent('game_rules_state_change', function(keys)
 				SpawnHeroesBis()
 			end)
 		end
+	elseif GameRules:State_Get() == DOTA_GAMERULES_STATE_PRE_GAME then
+		-- iterate until everyone picked a hero
+		Timers:CreateTimer(2.0, function()
+			local iterate = false
+
+			for _, hero in pairs(HeroList:GetAllHeroes()) do
+				if hero:GetUnitName() == "npc_dota_hero_wisp" then
+					CheckForSpawn()
+					iterate = true
+					return 0.25
+				end
+			end
+
+			print("STOP ITERATING FOR HERO PICKS")
+			return nil
+		end)
 	end
 end, nil)
 
@@ -153,83 +169,106 @@ local hero_vip_count = 1
 	lich_king_boss:AddNewModifier(nil, nil, "modifier_stunned", {})
 end
 
-function ChooseHero(event)
-local hero = event.activator
-local caller = event.caller
-local id = hero:GetPlayerID()
-local difficulty = GameRules:GetCustomGameDifficulty()
+function CheckForSpawn()
+	local triggers = Entities:FindAllByClassname("trigger_dota")
 
-	if PlayerResource:IsValidPlayer(id) and hero:GetUnitName() == "npc_dota_hero_wisp" then
-		for i = 1, #HEROLIST do -- 12 = POTM.
-			if caller:GetName() == "trigger_hero_12" then
-				Notifications:Bottom(hero:GetPlayerOwnerID(), {text = "This hero is disabled! Please choose a hero with a blue circle!", duration = 6.0})
-				return
-			end
+	for _, trigger in pairs(triggers) do
+		if trigger.GetName then
+--			print("Trigger name:", trigger:GetName())
 
-			if caller:GetName() == "trigger_hero_"..i then
-				UTIL_Remove(Entities:FindByName(nil, "trigger_hero_"..i))
-				local particle = ParticleManager:CreateParticle(CustomNetTables:GetTableValue("battlepass_item_effects", tostring(hero:GetPlayerID())).tome_stats["effect1"], PATTACH_ABSORIGIN_FOLLOW, hero)
-				ParticleManager:SetParticleControl(particle, 0, hero:GetAbsOrigin())
-				EmitSoundOnClient("ui.trophy_levelup", PlayerResource:GetPlayer(id))
-				hero:AddNewModifier(hero, nil, "modifier_command_restricted", {})
-				Notifications:Bottom(hero:GetPlayerOwnerID(), {hero="npc_dota_hero_"..HEROLIST[i], duration = 5.0})
-				Notifications:Bottom(hero:GetPlayerOwnerID(), {text="HERO: ", duration = 5.0, style={color="white"}, continue=true})
-				Notifications:Bottom(hero:GetPlayerOwnerID(), {text="#npc_dota_hero_"..HEROLIST[i], duration = 5.0, style={color="white"}, continue=true})
-				
-				local newHero = PlayerResource:ReplaceHeroWith(id, "npc_dota_hero_"..HEROLIST[i], STARTING_GOLD[difficulty], 0)
-				StartingItems(hero, newHero)
+			if string.find(trigger:GetName(), "trigger_hero_") then
+				local length = (trigger:GetBoundingMins() - trigger:GetBoundingMaxs()):Length2D() -- 320 and 362 for most triggers
+				local heroes = FindUnitsInRadius(2, trigger:GetAbsOrigin(), nil, length, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_CLOSEST, false)
 
-				Timers:CreateTimer(0.1, function()
-					if not hero:IsNull() then
-						UTIL_Remove(hero)
-					end
-				end)
-
-				return
-			end
-
-			if caller:GetName() == "trigger_hero_weekly" then
-				if api:IsDonator(hero:GetPlayerID()) then
-					Notifications:Bottom(hero:GetPlayerOwnerID(), {text="You are VIP. Please choose this hero on top!", duration = 5.0})
-
-					return
+				if #heroes > 0 and heroes[1]:GetUnitName() == "npc_dota_hero_wisp" then
+					ChooseHero(heroes[1], trigger)
 				end
+			elseif string.find(trigger:GetName(), "trigger_hero_vip_") then
+				local length = (trigger:GetBoundingMins() - trigger:GetBoundingMaxs()):Length2D() -- 320 and 362 for most triggers
+				local heroes = FindUnitsInRadius(2, trigger:GetAbsOrigin(), nil, length, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_CLOSEST, false)
 
-				UTIL_Remove(Entities:FindByName(nil, "trigger_hero_weekly"))
-				local particle = ParticleManager:CreateParticle(CustomNetTables:GetTableValue("battlepass_item_effects", tostring(hero:GetPlayerID())).tome_stats["effect1"], PATTACH_ABSORIGIN_FOLLOW, hero)
-				ParticleManager:SetParticleControl(particle, 0, hero:GetAbsOrigin())
-				EmitSoundOnClient("ui.trophy_levelup", PlayerResource:GetPlayer(id))
-				hero:AddNewModifier(hero, nil, "modifier_command_restricted", {})
-				local weekly_hero = WeekHero
-				if type(WeekHero) == "table" then weekly_hero = WeekHero[0] end
-				Notifications:Bottom(hero:GetPlayerOwnerID(), {hero=weekly_hero, duration = 5.0})
-				Notifications:Bottom(hero:GetPlayerOwnerID(), {text="HERO: ", duration = 5.0, style={color="white"}, continue=true})
-				Notifications:Bottom(hero:GetPlayerOwnerID(), {text="#"..weekly_hero, duration = 5.0, style={color="white"}, continue=true})
-
-				local newHero = PlayerResource:ReplaceHeroWith(id, weekly_hero, STARTING_GOLD[difficulty], 0)
-				StartingItems(hero, newHero)
-
-				Timers:CreateTimer(0.1, function()
-					if not hero:IsNull() then
-						UTIL_Remove(hero)
-					end
-				end)
-
-				return
+				if #heroes > 0 and heroes[1]:GetUnitName() == "npc_dota_hero_wisp" then
+					ChooseHeroVIP(heroes[1], trigger)
+				end
 			end
 		end
 	end
 end
 
-function ChooseHeroVIP(event)
-local hero = event.activator
-local caller = event.caller
-local id = hero:GetPlayerID()
-local difficulty = GameRules:GetCustomGameDifficulty()
+function ChooseHero(hero, trigger)
+	if hero.GetPlayerID == nil or hero:GetPlayerID() == nil then return end
+
+	local id = hero:GetPlayerID()
+	local difficulty = GameRules:GetCustomGameDifficulty()
+
+	for i = 1, #HEROLIST do -- 12 = POTM.
+		if trigger:GetName() == "trigger_hero_12" then
+			Notifications:Bottom(hero:GetPlayerOwnerID(), {text = "This hero is disabled! Please choose a hero with a blue circle!", duration = 6.0})
+			return
+		end
+
+		if trigger:GetName() == "trigger_hero_"..i then
+			UTIL_Remove(Entities:FindByName(nil, "trigger_hero_"..i))
+			local particle = ParticleManager:CreateParticle(CustomNetTables:GetTableValue("battlepass_item_effects", tostring(hero:GetPlayerID())).tome_stats["effect1"], PATTACH_ABSORIGIN_FOLLOW, hero)
+			ParticleManager:SetParticleControl(particle, 0, hero:GetAbsOrigin())
+			EmitSoundOnClient("ui.trophy_levelup", PlayerResource:GetPlayer(id))
+			hero:AddNewModifier(hero, nil, "modifier_command_restricted", {})
+			Notifications:Bottom(hero:GetPlayerOwnerID(), {hero="npc_dota_hero_"..HEROLIST[i], duration = 5.0})
+			Notifications:Bottom(hero:GetPlayerOwnerID(), {text="HERO: ", duration = 5.0, style={color="white"}, continue=true})
+			Notifications:Bottom(hero:GetPlayerOwnerID(), {text="#npc_dota_hero_"..HEROLIST[i], duration = 5.0, style={color="white"}, continue=true})
+
+			local newHero = PlayerResource:ReplaceHeroWith(id, "npc_dota_hero_"..HEROLIST[i], STARTING_GOLD[difficulty], 0)
+			StartingItems(hero, newHero)
+
+			Timers:CreateTimer(0.1, function()
+				if not hero:IsNull() then
+					UTIL_Remove(hero)
+				end
+			end)
+
+			return
+		end
+
+		if trigger:GetName() == "trigger_hero_weekly" then
+			if api:IsDonator(hero:GetPlayerID()) then
+				Notifications:Bottom(hero:GetPlayerOwnerID(), {text="You are VIP. Please choose this hero on top!", duration = 5.0})
+				return
+			end
+
+			UTIL_Remove(Entities:FindByName(nil, "trigger_hero_weekly"))
+			local particle = ParticleManager:CreateParticle(CustomNetTables:GetTableValue("battlepass_item_effects", tostring(hero:GetPlayerID())).tome_stats["effect1"], PATTACH_ABSORIGIN_FOLLOW, hero)
+			ParticleManager:SetParticleControl(particle, 0, hero:GetAbsOrigin())
+			EmitSoundOnClient("ui.trophy_levelup", PlayerResource:GetPlayer(id))
+			hero:AddNewModifier(hero, nil, "modifier_command_restricted", {})
+			local weekly_hero = WeekHero
+			if type(WeekHero) == "table" then weekly_hero = WeekHero[0] end
+			Notifications:Bottom(hero:GetPlayerOwnerID(), {hero=weekly_hero, duration = 5.0})
+			Notifications:Bottom(hero:GetPlayerOwnerID(), {text="HERO: ", duration = 5.0, style={color="white"}, continue=true})
+			Notifications:Bottom(hero:GetPlayerOwnerID(), {text="#"..weekly_hero, duration = 5.0, style={color="white"}, continue=true})
+
+			local newHero = PlayerResource:ReplaceHeroWith(id, weekly_hero, STARTING_GOLD[difficulty], 0)
+			StartingItems(hero, newHero)
+
+			Timers:CreateTimer(0.1, function()
+				if not hero:IsNull() then
+					UTIL_Remove(hero)
+				end
+			end)
+
+			return
+		end
+	end
+end
+
+function ChooseHeroVIP(hero, trigger)
+	if hero.GetPlayerID == nil or hero:GetPlayerID() == nil then return end
+
+	local id = hero:GetPlayerID()
+	local difficulty = GameRules:GetCustomGameDifficulty()
 
 	if PlayerResource:IsValidPlayer(id) and hero:GetUnitName() == "npc_dota_hero_wisp" and api:IsDonator(hero:GetPlayerID()) then
 		for i = 1, #HEROLIST_VIP do
-			if caller:GetName() == "trigger_hero_vip_"..i then
+			if trigger:GetName() == "trigger_hero_vip_"..i then
 				UTIL_Remove(Entities:FindByName(nil, "trigger_hero_vip_"..i))
 				local particle = ParticleManager:CreateParticle(CustomNetTables:GetTableValue("battlepass_item_effects", tostring(hero:GetPlayerID())).tome_stats["effect1"], PATTACH_ABSORIGIN_FOLLOW, hero)
 				ParticleManager:SetParticleControl(particle, 0, hero:GetAbsOrigin())
@@ -241,6 +280,12 @@ local difficulty = GameRules:GetCustomGameDifficulty()
 				
 				local newHero = PlayerResource:ReplaceHeroWith(id, "npc_dota_hero_"..HEROLIST_VIP[i], STARTING_GOLD[difficulty], 0)
 				StartingItems(hero, newHero)
+
+				Timers:CreateTimer(0.1, function()
+					if not hero:IsNull() then
+						UTIL_Remove(hero)
+					end
+				end)
 			end
 		end
 	elseif PlayerResource:IsValidPlayer(id) and hero:GetUnitName() == "npc_dota_hero_wisp" and not api:IsDonator(hero:GetPlayerID()) then

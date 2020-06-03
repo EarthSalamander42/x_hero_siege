@@ -22,7 +22,7 @@
 				</Panel>
 			</Panel>
 
-			<Panel class="LoadingButtons">
+			<Panel id="LoadingButtons1" class="LoadingButtons">
 				<Panel class="Row">
 					<Button id="ImbaLoadingSocialOfficialWebsite" class="SocialButtons" onactivate="DOTADisplayURL('http://frostrose-studio.com/ranking');">
 						<Label text="Official Website" />
@@ -96,7 +96,7 @@
 				</Panel>
 			</Panel>
 
-			<Panel class="LoadingButtons">
+			<Panel id="LoadingButtons2" class="LoadingButtons">
 				<Panel class="Row">
 					<Button class="SocialButtons DarkBlue">
 						<Label text="#loading_screen_patreon_modlist1" />

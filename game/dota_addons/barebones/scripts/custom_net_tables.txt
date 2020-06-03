@@ -2,7 +2,7 @@
 {
 	custom_net_tables =
 	[
-		"round_data",
+		"battlepass_player",
 		"containers_lua",
 		"zone_scores",
 		"player_zone_locations",

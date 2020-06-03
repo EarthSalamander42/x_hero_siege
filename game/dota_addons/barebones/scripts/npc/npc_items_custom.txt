@@ -1861,7 +1861,8 @@
 	"item_tome_of_power" 
 	{
 		"ID"						"2512"
-		"BaseClass"					"item_datadriven"
+		"BaseClass"					"item_lua"
+		"ScriptFile"				"items/tomes.lua"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
 
 		"Model"						"models/props_gameplay/red_box.vmdl" 
@@ -1892,17 +1893,6 @@
 	
 		"ItemPermanent"				"0"
 		"ItemDisassembleRule"		"DOTA_ITEM_DISASSEMBLE_ALWAYS"
-
-		"OnSpellStart"
-		{
-			"RunScript"
-			{
-				"ScriptFile"		"items/tomes.lua"
-				"Function"			"TomeOfPower"
-			}
-
-			"SpendCharge" {}
-		}
 	}
 
 	//=================================================================================================================

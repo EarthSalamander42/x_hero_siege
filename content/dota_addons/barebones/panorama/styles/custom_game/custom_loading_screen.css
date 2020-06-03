@@ -180,8 +180,15 @@
 	background-color: #003339;
 }
 
+#LoadingButtons1 {
+	margin-left: 180px;
+}
+
+#LoadingButtons2 {
+	margin-left: 110px;
+}
+
 .LoadingButtons {
-	margin-left: 220px;
 	overflow: scroll;
 	flow-children: down;
 	background-color: COLOR_INFO_BACKGROUND_GREY_SOCIAL;

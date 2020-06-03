@@ -16,9 +16,17 @@ function item_tome_big:OnSpellStart()
 	self:SpendCharge()
 end
 
-function TomeOfPower(event)
-	if IsValidEntity(event.caster) and event.caster:GetLevel() < 30 then 
-		event.caster:AddExperience(XP_PER_LEVEL_TABLE[level+1]-XP_PER_LEVEL_TABLE[hero:GetLevel()] , DOTA_ModifyXP_Unspecified , false, true)
+item_tome_of_power = item_tome_of_power or class({})
+
+function item_tome_of_power:OnSpellStart()
+	if not IsServer() then return end
+
+	if self:GetCaster():GetLevel() < 30 then
+		self:GetCaster():AddExperience(XP_PER_LEVEL_TABLE[self:GetCaster():GetLevel()+1]-XP_PER_LEVEL_TABLE[self:GetCaster():GetLevel()] , DOTA_ModifyXP_Unspecified , false, true)
+		self:SpendCharge()
+	else
+		Notifications:Bottom(self:GetCaster():GetPlayerID(), {text="Hero at max level!", duration=5.0, style={color="white"}})
+		self:StartCooldown(0.0)
 	end
 end
 
