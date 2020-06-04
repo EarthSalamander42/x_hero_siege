@@ -1,3 +1,5 @@
+CDOTA_PlayerResource.PlayerData = {}
+
 --[[ Extension functions for PlayerResource
 -PlayerResource:GetAllTeamPlayerIDs()
 	Returns an iterator for all the player IDs assigned to a valid team (radiant, dire, or custom)
@@ -61,7 +63,7 @@ ListenToGameEvent('npc_spawned', function(event)
 	end
 end, nil)
 
-function PlayerResource:StoreAbilitiesLevelUpOrder(player_id, ability_name)
+function CDOTA_PlayerResource:StoreAbilitiesLevelUpOrder(player_id, ability_name)
 	if self:IsImbaPlayer(player_id) then
 		local i = #self.PlayerData[player_id]["abilities_level_up_order"] + 1
 
@@ -80,7 +82,7 @@ function PlayerResource:StoreAbilitiesLevelUpOrder(player_id, ability_name)
 --	print("Abilities stored:", self.PlayerData[player_id]["abilities_level_up_order"])
 end
 
-function PlayerResource:GetAbilitiesLevelUpOrder(player_id)
+function CDOTA_PlayerResource:GetAbilitiesLevelUpOrder(player_id)
 	if self:IsImbaPlayer(player_id) then
 		return self.PlayerData[player_id]["abilities_level_up_order"]
 	end
@@ -89,7 +91,7 @@ function PlayerResource:GetAbilitiesLevelUpOrder(player_id)
 end
 
 -- todo: handle sell item shouldn't be stored
-function PlayerResource:StoreItemBought(player_id, item_name)
+function CDOTA_PlayerResource:StoreItemBought(player_id, item_name)
 	if self:IsImbaPlayer(player_id) then
 		local item_info = {}
 		item_info.game_time = GameRules:GetDOTATime(false, false)
@@ -99,7 +101,7 @@ function PlayerResource:StoreItemBought(player_id, item_name)
 	end
 end
 
-function PlayerResource:GetItemsBought(player_id)
+function CDOTA_PlayerResource:GetItemsBought(player_id)
 	if self:IsImbaPlayer(player_id) then
 		return self.PlayerData[player_id]["items_bought"]
 	end
@@ -107,7 +109,7 @@ function PlayerResource:GetItemsBought(player_id)
 	return {}
 end
 
-function PlayerResource:GetSupportItemsBought(player_id, items)
+function CDOTA_PlayerResource:GetSupportItemsBought(player_id, items)
 	local support_items_table = {}
 
 	if self:IsImbaPlayer(player_id) then

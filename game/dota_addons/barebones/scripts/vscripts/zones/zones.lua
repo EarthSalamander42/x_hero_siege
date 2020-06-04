@@ -1,7 +1,3 @@
-if GetMapName() == "ep_1" then
-	require( "zones/zone_tables_ep_1" )
-end
-
 if CDungeonZone == nil then
 	CDungeonZone = class({})
 end

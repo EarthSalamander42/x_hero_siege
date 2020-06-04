@@ -62,8 +62,8 @@ ListenToGameEvent('game_rules_state_change', function()
 			print(category .. ": " .. highest_key)
 		end
 
-		require('zones/dialog_ep_1')
-		require('zones/zone_tables_ep_1')
+		require('zones/dialog_xhs')
+		require('zones/zone_tables_xhs')
 	elseif newState == DOTA_GAMERULES_STATE_PRE_GAME then
 		Gold:Init()
 

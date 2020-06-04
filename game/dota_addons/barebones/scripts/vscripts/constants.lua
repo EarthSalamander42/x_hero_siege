@@ -1,4 +1,3 @@
-
 CUSTOM_GAME_TYPE = "XHS"
 
 _G.GAME_VERSION = "3.50"
