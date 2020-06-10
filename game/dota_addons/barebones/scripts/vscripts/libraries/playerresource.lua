@@ -143,3 +143,11 @@ function CDOTA_PlayerResource:GetSupportItemsBought(player_id, items)
 
 	return support_items_table
 end
+
+function CDOTA_PlayerResource:IsImbaPlayer(player_id)
+	if self.PlayerData[player_id] then
+		return true
+	else
+		return false
+	end
+end
