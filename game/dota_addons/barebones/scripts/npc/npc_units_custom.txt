@@ -14073,7 +14073,7 @@
 		
 		// Creature Data
 		//----------------------------------------------------------------
-		 "Creature"
+		"Creature"
 		{
 			"AttachWearables"   
 			{

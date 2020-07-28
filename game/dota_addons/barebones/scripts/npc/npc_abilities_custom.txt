@@ -18248,7 +18248,7 @@
 		"precache"
 		{
 			"particle"	"particles/units/heroes/hero_drow/drow_frost_arrow.vpcf"
-			"soundfile" "soundevents/game_sounds_heroes/game_sounds_lifestealer.vsndevts"
+			"soundfile" "soundevents/game_sounds_heroes/game_sounds_life_stealer.vsndevts"
 		}
 
 		// Special

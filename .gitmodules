@@ -1,6 +1,9 @@
 [submodule "game/dota_addons/barebones/scripts/vscripts/components/api"]
 	path = game/dota_addons/barebones/scripts/vscripts/components/api
 	url = https://github.com/EarthSalamander42/frostrose_api.git
-[submodule "content/dota_addons/x_hero_siege/panorama/layout/custom_game/frostrose_loading_screen"]
-	path = content/dota_addons/x_hero_siege/panorama/layout/custom_game/frostrose_loading_screen
+[submodule "content/dota_addons/barebones/panorama/layout/custom_game/frostrose_end_screen"]
+	path = content/dota_addons/barebones/panorama/layout/custom_game/frostrose_end_screen
+	url = https://github.com/EarthSalamander42/frostrose_end_screen.git
+[submodule "content/dota_addons/barebones/panorama/layout/custom_game/frostrose_loading_screen"]
+	path = content/dota_addons/barebones/panorama/layout/custom_game/frostrose_loading_screen
 	url = https://github.com/EarthSalamander42/frostrose_loading_screen.git
