@@ -27,8 +27,8 @@ end
 -------------------------------------------
 --			  BESERKERS RAGE
 -------------------------------------------
-LinkLuaModifier("modifier_imba_berserkers_rage_ranged", "heroes/hero_troll_warlord", LUA_MODIFIER_MOTION_NONE)
-LinkLuaModifier("modifier_imba_berserkers_rage_melee", "heroes/hero_troll_warlord", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_imba_berserkers_rage_ranged", "abilities/heroes/hero_troll_warlord", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_imba_berserkers_rage_melee", "abilities/heroes/hero_troll_warlord", LUA_MODIFIER_MOTION_NONE)
 
 holdout_berserkers_rage_alt = holdout_berserkers_rage_alt or class({})
 function holdout_berserkers_rage_alt:IsHiddenWhenStolen() return false end
@@ -99,7 +99,7 @@ end
 -------------------------------------------
 --			  BATTLE TRANCE
 -------------------------------------------
-LinkLuaModifier("modifier_battle_trance", "heroes/hero_troll_warlord", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_battle_trance", "abilities/heroes/hero_troll_warlord", LUA_MODIFIER_MOTION_NONE)
 
 holdout_battle_trance = holdout_battle_trance or class({})
 function holdout_battle_trance:IsHiddenWhenStolen() return false end

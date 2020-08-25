@@ -35,7 +35,7 @@ end
 
 -----------------------------------------------
 
-LinkLuaModifier( "modifier_xhs_brewmaster_drunken_haze_debuff", "heroes/hero_brewmaster.lua", LUA_MODIFIER_MOTION_NONE )
+LinkLuaModifier( "modifier_xhs_brewmaster_drunken_haze_debuff", "abilities/heroes/hero_brewmaster.lua", LUA_MODIFIER_MOTION_NONE )
 if modifier_xhs_brewmaster_drunken_haze_debuff == nil then modifier_xhs_brewmaster_drunken_haze_debuff = class({}) end
 function modifier_xhs_brewmaster_drunken_haze_debuff:IsPurgable() return true end
 function modifier_xhs_brewmaster_drunken_haze_debuff:IsHidden() return false end
@@ -80,7 +80,7 @@ end
 
 -----------------------------------------
 
-LinkLuaModifier( "modifier_xhs_brewmaster_drunken_haze_burn", "heroes/hero_brewmaster.lua", LUA_MODIFIER_MOTION_NONE )
+LinkLuaModifier( "modifier_xhs_brewmaster_drunken_haze_burn", "abilities/heroes/hero_brewmaster.lua", LUA_MODIFIER_MOTION_NONE )
 if modifier_xhs_brewmaster_drunken_haze_burn == nil then modifier_xhs_brewmaster_drunken_haze_burn = class({}) end
 function modifier_xhs_brewmaster_drunken_haze_burn:IsPurgable() return true end
 function modifier_xhs_brewmaster_drunken_haze_burn:IsHidden() return false end
@@ -155,7 +155,7 @@ end
 
 modifier_earthquake_aura = class({})
 
-LinkLuaModifier("modifier_earthquake", "heroes/hero_brewmaster", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_earthquake", "abilities/heroes/hero_brewmaster", LUA_MODIFIER_MOTION_NONE)
 
 function modifier_earthquake_aura:OnCreated()
 	if IsServer() then

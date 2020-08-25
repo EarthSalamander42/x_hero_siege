@@ -6,10 +6,10 @@
 --------------------------
 
 if IsServer() then
-	require("heroes/global")
+	require("abilities/heroes/global")
 end
 
-LinkLuaModifier("modifier_entrangling_roots", "heroes/hero_malfurion", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_entrangling_roots", "abilities/heroes/hero_malfurion", LUA_MODIFIER_MOTION_NONE)
 
 holdout_entrangling_roots = holdout_entrangling_roots or class({})
 
@@ -65,7 +65,7 @@ end
 --		Rejuvenation		--
 ------------------------------
 
-LinkLuaModifier("modifier_rejuvenation", "heroes/hero_malfurion", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_rejuvenation", "abilities/heroes/hero_malfurion", LUA_MODIFIER_MOTION_NONE)
 
 holdout_rejuvenation_alt = holdout_rejuvenation_alt or class({})
 
@@ -130,7 +130,7 @@ end
 --     Mark of the Claw    --
 -----------------------------
 
-LinkLuaModifier("modifier_mark_of_the_claw", "heroes/hero_malfurion", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_mark_of_the_claw", "abilities/heroes/hero_malfurion", LUA_MODIFIER_MOTION_NONE)
 
 holdout_mark_of_the_claw = holdout_mark_of_the_claw or class({})
 
@@ -192,7 +192,7 @@ end
 --  Strength of the Wild   --
 -----------------------------
 
-LinkLuaModifier("modifier_strength_of_the_wild", "heroes/hero_malfurion", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_strength_of_the_wild", "abilities/heroes/hero_malfurion", LUA_MODIFIER_MOTION_NONE)
 
 holdout_strength_of_the_wild = holdout_strength_of_the_wild or class({})
 
@@ -223,7 +223,7 @@ end
 --  Living Tower   --
 ---------------------
 
-LinkLuaModifier("modifier_imba_malfurion_living_tower", "heroes/hero_malfurion", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_imba_malfurion_living_tower", "abilities/heroes/hero_malfurion", LUA_MODIFIER_MOTION_NONE)
 
 imba_malfurion_living_tower = imba_malfurion_living_tower or class({})
 

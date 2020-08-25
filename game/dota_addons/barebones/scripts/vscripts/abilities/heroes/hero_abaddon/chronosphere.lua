@@ -1,4 +1,4 @@
-LinkLuaModifier("modifier_chronosphere_speed_lua", "heroes/hero_faceless_void/modifiers/modifier_chronosphere_speed_lua.lua", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_chronosphere_speed_lua", "abilities/heroes/hero_faceless_void/modifiers/modifier_chronosphere_speed_lua.lua", LUA_MODIFIER_MOTION_NONE)
 
 --[[Author: Pizzalol
 Date: 26.09.2015.

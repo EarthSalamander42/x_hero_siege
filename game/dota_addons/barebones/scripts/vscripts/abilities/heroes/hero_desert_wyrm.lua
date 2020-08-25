@@ -297,12 +297,12 @@ local duration = ability:GetLevelSpecialValueFor("duration", ability:GetLevel() 
 end
 
 function SkinChangerDragon(keys)
-local caster = keys.caster
-local model = keys.model
-local ability = keys.ability
-local range = caster:GetAttackRange()
-local bonus_range = ability:GetLevelSpecialValueFor("bonus_range", ability:GetLevel() -1)
-local Duration = keys.Duration
+	local caster = keys.caster
+	local model = keys.model
+	local ability = keys.ability
+	local range = caster:Script_GetAttackRange()
+	local bonus_range = ability:GetLevelSpecialValueFor("bonus_range", ability:GetLevel() -1)
+	local Duration = keys.Duration
 
 	if caster.caster_model == nil then 
 		caster.caster_model = caster:GetModelName()

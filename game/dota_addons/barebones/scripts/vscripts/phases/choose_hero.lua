@@ -243,6 +243,8 @@ function ChooseHeroVIP(event)
 				
 				local newHero = PlayerResource:ReplaceHeroWith(id, "npc_dota_hero_"..HEROLIST_VIP[i], STARTING_GOLD[difficulty], 0)
 				StartingItems(hero, newHero)
+
+				return
 			end
 		end
 	elseif PlayerResource:IsValidPlayer(id) and hero:GetUnitName() == "npc_dota_hero_wisp" and not api:IsDonator(hero:GetPlayerID()) then

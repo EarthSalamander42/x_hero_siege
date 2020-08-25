@@ -4,13 +4,13 @@
 -------------------------------------------
 
 imba_kunkka_torrent = class({})
-LinkLuaModifier("modifier_imba_torrent_handler", "heroes/hero_kunkka", LUA_MODIFIER_MOTION_NONE)
-LinkLuaModifier("modifier_imba_torrent_cast", "heroes/hero_kunkka", LUA_MODIFIER_MOTION_NONE)
-LinkLuaModifier("modifier_imba_torrent_slow_tide", "heroes/hero_kunkka", LUA_MODIFIER_MOTION_NONE)
-LinkLuaModifier("modifier_imba_torrent_slow", "heroes/hero_kunkka", LUA_MODIFIER_MOTION_NONE)
-LinkLuaModifier("modifier_imba_sec_torrent_slow", "heroes/hero_kunkka", LUA_MODIFIER_MOTION_NONE)
-LinkLuaModifier("modifier_imba_torrent_phase", "heroes/hero_kunkka", LUA_MODIFIER_MOTION_NONE)
-LinkLuaModifier("modifier_imba_kunkka_torrent_talent_thinker", "heroes/hero_kunkka", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_imba_torrent_handler", "abilities/heroes/hero_kunkka", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_imba_torrent_cast", "abilities/heroes/hero_kunkka", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_imba_torrent_slow_tide", "abilities/heroes/hero_kunkka", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_imba_torrent_slow", "abilities/heroes/hero_kunkka", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_imba_sec_torrent_slow", "abilities/heroes/hero_kunkka", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_imba_torrent_phase", "abilities/heroes/hero_kunkka", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_imba_kunkka_torrent_talent_thinker", "abilities/heroes/hero_kunkka", LUA_MODIFIER_MOTION_NONE)
 
 function imba_kunkka_torrent:GetAbilityTextureName()
 	return "kunkka_torrent"
@@ -481,10 +481,10 @@ end
 -------------------------------------------
 
 imba_kunkka_ghostship = class({})
-LinkLuaModifier("modifier_imba_ghostship_rum", "heroes/hero_kunkka", LUA_MODIFIER_MOTION_NONE)
-LinkLuaModifier("modifier_imba_ghostship_rum_damage", "heroes/hero_kunkka", LUA_MODIFIER_MOTION_NONE)
-LinkLuaModifier("modifier_imba_ghostship_tide_slow", "heroes/hero_kunkka", LUA_MODIFIER_MOTION_NONE)
-LinkLuaModifier("modifier_imba_ghostship_drag", "heroes/hero_kunkka", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_imba_ghostship_rum", "abilities/heroes/hero_kunkka", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_imba_ghostship_rum_damage", "abilities/heroes/hero_kunkka", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_imba_ghostship_tide_slow", "abilities/heroes/hero_kunkka", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_imba_ghostship_drag", "abilities/heroes/hero_kunkka", LUA_MODIFIER_MOTION_NONE)
 
 
 function imba_kunkka_ghostship:OnSpellStart()

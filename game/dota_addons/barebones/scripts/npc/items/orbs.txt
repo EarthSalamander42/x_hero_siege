@@ -430,7 +430,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/global.lua"
+						"ScriptFile"	"abilities/heroes/global.lua"
 						"Function"		"Splash"
 					}
 				}
@@ -592,7 +592,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/global.lua"
+						"ScriptFile"	"abilities/heroes/global.lua"
 						"Function"		"Splash"
 					}
 				}

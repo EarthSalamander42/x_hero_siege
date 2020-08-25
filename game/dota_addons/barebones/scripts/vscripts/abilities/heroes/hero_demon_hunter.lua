@@ -10,8 +10,8 @@ end
 
 --------------------------------------
 
-LinkLuaModifier("modifier_xhs_vampiric_aura", "heroes/hero_demon_hunter.lua", LUA_MODIFIER_MOTION_NONE)
-LinkLuaModifier("modifier_xhs_vampiric_aura_buff", "heroes/hero_demon_hunter.lua", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_xhs_vampiric_aura", "abilities/heroes/hero_demon_hunter.lua", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_xhs_vampiric_aura_buff", "abilities/heroes/hero_demon_hunter.lua", LUA_MODIFIER_MOTION_NONE)
 
 xhs_vampiric_aura = xhs_vampiric_aura or class({})
 

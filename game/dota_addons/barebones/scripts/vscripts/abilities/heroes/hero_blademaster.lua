@@ -6,8 +6,8 @@
 
 xhs_blademaster_mirror_image = xhs_blademaster_mirror_image or class({})
 
-LinkLuaModifier( "modifier_xhs_blademaster_mirror_image_invulnerable", "heroes/hero_blademaster.lua", LUA_MODIFIER_MOTION_NONE )
-LinkLuaModifier( "modifier_xhs_blademaster_mirror_image_handler", "heroes/hero_blademaster.lua", LUA_MODIFIER_MOTION_NONE )
+LinkLuaModifier( "modifier_xhs_blademaster_mirror_image_invulnerable", "abilities/heroes/hero_blademaster.lua", LUA_MODIFIER_MOTION_NONE )
+LinkLuaModifier( "modifier_xhs_blademaster_mirror_image_handler", "abilities/heroes/hero_blademaster.lua", LUA_MODIFIER_MOTION_NONE )
 
 function xhs_blademaster_mirror_image:IsHiddenWhenStolen() 		return false end
 function xhs_blademaster_mirror_image:IsRefreshable() 			return true  end
@@ -147,8 +147,8 @@ function modifier_xhs_blademaster_mirror_image_handler:OnIntervalThink()
 	end
 end
 
-LinkLuaModifier("modifier_blademaster_wardrums_aura", "heroes/hero_blademaster", LUA_MODIFIER_MOTION_NONE)
-LinkLuaModifier("modifier_blademaster_wardrums", "heroes/hero_blademaster", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_blademaster_wardrums_aura", "abilities/heroes/hero_blademaster", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_blademaster_wardrums", "abilities/heroes/hero_blademaster", LUA_MODIFIER_MOTION_NONE)
 
 blademaster_wardrums_aura = blademaster_wardrums_aura or class({})
 

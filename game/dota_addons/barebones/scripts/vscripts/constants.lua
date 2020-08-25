@@ -1,7 +1,7 @@
 CUSTOM_GAME_TYPE = "XHS"
 
 _G.GAME_VERSION = "3.50"
-CustomNetTables:SetTableValue("game_options", "game_version", {game_version = GAME_VERSION, game_type = CUSTOM_GAME_TYPE})
+CustomNetTables:SetTableValue("game_options", "game_version", {value = GAME_VERSION, game_type = CUSTOM_GAME_TYPE})
 CustomNetTables:SetTableValue("game_options", "game_count", {value = 1})
 
 -- General

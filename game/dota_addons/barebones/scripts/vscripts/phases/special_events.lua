@@ -9,7 +9,7 @@ function MuradinEvent(time)
 	mode:SetFixedRespawnTime(1)
 
 	local Muradin = CreateUnitByName("npc_dota_creature_muradin_bronzebeard", Entities:FindByName(nil, "npc_dota_muradin_boss"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
-	Muradin:AddNewModifier( nil, nil, "modifier_pause_creeps", {duration = stun_duration})
+	Muradin:AddNewModifier( nil, nil, "modifier_pause_creeps", {duration = stun_duration}):SetStackCount(1)
 	Muradin:AddNewModifier( nil, nil, "modifier_invulnerable", {duration = stun_duration})
 	Muradin:SetAngles(0, 270, 0)
 --	Muradin:EmitSound("SantaClaus.StartArena")

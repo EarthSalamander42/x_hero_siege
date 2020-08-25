@@ -12,7 +12,6 @@
 "game_version_name"						"Archimonde"
 "loading_screen_description"			"X Hero Siege will get a 100% free battlepass soon. The goal is to reward regular players on the long term by unlocking cosmetics and more! (Those rewards are unlocked in X Hero Siege only)."
 "loading_screen_button"					"COMING SOON: X Hero Siege website."
-"vote_gamemode"							"Difficulty vote:"
 
 "loading_screen_promote"				"Translate X Hero Siege in your native language!"
 "loading_screen_promote_description"	"You can translate X Hero Siege on Transifex website, it's easy! Just create an account and subscribe to a language. Give it a try! Don't forget to request your Discord role!"
@@ -28,12 +27,17 @@
 "loading_screen_patreon_modlist5"				"Hero Line Wars"
 "loading_screen_patreon_modlist6"				"Diretide (unofficial)"
 
-"vote_difficulty"							"Difficulty Vote:"
-"vote_difficulty_1"							"Easy: 150% Gold, 125% XP, 75% Damage."
-"vote_difficulty_2"							"Normal: 110% Gold, 100% XP, 100% Damage."
-"vote_difficulty_3"							"Hard: 100% Gold, 90% XP, 125% Damage."
-"vote_difficulty_4"							"Extreme: 100% Gold, 75% XP, 150% Damage."
-"vote_difficulty_5"							"Divine: 75% Gold, 60% XP, 200% Damage."
+"vote_gamemode"								"Difficulty:"
+"vote_gamemode_description"					"Difficulty Vote"
+"vote_gamemode_1"							"Easy: 150% Gold, 125% XP, 75% Damage"
+"vote_gamemode_2"							"Normal: 110% Gold, 100% XP, 100% Damage"
+"vote_gamemode_3"							"Hard: 100% Gold, 90% XP, 125% Damage"
+"vote_gamemode_4"							"Extreme: 100% Gold, 75% XP, 150% Damage"
+"vote_gamemode_5"							"Divine: 75% Gold, 60% XP, 200% Damage"
+
+"loading_screen_custom_games_1"			"This is the list of every custom games currently managed by Frostrose Studio:"
+"loading_screen_custom_games_2"			"You can translate Dota IMBA in your native language on Transifex website, it's easy! Just create an account and subscribe to a language. Give it a try! Don't forget to request your Discord role!"
+"loading_screen_custom_games_3"			"Support Frostrose Studio on Patreon and get in-game rewards! Battlepass XP boosters, companion following you on the battlefield, and more!"
 
 // Demo mode
 "Refresh_Msg"								"Hero Refreshed"

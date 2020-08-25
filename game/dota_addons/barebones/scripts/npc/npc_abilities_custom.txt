@@ -10,7 +10,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"                     "ability_lua"
-		"ScriptFile"                    "heroes/creeps"
+		"ScriptFile"                    "abilities/heroes/creeps"
 		"AbilityTextureName"            "ogre_magi_ignite"
 		"MaxLevel"                      "1"
 		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_PASSIVE"
@@ -260,7 +260,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"		"heroes/global.lua"
+						"ScriptFile"		"abilities/heroes/global.lua"
 						"Function"			"CastleMuradin"
 					}
 				}
@@ -276,7 +276,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"					"ability_lua"
-		"ScriptFile"				"heroes/hero_wisp.lua"
+		"ScriptFile"				"abilities/heroes/hero_wisp.lua"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"AbilityTextureName"		"wisp_relocate"
 		"MaxLevel"					"1"
@@ -285,7 +285,7 @@
 	"wisp_passives"
 	{
 		"BaseClass" 				"ability_lua"
-		"ScriptFile"				"heroes/hero_wisp.lua"
+		"ScriptFile"				"abilities/heroes/hero_wisp.lua"
 		"AbilityBehavior" 			"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_HIDDEN"
 		"MaxLevel"					"1"
 	}
@@ -361,6 +361,7 @@
 			{
 				"Passive"	"1"
 				"IsHidden"	"1"
+
 				"States"
 				{
 					"MODIFIER_STATE_NO_UNIT_COLLISION"		"MODIFIER_STATE_VALUE_ENABLED"
@@ -599,7 +600,7 @@
 						{
 							"RunScript"
 							{
-								"ScriptFile"	"heroes/hero_abaddon/howling_blast.lua"
+								"ScriptFile"	"abilities/heroes/hero_abaddon/howling_blast.lua"
 								"Function"		"HowlingBlast"
 								"modifier"		"modifier_disarmed"
 							}
@@ -716,7 +717,7 @@
 	
 			"RunScript"
 			{
-				"ScriptFile"	"scripts/vscripts/heroes/hero_abaddon/frozen_tempest.lua"
+				"ScriptFile"	"scripts/vscripts/abilities/heroes/hero_abaddon/frozen_tempest.lua"
 				"Function"		"pulse_nova_start"
 			}
 		}
@@ -735,7 +736,7 @@
 	
 			"RunScript"
 			{
-				"ScriptFile"	"scripts/vscripts/heroes/hero_abaddon/frozen_tempest.lua"
+				"ScriptFile"	"scripts/vscripts/abilities/heroes/hero_abaddon/frozen_tempest.lua"
 				"Function"		"pulse_nova_stop"
 			}
 		}
@@ -895,7 +896,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/hero_abaddon/frostmourne.lua"
+						"ScriptFile"	"abilities/heroes/hero_abaddon/frostmourne.lua"
 						"Function"		"FrostMourne"
 					}
 				}
@@ -956,7 +957,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"		"heroes/hero_abaddon/heartstopper_aura.lua"
+						"ScriptFile"		"abilities/heroes/hero_abaddon/heartstopper_aura.lua"
 						"Function"			"HeartstopperEnemy"
 					}
 				}
@@ -1578,7 +1579,7 @@
 	
 			"RunScript"
 			{
-				"ScriptFile"        "heroes/hero_lich/frost_breath.lua"
+				"ScriptFile"        "abilities/heroes/hero_lich/frost_breath.lua"
 				"Function"          "modifier_frost_breath"
 				"height"            "%knockback_height"
 				"duration"          "%knockback_duration"
@@ -1737,7 +1738,7 @@
 	
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/hero_lich/frost_arrows.lua"
+						"ScriptFile"	"abilities/heroes/hero_lich/frost_arrows.lua"
 						"Function"		"OnHitUnit"
 					}
 	
@@ -1903,7 +1904,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/hero_lich/frost_frenzy.lua"
+						"ScriptFile"	"abilities/heroes/hero_lich/frost_frenzy.lua"
 						"Function"		"FrostFrenzy"
 					}
 				}
@@ -2181,7 +2182,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/hero_lich/frost_chaos.lua"
+						"ScriptFile"	"abilities/heroes/hero_lich/frost_chaos.lua"
 						"Function"		"ApplyDPS"
 					}
 
@@ -2314,7 +2315,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/hero_lich/frost_beast.lua"
+						"ScriptFile"	"abilities/heroes/hero_lich/frost_beast.lua"
 						"Function"		"GrowModel"
 					}
 				}
@@ -2343,7 +2344,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/hero_mountain_giant.lua"
+						"ScriptFile"	"abilities/heroes/hero_mountain_giant.lua"
 						"Function"		"GrowDummy"
 					}
 				}
@@ -2424,7 +2425,7 @@
 	
 			"RunScript"
 			{
-				"ScriptFile"    "heroes/hero_paladin.lua"
+				"ScriptFile"    "abilities/heroes/hero_paladin.lua"
 				"Function"      "ShadowWave"
 				"shadow_wave_particle"  "particles/units/heroes/hero_uther/uther_healing_wave.vpcf"
 				"damage_particle"       "particles/units/heroes/hero_uther/uther_healing_wave_impact_damage.vpcf"
@@ -2688,7 +2689,7 @@
 	
 			"RunScript"
 			{
-				"ScriptFile"	"heroes/hero_paladin.lua"
+				"ScriptFile"	"abilities/heroes/hero_paladin.lua"
 				"Function"      "WaveOfTerrorVision"
 				"Target"        "POINT"
 				"wave_particle" "particles/units/heroes/hero_vengeful/vengeful_wave_of_terror.vpcf"
@@ -2763,7 +2764,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"	"heroes/hero_paladin.lua"
+				"ScriptFile"	"abilities/heroes/hero_paladin.lua"
 				"Function"		"Taunt"
 			}
 		}
@@ -2859,7 +2860,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/hero_enchantress/endurance_aura.lua"
+						"ScriptFile"	"abilities/heroes/hero_enchantress/endurance_aura.lua"
 						"Function"		"EnduranceAura"
 					}
 				}
@@ -2963,13 +2964,13 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/hero_enchantress/endurance_aura.lua"
+						"ScriptFile"	"abilities/heroes/hero_enchantress/endurance_aura.lua"
 						"Function"		"EnduranceAura"
 					}
 
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/hero_paladin.lua"
+						"ScriptFile"	"abilities/heroes/hero_paladin.lua"
 						"Function"		"LightFrenzy"
 					}
 				}
@@ -2990,7 +2991,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"ability_lua"
-		"ScriptFile"					"heroes/hero_brewmaster.lua"
+		"ScriptFile"					"abilities/heroes/hero_brewmaster.lua"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_AOE"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_CREEP"
@@ -3133,7 +3134,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"				"heroes/hero_blood_mage.lua"
+				"ScriptFile"				"abilities/heroes/hero_blood_mage.lua"
 				"Function"					"DragonSlave"
 				"Target"					"POINT"
 
@@ -3154,7 +3155,7 @@
 
 			"RunScript"
 			{
-				"ScriptFile"		"heroes/hero_brewmaster.lua"
+				"ScriptFile"		"abilities/heroes/hero_brewmaster.lua"
 				"Function"			"DragonSlaveBurn"
 				"Target"			"TARGET"
 			}
@@ -3345,7 +3346,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"	"heroes/hero_brewmaster.lua"
+				"ScriptFile"	"abilities/heroes/hero_brewmaster.lua"
 				"Function"		"EarthquakeStart"
 				"Target"		"POINT"
 			}
@@ -3355,7 +3356,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"	"heroes/hero_brewmaster.lua"
+				"ScriptFile"	"abilities/heroes/hero_brewmaster.lua"
 				"Function"		"EarthquakeEnd"
 			}
 		}
@@ -3515,7 +3516,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"				"heroes/hero_dreadlord.lua"
+				"ScriptFile"				"abilities/heroes/hero_dreadlord.lua"
 				"Function"					"invoker_chaos_meteor_datadriven_on_spell_start"
 				"Target"					"POINT"
 				"LandTime"					"%land_time"
@@ -3605,7 +3606,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"            "heroes/hero_dreadlord.lua"
+						"ScriptFile"            "abilities/heroes/hero_dreadlord.lua"
 						"Function"              "modifier_invoker_chaos_meteor_datadriven_main_damage_on_interval_think"
 						"AreaOfEffect"          "%area_of_effect"
 						"BurnDuration"          "%burn_duration"
@@ -3616,7 +3617,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"            "heroes/hero_dreadlord.lua"
+						"ScriptFile"            "abilities/heroes/hero_dreadlord.lua"
 						"Function"              "modifier_invoker_chaos_meteor_datadriven_main_damage_on_interval_think"
 						"AreaOfEffect"          "%area_of_effect"
 					}
@@ -3638,7 +3639,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"            "heroes/hero_dreadlord.lua"
+						"ScriptFile"            "abilities/heroes/hero_dreadlord.lua"
 						"Function"              "modifier_invoker_chaos_meteor_datadriven_burn_damage_on_interval_think"
 						"BurnDPSInterval"       "%burn_dps_inverval"
 					}
@@ -3933,7 +3934,7 @@
 
 					"RunScript"
 					{
-						"ScriptFile"		"heroes/hero_dreadlord.lua"
+						"ScriptFile"		"abilities/heroes/hero_dreadlord.lua"
 						"Function"			"NightmareEnd"
 
 						"loop_sound"		"Hero_Bane.Nightmare.Loop"
@@ -3970,7 +3971,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"			"heroes/hero_dreadlord.lua"
+						"ScriptFile"			"abilities/heroes/hero_dreadlord.lua"
 						"Function"				"NightmareInvulEnd"
 
 						"nightmare_modifier"	"modifier_imba_bane_nightmare"
@@ -4059,7 +4060,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"    "heroes/hero_dreadlord.lua"
+						"ScriptFile"    "abilities/heroes/hero_dreadlord.lua"
 						"Function"      "RenderInferno"
 					}
 				}
@@ -4291,7 +4292,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"			"heroes/hero_pit_lord.lua"
+						"ScriptFile"			"abilities/heroes/hero_pit_lord.lua"
 						"Function"				"rain_of_chaos"
 					}
 				}
@@ -4350,7 +4351,7 @@
 
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/hero_pit_lord.lua"
+						"ScriptFile"	"abilities/heroes/hero_pit_lord.lua"
 						"Function"		"target_modifier_remove"
 						"Duration"		"%duration"
 					}
@@ -4410,7 +4411,7 @@
 		{           
 			"RunScript"
 			{
-				"ScriptFile"        "heroes/hero_warlock/dark_portal.lua"
+				"ScriptFile"        "abilities/heroes/hero_warlock/dark_portal.lua"
 				"Function"          "venomancer_plague_ward_datadriven_on_spell_start"
 				"Target"            "POINT"
 				"Duration"          "%duration"
@@ -4601,7 +4602,7 @@
 	
 			"RunScript"
 			{
-				"ScriptFile"			"scripts/vscripts/heroes/hero_warlock/archimonde.lua"
+				"ScriptFile"			"scripts/vscripts/abilities/heroes/hero_warlock/archimonde.lua"
 				"Function"				"Transform"
 				"modifier_one"			"modifier_archimonde"
 				"modifier_two"			"modifier_archimonde"
@@ -4663,7 +4664,7 @@
 	
 					"RunScript"
 					{
-						"ScriptFile"            "scripts/vscripts/heroes/hero_warlock/archimonde.lua"
+						"ScriptFile"            "scripts/vscripts/abilities/heroes/hero_warlock/archimonde.lua"
 						"Function"              "ModelSwapStart"
 						"model"                 "models/items/terrorblade/dotapit_s3_fallen_light_metamorphosis/dotapit_s3_fallen_light_metamorphosis.vmdl"
 						"projectile_model"      "particles/units/heroes/hero_warlock/warlock_archimonde_base_attack.vpcf"
@@ -4671,7 +4672,7 @@
 	
 					"RunScript"
 					{
-						"ScriptFile"            "heroes/global.lua"
+						"ScriptFile"            "abilities/heroes/global.lua"
 						"Function"              "HideWearables"
 					}
 				}
@@ -4687,13 +4688,13 @@
 	
 					"RunScript"
 					{
-						"ScriptFile"            "scripts/vscripts/heroes/hero_warlock/archimonde.lua"
+						"ScriptFile"            "scripts/vscripts/abilities/heroes/hero_warlock/archimonde.lua"
 						"Function"              "ModelSwapEnd"
 					}
 	
 					"RunScript"
 					{
-						"ScriptFile"			"heroes/global.lua"
+						"ScriptFile"			"abilities/heroes/global.lua"
 						"Function"				"ShowWearables"
 					}
 				}
@@ -4708,7 +4709,7 @@
 
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/global.lua"
+						"ScriptFile"	"abilities/heroes/global.lua"
 						"Function"		"Splash"
 					}
 				}
@@ -4917,7 +4918,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"    "heroes/hero_warlock/gargoyle_swarm.lua"
+				"ScriptFile"    "abilities/heroes/hero_warlock/gargoyle_swarm.lua"
 				"Function"      "ExorcismDeath"
 			}
 	
@@ -4949,7 +4950,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"    "heroes/hero_warlock/gargoyle_swarm.lua"
+						"ScriptFile"    "abilities/heroes/hero_warlock/gargoyle_swarm.lua"
 						"Function"      "ExorcismStart"
 					}
 	
@@ -4964,7 +4965,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"    "heroes/hero_warlock/gargoyle_swarm.lua"
+						"ScriptFile"    "abilities/heroes/hero_warlock/gargoyle_swarm.lua"
 						"Function"      "ExorcismAttack"
 					}
 				}
@@ -4973,7 +4974,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"    "heroes/hero_warlock/gargoyle_swarm.lua"
+						"ScriptFile"    "abilities/heroes/hero_warlock/gargoyle_swarm.lua"
 						"Function"      "ExorcismDeath"
 					}
 	
@@ -4988,7 +4989,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"    "heroes/hero_warlock/gargoyle_swarm.lua"
+						"ScriptFile"    "abilities/heroes/hero_warlock/gargoyle_swarm.lua"
 						"Function"      "ExorcismEnd"
 					}
 				}
@@ -5000,7 +5001,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"    "heroes/hero_warlock/gargoyle_swarm.lua"
+						"ScriptFile"    "abilities/heroes/hero_warlock/gargoyle_swarm.lua"
 						"Function"      "ExorcismPhysics"
 					}
 	
@@ -5083,7 +5084,8 @@
 	//=================================================================================================================
 	"tyrande_multiple_arrows"
 	{
-		"BaseClass"					"medusa_split_shot"
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"abilities/heroes/hero_enchantress.lua"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"AbilityTextureName"		"custom/tyrande_multiple_arrows"
 
@@ -5103,7 +5105,6 @@
 			{	
 				"var_type"					"FIELD_INTEGER"
 				"arrow_count"				"3 5 7 9"
-				"LinkedSpecialBonus"		"special_bonus_unique_medusa_2"
 			}
 			"04"
 			{
@@ -5152,7 +5153,7 @@
 		// General
 		//-------------------------------------------------------------------------------------
 		"BaseClass"					"ability_lua"
-		"ScriptFile"				"heroes/creeps.lua"
+		"ScriptFile"				"abilities/heroes/creeps.lua"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_AURA"
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
 		"AbilityUnitTargetType"		"DOTA_UNIT_TARGET_HERO"
@@ -5441,7 +5442,7 @@
 
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/hero_demon_hunter.lua"
+						"ScriptFile"	"abilities/heroes/hero_demon_hunter.lua"
 						"Function"		"Immolation"
 					}
 				}
@@ -5457,7 +5458,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"ability_lua"
-		"ScriptFile"					"heroes/hero_demon_hunter.lua"
+		"ScriptFile"					"abilities/heroes/hero_demon_hunter.lua"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"AbilityTextureName"			"custom/holdout_thirst_aura"
 		"AbilityCastRange"				"900"
@@ -5633,7 +5634,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"			"heroes/hero_terrorblade.lua"
+						"ScriptFile"			"abilities/heroes/hero_terrorblade.lua"
 						"Function"				"ModelSwapStart"
 						"model"					"models/heroes/terrorblade/demon.vmdl"
 						"projectile_model"		"particles/units/heroes/hero_terrorblade/terrorblade_metamorphosis_base_attack.vpcf"
@@ -5641,7 +5642,7 @@
 
 					"RunScript"
 					{
-						"ScriptFile"		"heroes/hero_terrorblade.lua"
+						"ScriptFile"		"abilities/heroes/hero_terrorblade.lua"
 						"Function"			"HideWearables"
 					}
 
@@ -5664,7 +5665,7 @@
 
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/global.lua"
+						"ScriptFile"	"abilities/heroes/global.lua"
 						"Function"		"Splash"
 					}
 				}
@@ -5673,13 +5674,13 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/hero_terrorblade.lua"
+						"ScriptFile"	"abilities/heroes/hero_terrorblade.lua"
 						"Function"		"ModelSwapEnd"
 					}
 
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/hero_terrorblade.lua"
+						"ScriptFile"	"abilities/heroes/hero_terrorblade.lua"
 						"Function"		"ShowWearables"
 					}
 				}
@@ -5702,7 +5703,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"             		"ability_lua"
-		"ScriptFile"					"heroes/hero_enchantress.lua"
+		"ScriptFile"					"abilities/heroes/hero_enchantress.lua"
 		"AbilityTextureName"			"custom/xhs_trueshot_aura"
 		"MaxLevel" 						"3"
 		"RequiredLevel"					"10"
@@ -5997,7 +5998,7 @@
 		// General
 		//-------------------------------------------------------------------------------------
 		"BaseClass"					"ability_lua"
-		"ScriptFile"				"heroes/hero_elder_titan.lua"
+		"ScriptFile"				"abilities/heroes/hero_elder_titan.lua"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_AURA"
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
 		"AbilityUnitTargetType"		"DOTA_UNIT_TARGET_HERO"
@@ -6490,7 +6491,7 @@
 
 			"RunScript"
 			{
-				"ScriptFile"	"heroes/hero_demon_hunter.lua"
+				"ScriptFile"	"abilities/heroes/hero_demon_hunter.lua"
 				"Function"		"Roar"
 			}
 		}
@@ -6578,7 +6579,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"				"heroes/global.lua"
+						"ScriptFile"				"abilities/heroes/global.lua"
 						"Function"					"Reincarnation"
 					}
 				}
@@ -6911,7 +6912,7 @@
 		
 			"RunScript"
 			{
-				"ScriptFile"            "heroes/hero_archmage.lua"
+				"ScriptFile"            "abilities/heroes/hero_archmage.lua"
 				"Function"              "march_of_the_machines_spawn"
 				"Target"                "POINT"
 			}
@@ -7079,7 +7080,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/hero_archmage.lua"
+						"ScriptFile"	"abilities/heroes/hero_archmage.lua"
 						"Function"		"RainOfIce"
 					}
 
@@ -7251,7 +7252,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"ability_lua"
-		"ScriptFile"					"heroes/hero_blademaster"
+		"ScriptFile"					"abilities/heroes/hero_blademaster"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"AbilitySound"					"Blademaster.MirrorImage"
 
@@ -7766,7 +7767,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/global.lua"
+						"ScriptFile"	"abilities/heroes/global.lua"
 						"Function"		"Splash"
 					}
 				}
@@ -7892,7 +7893,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/hero_banehallow.lua"
+						"ScriptFile"	"abilities/heroes/hero_banehallow.lua"
 						"Function"		"create_projectile"
 						"EffectKV"		"particles/units/heroes/hero_tinker/tinker_machine.vpcf"
 					}
@@ -7971,7 +7972,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/global.lua"
+						"ScriptFile"	"abilities/heroes/global.lua"
 						"Function"		"Splash"
 					}
 				}
@@ -8030,7 +8031,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"		"heroes/hero_rhasta/serpent_ward.lua"
+				"ScriptFile"		"abilities/heroes/hero_rhasta/serpent_ward.lua"
 				"Function"			"SerpentWard"
 				"Target"			"POINT"
 				"Duration"			"%duration"
@@ -8171,7 +8172,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"		"heroes/hero_rhasta/laser_trap.lua"
+				"ScriptFile"		"abilities/heroes/hero_rhasta/laser_trap.lua"
 				"Function"			"venomancer_plague_ward_datadriven_on_spell_start"
 				"Target"			"POINT"
 				"Duration"			"%duration"
@@ -8270,14 +8271,14 @@
 
 			"RunScript"
 			{
-				"ScriptFile"	"heroes/hero_warden.lua"
+				"ScriptFile"	"abilities/heroes/hero_warden.lua"
 				"Function"		"Morph"
 				"Target"		"TARGET"
 			}
 
 			"RunScript"
 			{
-				"ScriptFile"		"heroes/hero_rhasta/hex.lua"
+				"ScriptFile"		"abilities/heroes/hero_rhasta/hex.lua"
 				"Function"			"venomancer_plague_ward_datadriven_on_spell_start"
 				"Target"			"POINT"
 				"Duration"			"%duration"
@@ -8342,7 +8343,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"    "scripts/vscripts/heroes/hero_huntress.lua"
+				"ScriptFile"    "scripts/vscripts/abilities/heroes/hero_huntress.lua"
 				"Function"      "lightning_storm_start"
 			}
 		}
@@ -8417,7 +8418,7 @@
 
 			"RunScript"
 			{
-				"ScriptFile"    "heroes/hero_huntress.lua"
+				"ScriptFile"    "abilities/heroes/hero_huntress.lua"
 				"Function"      "Shock"
 			}
 		}
@@ -8431,7 +8432,7 @@
 		// General
 		//-------------------------------------------------------------------------------------
 		"BaseClass"					"ability_lua"
-		"ScriptFile"				"heroes/creeps.lua"
+		"ScriptFile"				"abilities/heroes/creeps.lua"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_AURA"
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
 		"AbilityUnitTargetType"		"DOTA_UNIT_TARGET_HERO"
@@ -8500,7 +8501,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/hero_enchantress/endurance_aura.lua"
+						"ScriptFile"	"abilities/heroes/hero_enchantress/endurance_aura.lua"
 						"Function"		"EnduranceAura"
 					}
 				}
@@ -8672,7 +8673,7 @@
 
 			"RunScript"
 			{
-				"ScriptFile"    "scripts/vscripts/heroes/hero_huntress.lua"
+				"ScriptFile"    "scripts/vscripts/abilities/heroes/hero_huntress.lua"
 				"Function"      "eclipse_start"
 			}
 		}
@@ -9023,7 +9024,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/global.lua"
+						"ScriptFile"	"abilities/heroes/global.lua"
 						"Function"		"Lifesteal"
 					}
 				}
@@ -9053,7 +9054,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"ability_lua"
-		"ScriptFile"					"heroes/muradin.lua"
+		"ScriptFile"					"abilities/heroes/muradin.lua"
 		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"AbilityTextureName"            "holdout_avatar"
 		"AbilityCooldown"				"120.0"
@@ -9206,7 +9207,7 @@
 
 			"RunScript"
 			{
-				"ScriptFile"                    "heroes/hero_mountain_king/avatar.lua"
+				"ScriptFile"                    "abilities/heroes/hero_mountain_king/avatar.lua"
 				"Function"                      "avatar_grown_model"
 				"PercentageOverModelScale"      "%percentage_over_model_scale"
 				"Duration"                      "%AbilityDuration"
@@ -9478,7 +9479,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"		"heroes/hero_arthas.lua"
+				"ScriptFile"		"abilities/heroes/hero_arthas.lua"
 				"Function"			"Purification"
 
 				"sound_cast"		"Arthas.Holy_Light"
@@ -9538,7 +9539,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"	"heroes/hero_arthas.lua"
+				"ScriptFile"	"abilities/heroes/hero_arthas.lua"
 				"Function"		"DivineShield"
 			}
 	
@@ -9777,7 +9778,7 @@
 
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/global.lua"
+						"ScriptFile"	"abilities/heroes/global.lua"
 						"Function"		"Splash"
 					}
 				}
@@ -9955,7 +9956,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/hero_crypt_lord.lua"
+						"ScriptFile"	"abilities/heroes/hero_crypt_lord.lua"
 						"Function"		"Return"
 					}
 					"FireEffect"
@@ -10021,7 +10022,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"	"heroes/hero_banehallow.lua"
+				"ScriptFile"	"abilities/heroes/hero_banehallow.lua"
 				"Function"		"DeathCoil"
 			}
 		}
@@ -10256,7 +10257,7 @@
 		// General
 		//-------------------------------------------------------------------------------------
 		"BaseClass"					"ability_lua"
-		"ScriptFile"				"heroes/creeps.lua"
+		"ScriptFile"				"abilities/heroes/creeps.lua"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_AURA"
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
 		"AbilityUnitTargetType"		"DOTA_UNIT_TARGET_HERO"
@@ -10394,7 +10395,7 @@
 
 			"RunScript"
 			{
-				"ScriptFile"	"heroes/global.lua"
+				"ScriptFile"	"abilities/heroes/global.lua"
 				"Function"		"EndChannel"
 			}
 		}
@@ -10409,7 +10410,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/hero_banehallow.lua"
+						"ScriptFile"	"abilities/heroes/hero_banehallow.lua"
 						"Function"		"create_projectile"
 						"EffectKV"		"particles/econ/items/tinker/tinker_motm_rollermaw/tinker_rollermaw.vpcf"
 					}
@@ -10728,7 +10729,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"			"heroes/hero_pit_lord.lua"
+						"ScriptFile"			"abilities/heroes/hero_pit_lord.lua"
 						"Function"				"rain_of_chaos"
 					}
 				}
@@ -10791,7 +10792,7 @@
 	
 				"RunScript"
 				{
-				  "ScriptFile"  "heroes/hero_pit_lord.lua"
+				  "ScriptFile"  "abilities/heroes/hero_pit_lord.lua"
 				  "Function"    "target_modifier_remove"
 				  "Duration"	"%duration"
 				}
@@ -10937,7 +10938,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/hero_pit_lord.lua"
+						"ScriptFile"	"abilities/heroes/hero_pit_lord.lua"
 						"Function"		"SpawnDoomBeast"
 						"Duration"		"%duration"
 					}
@@ -11134,7 +11135,7 @@
 	
 			"RunScript"
 			{
-				"ScriptFile"        "heroes/hero_warden.lua"
+				"ScriptFile"        "abilities/heroes/hero_warden.lua"
 				"Function"          "heat_seeking_missile_seek_targets"
 			}
 		}
@@ -11706,7 +11707,7 @@
 
 			"RunScript"
 			{
-				"ScriptFile"	"heroes/hero_warden.lua"
+				"ScriptFile"	"abilities/heroes/hero_warden.lua"
 				"Function"		"Morph"
 				"Target"		"TARGET"
 			}
@@ -11901,7 +11902,7 @@
 
 			"RunScript"
 			{
-				"ScriptFile"        "heroes/hero_marine.lua"
+				"ScriptFile"        "abilities/heroes/hero_marine.lua"
 				"Function"          "FanOfRockets"
 			}
 		}
@@ -11916,7 +11917,7 @@
 
 			"RunScript"
 			{
-				"ScriptFile"	"heroes/hero_marine.lua"
+				"ScriptFile"	"abilities/heroes/hero_marine.lua"
 				"Function"		"FanOfRocketsExplode"
 			}
 
@@ -12053,7 +12054,7 @@
 
 			"RunScript"
 			{
-				"ScriptFile"	"heroes/hero_demon_hunter.lua"
+				"ScriptFile"	"abilities/heroes/hero_demon_hunter.lua"
 				"Function"		"Roar"
 			}
 		}
@@ -12156,7 +12157,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"	"heroes/hero_marine.lua"
+				"ScriptFile"	"abilities/heroes/hero_marine.lua"
 				"Function"		"Clone"
 				"Target"		"UNIT"
 			}
@@ -12282,7 +12283,7 @@
 
 					"RunScript"
 					{
-						"ScriptFile"		"heroes/hero_marine.lua"
+						"ScriptFile"		"abilities/heroes/hero_marine.lua"
 						"Function"			"ClusterRockets"
 						"particleEffect"	"particles/rocketswarm.vpcf"
 					}
@@ -12355,7 +12356,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"		"heroes/hero_potm/watery_minion.lua"
+				"ScriptFile"		"abilities/heroes/hero_potm/watery_minion.lua"
 				"Function"			"WateryMinion"
 				"Target"			"POINT"
 				"Duration"			"%duration"
@@ -12502,7 +12503,7 @@
 	
 			"RunScript"
 			{
-				"ScriptFile"    "heroes/hero_huntress.lua"
+				"ScriptFile"    "abilities/heroes/hero_huntress.lua"
 				"Function"      "Shock"
 			}
 		}
@@ -12574,7 +12575,7 @@
 
 			"RunScript"
 			{
-				"ScriptFile"			"heroes/hero_potm/rejuvenation.lua"
+				"ScriptFile"			"abilities/heroes/hero_potm/rejuvenation.lua"
 				"Function"				"Rejuvenation"
 
 				"sound_target"			"Hero_Warlock.ShadowWord"
@@ -12602,7 +12603,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"			"heroes/hero_potm/rejuvenation.lua"
+						"ScriptFile"			"abilities/heroes/hero_potm/rejuvenation.lua"
 						"Function"				"RejuvenationHealing"
 					}
 				}
@@ -12697,7 +12698,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"							"heroes/hero_potm/monsoon.lua"
+				"ScriptFile"							"abilities/heroes/hero_potm/monsoon.lua"
 				"Function"								"FreezingFieldCast"
 				"Target"								"POINT"
 
@@ -12713,7 +12714,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"							"heroes/hero_potm/monsoon.lua"
+				"ScriptFile"							"abilities/heroes/hero_potm/monsoon.lua"
 				"Function"								"FreezingFieldStopSound"
 
 				"modifier_aura"							"modifier_imba_freezing_field_aura"
@@ -12729,7 +12730,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"							"heroes/hero_potm/monsoon.lua"
+				"ScriptFile"							"abilities/heroes/hero_potm/monsoon.lua"
 				"Function"								"FreezingFieldEnd"
 
 				"modifier_aura"							"modifier_imba_freezing_field_aura"
@@ -12775,7 +12776,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"					"heroes/hero_potm/monsoon.lua"
+						"ScriptFile"					"abilities/heroes/hero_potm/monsoon.lua"
 						"Function"						"FreezingFieldExplode"
 						"section"						"0"
 					}
@@ -12793,7 +12794,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"					"heroes/hero_potm/monsoon.lua"
+						"ScriptFile"					"abilities/heroes/hero_potm/monsoon.lua"
 						"Function"						"FreezingFieldExplode"
 						"section"						"1"
 					}
@@ -12811,7 +12812,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"					"heroes/hero_potm/monsoon.lua"
+						"ScriptFile"					"abilities/heroes/hero_potm/monsoon.lua"
 						"Function"						"FreezingFieldExplode"
 						"section"						"2"
 					}
@@ -12829,7 +12830,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"					"heroes/hero_potm/monsoon.lua"
+						"ScriptFile"					"abilities/heroes/hero_potm/monsoon.lua"
 						"Function"						"FreezingFieldExplode"
 						"section"						"3"
 					}
@@ -12939,7 +12940,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"							"heroes/hero_potm/monsoon.lua"
+				"ScriptFile"							"abilities/heroes/hero_potm/monsoon.lua"
 				"Function"								"FreezingFieldCast"
 				"Target"								"POINT"
 
@@ -12955,7 +12956,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"							"heroes/hero_potm/monsoon.lua"
+				"ScriptFile"							"abilities/heroes/hero_potm/monsoon.lua"
 				"Function"								"FreezingFieldStopSound"
 
 				"modifier_aura"							"modifier_imba_freezing_field_aura"
@@ -12971,7 +12972,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"							"heroes/hero_potm/monsoon.lua"
+				"ScriptFile"							"abilities/heroes/hero_potm/monsoon.lua"
 				"Function"								"FreezingFieldEnd"
 
 				"modifier_aura"							"modifier_imba_freezing_field_aura"
@@ -13017,7 +13018,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"					"heroes/hero_potm/monsoon.lua"
+						"ScriptFile"					"abilities/heroes/hero_potm/monsoon.lua"
 						"Function"						"FreezingFieldExplode"
 						"section"						"0"
 					}
@@ -13035,7 +13036,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"					"heroes/hero_potm/monsoon.lua"
+						"ScriptFile"					"abilities/heroes/hero_potm/monsoon.lua"
 						"Function"						"FreezingFieldExplode"
 						"section"						"1"
 					}
@@ -13053,7 +13054,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"					"heroes/hero_potm/monsoon.lua"
+						"ScriptFile"					"abilities/heroes/hero_potm/monsoon.lua"
 						"Function"						"FreezingFieldExplode"
 						"section"						"2"
 					}
@@ -13071,7 +13072,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"					"heroes/hero_potm/monsoon.lua"
+						"ScriptFile"					"abilities/heroes/hero_potm/monsoon.lua"
 						"Function"						"FreezingFieldExplode"
 						"section"						"3"
 					}
@@ -13432,7 +13433,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"	"heroes/hero_blood_mage.lua"
+				"ScriptFile"	"abilities/heroes/hero_blood_mage.lua"
 				"Function"		"PointOrbThrow"
 				"Target"		"POINT"
 			}
@@ -13442,7 +13443,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"    "heroes/hero_blood_mage.lua"
+				"ScriptFile"    "abilities/heroes/hero_blood_mage.lua"
 				"Function"      "FlameStrikeStart"
 				"Target"        "POINT"
 			}
@@ -13489,7 +13490,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/hero_blood_mage.lua"
+						"ScriptFile"	"abilities/heroes/hero_blood_mage.lua"
 						"Function"		"FlameStrikeDamage"
 						"Target"
 						{
@@ -13539,7 +13540,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"    "heroes/hero_blood_mage.lua"
+						"ScriptFile"    "abilities/heroes/hero_blood_mage.lua"
 						"Function"      "FlameStrikeSecond"
 					}
 				}
@@ -13559,7 +13560,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"    "heroes/hero_blood_mage.lua"
+						"ScriptFile"    "abilities/heroes/hero_blood_mage.lua"
 						"Function"      "FlameStrikeDamage"
 						"Target"
 						{
@@ -13601,7 +13602,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"    "heroes/hero_blood_mage.lua"
+						"ScriptFile"    "abilities/heroes/hero_blood_mage.lua"
 						"Function"      "FlameStrikeDamage"
 						"Damage"        "%first_strike_dps"
 					}
@@ -13617,7 +13618,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"    "heroes/hero_blood_mage.lua"
+						"ScriptFile"    "abilities/heroes/hero_blood_mage.lua"
 						"Function"      "FlameStrikeDamage"
 						"Damage"        "%burn_dps"
 					}
@@ -13696,7 +13697,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"	"heroes/hero_blood_mage.lua"
+				"ScriptFile"	"abilities/heroes/hero_blood_mage.lua"
 				"Function"		"PointOrbThrow"
 				"Target"		"POINT"
 			}
@@ -13706,7 +13707,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"				"heroes/hero_blood_mage.lua"
+				"ScriptFile"				"abilities/heroes/hero_blood_mage.lua"
 				"Function"					"DragonSlave"
 				"Target"					"POINT"
 
@@ -13799,7 +13800,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"        "heroes/hero_blood_mage.lua"
+						"ScriptFile"        "abilities/heroes/hero_blood_mage.lua"
 						"Function"          "Incinerate"
 					}
 				}
@@ -13893,7 +13894,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/hero_blood_mage.lua"
+						"ScriptFile"	"abilities/heroes/hero_blood_mage.lua"
 						"Function"		"PointOrbThrow"
 						"Target"		"POINT"
 					}
@@ -14044,7 +14045,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"	"heroes/hero_blood_mage.lua"
+				"ScriptFile"	"abilities/heroes/hero_blood_mage.lua"
 				"Function"		"NoPointOrbThrow"
 				"Target"		"POINT"
 			}
@@ -14054,7 +14055,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"    "heroes/hero_blood_mage.lua"
+				"ScriptFile"    "abilities/heroes/hero_blood_mage.lua"
 				"Function"      "KillPhoenix"
 			}
 
@@ -14066,7 +14067,7 @@
 					"Center"            "CASTER"
 					"ScriptSelectPoints"
 					{
-						"ScriptFile"    "heroes/hero_blood_mage.lua"
+						"ScriptFile"    "abilities/heroes/hero_blood_mage.lua"
 						"Function"      "Phoenix"
 						"Target"        "CASTER"
 						"Count"         "1"
@@ -14081,7 +14082,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"    "heroes/hero_blood_mage.lua"
+						"ScriptFile"    "abilities/heroes/hero_blood_mage.lua"
 						"Function"      "SetPhoenixMoveForward"
 					}               
 	
@@ -14146,7 +14147,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"    "heroes/hero_blood_mage.lua"
+						"ScriptFile"    "abilities/heroes/hero_blood_mage.lua"
 						"Function"      "PhoenixDegen"
 					}
 	
@@ -14168,7 +14169,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"    "heroes/hero_blood_mage.lua"
+						"ScriptFile"    "abilities/heroes/hero_blood_mage.lua"
 						"Function"      "PhoenixEgg"
 					}
 				}
@@ -14208,7 +14209,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"    "heroes/hero_blood_mage.lua"
+						"ScriptFile"    "abilities/heroes/hero_blood_mage.lua"
 						"Function"      "PhoenixEggCheckReborn"
 					}               
 				}
@@ -14304,7 +14305,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"	"heroes/hero_blood_mage.lua"
+				"ScriptFile"	"abilities/heroes/hero_blood_mage.lua"
 				"Function"		"NoPointOrbThrow"
 				"Target"		"POINT"
 			}
@@ -14314,7 +14315,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"	"heroes/hero_blood_mage.lua"
+				"ScriptFile"	"abilities/heroes/hero_blood_mage.lua"
 				"Function"		"RainOfFire"
 			}
 		}
@@ -14340,7 +14341,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/hero_blood_mage.lua"
+						"ScriptFile"	"abilities/heroes/hero_blood_mage.lua"
 						"Function"		"AttachOrbs"
 					}
 				}
@@ -14349,7 +14350,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/hero_blood_mage.lua"
+						"ScriptFile"	"abilities/heroes/hero_blood_mage.lua"
 						"Function"		"RemoveOrbs"
 					}
 				}
@@ -14440,7 +14441,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"	"heroes/hero_archimage.lua"
+				"ScriptFile"	"abilities/heroes/hero_archimage.lua"
 				"Function"		"BlizzardStartPoint"
 				"Target"		"POINT"
 			}
@@ -14456,7 +14457,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"  "heroes/hero_archimage.lua"
+				"ScriptFile"  "abilities/heroes/hero_archimage.lua"
 				"Function"    "BlizzardEnd"
 			}
 		}
@@ -14491,7 +14492,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"  "heroes/hero_archimage.lua"
+						"ScriptFile"  "abilities/heroes/hero_archimage.lua"
 						"Function"    "ApplyAnimation"
 					}
 				}
@@ -14582,7 +14583,7 @@
 
 					"RunScript"
 					{
-						"ScriptFile"  "heroes/hero_archimage.lua"
+						"ScriptFile"  "abilities/heroes/hero_archimage.lua"
 						"Function"    "BlizzardWave"
 					}
 				}
@@ -14642,7 +14643,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"		"heroes/hero_archimage.lua"
+				"ScriptFile"		"abilities/heroes/hero_archimage.lua"
 				"Function"			"WaterElemental"
 				"Duration"			"%duration"
 			}
@@ -14862,7 +14863,7 @@
 
 			"RunScript"
 			{
-				"ScriptFile"	"heroes/hero_archimage.lua"
+				"ScriptFile"	"abilities/heroes/hero_archimage.lua"
 				"Function"		"MagicShield"
 			}
 
@@ -15037,7 +15038,7 @@
 	
 			"RunScript"
 			{
-				"ScriptFile"    "scripts/vscripts/heroes/hero_warlock/spiritual_beast.lua"
+				"ScriptFile"    "scripts/vscripts/abilities/heroes/hero_warlock/spiritual_beast.lua"
 				"Function"      "KillWolves"
 			}
 
@@ -15049,7 +15050,7 @@
 					"Center"    "CASTER"
 					"ScriptSelectPoints"
 					{
-						"ScriptFile"    "scripts/vscripts/heroes/hero_warlock/spiritual_beast.lua"
+						"ScriptFile"    "scripts/vscripts/abilities/heroes/hero_warlock/spiritual_beast.lua"
 						"Function"  "GetSummonPoints"
 						"Target"    "CASTER"
 						"Count" "1"
@@ -15067,7 +15068,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"    "scripts/vscripts/heroes/hero_warlock/spiritual_beast.lua"
+						"ScriptFile"    "scripts/vscripts/abilities/heroes/hero_warlock/spiritual_beast.lua"
 						"Function"      "SetUnitsMoveForward"
 					}
 	
@@ -15095,7 +15096,7 @@
 					"Center"    "CASTER"
 					"ScriptSelectPoints"
 					{
-						"ScriptFile"    "scripts/vscripts/heroes/hero_warlock/spiritual_beast.lua"
+						"ScriptFile"    "scripts/vscripts/abilities/heroes/hero_warlock/spiritual_beast.lua"
 						"Function"  "GetSummonPoints"
 						"Target"    "CASTER"
 						"Count" "2"
@@ -15113,7 +15114,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"    "scripts/vscripts/heroes/hero_warlock/spiritual_beast.lua"
+						"ScriptFile"    "scripts/vscripts/abilities/heroes/hero_warlock/spiritual_beast.lua"
 						"Function"      "SetUnitsMoveForward"
 					}
 	
@@ -15141,7 +15142,7 @@
 					"Center"    "CASTER"
 					"ScriptSelectPoints"
 					{
-						"ScriptFile"    "scripts/vscripts/heroes/hero_warlock/spiritual_beast.lua"
+						"ScriptFile"    "scripts/vscripts/abilities/heroes/hero_warlock/spiritual_beast.lua"
 						"Function"  "GetSummonPoints"
 						"Target"    "CASTER"
 						"Count" "2"
@@ -15159,7 +15160,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"    "scripts/vscripts/heroes/hero_warlock/spiritual_beast.lua"
+						"ScriptFile"    "scripts/vscripts/abilities/heroes/hero_warlock/spiritual_beast.lua"
 						"Function"      "SetUnitsMoveForward"
 					}
 	
@@ -15187,7 +15188,7 @@
 					"Center"    "CASTER"
 					"ScriptSelectPoints"
 					{
-						"ScriptFile"    "scripts/vscripts/heroes/hero_warlock/spiritual_beast.lua"
+						"ScriptFile"    "scripts/vscripts/abilities/heroes/hero_warlock/spiritual_beast.lua"
 						"Function"  "GetSummonPoints"
 						"Target"    "CASTER"
 						"Count" "2"
@@ -15205,7 +15206,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"    "scripts/vscripts/heroes/hero_warlock/spiritual_beast.lua"
+						"ScriptFile"    "scripts/vscripts/abilities/heroes/hero_warlock/spiritual_beast.lua"
 						"Function"      "SetUnitsMoveForward"
 					}
 	
@@ -15391,7 +15392,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/hero_crypt_lord.lua"
+						"ScriptFile"	"abilities/heroes/hero_crypt_lord.lua"
 						"Function"		"Return"
 					}
 
@@ -15457,7 +15458,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/hero_crypt_lord.lua"
+						"ScriptFile"	"abilities/heroes/hero_crypt_lord.lua"
 						"Function"		"Return"
 					}
 
@@ -15661,7 +15662,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"    "heroes/hero_warlock/gargoyle_swarm.lua"
+				"ScriptFile"    "abilities/heroes/hero_warlock/gargoyle_swarm.lua"
 				"Function"      "ExorcismDeath"
 			}
 	
@@ -15693,7 +15694,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"    "heroes/hero_warlock/gargoyle_swarm.lua"
+						"ScriptFile"    "abilities/heroes/hero_warlock/gargoyle_swarm.lua"
 						"Function"      "ExorcismStart"
 					}
 	
@@ -15708,7 +15709,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"    "heroes/hero_warlock/gargoyle_swarm.lua"
+						"ScriptFile"    "abilities/heroes/hero_warlock/gargoyle_swarm.lua"
 						"Function"      "ExorcismAttack"
 					}
 				}
@@ -15717,7 +15718,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"    "heroes/hero_warlock/gargoyle_swarm.lua"
+						"ScriptFile"    "abilities/heroes/hero_warlock/gargoyle_swarm.lua"
 						"Function"      "ExorcismDeath"
 					}
 	
@@ -15732,7 +15733,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"    "heroes/hero_warlock/gargoyle_swarm.lua"
+						"ScriptFile"    "abilities/heroes/hero_warlock/gargoyle_swarm.lua"
 						"Function"      "ExorcismEnd"
 					}
 				}
@@ -15744,7 +15745,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"    "heroes/hero_warlock/gargoyle_swarm.lua"
+						"ScriptFile"    "abilities/heroes/hero_warlock/gargoyle_swarm.lua"
 						"Function"      "ExorcismPhysics"
 					}
 	
@@ -15879,7 +15880,7 @@
 
 			"RunScript"
 			{
-				"ScriptFile"	"heroes/hero_crypt_lord.lua"
+				"ScriptFile"	"abilities/heroes/hero_crypt_lord.lua"
 				"Function"		"BurrowImpaleChannelEnd"
 			}
 		}
@@ -15895,7 +15896,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/hero_crypt_lord.lua"
+						"ScriptFile"	"abilities/heroes/hero_crypt_lord.lua"
 						"Function"		"BurrowImpaleAnimation"
 					}
 				}
@@ -15934,7 +15935,7 @@
 
 							"RunScript"
 							{
-								"ScriptFile"	"heroes/hero_crypt_lord.lua"
+								"ScriptFile"	"abilities/heroes/hero_crypt_lord.lua"
 								"Function"		"BurrowImpale"
 								"Target"		"TARGET"
 							}
@@ -15985,7 +15986,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"		"heroes/hero_rifleman.lua"
+				"ScriptFile"		"abilities/heroes/hero_rifleman.lua"
 				"Function"			"ToggleAbilities"
 				"ability_aux"		"holdout_plasma_rifle"
 				"projectile_model"	"particles/units/heroes/hero_clinkz/clinkz_searing_arrow.vpcf"
@@ -16008,7 +16009,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"	"heroes/hero_rifleman.lua"
+				"ScriptFile"	"abilities/heroes/hero_rifleman.lua"
 				"Function"		"SetOriginal"
 			}
 
@@ -16029,7 +16030,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/hero_rifleman.lua"
+						"ScriptFile"	"abilities/heroes/hero_rifleman.lua"
 						"Function"		"PreRifleOrb"
 						"sound"			"Hero_Clinkz.SearingArrows"
 					}
@@ -16039,7 +16040,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/hero_rifleman.lua"
+						"ScriptFile"	"abilities/heroes/hero_rifleman.lua"
 						"Function"		"RifleOrb"
 						"Target"		"TARGET"
 						"sound"			"Hero_Clinkz.SearingArrows.Impact"
@@ -16098,7 +16099,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"		"heroes/hero_rifleman.lua"
+				"ScriptFile"		"abilities/heroes/hero_rifleman.lua"
 				"Function"			"ToggleAbilities"
 				"ability_aux"		"holdout_rocket_launcher"
 				"projectile_model"	"particles/units/heroes/hero_warlock/warlock_base_attack.vpcf"
@@ -16121,7 +16122,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"	"heroes/hero_rifleman.lua"
+				"ScriptFile"	"abilities/heroes/hero_rifleman.lua"
 				"Function"		"SetOriginal"
 			}
 
@@ -16142,7 +16143,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/hero_rifleman.lua"
+						"ScriptFile"	"abilities/heroes/hero_rifleman.lua"
 						"Function"		"PreRifleOrb"
 						"sound"			"Hero_ObsidianDestroyer.ArcaneOrb"
 					}
@@ -16152,7 +16153,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/hero_rifleman.lua"
+						"ScriptFile"	"abilities/heroes/hero_rifleman.lua"
 						"Function"		"RifleOrb"
 						"Target"		"TARGET"
 						"sound"			"Hero_ObsidianDestroyer.ArcaneOrb.Impact"
@@ -16160,7 +16161,7 @@
 
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/global.lua"
+						"ScriptFile"	"abilities/heroes/global.lua"
 						"Function"		"Splash"
 					}
 
@@ -16227,7 +16228,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"ability_lua"
 		"AbilityTextureName"			"sniper_assassinate"
-		"ScriptFile"					"heroes/hero_rifleman"
+		"ScriptFile"					"abilities/heroes/hero_rifleman"
 		"AbilityType"					"DOTA_ABILITY_TYPE_ULTIMATE"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_NORMAL_WHEN_STOLEN"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
@@ -16344,7 +16345,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"		"heroes/hero_rifleman.lua"
+				"ScriptFile"		"abilities/heroes/hero_rifleman.lua"
 				"Function"			"ToggleAbilities"
 				"ability_aux"		"holdout_plasma_rifle_20"
 				"projectile_model"	"particles/econ/items/razor/razor_ti6/razor_base_attack_ti6.vpcf"
@@ -16373,7 +16374,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"	"heroes/hero_rifleman.lua"
+				"ScriptFile"	"abilities/heroes/hero_rifleman.lua"
 				"Function"		"SetOriginal"
 			}
 
@@ -16394,7 +16395,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/hero_rifleman.lua"
+						"ScriptFile"	"abilities/heroes/hero_rifleman.lua"
 						"Function"		"PreRifleOrb"
 						"sound"			"Hero_Tinker.LaserImpact"
 					}
@@ -16404,7 +16405,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/hero_rifleman.lua"
+						"ScriptFile"	"abilities/heroes/hero_rifleman.lua"
 						"Function"		"RifleOrb"
 						"Target"		"TARGET"
 						"sound"			""
@@ -16464,7 +16465,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"		"heroes/hero_rifleman.lua"
+				"ScriptFile"		"abilities/heroes/hero_rifleman.lua"
 				"Function"			"ToggleAbilities"
 				"ability_aux"		"holdout_laser"
 				"projectile_model"	"particles/units/heroes/hero_warlock/warlock_base_attack.vpcf"
@@ -16493,7 +16494,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"	"heroes/hero_rifleman.lua"
+				"ScriptFile"	"abilities/heroes/hero_rifleman.lua"
 				"Function"		"SetOriginal"
 			}
 
@@ -16514,7 +16515,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/hero_rifleman.lua"
+						"ScriptFile"	"abilities/heroes/hero_rifleman.lua"
 						"Function"		"PreRifleOrb"
 						"sound"			"Hero_ObsidianDestroyer.ArcaneOrb"
 					}
@@ -16524,7 +16525,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/hero_rifleman.lua"
+						"ScriptFile"	"abilities/heroes/hero_rifleman.lua"
 						"Function"		"RifleOrb"
 						"Target"		"TARGET"
 						"sound"			"Hero_ObsidianDestroyer.ArcaneOrb.Impact"
@@ -16532,7 +16533,7 @@
 
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/global.lua"
+						"ScriptFile"	"abilities/heroes/global.lua"
 						"Function"		"Splash"
 					}
 
@@ -16609,7 +16610,7 @@
 
 			"RunScript"
 			{
-				"ScriptFile"	"heroes/hero_centurion.lua"
+				"ScriptFile"	"abilities/heroes/hero_centurion.lua"
 				"Function"		"Purge"
 			}
 
@@ -16972,7 +16973,7 @@
 	
 			"RunScript"
 			{
-				"ScriptFile"			"scripts/vscripts/heroes/hero_centurion.lua"
+				"ScriptFile"			"scripts/vscripts/abilities/heroes/hero_centurion.lua"
 				"Function"				"Transform"
 				"modifier_one"			"modifier_green_dragon_datadriven"
 				"modifier_two"			"modifier_red_dragon_datadriven"
@@ -17012,7 +17013,7 @@
 	
 					"RunScript"
 					{
-						"ScriptFile"			"scripts/vscripts/heroes/hero_centurion.lua"
+						"ScriptFile"			"scripts/vscripts/abilities/heroes/hero_centurion.lua"
 						"Function"				"ModelSwapStart"
 						"model"					"models/items/dragon_knight/oblivion_blazer_dragon/oblivion_blazer_dragon.vmdl"
 						"projectile_model"		"particles/units/heroes/hero_dragon_knight/dragon_knight_elder_dragon_corrosive.vpcf"
@@ -17020,7 +17021,7 @@
 	
 					"RunScript"
 					{
-						"ScriptFile"            "heroes/global.lua"
+						"ScriptFile"            "abilities/heroes/global.lua"
 						"Function"              "HideWearables"
 					}
 				}
@@ -17045,13 +17046,13 @@
 	
 					"RunScript"
 					{
-						"ScriptFile"            "scripts/vscripts/heroes/hero_centurion.lua"
+						"ScriptFile"            "scripts/vscripts/abilities/heroes/hero_centurion.lua"
 						"Function"              "ModelSwapEnd"
 					}
 	
 					"RunScript"
 					{
-						"ScriptFile"            "heroes/global.lua"
+						"ScriptFile"            "abilities/heroes/global.lua"
 						"Function"              "ShowWearables"
 					}
 				}
@@ -17112,7 +17113,7 @@
 	
 					"RunScript"
 					{
-						"ScriptFile"            "scripts/vscripts/heroes/hero_centurion.lua"
+						"ScriptFile"            "scripts/vscripts/abilities/heroes/hero_centurion.lua"
 						"Function"              "ModelSwapStart"
 						"model"                 "models/items/dragon_knight/fireborn_dragon/fireborn_dragon.vmdl"
 						"projectile_model"      "particles/units/heroes/hero_dragon_knight/dragon_knight_elder_dragon_fire.vpcf"
@@ -17120,7 +17121,7 @@
 	
 					"RunScript"
 					{
-						"ScriptFile"			"heroes/global.lua"
+						"ScriptFile"			"abilities/heroes/global.lua"
 						"Function"				"HideWearables"
 					}
 	
@@ -17142,13 +17143,13 @@
 	
 					"RunScript"
 					{
-						"ScriptFile"            "scripts/vscripts/heroes/hero_centurion.lua"
+						"ScriptFile"            "scripts/vscripts/abilities/heroes/hero_centurion.lua"
 						"Function"              "ModelSwapEnd"
 					}
 	
 					"RunScript"
 					{
-						"ScriptFile"			"heroes/global.lua"
+						"ScriptFile"			"abilities/heroes/global.lua"
 						"Function"				"ShowWearables"
 					}
 				}
@@ -17220,7 +17221,7 @@
 	
 					"RunScript"
 					{
-						"ScriptFile"            "scripts/vscripts/heroes/hero_centurion.lua"
+						"ScriptFile"            "scripts/vscripts/abilities/heroes/hero_centurion.lua"
 						"Function"              "ModelSwapStart"
 						"model"                 "models/creeps/neutral_creeps/n_creep_black_dragon/n_creep_black_dragon.vmdl"
 						"projectile_model"      "particles/units/heroes/hero_dragon_knight/dragon_knight_elder_dragon_fire.vpcf"
@@ -17228,7 +17229,7 @@
 	
 					"RunScript"
 					{
-						"ScriptFile"			"heroes/global.lua"
+						"ScriptFile"			"abilities/heroes/global.lua"
 						"Function"				"HideWearables"
 					}
 	
@@ -17256,13 +17257,13 @@
 	
 					"RunScript"
 					{
-						"ScriptFile"            "scripts/vscripts/heroes/hero_centurion.lua"
+						"ScriptFile"            "scripts/vscripts/abilities/heroes/hero_centurion.lua"
 						"Function"              "ModelSwapEnd"
 					}
 	
 					"RunScript"
 					{
-						"ScriptFile"			"heroes/global.lua"
+						"ScriptFile"			"abilities/heroes/global.lua"
 						"Function"				"ShowWearables"
 					}
 				}
@@ -17458,7 +17459,7 @@
 
 			"RunScript"
 			{
-				"ScriptFile"	"heroes/hero_centurion.lua"
+				"ScriptFile"	"abilities/heroes/hero_centurion.lua"
 				"Function"		"DarkDimension"
 			}
 		}
@@ -17802,7 +17803,7 @@
 
 			"RunScript"
 			{
-				"ScriptFile"    "heroes/hero_beastmaster.lua"
+				"ScriptFile"    "abilities/heroes/hero_beastmaster.lua"
 				"Function"      "StampedeCast"
 				"Target"        "POINT"
 			}
@@ -17856,7 +17857,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"    "heroes/hero_beastmaster.lua"
+						"ScriptFile"    "abilities/heroes/hero_beastmaster.lua"
 						"Function"      "Stampede"
 						"Target"        "POINT"
 					}
@@ -17913,7 +17914,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"ability_lua"
-		"ScriptFile"					"heroes/hero_malfurion.lua"
+		"ScriptFile"					"abilities/heroes/hero_malfurion.lua"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_BASIC | DOTA_UNIT_TARGET_HERO"
@@ -17958,7 +17959,7 @@
 		// General
 		//-------------------------------------------------------------------------------------
 		"BaseClass"					"ability_lua"
-		"ScriptFile"				"heroes/hero_malfurion.lua"
+		"ScriptFile"				"abilities/heroes/hero_malfurion.lua"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 
 		// Stats
@@ -18022,7 +18023,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"ability_lua"
-		"ScriptFile"					"heroes/hero_malfurion.lua"
+		"ScriptFile"					"abilities/heroes/hero_malfurion.lua"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_BASIC | DOTA_UNIT_TARGET_HERO"
@@ -18078,7 +18079,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"ability_lua"
-		"ScriptFile"					"heroes/hero_malfurion.lua"
+		"ScriptFile"					"abilities/heroes/hero_malfurion.lua"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_BASIC | DOTA_UNIT_TARGET_HERO"
@@ -18145,7 +18146,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"ability_lua"
-		"ScriptFile"					"heroes/hero_malfurion.lua"
+		"ScriptFile"					"abilities/heroes/hero_malfurion.lua"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_POINT"
 		"AbilityType"					"ABILITY_TYPE_ULTIMATE"
 		"MaxLevel"						"3"
@@ -18281,7 +18282,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"			"heroes/hero_kobold_knight.lua"
+						"ScriptFile"			"abilities/heroes/hero_kobold_knight.lua"
 						"Function"				"LifeSteal"
 					}
 				}
@@ -18521,7 +18522,7 @@
 
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/hero_enchantress/endurance_aura.lua"
+						"ScriptFile"	"abilities/heroes/hero_enchantress/endurance_aura.lua"
 						"Function"		"EnduranceAura"
 					}
 				}
@@ -18586,14 +18587,14 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"		"heroes/hero_desert_wyrm.lua"
+				"ScriptFile"		"abilities/heroes/hero_desert_wyrm.lua"
 				"Function"			"LevelUpAura"
 				"ability_name"		"holdout_endurance_aura"
 			}
 
 			"RunScript"
 			{
-				"ScriptFile"		"heroes/hero_desert_wyrm.lua"
+				"ScriptFile"		"abilities/heroes/hero_desert_wyrm.lua"
 				"Function"			"Passives"
 				"unactive_passive"	"holdout_endurance_aura"
 			}
@@ -18630,7 +18631,7 @@
 
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/hero_enchantress/endurance_aura.lua"
+						"ScriptFile"	"abilities/heroes/hero_enchantress/endurance_aura.lua"
 						"Function"		"EnduranceAura"
 					}
 				}
@@ -18677,7 +18678,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"		"heroes/hero_kobold_knight.lua"
+				"ScriptFile"		"abilities/heroes/hero_kobold_knight.lua"
 				"Function"			"KoboldArmy"
 			}
 
@@ -18744,7 +18745,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"	"heroes/hero_mountain_giant.lua"
+				"ScriptFile"	"abilities/heroes/hero_mountain_giant.lua"
 				"Function"		"WarClub"
 			}
 		}
@@ -18768,13 +18769,13 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/hero_mountain_giant.lua"
+						"ScriptFile"	"abilities/heroes/hero_mountain_giant.lua"
 						"Function"		"WarClubStrike"
 					}
 
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/global.lua"
+						"ScriptFile"	"abilities/heroes/global.lua"
 						"Function"		"Splash"
 					}
 				}
@@ -18870,7 +18871,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/global.lua"
+						"ScriptFile"	"abilities/heroes/global.lua"
 						"Function"		"Splash"
 					}
 				}
@@ -18992,7 +18993,7 @@
 
 			"RunScript"
 			{
-				"ScriptFile"			"heroes/hero_mountain_giant.lua"
+				"ScriptFile"			"abilities/heroes/hero_mountain_giant.lua"
 				"Function"				"DwarfToss"
 
 				"Target"				"POINT"
@@ -19144,7 +19145,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"			"heroes/hero_mountain_giant.lua"
+						"ScriptFile"			"abilities/heroes/hero_mountain_giant.lua"
 						"Function"				"SecondWindRegen"
 
 						"modifier_regen"		"modifier_item_heart_extra_regen"
@@ -19166,7 +19167,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"			"heroes/hero_mountain_giant.lua"
+						"ScriptFile"			"abilities/heroes/hero_mountain_giant.lua"
 						"Function"				"SecondWindDamage"
 
 						"modifier_regen"		"modifier_item_heart_extra_regen"
@@ -19228,14 +19229,14 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"			"scripts/vscripts/heroes/hero_mountain_giant.lua"
+				"ScriptFile"			"scripts/vscripts/abilities/heroes/hero_mountain_giant.lua"
 				"Function"				"ToggleOn"
 				"modifier"				"modifier_giant_model"
 			}
 
 			"RunScript"
 			{
-				"ScriptFile"	"heroes/hero_mountain_giant.lua"
+				"ScriptFile"	"abilities/heroes/hero_mountain_giant.lua"
 				"Function"		"Taunt"
 			}
 
@@ -19250,13 +19251,13 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"			"scripts/vscripts/heroes/hero_mountain_giant.lua"
+				"ScriptFile"			"scripts/vscripts/abilities/heroes/hero_mountain_giant.lua"
 				"Function"				"ToggleOff"
 			}
 
 			"RunScript"
 			{
-				"ScriptFile"	"heroes/hero_mountain_giant.lua"
+				"ScriptFile"	"abilities/heroes/hero_mountain_giant.lua"
 				"Function"		"Taunt"
 			}
 
@@ -19462,7 +19463,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/hero_monkey_king.lua"
+						"ScriptFile"	"abilities/heroes/hero_monkey_king.lua"
 						"Function"		"CheckJingu"
 						"particle"		"particles/units/heroes/hero_monkey_king/monkey_king_quad_tap_stack.vpcf"
 					}
@@ -19491,7 +19492,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/hero_monkey_king.lua"
+						"ScriptFile"	"abilities/heroes/hero_monkey_king.lua"
 						"Function"		"JinguHit"
 						"particle"		"particles/units/heroes/hero_monkey_king/monkey_king_quad_tap_hit.vpcf"
 					}
@@ -19525,7 +19526,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/hero_monkey_king.lua"
+						"ScriptFile"	"abilities/heroes/hero_monkey_king.lua"
 						"Function"		"JinguOverheadInit"
 						"particle"		"particles/units/heroes/hero_monkey_king/monkey_king_quad_tap_stack.vpcf"
 					}
@@ -19535,7 +19536,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/hero_monkey_king.lua"
+						"ScriptFile"	"abilities/heroes/hero_monkey_king.lua"
 						"Function"		"JinguOverheadDestroy"
 					}
 				}
@@ -19940,7 +19941,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"	"heroes/hero_desert_wyrm.lua"
+				"ScriptFile"	"abilities/heroes/hero_desert_wyrm.lua"
 				"Function"		"PhaseEntrench"
 			}
 
@@ -19979,14 +19980,14 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"		"heroes/global.lua"
+				"ScriptFile"		"abilities/heroes/global.lua"
 				"Function"			"LevelUpAbility"
 				"ability_name"		"holdout_unentrench"
 			}
 
 			"RunScript"
 			{
-				"ScriptFile"		"heroes/global.lua"
+				"ScriptFile"		"abilities/heroes/global.lua"
 				"Function"			"LevelUpAbility"
 				"ability_name"		"holdout_arctic_flyout"
 			}
@@ -20023,7 +20024,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"			"heroes/hero_desert_wyrm.lua"
+						"ScriptFile"			"abilities/heroes/hero_desert_wyrm.lua"
 						"Function"				"Entrench"
 						"sub_ability_name"		"holdout_unentrench"
 					}
@@ -20033,7 +20034,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"			"heroes/hero_desert_wyrm.lua"
+						"ScriptFile"			"abilities/heroes/hero_desert_wyrm.lua"
 						"Function"				"UnEntrench"
 					}
 				}
@@ -20110,7 +20111,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"			"heroes/hero_desert_wyrm.lua"
+				"ScriptFile"			"abilities/heroes/hero_desert_wyrm.lua"
 				"Function"				"UnEntrench"
 				"sub_ability_name"		"holdout_entrench"
 			}
@@ -20173,7 +20174,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"		"heroes/global.lua"
+				"ScriptFile"		"abilities/heroes/global.lua"
 				"Function"			"LevelUpAbility"
 				"ability_name"		"holdout_entrench"
 			}
@@ -20286,7 +20287,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"		"heroes/global.lua"
+				"ScriptFile"		"abilities/heroes/global.lua"
 				"Function"			"LevelUpAbility"
 				"ability_name"		"holdout_arctic_breath"
 			}
@@ -20296,7 +20297,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"				"heroes/hero_desert_wyrm.lua"
+				"ScriptFile"				"abilities/heroes/hero_desert_wyrm.lua"
 				"Function"					"TornadoTempest"
 				"Target"					"POINT"
 				"TravelSpeed"				"%travel_speed"
@@ -20312,7 +20313,7 @@
 			
 			"RunScript"
 			{
-				"ScriptFile"		"heroes/hero_desert_wyrm.lua"
+				"ScriptFile"		"abilities/heroes/hero_desert_wyrm.lua"
 				"Function"			"TornadoTempestHit"
 			}
 		}
@@ -20366,7 +20367,7 @@
 	
 					"RunScript"
 					{
-						"ScriptFile"				"heroes/hero_desert_wyrm.lua"
+						"ScriptFile"				"abilities/heroes/hero_desert_wyrm.lua"
 						"Function"					"TornadoTempestCreated"
 						"CycloneInitialHeight"		"%cyclone_initial_height"
 						"CycloneMinHeight"			"%cyclone_min_height"
@@ -20379,7 +20380,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"    "heroes/hero_desert_wyrm.lua"
+						"ScriptFile"    "abilities/heroes/hero_desert_wyrm.lua"
 						"Function"      "TornadoTempestInterval"
 					}
 				}
@@ -20388,7 +20389,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/hero_desert_wyrm.lua"
+						"ScriptFile"	"abilities/heroes/hero_desert_wyrm.lua"
 						"Function"		"TornadoTempestDestroy"
 						"BaseDamage"	"%base_damage"
 					}
@@ -20458,14 +20459,14 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"		"heroes/global.lua"
+				"ScriptFile"		"abilities/heroes/global.lua"
 				"Function"			"LevelUpAbility"
 				"ability_name"		"holdout_arctic_skin"
 			}
 
 			"RunScript"
 			{
-				"ScriptFile"		"heroes/hero_desert_wyrm.lua"
+				"ScriptFile"		"abilities/heroes/hero_desert_wyrm.lua"
 				"Function"			"Passives"
 				"unactive_passive"	"holdout_arctic_skin"
 			}
@@ -20482,7 +20483,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/hero_desert_wyrm.lua"
+						"ScriptFile"	"abilities/heroes/hero_desert_wyrm.lua"
 						"Function"		"AcidSkin"
 					}
 				}
@@ -20602,7 +20603,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"			"heroes/hero_desert_wyrm.lua"
+						"ScriptFile"			"abilities/heroes/hero_desert_wyrm.lua"
 						"Function"				"SkinChangerDragon"
 						"Duration"				"%duration"
 						"model"					"models/items/dragon_knight/dragon_immortal_1/dragon_immortal_1.vmdl"
@@ -20615,7 +20616,7 @@
 
 					"RunScript"
 					{
-						"ScriptFile"			"heroes/global.lua"
+						"ScriptFile"			"abilities/heroes/global.lua"
 						"Function"				"HideWearables"
 					}
 				}
@@ -20624,7 +20625,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/global.lua"
+						"ScriptFile"	"abilities/heroes/global.lua"
 						"Function"		"Splash"
 					}
 				}
@@ -20633,7 +20634,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"			"heroes/global.lua"
+						"ScriptFile"			"abilities/heroes/global.lua"
 						"Function"				"ShowWearables"
 					}
 				}
@@ -20810,7 +20811,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"		"heroes/global.lua"
+				"ScriptFile"		"abilities/heroes/global.lua"
 				"Function"			"LevelUpAbility"
 				"ability_name"		"holdout_tornado_tempest"
 			}
@@ -20820,7 +20821,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"				"heroes/hero_blood_mage.lua"
+				"ScriptFile"				"abilities/heroes/hero_blood_mage.lua"
 				"Function"					"DragonSlave"
 				"Target"					"POINT"
 
@@ -20890,14 +20891,14 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"		"heroes/global.lua"
+				"ScriptFile"		"abilities/heroes/global.lua"
 				"Function"			"LevelUpAbility"
 				"ability_name"		"holdout_acid_skin"
 			}
 
 			"RunScript"
 			{
-				"ScriptFile"		"heroes/hero_desert_wyrm.lua"
+				"ScriptFile"		"abilities/heroes/hero_desert_wyrm.lua"
 				"Function"			"Passives"
 				"unactive_passive"	"holdout_acid_skin"
 			}
@@ -20920,7 +20921,7 @@
 						{
 							"RunScript"
 							{
-								"ScriptFile"	"heroes/hero_abaddon/howling_blast.lua"
+								"ScriptFile"	"abilities/heroes/hero_abaddon/howling_blast.lua"
 								"Function"		"HowlingBlast"
 								"modifier"		"modifier_stunned"
 							}
@@ -21142,7 +21143,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"	"heroes/hero_dark_summoner.lua"
+				"ScriptFile"	"abilities/heroes/hero_dark_summoner.lua"
 				"Function"		"Shadowraze3Cast"
 				"sound_raze"	"Hero_Nevermore.Shadowraze"
 			}
@@ -21358,7 +21359,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"			"heroes/hero_dark_summoner.lua"
+						"ScriptFile"			"abilities/heroes/hero_dark_summoner.lua"
 						"Function"				"ConsumingFlame"
 						"damage"				"%attack_damage"
 						"particle_lifesteal"	"particles/items3_fx/octarine_core_lifesteal.vpcf"
@@ -21370,7 +21371,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"			"heroes/hero_dark_summoner.lua"
+						"ScriptFile"			"abilities/heroes/hero_dark_summoner.lua"
 						"Function"				"ConsumingFlameAttack"
 
 						"damage"				"%attack_damage"
@@ -21445,7 +21446,7 @@
 
 			"RunScript"
 			{
-				"ScriptFile"	"heroes/hero_dark_summoner.lua"
+				"ScriptFile"	"abilities/heroes/hero_dark_summoner.lua"
 				"Function"		"Stitch"
 			}       
 		}
@@ -21700,7 +21701,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"			"heroes/hero_dark_summoner.lua"
+						"ScriptFile"			"abilities/heroes/hero_dark_summoner.lua"
 						"Function"				"ConsumingFlame"
 						"damage"				"%attack_damage"
 						"particle_lifesteal"	"particles/items3_fx/octarine_core_lifesteal.vpcf"
@@ -21712,7 +21713,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"			"heroes/hero_dark_summoner.lua"
+						"ScriptFile"			"abilities/heroes/hero_dark_summoner.lua"
 						"Function"				"ConsumingFlameAttack"
 						"damage"				"%attack_damage"
 						"modifier_prevent"		"modifier_prevent_spellsteal"
@@ -21786,7 +21787,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"scripts/vscripts/heroes/hero_bristleback.lua"
+						"ScriptFile"	"scripts/vscripts/abilities/heroes/hero_bristleback.lua"
 						"Function"		"bristleback_takedamage"
 						"Damage"		"%attack_damage"
 						"back_particle"	"particles/units/heroes/hero_bristleback/bristleback_back_dmg.vpcf"
@@ -21874,7 +21875,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"			"heroes/hero_bristleback.lua"
+				"ScriptFile"			"abilities/heroes/hero_bristleback.lua"
 				"Function"				"StormBoltLaunch"
 
 				"modifier_caster"		"modifier_imba_storm_bolt_caster"
@@ -21897,7 +21898,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"			"heroes/hero_bristleback.lua"
+				"ScriptFile"			"abilities/heroes/hero_bristleback.lua"
 				"Function"				"StormBoltEnd"
 
 				"modifier_caster"		"modifier_imba_storm_bolt_caster"
@@ -21908,7 +21909,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"			"heroes/hero_bristleback.lua"
+				"ScriptFile"			"abilities/heroes/hero_bristleback.lua"
 				"Function"				"StormBoltHit"
 
 				"modifier_caster"		"modifier_imba_storm_bolt_caster"
@@ -22021,7 +22022,7 @@
 		// General
 		//-------------------------------------------------------------------------------------
 		"BaseClass"					"ability_lua"
-		"ScriptFile"				"heroes/creeps.lua"
+		"ScriptFile"				"abilities/heroes/creeps.lua"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_AURA | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE"
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
 		"AbilityUnitTargetType"		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
@@ -22063,7 +22064,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"					"ability_lua"
-		"ScriptFile"				"heroes/creeps.lua"
+		"ScriptFile"				"abilities/heroes/creeps.lua"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
 		"AbilityUnitTargetType"		"DOTA_UNIT_TARGET_HERO"
@@ -22173,7 +22174,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"	"heroes/magtheridon/magtheridon.lua"
+				"ScriptFile"	"abilities/heroes/magtheridon/magtheridon.lua"
 				"Function"		"ThunderClap"
 			}
 		}
@@ -22339,7 +22340,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"	"heroes/magtheridon/magtheridon.lua"
+				"ScriptFile"	"abilities/heroes/magtheridon/magtheridon.lua"
 				"Function"		"ThunderClap"
 			}
 		}
@@ -22440,7 +22441,7 @@
 		// General
 		//-------------------------------------------------------------------------------------
 		"BaseClass"					"ability_lua"
-		"ScriptFile"				"heroes/creeps.lua"
+		"ScriptFile"				"abilities/heroes/creeps.lua"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_AURA"
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
 		"AbilityUnitTargetType"		"DOTA_UNIT_TARGET_HERO"
@@ -22472,7 +22473,7 @@
 		// General
 		//-------------------------------------------------------------------------------------
 		"BaseClass"				"ability_lua"
-		"ScriptFile"			"heroes/hero_magtheridon/magtheridon_medium.lua"
+		"ScriptFile"			"abilities/heroes/hero_magtheridon/magtheridon_medium.lua"
 		"AbilityBehavior"		"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_HIDDEN"
 		"MaxLevel"				"1"
 
@@ -22603,7 +22604,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"    "heroes/hero_grom_hellscream/mirror_image.lua"
+						"ScriptFile"    "abilities/heroes/hero_grom_hellscream/mirror_image.lua"
 						"Function"      "Phantasm"
 						"sound"			"Hero_ChaosKnight.Phantasm.Plus"
 					}
@@ -23702,7 +23703,7 @@
 
 					"RunScript"
 					{
-						"ScriptFile"		"heroes/global.lua"
+						"ScriptFile"		"abilities/heroes/global.lua"
 						"Function"			"AbilityStack"
 						"modifier_stack"	"modifier_power_mount_int"
 					}
@@ -23756,7 +23757,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"			"heroes/hero_dark_fundamental.lua"
+						"ScriptFile"			"abilities/heroes/hero_dark_fundamental.lua"
 						"Function"				"PowerMountPhaseCast"
 					}
 				}
@@ -23765,7 +23766,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"			"heroes/hero_dark_fundamental.lua"
+						"ScriptFile"			"abilities/heroes/hero_dark_fundamental.lua"
 						"Function"				"PowerMountCast"
 						"sub_ability_name"		"holdout_power_mount_agi"
 					}
@@ -23784,7 +23785,7 @@
 
 					"RunScript"
 					{
-						"ScriptFile"		"heroes/global.lua"
+						"ScriptFile"		"abilities/heroes/global.lua"
 						"Function"			"AbilityStack"
 						"modifier_stack"	"modifier_power_mount_agi"
 					}
@@ -23878,7 +23879,7 @@
 
 					"RunScript"
 					{
-						"ScriptFile"		"heroes/global.lua"
+						"ScriptFile"		"abilities/heroes/global.lua"
 						"Function"			"AbilityStack"
 						"modifier_stack"	"modifier_power_mount_str"
 					}
@@ -23932,7 +23933,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"			"heroes/hero_dark_fundamental.lua"
+						"ScriptFile"			"abilities/heroes/hero_dark_fundamental.lua"
 						"Function"				"PowerMountPhaseCast"
 					}
 				}
@@ -23941,7 +23942,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"			"heroes/hero_dark_fundamental.lua"
+						"ScriptFile"			"abilities/heroes/hero_dark_fundamental.lua"
 						"Function"				"PowerMountCast"
 						"sub_ability_name"		"holdout_power_mount_int"
 					}
@@ -23960,7 +23961,7 @@
 
 					"RunScript"
 					{
-						"ScriptFile"		"heroes/global.lua"
+						"ScriptFile"		"abilities/heroes/global.lua"
 						"Function"			"AbilityStack"
 						"modifier_stack"	"modifier_power_mount_int"
 					}
@@ -24039,7 +24040,7 @@
 
 					"RunScript"
 					{
-						"ScriptFile"		"heroes/global.lua"
+						"ScriptFile"		"abilities/heroes/global.lua"
 						"Function"			"AbilityStack"
 						"modifier_stack"	"modifier_power_mount_agi"
 					}
@@ -24092,7 +24093,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"			"heroes/hero_dark_fundamental.lua"
+						"ScriptFile"			"abilities/heroes/hero_dark_fundamental.lua"
 						"Function"				"PowerMountPhaseCast"
 					}
 				}
@@ -24101,7 +24102,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"			"heroes/hero_dark_fundamental.lua"
+						"ScriptFile"			"abilities/heroes/hero_dark_fundamental.lua"
 						"Function"				"PowerMountCast"
 						"sub_ability_name"		"holdout_power_mount_str"
 					}
@@ -24120,7 +24121,7 @@
 
 					"RunScript"
 					{
-						"ScriptFile"		"heroes/global.lua"
+						"ScriptFile"		"abilities/heroes/global.lua"
 						"Function"			"AbilityStack"
 						"modifier_stack"	"modifier_power_mount_str"
 					}
@@ -24208,7 +24209,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"		"heroes/global.lua"
+						"ScriptFile"		"abilities/heroes/global.lua"
 						"Function"			"AbilityStack"
 						"modifier_stack"	"modifier_dark_cleave_dummy"
 					}
@@ -24228,7 +24229,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"            "heroes/global.lua"
+						"ScriptFile"            "abilities/heroes/global.lua"
 						"Function"				"Splash"
 						"modifier_dark_cleave"	"modifier_dark_cleave"
 						"Target"				"TARGET"
@@ -24331,7 +24332,7 @@
 
 									"RunScript"
 									{
-										"ScriptFile"	"heroes/hero_dark_fundamental.lua"
+										"ScriptFile"	"abilities/heroes/hero_dark_fundamental.lua"
 										"Function"		"Instakill"
 										"Target"		"TARGET"
 										"Chance"		"%chance"
@@ -24454,7 +24455,7 @@
 
 			"RunScript"
 			{
-				"ScriptFile"			"heroes/hero_dark_fundamental.lua"
+				"ScriptFile"			"abilities/heroes/hero_dark_fundamental.lua"
 				"Function"				"RequiemPhaseCast"
 			}
 		}
@@ -24468,7 +24469,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"		"heroes/global.lua"
+						"ScriptFile"		"abilities/heroes/global.lua"
 						"Function"			"AbilityStack"
 						"modifier_stack"	"modifier_requiem_dummy"
 					}
@@ -24480,7 +24481,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"					"heroes/hero_dark_fundamental.lua"
+				"ScriptFile"					"abilities/heroes/hero_dark_fundamental.lua"
 				"Function"						"RequiemCast"
 
 				"requiem_cast_sound"			"Hero_Nevermore.RequiemOfSouls"
@@ -24496,7 +24497,7 @@
 
 			"RunScript"
 			{
-				"ScriptFile"					"heroes/hero_dark_fundamental.lua"
+				"ScriptFile"					"abilities/heroes/hero_dark_fundamental.lua"
 				"Function"						"RequiemProjectileHitOutward"
 			}
 		}
@@ -24616,7 +24617,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"			"heroes/hero_dark_fundamental.lua"
+						"ScriptFile"			"abilities/heroes/hero_dark_fundamental.lua"
 						"Function"				"SkinChangerPhaseCast"
 					}
 				}
@@ -24644,7 +24645,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"			"heroes/hero_dark_fundamental.lua"
+						"ScriptFile"			"abilities/heroes/hero_dark_fundamental.lua"
 						"Function"				"SkinChanger"
 						"HeroSwap"				"npc_dota_hero_keeper_of_the_light"
 					}
@@ -24734,7 +24735,7 @@
 
 			"RunScript"
 			{
-				"ScriptFile"                    "heroes/hero_mountain_king/avatar.lua"
+				"ScriptFile"                    "abilities/heroes/hero_mountain_king/avatar.lua"
 				"Function"                      "avatar_grown_model"
 				"PercentageOverModelScale"      "%percentage_over_model_scale"
 				"Duration"                      "%duration"
@@ -24815,7 +24816,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"			"heroes/hero_light_fundamental/mechanism.lua"
+				"ScriptFile"			"abilities/heroes/hero_light_fundamental/mechanism.lua"
 				"Function"				"Mechanism"
 				"HealAmount"			"%heal_amount"
 				"Armor"					"%bonus_armor"
@@ -24931,7 +24932,7 @@
 
 					"RunScript"
 					{
-						"ScriptFile"		"heroes/global.lua"
+						"ScriptFile"		"abilities/heroes/global.lua"
 						"Function"			"AbilityStack"
 						"modifier_stack"	"modifier_light_stand_dummy"
 					}
@@ -24959,7 +24960,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"		"heroes/hero_light_fundamental/light_stand.lua"
+						"ScriptFile"		"abilities/heroes/hero_light_fundamental/light_stand.lua"
 						"Function"			"PurificationDeath"
 
 						"cast_sound"		"Hero_Omniknight.Purification"
@@ -25082,7 +25083,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/hero_light_fundamental/sacred_pool.lua"
+						"ScriptFile"	"abilities/heroes/hero_light_fundamental/sacred_pool.lua"
 						"Function"		"ApplyHeal"
 					}
 
@@ -25141,7 +25142,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/hero_lich/frost_chaos.lua"
+						"ScriptFile"	"abilities/heroes/hero_lich/frost_chaos.lua"
 						"Function"		"ApplyDPS"
 					}
 				}
@@ -25235,7 +25236,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"			"heroes/hero_dark_fundamental.lua"
+						"ScriptFile"			"abilities/heroes/hero_dark_fundamental.lua"
 						"Function"				"SkinChangerPhaseCast"
 					}
 				}
@@ -25258,7 +25259,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"			"heroes/hero_dark_fundamental.lua"
+						"ScriptFile"			"abilities/heroes/hero_dark_fundamental.lua"
 						"Function"				"SkinChanger"
 						"HeroSwap"				"npc_dota_hero_chaos_knight"
 					}
@@ -25541,7 +25542,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"		"heroes/bosses/spirit_master.lua"
+				"ScriptFile"		"abilities/heroes/bosses/spirit_master.lua"
 				"Function"			"PrimalSplit"
 			}
 
@@ -25597,7 +25598,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"	"heroes/hero_doom_bringer.lua"
+				"ScriptFile"	"abilities/heroes/hero_doom_bringer.lua"
 				"Function"		"DevourCheck"
 				"modifier"		"modifier_devour_datadriven"
 			}
@@ -25625,7 +25626,7 @@
 
 			"RunScript"
 			{
-				"ScriptFile"	"heroes/hero_doom_bringer.lua"
+				"ScriptFile"	"abilities/heroes/hero_doom_bringer.lua"
 				"Function"		"Devour"
 				"modifier"		"modifier_devour_datadriven"
 				"doom_empty1"	"doom_bringer_empty1"
@@ -25643,7 +25644,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/hero_doom_bringer.lua"
+						"ScriptFile"	"abilities/heroes/hero_doom_bringer.lua"
 						"Function"		"DevourGold"
 					}				
 				}
@@ -25725,7 +25726,7 @@
 		
 			"RunScript"
 			{
-				"ScriptFile"		"heroes/hero_spirit_master.lua"
+				"ScriptFile"		"abilities/heroes/hero_spirit_master.lua"
 				"Function"			"static_remnant_init"
 			}
 		}
@@ -25773,7 +25774,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"ability_lua"
-		"ScriptFile"					"heroes/hero_spirit_master"
+		"ScriptFile"					"abilities/heroes/hero_spirit_master"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"	
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
@@ -25864,7 +25865,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"	"heroes/hero_spirit_master.lua"
+				"ScriptFile"	"abilities/heroes/hero_spirit_master.lua"
 				"Function"		"SpiritSwapPhaseCast"
 			}
 
@@ -25893,7 +25894,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"	"heroes/hero_spirit_master.lua"
+				"ScriptFile"	"abilities/heroes/hero_spirit_master.lua"
 				"Function"		"SpiritSwap"
 			}
 		}
@@ -25944,7 +25945,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"	"heroes/hero_spirit_master.lua"
+				"ScriptFile"	"abilities/heroes/hero_spirit_master.lua"
 				"Function"		"SpiritSwapPhaseCast"
 			}
 
@@ -25973,7 +25974,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"	"heroes/hero_spirit_master.lua"
+				"ScriptFile"	"abilities/heroes/hero_spirit_master.lua"
 				"Function"		"SpiritSwap"
 			}
 		}
@@ -26024,7 +26025,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"	"heroes/hero_spirit_master.lua"
+				"ScriptFile"	"abilities/heroes/hero_spirit_master.lua"
 				"Function"		"SpiritSwapPhaseCast"
 			}
 
@@ -26053,7 +26054,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"	"heroes/hero_spirit_master.lua"
+				"ScriptFile"	"abilities/heroes/hero_spirit_master.lua"
 				"Function"		"SpiritSwap"
 			}
 		}
@@ -26107,7 +26108,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"	"heroes/hero_spirit_master.lua"
+				"ScriptFile"	"abilities/heroes/hero_spirit_master.lua"
 				"Function"		"EnhancedSpirit"
 			}
 		}
@@ -26143,7 +26144,7 @@
 
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/global.lua"
+						"ScriptFile"	"abilities/heroes/global.lua"
 						"Function"		"Splash"
 					}
 				}
@@ -26372,7 +26373,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/global.lua"
+						"ScriptFile"	"abilities/heroes/global.lua"
 						"Function"		"OrbOfDarkness"
 					}
 				}
@@ -26965,7 +26966,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"		"heroes/hero_demon_hunter.lua"
+						"ScriptFile"		"abilities/heroes/hero_demon_hunter.lua"
 						"Function"			"VampiricAuraApply"
 					}
 				}
@@ -27188,7 +27189,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"			"heroes/npc_hero_balanar/balanar_rain_of_chaos.lua"
+						"ScriptFile"			"abilities/heroes/npc_hero_balanar/balanar_rain_of_chaos.lua"
 						"Function"				"rain_of_chaos"
 					}
 				}
@@ -27247,7 +27248,7 @@
 
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/npc_hero_balanar/balanar_rain_of_chaos.lua"
+						"ScriptFile"	"abilities/heroes/npc_hero_balanar/balanar_rain_of_chaos.lua"
 						"Function"		"target_modifier_remove"
 					}
 				}
@@ -27458,7 +27459,7 @@
 	"undead_disease_cloud"
 	{
 		"BaseClass"					"ability_lua"
-		"ScriptFile"				"heroes/creeps.lua"
+		"ScriptFile"				"abilities/heroes/creeps.lua"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_AOE | DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"AbilityUnitDamageType"		"DAMAGE_TYPE_MAGICAL"
 		"AbilityCastRange"			"%radius"
@@ -27658,7 +27659,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/hero_banehallow.lua"
+						"ScriptFile"	"abilities/heroes/hero_banehallow.lua"
 						"Function"		"create_projectile"
 						"EffectKV"		"particles/econ/items/tinker/tinker_motm_rollermaw/tinker_rollermaw.vpcf"
 					}
@@ -27759,7 +27760,7 @@
 
 			"RunScript"
 			{
-				"ScriptFile"        "scripts/vscripts/heroes/hero_abaddon/chronosphere.lua"
+				"ScriptFile"        "scripts/vscripts/abilities/heroes/hero_abaddon/chronosphere.lua"
 				"Function"          "Chronosphere"
 				"Target"            "POINT"
 				"dummy_aura"        "modifier_chronosphere_aura_datadriven"
@@ -27811,7 +27812,7 @@
 						{
 							"RunScript"
 							{
-								"ScriptFile"        "scripts/vscripts/heroes/hero_abaddon/chronosphere.lua"
+								"ScriptFile"        "scripts/vscripts/abilities/heroes/hero_abaddon/chronosphere.lua"
 								"Function"          "ChronosphereAura"
 								"Target"            "TARGET"
 								"aura_modifier"     "modifier_chronosphere_datadriven"
@@ -28031,7 +28032,7 @@
 						{
 							"RunScript"
 							{
-								"ScriptFile"	"heroes/hero_abaddon/howling_blast.lua"
+								"ScriptFile"	"abilities/heroes/hero_abaddon/howling_blast.lua"
 								"Function"		"HowlingBlast"
 								"modifier"		"modifier_disarmed"
 							}
@@ -28297,7 +28298,7 @@
 		{		
 			"RunScript"
 			{
-				"ScriptFile"		"heroes/global.lua"
+				"ScriptFile"		"abilities/heroes/global.lua"
 				"Function"			"CastleMuradin"
 			}
 		}
@@ -28659,7 +28660,7 @@
 	"ghost_revenant_blackjack"
 	{
 		"BaseClass"					"ability_lua"
-		"ScriptFile"				"heroes/hero_ghost_revenant.lua"
+		"ScriptFile"				"abilities/heroes/hero_ghost_revenant.lua"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_POINT"
 		"AbilityCastRange"			"1600"
 		"AbilityTextureName"    	"custom/ghost_revenant_blackjack"
@@ -28734,7 +28735,7 @@
 	"ghost_revenant_wraith"
 	{
 		"BaseClass"					"ability_lua"
-		"ScriptFile"				"heroes/hero_ghost_revenant.lua"
+		"ScriptFile"				"abilities/heroes/hero_ghost_revenant.lua"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_IGNORE_PSEUDO_QUEUE"
 		"AbilityTextureName"    	"custom/ghost_revenant_wraith"
 		"MaxLevel"					"4"
@@ -28779,7 +28780,7 @@
 	"ghost_revenant_miasma"
 	{
 		"BaseClass"					"ability_lua"
-		"ScriptFile"				"heroes/hero_ghost_revenant.lua"
+		"ScriptFile"				"abilities/heroes/hero_ghost_revenant.lua"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE"
 		"AbilityCastRange"			"900"
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
@@ -28843,7 +28844,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"					"ability_lua"
-		"ScriptFile"				"heroes/hero_ghost_revenant.lua"
+		"ScriptFile"				"abilities/heroes/hero_ghost_revenant.lua"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"AbilityCastRange"			"%radius"
 		"AbilityTextureName"    	"custom/ghost_revenant_ghost_immolation"
@@ -28877,7 +28878,7 @@
 	"ghost_revenant_exhaustion"
 	{
 		"BaseClass"					"ability_lua"
-		"ScriptFile"				"heroes/hero_ghost_revenant.lua"
+		"ScriptFile"				"abilities/heroes/hero_ghost_revenant.lua"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"AbilityTextureName"    	"custom/ghost_revenant_exhaustion"
 		"AbilityType"				"DOTA_ABILITY_TYPE_ULTIMATE"
@@ -28996,7 +28997,7 @@
 
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/global.lua"
+						"ScriptFile"	"abilities/heroes/global.lua"
 						"Function"		"Splash"
 					}
 				}
@@ -29019,7 +29020,7 @@
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
 		"FightRecapLevel"				"1"
 		"AbilityTextureName"			"kunkka_torrent"
-		"ScriptFile"					"heroes/hero_kunkka"
+		"ScriptFile"					"abilities/heroes/hero_kunkka"
 		"MaxLevel"						"4"
 		"LevelsBetweenUpgrades"			"2"
 
@@ -29126,7 +29127,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"ability_lua"
-		"ScriptFile"					"heroes/hero_kunkka"
+		"ScriptFile"					"abilities/heroes/hero_kunkka"
 		"AbilityType"					"DOTA_ABILITY_TYPE_ULTIMATE"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_AOE | DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
@@ -29323,7 +29324,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/hero_troll_warlord.lua"
+						"ScriptFile"	"abilities/heroes/hero_troll_warlord.lua"
 						"Function"		"EnchantedAxes"
 					}
 				}
@@ -29412,7 +29413,7 @@
 
 					"RunScript"
 					{
-						"ScriptFile"	"heroes/hero_troll_warlord.lua"
+						"ScriptFile"	"abilities/heroes/hero_troll_warlord.lua"
 						"Function"		"BattleTrance"
 					}
 				}

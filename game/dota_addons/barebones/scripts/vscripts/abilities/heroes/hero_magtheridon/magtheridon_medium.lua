@@ -1,7 +1,7 @@
 -- Author: Cookies
 -- Date: 05.12.2019
 
-LinkLuaModifier("modifier_magtheridon_medium", "heroes/hero_magtheridon/magtheridon_medium.lua", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_magtheridon_medium", "abilities/heroes/hero_magtheridon/magtheridon_medium.lua", LUA_MODIFIER_MOTION_NONE)
 
 magtheridon_medium = magtheridon_medium or class({})
 

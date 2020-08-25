@@ -18,6 +18,7 @@ require('libraries/gold')
 require('libraries/rgb_to_hex')
 require('libraries/wearables')
 require('libraries/wearables_warmful_ancient')
+require('libraries/corpses')
 
 require('phases/choose_hero')
 require('phases/creeps')
@@ -143,7 +144,7 @@ function GameMode:InitGameMode()
 	mode:SetCustomXPRequiredToReachNextLevel(XP_PER_LEVEL_TABLE)
 
 	-- Lua Modifiers
-	LinkLuaModifier("modifier_earthquake_aura", "heroes/hero_brewmaster", LUA_MODIFIER_MOTION_NONE)
+	LinkLuaModifier("modifier_earthquake_aura", "abilities/heroes/hero_brewmaster", LUA_MODIFIER_MOTION_NONE)
 	LinkLuaModifier("modifier_command_restricted", "modifiers/modifier_command_restricted", LUA_MODIFIER_MOTION_NONE)
 	LinkLuaModifier("modifier_ai", "modifiers/modifier_ai", LUA_MODIFIER_MOTION_NONE)
 	LinkLuaModifier("modifier_breakable_container", "modifiers/modifier_breakable_container", LUA_MODIFIER_MOTION_NONE)

@@ -2758,7 +2758,7 @@
 				{
 					"RunScript"
 					{
-						"ScriptFile"	"scripts/vscripts/heroes/hero_bristleback.lua"
+						"ScriptFile"	"scripts/vscripts/abilities/heroes/hero_bristleback.lua"
 						"Function"		"bristleback_takedamage"
 						"Damage"		"%attack_damage"
 						"back_particle"	"particles/units/heroes/hero_bristleback/bristleback_back_dmg.vpcf"

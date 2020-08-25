@@ -1,4 +1,4 @@
-LinkLuaModifier("modifier_wisp_passive", "heroes/hero_wisp.lua", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_wisp_passive", "abilities/heroes/hero_wisp.lua", LUA_MODIFIER_MOTION_NONE)
 
 wisp_pick_random_hero = wisp_pick_random_hero or class({})
 

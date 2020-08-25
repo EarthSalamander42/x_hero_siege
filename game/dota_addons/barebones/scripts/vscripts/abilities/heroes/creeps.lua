@@ -1,7 +1,7 @@
 campfire = class({})
 
-LinkLuaModifier( "modifier_campfire", "heroes/creeps", LUA_MODIFIER_MOTION_NONE )
-LinkLuaModifier( "modifier_campfire_effect", "heroes/creeps", LUA_MODIFIER_MOTION_NONE )
+LinkLuaModifier( "modifier_campfire", "abilities/heroes/creeps", LUA_MODIFIER_MOTION_NONE )
+LinkLuaModifier( "modifier_campfire_effect", "abilities/heroes/creeps", LUA_MODIFIER_MOTION_NONE )
 
 function campfire:GetIntrinsicModifierName()
 	return "modifier_campfire"
@@ -112,8 +112,8 @@ end
 
 undead_disease_cloud = class({})
 
-LinkLuaModifier("modifier_disease_cloud_aura", "heroes/creeps.lua", LUA_MODIFIER_MOTION_NONE)
-LinkLuaModifier("modifier_disease_cloud_debuff", "heroes/creeps.lua", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_disease_cloud_aura", "abilities/heroes/creeps.lua", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_disease_cloud_debuff", "abilities/heroes/creeps.lua", LUA_MODIFIER_MOTION_NONE)
 
 function undead_disease_cloud:GetIntrinsicModifierName()
 	return "modifier_disease_cloud_aura"

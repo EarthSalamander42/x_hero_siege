@@ -128,7 +128,7 @@ function EndChannel(keys)
 	EndAnimation(keys.caster)
 end
 
---	LinkLuaModifier( "modifier_hero", "heroes/global", LUA_MODIFIER_MOTION_NONE )
+--	LinkLuaModifier( "modifier_hero", "abilities/heroes/global", LUA_MODIFIER_MOTION_NONE )
 
 --	modifier_hero = class({})
 

@@ -112,9 +112,9 @@ end
 ---		   	  OVERLOAD		       ---
 --------------------------------------
 xhs_spirit_master_overload = xhs_spirit_master_overload or class({})
-LinkLuaModifier("modifier_imba_overload",			"heroes/hero_spirit_master.lua", LUA_MODIFIER_MOTION_NONE)
-LinkLuaModifier("modifier_imba_overload_buff",		"heroes/hero_spirit_master.lua", LUA_MODIFIER_MOTION_NONE)
-LinkLuaModifier("modifier_imba_overload_debuff",	"heroes/hero_spirit_master.lua", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_imba_overload",			"abilities/heroes/hero_spirit_master.lua", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_imba_overload_buff",		"abilities/heroes/hero_spirit_master.lua", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_imba_overload_debuff",	"abilities/heroes/hero_spirit_master.lua", LUA_MODIFIER_MOTION_NONE)
 
 function xhs_spirit_master_overload:GetIntrinsicModifierName()
 	return "modifier_imba_overload"

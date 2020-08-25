@@ -1,5 +1,5 @@
-LinkLuaModifier("modifier_muradin_avatar", "heroes/muradin.lua", LUA_MODIFIER_MOTION_NONE)
-LinkLuaModifier("modifier_muradin_avatar_buff", "heroes/muradin.lua", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_muradin_avatar", "abilities/heroes/muradin.lua", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_muradin_avatar_buff", "abilities/heroes/muradin.lua", LUA_MODIFIER_MOTION_NONE)
 
 muradin_avatar = muradin_avatar or class({})
 
