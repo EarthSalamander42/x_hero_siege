@@ -7,6 +7,8 @@ local modifier_sector_1 = keys.modifier_sector_1
 local modifier_sector_2 = keys.modifier_sector_2
 local modifier_sector_3 = keys.modifier_sector_3
 
+	caster:StartGesture(ACT_DOTA_TELEPORT)
+
 	-- Defines the center point (caster or dummy unit)
 	caster.freezing_field_center = CreateUnitByName("dummy_unit_invulnerable", keys.target_points[1], false, nil, nil, caster:GetTeamNumber())
 	caster.freezing_field_center:AddNewModifier(nil, nil, "modifier_invulnerable", {})
@@ -45,6 +47,8 @@ local modifier_sector_3 = keys.modifier_sector_3
 end
 
 function FreezingFieldExplode( keys )
+	if not keys.caster or not keys.caster.freezing_field_center or keys.caster.freezing_field_center and not IsValidEntity(keys.caster.freezing_field_center) then return end
+
 	local ability = keys.ability
 	local ability_level = ability:GetLevel() - 1
 	local caster = keys.caster
@@ -102,62 +106,67 @@ function FreezingFieldExplode( keys )
 end
 
 function FreezingFieldStopSound( keys )
-local caster = keys.caster
-local ability = keys.ability
-local modifier_aura = keys.modifier_aura
-local modifier_caster = keys.modifier_caster
-local modifier_NE = keys.modifier_NE
-local modifier_NW = keys.modifier_NW
-local modifier_SW = keys.modifier_SW
-local modifier_SE = keys.modifier_SE
+	if not keys.caster or not keys.caster.freezing_field_center then return end
+	local caster = keys.caster
+	local ability = keys.ability
+	local modifier_aura = keys.modifier_aura
+	local modifier_caster = keys.modifier_caster
+	local modifier_NE = keys.modifier_NE
+	local modifier_NW = keys.modifier_NW
+	local modifier_SW = keys.modifier_SW
+	local modifier_SE = keys.modifier_SE
 
--- Stop playing sounds
-caster.freezing_field_center:StopSound("Hero_Razor.Storm.Cast")
-caster.freezing_field_center:StopSound("Hero_Razor.Storm.Loop")
-caster.freezing_field_center:StopSound("Hero_Zuus.LightningBolt.Cast.Righteous")
+	-- Stop playing sounds
+	caster.freezing_field_center:StopSound("Hero_Razor.Storm.Cast")
+	caster.freezing_field_center:StopSound("Hero_Razor.Storm.Loop")
+	caster.freezing_field_center:StopSound("Hero_Zuus.LightningBolt.Cast.Righteous")
 
--- Stop animation
---EndAnimation(caster)
+	-- Stop animation
+	--EndAnimation(caster)
 
--- Removes auras and modifiers
-caster:RemoveModifierByName(modifier_caster)
-caster:RemoveModifierByName(modifier_aura)
-caster:RemoveModifierByName(modifier_NE)
-caster:RemoveModifierByName(modifier_NW)
-caster:RemoveModifierByName(modifier_SW)
-caster:RemoveModifierByName(modifier_SE)
+	-- Removes auras and modifiers
+	caster:RemoveModifierByName(modifier_caster)
+	caster:RemoveModifierByName(modifier_aura)
+	caster:RemoveModifierByName(modifier_NE)
+	caster:RemoveModifierByName(modifier_NW)
+	caster:RemoveModifierByName(modifier_SW)
+	caster:RemoveModifierByName(modifier_SE)
 
--- Destroy center particle
-ParticleManager:DestroyParticle(caster.freezing_field_particle, true)
+	-- Destroy center particle
+	ParticleManager:DestroyParticle(caster.freezing_field_particle, true)
 
--- Resets the center position
-caster.freezing_field_center = nil
-caster.freezing_field_particle = nil
+	-- Resets the center position
+	caster.freezing_field_center = nil
+	caster.freezing_field_particle = nil
+
+	caster:FadeGesture(ACT_DOTA_TELEPORT)
 end
 
 function FreezingFieldEnd( keys )
-local caster = keys.caster
-local ability = keys.ability
-local modifier_aura = keys.modifier_aura
-local modifier_caster = keys.modifier_caster
-local modifier_NE = keys.modifier_NE
-local modifier_NW = keys.modifier_NW
-local modifier_SW = keys.modifier_SW
-local modifier_SE = keys.modifier_SE
+	local caster = keys.caster
+	local ability = keys.ability
+	local modifier_aura = keys.modifier_aura
+	local modifier_caster = keys.modifier_caster
+	local modifier_NE = keys.modifier_NE
+	local modifier_NW = keys.modifier_NW
+	local modifier_SW = keys.modifier_SW
+	local modifier_SE = keys.modifier_SE
+	
+	-- Removes auras and modifiers
+	caster.freezing_field_center:IsNull()
+	caster:RemoveModifierByName(modifier_caster)
+	caster:RemoveModifierByName(modifier_aura)
+	caster:RemoveModifierByName(modifier_NE)
+	caster:RemoveModifierByName(modifier_NW)
+	caster:RemoveModifierByName(modifier_SW)
+	caster:RemoveModifierByName(modifier_SE)
+	
+	-- Destroy center particle
+	ParticleManager:DestroyParticle(caster.freezing_field_particle, false)
+	
+	-- Resets the center position
+	caster.freezing_field_center = nil
+	caster.freezing_field_particle = nil
 
--- Removes auras and modifiers
-caster.freezing_field_center:IsNull()
-caster:RemoveModifierByName(modifier_caster)
-caster:RemoveModifierByName(modifier_aura)
-caster:RemoveModifierByName(modifier_NE)
-caster:RemoveModifierByName(modifier_NW)
-caster:RemoveModifierByName(modifier_SW)
-caster:RemoveModifierByName(modifier_SE)
-
--- Destroy center particle
-ParticleManager:DestroyParticle(caster.freezing_field_particle, false)
-
--- Resets the center position
-caster.freezing_field_center = nil
-caster.freezing_field_particle = nil
+	caster:FadeGesture(ACT_DOTA_TELEPORT)
 end

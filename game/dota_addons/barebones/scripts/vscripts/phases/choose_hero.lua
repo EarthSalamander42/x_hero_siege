@@ -162,11 +162,6 @@ function ChooseHero(event)
 
 	if PlayerResource:IsValidPlayer(id) and hero:GetUnitName() == "npc_dota_hero_wisp" then
 		for i = 1, #HEROLIST do -- 12 = POTM.
-			if caller:GetName() == "trigger_hero_12" then
-				Notifications:Bottom(hero:GetPlayerOwnerID(), {text = "This hero is disabled! Please choose a hero with a blue circle!", duration = 6.0})
-				return
-			end
-
 			if caller:GetName() == "trigger_hero_"..i then
 				UTIL_Remove(Entities:FindByName(nil, "trigger_hero_"..i))
 				local particle = ParticleManager:CreateParticle(CustomNetTables:GetTableValue("battlepass_item_effects", tostring(hero:GetPlayerID())).tome_stats["effect1"], PATTACH_ABSORIGIN_FOLLOW, hero)

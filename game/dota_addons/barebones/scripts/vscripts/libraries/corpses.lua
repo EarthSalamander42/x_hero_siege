@@ -7,6 +7,15 @@ end
 CORPSE_APPEAR_DELAY = 5.0
 CORPSE_DURATION = 30.0 - CORPSE_APPEAR_DELAY
 
+ListenToGameEvent('entity_killed', function(event)
+	local killed_unit = EntIndexToHScript(keys.entindex_killed)
+	if not killed_unit then return end
+
+	if killed_unit.no_corpse ~= true then
+		Corpses:CreateFromUnit(killed_unit)
+	end
+end, nil)
+
 function Corpses:CreateFromUnit(killed)
 	if LeavesCorpse(killed) then
 		local name = killed:GetUnitName()
