@@ -52,7 +52,7 @@ _G.ZonesDefinition =
 				Completion = 
 				{	
 					Type = QUEST_EVENT_ON_ENEMY_KILLED,
-					szNPCName ="dota_badguys_barracks",
+					szNPCName ="dummy_unit_phase_2_invulnerable",
 				},
 				nCompleteLimit = 1,
 			},

@@ -126,7 +126,7 @@ function CDOTA_BaseNPC:IncrementAttributes(amount, bAll)
 		end
 	end
 
-	self:CalculateStatBonus()
+	self:CalculateStatBonus(true)
 end
 
 function CDOTA_BaseNPC:GetNetworth()

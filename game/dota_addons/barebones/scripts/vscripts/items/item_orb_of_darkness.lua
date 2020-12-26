@@ -21,7 +21,7 @@ local function StartSpell(caster, ability)
 	end
 end
 
-item_orb_of_darkness = class({})
+item_orb_of_darkness = item_orb_of_darkness or class({})
 
 function item_orb_of_darkness:GetIntrinsicModifierName()
 	return "modifier_orb_of_darkness_passive"
@@ -43,7 +43,7 @@ end
 
 --------------------------------------------------------------
 
-item_orb_of_darkness2 = class({})
+item_orb_of_darkness2 = item_orb_of_darkness2 or class({})
 
 function item_orb_of_darkness2:GetIntrinsicModifierName()
 	return "modifier_orb_of_darkness_passive"
@@ -65,7 +65,7 @@ end
 
 --------------------------------------------------------------
 
-item_bracer_of_the_void = class({})
+item_bracer_of_the_void = item_bracer_of_the_void or class({})
 
 function item_bracer_of_the_void:GetIntrinsicModifierName()
 	return "modifier_orb_of_darkness_passive"
@@ -87,7 +87,7 @@ end
 
 --------------------------------------------------------------
 
-modifier_orb_of_darkness_active = class({})
+modifier_orb_of_darkness_active = modifier_orb_of_darkness_active or class({})
 
 function modifier_orb_of_darkness_active:IsHidden() return false end
 function modifier_orb_of_darkness_active:IsPurgable() return false end
@@ -172,6 +172,7 @@ function modifier_orb_of_darkness_active:OnDeath( params )
 --			return
 --		end
 
+--[[
 		if params.attacker == self:GetParent() and LeavesCorpse(params.unit) and params.unit.no_corpse ~= true and not params.unit:IsConsideredHero() then
 			if self:GetStackCount() < self.max_units then
 				local unit = CreateUnitByName(params.unit:GetUnitName(), params.unit:GetAbsOrigin(), true, self:GetParent(), self:GetParent(), self:GetParent():GetTeam())
@@ -205,12 +206,13 @@ function modifier_orb_of_darkness_active:OnDeath( params )
 			-- reduce unit count under control when 1 of them is dying
 			self:SetStackCount(self:GetStackCount() - 1)
 		end
+--]]
 	end
 end
 
 --------------------------------------------------------------
 
-modifier_orb_of_darkness_passive = class({})
+modifier_orb_of_darkness_passive = modifier_orb_of_darkness_passive or class({})
 
 function modifier_orb_of_darkness_passive:IsHidden() return true end
 function modifier_orb_of_darkness_passive:IsPurgable() return false end

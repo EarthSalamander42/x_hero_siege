@@ -102,7 +102,7 @@ function modifier_ai:OnIntervalThink()
 
 				if #enemies == 0 then
 --					print("range / enemies / behavior:", self:GetParent():GetUnitName(), ability:GetAbilityName(), cast_range, #enemies, target_team, target_type)
-					if bit.band(ability:GetBehavior(), DOTA_ABILITY_BEHAVIOR_TOGGLE) == DOTA_ABILITY_BEHAVIOR_TOGGLE then
+					if bit.band(tonumber(tostring(ability:GetBehavior())), DOTA_ABILITY_BEHAVIOR_TOGGLE) == DOTA_ABILITY_BEHAVIOR_TOGGLE then
 						if ability:GetToggleState() == true then
 							ability:ToggleAbility()
 						end
@@ -121,11 +121,11 @@ function modifier_ai:OnIntervalThink()
 				-- Bug with jugg boss, no behavior after first cast
 --				print("Behavior:", ability:GetBehavior())
 
-				if bit.band(ability:GetBehavior(), DOTA_ABILITY_BEHAVIOR_TOGGLE) == DOTA_ABILITY_BEHAVIOR_TOGGLE then
+				if bit.band(tonumber(tostring(ability:GetBehavior())), DOTA_ABILITY_BEHAVIOR_TOGGLE) == DOTA_ABILITY_BEHAVIOR_TOGGLE then
 					if ability:GetToggleState() == false then
 						ability:ToggleAbility()
 					end
-				elseif bit.band(ability:GetBehavior(), DOTA_ABILITY_BEHAVIOR_NO_TARGET) == DOTA_ABILITY_BEHAVIOR_NO_TARGET then
+				elseif bit.band(tonumber(tostring(ability:GetBehavior())), DOTA_ABILITY_BEHAVIOR_NO_TARGET) == DOTA_ABILITY_BEHAVIOR_NO_TARGET then
 --					print("Cast No Target:", ability:GetAbilityName())
 
 					if ability:GetAbilityName() == "arthas_holy_light" then
@@ -137,12 +137,12 @@ function modifier_ai:OnIntervalThink()
 					end
 
 					return
-				elseif bit.band(ability:GetBehavior(), DOTA_ABILITY_BEHAVIOR_POINT) == DOTA_ABILITY_BEHAVIOR_POINT then
+				elseif bit.band(tonumber(tostring(ability:GetBehavior())), DOTA_ABILITY_BEHAVIOR_POINT) == DOTA_ABILITY_BEHAVIOR_POINT then
 --					print("Cast On Ground:", ability:GetAbilityName())
 					self:GetParent():CastAbilityOnPosition(enemies[RandomInt(1, #enemies)]:GetAbsOrigin(), ability, -1)
 
 					return
-				elseif bit.band(ability:GetBehavior(), DOTA_ABILITY_BEHAVIOR_UNIT_TARGET) == DOTA_ABILITY_BEHAVIOR_UNIT_TARGET then
+				elseif bit.band(tonumber(tostring(ability:GetBehavior())), DOTA_ABILITY_BEHAVIOR_UNIT_TARGET) == DOTA_ABILITY_BEHAVIOR_UNIT_TARGET then
 --					print("Cast On Target:", ability:GetAbilityName())
 
 					if self:GetParent():GetTeam() == ability:GetAbilityTargetTeam() then

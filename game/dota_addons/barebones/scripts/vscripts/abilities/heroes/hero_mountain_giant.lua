@@ -145,22 +145,24 @@ local BAT_Dec = ability:GetLevelSpecialValueFor("bat_reduction", ability:GetLeve
 end
 
 function ToggleOn( keys )
-local caster = keys.caster
-local ability = keys.ability
-local BAT_alt = caster:GetBaseAttackTime()
-local BAT_Dec = ability:GetLevelSpecialValueFor("bat_reduction", ability:GetLevel() -1)
+	local caster = keys.caster
+	local ability = keys.ability
+	local BAT_alt = caster:GetBaseAttackTime()
+	local BAT_Dec = ability:GetLevelSpecialValueFor("bat_reduction", ability:GetLevel() -1)
 
 	caster:SetModelScale( 1.25 )
 	caster:SetBaseAttackTime( BAT_alt + BAT_Dec )
-	
+
 	-- Set new model
 	caster:SetOriginalModel("models/heroes/tiny_03/tiny_03.vmdl")
 	caster:SetModel("models/heroes/tiny_03/tiny_03.vmdl")
+
 	-- Remove old wearables
 	UTIL_Remove(caster.head)
 	UTIL_Remove(caster.rarm)
 	UTIL_Remove(caster.larm)
 	UTIL_Remove(caster.body)
+
 	-- Set new wearables
 	caster.head = SpawnEntityFromTableSynchronous("prop_dynamic", {model = "models/heroes/tiny_03/tiny_03_head.vmdl"})
 	caster.rarm = SpawnEntityFromTableSynchronous("prop_dynamic", {model = "models/heroes/tiny_03/tiny_03_right_arm.vmdl"})

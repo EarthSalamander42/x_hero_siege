@@ -225,17 +225,24 @@ function EndFarmEvent()
 
 	-- Start Phase 2
 	for NumPlayers = 1, PlayerResource:GetPlayerCount() * CREEP_LANES_TYPE do
-		print("dota_badguys_barracks_"..NumPlayers)
-		local rax = Entities:FindByName(nil, "dota_badguys_barracks_"..NumPlayers)
-		if rax then
-			rax:ForceKill(false)
+		local rax_spawner = Entities:FindByName(nil, "npc_dota_spawner_"..NumPlayers)
+
+		if rax_spawner then
+			SpawnMagnataur(rax_spawner:GetAbsOrigin())
+			print("npc_dota_spawner_"..NumPlayers.." removed.")
+			rax_spawner.disabled = true
 		end
+	end
+
+	if PHASE_2_QUEST_UNIT then
+		PHASE_2_QUEST_UNIT:ForceKill(false)
 	end
 
 	-- only set timers and update panorama, restart count down happens when magnataurs are killed
 	CustomTimers.current_time["game_time"] = (XHS_SPECIAL_EVENT_INTERVAL * 2) - 1
 	CustomTimers.current_time["special_event"] = XHS_SPECIAL_EVENT_INTERVAL + 1
 	CustomTimers.current_time["special_wave"] = XHS_SPECIAL_WAVE_INTERVAL + 1
+
 	CustomTimers:Countdown("game_time")
 	CustomTimers:Countdown("special_event")
 	CustomTimers:Countdown("special_wave")

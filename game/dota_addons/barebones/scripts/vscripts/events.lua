@@ -54,6 +54,8 @@ ListenToGameEvent('game_rules_state_change', function()
 		AddFOWViewer(DOTA_TEAM_CUSTOM_2, Vector(6528, 1152, 192), 900, 99999, false)
 
 		GameMode:SetupZones()
+
+		PHASE_2_QUEST_UNIT = CreateUnitByName("dummy_unit_phase_2_invulnerable", Vector(10000, 0, 0), false, nil, nil, 3)
 	end
 
 	if newState == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
@@ -973,24 +975,13 @@ ListenToGameEvent('entity_killed', function(keys)
 	local killedUnit = EntIndexToHScript(keys.entindex_killed)
 	if killedUnit == nil then return end
 	if killedUnit:FindModifierByName( "modifier_breakable_container" ) then return end
-	local hero = nil
 	local killerAbility = nil
-	if keys.entindex_attacker ~= nil then hero = EntIndexToHScript(keys.entindex_attacker) end
+	local killer = nil
+	if keys.entindex_attacker ~= nil then killer = EntIndexToHScript(keys.entindex_attacker) end
 	if keys.entindex_inflictor ~= nil then killerAbility = EntIndexToHScript(keys.entindex_inflictor) end
 	local difficulty = GameRules:GetCustomGameDifficulty()
-	local damagebits = keys.damagebits -- This might always be 0 and therefore useless
-	local KillerID = hero:GetPlayerOwnerID()
-	local playerKills = PlayerResource:GetKills(KillerID)
 	local cn = string.gsub(killedUnit:GetName(), "dota_badguys_tower", "")
 	local lane = tonumber(cn)
-
-	if IsValidEntity(hero:GetPlayerOwner()) then
-		hero = hero:GetPlayerOwner():GetAssignedHero()
-	end
-
-	if hero:IsIllusion() and hero:GetTeamNumber() == 2 then
-		hero = PlayerResource:GetPlayer(hero:GetPlayerID()):GetAssignedHero()
-	end
 
 	local Zone = killedUnit.zone
 	if Zone then
@@ -1100,54 +1091,45 @@ ListenToGameEvent('entity_killed', function(keys)
 		end
 
 		-- add kills to the hero who spawned a controlled unit, or an illusion
-		if hero:GetTeamNumber() == 2 then
-			if killedUnit:GetTeamNumber() == 6 then
-				if hero:IsIllusion() then
-					hero = PlayerResource:GetPlayer(hero:GetPlayerID()):GetAssignedHero()
-					hero:IncrementKills(1)
-					for _, Zone in pairs(GameMode.Zones) do
-						if Zone:ContainsUnit(hero) then
-							Zone:AddStat(hero:GetPlayerID(), ZONE_STAT_KILLS, 1)
-						end
-					end
-				elseif IsValidEntity(hero:GetPlayerOwner()) then
-					if not hero:IsRealHero() then
-						if hero:GetPlayerOwner() then
-							hero = hero:GetPlayerOwner():GetAssignedHero()
-							hero:IncrementKills(1)
-						end
+		if killer:IsRealHero() then
+			if killer:GetTeamNumber() == 2 then
+				if killedUnit:GetTeamNumber() == 6 then
+					if killer:IsIllusion() then
+						killer = PlayerResource:GetPlayer(killer:GetPlayerID()):GetAssignedHero()
+						killer:IncrementKills(1)
 						for _, Zone in pairs(GameMode.Zones) do
-							if Zone:ContainsUnit(hero) then
-								Zone:AddStat(hero:GetPlayerID(), ZONE_STAT_KILLS, 1)
+							if Zone:ContainsUnit(killer) then
+								Zone:AddStat(killer:GetPlayerID(), ZONE_STAT_KILLS, 1)
 							end
 						end
-					--plays a particle and add a kill when a hero kills an enemy unit
-					elseif hero:IsRealHero() then
-						EmitSoundOnClient("Dungeon.LastHit", hero:GetPlayerOwner())
-						ParticleManager:ReleaseParticleIndex(ParticleManager:CreateParticleForPlayer("particles/darkmoon_last_hit_effect.vpcf", PATTACH_ABSORIGIN_FOLLOW, killedUnit, hero:GetPlayerOwner()))
-						if PlayerResource:HasSelectedHero(hero:GetPlayerOwnerID()) then
-							hero:IncrementKills(1)
+					elseif IsValidEntity(killer:GetPlayerOwner()) then
+						--plays a particle and add a kill when a hero kills an enemy unit
+						EmitSoundOnClient("Dungeon.LastHit", killer:GetPlayerOwner())
+						ParticleManager:ReleaseParticleIndex(ParticleManager:CreateParticleForPlayer("particles/darkmoon_last_hit_effect.vpcf", PATTACH_ABSORIGIN_FOLLOW, killedUnit, killer:GetPlayerOwner()))
+
+						if PlayerResource:HasSelectedHero(killer:GetPlayerOwnerID()) then
+							killer:IncrementKills(1)
 						end
 						for _, Zone in pairs(GameMode.Zones) do
-							if Zone:ContainsUnit(hero) then
-								Zone:AddStat(hero:GetPlayerID(), ZONE_STAT_KILLS, 1)
+							if Zone:ContainsUnit(killer) then
+								Zone:AddStat(killer:GetPlayerID(), ZONE_STAT_KILLS, 1)
 							end
 						end
 
 						-- reward system based on kills, including kill events
-						if hero:GetKills() == 99 then
-							Notifications:Bottom(hero:GetPlayerOwnerID(), {text="100 kills. You get 7500 gold.", duration=5.0, style={color="yellow"}})
-							PlayerResource:ModifyGold(hero:GetPlayerOwnerID(), 7500, false,  DOTA_ModifyGold_Unspecified)
-						elseif hero:GetKills() == 199 then
-							Notifications:Bottom(hero:GetPlayerOwnerID(), {text="200 kills. You get 25000 gold.", duration=5.0, style={color="yellow"}})
-							PlayerResource:ModifyGold(hero:GetPlayerOwnerID(), 25000, false,  DOTA_ModifyGold_Unspecified)
-						elseif hero:GetKills() == 399 then
-							Notifications:Bottom(hero:GetPlayerOwnerID(), {text="400 kills. You get 50000 gold.", duration=5.0, style={color="yellow"}})
-							PlayerResource:ModifyGold(hero:GetPlayerOwnerID(), 50000, false,  DOTA_ModifyGold_Unspecified)
-						elseif hero:GetKills() >= 499 and RAMERO == 0 then --500
-							StartRameroAndBaristolEvent(hero)
-						elseif hero:GetKills() >= 749 and RAMERO == 1 then --750
-							StartSogatEvent(hero)
+						if killer:GetKills() == 99 then
+							Notifications:Bottom(killer:GetPlayerOwnerID(), {text="100 kills. You get 7500 gold.", duration=5.0, style={color="yellow"}})
+							PlayerResource:ModifyGold(killer:GetPlayerOwnerID(), 7500, false,  DOTA_ModifyGold_Unspecified)
+						elseif killer:GetKills() == 199 then
+							Notifications:Bottom(killer:GetPlayerOwnerID(), {text="200 kills. You get 25000 gold.", duration=5.0, style={color="yellow"}})
+							PlayerResource:ModifyGold(killer:GetPlayerOwnerID(), 25000, false,  DOTA_ModifyGold_Unspecified)
+						elseif killer:GetKills() == 399 then
+							Notifications:Bottom(killer:GetPlayerOwnerID(), {text="400 kills. You get 50000 gold.", duration=5.0, style={color="yellow"}})
+							PlayerResource:ModifyGold(killer:GetPlayerOwnerID(), 50000, false,  DOTA_ModifyGold_Unspecified)
+						elseif killer:GetKills() >= 499 and RAMERO == 0 then --500
+							StartRameroAndBaristolEvent(killer)
+						elseif killer:GetKills() >= 749 and RAMERO == 1 then --750
+							StartSogatEvent(killer)
 						end
 					end
 				end
@@ -1157,35 +1139,25 @@ ListenToGameEvent('entity_killed', function(keys)
 		return
 	elseif killedUnit:IsBuilding() then
 		if killedUnit:GetTeamNumber() == 3 then
-			if hero:IsIllusion() then
-				hero = PlayerResource:GetPlayer(hero:GetPlayerID()):GetAssignedHero()
-				hero:IncrementKills(1)
+			if killer:IsIllusion() then
+				killer = PlayerResource:GetPlayer(killer:GetPlayerID()):GetAssignedHero()
+				killer:IncrementKills(1)
+
 				for _, Zone in pairs(GameMode.Zones) do
-					if Zone:ContainsUnit(hero) then
-						Zone:AddStat(hero:GetPlayerID(), ZONE_STAT_KILLS, 1)
+					if Zone:ContainsUnit(killer) then
+						Zone:AddStat(killer:GetPlayerID(), ZONE_STAT_KILLS, 1)
 					end
 				end
-			elseif IsValidEntity(hero:GetPlayerOwner()) then
-				if not hero:IsRealHero() then
-					if hero:GetPlayerOwner() then
-						hero = hero:GetPlayerOwner():GetAssignedHero()
-						hero:IncrementKills(1)
+			elseif IsValidEntity(killer:GetPlayerOwner()) then
+				if killer:IsRealHero() then
+					EmitSoundOnClient("Dungeon.LastHit", killer:GetPlayerOwner())
+					ParticleManager:ReleaseParticleIndex(ParticleManager:CreateParticleForPlayer("particles/darkmoon_last_hit_effect.vpcf", PATTACH_ABSORIGIN_FOLLOW, killedUnit, killer:GetPlayerOwner()))
+					if PlayerResource:HasSelectedHero(killer:GetPlayerOwnerID()) then
+						killer:IncrementKills(1)
 					end
 					for _, Zone in pairs(GameMode.Zones) do
-						if Zone:ContainsUnit(hero) then
-							Zone:AddStat(hero:GetPlayerID(), ZONE_STAT_KILLS, 1)
-						end
-					end
-				--plays a particle and add a kill when a hero kills an enemy unit
-				elseif hero:IsRealHero() then
-					EmitSoundOnClient("Dungeon.LastHit", hero:GetPlayerOwner())
-					ParticleManager:ReleaseParticleIndex(ParticleManager:CreateParticleForPlayer("particles/darkmoon_last_hit_effect.vpcf", PATTACH_ABSORIGIN_FOLLOW, killedUnit, hero:GetPlayerOwner()))
-					if PlayerResource:HasSelectedHero(hero:GetPlayerOwnerID()) then
-						hero:IncrementKills(1)
-					end
-					for _, Zone in pairs(GameMode.Zones) do
-						if Zone:ContainsUnit(hero) then
-							Zone:AddStat(hero:GetPlayerID(), ZONE_STAT_KILLS, 1)
+						if Zone:ContainsUnit(killer) then
+							Zone:AddStat(killer:GetPlayerID(), ZONE_STAT_KILLS, 1)
 						end
 					end
 				end

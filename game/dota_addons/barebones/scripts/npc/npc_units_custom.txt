@@ -103,6 +103,19 @@
 	}
 
 	//=================================================================================
+	// Dummy: Unit Invulnerable (Used for Abilities)
+	//=================================================================================
+	"dummy_unit_phase_2_invulnerable"
+	{
+		"BaseClass"					"npc_dota_creature"
+		"IsAncient"					"1"
+		"AttackCapabilities"		"DOTA_UNIT_CAP_NO_ATTACK"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_WARD"
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_NONE"
+		"Ability1"					"dummy_passive_invulnerable"
+	}
+
+	//=================================================================================
 	// Building: Defender Fort
 	//=================================================================================
 	"npc_dota_defender_fort"
@@ -5786,7 +5799,7 @@
 	"npc_magnataur_destroyer_crypt"
 	{
 		"BaseClass"					"npc_dota_creature"
-		"Model"                     "models/heroes/magnataur/magnataur.mdl"         // Model.
+		"Model"                     "models/heroes/magnataur/magnataur.vmdl"         // Model.
 		"SoundSet"                  "Hero_Magnataur"
 		"ConsideredHero"			"1"
 		"Portrait"                  "vgui/hud/heroportraits/portrait_centaur"
@@ -6322,7 +6335,7 @@
 		// General
 		//----------------------------------------------------------------
 		"BaseClass"					"npc_dota_creature"
-		"Model"						"models/heroes/terrorblade/demon.mdl"           // Model.
+		"Model"						"models/heroes/terrorblade/demon.vmdl"           // Model.
 		"SoundSet"					"Hero_Terrorblade"                                 // Name of sound set.
 		"IdleExpression"			"scenes/antimage/antimage_exp_idle_01.vcd"      // custom facial animation idle
 		"Portrait"					"vgui/hud/heroportraits/portrait_antimage"
@@ -7353,7 +7366,7 @@
 	"npc_dota_hero_magtheridon"
 	{
 		"BaseClass"					"npc_dota_creature"
-		"Model"						"models/heroes/abyssal_underlord/abyssal_underlord_v2.mdl"			// Model.
+		"Model"						"models/heroes/abyssal_underlord/abyssal_underlord_v2.vmdl"			// Model.
 		"SoundSet"					"Hero_AbyssalUnderlord"							// Name of sound set.
 		"ConsideredHero"			"1"
 		"Portrait"					"vgui/hud/heroportraits/portrait_centaur"
@@ -7493,7 +7506,7 @@
 	{
 
 		"BaseClass"     "npc_dota_creature"
-		"Model"						"models/heroes/abyssal_underlord/abyssal_underlord_v2.mdl"			// Model.
+		"Model"						"models/heroes/abyssal_underlord/abyssal_underlord_v2.vmdl"			// Model.
 		"SoundSet"					"Hero_AbyssalUnderlord"							// Name of sound set
 		"Portrait"					"vgui/hud/heroportraits/portrait_centaur"
 		"ModelScale"                "1.5"
@@ -7552,7 +7565,7 @@
 	{
 	
 		"BaseClass"					"npc_dota_creature"
-		"Model"						"models/heroes/abyssal_underlord/abyssal_underlord_v2.mdl"			// Model.
+		"Model"						"models/heroes/abyssal_underlord/abyssal_underlord_v2.vmdl"			// Model.
 		"SoundSet"					"Hero_AbyssalUnderlord"				// Name of sound set.
 		"Portrait"					"vgui/hud/heroportraits/portrait_centaur"
 		"ModelScale"				"0.75"
@@ -8992,7 +9005,7 @@
 	"npc_dota_hero_illidan"
 	{
 		"BaseClass"					"npc_dota_creature"
-		"Model"						"models/heroes/terrorblade/demon.mdl"		// Model.
+		"Model"						"models/heroes/terrorblade/demon.vmdl"		// Model.
 		"SoundSet"					"Hero_Terrorblade"							// Name of sound set.	
 		"ModelScale"				"1.8"
 		"Level"						"1"

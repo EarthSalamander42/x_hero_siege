@@ -65,38 +65,42 @@ function SpawnCreeps()
 	for c = 1, 8 do -- replace 8 with player count, to open and close lanes super easily
 	local point = Entities:FindByName( nil, "npc_dota_spawner_"..c)
 --	local Waypoint = Entities:FindByName( nil, "creep_path_"..c)
-		if CREEP_LANES[c][1] == 1 then -- Lane Activated?
-			if CREEP_LANES[c][3] == 1 then -- Barrack Alive?
-				if CREEP_LANES[c][2] == 1 then -- Lane Level
-					for j = 1, 4 do
-						local unit = CreateUnitByName(melee_1[GameMode.creep_roll["race"]], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-					end
-					for j = 1, 2 do
-						local unit = CreateUnitByName(ranged_1[GameMode.creep_roll["race"]], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-					end
-				elseif CREEP_LANES[c][2] == 2 then
-					for j = 1, 4 do
-						local unit = CreateUnitByName(melee_2[GameMode.creep_roll["race"]], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-					end
-					for j = 1, 2 do
-						local unit = CreateUnitByName(ranged_2[GameMode.creep_roll["race"]], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-					end
-				elseif CREEP_LANES[c][2] == 3 then
-					for j = 1, 4 do
-						local unit = CreateUnitByName(melee_3[GameMode.creep_roll["race"]], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-					end
-					for j = 1, 2 do
-						local unit = CreateUnitByName(ranged_3[GameMode.creep_roll["race"]], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-					end
-				elseif CREEP_LANES[c][2] >= 4 then
-					for j = 1, 4 do
-						local unit = CreateUnitByName(melee_4[GameMode.creep_roll["race"]], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-					end
-					for j = 1, 2 do
-						local unit = CreateUnitByName(ranged_4[GameMode.creep_roll["race"]], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+		if not point.disabled then
+			if CREEP_LANES[c][1] == 1 then -- Lane Activated?
+				if CREEP_LANES[c][3] == 1 then -- Barrack Alive?
+					if CREEP_LANES[c][2] == 1 then -- Lane Level
+						for j = 1, 4 do
+							local unit = CreateUnitByName(melee_1[GameMode.creep_roll["race"]], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+						end
+						for j = 1, 2 do
+							local unit = CreateUnitByName(ranged_1[GameMode.creep_roll["race"]], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+						end
+					elseif CREEP_LANES[c][2] == 2 then
+						for j = 1, 4 do
+							local unit = CreateUnitByName(melee_2[GameMode.creep_roll["race"]], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+						end
+						for j = 1, 2 do
+							local unit = CreateUnitByName(ranged_2[GameMode.creep_roll["race"]], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+						end
+					elseif CREEP_LANES[c][2] == 3 then
+						for j = 1, 4 do
+							local unit = CreateUnitByName(melee_3[GameMode.creep_roll["race"]], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+						end
+						for j = 1, 2 do
+							local unit = CreateUnitByName(ranged_3[GameMode.creep_roll["race"]], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+						end
+					elseif CREEP_LANES[c][2] >= 4 then
+						for j = 1, 4 do
+							local unit = CreateUnitByName(melee_4[GameMode.creep_roll["race"]], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+						end
+						for j = 1, 2 do
+							local unit = CreateUnitByName(ranged_4[GameMode.creep_roll["race"]], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+						end
 					end
 				end
 			end
+		else
+			print("Barracks: Spawner "..c.." disabled.")
 		end
 	end
 end
@@ -138,12 +142,9 @@ local player = PlayerResource:GetPlayer(tonumber(cn)-1)
 	end
 end
 
--- this function is not used anymore
-function SpawnMagnataur(event)
-local caller = event.caller
-
-	for j = 1, GameRules:GetCustomGameDifficulty() do
-		CreateUnitByName("npc_magnataur_destroyer_crypt", caller:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+function SpawnMagnataur(hPos)
+	for i = 1, GameRules:GetCustomGameDifficulty() do
+		CreateUnitByName("npc_magnataur_destroyer_crypt", hPos, true, nil, nil, DOTA_TEAM_CUSTOM_1)
 	end
 end
 
