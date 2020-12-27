@@ -5,7 +5,7 @@ end
 --------------------------------------------------------------------
 
 function CDungeonZone:Init( data )
-	print("CDungeonZone:Init:", data)
+--	print("CDungeonZone:Init:", data)
 	if data == nil then
 		return
 	end

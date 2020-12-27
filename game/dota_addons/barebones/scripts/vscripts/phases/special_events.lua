@@ -234,8 +234,11 @@ function EndFarmEvent()
 		end
 	end
 
-	if PHASE_2_QUEST_UNIT then
+	if PHASE_2_QUEST_UNIT and IsValidEntity(PHASE_2_QUEST_UNIT) and PHASE_2_QUEST_UNIT:IsAlive() then
+		print("Kill phase 2 unit and move on!")
 		PHASE_2_QUEST_UNIT:ForceKill(false)
+	else
+		print("ERROR: DUMMY UNIT PHASE 2 INVALID!!!")
 	end
 
 	-- only set timers and update panorama, restart count down happens when magnataurs are killed

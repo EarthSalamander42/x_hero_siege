@@ -147,6 +147,8 @@ function CustomTimers:Think()
 				end
 			end
 		end
+	else
+--		print("Custom Timers are currently in pause.")
 	end
 
 	-- These timer should always run

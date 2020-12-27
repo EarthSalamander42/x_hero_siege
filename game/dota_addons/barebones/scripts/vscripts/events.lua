@@ -56,6 +56,7 @@ ListenToGameEvent('game_rules_state_change', function()
 		GameMode:SetupZones()
 
 		PHASE_2_QUEST_UNIT = CreateUnitByName("dummy_unit_phase_2_invulnerable", Vector(10000, 0, 0), false, nil, nil, 3)
+		PHASE_2_QUEST_UNIT.zone = "xhs_holdout"
 	end
 
 	if newState == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then

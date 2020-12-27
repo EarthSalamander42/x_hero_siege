@@ -59,6 +59,7 @@ _G.CREEP_LANES_TYPE = 1
 _G.RAMERO_ARTIFACT_PICKED = false
 _G.SOGAT_ARTIFACT_PICKED = false
 _G.DOOM_ARTIFACT_MERGED = false
+_G.MAGNATAURS_TO_KILL = 4
 
 if GetMapName() == "x_hero_siege_4" then
 	_G.CREEP_LANES_TYPE = 2
