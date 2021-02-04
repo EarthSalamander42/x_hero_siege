@@ -217,8 +217,8 @@ function arthas_boss_die(caster)
 		RefreshPlayers()
 	end)
 
-	Timers:CreateTimer(19, function()
-		Timers:CreateTimer(5, StartBanehallowArena)
+	Timers:CreateTimer(15.0, function()
+		StartBanehallowArena()
 	end)
 end
 

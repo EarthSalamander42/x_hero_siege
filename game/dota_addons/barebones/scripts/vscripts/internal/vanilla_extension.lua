@@ -91,6 +91,8 @@ function CDOTA_BaseNPC:RemoveItemByName(ItemName, bStash)
 end
 
 function CDOTA_BaseNPC:IncrementAttributes(amount, bAll)
+	if self:IsIllusion() then return end
+
 	local bSoundPlayed = false
 
 	if self:HasModifier("modifier_tome_of_stats") then

@@ -126,20 +126,6 @@ ListenToGameEvent('player_disconnect', function(keys)
 end, nil)
 --]]
 
-function GameMode:OnSettingVote(keys)
-	local pid = keys.PlayerID
-	local mode = GameMode
-
-	-- VoteTable is initialised in InitGameMode()
-	if not mode.VoteTable[keys.category] then
-		mode.VoteTable[keys.category] = {}
-	end
-	mode.VoteTable[keys.category][pid] = keys.vote
-
-	-- TODO: Finish votes show up
-	CustomGameEventManager:Send_ServerToAllClients("send_votes", {category = keys.category, vote = keys.vote, table = mode.VoteTable, table2 = mode.VoteTable[keys.category]})
-end
-
 -- An NPC has spawned somewhere in game. This includes heroes
 ListenToGameEvent('npc_spawned', function(keys)
 	local difficulty = GameRules:GetCustomGameDifficulty()
@@ -1092,12 +1078,14 @@ ListenToGameEvent('entity_killed', function(keys)
 		end
 
 		-- add kills to the hero who spawned a controlled unit, or an illusion
-		if killer:IsRealHero() then
+		if killer:IsRealHero() or killer:IsIllusion() then
 			if killer:GetTeamNumber() == 2 then
 				if killedUnit:GetTeamNumber() == 6 then
 					if killer:IsIllusion() then
-						killer = PlayerResource:GetPlayer(killer:GetPlayerID()):GetAssignedHero()
+						killer = PlayerResource:GetSelectedHeroEntity(killer:GetPlayerOwnerID())
+
 						killer:IncrementKills(1)
+
 						for _, Zone in pairs(GameMode.Zones) do
 							if Zone:ContainsUnit(killer) then
 								Zone:AddStat(killer:GetPlayerID(), ZONE_STAT_KILLS, 1)

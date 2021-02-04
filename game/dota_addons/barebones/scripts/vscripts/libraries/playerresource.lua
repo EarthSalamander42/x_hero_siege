@@ -151,3 +151,20 @@ function CDOTA_PlayerResource:IsImbaPlayer(player_id)
 		return false
 	end
 end
+
+-- Set a player's abandonment due to long disconnect status
+function CDOTA_PlayerResource:SetHasAbandonedDueToLongDisconnect(player_id, state)
+	if self:IsImbaPlayer(player_id) then
+		self.PlayerData[player_id]["has_abandoned_due_to_long_disconnect"] = state
+--		print("Set player "..player_id.." 's abandon due to long disconnect state as "..tostring(state))
+	end
+end
+
+-- Fetch a player's abandonment due to long disconnect status
+function CDOTA_PlayerResource:GetHasAbandonedDueToLongDisconnect(player_id)
+	if self:IsImbaPlayer(player_id) then
+		return self.PlayerData[player_id]["has_abandoned_due_to_long_disconnect"]
+	else
+		return false
+	end
+end

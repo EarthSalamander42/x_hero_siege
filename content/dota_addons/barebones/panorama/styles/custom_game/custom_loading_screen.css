@@ -20,6 +20,15 @@
 @define COLOR_INFO_BACKGROUND_DARK_GREY: #333333;
 @define COLOR_INFO_TEXT_GREY: #ff0000;
 
+@define COLOR_INFO_BACKGROUND_PURPLE: #0B0B27;
+@define COLOR_INFO_BACKGROUND_PURPLE_SOCIAL: #222222da;
+@define COLOR_INFO_BACKGROUND_DARK_PURPLE: #333333;
+@define COLOR_INFO_TEXT_PURPLE: #ff0000;
+
+@define COLOR_INFO_BACKGROUND_BLUE: #224470dd;
+@define COLOR_INFO_BACKGROUND_DARK_BLUE_XHS: #0B0B27;
+@define COLOR_INFO_TEXT_BLUE: #66aaff;
+
 @define maximum_length: 77%;
 
 @keyframes 'VoteVisible'
@@ -236,15 +245,15 @@
 .description-background {
 	width: 100%;
 	height: 55%;
-	background-image: url("file://{images}/custom_game/loading_screen/outlanders_rising.jpg");
-	background-position: 50%;
+	background-image: url("file://{images}/custom_game/loading_screen/xhs.jpg");
+	background-position: 50% 0%;
 	background-size: cover;
 }
 
 .description-text-container {
 	width: 100%;
 	height: 45%;
-	background-color: #0B0B27;
+	background-color: COLOR_INFO_BACKGROUND_DARK_BLUE_XHS;
 	flow-children: down;
 }
 
