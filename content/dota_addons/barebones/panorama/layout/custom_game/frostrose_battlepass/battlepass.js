@@ -1013,13 +1013,13 @@ function GenerateBattlepassPanel(reward_list, player, bRewardsDisabled) {
 							}
 						}
 
-						var event = function(bp_hero, bp_slot_id, bp_item_id) {
+						var event = function(bp_hero, bp_slot_id, bp_item_id, bp_name) {
 							return function() {
 								SetArmory(bp_hero, bp_slot_id, bp_item_id, bp_name);
 							}
 						};
 
-						reward.SetPanelEvent("onactivate", event(bp_hero, bp_slot_id, bp_item_id));
+						reward.SetPanelEvent("onactivate", event(bp_hero, bp_slot_id, bp_item_id, bp_name));
 					} else {
 						reward.AddClass("BattlepassRewardIcon_locked")
 						reward.FindChildTraverse("BattlepassRewardTitle").AddClass("BattlepassRewardLabelLocked");
