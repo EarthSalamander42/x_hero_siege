@@ -3,7 +3,6 @@
 	custom_net_tables =
 	[
 		"battlepass_player",
-		"containers_lua",
 		"zone_scores",
 		"player_zone_locations",
 		"zone_names",
@@ -12,7 +11,8 @@
 		"battlepass",
 		"player_table",
 		"hero_selection",
-		"battlepass_item_effects",
-		"other_available_items"
+		"battlepass_js_builder",
+		"battlepass_js_builder_2",
+		"battlepass_rewards",
 	]
 }

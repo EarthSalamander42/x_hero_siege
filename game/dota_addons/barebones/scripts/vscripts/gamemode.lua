@@ -277,6 +277,18 @@ function GameMode:OnThink()
 		GameRules:SetGameWinner(3)
 	end
 
+	if not CScriptParticleManager.ACTIVE_PARTICLES then CScriptParticleManager.ACTIVE_PARTICLES = {} end
+
+	for k, v in pairs(CScriptParticleManager.ACTIVE_PARTICLES) do
+		if v[2] >= 60 then
+			ParticleManager:DestroyParticle(v[1], false)
+			ParticleManager:ReleaseParticleIndex(v[1])
+			table.remove(CScriptParticleManager.ACTIVE_PARTICLES, k)
+		else
+			CScriptParticleManager.ACTIVE_PARTICLES[k][2] = CScriptParticleManager.ACTIVE_PARTICLES[k][2] + 1
+		end
+	end
+
 	return 1
 end
 
@@ -918,7 +930,6 @@ end
 ListenToGameEvent('game_rules_state_change', function(keys)
 	if GameRules:State_Get() == DOTA_GAMERULES_STATE_HERO_SELECTION then
 		-- If no one voted, default to IMBA 10v10 gamemode
-		GameRules:SetCustomGameDifficulty(2)
 		api:SetCustomGamemode(1)
 
 		if GameMode.VoteTable == nil then return end
@@ -964,11 +975,6 @@ ListenToGameEvent('game_rules_state_change', function(keys)
 			-- Act on the winning vote
 			if category == "gamemode" then
 				api:SetCustomGamemode(highest_key)
-			end
-
-			-- Act on the winning vote
-			if category == "difficulty" then
-				GameRules:SetCustomGameDifficulty(highest_key)
 			end
 
 --			print(category .. ": " .. highest_key)

@@ -164,7 +164,7 @@ function ChooseHero(event)
 		for i = 1, #HEROLIST do -- 12 = POTM.
 			if caller:GetName() == "trigger_hero_"..i then
 				UTIL_Remove(Entities:FindByName(nil, "trigger_hero_"..i))
-				local particle = ParticleManager:CreateParticle(CustomNetTables:GetTableValue("battlepass_item_effects", tostring(hero:GetPlayerID())).tome_stats["effect1"], PATTACH_ABSORIGIN_FOLLOW, hero)
+				local particle = ParticleManager:CreateParticle("particles/generic_hero_status/hero_levelup.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero, hero)
 				ParticleManager:SetParticleControl(particle, 0, hero:GetAbsOrigin())
 				EmitSoundOnClient("ui.trophy_levelup", PlayerResource:GetPlayer(id))
 				hero:AddNewModifier(hero, nil, "modifier_command_restricted", {})
@@ -192,7 +192,7 @@ function ChooseHero(event)
 				end
 
 				UTIL_Remove(Entities:FindByName(nil, "trigger_hero_weekly"))
-				local particle = ParticleManager:CreateParticle(CustomNetTables:GetTableValue("battlepass_item_effects", tostring(hero:GetPlayerID())).tome_stats["effect1"], PATTACH_ABSORIGIN_FOLLOW, hero)
+				local particle = ParticleManager:CreateParticle("particles/generic_hero_status/hero_levelup.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero, hero)
 				ParticleManager:SetParticleControl(particle, 0, hero:GetAbsOrigin())
 				EmitSoundOnClient("ui.trophy_levelup", PlayerResource:GetPlayer(id))
 				hero:AddNewModifier(hero, nil, "modifier_command_restricted", {})
@@ -228,7 +228,7 @@ function ChooseHeroVIP(event)
 		for i = 1, #HEROLIST_VIP do
 			if caller:GetName() == "trigger_hero_vip_"..i then
 				UTIL_Remove(Entities:FindByName(nil, "trigger_hero_vip_"..i))
-				local particle = ParticleManager:CreateParticle(CustomNetTables:GetTableValue("battlepass_item_effects", tostring(hero:GetPlayerID())).tome_stats["effect1"], PATTACH_ABSORIGIN_FOLLOW, hero)
+				local particle = ParticleManager:CreateParticle("particles/generic_hero_status/hero_levelup.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
 				ParticleManager:SetParticleControl(particle, 0, hero:GetAbsOrigin())
 				EmitSoundOnClient("ui.trophy_levelup", PlayerResource:GetPlayer(id))
 				hero:AddNewModifier(hero, nil, "modifier_command_restricted", {})

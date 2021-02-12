@@ -14,17 +14,18 @@ DONATOR_COLOR[10] = {255, 255, 255}
 CustomNetTables:SetTableValue("game_options", "donator_colors", DONATOR_COLOR)
 
 UNIQUE_DONATOR_COMPANION = {}
--- UNIQUE_DONATOR_COMPANION["76561198015161808"] = "npc_donator_companion_cookies"
+-- UNIQUE_DONATOR_COMPANION["76561198015161808"] = "npc_donator_companion_zonnoz" -- EarthSalamander
 UNIQUE_DONATOR_COMPANION["76561198094835750"] = "npc_donator_companion_zonnoz"
 UNIQUE_DONATOR_COMPANION["76561198003571172"] = "npc_donator_companion_baumi"
 UNIQUE_DONATOR_COMPANION["76561198014254115"] = "npc_donator_companion_icefrog"
-UNIQUE_DONATOR_COMPANION["76561198014254115"] = "npc_donator_companion_admiral_bulldog"
+UNIQUE_DONATOR_COMPANION["76561198036748162"] = "npc_donator_companion_admiral_bulldog"
 UNIQUE_DONATOR_COMPANION["76561198021465788"] = "npc_donator_companion_suthernfriend"
 UNIQUE_DONATOR_COMPANION["76561198073163389"] = "npc_donator_companion_terdic"
 UNIQUE_DONATOR_COMPANION["76561197970766309"] = "npc_donator_companion_hamahe"
 UNIQUE_DONATOR_COMPANION["76561193687456266"] = "npc_donator_companion_exzas"
 UNIQUE_DONATOR_COMPANION["76561198095342815"] = "npc_donator_companion_the_blind_dog"
 UNIQUE_DONATOR_COMPANION["76561198009727790"] = "npc_donator_companion_acalia"
+UNIQUE_DONATOR_COMPANION["76561198173806838"] = "npc_donator_companion_kiddo"
 
 -- UNIQUE_DONATOR_COMPANION["76561198194491261"] = "npc_donator_companion_conjurist"
 UNIQUE_DONATOR_COMPANION["76561198194491261"] = "npc_donator_companion_suthernfriend" -- Conjurist wants a special Roshan
@@ -88,4 +89,101 @@ SHARED_NODRAW_MODIFIERS = {
 	"modifier_pangolier_gyroshell",
 	"modifier_smoke_of_deceit",
 	"modifier_mutation_monkey_business_transform",
+}
+
+UNIT_EQUIPMENT = {}
+UNIT_EQUIPMENT["models/heroes/crystal_maiden/crystal_maiden.vmdl"] = {
+	"models/heroes/crystal_maiden/crystal_maiden_staff.vmdl",
+	"models/heroes/crystal_maiden/crystal_maiden_cuffs.vmdl",
+	"models/heroes/crystal_maiden/crystal_maiden_cape.vmdl",
+	"models/heroes/crystal_maiden/head_item.vmdl",
+	"models/heroes/crystal_maiden/crystal_maiden_shoulders.vmdl",
+}
+UNIT_EQUIPMENT["models/heroes/crystal_maiden/crystal_maiden_arcana.vmdl"] = {
+	"models/heroes/crystal_maiden/crystal_maiden_staff.vmdl",
+	"models/heroes/crystal_maiden/crystal_maiden_cuffs.vmdl",
+	"models/heroes/crystal_maiden/crystal_maiden_arcana_back.vmdl",
+	"models/heroes/crystal_maiden/head_item.vmdl",
+	"models/heroes/crystal_maiden/crystal_maiden_shoulders.vmdl",
+}
+UNIT_EQUIPMENT["models/heroes/shredder/shredder.vmdl"] = {
+	"models/heroes/shredder/shredder_armor.vmdl",
+	"models/heroes/shredder/shredder_blade.vmdl",
+	"models/heroes/shredder/shredder_body.vmdl",
+	"models/heroes/shredder/shredder_chainsaw.vmdl",
+	"models/heroes/shredder/shredder_driver_hat.vmdl",
+	"models/heroes/shredder/shredder_hook.vmdl",
+	"models/heroes/shredder/shredder_shoulders.vmdl",
+}
+UNIT_EQUIPMENT["npc_donator_companion_zonnoz"] = {
+	"models/items/pudge/blackdeath_offhand/blackdeath_offhand.vmdl",
+	"models/items/pudge/blackdeath_head_s3/blackdeath_head_s3.vmdl",
+	"models/items/pudge/immortal_arm/immortal_arm.vmdl",
+	"models/items/pudge/scorching_talon/scorching_talon.vmdl",
+	"models/items/pudge/doomsday_ripper_belt/doomsday_ripper_belt.vmdl",
+	"models/items/pudge/pudge_deep_sea_abomination_arms/pudge_deep_sea_abomination_arms.vmdl",
+	"models/items/pudge/arcana/pudge_arcana_back.vmdl",
+}
+UNIT_EQUIPMENT["models/heroes/huskar/huskar.vmdl"] = {
+	"models/items/huskar/searing_dominator/searing_dominator.vmdl",
+	"models/heroes/huskar/huskar_bracer.vmdl",
+	"models/heroes/huskar/huskar_dagger.vmdl",
+	"models/heroes/huskar/huskar_shoulder.vmdl",
+	"models/heroes/huskar/huskar_spear.vmdl",
+}
+UNIT_EQUIPMENT["models/heroes/rubick/rubick.vmdl"] = {
+	"models/items/rubick/force_staff/force_staff.vmdl",
+	"models/items/rubick/kuroky_rubick_back/kuroky_rubick_back.vmdl",
+	"models/items/rubick/kuroky_rubick_shoulders/kuroky_rubick_shoulders.vmdl",
+	"models/items/rubick/kuroky_rubick_weapon/kuroky_rubick_weapon.vmdl",
+	"models/items/rubick/rubick_kuroky_head/rubick_kuroky_head.vmdl",
+}
+UNIT_EQUIPMENT["npc_donator_companion_acalia"] = {
+	"models/items/enchantress/rainbow_spear/mesh/rainbow_spear_model.vmdl",
+	"models/items/enchantress/anuxi_summer_head/anuxi_summer_head.vmdl",
+	"models/items/enchantress/amberlight_belt/amberlight_belt.vmdl",
+	"models/items/enchantress/anuxi_summer_shoulder/anuxi_summer_shoulder.vmdl",
+	"models/items/enchantress/anuxi_wildkin_arm/anuxi_wildkin_arm.vmdl",
+}
+UNIT_EQUIPMENT["npc_donator_companion_gordon_ramsay"] = {
+	"models/heroes/phoenix/phoenix_wings.vmdl",
+	"models/heroes/phoenix/phoenix_bird_head.vmdl",
+}
+UNIT_EQUIPMENT["npc_donator_companion_rayzone"] = {
+	"models/heroes/bristleback/bristleback_back.vmdl",
+	"models/heroes/bristleback/bristleback_bracer.vmdl",
+	"models/heroes/bristleback/bristleback_head.vmdl",
+	"models/heroes/bristleback/bristleback_necklace.vmdl",
+	"models/heroes/bristleback/bristleback_weapon.vmdl",
+--	"models/heroes/bristleback/bristleback_offhand_weapon.vmdl",
+}
+UNIT_EQUIPMENT["npc_donator_companion_rubick_arcana"] = {
+	"models/items/rubick/rubick_arcana/rubick_arcana_back.vmdl",
+	"models/heroes/rubick/rubick_head.vmdl",
+	"models/heroes/rubick/rubick_staff.vmdl",
+	"models/heroes/rubick/shoulder.vmdl",
+}
+UNIT_EQUIPMENT["npc_donator_companion_juggernaut_arcana"] = {
+	"models/items/juggernaut/arcana/juggernaut_arcana_mask.vmdl",
+	"models/items/juggernaut/jugg_ti8/jugg_ti8_sword.vmdl",
+	"models/heroes/juggernaut/jugg_cape.vmdl",
+	"models/heroes/juggernaut/juggernaut_pants.vmdl",
+}
+UNIT_EQUIPMENT["npc_donator_companion_terrorblade_arcana"] = {
+	{"5957", "arcana"},
+	{"306", "back"},
+	{"307", "weapon"},
+	{"476", "armor"},
+}
+UNIT_EQUIPMENT["npc_donator_companion_kiddo"] = {
+--	{"7247", "weapon"},
+--	{"137", "head"},
+--	{"138", "shoulder"},
+--	{"139", "back"},
+--	{"141", "belt"},
+	"models/heroes/phantom_assassin/pa_arcana_weapons.vmdl", -- Manifold Paradox
+	"models/heroes/phantom_assassin/phantom_assassin_helmet.vmdl",
+	"models/heroes/phantom_assassin/phantom_assassin_shoulders.vmdl",
+	"models/heroes/phantom_assassin/phantom_assassin_cape.vmdl",
+	"models/heroes/phantom_assassin/phantom_assassin_daggers.vmdl",
 }

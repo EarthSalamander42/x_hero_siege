@@ -743,7 +743,7 @@ ListenToGameEvent("player_chat", function(keys)
 					hero:IncrementAttributes(50)
 					hero:EmitSound("ui.trophy_levelup")
 
-					local particle1 = ParticleManager:CreateParticle(CustomNetTables:GetTableValue("battlepass_item_effects", tostring(hero:GetPlayerID())).tome_stats["effect1"], PATTACH_ABSORIGIN_FOLLOW, hero)
+					local particle1 = ParticleManager:CreateParticle("particles/generic_hero_status/hero_levelup.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero, hero)
 					ParticleManager:SetParticleControl(particle1, 0, hero:GetAbsOrigin())
 
 					i = i + 1

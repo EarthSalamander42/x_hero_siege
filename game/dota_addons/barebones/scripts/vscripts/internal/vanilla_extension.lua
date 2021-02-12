@@ -103,29 +103,12 @@ function CDOTA_BaseNPC:IncrementAttributes(amount, bAll)
 
 	if not self.GetPlayerID then return end
 
-	local tome_net_table = CustomNetTables:GetTableValue("battlepass_item_effects", tostring(self:GetPlayerID()))
+	local particle1 = ParticleManager:CreateParticle("particles/generic_hero_status/hero_levelup.vpcf", PATTACH_ABSORIGIN_FOLLOW, self, self)
+	ParticleManager:SetParticleControl(particle1, 0, self:GetAbsOrigin())
 
-	if tome_net_table then
---[[
-		if IsInToolsMode() then
-			print("Tome pfx:", tome_net_table.tome_stats["effect1"])
-
-			for k, v in pairs(tome_net_table) do
-				print(k, v)
-			end
-
-			for k, v in pairs(tome_net_table.tome_stats) do
-				print(k, v)
-			end
-		end
---]]
-		local particle1 = ParticleManager:CreateParticle(tome_net_table.tome_stats["effect1"], PATTACH_ABSORIGIN_FOLLOW, self)
-		ParticleManager:SetParticleControl(particle1, 0, self:GetAbsOrigin())
-
-		if bAll == true and bSoundPlayed == false then
-			bSoundPlayed = true
-			self:EmitSound("ui.trophy_levelup")
-		end
+	if bAll == true and bSoundPlayed == false then
+		bSoundPlayed = true
+		self:EmitSound("ui.trophy_levelup")
 	end
 
 	self:CalculateStatBonus(true)
@@ -183,4 +166,103 @@ function CDOTA_BaseNPC:Blink(position, bTeamOnlyParticle, bPlaySound)
 		ParticleManager:FireParticle(blink_effect_end, PATTACH_ABSORIGIN, self, {[0] = self:GetAbsOrigin()})
 	end
 	if bPlaySound == true then EmitSoundOn("DOTA_Item.BlinkDagger.NailedIt", self) end
+end
+
+local ignored_pfx_list = {}
+ignored_pfx_list["particles/dev/empty_particle.vpcf"] = true
+ignored_pfx_list["particles/ambient/fountain_danger_circle.vpcf"] = true
+ignored_pfx_list["particles/range_indicator.vpcf"] = true
+ignored_pfx_list["particles/units/heroes/hero_skeletonking/wraith_king_ambient_custom.vpcf"] = true
+ignored_pfx_list["particles/generic_gameplay/radiant_fountain_regen.vpcf"] = true
+ignored_pfx_list["particles/econ/courier/courier_wyvern_hatchling/courier_wyvern_hatchling_fire.vpcf"] = true
+ignored_pfx_list["particles/units/heroes/hero_wisp/wisp_tether.vpcf"] = true
+ignored_pfx_list["particles/units/heroes/hero_templar_assassin/templar_assassin_trap.vpcf"] = true
+ignored_pfx_list["particles/econ/courier/courier_donkey_ti7/courier_donkey_ti7_ambient.vpcf"] = true
+ignored_pfx_list["particles/econ/courier/courier_golden_roshan/golden_roshan_ambient.vpcf"] = true
+ignored_pfx_list["particles/econ/courier/courier_platinum_roshan/platinum_roshan_ambient.vpcf"] = true
+ignored_pfx_list["particles/econ/courier/courier_roshan_darkmoon/courier_roshan_darkmoon.vpcf"] = true
+ignored_pfx_list["particles/econ/courier/courier_roshan_desert_sands/baby_roshan_desert_sands_ambient.vpcf"] = true
+ignored_pfx_list["particles/econ/courier/courier_roshan_ti8/courier_roshan_ti8.vpcf"] = true
+ignored_pfx_list["particles/econ/courier/courier_roshan_lava/courier_roshan_lava.vpcf"] = true
+ignored_pfx_list["particles/econ/courier/courier_roshan_frost/courier_roshan_frost_ambient.vpcf"] = true
+ignored_pfx_list["particles/econ/courier/courier_babyroshan_winter18/courier_babyroshan_winter18_ambient.vpcf"] = true
+ignored_pfx_list["particles/econ/courier/courier_babyroshan_ti9/courier_babyroshan_ti9_ambient.vpcf"] = true
+ignored_pfx_list["particles/units/heroes/hero_witchdoctor/witchdoctor_voodoo_restoration.vpcf"] = true
+ignored_pfx_list["particles/units/heroes/hero_earth_spirit/espirit_stoneremnant.vpcf"] = true
+ignored_pfx_list["particles/econ/items/tiny/tiny_prestige/tiny_prestige_tree_ambient.vpcf"] = true
+ignored_pfx_list["particles/econ/events/ti7/ti7_hero_effect_1.vpcf"] = true
+ignored_pfx_list["particles/econ/events/ti9/ti9_emblem_effect_loadout.vpcf"] = true
+ignored_pfx_list["particles/econ/events/ti8/ti8_hero_effect.vpcf"] = true
+ignored_pfx_list["particles/econ/events/ti7/ti7_hero_effect.vpcf"] = true
+ignored_pfx_list["particles/econ/events/ti10/emblem/ti10_emblem_effect.vpcf"] = true
+
+-- Call custom functions whenever CreateParticle is being called anywhere
+local original_CreateParticle = CScriptParticleManager.CreateParticle
+CScriptParticleManager.CreateParticle = function(self, sParticleName, iAttachType, hParent, hCaster)
+	local override = nil
+
+	if hCaster then
+		override = CustomNetTables:GetTableValue("battlepass_player", sParticleName..'_'..hCaster:GetPlayerOwnerID()) 
+	end
+
+	if override then
+		sParticleName = override["1"]
+	end
+
+	-- call the original function
+	local response = original_CreateParticle(self, sParticleName, iAttachType, hParent)
+
+--	print("CreateParticle response:", sParticleName)
+
+	if not ignored_pfx_list[sParticleName] then
+		if hCaster and not hCaster:IsHero() then
+			table.insert(CScriptParticleManager.ACTIVE_PARTICLES, {response, 0})
+		else
+			table.insert(CScriptParticleManager.ACTIVE_PARTICLES, {response, 0})
+		end
+	end
+
+	return response
+end
+
+-- Call custom functions whenever CreateParticleForTeam is being called anywhere
+local original_CreateParticleForTeam = CScriptParticleManager.CreateParticleForTeam
+CScriptParticleManager.CreateParticleForTeam = function(self, sParticleName, iAttachType, hParent, iTeamNumber, hCaster)
+--	print("Create Particle (override):", sParticleName, iAttachType, hParent, iTeamNumber, hCaster)
+
+	local override = nil
+
+	if hCaster then
+		override = CustomNetTables:GetTableValue("battlepass_player", sParticleName..'_'..hCaster:GetPlayerOwnerID()) 
+	end
+
+	if override then
+		sParticleName = override["1"]
+	end
+
+	-- call the original function
+	local response = original_CreateParticleForTeam(self, sParticleName, iAttachType, hParent, iTeamNumber)
+
+	return response
+end
+
+-- Call custom functions whenever CreateParticleForPlayer is being called anywhere
+local original_CreateParticleForPlayer = CScriptParticleManager.CreateParticleForPlayer
+CScriptParticleManager.CreateParticleForPlayer = function(self, sParticleName, iAttachType, hParent, hPlayer, hCaster)
+--	print("Create Particle (override):", sParticleName, iAttachType, hParent, hPlayer, hCaster)
+
+	local override = nil
+
+	if hCaster then
+		override = CustomNetTables:GetTableValue("battlepass_player", sParticleName..'_'..hCaster:GetPlayerOwnerID()) 
+	end
+
+	if override then
+		sParticleName = override["1"]
+	end
+
+	-- call the original function
+	local response = original_CreateParticleForPlayer(self, sParticleName, iAttachType, hParent, hPlayer)
+
+	return response
 end

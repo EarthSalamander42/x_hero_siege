@@ -365,11 +365,7 @@ function OnVotesReceived(data)
 	}
 
 	if ($("#VoteGameModeText" + highest_vote)) {
-		if (highest_vote != 1 && vote_count[highest_vote] < 5) {
-			$("#VoteGameModeText1").style.color = "green";
-		} else {
-			$("#VoteGameModeText" + highest_vote).style.color = "green";
-		}
+		$("#VoteGameModeText" + highest_vote).style.color = "green";
 	}
 }
 

@@ -1,17 +1,22 @@
+-- Copyright (C) 2018  The Dota IMBA Development Team
+-- Battlepass System for Dota IMBA
+
 ListenToGameEvent('game_rules_state_change', function(keys)
 	if GameRules:State_Get() == DOTA_GAMERULES_STATE_CUSTOM_GAME_SETUP then
-		if _G.Battlepass == nil then
-			_G.Battlepass = class({})
-			require('components/battlepass/'..CUSTOM_GAME_TYPE..'_rewards')
-			require('components/battlepass/constants')
-			require('components/battlepass/util')
-			require('components/battlepass/donator_settings')
-			require('components/battlepass/donator')
-			require('components/battlepass/experience')
-		end
+		_G.Battlepass = _G.Battlepass or class({})
 
-		Battlepass:Init()
+		require('components/battlepass/constants')
+		require('components/battlepass/util')
+		require('components/battlepass/donator_settings')
+		require('components/battlepass/donator')
+		require('components/battlepass/experience')
+		require('components/battlepass/keyvalues/items_game')
+
+		require('components/battlepass/'..CUSTOM_GAME_TYPE..'_rewards')
+
 		Battlepass:GetPlayerInfoXP()
+
+		CustomGameEventManager:Send_ServerToAllClients("all_players_loaded", {})
 	end
 end, nil)
 
@@ -24,14 +29,14 @@ ListenToGameEvent('npc_spawned', function(event)
 	elseif npc:IsRealHero() then
 		Battlepass:AddItemEffects(npc)
 
-		local ply_table = CustomNetTables:GetTableValue("battlepass", tostring(npc:GetPlayerID()))
+		local ply_table = CustomNetTables:GetTableValue("battlepass_player", tostring(npc:GetPlayerID()))
 
 		if ply_table and ply_table.bp_rewards == 0 then
 			return
 		end
 
 		-- The commented out lines here are what I used to test in tools mode
-		if api:IsDonator(npc:GetPlayerID()) and PlayerResource:GetConnectionState(npc:GetPlayerID()) ~= 1 then
+		if api:IsDonator(npc:GetPlayerID()) and PlayerResource:GetConnectionState(npc:GetPlayerID()) ~= 1 or string.find(GetMapName(), "demo") then
 		-- if api:IsDonator(npc:GetPlayerID()) and PlayerResource:GetConnectionState(npc:GetPlayerID()) ~= 1 or (IsInToolsMode()) then
 			npc:SetupHealthBarLabel()
 
@@ -42,10 +47,11 @@ ListenToGameEvent('npc_spawned', function(event)
 				npc:AddNewModifier(npc, nil, "modifier_patreon_donator", {})
 
 				if GetMapName() == "imba_demo" then return end
-				if api:GetDonatorStatus(npc:GetPlayerID()) ~= 6 and api:GetPlayerCompanion(npc:GetPlayerID()) then
+				if api:GetDonatorStatus(npc:GetPlayerID()) ~= 6 then
 					Timers:CreateTimer(1.5, function()
-						print(api:GetPlayerCompanion(npc:GetPlayerID()))
-						Battlepass:DonatorCompanion(npc:GetPlayerID(), api:GetPlayerCompanion(npc:GetPlayerID()).file)
+						if api:GetPlayerCompanion(npc:GetPlayerID()) then
+							Battlepass:DonatorCompanion(npc:GetPlayerID(), api:GetPlayerCompanion(npc:GetPlayerID()).file)
+						end
 					end)
 				end
 			end
@@ -54,10 +60,19 @@ ListenToGameEvent('npc_spawned', function(event)
 		if npc.bp_init == true then return end
 
 		npc.bp_init = true
-
-		CustomGameEventManager:Send_ServerToAllClients("override_hero_image", {
-			player_id = npc:GetPlayerID(),
-			hero_name = string.gsub(npc:GetUnitName(), "npc_dota_hero_", ""),
-		})
 	end
+end, nil)
+
+ListenToGameEvent('dota_player_gained_level', function(keys)
+	if not keys.player then return end
+
+	local player = EntIndexToHScript(keys.player)
+	local hero = player:GetAssignedHero()
+	if hero == nil then
+		return
+	end
+	local level = keys.level
+
+	local particleID = ParticleManager:CreateParticle("particles/generic_hero_status/hero_levelup_vanilla.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero, hero)
+	ParticleManager:ReleaseParticleIndex(particleID)
 end, nil)

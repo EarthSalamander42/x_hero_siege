@@ -101,21 +101,21 @@
 	}
 }
 
-@keyframes 'breathe_mythical'
+@keyframes 'breathe_legendary'
 {
 	0%
 	{
-		box-shadow: inset #720585 0 0 1px 0;
+		box-shadow: inset #d32ce6 0 0 1px 0;
 	}
 
 	50%
 	{
-		box-shadow: inset #720585 0 0 4px 0;
+		box-shadow: inset #d32ce6 0 0 4px 0;
 	}
 
 	100%
 	{
-		box-shadow: inset #720585 0 0 1px 0;
+		box-shadow: inset #d32ce6 0 0 1px 0;
 	}
 }
 
@@ -185,6 +185,7 @@
 	text-transform: uppercase;
 	text-align: center center;
 	font-size: 18px;
+	text-overflow: shrink;
 }
 
 #BattlepassButton:hover Label
@@ -195,8 +196,8 @@
 #BattlepassWindow
 {
 	width: 820px;
-	height: 800px;
-	transform: translate3d( 100%, 0, 0px );
+	height: 780px;
+	transform: translate3d( 45%, 0, 0px );
 	margin-bottom: 100px;
 	background-color: gradient( linear, 100% 0, 0% 0%, from( #13161a ), color-stop( 0.4, #13161a ), to( #2b3139ee ) );
 	border-top:  1px solid #3a363a;	
@@ -206,10 +207,9 @@
 	box-shadow: 0px 0px 12px 0px #000000a5;
 	align: right center;
 	flow-children: down;
-	visibility: collapse;
-	padding: 10px;	
+	padding: 10px;
 	transition-property: transform;
-	transition-duration: 0.1s;
+	transition-duration: 0.3s;
 	transition-timing-function: ease-in;
 }
 
@@ -219,7 +219,6 @@
 }
 
 #BattlepassWindow.sethidden {
-	visibility: collapse;
 	transform: translate3d( 100%, 0, 0px );
 }
 
@@ -252,10 +251,6 @@
 
 #LocalPlayerInfo {
 	align: center bottom;
-}
-
-#BattlepassInfoContainer {
-	overflow:  squish scroll;
 }
 
 .LeaderboardTableWrapper {
@@ -329,11 +324,12 @@
 	background-color: #303848;
 }
 
-.LeaderboardRank,
-.LeaderboardXP,
-.LeaderboardAvatar,
-.LeaderboardAvatar_alt
+.LeaderboardRankLabel,
+.LeaderboardXPLabel,
+.LeaderboardAvatarLabel,
+.LeaderboardAvatar_altLabel
 {
+	width: 100%;
 	height: 100%;
 	text-align: center;
 	font-size: 19px;
@@ -354,10 +350,6 @@
 	color:#daebff;
 }
 
-.LeaderboardXP, {
-	padding: 3px 10px 3px 10px;
-}
-
 /* Leaderboard Legend */
 .LeaderboardLegend {
 	width: 100%;
@@ -376,18 +368,22 @@
 
 .LeaderboardRank {
 	width: 10%;	
-	align:  center center;
+	height: 90%;
+	align:  center top;
+	text-align:  center center;
 }
 
 .LeaderboardAvatar {
 	width: 15%;
+	height: 90%;
 	border: 0;
-	align:  center center;
+	align:  center top;
 }
 
 .LeaderboardXP {
-	width: 50%;	
+	width: 50%;
 	align:  center center;
+	padding: 3px 10px 3px 10px;
 }
 
 .LeaderboardIMR {
@@ -448,10 +444,11 @@
 }
 .sub_nav_tab {	
 	padding:  9px 10px;
+	flow-children: right;
 }
 .sub_nav_tab Label {
 	text-transform: uppercase;
-	letter-spacing: 0.5px;
+//	letter-spacing: 0.5px;
 	color: #606366;
 }
 .sub_nav_tab.active Label,
@@ -524,7 +521,7 @@
 #DonatorTabButton .text,
 #LeaderboardTabButton .text {
 	font-size: 19px;
-	letter-spacing: 1px;
+//	letter-spacing: 1px;
 	text-transform: uppercase;
 	align: left center;
 	padding-left: 30px;
@@ -666,7 +663,7 @@
 	horizontal-align: right;
 	text-align: right;
 	opacity: 1;
-	letter-spacing: 0.5px;
+//	letter-spacing: 0.5px;
 	text-shadow: 1px 1px 2px 2.0 #00000030;
 }
 
@@ -683,7 +680,7 @@
 	text-align: center;
 
 	font-family: Radiance,FZKai-Z03,TH Sarabun New,YDYGO 540;
-	letter-spacing: 2px;
+//	letter-spacing: 2px;
 	text-overflow: clip;
 
 	align: center center;
@@ -701,7 +698,7 @@
 
 	font-family: Radiance,FZKai-Z03,TH Sarabun New,YDYGO 540;
 	font-size: 14px;
-	letter-spacing: 2px;
+//	letter-spacing: 2px;
 	text-overflow: clip;
 
 	horizontal-align: center;
@@ -726,7 +723,7 @@
 	text-shadow: 1px 1px 2px 2.0 #00000011;
 
 	font-family: Radiance,FZKai-Z03,TH Sarabun New,YDYGO 540;
-	letter-spacing: 2px;
+//	letter-spacing: 2px;
 	text-overflow: clip;
 
 	text-align: center;
@@ -771,7 +768,7 @@
 	font-size: 14px;
 	color: #a2a99e;
 	vertical-align: top;
-	letter-spacing: 1.5px;
+//	letter-spacing: 1.5px;
 	text-transform: uppercase;
 	text-align: center center;
 	text-shadow: 0px 0px 3px 2 #00000050;
@@ -781,7 +778,7 @@
 }
 
 #ComingSoonPanel, #TabTitlePanel {
-	width: 70%;
+	width: 100%;
 	height: 40px;
 	background-color: #39404855;
 	align: left top;
@@ -799,33 +796,93 @@
 
 .BattlepassRow {
 	width: 100%;
-	height: 85px;
-	margin-top: 5px;
+	height: 100%;
+	align: center center;
 	/* background-color: #000000ba; */
-	horizontal-align: left;
 	flow-children: right;
-/*	overflow: noclip scroll; */
+	overflow: scroll squish;
 }
 
 .BattlepassReward {
-	width: 74px;
-	height: 84px;
+	width: 127px;
+	height: 100%;
 	margin-left: 2px;
 	margin-right: 2px;
 	flow-children: down;
 }
 
+.BattlepassRewardImage {
+	width: 100%;
+	height: 80%;
+	background-size: cover;
+	background-position: 0% 0%;
+}
+
+.BattlepassRewardImageLabelContainer {
+	width: 100%;
+	height: 100%;
+	background-color: #000000aa;
+}
+
+#BattlepassRewardImageLabel {
+	font-size: 16px;
+//	letter-spacing: 1px;
+	padding: 80px 0px;
+	text-transform: uppercase;
+	text-overflow: shrink;
+	text-align: center center;
+	text-shadow: 0px 0px 4px 4 #000000a5;
+	color: #b8c5ca;
+	line-height: 14px;
+}
+
+.BattlepassRewardImageLabelContainer:hover {
+	background-color: none;
+	transition-property: background-color;
+	transition-duration: 0.2s;
+	transition-timing-function: ease-in-out;
+}
+
+.BattlepassRewardImageLabel {
+	width: 100%;
+	height: 100%;
+}
+
+.BattlepassRewardTitleContainer {
+	width: 100%;
+	height: 20%;
+	box-shadow: 0px 2px 6px 0px #000000a5;
+	background-color: #000000aa;
+	flow-children: down;
+}
+
+.BattlepassRewardTitle {
+	height: 50%;
+	horizontal-align: center;
+}
+
+.BattlepassRewardRarity {
+	height: 50%;
+	horizontal-align: center;
+}
+
+.BattlepassReward:hover .BattlepassRewardPanelUnlocked {
+	opacity: 0;
+}
+
 .BattlepassRewardIcon {
-	width: 74px;
-	height: 64px;
+	width: 253px;
+	height: 100%;
 	border: 1px solid #38424b;
 	box-shadow: 0px 2px 6px 0px #000000a5;
-	vertical-align: top;
-	background-position: 0px 0px;
-	background-size: 74px 64px;
 }
 
 .BattlepassRewardIcon_locked {
+	wash-color: #000000a0;
+	brightness: 0.6;
+}
+
+.BattlepassRewardIcon_unreleased {
 	wash-color: #000000a0;
 	brightness: 0.6;
 }
@@ -836,28 +893,22 @@
 	horizontal-align: right;
 	background-size: cover;
 }
-.BattlepassReward:hover .BattlepassRewardPanelUnlocked {
-	opacity: 1;
-}
+
 .BattlepassRewardLabel {
-	width: 92%;
-	horizontal-align: left;
-	font-size: 11px;
-	vertical-align: top;
-	letter-spacing: 1px;
-	align: center center;
+	font-size: 12px;
+//	letter-spacing: 1px;
 	text-transform: uppercase;
 	text-align: center center;
 	text-shadow: 0px 0px 3px 3 #00000070;
 	color: #99a8ad;
-	box-shadow: 0px 1px 8px 0px #000000a2;
 	width: 100%;
+	height: 100%;
+	margin: 30% 2px 0px 2px;
 }
 .BattlepassRewardLabel.unlocked {
 	background-color: #2a3440;
 	border: 1px solid #1c2328;
-	border-top: 0;
-	margin-top:  -2px;
+	margin-top:  5px;
 	box-shadow: 0px 0 0 0px #00000000;
 }
 .BattlepassRewardLabel.locked {
@@ -865,40 +916,57 @@
 	border-color: #1c2328;
 	margin-top:  -2px;
 }
+.BattlepassRewardLabel.unreleased {
+	background-color: #282a2d;
+	border-color: #1c2328;
+	margin-top:  -2px;
+}
+
+.BattlepassRewardPanelUnlocked {
+	width: 100%;
+	height: 100%;
+	background-color: #000000ba;
+}
 
 .BattlepassRewardLabelLocked {
 	width: 100%;
 	horizontal-align: left;
-	font-size: 10px;
+	font-size: 12px;
 	vertical-align: top;
-	letter-spacing: 1px;
-	align: center center;
+//	letter-spacing: 1px;
 	text-transform: uppercase;
 	text-overflow: shrink;
 	text-align: center center;
-	text-shadow: 0px 0px 3px 3 #000000a5;
+	text-shadow: 0px 0px 4px 4 #000000a5;
 	color: red;
 	brightness:  1.5;
-}
-
-.BattlepassRewardPanelUnlocked {
-	opacity: 0;
-	width: 100%;
-	height: 100%;
-	background-color: #000000db;
+	line-height: 14px;
 }
 
 .BattlepassRewardLabelUnlocked {
-	font-size: 11px;
-	letter-spacing: 1px;
+	font-size: 12px;
+//	letter-spacing: 1px;
 	padding: 0 5px;
-	align: center center;
 	text-transform: uppercase;
 	text-overflow: shrink;
 	text-align: center center;
 	text-shadow: 0px 0px 4px 4 #000000a5;
 	color: #b8c5ca;
-	align: center center;
+	line-height: 14px;
+}
+
+.BattlepassRewardLabelUnreleased {
+	width: 100%;
+	horizontal-align: left;
+	font-size: 12px;
+	vertical-align: top;
+//	letter-spacing: 1px;
+	text-transform: uppercase;
+	text-overflow: shrink;
+	text-align: center center;
+	text-shadow: 0px 0px 4px 4 #000000a5;
+	color: orange;
+	brightness:  1.5;
 	line-height: 14px;
 }
 
@@ -948,7 +1016,7 @@
 	color:  #b1b1b1;
 	margin: 2px;
 	font-size: 13px;
-	letter-spacing: 0.4px;
+//	letter-spacing: 0.4px;
 	box-shadow: none;
 }
 
@@ -963,9 +1031,9 @@
 #CompanionNotification {
 	width: 100%;
 	height: 40px;
-	background-color: black;
+	background-color: none;
 	align: center center;
-	visibility: collapse;
+	visibility: visible;
 	margin-bottom: 15px;
 }
 
@@ -1004,10 +1072,9 @@
 
 #CompanionNotificationLabel {
 	padding: 10% 0% 10% 0%;
-	width: 100%;
-	height: 100%;
 	color: white;
 	text-align: center center;
+	align: center center;
 	font-size: 18px;
 	text-overflow: shrink;
 }
@@ -1100,15 +1167,16 @@
 	text-align: center center;
 	font-size: 19px;
 	font-weight: normal;
-	letter-spacing: 2px;
+//	letter-spacing: 2px;
 	margin-top: 2px;
 	text-transform: uppercase;
 	text-shadow: 1px 1px 3px 2.0 #00000025;
 }
 
-#RefreshBattlepass {
+.RefreshBattlepass {
 	width: 20px;
 	height: 20px;
+	margin-left: 6px;
 	margin-right: 6px;
 	background-image: url("s2r://panorama/images/control_icons/refresh_psd.vtex");
 	background-size: 100% 100%;
@@ -1119,7 +1187,7 @@
 	brightness: 1.6;
 }
 
-#RefreshBattlepass.Active {
+.RefreshBattlepass.Active {
 	animation-name: refresh;
 	animation-duration: 0.55s;
 	animation-delay: 0.15s;
@@ -1129,15 +1197,24 @@
 }
 
 /* colors */
-.ancient_border {
-	animation-name: breathe_ancient;
-	animation-duration: 2.0s;
-	animation-timing-function: ease-in;
-	animation-iteration-count: infinite;
+.common_border {
+	box-shadow: inset #b0c3d9 0 0 4px 0;
 }
 
-.arcana_border {
-	animation-name: breathe_arcana;
+.uncommon_border {
+	box-shadow: inset #5e98d9 0 0 4px 0;
+}
+
+.rare_border {
+	box-shadow: inset #4b69ff 0 0 4px 0;
+}
+
+.mythical_border {
+	box-shadow: inset #8847ff 0 0 4px 0;
+}
+
+.legendary_border {
+	animation-name: breathe_legendary;
 	animation-duration: 2.0s;
 	animation-timing-function: ease-in;
 	animation-iteration-count: infinite;
@@ -1150,8 +1227,15 @@
 	animation-iteration-count: infinite;
 }
 
-.mythical_border {
-	animation-name: breathe_mythical;
+.arcana_border {
+	animation-name: breathe_arcana;
+	animation-duration: 2.0s;
+	animation-timing-function: ease-in;
+	animation-iteration-count: infinite;
+}
+
+.ancient_border {
+	animation-name: breathe_ancient;
 	animation-duration: 2.0s;
 	animation-timing-function: ease-in;
 	animation-iteration-count: infinite;
@@ -1188,7 +1272,6 @@
 .ancient_text {
 	color: #eb4b4b;
 }
-
 
 .gold {
 	color: gold;
@@ -1248,31 +1331,350 @@
 	text-align: center center;
 	font-size: 14px;
 	font-weight: normal;
-	letter-spacing: 2px;
+//	letter-spacing: 2px;
 	margin-top: 2px;
 	text-transform: uppercase;
 	text-shadow: 1px 1px 3px 2.0 #00000025;
 	text-overflow: shrink;
 }
 
-#RefreshBattlepass {
-	width: 20px;
-	height: 20px;
-	margin-right: 6px;
-	background-image: url("s2r://panorama/images/control_icons/refresh_psd.vtex");
-	background-size: 100% 100%;
-	align: left center;
-}
-
 .SettingsButtonClass:hover {
 	brightness: 1.6;
 }
 
-#RefreshBattlepass.Active {
-	animation-name: refresh;
-	animation-duration: 0.55s;
-	animation-delay: 0.15s;
-	animation-timing-function: ease-in-out;
-	animation-iteration-count: 1;
-	animation-direction: reverse;
+.BattlepassPlayerRow {
+	width: 100%;
+	height: 25%;
+	margin-top: 5px;
+	/* background-color: #000000ba; */
+	flow-children: right;
+}
+
+#BattlepassRewardContainer {
+	width: 100%;
+	height: 520px;
+	flow-children: down;
+	opacity-mask: url("s2r://panorama/images/masks/softedge_horizontal_png.vtex");
+}
+
+#PlayerSteamAvatar {
+	width: 100px;
+	height: 100px;
+}
+
+.ContainerLevel {
+	height: 100%;
+	flow-children: down;
+}
+
+.RewardContainerLevel {
+	height: 80%;
+	flow-children: right;
+}
+
+.BattlepassRewardLabelContainer {
+	width: 100%;
+	height: 10%;
+	box-shadow: 0px 1px 8px 0px #000000a2;
+}
+
+.RewardEquipped {
+	width: 20%;
+	height: 20%;
+	background-image: url("s2r://panorama/images/status_icons/econtooltip_equipped_psd.vtex");
+	horizontal-align: right;
+	background-repeat: no-repeat;
+	background-position: right top;
+	background-size: 100%;
+	wash-color: #B3DFDC;
+}
+
+#PanelImbaXP 
+{
+	width: 50%;
+	padding: 3px 10px 5px;
+	align: center center;
+//	background-color: #0d061dcc;
+}
+#LevelContainer
+{
+	flow-children: right;
+	align: center top;
+	width: 100%;
+	padding: 0 3px;
+}
+#LevelContainerChild {
+	align: left top;
+	flow-children: right;
+	margin-right:  15px;
+	margin-top: 1px;
+}
+#LevelContainerChild2 {
+	align: right top;
+}
+#LevelLabel
+{
+	color: #c3b9d8;
+	font-family: Radiance,FZKai-Z03,TH Sarabun New,YDYGO 540;
+	font-size: 16px;
+	align: center top;
+}
+
+#ImbaXPRank0,
+#ImbaXPRank1,
+#ImbaXPRank2,
+#ImbaXPRank3,
+#ImbaXPRank4,
+#ImbaXPRank5,
+#ImbaXPRank6,
+#ImbaXPRank7,
+#ImbaXPRank8,
+#ImbaXPRank9,
+#ImbaXPRank10,
+#ImbaXPRank11,
+#ImbaXPRank12,
+#ImbaXPRank13,
+#ImbaXPRank14,
+#ImbaXPRank15,
+#ImbaXPRank16,
+#ImbaXPRank17,
+#ImbaXPRank18,
+#ImbaXPRank19,
+#ImbaXPRank20,
+#ImbaXPRank21,
+#ImbaXPRank22,
+#ImbaXPRank23
+{
+
+	font-family: Radiance,FZKai-Z03,TH Sarabun New,YDYGO 540;
+	font-size: 16px;
+	align: center top;
+	/*margin-top: 1px;*/
+	/*margin-right: 5%;
+	margin-bottom: 1px;
+	font-size: 16px;
+	font-weight: bold;
+	color: white;
+	text-shadow: 0 0 3px #000000cc;
+	align: center center;*/
+}
+
+#ImbaXP0,
+#ImbaXP1,
+#ImbaXP2,
+#ImbaXP3,
+#ImbaXP4,
+#ImbaXP5,
+#ImbaXP6,
+#ImbaXP7,
+#ImbaXP8,
+#ImbaXP9,
+#ImbaXP10,
+#ImbaXP11,
+#ImbaXP12,
+#ImbaXP13,
+#ImbaXP14,
+#ImbaXP15,
+#ImbaXP16,
+#ImbaXP17,
+#ImbaXP18,
+#ImbaXP19,
+#ImbaXP20,
+#ImbaXP21,
+#ImbaXP22,
+#ImbaXP23
+{
+	font-family: Radiance,FZKai-Z03,TH Sarabun New,YDYGO 540;
+	font-size: 16px;
+	color: #fefeff;
+	align: center center;
+	opacity: 0.5;
+}
+
+#ImbaXPEarned0,
+#ImbaXPEarned1,
+#ImbaXPEarned2,
+#ImbaXPEarned3,
+#ImbaXPEarned4,
+#ImbaXPEarned5,
+#ImbaXPEarned6,
+#ImbaXPEarned7,
+#ImbaXPEarned8,
+#ImbaXPEarned9,
+#ImbaXPEarned10,
+#ImbaXPEarned11,
+#ImbaXPEarned12,
+#ImbaXPEarned13,
+#ImbaXPEarned14,
+#ImbaXPEarned15,
+#ImbaXPEarned16,
+#ImbaXPEarned17,
+#ImbaXPEarned18,
+#ImbaXPEarned19,
+#ImbaXPEarned20,
+#ImbaXPEarned21,
+#ImbaXPEarned22,
+#ImbaXPEarned23
+{
+	visibility: collapse;
+}
+
+#ImbaLvl0,
+#ImbaLvl1,
+#ImbaLvl2,
+#ImbaLvl3,
+#ImbaLvl4,
+#ImbaLvl5,
+#ImbaLvl6,
+#ImbaLvl7,
+#ImbaLvl8,
+#ImbaLvl9,
+#ImbaLvl10,
+#ImbaLvl11,
+#ImbaLvl12,
+#ImbaLvl13,
+#ImbaLvl14,
+#ImbaLvl15,
+#ImbaLvl16,
+#ImbaLvl17,
+#ImbaLvl18,
+#ImbaLvl19,
+#ImbaLvl20,
+#ImbaLvl21,
+#ImbaLvl22,
+#ImbaLvl23
+{
+
+	font-family: Radiance,FZKai-Z03,TH Sarabun New,YDYGO 540;
+	font-size: 16px;
+	align: center bottom;
+	color: #c3b9d8;
+	/*font-size: 16px;
+	font-weight: bold;
+	margin-top: 2px;
+	margin-left: 3%;
+	color: white;
+	align: left center;
+	opacity: 0.75;*/
+}
+
+#XPProgressBar0,
+#XPProgressBar1,
+#XPProgressBar2,
+#XPProgressBar3,
+#XPProgressBar4,
+#XPProgressBar5,
+#XPProgressBar6,
+#XPProgressBar7,
+#XPProgressBar8,
+#XPProgressBar9,
+#XPProgressBar10,
+#XPProgressBar11,
+#XPProgressBar12,
+#XPProgressBar13,
+#XPProgressBar14,
+#XPProgressBar15,
+#XPProgressBar16,
+#XPProgressBar17,
+#XPProgressBar18,
+#XPProgressBar19,
+#XPProgressBar20,
+#XPProgressBar21,
+#XPProgressBar22,
+#XPProgressBar23
+{
+	width: 100%;
+	height: 20px;
+	vertical-align: bottom;
+	horizontal-align: center;
+	flow-children: right;
+}
+
+#XPProgressBar0_Left,
+#XPProgressBar1_Left,
+#XPProgressBar2_Left,
+#XPProgressBar3_Left,
+#XPProgressBar4_Left,
+#XPProgressBar5_Left,
+#XPProgressBar6_Left,
+#XPProgressBar7_Left,
+#XPProgressBar8_Left,
+#XPProgressBar9_Left,
+#XPProgressBar10_Left,
+#XPProgressBar11_Left,
+#XPProgressBar12_Left,
+#XPProgressBar13_Left,
+#XPProgressBar14_Left,
+#XPProgressBar15_Left,
+#XPProgressBar16_Left,
+#XPProgressBar17_Left,
+#XPProgressBar18_Left,
+#XPProgressBar19_Left,
+#XPProgressBar20_Left,
+#XPProgressBar21_Left,
+#XPProgressBar22_Left,
+#XPProgressBar23_Left
+{
+	background-color: gradient( linear,  100% 0%, 0 0 , from (#3e3060), color-stop( 0.5, #58418b ), to(#3e3060));
+	border-radius: 50px 0 0 50px;
+	border-top: 0px;
+}
+
+#XPProgressBar0_Right,
+#XPProgressBar1_Right,
+#XPProgressBar2_Right,
+#XPProgressBar3_Right,
+#XPProgressBar4_Right,
+#XPProgressBar5_Right,
+#XPProgressBar6_Right,
+#XPProgressBar7_Right,
+#XPProgressBar8_Right,
+#XPProgressBar9_Right,
+#XPProgressBar10_Right,
+#XPProgressBar11_Right,
+#XPProgressBar12_Right,
+#XPProgressBar13_Right,
+#XPProgressBar14_Right,
+#XPProgressBar15_Right,
+#XPProgressBar16_Right,
+#XPProgressBar17_Right,
+#XPProgressBar18_Right,
+#XPProgressBar19_Right,
+#XPProgressBar20_Right,
+#XPProgressBar21_Right,
+#XPProgressBar22_Right,
+#XPProgressBar23_Right
+{
+	background-color: #2d2839;
+	border-radius:  0 50px 50px 0;
+}
+
+#XPProgressBarContainer0,
+#XPProgressBarContainer1,
+#XPProgressBarContainer2,
+#XPProgressBarContainer3,
+#XPProgressBarContainer4,
+#XPProgressBarContainer5,
+#XPProgressBarContainer6,
+#XPProgressBarContainer7,
+#XPProgressBarContainer8,
+#XPProgressBarContainer9,
+#XPProgressBarContainer10,
+#XPProgressBarContainer11,
+#XPProgressBarContainer12,
+#XPProgressBarContainer13,
+#XPProgressBarContainer14,
+#XPProgressBarContainer15,
+#XPProgressBarContainer16,
+#XPProgressBarContainer17,
+#XPProgressBarContainer18,
+#XPProgressBarContainer19,
+#XPProgressBarContainer20,
+#XPProgressBarContainer21,
+#XPProgressBarContainer22,
+#XPProgressBarContainer23
+{
+	vertical-align: bottom;
+	height: 40px;
+	width: 100%;
 }

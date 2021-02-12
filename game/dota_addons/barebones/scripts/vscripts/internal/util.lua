@@ -609,13 +609,13 @@ function TeleportHero(hero, point, delay)
 
 	local TeleportEffect
 	local TeleportEffectEnd
+
 	if delay > 0 then
---		print("TP effects:", CustomNetTables:GetTableValue("battlepass_item_effects", tostring(hero:GetPlayerID())).teleport)
-		TeleportEffect = ParticleManager:CreateParticle(CustomNetTables:GetTableValue("battlepass_item_effects", tostring(hero:GetPlayerID())).teleport["effect1"], PATTACH_ABSORIGIN, hero)
+		TeleportEffect = ParticleManager:CreateParticle("particles/items2_fx/teleport_start.vpcf", PATTACH_ABSORIGIN, hero, hero)
 		ParticleManager:SetParticleControlEnt(TeleportEffect, PATTACH_ABSORIGIN, hero, PATTACH_ABSORIGIN, "attach_origin", pos, true)
 		hero:Attribute_SetIntValue( "effectsID", TeleportEffect )
 
-		TeleportEffectEnd = ParticleManager:CreateParticle(CustomNetTables:GetTableValue("battlepass_item_effects", tostring(hero:GetPlayerID())).teleport["effect2"], PATTACH_ABSORIGIN, hero)
+		TeleportEffectEnd = ParticleManager:CreateParticle("particles/items2_fx/teleport_end.vpcf", PATTACH_ABSORIGIN, hero, hero)
 		ParticleManager:SetParticleControlEnt(TeleportEffect, PATTACH_ABSORIGIN, hero, PATTACH_ABSORIGIN, "attach_origin", point, true)
 		ParticleManager:SetParticleControl(TeleportEffectEnd, 1, point)
 		hero:Attribute_SetIntValue( "effectsID", TeleportEffect )

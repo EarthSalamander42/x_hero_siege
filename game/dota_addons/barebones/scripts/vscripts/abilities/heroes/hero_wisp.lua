@@ -24,7 +24,7 @@ function wisp_pick_random_hero:OnSpellStart()
 		UTIL_Remove(IsAvailableHero)
 	end
 
-	local particle = ParticleManager:CreateParticle(CustomNetTables:GetTableValue("battlepass_item_effects", tostring(self:GetCaster():GetPlayerID())).tome_stats["effect1"], PATTACH_ABSORIGIN_FOLLOW, self:GetCaster())
+	local particle = ParticleManager:CreateParticle("particles/generic_hero_status/hero_levelup.vpcf", PATTACH_ABSORIGIN_FOLLOW, self:GetCaster(), self:GetCaster())
 	ParticleManager:SetParticleControl(particle, 0, self:GetCaster():GetAbsOrigin())
 
 	EmitSoundOnClient("ui.trophy_levelup", PlayerResource:GetPlayer(self:GetCaster():GetPlayerID()))

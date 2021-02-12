@@ -1,14 +1,41 @@
 <root>
 	<styles>
 		<include src="file://{resources}/styles/dotastyles.vcss_c" />
-		<include src="file://{resources}/styles/custom_game/battlepass.css" />
+		<include src="file://{resources}/layout/custom_game/frostrose_battlepass/battlepass.css" />
 	</styles>
 
 	<scripts>
 		<include src="file://{resources}/scripts/custom_game/util.js" />
 		<include src="file://{resources}/scripts/custom_game/api.js" />
-		<include src="file://{resources}/scripts/custom_game/battlepass.js" />
+		<include src="file://{resources}/layout/custom_game/frostrose_battlepass/battlepass.js" />
 	</scripts>
+
+	<snippets>
+		<snippet name="BattlePassReward">
+			<Panel class="BattlepassReward BattlepassRewardIcon">
+				<Panel id="SlashContainer" hittest="false" hittestchildren="false">
+					<Panel id="TeamColorBar" />
+				</Panel>
+
+				<Panel id="ToastElements" >
+					<Label id="ToastLabel" html="true" />
+				</Panel>
+
+				<Panel id="BattlepassRewardTitleContainer" class="BattlepassRewardTitleContainer" hittest="false">
+					<Label id="BattlepassRewardTitle" class="BattlepassRewardTitle" hittest="false"/>
+					<Label id="BattlepassRewardRarity" class="BattlepassRewardRarity" hittest="false"/>
+				</Panel>
+
+				<Panel id="BattlepassRewardImage" class="BattlepassRewardImage">
+					<Panel id="BattlepassRewardImageLabelContainer" class="BattlepassRewardImageLabelContainer">
+<!--
+						<Label id="BattlepassRewardImageLabel" class="BattlepassRewardImageLabel" text="#bp_reward_equip_description" hittest="false"/>
+-->
+					</Panel>
+				</Panel>
+			</Panel>
+		</snippet>
+	</snippets>
 
 	<Panel class="Battlepass" hittest="false">
 		<Panel id="BattlepassButtonContainer">
@@ -60,6 +87,7 @@
 						<Label id="MaxLevelValue" class="ImbaGameInfoLabel" text="" />
 					</Panel>
 				</Panel>
+
 				<Panel id="TabsButtonWrapper" hittest="false">
 					<Panel id="TabButtonContainer" hittest="false">
 						<Button class="color_animation" id="BattlepassTabButton" onactivate="SwitchTab('BattlepassInfoContainer');">
@@ -78,7 +106,26 @@
 						</Button>
 					</Panel>
 
+					<Button id="CompanionNotification" onactivate="DOTADisplayURL('https://www.patreon.com/bePatron?u=2533325');">
+						<Label id="CompanionNotificationLabel"/>
+					</Button>
+
 					<Panel id="MiniTabButtonContainer" class="MiniTabButtonContainer" hittest="false">
+						<Button class="sub_nav_tab" id="LeaderboardExperienceTabButton">
+							<Label class="text" text="Overview" />
+						</Button>
+
+						<Panel hittest="false" class="tab_separator">
+							<Label text="/" />
+						</Panel>
+
+						<Panel class="sub_nav_tab">
+							<Button class="RefreshBattlepass" onactivate="RefreshBattlepass()"/>
+							<Label class="text" text="#battlepass_refresh" />
+						</Panel>
+					</Panel>
+
+					<Panel id="MiniTabButtonContainer2" class="MiniTabButtonContainer" hittest="false">
 <!--
 						<Button class="sub_nav_tab" id="PatreonTabButton" onactivate="SwitchDonatorWrapper('Patreon');">
 							<Label class="text" text="#donator_patreon" />
@@ -107,9 +154,18 @@
 						<Button class="sub_nav_tab" id="EmblemTabButton" onactivate="SwitchDonatorWrapper('Emblem');">
 							<Label class="text" text="#donator_emblem" />
 						</Button>
+
+						<Panel hittest="false" class="tab_separator">
+							<Label text="/" />
+						</Panel>
+
+						<Panel class="sub_nav_tab">
+							<Button class="RefreshBattlepass" onactivate="RefreshBattlepass()"/>
+							<Label class="text" text="#battlepass_refresh" />
+						</Panel>
 					</Panel>
 
-					<Panel id="MiniTabButtonContainer2" class="MiniTabButtonContainer" hittest="false">
+					<Panel id="MiniTabButtonContainer3" class="MiniTabButtonContainer" hittest="false">
 						<Button class="sub_nav_tab" id="LeaderboardExperienceTabButton" onactivate="SwitchLeaderboardWrapper('Experience');">
 							<Label class="text" text="#leaderboard_xp" />
 						</Button>
@@ -138,39 +194,41 @@
 							<Label class="text" text="#mutation_diretide" />
 						</Button>
 -->
+
+						<Panel hittest="false" class="tab_separator">
+							<Label text="/" />
+						</Panel>
+
+						<Panel class="sub_nav_tab">
+							<Button class="RefreshBattlepass" onactivate="RefreshBattlepass()"/>
+							<Label class="text" text="#battlepass_refresh" />
+						</Panel>
 					</Panel>
 				</Panel>
 			</Panel>
 
 			<Panel id="BattlepassInfoContainer" hittest="false">
 				<Panel id="ComingSoonPanel">
-					<Label id="ComingSoon" text="#coming_soon" />
+					<Label id="ComingSoon" text="#bp_reward_equip_description" />
 				</Panel>
 
-				<Panel id="BattlepassButtons" hittest="false">
-					<Button class="BattlepassButton" onactivate="RefreshBattlepass();">
-						<Panel id="RefreshBattlepass" onactivate="RefreshBattlepass();"/>
-						<Label id="RefreshLabel" text="#battlepass_refresh"/>
-					</Button>
-				</Panel>				
-				<!-- JS Inserts records here -->
+				<Panel id="BattlepassRewardContainer" hittest="true">
+					<Panel id="BattlepassPlayerRow" class="BattlepassPlayerRow" hittest="false">
+<!--						<DOTAAvatarImage id="PlayerSteamAvatar" hittest="false"/> -->
+
+						<Panel id="PanelImbaXP" class="ScoreCol_ImbaXP ScoreboardPanel"/>
+					</Panel>
+
+					<Panel id="BattlepassRewardRow" class="BattlepassRow" hittest="false">
+						<!-- JS Inserts records here -->
+					</Panel>
+				</Panel>
 			</Panel>
 
 			<Panel id="DonatorInfoContainer" hittest="false">
 				<Panel id="TabTitlePanel">
 					<Label id="DonatorTabTitle" class="DonatorTabLabel" text="#donator_info" />
 				</Panel>
-
-				<Panel id="BattlepassButtons" hittest="false">
-					<Button class="BattlepassButton" onactivate="RefreshBattlepass();">
-						<Panel id="RefreshBattlepass" onactivate="RefreshBattlepass();"/>
-						<Label id="RefreshLabel" text="#battlepass_refresh"/>
-					</Button>
-				</Panel>
-
-				<Button id="CompanionNotification" onactivate="DOTADisplayURL('https://www.patreon.com/bePatron?u=2533325');">
-					<Label id="CompanionNotificationLabel"/>
-				</Button>
 <!--
 				<Panel id="PatreonTableWrapper" hittest="false">
 					<Panel id="Donator1" class="patreon_donator_row" hittest="false">
@@ -221,8 +279,12 @@
 			<Panel id="LeaderboardInfoContainer" hittest="false">
 				<Panel id="LeaderboardExperienceTableWrapper" class="LeaderboardTableWrapper" hittest="false">
 					<Panel id="Legend" class="LeaderboardLegend" hittest="false">
-						<Label id="Rank" class="LeaderboardRank" text="#leaderboard_rank" />
-						<Label id="SteamAvatar" class="LeaderboardAvatar" text="#leaderboard_steam_avatar" />
+						<Button id="Rank" class="LeaderboardRank" onactivate="">
+							<Label id="Rank" class="LeaderboardRankLabel" text="#leaderboard_rank" />
+						</Button>
+						<Button id="SteamAvatar" class="LeaderboardAvatar" onactivate="">
+							<Label id="SteamAvatar" class="LeaderboardAvatarLabel" text="#leaderboard_steam_avatar" />
+						</Button>
 						<Button id="XP" class="LeaderboardXP" onactivate="">
 							<Label class="LeaderboardButtonLabel" text="#leaderboard_xp" />
 						</Button>
@@ -238,8 +300,12 @@
 
 				<Panel id="LeaderboardDonatorTableWrapper" class="LeaderboardTableWrapper" hittest="false">
 					<Panel id="Legend" class="LeaderboardLegend" hittest="false">
-						<Label id="Rank" class="LeaderboardRank" text="#leaderboard_rank" />
-						<Label id="SteamAvatar" class="LeaderboardAvatar" text="#leaderboard_steam_avatar" />
+						<Button id="Rank" class="LeaderboardRank" onactivate="">
+							<Label id="Rank" class="LeaderboardRankLabel" text="#leaderboard_rank" />
+						</Button>
+						<Button id="SteamAvatar" class="LeaderboardAvatar" onactivate="">
+							<Label id="SteamAvatar" class="LeaderboardAvatarLabel" text="#leaderboard_steam_avatar" />
+						</Button>
 						<Button id="XP" class="LeaderboardXP" onactivate="">
 							<Label class="LeaderboardButtonLabel" text="#leaderboard_xp" />
 						</Button>

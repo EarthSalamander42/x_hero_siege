@@ -43,6 +43,8 @@
 		//Fuck that levelup button
 		newUI.FindChildTraverse("level_stats_frame").style.visibility = "collapse";
 
+		newUI.FindChildTraverse("AghsStatusContainer").style.visibility = "collapse";
+
 		//Skin Killer - TopBar
 		var topbar = hudElements.FindChildTraverse("topbar");
 		topbar.FindChildTraverse("HUDSkinTopBarBG").style.visibility = "collapse";
@@ -162,7 +164,7 @@
 		<CustomUIElement type="GameInfo" layoutfile="file://{resources}/layout/custom_game/game_info.xml" />
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/barebones_notifications.xml" />
 <!--	<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/barebones_attachments.xml" /> -->
-		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/battlepass.xml" />
+		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/frostrose_battlepass/battlepass.xml" />
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/hud_hero_demo.xml" /> 
 <!--	<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/precache.xml" /> -->
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/boss_healthbar.xml" />
