@@ -1078,7 +1078,7 @@ ListenToGameEvent('entity_killed', function(keys)
 		end
 
 		-- add kills to the hero who spawned a controlled unit, or an illusion
-		if killer:IsRealHero() or killer:IsIllusion() then
+		if killer:IsRealHero() or killer:IsIllusion() or IsValidEntity(killer:GetPlayerOwner()) then
 			if killer:GetTeamNumber() == 2 then
 				if killedUnit:GetTeamNumber() == 6 then
 					if killer:IsIllusion() then
@@ -1092,13 +1092,18 @@ ListenToGameEvent('entity_killed', function(keys)
 							end
 						end
 					elseif IsValidEntity(killer:GetPlayerOwner()) then
+						if PlayerResource:HasSelectedHero(killer:GetPlayerOwnerID()) then
+							killer = PlayerResource:GetSelectedHeroEntity(killer:GetPlayerOwnerID())
+						else
+							return
+						end
+
 						--plays a particle and add a kill when a hero kills an enemy unit
 						EmitSoundOnClient("Dungeon.LastHit", killer:GetPlayerOwner())
 						ParticleManager:ReleaseParticleIndex(ParticleManager:CreateParticleForPlayer("particles/darkmoon_last_hit_effect.vpcf", PATTACH_ABSORIGIN_FOLLOW, killedUnit, killer:GetPlayerOwner()))
 
-						if PlayerResource:HasSelectedHero(killer:GetPlayerOwnerID()) then
-							killer:IncrementKills(1)
-						end
+						killer:IncrementKills(1)
+
 						for _, Zone in pairs(GameMode.Zones) do
 							if Zone:ContainsUnit(killer) then
 								Zone:AddStat(killer:GetPlayerID(), ZONE_STAT_KILLS, 1)

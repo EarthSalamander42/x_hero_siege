@@ -130,7 +130,7 @@ local casterAngles = caster:GetAngles()
 		-- Recreate the items of the caster
 		for itemSlot = 0, 5 do
 			local item = caster:GetItemInSlot(itemSlot)
-			if item and item:GetName() ~= "item_ankh_of_reincarnation" and item:GetName() ~= "item_shield_of_invincibility" and item:GetName() ~= "item_cloak_of_flames" and item:GetName() ~= "item_orb_of_fire" and item:GetName() ~= "item_orb_of_fire2" and item:GetName() ~= "item_searing_blade" then
+			if item and item:GetName() ~= "item_ankh_of_reincarnation" and item:GetName() ~= "item_shield_of_invincibility" and item:GetName() ~= "item_xhs_cloak_of_flames" and item:GetName() ~= "item_orb_of_fire" and item:GetName() ~= "item_orb_of_fire2" and item:GetName() ~= "item_searing_blade" then
 				local newItem = CreateItem(item:GetName(), double, double)
 				double:AddItem(newItem)
 			end

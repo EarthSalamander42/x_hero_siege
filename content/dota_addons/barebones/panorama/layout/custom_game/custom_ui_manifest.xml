@@ -58,7 +58,7 @@
 
 		var TopBarRadiantTeam = hudElements.FindChildTraverse("TopBarRadiantTeam");
 		TopBarRadiantTeam.style.width = "320px";
-		TopBarRadiantTeam.style.marginRight = "191px";
+		TopBarRadiantTeam.style.marginRight = "189px";
 
 		var topbarRadiantPlayers = hudElements.FindChildTraverse("TopBarRadiantPlayers");
 		topbarRadiantPlayers.style.width = "275px";

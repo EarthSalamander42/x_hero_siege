@@ -1,8 +1,8 @@
 function Furbolg(keys)
-local caster = keys.caster
-local ability = keys.ability
-local duration = ability:GetSpecialValueFor("duration")
-local caster_origin = caster:GetAbsOrigin()
+	local caster = keys.caster
+	local ability = keys.ability
+	local duration = ability:GetSpecialValueFor("duration")
+	local caster_origin = caster:GetAbsOrigin()
 
 	caster:EmitSound("Hero_Ursa.Earthshock")
 
