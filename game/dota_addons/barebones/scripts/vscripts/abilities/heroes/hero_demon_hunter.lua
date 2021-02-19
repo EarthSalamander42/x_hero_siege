@@ -11,9 +11,10 @@ end
 --------------------------------------
 
 LinkLuaModifier("modifier_xhs_vampiric_aura", "abilities/heroes/hero_demon_hunter.lua", LUA_MODIFIER_MOTION_NONE)
-LinkLuaModifier("modifier_xhs_vampiric_aura_buff", "abilities/heroes/hero_demon_hunter.lua", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_lifesteal", "modifiers/modifier_lifesteal.lua", LUA_MODIFIER_MOTION_NONE)
 
 xhs_vampiric_aura = xhs_vampiric_aura or class({})
+holdout_muradin_hammer = xhs_vampiric_aura
 
 function xhs_vampiric_aura:GetAbilityTextureName()
 	return "custom/holdout_thirst_aura"
@@ -63,56 +64,14 @@ end
 function modifier_xhs_vampiric_aura:GetAuraSearchType()
 	return DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC
 end
---[[
-function modifier_xhs_vampiric_aura:GetAuraEntityReject(target)
-	if IsServer() then
-		for _, modifier in ipairs(_G.XHS_LIFESTEAL_MODIFIER_PRIORITY) do
-			if target:HasModifier(modifier) then
-				return true
-			end
-		end
-	end
 
-	return false
-end
---]]
 function modifier_xhs_vampiric_aura:GetModifierAura()
-	return "modifier_xhs_vampiric_aura_buff"
+	return "modifier_lifesteal"
 end
 
 function modifier_xhs_vampiric_aura:IsAura() return true end
 function modifier_xhs_vampiric_aura:IsDebuff() return false end
-function modifier_xhs_vampiric_aura:IsHidden() return true end
-
-modifier_xhs_vampiric_aura_buff = class({})
-
-function modifier_xhs_vampiric_aura_buff:IsHidden() return false end
-function modifier_xhs_vampiric_aura_buff:IsPurgable() return false end
-function modifier_xhs_vampiric_aura_buff:IsDebuff() return false end
-
-function modifier_xhs_vampiric_aura_buff:GetTexture()
-	return "custom/holdout_thirst_aura"
-end
-
-function modifier_xhs_vampiric_aura_buff:DeclareFunctions()
-	return {
-		MODIFIER_EVENT_ON_ATTACK_LANDED
-	}
-end
-
-function modifier_xhs_vampiric_aura_buff:OnAttackLanded(keys)
-	if IsServer() then
-		if self:GetParent() == keys.attacker then
-			if not self:GetParent():HasItemInInventory("item_lifesteal_mask") or not self:GetParent():HasItemInInventory("item_lightning_sword") or not self:GetParent():HasItemInInventory("item_doom_artifact") then
-				self:GetParent():Lifesteal(keys.target, self)
-			end
-		end
-	end
-end
-
-function modifier_xhs_vampiric_aura_buff:GetModifierLifesteal()
-	return self:GetAbility():GetSpecialValueFor("lifesteal_pct")
-end
+function modifier_xhs_vampiric_aura:IsHidden() return false end
 
 -------------------------------------------------------
 

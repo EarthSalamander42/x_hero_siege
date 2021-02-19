@@ -23,8 +23,6 @@ end, nil)
 ListenToGameEvent('npc_spawned', function(event)
 	local npc = EntIndexToHScript(event.entindex)
 
-	print(npc:GetUnitName())
-
 	if npc.bp_init == true then return end
 	npc.bp_init = true
 
@@ -40,7 +38,6 @@ ListenToGameEvent('npc_spawned', function(event)
 		npc:SetupHealthBarLabel(donator_level, ply_table)
 		return
 	elseif npc:IsRealHero() then
-		print(ply_table)
 		if ply_table and ply_table.bp_rewards == 0 then
 			return
 		end
@@ -66,11 +63,6 @@ ListenToGameEvent('npc_spawned', function(event)
 							Battlepass:DonatorCompanion(npc:GetPlayerID(), api:GetPlayerCompanion(npc:GetPlayerID()).file)
 						end
 					end)
-				end
-
-				if CUSTOM_GAME_TYPE == "XHS" then
-					local vip_ability = npc:AddAbility("holdout_vip")
-					vip_ability:SetLevel(1)
 				end
 			end
 		end

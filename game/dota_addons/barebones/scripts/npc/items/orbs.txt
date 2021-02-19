@@ -156,7 +156,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"ID"							"2540"
 		"BaseClass"             		"item_datadriven"
-		"Model"							"models/props_gameplay/recipe.mdl"
+		"Model"							"models/props_gameplay/recipe.vmdl"
 		"AbilityTextureName"			"custom/recipe"
 		
 		// Item Info
@@ -459,7 +459,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"ID"							"2539"
 		"BaseClass"             		"item_datadriven"
-		"Model"							"models/props_gameplay/recipe.mdl"
+		"Model"							"models/props_gameplay/recipe.vmdl"
 		"AbilityTextureName"			"custom/recipe"
 		
 		// Item Info
@@ -621,7 +621,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"ID"							"2515"
 		"BaseClass"             		"item_datadriven"
-		"Model"							"models/props_gameplay/recipe.mdl"
+		"Model"							"models/props_gameplay/recipe.vmdl"
 		"AbilityTextureName"			"custom/recipe"
 		
 		// Item Info
@@ -1027,7 +1027,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"ID"							"2544"
 		"BaseClass"             		"item_datadriven"
-		"Model"							"models/props_gameplay/recipe.mdl"
+		"Model"							"models/props_gameplay/recipe.vmdl"
 		"AbilityTextureName"			"custom/recipe"
 
 		// Item Info

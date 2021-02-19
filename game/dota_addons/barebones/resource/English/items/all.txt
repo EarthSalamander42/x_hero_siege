@@ -24,14 +24,11 @@
 "DOTA_Tooltip_modifier_healing_ward_datadriven_Description"		"Heals all friendly units in radius."
 
 "DOTA_Tooltip_ability_item_lightning_sword"								"<font color='#2a7fbf'>Lightning Sword</font>"
-"DOTA_Tooltip_ability_item_lightning_sword_Description"					"<h1><font color='#FF7800'>Passive:</h1> Grants lifesteal and bonus damage.</font>"
+"DOTA_Tooltip_ability_item_lightning_sword_Description"					"<h1><font color='#FF7800'>Passive:</h1> Grants lifesteal and bonus damage.</font>\n<h1><font color='#FF0000'>Restrictions:</font></h1> Does not stack with other sources of lifesteal."
 "DOTA_Tooltip_ability_item_lightning_sword_Lore"						"A simple sword, enhanced by Muradin's powers, for Ramero to wield in combat."
 "DOTA_Tooltip_ability_item_lightning_sword_bonus_damage"				"BONUS DAMAGE:"
 "DOTA_Tooltip_ability_item_lightning_sword_lifesteal_pct"				"%LIFESTEAL:"
 // "DOTA_Tooltip_ability_item_lightning_sword_bonus_armor"				"BONUS ARMOR:"
-
-"DOTA_Tooltip_modifier_lifesteal_lightning_sword"						"Lifesteal"
-"DOTA_Tooltip_modifier_lifesteal_lightning_sword_Description"			"Healed when attacking enemies."
 
 "DOTA_Tooltip_modifier_lifesteal"										"Lifesteal"
 "DOTA_Tooltip_modifier_lifesteal_Description"							"Healed when attacking enemies."
@@ -139,7 +136,7 @@
 "DOTA_Tooltip_modifier_orb_of_lightning_slow_Description"		"Rooted and disarmed!"
 
 "DOTA_Tooltip_Ability_item_lifesteal_mask"						"Mask of Death"
-"DOTA_Tooltip_ability_item_lifesteal_mask_Description"			"<h1><font color='#FF7800'>Passive:</h1> Grants lifesteal.</font>"
+"DOTA_Tooltip_ability_item_lifesteal_mask_Description"			"<h1><font color='#FF7800'>Passive:</h1> Grants lifesteal.</font>\n<h1><font color='#FF0000'>Restrictions:</font></h1> Does not stack with other sources of lifesteal."
 "DOTA_Tooltip_Ability_item_lifesteal_mask_lifesteal_pct"		"%LIFESTEAL:"
 "DOTA_Tooltip_ability_item_lifesteal_mask_Note0"				"Lifesteal based on Damage Received by the Target. High Armor Target will give less Healing."
 

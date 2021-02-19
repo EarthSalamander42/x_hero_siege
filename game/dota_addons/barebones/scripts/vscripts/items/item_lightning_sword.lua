@@ -6,7 +6,6 @@
 -----------------------
 
 LinkLuaModifier("modifier_lightning_sword_unique", "items/item_lightning_sword.lua", LUA_MODIFIER_MOTION_NONE)
-LinkLuaModifier("modifier_lifesteal_lightning_sword", "items/item_lightning_sword.lua", LUA_MODIFIER_MOTION_NONE)
 
 item_lightning_sword = item_lightning_sword or class({})
 
@@ -45,19 +44,20 @@ function modifier_lightning_sword_unique:OnCreated()
 		end
 	end
 
-	if not self:GetParent():HasModifier("modifier_lifesteal_lightning_sword") then
-		self:GetParent():AddNewModifier(self:GetParent(), self:GetAbility(), "modifier_lifesteal_lightning_sword", {})
-	end
+	self:GetParent():AddNewModifier(self:GetParent(), self:GetAbility(), "modifier_lifesteal", {})
 end
 
-function modifier_lightning_sword_unique:OnDestroy()
+function modifier_lightning_sword_unique:OnRemoved()
 	if IsServer() then
 		if not self:GetParent():IsIllusion() then
 			self:GetParent().has_epic_3 = false
 		end
 
-		if self:GetParent():HasModifier("modifier_lifesteal_lightning_sword") then
-			self:GetParent():RemoveModifierByName("modifier_lifesteal_lightning_sword")
+		for k, v in pairs(self:GetParent():FindAllModifiersByName("modifier_lifesteal")) do
+			if v:GetAbility() == self:GetAbility() or v:GetAbility() == nil then
+				v:Destroy()
+				-- don't break in case multiple modifiers were added with Lightning Sword as ability (bug happens sometimes because modifier_lifesteal is not an intrinsic modifier here)
+			end
 		end
 	end
 end
@@ -68,47 +68,4 @@ end
 
 function modifier_lightning_sword_unique:GetModifierPreAttack_BonusDamage()
 	return self:GetAbility():GetSpecialValueFor("bonus_damage")
-end
-
-modifier_lifesteal_lightning_sword = class({})
-
-function modifier_lifesteal_lightning_sword:IsHidden() return false end
-function modifier_lifesteal_lightning_sword:IsPurgable() return false end
-function modifier_lifesteal_lightning_sword:IsDebuff() return false end
-function modifier_lifesteal_lightning_sword:RemoveOnDeath() return false end
-
-function modifier_lifesteal_lightning_sword:GetTexture()
-	return "modifiers/lightning_sword"
-end
-
-function modifier_lifesteal_lightning_sword:DeclareFunctions()
-	return {
-		MODIFIER_EVENT_ON_ATTACK_LANDED
-	}
-end
-
-function modifier_lifesteal_lightning_sword:OnAttackLanded(keys)
-	if IsServer() then
-
-		if not self or not self:GetParent() or not keys.target then self:OnDestroy() return end
-
-		if self:GetParent() == keys.attacker then
-			self:GetParent():Lifesteal(keys.target, self)
-		end
-	end
-end
-
-function modifier_lifesteal_lightning_sword:GetModifierLifesteal()
-	if not self or not self:GetAbility() then self:OnDestroy() return end
-
-	return self:GetAbility():GetSpecialValueFor("lifesteal_pct")
-end
-
-function modifier_lifesteal_lightning_sword:OnDestroy()
-	if IsServer() then
-		-- fix with Vampiric Aura interaction
-		if self:GetParent():HasItemInInventory("item_lifesteal_mask") or self:GetParent():HasItemInInventory("item_lightning_sword") or self:GetParent():HasItemInInventory("item_doom_artifact") then
-			self:GetParent():AddNewModifier(self:GetParent(), self, "modifier_lifesteal_lightning_sword", {})
-		end
-	end
 end

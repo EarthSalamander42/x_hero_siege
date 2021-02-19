@@ -705,56 +705,6 @@
 "DOTA_Tooltip_ability_holdout_rain_of_chaos_20_radius_explosion"		"METEOR RADIUS:"
 
 
-//DEMONHUNTER
-"DOTA_Tooltip_ability_holdout_negative_energy"							"Negative Energy"
-"DOTA_Tooltip_ability_holdout_negative_energy_Description"				"Sends a bolt of negative energy, dealing damage to the target unit."
-"DOTA_Tooltip_ability_holdout_negative_energy_Lore"						""
-"DOTA_Tooltip_ability_holdout_negative_energy_Note0"					"This skill doesn't affect mechanical units."
-"DOTA_Tooltip_ability_holdout_negative_energy_damage"					"DAMAGE:"
-"DOTA_Tooltip_ability_holdout_negative_energy_damage_delay"				"DAMAGE DELAY:"
-
-"DOTA_Tooltip_ability_holdout_active_immolation"						"Immolation"
-"DOTA_Tooltip_ability_holdout_active_immolation_Description"			"Engulfs the Demon Hunter in flames, causing damage to nearby enemy units."
-"DOTA_Tooltip_ability_holdout_active_immolation_Lore"					"Of the rituals learned at the Isle of Masks, tending wounds with a bit of voodoo magic has proven to be quite useful."
-"DOTA_Tooltip_ability_holdout_active_immolation_Note0"					"Immolation drains mana until deactivated or not enough mana."
-"DOTA_Tooltip_ability_holdout_active_immolation_damage_per_tick"		"DAMAGE PER SECOND:"
-"DOTA_Tooltip_ability_holdout_active_immolation_radius"					"RADIUS:"
-
-"DOTA_Tooltip_ability_xhs_vampiric_aura"							"Vampiric Aura"
-"DOTA_Tooltip_ability_xhs_vampiric_aura_Description"				"Nearby friendly units gain hit points when they hit enemy units.\n<font color='#FF7800'>WARNING: Does NOT stack with other Unique Attack Modifiers.</font>"
-"DOTA_Tooltip_ability_xhs_vampiric_aura_Lore"						""
-"DOTA_Tooltip_ability_xhs_vampiric_aura_aura_radius"				"RADIUS:"
-"DOTA_Tooltip_ability_xhs_vampiric_aura_lifesteal_pct"				"%LIFESTEAL:"
-
-"DOTA_Tooltip_modifier_xhs_vampiric_aura_buff"						"Lifesteal"
-"DOTA_Tooltip_modifier_xhs_vampiric_aura_buff_Description"			"Healed when attacking enemies."
-
-"DOTA_Tooltip_ability_holdout_illidan_evasion"							"Evasion"
-"DOTA_Tooltip_ability_holdout_illidan_evasion_Description"				"Gives a percent chance to avoid attacks."
-"DOTA_Tooltip_ability_holdout_illidan_evasion_Lore"						"'The fruits of discipline; with practice comes evasion.'"
-"DOTA_Tooltip_ability_holdout_illidan_evasion_bonus_evasion"			"%EVASION:"
-
-"DOTA_Tooltip_ability_holdout_roar"										"Roar"
-"DOTA_Tooltip_ability_holdout_roar_Description"							"Increase allies damage by 25 percent."
-"DOTA_Tooltip_ability_holdout_roar_bonus_damage_percentage"				"%BONUS DAMAGE:"
-"DOTA_Tooltip_ability_holdout_roar_bonus_armor"							"BONUS ARMOR:"
-"DOTA_Tooltip_ability_holdout_roar_duration"							"DURATION:"
-
-"DOTA_Tooltip_modifier_roar"							"Roar"
-"DOTA_Tooltip_modifier_roar_Description"				"Grants bonus damage % and armor."
-
-"DOTA_Tooltip_ability_holdout_metamorphosis"								"Metamorphosis"
-"DOTA_Tooltip_ability_holdout_metamorphosis_Description"					"Transforms the Demon Hunter into a powerful Demon with a ranged attack and maximum movement speed."
-"DOTA_Tooltip_ability_holdout_metamorphosis_Lore"							""
-"DOTA_Tooltip_ability_holdout_metamorphosis_duration"						"DURATION:"
-"DOTA_Tooltip_ability_holdout_metamorphosis_transformation_time"			"TRANSFORMATION TIME:"
-"DOTA_Tooltip_ability_holdout_metamorphosis_base_attack_time"				"BASE ATTACK TIME:"
-"DOTA_Tooltip_ability_holdout_metamorphosis_tooltip_attack_range"			"ATTACK RANGE:"
-"DOTA_Tooltip_ability_holdout_metamorphosis_radius"							"CLEAVE RADIUS:"
-"DOTA_Tooltip_ability_holdout_metamorphosis_cleave_pct"				"%CLEAVE DAMAGE:"
-"DOTA_Tooltip_ability_holdout_metamorphosis_bonus_damage"					"%BONUS DAMAGE:"
-
-
 //DRYAD ( Tyrande )
 "DOTA_Tooltip_ability_holdout_evasion"							"Evasion"
 "DOTA_Tooltip_ability_holdout_evasion_Description"				"Tyrande focuses inward, increasing her ability to evade enemy attacks.\n\nStacks diminishingly with other sources of Evasion."
@@ -1003,56 +953,6 @@
 "DOTA_Tooltip_ability_holdout_war_club_20_range"						"ATTACK RANGE:"
 "DOTA_Tooltip_ability_holdout_war_club_20_radius"						"SPLASH RADIUS:"
 "DOTA_Tooltip_ability_holdout_war_club_20_cleave_pct"					"%SPLASH DAMAGE:"
-
-
-//MOUNTAIN KING
-"DOTA_Tooltip_ability_holdout_storm_bolt"								"Storm Bolt"
-"DOTA_Tooltip_ability_holdout_storm_bolt_Description"					"Sends a hammer to the enemy unit, dealing damage and stunning."
-"DOTA_Tooltip_ability_holdout_storm_bolt_bolt_stun_duration"			"STUN DURATION:"
-
-"DOTA_Tooltip_ability_holdout_thunder_clap"							"Thunder Clap"
-"DOTA_Tooltip_ability_holdout_thunder_clap_Description"				"Deals damage and slows attack speed and movement speed in a specific area."
-"DOTA_Tooltip_ability_holdout_thunder_clap_radius"					"RADIUS:"
-"DOTA_Tooltip_ability_holdout_thunder_clap_damage"					"DAMAGE:"
-"DOTA_Tooltip_ability_holdout_thunder_clap_movement_slow"			"%MOVEMENT SLOW:"
-"DOTA_Tooltip_ability_holdout_thunder_clap_attack_speed_slow"		"ATTACK SLOW:"
-"DOTA_Tooltip_ability_holdout_thunder_clap_duration"				"DURATION:"
-
-"DOTA_Tooltip_ability_holdout_muradin_hammer"						"Muradin's Hammer"
-"DOTA_Tooltip_ability_holdout_muradin_hammer_Description"			"Nearby friendly units gain hit points when they hit enemy units. \n<font color='#FF7800'>WARNING: Does NOT stack with other Unique Attack Modifiers.</font>"
-"DOTA_Tooltip_ability_holdout_muradin_hammer_Note0"					"Muradin's Hammer Doesn't stack with other source of lifesteal."
-"DOTA_Tooltip_ability_holdout_muradin_hammer_lifesteal_radius"		"RADIUS:"
-"DOTA_Tooltip_ability_holdout_muradin_hammer_lifesteal"				"%LIFESTEAL:"
-
-"DOTA_Tooltip_ability_holdout_thunder_spirit"							"Thunder Spirit"
-"DOTA_Tooltip_ability_holdout_thunder_spirit_Description"				"Increase the movement speed of the Hero to the maximum."
-"DOTA_Tooltip_ability_holdout_thunder_spirit_bonus_movement_speed"		"BONUS MOVEMENT SPEED:"
-
-"DOTA_Tooltip_modifier_thunder_spirit"									"Thunder Spirit"
-"DOTA_Tooltip_modifier_thunder_spirit_Description"						"Increase the movement speed of the Hero to the maximum."
-
-"DOTA_Tooltip_ability_holdout_avatar"									"Avatar"
-"DOTA_Tooltip_ability_holdout_avatar_Description"						"Mountain King turns into a rage, giving him bonus armor, hp and damage."
-"DOTA_Tooltip_ability_holdout_avatar_Lore"								"The Angerfist will fist everyone."
-"DOTA_Tooltip_ability_holdout_avatar_gods_strength_damage"				"BONUS DAMAGE:"
-"DOTA_Tooltip_ability_holdout_avatar_gods_strength_hp"					"BONUS HP:"
-"DOTA_Tooltip_ability_holdout_avatar_gods_strength_armor"				"BONUS ARMOR:"
-"DOTA_Tooltip_ability_holdout_avatar_duration"							"DURATION:"
-
-"DOTA_Tooltip_modifier_gods_strength"					"Avatar"
-"DOTA_Tooltip_modifier_gods_strength_Description"		"Turns into a rage for a short duration."
-
-"DOTA_Tooltip_ability_holdout_storm_bolt_20"							"Storm Bolt (Level 20)"
-"DOTA_Tooltip_ability_holdout_storm_bolt_20_Description"				"Sends a hammer to the enemy unit, dealing damage and stunning."
-"DOTA_Tooltip_ability_holdout_storm_bolt_20_bolt_stun_duration"			"STUN DURATION:"
-
-"DOTA_Tooltip_ability_holdout_thunder_clap_20"							"Thunder Clap (Level 20)"
-"DOTA_Tooltip_ability_holdout_thunder_clap_20_Description"				"Deals damage and slows attack speed and movement speed in a specific area."
-"DOTA_Tooltip_ability_holdout_thunder_clap_20_radius"					"RADIUS:"
-"DOTA_Tooltip_ability_holdout_thunder_clap_20_damage"					"DAMAGE:"
-"DOTA_Tooltip_ability_holdout_thunder_clap_20_movement_slow"			"%MOVEMENT SLOW:"
-"DOTA_Tooltip_ability_holdout_thunder_clap_20_attack_speed_slow"		"ATTACK SLOW:"
-"DOTA_Tooltip_ability_holdout_thunder_clap_20_duration"					"DURATION:"
 
 
 //PALADIN

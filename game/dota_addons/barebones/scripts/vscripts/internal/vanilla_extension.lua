@@ -23,36 +23,6 @@ function CDOTA_BaseNPC:GetRealDamageDone(hTarget)
 	return base_damage - (base_damage * armor_reduction)
 end
 
-function CDOTA_BaseNPC:Lifesteal(hTarget, modifier)
-	local lifesteal = self:GetLifesteal()
-	-- If there's no valid target, or lifesteal amount, do nothing
-	if hTarget:IsBuilding() or (hTarget:GetTeam() == self:GetTeam()) or lifesteal <= 0 then
-		return
-	end
-
-	for _, modifier_name in ipairs(_G.XHS_LIFESTEAL_MODIFIER_PRIORITY) do
-		if self:HasModifier(modifier:GetName()) then
-			print(_G.XHS_LIFESTEAL_MODIFIER_PRIORITY[modifier:GetName()])
-			print(_G.XHS_LIFESTEAL_MODIFIER_PRIORITY[modifier_name])
-			if _G.XHS_LIFESTEAL_MODIFIER_PRIORITY[modifier_name] < _G.XHS_LIFESTEAL_MODIFIER_PRIORITY[modifier:GetName()] then
-				return
-			end
-		end
-	end
-
-	-- Calculate actual lifesteal amount
-	local damage = self:GetRealDamageDone(hTarget)
-	if damage < 0 then return end
-	local heal = damage * lifesteal / 100
-	SendOverheadEventMessage(nil, OVERHEAD_ALERT_HEAL, self, heal, nil)
-
-	-- Heal and fire the particle
-	self:Heal(heal, self)
-	local lifesteal_pfx = ParticleManager:CreateParticle("particles/generic_gameplay/generic_lifesteal.vpcf", PATTACH_ABSORIGIN_FOLLOW, self)
-	ParticleManager:SetParticleControl(lifesteal_pfx, 0, self:GetAbsOrigin())
-	ParticleManager:ReleaseParticleIndex(lifesteal_pfx)
-end
-
 function CDOTA_BaseNPC:FindItemByName(ItemName, bStash)
 	local count = 8
 
@@ -196,6 +166,7 @@ ignored_pfx_list["particles/econ/events/ti8/ti8_hero_effect.vpcf"] = true
 ignored_pfx_list["particles/econ/events/ti7/ti7_hero_effect.vpcf"] = true
 ignored_pfx_list["particles/econ/events/ti10/emblem/ti10_emblem_effect.vpcf"] = true
 ignored_pfx_list["particles/units/heroes/hero_ember_spirit/ember_spirit_flameguard.vpcf"] = true
+ignored_pfx_list["particles/act_2/campfire_flame.vpcf"] = true
 
 -- Call custom functions whenever CreateParticle is being called anywhere
 local original_CreateParticle = CScriptParticleManager.CreateParticle

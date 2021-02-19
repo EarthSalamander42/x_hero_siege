@@ -1445,7 +1445,7 @@
 		"ScriptFile"						"items/ankh_of_reincarnation.lua"
 		"AbilityTextureName" 				"custom/ankh_of_reincarnation"
 		"AbilityBehavior"					"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-		"Model"								"models/props_gameplay/aegis.mdl"
+		"Model"								"models/props_gameplay/aegis.vmdl"
 
 		"ItemCost"							"3750"
 		"ItemDeclarations"					"DECLARE_PURCHASES_TO_TEAMMATES | DECLARE_PURCHASES_TO_SPECTATORS"
@@ -1948,7 +1948,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"ID"							"2520"
 		"BaseClass"             		"item_datadriven"
-		"Model"							"models/props_gameplay/recipe.mdl"
+		"Model"							"models/props_gameplay/recipe.vmdl"
 		"AbilityTextureName"			"custom/recipe"
 		
 		// Item Info
@@ -2166,7 +2166,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"ID"							"2526"
 		"BaseClass"             		"item_datadriven"
-		"Model"							"models/props_gameplay/recipe.mdl"
+		"Model"							"models/props_gameplay/recipe.vmdl"
 		"AbilityTextureName"			"custom/recipe"
 
 		// Item Info
@@ -2745,7 +2745,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 //		"ID"							"2545"
 //		"BaseClass"             		"item_datadriven"
-//		"Model"							"models/props_gameplay/recipe.mdl"
+//		"Model"							"models/props_gameplay/recipe.vmdl"
 //		"AbilityTextureName"			"custom/recipe"
 
 		// Item Info
@@ -2819,7 +2819,7 @@
 		"ID"							"2547"														// unique ID number for this item.  Do not change this once established or it will invalidate collected stats.
 		"AbilityName"					"item_tombstone"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_CHANNELLED | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK"
-		"Model"							"models/props_gameplay/tombstoneb01.mdl"
+		"Model"							"models/props_gameplay/tombstoneb01.vmdl"
 		"PingOverrideText"				"DOTA_Chat_Tombstone_Pinged"
 
 		// Stats

@@ -102,6 +102,7 @@ var api = {
 	},
 };
 
+/*
 if (Game.IsInToolsMode()) {
 	var info = {
 		steamid: "76561198057206770",
@@ -114,19 +115,18 @@ if (Game.IsInToolsMode()) {
 		$.Msg(err)
 	});
 
-/*
-	var info = {
-		steamid: "76561198057206770",
-		item_id: "13042",
-		slot_id: "persona_selector",
-		hero: "npc_dota_hero_invoker",
-		isEquipped: 1,
-	};
-
-	api.update_player_armory(info).then(function (data) {
-		$.Msg(data);
-	}).catch(function (err) {
-		$.Msg(err)
-	});
-*/
+//	var info = {
+//		steamid: "76561198057206770",
+//		item_id: "13042",
+//		slot_id: "persona_selector",
+//		hero: "npc_dota_hero_invoker",
+//		isEquipped: 1,
+//	};
+//
+//	api.update_player_armory(info).then(function (data) {
+//		$.Msg(data);
+//	}).catch(function (err) {
+//		$.Msg(err)
+//	});
 }
+*/

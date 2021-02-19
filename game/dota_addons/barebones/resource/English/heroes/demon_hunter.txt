@@ -1,0 +1,48 @@
+//DEMONHUNTER
+"DOTA_Tooltip_ability_holdout_negative_energy"							"Negative Energy"
+"DOTA_Tooltip_ability_holdout_negative_energy_Description"				"Sends a bolt of negative energy, dealing damage to the target unit."
+"DOTA_Tooltip_ability_holdout_negative_energy_Lore"						""
+"DOTA_Tooltip_ability_holdout_negative_energy_Note0"					"This skill doesn't affect mechanical units."
+"DOTA_Tooltip_ability_holdout_negative_energy_damage"					"DAMAGE:"
+"DOTA_Tooltip_ability_holdout_negative_energy_damage_delay"				"DAMAGE DELAY:"
+
+"DOTA_Tooltip_ability_holdout_active_immolation"						"Immolation"
+"DOTA_Tooltip_ability_holdout_active_immolation_Description"			"Engulfs the Demon Hunter in flames, causing damage to nearby enemy units."
+"DOTA_Tooltip_ability_holdout_active_immolation_Lore"					"Of the rituals learned at the Isle of Masks, tending wounds with a bit of voodoo magic has proven to be quite useful."
+"DOTA_Tooltip_ability_holdout_active_immolation_Note0"					"Immolation drains mana until deactivated or not enough mana."
+"DOTA_Tooltip_ability_holdout_active_immolation_damage_per_tick"		"DAMAGE PER SECOND:"
+"DOTA_Tooltip_ability_holdout_active_immolation_radius"					"RADIUS:"
+
+"DOTA_Tooltip_ability_xhs_vampiric_aura"							"Vampiric Aura"
+"DOTA_Tooltip_ability_xhs_vampiric_aura_Description"				"Nearby friendly units gain hit points when they hit enemy units.\n<font color='#FF7800'>WARNING: Does NOT stack with other source of lifesteal.</font>"
+"DOTA_Tooltip_ability_xhs_vampiric_aura_Lore"						""
+"DOTA_Tooltip_ability_xhs_vampiric_aura_aura_radius"				"RADIUS:"
+"DOTA_Tooltip_ability_xhs_vampiric_aura_lifesteal_pct"				"%LIFESTEAL:"
+
+"DOTA_Tooltip_modifier_xhs_vampiric_aura"							"Vampiric Aura"
+"DOTA_Tooltip_modifier_xhs_vampiric_aura_Description"				"Grants Lifesteal aura for nearby allies."
+
+"DOTA_Tooltip_ability_holdout_illidan_evasion"							"Evasion"
+"DOTA_Tooltip_ability_holdout_illidan_evasion_Description"				"Gives a percent chance to avoid attacks."
+"DOTA_Tooltip_ability_holdout_illidan_evasion_Lore"						"'The fruits of discipline; with practice comes evasion.'"
+"DOTA_Tooltip_ability_holdout_illidan_evasion_bonus_evasion"			"%EVASION:"
+
+"DOTA_Tooltip_ability_holdout_roar"										"Roar"
+"DOTA_Tooltip_ability_holdout_roar_Description"							"Increase allies damage by 25 percent."
+"DOTA_Tooltip_ability_holdout_roar_bonus_damage_percentage"				"%BONUS DAMAGE:"
+"DOTA_Tooltip_ability_holdout_roar_bonus_armor"							"BONUS ARMOR:"
+"DOTA_Tooltip_ability_holdout_roar_duration"							"DURATION:"
+
+"DOTA_Tooltip_modifier_roar"							"Roar"
+"DOTA_Tooltip_modifier_roar_Description"				"Grants bonus damage % and armor."
+
+"DOTA_Tooltip_ability_holdout_metamorphosis"								"Metamorphosis"
+"DOTA_Tooltip_ability_holdout_metamorphosis_Description"					"Transforms the Demon Hunter into a powerful Demon with a ranged attack and maximum movement speed."
+"DOTA_Tooltip_ability_holdout_metamorphosis_Lore"							""
+"DOTA_Tooltip_ability_holdout_metamorphosis_duration"						"DURATION:"
+"DOTA_Tooltip_ability_holdout_metamorphosis_transformation_time"			"TRANSFORMATION TIME:"
+"DOTA_Tooltip_ability_holdout_metamorphosis_base_attack_time"				"BASE ATTACK TIME:"
+"DOTA_Tooltip_ability_holdout_metamorphosis_tooltip_attack_range"			"ATTACK RANGE:"
+"DOTA_Tooltip_ability_holdout_metamorphosis_radius"							"CLEAVE RADIUS:"
+"DOTA_Tooltip_ability_holdout_metamorphosis_cleave_pct"						"%CLEAVE DAMAGE:"
+"DOTA_Tooltip_ability_holdout_metamorphosis_bonus_damage"					"%BONUS DAMAGE:"

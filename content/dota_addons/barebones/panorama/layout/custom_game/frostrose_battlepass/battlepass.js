@@ -1507,14 +1507,16 @@ function SetupPanel() {
 		$("#MaxLevelValue").style.visibility = "collapse";
 		$("#GoldTickValue").style.visibility = "collapse";
 
-		var max_score = CustomNetTables.GetTableValue("game_score", "max_score");
+		if (game_type == "PW") {
+			var max_score = CustomNetTables.GetTableValue("game_score", "max_score");
 
-		if (max_score)
-			max_score = max_score.kills;
-		else
-			return;
+			if (max_score)
+				max_score = max_score.kills;
+			else
+				return;
 
-		$("#BountyMultiplierValue").text = max_score;
+			$("#BountyMultiplierValue").text = max_score;
+		}
 	}
 
 	GameEvents.Subscribe("safe_to_leave", SafeToLeave);

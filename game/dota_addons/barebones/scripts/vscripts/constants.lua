@@ -381,16 +381,13 @@ _G.multiplayer_abilities_cast = {
 	"lion_voodoo",
 }
 
-_G.XHS_LIFESTEAL_MODIFIER_PRIORITY = {}
-_G.XHS_LIFESTEAL_MODIFIER_PRIORITY["modifier_lightning_sword_lifesteal"] = 1
-_G.XHS_LIFESTEAL_MODIFIER_PRIORITY["modifier_lifesteal"] = 2
-_G.XHS_LIFESTEAL_MODIFIER_PRIORITY["modifier_xhs_vampiric_aura"] = 3
-
 MODIFIER_ITEMS_WITH_LEVELS = {}
 MODIFIER_ITEMS_WITH_LEVELS["modifier_lifesteal"] = {
 	"item_doom_artifact",
 	"item_lightning_sword",
 	"item_lifesteal_mask",
+	"xhs_vampiric_aura",
+	"holdout_muradin_hammer",
 }
 MODIFIER_ITEMS_WITH_LEVELS["modifier_orb_of_darkness_active"] = {
 	"item_bracer_of_the_void",

@@ -1,4 +1,4 @@
-campfire = class({})
+campfire = campfire or class({})
 
 LinkLuaModifier( "modifier_campfire", "abilities/heroes/creeps", LUA_MODIFIER_MOTION_NONE )
 LinkLuaModifier( "modifier_campfire_effect", "abilities/heroes/creeps", LUA_MODIFIER_MOTION_NONE )
@@ -8,7 +8,7 @@ function campfire:GetIntrinsicModifierName()
 end
 
 
-modifier_campfire = class({})
+modifier_campfire = modifier_campfire or class({})
 
 function modifier_campfire:IsHidden()
 	return true

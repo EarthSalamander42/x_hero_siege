@@ -1,0 +1,48 @@
+//MOUNTAIN KING
+"DOTA_Tooltip_ability_holdout_storm_bolt"								"Storm Bolt"
+"DOTA_Tooltip_ability_holdout_storm_bolt_Description"					"Sends a hammer to the enemy unit, dealing damage and stunning."
+"DOTA_Tooltip_ability_holdout_storm_bolt_bolt_stun_duration"			"STUN DURATION:"
+
+"DOTA_Tooltip_ability_holdout_thunder_clap"							"Thunder Clap"
+"DOTA_Tooltip_ability_holdout_thunder_clap_Description"				"Deals damage and slows attack speed and movement speed in a specific area."
+"DOTA_Tooltip_ability_holdout_thunder_clap_radius"					"RADIUS:"
+"DOTA_Tooltip_ability_holdout_thunder_clap_damage"					"DAMAGE:"
+"DOTA_Tooltip_ability_holdout_thunder_clap_movement_slow"			"%MOVEMENT SLOW:"
+"DOTA_Tooltip_ability_holdout_thunder_clap_attack_speed_slow"		"ATTACK SLOW:"
+"DOTA_Tooltip_ability_holdout_thunder_clap_duration"				"DURATION:"
+
+"DOTA_Tooltip_ability_holdout_muradin_hammer"						"Muradin's Hammer"
+"DOTA_Tooltip_ability_holdout_muradin_hammer_Description"			"Nearby friendly units gain hit points when they hit enemy units. \n<font color='#FF7800'>WARNING: Does NOT stack with other source of lifesteal.</font>"
+"DOTA_Tooltip_ability_holdout_muradin_hammer_Note0"					"Muradin's Hammer Doesn't stack with other source of lifesteal."
+"DOTA_Tooltip_ability_holdout_muradin_hammer_lifesteal_radius"		"RADIUS:"
+"DOTA_Tooltip_ability_holdout_muradin_hammer_lifesteal_pct"			"%LIFESTEAL:"
+
+"DOTA_Tooltip_ability_holdout_thunder_spirit"							"Thunder Spirit"
+"DOTA_Tooltip_ability_holdout_thunder_spirit_Description"				"Increase the movement speed of the Hero to the maximum."
+"DOTA_Tooltip_ability_holdout_thunder_spirit_bonus_movement_speed"		"BONUS MOVEMENT SPEED:"
+
+"DOTA_Tooltip_modifier_thunder_spirit"									"Thunder Spirit"
+"DOTA_Tooltip_modifier_thunder_spirit_Description"						"Increase the movement speed of the Hero to the maximum."
+
+"DOTA_Tooltip_ability_holdout_avatar"									"Avatar"
+"DOTA_Tooltip_ability_holdout_avatar_Description"						"Mountain King turns into a rage, giving him bonus armor, hp and damage."
+"DOTA_Tooltip_ability_holdout_avatar_Lore"								"The Angerfist will fist everyone."
+"DOTA_Tooltip_ability_holdout_avatar_gods_strength_damage"				"BONUS DAMAGE:"
+"DOTA_Tooltip_ability_holdout_avatar_gods_strength_hp"					"BONUS HP:"
+"DOTA_Tooltip_ability_holdout_avatar_gods_strength_armor"				"BONUS ARMOR:"
+"DOTA_Tooltip_ability_holdout_avatar_duration"							"DURATION:"
+
+"DOTA_Tooltip_modifier_gods_strength"					"Avatar"
+"DOTA_Tooltip_modifier_gods_strength_Description"		"Turns into a rage for a short duration."
+
+"DOTA_Tooltip_ability_holdout_storm_bolt_20"							"Storm Bolt (Level 20)"
+"DOTA_Tooltip_ability_holdout_storm_bolt_20_Description"				"Sends a hammer to the enemy unit, dealing damage and stunning."
+"DOTA_Tooltip_ability_holdout_storm_bolt_20_bolt_stun_duration"			"STUN DURATION:"
+
+"DOTA_Tooltip_ability_holdout_thunder_clap_20"							"Thunder Clap (Level 20)"
+"DOTA_Tooltip_ability_holdout_thunder_clap_20_Description"				"Deals damage and slows attack speed and movement speed in a specific area."
+"DOTA_Tooltip_ability_holdout_thunder_clap_20_radius"					"RADIUS:"
+"DOTA_Tooltip_ability_holdout_thunder_clap_20_damage"					"DAMAGE:"
+"DOTA_Tooltip_ability_holdout_thunder_clap_20_movement_slow"			"%MOVEMENT SLOW:"
+"DOTA_Tooltip_ability_holdout_thunder_clap_20_attack_speed_slow"		"ATTACK SLOW:"
+"DOTA_Tooltip_ability_holdout_thunder_clap_20_duration"					"DURATION:"

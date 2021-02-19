@@ -8973,7 +8973,8 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"BaseClass"						"ability_datadriven"
+		"BaseClass"						"ability_lua"
+		"ScriptFile"					"abilities/heroes/hero_demon_hunter.lua"
 		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_AURA"
 		"AbilityUnitTargetTeam"         "DOTA_UNIT_TARGET_TEAM_FRIENDLY"
 		"AbilityTextureName"            "custom/holdout_muradin_hammer"
@@ -8990,58 +8991,7 @@
 			"02"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"lifesteal"				"20 30 40 50"
-			}
-		}
-
-		"Modifiers"
-		{
-			"modifier_lifesteal_aura"
-			{
-				"Passive"			"1"
-				"IsHidden"			"1"
-				"IsBuff"			"1"
-	
-				"Aura"				"modifier_lifesteal_hidden"
-				"Aura_Radius"		"%lifesteal_radius"
-				"Aura_Teams"		"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
-				"Aura_Types"		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
-				"Aura_Flags"		"DOTA_UNIT_TARGET_FLAG_INVULNERABLE"
-			}
-
-			"modifier_lifesteal_hidden"
-			{
-				"Passive"						"1"
-				"IsHidden"						"1"
-				"Attributes"					"MODIFIER_ATTRIBUTE_MULTIPLE"
-				
-				"Orb"
-				{
-					"Priority"					"DOTA_ORB_PRIORITY_ITEM"
-				}
-
-				"OnOrbImpact"
-				{
-					"RunScript"
-					{
-						"ScriptFile"	"abilities/heroes/global.lua"
-						"Function"		"Lifesteal"
-					}
-				}
-			}
-
-			"modifier_lifesteal"
-			{
-				"IsHidden"			"0"
-
-				"OnDealDamage"
-				{
-					"Lifesteal"
-					{
-						"Target"				"ATTACKER"
-						"LifestealPercent"		"%lifesteal"
-					}
-				}
+				"lifesteal_pct"			"20 30 40 50"
 			}
 		}
 	}
