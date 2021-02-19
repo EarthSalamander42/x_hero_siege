@@ -132,6 +132,14 @@ function FinalWave()
 		FinalWaveSpawner("npc_captain", "npc_marine", "npc_marine", "npc_knight", "npc_dota_hero_proudmoore", 90, "south", "final_wave_player_0")
 	end)
 
+	Timers:CreateTimer(30, function()
+		for _, hero in pairs(HeroList:GetAllHeroes()) do
+			if hero:IsRealHero() and hero:GetTeam() == DOTA_TEAM_GOODGUYS then
+				CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "set_player_camera", {hPosition = boss:GetAbsOrigin()})
+			end
+		end
+	end)
+
 	Timers:CreateTimer(31, function()
 		StopSoundOn("yaskar_01.music.ui_hero_select", Entities:FindByClassname(nil, 'npc_dota_fort'))
 
@@ -196,7 +204,7 @@ function FinalWaveSpawner(creep1, creep2, creep3, creep4, boss_name, angles, dir
 
 	for _, hero in pairs(HeroList:GetAllHeroes()) do
 		if hero:IsRealHero() and hero:GetTeam() == DOTA_TEAM_GOODGUYS then
-			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), boss)
+			CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "set_player_camera", {hPosition = boss:GetAbsOrigin()})
 		end
 	end
 end

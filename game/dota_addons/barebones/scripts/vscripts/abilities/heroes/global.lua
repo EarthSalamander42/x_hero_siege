@@ -82,13 +82,10 @@ local PauseTime = 10.0
 		Muradin:EmitSound("MountainKing.Avatar")
 
 		for _, hero in pairs(heroes) do
-			PlayerResource:SetCameraTarget(hero:GetPlayerID(), Muradin)
+			CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "set_player_camera", {hPosition = Muradin:GetAbsOrigin()})
+
 			hero:AddNewModifier(nil, nil, "modifier_pause_creeps", {Duration = 10, IsHidden = true})
 			hero:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 10, IsHidden = true})
-
-			Timers:CreateTimer(5.0, function()
-				PlayerResource:SetCameraTarget(hero:GetPlayerID(), nil)
-			end)
 		end
 
 		caster:AddNewModifier(caster, nil, "modifier_invulnerable", {duration = InvTime + PauseTime})

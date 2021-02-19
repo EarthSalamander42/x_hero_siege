@@ -415,6 +415,9 @@ function CloseLane(ID, lane_number)
 end
 
 function CloseCreepLane(lane_number)
+	if not CREEP_LANES[lane_number] then return end
+	if not CREEP_LANES[lane_number][1] then return end
+
 	if CREEP_LANES[lane_number][1] == 0 then return end
 	local DoorObs = Entities:FindAllByName("obstruction_lane"..lane_number)
 	local towers = Entities:FindAllByName("dota_badguys_tower"..lane_number)
@@ -621,9 +624,10 @@ function TeleportHero(hero, point, delay)
 		hero:Attribute_SetIntValue( "effectsID", TeleportEffect )
 	end
 
-	PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
 	hero:AddNewModifier(hero, nil, "modifier_command_restricted", {})
 	hero:EmitSound("Portal.Loop_Appear")
+
+	CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "set_player_camera", {hPosition = point})
 
 	Timers:CreateTimer(delay, function()
 		EmitSoundOnLocationWithCaster(pos, "Portal.Hero_Disappear", hero)
@@ -650,11 +654,6 @@ function TeleportHero(hero, point, delay)
 			ParticleManager:ReleaseParticleIndex(TeleportEffect)
 			ParticleManager:ReleaseParticleIndex(TeleportEffectEnd)
 		end
-
-		Timers:CreateTimer(0.1, function()
-			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
-			hero:StopSound("Portal.Loop_Appear")
-		end)
 	end)
 end
 
@@ -827,10 +826,6 @@ function TeleportAllHeroes(sEvent, iInvulnDelay, iTPDelay)
 				hero:AddNewModifier(nil, nil, "modifier_invulnerable", {duration= iInvulnDelay, IsHidden = true})
 			end
 		end
-
-		Timers:CreateTimer(iInvulnDelay, function()
-			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
-		end)
 	end
 end
 

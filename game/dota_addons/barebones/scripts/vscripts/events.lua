@@ -627,7 +627,7 @@ ListenToGameEvent("player_chat", function(keys)
 	local donator_level = api:GetDonatorStatus(userID)
 
 	for str in string.gmatch(text, "%S+") do
-		if donator_level == 1 or donator_level == 2 or donator_level == 3 then
+		if donator_level == 1 or donator_level == 2 or donator_level == 3 or IsInToolsMode() then
 			for Frozen = 0, PlayerResource:GetPlayerCount() -1 do
 				local PlayerNames = {"Red", "Blue", "Cyan", "Purple", "Yellow", "Orange", "Green", "Pink"}
 				if PlayerResource:IsValidPlayer(Frozen) then

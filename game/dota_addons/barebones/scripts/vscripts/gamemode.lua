@@ -60,14 +60,8 @@ function GameMode:OnHeroInGame(hero)
 	if hero:GetUnitName() == "npc_dota_hero_wisp" then
 		hero:SetAbilityPoints(0)
 		hero:SetGold(0, false)
-		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
-		Timers:CreateTimer(function()
-			FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
-			hero:Stop()
-			Timers:CreateTimer(0.1, function()
-				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
-			end)
-		end)
+
+		TeleportHero(hero, point:GetAbsOrigin())
 	elseif hero:GetUnitName() == "npc_dota_hero_terrorblade" then
 		if IsInToolsMode() then
 			hero:IncrementAttributes(10000)
@@ -508,8 +502,6 @@ function GameMode:HeroImage(event)
 		CustomGameEventManager:Send_ServerToAllClients("show_timer_hero_image", {})
 		CustomTimers.current_time["hero_image"] = SPECIAL_ARENA_DURATION
 
-		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
-
 		GameMode.HeroImage = CreateUnitByName(hero:GetUnitName(), point_beast, true, nil, nil, DOTA_TEAM_CUSTOM_1)
 		GameMode.HeroImage:SetAngles(0, 210, 0)
 
@@ -524,7 +516,7 @@ function GameMode:HeroImage(event)
 				ability:SetLevel(ability:GetMaxLevel())
 			end
 		end
---[[
+
 		for i = 0, 5 do
 			local item = hero:GetItemInSlot(i)
 
@@ -534,7 +526,7 @@ function GameMode:HeroImage(event)
 				GameMode.HeroImage:AddItem(newItem)
 			end
 		end
---]]
+
 		GameMode.HeroImage:AddNewModifier(nil, nil, "modifier_pause_creeps", {Duration = 5,IsHidden = true})
 		GameMode.HeroImage:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 5,IsHidden = true})
 		GameMode.HeroImage:MakeIllusion()
@@ -551,18 +543,9 @@ function GameMode:HeroImage(event)
 				GameMode:SpecialEventTPQuit(hero)
 				DisableItems(hero, SPECIAL_ARENA_DURATION)
 				Notifications:Bottom(hero:GetPlayerOwnerID(), {text = "Special Event: Kill Hero Image for +250 Stats. You have 2 minutes.", duration = 5.0})					
-				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
-				Timers:CreateTimer(0.1, function()
-					PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil) 
-				end)
-
 				TeleportHero(hero, point_hero:GetAbsOrigin())
 			end
 		end
-
-		Timers:CreateTimer(0.1, function()
-			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil) 
-		end)
 
 		timers.HeroImage = Timers:CreateTimer(SPECIAL_ARENA_DURATION, function()
 			Entities:FindByName(nil, "trigger_hero_image_duration"):Enable()
@@ -597,11 +580,6 @@ local point_beast = Entities:FindByName(nil, "spirit_beast_boss"):GetAbsOrigin()
 		CustomGameEventManager:Send_ServerToAllClients("show_timer_spirit_beast", {})
 		CustomTimers.current_time["spirit_beast"] = SPECIAL_ARENA_DURATION
 
-		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
-		Timers:CreateTimer(0.1, function()
-			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil) 
-		end)
-
 		timers.SpiritBeast = Timers:CreateTimer(SPECIAL_ARENA_DURATION, function()
 			if Entities:FindByName(nil, "trigger_spirit_beast_duration") then
 				Entities:FindByName(nil, "trigger_spirit_beast_duration"):Enable()
@@ -624,10 +602,6 @@ local point_beast = Entities:FindByName(nil, "spirit_beast_boss"):GetAbsOrigin()
 		if IsValidEntity(hero) then
 			GameMode:SpecialEventTPQuit(hero)
 			Notifications:Bottom(hero:GetPlayerOwnerID(), {text = "Special Event: Kill Spirit Beast for the Shield of Invincibility. You have 2 minutes.", duration = 5.0})
-			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
-			Timers:CreateTimer(0.1, function()
-				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil) 
-			end)
 
 			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
 				TeleportHero(hero, point_hero:GetAbsOrigin())
@@ -679,10 +653,6 @@ local point_beast = Entities:FindByName(nil, "frost_infernal_boss"):GetAbsOrigin
 
 		GameMode:SpecialEventTPQuit(hero)
 		Notifications:Bottom(hero:GetPlayerOwnerID(),{text = "Special Event: Kill Frost Infernal for the Key of the 3 Moons. You have 2 minutes.", duration = 5.0})
-		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
-		Timers:CreateTimer(0.1, function()
-			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil) 
-		end)
 
 		if IsValidEntity(hero) then
 			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
@@ -715,8 +685,6 @@ local point = Entities:FindByName(nil, "all_hero_image_player")
 		CustomGameEventManager:Send_ServerToAllClients("show_timer_all_hero_image", {})
 		CustomTimers.current_time["all_hero_images"] = SPECIAL_ARENA_DURATION
 
-		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
-
 		local illusion_spawn = 0
 		Timers:CreateTimer(0.25, function()
 			local random = RandomInt(1, #HEROLIST)
@@ -747,20 +715,11 @@ local point = Entities:FindByName(nil, "all_hero_image_player")
 			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
 				GameMode:SpecialEventTPQuit(hero)
 				Notifications:Bottom(hero:GetPlayerOwnerID(), {text = "Special Event: Kill All Heroes for Necklace of Immunity. You have 2 minutes.", duration = 5.0})
-				PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),hero)
-				Timers:CreateTimer(0.1, function()
-					PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil) 
-				end)
-
 				TeleportHero(hero, point:GetAbsOrigin())
 			end
 		end
 
 		DisableItems(hero, SPECIAL_ARENA_DURATION)
-
-		Timers:CreateTimer(0.1, function()
-			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(),nil) 
-		end)
 
 		timers.AllHeroImage = Timers:CreateTimer(0.5, function()
 			ALL_HERO_IMAGE_DEAD = 0
@@ -792,7 +751,9 @@ local point = Entities:FindByName(nil, "all_hero_image_player")
 			GameMode.AllHeroImages_occuring = 0
 
 			Timers:CreateTimer(5.5, function() --Debug time in case Frost Infernal kills the player at the very last second
-				Entities:FindByName(nil, "trigger_all_hero_image_duration"):Disable()
+				if Entities:FindByName(nil, "trigger_all_hero_image_duration") then
+					Entities:FindByName(nil, "trigger_all_hero_image_duration"):Disable()
+				end
 			end)
 
 			local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_2, point:GetAbsOrigin(), nil, 2500, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_ALL, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false)

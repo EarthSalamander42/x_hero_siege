@@ -262,9 +262,7 @@ function StartRameroAndBaristolEvent(hero)
 	TeleportHero(hero, point, delay)
 	PauseCreeps()
 
-	Timers:CreateTimer(delay, function()
-		RameroAndBaristolEvent(120)
-	end)
+	RameroAndBaristolEvent(120 + delay)
 
 	RAMERO = 1
 	hero.old_pos = hero:GetAbsOrigin()
@@ -332,9 +330,7 @@ function StartSogatEvent(hero)
 	PauseCreeps()
 	TeleportHero(hero, point, delay)
 
-	Timers:CreateTimer(delay, function()
-		SogatEvent(120.0)
-	end)
+	SogatEvent(120.0 + delay)
 
 	RAMERO = 2
 	hero.old_pos = hero:GetAbsOrigin()

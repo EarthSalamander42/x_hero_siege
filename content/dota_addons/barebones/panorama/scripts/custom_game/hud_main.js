@@ -305,7 +305,40 @@ function CreateErrorMessage(msg){
 
 GameUI.CreateErrorMessage = CreateErrorMessage;
 
+// Ancient position: 0, -3500, 0
+
+SetPlayersCameraPosition({
+	hPosition: "-6520.0 2048.0 128.0",
+})
+
+
+function SetPlayersCameraPosition(keys) {
+	$.Msg(keys)
+
+	if (!keys.iSpeed)
+		keys.iSpeed = 2.0;
+
+	if (!keys.hPosition) {
+		$.Msg("ERROR: MISSING CAMERA POSITION!!")
+		return;
+	}
+
+//	if (keys && keys.bStopLoop) {
+
+//		return;
+//	} else {
+		if (keys && keys.hPosition) {
+			keys.hPosition = keys.hPosition.split(" ");
+			GameUI.SetCameraTargetPosition([keys.hPosition[0], keys.hPosition[1], keys.hPosition[2]], keys.iSpeed);
+//			$.Schedule(0.03, function() {
+//				SetPlayersCameraPosition(keys);
+//			});
+		}
+//	}
+}
+
 (function(){
 	GameEvents.Subscribe("hide_ui", HideUI);
 	GameEvents.Subscribe("dotacraft_error_message", CreateErrorMessage)
+	GameEvents.Subscribe("set_player_camera", SetPlayersCameraPosition)
 })()

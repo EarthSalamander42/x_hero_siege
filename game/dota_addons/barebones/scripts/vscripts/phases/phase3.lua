@@ -296,6 +296,12 @@ function StartLichKingArena()
 			lich_king_boss:SetMoveCapability(DOTA_UNIT_CAP_MOVE_GROUND)
 --			BossBar(lich_king_boss, "lich_king")
 			lich_king_boss.zone = "xhs_holdout"
+
+			for _, hero in pairs(HeroList:GetAllHeroes()) do
+				if hero:IsRealHero() and hero:GetTeam() == DOTA_TEAM_GOODGUYS then
+					CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "set_player_camera", {hPosition = lich_king_boss:GetAbsOrigin()})
+				end
+			end
 		end)
 	end)
 
@@ -331,12 +337,8 @@ function StartSecretArena(hero)
 		FindClearSpaceForUnit(hero, point:GetAbsOrigin(), true)
 		hero:AddNewModifier(nil, nil, "modifier_pause_creeps", {Duration = 10, IsHidden = true}):SetStackCount(1)
 		hero:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 10, IsHidden = true})
-		hero:Stop()
-		PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
 
-		Timers:CreateTimer(0.1, function()
-			PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
-		end)
+		TeleportHero(hero, hero:GetAbsOrigin())
 
 		Notifications:BottomToAll({ hero = hero:GetUnitName(), duration = 5.0 })
 		Notifications:BottomToAll({ text = PlayerResource:GetPlayerName(hero:GetPlayerID()) .. " ", duration = 5.0, continue = true })
