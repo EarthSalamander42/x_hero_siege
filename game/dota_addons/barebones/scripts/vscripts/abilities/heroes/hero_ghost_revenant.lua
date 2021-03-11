@@ -464,7 +464,7 @@ end
 function modifier_ghost_revenant_ghost_immolation_debuff:OnCreated()
 	if not IsServer() then return end
 
-	print("Tick time:", self:GetAbility():GetSpecialValueFor("tick_time"))
+--	print("Tick time:", self:GetAbility():GetSpecialValueFor("tick_time"))
 	self:StartIntervalThink(self:GetAbility():GetSpecialValueFor("tick_time"))
 end
 

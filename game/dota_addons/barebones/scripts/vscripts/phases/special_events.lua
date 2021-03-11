@@ -26,7 +26,7 @@ function MuradinEvent(time)
 			local point = Entities:FindByName(nil,"npc_dota_muradin_player_"..id)
 
 			DisableItems(hero, time)
-			TeleportHero(hero, point:GetAbsOrigin())
+			TeleportHero(hero, point:GetAbsOrigin(), nil, 1.0)
 		end
 	end
 
@@ -70,12 +70,12 @@ function EndMuradinEvent()
 			if not hero:IsIllusion() and hero:IsRealHero() and not hero.paid then
 				hero.paid = true
 				if hero.old_pos then
-					TeleportHero(hero, hero.old_pos, 3.0)
+					TeleportHero(hero, hero.old_pos, 3.0, 1.0)
 				else
 					if hero:GetTeamNumber() == 2 then
-						TeleportHero(hero, base_good:GetAbsOrigin(), 3.0)
+						TeleportHero(hero, base_good:GetAbsOrigin(), 3.0, 1.0)
 					elseif hero:GetTeamNumber() == 3 then
-						TeleportHero(hero, base_bad:GetAbsOrigin(), 3.0)
+						TeleportHero(hero, base_bad:GetAbsOrigin(), 3.0, 1.0)
 					end
 				end
 
@@ -109,7 +109,7 @@ function FarmEvent(time)
 				Notifications:TopToAll({text="Invalid teleport point detected!! #ERROR 004 ", duration = 10.0})
 				Notifications:TopToAll({text="Please report this bug on Discord!! #ERROR 004 ", continue = true})
 			else
-				TeleportHero(hero, point:GetAbsOrigin())
+				TeleportHero(hero, point:GetAbsOrigin(), nil, 1.0)
 			end
 
 			GameMode.hero_farm_event[nPlayerID] = {}

@@ -603,7 +603,7 @@ function RefreshPlayers()
 	end
 end
 
-function TeleportHero(hero, point, delay)
+function TeleportHero(hero, point, delay, iCameraSpeed)
 	if not hero.GetPlayerID then return end
 	if hero:GetPlayerID() == -1 then return end
 	if delay == nil then delay = 0 end
@@ -627,7 +627,7 @@ function TeleportHero(hero, point, delay)
 	hero:AddNewModifier(hero, nil, "modifier_command_restricted", {})
 	hero:EmitSound("Portal.Loop_Appear")
 
-	CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "set_player_camera", {hPosition = point})
+	CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "set_player_camera", {hPosition = point, iSpeed = iCameraSpeed})
 
 	Timers:CreateTimer(delay, function()
 		EmitSoundOnLocationWithCaster(pos, "Portal.Hero_Disappear", hero)

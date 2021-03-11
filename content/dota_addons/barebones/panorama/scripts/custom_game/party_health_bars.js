@@ -34,7 +34,6 @@ function intToARGB(i)
 			playerPanel.SetAttributeInt( "player_id", playerID );
 			playerPanel.BLoadLayout( "file://{resources}/layout/custom_game/party_portrait.xml", false, false );
 
-
 			var colorInt = Players.GetPlayerColor( playerID );
 			var colorString = "#" + intToARGB( colorInt );
 
@@ -83,12 +82,14 @@ function intToARGB(i)
 				var LifeRemainingContainer = playerPanel.FindChild( "PartyLifeRemainingContainer" );
 				if ( LifeRemainingContainer !== null )
 				{
+					var heroImage = playerPanel.FindChildInLayoutFile( "HeroImage" );
 					var LifePanel = LifeRemainingContainer.FindChild( "PartyLife0" );
 					var LifeAmount = LifeRemainingContainer.FindChild("LifeAmount");
 					var NeutralItem = LifeRemainingContainer.FindChild("NeutralImage");
 
 					if ( LifePanel !== null )
 					{
+						heroImage.heroname = Entities.GetUnitName( entIndex );
 						LifePanel.heroname = Entities.GetUnitName( entIndex );
 						LifePanel.SetHasClass( "LifeUsed", nRespawnsRemaining == 0 )
 						LifeAmount.text = "x" + nRespawnsRemaining;

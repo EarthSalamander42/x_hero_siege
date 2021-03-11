@@ -307,13 +307,14 @@ GameUI.CreateErrorMessage = CreateErrorMessage;
 
 // Ancient position: 0, -3500, 0
 
+/*
 SetPlayersCameraPosition({
 	hPosition: "-6520.0 2048.0 128.0",
 })
-
+*/
 
 function SetPlayersCameraPosition(keys) {
-	$.Msg(keys)
+//	$.Msg(keys)
 
 	if (!keys.iSpeed)
 		keys.iSpeed = 2.0;

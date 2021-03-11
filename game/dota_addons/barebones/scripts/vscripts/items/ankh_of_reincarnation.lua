@@ -38,7 +38,7 @@ function modifier_ankh:OnCreated(keys)
 		mod:IncrementStackCount()
 		CustomNetTables:SetTableValue("player_table", tostring(self:GetParent():entindex()).."_respawns", {mod:GetStackCount()})
 	else
-		local charges = 1
+		local charges = self:GetAbility():GetCurrentCharges()
 
 		if keys and keys.charges then
 			charges = keys.charges

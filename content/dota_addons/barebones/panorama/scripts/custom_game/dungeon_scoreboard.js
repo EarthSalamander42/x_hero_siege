@@ -60,8 +60,8 @@ function UpdatePlayerImages()
 	var colorString = "#" + intToARGB( colorInt );
 	playerColorBar.style.backgroundColor = colorString;
 	var FriendlyBarImage = $("#ScoreboardTeamContainer").FindChildTraverse( "HeroImage" );
-	var friendlyBarImage2 = $("#PartyPortraits").FindChildTraverse( "PartyPortrait" + localPlayerId ).FindChildTraverse( "HeroImage" );
-	friendlyBarImage.heroname = Players.GetPlayerSelectedHero( localPlayerId );
+//	var friendlyBarImage2 = $("#PartyPortraits").FindChildTraverse( "PartyPortrait" + localPlayerId ).FindChildTraverse( "HeroImage" );
+//	friendlyBarImage.heroname = Players.GetPlayerSelectedHero( localPlayerId );
 
 	var actualPlayerInfo = 1;
 	for(var i = 0; i < 8; i++)
@@ -96,8 +96,8 @@ function UpdatePlayerImages()
 		var colorString = "#" + intToARGB( colorInt );
 		heroColorBar.style.backgroundColor = colorString;
 
-		var friendlyBarImage = $("#PartyPortraits").FindChildTraverse( "PartyPortrait" + actualPlayerInfo ).FindChildTraverse( "HeroImage" );
-		friendlyBarImage.heroname = Players.GetPlayerSelectedHero( i );
+//		var friendlyBarImage = $("#PartyPortraits").FindChildTraverse( "PartyPortrait" + actualPlayerInfo ).FindChildTraverse( "HeroImage" );
+//		friendlyBarImage.heroname = Players.GetPlayerSelectedHero( i );
 
 		actualPlayerInfo++;
 	}

@@ -12,10 +12,10 @@ ListenToGameEvent('game_rules_state_change', function()
 			EmitSoundOn("Global.InGame", base_good)
 
 --			if BOTS_ENABLED == true then
-			if IsInToolsMode() then
-				SendToServerConsole('sm_gmode 1')
-				SendToServerConsole('dota_bot_populate')
-			end
+--			if IsInToolsMode() then
+--				SendToServerConsole('sm_gmode 1')
+--				SendToServerConsole('dota_bot_populate')
+--			end
 
 --			if base_bad then
 --				EmitSoundOn("Global.InGame", base_bad)
@@ -1032,10 +1032,7 @@ ListenToGameEvent('entity_killed', function(keys)
 	elseif killedUnit:IsCreature() then
 		local ramero_check = 0
 		if killedUnit:GetUnitName() == "npc_ramero" then
-			local item = CreateItem("item_lightning_sword", nil, nil)
-			local pos = killedUnit:GetAbsOrigin()
-			local drop = CreateItemOnPositionSync(pos, item)
-			item:LaunchLoot(false, 300, 0.5, pos)
+			DropNeutralItemAtPositionForHero("item_lightning_sword", killedUnit:GetAbsOrigin(), killer, killer:GetTeam(), true)
 			ramero_check = ramero_check +1
 		elseif killedUnit:GetUnitName() == "npc_baristol" then
 			local item = CreateItem("item_tome_big", nil, nil)
@@ -1044,10 +1041,7 @@ ListenToGameEvent('entity_killed', function(keys)
 			item:LaunchLoot(false, 300, 0.5, pos)
 			ramero_check = ramero_check +1
 		elseif killedUnit:GetUnitName() == "npc_ramero_2" then
-			local item = CreateItem("item_ring_of_superiority", nil, nil)
-			local pos = killedUnit:GetAbsOrigin()
-			local drop = CreateItemOnPositionSync(pos, item)
-			item:LaunchLoot(false, 300, 0.5, pos)
+			DropNeutralItemAtPositionForHero("item_ring_of_superiority", killedUnit:GetAbsOrigin(), killer, killer:GetTeam(), true)
 			doom_first_time = true
 			Timers:RemoveTimer(timers.Ramero)
 		elseif killedUnit:GetUnitName() == "npc_dota_hero_secret" then
