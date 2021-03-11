@@ -44,7 +44,7 @@ function modifier_ai:OnIntervalThink()
 
 	if self:GetParent():IsStunned() or self:GetParent():IsSilenced() or self:GetParent():IsHexed() or self:GetParent():IsChanneling() or self:GetParent():GetCurrentActiveAbility() then return end
 
-	print("AI: Ready to work!:", self:GetParent():GetUnitName())
+--	print("AI: Ready to work!:", self:GetParent():GetUnitName())
 
 	if self.ai_state == 1 then
 		if not self:GetParent():IsAttacking() then
@@ -77,12 +77,12 @@ function modifier_ai:OnIntervalThink()
 	end
 
 	if not self:GetParent():GetCurrentActiveAbility() then
-		print("Caster is not casting an ability")
+--		print("Caster is not casting an ability")
 		for ability_index = 0, self:GetParent():GetAbilityCount() - 1 do
 			local ability = self:GetParent():GetAbilityByIndex(ability_index)
 
 			if ability and not ability:IsInAbilityPhase() and not ability:IsPassive() and ability:IsActivated() and ability:IsCooldownReady() then
-				print("Ability is castable")
+--				print("Ability is castable")
 				local cast_range = ability:GetCastRange(self:GetParent():GetCursorPosition(), self:GetParent()) or self.find_enemy_distance
 				local target_team = ability:GetAbilityTargetTeam()
 				local target_type = ability:GetAbilityTargetType()
@@ -90,13 +90,13 @@ function modifier_ai:OnIntervalThink()
 				if target_type == 0 then target_type = 19 end -- DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC
 				local target_flags = ability:GetAbilityTargetFlags()
 				if cast_range == 0 then cast_range = self.find_enemy_distance end
-				print("Cast Range:", cast_range)
+--				print("Cast Range:", cast_range)
 				cast_range = cast_range * 0.9 -- 90% of the range to allow projectiles hit the target. e.g: Mirana's Starfall
 				local allies = FindUnitsInRadius(self:GetParent():GetTeamNumber(), self:GetParent():GetAbsOrigin(), nil, cast_range, self:GetParent():GetTeamNumber(), target_type, ability:GetAbilityTargetFlags(), FIND_ANY_ORDER, false)
 				local enemies = FindUnitsInRadius(self:GetParent():GetTeamNumber(), self:GetParent():GetAbsOrigin(), nil, cast_range, target_team, target_type, ability:GetAbilityTargetFlags(), FIND_ANY_ORDER, false)
 
 				if #enemies == 0 then
-					print("range / enemies / behavior:", self:GetParent():GetUnitName(), ability:GetAbilityName(), cast_range, #enemies, target_team, target_type)
+--					print("range / enemies / behavior:", self:GetParent():GetUnitName(), ability:GetAbilityName(), cast_range, #enemies, target_team, target_type)
 					if bit.band(tonumber(tostring(ability:GetBehavior())), DOTA_ABILITY_BEHAVIOR_TOGGLE) == DOTA_ABILITY_BEHAVIOR_TOGGLE then
 						if ability:GetToggleState() == true then
 							ability:ToggleAbility()

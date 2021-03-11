@@ -3,7 +3,7 @@
 		<Panel id="container" style="visibility:collapse;">
 			<Image src="file://panorama/images/custom_game/close.png" hittest="false" />
 
-			<Image src="file://panorama/images/custom_game/battlepass/teleport.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/teleport1.png" hittest="false" />
 			<Image src="file://panorama/images/custom_game/battlepass/teleport2.png" hittest="false" />
 			<Image src="file://panorama/images/custom_game/battlepass/teleport3.png" hittest="false" />
 			<Image src="file://panorama/images/custom_game/battlepass/teleport4.png" hittest="false" />
@@ -32,10 +32,16 @@
 			<Image src="file://panorama/images/custom_game/battlepass/teleport26.png" hittest="false" />
 			<Image src="file://panorama/images/custom_game/battlepass/teleport27.png" hittest="false" />
 
-			<Image src="file://panorama/images/custom_game/battlepass/tome.png" hittest="false" />
-			<Image src="file://panorama/images/custom_game/battlepass/tome2.png" hittest="false" />
-			<Image src="file://panorama/images/custom_game/battlepass/tome3.png" hittest="false" />
-			<Image src="file://panorama/images/custom_game/battlepass/tome4.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/levelup.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/levelup2.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/levelup3.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/levelup4.png" hittest="false" />
+
+			<Image src="file://panorama/images/items/doom_artifact.png" hittest="false" />
+			<Image src="file://panorama/images/items/key_of_the_three_moons.png" hittest="false" />
+			<Image src="file://panorama/images/items/lightning_sword.png" hittest="false" />
+			<Image src="file://panorama/images/items/ring_of_superiority.png" hittest="false" />
+			<Image src="file://panorama/images/items/shield_of_invincibility.png" hittest="false" />
 		</Panel>
 	</Panel>
 </root>

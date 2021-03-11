@@ -1,0 +1,24 @@
+"neutral_items"
+{
+	"1"
+	{
+		"drop_rates"
+		{
+			"0:00"
+			{
+				"0" "14"
+				"1" "14"
+				"2" "14"
+				"3" "14"
+			}
+		}
+		
+		"items"
+		{
+			"item_key_of_the_three_moons"	"1"
+			"item_lightning_sword"			"1"
+			"item_ring_of_superiority"		"1"
+			"item_shield_of_invincibility"	"1"
+		}
+	}
+}

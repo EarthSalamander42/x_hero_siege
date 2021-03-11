@@ -11,6 +11,12 @@ ListenToGameEvent('game_rules_state_change', function()
 		Timers:CreateTimer(3.0, function()
 			EmitSoundOn("Global.InGame", base_good)
 
+--			if BOTS_ENABLED == true then
+			if IsInToolsMode() then
+				SendToServerConsole('sm_gmode 1')
+				SendToServerConsole('dota_bot_populate')
+			end
+
 --			if base_bad then
 --				EmitSoundOn("Global.InGame", base_bad)
 --			end

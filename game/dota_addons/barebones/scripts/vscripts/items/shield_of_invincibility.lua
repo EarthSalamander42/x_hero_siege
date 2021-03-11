@@ -1,7 +1,7 @@
 -- Author: Cookies
 -- Date: 05.12.2019
 
-LinkLuaModifier("modifier_ankh_passives", "items/ankh_of_reincarnation.lua", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_ankh", "items/ankh_of_reincarnation.lua", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_shield_of_invincibility", "items/shield_of_invincibility.lua", LUA_MODIFIER_MOTION_NONE)
 
 item_shield_of_invincibility = item_shield_of_invincibility or class({})
@@ -54,7 +54,12 @@ end
 function modifier_shield_of_invincibility:OnDestroy()
 	if not IsServer() then return end
 
-	self:GetParent():RemoveModifierByName("modifier_ankh_passives")
+	for k, v in pairs(self:GetParent():FindAllModifiersByName("modifier_ankh")) do
+		if v:GetAbility() == self:GetAbility() then
+			v:Destroy()
+			return
+		end
+	end
 end
 
 

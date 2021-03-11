@@ -1447,16 +1447,13 @@
 		"AbilityBehavior"					"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"Model"								"models/props_gameplay/aegis.vmdl"
 
-		"ItemCost"							"3750"
+		"ItemCost"							"1500"
 		"ItemDeclarations"					"DECLARE_PURCHASES_TO_TEAMMATES | DECLARE_PURCHASES_TO_SPECTATORS"
 		"ItemQuality"						"rare"
 		"ItemDroppable" 					"1"
 		"ItemKillable"						"0"
 		"ItemPurchasable"					"1"
 		"ItemSellable"						"0"
-		"ItemHideCharges"					"0"
-		"ItemDisplayCharges"				"1"
-		"ItemInitialCharges"				"3"
 		"ItemStackable"						"1"
 		"AllowedInBackpack"					"0"
 

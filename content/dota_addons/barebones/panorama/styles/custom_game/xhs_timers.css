@@ -1,7 +1,7 @@
 .Timers
 {
+	align: right top;
 	flow-children: right;
-	width: 100%;
 }
 
 #TimerPanels
@@ -16,7 +16,7 @@
 
 #GameTime
 {
-	margin-left: 47.4%;
+	margin-right: 21.3%;
 	flow-children: down;
 	width: 100px;
 	height: 46px;
@@ -25,12 +25,12 @@
 
 .AspectRatio16x10 #GameTime
 {
-	margin-left: 47.1%;
+	margin-right: 18.4%;
 }
 
 .AspectRatio4x3 #GameTime
 {
-	margin-left: 46.5%;
+	margin-right: 12.9%;
 }
 
 .TopbarPanel

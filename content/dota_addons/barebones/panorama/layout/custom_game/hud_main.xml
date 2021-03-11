@@ -1,0 +1,134 @@
+<root>
+	<styles>
+		<include src="s2r://panorama/styles/dotastyles.vcss_c" />
+<!--		<include src="s2r://panorama/styles/hud.vcss_c"/> -->
+		<include src="s2r://panorama/styles/hudstyles.vcss_c"/>
+		<include src="s2r://panorama/styles/hud/hud_reborn.vcss_c" />	
+
+		<include src="s2r://panorama/styles/custom_game/hud_main.vcss_c" />
+		<include src="s2r://panorama/styles/custom_game/quests.vcss_c" />
+		<include src="s2r://panorama/styles/custom_game/party_portraits.vcss_c" />
+		<include src="s2r://panorama/styles/custom_game/party_arrows.vcss_c" />
+	</styles>
+
+	<scripts>
+		<include src="s2r://panorama/scripts/custom_game/hud_main.vjs_c" />
+		<include src="s2r://panorama/scripts/custom_game/quests.vjs_c" />
+		<include src="s2r://panorama/scripts/custom_game/party_health_bars.vjs_c" />
+		<include src="s2r://panorama/scripts/custom_game/relic_courier.vjs_c" />
+	</scripts>
+
+  <Panel hittest="false" class="CustomHudRoot">
+	<Panel id="DungeonHUDContents" hittest="false" class="CustomHudContents">
+		<Panel hittest="false" id="PartyPortraitsMain">
+			<Panel hittest="false" id="PartyPortraits" class="LeftRightFlow"/>
+		</Panel>  
+	
+		<Panel hittest="false" id="ZoneToastPanel" always-cache-composition-layer="true" require-composition-layer="true" >
+		  <Label hittest="false" id="ZoneNameLabel" text="" class="TitleFont"/>
+		</Panel>  
+		
+	<Panel id="DialogPanel" hittest="false">
+		<Panel id="DialogPanelBackground" hittest="false"/>
+		<DOTAScenePanel id="DialogPortrait" unit="npc_dota_hero_pudge" environment="default" particleonly="false" hittest="false"/>
+		<Panel id="GlassBallOverlay" hittest="false"/>
+		<Label id="DialogTitle" class="DialogPanelTitle TitleFont" text="" hittest="false"/>		
+
+		<Panel id="DialogPanelContent" hittest="false">
+			<Panel class="SpeechBubble" hittest="false">
+				<Panel id="SpeechBubbleContainer" hittest="false">
+					<Panel class="SpeechBubbleBackgroundOutline" hittest="false"/>
+					<Panel class="SpeechBubbleCalloutSquash" hittest="false">
+						<Panel class="SpeechBubbleCallout" hittest="false"/>
+					</Panel>
+					<Panel class="SpeechBubbleBackground" hittest="false"/>
+				</Panel>
+				<Panel id="JournalPageBackground"/>
+				<Label id="DialogLabelSizer" html="true" class="DialogPanelText" text="#DialogTest" hittest="false" />
+				<Label id="DialogLabel" html="true" class="DialogPanelText" text="#DialogTest" hittest="false" />
+	
+			</Panel>
+			<Panel id="DialogPlayerConfirm">
+				<Panel id="Player0Confirm" class="PlayerConfirm"><Label text="{g:dota_player_name:nc:nh:player_id_0}" html="true"/><DOTAHeroImage id="Player0ConfirmIcon" class="ConfirmHeroIcon" heroid="1" hittest="false" scaling="stretch-to-fit-y-preserve-aspect"/></Panel>
+				<Panel id="Player1Confirm" class="PlayerConfirm"><Label text="{g:dota_player_name:nc:nh:player_id_1}" html="true"/><DOTAHeroImage id="Player1ConfirmIcon" class="ConfirmHeroIcon" heroid="2" hittest="false" scaling="stretch-to-fit-y-preserve-aspect"/></Panel>
+				<Panel id="Player2Confirm" class="PlayerConfirm"><Label text="{g:dota_player_name:nc:nh:player_id_2}" html="true"/><DOTAHeroImage id="Player2ConfirmIcon" class="ConfirmHeroIcon" heroid="3" hittest="false" scaling="stretch-to-fit-y-preserve-aspect"/></Panel>
+				<Panel id="Player3Confirm" class="PlayerConfirm"><Label text="{g:dota_player_name:nc:nh:player_id_3}" html="true"/><DOTAHeroImage id="Player3ConfirmIcon" class="ConfirmHeroIcon" heroid="4" hittest="false" scaling="stretch-to-fit-y-preserve-aspect"/></Panel>
+				<Panel id="Player4Confirm" class="PlayerConfirm"><Label text="{g:dota_player_name:nc:nh:player_id_4}" html="true"/><DOTAHeroImage id="Player4ConfirmIcon" class="ConfirmHeroIcon" heroid="5" hittest="false" scaling="stretch-to-fit-y-preserve-aspect"/></Panel>
+				<Panel id="Player5Confirm" class="PlayerConfirm"><Label text="{g:dota_player_name:nc:nh:player_id_5}" html="true"/><DOTAHeroImage id="Player5ConfirmIcon" class="ConfirmHeroIcon" heroid="6" hittest="false" scaling="stretch-to-fit-y-preserve-aspect"/></Panel>
+				<Panel id="Player6Confirm" class="PlayerConfirm"><Label text="{g:dota_player_name:nc:nh:player_id_6}" html="true"/><DOTAHeroImage id="Player6ConfirmIcon" class="ConfirmHeroIcon" heroid="7" hittest="false" scaling="stretch-to-fit-y-preserve-aspect"/></Panel>
+				<Panel id="Player7Confirm" class="PlayerConfirm"><Label text="{g:dota_player_name:nc:nh:player_id_7}" html="true"/><DOTAHeroImage id="Player7ConfirmIcon" class="ConfirmHeroIcon" heroid="8" hittest="false" scaling="stretch-to-fit-y-preserve-aspect"/></Panel>
+			</Panel>
+			<Button id="ConfirmButton" class="ButtonBevel" onactivate="OnConfirmButtonPressed()"><Panel class="CheckMark"/><Label text="#DOTA_Siltbreaker_ContinueSpeechText"/></Button>			
+			<Panel class="DialogButtonContainer LeftRightFlow">
+				<Button id="ContinueDialogButton" class="ButtonBevel CloseButton"  onactivate="OnAdvanceDialogButtonPressed()" hittest="true"/>
+				<Button id="CloseDialogButton" class="ButtonBevel CloseButton" onactivate="OnCloseDialogButtonPressed()" hittest="true"/>		
+			</Panel>	
+		</Panel>
+	</Panel>
+
+	<Panel id="QuestLog" class="TopBottomFlow" hittest="false" require-composition-layer="true" always-cache-composition-layer="true">
+		<Label hittest="false" text="#DOTA_Siltbreaker_Quests" class="QuestLogHeader"/>
+		<Panel id="QuestsContainer" class="TopBottomFlow"/>
+	</Panel>
+
+	<Panel id="BossHP" hittest="false">
+		<Label id="BossLabel" class="HoldoutLabelSmall" hittest="false" text=""/>
+		<Panel id="BossProgressBarContainer" hittest="false">
+			<Panel id="BossIcon"/>
+			<ProgressBar hittest="false" id="BossProgressBar" value="0"/>
+		</Panel>
+	</Panel>
+
+	<Panel id="FloatingDialogPanel" hittest="false">
+		<Panel id="Floating	Background" hittest="false"/>
+		<Panel id="FloatingDialogPanelContent" hittest="false">
+			<Panel class="SpeechBubble" hittest="false">
+				<Panel id="SpeechBubbleContainer" hittest="false">
+					<Panel class="SpeechBubbleBackgroundOutline" hittest="false"/>
+					<Panel class="SpeechBubbleCalloutSquash" hittest="false">
+						<Panel class="SpeechBubbleCallout" hittest="false"/>
+					</Panel>
+					<Panel class="SpeechBubbleBackground" hittest="false"/>
+				</Panel>
+				<Label id="FloatingDialogLabelSizer" html="true" class="DialogPanelText" text="#DialogTest" hittest="false" />
+				<Label id="FloatingDialogLabel" html="true" class="DialogPanelText" text="#DialogTest" hittest="false" />
+			</Panel>
+			<Panel class="DialogButtonContainer LeftRightFlow">
+				<Button id="ContinueFloatingDialogButton" class="ButtonBevel CloseButton" onactivate="OnAdvanceDialogButtonPressed()" hittest="true"/>
+				<Button id="CloseFloatingDialogButton" class="ButtonBevel CloseButton" onactivate="OnCloseDialogButtonPressed()" hittest="true"/>	
+			</Panel>
+					
+		</Panel>
+	</Panel>
+		<Panel id="DungeonQuestCompleteRoot" hittest="false">
+			<Panel id="QuestCompleteContainer" class="TopBottomFlow">
+				<Label id="DungeonQuestCompleteZoneName" class="DungeonQuestCompleteHeader TitleFont" text="{s:zone_name}"/>
+				<Panel class="LeftRightFlow">
+					<Panel id="QuestCompleteIcon"/>
+					<Label id="DungeonQuestCompleteQuestName" class="DungeonQuestCompleteHeader" text="{s:quest_name}"/>
+					<Label class="DungeonQuestCompleteReward CompletedNumber" text="{d:completed} / {d:complete_limit}"/>
+				</Panel>
+				<Panel id="XPGoldContainer" class="LeftRightFlow">
+					<Panel class="RewardBox LeftRightFlow">
+						<Panel class="BoxStuff LeftRightFlow">
+							<Panel id="DungeonCompleteGoldReward" />
+							<Label class="DungeonQuestCompleteReward GoldEarned" text="{d:gold_reward}"/>
+						</Panel>
+					</Panel>
+					<Panel class="RewardBox LeftRightFlow">
+						<Panel class="BoxStuff LeftRightFlow">
+							<Panel id="DungeonCompleteXPReward" />
+							<Label class="DungeonQuestCompleteReward XPEarned" text="{d:xp_reward}"/>
+						</Panel>
+					 </Panel>
+				</Panel>
+			</Panel>	
+			<Panel id="QuestCompleteTitleContainer">
+				<Label class="QuestCompleteTitle Highlight" text="#DOTA_QuestCompleted"/>
+				<Label class="QuestCompleteTitle Shadow" text="#DOTA_QuestCompleted"/>
+				<Label class="QuestCompleteTitle" text="#DOTA_QuestCompleted"/>
+			</Panel>
+		</Panel>
+	</Panel>
+  </Panel>
+</root>

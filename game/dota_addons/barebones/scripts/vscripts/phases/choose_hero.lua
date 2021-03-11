@@ -249,11 +249,9 @@ end
 
 function StartingItems(hero, newHero)
 	local difficulty = GameRules:GetCustomGameDifficulty()
+
 	if difficulty ~= 5 then
-		if difficulty < 4 then
-			local item = newHero:AddItemByName("item_ankh_of_reincarnation")
-			item:SetSellable(false)
-		end
+		newHero:AddNewModifier(newHero, nil, "modifier_ankh", {charges = 5 - difficulty})
 
 		local item = newHero:AddItemByName("item_health_potion")
 		item:SetPurchaseTime(0)

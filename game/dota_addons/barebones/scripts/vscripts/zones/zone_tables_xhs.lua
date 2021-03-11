@@ -371,7 +371,7 @@ _G.ZonesDefinition =
 					"item_potion_full",
 					"item_potion_of_invulnerability",
 					"item_potion_of_antimagic",
-					"item_cloak_of_flames",
+					"item_xhs_cloak_of_flames",
 					"item_amulet_of_the_wild",
 					"item_talisman_of_evasion_datadriven",
 				},

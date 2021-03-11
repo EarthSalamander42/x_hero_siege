@@ -462,17 +462,15 @@ end
 
 
 function modifier_ghost_revenant_ghost_immolation_debuff:OnCreated()
-	if IsServer() then
-		print("Tick time:", self:GetAbility():GetSpecialValueFor("tick_time"))
-		self:StartIntervalThink(self:GetAbility():GetSpecialValueFor("tick_time"))
-	end
+	if not IsServer() then return end
+
+	print("Tick time:", self:GetAbility():GetSpecialValueFor("tick_time"))
+	self:StartIntervalThink(self:GetAbility():GetSpecialValueFor("tick_time"))
 end
 
 function modifier_ghost_revenant_ghost_immolation_debuff:OnIntervalThink()
-	if IsServer() then
-		print("Damage:", self:GetParent():GetMaxHealth() / 100 * self:GetAbility():GetSpecialValueFor("health_as_damage_pct"))
-		ApplyDamage({victim = self:GetParent(), attacker = self:GetCaster(), damage = self:GetParent():GetMaxHealth() / 100 * self:GetAbility():GetSpecialValueFor("health_as_damage_pct"), damage_type = DAMAGE_TYPE_MAGICAL})
-	end
+--	print("Damage:", self:GetParent():GetMaxHealth() / 100 * self:GetAbility():GetSpecialValueFor("health_as_damage_pct"))
+	ApplyDamage({victim = self:GetParent(), attacker = self:GetCaster(), damage = self:GetParent():GetMaxHealth() / 100 * self:GetAbility():GetSpecialValueFor("health_as_damage_pct"), damage_type = DAMAGE_TYPE_MAGICAL})
 end
 
 -----------------------------------------------------------------------------------------------------------
