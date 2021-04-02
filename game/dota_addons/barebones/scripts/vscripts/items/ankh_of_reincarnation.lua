@@ -38,9 +38,11 @@ function modifier_ankh:OnCreated(keys)
 		mod:IncrementStackCount()
 		CustomNetTables:SetTableValue("player_table", tostring(self:GetParent():entindex()).."_respawns", {mod:GetStackCount()})
 	else
-		local charges = self:GetAbility():GetCurrentCharges()
+		local charges = 0
 
-		if keys and keys.charges then
+		if self:GetAbility() and self:GetAbility().GetCurrentCharges then
+			charges = self:GetAbility():GetCurrentCharges()
+		elseif keys and keys.charges then
 			charges = keys.charges
 		end
 
@@ -54,7 +56,7 @@ end
 
 modifier_ankh_passives = modifier_ankh_passives or class({})
 
-function modifier_ankh_passives:IsHidden() return true end
+function modifier_ankh_passives:IsHidden() return not IsInToolsMode() end
 function modifier_ankh_passives:RemoveOnDeath() return false end
 function modifier_ankh_passives:IsPurgable() return false end
 function modifier_ankh_passives:IsPurgeException() return false end

@@ -121,13 +121,13 @@
 
 .QuestIcon.Explore
 {
-	background-image: url("s2r://panorama/images/interface/quest_pip_empty_psd.vtex");
+	background-image: url("file://panorama/images/interface/quest_pip_empty_psd.psd");
 	wash-color: white;
 }
 
 .QuestIcon.Holdout
 {
-	background-image: url("s2r://panorama/images/interface/quest_holdout_empty_psd.vtex");
+	background-image: url("file://panorama/images/interface/quest_holdout_empty_psd.psd");
 }
 
 
@@ -135,7 +135,7 @@
 {
 	width: 32px;
 	height: 32px;
-	background-image: url("s2r://panorama/images/interface/quest_pip_complete_psd.vtex");
+	background-image: url("file://panorama/images/interface/quest_pip_complete_psd.psd");
 
 	background-size: 100%;
 	visibility: collapse;

@@ -4,7 +4,7 @@
 <!--		<include src="s2r://panorama/styles/hud.vcss_c"/> -->
 		<include src="s2r://panorama/styles/hudstyles.vcss_c"/>
 <!--		<include src="s2r://panorama/styles/dashboard_page_controlslibrary.vcss_c" /> -->
-		<include src="s2r://panorama/styles/custom_game/hud_main.vcss_c"/>
+		<include src="s2r://panorama/styles/custom_game/hud_main.css"/>
 		<include src="s2r://panorama/styles/custom_game/dungeon_scoreboard.vcss_c"/>
 		<include src="s2r://panorama/styles/custom_game/party_portraits.vcss_c"/>
 	</styles>

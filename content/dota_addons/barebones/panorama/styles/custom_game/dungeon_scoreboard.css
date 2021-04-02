@@ -43,13 +43,13 @@
 	transition-duration: .2s;
 	transition-timing-function: ease-in-out;
 
-	background-image: url("s2r://panorama/images/interface/zoneheader_01_psd.vtex");
+	background-image: url("file://panorama/images/interface/zoneheader_01_psd.psd");
 	background-position: center;
 	background-size: cover;
 	background-repeat: no-repeat;	
 }
 
-.ZoneSelected_xhs_holdout .ScoreboardHeaderContainer { background-image: url("s2r://panorama/images/interface/zoneheader_02_psd.vtex"); }
+.ZoneSelected_xhs_holdout .ScoreboardHeaderContainer { background-image: url("file://panorama/images/interface/zoneheader_02_psd.psd"); }
 
 .OldBest.ZoneSubtitle,
 .NewBest.ZoneSubtitle
@@ -117,7 +117,7 @@
 	width: 12px;
 	height: 26px;
 	margin-top: -4px;
-	background-image: url("s2r://panorama/images/status_icons/previousbest_icon_psd.vtex");
+	background-image: url("file://panorama/images/status_icons/previousbest_icon_psd.psd");
 	background-position: center;
 	background-size: contain;
 	background-repeat: no-repeat;
@@ -624,7 +624,7 @@
 .HasStars3.ReqTab #StarContainerReplays #ZoneStar3
 {
 	wash-color: #fa0;
-	background-image: url("s2r://panorama/images/status_icons/star_raised_filled_psd.vtex");	
+	background-image: url("file://panorama/images/status_icons/star_raised_filled_psd.psd");	
 }
 
 .Stars1 #ZoneStar1,
@@ -635,7 +635,7 @@
 .Stars3 #ZoneStar3
 {
 	wash-color: #fa0;
-	background-image: url("s2r://panorama/images/status_icons/star_raised_filled_psd.vtex");	
+	background-image: url("file://panorama/images/status_icons/star_raised_filled_psd.psd");	
 }
 
 #ZoneRequirementContainer
@@ -692,7 +692,7 @@
     background-size: 100%;
     background-repeat: no-repeat;
     background-position: 50% 50%;
-    background-image: url("s2r://panorama/images/custom_game/button_audio_on_psd.vtex");
+    background-image: url("file://panorama/images/custom_game/button_audio_on_psd.psd");
 	visibility: visible;
 	opacity: 0.8;
 	margin-right: -32px;
@@ -705,7 +705,7 @@
 
 .MuteButton.player_muted 
 {
-    background-image: url("s2r://panorama/images/custom_game/button_audio_off_psd.vtex");
+    background-image: url("file://panorama/images/custom_game/button_audio_off_psd.psd");
 }
 
 .local_player .MuteButton

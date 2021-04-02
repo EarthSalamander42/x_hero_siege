@@ -58,7 +58,7 @@
 {
 	margin-top: 3.7%;
 	align: center top;
-	background-image: url("s2r://panorama/images/hud/reborn/bg_timer_psd.vtex");
+	background-image: url("file://panorama/images/hud/reborn/bg_timer_psd.psd");
 	background-size: 100%;
 	flow-children: down;
 }
@@ -970,7 +970,7 @@
 	width: 20px;
 	height: 20px;
 	margin-right: 6px;
-	background-image: url("s2r://panorama/images/control_icons/refresh_psd.vtex");
+	background-image: url("file://panorama/images/control_icons/refresh_psd.psd");
 	background-size: 100% 100%;
 	align: left center;
 }

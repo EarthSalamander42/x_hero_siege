@@ -5,17 +5,17 @@
 		<include src="s2r://panorama/styles/hudstyles.vcss_c"/>
 		<include src="s2r://panorama/styles/hud/hud_reborn.vcss_c" />	
 
-		<include src="s2r://panorama/styles/custom_game/hud_main.vcss_c" />
+		<include src="s2r://panorama/styles/custom_game/hud_main.css" />
 		<include src="s2r://panorama/styles/custom_game/quests.vcss_c" />
 		<include src="s2r://panorama/styles/custom_game/party_portraits.vcss_c" />
-		<include src="s2r://panorama/styles/custom_game/party_arrows.vcss_c" />
+<!--		<include src="s2r://panorama/styles/custom_game/party_arrows.vcss_c" /> -->
 	</styles>
 
 	<scripts>
 		<include src="s2r://panorama/scripts/custom_game/hud_main.vjs_c" />
 		<include src="s2r://panorama/scripts/custom_game/quests.vjs_c" />
 		<include src="s2r://panorama/scripts/custom_game/party_health_bars.vjs_c" />
-		<include src="s2r://panorama/scripts/custom_game/relic_courier.vjs_c" />
+<!--		<include src="s2r://panorama/scripts/custom_game/relic_courier.vjs_c" /> -->
 	</scripts>
 
   <Panel hittest="false" class="CustomHudRoot">
