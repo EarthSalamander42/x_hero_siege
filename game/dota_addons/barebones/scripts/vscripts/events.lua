@@ -1061,9 +1061,10 @@ ListenToGameEvent('entity_killed', function(keys)
 		end
 
 		if killedUnit:GetUnitName() == "npc_dota_hero_magtheridon" then
-			local teleporters2 = Entities:FindAllByName("trigger_teleport2")
 			local difficulty = GameRules:GetCustomGameDifficulty()
+
 			MAGTHERIDON = MAGTHERIDON + 1
+
 			if MAGTHERIDON > 0 and difficulty == 1 then
 				EndMagtheridonArena()
 			elseif MAGTHERIDON > 1 and difficulty == 2 then

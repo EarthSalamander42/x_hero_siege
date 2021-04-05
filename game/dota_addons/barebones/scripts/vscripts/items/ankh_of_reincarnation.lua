@@ -4,14 +4,12 @@
 local function RespawnMagtheridon(iBossCount, vPosition, iAnkhCharges)
 	local magtheridon = CreateUnitByName("npc_dota_hero_magtheridon", vPosition, true, nil, nil, DOTA_TEAM_CUSTOM_2)
 	magtheridon.boss_count = iBossCount
-	local ankh = CreateItem("item_ankh_of_reincarnation", magtheridon, magtheridon)
 
-	if iAnkhCharges -1 ~= 0 then
-		magtheridon:AddItem(ankh)
+	print(iAnkhCharges)
+	if iAnkhCharges > 0 then
+		magtheridon:AddNewModifier(magtheridon, nil, "modifier_ankh_passives", {}):SetStackCount(iAnkhCharges)
 	end
 
-	ankh:SetCurrentCharges(iAnkhCharges -1)
-	magtheridon:FindModifierByName("modifier_ankh_passives"):SetStackCount(iAnkhCharges - 1)
 	magtheridon:EmitSound("Ability.Reincarnation")
 --	BossBar(magtheridon, "mag")
 	magtheridon.zone = "xhs_holdout"
@@ -84,6 +82,7 @@ function modifier_ankh_passives:OnDeath(params)
 		if not self:GetParent():HasItemInInventory("item_shield_of_invincibility") then
 			CustomNetTables:SetTableValue("player_table", tostring(self:GetParent():entindex()).."_respawns", {self:GetStackCount() - 1})
 
+--			print("Ankhs stacks:", self:GetStackCount())
 			if self:GetStackCount() -1 >= 1 then
 				self:DecrementStackCount()
 			else
@@ -107,6 +106,8 @@ function modifier_ankh_passives:OnDeath(params)
 		end
 
 		if string.find(self:GetParent():GetUnitName(), "magtheridon") then
+			reincarnate_time = 10.0
+
 			for i = 1, 8 do
 				CreateUnitByName("npc_dota_hero_magtheridon_medium", self.position + RandomVector(200), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 			end
@@ -115,7 +116,7 @@ function modifier_ankh_passives:OnDeath(params)
 			local position = self.position
 			local charges = self:GetStackCount()
 
-			Timers:CreateTimer(10.0, function()
+			Timers:CreateTimer(reincarnate_time, function()
 				RespawnMagtheridon(boss_count, position, charges)
 			end)
 		end
@@ -126,21 +127,21 @@ function modifier_ankh_passives:OnDeath(params)
 	ParticleManager:SetParticleControl(particle, 3, self.position)
 	ParticleManager:ReleaseParticleIndex(particle)
 
-	print("Unit name (pre):", self:GetParent():GetUnitName())
+--	print("Unit name (pre):", self:GetParent():GetUnitName())
 	self:StartIntervalThink(reincarnate_time)
 end
 
 function modifier_ankh_passives:OnIntervalThink()
 	self:StartIntervalThink(-1)
 
-	self:GetParent():SetRespawnPosition(self.position)
 	self:GetParent():EmitSound("Ability.ReincarnationAlt")
 
 	if self:GetParent():IsRealHero() then
+		self:GetParent():SetRespawnPosition(self.position)
 		self:GetParent():RespawnHero(false, false)
 		self:GetParent():SetRespawnsDisabled(false)
 	else
-		print("Unit name:", self:GetParent():GetUnitName())
+--		print("Unit name:", self:GetParent():GetUnitName())
 		-- useless fail-safe, just in case (shouldn't proc as the unit is removed before the interval think occurs)
 		if string.find(self:GetParent():GetUnitName(), "magtheridon") then
 			print("MAGTHERIDON RESPAWN!")
@@ -150,6 +151,8 @@ function modifier_ankh_passives:OnIntervalThink()
 	end
 
 	-- requires 0.1 timer?
+
+--	print("Marked for delete?", self.mark_for_delete)
 
 	if self.mark_for_delete then
 		self:Destroy()
