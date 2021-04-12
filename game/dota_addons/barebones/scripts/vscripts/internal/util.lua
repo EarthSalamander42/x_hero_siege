@@ -622,18 +622,22 @@ function TeleportHero(hero, point, delay, iCameraSpeed)
 		ParticleManager:SetParticleControlEnt(TeleportEffect, PATTACH_ABSORIGIN, hero, PATTACH_ABSORIGIN, "attach_origin", point, true)
 		ParticleManager:SetParticleControl(TeleportEffectEnd, 1, point)
 		hero:Attribute_SetIntValue( "effectsID", TeleportEffect )
+
+		hero:EmitSound("Portal.Loop_Appear")
 	end
 
 	hero:AddNewModifier(hero, nil, "modifier_command_restricted", {})
-	hero:EmitSound("Portal.Loop_Appear")
 
 	CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "set_player_camera", {hPosition = point, iSpeed = iCameraSpeed})
 
 	Timers:CreateTimer(delay, function()
 		EmitSoundOnLocationWithCaster(pos, "Portal.Hero_Disappear", hero)
+
 		hero:StopSound("Portal.Loop_Appear")
+
 		if hero:GetUnitName() == "npc_dota_hero_meepo" then
-		local meepo_table = Entities:FindAllByName("npc_dota_hero_meepo")
+			local meepo_table = Entities:FindAllByName("npc_dota_hero_meepo")
+
 			if meepo_table then
 				for i = 1, #meepo_table do
 					FindClearSpaceForUnit(meepo_table[i], point, false)
@@ -660,15 +664,15 @@ end
 -- Ported from Dota IMBA
 -- Get the base projectile of a unit
 function GetBaseRangedProjectileName(unit)
-local unit_name = unit:GetUnitName()
-unit_name = string.gsub(unit_name, "dota", "imba")
+	local unit_name = unit:GetUnitName()
+	unit_name = string.gsub(unit_name, "dota", "imba")
 
 	local unit_table = unit:IsHero() and GameRules.HeroKV[unit_name] or GameRules.UnitKV[unit_name]
 	return unit_table and unit_table["ProjectileModel"] or ""
 end
 
 function ChangeAttackProjectile(unit)
-local particle_lifesteal = "particles/item/lifesteal_mask/lifesteal_particle.vpcf"
+	local particle_lifesteal = "particles/item/lifesteal_mask/lifesteal_particle.vpcf"
 
 	if unit:HasModifier("modifier_lifesteal_custom") then		
 		unit:SetRangedProjectileName(particle_lifesteal)

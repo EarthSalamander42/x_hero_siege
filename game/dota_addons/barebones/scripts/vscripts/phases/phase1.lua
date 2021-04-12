@@ -88,16 +88,14 @@ function SpiritBeastBack(event)
 end
 
 function SpiritBeastDead(event)
-	local hero = event.activator
+	local hero = event.attacker
 
 	DoEntFire("trigger_spirit_beast_duration", "Kill", nil ,0 ,nil ,nil)
 	GameMode.SpiritBeast_killed = 1
 	CustomGameEventManager:Send_ServerToAllClients("hide_timer_spirit_beast", {})
 
-	Timers:CreateTimer(0.5, function()
-		local pos = GameMode.spirit_beast:GetAbsOrigin()
-		DropNeutralItemAtPositionForHero("item_shield_of_invincibility", pos, hero, hero:GetTeam(), true)
-	end)
+	local pos = GameMode.spirit_beast:GetAbsOrigin()
+	DropNeutralItemAtPositionForHero("item_shield_of_invincibility", pos, hero, hero:GetTeam(), true)
 end
 
 function FrostInfernalBack(event)
@@ -115,16 +113,14 @@ local hero = event.activator
 end
 
 function FrostInfernalDead(event)
-	local hero = event.activator
+	local hero = event.attacker
 
 	DoEntFire("trigger_frost_infernal_duration", "Kill", nil ,0 ,nil ,nil)
 	GameMode.FrostInfernal_killed = 1
 	CustomGameEventManager:Send_ServerToAllClients("hide_timer_frost_infernal", {})
 
-	Timers:CreateTimer(0.5,function ()
-		local pos = GameMode.frost_infernal:GetAbsOrigin()
-		DropNeutralItemAtPositionForHero("item_key_of_the_three_moons", pos, hero, hero:GetTeam(), true)
-	end)
+	local pos = GameMode.frost_infernal:GetAbsOrigin()
+	DropNeutralItemAtPositionForHero("item_key_of_the_three_moons", pos, hero, hero:GetTeam(), true)
 end
 
 function AllHeroImageBack(event)
