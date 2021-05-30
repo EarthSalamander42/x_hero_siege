@@ -141,7 +141,7 @@ function modifier_ai:OnIntervalThink()
 					print("Cast On Target:", ability:GetAbilityName())
 
 					if self:GetParent():GetTeam() == ability:GetAbilityTargetTeam() then
-						self:GetParent():CastAbilityOnTarget(allies[RandomInt(1, #enemies)], ability, -1)
+						self:GetParent():CastAbilityOnTarget(allies[RandomInt(1, #allies)], ability, -1)
 
 						return
 					else

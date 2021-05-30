@@ -120,7 +120,7 @@ function GameMode:InitGameMode()
 	GameRules:SetRuneMinimapIconScale(1)
 
 	-- Team Rules
-	SetTeamCustomHealthbarColor(DOTA_TEAM_GOODGUYS, 64, 64, 128) --Blue
+	SetTeamCustomHealthbarColor(DOTA_TEAM_GOODGUYS, 64, 64, 192) --Blue
 --	SetTeamCustomHealthbarColor(DOTA_TEAM_BADGUYS, 255, 255, 0) --Yellow
 	SetTeamCustomHealthbarColor(DOTA_TEAM_CUSTOM_1, 128, 32, 32) --Red	
 	SetTeamCustomHealthbarColor(DOTA_TEAM_CUSTOM_2, 128, 32, 32) --Red	
