@@ -252,6 +252,7 @@ function AllPlayersLoaded() {
 }
 
 function AllPlayersBattlepassLoaded() {
+/*
 	$.Msg("ALL PLAYERS BATTLEPASS LOADED!")
 
 	var player_table = CustomNetTables.GetTableValue("battlepass_player", Players.GetLocalPlayer().toString());
@@ -282,15 +283,15 @@ function AllPlayersBattlepassLoaded() {
 
 		$.GetContextPanel().FindChildTraverse("RankTier").style.backgroundImage = 'url("s2r://panorama/images/rank_tier_icons/rank' + mmr_rank_to_medals[short_title] + '_psd.vtex")';
 		$.GetContextPanel().FindChildTraverse("RankPips").style.backgroundImage = 'url("s2r://panorama/images/rank_tier_icons/pip' + title_stars + '_psd.vtex")';
-/*
-		rank_panel.SetPanelEvent("onmouseover", function () {
-			$.DispatchEvent("DOTAShowTextTooltip", rank_panel, player_table.mmr_title);
-		})
-		rank_panel.SetPanelEvent("onmouseout", function () {
-			$.DispatchEvent("DOTAHideTextTooltip", rank_panel);
-		})
-*/
+
+//		rank_panel.SetPanelEvent("onmouseover", function () {
+//			$.DispatchEvent("DOTAShowTextTooltip", rank_panel, player_table.mmr_title);
+//		})
+//		rank_panel.SetPanelEvent("onmouseout", function () {
+//			$.DispatchEvent("DOTAHideTextTooltip", rank_panel);
+//		})
 	}
+*/
 }
 
 function ToggleVoteContainer(bBoolean) {
@@ -432,6 +433,16 @@ function DisableRankingVoting() {
 	$("#imba-loading-title-vote").FindChildTraverse("vote-content").GetChild(0).style.visibility = "collapse";
 }
 
+function HidePickScreenDuringGame() {
+	$.Msg("Attempt to Hide loading screen")
+
+	if (Game.GameStateIsAfter(2)) {
+		$.GetContextPanel().style.visibility = "collapse";
+		$.Msg("Loading screen hidden!")
+	} else
+		$.Schedule(1.0, HidePickScreenDuringGame)
+}
+
 (function(){
 	var vote_info = $.GetContextPanel().FindChildrenWithClassTraverse("vote-info");
 
@@ -467,18 +478,21 @@ function DisableRankingVoting() {
 			companion.AddClass("DonatorReward");
 			companion.style.width = 100 / companion_list.length + "%";
 
-			var companionpreview = $.CreatePanel("Button", companion, "");
-			companionpreview.style.width = "100%";
-			companionpreview.style.height = "100%";
+//			var companionpreview = $.CreatePanel("Button", companion, "");
+//			companionpreview.style.width = "100%";
+//			companionpreview.style.height = "100%";
 
-			companionpreview.BLoadLayoutFromString('<root><Panel><DOTAScenePanel style="width:100%; height:100%;" particleonly="false" unit="' + companion_list[i] + '"/></Panel></root>', false, false);
-			companionpreview.style.opacityMask = 'url("s2r://panorama/images/masks/hero_model_opacity_mask_png.vtex");'
+//			companionpreview.BLoadLayoutFromString('<root><Panel><DOTAScenePanel style="width:100%; height:100%;" particleonly="false" unit="' + companion_list[i] + '"/></Panel></root>', false, false);
+//			companionpreview.style.opacityMask = 'url("s2r://panorama/images/masks/hero_model_opacity_mask_png.vtex");'
 		}
 	}
 
 	HoverableLoadingScreen();
 	fetch();
 	SetProfileName();
+
+	if (!Game.IsInToolsMode())
+		$.Schedule(1.0, HidePickScreenDuringGame); // Yeah like wtf, i really have to do this? really? like, really??
 
 	GameEvents.Subscribe("loading_screen_debug", LoadingScreenDebug);
 	GameEvents.Subscribe("send_votes", OnVotesReceived);

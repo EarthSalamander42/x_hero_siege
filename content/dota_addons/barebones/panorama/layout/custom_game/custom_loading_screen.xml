@@ -1,6 +1,6 @@
 <root>
 	<styles>
-		<include src="file://{resources}/styles/dotastyles.vcss_c" />
+		<include src="s2r://panorama/styles/dotastyles.vcss_c" />
 		<include src="file://{resources}/styles/custom_game/custom_loading_screen.css"/>
 	</styles>
 
@@ -50,19 +50,27 @@
 
 						<Label class="vote-select-description"/>
 
-						<Button id="VoteGameModeMainText4" class="vote-button">
-							<Label class="vote-button-label" text="Vote" />
-						</Button>
-					</Panel>
-
-					<Panel class="vote-select-panel">
-						<Label class="vote-select-title"/>
-
-						<Label class="vote-select-description"/>
-
 						<Button id="VoteGameModeMainText5" class="vote-button">
 							<Label class="vote-button-label" text="Vote" />
 						</Button>
+					</Panel>
+				</Panel>
+
+				<Panel class="vote-select-panel-party">
+					<Label class="vote-select-party" text="No team ordering"/>
+
+					<Panel class="vote-select-panel-party-bottom-container">
+						<Button id="party_vote_button" class="vote-button" onactivate="PartyVote();">
+							<Label class="vote-button-label" hittest="false" text="No Party Vote"/>
+						</Button>
+
+						<Panel class="vote-select-panel-party-progressbar-container">
+							<ProgressBar id="party_vote_progress_bar" class="HealthProgressBar" hittest="false" value="0.0">
+								<Panel class="vote-select-panel-party-progressbar-labels">
+									<Label id="party_required_votes" class="party-vote-count vote-button-label" hittest="false" text="#party_required_votes"/>
+								</Panel>
+							</ProgressBar>
+						</Panel>
 					</Panel>
 				</Panel>
 			</Panel>
@@ -84,7 +92,7 @@
 
 					<Panel id="vote-container" class="vote-container">
 						<Panel class="vote-header-container">
-							<Label class="vote-title" text="#vote_gamemode"/>
+							<Label class="vote-title" text="GAMEMODE"/>
 							<Panel class="vote-info"/>
 						</Panel>
 
@@ -93,9 +101,9 @@
 						<Label id="VoteGameModeText2" class="vote-label" text="#vote_gamemode_2" />
 
 						<Label id="VoteGameModeText3" class="vote-label" text="#vote_gamemode_3" />
-
+<!--
 						<Label id="VoteGameModeText4" class="vote-label" text="#vote_gamemode_4" />
-
+-->
 						<Label id="VoteGameModeText5" class="vote-label" text="#vote_gamemode_5" />
 
 						<Label id="VoteGameModeCheck" class="vote-label vote-check" text="You have not voted yet." />
@@ -117,7 +125,7 @@
 
 						<Label id="loading-description-text" />
 
-						<Button class="vote-button" onactivate="DOTADisplayURL('https://frostrose-studio.com')">
+						<Button class="vote-button" onactivate="ExternalBrowserGoToURL('https://frostrose-studio.com')">
 							<Label class="vote-button-label" text="#loading_screen_button" />
 						</Button>
 					</Panel>
@@ -150,7 +158,7 @@
 						</Button>
 
 						<!-- Dota IMBA -->
-						<Button class="mod-cell" onactivate="DOTADisplayURL('https://steamcommunity.com/sharedfiles/filedetails/?id=1350425247');">
+						<Button class="mod-cell" onactivate="ExternalBrowserGoToURL('https://steamcommunity.com/sharedfiles/filedetails/?id=1350425247');">
 							<Panel class="mod-image-container">
 								<Image class="mod-image" src="file://panorama/images/custom_game/mods/modlist2.jpg"/>
 								<Panel class="mod-background"/>
@@ -162,7 +170,7 @@
 						</Button>
 
 						<!-- X Hero Siege -->
-						<Button class="mod-cell" onactivate="DOTADisplayURL('https://steamcommunity.com/sharedfiles/filedetails/?id=536682348');">
+						<Button class="mod-cell" onactivate="ExternalBrowserGoToURL('https://steamcommunity.com/sharedfiles/filedetails/?id=536682348');">
 							<Panel class="mod-image-container">
 								<Image class="mod-image" src="file://panorama/images/custom_game/mods/modlist3.jpg"/>
 								<Panel class="mod-background"/>
@@ -174,7 +182,7 @@
 						</Button>
 
 						<!-- Pudge Wars -->
-						<Button class="mod-cell" onactivate="DOTADisplayURL('https://steamcommunity.com/sharedfiles/filedetails/?id=296831818');">
+						<Button class="mod-cell" onactivate="ExternalBrowserGoToURL('https://steamcommunity.com/sharedfiles/filedetails/?id=296831818');">
 							<Panel class="mod-image-container">
 								<Image class="mod-image" src="file://panorama/images/custom_game/mods/modlist4.jpg"/>
 								<Panel class="mod-background"/>
@@ -187,7 +195,7 @@
 
 						<!-- Hero Line Wars -->
 <!--
-						<Button class="mod-cell" onactivate="DOTADisplayURL('https://steamcommunity.com/sharedfiles/filedetails/?id=492195751');">
+						<Button class="mod-cell" onactivate="ExternalBrowserGoToURL('https://steamcommunity.com/sharedfiles/filedetails/?id=492195751');">
 							<Panel class="mod-image-container">
 								<Image class="mod-image" src="file://panorama/images/custom_game/mods/modlist1.jpg"/>
 								<Panel class="mod-background"/>
@@ -200,7 +208,7 @@
 -->
 
 						<!-- Diretide -->
-						<Button class="mod-cell" onactivate="DOTADisplayURL('https://steamcommunity.com/sharedfiles/filedetails/?id=544075277');">
+						<Button class="mod-cell" onactivate="ExternalBrowserGoToURL('https://steamcommunity.com/sharedfiles/filedetails/?id=544075277');">
 							<Panel class="mod-image-container">
 								<Image class="mod-image" src="file://panorama/images/custom_game/mods/modlist6.jpg"/>
 								<Panel class="mod-background"/>
@@ -213,7 +221,7 @@
 					</Panel>
 
 					<Panel class="bottom-transifex-container">
-						<Button class="vote-button" onactivate="DOTADisplayURL('https://www.transifex.com/frostrose-studio/x-hero-siege/')">
+						<Button class="vote-button" onactivate="ExternalBrowserGoToURL('https://www.transifex.com/frostrose-studio/dota-imba/')">
 							<Label class="vote-button-label" text="#loading_screen_promote_button" />
 						</Button>
 					</Panel>
@@ -222,7 +230,7 @@
 						<!-- Filled Dynamically -->
 						<Panel class="bottom-patreon-sub"/>
 
-						<Button class="loading-link-patreon" onactivate="DOTADisplayURL('https://www.patreon.com/bePatron?u=2533325')">
+						<Button class="loading-link-patreon" onactivate="ExternalBrowserGoToURL('https://www.patreon.com/bePatron?u=2533325')">
 							<Label class="vote-button-label" />
 						</Button>
 					</Panel>
