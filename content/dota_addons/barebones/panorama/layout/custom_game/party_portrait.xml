@@ -74,7 +74,7 @@
 		<ProgressBar hittest="false" id="ManaBar" class="PartyPortraitManaBar" min="0" max="100" value="100"/>
 
 		<Panel id="PartyLifeRemainingContainer" class="PartyPortaitLivesContainer" require-composition-layer="true" always-cache-composition-layer="true">
-			<DOTAHeroImage id="PartyLife0" hittest="false" heroimagestyle="icon" heroid="1" class="LifeLeftIcon LifeUsed" scaling="stretch-to-cover-preserve-aspect" />
+			<DOTAHeroImage id="PartyLife0" hittest="false" heroimagestyle="icon" heroid="91" class="LifeLeftIcon LifeUsed" scaling="stretch-to-cover-preserve-aspect" />
 
 			<Label hittest="false" id="LifeAmount" class="PartyPortraitName" text="" html="true"/>	
 			<Image id="NeutralImage" scaling="stretch-to-cover-preserve-aspect" onactivate="OnVIPIconClicked()"/>

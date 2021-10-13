@@ -1,7 +1,6 @@
 -- Author: Cookies
 -- Date: 05.12.2019
 
-LinkLuaModifier("modifier_ankh", "items/ankh_of_reincarnation.lua", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_shield_of_invincibility", "items/shield_of_invincibility.lua", LUA_MODIFIER_MOTION_NONE)
 
 item_shield_of_invincibility = item_shield_of_invincibility or class({})

@@ -85,6 +85,8 @@
 "DOTA_Tooltip_ability_item_ankh_of_reincarnation_Description"			"<h1><font color='#FF7800'>Passive:</font></h1> Reincarnate the Hero with full HP and Mana after death. Contains 3 charges.\n<h1><font color='#FF0000'>Restrictions:</h1> Consume 1 charge on death.</font>"
 "DOTA_Tooltip_ability_item_ankh_of_reincarnation_reincarnation_time"	"REINCARNATE TIME:"
 
+"DOTA_Tooltip_modifier_ankh_passives"                                           "Reincarnation"
+
 "DOTA_Tooltip_ability_item_talisman_of_evasion_datadriven"						"Talisman of Evasion"
 "DOTA_Tooltip_ability_item_talisman_of_evasion_datadriven_Lore"					"A necklace that allows you to anticipate enemy attacks."
 "DOTA_Tooltip_ability_item_talisman_of_evasion_datadriven_Note0"				"Talisman of Evasion doesn't stack with self."

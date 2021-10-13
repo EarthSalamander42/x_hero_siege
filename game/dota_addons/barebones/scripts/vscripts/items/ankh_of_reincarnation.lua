@@ -59,10 +59,33 @@ function modifier_ankh_passives:RemoveOnDeath() return false end
 function modifier_ankh_passives:IsPurgable() return false end
 function modifier_ankh_passives:IsPurgeException() return false end
 function modifier_ankh_passives:GetAttributes() return MODIFIER_ATTRIBUTE_MULTIPLE end
+function modifier_ankh_passives:GetTextre() return "modifiers/ankh_of_reincarnation" end
 
 function modifier_ankh_passives:DeclareFunctions() return {
 	MODIFIER_EVENT_ON_DEATH,
 } end
+
+function modifier_ankh_passives:OnIntervalThink()
+	self:StartIntervalThink(-1)
+
+	self:GetParent():EmitSound("Ability.ReincarnationAlt")
+
+	if self:GetParent():IsRealHero() then
+		self:GetParent():SetRespawnPosition(self.position)
+		self:GetParent():RespawnHero(false, false)
+		self:GetParent():SetRespawnsDisabled(false)
+	else
+--		print("Unit name:", self:GetParent():GetUnitName())
+		-- useless fail-safe, just in case (shouldn't proc as the unit is removed before the interval think occurs)
+		if string.find(self:GetParent():GetUnitName(), "magtheridon") then
+			print("MAGTHERIDON RESPAWN!")
+		else
+			self:GetParent():RespawnUnit()
+		end
+	end
+
+	self:GetParent().ankh_respawn = false
+end
 
 function modifier_ankh_passives:OnDeath(params)
 	if not IsServer() then return end
@@ -80,14 +103,12 @@ function modifier_ankh_passives:OnDeath(params)
 		self:GetAbility():StartCooldown(self:GetAbility():GetCooldown(self:GetAbility():GetLevel()))
 	else
 		if not self:GetParent():HasItemInInventory("item_shield_of_invincibility") then
-			CustomNetTables:SetTableValue("player_table", tostring(self:GetParent():entindex()).."_respawns", {self:GetStackCount() - 1})
+			local new_stacks = math.max(self:GetStackCount() - 1, 0)
 
---			print("Ankhs stacks:", self:GetStackCount())
-			if self:GetStackCount() -1 >= 1 then
-				self:DecrementStackCount()
-			else
-				self.mark_for_delete = true
-			end
+			CustomNetTables:SetTableValue("player_table", tostring(self:GetParent():entindex()).."_respawns", {new_stacks})
+			self:SetStackCount(new_stacks)
+
+			if self:GetStackCount() == 0 then return end
 		end
 	end
 
@@ -127,36 +148,5 @@ function modifier_ankh_passives:OnDeath(params)
 	ParticleManager:SetParticleControl(particle, 3, self.position)
 	ParticleManager:ReleaseParticleIndex(particle)
 
---	print("Unit name (pre):", self:GetParent():GetUnitName())
 	self:StartIntervalThink(reincarnate_time)
-end
-
-function modifier_ankh_passives:OnIntervalThink()
-	self:StartIntervalThink(-1)
-
-	self:GetParent():EmitSound("Ability.ReincarnationAlt")
-
-	if self:GetParent():IsRealHero() then
-		self:GetParent():SetRespawnPosition(self.position)
-		self:GetParent():RespawnHero(false, false)
-		self:GetParent():SetRespawnsDisabled(false)
-	else
---		print("Unit name:", self:GetParent():GetUnitName())
-		-- useless fail-safe, just in case (shouldn't proc as the unit is removed before the interval think occurs)
-		if string.find(self:GetParent():GetUnitName(), "magtheridon") then
-			print("MAGTHERIDON RESPAWN!")
-		else
-			self:GetParent():RespawnUnit()
-		end
-	end
-
-	-- requires 0.1 timer?
-
---	print("Marked for delete?", self.mark_for_delete)
-
-	if self.mark_for_delete then
-		self:Destroy()
-	else
-		self:GetParent().ankh_respawn = false
-	end
 end
