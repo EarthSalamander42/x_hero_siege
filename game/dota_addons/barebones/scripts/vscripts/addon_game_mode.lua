@@ -69,7 +69,6 @@ function Precache(context)
 	PrecacheUnitByNameAsync("npc_dota_hero_dazzle", context)		-- Creep - orc ranged 2
 --	PrecacheUnitByNameAsync("npc_dota_hero_drow_ranger", context)	-- Lich & Dryad [and apparently meepo wat]
 --	PrecacheUnitByNameAsync("npc_dota_hero_ember_spirit", context) 	-- Ember Spirit & Cloak of Flames & Immolation etc.
---	PrecacheUnitByNameAsync("npc_dota_hero_faceless_void", context) -- cleave? LK Chrono?
 	PrecacheUnitByNameAsync("npc_dota_hero_huskar", context) 		-- For creeps
 	PrecacheUnitByNameAsync("npc_dota_hero_keeper_of_the_light", context) -- Light Fundamental?
 	PrecacheUnitByNameAsync("npc_dota_hero_kunkka", context) 		-- last wave and 4 bosses kunkkas?
@@ -94,8 +93,6 @@ function Precache(context)
 	PrecacheUnitByNameAsync("npc_dota_hero_weaver", context) 		-- for creeps?
 	PrecacheUnitByNameAsync("npc_dota_hero_wisp", context) 			-- For Connecting bug
 	PrecacheUnitByNameAsync("npc_dota_hero_zuus", context) 			-- Muradin Bronzebeard
-
-	PrecacheUnitByNameAsync( "npc_dota_hero_skeleton_king_bis", context)
 
 	PrecacheUnitByNameSync( "npc_spirit_beast_bis", context)
 	PrecacheUnitByNameSync( "npc_frost_infernal_bis", context)

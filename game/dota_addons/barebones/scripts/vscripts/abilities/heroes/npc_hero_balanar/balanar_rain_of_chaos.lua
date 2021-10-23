@@ -1,9 +1,9 @@
 function rain_of_chaos(event)
-local caster = event.caster
-local ability = event.ability
-local radius = ability:GetLevelSpecialValueFor("radius", ability:GetLevel()-1)
-local radius_explosion = ability:GetLevelSpecialValueFor("radius_explosion", ability:GetLevel()-1)
-local meteors_per_tick = ability:GetLevelSpecialValueFor("meteors_per_tick", ability:GetLevel()-1)
+	local caster = event.caster
+	local ability = event.ability
+	local radius = ability:GetLevelSpecialValueFor("radius", ability:GetLevel()-1)
+	local radius_explosion = ability:GetLevelSpecialValueFor("radius_explosion", ability:GetLevel()-1)
+	local meteors_per_tick = ability:GetLevelSpecialValueFor("meteors_per_tick", ability:GetLevel()-1)
 
 	for i = 1, meteors_per_tick do
 		local point = caster:GetAbsOrigin()+ RandomInt(1,radius)*RandomVector(1)
@@ -21,18 +21,20 @@ local meteors_per_tick = ability:GetLevelSpecialValueFor("meteors_per_tick", abi
 
 		local unit = CreateUnitByName("dummy_unit_invulnerable", point, true, nil, nil, caster:GetTeamNumber())
 		unit:EmitSound("Hero_Invoker.ChaosMeteor.Loop")
+
 		local TimerDestroySound = Timers:CreateTimer(1.09, function()
 			unit:EmitSound("Hero_Invoker.ChaosMeteor.Impact")
 		end)
+
 		ability:ApplyDataDrivenModifier(caster, unit, "modifier_dummy_target", {duration = 1.1})
 	end
 end
 
 function target_modifier_remove(event)
-local target = event.target
-local caster = event.caster
-local ability = event.ability
-local duration = ability:GetSpecialValueFor("golem_duration")
+	local target = event.target
+	local caster = event.caster
+	local ability = event.ability
+	local duration = ability:GetSpecialValueFor("golem_duration")
 
 	target:StopSound("Hero_Invoker.ChaosMeteor.Loop")
 	local unit = CreateUnitByName("npc_infernal_beast", target:GetAbsOrigin(), true, caster,caster, target:GetTeamNumber())

@@ -50,6 +50,16 @@
 
 						<Label class="vote-select-description"/>
 
+						<Button id="VoteGameModeMainText4" class="vote-button">
+							<Label class="vote-button-label" text="Vote" />
+						</Button>
+					</Panel>
+
+					<Panel class="vote-select-panel">
+						<Label class="vote-select-title"/>
+
+						<Label class="vote-select-description"/>
+
 						<Button id="VoteGameModeMainText5" class="vote-button">
 							<Label class="vote-button-label" text="Vote" />
 						</Button>

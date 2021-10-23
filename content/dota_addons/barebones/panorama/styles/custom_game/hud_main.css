@@ -272,7 +272,7 @@
 //	border-bottom-left-radius: 50%;
 //	border-bottom-right-radius: 50%;
 	border-radius: 50%;
-	box-shadow: fill #000000af -6px -6px 12px 12px;	
+	box-shadow: fill #000000af 0px 0px 1px 1px;	
 	border: 2px solid black;
 	z-index: 1;
 }

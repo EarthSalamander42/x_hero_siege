@@ -8,7 +8,7 @@
 	transition-duration: .36s, .18s;
 	transition-delay: .16s, 0s;
 	transition-timing-function: ease-in-out;
-	box-shadow: #000000f5 -4px -4px 8px 8px;
+	box-shadow: #000000f5 0px 0px 2px 2px;
 	height: 98%;
 	width: 100%;
 }

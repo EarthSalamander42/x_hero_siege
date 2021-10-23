@@ -1,8 +1,6 @@
 function StartMagtheridonArena()
-	local point_mag = Entities:FindByName(nil,"npc_dota_spawner_magtheridon_arena"):GetAbsOrigin()
-	local point_mag2 = Entities:FindByName(nil,"npc_dota_spawner_magtheridon_arena2"):GetAbsOrigin()
-	local ankh = CreateItem("item_ankh_of_reincarnation", mag, mag)
-	local ankh2 = CreateItem("item_ankh_of_reincarnation", mag, mag)
+	local point_mag = Entities:FindByName(nil, "npc_dota_spawner_magtheridon_arena"):GetAbsOrigin()
+	local point_mag2 = Entities:FindByName(nil, "npc_dota_spawner_magtheridon_arena2"):GetAbsOrigin()
 	local difficulty = GameRules:GetCustomGameDifficulty()
 	local delay = 3.0
 
@@ -11,48 +9,32 @@ function StartMagtheridonArena()
 	TeleportAllHeroes("point_teleport_boss_", 10.0 + delay, delay)
 
 	Timers:CreateTimer(delay, function()
-		if difficulty == 1 then
-			magtheridon = CreateUnitByName("npc_dota_hero_magtheridon", point_mag  ,true, nil, nil, DOTA_TEAM_CUSTOM_2)
-			magtheridon:SetAngles(0, 180, 0)
-			magtheridon.zone = "xhs_holdout"
-		elseif difficulty == 2 then
-			magtheridon = CreateUnitByName("npc_dota_hero_magtheridon", point_mag  ,true, nil, nil, DOTA_TEAM_CUSTOM_2)
-			magtheridon:SetAngles(0, 180, 0)
-			magtheridon:AddItem(ankh)
-			ankh:SetCurrentCharges(1)
-			magtheridon.zone = "xhs_holdout"
+		magtheridon = CreateUnitByName("npc_dota_hero_magtheridon", point_mag  ,true, nil, nil, DOTA_TEAM_CUSTOM_2)
+		magtheridon:SetAngles(0, 180, 0)
+		magtheridon.zone = "xhs_holdout"
+
+		if difficulty == 2 then
+			magtheridon:AddNewModifier(magtheridon, nil, "modifier_ankh", {charges = 1})
 		elseif difficulty == 3 then
-			magtheridon = CreateUnitByName("npc_dota_hero_magtheridon", point_mag  ,true, nil, nil, DOTA_TEAM_CUSTOM_2)
-			magtheridon:SetAngles(0, 180, 0)
-			magtheridon:AddItem(ankh)
-			ankh:SetCurrentCharges(3)
-			magtheridon.zone = "xhs_holdout"
+			magtheridon:AddNewModifier(magtheridon, nil, "modifier_ankh", {charges = 3})
 		elseif difficulty == 4 then
-			magtheridon = CreateUnitByName("npc_dota_hero_magtheridon", point_mag  ,true, nil, nil, DOTA_TEAM_CUSTOM_2)
+			magtheridon:AddNewModifier(magtheridon, nil, "modifier_ankh", {charges = 1})
+
 			magtheridon2 = CreateUnitByName("npc_dota_hero_magtheridon", point_mag2  ,true, nil, nil, DOTA_TEAM_CUSTOM_2)
-			magtheridon:SetAngles(0, 180, 0)
 			magtheridon2:SetAngles(0, 0, 0)
-			magtheridon:AddItem(ankh)
-			ankh:SetCurrentCharges(1)
-			magtheridon2:AddItem(ankh2)
-			ankh2:SetCurrentCharges(1)
+			magtheridon2:AddNewModifier(magtheridon, nil, "modifier_ankh", {charges = 1})
 			magtheridon2:AddNewModifier(nil, nil, "modifier_pause_creeps", {Duration = 10, IsHidden = true}):SetStackCount(1)
 			magtheridon2:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 10, IsHidden = true})
-			magtheridon.zone = "xhs_holdout"
 			magtheridon2.zone = "xhs_holdout"
 			magtheridon2.boss_count = 2
 		elseif difficulty == 5 then
-			magtheridon = CreateUnitByName("npc_dota_hero_magtheridon", point_mag  ,true, nil, nil, DOTA_TEAM_CUSTOM_2)
+			magtheridon:AddNewModifier(magtheridon, nil, "modifier_ankh", {charges = 2})
+
 			magtheridon2 = CreateUnitByName("npc_dota_hero_magtheridon", point_mag2  ,true, nil, nil, DOTA_TEAM_CUSTOM_2)
-			magtheridon:SetAngles(0, 180, 0)
 			magtheridon2:SetAngles(0, 0, 0)
-			magtheridon:AddItem(ankh)
-			ankh:SetCurrentCharges(2)
-			magtheridon2:AddItem(ankh2)
-			ankh2:SetCurrentCharges(2)
+			magtheridon2:AddNewModifier(magtheridon, nil, "modifier_ankh", {charges = 2})
 			magtheridon2:AddNewModifier(nil, nil, "modifier_pause_creeps", {Duration = 10, IsHidden = true}):SetStackCount(1)
 			magtheridon2:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 10, IsHidden = true})
-			magtheridon.zone = "xhs_holdout"
 			magtheridon2.zone = "xhs_holdout"
 			magtheridon2.boss_count = 2
 		end
@@ -64,10 +46,13 @@ end
 
 function EndMagtheridonArena()
 	Entities:FindByName(nil, "trigger_teleport_phase3_creeps"):Enable()
+
 	CustomGameEventManager:Send_ServerToAllClients("hide_boss_hp", {boss_count = 1})
 	CustomGameEventManager:Send_ServerToAllClients("hide_boss_hp", {boss_count = 2})
 	CustomGameEventManager:Send_ServerToAllClients("hide_ui", {})
+
 	Notifications:TopToAll({text="Magtheridon has been killed! Door opened.", style={color="white"}, duration=10.0})
+
 	DoEntFire("door_magtheridon", "SetAnimation", "gate_02_open", 0, nil, nil)
 
 	local DoorObs = Entities:FindAllByName("obstruction_magtheridon")
@@ -80,16 +65,19 @@ function EndMagtheridonArena()
 		grom.zone = "xhs_holdout"
 		grom:SetAngles(0, 270, 0)
 	end)
+
 	Timers:CreateTimer(4.0, function()
 		local illidan = CreateUnitByName("npc_dota_hero_illidan",Entities:FindByName(nil,"spawn_illidan"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_CUSTOM_2)
 		illidan.zone = "xhs_holdout"
 		illidan:SetAngles(0, 0, 0)
 	end)
+
 	Timers:CreateTimer(6.0, function()
 		local balanar = CreateUnitByName("npc_dota_hero_balanar",Entities:FindByName(nil,"spawn_balanar"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_CUSTOM_2)
 		balanar.zone = "xhs_holdout"
 		balanar:SetAngles(0, 90, 0)
 	end)
+
 	Timers:CreateTimer(8.0, function()
 		local proudmoore = CreateUnitByName("npc_dota_hero_proudmoore",Entities:FindByName(nil,"spawn_admiral_proudmore"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_CUSTOM_2)
 		proudmoore.zone = "xhs_holdout"
@@ -98,9 +86,9 @@ function EndMagtheridonArena()
 end
 
 function DarkProtectors(keys)
-local activator = keys.activator
-local point2 = Entities:FindByName(nil, "spawner_phase3_creeps_west"):GetAbsOrigin()
-local point3 = Entities:FindByName(nil, "spawner_phase3_creeps_east"):GetAbsOrigin()
+	local activator = keys.activator
+	local point2 = Entities:FindByName(nil, "spawner_phase3_creeps_west"):GetAbsOrigin()
+	local point3 = Entities:FindByName(nil, "spawner_phase3_creeps_east"):GetAbsOrigin()
 
 	RefreshPlayers()
 
@@ -111,13 +99,13 @@ local point3 = Entities:FindByName(nil, "spawner_phase3_creeps_east"):GetAbsOrig
 
 		for i = 0, PlayerResource:GetPlayerCount() - 1 do
 			Timers:CreateTimer(3.0, function()
-				for i = 1, 2 do
+				for i = 1, 4 * GameRules:GetCustomGameDifficulty() do
 					local unit = CreateUnitByName("npc_dota_creep_dire_hulk", point2 + RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 				end
 			end)
 
 			Timers:CreateTimer(5.0, function()
-				for i = 1, 2 do
+				for i = 1, 4 * GameRules:GetCustomGameDifficulty() do
 					local unit = CreateUnitByName("npc_dota_creep_dire_hulk", point3 + RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 				end
 			end)
@@ -165,9 +153,10 @@ end
 
 function StartBanehallowArena()
 	TeleportAllHeroes("point_teleport_boss_", 25.0, 3.0)
+	local banehallow
 
 	Timers:CreateTimer(8,function()
-		local banehallow = CreateUnitByName("npc_dota_hero_banehallow",Entities:FindByName(nil,"npc_dota_spawner_magtheridon_arena"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_CUSTOM_2)
+		banehallow = CreateUnitByName("npc_dota_hero_banehallow",Entities:FindByName(nil,"npc_dota_spawner_magtheridon_arena"):GetAbsOrigin(),true,nil,nil,DOTA_TEAM_CUSTOM_2)
 		banehallow:SetAngles(0, 270, 0)
 		banehallow:AddNewModifier(nil, nil, "modifier_pause_creeps", {Duration = 26, IsHidden = true}):SetStackCount(1)
 		banehallow:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 14, IsHidden = true})
@@ -257,6 +246,10 @@ function StartBanehallowArena()
 		green_revenant2:AddNewModifier(nil, nil, "modifier_pause_creeps", {duration = 3.5, IsHidden = true}):SetStackCount(1)
 		green_revenant2:AddNewModifier(nil, nil, "modifier_invulnerable", {duration = 3.5, IsHidden = true})
 		green_revenant2:SetRenderColor(20, 200, 20)
+
+		if banehallow then
+			banehallow:AddNewModifier(banehallow, nil, "boss_thinker_nevermore", {})
+		end
 	end)
 end
 

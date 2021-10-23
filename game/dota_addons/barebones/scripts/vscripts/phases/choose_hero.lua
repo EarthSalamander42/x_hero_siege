@@ -25,7 +25,7 @@ ListenToGameEvent('game_rules_state_change', function(keys)
 	if GameRules:State_Get() == DOTA_GAMERULES_STATE_CUSTOM_GAME_SETUP then
 		if _G.INIT_CHOOSE_HERO == false then
 			_G.INIT_CHOOSE_HERO = true
-
+			
 			-- Need a timer else Battlepass is nil when first dummy hero spawn
 			Timers:CreateTimer(1.0, function()
 				SpawnHeroesBis()
@@ -133,7 +133,9 @@ local hero_vip_count = 1
 		vip_hero:SetAngles(0, 270, 0)
 		vip_hero:AddAbility("dummy_passive_vulnerable"):SetLevel(1)
 	end
+end
 
+function SpawnBosses()
 	_G.RAMERO_DUMMY = CreateUnitByName("npc_ramero", Entities:FindByName(nil, "point_special_arena_1"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
 	_G.RAMERO_DUMMY:SetAngles(0, 270, 0)
 	_G.RAMERO_DUMMY:AddNewModifier(nil, nil, "modifier_command_restricted", {})
@@ -147,6 +149,7 @@ local hero_vip_count = 1
 	-- Special events
 	local lich_king_boss = CreateUnitByName("npc_dota_boss_lich_king", Entities:FindByName(nil, "npc_dota_spawner_lich_king"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 	lich_king_boss:SetAngles(0, 90, 0)
+	CustomGameEventManager:Send_ServerToAllClients("hide_boss_hp", {boss_count = 1})
 
 	-- Suddenly non-vanilla modifiers are not working on Lich King
 	lich_king_boss:AddNewModifier(nil, nil, "modifier_invulnerable", {})

@@ -83,7 +83,7 @@
 	background-color: black;
 	vertical-align: middle;
 	horizontal-align: right;
-	box-shadow: fill #000 -3px -3px 6px 6px;
+	box-shadow: fill #000 0px 0px 1px 1px;
 	transition-property: value; /* Works for width but not for value */
 	transition-duration: 1s;
 }

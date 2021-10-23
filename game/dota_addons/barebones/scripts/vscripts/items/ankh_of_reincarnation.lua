@@ -2,16 +2,15 @@
 -- Date: 05.12.2019
 
 local function RespawnMagtheridon(iBossCount, vPosition, iAnkhCharges)
+	if iAnkhCharges == 0 then return end
+
 	local magtheridon = CreateUnitByName("npc_dota_hero_magtheridon", vPosition, true, nil, nil, DOTA_TEAM_CUSTOM_2)
 	magtheridon.boss_count = iBossCount
 
 	print(iAnkhCharges)
-	if iAnkhCharges > 0 then
-		magtheridon:AddNewModifier(magtheridon, nil, "modifier_ankh_passives", {}):SetStackCount(iAnkhCharges)
-	end
+	magtheridon:AddNewModifier(magtheridon, nil, "modifier_ankh_passives", {}):SetStackCount(iAnkhCharges - 1)
 
 	magtheridon:EmitSound("Ability.Reincarnation")
---	BossBar(magtheridon, "mag")
 	magtheridon.zone = "xhs_holdout"
 end
 
@@ -34,7 +33,10 @@ function modifier_ankh:OnCreated(keys)
 
 	if mod then
 		mod:IncrementStackCount()
-		CustomNetTables:SetTableValue("player_table", tostring(self:GetParent():entindex()).."_respawns", {mod:GetStackCount()})
+
+		if self:GetParent():IsRealHero() and self:GetParent():IsOwnedByAnyPlayer() then
+			CustomNetTables:SetTableValue("player_table", tostring(self:GetParent():entindex()).."_respawns", {mod:GetStackCount()})
+		end
 	else
 		local charges = 0
 
@@ -45,7 +47,10 @@ function modifier_ankh:OnCreated(keys)
 		end
 
 		self:GetParent():AddNewModifier(self:GetParent(), self:GetAbility(), "modifier_ankh_passives", {}):SetStackCount(charges)
-		CustomNetTables:SetTableValue("player_table", tostring(self:GetParent():entindex()).."_respawns", {charges})
+
+		if self:GetParent():IsRealHero() and self:GetParent():IsOwnedByAnyPlayer() then
+			CustomNetTables:SetTableValue("player_table", tostring(self:GetParent():entindex()).."_respawns", {charges})
+		end
 	end
 
 	UTIL_Remove(self:GetAbility())
@@ -95,6 +100,10 @@ function modifier_ankh_passives:OnDeath(params)
 	if params.unit ~= self:GetParent() then return end
 	if self:GetParent().ankh_respawn == true then return end
 
+	self.position = self:GetParent():GetAbsOrigin()
+	local boss_count = self:GetParent().boss_count
+	local charges = self:GetStackCount()
+
 	if self:GetAbility() and self:GetAbility():GetAbilityName() == "item_shield_of_invincibility" then
 		print("Victim is wearing Shield!")
 		if not self:GetAbility():IsCooldownReady() then return end
@@ -103,17 +112,21 @@ function modifier_ankh_passives:OnDeath(params)
 		self:GetAbility():StartCooldown(self:GetAbility():GetCooldown(self:GetAbility():GetLevel()))
 	else
 		if not self:GetParent():HasItemInInventory("item_shield_of_invincibility") then
-			local new_stacks = math.max(self:GetStackCount() - 1, 0)
+			local new_stacks = math.max(charges - 1, 0)
 
-			CustomNetTables:SetTableValue("player_table", tostring(self:GetParent():entindex()).."_respawns", {new_stacks})
+			if self:GetParent():IsRealHero() and self:GetParent():IsOwnedByAnyPlayer() then
+				CustomNetTables:SetTableValue("player_table", tostring(self:GetParent():entindex()).."_respawns", {new_stacks})
+			end
+
 			self:SetStackCount(new_stacks)
 
-			if self:GetStackCount() == 0 then return end
+			if charges == 0 then
+				return
+			end
 		end
 	end
 
 	local reincarnate_time = XHS_GLOBAL_RESPAWN_TIME
-	self.position = self:GetParent():GetAbsOrigin()
 
 	AddFOWViewer(self:GetParent():GetTeamNumber(), self.position, 200, reincarnate_time, false)
 	self:GetParent().ankh_respawn = true
@@ -133,12 +146,8 @@ function modifier_ankh_passives:OnDeath(params)
 				CreateUnitByName("npc_dota_hero_magtheridon_medium", self.position + RandomVector(200), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 			end
 
-			local boss_count = self:GetParent().boss_count
-			local position = self.position
-			local charges = self:GetStackCount()
-
 			Timers:CreateTimer(reincarnate_time, function()
-				RespawnMagtheridon(boss_count, position, charges)
+				RespawnMagtheridon(boss_count, self.position, charges)
 			end)
 		end
 	end

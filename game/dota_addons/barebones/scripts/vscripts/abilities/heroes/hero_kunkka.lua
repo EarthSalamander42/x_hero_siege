@@ -792,10 +792,6 @@ function modifier_imba_ghostship_drag:RemoveOnDeath()
 	return false
 end
 
-function modifier_imba_ghostship_drag:IsMotionController()
-	return true
-end
-
 function modifier_imba_ghostship_drag:StatusEffectPriority()
 	return 20
 end

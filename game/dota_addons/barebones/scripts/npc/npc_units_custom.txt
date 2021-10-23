@@ -10096,10 +10096,10 @@
 		//----------------------------------------------------------------
 		"Ability1"					"abaddon_aphotic_shield"
 		"Ability2"					"demonhunter_immolation"
-		"Ability3"					"arthas_frostmourne"
+		"Ability3"					"creature_chronosphere"
 		"Ability4"					"necronomicon_warrior_sight"
 		"Ability5"					"boss_health"
-		"Ability6"					"creature_chronosphere"
+		"Ability6"					"arthas_frostmourne"
 		"Ability7"					"cant_die_generic"
 		"Ability8"					"holdout_blue_effect"
 		"Ability9"					"holdout_lich_king_effects"
@@ -10114,7 +10114,7 @@
 		"AttackCapabilities"		"DOTA_UNIT_CAP_NO_ATTACK"
 		"AttackDamageMin"			"99998"							// Damage range min.
 		"AttackDamageMax"			"100000"						// Damage range max.
-		"AttackRate"				"0.70"							// Speed of attack.
+		"AttackRate"				"0.65"							// Speed of attack.
 		"AttackAnimationPoint"		"0.56"							// Normalized time in animation cycle to attack.
 		"AttackAcquisitionRange"	"1000"							// Range within a target can be acquired.
 		"AttackRange"				"240"							// Range within a target can be attacked.

@@ -54,6 +54,7 @@ ListenToGameEvent('game_rules_state_change', function()
 			CustomGameEventManager:Send_ServerToAllClients("show_timer_bar", {})
 			CustomGameEventManager:Send_ServerToAllClients("game_difficulty", {difficulty = diff[GameRules:GetCustomGameDifficulty()]})
 			Notifications:TopToAll({text="DIFFICULTY: "..diff[GameRules:GetCustomGameDifficulty()], color = Color[GameRules:GetCustomGameDifficulty()], duration=10.0})
+			SpawnBosses()
 		end)
 
 		AddFOWViewer(DOTA_TEAM_GOODGUYS, Vector(6528, 1152, 192), 900, 99999, false)
@@ -267,13 +268,10 @@ ListenToGameEvent('npc_spawned', function(keys)
 			for i = 1, #difficulty_abilities do
 				local current_ability = npc:FindAbilityByName(difficulty_abilities[i])
 				local difficulty = GameRules:GetCustomGameDifficulty()
+
 				if current_ability then
 					current_ability:SetLevel(difficulty)
 				end
-			end
-
-			if npc:GetUnitName() == "npc_dota_hero_banehallow" then
-				npc:AddNewModifier(npc, nil, "boss_thinker_nevermore", {})
 			end
 
 			npc.zone = "xhs_holdout"
