@@ -4,20 +4,41 @@ ListenToGameEvent('game_rules_state_change', function()
 		CustomNetTables:SetTableValue("game_options", "game_count", {value = 1})
 
 		api:RegisterGame(function(data)
+			print("Register game...")
 			for k, v in pairs(data.players) do
 				local payload = {
 					steamid = tostring(k),
 				}
 
-				api:Request("armory", function(data)
-					if api.players[k] then
-						api.players[k]["armory"] = data
-					end
-				end, nil, "POST", payload);
+				if CUSTOM_GAME_TYPE ~= "WARPATH" then
+					api:Request("armory", function(data)
+						if api.players[k] then
+							api.players[k]["armory"] = data
+						end
+					end, nil, "POST", payload);
+				end
 			end
+
+--[[
+			if CUSTOM_GAME_TYPE == "IMBA" then
+				GameRules:GetGameModeEntity():SetContextThink(DoUniqueString("anti_stacks_fucker"), function()
+					TeamOrdering:OnPlayersLoaded()
+
+					return nil
+				end, 3.0)
+			elseif CUSTOM_GAME_TYPE == "PLS" then
+--]]
+			if CUSTOM_GAME_TYPE == "PLS" then
+				api:GenerateGameModeLeaderboard()
+			end
+
+			print("ALL PLAYERS LOADED IN!")
+			CustomGameEventManager:Send_ServerToAllClients("all_players_battlepass_loaded", {})
 		end)
 
 		api:GetDisabledHeroes()
+
+		CustomGameEventManager:Send_ServerToAllClients("all_players_loaded", {})
 	elseif GameRules:State_Get() == DOTA_GAMERULES_STATE_PRE_GAME then
 		api:InitDonatorTableJS()
 
@@ -56,8 +77,8 @@ ListenToGameEvent('game_rules_state_change', function()
 		end
 
 		api:CompleteGame(function(data, payload)
-			print(data)
-			print(payload)
+--			print(data)
+--			print(payload)
 			CustomGameEventManager:Send_ServerToAllClients("end_game", {
 				players = payload.players,
 				data = data,

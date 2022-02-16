@@ -4,20 +4,33 @@
 api = class({});
 
 api.disabled_heroes = {}
+api.disabled_heroes[1] = "npc_dota_hero_target_dummy"
 
-local baseUrl = "https://api.frostrose-studio.com/imba/"
-local websiteUrl = "https://api.frostrose-studio.com/website/"
+local baseUrl = "https://api.frostrose-studio.com/"
+local endUrlWebsite = "website/"
+local endUrlFrostrose = "imba/"
+local endUrlWarpath = "warpath/"
 local timeout = 5000
 
 local native_print = print
 
 -- Utils
 function api:GetUrl(endpoint)
+	local url = baseUrl
+
 	if endpoint == "statistics/ranking/xp" or endpoint == "statistics/ranking/winrate" then
-		baseUrl = websiteUrl
+		url = url..endUrlWebsite
+	else
+		if CUSTOM_GAME_TYPE == "WARPATH" then
+			url = url..endUrlWarpath
+		else
+			url = url..endUrlFrostrose
+		end
 	end
 
-	return baseUrl..endpoint
+	print("URL:", url..endpoint)
+
+	return url..endpoint
 end
 
 function api:IsDonator(player_id)
@@ -58,6 +71,49 @@ function api:GetDonatorStatus(player_id)
 	end
 end
 
+function api:GetPlayerIngameTag(player_id)
+	if not PlayerResource:IsValidPlayerID(player_id) then
+--		native_print("api:GetPlayerIngameTag: Player ID not valid!")
+		return nil
+	end
+
+	local steamid = tostring(PlayerResource:GetSteamID(player_id));
+
+	-- if the game isnt registered yet, we have no way to know if the player is a donator
+	if self.players == nil then
+		return nil
+	end
+
+	if self.players[steamid] ~= nil then
+		return self.players[steamid].ingame_tag
+	else
+		--		native_print("api:GetPlayerIngameTag: api players steamid not valid!")
+		return nil
+	end
+end
+
+function api:SetPlayerIngameTag(player_id, tag)
+	if not PlayerResource:IsValidPlayerID(player_id) then
+--		native_print("api:GetPlayerIngameTag: Player ID not valid!")
+		return nil
+	end
+
+	local steamid = tostring(PlayerResource:GetSteamID(player_id));
+
+	-- if the game isnt registered yet, we have no way to know if the player is a donator
+	if self.players == nil then
+		return nil
+	end
+
+	if self.players[steamid] ~= nil and self.players[steamid]["toggle_tag"] then
+		self.players[steamid].changed_tag_this_game = true
+		self.players[steamid].ingame_tag = tag
+	else
+		--		native_print("api:GetPlayerIngameTag: api players steamid not valid!")
+		return nil
+	end
+end
+
 function api:InitDonatorTableJS()
 	local donators = {}
 
@@ -93,76 +149,104 @@ function api:GetPlayerXP(player_id)
 	end
 end
 
-function api:GetPlayerCompanion(player_id)
+function api:GetPlayerXPLevel(player_id)
 	if not PlayerResource:IsValidPlayerID(player_id) then
-		native_print("api:GetPlayerCompanion: Player ID not valid!")
-		return false
+		native_print("api:GetPlayerXP: Player ID not valid!")
+		return 0
 	end
 
 	local steamid = tostring(PlayerResource:GetSteamID(player_id));
 
 	-- if the game isnt registered yet, we have no way to know player xp
 	if self.players == nil then
-		native_print("api:GetPlayerCompanion() self.players == nil")
-		return false
+		native_print("api:GetPlayerXP() self.players == nil")
+		return 0
 	end
 
-	local ply_table = CustomNetTables:GetTableValue("battlepass_player", "companions")
-
-	if self.players[steamid] ~= nil and ply_table and ply_table["1"] and ply_table["1"][tostring(self.players[steamid].companion_id)] then
-		return ply_table["1"][tostring(self.players[steamid].companion_id)]
+	if self.players[steamid] ~= nil then
+		return self.players[steamid].xp_level
 	else
-		native_print("api:GetPlayerCompanion: api players steamid not valid!")
+		native_print("api:GetPlayerXP: api players steamid not valid!")
+		return 0
+	end
+end
+
+-- companion, statue, emblem only, wearable cosmetics handled in api:GetArmory()
+function api:GetPlayerCosmetics(player_id, cosmetic_type)
+	if not PlayerResource:IsValidPlayerID(player_id) then
+		native_print("api:GetPlayerCosmetics: Player ID not valid!")
 		return false
 	end
+
+	if not cosmetic_type then
+		native_print("api:GetPlayerCosmetics: cosmetic_type not valid!")
+		return false
+	end
+
+	local steamid = tostring(PlayerResource:GetSteamID(player_id))
+
+	-- if the game isnt registered yet, we have no way to know player xp
+	if self.players == nil then
+		native_print("api:GetPlayerCosmetics() self.players == nil")
+		return false
+	end
+
+	if self.players[steamid] == nil then
+		native_print("api:GetPlayerCosmetics: api players steamid not valid!")
+		return false
+	end
+
+	local cosmetic = CustomNetTables:GetTableValue("battlepass_player", cosmetic_type)
+	if cosmetic and cosmetic["1"] then cosmetic = cosmetic["1"] end
+	local cosmetic_variable = nil
+
+	if cosmetic_type == "companions" then
+		cosmetic_variable = "companion_id"
+	elseif cosmetic_type == "statues" then
+		cosmetic_variable = "statue_id"
+	elseif cosmetic_type == "emblems" then
+		cosmetic_variable = "emblem_id"
+	end
+
+	if cosmetic_variable == nil then
+		print("api:GetPlayerCosmetics: invalid cosmetic variable for cosmetic type:", cosmetic_type)
+		return false
+	end
+
+	local cosmetic_id = self.players[steamid][cosmetic_variable]
+
+	if cosmetic_id == nil then
+		native_print("api:GetPlayerCosmetics: Unable to get "..cosmetic_variable.." player table!")
+		return false
+	end
+
+	cosmetic = cosmetic[tostring(self.players[steamid][cosmetic_variable])]["file"]
+
+	if cosmetic and cosmetic ~= "" and type(cosmetic) == "string" then
+		return cosmetic
+	else
+		native_print("api:GetPlayerCosmetics: Invalid cosmetic for "..cosmetic_type.."")
+
+		if type(cosmetic) == "table" then
+			print(cosmetic)
+		else
+			native_print(cosmetic)
+		end
+
+		return false
+	end
+end
+
+function api:GetPlayerCompanion(player_id)
+	return self:GetPlayerCosmetics(player_id, "companions")
 end
 
 function api:GetPlayerStatue(player_id)
-	if not PlayerResource:IsValidPlayerID(player_id) then
-		native_print("api:GetPlayerStatue: Player ID not valid!")
-		return false
-	end
-
-	local steamid = tostring(PlayerResource:GetSteamID(player_id));
-
-	-- if the game isnt registered yet, we have no way to know player xp
-	if self.players == nil then
-		native_print("api:GetPlayerStatue() self.players == nil")
-		return false
-	end
-
-	if self.players[steamid] ~= nil then
-		return CustomNetTables:GetTableValue("battlepass_player", "statues")["1"][tostring(self.players[steamid].statue_id)]
-	else
-		native_print("api:GetPlayerStatue: api players steamid not valid!")
-		return false
-	end
+	return self:GetPlayerCosmetics(player_id, "statues")
 end
 
 function api:GetPlayerEmblem(player_id)
-	if not PlayerResource:IsValidPlayerID(player_id) then
-		native_print("api:GetPlayerEmblem: Player ID not valid!")
-		return ""
-	end
-
-	local steamid = tostring(PlayerResource:GetSteamID(player_id));
-
-	-- if the game isnt registered yet, we have no way to know player xp
-	if self.players == nil then
-		native_print("api:GetPlayerEmblem() self.players == nil")
-		return ""
-	end
-
-	if self.players[steamid] ~= nil then
-		if type(self.players[steamid].emblem_id) == "number" and CustomNetTables:GetTableValue("battlepass_player", "emblems") then
-			return CustomNetTables:GetTableValue("battlepass_player", "emblems")["1"][tostring(self.players[steamid].emblem_id)].file
-		else
-			return ""
-		end
-	else
-		native_print("api:GetPlayerEmblem: api players steamid not valid!")
-		return ""
-	end
+	return self:GetPlayerCosmetics(player_id, "emblems")
 end
 
 function api:GetPlayerTagEnabled(player_id)
@@ -180,9 +264,9 @@ function api:GetPlayerTagEnabled(player_id)
 	end
 
 	if self.players[steamid] ~= nil then
-		return self.players[steamid]["in_game_tag"]
+		return self.players[steamid]["toggle_tag"]
 	else
-		native_print("api:GetPlayerCompanion: api players steamid not valid!")
+		native_print("api:GetPlayerTagEnabled: api players steamid not valid!")
 		return false
 	end
 end
@@ -275,6 +359,28 @@ function api:GetPlayerWinrate(player_id)
 	end
 end
 
+function api:GetPlayerSeasonalWinrate(player_id)
+	if not PlayerResource:IsValidPlayerID(player_id) then
+		native_print("api:GetPlayerWinrate: Player ID not valid!")
+		return false
+	end
+
+	local steamid = tostring(PlayerResource:GetSteamID(player_id));
+
+	-- if the game isnt registered yet, we have no way to know player xp
+	if self.players == nil then
+		native_print("api:GetPlayerWinrate() self.players == nil")
+		return false
+	end
+
+	if self.players[steamid] ~= nil then
+		return self.players[steamid]["seasonal_winrate"]
+	else
+		native_print("api:GetPlayerWinrate: api players steamid not valid!")
+		return false
+	end
+end
+
 function api:GetPlayerMMR(player_id)
 	if not PlayerResource:IsValidPlayerID(player_id) then
 		native_print("api:GetPlayerMMR: Player ID not valid!")
@@ -341,6 +447,28 @@ function api:GetPhantomAssassinArcanaKills(player_id)
 	end
 end
 
+function api:GetPlayerSeasonalWinrate(player_id)
+	if not PlayerResource:IsValidPlayerID(player_id) then
+		native_print("api:GetPlayerSeasonalWinrate: Player ID not valid!")
+		return false
+	end
+
+	local steamid = tostring(PlayerResource:GetSteamID(player_id));
+
+	-- if the game isnt registered yet, we have no way to know player xp
+	if self.players == nil then
+		native_print("api:GetPlayerSeasonalWinrate() self.players == nil")
+		return false
+	end
+
+	if self.players[steamid] ~= nil then
+		return self.players[steamid]["seasonal_winrate"]
+	else
+		native_print("api:GetPlayerSeasonalWinrate: api players steamid not valid!")
+		return false
+	end
+end
+
 function api:GetArmory(player_id)
 	if not PlayerResource:IsValidPlayerID(player_id) then
 --		native_print("api:GetArmory: Player ID not valid!")
@@ -398,6 +526,10 @@ function api:CheatDetector()
 end
 
 function api:IsCheatGame()
+	if IsInToolsMode() then
+		return false
+	end
+
 	if CustomNetTables:GetTableValue("game_options", "game_count").value == 0 then
 		return true
 	end
@@ -425,7 +557,7 @@ function api:GetAllPlayerSteamIds()
 end
 
 function api:GetMatchID()
-	return tostring(GameRules:GetMatchID())
+	return tostring(GameRules:Script_GetMatchID())
 end
 
 function api:GetLoggingConfiguration(callback)
@@ -514,7 +646,7 @@ function api:Request(endpoint, okCallback, failCallback, method, payload)
 			if (code == nil) then
 				code = 0
 			end
-			native_print("Request to " .. endpoint .. " failed with message " .. message .. " (" .. tostring(code) .. ")")
+			print("Request to " .. endpoint .. " failed with message " .. message .. " (" .. tostring(code) .. ")")
 			failCallback();
 		end
 
@@ -554,18 +686,25 @@ function api:RegisterGame(callback)
 	self:Request("game-register", function(data)
 		api.game_id = data.game_id
 		api.players = data.players
+
 		if IsInToolsMode() then
 			print(data.players)
 		end
+
 		if callback ~= nil then
 			callback(data)
 		end
-	end, nil, "POST", {
+	end, function()
+		-- fail-safe if http request can't reach backend
+--		GameRules:SetCustomGameSetupRemainingTime(20.0)
+	end, "POST", {
 		map = GetMapName(),
 		match_id = self:GetMatchID(),
 		players = self:GetAllPlayerSteamIds(),
 		cheat_mode = self:IsCheatGame(),
 	});
+
+	if CUSTOM_GAME_TYPE == "WARPATH" then return end
 
 	local cool_hat = {}
 	local cool_hats = {
@@ -590,7 +729,7 @@ function api:RegisterGame(callback)
 --	CustomGameEventManager:Send_ServerToAllClients("all_players_loaded", {})
 end
 
-function api:CompleteGame(successCallback, failCallback)
+function api:CompleteGame(successCallback)
 	local players = {}
 
 	for id = 0, PlayerResource:GetPlayerCount() - 1 do
@@ -603,8 +742,27 @@ function api:CompleteGame(successCallback, failCallback)
 			local damage_done_to_heroes = 0
 			local damage_done_to_buildings = 0
 			local kills_done_to_hero = {}
-			local items_bought = PlayerResource:GetItemsBought(id)
-			local abandon = PlayerResource:GetHasAbandonedDueToLongDisconnect(id)
+			local items_bought = nil
+			local abandon = false
+			local leaderboard = {}
+			local support_items = {}
+			local abilities_level_up_order = {}
+
+			if PlayerResource.GetHasAbandonedDueToLongDisconnect then
+				abandon = PlayerResource:GetHasAbandonedDueToLongDisconnect(id)
+			end
+
+			if PlayerResource.GetItemsBought then
+				items_bought = PlayerResource:GetItemsBought(id)
+			end
+
+			if PlayerResource.GetSupportItemsBought then
+				support_items = PlayerResource:GetSupportItemsBought(id, items_bought)
+			end
+
+			if PlayerResource.GetAbilitiesLevelUpOrder then
+				abilities_level_up_order = PlayerResource:GetAbilitiesLevelUpOrder(id)
+			end
 
 			if heroEntity ~= nil then
 				hero = tostring(heroEntity:GetUnitName())
@@ -616,7 +774,14 @@ function api:CompleteGame(successCallback, failCallback)
 					end
 				end
 
-				networth = heroEntity:GetNetworth()
+				networth = PlayerResource:GetNetWorth(id)
+			end
+
+			if CUSTOM_GAME_TYPE == "PLS" then
+				for index, score in pairs(Rounds.player_score[id]) do
+					table.insert(leaderboard, index, score)
+--					table.insert(leaderboard, tonumber(index), score)
+				end
 			end
 
 			for i = 0, PlayerResource:GetPlayerCount() - 1 do
@@ -624,18 +789,20 @@ function api:CompleteGame(successCallback, failCallback)
 				kills_done_to_hero[i] = PlayerResource:GetKillsDoneToHero(id, i)
 			end
 
-			if IsInToolsMode() and id == 0 then
+--			if IsInToolsMode() and id == 0 then
 --				print("CompleteGame: Items:", items)
 --				print("CompleteGame: Items Bought:", items_bought)
 --				print("CompleteGame: Support Items Bought:", PlayerResource:GetSupportItemsBought(id, items_bought))
 --				print("CompleteGame: Abilities Level Up Order:", PlayerResource:GetAbilitiesLevelUpOrder(id))
-			end
+--			end
 
 			local increment_pa_arcana_kills = false
 
 			if hero and hero == "npc_dota_hero_phantom_assassin" and Battlepass and Battlepass:HasArcana(id, "phantom_assassin") then
 				increment_pa_arcana_kills = true
 			end
+
+--			print("Player Leaderboard:", leaderboard)
 
 			local player = {
 				id = id,
@@ -652,13 +819,18 @@ function api:CompleteGame(successCallback, failCallback)
 				damage_done_to_buildings = damage_done_to_buildings,
 				kills_done_to_hero = kills_done_to_hero,
 				items_bought = items_bought,
-				support_items = PlayerResource:GetSupportItemsBought(id, items_bought),
+				support_items = support_items,
 				gold_spent_on_support = PlayerResource:GetGoldSpentOnSupport(id),
-				abilities_level_up_order = PlayerResource:GetAbilitiesLevelUpOrder(id),
+				abilities_level_up_order = abilities_level_up_order,
 				increment_pa_arcana_kills = increment_pa_arcana_kills,
 				pa_arcana_kills = api:GetPhantomAssassinArcanaKills(id),
 				abandon = abandon,
+				leaderboard = leaderboard,
 			}
+
+			if CUSTOM_GAME_TYPE == "WARPATH" then
+				player.heroes = Warpath.selected_heroes[id] or {}
+			end
 
 			local steamid = tostring(PlayerResource:GetSteamID(id))
 
@@ -695,7 +867,7 @@ function api:CompleteGame(successCallback, failCallback)
 
 	local payload = {
 		winner = winnerTeam,
-		game_id = self.game_id,
+		game_id = self:GetApiGameId(),
 		players = players,
 		radiant_score = self:GetKillsForTeam(2),
 		dire_score = self:GetKillsForTeam(3),
@@ -709,9 +881,15 @@ function api:CompleteGame(successCallback, failCallback)
 
 	self:Request("game-complete", function(data)
 		if successCallback ~= nil then
-			successCallback(data, payload);
+			successCallback(data, payload)
 		end
-	end, failCallback, "POST", payload);
+	end,
+
+	function(data)
+		if successCallback ~= nil then
+			successCallback(data, payload)
+		end
+	end, "POST", payload);
 end
 
 function api:DiretideHallOfFame(successCallback, failCallback)
@@ -727,7 +905,11 @@ end
 
 function api:SetCustomGamemode(iValue)
 	if iValue and type(iValue) == "number" then
-		CustomNetTables:SetTableValue("game_options", "gamemode", {iValue})
+		GameRules:SetCustomGameDifficulty(iValue)
+		CustomNetTables:SetTableValue("game_options", "gamemode", {tostring(iValue)})
+	else
+		print("ERROR: Value should be a number, not string.")
+		api:SetCustomGamemode(tonumber(iValue))
 	end
 
 	return nil
@@ -740,68 +922,106 @@ function api:GetCustomGamemode()
 		gamemode = gamemode["1"]
 	end
 
-	return gamemode
-end
-
-function api:SendTeamConfiguration(players, combinations, callback)
-	local data = {
-		players = players,
-		team_combinations = combinations,
-		map = GetMapName(),
-	}
-
-	print(players)
-	print(team_combinations)
-
-	self:Request("teambalance", function(data)
-		if callback ~= nil then
-			callback(data)
-		end
-	end, nil, "POST", data)
+	return tonumber(gamemode)
 end
 
 -- Credits: darklord (Dota 12v12)
 function api:DetectParties()
 	self.parties = {}
 	local party_indicies = {}
+	local party_members_count = {}
 	local party_index = 1
-	local players = {}
-
 	-- Set up player colors
 	for id = 0, 23 do
 		if PlayerResource:IsValidPlayer(id) then
-			players[id] = tostring(PlayerResource:GetSteamID(id))
-
-			-- {"0":26703929098108930,"1":26703929098108930}
 			local party_id = tonumber(tostring(PlayerResource:GetPartyID(id)))
-
 			if party_id and party_id > 0 then
 				if not party_indicies[party_id] then
 					party_indicies[party_id] = party_index
 					party_index = party_index + 1
 				end
-
-				self.parties[id] = party_indicies[party_id]
+				local party_index = party_indicies[party_id]
+				self.parties[id] = party_index
+				if not party_members_count[party_index] then
+					party_members_count[party_index] = 0
+				end
+				party_members_count[party_index] = party_members_count[party_index] + 1
 			end
 		end
 	end
+	for id, party in pairs(self.parties) do
+		-- at least 2 ppl in party!
+		if party_members_count[party] and party_members_count[party] < 2 then
+			self.parties[id] = nil
+		end
+	end
 
-	local data = {
-		players = players,
-		parties = api.parties,
-		map = GetMapName(),
-	}
+	print("Parties:", api.parties)
+end
 
-	print(players)
-	print(api.parties)
+function api:FindPlayerParty(iPlayerID)
+	if not self.parties then
+		print("No party detected.")
+		return
+	end
 
-	self:Request("teambalance", function(data)
-		if callback ~= nil then
-			callback(data)
+	for id, party in pairs(self.parties) do
+		if iPlayerID == id then
+			return party
+		end
+	end
+end
+
+function api:GetParties(iPlayerID)
+	if not self.parties then
+		print("No party detected.")
+		return
+	end
+
+	return self.parties
+end
+
+function api:GenerateGameModeLeaderboard()
+	local round_count = Rounds:GetRoundCount()
+--	print("Amount of rounds:", round_count)
+
+	self:GetGameModeLeaderboard(1, round_count)
+end
+
+function api:GetGameModeLeaderboard(iRound, iMaxRound)
+	if not self.pls_ranking then
+		self.pls_ranking = {}
+	end
+
+	print("Iterate round "..iRound.."...")
+
+	self:Request("pls_ranking", function(data)
+		self.pls_ranking[iRound] = data.players
+
+		if IsInToolsMode() then
+--			print("GameMode Leaderboard for round "..iRound..":", data.players)
 		end
 
-		print(data)
-	end, nil, "POST", data)
+		print("Leaderboard round "..iRound..": success!")
+		iRound = iRound + 1
+
+		if iRound < iMaxRound + 1 then
+			self:GetGameModeLeaderboard(iRound, iMaxRound)
+		else
+			CustomNetTables:SetTableValue("game_options", "GameMode_leaderboard", self.pls_ranking)
+		end
+	end, function()
+		print("Leaderboard round "..iRound..": failure!!!")
+		iRound = iRound + 1
+
+		if iRound < iMaxRound + 1 then
+			self:GetGameModeLeaderboard(iRound, iMaxRound)
+		else
+			CustomNetTables:SetTableValue("game_options", "GameMode_leaderboard", self.pls_ranking)
+		end
+	end, "POST", {
+		round_range = iRound,
+	});
 end
 
 require("components/api/events")

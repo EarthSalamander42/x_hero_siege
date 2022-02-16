@@ -9,62 +9,27 @@
 		<include src="file://{resources}/scripts/custom_game/custom_loading_screen.js"/>
 	</scripts>
 
+	<snippets>
+		<snippet name="VoteChoice">
+			<Panel class="vote-select-panel">
+				<Label class="vote-select-title"/>
+
+				<Label class="vote-select-description"/>
+
+				<Button id="VoteGameModeMainText1" class="vote-button">
+					<Label class="vote-button-label" text="Vote" />
+				</Button>
+			</Panel>
+		</snippet>
+	</snippets>
+
 	<Panel class="addon-root">
 		<Panel class="vote-container-main">
 			<Panel class="vote-content">
 				<Label class="vote-content-title" text="Choose a Mode"/>
 
-				<Panel class="vote-select-panel-container">
-					<Panel class="vote-select-panel">
-						<Label class="vote-select-title"/>
-
-						<Label class="vote-select-description"/>
-
-						<Button id="VoteGameModeMainText1" class="vote-button">
-							<Label class="vote-button-label" text="Vote" />
-						</Button>
-					</Panel>
-
-					<Panel class="vote-select-panel">
-						<Label class="vote-select-title"/>
-
-						<Label class="vote-select-description"/>
-
-						<Button id="VoteGameModeMainText2" class="vote-button">
-							<Label class="vote-button-label" text="Vote" />
-						</Button>
-					</Panel>
-
-					<Panel class="vote-select-panel">
-						<Label class="vote-select-title"/>
-
-						<Label class="vote-select-description"/>
-
-						<Button id="VoteGameModeMainText3" class="vote-button">
-							<Label class="vote-button-label" text="Vote" />
-						</Button>
-					</Panel>
-
-					<Panel class="vote-select-panel">
-						<Label class="vote-select-title"/>
-
-						<Label class="vote-select-description"/>
-
-						<Button id="VoteGameModeMainText4" class="vote-button">
-							<Label class="vote-button-label" text="Vote" />
-						</Button>
-					</Panel>
-
-					<Panel class="vote-select-panel">
-						<Label class="vote-select-title"/>
-
-						<Label class="vote-select-description"/>
-
-						<Button id="VoteGameModeMainText5" class="vote-button">
-							<Label class="vote-button-label" text="Vote" />
-						</Button>
-					</Panel>
-				</Panel>
+				<!-- Filled dynamically in JS -->
+				<Panel id="VoteContent" class="vote-select-panel-container"/>
 			</Panel>
 		</Panel>
 
@@ -84,19 +49,11 @@
 
 					<Panel id="vote-container" class="vote-container">
 						<Panel class="vote-header-container">
-							<Label class="vote-title" text="GAMEMODE"/>
+							<Label class="vote-title" text="#vote_gamemode"/>
 							<Panel class="vote-info"/>
 						</Panel>
 
-						<Label id="VoteGameModeText1" class="vote-label" text="#vote_gamemode_1" />
-
-						<Label id="VoteGameModeText2" class="vote-label" text="#vote_gamemode_2" />
-
-						<Label id="VoteGameModeText3" class="vote-label" text="#vote_gamemode_3" />
-<!--
-						<Label id="VoteGameModeText4" class="vote-label" text="#vote_gamemode_4" />
--->
-						<Label id="VoteGameModeText5" class="vote-label" text="#vote_gamemode_5" />
+						<Panel id="vote-label-container" class="vote-label-container"/>
 
 						<Label id="VoteGameModeCheck" class="vote-label vote-check" text="You have not voted yet." />
 
@@ -117,7 +74,7 @@
 
 						<Label id="loading-description-text" />
 
-						<Button class="vote-button" onactivate="ExternalBrowserGoToURL('https://frostrose-studio.com')">
+						<Button class="vote-button" onactivate="DOTADisplayURL('https://frostrose-studio.com')">
 							<Label class="vote-button-label" text="#loading_screen_button" />
 						</Button>
 					</Panel>
@@ -150,7 +107,7 @@
 						</Button>
 
 						<!-- Dota IMBA -->
-						<Button class="mod-cell" onactivate="ExternalBrowserGoToURL('https://steamcommunity.com/sharedfiles/filedetails/?id=1350425247');">
+						<Button class="mod-cell" onactivate="DOTADisplayURL('https://steamcommunity.com/sharedfiles/filedetails/?id=1350425247');">
 							<Panel class="mod-image-container">
 								<Image class="mod-image" src="file://panorama/images/custom_game/mods/modlist2.jpg"/>
 								<Panel class="mod-background"/>
@@ -162,7 +119,7 @@
 						</Button>
 
 						<!-- X Hero Siege -->
-						<Button class="mod-cell" onactivate="ExternalBrowserGoToURL('https://steamcommunity.com/sharedfiles/filedetails/?id=536682348');">
+						<Button class="mod-cell" onactivate="DOTADisplayURL('https://steamcommunity.com/sharedfiles/filedetails/?id=536682348');">
 							<Panel class="mod-image-container">
 								<Image class="mod-image" src="file://panorama/images/custom_game/mods/modlist3.jpg"/>
 								<Panel class="mod-background"/>
@@ -174,7 +131,7 @@
 						</Button>
 
 						<!-- Pudge Wars -->
-						<Button class="mod-cell" onactivate="ExternalBrowserGoToURL('https://steamcommunity.com/sharedfiles/filedetails/?id=296831818');">
+						<Button class="mod-cell" onactivate="DOTADisplayURL('https://steamcommunity.com/sharedfiles/filedetails/?id=296831818');">
 							<Panel class="mod-image-container">
 								<Image class="mod-image" src="file://panorama/images/custom_game/mods/modlist4.jpg"/>
 								<Panel class="mod-background"/>
@@ -187,7 +144,7 @@
 
 						<!-- Hero Line Wars -->
 <!--
-						<Button class="mod-cell" onactivate="ExternalBrowserGoToURL('https://steamcommunity.com/sharedfiles/filedetails/?id=492195751');">
+						<Button class="mod-cell" onactivate="DOTADisplayURL('https://steamcommunity.com/sharedfiles/filedetails/?id=492195751');">
 							<Panel class="mod-image-container">
 								<Image class="mod-image" src="file://panorama/images/custom_game/mods/modlist1.jpg"/>
 								<Panel class="mod-background"/>
@@ -200,7 +157,7 @@
 -->
 
 						<!-- Diretide -->
-						<Button class="mod-cell" onactivate="ExternalBrowserGoToURL('https://steamcommunity.com/sharedfiles/filedetails/?id=544075277');">
+						<Button class="mod-cell" onactivate="DOTADisplayURL('https://steamcommunity.com/sharedfiles/filedetails/?id=544075277');">
 							<Panel class="mod-image-container">
 								<Image class="mod-image" src="file://panorama/images/custom_game/mods/modlist6.jpg"/>
 								<Panel class="mod-background"/>
@@ -213,7 +170,7 @@
 					</Panel>
 
 					<Panel class="bottom-transifex-container">
-						<Button class="vote-button" onactivate="ExternalBrowserGoToURL('https://www.transifex.com/frostrose-studio/dota-imba/')">
+						<Button class="vote-button" onactivate="DOTADisplayURL('https://www.transifex.com/frostrose-studio/x-hero-siege/')">
 							<Label class="vote-button-label" text="#loading_screen_promote_button" />
 						</Button>
 					</Panel>
@@ -222,7 +179,7 @@
 						<!-- Filled Dynamically -->
 						<Panel class="bottom-patreon-sub"/>
 
-						<Button class="loading-link-patreon" onactivate="ExternalBrowserGoToURL('https://www.patreon.com/bePatron?u=2533325')">
+						<Button class="loading-link-patreon" onactivate="DOTADisplayURL('https://www.patreon.com/bePatron?u=2533325')">
 							<Label class="vote-button-label" />
 						</Button>
 					</Panel>

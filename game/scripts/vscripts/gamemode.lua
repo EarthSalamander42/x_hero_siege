@@ -924,7 +924,7 @@ ListenToGameEvent('game_rules_state_change', function(keys)
 			for k, v in pairs(voteCounts) do
 --				print(k, v)
 				if v == highest_vote then
-					table.insert(tieTable, k[1])
+					table.insert(tieTable, tonumber(k))
 				end
 			end
 
