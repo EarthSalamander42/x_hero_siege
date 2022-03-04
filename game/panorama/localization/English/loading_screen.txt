@@ -24,11 +24,11 @@
 "vote_gamemode_4"							"Extreme"
 "vote_gamemode_5"							"Divine"
 
-"vote_gamemode_1"							"Gold: 150%\nExperience: 125%\nEnemies Damage: 75%"
-"vote_gamemode_2"							"Gold: 110%\nExperience: 100%\nEnemies Damage: 100%"
-"vote_gamemode_3"							"Gold: 100%\nExperience: 90%\nEnemies Damage: 125%"
-"vote_gamemode_4"							"Gold: 100%\nExperience: 75%\nEnemies Damage: 150%"
-"vote_gamemode_5"							"Gold: 75%\nExperience: 60%\nEnemies Damage: 200%"
+"vote_gamemode_1_description"				"Gold: 150%\nExperience: 125%\nEnemies Damage: 75%"
+"vote_gamemode_2_description"				"Gold: 110%\nExperience: 100%\nEnemies Damage: 100%"
+"vote_gamemode_3_description"				"Gold: 100%\nExperience: 90%\nEnemies Damage: 125%"
+"vote_gamemode_4_description"				"Gold: 100%\nExperience: 75%\nEnemies Damage: 150%"
+"vote_gamemode_5_description"				"Gold: 75%\nExperience: 60%\nEnemies Damage: 200%"
 
 "loading_screen_custom_games_1"			"This is the list of every custom games currently managed by Frostrose Studio:"
 "loading_screen_custom_games_2"			"You can translate Dota IMBA in your native language on Transifex website, it's easy! Just create an account and subscribe to a language. Give it a try! Don't forget to request your Discord role!"

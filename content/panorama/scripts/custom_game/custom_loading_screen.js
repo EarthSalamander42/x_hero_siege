@@ -220,7 +220,7 @@ function AllPlayersLoaded() {
 	for (var i = 1; i <= vote_count[game_options.game_type]; i++) {
 		var gamemode_vote = $.CreatePanel("Panel", $("#VoteContent"), "VoteGameMode" + i);
 		gamemode_vote.BLoadLayoutSnippet('VoteChoice');
-		gamemode_vote.style.width = (93 / vote_count[game_options.game_type]) + "%";
+		gamemode_vote.style.width = (88 / vote_count[game_options.game_type]) + "%";
 
 		var gamemode_label = $.CreatePanel("Label", $("#vote-label-container"), "VoteGameModeText" + i);
 		gamemode_label.AddClass("vote-label");

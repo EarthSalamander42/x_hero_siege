@@ -624,7 +624,7 @@
 .HasStars3.ReqTab #StarContainerReplays #ZoneStar3
 {
 	wash-color: #fa0;
-	background-image: url("file://panorama/images/status_icons/star_raised_filled_psd.psd");	
+	background-image: url("s2r://panorama/images/status_icons/star_raised_filled.psd");	
 }
 
 .Stars1 #ZoneStar1,
@@ -635,7 +635,7 @@
 .Stars3 #ZoneStar3
 {
 	wash-color: #fa0;
-	background-image: url("file://panorama/images/status_icons/star_raised_filled_psd.psd");	
+	background-image: url("s2r://panorama/images/status_icons/star_raised_filled.psd");	
 }
 
 #ZoneRequirementContainer

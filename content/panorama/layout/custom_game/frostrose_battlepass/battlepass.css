@@ -128,10 +128,8 @@
 
 #BattlepassButtonContainer
 {
-	margin-top: 7.7%;
+	margin-top: 3.7%;
 	align: center top;
-	background-image: url("s2r://panorama/images/hud/reborn/bg_timer_psd.vtex");
-	background-size: 100%;
 	flow-children: down;
 }
 
@@ -143,12 +141,15 @@
 }
 
 #SafeToLeave {
+	width: 250px;
+	max-width: 400px;
 	padding-left: 10px;
 	padding-right: 10px;
 	height: 40px;
 	background-color: green;
 	horizontal-align: center;
-	border-radius: 50px;
+	border-bottom-left-radius: 30px;
+	border-bottom-right-radius: 30px;
 	visibility: collapse;
 }
 
@@ -162,35 +163,27 @@
 
 #BattlepassButton
 {
-	width: 150px;
-	height: 35px;
-	horizontal-align: center;
-	saturation: 0.8;
+	background-image: url("file://panorama/images/custom_game/battlepass/battlepass_new.png");
+	background-size: 28px;
+	vertical-align: top;
+	width: 30px;
+	height: 30px;
+	background-repeat: no-repeat;
+	background-position: center;
+	opacity: 0.5;
+	wash-color: #CDF;
+	transition-property: opacity;
+	transition-duration: 0.2s;
 }
 
 #BattlepassButton:hover
 {
-	saturation: 0.7;
+	opacity: 1.0;
 }
 
 #BattlepassButton:active
 {
-	saturation: 1.0;
-}
-
-#BattlepassButton Label
-{
-	align: center center;
-	color: blue;
-	text-transform: uppercase;
-	text-align: center center;
-	font-size: 18px;
-	text-overflow: shrink;
-}
-
-#BattlepassButton:hover Label
-{
-	color: darkblue;
+	opacity: 1.0;
 }
 
 #BattlepassWindow
@@ -287,41 +280,78 @@
 }
 
 .LeaderboardButtonLabel {
-	width: 100%;
 	text-align: center;
 	font-size: 19px;
 	color:#daebff;
 	align:  center center;
 }
 
-#XP {
-	background-color: #2b323fa4;
+#Rank,
+#SteamAvatar,
+#XP,
+#IMR {
 	height: 90%;
 	align:  center center;
-	margin-bottom: 5px;
+	flow-children: right;
 }
 
-#XP:hover {
-	background-color: #303848;
+#Rank,
+#SteamAvatar,
+#XP {
+	background-color: #2b323fa4;
 }
 
-#XP:active {
-	background-color: #303848;
+#Rank {
+	margin: 0px 2px 3px 0px;
+}
+
+#SteamAvatar,
+#XP {
+	margin: 0px 2px 3px 2px;
 }
 
 #IMR {
+	margin: 0px 0px 3px 2px;
+}
+
+#Rank:hover,
+#SteamAvatar:hover,
+#XP:hover,
+#RoundOrderLeft:hover,
+.RoundOrder:hover,
+#RoundOrderRight:hover {
+	background-color: #303848;
+}
+
+#RoundOrderLeft {
+	horizontal-align: left;
+	background-image: url("s2r://panorama/images/control_icons/arrow_solid_left_png.vtex");
+}
+
+.RoundOrder {
+	width:  56%;
+	height: 100%;
+	align: center center;
 	background-color: #2b323fa4;
-	height: 90%;
+}
+
+#RoundOrderLabel {
 	align:  center center;
-	margin-bottom: 5px;
+	font-size: 19px;
+	color: #daebff;
 }
 
-#IMR:hover {
-	background-color: #303848;
+#RoundOrderRight {
+	horizontal-align: right;
+	background-image: url("s2r://panorama/images/control_icons/arrow_solid_right_png.vtex");
 }
 
-#IMR:active {
-	background-color: #303848;
+.LeaderboardArrowButton {
+	width:  20%;
+	height:  100%;
+	background-color: #2b323fa4;
+	background-repeat: no-repeat;
+	background-size: 100% 100%;
 }
 
 .LeaderboardRankLabel,
@@ -368,9 +398,10 @@
 
 .LeaderboardRank {
 	width: 10%;	
-	height: 90%;
-	align:  center top;
-	text-align:  center center;
+	text-align: center;
+	font-size: 19px;
+	color:#daebff;
+	align:  center center;
 }
 
 .LeaderboardAvatar {
@@ -383,11 +414,10 @@
 .LeaderboardXP {
 	width: 50%;
 	align:  center center;
-	padding: 3px 10px 3px 10px;
 }
 
 .LeaderboardIMR {
-	width: 23%;
+	width: 25%;
 	align:  center center;
 }
 
@@ -447,6 +477,8 @@
 	flow-children: right;
 }
 .sub_nav_tab Label {
+	transition-property: color, text-shadow;
+	transition-duration: 0.2s;
 	text-transform: uppercase;
 //	letter-spacing: 0.5px;
 	color: #606366;
@@ -507,17 +539,19 @@
 	animation-direction: alternate;
 	animation-iteration-count: infinite;
 }
-#BattlepassTabButton,
+#OverviewTabButton,
 #DonatorTabButton,
-#LeaderboardTabButton {	
+#LeaderboardTabButton {
 	width: 230px;
 	height: 47px;
 	padding-left: 30px;
 	align: left center;
 	margin-right: -18px;
+	transition-property: brightness;
+	transition-duration: 0.2s;
 }
 
-#BattlepassTabButton .text,
+#OverviewTabButton .text,
 #DonatorTabButton .text,
 #LeaderboardTabButton .text {
 	font-size: 19px;
@@ -527,7 +561,7 @@
 	padding-left: 30px;
 	margin-top: 0px;
 }
-#BattlepassTabButton .image,
+#OverviewTabButton .image,
 #DonatorTabButton .image,
 #LeaderboardTabButton .image {
 	width: 14px;
@@ -535,21 +569,21 @@
 	align: left center;
 	margin-top: -1px;
 }	
-#BattlepassTabButton {
+#OverviewTabButton {
 	background-image: url("file://panorama/images/custom_game/battlepass/assets/btn_battlepass.png");
 }
 
-#BattlepassTabButton:hover, #BattlepassTabButton:active,
+#OverviewTabButton:hover, #OverviewTabButton:active,
 #DonatorTabButton:hover, #DonatorTabButton:active,
 #LeaderboardTabButton:hover, #LeaderboardTabButton:active {
 	brightness:  2;
 	animation-name:  none;
 }
-#BattlepassTabButton .text {
+#OverviewTabButton .text {
 	color: #ceebf2;
 	text-shadow: 1px 1px 2px 2.0 #1a424ca2;
 }
-#BattlepassTabButton .image {
+#OverviewTabButton .image {
 	background-image: url("file://panorama/images/custom_game/battlepass/assets/btn_battlepass_icon.png");
 }
 #DonatorTabButton {
@@ -1677,4 +1711,27 @@
 	vertical-align: bottom;
 	height: 40px;
 	width: 100%;
+}
+
+#ChatContainer {
+	margin-top:  20px;
+}
+
+#GameChatEntry {
+	height: 32px;
+	margin-top: 2px;
+	background-color: #000000aa;
+	font-size: 16px;
+	padding: 6px 3px 5px 8px;
+	color: white;
+	font-weight: bold;
+	font-family: Radiance,FZLanTingHei-R-GBK,TH Sarabun New,YDYGO 540,Gulim,MingLiU;
+	text-overflow: clip;
+	border-radius: 3px;
+}
+
+.CompanionPreview {
+	width:100%;
+	height:85%;
+	opacity-mask:url("s2r://panorama/images/masks/hero_model_opacity_mask_png.vtex");
 }

@@ -67,7 +67,7 @@ function EndMuradinEvent()
 
 	for _, hero in pairs(MuradinCheck) do
 		Timers:CreateTimer(function()
-			if not hero:IsIllusion() and hero:IsRealHero() and not hero.paid then
+			if hero and not hero:IsNull() and hero:IsRealHero() and not hero:IsIllusion() and hero:IsRealHero() and not hero.paid then
 				hero.paid = true
 				if hero.old_pos then
 					TeleportHero(hero, hero.old_pos, 3.0, 1.0)
