@@ -2,6 +2,7 @@
 -- Date:	05.11.2017
 
 if modifier_ai == nil then modifier_ai = class({}) end
+
 function modifier_ai:GetAttributes() return MODIFIER_ATTRIBUTE_IGNORE_INVULNERABLE end
 function modifier_ai:IsPurgeException() return false end
 function modifier_ai:IsPurgable() return false end
@@ -106,7 +107,7 @@ function modifier_ai:OnIntervalThink()
 					end
 
 					return
-				elseif #enemies == 1 then
+				elseif #enemies == 1 and IsValidEntity(enemies[1]) and enemies[1]:IsInvisible() then
 					for _, restricted_ab in pairs(_G.multiplayer_abilities_cast) do
 						if ability:GetAbilityName() == restricted_ab then
 							print("Casting this ability in solo mode is restricted!!")
@@ -139,15 +140,21 @@ function modifier_ai:OnIntervalThink()
 					return
 				elseif bit.band(tonumber(tostring(ability:GetBehavior())), DOTA_ABILITY_BEHAVIOR_POINT) == DOTA_ABILITY_BEHAVIOR_POINT then
 					self:GetParent():Stop()
-					local position = enemies[RandomInt(1, #enemies)]:GetAbsOrigin()
+					for k, v in pairs(enemies) do
+						if v and IsValidEntity(v) and v:IsAlive() and not v:IsInvisible() and not v:IsInvulnerable() then
+							local position = v:GetAbsOrigin()
+		
+							ExecuteOrderFromTable({
+								UnitIndex = self:GetParent():entindex(),
+								OrderType = DOTA_UNIT_ORDER_CAST_POSITION,
+								AbilityIndex = ability:entindex(),
+								Position = position,
+		--						Queue = true
+							})
 
-					ExecuteOrderFromTable({
-						UnitIndex = self:GetParent():entindex(),
-						OrderType = DOTA_UNIT_ORDER_CAST_POSITION,
-						AbilityIndex = ability:entindex(),
-						Position = position,
---						Queue = true
-					})
+							return
+						end
+					end
 
 --					self:GetParent():CastAbilityOnPosition(position, ability, -1)
 
@@ -161,8 +168,13 @@ function modifier_ai:OnIntervalThink()
 
 						return
 					else
-						self:GetParent():Stop()
-						self:GetParent():CastAbilityOnTarget(enemies[RandomInt(1, #enemies)], ability, -1)
+						for k, v in pairs(enemies) do
+							if v and IsValidEntity(v) and v:IsAlive() and not v:IsInvisible() and not v:IsInvulnerable() then
+								self:GetParent():Stop()
+								self:GetParent():CastAbilityOnTarget(v, ability, -1)
+								return
+							end
+						end
 
 						return
 					end

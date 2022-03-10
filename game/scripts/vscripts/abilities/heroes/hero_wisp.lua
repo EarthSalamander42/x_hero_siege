@@ -68,7 +68,7 @@ function modifier_wisp_passive:OnCreated()
 
 	local donator_level = api:GetDonatorStatus(self:GetParent():GetPlayerID())
 
-	print("Donator level:", donator_level)
+--	print("Donator level:", donator_level)
 	if donator_level then
 		local stack_count = {}
 		stack_count[0] = ""
@@ -79,7 +79,7 @@ function modifier_wisp_passive:OnCreated()
 		stack_count[5] = "_4"
 		stack_count[6] = "_6"
 
-		print("Donator string pfx:", stack_count[donator_level])
+--		print("Donator string pfx:", stack_count[donator_level])
 		if stack_count[donator_level] then
 			local vip_effect = ParticleManager:CreateParticle("particles/status_fx/status_effect_holdout_borrowed_time"..stack_count[donator_level]..".vpcf", PATTACH_ABSORIGIN_FOLLOW, self:GetParent())
 			ParticleManager:SetParticleControl(vip_effect, 0, self:GetParent():GetAbsOrigin())

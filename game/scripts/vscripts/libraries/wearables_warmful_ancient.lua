@@ -224,8 +224,6 @@ function Wearable:Init()
 		end
 	end
 
-	Wearable:UICacheAvailableWards()
-
 	-- 棱彩宝石
 	Wearable.prismatics = {}
 	for color_key, color_table in pairs(Wearable.items_game.colors) do
@@ -1334,22 +1332,6 @@ function Wearable:UICacheAvailableItems(sUnitName)
 		CustomNetTables:SetTableValue("hero_available_items", sUnitName, Wearable.heroes[sHeroName])
 	end
 	-- PrintTable(CustomNetTables:GetTableValue("hero_available_items", sUnitName))
-end
-
--- 预读取信使饰品
-function Wearable:UICacheAvailableCouriers()
-	if not CustomNetTables:GetTableValue("other_available_items", "courier") then
-		CustomNetTables:SetTableValue("other_available_items", "courier", Wearable.couriers)
-	end
-	-- PrintTable(CustomNetTables:GetTableValue("other_available_items", "courier"))
-end
-
--- 预读取守卫饰品
-function Wearable:UICacheAvailableWards()
-	if not CustomNetTables:GetTableValue("other_available_items", "ward") then
-		CustomNetTables:SetTableValue("other_available_items", "ward", Wearable.wards)
-	end
-	-- PrintTable(CustomNetTables:GetTableValue("other_available_items", "courier"))
 end
 
 -- 复制英雄饰品

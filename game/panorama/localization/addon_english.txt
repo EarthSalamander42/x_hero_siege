@@ -1,5 +1,6 @@
 ﻿"addon" {
 	"addonname" "X Hero Siege"
+	"battlepass" "Battlepass"
 	"battlepass_level" "Level: "
 	"battlepass_levelup" "Tome of stats FX"
 	"battlepass_levelup1" "TI 2016"
@@ -59,6 +60,7 @@
 	"developer_credits_02" "EarthSalamander (lead-developer), oaeide (backend) and Gafu Ji (backend)."
 	"developer_credits_title" "DEVELOPERS"
 	"disable_companion" "Disable companion"
+	"donator" "Donator"
 	"donator_companion" "Companion"
 	"donator_companion_wrapper_label" "Select a Companion"
 	"donator_emblem" "Emblem"

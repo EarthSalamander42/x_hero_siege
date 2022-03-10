@@ -1,6 +1,7 @@
 "imba_safe_to_leave"				"Cheat mode enabled, no battlepass experience earned"
 "coming_soon"						"Coming Soon: Being able to choose Battlepass rewards"
 
+"battlepass"						"Battlepass"
 "battlepass_level"					"Level: "
 "battlepass_xp"						"Battlepass XP"
 "battlepass_reward_locked"			"Locked!"
@@ -48,6 +49,7 @@
 "custom_end_screen_legend_imr"		"IMR"
 
 //Donator Tab
+"donator"							"Donator"
 "donator_patreon"					"Patreon"
 "donator_Patreon_wrapper_label"		"Become a Patron"
 "donator_Companion_wrapper_label"	"Select a Companion"

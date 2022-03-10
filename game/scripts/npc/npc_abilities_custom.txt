@@ -6041,18 +6041,15 @@
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"	
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
+		"SpellDispellableType"			"SPELL_DISPELLABLE_YES_STRONG"
 		"RequiredLevel"					"8"
 		"LevelsBetweenUpgrades"			"3"
-		"AbilityCastRange"				"350"
+		"AbilityCastRange"				"350 400 450 500"
 
 		// Time		
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityDuration"				"0.0"
+		"AbilityDuration"				"0.6 0.9 1.2 1.5"
 
-		// Damage.
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityDamage"					"300 450 600 750"
-		
 		// Stats
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityModifierSupportBonus"	"100"
@@ -6065,6 +6062,13 @@
 			{
 				"var_type"					"FIELD_INTEGER"
 				"aftershock_range"			"350 400 450 500"
+				"LinkedSpecialBonus"		"special_bonus_unique_earthshaker_5"
+			}
+			"02"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"aftershock_damage"			"300 450 600 750"
+				"LinkedSpecialBonus"		"special_bonus_unique_earthshaker_6"
 			}
 		}
 	}

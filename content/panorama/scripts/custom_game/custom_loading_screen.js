@@ -119,8 +119,8 @@ function SetProfileName() {
 					$("#HomeProfileContainer").FindChildTraverse("UserName").GetChild(0).text = Players.GetPlayerName(Game.GetLocalPlayerID());
 					$("#HomeProfileContainer").FindChildTraverse("UserName").GetChild(0).style.textOverflow = "shrink";
 
-					$("#HomeProfileContainer").FindChildTraverse("RankTierContainer").style.marginTop = "21px";
-					$("#HomeProfileContainer").FindChildTraverse("RankTierContainer").style.marginRight = "-15px";
+					$("#HomeProfileContainer").FindChildTraverse("RankTierContainer").style.width = "60px";
+					$("#HomeProfileContainer").FindChildTraverse("RankTierContainer").style.height = "60px";
 
 					$("#HomeProfileContainer").FindChildTraverse("UserNickname").GetChild(0).text = "";
 
@@ -189,7 +189,7 @@ function fetch() {
 		for (var i in result) {
 			var info = result[i];
 
-			if (info.lang == $.Localize("lang")) {
+			if (info.lang == $.Localize("#lang")) {
 				view.text.text = info.content;
 //				view.link_text.text = info.link_text;
 				found_lang = true;
@@ -205,12 +205,12 @@ function fetch() {
 		}
 	}, function() {
 		// error callback
-		$.Msg("Unable to retrieve loading screen info.")
+		$.Msg("Unable to retrieve loading screen info.");
 	});
 };
 
 function AllPlayersLoaded() {
-	$.Msg("ALL PLAYERS LOADED IN!")
+//	$.Msg("ALL PLAYERS LOADED IN!");
 
 	$("#MainVoteButton").style.opacity = "1";
 
@@ -225,7 +225,7 @@ function AllPlayersLoaded() {
 		var gamemode_label = $.CreatePanel("Label", $("#vote-label-container"), "VoteGameModeText" + i);
 		gamemode_label.AddClass("vote-label");
 		gamemode_label.style.height = (100 / vote_count[game_options.game_type]) + "%";
-		gamemode_label.text = $.Localize(vote_tooltips[i]);
+		gamemode_label.text = $.Localize("#" + vote_tooltips[i]);
 	}
 
 	for (var i = 1; i <= $("#vote-label-container").GetChildCount(); i++) {
@@ -234,7 +234,7 @@ function AllPlayersLoaded() {
 
 		(function (panel, i) {
 			panel.SetPanelEvent("onmouseover", function () {
-				$.DispatchEvent("UIShowTextTooltip", panel, $.Localize(vote_tooltips[i] + "_description"));
+				$.DispatchEvent("UIShowTextTooltip", panel, $.Localize("#" + vote_tooltips[i] + "_description"));
 			})
 
 			panel.SetPanelEvent("onmouseout", function () {
@@ -255,8 +255,8 @@ function AllPlayersLoaded() {
 			if (panel.GetChild(2)) {
 				button = panel.GetChild(2);
 
-				panel.GetChild(0).text = $.Localize(vote_tooltips[i]);
-				panel.GetChild(1).text = $.Localize(vote_tooltips[i] + "_description");
+				panel.GetChild(0).text = $.Localize("#" + vote_tooltips[i]);
+				panel.GetChild(1).text = $.Localize("#" + vote_tooltips[i] + "_description");
 			}
 
 			(function (button, i) {
@@ -273,7 +273,7 @@ function AllPlayersLoaded() {
 }
 
 function AllPlayersBattlepassLoaded() {
-	$.Msg("ALL PLAYERS BATTLEPASS LOADED!")
+//	$.Msg("ALL PLAYERS BATTLEPASS LOADED!")
 
 	var player_table = CustomNetTables.GetTableValue("battlepass_player", Players.GetLocalPlayer().toString());
 
@@ -334,7 +334,7 @@ function OnVoteButtonPressed(category, vote)
 //	$.Msg("Category: ", category);
 //	$.Msg("Vote: ", vote);
 
-	var gamemode_name = $.Localize(vote_tooltips[vote]);
+	var gamemode_name = $.Localize("#" + vote_tooltips[vote]);
 
 	$("#VoteGameModeCheck").text = "You have voted for " + gamemode_name + ".";
 	GameEvents.SendCustomGameEventToServer( "setting_vote", { "category":category, "vote":vote, "PlayerID":Game.GetLocalPlayerID() } );
@@ -345,7 +345,7 @@ function OnVoteButtonPressed(category, vote)
 function OnVotesReceived(data)
 {
 //	$.Msg(data)
-	$.Msg(data.table)
+//	$.Msg(data.table)
 
 	var vote_counter = [];
 
@@ -355,7 +355,7 @@ function OnVotesReceived(data)
 	for (var i = 1; i <= vote_count[game_options.game_type]; i++) {
 		vote_counter[i] = 0;
 
-		var gamemode_text = $.Localize(vote_tooltips[i]);
+		var gamemode_text = $.Localize("#" + vote_tooltips[i]);
 
 		if ($("#VoteGameModeText" + i)) {
 			$("#VoteGameModeText" + i).text = gamemode_text;
@@ -364,10 +364,10 @@ function OnVotesReceived(data)
 
 	// Check number of votes for each gamemodes
 	for (var player_id in data.table) {
-		$.Msg(data.table[player_id]);
+//		$.Msg(data.table[player_id]);
 		var gamemode = data.table[player_id][1];
 		var amount_of_votes = data.table[player_id][2];
-		$.Msg(gamemode + " / "+ amount_of_votes)
+//		$.Msg(gamemode + " / "+ amount_of_votes)
 		vote_counter[gamemode] = vote_counter[gamemode] + amount_of_votes;
 	}
 
@@ -378,12 +378,12 @@ function OnVotesReceived(data)
 		if (vote_counter[i] > 1)
 			vote_tooltip = "votes";
 
-		var gamemode_text = $.Localize(vote_tooltips[i]) + " (" + vote_counter[i] + " "+ vote_tooltip +")";
+		var gamemode_text = $.Localize("#" + vote_tooltips[i]) + " (" + vote_counter[i] + " "+ vote_tooltip +")";
 
 		if ($("#VoteGameModeText" + i)) {
-			$.Msg(gamemode_text);
+//			$.Msg(gamemode_text);
 			$("#VoteGameModeText" + i).style.color = "white";
-			$("#VoteGameModeText" + i).text = $.Localize(vote_tooltips[i]) + " (" + vote_counter[i] + " "+ vote_tooltip +")";
+			$("#VoteGameModeText" + i).text = $.Localize("#" + vote_tooltips[i]) + " (" + vote_counter[i] + " "+ vote_tooltip +")";
 		}
 	}
 
@@ -412,7 +412,7 @@ function DisableRankingVoting() {
 
 	if (vote_info && vote_info[0]) {
 		vote_info[0].SetPanelEvent("onmouseover", function () {
-			$.DispatchEvent("UIShowTextTooltip", vote_info[0], $.Localize("vote_gamemode_description"));
+			$.DispatchEvent("UIShowTextTooltip", vote_info[0], $.Localize("#vote_gamemode_description"));
 		})
 
 		vote_info[0].SetPanelEvent("onmouseout", function () {

@@ -19,7 +19,7 @@ function OnQuestActivated( data )
 	{
 		ZonePanel = $.CreatePanel( "Panel", QuestsContainerPanel, szZoneName );
 		ZonePanel.BLoadLayout( "file://{resources}/layout/custom_game/quest_zone.xml", false, false );
-		ZonePanel.FindChildInLayoutFile( "ZoneName" ).text = $.Localize( szZoneName );
+		ZonePanel.FindChildInLayoutFile( "ZoneName" ).text = $.Localize( "#" + szZoneName );
 	}
 
 	var ZoneQuestsContainer = ZonePanel.FindChildInLayoutFile( "ZoneQuestsContainer" );
@@ -32,7 +32,7 @@ function OnQuestActivated( data )
 		QuestPanel = $.CreatePanel( "Panel", ZoneQuestsContainer, szQuestName );
 		QuestPanel.BLoadLayout( "file://{resources}/layout/custom_game/quest.xml", false, false );
 		QuestPanel.FindChildInLayoutFile( "QuestIcon" ).SetHasClass( szQuestType, true );
-		QuestPanel.FindChildInLayoutFile( "QuestText" ).text =  $.Localize( szQuestName );
+		QuestPanel.FindChildInLayoutFile( "QuestText" ).text =  $.Localize( "#" + szQuestName );
 
 		QuestPanel.SetDialogVariableInt( "completed", data["Completed"] );
 		QuestPanel.SetDialogVariableInt( "complete_limit", data["CompleteLimit"] );
@@ -93,7 +93,7 @@ function ShowQuestCompletePopup( data )
 
 	if( !(data["ZoneName"] === null) )
 	{
-		DungeonQuestCompleteRoot.SetDialogVariable( "zone_name", $.Localize( data["ZoneName"] ) );
+		DungeonQuestCompleteRoot.SetDialogVariable( "zone_name", $.Localize( "#" + data["ZoneName"] ) );
 	}
 	else
 	{
@@ -102,7 +102,7 @@ function ShowQuestCompletePopup( data )
 
 	if( !(data["QuestName"] === null) )
 	{
-		DungeonQuestCompleteRoot.SetDialogVariable( "quest_name", $.Localize( data["QuestName"] ) );
+		DungeonQuestCompleteRoot.SetDialogVariable( "quest_name", $.Localize( "#" + data["QuestName"] ) );
 	}
 	else
 	{

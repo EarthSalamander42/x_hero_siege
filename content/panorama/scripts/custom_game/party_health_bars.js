@@ -138,7 +138,7 @@ function UpdateVIPs()
 				playerPanel.SetHasClass( "VIP", true );
 
 				var playerNameLabel = playerPanel.FindChildInLayoutFile( "PlayerName" );
-				playerNameLabel.text = $.Localize( Entities.GetUnitName( entIndex ) );
+				playerNameLabel.text = $.Localize( "#" + Entities.GetUnitName( entIndex ) );
 
 				var VIPImage = playerPanel.FindChildInLayoutFile( "VIPImage" );
 				VIPImage.SetAttributeInt( "ent_index", entIndex );

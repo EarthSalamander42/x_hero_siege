@@ -1455,6 +1455,8 @@
 		"ItemPurchasable"					"1"
 		"ItemSellable"						"0"
 		"ItemStackable"						"1"
+		"ItemInitialCharges"				"1"
+		"ItemDisplayCharges"				"1"
 		"AllowedInBackpack"					"0"
 
 		// Special	

@@ -99,7 +99,7 @@ function EndScoreboard(args) {
 	var victoryMessage = "winning_team_name Victory!";
 	var victoryMessageLabel = $("#es-victory-info-text");
 
-	victoryMessage = victoryMessage.replace("winning_team_name", $.Localize(Game.GetTeamDetails(Game.GetGameWinner()).team_name));
+	victoryMessage = victoryMessage.replace("winning_team_name", $.Localize("#" + Game.GetTeamDetails(Game.GetGameWinner()).team_name));
 
 	victoryMessageLabel.text = victoryMessage;
 
@@ -180,7 +180,7 @@ function EndScoreboard(args) {
 
 		// Steam Name + Hero name
 		values.name.text = player.info.player_name;
-		values.desc.text = $.Localize(player.info.player_selected_hero);
+		values.desc.text = $.Localize("#" + player.info.player_selected_hero);
 
 		// Stats
 		values.kills.text = player.info.player_kills;
@@ -358,8 +358,8 @@ function CreateBattlepassRewardPanel(level, levelup_count) {
 		}
 
 		rp.style.visibility = 'visible';
-		rewards.desc.text = $.Localize("battlepass_reward_description") + " " + level;
-		rewards.name.text = $.Localize("battlepass_" + battlepass_reward);
+		rewards.desc.text = $.Localize("#battlepass_reward_description") + " " + level;
+		rewards.name.text = $.Localize("#battlepass_" + battlepass_reward);
 		rewards.rarity.AddClass(battlepass_rarity);
 		rewards.rarity.text = battlepass_rarity;
 		rewards.image.style.backgroundImage = 'url("file://{resources}/images/custom_game/battlepass/' + battlepass_reward + '.png")';

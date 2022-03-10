@@ -32,7 +32,10 @@ function modifier_ankh:OnCreated(keys)
 	local mod = self:GetParent():FindModifierByName("modifier_ankh_passives")
 
 	if mod then
-		mod:IncrementStackCount()
+		local previous_charges = CustomNetTables:GetTableValue("player_table", tostring(self:GetParent():entindex()).."_respawns")["1"] or 0
+		local ankh_charges = self:GetAbility():GetCurrentCharges()
+
+		mod:SetStackCount(previous_charges + ankh_charges)
 
 		if self:GetParent():IsRealHero() and self:GetParent():IsOwnedByAnyPlayer() then
 			CustomNetTables:SetTableValue("player_table", tostring(self:GetParent():entindex()).."_respawns", {mod:GetStackCount()})

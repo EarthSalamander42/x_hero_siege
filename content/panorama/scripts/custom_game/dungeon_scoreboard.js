@@ -125,7 +125,7 @@ function UpdateZoneScores( zoneName )
 		var secondsRaw = Math.floor( zoneData["CompletionTime"] );
 		var minutes = secondsRaw / 60;
 		var seconds = minutes < 1 ? secondsRaw : secondsRaw - ( Math.floor( minutes ) * 60 );
-		$("#ScoreboardZone").text = $.Localize( zoneName );
+		$("#ScoreboardZone").text = $.Localize( "#" + zoneName );
 		$("#ScoreboardDescription").text = $.Localize("#Dungeon_ZoneDesc_" + zoneName); //todo fillin
 		$("#ScoreboardZoneTimeLabel").text = Math.floor( minutes ) + ":" + ( "0" + seconds ).slice(-2);
 		$("#NewBestPanelStars").SetHasClass( "Hidden", true );

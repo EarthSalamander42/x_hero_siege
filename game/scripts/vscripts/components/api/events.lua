@@ -31,9 +31,6 @@ ListenToGameEvent('game_rules_state_change', function()
 			if CUSTOM_GAME_TYPE == "PLS" then
 				api:GenerateGameModeLeaderboard()
 			end
-
-			print("ALL PLAYERS LOADED IN!")
-			CustomGameEventManager:Send_ServerToAllClients("all_players_battlepass_loaded", {})
 		end)
 
 		api:GetDisabledHeroes()

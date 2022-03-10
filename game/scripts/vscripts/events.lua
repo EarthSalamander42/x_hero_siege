@@ -1871,13 +1871,11 @@ end
 
 ---------------------------------------------------------
 
-local ConfirmCount = {}
-
 function GameMode:OnDialogConfirm(eventSourceIndex, data)
-	if ConfirmCount[data.ConfirmToken] == nil then
-		ConfirmCount[data.ConfirmToken] = 1
+	if GameMode.DialogConfirmCount[data.ConfirmToken] == nil then
+		GameMode.DialogConfirmCount[data.ConfirmToken] = 1
 	else
-		ConfirmCount[data.ConfirmToken] = ConfirmCount[data.ConfirmToken] + 1
+		GameMode.DialogConfirmCount[data.ConfirmToken] = GameMode.DialogConfirmCount[data.ConfirmToken] + 1
 	end
 
 	local netTable = {}
@@ -1892,9 +1890,9 @@ function GameMode:OnDialogConfirm(eventSourceIndex, data)
 	end
 
 --	print("Check if everyone accepted dialog...")
---	print(ConfirmCount[data.ConfirmToken], nValid)
+--	print(GameMode.DialogConfirmCount[data.ConfirmToken], nValid)
 
-	if ConfirmCount[data.ConfirmToken] >= nValid then
+	if GameMode.DialogConfirmCount[data.ConfirmToken] >= nValid then
 		local netTable = {}
 		for _,zone in pairs(GameMode.Zones) do
 			zone:OnDialogAllConfirmed(EntIndexToHScript(data["DialogEntIndex"]), data["DialogLine"])
@@ -1907,7 +1905,7 @@ end
 ---------------------------------------------------------
 
 function GameMode:OnDialogConfirmExpired(eventSourceIndex, data)
-	ConfirmCount[data.ConfirmToken] = 4
+	GameMode.DialogConfirmCount[data.ConfirmToken] = 4
 
 	for _,zone in pairs(GameMode.Zones) do
 		zone:OnDialogAllConfirmed(EntIndexToHScript(data["DialogEntIndex"]), data["DialogLine"])

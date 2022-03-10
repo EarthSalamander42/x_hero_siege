@@ -63,8 +63,8 @@ local bot_angle = {9, 10, 25, 26, 27}
 end
 
 function SpawnHeroesBis()
-local hero_count = 1
-local hero_vip_count = 1
+	local hero_count = 1
+	local hero_vip_count = 1
 
 	Timers:CreateTimer(function()
 		SpawnHeroLoadout(hero_count)
@@ -277,6 +277,23 @@ function StartingItems(hero, newHero)
 	Timers:CreateTimer(0.1, function()
 		if not hero:IsNull() then
 			UTIL_Remove(hero)
+		end
+	end)
+
+	Timers:CreateTimer(1.0, function()
+		for k, v in pairs(HeroList:GetAllHeroes()) do
+			if v and IsValidEntity(v) and not v:IsNull() and v:GetUnitName() == "npc_dota_hero_wisp" then
+--				print("A wisp was found! Players are still picking a hero")
+				return
+			end
+		end
+
+		-- all players selected a hero, remove pick screen to reduce lag
+--		print("All players selected a hero, remove pick screen")
+		for k, v in pairs(HeroList:GetAllHeroes()) do
+			if v and IsValidEntity(v) and not v:IsNull() and v.is_fake_hero then
+				UTIL_Remove(v)
+			end
 		end
 	end)
 end

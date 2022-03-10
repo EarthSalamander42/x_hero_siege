@@ -13,7 +13,7 @@ function ShowBossBar(args) {
 		boss_icon.style.zIndex = "10";
 
 		$("#BossHP" + args.boss_count).style.visibility = "visible";
-		$("#BossLabel" + args.boss_count).text = $.Localize(args.boss_name);
+		$("#BossLabel" + args.boss_count).text = $.Localize("#" + args.boss_name);
 		$("#BossLevel" + args.boss_count).text = "Level: " + args.difficulty;
 		$("#BossHealth" + args.boss_count).text = args.boss_health + " / " + args.boss_max_health;
 		$("#BossProgressBar" + args.boss_count).value = args.boss_health / args.boss_max_health;

@@ -35,6 +35,22 @@
 				</Panel>
 			</Panel>
 		</snippet>
+
+		<snippet name="PlayerXP">
+			<Panel class="PlayerXP_Container" value="0.0">
+				<ProgressBar id="PlayerXP_ProgressBar" value="0.0"/>
+
+				<Panel class="PlayerXP_LevelContainer">
+					<Panel id="PlayerXP_Level">
+						<Label id="PlayerXP_LevelLabel" text="#battlepass_level"/>
+						<Label id="PlayerXP_ImbaLvl"/>
+						<Label id="PlayerXP_ImbaXPRank"/>
+					</Panel>
+
+					<Label id="PlayerXP_Experience"/>
+				</Panel>
+			</Panel>
+		</snippet>
 	</snippets>
 
 	<Panel class="Battlepass" hittest="false">
@@ -88,7 +104,7 @@
 					<Panel id="TabButtonContainer" hittest="false">
 						<Button class="color_animation" id="OverviewTabButton" onactivate="SwitchTab('BattlepassInfoContainer');">
 							<Label class="image"></Label>
-							<Label class="text" text="#battlepass" />
+							<Label class="text" text="#battlepass"/>
 						</Button>
 
 						<Button class="color_animation" id="DonatorTabButton" onactivate="SwitchTab('DonatorInfoContainer');">

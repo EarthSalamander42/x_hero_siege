@@ -254,10 +254,10 @@ function SetMutationTooltip(j) {
 	var panel = $("#Mutation" + j)
 //	$.Msg(panel)
 
-	$("#Mutation" + j + "Label").text = $.Localize("mutation_" + mutation[j]);
+	$("#Mutation" + j + "Label").text = $.Localize("#mutation_" + mutation[j]);
 
 	panel.SetPanelEvent("onmouseover", function () {
-		$.DispatchEvent("UIShowTextTooltip", panel, $.Localize("mutation_" + mutation[j] + "_Description"));
+		$.DispatchEvent("UIShowTextTooltip", panel, $.Localize("#mutation_" + mutation[j] + "_Description"));
 	})
 
 	panel.SetPanelEvent("onmouseout", function () {

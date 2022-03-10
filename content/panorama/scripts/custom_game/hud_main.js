@@ -30,7 +30,7 @@ function OnDialogReceived( data )
 	$( "#DialogPanel" ).SetHasClass( "Visible", g_bSentToAll || data["JournalEntry"] );
 	$( "#FloatingDialogPanel" ).SetHasClass( "Visible", !g_bSentToAll && !data["JournalEntry"] );
 	$( "#DialogPanel" ).SetHasClass( "JournalEntry", data["JournalEntry"] );
-	$( "#DialogTitle" ).text = $.Localize( Entities.GetUnitName( data["DialogEntIndex"] ) );
+	$( "#DialogTitle" ).text = $.Localize( "#" + Entities.GetUnitName( data["DialogEntIndex"] ) );
 	$( "#DialogPortrait" ).SetUnit(Entities.GetUnitName( data["DialogEntIndex"] ), "", false);
 	$( "#DialogPanel" ).SetHasClass( "ShowAdvanceButton", true );
 	$( "#FloatingDialogPanel" ).SetHasClass( "ShowAdvanceButton", true );
@@ -39,13 +39,13 @@ function OnDialogReceived( data )
 	g_nCurrentCharacter = 0;
 	g_nCurrentDialogEnt = data["DialogEntIndex"];
 	g_nCurrentDialogLine = data["DialogLine"];
-	g_szPendingDialog = $.Localize( data["DialogText"] );
+	g_szPendingDialog = $.Localize( "#" + data["DialogText"] );
 	g_szConfirmToken = data["ConfirmToken"]
 	if ( !g_bSentToAll )
 	{
 		var szFullHeroName = Entities.GetUnitName( data["PlayerHeroEntIndex"] );
 		var szHeroName = szFullHeroName.substring( 13, szFullHeroName.length );
-		var szHeroLocalizedDialog = $.Localize( data["DialogText"] + szHeroName );
+		var szHeroLocalizedDialog = $.Localize( "#" + data["DialogText"] + szHeroName );
 		if ( szHeroLocalizedDialog !== ( data["DialogText"] + szHeroName ) )
 		{
 			g_szPendingDialog = szHeroLocalizedDialog;

@@ -85,6 +85,7 @@ GameMode.AllHeroImages_occuring = 0
 GameMode.AllHeroImagesDead = 0
 GameMode.BossesTop_killed = 0
 GameMode.creep_roll = {}
+GameMode.DialogConfirmCount = {}
 GameMode.creep_roll["race"] = 0
 
 CREEP_LANES = {} -- Stores individual creep lanes {enable/disable, creep level, rax alive}

@@ -204,7 +204,7 @@ function CDungeonZone:PrecacheVIPs( vipTable )
 	local nVIPCount = 0
 	CDungeonZone.nPrecacheVIPCount = 0
 
-	print( "CDungeonZone:PrecacheVIPs() - Precaching VIPs " .. tostring( vipTable ) )
+--	print( "CDungeonZone:PrecacheVIPs() - Precaching VIPs " .. tostring( vipTable ) )
 	for _, unitTable in pairs( vipTable ) do
 		if unitTable ~= nil then
 			nVIPCount = nVIPCount + unitTable.nCount
@@ -222,7 +222,7 @@ function CDungeonZone:PrecacheVIPs( vipTable )
 			end
 		end
 	end
-	print( "CDungeonZone:PrecacheVIPs() - There are " .. CDungeonZone.nPrecacheVIPCount .. " VIP types in zone." )
+--	print( "CDungeonZone:PrecacheVIPs() - There are " .. CDungeonZone.nPrecacheVIPCount .. " VIP types in zone." )
 end
 
 --------------------------------------------------------------------
@@ -961,7 +961,7 @@ function CDungeonZone:Activate()
 --	print("CDungeonZone.bSpawnedVIPs (should be nil or false:", CDungeonZone.bSpawnedVIPs)
 
 	if not CDungeonZone.bSpawnedVIPs then
-		print(CDungeonZone.VIPs)
+--		print(CDungeonZone.VIPs)
 		CDungeonZone:SpawnVIPs( CDungeonZone.VIPs )
 		CDungeonZone:SpawnNeutrals( CDungeonZone.Neutrals )
 		CDungeonZone.bSpawnedVIPs = true

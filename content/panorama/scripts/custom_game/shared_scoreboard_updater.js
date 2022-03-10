@@ -339,7 +339,7 @@ function _ScoreboardUpdater_UpdateTeamPanel(scoreboardConfig, containerPanel, te
 	}
 
 	_ScoreboardUpdater_SetTextSafe(teamPanel, "TeamScore", teamDetails.team_score)
-	_ScoreboardUpdater_SetTextSafe(teamPanel, "TeamName", $.Localize(teamDetails.team_name).toUpperCase())
+	_ScoreboardUpdater_SetTextSafe(teamPanel, "TeamName", $.Localize("#" + teamDetails.team_name).toUpperCase())
 
 	if (GameUI.CustomUIConfig().team_colors) {
 		var teamColor = GameUI.CustomUIConfig().team_colors[teamId];
