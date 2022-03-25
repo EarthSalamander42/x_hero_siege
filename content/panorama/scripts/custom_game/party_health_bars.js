@@ -29,7 +29,6 @@ function intToARGB(i)
 			if ( entIndex === -1 )
 				continue;
 			
-//			$.Msg( "Creating player portrait" )
 			playerPanel = $.CreatePanel( "Panel", partyContainer, playerPanelName );
 			playerPanel.SetAttributeInt( "player_id", playerID );
 			playerPanel.BLoadLayout( "file://{resources}/layout/custom_game/party_portrait.xml", false, false );
@@ -71,14 +70,11 @@ function intToARGB(i)
 		{
 			var nRespawnsRemaining = 0;
 
-//			$.Msg(Entities.GetUnitName(entIndex))
-
 			var respawnData = CustomNetTables.GetTableValue( "player_table", entIndex.toString() + "_respawns" );
-//			$.Msg(respawnData);
+
 			if ( respawnData && respawnData["1"] )
 			{
 				var nRespawnsRemaining = respawnData["1"];
-//				$.Msg(nRespawnsRemaining)
 				var LifeRemainingContainer = playerPanel.FindChild( "PartyLifeRemainingContainer" );
 				if ( LifeRemainingContainer !== null )
 				{
@@ -130,7 +126,6 @@ function UpdateVIPs()
 				if ( entIndex === -1 )
 					continue;
 
-				$.Msg( "Creating player portrait for VIP" );
 				playerPanel = $.CreatePanel( "Panel", partyContainer, playerPanelName );
 				playerPanel.SetAttributeInt( "player_id", -1 );
 				playerPanel.SetAttributeInt( "ent_index", entIndex );
@@ -150,7 +145,6 @@ function UpdateVIPs()
 
 function RemoveVIPs()
 {
-	$.Msg( "RemoveVIPs" );
 	var partyContainer = $( "#PartyPortraits" );
 	var i = 0;
 	for ( i; i < 1; i++ )
@@ -160,7 +154,6 @@ function RemoveVIPs()
 		var playerPanel = partyContainer.FindChild( playerPanelName );
 		if ( playerPanel !== null )
 		{
-			$.Msg( "DeleteVIP" );
 			playerPanel.DeleteAsync( 1.0 );
 		}
 	}

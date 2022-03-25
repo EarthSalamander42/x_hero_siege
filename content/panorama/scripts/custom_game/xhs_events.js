@@ -1,49 +1,29 @@
-"use strict";
-
-function OnShowEvents()
-{
+function OnShowEvents() {
 	$.GetContextPanel().FindChildTraverse("EventPanel").style.visibility = "visible";
-	$.Msg("Menu: Show")
 }
 
-function HeroImage()
-{
-	var ID = Players.GetLocalPlayer()
-	GameEvents.SendCustomGameEventToServer("event_hero_image", {pID: ID});
-	$.Msg("Menu: Hero Image")
+function HeroImage() {
+	GameEvents.SendCustomGameEventToServer("event_hero_image", {pID: Players.GetLocalPlayer()});
 }
 
-function AllHeroImages()
-{
-	var ID = Players.GetLocalPlayer()
-	GameEvents.SendCustomGameEventToServer("event_all_hero_images", {pID: ID});
-	$.Msg("Menu: All Hero Images")
+function AllHeroImages() {
+	GameEvents.SendCustomGameEventToServer("event_all_hero_images", {pID: Players.GetLocalPlayer()});
 }
 
-function SpiritBeast()
-{
-	var ID = Players.GetLocalPlayer()
-	GameEvents.SendCustomGameEventToServer("event_spirit_beast", {pID: ID});
-	$.Msg("Menu: Spirit Beast")
+function SpiritBeast() {
+	GameEvents.SendCustomGameEventToServer("event_spirit_beast", {pID: Players.GetLocalPlayer()});
 }
 
-function FrostInfernal()
-{
-	var ID = Players.GetLocalPlayer()
-	GameEvents.SendCustomGameEventToServer("event_frost_infernal", {pID: ID});
-	$.Msg("Menu: Frost Infernal")
+function FrostInfernal() {
+	GameEvents.SendCustomGameEventToServer("event_frost_infernal", {pID: Players.GetLocalPlayer()});
 }
 
-function OnQuit()
-{
-	var ID = Players.GetLocalPlayer()
+function OnQuit() {
 	$.GetContextPanel().FindChildTraverse("EventPanel").style.visibility = "collapse";
-	GameEvents.SendCustomGameEventToServer("quit_event", {pID: ID});
-	$.Msg("Menu: Hide")
+	GameEvents.SendCustomGameEventToServer("quit_event", {pID: Players.GetLocalPlayer()});
 }
 
-(function()
-{
+(function() {
 	GameEvents.Subscribe("show_events", OnShowEvents);
 	GameEvents.Subscribe("quit_events", OnQuit);
 })();

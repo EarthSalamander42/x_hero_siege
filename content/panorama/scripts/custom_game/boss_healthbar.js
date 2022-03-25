@@ -1,9 +1,6 @@
 "use strict";
 
 function ShowBossBar(args) {
-//	$.Msg(args)
-//	$.Msg(args.boss_count)
-
 	if (args.boss_count) {
 		var boss_icon = $("#BossIcon" + args.boss_count);
 		boss_icon.style.backgroundImage = 'url("file://{images}/heroes/icons/' + args.boss_icon + '.png")';
@@ -15,6 +12,14 @@ function ShowBossBar(args) {
 		$("#BossHP" + args.boss_count).style.visibility = "visible";
 		$("#BossLabel" + args.boss_count).text = $.Localize("#" + args.boss_name);
 		$("#BossLevel" + args.boss_count).text = "Level: " + args.difficulty;
+		$("#BossHealth" + args.boss_count).text = args.boss_health + " / " + args.boss_max_health;
+		$("#BossProgressBar" + args.boss_count).value = args.boss_health / args.boss_max_health;
+		$("#BossProgressBar" + args.boss_count + "_Left").style.backgroundColor = "gradient( linear, 0% 0%, 0% 100%, from( " + args.dark_color + " ), color-stop( 0.3, " + args.light_color + " ), color-stop( .5, " + args.light_color + " ), to( " + args.dark_color + " ) )";
+	}
+}
+
+function UpdateBossBar(args) {
+	if (args.boss_count) {
 		$("#BossHealth" + args.boss_count).text = args.boss_health + " / " + args.boss_max_health;
 		$("#BossProgressBar" + args.boss_count).value = args.boss_health / args.boss_max_health;
 		$("#BossProgressBar" + args.boss_count + "_Left").style.backgroundColor = "gradient( linear, 0% 0%, 0% 100%, from( " + args.dark_color + " ), color-stop( 0.3, " + args.light_color + " ), color-stop( .5, " + args.light_color + " ), to( " + args.dark_color + " ) )";
@@ -34,5 +39,6 @@ function HideBossBar(args) {
 
 (function () {
 	GameEvents.Subscribe("show_boss_hp", ShowBossBar);
+	GameEvents.Subscribe("update_boss_hp", UpdateBossBar);
 	GameEvents.Subscribe("hide_boss_hp", HideBossBar);
 })();

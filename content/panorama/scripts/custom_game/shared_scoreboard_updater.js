@@ -24,11 +24,6 @@ function _ScoreboardUpdater_SetValueSafe(panel, childName, Value) {
 }
 
 function _ScoreboardUpdater_UpdatePlayerPanelImr(playerId, playerPanel) {
-
-//	$.Msg("Updating player imr panel");
-	
-	var map_info = Game.GetMapInfo();
-
 	var ids = {
 		_5v5: {
 			teammate: "TeammateIMRAmount",
@@ -41,7 +36,6 @@ function _ScoreboardUpdater_UpdatePlayerPanelImr(playerId, playerPanel) {
 	};
 
 	// set labels
-
 	var steamid = Game.GetPlayerInfo(playerId).player_steamid;
 	
 	LoadPlayerInfo(function (playerInfo) {
@@ -68,9 +62,6 @@ function _ScoreboardUpdater_UpdatePlayerPanelImr(playerId, playerPanel) {
 }
 
 function _ScoreboardUpdater_UpdatePlayerPanelXP(playerId, playerPanel, ImbaXP_Panel) {
-
-//	$.Msg("Updating player xp panel");
-
 	var ids = {
 		xpRank:  "ImbaXPRank" + playerId,
 		xp: "ImbaXP" + playerId,
@@ -138,8 +129,6 @@ function _ScoreboardUpdater_UpdatePlayerPanel(scoreboardConfig, playersContainer
 //	playerPanel.SetHasClass("is_local_player", (playerId == Game.GetLocalPlayerID()));
 
 	var player_table = CustomNetTables.GetTableValue("player_table", playerId.toString());
-//		$.Msg(player_table.donator_level)
-//		$.Msg(player_table.donator_color)
 	if (player_table && player_table.donator_level && player_table.donator_color) {
 		if (player_table.donator_level < 10) {
 			playerPanel.style.backgroundColor = player_table.donator_color;
@@ -248,7 +237,6 @@ function _ScoreboardUpdater_UpdatePlayerPanel(scoreboardConfig, playersContainer
 	if (playerItemsContainer) {
 		var playerItems = Game.GetPlayerItems(playerId);
 		if (playerItems) {
-			// $.Msg( "playerItems = ", playerItems );
 			for (var i = playerItems.inventory_slot_min; i < playerItems.inventory_slot_max; ++i) {
 				var itemPanelName = "_dynamic_item_" + i;
 				var itemPanel = playerItemsContainer.FindChild(itemPanelName);
@@ -294,12 +282,10 @@ function _ScoreboardUpdater_UpdateTeamPanel(scoreboardConfig, containerPanel, te
 		return;
 
 	var teamId = teamDetails.team_id;
-	// $.Msg( "_ScoreboardUpdater_UpdateTeamPanel: ", teamId );
 
 	var teamPanelName = "_dynamic_team_" + teamId;
 	var teamPanel = containerPanel.FindChild(teamPanelName);
 	if (teamPanel === null) {
-		// $.Msg( "UpdateTeamPanel.Create: ", teamPanelName, " = ",
 		// scoreboardConfig.teamXmlName );
 		teamPanel = $.CreatePanel("Panel", containerPanel, teamPanelName);
 		teamPanel.SetAttributeInt("team_id", teamId);
@@ -354,7 +340,6 @@ function _ScoreboardUpdater_UpdateTeamPanel(scoreboardConfig, containerPanel, te
 		var teamColor_GradentFromTransparentLeft = teamPanel.FindChildInLayoutFile("TeamColor_GradentFromTransparentLeft");
 		if (teamColor_GradentFromTransparentLeft) {
 			var gradientText = 'gradient( linear, 0% 0%, 800% 0%, from( #00000000 ), to( ' + teamColor + ' ) );';
-			// $.Msg( gradientText );
 			teamColor_GradentFromTransparentLeft.style.backgroundColor = gradientText;
 		}
 	}
@@ -365,7 +350,6 @@ function _ScoreboardUpdater_UpdateTeamPanel(scoreboardConfig, containerPanel, te
 // =============================================================================
 // =============================================================================
 function _ScoreboardUpdater_ReorderTeam(scoreboardConfig, teamsParent, teamPanel, teamId, newPlace, prevPanel) {
-	// $.Msg( "UPDATE: ", GameUI.CustomUIConfig().teamsPrevPlace );
 	var oldPlace = null;
 	if (GameUI.CustomUIConfig().teamsPrevPlace.length > teamId) {
 		oldPlace = GameUI.CustomUIConfig().teamsPrevPlace[teamId];
@@ -373,7 +357,6 @@ function _ScoreboardUpdater_ReorderTeam(scoreboardConfig, teamsParent, teamPanel
 	GameUI.CustomUIConfig().teamsPrevPlace[teamId] = newPlace;
 
 	if (newPlace != oldPlace) {
-		// $.Msg( "Team ", teamId, " : ", oldPlace, " --> ", newPlace );
 		teamPanel.RemoveClass("team_getting_worse");
 		teamPanel.RemoveClass("team_getting_better");
 		if (newPlace > oldPlace) {
@@ -412,8 +395,6 @@ function stableCompareFunc(a, b) {
 		return 0;
 	}
 
-	// $.Msg( GameUI.CustomUIConfig().teamsPrevPlace );
-
 	var a_prev = GameUI.CustomUIConfig().teamsPrevPlace[a.team_id];
 	var b_prev = GameUI.CustomUIConfig().teamsPrevPlace[b.team_id];
 	if (a_prev < b_prev) // [ A, B ]
@@ -430,9 +411,6 @@ function stableCompareFunc(a, b) {
 // =============================================================================
 // =============================================================================
 function _ScoreboardUpdater_UpdateAllTeamsAndPlayers(scoreboardConfig, teamsContainer) {
-	// $.Msg( "_ScoreboardUpdater_UpdateAllTeamsAndPlayers: ", scoreboardConfig
-	// );
-
 	var teamsList = [];
 	for (var teamId of Game.GetAllTeamIDs()) {
 		teamsList.push(Game.GetTeamDetails(teamId));
@@ -451,14 +429,10 @@ function _ScoreboardUpdater_UpdateAllTeamsAndPlayers(scoreboardConfig, teamsCont
 	}
 
 	if (teamsList.length > 1) {
-		// $.Msg( "panelsByTeam: ", panelsByTeam );
-
 		// sort
 		if (scoreboardConfig.shouldSort) {
 			teamsList.sort(stableCompareFunc);
 		}
-
-		// $.Msg( "POST: ", teamsAndPanels );
 
 		// reorder the panels based on the sort
 		var prevPanel = panelsByTeam[teamsList[0].team_id];
@@ -468,11 +442,7 @@ function _ScoreboardUpdater_UpdateAllTeamsAndPlayers(scoreboardConfig, teamsCont
 			_ScoreboardUpdater_ReorderTeam(scoreboardConfig, teamsContainer, teamPanel, teamId, i, prevPanel);
 			prevPanel = teamPanel;
 		}
-		// $.Msg( GameUI.CustomUIConfig().teamsPrevPlace );
 	}
-
-	// $.Msg( "END _ScoreboardUpdater_UpdateAllTeamsAndPlayers: ",
-	// scoreboardConfig );
 }
 
 
@@ -535,9 +505,6 @@ var playerInfoPending = [];
 
 // returns true if available
 function LoadPlayerInfo(cb) {
-	
-	$.Msg("Loading player info");
-
 	if (playerInfo !== null) {
 		cb(playerInfo);
 		return;

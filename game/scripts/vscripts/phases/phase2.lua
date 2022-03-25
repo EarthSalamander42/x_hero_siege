@@ -47,11 +47,12 @@ function Phase2CreepsLeft()
 				unit:SetHealth(unit:GetMaxHealth())
 				unit:SetPhysicalArmorBaseValue(unit:GetPhysicalArmorValue(false) + (PHASE_2_UPGRADE["armor"][difficulty] * wave_count))
 				if not unit.GrowthOverheadPfx then 
-					unit.GrowthOverheadPfx = ParticleManager:CreateParticle("particles/hw_fx/candy_carrying_stack.vpcf", PATTACH_OVERHEAD_FOLLOW, unit)
-					ParticleManager:SetParticleControl(unit.GrowthOverheadPfx, 0, unit:GetAbsOrigin())
+					unit.GrowthOverheadPfx = ParticleManager:CreateParticle("particles/units/heroes/hero_abaddon/abaddon_curse_counter_stack.vpcf", PATTACH_OVERHEAD_FOLLOW, unit)
 				end
-				local stack_10 = math.floor(wave_count / 10)
-				ParticleManager:SetParticleControl(unit.GrowthOverheadPfx, 2, Vector(stack_10, wave_count - stack_10*10, 0))
+
+				ParticleManager:SetParticleControl(unit.GrowthOverheadPfx, 1, Vector(0, wave_count, 0))
+--				local stack_10 = math.floor(wave_count / 10)
+--				ParticleManager:SetParticleControl(unit.GrowthOverheadPfx, 2, Vector(stack_10, wave_count - stack_10*10, 0))
 			end
 
 			return XHS_CREEPS_INTERVAL
@@ -81,11 +82,12 @@ function Phase2CreepsRight()
 				unit:SetHealth(unit:GetMaxHealth())
 				unit:SetPhysicalArmorBaseValue(unit:GetPhysicalArmorValue(false) + (PHASE_2_UPGRADE["armor"][difficulty] * wave_count))
 				if not unit.GrowthOverheadPfx then 
-					unit.GrowthOverheadPfx = ParticleManager:CreateParticle("particles/hw_fx/candy_carrying_stack.vpcf", PATTACH_OVERHEAD_FOLLOW, unit)
-					ParticleManager:SetParticleControl(unit.GrowthOverheadPfx, 0, unit:GetAbsOrigin())
+					unit.GrowthOverheadPfx = ParticleManager:CreateParticle("particles/units/heroes/hero_abaddon/abaddon_curse_counter_stack.vpcf", PATTACH_OVERHEAD_FOLLOW, unit)
 				end
-				local stack_10 = math.floor(wave_count / 10)
-				ParticleManager:SetParticleControl(unit.GrowthOverheadPfx, 2, Vector(stack_10, wave_count - stack_10*10, 0))
+
+				ParticleManager:SetParticleControl(unit.GrowthOverheadPfx, 1, Vector(0, wave_count, 0))
+--				local stack_10 = math.floor(wave_count / 10)
+--				ParticleManager:SetParticleControl(unit.GrowthOverheadPfx, 2, Vector(stack_10, wave_count - stack_10*10, 0))
 			end
 		return 30
 		elseif CustomTimers.timers_paused == 1 then

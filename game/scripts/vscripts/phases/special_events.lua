@@ -125,11 +125,12 @@ function FarmEvent(time)
 				unit:SetHealth(unit:GetMaxHealth())
 				unit:SetPhysicalArmorBaseValue(unit:GetPhysicalArmorValue(false) + (FARM_EVENT_UPGRADE["armor"][difficulty] * GameMode.hero_farm_event[nPlayerID]["level"]))
 				if not unit.GrowthOverheadPfx then 
-					unit.GrowthOverheadPfx = ParticleManager:CreateParticle("particles/hw_fx/candy_carrying_stack.vpcf", PATTACH_OVERHEAD_FOLLOW, unit)
-					ParticleManager:SetParticleControl(unit.GrowthOverheadPfx, 0, unit:GetAbsOrigin())
+					unit.GrowthOverheadPfx = ParticleManager:CreateParticle("particles/units/heroes/hero_abaddon/abaddon_curse_counter_stack.vpcf", PATTACH_OVERHEAD_FOLLOW, unit)
 				end
-				local stack_10 = math.floor(GameMode.hero_farm_event[nPlayerID]["level"] / 10)
-				ParticleManager:SetParticleControl(unit.GrowthOverheadPfx, 2, Vector(stack_10, GameMode.hero_farm_event[nPlayerID]["level"] - stack_10*10, 0))
+
+				ParticleManager:SetParticleControl(unit.GrowthOverheadPfx, 1, Vector(0, GameMode.hero_farm_event[nPlayerID]["level"], 0))
+--				local stack_10 = math.floor(GameMode.hero_farm_event[nPlayerID]["level"] / 10)
+--				ParticleManager:SetParticleControl(unit.GrowthOverheadPfx, 2, Vector(stack_10, GameMode.hero_farm_event[nPlayerID]["level"] - stack_10*10, 0))
 			end
 
 			DisableItems(hero, time)
@@ -182,12 +183,13 @@ function FarmEventCreeps(id)
 					unit:SetPhysicalArmorBaseValue(unit:GetPhysicalArmorValue(false) + (FARM_EVENT_UPGRADE["armor"][difficulty] * GameMode.hero_farm_event[id]["level"]))
 
 					if not unit.GrowthOverheadPfx then 
-						unit.GrowthOverheadPfx = ParticleManager:CreateParticle("particles/hw_fx/candy_carrying_stack.vpcf", PATTACH_OVERHEAD_FOLLOW, unit)
-						ParticleManager:SetParticleControl(unit.GrowthOverheadPfx, 0, unit:GetAbsOrigin())
+						unit.GrowthOverheadPfx = ParticleManager:CreateParticle("particles/units/heroes/hero_abaddon/abaddon_curse_counter_stack.vpcf", PATTACH_OVERHEAD_FOLLOW, unit)
 					end
+	
+					ParticleManager:SetParticleControl(unit.GrowthOverheadPfx, 1, Vector(0, GameMode.hero_farm_event[id]["level"], 0))
 
-					local stack_10 = math.floor(GameMode.hero_farm_event[id]["level"] / 10)
-					ParticleManager:SetParticleControl(unit.GrowthOverheadPfx, 2, Vector(stack_10, GameMode.hero_farm_event[id]["level"] - stack_10*10, 0))
+--					local stack_10 = math.floor(GameMode.hero_farm_event[id]["level"] / 10)
+--					ParticleManager:SetParticleControl(unit.GrowthOverheadPfx, 2, Vector(stack_10, GameMode.hero_farm_event[id]["level"] - stack_10*10, 0))
 				end
 			end
 

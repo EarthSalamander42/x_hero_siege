@@ -14081,6 +14081,7 @@
 		{
 			"modifier_phoenix_reborn"
 			{
+				"IsHidden"			"1"
 				"Passive"           "1"
 	
 				"EffectName"        "particles/units/heroes/hero_phoenix/phoenix_ambient_glow.vpcf"
@@ -22027,12 +22028,6 @@
 		"AbilityCastRange"			"900"
 		"RequiredLevel"				"5"
 
-		"precache"
-		{
-			"particle"		"particles/econ/courier/courier_faceless_rex/cour_rex_ground_a.vpcf"
-			"particle"		"particles/econ/courier/courier_roshan_frost/courier_roshan_frost_steam.vpcf"
-		}
-
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilitySpecial"
@@ -22040,7 +22035,7 @@
 			"01"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"radius"				"900"
+				"radius"					"900"
 			}
 			"02"
 			{

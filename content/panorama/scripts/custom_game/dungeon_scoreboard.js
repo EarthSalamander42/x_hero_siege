@@ -14,58 +14,50 @@ function intToARGB(i)
 function ToggleMute( nRowID )
 {
 	var muteButton =  $("#ScoreboardTeamContainer").FindChildTraverse( "PlayerMuteButton" + nRowID );
-	if ( muteButton !== null )
-	{
-		$.Msg( "clicked" );
-		var nPlayerID = muteButton.GetAttributeInt( "player_id", -1 )
-		if ( nPlayerID !== -1 )
-		{
-			$.Msg( "Toggling mute on player: " + nPlayerID );
+	if ( muteButton !== null ) {
+		var nPlayerID = muteButton.GetAttributeInt( "player_id", -1 );
+
+		if ( nPlayerID !== -1 ) {
 			var newIsMuted = !Game.IsPlayerMuted( nPlayerID );
+
 			Game.SetPlayerMuted( nPlayerID, newIsMuted );
 			muteButton.SetHasClass( "player_muted", Game.IsPlayerMuted( nPlayerID ) );
-		}
-		else
-		{
+		} else {
 			$.Msg( "No valid id" );
 		}
 	}
 }
 
-function GetLocalPlayerId()
-{
+function GetLocalPlayerId() {
 	var localPlayerId = 0;
 	var localPlayerInfo = Game.GetLocalPlayerInfo();
-	if(typeof(localPlayerInfo) !== "undefined")
-	{
+
+	if(typeof(localPlayerInfo) !== "undefined") {
 		localPlayerId = localPlayerInfo.player_id;
 	}
 
-	if(Players.IsLocalPlayerInPerspectiveCamera())
-	{
+	if (Players.IsLocalPlayerInPerspectiveCamera()) {
 		//get local player info for selected portrait unit
 		localPlayerId = Players.GetPerspectivePlayerId();
 	}
+
 	return localPlayerId;
 }
 
-function UpdatePlayerImages()
-{
+function UpdatePlayerImages() {
 	var localPlayerId = GetLocalPlayerId();
-
 	var playerImage = $("#ScoreboardTeamContainer").FindChildTraverse( "PlayerImage" );
-	playerImage.heroname = Players.GetPlayerSelectedHero( localPlayerId );
 	var playerColorBar = $("#ScoreboardTeamContainer").FindChildTraverse( "PlayerColorBar");
 	var colorInt = Players.GetPlayerColor( localPlayerId );
 	var colorString = "#" + intToARGB( colorInt );
+
+	playerImage.heroname = Players.GetPlayerSelectedHero( localPlayerId );
 	playerColorBar.style.backgroundColor = colorString;
-	var FriendlyBarImage = $("#ScoreboardTeamContainer").FindChildTraverse( "HeroImage" );
-//	var friendlyBarImage2 = $("#PartyPortraits").FindChildTraverse( "PartyPortrait" + localPlayerId ).FindChildTraverse( "HeroImage" );
 //	friendlyBarImage.heroname = Players.GetPlayerSelectedHero( localPlayerId );
 
 	var actualPlayerInfo = 1;
-	for(var i = 0; i < 8; i++)
-	{
+
+	for(var i = 0; i < 8; i++) {
 		var player_info = CustomNetTables.GetTableValue("battlepass", i);
 		if (player_info) {
 			playerImage.style.border = "2px solid " + player_info.donator_color;
@@ -86,7 +78,6 @@ function UpdatePlayerImages()
 		var muteButton =  $("#ScoreboardTeamContainer").FindChildTraverse( "PlayerMuteButton" + actualPlayerInfo );
 		muteButton.SetAttributeInt( "player_id", i );
 		muteButton.SetHasClass( "player_muted", Game.IsPlayerMuted( i ) )
-		//$.Msg( "assigning button to player id: " + i );
 
 		var heroImage = $("#ScoreboardTeamContainer").FindChildTraverse( "HeroImage" + actualPlayerInfo );
 		heroImage.heroname = Players.GetPlayerSelectedHero( i );
@@ -111,8 +102,6 @@ function UpdateZoneScores( zoneName )
 	UpdatePlayerImages();
 
 	var localPlayerId = GetLocalPlayerId();
-
-	//$.Msg( "Updating zone: " + zoneName );
 
 	var zonePlayerEntry = CustomNetTables.GetTableValue( "player_zone_locations", localPlayerId.toString());
 	var PlayerZoneName = zonePlayerEntry["ZoneName"];
@@ -215,9 +204,6 @@ function UpdateZoneScores( zoneName )
 				var badPanel = !ratioBarPanel;
 				if( !badPanel )
 				{
-					//$.Msg("dungeon_scoreboard - found child " + ratioBarPanelName + " for player " + i + " with width " + percentage.toFixed(2));
-					//$.Msg("dungeon_scoreboard - player: " + i + " values:" + playerValues[i] + "/" + keyTotal + " = " + percentage);
-
 					if(typeof(ratioBarPanel.style) != "undefined")
 					{
 						ratioBarPanel.style.width = percentage.toString() + "%;";
@@ -261,9 +247,6 @@ function _ScoreboardUpdater_SetValueSafe(childName, Value) {
 }
 
 function _ScoreboardUpdater_UpdatePlayerPanelXP(playerId, ImbaXP_Panel, player_info) {
-
-//	$.Msg("Updating player xp panel");
-
 	var ids = {
 		xpRank:  "es-player-xp-rank-name" + playerId,
 		xp: "es-player-xp-rank" + playerId,
@@ -314,14 +297,13 @@ function _ScoreboardUpdater_UpdatePlayerPanelXP(playerId, ImbaXP_Panel, player_i
 
 function UpdatePlayerZones()
 {
-	$.Msg( "UpdatePlayerZones" );
+//	$.Msg( "UpdatePlayerZones" );
 }
 
 var g_nCurZone = -1;
 
 function ZoneScoresReceived()
 {
-	//$.Msg( "ZoneScoresReceived" );
 	var localPlayerId = GetLocalPlayerId();
 	if( localPlayerId !== -1)
 	{
@@ -392,7 +374,6 @@ function SetFlyoutScoreboardVisible( bVisible )
 		var localPlayerId = GetLocalPlayerId();
 
 		var zonePlayerEntry = CustomNetTables.GetTableValue( "player_zone_locations", localPlayerId.toString());
-		$.Msg(zonePlayerEntry)
 		var zoneName = zonePlayerEntry["ZoneName"];
 		var zoneData = CustomNetTables.GetTableValue( "zone_scores", zoneName );
 		if ( typeof(zoneData) == "undefined" )
@@ -409,8 +390,6 @@ function SetFlyoutScoreboardVisible( bVisible )
 
 		var prevValidZoneName = ScanForValidZoneName(g_nCurZone, -1);
 		var nextValidZoneName = ScanForValidZoneName(g_nCurZone, 1);
-
-		//$.Msg("next:" + nextValidZoneName)
 
 		$.GetContextPanel().FindChildTraverse("PrevZoneButton").enabled = (prevValidZoneName.length > 0);
 		$.GetContextPanel().FindChildTraverse("NextZoneButton").enabled = (nextValidZoneName.length > 0);
@@ -436,11 +415,8 @@ function SetFlyoutScoreboardChangeZone( nDir )
 		return;
 	var zoneNameList = CustomNetTables.GetAllTableValues("zone_names");
 	
-	//$.Msg("new:" + newZoneName)
 	$.GetContextPanel().SetHasClass( "ZoneSelected_" + zoneNameList[g_nCurZone]["value"]["ZoneName"], false );
 	g_nCurZone = FindZoneByName(newZoneName);
-
-	//$.Msg("zone:" + g_nCurZone)
 
 	var prevValidZoneName = ScanForValidZoneName(g_nCurZone, -1);
 	var nextValidZoneName = ScanForValidZoneName(g_nCurZone, 1);

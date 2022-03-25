@@ -5462,7 +5462,7 @@
 	{
 		// General
 		"BaseClass"					"npc_dota_creature"  // Class of entity of link to.
-		"Model"						"models/heroes/life_stealer/life_stealer.vmdl"  // Model.
+		"Model"						"models/creeps/lane_creeps/creep_bad_melee_diretide/creep_bad_melee_diretide.vmdl"  // Model.
 		"Level"						"1"
 		"ModelScale"				"1"
 		"ConsideredHero"			"1"
@@ -5526,15 +5526,6 @@
 		// Bots
 		//----------------------------------------------------------------
 		"AttackDesire"				"1.5"   // How much bots want to attack them vs other non-hero things
-
-		"Creature"
-		{
-			"AttachWearables"
-			{
-				"Wearable1" { "ItemDef" "443" }
-				"Wearable2" { "ItemDef" "444" }
-			}
-		}
 	}
 
 	//=================================================================================

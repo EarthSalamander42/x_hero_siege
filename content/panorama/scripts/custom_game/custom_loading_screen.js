@@ -59,7 +59,7 @@ function isInt(n) {
 }
 
 function LoadingScreenDebug(args) {
-	$.Msg(args)
+	$.Msg(args);
 	view.text.text = view.text.text + ". \n\n" + args.text;
 }
 
@@ -210,8 +210,6 @@ function fetch() {
 };
 
 function AllPlayersLoaded() {
-//	$.Msg("ALL PLAYERS LOADED IN!");
-
 	$("#MainVoteButton").style.opacity = "1";
 
 	if (Game.IsInToolsMode())
@@ -229,7 +227,6 @@ function AllPlayersLoaded() {
 	}
 
 	for (var i = 1; i <= $("#vote-label-container").GetChildCount(); i++) {
-		//$.Msg("Game Mode: ", i)
 		var panel = $("#vote-label-container").GetChild(i - 1);
 
 		(function (panel, i) {
@@ -273,8 +270,6 @@ function AllPlayersLoaded() {
 }
 
 function AllPlayersBattlepassLoaded() {
-//	$.Msg("ALL PLAYERS BATTLEPASS LOADED!")
-
 	var player_table = CustomNetTables.GetTableValue("battlepass_player", Players.GetLocalPlayer().toString());
 
 	if (player_table && player_table.mmr_title) {
@@ -329,11 +324,7 @@ function HoverableLoadingScreen() {
 		$.Schedule(1.0, HoverableLoadingScreen)
 }
 
-function OnVoteButtonPressed(category, vote)
-{
-//	$.Msg("Category: ", category);
-//	$.Msg("Vote: ", vote);
-
+function OnVoteButtonPressed(category, vote) {
 	var gamemode_name = $.Localize("#" + vote_tooltips[vote]);
 
 	$("#VoteGameModeCheck").text = "You have voted for " + gamemode_name + ".";
@@ -342,14 +333,8 @@ function OnVoteButtonPressed(category, vote)
 
 /* new system, double votes for donators */
 
-function OnVotesReceived(data)
-{
-//	$.Msg(data)
-//	$.Msg(data.table)
-
+function OnVotesReceived(data) {
 	var vote_counter = [];
-
-	var map_name_cut = Game.GetMapInfo().map_display_name.replace('_', " ");
 
 	// Reset tooltips
 	for (var i = 1; i <= vote_count[game_options.game_type]; i++) {
@@ -364,10 +349,9 @@ function OnVotesReceived(data)
 
 	// Check number of votes for each gamemodes
 	for (var player_id in data.table) {
-//		$.Msg(data.table[player_id]);
 		var gamemode = data.table[player_id][1];
 		var amount_of_votes = data.table[player_id][2];
-//		$.Msg(gamemode + " / "+ amount_of_votes)
+
 		vote_counter[gamemode] = vote_counter[gamemode] + amount_of_votes;
 	}
 
@@ -381,7 +365,6 @@ function OnVotesReceived(data)
 		var gamemode_text = $.Localize("#" + vote_tooltips[i]) + " (" + vote_counter[i] + " "+ vote_tooltip +")";
 
 		if ($("#VoteGameModeText" + i)) {
-//			$.Msg(gamemode_text);
 			$("#VoteGameModeText" + i).style.color = "white";
 			$("#VoteGameModeText" + i).text = $.Localize("#" + vote_tooltips[i]) + " (" + vote_counter[i] + " "+ vote_tooltip +")";
 		}

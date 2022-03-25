@@ -8,8 +8,6 @@ var PT = {
   subs: []
 };
 
-$.Msg('[playertables_base.js] Loaded');
-
 var PlayerTables = {};
 
 PlayerTables.GetAllTableValues = function (tableName) {
@@ -112,7 +110,6 @@ function ProcessTable (newTable, oldTable, changes, dels) {
 function SendPID () {
   var pid = Players.GetLocalPlayer();
   var spec = Players.IsSpectator(pid);
-  // $.Msg(pid, ' -- ', spec)
   if (pid === -1 && !spec) {
     $.Schedule(1 / 30, SendPID);
     return;
@@ -122,7 +119,6 @@ function SendPID () {
 }
 
 function TableFullUpdate (msg) {
-  // $.Msg('TableFullUpdate -- ', msg)
   // msg.table = UnprocessTable(msg.table)
   var newTable = msg.table;
   var oldTable = PT.tables[msg.name];
@@ -159,7 +155,6 @@ function TableFullUpdate (msg) {
 }
 
 function UpdateTable (msg) {
-  // $.Msg('UpdateTable -- ', msg)
   // msg.changes = UnprocessTable(msg.changes)
 
   var table = PT.tables[msg.name];
@@ -194,7 +189,6 @@ function UpdateTable (msg) {
 }
 
 function DeleteTableKeys (msg) {
-  // $.Msg('DeleteTableKeys -- ', msg)
   var table = PT.tables[msg.name];
   if (!table) {
     $.Msg('PlayerTables.DeleteTableKey invoked on nonexistent playertable.');

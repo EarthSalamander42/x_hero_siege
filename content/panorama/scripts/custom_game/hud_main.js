@@ -110,7 +110,6 @@ function AdvanceDialogThink()
 
 function OnAdvanceDialogButtonPressed()
 {
-	$.Msg( "AdvanceDialogButtonPressed" );
 	if ( g_nCurrentCharacter < g_szPendingDialog.length )
 	{
 		g_nCurrentCharacter = g_szPendingDialog.length;
@@ -130,20 +129,17 @@ function OnAdvanceDialogButtonPressed()
 
 function OnConfirmButtonPressed()
 {
-	$.Msg("Pressed Confirm Button!")
 	GameEvents.SendCustomGameEventToServer( "dialog_confirm", { nPlayerID: (Players.GetLocalPlayer()), ConfirmToken: g_szConfirmToken, DialogEntIndex: g_nCurrentDialogEnt, DialogLine: g_nCurrentDialogLine } );
 	$( "#ConfirmButton" ).AddClass( "Confirmed" );
 }
 
 function OnDialogPlayerConfirm( data )
 {
-	$.Msg(data["PlayerID"] + " confirmed the dialog!")
 	$( "#Player"+data["PlayerID"]+"Confirm" ).AddClass( "Confirmed" )
 }
 
 function OnDialogPlayerAllConfirmed()
 {
-	$.Msg("Everyone confirmed the dialog!")
 	$( "#DialogPanel" ).SetHasClass( "Visible", false );
 	GameEvents.SendCustomGameEventToServer( "dialog_complete", { DialogEntIndex: g_nCurrentDialogEnt, DialogLine: g_nCurrentDialogLine, ShowNextLine : false, PlayerHeroEntIndex : Players.GetPlayerHeroEntityIndex( Players.GetLocalPlayer() ) } );
 	
@@ -314,8 +310,6 @@ SetPlayersCameraPosition({
 */
 
 function SetPlayersCameraPosition(keys) {
-//	$.Msg(keys)
-
 	if (!keys.iSpeed)
 		keys.iSpeed = 2.0;
 

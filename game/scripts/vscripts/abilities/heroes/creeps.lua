@@ -216,9 +216,11 @@ end
 LinkLuaModifier("modifier_endurance_aura", "modifiers/auras/modifier_endurance_aura.lua", LUA_MODIFIER_MOTION_NONE)
 
 holdout_endurance_aura = holdout_endurance_aura or class({})
+
 function holdout_endurance_aura:GetIntrinsicModifierName() return "modifier_endurance_aura" end
 
 xhs_creeps_phase_2_endurance_aura = xhs_creeps_phase_2_endurance_aura or class({})
+
 function xhs_creeps_phase_2_endurance_aura:GetIntrinsicModifierName() return "modifier_endurance_aura" end
 
 --------------------------------------------------------------------------------
@@ -226,12 +228,15 @@ function xhs_creeps_phase_2_endurance_aura:GetIntrinsicModifierName() return "mo
 LinkLuaModifier("modifier_command_aura", "modifiers/auras/modifier_command_aura.lua", LUA_MODIFIER_MOTION_NONE)
 
 holdout_command_aura = holdout_command_aura or class({})
+
 function holdout_command_aura:GetIntrinsicModifierName() return "modifier_command_aura" end
 
 holdout_command_aura_innate = holdout_command_aura_innate or class({})
+
 function holdout_command_aura_innate:GetIntrinsicModifierName() return "modifier_command_aura" end
 
 command_aura = command_aura or class({})
+
 function command_aura:GetIntrinsicModifierName() return "modifier_command_aura" end
 
 --------------------------------------------------------------------------------
@@ -239,4 +244,5 @@ function command_aura:GetIntrinsicModifierName() return "modifier_command_aura" 
 LinkLuaModifier("modifier_unholy_aura", "modifiers/auras/modifier_unholy_aura.lua", LUA_MODIFIER_MOTION_NONE)
 
 xhs_creeps_phase_2_unholy_aura = xhs_creeps_phase_2_unholy_aura or class({})
+
 function xhs_creeps_phase_2_unholy_aura:GetIntrinsicModifierName() return "modifier_unholy_aura" end

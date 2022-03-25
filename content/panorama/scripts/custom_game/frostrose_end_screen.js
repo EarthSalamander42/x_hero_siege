@@ -84,8 +84,6 @@ function RawTimetoGameTime(time) {
 }
 
 function EndScoreboard(args) {
-//	$.Msg(args)
-
 	// Hide all other UI
 	var MainPanel = $.GetContextPanel().GetParent().GetParent().GetParent().GetParent()
 	MainPanel.FindChildTraverse("topbar").style.visibility = "collapse";
@@ -109,9 +107,7 @@ function EndScoreboard(args) {
 		var result = null;
 
 		for (var k in args.data.players) {
-//			$.Msg(k + " / " + info.player_steamid)
 			if (k == info.player_steamid) {
-//				$.Msg(args.data.players[k])
 				return {
 					id: id,
 					info: info,
@@ -143,7 +139,6 @@ function EndScoreboard(args) {
 			return;
 
 		// Create a new Panel for this player
-//		$.Msg(player)
 		var pp = $.CreatePanel("Panel", parent, "es-player-" + player.id);
 		pp.AddClass("es-player");
 		pp.BLoadLayout(playerXmlFile, false, false);
@@ -171,8 +166,6 @@ function EndScoreboard(args) {
 				booster: pp.FindChildInLayoutFile("es-player-xp-booster")
 			}
 		};
-
-//		$.Msg(player.info.player_steamid);
 
 		// Avatar + Hero Image
 		values.avatar.steamid = player.info.player_steamid;
@@ -213,9 +206,6 @@ function EndScoreboard(args) {
 			values.xp.rank_name.style.color = ply_table.title_color;
 			if (ply_table.in_game_tag == 1)
 				values.xp.booster.style.color = ply_table.donator_color;
-
-//			$.Msg(Math.floor(player_xp) + " / " + Math.floor(player_max_xp_in_level))
-//			$.Msg(Math.floor(player_xp) / Math.floor(player_max_xp_in_level))
 
 			var progress = Math.round((100.0 * Math.floor(player_xp)) / Math.floor(player_max_xp_in_level));
 			values.xp.progress.style.width = progress + "%";
@@ -307,10 +297,6 @@ function CreateBattlepassRewardPanel(level, levelup_count) {
 	if (battlepass != undefined && battlepass[level] != undefined) {
 		var battlepass_reward = battlepass[level][1];
 		var battlepass_rarity = battlepass[level][2];
-//		$.Msg("Earned a reward:")
-//		$.Msg(level)
-//		$.Msg(battlepass_reward)
-//		$.Msg(battlepass_rarity)
 
 		var rp = $.CreatePanel("Panel", $("#es-player-reward-panel"), "es-player-reward-container" + levelup_count);
 		rp.AddClass("es-player-reward-container");
@@ -383,7 +369,6 @@ function CreateBattlepassRewardPanel(level, levelup_count) {
 
 function HallOfFame(args) {
 	var diretide_records = args.data.games;
-//	$.Msg(diretide_records)
 
 	if (diretide_records == undefined)
 		return;
@@ -419,7 +404,6 @@ function HallOfFame(args) {
 
 		while (players[j]) {
 			var steamid = players[j];
-//			$.Msg(steamid)
 			var panel_steam_id = $.CreatePanel("DOTAAvatarImage", players_row, "player_steamid_" + j);
 			panel_steam_id.AddClass("LeaderboardAvatar");
 			panel_steam_id.steamid = steamid;

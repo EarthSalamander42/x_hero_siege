@@ -29,6 +29,7 @@ function modifier_endurance_buff:DeclareFunctions() return {
 
 function modifier_endurance_buff:OnCreated()
 	if not IsServer() then return end
+	if self:GetParent():GetTeam() ~= 2 then return end -- Assuming this is causing massive lag issues in Phase 2
 
 	self.pfx = ParticleManager:CreateParticle("particles/items_fx/aura_endurance.vpcf", PATTACH_ABSORIGIN_FOLLOW, self:GetParent())
 end

@@ -1463,7 +1463,7 @@ end
 ---------------------------------------------------------
 
 function GameMode:OnQuestCompleted(questZone, quest)
-	print("GameMode:OnQuestCompleted - Quest " .. quest.szQuestName .. " in Zone " .. questZone.szName .. " completed.")
+--	print("GameMode:OnQuestCompleted - Quest " .. quest.szQuestName .. " in Zone " .. questZone.szName .. " completed.")
 	quest.nCompleted = quest.nCompleted + 1
 	if quest.nCompleted >= quest.nCompleteLimit then
 		quest.bCompleted = true
@@ -1905,11 +1905,14 @@ end
 ---------------------------------------------------------
 
 function GameMode:OnDialogConfirmExpired(eventSourceIndex, data)
-	GameMode.DialogConfirmCount[data.ConfirmToken] = 4
+	if data.ConfirmToken then
+		GameMode.DialogConfirmCount[data.ConfirmToken] = 4
+	end
 
 	for _,zone in pairs(GameMode.Zones) do
 		zone:OnDialogAllConfirmed(EntIndexToHScript(data["DialogEntIndex"]), data["DialogLine"])
 	end
+
 	CustomGameEventManager:Send_ServerToAllClients("dialog_player_all_confirmed", netTable)
 	GameMode.bConfirmPending = false
 end

@@ -28,6 +28,7 @@ function modifier_unholy_buff:DeclareFunctions() return {
 
 function modifier_unholy_buff:OnCreated()
 	if not IsServer() then return end
+	if self:GetParent():GetTeam() ~= 2 then return end -- Assuming this is causing massive lag issues in Phase 2
 
 	self.pfx1 = ParticleManager:CreateParticle("particles/econ/courier/courier_faceless_rex/cour_rex_ground_a.vpcf", PATTACH_ABSORIGIN_FOLLOW, self:GetParent())
 	self.pfx2 = ParticleManager:CreateParticle("particles/econ/courier/courier_roshan_frost/courier_roshan_frost_steam.vpcf", PATTACH_ABSORIGIN_FOLLOW, self:GetParent())

@@ -384,7 +384,6 @@ _G.multiplayer_abilities_cast = {
 
 MODIFIER_ITEMS_WITH_LEVELS = {}
 MODIFIER_ITEMS_WITH_LEVELS["modifier_lifesteal"] = {
-	"item_doom_artifact",
 	"item_lightning_sword",
 	"item_lifesteal_mask",
 	"xhs_vampiric_aura",

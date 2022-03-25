@@ -809,6 +809,20 @@ function ShowBossBar(caster)
 	})
 end
 
+function UpdateBossBar(caster)
+	if caster.deathStart then return end
+
+	if caster.boss_count == nil then
+		caster.boss_count = 1
+	end
+
+	CustomGameEventManager:Send_ServerToPlayer(PlayerResource:GetPlayer(caster:GetPlayerID()), "update_boss_hp", {
+		boss_health = caster:GetHealth(),
+		boss_max_health = caster:GetMaxHealth(),
+		boss_count = caster.boss_count,
+	})
+end
+
 function IsNearEntity(entity_class, location, distance)
 	local entity = Entities:FindByName(nil, entity_class)
 	if (entity:GetAbsOrigin() - location):Length2D() <= distance then

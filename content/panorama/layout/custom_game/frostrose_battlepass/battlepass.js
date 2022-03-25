@@ -478,7 +478,7 @@ function SetCompanion(companion, name, id, required_status) {
 		steamid : Game.GetLocalPlayerInfo().player_steamid,
 	}, function() {
 		$("#CompanionNotification").AddClass("success");
-		$("#CompanionNotificationLabel").text = $.Localize("#companion_success") + " " + $.Localize(name) + "!";
+		$("#CompanionNotificationLabel").text = $.Localize("#companion_success") + " " + $.Localize("#" + name) + "!";
 		GameEvents.SendCustomGameEventToServer("change_companion", {
 			ID : Players.GetLocalPlayer(),
 			unit : companion,
@@ -531,7 +531,7 @@ function SetStatue(statue, name, id) {
 		steamid : Game.GetLocalPlayerInfo().player_steamid,
 	}, function() {
 		$("#CompanionNotification").AddClass("success");
-		$("#CompanionNotificationLabel").text = $.Localize("#statue_success") + " " + $.Localize(name) + "!";
+		$("#CompanionNotificationLabel").text = $.Localize("#statue_success") + " " + $.Localize("#" + name) + "!";
 		GameEvents.SendCustomGameEventToServer("change_statue", {
 			ID : Players.GetLocalPlayer(),
 			unit : statue
@@ -585,7 +585,7 @@ function SetEmblem(emblem, name, id, required_status) {
 		steamid : Game.GetLocalPlayerInfo().player_steamid,
 	}, function() {
 		$("#CompanionNotification").AddClass("success");
-		$("#CompanionNotificationLabel").text = $.Localize("#emblem_success") + " " + $.Localize(name) + "!";
+		$("#CompanionNotificationLabel").text = $.Localize("#emblem_success") + " " + $.Localize("#" + name) + "!";
 		GameEvents.SendCustomGameEventToServer("change_emblem", {
 			ID : Players.GetLocalPlayer(),
 			unit : emblem
@@ -619,10 +619,6 @@ function SetTag() {
 
 		companion_changed = true;
 
-		if (chat.text === "-ping") {
-			Game.ServerCmd("dota_ping");
-		}
-
 		api.updateTag({
 			steamid : Game.GetLocalPlayerInfo().player_steamid,
 			tag_name : chat.text
@@ -632,7 +628,7 @@ function SetTag() {
 			});
 
 			$("#CompanionNotification").AddClass("success");
-			$("#CompanionNotificationLabel").text = $.Localize("#tag_success") + " " + $.Localize(chat.text) + "!";
+			$("#CompanionNotificationLabel").text = $.Localize("#tag_success") + " " + chat.text + "!";
 
 			$.Msg("Ingame tag update: success!")
 			$.Schedule(6.0, function() {
@@ -676,9 +672,9 @@ function SetArmory(hero, slot_id, item_id, bp_name, bForceUnequip) {
 
 		if ($("#reward_equipped_" + item_id)) {
 			$("#reward_equipped_" + item_id).DeleteAsync(0);
-			text = $.Localize("#bp_reward_unequip_success") + " " + $.Localize(bp_name);
+			text = $.Localize("#bp_reward_unequip_success") + " " + $.Localize("#" + bp_name);
 		} else {
-			text = $.Localize("#bp_reward_equip_success") + " " + $.Localize(bp_name);
+			text = $.Localize("#bp_reward_equip_success") + " " + $.Localize("#" + bp_name);
 			SetRewardEquipped(item_id, hero);
 		}
 
@@ -991,7 +987,7 @@ function GenerateBattlepassPanel(reward_list, player, bRewardsDisabled) {
 						reward_panel_unlocked.AddClass("BattlepassRewardPanelUnlocked");
 
 						if (bp_type == "bundle" || bp_type == "wearable" || bp_type == "taunt") {
-							var hero_tooltip = $.Localize(bp_hero);
+							var hero_tooltip = $.Localize("#" + bp_hero);
 							var new_hero_tooltip = undefined;
 
 							if (hero_tooltip.indexOf(" (IMBA)") !== -1) {
@@ -999,11 +995,11 @@ function GenerateBattlepassPanel(reward_list, player, bRewardsDisabled) {
 							}
 
 							if (new_hero_tooltip)
-								reward.FindChildTraverse("BattlepassRewardTitle").text = new_hero_tooltip + ": " +  $.Localize(bp_name);
+								reward.FindChildTraverse("BattlepassRewardTitle").text = new_hero_tooltip + ": " +  $.Localize("#" + bp_name);
 							else
-								reward.FindChildTraverse("BattlepassRewardTitle").text = hero_tooltip + ": " +  $.Localize(bp_name);
+								reward.FindChildTraverse("BattlepassRewardTitle").text = hero_tooltip + ": " +  $.Localize("#" + bp_name);
 						} else
-							reward.FindChildTraverse("BattlepassRewardTitle").text = $.Localize("#battlepass_" + bp_type) + ": " +  $.Localize(bp_name);
+							reward.FindChildTraverse("BattlepassRewardTitle").text = $.Localize("#battlepass_" + bp_type) + ": " +  $.Localize("#" + bp_name);
 
 						var armory = CustomNetTables.GetTableValue("battlepass_rewards", "rewards_" + player);
 

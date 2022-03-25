@@ -67,7 +67,7 @@ function modifier_ankh_passives:RemoveOnDeath() return false end
 function modifier_ankh_passives:IsPurgable() return false end
 function modifier_ankh_passives:IsPurgeException() return false end
 function modifier_ankh_passives:GetAttributes() return MODIFIER_ATTRIBUTE_MULTIPLE end
-function modifier_ankh_passives:GetTextre() return "modifiers/ankh_of_reincarnation" end
+function modifier_ankh_passives:GetTexture() return "modifiers/ankh_of_reincarnation" end
 
 function modifier_ankh_passives:DeclareFunctions() return {
 	MODIFIER_EVENT_ON_DEATH,

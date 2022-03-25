@@ -54,6 +54,8 @@
 "donator_Patreon_wrapper_label"		"Become a Patron"
 "donator_Companion_wrapper_label"	"Select a Companion"
 "donator_Statue_wrapper_label"		"Select a Statue"
+"donator_tag"						"Tag"
+"donator_tag_wrapper_label"			"Choose a health bar tag"
 "donator_companion"					"Companion"
 "donator_statue"					"Statue"
 "donator_info"						"Select a Companion"
@@ -91,5 +93,6 @@
 "disable_companion"				"Disable companion"
 "toggle_bp_rewards"				"Toggle battlepass rewards"
 "toggle_player_xp"				"Toggle battlepass XP visibility (will take effect on next game)"
+"toggle_winrate"				"Toggle Winrate visibility"
 
 "imba_gamemode_settings_gold_multiplier"	"Difficulty:"

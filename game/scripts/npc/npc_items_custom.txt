@@ -2603,99 +2603,6 @@
 		}
 	}
 
-	//========================================================================================================
-	// Doom Artifact
-	//========================================================================================================
-	"item_doom_artifact"
-	{
-		// General
-		//----------------------------------------------------------------------------------------------------
-		"BaseClass"             		"item_lua"
-		"ScriptFile"					"items/doom_artifact.lua"
-		"ID"							"2534"
-		"AbilityTextureName"			"custom/doom_artifact"		
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-
-		// Item Info
-		//----------------------------------------------------------------------------------------------------
-		"ItemCost"						"0"
-		"ItemShopTags"					"unique"
-		"ItemQuality"					"epic"
-		"ItemAliases"					"doom artifact"
-		"ItemPurchasable"				"0"
-		"ItemSellable"					"0"
-		"ItemKillable"					"0"
-		"ItemShareability"				"ITEM_NOT_SHAREABLE"
-		"ItemDroppable"					"0"
-		"AbilityCooldown"				"0.0"
-
-		// Special
-		//----------------------------------------------------------------------------------------------------
-		"AbilitySpecial"
-		{
-			"01"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_stats"			"1500"
-			}
-			"02"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_armor"			"75"
-			}
-			"03"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"damage_reduction"		"-20"
-			}
-			"04"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_hp"				"10000"
-			}
-			"05"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"reincarnation_time"	"5"
-			}
-			"06"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"damage_return_pct"		"20"
-			}
-			"07"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"lifesteal_pct"			"50"
-			}
-			"08"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_damage"			"3000"
-			}
-			"09"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_damage_percentage"	"50"
-			}
-			"10"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_health_regen"	"125"
-			}
-			"11"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_movement_speed"	"90"
-			}
-			"12"
-			{
-				"var_type"				"FIELD_FLOAT"
-				"bat_reduction"			"0.4"
-			}
-		}
-	}
-
 	//=================================================================================================================
 	// Armor Rune
 	//=================================================================================================================
@@ -2734,33 +2641,6 @@
 			}
 		}
 	}
-
-	//=================================================================================================================
-	// Recipe: Doom Artifact
-	//=================================================================================================================
-//	"item_recipe_doom_artifact"
-//	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-//		"ID"							"2545"
-//		"BaseClass"             		"item_datadriven"
-//		"Model"							"models/props_gameplay/recipe.vmdl"
-//		"AbilityTextureName"			"custom/recipe"
-
-		// Item Info
-		//-------------------------------------------------------------------------------------------------------------
-//		"ItemCost"						"0"	
-//		"ItemShopTags"					""
-
-		// Recipe
-		//-------------------------------------------------------------------------------------------------------------
-//		"ItemRecipe"					"1"
-//		"ItemResult"					"item_doom_artifact"
-//		"ItemRequirements"
-//		{
-//			"01"						"item_key_of_the_three_moons;item_shield_of_invincibility;item_lightning_sword;item_ring_of_superiority"
-//		}
-//	}
 
 	//========================================================================================================
 	// Necklace of Spell Immunity

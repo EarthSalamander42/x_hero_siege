@@ -178,6 +178,7 @@ function OverrideTopBarHeroImage(args) {
 
 GameEvents.Subscribe("override_hero_image", OverrideTopBarHeroImage);
 
+// Tools mode testing stuff
 /*
 if (FindDotaHudElement("RadiantPlayer" + Players.GetLocalPlayer()).FindChildTraverse("HeroImage")) {
 	var panel =  FindDotaHudElement("RadiantPlayer" + Players.GetLocalPlayer()).FindChildTraverse("HeroImage")
@@ -215,7 +216,6 @@ function OverrideTopBarColor() {
 	var colors = CustomNetTables.GetTableValue("game_options", "player_colors")
 
 	for (var id in colors) {
-//		if (!Players.GetTeam(parseInt(id))) {return $.Msg("No player for this ID, stop loop.")};
 		if (!Players.GetTeam(parseInt(id))) {return};
 		var team = "Radiant"
 
@@ -224,7 +224,6 @@ function OverrideTopBarColor() {
 		}
 
 		var panel = FindDotaHudElement(team + "Player" + id)
-//		$.Msg(id)
 		panel.FindChildTraverse('PlayerColor').style.backgroundColor = colors[id];
 	}    
 }
@@ -252,7 +251,6 @@ function Mutation(args) {
 
 function SetMutationTooltip(j) {
 	var panel = $("#Mutation" + j)
-//	$.Msg(panel)
 
 	$("#Mutation" + j + "Label").text = $.Localize("#mutation_" + mutation[j]);
 
@@ -313,8 +311,6 @@ function DonatorStatusConverterReverse(new_status) {
 function GetDonatorColor(status) {
 	// lua donator status are still using old numbers
 //	var donator_colors = CustomNetTables.GetTableValue("game_options", "donator_colors")
-//	$.Msg("Donator colors:")
-//	$.Msg(donator_colors)
 
 	// Placeholder
 	var donator_colors = [];

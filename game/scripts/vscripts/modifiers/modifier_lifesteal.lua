@@ -5,6 +5,7 @@ modifier_lifesteal = modifier_lifesteal or class({})
 function modifier_lifesteal:IsHidden() return not IsInToolsMode() end
 function modifier_lifesteal:IsPurgable() return false end
 function modifier_lifesteal:IsDebuff() return false end
+function modifier_lifesteal:RemoveOnDeath() return false end
 function modifier_lifesteal:GetAttributes() return MODIFIER_ATTRIBUTE_MULTIPLE end
 
 function modifier_lifesteal:GetTexture()

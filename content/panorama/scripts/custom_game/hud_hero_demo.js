@@ -42,7 +42,6 @@ function ToggleCheatMenu() {
 	var herolist = CustomNetTables.GetTableValue('hero_selection', 'herolist');
 
 	Object.keys(herolist.herolist).sort().forEach(function (hero) {
-//		$.Msg(hero)
 		var new_hero = $.CreatePanel('Panel', $("#" + herolist.herolist[hero]), hero);
 		new_hero.AddClass("HeroContainer")
 		new_hero.group = 'HeroChoises';

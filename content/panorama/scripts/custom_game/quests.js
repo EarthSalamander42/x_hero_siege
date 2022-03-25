@@ -1,9 +1,6 @@
 "use strict";
 
-function OnQuestActivated( data )
-{
-	$.Msg( "OnQuestActivated" );
-
+function OnQuestActivated( data ) {
 	var QuestsContainerPanel = $( "#QuestsContainer" );
 	if ( QuestsContainerPanel === null ) 
 		return;
@@ -49,9 +46,7 @@ GameEvents.Subscribe( "quest_activated", OnQuestActivated );
 function HideQuestCompletePopup( )
 {
 	var DungeonQuestCompleteRoot = $( "#DungeonQuestCompleteRoot" );
-	if(DungeonQuestCompleteRoot == null)
-	{
-		$.Msg( "Can't find quest complete root");
+	if (DungeonQuestCompleteRoot == null) {
 		return;
 	}
 
@@ -66,12 +61,9 @@ function HideQuestCompletePopup( )
 
 function ShowQuestCompletePopup( data )
 {
-	$.Msg( "ShowQuestCompletePopup");
-
 	var DungeonQuestCompleteRoot = $( "#DungeonQuestCompleteRoot" );
 	if(DungeonQuestCompleteRoot == null)
 	{
-		$.Msg( "Can't find quest complete root");
 		return;
 	}
 
@@ -116,8 +108,6 @@ function ShowQuestCompletePopup( data )
 
 function OnQuestCompleted( data )
 {
-	$.Msg( "OnQuestCompleted" );
-
 	if ( data["Completed"] === data["CompleteLimit"] && ( data["Optional"] || data["ZoneCompleted"] ) )
 	{
 		if ( data["ZoneCompleted"] )
@@ -165,8 +155,7 @@ function OnQuestCompleted( data )
 	var QuestsInZone = ZoneQuestsContainer.FindChildrenWithClassTraverse( "Quest" );
 	var bAllComplete = true;
 	var i = 0;
-	for ( i = 0; i < QuestsInZone.length; i++ )
-	{
+	for ( i = 0; i < QuestsInZone.length; i++ ) {
 		var Quest = QuestsInZone[i];
 		if ( Quest !== null && Quest.BHasClass( "Completed" ) === false )
 		{
@@ -175,9 +164,9 @@ function OnQuestCompleted( data )
 		}
 	}
 
-	//$.Msg( "Zone " + szZoneName + " is " + ( bAllComplete || data["ZoneCompleted"] ) );
 	ZonePanel.SetHasClass( "Completed", bAllComplete || data["ZoneCompleted"] );
 }
+
 GameEvents.Subscribe( "quest_completed", OnQuestCompleted );
 
 function OnPlayerEnteredZone( data )

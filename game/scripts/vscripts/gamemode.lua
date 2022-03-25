@@ -268,7 +268,7 @@ function GameMode:OnThink()
 	end
 
 	-- after 6 seconds of death for the whole team, end the game
-	if CheckTeamDeath == 6 then
+	if CheckTeamDeath == 10 then
 		GameRules:SetGameWinner(3)
 	end
 
@@ -454,17 +454,21 @@ function GameMode:FilterExecuteOrder( filterTable )
 
 	if order_type == DOTA_UNIT_ORDER_CAST_POSITION then
 		local ability = EntIndexToHScript(filterTable["entindex_ability"])
+
 		if ability:GetName() == "item_tpscroll" then
 			if _G.SECRET == 1 then return true end
+
 			local target_loc = Vector(filterTable.position_x, filterTable.position_y, filterTable.position_z)
+
 			if IsNearEntity("npc_dota_muradin_boss", target_loc, 1200) then
 				print("Near muradin")
 				if GameRules:GetCustomGameDifficulty() >= 4 or IsInToolsMode() then
 					print("Right difficulty")
 					for itemSlot = 0, 5 do
 						local item = unit:GetItemInSlot(itemSlot)
-						if item and item:GetName() == "item_doom_artifact" then
-							print("Doom artifact")
+
+						if item and item:GetName() == "item_key_of_the_three_moons" then
+							print("You have key to enter secret arena")
 							if not GameRules:IsCheatMode() or IsInToolsMode() then
 								print("Not cheat mode")
 								if not IsInToolsMode() then
@@ -472,12 +476,13 @@ function GameMode:FilterExecuteOrder( filterTable )
 								end
 
 								StartSecretArena(unit)
-
-								return false
 							end
 						end
 					end
 				end
+
+				SendErrorMessage(hero:GetPlayerID(), "I'm sorry, i can't let you in.")
+				return false
 			end
 		end
 	end
@@ -693,11 +698,24 @@ local point = Entities:FindByName(nil, "all_hero_image_player")
 			local point_image = Entities:FindByName(nil, "special_event_all_"..illusion_spawn)
 			GameMode.AllHeroImage = CreateUnitByName("npc_dota_hero_"..HEROLIST[random], point_image:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 			GameMode.AllHeroImage:SetAngles(0, 45 - 45 * illusion_spawn, 0)
+
 			GameMode.AllHeroImage:SetBaseStrength(hero:GetStrength() * 2)
 			GameMode.AllHeroImage:SetBaseIntellect(hero:GetIntellect() * 2)
 			GameMode.AllHeroImage:SetBaseAgility(hero:GetAgility() * 2)
+
+			for i = 0, 5 do
+				local item = hero:GetItemInSlot(i)
+	
+				if item then
+					print("Item name:", item:GetName())
+					local newItem = CreateItem(item:GetName(), GameMode.AllHeroImage, GameMode.AllHeroImage)
+					GameMode.AllHeroImage:AddItem(newItem)
+				end
+			end
+
 			GameMode.AllHeroImage:AddNewModifier(nil, nil, "modifier_pause_creeps", {Duration = 5,IsHidden = true})
 			GameMode.AllHeroImage:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 5,IsHidden = true})
+
 			GameMode.AllHeroImage:MakeIllusion()
 			GameMode.AllHeroImage.Boss = true
 			GameMode.AllHeroImage:SetHealth(99999999)
@@ -775,14 +793,16 @@ function GameMode:SpecialEventTPQuit(hero)
 end
 
 function GameMode:SpecialEventTPQuit2(event)
-local PlayerID = event.pID
-local player = PlayerResource:GetPlayer(PlayerID)
-local hero = player:GetAssignedHero()
+	local PlayerID = event.pID
+	local player = PlayerResource:GetPlayer(PlayerID)
+	local hero = player:GetAssignedHero()
 
 	hero:Stop()
-	Entities:FindByName(nil, "trigger_special_event"):Enable()
 	hero:RemoveModifierByName("modifier_pause_creeps")
 	hero:RemoveModifierByName("modifier_invulnerable")
+	EnableItems(hero)
+
+	Entities:FindByName(nil, "trigger_special_event"):Enable()
 end
 
 -- Gold gain filter function

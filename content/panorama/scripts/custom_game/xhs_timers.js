@@ -9,8 +9,6 @@ function CountdownTimer(data)
 	timerText += data.timer_second_10;
 	timerText += data.timer_second_01;
 
-//	$.Msg(data.timer_name)
-
 	$("#GameTimer_" + data.timer_name).text = timerText;
 }
 
