@@ -28,9 +28,9 @@ function item_orb_of_darkness:GetIntrinsicModifierName()
 end
 
 function item_orb_of_darkness:OnSpellStart()
-	if IsServer() then
-		StartSpell(self:GetCaster(), self)
-	end
+	if not IsServer() then return end
+
+	StartSpell(self:GetCaster(), self)
 end
 
 function item_orb_of_darkness:GetAbilityTextureName()
@@ -50,9 +50,9 @@ function item_orb_of_darkness2:GetIntrinsicModifierName()
 end
 
 function item_orb_of_darkness2:OnSpellStart()
-	if IsServer() then
-		StartSpell(self:GetCaster(), self)
-	end
+	if not IsServer() then return end
+
+	StartSpell(self:GetCaster(), self)
 end
 
 function item_orb_of_darkness2:GetAbilityTextureName()
@@ -72,9 +72,9 @@ function item_bracer_of_the_void:GetIntrinsicModifierName()
 end
 
 function item_bracer_of_the_void:OnSpellStart()
-	if IsServer() then
-		StartSpell(self:GetCaster(), self)
-	end
+	if not IsServer() then return end
+
+	StartSpell(self:GetCaster(), self)
 end
 
 function item_bracer_of_the_void:GetAbilityTextureName()
@@ -104,11 +104,9 @@ function modifier_orb_of_darkness_active:GetEffectName()
 	return "particles/units/heroes/hero_ursa/ursa_enrage_buff_glow.vpcf"
 end
 
-function modifier_orb_of_darkness_active:DeclareFunctions()
-	return {
-		MODIFIER_EVENT_ON_DEATH,
-	}
-end
+function modifier_orb_of_darkness_active:DeclareFunctions() return {
+	MODIFIER_EVENT_ON_DEATH,
+} end
 
 function modifier_orb_of_darkness_active:OnCreated()
 --	self.ability = self:GetAbility()
@@ -146,67 +144,64 @@ function modifier_orb_of_darkness_active:OnIntervalThink()
 end
 
 function modifier_orb_of_darkness_active:OnDeath( params )
-	if IsServer() then
---		if self:GetAbility() == nil then
---			local items = {
---				"item_bracer_of_the_void",
---				"item_orb_of_darkness2",
---				"item_orb_of_darkness",
---			}
+	if not IsServer() then return end
+--	if self:GetAbility() == nil then
+--		local items = {
+--			"item_bracer_of_the_void",
+--			"item_orb_of_darkness2",
+--			"item_orb_of_darkness",
+--		}
 
---			local new_item = false
---			for _, item_name in ipairs(items) do
---				if self:GetParent():HasItemInInventory(item_name) then
---					print("Change main item with:", item_name)
---					self.ability = self:GetParent():FindItemByName(item_name, false)
---					new_item = true
---					break
---				end
+--		local new_item = false
+--		for _, item_name in ipairs(items) do
+--			if self:GetParent():HasItemInInventory(item_name) then
+--				print("Change main item with:", item_name)
+--				self.ability = self:GetParent():FindItemByName(item_name, false)
+--				new_item = true
+--				break
 --			end
 --		end
+--	end
 
---		if new_item == false then
---			print("No item for this modifier, remove it!")
---			self:GetParent():RemoveModifierByName("modifier_orb_of_darkness_active")
+--	if new_item == false then
+--		print("No item for this modifier, remove it!")
+--		self:GetParent():RemoveModifierByName("modifier_orb_of_darkness_active")
 --
---			return
---		end
+--		return
+--	end
 
---[[
-		if params.attacker == self:GetParent() and LeavesCorpse(params.unit) and params.unit.no_corpse ~= true and not params.unit:IsConsideredHero() then
-			if self:GetStackCount() < self.max_units then
-				local unit = CreateUnitByName(params.unit:GetUnitName(), params.unit:GetAbsOrigin(), true, self:GetParent(), self:GetParent(), self:GetParent():GetTeam())
-				unit:SetControllableByPlayer(self:GetParent():GetPlayerID(), true)
-				unit:SetOwner(self:GetParent())
-				unit:SetForwardVector(params.unit:GetForwardVector())
-				unit:AddAbility("holdout_blue_effect"):SetLevel(1)
-				unit:AddAbility("orb_of_darkness_unit"):SetLevel(1)
-				FindClearSpaceForUnit(unit, params.unit:GetAbsOrigin(), true)
+	print(params.unit:GetUnitName(), LeavesCorpse(params.unit))
+	if params.attacker == self:GetParent() and LeavesCorpse(params.unit) and params.unit.no_corpse ~= true and not params.unit:IsConsideredHero() then
+		if self:GetStackCount() < self.max_units then
+			local unit = CreateUnitByName(params.unit:GetUnitName(), params.unit:GetAbsOrigin(), true, self:GetParent(), self:GetParent(), self:GetParent():GetTeam())
+			unit:SetControllableByPlayer(self:GetParent():GetPlayerID(), true)
+			unit:SetOwner(self:GetParent())
+			unit:SetForwardVector(params.unit:GetForwardVector())
+			unit:AddAbility("holdout_blue_effect"):SetLevel(1)
+			unit:AddAbility("orb_of_darkness_unit"):SetLevel(1)
+			FindClearSpaceForUnit(unit, params.unit:GetAbsOrigin(), true)
 
-				unit:AddNewModifier(self:GetParent(), nil, "modifier_kill", {duration = self.duration})
-				unit:AddNewModifier(self:GetParent(), nil, "modifier_summoned", {})
-				unit:SetNoCorpse()
-				unit.no_corpse = true
-	
-				for i = 0, 15 do
-					local a = unit:GetAbilityByIndex(i)
-					if a and not a:IsPassive() then
-						a:SetActivated(false)
-					end
+			unit:AddNewModifier(self:GetParent(), nil, "modifier_kill", {duration = self.duration})
+			unit:AddNewModifier(self:GetParent(), nil, "modifier_summoned", {})
+			unit:SetNoCorpse()
+			unit.no_corpse = true
+
+			for i = 0, 15 do
+				local a = unit:GetAbilityByIndex(i)
+				if a and not a:IsPassive() then
+					a:SetActivated(false)
 				end
-
-				-- the unit is reincarnated, don't want to see the previous unit dying
---				params.unit:RemoveSelf()
-				-- replaced RemoveSelf because it prevents ending some quests when it requires killing units
-				params.unit:AddNoDraw()
-				-- increase the number of units under your control
-				self:SetStackCount(self:GetStackCount() + 1)
 			end
-		elseif params.unit:HasAbility("orb_of_darkness_unit") then
-			-- reduce unit count under control when 1 of them is dying
-			self:SetStackCount(self:GetStackCount() - 1)
+
+			-- the unit is reincarnated, don't want to see the previous unit dying
+			params.unit:AddNoDraw()
+
+			-- increase the number of units under your control
+			self:SetStackCount(self:GetStackCount() + 1)
 		end
---]]
+	elseif params.unit:HasAbility("orb_of_darkness_unit") then
+		-- reduce unit count under control when 1 of them is dying
+		self:SetStackCount(self:GetStackCount() - 1)
 	end
 end
 

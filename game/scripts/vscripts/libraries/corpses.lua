@@ -7,7 +7,7 @@ end
 CORPSE_APPEAR_DELAY = 5.0
 CORPSE_DURATION = 30.0 - CORPSE_APPEAR_DELAY
 
-ListenToGameEvent('entity_killed', function(event)
+ListenToGameEvent('entity_killed', function(keys)
 	local killed_unit = EntIndexToHScript(keys.entindex_killed)
 	if not killed_unit then return end
 

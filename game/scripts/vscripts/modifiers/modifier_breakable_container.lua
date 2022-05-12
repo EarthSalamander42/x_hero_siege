@@ -29,6 +29,7 @@ function modifier_breakable_container:CheckState()
 		state[MODIFIER_STATE_NO_HEALTH_BAR] = true
 		state[MODIFIER_STATE_BLIND] = true
 		state[MODIFIER_STATE_NOT_ON_MINIMAP] = true
+		state[MODIFIER_STATE_LOW_ATTACK_PRIORITY] = true
 	end
 
 	return state

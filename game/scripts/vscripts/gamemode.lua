@@ -18,7 +18,7 @@ require('libraries/gold')
 require('libraries/rgb_to_hex')
 require('libraries/wearables')
 require('libraries/wearables_warmful_ancient')
--- require('libraries/corpses')
+require('libraries/corpses')
 
 require('phases/choose_hero')
 require('phases/creeps')
@@ -396,52 +396,36 @@ function GameMode:FilterExecuteOrder( filterTable )
 --	return true
 --	end
 
+--[[
 	-- Deny No-Target Orders requirements
 	if order_type == DOTA_UNIT_ORDER_CAST_NO_TARGET then
 		local ability = EntIndexToHScript(abilityIndex)
 		if not ability then return true end
 		local playerID = unit:GetPlayerOwnerID()
---		
---		-- Check health/mana requirements
---		local manaDeficit = unit:GetMana() ~= unit:GetMaxMana()
---		local healthDeficit = unit:GetHealthDeficit() > 0
---		local bNeedsAnyDeficit = ability:GetKeyValue("RequiresAnyDeficit")
---		local requiresHealthDeficit = ability:GetKeyValue("RequiresHealthDeficit")
---		local requiresManaDeficit = ability:GetKeyValue("RequiresManaDeficit")
---
---		if bNeedsAnyDeficit and not healthDeficit and not manaDeficit then
---			if unit:GetMaxMana() > 0 then
---				SendErrorMessage(issuer, "#error_full_mana_health")
---			else
---				SendErrorMessage(issuer, "#error_full_health")
---			end
---			return false
---		elseif requiresHealthDeficit and not healthDeficit then
---			SendErrorMessage(issuer, "#error_full_health")
---			return false
---		elseif requiresManaDeficit and not manaDeficit then
---			SendErrorMessage(issuer, "#error_full_mana")
---			return false
---		end
+		
+		-- Check health/mana requirements
+		local manaDeficit = unit:GetMana() ~= unit:GetMaxMana()
+		local healthDeficit = unit:GetHealthDeficit() > 0
+		local bNeedsAnyDeficit = ability:GetKeyValue("RequiresAnyDeficit")
+		local requiresHealthDeficit = ability:GetKeyValue("RequiresHealthDeficit")
+		local requiresManaDeficit = ability:GetKeyValue("RequiresManaDeficit")
 
-		-- Check corpse requirements
---		local corpseRadius = ability:GetKeyValue("RequiresCorpsesAround")
---		if corpseRadius then
---			local corpseFlag = ability:GetKeyValue("CorpseFlag")
---			if corpseFlag then
---				if corpseFlag == "NotMeatWagon" then
---					if not Corpses:AreAnyOutsideInRadius(playerID, unit:GetAbsOrigin(), corpseRadius) then
---						SendErrorMessage(issuer, "#error_no_usable_corpses")
---						return false
---					end
---				end
---		elseif not Corpses:AreAnyInRadius(playerID, unit:GetAbsOrigin(), corpseRadius) then
---			if not Corpses:AreAnyInRadius(playerID, unit:GetAbsOrigin(), corpseRadius) then
---				Notifications:Bottom(playerID, {text="No corpses near!", duration=5.0, style={color="white"}})
---				return false
---			end
---		end
+		if bNeedsAnyDeficit and not healthDeficit and not manaDeficit then
+			if unit:GetMaxMana() > 0 then
+				SendErrorMessage(issuer, "#error_full_mana_health")
+			else
+				SendErrorMessage(issuer, "#error_full_health")
+			end
+			return false
+		elseif requiresHealthDeficit and not healthDeficit then
+			SendErrorMessage(issuer, "#error_full_health")
+			return false
+		elseif requiresManaDeficit and not manaDeficit then
+			SendErrorMessage(issuer, "#error_full_mana")
+			return false
+		end
 	end
+--]]
 
 	if order_type == DOTA_UNIT_ORDER_PURCHASE_ITEM then
 		if CustomTimers.timers_paused == 1 then

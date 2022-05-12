@@ -101,6 +101,8 @@ function ConsumingFlameAttack(keys)
 	ability:ApplyDataDrivenModifier(caster, target, modifier_prevent, {})
 end
 
+-- holdout_stitch = holdout_stitch or class(require("abilities/corpse_baseclass"))
+
 function Stitch(event)
 	local caster = event.caster
 	local ability = event.ability

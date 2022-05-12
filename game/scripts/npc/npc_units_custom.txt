@@ -13232,7 +13232,8 @@
 	"dotacraft_corpse"
 	{
 		"BaseClass"					"npc_dota_creature"
-		"Model"						"models/creeps/neutral_creeps/n_creep_troll_skeleton/n_creep_troll_skeleton_fx.vmdl"
+		"Model"						"models/creeps/neutral_creeps/n_creep_troll_skeleton/n_creep_troll_skeleton_fx.vmdl" // lag?
+//		"Model"						"models/development/invisiblebox.vmdl"
 		"AttackCapabilities"		"DOTA_UNIT_CAP_NO_ATTACK"
 		"VisionDaytimeRange"		"0"
 		"VisionNighttimeRange"		"0"
@@ -13725,6 +13726,7 @@
 		"SoundSet"					"Creep_Good_Melee"
 		"Level"						"1"
 		"ModelScale" 				"0.9"
+		"LeavesCorpse"				"0"
 
 		// Abilities
 		//----------------------------------------------------------------

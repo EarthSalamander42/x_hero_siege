@@ -19,6 +19,7 @@
 
 //HUD STUFF
 "DOTA_Hud_Error_tutorial_shop_not_in_range"		"Shop Not In Range!"
+"DOTA_Hud_Error_error_no_usable_corpses"		"No usable corpse!"
 
 //DUMMY
 "DOTA_Tooltip_modifier_dummy_vulnerable"						"X HERO SIEGE"

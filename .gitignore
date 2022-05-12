@@ -25,5 +25,4 @@
 game/dota_addons/barebones/scripts/vscripts/statcollection/settings.kv
 game/dota_addons/barebones/scripts/vscripts/internal/auth.kv
 game/dota_addons/barebones/scripts/vscripts/components/api/backend_key.kv
-content/dota_addons/barebones/maps/x_hero_siege_4.vmap
-content/dota_addons/barebones/maps/x_hero_siege_8.vmap
+*.vmap
