@@ -1,7 +1,4 @@
-"use strict";
-
 (function () {
-	GameEvents.Subscribe("end_game", EndScoreboard);
 /*
 	// Placeholder
 	var args = {
@@ -64,6 +61,8 @@
 	EndScoreboard(args);
 */
 
+	EndScoreboard(CustomNetTables.GetTableValue("game_options", "end_game"));
+//	GameEvents.Subscribe("end_game", EndScoreboard);
 	GameEvents.Subscribe("diretide_hall_of_fame", HallOfFame);
 })();
 
@@ -84,6 +83,12 @@ function RawTimetoGameTime(time) {
 }
 
 function EndScoreboard(args) {
+	// $.Msg(args);
+	if (!args) {
+		// $.Msg("Critical error! no data found for end screen.");
+		return;
+	}
+
 	// Hide all other UI
 	var MainPanel = $.GetContextPanel().GetParent().GetParent().GetParent().GetParent()
 	MainPanel.FindChildTraverse("topbar").style.visibility = "collapse";
@@ -97,14 +102,12 @@ function EndScoreboard(args) {
 	var victoryMessage = "winning_team_name Victory!";
 	var victoryMessageLabel = $("#es-victory-info-text");
 
-	victoryMessage = victoryMessage.replace("winning_team_name", $.Localize("#" + Game.GetTeamDetails(Game.GetGameWinner()).team_name));
-
+	victoryMessage = victoryMessage.replace("winning_team_name", $.Localize(Game.GetTeamDetails(Game.GetGameWinner()).team_name));
 	victoryMessageLabel.text = victoryMessage;
 
 	// sort a player by merging results from server and using getplayerinfo
 	var loadPlayer = function (id) {
 		var info = Game.GetPlayerInfo(id);
-		var result = null;
 
 		for (var k in args.data.players) {
 			if (k == info.player_steamid) {
@@ -183,7 +186,12 @@ function EndScoreboard(args) {
 		values.level.text = player.info.player_level;
 
 		// XP
-		var ply_table = CustomNetTables.GetTableValue("battlepass", player.id.toString());
+		var ply_table = CustomNetTables.GetTableValue("battlepass_player", player.id.toString());
+
+		if (!ply_table) {
+			// $.Msg("Player info not found.")
+			return;
+		}
 
 		var player_xp = ply_table.XP;
 		var player_max_xp_in_level = ply_table.MaxXP
@@ -284,7 +292,8 @@ function EndScoreboard(args) {
 		}
 	}
 
-	$("#es-game-time-text").text = RawTimetoGameTime(Game.GetDOTATime(false, false));
+	$("#es-game-time-text").text = RawTimetoGameTime(Game.GetDOTATime(false, false));	
+
 }
 
 function CloseBottlepassReward(panel) {

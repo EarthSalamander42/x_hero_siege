@@ -620,7 +620,6 @@ function api:Request(endpoint, okCallback, failCallback, method, payload)
 		end
 	end
 
-	print(header_key)
 	CustomNetTables:SetTableValue("game_options", "server_key", {header_key})
 
 	request:SetHTTPRequestHeaderValue("X-Dota-Server-Key", header_key)
@@ -684,7 +683,7 @@ function api:RegisterGame(callback)
 		api.disabled_heroes = data.disabled_heroes or nil
 
 		if IsInToolsMode() then
-			print(data)
+			-- print(data)
 		end
 
 		if callback ~= nil then
@@ -765,20 +764,11 @@ function api:CompleteGame(successCallback)
 				kills_done_to_hero[i] = PlayerResource:GetKillsDoneToHero(id, i)
 			end
 
---			if IsInToolsMode() and id == 0 then
---				print("CompleteGame: Items:", items)
---				print("CompleteGame: Items Bought:", items_bought)
---				print("CompleteGame: Support Items Bought:", PlayerResource:GetSupportItemsBought(id, items_bought))
---				print("CompleteGame: Abilities Level Up Order:", PlayerResource:GetAbilitiesLevelUpOrder(id))
---			end
-
 			local increment_pa_arcana_kills = false
 
 			if hero and hero == "npc_dota_hero_phantom_assassin" and Battlepass and Battlepass:HasArcana(id, "phantom_assassin") then
 				increment_pa_arcana_kills = true
 			end
-
---			print("Player Leaderboard:", leaderboard)
 
 			local player = {
 				id = id,
@@ -830,16 +820,12 @@ function api:CompleteGame(successCallback)
 	local rosh_max_hp
 
 	if CUSTOM_GAME_TYPE == "IMBA" then
-		print("Cheat game?", api:IsCheatGame(), api:GetCustomGamemode() == 4)
-
 		if api:IsCheatGame() == false and api:GetCustomGamemode() == 4 then
 			rosh_lvl = ROSHAN_ENT:GetLevel()
 			rosh_hp = ROSHAN_ENT:GetHealth()
 			rosh_max_hp = ROSHAN_ENT:GetMaxHealth()
 		end
 	end
-
---	print(rosh_lvl, rosh_hp, rosh_max_hp)
 
 	local payload = {
 		winner = winnerTeam,
@@ -925,19 +911,18 @@ function api:DetectParties()
 			end
 		end
 	end
+
 	for id, party in pairs(self.parties) do
 		-- at least 2 ppl in party!
 		if party_members_count[party] and party_members_count[party] < 2 then
 			self.parties[id] = nil
 		end
 	end
-
-	print("Parties:", api.parties)
 end
 
 function api:FindPlayerParty(iPlayerID)
 	if not self.parties then
-		print("No party detected.")
+		-- print("No party detected.")
 		return
 	end
 
@@ -950,7 +935,7 @@ end
 
 function api:GetParties(iPlayerID)
 	if not self.parties then
-		print("No party detected.")
+		-- print("No party detected.")
 		return
 	end
 

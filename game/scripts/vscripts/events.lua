@@ -69,7 +69,6 @@ ListenToGameEvent('game_rules_state_change', function()
 	if newState == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
 		print("OnGameRulesStateChange: Game In Progress")
 
-		GAME_WINNER_TEAM = 3
 --		ModifyLanes()
 
 		local ice_towers = Entities:FindAllByName("npc_tower_death")
@@ -896,7 +895,7 @@ function GameMode:SetupZones()
 --	PrintTable(ZonesDefinition, "  ")
 	for _, zone in pairs(ZonesDefinition) do
 		if zone then
-			print("GameMode:SetupZones() - Setting up zone " .. zone.szName .. " from definition.")
+			-- print("GameMode:SetupZones() - Setting up zone " .. zone.szName .. " from definition.")
 			local newZone = CDungeonZone()
 			newZone:Init(zone)
 			table.insert(GameMode.Zones, newZone)
@@ -1388,7 +1387,7 @@ end
 function GameMode:OnPlayerHeroEnteredZone(playerHero, zoneName)
 	if not playerHero:GetPlayerOwner() then return end
 
-	print("GameMode:OnPlayerHeroEnteredZone - PlayerHero " .. playerHero:GetUnitName() .. " entered " .. zoneName)
+	-- print("GameMode:OnPlayerHeroEnteredZone - PlayerHero " .. playerHero:GetUnitName() .. " entered " .. zoneName)
 
 	local netTable = {}
 	netTable["ZoneName"] = zoneName

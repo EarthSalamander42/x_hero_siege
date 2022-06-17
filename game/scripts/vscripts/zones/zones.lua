@@ -568,8 +568,8 @@ end
 --------------------------------------------------------------------
 
 function CDungeonZone:SpawnVIPs( vipsTable )
-	print( "-----------------------------------" )
-	print( "CDungeonZone:SpawnVIPs()" )
+	-- print( "-----------------------------------" )
+	-- print( "CDungeonZone:SpawnVIPs()" )
 	if vipsTable == nil then
 		print( "CDungeonZone:SpawnVIPs() - ERROR: No VIPs Table" )
 		return
@@ -583,7 +583,7 @@ function CDungeonZone:SpawnVIPs( vipsTable )
 		end
 
 		if hSpawner ~= nil then
-			print( "CDungeonZone:SpawnVIPs() - Spawning " .. vip.nCount .. " " .. vip.szVIPName )
+			-- print( "CDungeonZone:SpawnVIPs() - Spawning " .. vip.nCount .. " " .. vip.szVIPName )
 
 			if vip.nSpawnAmt == nil then
 				vip.nSpawnAmt = 0

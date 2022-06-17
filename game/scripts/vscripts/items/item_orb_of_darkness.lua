@@ -170,7 +170,6 @@ function modifier_orb_of_darkness_active:OnDeath( params )
 --		return
 --	end
 
-	print(params.unit:GetUnitName(), LeavesCorpse(params.unit))
 	if params.attacker == self:GetParent() and LeavesCorpse(params.unit) and params.unit.no_corpse ~= true and not params.unit:IsConsideredHero() then
 		if self:GetStackCount() < self.max_units then
 			local unit = CreateUnitByName(params.unit:GetUnitName(), params.unit:GetAbsOrigin(), true, self:GetParent(), self:GetParent(), self:GetParent():GetTeam())

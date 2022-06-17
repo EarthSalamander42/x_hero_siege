@@ -4,7 +4,6 @@ ListenToGameEvent('game_rules_state_change', function()
 		CustomNetTables:SetTableValue("game_options", "game_count", {value = 1})
 
 		api:RegisterGame(function(data)
-			print("Register game...")
 			for k, v in pairs(data.players) do
 				local payload = {
 					steamid = tostring(k),
@@ -32,67 +31,48 @@ ListenToGameEvent('game_rules_state_change', function()
 				api:GenerateGameModeLeaderboard()
 			end
 
-			print("ALL PLAYERS LOADED IN!")
+			-- print("ALL PLAYERS LOADED IN!")
 			CustomGameEventManager:Send_ServerToAllClients("all_players_battlepass_loaded", {})
 		end)
 
 		CustomGameEventManager:Send_ServerToAllClients("all_players_loaded", {})
 	elseif GameRules:State_Get() == DOTA_GAMERULES_STATE_PRE_GAME then
 		api:InitDonatorTableJS()
-
+		
 		if api.parties then
 			CustomNetTables:SetTableValue("game_options", "parties", api.parties)
 		end
-
+		
 		if CUSTOM_GAME_TYPE == "IMBA" then
 			if api:GetCustomGamemode() == 4 then
 				api:DiretideHallOfFame(
 					function(data)
 						CustomNetTables:SetTableValue("battlepass", "leaderboard_diretide", {data = data})
 					end,
-
+					
 					function(data)
 						print("FAIL:", data)
 					end
 				)
 			end
 		end
-
+		
 		Timers:CreateTimer(function()
 			api:CheatDetector()
-
-			if GAME_IS_OVER then
+			
+			if GameRules:State_Get() == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
+				-- if IsInToolsMode() then
+					-- GameRules:SetGameWinner(2)
+					-- return nil
+				-- end
+			elseif GameRules:State_Get() == DOTA_GAMERULES_STATE_POST_GAME then
 				return nil
 			end
-
+			
 			return 1.0
 		end)
 	end
 end, nil)
-
-function api:OnGameEnd()
-	if CUSTOM_GAME_TYPE == "IMBA" then
-		if api:GetCustomGamemode() == 4 then
-			CustomGameEventManager:Send_ServerToAllClients("diretide_hall_of_fame", {})
-		end
-	end
-
-	api:CompleteGame(function(data, payload)
---			print(data)
---			print(payload)
-		CustomGameEventManager:Send_ServerToAllClients("end_game", {
-			players = payload.players,
-			data = data,
-			info = {
-				winner = GAME_WINNER_TEAM,
-				id = api:GetApiGameId(),
-				radiant_score = GetTeamHeroKills(2),
-				dire_score = GetTeamHeroKills(3),
-				gamemode = api:GetCustomGamemode(),
-			},
-		})
-	end)
-end
 
 ListenToGameEvent('dota_item_purchased', function(event)
 	-- itemcost, itemname, PlayerID, splitscreenplayer
@@ -106,9 +86,40 @@ ListenToGameEvent('dota_item_purchased', function(event)
 --	PlayerResource.ItemTimer = Timers:CreateTimer(10.0, CheckIfItemSold(event))
 end, nil)
 
+function api:OnGameEnd()
+	if CUSTOM_GAME_TYPE == "IMBA" then
+		if api:GetCustomGamemode() == 4 then
+			CustomGameEventManager:Send_ServerToAllClients("diretide_hall_of_fame", {})
+		end
+	end
+
+	api:CompleteGame(function(data, payload)
+		CustomNetTables:SetTableValue("game_options", "end_game", {
+			players = payload.players,
+			data = data,
+			info = {
+				winner = GAME_WINNER_TEAM,
+				id = api:GetApiGameId(),
+				radiant_score = GetTeamHeroKills(2),
+				dire_score = GetTeamHeroKills(3),
+				gamemode = api:GetCustomGamemode(),
+			},
+		})
+
+		original_SetGameWinner(GameRules, GAME_WINNER_TEAM)
+	end)
+end
+
 -- creepy way to check if an item was sold and fully refund
 function CheckIfItemSold(event)
 	if PlayerResource:GetSelectedHeroEntity(event.PlayerID):HasItemInInventory(event.itemname) then
 		PlayerResource:StoreItemBought(event.PlayerID, event.itemname)
 	end
+end
+
+-- Call custom functions whenever SetGameWinner is being called anywhere
+original_SetGameWinner = CDOTAGameRules.SetGameWinner
+CDOTAGameRules.SetGameWinner = function(self, iTeamNumber)
+	GAME_WINNER_TEAM = iTeamNumber
+	api:OnGameEnd()
 end

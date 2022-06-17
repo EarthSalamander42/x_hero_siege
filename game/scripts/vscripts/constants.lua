@@ -61,6 +61,10 @@ _G.SOGAT_ARTIFACT_PICKED = false
 _G.DOOM_ARTIFACT_MERGED = false
 _G.MAGNATAURS_TO_KILL = 4
 
+if IsInToolsMode() then
+	_G.PREGAMETIME = 10.0
+end
+
 if GetMapName() == "x_hero_siege_4" then
 	_G.CREEP_LANES_TYPE = 2
 end
