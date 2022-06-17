@@ -31,9 +31,10 @@ ListenToGameEvent('game_rules_state_change', function()
 			if CUSTOM_GAME_TYPE == "PLS" then
 				api:GenerateGameModeLeaderboard()
 			end
-		end)
 
-		api:GetDisabledHeroes()
+			print("ALL PLAYERS LOADED IN!")
+			CustomGameEventManager:Send_ServerToAllClients("all_players_battlepass_loaded", {})
+		end)
 
 		CustomGameEventManager:Send_ServerToAllClients("all_players_loaded", {})
 	elseif GameRules:State_Get() == DOTA_GAMERULES_STATE_PRE_GAME then
@@ -60,36 +61,38 @@ ListenToGameEvent('game_rules_state_change', function()
 		Timers:CreateTimer(function()
 			api:CheatDetector()
 
-			if GameRules:State_Get() == DOTA_GAMERULES_STATE_POST_GAME then
+			if GAME_IS_OVER then
 				return nil
 			end
 
 			return 1.0
 		end)
-	elseif GameRules:State_Get() == DOTA_GAMERULES_STATE_POST_GAME then
-		if CUSTOM_GAME_TYPE == "IMBA" then
-			if api:GetCustomGamemode() == 4 then
-				CustomGameEventManager:Send_ServerToAllClients("diretide_hall_of_fame", {})
-			end
-		end
-
-		api:CompleteGame(function(data, payload)
---			print(data)
---			print(payload)
-			CustomGameEventManager:Send_ServerToAllClients("end_game", {
-				players = payload.players,
-				data = data,
-				info = {
-					winner = GAME_WINNER_TEAM,
-					id = api:GetApiGameId(),
-					radiant_score = GetTeamHeroKills(2),
-					dire_score = GetTeamHeroKills(3),
-					gamemode = api:GetCustomGamemode(),
-				},
-			})
-		end)
 	end
 end, nil)
+
+function api:OnGameEnd()
+	if CUSTOM_GAME_TYPE == "IMBA" then
+		if api:GetCustomGamemode() == 4 then
+			CustomGameEventManager:Send_ServerToAllClients("diretide_hall_of_fame", {})
+		end
+	end
+
+	api:CompleteGame(function(data, payload)
+--			print(data)
+--			print(payload)
+		CustomGameEventManager:Send_ServerToAllClients("end_game", {
+			players = payload.players,
+			data = data,
+			info = {
+				winner = GAME_WINNER_TEAM,
+				id = api:GetApiGameId(),
+				radiant_score = GetTeamHeroKills(2),
+				dire_score = GetTeamHeroKills(3),
+				gamemode = api:GetCustomGamemode(),
+			},
+		})
+	end)
+end
 
 ListenToGameEvent('dota_item_purchased', function(event)
 	-- itemcost, itemname, PlayerID, splitscreenplayer

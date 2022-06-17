@@ -1,12 +1,10 @@
 -- Copyright (C) 2020 - Frostrose Studio Development Team
 -- Api Interface for every custom games managed/created by Frostrose Studio
 
-api = class({});
-
-api.disabled_heroes = {}
-api.disabled_heroes[1] = "npc_dota_hero_target_dummy"
+api = class({})
 
 local baseUrl = "https://api.frostrose-studio.com/"
+-- local baseUrl = "http://90.113.1.72/"
 local endUrlWebsite = "website/"
 local endUrlFrostrose = "imba/"
 local endUrlWarpath = "warpath/"
@@ -196,8 +194,6 @@ function api:GetPlayerCosmetics(player_id, cosmetic_type)
 		return false
 	end
 
-	local cosmetic = CustomNetTables:GetTableValue("battlepass_player", cosmetic_type)
-	if cosmetic and cosmetic["1"] then cosmetic = cosmetic["1"] end
 	local cosmetic_variable = nil
 
 	if cosmetic_type == "companions" then
@@ -220,20 +216,22 @@ function api:GetPlayerCosmetics(player_id, cosmetic_type)
 		return false
 	end
 
-	cosmetic = cosmetic[tostring(self.players[steamid][cosmetic_variable])]["file"]
+	local cosmetic_id = self.players[steamid][cosmetic_variable]
+	local cosmetic = api:GetCosmeticByID(cosmetic_type, cosmetic_id)
 
-	if cosmetic and cosmetic ~= "" and type(cosmetic) == "string" then
-		return cosmetic
-	else
-		native_print("api:GetPlayerCosmetics: Invalid cosmetic for "..cosmetic_type.."")
-
-		if type(cosmetic) == "table" then
-			print(cosmetic)
-		else
-			native_print(cosmetic)
-		end
-
+	if not cosmetic then
+		print("api:GetPlayerCosmetics: cosmetic doesn't exist!")
 		return false
+	end
+
+	return cosmetic
+end
+
+function api:GetCosmeticByID(cosmetic_type, id)
+	for i, cosmetic in pairs(api[cosmetic_type]) do
+		if cosmetic and cosmetic.id and cosmetic.id == tostring(id) then
+			return cosmetic
+		end
 	end
 end
 
@@ -491,19 +489,9 @@ function api:GetArmory(player_id)
 end
 
 function api:GetDisabledHeroes()
-	self:Request("disabled-heroes", function(data)
-		local disabled_heroes = {}
-
-		for k, v in pairs(data) do
-			if v.map == GetMapName() then
-				disabled_heroes[v.hero_name] = v.is_disabled
-			end
-		end
-
-		api.disabled_heroes = disabled_heroes
-	end, nil, "POST", {
-		map = GetMapName(),
-	});
+	if not api.disabled_heroes then return end
+	if not api.disabled_heroes["npc_dota_hero_target_dummy"] then api.disabled_heroes["npc_dota_hero_target_dummy"] = true end
+	return api.disabled_heroes
 end
 
 function api:GetApiGameId()
@@ -624,10 +612,15 @@ function api:Request(endpoint, okCallback, failCallback, method, payload)
 
 	if IsDedicatedServer() then
 		header_key = GetDedicatedServerKeyV2("2")
-	elseif LoadKeyValues("scripts/vscripts/components/api/backend_key.kv") then
-		header_key = LoadKeyValues("scripts/vscripts/components/api/backend_key.kv").server_key
+	else
+		local key = LoadKeyValues("scripts/vscripts/components/api/backend_key.kv")
+
+		if key then
+			header_key = key.server_key
+		end
 	end
 
+	print(header_key)
 	CustomNetTables:SetTableValue("game_options", "server_key", {header_key})
 
 	request:SetHTTPRequestHeaderValue("X-Dota-Server-Key", header_key)
@@ -686,9 +679,12 @@ function api:RegisterGame(callback)
 	self:Request("game-register", function(data)
 		api.game_id = data.game_id
 		api.players = data.players
+		api.companions = data.companions or nil
+		api.emblems = data.emblems or nil
+		api.disabled_heroes = data.disabled_heroes or nil
 
 		if IsInToolsMode() then
-			print(data.players)
+			print(data)
 		end
 
 		if callback ~= nil then
@@ -703,26 +699,6 @@ function api:RegisterGame(callback)
 		players = self:GetAllPlayerSteamIds(),
 		cheat_mode = self:IsCheatGame(),
 	});
-
-	if CUSTOM_GAME_TYPE == "WARPATH" then return end
-
-	local cool_hat = {}
-	local cool_hats = {
-		"companions",
-		"statues",
-		"emblems"
-	}
-
-	for i, j in pairs(cool_hats) do
-		self:Request(j, function(data)
-			cool_hat[j] = {}
-			for k, v in pairs(data) do
-				table.insert(cool_hat[j], data[k]["id"], data[k])
-			end
-
-			CustomNetTables:SetTableValue("battlepass_player", j, {cool_hat[j]})
-		end)
-	end
 
 	-- call in BP scripts after battlepass_player is set to show mmr medal in loading screen
 --	print("ALL PLAYERS LOADED IN!")

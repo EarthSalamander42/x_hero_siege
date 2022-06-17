@@ -4,11 +4,17 @@ function modifier_patreon_donator:IsHidden() return true end
 function modifier_patreon_donator:IsPurgable() return false end
 
 function modifier_patreon_donator:OnCreated()
-	if IsServer() then
-		self:SetStackCount(api:GetDonatorStatus(self:GetParent():GetPlayerID()))
-		self:StartIntervalThink(0.2)
-		self.current_effect_name = ""
-		self.effect_name = api:GetPlayerEmblem(self:GetParent():GetPlayerID())
+	if not IsServer() then return end
+
+	self:SetStackCount(api:GetDonatorStatus(self:GetParent():GetPlayerID()))
+	self:StartIntervalThink(0.2)
+	self.current_effect_name = ""
+	local player_emblem = api:GetPlayerEmblem(self:GetParent():GetPlayerID())
+
+	if player_emblem and player_emblem.file then
+		self.effect_name = player_emblem.file
+	else
+		self.effect_name = "particles/dev/empty_particle.vpcf"
 	end
 end
 
@@ -27,6 +33,7 @@ function modifier_patreon_donator:OnIntervalThink()
 end
 
 function modifier_patreon_donator:RefreshEffect()
+	if self.effect_name == false or self.effect_name == "" then return end
 	if self.current_effect_name ~= self.effect_name then
 --		print("Old Effect:", self.current_effect_name)
 --		print("Effect:", self.effect_name)

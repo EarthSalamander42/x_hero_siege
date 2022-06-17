@@ -36,10 +36,10 @@ ListenToGameEvent('game_rules_state_change', function()
 
 		if GetMapName() ~= "x_hero_siege_demo" then
 			-- debug
-			if IsInToolsMode() then
+--			if IsInToolsMode() then
 				Entities:FindByName(nil, "trigger_special_event_tp_off"):Disable()
 				Entities:FindByName(nil, "trigger_special_event"):Enable()
-			end
+--			end
 		end
 
 		local diff = {"Easy", "Normal", "Hard", "Extreme", "Divine"}

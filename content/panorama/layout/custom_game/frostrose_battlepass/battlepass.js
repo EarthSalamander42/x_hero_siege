@@ -401,7 +401,7 @@ function BubbleSortByElement(t, element_name) {
 function Battlepass(retainSubTab, bRewardsDisabled) {
 	if (typeof retainSubTab == "undefined") {retainSubTab = false;};
 
-	HallOfFame("Experience", null, 1); // init leaderboard on round 1 records
+//	HallOfFame("Experience", null, 1); // init leaderboard on round 1 records
 	MiniTabButtonContainer.style.visibility = "visible";
 
 	var BP_REWARDS = CustomNetTables.GetTableValue("battlepass_js_builder", "rewards");
@@ -426,6 +426,7 @@ function Battlepass(retainSubTab, bRewardsDisabled) {
 
 	GenerateBattlepassPanel(BP_REWARDS_3, Players.GetLocalPlayer(), bRewardsDisabled);
 
+	// todo: replace this with a request of data followed by response in order to generate battle pass without using net tables!
 	var companions = CustomNetTables.GetTableValue("battlepass_player", "companions");
 	if (companions != undefined)
 		GenerateCompanionPanel(companions["1"], Players.GetLocalPlayer(), "Companion", retainSubTab);
