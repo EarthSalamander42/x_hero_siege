@@ -697,7 +697,8 @@ function api:RegisterGame(callback)
 		match_id = self:GetMatchID(),
 		players = self:GetAllPlayerSteamIds(),
 		cheat_mode = self:IsCheatGame(),
-	});
+		game_mode = CUSTOM_GAME_TYPE,
+	})
 
 	-- call in BP scripts after battlepass_player is set to show mmr medal in loading screen
 --	print("ALL PLAYERS LOADED IN!")
