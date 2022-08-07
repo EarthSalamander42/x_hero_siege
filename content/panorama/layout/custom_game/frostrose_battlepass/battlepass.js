@@ -17,6 +17,7 @@ var game_type = undefined;
 if (game_version)
 	game_type = game_version.game_type;
 
+/*
 var api = {
 	base : "https://api.frostrose-studio.com/",
 	urls : {
@@ -53,30 +54,28 @@ var api = {
 			}
 		});
 	},
-/*
-	updateStatue : function(data, success_callback, error_callback) {
-		$.AsyncWebRequest(api.base + api.urls.modifyStatue, {
-			type : "POST",
-			dataType : "json",
-			data : data,
-			timeout : 5000,
-			headers : {'X-Dota-Server-Key' : secret_key},
-			success : function(obj) {
-				if (obj.error) {
-					$.Msg("Error updating statue");
-					error_callback();
-				} else {
-					$.Msg("Updated statue");
-					success_callback();
-				}
-			},
-			error : function(err) {
-				$.Msg("Error updating statue " + JSON.stringify(err));
-				error_callback();
-			}
-		});
-	},
-*/
+	// updateStatue : function(data, success_callback, error_callback) {
+		// $.AsyncWebRequest(api.base + api.urls.modifyStatue, {
+			// type : "POST",
+			// dataType : "json",
+			// data : data,
+			// timeout : 5000,
+			// headers : {'X-Dota-Server-Key' : secret_key},
+			// success : function(obj) {
+				// if (obj.error) {
+					// $.Msg("Error updating statue");
+					// error_callback();
+				// } else {
+					// $.Msg("Updated statue");
+					// success_callback();
+				// }
+			// },
+			// error : function(err) {
+				// $.Msg("Error updating statue " + JSON.stringify(err));
+				// error_callback();
+			// }
+		// });
+	// },
 	updateEmblem : function(data, success_callback, error_callback) {
 		$.AsyncWebRequest(api.base + api.urls.modifyEmblem, {
 			type : "POST",
@@ -255,6 +254,7 @@ var api = {
 		});
 	},
 };
+*/
 
 function ToggleBattlepass() {
 	if (toggle === false) {
@@ -401,7 +401,7 @@ function BubbleSortByElement(t, element_name) {
 function Battlepass(retainSubTab, bRewardsDisabled) {
 	if (typeof retainSubTab == "undefined") {retainSubTab = false;};
 
-//	HallOfFame("Experience", null, 1); // init leaderboard on round 1 records
+	HallOfFame("Experience", null, 1); // init leaderboard on round 1 records
 	MiniTabButtonContainer.style.visibility = "visible";
 
 	var BP_REWARDS = CustomNetTables.GetTableValue("battlepass_js_builder", "rewards");
@@ -426,7 +426,6 @@ function Battlepass(retainSubTab, bRewardsDisabled) {
 
 	GenerateBattlepassPanel(BP_REWARDS_3, Players.GetLocalPlayer(), bRewardsDisabled);
 
-	// todo: replace this with a request of data followed by response in order to generate battle pass without using net tables!
 	var companions = CustomNetTables.GetTableValue("battlepass_player", "companions");
 	if (companions != undefined)
 		GenerateCompanionPanel(companions["1"], Players.GetLocalPlayer(), "Companion", retainSubTab);
@@ -458,7 +457,7 @@ function SetCompanion(companion, name, id, required_status) {
 
 	if (IsDonator(Game.GetLocalPlayerID()) === false) {
 		$("#CompanionNotification").AddClass("not_donator");
-		$("#CompanionNotificationLabel").text = $.Localize("#companion_not_donator");
+		$("#CompanionNotificationLabel").text = $.Localize("companion_not_donator");
 		return;
 	}
 
@@ -466,7 +465,7 @@ function SetCompanion(companion, name, id, required_status) {
 //	$.Msg(required_status)
 	if (DonatorStatusConverter(donator_status) < required_status) {
 		$("#CompanionNotification").AddClass("not_donator");
-		$("#CompanionNotificationLabel").text = "Your donator status is too low. Required status: (" + $.Localize("#donator_label_" + DonatorStatusConverterReverse(required_status)) + ")";
+		$("#CompanionNotificationLabel").text = "Your donator status is too low. Required status: (" + $.Localize("donator_label_" + DonatorStatusConverterReverse(required_status)) + ")";
 		return;
 	}
 
@@ -479,7 +478,7 @@ function SetCompanion(companion, name, id, required_status) {
 		steamid : Game.GetLocalPlayerInfo().player_steamid,
 	}, function() {
 		$("#CompanionNotification").AddClass("success");
-		$("#CompanionNotificationLabel").text = $.Localize("#companion_success") + " " + $.Localize("#" + name) + "!";
+		$("#CompanionNotificationLabel").text = $.Localize("companion_success") + " " + $.Localize(name) + "!";
 		GameEvents.SendCustomGameEventToServer("change_companion", {
 			ID : Players.GetLocalPlayer(),
 			unit : companion,
@@ -492,7 +491,7 @@ function SetCompanion(companion, name, id, required_status) {
 		});
 	}, function() {
 		$("#CompanionNotification").AddClass("failure");
-		$("#CompanionNotificationLabel").text = $.Localize("#companion_error");
+		$("#CompanionNotificationLabel").text = $.Localize("companion_error");
 		$.Schedule(6.0, function() {
 			$("#CompanionNotification").RemoveClass("failure");
 			$("#CompanionNotificationLabel").text = "";
@@ -517,13 +516,13 @@ function SetStatue(statue, name, id) {
 
 	if (IsDonator(Game.GetLocalPlayerID()) === false) {
 		$("#CompanionNotification").AddClass("not_donator");
-		$("#CompanionNotificationLabel").text = $.Localize("#companion_not_donator");
+		$("#CompanionNotificationLabel").text = $.Localize("companion_not_donator");
 		return;
 	}
 
 	if (DonatorStatusConverter(donator_status) < required_status) {
 		$("#CompanionNotification").AddClass("not_donator");
-		$("#CompanionNotificationLabel").text = "Your donator status is too low. Required status: (" + $.Localize("#donator_label_" + DonatorStatusConverterReverse(required_status)) + ")";
+		$("#CompanionNotificationLabel").text = "Your donator status is too low. Required status: (" + $.Localize("donator_label_" + DonatorStatusConverterReverse(required_status)) + ")";
 		return;
 	}
 
@@ -532,7 +531,7 @@ function SetStatue(statue, name, id) {
 		steamid : Game.GetLocalPlayerInfo().player_steamid,
 	}, function() {
 		$("#CompanionNotification").AddClass("success");
-		$("#CompanionNotificationLabel").text = $.Localize("#statue_success") + " " + $.Localize("#" + name) + "!";
+		$("#CompanionNotificationLabel").text = $.Localize("statue_success") + " " + $.Localize(name) + "!";
 		GameEvents.SendCustomGameEventToServer("change_statue", {
 			ID : Players.GetLocalPlayer(),
 			unit : statue
@@ -544,7 +543,7 @@ function SetStatue(statue, name, id) {
 		});
 	}, function() {
 		$("#CompanionNotification").AddClass("failure");
-		$("#CompanionNotificationLabel").text = $.Localize("#companion_error");
+		$("#CompanionNotificationLabel").text = $.Localize("companion_error");
 		$.Schedule(6.0, function() {
 			$("#CompanionNotification").RemoveClass("failure");
 			companion_changed = false;
@@ -569,7 +568,7 @@ function SetEmblem(emblem, name, id, required_status) {
 
 	if (IsDonator(Game.GetLocalPlayerID()) === false) {
 		$("#CompanionNotification").AddClass("not_donator");
-		$("#CompanionNotificationLabel").text = $.Localize("#companion_not_donator");
+		$("#CompanionNotificationLabel").text = $.Localize("companion_not_donator");
 		return;
 	}
 
@@ -577,7 +576,7 @@ function SetEmblem(emblem, name, id, required_status) {
 //	$.Msg(required_status)
 	if (DonatorStatusConverter(donator_status) < required_status) {
 		$("#CompanionNotification").AddClass("not_donator");
-		$("#CompanionNotificationLabel").text = "Your donator status is too low. Required status: (" + $.Localize("#donator_label_" + DonatorStatusConverterReverse(required_status)) + ")";
+		$("#CompanionNotificationLabel").text = "Your donator status is too low. Required status: (" + $.Localize("donator_label_" + DonatorStatusConverterReverse(required_status)) + ")";
 		return;
 	}
 
@@ -586,7 +585,7 @@ function SetEmblem(emblem, name, id, required_status) {
 		steamid : Game.GetLocalPlayerInfo().player_steamid,
 	}, function() {
 		$("#CompanionNotification").AddClass("success");
-		$("#CompanionNotificationLabel").text = $.Localize("#emblem_success") + " " + $.Localize("#" + name) + "!";
+		$("#CompanionNotificationLabel").text = $.Localize("emblem_success") + " " + $.Localize(name) + "!";
 		GameEvents.SendCustomGameEventToServer("change_emblem", {
 			ID : Players.GetLocalPlayer(),
 			unit : emblem
@@ -598,7 +597,7 @@ function SetEmblem(emblem, name, id, required_status) {
 		});
 	}, function() {
 		$("#CompanionNotification").AddClass("failure");
-		$("#CompanionNotificationLabel").text = $.Localize("#companion_error");
+		$("#CompanionNotificationLabel").text = $.Localize("companion_error");
 		$.Schedule(6.0, function() {
 			$("#CompanionNotification").RemoveClass("failure");
 			$("#CompanionNotificationLabel").text = "";
@@ -620,6 +619,15 @@ function SetTag() {
 
 		companion_changed = true;
 
+		if (chat.text === "-ping") {
+			Game.ServerCmd("dota_ping");
+		}
+/*
+		GameEvents.SendCustomGameEventToServer("battlepass:update_tag", {
+			steamid : Game.GetLocalPlayerInfo().player_steamid,
+			tag_name : chat.text,
+		})
+*/
 		api.updateTag({
 			steamid : Game.GetLocalPlayerInfo().player_steamid,
 			tag_name : chat.text
@@ -629,7 +637,7 @@ function SetTag() {
 			});
 
 			$("#CompanionNotification").AddClass("success");
-			$("#CompanionNotificationLabel").text = $.Localize("#tag_success") + " " + chat.text + "!";
+			$("#CompanionNotificationLabel").text = $.Localize("tag_success") + " " + $.Localize(chat.text) + "!";
 
 			$.Msg("Ingame tag update: success!")
 			$.Schedule(6.0, function() {
@@ -642,7 +650,7 @@ function SetTag() {
 		}, function() {
 			$.Msg("Ingame tag update: failure")
 			$("#CompanionNotification").AddClass("failure");
-			$("#CompanionNotificationLabel").text = $.Localize("#companion_error");
+			$("#CompanionNotificationLabel").text = $.Localize("companion_error");
 			$.Schedule(6.0, function() {
 				$("#CompanionNotification").RemoveClass("failure");
 				$("#CompanionNotificationLabel").text = "";
@@ -673,9 +681,9 @@ function SetArmory(hero, slot_id, item_id, bp_name, bForceUnequip) {
 
 		if ($("#reward_equipped_" + item_id)) {
 			$("#reward_equipped_" + item_id).DeleteAsync(0);
-			text = $.Localize("#bp_reward_unequip_success") + " " + $.Localize("#" + bp_name);
+			text = $.Localize("bp_reward_unequip_success") + " " + $.Localize(bp_name);
 		} else {
-			text = $.Localize("#bp_reward_equip_success") + " " + $.Localize("#" + bp_name);
+			text = $.Localize("bp_reward_equip_success") + " " + $.Localize(bp_name);
 			SetRewardEquipped(item_id, hero);
 		}
 
@@ -696,7 +704,7 @@ function SetArmory(hero, slot_id, item_id, bp_name, bForceUnequip) {
 	}, function() {
 
 		$("#CompanionNotification").AddClass("failure");
-		$("#CompanionNotificationLabel").text = $.Localize("#companion_error");
+		$("#CompanionNotificationLabel").text = $.Localize("companion_error");
 
 		$.Schedule(6.0, function() {
 			$("#CompanionNotification").RemoveClass("failure");
@@ -906,22 +914,6 @@ function HallOfFame(type, retainSubTab, iRoundCount) {
 	}
 }
 
-function RawTimetoGameTime(time) {
-	var sec = Math.floor( time % 60 );
-	var min = Math.floor( time / 60 );
-
-	var timerText = "";
-	timerText += min;
-	timerText += ":";
-
-	if ( sec < 10 )
-	{
-		timerText += "0";
-	}
-	timerText += sec;
-	return timerText;
-}
-
 function SafeToLeave() {
 	$("#SafeToLeave").style.visibility = "visible";
 }
@@ -962,7 +954,7 @@ function GenerateBattlepassPanel(reward_list, player, bRewardsDisabled) {
 
 				var reward_label = $.CreatePanel("Label", reward_label_container, "");
 				reward_label.AddClass("BattlepassRewardLabel");
-				reward_label.text = $.Localize("#battlepass_level") + bp_level;
+				reward_label.text = $.Localize("battlepass_level") + bp_level;
 //				reward_label.AddClass(bp_rarity + "_text");
 			}
 
@@ -988,7 +980,7 @@ function GenerateBattlepassPanel(reward_list, player, bRewardsDisabled) {
 						reward_panel_unlocked.AddClass("BattlepassRewardPanelUnlocked");
 
 						if (bp_type == "bundle" || bp_type == "wearable" || bp_type == "taunt") {
-							var hero_tooltip = $.Localize("#" + bp_hero);
+							var hero_tooltip = $.Localize(bp_hero);
 							var new_hero_tooltip = undefined;
 
 							if (hero_tooltip.indexOf(" (IMBA)") !== -1) {
@@ -996,11 +988,11 @@ function GenerateBattlepassPanel(reward_list, player, bRewardsDisabled) {
 							}
 
 							if (new_hero_tooltip)
-								reward.FindChildTraverse("BattlepassRewardTitle").text = new_hero_tooltip + ": " +  $.Localize("#" + bp_name);
+								reward.FindChildTraverse("BattlepassRewardTitle").text = new_hero_tooltip + ": " +  $.Localize(bp_name);
 							else
-								reward.FindChildTraverse("BattlepassRewardTitle").text = hero_tooltip + ": " +  $.Localize("#" + bp_name);
+								reward.FindChildTraverse("BattlepassRewardTitle").text = hero_tooltip + ": " +  $.Localize(bp_name);
 						} else
-							reward.FindChildTraverse("BattlepassRewardTitle").text = $.Localize("#battlepass_" + bp_type) + ": " +  $.Localize("#" + bp_name);
+							reward.FindChildTraverse("BattlepassRewardTitle").text = $.Localize("battlepass_" + bp_type) + ": " +  $.Localize(bp_name);
 
 						var armory = CustomNetTables.GetTableValue("battlepass_rewards", "rewards_" + player);
 
@@ -1036,17 +1028,17 @@ function GenerateBattlepassPanel(reward_list, player, bRewardsDisabled) {
 					} else {
 						reward.AddClass("BattlepassRewardIcon_locked")
 						reward.FindChildTraverse("BattlepassRewardTitle").AddClass("BattlepassRewardLabelLocked");
-						reward.FindChildTraverse("BattlepassRewardTitle").text = $.Localize("#battlepass_reward_locked") + "\n" + $.Localize("#battlepass_" + bp_type) + ": " +  $.Localize(bp_name);
+						reward.FindChildTraverse("BattlepassRewardTitle").text = $.Localize("battlepass_reward_locked") + "\n" + $.Localize("battlepass_" + bp_type) + ": " +  $.Localize(bp_name);
 					}
 				} else {
 					reward.AddClass("BattlepassRewardIcon_unreleased")
 					reward.FindChildTraverse("BattlepassRewardTitle").AddClass("BattlepassRewardLabelUnreleased");
-					reward.FindChildTraverse("BattlepassRewardTitle").text = $.Localize("#battlepass_reward_unreleased") + "\n" + $.Localize("#battlepass_" + bp_type) + ": " +  $.Localize(bp_name);
+					reward.FindChildTraverse("BattlepassRewardTitle").text = $.Localize("battlepass_reward_unreleased") + "\n" + $.Localize("battlepass_" + bp_type) + ": " +  $.Localize(bp_name);
 				}
 			} else {
 				reward.AddClass("BattlepassRewardIcon_locked")
 				reward.FindChildTraverse("BattlepassRewardTitle").AddClass("BattlepassRewardLabelLocked");
-				reward.FindChildTraverse("BattlepassRewardTitle").text = $.Localize("#battlepass_reward_locked") + "\n" + $.Localize("#battlepass_" + bp_type) + ": " +  $.Localize(bp_name);
+				reward.FindChildTraverse("BattlepassRewardTitle").text = $.Localize("battlepass_reward_locked") + "\n" + $.Localize("battlepass_" + bp_type) + ": " +  $.Localize(bp_name);
 			}
 
 			if (reward.FindChildTraverse("BattlepassRewardRarity")) {			
@@ -1134,16 +1126,19 @@ function GenerateCompanionPanel(companions, player, panel, retainSubTab) {
 		var companion = $.CreatePanel("Panel", donator_row, companion_name[i]);
 		companion.AddClass("DonatorReward");
 
+		var companionpreview = $.CreatePanel("Button", companion, "CompanionPreview_" + i);
+		companionpreview.style.width = "132px";
+		companionpreview.style.height = "135px";
+
+		var companion_scene = $.CreatePanelWithProperties('DOTAScenePanel', companionpreview, "", {
+			class: `companion_scene`,
+			particleonly: "false",
+			unit: companion_name[i],
+		});
+
 //		companionpreview.style.backgroundImage = 'url("file://{images}/custom_game/flyout/donator_emblem_' + i + '.png")';
 //		companionpreview.BLoadLayoutFromString('<root><Panel><DOTAScenePanel style="width:100%; height:153px; margin-top: -45px;" particleonly="false" unit="' + companion_unit[i.toString()] + '"/></Panel></root>', false, false);
-//		companionpreview.style.opacityMask = 'url("s2r://panorama/images/masks/hero_model_opacity_mask_png.vtex");'
-
-		var companionpreview = $.CreatePanelWithProperties(`DOTAScenePanel`, companion, "CompanionPreview_" + i, {
-			class: "CompanionPreview",
-			particleonly: `false`,
-			unit: companion_unit[i.toString()],
-			hittest: `false`,
-		});
+		companionpreview.style.opacityMask = 'url("s2r://panorama/images/masks/hero_model_opacity_mask_png.vtex");'
 
 		var companion_unit_name = companion_unit[i];
 
@@ -1229,7 +1224,7 @@ function SettingsIngameTag() {
 		$("#IngameTagCheckBox").checked = tag;
 //		$.Msg("Ingame tag update: failure")
 //		$("#CompanionNotification").AddClass("failure");
-//		$("#CompanionNotificationLabel").text = $.Localize("#companion_error");
+//		$("#CompanionNotificationLabel").text = $.Localize("companion_error");
 //		$.Schedule(6.0, function() {
 //			$("#CompanionNotification").RemoveClass("failure");
 //			companion_changed = false;
@@ -1267,7 +1262,7 @@ function SettingsBattlepassRewards() {
 	}, function() {
 //		$.Msg("BP rewards update: failure")
 //		$("#CompanionNotification").AddClass("failure");
-//		$("#CompanionNotificationLabel").text = $.Localize("#companion_error");
+//		$("#CompanionNotificationLabel").text = $.Localize("companion_error");
 //		$.Schedule(6.0, function() {
 //			$("#CompanionNotification").RemoveClass("failure");
 //			companion_changed = false;
@@ -1304,7 +1299,7 @@ function SettingsPlayerXP() {
 	}, function() {
 //		$.Msg("Player XP update: failure")
 //		$("#CompanionNotification").AddClass("failure");
-//		$("#CompanionNotificationLabel").text = $.Localize("#companion_error");
+//		$("#CompanionNotificationLabel").text = $.Localize("companion_error");
 //		$.Schedule(6.0, function() {
 //			$("#CompanionNotification").RemoveClass("failure");
 //			companion_changed = false;
@@ -1389,34 +1384,81 @@ function _ScoreboardUpdater_UpdatePlayerPanelXP(playerId, playerPanel, ImbaXP_Pa
 //	$.Msg("Updating player xp panel");
 
 	var ids = {
-		xpRank:  "PlayerXP_ImbaXPRank",
-		xp: "PlayerXP_Experience",
-		level: "PlayerXP_ImbaLvl",
-		progress_bar: "PlayerXP_ProgressBar"
+		xpRank:  "ImbaXPRank" + playerId,
+		xp: "ImbaXP" + playerId,
+		xpEarned: "ImbaXPEarned" + playerId,
+		level: "ImbaLvl" + playerId,
+		progress_bar: "XPProgressBar" + playerId
 	};
 
-	ImbaXP_Panel.RemoveAndDeleteChildren();
-	
 	// setup panels
-	var Imbar_Container = $.CreatePanel("Panel", ImbaXP_Panel, "XPProgressBarContainer" + playerId);
-	Imbar_Container.BLoadLayoutSnippet('PlayerXP');
+	ImbaXP_Panel.BCreateChildren("<Panel id='XPProgressBarContainer" + playerId + "' value='0.0'/>");
+	var Imbar = ImbaXP_Panel.BCreateChildren("<ProgressBar id='XPProgressBar" + playerId + "'/>");
 
+
+	ImbaXP_Panel.BCreateChildren("<Panel id='LevelContainer'/>");
+
+	var LevelContainer = ImbaXP_Panel.FindChildTraverse("LevelContainer");
+	LevelContainer.BCreateChildren("<Panel id='LevelContainerChild'/>");
+
+	var LevelContainerChild = ImbaXP_Panel.FindChildTraverse("LevelContainerChild");
+
+	LevelContainerChild.BCreateChildren("<Label id='LevelLabel' text='Level: '/>");
+
+	LevelContainerChild.BCreateChildren("<Label id='ImbaLvl" + playerId + "' text='undefined'/>");
+	LevelContainerChild.BCreateChildren("<Label id='ImbaXPRank" + playerId + "' text='undefined'/>");
+
+
+	LevelContainer.BCreateChildren("<Panel id='LevelContainerChild2'/>");
+
+	var LevelContainerChild2 = ImbaXP_Panel.FindChildTraverse("LevelContainerChild2");
+
+
+	LevelContainerChild2.BCreateChildren("<Label id='ImbaXP" + playerId + "' text='undefined'/>");
+	LevelContainerChild2.BCreateChildren("<Label id='ImbaXPEarned" + playerId + "' text='+0'/>");
+
+	var steamid = Game.GetPlayerInfo(playerId).player_steamid;
+/*
+	// load player data from api
+	LoadPlayerInfo(function (data) {
+		var thisPlayerInfo = null;
+		playerInfo.forEach(function (i) {
+			if (i.steamid == steamid)
+				thisPlayerInfo = i;
+		});
+
+		if (thisPlayerInfo == null) // wtf
+			return;
+
+		$.Msg(thisPlayerInfo)
+
+		_ScoreboardUpdater_SetTextSafe(playerPanel, ids.xpRank, thisPlayerInfo.xp_rank_title);
+		_ScoreboardUpdater_SetTextSafe(playerPanel, ids.xp, thisPlayerInfo.xp_in_current_level + "/" + thisPlayerInfo.total_xp_for_current_level);
+		_ScoreboardUpdater_SetTextSafe(playerPanel, ids.level, thisPlayerInfo.xp_level);
+		_ScoreboardUpdater_SetValueSafe(playerPanel, ids.progress_bar, thisPlayerInfo.xp_in_current_level / thisPlayerInfo.total_xp_for_current_level);
+		playerPanel.FindChildTraverse(ids.xpRank).style.color = "#" + thisPlayerInfo.xp_rank_color;
+	});
+*/
+
+	// xp shown fix (temporary?)
 	var player_info = CustomNetTables.GetTableValue("battlepass_player", playerId.toString())
-	
+
 	if (!player_info || player_info.player_xp == 0) {
-		_ScoreboardUpdater_SetTextSafe(Imbar_Container, ids.xpRank, "N/A");
-		_ScoreboardUpdater_SetTextSafe(Imbar_Container, ids.xp, "N/A");
-		_ScoreboardUpdater_SetTextSafe(Imbar_Container, ids.level, "N/A");
-		_ScoreboardUpdater_SetValueSafe(Imbar_Container, ids.progress_bar, 0);
-		Imbar_Container.FindChildTraverse(ids.xpRank).style.color = "#FFFFFF";
+		_ScoreboardUpdater_SetTextSafe(playerPanel, ids.xpRank, "N/A");
+		_ScoreboardUpdater_SetTextSafe(playerPanel, ids.xp, "N/A");
+		_ScoreboardUpdater_SetTextSafe(playerPanel, ids.level, "N/A");
+		_ScoreboardUpdater_SetValueSafe(playerPanel, ids.progress_bar, 0);
+		playerPanel.FindChildTraverse(ids.xpRank).style.color = "#FFFFFF";
 	} else if (player_info.player_xp == 1) {
-		_ScoreboardUpdater_SetTextSafe(Imbar_Container, ids.xpRank, player_info.title);
-		_ScoreboardUpdater_SetTextSafe(Imbar_Container, ids.xp, player_info.XP + "/" + player_info.MaxXP);
-		_ScoreboardUpdater_SetTextSafe(Imbar_Container, ids.level, player_info.Lvl + ' - ');
-		_ScoreboardUpdater_SetValueSafe(Imbar_Container, ids.progress_bar, player_info.XP / player_info.MaxXP);
-		Imbar_Container.FindChildTraverse(ids.xpRank).style.color = player_info.title_color;		
+		_ScoreboardUpdater_SetTextSafe(playerPanel, ids.xpRank, player_info.title);
+		_ScoreboardUpdater_SetTextSafe(playerPanel, ids.xp, player_info.XP + "/" + player_info.MaxXP);
+		_ScoreboardUpdater_SetTextSafe(playerPanel, ids.level, player_info.Lvl + ' - ');
+		_ScoreboardUpdater_SetValueSafe(playerPanel, ids.progress_bar, player_info.XP / player_info.MaxXP);
+//		_ScoreboardUpdater_SetValueSafe(playerPanel, "Rank", player_info.winrate);
+		playerPanel.FindChildTraverse(ids.xpRank).style.color = player_info.title_color;		
+		// playerPanel.FindChildTraverse(ids.level).style.color = player_info.title_color;		
 	}
-	
+
 	_ScoreboardUpdater_SetValueSafe(playerPanel, "Rank", player_info.mmr_title);
 }
 
@@ -1453,7 +1495,7 @@ function CreateBattlepassButton() {
 	});
 
 	BattlepassButton.SetPanelEvent("onmouseover", function() {
-		$.DispatchEvent("UIShowTextTooltip", BattlepassButton, $.Localize("#battlepass"));
+		$.DispatchEvent("UIShowTextTooltip", BattlepassButton, $.Localize("battlepass"));
 	})
 
 	BattlepassButton.SetPanelEvent("onmouseout", function() {
@@ -1469,7 +1511,7 @@ function CreateBattlepassButton() {
 	if (!Game.IsInToolsMode()) {
 		var args = {
 			steamid: Game.GetLocalPlayerInfo().player_steamid,
-			language: $.Localize("#lang"),
+			language: $.Localize("lang"),
 		}
 
 		api.getPlayerPosition(args, function(players) {});
@@ -1492,10 +1534,8 @@ function CreateBattlepassButton() {
 	var playerId = Game.GetLocalPlayerID();
 
 	if (ImbaXP_Panel != null) {
-
 		// get player data
 		var plyData = CustomNetTables.GetTableValue("battlepass_player", playerId.toString());
-
 
 		if (plyData != null) {
 			// set xp values
@@ -1504,20 +1544,22 @@ function CreateBattlepassButton() {
 	}
 
 	if (game_type == "IMBA") {
-		// Update the game options display
-		var bounty_multiplier = CustomNetTables.GetTableValue("game_options", "bounty_multiplier");
-		var exp_multiplier = CustomNetTables.GetTableValue("game_options", "exp_multiplier");
-		var initial_gold = CustomNetTables.GetTableValue("game_options", "initial_gold");
-		var initial_level = CustomNetTables.GetTableValue("game_options", "initial_level");
-		var max_level = CustomNetTables.GetTableValue("game_options", "max_level");
-		var gold_tick = CustomNetTables.GetTableValue("game_options", "gold_tick");
+		var values = [
+			"bounty_multiplier", // todo: add % in text
+			"exp_multiplier", // todo: add % in text
+			"initial_gold",
+			"initial_level",
+			"max_level",
+			"gold_tick",
+		]
 
-		$("#BountyMultiplierValue").text = bounty_multiplier[1] + "%";
-		$("#ExpMultiplierValue").text = exp_multiplier[1] + "%";
-		$("#InitialGoldValue").text = initial_gold[1];
-		$("#InitialLevelValue").text = initial_level[1];
-		$("#MaxLevelValue").text = max_level[1];
-		$("#GoldTickValue").text = gold_tick[1].toFixed(1);
+		// Update the game options display
+		for (var i in values) {
+			var value = CustomNetTables.GetTableValue("game_options", values[i]);
+
+			if (value && value[1] && $("#" + value + "_value"))
+				$("#" + value + "_value").text = value[1];
+		}
 	} else {
 		$("#BountyMultiplierDesc").style.visibility = "collapse";
 		$("#ExpMultiplierDesc").style.visibility = "collapse";

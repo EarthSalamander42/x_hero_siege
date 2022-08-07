@@ -108,16 +108,6 @@ ListenToGameEvent('game_rules_state_change', function()
 			end
 		end
 	end
-
-	if newState == DOTA_GAMERULES_STATE_POST_GAME then
---		print("END THE GAME!")
-
-		CustomGameEventManager:Send_ServerToAllClients("end_game", {
-			info = {
-				game_time = CustomTimers.current_time["game_time"],
-			},
-		})
-	end
 end, nil)
 
 -- Cleanup a player when they leave

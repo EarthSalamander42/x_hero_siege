@@ -4,6 +4,7 @@
 ListenToGameEvent('game_rules_state_change', function(keys)
 	if GameRules:State_Get() == DOTA_GAMERULES_STATE_CUSTOM_GAME_SETUP then
 		_G.Battlepass = _G.Battlepass or class({})
+		Battlepass.ENTITY_MODEL_OVERRIDE = {}
 
 		require('components/battlepass/constants')
 		require('components/battlepass/util')
@@ -12,16 +13,26 @@ ListenToGameEvent('game_rules_state_change', function(keys)
 		require('components/battlepass/experience')
 		require('components/battlepass/keyvalues/items_game')
 
-		require('components/battlepass/'..CUSTOM_GAME_TYPE..'_rewards')
+		if CUSTOM_GAME_TYPE ~= "IMBA" and CUSTOM_GAME_TYPE ~= "PLS" then
+			require('components/battlepass/'..CUSTOM_GAME_TYPE..'_rewards')
+		end
+
+		if CUSTOM_GAME_TYPE == "PLS" then
+			require('components/battlepass/PW_rewards')
+		end
+
+		if Battlepass.Init then
+			Battlepass:Init()
+		end
 
 		Battlepass:GetPlayerInfoXP()
-
-		CustomGameEventManager:Send_ServerToAllClients("all_players_loaded", {})
 	end
 end, nil)
 
 ListenToGameEvent('npc_spawned', function(event)
 	local npc = EntIndexToHScript(event.entindex)
+
+--	print(npc:GetUnitName())
 
 	if npc.bp_init == true then return end
 	npc.bp_init = true
@@ -32,22 +43,40 @@ ListenToGameEvent('npc_spawned', function(event)
 		donator_level = api:GetDonatorStatus(npc:GetPlayerID())
 	end
 
+	if CUSTOM_GAME_TYPE == "IMBA" and npc.IsCustomHero and npc:IsCustomHero() then
+		CustomGameEventManager:Send_ServerToAllClients("override_hero_image", {
+			player_id = npc:GetPlayerID(),
+			icon_path = npc:GetUnitName(),
+		})
+	end
+
 	local ply_table = CustomNetTables:GetTableValue("battlepass_player", tostring(npc:GetPlayerOwnerID()))
+	if type(ply_table) == nil then ply_table = nil end
 
 	if npc:IsIllusion() or string.find(npc:GetUnitName(), "npc_dota_lone_druid_bear") then
-		npc:SetupHealthBarLabel(donator_level, ply_table)
-		return
-	elseif npc:IsRealHero() then
-		if ply_table and ply_table.bp_rewards == 0 then
+		if ply_table and ply_table.toggle_tag == 0 or ply_table.toggle_tag == false then
 			return
 		end
 
-		Battlepass:AddItemEffects(npc, ply_table)
+		npc:SetupHealthBarLabel()
+
+		return
+	elseif npc:IsRealHero() then
+		if ply_table and ply_table.bp_rewards == 1 then
+			Battlepass:AddItemEffects(npc, ply_table)
+		end
+
+		if Battlepass.ENTITY_MODEL_OVERRIDE[unit_name] then
+			npc:SetOriginalModel(Battlepass.ENTITY_MODEL_OVERRIDE[unit_name])
+			npc:SetModel(Battlepass.ENTITY_MODEL_OVERRIDE[unit_name])
+		end
 
 		-- The commented out lines here are what I used to test in tools mode
 		if api:IsDonator(npc:GetPlayerID()) and PlayerResource:GetConnectionState(npc:GetPlayerID()) ~= 1 or string.find(GetMapName(), "demo") then
 		-- if api:IsDonator(npc:GetPlayerID()) and PlayerResource:GetConnectionState(npc:GetPlayerID()) ~= 1 or (IsInToolsMode()) then
-			npc:SetupHealthBarLabel(donator_level, ply_table)
+			if ply_table and ply_table.toggle_tag == 1 or ply_table.toggle_tag == true then
+				npc:SetupHealthBarLabel()
+			end
 
 			if api:GetDonatorStatus(npc:GetPlayerID()) == 10 then
 				npc:SetOriginalModel("models/items/courier/kanyu_shark/kanyu_shark.vmdl")
@@ -59,8 +88,10 @@ ListenToGameEvent('npc_spawned', function(event)
 
 				if api:GetDonatorStatus(npc:GetPlayerID()) ~= 6 then
 					Timers:CreateTimer(1.5, function()
-						if api:GetPlayerCompanion(npc:GetPlayerID()) then
-							Battlepass:DonatorCompanion(npc:GetPlayerID(), api:GetPlayerCompanion(npc:GetPlayerID()).file)
+						local companion = api:GetPlayerCompanion(npc:GetPlayerID())
+
+						if companion then
+							Battlepass:DonatorCompanion(npc:GetPlayerID(), companion)
 						end
 					end)
 				end

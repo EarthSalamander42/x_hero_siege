@@ -6,7 +6,6 @@
 
 	<scripts>
 		<include src="file://{resources}/scripts/custom_game/util.js" />
-		<include src="file://{resources}/scripts/custom_game/api.js" />
 		<include src="file://{resources}/layout/custom_game/frostrose_battlepass/battlepass.js" />
 	</scripts>
 
@@ -32,22 +31,6 @@
 						<Label id="BattlepassRewardImageLabel" class="BattlepassRewardImageLabel" text="#bp_reward_equip_description" hittest="false"/>
 -->
 					</Panel>
-				</Panel>
-			</Panel>
-		</snippet>
-
-		<snippet name="PlayerXP">
-			<Panel class="PlayerXP_Container" value="0.0">
-				<ProgressBar id="PlayerXP_ProgressBar" value="0.0"/>
-
-				<Panel class="PlayerXP_LevelContainer">
-					<Panel id="PlayerXP_Level">
-						<Label id="PlayerXP_LevelLabel" text="#battlepass_level"/>
-						<Label id="PlayerXP_ImbaLvl"/>
-						<Label id="PlayerXP_ImbaXPRank"/>
-					</Panel>
-
-					<Label id="PlayerXP_Experience"/>
 				</Panel>
 			</Panel>
 		</snippet>
@@ -80,9 +63,9 @@
 					</Panel>
 
 					<Panel class="GameModeValuePanel">
-						<Label id="BountyMultiplierValue" class="ImbaGameInfoLabel gold" text="" />
-						<Label id="InitialGoldValue" class="ImbaGameInfoLabel gold" text="" />
-						<Label id="GoldTickValue" class="ImbaGameInfoLabel gold" text="" />
+						<Label id="bounty_multiplier_value" class="ImbaGameInfoLabel gold" text="" />
+						<Label id="initial_gold_value" class="ImbaGameInfoLabel gold" text="" />
+						<Label id="gold_tick_value" class="ImbaGameInfoLabel gold" text="" />
 					</Panel>
 
 					<Panel class="Separator" />
@@ -94,9 +77,9 @@
 					</Panel>
 
 					<Panel class="GameModeValuePanel">
-						<Label id="ExpMultiplierValue" class="ImbaGameInfoLabel blue" text="" />
-						<Label id="InitialLevelValue" class="ImbaGameInfoLabel" text="" />
-						<Label id="MaxLevelValue" class="ImbaGameInfoLabel" text="" />
+						<Label id="exp_multiplier_value" class="ImbaGameInfoLabel blue" text="" />
+						<Label id="initial_level_value" class="ImbaGameInfoLabel" text="" />
+						<Label id="max_level_value" class="ImbaGameInfoLabel" text="" />
 					</Panel>
 				</Panel>
 
@@ -104,7 +87,7 @@
 					<Panel id="TabButtonContainer" hittest="false">
 						<Button class="color_animation" id="OverviewTabButton" onactivate="SwitchTab('BattlepassInfoContainer');">
 							<Label class="image"></Label>
-							<Label class="text" text="#battlepass"/>
+							<Label class="text" text="#battlepass" />
 						</Button>
 
 						<Button class="color_animation" id="DonatorTabButton" onactivate="SwitchTab('DonatorInfoContainer');">

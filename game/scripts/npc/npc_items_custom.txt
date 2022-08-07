@@ -3,47 +3,6 @@
 "DOTAAbilities"
 {
 	//=================================================================================================================
-	// Treasure Box
-	//=================================================================================================================
-	"item_treasure_box"
-	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"BaseClass"						"item_lua"
-		"AbilityTextureName"			"treasure_box"
-		"ScriptFile"					"items/item_treasure_box"
-
-		"AbilityBehavior"				"DOTA_ABILTIY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_IGNORE_CHANNEL"
-		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
-		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO"
-		"Model"							"models/props_gameplay/bottle_rejuvenation.vmdl"
-		"ItemKillable"					"0"
-
-		// Stats
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCastRange"				"100"
-		"AbilityCastPoint"				"0.0"
-
-		// Item Info
-		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"						"750"
-		"ItemPurchasable"				"1"
-		"ItemShopTags"					"consumable"
-		"ItemQuality"					"consumable"
-		"ItemStackable"					"1"
-		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
-		"ItemPermanent"					"0"
-		"ItemInitialCharges"			"1"
-		"ItemKillable"					"0"
-
-		"CustomShop"					"1"
-		"RequiresCustomShop"			"1"
-		"RequiredCustomShopName"		"invoker_shop"
-		"ItemCastOnPickup"				"1"
-		"ID"							"99999"	
-	}
-
-	//=================================================================================================================
 	// Bag of Gold
 	//=================================================================================================================
 	"item_bag_of_gold"
