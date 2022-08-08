@@ -22,7 +22,5 @@
 
 #Github dump
 *.stackdump
-game/dota_addons/barebones/scripts/vscripts/statcollection/settings.kv
-game/dota_addons/barebones/scripts/vscripts/internal/auth.kv
-game/dota_addons/barebones/scripts/vscripts/components/api/backend_key.kv
+game/scripts/vscripts/components/api/backend_key.kv
 *.vmap
