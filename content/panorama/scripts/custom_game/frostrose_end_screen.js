@@ -61,6 +61,22 @@
 	EndScoreboard(args);
 */
 
+	var args = {
+		data: {
+			players: {},
+		},
+	};
+
+	var PlayerID = 0;
+
+	while (Game.GetPlayerInfo(PlayerID)) {
+		args.data.players[Game.GetPlayerInfo(PlayerID).player_steamid] = {}
+		PlayerID++;
+	}
+
+	// Generate player rows before game-complete backend call happens (so there is content to watch if call fails)
+	EndScoreboard(args);
+
 	GameEvents.Subscribe("end_game", EndScoreboard);
 })();
 
@@ -84,7 +100,6 @@ function EndScoreboard(args) {
 	$.Msg(args);
 	if (!args) {
 		$.Msg("Critical error! no data found for end screen.");
-		return;
 	}
 
 	// Hide all other UI
@@ -224,7 +239,7 @@ function EndScoreboard(args) {
 		}
 
 		if (player.result != null) {
-			var xpDiff = Math.floor(player.result.xp_change);
+			var xpDiff = Math.floor(player.result.xp_change) || 0;
 //			if (Game.IsInToolsMode())
 //				xpDiff = 300000;
 
@@ -291,7 +306,6 @@ function EndScoreboard(args) {
 	}
 
 	$("#es-game-time-text").text = RawTimetoGameTime(Game.GetDOTATime(false, false));	
-
 }
 
 function CloseBottlepassReward(panel) {

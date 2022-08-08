@@ -633,7 +633,9 @@ function api:Request(endpoint, okCallback, failCallback, method, payload)
 		request:SetHTTPRequestRawPostBody("application/json", encoded)
 	end
 
+	print("About to send request...")
 	request:Send(function(result)
+		print(result)
 		local code = result.StatusCode;
 		print("Result status code:", code)
 
@@ -662,6 +664,7 @@ function api:Request(endpoint, okCallback, failCallback, method, payload)
 				return fail("Unknown Server error")
 			end
 
+			print(obj)
 			if obj.error == nil then
 				return fail("Invalid response from server")
 			elseif obj.error == true and obj.message ~= nil then
@@ -827,7 +830,7 @@ function api:CompleteGame()
 	local rosh_max_hp
 
 	if CUSTOM_GAME_TYPE == "IMBA" then
-		print("Cheat game?", api:IsCheatGame(), api:GetCustomGamemode() == 4)
+		-- print("Cheat game?", api:IsCheatGame(), api:GetCustomGamemode() == 4)
 
 		if api:IsCheatGame() == false and api:GetCustomGamemode() == 4 then
 			rosh_lvl = ROSHAN_ENT:GetLevel()
@@ -842,8 +845,8 @@ function api:CompleteGame()
 		winner = winnerTeam,
 		game_id = self:GetApiGameId(),
 		players = players,
-		radiant_score = self:GetKillsForTeam(2),
-		dire_score = self:GetKillsForTeam(3),
+		-- radiant_score = self:GetKillsForTeam(2),
+		-- dire_score = self:GetKillsForTeam(3),
 		game_time = GameRules:GetDOTATime(false, false),
 		game_type = CUSTOM_GAME_TYPE,
 		gamemode = api:GetCustomGamemode(),
@@ -853,6 +856,8 @@ function api:CompleteGame()
 		cheat_mode = self:IsCheatGame(),
 	}
 
+	print("game-complete Payload:", payload)
+
 	self:Request("game-complete", function(data)
 		print("Success! call end_game js")
 		CustomGameEventManager:Send_ServerToAllClients("end_game", {
@@ -860,9 +865,6 @@ function api:CompleteGame()
 			data = data,
 			info = {
 				winner = GAME_WINNER_TEAM,
-				id = api:GetApiGameId(),
-				radiant_score = GetTeamHeroKills(2),
-				dire_score = GetTeamHeroKills(3),
 				gamemode = api:GetCustomGamemode(),
 			},
 		})

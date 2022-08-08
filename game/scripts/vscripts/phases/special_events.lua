@@ -226,7 +226,7 @@ function EndFarmEvent()
 	end
 
 	-- Start Phase 2
-	for NumPlayers = 1, PlayerResource:GetPlayerCount() * CREEP_LANES_TYPE do
+	for NumPlayers = 1, MAGNATAURS_TO_KILL * PlayerResource:GetPlayerCount() * CREEP_LANES_TYPE do
 		local rax_spawner = Entities:FindByName(nil, "npc_dota_spawner_"..NumPlayers)
 
 		if rax_spawner then
@@ -237,7 +237,6 @@ function EndFarmEvent()
 	end
 
 	if PHASE_2_QUEST_UNIT and IsValidEntity(PHASE_2_QUEST_UNIT) and PHASE_2_QUEST_UNIT:IsAlive() then
-		print("Kill phase 2 unit and move on!")
 		PHASE_2_QUEST_UNIT:ForceKill(false)
 	else
 		print("ERROR: DUMMY UNIT PHASE 2 INVALID!!!")

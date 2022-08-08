@@ -269,16 +269,15 @@ if Log == nil then
 	-- and logs errors
 	---------------------------------------------
 	function Log:ExecuteInSafeContext(fun, args)
-
-		if args == nil then
-			args = {}
-		end
+		if args == nil then args = {} end
 
 		local status, err = xpcall(fun, function(err)
-
 			if err == nil then
 				err = "Unknown Error"
 			end
+
+			-- print(status)
+			-- print(err)
 
 			-- dont filter errors
 			local levelString = self:_LevelToString(Log.Levels.ERROR)

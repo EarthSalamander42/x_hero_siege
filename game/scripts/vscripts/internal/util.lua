@@ -753,73 +753,83 @@ function CDOTA_BaseNPC:IsXHSReincarnating()
 	return self.ankh_respawn
 end
 
+function GetBossBarColor(sBossName)
+	local colors = {}
+	colors.light_color = "#009933"
+	colors.dark_color = "#003311"
+
+	if sBossName == "npc_dota_hero_arthas" then
+		colors.light_color = "#e6ac00"
+		colors.dark_color = "#b34700"
+	elseif sBossName == "npc_dota_hero_banehallow" then
+		colors.light_color = "#ff6600"
+		colors.dark_color = "#320000"
+	elseif sBossName == "npc_dota_boss_lich_king" then
+		colors.light_color = "#0047b3"
+		colors.dark_color = "#000d33"
+	elseif sBossName == "npc_dota_boss_spirit_master_storm" then
+		colors.light_color = "#0092B3"
+		colors.dark_color = "#002B33"
+	elseif sBossName == "npc_dota_boss_spirit_master_fire" then
+		colors.light_color = "#ff6600"
+		colors.dark_color = "#320000"
+	end
+
+	return colors
+end
+
+function GetBossBarIcon(sBossName)
+	if sBossName == "npc_dota_hero_arthas" then
+		icon = "npc_dota_hero_omniknight"
+	elseif sBossName == "npc_dota_hero_balanar" then
+		icon = "npc_dota_hero_pugna"
+	elseif sBossName == "npc_dota_hero_banehallow" then
+		icon = "npc_dota_hero_nevermore"
+	elseif sBossName == "npc_dota_hero_grom_hellscream" then
+		icon = "npc_dota_hero_juggernaut"
+	elseif sBossName == "npc_dota_hero_illidan" then
+		icon = "npc_dota_hero_terrorblade"
+	elseif sBossName == "npc_dota_boss_lich_king" then
+		icon = "npc_dota_hero_abaddon"
+	elseif sBossName == "npc_dota_hero_magtheridon" then
+		icon = "npc_dota_hero_abyssal_underlord"
+	elseif sBossName == "npc_dota_hero_proudmoore" then
+		icon = "npc_dota_hero_kunkka"
+	elseif sBossName == "npc_dota_boss_spirit_master_storm" then
+		icon = "npc_dota_hero_storm_spirit"
+	elseif sBossName == "npc_dota_boss_spirit_master_earth" then
+		icon = "npc_dota_hero_earth_spirit"
+	elseif sBossName == "npc_dota_boss_spirit_master_fire" then
+		icon = "npc_dota_hero_ember_spirit"
+	end
+end
+
 function ShowBossBar(caster)
 	if caster.deathStart then return end
-	local icon
-	local light_color = "#009933"
-	local dark_color = "#003311"
-
-	if caster:GetUnitName() == "npc_dota_hero_arthas" then
-		icon = "npc_dota_hero_omniknight"
-		light_color = "#e6ac00"
-		dark_color = "#b34700"
-	elseif caster:GetUnitName() == "npc_dota_hero_balanar" then
-		icon = "npc_dota_hero_pugna"
-	elseif caster:GetUnitName() == "npc_dota_hero_banehallow" then
-		icon = "npc_dota_hero_nevermore"
-		light_color = "#ff6600"
-		dark_color = "#320000"
-	elseif caster:GetUnitName() == "npc_dota_hero_grom_hellscream" then
-		icon = "npc_dota_hero_juggernaut"
-	elseif caster:GetUnitName() == "npc_dota_hero_illidan" then
-		icon = "npc_dota_hero_terrorblade"
-	elseif caster:GetUnitName() == "npc_dota_boss_lich_king" then
-		icon = "npc_dota_hero_abaddon"
-		light_color = "#0047b3"
-		dark_color = "#000d33"
-	elseif caster:GetUnitName() == "npc_dota_hero_magtheridon" then
-		icon = "npc_dota_hero_abyssal_underlord"
-	elseif caster:GetUnitName() == "npc_dota_hero_proudmoore" then
-		icon = "npc_dota_hero_kunkka"
-	elseif caster:GetUnitName() == "npc_dota_boss_spirit_master_storm" then
-		icon = "npc_dota_hero_storm_spirit"
-		light_color = "#0092B3"
-		dark_color = "#002B33"
-	elseif caster:GetUnitName() == "npc_dota_boss_spirit_master_earth" then
-		icon = "npc_dota_hero_earth_spirit"
-	elseif caster:GetUnitName() == "npc_dota_boss_spirit_master_fire" then
-		icon = "npc_dota_hero_ember_spirit"
-		light_color = "#ff6600"
-		dark_color = "#320000"
-	end
-
-	if caster.boss_count == nil then
-		caster.boss_count = 1
-	end
+	local icon = GetBossBarIcon(caster:GetUnitName())
+	local colors = GetBossBarColor(caster:GetUnitName())
+	if caster.boss_count == nil then caster.boss_count = 1 end
 
 	CustomGameEventManager:Send_ServerToAllClients("show_boss_hp", {
 		boss_name = caster:GetUnitName(),
 		difficulty = GameRules:GetCustomGameDifficulty(),
 		boss_icon = icon,
-		light_color = light_color,
-		dark_color = dark_color,
+		light_color = colors.light_color,
+		dark_color = colors.dark_color,
 		boss_health = caster:GetHealth(),
 		boss_max_health = caster:GetMaxHealth(),
 		boss_count = caster.boss_count,
 	})
 end
 
-function UpdateBossBar(caster)
-	if caster.deathStart then return end
+function UpdateBossBar(boss, attacker)
+	if boss.deathStart then return end
+	if boss.boss_count == nil then boss.boss_count = 1 end
 
-	if caster.boss_count == nil then
-		caster.boss_count = 1
-	end
-
-	CustomGameEventManager:Send_ServerToPlayer(PlayerResource:GetPlayer(caster:GetPlayerID()), "update_boss_hp", {
-		boss_health = caster:GetHealth(),
-		boss_max_health = caster:GetMaxHealth(),
-		boss_count = caster.boss_count,
+	CustomGameEventManager:Send_ServerToPlayer(PlayerResource:GetPlayer(attacker:GetPlayerID()), "update_boss_hp", {
+		boss_health = boss:GetHealth(),
+		boss_max_health = boss:GetMaxHealth(),
+		boss_count = boss.boss_count,
 	})
 end
 

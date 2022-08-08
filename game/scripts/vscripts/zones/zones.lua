@@ -1057,10 +1057,10 @@ function CDungeonZone:OnEnemyKilled(killedUnit, Zone)
 			if quest.bActivated == false then
 				local bShouldActivate = false
 				for _,activator in pairs( quest.Activators ) do
-					if activator ~= nil and activator.Type == QUEST_EVENT_ON_ENEMY_KILLED and activator.szNPCName == killedUnit:GetUnitName() and ( ( quest.Completion.szZoneName == Zone.szName ) or ( quest.Completion.szZoneName == nil ) ) then
+					if activator ~= nil and activator.Type == QUEST_EVENT_ON_ENEMY_KILLED and activator.szNPCName == killedUnit:GetUnitName() and ( ( quest.Completion.szZoneName == Zone.szName ) or ( quest.Completion.szZoneName == nil ) ) and not killedUnit:IsBuilding() then
 						bShouldActivate = true
 					end
-					if activator ~= nil and activator.Type == QUEST_EVENT_ON_TEAM_ENEMY_KILLED and activator.szTeamName == killedUnit:GetTeam() and ( ( quest.Completion.szZoneName == Zone.szName ) or ( quest.Completion.szZoneName == nil ) ) then
+					if activator ~= nil and activator.Type == QUEST_EVENT_ON_TEAM_ENEMY_KILLED and activator.szTeamName == killedUnit:GetTeam() and ( ( quest.Completion.szZoneName == Zone.szName ) or ( quest.Completion.szZoneName == nil ) ) and not killedUnit:IsBuilding() then
 						bShouldActivate = true
 					end
 				end
@@ -1547,13 +1547,13 @@ function CDungeonZone:CheckForZoneComplete()
 				end
 			end
 
-			local nData1 = bit.bor( bit.lshift( CDungeonZone.nKills, 16 ), bit.band(CDungeonZone.nDeaths, 0xFFFF ) )
-			local nData2 = bit.bor( bit.lshift( CDungeonZone.nGoldBags, 16 ), bit.band(CDungeonZone.nPotions, 0xFFFF ) )
-			local nData3 = bit.bor( bit.lshift( CDungeonZone.nItems, 16 ), bit.band(CDungeonZone.nReviveTime, 0xFFFF ) )
-			local nData4 = bit.bor( bit.lshift( CDungeonZone.nDamage / 1000, 16 ), bit.band(CDungeonZone.nHealing / 1000, 0xFFFF ) )
-			local nData5 = bit.lshift( CDungeonZone.PlayerStats[0]["Deaths"], 24 ) + bit.lshift( CDungeonZone.PlayerStats[1]["Deaths"], 16 ) + bit.lshift( CDungeonZone.PlayerStats[2]["Deaths"], 8 ) + CDungeonZone.PlayerStats[3]["Deaths"]
+			-- local nData1 = bit.bor( bit.lshift( CDungeonZone.nKills, 16 ), bit.band(CDungeonZone.nDeaths, 0xFFFF ) )
+			-- local nData2 = bit.bor( bit.lshift( CDungeonZone.nGoldBags, 16 ), bit.band(CDungeonZone.nPotions, 0xFFFF ) )
+			-- local nData3 = bit.bor( bit.lshift( CDungeonZone.nItems, 16 ), bit.band(CDungeonZone.nReviveTime, 0xFFFF ) )
+			-- local nData4 = bit.bor( bit.lshift( CDungeonZone.nDamage / 1000, 16 ), bit.band(CDungeonZone.nHealing / 1000, 0xFFFF ) )
+			-- local nData5 = bit.lshift( CDungeonZone.PlayerStats[0]["Deaths"], 24 ) + bit.lshift( CDungeonZone.PlayerStats[1]["Deaths"], 16 ) + bit.lshift( CDungeonZone.PlayerStats[2]["Deaths"], 8 ) + CDungeonZone.PlayerStats[3]["Deaths"]
 
-			GameRules:AddEventMetadataLeaderboardEntry( CDungeonZone.szName, math.ceil( CDungeonZone.flCompletionTime ), CDungeonZone.nStars, 3, nData1, nData2, nData3, nData4, nData5 )
+			-- GameRules:AddEventMetadataLeaderboardEntry( CDungeonZone.szName, math.ceil( CDungeonZone.flCompletionTime ), CDungeonZone.nStars, 3, nData1, nData2, nData3, nData4, nData5 )
 
 			local nFurthestZone = 0
 			local nTotalTime = 0

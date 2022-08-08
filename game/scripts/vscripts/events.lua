@@ -137,7 +137,7 @@ ListenToGameEvent('npc_spawned', function(keys)
 		local normal_xp = npc:GetDeathXP() * 2
 	end
 
-	if npc then
+	if npc and IsValidEntity(npc) then
 		--ALL NPC
 		for i = 1, #innate_abilities do
 			local current_ability = npc:FindAbilityByName(innate_abilities[i])
@@ -549,28 +549,6 @@ local killerTeamNumber = keys.teamnumber
 end
 
 function GameMode:PlayerConnect(keys)
-end
-
-function GameMode:OnConnectFull(keys)
-GameMode:_OnConnectFull(keys)
-local entIndex = keys.index+1
-local ply = EntIndexToHScript(entIndex)
-local playerID = ply:GetPlayerID()
-
-	-- If this is Mohammad Mehdi Akhondi, end the game. Dota Imba ban system.
-	for i = 1, #banned_players do
-		if PlayerResource:GetSteamAccountID(ply:GetPlayerID()) == banned_players[i] then
-			Timers:CreateTimer(5.0, function()
-				GameRules:SetGameWinner(DOTA_TEAM_CUSTOM_1)
-			end)
-
-			GameRules:SetHeroSelectionTime(1.0)
-			GameRules:SetPreGameTime(1.0)
-			GameRules:SetPostGameTime(5.0)
-			GameRules:SetCustomGameSetupAutoLaunchDelay(0.0)
-			Say(nil, "<font color='#FF0000'>Mohammad Mehdi Akhondi</font> detected, game will not start. Please disconnect.", false)
-		end
-	end
 end
 
 function GameMode:OnItemCombined(keys)
@@ -1122,7 +1100,11 @@ ListenToGameEvent('entity_killed', function(keys)
 
 		return
 	elseif killedUnit:IsBuilding() then
-		if killedUnit:GetTeamNumber() == 3 then
+		if killedUnit:GetTeamNumber() == 2 then
+			if killedUnit:GetClassname() == "npc_dota_fort" then
+				GameRules:SetGameWinner(3)
+			end
+		elseif killedUnit:GetTeamNumber() == 3 then
 			if killer:IsIllusion() then
 				killer = PlayerResource:GetPlayer(killer:GetPlayerID()):GetAssignedHero()
 				killer:IncrementKills(1)

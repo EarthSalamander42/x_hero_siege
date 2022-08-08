@@ -20,7 +20,9 @@ function ShowBossBar(args) {
 
 function UpdateBossBar(args) {
 	if (args.boss_count) {
+		$.Msg(args);
 		$("#BossHealth" + args.boss_count).text = args.boss_health + " / " + args.boss_max_health;
+		$.Msg(args.boss_health / args.boss_max_health);
 		$("#BossProgressBar" + args.boss_count).value = args.boss_health / args.boss_max_health;
 		$("#BossProgressBar" + args.boss_count + "_Left").style.backgroundColor = "gradient( linear, 0% 0%, 0% 100%, from( " + args.dark_color + " ), color-stop( 0.3, " + args.light_color + " ), color-stop( .5, " + args.light_color + " ), to( " + args.dark_color + " ) )";
 	}

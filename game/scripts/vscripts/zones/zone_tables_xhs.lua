@@ -71,8 +71,7 @@ _G.ZonesDefinition =
 					Type = QUEST_EVENT_ON_ENEMY_KILLED,
 					szNPCName ="npc_magnataur_destroyer_crypt",
 				},
---				nCompleteLimit = MAGNATAURS_TO_KILL * PlayerResource:GetPlayerCount() * CREEP_LANES_TYPE,
-				nCompleteLimit = 1,
+				nCompleteLimit = MAGNATAURS_TO_KILL * PlayerResource:GetPlayerCount() * CREEP_LANES_TYPE,
 			},
 			{
 				szQuestName = "kill_ice_towers",

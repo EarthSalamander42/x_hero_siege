@@ -49,7 +49,7 @@ function OnCreated(keys)
 end
 
 function BossTakeDamage(keys)
-	UpdateBossBar(keys.caster)
+	UpdateBossBar(keys.caster, keys.attacker)
 end
 
 function death_animation(keys)

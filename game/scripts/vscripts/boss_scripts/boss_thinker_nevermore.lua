@@ -352,7 +352,7 @@ function boss_thinker_nevermore:Raze(target, play_impact_sound)
 	local delay = ability:GetSpecialValueFor("delay")
 	local damage = ability:GetSpecialValueFor("damage")
 	local radius = ability:GetSpecialValueFor("radius")
-	print("Raze damage:", damage)
+	-- print("Raze damage:", damage)
 
 	-- Show warning pulses
 	local warning_pfx = ParticleManager:CreateParticle("particles/boss_nevermore/pre_raze.vpcf", PATTACH_WORLDORIGIN, nil)
