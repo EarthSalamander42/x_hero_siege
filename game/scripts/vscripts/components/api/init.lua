@@ -710,7 +710,7 @@ function api:RegisterGame(callback)
 --	CustomGameEventManager:Send_ServerToAllClients("all_players_loaded", {})
 end
 
-function api:CompleteGame()
+function api:CompleteGame(successCallback)
 	print("CompleteGame")
 	local players = {}
 
