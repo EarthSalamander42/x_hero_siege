@@ -77,7 +77,22 @@ function api:OnGameEnd()
 		end
 	end
 
-	api:CompleteGame()
+	api:CompleteGame(function(data, payload)
+		print(data)
+		print(payload)
+		local full_data = {
+			players = payload.players,
+			data = data,
+			info = {
+				winner = GAME_WINNER_TEAM,
+				id = api:GetApiGameId(),
+				gamemode = api:GetCustomGamemode(),
+			}
+		}
+
+		CustomNetTables:SetTableValue("game_options", "end_game", full_data)
+		-- CustomGameEventManager:Send_ServerToAllClients("end_game", full_data)
+	end)
 end
 
 ListenToGameEvent('dota_item_purchased', function(event)
