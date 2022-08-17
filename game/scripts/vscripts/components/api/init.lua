@@ -855,6 +855,7 @@ function api:CompleteGame(successCallback)
 		rosh_hp = rosh_hp,
 		rosh_max_hp = rosh_max_hp,
 		cheat_mode = self:IsCheatGame(),
+		map = GetMapName(),
 	}
 
 	self:Request("game-complete", function(data)
