@@ -28141,7 +28141,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityCastPoint"				"0.3"
 		"AbilityCastRange"				"350 400 450 500"
-		"AbilityDamage"					"250"
+		"AbilityDamage"					"90 270 450 630"
 
 		// Time		
 		//-------------------------------------------------------------------------------------------------------------
@@ -28179,11 +28179,16 @@
 			{
 				"var_type"								"FIELD_FLOAT"
 				"duration"								"1.0 2.0 3.0 4.0"
-			}	
+			}
 			"06"
 			{
 				"var_type"								"FIELD_INTEGER"
 				"radius"								"350 400 450 500"
+			}
+			"07"
+			{
+				"var_type"								"FIELD_INTEGER"
+				"damage"								"90 270 450 630"
 			}
 		}
 
@@ -28213,6 +28218,24 @@
 				"Target"				"CASTER"
 				"Duration"				"%electric_vortex_self_slow_duration"
 				"ModifierName"			"modifier_storm_spirit_electric_vortex_self_slow"
+			}
+
+			"DelayedAction"
+			{
+				"Delay"					"%duration"
+				"Action"
+				{
+					"Damage"
+					{
+						"Target"
+						{
+						"Type"					"DAMAGE_TYPE_MAGICAL"
+						"Damage"				"%damage"
+						"Types"					"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_CREEP"
+						"Radius"				"%radius"
+						}
+					}
+				}
 			}
 
 			"FireSound"

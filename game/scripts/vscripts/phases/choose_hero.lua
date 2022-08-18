@@ -230,17 +230,23 @@ function ChooseHeroVIP(event)
 	if PlayerResource:IsValidPlayer(id) and hero:GetUnitName() == "npc_dota_hero_wisp" and api:IsDonator(hero:GetPlayerID()) then
 		for i = 1, #HEROLIST_VIP do
 			if caller:GetName() == "trigger_hero_vip_"..i then
+				local picked_hero_name = "npc_dota_hero_"..HEROLIST_VIP[i]
 				UTIL_Remove(Entities:FindByName(nil, "trigger_hero_vip_"..i))
 				local particle = ParticleManager:CreateParticle("particles/generic_hero_status/hero_levelup.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
 				ParticleManager:SetParticleControl(particle, 0, hero:GetAbsOrigin())
 				EmitSoundOnClient("ui.trophy_levelup", PlayerResource:GetPlayer(id))
 				hero:AddNewModifier(hero, nil, "modifier_command_restricted", {})
-				Notifications:Bottom(hero:GetPlayerOwnerID(), {hero="npc_dota_hero_"..HEROLIST_VIP[i], duration = 5.0})
+				Notifications:Bottom(hero:GetPlayerOwnerID(), {hero=picked_hero_name, duration = 5.0})
 				Notifications:Bottom(hero:GetPlayerOwnerID(), {text="HERO: ", duration = 5.0, style={color="white"}, continue=true})
 				Notifications:Bottom(hero:GetPlayerOwnerID(), {text="#npc_dota_hero_"..HEROLIST_VIP[i], duration = 5.0, style={color="white"}, continue=true})
 				
-				local newHero = PlayerResource:ReplaceHeroWith(id, "npc_dota_hero_"..HEROLIST_VIP[i], STARTING_GOLD[difficulty], 0)
+				local newHero = PlayerResource:ReplaceHeroWith(id, picked_hero_name, STARTING_GOLD[difficulty], 0)
 				StartingItems(hero, newHero)
+
+				if picked_hero_name == "npc_dota_hero_storm_spirit" then
+					PrecacheUnitByNameAsync("npc_dota_hero_ember_spirit", function() end)
+					PrecacheUnitByNameAsync("npc_dota_hero_earth_spirit", function() end)
+				end
 
 				return
 			end

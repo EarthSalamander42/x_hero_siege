@@ -22,35 +22,35 @@ ward[6] = { 55, -110, 0 }	-- South-East
 end
 
 function static_remnant_init(keys)
-local caster = keys.caster
-local target = caster:GetAbsOrigin()
-local ability = keys.ability
-local model_name = caster:GetModelName()
-local dummyModifierName = "modifier_static_remnant_dummy_datadriven"
-local dummyFreezeModifierName = "modifier_static_remnant_dummy_freeze_datadriven"
-local remnant_interval_check = 0.1
-local delay = ability:GetLevelSpecialValueFor( "static_remnant_delay", ability:GetLevel() - 1 )
-local trigger_radius = ability:GetLevelSpecialValueFor( "static_remnant_radius", ability:GetLevel() - 1 )
-local damage_radius = ability:GetLevelSpecialValueFor( "static_remnant_damage_radius", ability:GetLevel() - 1 )
-local ability_damage = ability:GetLevelSpecialValueFor( "static_remnant_damage", ability:GetLevel() - 1 )
-local ability_damage_type = ability:GetAbilityDamageType()
-local ability_duration = ability:GetDuration()
+	local caster = keys.caster
+	local target = caster:GetAbsOrigin()
+	local ability = keys.ability
+	local model_name = caster:GetModelName()
+	local dummyModifierName = "modifier_static_remnant_dummy_datadriven"
+	local dummyFreezeModifierName = "modifier_static_remnant_dummy_freeze_datadriven"
+	local remnant_interval_check = 0.1
+	local delay = ability:GetLevelSpecialValueFor( "static_remnant_delay", ability:GetLevel() - 1 )
+	local trigger_radius = ability:GetLevelSpecialValueFor( "static_remnant_radius", ability:GetLevel() - 1 )
+	local damage_radius = ability:GetLevelSpecialValueFor( "static_remnant_damage_radius", ability:GetLevel() - 1 )
+	local ability_damage = ability:GetLevelSpecialValueFor( "static_remnant_damage", ability:GetLevel() - 1 )
+	local ability_damage_type = ability:GetAbilityDamageType()
+	local ability_duration = ability:GetDuration()
 
-local ward = {}
-ward[1] = { 100, 200, 0 }	-- North-East
-ward[2] = { -100, 200, 0 }	-- North-West
-ward[3] = { -200, 0, 0 }	-- West
-ward[4] = { 200, 0, 0 }		-- East
-ward[5] = { -100, -200, 0 }	-- South-West
-ward[6] = { 100, -200, 0 }	-- South-East
+	local ward = {}
+	ward[1] = { 100, 200, 0 }	-- North-East
+	ward[2] = { -100, 200, 0 }	-- North-West
+	ward[3] = { -200, 0, 0 }	-- West
+	ward[4] = { 200, 0, 0 }		-- East
+	ward[5] = { -100, -200, 0 }	-- South-West
+	ward[6] = { 100, -200, 0 }	-- South-East
 
-local remnant_timer = {}
-remnant_timer[1] = {0}
-remnant_timer[2] = {0}
-remnant_timer[3] = {0}
-remnant_timer[4] = {0}
-remnant_timer[5] = {0}
-remnant_timer[6] = {0}
+	local remnant_timer = {}
+	remnant_timer[1] = {0}
+	remnant_timer[2] = {0}
+	remnant_timer[3] = {0}
+	remnant_timer[4] = {0}
+	remnant_timer[5] = {0}
+	remnant_timer[6] = {0}
 
 	-- Dummy creation
 	for count = 1, 6 do
@@ -325,6 +325,13 @@ function SpiritSwap(keys)
 	local Mana = caster:GetMaxMana() * caster:GetManaPercent() / 100
 	local AbPoints = caster:GetAbilityPoints()
 	local cooldowns_caster = {}
+	local bonus_stats_stacks = 0
+
+	local mod = caster:FindModifierByName("modifier_tome_of_stats")
+
+	if mod and mod:GetStackCount() > 0 then
+		bonus_stats_stacks = mod:GetStackCount()
+	end
 
 	local items = {}
 
@@ -378,6 +385,10 @@ function SpiritSwap(keys)
 	hero:SetHealth(HP)
 	hero:SetMana(Mana)
 	hero:SetAbilityPoints(AbPoints)
+
+	if bonus_stats_stacks > 0 then
+		hero:AddNewModifier(hero, nil, "modifier_tome_of_stats", {}):SetStackCount(bonus_stats_stacks)
+	end
 
 	for i = 0, 14 do
 		if items[i] then

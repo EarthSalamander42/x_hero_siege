@@ -2843,21 +2843,22 @@
 			{
 				"var_type"						"FIELD_INTEGER"
 				"radius"						"600"
-			}			
+			}
 			"03"
 			{
 				"var_type"						"FIELD_INTEGER"
-				"total_damage"			"150 400 750 1200"
+				"damage_per_second"				"150 200 250 300"
 			}
 			"04"
 			{
 				"var_type"						"FIELD_FLOAT"
-				"tick_interval"					"1.0"
+				"tick_interval"					"0.5"
 			}
 			"05"
 			{
 				"var_type"						"FIELD_INTEGER"
 				"unit_count"					"4 8 12 16"
+				"LinkedSpecialBonus"			"special_bonus_unique_ember_spirit_7"
 			}
 		}
 	}
