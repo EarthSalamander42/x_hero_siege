@@ -194,99 +194,24 @@ function OnRoundDataUpdated( table_name, key, data )
 }
 CustomNetTables.SubscribeNetTableListener( "round_data", OnRoundDataUpdated )
 
-function UpdateRoundUI()
-{
+function UpdateRoundUI() {
 	var key = "bossHealth"
 	var roundData = CustomNetTables.GetTableValue("round_data", key);
 
-	if ( roundData !== null )
-	{
-		if (roundData.boss == "mag")
-		{
+	if ( roundData !== null ) {
+		$.Msg(roundData);
+		if (roundData.boss) {
+		// if (roundData.boss == "arthas") {
 			var nBossHP = roundData.hp;
-			var bShowBossHP = roundData.hp == 0 ? false : true;
-			$("#MagtheridonProgressBar").value = nBossHP / 100;
-			$("#MagtheridonHP").visible = true;
-		}
-
-		if (roundData.boss2 == "true")
-		{
-			var nBossHP = roundData.hp2;
-			var bShowBossHP = roundData.hp2 == 0 ? false : true;
-			$("#Magtheridon2ProgressBar").value = nBossHP / 100;
-			$("#Magtheridon2HP").visible = true;
-			$("#MagtheridonHP").style.position = "-300px 0px 0px";
-		}
-
-		if (roundData.boss == "arthas")
-		{
-			var nBossHP = roundData.hp;
-			var bShowBossHP = roundData.hp == 0 ? false : true;
-			$("#ArthasProgressBar").value = nBossHP / 100;
-			$("#ArthasHP").visible = true;
-		}
-
-		if (roundData.boss == "banehallow")
-		{
-			var nBossHP = roundData.hp;
-			var bShowBossHP = roundData.hp == 0 ? false : true;
-			$("#BanehallowProgressBar").value = nBossHP / 100;
-			$("#BanehallowHP").visible = true;
-		}
-
-		if (roundData.boss == "lich_king")
-		{
-			var nBossHP = roundData.hp;
-			var bShowBossHP = roundData.hp == 0 ? false : true;
-			$("#LichKingProgressBar").value = nBossHP / 100;
-			$("#LichKingHP").visible = true;
-		}
-
-		if (roundData.boss == "spirit_master")
-		{
-			var nBossHP = roundData.hp;
-			var bShowBossHP = roundData.hp == 0 ? false : true;
-			$("#SpiritMasterProgressBar").value = nBossHP / 100;
-			$("#SpiritMasterHP").visible = true;
-		}
-
-		if (roundData.boss == "storm_spirit")
-		{
-			var nBossHP = roundData.hp;
-			var bShowBossHP = roundData.hp == 0 ? false : true;
-			$("#SpiritMasterStormProgressBar").value = nBossHP / 100;
-			$("#SpiritMasterStormHP").visible = true;
-		}
-
-		if (roundData.boss3 == "true")
-		{
-			var nBossHP = roundData.hp3;
-			var bShowBossHP = roundData.hp3 == 0 ? false : true;
-			$("#SpiritMasterEarthProgressBar").value = nBossHP / 100;
-			$("#SpiritMasterEarthHP").visible = true;
-		}
-
-		if (roundData.boss4 == "true")
-		{
-			var nBossHP = roundData.hp4;
-			var bShowBossHP = roundData.hp4 == 0 ? false : true;
-			$("#SpiritMasterFireProgressBar").value = nBossHP / 100;
-			$("#SpiritMasterFireHP").visible = true;
+			// var bShowBossHP = roundData.hp == 0 ? false : true;
+			$("#BossProgressBar").value = nBossHP / 100;
+			$("#BossHP").visible = true;
 		}
 	}
 }
 
-function HideUI()
-{
-	$.GetContextPanel().FindChildTraverse("MagtheridonHP").style.visibility = "collapse";
-	$.GetContextPanel().FindChildTraverse("Magtheridon2HP").style.visibility = "collapse";
-	$.GetContextPanel().FindChildTraverse("ArthasHP").style.visibility = "collapse";
-	$.GetContextPanel().FindChildTraverse("BanehallowHP").style.visibility = "collapse";
-	$.GetContextPanel().FindChildTraverse("LichKingHP").style.visibility = "collapse";
-	$.GetContextPanel().FindChildTraverse("SpiritMasterHP").style.visibility = "collapse";
-	$.GetContextPanel().FindChildTraverse("SpiritMasterStormHP").style.visibility = "collapse";
-	$.GetContextPanel().FindChildTraverse("SpiritMasterEarthHP").style.visibility = "collapse";
-	$.GetContextPanel().FindChildTraverse("SpiritMasterFireHP").style.visibility = "collapse";
+function HideUI() {
+	$.GetContextPanel().FindChildTraverse("BossHP").style.visibility = "collapse";
 }
 
 function CreateErrorMessage(msg){

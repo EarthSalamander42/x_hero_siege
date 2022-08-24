@@ -5,6 +5,8 @@ function PrimalSplit(event)
 	local origin = caster:GetAbsOrigin()
 
 	local Storm = CreateUnitByName("npc_dota_boss_spirit_master_storm", origin, true, nil, nil, DOTA_TEAM_CUSTOM_1)
+	Storm.boss_count = 1
+	ShowBossBar(Storm)
 	local Earth = CreateUnitByName("npc_dota_boss_spirit_master_earth", origin, true, nil, nil, DOTA_TEAM_CUSTOM_1)
 	Earth.boss_count = 2
 	ShowBossBar(Earth)

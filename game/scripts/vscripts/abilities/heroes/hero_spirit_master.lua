@@ -409,8 +409,8 @@ function SpiritSwap(keys)
 end
 
 function EnhancedSpirit(keys)
-local caster = keys.caster
-local ability = keys.ability
+	local caster = keys.caster
+	local ability = keys.ability
 
 	if caster:GetUnitName() == "npc_dota_hero_storm_spirit" then
 		caster:RemoveModifierByName("modifier_enhanced_spirit_earth")

@@ -1458,11 +1458,7 @@
 	width: 95px;
 }
 
-#SpiritMasterHP,
-#LichKingHP,
-#BanehallowHP,
-#ArthasHP,
-#MagtheridonHP
+#BossHP
 {
 	width: 500px;
 	height: 64px;
@@ -1472,59 +1468,7 @@
 	visibility: collapse;
 }
 
-#SpiritMasterFireHP
-{
-	width: 500px;
-	height: 64px;
-	horizontal-align: center;
-	vertical-align: center;
-	margin-bottom: 800px;
-	margin-left: 350px;
-	visibility: collapse;
-}
-
-#SpiritMasterEarthHP
-{
-	width: 500px;
-	height: 64px;
-	horizontal-align: center;
-	vertical-align: center;
-	margin-bottom: 800px;
-	margin-left: -350px;
-	visibility: collapse;
-}
-
-#SpiritMasterStormHP
-{
-	width: 500px;
-	height: 64px;
-	horizontal-align: center;
-	vertical-align: center;
-	margin-bottom: 700px;
-	margin-left: 0px;
-	visibility: collapse;
-}
-
-#Magtheridon2HP
-{
-	width: 500px;
-	height: 64px;
-	horizontal-align: center;
-	vertical-align: center;
-	margin-bottom: 800px;
-	margin-left: 600px;
-	visibility: collapse;
-}
-
-#SpiritMasterFireLabel,
-#SpiritMasterEarthLabel,
-#SpiritMasterStormLabel,
-#SpiritMasterLabel,
-#LichKingLabel,
-#BanehallowLabel,
-#ArthasLabel,
-#MagtheridonLabel,
-#Magtheridon2Label
+#BossLabel
 {
 	horizontal-align: center;
 	text-align: center;	
@@ -1533,15 +1477,7 @@
 	font-size: 16px;
 }
 
-#SpiritMasterFireProgressBar,
-#SpiritMasterEarthProgressBar,
-#SpiritMasterStormProgressBar,
-#SpiritMasterProgressBar,
-#LichKingProgressBar,
-#BanehallowProgressBar,
-#ArthasProgressBar,
-#MagtheridonProgressBar,
-#Magtheridon2ProgressBar
+#BossProgressBar
 {
 	width: 90%;
 	border-radius: 4px;
@@ -1553,64 +1489,24 @@
 	box-shadow: fill #000 -3px -3px 6px 6px;	
 }
 
-#SpiritMasterStormProgressBar_Left,
-#SpiritMasterFireProgressBar_Left,
-#SpiritMasterEarthProgressBar_Left,
-#SpiritMasterProgressBar_Left,
-#LichKingProgressBar_Left,
-#BanehallowProgressBar_Left,
-#ArthasProgressBar_Left,
-#MagtheridonProgressBar_Left,
-#Magtheridon2ProgressBar_Left
+#BossProgressBar_Left
 {
 	background-color: gradient( linear, 0% 0%, 0% 100%, from( #326114 ), color-stop( 0.3, #54BA07 ), color-stop( .5, #54BA07 ), to( #326114 ) );
 	box-shadow: inset #000 1px 1px 3px 3px;	
 	border-radius: 2px;
 }
 
-#SpiritMasterFireProgressBar_Left,
-#SpiritMasterProgressBar_Left,
-#BanehallowProgressBar_Left,
-#ArthasProgressBar_Left,
-#MagtheridonProgressBar_Left,
-#Magtheridon2ProgressBar_Left
+#BossProgressBar_Left
 {
 	background-color: gradient( linear, 0% 0%, 0% 100%, from( #320000 ), color-stop( 0.3, #ff4A07 ), color-stop( .5, #ff4A07 ), to( #320000 ) );
 }
 
-#SpiritMasterEarthProgressBar_Left
-{
-	background-color: gradient( linear, 0% 0%, 0% 100%, from( #320000 ), color-stop( 0.3, green ), color-stop( .5, green ), to( #320000 ) );
-}
-
-#SpiritMasterStormProgressBar_Left,
-#LichKingProgressBar_Left
-{
-	background-color: gradient( linear, 0% 0%, 0% 100%, from( #320000 ), color-stop( 0.3, dodgerblue ), color-stop( .5, dodgerblue ), to( #320000 ) );
-}
-
-#SpiritMasterFireProgressBar_Right,
-#SpiritMasterEarthProgressBar_Right,
-#SpiritMasterStormProgressBar_Right,
-#SpiritMasterProgressBar_Right,
-#LichKingProgressBar_Right,
-#BanehallowProgressBar_Right,
-#ArthasProgressBar_Right,
-#MagtheridonProgressBar_Right,
-#Magtheridon2ProgressBar_Right
+#BossProgressBar_Right
 {
 	background-color: gradient( linear, 0% 0%, 100% 0%, from( #222222FF ), to( black ) );
 }
 
-#SpiritMasterFireProgressBarContainer,
-#SpiritMasterEarthProgressBarContainer,
-#SpiritMasterStormProgressBarContainer,
-#SpiritMasterProgressBarContainer,
-#LichKingProgressBarContainer,
-#BanehallowProgressBarContainer,
-#ArthasProgressBarContainer,
-#MagtheridonProgressBarContainer,
-#Magtheridon2ProgressBarContainer
+#BossProgressBarContainer
 {
 	vertical-align: bottom;
 	height: 40px;

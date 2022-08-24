@@ -20,11 +20,8 @@ function ShowBossBar(args) {
 
 function UpdateBossBar(args) {
 	if (args.boss_count) {
-		$.Msg(args);
 		$("#BossHealth" + args.boss_count).text = args.boss_health + " / " + args.boss_max_health;
-		$.Msg(args.boss_health / args.boss_max_health);
 		$("#BossProgressBar" + args.boss_count).value = args.boss_health / args.boss_max_health;
-		$("#BossProgressBar" + args.boss_count + "_Left").style.backgroundColor = "gradient( linear, 0% 0%, 0% 100%, from( " + args.dark_color + " ), color-stop( 0.3, " + args.light_color + " ), color-stop( .5, " + args.light_color + " ), to( " + args.dark_color + " ) )";
 	}
 }
 
@@ -32,10 +29,9 @@ function HideBossBar(args) {
 	if (args.boss_count) {
 		$("#BossHP" + args.boss_count).style.visibility = "collapse";
 		$("#BossLabel" + args.boss_count).text = "";
-		$("#BossIcon" + args.boss_count).style.backgroundImage = '';
+		$("#BossIcon" + args.boss_count).style.backgroundImage = 'none';
 		$("#BossHealth" + args.boss_count).text = "";
 		$("#BossProgressBar" + args.boss_count).value = 100;
-		$("#BossProgressBar" + args.boss_count + "_Left").style.backgroundColor = "gradient( linear, 0% 0%, 0% 100%, from( #320000 ), color-stop( 0.3, #a30f0f ), color-stop( .5, #a30f0f ), to( #320000 ) )";
 	}
 }
 

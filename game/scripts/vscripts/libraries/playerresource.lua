@@ -15,6 +15,14 @@ CDOTA_PlayerResource.PlayerData = {}
 	Returns true if the given player ID is a connected bot or player
 ]]
 
+local function IsSupportItem(bItemName)
+	if bItemName == "item_smoke_of_deceit" or bItemName == "item_ward_observer" or bItemName == "item_ward_sentry" or bItemName == "item_imba_dust_of_appearance" or bItemName == "item_imba_gem" or bItemName == "item_imba_soul_of_truth" then
+		return true
+	end
+
+	return false
+end
+
 function CDOTA_PlayerResource:GetAllTeamPlayerIDs()
 	return filter(partial(self.IsValidPlayerID, self), range(0, self:GetPlayerCount()))
 end
