@@ -24,3 +24,4 @@
 *.stackdump
 game/scripts/vscripts/components/api/backend_key.kv
 *.vmap
+game/scripts/vscripts/components/api/.gitattributes

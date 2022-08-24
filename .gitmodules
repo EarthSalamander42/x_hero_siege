@@ -4,3 +4,6 @@
 [submodule "game/dota_addons/barebones/scripts/vscripts/components/api"]
 	path = game/dota_addons/barebones/scripts/vscripts/components/api
 	url = https://github.com/FrostroseStudio/frostrose_api
+[submodule "game/scripts/vscripts/components/api"]
+	path = game/scripts/vscripts/components/api
+	url = https://github.com/FrostroseStudio/frostrose_api
