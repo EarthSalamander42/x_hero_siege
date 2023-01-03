@@ -959,8 +959,7 @@
 }
 
 .ShowAdvanceButton #CloseFloatingDialogButton,
-.ShowAdvanceButton #CloseDialogButton,
-{
+.ShowAdvanceButton #CloseDialogButton {
 	visibility: collapse;
 }
 

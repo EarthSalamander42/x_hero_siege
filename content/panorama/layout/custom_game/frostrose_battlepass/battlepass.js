@@ -954,7 +954,7 @@ function GenerateBattlepassPanel(reward_list, player, bRewardsDisabled) {
 
 				var reward_label = $.CreatePanel("Label", reward_label_container, "");
 				reward_label.AddClass("BattlepassRewardLabel");
-				reward_label.text = $.Localize("battlepass_level") + bp_level;
+				reward_label.text = $.Localize("#battlepass_level") + bp_level;
 //				reward_label.AddClass(bp_rarity + "_text");
 			}
 
@@ -1561,19 +1561,26 @@ function CreateBattlepassButton() {
 				$("#" + value + "_value").text = value[1];
 		}
 	} else {
-		$("#BountyMultiplierDesc").style.visibility = "collapse";
-		$("#ExpMultiplierDesc").style.visibility = "collapse";
-		$("#InitialGoldDesc").style.visibility = "collapse";
-		$("#InitialLevelDesc").style.visibility = "collapse";
-		$("#MaxLevelDesc").style.visibility = "collapse";
-		$("#GoldTickDesc").style.visibility = "collapse";
+		var panels = {
+			"bounty_multiplier": "BountyMultiplier",
+			"exp_multiplier": "ExpMultiplier",
+			"initial_gold": "InitialGold",
+			"initial_level": "InitialLevel",
+			"max_level": "MaxLevel",
+			"gold_tick": "GoldTick",
+		}
 
-		$("#BountyMultiplierValue").style.visibility = "collapse";
-		$("#ExpMultiplierValue").style.visibility = "collapse";
-		$("#InitialGoldValue").style.visibility = "collapse";
-		$("#InitialLevelValue").style.visibility = "collapse";
-		$("#MaxLevelValue").style.visibility = "collapse";
-		$("#GoldTickValue").style.visibility = "collapse";
+		for (var i in panels) {
+			const panel = panels[i];
+
+			if ($("#" + panel + "Desc")) {
+				$("#" + panel + "Desc").style.visibility = "collapse";
+			}
+
+			if ($("#" + panel + "Value")) {
+				$("#" + panel + "Value").style.visibility = "collapse";
+			}
+		}
 
 		if (game_type == "PW") {
 			var max_score = CustomNetTables.GetTableValue("game_score", "max_score");

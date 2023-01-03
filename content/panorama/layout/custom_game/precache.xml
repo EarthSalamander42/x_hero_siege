@@ -2,6 +2,18 @@
 	<Panel style="visibility:collapse;">
 		<Panel id="container" style="visibility:collapse;">
 			<Image src="file://panorama/images/custom_game/close.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/patreon.png" hittest="false" />
+
+			<Image src="file://panorama/images/custom_game/loading_screen/bg.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/loading_screen/patreon.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/loading_screen/xhs.jpg" hittest="false" />
+			<Image src="file://panorama/images/custom_game/loading_screen/mods/modlist1.jpg" hittest="false" />
+			<Image src="file://panorama/images/custom_game/loading_screen/mods/modlist2.jpg" hittest="false" />
+			<Image src="file://panorama/images/custom_game/loading_screen/mods/modlist3.jpg" hittest="false" />
+			<Image src="file://panorama/images/custom_game/loading_screen/mods/modlist4.jpg" hittest="false" />
+			<Image src="file://panorama/images/custom_game/loading_screen/mods/modlist6.jpg" hittest="false" />
+
+			<Image src="file://panorama/images/custom_game/gg/gg_background.png" hittest="false" />
 
 			<Image src="file://panorama/images/custom_game/battlepass/teleport1.png" hittest="false" />
 			<Image src="file://panorama/images/custom_game/battlepass/teleport2.png" hittest="false" />
