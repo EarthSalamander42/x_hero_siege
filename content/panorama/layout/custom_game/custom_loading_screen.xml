@@ -16,7 +16,7 @@
 
 				<Label class="vote-select-description"/>
 
-				<Button id="VoteGameModeMainText1" class="vote-button">
+				<Button id="vote-gamemode-button" class="vote-button">
 					<Label class="vote-button-label" text="Vote" />
 				</Button>
 			</Panel>
@@ -49,13 +49,13 @@
 
 					<Panel id="vote-container" class="vote-container">
 						<Panel class="vote-header-container">
-							<Label class="vote-title" text="#vote_gamemode"/>
+							<Label class="vote-title" text="#votes"/>
 							<Panel class="vote-info"/>
 						</Panel>
 
 						<Panel id="vote-label-container" class="vote-label-container"/>
 
-						<Label id="VoteGameModeCheck" class="vote-label vote-check" text="You have not voted yet." />
+						<!-- <Label id="VoteGameModeCheck" class="vote-label vote-check" text="You have not voted yet." /> -->
 
 						<Button id="MainVoteButton" class="vote-button" onactivate="ToggleVoteContainer(true);">
 							<Label class="vote-button-label" text="Change Vote" />
@@ -65,7 +65,7 @@
 
 				<Panel class="description-container">
 					<Panel class="description-background">
-				</Panel>
+					</Panel>
 
 					<Panel class="description-text-container">
 						<Label id="loading-title-text"/>
@@ -143,7 +143,7 @@
 						</Button>
 
 						<!-- Hero Line Wars -->
-<!--
+						<!--
 						<Button class="mod-cell" onactivate="DOTADisplayURL('https://steamcommunity.com/sharedfiles/filedetails/?id=492195751');">
 							<Panel class="mod-image-container">
 								<Image class="mod-image" src="file://panorama/images/custom_game/mods/modlist1.jpg"/>

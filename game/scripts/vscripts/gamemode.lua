@@ -897,6 +897,7 @@ ListenToGameEvent('game_rules_state_change', function(keys)
 	if GameRules:State_Get() == DOTA_GAMERULES_STATE_HERO_SELECTION then
 		-- If no one voted, default to IMBA 10v10 gamemode
 		api:SetCustomGamemode(1)
+		api:SetCustomDifficulty(1)
 
 		if GameMode.VoteTable == nil then return end
 		local votes = GameMode.VoteTable
@@ -941,9 +942,11 @@ ListenToGameEvent('game_rules_state_change', function(keys)
 			-- Act on the winning vote
 			if category == "gamemode" then
 				api:SetCustomGamemode(highest_key)
+			elseif category == "difficulty" then
+				api:SetCustomDifficulty(highest_key)
 			end
 
---			print(category .. ": " .. highest_key)
+			print(category .. ": " .. highest_key)
 		end
 	end
 end, nil)
@@ -960,7 +963,7 @@ donator_list[9] = 3 -- Gaben Donator
 function GameMode:OnSettingVote(keys)
 	local pid = keys.PlayerID
 
---	print(keys)
+	print(keys)
 
 	if not GameMode.VoteTable then GameMode.VoteTable = {} end
 	if not GameMode.VoteTable[keys.category] then GameMode.VoteTable[keys.category] = {} end

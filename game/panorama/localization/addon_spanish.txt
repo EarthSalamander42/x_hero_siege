@@ -166,5 +166,5 @@
 	"vote_difficulty_3" "Difícil: 100% Oro, 90% Exp, 125% Daño."
 	"vote_difficulty_4" "Extremo: 100% Oro, 75% Exp, 150% Daño."
 	"vote_difficulty_5" "Divino: 75% Oro, 60% Exp, 200% Daño."
-	"vote_gamemode" "Votación de Dificultad:"
+	"vote_difficulty" "Votación de Dificultad:"
 }

@@ -897,13 +897,35 @@ function api:SetCustomGamemode(iValue)
 end
 
 function api:GetCustomGamemode()
-	local gamemode = CustomNetTables:GetTableValue("game_options", "gamemode")
+	local value = CustomNetTables:GetTableValue("game_options", "gamemode")
 
-	if gamemode then
-		gamemode = gamemode["1"]
+	if value then
+		value = value["1"]
 	end
 
-	return tonumber(gamemode)
+	return tonumber(value)
+end
+
+function api:SetCustomDifficulty(iValue)
+	if iValue and type(iValue) == "number" then
+		GameRules:SetCustomGameDifficulty(iValue)
+		CustomNetTables:SetTableValue("game_options", "difficulty", {tostring(iValue)})
+	else
+		print("ERROR: Value should be a number, not string.")
+		api:SetCustomDifficulty(tonumber(iValue))
+	end
+
+	return nil
+end
+
+function api:GetCustomDifficulty()
+	local value = CustomNetTables:GetTableValue("game_options", "difficulty")
+
+	if value then
+		value = value["1"]
+	end
+
+	return tonumber(value)
 end
 
 -- Credits: darklord (Dota 12v12)

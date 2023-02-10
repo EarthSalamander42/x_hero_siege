@@ -4,6 +4,7 @@ wisp_pick_random_hero = wisp_pick_random_hero or class({})
 
 function wisp_pick_random_hero:OnSpellStart()
 	if not IsServer() then return end
+	self.caster = self:GetCaster()
 
 	local random = RandomInt(1, #HEROLIST + 1) -- +1 for Weekly hero
 	local IsAvailableHero = Entities:FindByName(nil, "trigger_hero_"..random)
@@ -24,23 +25,23 @@ function wisp_pick_random_hero:OnSpellStart()
 		UTIL_Remove(IsAvailableHero)
 	end
 
-	local particle = ParticleManager:CreateParticle("particles/generic_hero_status/hero_levelup.vpcf", PATTACH_ABSORIGIN_FOLLOW, self:GetCaster(), self:GetCaster())
-	ParticleManager:SetParticleControl(particle, 0, self:GetCaster():GetAbsOrigin())
+	local particle = ParticleManager:CreateParticle("particles/generic_hero_status/hero_levelup.vpcf", PATTACH_ABSORIGIN_FOLLOW, self.caster, self.caster)
+	ParticleManager:SetParticleControl(particle, 0, self.caster:GetAbsOrigin())
 
-	EmitSoundOnClient("ui.trophy_levelup", PlayerResource:GetPlayer(self:GetCaster():GetPlayerID()))
+	EmitSoundOnClient("ui.trophy_levelup", PlayerResource:GetPlayer(self.caster:GetPlayerID()))
 
-	self:GetCaster():AddNewModifier(self:GetCaster(), nil, "modifier_command_restricted", {})
+	self.caster:AddNewModifier(self.caster, nil, "modifier_command_restricted", {})
 
-	Notifications:Bottom(self:GetCaster():GetPlayerOwnerID(), {hero=hero_name, duration = 5.0})
-	Notifications:Bottom(self:GetCaster():GetPlayerOwnerID(), {text="HERO: ", duration = 5.0, style={color="white"}, continue=true})
-	Notifications:Bottom(self:GetCaster():GetPlayerOwnerID(), {text="#npc_dota_hero_"..HEROLIST[random], duration = 5.0, style={color="white"}, continue=true})
+	Notifications:Bottom(self.caster:GetPlayerOwnerID(), {hero=hero_name, duration = 5.0})
+	Notifications:Bottom(self.caster:GetPlayerOwnerID(), {text="HERO: ", duration = 5.0, style={color="white"}, continue=true})
+	Notifications:Bottom(self.caster:GetPlayerOwnerID(), {text="#npc_dota_hero_"..HEROLIST[random], duration = 5.0, style={color="white"}, continue=true})
 
-	local newHero = PlayerResource:ReplaceHeroWith(self:GetCaster():GetPlayerID(), hero_name, STARTING_GOLD[difficulty] * 2, 0)
-	StartingItems(self:GetCaster(), newHero)
+	local newHero = PlayerResource:ReplaceHeroWith(self.caster:GetPlayerID(), hero_name, STARTING_GOLD[difficulty] * 2, 0)
+	StartingItems(self.caster, newHero)
 
 	Timers:CreateTimer(0.1, function()
-		if self and self.GetCaster and IsValidEntity(self:GetCaster()) then
-			UTIL_Remove(self:GetCaster())
+		if self and self.caster and not self.caster:IsNull() then
+			UTIL_Remove(self.caster)
 		end
 	end)
 end

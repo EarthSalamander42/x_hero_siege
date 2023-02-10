@@ -166,5 +166,5 @@
 	"vote_difficulty_3" "Hard: 100% Gold, 90% XP, 125% Damage."
 	"vote_difficulty_4" "Extreme: 100% Gold, 75% XP, 150% Damage."
 	"vote_difficulty_5" "Divine: 75% Gold, 60% XP, 200% Damage."
-	"vote_gamemode" "Difficulty vote:"
+	"vote_difficulty" "Difficulty vote:"
 }
