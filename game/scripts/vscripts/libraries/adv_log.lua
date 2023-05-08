@@ -18,7 +18,6 @@
 --------------------------------------------------------------------------
 
 if Log == nil then
-
 	log = {
 	}
 
@@ -75,7 +74,7 @@ if Log == nil then
 	end
 
 	function Log:_StringSplit(str, pat)
-		local t = {}  -- NOTE: use {n = 0} in Lua-5.0
+		local t = {} -- NOTE: use {n = 0} in Lua-5.0
 		local fpat = "(.-)" .. pat
 		local last_end = 1
 		local s, e, cap = str:find(fpat, 1)
@@ -120,7 +119,6 @@ if Log == nil then
 			local cur_index = 1
 			for k, v in pairs(node) do
 				if (cache[node] == nil) or (cur_index >= cache[node]) then
-
 					if (string.find(output_str, "}", output_str:len())) then
 						output_str = output_str .. ",\n"
 					elseif not (string.find(output_str, "\n", output_str:len())) then
@@ -184,17 +182,14 @@ if Log == nil then
 	end
 
 	function Log:_IsFiltered(target, level, file)
-
 		-- go over each rule
 		for i = 1, #self.config do
 			local rule = self.config[i]
 
 			-- check if matcher matches
 			if string.match(file, rule.matcher) then
-
 				-- check if level is high enough for rule
 				if level >= rule.level then
-
 					-- see if the rule defines this target
 					for j = 1, #rule.targets do
 						if rule.targets[j] == target then
@@ -209,7 +204,6 @@ if Log == nil then
 	end
 
 	function Log:_GetStackTrace(ptr)
-
 		local trace = {}
 
 		-- gather info
@@ -238,7 +232,6 @@ if Log == nil then
 	-- which actually just prepares data and passes them to the configured targets
 	---------------------------------------------
 	function Log:Print(obj, level, traceLevel)
-
 		if traceLevel == nil then
 			traceLevel = 4
 		end
@@ -283,11 +276,12 @@ if Log == nil then
 			local levelString = self:_LevelToString(Log.Levels.ERROR)
 
 			for i = 1, #self.targets do
-				self.targets[i]:print(levelString, "Error occured while executing in safe context: " .. err, self:_GetStackTrace(4))
+				self.targets[i]:print(levelString, "Error occured while executing in safe context: " .. err,
+					self:_GetStackTrace(4))
 			end
 
 			-- ultimate debugging
-			Say(PlayerResource:GetPlayer(0), "Error: " .. err, false)
+			GameRules:SendCustomMessage("Error: " .. err, 0, 0)
 		end, unpack(args))
 
 		return status, err
@@ -323,21 +317,27 @@ if Log == nil then
 	function log.debug(obj)
 		Log:Print(obj, Log.Levels.DEBUG)
 	end
+
 	function log.info(obj)
 		Log:Print(obj, Log.Levels.INFO)
 	end
+
 	function log.warn(obj)
 		Log:Print(obj, Log.Levels.WARN)
 	end
+
 	function log.warning(obj)
 		Log:Print(obj, Log.Levels.WARN)
 	end
+
 	function log.critical(obj)
 		Log:Print(obj, Log.Levels.CRITICAL)
 	end
+
 	function log.crit(obj)
 		Log:Print(obj, Log.Levels.CRITICAL)
 	end
+
 	function log.error(obj)
 		Log:Print(obj, Log.Levels.ERROR)
 	end
@@ -358,7 +358,6 @@ if Log == nil then
 	}
 
 	function ApiLogTarget:print(level, content, trace)
-
 		local trace = ""
 		for i = 1, #trace do
 			trace = trace .. ", " .. json.encode(trace[i])
@@ -380,10 +379,9 @@ if Log == nil then
 		if trace[1]["name"] ~= nil then
 			name = "|" .. trace[1]["name"]
 		end
-		NativePrint("[" .. level .. "][" .. trace[1]["short_src"] .. ":" .. trace[1]["currentline"] .. name .. "] " .. content)
+		NativePrint("[" ..
+		level .. "][" .. trace[1]["short_src"] .. ":" .. trace[1]["currentline"] .. name .. "] " .. content)
 	end
-
-
 
 	-----------------------------------------------------------------
 	-- Overwrite the default print and redirect it to the custom
@@ -393,7 +391,6 @@ if Log == nil then
 	print = nil
 
 	function print(...)
-
 		local args = { ... }
 
 		if #args == 1 then
@@ -415,18 +412,17 @@ if Log == nil then
 
 	function Dynamic_Wrap(mt, name)
 		-- testing nil value fix on line "return mt[name](unpack(args))" [NOT WORKING]
---		if mt == nil or name == nil then return end
+		--		if mt == nil or name == nil then return end
 
 		local function wrapper(...)
-
 			local args = { ... }
 
 			-- Very rare issue! if this line appears:
 			-- [error][[C]:-1|xpcall] Error occured while executing in safe context: scripts\vscripts\libraries\adv_log.lua:423: attempt to call a nil value
 			-- uncomment prints and check what's wrong
---			print(mt, name, args)
---			print(mt[name])
---			print(mt[name](unpack(args)))
+			--			print(mt, name, args)
+			--			print(mt[name])
+			--			print(mt[name](unpack(args)))
 
 			local status, v = safe(function()
 				return mt[name](unpack(args))
@@ -492,10 +488,8 @@ if Log == nil then
 	}
 
 	function AdvLogRegisterLuaModifier(modifier)
-
 		-- check if a covered function is defined
 		for _, name in pairs(coveredByProxy) do
-
 			print("Checking modifier for " .. name)
 
 			if modifier[name] ~= nil then

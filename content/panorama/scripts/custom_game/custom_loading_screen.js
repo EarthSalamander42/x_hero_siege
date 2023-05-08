@@ -155,6 +155,7 @@ function fetch() {
 	}
 
 	game_options = CustomNetTables.GetTableValue("game_options", "game_version");
+	// $.Msg(game_options.game_type)
 	if (game_options == undefined) {
 		$.Schedule(0.1, fetch);
 		return;
@@ -180,6 +181,8 @@ function fetch() {
 
 	view.title.text = $.Localize("#addon_game_name") + " " + game_version;
 	view.subtitle.text = $.Localize("#game_version_name").toUpperCase();
+
+	$.Msg($.Localize("lang"))
 
 	api.getLoadingScreenMessage(function (data) {
 		var found_lang = false;
@@ -233,12 +236,15 @@ function AllPlayersLoaded() {
 	if (Game.IsInToolsMode())
 		vote_parent.RemoveAndDeleteChildren();
 
-	$.Msg(vote_array["XHS"])
-	// for (var j in vote_array[game_options.game_type]) {
-	for (var j in vote_array["XHS"]) {
+	if (!game_options || !game_options.game_type) {
+		$.Schedule(0.1, AllPlayersLoaded);
+		return;
+	}
+
+	// $.Msg(vote_array["XHS"])
+	for (var j in vote_array[game_options.game_type]) {
 		const vote_type = j;
-		// const vote_count = vote_array[game_options.game_type][j];
-		const vote_count = vote_array["XHS"][j];
+		const vote_count = vote_array[game_options.game_type][j];
 		const panel = $.CreatePanel("Panel", vote_parent, "vote_" + vote_type);
 		panel.AddClass("vote-select-panel-container");
 		// panel.AddClass("VotePanel");

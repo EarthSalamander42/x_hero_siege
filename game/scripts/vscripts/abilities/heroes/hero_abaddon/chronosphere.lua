@@ -3,8 +3,10 @@
 ----------------------------------------------------------------
 if creature_chronosphere == nil then creature_chronosphere = class({}) end
 
-LinkLuaModifier("modifier_creature_chronosphere_aura", "abilities/heroes/hero_abaddon/chronosphere.lua", LUA_MODIFIER_MOTION_NONE)		-- Aura - Handle applier
-LinkLuaModifier("modifier_creature_chronosphere_handler", "abilities/heroes/hero_abaddon/chronosphere.lua", LUA_MODIFIER_MOTION_NONE)	-- Handler
+LinkLuaModifier("modifier_creature_chronosphere_aura", "abilities/heroes/hero_abaddon/chronosphere.lua",
+	LUA_MODIFIER_MOTION_NONE)                                                                                                         -- Aura - Handle applier
+LinkLuaModifier("modifier_creature_chronosphere_handler", "abilities/heroes/hero_abaddon/chronosphere.lua",
+	LUA_MODIFIER_MOTION_NONE)                                                                                                         -- Handler
 
 function creature_chronosphere:OnSpellStart()
 	local caster = self:GetCaster()
@@ -21,7 +23,7 @@ function creature_chronosphere:OnSpellStart()
 	local mod = CreateModifierThinker(caster,
 		self,
 		"modifier_creature_chronosphere_aura",
-		{duration = duration},
+		{ duration = duration },
 		chrono_center,
 		caster:GetTeamNumber(),
 		false
@@ -37,8 +39,11 @@ end
 if modifier_creature_chronosphere_aura == nil then modifier_creature_chronosphere_aura = class({}) end
 
 function modifier_creature_chronosphere_aura:IsPurgable() return false end
+
 function modifier_creature_chronosphere_aura:IsHidden() return true end
+
 function modifier_creature_chronosphere_aura:IsAura() return true end
+
 function modifier_creature_chronosphere_aura:IsNetherWardStealable() return false end
 
 function modifier_creature_chronosphere_aura:GetAuraDuration()
@@ -79,7 +84,9 @@ function modifier_creature_chronosphere_aura:OnCreated()
 		self.parent = self:GetParent()
 		self.base_radius = self.ability:GetSpecialValueFor("base_radius")
 
-		local particle = ParticleManager:CreateParticle("particles/units/heroes/hero_faceless_void/faceless_void_chronosphere_red.vpcf", PATTACH_WORLDORIGIN, self.parent, self.caster)
+		local particle = ParticleManager:CreateParticle(
+		"particles/units/heroes/hero_faceless_void/faceless_void_chronosphere_red.vpcf", PATTACH_WORLDORIGIN, self
+		.parent, self.caster)
 		ParticleManager:SetParticleControl(particle, 0, self.parent:GetAbsOrigin())
 		ParticleManager:SetParticleControl(particle, 1, Vector(self.base_radius, self.base_radius, self.base_radius))
 		self:AddParticle(particle, false, false, -1, false, false)
@@ -92,7 +99,9 @@ end
 if modifier_creature_chronosphere_handler == nil then modifier_creature_chronosphere_handler = class({}) end
 
 function modifier_creature_chronosphere_handler:IsHidden() return true end
+
 function modifier_creature_chronosphere_handler:IsPurgable() return false end
+
 function modifier_creature_chronosphere_handler:GetAttributes() return MODIFIER_ATTRIBUTE_MULTIPLE end
 
 -- Utilizes the stack system to work
@@ -113,7 +122,7 @@ end
 function modifier_creature_chronosphere_handler:OnCreated()
 	if IsServer() then
 		self.parent = self:GetParent()
-		self.caster = self:GetCaster()		
+		self.caster = self:GetCaster()
 		self.projectile_speed = self.parent:GetProjectileSpeed()
 
 		if self.parent == self.caster or self.parent:GetPlayerOwner() == self.caster:GetPlayerOwner() then
@@ -126,14 +135,13 @@ end
 
 function modifier_creature_chronosphere_handler:OnIntervalThink()
 	if IsServer() then
-	
-		self.projectile_speed	= 0
-		self.projectile_speed	= self.parent:GetProjectileSpeed()
-		
+		self.projectile_speed = 0
+		self.projectile_speed = self.parent:GetProjectileSpeed()
+
 		-- Normal frozen enemy gets interrupted all the time
 		if self:GetStackCount() == 0 then
 			-- Make certain people are stunned
-			self.parent:AddNewModifier(self.caster, self:GetAbility(), "modifier_stunned", {duration = FrameTime()})
+			self.parent:AddNewModifier(self.caster, self:GetAbility(), "modifier_stunned", { duration = FrameTime() })
 
 			-- Non-IMBA handling
 			self.parent:InterruptMotionControllers(true)
@@ -141,14 +149,16 @@ function modifier_creature_chronosphere_handler:OnIntervalThink()
 	end
 end
 
-function modifier_creature_chronosphere_handler:CheckState() return {
-	[MODIFIER_STATE_FROZEN] = true,
-	[MODIFIER_STATE_ROOTED] = true,
-	[MODIFIER_STATE_STUNNED] = true,
-	[MODIFIER_STATE_SILENCED] = true,
-	[MODIFIER_STATE_INVISIBLE] = false,
-	[MODIFIER_STATE_NO_UNIT_COLLISION] = true
-} end
+function modifier_creature_chronosphere_handler:CheckState()
+	return {
+		[MODIFIER_STATE_FROZEN] = true,
+		[MODIFIER_STATE_ROOTED] = true,
+		[MODIFIER_STATE_STUNNED] = true,
+		[MODIFIER_STATE_SILENCED] = true,
+		[MODIFIER_STATE_INVISIBLE] = false,
+		[MODIFIER_STATE_NO_UNIT_COLLISION] = true
+	}
+end
 
 function modifier_creature_chronosphere_handler:GetPriority()
 	return MODIFIER_PRIORITY_HIGH
@@ -156,7 +166,7 @@ end
 
 function modifier_creature_chronosphere_handler:DeclareFunctions()
 	return {
-		MODIFIER_PROPERTY_MOVESPEED_MAX,
+		MODIFIER_PROPERTY_IGNORE_MOVESPEED_LIMIT,
 		MODIFIER_PROPERTY_MOVESPEED_ABSOLUTE,
 		MODIFIER_PROPERTY_CASTTIME_PERCENTAGE,
 		MODIFIER_PROPERTY_PROJECTILE_SPEED_BONUS,
@@ -165,8 +175,8 @@ function modifier_creature_chronosphere_handler:DeclareFunctions()
 	}
 end
 
-function modifier_creature_chronosphere_handler:GetModifierMoveSpeed_Max()
-	return self:GetAbility():GetSpecialValueFor("movement_speed")
+function modifier_creature_chronosphere_handler:GetModifierIgnoreMovespeedLimit()
+	return true
 end
 
 -- #3 TALENT: Void gains infinite movement speed in Chrono

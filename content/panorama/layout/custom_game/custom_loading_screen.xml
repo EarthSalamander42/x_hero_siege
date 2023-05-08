@@ -74,7 +74,7 @@
 
 						<Label id="loading-description-text" />
 
-						<Button class="vote-button" onactivate="DOTADisplayURL('https://frostrose-studio.com')">
+						<Button class="vote-button" onactivate="DOTADisplayURL('https://mods.frostrose-studio.com')">
 							<Label class="vote-button-label" text="#loading_screen_button" />
 						</Button>
 					</Panel>

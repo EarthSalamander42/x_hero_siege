@@ -1,26 +1,29 @@
-function pulse_nova_start( keys )
+function pulse_nova_start(keys)
     local caster = keys.caster
     local ability = keys.ability
 
     local mana_per_sec = ability:GetLevelSpecialValueFor("mana_cost_per_second", ability:GetLevel() - 1)
     local nova_tick = ability:GetLevelSpecialValueFor("nova_tick", ability:GetLevel() - 1)
 
-    pulse_nova_take_mana({caster=caster,
-                        ability=ability,
-                        mana_per_sec=mana_per_sec,
-                        nova_tick=nova_tick})
+    pulse_nova_take_mana({
+        caster = caster,
+        ability = ability,
+        mana_per_sec = mana_per_sec,
+        nova_tick = nova_tick
+    })
 end
 
-function pulse_nova_take_mana( params )
+function pulse_nova_take_mana(params)
     if params.ability:GetToggleState() == false then
         return
     end
 
-    params.caster:ReduceMana(params.mana_per_sec)
+    params.caster:ReduceMana(params.mana_per_sec, params.ability)
+
     if params.caster:GetMana() < params.mana_per_sec then
         params.ability:ToggleAbility()
     end
-    
+
     Timers:CreateTimer(params.nova_tick,
         function()
             pulse_nova_take_mana(params)
@@ -28,7 +31,7 @@ function pulse_nova_take_mana( params )
     )
 end
 
-function pulse_nova_stop( keys )
+function pulse_nova_stop(keys)
     local caster = keys.caster
     local sound = "Hero_Leshrac.Pulse_Nova"
 

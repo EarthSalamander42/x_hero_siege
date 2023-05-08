@@ -2,7 +2,7 @@ ListenToGameEvent('game_rules_state_change', function()
 	local newState = GameRules:State_Get()
 
 	if newState == DOTA_GAMERULES_STATE_CUSTOM_GAME_SETUP then
-		for playerID = 0, PlayerResource:GetPlayerCount() -1 do
+		for playerID = 0, PlayerResource:GetPlayerCount() - 1 do
 			if PlayerResource:IsValidPlayer(playerID) then
 				PlayerResource:SetCustomPlayerColor(playerID, PLAYER_COLORS[playerID][1], PLAYER_COLORS[playerID][2], PLAYER_COLORS[playerID][3])
 			end
@@ -11,19 +11,19 @@ ListenToGameEvent('game_rules_state_change', function()
 		Timers:CreateTimer(3.0, function()
 			EmitSoundOn("Global.InGame", base_good)
 
---			if BOTS_ENABLED == true then
---			if IsInToolsMode() then
---				SendToServerConsole('sm_gmode 1')
---				SendToServerConsole('dota_bot_populate')
---			end
+			--			if BOTS_ENABLED == true then
+			--			if IsInToolsMode() then
+			--				SendToServerConsole('sm_gmode 1')
+			--				SendToServerConsole('dota_bot_populate')
+			--			end
 
---			if base_bad then
---				EmitSoundOn("Global.InGame", base_bad)
---			end
+			--			if base_bad then
+			--				EmitSoundOn("Global.InGame", base_bad)
+			--			end
 		end)
 	elseif newState == DOTA_GAMERULES_STATE_HERO_SELECTION then
 		-- crash game (since 7.23)
---		GameRules:GetGameModeEntity():SetItemAddedToInventoryFilter(Dynamic_Wrap(GameMode, "ItemAddedFilter"), GameMode)
+		--		GameRules:GetGameModeEntity():SetItemAddedToInventoryFilter(Dynamic_Wrap(GameMode, "ItemAddedFilter"), GameMode)
 
 		require('zones/dialog_xhs')
 		require('zones/zone_tables_xhs')
@@ -31,20 +31,20 @@ ListenToGameEvent('game_rules_state_change', function()
 		Gold:Init()
 
 		for i = 1, 8 do
-			DoEntFire("door_lane"..i, "SetAnimation", "gate_02_close", 0, nil, nil)
+			DoEntFire("door_lane" .. i, "SetAnimation", "gate_02_close", 0, nil, nil)
 		end
 
 		if GetMapName() ~= "x_hero_siege_demo" then
 			-- debug
---			if IsInToolsMode() then
-				Entities:FindByName(nil, "trigger_special_event_tp_off"):Disable()
-				Entities:FindByName(nil, "trigger_special_event"):Enable()
---			end
+			--			if IsInToolsMode() then
+			Entities:FindByName(nil, "trigger_special_event_tp_off"):Disable()
+			Entities:FindByName(nil, "trigger_special_event"):Enable()
+			--			end
 		end
 
-		local diff = {"Easy", "Normal", "Hard", "Extreme", "Divine"}
-		local lanes = {"Simple", "Double", "Full"}
-		local Color = {"green", "Yellow", "orange", "red", "darkred"}
+		local diff = { "Easy", "Normal", "Hard", "Extreme", "Divine" }
+		local lanes = { "Simple", "Double", "Full" }
+		local Color = { "green", "Yellow", "orange", "red", "darkred" }
 
 		CustomNetTables:SetTableValue("game_options", "game_info", {
 			difficulty = diff[GameRules:GetCustomGameDifficulty()],
@@ -52,8 +52,8 @@ ListenToGameEvent('game_rules_state_change', function()
 
 		Timers:CreateTimer(3.0, function()
 			CustomGameEventManager:Send_ServerToAllClients("show_timer_bar", {})
-			CustomGameEventManager:Send_ServerToAllClients("game_difficulty", {difficulty = diff[GameRules:GetCustomGameDifficulty()]})
-			Notifications:TopToAll({text="DIFFICULTY: "..diff[GameRules:GetCustomGameDifficulty()], color = Color[GameRules:GetCustomGameDifficulty()], duration=10.0})
+			CustomGameEventManager:Send_ServerToAllClients("game_difficulty", { difficulty = diff[GameRules:GetCustomGameDifficulty()] })
+			Notifications:TopToAll({ text = "DIFFICULTY: " .. diff[GameRules:GetCustomGameDifficulty()], color = Color[GameRules:GetCustomGameDifficulty()], duration = 10.0 })
 			SpawnBosses()
 		end)
 
@@ -69,7 +69,7 @@ ListenToGameEvent('game_rules_state_change', function()
 	if newState == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
 		print("OnGameRulesStateChange: Game In Progress")
 
---		ModifyLanes()
+		--		ModifyLanes()
 
 		local ice_towers = Entities:FindAllByName("npc_tower_death")
 		for _, tower in pairs(ice_towers) do
@@ -77,36 +77,40 @@ ListenToGameEvent('game_rules_state_change', function()
 		end
 
 		for TW = 1, 2 do
-			local ice_towers_main = Entities:FindByName(nil, "npc_tower_cold_"..TW)
+			local ice_towers_main = Entities:FindByName(nil, "npc_tower_cold_" .. TW)
 			ice_towers_main:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
 			ice_towers_main.zone = "xhs_holdout"
 		end
+		print("Ice towers setup")
 
 		-- Make towers invulnerable again
 		for Players = 1, 8 do
-			local towers = Entities:FindAllByName("dota_badguys_tower"..Players)
+			local towers = Entities:FindAllByName("dota_badguys_tower" .. Players)
 			for _, tower in pairs(towers) do
 				tower:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
 			end
-			local raxes = Entities:FindAllByName("dota_badguys_barracks_"..Players)
+			local raxes = Entities:FindAllByName("dota_badguys_barracks_" .. Players)
 			for _, rax in pairs(raxes) do
 				rax.zone = "xhs_holdout"
 				rax:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
 			end
 		end
+		print("Towers setup")
 
 		for NumPlayers = 1, PlayerResource:GetPlayerCount() * CREEP_LANES_TYPE do
 			CREEP_LANES[NumPlayers][1] = 1
-			local DoorObs = Entities:FindAllByName("obstruction_lane"..NumPlayers)
+			local DoorObs = Entities:FindAllByName("obstruction_lane" .. NumPlayers)
 			for _, obs in pairs(DoorObs) do
 				obs:SetEnabled(false, true)
 			end
-			DoEntFire("door_lane"..NumPlayers, "SetAnimation", "gate_02_open", 0, nil, nil)
-			local towers = Entities:FindAllByName("dota_badguys_tower"..NumPlayers)
+			DoEntFire("door_lane" .. NumPlayers, "SetAnimation", "gate_02_open", 0, nil, nil)
+			local towers = Entities:FindAllByName("dota_badguys_tower" .. NumPlayers)
 			for _, tower in pairs(towers) do
 				tower:RemoveModifierByName("modifier_invulnerable")
 			end
 		end
+
+		print("Lanes setup")
 	end
 end, nil)
 
@@ -121,7 +125,6 @@ ListenToGameEvent('player_disconnect', function(keys)
 --	CloseLane(userid)
 end, nil)
 --]]
-
 -- An NPC has spawned somewhere in game. This includes heroes
 ListenToGameEvent('npc_spawned', function(keys)
 	local difficulty = GameRules:GetCustomGameDifficulty()
@@ -149,7 +152,7 @@ ListenToGameEvent('npc_spawned', function(keys)
 		if npc:GetTeamNumber() ~= 2 or npc:GetUnitName() == "npc_dota_creature_muradin_bronzebeard" then
 			local ai_state = npc:GetKeyValue("UseAI")
 			if ai_state then
-				npc:AddNewModifier(npc, nil, "modifier_ai", {state = ai_state})
+				npc:AddNewModifier(npc, nil, "modifier_ai", { state = ai_state })
 			end
 		end
 
@@ -191,7 +194,7 @@ ListenToGameEvent('npc_spawned', function(keys)
 					npc.CurrentZoneName = nil
 					GameMode:OnPlayerHeroEnteredZone(npc, "xhs_holdout")
 					npc.ankh_respawn = false
---					npc:AddNewModifier(npc, nil, "modifier_hero", {})
+					--					npc:AddNewModifier(npc, nil, "modifier_hero", {})
 				end
 			elseif npc.bFirstSpawnComplete == true then
 				if npc:GetUnitName() == "npc_dota_hero_chaos_knight" or npc:GetUnitName() == "npc_dota_hero_keeper_of_the_light" then
@@ -206,7 +209,7 @@ ListenToGameEvent('npc_spawned', function(keys)
 					end)
 					--debug
 					if hero_level == 17 then
-						npc:SetAbilityPoints(npc:GetAbilityPoints()-1)
+						npc:SetAbilityPoints(npc:GetAbilityPoints() - 1)
 					elseif hero_level >= 20 then
 						local ability = npc:FindAbilityByName("holdout_war_club_20")
 						npc:RemoveModifierByName("modifier_item_ultimate_scepter_consumed")
@@ -222,35 +225,35 @@ ListenToGameEvent('npc_spawned', function(keys)
 		-- CREATURES NPC
 		if not npc:IsRealHero() and (npc:GetTeamNumber() == DOTA_TEAM_CUSTOM_1 or npc:GetTeamNumber() == DOTA_TEAM_CUSTOM_2 or npc:GetTeamNumber() == DOTA_TEAM_NEUTRALS) then
 			if difficulty == 1 then
-				npc:SetMinimumGoldBounty(normal_bounty*1.5)
-				npc:SetMaximumGoldBounty(normal_bounty*1.5)
-				npc:SetDeathXP(normal_xp*1.25)
-				npc:SetBaseDamageMin(normal_min_damage*0.75)
-				npc:SetBaseDamageMax(normal_max_damage*0.75)
+				npc:SetMinimumGoldBounty(normal_bounty * 1.5)
+				npc:SetMaximumGoldBounty(normal_bounty * 1.5)
+				npc:SetDeathXP(normal_xp * 1.25)
+				npc:SetBaseDamageMin(normal_min_damage * 0.75)
+				npc:SetBaseDamageMax(normal_max_damage * 0.75)
 			elseif difficulty == 2 then
-				npc:SetMinimumGoldBounty(normal_bounty*1.1)
-				npc:SetMaximumGoldBounty(normal_bounty*1.1)
+				npc:SetMinimumGoldBounty(normal_bounty * 1.1)
+				npc:SetMaximumGoldBounty(normal_bounty * 1.1)
 				npc:SetDeathXP(normal_xp)
 				npc:SetBaseDamageMin(normal_min_damage)
 				npc:SetBaseDamageMax(normal_max_damage)
 			elseif difficulty == 3 then
 				npc:SetMinimumGoldBounty(normal_bounty)
 				npc:SetMaximumGoldBounty(normal_bounty)
-				npc:SetDeathXP(normal_xp*0.9)
-				npc:SetBaseDamageMin(normal_min_damage*1.25)
-				npc:SetBaseDamageMax(normal_max_damage*1.25)
+				npc:SetDeathXP(normal_xp * 0.9)
+				npc:SetBaseDamageMin(normal_min_damage * 1.25)
+				npc:SetBaseDamageMax(normal_max_damage * 1.25)
 			elseif difficulty == 4 then
 				npc:SetMinimumGoldBounty(normal_bounty)
 				npc:SetMaximumGoldBounty(normal_bounty)
-				npc:SetDeathXP(normal_xp*0.75)
-				npc:SetBaseDamageMin(normal_min_damage*1.5)
-				npc:SetBaseDamageMax(normal_max_damage*1.5)
+				npc:SetDeathXP(normal_xp * 0.75)
+				npc:SetBaseDamageMin(normal_min_damage * 1.5)
+				npc:SetBaseDamageMax(normal_max_damage * 1.5)
 			elseif difficulty == 5 then
-				npc:SetMinimumGoldBounty(normal_bounty*0.75)
-				npc:SetMaximumGoldBounty(normal_bounty*0.75)
-				npc:SetDeathXP(normal_xp*0.60)
-				npc:SetBaseDamageMin(normal_min_damage*2.0)
-				npc:SetBaseDamageMax(normal_max_damage*2.0)
+				npc:SetMinimumGoldBounty(normal_bounty * 0.75)
+				npc:SetMaximumGoldBounty(normal_bounty * 0.75)
+				npc:SetDeathXP(normal_xp * 0.60)
+				npc:SetBaseDamageMin(normal_min_damage * 2.0)
+				npc:SetBaseDamageMax(normal_max_damage * 2.0)
 			end
 
 			-- Cycle through any innate abilities found, then upgrade them
@@ -306,7 +309,7 @@ function GameMode:OnItemPurchased(keys)
 	if not plyID then return end
 
 	-- The name of the item purchased
-	local itemName = keys.itemname 
+	local itemName = keys.itemname
 	
 	-- The cost of the item purchased
 	local itemcost = keys.itemcost
@@ -334,17 +337,16 @@ function GameMode:OnPlayerChangedName(keys)
 end
 
 --]]
-
 ListenToGameEvent('dota_player_learned_ability', function(keys)
-local player = EntIndexToHScript(keys.player)
-local hero = player:GetAssignedHero()
-local abilityname = keys.abilityname
-local ability = hero:FindAbilityByName(abilityname)
+	local player = EntIndexToHScript(keys.player)
+	local hero = player:GetAssignedHero()
+	local abilityname = keys.abilityname
+	local ability = hero:FindAbilityByName(abilityname)
 
 	if hero:GetUnitName() == "npc_dota_hero_doom_bringer" then
 		if ability:GetAbilityIndex() == 3 or ability:GetAbilityIndex() == 4 then
-			ability:SetLevel(ability:GetLevel() -1)
-			hero:SetAbilityPoints(hero:GetAbilityPoints() +1)
+			ability:SetLevel(ability:GetLevel() - 1)
+			hero:SetAbilityPoints(hero:GetAbilityPoints() + 1)
 			SendErrorMessage(hero:GetPlayerID(), "#error_cant_lvlup")
 		end
 	elseif hero:GetUnitName() == "npc_dota_hero_lone_druid" then
@@ -352,7 +354,7 @@ local ability = hero:FindAbilityByName(abilityname)
 			local Bears = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_ALL, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, 0, false)
 			for _, Bear in pairs(Bears) do
 				for number = 1, 7 do
-					if Bear and Bear:GetUnitName() == "npc_dota_lone_druid_bear"..number then
+					if Bear and Bear:GetUnitName() == "npc_dota_lone_druid_bear" .. number then
 						Bear.ankh_respawn = true
 						Timers:CreateTimer(0.03, function()
 							Bear.ankh_respawn = false
@@ -371,7 +373,6 @@ function GameMode:OnAbilityChannelFinished(keys)
 	local interrupted = keys.interrupted == 1
 end
 --]]
-
 ListenToGameEvent('dota_player_gained_level', function(keys)
 	local player = EntIndexToHScript(keys.player)
 	local level = keys.level
@@ -483,7 +484,7 @@ ListenToGameEvent('dota_player_gained_level', function(keys)
 			hero:RemoveAbility("ability_capture")
 		end
 
-		for i = 0, 17 do 
+		for i = 0, 17 do
 			local ability = hero:GetAbilityByIndex(i)
 
 			if IsValidEntity(ability) then
@@ -498,21 +499,21 @@ ListenToGameEvent('dota_player_gained_level', function(keys)
 		if AbilitiesHeroes_XX[hero:GetUnitName()] then
 			print("Whisper Level 20 Ability")
 			hero.lvl_20 = true
-			Notifications:Bottom(hero:GetPlayerOwnerID(), {text="You've reached level 20. Check out your new abilities! ",duration = 10})
+			Notifications:Bottom(hero:GetPlayerOwnerID(), { text = "You've reached level 20. Check out your new abilities! ", duration = 10 })
 			for _, ability in pairs(AbilitiesHeroes_XX[hero:GetUnitName()]) do
 				if ability ~= nil then
-					Notifications:Bottom(hero:GetPlayerOwnerID(), {ability=ability[1] ,continue=true})
+					Notifications:Bottom(hero:GetPlayerOwnerID(), { ability = ability[1], continue = true })
 					hero:AddAbility(ability[1])
 					hero:UpgradeAbility(hero:FindAbilityByName(ability[1]))
 					local oldab = hero:GetAbilityByIndex(ability[2])
-					if oldab:GetAutoCastState() then 
+					if oldab:GetAutoCastState() then
 						oldab:ToggleAutoCast()
 					end
-					hero:SwapAbilities(oldab:GetName(),ability[1],true,true)
+					hero:SwapAbilities(oldab:GetName(), ability[1], true, true)
 				end
 			end
 		else
-			print("No Level 20 Ability")			
+			print("No Level 20 Ability")
 		end
 	end
 end, nil)
@@ -555,7 +556,7 @@ function GameMode:OnItemCombined(keys)
 local plyID = keys.PlayerID
 if not plyID then return end
 local player = PlayerResource:GetPlayer(plyID)
-local itemName = keys.itemname 
+local itemName = keys.itemname
 local itemcost = keys.itemcost
 end
 
@@ -590,7 +591,6 @@ local npc = EntIndexToHScript(keys.npc_entindex)
 end
 
 --]]
-
 ListenToGameEvent("player_chat", function(keys)
 	local teamonly = keys.teamonly
 	local userID = keys.playerid
@@ -601,68 +601,68 @@ ListenToGameEvent("player_chat", function(keys)
 
 	for str in string.gmatch(text, "%S+") do
 		if donator_level == 1 or donator_level == 2 or donator_level == 3 or IsInToolsMode() then
-			for Frozen = 0, PlayerResource:GetPlayerCount() -1 do
-				local PlayerNames = {"Red", "Blue", "Cyan", "Purple", "Yellow", "Orange", "Green", "Pink"}
+			for Frozen = 0, PlayerResource:GetPlayerCount() - 1 do
+				local PlayerNames = { "Red", "Blue", "Cyan", "Purple", "Yellow", "Orange", "Green", "Pink" }
 				if PlayerResource:IsValidPlayer(Frozen) then
-					if str == "-freeze_"..Frozen +1 then
+					if str == "-freeze_" .. Frozen + 1 then
 						local hero = PlayerResource:GetPlayer(Frozen):GetAssignedHero()
 						hero:AddNewModifier(nil, nil, "modifier_pause_creeps", {})
 						hero:AddNewModifier(nil, nil, "modifier_invulnerable", {})
 						PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
-						Notifications:TopToAll({text="[ADMIN MOD]: ", duration=6.0, style={color="red", ["font-size"]="30px"}})
-						Notifications:TopToAll({text=PlayerNames[Frozen +1].." ", style={color=PlayerNames[Frozen +1], ["font-size"]="25px"}, continue=true})
-						Notifications:TopToAll({text="player has been jailed!", style={color="white", ["font-size"]="25px"}, continue=true})
+						Notifications:TopToAll({ text = "[ADMIN MOD]: ", duration = 6.0, style = { color = "red", ["font-size"] = "30px" } })
+						Notifications:TopToAll({ text = PlayerNames[Frozen + 1] .. " ", style = { color = PlayerNames[Frozen + 1], ["font-size"] = "25px" }, continue = true })
+						Notifications:TopToAll({ text = "player has been jailed!", style = { color = "white", ["font-size"] = "25px" }, continue = true })
 					end
-					if str == "-unfreeze_"..Frozen +1 then
+					if str == "-unfreeze_" .. Frozen + 1 then
 						local hero = PlayerResource:GetPlayer(Frozen):GetAssignedHero()
 						hero:RemoveModifierByName("modifier_pause_creeps")
 						hero:RemoveModifierByName("modifier_pause_creeps")
 						hero:RemoveModifierByName("modifier_invulnerable")
 						hero:RemoveModifierByName("modifier_command_restricted")
 						PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
-						Notifications:TopToAll({text="[ADMIN MOD]: ", duration=6.0, style={color="red", ["font-size"]="30px"}})
-						Notifications:TopToAll({text=PlayerNames[Frozen +1].." ", style={color=PlayerNames[Frozen +1], ["font-size"]="25px"}, continue=true})
-						Notifications:TopToAll({text="player has been released!", style={color="white", ["font-size"]="25px"}, continue=true})
+						Notifications:TopToAll({ text = "[ADMIN MOD]: ", duration = 6.0, style = { color = "red", ["font-size"] = "30px" } })
+						Notifications:TopToAll({ text = PlayerNames[Frozen + 1] .. " ", style = { color = PlayerNames[Frozen + 1], ["font-size"] = "25px" }, continue = true })
+						Notifications:TopToAll({ text = "player has been released!", style = { color = "white", ["font-size"] = "25px" }, continue = true })
 					end
-					if str == "-kill_"..Frozen +1 then
+					if str == "-kill_" .. Frozen + 1 then
 						local hero = PlayerResource:GetPlayer(Frozen):GetAssignedHero()
 						if hero:IsAlive() then
 							hero:ForceKill(true)
-							Notifications:TopToAll({text="[ADMIN MOD]: ", duration=6.0, style={color="red", ["font-size"]="30px"}})
-							Notifications:TopToAll({text=PlayerNames[Frozen +1].." ", style={color=PlayerNames[Frozen +1], ["font-size"]="25px"}, continue=true})
-							Notifications:TopToAll({text="player has been slayed!", style={color="white", ["font-size"]="25px"}, continue=true})
+							Notifications:TopToAll({ text = "[ADMIN MOD]: ", duration = 6.0, style = { color = "red", ["font-size"] = "30px" } })
+							Notifications:TopToAll({ text = PlayerNames[Frozen + 1] .. " ", style = { color = PlayerNames[Frozen + 1], ["font-size"] = "25px" }, continue = true })
+							Notifications:TopToAll({ text = "player has been slayed!", style = { color = "white", ["font-size"] = "25px" }, continue = true })
 						end
 					end
-					if str == "-revive_"..Frozen +1 then
+					if str == "-revive_" .. Frozen + 1 then
 						local hero = PlayerResource:GetPlayer(Frozen):GetAssignedHero()
 						hero:RespawnHero(false, false)
-						Notifications:TopToAll({text="[ADMIN MOD]: ", duration=6.0, style={color="red", ["font-size"]="30px"}})
-						Notifications:TopToAll({text=PlayerNames[Frozen +1].." ", style={color=PlayerNames[Frozen +1], ["font-size"]="25px"}, continue=true})
-						Notifications:TopToAll({text="player has been revived!", style={color="white", ["font-size"]="25px"}, continue=true})
+						Notifications:TopToAll({ text = "[ADMIN MOD]: ", duration = 6.0, style = { color = "red", ["font-size"] = "30px" } })
+						Notifications:TopToAll({ text = PlayerNames[Frozen + 1] .. " ", style = { color = PlayerNames[Frozen + 1], ["font-size"] = "25px" }, continue = true })
+						Notifications:TopToAll({ text = "player has been revived!", style = { color = "white", ["font-size"] = "25px" }, continue = true })
 					end
-					if str == "-yolo_"..Frozen +1 then
+					if str == "-yolo_" .. Frozen + 1 then
 						local hero = PlayerResource:GetPlayer(Frozen):GetAssignedHero()
 						hero:SetMoveCapability(DOTA_UNIT_CAP_MOVE_FLY)
-						StartAnimation(hero, {duration = 9999.0, activity = ACT_DOTA_FLAIL, rate = 0.9})
+						StartAnimation(hero, { duration = 9999.0, activity = ACT_DOTA_FLAIL, rate = 0.9 })
 						yolo = ParticleManager:CreateParticle("particles/units/heroes/hero_batrider/batrider_firefly_ember.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
 						ParticleManager:SetParticleControl(yolo, 0, hero:GetAbsOrigin() + Vector(0, 0, 100))
 						yolo2 = ParticleManager:CreateParticle("particles/units/heroes/hero_ember_spirit/ember_spirit_flameguard.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
 						hero:EmitSound("Hero_Batrider.Firefly.Cast")
 						hero:EmitSound("Hero_Batrider.Firefly.Loop")
-						Notifications:TopToAll({text="[ADMIN MOD]: ", duration=6.0, style={color="red", ["font-size"]="30px"}})
-						Notifications:TopToAll({text=PlayerNames[Frozen +1].." ", style={color=PlayerNames[Frozen +1], ["font-size"]="25px"}, continue=true})
-						Notifications:TopToAll({text="player is in YOLO state!", style={color="white", ["font-size"]="25px"}, continue=true})
+						Notifications:TopToAll({ text = "[ADMIN MOD]: ", duration = 6.0, style = { color = "red", ["font-size"] = "30px" } })
+						Notifications:TopToAll({ text = PlayerNames[Frozen + 1] .. " ", style = { color = PlayerNames[Frozen + 1], ["font-size"] = "25px" }, continue = true })
+						Notifications:TopToAll({ text = "player is in YOLO state!", style = { color = "white", ["font-size"] = "25px" }, continue = true })
 					end
-					if str == "-unyolo_"..Frozen +1 then
+					if str == "-unyolo_" .. Frozen + 1 then
 						local hero = PlayerResource:GetPlayer(Frozen):GetAssignedHero()
 						hero:SetMoveCapability(DOTA_UNIT_CAP_MOVE_GROUND)
 						EndAnimation(hero)
 						hero:StopSound("Hero_Batrider.Firefly.Loop")
 						ParticleManager:DestroyParticle(yolo, true)
 						ParticleManager:DestroyParticle(yolo2, true)
-						Notifications:TopToAll({text="[ADMIN MOD]: ", duration=6.0, style={color="red", ["font-size"]="30px"}})
-						Notifications:TopToAll({text=PlayerNames[Frozen +1].." ", style={color=PlayerNames[Frozen +1], ["font-size"]="25px"}, continue=true})
-						Notifications:TopToAll({text="player is not in YOLO state anymore.", style={color="white", ["font-size"]="25px"}, continue=true})
+						Notifications:TopToAll({ text = "[ADMIN MOD]: ", duration = 6.0, style = { color = "red", ["font-size"] = "30px" } })
+						Notifications:TopToAll({ text = PlayerNames[Frozen + 1] .. " ", style = { color = PlayerNames[Frozen + 1], ["font-size"] = "25px" }, continue = true })
+						Notifications:TopToAll({ text = "player is not in YOLO state anymore.", style = { color = "white", ["font-size"] = "25px" }, continue = true })
 					end
 				end
 			end
@@ -670,22 +670,22 @@ ListenToGameEvent("player_chat", function(keys)
 			if str == "-replaceherowith" then
 				text = string.gsub(text, str, "")
 				text = string.gsub(text, " ", "")
-				print(PlayerResource:GetSelectedHeroName(hero:GetPlayerID()), "npc_dota_hero_"..text, KeyValues.HeroKV["npc_dota_hero_"..text])
-				if PlayerResource:GetSelectedHeroName(hero:GetPlayerID()) ~= "npc_dota_hero_"..text then
---					if KeyValues.HeroKV["npc_dota_hero_"..text] then
-						PrecacheUnitByNameAsync("npc_dota_hero_"..text, function()
-							local wisp = PlayerResource:GetSelectedHeroEntity(hero:GetPlayerID())
-							local new_hero = PlayerResource:ReplaceHeroWith(hero:GetPlayerID(), "npc_dota_hero_"..text, 0, 0)
+				print(PlayerResource:GetSelectedHeroName(hero:GetPlayerID()), "npc_dota_hero_" .. text, KeyValues.HeroKV["npc_dota_hero_" .. text])
+				if PlayerResource:GetSelectedHeroName(hero:GetPlayerID()) ~= "npc_dota_hero_" .. text then
+					--					if KeyValues.HeroKV["npc_dota_hero_"..text] then
+					PrecacheUnitByNameAsync("npc_dota_hero_" .. text, function()
+						local wisp = PlayerResource:GetSelectedHeroEntity(hero:GetPlayerID())
+						local new_hero = PlayerResource:ReplaceHeroWith(hero:GetPlayerID(), "npc_dota_hero_" .. text, 0, 0)
 
-							Timers:CreateTimer(1.0, function()
-								if wisp then
-									UTIL_Remove(wisp)
-								end
-							end)
+						Timers:CreateTimer(1.0, function()
+							if wisp then
+								UTIL_Remove(wisp)
+							end
 						end)
---					else
---						Notifications:TopToAll({text="Hero don't exist!", duration=6.0, style={color="red", ["font-size"]="30px"}})
---					end
+					end)
+					--					else
+					--						Notifications:TopToAll({text="Hero don't exist!", duration=6.0, style={color="red", ["font-size"]="30px"}})
+					--					end
 				end
 			end
 		end
@@ -709,7 +709,7 @@ ListenToGameEvent("player_chat", function(keys)
 
 				local i = 0
 
-				Notifications:Bottom(player, {text="You've bought "..numberOfTomes.." Tomes!", duration=5.0, style={color="white"}})
+				Notifications:Bottom(player, { text = "You've bought " .. numberOfTomes .. " Tomes!", duration = 5.0, style = { color = "white" } })
 				PlayerResource:SpendGold(player:GetPlayerID(), (numberOfTomes) * cost, DOTA_ModifyGold_PurchaseItem)
 
 				Timers:CreateTimer(function()
@@ -733,15 +733,15 @@ ListenToGameEvent("player_chat", function(keys)
 		end
 
 		if str == "-info" then
-			local diff = {"Easy", "Normal", "Hard", "Extreme", "Divine"}
-			local lanes = {"Simple", "Double", "Full"}
+			local diff = { "Easy", "Normal", "Hard", "Extreme", "Divine" }
+			local lanes = { "Simple", "Double", "Full" }
 
-			Notifications:Bottom(player, {text="DIFFICULTY: "..diff[GameRules:GetCustomGameDifficulty()], duration=10.0})
-			Notifications:Bottom(player, {text="CREEP LANES: "..lanes[CREEP_LANES_TYPE], duration=10.0})
+			Notifications:Bottom(player, { text = "DIFFICULTY: " .. diff[GameRules:GetCustomGameDifficulty()], duration = 10.0 })
+			Notifications:Bottom(player, { text = "CREEP LANES: " .. lanes[CREEP_LANES_TYPE], duration = 10.0 })
 		end
 
 		if str == "-openlane_all" or str == "-ol_all" then
---			Notifications:TopToAll({text="Host opened every lanes!", style={color="lightgreen"}, duration=5.0})
+			--			Notifications:TopToAll({text="Host opened every lanes!", style={color="lightgreen"}, duration=5.0})
 
 			for i = 1, 8 do
 				OpenCreepLane(i)
@@ -749,7 +749,7 @@ ListenToGameEvent("player_chat", function(keys)
 		end
 
 		if str == "-closelane_all" or str == "-cl_all" then
---			Notifications:TopToAll({text="Host closed every lanes!", style={color="lightgreen"}, duration=5.0})
+			--			Notifications:TopToAll({text="Host closed every lanes!", style={color="lightgreen"}, duration=5.0})
 
 			for i = 1, 8 do
 				CloseCreepLane(hero:GetPlayerID(), i)
@@ -763,12 +763,12 @@ ListenToGameEvent("player_chat", function(keys)
 	}
 
 	for _, openlane in pairs(openlane_command) do
-		local i, j = string.find(text, openlane.."_%d")
+		local i, j = string.find(text, openlane .. "_%d")
 		local lane = nil
 
 		if i then
 			lane = string.sub(text, i, j)
-			local i,j = string.find(lane, "%d")
+			local i, j = string.find(lane, "%d")
 			lane = tonumber(string.sub(lane, i, j))
 
 			if lane <= 8 then
@@ -784,12 +784,12 @@ ListenToGameEvent("player_chat", function(keys)
 	}
 
 	for _, closelane in pairs(closelane_command) do
-		local i, j = string.find(text, closelane.."_%d")
+		local i, j = string.find(text, closelane .. "_%d")
 		local lane = nil
 
 		if i then
 			lane = string.sub(text, i, j)
-			local i,j = string.find(lane, "%d")
+			local i, j = string.find(lane, "%d")
 			lane = tonumber(string.sub(lane, i, j))
 
 			if lane <= 8 then
@@ -805,19 +805,19 @@ function GameMode:OnTriggerStartTouch(triggerName, activator_entindex, caller_en
 	--print("GameMode:OnTriggerStartTouch - " .. triggerName)
 	local playerHero = EntIndexToHScript(activator_entindex)
 	if playerHero and playerHero:IsRealHero() and playerHero:GetPlayerOwnerID() ~= -1 then
---    local i, j = string.find(triggerName, "_zone_")
+		--    local i, j = string.find(triggerName, "_zone_")
 		--This is a zone transition trigger
---    if i then
---      local zone1Name = string.sub(triggerName, 1, i-1)
---      local zone2Name = string.sub(triggerName, j+1, string.len(triggerName))
---      print("Zone Transition: " .. zone1Name .. zone2Name)
-			for _,zone in pairs(GameMode.Zones) do
---        if zone and (zone.szName == zone1Name or zone.szName == zone2Name) then
-				if zone and (zone.szName == "xhs_holdout") then
-					zone:Precache()
-				end
+		--    if i then
+		--      local zone1Name = string.sub(triggerName, 1, i-1)
+		--      local zone2Name = string.sub(triggerName, j+1, string.len(triggerName))
+		--      print("Zone Transition: " .. zone1Name .. zone2Name)
+		for _, zone in pairs(GameMode.Zones) do
+			--        if zone and (zone.szName == zone1Name or zone.szName == zone2Name) then
+			if zone and (zone.szName == "xhs_holdout") then
+				zone:Precache()
 			end
---    end
+		end
+		--    end
 
 		local m, o = string.find(triggerName, "reveal_radius")
 		if m then
@@ -825,7 +825,7 @@ function GameMode:OnTriggerStartTouch(triggerName, activator_entindex, caller_en
 			local TriggerEntity = EntIndexToHScript(caller_entindex)
 			if TriggerEntity then
 				local nRevealRadius = TriggerEntity:Attribute_GetIntValue("reveal_radius", 512)
-			--  print("GameMode - Setting FOW Reveal Radius to " .. nRevealRadius)
+				--  print("GameMode - Setting FOW Reveal Radius to " .. nRevealRadius)
 				playerHero:SetRevealRadius(nRevealRadius)
 			end
 		end
@@ -841,8 +841,8 @@ function GameMode:OnTriggerEndTouch(triggerName, activator_entindex, caller_enti
 	if playerHero and playerHero:IsRealHero() and playerHero:GetPlayerOwnerID() ~= -1 then
 		local i, j = string.find(triggerName, "_zone_")
 		if i then
-			local zone1Name = string.sub(triggerName, 1, i-1)
-			local zone2Name = string.sub(triggerName, j+1, string.len(triggerName))
+			local zone1Name = string.sub(triggerName, 1, i - 1)
+			local zone2Name = string.sub(triggerName, j + 1, string.len(triggerName))
 
 			local zone1 = self:GetZoneByName(zone1Name)
 			local zone2 = self:GetZoneByName(zone2Name)
@@ -860,7 +860,7 @@ end
 
 function GameMode:SetupZones()
 	GameMode.Zones = {}
---	PrintTable(ZonesDefinition, "  ")
+	--	PrintTable(ZonesDefinition, "  ")
 	for _, zone in pairs(ZonesDefinition) do
 		if zone then
 			-- print("GameMode:SetupZones() - Setting up zone " .. zone.szName .. " from definition.")
@@ -873,52 +873,52 @@ end
 
 -- Cleanup a player when they leave
 function GameMode:OnDisconnect(keys)
-DebugPrint('[BAREBONES] Player Disconnected ' .. tostring(keys.userid))
-DebugPrintTable(keys)
-local name = keys.name
-local networkid = keys.networkid
-local reason = keys.reason
-local userid = keys.userid
+	DebugPrint('[BAREBONES] Player Disconnected ' .. tostring(keys.userid))
+	DebugPrintTable(keys)
+	local name = keys.name
+	local networkid = keys.networkid
+	local reason = keys.reason
+	local userid = keys.userid
 
---	CloseLane(userid)
+	--	CloseLane(userid)
 end
 
 -- A non-player entity (necro-book, chen creep, etc) used an ability
 function GameMode:OnNonPlayerUsedAbility(keys)
-DebugPrint('[BAREBONES] OnNonPlayerUsedAbility')
-DebugPrintTable(keys)
+	DebugPrint('[BAREBONES] OnNonPlayerUsedAbility')
+	DebugPrintTable(keys)
 
-local abilityname = keys.abilityname
+	local abilityname = keys.abilityname
 end
 
 -- This function is called whenever a tower is killed
 function GameMode:OnTowerKill(keys)
-DebugPrint('[BAREBONES] OnTowerKill')
-DebugPrintTable(keys)
+	DebugPrint('[BAREBONES] OnTowerKill')
+	DebugPrintTable(keys)
 
-local gold = keys.gold
-local killerPlayer = PlayerResource:GetPlayer(keys.killer_userid)
-local team = keys.teamnumber
+	local gold = keys.gold
+	local killerPlayer = PlayerResource:GetPlayer(keys.killer_userid)
+	local team = keys.teamnumber
 end
 
--- This function is called whenever a player changes there custom team selection during Game Setup 
+-- This function is called whenever a player changes there custom team selection during Game Setup
 function GameMode:OnPlayerSelectedCustomTeam(keys)
-DebugPrint('[BAREBONES] OnPlayerSelectedCustomTeam')
-DebugPrintTable(keys)
+	DebugPrint('[BAREBONES] OnPlayerSelectedCustomTeam')
+	DebugPrintTable(keys)
 
-local player = PlayerResource:GetPlayer(keys.player_id)
-local success = (keys.success == 1)
-local team = keys.team_id
+	local player = PlayerResource:GetPlayer(keys.player_id)
+	local success = (keys.success == 1)
+	local team = keys.team_id
 end
 
 -- This function is called whenever an NPC reaches its goal position/target
 function GameMode:OnNPCGoalReached(keys)
-DebugPrint('[BAREBONES] OnNPCGoalReached')
-DebugPrintTable(keys)
+	DebugPrint('[BAREBONES] OnNPCGoalReached')
+	DebugPrintTable(keys)
 
-local goalEntity = EntIndexToHScript(keys.goal_entindex)
-local nextGoalEntity = EntIndexToHScript(keys.next_goal_entindex)
-local npc = EntIndexToHScript(keys.npc_entindex)
+	local goalEntity = EntIndexToHScript(keys.goal_entindex)
+	local nextGoalEntity = EntIndexToHScript(keys.next_goal_entindex)
+	local npc = EntIndexToHScript(keys.npc_entindex)
 end
 
 ---------------------------------------------------------
@@ -934,7 +934,7 @@ local first_rax = false
 ListenToGameEvent('entity_killed', function(keys)
 	local killedUnit = EntIndexToHScript(keys.entindex_killed)
 	if killedUnit == nil then return end
-	if killedUnit:FindModifierByName( "modifier_breakable_container" ) then return end
+	if killedUnit:FindModifierByName("modifier_breakable_container") then return end
 	local killerAbility = nil
 	local killer = nil
 	if keys.entindex_attacker ~= nil then killer = EntIndexToHScript(keys.entindex_attacker) end
@@ -945,30 +945,30 @@ ListenToGameEvent('entity_killed', function(keys)
 
 	local Zone = killedUnit.zone
 	if Zone then
-		for _,zone in pairs(GameMode.Zones) do
+		for _, zone in pairs(GameMode.Zones) do
 			zone:OnEnemyKilled(killedUnit, Zone)
 		end
 	end
 
 	if killedUnit:IsRealHero() and (killedUnit:GetTeamNumber() == DOTA_TEAM_GOODGUYS) then
 		local netTable = {}
---		CustomGameEventManager:Send_ServerToPlayer(killedUnit:GetPlayerOwner(), "life_lost", netTable)
+		--		CustomGameEventManager:Send_ServerToPlayer(killedUnit:GetPlayerOwner(), "life_lost", netTable)
 
 		if killedUnit:GetUnitName() == "npc_dota_hero_tiny" then
 			killedUnit:RemoveModifierByName("modifier_item_ultimate_scepter_consumed")
-			killedUnit:RemoveModifierByName("modifier_animation_translate")  
-		-- Lone Druid Bear death debug
+			killedUnit:RemoveModifierByName("modifier_animation_translate")
+			-- Lone Druid Bear death debug
 		elseif killedUnit:GetUnitName() == "npc_dota_hero_lone_druid" then
 			local Bears = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_ALL, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, 0, false)
 			for _, Bear in pairs(Bears) do
 				for number = 1, 7 do
-					if Bear and Bear:GetUnitName() == "npc_dota_lone_druid_bear"..number then
+					if Bear and Bear:GetUnitName() == "npc_dota_lone_druid_bear" .. number then
 						Timers:CreateTimer(0.03, function()
 							Bear:RespawnUnit()
 						end)
 						Timers:CreateTimer(0.17, function()
 							Bear:RespawnUnit()
-							Bear:AddNewModifier(nil, nil, "modifier_pause_creeps", {duration=4.8})
+							Bear:AddNewModifier(nil, nil, "modifier_pause_creeps", { duration = 4.8 })
 						end)
 					end
 				end
@@ -989,24 +989,24 @@ ListenToGameEvent('entity_killed', function(keys)
 			end
 		end
 
-		for _,Zone in pairs(GameMode.Zones) do
+		for _, Zone in pairs(GameMode.Zones) do
 			if Zone:ContainsUnit(killedUnit) then
 				Zone:AddStat(killedUnit:GetPlayerID(), ZONE_STAT_DEATHS, 1)
 				killedUnit.DeathZone = Zone
 			end
-		end 
-	return
+		end
+		return
 	elseif killedUnit:IsCreature() then
 		local ramero_check = 0
 		if killedUnit:GetUnitName() == "npc_ramero" then
 			DropNeutralItemAtPositionForHero("item_lightning_sword", killedUnit:GetAbsOrigin(), killer, killer:GetTeam(), true)
-			ramero_check = ramero_check +1
+			ramero_check = ramero_check + 1
 		elseif killedUnit:GetUnitName() == "npc_baristol" then
 			local item = CreateItem("item_tome_big", nil, nil)
 			local pos = killedUnit:GetAbsOrigin()
 			local drop = CreateItemOnPositionSync(pos, item)
 			item:LaunchLoot(false, 300, 0.5, pos)
-			ramero_check = ramero_check +1
+			ramero_check = ramero_check + 1
 		elseif killedUnit:GetUnitName() == "npc_ramero_2" then
 			DropNeutralItemAtPositionForHero("item_ring_of_superiority", killedUnit:GetAbsOrigin(), killer, killer:GetTeam(), true)
 			doom_first_time = true
@@ -1024,7 +1024,7 @@ ListenToGameEvent('entity_killed', function(keys)
 		end
 
 		if killedUnit:GetUnitName() == "npc_dota_creature_muradin_bronzebeard" and killedUnit:GetTeamNumber() ~= 2 then
-			Notifications:TopToAll({text="Muradin is dead! All heroes in the arena level increase to maximum, killer earned 50 000 gold bounty.", duration=5.0, style={color="lightgreen"}})
+			Notifications:TopToAll({ text = "Muradin is dead! All heroes in the arena level increase to maximum, killer earned 50 000 gold bounty.", duration = 5.0, style = { color = "lightgreen" } })
 		end
 
 		if killedUnit:GetUnitName() == "npc_dota_hero_magtheridon" then
@@ -1080,14 +1080,14 @@ ListenToGameEvent('entity_killed', function(keys)
 
 						-- reward system based on kills, including kill events
 						if killer:GetKills() == 99 then
-							Notifications:Bottom(killer:GetPlayerOwnerID(), {text="100 kills. You get 7500 gold.", duration=5.0, style={color="yellow"}})
-							PlayerResource:ModifyGold(killer:GetPlayerOwnerID(), 7500, false,  DOTA_ModifyGold_Unspecified)
+							Notifications:Bottom(killer:GetPlayerOwnerID(), { text = "100 kills. You get 7500 gold.", duration = 5.0, style = { color = "yellow" } })
+							PlayerResource:ModifyGold(killer:GetPlayerOwnerID(), 7500, false, DOTA_ModifyGold_Unspecified)
 						elseif killer:GetKills() == 199 then
-							Notifications:Bottom(killer:GetPlayerOwnerID(), {text="200 kills. You get 25000 gold.", duration=5.0, style={color="yellow"}})
-							PlayerResource:ModifyGold(killer:GetPlayerOwnerID(), 25000, false,  DOTA_ModifyGold_Unspecified)
+							Notifications:Bottom(killer:GetPlayerOwnerID(), { text = "200 kills. You get 25000 gold.", duration = 5.0, style = { color = "yellow" } })
+							PlayerResource:ModifyGold(killer:GetPlayerOwnerID(), 25000, false, DOTA_ModifyGold_Unspecified)
 						elseif killer:GetKills() == 399 then
-							Notifications:Bottom(killer:GetPlayerOwnerID(), {text="400 kills. You get 50000 gold.", duration=5.0, style={color="yellow"}})
-							PlayerResource:ModifyGold(killer:GetPlayerOwnerID(), 50000, false,  DOTA_ModifyGold_Unspecified)
+							Notifications:Bottom(killer:GetPlayerOwnerID(), { text = "400 kills. You get 50000 gold.", duration = 5.0, style = { color = "yellow" } })
+							PlayerResource:ModifyGold(killer:GetPlayerOwnerID(), 50000, false, DOTA_ModifyGold_Unspecified)
 						elseif killer:GetKills() >= 499 and RAMERO == 0 then --500
 							StartRameroAndBaristolEvent(killer)
 						elseif killer:GetKills() >= 749 and RAMERO == 1 then --750
@@ -1135,14 +1135,14 @@ ListenToGameEvent('entity_killed', function(keys)
 				for j = 1, difficulty do
 					local unit = CreateUnitByName("xhs_death_revenant", killedUnit:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
 				end
---				CREEP_LANES[lane][2] = CREEP_LANES[lane][2] + 1
---				Notifications:TopToAll({text="Creep lane "..lane.." is now level "..CREEP_LANES[lane][2].."!", duration=5.0, style={color="lightgreen"}})
+				--				CREEP_LANES[lane][2] = CREEP_LANES[lane][2] + 1
+				--				Notifications:TopToAll({text="Creep lane "..lane.." is now level "..CREEP_LANES[lane][2].."!", duration=5.0, style={color="lightgreen"}})
 			elseif killedUnit:GetUnitName() == "xhs_tower_lane_2" then
 				for j = 1, difficulty do
 					local unit = CreateUnitByName("xhs_death_revenant_2", killedUnit:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
 				end
---				CREEP_LANES[lane][2] = CREEP_LANES[lane][2] + 1
---				Notifications:TopToAll({text="Creep lane "..lane.." is now level "..CREEP_LANES[lane][2].."!", duration=5.0, style={color="lightgreen"}})
+				--				CREEP_LANES[lane][2] = CREEP_LANES[lane][2] + 1
+				--				Notifications:TopToAll({text="Creep lane "..lane.." is now level "..CREEP_LANES[lane][2].."!", duration=5.0, style={color="lightgreen"}})
 			end
 		elseif killedUnit:IsAncient() then
 			local castle_shop = Entities:FindByName(nil, "castle_shop")
@@ -1153,7 +1153,7 @@ ListenToGameEvent('entity_killed', function(keys)
 			end
 		end
 	end
---	print("EntityKilled: Not Hero or Creature or Building.")
+	--	print("EntityKilled: Not Hero or Creature or Building.")
 end, nil)
 
 ---------------------------------------------------------
@@ -1173,7 +1173,7 @@ function GameMode:OnPlayerRevived(event)
 		local hReviver = EntIndexToHScript(event.caster)
 		local flChannelTime = event.channel_time
 		if hReviver and flChannelTime > 0.0 then
-			for _,Zone in pairs(GameMode.Zones) do
+			for _, Zone in pairs(GameMode.Zones) do
 				if Zone:ContainsUnit(hReviver) then
 					Zone:AddStat(hReviver:GetPlayerID(), ZONE_STAT_REVIVE_TIME, flChannelTime)
 				end
@@ -1220,11 +1220,11 @@ function GameMode:OnRelicSpawned(item, itemKV)
 	local PlayerIDs = {}
 	local nRelicItemDef = tonumber(itemKV["DungeonItemDef"])
 	print("GameMode:OnRelicSpawned - New Relic " .. item:GetAbilityName() .. " created of itemdef: " .. nRelicItemDef)
-	for _, Hero in pairs (HeroList:GetAllHeroes()) do
+	for _, Hero in pairs(HeroList:GetAllHeroes()) do
 		if Hero and Hero:IsRealHero() and Hero:HasOwnerAbandoned() == false then
 			if GetItemDefOwnedCount(Hero:GetPlayerID(), nRelicItemDef) == 0 then
 				print("GameMode:OnRelicSpawned - PlayerID " .. Hero:GetPlayerID() .. " does not own item, adding to grant list.")
-				table.insert(PlayerIDs, Hero:GetPlayerID()) 
+				table.insert(PlayerIDs, Hero:GetPlayerID())
 			end
 		end
 	end
@@ -1232,14 +1232,14 @@ function GameMode:OnRelicSpawned(item, itemKV)
 	-- What do we do if it's empty?  Right now just give it to someone as a dupe?
 	local bDupeForAllPlayers = #PlayerIDs == 0
 	if bDupeForAllPlayers then
-		for _,Hero in pairs (Heroes) do
+		for _, Hero in pairs(Heroes) do
 			if Hero and Hero:IsRealHero() then
-				table.insert(PlayerIDs, Hero:GetPlayerID()) 
+				table.insert(PlayerIDs, Hero:GetPlayerID())
 			end
 		end
 	end
 
-	local WinningPlayerID =  PlayerIDs[RandomInt(1, #PlayerIDs)]
+	local WinningPlayerID = PlayerIDs[RandomInt(1, #PlayerIDs)]
 	local WinningHero = PlayerResource:GetSelectedHeroEntity(WinningPlayerID)
 	local WinningSteamID = PlayerResource:GetSteamID(WinningPlayerID)
 
@@ -1253,7 +1253,7 @@ function GameMode:OnRelicSpawned(item, itemKV)
 	Relic["DungeonAction"] = itemKV["DungeonAction"]
 	Relic["SteamID"] = WinningSteamID
 	table.insert(self.RelicsFound, Relic)
-	
+
 	local gameEvent = {}
 	gameEvent["player_id"] = WinningHero:GetPlayerID()
 	gameEvent["team_number"] = DOTA_TEAM_GOODGUYS
@@ -1272,7 +1272,6 @@ ListenToGameEvent("player_reconnected", function(event)
 --	OpenLane(event.player_id)
 end, nil)
 --]]
-
 ---------------------------------------------------------
 -- entity_killed
 -- * entindex_killed
@@ -1288,7 +1287,7 @@ end, nil)
 ---------------------------------------------------------
 
 function GameMode:OnPlayerRevived(event)
-local hRevivedHero = EntIndexToHScript(event.target)
+	local hRevivedHero = EntIndexToHScript(event.target)
 
 	print("GameMode:OnPlayerRevived")
 	if hRevivedHero ~= nil and hRevivedHero:IsRealHero() then
@@ -1299,7 +1298,7 @@ local hRevivedHero = EntIndexToHScript(event.target)
 		local hReviver = EntIndexToHScript(event.caster)
 		local flChannelTime = event.channel_time
 		if hReviver ~= nil and flChannelTime > 0.0 then
-			for _,Zone in pairs(GameMode.Zones) do
+			for _, Zone in pairs(GameMode.Zones) do
 				if Zone:ContainsUnit(hReviver) then
 					Zone:AddStat(hReviver:GetPlayerID(), ZONE_STAT_REVIVE_TIME, flChannelTime)
 				end
@@ -1312,11 +1311,11 @@ function GameMode:OnRelicSpawned(item, itemKV)
 	local PlayerIDs = {}
 	local nRelicItemDef = tonumber(itemKV["DungeonItemDef"])
 	print("GameMode:OnRelicSpawned - New Relic " .. item:GetAbilityName() .. " created of itemdef: " .. nRelicItemDef)
-	for _,Hero in pairs (HeroList:GetAllHeroes()) do
+	for _, Hero in pairs(HeroList:GetAllHeroes()) do
 		if Hero ~= nil and Hero:IsRealHero() and Hero:HasOwnerAbandoned() == false then
 			if GetItemDefOwnedCount(Hero:GetPlayerID(), nRelicItemDef) == 0 then
 				print("GameMode:OnRelicSpawned - PlayerID " .. Hero:GetPlayerID() .. " does not own item, adding to grant list.")
-				table.insert(PlayerIDs, Hero:GetPlayerID()) 
+				table.insert(PlayerIDs, Hero:GetPlayerID())
 			end
 		end
 	end
@@ -1324,14 +1323,14 @@ function GameMode:OnRelicSpawned(item, itemKV)
 	-- What do we do if it's empty?  Right now just give it to someone as a dupe?
 	local bDupeForAllPlayers = #PlayerIDs == 0
 	if bDupeForAllPlayers then
-		for _,Hero in pairs (Heroes) do
+		for _, Hero in pairs(Heroes) do
 			if Hero ~= nil and Hero:IsRealHero() then
-				table.insert(PlayerIDs, Hero:GetPlayerID()) 
+				table.insert(PlayerIDs, Hero:GetPlayerID())
 			end
 		end
 	end
 
-	local WinningPlayerID =  PlayerIDs[RandomInt(1, #PlayerIDs)]
+	local WinningPlayerID = PlayerIDs[RandomInt(1, #PlayerIDs)]
 	local WinningHero = PlayerResource:GetSelectedHeroEntity(WinningPlayerID)
 	local WinningSteamID = PlayerResource:GetSteamID(WinningPlayerID)
 
@@ -1345,7 +1344,7 @@ function GameMode:OnRelicSpawned(item, itemKV)
 	Relic["DungeonAction"] = itemKV["DungeonAction"]
 	Relic["SteamID"] = WinningSteamID
 	table.insert(self.RelicsFound, Relic)
-	
+
 	local gameEvent = {}
 	gameEvent["player_id"] = WinningHero:GetPlayerID()
 	gameEvent["team_number"] = DOTA_TEAM_GOODGUYS
@@ -1369,29 +1368,27 @@ end
 ---------------------------------------------------------
 
 function GameMode:OnZoneActivated(Zone)
-
---	print("GameMode:OnZoneActivated")
-	for _,zone in pairs(GameMode.Zones) do
+	--	print("GameMode:OnZoneActivated")
+	for _, zone in pairs(GameMode.Zones) do
 		zone:OnZoneActivated(Zone)
 	end
 
---	if Zone.szName == "forest_holdout" then
---		local hTowers = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_BUILDING, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, 0, false)
---		for _,Tower in pairs(hTowers) do
---			if Tower ~= nil and Tower:GetUnitName() == "npc_dota_holdout_tower" then
---				Tower:RemoveAbility("building_no_vision")
---				Tower:RemoveModifierByName("modifier_no_vision")
---			end
---		end
---	end
+	--	if Zone.szName == "forest_holdout" then
+	--		local hTowers = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_BUILDING, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, 0, false)
+	--		for _,Tower in pairs(hTowers) do
+	--			if Tower ~= nil and Tower:GetUnitName() == "npc_dota_holdout_tower" then
+	--				Tower:RemoveAbility("building_no_vision")
+	--				Tower:RemoveModifierByName("modifier_no_vision")
+	--			end
+	--		end
+	--	end
 end
 
 ---------------------------------------------------------
 
 function GameMode:OnZoneEventComplete(Zone)
-
 	print("GameMode:OnZoneEventComplete")
-	for _,zone in pairs(GameMode.Zones) do
+	for _, zone in pairs(GameMode.Zones) do
 		zone:OnZoneEventComplete(Zone)
 	end
 end
@@ -1399,17 +1396,17 @@ end
 ---------------------------------------------------------
 
 function GameMode:OnQuestStarted(zone, quest)
---	print("GameMode:OnQuestStarted - Quest " .. quest.szQuestName .. " in Zone " .. zone.szName .. " started.")
+	--	print("GameMode:OnQuestStarted - Quest " .. quest.szQuestName .. " in Zone " .. zone.szName .. " started.")
 	quest.bActivated = true
 
-	for _,zone in pairs(GameMode.Zones) do
+	for _, zone in pairs(GameMode.Zones) do
 		zone:OnQuestStarted(quest)
 	end
 
 	if quest.Completion.Type == QUEST_EVENT_ON_DIALOG or quest.Completion.Type == QUEST_EVENT_ON_DIALOG_ALL_CONFIRMED then
 		local hDialogEntities = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_ALL, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, 0, false)
-		for _,DialogEnt in pairs (hDialogEntities) do
-			if DialogEnt ~= nil  and DialogEnt:GetUnitName() == quest.Completion.szNPCName and DialogEnt:FindModifierByName("modifier_npc_dialog_notify") == nil then
+		for _, DialogEnt in pairs(hDialogEntities) do
+			if DialogEnt ~= nil and DialogEnt:GetUnitName() == quest.Completion.szNPCName and DialogEnt:FindModifierByName("modifier_npc_dialog_notify") == nil then
 				if DialogEnt:FindModifierByName("modifier_invulnerable") then
 					DialogEnt:RemoveModifierByName("modifier_invulnerable")
 				end
@@ -1434,7 +1431,7 @@ end
 ---------------------------------------------------------
 
 function GameMode:OnQuestCompleted(questZone, quest)
---	print("GameMode:OnQuestCompleted - Quest " .. quest.szQuestName .. " in Zone " .. questZone.szName .. " completed.")
+	--	print("GameMode:OnQuestCompleted - Quest " .. quest.szQuestName .. " in Zone " .. questZone.szName .. " completed.")
 	quest.nCompleted = quest.nCompleted + 1
 	if quest.nCompleted >= quest.nCompleteLimit then
 		quest.bCompleted = true
@@ -1447,13 +1444,13 @@ function GameMode:OnQuestCompleted(questZone, quest)
 	end
 
 	if quest.bCompleted == true then
-		for _,zone in pairs(GameMode.Zones) do
+		for _, zone in pairs(GameMode.Zones) do
 			zone:OnQuestCompleted(quest)
 		end
 
 		if quest.Completion.Type == QUEST_EVENT_ON_DIALOG or quest.Completion.Type == QUEST_EVENT_ON_DIALOG_ALL_CONFIRMED then
 			local hDialogEntities = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_ALL, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, 0, false)
-			for _,DialogEnt in pairs (hDialogEntities) do
+			for _, DialogEnt in pairs(hDialogEntities) do
 				if DialogEnt ~= nil and DialogEnt:GetUnitName() == quest.Completion.szNPCName and DialogEnt:FindModifierByName("modifier_npc_dialog_notify") then
 					DialogEnt:RemoveModifierByName("modifier_npc_dialog_notify")
 				end
@@ -1465,7 +1462,7 @@ function GameMode:OnQuestCompleted(questZone, quest)
 			hLogicRelay:Trigger()
 		end
 
-		for _,Hero in pairs (HeroList:GetAllHeroes()) do
+		for _, Hero in pairs(HeroList:GetAllHeroes()) do
 			if Hero ~= nil and Hero:IsRealHero() and Hero:GetTeamNumber() == DOTA_TEAM_GOODGUYS then
 				if quest.RewardXP ~= nil and quest.RewardXP > 0 then
 					Hero:AddExperience(quest.RewardXP, DOTA_ModifyXP_Unspecified, false, true)
@@ -1504,7 +1501,7 @@ end
 ---------------------------------------------------------
 
 function GameMode:OnDialogBegin(hPlayerHero, hDialogEnt)
-local Dialog = self:GetDialog(hDialogEnt)
+	local Dialog = self:GetDialog(hDialogEnt)
 
 	if Dialog == nil then
 		print("GameMode:OnDialogBegin - ERROR: No Dialog found for " .. hDialogEnt:GetUnitName())
@@ -1524,7 +1521,7 @@ local Dialog = self:GetDialog(hDialogEnt)
 	end
 
 	local bShowAdvanceDialogButton = true
-	local NextDialog = self:GetDialogLine(hDialogEnt, hDialogEnt.nCurrentLine + 1) 
+	local NextDialog = self:GetDialogLine(hDialogEnt, hDialogEnt.nCurrentLine + 1)
 	if Dialog.bPlayersConfirm == true or NextDialog == nil or NextDialog.bPlayersConfirm == true or Dialog.bForceBreak == true then
 		bShowAdvanceDialogButton = false
 	end
@@ -1543,7 +1540,7 @@ local Dialog = self:GetDialog(hDialogEnt)
 
 	hDialogEnt:RemoveModifierByName("modifier_npc_dialog_notify")
 
-	for _,zone in pairs(GameMode.Zones) do
+	for _, zone in pairs(GameMode.Zones) do
 		zone:OnDialogBegin(hDialogEnt)
 	end
 
@@ -1551,7 +1548,7 @@ local Dialog = self:GetDialog(hDialogEnt)
 		GameMode.bConfirmPending = true
 	end
 
-	if Dialog.bSkipFacePlayer ~= true then 
+	if Dialog.bSkipFacePlayer ~= true then
 		hDialogEnt.vOriginalFaceDir = hDialogEnt:GetOrigin() + hDialogEnt:GetForwardVector() * 50
 		hDialogEnt:FaceTowards(hPlayerHero:GetOrigin())
 	end
@@ -1584,13 +1581,13 @@ local Dialog = self:GetDialog(hDialogEnt)
 	if Dialog.bDialogStopsMovement == true then
 		hDialogEnt:SetMoveCapability(DOTA_UNIT_CAP_MOVE_NONE)
 	end
-	
+
 	if hDialogEnt:FindAbilityByName("ability_journal_note") ~= nil then
 		local szJournalNumber = string.match(Dialog.szText, "chef_journal_(%d+)");
 		if szJournalNumber ~= nil then
 			local nJournalNumber = tonumber(szJournalNumber);
 			local nPlayerID = hPlayerHero:GetPlayerID()
---			self:OnPlayerFoundChefNote(nPlayerID, nJournalNumber)
+			--			self:OnPlayerFoundChefNote(nPlayerID, nJournalNumber)
 		end
 	end
 
@@ -1604,10 +1601,10 @@ end
 ---------------------------------------------------------
 
 function GameMode:OnDialogEnded(eventSourceIndex, data)
-local hDialogEnt = EntIndexToHScript(data.DialogEntIndex)
-local hPlayerHero = EntIndexToHScript(data.PlayerHeroEntIndex)
-local nDialogLine = data.DialogLine
-local bShowNextLine = data.ShowNextLine
+	local hDialogEnt = EntIndexToHScript(data.DialogEntIndex)
+	local hPlayerHero = EntIndexToHScript(data.PlayerHeroEntIndex)
+	local nDialogLine = data.DialogLine
+	local bShowNextLine = data.ShowNextLine
 
 	if hDialogEnt ~= nil and nDialogLine ~= nil then
 		local Dialog = self:GetDialogLine(hDialogEnt, nDialogLine)
@@ -1694,7 +1691,7 @@ function GameMode:OnBossFightIntro(hBoss)
 	local hFriendlyHero = nil
 	if Dialog.bSkipBossIntro == false then
 		local units = FindUnitsInRadius(hBoss:GetTeamNumber(), hBoss:GetOrigin(), hBoss, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_ALL, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES + DOTA_UNIT_TARGET_FLAG_INVULNERABLE, 0, false)
-		for _,unit in pairs (units) do
+		for _, unit in pairs(units) do
 			if unit ~= nil and unit ~= hBoss then
 				unit:AddNewModifier(hBoss, nil, "modifier_boss_intro", { duration = netTable["BossIntroTime"] })
 				if unit:IsRealHero() and unit:GetTeamNumber() == DOTA_TEAM_GOODGUYS then
@@ -1718,7 +1715,7 @@ function GameMode:OnBossFightIntroEnd(hBoss)
 
 	if hBoss ~= nil then
 		local units = FindUnitsInRadius(hBoss:GetTeamNumber(), hBoss:GetOrigin(), hBoss, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_ALL, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES + DOTA_UNIT_TARGET_FLAG_INVULNERABLE, 0, false)
-		for _,unit in pairs (units) do
+		for _, unit in pairs(units) do
 			if unit ~= nil and unit ~= hBoss then
 				unit:RemoveModifierByName("modifier_boss_intro")
 			end
@@ -1731,7 +1728,7 @@ function GameMode:OnBossFightIntroEnd(hBoss)
 			hBoss:RemoveGesture(ACT_DOTA_CAST_ABILITY_7)
 		end
 
-		for _,Hero in pairs (HeroList:GetAllHeroes()) do
+		for _, Hero in pairs(HeroList:GetAllHeroes()) do
 			if Hero ~= nil and Hero:IsRealHero() and Hero:GetTeamNumber() == DOTA_TEAM_GOODGUYS then
 				local hPlayer = Hero:GetPlayerOwner()
 				if hPlayer ~= nil then
@@ -1757,10 +1754,10 @@ end
 
 function GameMode:UpdateGameEndTables()
 	local metadataTable = {}
-	metadataTable[ "event_name" ] = "siltbreaker"
-	metadataTable[ "map_name" ] = "ep_1"
+	metadataTable["event_name"] = "siltbreaker"
+	metadataTable["map_name"] = "ep_1"
 
-	metadataTable[ "zones" ] = {}
+	metadataTable["zones"] = {}
 
 	local trophyLevel = 0
 
@@ -1769,24 +1766,24 @@ function GameMode:UpdateGameEndTables()
 	signoutTable["chef_notes"] = self.ChefNotesFound;
 	signoutTable["invoker_found"] = self.InvokerFound;
 
-	for _,zone in pairs(GameMode.Zones) do
+	for _, zone in pairs(GameMode.Zones) do
 		if not zone.bNoLeaderboard and zone.flCompletionTime > 0 then
 			local zoneTable = {}
 
-			zoneTable[ "zone_id" ] = zone.nZoneID
-			zoneTable[ "completed" ] = zone.bZoneCompleted
-			zoneTable[ "stars" ] = zone.nStars
-			zoneTable[ "kills" ] = zone.nKills
-			zoneTable[ "deaths" ] = zone.nDeaths
-			zoneTable[ "items" ] = zone.nItems
-			zoneTable[ "gold_bags" ] = zone.nGoldBags
-			zoneTable[ "potions" ] = zone.nPotions
-			zoneTable[ "revive_time" ] = zone.nReviveTime
-			zoneTable[ "damage" ] = zone.nDamage
-			zoneTable[ "healing" ] = zone.nHealing
-			zoneTable[ "completion_time" ] = zone.flCompletionTime
-			
-			metadataTable[ "zones" ][ zone.szName ] = zoneTable
+			zoneTable["zone_id"] = zone.nZoneID
+			zoneTable["completed"] = zone.bZoneCompleted
+			zoneTable["stars"] = zone.nStars
+			zoneTable["kills"] = zone.nKills
+			zoneTable["deaths"] = zone.nDeaths
+			zoneTable["items"] = zone.nItems
+			zoneTable["gold_bags"] = zone.nGoldBags
+			zoneTable["potions"] = zone.nPotions
+			zoneTable["revive_time"] = zone.nReviveTime
+			zoneTable["damage"] = zone.nDamage
+			zoneTable["healing"] = zone.nHealing
+			zoneTable["completion_time"] = zone.flCompletionTime
+
+			metadataTable["zones"][zone.szName] = zoneTable
 
 			if (zone.nZoneID == 13) then
 				trophyLevel = zone.nStars
@@ -1797,17 +1794,17 @@ function GameMode:UpdateGameEndTables()
 		end
 
 		if zone.nStars > 0 then
-			signoutTable["zone_stars"][ zone.nZoneID ] = zone.nStars
+			signoutTable["zone_stars"][zone.nZoneID] = zone.nStars
 		end
 	end
 
---	if #self.RelicsFound > 0 then
---		signoutTable[ "relics_found" ] = self.RelicsFound
---	end
+	--	if #self.RelicsFound > 0 then
+	--		signoutTable[ "relics_found" ] = self.RelicsFound
+	--	end
 
 	if trophyLevel > 0 then
-		signoutTable[ "trophy_id" ] = 63
-		signoutTable[ "trophy_level" ] = trophyLevel
+		signoutTable["trophy_id"] = 63
+		signoutTable["trophy_level"] = trophyLevel
 	end
 
 	GameRules:SetEventMetadataCustomTable(metadataTable)
@@ -1818,7 +1815,7 @@ end
 
 function GameMode:OnZoneCompleted(zone)
 	print("GameMode:OnZoneCompleted - Zone " .. zone.szName .. " has been completed with " .. zone.nStars .. " stars ")
-	
+
 	self:UpdateGameEndTables();
 end
 
@@ -1833,7 +1830,7 @@ end
 ---------------------------------------------------------
 
 function GameMode:OnScrollClicked(eventSourceIndex, data)
-local hPlayerHero = EntIndexToHScript(data.ent_index)
+	local hPlayerHero = EntIndexToHScript(data.ent_index)
 
 	if hPlayerHero then
 		hPlayerHero.bHasClickedScroll = true
@@ -1860,12 +1857,12 @@ function GameMode:OnDialogConfirm(eventSourceIndex, data)
 		end
 	end
 
---	print("Check if everyone accepted dialog...")
---	print(GameMode.DialogConfirmCount[data.ConfirmToken], nValid)
+	--	print("Check if everyone accepted dialog...")
+	--	print(GameMode.DialogConfirmCount[data.ConfirmToken], nValid)
 
 	if GameMode.DialogConfirmCount[data.ConfirmToken] >= nValid then
 		local netTable = {}
-		for _,zone in pairs(GameMode.Zones) do
+		for _, zone in pairs(GameMode.Zones) do
 			zone:OnDialogAllConfirmed(EntIndexToHScript(data["DialogEntIndex"]), data["DialogLine"])
 		end
 		CustomGameEventManager:Send_ServerToAllClients("dialog_player_all_confirmed", netTable)
@@ -1880,7 +1877,7 @@ function GameMode:OnDialogConfirmExpired(eventSourceIndex, data)
 		GameMode.DialogConfirmCount[data.ConfirmToken] = 4
 	end
 
-	for _,zone in pairs(GameMode.Zones) do
+	for _, zone in pairs(GameMode.Zones) do
 		zone:OnDialogAllConfirmed(EntIndexToHScript(data["DialogEntIndex"]), data["DialogLine"])
 	end
 
@@ -1897,7 +1894,7 @@ function GameMode:OnRelicClaimed(eventSourceIndex, data)
 		print("GameMode:OnRelicClaimed - Player " .. nPlayerID .. " is trying to claim relic " .. szClaimedRelicName)
 		local relicTable = CustomNetTables:GetTableValue("relics", string.format("%d", nPlayerID))
 		if relicTable ~= nil then
-			for k,v in pairs(relicTable) do
+			for k, v in pairs(relicTable) do
 				if v ~= nil and v == szClaimedRelicName then
 					local Hero = PlayerResource:GetSelectedHeroEntity(nPlayerID)
 					if Hero ~= nil then
@@ -1907,7 +1904,7 @@ function GameMode:OnRelicClaimed(eventSourceIndex, data)
 						newRelic.bIsRelic = true
 						newRelic.nBoundPlayerID = nPlayerID
 						if Hero:HasAnyAvailableInventorySpace() then
-							Hero:AddItem(newRelic) 
+							Hero:AddItem(newRelic)
 						else
 							local drop = CreateItemOnPositionSync(Hero:GetAbsOrigin(), newRelic)
 							local dropTarget = Hero:GetAbsOrigin() + RandomVector(RandomFloat(50, 150))
@@ -1926,5 +1923,5 @@ end
 ---------------------------------------------------------
 
 function GameMode:OnPlayerFoundChefNote(nPlayerID, nChefNoteIndex)
---	self:TrackPlayerAchievementEvent(self.ChefNotesFound, nPlayerID, nChefNoteIndex)
+	--	self:TrackPlayerAchievementEvent(self.ChefNotesFound, nPlayerID, nChefNoteIndex)
 end

@@ -1,3 +1,5 @@
+"lang"										"en"
+
 "DOTA_GoodGuys"   							"Light Forces"
 "DOTA_BadGuys"    							"Dark Forces"
 
