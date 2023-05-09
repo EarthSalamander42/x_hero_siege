@@ -46,7 +46,7 @@ var vote_array = {
 		"gamemode": 5,
 	},
 	"XHS": {
-		"gamemode": 2,
+		// "gamemode": 2, // Enable this when classic and reborn versions of the game are ready
 		"difficulty": 5,
 	},
 	"PW": {
@@ -182,7 +182,7 @@ function fetch() {
 	view.title.text = $.Localize("#addon_game_name") + " " + game_version;
 	view.subtitle.text = $.Localize("#game_version_name").toUpperCase();
 
-	$.Msg($.Localize("lang"))
+	$.Msg($.Localize("lang"));
 
 	api.getLoadingScreenMessage(function (data) {
 		var found_lang = false;
@@ -241,9 +241,10 @@ function AllPlayersLoaded() {
 		return;
 	}
 
-	// $.Msg(vote_array["XHS"])
+	// $.Msg(vote_array["XHS"]);
 	for (var j in vote_array[game_options.game_type]) {
 		const vote_type = j;
+		// $.Msg(vote_type)
 		const vote_count = vote_array[game_options.game_type][j];
 		const panel = $.CreatePanel("Panel", vote_parent, "vote_" + vote_type);
 		panel.AddClass("vote-select-panel-container");
@@ -433,9 +434,9 @@ function DisableRankingVoting() {
 }
 
 (function () {
-	if (Game.IsInToolsMode()) {
-		AllPlayersLoaded();
-	}
+	// if (Game.IsInToolsMode()) {
+	// 	AllPlayersLoaded();
+	// }
 
 	var vote_info = $.GetContextPanel().FindChildrenWithClassTraverse("vote-info");
 
