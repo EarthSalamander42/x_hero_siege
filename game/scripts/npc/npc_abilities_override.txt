@@ -118,11 +118,26 @@
 	//=================================================================================================================
 	// Removed Items
 	//=================================================================================================================
-	"item_ward_observer"			"REMOVE"
-	"item_ward_sentry"				"REMOVE"
-	"item_clarity"					"REMOVE"
-	"item_flask"					"REMOVE"
-	"item_dust"						"REMOVE"
+	"item_ward_observer"			
+	{
+		"ItemPurchasable"				"0"
+	}
+	"item_ward_sentry"				
+	{
+		"ItemPurchasable"				"0"
+	}
+	"item_clarity"					
+	{
+		"ItemPurchasable"				"0"
+	}
+	"item_flask"					
+	{
+		"ItemPurchasable"				"0"
+	}
+	"item_dust"						
+	{
+		"ItemPurchasable"				"0"
+	}
 	"item_bottle"					"REMOVE"
 	"item_recipe_dagon"				"REMOVE"
 	"item_recipe_dagon_2"			"REMOVE"

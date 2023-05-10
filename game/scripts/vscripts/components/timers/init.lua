@@ -66,8 +66,6 @@ function CustomTimers:Think()
 	if CustomTimers.timers_paused == 0 then
 		CustomTimers:Countdown("game_time")
 
-		print("Game Time:", CustomTimers.current_time["game_time"])
-		print("Game in progress:", GameRules:State_Get() == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS)
 		if GameRules:State_Get() == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
 			-- 9:00 minutes (Muradin Event)
 			if CustomTimers.current_time["game_time"] == (XHS_SPECIAL_EVENT_INTERVAL - 1) then
@@ -109,12 +107,9 @@ function CustomTimers:Think()
 				FinalWave()
 			end
 
-			print("CustomTimers.game_phase:", CustomTimers.game_phase)
-
 			-- this 'game phase' fail-safe is unnecessary anymore, but yeah just in case
 			if CustomTimers.game_phase == 1 then
 				if CustomTimers.current_time["game_time"] % XHS_CREEPS_INTERVAL == 0 or math.floor(GameRules:GetDOTATime(false, false)) == 0 then
-					print("Attempt to spawn creeps...")
 					SpawnCreeps()
 				end
 

@@ -1883,7 +1883,7 @@
 		"SideShop"						"0"
 		"SecretShop"					"0"
 		"ItemKillable"					"0"
-		"ItemIsNeutralDrop"				"1"
+		// "ItemIsNeutralDrop"				"1"
 
 		// Special	
 		//-------------------------------------------------------------------------------------------------------------
@@ -1960,7 +1960,7 @@
 		"SideShop"						"0"
 		"SecretShop"					"0"
 		"ItemKillable"					"0"
-		"ItemIsNeutralDrop"				"1"
+		// "ItemIsNeutralDrop"				"1"
 
 		// Special	
 		//-------------------------------------------------------------------------------------------------------------
@@ -2172,7 +2172,7 @@
 		"ItemSellable"					"0"
 		"ItemKillable"					"0"
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
-		"ItemIsNeutralDrop"				"1"
+		// "ItemIsNeutralDrop"				"1"
 
 		// Special
 		//----------------------------------------------------------------------------------------------------
@@ -2453,7 +2453,7 @@
 		"ItemSellable"					"0"
 		"ItemKillable"					"0"
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
-		"ItemIsNeutralDrop"				"1"
+		// "ItemIsNeutralDrop"				"1"
 
 		// Special
 		//----------------------------------------------------------------------------------------------------

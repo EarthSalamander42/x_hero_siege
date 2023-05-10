@@ -1401,7 +1401,7 @@
 
 		// Damage.
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityDamage"					"150 350 550 750"
+		"AbilityDamage"					"200 400 650 1000"
 
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
@@ -1418,22 +1418,22 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"radius"				"350"
+				"radius"				"450"
 			}
 			"02"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"slow_movement_speed"	"-5 -10 -15 -30"
+				"slow_movement_speed"	"-10 -20 -35 -50"
 			}
 			"03"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"slow_attack_speed"		"-5 -10 -15 -20"
+				"slow_attack_speed"		"-10 -20 -35 -50"
 			}
 			"04"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"aoe_damage"			"150 250 450 650"
+				"aoe_damage"			"150 300 500 750"
 			}
 		}
 	}

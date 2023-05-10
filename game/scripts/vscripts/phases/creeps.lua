@@ -61,50 +61,40 @@ function SpawnCreeps()
 		"npc_xhs_human_creep_ranged_4"
 	}
 
-	print("Spawning creeps")
 	for c = 1, 8 do -- replace 8 with player count, to open and close lanes super easily
 		local point = Entities:FindByName(nil, "npc_dota_spawner_" .. c)
 		--	local Waypoint = Entities:FindByName( nil, "creep_path_"..c)
 
 		if not point.disabled then
-			print("Spawning creeps for lane:", c)
 			if CREEP_LANES[c][1] == 1 then -- Lane Activated?
-				print("Lane is activated")
 				if CREEP_LANES[c][3] == 1 then -- Barrack Alive?
-					print("Barracks is alive")
 					if CREEP_LANES[c][2] == 1 then -- Lane Level
-						print("Lane level is 1")
 						for j = 1, 4 do
-							print("Spawn unit:", melee_1[GameMode.creep_roll["race"]])
-							local unit = CreateUnitByName(melee_1[GameMode.creep_roll["race"]], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+							CreateUnitByName(melee_1[GameMode.creep_roll["race"]], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
 						end
 						for j = 1, 2 do
-							print("Spawn unit:", ranged_1[GameMode.creep_roll["race"]])
-							local unit = CreateUnitByName(ranged_1[GameMode.creep_roll["race"]], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+							CreateUnitByName(ranged_1[GameMode.creep_roll["race"]], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
 						end
 					elseif CREEP_LANES[c][2] == 2 then
-						print("Lane level is 2")
 						for j = 1, 4 do
-							local unit = CreateUnitByName(melee_2[GameMode.creep_roll["race"]], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+							CreateUnitByName(melee_2[GameMode.creep_roll["race"]], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
 						end
 						for j = 1, 2 do
-							local unit = CreateUnitByName(ranged_2[GameMode.creep_roll["race"]], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+							CreateUnitByName(ranged_2[GameMode.creep_roll["race"]], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
 						end
 					elseif CREEP_LANES[c][2] == 3 then
-						print("Lane level is 3")
 						for j = 1, 4 do
-							local unit = CreateUnitByName(melee_3[GameMode.creep_roll["race"]], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+							CreateUnitByName(melee_3[GameMode.creep_roll["race"]], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
 						end
 						for j = 1, 2 do
-							local unit = CreateUnitByName(ranged_3[GameMode.creep_roll["race"]], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+							CreateUnitByName(ranged_3[GameMode.creep_roll["race"]], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
 						end
 					elseif CREEP_LANES[c][2] >= 4 then
-						print("Lane level is 4 or above")
 						for j = 1, 4 do
-							local unit = CreateUnitByName(melee_4[GameMode.creep_roll["race"]], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+							CreateUnitByName(melee_4[GameMode.creep_roll["race"]], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
 						end
 						for j = 1, 2 do
-							local unit = CreateUnitByName(ranged_4[GameMode.creep_roll["race"]], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+							CreateUnitByName(ranged_4[GameMode.creep_roll["race"]], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
 						end
 					end
 				end
@@ -113,8 +103,6 @@ function SpawnCreeps()
 			print("Barracks: Spawner " .. c .. " disabled.")
 		end
 	end
-
-	print("Spawn creeps successful.")
 end
 
 function CreepLevels(level)
@@ -143,11 +131,11 @@ function SpawnRevenant(event)
 
 	for j = 1, difficulty do
 		if caller:GetUnitName() == "xhs_tower_lane_1" and CREEP_LANES[tonumber(cn)][2] < 2 then
-			local unit = CreateUnitByName("xhs_death_revenant", caller:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+			CreateUnitByName("xhs_death_revenant", caller:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
 			--			CREEP_LANES[tonumber(cn)][2] = CREEP_LANES[tonumber(cn)][2] + 1
 			--			Notifications:Bottom(player, {text="Your creep lane is now level "..CREEP_LANES[tonumber(cn)][2].."!", duration=5.0, style={color="green"}})
 		elseif caller:GetUnitName() == "xhs_tower_lane_2" and CREEP_LANES[tonumber(cn)][2] < 3 then
-			local unit = CreateUnitByName("xhs_death_revenant_2", caller:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+			CreateUnitByName("xhs_death_revenant_2", caller:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
 			--			CREEP_LANES[tonumber(cn)][2] = CREEP_LANES[tonumber(cn)][2] + 1
 			--			Notifications:Bottom(player, {text="Your creep lane is now level "..CREEP_LANES[tonumber(cn)][2].."!", duration=5.0, style={color="green"}})
 		end

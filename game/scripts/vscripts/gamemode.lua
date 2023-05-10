@@ -67,6 +67,9 @@ function GameMode:OnHeroInGame(hero)
 			hero:IncrementAttributes(10000)
 		end
 	end
+
+	hero:SetDayTimeVisionRange(XHS_HERO_VISION)
+	hero:SetNightTimeVisionRange(XHS_HERO_VISION)
 end
 
 function GameMode:InitGameMode()

@@ -102,14 +102,14 @@ CREEP_LANES[6] = { 0, 1, 1 }
 CREEP_LANES[7] = { 0, 1, 1 }
 CREEP_LANES[8] = { 0, 1, 1 }
 
-PLAYER_COLORS = {}                 -- Stores individual player colors
-PLAYER_COLORS[0] = { 200, 0, 0 }   --Red
-PLAYER_COLORS[1] = { 0, 50, 200 }  --Blue
-PLAYER_COLORS[2] = { 0, 255, 255 } --Cyan
-PLAYER_COLORS[3] = { 100, 0, 100 } --Purple
-PLAYER_COLORS[4] = { 255, 255, 0 } --Yellow
-PLAYER_COLORS[5] = { 255, 150, 0 } --Orange
-PLAYER_COLORS[6] = { 0, 125, 0 }   --Green (Dark)
+PLAYER_COLORS = {}                   -- Stores individual player colors
+PLAYER_COLORS[0] = { 200, 0, 0 }     --Red
+PLAYER_COLORS[1] = { 0, 50, 200 }    --Blue
+PLAYER_COLORS[2] = { 0, 255, 255 }   --Cyan
+PLAYER_COLORS[3] = { 100, 0, 100 }   --Purple
+PLAYER_COLORS[4] = { 255, 255, 0 }   --Yellow
+PLAYER_COLORS[5] = { 255, 150, 0 }   --Orange
+PLAYER_COLORS[6] = { 0, 125, 0 }     --Green (Dark)
 PLAYER_COLORS[7] = { 255, 100, 255 } --Pink
 
 HEROLIST = {}
@@ -199,10 +199,6 @@ PHASE_2_UPGRADE = {}
 PHASE_2_UPGRADE["damage"] = { 25, 50, 75, 100, 125 }
 PHASE_2_UPGRADE["health"] = { 200, 400, 600, 800, 1000 }
 PHASE_2_UPGRADE["armor"] = { 0, 0, 0, 0, 0 }
-
-_G.banned_players = {
-	151018319, -- Mohammad Mehdi Akhondi
-}
 
 XP_PER_LEVEL_TABLE = {
 	0,   -- 1
@@ -414,3 +410,4 @@ XHS_MURADIN_EVENT_GOLD = 20000
 XHS_MURADIN_EVENT_DURATION = 120.0
 
 XHS_GLOBAL_RESPAWN_TIME = 5.0
+XHS_HERO_VISION = 2000
