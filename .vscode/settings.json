@@ -926,6 +926,7 @@
 		"VectorToAngles",
 		"class",
 		"json",
+		"DropNeutralItemAtPositionForHero"
 	],
 	"Lua.hint.await": true,
 	"Lua.semantic.annotation": false,

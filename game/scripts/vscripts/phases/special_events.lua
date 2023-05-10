@@ -255,6 +255,10 @@ function EndFarmEvent()
 end
 
 function StartRameroAndBaristolEvent(hero)
+	if IsInToolsMode() and hero == nil then
+		hero = PlayerResource:GetSelectedHeroEntity(0)
+	end
+
 	local point = Entities:FindByName(nil, "npc_dota_muradin_player_1"):GetAbsOrigin()
 	local delay = 5.0
 	CustomTimers.timers_paused = 2
@@ -263,7 +267,7 @@ function StartRameroAndBaristolEvent(hero)
 	TeleportHero(hero, point, delay)
 	PauseCreeps()
 
-	RameroAndBaristolEvent(120 + delay)
+	RameroAndBaristolEvent(XHS_RAMERO_BARISTOL_TIME + delay)
 
 	RAMERO = 1
 	hero.old_pos = hero:GetAbsOrigin()

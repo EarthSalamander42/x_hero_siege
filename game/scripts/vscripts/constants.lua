@@ -51,8 +51,8 @@ _G.FOUR_BOSSES                         = 0
 _G.SPIRIT_MASTER                       = 0
 _G.sword_first_time                    = true
 _G.ring_first_time                     = true
-_G.doom_first_time                     = false
-_G.frost_first_time                    = false
+_G.DOOM_FIRST_TIME                     = false
+_G.FROST_FIRST_TIME                    = false
 _G.SECRET                              = 0
 _G.RESPAWN_TIME                        = 40.0
 _G.CREEP_LANES_TYPE                    = 1
@@ -411,3 +411,4 @@ XHS_MURADIN_EVENT_DURATION = 120.0
 
 XHS_GLOBAL_RESPAWN_TIME = 5.0
 XHS_HERO_VISION = 2000
+XHS_RAMERO_BARISTOL_TIME = 120.0

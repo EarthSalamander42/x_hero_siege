@@ -180,9 +180,8 @@ function GameMode:InitGameMode()
 		Convars:RegisterCommand("lich_king", function(keys) return StartLichKingArena() end, "Test Magtheridon Boss",
 			FCVAR_CHEAT)
 		Convars:RegisterCommand("win_game", function(keys) return WinGame() end, "End the game", FCVAR_CHEAT)
-		Convars:RegisterCommand("r&b", function(keys) return RameroAndBaristolEvent() end,
+		Convars:RegisterCommand("r&b", function(keys) return StartRameroAndBaristolEvent() end,
 			"Test Ramero and Baristol Arena", FCVAR_CHEAT)
-		Convars:RegisterCommand("r", function(keys) return RameroEvent() end, "Test Ramero Arena", FCVAR_CHEAT)
 		Convars:RegisterCommand("farm_event", function(keys) return FarmTest() end, "Test Farm Event", FCVAR_CHEAT)
 	end
 
@@ -765,11 +764,8 @@ function GameMode:AllHeroImages(event)
 				Timers:RemoveTimer(timers.AllHeroImage)
 				Timers:RemoveTimer(timers.AllHeroImage2)
 				Timers:CreateTimer(0.5, function()
-					local item = CreateItem("item_necklace_of_spell_immunity", nil, nil)
 					local pos = Entities:FindByName(nil, "all_hero_image_player"):GetAbsOrigin()
-					local drop = CreateItemOnPositionSync(pos, item)
-					local pos_launch = pos + RandomVector(RandomFloat(150, 200))
-					item:LaunchLoot(false, 300, 0.5, pos)
+					DropNeutralItemAtPositionForHero("item_necklace_of_spell_immunity", pos, hero, true)
 				end)
 				return nil
 			end

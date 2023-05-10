@@ -940,10 +940,8 @@ ListenToGameEvent('entity_killed', function(keys)
 	if keys.entindex_attacker ~= nil then killer = EntIndexToHScript(keys.entindex_attacker) end
 	if keys.entindex_inflictor ~= nil then killerAbility = EntIndexToHScript(keys.entindex_inflictor) end
 	local difficulty = GameRules:GetCustomGameDifficulty()
-	local cn = string.gsub(killedUnit:GetName(), "dota_badguys_tower", "")
-	local lane = tonumber(cn)
-
 	local Zone = killedUnit.zone
+
 	if Zone then
 		for _, zone in pairs(GameMode.Zones) do
 			zone:OnEnemyKilled(killedUnit, Zone)
@@ -951,7 +949,7 @@ ListenToGameEvent('entity_killed', function(keys)
 	end
 
 	if killedUnit:IsRealHero() and (killedUnit:GetTeamNumber() == DOTA_TEAM_GOODGUYS) then
-		local netTable = {}
+		-- local netTable = {}
 		--		CustomGameEventManager:Send_ServerToPlayer(killedUnit:GetPlayerOwner(), "life_lost", netTable)
 
 		if killedUnit:GetUnitName() == "npc_dota_hero_tiny" then
@@ -1002,21 +1000,25 @@ ListenToGameEvent('entity_killed', function(keys)
 			DropNeutralItemAtPositionForHero("item_lightning_sword", killedUnit:GetAbsOrigin(), killer, killer:GetTeam(), true)
 			ramero_check = ramero_check + 1
 		elseif killedUnit:GetUnitName() == "npc_baristol" then
-			local item = CreateItem("item_tome_big", nil, nil)
-			local pos = killedUnit:GetAbsOrigin()
-			local drop = CreateItemOnPositionSync(pos, item)
-			item:LaunchLoot(false, 300, 0.5, pos)
+			local hero = killer
+
+			if not killer:IsRealHero() then
+				hero = killer:GetPlayerOwner():GetAssignedHero()
+			end
+
+			if hero then
+				hero:IncrementAttributes(250)
+			end
+
 			ramero_check = ramero_check + 1
 		elseif killedUnit:GetUnitName() == "npc_ramero_2" then
 			DropNeutralItemAtPositionForHero("item_ring_of_superiority", killedUnit:GetAbsOrigin(), killer, killer:GetTeam(), true)
-			doom_first_time = true
+			DOOM_FIRST_TIME = true
 			Timers:RemoveTimer(timers.Ramero)
 		elseif killedUnit:GetUnitName() == "npc_dota_hero_secret" then
-			local item = CreateItem("item_orb_of_frost", nil, nil)
 			local pos = killedUnit:GetAbsOrigin()
-			local drop = CreateItemOnPositionSync(pos, item)
-			item:LaunchLoot(false, 300, 0.5, pos)
-			frost_first_time = true
+			DropNeutralItemAtPositionForHero("item_orb_of_frost", pos, killer, true)
+			FROST_FIRST_TIME = true
 		end
 
 		if ramero_check == 2 then
@@ -1571,9 +1573,8 @@ function GameMode:OnDialogBegin(hPlayerHero, hDialogEnt)
 			hPlayerHero:AddItem(newItem)
 		else
 			if newItem ~= nil then
-				local drop = CreateItemOnPositionSync(hPlayerHero:GetAbsOrigin(), newItem)
 				local dropTarget = hPlayerHero:GetAbsOrigin() + RandomVector(RandomFloat(50, 150))
-				newItem:LaunchLoot(false, 150, 0.75, dropTarget)
+				DropNeutralItemAtPositionForHero(Dialog.szGiveItemName, dropTarget, hPlayerHero, true)
 			end
 		end
 	end
@@ -1898,17 +1899,16 @@ function GameMode:OnRelicClaimed(eventSourceIndex, data)
 				if v ~= nil and v == szClaimedRelicName then
 					local Hero = PlayerResource:GetSelectedHeroEntity(nPlayerID)
 					if Hero ~= nil then
-						local newRelic = CreateItem(szClaimedRelicName, Hero, Hero)
-						newRelic:SetPurchaseTime(GameRules:GetGameTime())
-						newRelic:SetPurchaser(Hero)
-						newRelic.bIsRelic = true
-						newRelic.nBoundPlayerID = nPlayerID
 						if Hero:HasAnyAvailableInventorySpace() then
+							local newRelic = CreateItem(szClaimedRelicName, Hero, Hero)
+							newRelic:SetPurchaseTime(GameRules:GetGameTime())
+							newRelic:SetPurchaser(Hero)
+							newRelic.bIsRelic = true
+							newRelic.nBoundPlayerID = nPlayerID
 							Hero:AddItem(newRelic)
 						else
-							local drop = CreateItemOnPositionSync(Hero:GetAbsOrigin(), newRelic)
 							local dropTarget = Hero:GetAbsOrigin() + RandomVector(RandomFloat(50, 150))
-							newRelic:LaunchLoot(false, 150, 0.75, dropTarget)
+							DropNeutralItemAtPositionForHero(szClaimedRelicName, dropTarget, Hero, true)
 						end
 
 						relicTable[k] = nil

@@ -4,7 +4,7 @@ function SpecialEventTPDisabled(event)
 	local hero = event.activator
 	local msg = "This section will be activated after Muradin Event! (14 Minutes)"
 
-	Notifications:Bottom(hero:GetPlayerOwnerID(), {text = msg, duration = 6.0})
+	Notifications:Bottom(hero:GetPlayerOwnerID(), { text = msg, duration = 6.0 })
 end
 
 function SpecialEventTPEnabled(event)
@@ -31,7 +31,7 @@ function HeroImageBack(event)
 		UTIL_Remove(GameMode.HeroImage)
 	end
 	hero.hero_image = true
-	Notifications:Bottom(hero:GetPlayerOwnerID(), {text = "You can do this event only 1 time!", duration = 5.0})
+	Notifications:Bottom(hero:GetPlayerOwnerID(), { text = "You can do this event only 1 time!", duration = 5.0 })
 	CustomGameEventManager:Send_ServerToAllClients("hide_timer_hero_image", {})
 end
 
@@ -42,11 +42,8 @@ function HeroImageDead(event)
 	if caster:GetHealth() == 0 then
 		CustomGameEventManager:Send_ServerToAllClients("hide_timer_hero_image", {})
 		Timers:CreateTimer(0.5, function()
-			local item = CreateItem("item_tome_big", nil, nil)
-			local pos = point_beast
-			local drop = CreateItemOnPositionSync( pos, item )
-			local pos_launch = pos + RandomVector(RandomFloat(150, 200))
-			item:LaunchLoot(false, 300, 0.5, pos)
+			local pos_launch = point_beast + RandomVector(RandomFloat(150, 200))
+			DropNeutralItemAtPositionForHero("item_tome_big", pos_launch, caster, true)
 		end)
 	end
 end
@@ -90,7 +87,7 @@ end
 function SpiritBeastDead(event)
 	local hero = event.attacker
 
-	DoEntFire("trigger_spirit_beast_duration", "Kill", nil ,0 ,nil ,nil)
+	DoEntFire("trigger_spirit_beast_duration", "Kill", nil, 0, nil, nil)
 	GameMode.SpiritBeast_killed = 1
 	CustomGameEventManager:Send_ServerToAllClients("hide_timer_spirit_beast", {})
 
@@ -99,7 +96,7 @@ function SpiritBeastDead(event)
 end
 
 function FrostInfernalBack(event)
-local hero = event.activator
+	local hero = event.activator
 
 	SpecialEventBack(event)
 	Timers:RemoveTimer(timers.FrostInfernal)
@@ -115,7 +112,7 @@ end
 function FrostInfernalDead(event)
 	local hero = event.attacker
 
-	DoEntFire("trigger_frost_infernal_duration", "Kill", nil ,0 ,nil ,nil)
+	DoEntFire("trigger_frost_infernal_duration", "Kill", nil, 0, nil, nil)
 	GameMode.FrostInfernal_killed = 1
 	CustomGameEventManager:Send_ServerToAllClients("hide_timer_frost_infernal", {})
 
@@ -133,7 +130,7 @@ function AllHeroImageBack(event)
 	GameMode.AllHeroImages_occuring = 0
 	SpecialEventBack(event)
 
-	local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_2, point, nil, 2500, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_ALL, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false)
+	local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_2, point, nil, 2500, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_ALL, DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER, false)
 
 	for _, v in pairs(units) do
 		UTIL_Remove(v)
