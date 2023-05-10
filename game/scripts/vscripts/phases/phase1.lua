@@ -15,8 +15,8 @@ function SpecialEventTPEnabled(event)
 	CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "show_events", {})
 	Entities:FindByName(nil, "trigger_special_event"):Disable()
 	TeleportHero(hero, point)
-	hero:AddNewModifier(nil, nil, "modifier_pause_creeps", {IsHidden = true})
-	hero:AddNewModifier(nil, nil, "modifier_invulnerable", {IsHidden = true})
+	hero:AddNewModifier(hero, nil, "modifier_pause_creeps", { IsHidden = true })
+	hero:AddNewModifier(hero, nil, "modifier_invulnerable", { IsHidden = true })
 	DoEntFire("special_event_piedestal", "SetAnimation", "ancient_trigger001_down_up", 0, nil, nil)
 end
 

@@ -84,8 +84,8 @@ local PauseTime = 10.0
 		for _, hero in pairs(heroes) do
 			CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "set_player_camera", {hPosition = Muradin:GetAbsOrigin()})
 
-			hero:AddNewModifier(nil, nil, "modifier_pause_creeps", {Duration = 10, IsHidden = true})
-			hero:AddNewModifier(nil, nil, "modifier_invulnerable", {Duration = 10, IsHidden = true})
+			hero:AddNewModifier(hero, nil, "modifier_pause_creeps", { Duration = 10, IsHidden = true })
+			hero:AddNewModifier(hero, nil, "modifier_invulnerable", { Duration = 10, IsHidden = true })
 		end
 
 		caster:AddNewModifier(caster, nil, "modifier_invulnerable", {duration = InvTime + PauseTime})

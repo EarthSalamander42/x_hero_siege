@@ -5,9 +5,9 @@ function Battlepass:DonatorCompanion(ID, unit_name, js)
 
 	if stored_companions[ID] then
 		-- ForceKill on roshan companions results in global death sound which is annoying
-	
+
 		--stored_companions[ID]:ForceKill(false)
-		
+
 		if stored_companions[ID].RemoveSelf then
 			stored_companions[ID]:RemoveSelf()
 		end
@@ -24,7 +24,7 @@ function Battlepass:DonatorCompanion(ID, unit_name, js)
 		unit_name = "npc_donator_companion_demi_doom"
 	end
 
-	if UNIQUE_DONATOR_COMPANION[tostring(PlayerResource:GetSteamID(ID))] and not js then 
+	if UNIQUE_DONATOR_COMPANION[tostring(PlayerResource:GetSteamID(ID))] and not js then
 		unit_name = UNIQUE_DONATOR_COMPANION[tostring(PlayerResource:GetSteamID(ID))]
 	end
 
@@ -61,9 +61,9 @@ function Battlepass:DonatorCompanion(ID, unit_name, js)
 		particle_name[8] = "particles/econ/courier/courier_babyroshan_winter18/courier_babyroshan_winter18_ambient.vpcf"
 		particle_name[9] = "particles/econ/courier/courier_babyroshan_ti9/courier_babyroshan_ti9_ambient.vpcf"
 
---		if RandomInt(1, 2) == 2 then
---			model = model.."_flying"
---		end
+		--		if RandomInt(1, 2) == 2 then
+		--			model = model.."_flying"
+		--		end
 
 		-- also attach eyes effect later
 		local random_int = RandomInt(0, #particle_name)
@@ -111,7 +111,7 @@ function CompanionCosmetics(unit, unit_name)
 			local cosmetic = CreateUnitByName("wearable_dummy", unit:GetAbsOrigin(), false, nil, nil, unit:GetTeam())
 			cosmetic:SetOriginalModel(wearable)
 			cosmetic:SetModel(wearable)
-			cosmetic:AddNewModifier(nil, nil, "modifier_wearable", {})
+			cosmetic:AddNewModifier(cosmetic, nil, "modifier_wearable", {})
 			cosmetic:SetParent(unit, nil)
 			cosmetic:FollowEntity(unit, true)
 
@@ -129,8 +129,8 @@ function CompanionCosmetics(unit, unit_name)
 				ParticleManager:CreateParticle("particles/econ/items/pudge/pudge_arcana/pudge_arcana_ambient_flies.vpcf", PATTACH_ABSORIGIN_FOLLOW, unit)
 			elseif wearable == "models/items/rubick/rubick_arcana/rubick_arcana_back.vmdl" then
 				ParticleManager:CreateParticle("particles/econ/items/rubick/rubick_arcana/rubick_arc_ambient_default.vpcf", PATTACH_ABSORIGIN_FOLLOW, cosmetic)
---			elseif wearable == "models/items/juggernaut/arcana/juggernaut_arcana_mask.vmdl" then
---				ParticleManager:CreateParticle("particles/econ/items/juggernaut/jugg_arcana/juggernaut_arcana_ambient.vpcf", PATTACH_ABSORIGIN_FOLLOW, cosmetic)
+				--			elseif wearable == "models/items/juggernaut/arcana/juggernaut_arcana_mask.vmdl" then
+				--				ParticleManager:CreateParticle("particles/econ/items/juggernaut/jugg_arcana/juggernaut_arcana_ambient.vpcf", PATTACH_ABSORIGIN_FOLLOW, cosmetic)
 			elseif wearable == "models/items/juggernaut/jugg_ti8/jugg_ti8_sword.vmdl" then
 				ParticleManager:CreateParticle("particles/econ/items/juggernaut/jugg_ti8_sword/jugg_ti8_crimson_sword_ambient.vpcf", PATTACH_ABSORIGIN_FOLLOW, cosmetic)
 			elseif wearable == "models/heroes/phantom_assassin/pa_arcana_weapons.vmdl" then
@@ -140,9 +140,9 @@ function CompanionCosmetics(unit, unit_name)
 
 				local right_sword = ParticleManager:CreateParticle("particles/econ/items/phantom_assassin/phantom_assassin_arcana_elder_smith/pa_arcana_blade_ambient_b.vpcf", PATTACH_ABSORIGIN_FOLLOW, unit)
 				ParticleManager:SetParticleControl(right_sword, 26, Vector(40, 0, 0))
---				"control_point_number"		"26"
---				"cp_position"		"40 0 0"
---				"style"		"1"
+				--				"control_point_number"		"26"
+				--				"cp_position"		"40 0 0"
+				--				"style"		"1"
 
 				-- Ambient Body
 				ParticleManager:CreateParticle("particles/econ/items/phantom_assassin/phantom_assassin_arcana_elder_smith/pa_arcana_elder_ambient.vpcf", PATTACH_ABSORIGIN_FOLLOW, unit)
@@ -158,32 +158,32 @@ end
 function DonatorCompanionSkin(id, unit, skin)
 	local hero = PlayerResource:GetPlayer(id):GetAssignedHero()
 
---	print("Material Group:", skin)
---	print(stored_companions[ID], stored_companions[ID]:GetUnitName(), unit)
+	--	print("Material Group:", skin)
+	--	print(stored_companions[ID], stored_companions[ID]:GetUnitName(), unit)
 	if stored_companions[ID] and stored_companions[ID]:GetUnitName() == unit then
 		stored_companions[ID]:SetMaterialGroup(tostring(skin))
 	end
 end
 
 function Battlepass:DonatorStatue(ID, statue_unit)
-	if UNIQUE_DONATOR_STATUE[tostring(PlayerResource:GetSteamID(ID))] and not js then 
+	if UNIQUE_DONATOR_STATUE[tostring(PlayerResource:GetSteamID(ID))] and not js then
 		statue_unit = UNIQUE_DONATOR_STATUE[tostring(PlayerResource:GetSteamID(ID))]
 	end
 
 	local pedestal_name = "npc_donator_pedestal"
 	local hero = PlayerResource:GetSelectedHeroEntity(ID)
 
---	if hero.donator_statue then
---		hero.donator_statue:ForceKill(false)
+	--	if hero.donator_statue then
+	--		hero.donator_statue:ForceKill(false)
 
---		local unit = CreateUnitByName(statue_unit[2], abs, true, nil, nil, PlayerResource:GetPlayer(ID):GetTeam())
---		unit:SetModelScale(statue_unit[1])
---		unit:SetAbsOrigin(abs + Vector(0, 0, 17))
---		unit:AddNewModifier(unit, nil, "modifier_contributor_statue", {})
---		hero.donator_statue = unit
+	--		local unit = CreateUnitByName(statue_unit[2], abs, true, nil, nil, PlayerResource:GetPlayer(ID):GetTeam())
+	--		unit:SetModelScale(statue_unit[1])
+	--		unit:SetAbsOrigin(abs + Vector(0, 0, 17))
+	--		unit:AddNewModifier(unit, nil, "modifier_contributor_statue", {})
+	--		hero.donator_statue = unit
 
---		return
---	end
+	--		return
+	--	end
 
 	local team = "good"
 
@@ -192,10 +192,10 @@ function Battlepass:DonatorStatue(ID, statue_unit)
 	end
 
 	local fillers = {
-		team.."_filler_2",
-		team.."_filler_4",
-		team.."_filler_6",
-		team.."_filler_7",
+		team .. "_filler_2",
+		team .. "_filler_4",
+		team .. "_filler_6",
+		team .. "_filler_7",
 	}
 
 	local model_scale = nil
@@ -221,7 +221,7 @@ function Battlepass:DonatorStatue(ID, statue_unit)
 			if unit == nil then return end
 			unit:SetModelScale(model_scale)
 			unit:SetAbsOrigin(abs + Vector(0, 0, 45))
---			unit:AddNewModifier(unit, nil, "modifier_donator_statue", {})
+			--			unit:AddNewModifier(unit, nil, "modifier_donator_statue", {})
 			unit:AddNewModifier(unit, nil, "modifier_invulnerable", {})
 			hero.donator_statue = unit
 
@@ -233,18 +233,18 @@ function Battlepass:DonatorStatue(ID, statue_unit)
 				pedestal_name = "npc_donator_pedestal_cookies"
 			elseif api:GetDonatorStatus(ID) == 2 then
 				unit:SetCustomHealthLabel("sutherncuck", 0, 204, 255)
-				pedestal_name = "npc_donator_pedestal_developer_"..team
+				pedestal_name = "npc_donator_pedestal_developer_" .. team
 			elseif api:GetDonatorStatus(ID) == 3 then
 				unit:SetCustomHealthLabel(name, 160, 20, 20)
 			elseif api:GetDonatorStatus(ID) == 4 then
 				unit:SetCustomHealthLabel(name, 240, 50, 50)
-				pedestal_name = "npc_donator_pedestal_ember_"..team
+				pedestal_name = "npc_donator_pedestal_ember_" .. team
 			elseif api:GetDonatorStatus(ID) == 5 then
 				unit:SetCustomHealthLabel(name, 218, 165, 32)
-				pedestal_name = "npc_donator_pedestal_golden_"..team
+				pedestal_name = "npc_donator_pedestal_golden_" .. team
 			elseif api:GetDonatorStatus(ID) == 7 then
 				unit:SetCustomHealthLabel(name, 47, 91, 151)
-				pedestal_name = "npc_donator_pedestal_salamander_"..team
+				pedestal_name = "npc_donator_pedestal_salamander_" .. team
 			elseif api:GetDonatorStatus(ID) == 8 then
 				unit:SetCustomHealthLabel(name, 153, 51, 153)
 				pedestal_name = "npc_donator_pedestal_icefrog"

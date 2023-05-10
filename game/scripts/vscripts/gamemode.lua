@@ -524,8 +524,8 @@ function GameMode:HeroImage(event)
 			end
 		end
 
-		GameMode.HeroImage:AddNewModifier(nil, nil, "modifier_pause_creeps", { Duration = 5, IsHidden = true })
-		GameMode.HeroImage:AddNewModifier(nil, nil, "modifier_invulnerable", { Duration = 5, IsHidden = true })
+		GameMode.HeroImage:AddNewModifier(GameMode.HeroImage, nil, "modifier_pause_creeps", { Duration = 5, IsHidden = true })
+		GameMode.HeroImage:AddNewModifier(GameMode.HeroImage, nil, "modifier_invulnerable", { Duration = 5, IsHidden = true })
 		GameMode.HeroImage:MakeIllusion()
 		GameMode.HeroImage:AddAbility("hero_image_death")
 		GameMode.HeroImage.Boss = true
@@ -594,8 +594,8 @@ function GameMode:SpiritBeast(event)
 
 		GameMode.spirit_beast = CreateUnitByName("npc_spirit_beast", point_beast, true, nil, nil, DOTA_TEAM_CUSTOM_1)
 		GameMode.spirit_beast:SetAngles(0, 210, 0)
-		GameMode.spirit_beast:AddNewModifier(nil, nil, "modifier_pause_creeps", { Duration = 5, IsHidden = true })
-		GameMode.spirit_beast:AddNewModifier(nil, nil, "modifier_invulnerable", { Duration = 5, IsHidden = true })
+		GameMode.spirit_beast:AddNewModifier(GameMode.spirit_beast, nil, "modifier_pause_creeps", { Duration = 5, IsHidden = true })
+		GameMode.spirit_beast:AddNewModifier(GameMode.spirit_beast, nil, "modifier_invulnerable", { Duration = 5, IsHidden = true })
 		GameMode.spirit_beast.Boss = true
 
 		if IsValidEntity(hero) then
@@ -652,8 +652,8 @@ function GameMode:FrostInfernal(event)
 
 		GameMode.frost_infernal = CreateUnitByName("npc_frost_infernal", point_beast, true, nil, nil, DOTA_TEAM_CUSTOM_1)
 		GameMode.frost_infernal:SetAngles(0, 210, 0)
-		GameMode.frost_infernal:AddNewModifier(nil, nil, "modifier_pause_creeps", { Duration = 5, IsHidden = true })
-		GameMode.frost_infernal:AddNewModifier(nil, nil, "modifier_invulnerable", { Duration = 5, IsHidden = true })
+		GameMode.frost_infernal:AddNewModifier(GameMode.frost_infernal, nil, "modifier_pause_creeps", { Duration = 5, IsHidden = true })
+		GameMode.frost_infernal:AddNewModifier(GameMode.frost_infernal, nil, "modifier_invulnerable", { Duration = 5, IsHidden = true })
 		GameMode.frost_infernal.Boss = true
 
 		GameMode:SpecialEventTPQuit(hero)
@@ -715,8 +715,8 @@ function GameMode:AllHeroImages(event)
 				end
 			end
 
-			GameMode.AllHeroImage:AddNewModifier(nil, nil, "modifier_pause_creeps", { Duration = 5, IsHidden = true })
-			GameMode.AllHeroImage:AddNewModifier(nil, nil, "modifier_invulnerable", { Duration = 5, IsHidden = true })
+			GameMode.AllHeroImage:AddNewModifier(GameMode.AllHeroImage, nil, "modifier_pause_creeps", { Duration = 5, IsHidden = true })
+			GameMode.AllHeroImage:AddNewModifier(GameMode.AllHeroImage, nil, "modifier_invulnerable", { Duration = 5, IsHidden = true })
 
 			GameMode.AllHeroImage:MakeIllusion()
 			GameMode.AllHeroImage.Boss = true

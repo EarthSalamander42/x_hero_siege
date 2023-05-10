@@ -4,7 +4,7 @@ function StartPhase2()
 
 	local DoorObs = Entities:FindAllByName("obstruction_phase2_1")
 
-	for _, obs in pairs(DoorObs) do 
+	for _, obs in pairs(DoorObs) do
 		obs:SetEnabled(false, true)
 	end
 
@@ -14,7 +14,7 @@ function StartPhase2()
 	if PlayerResource:GetPlayerCount() > 1 then
 		local DoorObs = Entities:FindAllByName("obstruction_phase2_2")
 
-		for _, obs in pairs(DoorObs) do 
+		for _, obs in pairs(DoorObs) do
 			obs:SetEnabled(false, true)
 		end
 
@@ -39,20 +39,20 @@ function Phase2CreepsLeft()
 			wave_count = wave_count + 1
 
 			for j = 1, 8 do
-				local unit = CreateUnitByName("npc_ghul_II", point+RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+				local unit = CreateUnitByName("npc_ghul_II", point + RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_CUSTOM_1)
 				unit:SetBaseDamageMin(unit:GetRealDamageDone(unit) + (PHASE_2_UPGRADE["damage"][difficulty] * wave_count))
 				unit:SetBaseDamageMax(unit:GetRealDamageDone(unit) + (PHASE_2_UPGRADE["damage"][difficulty] * wave_count) * 1.1)
 				unit:SetMaxHealth(unit:GetMaxHealth() + (PHASE_2_UPGRADE["health"][difficulty] * wave_count))
 				unit:SetBaseMaxHealth(unit:GetMaxHealth() + (PHASE_2_UPGRADE["health"][difficulty] * wave_count))
 				unit:SetHealth(unit:GetMaxHealth())
 				unit:SetPhysicalArmorBaseValue(unit:GetPhysicalArmorValue(false) + (PHASE_2_UPGRADE["armor"][difficulty] * wave_count))
-				if not unit.GrowthOverheadPfx then 
+				if not unit.GrowthOverheadPfx then
 					unit.GrowthOverheadPfx = ParticleManager:CreateParticle("particles/units/heroes/hero_abaddon/abaddon_curse_counter_stack.vpcf", PATTACH_OVERHEAD_FOLLOW, unit)
 				end
 
 				ParticleManager:SetParticleControl(unit.GrowthOverheadPfx, 1, Vector(0, wave_count, 0))
---				local stack_10 = math.floor(wave_count / 10)
---				ParticleManager:SetParticleControl(unit.GrowthOverheadPfx, 2, Vector(stack_10, wave_count - stack_10*10, 0))
+				--				local stack_10 = math.floor(wave_count / 10)
+				--				ParticleManager:SetParticleControl(unit.GrowthOverheadPfx, 2, Vector(stack_10, wave_count - stack_10*10, 0))
 			end
 
 			return XHS_CREEPS_INTERVAL
@@ -74,22 +74,22 @@ function Phase2CreepsRight()
 		if not EntIceTower:IsNull() and CustomTimers.timers_paused ~= 1 then
 			wave_count = wave_count + 1
 			for j = 1, 8 do
-				local unit = CreateUnitByName("npc_orc_II", point+RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+				local unit = CreateUnitByName("npc_orc_II", point + RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_CUSTOM_1)
 				unit:SetBaseDamageMin(unit:GetRealDamageDone(unit) + (PHASE_2_UPGRADE["damage"][difficulty] * wave_count))
 				unit:SetBaseDamageMax(unit:GetRealDamageDone(unit) + (PHASE_2_UPGRADE["damage"][difficulty] * wave_count) * 1.1)
 				unit:SetMaxHealth(unit:GetMaxHealth() + (PHASE_2_UPGRADE["health"][difficulty] * wave_count))
 				unit:SetBaseMaxHealth(unit:GetMaxHealth() + (PHASE_2_UPGRADE["health"][difficulty] * wave_count))
 				unit:SetHealth(unit:GetMaxHealth())
 				unit:SetPhysicalArmorBaseValue(unit:GetPhysicalArmorValue(false) + (PHASE_2_UPGRADE["armor"][difficulty] * wave_count))
-				if not unit.GrowthOverheadPfx then 
+				if not unit.GrowthOverheadPfx then
 					unit.GrowthOverheadPfx = ParticleManager:CreateParticle("particles/units/heroes/hero_abaddon/abaddon_curse_counter_stack.vpcf", PATTACH_OVERHEAD_FOLLOW, unit)
 				end
 
 				ParticleManager:SetParticleControl(unit.GrowthOverheadPfx, 1, Vector(0, wave_count, 0))
---				local stack_10 = math.floor(wave_count / 10)
---				ParticleManager:SetParticleControl(unit.GrowthOverheadPfx, 2, Vector(stack_10, wave_count - stack_10*10, 0))
+				--				local stack_10 = math.floor(wave_count / 10)
+				--				ParticleManager:SetParticleControl(unit.GrowthOverheadPfx, 2, Vector(stack_10, wave_count - stack_10*10, 0))
 			end
-		return 30
+			return 30
 		elseif CustomTimers.timers_paused == 1 then
 			return 30
 		elseif EntIceTower:IsNull() then
@@ -105,7 +105,7 @@ function EndPhase2()
 	end
 
 	for TW = 1, 2 do
-		local ice_towers_main = Entities:FindByName(nil, "npc_tower_cold_"..TW)
+		local ice_towers_main = Entities:FindByName(nil, "npc_tower_cold_" .. TW)
 		ice_towers_main:ForceKill(false)
 	end
 end
@@ -137,7 +137,7 @@ function FinalWave()
 	Timers:CreateTimer(30, function()
 		for _, hero in pairs(HeroList:GetAllHeroes()) do
 			if hero:IsRealHero() and hero:GetTeam() == DOTA_TEAM_GOODGUYS then
-				CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "set_player_camera", {hPosition = boss:GetAbsOrigin()})
+				CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "set_player_camera", { hPosition = boss:GetAbsOrigin() })
 			end
 		end
 	end)
@@ -145,11 +145,11 @@ function FinalWave()
 	Timers:CreateTimer(31, function()
 		StopSoundOn("yaskar_01.music.ui_hero_select", Entities:FindByClassname(nil, 'npc_dota_fort'))
 
-		local units = FindUnitsInRadius(DOTA_TEAM_NEUTRALS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_ALL, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false )
+		local units = FindUnitsInRadius(DOTA_TEAM_NEUTRALS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_ALL, DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER, false)
 		local number = 0
 
 		for _, v in pairs(units) do
-			number = number +1
+			number = number + 1
 		end
 
 		if number > 0 then
@@ -162,43 +162,43 @@ local final_wave_stun_time = 0
 
 function FinalWaveSpawner(creep1, creep2, creep3, creep4, boss_name, angles, direction, waypoint)
 	local number = 1
-	local waypoint = Entities:FindByName(nil,"final_wave_player_2")
+	local waypoint = Entities:FindByName(nil, "final_wave_player_2")
 
 	for i = 1, 3 do
-		local unit = CreateUnitByName(creep1.."_final_wave", Entities:FindByName(nil,"final_wave_"..direction.."_"..number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+		local unit = CreateUnitByName(creep1 .. "_final_wave", Entities:FindByName(nil, "final_wave_" .. direction .. "_" .. number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
 		unit:SetAngles(0, angles, 0)
 		number = number + 1
 	end
 
 	for i = 1, 3 do
-		local unit = CreateUnitByName(creep2.."_final_wave", Entities:FindByName(nil,"final_wave_"..direction.."_"..number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+		local unit = CreateUnitByName(creep2 .. "_final_wave", Entities:FindByName(nil, "final_wave_" .. direction .. "_" .. number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
 		unit:SetAngles(0, angles, 0)
 		number = number + 1
 	end
 
 	for i = 1, 3 do
-		local unit = CreateUnitByName(creep3.."_final_wave", Entities:FindByName(nil,"final_wave_"..direction.."_"..number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+		local unit = CreateUnitByName(creep3 .. "_final_wave", Entities:FindByName(nil, "final_wave_" .. direction .. "_" .. number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
 		unit:SetAngles(0, angles, 0)
 		number = number + 1
 	end
 
 	for i = 1, 3 do
-		local unit = CreateUnitByName(creep4.."_final_wave", Entities:FindByName(nil,"final_wave_"..direction.."_"..number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+		local unit = CreateUnitByName(creep4 .. "_final_wave", Entities:FindByName(nil, "final_wave_" .. direction .. "_" .. number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
 		unit:SetAngles(0, angles, 0)
 		number = number + 1
 	end
 
-	local boss = CreateUnitByName(boss_name.."_final_wave", Entities:FindByName(nil,"final_wave_"..direction.."_"..number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+	local boss = CreateUnitByName(boss_name .. "_final_wave", Entities:FindByName(nil, "final_wave_" .. direction .. "_" .. number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
 	boss:SetAngles(0, angles, 0)
 	boss:EmitSound("Hero_TemplarAssassin.Trap")
 	boss:SetInitialGoalEntity(waypoint)
 	boss:MoveToPositionAggressive(waypoint:GetAbsOrigin())
 
-	local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_1, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_NONE , FIND_ANY_ORDER, false)
-	for _,v in pairs(units) do
+	local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_1, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)
+	for _, v in pairs(units) do
 		if v:IsCreature() and v:HasMovementCapability() then
-			v:AddNewModifier(nil, nil, "modifier_pause_creeps", {duration = 25 + final_wave_stun_time, IsHidden = true}):SetStackCount(1)
-			v:AddNewModifier(nil, nil, "modifier_invulnerable", {duration = 25 + final_wave_stun_time, IsHidden = true})
+			v:AddNewModifier(v, nil, "modifier_pause_creeps", { duration = 25 + final_wave_stun_time, IsHidden = true }):SetStackCount(1)
+			v:AddNewModifier(v, nil, "modifier_invulnerable", { duration = 25 + final_wave_stun_time, IsHidden = true })
 		end
 	end
 
@@ -206,7 +206,7 @@ function FinalWaveSpawner(creep1, creep2, creep3, creep4, boss_name, angles, dir
 
 	for _, hero in pairs(HeroList:GetAllHeroes()) do
 		if hero:IsRealHero() and hero:GetTeam() == DOTA_TEAM_GOODGUYS then
-			CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "set_player_camera", {hPosition = boss:GetAbsOrigin()})
+			CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "set_player_camera", { hPosition = boss:GetAbsOrigin() })
 		end
 	end
 end

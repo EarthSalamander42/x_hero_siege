@@ -1,4 +1,3 @@
-
 modifier_breakable_container = class({})
 
 --------------------------------------------------------------------------------
@@ -9,14 +8,14 @@ end
 
 --------------------------------------------------------------------------------
 
-function modifier_breakable_container:OnCreated( kv )
+function modifier_breakable_container:OnCreated(kv)
 	if IsServer() then
 		if self:GetParent():GetUnitName() == "npc_dota_crate" then
-			self:GetParent():SetModelScale( RandomFloat( 0.6, 0.9 ) )
+			self:GetParent():SetModelScale(RandomFloat(0.6, 0.9))
 		elseif self:GetParent():GetUnitName() == "npc_dota_vase" then
-			self:GetParent():SetModelScale( RandomFloat( 0.4, 0.6 ) )
+			self:GetParent():SetModelScale(RandomFloat(0.4, 0.6))
 		end
---		self:GetParent():AddNewModifier( nil, nil, "modifier_disable_aggro", { duration = -1 } )
+		--		self:GetParent():AddNewModifier( self:GetParent(), nil, "modifier_disable_aggro", { duration = -1 } )
 	end
 end
 
@@ -24,7 +23,7 @@ end
 
 function modifier_breakable_container:CheckState()
 	local state = {}
-	if IsServer()  then
+	if IsServer() then
 		state[MODIFIER_STATE_ROOTED] = true
 		state[MODIFIER_STATE_NO_HEALTH_BAR] = true
 		state[MODIFIER_STATE_BLIND] = true
@@ -47,29 +46,28 @@ end
 
 --------------------------------------------------------------------------------
 
-function modifier_breakable_container:GetModifierProvidesFOWVision( params )
+function modifier_breakable_container:GetModifierProvidesFOWVision(params)
 	return 1
 end
 
 -----------------------------------------------------------------------
 
-function modifier_breakable_container:OnDeath( params )
+function modifier_breakable_container:OnDeath(params)
 	if IsServer() then
-		if ( params.unit == self:GetParent() ) then
+		if (params.unit == self:GetParent()) then
 			--print( string.format( "Breakable container \"%s\" destroyed by \"%s\"", self:GetParent():GetUnitName() or "Unknown Attacker", self.hAttacker:GetUnitName() ) )
 			if self:GetParent():GetUnitName() == "npc_dota_crate" then
-				if RandomInt( 0, 1 ) >= 1 then
-					EmitSoundOn( "Dungeon.SmashCrateShort", self:GetParent() )
+				if RandomInt(0, 1) >= 1 then
+					EmitSoundOn("Dungeon.SmashCrateShort", self:GetParent())
 				else
-					EmitSoundOn( "Dungeon.SmashCrateLong", self:GetParent() )
+					EmitSoundOn("Dungeon.SmashCrateLong", self:GetParent())
 				end
 			elseif self:GetParent():GetUnitName() == "npc_dota_vase" then
-				EmitSoundOn( "Dungeon.VaseBreak", self:GetParent() )
+				EmitSoundOn("Dungeon.VaseBreak", self:GetParent())
 			end
-			GameRules.GameMode:ChooseBreakableSurprise( params.attacker, self:GetParent() )
+			GameRules.GameMode:ChooseBreakableSurprise(params.attacker, self:GetParent())
 		end
 	end
 end
 
 -----------------------------------------------------------------------
-

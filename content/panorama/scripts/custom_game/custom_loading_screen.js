@@ -182,8 +182,6 @@ function fetch() {
 	view.title.text = $.Localize("#addon_game_name") + " " + game_version;
 	view.subtitle.text = $.Localize("#game_version_name").toUpperCase();
 
-	$.Msg($.Localize("lang"));
-
 	api.getLoadingScreenMessage(function (data) {
 		var found_lang = false;
 		var result = data.data;

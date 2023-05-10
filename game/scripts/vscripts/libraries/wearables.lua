@@ -7,14 +7,14 @@ function Wearables:SwapWearable(unit, new_model, material_group)
 		if wearable:GetClassname() == "dota_item_wearable" and wearable:GetModelName() ~= "" and wearable:GetModelName() ~= new_model then
 			for k, v in pairs(cool_hats[new_model]["wearable_slot"]) do
 				if string.find(wearable:GetModelName(), v) then
-					print("Change cosmetic model from "..wearable:GetModelName().." to "..new_model)
+					print("Change cosmetic model from " .. wearable:GetModelName() .. " to " .. new_model)
 
 					wearable:AddEffects(EF_NODRAW)
 
 					local newWearable = CreateUnitByName("wearable_dummy", unit:GetAbsOrigin(), false, nil, nil, unit:GetTeam())
 					newWearable:SetOriginalModel(new_model)
 					newWearable:SetModel(new_model)
-					newWearable:AddNewModifier(nil, nil, "modifier_wearable", {})
+					newWearable:AddNewModifier(newWearable, nil, "modifier_wearable", {})
 					newWearable:SetParent(unit, nil)
 					newWearable:FollowEntity(unit, true)
 
@@ -137,7 +137,6 @@ function Wearables:SwapWearableSlot(unit, new_model, material_group)
 	end
 end
 --]]
-
 function Wearables:RemoveWearable(wearable)
 	Timers:CreateTimer(0.1, function()
 		if wearable and wearable.GetModelName then
@@ -166,7 +165,7 @@ function Wearables:GetWearable(unit, model_find)
 	return false
 end
 
-function Wearables:HideWearable( unit, target_model )
+function Wearables:HideWearable(unit, target_model)
 	local wearable = unit:FirstMoveChild()
 	while wearable ~= nil do
 		if wearable:GetClassname() == "dota_item_wearable" then
@@ -180,7 +179,7 @@ function Wearables:HideWearable( unit, target_model )
 	end
 end
 
-function Wearables:ShowWearable( unit, target_model )
+function Wearables:ShowWearable(unit, target_model)
 	local wearable = unit:FirstMoveChild()
 	while wearable ~= nil do
 		if wearable:GetClassname() == "dota_item_wearable" then
@@ -193,10 +192,10 @@ function Wearables:ShowWearable( unit, target_model )
 	end
 end
 
-function Wearables:PrintWearables( unit )
+function Wearables:PrintWearables(unit)
 	print("---------------------")
-	print("Wearable List of "..unit:GetUnitName())
-	print("Main Model: "..unit:GetModelName())
+	print("Wearable List of " .. unit:GetUnitName())
+	print("Main Model: " .. unit:GetModelName())
 	local wearable = unit:FirstMoveChild()
 	while wearable ~= nil do
 		if wearable:GetClassname() == "dota_item_wearable" then

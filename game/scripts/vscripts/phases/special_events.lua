@@ -9,21 +9,21 @@ function MuradinEvent(time)
 	mode:SetFixedRespawnTime(1)
 
 	local Muradin = CreateUnitByName("npc_dota_creature_muradin_bronzebeard", Entities:FindByName(nil, "npc_dota_muradin_boss"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
-	Muradin:AddNewModifier( nil, nil, "modifier_pause_creeps", {duration = stun_duration}):SetStackCount(1)
-	Muradin:AddNewModifier( nil, nil, "modifier_invulnerable", {duration = stun_duration})
+	Muradin:AddNewModifier(Muradin, nil, "modifier_pause_creeps", { duration = stun_duration }):SetStackCount(1)
+	Muradin:AddNewModifier(Muradin, nil, "modifier_invulnerable", { duration = stun_duration })
 	Muradin:SetAngles(0, 270, 0)
---	Muradin:EmitSound("SantaClaus.StartArena")
+	--	Muradin:EmitSound("SantaClaus.StartArena")
 	EmitSoundOn("Muradin.StormEarthFire", Muradin)
-	Notifications:TopToAll({hero="npc_dota_hero_zuus", duration = stun_duration})
-	Notifications:TopToAll({text=" You can't kill him! Just survive the Countdown. ", continue=true})
-	Notifications:TopToAll({text="Reward: 15 000 Gold.", continue=true})
+	Notifications:TopToAll({ hero = "npc_dota_hero_zuus", duration = stun_duration })
+	Notifications:TopToAll({ text = " You can't kill him! Just survive the Countdown. ", continue = true })
+	Notifications:TopToAll({ text = "Reward: 15 000 Gold.", continue = true })
 
-	for nPlayerID = 0, PlayerResource:GetPlayerCount() -1 do
+	for nPlayerID = 0, PlayerResource:GetPlayerCount() - 1 do
 		if PlayerResource:HasSelectedHero(nPlayerID) and PlayerResource:GetSelectedHeroEntity(nPlayerID) ~= "npc_dota_hero_wisp" then
 			local hero = PlayerResource:GetSelectedHeroEntity(nPlayerID)
 			hero.old_pos = hero:GetAbsOrigin()
 			local id = hero:GetPlayerID()
-			local point = Entities:FindByName(nil,"npc_dota_muradin_player_"..id)
+			local point = Entities:FindByName(nil, "npc_dota_muradin_player_" .. id)
 
 			DisableItems(hero, time)
 			TeleportHero(hero, point:GetAbsOrigin(), nil, 1.0)
@@ -31,7 +31,7 @@ function MuradinEvent(time)
 	end
 
 	Timers:CreateTimer(time - 30, function()
-		Notifications:TopToAll({text="WARNING: Incoming Wave of Darkness from the East!", duration=25.0, style={color="red"}})
+		Notifications:TopToAll({ text = "WARNING: Incoming Wave of Darkness from the East!", duration = 25.0, style = { color = "red" } })
 		SpawnRunes()
 	end)
 
@@ -43,7 +43,7 @@ function MuradinEvent(time)
 		BT_ENABLED = 1
 		CustomTimers.timers_paused = 0
 		RestartCreeps(3.0)
-		Notifications:TopToAll({text="Special Events are unlocked!", style={color="DodgerBlue"}, duration=5.0})
+		Notifications:TopToAll({ text = "Special Events are unlocked!", style = { color = "DodgerBlue" }, duration = 5.0 })
 		Entities:FindByName(nil, "trigger_special_event_tp_off"):Disable()
 		Entities:FindByName(nil, "trigger_special_event"):Enable()
 		CustomGameEventManager:Send_ServerToAllClients("update_special_event_label_farm", {})
@@ -53,8 +53,8 @@ function MuradinEvent(time)
 			-- fail-safe, just in case a hero died and had an ankh of reincarnation
 			EndMuradinEvent()
 
-			Notifications:TopToAll({text="All heroes who survived Muradin received "..XHS_MURADIN_EVENT_GOLD.." Gold!", duration=6.0})
-			Notifications:TopToAll({ability="alchemist_goblins_greed", continue = true})
+			Notifications:TopToAll({ text = "All heroes who survived Muradin received " .. XHS_MURADIN_EVENT_GOLD .. " Gold!", duration = 6.0 })
+			Notifications:TopToAll({ ability = "alchemist_goblins_greed", continue = true })
 
 			RestartCreeps(0.0)
 			UTIL_Remove(Muradin)
@@ -63,7 +63,7 @@ function MuradinEvent(time)
 end
 
 function EndMuradinEvent()
-	local MuradinCheck = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, Entities:FindByName(nil, "npc_dota_muradin_boss"):GetAbsOrigin(), nil, 2000, DOTA_UNIT_TARGET_TEAM_BOTH, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false)
+	local MuradinCheck = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, Entities:FindByName(nil, "npc_dota_muradin_boss"):GetAbsOrigin(), nil, 2000, DOTA_UNIT_TARGET_TEAM_BOTH, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER, false)
 
 	for _, hero in pairs(MuradinCheck) do
 		Timers:CreateTimer(function()
@@ -92,22 +92,22 @@ function FarmEvent(time)
 	GameMode.hero_farm_event = {}
 	StunBuildings(time)
 
-	Notifications:TopToAll({hero="npc_dota_hero_alchemist", duration = 5.0})
-	Notifications:TopToAll({text=" It's farming time! Kill as much creeps as you can!", continue = true})
+	Notifications:TopToAll({ hero = "npc_dota_hero_alchemist", duration = 5.0 })
+	Notifications:TopToAll({ text = " It's farming time! Kill as much creeps as you can!", continue = true })
 
 	for nPlayerID = 0, PlayerResource:GetPlayerCount() - 1 do
 		if PlayerResource:HasSelectedHero(nPlayerID) and PlayerResource:GetSelectedHeroEntity(nPlayerID) ~= "npc_dota_hero_wisp" then
 			local hero = PlayerResource:GetSelectedHeroEntity(nPlayerID)
 			hero.old_pos = hero:GetAbsOrigin()
-			local point = Entities:FindByName(nil, "farm_event_player_"..nPlayerID)
+			local point = Entities:FindByName(nil, "farm_event_player_" .. nPlayerID)
 			EmitSoundOn("Muradin.StormEarthFire", point)
 
 			if nPlayerID == nil then
-				Notifications:TopToAll({text="Invalid Steam ID detected!! #ERROR 003 ", duration = 10.0})
-				Notifications:TopToAll({text="Please report this bug on Discord!! #ERROR 003 ", continue = true})
+				Notifications:TopToAll({ text = "Invalid Steam ID detected!! #ERROR 003 ", duration = 10.0 })
+				Notifications:TopToAll({ text = "Please report this bug on Discord!! #ERROR 003 ", continue = true })
 			elseif point == nil then
-				Notifications:TopToAll({text="Invalid teleport point detected!! #ERROR 004 ", duration = 10.0})
-				Notifications:TopToAll({text="Please report this bug on Discord!! #ERROR 004 ", continue = true})
+				Notifications:TopToAll({ text = "Invalid teleport point detected!! #ERROR 004 ", duration = 10.0 })
+				Notifications:TopToAll({ text = "Please report this bug on Discord!! #ERROR 004 ", continue = true })
 			else
 				TeleportHero(hero, point:GetAbsOrigin(), nil, 1.0)
 			end
@@ -124,13 +124,13 @@ function FarmEvent(time)
 				unit:SetBaseMaxHealth(unit:GetMaxHealth() + (FARM_EVENT_UPGRADE["health"][difficulty] * GameMode.hero_farm_event[nPlayerID]["level"]))
 				unit:SetHealth(unit:GetMaxHealth())
 				unit:SetPhysicalArmorBaseValue(unit:GetPhysicalArmorValue(false) + (FARM_EVENT_UPGRADE["armor"][difficulty] * GameMode.hero_farm_event[nPlayerID]["level"]))
-				if not unit.GrowthOverheadPfx then 
+				if not unit.GrowthOverheadPfx then
 					unit.GrowthOverheadPfx = ParticleManager:CreateParticle("particles/units/heroes/hero_abaddon/abaddon_curse_counter_stack.vpcf", PATTACH_OVERHEAD_FOLLOW, unit)
 				end
 
 				ParticleManager:SetParticleControl(unit.GrowthOverheadPfx, 1, Vector(0, GameMode.hero_farm_event[nPlayerID]["level"], 0))
---				local stack_10 = math.floor(GameMode.hero_farm_event[nPlayerID]["level"] / 10)
---				ParticleManager:SetParticleControl(unit.GrowthOverheadPfx, 2, Vector(stack_10, GameMode.hero_farm_event[nPlayerID]["level"] - stack_10*10, 0))
+				--				local stack_10 = math.floor(GameMode.hero_farm_event[nPlayerID]["level"] / 10)
+				--				ParticleManager:SetParticleControl(unit.GrowthOverheadPfx, 2, Vector(stack_10, GameMode.hero_farm_event[nPlayerID]["level"] - stack_10*10, 0))
 			end
 
 			DisableItems(hero, time)
@@ -139,8 +139,8 @@ function FarmEvent(time)
 		end
 	end
 
-	Timers:CreateTimer(time-20, function() -- 150
-		Notifications:TopToAll({text="WARNING: Incoming Wave of Darkness from the North!", duration=25.0, style={color="red"}})
+	Timers:CreateTimer(time - 20, function() -- 150
+		Notifications:TopToAll({ text = "WARNING: Incoming Wave of Darkness from the North!", duration = 25.0, style = { color = "red" } })
 		SpawnRunes()
 	end)
 
@@ -159,7 +159,7 @@ function FarmEvent(time)
 end
 
 function FarmEventCreeps(id)
-	local point = Entities:FindByName(nil, "farm_event_player_"..id)
+	local point = Entities:FindByName(nil, "farm_event_player_" .. id)
 	local difficulty = GameRules:GetCustomGameDifficulty()
 
 	Timers:CreateTimer(function()
@@ -182,14 +182,14 @@ function FarmEventCreeps(id)
 					unit:SetHealth(unit:GetMaxHealth())
 					unit:SetPhysicalArmorBaseValue(unit:GetPhysicalArmorValue(false) + (FARM_EVENT_UPGRADE["armor"][difficulty] * GameMode.hero_farm_event[id]["level"]))
 
-					if not unit.GrowthOverheadPfx then 
+					if not unit.GrowthOverheadPfx then
 						unit.GrowthOverheadPfx = ParticleManager:CreateParticle("particles/units/heroes/hero_abaddon/abaddon_curse_counter_stack.vpcf", PATTACH_OVERHEAD_FOLLOW, unit)
 					end
-	
+
 					ParticleManager:SetParticleControl(unit.GrowthOverheadPfx, 1, Vector(0, GameMode.hero_farm_event[id]["level"], 0))
 
---					local stack_10 = math.floor(GameMode.hero_farm_event[id]["level"] / 10)
---					ParticleManager:SetParticleControl(unit.GrowthOverheadPfx, 2, Vector(stack_10, GameMode.hero_farm_event[id]["level"] - stack_10*10, 0))
+					--					local stack_10 = math.floor(GameMode.hero_farm_event[id]["level"] / 10)
+					--					ParticleManager:SetParticleControl(unit.GrowthOverheadPfx, 2, Vector(stack_10, GameMode.hero_farm_event[id]["level"] - stack_10*10, 0))
 				end
 			end
 
@@ -218,8 +218,8 @@ function EndFarmEvent()
 		end
 	end
 
-	local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_2, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_NONE , FIND_ANY_ORDER, false)
-	for _,v in pairs(units) do
+	local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_2, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)
+	for _, v in pairs(units) do
 		if v:IsCreature() and v:HasMovementCapability() and v:GetUnitName() ~= "npc_dota_boss_lich_king" then
 			UTIL_Remove(v)
 		end
@@ -227,11 +227,11 @@ function EndFarmEvent()
 
 	-- Start Phase 2
 	for NumPlayers = 1, MAGNATAURS_TO_KILL * PlayerResource:GetPlayerCount() * CREEP_LANES_TYPE do
-		local rax_spawner = Entities:FindByName(nil, "npc_dota_spawner_"..NumPlayers)
+		local rax_spawner = Entities:FindByName(nil, "npc_dota_spawner_" .. NumPlayers)
 
 		if rax_spawner then
 			SpawnMagnataur(rax_spawner:GetAbsOrigin())
-			print("npc_dota_spawner_"..NumPlayers.." removed.")
+			print("npc_dota_spawner_" .. NumPlayers .. " removed.")
 			rax_spawner.disabled = true
 		end
 	end
@@ -251,7 +251,7 @@ function EndFarmEvent()
 	CustomTimers:Countdown("special_event")
 	CustomTimers:Countdown("special_wave")
 
-	Notifications:TopToAll({text="Phase 2 begins! (Destroyer Magnataur launched)", duration=10.0, style={color="red"}})
+	Notifications:TopToAll({ text = "Phase 2 begins! (Destroyer Magnataur launched)", duration = 10.0, style = { color = "red" } })
 end
 
 function StartRameroAndBaristolEvent(hero)
@@ -259,7 +259,7 @@ function StartRameroAndBaristolEvent(hero)
 	local delay = 5.0
 	CustomTimers.timers_paused = 2
 
-	Notifications:TopToAll({text="A hero has reached 500 kills and will fight Ramero and Baristol!", style={color="white"}, duration=5.0})
+	Notifications:TopToAll({ text = "A hero has reached 500 kills and will fight Ramero and Baristol!", style = { color = "white" }, duration = 5.0 })
 	TeleportHero(hero, point, delay)
 	PauseCreeps()
 
@@ -277,17 +277,17 @@ function RameroAndBaristolEvent(time) -- 500 kills
 	GameMode.SpecialArena_occuring = 1
 
 	local Ramero = CreateUnitByName("npc_ramero", Entities:FindByName(nil, "roshan_wp_4"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
-	Ramero:AddNewModifier( nil, nil, "modifier_pause_creeps", {duration = stun_duration})
-	Ramero:AddNewModifier( nil, nil, "modifier_invulnerable", {duration = stun_duration})
+	Ramero:AddNewModifier(Ramero, nil, "modifier_pause_creeps", { duration = stun_duration })
+	Ramero:AddNewModifier(Ramero, nil, "modifier_invulnerable", { duration = stun_duration })
 	Ramero:SetAngles(0, 45, 0)
 	local Baristol = CreateUnitByName("npc_baristol", Entities:FindByName(nil, "roshan_wp_2"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
-	Baristol:AddNewModifier( nil, nil, "modifier_pause_creeps", {duration = stun_duration})
-	Baristol:AddNewModifier( nil, nil, "modifier_invulnerable", {duration = stun_duration})
+	Baristol:AddNewModifier(Baristol, nil, "modifier_pause_creeps", { duration = stun_duration })
+	Baristol:AddNewModifier(Baristol, nil, "modifier_invulnerable", { duration = stun_duration })
 	Baristol:SetAngles(0, 325, 0)
 	EmitSoundOn("Muradin.StormEarthFire", Ramero)
-	Notifications:TopToAll({hero="npc_dota_hero_sven", duration = stun_duration})
-	Notifications:TopToAll({text="Kill Ramero and Baristol to get special items! ", continue=true})
-	Notifications:TopToAll({text="Reward: Lightning Sword and Tome of Stats +250.", continue=true})
+	Notifications:TopToAll({ hero = "npc_dota_hero_sven", duration = stun_duration })
+	Notifications:TopToAll({ text = "Kill Ramero and Baristol to get special items! ", continue = true })
+	Notifications:TopToAll({ text = "Reward: Lightning Sword and Tome of Stats +250.", continue = true })
 
 	timers.RameroAndBaristol = Timers:CreateTimer(time, function() -- Teleport back to the spawn
 		CustomTimers.timers_paused = 0
@@ -305,17 +305,17 @@ function RameroAndBaristolEvent(time) -- 500 kills
 			UTIL_Remove(Baristol)
 
 			local Check = 0
-			Notifications:TopToAll({text="Ramero and Baristol arena has been loss!", duration=5.0})
+			Notifications:TopToAll({ text = "Ramero and Baristol arena has been loss!", duration = 5.0 })
 			Timers:CreateTimer(function()
 				if Check < 2 then
-					local RameroAndBaristolCheck = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, Entities:FindByName(nil, "npc_dota_muradin_boss"):GetAbsOrigin(), nil, 2000, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false)
+					local RameroAndBaristolCheck = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, Entities:FindByName(nil, "npc_dota_muradin_boss"):GetAbsOrigin(), nil, 2000, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER, false)
 					for _, hero in pairs(RameroAndBaristolCheck) do
 						if hero:IsRealHero() then
 							TeleportHero(hero, base_good:GetAbsOrigin(), teleport_time)
 							RestartCreeps(teleport_time + 3.0)
 						end
 					end
-					Check = Check +1
+					Check = Check + 1
 					return 5
 				end
 			end)
@@ -327,7 +327,7 @@ function StartSogatEvent(hero)
 	local point = Entities:FindByName(nil, "npc_dota_muradin_player_1"):GetAbsOrigin()
 	local delay = 5.0
 
-	Notifications:TopToAll({text="A hero has reached 750 kills and will fight Ramero!", style={color="white"}, duration=5.0})
+	Notifications:TopToAll({ text = "A hero has reached 750 kills and will fight Ramero!", style = { color = "white" }, duration = 5.0 })
 	PauseCreeps()
 	TeleportHero(hero, point, delay)
 
@@ -346,13 +346,13 @@ function SogatEvent(time) -- 750 kills
 	GameMode.SpecialArena_occuring = 1
 
 	local Ramero = CreateUnitByName("npc_ramero_2", Entities:FindByName(nil, "roshan_wp_4"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
-	Ramero:AddNewModifier( nil, nil, "modifier_pause_creeps", {duration = stun_duration})
-	Ramero:AddNewModifier( nil, nil, "modifier_invulnerable", {duration = stun_duration})
+	Ramero:AddNewModifier(nil, nil, "modifier_pause_creeps", { duration = stun_duration })
+	Ramero:AddNewModifier(nil, nil, "modifier_invulnerable", { duration = stun_duration })
 	Ramero:SetAngles(0, 45, 0)
 	EmitSoundOn("Muradin.StormEarthFire", Ramero)
-	Notifications:TopToAll({hero="npc_dota_hero_sven", duration = stun_duration})
-	Notifications:TopToAll({text="Kill Sogat to get a special item! ", continue = true})
-	Notifications:TopToAll({text="Reward: Ring of Superiority.", continue = true})
+	Notifications:TopToAll({ hero = "npc_dota_hero_sven", duration = stun_duration })
+	Notifications:TopToAll({ text = "Kill Sogat to get a special item! ", continue = true })
+	Notifications:TopToAll({ text = "Reward: Ring of Superiority.", continue = true })
 
 	timers.Ramero = Timers:CreateTimer(time, function() -- Teleport back to the spawn
 		CustomTimers.timers_paused = 0
@@ -368,16 +368,16 @@ function SogatEvent(time) -- 750 kills
 			UTIL_Remove(Ramero)
 
 			local Check = 0
-			Notifications:TopToAll({text="Ramero arena has been loss!", duration=5.0})
+			Notifications:TopToAll({ text = "Ramero arena has been loss!", duration = 5.0 })
 			Timers:CreateTimer(0.0, function()
 				if Check < 5 then
-					local RameroCheck = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, Entities:FindByName(nil, "npc_dota_muradin_boss"):GetAbsOrigin(), nil, 2000, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false)
+					local RameroCheck = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, Entities:FindByName(nil, "npc_dota_muradin_boss"):GetAbsOrigin(), nil, 2000, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER, false)
 					for _, hero in pairs(RameroCheck) do
 						if hero:IsRealHero() then
 							FindClearSpaceForUnit(hero, base_good:GetAbsOrigin(), true)
 						end
 					end
-					Check = Check +1
+					Check = Check + 1
 					return 1
 				end
 			end)
@@ -386,11 +386,11 @@ function SogatEvent(time) -- 750 kills
 end
 
 function DuelEvent()
-PauseCreeps()
-SpawnRunes()
-CustomGameEventManager:Send_ServerToAllClients("show_duel", {})
+	PauseCreeps()
+	SpawnRunes()
+	CustomGameEventManager:Send_ServerToAllClients("show_duel", {})
 
-	Notifications:TopToAll({text="Fight your team mates until 1 team survives!", duration=10.0, style={color="white"}})
+	Notifications:TopToAll({ text = "Fight your team mates until 1 team survives!", duration = 10.0, style = { color = "white" } })
 
 	-- Initialize duel
 	for _, hero in pairs(HeroList:GetAllHeroes()) do
@@ -400,10 +400,10 @@ CustomGameEventManager:Send_ServerToAllClients("show_duel", {})
 		if not hero:HasOwnerAbandoned() then
 			if PlayerResource:IsValidPlayerID(hero:GetPlayerOwnerID()) and hero:IsRealHero() then
 				if ID == 0 or ID == 2 or ID == 4 or ID == 6 then
---					hero:SetTeam(DOTA_TEAM_CUSTOM_3)
---					if hero:GetPlayerOwner() then
---						hero:GetPlayerOwner():SetTeam(DOTA_TEAM_CUSTOM_3)
---					end
+					--					hero:SetTeam(DOTA_TEAM_CUSTOM_3)
+					--					if hero:GetPlayerOwner() then
+					--						hero:GetPlayerOwner():SetTeam(DOTA_TEAM_CUSTOM_3)
+					--					end
 				elseif ID == 1 or ID == 3 or ID == 5 or ID == 7 then
 					hero:SetTeam(DOTA_TEAM_BADGUYS)
 					if hero:GetPlayerOwner() then
@@ -412,11 +412,11 @@ CustomGameEventManager:Send_ServerToAllClients("show_duel", {})
 				end
 				hero:SetGold(Gold, false)
 
-				local point = Entities:FindByName(nil, "duel_event_"..ID)
+				local point = Entities:FindByName(nil, "duel_event_" .. ID)
 				TeleportHero(hero, point:GetAbsOrigin(), 3.0)
 
 				-- Duel Settings
-				hero:SetPhysicalArmorBaseValue(0 - hero:GetPhysicalArmorValue(false)*0.80) -- Remove 80% of the heroes armor
+				hero:SetPhysicalArmorBaseValue(0 - hero:GetPhysicalArmorValue(false) * 0.80) -- Remove 80% of the heroes armor
 
 				for itemSlot = 0, 14 do
 					local item = hero:GetItemInSlot(itemSlot)
@@ -433,7 +433,7 @@ CustomGameEventManager:Send_ServerToAllClients("show_duel", {})
 			elseif hero:GetTeamNumber() == 3 then
 				TeleportHero(hero, base_bad:GetAbsOrigin(), 3.0)
 			end
-			Notifications:TopToAll({text="Disconnected hero detected, teleporting out of arena!", duration=5.0, style={color="white"}})
+			Notifications:TopToAll({ text = "Disconnected hero detected, teleporting out of arena!", duration = 5.0, style = { color = "white" } })
 		end
 	end
 
@@ -441,25 +441,25 @@ CustomGameEventManager:Send_ServerToAllClients("show_duel", {})
 	local RadiantCheck = 0
 	local DireCheck = 0
 	timers.Duel = Timers:CreateTimer(1.0, function()
-		local RadiantPlayers = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false)
-		local DirePlayers = FindUnitsInRadius(DOTA_TEAM_BADGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false)
+		local RadiantPlayers = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER, false)
+		local DirePlayers = FindUnitsInRadius(DOTA_TEAM_BADGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER, false)
 		local RadiantNumber = 0
 		local DireNumber = 0
 
 		--Count the number of players alive in each teams
 		for _, unit in pairs(RadiantPlayers) do
 			if unit:IsAlive() then
-				RadiantNumber = RadiantNumber +1
+				RadiantNumber = RadiantNumber + 1
 			end
 		end
 		for _, unit in pairs(DirePlayers) do
 			if unit:IsAlive() then
-				DireNumber = DireNumber +1
+				DireNumber = DireNumber + 1
 			end
 		end
 
 		if RadiantNumber == 0 then --if a whole team is dead then
-			RadiantCheck = RadiantCheck +1
+			RadiantCheck = RadiantCheck + 1
 		elseif RadiantNumber > 0 then --elseif a player revives
 			RadiantCheck = 0
 		end
@@ -469,7 +469,7 @@ CustomGameEventManager:Send_ServerToAllClients("show_duel", {})
 		end
 
 		if DireNumber == 0 then
-			DireCheck = DireCheck +1
+			DireCheck = DireCheck + 1
 		elseif DireNumber > 0 then
 			DireCheck = 0
 		end
@@ -478,19 +478,19 @@ CustomGameEventManager:Send_ServerToAllClients("show_duel", {})
 			print("Radiant Win!")
 		end
 
-		print("Radiant Check: "..RadiantCheck)
-		print("Dire Check: "..DireCheck)
-		print("Duel Score: "..RadiantNumber.."/"..DireNumber)
+		print("Radiant Check: " .. RadiantCheck)
+		print("Dire Check: " .. DireCheck)
+		print("Duel Score: " .. RadiantNumber .. "/" .. DireNumber)
 		return 1.0
 	end)
 end
 
 function DuelRanked()
-PauseCreeps()
-SpawnRunes()
---	CustomGameEventManager:Send_ServerToAllClients("show_duel", {})
+	PauseCreeps()
+	SpawnRunes()
+	--	CustomGameEventManager:Send_ServerToAllClients("show_duel", {})
 
-	Notifications:TopToAll({text="It's Duel Time!", duration=5.0, style={color="white"}})
+	Notifications:TopToAll({ text = "It's Duel Time!", duration = 5.0, style = { color = "white" } })
 
 	-- Initialize duel
 	for _, hero in pairs(HeroList:GetAllHeroes()) do
@@ -498,11 +498,11 @@ SpawnRunes()
 		hero:SetRespawnsDisabled(true)
 		if PlayerResource:GetConnectionState() == 2 then
 			if PlayerResource:IsValidPlayerID(hero:GetPlayerOwnerID()) and hero:IsRealHero() then
-				local point = Entities:FindByName(nil, "duel_event_"..ID)
+				local point = Entities:FindByName(nil, "duel_event_" .. ID)
 				TeleportHero(hero, point:GetAbsOrigin(), 3.0)
 
 				-- Duel Settings
---				hero:SetPhysicalArmorBaseValue(0 - hero:GetPhysicalArmorValue(false)*0.80) -- Remove 80% of the heroes armor
+				--				hero:SetPhysicalArmorBaseValue(0 - hero:GetPhysicalArmorValue(false)*0.80) -- Remove 80% of the heroes armor
 
 				for itemSlot = 0, 14 do
 					local item = hero:GetItemInSlot(itemSlot)
@@ -519,7 +519,7 @@ SpawnRunes()
 			elseif hero:GetTeamNumber() == 3 then
 				TeleportHero(hero, base_bad:GetAbsOrigin(), 3.0)
 			end
-			Notifications:TopToAll({text="Disconnected hero detected, teleporting out of arena!", duration=5.0, style={color="white"}})
+			Notifications:TopToAll({ text = "Disconnected hero detected, teleporting out of arena!", duration = 5.0, style = { color = "white" } })
 		end
 	end
 
@@ -527,25 +527,25 @@ SpawnRunes()
 	local RadiantCheck = 0
 	local DireCheck = 0
 	timers.Duel = Timers:CreateTimer(1.0, function()
-		local RadiantPlayers = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false)
-		local DirePlayers = FindUnitsInRadius(DOTA_TEAM_BADGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false)
+		local RadiantPlayers = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER, false)
+		local DirePlayers = FindUnitsInRadius(DOTA_TEAM_BADGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER, false)
 		local RadiantNumber = 0
 		local DireNumber = 0
 
 		--Count the number of players alive in each teams
 		for _, unit in pairs(RadiantPlayers) do
 			if unit:IsAlive() then
-				RadiantNumber = RadiantNumber +1
+				RadiantNumber = RadiantNumber + 1
 			end
 		end
 		for _, unit in pairs(DirePlayers) do
 			if unit:IsAlive() then
-				DireNumber = DireNumber +1
+				DireNumber = DireNumber + 1
 			end
 		end
 
 		if RadiantNumber == 0 then --if a whole team is dead then
-			RadiantCheck = RadiantCheck +1
+			RadiantCheck = RadiantCheck + 1
 		elseif RadiantNumber > 0 then --elseif a player revives
 			RadiantCheck = 0
 		end
@@ -555,7 +555,7 @@ SpawnRunes()
 		end
 
 		if DireNumber == 0 then
-			DireCheck = DireCheck +1
+			DireCheck = DireCheck + 1
 		elseif DireNumber > 0 then
 			DireCheck = 0
 		end
@@ -564,9 +564,9 @@ SpawnRunes()
 			print("Radiant Win!")
 		end
 
-		print("Radiant Check: "..RadiantCheck)
-		print("Dire Check: "..DireCheck)
-		print("Duel Score: "..RadiantNumber.."/"..DireNumber)
+		print("Radiant Check: " .. RadiantCheck)
+		print("Dire Check: " .. DireCheck)
+		print("Duel Score: " .. RadiantNumber .. "/" .. DireNumber)
 		return 1.0
 	end)
 end

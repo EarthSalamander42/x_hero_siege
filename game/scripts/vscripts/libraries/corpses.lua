@@ -27,7 +27,7 @@ function Corpses:CreateFromUnit(killed)
 		corpse.playerID = killed:GetPlayerOwnerID()
 		corpse:SetForwardVector(fv)
 		corpse:AddNoDraw()
-		corpse:AddNewModifier(nil, nil, "modifier_corpse", {})
+		corpse:AddNewModifier(corpse, nil, "modifier_corpse", {})
 
 		Timers:CreateTimer(CORPSE_APPEAR_DELAY, function()
 			if IsValidEntity(corpse) then
@@ -67,7 +67,7 @@ function Corpses:CreateByNameOnPosition(name, position, team)
 	end
 
 	corpse:StartExpiration()
-	
+
 	return corpse
 end
 
@@ -79,7 +79,7 @@ function Corpses:FindInRadius(playerID, origin, radius)
 			table.insert(corpses, target)
 		end
 	end
-	for _,target in pairs(targets) do
+	for _, target in pairs(targets) do
 		if IsCorpse(target) and target.meat_wagon and target.meat_wagon:GetPlayerOwnerID() == playerID then -- Check meat wagon ownership
 			table.insert(corpses, target)
 		end
@@ -104,31 +104,31 @@ end
 function LeavesCorpse(unit)
 	if not unit or not IsValidEntity(unit) then
 		return false
-	-- Heroes don't leave corpses (includes illusions)
+		-- Heroes don't leave corpses (includes illusions)
 	elseif unit:IsHero() then
 		return false
-	-- Ignore buildings 
+		-- Ignore buildings
 	elseif unit.GetInvulnCount ~= nil then
 		return false
-	-- Ignore units that start with dummy keyword   
+		-- Ignore units that start with dummy keyword
 	elseif unit:IsDummy() then
 		return false
-	-- Ignore units that were specifically set to leave no corpse
---	elseif unit.no_corpse then
---		return false
-	-- Air units
---	elseif unit:GetKeyValue("MovementCapabilities") == "DOTA_UNIT_CAP_MOVE_FLY" then
---		return false
-	-- Summoned units via permanent modifier
+		-- Ignore units that were specifically set to leave no corpse
+		--	elseif unit.no_corpse then
+		--		return false
+		-- Air units
+		--	elseif unit:GetKeyValue("MovementCapabilities") == "DOTA_UNIT_CAP_MOVE_FLY" then
+		--		return false
+		-- Summoned units via permanent modifier
 	elseif unit:IsSummoned() then
 		return false
-	-- Read the LeavesCorpse KV
+		-- Read the LeavesCorpse KV
 	else
 		local leavesCorpse = unit:GetKeyValue("LeavesCorpse")
 		if leavesCorpse and leavesCorpse == 0 then
 			return false
 		else
-			-- Leave corpse     
+			-- Leave corpse
 			return true
 		end
 	end

@@ -73,12 +73,12 @@ ListenToGameEvent('game_rules_state_change', function()
 
 		local ice_towers = Entities:FindAllByName("npc_tower_death")
 		for _, tower in pairs(ice_towers) do
-			tower:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
+			tower:AddNewModifier(tower, nil, "modifier_invulnerable", nil)
 		end
 
 		for TW = 1, 2 do
 			local ice_towers_main = Entities:FindByName(nil, "npc_tower_cold_" .. TW)
-			ice_towers_main:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
+			ice_towers_main:AddNewModifier(ice_towers_main, nil, "modifier_invulnerable", nil)
 			ice_towers_main.zone = "xhs_holdout"
 		end
 		print("Ice towers setup")
@@ -87,12 +87,12 @@ ListenToGameEvent('game_rules_state_change', function()
 		for Players = 1, 8 do
 			local towers = Entities:FindAllByName("dota_badguys_tower" .. Players)
 			for _, tower in pairs(towers) do
-				tower:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
+				tower:AddNewModifier(tower, nil, "modifier_invulnerable", nil)
 			end
 			local raxes = Entities:FindAllByName("dota_badguys_barracks_" .. Players)
 			for _, rax in pairs(raxes) do
 				rax.zone = "xhs_holdout"
-				rax:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
+				rax:AddNewModifier(rax, nil, "modifier_invulnerable", nil)
 			end
 		end
 		print("Towers setup")
@@ -215,7 +215,7 @@ ListenToGameEvent('npc_spawned', function(keys)
 						npc:RemoveModifierByName("modifier_item_ultimate_scepter_consumed")
 						npc:RemoveModifierByName("modifier_item_ultimate_scepter_consumed")
 						npc:AddNewModifier(npc, ability, "modifier_item_ultimate_scepter_consumed", {})
-						npc:AddNewModifier(npc, nil, "modifier_tiny_craggy_exterior", {})
+						-- npc:AddNewModifier(npc, nil, "modifier_tiny_craggy_exterior", {})
 					end
 				end
 			end
@@ -606,8 +606,8 @@ ListenToGameEvent("player_chat", function(keys)
 				if PlayerResource:IsValidPlayer(Frozen) then
 					if str == "-freeze_" .. Frozen + 1 then
 						local hero = PlayerResource:GetPlayer(Frozen):GetAssignedHero()
-						hero:AddNewModifier(nil, nil, "modifier_pause_creeps", {})
-						hero:AddNewModifier(nil, nil, "modifier_invulnerable", {})
+						hero:AddNewModifier(hero, nil, "modifier_pause_creeps", {})
+						hero:AddNewModifier(hero, nil, "modifier_invulnerable", {})
 						PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
 						Notifications:TopToAll({ text = "[ADMIN MOD]: ", duration = 6.0, style = { color = "red", ["font-size"] = "30px" } })
 						Notifications:TopToAll({ text = PlayerNames[Frozen + 1] .. " ", style = { color = PlayerNames[Frozen + 1], ["font-size"] = "25px" }, continue = true })
@@ -968,7 +968,7 @@ ListenToGameEvent('entity_killed', function(keys)
 						end)
 						Timers:CreateTimer(0.17, function()
 							Bear:RespawnUnit()
-							Bear:AddNewModifier(nil, nil, "modifier_pause_creeps", { duration = 4.8 })
+							Bear:AddNewModifier(Bear, nil, "modifier_pause_creeps", { duration = 4.8 })
 						end)
 					end
 				end

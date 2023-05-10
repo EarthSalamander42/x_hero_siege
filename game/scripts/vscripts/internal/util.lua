@@ -20,19 +20,19 @@ function DebugPrintTable(...)
 	end
 end
 
-function PrintTable( t, indent )
+function PrintTable(t, indent)
 	--print( "PrintTable( t, indent ): " )
 	if type(t) ~= "table" then return end
 
-	for k,v in pairs( t ) do
-		if type( v ) == "table" then
-			if ( v ~= t ) then
-				print( indent .. tostring( k ) .. ":\n" .. indent .. "{" )
-				PrintTable( v, indent .. "  " )
-				print( indent .. "}" )
+	for k, v in pairs(t) do
+		if type(v) == "table" then
+			if (v ~= t) then
+				print(indent .. tostring(k) .. ":\n" .. indent .. "{")
+				PrintTable(v, indent .. "  ")
+				print(indent .. "}")
 			end
 		else
-		print( indent .. tostring( k ) .. ":" .. tostring(v) )
+			print(indent .. tostring(k) .. ":" .. tostring(v))
 		end
 	end
 end
@@ -77,10 +77,10 @@ function HideWearables(event)
 	end
 end
 
-function ShowWearables( event )
+function ShowWearables(event)
 	local hero = event.caster
 
-	for i,v in pairs(hero.hiddenWearables) do
+	for i, v in pairs(hero.hiddenWearables) do
 		v:RemoveEffects(EF_NODRAW)
 	end
 end
@@ -111,13 +111,13 @@ end
 
 -- Checks if a hero is wielding Aghanim's Scepter
 function HasScepter(hero)
-	for i=0,5 do
+	for i = 0, 5 do
 		local item = hero:GetItemInSlot(i)
 		if item and item:GetAbilityName() == "item_ultimate_scepter" then
 			return true
 		end
 	end
-	
+
 	return false
 end
 
@@ -135,24 +135,24 @@ function shallowcopy(orig)
 	return copy
 end
 
-function ShuffledList( orig_list )
-	local list = shallowcopy( orig_list )
+function ShuffledList(orig_list)
+	local list = shallowcopy(orig_list)
 	local result = {}
 	local count = #list
 	for i = 1, count do
-		local pick = RandomInt( 1, #list )
-		result[ #result + 1 ] = list[ pick ]
-		table.remove( list, pick )
+		local pick = RandomInt(1, #list)
+		result[#result + 1] = list[pick]
+		table.remove(list, pick)
 	end
 	return result
 end
 
 function GenerateNumPointsAround(num, center, distance)
 	local points = {}
-	local angle = 360/num
-	for i=0,num-1 do
-		local rotate_pos = center + Vector(1,0,0) * distance
-		table.insert(points, RotatePosition(center, QAngle(0, angle*i, 0), rotate_pos) )
+	local angle = 360 / num
+	for i = 0, num - 1 do
+		local rotate_pos = center + Vector(1, 0, 0) * distance
+		table.insert(points, RotatePosition(center, QAngle(0, angle * i, 0), rotate_pos))
 	end
 	return points
 end
@@ -208,8 +208,8 @@ end
 
 -- IMBA Rune System
 function SpawnRunes()
-local powerup_rune_locations = Entities:FindAllByName("dota_item_rune_spawner_custom")
-local game_time = GameRules:GetDOTATime(false, false)
+	local powerup_rune_locations = Entities:FindAllByName("dota_item_rune_spawner_custom")
+	local game_time = GameRules:GetDOTATime(false, false)
 
 	RemoveRunes()
 
@@ -226,7 +226,6 @@ local game_time = GameRules:GetDOTATime(false, false)
 end
 
 function RegisterRune(rune)
-
 	-- Initialize table
 	if not rune_spawn_table then
 		rune_spawn_table = {}
@@ -238,10 +237,9 @@ end
 
 function RemoveRunes()
 	if rune_spawn_table then
-
 		-- Remove existing runes
 		for _, rune in pairs(rune_spawn_table) do
-			if not rune:IsNull() then								
+			if not rune:IsNull() then
 				local item = rune:GetContainedItem()
 				UTIL_Remove(item)
 				UTIL_Remove(rune)
@@ -268,22 +266,22 @@ end
 
 -- Overrides dota method, use modifier_summoned MODIFIER_STATE_DOMINATED
 function CDOTA_BaseNPC:IsSummoned()
-    return self:IsDominated()
+	return self:IsDominated()
 end
 
 function CDOTA_BaseNPC:IsDummy()
-    return self:GetUnitName():match("dummy_") or self:GetUnitLabel():match("dummy")
+	return self:GetUnitName():match("dummy_") or self:GetUnitLabel():match("dummy")
 end
 
 function SendErrorMessage(playerID, string)
-	CustomGameEventManager:Send_ServerToPlayer(PlayerResource:GetPlayer(playerID), "dotacraft_error_message", {message=string}) 
+	CustomGameEventManager:Send_ServerToPlayer(PlayerResource:GetPlayer(playerID), "dotacraft_error_message", { message = string })
 end
 
 -- Similar to SendErrorMessage to the bottom, except it checks whether the source of error is currently selected unit/hero.
 function SendErrorMessageForSelectedUnit(playerID, string, unit)
 	local selected = PlayerResource:GetSelectedEntities(playerID)
 	if selected and selected["0"] == unit:GetEntityIndex() then
-		CustomGameEventManager:Send_ServerToPlayer(PlayerResource:GetPlayer(playerID), "dotacraft_error_message", {message=string})
+		CustomGameEventManager:Send_ServerToPlayer(PlayerResource:GetPlayer(playerID), "dotacraft_error_message", { message = string })
 	end
 end
 
@@ -302,7 +300,7 @@ function SkeletonKingWearables(hero)
 	Attachments:AttachProp(hero, "attach_hitloc", "models/heroes/wraith_king/wraith_king_chest.vmdl", 1.0)
 
 	-- Gauntlet
---	Attachments:AttachProp(hero, "attach_attack1", "models/heroes/wraith_king/wraith_king_gauntlet.vmdl", 1.0)
+	--	Attachments:AttachProp(hero, "attach_attack1", "models/heroes/wraith_king/wraith_king_gauntlet.vmdl", 1.0)
 
 	-- Weapon
 	Attachments:AttachProp(hero, "attach_attack1", "models/items/skeleton_king/the_blood_shard/the_blood_shard.vmdl", 1.0)
@@ -315,7 +313,7 @@ end
 
 -- ITEMS
 function GetItemByID(id)
-	for k,v in pairs(GameMode.ItemKVs) do
+	for k, v in pairs(GameMode.ItemKVs) do
 		if tonumber(v["ID"]) == id then return v end
 	end
 end
@@ -348,9 +346,9 @@ end
 
 function OpenCreepLane(lane_number)
 	if CREEP_LANES[lane_number][1] == 1 then return end
-	local DoorObs = Entities:FindAllByName("obstruction_lane"..lane_number)
-	local towers = Entities:FindAllByName("dota_badguys_tower"..lane_number)
-	local raxes = Entities:FindAllByName("dota_badguys_barracks_"..lane_number)
+	local DoorObs = Entities:FindAllByName("obstruction_lane" .. lane_number)
+	local towers = Entities:FindAllByName("dota_badguys_tower" .. lane_number)
+	local raxes = Entities:FindAllByName("dota_badguys_barracks_" .. lane_number)
 
 	for _, obs in pairs(DoorObs) do
 		obs:SetEnabled(false, true)
@@ -364,9 +362,9 @@ function OpenCreepLane(lane_number)
 		rax:RemoveModifierByName("modifier_invulnerable")
 	end
 
-	Notifications:TopToAll({text="Host opened lane "..lane_number.."!", style={color="lightgreen"}, duration=5.0})
+	Notifications:TopToAll({ text = "Host opened lane " .. lane_number .. "!", style = { color = "lightgreen" }, duration = 5.0 })
 	CREEP_LANES[lane_number][1] = 1
-	DoEntFire("door_lane"..lane_number, "SetAnimation", "gate_02_open", 0, nil, nil)
+	DoEntFire("door_lane" .. lane_number, "SetAnimation", "gate_02_open", 0, nil, nil)
 end
 
 function CloseLane(ID, lane_number)
@@ -419,41 +417,41 @@ function CloseCreepLane(lane_number)
 	if not CREEP_LANES[lane_number][1] then return end
 
 	if CREEP_LANES[lane_number][1] == 0 then return end
-	local DoorObs = Entities:FindAllByName("obstruction_lane"..lane_number)
-	local towers = Entities:FindAllByName("dota_badguys_tower"..lane_number)
-	local raxes = Entities:FindAllByName("dota_badguys_barracks_"..lane_number)
+	local DoorObs = Entities:FindAllByName("obstruction_lane" .. lane_number)
+	local towers = Entities:FindAllByName("dota_badguys_tower" .. lane_number)
+	local raxes = Entities:FindAllByName("dota_badguys_barracks_" .. lane_number)
 
 	for _, obs in pairs(DoorObs) do
 		obs:SetEnabled(true, false)
 	end
 
 	for _, tower in pairs(towers) do
-		tower:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
+		tower:AddNewModifier(tower, nil, "modifier_invulnerable", nil)
 	end
 
 	for _, rax in pairs(raxes) do
-		rax:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
+		rax:AddNewModifier(rax, nil, "modifier_invulnerable", nil)
 	end
 
-	Notifications:TopToAll({text="Host closed lane "..lane_number.."!", style={color="red"}, duration=5.0})
+	Notifications:TopToAll({ text = "Host closed lane " .. lane_number .. "!", style = { color = "red" }, duration = 5.0 })
 	CREEP_LANES[lane_number][1] = 0
-	DoEntFire("door_lane"..lane_number, "SetAnimation", "gate_02_close", 0, nil, nil)
+	DoEntFire("door_lane" .. lane_number, "SetAnimation", "gate_02_close", 0, nil, nil)
 end
 
 function PauseHeroes()
 	-- heal/revive heroes
 	RefreshPlayers()
 
-	for _,hero in pairs(HeroList:GetAllHeroes()) do
+	for _, hero in pairs(HeroList:GetAllHeroes()) do
 		if hero:IsRealHero() then
-			hero:AddNewModifier(nil, nil, "modifier_pause_creeps", nil)
-			hero:AddNewModifier(nil, nil, "modifier_invulnerable", nil)
+			hero:AddNewModifier(hero, nil, "modifier_pause_creeps", nil)
+			hero:AddNewModifier(hero, nil, "modifier_invulnerable", nil)
 		end
 	end
 end
 
 function RestartHeroes()
-	for _,hero in pairs(HeroList:GetAllHeroes()) do
+	for _, hero in pairs(HeroList:GetAllHeroes()) do
 		if hero:IsRealHero() then
 			hero:RemoveModifierByName("modifier_pause_creeps")
 			hero:RemoveModifierByName("modifier_invulnerable")
@@ -462,51 +460,51 @@ function RestartHeroes()
 end
 
 function PauseCreeps(iTime)
-local units = FindUnitsInRadius( DOTA_TEAM_CUSTOM_1, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false )
-local units2 = FindUnitsInRadius( DOTA_TEAM_GOODGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false )
-local units3 = FindUnitsInRadius( DOTA_TEAM_BADGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false )
+	local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_1, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER, false)
+	local units2 = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER, false)
+	local units3 = FindUnitsInRadius(DOTA_TEAM_BADGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER, false)
 
-	for _,v in pairs(units) do
+	for _, v in pairs(units) do
 		if v:HasMovementCapability() and not v.Boss then
-			v:AddNewModifier(nil, nil, "modifier_pause_creeps", {duration=iTime})
-			v:AddNewModifier(nil, nil, "modifier_invulnerable", {duration=iTime})
+			v:AddNewModifier(v, nil, "modifier_pause_creeps", { duration = iTime })
+			v:AddNewModifier(v, nil, "modifier_invulnerable", { duration = iTime })
 		end
 	end
 
-	for _,v in pairs(units2) do
+	for _, v in pairs(units2) do
 		if v:HasMovementCapability() then
-			v:AddNewModifier(nil, nil, "modifier_pause_creeps", {duration=iTime})
-			v:AddNewModifier(nil, nil, "modifier_invulnerable", {duration=iTime})
+			v:AddNewModifier(v, nil, "modifier_pause_creeps", { duration = iTime })
+			v:AddNewModifier(v, nil, "modifier_invulnerable", { duration = iTime })
 		end
 	end
-	
-	for _,v in pairs(units3) do
+
+	for _, v in pairs(units3) do
 		if v:HasMovementCapability() then
-			v:AddNewModifier(nil, nil, "modifier_pause_creeps", {duration=iTime})
-			v:AddNewModifier(nil, nil, "modifier_invulnerable", {duration=iTime})
+			v:AddNewModifier(v, nil, "modifier_pause_creeps", { duration = iTime })
+			v:AddNewModifier(v, nil, "modifier_invulnerable", { duration = iTime })
 		end
 	end
 end
 
 function KillCreeps(teamnumber)
-local units = FindUnitsInRadius(teamnumber, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false )
+	local units = FindUnitsInRadius(teamnumber, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER, false)
 
-	for _,v in pairs(units) do
+	for _, v in pairs(units) do
 		if v:HasMovementCapability() then
---			v:RemoveSelf()
+			--			v:RemoveSelf()
 			v:ForceKill(false) -- looks better visually, revert if causing new bugs
 		end
 	end
 end
 
 function RestartCreeps(delay)
-local units = FindUnitsInRadius( DOTA_TEAM_BADGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false )
-local units2 = FindUnitsInRadius( DOTA_TEAM_GOODGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false )
-local units3 = FindUnitsInRadius( DOTA_TEAM_CUSTOM_1, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_INVULNERABLE , FIND_ANY_ORDER, false )
+	local units = FindUnitsInRadius(DOTA_TEAM_BADGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER, false)
+	local units2 = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER, false)
+	local units3 = FindUnitsInRadius(DOTA_TEAM_CUSTOM_1, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER, false)
 
 	Timers:CreateTimer(delay, function()
-		for _,v in pairs(units) do
---			if v and v:HasMovementCapability() then
+		for _, v in pairs(units) do
+			--			if v and v:HasMovementCapability() then
 			if IsValidEntity(v) then
 				if v:HasModifier("modifier_pause_creeps") then
 					v:RemoveModifierByName("modifier_pause_creeps")
@@ -517,8 +515,8 @@ local units3 = FindUnitsInRadius( DOTA_TEAM_CUSTOM_1, Vector(0, 0, 0), nil, FIND
 			end
 		end
 
-		for _,v in pairs(units2) do
---			if v and v:HasMovementCapability() then
+		for _, v in pairs(units2) do
+			--			if v and v:HasMovementCapability() then
 			if IsValidEntity(v) and not string.find(v:GetUnitName(), "npc_xhs_paladin") then
 				if v:HasModifier("modifier_pause_creeps") then
 					v:RemoveModifierByName("modifier_pause_creeps")
@@ -528,9 +526,9 @@ local units3 = FindUnitsInRadius( DOTA_TEAM_CUSTOM_1, Vector(0, 0, 0), nil, FIND
 				end
 			end
 		end
-	
-		for _,v in pairs(units3) do
---			if v and v:HasMovementCapability() then
+
+		for _, v in pairs(units3) do
+			--			if v and v:HasMovementCapability() then
 			if IsValidEntity(v) then
 				if v:HasModifier("modifier_pause_creeps") then
 					v:RemoveModifierByName("modifier_pause_creeps")
@@ -546,14 +544,14 @@ end
 function DisableItems(hero, time)
 	timers.disabled_items = Timers:CreateTimer(0.0, function()
 		for itemSlot = 0, 5 do
-		local item = hero:GetItemInSlot(itemSlot)
+			local item = hero:GetItemInSlot(itemSlot)
 			if item then
 				if item:GetName() == "item_tome_small" then
 					item:StartCooldown(time)
 				elseif item:GetName() == "item_tome_big" then
 					item:StartCooldown(time)
 				elseif item:GetName() == "item_tpscroll" then
-				item:StartCooldown(time)
+					item:StartCooldown(time)
 				end
 			end
 		end
@@ -565,25 +563,25 @@ function EnableItems(hero)
 		Timers:RemoveTimer(timers.disabled_items)
 	end
 	for itemSlot = 0, 5 do
-	local item = hero:GetItemInSlot(itemSlot)
+		local item = hero:GetItemInSlot(itemSlot)
 		if item then
 			if item:GetName() == "item_tome_small" then
 				item:EndCooldown()
 			elseif item:GetName() == "item_tome_big" then
 				item:EndCooldown()
 			elseif item:GetName() == "item_tpscroll" then
-			item:EndCooldown()
+				item:EndCooldown()
 			end
 		end
 	end
 end
 
 function SendErrorMessage(playerID, string)
-	CustomGameEventManager:Send_ServerToPlayer(PlayerResource:GetPlayer(playerID), "dotacraft_error_message", {message=string}) 
+	CustomGameEventManager:Send_ServerToPlayer(PlayerResource:GetPlayer(playerID), "dotacraft_error_message", { message = string })
 end
 
 function RefreshPlayers()
-	for nPlayerID = 0, PlayerResource:GetPlayerCount() -1 do
+	for nPlayerID = 0, PlayerResource:GetPlayerCount() - 1 do
 		if PlayerResource:HasSelectedHero(nPlayerID) then
 			local hero = PlayerResource:GetSelectedHeroEntity(nPlayerID)
 
@@ -608,7 +606,7 @@ function TeleportHero(hero, point, delay, iCameraSpeed)
 	if hero:GetPlayerID() == -1 then return end
 	if delay == nil then delay = 0 end
 	local pos = hero:GetAbsOrigin()
---	local pos = hero:GetAbsOrigin() + RandomVector(400)
+	--	local pos = hero:GetAbsOrigin() + RandomVector(400)
 
 	local TeleportEffect
 	local TeleportEffectEnd
@@ -616,19 +614,19 @@ function TeleportHero(hero, point, delay, iCameraSpeed)
 	if delay > 0 then
 		TeleportEffect = ParticleManager:CreateParticle("particles/items2_fx/teleport_start.vpcf", PATTACH_ABSORIGIN, hero, hero)
 		ParticleManager:SetParticleControlEnt(TeleportEffect, PATTACH_ABSORIGIN, hero, PATTACH_ABSORIGIN, "attach_origin", pos, true)
-		hero:Attribute_SetIntValue( "effectsID", TeleportEffect )
+		hero:Attribute_SetIntValue("effectsID", TeleportEffect)
 
 		TeleportEffectEnd = ParticleManager:CreateParticle("particles/items2_fx/teleport_end.vpcf", PATTACH_ABSORIGIN, hero, hero)
 		ParticleManager:SetParticleControlEnt(TeleportEffect, PATTACH_ABSORIGIN, hero, PATTACH_ABSORIGIN, "attach_origin", point, true)
 		ParticleManager:SetParticleControl(TeleportEffectEnd, 1, point)
-		hero:Attribute_SetIntValue( "effectsID", TeleportEffect )
+		hero:Attribute_SetIntValue("effectsID", TeleportEffect)
 
 		hero:EmitSound("Portal.Loop_Appear")
 	end
 
 	hero:AddNewModifier(hero, nil, "modifier_command_restricted", {})
 
-	CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "set_player_camera", {hPosition = point, iSpeed = iCameraSpeed})
+	CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "set_player_camera", { hPosition = point, iSpeed = iCameraSpeed })
 
 	Timers:CreateTimer(delay, function()
 		EmitSoundOnLocationWithCaster(pos, "Portal.Hero_Disappear", hero)
@@ -674,7 +672,7 @@ end
 function ChangeAttackProjectile(unit)
 	local particle_lifesteal = "particles/item/lifesteal_mask/lifesteal_particle.vpcf"
 
-	if unit:HasModifier("modifier_lifesteal_custom") then		
+	if unit:HasModifier("modifier_lifesteal_custom") then
 		unit:SetRangedProjectileName(particle_lifesteal)
 	else
 		unit:SetRangedProjectileName(GetBaseRangedProjectileName(unit))
@@ -683,40 +681,40 @@ end
 
 function StunBuildings(time)
 	for Players = 1, 8 do
-		local towers = Entities:FindAllByName("dota_badguys_tower"..Players)
+		local towers = Entities:FindAllByName("dota_badguys_tower" .. Players)
 		for _, tower in pairs(towers) do
 			if not tower:HasModifier("modifier_invulnerable") then
-				tower:AddNewModifier(nil, nil, "modifier_invulnerable", {duration=time})
+				tower:AddNewModifier(tower, nil, "modifier_invulnerable", { duration = time })
 			end
 		end
-		local raxes = Entities:FindAllByName("dota_badguys_barracks_"..Players)
+		local raxes = Entities:FindAllByName("dota_badguys_barracks_" .. Players)
 		for _, rax in pairs(raxes) do
 			if not rax:HasModifier("modifier_invulnerable") then
-				rax:AddNewModifier(nil, nil, "modifier_invulnerable", {duration=time})
+				rax:AddNewModifier(rax, nil, "modifier_invulnerable", { duration = time })
 			end
 		end
 	end
 	for TW = 1, 2 do
-		local ice_towers = Entities:FindAllByName("npc_tower_cold_"..TW)
+		local ice_towers = Entities:FindAllByName("npc_tower_cold_" .. TW)
 		for _, tower in pairs(ice_towers) do
 			if not tower:HasModifier("modifier_invulnerable") then
-				tower:AddNewModifier(nil, nil, "modifier_invulnerable", {duration=time})
+				tower:AddNewModifier(tower, nil, "modifier_invulnerable", { duration = time })
 			end
 		end
 	end
 	local death_towers = Entities:FindAllByName("npc_tower_death")
 	for _, tower in pairs(death_towers) do
 		if not tower:HasModifier("modifier_invulnerable") then
-			tower:AddNewModifier(nil, nil, "modifier_invulnerable", {duration=time})
+			tower:AddNewModifier(tower, nil, "modifier_invulnerable", { duration = time })
 		end
 	end
 end
 
 function getkvValues(tEntity, ...) -- KV Values look hideous in finished code, so this function will parse through all sent KV's for tEntity (typically self)
-	local values = {...}
+	local values = { ... }
 	local data = {}
-	for i,v in ipairs(values) do
-		table.insert(data,tEntity:GetSpecialValueFor(v))
+	for i, v in ipairs(values) do
+		table.insert(data, tEntity:GetSpecialValueFor(v))
 	end
 	return unpack(data)
 end
@@ -741,7 +739,7 @@ function UnitVarToPlayerID(unitvar)
 			end
 		end
 	end
-	
+
 	return -1
 end
 
@@ -847,11 +845,11 @@ function TeleportAllHeroes(sEvent, iInvulnDelay, iTPDelay)
 		if hero:IsRealHero() and hero:GetTeam() == DOTA_TEAM_GOODGUYS then
 			local id = hero:GetPlayerID()
 			if hero:GetPlayerID() ~= -1 then
-				local point = Entities:FindByName(nil, sEvent..tostring(id)) -- might cause error with Dark Fundamental?
+				local point = Entities:FindByName(nil, sEvent .. tostring(id)) -- might cause error with Dark Fundamental?
 
 				TeleportHero(hero, point:GetAbsOrigin(), iTPDelay)
-				hero:AddNewModifier(nil, nil, "modifier_pause_creeps", {duration= iInvulnDelay, IsHidden = true})
-				hero:AddNewModifier(nil, nil, "modifier_invulnerable", {duration= iInvulnDelay, IsHidden = true})
+				hero:AddNewModifier(hero, nil, "modifier_pause_creeps", { duration = iInvulnDelay, IsHidden = true })
+				hero:AddNewModifier(hero, nil, "modifier_invulnerable", { duration = iInvulnDelay, IsHidden = true })
 			end
 		end
 	end
@@ -860,7 +858,7 @@ end
 function GiveTomeToAllHeroes(iCount)
 	local sound_played = false
 
-	Notifications:TopToAll({text="Power Up: +250 to all stats!", style={color="green"}, duration=10.0})
+	Notifications:TopToAll({ text = "Power Up: +250 to all stats!", style = { color = "green" }, duration = 10.0 })
 
 	for _, hero in pairs(HeroList:GetAllHeroes()) do
 		hero:IncrementAttributes(iCount)
@@ -878,7 +876,7 @@ end
 -- credits to yahnich for the following
 function CDOTA_BaseNPC:IsRealHero()
 	if not self:IsNull() then
-		return self:IsHero() and not ( self:IsIllusion() or self:IsClone() ) and not self:IsFakeHero()
+		return self:IsHero() and not (self:IsIllusion() or self:IsClone()) and not self:IsFakeHero()
 	end
 end
 
@@ -904,8 +902,8 @@ function ReturnFromSpecialArena(hero)
 	else
 		if hero:GetTeamNumber() == 2 then
 			TeleportHero(hero, base_good:GetAbsOrigin(), 3.0)
---		elseif hero:GetTeamNumber() == 3 then
---			TeleportHero(hero, base_bad:GetAbsOrigin(), 3.0)
+			--		elseif hero:GetTeamNumber() == 3 then
+			--			TeleportHero(hero, base_bad:GetAbsOrigin(), 3.0)
 		end
 	end
 
