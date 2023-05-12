@@ -9,7 +9,7 @@ ListenToGameEvent('game_rules_state_change', function()
 		end
 
 		Timers:CreateTimer(3.0, function()
-			EmitSoundOn("Global.InGame", base_good)
+			EmitSoundOn("Global.InGame", BASE_GOOD)
 
 			--			if BOTS_ENABLED == true then
 			--			if IsInToolsMode() then
@@ -81,7 +81,6 @@ ListenToGameEvent('game_rules_state_change', function()
 			ice_towers_main:AddNewModifier(ice_towers_main, nil, "modifier_invulnerable", nil)
 			ice_towers_main.zone = "xhs_holdout"
 		end
-		print("Ice towers setup")
 
 		-- Make towers invulnerable again
 		for Players = 1, 8 do
@@ -95,7 +94,6 @@ ListenToGameEvent('game_rules_state_change', function()
 				rax:AddNewModifier(rax, nil, "modifier_invulnerable", nil)
 			end
 		end
-		print("Towers setup")
 
 		for NumPlayers = 1, PlayerResource:GetPlayerCount() * CREEP_LANES_TYPE do
 			CREEP_LANES[NumPlayers][1] = 1
@@ -109,8 +107,6 @@ ListenToGameEvent('game_rules_state_change', function()
 				tower:RemoveModifierByName("modifier_invulnerable")
 			end
 		end
-
-		print("Lanes setup")
 	end
 end, nil)
 
@@ -1017,7 +1013,7 @@ ListenToGameEvent('entity_killed', function(keys)
 			Timers:RemoveTimer(timers.Ramero)
 		elseif killedUnit:GetUnitName() == "npc_dota_hero_secret" then
 			local pos = killedUnit:GetAbsOrigin()
-			DropNeutralItemAtPositionForHero("item_orb_of_frost", pos, killer, true)
+			DropNeutralItemAtPositionForHero("item_orb_of_frost", pos, killer, killer:GetTeam(), true)
 			FROST_FIRST_TIME = true
 		end
 

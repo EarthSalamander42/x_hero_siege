@@ -276,7 +276,7 @@ function StartingItems(hero, newHero)
 	end
 
 	if newHero:GetTeamNumber() == 2 then
-		TeleportHero(newHero, base_good:GetAbsOrigin(), 3.0)
+		TeleportHero(newHero, BASE_GOOD:GetAbsOrigin(), 3.0)
 	elseif newHero:GetTeamNumber() == 3 then
 		TeleportHero(newHero, base_bad:GetAbsOrigin(), 3.0)
 	end

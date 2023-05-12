@@ -171,7 +171,7 @@
 	// loading_screen.txt
 	"game_version_name"		"Priestess of the Moon"
 	"loading_screen_description"		" 				"
-	"loading_screen_button"		"COMING SOON: X Hero Siege website."
+	"loading_screen_button"		"Frostrose Studio mods website."
 	"loading_screen_promote"		"Translate X Hero Siege in your native language!"
 	"loading_screen_promote_description"		"You can translate X Hero Siege on Transifex website, it's easy! Just create an account and subscribe to a language. Give it a try! Don't forget to request your Discord role!"
 	"loading_screen_promote_button"		"Click here to redirect to Transifex!"

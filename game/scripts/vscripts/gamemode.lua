@@ -16,8 +16,6 @@ require('libraries/playerresource')
 require('libraries/playertables')
 require('libraries/gold')
 require('libraries/rgb_to_hex')
-require('libraries/wearables')
-require('libraries/wearables_warmful_ancient')
 require('libraries/corpses')
 
 require('phases/choose_hero')
@@ -46,7 +44,7 @@ end
 require('boss_scripts/boss_functions')
 
 function GameMode:OnFirstPlayerLoaded()
-	base_good = Entities:FindByName(nil, "base_spawn")
+	BASE_GOOD = Entities:FindByName(nil, "base_spawn")
 end
 
 function GameMode:OnHeroInGame(hero)
@@ -64,12 +62,60 @@ function GameMode:OnHeroInGame(hero)
 		TeleportHero(hero, point:GetAbsOrigin())
 	elseif hero:GetUnitName() == "npc_dota_hero_terrorblade" then
 		if IsInToolsMode() then
-			hero:IncrementAttributes(10000)
+			hero:IncrementAttributes(100000)
 		end
 	end
 
 	hero:SetDayTimeVisionRange(XHS_HERO_VISION)
 	hero:SetNightTimeVisionRange(XHS_HERO_VISION)
+
+	-- debugging tool
+	-- if IsInToolsMode() and hero:GetUnitName() == "npc_dota_hero_terrorblade" and hero:IsOwnedByAnyPlayer() then
+	-- 	GameMode:TestEveryUnitSpawn()
+	-- end
+end
+
+function GameMode:TestEveryUnitSpawn()
+	local custom_units = LoadKeyValues("scripts/npc/npc_units_custom.txt")
+	local units_array = {}
+	local delay = 0.5
+
+	local index = 1 -- Indice pour suivre l'unité en cours d'invocation
+
+	for k, v in pairs(custom_units) do
+		table.insert(units_array, k)
+	end
+
+	local function SpawnNextUnit()
+		local unit_name = units_array[index]
+		local remainingUnits = #units_array - index
+		print("Attempt to spawn unit " .. unit_name .. ". Remaining:" .. remainingUnits)
+
+		CreateUnitByName(unit_name, Vector(0, 0, 0), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+
+		index = index + 1
+		if index <= #units_array then
+			return delay
+		else
+			return nil
+		end
+	end
+
+	GameRules:GetGameModeEntity():SetContextThink(DoUniqueString("spawn_units"), function()
+		local context = GameRules:GetGameModeEntity():GetContext("spawn_units")
+		if context then
+			index = tonumber(context)
+		end
+		local nextDelay = SpawnNextUnit()
+		if nextDelay then
+			GameRules:GetGameModeEntity():SetContextThink("spawn_units", function()
+				return SpawnNextUnit()
+			end, nextDelay)
+		else
+			GameRules:GetGameModeEntity():SetContextThink("spawn_units", nil, 0)
+		end
+		return nil
+	end, 0)
 end
 
 function GameMode:InitGameMode()

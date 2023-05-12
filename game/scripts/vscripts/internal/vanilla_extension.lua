@@ -2,7 +2,7 @@ function GetReductionFromArmor(armor)
 	return ((0.052 * armor) / (0.9 + 0.048 * armor))
 end
 
-function CDOTA_BaseNPC:GetLifesteal()
+function CDOTA_BaseNPC:SendLifestealAttack(hTarget)
 	local lifesteal = 0
 
 	-- useless atm because modifier can't have multiple instances, find a way to call lifefsteal attack once
@@ -14,7 +14,19 @@ function CDOTA_BaseNPC:GetLifesteal()
 		end
 	end
 
-	return lifesteal
+	-- print("Lifesteal is " .. lifesteal .. "%")
+
+	if lifesteal > 0 then
+		local damage = self:GetRealDamageDone(hTarget)
+		local heal = damage * (lifesteal / 100)
+
+		self:Heal(heal, self)
+		SendOverheadEventMessage(nil, OVERHEAD_ALERT_HEAL, self, heal, nil)
+
+		local lifesteal_pfx = ParticleManager:CreateParticle("", PATTACH_ABSORIGIN_FOLLOW, self)
+		ParticleManager:SetParticleControl(lifesteal_pfx, 0, self:GetAbsOrigin())
+		ParticleManager:ReleaseParticleIndex(lifesteal_pfx)
+	end
 end
 
 function CDOTA_BaseNPC:GetRealDamageDone(hTarget)
@@ -103,12 +115,14 @@ end
 function CDOTA_BaseNPC:IsFakeHero()
 	if self:IsIllusion() or (self:HasModifier("modifier_monkey_king_fur_army_soldier") or self:HasModifier("modifier_monkey_king_fur_army_soldier_hidden")) or self:IsTempestDouble() or self:IsClone() then
 		return true
-	else return false end
+	else
+		return false
+	end
 end
 
 function CDOTA_BaseNPC:IsRealHero()
 	if not self:IsNull() then
-		return self:IsHero() and not ( self:IsIllusion() or self:IsClone() ) and not self:IsFakeHero()
+		return self:IsHero() and not (self:IsIllusion() or self:IsClone()) and not self:IsFakeHero()
 	end
 end
 
@@ -125,15 +139,15 @@ function CDOTA_BaseNPC:Blink(position, bTeamOnlyParticle, bPlaySound)
 		local blink_pfx = ParticleManager:CreateParticleForTeam(blink_effect, PATTACH_ABSORIGIN, self, self:GetTeamNumber())
 		ParticleManager:ReleaseParticleIndex(blink_pfx)
 	else
-		ParticleManager:FireParticle(blink_effect, PATTACH_ABSORIGIN, self, {[0] = self:GetAbsOrigin()})
+		ParticleManager:FireParticle(blink_effect, PATTACH_ABSORIGIN, self, { [0] = self:GetAbsOrigin() })
 	end
 	FindClearSpaceForUnit(self, position, true)
-	ProjectileManager:ProjectileDodge( self )
+	ProjectileManager:ProjectileDodge(self)
 	if bTeamOnlyParticle == true then
 		local blink_end_pfx = ParticleManager:CreateParticleForTeam(blink_effect_end, PATTACH_ABSORIGIN, self, self:GetTeamNumber())
 		ParticleManager:ReleaseParticleIndex(blink_end_pfx)
 	else
-		ParticleManager:FireParticle(blink_effect_end, PATTACH_ABSORIGIN, self, {[0] = self:GetAbsOrigin()})
+		ParticleManager:FireParticle(blink_effect_end, PATTACH_ABSORIGIN, self, { [0] = self:GetAbsOrigin() })
 	end
 	if bPlaySound == true then EmitSoundOn("DOTA_Item.BlinkDagger.NailedIt", self) end
 end
@@ -174,7 +188,7 @@ CScriptParticleManager.CreateParticle = function(self, sParticleName, iAttachTyp
 	local override = nil
 
 	if hCaster then
-		override = CustomNetTables:GetTableValue("battlepass_player", sParticleName..'_'..hCaster:GetPlayerOwnerID()) 
+		override = CustomNetTables:GetTableValue("battlepass_player", sParticleName .. '_' .. hCaster:GetPlayerOwnerID())
 	end
 
 	if override then
@@ -184,13 +198,13 @@ CScriptParticleManager.CreateParticle = function(self, sParticleName, iAttachTyp
 	-- call the original function
 	local response = original_CreateParticle(self, sParticleName, iAttachType, hParent)
 
---	print("CreateParticle response:", sParticleName)
+	--	print("CreateParticle response:", sParticleName)
 
 	if not ignored_pfx_list[sParticleName] then
 		if hCaster and not hCaster:IsHero() then
-			table.insert(CScriptParticleManager.ACTIVE_PARTICLES, {response, 0})
+			table.insert(CScriptParticleManager.ACTIVE_PARTICLES, { response, 0 })
 		else
-			table.insert(CScriptParticleManager.ACTIVE_PARTICLES, {response, 0})
+			table.insert(CScriptParticleManager.ACTIVE_PARTICLES, { response, 0 })
 		end
 	end
 
@@ -200,12 +214,12 @@ end
 -- Call custom functions whenever CreateParticleForTeam is being called anywhere
 local original_CreateParticleForTeam = CScriptParticleManager.CreateParticleForTeam
 CScriptParticleManager.CreateParticleForTeam = function(self, sParticleName, iAttachType, hParent, iTeamNumber, hCaster)
---	print("Create Particle (override):", sParticleName, iAttachType, hParent, iTeamNumber, hCaster)
+	--	print("Create Particle (override):", sParticleName, iAttachType, hParent, iTeamNumber, hCaster)
 
 	local override = nil
 
 	if hCaster then
-		override = CustomNetTables:GetTableValue("battlepass_player", sParticleName..'_'..hCaster:GetPlayerOwnerID()) 
+		override = CustomNetTables:GetTableValue("battlepass_player", sParticleName .. '_' .. hCaster:GetPlayerOwnerID())
 	end
 
 	if override then
@@ -221,12 +235,12 @@ end
 -- Call custom functions whenever CreateParticleForPlayer is being called anywhere
 local original_CreateParticleForPlayer = CScriptParticleManager.CreateParticleForPlayer
 CScriptParticleManager.CreateParticleForPlayer = function(self, sParticleName, iAttachType, hParent, hPlayer, hCaster)
---	print("Create Particle (override):", sParticleName, iAttachType, hParent, hPlayer, hCaster)
+	--	print("Create Particle (override):", sParticleName, iAttachType, hParent, hPlayer, hCaster)
 
 	local override = nil
 
 	if hCaster then
-		override = CustomNetTables:GetTableValue("battlepass_player", sParticleName..'_'..hCaster:GetPlayerOwnerID()) 
+		override = CustomNetTables:GetTableValue("battlepass_player", sParticleName .. '_' .. hCaster:GetPlayerOwnerID())
 	end
 
 	if override then

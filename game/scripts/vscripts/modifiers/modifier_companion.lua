@@ -1,8 +1,11 @@
 modifier_companion = class({})
 
 function modifier_companion:IsHidden() return true end
+
 function modifier_companion:GetAbsoluteNoDamagePhysical() return 1 end
+
 function modifier_companion:GetAbsoluteNoDamageMagical() return 1 end
+
 function modifier_companion:GetAbsoluteNoDamagePure() return 1 end
 
 function modifier_companion:CheckState()
@@ -59,7 +62,6 @@ local target = keys.target
 	end
 end
 --]]
-
 function modifier_companion:GetModifierMoveSpeedBonus_Constant()
 	return self:GetStackCount()
 end
@@ -80,7 +82,7 @@ function modifier_companion:OnIntervalThink()
 		if companion:GetPlayerOwner():GetAssignedHero() == nil then return end
 		local hero = companion:GetPlayerOwner():GetAssignedHero()
 		hero.companion = companion
-		local fountain = base_good
+		local fountain = BASE_GOOD
 		local hero_origin = hero:GetAbsOrigin()
 		local hero_distance = (hero_origin - companion:GetAbsOrigin()):Length()
 		local fountain_distance = (fountain:GetAbsOrigin() - companion:GetAbsOrigin()):Length()
@@ -91,17 +93,17 @@ function modifier_companion:OnIntervalThink()
 			companion:SetBaseMoveSpeed(hero:GetIdealSpeed() - 70)
 		end
 
---		for _,v in pairs(IMBA_INVISIBLE_MODIFIERS) do
---			if not hero:HasModifier(v) then
---				if companion:HasModifier(v) then
---					companion:RemoveModifierByName(v)
---				end
---			else
---				if not companion:HasModifier(v) then
---					companion:AddNewModifier(companion, nil, v, {})
---				end
---			end
---		end
+		--		for _,v in pairs(IMBA_INVISIBLE_MODIFIERS) do
+		--			if not hero:HasModifier(v) then
+		--				if companion:HasModifier(v) then
+		--					companion:RemoveModifierByName(v)
+		--				end
+		--			else
+		--				if not companion:HasModifier(v) then
+		--					companion:AddNewModifier(companion, nil, v, {})
+		--				end
+		--			end
+		--		end
 
 		if not hero:IsAlive() then
 			if fountain_distance > blink_distance then -- min_distance is too high with fountain bound radius
@@ -122,14 +124,14 @@ function modifier_companion:OnIntervalThink()
 
 		self:SetStackCount(hero_distance / 4)
 
---		for _, v in ipairs(SHARED_NODRAW_MODIFIERS) do
---			if hero:HasModifier(v) or self:IsOnMountain() then
---				companion:AddNoDraw()
---				return
---			elseif not hero:HasModifier(v) then
---				companion:RemoveNoDraw()
---			end
---		end
+		--		for _, v in ipairs(SHARED_NODRAW_MODIFIERS) do
+		--			if hero:HasModifier(v) or self:IsOnMountain() then
+		--				companion:AddNoDraw()
+		--				return
+		--			elseif not hero:HasModifier(v) then
+		--				companion:RemoveNoDraw()
+		--			end
+		--		end
 	end
 end
 
@@ -137,7 +139,7 @@ function modifier_companion:IsOnMountain()
 	local hero = self:GetParent():GetPlayerOwner():GetAssignedHero()
 	local origin = hero:GetAbsOrigin()
 
---	print("cliff:", origin.z, 512)
+	--	print("cliff:", origin.z, 512)
 	if origin.z > 512 then
 		return true
 	else

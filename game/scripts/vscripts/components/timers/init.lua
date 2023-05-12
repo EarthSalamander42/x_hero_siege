@@ -5,6 +5,7 @@ if CustomTimers == nil then
 
 	CustomTimers.current_time = {}
 	CustomTimers.current_time["game_time"] = PREGAMETIME * (-1)          -- Game Time
+	-- if IsInToolsMode() then CustomTimers.current_time["game_time"] = 600 end
 	CustomTimers.current_time["creep_level"] = XHS_CREEPS_UPGRADE_INTERVAL -- Upgrade phase 1 creeps level
 	CustomTimers.current_time["special_wave"] = XHS_SPECIAL_WAVE_INTERVAL -- Special Wave spawning west, north, east, south
 	CustomTimers.current_time["special_event"] = XHS_SPECIAL_EVENT_INTERVAL -- Muradin Event, Farm Event, Final Wave
@@ -67,6 +68,7 @@ function CustomTimers:Think()
 		CustomTimers:Countdown("game_time")
 
 		if GameRules:State_Get() == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
+			-- print("Game Time:", CustomTimers.current_time["game_time"])
 			-- 9:00 minutes (Muradin Event)
 			if CustomTimers.current_time["game_time"] == (XHS_SPECIAL_EVENT_INTERVAL - 1) then
 				CustomTimers.timers_paused = 1
@@ -136,6 +138,7 @@ function CustomTimers:Think()
 					local cardinal_point = CustomTimers.special_wave
 
 					if CustomTimers.current_time["special_wave"] == 31 then
+						print("Special Wave in 30 seconds:", CustomTimers.special_wave_region[cardinal_point], CustomTimers.special_wave)
 						Notifications:TopToAll({ text = "WARNING: " .. CustomTimers.special_wave_region[cardinal_point] .. "!", duration = 25.0, style = { color = "red" } })
 						SpawnRunes()
 					elseif CustomTimers.current_time["special_wave"] == 1 then
@@ -144,7 +147,7 @@ function CustomTimers:Think()
 				else
 					if CustomTimers.current_time["special_wave"] ~= 1 then
 						CustomTimers.current_time["special_wave"] = 1
-						CustomTimers:Countdown("special_wave") -- run once to set to 00:00
+						CustomTimers:Countdown("special_wave") -- run once to set to 00:00 on UI
 					end
 				end
 			end

@@ -16,9 +16,14 @@ end
 modifier_lightning_sword_unique = class({})
 
 function modifier_lightning_sword_unique:IsHidden() return true end
+
 function modifier_lightning_sword_unique:IsDebuff() return false end
+
 function modifier_lightning_sword_unique:IsPurgable() return false end
+
 function modifier_lightning_sword_unique:RemoveOnDeath() return false end
+
+function modifier_lightning_sword_unique:GetModifierLifesteal() return self:GetAbility():GetSpecialValueFor("lifesteal_pct") end
 
 function modifier_lightning_sword_unique:DeclareFunctions()
 	local funcs = {
@@ -43,21 +48,12 @@ function modifier_lightning_sword_unique:OnCreated()
 			ReturnFromSpecialArena(self:GetParent())
 		end
 	end
-
-	self:GetParent():AddNewModifier(self:GetParent(), self:GetAbility(), "modifier_lifesteal", {})
 end
 
 function modifier_lightning_sword_unique:OnRemoved()
 	if IsServer() then
 		if not self:GetParent():IsIllusion() then
 			self:GetParent().has_epic_3 = false
-		end
-
-		for k, v in pairs(self:GetParent():FindAllModifiersByName("modifier_lifesteal")) do
-			if v:GetAbility() == self:GetAbility() or v:GetAbility() == nil then
-				v:Destroy()
-				-- don't break in case multiple modifiers were added with Lightning Sword as ability (bug happens sometimes because modifier_lifesteal is not an intrinsic modifier here)
-			end
 		end
 	end
 end

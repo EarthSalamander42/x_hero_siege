@@ -161,7 +161,7 @@
 	"tutorial_end"                              "<font color='#FF7800'>HAVE FUN!</font>"
 	"game_version_name"                         "Priestess of the Moon"
 	"loading_screen_description"                ""
-	"loading_screen_button"                     " MUY PRONTO: Página web oficial de X Hero Siege."
+	"loading_screen_button"                     "Frostrose Studio mods website."
 	"loading_screen_promote"                    "Traduce X Hero Siege en tu lenguaje Nativo!"
 	"loading_screen_promote_description"        "Puedes traducir X Hero Siege en la página de Transifex, es sencillo! Solo crea una cuenta y suscribete a un lenguaje. Inténtalo! No te olvides de pedir tu rol en Discord!"
 	"loading_screen_promote_button"             "Haz click aquí para ir a Transifex!"

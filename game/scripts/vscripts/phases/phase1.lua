@@ -53,7 +53,7 @@ function SpecialEventBack(event)
 	local hero = event.activator
 
 	if hero:GetTeamNumber() == 2 then
-		TeleportHero(hero, base_good:GetAbsOrigin())
+		TeleportHero(hero, BASE_GOOD:GetAbsOrigin())
 	elseif hero:GetTeamNumber() == 3 then
 		TeleportHero(hero, base_bad:GetAbsOrigin())
 	end

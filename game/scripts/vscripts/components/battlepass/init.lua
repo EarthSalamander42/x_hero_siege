@@ -11,10 +11,10 @@ ListenToGameEvent('game_rules_state_change', function(keys)
 		require('components/battlepass/donator_settings')
 		require('components/battlepass/donator')
 		require('components/battlepass/experience')
-		require('components/battlepass/keyvalues/items_game')
+		-- require('components/battlepass/keyvalues/items_game')
 
 		if CUSTOM_GAME_TYPE ~= "IMBA" and CUSTOM_GAME_TYPE ~= "PLS" then
-			require('components/battlepass/'..CUSTOM_GAME_TYPE..'_rewards')
+			require('components/battlepass/' .. CUSTOM_GAME_TYPE .. '_rewards')
 		end
 
 		if CUSTOM_GAME_TYPE == "PLS" then
@@ -32,7 +32,7 @@ end, nil)
 ListenToGameEvent('npc_spawned', function(event)
 	local npc = EntIndexToHScript(event.entindex)
 
---	print(npc:GetUnitName())
+	--	print(npc:GetUnitName())
 
 	if npc.bp_init == true then return end
 	npc.bp_init = true
@@ -54,17 +54,19 @@ ListenToGameEvent('npc_spawned', function(event)
 	if type(ply_table) == nil then ply_table = nil end
 
 	if npc:IsIllusion() or string.find(npc:GetUnitName(), "npc_dota_lone_druid_bear") then
-		if ply_table and ply_table.toggle_tag and ply_table.toggle_tag == 0 or ply_table.toggle_tag == false then
-			return
+		if ply_table then
+			if ply_table.toggle_tag ~= nil and ply_table.toggle_tag == 1 or ply_table.toggle_tag ~= nil and ply_table.toggle_tag == true then
+				npc:SetupHealthBarLabel()
+			end
 		end
-
-		npc:SetupHealthBarLabel()
 
 		return
 	elseif npc:IsRealHero() then
 		if ply_table and ply_table.bp_rewards == 1 then
 			Battlepass:AddItemEffects(npc, ply_table)
 		end
+
+		local unit_name = npc:GetUnitName()
 
 		if Battlepass.ENTITY_MODEL_OVERRIDE[unit_name] then
 			npc:SetOriginalModel(Battlepass.ENTITY_MODEL_OVERRIDE[unit_name])
@@ -73,9 +75,11 @@ ListenToGameEvent('npc_spawned', function(event)
 
 		-- The commented out lines here are what I used to test in tools mode
 		if api:IsDonator(npc:GetPlayerID()) and PlayerResource:GetConnectionState(npc:GetPlayerID()) ~= 1 or string.find(GetMapName(), "demo") then
-		-- if api:IsDonator(npc:GetPlayerID()) and PlayerResource:GetConnectionState(npc:GetPlayerID()) ~= 1 or (IsInToolsMode()) then
-			if ply_table and ply_table.toggle_tag == 1 or ply_table.toggle_tag == true then
-				npc:SetupHealthBarLabel()
+			-- if api:IsDonator(npc:GetPlayerID()) and PlayerResource:GetConnectionState(npc:GetPlayerID()) ~= 1 or (IsInToolsMode()) then
+			if ply_table then
+				if ply_table.toggle_tag ~= nil and ply_table.toggle_tag == 1 or ply_table.toggle_tag ~= nil and ply_table.toggle_tag == true then
+					npc:SetupHealthBarLabel()
+				end
 			end
 
 			if api:GetDonatorStatus(npc:GetPlayerID()) == 10 then

@@ -670,13 +670,7 @@ function GetBaseRangedProjectileName(unit)
 end
 
 function ChangeAttackProjectile(unit)
-	local particle_lifesteal = "particles/item/lifesteal_mask/lifesteal_particle.vpcf"
-
-	if unit:HasModifier("modifier_lifesteal_custom") then
-		unit:SetRangedProjectileName(particle_lifesteal)
-	else
-		unit:SetRangedProjectileName(GetBaseRangedProjectileName(unit))
-	end
+	unit:SetRangedProjectileName(GetBaseRangedProjectileName(unit))
 end
 
 function StunBuildings(time)
@@ -901,7 +895,7 @@ function ReturnFromSpecialArena(hero)
 		TeleportHero(hero, hero.old_pos, teleport_time)
 	else
 		if hero:GetTeamNumber() == 2 then
-			TeleportHero(hero, base_good:GetAbsOrigin(), 3.0)
+			TeleportHero(hero, BASE_GOOD:GetAbsOrigin(), 3.0)
 			--		elseif hero:GetTeamNumber() == 3 then
 			--			TeleportHero(hero, base_bad:GetAbsOrigin(), 3.0)
 		end

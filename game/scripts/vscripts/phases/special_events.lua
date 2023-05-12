@@ -73,7 +73,7 @@ function EndMuradinEvent()
 					TeleportHero(hero, hero.old_pos, 3.0, 1.0)
 				else
 					if hero:GetTeamNumber() == 2 then
-						TeleportHero(hero, base_good:GetAbsOrigin(), 3.0, 1.0)
+						TeleportHero(hero, BASE_GOOD:GetAbsOrigin(), 3.0, 1.0)
 					elseif hero:GetTeamNumber() == 3 then
 						TeleportHero(hero, base_bad:GetAbsOrigin(), 3.0, 1.0)
 					end
@@ -209,7 +209,7 @@ function EndFarmEvent()
 				TeleportHero(hero, hero.old_pos, 3.0)
 			else
 				if hero:GetTeamNumber() == 2 then
-					TeleportHero(hero, base_good:GetAbsOrigin(), 3.0)
+					TeleportHero(hero, BASE_GOOD:GetAbsOrigin(), 3.0)
 				elseif hero:GetTeamNumber() == 3 then
 					TeleportHero(hero, base_bad:GetAbsOrigin(), 3.0)
 				end
@@ -315,7 +315,7 @@ function RameroAndBaristolEvent(time) -- 500 kills
 					local RameroAndBaristolCheck = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, Entities:FindByName(nil, "npc_dota_muradin_boss"):GetAbsOrigin(), nil, 2000, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER, false)
 					for _, hero in pairs(RameroAndBaristolCheck) do
 						if hero:IsRealHero() then
-							TeleportHero(hero, base_good:GetAbsOrigin(), teleport_time)
+							TeleportHero(hero, BASE_GOOD:GetAbsOrigin(), teleport_time)
 							RestartCreeps(teleport_time + 3.0)
 						end
 					end
@@ -378,7 +378,7 @@ function SogatEvent(time) -- 750 kills
 					local RameroCheck = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, Entities:FindByName(nil, "npc_dota_muradin_boss"):GetAbsOrigin(), nil, 2000, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER, false)
 					for _, hero in pairs(RameroCheck) do
 						if hero:IsRealHero() then
-							FindClearSpaceForUnit(hero, base_good:GetAbsOrigin(), true)
+							FindClearSpaceForUnit(hero, BASE_GOOD:GetAbsOrigin(), true)
 						end
 					end
 					Check = Check + 1
@@ -433,7 +433,7 @@ function DuelEvent()
 			end
 		else
 			if hero:GetTeamNumber() == 2 then
-				TeleportHero(hero, base_good:GetAbsOrigin(), 3.0)
+				TeleportHero(hero, BASE_GOOD:GetAbsOrigin(), 3.0)
 			elseif hero:GetTeamNumber() == 3 then
 				TeleportHero(hero, base_bad:GetAbsOrigin(), 3.0)
 			end
@@ -519,7 +519,7 @@ function DuelRanked()
 			end
 		else
 			if hero:GetTeamNumber() == 2 then
-				TeleportHero(hero, base_good:GetAbsOrigin(), 3.0)
+				TeleportHero(hero, BASE_GOOD:GetAbsOrigin(), 3.0)
 			elseif hero:GetTeamNumber() == 3 then
 				TeleportHero(hero, base_bad:GetAbsOrigin(), 3.0)
 			end

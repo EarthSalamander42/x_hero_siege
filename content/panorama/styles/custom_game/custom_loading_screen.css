@@ -330,7 +330,7 @@
 	color: #aaa;
 }
 
-.bottom-radio-button>.RadioBox {
+.bottom-radio-button .RadioBox {
 	visibility: collapse;
 }
 

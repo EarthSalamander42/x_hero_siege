@@ -1,8 +1,8 @@
-function Immolation( event )
-local manacost_per_second = 10
+function Immolation(event)
+	local manacost_per_second = 10
 
 	if event.caster:GetMana() >= manacost_per_second then
-		event.caster:SpendMana( manacost_per_second, event.ability)
+		event.caster:SpendMana(manacost_per_second, event.ability)
 	else
 		event.ability:ToggleAbility()
 	end
@@ -11,7 +11,7 @@ end
 --------------------------------------
 
 LinkLuaModifier("modifier_xhs_vampiric_aura", "abilities/heroes/hero_demon_hunter.lua", LUA_MODIFIER_MOTION_NONE)
-LinkLuaModifier("modifier_lifesteal", "modifiers/modifier_lifesteal.lua", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_xhs_vampiric", "abilities/heroes/hero_demon_hunter.lua", LUA_MODIFIER_MOTION_NONE)
 
 xhs_vampiric_aura = xhs_vampiric_aura or class({})
 holdout_muradin_hammer = xhs_vampiric_aura
@@ -24,7 +24,7 @@ function xhs_vampiric_aura:GetIntrinsicModifierName()
 	return "modifier_xhs_vampiric_aura"
 end
 
--- Fountain aura 
+-- Fountain aura
 modifier_xhs_vampiric_aura = modifier_xhs_vampiric_aura or class({})
 
 function modifier_xhs_vampiric_aura:OnCreated()
@@ -66,17 +66,25 @@ function modifier_xhs_vampiric_aura:GetAuraSearchType()
 end
 
 function modifier_xhs_vampiric_aura:GetModifierAura()
-	return "modifier_lifesteal"
+	return "modifier_xhs_vampiric"
 end
 
 function modifier_xhs_vampiric_aura:IsAura() return true end
+
 function modifier_xhs_vampiric_aura:IsDebuff() return false end
+
 function modifier_xhs_vampiric_aura:IsHidden() return false end
+
+modifier_xhs_vampiric = modifier_xhs_vampiric or class({})
+
+function modifier_xhs_vampiric:GetModifierLifesteal()
+	return self:GetAbility():GetSpecialValueFor("lifesteal_pct")
+end
 
 -------------------------------------------------------
 
-function Roar( event )
-local caster = event.caster
+function Roar(event)
+	local caster = event.caster
 	EmitSoundOnLocationForAllies(caster:GetAbsOrigin(), "Ability.Roar", caster)
 
 	Timers:CreateTimer(1.9, function()
@@ -84,12 +92,12 @@ local caster = event.caster
 	end)
 end
 
-function ModelSwapStart( keys )
-local caster = keys.caster
-local model = keys.model
-local projectile_model = keys.projectile_model
+function ModelSwapStart(keys)
+	local caster = keys.caster
+	local model = keys.model
+	local projectile_model = keys.projectile_model
 
-	if caster.caster_model == nil then 
+	if caster.caster_model == nil then
 		caster.caster_model = caster:GetModelName()
 	end
 	caster.caster_attack = caster:GetAttackCapability()
@@ -99,35 +107,35 @@ local projectile_model = keys.projectile_model
 	caster:SetAttackCapability(DOTA_UNIT_CAP_RANGED_ATTACK)
 end
 
-function ModelSwapEnd( keys )
-local caster = keys.caster
+function ModelSwapEnd(keys)
+	local caster = keys.caster
 
 	caster:SetModel(caster.caster_model)
 	caster:SetOriginalModel(caster.caster_model)
 	caster:SetAttackCapability(caster.caster_attack)
 end
 
-function HideWearables( event )
-local hero = event.caster
-local ability = event.ability
-local duration = ability:GetLevelSpecialValueFor( "duration", ability:GetLevel() - 1 )
-hero.hiddenWearables = {} -- Keep every wearable handle in a table, as its way better to iterate than in the MovePeer system
-print("Hiding Wearables")
-local model = hero:FirstMoveChild()
---hero:AddNoDraw() -- Doesn't work on classname dota_item_wearable
+function HideWearables(event)
+	local hero = event.caster
+	local ability = event.ability
+	local duration = ability:GetLevelSpecialValueFor("duration", ability:GetLevel() - 1)
+	hero.hiddenWearables = {} -- Keep every wearable handle in a table, as its way better to iterate than in the MovePeer system
+	print("Hiding Wearables")
+	local model = hero:FirstMoveChild()
+	--hero:AddNoDraw() -- Doesn't work on classname dota_item_wearable
 	while model ~= nil do
 		if model:GetClassname() == "dota_item_wearable" then
 			model:AddEffects(EF_NODRAW)
-			table.insert(hero.hiddenWearables,model)
+			table.insert(hero.hiddenWearables, model)
 		end
 		model = model:NextMovePeer()
 	end
 end
 
-function ShowWearables( event )
-local hero = event.caster
+function ShowWearables(event)
+	local hero = event.caster
 
-	for i,v in ipairs(hero.hiddenWearables) do
+	for i, v in ipairs(hero.hiddenWearables) do
 		v:RemoveEffects(EF_NODRAW)
 	end
 end
