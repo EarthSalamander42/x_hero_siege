@@ -362,12 +362,14 @@ if Log == nil then
 		for i = 1, #trace do
 			trace = trace .. ", " .. json.encode(trace[i])
 		end
-		-- prepare api request
-		api:Message({
-			level = level,
-			content = tostring(content),
-			trace = trace
-		}, 2)
+		if api then
+			-- prepare api request
+			api:Message({
+				level = level,
+				content = tostring(content),
+				trace = trace
+			}, 2)
+		end
 	end
 
 	ConsoleLogTarget = {
@@ -380,7 +382,7 @@ if Log == nil then
 			name = "|" .. trace[1]["name"]
 		end
 		NativePrint("[" ..
-		level .. "][" .. trace[1]["short_src"] .. ":" .. trace[1]["currentline"] .. name .. "] " .. content)
+			level .. "][" .. trace[1]["short_src"] .. ":" .. trace[1]["currentline"] .. name .. "] " .. content)
 	end
 
 	-----------------------------------------------------------------

@@ -8,7 +8,7 @@ ListenToGameEvent('game_rules_state_change', function()
 			end
 		end
 
-		Timers:CreateTimer(3.0, function()
+		GameRules:GetGameModeEntity():SetContextThink("PreGame", function()
 			EmitSoundOn("Global.InGame", BASE_GOOD)
 
 			--			if BOTS_ENABLED == true then
@@ -20,7 +20,8 @@ ListenToGameEvent('game_rules_state_change', function()
 			--			if base_bad then
 			--				EmitSoundOn("Global.InGame", base_bad)
 			--			end
-		end)
+			return nil
+		end, 3.0)
 	elseif newState == DOTA_GAMERULES_STATE_HERO_SELECTION then
 		-- crash game (since 7.23)
 		--		GameRules:GetGameModeEntity():SetItemAddedToInventoryFilter(Dynamic_Wrap(GameMode, "ItemAddedFilter"), GameMode)
@@ -28,7 +29,9 @@ ListenToGameEvent('game_rules_state_change', function()
 		require('zones/dialog_xhs')
 		require('zones/zone_tables_xhs')
 	elseif newState == DOTA_GAMERULES_STATE_PRE_GAME then
-		Gold:Init()
+		if Gold then
+			Gold:Init()
+		end
 
 		for i = 1, 8 do
 			DoEntFire("door_lane" .. i, "SetAnimation", "gate_02_close", 0, nil, nil)
@@ -43,19 +46,18 @@ ListenToGameEvent('game_rules_state_change', function()
 		end
 
 		local diff = { "Easy", "Normal", "Hard", "Extreme", "Divine" }
-		local lanes = { "Simple", "Double", "Full" }
 		local Color = { "green", "Yellow", "orange", "red", "darkred" }
 
 		CustomNetTables:SetTableValue("game_options", "game_info", {
 			difficulty = diff[GameRules:GetCustomGameDifficulty()],
 		})
 
-		Timers:CreateTimer(3.0, function()
+		GameRules:GetGameModeEntity():SetContextThink("PreGame", function()
 			CustomGameEventManager:Send_ServerToAllClients("show_timer_bar", {})
 			CustomGameEventManager:Send_ServerToAllClients("game_difficulty", { difficulty = diff[GameRules:GetCustomGameDifficulty()] })
 			Notifications:TopToAll({ text = "DIFFICULTY: " .. diff[GameRules:GetCustomGameDifficulty()], color = Color[GameRules:GetCustomGameDifficulty()], duration = 10.0 })
-			SpawnBosses()
-		end)
+			return nil
+		end, 3.0)
 
 		AddFOWViewer(DOTA_TEAM_GOODGUYS, Vector(6528, 1152, 192), 900, 99999, false)
 		AddFOWViewer(DOTA_TEAM_CUSTOM_2, Vector(6528, 1152, 192), 900, 99999, false)
@@ -78,8 +80,11 @@ ListenToGameEvent('game_rules_state_change', function()
 
 		for TW = 1, 2 do
 			local ice_towers_main = Entities:FindByName(nil, "npc_tower_cold_" .. TW)
-			ice_towers_main:AddNewModifier(ice_towers_main, nil, "modifier_invulnerable", nil)
-			ice_towers_main.zone = "xhs_holdout"
+
+			if ice_towers_main then
+				ice_towers_main:AddNewModifier(ice_towers_main, nil, "modifier_invulnerable", nil)
+				ice_towers_main.zone = "xhs_holdout"
+			end
 		end
 
 		-- Make towers invulnerable again
@@ -88,6 +93,7 @@ ListenToGameEvent('game_rules_state_change', function()
 			for _, tower in pairs(towers) do
 				tower:AddNewModifier(tower, nil, "modifier_invulnerable", nil)
 			end
+
 			local raxes = Entities:FindAllByName("dota_badguys_barracks_" .. Players)
 			for _, rax in pairs(raxes) do
 				rax.zone = "xhs_holdout"
@@ -146,17 +152,20 @@ ListenToGameEvent('npc_spawned', function(keys)
 		end
 
 		if npc:GetTeamNumber() ~= 2 or npc:GetUnitName() == "npc_dota_creature_muradin_bronzebeard" then
-			local ai_state = npc:GetKeyValue("UseAI")
-			if ai_state then
-				npc:AddNewModifier(npc, nil, "modifier_ai", { state = ai_state })
+			local unit_kv = GetUnitKeyValuesByName(npc:GetUnitName())
+
+			if unit_kv and unit_kv["UseAI"] then
+				npc:AddNewModifier(npc, nil, "modifier_ai", { state = unit_kv["UseAI"] })
 			end
 		end
 
 		if npc:GetUnitName() == "npc_dota_hero_magtheridon" then
 			-- in case there are 2, wait for npc.boss_count
-			Timers:CreateTimer(0.1, function()
+
+			GameRules:GetGameModeEntity():SetContextThink("PreGame", function()
 				ShowBossBar(npc)
-			end)
+				return nil
+			end, 0.1)
 		end
 
 		-- HERO NPC
@@ -196,13 +205,14 @@ ListenToGameEvent('npc_spawned', function(keys)
 				if npc:GetUnitName() == "npc_dota_hero_chaos_knight" or npc:GetUnitName() == "npc_dota_hero_keeper_of_the_light" then
 					npc:SetAbilityPoints(0)
 				elseif npc:GetUnitName() == "npc_dota_hero_tiny" then
-					npc:AddAbility("tiny_grow")
-					grow = npc:FindAbilityByName("tiny_grow")
-					grow:SetLevel(1)
+					npc:AddAbility("tiny_grow"):SetLevel(1)
 					npc:SetModelScale(1.1)
-					Timers:CreateTimer(0.3, function()
+
+					GameRules:GetGameModeEntity():SetContextThink("PreGame", function()
 						npc:RemoveAbility("tiny_grow")
-					end)
+						return nil
+					end, 0.3)
+
 					--debug
 					if hero_level == 17 then
 						npc:SetAbilityPoints(npc:GetAbilityPoints() - 1)
@@ -352,9 +362,11 @@ ListenToGameEvent('dota_player_learned_ability', function(keys)
 				for number = 1, 7 do
 					if Bear and Bear:GetUnitName() == "npc_dota_lone_druid_bear" .. number then
 						Bear.ankh_respawn = true
-						Timers:CreateTimer(0.03, function()
+
+						GameRules:GetGameModeEntity():SetContextThink("PreGame", function()
 							Bear.ankh_respawn = false
-						end)
+							return nil
+						end, FrameTime())
 					end
 				end
 			end
@@ -593,7 +605,11 @@ ListenToGameEvent("player_chat", function(keys)
 	local text = keys.text
 	local player = PlayerResource:GetPlayer(userID)
 	local hero = PlayerResource:GetPlayer(userID):GetAssignedHero()
-	local donator_level = api:GetDonatorStatus(userID)
+	local donator_level = 0
+
+	if api then
+		donator_level = api:GetDonatorStatus(userID)
+	end
 
 	for str in string.gmatch(text, "%S+") do
 		if donator_level == 1 or donator_level == 2 or donator_level == 3 or IsInToolsMode() then
@@ -671,13 +687,15 @@ ListenToGameEvent("player_chat", function(keys)
 					--					if KeyValues.HeroKV["npc_dota_hero_"..text] then
 					PrecacheUnitByNameAsync("npc_dota_hero_" .. text, function()
 						local wisp = PlayerResource:GetSelectedHeroEntity(hero:GetPlayerID())
-						local new_hero = PlayerResource:ReplaceHeroWith(hero:GetPlayerID(), "npc_dota_hero_" .. text, 0, 0)
+						PlayerResource:ReplaceHeroWith(hero:GetPlayerID(), "npc_dota_hero_" .. text, 0, 0)
 
-						Timers:CreateTimer(1.0, function()
+						GameRules:GetGameModeEntity():SetContextThink("PreGame", function()
 							if wisp then
 								UTIL_Remove(wisp)
 							end
-						end)
+
+							return nil
+						end, 1.0)
 					end)
 					--					else
 					--						Notifications:TopToAll({text="Hero don't exist!", duration=6.0, style={color="red", ["font-size"]="30px"}})
@@ -708,12 +726,12 @@ ListenToGameEvent("player_chat", function(keys)
 				Notifications:Bottom(player, { text = "You've bought " .. numberOfTomes .. " Tomes!", duration = 5.0, style = { color = "white" } })
 				PlayerResource:SpendGold(player:GetPlayerID(), (numberOfTomes) * cost, DOTA_ModifyGold_PurchaseItem)
 
-				Timers:CreateTimer(function()
+				GameRules:GetGameModeEntity():SetContextThink("PreGame", function()
 					hero:IncrementAttributes(50)
 					hero:EmitSound("ui.trophy_levelup")
 
-					local particle1 = ParticleManager:CreateParticle("particles/generic_hero_status/hero_levelup.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero, hero)
-					ParticleManager:SetParticleControl(particle1, 0, hero:GetAbsOrigin())
+					local pfx = ParticleManager:CreateParticle("particles/generic_hero_status/hero_levelup.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero, hero)
+					ParticleManager:SetParticleControl(pfx, 0, hero:GetAbsOrigin())
 
 					i = i + 1
 
@@ -722,7 +740,7 @@ ListenToGameEvent("player_chat", function(keys)
 					else
 						return 0.1
 					end
-				end)
+				end, FrameTime())
 			elseif BT_ENABLED == 0 then
 				SendErrorMessage(hero:GetPlayerID(), "#error_buy_tome_disabled")
 			end
@@ -748,7 +766,7 @@ ListenToGameEvent("player_chat", function(keys)
 			--			Notifications:TopToAll({text="Host closed every lanes!", style={color="lightgreen"}, duration=5.0})
 
 			for i = 1, 8 do
-				CloseCreepLane(hero:GetPlayerID(), i)
+				CloseCreepLane(i)
 			end
 		end
 	end
@@ -869,8 +887,6 @@ end
 
 -- Cleanup a player when they leave
 function GameMode:OnDisconnect(keys)
-	DebugPrint('[BAREBONES] Player Disconnected ' .. tostring(keys.userid))
-	DebugPrintTable(keys)
 	local name = keys.name
 	local networkid = keys.networkid
 	local reason = keys.reason
@@ -881,17 +897,11 @@ end
 
 -- A non-player entity (necro-book, chen creep, etc) used an ability
 function GameMode:OnNonPlayerUsedAbility(keys)
-	DebugPrint('[BAREBONES] OnNonPlayerUsedAbility')
-	DebugPrintTable(keys)
-
 	local abilityname = keys.abilityname
 end
 
 -- This function is called whenever a tower is killed
 function GameMode:OnTowerKill(keys)
-	DebugPrint('[BAREBONES] OnTowerKill')
-	DebugPrintTable(keys)
-
 	local gold = keys.gold
 	local killerPlayer = PlayerResource:GetPlayer(keys.killer_userid)
 	local team = keys.teamnumber
@@ -899,22 +909,9 @@ end
 
 -- This function is called whenever a player changes there custom team selection during Game Setup
 function GameMode:OnPlayerSelectedCustomTeam(keys)
-	DebugPrint('[BAREBONES] OnPlayerSelectedCustomTeam')
-	DebugPrintTable(keys)
-
 	local player = PlayerResource:GetPlayer(keys.player_id)
 	local success = (keys.success == 1)
 	local team = keys.team_id
-end
-
--- This function is called whenever an NPC reaches its goal position/target
-function GameMode:OnNPCGoalReached(keys)
-	DebugPrint('[BAREBONES] OnNPCGoalReached')
-	DebugPrintTable(keys)
-
-	local goalEntity = EntIndexToHScript(keys.goal_entindex)
-	local nextGoalEntity = EntIndexToHScript(keys.next_goal_entindex)
-	local npc = EntIndexToHScript(keys.npc_entindex)
 end
 
 ---------------------------------------------------------
@@ -924,8 +921,6 @@ end
 -- * entindex_inflictor
 -- * damagebits
 ---------------------------------------------------------
-
-local first_rax = false
 
 ListenToGameEvent('entity_killed', function(keys)
 	local killedUnit = EntIndexToHScript(keys.entindex_killed)
@@ -957,13 +952,16 @@ ListenToGameEvent('entity_killed', function(keys)
 			for _, Bear in pairs(Bears) do
 				for number = 1, 7 do
 					if Bear and Bear:GetUnitName() == "npc_dota_lone_druid_bear" .. number then
-						Timers:CreateTimer(0.03, function()
+						GameRules:GetGameModeEntity():SetContextThink("PreGame", function()
 							Bear:RespawnUnit()
-						end)
-						Timers:CreateTimer(0.17, function()
+							return nil
+						end, 0.03)
+
+						GameRules:GetGameModeEntity():SetContextThink("PreGame", function()
 							Bear:RespawnUnit()
 							Bear:AddNewModifier(Bear, nil, "modifier_pause_creeps", { duration = 4.8 })
-						end)
+							return nil
+						end, 0.17)
 					end
 				end
 			end
@@ -1010,7 +1008,7 @@ ListenToGameEvent('entity_killed', function(keys)
 		elseif killedUnit:GetUnitName() == "npc_ramero_2" then
 			DropNeutralItemAtPositionForHero("item_ring_of_superiority", killedUnit:GetAbsOrigin(), killer, killer:GetTeam(), true)
 			DOOM_FIRST_TIME = true
-			Timers:RemoveTimer(timers.Ramero)
+			GameRules:GetGameModeEntity():SetContextThink(SpecialEvents.SogatTimer, nil, 0)
 		elseif killedUnit:GetUnitName() == "npc_dota_hero_secret" then
 			local pos = killedUnit:GetAbsOrigin()
 			DropNeutralItemAtPositionForHero("item_orb_of_frost", pos, killer, killer:GetTeam(), true)
@@ -1018,7 +1016,7 @@ ListenToGameEvent('entity_killed', function(keys)
 		end
 
 		if ramero_check == 2 then
-			Timers:RemoveTimer(timers.RameroAndBaristol)
+			GameRules:GetGameModeEntity():SetContextThink(SpecialEvents.RameroAndBaristol, nil, 0)
 		end
 
 		if killedUnit:GetUnitName() == "npc_dota_creature_muradin_bronzebeard" and killedUnit:GetTeamNumber() ~= 2 then
@@ -1086,10 +1084,10 @@ ListenToGameEvent('entity_killed', function(keys)
 						elseif killer:GetKills() == 399 then
 							Notifications:Bottom(killer:GetPlayerOwnerID(), { text = "400 kills. You get 50000 gold.", duration = 5.0, style = { color = "yellow" } })
 							PlayerResource:ModifyGold(killer:GetPlayerOwnerID(), 50000, false, DOTA_ModifyGold_Unspecified)
-						elseif killer:GetKills() >= 499 and RAMERO == 0 then --500
-							StartRameroAndBaristolEvent(killer)
-						elseif killer:GetKills() >= 749 and RAMERO == 1 then --750
-							StartSogatEvent(killer)
+						elseif killer:GetKills() >= 499 and SpecialEvents.Ramero_trigger == 0 then --500
+							SpecialEvents:StartRameroAndBaristolEvent(killer)
+						elseif killer:GetKills() >= 749 and SpecialEvents.Ramero_trigger == 1 then --750
+							SpecialEvents:StartSogatEvent(killer)
 						end
 					end
 				end
@@ -1155,32 +1153,6 @@ ListenToGameEvent('entity_killed', function(keys)
 end, nil)
 
 ---------------------------------------------------------
--- dota_holdout_revive_complete
--- * caster (reviver hero entity index)
--- * target (revivee hero entity index)
----------------------------------------------------------
-
-function GameMode:OnPlayerRevived(event)
-	local hRevivedHero = EntIndexToHScript(event.target)
-
-	if hRevivedHero and hRevivedHero:IsRealHero() then
-		hRevivedHero:AddNewModifier(hRevivedHero, nil, "modifier_invulnerable", { duration = 2.5 })
-		hRevivedHero:AddNewModifier(hRevivedHero, nil, "modifier_omninight_guardian_angel", { duration = 2.5 })
-		EmitSoundOn("Dungeon.HeroRevived", hRevivedHero)
-
-		local hReviver = EntIndexToHScript(event.caster)
-		local flChannelTime = event.channel_time
-		if hReviver and flChannelTime > 0.0 then
-			for _, Zone in pairs(GameMode.Zones) do
-				if Zone:ContainsUnit(hReviver) then
-					Zone:AddStat(hReviver:GetPlayerID(), ZONE_STAT_REVIVE_TIME, flChannelTime)
-				end
-			end
-		end
-	end
-end
-
----------------------------------------------------------
 -- dota_player_gained_level
 -- * player (player entity index)
 -- * level (new level)
@@ -1210,54 +1182,6 @@ function GameMode:OnItemSpawned(event)
 			self:OnRelicSpawned(item, itemKV)
 		end
 	end
-end
-
----------------------------------------------------------
-
-function GameMode:OnRelicSpawned(item, itemKV)
-	local PlayerIDs = {}
-	local nRelicItemDef = tonumber(itemKV["DungeonItemDef"])
-	print("GameMode:OnRelicSpawned - New Relic " .. item:GetAbilityName() .. " created of itemdef: " .. nRelicItemDef)
-	for _, Hero in pairs(HeroList:GetAllHeroes()) do
-		if Hero and Hero:IsRealHero() and Hero:HasOwnerAbandoned() == false then
-			if GetItemDefOwnedCount(Hero:GetPlayerID(), nRelicItemDef) == 0 then
-				print("GameMode:OnRelicSpawned - PlayerID " .. Hero:GetPlayerID() .. " does not own item, adding to grant list.")
-				table.insert(PlayerIDs, Hero:GetPlayerID())
-			end
-		end
-	end
-
-	-- What do we do if it's empty?  Right now just give it to someone as a dupe?
-	local bDupeForAllPlayers = #PlayerIDs == 0
-	if bDupeForAllPlayers then
-		for _, Hero in pairs(Heroes) do
-			if Hero and Hero:IsRealHero() then
-				table.insert(PlayerIDs, Hero:GetPlayerID())
-			end
-		end
-	end
-
-	local WinningPlayerID = PlayerIDs[RandomInt(1, #PlayerIDs)]
-	local WinningHero = PlayerResource:GetSelectedHeroEntity(WinningPlayerID)
-	local WinningSteamID = PlayerResource:GetSteamID(WinningPlayerID)
-
-	print("GameMode:OnRelicSpawned - Relic " .. item:GetAbilityName() .. " has been bound to " .. WinningPlayerID)
-	item.nBoundPlayerID = WinningPlayerID
-	item:SetPurchaser(WinningHero)
-
-	EmitSoundOn("Dungeon.Stinger06", WinningHero)
-	local Relic = {}
-	Relic["DungeonItemDef"] = itemKV["DungeonItemDef"]
-	Relic["DungeonAction"] = itemKV["DungeonAction"]
-	Relic["SteamID"] = WinningSteamID
-	table.insert(self.RelicsFound, Relic)
-
-	local gameEvent = {}
-	gameEvent["player_id"] = WinningHero:GetPlayerID()
-	gameEvent["team_number"] = DOTA_TEAM_GOODGUYS
-	gameEvent["locstring_value"] = "#DOTA_Tooltip_Ability_" .. item:GetAbilityName()
-	gameEvent["message"] = "#Dungeon_FoundNewRelic"
-	FireGameEvent("dota_combat_event_message", gameEvent)
 end
 
 ---------------------------------------------------------

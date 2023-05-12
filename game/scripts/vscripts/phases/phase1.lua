@@ -88,7 +88,7 @@ function SpiritBeastDead(event)
 	local hero = event.attacker
 
 	DoEntFire("trigger_spirit_beast_duration", "Kill", nil, 0, nil, nil)
-	GameMode.SpiritBeast_killed = 1
+	GameMode.SpiritBeast_killed = true
 	CustomGameEventManager:Send_ServerToAllClients("hide_timer_spirit_beast", {})
 
 	local pos = GameMode.spirit_beast:GetAbsOrigin()

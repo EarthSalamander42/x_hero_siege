@@ -5,11 +5,8 @@ end
 require('events')
 require('constants') -- in cause?
 
-require('libraries/timers')
 require('libraries/notifications')
 require('libraries/animations')
-require('libraries/keyvalues')
---	require('libraries/illusionmanager')
 require('libraries/fun')()
 require('libraries/functional')
 require('libraries/playerresource')
@@ -18,7 +15,7 @@ require('libraries/gold')
 require('libraries/rgb_to_hex')
 require('libraries/corpses')
 
-require('phases/choose_hero')
+-- require('phases/choose_hero') -- this should remain disabled as this is called through hero map triggers
 require('phases/creeps')
 require('phases/special_events')
 require('phases/phase1')
@@ -103,10 +100,13 @@ function GameMode:TestEveryUnitSpawn()
 
 	GameRules:GetGameModeEntity():SetContextThink(DoUniqueString("spawn_units"), function()
 		local context = GameRules:GetGameModeEntity():GetContext("spawn_units")
+
 		if context then
 			index = tonumber(context)
 		end
+
 		local nextDelay = SpawnNextUnit()
+
 		if nextDelay then
 			GameRules:GetGameModeEntity():SetContextThink("spawn_units", function()
 				return SpawnNextUnit()
@@ -114,6 +114,7 @@ function GameMode:TestEveryUnitSpawn()
 		else
 			GameRules:GetGameModeEntity():SetContextThink("spawn_units", nil, 0)
 		end
+
 		return nil
 	end, 0)
 end
@@ -190,18 +191,10 @@ function GameMode:InitGameMode()
 	LinkLuaModifier("modifier_command_restricted", "modifiers/modifier_command_restricted", LUA_MODIFIER_MOTION_NONE)
 	LinkLuaModifier("modifier_ai", "modifiers/modifier_ai", LUA_MODIFIER_MOTION_NONE)
 	LinkLuaModifier("modifier_breakable_container", "modifiers/modifier_breakable_container", LUA_MODIFIER_MOTION_NONE)
-	LinkLuaModifier("modifier_creature_techies_land_mine", "modifiers/modifier_creature_techies_land_mine",
-		LUA_MODIFIER_MOTION_NONE)
+	LinkLuaModifier("modifier_creature_techies_land_mine", "modifiers/modifier_creature_techies_land_mine", LUA_MODIFIER_MOTION_NONE)
 	LinkLuaModifier("modifier_ankh", "items/ankh_of_reincarnation.lua", LUA_MODIFIER_MOTION_NONE)
 
 	CustomGameEventManager:RegisterListener("setting_vote", Dynamic_Wrap(GameMode, "OnSettingVote"))
-
-	local spew = 0
-	if BAREBONES_DEBUG_SPEW then
-		spew = 1
-	end
-	Convars:RegisterConvar('barebones_spew', tostring(spew),
-		'Set to 1 to start spewing barebones debug info.  Set to 0 to disable.', 0)
 
 	-- Initialized tables for tracking state
 	GameMode.bSeenWaitForPlayers = false
@@ -212,11 +205,11 @@ function GameMode:InitGameMode()
 
 	mode:SetThink("OnThink", GameMode, 1)
 	mode:SetModifyGoldFilter(Dynamic_Wrap(GameMode, "GoldFilter"), GameMode)
-	mode:SetModifierGainedFilter(Dynamic_Wrap(GameMode, "ModifierFilter"), GameMode)
+	-- mode:SetModifierGainedFilter(Dynamic_Wrap(GameMode, "ModifierFilter"), GameMode)
 
 	if IsInToolsMode() then
 		Convars:RegisterCommand("final_wave", function(keys) return FinalWave() end, "Test Final Wave", FCVAR_CHEAT)
-		Convars:RegisterCommand("duel_event", function(keys) return DuelEvent() end, "Test Duel Event", FCVAR_CHEAT)
+		Convars:RegisterCommand("duel_event", function(keys) return SpecialEvents:DuelEvent() end, "Test Duel Event", FCVAR_CHEAT)
 		Convars:RegisterCommand("magtheridon", function(keys) return StartMagtheridonArena() end, "Test Magtheridon Boss",
 			FCVAR_CHEAT)
 		Convars:RegisterCommand("banehallow", function(keys) return StartBanehallowArena() end, "Test Banehallow Boss",
@@ -226,7 +219,7 @@ function GameMode:InitGameMode()
 		Convars:RegisterCommand("lich_king", function(keys) return StartLichKingArena() end, "Test Magtheridon Boss",
 			FCVAR_CHEAT)
 		Convars:RegisterCommand("win_game", function(keys) return WinGame() end, "End the game", FCVAR_CHEAT)
-		Convars:RegisterCommand("r&b", function(keys) return StartRameroAndBaristolEvent() end,
+		Convars:RegisterCommand("r&b", function(keys) return SpecialEvents:StartRameroAndBaristolEvent() end,
 			"Test Ramero and Baristol Arena", FCVAR_CHEAT)
 		Convars:RegisterCommand("farm_event", function(keys) return FarmTest() end, "Test Farm Event", FCVAR_CHEAT)
 	end
@@ -257,7 +250,7 @@ end
 function FarmTest()
 	CustomTimers.current_time["game_time"] = XHS_SPECIAL_EVENT_INTERVAL * 2
 	CustomTimers.timers_paused = 1
-	FarmEvent(180)
+	SpecialEvents:FarmEvent(180)
 end
 
 local CheckTeamDeath = 0
@@ -312,6 +305,11 @@ function GameMode:OnThink()
 				end
 			end
 		end
+	end
+
+	-- using BT_ENABLED to check if Muradin or Farm Event is currently occuring, not the best way but it's a way
+	if CustomTimers.game_phase == 1 and GameMode.SpecialArena_occuring == false and GameMode.Muradin_occuring == false and GameMode.FarmEvent_occuring == false then
+		SpecialEvents:ReturnFromSpecialArena()
 	end
 
 	if CustomTimers.game_phase == 3 then
@@ -621,7 +619,7 @@ function GameMode:SpiritBeast(event)
 		GameMode:SpecialEventTPQuit(hero)
 		Notifications:Bottom(hero:GetPlayerOwnerID(),
 			{ text = "Spirit Beast is already occuring, please choose another event.", duration = 7.5 })
-	elseif GameMode.SpiritBeast_killed == 0 then
+	elseif GameMode.SpiritBeast_killed == false then
 		GameMode.SpiritBeast_occuring = 1
 		Entities:FindByName(nil, "trigger_special_event_back3"):Enable()
 		CustomGameEventManager:Send_ServerToAllClients("show_timer_spirit_beast", {})
@@ -660,7 +658,7 @@ function GameMode:SpiritBeast(event)
 		end
 
 		DisableItems(hero, SPECIAL_ARENA_DURATION)
-	elseif GameMode.SpiritBeast_killed == 1 then
+	elseif GameMode.SpiritBeast_killed == true then
 		Notifications:Bottom(hero:GetPlayerOwnerID(), { text = "Spirit Beast has already been killed!", duration = 5.0 })
 	end
 end
@@ -676,7 +674,7 @@ function GameMode:FrostInfernal(event)
 		GameMode:SpecialEventTPQuit(hero)
 		Notifications:Bottom(hero:GetPlayerOwnerID(),
 			{ text = "Frost Infernal is already occuring, please choose another event.", duration = 7.5 })
-	elseif GameMode.FrostInfernal_killed == 0 then
+	elseif GameMode.FrostInfernal_killed == false then
 		GameMode.FrostInfernal_occuring = 1
 		Entities:FindByName(nil, "trigger_special_event_back2"):Enable()
 		CustomGameEventManager:Send_ServerToAllClients("show_timer_frost_infernal", {})
@@ -726,7 +724,7 @@ function GameMode:AllHeroImages(event)
 	local hero = player:GetAssignedHero()
 	local point = Entities:FindByName(nil, "all_hero_image_player")
 
-	if GameMode.AllHeroImagesDead == 1 then
+	if GameMode.AllHeroImagesDead == true then
 		Notifications:Bottom(hero:GetPlayerOwnerID(), { text = "All Hero Image has already been done!", duration = 5.0 })
 		return
 	end
@@ -804,7 +802,7 @@ function GameMode:AllHeroImages(event)
 			end
 
 			if ALL_HERO_IMAGE_DEAD == 0 then
-				GameMode.AllHeroImagesDead = 1
+				GameMode.AllHeroImagesDead = true
 				DoEntFire("trigger_all_hero_image_duration", "Kill", nil, 0, nil, nil)
 				CustomGameEventManager:Send_ServerToAllClients("hide_timer_all_hero_image", {})
 				Timers:RemoveTimer(timers.AllHeroImage)
@@ -941,35 +939,40 @@ function GameMode:IsQuestActive(szQuestName)
 end
 
 -- Modifier gained filter function
-function GameMode:ModifierFilter(keys)
-	-- entindex_parent_const	215
-	-- entindex_ability_const	610
-	-- duration					-1
-	-- entindex_caster_const	215
-	-- name_const				modifier_imba_roshan_rage_stack
+-- function GameMode:ModifierFilter(keys)
+-- 	-- entindex_parent_const	215
+-- 	-- entindex_ability_const	610
+-- 	-- duration					-1
+-- 	-- entindex_caster_const	215
+-- 	-- name_const				modifier_imba_roshan_rage_stack
 
-	if IsServer() then
-		local modifier_owner = EntIndexToHScript(keys.entindex_parent_const)
-		local modifier_name = keys.name_const
-		local modifier_caster
-		local modifier_class
+-- 	if IsServer() then
+-- 		local modifier_owner = EntIndexToHScript(keys.entindex_parent_const)
+-- 		local modifier_name = keys.name_const
+-- 		local modifier_caster
+-- 		local modifier_class
 
-		if keys.entindex_caster_const then
-			modifier_caster = EntIndexToHScript(keys.entindex_caster_const)
-		else
-			return true
-		end
+-- 		if keys.entindex_caster_const then
+-- 			modifier_caster = EntIndexToHScript(keys.entindex_caster_const)
+-- 		else
+-- 			return true
+-- 		end
 
-		return true
-	end
-end
+-- 		return true
+-- 	end
+-- end
 
 -- new system, double votes for donators
 ListenToGameEvent('game_rules_state_change', function(keys)
 	if GameRules:State_Get() == DOTA_GAMERULES_STATE_HERO_SELECTION then
 		-- If no one voted, default to IMBA 10v10 gamemode
-		api:SetCustomGamemode(1)
-		api:SetCustomDifficulty(1)
+
+		if api then
+			api:SetCustomGamemode(1)
+			api:SetCustomDifficulty(1)
+		else
+			GameRules:SetCustomGameDifficulty(2)
+		end
 
 		if GameMode.VoteTable == nil then return end
 		local votes = GameMode.VoteTable

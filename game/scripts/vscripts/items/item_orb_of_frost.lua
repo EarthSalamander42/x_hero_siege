@@ -1,3 +1,3 @@
 function Equip(keys)
-	ReturnFromSpecialArena(keys.caster)
+	SpecialEvents:ReturnFromSpecialArena()
 end

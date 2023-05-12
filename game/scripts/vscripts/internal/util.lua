@@ -1,25 +1,3 @@
-function DebugPrint(...)
-	local spew = Convars:GetInt('barebones_spew') or -1
-	if spew == -1 and BAREBONES_DEBUG_SPEW then
-		spew = 1
-	end
-
-	if spew == 1 then
-		print(...)
-	end
-end
-
-function DebugPrintTable(...)
-	local spew = Convars:GetInt('barebones_spew') or -1
-	if spew == -1 and BAREBONES_DEBUG_SPEW then
-		spew = 1
-	end
-
-	if spew == 1 then
-		PrintTable(...)
-	end
-end
-
 function PrintTable(t, indent)
 	--print( "PrintTable( t, indent ): " )
 	if type(t) ~= "table" then return end
@@ -460,6 +438,12 @@ function RestartHeroes()
 end
 
 function PauseCreeps(iTime)
+	if iTime then
+		print("Pausing creeps for " .. iTime .. " seconds")
+	else
+		print("Pausing creeps indefinitely")
+	end
+
 	local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_1, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER, false)
 	local units2 = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER, false)
 	local units3 = FindUnitsInRadius(DOTA_TEAM_BADGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER, false)
@@ -498,6 +482,12 @@ function KillCreeps(teamnumber)
 end
 
 function RestartCreeps(delay)
+	if delay then
+		print("Restarting creeps in " .. delay .. " seconds")
+	else
+		print("Restarting creeps immediately")
+	end
+
 	local units = FindUnitsInRadius(DOTA_TEAM_BADGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER, false)
 	local units2 = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER, false)
 	local units3 = FindUnitsInRadius(DOTA_TEAM_CUSTOM_1, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER, false)
@@ -865,41 +855,4 @@ end
 
 function MapDemo()
 	return GetMapName() == "x_hero_siege_demo"
-end
-
--- credits to yahnich for the following
-function CDOTA_BaseNPC:IsRealHero()
-	if not self:IsNull() then
-		return self:IsHero() and not (self:IsIllusion() or self:IsClone()) and not self:IsFakeHero()
-	end
-end
-
-function CDOTA_BaseNPC:IsFakeHero()
-	if self:IsIllusion() or (self:HasModifier("modifier_monkey_king_fur_army_soldier") or self:HasModifier("modifier_monkey_king_fur_army_soldier_hidden")) or self:IsTempestDouble() or self:IsClone() or self:HasAbility("dummy_passive_vulnerable") then
-		return true
-	else
-		return false
-	end
-end
-
-function ReturnFromSpecialArena(hero)
-	CustomTimers.timers_paused = 0
-	CustomGameEventManager:Send_ServerToAllClients("hide_timer_special_arena", {})
-	GameMode.SpecialArena_occuring = 0
-
-	local teleport_time = 3.0
-
-	RestartCreeps(teleport_time + 3)
-
-	if hero.old_pos then
-		TeleportHero(hero, hero.old_pos, teleport_time)
-	else
-		if hero:GetTeamNumber() == 2 then
-			TeleportHero(hero, BASE_GOOD:GetAbsOrigin(), 3.0)
-			--		elseif hero:GetTeamNumber() == 3 then
-			--			TeleportHero(hero, base_bad:GetAbsOrigin(), 3.0)
-		end
-	end
-
-	hero:EmitSound("Hero_TemplarAssassin.Trap")
 end

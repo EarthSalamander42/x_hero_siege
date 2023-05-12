@@ -39,13 +39,7 @@ function modifier_lightning_sword_unique:OnCreated()
 
 	if _G.RAMERO_ARTIFACT_PICKED == false then
 		if self:GetParent():IsRealHero() then
-			_G.RAMERO_ARTIFACT_PICKED = true
-
-			if timers.RameroAndBaristol then
-				Timers:RemoveTimer(timers.RameroAndBaristol)
-			end
-
-			ReturnFromSpecialArena(self:GetParent())
+			SpecialEvents:EndRameroAndBaristolEvent(true)
 		end
 	end
 end

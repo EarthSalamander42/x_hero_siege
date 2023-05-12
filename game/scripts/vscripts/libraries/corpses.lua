@@ -124,7 +124,8 @@ function LeavesCorpse(unit)
 		return false
 		-- Read the LeavesCorpse KV
 	else
-		local leavesCorpse = unit:GetKeyValue("LeavesCorpse")
+		local leavesCorpse = GetUnitKeyValuesByName(unit:GetUnitName())["LeavesCorpse"]
+
 		if leavesCorpse and leavesCorpse == 0 then
 			return false
 		else
