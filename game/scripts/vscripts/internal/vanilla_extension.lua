@@ -200,7 +200,7 @@ CScriptParticleManager.CreateParticle = function(self, sParticleName, iAttachTyp
 
 	--	print("CreateParticle response:", sParticleName)
 
-	if not ignored_pfx_list[sParticleName] then
+	if not ignored_pfx_list[sParticleName] and CScriptParticleManager and CScriptParticleManager.ACTIVE_PARTICLES then
 		if hCaster and not hCaster:IsHero() then
 			table.insert(CScriptParticleManager.ACTIVE_PARTICLES, { response, 0 })
 		else

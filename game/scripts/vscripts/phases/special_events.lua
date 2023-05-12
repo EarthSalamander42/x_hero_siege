@@ -5,7 +5,7 @@ function MuradinEvent(time)
 	CustomTimers.current_time["special_event"] = time + stun_duration
 	BT_ENABLED = 0
 	StunBuildings(time)
-	mode = GameRules:GetGameModeEntity()
+	local mode = GameRules:GetGameModeEntity()
 	mode:SetFixedRespawnTime(1)
 
 	local Muradin = CreateUnitByName("npc_dota_creature_muradin_bronzebeard", Entities:FindByName(nil, "npc_dota_muradin_boss"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
@@ -36,7 +36,6 @@ function MuradinEvent(time)
 	end)
 
 	Timers:CreateTimer(time, function()
-		SpecialWave(3)
 		mode:SetFixedRespawnTime(RESPAWN_TIME)
 		CustomTimers.current_time["special_event"] = XHS_SPECIAL_EVENT_INTERVAL + 1
 		CustomTimers.current_time["creep_level"] = XHS_CREEPS_UPGRADE_INTERVAL + 1
@@ -58,6 +57,8 @@ function MuradinEvent(time)
 
 			RestartCreeps(0.0)
 			UTIL_Remove(Muradin)
+
+			SpecialWave(3)
 		end)
 	end)
 end

@@ -7,7 +7,7 @@ function wisp_pick_random_hero:OnSpellStart()
 	self.caster = self:GetCaster()
 
 	local random = RandomInt(1, #HEROLIST + 1) -- +1 for Weekly hero
-	local IsAvailableHero = Entities:FindByName(nil, "trigger_hero_"..random)
+	local IsAvailableHero = Entities:FindByName(nil, "trigger_hero_" .. random)
 	local difficulty = GameRules:GetCustomGameDifficulty()
 	local hero_name
 
@@ -19,7 +19,7 @@ function wisp_pick_random_hero:OnSpellStart()
 		hero_name = WeekHero
 	end
 
-	hero_name = "npc_dota_hero_"..HEROLIST[random]
+	hero_name = "npc_dota_hero_" .. HEROLIST[random]
 
 	if IsAvailableHero then
 		UTIL_Remove(IsAvailableHero)
@@ -32,9 +32,9 @@ function wisp_pick_random_hero:OnSpellStart()
 
 	self.caster:AddNewModifier(self.caster, nil, "modifier_command_restricted", {})
 
-	Notifications:Bottom(self.caster:GetPlayerOwnerID(), {hero=hero_name, duration = 5.0})
-	Notifications:Bottom(self.caster:GetPlayerOwnerID(), {text="HERO: ", duration = 5.0, style={color="white"}, continue=true})
-	Notifications:Bottom(self.caster:GetPlayerOwnerID(), {text="#npc_dota_hero_"..HEROLIST[random], duration = 5.0, style={color="white"}, continue=true})
+	Notifications:Bottom(self.caster:GetPlayerOwnerID(), { hero = hero_name, duration = 5.0 })
+	Notifications:Bottom(self.caster:GetPlayerOwnerID(), { text = "HERO: ", duration = 5.0, style = { color = "white" }, continue = true })
+	Notifications:Bottom(self.caster:GetPlayerOwnerID(), { text = "#npc_dota_hero_" .. HEROLIST[random], duration = 5.0, style = { color = "white" }, continue = true })
 
 	local newHero = PlayerResource:ReplaceHeroWith(self.caster:GetPlayerID(), hero_name, STARTING_GOLD[difficulty] * 2, 0)
 	StartingItems(self.caster, newHero)
@@ -56,20 +56,26 @@ modifier_wisp_passive = modifier_wisp_passive or class({})
 
 function modifier_wisp_passive:IsHidden() return true end
 
-function modifier_wisp_passive:CheckState() return {
-	[MODIFIER_STATE_UNSELECTABLE] = true,
-	[MODIFIER_STATE_NO_TEAM_MOVE_TO] = true,
-	[MODIFIER_STATE_NO_TEAM_SELECT] = true,
-	[MODIFIER_STATE_ATTACK_IMMUNE] = true,
-	[MODIFIER_STATE_MAGIC_IMMUNE] = true,
-} end
+function modifier_wisp_passive:CheckState()
+	return {
+		[MODIFIER_STATE_UNSELECTABLE] = true,
+		[MODIFIER_STATE_NO_TEAM_MOVE_TO] = true,
+		[MODIFIER_STATE_NO_TEAM_SELECT] = true,
+		[MODIFIER_STATE_ATTACK_IMMUNE] = true,
+		[MODIFIER_STATE_MAGIC_IMMUNE] = true,
+	}
+end
 
 function modifier_wisp_passive:OnCreated()
 	if not IsServer() then return end
 
-	local donator_level = api:GetDonatorStatus(self:GetParent():GetPlayerID())
+	local donator_level = 0
 
---	print("Donator level:", donator_level)
+	if api then
+		donator_level = api:GetDonatorStatus(self:GetParent():GetPlayerID())
+	end
+
+	--	print("Donator level:", donator_level)
 	if donator_level then
 		local stack_count = {}
 		stack_count[0] = ""
@@ -80,13 +86,13 @@ function modifier_wisp_passive:OnCreated()
 		stack_count[5] = "_4"
 		stack_count[6] = "_6"
 
---		print("Donator string pfx:", stack_count[donator_level])
+		--		print("Donator string pfx:", stack_count[donator_level])
 		if stack_count[donator_level] then
-			local vip_effect = ParticleManager:CreateParticle("particles/status_fx/status_effect_holdout_borrowed_time"..stack_count[donator_level]..".vpcf", PATTACH_ABSORIGIN_FOLLOW, self:GetParent())
+			local vip_effect = ParticleManager:CreateParticle("particles/status_fx/status_effect_holdout_borrowed_time" .. stack_count[donator_level] .. ".vpcf", PATTACH_ABSORIGIN_FOLLOW, self:GetParent())
 			ParticleManager:SetParticleControl(vip_effect, 0, self:GetParent():GetAbsOrigin())
 			ParticleManager:SetParticleControl(vip_effect, 1, self:GetParent():GetAbsOrigin())
 
-			local vip_effect2 = ParticleManager:CreateParticle("particles/units/heroes/hero_abaddon/holdout_borrowed_time"..stack_count[donator_level]..".vpcf", PATTACH_ABSORIGIN_FOLLOW, self:GetParent())
+			local vip_effect2 = ParticleManager:CreateParticle("particles/units/heroes/hero_abaddon/holdout_borrowed_time" .. stack_count[donator_level] .. ".vpcf", PATTACH_ABSORIGIN_FOLLOW, self:GetParent())
 			ParticleManager:SetParticleControl(vip_effect2, 0, self:GetParent():GetAbsOrigin())
 			ParticleManager:SetParticleControl(vip_effect2, 1, self:GetParent():GetAbsOrigin())
 		end

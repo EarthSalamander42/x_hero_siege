@@ -164,7 +164,7 @@
 
 		// Bounds
 		//----------------------------------------------------------------
-		"BoundsHullName"			"DOTA_HULL_SIZE_BUILDING"			// Hull type used for navigation/locomotion.
+		"BoundsHullName"			"DOTA_HULL_SIZE_TOWER"			// Hull type used for navigation/locomotion.
 		"RingRadius"				"450"
 
 		// Movement
@@ -13454,7 +13454,8 @@
 		// General
 		//
 		"BaseClass"					"npc_dota_building"	// Class of entity of link to.
-		"Model"						"models/props_structures/radiant_checkpoint_01.vmdl"	// Model.
+		// "Model"						"models/props_structures/radiant_checkpoint_01.vmdl"	// Model.
+		"Model"						"models/props_structures/outpost.vmdl"	// Model.
 		"SoundSet"					"Creep_Good_Melee"					// Name of sound set.
 		"MinimapIcon"				"minimap_miscbuilding"
 		"ModelScale" 				"0.95"

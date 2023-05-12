@@ -262,26 +262,25 @@ if Log == nil then
 	-- and logs errors
 	---------------------------------------------
 	function Log:ExecuteInSafeContext(fun, args)
-		if args == nil then args = {} end
+		if args == nil then
+			args = {}
+		end
 
 		local status, err = xpcall(fun, function(err)
 			if err == nil then
 				err = "Unknown Error"
 			end
 
-			-- print(status)
-			-- print(err)
-
 			-- dont filter errors
 			local levelString = self:_LevelToString(Log.Levels.ERROR)
 
 			for i = 1, #self.targets do
-				self.targets[i]:print(levelString, "Error occured while executing in safe context: " .. err,
-					self:_GetStackTrace(4))
+				local error_message = "Error occured while executing in safe context: " .. err
+				self.targets[i]:print(levelString, error_message, self:_GetStackTrace(4))
 			end
 
 			-- ultimate debugging
-			GameRules:SendCustomMessage("Error: " .. err, 0, 0)
+			GameRules:SetCustomGameMessage("Error: " .. err, 0, 0)
 		end, unpack(args))
 
 		return status, err
@@ -292,16 +291,6 @@ if Log == nil then
 	---------------------------------------------
 	function Log:Configure(config)
 		self.config = config;
-	end
-
-	---------------------------------------------
-	-- Load the logger config from api
-	---------------------------------------------
-	function Log:ConfigureFromApi()
-		api:GetLoggingConfiguration(function(data)
-			log.info("Loaded new Logging configuration from server")
-			self.config = data.rules
-		end)
 	end
 
 	---------------------------------------------
@@ -362,12 +351,15 @@ if Log == nil then
 		for i = 1, #trace do
 			trace = trace .. ", " .. json.encode(trace[i])
 		end
+
 		-- prepare api request
-		api:Message({
-			level = level,
-			content = tostring(content),
-			trace = trace
-		}, 2)
+		if level == "error" and api then
+			api:Message({
+				level = level,
+				content = tostring(content),
+				trace = trace
+			}, 2)
+		end
 	end
 
 	ConsoleLogTarget = {
@@ -379,15 +371,14 @@ if Log == nil then
 		if trace[1]["name"] ~= nil then
 			name = "|" .. trace[1]["name"]
 		end
-		NativePrint("[" ..
-		level .. "][" .. trace[1]["short_src"] .. ":" .. trace[1]["currentline"] .. name .. "] " .. content)
+		native_print("[" .. level .. "][" .. trace[1]["short_src"] .. ":" .. trace[1]["currentline"] .. name .. "] " .. content)
 	end
 
 	-----------------------------------------------------------------
 	-- Overwrite the default print and redirect it to the custom
 	-- Log implementation above
 	-----------------------------------------------------------------
-	NativePrint = print
+	native_print = print
 	print = nil
 
 	function print(...)
@@ -484,13 +475,16 @@ if Log == nil then
 		"OnIntervalThink",
 		"OnRefresh",
 		"OnRemoved",
-		"OnStackCountChanged"
+		"OnStackCountChanged",
+		"OnModifierRoundEnd",
+		"OnModifierRoundStart",
+		"OnModifierActionThink",
 	}
 
 	function AdvLogRegisterLuaModifier(modifier)
 		-- check if a covered function is defined
 		for _, name in pairs(coveredByProxy) do
-			print("Checking modifier for " .. name)
+			-- print("Checking modifier for " .. name)
 
 			if modifier[name] ~= nil then
 				print("Modifier defines method " .. name .. ": " .. tostring(modifier[name]))
@@ -511,4 +505,99 @@ if Log == nil then
 	---------------------------------------------
 	Log:AddTarget(ApiLogTarget)
 	Log:AddTarget(ConsoleLogTarget)
+end
+
+local exclusion_list = {
+	-- Valve files
+	"/",
+	"builtin",
+
+	"adv_log",    -- ignore self file
+	"cdota_basenpc", -- GetCustomArmor spams a bit but at a low rate and shouldn't be a problem
+
+	-- Files we don't want to track right now
+	"modifier_custom_mechanics",
+	-- "modifiers",
+	-- "cdota_modifier_lua",
+	-- "keyvalues",
+	-- "tech_tree",
+	-- "timers",
+	-- "cdota_basenpc",
+	-- "removed_hero",
+	-- "util.lua",
+	-- "combat_log",
+	-- "abilities"
+}
+
+local enable_ultimate_debug = false
+
+-- Useful to track what's happening and where in real time. Careful: spams a lot!
+if IsInToolsMode() and enable_ultimate_debug then
+	local recorded_strings = {}
+	local minimum_amount_of_occurences = 1000
+	local max_amount_of_strings = 24
+
+	ListenToGameEvent("game_rules_state_change", function()
+		if GameRules:State_Get() == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
+			GameRules:GetGameModeEntity():SetContextThink(DoUniqueString("onthink"), function()
+				local strings = {}
+				local sorted_strings = {}
+
+				for k, v in pairs(recorded_strings) do
+					if v >= minimum_amount_of_occurences then
+						table.insert(sorted_strings, { key = k, value = v })
+					end
+				end
+
+				table.sort(sorted_strings, function(a, b) return a.value > b.value end)
+
+				for i = 1, math.min(#sorted_strings, max_amount_of_strings) do
+					table.insert(strings, sorted_strings[i].key .. " (" .. sorted_strings[i].value .. ")")
+				end
+
+				print(strings)
+
+				return 1.0
+			end, 1.0)
+		end
+	end, nil)
+
+	debug.sethook(function(event, line)
+		if event == "line" then
+			-- Check if an error occurred at this line
+			local info = debug.getinfo(2, "Sl")
+			local print_info = true
+			if info.what ~= "Lua" then return end -- ignore non-Lua functions
+
+			for _, v in pairs(exclusion_list) do
+				if string.find(info.short_src, v) ~= nil then
+					print_info = false
+					return
+				end
+			end
+
+			if print_info then
+				-- print(info)
+
+				if GameRules:State_Get() == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
+					-- local time = GameRules:GetDOTATime(false, false)
+					-- local minutes = math.floor(time / 60)
+					-- local seconds = math.floor(time % 60)
+					-- local string_time = string.format("%02d:%02d", minutes, seconds)
+					-- local string_record = string_time .. ":" .. info.short_src .. ":" .. info.currentline
+					local string_record = info.short_src .. ":" .. info.currentline
+
+					if recorded_strings[string_record] == nil then
+						recorded_strings[string_record] = 1
+					else
+						recorded_strings[string_record] = recorded_strings[string_record] + 1
+					end
+
+					-- api:Message(string_record, 2)
+				end
+			end
+		else
+			print("Event is not line:", event)
+		end
+	end, "l")
 end

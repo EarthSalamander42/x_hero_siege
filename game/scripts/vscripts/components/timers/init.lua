@@ -18,6 +18,7 @@ if CustomTimers == nil then
 	CustomTimers.game_phase = 0
 	CustomTimers.creep_level = 1
 	CustomTimers.special_wave = 1
+	CustomTimers.enable_special_wave = false -- todo: use this to enable/disable special waves when notification happens 30s before and disable it when it has spawned. This will allow waves to spawn exactly when supposed to, rather than a few seconds before/after
 	CustomTimers.proc_final_wave = false
 	CustomTimers.final_wave_delay = 60.0
 
@@ -68,7 +69,9 @@ function CustomTimers:Think()
 		CustomTimers:Countdown("game_time")
 
 		if GameRules:State_Get() == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
-			-- print("Game Time:", CustomTimers.current_time["game_time"])
+			local minutes = math.floor(CustomTimers.current_time["game_time"] / 60)
+			local seconds = math.floor(CustomTimers.current_time["game_time"] - (minutes * 60))
+			print("Game Time: " .. minutes .. ":" .. seconds)
 			-- 9:00 minutes (Muradin Event)
 			if CustomTimers.current_time["game_time"] == (XHS_SPECIAL_EVENT_INTERVAL - 1) then
 				CustomTimers.timers_paused = 1
@@ -141,6 +144,7 @@ function CustomTimers:Think()
 						print("Special Wave in 30 seconds:", CustomTimers.special_wave_region[cardinal_point], CustomTimers.special_wave)
 						Notifications:TopToAll({ text = "WARNING: " .. CustomTimers.special_wave_region[cardinal_point] .. "!", duration = 25.0, style = { color = "red" } })
 						SpawnRunes()
+						CustomTimers.enable_special_wave = true
 					elseif CustomTimers.current_time["special_wave"] == 1 then
 						SpecialWave(cardinal_point)
 					end
@@ -214,6 +218,7 @@ end
 function SpecialWave(iCardinalPoint)
 	if CustomTimers.game_phase > 2 then return end
 
+	CustomTimers.enable_special_wave = false
 	CustomTimers.current_time["special_wave"] = XHS_SPECIAL_WAVE_INTERVAL + 1
 
 	if iCardinalPoint > 4 then iCardinalPoint = iCardinalPoint - 4 end

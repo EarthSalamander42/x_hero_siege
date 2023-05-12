@@ -1,3 +1,5 @@
+-- todo: format this file. the file is called everytime a hero trigger is created through the map editor. it's a mess.
+
 STARTING_GOLD = { 10000, 5000, 4000, 3000, 2000 }
 
 -- WeekHero = "npc_dota_hero_slardar"			-- Centurion
@@ -28,6 +30,7 @@ ListenToGameEvent('game_rules_state_change', function(keys)
 			-- Need a timer else Battlepass is nil when first dummy hero spawn
 			Timers:CreateTimer(1.0, function()
 				SpawnHeroesBis()
+				SpawnBosses()
 			end)
 		end
 	end

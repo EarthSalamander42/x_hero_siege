@@ -43,7 +43,6 @@ ListenToGameEvent('game_rules_state_change', function()
 		end
 
 		local diff = { "Easy", "Normal", "Hard", "Extreme", "Divine" }
-		local lanes = { "Simple", "Double", "Full" }
 		local Color = { "green", "Yellow", "orange", "red", "darkred" }
 
 		CustomNetTables:SetTableValue("game_options", "game_info", {
@@ -52,15 +51,23 @@ ListenToGameEvent('game_rules_state_change', function()
 
 		Timers:CreateTimer(3.0, function()
 			CustomGameEventManager:Send_ServerToAllClients("show_timer_bar", {})
-			CustomGameEventManager:Send_ServerToAllClients("game_difficulty", { difficulty = diff[GameRules:GetCustomGameDifficulty()] })
-			Notifications:TopToAll({ text = "DIFFICULTY: " .. diff[GameRules:GetCustomGameDifficulty()], color = Color[GameRules:GetCustomGameDifficulty()], duration = 10.0 })
-			SpawnBosses()
+
+			local difficulty = diff[GameRules:GetCustomGameDifficulty()]
+
+			if not difficulty then
+				difficulty = "Normal"
+			end
+
+			CustomGameEventManager:Send_ServerToAllClients("game_difficulty", { difficulty = difficulty })
+			Notifications:TopToAll({ text = "DIFFICULTY: " .. difficulty, color = Color[GameRules:GetCustomGameDifficulty()], duration = 10.0 })
 		end)
 
 		AddFOWViewer(DOTA_TEAM_GOODGUYS, Vector(6528, 1152, 192), 900, 99999, false)
 		AddFOWViewer(DOTA_TEAM_CUSTOM_2, Vector(6528, 1152, 192), 900, 99999, false)
 
-		GameMode:SetupZones()
+		if CDungeonZone then
+			GameMode:SetupZones()
+		end
 
 		PHASE_2_QUEST_UNIT = CreateUnitByName("dummy_unit_phase_2_invulnerable", Vector(10000, 0, 0), false, nil, nil, 3)
 		PHASE_2_QUEST_UNIT.zone = "xhs_holdout"

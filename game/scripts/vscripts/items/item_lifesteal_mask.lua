@@ -15,6 +15,10 @@ end
 
 modifier_lifesteal_mask = modifier_lifesteal_mask or class({})
 
+function modifier_lifesteal_mask:GetTexture()
+	return "modifiers/lifesteal_mask"
+end
+
 function modifier_lifesteal_mask:GetModifierLifesteal()
 	return self:GetAbility():GetSpecialValueFor("lifesteal_pct")
 end
