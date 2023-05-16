@@ -11,7 +11,7 @@ local function StartSpell(caster, ability)
 
 		for _, darkness_unit in pairs(darkness_units) do
 			if darkness_unit:HasAbility("orb_of_darkness_unit") then
-				darkness_unit:ForceKill(false)
+				darkness_unit:Kill(nil, nil)
 			end
 		end
 
@@ -133,7 +133,7 @@ function modifier_orb_of_darkness_active:OnIntervalThink()
 
 		if item then
 			for k, v in pairs(MODIFIER_ITEMS_WITH_LEVELS["modifier_orb_of_darkness_active"]) do
-				--				print(v, item:GetAbilityName())
+				-- print(v, item:GetAbilityName())
 				if v == item:GetAbilityName() then
 					has_parent_item = true
 
@@ -145,7 +145,7 @@ function modifier_orb_of_darkness_active:OnIntervalThink()
 
 	--	print("Has parent item?", has_parent_item)
 	if has_parent_item == false then
-		--		print("has_parent_item:", has_parent_item)
+		-- print("has_parent_item:", has_parent_item)
 		self:GetParent():RemoveModifierByName("modifier_orb_of_darkness_active")
 	end
 end

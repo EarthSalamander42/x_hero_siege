@@ -1,7 +1,5 @@
 -- todo: format this file. the file is called everytime a hero trigger is created through the map editor. it's a mess.
 
-STARTING_GOLD = { 10000, 5000, 4000, 3000, 2000 }
-
 -- WeekHero = "npc_dota_hero_slardar"			-- Centurion
 WeekHero = "npc_dota_hero_skeleton_king" -- Lich King
 -- WeekHero = "npc_dota_hero_meepo"			-- Kobold Knight
@@ -177,7 +175,7 @@ function ChooseHero(event)
 				Notifications:Bottom(hero:GetPlayerOwnerID(), { text = "HERO: ", duration = 5.0, style = { color = "white" }, continue = true })
 				Notifications:Bottom(hero:GetPlayerOwnerID(), { text = "#npc_dota_hero_" .. HEROLIST[i], duration = 5.0, style = { color = "white" }, continue = true })
 
-				local newHero = PlayerResource:ReplaceHeroWith(id, "npc_dota_hero_" .. HEROLIST[i], STARTING_GOLD[difficulty], 0)
+				local newHero = PlayerResource:ReplaceHeroWith(id, "npc_dota_hero_" .. HEROLIST[i], XHS_STARTING_GOLD[difficulty], 0)
 				StartingItems(hero, newHero)
 
 				Timers:CreateTimer(0.1, function()
@@ -207,7 +205,7 @@ function ChooseHero(event)
 				Notifications:Bottom(hero:GetPlayerOwnerID(), { text = "HERO: ", duration = 5.0, style = { color = "white" }, continue = true })
 				Notifications:Bottom(hero:GetPlayerOwnerID(), { text = "#" .. weekly_hero, duration = 5.0, style = { color = "white" }, continue = true })
 
-				local newHero = PlayerResource:ReplaceHeroWith(id, weekly_hero, STARTING_GOLD[difficulty], 0)
+				local newHero = PlayerResource:ReplaceHeroWith(id, weekly_hero, XHS_STARTING_GOLD[difficulty], 0)
 				StartingItems(hero, newHero)
 
 				Timers:CreateTimer(0.1, function()
@@ -242,7 +240,7 @@ function ChooseHeroVIP(event)
 				Notifications:Bottom(hero:GetPlayerOwnerID(), { text = "HERO: ", duration = 5.0, style = { color = "white" }, continue = true })
 				Notifications:Bottom(hero:GetPlayerOwnerID(), { text = "#npc_dota_hero_" .. HEROLIST_VIP[i], duration = 5.0, style = { color = "white" }, continue = true })
 
-				local newHero = PlayerResource:ReplaceHeroWith(id, picked_hero_name, STARTING_GOLD[difficulty], 0)
+				local newHero = PlayerResource:ReplaceHeroWith(id, picked_hero_name, XHS_STARTING_GOLD[difficulty], 0)
 				StartingItems(hero, newHero)
 
 				if picked_hero_name == "npc_dota_hero_storm_spirit" then
@@ -258,52 +256,4 @@ function ChooseHeroVIP(event)
 	elseif PlayerResource:IsValidPlayer(id) and hero:GetUnitName() == "npc_dota_hero_wisp" and not api:IsDonator(hero:GetPlayerID()) then
 		Notifications:Bottom(hero:GetPlayerOwnerID(), { text = "This hero is only for <font color='#FF0000'>VIP Members!</font> Please choose another hero.", duration = 5.0 })
 	end
-end
-
-function StartingItems(hero, newHero)
-	local difficulty = GameRules:GetCustomGameDifficulty()
-
-	if difficulty ~= 5 then
-		newHero:AddNewModifier(newHero, nil, "modifier_ankh", { charges = 5 - difficulty })
-
-		local item = newHero:AddItemByName("item_health_potion")
-		item:SetPurchaseTime(0)
-
-		local item = newHero:AddItemByName("item_mana_potion")
-		item:SetPurchaseTime(0)
-
-		if difficulty == 1 then
-			local item = newHero:AddItemByName("item_lifesteal_mask")
-			item:SetSellable(false)
-		end
-	end
-
-	if newHero:GetTeamNumber() == 2 then
-		TeleportHero(newHero, BASE_GOOD:GetAbsOrigin(), 3.0)
-	elseif newHero:GetTeamNumber() == 3 then
-		TeleportHero(newHero, base_bad:GetAbsOrigin(), 3.0)
-	end
-
-	Timers:CreateTimer(0.1, function()
-		if not hero:IsNull() then
-			UTIL_Remove(hero)
-		end
-	end)
-
-	Timers:CreateTimer(1.0, function()
-		for k, v in pairs(HeroList:GetAllHeroes()) do
-			if v and IsValidEntity(v) and not v:IsNull() and v:GetUnitName() == "npc_dota_hero_wisp" then
-				--				print("A wisp was found! Players are still picking a hero")
-				return
-			end
-		end
-
-		-- all players selected a hero, remove pick screen to reduce lag
-		--		print("All players selected a hero, remove pick screen")
-		for k, v in pairs(HeroList:GetAllHeroes()) do
-			if v and IsValidEntity(v) and not v:IsNull() and v.is_fake_hero then
-				UTIL_Remove(v)
-			end
-		end
-	end)
 end

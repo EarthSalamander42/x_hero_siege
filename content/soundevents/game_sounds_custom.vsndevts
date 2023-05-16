@@ -17,7 +17,7 @@
                             "value0"        "sounds/storm_earth_fire.vsnd"
                         }
                     }
-                    "volume"            {   "value"     "1.00000"  }
+                    "volume"            {   "value"     "2.00000"  }
                     "pitch_rand_min"    {   "value"     "0.00000"  }
                     "pitch_rand_max"    {   "value"     "0.000000"  }
                     "pitch"             {   "value"     "1.000000"  }

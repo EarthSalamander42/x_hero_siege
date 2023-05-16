@@ -1,4 +1,4 @@
-function PurificationDeath( keys )
+function PurificationDeath(keys)
 	local caster = keys.caster
 	local ability = keys.ability
 	local ability_level = ability:GetLevel() - 1
@@ -29,7 +29,6 @@ function PurificationDeath( keys )
 	print(heal)
 
 	if ability:IsCooldownReady() then
-
 		-- Heal the caster
 		caster:Heal(heal, caster)
 		SendOverheadEventMessage(nil, OVERHEAD_ALERT_HEAL, caster, heal, nil)
@@ -51,8 +50,8 @@ function PurificationDeath( keys )
 
 		-- Damage nearby enemies
 		local enemies = FindUnitsInRadius(caster:GetTeamNumber(), caster_pos, nil, radius, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC, 0, 0, false)
-		for _,enemy in pairs(enemies) do
-			ApplyDamage({attacker = caster, victim = enemy, ability = ability, damage = damage, damage_type = DAMAGE_TYPE_PURE})
+		for _, enemy in pairs(enemies) do
+			ApplyDamage({ attacker = caster, victim = enemy, ability = ability, damage = damage, damage_type = DAMAGE_TYPE_PURE })
 
 			-- Play particle
 			local hit_pfx = ParticleManager:CreateParticle(hit_particle, PATTACH_ABSORIGIN_FOLLOW, enemy)
@@ -66,6 +65,6 @@ function PurificationDeath( keys )
 		ability:StartCooldown(cooldown)
 		caster:RemoveModifierByName("modifier_imba_purification_passive")
 	else
-		caster:ForceKill(true)
+		caster:Kill(nil, nil)
 	end
 end

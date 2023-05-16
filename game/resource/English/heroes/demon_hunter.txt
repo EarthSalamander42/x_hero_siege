@@ -19,8 +19,8 @@
 "DOTA_Tooltip_ability_xhs_vampiric_aura_aura_radius"				"RADIUS:"
 "DOTA_Tooltip_ability_xhs_vampiric_aura_lifesteal_pct"				"%LIFESTEAL:"
 
-"DOTA_Tooltip_modifier_xhs_vampiric_aura"							"Vampiric Aura"
-"DOTA_Tooltip_modifier_xhs_vampiric_aura_Description"				"Grants Lifesteal aura for nearby allies."
+"DOTA_Tooltip_modifier_xhs_vampiric"									"Vampiric Aura"
+"DOTA_Tooltip_modifier_xhs_vampiric_Description"						"Grants Lifesteal aura for nearby allies."
 
 "DOTA_Tooltip_ability_holdout_illidan_evasion"							"Evasion"
 "DOTA_Tooltip_ability_holdout_illidan_evasion_Description"				"Gives a percent chance to avoid attacks."

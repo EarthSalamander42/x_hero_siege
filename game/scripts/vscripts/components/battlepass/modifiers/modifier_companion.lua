@@ -1,8 +1,11 @@
 modifier_companion = class({})
 
 function modifier_companion:IsHidden() return true end
+
 function modifier_companion:GetAbsoluteNoDamagePhysical() return 1 end
+
 function modifier_companion:GetAbsoluteNoDamageMagical() return 1 end
+
 function modifier_companion:GetAbsoluteNoDamagePure() return 1 end
 
 function modifier_companion:CheckState()
@@ -21,14 +24,16 @@ function modifier_companion:CheckState()
 	return state
 end
 
-function modifier_companion:DeclareFunctions() return {
-	MODIFIER_PROPERTY_VISUAL_Z_DELTA,
-	MODIFIER_PROPERTY_ABSOLUTE_NO_DAMAGE_PHYSICAL,
-	MODIFIER_PROPERTY_ABSOLUTE_NO_DAMAGE_MAGICAL,
-	MODIFIER_PROPERTY_ABSOLUTE_NO_DAMAGE_PURE,
-	MODIFIER_PROPERTY_MOVESPEED_BONUS_CONSTANT,
-	MODIFIER_PROPERTY_TRANSLATE_ACTIVITY_MODIFIERS,
-} end
+function modifier_companion:DeclareFunctions()
+	return {
+		MODIFIER_PROPERTY_VISUAL_Z_DELTA,
+		MODIFIER_PROPERTY_ABSOLUTE_NO_DAMAGE_PHYSICAL,
+		MODIFIER_PROPERTY_ABSOLUTE_NO_DAMAGE_MAGICAL,
+		MODIFIER_PROPERTY_ABSOLUTE_NO_DAMAGE_PURE,
+		MODIFIER_PROPERTY_MOVESPEED_BONUS_CONSTANT,
+		MODIFIER_PROPERTY_TRANSLATE_ACTIVITY_MODIFIERS,
+	}
+end
 
 function modifier_companion:GetVisualZDelta()
 	if self.is_flying == 1 then
@@ -53,7 +58,7 @@ function modifier_companion:OnCreated()
 		self.set_final_pos = false
 
 		if GetMapName() == "imba_1v1" then
-			self:GetParent():ForceKill(false)
+			self:GetParent():Kill(nil, nil)
 			return
 		else
 			self:StartIntervalThink(0.1)
@@ -98,7 +103,6 @@ local target = keys.target
 	end
 end
 --]]
-
 function modifier_companion:GetModifierMoveSpeedBonus_Constant()
 	return self:GetStackCount()
 end
@@ -108,11 +112,11 @@ function modifier_companion:OnIntervalThink()
 		local companion = self:GetParent()
 
 		-- vanilla baseclass bug
---		if companion:IsMoving() then
---			companion:StartGesture(ACT_DOTA_RUN)
---		else
---			companion:FadeGesture(ACT_DOTA_RUN)
---		end
+		--		if companion:IsMoving() then
+		--			companion:StartGesture(ACT_DOTA_RUN)
+		--		else
+		--			companion:FadeGesture(ACT_DOTA_RUN)
+		--		end
 
 		if companion:GetPlayerOwner() == nil or companion:GetPlayerOwner():GetAssignedHero() == nil then return end
 		local hero = companion:GetPlayerOwner():GetAssignedHero()
@@ -163,16 +167,16 @@ function modifier_companion:OnIntervalThink()
 		-- This thing crashes with Treant's Nature's Guise
 		-- Also using static lists for invisibltiy modifiers is just asking for trouble
 		-- for _,v in pairs(IMBA_INVISIBLE_MODIFIERS) do
-			-- if not hero:HasModifier(v) then
-				-- if companion:HasModifier(v) then
-					-- companion:RemoveModifierByName(v)
-				-- end
-			-- else
-				-- if not companion:HasModifier(v) then
-					-- companion:AddNewModifier(companion, nil, v, {})
-					-- break -- remove this break if you want to add multiple modifiers at the same time
-				-- end
-			-- end
+		-- if not hero:HasModifier(v) then
+		-- if companion:HasModifier(v) then
+		-- companion:RemoveModifierByName(v)
+		-- end
+		-- else
+		-- if not companion:HasModifier(v) then
+		-- companion:AddNewModifier(companion, nil, v, {})
+		-- break -- remove this break if you want to add multiple modifiers at the same time
+		-- end
+		-- end
 		-- end
 
 		if hero:IsInvisible() then
@@ -219,7 +223,7 @@ function modifier_companion:IsOnMountain()
 	local hero = self:GetParent():GetPlayerOwner():GetAssignedHero()
 	local origin = hero:GetAbsOrigin()
 
---	print("cliff:", origin.z, 512)
+	--	print("cliff:", origin.z, 512)
 	if origin.z > 512 then
 		return true
 	else

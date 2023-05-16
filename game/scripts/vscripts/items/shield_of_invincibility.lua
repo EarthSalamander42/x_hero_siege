@@ -66,10 +66,12 @@ end
 function modifier_shield_of_invincibility:OnDestroy()
 	if not IsServer() then return end
 
-	for k, v in pairs(self.parent:FindAllModifiersByName("modifier_ankh")) do
-		if v:GetAbility() == self.ability then
-			v:Destroy()
-			return
+	if self.parent and not self.parent:IsNull() then
+		for k, v in pairs(self.parent:FindAllModifiersByName("modifier_ankh")) do
+			if v:GetAbility() == self.ability then
+				v:Destroy()
+				return
+			end
 		end
 	end
 end

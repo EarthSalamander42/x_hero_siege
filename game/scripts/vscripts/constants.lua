@@ -390,6 +390,90 @@ MODIFIER_ITEMS_WITH_LEVELS["modifier_orb_of_lightning_active"] = {
 	"item_orb_of_lightning2",
 	"item_orb_of_lightning",
 }
+EXPLOSION_SOUND_TABLE = { "Hero_Techies.RemoteMine.Detonate", "Hero_Rattletrap.Rocket_Flare.Explode" }
+EXPLOSION_PARTICLE_TABLE = { "particles/econ/items/shadow_fiend/sf_fire_arcana/sf_fire_arcana_shadowraze.vpcf" }
+XHS_BOSSES_TABLE = {
+	npc_dota_hero_grom_hellscream = {
+		doors_to_open = { "door_illidan", "door_illidan2" },
+		obstructions_to_disable = { "obstruction_illidan" },
+		death_animation = { duration = 6.0, activity = ACT_DOTA_DIE, rate = 0.25 },
+		death_sound = "skeleton_king_wraith_death_long_09",
+		death_no_draw_delay = 12.0,
+		four_bosses_kill_count = true,
+	},
+	npc_dota_hero_illidan = {
+		doors_to_open = { "door_balanar", "door_balanar2" },
+		obstructions_to_disable = { "obstruction_balanar" },
+		death_animation = { duration = 6.0, activity = ACT_DOTA_DIE, rate = 0.35 },
+		death_sound = "skeleton_king_wraith_death_long_09",
+		death_no_draw_delay = 12.0,
+		four_bosses_kill_count = true,
+	},
+	npc_dota_hero_balanar = {
+		doors_to_open = { "door_proudmoore", "door_proudmoore2" },
+		obstructions_to_disable = { "obstruction_proudmoore" },
+		death_animation = { duration = 6.0, activity = ACT_DOTA_DIE, rate = 0.3 },
+		death_sound = "skeleton_king_wraith_death_long_09",
+		death_no_draw_delay = 12.0,
+		four_bosses_kill_count = true,
+	},
+	npc_dota_hero_proudmoore = {
+		doors_to_open = { "door_proudmoore3" },
+		obstructions_to_disable = { "obstruction_proudmoore2" },
+		death_animation = { duration = 6.0, activity = ACT_DOTA_DIE, rate = 0.4 },
+		death_sound = "skeleton_king_wraith_death_long_09",
+		death_no_draw_delay = 12.0,
+		four_bosses_kill_count = true,
+	},
+	npc_dota_hero_arthas = {
+		death_animation = { duration = 6.0, activity = ACT_DOTA_DIE, rate = 0.1 },
+		death_sound = "Arthas.Death",
+		death_no_draw_delay = 11.0,
+		refresh_players = true,
+		func_next_delay = 15.0,
+		func_next = function() StartBanehallowArena() end
+	},
+	npc_dota_hero_banehallow = {
+		death_animation = { duration = 6.3, activity = ACT_DOTA_DIE, rate = 0.17 },
+		-- death_sound = "Banehallow.Death",
+		death_no_draw_delay = 12.5,
+		refresh_players = true,
+		func_next_delay = 15.0,
+		func_next = function() StartLichKingArena() end
+	},
+	npc_dota_boss_lich_king = {
+		death_animation = { duration = 10.0, activity = ACT_DOTA_DIE, rate = 0.1 },
+		death_sound = "razor_raz_death_04",
+		death_no_draw_delay = 14.0,
+		refresh_players = true,
+		func_next_delay = 17.0,
+		func_next = function() StartSpiritMasterArena() end
+	},
+	npc_dota_boss_spirit_master_storm = {
+		death_animation = { duration = 10.0, activity = ACT_DOTA_DIE, rate = 0.3 },
+		death_sound = "razor_raz_death_04",
+		death_no_draw_delay = 10.0,
+		refresh_players = true,
+		func_next_delay = 14.0,
+		func_next = function() EndGame() end
+	},
+	npc_dota_boss_spirit_master_earth = {
+		death_animation = { duration = 10.0, activity = ACT_DOTA_DIE, rate = 0.3 },
+		death_sound = "razor_raz_death_04",
+		death_no_draw_delay = 10.0,
+		refresh_players = true,
+		func_next_delay = 14.0,
+		func_next = function() EndGame() end
+	},
+	npc_dota_boss_spirit_master_fire = {
+		death_animation = { duration = 10.0, activity = ACT_DOTA_DIE, rate = 0.3 },
+		death_sound = "razor_raz_death_04",
+		death_no_draw_delay = 10.0,
+		refresh_players = true,
+		func_next_delay = 14.0,
+		func_next = function() EndGame() end
+	},
+}
 
 XHS_CREEPS_INTERVAL = 20.0
 XHS_SPECIAL_EVENT_INTERVAL = 540.0                           -- 9 min (has to be a multiple of 3)
@@ -399,7 +483,10 @@ XHS_PHASE_2_DELAY = 420.0                                    -- 7 min
 
 XHS_MURADIN_EVENT_GOLD = 20000
 XHS_MURADIN_EVENT_DURATION = 120.0
+XHS_FARM_EVENT_DURATION = 180.0
 
 XHS_GLOBAL_RESPAWN_TIME = 5.0
 XHS_HERO_VISION = 2000
 XHS_RAMERO_BARISTOL_TIME = 120.0
+_G.XHS_STARTING_GOLD = { 10000, 5000, 4000, 3000, 2000 }
+SPIRIT_MASTER_KILLED_BOSS_COUNT = 0

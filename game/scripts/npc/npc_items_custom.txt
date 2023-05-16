@@ -2231,7 +2231,7 @@
 			"03"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"regeneration"			"2"
+				"regeneration"			"5"
 			}
 		}
 

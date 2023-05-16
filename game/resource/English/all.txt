@@ -1804,6 +1804,9 @@
 "DOTA_Tooltip_ability_balanar_sleep_Description"				"Make a unit fall asleep, wich can't move and is invulnerable."
 "DOTA_Tooltip_ability_balanar_sleep_duration"					"DURATION:"
 
+"DOTA_Tooltip_modifier_sleep"								"Sleep"
+"DOTA_Tooltip_modifier_sleep_Description"					"Sleeping unit can't move and is invulnerable."
+
 "DOTA_Tooltip_ability_balanar_rain_of_chaos"						"Rain of Chaos"
 "DOTA_Tooltip_ability_balanar_rain_of_chaos_Description"			"Calls down meteors around Abyssal Underlord, stunning enemy units. Abyssal Underlord receive 50% of the physical incoming damage during the process."
 "DOTA_Tooltip_ability_balanar_rain_of_chaos_damage_per_unit"		"DAMAGE PER METEOR:"

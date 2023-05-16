@@ -4201,7 +4201,8 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------
-		"BaseClass"						"ability_datadriven"
+		"BaseClass"						"ability_lua"
+		"ScriptFile"					"abilities/heroes/npc_hero_balanar/balanar_rain_of_chaos.lua"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_AOE"
 		"MaxLevel"						"1"
 		"RequiredLevel"					"20"
@@ -4210,7 +4211,7 @@
 		//-------------------------------------------------------------------------------------
 		"AbilityCastPoint"				"0.35"
 		"AnimationPlaybackRate"			"0.5"
-		"AOERadius"						"450"
+		"AOERadius"						"1000"
 		"AbilityCooldown"				"35"
 		"AbilityManaCost"				"0"
 		"AbilityTextureName"			"warlock_rain_of_chaos"
@@ -4233,7 +4234,7 @@
 			"03"
 			{
 				"var_type"					"FIELD_FLOAT"
-				"stun_duration"				"1.25"
+				"stun_duration"				"0.5"
 			}
 			"04"
 			{
@@ -4255,107 +4256,10 @@
 				"var_type"					"FIELD_FLOAT"
 				"duration"					"10.9"
 			}
-		}
-
-		"OnSpellStart"
-		{
-			"ApplyModifier"
+			"08"
 			{
-				"ModifierName"	"modifier_spawn_meteor"
-				"Target"		"CASTER"
-			}
-
-			"FireSound"
-			{
-				"EffectName"			"DOTA_Item.BlackKingBar.Activate"
-				"Target"				"CASTER"
-			}
-		}
-
-		"Modifiers"
-		{
-			"modifier_spawn_meteor" 
-			{
-				"IsHidden" "1"
-				"ThinkInterval"		"%time_between_meteors"
-				"Duration"			"%duration"
-				"OverrideAnimation" "ACT_DOTA_TELEPORT"
-
-				"AttachEffect"
-				{
-					"EffectName"			"particles/items_fx/black_king_bar_avatar.vpcf"
-					"EffectAttachType"		"follow_origin"
-					"Target"				"CASTER"
-				}
-
-				"OnIntervalThink"
-				{
-					"RunScript"
-					{
-						"ScriptFile"			"abilities/heroes/hero_pit_lord.lua"
-						"Function"				"rain_of_chaos"
-					}
-				}
-
-				"States"
-				{
-					"MODIFIER_STATE_STUNNED"				"MODIFIER_STATE_VALUE_ENABLED"
-					"MODIFIER_STATE_COMMAND_RESTRICTED"		"MODIFIER_STATE_VALUE_ENABLED"
-					"MODIFIER_STATE_MAGIC_IMMUNE"			"MODIFIER_STATE_VALUE_ENABLED"
-				}
-			}
-
-			"modifier_dummy_target" 
-			{
-			  "IsHidden" "1"
-	
-			  "States"
-			  {
-				"MODIFIER_STATE_UNSELECTABLE"			"MODIFIER_STATE_VALUE_ENABLED"
-				"MODIFIER_STATE_NO_HEALTH_BAR"			"MODIFIER_STATE_VALUE_ENABLED"
-				"MODIFIER_STATE_NO_UNIT_COLLISION"		"MODIFIER_STATE_VALUE_ENABLED"
-				"MODIFIER_STATE_NO_TEAM_MOVE_TO"		"MODIFIER_STATE_VALUE_ENABLED"
-				"MODIFIER_STATE_NO_TEAM_SELECT"			"MODIFIER_STATE_VALUE_ENABLED"
-				"MODIFIER_STATE_COMMAND_RESTRICTED"		"MODIFIER_STATE_VALUE_ENABLED"
-				"MODIFIER_STATE_ATTACK_IMMUNE"			"MODIFIER_STATE_VALUE_ENABLED"
-				"MODIFIER_STATE_MAGIC_IMMUNE"			"MODIFIER_STATE_VALUE_ENABLED"
-				"MODIFIER_STATE_NOT_ON_MINIMAP"			"MODIFIER_STATE_VALUE_ENABLED"
-			  }
-	
-				"OnDestroy" 
-				{
-					"Damage"
-					{
-						"Target"
-						{
-							"Center"	"TARGET"
-							"Radius"	"%radius_explosion"
-							"Teams"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
-							"Types"		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
-						}
-						"Type"			"DAMAGE_TYPE_MAGICAL"
-						"Damage"		"%damage_per_unit"
-					}
-
-					"Stun"
-					{
-						"Duration"		"%stun_duration"
-						"Target"
-						{
-							"Center"	"TARGET"
-							"Radius"	"%radius_explosion"
-							"Teams"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
-							"Types"		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
-						}
-					}
-
-					"RunScript"
-					{
-						"ScriptFile"	"abilities/heroes/hero_pit_lord.lua"
-						"Function"		"target_modifier_remove"
-						"Duration"		"%duration"
-					}
-				}
+				"var_type"					"FIELD_INTEGER"
+				"seek_radius"				"1000"
 			}
 		}
 	}
@@ -5104,7 +5008,7 @@
 			"03"
 			{	
 				"var_type"					"FIELD_INTEGER"
-				"arrow_count"				"3 5 7 9"
+				"arrow_count"				"3 4 5 8"
 			}
 			"04"
 			{
@@ -7530,12 +7434,12 @@
 			"01"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"bonus_damage_percent"		"20 25 30 35"
+				"bonus_damage_percent"		"40"
 			}
 			"02"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"bonus_armor"				"10 17 24 31"
+				"bonus_armor"				"10 20 30 40"
 			}
 			"03"
 			{
@@ -7622,7 +7526,7 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"damage_bonus"			"50 100 200 400"
+				"damage_bonus"			"100 150 225 400"
 			}
 		}
 	}
@@ -7735,7 +7639,7 @@
 			"03"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"bonus_damage"				"125 425 725"
+				"bonus_damage"				"125 300 550"
 			}
 		}
 
@@ -9206,7 +9110,7 @@
 
 		// Time		
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCooldown"				"5.0"
+		"AbilityCooldown"				"7.0"
 		
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
@@ -10582,7 +10486,8 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------
-		"BaseClass"						"ability_datadriven"
+		"BaseClass"						"ability_lua"
+		"ScriptFile"					"abilities/heroes/npc_hero_balanar/balanar_rain_of_chaos.lua"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"RequiredLevel"					"8"
 		"LevelsBetweenUpgrades"			"3"
@@ -10591,7 +10496,7 @@
 		//-------------------------------------------------------------------------------------
 		"AbilityCastPoint"				"0.35"
 		"AnimationPlaybackRate"			"0.5"
-		"AOERadius"						"425"
+		"AOERadius"						"1000"
 		"AbilityCooldown"				"35.0"
 		"AbilityManaCost"				"175 250 325 400"
 		"AbilityTextureName"			"warlock_rain_of_chaos"
@@ -10619,7 +10524,7 @@
 			"03"
 			{
 				"var_type"					"FIELD_FLOAT"
-				"stun_duration"				"0.4 0.6 0.8 1.0"
+				"stun_duration"				"0.35 0.4 0.45 0.5"
 			}
 			"04"
 			{
@@ -10644,114 +10549,12 @@
 			"08"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"damage_reduction"			"-50 -60 -70 -80"
+				"damage_reduction"			"50 60 70 80"
 			}
-		}
-
-		"OnSpellStart"
-		{
-			"ApplyModifier"
+			"09"
 			{
-				"ModifierName"	"modifier_spawn_meteor"
-				"Target"		"CASTER"
-			}
-
-			"FireSound"
-			{
-				"EffectName"			"DOTA_Item.BlackKingBar.Activate"
-				"Target"				"CASTER"
-			}
-		}
-
-		"Modifiers"
-		{
-			"modifier_spawn_meteor" 
-			{
-				"IsHidden" "1"
-				"ThinkInterval"		"%time_between_meteors"
-				"Duration"			"%duration"
-				"OverrideAnimation" "ACT_DOTA_TELEPORT"
-
-				"AttachEffect"
-				{
-					"EffectName"			"particles/items_fx/black_king_bar_avatar.vpcf"
-					"EffectAttachType"		"follow_origin"
-					"Target"				"CASTER"
-				}
-
-				"OnIntervalThink"
-				{
-					"RunScript"
-					{
-						"ScriptFile"			"abilities/heroes/hero_pit_lord.lua"
-						"Function"				"rain_of_chaos"
-					}
-				}
-
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_INCOMING_DAMAGE_PERCENTAGE"		"%damage_reduction"
-				}
-
-				"States"
-				{
-					"MODIFIER_STATE_STUNNED"				"MODIFIER_STATE_VALUE_ENABLED"
-					"MODIFIER_STATE_COMMAND_RESTRICTED"		"MODIFIER_STATE_VALUE_ENABLED"
-					"MODIFIER_STATE_MAGIC_IMMUNE"			"MODIFIER_STATE_VALUE_ENABLED"
-				}
-			}
-
-			"modifier_dummy_target" 
-			{
-			  "IsHidden" "1"
-	
-			  "States"
-			  {
-				"MODIFIER_STATE_UNSELECTABLE"			"MODIFIER_STATE_VALUE_ENABLED"
-				"MODIFIER_STATE_NO_HEALTH_BAR"			"MODIFIER_STATE_VALUE_ENABLED"
-				"MODIFIER_STATE_NO_UNIT_COLLISION"		"MODIFIER_STATE_VALUE_ENABLED"
-				"MODIFIER_STATE_NO_TEAM_MOVE_TO"		"MODIFIER_STATE_VALUE_ENABLED"
-				"MODIFIER_STATE_NO_TEAM_SELECT"			"MODIFIER_STATE_VALUE_ENABLED"
-				"MODIFIER_STATE_COMMAND_RESTRICTED"		"MODIFIER_STATE_VALUE_ENABLED"
-				"MODIFIER_STATE_ATTACK_IMMUNE"			"MODIFIER_STATE_VALUE_ENABLED"
-				"MODIFIER_STATE_MAGIC_IMMUNE"			"MODIFIER_STATE_VALUE_ENABLED"
-				"MODIFIER_STATE_NOT_ON_MINIMAP"			"MODIFIER_STATE_VALUE_ENABLED"
-			  }
-	
-			  "OnDestroy" 
-			  {
-				"Damage"
-				{
-				  "Target"
-				  {
-					"Center"    "TARGET"
-					"Radius"   "%radius_explosion"
-					"Teams"   "DOTA_UNIT_TARGET_TEAM_ENEMY"
-					"Types"   "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
-				  }
-				  "Type"      "DAMAGE_TYPE_MAGICAL"
-				  "Damage"    "%damage_per_unit"
-				}
-				"Stun"
-				{
-				  "Duration"   "%stun_duration"
-				  "Target"
-				  {
-					"Center"    "TARGET"
-					"Radius"   "%radius_explosion"
-					"Teams"   "DOTA_UNIT_TARGET_TEAM_ENEMY"
-					"Types"   "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
-				  }
-				}
-	
-				"RunScript"
-				{
-				  "ScriptFile"  "abilities/heroes/hero_pit_lord.lua"
-				  "Function"    "target_modifier_remove"
-				  "Duration"	"%duration"
-				}
-				
-			  }
+				"var_type"					"FIELD_INTEGER"
+				"seek_radius"				"1000"
 			}
 		}
 	}
@@ -27031,7 +26834,8 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------
-		"BaseClass"						"ability_datadriven"
+		"BaseClass"						"ability_lua"
+		"ScriptFile"					"abilities/heroes/npc_hero_balanar/balanar_rain_of_chaos.lua"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"AbilityUnitTargetFlags"		"DOTA_UNIT_TARGET_FLAG_INVULNERABLE | DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES"
 		"MaxLevel"						"5"
@@ -27064,7 +26868,7 @@
 			"03"
 			{
 				"var_type"				"FIELD_FLOAT"
-				"stun_duration"			"0.5 1.5 2.5 3.5 4.5"
+				"stun_duration"			"0.5"
 			}
 			"04"
 			{
@@ -27091,116 +26895,10 @@
 				"var_type"				"FIELD_INTEGER"
 				"golem_duration"		"30"
 			}
-		}
-
-		"OnSpellStart"
-		{
-			"ApplyModifier"
+			"09"
 			{
-				"ModifierName"	"modifier_spawn_meteor"
-				"Target"		"CASTER"
-			}
-
-			"FireSound"
-			{
-				"EffectName"	"DOTA_Item.BlackKingBar.Activate"
-				"Target"		"CASTER"
-			}
-		}
-
-		"Modifiers"
-		{
-			"modifier_spawn_meteor"
-			{
-				"IsHidden"			"0"
-				"ThinkInterval"		"%time_between_meteors"
-				"Duration"			"%duration"
-				"OverrideAnimation"	"ACT_DOTA_TELEPORT"
-
-				"AttachEffect"
-				{
-					"EffectName"			"particles/items_fx/black_king_bar_avatar.vpcf"
-					"EffectAttachType"		"follow_origin"
-					"Target"				"CASTER"
-				}
-
-				"OnCreated"
-				{
-					"ApplyModifier"
-					{
-						"ModifierName"	"modifier_invulnerable"
-						"Target" 		"CASTER"
-						"Duration"		"%duration"
-					}
-				}
-
-				"OnIntervalThink"
-				{
-					"RunScript"
-					{
-						"ScriptFile"			"abilities/heroes/npc_hero_balanar/balanar_rain_of_chaos.lua"
-						"Function"				"rain_of_chaos"
-					}
-				}
-
-				"States"
-				{
-					"MODIFIER_STATE_STUNNED"				"MODIFIER_STATE_VALUE_ENABLED"
-					"MODIFIER_STATE_COMMAND_RESTRICTED"		"MODIFIER_STATE_VALUE_ENABLED"
-					"MODIFIER_STATE_MAGIC_IMMUNE"			"MODIFIER_STATE_VALUE_ENABLED"
-				}
-			}
-
-			"modifier_dummy_target" 
-			{
-				"IsHidden" "1"
-
-				"States"
-				{
-					"MODIFIER_STATE_UNSELECTABLE"		"MODIFIER_STATE_VALUE_ENABLED"
-					"MODIFIER_STATE_NO_HEALTH_BAR"		"MODIFIER_STATE_VALUE_ENABLED"
-					"MODIFIER_STATE_NO_UNIT_COLLISION"	"MODIFIER_STATE_VALUE_ENABLED"
-					"MODIFIER_STATE_NO_TEAM_MOVE_TO"	"MODIFIER_STATE_VALUE_ENABLED"
-					"MODIFIER_STATE_NO_TEAM_SELECT"		"MODIFIER_STATE_VALUE_ENABLED"
-					"MODIFIER_STATE_COMMAND_RESTRICTED"	"MODIFIER_STATE_VALUE_ENABLED"
-					"MODIFIER_STATE_ATTACK_IMMUNE"		"MODIFIER_STATE_VALUE_ENABLED"
-					"MODIFIER_STATE_MAGIC_IMMUNE"		"MODIFIER_STATE_VALUE_ENABLED"
-					"MODIFIER_STATE_NOT_ON_MINIMAP"		"MODIFIER_STATE_VALUE_ENABLED"
-				}
-
-				"OnDestroy" 
-				{
-					"Damage"
-					{
-						"Target"
-						{
-							"Center"	"TARGET"
-							"Radius"	"%radius_explosion"
-							"Teams"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
-							"Types"		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
-						}
-						"Type"			"DAMAGE_TYPE_PURE"
-						"Damage"		"%damage_per_unit"
-					}
-
-					"Stun"
-					{
-						"Duration"		"%stun_duration"
-						"Target"
-						{
-							"Center"	"TARGET"
-							"Radius"	"%radius_explosion"
-							"Teams"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
-							"Types"		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
-						}
-					}
-
-					"RunScript"
-					{
-						"ScriptFile"	"abilities/heroes/npc_hero_balanar/balanar_rain_of_chaos.lua"
-						"Function"		"target_modifier_remove"
-					}
-				}
+				"var_type"				"FIELD_INTEGER"
+				"seek_radius"			"1000"
 			}
 		}
 	}
@@ -27443,7 +27141,7 @@
 		//-------------------------------------------------------------------------------------
 		"BaseClass"					"ability_datadriven"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
-		"MaxLevel"						"5"
+		"MaxLevel"					"5"
 
 		// Stats
 		//-------------------------------------------------------------------------------------
@@ -27455,7 +27153,6 @@
 		"AbilityTextureName"		"custom/holdout_sleep"
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
 		"AbilityUnitTargetType"		"DOTA_UNIT_TARGET_HERO"
-	
 	
 		// Special
 		//-------------------------------------------------------------------------------------
@@ -27956,61 +27653,10 @@
 	"cant_die_generic"
 	{
 		"AbilityBehavior"	"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_HIDDEN"
-		"BaseClass"	"ability_datadriven"
+		"BaseClass"	"ability_lua"
+		"ScriptFile"	"npc_abilities/cant_die.lua"
 		"AbilityTextureName"	"custom/rubick_empty1"
 		"MaxLevel"	"1"
-
-		"Modifiers"
-		{
-			"modifier_cant_die_generic"
-			{
-				"Passive"	"1"
-				"IsHidden"	"1"
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_MIN_HEALTH" "1" 
-				}
-
-				"ThinkInterval"  "0.3"
-
-				"OnIntervalThink"
-				{
-					"RunScript"
-					{
-						"ScriptFile"	"npc_abilities/cant_die.lua"
-						"Function"		"death_check"
-						"Target"		"TARGET"
-					}
-				}
-			}
-
-			"modifier_dying_generic"
-			{
-				"IsHidden"	"1"
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_MIN_HEALTH" "1" 
-				}
-				"States"
-				{
-					"MODIFIER_STATE_DISARMED"		"MODIFIER_STATE_VALUE_ENABLED"
-					"MODIFIER_STATE_INVULNERABLE"	"MODIFIER_STATE_VALUE_ENABLED"
-					"MODIFIER_STATE_ROOTED"			"MODIFIER_STATE_VALUE_ENABLED"
-					"MODIFIER_STATE_SILENCED"		"MODIFIER_STATE_VALUE_ENABLED"
-					"MODIFIER_STATE_NO_HEALTH_BAR"	"MODIFIER_STATE_VALUE_ENABLED"
-					"MODIFIER_STATE_UNSELECTABLE"	"MODIFIER_STATE_VALUE_ENABLED"
-				}
-				"ThinkInterval"  "0.5"
-				"OnIntervalThink"
-				{
-					"RunScript"
-					{
-						"ScriptFile"	"npc_abilities/cant_die.lua"
-						"Function"		"death_animation"
-					}
-				}
-			}
-		}
 	}
 
 	//=================================================================================================================

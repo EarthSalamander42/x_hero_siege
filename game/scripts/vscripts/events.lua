@@ -505,7 +505,6 @@ ListenToGameEvent('dota_player_gained_level', function(keys)
 		end
 
 		if AbilitiesHeroes_XX[hero:GetUnitName()] then
-			print("Whisper Level 20 Ability")
 			hero.lvl_20 = true
 			Notifications:Bottom(hero:GetPlayerOwnerID(), { text = "You've reached level 20. Check out your new abilities! ", duration = 10 })
 			for _, ability in pairs(AbilitiesHeroes_XX[hero:GetUnitName()]) do
@@ -521,7 +520,7 @@ ListenToGameEvent('dota_player_gained_level', function(keys)
 				end
 			end
 		else
-			print("No Level 20 Ability")
+			print("No Level 20 Ability for " .. hero:GetUnitName() .. " found!")
 		end
 	end
 end, nil)
@@ -639,7 +638,7 @@ ListenToGameEvent("player_chat", function(keys)
 					if str == "-kill_" .. Frozen + 1 then
 						local hero = PlayerResource:GetPlayer(Frozen):GetAssignedHero()
 						if hero:IsAlive() then
-							hero:ForceKill(true)
+							hero:Kill(nil, nil)
 							Notifications:TopToAll({ text = "[ADMIN MOD]: ", duration = 6.0, style = { color = "red", ["font-size"] = "30px" } })
 							Notifications:TopToAll({ text = PlayerNames[Frozen + 1] .. " ", style = { color = PlayerNames[Frozen + 1], ["font-size"] = "25px" }, continue = true })
 							Notifications:TopToAll({ text = "player has been slayed!", style = { color = "white", ["font-size"] = "25px" }, continue = true })
@@ -682,7 +681,7 @@ ListenToGameEvent("player_chat", function(keys)
 			if str == "-replaceherowith" then
 				text = string.gsub(text, str, "")
 				text = string.gsub(text, " ", "")
-				print(PlayerResource:GetSelectedHeroName(hero:GetPlayerID()), "npc_dota_hero_" .. text, KeyValues.HeroKV["npc_dota_hero_" .. text])
+
 				if PlayerResource:GetSelectedHeroName(hero:GetPlayerID()) ~= "npc_dota_hero_" .. text then
 					--					if KeyValues.HeroKV["npc_dota_hero_"..text] then
 					PrecacheUnitByNameAsync("npc_dota_hero_" .. text, function()
@@ -929,6 +928,7 @@ ListenToGameEvent('entity_killed', function(keys)
 	local killerAbility = nil
 	local killer = nil
 	if keys.entindex_attacker ~= nil then killer = EntIndexToHScript(keys.entindex_attacker) end
+	if not killer then killer = GameRules:GetGameModeEntity() end
 	if keys.entindex_inflictor ~= nil then killerAbility = EntIndexToHScript(keys.entindex_inflictor) end
 	local difficulty = GameRules:GetCustomGameDifficulty()
 	local Zone = killedUnit.zone
@@ -1008,7 +1008,7 @@ ListenToGameEvent('entity_killed', function(keys)
 		elseif killedUnit:GetUnitName() == "npc_ramero_2" then
 			DropNeutralItemAtPositionForHero("item_ring_of_superiority", killedUnit:GetAbsOrigin(), killer, killer:GetTeam(), true)
 			DOOM_FIRST_TIME = true
-			GameRules:GetGameModeEntity():SetContextThink(SpecialEvents.SogatTimer, nil, 0)
+			GameRules:GetGameModeEntity():SetContextThink("Sogat", nil, 0)
 		elseif killedUnit:GetUnitName() == "npc_dota_hero_secret" then
 			local pos = killedUnit:GetAbsOrigin()
 			DropNeutralItemAtPositionForHero("item_orb_of_frost", pos, killer, killer:GetTeam(), true)
@@ -1016,7 +1016,7 @@ ListenToGameEvent('entity_killed', function(keys)
 		end
 
 		if ramero_check == 2 then
-			GameRules:GetGameModeEntity():SetContextThink(SpecialEvents.RameroAndBaristol, nil, 0)
+			GameRules:GetGameModeEntity():SetContextThink("RameroAndBaristol", nil, 0)
 		end
 
 		if killedUnit:GetUnitName() == "npc_dota_creature_muradin_bronzebeard" and killedUnit:GetTeamNumber() ~= 2 then
@@ -1042,7 +1042,7 @@ ListenToGameEvent('entity_killed', function(keys)
 		end
 
 		-- add kills to the hero who spawned a controlled unit, or an illusion
-		if killer:IsRealHero() or killer:IsIllusion() or IsValidEntity(killer:GetPlayerOwner()) then
+		if (killer and killer ~= GameRules:GetGameModeEntity()) and killer:IsRealHero() or (killer.IsIllusion and killer:IsIllusion()) or (killer.GetPlayerOwner and killer:GetPlayerOwner() and IsValidEntity(killer:GetPlayerOwner())) then
 			if killer:GetTeamNumber() == 2 then
 				if killedUnit:GetTeamNumber() == 6 then
 					if killer:IsIllusion() then
@@ -1101,7 +1101,7 @@ ListenToGameEvent('entity_killed', function(keys)
 				GameRules:SetGameWinner(3)
 			end
 		elseif killedUnit:GetTeamNumber() == 3 then
-			if killer:IsIllusion() then
+			if killer and killer:IsIllusion() then
 				killer = PlayerResource:GetPlayer(killer:GetPlayerID()):GetAssignedHero()
 				killer:IncrementKills(1)
 
@@ -1111,7 +1111,7 @@ ListenToGameEvent('entity_killed', function(keys)
 					end
 				end
 			elseif IsValidEntity(killer:GetPlayerOwner()) then
-				if killer:IsRealHero() then
+				if killer and killer:IsRealHero() then
 					EmitSoundOnClient("Dungeon.LastHit", killer:GetPlayerOwner())
 					ParticleManager:ReleaseParticleIndex(ParticleManager:CreateParticleForPlayer("particles/darkmoon_last_hit_effect.vpcf", PATTACH_ABSORIGIN_FOLLOW, killedUnit, killer:GetPlayerOwner()))
 					if PlayerResource:HasSelectedHero(killer:GetPlayerOwnerID()) then
@@ -1129,16 +1129,16 @@ ListenToGameEvent('entity_killed', function(keys)
 		if killedUnit:IsTower() then
 			if killedUnit:GetUnitName() == "xhs_tower_lane_1" then
 				for j = 1, difficulty do
-					local unit = CreateUnitByName("xhs_death_revenant", killedUnit:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+					CreateUnitByName("xhs_death_revenant", killedUnit:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
 				end
-				--				CREEP_LANES[lane][2] = CREEP_LANES[lane][2] + 1
-				--				Notifications:TopToAll({text="Creep lane "..lane.." is now level "..CREEP_LANES[lane][2].."!", duration=5.0, style={color="lightgreen"}})
+				-- CREEP_LANES[lane][2] = CREEP_LANES[lane][2] + 1
+				-- Notifications:TopToAll({text="Creep lane "..lane.." is now level "..CREEP_LANES[lane][2].."!", duration=5.0, style={color="lightgreen"}})
 			elseif killedUnit:GetUnitName() == "xhs_tower_lane_2" then
 				for j = 1, difficulty do
-					local unit = CreateUnitByName("xhs_death_revenant_2", killedUnit:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+					CreateUnitByName("xhs_death_revenant_2", killedUnit:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
 				end
-				--				CREEP_LANES[lane][2] = CREEP_LANES[lane][2] + 1
-				--				Notifications:TopToAll({text="Creep lane "..lane.." is now level "..CREEP_LANES[lane][2].."!", duration=5.0, style={color="lightgreen"}})
+				-- CREEP_LANES[lane][2] = CREEP_LANES[lane][2] + 1
+				-- Notifications:TopToAll({text="Creep lane "..lane.." is now level "..CREEP_LANES[lane][2].."!", duration=5.0, style={color="lightgreen"}})
 			end
 		elseif killedUnit:IsAncient() then
 			local castle_shop = Entities:FindByName(nil, "castle_shop")

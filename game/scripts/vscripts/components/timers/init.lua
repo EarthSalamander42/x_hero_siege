@@ -67,51 +67,18 @@ function CustomTimers:Think()
 	if CustomTimers.timers_paused == 0 then
 		CustomTimers:Countdown("game_time")
 
-		local mode = GameRules:GetGameModeEntity()
-
 		if GameRules:State_Get() == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
 			-- print("Game Time:", CustomTimers.current_time["game_time"])
 			-- 9:00 minutes (Muradin Event)
 			if CustomTimers.current_time["game_time"] == (XHS_SPECIAL_EVENT_INTERVAL - 1) then
-				CustomTimers.timers_paused = 1
-				GameMode.Muradin_occuring = true
-
-				PauseCreeps()
-				PauseHeroes()
-
-				mode:SetContextThink(DoUniqueString("MuradinEvent"), function()
-					SpecialEvents:MuradinEvent(XHS_MURADIN_EVENT_DURATION)
-
-					return nil
-				end, 6.0)
-
-				mode:SetContextThink(DoUniqueString("MuradinEvent"), function()
-					RestartHeroes()
-					return nil
-				end, 8.0)
+				SpecialEvents:MuradinEvent(XHS_MURADIN_EVENT_DURATION)
 
 				return
 			end
 
 			-- 18:00 minutes (Farm Event)
 			if CustomTimers.current_time["game_time"] == (XHS_SPECIAL_EVENT_INTERVAL * 2) - 1 then
-				CustomTimers.timers_paused = 1
-				GameMode.FarmEvent_occuring = true
-
-				PauseCreeps()
-				PauseHeroes()
-
-				mode:SetContextThink(DoUniqueString("MuradinEvent"), function()
-					RestartHeroes()
-
-					return nil
-				end, 6.0)
-
-				mode:SetContextThink(DoUniqueString("MuradinEvent"), function()
-					SpecialEvents:FarmEvent(180)
-
-					return nil
-				end, 6.0)
+				SpecialEvents:FarmEvent(XHS_FARM_EVENT_DURATION)
 
 				return
 			end

@@ -355,7 +355,6 @@ function CloseLane(ID, lane_number)
 
 	if CustomTimers.game_phase ~= 3 then
 		if CREEP_LANES_TYPE == 1 then
-			print(lane_number, player_count)
 			if lane_number <= player_count then
 				SendErrorMessage(ID, "#error_cant_close_lane_player_count")
 				return
@@ -363,7 +362,6 @@ function CloseLane(ID, lane_number)
 
 			CloseCreepLane(lane_number)
 		elseif CREEP_LANES_TYPE == 2 then
-			print(math.ceil(lane_number / 2), player_count)
 			if math.ceil(lane_number / 2) <= player_count then
 				SendErrorMessage(ID, "#error_cant_close_lane_player_count")
 				return
@@ -476,7 +474,7 @@ function KillCreeps(teamnumber)
 	for _, v in pairs(units) do
 		if v:HasMovementCapability() then
 			--			v:RemoveSelf()
-			v:ForceKill(false) -- looks better visually, revert if causing new bugs
+			v:Kill(nil, nil) -- looks better visually, revert if causing new bugs
 		end
 	end
 end
@@ -736,54 +734,51 @@ function CDOTA_BaseNPC:IsXHSReincarnating()
 end
 
 function GetBossBarColor(sBossName)
-	local colors = {}
-	colors.light_color = "#009933"
-	colors.dark_color = "#003311"
+	local colors = {
+		default = {
+			light_color = "#009933",
+			dark_color = "#003311"
+		},
+		npc_dota_hero_arthas = {
+			light_color = "#e6ac00",
+			dark_color = "#b34700"
+		},
+		npc_dota_hero_banehallow = {
+			light_color = "#ff6600",
+			dark_color = "#320000"
+		},
+		npc_dota_boss_lich_king = {
+			light_color = "#0047b3",
+			dark_color = "#000d33"
+		},
+		npc_dota_boss_spirit_master_storm = {
+			light_color = "#0092B3",
+			dark_color = "#002B33"
+		},
+		npc_dota_boss_spirit_master_fire = {
+			light_color = "#ff6600",
+			dark_color = "#320000"
+		}
+	}
 
-	if sBossName == "npc_dota_hero_arthas" then
-		colors.light_color = "#e6ac00"
-		colors.dark_color = "#b34700"
-	elseif sBossName == "npc_dota_hero_banehallow" then
-		colors.light_color = "#ff6600"
-		colors.dark_color = "#320000"
-	elseif sBossName == "npc_dota_boss_lich_king" then
-		colors.light_color = "#0047b3"
-		colors.dark_color = "#000d33"
-	elseif sBossName == "npc_dota_boss_spirit_master_storm" then
-		colors.light_color = "#0092B3"
-		colors.dark_color = "#002B33"
-	elseif sBossName == "npc_dota_boss_spirit_master_fire" then
-		colors.light_color = "#ff6600"
-		colors.dark_color = "#320000"
-	end
-
-	return colors
+	return colors[sBossName] or colors.default
 end
 
 function GetBossBarIcon(sBossName)
-	if sBossName == "npc_dota_hero_arthas" then
-		icon = "npc_dota_hero_omniknight"
-	elseif sBossName == "npc_dota_hero_balanar" then
-		icon = "npc_dota_hero_pugna"
-	elseif sBossName == "npc_dota_hero_banehallow" then
-		icon = "npc_dota_hero_nevermore"
-	elseif sBossName == "npc_dota_hero_grom_hellscream" then
-		icon = "npc_dota_hero_juggernaut"
-	elseif sBossName == "npc_dota_hero_illidan" then
-		icon = "npc_dota_hero_terrorblade"
-	elseif sBossName == "npc_dota_boss_lich_king" then
-		icon = "npc_dota_hero_abaddon"
-	elseif sBossName == "npc_dota_hero_magtheridon" then
-		icon = "npc_dota_hero_abyssal_underlord"
-	elseif sBossName == "npc_dota_hero_proudmoore" then
-		icon = "npc_dota_hero_kunkka"
-	elseif sBossName == "npc_dota_boss_spirit_master_storm" then
-		icon = "npc_dota_hero_storm_spirit"
-	elseif sBossName == "npc_dota_boss_spirit_master_earth" then
-		icon = "npc_dota_hero_earth_spirit"
-	elseif sBossName == "npc_dota_boss_spirit_master_fire" then
-		icon = "npc_dota_hero_ember_spirit"
-	end
+	local icons = {
+		npc_dota_hero_arthas = "npc_dota_hero_omniknight",
+		npc_dota_hero_balanar = "npc_dota_hero_pugna",
+		npc_dota_hero_banehallow = "npc_dota_hero_nevermore",
+		npc_dota_hero_grom_hellscream = "npc_dota_hero_juggernaut",
+		npc_dota_hero_illidan = "npc_dota_hero_terrorblade",
+		npc_dota_boss_lich_king = "npc_dota_hero_abaddon",
+		npc_dota_hero_magtheridon = "npc_dota_hero_elder_titan",
+		npc_dota_boss_spirit_master_storm = "npc_dota_hero_storm_spirit",
+		npc_dota_boss_spirit_master_fire = "npc_dota_hero_lina",
+		npc_dota_boss_spirit_master_earth = "npc_dota_hero_earth_spirit",
+	}
+
+	return icons[sBossName] or sBossName
 end
 
 function ShowBossBar(caster)
@@ -805,10 +800,11 @@ function ShowBossBar(caster)
 end
 
 function UpdateBossBar(boss, attacker)
+	if not attacker or not attacker:GetPlayerID() then return end
 	if boss.deathStart then return end
 	if boss.boss_count == nil then boss.boss_count = 1 end
 
-	CustomGameEventManager:Send_ServerToPlayer(PlayerResource:GetPlayer(attacker:GetPlayerID()), "update_boss_hp", {
+	CustomGameEventManager:Send_ServerToAllClients("update_boss_hp", {
 		boss_health = boss:GetHealth(),
 		boss_max_health = boss:GetMaxHealth(),
 		boss_count = boss.boss_count,
@@ -855,4 +851,52 @@ end
 
 function MapDemo()
 	return GetMapName() == "x_hero_siege_demo"
+end
+
+function StartingItems(hero, newHero)
+	local difficulty = GameRules:GetCustomGameDifficulty()
+
+	if difficulty ~= 5 then
+		newHero:AddNewModifier(newHero, nil, "modifier_ankh", { charges = 5 - difficulty })
+
+		local item = newHero:AddItemByName("item_health_potion")
+		item:SetPurchaseTime(0)
+
+		local item = newHero:AddItemByName("item_mana_potion")
+		item:SetPurchaseTime(0)
+
+		if difficulty == 1 then
+			local item = newHero:AddItemByName("item_lifesteal_mask")
+			item:SetSellable(false)
+		end
+	end
+
+	if newHero:GetTeamNumber() == 2 then
+		TeleportHero(newHero, BASE_GOOD:GetAbsOrigin(), 3.0)
+		-- elseif newHero:GetTeamNumber() == 3 then
+		-- TeleportHero(newHero, base_bad:GetAbsOrigin(), 3.0)
+	end
+
+	Timers:CreateTimer(0.1, function()
+		if not hero:IsNull() then
+			UTIL_Remove(hero)
+		end
+	end)
+
+	Timers:CreateTimer(1.0, function()
+		for k, v in pairs(HeroList:GetAllHeroes()) do
+			if v and IsValidEntity(v) and not v:IsNull() and v:GetUnitName() == "npc_dota_hero_wisp" then
+				-- print("A wisp was found! Players are still picking a hero")
+				return
+			end
+		end
+
+		-- all players selected a hero, remove pick screen to reduce lag
+		-- print("All players selected a hero, remove pick screen")
+		for k, v in pairs(HeroList:GetAllHeroes()) do
+			if v and IsValidEntity(v) and not v:IsNull() and v.is_fake_hero then
+				UTIL_Remove(v)
+			end
+		end
+	end)
 end
