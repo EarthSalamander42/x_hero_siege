@@ -6005,7 +6005,7 @@
 
 		// Damage
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityDamage"                 "1000 2000 3000"
+		"AbilityDamage"                 "1500 2500 4000"
 
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
@@ -6377,7 +6377,12 @@
 			{
 				"var_type"					"FIELD_INTEGER"
 				"duration"					"25"
-			}     
+			}
+			"05"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"bonus_damage"				"1000"
+			}
 		}
 	
 		// Data Driven
@@ -6420,6 +6425,7 @@
 				{
 					"MODIFIER_PROPERTY_BASEDAMAGEOUTGOING_PERCENTAGE"	"%bonus_damage_percentage"
 					"MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS"			"%bonus_armor"
+					"MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE"			"%bonus_damage"
 				}
 
 				"OnCreated"
@@ -11789,7 +11795,12 @@
 			{
 				"var_type"					"FIELD_INTEGER"
 				"duration"					"25"
-			}     
+			}
+			"05"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"bonus_damage"				"100"
+			}
 		}
 	
 		// Data Driven
@@ -11831,6 +11842,7 @@
 				{
 					"MODIFIER_PROPERTY_BASEDAMAGEOUTGOING_PERCENTAGE"	"%bonus_damage_percentage"
 					"MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS"			"%bonus_armor"
+					"MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE"			"%bonus_damage"
 				}
 
 				"OnCreated"
@@ -26092,8 +26104,9 @@
 			{
 				"Passive"	"1"
 				"IsHidden"	"1"
-				
-				"OnTakeDamage"
+				"Attributes"		"MODIFIER_ATTRIBUTE_PERMANENT"
+
+				"OnDeath"
 				{
 					"RunScript"
 					{

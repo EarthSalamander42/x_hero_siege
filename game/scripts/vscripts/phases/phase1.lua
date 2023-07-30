@@ -39,13 +39,12 @@ function HeroImageDead(event)
 	local caster = event.caster
 	local point_beast = Entities:FindByName(nil, "hero_image_boss"):GetAbsOrigin()
 
-	if caster:GetHealth() == 0 then
-		CustomGameEventManager:Send_ServerToAllClients("hide_timer_hero_image", {})
-		Timers:CreateTimer(0.5, function()
-			local pos_launch = point_beast + RandomVector(RandomFloat(150, 200))
-			DropNeutralItemAtPositionForHero("item_tome_big", pos_launch, caster, true)
-		end)
-	end
+	CustomGameEventManager:Send_ServerToAllClients("hide_timer_hero_image", {})
+
+	Timers:CreateTimer(0.5, function()
+		local pos_launch = point_beast + RandomVector(RandomFloat(150, 200))
+		DropNeutralItemAtPositionForHero("item_tome_big", pos_launch, caster, caster:GetTeam(), true)
+	end)
 end
 
 function SpecialEventBack(event)

@@ -55,29 +55,29 @@ function modifier_ai:OnIntervalThink()
 	-- Move to ancient if no target
 	if self.ai_state == 1 then
 		-- print(self.parent:GetUnitName() .. " is attacking? ", self.isAttacking)
-		print(self.parent:GetUnitName() .. " is attacking? ", self.isAttacking)
+		-- print(self.parent:GetUnitName() .. " is attacking? ", self.isAttacking)
 		local ancient = Entities:FindByName(nil, "dota_goodguys_fort")
 		local distance = (self.parent:GetAbsOrigin() - ancient:GetAbsOrigin()):Length2D()
 
 		if distance < 500 then
 			self.parent:SetAttacking(ancient)
-			print("Attack ancient")
+			-- print("Attack ancient")
 			return
 		else
 			local attack_range = math.max(self.parent:Script_GetAttackRange(), 800)
 
-			print("Attack range:", attack_range)
+			-- print("Attack range:", attack_range)
 
 			-- ignore VIPs
 			for _, vip in pairs(CDungeonZone.VIPsAlive) do
 				local vip_distance = (self.parent:GetAbsOrigin() - vip:GetAbsOrigin()):Length2D()
 				-- this variable is to ignore vip if he is too close to the unit based on attack range or 600, whichever is lower
 
-				print("VIP distance:", vip_distance)
+				-- print("VIP distance:", vip_distance)
 				if vip_distance < attack_range then
 					self.parent:SetForceAttackTarget(nil)
 					self.parent:MoveToPosition(ancient:GetAbsOrigin())
-					print("VIP here, move to ancient")
+					-- print("VIP here, move to ancient")
 					return
 				end
 			end
@@ -89,7 +89,7 @@ function modifier_ai:OnIntervalThink()
 			if #crates > 0 or #chests > 0 then
 				self.parent:SetForceAttackTarget(nil)
 				self.parent:MoveToPosition(ancient:GetAbsOrigin())
-				print("Crate or chest here, move to ancient")
+				-- print("Crate or chest here, move to ancient")
 				return
 			end
 

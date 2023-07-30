@@ -610,6 +610,7 @@
 "DOTA_Tooltip_ability_holdout_pulverize"									"Pulverize"
 "DOTA_Tooltip_ability_holdout_pulverize_Description"						"Damage all nearby enemy units in a radius every time an active ability is casted by the Tauren Chieftain."
 "DOTA_Tooltip_ability_holdout_pulverize_aftershock_range"					"RANGE:"
+"DOTA_Tooltip_ability_holdout_pulverize_aftershock_damage"					"DAMAGE:"
 
 "DOTA_Tooltip_ability_holdout_lightning_stroke"								"Lightning Stroke"
 "DOTA_Tooltip_ability_holdout_lightning_stroke_Description"					"Damage all nearby enemy units in a radius."
@@ -630,8 +631,9 @@
 "DOTA_Tooltip_ability_holdout_war_stomp_20_stomp_damage"					"DAMAGE:"
 
 "DOTA_Tooltip_ability_holdout_roar_20"										"Roar (Level 20)"
-"DOTA_Tooltip_ability_holdout_roar_20_Description"							"Increase allies damage by 25 percent."
-"DOTA_Tooltip_ability_holdout_roar_20_bonus_damage_percentage"				"%BONUS DAMAGE:"
+"DOTA_Tooltip_ability_holdout_roar_20_Description"							"Increase allies damage by %bonus_damage_percentage%% + %bonus_damage%."
+"DOTA_Tooltip_ability_holdout_roar_20_bonus_damage_percentage"				"%BONUS DAMAGE PCT:"
+"DOTA_Tooltip_ability_holdout_roar_20_bonus_damage"							"BONUS DAMAGE:"
 "DOTA_Tooltip_ability_holdout_roar_20_bonus_armor"							"BONUS ARMOR:"
 "DOTA_Tooltip_ability_holdout_roar_20_duration"								"DURATION:"
 

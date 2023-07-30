@@ -810,7 +810,7 @@ function GameMode:AllHeroImages(event)
 				Timers:RemoveTimer(timers.AllHeroImage2)
 				Timers:CreateTimer(0.5, function()
 					local pos = Entities:FindByName(nil, "all_hero_image_player"):GetAbsOrigin()
-					DropNeutralItemAtPositionForHero("item_necklace_of_spell_immunity", pos, hero, true)
+					DropNeutralItemAtPositionForHero("item_necklace_of_spell_immunity", pos, hero, hero:GetTeam(), true)
 				end)
 				return nil
 			end

@@ -52,10 +52,9 @@ ListenToGameEvent('entity_killed', function(keys)
 		CustomTimers.proc_final_wave = true
 		Notifications:TopToAll({ text = "WARNING! Final Wave incoming. Arriving in 60 seconds! Back to the Castle!", duration = 10.0 })
 		CustomTimers:IncrementGamePhase() -- Phase 2 to Phase 3
-		CustomTimers.current_time["special_event"] = CustomTimers.final_wave_delay + 1.0
+		CustomTimers.current_time["special_event"] = CustomTimers.final_wave_delay
 		CustomTimers.current_time["special_wave"] = 1
 		CustomTimers:Countdown("special_wave") -- will not trigger a special wave while in phase 3
-		KillCreeps(DOTA_TEAM_CUSTOM_1)
 	end
 
 	-- The Killing entity
@@ -73,26 +72,30 @@ function CustomTimers:Think()
 			local seconds = math.floor(CustomTimers.current_time["game_time"] - (minutes * 60))
 			print("Game Time: " .. minutes .. ":" .. seconds)
 			-- 9:00 minutes (Muradin Event)
-			if CustomTimers.current_time["game_time"] == (XHS_SPECIAL_EVENT_INTERVAL - 1) then
+			if CustomTimers.current_time["game_time"] == XHS_SPECIAL_EVENT_INTERVAL and XHS_TIMERS_MURADIN == false then
+				XHS_TIMERS_MURADIN = true
 				SpecialEvents:MuradinEvent(XHS_MURADIN_EVENT_DURATION)
 
 				return
 			end
 
 			-- 18:00 minutes (Farm Event)
-			if CustomTimers.current_time["game_time"] == (XHS_SPECIAL_EVENT_INTERVAL * 2) - 1 then
+			if CustomTimers.current_time["game_time"] == (XHS_SPECIAL_EVENT_INTERVAL * 2) and XHS_TIMERS_FARM == false then
+				XHS_TIMERS_FARM = true
 				SpecialEvents:FarmEvent(XHS_FARM_EVENT_DURATION)
 
 				return
 			end
 
-			-- 27:00 minutes (Farm Event)
-			-- print("End of phase 2:", CustomTimers.current_time["game_time"], XHS_SPECIAL_EVENT_INTERVAL * 3 - 1)
-			if CustomTimers.current_time["game_time"] == (XHS_SPECIAL_EVENT_INTERVAL * 3) then
+			-- 27:00 minutes (End of phase 2)
+			if CustomTimers.current_time["game_time"] == (XHS_SPECIAL_EVENT_INTERVAL * 3) and XHS_TIMERS_PHASE_2 == false then
+				XHS_TIMERS_PHASE_2 = true
 				EndPhase2()
 			end
 
-			if CustomTimers.current_time["game_time"] == (XHS_SPECIAL_EVENT_INTERVAL * 3) + CustomTimers.final_wave_delay then
+			-- 28:00 minutes (Final Wave)
+			if CustomTimers.current_time["game_time"] == (XHS_SPECIAL_EVENT_INTERVAL * 3) + CustomTimers.final_wave_delay and XHS_TIMERS_FINAL_WAVE == false then
+				XHS_TIMERS_FINAL_WAVE = true
 				FinalWave()
 			end
 
@@ -106,7 +109,7 @@ function CustomTimers:Think()
 				if CustomTimers.creep_level <= 4 then
 					CustomTimers:Countdown("creep_level")
 
-					if CustomTimers.current_time["creep_level"] == 1 then
+					if CustomTimers.current_time["creep_level"] == -1 then
 						CustomTimers.creep_level = CustomTimers.creep_level + 1
 						CustomTimers.current_time["creep_level"] = XHS_CREEPS_UPGRADE_INTERVAL + 1
 						CreepLevels(CustomTimers.creep_level)
@@ -124,18 +127,18 @@ function CustomTimers:Think()
 
 					local cardinal_point = CustomTimers.special_wave
 
-					if CustomTimers.current_time["special_wave"] == 31 then
+					if CustomTimers.current_time["special_wave"] == 30 then
 						print("Special Wave in 30 seconds:", CustomTimers.special_wave_region[cardinal_point], CustomTimers.special_wave)
 						Notifications:TopToAll({ text = "WARNING: " .. CustomTimers.special_wave_region[cardinal_point] .. "!", duration = 25.0, style = { color = "red" } })
 						SpawnRunes()
 						CustomTimers.enable_special_wave = true
-					elseif CustomTimers.current_time["special_wave"] == 1 then
+					elseif CustomTimers.current_time["special_wave"] == 0 then
 						print("Special Wave:", CustomTimers.special_wave_region[cardinal_point], CustomTimers.special_wave)
 						SpecialWave(cardinal_point)
 					end
 				else
-					if CustomTimers.current_time["special_wave"] ~= 1 then
-						CustomTimers.current_time["special_wave"] = 1
+					if CustomTimers.current_time["special_wave"] ~= 0 then
+						CustomTimers.current_time["special_wave"] = 0
 						CustomTimers:Countdown("special_wave") -- run once to set to 00:00 on UI
 					end
 				end

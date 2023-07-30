@@ -1494,7 +1494,7 @@ function GameMode:OnDialogBegin(hPlayerHero, hDialogEnt)
 		else
 			if newItem ~= nil then
 				local dropTarget = hPlayerHero:GetAbsOrigin() + RandomVector(RandomFloat(50, 150))
-				DropNeutralItemAtPositionForHero(Dialog.szGiveItemName, dropTarget, hPlayerHero, true)
+				DropNeutralItemAtPositionForHero(Dialog.szGiveItemName, dropTarget, hPlayerHero, hPlayerHero:GetTeam(), true)
 			end
 		end
 	end
@@ -1828,7 +1828,7 @@ function GameMode:OnRelicClaimed(eventSourceIndex, data)
 							Hero:AddItem(newRelic)
 						else
 							local dropTarget = Hero:GetAbsOrigin() + RandomVector(RandomFloat(50, 150))
-							DropNeutralItemAtPositionForHero(szClaimedRelicName, dropTarget, Hero, true)
+							DropNeutralItemAtPositionForHero(szClaimedRelicName, dropTarget, Hero, Hero:GetTeam(), true)
 						end
 
 						relicTable[k] = nil

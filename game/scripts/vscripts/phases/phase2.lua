@@ -111,6 +111,7 @@ function EndPhase2()
 end
 
 function FinalWave()
+	KillCreeps(DOTA_TEAM_CUSTOM_1)
 	RefreshPlayers()
 	GameRules:SetHeroRespawnEnabled(false)
 
