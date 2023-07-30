@@ -1,4 +1,9 @@
-function StartMagtheridonArena()
+function StartMagtheridonArena(bConsole)
+	if bConsole == true then
+		local newZone = CDungeonZone()
+		newZone:StartQuestByName("kill_mag")
+	end
+
 	local point_mag = Entities:FindByName(nil, "npc_dota_spawner_magtheridon_arena"):GetAbsOrigin()
 	local point_mag2 = Entities:FindByName(nil, "npc_dota_spawner_magtheridon_arena2"):GetAbsOrigin()
 	local difficulty = GameRules:GetCustomGameDifficulty()
@@ -9,7 +14,7 @@ function StartMagtheridonArena()
 	TeleportAllHeroes("point_teleport_boss_", 10.0 + delay, delay)
 
 	Timers:CreateTimer(delay, function()
-		magtheridon = CreateUnitByName("npc_dota_hero_magtheridon", point_mag, true, nil, nil, DOTA_TEAM_CUSTOM_2)
+		local magtheridon = CreateUnitByName("npc_dota_hero_magtheridon", point_mag, true, nil, nil, DOTA_TEAM_CUSTOM_2)
 		magtheridon:SetAngles(0, 180, 0)
 		magtheridon.zone = "xhs_holdout"
 
@@ -20,7 +25,7 @@ function StartMagtheridonArena()
 		elseif difficulty == 4 then
 			magtheridon:AddNewModifier(magtheridon, nil, "modifier_ankh", { charges = 1 })
 
-			magtheridon2 = CreateUnitByName("npc_dota_hero_magtheridon", point_mag2, true, nil, nil, DOTA_TEAM_CUSTOM_2)
+			local magtheridon2 = CreateUnitByName("npc_dota_hero_magtheridon", point_mag2, true, nil, nil, DOTA_TEAM_CUSTOM_2)
 			magtheridon2:SetAngles(0, 0, 0)
 			magtheridon2:AddNewModifier(magtheridon2, nil, "modifier_ankh", { charges = 1 })
 			magtheridon2:AddNewModifier(magtheridon2, nil, "modifier_pause_creeps", { Duration = 10, IsHidden = true }):SetStackCount(1)
@@ -30,7 +35,7 @@ function StartMagtheridonArena()
 		elseif difficulty == 5 then
 			magtheridon:AddNewModifier(magtheridon, nil, "modifier_ankh", { charges = 2 })
 
-			magtheridon2 = CreateUnitByName("npc_dota_hero_magtheridon", point_mag2, true, nil, nil, DOTA_TEAM_CUSTOM_2)
+			local magtheridon2 = CreateUnitByName("npc_dota_hero_magtheridon", point_mag2, true, nil, nil, DOTA_TEAM_CUSTOM_2)
 			magtheridon2:SetAngles(0, 0, 0)
 			magtheridon2:AddNewModifier(magtheridon2, nil, "modifier_ankh", { charges = 2 })
 			magtheridon2:AddNewModifier(magtheridon2, nil, "modifier_pause_creeps", { Duration = 10, IsHidden = true }):SetStackCount(1)
@@ -134,9 +139,16 @@ function FourBossesKillCount()
 	end
 end
 
-function StartArthasArena(keys)
+function StartArthasArena(bConsole)
+	if bConsole == true then
+		local newZone = CDungeonZone()
+		newZone:StartQuestByName("kill_arthas")
+	end
+
 	DoEntFire("door_magtheridon", "SetAnimation", "gate_02_close", 0, nil, nil)
+
 	local DoorObs = Entities:FindAllByName("obstruction_magtheridon")
+
 	for _, obs in pairs(DoorObs) do
 		obs:SetEnabled(true, false)
 	end
@@ -148,7 +160,7 @@ function StartArthasArena(keys)
 	--	BossBar(arthas, "arthas")
 	arthas.zone = "xhs_holdout"
 
-	TeleportAllHeroes("point_teleport_boss_", 10.0, 3.0)
+	TeleportAllHeroes("point_teleport_boss_", 7.0, 3.0)
 end
 
 function StartBanehallowArena()
@@ -159,23 +171,27 @@ function StartBanehallowArena()
 	Timers:CreateTimer(8.0, function()
 		banehallow = CreateUnitByName("npc_dota_hero_banehallow", Entities:FindByName(nil, "npc_dota_spawner_magtheridon_arena"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 		banehallow:SetAngles(0, 270, 0)
-		banehallow:AddNewModifier(banehallow, nil, "modifier_pause_creeps", { Duration = 26, IsHidden = true }):SetStackCount(1)
-		banehallow:AddNewModifier(banehallow, nil, "modifier_invulnerable", { Duration = 26, IsHidden = true })
+		banehallow:AddNewModifier(banehallow, nil, "modifier_pause_creeps", { Duration = 20, IsHidden = true }):SetStackCount(1)
+		banehallow:AddNewModifier(banehallow, nil, "modifier_invulnerable", { Duration = 20, IsHidden = true })
 		banehallow:EmitSound("shop_jbrice_01.stinger.radiant_lose")
 		banehallow.zone = "xhs_holdout"
 
+		local pos = banehallow:GetAbsOrigin()
+
 		for i = 1, 6 do
-			Timers:CreateTimer(i * 3.5, function()
+			local delay = i * 1.0
+
+			Timers:CreateTimer(delay, function()
 				local green_revenant = CreateUnitByName("npc_death_revenant_banehallow", Entities:FindByName(nil, "npc_dota_spawner_green_revenant_" .. index):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
-				green_revenant:SetAngles(0, 340, 0)
-				green_revenant:AddNewModifier(green_revenant, nil, "modifier_pause_creeps", { duration = 12, IsHidden = true })
-				green_revenant:AddNewModifier(green_revenant, nil, "modifier_invulnerable", { duration = 12, IsHidden = true }):SetStackCount(1)
+				green_revenant:FaceTowards(pos)
+				green_revenant:AddNewModifier(green_revenant, nil, "modifier_pause_creeps", { duration = 20 - delay, IsHidden = true })
+				green_revenant:AddNewModifier(green_revenant, nil, "modifier_invulnerable", { duration = 20 - delay, IsHidden = true }):SetStackCount(1)
 				green_revenant:SetRenderColor(20, 200, 20)
 
 				local green_revenant = CreateUnitByName("npc_death_revenant_banehallow", Entities:FindByName(nil, "npc_dota_spawner_green_revenant_" .. index + 6):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
-				green_revenant:SetAngles(0, 340, 0)
-				green_revenant:AddNewModifier(green_revenant, nil, "modifier_pause_creeps", { duration = 12, IsHidden = true })
-				green_revenant:AddNewModifier(green_revenant, nil, "modifier_invulnerable", { duration = 12, IsHidden = true }):SetStackCount(1)
+				green_revenant:FaceTowards(pos)
+				green_revenant:AddNewModifier(green_revenant, nil, "modifier_pause_creeps", { duration = 20 - delay, IsHidden = true })
+				green_revenant:AddNewModifier(green_revenant, nil, "modifier_invulnerable", { duration = 20 - delay, IsHidden = true }):SetStackCount(1)
 				green_revenant:SetRenderColor(20, 200, 20)
 
 				index = index + 1
@@ -202,6 +218,8 @@ function StartLichKingArena()
 			break
 		end
 	end
+
+	ShowBossBar(lich_king_boss)
 
 	if not lich_king_boss then
 		Notifications:TopToAll({ text = "Something went wrong, please report Lich King not spawning on Discord!", duration = 5.0 })
@@ -279,4 +297,17 @@ function StartSecretArena(hero)
 		secret:AddNewModifier(secret, nil, "modifier_pause_creeps", { Duration = 10, IsHidden = true }):SetStackCount(1)
 		secret:AddNewModifier(secret, nil, "modifier_invulnerable", { Duration = 9, IsHidden = true })
 	end)
+end
+
+function EndGame()
+	GameRules:SetGameWinner(DOTA_TEAM_GOODGUYS)
+
+	--		Notifications:TopToAll({text="It's Duel Time!", duration=5.0, style={color="white"}})
+	--		Timers:CreateTimer(1, function()
+	--			PauseHeroes()
+	--			Timers:CreateTimer(5, function()
+	--				DuelEvent()
+	--				Timers:CreateTimer(3, RestartHeroes())
+	--			end)
+	--		end)
 end

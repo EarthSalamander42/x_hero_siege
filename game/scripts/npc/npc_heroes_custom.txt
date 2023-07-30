@@ -735,6 +735,9 @@
 		"AttributeAgilityGain"			"10"
 		"AttributeIntelligenceGain"		"5"
 
+		"AttackDamageMin"				"46"
+		"AttackDamageMax"				"52"
+
 		"Ability1"						"holdout_owl_lightning"
 		"Ability2"						"holdout_forked_lightning"
 		"Ability3"						"holdout_command_aura"

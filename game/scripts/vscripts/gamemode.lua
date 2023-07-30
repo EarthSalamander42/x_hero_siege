@@ -5,11 +5,8 @@ end
 require('events')
 require('constants') -- in cause?
 
-require('libraries/timers')
 require('libraries/notifications')
 require('libraries/animations')
-require('libraries/keyvalues')
---	require('libraries/illusionmanager')
 require('libraries/fun')()
 require('libraries/functional')
 require('libraries/playerresource')
@@ -18,7 +15,7 @@ require('libraries/gold')
 require('libraries/rgb_to_hex')
 require('libraries/corpses')
 
-require('phases/choose_hero')
+-- require('phases/choose_hero') -- this should remain disabled as this is called through hero map triggers
 require('phases/creeps')
 require('phases/special_events')
 require('phases/phase1')
@@ -59,7 +56,14 @@ function GameMode:OnHeroInGame(hero)
 		hero:SetAbilityPoints(0)
 		hero:SetGold(0, false)
 
-		TeleportHero(hero, point:GetAbsOrigin())
+		local delay = 2.0
+		hero:AddNewModifier(hero, nil, "modifier_command_restricted", { duration = delay + 0.1 })
+
+		hero:SetContextThink("delay_to_fix_camera_not_centering_lul", function()
+			TeleportHero(hero, point:GetAbsOrigin(), 3.0)
+
+			return nil
+		end, delay)
 	elseif hero:GetUnitName() == "npc_dota_hero_terrorblade" then
 		if IsInToolsMode() then
 			hero:IncrementAttributes(100000)
@@ -103,10 +107,13 @@ function GameMode:TestEveryUnitSpawn()
 
 	GameRules:GetGameModeEntity():SetContextThink(DoUniqueString("spawn_units"), function()
 		local context = GameRules:GetGameModeEntity():GetContext("spawn_units")
+
 		if context then
 			index = tonumber(context)
 		end
+
 		local nextDelay = SpawnNextUnit()
+
 		if nextDelay then
 			GameRules:GetGameModeEntity():SetContextThink("spawn_units", function()
 				return SpawnNextUnit()
@@ -114,6 +121,7 @@ function GameMode:TestEveryUnitSpawn()
 		else
 			GameRules:GetGameModeEntity():SetContextThink("spawn_units", nil, 0)
 		end
+
 		return nil
 	end, 0)
 end
@@ -129,7 +137,7 @@ function GameMode:InitGameMode()
 	GameRules:SetCustomGameSetupAutoLaunchDelay(10.0) --Vote Time
 	GameRules:SetPreGameTime(PREGAMETIME)
 
-	mode:SetCustomAttributeDerivedStatValue(DOTA_ATTRIBUTE_AGILITY_ARMOR, 0) -- default: 0.016 armor per agility point
+	-- mode:SetCustomAttributeDerivedStatValue(DOTA_ATTRIBUTE_AGILITY_ARMOR, 0) -- default: 0.016 armor per agility point
 
 	--[[
 	--Disabling Derived Stats
@@ -157,6 +165,7 @@ function GameMode:InitGameMode()
 	mode:SetAlwaysShowPlayerInventory(false)
 	mode:SetAnnouncerDisabled(false)
 	mode:SetLoseGoldOnDeath(false)
+	mode:SetDaynightCycleDisabled(true)
 
 	-- Value Rules
 	mode:SetCameraDistanceOverride(1250)
@@ -190,18 +199,10 @@ function GameMode:InitGameMode()
 	LinkLuaModifier("modifier_command_restricted", "modifiers/modifier_command_restricted", LUA_MODIFIER_MOTION_NONE)
 	LinkLuaModifier("modifier_ai", "modifiers/modifier_ai", LUA_MODIFIER_MOTION_NONE)
 	LinkLuaModifier("modifier_breakable_container", "modifiers/modifier_breakable_container", LUA_MODIFIER_MOTION_NONE)
-	LinkLuaModifier("modifier_creature_techies_land_mine", "modifiers/modifier_creature_techies_land_mine",
-		LUA_MODIFIER_MOTION_NONE)
+	LinkLuaModifier("modifier_creature_techies_land_mine", "modifiers/modifier_creature_techies_land_mine", LUA_MODIFIER_MOTION_NONE)
 	LinkLuaModifier("modifier_ankh", "items/ankh_of_reincarnation.lua", LUA_MODIFIER_MOTION_NONE)
 
 	CustomGameEventManager:RegisterListener("setting_vote", Dynamic_Wrap(GameMode, "OnSettingVote"))
-
-	local spew = 0
-	if BAREBONES_DEBUG_SPEW then
-		spew = 1
-	end
-	Convars:RegisterConvar('barebones_spew', tostring(spew),
-		'Set to 1 to start spewing barebones debug info.  Set to 0 to disable.', 0)
 
 	-- Initialized tables for tracking state
 	GameMode.bSeenWaitForPlayers = false
@@ -212,23 +213,20 @@ function GameMode:InitGameMode()
 
 	mode:SetThink("OnThink", GameMode, 1)
 	mode:SetModifyGoldFilter(Dynamic_Wrap(GameMode, "GoldFilter"), GameMode)
-	mode:SetModifierGainedFilter(Dynamic_Wrap(GameMode, "ModifierFilter"), GameMode)
+	-- mode:SetModifierGainedFilter(Dynamic_Wrap(GameMode, "ModifierFilter"), GameMode)
 
 	if IsInToolsMode() then
+		Convars:RegisterCommand("muradin_event", function(keys) return SpecialEvents:MuradinEvent(10) end, "Test Farm Event", FCVAR_CHEAT)
+		Convars:RegisterCommand("r&b", function(keys) return SpecialEvents:StartRameroAndBaristolEvent() end, "Test Ramero and Baristol Arena", FCVAR_CHEAT)
+		Convars:RegisterCommand("farm_event", function(keys) return SpecialEvents:FarmEvent(10) end, "Test Farm Event", FCVAR_CHEAT)
 		Convars:RegisterCommand("final_wave", function(keys) return FinalWave() end, "Test Final Wave", FCVAR_CHEAT)
-		Convars:RegisterCommand("duel_event", function(keys) return DuelEvent() end, "Test Duel Event", FCVAR_CHEAT)
-		Convars:RegisterCommand("magtheridon", function(keys) return StartMagtheridonArena() end, "Test Magtheridon Boss",
-			FCVAR_CHEAT)
-		Convars:RegisterCommand("banehallow", function(keys) return StartBanehallowArena() end, "Test Banehallow Boss",
-			FCVAR_CHEAT)
-		Convars:RegisterCommand("spirit_master", function(keys) return StartSpiritMasterArena() end,
-			"Test Spirit Master Boss", FCVAR_CHEAT)
-		Convars:RegisterCommand("lich_king", function(keys) return StartLichKingArena() end, "Test Magtheridon Boss",
-			FCVAR_CHEAT)
+		Convars:RegisterCommand("magtheridon", function(keys) return StartMagtheridonArena(true) end, "Test Magtheridon Boss", FCVAR_CHEAT)
+		Convars:RegisterCommand("arthas", function(keys) return StartArthasArena(true) end, "Test Banehallow Boss", FCVAR_CHEAT)
+		Convars:RegisterCommand("banehallow", function(keys) return StartBanehallowArena() end, "Test Banehallow Boss", FCVAR_CHEAT)
+		Convars:RegisterCommand("lich_king", function(keys) return StartLichKingArena() end, "Test Magtheridon Boss", FCVAR_CHEAT)
+		Convars:RegisterCommand("spirit_master", function(keys) return StartSpiritMasterArena() end, "Test Spirit Master Boss", FCVAR_CHEAT)
+		Convars:RegisterCommand("duel_event", function(keys) return SpecialEvents:DuelEvent() end, "Test Duel Event", FCVAR_CHEAT)
 		Convars:RegisterCommand("win_game", function(keys) return WinGame() end, "End the game", FCVAR_CHEAT)
-		Convars:RegisterCommand("r&b", function(keys) return StartRameroAndBaristolEvent() end,
-			"Test Ramero and Baristol Arena", FCVAR_CHEAT)
-		Convars:RegisterCommand("farm_event", function(keys) return FarmTest() end, "Test Farm Event", FCVAR_CHEAT)
 	end
 
 	mode:SetExecuteOrderFilter(Dynamic_Wrap(GameMode, "FilterExecuteOrder"), GameMode)
@@ -254,12 +252,6 @@ function GameMode:InitGameMode()
 	GameMode.Zones = {}
 end
 
-function FarmTest()
-	CustomTimers.current_time["game_time"] = XHS_SPECIAL_EVENT_INTERVAL * 2
-	CustomTimers.timers_paused = 1
-	FarmEvent(180)
-end
-
 local CheckTeamDeath = 0
 
 function GameMode:OnThink()
@@ -270,6 +262,10 @@ function GameMode:OnThink()
 		if GetMapName() ~= "x_hero_siege_demo" then
 			CustomTimers:Think()
 		end
+	end
+
+	if newState >= DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
+		GameRules:SetTimeOfDay(0) -- always night
 	end
 
 	if not GameMode.Zones then GameMode.Zones = {} end
@@ -314,6 +310,11 @@ function GameMode:OnThink()
 		end
 	end
 
+	-- using BT_ENABLED to check if Muradin or Farm Event is currently occuring, not the best way but it's a way
+	if CustomTimers.game_phase == 1 and GameMode.SpecialArena_occuring == false and GameMode.Muradin_occuring == false and GameMode.FarmEvent_occuring == false then
+		SpecialEvents:ReturnFromSpecialArena()
+	end
+
 	if CustomTimers.game_phase == 3 then
 		if IsTeamAlive == false then
 			CheckTeamDeath = CheckTeamDeath + 1
@@ -327,17 +328,17 @@ function GameMode:OnThink()
 		GameRules:SetGameWinner(3)
 	end
 
-	if not CScriptParticleManager.ACTIVE_PARTICLES then CScriptParticleManager.ACTIVE_PARTICLES = {} end
+	-- if not CScriptParticleManager.ACTIVE_PARTICLES then CScriptParticleManager.ACTIVE_PARTICLES = {} end
 
-	for k, v in pairs(CScriptParticleManager.ACTIVE_PARTICLES) do
-		if v[2] >= 60 then
-			ParticleManager:DestroyParticle(v[1], false)
-			ParticleManager:ReleaseParticleIndex(v[1])
-			table.remove(CScriptParticleManager.ACTIVE_PARTICLES, k)
-		else
-			CScriptParticleManager.ACTIVE_PARTICLES[k][2] = CScriptParticleManager.ACTIVE_PARTICLES[k][2] + 1
-		end
-	end
+	-- for k, v in pairs(CScriptParticleManager.ACTIVE_PARTICLES) do
+	-- 	if v[2] >= 60 then
+	-- 		ParticleManager:DestroyParticle(v[1], false)
+	-- 		ParticleManager:ReleaseParticleIndex(v[1])
+	-- 		table.remove(CScriptParticleManager.ACTIVE_PARTICLES, k)
+	-- 	else
+	-- 		CScriptParticleManager.ACTIVE_PARTICLES[k][2] = CScriptParticleManager.ACTIVE_PARTICLES[k][2] + 1
+	-- 	end
+	-- end
 
 	return 1
 end
@@ -535,14 +536,16 @@ function GameMode:HeroImage(event)
 	local point_hero = Entities:FindByName(nil, "hero_image_player")
 	local point_beast = Entities:FindByName(nil, "hero_image_boss"):GetAbsOrigin()
 
-	if GameMode.HeroImage_occuring == 1 then
+	if GameMode.HeroImage_occuring == true then
 		GameMode:SpecialEventTPQuit(hero)
 		Notifications:Bottom(hero:GetPlayerOwnerID(),
 			{ text = "Hero Image is already occuring, please choose another event.", duration = 7.5 })
 	end
 
-	if not hero.hero_image and GameMode.HeroImage_occuring == 0 then
-		GameMode.HeroImage_occuring = 1
+	if hero.hero_image then
+		Notifications:Bottom(hero:GetPlayerOwnerID(), { text = "You can do hero image only once!", duration = 5.0 })
+	else
+		GameMode.HeroImage_occuring = true
 		Entities:FindByName(nil, "trigger_special_event_back4"):Enable()
 		CustomGameEventManager:Send_ServerToAllClients("show_timer_hero_image", {})
 		CustomTimers.current_time["hero_image"] = SPECIAL_ARENA_DURATION
@@ -566,7 +569,6 @@ function GameMode:HeroImage(event)
 			local item = hero:GetItemInSlot(i)
 
 			if item then
-				print("Item name:", item:GetName())
 				local newItem = CreateItem(item:GetName(), GameMode.HeroImage, GameMode.HeroImage)
 				GameMode.HeroImage:AddItem(newItem)
 			end
@@ -595,7 +597,7 @@ function GameMode:HeroImage(event)
 
 		timers.HeroImage = Timers:CreateTimer(SPECIAL_ARENA_DURATION, function()
 			Entities:FindByName(nil, "trigger_hero_image_duration"):Enable()
-			GameMode.SpiritBeast_occuring = 0
+			GameMode.SpiritBeast_occuring = false
 
 			Timers:CreateTimer(5.5, function() --Debug time in case Hero Image kills the player at the very last second
 				Entities:FindByName(nil, "trigger_hero_image_duration"):Disable()
@@ -605,8 +607,6 @@ function GameMode:HeroImage(event)
 			else
 			end
 		end)
-	elseif hero.hero_image then
-		Notifications:Bottom(hero:GetPlayerOwnerID(), { text = "You can do hero image only once!", duration = 5.0 })
 	end
 end
 
@@ -617,12 +617,12 @@ function GameMode:SpiritBeast(event)
 	local point_hero = Entities:FindByName(nil, "spirit_beast_player")
 	local point_beast = Entities:FindByName(nil, "spirit_beast_boss"):GetAbsOrigin()
 
-	if GameMode.SpiritBeast_occuring == 1 then
+	if GameMode.SpiritBeast_occuring == true then
 		GameMode:SpecialEventTPQuit(hero)
 		Notifications:Bottom(hero:GetPlayerOwnerID(),
 			{ text = "Spirit Beast is already occuring, please choose another event.", duration = 7.5 })
-	elseif GameMode.SpiritBeast_killed == 0 then
-		GameMode.SpiritBeast_occuring = 1
+	elseif GameMode.SpiritBeast_killed == false then
+		GameMode.SpiritBeast_occuring = true
 		Entities:FindByName(nil, "trigger_special_event_back3"):Enable()
 		CustomGameEventManager:Send_ServerToAllClients("show_timer_spirit_beast", {})
 		CustomTimers.current_time["spirit_beast"] = SPECIAL_ARENA_DURATION
@@ -632,7 +632,7 @@ function GameMode:SpiritBeast(event)
 				Entities:FindByName(nil, "trigger_spirit_beast_duration"):Enable()
 			end
 
-			GameMode.SpiritBeast_occuring = 0
+			GameMode.SpiritBeast_occuring = false
 			GameMode.spirit_beast:RemoveSelf()
 
 			Timers:CreateTimer(5.5, function() --Debug time in case Spirit Beast kills the player at the very last second
@@ -660,7 +660,7 @@ function GameMode:SpiritBeast(event)
 		end
 
 		DisableItems(hero, SPECIAL_ARENA_DURATION)
-	elseif GameMode.SpiritBeast_killed == 1 then
+	elseif GameMode.SpiritBeast_killed == true then
 		Notifications:Bottom(hero:GetPlayerOwnerID(), { text = "Spirit Beast has already been killed!", duration = 5.0 })
 	end
 end
@@ -672,12 +672,12 @@ function GameMode:FrostInfernal(event)
 	local point_hero = Entities:FindByName(nil, "frost_infernal_player")
 	local point_beast = Entities:FindByName(nil, "frost_infernal_boss"):GetAbsOrigin()
 
-	if GameMode.FrostInfernal_occuring == 1 then
+	if GameMode.FrostInfernal_occuring == true then
 		GameMode:SpecialEventTPQuit(hero)
 		Notifications:Bottom(hero:GetPlayerOwnerID(),
 			{ text = "Frost Infernal is already occuring, please choose another event.", duration = 7.5 })
-	elseif GameMode.FrostInfernal_killed == 0 then
-		GameMode.FrostInfernal_occuring = 1
+	elseif GameMode.FrostInfernal_killed == false then
+		GameMode.FrostInfernal_occuring = true
 		Entities:FindByName(nil, "trigger_special_event_back2"):Enable()
 		CustomGameEventManager:Send_ServerToAllClients("show_timer_frost_infernal", {})
 		CustomTimers.current_time["frost_infernal"] = SPECIAL_ARENA_DURATION
@@ -687,7 +687,7 @@ function GameMode:FrostInfernal(event)
 				Entities:FindByName(nil, "trigger_frost_infernal_duration"):Enable()
 			end
 
-			GameMode.FrostInfernal_occuring = 0
+			GameMode.FrostInfernal_occuring = false
 			GameMode.frost_infernal:RemoveSelf()
 
 			Timers:CreateTimer(5.5,
@@ -726,16 +726,16 @@ function GameMode:AllHeroImages(event)
 	local hero = player:GetAssignedHero()
 	local point = Entities:FindByName(nil, "all_hero_image_player")
 
-	if GameMode.AllHeroImagesDead == 1 then
+	if GameMode.AllHeroImagesDead == true then
 		Notifications:Bottom(hero:GetPlayerOwnerID(), { text = "All Hero Image has already been done!", duration = 5.0 })
 		return
 	end
 
-	if GameMode.AllHeroImages_occuring == 1 then
+	if GameMode.AllHeroImages_occuring == true then
 		Notifications:Bottom(hero:GetPlayerOwnerID(),
 			{ text = "All Hero Images is already occuring, please choose another event.", duration = 7.5 })
-	elseif GameMode.AllHeroImages_occuring == 0 then
-		GameMode.AllHeroImages_occuring = 1
+	elseif GameMode.AllHeroImages_occuring == false then
+		GameMode.AllHeroImages_occuring = true
 		Entities:FindByName(nil, "trigger_special_event_back5"):Enable()
 		CustomGameEventManager:Send_ServerToAllClients("show_timer_all_hero_image", {})
 		CustomTimers.current_time["all_hero_images"] = SPECIAL_ARENA_DURATION
@@ -757,7 +757,6 @@ function GameMode:AllHeroImages(event)
 				local item = hero:GetItemInSlot(i)
 
 				if item then
-					print("Item name:", item:GetName())
 					local newItem = CreateItem(item:GetName(), GameMode.AllHeroImage, GameMode.AllHeroImage)
 					GameMode.AllHeroImage:AddItem(newItem)
 				end
@@ -771,10 +770,10 @@ function GameMode:AllHeroImages(event)
 			GameMode.AllHeroImage:SetHealth(99999999)
 			GameMode.AllHeroImage:SetMana(99999999)
 
+			local return_time = nil
+
 			if illusion_spawn < 8 then
 				return_time = 0.2
-			else
-				return_time = nil
 			end
 
 			return return_time
@@ -804,7 +803,7 @@ function GameMode:AllHeroImages(event)
 			end
 
 			if ALL_HERO_IMAGE_DEAD == 0 then
-				GameMode.AllHeroImagesDead = 1
+				GameMode.AllHeroImagesDead = true
 				DoEntFire("trigger_all_hero_image_duration", "Kill", nil, 0, nil, nil)
 				CustomGameEventManager:Send_ServerToAllClients("hide_timer_all_hero_image", {})
 				Timers:RemoveTimer(timers.AllHeroImage)
@@ -820,7 +819,7 @@ function GameMode:AllHeroImages(event)
 
 		timers.AllHeroImage2 = Timers:CreateTimer(SPECIAL_ARENA_DURATION, function()
 			Entities:FindByName(nil, "trigger_all_hero_image_duration"):Enable()
-			GameMode.AllHeroImages_occuring = 0
+			GameMode.AllHeroImages_occuring = false
 
 			Timers:CreateTimer(5.5,
 				function() --Debug time in case Frost Infernal kills the player at the very last second
@@ -941,35 +940,40 @@ function GameMode:IsQuestActive(szQuestName)
 end
 
 -- Modifier gained filter function
-function GameMode:ModifierFilter(keys)
-	-- entindex_parent_const	215
-	-- entindex_ability_const	610
-	-- duration					-1
-	-- entindex_caster_const	215
-	-- name_const				modifier_imba_roshan_rage_stack
+-- function GameMode:ModifierFilter(keys)
+-- 	-- entindex_parent_const	215
+-- 	-- entindex_ability_const	610
+-- 	-- duration					-1
+-- 	-- entindex_caster_const	215
+-- 	-- name_const				modifier_imba_roshan_rage_stack
 
-	if IsServer() then
-		local modifier_owner = EntIndexToHScript(keys.entindex_parent_const)
-		local modifier_name = keys.name_const
-		local modifier_caster
-		local modifier_class
+-- 	if IsServer() then
+-- 		local modifier_owner = EntIndexToHScript(keys.entindex_parent_const)
+-- 		local modifier_name = keys.name_const
+-- 		local modifier_caster
+-- 		local modifier_class
 
-		if keys.entindex_caster_const then
-			modifier_caster = EntIndexToHScript(keys.entindex_caster_const)
-		else
-			return true
-		end
+-- 		if keys.entindex_caster_const then
+-- 			modifier_caster = EntIndexToHScript(keys.entindex_caster_const)
+-- 		else
+-- 			return true
+-- 		end
 
-		return true
-	end
-end
+-- 		return true
+-- 	end
+-- end
 
 -- new system, double votes for donators
 ListenToGameEvent('game_rules_state_change', function(keys)
 	if GameRules:State_Get() == DOTA_GAMERULES_STATE_HERO_SELECTION then
 		-- If no one voted, default to IMBA 10v10 gamemode
-		api:SetCustomGamemode(1)
-		api:SetCustomDifficulty(1)
+
+		if api then
+			api:SetCustomGamemode(1)
+			api:SetCustomDifficulty(1)
+		else
+			GameRules:SetCustomGameDifficulty(2)
+		end
 
 		if GameMode.VoteTable == nil then return end
 		local votes = GameMode.VoteTable

@@ -101,12 +101,12 @@ end
 function EndPhase2()
 	local ice_towers = Entities:FindAllByName("npc_tower_death")
 	for _, tower in pairs(ice_towers) do
-		tower:ForceKill(false)
+		tower:Kill(nil, nil)
 	end
 
 	for TW = 1, 2 do
 		local ice_towers_main = Entities:FindByName(nil, "npc_tower_cold_" .. TW)
-		ice_towers_main:ForceKill(false)
+		ice_towers_main:Kill(nil, nil)
 	end
 end
 
@@ -137,7 +137,7 @@ function FinalWave()
 	Timers:CreateTimer(30, function()
 		for _, hero in pairs(HeroList:GetAllHeroes()) do
 			if hero:IsRealHero() and hero:GetTeam() == DOTA_TEAM_GOODGUYS then
-				CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "set_player_camera", { hPosition = boss:GetAbsOrigin() })
+				CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "set_player_camera", { hPosition = hero:GetAbsOrigin() })
 			end
 		end
 	end)

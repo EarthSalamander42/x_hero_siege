@@ -23,7 +23,7 @@ function CDOTA_BaseNPC:SendLifestealAttack(hTarget)
 		self:Heal(heal, self)
 		SendOverheadEventMessage(nil, OVERHEAD_ALERT_HEAL, self, heal, nil)
 
-		local lifesteal_pfx = ParticleManager:CreateParticle("", PATTACH_ABSORIGIN_FOLLOW, self)
+		local lifesteal_pfx = ParticleManager:CreateParticle("particles/generic_gameplay/generic_lifesteal.vpcf", PATTACH_ABSORIGIN_FOLLOW, self)
 		ParticleManager:SetParticleControl(lifesteal_pfx, 0, self:GetAbsOrigin())
 		ParticleManager:ReleaseParticleIndex(lifesteal_pfx)
 	end
@@ -74,6 +74,7 @@ end
 
 function CDOTA_BaseNPC:IncrementAttributes(amount, bAll)
 	if self:IsIllusion() then return end
+	if not self:IsAlive() then return end
 
 	local bSoundPlayed = false
 
@@ -88,7 +89,7 @@ function CDOTA_BaseNPC:IncrementAttributes(amount, bAll)
 	local particle1 = ParticleManager:CreateParticle("particles/generic_hero_status/hero_levelup.vpcf", PATTACH_ABSORIGIN_FOLLOW, self, self)
 	ParticleManager:SetParticleControl(particle1, 0, self:GetAbsOrigin())
 
-	if bAll == true and bSoundPlayed == false then
+	if bSoundPlayed == false then
 		bSoundPlayed = true
 		self:EmitSound("ui.trophy_levelup")
 	end

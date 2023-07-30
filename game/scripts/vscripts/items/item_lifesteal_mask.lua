@@ -15,10 +15,20 @@ end
 
 modifier_lifesteal_mask = modifier_lifesteal_mask or class({})
 
-function modifier_lifesteal_mask:GetTexture()
-	return "modifiers/lifesteal_mask"
+function modifier_lifesteal_mask:DeclareFunctions()
+	return {
+		MODIFIER_PROPERTY_TOOLTIP,
+	}
+end
+
+function modifier_lifesteal_mask:OnCreated()
+	self.lifesteal_pct = self:GetAbility():GetSpecialValueFor("lifesteal_pct")
+end
+
+function modifier_lifesteal_mask:OnTooltip()
+	return self.lifesteal_pct
 end
 
 function modifier_lifesteal_mask:GetModifierLifesteal()
-	return self:GetAbility():GetSpecialValueFor("lifesteal_pct")
+	return self.lifesteal_pct
 end

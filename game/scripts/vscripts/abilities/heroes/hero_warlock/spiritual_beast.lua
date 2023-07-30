@@ -7,7 +7,7 @@ function KillWolves( event )
 	local targets = caster.wolves or {}
 for _,unit in pairs(targets) do 
 	if unit and IsValidEntity(unit) then
-		unit:ForceKill(true)
+			unit:Kill(nil, nil)
 		end
 	end
 -- Reset table

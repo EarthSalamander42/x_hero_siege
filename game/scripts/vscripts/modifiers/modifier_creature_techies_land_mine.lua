@@ -2,14 +2,14 @@ modifier_creature_techies_land_mine = class({})
 
 --------------------------------------------------------------------------------
 
-function modifier_creature_techies_land_mine:OnCreated( kv )
+function modifier_creature_techies_land_mine:OnCreated(kv)
 	if IsServer() then
-		self.radius = self:GetAbility():GetSpecialValueFor( "radius" )
-		self.activation_delay = self:GetAbility():GetSpecialValueFor( "activation_delay" )
-		self.damage = self:GetAbility():GetSpecialValueFor( "damage" )
+		self.radius = self:GetAbility():GetSpecialValueFor("radius")
+		self.activation_delay = self:GetAbility():GetSpecialValueFor("activation_delay")
+		self.damage = self:GetAbility():GetSpecialValueFor("damage")
 		--self.proximity_threshold = self:GetAbility():GetSpecialValueFor( "proximity_threshold" )
 
-		self:StartIntervalThink( self.activation_delay )
+		self:StartIntervalThink(self.activation_delay)
 	end
 end
 
@@ -34,10 +34,10 @@ end
 
 function modifier_creature_techies_land_mine:OnIntervalThink()
 	if IsServer() then
-		local enemies = FindUnitsInRadius( self:GetParent():GetTeamNumber(), self:GetParent():GetOrigin(), self:GetCaster(), self.radius, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NOT_ANCIENTS, 0, false )
+		local enemies = FindUnitsInRadius(self:GetParent():GetTeamNumber(), self:GetParent():GetOrigin(), self:GetCaster(), self.radius, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NOT_ANCIENTS, 0, false)
 		if #enemies > 0 then
-			for _, enemy in pairs( enemies ) do
-				if enemy ~= nil and ( not enemy:IsMagicImmune() ) and ( not enemy:IsInvulnerable() ) then
+			for _, enemy in pairs(enemies) do
+				if enemy ~= nil and (not enemy:IsMagicImmune()) and (not enemy:IsInvulnerable()) then
 					local DamageInfo =
 					{
 						victim = enemy,
@@ -46,18 +46,18 @@ function modifier_creature_techies_land_mine:OnIntervalThink()
 						damage = self.damage,
 						damage_type = DAMAGE_TYPE_MAGICAL,
 					}
-					ApplyDamage( DamageInfo )
+					ApplyDamage(DamageInfo)
 				end
 			end
 		end
 
-		local nFXIndex = ParticleManager:CreateParticle( "particles/units/heroes/hero_techies/techies_land_mine_explode.vpcf", PATTACH_CUSTOMORIGIN, nil )
-		ParticleManager:SetParticleControl( nFXIndex, 0, self:GetParent():GetOrigin() )
-		ParticleManager:SetParticleControl( nFXIndex, 1, Vector( 1.0, 1.0, radius ) )
-		ParticleManager:SetParticleControl( nFXIndex, 2, Vector( 1.0, 1.0, radius ) )
-		ParticleManager:ReleaseParticleIndex( nFXIndex )
+		local nFXIndex = ParticleManager:CreateParticle("particles/units/heroes/hero_techies/techies_land_mine_explode.vpcf", PATTACH_CUSTOMORIGIN, nil)
+		ParticleManager:SetParticleControl(nFXIndex, 0, self:GetParent():GetOrigin())
+		ParticleManager:SetParticleControl(nFXIndex, 1, Vector(1.0, 1.0, radius))
+		ParticleManager:SetParticleControl(nFXIndex, 2, Vector(1.0, 1.0, radius))
+		ParticleManager:ReleaseParticleIndex(nFXIndex)
 
-		EmitSoundOn( "TreasureChest.MineTrap.Detonate", self:GetParent() )
-		self:GetParent():ForceKill( false )
+		EmitSoundOn("TreasureChest.MineTrap.Detonate", self:GetParent())
+		self:GetParent():Kill(nil, nil)
 	end
 end

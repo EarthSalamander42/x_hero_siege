@@ -1,11 +1,12 @@
 if xhs_brewmaster_drunken_haze == nil then xhs_brewmaster_drunken_haze = class({}) end
 
 function xhs_brewmaster_drunken_haze:GetAbilityTextureName()
-   return "brewmaster_drunken_haze"
+	return "brewmaster_drunken_haze"
 end
 
 function xhs_brewmaster_drunken_haze:GetBehavior()
-	return DOTA_ABILITY_BEHAVIOR_UNIT_TARGET end
+	return DOTA_ABILITY_BEHAVIOR_UNIT_TARGET
+end
 
 function xhs_brewmaster_drunken_haze:OnSpellStart()
 	local projectile = {
@@ -24,22 +25,25 @@ end
 
 function xhs_brewmaster_drunken_haze:OnProjectileHit(target, location)
 	if target:TriggerSpellAbsorb(self) then return end
-	
+
 	EmitSoundOn("Hero_Brewmaster.DrunkenHaze.Target", target)
 
 	local units = FindUnitsInRadius(self:GetCaster():GetTeamNumber(), target:GetAbsOrigin(), nil, self:GetSpecialValueFor("radius"), DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_ALL, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)
 	for _, unit in pairs(units) do
-		unit:AddNewModifier(self:GetCaster(), self, "modifier_xhs_brewmaster_drunken_haze_debuff", {duration = self:GetSpecialValueFor("duration")})
+		unit:AddNewModifier(self:GetCaster(), self, "modifier_xhs_brewmaster_drunken_haze_debuff", { duration = self:GetSpecialValueFor("duration") })
 	end
 end
 
 -----------------------------------------------
 
-LinkLuaModifier( "modifier_xhs_brewmaster_drunken_haze_debuff", "abilities/heroes/hero_brewmaster.lua", LUA_MODIFIER_MOTION_NONE )
+LinkLuaModifier("modifier_xhs_brewmaster_drunken_haze_debuff", "abilities/heroes/hero_brewmaster.lua", LUA_MODIFIER_MOTION_NONE)
 if modifier_xhs_brewmaster_drunken_haze_debuff == nil then modifier_xhs_brewmaster_drunken_haze_debuff = class({}) end
 function modifier_xhs_brewmaster_drunken_haze_debuff:IsPurgable() return true end
+
 function modifier_xhs_brewmaster_drunken_haze_debuff:IsHidden() return false end
+
 function modifier_xhs_brewmaster_drunken_haze_debuff:IsDebuff() return true end
+
 function modifier_xhs_brewmaster_drunken_haze_debuff:GetAttributes() return MODIFIER_ATTRIBUTE_MULTIPLE end
 
 function modifier_xhs_brewmaster_drunken_haze_debuff:GetTexture()
@@ -80,11 +84,14 @@ end
 
 -----------------------------------------
 
-LinkLuaModifier( "modifier_xhs_brewmaster_drunken_haze_burn", "abilities/heroes/hero_brewmaster.lua", LUA_MODIFIER_MOTION_NONE )
+LinkLuaModifier("modifier_xhs_brewmaster_drunken_haze_burn", "abilities/heroes/hero_brewmaster.lua", LUA_MODIFIER_MOTION_NONE)
 if modifier_xhs_brewmaster_drunken_haze_burn == nil then modifier_xhs_brewmaster_drunken_haze_burn = class({}) end
 function modifier_xhs_brewmaster_drunken_haze_burn:IsPurgable() return true end
+
 function modifier_xhs_brewmaster_drunken_haze_burn:IsHidden() return false end
+
 function modifier_xhs_brewmaster_drunken_haze_burn:IsDebuff() return true end
+
 function modifier_xhs_brewmaster_drunken_haze_burn:GetAttributes() return MODIFIER_ATTRIBUTE_MULTIPLE end
 
 function modifier_xhs_brewmaster_drunken_haze_burn:GetTexture()
@@ -112,12 +119,12 @@ end
 -----------------------------------------
 
 function DragonSlaveBurn(keys)
-local caster = keys.caster
-local target = keys.target
-local ability = keys.ability
+	local caster = keys.caster
+	local target = keys.target
+	local ability = keys.ability
 
 	if target:HasModifier("modifier_xhs_brewmaster_drunken_haze_debuff") then --Apply normal damage + burn damage over 5 seconds
-		ability:ApplyDataDrivenModifier(caster, target, "modifier_xhs_brewmaster_drunken_haze_burn", {duration = caster:FindAbilityByName("xhs_brewmaster_drunken_haze"):GetSpecialValueFor("burn_duration")})
+		ability:ApplyDataDrivenModifier(caster, target, "modifier_xhs_brewmaster_drunken_haze_burn", { duration = caster:FindAbilityByName("xhs_brewmaster_drunken_haze"):GetSpecialValueFor("burn_duration") })
 	elseif not target:HasModifier("modifier_xhs_brewmaster_drunken_haze_debuff") then
 		return
 	end
@@ -126,7 +133,7 @@ end
 --------------------------------
 
 -- Creates a dummy unit to apply the Earthquake aura
-function EarthquakeStart( event )
+function EarthquakeStart(event)
 	local ability = event.ability
 	local caster = event.caster
 	local point = event.target_points[1]
@@ -143,11 +150,11 @@ function EarthquakeStart( event )
 	end)
 end
 
-function EarthquakeEnd( event )
+function EarthquakeEnd(event)
 	local caster = event.caster
 	if IsValidEntity(caster.earthquake_dummy) then
 		caster:RemoveGesture(ACT_DOTA_KINETIC_FIELD)
-		caster.earthquake_dummy:ForceKill(true)
+		caster.earthquake_dummy:Kill(nil, nil)
 	end
 end
 
@@ -166,8 +173,8 @@ end
 
 function modifier_earthquake_aura:OnIntervalThink()
 	if self:GetAbility():IsChanneling() then
-		self:PlayParticleEffect() 
-		self:GetParent():EmitSound("Hero_Leshrac.Split_Earth")   
+		self:PlayParticleEffect()
+		self:GetParent():EmitSound("Hero_Leshrac.Split_Earth")
 	end
 end
 
@@ -178,7 +185,9 @@ function modifier_earthquake_aura:PlayParticleEffect()
 end
 
 function modifier_earthquake_aura:IsAura() return true end
+
 function modifier_earthquake_aura:IsHidden() return true end
+
 function modifier_earthquake_aura:IsPurgable() return false end
 
 function modifier_earthquake_aura:GetAuraRadius()
@@ -188,7 +197,7 @@ end
 function modifier_earthquake_aura:GetModifierAura()
 	return "modifier_earthquake"
 end
-   
+
 function modifier_earthquake_aura:GetAuraSearchTeam()
 	return DOTA_UNIT_TARGET_TEAM_ENEMY
 end
@@ -237,4 +246,5 @@ function modifier_earthquake:DamageUnits()
 end
 
 function modifier_earthquake:IsPurgable() return false end
+
 function modifier_earthquake:IsDebuff() return true end

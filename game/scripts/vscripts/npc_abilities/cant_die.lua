@@ -1,355 +1,200 @@
-require('phases/phase3')
+LinkLuaModifier("modifier_cant_die_generic", "npc_abilities/cant_die.lua", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_dying_generic", "npc_abilities/cant_die.lua", LUA_MODIFIER_MOTION_NONE)
 
-EXPLOSION_SOUND_TABLE = { "Hero_Techies.RemoteMine.Detonate", "Hero_Rattletrap.Rocket_Flare.Explode" }
-EXPLOSION_PARTICLE_TABLE = { "particles/econ/items/shadow_fiend/sf_fire_arcana/sf_fire_arcana_shadowraze.vpcf" }
+cant_die_generic = cant_die_generic or class({})
 
-SPIRIT_MASTER_KILLED_BOSS_COUNT = 0
+function cant_die_generic:GetIntrinsicModifierName()
+	return "modifier_cant_die_generic"
+end
 
-function death_check(event)
-	local caster = event.caster
-	local ability = event.ability
+modifier_cant_die_generic = modifier_cant_die_generic or class({})
 
-	if not caster.deathStart then
-		if caster:GetHealth() < 100 and not caster:IsIllusion() then
-			caster:SetBaseHealthRegen(0.0)
-			ability:ApplyDataDrivenModifier(caster, caster, "modifier_dying_generic", { duration = 20 })
-			CustomGameEventManager:Send_ServerToAllClients("hide_boss_hp", { boss_count = caster.boss_count })
-			caster.deathStart = true
-			if caster:GetUnitName() == "npc_dota_hero_illidan" then
-				illidan_boss_die(caster)
-			elseif caster:GetUnitName() == "npc_dota_hero_balanar" then
-				balanar_boss_die(caster)
-			elseif caster:GetUnitName() == "npc_dota_hero_proudmoore" then
-				proudmoore_boss_die(caster)
-			elseif caster:GetUnitName() == "npc_dota_hero_grom_hellscream" then
-				grom_boss_die(caster)
-			elseif caster:GetUnitName() == "npc_dota_hero_arthas" then
-				arthas_boss_die(caster)
-			elseif caster:GetUnitName() == "npc_dota_hero_banehallow" then
-				banehallow_boss_die(caster)
-			elseif caster:GetUnitName() == "npc_dota_boss_lich_king" then
-				LichKingEnd(caster)
-			elseif string.find(caster:GetUnitName(), "npc_dota_boss_spirit_master_") then
+function modifier_cant_die_generic:IsHidden() return true end
+
+function modifier_cant_die_generic:IsPurgable() return false end
+
+function modifier_cant_die_generic:DeclareFunctions()
+	return {
+		MODIFIER_PROPERTY_MIN_HEALTH,
+		MODIFIER_EVENT_ON_TAKEDAMAGE,
+	}
+end
+
+function modifier_cant_die_generic:OnCreated()
+	if not IsServer() then return end
+
+	self.parent = self:GetParent()
+	self.disable_on_takedamage = false
+
+	local blacklist = {
+		["npc_dota_hero_grom_hellscream"] = true,
+		["npc_dota_hero_illidan"] = true,
+		["npc_dota_hero_balanar"] = true,
+		["npc_dota_hero_proudmoore"] = true,
+		["npc_dota_boss_spirit_master_storm"] = true,
+		["npc_dota_boss_spirit_master_earth"] = true,
+		["npc_dota_boss_spirit_master_fire"] = true,
+	}
+
+	if not blacklist[self.parent:GetUnitName()] then
+		if ShowBossBar then
+			ShowBossBar(self.parent)
+		end
+	end
+end
+
+function modifier_cant_die_generic:GetMinHealth()
+	if self:GetStackCount() == 1 then
+		return 0
+	end
+
+	return 1
+end
+
+function modifier_cant_die_generic:OnTakeDamage(event)
+	if self.disable_on_takedamage then return end
+	local parent = event.unit
+	local attacker = event.attacker
+
+	if parent == self.parent then
+		UpdateBossBar(parent, attacker)
+
+		if parent:GetHealth() <= 100 and not parent:IsIllusion() and parent.deathStart ~= true then
+			self.disable_on_takedamage = true
+
+			parent:SetBaseHealthRegen(0.0)
+			parent:AddNewModifier(parent, nil, "modifier_dying_generic", { duration = 15.0 })
+			CustomGameEventManager:Send_ServerToAllClients("hide_boss_hp", { boss_count = parent.boss_count })
+
+			parent.deathStart = true
+
+			-- specific interaction for first 4 bosses
+			if XHS_BOSSES_TABLE[parent:GetUnitName()] and XHS_BOSSES_TABLE[parent:GetUnitName()].four_bosses_kill_count then
+				FourBossesKillCount()
+			end
+
+			-- play death sound
+			if XHS_BOSSES_TABLE[parent:GetUnitName()] and XHS_BOSSES_TABLE[parent:GetUnitName()].custom_death_sound then
+				EmitGlobalSound(XHS_BOSSES_TABLE[parent:GetUnitName()].custom_death_sound)
+			else
+				EmitSoundOn("skeleton_king_wraith_death_long_01", parent)
+			end
+
+			-- play death animation
+			StartAnimation(parent, { duration = 6.0, activity = ACT_DOTA_FLAIL, rate = 0.75 })
+
+			-- no draw and kill boss after delay
+			Timers:CreateTimer(XHS_BOSSES_TABLE[parent:GetUnitName()].death_no_draw_delay, function()
+				parent:AddNoDraw()
+				self:SetStackCount(1)
+				parent:Kill(attacker, nil)
+				CustomGameEventManager:Send_ServerToAllClients("hide_ui", {})
+
+				if XHS_BOSSES_TABLE[parent:GetUnitName()].refresh_players then
+					RefreshPlayers()
+				end
+			end)
+
+			-- play spirit master death sound and give stats
+			if string.find(parent:GetUnitName(), "npc_dota_boss_spirit_master_") then
 				SPIRIT_MASTER_KILLED_BOSS_COUNT = SPIRIT_MASTER_KILLED_BOSS_COUNT + 1
 
+				-- last spirit master boss death
 				if SPIRIT_MASTER_KILLED_BOSS_COUNT == 3 then
-					SpiritMasterEnd(caster)
-				else
-					spirit_master_boss_die(caster)
+					Timers:CreateTimer(1.0, function()
+						EmitGlobalSound("Loot_Drop_Stinger_Arcana")
+					end)
+
+					EndGame()
+				else -- normal spirit master boss death
+					Timers:CreateTimer(1.0, function()
+						EmitGlobalSound("Loot_Drop_Stinger_Mythical")
+					end)
+
+					return
 				end
+			else -- normal boss death
+				GiveTomeToAllHeroes(250)
+				EmitGlobalSound("Loot_Drop_Stinger_Arcana")
+			end
+
+			-- open doors if any
+			Timers:CreateTimer(6.0, function()
+				if XHS_BOSSES_TABLE[parent:GetUnitName()] and XHS_BOSSES_TABLE[parent:GetUnitName()].doors_to_open then
+					for _, door_name in pairs(XHS_BOSSES_TABLE[parent:GetUnitName()].doors_to_open) do
+						DoEntFire(door_name, "SetAnimation", "gate_02_open", 0, nil, nil)
+					end
+				end
+
+				if XHS_BOSSES_TABLE[parent:GetUnitName()] and XHS_BOSSES_TABLE[parent:GetUnitName()].obstructions_to_disable then
+					for _, obs_name in pairs(XHS_BOSSES_TABLE[parent:GetUnitName()].obstructions_to_disable) do
+						for _, obs in pairs(Entities:FindAllByName(obs_name)) do
+							obs:SetEnabled(false, true)
+						end
+					end
+				end
+
+				StartAnimation(parent, XHS_BOSSES_TABLE[parent:GetUnitName()].death_animation)
+				EmitSoundOn("skeleton_king_wraith_death_long_09", parent)
+			end)
+
+			-- next boss
+			local delay = XHS_BOSSES_TABLE[parent:GetUnitName()].func_next_delay or 0.0
+			local func = XHS_BOSSES_TABLE[parent:GetUnitName()].func_next
+
+			if delay and func then
+				Timers:CreateTimer(delay, function()
+					func()
+				end)
 			end
 		end
 	end
 end
 
-function OnCreated(keys)
-	if ShowBossBar and keys.caster:GetUnitName() ~= "npc_dota_hero_grom_hellscream" and keys.caster:GetUnitName() ~= "npc_dota_hero_illidan" and keys.caster:GetUnitName() ~= "npc_dota_hero_balanar" and keys.caster:GetUnitName() ~= "npc_dota_hero_proudmoore" then
-		ShowBossBar(keys.caster)
-	end
+modifier_dying_generic = modifier_dying_generic or class({})
+
+function modifier_dying_generic:IsHidden() return true end
+
+function modifier_dying_generic:IsPurgable() return false end
+
+function modifier_dying_generic:CheckState()
+	return {
+		[MODIFIER_STATE_INVULNERABLE] = true,
+		[MODIFIER_STATE_DISARMED] = true,
+		[MODIFIER_STATE_ROOTED] = true,
+		[MODIFIER_STATE_SILENCED] = true,
+		[MODIFIER_STATE_NO_HEALTH_BAR] = true,
+		[MODIFIER_STATE_UNSELECTABLE] = true,
+	}
 end
 
-function BossTakeDamage(keys)
-	UpdateBossBar(keys.caster, keys.attacker)
+function modifier_dying_generic:DeclareFunctions()
+	return {
+		MODIFIER_PROPERTY_DISABLE_HEALING,
+	}
 end
 
-function death_animation(keys)
-	caster = keys.caster
+function modifier_dying_generic:OnCreated()
+	if not IsServer() then return end
+
+	self.parent = self:GetParent()
+
+	self:StartIntervalThink(0.5)
+end
+
+function modifier_dying_generic:OnIntervalThink()
+	if not IsServer() then return end
+
+	local particleVector = self.parent:GetAbsOrigin()
 	local particleName = EXPLOSION_PARTICLE_TABLE[RandomInt(1, 1)]
-	local particleVector = caster:GetAbsOrigin()
-	pfx = ParticleManager:CreateParticle(particleName, PATTACH_ABSORIGIN_FOLLOW, caster)
-	ParticleManager:SetParticleControlEnt(pfx, 0, caster, PATTACH_POINT_FOLLOW, "attach_hitloc", particleVector, true)
+
+	local pfx = ParticleManager:CreateParticle(particleName, PATTACH_ABSORIGIN_FOLLOW, self.parent)
+	ParticleManager:SetParticleControlEnt(pfx, 0, self.parent, PATTACH_POINT_FOLLOW, "attach_hitloc", particleVector, true)
+
 	local sound = EXPLOSION_SOUND_TABLE[RandomInt(1, 2)]
-	EmitSoundOn(sound, caster)
+	EmitSoundOn(sound, self.parent)
 end
 
-function grom_boss_die(caster)
-	FourBossesKillCount()
-
-	Timers:CreateTimer(1.0, function()
-		GiveTomeToAllHeroes(250)
-		EmitGlobalSound("Loot_Drop_Stinger_Arcana")
-	end)
-
-	EmitSoundOn("skeleton_king_wraith_death_long_01", caster)
-	EmitSoundOn("skeleton_king_wraith_death_long_01", caster)
-	EmitSoundOn("skeleton_king_wraith_death_long_01", caster)
-	StartAnimation(caster, { duration = 6.0, activity = ACT_DOTA_FLAIL, rate = 0.75 })
-
-	Timers:CreateTimer(6, function()
-		StartAnimation(caster, { duration = 6.0, activity = ACT_DOTA_DIE, rate = 0.25 })
-		EmitSoundOn("skeleton_king_wraith_death_long_09", caster)
-		EmitSoundOn("skeleton_king_wraith_death_long_09", caster)
-		DoEntFire("door_illidan", "SetAnimation", "gate_02_open", 0, nil, nil)
-		DoEntFire("door_illidan2", "SetAnimation", "gate_02_open", 0, nil, nil)
-		local DoorObs = Entities:FindAllByName("obstruction_illidan")
-		for _, obs in pairs(DoorObs) do
-			obs:SetEnabled(false, true)
-		end
-	end)
-
-	Timers:CreateTimer(12.0, function()
-		caster:AddNoDraw()
-		caster:ForceKill(true)
-	end)
-end
-
-function illidan_boss_die(caster)
-	FourBossesKillCount()
-
-	Timers:CreateTimer(1.0, function()
-		GiveTomeToAllHeroes(250)
-		EmitGlobalSound("Loot_Drop_Stinger_Arcana")
-	end)
-
-	EmitSoundOn("skeleton_king_wraith_death_long_01", caster)
-	EmitSoundOn("skeleton_king_wraith_death_long_01", caster)
-	EmitSoundOn("skeleton_king_wraith_death_long_01", caster)
-	StartAnimation(caster, { duration = 6.0, activity = ACT_DOTA_FLAIL, rate = 0.75 })
-
-	Timers:CreateTimer(6, function()
-		DoEntFire("door_balanar", "SetAnimation", "gate_02_open", 0, nil, nil)
-		DoEntFire("door_balanar2", "SetAnimation", "gate_02_open", 0, nil, nil)
-		local DoorObs = Entities:FindAllByName("obstruction_balanar")
-		for _, obs in pairs(DoorObs) do
-			obs:SetEnabled(false, true)
-		end
-	end)
-
-	Timers:CreateTimer(6, function()
-		StartAnimation(caster, { duration = 6.0, activity = ACT_DOTA_DIE, rate = 0.25 })
-		EmitSoundOn("skeleton_king_wraith_death_long_09", caster)
-		EmitSoundOn("skeleton_king_wraith_death_long_09", caster)
-	end)
-
-	Timers:CreateTimer(12.0, function()
-		caster:AddNoDraw()
-		caster:ForceKill(true)
-	end)
-end
-
-function proudmoore_boss_die(caster)
-	FourBossesKillCount()
-
-	Timers:CreateTimer(1.0, function()
-		GiveTomeToAllHeroes(250)
-		EmitGlobalSound("Loot_Drop_Stinger_Arcana")
-	end)
-
-	Timers:CreateTimer(6, function()
-		DoEntFire("door_proudmoore3", "SetAnimation", "gate_02_open", 0, nil, nil)
-		local DoorObs = Entities:FindAllByName("obstruction_proudmoore2")
-		for _, obs in pairs(DoorObs) do
-			obs:SetEnabled(false, true)
-		end
-	end)
-
-	EmitSoundOn("skeleton_king_wraith_death_long_01", caster)
-	EmitSoundOn("skeleton_king_wraith_death_long_01", caster)
-	EmitSoundOn("skeleton_king_wraith_death_long_01", caster)
-	StartAnimation(caster, { duration = 6.0, activity = ACT_DOTA_FLAIL, rate = 0.75 })
-
-	Timers:CreateTimer(6, function()
-		StartAnimation(caster, { duration = 6.0, activity = ACT_DOTA_DIE, rate = 0.3 })
-		EmitSoundOn("skeleton_king_wraith_death_long_09", caster)
-		EmitSoundOn("skeleton_king_wraith_death_long_09", caster)
-	end)
-
-	Timers:CreateTimer(12.0, function()
-		caster:AddNoDraw()
-		caster:ForceKill(true)
-	end)
-end
-
-function balanar_boss_die(caster)
-	FourBossesKillCount()
-
-	Timers:CreateTimer(1.0, function()
-		GiveTomeToAllHeroes(250)
-		EmitGlobalSound("Loot_Drop_Stinger_Arcana")
-	end)
-
-	EmitSoundOn("skeleton_king_wraith_death_long_01", caster)
-	EmitSoundOn("skeleton_king_wraith_death_long_01", caster)
-	EmitSoundOn("skeleton_king_wraith_death_long_01", caster)
-	StartAnimation(caster, { duration = 6.0, activity = ACT_DOTA_FLAIL, rate = 0.75 })
-
-	Timers:CreateTimer(6, function()
-		DoEntFire("door_proudmoore", "SetAnimation", "gate_02_open", 0, nil, nil)
-		DoEntFire("door_proudmoore2", "SetAnimation", "gate_02_open", 0, nil, nil)
-		local DoorObs = Entities:FindAllByName("obstruction_proudmoore")
-		for _, obs in pairs(DoorObs) do
-			obs:SetEnabled(false, true)
-		end
-		StartAnimation(caster, { duration = 6.0, activity = ACT_DOTA_DIE, rate = 0.35 })
-		EmitSoundOn("skeleton_king_wraith_death_long_09", caster)
-		EmitSoundOn("skeleton_king_wraith_death_long_09", caster)
-	end)
-
-	Timers:CreateTimer(12.0, function()
-		caster:AddNoDraw()
-		caster:ForceKill(true)
-	end)
-end
-
-function arthas_boss_die(caster)
-	EmitGlobalSound("Arthas.Death")
-
-	Timers:CreateTimer(1.0, function()
-		GiveTomeToAllHeroes(250)
-		EmitGlobalSound("Loot_Drop_Stinger_Arcana")
-	end)
-
-	EmitSoundOn("skeleton_king_wraith_death_long_01", caster)
-	EmitSoundOn("skeleton_king_wraith_death_long_01", caster)
-	EmitSoundOn("skeleton_king_wraith_death_long_01", caster)
-	StartAnimation(caster, { duration = 6.0, activity = ACT_DOTA_FLAIL, rate = 0.75 })
-
-	Timers:CreateTimer(6.2, function()
-		StartAnimation(caster, { duration = 6.3, activity = ACT_DOTA_DIE, rate = 0.22 })
-		EmitSoundOn("skeleton_king_wraith_death_long_09", caster)
-		EmitSoundOn("skeleton_king_wraith_death_long_09", caster)
-	end)
-
-	Timers:CreateTimer(11.0, function()
-		caster:AddNoDraw()
-		caster:ForceKill(true)
-		CustomGameEventManager:Send_ServerToAllClients("hide_ui", {})
-		RefreshPlayers()
-	end)
-
-	Timers:CreateTimer(15.0, function()
-		StartBanehallowArena()
-	end)
-end
-
-function banehallow_boss_die(caster)
-	Timers:CreateTimer(1.0, function()
-		GiveTomeToAllHeroes(250)
-		EmitGlobalSound("Loot_Drop_Stinger_Arcana")
-	end)
-
-	EmitSoundOn("skeleton_king_wraith_death_long_01", caster)
-	EmitSoundOn("skeleton_king_wraith_death_long_01", caster)
-	EmitSoundOn("skeleton_king_wraith_death_long_01", caster)
-	StartAnimation(caster, { duration = 6.0, activity = ACT_DOTA_FLAIL, rate = 0.75 })
-
-	Timers:CreateTimer(6, function()
-		StartAnimation(caster, { duration = 6.3, activity = ACT_DOTA_DIE, rate = 0.17 })
-		EmitSoundOn("skeleton_king_wraith_death_long_09", caster)
-		EmitSoundOn("skeleton_king_wraith_death_long_09", caster)
-	end)
-
-	Timers:CreateTimer(12.5, function()
-		caster:AddNoDraw()
-		caster:ForceKill(true)
-		CustomGameEventManager:Send_ServerToAllClients("hide_ui", {})
-		RefreshPlayers()
-	end)
-
-	Timers:CreateTimer(17, StartLichKingArena)
-end
-
-function LichKingEnd(caster)
-	Timers:CreateTimer(1.0, function()
-		GiveTomeToAllHeroes(250)
-		EmitGlobalSound("Loot_Drop_Stinger_Arcana")
-	end)
-
-	EmitGlobalSound("razor_raz_death_04")
-	EmitGlobalSound("razor_raz_death_04")
-	EmitGlobalSound("razor_raz_death_04")
-	StartAnimation(caster, { duration = 4.9, activity = ACT_DOTA_FLAIL, rate = 0.75 })
-
-	Timers:CreateTimer(5, function()
-		StartAnimation(caster, { duration = 10.0, activity = ACT_DOTA_DIE, rate = 0.10 })
-		EmitSoundOn("razor_raz_death_05", caster)
-		EmitSoundOn("razor_raz_death_05", caster)
-		EmitSoundOn("razor_raz_death_05", caster)
-	end)
-
-	Timers:CreateTimer(14, function()
-		caster:AddNoDraw()
-		caster:ForceKill(true)
-		CustomGameEventManager:Send_ServerToAllClients("hide_ui", {})
-		RefreshPlayers()
-	end)
-
-	Timers:CreateTimer(17, function()
-		RefreshPlayers()
-		Timers:CreateTimer(5, StartSpiritMasterArena)
-
-		--		GameRules:SetGameWinner(DOTA_TEAM_GOODGUYS)
-
-		--		Notifications:TopToAll({text="It's Duel Time!", duration=5.0, style={color="white"}})
-		--		Timers:CreateTimer(1, function()
-		--			PauseHeroes()
-		--			Timers:CreateTimer(5, function()
-		--				DuelEvent()
-		--				Timers:CreateTimer(3, RestartHeroes())
-		--			end)
-		--		end)
-	end)
-end
-
-function spirit_master_boss_die(caster)
-	Timers:CreateTimer(1.0, function()
-		--		GiveTomeToAllHeroes(250)
-		EmitGlobalSound("Loot_Drop_Stinger_Arcana")
-	end)
-
-	EmitSoundOn("skeleton_king_wraith_death_long_01", caster)
-	EmitSoundOn("skeleton_king_wraith_death_long_01", caster)
-	EmitSoundOn("skeleton_king_wraith_death_long_01", caster)
-	StartAnimation(caster, { duration = 6.0, activity = ACT_DOTA_FLAIL, rate = 0.75 })
-
-	Timers:CreateTimer(6, function()
-		StartAnimation(caster, { duration = 6.3, activity = ACT_DOTA_DIE, rate = 0.17 })
-		EmitSoundOn("skeleton_king_wraith_death_long_09", caster)
-		EmitSoundOn("skeleton_king_wraith_death_long_09", caster)
-	end)
-
-	Timers:CreateTimer(12.5, function()
-		caster:AddNoDraw()
-		caster:ForceKill(true)
-	end)
-end
-
-function SpiritMasterEnd(caster)
-	Timers:CreateTimer(1.0, function()
-		GiveTomeToAllHeroes(250)
-		EmitGlobalSound("Loot_Drop_Stinger_Arcana")
-	end)
-
-	EmitGlobalSound("razor_raz_death_04")
-	EmitGlobalSound("razor_raz_death_04")
-	EmitGlobalSound("razor_raz_death_04")
-	StartAnimation(caster, { duration = 4.9, activity = ACT_DOTA_FLAIL, rate = 0.75 })
-
-	Timers:CreateTimer(5, function()
-		StartAnimation(caster, { duration = 10.0, activity = ACT_DOTA_DIE, rate = 0.30 })
-		EmitSoundOn("razor_raz_death_05", caster)
-		EmitSoundOn("razor_raz_death_05", caster)
-		EmitSoundOn("razor_raz_death_05", caster)
-	end)
-
-	Timers:CreateTimer(14, function()
-		caster:ForceKill(false)
-		CustomGameEventManager:Send_ServerToAllClients("hide_ui", {})
-		RefreshPlayers()
-	end)
-
-	Timers:CreateTimer(17, function()
-		RefreshPlayers()
-
-		GameRules:SetGameWinner(DOTA_TEAM_GOODGUYS)
-
-		--		Notifications:TopToAll({text="It's Duel Time!", duration=5.0, style={color="white"}})
-		--		Timers:CreateTimer(1, function()
-		--			PauseHeroes()
-		--			Timers:CreateTimer(5, function()
-		--				DuelEvent()
-		--				Timers:CreateTimer(3, RestartHeroes())
-		--			end)
-		--		end)
-	end)
+function modifier_dying_generic:GetDisableHealing()
+	return 1
 end

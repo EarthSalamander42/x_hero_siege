@@ -25,7 +25,7 @@ function HeroImageBack(event)
 
 	SpecialEventBack(event)
 	Timers:RemoveTimer(timers.HeroImage)
-	GameMode.HeroImage_occuring = 0
+	GameMode.HeroImage_occuring = false
 
 	if GameMode.HeroImage:IsAlive() then
 		UTIL_Remove(GameMode.HeroImage)
@@ -54,8 +54,8 @@ function SpecialEventBack(event)
 
 	if hero:GetTeamNumber() == 2 then
 		TeleportHero(hero, BASE_GOOD:GetAbsOrigin())
-	elseif hero:GetTeamNumber() == 3 then
-		TeleportHero(hero, base_bad:GetAbsOrigin())
+		-- elseif hero:GetTeamNumber() == 3 then
+		-- TeleportHero(hero, base_bad:GetAbsOrigin())
 	end
 
 	Entities:FindByName(nil, "trigger_special_event"):Enable()
@@ -72,11 +72,11 @@ function SpecialEventBack(event)
 end
 
 function SpiritBeastBack(event)
-	local hero = event.activator
+	-- local hero = event.activator
 
 	SpecialEventBack(event)
 	Timers:RemoveTimer(timers.SpiritBeast)
-	GameMode.SpiritBeast_occuring = 0
+	GameMode.SpiritBeast_occuring = false
 
 	if not GameMode.spirit_beast:IsNull() then
 		GameMode.spirit_beast:RemoveSelf()
@@ -88,7 +88,7 @@ function SpiritBeastDead(event)
 	local hero = event.attacker
 
 	DoEntFire("trigger_spirit_beast_duration", "Kill", nil, 0, nil, nil)
-	GameMode.SpiritBeast_killed = 1
+	GameMode.SpiritBeast_killed = true
 	CustomGameEventManager:Send_ServerToAllClients("hide_timer_spirit_beast", {})
 
 	local pos = GameMode.spirit_beast:GetAbsOrigin()
@@ -96,11 +96,11 @@ function SpiritBeastDead(event)
 end
 
 function FrostInfernalBack(event)
-	local hero = event.activator
+	-- local hero = event.activator
 
 	SpecialEventBack(event)
 	Timers:RemoveTimer(timers.FrostInfernal)
-	GameMode.FrostInfernal_occuring = 0
+	GameMode.FrostInfernal_occuring = false
 
 	if not GameMode.frost_infernal:IsNull() then
 		GameMode.frost_infernal:RemoveSelf()
@@ -121,13 +121,12 @@ function FrostInfernalDead(event)
 end
 
 function AllHeroImageBack(event)
-	local hero = event.activator
 	local point = Entities:FindByName(nil, "all_hero_image_player"):GetAbsOrigin()
 	if timers.AllHeroImage then Timers:RemoveTimer(timers.AllHeroImage) end
 	if timers.AllHeroImage2 then Timers:RemoveTimer(timers.AllHeroImage2) end
 
 	CustomGameEventManager:Send_ServerToAllClients("hide_timer_all_hero_image", {})
-	GameMode.AllHeroImages_occuring = 0
+	GameMode.AllHeroImages_occuring = false
 	SpecialEventBack(event)
 
 	local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_2, point, nil, 2500, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_ALL, DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER, false)

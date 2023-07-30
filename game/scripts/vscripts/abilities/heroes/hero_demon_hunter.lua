@@ -27,23 +27,11 @@ end
 -- Fountain aura
 modifier_xhs_vampiric_aura = modifier_xhs_vampiric_aura or class({})
 
-function modifier_xhs_vampiric_aura:OnCreated()
-	self.caster = self:GetCaster()
-	self.ability = self:GetAbility()
-	if not self.ability or not self.caster:IsRealHero() then
-		self:Destroy()
-		return nil
-	end
+function modifier_xhs_vampiric_aura:IsHidden() return true end
 
-	-- Ability specials
-	self.aura_radius = self.ability:GetSpecialValueFor("aura_radius")
-	self.aura_stickyness = self.ability:GetSpecialValueFor("aura_stickyness")
-end
+function modifier_xhs_vampiric_aura:IsDebuff() return false end
 
---ability properties
-function modifier_xhs_vampiric_aura:OnRefresh()
-	self:OnCreated()
-end
+function modifier_xhs_vampiric_aura:IsAura() return true end
 
 function modifier_xhs_vampiric_aura:GetAuraDuration()
 	return self.aura_stickyness
@@ -69,11 +57,23 @@ function modifier_xhs_vampiric_aura:GetModifierAura()
 	return "modifier_xhs_vampiric"
 end
 
-function modifier_xhs_vampiric_aura:IsAura() return true end
+function modifier_xhs_vampiric_aura:OnCreated()
+	self.caster = self:GetCaster()
+	self.ability = self:GetAbility()
 
-function modifier_xhs_vampiric_aura:IsDebuff() return false end
+	if not self.ability or not self.caster:IsRealHero() then
+		self:Destroy()
+		return nil
+	end
 
-function modifier_xhs_vampiric_aura:IsHidden() return false end
+	-- Ability specials
+	self.aura_radius = self.ability:GetSpecialValueFor("aura_radius")
+	self.aura_stickyness = self.ability:GetSpecialValueFor("aura_stickyness")
+end
+
+function modifier_xhs_vampiric_aura:OnRefresh()
+	self:OnCreated()
+end
 
 modifier_xhs_vampiric = modifier_xhs_vampiric or class({})
 

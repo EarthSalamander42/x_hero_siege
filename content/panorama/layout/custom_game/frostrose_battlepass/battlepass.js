@@ -11,7 +11,8 @@ var LeaderboardInfoContainer = $("#LeaderboardInfoContainer");
 var toggle = false;
 var first_time = false;
 
-var secret_key = CustomNetTables.GetTableValue("game_options", "server_key")["1"];
+var secret_key = CustomNetTables.GetTableValue("game_options", "server_key");
+if (secret_key && secret_key["1"]) secret_key = secret_key["1"];
 var game_version = CustomNetTables.GetTableValue("game_options", "game_version");
 var game_type = undefined;
 if (game_version)

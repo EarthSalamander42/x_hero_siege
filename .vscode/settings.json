@@ -927,7 +927,9 @@
 		"class",
 		"json",
 		"DropNeutralItemAtPositionForHero",
-		"EmitSoundOn"
+		"EmitSoundOn",
+		"GetUnitKeyValuesByName",
+		"GetAbilityKeyValuesByName"
 	],
 	"Lua.hint.await": true,
 	"Lua.semantic.annotation": false,

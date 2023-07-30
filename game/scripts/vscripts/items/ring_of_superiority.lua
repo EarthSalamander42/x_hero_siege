@@ -18,13 +18,7 @@ function modifier_ring_of_superiority:OnCreated()
 	if not IsServer() then return end
 
 	if self:GetParent():IsRealHero() and _G.SOGAT_ARTIFACT_PICKED == false then
-		_G.SOGAT_ARTIFACT_PICKED = true
-
-		if timers.Ramero then
-			Timers:RemoveTimer(timers.Ramero)
-		end
-
-		ReturnFromSpecialArena(self:GetParent())
+		SpecialEvents:EndSogatEvent(true)
 	end
 
 	self:GetParent():AddNewModifier(self:GetParent(), self:GetAbility(), "modifier_endurance_buff", {})
@@ -46,9 +40,11 @@ modifier_devotion_buff = modifier_devotion_buff or class({})
 
 function modifier_devotion_buff:GetTexture() return "omniknight_degen_aura" end
 
-function modifier_devotion_buff:DeclareFunctions() return {
-	MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS,
-} end
+function modifier_devotion_buff:DeclareFunctions()
+	return {
+		MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS,
+	}
+end
 
 function modifier_devotion_buff:OnCreated()
 	if not IsServer() then return end

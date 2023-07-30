@@ -1,25 +1,26 @@
 corpse_baseclass = corpse_baseclass or {}
 
 -- Careful! These functions are being overriden if one exists in hero scripts
-function corpse_baseclass:CastFilterResultTarget( target )
+function corpse_baseclass:CastFilterResultTarget(target)
 	if not IsServer() then return end
 
 	local caster = self:GetCaster()
-	local corpseRadius = ability:GetKeyValue("RequiresCorpsesAround")
+	local corpseRadius = GetAbilityKeyValuesByName(self:GetAbilityName())["RequiresCorpsesAround"]
+	local playerID = caster:GetPlayerID()
 
 	if corpseRadius then
-		local corpseFlag = ability:GetKeyValue("CorpseFlag")
+		local corpseFlag = GetAbilityKeyValuesByName(self:GetAbilityName())["CorpseFlag"]
 
 		if corpseFlag then
 			if corpseFlag == "NotMeatWagon" then
-				if not Corpses:AreAnyOutsideInRadius(playerID, unit:GetAbsOrigin(), corpseRadius) then
+				if not Corpses:AreAnyOutsideInRadius(playerID, caster:GetAbsOrigin(), corpseRadius) then
 					SendErrorMessage(caster:GetPlayerID(), "#error_no_usable_corpses")
 					return false
 				end
 			end
-		elseif not Corpses:AreAnyInRadius(playerID, unit:GetAbsOrigin(), corpseRadius) then
+		elseif not Corpses:AreAnyInRadius(playerID, caster:GetAbsOrigin(), corpseRadius) then
 			SendErrorMessage(caster:GetPlayerID(), "#error_no_usable_corpses")
-			Notifications:Bottom(playerID, {text="No corpses near!", duration=5.0, style={color="white"}})
+			Notifications:Bottom(playerID, { text = "No corpses near!", duration = 5.0, style = { color = "white" } })
 			return false
 		end
 	end

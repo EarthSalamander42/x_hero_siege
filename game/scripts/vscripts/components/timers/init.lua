@@ -74,36 +74,20 @@ function CustomTimers:Think()
 			print("Game Time: " .. minutes .. ":" .. seconds)
 			-- 9:00 minutes (Muradin Event)
 			if CustomTimers.current_time["game_time"] == (XHS_SPECIAL_EVENT_INTERVAL - 1) then
-				CustomTimers.timers_paused = 1
-
-				PauseCreeps()
-				PauseHeroes()
-
-				Timers:CreateTimer(3, function()
-					Timers:CreateTimer(3, RestartHeroes())
-					Timers:CreateTimer(5, MuradinEvent(XHS_MURADIN_EVENT_DURATION))
-				end)
+				SpecialEvents:MuradinEvent(XHS_MURADIN_EVENT_DURATION)
 
 				return
 			end
 
 			-- 18:00 minutes (Farm Event)
 			if CustomTimers.current_time["game_time"] == (XHS_SPECIAL_EVENT_INTERVAL * 2) - 1 then
-				CustomTimers.timers_paused = 1
-
-				PauseCreeps()
-				PauseHeroes()
-
-				Timers:CreateTimer(3, function()
-					Timers:CreateTimer(3, RestartHeroes())
-					FarmEvent(180)
-				end)
+				SpecialEvents:FarmEvent(XHS_FARM_EVENT_DURATION)
 
 				return
 			end
 
 			-- 27:00 minutes (Farm Event)
-			--			print("End of phase 2:", CustomTimers.current_time["game_time"], XHS_SPECIAL_EVENT_INTERVAL * 3 - 1)
+			-- print("End of phase 2:", CustomTimers.current_time["game_time"], XHS_SPECIAL_EVENT_INTERVAL * 3 - 1)
 			if CustomTimers.current_time["game_time"] == (XHS_SPECIAL_EVENT_INTERVAL * 3) then
 				EndPhase2()
 			end
@@ -146,6 +130,7 @@ function CustomTimers:Think()
 						SpawnRunes()
 						CustomTimers.enable_special_wave = true
 					elseif CustomTimers.current_time["special_wave"] == 1 then
+						print("Special Wave:", CustomTimers.special_wave_region[cardinal_point], CustomTimers.special_wave)
 						SpecialWave(cardinal_point)
 					end
 				else
@@ -157,7 +142,7 @@ function CustomTimers:Think()
 			end
 		end
 	else
-		--		print("Custom Timers are currently in pause.")
+		-- print("Custom Timers are currently in pause.")
 	end
 
 	-- These timer should always run
@@ -166,11 +151,11 @@ function CustomTimers:Think()
 			CustomTimers:Countdown("special_event")
 		end
 
-		if GameMode.SpecialArena_occuring == 1 then CustomTimers:Countdown("special_arena") end
-		if GameMode.HeroImage_occuring == 1 then CustomTimers:Countdown("hero_image") end
-		if GameMode.SpiritBeast_occuring == 1 then CustomTimers:Countdown("spirit_beast") end
-		if GameMode.FrostInfernal_occuring == 1 then CustomTimers:Countdown("frost_infernal") end
-		if GameMode.AllHeroImages_occuring == 1 then CustomTimers:Countdown("all_hero_images") end
+		if GameMode.SpecialArena_occuring == true then CustomTimers:Countdown("special_arena") end
+		if GameMode.HeroImage_occuring == true then CustomTimers:Countdown("hero_image") end
+		if GameMode.SpiritBeast_occuring == true then CustomTimers:Countdown("spirit_beast") end
+		if GameMode.FrostInfernal_occuring == true then CustomTimers:Countdown("frost_infernal") end
+		if GameMode.AllHeroImages_occuring == true then CustomTimers:Countdown("all_hero_images") end
 	end
 end
 
