@@ -1,29 +1,8 @@
--- todo: format this file. the file is called everytime a hero trigger is created through the map editor. it's a mess.
-
--- WeekHero = "npc_dota_hero_slardar"			-- Centurion
-WeekHero = "npc_dota_hero_skeleton_king" -- Lich King
--- WeekHero = "npc_dota_hero_meepo"			-- Kobold Knight
--- WeekHero = "npc_dota_hero_tiny"				-- Stone Giant
--- WeekHero = "npc_dota_hero_sand_king"		-- Desert Wyrm
--- WeekHero = "npc_dota_hero_necrolyte"		-- Dark Summoner
-
--- the first hero will be selected by default when using a table
---[[
-WeekHero = { -- Spirit Master
-	"npc_dota_hero_storm_spirit",
-	"npc_dota_hero_ember_spirit",
-	"npc_dota_hero_earth_spirit",
-}
---]]
--- WeekHero = { -- Dark Fundamental
---	"npc_dota_hero_chaos_knight",
---	"npc_dota_hero_keeper_of_the_light",
--- }
-
 ListenToGameEvent('game_rules_state_change', function(keys)
 	if GameRules:State_Get() == DOTA_GAMERULES_STATE_CUSTOM_GAME_SETUP then
 		if _G.INIT_CHOOSE_HERO == false then
 			_G.INIT_CHOOSE_HERO = true
+			print("Choose Hero Phase")
 
 			-- Need a timer else Battlepass is nil when first dummy hero spawn
 			Timers:CreateTimer(1.0, function()
@@ -113,26 +92,6 @@ function SpawnHeroesBis()
 			return nil
 		end
 	end)
-
-	local vip_point = Entities:FindByName(nil, "choose_vip_point"):GetAbsOrigin()
-
-	if type(WeekHero) == "table" then
-		local pos = {}
-		pos[1] = Vector(0, 100, 0)
-		pos[2] = Vector(-100, 0, 0)
-		pos[3] = Vector(100, 0, 0)
-
-		for i, hero in ipairs(WeekHero) do
-			local vip_hero = CreateUnitByName(hero, vip_point + pos[i], true, nil, nil, DOTA_TEAM_GOODGUYS)
-			vip_hero:SetAngles(0, 270, 0)
-			vip_hero:AddAbility("dummy_passive_vulnerable"):SetLevel(1)
-			vip_hero.is_fake_hero = true
-		end
-	else
-		local vip_hero = CreateUnitByName(WeekHero, vip_point, true, nil, nil, DOTA_TEAM_GOODGUYS)
-		vip_hero:SetAngles(0, 270, 0)
-		vip_hero:AddAbility("dummy_passive_vulnerable"):SetLevel(1)
-	end
 end
 
 function SpawnBosses()
@@ -186,36 +145,6 @@ function ChooseHero(event)
 
 				return
 			end
-
-			if caller:GetName() == "trigger_hero_weekly" then
-				if api:IsDonator(hero:GetPlayerID()) then
-					Notifications:Bottom(hero:GetPlayerOwnerID(), { text = "You are VIP. Please choose this hero on top!", duration = 5.0 })
-
-					return
-				end
-
-				UTIL_Remove(Entities:FindByName(nil, "trigger_hero_weekly"))
-				local particle = ParticleManager:CreateParticle("particles/generic_hero_status/hero_levelup.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero, hero)
-				ParticleManager:SetParticleControl(particle, 0, hero:GetAbsOrigin())
-				EmitSoundOnClient("ui.trophy_levelup", PlayerResource:GetPlayer(id))
-				hero:AddNewModifier(hero, nil, "modifier_command_restricted", {})
-				local weekly_hero = WeekHero
-				if type(WeekHero) == "table" then weekly_hero = WeekHero[0] end
-				Notifications:Bottom(hero:GetPlayerOwnerID(), { hero = weekly_hero, duration = 5.0 })
-				Notifications:Bottom(hero:GetPlayerOwnerID(), { text = "HERO: ", duration = 5.0, style = { color = "white" }, continue = true })
-				Notifications:Bottom(hero:GetPlayerOwnerID(), { text = "#" .. weekly_hero, duration = 5.0, style = { color = "white" }, continue = true })
-
-				local newHero = PlayerResource:ReplaceHeroWith(id, weekly_hero, XHS_STARTING_GOLD[difficulty], 0)
-				StartingItems(hero, newHero)
-
-				Timers:CreateTimer(0.1, function()
-					if not hero:IsNull() then
-						UTIL_Remove(hero)
-					end
-				end)
-
-				return
-			end
 		end
 	end
 end
@@ -227,7 +156,7 @@ function ChooseHeroVIP(event)
 	local id = hero:GetPlayerID()
 	local difficulty = GameRules:GetCustomGameDifficulty()
 
-	if PlayerResource:IsValidPlayer(id) and hero:GetUnitName() == "npc_dota_hero_wisp" and api:IsDonator(hero:GetPlayerID()) then
+	if PlayerResource:IsValidPlayer(id) and hero:GetUnitName() == "npc_dota_hero_wisp" then
 		for i = 1, #HEROLIST_VIP do
 			if caller:GetName() == "trigger_hero_vip_" .. i then
 				local picked_hero_name = "npc_dota_hero_" .. HEROLIST_VIP[i]
@@ -253,7 +182,5 @@ function ChooseHeroVIP(event)
 				return
 			end
 		end
-	elseif PlayerResource:IsValidPlayer(id) and hero:GetUnitName() == "npc_dota_hero_wisp" and not api:IsDonator(hero:GetPlayerID()) then
-		Notifications:Bottom(hero:GetPlayerOwnerID(), { text = "This hero is only for <font color='#FF0000'>VIP Members!</font> Please choose another hero.", duration = 5.0 })
 	end
 end

@@ -195,7 +195,7 @@
 	"vote_difficulty_4_description"             "Gold: 100%\nExperience: 75%\nEnemies Damage: 150%"
 	"vote_difficulty_5_description"             "Gold: 75%\nExperience: 60%\nEnemies Damage: 200%"
 	"loading_screen_custom_games_1"             "This is the list of every custom games currently managed by Frostrose Studio:"
-	"loading_screen_custom_games_2"             "You can translate Dota IMBA in your native language on Transifex website, it's easy! Just create an account and subscribe to a language. Give it a try! Don't forget to request your Discord role!"
+	"loading_screen_custom_games_2"             "You can translate X Hero Siege in your native language on Transifex website, it's easy! Just create an account and subscribe to a language. Give it a try! Don't forget to request your Discord role!"
 	"loading_screen_custom_games_3"             "如果在Patreon众筹网站上支持Frostrose工作室，您还可以获得游戏内的奖励！通行证经验加成，《战场》中的侍从，还有更多！"
 	"tooltip_event_hero_image"                  "Hero Image \n(x4 stats)"
 	"tooltip_event_spirit_beast"                "Spirit Beast"

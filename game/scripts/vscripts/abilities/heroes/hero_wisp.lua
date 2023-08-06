@@ -6,7 +6,7 @@ function wisp_pick_random_hero:OnSpellStart()
 	if not IsServer() then return end
 	self.caster = self:GetCaster()
 
-	local random = RandomInt(1, #HEROLIST + 1) -- +1 for Weekly hero
+	local random = RandomInt(1, #HEROLIST)
 	local IsAvailableHero = Entities:FindByName(nil, "trigger_hero_" .. random)
 	local difficulty = GameRules:GetCustomGameDifficulty()
 	local hero_name
@@ -15,8 +15,6 @@ function wisp_pick_random_hero:OnSpellStart()
 		print("This hero is disabled! Re-rolls Random Hero")
 		self:OnSpellStart()
 		return
-	elseif random == #HEROLIST + 1 then
-		hero_name = WeekHero
 	end
 
 	hero_name = "npc_dota_hero_" .. HEROLIST[random]
