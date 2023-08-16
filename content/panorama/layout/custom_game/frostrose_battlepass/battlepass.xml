@@ -101,9 +101,9 @@
 						</Button>
 					</Panel>
 
-					<Button id="CompanionNotification" onactivate="DOTADisplayURL('https://www.patreon.com/bePatron?u=2533325');">
+					<!-- <Button id="CompanionNotification" onactivate="DOTADisplayURL('https://www.patreon.com/bePatron?u=2533325');">
 						<Label id="CompanionNotificationLabel"/>
-					</Button>
+					</Button> -->
 
 					<Panel id="MiniTabButtonContainer" class="MiniTabButtonContainer" hittest="false">
 						<Button class="sub_nav_tab" id="LeaderboardExperienceTabButton">
