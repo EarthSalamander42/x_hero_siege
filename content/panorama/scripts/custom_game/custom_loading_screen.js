@@ -211,7 +211,6 @@ function fetch() {
 };
 
 function HideVoteCategory(vote_type) {
-	$.Msg(vote_type);
 	const parent = $("#vote_" + vote_type);
 
 	if (parent) {
@@ -360,7 +359,6 @@ function OnVoteButtonPressed(category, vote) {
 
 function OnVotesReceived(data) {
 	var vote_counter = [];
-	$.Msg(data);
 
 	// Reset tooltips
 	for (var i in $("#vote-label-container").FindChildrenWithClassTraverse("label_" + data.category + "_reset")) {

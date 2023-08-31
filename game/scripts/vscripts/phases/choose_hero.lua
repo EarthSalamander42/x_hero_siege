@@ -2,7 +2,6 @@ ListenToGameEvent('game_rules_state_change', function(keys)
 	if GameRules:State_Get() == DOTA_GAMERULES_STATE_CUSTOM_GAME_SETUP then
 		if _G.INIT_CHOOSE_HERO == false then
 			_G.INIT_CHOOSE_HERO = true
-			print("Choose Hero Phase")
 
 			-- Need a timer else Battlepass is nil when first dummy hero spawn
 			Timers:CreateTimer(1.0, function()

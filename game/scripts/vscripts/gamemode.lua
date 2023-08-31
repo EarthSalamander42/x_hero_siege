@@ -166,15 +166,17 @@ function GameMode:InitGameMode()
 	mode:SetAnnouncerDisabled(false)
 	mode:SetLoseGoldOnDeath(false)
 	mode:SetDaynightCycleDisabled(true)
+	mode:SetWeatherEffectsDisabled(true)
+	mode:SetCustomTerrainWeatherEffect("particles/rain_fx/econ_snow.vpcf")
 
 	-- Value Rules
 	mode:SetCameraDistanceOverride(1250)
 	mode:SetMaximumAttackSpeed(500)
 	mode:SetMinimumAttackSpeed(20)
 	mode:SetCustomHeroMaxLevel(20)
-	GameRules:SetHeroMinimapIconScale(1.0)
-	GameRules:SetCreepMinimapIconScale(1)
-	GameRules:SetRuneMinimapIconScale(1)
+	-- GameRules:SetHeroMinimapIconScale(1.0) -- There's a bug causing it to change from big to small billion times a second
+	-- GameRules:SetCreepMinimapIconScale(1)
+	-- GameRules:SetRuneMinimapIconScale(1)
 
 	-- Team Rules
 	SetTeamCustomHealthbarColor(DOTA_TEAM_GOODGUYS, 64, 64, 192) --Blue
@@ -1022,7 +1024,7 @@ ListenToGameEvent('game_rules_state_change', function(keys)
 				api:SetCustomDifficulty(highest_key)
 			end
 
-			print(category .. ": " .. highest_key)
+			-- print(category .. ": " .. highest_key)
 		end
 	end
 end, nil)

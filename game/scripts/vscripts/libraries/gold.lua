@@ -14,17 +14,20 @@ end
 local GOLD_CAP = 50000
 
 function Gold:Init()
+	local ids = PlayerResource:GetAllTeamPlayerIDs()
+
 	-- a table for every player
 	PlayerTables:CreateTable("gold", {
 		gold = {}
-	}, totable(PlayerResource:GetAllTeamPlayerIDs()))
+	}, totable(ids))
 
-		-- start think timer
+	-- start think timer
 	Timers:CreateTimer(1, Dynamic_Wrap(Gold, "Think"))
 end
 
 function Gold:UpdatePlayerGold(unitvar, newGold)
 	local playerID = UnitVarToPlayerID(unitvar)
+
 	if playerID and playerID > -1 then
 		-- get full tree,
 		--[[local allgold = PlayerTables:GetTableValue("gold", "gold")
@@ -33,7 +36,8 @@ function Gold:UpdatePlayerGold(unitvar, newGold)
 		local player = PlayerResource:GetPlayer(playerID)
 		CustomGameEventManager:Send_ServerToAllClients("oaa_update_gold", {
 			gold = allgold
-		})]]--
+		})]]
+		--
 		local tableGold = PlayerTables:GetTableValue("gold", "gold")
 		tableGold[playerID] = newGold
 		PlayerTables:SetTableValue("gold", "gold", tableGold)
@@ -53,7 +57,6 @@ function Gold:Think()
 		if PlayerResource:IsValidPlayerID(i) then
 			local gameState = GameRules:State_Get()
 			if gameState == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS or gameState == DOTA_GAMERULES_STATE_PRE_GAME then
-
 				local currentGold = Gold:GetGold(i)
 				local currentDotaGold = PlayerResource:GetGold(i)
 
@@ -80,9 +83,9 @@ function Gold:Think()
 			end
 		end
 	end, PlayerResource:GetAllTeamPlayerIDs())
+
 	return 0.2
 end
-
 
 function Gold:ClearGold(unitvar)
 	Gold:SetGold(unitvar, 0)

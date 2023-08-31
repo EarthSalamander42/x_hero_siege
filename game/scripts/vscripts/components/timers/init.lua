@@ -68,9 +68,10 @@ function CustomTimers:Think()
 		CustomTimers:Countdown("game_time")
 
 		if GameRules:State_Get() == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
-			local minutes = math.floor(CustomTimers.current_time["game_time"] / 60)
-			local seconds = math.floor(CustomTimers.current_time["game_time"] - (minutes * 60))
-			print("Game Time: " .. minutes .. ":" .. seconds)
+			-- local minutes = math.floor(CustomTimers.current_time["game_time"] / 60)
+			-- local seconds = math.floor(CustomTimers.current_time["game_time"] - (minutes * 60))
+			-- print("Game Time: " .. minutes .. ":" .. seconds)
+
 			-- 9:00 minutes (Muradin Event)
 			if CustomTimers.current_time["game_time"] == XHS_SPECIAL_EVENT_INTERVAL and XHS_TIMERS_MURADIN == false then
 				XHS_TIMERS_MURADIN = true
