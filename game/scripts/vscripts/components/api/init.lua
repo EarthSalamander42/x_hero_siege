@@ -195,7 +195,7 @@ function api:GetPlayerCosmetics(player_id, cosmetic_type)
 
 	local cosmetics = api[cosmetic_type]
 
-	if cosmetics and type(cosmetics == "table" and next(cosmetics)) then
+	if cosmetics and type(cosmetics) == "table" and next(cosmetics) then
 	else
 		print("api:GetPlayerCosmetics: cosmetics table value is empty for cosmetic_type:", cosmetic_type)
 		return false
