@@ -61,23 +61,28 @@
 	EndScoreboard(args);
 */
 
-	var args = {
-		data: {
-			players: {},
-		},
-	};
+	var args = CustomNetTables.GetTableValue("game_options", "end_game");
 
-	var PlayerID = 0;
+	if (!args) {
+		$.Msg("Critical error! no data found for end screen.");
 
-	while (Game.GetPlayerInfo(PlayerID)) {
-		args.data.players[Game.GetPlayerInfo(PlayerID).player_steamid] = {}
-		PlayerID++;
-	}
+		args = {
+			data: {
+				players: {},
+			},
+		};
+	
+		var PlayerID = 0;
+	
+		while (Game.GetPlayerInfo(PlayerID)) {
+			args.data.players[Game.GetPlayerInfo(PlayerID).player_steamid] = {}
+			PlayerID++;
+		}
+	} 
 
-	// Generate player rows before game-complete backend call happens (so there is content to watch if call fails)
 	EndScoreboard(args);
 
-	GameEvents.Subscribe("end_game", EndScoreboard);
+	// GameEvents.Subscribe("end_game", EndScoreboard);
 })();
 
 function RawTimetoGameTime(time) {
@@ -240,8 +245,9 @@ function EndScoreboard(args) {
 
 		if (player.result != null) {
 			var xpDiff = Math.floor(player.result.xp_change) || 0;
-//			if (Game.IsInToolsMode())
-//				xpDiff = 300000;
+			// Comment me please
+			// if (Game.IsInToolsMode())
+				// xpDiff = 30000;
 
 			// fail-safe to prevent text being grey
 			values.xp.earned.text = "0";
@@ -272,8 +278,8 @@ function EndScoreboard(args) {
 						for (var i = 1; i <= levelup_count; i++) {
 							var level = ply_table.Lvl + i;
 							// Comment me please
-//							if (Game.IsInToolsMode())
-//								var level = 0 + i;
+							// if (Game.IsInToolsMode())
+								// var level = 0 + i;
 
 							CreateBattlepassRewardPanel(level, i);
 						}
@@ -313,13 +319,18 @@ function CloseBottlepassReward(panel) {
 }
 
 function CreateBattlepassRewardPanel(level, levelup_count) {
-	var battlepass = CustomNetTables.GetTableValue("game_options", "battlepass").battlepass;
+	// $.Msg("Find reward for level: " + level);
+	var battlepass = CustomNetTables.GetTableValue("battlepass_js_builder", "rewards");
+	if (battlepass && battlepass["1"]) {
+		battlepass = battlepass["1"];
+	}
 
 	if (battlepass != undefined && battlepass[level] != undefined) {
-		var battlepass_reward = battlepass[level][1];
-		var battlepass_rarity = battlepass[level][2];
+		var battlepass_reward = battlepass[level]["name"];
+		var battlepass_rarity = battlepass[level]["rarity"];
+		var battlepass_type = battlepass[level]["type"];
 
-		var rp = $.CreatePanel("Panel", $("#es-player-reward-panel"), "es-player-reward-container" + levelup_count);
+		var rp = $.CreatePanel("Panel", $("#es-player-reward-container"), "es-player-reward-panel" + levelup_count);
 		rp.AddClass("es-player-reward-container");
 		rp.AddClass("es-player-reward");
 
@@ -366,7 +377,7 @@ function CreateBattlepassRewardPanel(level, levelup_count) {
 
 		rp.style.visibility = 'visible';
 		rewards.desc.text = $.Localize("#battlepass_reward_description") + " " + level;
-		rewards.name.text = $.Localize("#battlepass_" + battlepass_reward);
+		rewards.name.text = battlepass_type + ": " + $.Localize("#" + battlepass_reward);
 		rewards.rarity.AddClass(battlepass_rarity);
 		rewards.rarity.text = battlepass_rarity;
 		rewards.image.style.backgroundImage = 'url("file://{resources}/images/custom_game/battlepass/' + battlepass_reward + '.png")';

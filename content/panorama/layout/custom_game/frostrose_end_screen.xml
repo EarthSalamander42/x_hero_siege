@@ -46,6 +46,7 @@
 				<Label id="es-victory-info-text" text="Loading..." />
 				<Label id="es-game-time-text" text="00:00" />
 			</Panel>
+
 			<Panel id="es-teams">
 				<Panel class="es-teams-columns">
 					<Panel class="es-team" id="es-2-team"> <!-- TODO: create those panels in js instead -->
@@ -170,6 +171,9 @@
 					<Label text="#CustomEndScreenClose" />
 				</Button>
 			</Panel>
+
+			<!-- Filled dynamically through JS -->
+			<Panel id="es-player-reward-container"/>
 		</Panel>
 	</Panel>
 </root>

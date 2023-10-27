@@ -23,7 +23,7 @@ function api:GetUrl(endpoint)
 		url = url .. endUrlFrostrose
 	end
 
-	print("URL:", url .. endpoint)
+	print("URL: " .. url .. endpoint)
 
 	return url .. endpoint
 end
@@ -601,8 +601,8 @@ function api:Request(endpoint, okCallback, failCallback, method, payload)
 	local request = CreateHTTPRequestScriptVM(method, self:GetUrl(endpoint))
 
 	if request == nil then
-		native_print("Failed to create http request. skipping")
-		return failCallback();
+		print("Failed to create http request. skipping")
+		return failCallback()
 	end
 
 	request:SetHTTPRequestAbsoluteTimeoutMS(timeout)
@@ -619,31 +619,28 @@ function api:Request(endpoint, okCallback, failCallback, method, payload)
 		end
 	end
 
-	print(header_key)
 	CustomNetTables:SetTableValue("game_options", "server_key", { header_key })
 
 	request:SetHTTPRequestHeaderValue("X-Dota-Server-Key", header_key)
 	request:SetHTTPRequestHeaderValue("X-Dota-Game-Type", CUSTOM_GAME_TYPE)
 
 	-- encode payload
-	print(payload)
 	if payload ~= nil then
 		local encoded = json.encode(payload)
 		request:SetHTTPRequestRawPostBody("application/json", encoded)
 	end
 
-	print("About to send request...")
 	request:Send(function(result)
 		-- print(result)
 		local code = result.StatusCode;
-		print("Result status code:" .. code)
 
 		local fail = function(message)
 			if (code == nil) then
 				code = 0
 			end
+
 			print("Request to " .. endpoint .. " failed with message " .. message .. " (" .. tostring(code) .. ")")
-			failCallback();
+			failCallback()
 		end
 
 		if code == 0 then
@@ -651,7 +648,8 @@ function api:Request(endpoint, okCallback, failCallback, method, payload)
 		elseif code >= 500 then
 			return fail("Server Error")
 		elseif code == 204 then
-			return okCallback();
+			print("Request to " .. endpoint .. " succeeded with no content")
+			return okCallback(obj.data or {})
 		else
 			local obj, pos, err = json.decode(result.Body)
 
@@ -671,7 +669,7 @@ function api:Request(endpoint, okCallback, failCallback, method, payload)
 			elseif obj.error == true and obj.message == nil then
 				return fail("Unknown server error. (message is nil)")
 			elseif code >= 200 and code < 400 then
-				return okCallback(obj.data);
+				return okCallback(obj.data or {})
 			else
 				return fail("Wtf")
 			end
@@ -681,9 +679,9 @@ end
 
 function api:RegisterGame(callback)
 	self:Request("game-register", function(data)
-		if IsInToolsMode() then
-			print(data.emblems)
-		end
+		-- if IsInToolsMode() then
+		-- print(data.emblems)
+		-- end
 
 		api.game_id = tonumber(data.game_id)
 		api.players = data.players
@@ -712,7 +710,23 @@ function api:RegisterGame(callback)
 	--	CustomGameEventManager:Send_ServerToAllClients("all_players_loaded", {})
 end
 
-function api:CompleteGame(successCallback)
+function api:ProcessCompletedGame(data, payload)
+	local full_data = {
+		players = payload.players,
+		data = data,
+		info = {
+			winner = GAME_WINNER_TEAM,
+			id = api:GetApiGameId(),
+			gamemode = api:GetCustomGamemode(),
+		}
+	}
+	CustomNetTables:SetTableValue("game_options", "end_game", full_data)
+	-- CustomGameEventManager:Send_ServerToAllClients("end_game", full_data)
+
+	GameRules:SetGameWinner(GAME_WINNER_TEAM, true)
+end
+
+function api:CompleteGame()
 	print("CompleteGame")
 	local players = {}
 
@@ -860,19 +874,17 @@ function api:CompleteGame(successCallback)
 	}
 
 	self:Request("game-complete", function(data)
-			print("Game complete successful!")
-			if successCallback ~= nil then
-				successCallback(data, payload)
-			end
+			print("game-complete: Game complete successful!")
+			api:ProcessCompletedGame(data, payload)
 		end,
 
 		function(data)
-			print("Error on game complete!")
+			print("game-complete: Error on game complete!")
 			print(data)
-			if successCallback ~= nil then
-				successCallback(data, payload)
-			end
-		end, "POST", payload)
+			api:ProcessCompletedGame(data, payload)
+		end,
+		"POST", payload
+	)
 end
 
 function api:DiretideHallOfFame(successCallback, failCallback)

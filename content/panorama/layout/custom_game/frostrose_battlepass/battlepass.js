@@ -1390,8 +1390,6 @@ function SwitchLeaderboardWrapper(type) {
 }
 
 function _ScoreboardUpdater_UpdatePlayerPanelXP(playerId, playerPanel, ImbaXP_Panel) {
-		$.Msg("Updating player xp panel");
-
 	var ids = {
 		xpRank: "ImbaXPRank",
 		xp: "ImbaXP",

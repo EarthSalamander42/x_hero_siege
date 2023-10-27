@@ -64,36 +64,12 @@ ListenToGameEvent('game_rules_state_change', function()
 		end)
 		-- elseif GameRules:State_Get() == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
 		-- 	if IsInToolsMode() then
-		-- 		GameRules:SetGameWinner(2)
+		-- 		GameRules:GetGameModeEntity():SetContextThink(DoUniqueString("delay"), function()
+		-- 			GameRules:SetGameWinner(2)
+		-- 		end, 2.0)
 		-- 	end
 	end
 end, nil)
-
-function api:OnGameEnd()
-	print("OnGameEnd")
-	if CUSTOM_GAME_TYPE == "IMBA" then
-		if api:GetCustomGamemode() == 4 then
-			CustomGameEventManager:Send_ServerToAllClients("diretide_hall_of_fame", {})
-		end
-	end
-
-	api:CompleteGame(function(data, payload)
-		print(data)
-		print(payload)
-		local full_data = {
-			players = payload.players,
-			data = data,
-			info = {
-				winner = GAME_WINNER_TEAM,
-				id = api:GetApiGameId(),
-				gamemode = api:GetCustomGamemode(),
-			}
-		}
-
-		CustomNetTables:SetTableValue("game_options", "end_game", full_data)
-		-- CustomGameEventManager:Send_ServerToAllClients("end_game", full_data)
-	end)
-end
 
 ListenToGameEvent('dota_item_purchased', function(event)
 	-- itemcost, itemname, PlayerID, splitscreenplayer
@@ -124,9 +100,15 @@ end
 
 -- Call custom functions whenever SetGameWinner is being called anywhere
 original_SetGameWinner = CDOTAGameRules.SetGameWinner
-CDOTAGameRules.SetGameWinner = function(self, iTeamNumber)
+CDOTAGameRules.SetGameWinner = function(self, iTeamNumber, bSkipRecord)
 	GAME_WINNER_TEAM = iTeamNumber
-	api:OnGameEnd()
 
-	return original_SetGameWinner(self, iTeamNumber)
+	if bSkipRecord then
+		return original_SetGameWinner(self, iTeamNumber)
+	end
+
+	api:CompleteGame()
+
+	-- Ending the game so fast causes game-complete endpoint to not return anything
+	-- return original_SetGameWinner(self, iTeamNumber)
 end

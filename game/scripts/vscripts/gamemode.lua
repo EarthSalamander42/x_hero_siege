@@ -14,7 +14,6 @@ require('libraries/playertables')
 require('libraries/gold')
 require('libraries/rgb_to_hex')
 require('libraries/corpses')
-require('libraries/wearables')
 
 -- require('phases/choose_hero') -- this should remain disabled as this is called through hero map triggers
 require('phases/creeps')
@@ -28,7 +27,7 @@ require('units/treasure_chest_surprises')
 require('triggers')
 require('components/api/init')
 if IsInToolsMode() then
-	require('libraries/adv_log') -- SUPER SPAM KILLING BACKEND LEAVE IT DISABLED
+	require('libraries/adv_log')
 end
 require('components/battlepass/init')
 require('components/timers/init')

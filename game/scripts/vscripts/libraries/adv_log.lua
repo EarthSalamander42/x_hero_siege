@@ -269,15 +269,11 @@ if Log == nil then
 				err = "Unknown Error"
 			end
 
-			-- print(status)
-			-- print(err)
-
 			-- dont filter errors
 			local levelString = self:_LevelToString(Log.Levels.ERROR)
 
 			for i = 1, #self.targets do
-				self.targets[i]:print(levelString, "Error occured while executing in safe context: " .. err,
-					self:_GetStackTrace(4))
+				self.targets[i]:print(levelString, "Error occured while executing in safe context: " .. err, self:_GetStackTrace(4))
 			end
 
 			-- ultimate debugging

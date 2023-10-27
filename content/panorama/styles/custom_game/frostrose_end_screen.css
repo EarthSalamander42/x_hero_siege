@@ -179,7 +179,7 @@
 	width: 100%;
 	height: 100%;
 	background-color: gradient( linear, 0% 0%, 0% 100%, from( #000000FF ), color-stop( 0.12, #000000ff ), color-stop( 0.5, #00000022 ), to( #00000000 ) );
-	flow-children: down;
+	/* flow-children: down; */
 }
 
 #es-victory-info,
@@ -214,11 +214,9 @@
 }
 
 #es-teams {
-	height: 700px;
+	margin-bottom: 300px;
 	flow-children: down;
-	horizontal-align: center;
-	width: 100%;
-	padding: 10px 5px 10px 5px;
+	align: center center;
 	overflow:  squish scroll;
 }
 
@@ -491,8 +489,8 @@
 }
 
 #es-buttons {
-	flow-children: right;
-	horizontal-align: center;
+	margin-bottom: 100px;
+	align: center bottom;
 	flow-children: right;
 }
 
@@ -528,6 +526,10 @@
 	background-color: #222222ff;
 	border: 1px transparent;
 	box-shadow: none;
+}
+
+#es-player-reward-container {
+	align: center center;
 }
 
 
@@ -759,4 +761,86 @@
 }
 #CloseButton:hover #CloseButtonImage {
 	opacity: 1;
+}
+
+.es-player-reward-container {
+	width: 300px;
+	padding: 30px;
+	background-color: #000000da;
+	border-radius: 20px;
+	align: center center;
+	flow-children: down;
+	visibility: collapse;
+}
+
+.es-player-reward-name,
+.es-player-reward-description {
+	width: 100%;
+	color: white;
+	text-align: center;
+	vertical-align: center;
+	font-size: 26px;
+}
+
+.es-player-reward-description {
+	font-size: 20px;
+}
+
+.es-player-reward-rarity {
+	width: 100%;
+	text-align: center;
+	vertical-align: center;
+	font-size: 20px;
+}
+
+.Arcana {
+	color: lightgreen;
+}
+
+/*
+#es-player-reward-image-container {
+	width: 180px;
+	height: 180px;
+	margin-top: 30px;
+	align: center bottom;
+	background-image: url("s2r://panorama/images/hud/reborn/ability_bg_psd.vtex");
+}
+*/
+.es-player-reward-image {
+	width: 180px;
+	height: 120px;
+	margin-top: 30px;
+	align: center bottom;
+}
+
+.es-player-reward-button {
+	margin-top: 30px;
+	height: 30px;
+	width: fill-parent-flow(1.0);
+	background-position: 10px center;
+	background-repeat: no-repeat;
+	background-size: auto 32px;
+
+	background-color: gradient( linear, 0% 0%, 0% 100%, from( #404D65dd ), to( #2B3445dd ) );
+	box-shadow: #0000008f -6px -6px 12px 12px;
+	transition-property: brightness;
+	transition-duration: 0.2s;
+	margin-bottom: 20px;
+}
+
+.es-player-reward-button Label {
+	margin-top: 5px;
+	color: darkgrey;
+	align: center center;
+	text-transform: uppercase;
+}
+
+.es-player-reward-button:hover {
+  brightness: 2.0;
+  box-shadow: #999999ff -2px -2px 4px 4px;
+}
+
+.es-player-reward-button:active {
+  brightness: 0.5;
+  box-shadow: #999999ff -2px -2px 4px 4px;
 }

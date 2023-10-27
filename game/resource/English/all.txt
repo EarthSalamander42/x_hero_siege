@@ -1469,7 +1469,7 @@
 "npc_dota_hero_ursa"								"Malfurion"
 "npc_dota_hero_warlock"								"Archimonde"
 "npc_dota_hero_windrunner"							"Ranger"
-"npc_dota_hero_wisp"								"Choose Hero"
+"npc_dota_hero_wisp"								"Choosing Hero..."
 
 //HERO CREEPS
 "npc_dota_golem_inferno"							"Inferno"

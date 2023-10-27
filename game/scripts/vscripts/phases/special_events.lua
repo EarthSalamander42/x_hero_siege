@@ -23,10 +23,12 @@ function SpecialEvents:MuradinEvent(time)
 	Muradin:AddNewModifier(Muradin, nil, "modifier_pause_creeps", { duration = stun_duration }):SetStackCount(1)
 	Muradin:AddNewModifier(Muradin, nil, "modifier_invulnerable", { duration = stun_duration })
 	Muradin:SetAngles(0, 270, 0)
-	--	Muradin:EmitSound("SantaClaus.StartArena")
 	Notifications:TopToAll({ hero = "npc_dota_hero_zuus", duration = stun_duration })
 	Notifications:TopToAll({ text = " You can't kill him! Just survive the Countdown. ", continue = true })
 	Notifications:TopToAll({ text = "Reward: 15 000 Gold.", continue = true })
+
+	-- EmitSoundOn("SantaClaus.StartArena", Muradin) -- todo: add a variable in game-register endpoint to enable/disable this sound during december
+	EmitSoundOn("Muradin.StormEarthFire", Muradin)
 
 	for nPlayerID = 0, PlayerResource:GetPlayerCount() - 1 do
 		if PlayerResource:HasSelectedHero(nPlayerID) and PlayerResource:GetSelectedHeroEntity(nPlayerID) ~= "npc_dota_hero_wisp" then
@@ -44,7 +46,6 @@ function SpecialEvents:MuradinEvent(time)
 	end
 
 	GameRules:GetGameModeEntity():SetContextThink(DoUniqueString("muradin_event"), function()
-		EmitSoundOn("Muradin.StormEarthFire", Muradin)
 		RestartHeroes()
 
 		return nil
