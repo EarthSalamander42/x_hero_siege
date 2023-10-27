@@ -34,6 +34,25 @@
 				</Panel>
 			</Panel>
 		</snippet>
+
+		<snippet name="LocalPlayerProfile">
+			<Panel class="XPProgressBarContainer">
+				<Panel class="LevelContainer">
+					<Panel class="LevelContainerChild">
+						<Label id="LevelLabel" text="#battlepass_level" />
+						<Label id="ImbaLvl" text="undefined" />
+						<Label id="ImbaXPRank" text="undefined" />
+					</Panel>
+
+					<Panel class="LevelContainerChild2">
+						<Label id="ImbaXP" text="undefined" />
+						<Label id="ImbaXPEarned" text="undefined" />
+					</Panel>
+				</Panel>
+
+				<ProgressBar id="XPProgressBar" value="0.0" hittest="false"/>
+			</Panel>
+		</snippet>
 	</snippets>
 
 	<Panel class="Battlepass" hittest="false">
@@ -106,7 +125,7 @@
 					</Button> -->
 
 					<Panel id="MiniTabButtonContainer" class="MiniTabButtonContainer" hittest="false">
-						<Button class="sub_nav_tab" id="LeaderboardExperienceTabButton">
+						<Button class="sub_nav_tab" id="BattlepassOverviewTabButton">
 							<Label class="text" text="Overview" />
 						</Button>
 

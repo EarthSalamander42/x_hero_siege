@@ -14,6 +14,7 @@ require('libraries/playertables')
 require('libraries/gold')
 require('libraries/rgb_to_hex')
 require('libraries/corpses')
+require('libraries/wearables')
 
 -- require('phases/choose_hero') -- this should remain disabled as this is called through hero map triggers
 require('phases/creeps')

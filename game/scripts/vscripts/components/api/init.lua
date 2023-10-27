@@ -10,7 +10,6 @@ local timeout = 5000
 local native_print = print
 
 function api:Init()
-	CustomGameEventManager:RegisterListener("get_companions_table", Dynamic_Wrap(self, "SendCompanionsTable"))
 	CustomGameEventManager:RegisterListener("api_change_companion", Dynamic_Wrap(self, "SetCompanion"))
 end
 
@@ -635,9 +634,9 @@ function api:Request(endpoint, okCallback, failCallback, method, payload)
 
 	print("About to send request...")
 	request:Send(function(result)
-		print(result)
+		-- print(result)
 		local code = result.StatusCode;
-		print("Result status code:", code)
+		print("Result status code:" .. code)
 
 		local fail = function(message)
 			if (code == nil) then
@@ -682,15 +681,18 @@ end
 
 function api:RegisterGame(callback)
 	self:Request("game-register", function(data)
+		if IsInToolsMode() then
+			print(data.emblems)
+		end
+
 		api.game_id = tonumber(data.game_id)
 		api.players = data.players
 		api.companions = data.companions or nil
 		api.emblems = data.emblems or nil
 		api.disabled_heroes = data.disabled_heroes or nil
 
-		if IsInToolsMode() then
-			print(data.disabled_heroes)
-		end
+		CustomNetTables:SetTableValue("battlepass_player", "companions", api.companions)
+		CustomNetTables:SetTableValue("battlepass_player", "emblems", api.emblems)
 
 		if callback ~= nil then
 			callback(data)
@@ -999,10 +1001,6 @@ function api:GetParties(iPlayerID)
 	end
 
 	return self.parties
-end
-
-function api:SendCompanionsTable(data)
-	CustomGameEventManager:Send_ServerToPlayer(PlayerResource:GetPlayer(data.PlayerID), "receive_companions_table", api.companions)
 end
 
 function api:GenerateGameModeLeaderboard()

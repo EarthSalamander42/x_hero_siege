@@ -1,5 +1,6 @@
-// #base units/companions.txt
+#base units/companions.txt
 // #base units/statues.txt
+#base units/emblems.txt
 
 // Dota Units File
 "DOTAUnits"

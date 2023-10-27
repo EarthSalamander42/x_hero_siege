@@ -31,12 +31,15 @@ function SpecialEvents:MuradinEvent(time)
 	for nPlayerID = 0, PlayerResource:GetPlayerCount() - 1 do
 		if PlayerResource:HasSelectedHero(nPlayerID) and PlayerResource:GetSelectedHeroEntity(nPlayerID) ~= "npc_dota_hero_wisp" then
 			local hero = PlayerResource:GetSelectedHeroEntity(nPlayerID)
-			hero.old_pos = hero:GetAbsOrigin()
-			local id = hero:GetPlayerID()
-			local point = Entities:FindByName(nil, "npc_dota_muradin_player_" .. id)
 
-			DisableItems(hero, time)
-			TeleportHero(hero, point:GetAbsOrigin(), stun_duration - 2.0)
+			if hero and not hero:IsNull() and hero:IsRealHero() and not hero:HasModifier("modifier_fountain_invulnerability") then
+				hero.old_pos = hero:GetAbsOrigin()
+				local id = hero:GetPlayerID()
+				local point = Entities:FindByName(nil, "npc_dota_muradin_player_" .. id)
+
+				DisableItems(hero, time)
+				TeleportHero(hero, point:GetAbsOrigin(), stun_duration - 2.0)
+			end
 		end
 	end
 
