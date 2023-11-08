@@ -238,8 +238,14 @@
 						<Panel id="PanelImbaXP" class="ScoreCol_ImbaXP ScoreboardPanel"/>
 					</Panel>
 
-					<Panel id="BattlepassRewardRow" class="BattlepassRow" hittest="false">
-						<!-- JS Inserts records here -->
+					<Panel id="BattlepassRewardRow" class="BattlepassParentRow" hittest="false">
+						<Panel id="BattlepassRewardRowFree" class="BattlepassRow" hittest="false">
+							<!-- JS Inserts records here -->
+						</Panel>
+
+						<Panel id="BattlepassRewardRowPremium" class="BattlepassRow" hittest="false">
+							<!-- JS Inserts records here -->
+						</Panel>
 					</Panel>
 				</Panel>
 			</Panel>

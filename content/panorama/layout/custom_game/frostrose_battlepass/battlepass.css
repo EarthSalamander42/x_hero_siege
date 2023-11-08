@@ -828,13 +828,20 @@
 	text-overflow: shrink;
 }
 
-.BattlepassRow {
-	width: 100%;
-	height: 100%;
+.BattlepassParentRow {
+	/* width: 100%; */
+	height: 80%;
 	align: center center;
 	/* background-color: #000000ba; */
-	flow-children: right;
+	flow-children: down;
 	overflow: scroll squish;
+}
+
+.BattlepassRow {
+	height: 50%;
+	/* align: center center; */
+	/* background-color: #000000ba; */
+	flow-children: right;
 }
 
 .BattlepassReward {
@@ -849,7 +856,7 @@
 	width: 100%;
 	height: 80%;
 	background-size: cover;
-	background-position: 0% 0%;
+	/* background-position: 0% 0%; */
 }
 
 .BattlepassRewardImageLabelContainer {
@@ -1376,9 +1383,8 @@
 }
 
 .BattlepassPlayerRow {
-	width: 100%;
-	height: 25%;
-	margin-top: 5px;
+	/* width: 100%; */
+	height: 20%;
 	/* background-color: #000000ba; */
 	flow-children: right;
 }

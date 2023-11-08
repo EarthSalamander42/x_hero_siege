@@ -431,7 +431,8 @@ function Battlepass(retainSubTab, bRewardsDisabled) {
 
 	var BP_REWARDS_3 = BubbleSortByElement(BP_REWARDS, "level");
 
-	GenerateBattlepassPanel(BP_REWARDS_3, Players.GetLocalPlayer(), bRewardsDisabled);
+	GenerateBattlepassPanel(BP_REWARDS_3, $("#BattlepassRewardRowFree"), bRewardsDisabled);
+	GenerateBattlepassPanel(BP_REWARDS_3, $("#BattlepassRewardRowPremium"), bRewardsDisabled);
 
 	var companions = CustomNetTables.GetTableValue("battlepass_player", "companions");
 	if (companions != undefined)
@@ -925,16 +926,19 @@ function SafeToLeave() {
 	$("#SafeToLeave").style.visibility = "visible";
 }
 
-function GenerateBattlepassPanel(reward_list, player, bRewardsDisabled) {
+function GenerateBattlepassPanel(reward_list, reward_row, bRewardsDisabled) {
+	$.Msg("GenerateBattlepassPanel: " + reward_row.id);
+	const player = Players.GetLocalPlayer();
 	var plyData = CustomNetTables.GetTableValue("battlepass_player", player);
-	var reward_row = $("#BattlepassRewardRow");
 	var player_avatar = $("#PlayerSteamAvatar");
 
 	if (player_avatar)
-		player_avatar.steamid = Game.GetLocalPlayerInfo(Players.GetLocalPlayer()).player_steamid;
+		player_avatar.steamid = Game.GetLocalPlayerInfo(player).player_steamid;
 
 	for (var i = 1; i <= 1000; i++) {
+		$.Msg("GenerateBattlepassPanel: " + reward_row.id + " - " + i);
 		if (reward_list[i] != undefined) {
+			$.Msg("GenerateBattlepassPanel: " + reward_row.id + " - " + i + " - " + reward_list[i].name);
 			var bp_image = reward_list[i].image;
 			var bp_level = reward_list[i].level;
 			var bp_name = reward_list[i].name;
@@ -949,23 +953,29 @@ function GenerateBattlepassPanel(reward_list, player, bRewardsDisabled) {
 			if (bp_type == "taunt")
 				bp_slot_id = "taunt";
 
-			if (!$("#container_level_" + bp_level)) {
-				var level_container = $.CreatePanel("Panel", reward_row, "container_level_" + bp_level);
-				level_container.AddClass("ContainerLevel");
+			var container_level = reward_row.FindChildTraverse("#container_level_" + bp_level);
+			var reward_level_container;
 
-				var reward_level_container = $.CreatePanel("Panel", $("#container_level_" + bp_level), "reward_container_level_" + bp_level);
+			if (!container_level) {
+				$.Msg("Create reward container for level " + bp_level + " in " + reward_row.id + "")
+				container_level = $.CreatePanel("Panel", reward_row, "container_level_" + bp_level);
+				container_level.AddClass("ContainerLevel");
+
+				reward_level_container = $.CreatePanel("Panel", container_level, "reward_container_level_" + bp_level);
 				reward_level_container.AddClass("RewardContainerLevel");
 
-				var reward_label_container = $.CreatePanel("Panel", $("#container_level_" + bp_level), "");
+				var reward_label_container = $.CreatePanel("Panel", container_level, "");
 				reward_label_container.AddClass("BattlepassRewardLabelContainer");
 
 				var reward_label = $.CreatePanel("Label", reward_label_container, "");
 				reward_label.AddClass("BattlepassRewardLabel");
 				reward_label.text = $.Localize("#battlepass_level") + bp_level;
 				//				reward_label.AddClass(bp_rarity + "_text");
+			} else {
+				reward_level_container = container_level.FindChildTraverse("#reward_container_level_" + bp_level);
 			}
 
-			var reward = $.CreatePanel("Button", $("#reward_container_level_" + bp_level), "reward_button_" + bp_item_id);
+			var reward = $.CreatePanel("Button", reward_level_container, "reward_button_" + bp_item_id);
 			reward.BLoadLayoutSnippet('BattlePassReward');
 			reward.FindChildTraverse("BattlepassRewardImage").style.backgroundImage = 'url("s2r://panorama/images/' + bp_image + '.png")';
 			reward.FindChildTraverse("BattlepassRewardImage").AddClass(bp_rarity + "_border");
@@ -1035,17 +1045,17 @@ function GenerateBattlepassPanel(reward_list, player, bRewardsDisabled) {
 					} else {
 						reward.AddClass("BattlepassRewardIcon_locked")
 						reward.FindChildTraverse("BattlepassRewardTitle").AddClass("BattlepassRewardLabelLocked");
-						reward.FindChildTraverse("BattlepassRewardTitle").text = $.Localize("#battlepass_reward_locked") + "\n" + $.Localize("#battlepass_" + bp_type) + ": " + $.Localize("#" + bp_name);
+						reward.FindChildTraverse("BattlepassRewardTitle").text = $.Localize("#battlepass_reward_locked") + $.Localize("#battlepass_" + bp_type) + ": " + $.Localize("#" + bp_name);
 					}
 				} else {
 					reward.AddClass("BattlepassRewardIcon_unreleased")
 					reward.FindChildTraverse("BattlepassRewardTitle").AddClass("BattlepassRewardLabelUnreleased");
-					reward.FindChildTraverse("BattlepassRewardTitle").text = $.Localize("#battlepass_reward_unreleased") + "\n" + $.Localize("#battlepass_" + bp_type) + ": " + $.Localize("#" + bp_name);
+					reward.FindChildTraverse("BattlepassRewardTitle").text = $.Localize("#battlepass_reward_unreleased") + $.Localize("#battlepass_" + bp_type) + ": " + $.Localize("#" + bp_name);
 				}
 			} else {
 				reward.AddClass("BattlepassRewardIcon_locked")
 				reward.FindChildTraverse("BattlepassRewardTitle").AddClass("BattlepassRewardLabelLocked");
-				reward.FindChildTraverse("BattlepassRewardTitle").text = $.Localize("#battlepass_reward_locked") + "\n" + $.Localize("#battlepass_" + bp_type) + ": " + $.Localize("#" + bp_name);
+				reward.FindChildTraverse("BattlepassRewardTitle").text = $.Localize("#battlepass_reward_locked") + $.Localize("#battlepass_" + bp_type) + ": " + $.Localize("#" + bp_name);
 			}
 
 			if (reward.FindChildTraverse("BattlepassRewardRarity")) {
