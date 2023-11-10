@@ -27,9 +27,7 @@
 
 				<Panel id="BattlepassRewardImage" class="BattlepassRewardImage">
 					<Panel id="BattlepassRewardImageLabelContainer" class="BattlepassRewardImageLabelContainer">
-<!--
-						<Label id="BattlepassRewardImageLabel" class="BattlepassRewardImageLabel" text="#bp_reward_equip_description" hittest="false"/>
--->
+						<Label id="BattlepassRewardImageLabel" class="BattlepassRewardImageLabel" text="" hittest="false"/>
 					</Panel>
 				</Panel>
 			</Panel>
@@ -104,7 +102,7 @@
 
 				<Panel id="TabsButtonWrapper" hittest="false">
 					<Panel id="TabButtonContainer" hittest="false">
-						<Button class="color_animation" id="OverviewTabButton" onactivate="SwitchTab('BattlepassInfoContainer');">
+						<Button class="color_animation" id="BattlepassTabButton" onactivate="SwitchTab('BattlepassInfoContainer');">
 							<Label class="image"></Label>
 							<Label class="text" text="#battlepass" />
 						</Button>
@@ -125,8 +123,16 @@
 					</Button> -->
 
 					<Panel id="MiniTabButtonContainer" class="MiniTabButtonContainer" hittest="false">
-						<Button class="sub_nav_tab" id="BattlepassOverviewTabButton">
+						<Button class="sub_nav_tab" id="OverviewTabButton" onactivate="SwitchBattlepassWrapper('Overview');">
 							<Label class="text" text="Overview" />
+						</Button>
+
+						<Panel hittest="false" class="tab_separator">
+							<Label text="/" />
+						</Panel>
+
+						<Button class="sub_nav_tab" id="ArmoryTabButton" onactivate="SwitchBattlepassWrapper('Armory');">
+							<Label class="text" text="Armory" />
 						</Button>
 
 						<Panel hittest="false" class="tab_separator">
@@ -231,7 +237,7 @@
 					<Label id="ComingSoon" text="#bp_reward_equip_description" />
 				</Panel>
 
-				<Panel id="BattlepassRewardContainer" hittest="true">
+				<Panel id="OverviewTableWrapper" hittest="true">
 					<Panel id="BattlepassPlayerRow" class="BattlepassPlayerRow" hittest="false">
 <!--						<DOTAAvatarImage id="PlayerSteamAvatar" hittest="false"/> -->
 
@@ -239,14 +245,29 @@
 					</Panel>
 
 					<Panel id="BattlepassRewardRow" class="BattlepassParentRow" hittest="false">
+						<Label id="BattlepassRewardRowFreeTitle" class="BattlepassRowTitle" text="#battlepass_rewards" hittest="false"/>
+
 						<Panel id="BattlepassRewardRowFree" class="BattlepassRow" hittest="false">
 							<!-- JS Inserts records here -->
 						</Panel>
 
+						<Label id="BattlepassRewardRowPremiumTitle" class="BattlepassRowTitle" text="#battlepass_rewards_premium" hittest="false"/>
+
 						<Panel id="BattlepassRewardRowPremium" class="BattlepassRow" hittest="false">
+
 							<!-- JS Inserts records here -->
+							<Panel id="BattlepassRewardRowPremiumContainer" class="BattlepassRow" hittest="false">
+							</Panel>
+
+							<Button id="BattlepassRewardRowPremiumButton" class="BattlepassRowTitle" onactivate="OpenWhalepass();">
+								<Label id="BattlepassRewardRowPremiumSubscription" class="BattlepassRowTitle" text="#battlepass_whalepass_subscription" hittest="false"/>
+							</Button>
 						</Panel>
 					</Panel>
+				</Panel>
+
+				<Panel id="ArmoryTableWrapper" hittest="false">
+					<!-- JS Inserts records here -->
 				</Panel>
 			</Panel>
 

@@ -228,7 +228,7 @@
 #LeaderboardInfoContainer,
 #SettingsInfoContainer {
 	width: 100%;
-	height: 520px;
+	height: 540px;
 	flow-children: down;
 	padding: 5px;
 }
@@ -539,7 +539,7 @@
 	animation-direction: alternate;
 	animation-iteration-count: infinite;
 }
-#OverviewTabButton,
+#BattlepassTabButton,
 #DonatorTabButton,
 #LeaderboardTabButton {
 	width: 230px;
@@ -551,7 +551,7 @@
 	transition-duration: 0.2s;
 }
 
-#OverviewTabButton .text,
+#BattlepassTabButton .text,
 #DonatorTabButton .text,
 #LeaderboardTabButton .text {
 	font-size: 19px;
@@ -561,7 +561,7 @@
 	padding-left: 30px;
 	margin-top: 0px;
 }
-#OverviewTabButton .image,
+#BattlepassTabButton .image,
 #DonatorTabButton .image,
 #LeaderboardTabButton .image {
 	width: 14px;
@@ -569,21 +569,21 @@
 	align: left center;
 	margin-top: -1px;
 }	
-#OverviewTabButton {
+#BattlepassTabButton {
 	background-image: url("file://panorama/images/custom_game/battlepass/assets/btn_battlepass.png");
 }
 
-#OverviewTabButton:hover, #OverviewTabButton:active,
+#BattlepassTabButton:hover, #BattlepassTabButton:active,
 #DonatorTabButton:hover, #DonatorTabButton:active,
 #LeaderboardTabButton:hover, #LeaderboardTabButton:active {
 	brightness:  2;
 	animation-name:  none;
 }
-#OverviewTabButton .text {
+#BattlepassTabButton .text {
 	color: #ceebf2;
 	text-shadow: 1px 1px 2px 2.0 #1a424ca2;
 }
-#OverviewTabButton .image {
+#BattlepassTabButton .image {
 	background-image: url("file://panorama/images/custom_game/battlepass/assets/btn_battlepass_icon.png");
 }
 #DonatorTabButton {
@@ -838,10 +838,53 @@
 }
 
 .BattlepassRow {
-	height: 50%;
+	height: 44%;
 	/* align: center center; */
 	/* background-color: #000000ba; */
 	flow-children: right;
+}
+
+.BattlepassRowTitle {
+	align: center center;
+	font-size: 16px;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+	text-align: center center;
+	text-shadow: 0px 0px 4px 4 #000000a5;
+	color: #b8c5ca;
+}
+
+#BattlepassRewardRowPremiumTitle {
+	color: gold;
+}
+
+#BattlepassRewardRowPremium {
+	flow-children: none;
+}
+
+#BattlepassRewardRowPremiumContainer {
+	height: 100%;
+}
+
+#BattlepassRewardRowPremiumButton {
+	align: left center;
+	transition-property: brightness;
+	transition-duration: 0.2s;
+	transition-timing-function: ease-in-out;
+}
+
+#BattlepassRewardRowPremiumButton:hover {
+	brightness: 1.6;
+}
+
+#BattlepassRewardRowPremiumSubscription {
+	opacity-mask: url("s2r://panorama/images/masks/softedge_horizontal_png.vtex");
+	background-color: darkslategrey;
+	color: gold;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	padding-left: 235px;
+	padding-right: 235px;
 }
 
 .BattlepassReward {
@@ -854,9 +897,10 @@
 
 .BattlepassRewardImage {
 	width: 100%;
-	height: 80%;
+	height: 75%;
 	background-size: cover;
 	/* background-position: 0% 0%; */
+	flow-children: none;
 }
 
 .BattlepassRewardImageLabelContainer {
@@ -867,14 +911,19 @@
 
 #BattlepassRewardImageLabel {
 	font-size: 16px;
-//	letter-spacing: 1px;
-	padding: 80px 0px;
+	letter-spacing: 1px;
 	text-transform: uppercase;
 	text-overflow: shrink;
 	text-align: center center;
+	align: center center;
 	text-shadow: 0px 0px 4px 4 #000000a5;
 	color: #b8c5ca;
 	line-height: 14px;
+}
+
+.BattlepassRewardIcon_locked #BattlepassRewardImageLabel {
+	wash-color: red;
+	brightness: 3;
 }
 
 .BattlepassRewardImageLabelContainer:hover {
@@ -884,14 +933,9 @@
 	transition-timing-function: ease-in-out;
 }
 
-.BattlepassRewardImageLabel {
-	width: 100%;
-	height: 100%;
-}
-
 .BattlepassRewardTitleContainer {
 	width: 100%;
-	height: 20%;
+	height: 25%;
 	box-shadow: 0px 2px 6px 0px #000000a5;
 	background-color: #000000aa;
 	flow-children: down;
@@ -912,7 +956,7 @@
 }
 
 .BattlepassRewardIcon {
-	width: 253px;
+	width: 192px;
 	height: 100%;
 	border: 1px solid #38424b;
 	box-shadow: 0px 2px 6px 0px #000000a5;
@@ -971,14 +1015,13 @@
 .BattlepassRewardLabelLocked {
 	width: 100%;
 	horizontal-align: left;
-	font-size: 12px;
+	font-size: 14px;
 	vertical-align: top;
 //	letter-spacing: 1px;
 	text-transform: uppercase;
 	text-overflow: shrink;
 	text-align: center center;
 	text-shadow: 0px 0px 4px 4 #000000a5;
-	color: red;
 	brightness:  1.5;
 	line-height: 14px;
 }
@@ -1383,15 +1426,15 @@
 }
 
 .BattlepassPlayerRow {
-	/* width: 100%; */
+	width: 100%;
 	height: 20%;
 	/* background-color: #000000ba; */
 	flow-children: right;
 }
 
-#BattlepassRewardContainer {
+#OverviewTableWrapper {
 	width: 100%;
-	height: 520px;
+	height: 100%;
 	flow-children: down;
 	opacity-mask: url("s2r://panorama/images/masks/softedge_horizontal_png.vtex");
 }
@@ -1407,7 +1450,7 @@
 }
 
 .RewardContainerLevel {
-	height: 80%;
+	height: 85%;
 	flow-children: right;
 }
 
@@ -1446,7 +1489,6 @@
 .LevelContainerChild {
 	align: left top;
 	flow-children: right;
-	margin-right:  15px;
 	margin-top: 1px;
 }
 

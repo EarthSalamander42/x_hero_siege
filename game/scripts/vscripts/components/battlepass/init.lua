@@ -11,8 +11,8 @@ ListenToGameEvent('game_rules_state_change', function(keys)
 		require('components/battlepass/donator_settings')
 		require('components/battlepass/donator')
 		require('components/battlepass/experience')
-		require('libraries/wearables') -- this lib before items_game
-		require('components/battlepass/keyvalues/items_game')
+		-- require('libraries/wearables') -- this lib before items_game
+		-- require('components/battlepass/keyvalues/items_game')
 
 		if CUSTOM_GAME_TYPE ~= "IMBA" and CUSTOM_GAME_TYPE ~= "PLS" then
 			require('components/battlepass/' .. CUSTOM_GAME_TYPE .. '_rewards')

@@ -345,6 +345,35 @@ function SwitchTab(tab) {
 	}
 }
 
+function SwitchBattlepassWrapper(type) {
+	if (current_sub_tab == type) {
+		//		$.Msg("Bro don't reload you're fine!");
+		return;
+	}
+
+	current_sub_tab = type;
+
+	var BattlepassInfoContainer = $("#BattlepassInfoContainer");
+
+	for (var i = 1; i < BattlepassInfoContainer.GetChildCount(); i++) {
+		var child = BattlepassInfoContainer.GetChild(i);
+		child.style.visibility = "collapse";
+	}
+
+	var Buttons = $("#MiniTabButtonContainer");
+
+	for (var i = 0; i < Buttons.GetChildCount(); i++) {
+		var child = Buttons.GetChild(i);
+		child.RemoveClass('active');
+	}
+
+	$.Msg(type + "TableWrapper");
+	$("#" + type + "TableWrapper").style.visibility = "visible";
+	$("#" + type + "TabButton").AddClass('active');
+
+	// $('#BattlepassTabTitle').text = $.Localize("#donator_" + type.toLowerCase() + "_wrapper_label").toUpperCase();
+}
+
 function SwitchDonatorWrapper(type) {
 	if (current_sub_tab == type) {
 		//		$.Msg("Bro don't reload you're fine!");
@@ -432,7 +461,7 @@ function Battlepass(retainSubTab, bRewardsDisabled) {
 	var BP_REWARDS_3 = BubbleSortByElement(BP_REWARDS, "level");
 
 	GenerateBattlepassPanel(BP_REWARDS_3, $("#BattlepassRewardRowFree"), bRewardsDisabled);
-	GenerateBattlepassPanel(BP_REWARDS_3, $("#BattlepassRewardRowPremium"), bRewardsDisabled);
+	GenerateBattlepassPanel(BP_REWARDS_3, $("#BattlepassRewardRowPremiumContainer"), bRewardsDisabled);
 
 	var companions = CustomNetTables.GetTableValue("battlepass_player", "companions");
 	if (companions != undefined)
@@ -927,7 +956,7 @@ function SafeToLeave() {
 }
 
 function GenerateBattlepassPanel(reward_list, reward_row, bRewardsDisabled) {
-	$.Msg("GenerateBattlepassPanel: " + reward_row.id);
+	// $.Msg("GenerateBattlepassPanel: " + reward_row.id);
 	const player = Players.GetLocalPlayer();
 	var plyData = CustomNetTables.GetTableValue("battlepass_player", player);
 	var player_avatar = $("#PlayerSteamAvatar");
@@ -936,9 +965,9 @@ function GenerateBattlepassPanel(reward_list, reward_row, bRewardsDisabled) {
 		player_avatar.steamid = Game.GetLocalPlayerInfo(player).player_steamid;
 
 	for (var i = 1; i <= 1000; i++) {
-		$.Msg("GenerateBattlepassPanel: " + reward_row.id + " - " + i);
+		// $.Msg("GenerateBattlepassPanel: " + reward_row.id + " - " + i);
 		if (reward_list[i] != undefined) {
-			$.Msg("GenerateBattlepassPanel: " + reward_row.id + " - " + i + " - " + reward_list[i].name);
+			// $.Msg("GenerateBattlepassPanel: " + reward_row.id + " - " + i + " - " + reward_list[i].name);
 			var bp_image = reward_list[i].image;
 			var bp_level = reward_list[i].level;
 			var bp_name = reward_list[i].name;
@@ -957,7 +986,7 @@ function GenerateBattlepassPanel(reward_list, reward_row, bRewardsDisabled) {
 			var reward_level_container;
 
 			if (!container_level) {
-				$.Msg("Create reward container for level " + bp_level + " in " + reward_row.id + "")
+				// $.Msg("Create reward container for level " + bp_level + " in " + reward_row.id + "")
 				container_level = $.CreatePanel("Panel", reward_row, "container_level_" + bp_level);
 				container_level.AddClass("ContainerLevel");
 
@@ -1045,17 +1074,21 @@ function GenerateBattlepassPanel(reward_list, reward_row, bRewardsDisabled) {
 					} else {
 						reward.AddClass("BattlepassRewardIcon_locked")
 						reward.FindChildTraverse("BattlepassRewardTitle").AddClass("BattlepassRewardLabelLocked");
-						reward.FindChildTraverse("BattlepassRewardTitle").text = $.Localize("#battlepass_reward_locked") + $.Localize("#battlepass_" + bp_type) + ": " + $.Localize("#" + bp_name);
+						reward.FindChildTraverse("BattlepassRewardTitle").text = $.Localize("#battlepass_" + bp_type) + ": " + $.Localize("#" + bp_name);
+						reward.FindChildTraverse("BattlepassRewardImageLabel").text = $.Localize("#battlepass_reward_locked");
 					}
 				} else {
 					reward.AddClass("BattlepassRewardIcon_unreleased")
 					reward.FindChildTraverse("BattlepassRewardTitle").AddClass("BattlepassRewardLabelUnreleased");
-					reward.FindChildTraverse("BattlepassRewardTitle").text = $.Localize("#battlepass_reward_unreleased") + $.Localize("#battlepass_" + bp_type) + ": " + $.Localize("#" + bp_name);
+					reward.FindChildTraverse("BattlepassRewardTitle").text = $.Localize("#battlepass_" + bp_type) + ": " + $.Localize("#" + bp_name);
+					reward.FindChildTraverse("BattlepassRewardImageLabel").text = $.Localize("#battlepass_reward_unreleased");
+
 				}
 			} else {
 				reward.AddClass("BattlepassRewardIcon_locked")
 				reward.FindChildTraverse("BattlepassRewardTitle").AddClass("BattlepassRewardLabelLocked");
-				reward.FindChildTraverse("BattlepassRewardTitle").text = $.Localize("#battlepass_reward_locked") + $.Localize("#battlepass_" + bp_type) + ": " + $.Localize("#" + bp_name);
+				reward.FindChildTraverse("BattlepassRewardTitle").text = $.Localize("#battlepass_" + bp_type) + ": " + $.Localize("#" + bp_name);
+				reward.FindChildTraverse("BattlepassRewardImageLabel").text = $.Localize("#battlepass_reward_locked");
 			}
 
 			if (reward.FindChildTraverse("BattlepassRewardRarity")) {
@@ -1449,6 +1482,10 @@ function SetupPanel() {
 		if (ply_table.winrate_toggle)
 			$("#WinrateCheckBox").checked = ply_table.winrate_toggle;
 	}
+
+	MiniTabButtonContainer.GetChild(0).AddClass('active');
+	MiniTabButtonContainer2.GetChild(0).AddClass('active');
+	MiniTabButtonContainer3.GetChild(0).AddClass('active');
 }
 
 function CreateBattlepassButton() {
@@ -1476,6 +1513,25 @@ function CreateBattlepassButton() {
 		$.DispatchEvent("UIHideTextTooltip", BattlepassButton);
 	})
 	BattlepassButton.SetParent(Parent);
+}
+
+function OpenWhalepass() {
+	const bp_player = CustomNetTables.GetTableValue("battlepass_player", Players.GetLocalPlayer());
+
+	if (bp_player) {
+		$.Msg("Battlepass player info available");
+		$.Msg(bp_player);
+		const whalepass_url = bp_player.whalepass_url;
+
+		if (whalepass_url) {
+			$.Msg("Opening Whalepass: " + whalepass_url);
+			$.DispatchEvent('ExternalBrowserGoToURL', whalepass_url);
+		} else {
+			$.Msg("Whalepass URL not available");
+		}
+	} else {
+		$.Msg("Battlepass player info not available");
+	}
 }
 
 (function () {

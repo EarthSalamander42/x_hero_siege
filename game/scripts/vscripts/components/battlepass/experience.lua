@@ -1,33 +1,33 @@
 -- Experience System
-CustomNetTables:SetTableValue("game_options", "game_count", {value = 1})
+CustomNetTables:SetTableValue("game_options", "game_count", { value = 1 })
 
 function Battlepass:GetTitleColorXP(title)
 	if title == "Rookie" then
-		return {255, 255, 255}
+		return { 255, 255, 255 }
 	elseif title == "Amateur" then
-		return {102, 204, 0}
+		return { 102, 204, 0 }
 	elseif title == "Captain" then
-		return {76, 139, 202}
+		return { 76, 139, 202 }
 	elseif title == "Warrior" then
-		return {0, 76, 153}
+		return { 0, 76, 153 }
 	elseif title == "Commander" then
-		return {152, 95, 209}
+		return { 152, 95, 209 }
 	elseif title == "General" then
-		return {70, 5, 135}
+		return { 70, 5, 135 }
 	elseif title == "Master" then
-		return {250, 83, 83}
+		return { 250, 83, 83 }
 	elseif title == "Epic" then
-		return {142, 12, 12}
+		return { 142, 12, 12 }
 	elseif title == "Legendary" then
-		return {239, 188, 20}
+		return { 239, 188, 20 }
 	elseif title == "Ancient" then
-		return {191, 149, 13}
+		return { 191, 149, 13 }
 	elseif title == "Amphibian" then
-		return {0, 0, 102}
+		return { 0, 0, 102 }
 	elseif title == "Icefrog" then
-		return {20, 86, 239}
+		return { 20, 86, 239 }
 	else -- it's Firetoaaaaaaaaaaad!
-		return {199, 81, 2}
+		return { 199, 81, 2 }
 	end
 end
 
@@ -45,11 +45,11 @@ function Battlepass:GetPlayerInfoXP() -- yet it has too much useless loops, form
 
 	local current_xp_in_level = {}
 
-	for player_id = 0, PlayerResource:GetPlayerCount() -1 do
+	for player_id = 0, PlayerResource:GetPlayerCount() - 1 do
 		local steamid = tostring(PlayerResource:GetSteamID(player_id))
 
 		if api.players[steamid] then
---			print("Player XP:", api.players[steamid].xp_in_level, api.players[steamid].xp_next_level, api.players[steamid].xp_level)
+			--			print("Player XP:", api.players[steamid].xp_in_level, api.players[steamid].xp_next_level, api.players[steamid].xp_level)
 
 			local color = PLAYER_COLORS[player_id]
 
@@ -61,8 +61,7 @@ function Battlepass:GetPlayerInfoXP() -- yet it has too much useless loops, form
 				donator_color = DONATOR_COLOR[0]
 			end
 
-			CustomNetTables:SetTableValue("battlepass_player", tostring(player_id),
-			{
+			CustomNetTables:SetTableValue("battlepass_player", tostring(player_id), {
 				XP = api.players[steamid].xp_in_level,
 				MaxXP = api.players[steamid].xp_next_level,
 				Lvl = api.players[steamid].xp_level,
@@ -78,8 +77,9 @@ function Battlepass:GetPlayerInfoXP() -- yet it has too much useless loops, form
 				winrate_toggle = api:GetPlayerWinrateShown(player_id),
 				XP_change = 0,
 				ingame_tag = api:GetPlayerIngameTag(player_id),
---				mmr = api:GetPlayerMMR(player_id),
---				mmr_title = api:GetPlayerRankMMR(player_id),
+				whalepass_url = api:GetPlayerWhalepassURL(player_id),
+				--				mmr = api:GetPlayerMMR(player_id),
+				--				mmr_title = api:GetPlayerRankMMR(player_id),
 			})
 		end
 	end

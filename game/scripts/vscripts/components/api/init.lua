@@ -679,9 +679,20 @@ end
 
 function api:RegisterGame(callback)
 	self:Request("game-register", function(data)
-		-- if IsInToolsMode() then
-		-- print(data.emblems)
-		-- end
+		if IsInToolsMode() then
+			for k, v in pairs(data.players) do
+				print("Player SteamID: " .. k)
+				print("Whalepass:")
+
+				if v.whalepass and v.whalepass[1] then
+					for i, j in pairs(v.whalepass[1]) do
+						print(i, j)
+					end
+				end
+			end
+			-- print(data.players)
+			-- print(data.whalepass)
+		end
 
 		api.game_id = tonumber(data.game_id)
 		api.players = data.players
@@ -1056,6 +1067,27 @@ function api:GetGameModeLeaderboard(iRound, iMaxRound)
 	end, "POST", {
 		round_range = iRound,
 	})
+end
+
+function api:GetPlayerWhalepassURL(player_id)
+	if not PlayerResource:IsValidPlayerID(player_id) then
+		native_print("api:GetPlayerWhalepassURL: Player ID not valid!")
+		return false
+	end
+
+	local steamid = tostring(PlayerResource:GetSteamID(player_id))
+
+	-- if the game isnt registered yet, we have no way to know if the player is a donator
+	if self.players == nil then
+		return false
+	end
+
+	if self.players[steamid] ~= nil then
+		return self.players[steamid].whalepass_url
+	else
+		native_print("api:GetPlayerWhalepassURL: api players steamid not valid!")
+		return false
+	end
 end
 
 api:Init()
