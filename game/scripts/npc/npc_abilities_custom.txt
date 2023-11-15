@@ -5617,7 +5617,6 @@
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
-		"AbilityUnitTargetFlags"		"DOTA_UNIT_TARGET_FLAG_RANGED_ONLY"
 
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
@@ -9671,7 +9670,6 @@
 		"AbilityCastRange"			"900"
 		"AbilityTextureName"		"custom/holdout_light_roar"
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
-		"AbilityUnitTargetFlags"	"DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ALLIES"
 
 		// Special
 		//-------------------------------------------------------------------------------------
@@ -9718,7 +9716,6 @@
 					"Radius"		"%radius"
 					"Teams"			"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
 					"Types"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
-					"Flags"			"DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ALLIES"
 				}
 			}
 
@@ -12185,7 +12182,7 @@
 				"Aura_Radius"       "%aura_radius"
 				"Aura_Teams"        "DOTA_UNIT_TARGET_TEAM_FRIENDLY"
 				"Aura_Types"        "DOTA_UNIT_TARGET_HERO"
-				"Aura_Flags"		"DOTA_UNIT_TARGET_FLAG_INVULNERABLE | DOTA_UNIT_TARGET_FLAG_RANGED_ONLY"
+				"Aura_Flags"		"DOTA_UNIT_TARGET_FLAG_INVULNERABLE"
 			}
 
 			"modifier_distance_aura_hidden"
@@ -12290,7 +12287,6 @@
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
-		"AbilityUnitTargetFlags"		"DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ALLIES"
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_YES"
 		"MaxLevel"						"1"
 

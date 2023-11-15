@@ -432,7 +432,7 @@ function BubbleSortByElement(t, element_name) {
 function Battlepass(retainSubTab, bRewardsDisabled) {
 	if (typeof retainSubTab == "undefined") { retainSubTab = false; };
 
-	HallOfFame("Experience", null, 1); // init leaderboard on round 1 records
+	PlayerQuests();
 	MiniTabButtonContainer.style.visibility = "visible";
 
 	var BP_REWARDS = CustomNetTables.GetTableValue("battlepass_js_builder", "rewards");
@@ -777,178 +777,6 @@ function SpecialBubbleSortByElement(t, array_name, element_name) {
 	}
 
 	return t;
-}
-
-var current_type = "";
-function HallOfFame(type, retainSubTab, iRoundCount) {
-	if (!retainSubTab) {
-		SwitchLeaderboardWrapper(type);
-	}
-
-	$("#ExperienceTops").RemoveAndDeleteChildren();
-
-	var plyData = CustomNetTables.GetTableValue("battlepass_player", Players.GetLocalPlayer());
-	var top_users = undefined;
-	var iterations = 100;
-
-	//	$.Msg(plyData);
-
-	if (iRoundCount) {
-		current_leaderboard_round = current_leaderboard_round + iRoundCount;
-
-		var max_rounds = CustomNetTables.GetTableValue("game_options", "max_rounds");
-		if (max_rounds && max_rounds["1"]) max_rounds == max_rounds["1"]
-
-		if (current_leaderboard_round > max_rounds)
-			current_leaderboard_round = 1;
-		else if (current_leaderboard_round <= 0)
-			current_leaderboard_round = max_rounds;
-	}
-
-	$("#RoundOrderLabel").text = "Round " + current_leaderboard_round;
-
-	if (type == "Donator") {
-		top_users = CustomNetTables.GetTableValue("game_options", "leaderboard_donator");
-	} else if (type == "Winrate") {
-		top_users = top_winrate;
-	} else if (type == "Diretide") {
-		top_users = CustomNetTables.GetTableValue("game_options", "leaderboard_diretide");
-		iterations = 10;
-	} else if (type == "Experience" && game_type == "PLS") {
-		top_users = CustomNetTables.GetTableValue("game_options", "olympiade_leaderboard");
-
-		if (top_users && top_users[current_leaderboard_round.toString()]) top_users = top_users[current_leaderboard_round.toString()];
-
-		top_users = SpecialBubbleSortByElement(top_users, "round_score", current_leaderboard_round.toString());
-	}
-
-	//	$.Msg(top_users);
-
-	if (top_users == undefined) {
-		$.Schedule(3.0, function () {
-			HallOfFame(type, retainSubTab, iRoundCount);
-		})
-
-		return;
-	}
-
-	for (var i in top_users) {
-		if (top_users === undefined) {
-			$.Msg("Top Players not defined...")
-			return;
-		}
-
-		var user_info = top_users[(i).toString()];
-		var top_id = parseInt(i) + 1;
-
-		//		$.Msg(user_info);
-
-		if (!user_info) {
-			$.Msg("Invalid user info. End loop");
-			return;
-		}
-
-		//		$.Msg(user_info)
-
-		var next_level_progress = user_info.next_level_progress || 0;
-		var xp_level = user_info.xp_level || 0;
-		var rank_title = user_info.rank_title || "Rookie";
-		var xp_in_level = user_info.xp_in_level || 0;
-		var xp_next_level = user_info.xp_next_level || 0;
-		var xp_total_for_level = user_info.xp_total_for_level || 500;
-
-		var player = $.CreatePanel("Panel", $('#' + type + 'Tops'), "player_" + top_id);
-		player.AddClass("LeaderboardGames");
-		var rank = $.CreatePanel("Label", player, "rank_" + top_id);
-		rank.AddClass("LeaderboardRank");
-		rank.text = top_id;
-
-		/*
-				if (local_rank && Game.GetLocalPlayerInfo().player_steamid == user_info.steamid) {
-					local_rank.text = top_id;
-				}
-		*/
-
-		var steam_id = $.CreatePanel("DOTAAvatarImage", player, "player_steamid_" + top_id);
-		steam_id.AddClass("LeaderboardAvatar");
-		steam_id.steamid = user_info.steamid;
-		steam_id.style.width = "38px";
-		steam_id.style.height = "38px";
-		steam_id.style.marginLeft = "40px";
-		steam_id.style.marginRight = "40px";
-		steam_id.style.align = "center center";
-
-		var leaderboard_border = [];
-		leaderboard_border[1] = "darkred"
-		leaderboard_border[2] = "red"
-		leaderboard_border[3] = "blue"
-		leaderboard_border[4] = "darkred"
-		leaderboard_border[5] = "gold"
-		leaderboard_border[6] = "green"
-		leaderboard_border[7] = "purple"
-		leaderboard_border[8] = "dodgerblue"
-		leaderboard_border[9] = "brown"
-
-		if (user_info.donator_status)
-			steam_id.style.border = "1px solid " + leaderboard_border[user_info.donator_status];
-		else
-			steam_id.style.border = "1px solid #3f464ecc";
-
-		var imbar_container = $.CreatePanel("Panel", player, "imbar_container_" + top_id);
-		imbar_container.AddClass("LeaderboardXP");
-		var imbar = $.CreatePanel("ProgressBar", imbar_container, "imbar_" + top_id);
-		imbar.AddClass("imbar-progress-bar");
-		var imbar_value = (parseFloat(xp_in_level - xp_next_level) / xp_next_level) + 1;
-		imbar.value = imbar_value;
-
-		var imbar_lvl = $.CreatePanel("Label", imbar_container, "imbar_lvl" + top_id);
-		imbar_lvl.AddClass("imbar-lvl");
-		imbar_lvl.text = "Level: " + xp_level;
-
-		var imbar_rank_wrapper = $.CreatePanel("Panel", imbar_container, "imbar_rank" + top_id);
-		imbar_rank_wrapper.AddClass("imbar-rank-wrapper");
-
-		var imbar_rank_circle = $.CreatePanel("Panel", imbar_rank_wrapper, "");
-		imbar_rank_circle.AddClass("imbar-rank-cicle");
-		imbar_rank_circle.style.backgroundColor = "white";
-		//		imbar_rank_circle.style.backgroundColor = user_info.title_color;
-
-		if (rank_title == "Icefrog")
-			rank_title += " " + (xp_level - 300);
-		else if (rank_title == "Firetoad")
-			rank_title += " " + (xp_level - 400);
-
-		var imbar_rank = $.CreatePanel("Label", imbar_rank_wrapper, "");
-		imbar_rank.AddClass("imbar-rank");
-		imbar_rank.text = rank_title;
-
-		var xp_text = {}
-		xp_text["Experience"] = xp_in_level + "/" + xp_total_for_level;
-		xp_text["Winrate"] = "Matches: " + user_info.total_matches;
-		xp_text["Donator"] = "";
-		xp_text["Diretide"] = "";
-
-		var imbar_xp = $.CreatePanel("Label", imbar_container, "imbar_xp" + top_id);
-		imbar_xp.AddClass("imbar-xp");
-		imbar_xp.text = xp_text[type];
-
-		var imr = $.CreatePanel("Label", player, "rank_" + top_id);
-		imr.AddClass("LeaderboardIMR");
-
-		// temporary
-		if (type == "Winrate") {
-			imr.text = user_info.win_percentage;
-		} else {
-			if (user_info.round_score[current_leaderboard_round]) {
-				var score = user_info.round_score[current_leaderboard_round];
-
-				if (current_leaderboard_round == 4)
-					imr.text = RawTimetoGameTime(score);
-				else
-					imr.text = score;
-			}
-		}
-	}
 }
 
 function SafeToLeave() {
@@ -1428,6 +1256,7 @@ function SwitchLeaderboardWrapper(type) {
 		MiniTabButtonContainer2.GetChild(i).RemoveClass("active");
 	}
 
+	$.Msg("Switching to " + type + " tab");
 	$("#Leaderboard" + type + "TableWrapper").style.visibility = "visible";
 	$("#Leaderboard" + type + "TabButton").AddClass('active');
 }
@@ -1531,6 +1360,31 @@ function OpenWhalepass() {
 		}
 	} else {
 		$.Msg("Battlepass player info not available");
+	}
+}
+
+function PlayerQuests() {
+	const remaining_points = 1000;
+
+	// $.GetContextPanel().FindChildrenWithClassTraverse("SeasonAchievementsTitle")[0].text = "Win up to " + remaining_points + " experience during " + bp_name + ".";
+	$.GetContextPanel().FindChildrenWithClassTraverse("SeasonAchievementsTitle")[0].SetDialogVariableInt("total_reward", 1000);
+	// $.GetContextPanel().FindChildrenWithClassTraverse("SeasonAchievementsTitle")[0].SetDialogVariable("shards_available", 1000);
+	$.GetContextPanel().FindChildrenWithClassTraverse("SeasonAchievementsProgress")[0].SetDialogVariableInt("quests_completed", 2);
+	$.GetContextPanel().FindChildrenWithClassTraverse("SeasonAchievementsProgress")[0].SetDialogVariableInt("quests_count", 10);
+	$.GetContextPanel().FindChildrenWithClassTraverse("SeasonAchievementsSubtitle")[0].text = "Winter 2023 Battle Pass";
+	// if (Game.IsInToolsMode()) {
+	// 	$("#LeaderboardExperienceTableWrapper").RemoveAndDeleteChildren();
+	// }
+
+	const parent = $("#CurrentSeasonQuestsList");
+
+	for (let i = 0; i < 10; i++) {
+		const quest = $.CreatePanel("Panel", parent, "");
+		quest.BLoadLayoutSnippet("PlusQuest");
+		// quest.FindChildTraverse("AchievementName").text = "Quest " + i;
+		// quest.FindChildTraverse("QuestDescription").text = "Quest " + i + " description";
+		// quest.FindChildTraverse("QuestReward").text = "Quest " + i + " reward";
+		// quest.FindChildTraverse("QuestReward").style.visibility = "collapse";
 	}
 }
 

@@ -2,6 +2,8 @@
 	<styles>
 		<include src="s2r://panorama/styles/dotastyles.vcss_c" />
 		<include src="file://{resources}/layout/custom_game/frostrose_battlepass/battlepass.css" />
+		<include src="file://{resources}/layout/custom_game/frostrose_battlepass/quests/dashboard_page_plus_achievements.css" />
+		<include src="file://{resources}/layout/custom_game/frostrose_battlepass/quests/plus_achievement.css" />
 	</styles>
 
 	<scripts>
@@ -49,6 +51,30 @@
 				</Panel>
 
 				<ProgressBar id="XPProgressBar" value="0.0" hittest="false"/>
+			</Panel>
+		</snippet>
+
+		<snippet name="PlusQuest">
+			<Image id="AchievementImage" scaling="stretch-to-fit-preserve-aspect" />
+
+			<Panel id="AchievementDetails">
+				<Label id="AchievementName" />
+				<Label id="AchievementProgress" text="{d:current_score}/{d:achievement_quantity}" />
+				<Panel id="CompletedCheckbox" />
+				<Panel id="CompletedCheckmark" />
+
+				<Panel id="RewardAmount">
+					<Panel class="DotaPlusCurrencyIcon" />
+					<Label class="MonoNumbersFont" text="{d:shard_rewards}" />
+				</Panel>
+
+				<Panel id="Tiers" />
+
+				<Button id="ClaimButton" class="DotaPlusBrightButton" onactivate="DOTAPlusAchievementClaimReward()">
+					<Label text="#DOTA_Claim" />
+					<Panel class="DotaPlusCurrencyIcon" />
+					<Label class="MonoNumbersFont" text="{d:shard_rewards}" />
+				</Button>
 			</Panel>
 		</snippet>
 	</snippets>
@@ -330,90 +356,22 @@
 			</Panel>
 
 			<Panel id="LeaderboardInfoContainer" hittest="false">
-				<Panel id="LeaderboardExperienceTableWrapper" class="LeaderboardTableWrapper" hittest="false">
-					<Panel id="Legend" class="LeaderboardLegend" hittest="false">
-						<Panel id="Rank" class="LeaderboardRank" onactivate="">
-							<Label id="RankLabel" class="LeaderboardButtonLabel" text="#leaderboard_rank" />
-						</Panel>
-						<Panel id="SteamAvatar" class="LeaderboardAvatar" onactivate="">
-							<Label id="SteamAvatarLabel" class="LeaderboardButtonLabel" text="#leaderboard_steam_avatar" />
-						</Panel>
-						<Panel id="XP" class="LeaderboardXP" onactivate="">
-							<Label class="LeaderboardButtonLabel" text="#leaderboard_xp" />
-						</Panel>
-						<Panel id="IMR" class="LeaderboardIMR" onactivate=";">
-							<Button id="RoundOrderLeft" class="LeaderboardArrowButton" onactivate='HallOfFame("Experience", null, -1)'/>
-
-							<Panel class="RoundOrder" onactivate=";">
-								<Label id="RoundOrderLabel" text="#leaderboard_value" />
+				<Panel id="LeaderboardExperienceTableWrapper" class="DotaPlusContainer">
+					<TabContents id="CurrentSeasonQuestsTabContents" class="AchievementTabContents SeasonTabContents" group="achievements_tab">
+						<Panel class="AchievementTabContentsHeader">
+							<Panel class="AchievementTabContentsHeaderLeft">
+								<Label class="SeasonAchievementsTitle" text="#DOTA_PlusSeason_Description" html="true" />
+								<Label class="SeasonAchievementsSubtitle" text="{s:current_season_subtitle}" />
 							</Panel>
-
-							<Button id="RoundOrderRight" class="LeaderboardArrowButton" onactivate='HallOfFame("Experience", null, 1)'/>
+							<Panel class="FillWidth" />
+							<Panel class="AchievementTabContentsHeaderRight">
+								<Label class="SeasonAchievementsProgress" text="#DOTA_QuestProgress" />
+								<Label class="SeasonAchievementsRewards" text="#DOTA_Plus_QuestRewardsAvailable" html="true" />
+								<Label class="SeasonAchievementsCompleted" text="#DOTA_QuestsComplete" />
+							</Panel>
 						</Panel>
-					</Panel>
-
-					<Panel id="ExperienceTops" class="Tops" hittest="false">
-						<!-- JS Inserts records here -->
-					</Panel>
-				</Panel>
-
-				<Panel id="LeaderboardDonatorTableWrapper" class="LeaderboardTableWrapper" hittest="false">
-					<Panel id="Legend" class="LeaderboardLegend" hittest="false">
-						<Button id="Rank" class="LeaderboardRank" onactivate="">
-							<Label id="Rank" class="LeaderboardRankLabel" text="#leaderboard_rank" />
-						</Button>
-						<Button id="SteamAvatar" class="LeaderboardAvatar" onactivate="">
-							<Label id="SteamAvatar" class="LeaderboardAvatarLabel" text="#leaderboard_steam_avatar" />
-						</Button>
-						<Button id="XP" class="LeaderboardXP" onactivate="">
-							<Label class="LeaderboardButtonLabel" text="#leaderboard_xp" />
-						</Button>
-						<Button id="IMR" class="LeaderboardIMR" onactivate="">
-							<Label class="LeaderboardButtonLabel" text="Winrate" />
-						</Button>
-					</Panel>
-
-					<Panel id="DonatorTops" class="Tops" hittest="false">
-						<!-- JS Inserts records here -->
-					</Panel>
-				</Panel>
-
-				<Panel id="LeaderboardWinrateTableWrapper" class="LeaderboardTableWrapper" hittest="false">
-					<Panel id="Legend" class="LeaderboardLegend" hittest="false">
-						<Label id="Rank" class="LeaderboardRank" text="#leaderboard_rank" />
-						<Label id="SteamAvatar" class="LeaderboardAvatar" text="#leaderboard_steam_avatar" />
-						<Button id="XP" class="LeaderboardXP" onactivate=";">
-							<Label class="LeaderboardButtonLabel" text="#leaderboard_xp" />
-						</Button>
-						<Button id="IMR" class="LeaderboardIMR" onactivate=";">
-							<Label class="LeaderboardButtonLabel" text="Winrate" />
-						</Button>
-					</Panel>
-
-					<Panel id="WinrateTops" class="Tops" hittest="false">
-						<!-- JS Inserts records here -->
-					</Panel>
-				</Panel>
-
-				<Panel id="LeaderboardDiretideTableWrapper" class="LeaderboardTableWrapper" hittest="false">
-					<Panel id="Legend" class="LeaderboardLegend" hittest="false">
-						<Label id="Rank" class="LeaderboardButtonLabel" text="#leaderboard_rank" />
-						<Button id="XP" class="LeaderboardXP" onactivate=";">
-							<Label class="LeaderboardButtonLabel" text="#leaderboard_steam_avatar" />
-						</Button>
-						<Button id="IMR" class="LeaderboardAvatarDiretide" onactivate=";">
-							<Label class="LeaderboardButtonLabel" text="Winrate" />
-						</Button>
-					</Panel>
-
-					<Panel id="DiretideTops" class="Tops" hittest="false">
-						<!-- JS Inserts records here -->
-					</Panel>
-				</Panel>
-
-				<Panel id="LocalPlayerInfoContainer" hittest="false">
-					<Panel id="LocalPlayerInfo" class="LeaderboardGames" hittest="false">
-					</Panel>
+						<Panel id="CurrentSeasonQuestsList" class="SeasonQuestsList" />
+					</TabContents>
 				</Panel>
 			</Panel>
 
