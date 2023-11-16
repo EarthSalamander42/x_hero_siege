@@ -43,8 +43,6 @@ function Battlepass:GetPlayerInfoXP() -- yet it has too much useless loops, form
 
 	print("API ready!")
 
-	local current_xp_in_level = {}
-
 	for player_id = 0, PlayerResource:GetPlayerCount() - 1 do
 		local steamid = tostring(PlayerResource:GetSteamID(player_id))
 
@@ -78,8 +76,9 @@ function Battlepass:GetPlayerInfoXP() -- yet it has too much useless loops, form
 				XP_change = 0,
 				ingame_tag = api:GetPlayerIngameTag(player_id),
 				whalepass_url = api:GetPlayerWhalepassURL(player_id),
-				--				mmr = api:GetPlayerMMR(player_id),
-				--				mmr_title = api:GetPlayerRankMMR(player_id),
+				achievements = api:GetPlayerAchievements(player_id),
+				-- mmr = api:GetPlayerMMR(player_id),
+				-- mmr_title = api:GetPlayerRankMMR(player_id),
 			})
 		end
 	end

@@ -128,7 +128,7 @@
 	"bp_reward_equip_description"		"Click to Equip/Unequip item"
 	"bp_reward_equip_success"		"Reward equipped: "
 	"bp_reward_unequip_success"		"Reward unequipped: "
-	"leaderboard"		"Leaderboard"
+	"leaderboard"		"Achievements"
 	"leaderboard_loading"		"Loading leaderboard, please wait"
 	"leaderboard_rank"		"Rank"
 	"leaderboard_steam_avatar"		"Steam"
@@ -161,10 +161,10 @@
 	"tutorial_roshan_01"		"If your castle's health drop below 40%, Muradin will defend it for a short time. Muradin is called once."
 	"developer_credits_title"		"DEVELOPERS"
 	"developer_credits_01"		"Current list of developers:"
-	"developer_credits_02"		"EarthSalamander (lead-developer), oaeide (backend) and Gafu Ji (backend)."
+	"developer_credits_02"		"EarthSalamander (lead-developer)."
 	"tutorial_credits_title"		"CONTRIBUTORS"
 	"tutorial_credits_01"		"These people have contributed throughout X Hero Siege development:"
-	"tutorial_credits_02"		"beast (alpha tester), Flotos (Dark and Light Fundamental custom icons), Mugiwara (custom icons pre-3.0), Sogat (Created X Hero Siege in Warcraft 3), Starboxx (Door models), Xero (custom icons post 3.0)."
+	"tutorial_credits_02"		"beast (alpha tester), Flotos (Dark and Light Fundamental custom icons), Gafu Ji (backend), Mugiwara (custom icons pre-3.0), oaeide (backend), Sogat (Created X Hero Siege in Warcraft 3), Starboxx (Door models), Xero (custom icons post 3.0)."
 	"tutorial_end"		"<font color='#FF7800'>HAVE FUN!</font>"
 
 	// ingame_advertize.txt

@@ -21,6 +21,10 @@ DOTAPlusAchievement{
   border-top: 1px solid #ffffff08;
   border-left: 1px solid #ffffff05;
   background-color: gradient( linear, 0% 100%, 0% 0%, from( dotaPlusGold&33 ), to( dotaPlusGold&66 ) );
+  background-image: url( "file://panorama/images/custom_game/achievements/wins_icon_png.png" );
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
  }
 
  #AchievementDetails{
@@ -36,7 +40,7 @@ DOTAPlusAchievement{
  #AchievementName{
 
   padding-top: 12px;
-  margin-left: 16px;
+  margin-left: 90px;
   font-size: 15px;
   color: #999;
   width: 260px;

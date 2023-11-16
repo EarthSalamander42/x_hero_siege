@@ -153,6 +153,7 @@
   flow-children: right-wrap;
   horizontal-align: center;
   width: 100%;
+  overflow: squish scroll;
  }
 
  @define seasonQuestListColumns: 3;
@@ -223,7 +224,14 @@
   letter-spacing: 2px;
   font-size: 24px;
   text-align: right;
-  horizontal-align: right;
+  horizontal-align: left;
+  margin-left: 3%;
+ }
+
+.SeasonAchievementsSpacer {
+
+  width: 40%;
+  height: 20px;
  }
 
  .SeasonAchievementsRewards{

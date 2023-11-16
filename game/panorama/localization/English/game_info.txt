@@ -27,10 +27,10 @@
 
 "developer_credits_title"			"DEVELOPERS"
 "developer_credits_01"				"Current list of developers:"
-"developer_credits_02"				"EarthSalamander (lead-developer), oaeide (backend) and Gafu Ji (backend)."
+"developer_credits_02"				"EarthSalamander (lead-developer)."
 
 "tutorial_credits_title"			"CONTRIBUTORS"
 "tutorial_credits_01"				"These people have contributed throughout X Hero Siege development:"
-"tutorial_credits_02"				"beast (alpha tester), Flotos (Dark and Light Fundamental custom icons), Mugiwara (custom icons pre-3.0), Sogat (Created X Hero Siege in Warcraft 3), Starboxx (Door models), Xero (custom icons post 3.0)."
+"tutorial_credits_02"				"beast (alpha tester), Flotos (Dark and Light Fundamental custom icons), Gafu Ji (backend), Mugiwara (custom icons pre-3.0), oaeide (backend), Sogat (Created X Hero Siege in Warcraft 3), Starboxx (Door models), Xero (custom icons post 3.0)."
 
 "tutorial_end"						"<font color='#FF7800'>HAVE FUN!</font>"

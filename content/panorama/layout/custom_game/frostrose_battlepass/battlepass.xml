@@ -55,26 +55,28 @@
 		</snippet>
 
 		<snippet name="PlusQuest">
-			<Image id="AchievementImage" scaling="stretch-to-fit-preserve-aspect" />
+			<Panel>
+				<Image id="AchievementImage" scaling="stretch-to-fit-preserve-aspect" />
 
-			<Panel id="AchievementDetails">
-				<Label id="AchievementName" />
-				<Label id="AchievementProgress" text="{d:current_score}/{d:achievement_quantity}" />
-				<Panel id="CompletedCheckbox" />
-				<Panel id="CompletedCheckmark" />
+				<Panel id="AchievementDetails">
+					<Label id="AchievementName" />
+					<Label id="AchievementProgress" text="{d:current_score}/{d:achievement_quantity}" />
+					<Panel id="CompletedCheckbox" />
+					<Panel id="CompletedCheckmark" />
 
-				<Panel id="RewardAmount">
-					<Panel class="DotaPlusCurrencyIcon" />
-					<Label class="MonoNumbersFont" text="{d:shard_rewards}" />
+					<Panel id="RewardAmount">
+						<Panel class="DotaPlusCurrencyIcon" />
+						<Label class="MonoNumbersFont" text="{d:shard_rewards}" />
+					</Panel>
+
+					<Panel id="Tiers" />
+
+					<Button id="ClaimButton" class="DotaPlusBrightButton" onactivate="DOTAPlusAchievementClaimReward()">
+						<Label text="#DOTA_Claim" />
+						<Panel class="DotaPlusCurrencyIcon" />
+						<Label class="MonoNumbersFont" text="{d:shard_rewards}" />
+					</Button>
 				</Panel>
-
-				<Panel id="Tiers" />
-
-				<Button id="ClaimButton" class="DotaPlusBrightButton" onactivate="DOTAPlusAchievementClaimReward()">
-					<Label text="#DOTA_Claim" />
-					<Panel class="DotaPlusCurrencyIcon" />
-					<Label class="MonoNumbersFont" text="{d:shard_rewards}" />
-				</Button>
 			</Panel>
 		</snippet>
 	</snippets>
@@ -301,39 +303,7 @@
 				<Panel id="TabTitlePanel">
 					<Label id="DonatorTabTitle" class="DonatorTabLabel" text="#donator_info" />
 				</Panel>
-<!--
-				<Panel id="PatreonTableWrapper" hittest="false">
-					<Panel id="Donator1" class="patreon_donator_row" hittest="false">
-						<Image src="file://{images}/custom_game/patreon/tiers/1.png" />
-						<Panel id="Donator1Center" class="patreon_donator_row_center" hittest="false">
-						</Panel>
-					</Panel>
-					<Panel id="Donator2" class="patreon_donator_row" hittest="false">
-						<Image src="file://{images}/custom_game/patreon/tiers/2.png" />
-					</Panel>
-					<Panel id="Donator3" class="patreon_donator_row" hittest="false">
-						<Image src="file://{images}/custom_game/patreon/tiers/3.png" />
-					</Panel>
-					<Panel id="Donator4" class="patreon_donator_row" hittest="false">
-						<Image src="file://{images}/custom_game/patreon/tiers/4.png" />
-					</Panel>
-					<Panel id="Donator5" class="patreon_donator_row" hittest="false">
-						<Image src="file://{images}/custom_game/patreon/tiers/5.jpg" />
-					</Panel>
-					<Panel id="Donator6" class="patreon_donator_row" hittest="false">
-						<Image src="file://{images}/custom_game/patreon/tiers/6.jpg" />
-					</Panel>
-					<Panel id="Donator7" class="patreon_donator_row" hittest="false">
-						<Image src="file://{images}/custom_game/patreon/tiers/7.png" />
-					</Panel>
-					<Panel id="Donator8" class="patreon_donator_row" hittest="false">
-						<Image src="file://{images}/custom_game/patreon/tiers/8.jpg" />
-					</Panel>
-					<Panel id="Donator9" class="patreon_donator_row" hittest="false">
-						<Image src="file://{images}/custom_game/patreon/tiers/9.png" />
-					</Panel>
-				</Panel>
--->
+
 				<Panel id="CompanionTableWrapper" hittest="false">
 					<!-- JS Inserts records here -->
 				</Panel>
@@ -359,17 +329,16 @@
 				<Panel id="LeaderboardExperienceTableWrapper" class="DotaPlusContainer">
 					<TabContents id="CurrentSeasonQuestsTabContents" class="AchievementTabContents SeasonTabContents" group="achievements_tab">
 						<Panel class="AchievementTabContentsHeader">
-							<Panel class="AchievementTabContentsHeaderLeft">
-								<Label class="SeasonAchievementsTitle" text="#DOTA_PlusSeason_Description" html="true" />
-								<Label class="SeasonAchievementsSubtitle" text="{s:current_season_subtitle}" />
-							</Panel>
 							<Panel class="FillWidth" />
+
 							<Panel class="AchievementTabContentsHeaderRight">
 								<Label class="SeasonAchievementsProgress" text="#DOTA_QuestProgress" />
+								<Panel class="SeasonAchievementsSpacer"/>
 								<Label class="SeasonAchievementsRewards" text="#DOTA_Plus_QuestRewardsAvailable" html="true" />
 								<Label class="SeasonAchievementsCompleted" text="#DOTA_QuestsComplete" />
 							</Panel>
 						</Panel>
+
 						<Panel id="CurrentSeasonQuestsList" class="SeasonQuestsList" />
 					</TabContents>
 				</Panel>

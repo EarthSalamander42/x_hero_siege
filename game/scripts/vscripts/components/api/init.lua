@@ -700,8 +700,16 @@ function api:RegisterGame(callback)
 		api.emblems = data.emblems or nil
 		api.disabled_heroes = data.disabled_heroes or nil
 
+		-- Whalepass
+		if data.whalepass and data.whalepass[1] then
+			api.whalepass = data.whalepass[1]
+		else
+			api.whalepass = nil
+		end
+
 		CustomNetTables:SetTableValue("battlepass_player", "companions", api.companions)
 		CustomNetTables:SetTableValue("battlepass_player", "emblems", api.emblems)
+		CustomNetTables:SetTableValue("battlepass_player", "whalepass", api.whalepass)
 
 		if callback ~= nil then
 			callback(data)
@@ -1086,6 +1094,27 @@ function api:GetPlayerWhalepassURL(player_id)
 		return self.players[steamid].whalepass_url
 	else
 		native_print("api:GetPlayerWhalepassURL: api players steamid not valid!")
+		return false
+	end
+end
+
+function api:GetPlayerAchievements(player_id)
+	if not PlayerResource:IsValidPlayerID(player_id) then
+		native_print("api:GetPlayerAchievements: Player ID not valid!")
+		return false
+	end
+
+	local steamid = tostring(PlayerResource:GetSteamID(player_id))
+
+	-- if the game isnt registered yet, we have no way to know if the player is a donator
+	if self.players == nil then
+		return false
+	end
+
+	if self.players[steamid] ~= nil then
+		return self.players[steamid].whalepass[1].challenges
+	else
+		native_print("api:GetPlayerAchievements: api players steamid not valid!")
 		return false
 	end
 end

@@ -1364,27 +1364,44 @@ function OpenWhalepass() {
 }
 
 function PlayerQuests() {
-	const remaining_points = 1000;
-
-	// $.GetContextPanel().FindChildrenWithClassTraverse("SeasonAchievementsTitle")[0].text = "Win up to " + remaining_points + " experience during " + bp_name + ".";
-	$.GetContextPanel().FindChildrenWithClassTraverse("SeasonAchievementsTitle")[0].SetDialogVariableInt("total_reward", 1000);
-	// $.GetContextPanel().FindChildrenWithClassTraverse("SeasonAchievementsTitle")[0].SetDialogVariable("shards_available", 1000);
-	$.GetContextPanel().FindChildrenWithClassTraverse("SeasonAchievementsProgress")[0].SetDialogVariableInt("quests_completed", 2);
-	$.GetContextPanel().FindChildrenWithClassTraverse("SeasonAchievementsProgress")[0].SetDialogVariableInt("quests_count", 10);
-	$.GetContextPanel().FindChildrenWithClassTraverse("SeasonAchievementsSubtitle")[0].text = "Winter 2023 Battle Pass";
-	// if (Game.IsInToolsMode()) {
-	// 	$("#LeaderboardExperienceTableWrapper").RemoveAndDeleteChildren();
-	// }
-
 	const parent = $("#CurrentSeasonQuestsList");
+	const bp_player = CustomNetTables.GetTableValue("battlepass_player", Players.GetLocalPlayer());
+	
+	if (Game.IsInToolsMode()) {
+		parent.RemoveAndDeleteChildren();
+	}
 
-	for (let i = 0; i < 10; i++) {
-		const quest = $.CreatePanel("Panel", parent, "");
-		quest.BLoadLayoutSnippet("PlusQuest");
-		// quest.FindChildTraverse("AchievementName").text = "Quest " + i;
-		// quest.FindChildTraverse("QuestDescription").text = "Quest " + i + " description";
-		// quest.FindChildTraverse("QuestReward").text = "Quest " + i + " reward";
-		// quest.FindChildTraverse("QuestReward").style.visibility = "collapse";
+	// $.Msg(bp_player.achievements);
+	if (bp_player && bp_player.achievements) {
+
+		let remaining_points = 0;
+		let remaining_quests = 0;
+		let quest_counter = 1;
+
+		while (bp_player.achievements[quest_counter.toString()]) {
+			const achievement = bp_player.achievements[quest_counter.toString()];
+			remaining_points += achievement.rewards["1"].amount;
+
+			const quest = $.CreatePanel("Panel", parent, "");
+			quest.BLoadLayoutSnippet("PlusQuest");
+			quest.FindChildTraverse("AchievementName").text = achievement.name;
+			quest.FindChildTraverse("RewardAmount").GetChild(1).text = achievement.rewards["1"].amount;
+
+			if (achievement.completed) {
+				quest.AddClass("AlreadyClaimed");
+				remaining_quests++;
+			}
+
+			quest_counter++;
+		}
+
+		// $.GetContextPanel().FindChildrenWithClassTraverse("SeasonAchievementsTitle")[0].text = "Win up to " + remaining_points + " experience during " + bp_name + ".";
+		$.GetContextPanel().FindChildrenWithClassTraverse("SeasonAchievementsRewards")[0].SetDialogVariableInt("shards_available", remaining_points);
+		$.GetContextPanel().FindChildrenWithClassTraverse("SeasonAchievementsProgress")[0].SetDialogVariableInt("quests_completed", remaining_quests);
+		$.GetContextPanel().FindChildrenWithClassTraverse("SeasonAchievementsProgress")[0].SetDialogVariableInt("quests_count", quest_counter - 1);
+		// if (Game.IsInToolsMode()) {
+		// 	$("#LeaderboardExperienceTableWrapper").RemoveAndDeleteChildren();
+		// }
 	}
 }
 
