@@ -203,16 +203,10 @@
 	padding: 10px;
 	transition-property: transform;
 	transition-duration: 0.3s;
-	transition-timing-function: ease-in;
 }
 
 #BattlepassWindow.setvisible {
-	visibility: visible;
 	transform: translate3d( 0, 0, 0px );
-}
-
-#BattlepassWindow.sethidden {
-	transform: translate3d( 100%, 0, 0px );
 }
 
 #InfoContent
@@ -1608,4 +1602,26 @@
 	width: 100%;
 	height: 100%;
 	flow-children: down;
+}
+
+.TopLabelsContainer {
+	width: 100%;
+	flow-children: down;
+}
+
+.TopLabel {
+	width: 100%;
+	flow-children: right;
+	font-size: 20px;
+}
+
+.TopLabelSmall {
+	width: 100%;
+	flow-children: right;
+	font-size: 12px;
+}
+
+.CompanionLocked {
+	saturation: 0.5;
+	brightness: 0.25;
 }

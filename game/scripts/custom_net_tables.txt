@@ -11,8 +11,8 @@
 		"battlepass",
 		"player_table",
 		"hero_selection",
-		"battlepass_js_builder",
-		"battlepass_js_builder_2",
+		"battlepass_js_free",
+		"battlepass_js_premium",
 		"battlepass_rewards",
 	]
 }

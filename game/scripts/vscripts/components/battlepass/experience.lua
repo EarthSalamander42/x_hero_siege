@@ -77,6 +77,7 @@ function Battlepass:GetPlayerInfoXP() -- yet it has too much useless loops, form
 				ingame_tag = api:GetPlayerIngameTag(player_id),
 				whalepass_url = api:GetPlayerWhalepassURL(player_id),
 				achievements = api:GetPlayerAchievements(player_id),
+				whalepass_xp = api:GetPlayerWhalepassXP(player_id),
 				-- mmr = api:GetPlayerMMR(player_id),
 				-- mmr_title = api:GetPlayerRankMMR(player_id),
 			})

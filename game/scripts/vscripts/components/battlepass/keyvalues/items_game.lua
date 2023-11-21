@@ -37,14 +37,11 @@ function ItemsGame:Init()
 	ItemsGame.battlepass2 = {}
 	ItemsGame.companions = {}
 
-	local count = 1
 	local bp_reward_table = {}
 	local bp_reward_table2 = {}
-	local nettable_limiter = 90
+	local count = 1
 
---	CustomNetTables:SetTableValue("battlepass_js_builder_limiter", "rewards", {nettable_limiter})
-
-	while ItemsGame.custom_kv[tostring(count)] and count < nettable_limiter do
+	while ItemsGame.custom_kv[tostring(count)] do
 		local itemKV = ItemsGame.custom_kv[tostring(count)]
 
 		if itemKV.item_type == "courier" then
@@ -54,31 +51,32 @@ function ItemsGame:Init()
 
 			table.insert(ItemsGame.companions, itemKV)
 		else
-			local reward_table = {}
-			reward_table.image = ItemsGame:GetItemImage(count)
-			reward_table.level = ItemsGame:GetItemUnlockLevel(count)
-			reward_table.name = ItemsGame:GetItemName(count)
-			reward_table.rarity = ItemsGame:GetItemRarity(count)
-			reward_table.type = ItemsGame:GetItemType(count)
-			reward_table.item_id = tostring(count)
-			reward_table.slot_id = ItemsGame:GetItemSlot(count)
-			reward_table.hero = ItemsGame:GetItemHero(count)
-			reward_table.item_unreleased = ItemsGame:GetItemReleaseState(count)
+			if ItemsGame:IsPremiumReward(count) == false then
+				local reward_table = {}
+				reward_table.image = ItemsGame:GetItemImage(count)
+				reward_table.level = ItemsGame:GetItemUnlockLevel(count)
+				reward_table.name = ItemsGame:GetItemName(count)
+				reward_table.rarity = ItemsGame:GetItemRarity(count)
+				reward_table.type = ItemsGame:GetItemType(count)
+				reward_table.item_id = tostring(count)
+				reward_table.slot_id = ItemsGame:GetItemSlot(count)
+				reward_table.hero = ItemsGame:GetItemHero(count)
+				reward_table.item_unreleased = ItemsGame:GetItemReleaseState(count)
 
-			table.insert(bp_reward_table, count, reward_table)
+				table.insert(bp_reward_table, reward_table)
+			end
 		end
 
 		count = count + 1
 	end
 
-	-- bubble sort by level
---	ItemsGame.battlepass = BubbleSortByElement(bp_reward_table, "level")
 	ItemsGame.battlepass = bp_reward_table
 
-	-- max nettable limit :(
-	CustomNetTables:SetTableValue("battlepass_js_builder", "rewards", {ItemsGame.battlepass})
+	CustomNetTables:SetTableValue("battlepass_js_free", "rewards", { ItemsGame.battlepass })
 
-	while ItemsGame.custom_kv[tostring(count)] and count >= nettable_limiter do
+	count = 1
+
+	while ItemsGame.custom_kv[tostring(count)] do
 		local itemKV = ItemsGame.custom_kv[tostring(count)]
 
 		if itemKV.item_type == "courier" then
@@ -88,27 +86,28 @@ function ItemsGame:Init()
 
 			table.insert(ItemsGame.companions, itemKV)
 		else
-			local reward_table = {}
-			reward_table.image = ItemsGame:GetItemImage(count)
-			reward_table.level = ItemsGame:GetItemUnlockLevel(count)
-			reward_table.name = ItemsGame:GetItemName(count)
-			reward_table.rarity = ItemsGame:GetItemRarity(count)
-			reward_table.type = ItemsGame:GetItemType(count)
-			reward_table.item_id = tostring(count)
-			reward_table.slot_id = ItemsGame:GetItemSlot(count)
-			reward_table.hero = ItemsGame:GetItemHero(count)
+			if ItemsGame:IsPremiumReward(count) then
+				local reward_table = {}
+				reward_table.image = ItemsGame:GetItemImage(count)
+				reward_table.level = ItemsGame:GetItemUnlockLevel(count)
+				reward_table.name = ItemsGame:GetItemName(count)
+				reward_table.rarity = ItemsGame:GetItemRarity(count)
+				reward_table.type = ItemsGame:GetItemType(count)
+				reward_table.item_id = tostring(count)
+				reward_table.slot_id = ItemsGame:GetItemSlot(count)
+				reward_table.hero = ItemsGame:GetItemHero(count)
 
-			table.insert(bp_reward_table2, count - (nettable_limiter - 1), reward_table)
+				table.insert(bp_reward_table2, reward_table)
+			end
 		end
 
 		count = count + 1
 	end
 
---	ItemsGame.battlepass2 = BubbleSortByElement(bp_reward_table2, "level")
 	ItemsGame.battlepass2 = bp_reward_table2
 
-	CustomNetTables:SetTableValue("battlepass_js_builder_2", "rewards", {ItemsGame.battlepass2})
-	CustomNetTables:SetTableValue("battlepass_player", "companions", {ItemsGame.companions})
+	CustomNetTables:SetTableValue("battlepass_js_premium", "rewards", { ItemsGame.battlepass2 })
+	CustomNetTables:SetTableValue("battlepass_player", "companions", { ItemsGame.companions })
 end
 
 function ItemsGame:GetItemKV(item_id)
@@ -256,5 +255,13 @@ function ItemsGame:GetItemCompanion(item_id)
 	return self:GetItemInfo(item_id, "companion") or {}
 end
 --]]
+
+function ItemsGame:IsPremiumReward(item_id)
+	if self:GetItemInfo(item_id, "premium") == 1 then
+		return true
+	end
+
+	return false
+end
 
 ItemsGame:Init()

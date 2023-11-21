@@ -222,8 +222,8 @@ function EndScoreboard(args) {
 			player_max_xp_in_level = 500;
 
 		// Comment me please
-//		if (Game.IsInToolsMode())
-//			var player_xp = 7800;
+		// if (Game.IsInToolsMode())
+		// 	var player_xp = 7800;
 
 		if (ply_table && ply_table.player_xp == 1) {
 			values.xp.rank.text = Math.floor(player_xp) + "/" + Math.floor(player_max_xp_in_level);
@@ -320,7 +320,7 @@ function CloseBottlepassReward(panel) {
 
 function CreateBattlepassRewardPanel(level, levelup_count) {
 	// $.Msg("Find reward for level: " + level);
-	var battlepass = CustomNetTables.GetTableValue("battlepass_js_builder", "rewards");
+	var battlepass = CustomNetTables.GetTableValue("battlepass_js_free", "rewards");
 	if (battlepass && battlepass["1"]) {
 		battlepass = battlepass["1"];
 	}

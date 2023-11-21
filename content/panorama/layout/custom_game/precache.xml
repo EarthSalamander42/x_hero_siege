@@ -48,6 +48,29 @@
 			<Image src="file://panorama/images/custom_game/battlepass/levelup2.png" hittest="false" />
 			<Image src="file://panorama/images/custom_game/battlepass/levelup3.png" hittest="false" />
 			<Image src="file://panorama/images/custom_game/battlepass/levelup4.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/levelup5.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/levelup6.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/levelup7.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/levelup8.png" hittest="false" />
+
+			<Image src="file://panorama/images/custom_game/battlepass/emblem_sunken.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/emblem_overgrown.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/emblem_divinity.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/emblem_aghanim.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/emblem_nemestice.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/emblem_diretide_red.png" hittest="false" />
+
+			<Image src="file://panorama/images/custom_game/battlepass/kill_effect_culling_blade.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/kill_effect_faceless_void.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/kill_effect_purple_smoke_free.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/kill_effect_purple_smoke.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/kill_effect_radiant_tower.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/kill_effect_razor.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/kill_effect_spectre_free.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/kill_effect_spectre.png" hittest="false" />
+
+			<Image src="file://panorama/images/custom_game/battlepass/kill_effect_rubick_free.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/kill_effect_rubick.png" hittest="false" />
 
 			<Image src="file://panorama/images/items/doom_artifact.png" hittest="false" />
 			<Image src="file://panorama/images/items/key_of_the_three_moons.png" hittest="false" />

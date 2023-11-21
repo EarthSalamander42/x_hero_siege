@@ -6,39 +6,39 @@
 	// BLINK EFFECTS
 	////////////////////////////////////////////////////////
 
-	"1" // Fall Major 2016
-	{
-		"item_id"					"16315" // this item is in a special bundle, informations can't be retrieved
-		"item_name"					"battlepass_teleport1"
-		"item_type"					"teleport"
-		"item_unlock_level"			"5"
-		"item_rarity"				"uncommon"
-		"image_inventory"			"custom_game/battlepass/teleport1" // USE GAMEPEDIA WEBM VIDEO
-		"used_by_heroes"			"teleport"
+	// "1" // TI 2014
+	// {
+	// 	"item_id"					"16315" // this item is in a special bundle, informations can't be retrieved
+	// 	"item_name"					"battlepass_teleport1"
+	// 	"item_type"					"teleport"
+	// 	"item_unlock_level"			"1"
+	// 	"item_rarity"				"uncommon"
+	// 	"image_inventory"			"custom_game/battlepass/teleport1" // USE GAMEPEDIA WEBM VIDEO
+	// 	"used_by_heroes"			"teleport"
 
-		"visuals"
-		{
-			"asset_modifier0"
-			{
-				"type"			"particle"
-				"asset"			"particles/items2_fx/teleport_start.vpcf"
-				"modifier"		"particles/econ/events/ti4/teleport_start_ti4.vpcf"
-			}
+	// 	"visuals"
+	// 	{
+	// 		"asset_modifier0"
+	// 		{
+	// 			"type"			"particle"
+	// 			"asset"			"particles/items2_fx/teleport_start.vpcf"
+	// 			"modifier"		"particles/econ/events/ti4/teleport_start_ti4.vpcf"
+	// 		}
 
-			"asset_modifier1"
-			{
-				"type"			"particle"
-				"asset"			"particles/items2_fx/teleport_end.vpcf"
-				"modifier"		"particles/econ/events/ti4/teleport_end_ti4.vpcf"
-			}
-		}
-	}
-	"2" // Fall Major 2016
+	// 		"asset_modifier1"
+	// 		{
+	// 			"type"			"particle"
+	// 			"asset"			"particles/items2_fx/teleport_end.vpcf"
+	// 			"modifier"		"particles/econ/events/ti4/teleport_end_ti4.vpcf"
+	// 		}
+	// 	}
+	// }
+	"1" // League
 	{
 		"item_id"					"16315" // this item is in a special bundle, informations can't be retrieved
 		"item_name"					"battlepass_teleport2"
 		"item_type"					"teleport"
-		"item_unlock_level"			"10"
+		"item_unlock_level"			"1"
 		"item_rarity"				"uncommon"
 		"image_inventory"			"custom_game/battlepass/teleport2" // USE GAMEPEDIA WEBM VIDEO
 		"used_by_heroes"			"teleport"
@@ -60,69 +60,70 @@
 			}
 		}
 	}
-	"3" // Fall Major 2016
-	{
-		"item_id"					"16315" // this item is in a special bundle, informations can't be retrieved
-		"item_name"					"battlepass_teleport3"
-		"item_type"					"teleport"
-		"item_unlock_level"			"15"
-		"item_rarity"				"uncommon"
-		"image_inventory"			"custom_game/battlepass/teleport3" // USE GAMEPEDIA WEBM VIDEO
-		"used_by_heroes"			"teleport"
+	// "3" // League: Bronze
+	// {
+	// 	"item_id"					"16315" // this item is in a special bundle, informations can't be retrieved
+	// 	"item_name"					"battlepass_teleport3"
+	// 	"item_type"					"teleport"
+	// 	"item_unlock_level"			"3"
+	// 	"item_rarity"				"uncommon"
+	// 	"image_inventory"			"custom_game/battlepass/teleport3" // USE GAMEPEDIA WEBM VIDEO
+	// 	"used_by_heroes"			"teleport"
 
-		"visuals"
-		{
-			"asset_modifier0"
-			{
-				"type"			"particle"
-				"asset"			"particles/items2_fx/teleport_start.vpcf"
-				"modifier"		"particles/econ/events/league_teleport_2014/teleport_start_league_bronze.vpcf"
-			}
+	// 	"visuals"
+	// 	{
+	// 		"asset_modifier0"
+	// 		{
+	// 			"type"			"particle"
+	// 			"asset"			"particles/items2_fx/teleport_start.vpcf"
+	// 			"modifier"		"particles/econ/events/league_teleport_2014/teleport_start_league_bronze.vpcf"
+	// 		}
 
-			"asset_modifier1"
-			{
-				"type"			"particle"
-				"asset"			"particles/items2_fx/teleport_end.vpcf"
-				"modifier"		"particles/econ/events/league_teleport_2014/teleport_end_league_bronze.vpcf"
-			}
-		}
-	}
-	"4" // Fall Major 2016
-	{
-		"item_id"					"16315" // this item is in a special bundle, informations can't be retrieved
-		"item_name"					"battlepass_teleport4"
-		"item_type"					"teleport"
-		"item_unlock_level"			"20"
-		"item_rarity"				"uncommon"
-		"image_inventory"			"custom_game/battlepass/teleport4" // USE GAMEPEDIA WEBM VIDEO
-		"used_by_heroes"			"teleport"
+	// 		"asset_modifier1"
+	// 		{
+	// 			"type"			"particle"
+	// 			"asset"			"particles/items2_fx/teleport_end.vpcf"
+	// 			"modifier"		"particles/econ/events/league_teleport_2014/teleport_end_league_bronze.vpcf"
+	// 		}
+	// 	}
+	// }
+	// "4" // League: Silver
+	// {
+	// 	"item_id"					"16315" // this item is in a special bundle, informations can't be retrieved
+	// 	"item_name"					"battlepass_teleport4"
+	// 	"item_type"					"teleport"
+	// 	"item_unlock_level"			"4"
+	// 	"item_rarity"				"uncommon"
+	// 	"image_inventory"			"custom_game/battlepass/teleport4" // USE GAMEPEDIA WEBM VIDEO
+	// 	"used_by_heroes"			"teleport"
 
-		"visuals"
-		{
-			"asset_modifier0"
-			{
-				"type"			"particle"
-				"asset"			"particles/items2_fx/teleport_start.vpcf"
-				"modifier"		"particles/econ/events/league_teleport_2014/teleport_start_league_silver.vpcf"
-			}
+	// 	"visuals"
+	// 	{
+	// 		"asset_modifier0"
+	// 		{
+	// 			"type"			"particle"
+	// 			"asset"			"particles/items2_fx/teleport_start.vpcf"
+	// 			"modifier"		"particles/econ/events/league_teleport_2014/teleport_start_league_silver.vpcf"
+	// 		}
 
-			"asset_modifier1"
-			{
-				"type"			"particle"
-				"asset"			"particles/items2_fx/teleport_end.vpcf"
-				"modifier"		"particles/econ/events/league_teleport_2014/teleport_end_league_silver.vpcf"
-			}
-		}
-	}
-	"5" // Fall Major 2016
+	// 		"asset_modifier1"
+	// 		{
+	// 			"type"			"particle"
+	// 			"asset"			"particles/items2_fx/teleport_end.vpcf"
+	// 			"modifier"		"particles/econ/events/league_teleport_2014/teleport_end_league_silver.vpcf"
+	// 		}
+	// 	}
+	// }
+	"2" // League: Gold
 	{
 		"item_id"					"16315" // this item is in a special bundle, informations can't be retrieved
 		"item_name"					"battlepass_teleport5"
 		"item_type"					"teleport"
-		"item_unlock_level"			"25"
+		"item_unlock_level"			"1"
 		"item_rarity"				"uncommon"
 		"image_inventory"			"custom_game/battlepass/teleport5" // USE GAMEPEDIA WEBM VIDEO
 		"used_by_heroes"			"teleport"
+		"premium"					"1"
 
 		"visuals"
 		{
@@ -141,12 +142,12 @@
 			}
 		}
 	}
-	"6" // Fall Major 2016
+	"3" // TI 2015: Level 1
 	{
 		"item_id"					"16315" // this item is in a special bundle, informations can't be retrieved
 		"item_name"					"battlepass_teleport6"
 		"item_type"					"teleport"
-		"item_unlock_level"			"30"
+		"item_unlock_level"			"2"
 		"item_rarity"				"uncommon"
 		"image_inventory"			"custom_game/battlepass/teleport6" // USE GAMEPEDIA WEBM VIDEO
 		"used_by_heroes"			"teleport"
@@ -168,15 +169,16 @@
 			}
 		}
 	}
-	"7" // Fall Major 2016
+	"4" // TI 2015: Level 2
 	{
 		"item_id"					"16315" // this item is in a special bundle, informations can't be retrieved
 		"item_name"					"battlepass_teleport7"
 		"item_type"					"teleport"
-		"item_unlock_level"			"35"
+		"item_unlock_level"			"2"
 		"item_rarity"				"uncommon"
 		"image_inventory"			"custom_game/battlepass/teleport7" // USE GAMEPEDIA WEBM VIDEO
 		"used_by_heroes"			"teleport"
+		"premium"					"1"
 
 		"visuals"
 		{
@@ -195,12 +197,12 @@
 			}
 		}
 	}
-	"8" // Fall Major 2016
+	"5" // Fall Season 2015: Level 1
 	{
 		"item_id"					"16315" // this item is in a special bundle, informations can't be retrieved
 		"item_name"					"battlepass_teleport8"
 		"item_type"					"teleport"
-		"item_unlock_level"			"40"
+		"item_unlock_level"			"3"
 		"item_rarity"				"uncommon"
 		"image_inventory"			"custom_game/battlepass/teleport8" // USE GAMEPEDIA WEBM VIDEO
 		"used_by_heroes"			"teleport"
@@ -222,15 +224,16 @@
 			}
 		}
 	}
-	"9" // Fall Major 2016
+	"6" // Fall Season 2015: Level 2
 	{
 		"item_id"					"16315" // this item is in a special bundle, informations can't be retrieved
 		"item_name"					"battlepass_teleport9"
 		"item_type"					"teleport"
-		"item_unlock_level"			"45"
+		"item_unlock_level"			"3"
 		"item_rarity"				"uncommon"
 		"image_inventory"			"custom_game/battlepass/teleport9" // USE GAMEPEDIA WEBM VIDEO
 		"used_by_heroes"			"teleport"
+		"premium"					"1"
 
 		"visuals"
 		{
@@ -249,12 +252,12 @@
 			}
 		}
 	}
-	"10" // Fall Major 2016
+	"7" // Winter 2016: Level 1
 	{
 		"item_id"					"16315" // this item is in a special bundle, informations can't be retrieved
 		"item_name"					"battlepass_teleport10"
 		"item_type"					"teleport"
-		"item_unlock_level"			"50"
+		"item_unlock_level"			"4"
 		"item_rarity"				"uncommon"
 		"image_inventory"			"custom_game/battlepass/teleport10" // USE GAMEPEDIA WEBM VIDEO
 		"used_by_heroes"			"teleport"
@@ -276,42 +279,44 @@
 			}
 		}
 	}
-	"11" // Fall Major 2016
-	{
-		"item_id"					"16315" // this item is in a special bundle, informations can't be retrieved
-		"item_name"					"battlepass_teleport11"
-		"item_type"					"teleport"
-		"item_unlock_level"			"55"
-		"item_rarity"				"uncommon"
-		"image_inventory"			"custom_game/battlepass/teleport11" // USE GAMEPEDIA WEBM VIDEO
-		"used_by_heroes"			"teleport"
+	// "8" // Winter 2016: Level 2
+	// {
+	// 	"item_id"					"16315" // this item is in a special bundle, informations can't be retrieved
+	// 	"item_name"					"battlepass_teleport11"
+	// 	"item_type"					"teleport"
+	// 	"item_unlock_level"			"4"
+	// 	"item_rarity"				"uncommon"
+	// 	"image_inventory"			"custom_game/battlepass/teleport11" // USE GAMEPEDIA WEBM VIDEO
+	// 	"used_by_heroes"			"teleport"
+	// 	"premium"					"1"
 
-		"visuals"
-		{
-			"asset_modifier0"
-			{
-				"type"			"particle"
-				"asset"			"particles/items2_fx/teleport_start.vpcf"
-				"modifier"		"particles/econ/events/fall_major_2016/teleport_start_fm06_lvl2.vpcf"
-			}
+	// 	"visuals"
+	// 	{
+	// 		"asset_modifier0"
+	// 		{
+	// 			"type"			"particle"
+	// 			"asset"			"particles/items2_fx/teleport_start.vpcf"
+	// 			"modifier"		"particles/econ/events/fall_major_2016/teleport_start_fm06_lvl2.vpcf"
+	// 		}
 
-			"asset_modifier1"
-			{
-				"type"			"particle"
-				"asset"			"particles/items2_fx/teleport_end.vpcf"
-				"modifier"		"particles/econ/events/fall_major_2016/teleport_end_fm06_lvl2.vpcf"
-			}
-		}
-	}
-	"12" // Fall Major 2016
+	// 		"asset_modifier1"
+	// 		{
+	// 			"type"			"particle"
+	// 			"asset"			"particles/items2_fx/teleport_end.vpcf"
+	// 			"modifier"		"particles/econ/events/fall_major_2016/teleport_end_fm06_lvl2.vpcf"
+	// 		}
+	// 	}
+	// }
+	"8" // Winter 2016: Level 3
 	{
 		"item_id"					"16315" // this item is in a special bundle, informations can't be retrieved
 		"item_name"					"battlepass_teleport12"
 		"item_type"					"teleport"
-		"item_unlock_level"			"60"
+		"item_unlock_level"			"4"
 		"item_rarity"				"uncommon"
 		"image_inventory"			"custom_game/battlepass/teleport12" // USE GAMEPEDIA WEBM VIDEO
 		"used_by_heroes"			"teleport"
+		"premium"					"1"
 
 		"visuals"
 		{
@@ -330,12 +335,12 @@
 			}
 		}
 	}
-	"13" // Fall Major 2016
+	"9" // TI 2016: Level 1
 	{
 		"item_id"					"16315" // this item is in a special bundle, informations can't be retrieved
 		"item_name"					"battlepass_teleport13"
 		"item_type"					"teleport"
-		"item_unlock_level"			"65"
+		"item_unlock_level"			"6"
 		"item_rarity"				"uncommon"
 		"image_inventory"			"custom_game/battlepass/teleport13" // USE GAMEPEDIA WEBM VIDEO
 		"used_by_heroes"			"teleport"
@@ -357,42 +362,44 @@
 			}
 		}
 	}
-	"14" // Fall Major 2016
-	{
-		"item_id"					"16315" // this item is in a special bundle, informations can't be retrieved
-		"item_name"					"battlepass_teleport14"
-		"item_type"					"teleport"
-		"item_unlock_level"			"70"
-		"item_rarity"				"uncommon"
-		"image_inventory"			"custom_game/battlepass/teleport14" // USE GAMEPEDIA WEBM VIDEO
-		"used_by_heroes"			"teleport"
+	// "10" // TI 2016: Level 2
+	// {
+	// 	"item_id"					"16315" // this item is in a special bundle, informations can't be retrieved
+	// 	"item_name"					"battlepass_teleport14"
+	// 	"item_type"					"teleport"
+	// 	"item_unlock_level"			"5"
+	// 	"item_rarity"				"uncommon"
+	// 	"image_inventory"			"custom_game/battlepass/teleport14" // USE GAMEPEDIA WEBM VIDEO
+	// 	"used_by_heroes"			"teleport"
+	// 	"premium"					"1"
 
-		"visuals"
-		{
-			"asset_modifier0"
-			{
-				"type"			"particle"
-				"asset"			"particles/items2_fx/teleport_start.vpcf"
-				"modifier"		"particles/econ/events/ti6/teleport_start_ti6_lvl2.vpcf"
-			}
+	// 	"visuals"
+	// 	{
+	// 		"asset_modifier0"
+	// 		{
+	// 			"type"			"particle"
+	// 			"asset"			"particles/items2_fx/teleport_start.vpcf"
+	// 			"modifier"		"particles/econ/events/ti6/teleport_start_ti6_lvl2.vpcf"
+	// 		}
 
-			"asset_modifier1"
-			{
-				"type"			"particle"
-				"asset"			"particles/items2_fx/teleport_end.vpcf"
-				"modifier"		"particles/econ/events/ti6/teleport_end_ti6_lvl2.vpcf"
-			}
-		}
-	}
-	"15" // Fall Major 2016
+	// 		"asset_modifier1"
+	// 		{
+	// 			"type"			"particle"
+	// 			"asset"			"particles/items2_fx/teleport_end.vpcf"
+	// 			"modifier"		"particles/econ/events/ti6/teleport_end_ti6_lvl2.vpcf"
+	// 		}
+	// 	}
+	// }
+	"10" // TI 2016: Level 3
 	{
 		"item_id"					"16315" // this item is in a special bundle, informations can't be retrieved
 		"item_name"					"battlepass_teleport15"
 		"item_type"					"teleport"
-		"item_unlock_level"			"75"
+		"item_unlock_level"			"6"
 		"item_rarity"				"uncommon"
 		"image_inventory"			"custom_game/battlepass/teleport15" // USE GAMEPEDIA WEBM VIDEO
 		"used_by_heroes"			"teleport"
+		"premium"					"1"
 
 		"visuals"
 		{
@@ -411,12 +418,12 @@
 			}
 		}
 	}
-	"16" // Fall Major 2016
+	"11" // Fall 2016: Level 1
 	{
 		"item_id"					"16315" // this item is in a special bundle, informations can't be retrieved
 		"item_name"					"battlepass_teleport16"
 		"item_type"					"teleport"
-		"item_unlock_level"			"80"
+		"item_unlock_level"			"7"
 		"item_rarity"				"uncommon"
 		"image_inventory"			"custom_game/battlepass/teleport16" // USE GAMEPEDIA WEBM VIDEO
 		"used_by_heroes"			"teleport"
@@ -438,42 +445,43 @@
 			}
 		}
 	}
-	"17" // Fall Major 2016
-	{
-		"item_id"					"16315" // this item is in a special bundle, informations can't be retrieved
-		"item_name"					"battlepass_teleport17"
-		"item_type"					"teleport"
-		"item_unlock_level"			"85"
-		"item_rarity"				"uncommon"
-		"image_inventory"			"custom_game/battlepass/teleport17" // USE GAMEPEDIA WEBM VIDEO
-		"used_by_heroes"			"teleport"
+	// "17" // Fall 2016: Level 2
+	// {
+	// 	"item_id"					"16315" // this item is in a special bundle, informations can't be retrieved
+	// 	"item_name"					"battlepass_teleport17"
+	// 	"item_type"					"teleport"
+	// 	"item_unlock_level"			"21"
+	// 	"item_rarity"				"uncommon"
+	// 	"image_inventory"			"custom_game/battlepass/teleport17" // USE GAMEPEDIA WEBM VIDEO
+	// 	"used_by_heroes"			"teleport"
 
-		"visuals"
-		{
-			"asset_modifier0"
-			{
-				"type"			"particle"
-				"asset"			"particles/items2_fx/teleport_start.vpcf"
-				"modifier"		"particles/econ/events/winter_major_2016/teleport_start_winter_major_2016_lvl2.vpcf"
-			}
+	// 	"visuals"
+	// 	{
+	// 		"asset_modifier0"
+	// 		{
+	// 			"type"			"particle"
+	// 			"asset"			"particles/items2_fx/teleport_start.vpcf"
+	// 			"modifier"		"particles/econ/events/winter_major_2016/teleport_start_winter_major_2016_lvl2.vpcf"
+	// 		}
 
-			"asset_modifier1"
-			{
-				"type"			"particle"
-				"asset"			"particles/items2_fx/teleport_end.vpcf"
-				"modifier"		"particles/econ/events/winter_major_2016/teleport_end_winter_major_2016_lvl2.vpcf"
-			}
-		}
-	}
-	"18" // Fall Major 2016
+	// 		"asset_modifier1"
+	// 		{
+	// 			"type"			"particle"
+	// 			"asset"			"particles/items2_fx/teleport_end.vpcf"
+	// 			"modifier"		"particles/econ/events/winter_major_2016/teleport_end_winter_major_2016_lvl2.vpcf"
+	// 		}
+	// 	}
+	// }
+	"12" // Fall 2016: Level 3
 	{
 		"item_id"					"16315" // this item is in a special bundle, informations can't be retrieved
 		"item_name"					"battlepass_teleport18"
 		"item_type"					"teleport"
-		"item_unlock_level"			"90"
+		"item_unlock_level"			"7"
 		"item_rarity"				"uncommon"
 		"image_inventory"			"custom_game/battlepass/teleport18" // USE GAMEPEDIA WEBM VIDEO
 		"used_by_heroes"			"teleport"
+		"premium"					"1"
 
 		"visuals"
 		{
@@ -492,12 +500,12 @@
 			}
 		}
 	}
-	"19" // Fall Major 2016
+	"13" // TI 2017: Level 1
 	{
 		"item_id"					"16315" // this item is in a special bundle, informations can't be retrieved
 		"item_name"					"battlepass_teleport19"
 		"item_type"					"teleport"
-		"item_unlock_level"			"95"
+		"item_unlock_level"			"8"
 		"item_rarity"				"uncommon"
 		"image_inventory"			"custom_game/battlepass/teleport19" // USE GAMEPEDIA WEBM VIDEO
 		"used_by_heroes"			"teleport"
@@ -519,42 +527,43 @@
 			}
 		}
 	}
-	"20" // Fall Major 2016
-	{
-		"item_id"					"16315" // this item is in a special bundle, informations can't be retrieved
-		"item_name"					"battlepass_teleport20"
-		"item_type"					"teleport"
-		"item_unlock_level"			"100"
-		"item_rarity"				"uncommon"
-		"image_inventory"			"custom_game/battlepass/teleport20" // USE GAMEPEDIA WEBM VIDEO
-		"used_by_heroes"			"teleport"
+	// "20" // TI 2017: Level 2
+	// {
+	// 	"item_id"					"16315" // this item is in a special bundle, informations can't be retrieved
+	// 	"item_name"					"battlepass_teleport20"
+	// 	"item_type"					"teleport"
+	// 	"item_unlock_level"			"24"
+	// 	"item_rarity"				"uncommon"
+	// 	"image_inventory"			"custom_game/battlepass/teleport20" // USE GAMEPEDIA WEBM VIDEO
+	// 	"used_by_heroes"			"teleport"
 
-		"visuals"
-		{
-			"asset_modifier0"
-			{
-				"type"			"particle"
-				"asset"			"particles/items2_fx/teleport_start.vpcf"
-				"modifier"		"particles/econ/events/ti7/teleport_start_ti7_lvl2.vpcf"
-			}
+	// 	"visuals"
+	// 	{
+	// 		"asset_modifier0"
+	// 		{
+	// 			"type"			"particle"
+	// 			"asset"			"particles/items2_fx/teleport_start.vpcf"
+	// 			"modifier"		"particles/econ/events/ti7/teleport_start_ti7_lvl2.vpcf"
+	// 		}
 
-			"asset_modifier1"
-			{
-				"type"			"particle"
-				"asset"			"particles/items2_fx/teleport_end.vpcf"
-				"modifier"		"particles/econ/events/ti7/teleport_end_ti7_lvl2.vpcf"
-			}
-		}
-	}
-	"21" // Fall Major 2016
+	// 		"asset_modifier1"
+	// 		{
+	// 			"type"			"particle"
+	// 			"asset"			"particles/items2_fx/teleport_end.vpcf"
+	// 			"modifier"		"particles/econ/events/ti7/teleport_end_ti7_lvl2.vpcf"
+	// 		}
+	// 	}
+	// }
+	"14" // TI 2017: Level 3
 	{
 		"item_id"					"16315" // this item is in a special bundle, informations can't be retrieved
 		"item_name"					"battlepass_teleport21"
 		"item_type"					"teleport"
-		"item_unlock_level"			"105"
+		"item_unlock_level"			"8"
 		"item_rarity"				"uncommon"
 		"image_inventory"			"custom_game/battlepass/teleport21" // USE GAMEPEDIA WEBM VIDEO
 		"used_by_heroes"			"teleport"
+		"premium"					"1"
 
 		"visuals"
 		{
@@ -573,12 +582,12 @@
 			}
 		}
 	}
-	"22" // Fall Major 2016
+	"15" // TI 2018: Level 1
 	{
 		"item_id"					"16315" // this item is in a special bundle, informations can't be retrieved
 		"item_name"					"battlepass_teleport22"
 		"item_type"					"teleport"
-		"item_unlock_level"			"110"
+		"item_unlock_level"			"9"
 		"item_rarity"				"uncommon"
 		"image_inventory"			"custom_game/battlepass/teleport22" // USE GAMEPEDIA WEBM VIDEO
 		"used_by_heroes"			"teleport"
@@ -600,42 +609,43 @@
 			}
 		}
 	}
-	"23" // Fall Major 2016
-	{
-		"item_id"					"16315" // this item is in a special bundle, informations can't be retrieved
-		"item_name"					"battlepass_teleport23"
-		"item_type"					"teleport"
-		"item_unlock_level"			"115"
-		"item_rarity"				"uncommon"
-		"image_inventory"			"custom_game/battlepass/teleport23" // USE GAMEPEDIA WEBM VIDEO
-		"used_by_heroes"			"teleport"
+	// "23" // TI 2018: Level 2
+	// {
+	// 	"item_id"					"16315" // this item is in a special bundle, informations can't be retrieved
+	// 	"item_name"					"battlepass_teleport23"
+	// 	"item_type"					"teleport"
+	// 	"item_unlock_level"			"28"
+	// 	"item_rarity"				"uncommon"
+	// 	"image_inventory"			"custom_game/battlepass/teleport23" // USE GAMEPEDIA WEBM VIDEO
+	// 	"used_by_heroes"			"teleport"
 
-		"visuals"
-		{
-			"asset_modifier0"
-			{
-				"type"			"particle"
-				"asset"			"particles/items2_fx/teleport_start.vpcf"
-				"modifier"		"particles/econ/events/ti8/teleport_start_ti8_lvl2.vpcf"
-			}
+	// 	"visuals"
+	// 	{
+	// 		"asset_modifier0"
+	// 		{
+	// 			"type"			"particle"
+	// 			"asset"			"particles/items2_fx/teleport_start.vpcf"
+	// 			"modifier"		"particles/econ/events/ti8/teleport_start_ti8_lvl2.vpcf"
+	// 		}
 
-			"asset_modifier1"
-			{
-				"type"			"particle"
-				"asset"			"particles/items2_fx/teleport_end.vpcf"
-				"modifier"		"particles/econ/events/ti8/teleport_end_ti8_lvl2.vpcf"
-			}
-		}
-	}
-	"24" // Fall Major 2016
+	// 		"asset_modifier1"
+	// 		{
+	// 			"type"			"particle"
+	// 			"asset"			"particles/items2_fx/teleport_end.vpcf"
+	// 			"modifier"		"particles/econ/events/ti8/teleport_end_ti8_lvl2.vpcf"
+	// 		}
+	// 	}
+	// }
+	"16" // TI 2018: Level 3
 	{
 		"item_id"					"16315" // this item is in a special bundle, informations can't be retrieved
 		"item_name"					"battlepass_teleport24"
 		"item_type"					"teleport"
-		"item_unlock_level"			"120"
+		"item_unlock_level"			"9"
 		"item_rarity"				"uncommon"
 		"image_inventory"			"custom_game/battlepass/teleport24" // USE GAMEPEDIA WEBM VIDEO
 		"used_by_heroes"			"teleport"
+		"premium"					"1"
 
 		"visuals"
 		{
@@ -654,97 +664,97 @@
 			}
 		}
 	}
-	"25" // Fall Major 2016
-	{
-		"item_id"					"16315" // this item is in a special bundle, informations can't be retrieved
-		"item_name"					"battlepass_teleport25"
-		"item_type"					"teleport"
-		"item_unlock_level"			"125"
-		"item_rarity"				"uncommon"
-		"image_inventory"			"custom_game/battlepass/teleport25" // USE GAMEPEDIA WEBM VIDEO
-		"used_by_heroes"			"teleport"
+	// "25" // TI 2019: Level 1
+	// {
+	// 	"item_id"					"16315" // this item is in a special bundle, informations can't be retrieved
+	// 	"item_name"					"battlepass_teleport25"
+	// 	"item_type"					"teleport"
+	// 	"item_unlock_level"			"31"
+	// 	"item_rarity"				"uncommon"
+	// 	"image_inventory"			"custom_game/battlepass/teleport25" // USE GAMEPEDIA WEBM VIDEO
+	// 	"used_by_heroes"			"teleport"
 
-		"visuals"
-		{
-			"asset_modifier0"
-			{
-				"type"			"particle"
-				"asset"			"particles/items2_fx/teleport_start.vpcf"
-				"modifier"		"particles/econ/events/ti9/teleport_start_ti9.vpcf"
-			}
+	// 	"visuals"
+	// 	{
+	// 		"asset_modifier0"
+	// 		{
+	// 			"type"			"particle"
+	// 			"asset"			"particles/items2_fx/teleport_start.vpcf"
+	// 			"modifier"		"particles/econ/events/ti9/teleport_start_ti9.vpcf"
+	// 		}
 
-			"asset_modifier1"
-			{
-				"type"			"particle"
-				"asset"			"particles/items2_fx/teleport_end.vpcf"
-				"modifier"		"particles/econ/events/ti9/teleport_end_ti9.vpcf"
-			}
-		}
-	}
-	"26" // Fall Major 2016
-	{
-		"item_id"					"16315" // this item is in a special bundle, informations can't be retrieved
-		"item_name"					"battlepass_teleport26"
-		"item_type"					"teleport"
-		"item_unlock_level"			"130"
-		"item_rarity"				"uncommon"
-		"image_inventory"			"custom_game/battlepass/teleport26" // USE GAMEPEDIA WEBM VIDEO
-		"used_by_heroes"			"teleport"
+	// 		"asset_modifier1"
+	// 		{
+	// 			"type"			"particle"
+	// 			"asset"			"particles/items2_fx/teleport_end.vpcf"
+	// 			"modifier"		"particles/econ/events/ti9/teleport_end_ti9.vpcf"
+	// 		}
+	// 	}
+	// }
+	// "26" // TI 2019: Level 2
+	// {
+	// 	"item_id"					"16315" // this item is in a special bundle, informations can't be retrieved
+	// 	"item_name"					"battlepass_teleport26"
+	// 	"item_type"					"teleport"
+	// 	"item_unlock_level"			"32"
+	// 	"item_rarity"				"uncommon"
+	// 	"image_inventory"			"custom_game/battlepass/teleport26" // USE GAMEPEDIA WEBM VIDEO
+	// 	"used_by_heroes"			"teleport"
 
-		"visuals"
-		{
-			"asset_modifier0"
-			{
-				"type"			"particle"
-				"asset"			"particles/items2_fx/teleport_start.vpcf"
-				"modifier"		"particles/econ/events/ti9/teleport_start_ti9_lvl2.vpcf"
-			}
+	// 	"visuals"
+	// 	{
+	// 		"asset_modifier0"
+	// 		{
+	// 			"type"			"particle"
+	// 			"asset"			"particles/items2_fx/teleport_start.vpcf"
+	// 			"modifier"		"particles/econ/events/ti9/teleport_start_ti9_lvl2.vpcf"
+	// 		}
 
-			"asset_modifier1"
-			{
-				"type"			"particle"
-				"asset"			"particles/items2_fx/teleport_end.vpcf"
-				"modifier"		"particles/econ/events/ti9/teleport_end_ti9_lvl2.vpcf"
-			}
-		}
-	}
-	"27" // Fall Major 2016
-	{
-		"item_id"					"16315" // this item is in a special bundle, informations can't be retrieved
-		"item_name"					"battlepass_teleport27"
-		"item_type"					"teleport"
-		"item_unlock_level"			"135"
-		"item_rarity"				"uncommon"
-		"image_inventory"			"custom_game/battlepass/teleport27" // USE GAMEPEDIA WEBM VIDEO
-		"used_by_heroes"			"teleport"
+	// 		"asset_modifier1"
+	// 		{
+	// 			"type"			"particle"
+	// 			"asset"			"particles/items2_fx/teleport_end.vpcf"
+	// 			"modifier"		"particles/econ/events/ti9/teleport_end_ti9_lvl2.vpcf"
+	// 		}
+	// 	}
+	// }
+	// "27" // TI 2019: Level 3
+	// {
+	// 	"item_id"					"16315" // this item is in a special bundle, informations can't be retrieved
+	// 	"item_name"					"battlepass_teleport27"
+	// 	"item_type"					"teleport"
+	// 	"item_unlock_level"			"33"
+	// 	"item_rarity"				"uncommon"
+	// 	"image_inventory"			"custom_game/battlepass/teleport27" // USE GAMEPEDIA WEBM VIDEO
+	// 	"used_by_heroes"			"teleport"
 
-		"visuals"
-		{
-			"asset_modifier0"
-			{
-				"type"			"particle"
-				"asset"			"particles/items2_fx/teleport_start.vpcf"
-				"modifier"		"particles/econ/events/ti9/teleport_start_ti9_lvl3.vpcf"
-			}
+	// 	"visuals"
+	// 	{
+	// 		"asset_modifier0"
+	// 		{
+	// 			"type"			"particle"
+	// 			"asset"			"particles/items2_fx/teleport_start.vpcf"
+	// 			"modifier"		"particles/econ/events/ti9/teleport_start_ti9_lvl3.vpcf"
+	// 		}
 
-			"asset_modifier1"
-			{
-				"type"			"particle"
-				"asset"			"particles/items2_fx/teleport_end.vpcf"
-				"modifier"		"particles/econ/events/ti9/teleport_end_ti9_lvl3.vpcf"
-			}
-		}
-	}
+	// 		"asset_modifier1"
+	// 		{
+	// 			"type"			"particle"
+	// 			"asset"			"particles/items2_fx/teleport_end.vpcf"
+	// 			"modifier"		"particles/econ/events/ti9/teleport_end_ti9_lvl3.vpcf"
+	// 		}
+	// 	}
+	// }
 
 	// Level-Up Effects
 
-	"28" // Fall Major 2016
+	"17" // Fall Major 2016
 	{
 		"item_id"					"16315" // this item is in a special bundle, informations can't be retrieved
 		"item_name"					"battlepass_levelup1"
 		"item_type"					"levelup"
-		"item_unlock_level"			"50"
-		"item_rarity"				"uncommon"
+		"item_unlock_level"			"12"
+		"item_rarity"				"legendary"
 		"image_inventory"			"custom_game/battlepass/levelup" // USE GAMEPEDIA WEBM VIDEO
 		"used_by_heroes"			"levelup"
 
@@ -758,15 +768,16 @@
 			}
 		}
 	}
-	"29" // Fall Major 2016
+	"18" // Fall Major 2016
 	{
 		"item_id"					"16315" // this item is in a special bundle, informations can't be retrieved
 		"item_name"					"battlepass_levelup2"
 		"item_type"					"levelup"
-		"item_unlock_level"			"100"
-		"item_rarity"				"uncommon"
+		"item_unlock_level"			"12"
+		"item_rarity"				"legendary"
 		"image_inventory"			"custom_game/battlepass/levelup2" // USE GAMEPEDIA WEBM VIDEO
 		"used_by_heroes"			"levelup"
+		"premium"					"1"
 
 		"visuals"
 		{
@@ -778,13 +789,13 @@
 			}
 		}
 	}
-	"30" // Fall Major 2016
+	"19" // Fall Major 2016
 	{
 		"item_id"					"16315" // this item is in a special bundle, informations can't be retrieved
 		"item_name"					"battlepass_levelup3"
 		"item_type"					"levelup"
-		"item_unlock_level"			"150"
-		"item_rarity"				"uncommon"
+		"item_unlock_level"			"14"
+		"item_rarity"				"legendary"
 		"image_inventory"			"custom_game/battlepass/levelup3" // USE GAMEPEDIA WEBM VIDEO
 		"used_by_heroes"			"levelup"
 
@@ -798,15 +809,16 @@
 			}
 		}
 	}
-	"31" // Fall Major 2016
+	"20" // Fall Major 2016
 	{
 		"item_id"					"16315" // this item is in a special bundle, informations can't be retrieved
 		"item_name"					"battlepass_levelup4"
 		"item_type"					"levelup"
-		"item_unlock_level"			"200"
-		"item_rarity"				"uncommon"
+		"item_unlock_level"			"14"
+		"item_rarity"				"legendary"
 		"image_inventory"			"custom_game/battlepass/levelup4" // USE GAMEPEDIA WEBM VIDEO
 		"used_by_heroes"			"levelup"
+		"premium"					"1"
 
 		"visuals"
 		{
@@ -815,6 +827,454 @@
 				"type"			"particle"
 				"asset"			"particles/generic_hero_status/hero_levelup.vpcf"
 				"modifier"		"particles/econ/events/ti9/hero_levelup_ti9.vpcf"
+			}
+		}
+	}
+
+	// Hero Emblems
+
+	"21" // Sunken Emblem
+	{
+		"item_id"					"638"
+		"item_name"					"battlepass_emblem_sunken" // name of the item to be displayed in inventory and death screen
+		"item_type"					"emblem"
+		"item_unlock_level"			"5"
+		"item_rarity"				"immortal"
+		"image_inventory"			"custom_game/battlepass/emblem_sunken" // USE GAMEPEDIA WEBM VIDEO
+		"used_by_heroes"			"emblem"
+
+		"visuals"
+		{
+			"asset_modifier0"
+			{
+				"type"			"particle"
+				"asset"			"particles/hero_emblem/default.vpcf"
+				"modifier"		"particles/econ/events/ti7/ti7_hero_effect.vpcf"
+			}
+		}
+	}
+
+	"22" // Overgrown Emblem
+	{
+		"item_id"					"12996"
+		"item_name"					"battlepass_emblem_overgrown" // name of the item to be displayed in inventory and death screen
+		"item_type"					"emblem"
+		"item_unlock_level"			"10"
+		"item_rarity"				"immortal"
+		"image_inventory"			"custom_game/battlepass/emblem_overgrown" // USE GAMEPEDIA WEBM VIDEO
+		"used_by_heroes"			"emblem"
+
+		"visuals"
+		{
+			"asset_modifier0"
+			{
+				"type"			"particle"
+				"asset"			"particles/hero_emblem/default.vpcf"
+				"modifier"		"particles/econ/events/ti9/ti9_emblem_effect.vpcf"
+			}
+		}
+	}
+
+	"23" // Emblem of Divinity
+	{
+		"item_id"					"13815"
+		"item_name"					"battlepass_emblem_divinity" // name of the item to be displayed in inventory and death screen
+		"item_type"					"emblem"
+		"item_unlock_level"			"20"
+		"item_rarity"				"immortal"
+		"image_inventory"			"custom_game/battlepass/emblem_divinity" // USE GAMEPEDIA WEBM VIDEO
+		"used_by_heroes"			"emblem"
+
+		"visuals"
+		{
+			"asset_modifier0"
+			{
+				"type"			"particle"
+				"asset"			"particles/hero_emblem/default.vpcf"
+				"modifier"		"particles/econ/events/ti10/ti10_emblem_effect.vpcf"
+			}
+		}
+	}
+
+	"24" // Aghanim's 2021 Emblem
+	{
+		"item_id"					"22263"
+		"item_name"					"battlepass_emblem_aghanim" // name of the item to be displayed in inventory and death screen
+		"item_type"					"emblem"
+		"item_unlock_level"			"5"
+		"item_rarity"				"immortal"
+		"image_inventory"			"custom_game/battlepass/emblem_aghanim" // USE GAMEPEDIA WEBM VIDEO
+		"used_by_heroes"			"emblem"
+		"premium"					"1"
+
+		"visuals"
+		{
+			"asset_modifier0"
+			{
+				"type"			"particle"
+				"asset"			"particles/hero_emblem/default.vpcf"
+				"modifier"		"particles/econ/events/fall_2021/fall_2021_emblem_game_effect.vpcf"
+			}
+		}
+	}
+
+	"25" // Nemestice Emblem 2021
+	{
+		"item_id"					"18787"
+		"item_name"					"battlepass_emblem_nemestice" // name of the item to be displayed in inventory and death screen
+		"item_type"					"emblem"
+		"item_unlock_level"			"10"
+		"item_rarity"				"immortal"
+		"image_inventory"			"custom_game/battlepass/emblem_nemestice" // USE GAMEPEDIA WEBM VIDEO
+		"used_by_heroes"			"emblem"
+		"premium"					"1"
+
+		"visuals"
+		{
+			"asset_modifier0"
+			{
+				"type"			"particle"
+				"asset"			"particles/hero_emblem/default.vpcf"
+				"modifier"		"particles/econ/events/summer_2021/summer_2021_emblem_effect.vpcf"
+			}
+		}
+	}
+
+	"26" // Enigmatic Emblem of the Diretide - Red
+	{
+		"item_id"					"18393"
+		"item_name"					"battlepass_emblem_diretide_red" // name of the item to be displayed in inventory and death screen
+		"item_type"					"emblem"
+		"item_unlock_level"			"20"
+		"item_rarity"				"immortal"
+		"image_inventory"			"custom_game/battlepass/emblem_diretide_red" // USE GAMEPEDIA WEBM VIDEO
+		"used_by_heroes"			"emblem"
+		"premium"					"1"
+
+		"visuals"
+		{
+			"asset_modifier0"
+			{
+				"type"			"particle"
+				"asset"			"particles/hero_emblem/default.vpcf"
+				"modifier"		"particles/econ/events/diretide_2020/emblem/fall20_emblem_v2_effect.vpcf"
+			}
+		}
+	}
+
+	// Kill Effects
+
+	"27" // Culling Blade kill effect
+	{
+		"item_id"					"16315"
+		"item_name"					"battlepass_kill_effect_culling_blade"
+		"item_type"					"kill_effect"
+		"item_unlock_level"			"11"
+		"item_rarity"				"uncommon"
+		"image_inventory"			"custom_game/battlepass/kill_effect_culling_blade"
+		"used_by_heroes"			"kill_effect"
+
+		"visuals"
+		{
+			"asset_modifier0"
+			{
+				"type"			"particle"
+				"asset"			"particles/kill_effect/default_target.vpcf"
+				"modifier"		"particles/econ/items/axe/ti9_jungle_axe/ti9_jungle_axe_culling_blade_kill.vpcf"
+			}
+		}
+	}
+
+	"28" // Faceless Void Arcana kill effect
+	{
+		"item_id"					"16315"
+		"item_name"					"battlepass_kill_effect_faceless_void"
+		"item_type"					"kill_effect"
+		"item_unlock_level"			"11"
+		"item_rarity"				"uncommon"
+		"image_inventory"			"custom_game/battlepass/kill_effect_faceless_void"
+		"used_by_heroes"			"kill_effect"
+		"premium"					"1"
+
+		"visuals"
+		{
+			"asset_modifier0"
+			{
+				"type"			"particle"
+				"asset"			"particles/kill_effect/default_target.vpcf"
+				"modifier"		"particles/econ/items/faceless_void/faceless_void_arcana/faceless_void_arcana_kill_effect_target.vpcf"
+			}
+
+			"asset_modifier1"
+			{
+				"type"			"particle"
+				"asset"			"particles/kill_effect/default_caster.vpcf"
+				"modifier"		"particles/econ/items/faceless_void/faceless_void_arcana/faceless_void_arcana_kill_effect_caster.vpcf"
+			}
+		}
+	}
+
+	"29" // Radiant tower kill effect
+	{
+		"item_id"					"16315"
+		"item_name"					"battlepass_kill_effect_radiant_tower"
+		"item_type"					"kill_effect"
+		"item_unlock_level"			"13"
+		"item_rarity"				"uncommon"
+		"image_inventory"			"custom_game/battlepass/kill_effect_radiant_tower"
+		"used_by_heroes"			"kill_effect"
+
+		"visuals"
+		{
+			"asset_modifier0"
+			{
+				"type"			"particle"
+				"asset"			"particles/kill_effect/default_target.vpcf"
+				"modifier"		"particles/base_attacks/ranged_tower_good_explosion.vpcf"
+			}
+		}
+	}
+
+	"30" // Razor Arcana kill effect
+	{
+		"item_id"					"16315"
+		"item_name"					"battlepass_kill_effect_razor"
+		"item_type"					"kill_effect"
+		"item_unlock_level"			"13"
+		"item_rarity"				"uncommon"
+		"image_inventory"			"custom_game/battlepass/kill_effect_razor"
+		"used_by_heroes"			"kill_effect"
+		"premium"					"1"
+
+		"visuals"
+		{
+			"asset_modifier0"
+			{
+				"type"			"particle"
+				"asset"			"particles/kill_effect/default_target.vpcf"
+				"modifier"		"particles/econ/items/razor/razor_arcana/razor_arcana_kill_effect_target_v2.vpcf"
+			}
+
+			"asset_modifier1"
+			{
+				"type"			"particle"
+				"asset"			"particles/kill_effect/default_caster.vpcf"
+				"modifier"		"particles/econ/items/razor/razor_arcana/razor_arcana_kill_effect_caster_v2.vpcf"
+			}
+		}
+	}
+
+	"31" // Spectre Arcana kill effect (free version)
+	{
+		"item_id"					"16315"
+		"item_name"					"battlepass_kill_effect_spectre_free"
+		"item_type"					"kill_effect"
+		"item_unlock_level"			"15"
+		"item_rarity"				"uncommon"
+		"image_inventory"			"custom_game/battlepass/kill_effect_spectre_free"
+		"used_by_heroes"			"kill_effect"
+
+		"visuals"
+		{
+			"asset_modifier0"
+			{
+				"type"			"particle"
+				"asset"			"particles/kill_effect/default_target.vpcf"
+				"modifier"		"particles/econ/items/spectre/spectre_arcana/spectre_arcana_illusion_killed_flame.vpcf"
+			}
+		}
+	}
+
+	"32" // Spectre Arcana kill effect
+	{
+		"item_id"					"16315"
+		"item_name"					"battlepass_kill_effect_spectre"
+		"item_type"					"kill_effect"
+		"item_unlock_level"			"15"
+		"item_rarity"				"uncommon"
+		"image_inventory"			"custom_game/battlepass/kill_effect_spectre"
+		"used_by_heroes"			"kill_effect"
+		"premium"					"1"
+
+		"visuals"
+		{
+			"asset_modifier0"
+			{
+				"type"			"particle"
+				"asset"			"particles/kill_effect/default_target.vpcf"
+				"modifier"		"particles/econ/items/spectre/spectre_arcana/spectre_arcana_illusion_killed_v2.vpcf"
+			}
+		}
+	}
+
+	"33" // Gyro TI 10 (free version)
+	{
+		"item_id"					"16315"
+		"item_name"					"battlepass_kill_effect_gyro_free"
+		"item_type"					"kill_effect"
+		"item_unlock_level"			"17"
+		"item_rarity"				"uncommon"
+		"image_inventory"			"custom_game/battlepass/kill_effect_purple_smoke_free"
+		"used_by_heroes"			"kill_effect"
+
+		"visuals"
+		{
+			"asset_modifier0"
+			{
+				"type"				"particle"
+				"asset"				"particles/kill_effect/default_target.vpcf"
+				"modifier"			"particles/econ/items/gyrocopter/gyro_ti10_immortal_missile/gyro_ti10_immortal_missle_explosion_fire.vpcf"
+			}
+		}
+	}
+
+	"34" // Gyro TI 10
+	{
+		"item_id"					"16315"
+		"item_name"					"battlepass_kill_effect_gyro_free"
+		"item_type"					"kill_effect"
+		"item_unlock_level"			"17"
+		"item_rarity"				"uncommon"
+		"image_inventory"			"custom_game/battlepass/kill_effect_purple_smoke"
+		"used_by_heroes"			"kill_effect"
+		"premium"					"1"
+
+		"visuals"
+		{
+			"asset_modifier0"
+			{
+				"type"				"particle"
+				"asset"				"particles/kill_effect/default_target.vpcf"
+				"modifier"			"particles/econ/items/gyrocopter/gyro_ti10_immortal_missile/gyro_ti10_immortal_missile_explosion.vpcf"
+			}
+		}
+	}
+
+	"35" // Rubick Arcana (free version)
+	{
+		"item_id"					"16315"
+		"item_name"					"battlepass_kill_effect_rubick_free"
+		"item_type"					"kill_effect"
+		"item_unlock_level"			"19"
+		"item_rarity"				"uncommon"
+		"image_inventory"			"custom_game/battlepass/kill_effect_rubick_free"
+		"used_by_heroes"			"kill_effect"
+
+		"visuals"
+		{
+			"asset_modifier0"
+			{
+				"type"				"particle"
+				"asset"				"particles/kill_effect/default_target.vpcf"
+				"modifier"			"particles/econ/items/rubick/rubick_arcana/rbck_arc_skeletonking_hellfireblast_explosion_d.vpcf"
+			}
+		}
+	}
+
+	"36" // Rubick Arcana
+	{
+		"item_id"					"16315"
+		"item_name"					"battlepass_kill_effect_rubick"
+		"item_type"					"kill_effect"
+		"item_unlock_level"			"19"
+		"item_rarity"				"uncommon"
+		"image_inventory"			"custom_game/battlepass/kill_effect_rubick"
+		"used_by_heroes"			"kill_effect"
+		"premium"					"1"
+
+		"visuals"
+		{
+			"asset_modifier0"
+			{
+				"type"				"particle"
+				"asset"				"particles/kill_effect/default_target.vpcf"
+				"modifier"			"particles/econ/items/rubick/rubick_arcana/rbck_arc_skeletonking_hellfireblast_explosion.vpcf"
+			}
+		}
+	}
+
+	"37" // Tome of Stats - TI10
+	{
+		"item_id"					"16315" // this item is in a special bundle, informations can't be retrieved
+		"item_name"					"battlepass_levelup5"
+		"item_type"					"levelup"
+		"item_unlock_level"			"16"
+		"item_rarity"				"legendary"
+		"image_inventory"			"custom_game/battlepass/levelup5" // USE GAMEPEDIA WEBM VIDEO
+		"used_by_heroes"			"levelup"
+
+		"visuals"
+		{
+			"asset_modifier0"
+			{
+				"type"			"particle"
+				"asset"			"particles/generic_hero_status/hero_levelup.vpcf"
+				"modifier"		"particles/econ/events/ti10/hero_levelup_ti10.vpcf"
+			}
+		}
+	}
+
+	"38" // Tome of Stats - Spring 2021
+	{
+		"item_id"					"16315" // this item is in a special bundle, informations can't be retrieved
+		"item_name"					"battlepass_levelup6"
+		"item_type"					"levelup"
+		"item_unlock_level"			"16"
+		"item_rarity"				"legendary"
+		"image_inventory"			"custom_game/battlepass/levelup6" // USE GAMEPEDIA WEBM VIDEO
+		"used_by_heroes"			"levelup"
+		"premium"					"1"
+
+		"visuals"
+		{
+			"asset_modifier0"
+			{
+				"type"			"particle"
+				"asset"			"particles/generic_hero_status/hero_levelup.vpcf"
+				"modifier"		"particles/econ/events/spring_2021/hero_levelup_spring_2021.vpcf"
+			}
+		}
+	}
+
+	"39" // Tome of Stats - Fall 2021
+	{
+		"item_id"					"16315" // this item is in a special bundle, informations can't be retrieved
+		"item_name"					"battlepass_levelup5"
+		"item_type"					"levelup"
+		"item_unlock_level"			"18"
+		"item_rarity"				"legendary"
+		"image_inventory"			"custom_game/battlepass/levelup7" // USE GAMEPEDIA WEBM VIDEO
+		"used_by_heroes"			"levelup"
+
+		"visuals"
+		{
+			"asset_modifier0"
+			{
+				"type"			"particle"
+				"asset"			"particles/generic_hero_status/hero_levelup.vpcf"
+				"modifier"		"particles/econ/events/fall_2021/hero_levelup_fall_2021.vpcf"
+			}
+		}
+	}
+
+	"40" // Tome of Stats - Fall 2022
+	{
+		"item_id"					"16315" // this item is in a special bundle, informations can't be retrieved
+		"item_name"					"battlepass_levelup6"
+		"item_type"					"levelup"
+		"item_unlock_level"			"18"
+		"item_rarity"				"legendary"
+		"image_inventory"			"custom_game/battlepass/levelup8" // USE GAMEPEDIA WEBM VIDEO
+		"used_by_heroes"			"levelup"
+		"premium"					"1"
+
+		"visuals"
+		{
+			"asset_modifier0"
+			{
+				"type"			"particle"
+				"asset"			"particles/generic_hero_status/hero_levelup.vpcf"
+				"modifier"		"particles/econ/events/fall_2022/level_up/hero_levelup_fall2022.vpcf"
 			}
 		}
 	}
