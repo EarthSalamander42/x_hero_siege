@@ -680,16 +680,18 @@ end
 function api:RegisterGame(callback)
 	self:Request("game-register", function(data)
 		if IsInToolsMode() then
-			for k, v in pairs(data.players) do
-				print("Player SteamID: " .. k)
-				print("Whalepass:")
+			-- for k, v in pairs(data.players) do
+			-- 	print("Player SteamID: " .. k)
+			-- 	print("Whalepass:")
+			-- 	print(v.whalepass)
 
-				-- if v.whalepass and v.whalepass[1] then
-				-- 	for i, j in pairs(v.whalepass[1]) do
-				-- 		print(i, j)
-				-- 	end
-				-- end
-			end
+			-- 	if v.whalepass and v.whalepass[1] then
+			-- 		for i, j in pairs(v.whalepass[1]) do
+			-- 			print(i)
+			-- 			-- print(i, j)
+			-- 		end
+			-- 	end
+			-- end
 
 			-- print(data.players)
 			-- print(data.whalepass)
@@ -1112,7 +1114,7 @@ function api:GetPlayerAchievements(player_id)
 		return false
 	end
 
-	if self.players[steamid] ~= nil then
+	if self.players[steamid] ~= nil and self.players[steamid].whalepass and self.players[steamid].whalepass[1] then
 		return self.players[steamid].whalepass[1].challenges
 	else
 		native_print("api:GetPlayerAchievements: api players steamid not valid!")
@@ -1134,6 +1136,26 @@ function api:GetPlayerWhalepassXP(player_id)
 
 	if self.players[steamid] ~= nil then
 		return self.players[steamid].whalepass[1].currentExp
+	else
+		native_print("api:GetPlayerAchievements: api players steamid not valid!")
+		return false
+	end
+end
+
+function api:GetPlayerWhalepassLevel(player_id)
+	if not PlayerResource:IsValidPlayerID(player_id) then
+		native_print("api:GetPlayerAchievements: Player ID not valid!")
+		return false
+	end
+
+	local steamid = tostring(PlayerResource:GetSteamID(player_id))
+
+	if self.players == nil then
+		return false
+	end
+
+	if self.players[steamid] ~= nil then
+		return self.players[steamid].whalepass[1].lastCompletedLevel or 0
 	else
 		native_print("api:GetPlayerAchievements: api players steamid not valid!")
 		return false

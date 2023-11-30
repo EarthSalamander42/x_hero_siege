@@ -59,10 +59,18 @@ function Battlepass:GetPlayerInfoXP() -- yet it has too much useless loops, form
 				donator_color = DONATOR_COLOR[0]
 			end
 
+			local current_xp = api:GetPlayerWhalepassXP(player_id)
+			local xp_in_level = current_xp
+			local level = api:GetPlayerWhalepassLevel(player_id)
+
+			while xp_in_level > 2000 do
+				xp_in_level = xp_in_level - 2000
+			end
+
 			CustomNetTables:SetTableValue("battlepass_player", tostring(player_id), {
-				XP = api.players[steamid].xp_in_level,
-				MaxXP = api.players[steamid].xp_next_level,
-				Lvl = api.players[steamid].xp_level,
+				XP = xp_in_level,
+				MaxXP = 2000,
+				Lvl = level,
 				ply_color = rgbToHex(color),
 				title = api.players[steamid].rank_title,
 				title_color = rgbToHex(Battlepass:GetTitleColorXP(api.players[steamid].rank_title)),
@@ -77,7 +85,7 @@ function Battlepass:GetPlayerInfoXP() -- yet it has too much useless loops, form
 				ingame_tag = api:GetPlayerIngameTag(player_id),
 				whalepass_url = api:GetPlayerWhalepassURL(player_id),
 				achievements = api:GetPlayerAchievements(player_id),
-				whalepass_xp = api:GetPlayerWhalepassXP(player_id),
+				whalepass_xp = current_xp,
 				-- mmr = api:GetPlayerMMR(player_id),
 				-- mmr_title = api:GetPlayerRankMMR(player_id),
 			})

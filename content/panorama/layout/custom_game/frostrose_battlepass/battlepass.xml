@@ -303,7 +303,13 @@
 				</Panel>
 
 				<Panel id="ArmoryTableWrapper" hittest="false">
-					<!-- JS Inserts records here -->
+					<Panel id="BattlepassArmoryRow" class="BattlepassParentRow" hittest="false">
+						<!-- <Label id="BattlepassArmoryRowTitle" class="BattlepassRowTitle" text="#battlepass_armory" hittest="false"/> -->
+
+						<Panel id="BattlepassArmoryRowContainer0" class="BattlepassRow BattlepassArmoryRowContainer" hittest="false">
+							<!-- JS Inserts records here -->
+						</Panel>
+					</Panel>
 				</Panel>
 			</Panel>
 

@@ -1625,3 +1625,17 @@
 	saturation: 0.5;
 	brightness: 0.25;
 }
+
+#ArmoryTableWrapper {
+	width: 100%;
+	height: 100%;
+	flow-children: down;
+}
+
+#BattlepassArmoryRow {
+	overflow: scroll;
+}
+
+.BattlepassArmoryRowContainer {
+	height: 50%;
+}
