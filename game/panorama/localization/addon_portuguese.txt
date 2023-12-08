@@ -164,6 +164,7 @@
 	"toggle_player_xp"                          "Alternar visibilidade de XP do passe de batalha (terá efeito no próximo jogo)"
 	"toggle_winrate"                            "Toggle Winrate visibility"
 	"imba_gamemode_settings_gold_multiplier"    "Dificuldade:"
+	"DOTA_EconItemSet_Tooltip_Premium"          "Premium Subscription Only"
 	"tutorial_intro_01"                         "X Hero Siege é um jogo customizado de defesa do castelo seguido por batalhas contra chefes. O objetivo nas fases 1 e 2 é defender o castelo contra as ondas de criaturas enquanto a fase 3 consiste em derrotar poderosos chefes."
 	"tutorial_intro_02"                         "Nas fases 1 e 2 o objetivo é defender e farmar o suficiente para derrotar os chefes de fim de jogo. Tenha cuidado, se você morrer na fase 3 não poderá reviver! Seus aliados podem te reviver. Você também pode carregar Ankhs de Reencarnação."
 	"tutorial_heroes_title"                     "EVENTOS ESPECIAIS"

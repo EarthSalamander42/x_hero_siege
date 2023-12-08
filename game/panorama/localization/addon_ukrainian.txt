@@ -164,6 +164,7 @@
 	"toggle_player_xp"                          "Toggle battlepass XP visibility (will take effect on next game)"
 	"toggle_winrate"                            "Toggle Winrate visibility"
 	"imba_gamemode_settings_gold_multiplier"    "Difficulty:"
+	"DOTA_EconItemSet_Tooltip_Premium"          "Premium Subscription Only"
 	"tutorial_intro_01"                         "X Hero Siege is a castle defense custom game followed by boss fights. The goal in phase 1 and 2 is to defend the castle against wave creeps while the phase 3 is to defeat powerful bosses."
 	"tutorial_intro_02"                         "In phase 1 and 2 the goal is to defend and farm to be able to defeat the bosses in late game. Be careful, if you die in phase 3 you don't respawn! Your teammates can respawn you. You can also carry Ankhs of Reincarnations."
 	"tutorial_heroes_title"                     "SPECIAL EVENTS"

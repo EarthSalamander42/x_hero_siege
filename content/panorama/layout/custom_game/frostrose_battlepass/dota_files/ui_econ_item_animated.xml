@@ -3,8 +3,9 @@
 	<styles>
 		<include src="s2r://panorama/styles/dotastyles.vcss_c" />
 		<include src="s2r://panorama/styles/collection_shared.vcss_c" />
-		<include src="s2r://panorama/styles/ui_econ_item_animated.vcss_c" />
+		<include src="file://panorama/layout/custom_game/frostrose_battlepass/dota_files/ui_econ_item_animated.css" />
 	</styles>
+
 	<DOTAEconItemAnimated require-composition-layer="true">
 		<Panel class="Container">
 			<Panel id="ItemViewContainer">
@@ -40,7 +41,7 @@
 					<Panel id="EditSavedSetButton" class="ButtonPrimary DarkGrey Small" onmouseover="UIShowTextTooltip( #DOTA_SavedSets_Edit_Title )" onmouseout="UIHideTextTooltip(); DOTAEconItemAnimatedRetriggerOnMouseOver()">
 						<Image src="s2r://panorama/images/control_icons/24px/settings.vsvg" />
 					</Panel>
-					<Panel class="InformationalImage Seasonal" onmouseover="UIShowTextTooltip( #DOTA_EconItemSet_Tooltip_DotaPlus )" onmouseout="UIHideTextTooltip(); DOTAEconItemAnimatedRetriggerOnMouseOver()" />
+					<Panel class="InformationalImage Seasonal" onmouseover="UIShowTextTooltip( #DOTA_EconItemSet_Tooltip_Premium )" onmouseout="UIHideTextTooltip(); DOTAEconItemAnimatedRetriggerOnMouseOver()" />
 					<Panel class="InformationalImage Bundle" onmouseover="UIShowTextTooltip( #DOTA_EconItemSet_Tooltip_IsBundle )" onmouseout="UIHideTextTooltip(); DOTAEconItemAnimatedRetriggerOnMouseOver()" />
 					<Panel class="InformationalImage Treasure" onmouseover="UIShowTextTooltip( #DOTA_EconItemSet_Tooltip_IsTreasure )" onmouseout="UIHideTextTooltip(); DOTAEconItemAnimatedRetriggerOnMouseOver()" />
 					<Panel class="InformationalImage Locked" onmouseover="UIShowTextTooltip( #DOTA_EconItemSet_Tooltip_RequiresKey )" onmouseout="UIHideTextTooltip(); DOTAEconItemAnimatedRetriggerOnMouseOver()" />

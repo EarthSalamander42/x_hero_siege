@@ -1,6 +1,5 @@
-@define EconItemAnimated_ClearNewFlagDelay:  0.2s;
-
- DOTAEconItemAnimated{
+/* @define EconItemAnimated_ClearNewFlagDelay:  0.2s;
+{
 
   width: 276px;
      height: 410px;
@@ -9,30 +8,31 @@
   transition-duration: 0.1s, 0.05s;
 
   tooltip-position: left;
- }
-  .FeaturedGlobalItem DOTAEconItemAnimated{
+ } */
+
+ .FeaturedGlobalItem {
    width: 229px;
    height: 282px;
   }
 
-  DOTAEconItemAnimated #AnimatedItemViewContainer,DOTAEconItemAnimated #StaticItemViewContainer{
+   #AnimatedItemViewContainer, #StaticItemViewContainer{
 
    visibility: collapse;
   }
 
 
-   DOTAEconItemAnimated.Animated #ItemViewContainer{
+   .Animated #ItemViewContainer{
     width: 100%;
     height: 100%;
    }
-    DOTAEconItemAnimated.Animated #ItemViewContainer #AnimatedItemViewContainer{
+    .Animated #ItemViewContainer #AnimatedItemViewContainer{
      width: 100%;
      height: 100%;
      visibility: visible;
     }
 
 
-   DOTAEconItemAnimated.Animated #EconItemName{
+   .Animated #EconItemName{
     vertical-align: bottom;
     color: white;
     text-shadow: 0px 2px 8px  black;
@@ -41,22 +41,22 @@
 
 
 
-   DOTAEconItemAnimated.Animated:not(.IsPortrait) #SceneContainer{
+   .Animated:not(.IsPortrait) #SceneContainer{
     opacity-mask: url( "s2r://panorama/images/masks/set_thumbnail_mask_psd.vtex");
    }
 
 
 
-   DOTAEconItemAnimated.AnimatedIcon #ItemViewContainer{
+   .AnimatedIcon #ItemViewContainer{
     width: 100%;
    }
-    DOTAEconItemAnimated.AnimatedIcon #ItemViewContainer #AnimatedItemViewContainer{
+    .AnimatedIcon #ItemViewContainer #AnimatedItemViewContainer{
      visibility: visible;
      width: 100%;
      height: width-percentage( 66.67% );
      background-color: gradient( linear, 0% 50%, 0% 100%, from( #424142 ), to( #9D9D9D ) );
     }
-     DOTAEconItemAnimated.AnimatedIcon #ItemViewContainer #AnimatedItemViewContainer #ScenePanel{
+     .AnimatedIcon #ItemViewContainer #AnimatedItemViewContainer #ScenePanel{
       width: 100%;
       height: 100%;
       transform: translateX( 0% ) translateY( 0% );
@@ -66,22 +66,24 @@
 
 
 
-   DOTAEconItemAnimated.Static #ItemViewContainer{
+  #ItemViewContainer{
     width: 100%;
-   }
-    DOTAEconItemAnimated.Static #ItemViewContainer #StaticItemViewContainer{
+    height: width-percentage( 100% );
+  }
+    
+  #StaticItemViewContainer{
      visibility: visible;
      width: 100%;
-     height: width-percentage( 66.67% );
-     background-color: gradient( linear, 0% 50%, 0% 100%, from( #424142 ), to( #9D9D9D ) );
+     height: width-percentage( 55% );
+     /* background-color: gradient( linear, 0% 50%, 0% 100%, from( #424142 ), to( #9D9D9D ) ); */
     }
 
 
 
-  DOTAEconItemAnimated #EconItemName{
+   #EconItemName{
    width: 100%;
    text-align: center;
-   text-overflow: ellipsis;
+   text-overflow: shrink;
    height: 20px;
 
    transition-property: color;
@@ -89,7 +91,7 @@
    transition-timing-function: ease;
   }
 
-  DOTAEconItemAnimated #EconItemSlotName{
+   #EconItemSlotName{
    text-align: center;
    height: 16px;
    width: 100%;
@@ -100,18 +102,18 @@
   }
 
 
-   DOTAEconItemAnimated.HideSlotInfo #EconItemSlotName{
+   .HideSlotInfo #EconItemSlotName{
     visibility: collapse;
    }
 
 
-  DOTAEconItemAnimated.Equipped{
+  .Equipped{
    animation-name: Flash;
    animation-duration: 0.6s;
    animation-timing-function: ease;
   }
 
-  DOTAEconItemAnimated.IsPreviewing,DOTAEconItemAnimated:selected{
+  .IsPreviewing,:selected{
 
    box-shadow: 0px 0px 80px -24px rgba(206, 229, 255, 0.1);
 
@@ -124,7 +126,7 @@
   }
 
 
-   DOTAEconItemAnimated:active{
+   :active{
     transform: scale3d(0.985, 0.985, 1);
     brightness: 0.5;
    }
@@ -162,6 +164,9 @@
   transition-timing-function: cubic-bezier(0, 1, 0, 1);
 
   width: 100%;
+  height: 100%;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
   transform: scale3d(1.04, 1.04, 0);
  }
 
@@ -547,7 +552,7 @@
                           0.3s
      ;
     }
- DOTAEconItemAnimated.Unavailable:not(.Owned){
+ .Unavailable:not(.Owned){
   opacity:
            
            0.8
@@ -778,7 +783,7 @@
    ;
   }
  }
- DOTAEconItemAnimated:disabled #ScenePanel,DOTAEconItemAnimated:disabled #HeroSetName{
+ :disabled #ScenePanel,:disabled #HeroSetName{
   visibility:
               
               collapse
@@ -2232,7 +2237,7 @@
                collapse
    ;
   }
- DOTAEconItemAnimated.TooltipTriggerIconEnabled:hover #TooltipTriggerIcon{
+ .TooltipTriggerIconEnabled:hover #TooltipTriggerIcon{
   opacity:
            
            1
@@ -2388,12 +2393,7 @@
   ;
  }
   #Bundle:hover{
-   background-color:
-                     
-                     DarkestGrey
-                                &
-                                 dd
-   ;
+   background-color: DarkestGrey;
    box-shadow:
                
                inset
@@ -2566,12 +2566,7 @@
   ;
  }
   #Stack:hover{
-   background-color:
-                     
-                     DarkestGrey
-                                &
-                                 dd
-   ;
+   background-color: DarkestGrey;
    box-shadow:
                
                inset
@@ -3014,13 +3009,13 @@
                    70%
   ;
  }
- DOTAEconItemAnimated.IsTradeable .TradeableIcon{
+ .IsTradeable .TradeableIcon{
      visibility:
                  
                  visible
      ;
  }
- DOTAEconItemAnimated.Seasonal .Seasonal{
+ .Seasonal .Seasonal{
      wash-color:
                  
                  #e54e42
@@ -3038,7 +3033,7 @@
               collapse
   ;
  }
- DOTAEconItemAnimated.Seasonal.Season_PlusSubscription .Seasonal{
+ .Seasonal.Season_PlusSubscription .Seasonal{
   visibility:
               
               visible
@@ -3066,13 +3061,13 @@
                    75%
   ;
  }
- DOTAEconItemAnimated.IsInBundle .Bundle{
+ .IsInBundle .Bundle{
   visibility:
               
               visible
   ;
  }
- DOTAEconItemAnimated.IsBundle.SingleItem .Bundle{
+ .IsBundle.SingleItem .Bundle{
   visibility:
               
               visible
@@ -3098,7 +3093,7 @@
                    80%
   ;
  }
- DOTAEconItemAnimated.TreasureRequiresKey .Locked{
+ .TreasureRequiresKey .Locked{
   visibility:
               
               visible
@@ -3120,7 +3115,7 @@
                        center
   ;
  }
- DOTAEconItemAnimated.IsKey .Key{
+ .IsKey .Key{
   visibility:
               
               visible
@@ -3418,36 +3413,14 @@
  }
  @keyframes 'GlowArcanaLabelText'{
      0%{
-   text-shadow:
-                
-                0px
-                    
-                    0px
-                        
-                        8px
-                            
-                            rarity_color_arcana
-                                               &
-                                                11
-   ;
+   text-shadow: 0px 0px 8px rarity_color_arcana;
    brightness:
                
                1
    ;
      }
   100%{
-   text-shadow:
-                
-                0px
-                    
-                    0px
-                        
-                        12px
-                             
-                             rarity_color_arcana
-                                                &
-                                                 66
-   ;
+   text-shadow: 0px 0px 12px rarity_color_arcana;
    brightness:
                
                1.5
@@ -3465,8 +3438,7 @@
                         8px
                             
                             rarity_color_immortal
-                                                 &
-                                                  11
+                                                 
    ;
    brightness:
                
@@ -3483,8 +3455,7 @@
                         12px
                              
                              rarity_color_immortal
-                                                  &
-                                                   66
+                                                  
    ;
    brightness:
                
@@ -4056,8 +4027,7 @@
                        12px
                             
                             rarity_color_arcana
-                                               &
-                                                00
+                                              
    ;
    brightness:
                
@@ -4074,8 +4044,7 @@
                        16px
                             
                             rarity_color_arcana
-                                               &
-                                                11
+                                               
    ;
    brightness:
                
@@ -4094,8 +4063,7 @@
                        12px
                             
                             rarity_color_immortal
-                                                 &
-                                                  00
+                                                 
    ;
    brightness:
                
@@ -4112,8 +4080,7 @@
                        16px
                             
                             rarity_color_immortal
-                                                 &
-                                                  11
+                                                
    ;
    brightness:
                
@@ -4543,8 +4510,7 @@
                        12px
                             
                             winnerGreenLow
-                                          &
-                                           00
+                                       
    ;
    brightness:
                
@@ -4561,8 +4527,7 @@
                        12px
                             
                             winnerGreenLow
-                                          &
-                                           11
+                                         
    ;
    brightness:
                
@@ -4975,7 +4940,7 @@
                                      )
   ;
  }
- DOTAEconItemAnimated.MultipleStyles:not(.HideAttributeIcons) #MultiStyle{
+ .MultipleStyles:not(.HideAttributeIcons) #MultiStyle{
   visibility:
               
               visible

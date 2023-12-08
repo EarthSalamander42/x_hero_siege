@@ -131,3 +131,5 @@
 "toggle_winrate"				"Toggle Winrate visibility"
 
 "imba_gamemode_settings_gold_multiplier"	"Difficulty:"
+
+"DOTA_EconItemSet_Tooltip_Premium"		"Premium Subscription Only"

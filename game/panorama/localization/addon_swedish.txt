@@ -164,6 +164,7 @@
 	"toggle_player_xp"                          "Toggla battlepass XP synlighet (syns under nästa game)"
 	"toggle_winrate"                            "Toggle Winrate visibility"
 	"imba_gamemode_settings_gold_multiplier"    "Svårighetsgrad:"
+	"DOTA_EconItemSet_Tooltip_Premium"          "Premium Subscription Only"
 	"tutorial_intro_01"                         "X Hero Siege är ett custom spel där du ska försvara slottet och besegra bossar. Målet i fast 1 och 2 är att försvara slottet mot vågor utav creeps medans fas 3 går ut på att besegra kraftfulla bossar!"
 	"tutorial_intro_02"                         "I fas 1 och 2 är målet att försvara och farma för att kunna besegra bossarna i slutet av spelet. Var försiktig, om du dör i fas 3 så kan du inte återuppstå! Dina lagkamrater kan väcka dig till liv. Du kan även bära Ankhs of Reincarnations."
 	"tutorial_heroes_title"                     "SPECIELLA EVENTS"

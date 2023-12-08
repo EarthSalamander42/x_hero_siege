@@ -168,6 +168,7 @@
 	"toggle_player_xp"		"Toggle battlepass XP visibility (will take effect on next game)"
 	"toggle_winrate"		"Toggle Winrate visibility"
 	"imba_gamemode_settings_gold_multiplier"		"Difficulty:"
+	"DOTA_EconItemSet_Tooltip_Premium"		"Premium Subscription Only"
 
 	// game_info.txt
 	"tutorial_intro_01"		"X Hero Siege is a castle defense custom game followed by boss fights. The goal in phase 1 and 2 is to defend the castle against wave creeps while the phase 3 is to defeat powerful bosses."

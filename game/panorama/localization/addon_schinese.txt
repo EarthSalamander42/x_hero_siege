@@ -164,6 +164,7 @@
 	"toggle_player_xp"                          "Toggle battlepass XP visibility (will take effect on next game)"
 	"toggle_winrate"                            "Toggle Winrate visibility"
 	"imba_gamemode_settings_gold_multiplier"    "Difficulty:"
+	"DOTA_EconItemSet_Tooltip_Premium"          "Premium Subscription Only"
 	"tutorial_intro_01"                         "X Hero Siege是一款加入了Boss战的塔防游戏。第1阶段及第2阶段的目标是守护基地，抵御大波小兵；而第3阶段将会面临各种强大的Boss。"
 	"tutorial_intro_02"                         "在第1阶段和第2阶段中，游戏目标为防守及打钱升级，以应对游戏后期的Boss战。要小心，如果在第3阶段死亡，您的角色将无法复活！但是您的队友可以复活您。同时也可以通过携带重生护符来复活。"
 	"tutorial_heroes_title"                     "特殊事件"

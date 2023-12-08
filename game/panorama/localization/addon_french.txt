@@ -164,6 +164,7 @@
 	"toggle_player_xp"                          "Activer l'indicateur d'expérience pour le battlepass (prendra effet à la prochaine partie)"
 	"toggle_winrate"                            "Toggle Winrate visibility"
 	"imba_gamemode_settings_gold_multiplier"    " Difficulté :"
+	"DOTA_EconItemSet_Tooltip_Premium"          "Premium Subscription Only"
 	"tutorial_intro_01"                         "X Hero Siege est un jeu de défense de château suivi de combats contre des boss. Dans les phases 1 et 2, l'objectif est de défendre le château contre les vagues de creeps tandis que dans la phase 3, il faut vaincre de puissants boss."
 	"tutorial_intro_02"                         " Pendant les phases 1 et 2, l'objectif est de défendre le château et de farmer afin de vaincre les boss qui apparaîtront plus tard. Faites attention, si vous mourrez durant la phase 3, vous ne pourrez plus réapparaître ! Vos alliés pourront vous faire revivre. Vous aurez la possibilité d'acheter des Ankhs de Réincarnations."
 	"tutorial_heroes_title"                     "ÉVÈNEMENTS SPÉCIAUX"
