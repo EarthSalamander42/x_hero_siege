@@ -189,10 +189,15 @@
   flow-children: down;
  }
 
- .AchievementTabContentsHeaderRight{
+.AchievementTabContentsHeaderRight {
   width: 100%;
   flow-children: right;
- }
+  opacity: 0;
+}
+
+.AchievementTabContentsHeaderRight.Visible {
+  opacity: 1;
+}
 
  .SeasonAchievementsTitle{
 

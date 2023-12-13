@@ -952,6 +952,7 @@ function GenerateArmoryPanel(reward_list, premium_reward_list, bRewardsDisabled)
 	// $.Msg("GenerateArmoryPanel: " + reward_row.id);
 	const player = Players.GetLocalPlayer();
 	var plyData = CustomNetTables.GetTableValue("battlepass_player", player);
+	if (plyData == undefined) return;
 	var player_avatar = $("#PlayerSteamAvatar");
 
 	// for (var i in plyData) {
@@ -1724,13 +1725,16 @@ function PlayerQuests() {
 			quest_counter++;
 		}
 
-		// $.GetContextPanel().FindChildrenWithClassTraverse("SeasonAchievementsTitle")[0].text = "Win up to " + remaining_points + " experience during " + bp_name + ".";
-		$.GetContextPanel().FindChildrenWithClassTraverse("SeasonAchievementsRewards")[0].SetDialogVariableInt("shards_available", remaining_points);
-		$.GetContextPanel().FindChildrenWithClassTraverse("SeasonAchievementsProgress")[0].SetDialogVariableInt("quests_completed", remaining_quests);
-		$.GetContextPanel().FindChildrenWithClassTraverse("SeasonAchievementsProgress")[0].SetDialogVariableInt("quests_count", quest_counter - 1);
-		// if (Game.IsInToolsMode()) {
-		// 	$("#LeaderboardExperienceTableWrapper").RemoveAndDeleteChildren();
-		// }
+		if (quest_counter > 1) {
+			$.GetContextPanel().FindChildrenWithClassTraverse("AchievementTabContentsHeaderRight")[0].AddClass("Visible");
+			// $.GetContextPanel().FindChildrenWithClassTraverse("SeasonAchievementsTitle")[0].text = "Win up to " + remaining_points + " experience during " + bp_name + ".";
+			$.GetContextPanel().FindChildrenWithClassTraverse("SeasonAchievementsRewards")[0].SetDialogVariableInt("shards_available", remaining_points);
+			$.GetContextPanel().FindChildrenWithClassTraverse("SeasonAchievementsProgress")[0].SetDialogVariableInt("quests_completed", remaining_quests);	
+			$.GetContextPanel().FindChildrenWithClassTraverse("SeasonAchievementsProgress")[0].SetDialogVariableInt("quests_count", quest_counter - 1);
+			// if (Game.IsInToolsMode()) {
+			// 	$("#LeaderboardExperienceTableWrapper").RemoveAndDeleteChildren();
+			// }
+		}
 	}
 }
 
