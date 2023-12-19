@@ -1134,7 +1134,7 @@ function api:GetPlayerWhalepassXP(player_id)
 		return false
 	end
 
-	if self.players[steamid] ~= nil then
+	if self.players[steamid] ~= nil and self.players[steamid].whalepass and self.players[steamid].whalepass[1] then
 		return self.players[steamid].whalepass[1].currentExp
 	else
 		native_print("api:GetPlayerAchievements: api players steamid not valid!")

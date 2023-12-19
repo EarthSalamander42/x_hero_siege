@@ -1131,7 +1131,7 @@
 	"34" // Gyro TI 10
 	{
 		"item_id"					"16315"
-		"item_name"					"battlepass_kill_effect_gyro_premium"
+		"item_name"					"battlepass_kill_effect_gyro"
 		"item_type"					"kill_effect"
 		"item_unlock_level"			"17"
 		"item_rarity"				"uncommon"
