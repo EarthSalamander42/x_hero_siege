@@ -1037,49 +1037,6 @@ function api:GetParties(iPlayerID)
 	return self.parties
 end
 
-function api:GenerateGameModeLeaderboard()
-	local round_count = Rounds:GetRoundCount()
-	--	print("Amount of rounds:", round_count)
-
-	self:GetGameModeLeaderboard(1, round_count)
-end
-
-function api:GetGameModeLeaderboard(iRound, iMaxRound)
-	if not self.pls_ranking then
-		self.pls_ranking = {}
-	end
-
-	print("Iterate round " .. iRound .. "...")
-
-	self:Request("pls_ranking", function(data)
-		self.pls_ranking[iRound] = data.players
-
-		-- if IsInToolsMode() then
-		-- print("GameMode Leaderboard for round "..iRound..":", data.players)
-		-- end
-
-		print("Leaderboard round " .. iRound .. ": success!")
-		iRound = iRound + 1
-
-		if iRound < iMaxRound + 1 then
-			self:GetGameModeLeaderboard(iRound, iMaxRound)
-		else
-			CustomNetTables:SetTableValue("game_options", "GameMode_leaderboard", self.pls_ranking)
-		end
-	end, function()
-		print("Leaderboard round " .. iRound .. ": failure!!!")
-		iRound = iRound + 1
-
-		if iRound < iMaxRound + 1 then
-			self:GetGameModeLeaderboard(iRound, iMaxRound)
-		else
-			CustomNetTables:SetTableValue("game_options", "GameMode_leaderboard", self.pls_ranking)
-		end
-	end, "POST", {
-		round_range = iRound,
-	})
-end
-
 function api:GetPlayerWhalepassURL(player_id)
 	if not PlayerResource:IsValidPlayerID(player_id) then
 		native_print("api:GetPlayerWhalepassURL: Player ID not valid!")
@@ -1114,8 +1071,8 @@ function api:GetPlayerAchievements(player_id)
 		return false
 	end
 
-	if self.players[steamid] ~= nil and self.players[steamid].whalepass and self.players[steamid].whalepass[1] then
-		return self.players[steamid].whalepass[1].challenges
+	if self.players[steamid] ~= nil and self.players[steamid].whalepass then
+		return self.players[steamid].whalepass.challenges
 	else
 		native_print("api:GetPlayerAchievements: api players steamid not valid!")
 		return false
@@ -1124,27 +1081,32 @@ end
 
 function api:GetPlayerWhalepassXP(player_id)
 	if not PlayerResource:IsValidPlayerID(player_id) then
-		native_print("api:GetPlayerAchievements: Player ID not valid!")
-		return false
+		native_print("api:GetPlayerWhalepassXP: Player ID not valid!")
+		return 0
 	end
 
 	local steamid = tostring(PlayerResource:GetSteamID(player_id))
 
 	if self.players == nil then
-		return false
+		return 0
 	end
 
-	if self.players[steamid] ~= nil and self.players[steamid].whalepass and self.players[steamid].whalepass[1] then
-		return self.players[steamid].whalepass[1].currentExp
+	if self.players[steamid] ~= nil then
+		if self.players[steamid] ~= nil and self.players[steamid].whalepass then
+			return self.players[steamid].whalepass.currentExp
+		end
+
+		native_print("api:GetPlayerWhalepassXP: api players whalepass not valid!")
+		return 0
 	else
-		native_print("api:GetPlayerAchievements: api players steamid not valid!")
-		return false
+		native_print("api:GetPlayerWhalepassXP: api players steamid not valid!")
+		return 0
 	end
 end
 
 function api:GetPlayerWhalepassLevel(player_id)
 	if not PlayerResource:IsValidPlayerID(player_id) then
-		native_print("api:GetPlayerAchievements: Player ID not valid!")
+		native_print("api:GetPlayerWhalepassLevel: Player ID not valid!")
 		return false
 	end
 
@@ -1155,9 +1117,16 @@ function api:GetPlayerWhalepassLevel(player_id)
 	end
 
 	if self.players[steamid] ~= nil then
-		return self.players[steamid].whalepass[1].lastCompletedLevel or 0
+		if self.players[steamid].whalepass then
+			return self.players[steamid].whalepass.currentExp
+		else
+			native_print("api:GetPlayerWhalepassLevel: api players whalepass not valid!")
+			return false
+		end
+
+		return self.players[steamid].whalepass.lastCompletedLevel or 0
 	else
-		native_print("api:GetPlayerAchievements: api players steamid not valid!")
+		native_print("api:GetPlayerWhalepassLevel: api players steamid not valid!")
 		return false
 	end
 end
@@ -1165,3 +1134,4 @@ end
 api:Init()
 
 require("components/api/events")
+require("components/api/mods/" .. CUSTOM_GAME_TYPE .. "")
