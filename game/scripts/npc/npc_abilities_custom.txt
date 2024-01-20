@@ -11137,7 +11137,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"ability_datadriven"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_ATTRIBUTES"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"RequiredLevel"					"5"
 		"AbilityTextureName"			"custom/holdout_permanent_stats"
 
@@ -17491,7 +17491,7 @@
 		"AbilityType"                   "DOTA_ABILITY_TYPE_ULTIMATE"
 		"LevelsBetweenUpgrades"			"5"
 		"RequiredLevel"					"10"
-		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_DIRECTIONAL | DOTA_ABILITY_BEHAVIOR_CHANNELING"
+		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_DIRECTIONAL"
 		"AbilityUnitTargetTeam"         "DOTA_UNIT_TARGET_TEAM_ENEMY"
 		"AbilityUnitTargetType"         "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC | DOTA_UNIT_TARGET_BUILDING"
 		"AbilityUnitDamageType"         "DAMAGE_TYPE_MAGICAL"
@@ -17914,7 +17914,7 @@
 		"BaseClass"						"ability_lua"
 		"ScriptFile"					"abilities/heroes/hero_malfurion.lua"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_POINT"
-		"AbilityType"					"ABILITY_TYPE_ULTIMATE"
+		"AbilityType"					"DOTA_ABILITY_TYPE_ULTIMATE"
 		"MaxLevel"						"3"
 		"LevelsBetweenUpgrades"			"6"
 		"RequiredLevel"					"6"

@@ -680,18 +680,18 @@ end
 function api:RegisterGame(callback)
 	self:Request("game-register", function(data)
 		if IsInToolsMode() then
-			for k, v in pairs(data.players) do
-				print("Player SteamID: " .. k)
-				print("Whalepass:")
-				print(v.whalepass)
+			-- for k, v in pairs(data.players) do
+			-- print("Player SteamID: " .. k)
+			-- print("Whalepass:")
+			-- print(v.whalepass)
 
-				if v.whalepass and v.whalepass[1] then
-					for i, j in pairs(v.whalepass[1]) do
-						print(i)
-						-- print(i, j)
-					end
-				end
-			end
+			-- if v.whalepass then
+			-- 	for i, j in pairs(v.whalepass) do
+			-- 		print(i)
+			-- 		-- print(i, j)
+			-- 	end
+			-- end
+			-- end
 
 			print(data.players)
 			print(data.whalepass)
@@ -995,7 +995,7 @@ function api:DetectParties()
 		end
 	end
 
-	print("Parties:", api.parties)
+	-- print("Parties:", api.parties)
 end
 
 function api:FindPlayerParty(iPlayerID)
