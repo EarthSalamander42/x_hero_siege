@@ -679,23 +679,23 @@ end
 
 function api:RegisterGame(callback)
 	self:Request("game-register", function(data)
-		if IsInToolsMode() then
-			-- for k, v in pairs(data.players) do
-			-- print("Player SteamID: " .. k)
-			-- print("Whalepass:")
-			-- print(v.whalepass)
+		-- if IsInToolsMode() then
+		-- for k, v in pairs(data.players) do
+		-- print("Player SteamID: " .. k)
+		-- print("Whalepass:")
+		-- print(v.whalepass)
 
-			-- if v.whalepass then
-			-- 	for i, j in pairs(v.whalepass) do
-			-- 		print(i)
-			-- 		-- print(i, j)
-			-- 	end
-			-- end
-			-- end
+		-- if v.whalepass then
+		-- 	for i, j in pairs(v.whalepass) do
+		-- 		print(i)
+		-- 		-- print(i, j)
+		-- 	end
+		-- end
+		-- end
 
-			print(data.players)
-			print(data.whalepass)
-		end
+		-- print(data.players)
+		-- print(data.whalepass)
+		-- end
 
 		api.game_id = tonumber(data.game_id)
 		api.players = data.players
