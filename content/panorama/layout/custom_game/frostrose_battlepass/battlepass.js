@@ -272,6 +272,7 @@ function ToggleBattlepass() {
 		toggle = false;
 	}
 
+	$.GetContextPanel().visible = toggle;
 	$("#BattlepassWindow").SetHasClass("setvisible", toggle);
 }
 
