@@ -5,23 +5,24 @@ item_rune_immolation = item_rune_immolation or class({})
 function item_rune_immolation:OnSpellStart()
 	if not IsServer() then return end
 
-	self:GetCaster():AddNewModifier(self:GetCaster(), self, "modifier_rune_immolation", {duration = self:GetSpecialValueFor("duration")})
-	self:GetCaster():EmitSound("Rune.Haste")
-	PickupRune(self, self:GetCaster())
-	self:GetCaster():RemoveItem(self)
+	self.caster = self:GetCaster()
+	self.duration = self:GetSpecialValueFor("duration") or -1
+
+	self.caster:AddNewModifier(self.caster, self, "modifier_rune_immolation", { duration = self.duration })
+	self.caster:EmitSound("Rune.Haste")
+
+	PickupRune(self, self.caster)
+
+	self.caster:RemoveItem(self)
 end
 
 modifier_rune_immolation = modifier_rune_immolation or class({})
 
 function modifier_rune_immolation:IsHidden() return false end
 
-function modifier_rune_immolation:GetTexture()
-	return "custom/holdout_immolation"
-end
+function modifier_rune_immolation:GetTexture() return "custom/holdout_immolation" end
 
-function modifier_rune_immolation:GetEffectName()
-	return "particles/units/heroes/hero_lone_druid/lone_druid_battle_cry_overhead_ember.vpcf"
-end
+function modifier_rune_immolation:GetEffectName() return "particles/units/heroes/hero_lone_druid/lone_druid_battle_cry_overhead_ember.vpcf" end
 
 function modifier_rune_immolation:GetEffectAttachType()
 	return PATTACH_OVERHEAD_FOLLOW
@@ -45,7 +46,7 @@ function modifier_rune_immolation:OnIntervalThink()
 	local enemies = FindUnitsInRadius(self:GetParent():GetTeamNumber(), self:GetParent():GetAbsOrigin(), nil, self.radius, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_ALL, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)
 
 	for _, enemy in pairs(enemies) do
-	    ApplyDamage({attacker = self:GetParent(), victim = enemy, ability = self, damage = self.damage, damage_type = DAMAGE_TYPE_MAGICAL})
+		ApplyDamage({ attacker = self:GetParent(), victim = enemy, ability = self, damage = self.damage, damage_type = DAMAGE_TYPE_MAGICAL })
 	end
 end
 

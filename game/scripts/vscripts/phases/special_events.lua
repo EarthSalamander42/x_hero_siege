@@ -53,7 +53,7 @@ function SpecialEvents:MuradinEvent(time)
 
 	GameRules:GetGameModeEntity():SetContextThink(DoUniqueString("muradin_event"), function()
 		Notifications:TopToAll({ text = "WARNING: Incoming Wave of Darkness from the East!", duration = 25.0, style = { color = "red" } })
-		SpawnRunes()
+		-- SpawnRunes()
 
 		return nil
 	end, time - 30)
@@ -190,7 +190,7 @@ function SpecialEvents:FarmEvent(time)
 
 	GameRules:GetGameModeEntity():SetContextThink(DoUniqueString("muradin_event"), function()
 		Notifications:TopToAll({ text = "WARNING: Incoming Wave of Darkness from the North!", duration = 25.0, style = { color = "red" } })
-		SpawnRunes()
+		-- SpawnRunes()
 
 		return nil
 	end, time - 20)
@@ -470,7 +470,7 @@ end
 
 function SpecialEvents:DuelEvent()
 	PauseCreeps()
-	SpawnRunes()
+	-- SpawnRunes()
 	CustomGameEventManager:Send_ServerToAllClients("show_duel", {})
 
 	Notifications:TopToAll({ text = "Fight your team mates until 1 team survives!", duration = 10.0, style = { color = "white" } })
@@ -570,7 +570,7 @@ end
 
 function SpecialEvents:DuelRanked()
 	PauseCreeps()
-	SpawnRunes()
+	-- SpawnRunes()
 	--	CustomGameEventManager:Send_ServerToAllClients("show_duel", {})
 
 	Notifications:TopToAll({ text = "It's Duel Time!", duration = 5.0, style = { color = "white" } })

@@ -187,7 +187,6 @@ end
 -- IMBA Rune System
 function SpawnRunes()
 	local powerup_rune_locations = Entities:FindAllByName("dota_item_rune_spawner_custom")
-	local game_time = GameRules:GetDOTATime(false, false)
 
 	RemoveRunes()
 
@@ -230,16 +229,16 @@ function RemoveRunes()
 end
 
 function PickupRune(item, unit)
-	local gameEvent = {}
-	if unit:IsRealHero() then
-		gameEvent["player_id"] = unit:GetPlayerID()
-	elseif unit:IsConsideredHero() then
-		gameEvent["player_id"] = unit:GetPlayerOwnerID()
-	end
-	gameEvent["team_number"] = unit:GetTeamNumber()
-	gameEvent["locstring_value"] = "#DOTA_Tooltip_Ability_" .. item:GetAbilityName()
-	gameEvent["message"] = "#Dungeon_Rune"
-	FireGameEvent("dota_combat_event_message", gameEvent)
+	-- local gameEvent = {}
+	-- if unit:IsRealHero() then
+	-- 	gameEvent["player_id"] = unit:GetPlayerID()
+	-- elseif unit:IsConsideredHero() then
+	-- 	gameEvent["player_id"] = unit:GetPlayerOwnerID()
+	-- end
+	-- gameEvent["team_number"] = unit:GetTeamNumber()
+	-- gameEvent["locstring_value"] = "#DOTA_Tooltip_Ability_" .. item:GetAbilityName()
+	-- gameEvent["message"] = "#Dungeon_Rune"
+	-- FireGameEvent("dota_combat_event_message", gameEvent)
 end
 
 -- Overrides dota method, use modifier_summoned MODIFIER_STATE_DOMINATED

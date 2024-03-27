@@ -131,7 +131,7 @@ function CustomTimers:Think()
 					if CustomTimers.current_time["special_wave"] == 30 then
 						print("Special Wave in 30 seconds:", CustomTimers.special_wave_region[cardinal_point], CustomTimers.special_wave)
 						Notifications:TopToAll({ text = "WARNING: " .. CustomTimers.special_wave_region[cardinal_point] .. "!", duration = 25.0, style = { color = "red" } })
-						SpawnRunes()
+						-- SpawnRunes()
 						CustomTimers.enable_special_wave = true
 					elseif CustomTimers.current_time["special_wave"] == 0 then
 						print("Special Wave:", CustomTimers.special_wave_region[cardinal_point], CustomTimers.special_wave)
@@ -230,17 +230,22 @@ function SpecialWave(iCardinalPoint)
 		"npc_dota_creature_clockwerk_event_8"
 	}
 
-	local real_point = "npc_dota_spawner_" .. point[iCardinalPoint] .. "_event"
+	local real_point = Entities:FindByName(nil, "npc_dota_spawner_" .. point[iCardinalPoint] .. "_event")
+
+	if real_point == nil then
+		print("Special Wave: Failed to find spawner for " .. point[iCardinalPoint])
+		return
+	end
 
 	for j = 1, 10 do
-		CreateUnitByName(unit[CustomTimers.special_wave], Entities:FindByName(nil, real_point):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+		CreateUnitByName(unit[CustomTimers.special_wave], real_point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
 	end
 
 	CustomTimers.special_wave = CustomTimers.special_wave + 1
 
-	EmitSoundOnLocationForAllies(Entities:FindByName(nil, real_point):GetAbsOrigin(), "Ability.Roar", caster)
+	EmitSoundOnLocationForAllies(real_point:GetAbsOrigin(), "Ability.Roar", caster)
 
 	Timers:CreateTimer(1.9, function()
-		Entities:FindByName(nil, real_point):StopSound("Ability.Roar")
+		real_point:StopSound("Ability.Roar")
 	end)
 end

@@ -98,10 +98,12 @@ function AddNotification(msg, panel) {
 	else
 		notification.AddClass('NotificationMessage');
 
-	if (msg.style){
+	if (msg.style) {
 		for (var key in msg.style){
 			var value = msg.style[key]
-			notification.style[key] = value;
+
+			if (key != "continue")
+				notification.style[key] = value;
 		}
 	}
 }

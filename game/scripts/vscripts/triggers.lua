@@ -11,8 +11,10 @@ end
 
 function OnEndTouch(trigger)
 	local triggerName = thisEntity:GetName()
-	local activator_entindex = trigger.activator:GetEntityIndex()
-	local caller_entindex = trigger.caller:GetEntityIndex()
+	local activator_entindex
+	if trigger.activator then activator_entindex = trigger.activator:GetEntityIndex() end
+	local caller_entindex
+	if trigger.caller then caller_entindex = trigger.caller:GetEntityIndex() end
 	local gamemode = GameRules.GameMode
 
 	if gamemode and gamemode.OnTriggerEndTouch then
