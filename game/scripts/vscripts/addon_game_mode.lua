@@ -58,6 +58,10 @@ function Precache(context)
 	PrecacheResource("model_folder", "models/items/furion/treant/the_ancient_guardian_the_ancient_treants", context)
 	PrecacheResource("model_folder", "particles/econ/events/fall_major_2015", context)
 
+	PrecacheResource("particle", "particles/act_2/campfire_flame.vpcf", context)
+	PrecacheResource("particle", "particles/camp_fire_buff.vpcf", context)
+	PrecacheResource("particle", "particles/custom/undead/disease_cloud.vpcf", context)
+
 	-- TODO: remove all of those and precache them in abilities kv instead
 	-- PRECACHE HEROES (Particle effects for custom abilities)
 	--	PrecacheUnitByNameAsync("npc_dota_hero_antimage", context)		-- Shaman?

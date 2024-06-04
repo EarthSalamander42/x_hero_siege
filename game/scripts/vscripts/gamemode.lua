@@ -556,7 +556,7 @@ function GameMode:HeroImage(event)
 		GameMode.HeroImage:SetAngles(0, 210, 0)
 
 		GameMode.HeroImage:SetBaseStrength(hero:GetStrength() * 4)
-		GameMode.HeroImage:SetBaseIntellect(hero:GetIntellect() * 4)
+		GameMode.HeroImage:SetBaseIntellect(hero:GetIntellect(true) * 4)
 		GameMode.HeroImage:SetBaseAgility(hero:GetAgility() * 4)
 		--		GameMode.HeroImage:SetHasInventory(true)
 
@@ -752,7 +752,7 @@ function GameMode:AllHeroImages(event)
 			GameMode.AllHeroImage:SetAngles(0, 45 - 45 * illusion_spawn, 0)
 
 			GameMode.AllHeroImage:SetBaseStrength(hero:GetStrength() * 2)
-			GameMode.AllHeroImage:SetBaseIntellect(hero:GetIntellect() * 2)
+			GameMode.AllHeroImage:SetBaseIntellect(hero:GetIntellect(true) * 2)
 			GameMode.AllHeroImage:SetBaseAgility(hero:GetAgility() * 2)
 
 			for i = 0, 5 do

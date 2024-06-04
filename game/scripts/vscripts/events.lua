@@ -283,7 +283,7 @@ ListenToGameEvent('npc_spawned', function(keys)
 
 				npc:SetBaseStrength(main_hero:GetStrength())
 				npc:SetBaseAgility(main_hero:GetAgility())
-				npc:SetBaseIntellect(main_hero:GetIntellect())
+				npc:SetBaseIntellect(main_hero:GetIntellect(true))
 			end
 		end
 	end

@@ -43,7 +43,7 @@ function modifier_custom_mechanics:GetModifierPhysicalArmorBonus()
 end
 
 function modifier_custom_mechanics:GetModifierSpellAmplify_Percentage()
-	return self:GetParent():GetIntellect() * (1 / self.required_intellect)
+	return self:GetParent():GetIntellect(true) * (1 / self.required_intellect)
 end
 
 function modifier_custom_mechanics:OnAttackLanded(keys)

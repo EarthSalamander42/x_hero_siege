@@ -490,31 +490,31 @@ function SetCompanion(companion, name, id, required_status) {
 	//	$.Msg(id)
 	//	$.Msg(Game.GetLocalPlayerInfo().player_steamid)
 
-	api.updateCompanion({
-		companion_id: id,
-		steamid: Game.GetLocalPlayerInfo().player_steamid,
-	}, function () {
-		$("#CompanionNotification").AddClass("success");
-		$("#CompanionNotificationLabel").text = $.Localize("#companion_success") + " " + $.Localize("#" + name) + "!";
-		GameEvents.SendCustomGameEventToServer("change_companion", {
-			ID: Players.GetLocalPlayer(),
-			unit: companion,
-			js: true
-		});
-		$.Schedule(6.0, function () {
-			$("#CompanionNotification").RemoveClass("success");
-			$("#CompanionNotificationLabel").text = "";
-			companion_changed = false;
-		});
-	}, function () {
-		$("#CompanionNotification").AddClass("failure");
-		$("#CompanionNotificationLabel").text = $.Localize("#companion_error");
-		$.Schedule(6.0, function () {
-			$("#CompanionNotification").RemoveClass("failure");
-			$("#CompanionNotificationLabel").text = "";
-			companion_changed = false;
-		});
-	});
+	// api.updateCompanion({
+	// 	companion_id: id,
+	// 	steamid: Game.GetLocalPlayerInfo().player_steamid,
+	// }, function () {
+	// 	$("#CompanionNotification").AddClass("success");
+	// 	$("#CompanionNotificationLabel").text = $.Localize("#companion_success") + " " + $.Localize("#" + name) + "!";
+	// 	GameEvents.SendCustomGameEventToServer("change_companion", {
+	// 		ID: Players.GetLocalPlayer(),
+	// 		unit: companion,
+	// 		js: true
+	// 	});
+	// 	$.Schedule(6.0, function () {
+	// 		$("#CompanionNotification").RemoveClass("success");
+	// 		$("#CompanionNotificationLabel").text = "";
+	// 		companion_changed = false;
+	// 	});
+	// }, function () {
+	// 	$("#CompanionNotification").AddClass("failure");
+	// 	$("#CompanionNotificationLabel").text = $.Localize("#companion_error");
+	// 	$.Schedule(6.0, function () {
+	// 		$("#CompanionNotification").RemoveClass("failure");
+	// 		$("#CompanionNotificationLabel").text = "";
+	// 		companion_changed = false;
+	// 	});
+	// });
 
 	companion_changed = true;
 }
@@ -543,30 +543,30 @@ function SetStatue(statue, name, id) {
 		return;
 	}
 
-	api.updateStatue({
-		statue_id: id,
-		steamid: Game.GetLocalPlayerInfo().player_steamid,
-	}, function () {
-		$("#CompanionNotification").AddClass("success");
-		$("#CompanionNotificationLabel").text = $.Localize("#statue_success") + " " + $.Localize("#" + name) + "!";
-		GameEvents.SendCustomGameEventToServer("change_statue", {
-			ID: Players.GetLocalPlayer(),
-			unit: statue
-		});
-		$.Schedule(6.0, function () {
-			$("#CompanionNotification").RemoveClass("success");
-			companion_changed = false;
-			$("#CompanionNotificationLabel").text = "";
-		});
-	}, function () {
-		$("#CompanionNotification").AddClass("failure");
-		$("#CompanionNotificationLabel").text = $.Localize("#companion_error");
-		$.Schedule(6.0, function () {
-			$("#CompanionNotification").RemoveClass("failure");
-			companion_changed = false;
-			$("#CompanionNotificationLabel").text = "";
-		});
-	});
+	// api.updateStatue({
+	// 	statue_id: id,
+	// 	steamid: Game.GetLocalPlayerInfo().player_steamid,
+	// }, function () {
+	// 	$("#CompanionNotification").AddClass("success");
+	// 	$("#CompanionNotificationLabel").text = $.Localize("#statue_success") + " " + $.Localize("#" + name) + "!";
+	// 	GameEvents.SendCustomGameEventToServer("change_statue", {
+	// 		ID: Players.GetLocalPlayer(),
+	// 		unit: statue
+	// 	});
+	// 	$.Schedule(6.0, function () {
+	// 		$("#CompanionNotification").RemoveClass("success");
+	// 		companion_changed = false;
+	// 		$("#CompanionNotificationLabel").text = "";
+	// 	});
+	// }, function () {
+	// 	$("#CompanionNotification").AddClass("failure");
+	// 	$("#CompanionNotificationLabel").text = $.Localize("#companion_error");
+	// 	$.Schedule(6.0, function () {
+	// 		$("#CompanionNotification").RemoveClass("failure");
+	// 		companion_changed = false;
+	// 		$("#CompanionNotificationLabel").text = "";
+	// 	});
+	// });
 
 	companion_changed = true;
 }
@@ -597,30 +597,30 @@ function SetEmblem(emblem, name, id, required_status) {
 		return;
 	}
 
-	api.updateEmblem({
-		emblem_id: id,
-		steamid: Game.GetLocalPlayerInfo().player_steamid,
-	}, function () {
-		$("#CompanionNotification").AddClass("success");
-		$("#CompanionNotificationLabel").text = $.Localize("#emblem_success") + " " + $.Localize("#" + name) + "!";
-		GameEvents.SendCustomGameEventToServer("change_emblem", {
-			ID: Players.GetLocalPlayer(),
-			unit: emblem
-		});
-		$.Schedule(6.0, function () {
-			$("#CompanionNotification").RemoveClass("success");
-			$("#CompanionNotificationLabel").text = "";
-			companion_changed = false;
-		});
-	}, function () {
-		$("#CompanionNotification").AddClass("failure");
-		$("#CompanionNotificationLabel").text = $.Localize("#companion_error");
-		$.Schedule(6.0, function () {
-			$("#CompanionNotification").RemoveClass("failure");
-			$("#CompanionNotificationLabel").text = "";
-			companion_changed = false;
-		});
-	});
+	// api.updateEmblem({
+	// 	emblem_id: id,
+	// 	steamid: Game.GetLocalPlayerInfo().player_steamid,
+	// }, function () {
+	// 	$("#CompanionNotification").AddClass("success");
+	// 	$("#CompanionNotificationLabel").text = $.Localize("#emblem_success") + " " + $.Localize("#" + name) + "!";
+	// 	GameEvents.SendCustomGameEventToServer("change_emblem", {
+	// 		ID: Players.GetLocalPlayer(),
+	// 		unit: emblem
+	// 	});
+	// 	$.Schedule(6.0, function () {
+	// 		$("#CompanionNotification").RemoveClass("success");
+	// 		$("#CompanionNotificationLabel").text = "";
+	// 		companion_changed = false;
+	// 	});
+	// }, function () {
+	// 	$("#CompanionNotification").AddClass("failure");
+	// 	$("#CompanionNotificationLabel").text = $.Localize("#companion_error");
+	// 	$.Schedule(6.0, function () {
+	// 		$("#CompanionNotification").RemoveClass("failure");
+	// 		$("#CompanionNotificationLabel").text = "";
+	// 		companion_changed = false;
+	// 	});
+	// });
 
 	companion_changed = true;
 }
@@ -645,35 +645,35 @@ function SetTag() {
 					tag_name : chat.text,
 				})
 		*/
-		api.updateTag({
-			steamid: Game.GetLocalPlayerInfo().player_steamid,
-			tag_name: chat.text
-		}, function () {
-			GameEvents.SendCustomGameEventToServer("change_ingame_tag", {
-				ingame_tag: chat.text
-			});
+		// api.updateTag({
+		// 	steamid: Game.GetLocalPlayerInfo().player_steamid,
+		// 	tag_name: chat.text
+		// }, function () {
+		// 	GameEvents.SendCustomGameEventToServer("change_ingame_tag", {
+		// 		ingame_tag: chat.text
+		// 	});
 
-			$("#CompanionNotification").AddClass("success");
-			$("#CompanionNotificationLabel").text = $.Localize("#tag_success") + " " + chat.text + "!";
+		// 	$("#CompanionNotification").AddClass("success");
+		// 	$("#CompanionNotificationLabel").text = $.Localize("#tag_success") + " " + chat.text + "!";
 
-			$.Msg("Ingame tag update: success!")
-			$.Schedule(6.0, function () {
-				$("#CompanionNotification").RemoveClass("success");
-				$("#CompanionNotificationLabel").text = "";
-				companion_changed = false;
-			});
+		// 	$.Msg("Ingame tag update: success!")
+		// 	$.Schedule(6.0, function () {
+		// 		$("#CompanionNotification").RemoveClass("success");
+		// 		$("#CompanionNotificationLabel").text = "";
+		// 		companion_changed = false;
+		// 	});
 
-			chat.text = "";
-		}, function () {
-			$.Msg("Ingame tag update: failure")
-			$("#CompanionNotification").AddClass("failure");
-			$("#CompanionNotificationLabel").text = $.Localize("#companion_error");
-			$.Schedule(6.0, function () {
-				$("#CompanionNotification").RemoveClass("failure");
-				$("#CompanionNotificationLabel").text = "";
-				companion_changed = false;
-			});
-		});
+		// 	chat.text = "";
+		// }, function () {
+		// 	$.Msg("Ingame tag update: failure")
+		// 	$("#CompanionNotification").AddClass("failure");
+		// 	$("#CompanionNotificationLabel").text = $.Localize("#companion_error");
+		// 	$.Schedule(6.0, function () {
+		// 		$("#CompanionNotification").RemoveClass("failure");
+		// 		$("#CompanionNotificationLabel").text = "";
+		// 		companion_changed = false;
+		// 	});
+		// });
 	});
 }
 
@@ -1410,28 +1410,28 @@ function SettingsIngameTag() {
 			tag = 1
 	}
 
-	api.updateIngameTag({
-		steamid: Game.GetLocalPlayerInfo().player_steamid,
-		toggle_tag: tag
-	}, function () {
-		GameEvents.SendCustomGameEventToServer("toggle_ingame_tag", {
-			tag: tag
-		});
-		//		$.Msg("Ingame tag update: success!")
-		//		$.Schedule(6.0, function() {
-		//			$("#CompanionNotification").RemoveClass("success");
-		//			companion_changed = false;
-		//		});
-	}, function () {
-		$("#IngameTagCheckBox").checked = tag;
-		//		$.Msg("Ingame tag update: failure")
-		//		$("#CompanionNotification").AddClass("failure");
-		//		$("#CompanionNotificationLabel").text = $.Localize("#companion_error");
-		//		$.Schedule(6.0, function() {
-		//			$("#CompanionNotification").RemoveClass("failure");
-		//			companion_changed = false;
-		//		});
-	});
+	// api.updateIngameTag({
+	// 	steamid: Game.GetLocalPlayerInfo().player_steamid,
+	// 	toggle_tag: tag
+	// }, function () {
+	// 	GameEvents.SendCustomGameEventToServer("toggle_ingame_tag", {
+	// 		tag: tag
+	// 	});
+	// 	//		$.Msg("Ingame tag update: success!")
+	// 	//		$.Schedule(6.0, function() {
+	// 	//			$("#CompanionNotification").RemoveClass("success");
+	// 	//			companion_changed = false;
+	// 	//		});
+	// }, function () {
+	// 	$("#IngameTagCheckBox").checked = tag;
+	// 	//		$.Msg("Ingame tag update: failure")
+	// 	//		$("#CompanionNotification").AddClass("failure");
+	// 	//		$("#CompanionNotificationLabel").text = $.Localize("#companion_error");
+	// 	//		$.Schedule(6.0, function() {
+	// 	//			$("#CompanionNotification").RemoveClass("failure");
+	// 	//			companion_changed = false;
+	// 	//		});
+	// });
 }
 
 function SettingsBattlepassRewards() {
@@ -1447,29 +1447,29 @@ function SettingsBattlepassRewards() {
 
 	//	$.Msg("BP Rewards :" + toggle_rewards)
 
-	api.updateBPRewards({
-		steamid: Game.GetLocalPlayerInfo().player_steamid,
-		bp_rewards: toggle_rewards
-	}, function () {
-		GameEvents.SendCustomGameEventToServer("change_battlepass_rewards", {
-			ID: Players.GetLocalPlayer(),
-			bp_rewards: toggle_rewards
-		});
-		RefreshBattlepass(toggle_rewards);
-		//		$.Msg("BP rewards update: success!")
-		//		$.Schedule(6.0, function() {
-		//			$("#CompanionNotification").RemoveClass("success");
-		//			companion_changed = false;
-		//		});
-	}, function () {
-		//		$.Msg("BP rewards update: failure")
-		//		$("#CompanionNotification").AddClass("failure");
-		//		$("#CompanionNotificationLabel").text = $.Localize("#companion_error");
-		//		$.Schedule(6.0, function() {
-		//			$("#CompanionNotification").RemoveClass("failure");
-		//			companion_changed = false;
-		//		});
-	});
+	// api.updateBPRewards({
+	// 	steamid: Game.GetLocalPlayerInfo().player_steamid,
+	// 	bp_rewards: toggle_rewards
+	// }, function () {
+	// 	GameEvents.SendCustomGameEventToServer("change_battlepass_rewards", {
+	// 		ID: Players.GetLocalPlayer(),
+	// 		bp_rewards: toggle_rewards
+	// 	});
+	// 	RefreshBattlepass(toggle_rewards);
+	// 	//		$.Msg("BP rewards update: success!")
+	// 	//		$.Schedule(6.0, function() {
+	// 	//			$("#CompanionNotification").RemoveClass("success");
+	// 	//			companion_changed = false;
+	// 	//		});
+	// }, function () {
+	// 	//		$.Msg("BP rewards update: failure")
+	// 	//		$("#CompanionNotification").AddClass("failure");
+	// 	//		$("#CompanionNotificationLabel").text = $.Localize("#companion_error");
+	// 	//		$.Schedule(6.0, function() {
+	// 	//			$("#CompanionNotification").RemoveClass("failure");
+	// 	//			companion_changed = false;
+	// 	//		});
+	// });
 }
 
 function SettingsPlayerXP() {
@@ -1485,28 +1485,28 @@ function SettingsPlayerXP() {
 
 	//	$.Msg("Player XP :" + toggle)
 
-	api.updatePlayerXP({
-		steamid: Game.GetLocalPlayerInfo().player_steamid,
-		player_xp: toggle
-	}, function () {
-		GameEvents.SendCustomGameEventToServer("change_player_xp", {
-			ID: Players.GetLocalPlayer(),
-			player_xp: toggle
-		});
-		//		$.Msg("Player XP update: success!")
-		//		$.Schedule(6.0, function() {
-		//			$("#CompanionNotification").RemoveClass("success");
-		//			companion_changed = false;
-		//		});
-	}, function () {
-		//		$.Msg("Player XP update: failure")
-		//		$("#CompanionNotification").AddClass("failure");
-		//		$("#CompanionNotificationLabel").text = $.Localize("#companion_error");
-		//		$.Schedule(6.0, function() {
-		//			$("#CompanionNotification").RemoveClass("failure");
-		//			companion_changed = false;
-		//		});
-	});
+	// api.updatePlayerXP({
+	// 	steamid: Game.GetLocalPlayerInfo().player_steamid,
+	// 	player_xp: toggle
+	// }, function () {
+	// 	GameEvents.SendCustomGameEventToServer("change_player_xp", {
+	// 		ID: Players.GetLocalPlayer(),
+	// 		player_xp: toggle
+	// 	});
+	// 	//		$.Msg("Player XP update: success!")
+	// 	//		$.Schedule(6.0, function() {
+	// 	//			$("#CompanionNotification").RemoveClass("success");
+	// 	//			companion_changed = false;
+	// 	//		});
+	// }, function () {
+	// 	//		$.Msg("Player XP update: failure")
+	// 	//		$("#CompanionNotification").AddClass("failure");
+	// 	//		$("#CompanionNotificationLabel").text = $.Localize("#companion_error");
+	// 	//		$.Schedule(6.0, function() {
+	// 	//			$("#CompanionNotification").RemoveClass("failure");
+	// 	//			companion_changed = false;
+	// 	//		});
+	// });
 }
 
 function SettingsWinrate() {
@@ -1521,17 +1521,17 @@ function SettingsWinrate() {
 
 	//	$.Msg("Player XP :" + toggle)
 
-	api.updateWinrate({
-		steamid: Game.GetLocalPlayerInfo().player_steamid,
-		winrate: toggle
-	}, function () {
-		GameEvents.SendCustomGameEventToServer("change_winrate", {
-			ID: Players.GetLocalPlayer(),
-			player_xp: toggle
-		});
-	}, function () {
-		$.Msg("Winrate update fail!")
-	});
+	// api.updateWinrate({
+	// 	steamid: Game.GetLocalPlayerInfo().player_steamid,
+	// 	winrate: toggle
+	// }, function () {
+	// 	GameEvents.SendCustomGameEventToServer("change_winrate", {
+	// 		ID: Players.GetLocalPlayer(),
+	// 		player_xp: toggle
+	// 	});
+	// }, function () {
+	// 	$.Msg("Winrate update fail!")
+	// });
 }
 
 function _ScoreboardUpdater_SetTextSafe(panel, childName, textValue) {
