@@ -27,6 +27,7 @@ function OnDialogReceived( data )
 		$( "#FloatingDialogPanel" ).style.y = ( nY - 100 ) + "px";
 	}
 
+	
 	$( "#DialogPanel" ).SetHasClass( "Visible", g_bSentToAll || data["JournalEntry"] );
 	$( "#FloatingDialogPanel" ).SetHasClass( "Visible", !g_bSentToAll && !data["JournalEntry"] );
 	$( "#DialogPanel" ).SetHasClass( "JournalEntry", data["JournalEntry"] );

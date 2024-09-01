@@ -2,6 +2,7 @@ if GameMode == nil then
 	_G.GameMode = class({})
 end
 
+require('addon_init')
 require('events')
 require('constants') -- in cause?
 
@@ -381,10 +382,13 @@ end
 
 function GameMode:DamageFilter(filterTable)
 	local flDamage = filterTable["damage"]
+
 	if filterTable["entindex_attacker_const"] == nil then
 		return true
 	end
+
 	local hAttackerHero = EntIndexToHScript(filterTable["entindex_attacker_const"])
+
 	if flDamage > 0 and hAttackerHero ~= nil and hAttackerHero:IsRealHero() then
 		for _, Zone in pairs(GameMode.Zones) do
 			if Zone:ContainsUnit(hAttackerHero) then

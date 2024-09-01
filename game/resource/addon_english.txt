@@ -1771,7 +1771,7 @@
 		"DOTA_Tooltip_ability_holdout_dark_pact_radius"		"RADIUS:"
 		"DOTA_Tooltip_ability_holdout_dark_pact_total_heal"		"HEAL/DAMAGE:"
 		"DOTA_Tooltip_ability_holdout_sea_dragon_form"		"Sea Dragon Form"
-		"DOTA_Tooltip_ability_holdout_sea_dragon_form_Description"		"Centurion takes the form of one of two powerful sea dragons, increasing his damage and speed, while granting him new powers.\n<font color=\"
+		"DOTA_Tooltip_ability_holdout_sea_dragon_form_Description"		"Centurion takes the form of one of two powerful sea dragons, increasing his damage and speed, while granting him new powers.\n<font color='#9acd32'>LEVEL 1 Green Dragon</font> - Corrosive Breath: attacks deal 20 poison damage over 5 seconds. Works on structures.\n<font color='#828282'>LEVEL 3 Black Dragon</font> - Stun Breath: Give a chance to stun the primary target for 0.2 seconds.\nCorrosive Breath works on both levels."
 		"DOTA_Tooltip_ability_holdout_sea_dragon_form_Lore"		"The dormant dragon power springs forth from within Centurion, combining the powers of a legendary Naga with a legendary Dragon."
 		"DOTA_Tooltip_ability_holdout_sea_dragon_form_Note0"		"Corrosive Breath poison damage is lethal."
 		"DOTA_Tooltip_ability_holdout_sea_dragon_form_Note1"		"Stun Breath stacks with Unique Attack Modifiers."
