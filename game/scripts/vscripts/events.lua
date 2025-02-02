@@ -695,10 +695,10 @@ ListenToGameEvent("player_chat", function(keys)
 
 							return nil
 						end, 1.0)
-					end)
-					--					else
-					--						Notifications:TopToAll({text="Hero don't exist!", duration=6.0, style={color="red", ["font-size"]="30px"}})
-					--					end
+					end, userID)
+					-- else
+					-- 	Notifications:TopToAll({text="Hero don't exist!", duration=6.0, style={color="red", ["font-size"]="30px"}})
+					-- end
 				end
 			end
 		end
@@ -850,6 +850,7 @@ end
 function GameMode:OnTriggerEndTouch(triggerName, activator_entindex, caller_entindex)
 	--print("GameMode:OnTriggerEndTouch - " .. triggerName)
 	--This is a zone transition trigger
+	print(activator_entindex, caller_entindex)
 	local playerHero = EntIndexToHScript(activator_entindex)
 	if playerHero and playerHero:IsRealHero() and playerHero:GetPlayerOwnerID() ~= -1 then
 		local i, j = string.find(triggerName, "_zone_")

@@ -184,7 +184,7 @@ function CDungeonZone:PrecacheNPCs(zoneTable)
 					end
 					if bFound == false then
 						CDungeonZone.nPrecacheCount = CDungeonZone.nPrecacheCount + 1
-						PrecacheUnitByNameAsync(unitTable.szNPCName, function(sg) table.insert(CDungeonZone.SpawnGroups, sg) end)
+						PrecacheUnitByNameAsync(unitTable.szNPCName, function(sg) table.insert(CDungeonZone.SpawnGroups, sg) end, 0)
 						table.insert(GameRules.GameMode.PrecachedEnemies, unitTable.szNPCName)
 						--print( "CDungeonZone:PrecacheNPCs() - Precached unit of type " .. unitTable.szNPCName )
 					end
@@ -216,7 +216,7 @@ function CDungeonZone:PrecacheVIPs(vipTable)
 			end
 			if bFound == false then
 				CDungeonZone.nPrecacheVIPCount = CDungeonZone.nPrecacheVIPCount + 1
-				PrecacheUnitByNameAsync(unitTable.szVIPName, function(sg) table.insert(CDungeonZone.SpawnGroups, sg) end)
+				PrecacheUnitByNameAsync(unitTable.szVIPName, function(sg) table.insert(CDungeonZone.SpawnGroups, sg) end, 0)
 				table.insert(GameRules.GameMode.PrecachedVIPs, unitTable.szVIPName)
 				--print( "CDungeonZone:PrecacheVIPs() - Precached unit of type " .. unitTable.szVIPName )
 			end
@@ -235,7 +235,7 @@ function CDungeonZone:PrecacheNeutrals(neutralTable)
 	--print( "CDungeonZone:PrecacheNeutrals() - Precaching Neutrals " .. tostring( neutralTable ) )
 	for _, unitTable in pairs(neutralTable) do
 		if unitTable ~= nil then
-			PrecacheUnitByNameAsync(unitTable.szNPCName, function(sg) table.insert(CDungeonZone.SpawnGroups, sg) end)
+			PrecacheUnitByNameAsync(unitTable.szNPCName, function(sg) table.insert(CDungeonZone.SpawnGroups, sg) end, 0)
 		end
 	end
 end
@@ -547,17 +547,20 @@ function CDungeonZone:SpawnAlliedStructures()
 				-- Roll dice to determine whether to spawn structure at this spawner
 				local fThreshold = 1 - fSpawnChance
 				local bSpawnStructure = RandomFloat(0, 1) >= fThreshold
+
 				if bSpawnStructure then
-					local hUnit = CreateUnitByName(structureTable.szNPCName, vSpawnLoc, true, nil, nil, DOTA_TEAM_GOODGUYS)
-					if hUnit then
-						local vSpawnerForward = hSpawner:GetForwardVector()
-						hUnit:SetForwardVector(vSpawnerForward)
+					PrecacheUnitByNameAsync(structureTable.szNPCName, function()
+						local hUnit = CreateUnitByName(structureTable.szNPCName, vSpawnLoc, true, nil, nil, DOTA_TEAM_GOODGUYS)
+						if hUnit then
+							local vSpawnerForward = hSpawner:GetForwardVector()
+							hUnit:SetForwardVector(vSpawnerForward)
 
-						--print( "Created allied structure unit named " .. hUnit:GetUnitName() )
-						hUnit.zone = CDungeonZone
+							--print( "Created allied structure unit named " .. hUnit:GetUnitName() )
+							hUnit.zone = CDungeonZone
 
-						--CDungeonZone:AddBreakableContainerToZone( hUnit )
-					end
+							--CDungeonZone:AddBreakableContainerToZone( hUnit )
+						end
+					end, 0)
 				end
 			end
 		end
