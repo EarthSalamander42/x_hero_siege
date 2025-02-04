@@ -91,7 +91,7 @@ function EndMagtheridonArena()
 end
 
 function DarkProtectors(keys)
-	local activator = keys.activator
+	-- local activator = keys.activator
 	local point2 = Entities:FindByName(nil, "spawner_phase3_creeps_west"):GetAbsOrigin()
 	local point3 = Entities:FindByName(nil, "spawner_phase3_creeps_east"):GetAbsOrigin()
 
@@ -105,13 +105,13 @@ function DarkProtectors(keys)
 		for i = 0, PlayerResource:GetPlayerCount() - 1 do
 			Timers:CreateTimer(3.0, function()
 				for i = 1, 4 * GameRules:GetCustomGameDifficulty() do
-					local unit = CreateUnitByName("npc_dota_creep_dire_hulk", point2 + RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_CUSTOM_2)
+					CreateUnitByName("npc_dota_creep_dire_hulk", point2 + RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 				end
 			end)
 
 			Timers:CreateTimer(5.0, function()
 				for i = 1, 4 * GameRules:GetCustomGameDifficulty() do
-					local unit = CreateUnitByName("npc_dota_creep_dire_hulk", point3 + RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_CUSTOM_2)
+					CreateUnitByName("npc_dota_creep_dire_hulk", point3 + RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 				end
 			end)
 		end

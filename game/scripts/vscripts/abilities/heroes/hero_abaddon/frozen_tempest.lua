@@ -18,7 +18,7 @@ function pulse_nova_take_mana(params)
         return
     end
 
-    params.caster:ReduceMana(params.mana_per_sec, params.ability)
+    params.caster:Script_ReduceMana(params.mana_per_sec, params.ability)
 
     if params.caster:GetMana() < params.mana_per_sec then
         params.ability:ToggleAbility()

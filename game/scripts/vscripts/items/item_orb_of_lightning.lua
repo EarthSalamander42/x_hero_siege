@@ -33,7 +33,7 @@ local function StartLightningOrbsCooldown(hero, cooldown)
 	end
 end
 
-item_orb_of_lightning = class({})
+item_orb_of_lightning = item_orb_of_lightning or class({})
 
 function item_orb_of_lightning:GetIntrinsicModifierName()
 	return "modifier_orb_of_lightning_passive"
@@ -55,7 +55,7 @@ end
 
 --------------------------------------------------------------
 
-item_orb_of_lightning2 = class({})
+item_orb_of_lightning2 = item_orb_of_lightning2 or class({})
 
 function item_orb_of_lightning2:GetIntrinsicModifierName()
 	return "modifier_orb_of_lightning_passive"
@@ -77,7 +77,7 @@ end
 
 --------------------------------------------------------------
 
-item_celestial_claws = class({})
+item_celestial_claws = item_celestial_claws or class({})
 
 function item_celestial_claws:GetIntrinsicModifierName()
 	return "modifier_orb_of_lightning_passive"
@@ -115,13 +115,18 @@ end
 
 --------------------------------------------------------------
 
-modifier_orb_of_lightning_active = class({})
+modifier_orb_of_lightning_active = modifier_orb_of_lightning_active or class({})
 
 function modifier_orb_of_lightning_active:IsHidden() return false end
+
 function modifier_orb_of_lightning_active:IsPurgable() return false end
+
 function modifier_orb_of_lightning_active:IsPurgeException() return false end
+
 function modifier_orb_of_lightning_active:IsDebuff() return false end
+
 function modifier_orb_of_lightning_active:RemoveOnDeath() return false end
+
 function modifier_orb_of_lightning_active:GetTexture() return "modifiers/orb_of_lightning" end
 
 function modifier_orb_of_lightning_active:GetEffectAttachType()
@@ -139,10 +144,11 @@ function modifier_orb_of_lightning_active:DeclareFunctions()
 end
 
 function modifier_orb_of_lightning_active:OnCreated()
---	self.ability = self:GetAbility()
+	--	self.ability = self:GetAbility()
 	self.duration = self:GetAbility():GetSpecialValueFor("duration")
 	self.purge_chance = self:GetAbility():GetSpecialValueFor("purge_chance")
 	self.purge_cooldown = self:GetAbility():GetSpecialValueFor("purge_cooldown")
+	print(self.duration, self.purge_chance, self.purge_cooldown)
 end
 
 function modifier_orb_of_lightning_active:OnAttackLanded(params)
@@ -177,7 +183,7 @@ function modifier_orb_of_lightning_active:OnAttackLanded(params)
 			if RandomInt(1, 100) <= self.purge_chance then
 				if ability:IsCooldownReady() then
 					if not params.target:IsBuilding() then
-						params.target:AddNewModifier(caster, ability, "modifier_orb_of_lightning_purge", {duration = self.duration})
+						params.target:AddNewModifier(caster, ability, "modifier_orb_of_lightning_purge", { duration = self.duration })
 						StartLightningOrbsCooldown(params.attacker, self.purge_cooldown)
 					end
 				end
@@ -188,12 +194,16 @@ end
 
 --------------------------------------------------------------
 
-modifier_orb_of_lightning_passive = class({})
+modifier_orb_of_lightning_passive = modifier_orb_of_lightning_passive or class({})
 
 function modifier_orb_of_lightning_passive:IsHidden() return true end
+
 function modifier_orb_of_lightning_passive:IsPurgable() return false end
+
 function modifier_orb_of_lightning_passive:IsPurgeException() return false end
+
 function modifier_orb_of_lightning_passive:IsDebuff() return false end
+
 function modifier_orb_of_lightning_passive:RemoveOnDeath() return false end
 
 -- allow multiple instances of that modifier
@@ -219,11 +229,14 @@ end
 
 --------------------------------------------------------------
 
-modifier_orb_of_lightning_purge = class({})
+modifier_orb_of_lightning_purge = modifier_orb_of_lightning_purge or class({})
 
 function modifier_orb_of_lightning_purge:IsHidden() return false end
+
 function modifier_orb_of_lightning_purge:IsPurgable() return false end
+
 function modifier_orb_of_lightning_purge:IsPurgeException() return false end
+
 function modifier_orb_of_lightning_purge:IsDebuff() return true end
 
 function modifier_orb_of_lightning_purge:CheckState()
@@ -253,7 +266,7 @@ function modifier_orb_of_lightning_purge:OnCreated()
 		self:GetParent():Purge(RemovePositiveBuffs, RemoveDebuffs, BuffsCreatedThisFrameOnly, RemoveStuns, RemoveExceptions)
 
 		if self:GetParent():IsSummoned() then
-			ApplyDamage({victim = self:GetParent(), attacker = self:GetCaster(), damage = self:GetAbility():GetSpecialValueFor('damage_to_summons'), damage_type = DAMAGE_TYPE_PURE, ability = self:GetAbility()})
+			ApplyDamage({ victim = self:GetParent(), attacker = self:GetCaster(), damage = self:GetAbility():GetSpecialValueFor('damage_to_summons'), damage_type = DAMAGE_TYPE_PURE, ability = self:GetAbility() })
 			StartLightningOrbsCooldown(self:GetCaster(), 10.0)
 		end
 	end

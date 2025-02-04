@@ -850,8 +850,14 @@ end
 function GameMode:OnTriggerEndTouch(triggerName, activator_entindex, caller_entindex)
 	--print("GameMode:OnTriggerEndTouch - " .. triggerName)
 	--This is a zone transition trigger
-	print(activator_entindex, caller_entindex)
+	-- print(activator_entindex, caller_entindex)
+
+	if activator_entindex == nil then
+		return
+	end
+
 	local playerHero = EntIndexToHScript(activator_entindex)
+
 	if playerHero and playerHero:IsRealHero() and playerHero:GetPlayerOwnerID() ~= -1 then
 		local i, j = string.find(triggerName, "_zone_")
 		if i then

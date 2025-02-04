@@ -771,7 +771,7 @@ function GetBossBarIcon(sBossName)
 		npc_dota_hero_grom_hellscream = "npc_dota_hero_juggernaut",
 		npc_dota_hero_illidan = "npc_dota_hero_terrorblade",
 		npc_dota_boss_lich_king = "npc_dota_hero_abaddon",
-		npc_dota_hero_magtheridon = "npc_dota_hero_elder_titan",
+		npc_dota_hero_magtheridon = "npc_dota_hero_abyssal_underlord",
 		npc_dota_boss_spirit_master_storm = "npc_dota_hero_storm_spirit",
 		npc_dota_boss_spirit_master_fire = "npc_dota_hero_lina",
 		npc_dota_boss_spirit_master_earth = "npc_dota_hero_earth_spirit",

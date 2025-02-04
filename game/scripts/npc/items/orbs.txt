@@ -39,38 +39,14 @@
 		"UIDropSound"					"Item.DropGemShop"
 		"WorldDropSound"				"Item.DropGemWorld"
 
-		"AbilitySpecial"
+		"AbilityValues"
 		{
-			"01"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_damage"			"150"
-			}
-			"02"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"purge_chance"			"10"
-			}
-			"03"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"duration"				"3"
-			}
-			"04"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_movespeed"		"5"
-			}
-			"05"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"purge_cooldown"		"10"
-			}
-			"06"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"damage_to_summons"		"300"
-			}
+			"bonus_damage"			"150"
+			"purge_chance"			"10"
+			"duration"				"3.0"
+			"bonus_movespeed"		"5"
+			"purge_cooldown"		"10.0"
+			"damage_to_summons"		"300"
 		}
 	}
 
@@ -112,38 +88,14 @@
 		"UIDropSound"					"Item.DropGemShop"
 		"WorldDropSound"				"Item.DropGemWorld"
 
-		"AbilitySpecial"
+		"AbilityValues"
 		{
-			"01"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_damage"			"450"
-			}
-			"02"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"purge_chance"			"10"
-			}
-			"03"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"duration"				"3"
-			}
-			"04"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_movespeed"		"10"
-			}
-			"05"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"purge_cooldown"		"10"
-			}
-			"06"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"damage_to_summons"		"300"
-			}
+			"bonus_damage"			"450"
+			"purge_chance"			"10"
+			"duration"				"3.0"
+			"bonus_movespeed"		"10"
+			"purge_cooldown"		"10.0"
+			"damage_to_summons"		"300"
 		}
 	}
 
@@ -218,43 +170,15 @@
 		"UIDropSound"					"Item.DropGemShop"
 		"WorldDropSound"				"Item.DropGemWorld"
 
-		"AbilitySpecial"
+		"AbilityValues"
 		{
-			"01"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_damage"			"1350"
-			}
-			"02"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"purge_chance"			"10"
-			}
-			"03"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"duration"				"3"
-			}
-			"04"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_movespeed"		"20"
-			}
-			"05"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"purge_cooldown"		"10"
-			}
-			"06"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"damage_to_summons"		"300"
-			}
-			"07"
-			{
-				"var_type"				"FIELD_FLOAT"
-				"bat_reduction"			"0.2"
-			}
+			"bonus_damage"			"1350"
+			"purge_chance"			"10"
+			"duration"				"3.0"
+			"bonus_movespeed"		"20"
+			"purge_cooldown"		"10.0"
+			"damage_to_summons"		"300"
+			"bat_reduction"			"0.2"
 		}
 	}
 
@@ -296,23 +220,11 @@
 		"UIDropSound"                   "Item.DropGemShop"
 		"WorldDropSound"                "Item.DropGemWorld"
 
-		"AbilitySpecial"
+		"AbilityValues"
 		{
-			"01"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_damage"			"100"
-			}
-			"02"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"radius"				"325"
-			}
-			"03"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"cleave_pct"			"15"
-			}
+			"bonus_damage"			"100"
+			"radius"				"325"
+			"cleave_pct"			"15"
 		}
 	}
 
@@ -354,23 +266,11 @@
 		"UIDropSound"                   "Item.DropGemShop"
 		"WorldDropSound"                "Item.DropGemWorld"
 
-		"AbilitySpecial"
+		"AbilityValues"
 		{
-			"01"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_damage"			"300"
-			}
-			"02"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"radius"				"325"
-			}
-			"03"
-			{
-				"var_type"				"FIELD_FLOAT"
-				"cleave_pct"			"25"
-			}
+			"bonus_damage"			"300"
+			"radius"				"325"
+			"cleave_pct"			"25"
 		}
 
 		"OnEquip"
@@ -514,25 +414,11 @@
 		"MaxUpgradeLevel"				"3"
 		"AllowedInBackpack"				"0"
 
-		// Special
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilitySpecial"
+		"AbilityValues"
 		{
-			"01"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_damage"			"450"
-			}
-			"02"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"radius"				"325"
-			}
-			"03"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"cleave_pct"			"40"
-			}
+			"bonus_damage"			"450"
+			"radius"				"325"
+			"cleave_pct"			"40"
 		}
 
 		"OnEquip"
@@ -670,24 +556,12 @@
 		"UIPickupSound"                 "Item.PickUpGemShop"
 		"UIDropSound"                   "Item.DropGemShop"
 		"WorldDropSound"                "Item.DropGemWorld"
-	
-		"AbilitySpecial"
+
+		"AbilityValues"
 		{
-			"01"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_damage"			"10000"
-			}
-			"02"
-			{
-				"var_type"				"FIELD_FLOAT"
-				"freeze_cooldown"		"0.1"
-			}
-			"03"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bash_chance"			"17"
-			}
+			"bonus_damage"			"10000"
+			"freeze_cooldown"		"0.1"
+			"bash_chance"			"17"
 		}
 
 		"OnEquip"
@@ -859,24 +733,12 @@
 		"UIPickupSound"                 "Item.PickUpGemShop"
 		"UIDropSound"                   "Item.DropGemShop"
 		"WorldDropSound"                "Item.DropGemWorld"
-	
-		"AbilitySpecial"
+
+		"AbilityValues"
 		{
-			"01"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_damage"			"100"
-			}
-			"02"
-			{
-				"var_type"				"FIELD_FLOAT"
-				"bash_duration"			"1.0"
-			}
-			"03"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bash_chance"			"10"
-			}
+			"bonus_damage"			"100"
+			"bash_duration"			"1.0"
+			"bash_chance"			"10"
 		}
 	}
 
@@ -913,39 +775,15 @@
 		"UIPickupSound"                 "Item.PickUpGemShop"
 		"UIDropSound"                   "Item.DropGemShop"
 		"WorldDropSound"                "Item.DropGemWorld"
-	
-		"AbilitySpecial"
+
+		"AbilityValues"
 		{
-			"01"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_hp"				"1500"
-			}
-			"02"
-			{
-				"var_type"              "FIELD_INTEGER"
-				"bonus_damage"          "50"
-			}
-			"03"
-			{
-				"var_type"				"FIELD_FLOAT"
-				"duration"				"25.0"
-			}
-			"04"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_armor"			"5"
-			}
-			"05"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_health_regen"	"20"
-			}
-			"06"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"max_units"				"10"
-			}
+			"bonus_hp"				"1500"
+			"bonus_damage"          "50"
+			"duration"				"25.0"
+			"bonus_armor"			"5"
+			"bonus_health_regen"	"20"
+			"max_units"				"10"
 		}
 	}
 
@@ -983,38 +821,14 @@
 		"UIDropSound"                   "Item.DropGemShop"
 		"WorldDropSound"                "Item.DropGemWorld"
 
-		"AbilitySpecial"
+		"AbilityValues"
 		{
-			"01"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_hp"				"3000"
-			}
-			"02"
-			{
-				"var_type"              "FIELD_INTEGER"
-				"bonus_damage"          "100"
-			}
-			"03"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"duration"				"25"
-			}
-			"04"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_armor"			"10"
-			}
-			"05"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_health_regen"	"20"
-			}
-			"06"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"max_units"				"10"
-			}
+			"bonus_hp"				"3000"
+			"bonus_damage"          "100"
+			"duration"				"25.0"
+			"bonus_armor"			"10"
+			"bonus_health_regen"	"20"
+			"max_units"				"10"
 		}
 	}
 
@@ -1084,40 +898,14 @@
 		"MaxUpgradeLevel"				"3"
 		"AllowedInBackpack"				"0"
 
-		// Special	
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilitySpecial"
+		"AbilityValues"
 		{
-			"01"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_hp"				"9000"
-			}
-			"02"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"duration"				"20"
-			}
-			"03"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_damage"			"150"
-			}
-			"04"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_armor"			"20"
-			}
-			"05"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_health_regen"	"20"
-			}
-			"06"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"max_units"				"10"
-			}
+			"bonus_hp"				"9000"
+			"bonus_damage"          "150"
+			"duration"				"25.0"
+			"bonus_armor"			"20"
+			"bonus_health_regen"	"20"
+			"max_units"				"10"
 		}
 	}
 }

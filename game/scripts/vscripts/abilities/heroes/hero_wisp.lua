@@ -34,14 +34,16 @@ function wisp_pick_random_hero:OnSpellStart()
 	Notifications:Bottom(self.caster:GetPlayerOwnerID(), { text = "HERO: ", duration = 5.0, style = { color = "white" }, continue = true })
 	Notifications:Bottom(self.caster:GetPlayerOwnerID(), { text = "#npc_dota_hero_" .. HEROLIST[random], duration = 5.0, style = { color = "white" }, continue = true })
 
-	local newHero = PlayerResource:ReplaceHeroWith(self.caster:GetPlayerID(), hero_name, XHS_STARTING_GOLD[difficulty] * 2, 0)
-	StartingItems(self.caster, newHero)
+	PrecacheUnitByNameAsync(hero_name, function()
+		local newHero = PlayerResource:ReplaceHeroWith(self.caster:GetPlayerID(), hero_name, XHS_STARTING_GOLD[difficulty] * 2, 0)
+		StartingItems(self.caster, newHero)
 
-	Timers:CreateTimer(0.1, function()
-		if self and self.caster and not self.caster:IsNull() then
-			UTIL_Remove(self.caster)
-		end
-	end)
+		Timers:CreateTimer(0.1, function()
+			if self and self.caster and not self.caster:IsNull() then
+				UTIL_Remove(self.caster)
+			end
+		end)
+	end, self.caster:GetPlayerID())
 end
 
 wisp_passives = wisp_passives or class({})
