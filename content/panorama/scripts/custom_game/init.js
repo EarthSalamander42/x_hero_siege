@@ -18,31 +18,33 @@ GameUI.CustomUIConfig().team_colors[DOTATeam_t.DOTA_TEAM_BADGUYS ] = "#802020;";
 GameUI.CustomUIConfig().team_colors[DOTATeam_t.DOTA_TEAM_CUSTOM_3 ] = "#00b4c8;";
 GameUI.CustomUIConfig().team_colors[DOTATeam_t.DOTA_TEAM_CUSTOM_4 ] = "#00963c;";
 
-var newUI = $.GetContextPanel().GetParent().GetParent().FindChildTraverse("HUDElements").FindChildTraverse("lower_hud").FindChildTraverse("center_with_stats").FindChildTraverse("center_block");
-//Use this line if you want to keep 4 ability minimum size, and only use 160 if you want ~2 ability min size
-newUI.FindChildTraverse("AbilitiesAndStatBranch").style.minWidth = "386px";
-//newUI.FindChildTraverse("AbilitiesAndStatBranch").style.minWidth = "160px";
-
-//Fuck Scanner
-var newUI = $.GetContextPanel().GetParent().GetParent().FindChildTraverse("HUDElements").FindChildTraverse("minimap_container");
-newUI.FindChildTraverse("GlyphScanContainer").style.visibility = "collapse";
-
 var hudElements = $.GetContextPanel().GetParent().GetParent().FindChildTraverse("HUDElements");
-var newUI = hudElements.FindChildTraverse("center_block");
+var center_block = hudElements.FindChildTraverse("lower_hud").FindChildTraverse("center_with_stats").FindChildTraverse("center_block");
+//Use this line if you want to keep 4 ability minimum size, and only use 160 if you want ~2 ability min size
+center_block.FindChildTraverse("AbilitiesAndStatBranch").style.minWidth = "386px";
+//center_block.FindChildTraverse("AbilitiesAndStatBranch").style.minWidth = "160px";
+center_block.FindChildTraverse("inventory_neutral_craft_holder").style.visibility = "collapse";
 
-newUI.FindChildTraverse("StatBranch").style.visibility = "collapse";
+//Fuck Scanner UI
+var minimap_container = hudElements.FindChildTraverse("minimap_container");
+minimap_container.FindChildTraverse("GlyphScanContainer").style.visibility = "collapse";
+
+//Fuck Roshan UI
+minimap_container.FindChildTraverse("RoshanTimerContainer").style.visibility = "collapse";
+
+center_block.FindChildTraverse("StatBranch").style.visibility = "collapse";
 
 //you are not spawning the talent UI, fuck off (Disabling mouseover and onactivate)
 //We also don't want to crash, valve plz
-newUI.FindChildTraverse("StatBranch").SetPanelEvent("onmouseover", function(){});
-newUI.FindChildTraverse("StatBranch").SetPanelEvent("onactivate", function(){});
+center_block.FindChildTraverse("StatBranch").SetPanelEvent("onmouseover", function(){});
+center_block.FindChildTraverse("StatBranch").SetPanelEvent("onactivate", function(){});
 
-newUI.FindChildrenWithClassTraverse("RootInnateDisplay")[0].style.visibility = "collapse";
+center_block.FindChildrenWithClassTraverse("RootInnateDisplay")[0].style.visibility = "collapse";
 
 //Fuck that levelup button
-newUI.FindChildTraverse("level_stats_frame").style.visibility = "collapse";
+center_block.FindChildTraverse("level_stats_frame").style.visibility = "collapse";
 
-newUI.FindChildTraverse("AghsStatusContainer").style.visibility = "collapse";
+center_block.FindChildTraverse("AghsStatusContainer").style.visibility = "collapse";
 
 //Skin Killer - TopBar
 var topbar = hudElements.FindChildTraverse("topbar");
@@ -90,18 +92,18 @@ if (map_info.map_display_name == "x_hero_siege_8") {
 }
 
 //Skin Killer - Portrait
-newUI.FindChildTraverse("HUDSkinPortrait").style.visibility = "collapse";
-newUI.FindChildTraverse("HUDSkinXPBackground").style.visibility = "collapse";
-newUI.FindChildTraverse("HUDSkinStatBranchBG").style.visibility = "collapse";
-newUI.FindChildTraverse("HUDSkinStatBranchGlow").style.visibility = "collapse";
-newUI.FindChildTraverse("unitname").style.transform = "translateY(0px)";
-newUI.FindChildTraverse("unitname").style.width = "159px";
+center_block.FindChildTraverse("HUDSkinPortrait").style.visibility = "collapse";
+center_block.FindChildTraverse("HUDSkinXPBackground").style.visibility = "collapse";
+center_block.FindChildTraverse("HUDSkinStatBranchBG").style.visibility = "collapse";
+center_block.FindChildTraverse("HUDSkinStatBranchGlow").style.visibility = "collapse";
+center_block.FindChildTraverse("unitname").style.transform = "translateY(0px)";
+center_block.FindChildTraverse("unitname").style.width = "159px";
 //Skin Killer - AbilityPanel
-newUI.FindChildTraverse("HUDSkinAbilityContainerBG").style.visibility = "collapse";
-newUI.FindChildTraverse("center_bg").style.backgroundImage = "url('s2r://panorama/images/hud/reborn/ability_bg_psd.vtex')";
+center_block.FindChildTraverse("HUDSkinAbilityContainerBG").style.visibility = "collapse";
+center_block.FindChildTraverse("center_bg").style.backgroundImage = "url('s2r://panorama/images/hud/reborn/ability_bg_psd.vtex')";
 //Skin Killer - inventory
-newUI.FindChildTraverse("inventory").FindChildTraverse("HUDSkinInventoryBG").style.visibility = "collapse";
-newUI.FindChildTraverse("inventory").FindChildTraverse("inventory_list_container").style.backgroundColor = "#ffffff00"; //0% opacity on colour
+center_block.FindChildTraverse("inventory").FindChildTraverse("HUDSkinInventoryBG").style.visibility = "collapse";
+center_block.FindChildTraverse("inventory").FindChildTraverse("inventory_list_container").style.backgroundColor = "#ffffff00"; //0% opacity on colour
 //Skin Killer - minimap
 hudElements.FindChildTraverse("HUDSkinMinimap").style.visibility = "collapse";
 
@@ -126,7 +128,7 @@ HeroDisplay.style.height = "76px"
 HeroDisplayContainer.style.width = "500px"
 HeroDisplayContainer.style.flowChildren = "right"
 
-$.GetContextPanel().GetParent().GetParent().FindChildTraverse("HUDElements").FindChildTraverse("topbar").FindChildTraverse("GameTime").style.visibility = "collapse";
+hudElements.FindChildTraverse("topbar").FindChildTraverse("GameTime").style.visibility = "collapse";
 
 //Top Bar Dire
 var TopBarDireTeam = hudElements.FindChildTraverse("TopBarDireTeam");

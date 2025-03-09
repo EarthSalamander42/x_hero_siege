@@ -12,7 +12,6 @@ function pulse_nova_start(keys)
         nova_tick = nova_tick
     })
 end
-
 function pulse_nova_take_mana(params)
     if params.ability:GetToggleState() == false then
         return

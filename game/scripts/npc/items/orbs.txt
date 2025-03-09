@@ -239,7 +239,7 @@
 		"AbilityTextureName"			"custom/orb_of_fire2"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"AbilityCooldown"				"10.0"
-	
+
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
 		"AbilitySharedCooldown"         "orb_of_fire"
 		"ItemShopTags"					"cleave"
@@ -258,7 +258,7 @@
 //		"ItemStockMax"					"2" 
 //		"ItemStockTime"					"30.0"
 //		"ItemStockInitial"				"0"
-		
+
 		"Model"                         "models/props_gameplay/red_box.vmdl"
 		"Effect"                        "particles/econ/courier/courier_greevil_red/courier_greevil_red_ambient_3.vpcf"
 	

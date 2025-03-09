@@ -47,6 +47,10 @@ function Precache(context)
 	PrecacheResource("particle", "particles/darkmoon_last_hit_effect.vpcf", context)
 	PrecacheResource("particle", "particles/units/heroes/hero_abaddon/abaddon_curse_counter_stack.vpcf", context)         -- Farm event overhead
 	PrecacheResource("particle", "particles/econ/items/shadow_fiend/sf_fire_arcana/sf_fire_arcana_shadowraze.vpcf", context) -- Boss death
+	PrecacheResource("particle", "particles/units/heroes/hero_morphling/morphling_ambient_new.vpcf", context)             -- Lightning Sword
+	PrecacheResource("particle", "particles/units/heroes/hero_ogre_magi/ogre_magi_ignite_debuff.vpcf", context)           -- Shield of Invincibility
+	PrecacheResource("particle", "particles/units/heroes/hero_morphling/morphling_morph_agi.vpcf", context)               -- Ring of Superiority
+	PrecacheResource("particle", "particles/econ/courier/courier_greevil_red/courier_greevil_red_ambient_3.vpcf", context) -- Orb of Fire dropped
 
 	PrecacheResource("model_folder", "models/heroes/skeleton_king", context)                                              --Lich King Boss
 	PrecacheResource("model_folder", "models/items/juggernaut/arcana", context)
@@ -58,14 +62,19 @@ function Precache(context)
 	PrecacheResource("model_folder", "models/items/chaos_knight/ck_esp_shoulder", context)
 	PrecacheResource("model_folder", "models/items/furion/treant/the_ancient_guardian_the_ancient_treants", context)
 	PrecacheResource("model_folder", "models/items/dragon_knight/aurora_warrior_set_dragon_style2_aurora_warrior_set", context)
-	PrecacheResource("model_folder", "models/heroes/dragon_knight", context) -- For some reason precaching the hero doesn't fix missing model
-	PrecacheResource("model_folder", "models/items/juggernaut/arcana", context) -- Grom Hellscream
+	PrecacheResource("model_folder", "models/heroes/dragon_knight", context)         -- For some reason precaching the hero doesn't fix missing model
+	PrecacheResource("model_folder", "models/items/juggernaut/arcana", context)      -- Grom Hellscream
+	PrecacheResource("model_folder", "models/items/undying/idol_of_ruination", context) -- Archimonde minions
 
 	PrecacheResource("model", "models/creeps/neutral_creeps/n_creep_troll_skeleton/n_creep_troll_skeleton_fx.vmdl", context)
 	PrecacheResource("model", "models/gameplay/breakingcrate_dest.vmdl", context)
 	PrecacheResource("model", "models/creeps/lane_creeps/creep_bad_melee_diretide/creep_bad_melee_diretide.vmdl", context)           -- Phase 2 creeps
 	PrecacheResource("model", "models/items/warlock/golem/mystery_of_the_lost_ores_golem/mystery_of_the_lost_ores_golem.vmdl", context) -- Dark Protectors
 	PrecacheResource("model", "models/items/warlock/golem/obsidian_golem/obsidian_golem.vmdl", context)                              -- Balanar's Infernal Beast
+	PrecacheResource("model", "models/props_items/blinkdagger.vmdl", context)                                                        -- Lightning Sword
+	PrecacheResource("model", "models/props_items/poor_man_shield01.vmdl", context)                                                  -- Shield of Invincibility
+	PrecacheResource("model", "models/props_items/ring_health.vmdl", context)                                                        -- Ring of Superiority
+	PrecacheResource("model", "models/heroes/witchdoctor/witchdoctor_ward.vmdl", context)                                            -- Archimonde Dark Portal
 
 	-- TODO: remove all of those and precache them in abilities kv instead
 	-- PRECACHE HEROES (Particle effects for custom abilities)
@@ -89,7 +98,7 @@ function Precache(context)
 	PrecacheUnitByNameAsync("npc_dota_hero_life_stealer", context) -- Creep wave 1 (undead)
 	-- PrecacheUnitByNameAsync("npc_dota_hero_lycan", context)            -- Archimonde??
 	-- --	PrecacheUnitByNameAsync("npc_dota_hero_magnataur", context) 	-- Magnataur & Tauren Chieftain
-	-- --	PrecacheUnitByNameAsync("npc_dota_hero_morphling", context)		-- Archmage & Archimage
+	PrecacheUnitByNameAsync("npc_dota_hero_morphling", context) -- Archmage & Archimage
 	-- PrecacheUnitByNameAsync("npc_dota_hero_naga_siren", context)    -- Special Wave 2
 	-- PrecacheUnitByNameAsync("npc_dota_hero_necrolyte", context)     -- Special Wave 1 & Tauren Chieftain & Dark Summoner & LK & Paladin &
 	-- PrecacheUnitByNameAsync("npc_dota_hero_ogre_magi", context)     -- Sniper
@@ -164,6 +173,13 @@ function Precache(context)
 	-- Three spirits vip hero
 	PrecacheUnitByNameAsync("npc_dota_hero_ember_spirit", context)
 	PrecacheUnitByNameAsync("npc_dota_hero_earth_spirit", context)
+
+	-- Battle Pass precache
+	for key, value in pairs(LoadKeyValues("scripts/npc/units/companions.txt")) do
+		if value and type(value) == "table" and value["Model"] then
+			PrecacheResource("model", value["Model"], context) -- Balanar's Infernal Beast
+		end
+	end
 end
 
 -- Create the game mode when we activate

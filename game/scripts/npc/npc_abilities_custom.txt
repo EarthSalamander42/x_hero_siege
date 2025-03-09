@@ -3605,19 +3605,22 @@
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityCastPoint"              "0.3"
-	
+	    "RestrictValuesToMaxLevel"		"0"
+		"MaxLevel"						"4"
+
 		// Time     
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityCooldown"               "25.0"
-	
-		// Cost
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityManaCost"               "65 125 185 225"
 	
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityValues"
 		{
+			"AbilityManaCost"				
+			{
+				"value"			"65 125 185 225"
+				"special_bonus_facet_lycan_spirit_wolves" "-50"				
+			}
 			"wolf_index"                "1 2 3 4"
 			"wolf_duration"             "25.0"
 			"wolf_bat"                  "1.25 1.2 1.15 1.1"
@@ -3625,8 +3628,12 @@
 			"wolf_hp"                   "600 1900 3250 5000"
 			"bash_chance"				"15"
 			"bash_duration"				"1.0"
-			"tooltip_wolf_count"		"2 2 2 2"
-			"LinkedSpecialBonus"		"special_bonus_unique_lycan_2"
+			"wolf_count"			
+			{
+				"value"			"2"
+				"special_bonus_unique_lycan_2" "+2"
+			}
+			"max_level" "4"
 		}
 		"AbilityCastAnimation"		"ACT_DOTA_CAST_ABILITY_1"
 	}
