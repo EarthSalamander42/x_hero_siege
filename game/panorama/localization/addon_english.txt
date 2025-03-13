@@ -196,9 +196,10 @@
 	"tutorial_end"		"<font color='#FF7800'>HAVE FUN!</font>"
 
 	// ingame_advertize.txt
-	"ingame_advertize_header"		"THE DOTA 2 ARCADE TRANSITION"
-	"ingame_advertize_description"		"Valve's unforeseen choice to de-monetize Dota 2 custom games reverberates through the community. Developers confront a dilemma: share incomplete projects devoid of financial motivation or await an uncertain reversal. Players lament potential loss of captivating experiences. The situation underscores the intricate interplay between creative fervor and economic reality, leaving enthusiasts to contemplate the future of their cherished custom games.\n\nAmidst this uncertainty, I've chosen to reveal my ongoing creation, 'Frostrose Battlefield', an arena-style custom game featuring skillshots and round-based gameplay. It stands as a testament to unwavering dedication and creative persistence in the face of challenges."
-	"ingame_advertize_more"		"Read More..."
+	"ingame_advertize_header"		"DID YOU KNOW?"
+	"ingame_advertize_description"		"X Hero Siege is played by more than <font color='#FF7800'>{s:player_count_monthly}</font> unique players monthly, and yet, many players on Discord struggle to find teammates to play with.<br><br>By joining our Discord server, you can:<br>- Find teammates instantly and form parties for a better co-op experience.<br>- Get real-time updates on the latest patches, balance changes, and upcoming features.<br>- Participate in exclusive events, tournaments, and community challenges.<br>- Share your feedback directly with the developers and help shape the future of the mod.<br>- Discuss strategies, builds, and gameplay mechanics with experienced players.<br><br>Don't play alone! Join our growing community now and experience X Hero Siege like never before!"
+	"ingame_advertize_more"		"Website"
+	"ingame_advertize_more2"		"Discord"
 	"ingame_advertize_dismiss"		"Dismiss"
 
 	// loading_screen.txt

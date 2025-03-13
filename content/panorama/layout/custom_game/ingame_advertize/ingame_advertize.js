@@ -9,4 +9,10 @@ function CloseFixGame() {
 
 (function () {
 	OpenFixGame();
+
+	const descriptionPanel = FIX_CG_ROOT.FindChildTraverse("Ads_Description");
+
+	if (descriptionPanel) {
+		descriptionPanel.SetDialogVariable( "player_count_monthly", "3000" );
+	}
 })();

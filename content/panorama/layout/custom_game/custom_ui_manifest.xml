@@ -19,6 +19,6 @@
 		<CustomUIElement type="EndScreen"			layoutfile="file://{resources}/layout/custom_game/frostrose_end_screen.xml" />
 		<CustomUIElement type="FlyoutScoreboard"	layoutfile="file://{resources}/layout/custom_game/dungeon_scoreboard.xml" />
 
-		<!-- <CustomUIElement type="Hud" layoutfile="file://{resources}/layout/custom_game/ingame_advertize/ingame_advertize.xml" /> -->
+		<CustomUIElement type="Hud" layoutfile="file://{resources}/layout/custom_game/ingame_advertize/ingame_advertize.xml" />
 	</Panel>
 </root>

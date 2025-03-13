@@ -51,6 +51,7 @@ function Precache(context)
 	PrecacheResource("particle", "particles/units/heroes/hero_ogre_magi/ogre_magi_ignite_debuff.vpcf", context)           -- Shield of Invincibility
 	PrecacheResource("particle", "particles/units/heroes/hero_morphling/morphling_morph_agi.vpcf", context)               -- Ring of Superiority
 	PrecacheResource("particle", "particles/econ/courier/courier_greevil_red/courier_greevil_red_ambient_3.vpcf", context) -- Orb of Fire dropped
+	PrecacheResource("particle", "particles/units/heroes/hero_doom_bringer/doom_bringer_doom_ring.vpcf", context)         -- Necklace of Spell Immunity dropped
 
 	PrecacheResource("model_folder", "models/heroes/skeleton_king", context)                                              --Lich King Boss
 	PrecacheResource("model_folder", "models/items/juggernaut/arcana", context)
@@ -75,6 +76,7 @@ function Precache(context)
 	PrecacheResource("model", "models/props_items/poor_man_shield01.vmdl", context)                                                  -- Shield of Invincibility
 	PrecacheResource("model", "models/props_items/ring_health.vmdl", context)                                                        -- Ring of Superiority
 	PrecacheResource("model", "models/heroes/witchdoctor/witchdoctor_ward.vmdl", context)                                            -- Archimonde Dark Portal
+	PrecacheResource("model", "models/props_items/staff_wizardry01.vmdl", context)                                                   -- Necklace of Spell Immunity
 
 	-- TODO: remove all of those and precache them in abilities kv instead
 	-- PRECACHE HEROES (Particle effects for custom abilities)
