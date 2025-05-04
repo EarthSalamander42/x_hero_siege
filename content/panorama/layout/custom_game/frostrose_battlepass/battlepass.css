@@ -192,7 +192,7 @@
 {
 	width: 820px;
 	height: 840px;
-	transform: translate3d( 45%, 0, 0px );
+	transform: translate3d( 50%, 0, 0px );
 	margin-bottom: 100px;
 	background-color: gradient( linear, 100% 0, 0% 0%, from( #13161a ), color-stop( 0.4, #13161a ), to( #2b3139ee ) );
 	border-top:  1px solid #3a363a;	

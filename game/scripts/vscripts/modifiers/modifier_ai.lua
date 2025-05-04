@@ -47,8 +47,14 @@ end
 function modifier_ai:OnIntervalThink()
 	if self.parent:IsIllusion() then return end
 	if Entities:FindByName(nil, "dota_goodguys_fort") == nil then return end
-
 	if self.parent:IsStunned() or self.parent:IsSilenced() or self.parent:IsHexed() or self.parent:IsChanneling() or self.parent:GetCurrentActiveAbility() then return end
+	if self.parent:GetAggroTarget() ~= nil then return end
+
+	local now = GameRules:GetGameTime()
+
+	if self.last_attack_time and now - self.last_attack_time < 0.5 then
+		return
+	end
 
 	-- print("AI: Ready to work!:", self.parent:GetUnitName())
 
@@ -234,6 +240,7 @@ function modifier_ai:OnAttackLanded(keys)
 
 		if self.parent == attacker then
 			self.isAttacking = false
+			self.last_attack_time = GameRules:GetGameTime()
 		end
 	end
 end

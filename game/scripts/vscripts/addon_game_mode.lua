@@ -45,18 +45,22 @@ function Precache(context)
 	PrecacheResource("particle", "particles/camp_fire_buff.vpcf", context)
 	PrecacheResource("particle", "particles/custom/undead/disease_cloud.vpcf", context)
 	PrecacheResource("particle", "particles/darkmoon_last_hit_effect.vpcf", context)
-	PrecacheResource("particle", "particles/units/heroes/hero_abaddon/abaddon_curse_counter_stack.vpcf", context)         -- Farm event overhead
+	PrecacheResource("particle", "particles/units/heroes/hero_abaddon/abaddon_curse_counter_stack.vpcf", context)            -- Farm event overhead
 	PrecacheResource("particle", "particles/econ/items/shadow_fiend/sf_fire_arcana/sf_fire_arcana_shadowraze.vpcf", context) -- Boss death
-	PrecacheResource("particle", "particles/units/heroes/hero_morphling/morphling_ambient_new.vpcf", context)             -- Lightning Sword
-	PrecacheResource("particle", "particles/units/heroes/hero_ogre_magi/ogre_magi_ignite_debuff.vpcf", context)           -- Shield of Invincibility
-	PrecacheResource("particle", "particles/units/heroes/hero_morphling/morphling_morph_agi.vpcf", context)               -- Ring of Superiority
-	PrecacheResource("particle", "particles/econ/courier/courier_greevil_red/courier_greevil_red_ambient_3.vpcf", context) -- Orb of Fire dropped
-	PrecacheResource("particle", "particles/units/heroes/hero_doom_bringer/doom_bringer_doom_ring.vpcf", context)         -- Necklace of Spell Immunity dropped
+	PrecacheResource("particle", "particles/units/heroes/hero_morphling/morphling_ambient_new.vpcf", context)                -- Lightning Sword
+	PrecacheResource("particle", "particles/units/heroes/hero_ogre_magi/ogre_magi_ignite_debuff.vpcf", context)              -- Shield of Invincibility
+	PrecacheResource("particle", "particles/units/heroes/hero_morphling/morphling_morph_agi.vpcf", context)                  -- Ring of Superiority
+	PrecacheResource("particle", "particles/econ/courier/courier_greevil_red/courier_greevil_red_ambient_3.vpcf", context)   -- Orb of Fire dropped
+	PrecacheResource("particle", "particles/units/heroes/hero_doom_bringer/doom_bringer_doom_ring.vpcf", context)            -- Necklace of Spell Immunity dropped
+	PrecacheResource("particle", "particles/units/heroes/hero_jakiro/jakiro_base_attack.vpcf", context)                      -- Jakiro Level 2 creeps
+	PrecacheResource("particle", "particles/units/heroes/hero_ancient_apparition/ancient_apparition_base_attack.vpcf", context) -- Necro Level 2 creeps
+	PrecacheResource("particle", "particles/units/heroes/hero_lion/lion_base_attack.vpcf", context)                          -- Special Wave 2
 
-	PrecacheResource("model_folder", "models/heroes/skeleton_king", context)                                              --Lich King Boss
-	PrecacheResource("model_folder", "models/items/juggernaut/arcana", context)
+	PrecacheResource("model_folder", "models/heroes/skeleton_king", context)                                                 --Lich King Boss
+	PrecacheResource("model_folder", "models/items/warlock/archivist_golem", context)                                        -- Spirit Beast event
+	PrecacheResource("model_folder", "models/creeps/ice_biome/storegga", context)                                            -- Frost Infernal event
 
-	PrecacheResource("model_folder", "models/items/chaos_knight/ck_esp_blade", context) --Dark Fundamental Boss Set
+	PrecacheResource("model_folder", "models/items/chaos_knight/ck_esp_blade", context)                                      --Dark Fundamental Boss Set
 	PrecacheResource("model_folder", "models/items/chaos_knight/ck_esp_helm", context)
 	PrecacheResource("model_folder", "models/items/chaos_knight/ck_esp_mount", context)
 	PrecacheResource("model_folder", "models/items/chaos_knight/ck_esp_shield", context)
@@ -77,6 +81,7 @@ function Precache(context)
 	PrecacheResource("model", "models/props_items/ring_health.vmdl", context)                                                        -- Ring of Superiority
 	PrecacheResource("model", "models/heroes/witchdoctor/witchdoctor_ward.vmdl", context)                                            -- Archimonde Dark Portal
 	PrecacheResource("model", "models/props_items/staff_wizardry01.vmdl", context)                                                   -- Necklace of Spell Immunity
+	PrecacheResource("model", "models/items/juggernaut/arcana/juggernaut_arcana_mask.vmdl", context)                                 -- Grom Hellscream
 
 	-- TODO: remove all of those and precache them in abilities kv instead
 	-- PRECACHE HEROES (Particle effects for custom abilities)
