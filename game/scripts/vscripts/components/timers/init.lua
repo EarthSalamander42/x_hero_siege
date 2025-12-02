@@ -129,12 +129,12 @@ function CustomTimers:Think()
 					local cardinal_point = CustomTimers.special_wave
 
 					if CustomTimers.current_time["special_wave"] == 30 then
-						print("Special Wave in 30 seconds:", CustomTimers.special_wave_region[cardinal_point], CustomTimers.special_wave)
+						-- print("Special Wave in 30 seconds:", CustomTimers.special_wave_region[cardinal_point], CustomTimers.special_wave)
 						Notifications:TopToAll({ text = "WARNING: " .. CustomTimers.special_wave_region[cardinal_point] .. "!", duration = 25.0, style = { color = "red" } })
 						-- SpawnRunes()
 						CustomTimers.enable_special_wave = true
 					elseif CustomTimers.current_time["special_wave"] == 0 then
-						print("Special Wave:", CustomTimers.special_wave_region[cardinal_point], CustomTimers.special_wave)
+						-- print("Special Wave:", CustomTimers.special_wave_region[cardinal_point], CustomTimers.special_wave)
 						SpecialWave(cardinal_point)
 					end
 				else

@@ -75,14 +75,19 @@ function xhs_blademaster_mirror_image:OnSpellStart()
 			outgoing_damage_roshan    = nil,
 			duration                  = self:GetSpecialValueFor("illusion_duration")
 		}, self:GetSpecialValueFor("images_count"), self:GetCaster():GetHullRadius(), true, true)
+		local caster_origin = self:GetCaster():GetAbsOrigin()
 
 		for i = 1, #self.illusions do
 			local illusion = self.illusions[i]
-			local pos = self:GetCaster():GetAbsOrigin() + vRandomSpawnPos[i]
+			local pos = caster_origin + vRandomSpawnPos[i]
 			FindClearSpaceForUnit(illusion, pos, true)
 			local part2 = ParticleManager:CreateParticle("particles/units/heroes/hero_siren/naga_siren_riptide_foam.vpcf", PATTACH_ABSORIGIN, illusion)
 			ParticleManager:ReleaseParticleIndex(part2)
-			illusion:MoveToPositionAggressive(self:GetCaster():GetAbsOrigin())
+			ExecuteOrderFromTable({
+				UnitIndex = illusion:entindex(),
+				OrderType = DOTA_UNIT_ORDER_ATTACK_MOVE,
+				Position = caster_origin,
+			})
 			--			self:SetInventory(illusion) -- not working yet
 		end
 

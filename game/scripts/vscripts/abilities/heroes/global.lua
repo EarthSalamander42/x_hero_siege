@@ -69,6 +69,7 @@ function CastleMuradin(event)
 	local ability = event.ability
 	local heroes = HeroList:GetAllHeroes()
 	local Waypoint = Entities:FindByName(nil, "final_wave_player_1")
+	local waypoint_pos = Waypoint:GetAbsOrigin()
 	local Health = ability:GetSpecialValueFor("hp_tooltip")
 	local InvTime = ability:GetSpecialValueFor("invulnerability_time")
 	local PauseTime = 10.0
@@ -76,9 +77,13 @@ function CastleMuradin(event)
 	if caster:GetHealthPercent() <= Health then
 		PauseCreeps(PauseTime)
 
-		local Muradin = CreateUnitByName("npc_dota_creature_muradin_bronzebeard", Waypoint:GetAbsOrigin(), false, nil, nil, DOTA_TEAM_GOODGUYS)
+		local Muradin = CreateUnitByName("npc_dota_creature_muradin_bronzebeard", waypoint_pos, false, nil, nil, DOTA_TEAM_GOODGUYS)
 		Muradin:SetInitialGoalEntity(Waypoint)
-		Muradin:MoveToPositionAggressive(Waypoint:GetAbsOrigin())
+		ExecuteOrderFromTable({
+			UnitIndex = Muradin:entindex(),
+			OrderType = DOTA_UNIT_ORDER_ATTACK_MOVE,
+			Position = waypoint_pos,
+		})
 		Muradin:EmitSound("MountainKing.Avatar")
 
 		for _, hero in pairs(heroes) do

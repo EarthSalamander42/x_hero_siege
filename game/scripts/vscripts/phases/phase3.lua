@@ -237,9 +237,14 @@ function StartLichKingArena()
 
 		Timers:CreateTimer(reincarnate_time, function()
 			FindClearSpaceForUnit(lich_king_boss, point_boss, true)
+			local attack_position = Entities:FindByName(nil, "npc_dota_spawner_magtheridon_arena"):GetAbsOrigin()
 			lich_king_boss:RemoveModifierByName("modifier_invulnerable")
 			lich_king_boss:RemoveModifierByName("modifier_stunned")
-			lich_king_boss:MoveToPositionAggressive(Entities:FindByName(nil, "npc_dota_spawner_magtheridon_arena"):GetAbsOrigin())
+			ExecuteOrderFromTable({
+				UnitIndex = lich_king_boss:entindex(),
+				OrderType = DOTA_UNIT_ORDER_ATTACK_MOVE,
+				Position = attack_position,
+			})
 			lich_king_boss:SetAttackCapability(DOTA_UNIT_CAP_MELEE_ATTACK)
 			lich_king_boss:SetMoveCapability(DOTA_UNIT_CAP_MOVE_GROUND)
 			--			BossBar(lich_king_boss, "lich_king")

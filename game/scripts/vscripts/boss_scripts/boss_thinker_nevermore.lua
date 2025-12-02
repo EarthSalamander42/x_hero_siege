@@ -88,6 +88,13 @@ function boss_thinker_nevermore:OnIntervalThink()
 	if IsServer() then
 		-- Parameters
 		local boss = self:GetParent()
+		local function MoveBoss(position)
+			ExecuteOrderFromTable({
+				UnitIndex = boss:entindex(),
+				OrderType = DOTA_UNIT_ORDER_MOVE_TO_POSITION,
+				Position = position,
+			})
+		end
 
 		if boss.deathStart == true then return end
 
@@ -135,55 +142,55 @@ function boss_thinker_nevermore:OnIntervalThink()
 
 		-- Boss move script
 		if self.boss_timer > 1 and not self.events[1] then
-			boss:MoveToPosition(RotatePosition(self.altar_loc, QAngle(0, 180, 0), self.random_position))
+			MoveBoss(RotatePosition(self.altar_loc, QAngle(0, 180, 0), self.random_position))
 			self:LineRaze(self.altar_loc)
 			self.events[1] = true
 		end
 
 		if self.boss_timer > 6.5 and not self.events[2] then
-			boss:MoveToPosition(RotatePosition(self.altar_loc, QAngle(0, 180, 0), self.random_position))
+			MoveBoss(RotatePosition(self.altar_loc, QAngle(0, 180, 0), self.random_position))
 			self:Immolation(self.altar_loc)
 			self.events[2] = true
 		end
 
 		if self.boss_timer > 11 and not self.events[3] then
-			boss:MoveToPosition(self.altar_loc + Vector(0, 300, 0))
+			MoveBoss(self.altar_loc + Vector(0, 300, 0))
 			self:Meteorain(self.altar_loc)
 			self.events[3] = true
 		end
 
 		if self.boss_timer > 21.5 and not self.events[4] then
-			boss:MoveToPosition(self.altar_loc + Vector(0, 300, 0))
+			MoveBoss(self.altar_loc + Vector(0, 300, 0))
 			self:RagnaBlade(self.altar_loc)
 			self.events[4] = true
 		end
 
 		if self.boss_timer > 26.5 and not self.events[5] then
-			boss:MoveToPosition(self.altar_loc)
+			MoveBoss(self.altar_loc)
 			self:CircleRaze(self.altar_loc)
 			self.events[5] = true
 		end
 
 		if self.boss_timer > 31.5 and not self.events[6] then
-			boss:MoveToPosition(self.altar_loc)
+			MoveBoss(self.altar_loc)
 			self:Immolation(self.altar_loc)
 			self.events[6] = true
 		end
 
 		if self.boss_timer > 36.5 and not self.events[7] then
-			boss:MoveToPosition(self.altar_loc)
+			MoveBoss(self.altar_loc)
 			self:RequiemOfSouls(self.altar_loc)
 			self.events[7] = true
 		end
 
 		if self.boss_timer > 42 and not self.events[8] then
-			boss:MoveToPosition(self.altar_loc)
+			MoveBoss(self.altar_loc)
 			self:Meteorain(self.altar_loc)
 			self.events[8] = true
 		end
 
 		if self.boss_timer > 52.5 and not self.events[9] then
-			boss:MoveToPosition(self.altar_loc)
+			MoveBoss(self.altar_loc)
 			self:CircleRaze(self.altar_loc)
 			self.events[9] = true
 		end
@@ -194,43 +201,43 @@ function boss_thinker_nevermore:OnIntervalThink()
 		end
 
 		if self.boss_timer > 60.5 and not self.events[11] then
-			boss:MoveToPosition(self.altar_loc + Vector(0, 500, 0))
+			MoveBoss(self.altar_loc + Vector(0, 500, 0))
 			self:Immolation(self.altar_loc)
 			self.events[11] = true
 		end
 
 		if self.boss_timer > 66 and not self.events[12] then
-			boss:MoveToPosition(self.altar_loc + Vector(0, 500, 0))
+			MoveBoss(self.altar_loc + Vector(0, 500, 0))
 			self:RagnaBlade(self.altar_loc)
 			self.events[12] = true
 		end
 
 		if self.boss_timer > 71 and not self.events[13] then
-			boss:MoveToPosition(self.altar_loc + Vector(0, 500, 0))
+			MoveBoss(self.altar_loc + Vector(0, 500, 0))
 			self:CircleRaze(self.altar_loc)
 			self.events[13] = true
 		end
 
 		if self.boss_timer > 76 and not self.events[14] then
-			boss:MoveToPosition(self.altar_loc + Vector(0, 500, 0))
+			MoveBoss(self.altar_loc + Vector(0, 500, 0))
 			self:Immolation(self.altar_loc)
 			self.events[14] = true
 		end
 
 		if self.boss_timer > 81 and not self.events[15] then
-			boss:MoveToPosition(self.altar_loc + Vector(0, 500, 0))
+			MoveBoss(self.altar_loc + Vector(0, 500, 0))
 			self:Meteorain(self.altar_loc)
 			self.events[15] = true
 		end
 
 		if self.boss_timer > 91.5 and not self.events[16] then
-			boss:MoveToPosition(self.altar_loc)
+			MoveBoss(self.altar_loc)
 			self:RequiemOfSouls(self.altar_loc)
 			self.events[16] = true
 		end
 
 		if self.boss_timer > 97 and not self.events[17] then
-			boss:MoveToPosition(self.altar_loc + Vector(0, 500, 0))
+			MoveBoss(self.altar_loc + Vector(0, 500, 0))
 			self:Meteorain(self.altar_loc)
 			self.events[17] = true
 		end
@@ -241,25 +248,25 @@ function boss_thinker_nevermore:OnIntervalThink()
 		end
 
 		if self.boss_timer > 105 and not self.events[19] then
-			boss:MoveToPosition(self.altar_loc + Vector(0, 500, 0))
+			MoveBoss(self.altar_loc + Vector(0, 500, 0))
 			self:RagnaBlade(self.altar_loc)
 			self.events[19] = true
 		end
 
 		if self.boss_timer > 105 and not self.events[20] then
-			boss:MoveToPosition(self.altar_loc + Vector(0, 500, 0))
+			MoveBoss(self.altar_loc + Vector(0, 500, 0))
 			self:RequiemOfSouls(self.altar_loc)
 			self.events[20] = true
 		end
 
 		if self.boss_timer > 110 and not self.events[21] then
-			boss:MoveToPosition(self.altar_loc + Vector(0, 500, 0))
+			MoveBoss(self.altar_loc + Vector(0, 500, 0))
 			self:RagnaBlade(self.altar_loc)
 			self.events[21] = true
 		end
 
 		if self.boss_timer > 114.5 and not self.events[22] then
-			boss:MoveToPosition(self.altar_loc + Vector(0, 500, 0))
+			MoveBoss(self.altar_loc + Vector(0, 500, 0))
 			self:Meteorain(self.altar_loc)
 			self.events[22] = true
 		end
@@ -270,37 +277,37 @@ function boss_thinker_nevermore:OnIntervalThink()
 		end
 
 		if self.boss_timer > 120 and not self.events[24] then
-			boss:MoveToPosition(self.altar_loc + Vector(0, 500, 0))
+			MoveBoss(self.altar_loc + Vector(0, 500, 0))
 			self:CircleRaze(self.altar_loc)
 			self.events[24] = true
 		end
 
 		if self.boss_timer > 126 and not self.events[25] then
-			boss:MoveToPosition(self.random_position)
+			MoveBoss(self.random_position)
 			self:Immolation(self.altar_loc)
 			self.events[25] = true
 		end
 
 		if self.boss_timer > 131.5 and not self.events[26] then
-			boss:MoveToPosition(self.random_position)
+			MoveBoss(self.random_position)
 			self:CircleRaze(self.altar_loc)
 			self.events[26] = true
 		end
 
 		if self.boss_timer > 133.5 and not self.events[27] then
-			boss:MoveToPosition(self.random_position)
+			MoveBoss(self.random_position)
 			self:RagnaBlade(self.altar_loc)
 			self.events[27] = true
 		end
 
 		if self.boss_timer > 135.5 and not self.events[28] then
-			boss:MoveToPosition(self.random_position)
+			MoveBoss(self.random_position)
 			self:CircleRaze(self.altar_loc)
 			self.events[28] = true
 		end
 
 		if self.boss_timer > 137.5 and not self.events[29] then
-			boss:MoveToPosition(self.random_position)
+			MoveBoss(self.random_position)
 			self:Meteorain(self.altar_loc)
 			self.events[29] = true
 		end
@@ -311,20 +318,20 @@ function boss_thinker_nevermore:OnIntervalThink()
 		end
 
 		if self.boss_timer > 147 and not self.events[31] then
-			boss:MoveToPosition(self.altar_loc)
+			MoveBoss(self.altar_loc)
 			self:RequiemOfSouls(self.altar_loc)
 			self.events[31] = true
 		end
 
 		if self.boss_timer > 151 and not self.events[32] then
-			boss:MoveToPosition(self.random_position)
+			MoveBoss(self.random_position)
 			self:Meteorain(self.altar_loc)
 			self.events[32] = true
 		end
 
 		if self.boss_timer > 160 and not self.events[33] then
 			self:Immolation(self.altar_loc)
-			boss:MoveToPosition(self.random_position)
+			MoveBoss(self.random_position)
 			self.events[33] = true
 		end
 	end

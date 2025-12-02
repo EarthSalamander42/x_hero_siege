@@ -197,7 +197,12 @@ function modifier_companion:OnIntervalThink()
 		if hero_distance < min_distance then
 			if hero:IsMoving() == false and self.set_final_pos == false then
 				self.set_final_pos = true
-				companion:MoveToPosition(hero:GetAbsOrigin() + RandomVector(200))
+				local move_position = hero:GetAbsOrigin() + RandomVector(200)
+				ExecuteOrderFromTable({
+					UnitIndex = companion:entindex(),
+					OrderType = DOTA_UNIT_ORDER_MOVE_TO_POSITION,
+					Position = move_position,
+				})
 				return
 			elseif hero:IsMoving() and self.set_final_pos == true then
 				self.set_final_pos = false

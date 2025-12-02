@@ -71,6 +71,7 @@ function modifier_ai:OnIntervalThink()
 			return
 		else
 			local attack_range = math.max(self.parent:Script_GetAttackRange(), 800)
+			local ancient_position = ancient:GetAbsOrigin()
 
 			-- print("Attack range:", attack_range)
 
@@ -82,7 +83,11 @@ function modifier_ai:OnIntervalThink()
 				-- print("VIP distance:", vip_distance)
 				if vip_distance < attack_range then
 					self.parent:SetForceAttackTarget(nil)
-					self.parent:MoveToPosition(ancient:GetAbsOrigin())
+					ExecuteOrderFromTable({
+						UnitIndex = self.parent:entindex(),
+						OrderType = DOTA_UNIT_ORDER_MOVE_TO_POSITION,
+						Position = ancient_position,
+					})
 					-- print("VIP here, move to ancient")
 					return
 				end
@@ -94,21 +99,33 @@ function modifier_ai:OnIntervalThink()
 
 			if #crates > 0 or #chests > 0 then
 				self.parent:SetForceAttackTarget(nil)
-				self.parent:MoveToPosition(ancient:GetAbsOrigin())
+				ExecuteOrderFromTable({
+					UnitIndex = self.parent:entindex(),
+					OrderType = DOTA_UNIT_ORDER_MOVE_TO_POSITION,
+					Position = ancient_position,
+				})
 				-- print("Crate or chest here, move to ancient")
 				return
 			end
 
 			if not self.isAttacking then
 				self.parent:SetForceAttackTarget(nil)
-				self.parent:MoveToPositionAggressive(ancient:GetAbsOrigin())
+				ExecuteOrderFromTable({
+					UnitIndex = self.parent:entindex(),
+					OrderType = DOTA_UNIT_ORDER_ATTACK_MOVE,
+					Position = ancient_position,
+				})
 			end
 		end
 		-- Muradin AI
 	elseif self.ai_state == 3 then
 		local random_int = RandomInt(1, 4)
 		if self.last_goal ~= random_int and not self.parent:IsMoving() and not self.parent:IsAttacking() then
-			self.parent:MoveToPositionAggressive(Entities:FindByName(nil, "roshan_wp_" .. random_int):GetAbsOrigin())
+			ExecuteOrderFromTable({
+				UnitIndex = self.parent:entindex(),
+				OrderType = DOTA_UNIT_ORDER_ATTACK_MOVE,
+				Position = Entities:FindByName(nil, "roshan_wp_" .. random_int):GetAbsOrigin(),
+			})
 			self.last_goal = random_int
 		end
 	end

@@ -90,6 +90,7 @@ function Precache(context)
 	-- PrecacheUnitByNameAsync("npc_dota_hero_chaos_knight", context)     -- Special Wave and creeps [what about dark fundamental?]
 	-- --	PrecacheUnitByNameAsync("npc_dota_hero_clinkz", context)		-- Windrunner
 	-- PrecacheUnitByNameAsync("npc_dota_hero_clockwerk", context)        -- Space Marine PC and NPC?
+	PrecacheUnitByNameAsync("npc_dota_hero_dark_seer", context)        -- Final Wave - East
 	PrecacheUnitByNameAsync("npc_dota_hero_dazzle", context)           -- Creep - orc ranged 2
 	PrecacheUnitByNameAsync("npc_dota_hero_dragon_knight", context)    -- Lich & Dryad [Creeps level 1]
 	PrecacheUnitByNameAsync("npc_dota_hero_drow_ranger", context)      -- Lich & Dryad [and apparently meepo wat]

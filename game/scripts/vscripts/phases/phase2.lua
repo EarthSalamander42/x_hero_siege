@@ -193,7 +193,11 @@ function FinalWaveSpawner(creep1, creep2, creep3, creep4, boss_name, angles, dir
 	boss:SetAngles(0, angles, 0)
 	boss:EmitSound("Hero_TemplarAssassin.Trap")
 	boss:SetInitialGoalEntity(waypoint)
-	boss:MoveToPositionAggressive(waypoint:GetAbsOrigin())
+	ExecuteOrderFromTable({
+		UnitIndex = boss:entindex(),
+		OrderType = DOTA_UNIT_ORDER_ATTACK_MOVE,
+		Position = waypoint:GetAbsOrigin(),
+	})
 
 	local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_1, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)
 	for _, v in pairs(units) do
