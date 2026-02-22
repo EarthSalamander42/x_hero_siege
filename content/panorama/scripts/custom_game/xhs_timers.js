@@ -2,6 +2,8 @@
 
 function CountdownTimer(data)
 {
+	EnsureTimerShellVisible();
+
 	var timerText = "";
 	timerText += data.timer_minute_10;
 	timerText += data.timer_minute_01;
@@ -12,7 +14,15 @@ function CountdownTimer(data)
 	$("#GameTimer_" + data.timer_name).text = timerText;
 }
 
+function EnsureTimerShellVisible() {
+	if ($("#TimerShell").style.visibility !== "visible") {
+		$("#TimerShell").style.visibility = "visible";
+		$("#TimerPanels").style.visibility = "visible";
+	}
+}
+
 function ShowTimerBar() {
+	$("#TimerShell").style.visibility = "visible";
 	$("#TimerPanels").style.visibility = "visible";
 }
 
@@ -65,7 +75,7 @@ function SpecialEventLabelFinal() {
 }
 
 function Difficulty(args) {
-	$("#DifficultyGame").color = "red";
+	$("#DifficultyGame").style.color = "#ffcf66";
 	$("#DifficultyGame").text = args.difficulty;
 }
 
