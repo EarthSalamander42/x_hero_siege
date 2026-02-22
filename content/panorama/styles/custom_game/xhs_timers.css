@@ -26,7 +26,6 @@
 	blur: gaussian(4);
 	horizontal-align: center;
 	vertical-align: center;
-	position: 0;
 	ignore-parent-flow: true;
 	border-radius: 12px;
 }
@@ -135,12 +134,12 @@
 	animation-iteration-count: infinite;
 }
 
-@keyframes shellFadeIn {
+@keyframes 'shellFadeIn' {
 	0% { opacity: 0; transform: translateY(-6px); }
 	100% { opacity: 1; transform: translateY(0px); }
 }
 
-@keyframes pulseGlow {
+@keyframes 'pulseGlow' {
 	0% { opacity: 0.6; box-shadow: 0 0 8px #69f2ff; }
 	50% { opacity: 1; box-shadow: 0 0 14px #69f2ff; }
 	100% { opacity: 0.6; box-shadow: 0 0 8px #69f2ff; }

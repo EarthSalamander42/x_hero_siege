@@ -136,7 +136,8 @@ function GameMode:InitGameMode()
 	GameRules:SetHeroSelectionTime(0.0)
 	GameRules:SetGoldTickTime(0.0)
 	GameRules:SetGoldPerTick(0.0)
-	GameRules:SetCustomGameSetupAutoLaunchDelay(10.0) --Vote Time
+	GameRules:SetCustomGameSetupAutoLaunchDelay(9999.0) -- disabled, custom setup flow handles launch
+	GameRules:SetCustomGameSetupTimeout(-1.0) -- keep setup open until custom logic starts the game
 	GameRules:SetPreGameTime(PREGAMETIME)
 
 	-- mode:SetCustomAttributeDerivedStatValue(DOTA_ATTRIBUTE_AGILITY_ARMOR, 0) -- default: 0.016 armor per agility point
@@ -207,11 +208,15 @@ function GameMode:InitGameMode()
 	LinkLuaModifier("modifier_ankh", "items/ankh_of_reincarnation.lua", LUA_MODIFIER_MOTION_NONE)
 
 	CustomGameEventManager:RegisterListener("setting_vote", Dynamic_Wrap(GameMode, "OnSettingVote"))
+	CustomGameEventManager:RegisterListener("custom_setup_ready", Dynamic_Wrap(GameMode, "OnCustomSetupReady"))
 
 	-- Initialized tables for tracking state
 	GameMode.bSeenWaitForPlayers = false
 	GameMode.vUserIds = {}
 	GameMode.VoteTable = {}
+	GameMode.CustomSetupDuration = IsInToolsMode() and 3600 or 20
+	GameMode.CustomSetupReadyLaunchDelay = 3
+	GameMode.CustomSetupState = nil
 
 	GameMode:OnFirstPlayerLoaded()
 
@@ -972,15 +977,25 @@ end
 
 -- new system, double votes for donators
 ListenToGameEvent('game_rules_state_change', function(keys)
-	if GameRules:State_Get() == DOTA_GAMERULES_STATE_HERO_SELECTION then
-		-- If no one voted, default to IMBA 10v10 gamemode
+	local game_state = GameRules:State_Get()
+
+	if game_state == DOTA_GAMERULES_STATE_CUSTOM_GAME_SETUP then
+		GameMode:StartCustomSetupFlow()
+	elseif game_state == DOTA_GAMERULES_STATE_HERO_SELECTION then
+		local default_gamemode = XHS_GAMEMODE_CLASSIC or 1
+		local default_difficulty = 1
 
 		if api then
-			api:SetCustomGamemode(1)
-			api:SetCustomDifficulty(1)
+			api:SetCustomGamemode(default_gamemode)
+			api:SetCustomDifficulty(default_difficulty)
 		else
-			GameRules:SetCustomGameDifficulty(2)
+			CustomNetTables:SetTableValue("game_options", "gamemode", { tostring(default_gamemode) })
+			CustomNetTables:SetTableValue("game_options", "difficulty", { tostring(default_difficulty) })
+			GameRules:SetCustomGameDifficulty(default_difficulty)
 		end
+
+		XHS_GAMEMODE_ACTIVE = default_gamemode
+		GameMode.SelectedGameMode = default_gamemode
 
 		if GameMode.VoteTable == nil then return end
 		local votes = GameMode.VoteTable
@@ -1024,9 +1039,25 @@ ListenToGameEvent('game_rules_state_change', function(keys)
 
 			-- Act on the winning vote
 			if category == "gamemode" then
-				api:SetCustomGamemode(highest_key)
+				local selected_gamemode = tonumber(highest_key) or default_gamemode
+
+				if api then
+					api:SetCustomGamemode(selected_gamemode)
+				else
+					CustomNetTables:SetTableValue("game_options", "gamemode", { tostring(selected_gamemode) })
+				end
+
+				XHS_GAMEMODE_ACTIVE = selected_gamemode
+				GameMode.SelectedGameMode = selected_gamemode
 			elseif category == "difficulty" then
-				api:SetCustomDifficulty(highest_key)
+				local selected_difficulty = tonumber(highest_key) or default_difficulty
+
+				if api then
+					api:SetCustomDifficulty(selected_difficulty)
+				else
+					CustomNetTables:SetTableValue("game_options", "difficulty", { tostring(selected_difficulty) })
+					GameRules:SetCustomGameDifficulty(selected_difficulty)
+				end
 			end
 
 			-- print(category .. ": " .. highest_key)
@@ -1056,12 +1087,10 @@ function GameMode:OnSettingVote(keys)
 
 		GameMode.VoteTable[keys.category][pid][1] = keys.vote
 
-		if api then
-			if donator_list[api:GetDonatorStatus(pid)] then
-				GameMode.VoteTable[keys.category][pid][2] = donator_list[api:GetDonatorStatus(pid)]
-			else
-				GameMode.VoteTable[keys.category][pid][2] = 1
-			end
+		if api and donator_list[api:GetDonatorStatus(pid)] then
+			GameMode.VoteTable[keys.category][pid][2] = donator_list[api:GetDonatorStatus(pid)]
+		else
+			GameMode.VoteTable[keys.category][pid][2] = 1
 		end
 	end
 
@@ -1071,4 +1100,201 @@ function GameMode:OnSettingVote(keys)
 	-- TODO: Finish votes show up
 	CustomGameEventManager:Send_ServerToAllClients("send_votes",
 		{ category = keys.category, vote = keys.vote, table = GameMode.VoteTable[keys.category] })
+end
+
+function GameMode:IsPlayerEligibleForCustomSetupReady(player_id)
+	if not PlayerResource:IsValidPlayerID(player_id) then
+		return false
+	end
+
+	local player = PlayerResource:GetPlayer(player_id)
+	if player == nil then
+		return false
+	end
+
+	if PlayerResource:GetTeam(player_id) ~= DOTA_TEAM_GOODGUYS then
+		return false
+	end
+
+	return true
+end
+
+function GameMode:GetCustomSetupEligiblePlayers()
+	local players = {}
+
+	for player_id = 0, 23 do
+		if self:IsPlayerEligibleForCustomSetupReady(player_id) then
+			table.insert(players, player_id)
+		end
+	end
+
+	return players
+end
+
+function GameMode:GetCustomSetupSummary()
+	local eligible_players = self:GetCustomSetupEligiblePlayers()
+	local ready_players = {}
+	local ready_count = 0
+
+	for _, player_id in pairs(eligible_players) do
+		local is_ready = false
+
+		if self.CustomSetupState and self.CustomSetupState.ready_players and self.CustomSetupState.ready_players[player_id] then
+			is_ready = true
+		end
+
+		if is_ready then
+			ready_count = ready_count + 1
+		end
+
+		ready_players[tostring(player_id)] = is_ready and 1 or 0
+	end
+
+	return ready_players, ready_count, #eligible_players
+end
+
+function GameMode:PushCustomSetupNetTable()
+	if not self.CustomSetupState then
+		return
+	end
+
+	local ready_players, ready_count, total_players = self:GetCustomSetupSummary()
+	local remaining_time = 0
+
+	if self.CustomSetupState.active then
+		remaining_time = math.max(0, math.ceil(self.CustomSetupState.deadline - GameRules:GetGameTime()))
+	end
+
+	CustomNetTables:SetTableValue("game_options", "custom_setup", {
+		active = self.CustomSetupState.active and 1 or 0,
+		launching = self.CustomSetupState.launching and 1 or 0,
+		launch_reason = self.CustomSetupState.launch_reason or "",
+		duration = self.CustomSetupDuration or 20,
+		remaining_time = remaining_time,
+		ready_count = ready_count,
+		total_players = total_players,
+		ready_players = ready_players,
+	})
+end
+
+function GameMode:StartCustomSetupFlow()
+	if self.CustomSetupState and self.CustomSetupState.active then
+		self:PushCustomSetupNetTable()
+		return
+	end
+
+	self.CustomSetupState = {
+		active = true,
+		launching = false,
+		launch_reason = "",
+		deadline = GameRules:GetGameTime() + (self.CustomSetupDuration or 20),
+		all_ready_triggered = false,
+		ready_players = {},
+	}
+
+	self:PushCustomSetupNetTable()
+
+	GameRules:GetGameModeEntity():SetContextThink("xhs_custom_setup_think", function()
+		return GameMode:CustomSetupThink()
+	end, 0.1)
+end
+
+function GameMode:FinishCustomSetup(launch_reason)
+	if not self.CustomSetupState or not self.CustomSetupState.active then
+		return
+	end
+
+	self.CustomSetupState.active = false
+	self.CustomSetupState.launching = true
+	self.CustomSetupState.launch_reason = launch_reason or "timeout"
+	self:PushCustomSetupNetTable()
+
+	if GameRules.FinishCustomGameSetup then
+		GameRules:FinishCustomGameSetup()
+	else
+		GameRules:SetCustomGameSetupRemainingTime(0.0)
+	end
+end
+
+function GameMode:CustomSetupThink()
+	if not self.CustomSetupState then
+		return nil
+	end
+
+	if GameRules:State_Get() ~= DOTA_GAMERULES_STATE_CUSTOM_GAME_SETUP then
+		self.CustomSetupState.active = false
+		self.CustomSetupState.launching = false
+		self:PushCustomSetupNetTable()
+		return nil
+	end
+
+	local ready_launch_delay = self.CustomSetupReadyLaunchDelay or 3
+	local current_time = GameRules:GetGameTime()
+	local _, ready_count, total_players = self:GetCustomSetupSummary()
+
+	if total_players > 0 and ready_count >= total_players then
+		local all_ready_deadline = current_time + ready_launch_delay
+
+		-- Everyone is ready: start a short final countdown, but never extend
+		-- an already shorter auto-launch timer.
+		if self.CustomSetupState.deadline > all_ready_deadline then
+			self.CustomSetupState.deadline = all_ready_deadline
+			self.CustomSetupState.all_ready_triggered = true
+		end
+	end
+
+	if current_time >= self.CustomSetupState.deadline then
+		local launch_reason = "timeout"
+		if self.CustomSetupState.all_ready_triggered then
+			launch_reason = "all_ready"
+		end
+
+		self:FinishCustomSetup(launch_reason)
+		return nil
+	end
+
+	self:PushCustomSetupNetTable()
+	return 0.2
+end
+
+function GameMode:OnCustomSetupReady(event_source_index, keys)
+	local payload = keys
+
+	-- Dynamic_Wrap + CustomGameEventManager passes (eventSourceIndex, keys)
+	-- Keep compatibility with direct calls that might pass only keys.
+	if type(event_source_index) == "table" and payload == nil then
+		payload = event_source_index
+	end
+
+	if not payload then
+		return
+	end
+
+	if not GameMode.CustomSetupState or not GameMode.CustomSetupState.active then
+		return
+	end
+
+	local player_id = tonumber(payload.PlayerID or -1)
+
+	-- Prefer the actual sender when available (prevents spoofing PlayerID from client).
+	if type(event_source_index) == "number" and event_source_index > 0 then
+		local ok, sender = pcall(EntIndexToHScript, event_source_index)
+		if ok and sender ~= nil and sender.GetPlayerID then
+			local sender_player_id = sender:GetPlayerID()
+			if sender_player_id ~= nil and sender_player_id >= 0 then
+				player_id = sender_player_id
+			end
+		end
+	end
+
+	if player_id < 0 then
+		return
+	end
+
+	if not GameMode:IsPlayerEligibleForCustomSetupReady(player_id) then
+		return
+	end
+
+	GameMode.CustomSetupState.ready_players[player_id] = true
+	GameMode:PushCustomSetupNetTable()
 end

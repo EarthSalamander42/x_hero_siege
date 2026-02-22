@@ -142,19 +142,9 @@ SetupLoadingScreen();
 
 function SetupLoadingScreen() {
 	if (Parent.FindChildTraverse("GameAndPlayersRoot") == undefined || Parent.FindChildTraverse("TeamsList") == undefined || Parent.FindChildTraverse("TeamsListGroup") == undefined || Parent.FindChildTraverse("CancelAndUnlockButton") == undefined || Parent.FindChildTraverse("UnassignedPlayerPanel") == undefined || Parent.FindChildTraverse("ShuffleTeamAssignmentButton") == undefined)
-		$.Schedule(0.25, SetupLoadingScreen);
+		$.Schedule(0.1, SetupLoadingScreen);
 	else {
-		Parent.FindChildTraverse("GameAndPlayersRoot").style.backgroundColor = "rgba(50, 50, 50, 0.5)";
-		Parent.FindChildTraverse("GameAndPlayersRoot").style.borderRadius = "3px";
-		Parent.FindChildTraverse("GameAndPlayersRoot").style.boxShadow = "black 0px 0px 2px 2px";
+		Parent.FindChildTraverse("GameAndPlayersRoot").style.visibility = "collapse";
 		Parent.FindChildTraverse("TeamsList").style.visibility = "collapse";
-		Parent.FindChildTraverse("TeamsListGroup").SetParent(Parent.FindChildTraverse("GameAndPlayersRoot"))
-		Parent.FindChildTraverse("TeamsListGroup").style.verticalAlign = "top";
-		Parent.FindChildTraverse("TeamsListGroup").style.width = "99%";
-		if (Game.IsInToolsMode() == false) {
-			Parent.FindChildTraverse("UnassignedPlayerPanel").style.visibility = "collapse";
-			Parent.FindChildTraverse("CancelAndUnlockButton").style.visibility = "collapse";
-			Parent.FindChildTraverse("ShuffleTeamAssignmentButton").style.visibility = "collapse";
-		}
 	}
 }

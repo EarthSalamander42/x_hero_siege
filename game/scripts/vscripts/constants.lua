@@ -43,6 +43,10 @@ _G.ZONE_STAR_CRITERIA_KILLS            = 2
 _G.ZONE_STAR_CRITERIA_QUEST_COMPLETE   = 3
 
 -- X Hero Siege
+_G.XHS_GAMEMODE_CLASSIC               = 1
+_G.XHS_GAMEMODE_REBORN                = 2
+_G.XHS_GAMEMODE_ACTIVE                = XHS_GAMEMODE_CLASSIC
+
 _G.PREGAMETIME                         = 90.0
 _G.SPECIAL_ARENA_DURATION              = 120.0
 _G.MAGTHERIDON                         = 0
