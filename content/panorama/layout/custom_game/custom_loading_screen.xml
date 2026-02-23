@@ -33,8 +33,9 @@
 		</Panel>
 
 		<Panel class="container-main">
-			<Panel class="header">
-				<Panel class="top-left-container">
+			<Panel class="content-left-column">
+				<Panel class="header">
+					<Panel class="top-left-container">
 					<Button id="HomeProfileContainer" onactivate="ToggleProfileModal(true);">
 						<Panel id="HomeProfileHeader" class="TodayPageHeader">
 							<Panel id="PopoutArrow" class="DemoArrow" />
@@ -75,9 +76,9 @@
 							<Label class="vote-button-label" text="#loading_screen_change_vote" />
 						</Button>
 					</Panel>
-				</Panel>
+					</Panel>
 
-				<Panel class="description-container">
+					<Panel class="description-container">
 					<Panel class="description-background">
 						<Panel class="description-credit-wrap">
 							<Label class="description-credit-text" text="#loading_screen_artwork_credit" />
@@ -98,39 +99,24 @@
 							<Label class="vote-button-label" text="#loading_screen_button" />
 						</Button>
 					</Panel>
+					</Panel>
 				</Panel>
 
-				<Panel id="PlayerLoadingSidebar" class="player-loading-sidebar">
-					<Panel class="player-loading-header">
-						<Label class="player-loading-title" text="#loading_screen_players" />
-						<Label id="PlayerLoadingCounter" class="player-loading-counter" text="#loading_screen_loaded_counter_default" />
-						<ProgressBar id="PlayerLoadingProgress" class="player-loading-progress" value="0.0" />
-						<Panel class="player-loading-status-wrap">
-							<Label id="PlayerLoadingWaiting" class="player-loading-status" text="#loading_screen_waiting_counter_default" />
-							<Label id="PlayerLoadingIssues" class="player-loading-status" text="#loading_screen_failed_counter_default" />
-						</Panel>
-						<Label id="PlayerForceLaunchLabel" class="player-force-launch-label" text="#loading_screen_match_starts_in_default" />
-						<Button id="PlayerReadyButton" class="player-ready-button" onactivate="OnCustomSetupReadyPressed();">
-							<Label id="PlayerReadyButtonLabel" text="#loading_screen_mark_ready" />
-						</Button>
+				<Panel id="BottomFooterRoot" class="footer">
+					<Panel class="bottom-button-container" hittest="false">
+					<RadioButton id="BottomRadioPatreon" class="bottom-radio-button" onactivate="SwitchTab(3)" text="#loading_screen_tab_patreon" />
+					<Label class="bottom-radio-separator" text="/" />
+					<RadioButton id="BottomRadioCustomGames" class="bottom-radio-button" onactivate="SwitchTab(1)" text="#loading_screen_tab_custom_games" />
+					<Label class="bottom-radio-separator" text="/" />
+					<RadioButton id="BottomRadioTransifex" class="bottom-radio-button" onactivate="SwitchTab(2)" text="#loading_screen_tab_transifex" />
+					<Panel id="BottomTabCountdownWrap" class="bottom-tab-countdown-wrap">
+						<Panel class="bottom-tab-countdown-dot" />
+						<Label id="BottomTabCountdown" class="bottom-tab-countdown" text="#loading_screen_tab_timer_default" />
+					</Panel>
+					<Panel class="bottom-button-spacer" />
 					</Panel>
 
-					<Panel id="PlayerLoadingList" class="player-loading-list" />
-				</Panel>
-			</Panel>
-
-			<Panel class="footer">
-				<Panel class="bottom-button-container" hittest="false">
-					<RadioButton class="bottom-radio-button" onactivate="SwitchTab(1)" text="#loading_screen_tab_custom_games" />
-					<Label class="bottom-radio-separator" text="/" />
-					<RadioButton class="bottom-radio-button" onactivate="SwitchTab(2)" text="#loading_screen_tab_transifex" />
-					<Label class="bottom-radio-separator" text="/" />
-					<RadioButton class="bottom-radio-button" onactivate="SwitchTab(3)" text="#loading_screen_tab_patreon" />
-				</Panel>
-
-				<Label id="BottomLabel" class="bottom-label" text="#loading_screen_custom_games_1"/>
-
-				<Panel class="bottom-footer-container">
+					<Panel class="bottom-footer-container">
 					<Panel class="bottom-mods-container">
 						<!-- Frostrose Battlefield -->
 						<Button class="mod-cell">
@@ -195,7 +181,7 @@
 -->
 
 						<!-- Diretide -->
-						<Button class="mod-cell" onactivate="DOTADisplayURL('https://steamcommunity.com/sharedfiles/filedetails/?id=544075277');">
+						<!-- <Button class="mod-cell" onactivate="DOTADisplayURL('https://steamcommunity.com/sharedfiles/filedetails/?id=544075277');">
 							<Panel class="mod-image-container">
 								<Image class="mod-image" src="file://panorama/images/custom_game/mods/modlist6.jpg"/>
 								<Panel class="mod-background"/>
@@ -204,22 +190,54 @@
 							<Panel class="mod-footer">
 								<Label class="mod-name" text="#loading_screen_patreon_modlist6"/>
 							</Panel>
-						</Button>
+						</Button> -->
 					</Panel>
 
 					<Panel class="bottom-transifex-container">
-						<Button class="vote-button" onactivate="ExternalBrowserGoToURL('https://www.transifex.com/frostrose-studio/x-hero-siege/')">
-							<Label class="vote-button-label" text="#loading_screen_promote_button" />
-						</Button>
+						<Panel class="transifex-highlight-card">
+							<Panel class="transifex-highlight-copy">
+								<Label class="transifex-highlight-title" text="#loading_screen_transifex_section_title" />
+								<Label class="transifex-highlight-subtitle" text="#loading_screen_transifex_section_subtitle" />
+								<Label class="transifex-highlight-description" text="#loading_screen_transifex_section_description" />
+
+								<Panel class="transifex-benefits-list">
+									<Panel class="transifex-benefit-row">
+										<Panel class="transifex-benefit-dot" />
+										<Label class="transifex-benefit-text" text="#loading_screen_transifex_advantage_1" />
+									</Panel>
+									<Panel class="transifex-benefit-row">
+										<Panel class="transifex-benefit-dot" />
+										<Label class="transifex-benefit-text" text="#loading_screen_transifex_advantage_2" />
+									</Panel>
+									<Panel class="transifex-benefit-row">
+										<Panel class="transifex-benefit-dot" />
+										<Label class="transifex-benefit-text" text="#loading_screen_transifex_advantage_3" />
+									</Panel>
+								</Panel>
+
+								<Panel class="transifex-highlight-footer">
+									<Label class="transifex-highlight-support-note" text="#loading_screen_transifex_support_note" />
+									<Panel class="transifex-cta-row">
+										<Button class="vote-button transifex-cta-button" onactivate="ExternalBrowserGoToURL('https://www.transifex.com/frostrose-studio/x-hero-siege/')">
+											<Label class="vote-button-label" text="#loading_screen_transifex_cta_button" />
+										</Button>
+										<Button class="vote-button transifex-cta-secondary-button" onactivate="ExternalBrowserGoToURL('https://www.patreon.com/bePatron?u=2533325')">
+											<Label class="vote-button-label" text="#loading_screen_patreon_cta_button" />
+										</Button>
+									</Panel>
+								</Panel>
+							</Panel>
+						</Panel>
 					</Panel>
 
 					<Panel class="bottom-patreon-container">
 						<Panel class="patreon-highlight-card">
-							<Panel class="patreon-highlight-visual" />
-
 							<Panel class="patreon-highlight-copy">
 								<Label class="patreon-highlight-title" text="#loading_screen_patreon_section_title" />
 								<Label class="patreon-highlight-subtitle" text="#loading_screen_patreon_section_subtitle" />
+								<Panel class="patreon-cta-inline-row">
+									<Button class="patreon-cta-image-button" onactivate="ExternalBrowserGoToURL('https://www.patreon.com/bePatron?u=2533325')" />
+								</Panel>
 								<Label class="patreon-highlight-description" text="#loading_screen_patreon_section_description" />
 
 								<Panel class="patreon-benefits-list">
@@ -239,14 +257,29 @@
 
 								<Panel class="patreon-highlight-footer">
 									<Label class="patreon-highlight-support-note" text="#loading_screen_patreon_support_note" />
-									<Button class="vote-button patreon-cta-button" onactivate="ExternalBrowserGoToURL('https://www.patreon.com/bePatron?u=2533325')">
-										<Label class="vote-button-label" text="#loading_screen_patreon_cta_button" />
-									</Button>
 								</Panel>
 							</Panel>
 						</Panel>
 					</Panel>
+					</Panel>
 				</Panel>
+			</Panel>
+
+			<Panel id="PlayerLoadingSidebar" class="player-loading-sidebar">
+				<Panel class="player-loading-header">
+					<Label class="player-loading-title" text="#loading_screen_players" />
+					<Label id="PlayerLoadingCounter" class="player-loading-counter" text="#loading_screen_loaded_counter_default" />
+					<ProgressBar id="PlayerLoadingProgress" class="player-loading-progress" value="0.0" />
+					<Panel class="player-loading-status-wrap">
+						<Label id="PlayerLoadingWaiting" class="player-loading-status" text="#loading_screen_waiting_counter_default" />
+					</Panel>
+					<Label id="PlayerForceLaunchLabel" class="player-force-launch-label" text="#loading_screen_match_starts_in_default" />
+					<Button id="PlayerReadyButton" class="player-ready-button" onactivate="OnCustomSetupReadyPressed();">
+						<Label id="PlayerReadyButtonLabel" text="#loading_screen_mark_ready" />
+					</Button>
+				</Panel>
+
+				<Panel id="PlayerLoadingList" class="player-loading-list" />
 			</Panel>
 		</Panel>
 

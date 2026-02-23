@@ -13,6 +13,41 @@ var profile_position_pending = {};
 var profile_position_retry_at = {};
 var profile_modal_transition_token = 0;
 var profile_modal_fade_duration = 0.18;
+var bottom_tab_current_panel_index = -1;
+var bottom_tab_transition_token = 0;
+var bottom_tab_transition_duration = 0.34;
+var bottom_tab_auto_interval = 10.0;
+var bottom_tab_rotation_order = [3, 1, 2];
+var bottom_tab_auto_tick_interval = 0.1;
+var bottom_tab_countdown_remaining = 10.0;
+var bottom_tab_last_tick_time = -1;
+var bottom_tab_mouse_over_footer = false;
+var bottom_tab_last_mouse_move_time = -1;
+var bottom_tab_mouse_move_pause_window = 0.22;
+var custom_setup_failed_state = false;
+var loading_screen_logs_enabled = false;
+var loading_screen_log_sequence = 0;
+var loading_screen_last_setup_signature = "";
+var loading_screen_last_sidebar_summary_signature = "";
+var loading_screen_last_footer_mouse_state = false;
+var loading_screen_last_bottom_tab_countdown_bucket = -1;
+var tools_mode_last_lobby_signature = "";
+var loading_screen_last_fetch_stage = "";
+var loading_screen_last_profile_signature = "";
+// Debug toggle: set to true to enable fake tools-mode player state simulation.
+var tools_mode_lobby_simulation_enabled = true;
+var tools_mode_lobby_sim_started_at = -1;
+var tools_mode_lobby_player_count = 19;
+var tools_mode_lobby_player_stagger = 1.8;
+var tools_mode_lobby_ready_stagger = 0.55;
+var tools_mode_lobby_stage_durations = {
+	unknown: 1.3,
+	pending: 1.3,
+	loading_primary: 2.5,
+	disconnected: 1.4,
+	abandoned: 1.2,
+	loading_reconnect: 2.1,
+};
 
 var mmr_rank_to_medals = {
 	Herald: 1,
@@ -167,14 +202,129 @@ function LocalizeTemplate(token, values) {
 	return localized;
 }
 
+function SafeSerializeForLog(data) {
+	if (data === undefined) {
+		return "";
+	}
+
+	if (data === null) {
+		return "null";
+	}
+
+	if (typeof data === "string") {
+		return data;
+	}
+
+	try {
+		return JSON.stringify(data);
+	} catch (err) {
+		return "<unserializable>";
+	}
+}
+
+function BuildSetupStatusSignature(setup_status) {
+	if (!setup_status) {
+		return "none";
+	}
+
+	var active_value = setup_status.active === true || setup_status.active === 1 || setup_status.active === "1" ? "1" : "0";
+	var launching_value = setup_status.launching === true || setup_status.launching === 1 || setup_status.launching === "1" ? "1" : "0";
+	var remaining_value = Math.max(0, Math.floor(ToNumber(setup_status.remaining_time, ToNumber(setup_status.duration, 20))));
+	var ready_parts = [];
+
+	if (setup_status.ready_players) {
+		for (var key in setup_status.ready_players) {
+			if (setup_status.ready_players[key] === true || setup_status.ready_players[key] === 1 || setup_status.ready_players[key] === "1") {
+				ready_parts.push(key.toString());
+			}
+		}
+	}
+
+	ready_parts.sort();
+	return "a" + active_value + "|l" + launching_value + "|t" + remaining_value + "|r" + ready_parts.join(",");
+}
+
+function LoadingTrace(tag, message, data) {
+	if (!loading_screen_logs_enabled) {
+		return;
+	}
+
+	loading_screen_log_sequence = loading_screen_log_sequence + 1;
+	var now = GetCurrentTime();
+	var now_text = now.toFixed ? now.toFixed(2) : now;
+	var line = "[XHS_LOADING #" + loading_screen_log_sequence + " t=" + now_text + "][" + tag + "] " + message;
+	var serialized = SafeSerializeForLog(data);
+
+	if (serialized && serialized.length > 0) {
+		line = line + " | " + serialized;
+	}
+
+	$.Msg(line);
+}
+
+function LoadingTraceState(tag, state_key, signature, message, data) {
+	if (!loading_screen_logs_enabled) {
+		return;
+	}
+
+	if (state_key.value !== signature) {
+		var previous = state_key.value;
+		state_key.value = signature;
+		LoadingTrace(tag, message, {
+			previous: previous,
+			current: signature,
+			data: data,
+		});
+	}
+}
+
+function GetConnectionStateDebugName(state) {
+	if (state === connection_state.CONNECTED) {
+		return "CONNECTED";
+	}
+
+	if (state === connection_state.LOADING) {
+		return "LOADING";
+	}
+
+	if (state === connection_state.DISCONNECTED) {
+		return "DISCONNECTED";
+	}
+
+	if (state === connection_state.ABANDONED) {
+		return "ABANDONED";
+	}
+
+	if (state === connection_state.FAILED) {
+		return "FAILED";
+	}
+
+	if (state === connection_state.NOT_YET_CONNECTED) {
+		return "PENDING";
+	}
+
+	if (state === connection_state.UNKNOWN) {
+		return "UNKNOWN";
+	}
+
+	return "STATE_" + state;
+}
+
 function LoadingScreenDebug(args) {
-	$.Msg(args);
+	LoadingTrace("event/loading_screen_debug", "Received debug payload", args);
 	view.text.text = view.text.text + ". \n\n" + args.text;
 }
 
 function GetCurrentTime() {
-	if (Game.GetGameTime) {
-		return Game.GetGameTime();
+	if (typeof Game.GetGameTime === "function") {
+		var game_time = Game.GetGameTime();
+		if (game_time !== undefined && game_time !== null && !isNaN(game_time)) {
+			return game_time;
+		}
+	}
+
+	if (typeof $.Now === "function") {
+		return $.Now() / 1000.0;
 	}
 
 	return 0;
@@ -190,6 +340,63 @@ function GetLocalPlayerIDSafe() {
 	return local_player_id;
 }
 
+function IsToolsModeEnabled() {
+	if (typeof Game.IsInToolsMode === "function") {
+		return Game.IsInToolsMode();
+	}
+
+	return false;
+}
+
+function IsToolsModeLoadingSimulationEnabled() {
+	return tools_mode_lobby_simulation_enabled === true;
+}
+
+function GetToolsModeLobbyElapsedSeconds() {
+	if (tools_mode_lobby_sim_started_at < 0) {
+		tools_mode_lobby_sim_started_at = GetCurrentTime();
+	}
+
+	return Math.max(0, GetCurrentTime() - tools_mode_lobby_sim_started_at);
+}
+
+function GetToolsModeLobbyPlayerName(index) {
+	var token = "#loading_screen_tools_player_" + (index + 1);
+	var localized = $.Localize(token);
+
+	if (localized && localized != token) {
+		return localized;
+	}
+
+	return "Player " + (index + 1);
+}
+
+function GetToolsModeLobbyPlayerState(player_index, elapsed_seconds) {
+	var loading_phase_base = 1.8;
+	var ready_step = Math.max(0.25, tools_mode_lobby_ready_stagger);
+	var last_fake_index = Math.max(0, tools_mode_lobby_player_count - 1);
+
+	if (player_index == last_fake_index) {
+		var failed_time = loading_phase_base + ((last_fake_index - 1) * ready_step) + 1.4;
+		if (elapsed_seconds >= failed_time) {
+			return connection_state.FAILED;
+		}
+
+		return connection_state.LOADING;
+	}
+
+	var ready_time = loading_phase_base + (player_index * ready_step);
+	if (elapsed_seconds >= ready_time) {
+		return connection_state.CONNECTED;
+	}
+
+	return connection_state.LOADING;
+}
+
+function GetToolsModeLobbyPlayerReady(player_index, elapsed_seconds, state) {
+	return state === connection_state.CONNECTED;
+}
+
 function GetSelectedProfilePlayerID() {
 	if (selected_profile_player_id !== undefined && selected_profile_player_id !== null && selected_profile_player_id >= 0) {
 		return selected_profile_player_id;
@@ -201,11 +408,18 @@ function GetSelectedProfilePlayerID() {
 }
 
 function SetSelectedProfilePlayer(player_id, open_modal) {
+	var requested_player_id = player_id;
+
 	if (player_id === undefined || player_id === null || player_id < 0) {
 		player_id = GetLocalPlayerIDSafe();
 	}
 
 	selected_profile_player_id = player_id;
+	LoadingTrace("profile/select", "Selected profile player updated", {
+		requested_player_id: requested_player_id,
+		resolved_player_id: player_id,
+		open_modal: open_modal === true,
+	});
 	UpdateProfilePanels();
 	UpdatePlayerLoadingSidebar();
 	RequestProfilePositionForSelected();
@@ -311,7 +525,19 @@ function HasServerKey() {
 }
 
 function GetCustomSetupStatus() {
-	return CustomNetTables.GetTableValue("game_options", "custom_setup") || {};
+	var status = {};
+
+	if (typeof CustomNetTables !== "undefined" && CustomNetTables && typeof CustomNetTables.GetTableValue === "function") {
+		status = CustomNetTables.GetTableValue("game_options", "custom_setup") || {};
+	}
+
+	var signature = BuildSetupStatusSignature(status);
+	if (loading_screen_last_setup_signature !== signature) {
+		LoadingTrace("setup/status", "Custom setup status changed", status);
+		loading_screen_last_setup_signature = signature;
+	}
+
+	return status;
 }
 
 function IsCustomSetupStatusActive(setup_status) {
@@ -542,22 +768,41 @@ function RequestProfilePositionForSteam(steam_id) {
 	steam_id = NormalizeSteamID64(steam_id);
 
 	if (!steam_id || !HasServerKey()) {
+		LoadingTrace("profile/position", "Skipping profile position request", {
+			steam_id: steam_id,
+			has_server_key: HasServerKey(),
+		});
 		return;
 	}
 
 	if (profile_position_cache[steam_id] !== undefined) {
+		LoadingTrace("profile/position", "Profile position already cached", {
+			steam_id: steam_id,
+			position: profile_position_cache[steam_id],
+		});
 		return;
 	}
 
 	if (profile_position_pending[steam_id]) {
+		LoadingTrace("profile/position", "Profile position request already pending", {
+			steam_id: steam_id,
+		});
 		return;
 	}
 
 	if (profile_position_retry_at[steam_id] !== undefined && GetCurrentTime() < profile_position_retry_at[steam_id]) {
+		LoadingTrace("profile/position", "Profile position request in retry cooldown", {
+			steam_id: steam_id,
+			retry_at: profile_position_retry_at[steam_id],
+			now: GetCurrentTime(),
+		});
 		return;
 	}
 
 	profile_position_pending[steam_id] = true;
+	LoadingTrace("profile/position", "Requesting profile position from API", {
+		steam_id: steam_id,
+	});
 
 	api.getPlayerPosition({
 		steamid: steam_id,
@@ -566,10 +811,18 @@ function RequestProfilePositionForSteam(steam_id) {
 		profile_position_cache[steam_id] = ExtractProfilePosition(data, steam_id);
 		profile_position_pending[steam_id] = false;
 		profile_position_retry_at[steam_id] = 0;
+		LoadingTrace("profile/position", "Profile position API request succeeded", {
+			steam_id: steam_id,
+			position: profile_position_cache[steam_id],
+		});
 		UpdateProfilePanels();
 	}, function () {
 		profile_position_pending[steam_id] = false;
 		profile_position_retry_at[steam_id] = GetCurrentTime() + 5;
+		LoadingTrace("profile/position", "Profile position API request failed, retry scheduled", {
+			steam_id: steam_id,
+			retry_at: profile_position_retry_at[steam_id],
+		});
 	});
 }
 
@@ -759,6 +1012,29 @@ function UpdateProfilePanels() {
 		steam_button.enabled = can_open_steam;
 		steam_button.SetHasClass("IsDisabled", !can_open_steam);
 	}
+
+	var profile_signature =
+		"local:" + local_data.player_id +
+		"|selected:" + selected_data.player_id +
+		"|steam:" + selected_data.steam_id +
+		"|title:" + selected_data.title +
+		"|level:" + selected_data.level +
+		"|conn:" + GetConnectionStateDebugName(selected_data.connection_state) +
+		"|can_open_steam:" + (selected_data.steam_id.length > 0 ? "1" : "0");
+
+	if (loading_screen_last_profile_signature !== profile_signature) {
+		loading_screen_last_profile_signature = profile_signature;
+		LoadingTrace("profile/panels", "Profile panel data changed", {
+			local_player_id: local_data.player_id,
+			selected_player_id: selected_data.player_id,
+			selected_player_name: selected_data.player_name,
+			selected_steam_id: selected_data.steam_id,
+			title: selected_data.title,
+			level: selected_data.level,
+			connection_state: GetConnectionStateDebugName(selected_data.connection_state),
+			leaderboard: GetLeaderboardTextForSteam(selected_data.steam_id),
+		});
+	}
 }
 
 function RefreshProfileDataLoop() {
@@ -771,6 +1047,10 @@ function ToggleProfileModal(bBoolean) {
 	var root_panel = $.GetContextPanel();
 	profile_modal_transition_token = profile_modal_transition_token + 1;
 	var transition_token = profile_modal_transition_token;
+	LoadingTrace("profile/modal", bBoolean ? "Opening profile modal" : "Closing profile modal", {
+		selected_player_id: GetSelectedProfilePlayerID(),
+		transition_token: transition_token,
+	});
 
 	if (bBoolean) {
 		if (GetSelectedProfilePlayerID() < 0) {
@@ -792,42 +1072,62 @@ function ToggleProfileModal(bBoolean) {
 
 	$.Schedule(profile_modal_fade_duration, function () {
 		if (transition_token != profile_modal_transition_token) {
+			LoadingTrace("profile/modal", "Close transition interrupted", {
+				scheduled_token: transition_token,
+				current_token: profile_modal_transition_token,
+			});
 			return;
 		}
 
 		root_panel.SetHasClass("ProfileModalClosing", false);
+		LoadingTrace("profile/modal", "Close transition completed", {
+			transition_token: transition_token,
+		});
 	});
 }
 
 function OpenExternalURL(url) {
 	if (!url || url.length <= 0) {
+		LoadingTrace("external/url", "Blocked opening empty URL");
 		return false;
 	}
 
+	LoadingTrace("external/url", "Attempting to open URL", { url: url });
+
 	if (typeof ExternalBrowserGoToURL === "function") {
 		ExternalBrowserGoToURL(url);
+		LoadingTrace("external/url", "Opened via ExternalBrowserGoToURL", { url: url });
 		return true;
 	}
 
 	try {
 		$.DispatchEvent("ExternalBrowserGoToURL", url);
+		LoadingTrace("external/url", "Opened via DispatchEvent ExternalBrowserGoToURL", { url: url });
 		return true;
 	} catch (err) {
 		$.Msg("ExternalBrowserGoToURL unavailable: " + err);
+		LoadingTrace("external/url", "ExternalBrowserGoToURL dispatch unavailable", { error: err ? err.toString() : "unknown" });
 	}
 
 	try {
 		$.DispatchEvent("DOTADisplayURL", url);
+		LoadingTrace("external/url", "Opened via DispatchEvent DOTADisplayURL", { url: url });
 		return true;
 	} catch (err2) {
 		$.Msg("DOTADisplayURL unavailable: " + err2);
+		LoadingTrace("external/url", "DOTADisplayURL dispatch unavailable", { error: err2 ? err2.toString() : "unknown" });
 	}
 
+	LoadingTrace("external/url", "Failed to open URL", { url: url });
 	return false;
 }
 
 function OpenProfileSteamPage() {
 	var selected_data = GetProfileDataForPlayer(GetSelectedProfilePlayerID());
+	LoadingTrace("profile/steam", "Open profile requested", {
+		selected_player_id: GetSelectedProfilePlayerID(),
+		selected_steam_id: selected_data.steam_id,
+	});
 
 	if (selected_data.steam_id) {
 		OpenExternalURL("https://steamcommunity.com/profiles/" + selected_data.steam_id);
@@ -843,18 +1143,35 @@ function OpenProfileSteamPage() {
 	}
 
 	if (typeof DOTAShowProfilePage === "function") {
+		LoadingTrace("profile/steam", "Fallback to DOTAShowProfilePage(0)");
 		DOTAShowProfilePage(0);
 	}
 }
 
 function OnCustomSetupReadyPressed() {
-	var local_player_id = GetLocalPlayerIDSafe();
+	LoadingTrace("setup/ready_click", "Ready button clicked", {
+		failed_state: custom_setup_failed_state,
+		local_player_id: GetLocalPlayerIDSafe(),
+	});
 
-	if (local_player_id < 0) {
+	if (custom_setup_failed_state) {
+		LoadingTrace("setup/ready_click", "Blocked ready click because setup is failed");
 		return;
 	}
 
-	GameEvents.SendCustomGameEventToServer("custom_setup_ready", { PlayerID: local_player_id });
+	var local_player_id = GetLocalPlayerIDSafe();
+
+	if (local_player_id < 0) {
+		LoadingTrace("setup/ready_click", "Blocked ready click because local player id is invalid");
+		return;
+	}
+
+	if (typeof GameEvents !== "undefined" && GameEvents && typeof GameEvents.SendCustomGameEventToServer === "function") {
+		GameEvents.SendCustomGameEventToServer("custom_setup_ready", { PlayerID: local_player_id });
+		LoadingTrace("setup/ready_click", "Sent custom_setup_ready to server", { player_id: local_player_id });
+	} else {
+		LoadingTrace("setup/ready_click", "Failed to send custom_setup_ready because GameEvents API is unavailable");
+	}
 }
 
 function GetVoteInfoTooltipText() {
@@ -971,6 +1288,106 @@ function GetConnectionGroupTitle(group_key) {
 	return L("loading_screen_group_ready");
 }
 
+function GetTeamConstant(name, fallback_value) {
+	if (typeof DOTATeam_t !== "undefined" && DOTATeam_t && DOTATeam_t[name] !== undefined) {
+		return DOTATeam_t[name];
+	}
+
+	return fallback_value;
+}
+
+function GetDefaultFriendlyTeamID() {
+	return GetTeamConstant("DOTA_TEAM_GOODGUYS", 2);
+}
+
+function GetDefaultEnemyTeamID() {
+	return GetTeamConstant("DOTA_TEAM_BADGUYS", 3);
+}
+
+function GetOppositeCoreTeamID(team_id) {
+	var goodguys = GetDefaultFriendlyTeamID();
+	var badguys = GetDefaultEnemyTeamID();
+
+	if (team_id == goodguys) {
+		return badguys;
+	}
+
+	if (team_id == badguys) {
+		return goodguys;
+	}
+
+	return badguys;
+}
+
+function GetPlayerTeamIDFromInfo(player_info, fallback_team_id) {
+	var fallback = fallback_team_id;
+	if (fallback === undefined || fallback === null) {
+		fallback = GetDefaultFriendlyTeamID();
+	}
+
+	if (!player_info) {
+		return fallback;
+	}
+
+	var raw_team_id = player_info.player_team_id;
+	if (raw_team_id === undefined || raw_team_id === null) {
+		raw_team_id = player_info.team_id;
+	}
+
+	var parsed_team_id = parseInt(raw_team_id);
+	if (isNaN(parsed_team_id)) {
+		return fallback;
+	}
+
+	return parsed_team_id;
+}
+
+function GetToolsModeLobbyTeamID(player_index, local_team_id) {
+	var friendly_team_id = local_team_id;
+	var enemy_team_id = GetOppositeCoreTeamID(local_team_id);
+
+	// Keep the local player as slot 8 and split tools players 3/4 around that.
+	return player_index < 3 ? friendly_team_id : enemy_team_id;
+}
+
+function GetTeamSectionKey(team_id) {
+	return "team_" + team_id;
+}
+
+function GetTeamSortPriority(team_id, local_team_id) {
+	if (team_id == local_team_id) {
+		return 0;
+	}
+
+	return 1 + team_id;
+}
+
+function GetTeamDisplayName(team_id) {
+	var goodguys = GetDefaultFriendlyTeamID();
+	var badguys = GetDefaultEnemyTeamID();
+
+	if (team_id == goodguys) {
+		var radiant = LocalizeWithFallback("#DOTA_GoodGuys");
+		return radiant == "DOTA_GoodGuys" ? "Radiant" : radiant;
+	}
+
+	if (team_id == badguys) {
+		var dire = LocalizeWithFallback("#DOTA_BadGuys");
+		return dire == "DOTA_BadGuys" ? "Dire" : dire;
+	}
+
+	var details = null;
+	if (typeof Game.GetTeamDetails === "function") {
+		details = Game.GetTeamDetails(team_id);
+	}
+
+	if (details && details.team_name && details.team_name.length > 0) {
+		return details.team_name;
+	}
+
+	return "Team " + team_id;
+}
+
 function GetPlayerDisplayName(player_id, player_info) {
 	if (player_info && player_info.player_name && player_info.player_name.length > 0) {
 		return player_info.player_name;
@@ -987,31 +1404,76 @@ function GetPlayerDisplayName(player_id, player_info) {
 }
 
 function BuildToolsModeLoadingEntries() {
-	if (!Game.IsInToolsMode || !Game.IsInToolsMode()) {
+	if (!IsToolsModeLoadingSimulationEnabled()) {
+		if (tools_mode_last_lobby_signature !== "disabled") {
+			tools_mode_last_lobby_signature = "disabled";
+			LoadingTrace("tools/sim", "Tools loading simulation disabled", {
+				is_tools_mode: IsToolsModeEnabled(),
+				simulation_flag: IsToolsModeLoadingSimulationEnabled(),
+			});
+		}
 		return [];
 	}
 
-	return [
-		{ key: "tools_state_connected", state: connection_state.CONNECTED, name: L("loading_screen_tools_loaded") },
-		{ key: "tools_state_loading", state: connection_state.LOADING, name: L("loading_screen_tools_loading") },
-		{ key: "tools_state_pending", state: connection_state.NOT_YET_CONNECTED, name: L("loading_screen_tools_pending") },
-		{ key: "tools_state_unknown", state: connection_state.UNKNOWN, name: L("loading_screen_tools_unknown") },
-		{ key: "tools_state_disconnected", state: connection_state.DISCONNECTED, name: L("loading_screen_tools_disconnected") },
-		{ key: "tools_state_failed", state: connection_state.FAILED, name: L("loading_screen_tools_failed") },
-		{ key: "tools_state_abandoned", state: connection_state.ABANDONED, name: L("loading_screen_tools_abandoned") },
-	];
+	if (!IsToolsModeEnabled() && tools_mode_last_lobby_signature !== "no_tools_flag") {
+		tools_mode_last_lobby_signature = "no_tools_flag";
+		LoadingTrace("tools/sim", "Simulation enabled while IsInToolsMode() is false; running anyway because debug flag is enabled", {
+			is_tools_mode: IsToolsModeEnabled(),
+			simulation_flag: IsToolsModeLoadingSimulationEnabled(),
+		});
+	}
+
+	var elapsed_seconds = GetToolsModeLobbyElapsedSeconds();
+	var entries = [];
+	var local_player_id = GetLocalPlayerIDSafe();
+	var local_info = local_player_id >= 0 ? Game.GetPlayerInfo(local_player_id) : null;
+
+	if (!local_info) {
+		local_info = Game.GetLocalPlayerInfo();
+	}
+
+	var local_team_id = GetPlayerTeamIDFromInfo(local_info, GetDefaultFriendlyTeamID());
+
+	for (var i = 0; i < tools_mode_lobby_player_count; i++) {
+		var player_state = GetToolsModeLobbyPlayerState(i, elapsed_seconds);
+
+		entries.push({
+			key: "tools_sim_player_" + i,
+			state: player_state,
+			name: GetToolsModeLobbyPlayerName(i),
+			is_marked_ready: GetToolsModeLobbyPlayerReady(i, elapsed_seconds, player_state),
+			team_id: GetToolsModeLobbyTeamID(i, local_team_id),
+		});
+	}
+
+	var tools_signature = "";
+	for (var e = 0; e < entries.length; e++) {
+		tools_signature = tools_signature + "|" + entries[e].key + ":" + entries[e].team_id + ":" + GetConnectionStateDebugName(entries[e].state) + ":" + (entries[e].is_marked_ready ? "1" : "0");
+	}
+
+	if (tools_mode_last_lobby_signature !== tools_signature) {
+		tools_mode_last_lobby_signature = tools_signature;
+		LoadingTrace("tools/sim", "Tools loading simulation state changed", {
+			elapsed_seconds: Math.floor(elapsed_seconds * 100) / 100,
+			signature: tools_signature,
+		});
+	}
+
+	return entries;
 }
 
 function UpdatePlayerLoadingSidebar() {
+	try {
 	const list_parent = $("#PlayerLoadingList");
 	const counter = $("#PlayerLoadingCounter");
 	const progress_bar = $("#PlayerLoadingProgress");
 	const waiting_label = $("#PlayerLoadingWaiting");
-	const issues_label = $("#PlayerLoadingIssues");
 	const force_launch_label = $("#PlayerForceLaunchLabel");
 	const ready_button = $("#PlayerReadyButton");
 	const ready_button_label = $("#PlayerReadyButtonLabel");
 	const setup_status = GetCustomSetupStatus();
+	const is_tools_mode = IsToolsModeEnabled();
+	const tools_simulation_enabled = IsToolsModeLoadingSimulationEnabled();
 	const setup_active = IsCustomSetupStatusActive(setup_status);
 	const setup_launching = setup_status && (setup_status.launching === true || setup_status.launching === 1 || setup_status.launching === "1");
 	const setup_remaining = Math.max(0, Math.floor(ToNumber(setup_status.remaining_time, ToNumber(setup_status.duration, 20))));
@@ -1022,6 +1484,10 @@ function UpdatePlayerLoadingSidebar() {
 		(setup_status.ready_players[local_player_id] !== undefined || setup_status.ready_players[local_player_id.toString()] !== undefined);
 
 	if (!list_parent || !counter) {
+		LoadingTrace("sidebar/update", "Skipped update because required panels are missing", {
+			has_list_parent: !!list_parent,
+			has_counter: !!counter,
+		});
 		return;
 	}
 
@@ -1030,7 +1496,19 @@ function UpdatePlayerLoadingSidebar() {
 		player_ids = Game.GetAllPlayerIDs() || [];
 	}
 
+	if (tools_simulation_enabled) {
+		player_ids = local_player_id >= 0 ? [local_player_id] : [];
+	} else if (local_player_id >= 0 && player_ids.indexOf(local_player_id) < 0) {
+		player_ids.push(local_player_id);
+	}
+
 	player_ids = player_ids.slice(0).sort(function (a, b) { return a - b; });
+
+	var local_player_info = local_player_id >= 0 ? Game.GetPlayerInfo(local_player_id) : null;
+	if (!local_player_info) {
+		local_player_info = Game.GetLocalPlayerInfo();
+	}
+	var local_team_id = GetPlayerTeamIDFromInfo(local_player_info, GetDefaultFriendlyTeamID());
 
 	const player_entries = [];
 
@@ -1047,6 +1525,7 @@ function UpdatePlayerLoadingSidebar() {
 			player_id: player_id,
 			player_info: player_info,
 			display_name: GetPlayerDisplayName(player_id, player_info),
+			team_id: GetPlayerTeamIDFromInfo(player_info, local_team_id),
 			can_open_profile: true,
 			is_tools_debug: false,
 		});
@@ -1062,8 +1541,10 @@ function UpdatePlayerLoadingSidebar() {
 			player_info: {
 				player_name: tools_entry.name,
 				player_connection_state: tools_entry.state,
+				player_team_id: tools_entry.team_id,
 			},
 			display_name: tools_entry.name,
+			team_id: tools_entry.team_id,
 			can_open_profile: false,
 			is_tools_debug: true,
 		});
@@ -1071,11 +1552,7 @@ function UpdatePlayerLoadingSidebar() {
 
 	const active_rows = {};
 	const active_sections = {};
-	const section_counts = {
-		failed: 0,
-		waiting: 0,
-		ready: 0,
-	};
+	const section_counts = {};
 	let total_players = 0;
 	let loaded_players = 0;
 	let waiting_players = 0;
@@ -1084,19 +1561,21 @@ function UpdatePlayerLoadingSidebar() {
 	for (var entry_seed = 0; entry_seed < player_entries.length; entry_seed++) {
 		const seeded_entry = player_entries[entry_seed];
 		const seeded_state = seeded_entry.player_info.player_connection_state;
-		const seeded_group = GetConnectionGroup(seeded_state);
+		const seeded_team_id = seeded_entry.team_id !== undefined ? seeded_entry.team_id : GetPlayerTeamIDFromInfo(seeded_entry.player_info, local_team_id);
+		const seeded_team_key = GetTeamSectionKey(seeded_team_id);
 
 		seeded_entry.connection_state = seeded_state;
-		seeded_entry.group = seeded_group;
-		seeded_entry.group_priority = GetConnectionGroupPriority(seeded_state);
+		seeded_entry.team_id = seeded_team_id;
+		seeded_entry.team_key = seeded_team_key;
+		seeded_entry.team_priority = GetTeamSortPriority(seeded_team_id, local_team_id);
 		seeded_entry.state_priority = GetConnectionStatePriority(seeded_state);
 
-		section_counts[seeded_group] = (section_counts[seeded_group] || 0) + 1;
+		section_counts[seeded_team_key] = (section_counts[seeded_team_key] || 0) + 1;
 	}
 
 	player_entries.sort(function (a, b) {
-		if (a.group_priority != b.group_priority) {
-			return a.group_priority - b.group_priority;
+		if (a.team_priority != b.team_priority) {
+			return a.team_priority - b.team_priority;
 		}
 
 		if (a.state_priority != b.state_priority) {
@@ -1107,16 +1586,41 @@ function UpdatePlayerLoadingSidebar() {
 			return a.can_open_profile ? -1 : 1;
 		}
 
-		return a.display_name.localeCompare(b.display_name);
+		var name_a = (a.display_name !== undefined && a.display_name !== null) ? a.display_name.toString() : "";
+		var name_b = (b.display_name !== undefined && b.display_name !== null) ? b.display_name.toString() : "";
+
+		if (name_a < name_b) {
+			return -1;
+		}
+
+		if (name_a > name_b) {
+			return 1;
+		}
+
+		return 0;
 	});
 
 	var order_signature = "";
 	for (var sig_i = 0; sig_i < player_entries.length; sig_i++) {
-		order_signature = order_signature + "|" + player_entries[sig_i].row_key + ":" + player_entries[sig_i].group + ":" + player_entries[sig_i].state_priority;
+		order_signature = order_signature + "|" + player_entries[sig_i].row_key + ":" + player_entries[sig_i].team_key + ":" + player_entries[sig_i].state_priority;
 	}
-	order_signature = order_signature + "|f" + section_counts.failed + "|w" + section_counts.waiting + "|r" + section_counts.ready;
+	for (var section_count_key in section_counts) {
+		order_signature = order_signature + "|" + section_count_key + ":" + section_counts[section_count_key];
+	}
 
 	if (player_loading_order_signature != order_signature) {
+		var old_order_signature = player_loading_order_signature;
+		var display_rows = [];
+		for (var display_i = 0; display_i < player_entries.length; display_i++) {
+			var display_entry = player_entries[display_i];
+			display_rows.push(display_entry.display_name + ":" + GetConnectionStateDebugName(display_entry.connection_state) + ":" + GetTeamDisplayName(display_entry.team_id));
+		}
+		LoadingTrace("sidebar/order", "Player loading order changed", {
+			old_signature: old_order_signature,
+			new_signature: order_signature,
+			rows: display_rows,
+		});
+
 		for (var stale_row_key in player_loading_rows) {
 			if (player_loading_rows[stale_row_key] && player_loading_rows[stale_row_key].panel) {
 				player_loading_rows[stale_row_key].panel.DeleteAsync(0);
@@ -1140,21 +1644,22 @@ function UpdatePlayerLoadingSidebar() {
 		const player_id = entry.player_id;
 		const player_info = entry.player_info;
 		const state = entry.connection_state;
-		const group = entry.group;
+		const team_id = entry.team_id;
+		const team_key = entry.team_key;
 		const is_loaded = IsLoadedConnectionState(state);
 		const is_issue = IsIssueConnectionState(state);
 		const is_connecting = !is_loaded && !is_issue;
 
-		if (!active_sections[group]) {
-			active_sections[group] = true;
+		if (!active_sections[team_key]) {
+			active_sections[team_key] = true;
 
-			if (!player_loading_section_rows[group]) {
-				var section_row = $.CreatePanel("Label", list_parent, "PlayerLoadingSection_" + group);
+			if (!player_loading_section_rows[team_key]) {
+				var section_row = $.CreatePanel("Label", list_parent, "PlayerLoadingSection_" + team_key);
 				section_row.AddClass("player-loading-section");
-				player_loading_section_rows[group] = section_row;
+				player_loading_section_rows[team_key] = section_row;
 			}
 
-			player_loading_section_rows[group].text = GetConnectionGroupTitle(group) + " (" + (section_counts[group] || 0) + ")";
+			player_loading_section_rows[team_key].text = GetTeamDisplayName(team_id) + " (" + (section_counts[team_key] || 0) + ")";
 		}
 
 		total_players = total_players + 1;
@@ -1199,11 +1704,19 @@ function UpdatePlayerLoadingSidebar() {
 				status: status_label,
 				player_id: player_id,
 			};
+
+			LoadingTrace("sidebar/row_create", "Created player loading row", {
+				row_key: row_key,
+				player_id: player_id,
+				display_name: entry.display_name,
+				is_tools_debug: entry.is_tools_debug === true,
+			});
 		}
 
 		const player_row = player_loading_rows[row_key];
 		player_row.player_id = player_id;
-		const is_marked_ready = player_id >= 0 && IsPlayerMarkedReady(setup_status, player_id);
+		const is_marked_ready = (player_id >= 0 && IsPlayerMarkedReady(setup_status, player_id))
+			|| (tools_simulation_enabled && entry.is_tools_debug === true && entry.is_marked_ready === true);
 
 		if (!player_row.spinner) {
 			player_row.spinner = $.CreatePanel("Panel", player_row.panel, "");
@@ -1267,6 +1780,12 @@ function UpdatePlayerLoadingSidebar() {
 
 	for (var row_key in player_loading_rows) {
 		if (!active_rows[row_key]) {
+			LoadingTrace("sidebar/row_remove", "Removing stale player row", {
+				row_key: row_key,
+				player_id: player_loading_rows[row_key].player_id,
+				selected_profile_player_id: GetSelectedProfilePlayerID(),
+			});
+
 			if (player_loading_rows[row_key].player_id == GetSelectedProfilePlayerID()) {
 				selected_profile_player_id = GetLocalPlayerIDSafe();
 			}
@@ -1278,6 +1797,9 @@ function UpdatePlayerLoadingSidebar() {
 
 	for (var section_key in player_loading_section_rows) {
 		if (!active_sections[section_key]) {
+			LoadingTrace("sidebar/section_remove", "Removing stale section row", {
+				section_key: section_key,
+			});
 			player_loading_section_rows[section_key].DeleteAsync(0);
 			delete player_loading_section_rows[section_key];
 		}
@@ -1294,22 +1816,14 @@ function UpdatePlayerLoadingSidebar() {
 
 	const all_players_loaded = total_players > 0 && loaded_players >= total_players;
 	const has_connection_failures = issue_players > 0;
+	custom_setup_failed_state = custom_setup_failed_state || has_connection_failures;
 
 	if (waiting_label) {
 		if (all_players_loaded || total_players <= 0) {
 			waiting_label.style.visibility = "collapse";
 		} else {
 			waiting_label.style.visibility = "visible";
-			waiting_label.text = LocalizeTemplate("loading_screen_failed_counter", { count: issue_players.toString() });
-		}
-	}
-
-	if (issues_label) {
-		if (all_players_loaded || total_players <= 0) {
-			issues_label.style.visibility = "collapse";
-		} else {
-			issues_label.style.visibility = "collapse";
-			issues_label.text = LocalizeTemplate("loading_screen_waiting_counter", { count: waiting_players.toString() });
+			waiting_label.text = LocalizeTemplate("loading_screen_waiting_counter", { count: waiting_players.toString() });
 		}
 	}
 
@@ -1326,39 +1840,446 @@ function UpdatePlayerLoadingSidebar() {
 	}
 
 	if (ready_button) {
-		const can_show_ready = setup_active && local_player_id >= 0 && local_player_eligible;
+		const can_show_ready = setup_active && local_player_id >= 0 && (local_player_eligible || tools_simulation_enabled);
+		const ready_locked_by_failure = has_connection_failures;
 		ready_button.style.visibility = can_show_ready ? "visible" : "collapse";
-		ready_button.enabled = can_show_ready && !local_player_ready;
+		ready_button.enabled = can_show_ready && !local_player_ready && !ready_locked_by_failure;
 		ready_button.SetHasClass("IsReady", local_player_ready);
-		ready_button.SetHasClass("IsDisabled", can_show_ready && local_player_ready);
+		ready_button.SetHasClass("IsDisabled", can_show_ready && (local_player_ready || ready_locked_by_failure));
+		ready_button.SetHasClass("IsFailedLock", can_show_ready && ready_locked_by_failure);
 
 		if (ready_button_label) {
 			ready_button_label.text = local_player_ready ? L("loading_screen_ready") : L("loading_screen_mark_ready");
 		}
 	}
 
+	var sidebar_summary_signature =
+		"p" + total_players +
+		"|l" + loaded_players +
+		"|w" + waiting_players +
+		"|i" + issue_players +
+		"|active:" + (setup_active ? "1" : "0") +
+		"|launching:" + (setup_launching ? "1" : "0") +
+		"|remaining:" + setup_remaining +
+		"|local_ready:" + (local_player_ready ? "1" : "0") +
+		"|failed_lock:" + (custom_setup_failed_state ? "1" : "0");
+
+	if (loading_screen_last_sidebar_summary_signature !== sidebar_summary_signature) {
+		loading_screen_last_sidebar_summary_signature = sidebar_summary_signature;
+		LoadingTrace("sidebar/summary", "Sidebar aggregate state changed", {
+			total_players: total_players,
+			loaded_players: loaded_players,
+			waiting_players: waiting_players,
+			issue_players: issue_players,
+			setup_active: setup_active,
+			setup_launching: setup_launching,
+			setup_remaining: setup_remaining,
+			local_player_id: local_player_id,
+			local_player_ready: local_player_ready,
+			local_player_eligible: local_player_eligible,
+			tools_simulation_enabled: tools_simulation_enabled,
+			custom_setup_failed_state: custom_setup_failed_state,
+		});
+	}
+
 	$.Schedule(0.2, UpdatePlayerLoadingSidebar);
+	} catch (err) {
+		LoadingTrace("sidebar/error", "UpdatePlayerLoadingSidebar crashed", {
+			error: err ? err.toString() : "unknown",
+		});
+		$.Schedule(0.5, UpdatePlayerLoadingSidebar);
+	}
 }
 
-function SwitchTab(count) {
+function GetBottomTabPanels() {
 	var container = $.GetContextPanel().FindChildrenWithClassTraverse("bottom-footer-container");
 
-	if (container && container[0]) {
-		for (var i = 0; i < container[0].GetChildCount(); i++) {
-			var panel = container[0].GetChild(i);
-			var new_panel = container[0].GetChild(count - 1);
+	if (!container || !container[0]) {
+		return [];
+	}
 
-			if (panel == new_panel)
-				panel.style.visibility = "visible";
-			else
-				panel.style.visibility = "collapse";
+	var root = container[0];
+	var panels = [];
+	var panel_count = 0;
+
+	if (typeof root.GetChildCount === "function") {
+		panel_count = root.GetChildCount();
+	}
+
+	for (var i = 0; i < panel_count; i++) {
+		var child = root.GetChild(i);
+		if (!child) {
+			continue;
+		}
+
+		child.AddClass("bottom-tab-panel");
+		panels.push(child);
+	}
+
+	return panels;
+}
+
+function GetBottomTabRotationPosition(panel_index) {
+	for (var i = 0; i < bottom_tab_rotation_order.length; i++) {
+		if (bottom_tab_rotation_order[i] == panel_index) {
+			return i;
 		}
 	}
 
-	var label = $("#BottomLabel");
+	return -1;
+}
 
-	if (label) {
-		label.text = $.Localize("#loading_screen_custom_games_" + count);
+function GetBottomTabTargetRadio(panel_index) {
+	if (panel_index == 3) {
+		return $("#BottomRadioPatreon");
+	}
+
+	if (panel_index == 1) {
+		return $("#BottomRadioCustomGames");
+	}
+
+	if (panel_index == 2) {
+		return $("#BottomRadioTransifex");
+	}
+
+	return null;
+}
+
+function UpdateBottomTabHeader(panel_index) {
+	var radios = [
+		$("#BottomRadioPatreon"),
+		$("#BottomRadioCustomGames"),
+		$("#BottomRadioTransifex"),
+	];
+	var target_radio = GetBottomTabTargetRadio(panel_index);
+
+	for (var i = 0; i < radios.length; i++) {
+		var radio = radios[i];
+		if (!radio) {
+			continue;
+		}
+
+		var is_target = radio == target_radio;
+		radio.checked = is_target;
+		radio.SetHasClass("BottomRadioManualSelected", is_target);
+
+		if (typeof radio.SetSelected === "function") {
+			radio.SetSelected(is_target);
+		}
+	}
+
+	LoadingTrace("footer/header", "Updated footer tab header selection", {
+		panel_index: panel_index,
+		target_radio: target_radio ? target_radio.id : "none",
+	});
+}
+
+function GetNextBottomTabPanelIndex() {
+	var current_position = GetBottomTabRotationPosition(bottom_tab_current_panel_index);
+	if (current_position < 0) {
+		return bottom_tab_rotation_order[0];
+	}
+
+	return bottom_tab_rotation_order[(current_position + 1) % bottom_tab_rotation_order.length];
+}
+
+function UpdateBottomTabCountdownLabel(seconds_remaining, is_paused, hide_label) {
+	var timer_label = $("#BottomTabCountdown");
+	var timer_wrap = $("#BottomTabCountdownWrap");
+
+	if (!timer_label) {
+		return;
+	}
+
+	if (hide_label) {
+		timer_label.style.visibility = "collapse";
+		if (timer_wrap) {
+			timer_wrap.style.visibility = "collapse";
+		}
+		return;
+	}
+
+	if (timer_wrap) {
+		timer_wrap.style.visibility = "visible";
+		timer_wrap.SetHasClass("IsPausedByMouse", is_paused);
+	}
+
+	timer_label.style.visibility = "visible";
+	var timer_text = LocalizeTemplate("loading_screen_tab_timer", {
+		seconds: Math.max(0, Math.ceil(seconds_remaining)).toString(),
+	});
+
+	if (!timer_text || timer_text == "loading_screen_tab_timer" || timer_text == "#loading_screen_tab_timer") {
+		timer_text = Math.max(0, Math.ceil(seconds_remaining)).toString() + "s";
+	}
+
+	timer_label.text = timer_text;
+	timer_label.SetHasClass("IsPausedByMouse", is_paused);
+}
+
+function ResetBottomTabAutoTimer() {
+	bottom_tab_countdown_remaining = bottom_tab_auto_interval;
+	bottom_tab_last_tick_time = GetCurrentTime();
+	UpdateBottomTabCountdownLabel(bottom_tab_countdown_remaining, false, false);
+	LoadingTrace("footer/timer", "Bottom tab auto timer reset", {
+		interval_seconds: bottom_tab_auto_interval,
+	});
+}
+
+function InitializeBottomFooterMouseTracking() {
+	var footer_panel = $("#BottomFooterRoot");
+	if (!footer_panel) {
+		return;
+	}
+
+	footer_panel.SetPanelEvent("onmouseover", function () {
+		bottom_tab_mouse_over_footer = true;
+		LoadingTrace("footer/mouse", "Mouse entered footer");
+	});
+
+	footer_panel.SetPanelEvent("onmouseout", function () {
+		bottom_tab_mouse_over_footer = false;
+		bottom_tab_last_mouse_move_time = -1;
+		LoadingTrace("footer/mouse", "Mouse left footer");
+	});
+
+	footer_panel.SetPanelEvent("onmousemove", function () {
+		var now = GetCurrentTime();
+		var first_move_after_idle = bottom_tab_last_mouse_move_time < 0 || (now - bottom_tab_last_mouse_move_time) > bottom_tab_mouse_move_pause_window;
+		bottom_tab_mouse_over_footer = true;
+		bottom_tab_last_mouse_move_time = now;
+		bottom_tab_countdown_remaining = bottom_tab_auto_interval;
+		UpdateBottomTabCountdownLabel(bottom_tab_countdown_remaining, true, false);
+		if (first_move_after_idle) {
+			LoadingTrace("footer/mouse", "Mouse moved on footer and paused auto-switch timer", {
+				pause_window: bottom_tab_mouse_move_pause_window,
+			});
+		}
+	});
+}
+
+function AutoRotateBottomTabs() {
+	var panels = GetBottomTabPanels();
+	var has_rotation = panels && panels.length > 1;
+	var now = GetCurrentTime();
+
+	if (bottom_tab_last_tick_time < 0 || now < bottom_tab_last_tick_time) {
+		bottom_tab_last_tick_time = now;
+	}
+
+	var delta = Math.max(0, now - bottom_tab_last_tick_time);
+	bottom_tab_last_tick_time = now;
+
+	if (!has_rotation) {
+		UpdateBottomTabCountdownLabel(bottom_tab_countdown_remaining, false, true);
+		if (loading_screen_last_bottom_tab_countdown_bucket !== -999) {
+			loading_screen_last_bottom_tab_countdown_bucket = -999;
+			LoadingTrace("footer/autorotate", "Auto-rotation paused because there are not enough panels", {
+				panel_count: panels ? panels.length : 0,
+			});
+		}
+		$.Schedule(bottom_tab_auto_tick_interval, AutoRotateBottomTabs);
+		return;
+	}
+
+	var mouse_moving_now = bottom_tab_mouse_over_footer &&
+		bottom_tab_last_mouse_move_time >= 0 &&
+		(now - bottom_tab_last_mouse_move_time) <= bottom_tab_mouse_move_pause_window;
+
+	if (mouse_moving_now) {
+		bottom_tab_countdown_remaining = bottom_tab_auto_interval;
+	} else {
+		bottom_tab_countdown_remaining = Math.max(0, bottom_tab_countdown_remaining - delta);
+	}
+
+	if (loading_screen_last_footer_mouse_state !== mouse_moving_now) {
+		loading_screen_last_footer_mouse_state = mouse_moving_now;
+		LoadingTrace("footer/autorotate", mouse_moving_now ? "Auto-rotation timer paused by footer mouse activity" : "Auto-rotation timer resumed");
+	}
+
+	UpdateBottomTabCountdownLabel(bottom_tab_countdown_remaining, mouse_moving_now, false);
+
+	if (bottom_tab_countdown_remaining <= 0) {
+		LoadingTrace("footer/autorotate", "Countdown reached zero, rotating to next tab", {
+			current_tab: bottom_tab_current_panel_index,
+			next_tab: GetNextBottomTabPanelIndex(),
+		});
+		SwitchTab(GetNextBottomTabPanelIndex(), true);
+		bottom_tab_countdown_remaining = bottom_tab_auto_interval;
+		UpdateBottomTabCountdownLabel(bottom_tab_countdown_remaining, false, false);
+	}
+
+	$.Schedule(bottom_tab_auto_tick_interval, AutoRotateBottomTabs);
+}
+
+function InitializeBottomTabs() {
+	var panels = GetBottomTabPanels();
+
+	if (!panels || panels.length <= 0) {
+		LoadingTrace("footer/init", "Skipped bottom tab init because no panels were found");
+		return;
+	}
+
+	bottom_tab_current_panel_index = -1;
+	LoadingTrace("footer/init", "Initializing bottom tabs", {
+		panel_count: panels.length,
+		rotation_order: bottom_tab_rotation_order,
+	});
+	SwitchTab(bottom_tab_rotation_order[0], true);
+	ResetBottomTabAutoTimer();
+}
+
+function SwitchTab(count, is_auto) {
+	var panels = GetBottomTabPanels();
+	var switched_by_auto = is_auto === true;
+
+	if (!panels || panels.length <= 0) {
+		LoadingTrace("footer/switch", "Skipped tab switch because panels are missing", {
+			requested: count,
+			is_auto: switched_by_auto,
+		});
+		return;
+	}
+
+	var target_panel_index = parseInt(count);
+	if (isNaN(target_panel_index) || target_panel_index < 1 || target_panel_index > panels.length) {
+		target_panel_index = bottom_tab_rotation_order[0];
+	}
+
+	LoadingTrace("footer/switch", "Requested tab switch", {
+		requested: count,
+		resolved_target: target_panel_index,
+		is_auto: switched_by_auto,
+		current: bottom_tab_current_panel_index,
+		panel_count: panels.length,
+	});
+
+	var previous_panel_index = bottom_tab_current_panel_index;
+	var has_previous = previous_panel_index >= 1 && previous_panel_index <= panels.length;
+
+	if (!has_previous || previous_panel_index == target_panel_index) {
+		for (var i = 0; i < panels.length; i++) {
+			var panel = panels[i];
+			var is_target = i == (target_panel_index - 1);
+
+			panel.SetHasClass("IsActive", is_target);
+			panel.SetHasClass("IsLeavingLeft", false);
+			panel.SetHasClass("IsLeavingRight", false);
+			panel.SetHasClass("IsEnteringFromLeft", false);
+			panel.SetHasClass("IsEnteringFromRight", false);
+			panel.style.visibility = is_target ? "visible" : "collapse";
+		}
+
+		bottom_tab_current_panel_index = target_panel_index;
+		UpdateBottomTabHeader(target_panel_index);
+		LoadingTrace("footer/switch", "Applied direct tab selection without transition", {
+			target: target_panel_index,
+			previous: previous_panel_index,
+		});
+
+		if (!switched_by_auto) {
+			ResetBottomTabAutoTimer();
+		}
+
+		return;
+	}
+
+	bottom_tab_transition_token = bottom_tab_transition_token + 1;
+	var transition_token = bottom_tab_transition_token;
+	var previous_panel = panels[previous_panel_index - 1];
+	var target_panel = panels[target_panel_index - 1];
+
+	for (var j = 0; j < panels.length; j++) {
+		if (j == (previous_panel_index - 1) || j == (target_panel_index - 1)) {
+			continue;
+		}
+
+		panels[j].SetHasClass("IsActive", false);
+		panels[j].SetHasClass("IsLeavingLeft", false);
+		panels[j].SetHasClass("IsLeavingRight", false);
+		panels[j].SetHasClass("IsEnteringFromLeft", false);
+		panels[j].SetHasClass("IsEnteringFromRight", false);
+		panels[j].style.visibility = "collapse";
+	}
+
+	var previous_order = GetBottomTabRotationPosition(previous_panel_index);
+	var target_order = GetBottomTabRotationPosition(target_panel_index);
+	var move_forward = true;
+
+	if (previous_order >= 0 && target_order >= 0) {
+		var diff = target_order - previous_order;
+		var last_step = bottom_tab_rotation_order.length - 1;
+
+		if (diff == 1 || diff == -last_step) {
+			move_forward = true;
+		} else if (diff == -1 || diff == last_step) {
+			move_forward = false;
+		} else {
+			move_forward = diff > 0;
+		}
+	} else {
+		move_forward = target_panel_index > previous_panel_index;
+	}
+
+	previous_panel.style.visibility = "visible";
+	previous_panel.SetHasClass("IsActive", false);
+	previous_panel.SetHasClass("IsLeavingLeft", move_forward);
+	previous_panel.SetHasClass("IsLeavingRight", !move_forward);
+	previous_panel.SetHasClass("IsEnteringFromLeft", false);
+	previous_panel.SetHasClass("IsEnteringFromRight", false);
+
+	target_panel.style.visibility = "visible";
+	target_panel.SetHasClass("IsActive", false);
+	target_panel.SetHasClass("IsLeavingLeft", false);
+	target_panel.SetHasClass("IsLeavingRight", false);
+	target_panel.SetHasClass("IsEnteringFromRight", move_forward);
+	target_panel.SetHasClass("IsEnteringFromLeft", !move_forward);
+
+	$.Schedule(0.01, function () {
+		if (transition_token != bottom_tab_transition_token) {
+			LoadingTrace("footer/switch", "Transition start canceled by newer transition token", {
+				scheduled_token: transition_token,
+				current_token: bottom_tab_transition_token,
+			});
+			return;
+		}
+
+		target_panel.SetHasClass("IsActive", true);
+		target_panel.SetHasClass("IsEnteringFromRight", false);
+		target_panel.SetHasClass("IsEnteringFromLeft", false);
+	});
+
+	$.Schedule(bottom_tab_transition_duration, function () {
+		if (transition_token != bottom_tab_transition_token) {
+			LoadingTrace("footer/switch", "Transition completion canceled by newer transition token", {
+				scheduled_token: transition_token,
+				current_token: bottom_tab_transition_token,
+			});
+			return;
+		}
+
+		previous_panel.style.visibility = "collapse";
+		previous_panel.SetHasClass("IsLeavingLeft", false);
+		previous_panel.SetHasClass("IsLeavingRight", false);
+		LoadingTrace("footer/switch", "Transition completed", {
+			transition_token: transition_token,
+			previous: previous_panel_index,
+			target: target_panel_index,
+		});
+	});
+
+	bottom_tab_current_panel_index = target_panel_index;
+	UpdateBottomTabHeader(target_panel_index);
+	LoadingTrace("footer/switch", "Tab switch committed", {
+		previous: previous_panel_index,
+		target: target_panel_index,
+		is_auto: switched_by_auto,
+		move_forward: move_forward,
+		transition_token: transition_token,
+	});
+
+	if (!switched_by_auto) {
+		ResetBottomTabAutoTimer();
 	}
 }
 
@@ -1373,6 +2294,10 @@ function SetProfileName() {
 function fetch() {
 	// if data is not available yet, reschedule
 	if (!info_already_available()) {
+		if (loading_screen_last_fetch_stage !== "waiting_map_info") {
+			loading_screen_last_fetch_stage = "waiting_map_info";
+			LoadingTrace("fetch/stage", "Waiting for map info to become available");
+		}
 		$.Schedule(0.1, fetch);
 		return;
 	}
@@ -1380,12 +2305,20 @@ function fetch() {
 	game_options = CustomNetTables.GetTableValue("game_options", "game_version");
 	// $.Msg(game_options.game_type)
 	if (game_options == undefined) {
+		if (loading_screen_last_fetch_stage !== "waiting_game_options") {
+			loading_screen_last_fetch_stage = "waiting_game_options";
+			LoadingTrace("fetch/stage", "Waiting for game_options nettable game_version");
+		}
 		$.Schedule(0.1, fetch);
 		return;
 	}
 
 	secret_key = CustomNetTables.GetTableValue("game_options", "server_key");
 	if (secret_key == undefined) {
+		if (loading_screen_last_fetch_stage !== "waiting_server_key") {
+			loading_screen_last_fetch_stage = "waiting_server_key";
+			LoadingTrace("fetch/stage", "Waiting for server_key nettable");
+		}
 		$.Schedule(0.1, fetch);
 		return;
 	} else {
@@ -1394,6 +2327,15 @@ function fetch() {
 		if (secret_key !== undefined && secret_key !== null) {
 			secret_key = secret_key.toString();
 		}
+	}
+
+	if (loading_screen_last_fetch_stage !== "ready") {
+		loading_screen_last_fetch_stage = "ready";
+		LoadingTrace("fetch/stage", "Fetch prerequisites are ready", {
+			game_type: game_options ? game_options.game_type : null,
+			game_version: game_options ? game_options.value : null,
+			has_server_key: HasServerKey(),
+		});
 	}
 
 	RequestProfilePositionForSelected();
@@ -1410,8 +2352,16 @@ function fetch() {
 
 	view.title.text = $.Localize("#addon_game_name") + " " + game_version;
 	view.subtitle.text = $.Localize("#game_version_name").toUpperCase();
+	LoadingTrace("fetch/ui", "Updated title and subtitle from game options", {
+		title: view.title ? view.title.text : "",
+		subtitle: view.subtitle ? view.subtitle.text : "",
+	});
 
 	api.getLoadingScreenMessage(function (data) {
+		LoadingTrace("fetch/api", "Loading screen message API success callback", {
+			has_data: !!(data && data.data),
+			lang: $.Localize("#lang"),
+		});
 		var found_lang = false;
 		var result = data.data;
 		var english_row;
@@ -1435,15 +2385,26 @@ function fetch() {
 			}
 			//			view.link_text.text = english_row.link_text;
 		}
+
+		LoadingTrace("fetch/api", "Applied loading screen text content", {
+			found_requested_lang: found_lang,
+			content_length: view.text && view.text.text ? view.text.text.length : 0,
+		});
 	}, function () {
 		// error callback
 		$.Msg("Unable to retrieve loading screen info.");
+		LoadingTrace("fetch/api", "Loading screen message API failed");
 	});
 };
 
 function HideVoteCategory(vote_type) {
 	const parent = $("#vote_" + vote_type);
 	const vote_content = $("#VoteContent");
+	LoadingTrace("vote/hide_category", "Hide vote category requested", {
+		vote_type: vote_type,
+		has_parent: !!parent,
+		has_vote_content: !!vote_content,
+	});
 
 	if (parent) {
 		parent.visible = false;
@@ -1468,6 +2429,7 @@ function ShowAllVoteCategories() {
 	const vote_content = $("#VoteContent");
 
 	if (!vote_content) {
+		LoadingTrace("vote/show_all", "Skipped showing categories because VoteContent is missing");
 		return;
 	}
 
@@ -1475,6 +2437,10 @@ function ShowAllVoteCategories() {
 	for (var i = 0; i < vote_children.length; i++) {
 		vote_children[i].visible = true;
 	}
+
+	LoadingTrace("vote/show_all", "All vote categories made visible", {
+		count: vote_children.length,
+	});
 }
 
 function AllPlayersLoaded() {
@@ -1483,8 +2449,11 @@ function AllPlayersLoaded() {
 	const main_vote_button = $("#MainVoteButton");
 
 	if (!vote_parent) {
+		LoadingTrace("vote/all_players_loaded", "Skipped rebuild because VoteContent panel is missing");
 		return;
 	}
+
+	LoadingTrace("vote/all_players_loaded", "Rebuilding vote panels");
 
 	// Rebuild from scratch to avoid stale hidden panels / duplicate rows.
 	vote_parent.RemoveAndDeleteChildren();
@@ -1497,6 +2466,7 @@ function AllPlayersLoaded() {
 	}
 
 	if (!game_options || !game_options.game_type) {
+		LoadingTrace("vote/all_players_loaded", "Game options not ready, retry scheduled");
 		$.Schedule(0.1, AllPlayersLoaded);
 		return;
 	}
@@ -1518,6 +2488,11 @@ function AllPlayersLoaded() {
 	if (vote_dialog && vote_dialog[0]) {
 		vote_dialog[0].SetHasClass("SingleVoteCategory", vote_categories.length == 1);
 	}
+
+	LoadingTrace("vote/all_players_loaded", "Vote categories resolved", {
+		game_type: game_options.game_type,
+		categories: vote_categories,
+	});
 
 	for (var j in vote_config) {
 		const vote_type = j;
@@ -1595,6 +2570,11 @@ function AllPlayersLoaded() {
 		}
 
 		panel.SetHasClass("VoteRowCompact", row_is_compact);
+		LoadingTrace("vote/all_players_loaded", "Built vote category row", {
+			vote_type: vote_type,
+			vote_count: vote_count,
+			row_is_compact: row_is_compact,
+		});
 	}
 
 	const has_vote_options = vote_categories.length > 0;
@@ -1605,12 +2585,17 @@ function AllPlayersLoaded() {
 	}
 
 	ToggleVoteContainer(has_vote_options);
+	LoadingTrace("vote/all_players_loaded", "Vote container visibility updated", {
+		has_vote_options: has_vote_options,
+		category_count: vote_categories.length,
+	});
 
 	//	$("#VoteGameMode1").checked = true;
 	//	OnVoteButtonPressed("gamemode", 1);
 }
 
 function AllPlayersBattlepassLoaded() {
+	LoadingTrace("event/all_players_battlepass_loaded", "Received all_players_battlepass_loaded event");
 	UpdateProfilePanels();
 	RequestProfilePositionForSelected();
 }
@@ -1628,14 +2613,24 @@ function ToggleVoteContainer(bBoolean) {
 		if (bBoolean) {
 			ShowAllVoteCategories();
 		}
+
+		LoadingTrace("vote/container", "Vote container toggled", {
+			visible: bBoolean,
+		});
+	} else {
+		LoadingTrace("vote/container", "Vote container panel not found", {
+			requested_visible: bBoolean,
+		});
 	}
 }
 
 function HoverableLoadingScreen() {
-	if (Game.GameStateIs(2))
+	if (Game.GameStateIs(2)) {
 		$.GetContextPanel().style.zIndex = "1";
-	else
+		LoadingTrace("loading_screen/zindex", "Set loading screen panel zIndex to 1");
+	} else {
 		$.Schedule(1.0, HoverableLoadingScreen)
+	}
 }
 
 function RefreshLocalVoteCategoryUI(category) {
@@ -1650,6 +2645,13 @@ function RefreshLocalVoteCategoryUI(category) {
 		labels[i].SetHasClass("VotePendingOption", is_selected && !vote_confirmed);
 		labels[i].SetHasClass("VoteConfirmedOption", is_selected && vote_confirmed);
 	}
+
+	LoadingTrace("vote/local_ui", "Refreshed local vote category UI", {
+		category: category,
+		label_count: labels.length,
+		selected_vote: isNaN(selected_vote) ? null : selected_vote,
+		vote_confirmed: vote_confirmed,
+	});
 }
 
 function GetVoteChoiceFromEntry(vote_entry) {
@@ -1703,12 +2705,24 @@ function UpdateLocalVoteConfirmation(category, vote_table) {
 
 	if (local_player_id < 0 || isNaN(local_vote)) {
 		local_vote_confirmed[category] = false;
+		LoadingTrace("vote/local_confirm", "Local vote confirmation reset", {
+			category: category,
+			local_player_id: local_player_id,
+			local_vote: local_votes[category],
+		});
 		return;
 	}
 
 	var local_entry = FindPlayerVoteEntry(vote_table, local_player_id);
 	var server_vote = GetVoteChoiceFromEntry(local_entry);
 	local_vote_confirmed[category] = server_vote == local_vote;
+	LoadingTrace("vote/local_confirm", "Local vote confirmation updated", {
+		category: category,
+		local_player_id: local_player_id,
+		local_vote: local_vote,
+		server_vote: server_vote,
+		confirmed: local_vote_confirmed[category] === true,
+	});
 }
 
 function GetOrderedVoteLabels(category) {
@@ -1746,12 +2760,33 @@ function OnVoteButtonPressed(category, vote) {
 	local_votes[category] = vote;
 	local_vote_confirmed[category] = false;
 	RefreshLocalVoteCategoryUI(category);
-	GameEvents.SendCustomGameEventToServer("setting_vote", { "category": category, "vote": vote, "PlayerID": Game.GetLocalPlayerID() });
+	LoadingTrace("vote/click", "Vote button pressed", {
+		category: category,
+		vote: vote,
+		player_id: Game.GetLocalPlayerID(),
+	});
+	if (typeof GameEvents !== "undefined" && GameEvents && typeof GameEvents.SendCustomGameEventToServer === "function") {
+		GameEvents.SendCustomGameEventToServer("setting_vote", { "category": category, "vote": vote, "PlayerID": Game.GetLocalPlayerID() });
+		LoadingTrace("vote/click", "Sent setting_vote event to server", {
+			category: category,
+			vote: vote,
+		});
+	} else {
+		LoadingTrace("vote/click", "Could not send setting_vote event because GameEvents API is unavailable", {
+			category: category,
+			vote: vote,
+		});
+	}
 }
 
 /* new system, double votes for donators */
 
 function OnVotesReceived(data) {
+	LoadingTrace("vote/server_update", "Received vote table update", {
+		category: data ? data.category : null,
+		has_table: !!(data && data.table),
+	});
+
 	var vote_counter = [];
 	var reset_labels = GetOrderedVoteLabels(data.category);
 
@@ -1816,6 +2851,11 @@ function OnVotesReceived(data) {
 
 	UpdateLocalVoteConfirmation(data.category, data.table);
 	RefreshLocalVoteCategoryUI(data.category);
+	LoadingTrace("vote/server_update", "Vote UI refreshed from server update", {
+		category: data.category,
+		highest_vote: highest_vote,
+		vote_counter: vote_counter,
+	});
 }
 
 function DisableVoting() {
@@ -1831,6 +2871,11 @@ function DisableRankingVoting() {
 }
 
 (function () {
+	LoadingTrace("init", "custom_loading_screen.js bootstrap started", {
+		tools_mode: IsToolsModeEnabled(),
+		tools_simulation_enabled: IsToolsModeLoadingSimulationEnabled(),
+	});
+
 	// if (Game.IsInToolsMode()) {
 	// 	AllPlayersLoaded();
 	// }
@@ -1853,15 +2898,18 @@ function DisableRankingVoting() {
 		})
 	}
 
-	var bottom_button_container = $.GetContextPanel().FindChildrenWithClassTraverse("bottom-button-container");
-
-	if (bottom_button_container && bottom_button_container[0] && bottom_button_container[0].GetChild(0))
-		bottom_button_container[0].GetChild(0).checked = true;
+	InitializeBottomTabs();
+	InitializeBottomFooterMouseTracking();
+	$.Schedule(bottom_tab_auto_tick_interval, AutoRotateBottomTabs);
+	LoadingTrace("init", "Bottom tabs initialized and auto-rotate scheduled", {
+		interval: bottom_tab_auto_tick_interval,
+	});
 
 	var profile_button = $("#HomeProfileContainer");
 
 	if (profile_button) {
 		profile_button.SetPanelEvent("onactivate", function () {
+			LoadingTrace("profile/button", "Profile summary button clicked");
 			SetSelectedProfilePlayer(GetLocalPlayerIDSafe(), true);
 		});
 
@@ -1872,48 +2920,48 @@ function DisableRankingVoting() {
 		profile_button.SetPanelEvent("onmouseout", function () {
 			$.DispatchEvent("UIHideTextTooltip", profile_button);
 		});
+	} else {
+		LoadingTrace("profile/button", "Home profile container not found");
 	}
-	/*/
-		var bottom_patreon_container = $.GetContextPanel().FindChildrenWithClassTraverse("bottom-patreon-sub");
-	
-		if (bottom_patreon_container && bottom_patreon_container[0]) {
-			var companion_list = [
-				"npc_donator_companion_chocobo",
-				"npc_donator_companion_mega_greevil",
-				"npc_donator_companion_butch",
-				"npc_donator_companion_hollow_jack",
-				"npc_donator_companion_tory",
-				"npc_donator_companion_frog",
-			];
-	
-			for (var i in companion_list) {
-				var companion = $.CreatePanel("Panel", bottom_patreon_container[0], "");
-				companion.AddClass("DonatorReward");
-				companion.style.width = 100 / companion_list.length + "%";
-	
-				var companionpreview = $.CreatePanel("Button", companion, "");
-				companionpreview.style.width = "100%";
-				companionpreview.style.height = "100%";
-	
-				companionpreview.BLoadLayoutFromString('<root><Panel><DOTAScenePanel style="width:100%; height:100%;" particleonly="false" unit="' + companion_list[i] + '"/></Panel></root>', false, false);
-				companionpreview.style.opacityMask = 'url("s2r://panorama/images/masks/hero_model_opacity_mask_png.vtex");'
-			}
-		}
-	*/
 	HoverableLoadingScreen();
 	fetch();
 	SetProfileName();
 	RefreshProfileDataLoop();
 	UpdatePlayerLoadingSidebar();
+	LoadingTrace("init", "Initial loops started: hover, fetch, profile refresh, sidebar refresh");
 	$.GetContextPanel().SetHasClass("ProfileModalVisible", false);
 	$.GetContextPanel().SetHasClass("ProfileModalClosing", false);
 
-	CustomNetTables.SubscribeNetTableListener("battlepass_player", function (table_name, key, data) {
-		UpdateProfilePanels();
-	});
+	if (typeof CustomNetTables !== "undefined" && CustomNetTables && typeof CustomNetTables.SubscribeNetTableListener === "function") {
+		CustomNetTables.SubscribeNetTableListener("battlepass_player", function (table_name, key, data) {
+			LoadingTrace("nettable/battlepass_player", "battlepass_player update received", {
+				table_name: table_name,
+				key: key,
+				has_data: data !== undefined && data !== null,
+			});
+			UpdateProfilePanels();
+		});
+		LoadingTrace("init", "Subscribed to CustomNetTables battlepass_player");
+	} else {
+		LoadingTrace("init", "CustomNetTables.SubscribeNetTableListener unavailable");
+	}
 
-	GameEvents.Subscribe("loading_screen_debug", LoadingScreenDebug);
-	GameEvents.Subscribe("send_votes", OnVotesReceived);
-	GameEvents.Subscribe("all_players_loaded", AllPlayersLoaded);
-	GameEvents.Subscribe("all_players_battlepass_loaded", AllPlayersBattlepassLoaded);
+	if (typeof GameEvents !== "undefined" && GameEvents && typeof GameEvents.Subscribe === "function") {
+		GameEvents.Subscribe("loading_screen_debug", LoadingScreenDebug);
+		GameEvents.Subscribe("send_votes", function (payload) {
+			LoadingTrace("event/send_votes", "Received send_votes event", payload);
+			OnVotesReceived(payload);
+		});
+		GameEvents.Subscribe("all_players_loaded", function (payload) {
+			LoadingTrace("event/all_players_loaded", "Received all_players_loaded event", payload);
+			AllPlayersLoaded();
+		});
+		GameEvents.Subscribe("all_players_battlepass_loaded", function (payload) {
+			LoadingTrace("event/all_players_battlepass_loaded", "Received all_players_battlepass_loaded event", payload);
+			AllPlayersBattlepassLoaded();
+		});
+		LoadingTrace("init", "Subscribed to GameEvents listeners");
+	} else {
+		LoadingTrace("init", "GameEvents.Subscribe unavailable");
+	}
 })();
