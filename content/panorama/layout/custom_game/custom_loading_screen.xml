@@ -53,7 +53,7 @@
 									<Label id="ProfileSummaryLevel" class="profile-summary-value" text="-" />
 								</Panel>
 								<Panel class="profile-summary-row">
-									<Label class="profile-summary-key" text="#loading_screen_winrate" />
+									<Label class="profile-summary-key" text="#loading_screen_donator" />
 									<Label id="ProfileSummaryWinrate" class="profile-summary-value" text="-" />
 								</Panel>
 							</Panel>
@@ -80,7 +80,7 @@
 					<Panel class="description-background">
 						<Panel class="description-credit-wrap">
 							<Label class="description-credit-text" text="#loading_screen_artwork_credit" />
-							<Button class="description-credit-instagram-button" onactivate="ExternalBrowserGoToURL('https://www.instagram.com/duongcua_art');">
+							<Button class="description-credit-instagram-button" onactivate="OnArtworkCreditPressed();">
 								<Label class="description-credit-instagram-label" text="#loading_screen_instagram_short" />
 							</Button>
 						</Panel>
@@ -93,7 +93,7 @@
 
 						<Label id="loading-description-text" />
 
-						<Button class="vote-button" onactivate="ExternalBrowserGoToURL('https://mods.frostrose-studio.com')">
+						<Button class="vote-button" onactivate="OnWebsiteButtonPressed();">
 							<Label class="vote-button-label" text="#loading_screen_button" />
 						</Button>
 					</Panel>
@@ -102,6 +102,8 @@
 
 				<Panel id="BottomFooterRoot" class="footer">
 					<Panel class="bottom-button-container" hittest="false">
+					<RadioButton id="BottomRadioDiscord" class="bottom-radio-button" onactivate="SwitchTab(4)" text="#loading_screen_tab_discord" />
+					<Label class="bottom-radio-separator" text="/" />
 					<RadioButton id="BottomRadioPatreon" class="bottom-radio-button" onactivate="SwitchTab(3)" text="#loading_screen_tab_patreon" />
 					<Label class="bottom-radio-separator" text="/" />
 					<RadioButton id="BottomRadioCustomGames" class="bottom-radio-button" onactivate="SwitchTab(1)" text="#loading_screen_tab_custom_games" />
@@ -110,6 +112,9 @@
 					<Panel id="BottomTabCountdownWrap" class="bottom-tab-countdown-wrap">
 						<Panel class="bottom-tab-countdown-dot" />
 						<Label id="BottomTabCountdown" class="bottom-tab-countdown" text="#loading_screen_tab_timer_default" />
+					</Panel>
+					<Panel id="BottomTabTaglineWrap" class="bottom-tab-tagline-wrap">
+						<Label id="BottomTabTagline" class="bottom-tab-tagline" text="#loading_screen_tab_tagline_patreon" />
 					</Panel>
 					<Panel class="bottom-button-spacer" />
 					</Panel>
@@ -196,7 +201,6 @@
 							<Panel class="transifex-highlight-copy">
 								<Label class="transifex-highlight-title" text="#loading_screen_transifex_section_title" />
 								<Label class="transifex-highlight-subtitle" text="#loading_screen_transifex_section_subtitle" />
-								<Label class="transifex-highlight-description" text="#loading_screen_transifex_section_description" />
 
 								<Panel class="transifex-benefits-list">
 									<Panel class="transifex-benefit-row">
@@ -210,12 +214,11 @@
 								</Panel>
 
 								<Panel class="transifex-highlight-footer">
-									<Panel class="transifex-cta-row">
-										<Button class="vote-button transifex-cta-button" onactivate="ExternalBrowserGoToURL('https://www.transifex.com/frostrose-studio/x-hero-siege/')">
-											<Label class="vote-button-label" text="#loading_screen_transifex_cta_button" />
-										</Button>
-									</Panel>
+									<Label class="transifex-highlight-support-note" text="#loading_screen_transifex_support_note" />
 								</Panel>
+							</Panel>
+							<Panel class="transifex-cta-side">
+								<Button class="transifex-cta-image-button" onactivate="OnTransifexButtonPressed();" />
 							</Panel>
 						</Panel>
 					</Panel>
@@ -246,7 +249,34 @@
 								</Panel>
 							</Panel>
 							<Panel class="patreon-cta-side">
-								<Button class="patreon-cta-image-button" onactivate="ExternalBrowserGoToURL('https://www.patreon.com/bePatron?u=2533325')" />
+								<Button class="patreon-cta-image-button" onactivate="OnPatreonButtonPressed();" />
+							</Panel>
+						</Panel>
+					</Panel>
+
+					<Panel class="bottom-discord-container">
+						<Panel class="discord-highlight-card">
+							<Panel class="discord-highlight-copy">
+								<Label class="discord-highlight-title" text="#loading_screen_discord_section_title" />
+								<Label class="discord-highlight-subtitle" text="#loading_screen_discord_section_subtitle" />
+
+								<Panel class="discord-benefits-list">
+									<Panel class="discord-benefit-row">
+										<Panel class="discord-benefit-dot" />
+										<Label class="discord-benefit-text" text="#loading_screen_discord_advantage_1" />
+									</Panel>
+									<Panel class="discord-benefit-row">
+										<Panel class="discord-benefit-dot" />
+										<Label class="discord-benefit-text" text="#loading_screen_discord_advantage_2" />
+									</Panel>
+								</Panel>
+
+								<Panel class="discord-highlight-footer">
+									<Label class="discord-highlight-support-note" text="#loading_screen_discord_support_note" />
+								</Panel>
+							</Panel>
+							<Panel class="discord-cta-side">
+								<Button class="discord-cta-image-button" onactivate="OnDiscordButtonPressed();" />
 							</Panel>
 						</Panel>
 					</Panel>
@@ -262,14 +292,46 @@
 					<Panel class="player-loading-status-wrap">
 						<Label id="PlayerLoadingWaiting" class="player-loading-status" text="#loading_screen_waiting_counter_default" />
 					</Panel>
+					<Label id="PlayerLoadingGlobalStatus" class="player-loading-global-status" text="#loading_screen_status_loading" />
 					<Label id="PlayerForceLaunchLabel" class="player-force-launch-label" text="#loading_screen_match_starts_in_default" />
 					<Button id="PlayerReadyButton" class="player-ready-button" onactivate="OnCustomSetupReadyPressed();">
 						<Label id="PlayerReadyButtonLabel" text="#loading_screen_mark_ready" />
 					</Button>
+					<Button id="LoadingQaToggleButton" class="loading-qa-toggle-button" onactivate="ToggleLoadingQaPanel();">
+						<Label text="QA" />
+					</Button>
 				</Panel>
 
 				<Panel id="PlayerLoadingList" class="player-loading-list" />
+				<Panel id="LoadingQaPanel" class="loading-qa-panel">
+					<Label class="loading-qa-title" text="#loading_screen_qa_title" />
+					<Panel class="loading-qa-buttons-row">
+						<Button class="loading-qa-button" onactivate="SetToolsQaMode('normal');">
+							<Label text="#loading_screen_qa_mode_normal" />
+						</Button>
+						<Button class="loading-qa-button" onactivate="SetToolsQaMode('all_loading');">
+							<Label text="#loading_screen_qa_mode_all_loading" />
+						</Button>
+					</Panel>
+					<Panel class="loading-qa-buttons-row">
+						<Button class="loading-qa-button" onactivate="SetToolsQaMode('all_loaded');">
+							<Label text="#loading_screen_qa_mode_all_loaded" />
+						</Button>
+						<Button class="loading-qa-button" onactivate="SetToolsQaMode('all_ready');">
+							<Label text="#loading_screen_qa_mode_all_ready" />
+						</Button>
+					</Panel>
+					<Panel class="loading-qa-buttons-row">
+						<Button class="loading-qa-button" onactivate="SetToolsQaMode('one_failed');">
+							<Label text="#loading_screen_qa_mode_one_failed" />
+						</Button>
+					</Panel>
+				</Panel>
 			</Panel>
+		</Panel>
+
+		<Panel id="ReadyToast" class="ready-toast">
+			<Label id="ReadyToastLabel" text="#loading_screen_ready_toast" />
 		</Panel>
 
 		<Panel id="ProfileModalOverlay">
@@ -367,7 +429,7 @@
 					<Button id="ProfileModalSteamButton" class="vote-button" onactivate="OpenProfileSteamPage();">
 						<Label class="vote-button-label" text="#loading_screen_open_steam_profile" />
 					</Button>
-					<Button id="ProfileModalWebsiteButton" class="vote-button" onactivate="ExternalBrowserGoToURL('https://mods.frostrose-studio.com')">
+					<Button id="ProfileModalWebsiteButton" class="vote-button" onactivate="OnWebsiteButtonPressed();">
 						<Label class="vote-button-label" text="#loading_screen_open_website" />
 					</Button>
 				</Panel>

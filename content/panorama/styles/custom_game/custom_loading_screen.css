@@ -1228,9 +1228,10 @@ DOTAHudPreGame .TeamSelectContainer {
 	height: 34px;
 	width: 80px;
 	margin-left: 12px;
+	margin-top: 0px;
 	padding: 0px 10px 0px 8px;
 	flow-children: right;
-	vertical-align: center;
+	vertical-align: middle;
 	background-color: gradient(linear, 0% 0%, 100% 100%, from(#1a2435f0), to(#101826f0));
 	border: 1px solid #d5b87855;
 	box-shadow: fill #00000099 0px 0px 6px 0px;
@@ -1248,7 +1249,6 @@ DOTAHudPreGame .TeamSelectContainer {
 
 .bottom-tab-countdown {
 	width: fill-parent-flow(1.0);
-	height: 100%;
 	text-align: center center;
 	vertical-align: center;
 	font-size: 18px;
@@ -1341,13 +1341,21 @@ DOTAHudPreGame .TeamSelectContainer {
 	visibility: collapse;
 }
 
+.bottom-discord-container {
+	width: 100%;
+	height: 100%;
+	padding: 8px 10px;
+	flow-children: down;
+	visibility: collapse;
+}
+
 .patreon-highlight-card {
 	width: 100%;
 	height: 100%;
 	padding: 8px 10px;
 	flow-children: right;
-	background-color: gradient(linear, 0% 0%, 100% 100%, from(#101826f5), to(#090f17f2));
-	border: 1px solid #d5b8784d;
+	background-color: gradient(linear, 0% 0%, 100% 100%, from(#2a1a13f6), to(#150d09f4));
+	border: 1px solid #e08d5e70;
 	box-shadow: fill #000000a8 0px 0px 12px 0px;
 }
 
@@ -1363,7 +1371,7 @@ DOTAHudPreGame .TeamSelectContainer {
 	font-size: 28px;
 	text-transform: uppercase;
 	letter-spacing: 1px;
-	color: gradient(linear, 0% 0%, 0% 100%, from(#fff4de), color-stop(0.55, #f0d39a), to(#c29d5f));
+	color: gradient(linear, 0% 0%, 0% 100%, from(#ffe5cf), color-stop(0.55, #ffb07a), to(#d6793f));
 	text-shadow: 0px 2px 8px #000000;
 	font-family: titleFont;
 }
@@ -1373,7 +1381,7 @@ DOTAHudPreGame .TeamSelectContainer {
 	margin-top: 0px;
 	font-size: 20px;
 	letter-spacing: 0.5px;
-	color: #cdd8eb;
+	color: #ffd7bc;
 	text-shadow: 0px 1px 3px #000000;
 	font-family: Reaver;
 }
@@ -1398,8 +1406,8 @@ DOTAHudPreGame .TeamSelectContainer {
 	background-size: contain;
 	background-position: 50% 50%;
 	background-repeat: no-repeat;
-	background-color: gradient(linear, 0% 0%, 100% 100%, from(#0f1a2aff), to(#0a111cff));
-	border: 1px solid #d5b87855;
+	background-color: gradient(linear, 0% 0%, 100% 100%, from(#382115ff), to(#1c110aff));
+	border: 1px solid #f0a26f88;
 	box-shadow: fill #000000a8 0px 0px 8px 0px;
 	transition-property: brightness, pre-transform-scale2d, border;
 	transition-duration: 0.12s;
@@ -1408,7 +1416,7 @@ DOTAHudPreGame .TeamSelectContainer {
 .patreon-cta-image-button:hover {
 	brightness: 1.12;
 	pre-transform-scale2d: 1.01;
-	border: 1px solid #f1deb3;
+	border: 1px solid #ffd2b6;
 }
 
 .patreon-cta-image-button:active {
@@ -1446,15 +1454,15 @@ DOTAHudPreGame .TeamSelectContainer {
 	margin-top: 6px;
 	margin-right: 10px;
 	border-radius: 50%;
-	background-color: #d5b878;
-	box-shadow: fill #d5b87855 0px 0px 4px 0px;
+	background-color: #ffb179;
+	box-shadow: fill #ffb17966 0px 0px 4px 0px;
 }
 
 .patreon-benefit-text {
 	width: fill-parent-flow(1.0);
 	font-size: 15px;
 	line-height: 18px;
-	color: #dfebff;
+	color: #ffeada;
 	text-shadow: 0px 1px 2px #000000;
 	font-family: Reaver;
 }
@@ -1471,30 +1479,159 @@ DOTAHudPreGame .TeamSelectContainer {
 	width: 100%;
 	font-size: 14px;
 	line-height: 16px;
-	color: #9db0cc;
+	color: #dcb59a;
 	text-shadow: 0px 1px 2px #000000;
 	font-family: Reaver;
+}
+
+.discord-highlight-card {
+	width: 100%;
+	height: 100%;
+	padding: 8px 10px;
+	flow-children: right;
+	background-color: gradient(linear, 0% 0%, 100% 100%, from(#1e2238f6), to(#131627f4));
+	border: 1px solid #6d78ff72;
+	box-shadow: fill #000000a8 0px 0px 12px 0px;
+}
+
+.discord-highlight-copy {
+	width: fill-parent-flow(1.0);
+	height: 100%;
+	padding: 6px 8px 4px 8px;
+	flow-children: down;
+}
+
+.discord-highlight-title {
+	width: 100%;
+	font-size: 28px;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	color: gradient(linear, 0% 0%, 0% 100%, from(#f2f4ff), color-stop(0.55, #b5c2ff), to(#7f8cff));
+	text-shadow: 0px 2px 8px #000000;
+	font-family: titleFont;
+}
+
+.discord-highlight-subtitle {
+	width: 100%;
+	margin-top: 0px;
+	font-size: 20px;
+	letter-spacing: 0.5px;
+	color: #d8deff;
+	text-shadow: 0px 1px 3px #000000;
+	font-family: Reaver;
+}
+
+.discord-highlight-description {
+	width: 100%;
+	margin-top: 4px;
+	font-size: 17px;
+	line-height: 21px;
+	color: #aeb8ec;
+	text-shadow: 0px 1px 2px #000000;
+	font-family: Reaver;
+}
+
+.discord-benefits-list {
+	width: 100%;
+	height: fit-children;
+	margin-top: 4px;
+	flow-children: down;
+}
+
+.discord-benefit-row {
+	width: 100%;
+	height: fit-children;
+	margin-bottom: 2px;
+	flow-children: right;
+}
+
+.discord-benefit-dot {
+	width: 8px;
+	height: 8px;
+	margin-top: 6px;
+	margin-right: 10px;
+	border-radius: 50%;
+	background-color: #8d97ff;
+	box-shadow: fill #8d97ff66 0px 0px 5px 0px;
+}
+
+.discord-benefit-text {
+	width: fill-parent-flow(1.0);
+	font-size: 15px;
+	line-height: 18px;
+	color: #e5e9ff;
+	text-shadow: 0px 1px 2px #000000;
+	font-family: Reaver;
+}
+
+.discord-highlight-footer {
+	width: 100%;
+	height: fit-children;
+	margin-top: 3px;
+	flow-children: down;
+	vertical-align: bottom;
+}
+
+.discord-highlight-support-note {
+	width: 100%;
+	font-size: 14px;
+	line-height: 16px;
+	color: #b5bcef;
+	text-shadow: 0px 1px 2px #000000;
+	font-family: Reaver;
+}
+
+.discord-cta-side {
+	width: 450px;
+	align: center center;
+	flow-children: down;
+}
+
+.discord-cta-image-button {
+	width: 434px;
+	height: 102px;
+	align: center center;
+	background-image: url("file://{images}/custom_game/loading_screen/patreon.png");
+	background-size: contain;
+	background-position: 50% 50%;
+	background-repeat: no-repeat;
+	background-color: gradient(linear, 0% 0%, 100% 100%, from(#2a2f56ff), to(#141832ff));
+	border: 1px solid #b2bcff88;
+	box-shadow: fill #000000a8 0px 0px 8px 0px;
+	transition-property: brightness, pre-transform-scale2d, border;
+	transition-duration: 0.12s;
+}
+
+.discord-cta-image-button:hover {
+	brightness: 1.12;
+	pre-transform-scale2d: 1.01;
+	border: 1px solid #dfe4ff;
+}
+
+.discord-cta-image-button:active {
+	pre-transform-scale2d: 0.985;
 }
 
 .transifex-highlight-card {
 	width: 100%;
 	height: 100%;
-	padding: 14px 16px 12px 16px;
-	flow-children: down;
+	padding: 8px 10px;
+	flow-children: right;
 	background-color: gradient(linear, 0% 0%, 100% 100%, from(#101d2bf5), to(#09121cf2));
 	border: 1px solid #7bb4d04f;
 	box-shadow: fill #000000a8 0px 0px 12px 0px;
 }
 
 .transifex-highlight-copy {
-	width: 100%;
+	width: fill-parent-flow(1.0);
 	height: 100%;
+	padding: 6px 8px 4px 8px;
 	flow-children: down;
 }
 
 .transifex-highlight-title {
 	width: 100%;
-	font-size: 34px;
+	font-size: 28px;
 	text-transform: uppercase;
 	letter-spacing: 1px;
 	color: gradient(linear, 0% 0%, 0% 100%, from(#eaf9ff), color-stop(0.58, #9fdbff), to(#6aa7d6));
@@ -1504,9 +1641,9 @@ DOTAHudPreGame .TeamSelectContainer {
 
 .transifex-highlight-subtitle {
 	width: 100%;
-	margin-top: 2px;
-	font-size: 24px;
-	letter-spacing: 1px;
+	margin-top: 0px;
+	font-size: 20px;
+	letter-spacing: 0.5px;
 	color: #d3e8fb;
 	text-shadow: 0px 1px 3px #000000;
 	font-family: Reaver;
@@ -1514,9 +1651,9 @@ DOTAHudPreGame .TeamSelectContainer {
 
 .transifex-highlight-description {
 	width: 100%;
-	margin-top: 6px;
-	font-size: 19px;
-	line-height: 24px;
+	margin-top: 4px;
+	font-size: 17px;
+	line-height: 21px;
 	color: #a9c4dc;
 	text-shadow: 0px 1px 2px #000000;
 	font-family: Reaver;
@@ -1525,20 +1662,21 @@ DOTAHudPreGame .TeamSelectContainer {
 .transifex-benefits-list {
 	width: 100%;
 	height: fit-children;
-	margin-top: 10px;
+	margin-top: 4px;
 	flow-children: down;
 }
 
 .transifex-benefit-row {
 	width: 100%;
-	height: 28px;
+	height: fit-children;
+	margin-bottom: 2px;
 	flow-children: right;
 }
 
 .transifex-benefit-dot {
 	width: 8px;
 	height: 8px;
-	margin-top: 10px;
+	margin-top: 6px;
 	margin-right: 10px;
 	border-radius: 50%;
 	background-color: #8ed8ff;
@@ -1547,7 +1685,8 @@ DOTAHudPreGame .TeamSelectContainer {
 
 .transifex-benefit-text {
 	width: fill-parent-flow(1.0);
-	font-size: 18px;
+	font-size: 15px;
+	line-height: 18px;
 	color: #dcedff;
 	text-shadow: 0px 1px 2px #000000;
 	font-family: Reaver;
@@ -1555,46 +1694,50 @@ DOTAHudPreGame .TeamSelectContainer {
 
 .transifex-highlight-footer {
 	width: 100%;
-	height: fill-parent-flow(1.0);
-	margin-top: 8px;
+	height: fit-children;
+	margin-top: 3px;
 	flow-children: down;
 	vertical-align: bottom;
 }
 
 .transifex-highlight-support-note {
 	width: 100%;
-	font-size: 17px;
-	line-height: 21px;
+	font-size: 14px;
+	line-height: 16px;
 	color: #9bb5cf;
 	text-shadow: 0px 1px 2px #000000;
 	font-family: Reaver;
 }
 
-.transifex-cta-row {
-	width: 100%;
-	height: 46px;
-	margin-top: 10px;
-	flow-children: right;
+.transifex-cta-side {
+	width: 450px;
+	align: center center;
+	flow-children: down;
 }
 
-.transifex-cta-row .vote-button {
-	height: 46px;
-	margin-top: 0px;
-	horizontal-align: left;
-	align: left center;
+.transifex-cta-image-button {
+	width: 434px;
+	height: 102px;
+	align: center center;
+	background-image: url("file://{images}/custom_game/loading_screen/patreon.png");
+	background-size: contain;
+	background-position: 50% 50%;
+	background-repeat: no-repeat;
+	background-color: gradient(linear, 0% 0%, 100% 100%, from(#132a3dff), to(#0a1826ff));
+	border: 1px solid #7bb4d0aa;
+	box-shadow: fill #000000a8 0px 0px 8px 0px;
+	transition-property: brightness, pre-transform-scale2d, border;
+	transition-duration: 0.12s;
 }
 
-.transifex-cta-button {
-	width: 52%;
-	margin-right: 8px;
+.transifex-cta-image-button:hover {
+	brightness: 1.12;
+	pre-transform-scale2d: 1.01;
+	border: 1px solid #d3ecff;
 }
 
-.transifex-cta-secondary-button {
-	width: fill-parent-flow(1.0);
-}
-
-.transifex-cta-secondary-button .vote-button-label {
-	font-size: 19px;
+.transifex-cta-image-button:active {
+	pre-transform-scale2d: 0.985;
 }
 
 .mod-cell {
@@ -2335,7 +2478,7 @@ DOTAHudPreGame .TeamSelectContainer {
 
 .player-loading-header {
 	height: 15%;
-	padding: 6px 10px 4px 10px;
+	padding: 6px 10px 34px 10px;
 }
 
 .player-loading-title {
@@ -2357,7 +2500,10 @@ DOTAHudPreGame .TeamSelectContainer {
 
 .player-ready-button {
 	height: 24px;
-	margin-top: 3px;
+	margin-top: 0px;
+	margin-bottom: 4px;
+	align: center bottom;
+	ignore-parent-flow: true;
 }
 
 .player-loading-list {
@@ -2405,6 +2551,24 @@ DOTAHudPreGame .TeamSelectContainer {
 	height: 82px;
 }
 
+.AspectRatio21x9 .transifex-cta-side {
+	width: 364px;
+}
+
+.AspectRatio21x9 .transifex-cta-image-button {
+	width: 348px;
+	height: 82px;
+}
+
+.AspectRatio21x9 .discord-cta-side {
+	width: 364px;
+}
+
+.AspectRatio21x9 .discord-cta-image-button {
+	width: 348px;
+	height: 82px;
+}
+
 .AspectRatio4x3 .content-left-column {
 	width: 74.8%;
 }
@@ -2425,7 +2589,23 @@ DOTAHudPreGame .TeamSelectContainer {
 	font-size: 24px;
 }
 
+.AspectRatio4x3 .transifex-highlight-title {
+	font-size: 24px;
+}
+
+.AspectRatio4x3 .discord-highlight-title {
+	font-size: 24px;
+}
+
 .AspectRatio4x3 .patreon-highlight-subtitle {
+	font-size: 17px;
+}
+
+.AspectRatio4x3 .transifex-highlight-subtitle {
+	font-size: 17px;
+}
+
+.AspectRatio4x3 .discord-highlight-subtitle {
 	font-size: 17px;
 }
 
@@ -2434,7 +2614,27 @@ DOTAHudPreGame .TeamSelectContainer {
 	line-height: 15px;
 }
 
+.AspectRatio4x3 .transifex-benefit-text {
+	font-size: 13px;
+	line-height: 15px;
+}
+
+.AspectRatio4x3 .discord-benefit-text {
+	font-size: 13px;
+	line-height: 15px;
+}
+
 .AspectRatio4x3 .patreon-highlight-support-note {
+	font-size: 12px;
+	line-height: 14px;
+}
+
+.AspectRatio4x3 .transifex-highlight-support-note {
+	font-size: 12px;
+	line-height: 14px;
+}
+
+.AspectRatio4x3 .discord-highlight-support-note {
 	font-size: 12px;
 	line-height: 14px;
 }
@@ -2449,6 +2649,26 @@ DOTAHudPreGame .TeamSelectContainer {
 	height: 51px;
 }
 
+.AspectRatio4x3 .transifex-cta-side {
+	width: 232px;
+	margin-left: 8px;
+}
+
+.AspectRatio4x3 .transifex-cta-image-button {
+	width: 216px;
+	height: 51px;
+}
+
+.AspectRatio4x3 .discord-cta-side {
+	width: 232px;
+	margin-left: 8px;
+}
+
+.AspectRatio4x3 .discord-cta-image-button {
+	width: 216px;
+	height: 51px;
+}
+
 .AspectRatio4x3 .player-loading-header {
 	height: 22%;
 }
@@ -2457,11 +2677,37 @@ DOTAHudPreGame .TeamSelectContainer {
 	font-size: 26px;
 }
 
+.AspectRatio16x10 .transifex-highlight-title {
+	font-size: 26px;
+}
+
+.AspectRatio16x10 .discord-highlight-title {
+	font-size: 26px;
+}
+
 .AspectRatio16x10 .patreon-highlight-subtitle {
 	font-size: 18px;
 }
 
+.AspectRatio16x10 .transifex-highlight-subtitle {
+	font-size: 18px;
+}
+
+.AspectRatio16x10 .discord-highlight-subtitle {
+	font-size: 18px;
+}
+
 .AspectRatio16x10 .patreon-benefit-text {
+	font-size: 14px;
+	line-height: 16px;
+}
+
+.AspectRatio16x10 .transifex-benefit-text {
+	font-size: 14px;
+	line-height: 16px;
+}
+
+.AspectRatio16x10 .discord-benefit-text {
 	font-size: 14px;
 	line-height: 16px;
 }
@@ -2471,11 +2717,39 @@ DOTAHudPreGame .TeamSelectContainer {
 	line-height: 15px;
 }
 
+.AspectRatio16x10 .transifex-highlight-support-note {
+	font-size: 13px;
+	line-height: 15px;
+}
+
+.AspectRatio16x10 .discord-highlight-support-note {
+	font-size: 13px;
+	line-height: 15px;
+}
+
 .AspectRatio16x10 .patreon-cta-side {
 	width: 292px;
 }
 
 .AspectRatio16x10 .patreon-cta-image-button {
+	width: 276px;
+	height: 65px;
+}
+
+.AspectRatio16x10 .transifex-cta-side {
+	width: 292px;
+}
+
+.AspectRatio16x10 .transifex-cta-image-button {
+	width: 276px;
+	height: 65px;
+}
+
+.AspectRatio16x10 .discord-cta-side {
+	width: 292px;
+}
+
+.AspectRatio16x10 .discord-cta-image-button {
 	width: 276px;
 	height: 65px;
 }
@@ -2512,4 +2786,240 @@ DOTAHudPreGame .TeamSelectContainer {
 
 #HomeProfileContainer:hover #ProfileSummaryNameArrow {
 	wash-color: white;
+}
+
+/* -------------------------------------------------------------------------- */
+/* V1.1 polish: status banner, tagline, QA panel, ready toast                */
+/* -------------------------------------------------------------------------- */
+
+@keyframes 'XhsStatusPulseWarning' {
+	0% {
+		brightness: 0.96;
+	}
+
+	50% {
+		brightness: 1.08;
+	}
+
+	100% {
+		brightness: 0.96;
+	}
+}
+
+@keyframes 'XhsStatusPulseSuccess' {
+	0% {
+		brightness: 0.96;
+	}
+
+	50% {
+		brightness: 1.12;
+	}
+
+	100% {
+		brightness: 0.96;
+	}
+}
+
+.bottom-tab-tagline-wrap {
+	height: 34px;
+	max-width: 520px;
+	margin-left: 10px;
+	margin-top: 0px;
+	padding: 0px 10px;
+	align: center center;
+	background-color: #0f182666;
+	border: 1px solid #d5b87833;
+}
+
+.bottom-tab-tagline {
+	align: center center;
+	text-align: center center;
+	font-size: 14px;
+	letter-spacing: 0.4px;
+	color: #a8b7cd;
+	text-overflow: shrink;
+	font-family: Reaver;
+	text-shadow: 0px 1px 2px #000000;
+}
+
+.player-loading-global-status {
+	width: 100%;
+	margin-top: 3px;
+	font-size: 15px;
+	letter-spacing: 0.7px;
+	text-transform: uppercase;
+	color: #d5be88;
+	font-family: titleFont;
+	text-shadow: 0px 1px 4px #000000;
+	text-overflow: shrink;
+}
+
+.player-loading-global-status.StatusLoading {
+	color: #d5be88;
+	animation-name: XhsStatusPulseWarning;
+	animation-duration: 1.1s;
+	animation-iteration-count: infinite;
+	animation-timing-function: ease-in-out;
+}
+
+.player-loading-global-status.StatusAllReady {
+	color: #86d89a;
+	text-shadow: 0px 0px 8px #4d9c6199;
+	animation-name: XhsStatusPulseSuccess;
+	animation-duration: 0.95s;
+	animation-iteration-count: infinite;
+	animation-timing-function: ease-in-out;
+}
+
+.player-loading-global-status.StatusFailed {
+	color: #f09b9b;
+	text-shadow: 0px 0px 10px #7c272799;
+	animation-name: XhsStatusPulseWarning;
+	animation-duration: 0.7s;
+	animation-iteration-count: infinite;
+	animation-timing-function: ease-in-out;
+}
+
+.loading-qa-toggle-button {
+	ignore-parent-flow: true;
+	width: 38px;
+	height: 20px;
+	align: right top;
+	margin-top: 6px;
+	margin-right: 10px;
+	visibility: collapse;
+	border: 1px solid #7bb4d066;
+	background-color: #121e2fdd;
+	transition-property: brightness, border;
+	transition-duration: 0.1s;
+}
+
+.loading-qa-toggle-button Label {
+	width: 100%;
+	height: 100%;
+	text-align: center center;
+	font-size: 12px;
+	letter-spacing: 1px;
+	color: #9fc6e4;
+	font-family: titleFont;
+}
+
+.loading-qa-toggle-button:hover {
+	brightness: 1.15;
+	border: 1px solid #9fd2ff;
+}
+
+.loading-qa-toggle-button.IsActive {
+	background-color: #233854f0;
+	border: 1px solid #9fd2ff;
+}
+
+.loading-qa-panel {
+	ignore-parent-flow: true;
+	width: 254px;
+	align: right top;
+	margin-top: 154px;
+	margin-right: 10px;
+	padding: 8px;
+	flow-children: down;
+	visibility: collapse;
+	background-color: gradient(linear, 0% 0%, 100% 100%, from(#0f1724f3), to(#09111af4));
+	border: 1px solid #7bb4d066;
+	box-shadow: fill #000000cc 0px 0px 8px 0px;
+	z-index: 12;
+}
+
+.loading-qa-title {
+	width: 100%;
+	font-size: 14px;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+	color: #9fc6e4;
+	text-shadow: 0px 1px 2px #000000;
+	font-family: titleFont;
+}
+
+.loading-qa-buttons-row {
+	width: 100%;
+	height: fit-children;
+	margin-top: 6px;
+	flow-children: right;
+}
+
+.loading-qa-button {
+	width: fill-parent-flow(1.0);
+	height: 28px;
+	margin-right: 4px;
+	border: 1px solid #7bb4d066;
+	background-color: #162335;
+}
+
+.loading-qa-buttons-row .loading-qa-button:last-child {
+	margin-right: 0px;
+}
+
+.loading-qa-button Label {
+	width: 100%;
+	height: 100%;
+	text-align: center center;
+	font-size: 12px;
+	color: #c5d7ee;
+	font-family: Reaver;
+	text-overflow: shrink;
+}
+
+.loading-qa-button:hover {
+	brightness: 1.15;
+	border: 1px solid #9fd2ff;
+}
+
+#ReadyToast {
+	ignore-parent-flow: true;
+	width: fit-children;
+	max-width: 620px;
+	height: 42px;
+	align: center top;
+	margin-top: 16px;
+	padding: 0px 18px;
+	flow-children: right;
+	vertical-align: center;
+	background-color: gradient(linear, 0% 0%, 100% 100%, from(#1a2a3ddd), to(#101b29dd));
+	border: 1px solid #d5b87877;
+	box-shadow: fill #000000d1 0px 0px 10px 0px;
+	opacity: 0.0;
+	transform: translateY(-10px);
+	visibility: collapse;
+	transition-property: opacity, transform;
+	transition-duration: 0.16s;
+	z-index: 35;
+}
+
+#ReadyToast.ReadyToastVisible {
+	visibility: visible;
+	opacity: 1.0;
+	transform: translateY(0px);
+}
+
+#ReadyToastLabel {
+	height: 100%;
+	text-align: center center;
+	font-size: 18px;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+	color: #f2dfb8;
+	text-shadow: 0px 1px 3px #000000;
+	font-family: titleFont;
+}
+
+.AspectRatio4x3 .bottom-tab-tagline-wrap {
+	max-width: 260px;
+}
+
+.AspectRatio4x3 .bottom-tab-tagline {
+	font-size: 12px;
+}
+
+.AspectRatio4x3 .loading-qa-panel {
+	margin-top: 188px;
+	width: 232px;
 }
