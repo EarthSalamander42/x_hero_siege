@@ -512,12 +512,80 @@ function NormalizeSteamID64(raw_steam_id) {
 	return "";
 }
 
-function GetSteamIDFromPlayerInfo(player_info) {
-	if (!player_info || player_info.player_steamid === undefined || player_info.player_steamid === null) {
+function GetSteamIDCandidateFromPlayerInfo(player_info) {
+	if (!player_info) {
 		return "";
 	}
 
-	return NormalizeSteamID64(player_info.player_steamid);
+	var fields = [
+		"player_steamid",
+		"player_steam_id",
+		"steamid",
+		"steam_id",
+		"accountid",
+		"account_id",
+	];
+
+	for (var i = 0; i < fields.length; i++) {
+		var field_name = fields[i];
+		var value = player_info[field_name];
+		if (value !== undefined && value !== null && value.toString().trim().length > 0 && value.toString().trim() != "0") {
+			return value.toString().trim();
+		}
+	}
+
+	return "";
+}
+
+function GetSteamIDFromPlayerInfo(player_info, player_id) {
+	var candidate = GetSteamIDCandidateFromPlayerInfo(player_info);
+	var normalized = NormalizeSteamID64(candidate);
+	if (normalized.length > 0) {
+		return normalized;
+	}
+
+	if (player_id !== undefined && player_id >= 0 && typeof Game.GetPlayerInfo === "function") {
+		var fallback_info = Game.GetPlayerInfo(player_id);
+		candidate = GetSteamIDCandidateFromPlayerInfo(fallback_info);
+		normalized = NormalizeSteamID64(candidate);
+		if (normalized.length > 0) {
+			return normalized;
+		}
+	}
+
+	var local_player_id = GetLocalPlayerIDSafe();
+	if (player_id !== undefined && player_id == local_player_id) {
+		var local_info = Game.GetLocalPlayerInfo();
+		candidate = GetSteamIDCandidateFromPlayerInfo(local_info);
+		normalized = NormalizeSteamID64(candidate);
+		if (normalized.length > 0) {
+			return normalized;
+		}
+	}
+
+	return "";
+}
+
+function GetAvatarSteamIDFromPlayerInfo(player_info, player_id) {
+	var normalized = GetSteamIDFromPlayerInfo(player_info, player_id);
+	if (normalized.length > 0) {
+		return normalized;
+	}
+
+	var candidate = GetSteamIDCandidateFromPlayerInfo(player_info);
+	if (candidate.length > 0) {
+		return candidate;
+	}
+
+	if (player_id !== undefined && player_id >= 0 && typeof Game.GetPlayerInfo === "function") {
+		var fallback_info = Game.GetPlayerInfo(player_id);
+		candidate = GetSteamIDCandidateFromPlayerInfo(fallback_info);
+		if (candidate.length > 0) {
+			return candidate;
+		}
+	}
+
+	return "";
 }
 
 function HasServerKey() {
@@ -880,7 +948,7 @@ function GetProfileDataForPlayer(player_id) {
 
 	return {
 		player_id: player_id,
-		steam_id: GetSteamIDFromPlayerInfo(player_info),
+		steam_id: GetSteamIDFromPlayerInfo(player_info, player_id),
 		player_name: GetPlayerDisplayName(player_id, player_info),
 		title: player_table.title || L("loading_screen_unavailable"),
 		title_color: player_table.title_color || "#9eb0c9",
@@ -1135,7 +1203,7 @@ function OpenProfileSteamPage() {
 	}
 
 	var local_info = Game.GetLocalPlayerInfo();
-	var local_steam_id64 = GetSteamIDFromPlayerInfo(local_info);
+	var local_steam_id64 = GetSteamIDFromPlayerInfo(local_info, GetLocalPlayerIDSafe());
 
 	if (local_steam_id64) {
 		OpenExternalURL("https://steamcommunity.com/profiles/" + local_steam_id64);
@@ -1388,15 +1456,67 @@ function GetTeamDisplayName(team_id) {
 	return "Team " + team_id;
 }
 
-function GetPlayerDisplayName(player_id, player_info) {
-	if (player_info && player_info.player_name && player_info.player_name.length > 0) {
-		return player_info.player_name;
+function NormalizePlayerDisplayName(raw_name) {
+	if (raw_name === undefined || raw_name === null) {
+		return "";
 	}
 
-	if (player_id !== undefined && player_id >= 0) {
-		const fallback_name = Players.GetPlayerName(player_id);
-		if (fallback_name && fallback_name.length > 0) {
-			return fallback_name;
+	var text = "";
+	try {
+		text = raw_name.toString();
+	} catch (err) {
+		return "";
+	}
+
+	text = text.replace(/\s+/g, " ").trim();
+	if (text.length <= 0) {
+		return "";
+	}
+
+	var lowered = text.toLowerCase();
+	if (
+		lowered == "unnamed" ||
+		lowered == "unnamed player" ||
+		lowered == "unknown" ||
+		lowered == "null" ||
+		lowered == "undefined" ||
+		lowered == "n/a" ||
+		lowered == "na"
+	) {
+		return "";
+	}
+
+	return text;
+}
+
+function GetPlayerDisplayName(player_id, player_info) {
+	// $.Msg(player_info);
+	var resolved_name = NormalizePlayerDisplayName(player_info && player_info.player_name);
+	if (resolved_name.length > 0) {
+		return resolved_name;
+	}
+
+	if (player_id !== undefined && player_id >= 0 && typeof Players !== "undefined" && typeof Players.GetPlayerName === "function") {
+		resolved_name = NormalizePlayerDisplayName(Players.GetPlayerName(player_id));
+		if (resolved_name.length > 0) {
+			return resolved_name;
+		}
+	}
+
+	if (player_id !== undefined && player_id >= 0 && typeof Game.GetPlayerInfo === "function") {
+		var info_fallback = Game.GetPlayerInfo(player_id);
+		resolved_name = NormalizePlayerDisplayName(info_fallback && info_fallback.player_name);
+		if (resolved_name.length > 0) {
+			return resolved_name;
+		}
+	}
+
+	var local_player_id = GetLocalPlayerIDSafe();
+	if (player_id == local_player_id || player_id < 0) {
+		var local_info = Game.GetLocalPlayerInfo();
+		resolved_name = NormalizePlayerDisplayName(local_info && local_info.player_name);
+		if (resolved_name.length > 0) {
+			return resolved_name;
 		}
 	}
 
@@ -1465,6 +1585,7 @@ function BuildToolsModeLoadingEntries() {
 function UpdatePlayerLoadingSidebar() {
 	try {
 	const list_parent = $("#PlayerLoadingList");
+	const title_label = $("#PlayerLoadingTitle");
 	const counter = $("#PlayerLoadingCounter");
 	const progress_bar = $("#PlayerLoadingProgress");
 	const waiting_label = $("#PlayerLoadingWaiting");
@@ -1568,7 +1689,6 @@ function UpdatePlayerLoadingSidebar() {
 		seeded_entry.team_id = seeded_team_id;
 		seeded_entry.team_key = seeded_team_key;
 		seeded_entry.team_priority = GetTeamSortPriority(seeded_team_id, local_team_id);
-		seeded_entry.state_priority = GetConnectionStatePriority(seeded_state);
 
 		section_counts[seeded_team_key] = (section_counts[seeded_team_key] || 0) + 1;
 	}
@@ -1576,10 +1696,6 @@ function UpdatePlayerLoadingSidebar() {
 	player_entries.sort(function (a, b) {
 		if (a.team_priority != b.team_priority) {
 			return a.team_priority - b.team_priority;
-		}
-
-		if (a.state_priority != b.state_priority) {
-			return a.state_priority - b.state_priority;
 		}
 
 		if (a.can_open_profile != b.can_open_profile) {
@@ -1602,7 +1718,7 @@ function UpdatePlayerLoadingSidebar() {
 
 	var order_signature = "";
 	for (var sig_i = 0; sig_i < player_entries.length; sig_i++) {
-		order_signature = order_signature + "|" + player_entries[sig_i].row_key + ":" + player_entries[sig_i].team_key + ":" + player_entries[sig_i].state_priority;
+		order_signature = order_signature + "|" + player_entries[sig_i].row_key + ":" + player_entries[sig_i].team_key;
 	}
 	for (var section_count_key in section_counts) {
 		order_signature = order_signature + "|" + section_count_key + ":" + section_counts[section_count_key];
@@ -1667,7 +1783,7 @@ function UpdatePlayerLoadingSidebar() {
 
 		if (is_loaded) {
 			loaded_players = loaded_players + 1;
-		} else {
+		} else if (is_connecting) {
 			waiting_players = waiting_players + 1;
 		}
 
@@ -1687,7 +1803,20 @@ function UpdatePlayerLoadingSidebar() {
 			spinner.AddClass("player-loading-spinner");
 
 			const avatar = $.CreatePanel("DOTAAvatarImage", row, "");
-			avatar.AddClass("player-loading-avatar");
+			avatar.style.width = "24px";
+			avatar.style.height = "24px";
+			avatar.style.marginRight = "8px";
+			avatar.style.border = "1px solid #d5b87855";
+			avatar.style.backgroundColor = "#04060b";
+			avatar.style.verticalAlign = "center";
+			const initial_avatar_steam_id = entry.can_open_profile ? GetAvatarSteamIDFromPlayerInfo(player_info, player_id) : "";
+			if (initial_avatar_steam_id && initial_avatar_steam_id.length > 0) {
+				avatar.steamid = initial_avatar_steam_id;
+				avatar.style.visibility = "visible";
+			} else {
+				avatar.steamid = "0";
+				avatar.style.visibility = "collapse";
+			}
 
 			const name = $.CreatePanel("Label", row, "");
 			name.AddClass("player-loading-name");
@@ -1717,6 +1846,7 @@ function UpdatePlayerLoadingSidebar() {
 		player_row.player_id = player_id;
 		const is_marked_ready = (player_id >= 0 && IsPlayerMarkedReady(setup_status, player_id))
 			|| (tools_simulation_enabled && entry.is_tools_debug === true && entry.is_marked_ready === true);
+		const is_selected = player_id >= 0 && player_id == GetSelectedProfilePlayerID();
 
 		if (!player_row.spinner) {
 			player_row.spinner = $.CreatePanel("Panel", player_row.panel, "");
@@ -1748,34 +1878,59 @@ function UpdatePlayerLoadingSidebar() {
 			});
 		})(player_row.panel, entry.display_name);
 
-		player_row.panel.SetHasClass("PlayerLoadingReady", is_loaded);
-		player_row.panel.SetHasClass("PlayerLoadingWaiting", !is_loaded);
-		player_row.panel.SetHasClass("PlayerLoadingIssue", is_issue);
-		player_row.panel.SetHasClass("PlayerLoadingConnecting", is_connecting);
-		player_row.panel.SetHasClass("PlayerLoadingSelected", player_id >= 0 && player_id == GetSelectedProfilePlayerID());
-		player_row.panel.SetHasClass("PlayerMarkedReady", is_marked_ready);
-		player_row.panel.SetHasClass("PlayerLoadingInteractive", entry.can_open_profile);
-		player_row.panel.SetHasClass("PlayerLoadingStatic", !entry.can_open_profile);
-		player_row.panel.SetHasClass("PlayerLoadingToolsDebug", entry.is_tools_debug);
+		const status_text = is_marked_ready ? L("loading_screen_ready") : GetConnectionStateText(state);
+		const row_visual_signature = [
+			state,
+			is_loaded ? "1" : "0",
+			is_issue ? "1" : "0",
+			is_connecting ? "1" : "0",
+			is_selected ? "1" : "0",
+			is_marked_ready ? "1" : "0",
+			entry.can_open_profile ? "1" : "0",
+			entry.is_tools_debug ? "1" : "0",
+			status_text,
+		].join("|");
 
-		player_row.dot.SetHasClass("PlayerLoadingReady", is_loaded);
-		player_row.dot.SetHasClass("PlayerLoadingWaiting", !is_loaded);
-		player_row.dot.SetHasClass("PlayerLoadingIssue", is_issue);
-		player_row.dot.style.visibility = is_connecting ? "collapse" : "visible";
+		if (player_row.row_visual_signature !== row_visual_signature) {
+			player_row.row_visual_signature = row_visual_signature;
+			player_row.panel.SetHasClass("PlayerLoadingReady", is_loaded);
+			player_row.panel.SetHasClass("PlayerLoadingWaiting", !is_loaded);
+			player_row.panel.SetHasClass("PlayerLoadingIssue", is_issue);
+			player_row.panel.SetHasClass("PlayerLoadingConnecting", is_connecting);
+			player_row.panel.SetHasClass("PlayerLoadingSelected", is_selected);
+			player_row.panel.SetHasClass("PlayerMarkedReady", is_marked_ready);
+			player_row.panel.SetHasClass("PlayerLoadingInteractive", entry.can_open_profile);
+			player_row.panel.SetHasClass("PlayerLoadingStatic", !entry.can_open_profile);
+			player_row.panel.SetHasClass("PlayerLoadingToolsDebug", entry.is_tools_debug);
 
-		player_row.spinner.style.visibility = is_connecting ? "visible" : "collapse";
+			player_row.dot.SetHasClass("PlayerLoadingReady", is_loaded);
+			player_row.dot.SetHasClass("PlayerLoadingWaiting", !is_loaded);
+			player_row.dot.SetHasClass("PlayerLoadingIssue", is_issue);
+			player_row.dot.style.visibility = is_connecting ? "collapse" : "visible";
 
-		const steam_id64 = entry.can_open_profile ? GetSteamIDFromPlayerInfo(player_info) : "";
-		if (steam_id64 && steam_id64.length > 0) {
-			player_row.avatar.steamid = steam_id64;
-			player_row.avatar.style.visibility = "visible";
-		} else {
-			player_row.avatar.steamid = "0";
-			player_row.avatar.style.visibility = "collapse";
+			player_row.spinner.style.visibility = is_connecting ? "visible" : "collapse";
+			player_row.status.text = status_text;
 		}
 
-		player_row.name.text = entry.display_name;
-		player_row.status.text = is_marked_ready ? L("loading_screen_ready") : GetConnectionStateText(state);
+		const avatar_steam_id = entry.can_open_profile ? GetAvatarSteamIDFromPlayerInfo(player_info, player_id) : "";
+		const row_identity_signature = [
+			entry.display_name || "",
+			avatar_steam_id || "0",
+		].join("|");
+
+		if (player_row.row_identity_signature !== row_identity_signature) {
+			player_row.row_identity_signature = row_identity_signature;
+
+			if (avatar_steam_id && avatar_steam_id.length > 0) {
+				player_row.avatar.steamid = avatar_steam_id;
+				player_row.avatar.style.visibility = "visible";
+			} else {
+				player_row.avatar.steamid = "0";
+				player_row.avatar.style.visibility = "collapse";
+			}
+
+			player_row.name.text = entry.display_name;
+		}
 	}
 
 	for (var row_key in player_loading_rows) {
@@ -1805,10 +1960,23 @@ function UpdatePlayerLoadingSidebar() {
 		}
 	}
 
-	counter.text = LocalizeTemplate("loading_screen_loaded_counter", {
+	const loaded_counter_text = LocalizeTemplate("loading_screen_loaded_counter", {
 		loaded: loaded_players.toString(),
 		total: total_players.toString(),
 	});
+
+	if (counter) {
+		counter.text = loaded_counter_text;
+		counter.style.visibility = "collapse";
+	}
+
+	if (title_label) {
+		var players_title_text = L("loading_screen_players");
+		if (!players_title_text || players_title_text == "loading_screen_players" || players_title_text == "#loading_screen_players") {
+			players_title_text = "PLAYERS";
+		}
+		title_label.text = players_title_text + " " + loaded_counter_text;
+	}
 
 	if (progress_bar) {
 		progress_bar.value = total_players > 0 ? Clamp01(loaded_players / total_players) : 0;
@@ -1818,8 +1986,12 @@ function UpdatePlayerLoadingSidebar() {
 	const has_connection_failures = issue_players > 0;
 	custom_setup_failed_state = custom_setup_failed_state || has_connection_failures;
 
+	if (title_label) {
+		title_label.SetHasClass("PlayerLoadingTitleFailed", has_connection_failures);
+	}
+
 	if (waiting_label) {
-		if (all_players_loaded || total_players <= 0) {
+		if (all_players_loaded || total_players <= 0 || has_connection_failures || waiting_players <= 0) {
 			waiting_label.style.visibility = "collapse";
 		} else {
 			waiting_label.style.visibility = "visible";

@@ -409,21 +409,23 @@ if Log == nil then
 	end
 
 	function Dynamic_Wrap(mt, name)
-		-- testing nil value fix on line "return mt[name](unpack(args))" [NOT WORKING]
-		--		if mt == nil or name == nil then return end
-
 		local function wrapper(...)
 			local args = { ... }
 
-			-- Very rare issue! if this line appears:
-			-- [error][[C]:-1|xpcall] Error occured while executing in safe context: scripts\vscripts\libraries\adv_log.lua:423: attempt to call a nil value
-			-- uncomment prints and check what's wrong
-			--			print(mt, name, args)
-			--			print(mt[name])
-			--			print(mt[name](unpack(args)))
+			if mt == nil or name == nil then
+				print("[adv_log] Dynamic_Wrap received invalid mt/name")
+				return nil
+			end
+
+			local method = mt[name]
+			if type(method) ~= "function" then
+				print("[adv_log] Dynamic_Wrap target is not a function:", tostring(name), type(method))
+				return nil
+			end
 
 			local status, v = safe(function()
-				return mt[name](unpack(args))
+				-- Keep native Dynamic_Wrap behavior: pass wrapped table as self.
+				return method(mt, unpack(args))
 			end)
 
 			if status then
