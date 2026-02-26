@@ -9,73 +9,93 @@
 	</scripts>
 
 	<Panel class="OverthrowGameInfo">
-
 		<Panel id="Title">
-			<Image id="ImbaTitle" class="SeqImg" src="file://{images}/custom_game/tutorial/imba.png" />
-		</Panel>
+			<Panel id="InfoHeroArt">
+				<Panel id="InfoHeroTint" />
+			</Panel>
 
-		<Label id="Intro01" class="Header" html="true" text="#tutorial_intro_01" />
-		<Label id="Intro02" text="#tutorial_intro_02" />
-
-		<Panel id="Heroes" class="InfoBox">
-			<Panel id="HeroesTextBox" class="TextBox">
-				<Label id="HeroesTitle" class="Header" html="true" text="#tutorial_heroes_title" />
-				<Label id="Heroes01" html="true" text="#tutorial_heroes_01" />
-				<Label id="Heroes02" html="true" text="#tutorial_heroes_02" />
-				<Label id="Heroes03" html="true" text="#tutorial_heroes_03" />
-			</Panel>
-<!--			<Image id="HeroesImage" src="file://{images}/custom_game/tutorial/Tutorial01.png" /> -->
-		</Panel>
-<!--
-		<Panel id="AbilitiesImage"/>
--->
-
-		<Panel id="Items" class="InfoBox">
-			<Panel id="ItemsTextBox" class="TextBox">
-				<Label id="ItemsTitle" class="Header" html="true" text="#tutorial_items_title" />
-				<Label id="Items01" html="true" text="#tutorial_items_01" />
-				<Label id="Items02" html="true" text="#tutorial_items_02" />
-				<Label id="Items03" html="true" text="#tutorial_items_03" />
-				<Label id="Items04" html="true" text="#tutorial_items_04" />
-				<Label id="Items05" html="true" text="#tutorial_items_05" />
-			</Panel>
-		</Panel>
-<!--
-		<Panel id="ItemsImage"/>
--->
-		<Panel id="Creeps" class="InfoBox">
-			<Panel id="CreepsTextBox" class="TextBox">
-				<Label id="CreepsTitle" class="Header" html="true" text="#tutorial_creeps_title" />
-				<Label id="Creeps01" html="true" text="#tutorial_creeps_01" />
-			</Panel>
-		</Panel>
-<!--
-		<Panel id="PowerBalance" class="InfoBox">
-			<Panel id="PowerBalanceTextBox" class="TextBox">
-				<Label id="PowerBalanceTitle" class="Header" html="true" text="#tutorial_power_balance_title" />
-				<Label id="PowerBalance01" html="true" text="#tutorial_power_balance_01" />
-				<Label id="PowerBalance02" html="true" text="#tutorial_power_balance_02" />
-				<Label id="PowerBalance03" html="true" text="#tutorial_power_balance_03" />
-				<Label id="PowerBalance04" html="true" text="#tutorial_power_balance_04" />
-			</Panel>
-		</Panel>
--->
-		<Panel id="Developers" class="InfoBox">
-			<Panel id="DevelopersTextBox" class="TextBox">
-				<Label id="DevelopersTitle" class="Header" html="true" text="DEVELOPERS" />
-				<Label id="Developers01" html="true" text="#developer_credits_01" />
-				<Label id="Developers02" html="true" text="#developer_credits_02" />
+			<Panel id="TitleContent">
+				<Image id="ImbaTitle" class="SeqImg" src="file://{images}/custom_game/tutorial/imba.png" />
+				<Label id="Intro01" class="IntroText" html="true" text="#tutorial_intro_01" />
+				<Label id="Intro02" class="IntroText" html="true" text="#tutorial_intro_02" />
 			</Panel>
 		</Panel>
 
-		<Panel id="Supporters" class="InfoBox">
-			<Panel id="SupportersTextBox" class="TextBox">
-				<Label id="SupportersTitle" class="Header" html="true" text="#tutorial_credits_title" />
-				<Label id="Supporters01" html="true" text="#tutorial_credits_01" />
-				<Label id="Supporters02" html="true" text="#tutorial_credits_02" />
+		<Panel class="InfoRows">
+			<Panel id="Heroes" class="InfoBox">
+				<Panel id="HeroesTextBox" class="TextBox">
+					<Label id="HeroesTitle" class="Header" html="true" text="#tutorial_heroes_title" />
+					<Label id="Heroes01" class="InfoLine" html="true" text="#tutorial_heroes_01" />
+					<Label id="Heroes02" class="InfoLine" html="true" text="#tutorial_heroes_02" />
+					<Label id="Heroes03" class="InfoLine" html="true" text="#tutorial_heroes_03" />
+				</Panel>
+			</Panel>
+
+			<Panel id="Items" class="InfoBox">
+				<Panel id="ItemsTextBox" class="TextBox">
+					<Label id="ItemsTitle" class="Header" html="true" text="#tutorial_items_title" />
+					<Label id="Items01" class="InfoLine" html="true" text="#tutorial_items_01" />
+					<Label id="Items02" class="InfoLine" html="true" text="#tutorial_items_02" />
+					<Label id="Items03" class="InfoLine" html="true" text="#tutorial_items_03" />
+					<Label id="Items04" class="InfoLine" html="true" text="#tutorial_items_04" />
+					<Label id="Items05" class="InfoLine" html="true" text="#tutorial_items_05" />
+				</Panel>
+			</Panel>
+
+			<Panel id="Creeps" class="InfoBox">
+				<Panel id="CreepsTextBox" class="TextBox">
+					<Label id="CreepsTitle" class="Header" html="true" text="#tutorial_creeps_title" />
+					<Label id="Creeps01" class="InfoLine" html="true" text="#tutorial_creeps_01" />
+				</Panel>
+			</Panel>
+
+			<Panel id="Developers" class="InfoBox">
+				<Panel id="DevelopersTextBox" class="TextBox">
+					<Label id="DevelopersTitle" class="Header" html="true" text="#developer_credits_title" />
+					<Label id="Developers01" class="InfoLine" html="true" text="#developer_credits_01" />
+					<Label id="Developers02" class="InfoLine" html="true" text="#developer_credits_02" />
+				</Panel>
+			</Panel>
+
+			<Panel id="Supporters" class="InfoBox">
+				<Panel id="SupportersTextBox" class="TextBox">
+					<Label id="SupportersTitle" class="Header" html="true" text="#tutorial_credits_title" />
+					<Label id="Supporters01" class="InfoLine" html="true" text="#tutorial_credits_01" />
+					<Label id="Supporters02" class="InfoLine" html="true" text="#tutorial_credits_02" />
+				</Panel>
+			</Panel>
+
+			<Panel id="Patreon" class="InfoBox PatreonBox">
+				<Panel id="PatreonCopy" class="PatreonCopy">
+					<Label id="PatreonTitle" class="Header PatreonTitle" html="true" text="#tutorial_patreon_title" />
+					<Label id="PatreonSubtitle" class="PatreonSubtitle" html="true" text="#tutorial_patreon_subtitle" />
+					<Panel class="PatreonBenefits">
+						<Panel class="PatreonBenefitRow">
+							<Panel class="PatreonBenefitDot" />
+							<Label id="Patreon01" class="PatreonBenefitText" html="true" text="#tutorial_patreon_01" />
+						</Panel>
+						<Panel class="PatreonBenefitRow">
+							<Panel class="PatreonBenefitDot" />
+							<Label id="Patreon02" class="PatreonBenefitText" html="true" text="#tutorial_patreon_02" />
+						</Panel>
+						<Panel class="PatreonBenefitRow">
+							<Panel class="PatreonBenefitDot" />
+							<Label id="Patreon03" class="PatreonBenefitText" html="true" text="#tutorial_patreon_03" />
+						</Panel>
+					</Panel>
+					<Panel class="PatreonFooter">
+						<Label id="PatreonNote" class="PatreonNote" html="true" text="#tutorial_patreon_note" />
+
+						<Panel id="PatreonCtaSide" class="PatreonCtaSide">
+							<Button id="PatreonButton" class="PatreonImageButton" onactivate="ExternalBrowserGoToURL('https://www.patreon.com/bePatron?u=2533325');"/>
+						</Panel>
+					</Panel>
+				</Panel>
 			</Panel>
 		</Panel>
 
-		<Label id="End" class="Header" html="true" text="#tutorial_end" />
+		<Panel id="EndCard">
+			<Label id="End" class="HeaderSpecial" html="true" text="#tutorial_end" />
+		</Panel>
 	</Panel>
 </root>

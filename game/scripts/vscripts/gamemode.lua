@@ -1074,32 +1074,56 @@ donator_list[7] = 2 -- Salamander Donator
 donator_list[8] = 3 -- Icefrog Donator
 donator_list[9] = 3 -- Gaben Donator
 
-function GameMode:OnSettingVote(keys)
-	local pid = keys.PlayerID
+function GameMode:OnSettingVote(event_source_index, keys)
+	local payload = keys
 
-	print(keys)
+	-- Dynamic_Wrap + CustomGameEventManager passes (eventSourceIndex, keys)
+	-- Keep compatibility with direct calls that might pass only keys.
+	if type(event_source_index) == "table" and payload == nil then
+		payload = event_source_index
+	end
 
-	if not GameMode.VoteTable then GameMode.VoteTable = {} end
-	if not GameMode.VoteTable[keys.category] then GameMode.VoteTable[keys.category] = {} end
+	if not payload then
+		return
+	end
 
-	if pid >= 0 then
-		if not GameMode.VoteTable[keys.category][pid] then GameMode.VoteTable[keys.category][pid] = {} end
+	local category = payload.category
+	local vote = payload.vote
+	local pid = tonumber(payload.PlayerID or -1)
 
-		GameMode.VoteTable[keys.category][pid][1] = keys.vote
-
-		if api and donator_list[api:GetDonatorStatus(pid)] then
-			GameMode.VoteTable[keys.category][pid][2] = donator_list[api:GetDonatorStatus(pid)]
-		else
-			GameMode.VoteTable[keys.category][pid][2] = 1
+	-- Prefer actual sender when available (prevents spoofing PlayerID from client).
+	if type(event_source_index) == "number" and event_source_index > 0 then
+		local ok, sender = pcall(EntIndexToHScript, event_source_index)
+		if ok and sender ~= nil and sender.GetPlayerID then
+			local sender_player_id = sender:GetPlayerID()
+			if sender_player_id ~= nil and sender_player_id >= 0 then
+				pid = sender_player_id
+			end
 		end
 	end
 
-	--	GameRules:SendCustomMessage(keys.category, 0, 0)
-	--	GameRules:SendCustomMessage(tostring(keys.vote), 0, 0)
+	if category == nil or vote == nil then
+		return
+	end
+
+	if not GameMode.VoteTable then GameMode.VoteTable = {} end
+	if not GameMode.VoteTable[category] then GameMode.VoteTable[category] = {} end
+
+	if pid >= 0 then
+		if not GameMode.VoteTable[category][pid] then GameMode.VoteTable[category][pid] = {} end
+
+		GameMode.VoteTable[category][pid][1] = vote
+
+		if api and donator_list[api:GetDonatorStatus(pid)] then
+			GameMode.VoteTable[category][pid][2] = donator_list[api:GetDonatorStatus(pid)]
+		else
+			GameMode.VoteTable[category][pid][2] = 1
+		end
+	end
 
 	-- TODO: Finish votes show up
 	CustomGameEventManager:Send_ServerToAllClients("send_votes",
-		{ category = keys.category, vote = keys.vote, table = GameMode.VoteTable[keys.category] })
+		{ category = category, vote = vote, table = GameMode.VoteTable[category] })
 end
 
 function GameMode:IsPlayerEligibleForCustomSetupReady(player_id)

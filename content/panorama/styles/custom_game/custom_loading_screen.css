@@ -1325,22 +1325,8 @@ DOTAHudPreGame .TeamSelectContainer {
 	overflow: scroll squish;
 }
 
-.bottom-transifex-container {
-	width: 100%;
-	height: 100%;
-	padding: 8px 10px;
-	flow-children: down;
-	visibility: collapse;
-}
-
-.bottom-patreon-container {
-	width: 100%;
-	height: 100%;
-	padding: 8px 10px;
-	flow-children: down;
-	visibility: collapse;
-}
-
+.bottom-transifex-container,
+.bottom-patreon-container,
 .bottom-discord-container {
 	width: 100%;
 	height: 100%;
@@ -1349,41 +1335,84 @@ DOTAHudPreGame .TeamSelectContainer {
 	visibility: collapse;
 }
 
-.patreon-highlight-card {
+.patreon-highlight-card,
+.discord-highlight-card,
+.transifex-highlight-card {
 	width: 100%;
 	height: 100%;
 	padding: 8px 10px;
 	flow-children: right;
-	background-color: gradient(linear, 0% 0%, 100% 100%, from(#2a1a13f6), to(#150d09f4));
-	border: 1px solid #e08d5e70;
 	box-shadow: fill #000000a8 0px 0px 12px 0px;
 }
 
-.patreon-highlight-copy {
+.patreon-highlight-card {
+	background-color: gradient(linear, 0% 0%, 100% 100%, from(#2a1a13f6), to(#150d09f4));
+	border: 1px solid #e08d5e70;
+}
+
+.discord-highlight-card {
+	background-color: gradient(linear, 0% 0%, 100% 100%, from(#1e2238f6), to(#131627f4));
+	border: 1px solid #6d78ff72;
+}
+
+.transifex-highlight-card {
+	background-color: gradient(linear, 0% 0%, 100% 100%, from(#101d2bf5), to(#09121cf2));
+	border: 1px solid #7bb4d04f;
+}
+
+.patreon-highlight-copy,
+.discord-highlight-copy,
+.transifex-highlight-copy {
 	width: fill-parent-flow(1.0);
 	height: 100%;
 	padding: 6px 8px 4px 8px;
 	flow-children: down;
 }
 
-.patreon-highlight-title {
+.patreon-highlight-title,
+.discord-highlight-title,
+.transifex-highlight-title {
 	width: 100%;
 	font-size: 28px;
 	text-transform: uppercase;
 	letter-spacing: 1px;
-	color: gradient(linear, 0% 0%, 0% 100%, from(#ffe5cf), color-stop(0.55, #ffb07a), to(#d6793f));
 	text-shadow: 0px 2px 8px #000000;
 	font-family: titleFont;
 }
 
-.patreon-highlight-subtitle {
+.patreon-highlight-title {
+	color: gradient(linear, 0% 0%, 0% 100%, from(#ffe5cf), color-stop(0.55, #ffb07a), to(#d6793f));
+}
+
+.discord-highlight-title {
+	color: gradient(linear, 0% 0%, 0% 100%, from(#f2f4ff), color-stop(0.55, #b5c2ff), to(#7f8cff));
+}
+
+.transifex-highlight-title {
+	color: gradient(linear, 0% 0%, 0% 100%, from(#eaf9ff), color-stop(0.58, #9fdbff), to(#6aa7d6));
+}
+
+.patreon-highlight-subtitle,
+.discord-highlight-subtitle,
+.transifex-highlight-subtitle {
 	width: 100%;
 	margin-top: 0px;
 	font-size: 20px;
 	letter-spacing: 0.5px;
-	color: #ffd7bc;
 	text-shadow: 0px 1px 3px #000000;
 	font-family: Reaver;
+}
+
+.patreon-highlight-subtitle {
+	color: #ffd7bc;
+}
+
+.discord-highlight-subtitle {
+	color: #d8deff;
+}
+
+.transifex-highlight-subtitle {
+	color: #d3e8fb;
 }
 
 .patreon-cta-inline-row {
@@ -1392,329 +1421,8 @@ DOTAHudPreGame .TeamSelectContainer {
 	visibility: collapse;
 }
 
-.patreon-cta-side {
-	width: 450px;
-	align: center center;
-	flow-children: down;
-}
-
-.patreon-cta-image-button {
-	width: 434px;
-	height: 102px;
-	align: center center;
-	background-image: url("file://{images}/custom_game/loading_screen/patreon.png");
-	background-size: contain;
-	background-position: 50% 50%;
-	background-repeat: no-repeat;
-	background-color: gradient(linear, 0% 0%, 100% 100%, from(#382115ff), to(#1c110aff));
-	border: 1px solid #f0a26f88;
-	box-shadow: fill #000000a8 0px 0px 8px 0px;
-	transition-property: brightness, pre-transform-scale2d, border;
-	transition-duration: 0.12s;
-}
-
-.patreon-cta-image-button:hover {
-	brightness: 1.12;
-	pre-transform-scale2d: 1.01;
-	border: 1px solid #ffd2b6;
-}
-
-.patreon-cta-image-button:active {
-	pre-transform-scale2d: 0.985;
-}
-
-.patreon-highlight-description {
-	width: 100%;
-	height: fit-children;
-	margin-top: 4px;
-	font-size: 17px;
-	line-height: 21px;
-	color: #a5b7d3;
-	text-shadow: 0px 1px 2px #000000;
-	font-family: Reaver;
-}
-
-.patreon-benefits-list {
-	width: 100%;
-	height: fit-children;
-	margin-top: 4px;
-	flow-children: down;
-}
-
-.patreon-benefit-row {
-	width: 100%;
-	height: fit-children;
-	margin-bottom: 2px;
-	flow-children: right;
-}
-
-.patreon-benefit-dot {
-	width: 8px;
-	height: 8px;
-	margin-top: 6px;
-	margin-right: 10px;
-	border-radius: 50%;
-	background-color: #ffb179;
-	box-shadow: fill #ffb17966 0px 0px 4px 0px;
-}
-
-.patreon-benefit-text {
-	width: fill-parent-flow(1.0);
-	font-size: 15px;
-	line-height: 18px;
-	color: #ffeada;
-	text-shadow: 0px 1px 2px #000000;
-	font-family: Reaver;
-}
-
-.patreon-highlight-footer {
-	width: 100%;
-	height: fit-children;
-	margin-top: 3px;
-	flow-children: down;
-	vertical-align: bottom;
-}
-
-.patreon-highlight-support-note {
-	width: 100%;
-	font-size: 14px;
-	line-height: 16px;
-	color: #dcb59a;
-	text-shadow: 0px 1px 2px #000000;
-	font-family: Reaver;
-}
-
-.discord-highlight-card {
-	width: 100%;
-	height: 100%;
-	padding: 8px 10px;
-	flow-children: right;
-	background-color: gradient(linear, 0% 0%, 100% 100%, from(#1e2238f6), to(#131627f4));
-	border: 1px solid #6d78ff72;
-	box-shadow: fill #000000a8 0px 0px 12px 0px;
-}
-
-.discord-highlight-copy {
-	width: fill-parent-flow(1.0);
-	height: 100%;
-	padding: 6px 8px 4px 8px;
-	flow-children: down;
-}
-
-.discord-highlight-title {
-	width: 100%;
-	font-size: 28px;
-	text-transform: uppercase;
-	letter-spacing: 1px;
-	color: gradient(linear, 0% 0%, 0% 100%, from(#f2f4ff), color-stop(0.55, #b5c2ff), to(#7f8cff));
-	text-shadow: 0px 2px 8px #000000;
-	font-family: titleFont;
-}
-
-.discord-highlight-subtitle {
-	width: 100%;
-	margin-top: 0px;
-	font-size: 20px;
-	letter-spacing: 0.5px;
-	color: #d8deff;
-	text-shadow: 0px 1px 3px #000000;
-	font-family: Reaver;
-}
-
-.discord-highlight-description {
-	width: 100%;
-	margin-top: 4px;
-	font-size: 17px;
-	line-height: 21px;
-	color: #aeb8ec;
-	text-shadow: 0px 1px 2px #000000;
-	font-family: Reaver;
-}
-
-.discord-benefits-list {
-	width: 100%;
-	height: fit-children;
-	margin-top: 4px;
-	flow-children: down;
-}
-
-.discord-benefit-row {
-	width: 100%;
-	height: fit-children;
-	margin-bottom: 2px;
-	flow-children: right;
-}
-
-.discord-benefit-dot {
-	width: 8px;
-	height: 8px;
-	margin-top: 6px;
-	margin-right: 10px;
-	border-radius: 50%;
-	background-color: #8d97ff;
-	box-shadow: fill #8d97ff66 0px 0px 5px 0px;
-}
-
-.discord-benefit-text {
-	width: fill-parent-flow(1.0);
-	font-size: 15px;
-	line-height: 18px;
-	color: #e5e9ff;
-	text-shadow: 0px 1px 2px #000000;
-	font-family: Reaver;
-}
-
-.discord-highlight-footer {
-	width: 100%;
-	height: fit-children;
-	margin-top: 3px;
-	flow-children: down;
-	vertical-align: bottom;
-}
-
-.discord-highlight-support-note {
-	width: 100%;
-	font-size: 14px;
-	line-height: 16px;
-	color: #b5bcef;
-	text-shadow: 0px 1px 2px #000000;
-	font-family: Reaver;
-}
-
-.discord-cta-side {
-	width: 450px;
-	align: center center;
-	flow-children: down;
-}
-
-.discord-cta-image-button {
-	width: 434px;
-	height: 102px;
-	align: center center;
-	background-image: url("file://{images}/custom_game/loading_screen/patreon.png");
-	background-size: contain;
-	background-position: 50% 50%;
-	background-repeat: no-repeat;
-	background-color: gradient(linear, 0% 0%, 100% 100%, from(#2a2f56ff), to(#141832ff));
-	border: 1px solid #b2bcff88;
-	box-shadow: fill #000000a8 0px 0px 8px 0px;
-	transition-property: brightness, pre-transform-scale2d, border;
-	transition-duration: 0.12s;
-}
-
-.discord-cta-image-button:hover {
-	brightness: 1.12;
-	pre-transform-scale2d: 1.01;
-	border: 1px solid #dfe4ff;
-}
-
-.discord-cta-image-button:active {
-	pre-transform-scale2d: 0.985;
-}
-
-.transifex-highlight-card {
-	width: 100%;
-	height: 100%;
-	padding: 8px 10px;
-	flow-children: right;
-	background-color: gradient(linear, 0% 0%, 100% 100%, from(#101d2bf5), to(#09121cf2));
-	border: 1px solid #7bb4d04f;
-	box-shadow: fill #000000a8 0px 0px 12px 0px;
-}
-
-.transifex-highlight-copy {
-	width: fill-parent-flow(1.0);
-	height: 100%;
-	padding: 6px 8px 4px 8px;
-	flow-children: down;
-}
-
-.transifex-highlight-title {
-	width: 100%;
-	font-size: 28px;
-	text-transform: uppercase;
-	letter-spacing: 1px;
-	color: gradient(linear, 0% 0%, 0% 100%, from(#eaf9ff), color-stop(0.58, #9fdbff), to(#6aa7d6));
-	text-shadow: 0px 2px 8px #000000;
-	font-family: titleFont;
-}
-
-.transifex-highlight-subtitle {
-	width: 100%;
-	margin-top: 0px;
-	font-size: 20px;
-	letter-spacing: 0.5px;
-	color: #d3e8fb;
-	text-shadow: 0px 1px 3px #000000;
-	font-family: Reaver;
-}
-
-.transifex-highlight-description {
-	width: 100%;
-	margin-top: 4px;
-	font-size: 17px;
-	line-height: 21px;
-	color: #a9c4dc;
-	text-shadow: 0px 1px 2px #000000;
-	font-family: Reaver;
-}
-
-.transifex-benefits-list {
-	width: 100%;
-	height: fit-children;
-	margin-top: 4px;
-	flow-children: down;
-}
-
-.transifex-benefit-row {
-	width: 100%;
-	height: fit-children;
-	margin-bottom: 2px;
-	flow-children: right;
-}
-
-.transifex-benefit-dot {
-	width: 8px;
-	height: 8px;
-	margin-top: 6px;
-	margin-right: 10px;
-	border-radius: 50%;
-	background-color: #8ed8ff;
-	box-shadow: fill #8ed8ff66 0px 0px 5px 0px;
-}
-
-.transifex-benefit-text {
-	width: fill-parent-flow(1.0);
-	font-size: 15px;
-	line-height: 18px;
-	color: #dcedff;
-	text-shadow: 0px 1px 2px #000000;
-	font-family: Reaver;
-}
-
-.transifex-highlight-footer {
-	width: 100%;
-	height: fit-children;
-	margin-top: 3px;
-	flow-children: down;
-	vertical-align: bottom;
-}
-
-.transifex-highlight-support-note {
-	width: 100%;
-	font-size: 14px;
-	line-height: 16px;
-	color: #9bb5cf;
-	text-shadow: 0px 1px 2px #000000;
-	font-family: Reaver;
-}
-
-.transifex-cta-side {
-	width: 450px;
-	align: center center;
-	flow-children: down;
-}
-
+.patreon-cta-image-button,
+.discord-cta-image-button,
 .transifex-cta-image-button {
 	width: 434px;
 	height: 102px;
@@ -1723,21 +1431,178 @@ DOTAHudPreGame .TeamSelectContainer {
 	background-size: contain;
 	background-position: 50% 50%;
 	background-repeat: no-repeat;
-	background-color: gradient(linear, 0% 0%, 100% 100%, from(#132a3dff), to(#0a1826ff));
-	border: 1px solid #7bb4d0aa;
 	box-shadow: fill #000000a8 0px 0px 8px 0px;
 	transition-property: brightness, pre-transform-scale2d, border;
 	transition-duration: 0.12s;
 }
 
+.patreon-cta-image-button {
+	background-color: gradient(linear, 0% 0%, 100% 100%, from(#382115ff), to(#1c110aff));
+	border: 1px solid #f0a26f88;
+}
+
+.discord-cta-image-button {
+	background-color: gradient(linear, 0% 0%, 100% 100%, from(#2a2f56ff), to(#141832ff));
+	border: 1px solid #b2bcff88;
+}
+
+.transifex-cta-image-button {
+	background-color: gradient(linear, 0% 0%, 100% 100%, from(#132a3dff), to(#0a1826ff));
+	border: 1px solid #7bb4d0aa;
+}
+
+.patreon-cta-image-button:hover,
+.discord-cta-image-button:hover,
 .transifex-cta-image-button:hover {
 	brightness: 1.12;
 	pre-transform-scale2d: 1.01;
+}
+
+.patreon-cta-image-button:hover {
+	border: 1px solid #ffd2b6;
+}
+
+.discord-cta-image-button:hover {
+	border: 1px solid #dfe4ff;
+}
+
+.transifex-cta-image-button:hover {
 	border: 1px solid #d3ecff;
 }
 
+.patreon-cta-image-button:active,
+.discord-cta-image-button:active,
 .transifex-cta-image-button:active {
 	pre-transform-scale2d: 0.985;
+}
+
+.patreon-highlight-description,
+.discord-highlight-description,
+.transifex-highlight-description {
+	width: 100%;
+	margin-top: 4px;
+	font-size: 17px;
+	line-height: 21px;
+	text-shadow: 0px 1px 2px #000000;
+	font-family: Reaver;
+}
+
+.patreon-highlight-description {
+	height: fit-children;
+	color: #a5b7d3;
+}
+
+.discord-highlight-description {
+	color: #aeb8ec;
+}
+
+.transifex-highlight-description {
+	color: #a9c4dc;
+}
+
+.patreon-benefits-list,
+.discord-benefits-list,
+.transifex-benefits-list {
+	width: 100%;
+	height: fit-children;
+	margin-top: 4px;
+	flow-children: down;
+}
+
+.patreon-benefit-row,
+.discord-benefit-row,
+.transifex-benefit-row {
+	width: 100%;
+	height: fit-children;
+	margin-bottom: 2px;
+	flow-children: right;
+}
+
+.patreon-benefit-dot,
+.discord-benefit-dot,
+.transifex-benefit-dot {
+	width: 8px;
+	height: 8px;
+	margin-top: 6px;
+	margin-right: 10px;
+	border-radius: 50%;
+}
+
+.patreon-benefit-dot {
+	background-color: #ffb179;
+	box-shadow: fill #ffb17966 0px 0px 4px 0px;
+}
+
+.discord-benefit-dot {
+	background-color: #8d97ff;
+	box-shadow: fill #8d97ff66 0px 0px 5px 0px;
+}
+
+.transifex-benefit-dot {
+	background-color: #8ed8ff;
+	box-shadow: fill #8ed8ff66 0px 0px 5px 0px;
+}
+
+.patreon-benefit-text,
+.discord-benefit-text,
+.transifex-benefit-text {
+	width: fill-parent-flow(1.0);
+	font-size: 15px;
+	line-height: 18px;
+	text-shadow: 0px 1px 2px #000000;
+	font-family: Reaver;
+}
+
+.patreon-benefit-text {
+	color: #ffeada;
+}
+
+.discord-benefit-text {
+	color: #e5e9ff;
+}
+
+.transifex-benefit-text {
+	color: #dcedff;
+}
+
+.patreon-highlight-footer,
+.discord-highlight-footer,
+.transifex-highlight-footer {
+	width: 100%;
+	height: fit-children;
+	margin-top: 3px;
+	flow-children: down;
+	vertical-align: bottom;
+}
+
+.patreon-highlight-support-note,
+.discord-highlight-support-note,
+.transifex-highlight-support-note {
+	width: 100%;
+	font-size: 14px;
+	line-height: 16px;
+	text-shadow: 0px 1px 2px #000000;
+	font-family: Reaver;
+}
+
+.patreon-highlight-support-note {
+	color: #dcb59a;
+}
+
+.discord-highlight-support-note {
+	color: #b5bcef;
+}
+
+.transifex-highlight-support-note {
+	color: #9bb5cf;
+}
+
+.patreon-cta-side,
+.discord-cta-side,
+.transifex-cta-side {
+	width: 450px;
+	align: center center;
+	flow-children: down;
 }
 
 .mod-cell {
@@ -2032,6 +1897,7 @@ DOTAHudPreGame .TeamSelectContainer {
 	text-align: right center;
 	color: #f2dfb8;
 	font-family: Reaver;
+	text-overflow: shrink;
 }
 
 .vote-label.VoteSelectedOption {
@@ -2542,28 +2408,14 @@ DOTAHudPreGame .TeamSelectContainer {
 	height: 30%;
 }
 
-.AspectRatio21x9 .patreon-cta-side {
-	width: 364px;
-}
-
-.AspectRatio21x9 .patreon-cta-image-button {
-	width: 348px;
-	height: 82px;
-}
-
-.AspectRatio21x9 .transifex-cta-side {
-	width: 364px;
-}
-
-.AspectRatio21x9 .transifex-cta-image-button {
-	width: 348px;
-	height: 82px;
-}
-
+.AspectRatio21x9 .patreon-cta-side,
+.AspectRatio21x9 .transifex-cta-side,
 .AspectRatio21x9 .discord-cta-side {
 	width: 364px;
 }
 
+.AspectRatio21x9 .patreon-cta-image-button,
+.AspectRatio21x9 .transifex-cta-image-button,
 .AspectRatio21x9 .discord-cta-image-button {
 	width: 348px;
 	height: 82px;
@@ -2585,85 +2437,41 @@ DOTAHudPreGame .TeamSelectContainer {
 	height: 37%;
 }
 
-.AspectRatio4x3 .patreon-highlight-title {
-	font-size: 24px;
-}
-
-.AspectRatio4x3 .transifex-highlight-title {
-	font-size: 24px;
-}
-
+.AspectRatio4x3 .patreon-highlight-title,
+.AspectRatio4x3 .transifex-highlight-title,
 .AspectRatio4x3 .discord-highlight-title {
 	font-size: 24px;
 }
 
-.AspectRatio4x3 .patreon-highlight-subtitle {
-	font-size: 17px;
-}
-
-.AspectRatio4x3 .transifex-highlight-subtitle {
-	font-size: 17px;
-}
-
+.AspectRatio4x3 .patreon-highlight-subtitle,
+.AspectRatio4x3 .transifex-highlight-subtitle,
 .AspectRatio4x3 .discord-highlight-subtitle {
 	font-size: 17px;
 }
 
-.AspectRatio4x3 .patreon-benefit-text {
-	font-size: 13px;
-	line-height: 15px;
-}
-
-.AspectRatio4x3 .transifex-benefit-text {
-	font-size: 13px;
-	line-height: 15px;
-}
-
+.AspectRatio4x3 .patreon-benefit-text,
+.AspectRatio4x3 .transifex-benefit-text,
 .AspectRatio4x3 .discord-benefit-text {
 	font-size: 13px;
 	line-height: 15px;
 }
 
-.AspectRatio4x3 .patreon-highlight-support-note {
-	font-size: 12px;
-	line-height: 14px;
-}
-
-.AspectRatio4x3 .transifex-highlight-support-note {
-	font-size: 12px;
-	line-height: 14px;
-}
-
+.AspectRatio4x3 .patreon-highlight-support-note,
+.AspectRatio4x3 .transifex-highlight-support-note,
 .AspectRatio4x3 .discord-highlight-support-note {
 	font-size: 12px;
 	line-height: 14px;
 }
 
-.AspectRatio4x3 .patreon-cta-side {
-	width: 232px;
-	margin-left: 8px;
-}
-
-.AspectRatio4x3 .patreon-cta-image-button {
-	width: 216px;
-	height: 51px;
-}
-
-.AspectRatio4x3 .transifex-cta-side {
-	width: 232px;
-	margin-left: 8px;
-}
-
-.AspectRatio4x3 .transifex-cta-image-button {
-	width: 216px;
-	height: 51px;
-}
-
+.AspectRatio4x3 .patreon-cta-side,
+.AspectRatio4x3 .transifex-cta-side,
 .AspectRatio4x3 .discord-cta-side {
 	width: 232px;
 	margin-left: 8px;
 }
 
+.AspectRatio4x3 .patreon-cta-image-button,
+.AspectRatio4x3 .transifex-cta-image-button,
 .AspectRatio4x3 .discord-cta-image-button {
 	width: 216px;
 	height: 51px;
@@ -2673,82 +2481,40 @@ DOTAHudPreGame .TeamSelectContainer {
 	height: 22%;
 }
 
-.AspectRatio16x10 .patreon-highlight-title {
-	font-size: 26px;
-}
-
-.AspectRatio16x10 .transifex-highlight-title {
-	font-size: 26px;
-}
-
+.AspectRatio16x10 .patreon-highlight-title,
+.AspectRatio16x10 .transifex-highlight-title,
 .AspectRatio16x10 .discord-highlight-title {
 	font-size: 26px;
 }
 
-.AspectRatio16x10 .patreon-highlight-subtitle {
-	font-size: 18px;
-}
-
-.AspectRatio16x10 .transifex-highlight-subtitle {
-	font-size: 18px;
-}
-
+.AspectRatio16x10 .patreon-highlight-subtitle,
+.AspectRatio16x10 .transifex-highlight-subtitle,
 .AspectRatio16x10 .discord-highlight-subtitle {
 	font-size: 18px;
 }
 
-.AspectRatio16x10 .patreon-benefit-text {
-	font-size: 14px;
-	line-height: 16px;
-}
-
-.AspectRatio16x10 .transifex-benefit-text {
-	font-size: 14px;
-	line-height: 16px;
-}
-
+.AspectRatio16x10 .patreon-benefit-text,
+.AspectRatio16x10 .transifex-benefit-text,
 .AspectRatio16x10 .discord-benefit-text {
 	font-size: 14px;
 	line-height: 16px;
 }
 
-.AspectRatio16x10 .patreon-highlight-support-note {
-	font-size: 13px;
-	line-height: 15px;
-}
-
-.AspectRatio16x10 .transifex-highlight-support-note {
-	font-size: 13px;
-	line-height: 15px;
-}
-
+.AspectRatio16x10 .patreon-highlight-support-note,
+.AspectRatio16x10 .transifex-highlight-support-note,
 .AspectRatio16x10 .discord-highlight-support-note {
 	font-size: 13px;
 	line-height: 15px;
 }
 
-.AspectRatio16x10 .patreon-cta-side {
-	width: 292px;
-}
-
-.AspectRatio16x10 .patreon-cta-image-button {
-	width: 276px;
-	height: 65px;
-}
-
-.AspectRatio16x10 .transifex-cta-side {
-	width: 292px;
-}
-
-.AspectRatio16x10 .transifex-cta-image-button {
-	width: 276px;
-	height: 65px;
-}
-
+.AspectRatio16x10 .patreon-cta-side,
+.AspectRatio16x10 .transifex-cta-side,
 .AspectRatio16x10 .discord-cta-side {
 	width: 292px;
 }
 
+.AspectRatio16x10 .patreon-cta-image-button,
+.AspectRatio16x10 .transifex-cta-image-button,
 .AspectRatio16x10 .discord-cta-image-button {
 	width: 276px;
 	height: 65px;

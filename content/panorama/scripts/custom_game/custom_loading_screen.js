@@ -30,7 +30,7 @@ var LOADING_SCREEN_CONFIG = {
 	},
 	tools: {
 		lobby_simulation_enabled: true,
-		player_count: 19,
+		player_count: 7,
 		ready_stagger_seconds: 0.55,
 	},
 	ready: {
@@ -1553,10 +1553,8 @@ function GetPlayerTeamIDFromInfo(player_info, fallback_team_id) {
 
 function GetToolsModeLobbyTeamID(player_index, local_team_id) {
 	var friendly_team_id = local_team_id;
-	var enemy_team_id = GetOppositeCoreTeamID(local_team_id);
-
-	// Keep the local player as slot 8 and split tools players 3/4 around that.
-	return player_index < 3 ? friendly_team_id : enemy_team_id;
+	// Tools-mode QA: keep every simulated player in the same team as local player.
+	return friendly_team_id;
 }
 
 function GetTeamSectionKey(team_id) {

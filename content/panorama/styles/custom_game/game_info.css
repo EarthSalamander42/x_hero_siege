@@ -1,99 +1,366 @@
-.OverthrowGameInfo
-{
-	width: 95%;
-	margin-top: -50px;
+.OverthrowGameInfo {
+	width: 90%;
+	margin-top: 4px;
+	padding-right: 6px;
+	padding-bottom: 18px;
 	flow-children: down;
 }
 
-Label
-{
+.OverthrowGameInfo Label {
 	font-size: 18px;
-	color: #999999;
-	vertical-align: top;
-	margin-top: 8px;
+	color: #d4deef;
+	margin-top: 0px;
+	text-shadow: 0px 1px 2px #000000;
+	font-family: Reaver;
 }
 
-#Intro01,
-#Intro02
-{
-	width: 95%;
-	horizontal-align: left;
-}
-
-#ImbaTitle
-{
-	horizontal-align: center;
-}
-
-.HeaderSpecial
-{
-	font-size: 30px;
-	font-weight: bold;
-	margin-top: 24px;
-	horizontal-align: center;
-	color: #FF7800;
-}
-
-.Header
-{
-	font-size: 18px;
-	font-weight: bold;
-	margin-top: 24px;
-}
-
-.InfoBox
-{
-	flow-children: right;
-	width: 95%;
-	horizontal-align: left;
-}
-
-#HeroesTextBox
-{
+#Title {
+	width: 100%;
+	height: fit-children;
+	margin-bottom: 12px;
 	flow-children: down;
-	horizontal-align: left;
-	width: 95%;
+	background-color: gradient(linear, 0% 0%, 100% 100%, from(#131a27f6), to(#090f17f2));
+	border: 1px solid #d5b87866;
+	box-shadow: fill #000000bb 0px 0px 14px 0px;
 }
 
-#HeroesImage
-{
-	margin-top: 2px;
-	horizontal-align: left;
-	vertical-align: center;
+#InfoHeroArt {
+	width: 100%;
+	height: 190px;
+	background-image: url("file://{images}/custom_game/loading_screen/bg.jpg");
+	background-size: cover;
+	background-position: 50% 42%;
+	background-repeat: no-repeat;
+	border-bottom: 1px solid #d5b87833;
+}
+
+#InfoHeroTint {
+	width: 100%;
 	height: 100%;
+	background-color: gradient(linear, 0% 0%, 100% 100%, from(#0a111ada), to(#1f2e4380));
 }
 
-#AbilitiesImage
-{
-	margin-top: 24px;
-	width: 93%;
-	height: 52px;
-	horizontal-align: left;
-	flow-children: right;
-}
-
-.TextBox
-{
+#TitleContent {
+	width: 100%;
+	height: fit-children;
+	padding: 14px 18px 12px 18px;
 	flow-children: down;
+}
+
+#ImbaTitle {
+	width: 350px;
+	height: 58px;
+	horizontal-align: left;
+	margin-bottom: 6px;
+	opacity: 0.95;
+}
+
+.IntroText {
+	width: 100%;
+	font-size: 18px;
+	line-height: 23px;
+	color: #e4ecfa;
+	margin-top: 4px;
+	text-overflow: shrink;
+}
+
+.InfoRows {
+	width: 100%;
+	height: fit-children;
+	flow-children: down;
+}
+
+.InfoRow {
+	visibility: collapse;
+}
+
+.InfoRow.Single {
+	visibility: collapse;
+}
+
+.InfoBox {
+	width: 100%;
+	height: fit-children;
+	margin-right: 0px;
+	margin-bottom: 8px;
+	padding: 10px 12px;
+	flow-children: down;
+	background-color: gradient(linear, 0% 0%, 100% 100%, from(#121b2af2), to(#0a1220ef));
+	border: 1px solid #d5b87855;
+	box-shadow: fill #000000a5 0px 0px 12px 0px;
+}
+
+.InfoBox.NoRightMargin,
+.InfoBox.FullWidth {
+	margin-right: 0px;
+}
+
+.InfoBox.FullWidth {
 	width: 100%;
 }
 
-#ItemsImage
-{
-	margin-top: 24px;
-	width: 93%;
-	height: 48px;
-	horizontal-align: left;
+.TextBox {
+	width: 100%;
+	height: fit-children;
+	flow-children: down;
+}
+
+.Header {
+	width: 100%;
+	margin-top: 0px;
+	margin-bottom: 6px;
+	font-size: 28px;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+	color: gradient(linear, 0% 0%, 0% 100%, from(#fff7e1), color-stop(0.56, #f2d190), to(#c99d58));
+	text-shadow: 0px 2px 6px #000000;
+	font-family: titleFont;
+}
+
+.InfoLine {
+	width: 100%;
+	margin-top: 2px;
+	font-size: 17px;
+	line-height: 22px;
+	color: #d7e1f2;
+}
+
+#Patreon {
+	border: 1px solid #f0ab6d88;
+	background-color: gradient(linear, 0% 0%, 100% 100%, from(#3a2418f2), to(#1a1010ef));
+}
+
+.PatreonBox {
+	padding: 10px 12px;
+	flow-children: down;
+}
+
+.PatreonCopy {
+	width: fill-parent-flow(1.0);
+	height: fit-children;
+	padding: 2px 4px 2px 2px;
+	flow-children: down;
+}
+
+.PatreonTitle {
+	margin-bottom: 4px;
+}
+
+.PatreonSubtitle {
+	width: 100%;
+	margin-top: 0px;
+	margin-bottom: 5px;
+	font-size: 19px;
+	line-height: 24px;
+	color: #ffe6d2;
+	font-weight: semi-bold;
+}
+
+.PatreonBenefits {
+	width: 100%;
+	height: fit-children;
+	margin-top: 2px;
+	flow-children: down;
+}
+
+.PatreonBenefitRow {
+	width: 100%;
+	height: fit-children;
+	margin-bottom: 3px;
 	flow-children: right;
 }
 
-#End
-{
-	font-size: 24;
+.PatreonBenefitDot {
+	width: 8px;
+	height: 8px;
+	margin-top: 6px;
+	margin-right: 10px;
+	border-radius: 50%;
+	background-color: #ffb179;
+	box-shadow: fill #ffb17966 0px 0px 4px 0px;
 }
 
-.AbilityIcon
-{
-	margin: 2px;
-	border: 1px solid #121212FF;
+.PatreonBenefitText {
+	font-size: 15px;
+	line-height: 20px;
+	color: #ffeada;
+	text-shadow: 0px 1px 2px #000000;
+	font-family: Reaver;
+}
+
+.PatreonFooter {
+	width: 100%;
+	height: fit-children;
+	margin-top: 4px;
+	flow-children: down;
+}
+
+.PatreonNote {
+	width: 100%;
+	margin-top: 0px;
+	font-size: 14px;
+	line-height: 18px;
+	color: #f0c89f;
+	text-shadow: 0px 1px 2px #000000;
+	font-family: Reaver;
+}
+
+.PatreonCtaSide {
+	margin-top: 20px;
+	width: 404px;
+	height: 100px;
+	flow-children: down;
+	align: center center;
+}
+
+.PatreonImageButton {
+	width: 388px;
+	height: 92px;
+	align: center center;
+	background-image: url("file://{images}/custom_game/loading_screen/patreon.png");
+	background-size: contain;
+	background-position: 50% 50%;
+	background-repeat: no-repeat;
+	background-color: gradient(linear, 0% 0%, 100% 100%, from(#382115ff), to(#1c110aff));
+	border: 1px solid #f0a26f88;
+	box-shadow: fill #00000099 0px 1px 8px 0px;
+	transition-property: brightness, pre-transform-scale2d, border;
+	transition-duration: 0.14s;
+	transition-timing-function: ease-in-out;
+}
+
+.PatreonImageButton:hover {
+	brightness: 1.12;
+	pre-transform-scale2d: 1.01;
+	border: 1px solid #ffd2b6;
+}
+
+.PatreonImageButton:active {
+	pre-transform-scale2d: 0.985;
+}
+
+.PatreonImageButtonLabel {
+	width: 100%;
+	font-size: 0px;
+	color: #00000000;
+}
+
+#EndCard {
+	width: 100%;
+	padding: 8px 12px;
+	margin-top: 2px;
+	background-color: gradient(linear, 0% 0%, 100% 100%, from(#111927f2), to(#090f18ef));
+	border: 1px solid #d5b87866;
+	box-shadow: fill #000000a5 0px 0px 10px 0px;
+}
+
+.HeaderSpecial {
+	width: 100%;
+	font-size: 30px;
+	letter-spacing: 2px;
+	text-transform: uppercase;
+	text-align: center center;
+	color: gradient(linear, 0% 0%, 0% 100%, from(#fff7e1), color-stop(0.56, #f2d190), to(#c99d58));
+	text-shadow: 0px 2px 6px #000000;
+	font-family: titleFont;
+}
+
+#End {
+	width: 100%;
+}
+
+.AspectRatio16x10 #Title {
+	height: fit-children;
+}
+
+.AspectRatio16x10 #InfoHeroArt {
+	height: 176px;
+}
+
+.AspectRatio16x10 #ImbaTitle {
+	width: 320px;
+	height: 54px;
+}
+
+.AspectRatio16x10 .Header {
+	font-size: 25px;
+}
+
+.AspectRatio16x10 .InfoLine {
+	font-size: 16px;
+	line-height: 21px;
+}
+
+.AspectRatio4x3 #Title {
+	height: fit-children;
+}
+
+.AspectRatio4x3 #InfoHeroArt {
+	width: 100%;
+	height: 148px;
+}
+
+.AspectRatio4x3 #ImbaTitle {
+	width: 270px;
+	height: 46px;
+}
+
+.AspectRatio4x3 .IntroText {
+	font-size: 15px;
+	line-height: 20px;
+}
+
+.AspectRatio4x3 .Header {
+	font-size: 22px;
+}
+
+.AspectRatio4x3 .InfoLine {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+.AspectRatio4x3 .HeaderSpecial {
+	font-size: 25px;
+}
+
+.AspectRatio4x3 .PatreonSubtitle {
+	font-size: 16px;
+	line-height: 21px;
+}
+
+.AspectRatio4x3 .PatreonNote {
+	font-size: 13px;
+	line-height: 17px;
+}
+
+.AspectRatio4x3 .PatreonCtaSide {
+	width: 288px;
+}
+
+.AspectRatio4x3 .PatreonImageButton {
+	width: 276px;
+	height: 64px;
+}
+
+.AspectRatio16x10 .PatreonCtaSide {
+	width: 332px;
+}
+
+.AspectRatio16x10 .PatreonImageButton {
+	width: 320px;
+	height: 76px;
+}
+
+.AspectRatio21x9 #Title {
+	height: fit-children;
+}
+
+.AspectRatio21x9 #InfoHeroArt {
+	width: 100%;
+	height: 214px;
+}
+
+.AspectRatio21x9 .InfoLine {
+	font-size: 18px;
+	line-height: 23px;
 }

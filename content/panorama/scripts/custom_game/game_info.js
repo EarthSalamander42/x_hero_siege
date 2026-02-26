@@ -1,7 +1,14 @@
 "use strict";
 
 (function() {
-/*
+	// var parent = $.GetContextPanel().GetParent().GetParent().GetParent().GetParent().FindChildTraverse("GameInfoPanel");
+	
+	// if (parent) {
+	// 	parent.style.width = "600px";
+	// }
+
+
+	/*
 	var AbilityPanel = $("#AbilitiesImage");
 
 	var abilities = [
