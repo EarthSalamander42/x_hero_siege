@@ -665,14 +665,6 @@
 	width: 100%;
 }
 
-/* Hide vanilla pregame team selection panel on loading screen */
-DOTAHudPreGame .TeamSelect,
-DOTAHudPreGame #TeamSelect,
-DOTAHudPreGame #TeamSelectContainer,
-DOTAHudPreGame .TeamSelectContainer {
-	visibility: collapse;
-}
-
 /* -------------------------------------------------------------------------- */
 /* Final Loading Theme (Mockup 1)                                             */
 /* -------------------------------------------------------------------------- */

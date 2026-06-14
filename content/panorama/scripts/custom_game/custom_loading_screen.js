@@ -268,6 +268,19 @@ function SafeSerializeForLog(data) {
 	}
 }
 
+function LoadingScreenLog(scope, message, data) {
+	if (!loading_screen_logs_enabled) {
+		return;
+	}
+
+	var prefix = "[XHS_LOADING_HIDE][" + scope + "] " + message;
+	if (data !== undefined) {
+		$.Msg(prefix + " | " + SafeSerializeForLog(data));
+	} else {
+		$.Msg(prefix);
+	}
+}
+
 function BuildSetupStatusSignature(setup_status) {
 	if (!setup_status) {
 		return "none";

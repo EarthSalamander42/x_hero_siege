@@ -135,16 +135,29 @@ var TopBarDireTeam = hudElements.FindChildTraverse("TopBarDireTeam");
 TopBarDireTeam.style.visibility = "collapse";
 
 var Parent = $.GetContextPanel().GetParent().GetParent();
-var PreGame = Parent.FindChildTraverse("PreGame")
 
-// setup modified vanilla HUD
+// Loading screen custom UI runs in an isolated DotaLoadingScreen context and
+// cannot reliably reach these vanilla pregame panels. This override must stay
+// in a HUD-context script such as init.js.
 SetupLoadingScreen();
 
 function SetupLoadingScreen() {
-	if (Parent.FindChildTraverse("GameAndPlayersRoot") == undefined || Parent.FindChildTraverse("TeamsList") == undefined || Parent.FindChildTraverse("TeamsListGroup") == undefined || Parent.FindChildTraverse("CancelAndUnlockButton") == undefined || Parent.FindChildTraverse("UnassignedPlayerPanel") == undefined || Parent.FindChildTraverse("ShuffleTeamAssignmentButton") == undefined)
-		$.Schedule(0.1, SetupLoadingScreen);
-	else {
-		Parent.FindChildTraverse("GameAndPlayersRoot").style.visibility = "collapse";
-		Parent.FindChildTraverse("TeamsList").style.visibility = "collapse";
+	var required_panels = [
+		"GameAndPlayersRoot",
+		"TeamsList",
+		"TeamsListGroup",
+		"CancelAndUnlockButton",
+		"UnassignedPlayerPanel",
+		"ShuffleTeamAssignmentButton",
+	];
+
+	for (var i = 0; i < required_panels.length; i++) {
+		if (Parent.FindChildTraverse(required_panels[i]) == undefined) {
+			$.Schedule(0.1, SetupLoadingScreen);
+			return;
+		}
 	}
+
+	Parent.FindChildTraverse("GameAndPlayersRoot").style.visibility = "collapse";
+	Parent.FindChildTraverse("TeamsList").style.visibility = "collapse";
 }
