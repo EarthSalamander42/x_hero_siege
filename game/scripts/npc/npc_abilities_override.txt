@@ -1,4 +1,6 @@
 // Dota Abilities Override File
+#base generated/removed_dota_items.txt
+
 "DOTAAbilities"
 {
 	"Version"	"1"

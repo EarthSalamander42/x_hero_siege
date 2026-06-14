@@ -1,0 +1,24 @@
+# Manual whitelist for official Dota items that X Hero Siege is allowed to keep.
+# One item name per line. Blank lines and comments are ignored.
+#
+# This file means "do not auto-REMOVE this official item".
+# It does not necessarily mean the item is purchasable; npc_abilities_override.txt can still
+# override properties such as ItemPurchasable.
+
+# [Core Dota Items Intentionally Kept]
+item_tpscroll
+item_monkey_king_bar
+item_ward_observer
+item_ward_sentry
+item_clarity
+item_flask
+item_dust
+
+# [XHS Shop Dependencies]
+# Items listed in game/scripts/shops/*.txt are added automatically by the generator.
+
+# [XHS Custom Item Dependencies]
+# Items declared in game/scripts/npc/npc_items_custom.txt are added automatically by the generator.
+
+# [Temporary Patch Exceptions]
+# Add new official items here only if XHS should intentionally keep them visible/available.
