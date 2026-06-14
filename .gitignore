@@ -25,3 +25,7 @@
 game/scripts/vscripts/components/api/backend_key.kv
 *.vmap
 game/scripts/vscripts/components/api/.gitattributes
+*.vtex_c
+
+# Local Valve KV source used by scripts/update_removed_dota_items.js
+scripts/dota_item_removal/official_dota_items.txt

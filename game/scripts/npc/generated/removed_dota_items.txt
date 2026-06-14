@@ -1,0 +1,8 @@
+// AUTO-GENERATED FILE - DO NOT EDIT BY HAND
+// Regenerate with: node scripts/update_removed_dota_items.js
+//
+// This file removes official Dota items that are not explicitly allowed for X Hero Siege.
+
+"DOTAAbilities"
+{
+}

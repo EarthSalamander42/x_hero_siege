@@ -1,52 +1,36 @@
 .Timers {
-	horizontal-align: center;
+	horizontal-align: right;
 	vertical-align: top;
-	margin-top: 16px;
+	margin-top: 42px;
+	margin-right: 210px;
 	flow-children: none;
 }
 
 .TimerShell {
 	flow-children: right;
-	padding: 8px;
-	border-radius: 14px;
-	background-color: gradient( linear, 0% 0%, 100% 0%, from( #0b1c2bd9 ), to( #0e3048d9 ) );
-	border: 1px solid #5ad0ff44;
-	box-shadow: fill #000000aa -6px -6px 12px 12px;
+	padding: 5px;
+	background-color: #081521d8;
+	border: 1px solid #4a8fb055;
+	box-shadow: #00000066 0px 2px 6px 0px;
 	animation-name: shellFadeIn;
 	animation-duration: 0.35s;
 	visibility: collapse;
 }
 
-.TimerBackground {
-	width: 100%;
-	height: 100%;
-	opacity: 0.45;
-	background-image: url("s2r://panorama/images/backgrounds/bp_background2_psd.vtex");
-	background-size: cover;
-	blur: gaussian(4);
-	horizontal-align: center;
-	vertical-align: center;
-	position: 0;
-	ignore-parent-flow: true;
-	border-radius: 12px;
-}
-
 .TimerTray {
 	flow-children: right;
-	margin-left: 6px;
+	margin-left: 4px;
 }
 
 .TimerCard {
 	flow-children: down;
-	width: 120px;
-	min-height: 62px;
-	padding: 6px 8px 7px 8px;
-	margin: 2px;
-	background-color: gradient( linear, 0% 0%, 0% 100%, from( #15334dff ), to( #0d1f33ff ) );
-	border: 1px solid #5ad0ff88;
-	box-shadow: 0px 4px 12px #00000088;
-	border-radius: 10px;
-	opacity-mask: url("s2r://panorama/images/masks/gradient_horizontal_png.vtex");
+	width: 104px;
+	min-height: 46px;
+	padding: 4px 7px 5px 7px;
+	margin: 1px;
+	background-color: gradient( linear, 0% 0%, 0% 100%, from( #173348f2 ), to( #0b1a28f2 ) );
+	border: 1px solid #5bb7d566;
+	box-shadow: #00000055 0px 1px 4px 0px;
 	transition-property: brightness, transform;
 	transition-duration: 0.12s;
 }
@@ -57,10 +41,10 @@
 }
 
 .GameClock {
-	width: 140px;
-	background-color: gradient( linear, 0% 0%, 100% 0%, from( #0f90ff ), to( #35bdee ) );
-	border: 1px solid #a8e3ff;
-	box-shadow: 0px 6px 14px #061724cc;
+	width: 112px;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #1a9be8f4 ), to( #39c2eff4 ) );
+	border: 1px solid #a8e3ff99;
+	box-shadow: #00000055 0px 1px 5px 0px;
 }
 
 .TopbarPanel {
@@ -78,27 +62,27 @@
 .TopbarPanelLabel {
 	text-align: left;
 	width: 100%;
-	margin-bottom: 2px;
-	letter-spacing: 1px;
-	font-size: 13px;
+	margin-bottom: 1px;
+	letter-spacing: 0px;
+	font-size: 11px;
 	font-weight: semi-bold;
-	color: #b9d9ff;
+	color: #b9d9ffff;
 	text-transform: uppercase;
 	text-overflow: shrink;
 }
 
 .TimerLabelTitle {
-	font-size: 12px;
+	font-size: 11px;
 	font-weight: bold;
 	text-transform: uppercase;
-	letter-spacing: 1px;
-	color: #083354;
+	letter-spacing: 0px;
+	color: #06304c;
 	text-align: left;
-	margin-bottom: 2px;
+	margin-bottom: 1px;
 }
 
 .TimerLabelValue {
-	font-size: 20px;
+	font-size: 17px;
 	font-weight: bold;
 	color: #ffffff;
 	text-align: left;
@@ -106,10 +90,10 @@
 }
 
 .GameClock .TimerLabelValue {
-	font-size: 26px;
-	letter-spacing: 1px;
+	font-size: 22px;
+	letter-spacing: 0px;
 	color: #0a1622;
-	text-shadow: 0px 2px 8px #ffffff55;
+	text-shadow: 0px 1px 3px #ffffff66;
 }
 
 .TimerLabel {
@@ -124,24 +108,24 @@
 }
 
 .TimerPulse {
-	width: 10px;
-	height: 10px;
-	margin-right: 6px;
+	width: 7px;
+	height: 7px;
+	margin-right: 4px;
 	border-radius: 50%;
 	background-color: #69f2ff;
-	box-shadow: 0px 0px 12px #69f2ff;
+	box-shadow: #69f2ff88 0px 0px 5px 0px;
 	animation-name: pulseGlow;
 	animation-duration: 1.4s;
 	animation-iteration-count: infinite;
 }
 
-@keyframes shellFadeIn {
+@keyframes 'shellFadeIn' {
 	0% { opacity: 0; transform: translateY(-6px); }
 	100% { opacity: 1; transform: translateY(0px); }
 }
 
-@keyframes pulseGlow {
-	0% { opacity: 0.6; box-shadow: 0 0 8px #69f2ff; }
-	50% { opacity: 1; box-shadow: 0 0 14px #69f2ff; }
-	100% { opacity: 0.6; box-shadow: 0 0 8px #69f2ff; }
+@keyframes 'pulseGlow' {
+	0% { opacity: 0.6; box-shadow: #69f2ff88 0px 0px 4px 0px; }
+	50% { opacity: 1; box-shadow: #69f2ffbb 0px 0px 7px 0px; }
+	100% { opacity: 0.6; box-shadow: #69f2ff88 0px 0px 4px 0px; }
 }
