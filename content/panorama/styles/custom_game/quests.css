@@ -2,19 +2,26 @@
 {
 	horizontal-align: left;
 	vertical-align: top;
-	margin-top: 23%;
-	margin-left: 20px;
+	margin-top: 238px;
+	margin-left: 24px;
+	width: 300px;
 	max-height: 600px;
-	padding: 10px;
-	border-radius: 20px;
+	padding: 10px 12px 10px 12px;
+	border-radius: 2px;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( xhs_panel_bg ), to( xhs_panel_bg_deep ) );
+	border-left: 2px solid #5ad0ff78;
+	border-top: 1px solid xhs_border_soft;
+	border-bottom: 1px solid #77c8ff14;
+	box-shadow: fill #00111f42 0px 0px 5px 0px;
 
-	transition-property: background-color;
+	transition-property: background-color, brightness;
 	transition-duration: .18s;
 }
 
 #QuestLog:hover
 {
-	background-color: #000000da;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( xhs_panel_bg_strong ), to( #06101dcc ) );
+	brightness: 1.05;
 }
 
 .HUDFlipped #QuestLog {
@@ -23,46 +30,58 @@
 
 .Zone
 {
+	width: 100%;
+	height: fit-children;
 	transform: translatex( 0px );
 	transition-property: transform;
 	transition-duration: 0.2s;
 	transition-delay: 10.0s;
 }
 
+#QuestsContainer
+{
+	width: 100%;
+	height: fit-children;
+	flow-children: down;
+}
+
 .QuestLogHeader
 {
-	color: #965D01;
+	width: 100%;
+	color: xhs_accent_text;
 	font-weight: thin;
-	text-align: center;
-	text-shadow: 1px 1px 2px 2.0 #00000011;
+	text-align: left;
+	text-shadow: 0px 1px 3px xhs_shadow;
 
 	font-family: Radiance,FZKai-Z03,TH Sarabun New,YDYGO 540;
-	font-size: 16px;
+	font-size: 15px;
 	background-color: none;
-	letter-spacing: 3px;
+	letter-spacing: 4px;
+	text-transform: uppercase;
+	margin-bottom: 2px;
 }
 
 .QuestZoneName
 {
-	color: gradient(linear, 0% 0%, 0% 100%, from(#E7D291), to(#965D01));
-	text-shadow: 0px 2px 2px 4 black;
+	width: 100%;
+	color: gradient(linear, 0% 0%, 0% 100%, from(#f3fbff), color-stop(0.5, #89dcff), to(#3e9dd0));
 
 	font-weight: bold;
-	text-align: center;
-	text-shadow: 1px 1px 0px 2.0 #000000;
+	text-align: left;
+	text-shadow: 0px 2px 4px xhs_shadow;
 
 	font-family: Radiance,FZKai-Z03,TH Sarabun New,YDYGO 540;
-	font-size: 24px;
+	font-size: 26px;
 
-	margin-bottom: 4px;
+	margin-bottom: 6px;
 }
 
 .QuestText,
 .RewardText
 {
-	color: #B79358;
+	color: xhs_text_muted;
 	text-align: center;
-	text-shadow: 1px 1px 2px 2.0 #000000ff;
+	text-shadow: 1px 1px 2px 2.0 #00111fff;
 
 	font-family: Radiance,FZKai-Z03,TH Sarabun New,YDYGO 540;
 	font-weight: thin;
@@ -74,10 +93,10 @@
 
 .QuestText
 {
-	color: gradient(linear, 0% 0%, 0% 100%, from(#E7D291), to(#4da6ff));
-	max-width: 250px;
+	color: xhs_text;
+	max-width: 224px;
 	text-align: left;
-	margin-left: 4px;
+	margin-left: 7px;
 	
 	transition-property: opacity, color;
 	transition-duration: .32s;
@@ -89,7 +108,7 @@
 .desert_start .QuestText,
 .desert_town .QuestText
 {
-	color: #FAD2A1;
+	color: #bfe8ff;
 }
 
 #QuestReward
@@ -104,7 +123,8 @@
 
 .Completed .QuestText
 {
-	opacity: .1;
+	opacity: .38;
+	color: xhs_text_dim;
 }
 
 .Completed .QuestText:hover {
@@ -118,14 +138,28 @@
 
 .QuestIcon
 {
-	width: 26px;
-	height: 26px;
+	width: 20px;
+	height: 20px;
+	margin-top: 3px;
 	background-size: 100%;
+	wash-color: xhs_accent_soft;
 }
 
 #ZoneQuestsContainer
 {
-	flow-children: up;
+	width: 100%;
+	height: fit-children;
+	flow-children: down;
+}
+
+.Quest
+{
+	width: 100%;
+	min-height: 28px;
+	margin-top: 2px;
+	padding: 2px 4px 2px 0px;
+	background-color: #06203322;
+	border-left: 3px solid #77c8ff12;
 }
 
 .Completed .QuestIcon
@@ -136,19 +170,21 @@
 .QuestIcon.Explore
 {
 	background-image: url("file://panorama/images/interface/quest_pip_empty_psd.psd");
-	wash-color: white;
+	wash-color: xhs_accent_soft;
 }
 
 .QuestIcon.Holdout
 {
 	background-image: url("file://panorama/images/interface/quest_holdout_empty_psd.psd");
+	wash-color: xhs_accent_soft;
 }
 
 
 .QuestIconCheckMark
 {
-	width: 32px;
-	height: 32px;
+	width: 22px;
+	height: 22px;
+	margin-top: 2px;
 	background-image: url("file://panorama/images/interface/quest_pip_complete_psd.psd");
 
 	background-size: 100%;
@@ -163,6 +199,8 @@
 #QuestNumbers
 {
 	visibility: collapse;
+	margin-left: 4px;
+	color: #7ad7ff;
 }
 
 .ShowNumbers #QuestNumbers
@@ -188,4 +226,3 @@
 {
 	visibility: visible;
 }
-

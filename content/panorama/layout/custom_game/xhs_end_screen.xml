@@ -1,0 +1,103 @@
+<root>
+	<styles>
+		<include src="file://{resources}/styles/custom_game/xhs_theme.css" />
+		<include src="file://{resources}/styles/custom_game/xhs_end_screen.css" />
+	</styles>
+
+	<scripts>
+		<include src="file://{resources}/scripts/custom_game/util.js" />
+		<include src="file://{resources}/scripts/custom_game/xhs_end_screen.js" />
+	</scripts>
+
+	<Panel class="XHSEndScreenRoot">
+		<Panel class="XHSEndScreenBackdrop" hittest="false" />
+
+		<Panel id="XHSEndScreenMain" class="XHSEndScreenMain">
+			<Panel class="XHSEndScreenHeader">
+				<Panel class="XHSEndScreenHeaderCopy">
+					<Label id="XHSEndScreenResult" class="XHSEndScreenResult" text="X HEROES VICTORY" />
+					<Panel class="XHSEndScreenMeta">
+						<Label id="XHSEndScreenTime" class="XHSEndScreenMetaValue" text="00:00" />
+						<Label id="XHSEndScreenDifficulty" class="XHSEndScreenMetaValue" text="Difficulty: -" />
+						<Label id="XHSEndScreenMap" class="XHSEndScreenMetaValue" text="Map: -" />
+						<Label id="XHSEndScreenGameId" class="XHSEndScreenMetaValue" text="Game: -" />
+					</Panel>
+				</Panel>
+
+				<Panel class="XHSEndScreenHeaderActions">
+					<Button id="XHSEndScreenHallButton" class="XHSEndScreenButton XHSEndScreenButtonSecondary">
+						<Label text="Hall of Fame" />
+					</Button>
+					<Button id="XHSEndScreenCloseTopButton" class="XHSEndScreenButton">
+						<Label text="#CustomEndScreenClose" />
+					</Button>
+				</Panel>
+			</Panel>
+
+			<Panel class="XHSEndScreenBody">
+				<Panel class="XHSEndScreenLeft">
+					<Panel id="XHSEndScreenRunSummary" class="XHSEndScreenSummary" />
+					<Panel id="XHSEndScreenMvpCards" class="XHSEndScreenMvpGrid" />
+				</Panel>
+
+				<Panel class="XHSEndScreenPlayersPanel XHSPanel">
+					<Panel class="XHSEndScreenSectionHeader">
+						<Label class="XHSEndScreenSectionTitle" text="Run Scoreboard" />
+						<Label id="XHSEndScreenPlayerCount" class="XHSEndScreenSectionNote" text="0 players" />
+					</Panel>
+
+					<Panel class="XHSEndScreenPlayerHeader">
+						<Label class="PlayerColIdentity" text="Player" />
+						<Label class="PlayerColSmall" text="LVL" />
+						<Label class="PlayerColKda" text="KDA" />
+						<Label class="PlayerColNumber" text="Networth" />
+						<Label class="PlayerColNumber" text="Hero DMG" />
+						<Label class="PlayerColNumber" text="Healing" />
+						<Label class="PlayerColSmall" text="Tomes" />
+						<Label class="PlayerColNumber" text="Support" />
+						<Label class="PlayerColBattlepass" text="Battlepass" />
+					</Panel>
+
+					<Panel id="XHSEndScreenPlayerRows" class="XHSEndScreenPlayerRows" />
+				</Panel>
+			</Panel>
+
+			<Panel class="XHSEndScreenFooter">
+				<Button id="XHSEndScreenWebsiteButton" class="XHSEndScreenFooterButton XHSEndScreenButtonSecondary">
+					<Label text="Website" />
+				</Button>
+				<Button id="XHSEndScreenDiscordButton" class="XHSEndScreenFooterButton XHSEndScreenDiscordButton">
+					<Label text="Discord" />
+				</Button>
+				<Button id="XHSEndScreenCloseButton" class="XHSEndScreenFooterButton XHSEndScreenButton">
+					<Label text="#CustomEndScreenClose" />
+				</Button>
+			</Panel>
+		</Panel>
+
+		<Panel id="XHSEndScreenHallPanel" class="XHSEndScreenHallPanel">
+			<Panel class="XHSEndScreenHallWindow XHSPanel">
+				<Panel class="XHSEndScreenHallHeader">
+					<Panel>
+						<Label class="XHSEndScreenSectionTitle" text="Hall of Fame" />
+						<Label class="XHSEndScreenSectionNote" text="Diretide leaderboard" />
+					</Panel>
+					<Button id="XHSEndScreenHallCloseButton" class="XHSEndScreenIconButton">
+						<Label text="X" />
+					</Button>
+				</Panel>
+
+				<Panel class="XHSEndScreenHallLegend">
+					<Label class="HallColRank" text="#" />
+					<Label class="HallColPlayer" text="Player" />
+					<Label class="HallColScore" text="Score" />
+				</Panel>
+
+				<Panel id="XHSEndScreenHallRows" class="XHSEndScreenHallRows" />
+				<Label id="XHSEndScreenHallEmpty" class="XHSEndScreenEmptyText" text="No Hall of Fame data available for this run." />
+			</Panel>
+		</Panel>
+
+		<Panel id="XHSEndScreenRewardContainer" class="XHSEndScreenRewardContainer" />
+	</Panel>
+</root>

@@ -247,9 +247,6 @@
 "DOTA_Tooltip_ability_holdout_knights_armor_damage_reduction"				"%DAMAGE REDUCTION:"
 "DOTA_Tooltip_ability_holdout_knights_armor_bonus_armor"					"BONUS ARMOR:"
 
-"DOTA_Tooltip_modifier_knights_armor"						"Knight's Armor"
-"DOTA_Tooltip_modifier_knights_armor_Description"			"Increase Armor of Arthas and returns part of damage received, while reducing damage received."
-
 
 //ARCHIMAGE
 "DOTA_Tooltip_ability_holdout_blizzard"										"Blizzard"

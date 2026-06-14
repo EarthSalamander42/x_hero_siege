@@ -199,8 +199,6 @@
 		"DOTA_Tooltip_ability_holdout_knights_armor_hero_return_percent"		"%RETURN DAMAGE:"
 		"DOTA_Tooltip_ability_holdout_knights_armor_damage_reduction"		"%DAMAGE REDUCTION:"
 		"DOTA_Tooltip_ability_holdout_knights_armor_bonus_armor"		"BONUS ARMOR:"
-		"DOTA_Tooltip_modifier_knights_armor"		"Knight's Armor"
-		"DOTA_Tooltip_modifier_knights_armor_Description"		"Increase Armor of Arthas and returns part of damage received, while reducing damage received."
 		"DOTA_Tooltip_ability_holdout_blizzard"		"Blizzard"
 		"DOTA_Tooltip_ability_holdout_blizzard_Description"		"Archimage calls down waves of ice crushing down on an area. Each wave deals damage to all units in area of effect."
 		"DOTA_Tooltip_ability_holdout_blizzard_radius"		"RADIUS:"

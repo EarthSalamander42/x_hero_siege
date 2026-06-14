@@ -21965,15 +21965,6 @@
 			{	
 				"Passive"		"1"
 				"IsHidden"		"0"
-				
-				"OnDeath"
-				{
-					"RunScript"
-					{
-						"ScriptFile"	"abilities/heroes/global.lua"
-						"Function"		"OrbOfDarkness"
-					}
-				}
 			}
 		}
 	}

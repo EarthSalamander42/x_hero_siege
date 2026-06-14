@@ -1,0 +1,55 @@
+@define xhs_panel_bg: #07182770;
+@define xhs_panel_bg_strong: #082138e4;
+@define xhs_panel_bg_solid: #0b1322e8;
+@define xhs_panel_bg_deep: #050b1438;
+
+@define xhs_border: #77c8ff42;
+@define xhs_border_soft: #77c8ff20;
+@define xhs_accent: #5ad0ff;
+@define xhs_accent_soft: #9fdcff;
+@define xhs_accent_text: #8fdcff;
+
+@define xhs_text: #dceeff;
+@define xhs_text_muted: #b9d9ff;
+@define xhs_text_dim: #7f9eb9;
+@define xhs_shadow: #00111f;
+
+@define xhs_warning: #d03a24;
+@define xhs_warning_dark: #8e1f17;
+@define xhs_success: #8fd39d;
+@define xhs_gold: #ffcf66;
+
+.XHSPanel {
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( xhs_panel_bg ), to( xhs_panel_bg_deep ) );
+	border: 1px solid xhs_border;
+	box-shadow: fill #00000070 0px 0px 8px 0px;
+}
+
+.XHSPanelHover:hover {
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( xhs_panel_bg_strong ), to( #06101dcc ) );
+	brightness: 1.05;
+}
+
+.XHSTitle {
+	color: xhs_accent_text;
+	text-shadow: 0px 1px 3px xhs_shadow;
+	text-transform: uppercase;
+	letter-spacing: 2px;
+}
+
+.XHSButton {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( xhs_warning ), to( xhs_warning_dark ) );
+	border: 1px solid #ffffff18;
+	transition-property: brightness, box-shadow;
+	transition-duration: 0.1s;
+}
+
+.XHSButton:hover {
+	brightness: 1.2;
+	box-shadow: fill #0000008a 0px 0px 6px 0px;
+}
+
+.XHSButtonSecondary {
+	background-color: #090c12ee;
+	border: 1px solid xhs_border_soft;
+}

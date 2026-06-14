@@ -3,6 +3,7 @@
 		<include src="s2r://panorama/styles/dotastyles.vcss_c" />
 		<include src="s2r://panorama/styles/hudstyles.vcss_c"/>
 	
+		<include src="s2r://panorama/styles/custom_game/xhs_theme.vcss_c" />
 		<include src="s2r://panorama/styles/custom_game/quests.vcss_c" />
 	</styles>
 

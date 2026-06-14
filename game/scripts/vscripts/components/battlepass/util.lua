@@ -15,10 +15,10 @@
 -- Editors:
 --     Earth Salamander #42
 
-LinkLuaModifier("modifier_companion", "components/battlepass/modifiers/modifier_companion.lua", LUA_MODIFIER_MOTION_NONE )
-LinkLuaModifier("modifier_patreon_donator", "components/battlepass/modifiers/modifier_patreon_donator.lua", LUA_MODIFIER_MOTION_NONE )
-LinkLuaModifier("modifier_donator_statue", "components/battlepass/modifiers/modifier_donator_statue.lua", LUA_MODIFIER_MOTION_NONE )
-LinkLuaModifier("modifier_battlepass_taunt", "components/battlepass/modifiers/modifier_battlepass_taunt.lua", LUA_MODIFIER_MOTION_NONE )
+LinkLuaModifier("modifier_companion", "components/battlepass/modifiers/modifier_companion.lua", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_patreon_donator", "components/battlepass/modifiers/modifier_patreon_donator.lua", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_donator_statue", "components/battlepass/modifiers/modifier_donator_statue.lua", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_battlepass_taunt", "components/battlepass/modifiers/modifier_battlepass_taunt.lua", LUA_MODIFIER_MOTION_NONE)
 
 CustomGameEventManager:RegisterListener("change_companion", Dynamic_Wrap(Battlepass, "DonatorCompanionJS"))
 CustomGameEventManager:RegisterListener("change_statue", Dynamic_Wrap(Battlepass, "DonatorStatueJS"))
@@ -60,18 +60,18 @@ end
 function Battlepass:HasArcana(ID, hero_name)
 	if not Battlepass.GetRewardUnlocked or not BattlepassHeroes or not BattlepassHeroes[hero_name] then return nil end
 
-	if BattlepassHeroes[hero_name][hero_name.."_arcana2"] then
-		if Battlepass:GetRewardUnlocked(ID) >= BattlepassHeroes[hero_name][hero_name.."_arcana2"] then
+	if BattlepassHeroes[hero_name][hero_name .. "_arcana2"] then
+		if Battlepass:GetRewardUnlocked(ID) >= BattlepassHeroes[hero_name][hero_name .. "_arcana2"] then
 			return 1
 		end
-	elseif BattlepassHeroes[hero_name][hero_name.."_arcana"] then
-		if Battlepass:GetRewardUnlocked(ID) >= BattlepassHeroes[hero_name][hero_name.."_arcana"] then
+	elseif BattlepassHeroes[hero_name][hero_name .. "_arcana"] then
+		if Battlepass:GetRewardUnlocked(ID) >= BattlepassHeroes[hero_name][hero_name .. "_arcana"] then
 			return 0
 		end
-	-- -- axe immortal topbar icon handling
-	-- elseif BattlepassHeroes[hero_name]["axe_immortal"] then
+		-- -- axe immortal topbar icon handling
+		-- elseif BattlepassHeroes[hero_name]["axe_immortal"] then
 		-- if Battlepass:GetRewardUnlocked(ID) >= BattlepassHeroes[hero_name]["axe_immortal"] then
-			-- return 0
+		-- return 0
 		-- end
 	end
 
@@ -81,10 +81,10 @@ end
 -- vanilla extension
 function CDOTA_BaseNPC:SetupHealthBarLabel(sCustomTag)
 	local ply_table = CustomNetTables:GetTableValue("battlepass_player", tostring(self:GetPlayerID()))
---	print(ply_table)
+	--	print(ply_table)
 	if not ply_table then return end
 
---	print(sCustomTag)
+	--	print(sCustomTag)
 	if not sCustomTag then
 		if ply_table.ingame_tag then
 			sCustomTag = ply_table.ingame_tag
@@ -92,12 +92,11 @@ function CDOTA_BaseNPC:SetupHealthBarLabel(sCustomTag)
 			sCustomTag = "#donator_label_" .. ply_table.donator_level
 		end
 	end
---	print(sCustomTag)
+	--	print(sCustomTag)
 
---	print("Donator Player ID / status:", self:GetPlayerOwnerID(), api:GetDonatorStatus(self:GetPlayerOwnerID()))
+	--	print("Donator Player ID / status:", self:GetPlayerOwnerID(), api:GetDonatorStatus(self:GetPlayerOwnerID()))
 	if api:IsDonator(self:GetPlayerOwnerID()) ~= false then
 		if ply_table.donator_level and ply_table.donator_level > 0 then
-			print("I'm a donator, update my tag please")
 			self:SetCustomHealthLabel(sCustomTag, DONATOR_COLOR[ply_table.donator_level][1], DONATOR_COLOR[ply_table.donator_level][2], DONATOR_COLOR[ply_table.donator_level][3])
 		end
 	end
@@ -140,15 +139,15 @@ function Battlepass:ToggleDonatorTag(keys)
 end
 
 function Battlepass:SetDonatorTag(keys)
---	print(keys)
+	--	print(keys)
 	local hero = PlayerResource:GetSelectedHeroEntity(keys.PlayerID)
 
---	if api.players[steamid].changed_tag_this_game then
---		DisplayError(keys.PlayerID, "Don't abuse the fucking feature!")
---	else
-		api:SetPlayerIngameTag(keys.PlayerID, keys.ingame_tag)
-		hero:SetupHealthBarLabel(keys.ingame_tag)
---	end
+	--	if api.players[steamid].changed_tag_this_game then
+	--		DisplayError(keys.PlayerID, "Don't abuse the fucking feature!")
+	--	else
+	api:SetPlayerIngameTag(keys.PlayerID, keys.ingame_tag)
+	hero:SetupHealthBarLabel(keys.ingame_tag)
+	--	end
 end
 
 function Battlepass:BattlepassRewards(keys)
@@ -162,7 +161,7 @@ end
 function Battlepass:RegisterHeroTaunt(hero)
 	local armory = api:GetArmory(hero:GetPlayerID()) or {}
 
---	print("Armory:", armory)
+	--	print("Armory:", armory)
 
 	if armory and type(armory) == "table" then
 		for k, v in pairs(armory) do
@@ -206,8 +205,8 @@ function Battlepass:PlayHeroTaunt(keys)
 
 	if hero.can_cast_taunt == true then
 		hero.can_cast_taunt = false
-		hero:AddNewModifier(hero, nil, "modifier_battlepass_taunt", {duration=7.0, taunt_anim_translate = hero.bp_taunt})
---		ActivityModifier:AddWearableActivity(hero, hero.bp_taunt, sItemDef)
+		hero:AddNewModifier(hero, nil, "modifier_battlepass_taunt", { duration = 7.0, taunt_anim_translate = hero.bp_taunt })
+		--		ActivityModifier:AddWearableActivity(hero, hero.bp_taunt, sItemDef)
 
 		Timers:CreateTimer(8.0, function()
 			hero.can_cast_taunt = true
@@ -225,7 +224,7 @@ end
 
 function Battlepass:DonatorStatueJS(event)
 	-- need to update the current statue with the new one
---	Battlepass:DonatorCompanion(event.ID, event.unit, event.js)
+	--	Battlepass:DonatorCompanion(event.ID, event.unit, event.js)
 end
 
 function Battlepass:DonatorEmblemJS(event)
@@ -254,31 +253,31 @@ function Battlepass:SetOverrideAssets(hero, modifier, table_name)
 			if j.type == "particle" then
 				if j.style == nil or j.style == asset_style then
 					if j.asset == GetKeyValueByHeroName(hero:GetUnitName(), "ProjectileModel") then
---						print("Range attack particle:", j)
+						--						print("Range attack particle:", j)
 						hero:SetRangedProjectileName(j.modifier)
 					else
---						print("Particle:", j)
+						--						print("Particle:", j)
 						local particle_table = {}
 						particle_table.asset = j.asset
 						particle_table.modifier = j.modifier
 						particle_table.parent = hero
 
-						CustomNetTables:SetTableValue("battlepass_player", j.asset..'_'..hero:GetPlayerID(), {j.modifier}) 
+						CustomNetTables:SetTableValue("battlepass_player", j.asset .. '_' .. hero:GetPlayerID(), { j.modifier })
 					end
 				end
 			elseif j.type == "sound" then
 				if j.style == nil or j.style == asset_style then
---					print("Sound:", j)
-					CustomNetTables:SetTableValue("battlepass_player", j.asset..'_'..hero:GetPlayerID(), {j.modifier}) 
+					--					print("Sound:", j)
+					CustomNetTables:SetTableValue("battlepass_player", j.asset .. '_' .. hero:GetPlayerID(), { j.modifier })
 				end
 			elseif j.type == "ability_icon" then
 				if j.style == nil or j.style == asset_style then
---					print("ability icon:", j)
-					CustomNetTables:SetTableValue("battlepass_player", j.asset..'_'..hero:GetPlayerID(), {j.modifier}) 
+					--					print("ability icon:", j)
+					CustomNetTables:SetTableValue("battlepass_player", j.asset .. '_' .. hero:GetPlayerID(), { j.modifier })
 				end
 			elseif j.type == "icon_replacement_hero" then
 				if j.style == nil or j.style == asset_style then
---					print("topbar icon:", j)
+					--					print("topbar icon:", j)
 					CustomGameEventManager:Send_ServerToAllClients("override_hero_image", {
 						player_id = hero:GetPlayerID(),
 						icon_path = j.modifier,
@@ -286,11 +285,11 @@ function Battlepass:SetOverrideAssets(hero, modifier, table_name)
 				end
 			elseif j.type == "entity_model" then
 				if j.style == nil or j.style == asset_style then
---					print("entity model:", j)
+					--					print("entity model:", j)
 					Battlepass.ENTITY_MODEL_OVERRIDE[j.asset] = j.modifier
 				end
 			elseif j.type == "sheepstick_model" then
-				hero.sheepstick_model = j.modifier				
+				hero.sheepstick_model = j.modifier
 			end
 		end
 	end
@@ -332,10 +331,10 @@ function Battlepass:GetHeroEffect(hero)
 
 	if tostring(PlayerResource:GetSteamID(hero:GetPlayerID())) ~= "0" then
 		local armory = api:GetArmory(hero:GetPlayerID())
---		print("Armory:", armory)
+		--		print("Armory:", armory)
 		if not armory or armory and type(armory) ~= "table" then return end
 
-		CustomNetTables:SetTableValue("battlepass_rewards", "rewards_"..hero:GetPlayerID(), armory)
+		CustomNetTables:SetTableValue("battlepass_rewards", "rewards_" .. hero:GetPlayerID(), armory)
 
 		local battlepass_items = {}
 		battlepass_items["blink"] = ""
@@ -358,13 +357,13 @@ function Battlepass:GetHeroEffect(hero)
 					local style = 0
 
 					if modifier then
---						print("Add cosmetic modifier:", modifier)
+						--						print("Add cosmetic modifier:", modifier)
 						hero:AddNewModifier(hero, nil, modifier, {})
 
 						if v.hero == "npc_dota_hero_phantom_assassin" then
---							print("Arcana kills:")
+							--							print("Arcana kills:")
 							local pa_arcana_kills = api:GetPhantomAssassinArcanaKills(hero:GetPlayerID()) or 0
---							print(pa_arcana_kills)
+							--							print(pa_arcana_kills)
 							hero:AddNewModifier(hero, nil, "modifier_phantom_assassin_arcana", {}):SetStackCount(tonumber(pa_arcana_kills))
 
 							if tonumber(pa_arcana_kills) >= 400 then
@@ -401,24 +400,24 @@ function Battlepass:GetHeroEffect(hero)
 
 				-- items rewards only
 				if battlepass_items[item_name] then
---					print(v.item_id, item_name)
+					--					print(v.item_id, item_name)
 					local item_effects = ItemsGame:GetItemVisuals(v.item_id)
 
---					print(item_effects)
+					--					print(item_effects)
 					Battlepass:SetOverrideAssets(hero, nil, ItemsGame:GetItemVisuals(v.item_id))
 
 					local images = ItemsGame:GetItemImages(v.item_id)
 
 					for k, v in pairs(images) do
-						CustomNetTables:SetTableValue("battlepass_player", v.asset..'_'..hero:GetPlayerID(), {v.modifier}) 
+						CustomNetTables:SetTableValue("battlepass_player", v.asset .. '_' .. hero:GetPlayerID(), { v.modifier })
 					end
 				end
 			end
 		end
 
---		print(CScriptParticleManager.PARTICLES_OVERRIDE)
---		print("---------------------------------")
---		print(CDOTA_BaseNPC.SOUNDS_OVERRIDE)
+		--		print(CScriptParticleManager.PARTICLES_OVERRIDE)
+		--		print("---------------------------------")
+		--		print(CDOTA_BaseNPC.SOUNDS_OVERRIDE)
 	end
 
 	local hello = false
@@ -457,7 +456,7 @@ function Battlepass:GetHeroEffect(hero)
 				hero.blink_sound = "Hero_Earthshaker.BlinkDagger.Arcana"
 
 				Wearable:_WearProp(hero, "12692", "head", "02")
-				hero:AddNewModifier(hero, nil, "modifier_battlepass_wearable_spellicons", {style = 2})
+				hero:AddNewModifier(hero, nil, "modifier_battlepass_wearable_spellicons", { style = 2 })
 			elseif Battlepass:GetRewardUnlocked(hero:GetPlayerID()) >= BattlepassHeroes[short_name]["earthshaker_arcana"] then
 				hero.enchant_totem_leap_blur_pfx = "particles/econ/items/earthshaker/earthshaker_arcana/earthshaker_arcana_totem_leap.vpcf"
 				hero.enchant_totem_buff_pfx = "particles/econ/items/earthshaker/earthshaker_arcana/earthshaker_arcana_totem_buff.vpcf"
@@ -473,11 +472,11 @@ function Battlepass:GetHeroEffect(hero)
 				hero.blink_sound = "Hero_Earthshaker.BlinkDagger.Arcana"
 
 				Wearable:_WearProp(hero, "12692", "head")
-				hero:AddNewModifier(hero, nil, "modifier_battlepass_wearable_spellicons", {style = 1})
+				hero:AddNewModifier(hero, nil, "modifier_battlepass_wearable_spellicons", { style = 1 })
 				-- not used atm
---				if not hero:HasModifier("modifier_earthshaker_arcana") then -- need to change name, this is the vanilla modifier name
---					hero:AddNewModifier(hero, nil, "modifier_earthshaker_arcana", {})
---				end
+				--				if not hero:HasModifier("modifier_earthshaker_arcana") then -- need to change name, this is the vanilla modifier name
+				--					hero:AddNewModifier(hero, nil, "modifier_earthshaker_arcana", {})
+				--				end
 			end
 		elseif hero:GetUnitName() == "npc_dota_hero_nevermore" then
 			if IsInToolsMode() then
@@ -487,20 +486,20 @@ function Battlepass:GetHeroEffect(hero)
 			end
 		elseif hero:GetUnitName() == "npc_dota_hero_terrorblade" then
 			if IsInToolsMode() then
---				if Battlepass:GetRewardUnlocked(hero:GetPlayerID()) >= BattlepassHeroes[short_name]["terrorblade_arcana"] then
---					Wearable:_WearProp(hero, "5957", "head")
---				end
+				--				if Battlepass:GetRewardUnlocked(hero:GetPlayerID()) >= BattlepassHeroes[short_name]["terrorblade_arcana"] then
+				--					Wearable:_WearProp(hero, "5957", "head")
+				--				end
 			end
---		elseif hero:GetUnitName() == "npc_dota_hero_tidehunter" then
---			if Battlepass:GetRewardUnlocked(hero:GetPlayerID()) >= BattlepassHeroes[short_name]["tidehunter_ancient"] then
---				Wearable:RemoveWearables(hero)
---				hero.arms = SpawnEntityFromTableSynchronous("prop_dynamic", {model = "models/items/tidehunter/Celth_AzhagTidehunter/tidehunter_arms_wh/tidehunter_arms_wh.vmdl"})
---				hero.back = SpawnEntityFromTableSynchronous("prop_dynamic", {model = "models/items/tidehunter/Celth_AzhagTidehunter/tidehunter_back_wh/tidehunter_back_wh.vmdl"})
---				hero.belt = SpawnEntityFromTableSynchronous("prop_dynamic", {model = "models/items/tidehunter/Celth_AzhagTidehunter/tidehunter_belt_wh/tidehunter_belt_wh.vmdl"})
---				hero.head = SpawnEntityFromTableSynchronous("prop_dynamic", {model = "models/items/tidehunter/Celth_AzhagTidehunter/tidehunter_head_wh/tidehunter_head_wh.vmdl"})
---				hero.offhand = SpawnEntityFromTableSynchronous("prop_dynamic", {model = "models/items/tidehunter/Celth_AzhagTidehunter/tidehunter_offhand_wh/tidehunter_offhand_wh.vmdl"})
---				hero.weapon = SpawnEntityFromTableSynchronous("prop_dynamic", {model = "models/items/tidehunter/Celth_AzhagTidehunter/tidehunter_weapon_wh/tidehunter_weapon_wh.vmdl"})
---			end
+			--		elseif hero:GetUnitName() == "npc_dota_hero_tidehunter" then
+			--			if Battlepass:GetRewardUnlocked(hero:GetPlayerID()) >= BattlepassHeroes[short_name]["tidehunter_ancient"] then
+			--				Wearable:RemoveWearables(hero)
+			--				hero.arms = SpawnEntityFromTableSynchronous("prop_dynamic", {model = "models/items/tidehunter/Celth_AzhagTidehunter/tidehunter_arms_wh/tidehunter_arms_wh.vmdl"})
+			--				hero.back = SpawnEntityFromTableSynchronous("prop_dynamic", {model = "models/items/tidehunter/Celth_AzhagTidehunter/tidehunter_back_wh/tidehunter_back_wh.vmdl"})
+			--				hero.belt = SpawnEntityFromTableSynchronous("prop_dynamic", {model = "models/items/tidehunter/Celth_AzhagTidehunter/tidehunter_belt_wh/tidehunter_belt_wh.vmdl"})
+			--				hero.head = SpawnEntityFromTableSynchronous("prop_dynamic", {model = "models/items/tidehunter/Celth_AzhagTidehunter/tidehunter_head_wh/tidehunter_head_wh.vmdl"})
+			--				hero.offhand = SpawnEntityFromTableSynchronous("prop_dynamic", {model = "models/items/tidehunter/Celth_AzhagTidehunter/tidehunter_offhand_wh/tidehunter_offhand_wh.vmdl"})
+			--				hero.weapon = SpawnEntityFromTableSynchronous("prop_dynamic", {model = "models/items/tidehunter/Celth_AzhagTidehunter/tidehunter_weapon_wh/tidehunter_weapon_wh.vmdl"})
+			--			end
 		elseif hero:GetUnitName() == "npc_dota_hero_tiny" then
 			if Battlepass:GetRewardUnlocked(hero:GetPlayerID()) >= BattlepassHeroes[short_name]["tiny_immortal"] then
 				-- attempt to fix tree throw pfx being vanilla (whatever you have equipped in your armory). not fixing it
@@ -529,7 +528,7 @@ function Battlepass:GetHeroEffect(hero)
 				hero:SetModel("models/items/tiny/tiny_prestige/tiny_prestige_lvl_01.vmdl")
 				hero:SetOriginalModel("models/items/tiny/tiny_prestige/tiny_prestige_lvl_01.vmdl")
 				hero:AddNewModifier(hero, nil, "modifier_battlepass_wearable_spellicons", {})
---				Wearable:_WearProp(hero, "13541", "weapon")
+				--				Wearable:_WearProp(hero, "13541", "weapon")
 
 				hero.ambient_pfx = ParticleManager:CreateParticle(hero.ambient_pfx_effect, PATTACH_ABSORIGIN_FOLLOW, hero)
 			end
@@ -564,7 +563,7 @@ function Battlepass:InitializeTowers()
 		local level = dire_level
 		local particle = "particles/world_tower/tower_upgrade/ti7_dire_tower_orb.vpcf"
 		local team = "dire"
---		local max_particle = "particles/world_tower/tower_upgrade/ti7_radiant_tower_lvl11_orb.vpcf"
+		--		local max_particle = "particles/world_tower/tower_upgrade/ti7_radiant_tower_lvl11_orb.vpcf"
 
 		if tower:GetTeamNumber() == 2 then
 			level = radiant_level
@@ -574,9 +573,9 @@ function Battlepass:InitializeTowers()
 
 		tower:SetModel("models/props_structures/tower_upgrade/tower_upgrade.vmdl")
 		tower:SetOriginalModel("models/props_structures/tower_upgrade/tower_upgrade.vmdl")
-		tower:SetMaterialGroup(team.."_level"..Battlepass:CheckBattlepassTowerLevel(level).mg)
+		tower:SetMaterialGroup(team .. "_level" .. Battlepass:CheckBattlepassTowerLevel(level).mg)
 		ParticleManager:CreateParticle(particle, PATTACH_ABSORIGIN_FOLLOW, tower)
-		StartAnimation(tower, {duration=9999, activity=ACT_DOTA_CAPTURE, rate=1.0, translate = 'level'..Battlepass:CheckBattlepassTowerLevel(level).anim})
+		StartAnimation(tower, { duration = 9999, activity = ACT_DOTA_CAPTURE, rate = 1.0, translate = 'level' .. Battlepass:CheckBattlepassTowerLevel(level).anim })
 	end
 end
 

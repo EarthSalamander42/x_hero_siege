@@ -718,7 +718,7 @@
 .background-dim-overlay {
 	width: 100%;
 	height: 100%;
-	background-color: #000000da;
+	background-color: #000000d2;
 }
 
 .container-main {
@@ -748,8 +748,8 @@
 	height: 22%;
 	margin-bottom: 10px;
 	background-color: gradient(linear, 0% 0%, 100% 100%, from(#141b27f0), to(#0b1018ef));
-	border: 1px solid #d5b87855;
-	box-shadow: fill #000000b0 0px 0px 12px 0px;
+	border: 1px solid #d5b87842;
+	box-shadow: fill #000000a2 0px 0px 8px 0px;
 }
 
 #HomeProfileHeader {
@@ -783,8 +783,8 @@
 	padding-bottom: 10px;
 	flow-children: down;
 	background-color: gradient(linear, 0% 0%, 100% 100%, from(#131a27ee), to(#0b1018ef));
-	border: 1px solid #d5b87855;
-	box-shadow: fill #000000aa 0px 0px 12px 0px;
+	border: 1px solid #d5b87842;
+	box-shadow: fill #0000009c 0px 0px 8px 0px;
 }
 
 .vote-header-container {
@@ -846,8 +846,8 @@
 	margin: 8px 0px 8px 0px;
 	flow-children: down;
 	background-color: gradient(linear, 0% 0%, 100% 100%, from(#131a27ef), to(#0b1018ef));
-	border: 1px solid #d5b87855;
-	box-shadow: fill #000000be 0px 0px 14px 0px;
+	border: 1px solid #d5b87842;
+	box-shadow: fill #000000ad 0px 0px 10px 0px;
 }
 
 .player-loading-header {
@@ -872,9 +872,9 @@
 }
 
 .player-loading-title.PlayerLoadingTitleFailed {
-	color: #f7a7a7;
-	text-shadow: 0px 0px 8px #6b1010;
-	brightness: 1.08;
+	color: #eca3a3;
+	text-shadow: 0px 0px 5px #5f1717;
+	brightness: 1.04;
 }
 
 .player-loading-counter {
@@ -937,9 +937,9 @@
 }
 
 .player-loading-row.PlayerLoadingSelected {
-	border: 1px solid #f0d39a;
-	background-color: #243954;
-	box-shadow: fill #b58a4a33 0px 0px 6px 0px;
+	border: 1px solid #f0d39a99;
+	background-color: #20344f;
+	box-shadow: fill #b58a4a26 0px 0px 5px 0px;
 }
 
 .player-loading-row.PlayerLoadingSelected .player-loading-name {
@@ -947,12 +947,13 @@
 }
 
 .player-loading-dot {
-	width: 10px;
-	height: 10px;
-	margin-left: 1px;
-	margin-top: 8px;
+	width: 12px;
+	height: 12px;
+	margin-left: 0px;
+	margin-top: 0px;
 	margin-right: 8px;
-	border-radius: 50%;
+	vertical-align: center;
+	border-radius: 6px;
 	background-color: #9ca8bd;
 }
 
@@ -1017,8 +1018,8 @@
 }
 
 .player-loading-row.PlayerLoadingReady {
-	border: 1px solid #7294c155;
-	background-color: #142338;
+	border: 1px solid #7294c144;
+	background-color: #132033;
 }
 
 .player-loading-row.PlayerLoadingReady .player-loading-state {
@@ -1026,8 +1027,8 @@
 }
 
 .player-loading-row.PlayerMarkedReady {
-	border: 1px solid #94d29c44;
-	background-color: #102117;
+	border: 1px solid #94d29c38;
+	background-color: #0f1d15;
 }
 
 .player-loading-row.PlayerMarkedReady .player-loading-state {
@@ -1051,25 +1052,25 @@
 }
 
 .player-loading-row.PlayerLoadingIssue {
-	border: 1px solid #d3717155;
-	background-color: #291214;
+	border: 1px solid #d3717140;
+	background-color: #241719;
 }
 
 .player-loading-row.PlayerLoadingIssue .player-loading-state {
-	color: #f29a9a;
+	color: #e69494;
 }
 
 .player-loading-dot.PlayerLoadingIssue {
-	background-color: #f29a9a;
+	background-color: #e69494;
 }
 
 .description-background {
 	width: 100%;
-	height: 58%;
+	height: 60%;
 	background-image: url("file://{images}/custom_game/loading_screen/description-container.webp");
 	background-position: 50% 36%;
 	background-size: cover;
-	saturation: 0.84;
+	saturation: 0.9;
 }
 
 .description-credit-wrap {
@@ -1079,8 +1080,8 @@
 	margin-right: 12px;
 	margin-bottom: 10px;
 	padding: 6px 8px;
-	background-color: #05080cbf;
-	border: 1px solid #d5b87844;
+	background-color: #05080ca8;
+	border: 1px solid #d5b87832;
 }
 
 .description-credit-text {
@@ -1119,8 +1120,8 @@
 
 .description-text-container {
 	width: 100%;
-	height: 42%;
-	padding: 18px 20px 12px 20px;
+	height: 40%;
+	padding: 20px 22px 12px 22px;
 	flow-children: down;
 	background-color: gradient(linear, 0% 0%, 100% 100%, from(#131a27f5), to(#0a0f17f0));
 }
@@ -1128,12 +1129,12 @@
 #loading-title-text {
 	margin-top: 0px;
 	width: 100%;
-	font-size: 66px;
-	line-height: 70px;
+	font-size: 68px;
+	line-height: 72px;
 	text-align: left top;
 	text-transform: uppercase;
 	color: gradient(linear, 0% 0%, 0% 100%, from(#fff4de), color-stop(0.55, #f0d39a), to(#c29d5f));
-	text-shadow: 0px 2px 8px #000000;
+	text-shadow: 0px 2px 6px #000000;
 	font-family: titleFont;
 }
 
@@ -1166,12 +1167,12 @@
 	flow-children: down;
 	margin-left: 4%;
 	width: 82.4%;
-	height: 37%;
+	height: 34%;
 	margin: 4px 0px 10px 0px;
 	horizontal-align: left;
 	background-color: gradient(linear, 0% 0%, 100% 100%, from(#111823f2), to(#0a0f17f2));
-	border: 1px solid #d5b87855;
-	box-shadow: fill #000000be 0px 0px 14px 0px;
+	border: 1px solid #d5b87842;
+	box-shadow: fill #000000ad 0px 0px 10px 0px;
 }
 
 .bottom-button-container {
@@ -1225,8 +1226,8 @@
 	flow-children: right;
 	vertical-align: middle;
 	background-color: gradient(linear, 0% 0%, 100% 100%, from(#1a2435f0), to(#101826f0));
-	border: 1px solid #d5b87855;
-	box-shadow: fill #00000099 0px 0px 6px 0px;
+	border: 1px solid #d5b87840;
+	box-shadow: fill #00000088 0px 0px 4px 0px;
 }
 
 .bottom-tab-countdown-dot {
@@ -1428,14 +1429,22 @@
 	transition-duration: 0.12s;
 }
 
+.patreon-cta-image-button Label,
+.transifex-cta-image-button Label {
+	visibility: collapse;
+}
+
 .patreon-cta-image-button {
 	background-color: gradient(linear, 0% 0%, 100% 100%, from(#382115ff), to(#1c110aff));
 	border: 1px solid #f0a26f88;
 }
 
 .discord-cta-image-button {
-	background-color: gradient(linear, 0% 0%, 100% 100%, from(#2a2f56ff), to(#141832ff));
-	border: 1px solid #b2bcff88;
+	width: 466px;
+	height: 149px;
+	background-color: #00000000;
+	border: 0px solid transparent;
+	background-image: url("file://{images}/custom_game/loading_screen/discord.webp");
 }
 
 .transifex-cta-image-button {
@@ -1455,7 +1464,7 @@
 }
 
 .discord-cta-image-button:hover {
-	border: 1px solid #dfe4ff;
+	border: 0px solid transparent;
 }
 
 .transifex-cta-image-button:hover {
@@ -1606,8 +1615,8 @@
 .mod-image-container {
 	width: 282px;
 	height: 202px;
-	border: 1px solid #d5b87840;
-	box-shadow: fill #00000099 0px 0px 8px 0px;
+	border: 1px solid #d5b87832;
+	box-shadow: fill #00000086 0px 0px 6px 0px;
 }
 
 .mod-image-container:hover {
@@ -2510,6 +2519,48 @@
 .AspectRatio16x10 .discord-cta-image-button {
 	width: 276px;
 	height: 65px;
+}
+
+.discord-cta-side,
+.AspectRatio21x9 .discord-cta-side,
+.AspectRatio4x3 .discord-cta-side,
+.AspectRatio16x10 .discord-cta-side {
+	width: 482px;
+}
+
+.discord-cta-image-button,
+.AspectRatio21x9 .discord-cta-image-button,
+.AspectRatio4x3 .discord-cta-image-button,
+.AspectRatio16x10 .discord-cta-image-button {
+	width: 466px;
+	height: 149px;
+}
+
+.AspectRatio21x9 .discord-cta-side {
+	width: 436px;
+}
+
+.AspectRatio21x9 .discord-cta-image-button {
+	width: 420px;
+	height: 135px;
+}
+
+.AspectRatio4x3 .discord-cta-side {
+	width: 330px;
+}
+
+.AspectRatio4x3 .discord-cta-image-button {
+	width: 314px;
+	height: 101px;
+}
+
+.AspectRatio16x10 .discord-cta-side {
+	width: 400px;
+}
+
+.AspectRatio16x10 .discord-cta-image-button {
+	width: 384px;
+	height: 123px;
 }
 
 /* Profile summary compact layout (title removed, arrow moved next to name) */

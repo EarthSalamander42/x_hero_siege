@@ -752,6 +752,22 @@ function api:CompleteGame()
 	print("CompleteGame")
 	local players = {}
 
+	local function CountItemsBought(itemsBought, itemName)
+		local count = 0
+
+		if itemsBought == nil then
+			return count
+		end
+
+		for _, itemInfo in pairs(itemsBought) do
+			if itemInfo and itemInfo.item_name == itemName then
+				count = count + 1
+			end
+		end
+
+		return count
+	end
+
 	for id = 0, PlayerResource:GetPlayerCount() - 1 do
 		if PlayerResource:IsValidPlayerID(id) then
 			local items = {}
@@ -762,11 +778,12 @@ function api:CompleteGame()
 			local damage_done_to_heroes = 0
 			local damage_done_to_buildings = 0
 			local kills_done_to_hero = {}
-			local items_bought = nil
+			local items_bought = {}
 			local abandon = false
 			local leaderboard = {}
 			local support_items = {}
 			local abilities_level_up_order = {}
+			local tome_stats_bonus = 0
 
 			if PlayerResource.GetHasAbandonedDueToLongDisconnect then
 				abandon = PlayerResource:GetHasAbandonedDueToLongDisconnect(id)
@@ -795,6 +812,11 @@ function api:CompleteGame()
 				end
 
 				networth = PlayerResource:GetNetWorth(id)
+
+				local tomeModifier = heroEntity:FindModifierByName("modifier_tome_of_stats")
+				if tomeModifier ~= nil then
+					tome_stats_bonus = tomeModifier:GetStackCount()
+				end
 			end
 
 			if CUSTOM_GAME_TYPE == "PLS" then
@@ -839,6 +861,10 @@ function api:CompleteGame()
 				damage_done_to_buildings = damage_done_to_buildings,
 				kills_done_to_hero = kills_done_to_hero,
 				items_bought = items_bought,
+				tome_stats_bonus = tome_stats_bonus,
+				tomes_bought_small = CountItemsBought(items_bought, "item_tome_small"),
+				tomes_bought_big = CountItemsBought(items_bought, "item_tome_big"),
+				tomes_bought_power = CountItemsBought(items_bought, "item_tome_of_power"),
 				support_items = support_items,
 				gold_spent_on_support = PlayerResource:GetGoldSpentOnSupport(id),
 				abilities_level_up_order = abilities_level_up_order,
@@ -850,7 +876,7 @@ function api:CompleteGame()
 
 			local steamid = tostring(PlayerResource:GetSteamID(id))
 
-			if steamid == 0 then
+			if steamid == "0" then
 				steamid = tostring(id)
 			end
 

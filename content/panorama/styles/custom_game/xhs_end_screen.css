@@ -1,0 +1,674 @@
+@define COMMON_COLOR: #b0c3d9;
+@define UNCOMMON_COLOR: #5e98d9;
+@define RARE_COLOR: #4b69ff;
+@define MYTHICAL_COLOR: #8847ff;
+@define LEGENDARY_COLOR: #d32ce6;
+@define IMMORTAL_COLOR: #b28a33;
+@define ARCANA_COLOR: #ade55c;
+@define ANCIENT_COLOR: #eb4b4b;
+
+@keyframes 'xhs_end_fade_in'
+{
+	0% { opacity: 0; }
+	100% { opacity: 1; }
+}
+
+@keyframes 'xhs_reward_pulse'
+{
+	0% { box-shadow: fill #5ad0ff00 0px 0px 0px 0px; }
+	50% { box-shadow: fill #5ad0ff80 0px 0px 16px 0px; }
+	100% { box-shadow: fill #5ad0ff00 0px 0px 0px 0px; }
+}
+
+.XHSEndScreenRoot {
+	width: 100%;
+	height: 100%;
+	animation-name: xhs_end_fade_in;
+	animation-duration: 0.35s;
+	animation-timing-function: ease-in;
+}
+
+.XHSEndScreenBackdrop {
+	width: 100%;
+	height: 100%;
+	background-color: gradient( linear, 0% 0%, 0% 100%, from( #02050cff ), color-stop( 0.28, #061326d8 ), color-stop( 0.68, #06132694 ), to( #02050ce8 ) );
+}
+
+.XHSEndScreenMain {
+	width: 1400px;
+	height: 840px;
+	align: center center;
+	flow-children: down;
+}
+
+.XHSEndScreenHeader {
+	width: 100%;
+	height: 116px;
+	flow-children: right;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #071827f4 ), color-stop( 0.7, #0a2037ea ), to( #07101def ) );
+	border: 1px solid xhs_border;
+	box-shadow: fill #00000090 0px 0px 12px 0px;
+}
+
+.XHSEndScreenHeaderCopy {
+	width: fill-parent-flow( 1.0 );
+	height: 100%;
+	padding: 18px 24px;
+	flow-children: down;
+}
+
+.XHSEndScreenResult {
+	font-size: 42px;
+	font-weight: bold;
+	color: #f3fbff;
+	text-transform: uppercase;
+	text-shadow: 0px 2px 4px #00111f;
+}
+
+.XHSEndScreenResult.IsDefeat {
+	color: #ffb6a8;
+}
+
+.XHSEndScreenMeta {
+	width: 100%;
+	height: 32px;
+	margin-top: 8px;
+	flow-children: right;
+}
+
+.XHSEndScreenMetaValue {
+	min-width: 130px;
+	height: 32px;
+	margin-right: 8px;
+	padding: 6px 10px 4px 10px;
+	background-color: #050b14b8;
+	border: 1px solid xhs_border_soft;
+	color: xhs_text_muted;
+	font-size: 16px;
+	text-transform: uppercase;
+}
+
+.XHSEndScreenHeaderActions {
+	width: 310px;
+	height: 100%;
+	padding: 22px 20px;
+	flow-children: right;
+}
+
+.XHSEndScreenButton,
+.XHSEndScreenButtonSecondary,
+.XHSEndScreenFooterButton,
+.XHSEndScreenIconButton {
+	height: 42px;
+	padding: 0px 18px;
+	margin-left: 8px;
+	border: 1px solid #ffffff18;
+	transition-property: brightness, background-color, box-shadow;
+	transition-duration: 0.12s;
+}
+
+.XHSEndScreenButton {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( xhs_warning ), to( xhs_warning_dark ) );
+}
+
+.XHSEndScreenButtonSecondary {
+	background-color: #071321e8;
+	border: 1px solid xhs_border;
+}
+
+.XHSEndScreenDiscordButton {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #4e60df ), to( #2f3db0 ) );
+}
+
+.XHSEndScreenButton:hover,
+.XHSEndScreenButtonSecondary:hover,
+.XHSEndScreenFooterButton:hover,
+.XHSEndScreenIconButton:hover {
+	brightness: 1.22;
+	box-shadow: fill #00000070 0px 0px 8px 0px;
+}
+
+.XHSEndScreenButton Label,
+.XHSEndScreenButtonSecondary Label,
+.XHSEndScreenFooterButton Label,
+.XHSEndScreenIconButton Label {
+	align: center center;
+	color: #f4fbff;
+	font-size: 18px;
+	text-shadow: 0px 1px 2px #000000;
+}
+
+.XHSEndScreenBody {
+	width: 100%;
+	height: fill-parent-flow( 1.0 );
+	margin-top: 10px;
+	flow-children: right;
+}
+
+.XHSEndScreenLeft {
+	width: 306px;
+	height: 100%;
+	margin-right: 10px;
+	flow-children: down;
+}
+
+.XHSEndScreenSummary {
+	width: 100%;
+	height: 252px;
+	flow-children: down;
+	padding: 14px;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #071827dc ), to( #050b14cc ) );
+	border: 1px solid xhs_border;
+	box-shadow: fill #00000070 0px 0px 8px 0px;
+}
+
+.XHSSummaryTile {
+	width: 100%;
+	min-height: 46px;
+	margin-bottom: 8px;
+	flow-children: down;
+}
+
+.XHSSummaryLabel,
+.XHSMvpLabel,
+.XHSEndScreenSectionNote {
+	color: xhs_text_dim;
+	font-size: 13px;
+	text-transform: uppercase;
+}
+
+.XHSSummaryValue {
+	color: xhs_text;
+	font-size: 24px;
+	font-weight: bold;
+	text-shadow: 0px 1px 3px xhs_shadow;
+}
+
+.XHSEndScreenMvpGrid {
+	width: 100%;
+	height: fill-parent-flow( 1.0 );
+	margin-top: 10px;
+	flow-children: down;
+}
+
+.XHSMvpCard {
+	width: 100%;
+	height: 96px;
+	margin-bottom: 10px;
+	padding: 10px;
+	flow-children: right;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #071827d8 ), to( #050b14c8 ) );
+	border: 1px solid xhs_border_soft;
+}
+
+.XHSMvpIcon {
+	width: 54px;
+	height: 54px;
+	margin-right: 10px;
+	align: left center;
+	border: 1px solid xhs_border;
+}
+
+.XHSMvpCopy {
+	width: fill-parent-flow( 1.0 );
+	height: 100%;
+	flow-children: down;
+}
+
+.XHSMvpName {
+	color: #f3fbff;
+	font-size: 20px;
+	height: 25px;
+	text-overflow: shrink;
+}
+
+.XHSMvpValue {
+	color: xhs_gold;
+	font-size: 20px;
+	font-weight: bold;
+}
+
+.XHSEndScreenPlayersPanel {
+	width: fill-parent-flow( 1.0 );
+	height: 100%;
+	flow-children: down;
+	padding: 14px;
+}
+
+.XHSEndScreenSectionHeader {
+	width: 100%;
+	height: 40px;
+	flow-children: right;
+}
+
+.XHSEndScreenSectionTitle {
+	width: fill-parent-flow( 1.0 );
+	color: xhs_accent_text;
+	font-size: 24px;
+	font-weight: bold;
+	text-transform: uppercase;
+	text-shadow: 0px 1px 3px xhs_shadow;
+}
+
+.XHSEndScreenSectionNote {
+	width: 190px;
+	text-align: right;
+	vertical-align: center;
+}
+
+.XHSEndScreenPlayerHeader,
+.XHSEndScreenPlayerRow {
+	width: 100%;
+	flow-children: right;
+}
+
+.XHSEndScreenPlayerHeader {
+	height: 32px;
+	padding: 0px 10px;
+	background-color: #050b14e8;
+	border: 1px solid xhs_border_soft;
+}
+
+.XHSEndScreenPlayerHeader Label {
+	color: xhs_text_dim;
+	font-size: 12px;
+	text-transform: uppercase;
+	vertical-align: center;
+	text-align: center;
+}
+
+.XHSEndScreenPlayerRows {
+	width: 100%;
+	height: fill-parent-flow( 1.0 );
+	margin-top: 6px;
+	flow-children: down;
+	overflow: squish scroll;
+}
+
+.XHSEndScreenPlayerRow {
+	height: 64px;
+	margin-bottom: 5px;
+	padding: 7px 10px;
+	background-color: #071827b8;
+	border: 1px solid #77c8ff18;
+	transition-property: background-color, brightness;
+	transition-duration: 0.12s;
+}
+
+.XHSEndScreenPlayerRow:hover {
+	background-color: #0a2037e8;
+	brightness: 1.08;
+}
+
+.XHSEndScreenPlayerRow.IsAbandoned {
+	background-color: #321015b8;
+	border: 1px solid #ff6d6d30;
+}
+
+.PlayerColIdentity {
+	width: 280px;
+	text-align: left;
+}
+
+.PlayerColSmall {
+	width: 54px;
+}
+
+.PlayerColKda {
+	width: 84px;
+}
+
+.PlayerColNumber {
+	width: 100px;
+}
+
+.PlayerColBattlepass {
+	width: fill-parent-flow( 1.0 );
+	min-width: 190px;
+}
+
+.XHSPlayerIdentity {
+	width: 280px;
+	height: 100%;
+	flow-children: right;
+}
+
+.XHSPlayerHeroImage {
+	width: 74px;
+	height: 42px;
+	margin-right: 8px;
+	border: 1px solid xhs_border;
+	vertical-align: center;
+}
+
+.XHSPlayerAvatar {
+	width: 42px;
+	height: 42px;
+	margin-right: 8px;
+	border: 1px solid xhs_border_soft;
+	vertical-align: center;
+}
+
+.XHSPlayerText {
+	width: fill-parent-flow( 1.0 );
+	height: 100%;
+	flow-children: down;
+}
+
+.XHSPlayerName {
+	color: #f3fbff;
+	font-size: 18px;
+	height: 24px;
+	text-overflow: shrink;
+}
+
+.XHSPlayerHeroName {
+	color: xhs_text_muted;
+	font-size: 13px;
+	height: 18px;
+	text-overflow: shrink;
+}
+
+.XHSPlayerCell {
+	color: xhs_text;
+	font-size: 17px;
+	text-align: center;
+	vertical-align: center;
+	text-overflow: shrink;
+}
+
+.XHSPlayerCellGold {
+	color: xhs_gold;
+}
+
+.XHSBattlepassCell {
+	height: 100%;
+	flow-children: down;
+}
+
+.XHSBattlepassTop {
+	width: 100%;
+	height: 22px;
+	flow-children: right;
+}
+
+.XHSBattlepassLevel {
+	width: fill-parent-flow( 1.0 );
+	color: xhs_text;
+	font-size: 14px;
+	text-overflow: shrink;
+}
+
+.XHSBattlepassEarned {
+	width: 58px;
+	color: xhs_success;
+	font-size: 14px;
+	text-align: right;
+}
+
+.XHSBattlepassEarned.IsNegative {
+	color: #ff8b80;
+}
+
+.XHSBattlepassBar {
+	width: 100%;
+	height: 12px;
+	margin-top: 4px;
+	flow-children: none;
+	background-color: #020712;
+	border: 1px solid #77c8ff18;
+}
+
+.XHSBattlepassProgress,
+.XHSBattlepassDiff {
+	height: 100%;
+}
+
+.XHSBattlepassProgress {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #0a7ca8 ), to( #5ad0ff ) );
+}
+
+.XHSBattlepassDiff {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #d3b24a ), to( #ffdf7d ) );
+}
+
+.XHSBattlepassBar.LevelUp {
+	animation-name: xhs_reward_pulse;
+	animation-duration: 1.4s;
+	animation-iteration-count: infinite;
+}
+
+.XHSEndScreenFooter {
+	width: 100%;
+	height: 58px;
+	margin-top: 10px;
+	flow-children: right;
+}
+
+.XHSEndScreenFooterButton {
+	width: 180px;
+	margin-left: 0px;
+	margin-right: 10px;
+}
+
+#XHSEndScreenCloseButton {
+	horizontal-align: right;
+}
+
+.XHSEndScreenHallPanel {
+	width: 100%;
+	height: 100%;
+	background-color: #000000aa;
+	visibility: collapse;
+}
+
+.XHSEndScreenHallPanel.IsVisible {
+	visibility: visible;
+}
+
+.XHSEndScreenHallWindow {
+	width: 760px;
+	height: 640px;
+	align: center center;
+	flow-children: down;
+	padding: 18px;
+}
+
+.XHSEndScreenHallHeader {
+	width: 100%;
+	height: 54px;
+	flow-children: right;
+}
+
+.XHSEndScreenIconButton {
+	width: 44px;
+	padding: 0px;
+	margin-left: 10px;
+	background-color: #071321e8;
+}
+
+.XHSEndScreenHallLegend,
+.XHSEndScreenHallRow {
+	width: 100%;
+	flow-children: right;
+}
+
+.XHSEndScreenHallLegend {
+	height: 30px;
+	background-color: #050b14e8;
+	border: 1px solid xhs_border_soft;
+}
+
+.XHSEndScreenHallLegend Label {
+	color: xhs_text_dim;
+	font-size: 12px;
+	text-transform: uppercase;
+	vertical-align: center;
+}
+
+.XHSEndScreenHallRows {
+	width: 100%;
+	height: fill-parent-flow( 1.0 );
+	margin-top: 8px;
+	flow-children: down;
+	overflow: squish scroll;
+}
+
+.XHSEndScreenHallRow {
+	height: 48px;
+	margin-bottom: 4px;
+	padding: 6px 10px;
+	background-color: #071827b8;
+	border: 1px solid #77c8ff18;
+}
+
+.HallColRank {
+	width: 70px;
+	text-align: center;
+}
+
+.HallColPlayer {
+	width: fill-parent-flow( 1.0 );
+}
+
+.HallColScore {
+	width: 160px;
+	text-align: right;
+}
+
+.XHSEndScreenHallRow Label {
+	color: xhs_text;
+	font-size: 18px;
+	vertical-align: center;
+}
+
+.XHSEndScreenEmptyText {
+	width: 100%;
+	margin-top: 20px;
+	color: xhs_text_muted;
+	font-size: 18px;
+	text-align: center;
+	visibility: collapse;
+}
+
+.XHSEndScreenEmptyText.IsVisible {
+	visibility: visible;
+}
+
+.XHSEndScreenRewardContainer {
+	align: center center;
+	flow-children: right-wrap;
+}
+
+.XHSEndScreenRewardPanel {
+	width: 360px;
+	min-height: 420px;
+	margin: 10px;
+	padding: 24px;
+	flow-children: down;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #071827f6 ), to( #050b14fa ) );
+	border: 1px solid xhs_border;
+	box-shadow: fill #000000aa 0px 0px 16px 0px;
+	animation-name: xhs_end_fade_in;
+	animation-duration: 0.25s;
+}
+
+.XHSEndScreenRewardPanel.level-common { border: 1px solid COMMON_COLOR; }
+.XHSEndScreenRewardPanel.level-uncommon { border: 1px solid UNCOMMON_COLOR; }
+.XHSEndScreenRewardPanel.level-rare { border: 1px solid RARE_COLOR; }
+.XHSEndScreenRewardPanel.level-mythical { border: 1px solid MYTHICAL_COLOR; }
+.XHSEndScreenRewardPanel.level-legendary { border: 1px solid LEGENDARY_COLOR; }
+.XHSEndScreenRewardPanel.level-immortal { border: 1px solid IMMORTAL_COLOR; }
+.XHSEndScreenRewardPanel.level-arcana { border: 1px solid ARCANA_COLOR; }
+.XHSEndScreenRewardPanel.level-ancient { border: 1px solid ANCIENT_COLOR; }
+
+.XHSRewardDescription,
+.XHSRewardName,
+.XHSRewardRarity {
+	width: 100%;
+	text-align: center;
+	color: xhs_text;
+}
+
+.XHSRewardDescription {
+	font-size: 18px;
+	text-transform: uppercase;
+	color: xhs_text_muted;
+}
+
+.XHSRewardName {
+	margin-top: 8px;
+	font-size: 25px;
+	text-overflow: shrink;
+}
+
+.XHSRewardRarity {
+	margin-top: 6px;
+	font-size: 18px;
+	text-transform: uppercase;
+}
+
+.XHSRewardRarity.common { color: COMMON_COLOR; }
+.XHSRewardRarity.uncommon { color: UNCOMMON_COLOR; }
+.XHSRewardRarity.rare { color: RARE_COLOR; }
+.XHSRewardRarity.mythical { color: MYTHICAL_COLOR; }
+.XHSRewardRarity.legendary { color: LEGENDARY_COLOR; }
+.XHSRewardRarity.immortal { color: IMMORTAL_COLOR; }
+.XHSRewardRarity.arcana { color: ARCANA_COLOR; }
+.XHSRewardRarity.ancient { color: ANCIENT_COLOR; }
+
+.XHSRewardImage {
+	width: 220px;
+	height: 146px;
+	margin-top: 22px;
+	horizontal-align: center;
+	background-size: cover;
+	background-position: center;
+	border: 1px solid xhs_border_soft;
+}
+
+.XHSRewardButton {
+	width: 100%;
+	height: 42px;
+	margin-top: 26px;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #0a7ca8 ), to( #1fb8ec ) );
+	border: 1px solid #ffffff20;
+}
+
+.XHSRewardButton:hover {
+	brightness: 1.2;
+}
+
+.XHSRewardButton Label {
+	align: center center;
+	color: #f4fbff;
+	font-size: 18px;
+	text-transform: uppercase;
+}
+
+.AspectRatio16x10 .XHSEndScreenMain {
+	width: 1280px;
+	height: 780px;
+}
+
+.AspectRatio16x10 .XHSEndScreenLeft {
+	width: 286px;
+}
+
+.AspectRatio4x3 .XHSEndScreenMain {
+	width: 1160px;
+	height: 760px;
+}
+
+.AspectRatio4x3 .XHSEndScreenLeft {
+	width: 270px;
+}
+
+.AspectRatio4x3 .PlayerColNumber {
+	width: 82px;
+}
+
+.AspectRatio4x3 .PlayerColIdentity,
+.AspectRatio4x3 .XHSPlayerIdentity {
+	width: 240px;
+}

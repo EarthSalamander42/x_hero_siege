@@ -25,12 +25,11 @@ center_block.FindChildTraverse("AbilitiesAndStatBranch").style.minWidth = "386px
 //center_block.FindChildTraverse("AbilitiesAndStatBranch").style.minWidth = "160px";
 center_block.FindChildTraverse("inventory_neutral_craft_holder").style.visibility = "collapse";
 
-//Fuck Scanner UI
 var minimap_container = hudElements.FindChildTraverse("minimap_container");
 minimap_container.FindChildTraverse("GlyphScanContainer").style.visibility = "collapse";
 
-//Fuck Roshan UI
 minimap_container.FindChildTraverse("RoshanTimerContainer").style.visibility = "collapse";
+minimap_container.FindChildTraverse("TormentorTimerContainer").style.visibility = "collapse";
 
 center_block.FindChildTraverse("StatBranch").style.visibility = "collapse";
 

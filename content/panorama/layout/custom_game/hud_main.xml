@@ -6,24 +6,19 @@
 		<include src="s2r://panorama/styles/hud/hud_reborn.vcss_c" />	
 
 		<include src="s2r://panorama/styles/custom_game/hud_main.css" />
+		<include src="s2r://panorama/styles/custom_game/xhs_theme.vcss_c" />
 		<include src="s2r://panorama/styles/custom_game/quests.vcss_c" />
-		<include src="s2r://panorama/styles/custom_game/party_portraits.vcss_c" />
 <!--		<include src="s2r://panorama/styles/custom_game/party_arrows.vcss_c" /> -->
 	</styles>
 
 	<scripts>
 		<include src="s2r://panorama/scripts/custom_game/hud_main.vjs_c" />
 		<include src="s2r://panorama/scripts/custom_game/quests.vjs_c" />
-		<include src="s2r://panorama/scripts/custom_game/party_health_bars.vjs_c" />
 <!--		<include src="s2r://panorama/scripts/custom_game/relic_courier.vjs_c" /> -->
 	</scripts>
 
   <Panel hittest="false" class="CustomHudRoot">
 	<Panel id="DungeonHUDContents" hittest="false" class="CustomHudContents">
-		<Panel hittest="false" id="PartyPortraitsMain">
-			<Panel hittest="false" id="PartyPortraits" class="LeftRightFlow"/>
-		</Panel>  
-	
 		<Panel hittest="false" id="ZoneToastPanel" always-cache-composition-layer="true" require-composition-layer="true" >
 		  <Label hittest="false" id="ZoneNameLabel" text="" class="TitleFont"/>
 		</Panel>  

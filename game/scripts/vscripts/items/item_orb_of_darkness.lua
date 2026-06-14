@@ -2,23 +2,128 @@
 -- Date (DD/MM/YYYY): 14/12/2018
 
 LinkLuaModifier("modifier_orb_of_darkness_active", "items/item_orb_of_darkness.lua", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_orb_of_darkness_controlled", "items/item_orb_of_darkness.lua", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_orb_of_darkness_passive", "items/item_orb_of_darkness.lua", LUA_MODIFIER_MOTION_NONE)
 
-local function StartSpell(caster, ability)
-	if caster:HasModifier("modifier_orb_of_darkness_active") then
-		-- kill units under control when disabling the orb
-		local darkness_units = FindUnitsInRadius(caster:GetTeamNumber(), Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)
+local ORB_CONTROL_MARKER_ABILITY = "orb_of_darkness_unit"
+local ORB_VISUAL_ABILITY = "holdout_blue_effect"
+local ORB_ACTIVE_MODIFIER = "modifier_orb_of_darkness_active"
+local ORB_CONTROLLED_MODIFIER = "modifier_orb_of_darkness_controlled"
 
-		for _, darkness_unit in pairs(darkness_units) do
-			if darkness_unit:HasAbility("orb_of_darkness_unit") then
-				darkness_unit:Kill(nil, nil)
+local function IsValidEntity(entity)
+	return entity ~= nil and not entity:IsNull()
+end
+
+local function IsValidLivingUnit(unit)
+	return IsValidEntity(unit) and unit:IsAlive()
+end
+
+local function FindOrbItem(caster)
+	if not IsValidEntity(caster) then
+		return nil
+	end
+
+	local item_names = MODIFIER_ITEMS_WITH_LEVELS[ORB_ACTIVE_MODIFIER] or {}
+
+	for slot = 0, 5 do
+		local item = caster:GetItemInSlot(slot)
+
+		if item then
+			local item_name = item:GetAbilityName()
+
+			for _, orb_item_name in ipairs(item_names) do
+				if item_name == orb_item_name then
+					return item
+				end
 			end
 		end
-
-		caster:RemoveModifierByName("modifier_orb_of_darkness_active")
-	else
-		caster:AddNewModifier(caster, ability, "modifier_orb_of_darkness_active", {})
 	end
+
+	return nil
+end
+
+local function HasOrbItem(caster)
+	return FindOrbItem(caster) ~= nil
+end
+
+local function IsControlledByOrbOwner(unit, owner)
+	if not IsValidEntity(unit) or not IsValidEntity(owner) then
+		return false
+	end
+
+	if not unit:HasAbility(ORB_CONTROL_MARKER_ABILITY) then
+		return false
+	end
+
+	if unit:GetOwner() == owner then
+		return true
+	end
+
+	return unit:GetPlayerOwnerID() == owner:GetPlayerID()
+end
+
+local function KillOwnedOrbUnits(owner)
+	if not IsValidEntity(owner) then
+		return
+	end
+
+	local units = FindUnitsInRadius(
+		owner:GetTeamNumber(),
+		Vector(0, 0, 0),
+		nil,
+		FIND_UNITS_EVERYWHERE,
+		DOTA_UNIT_TARGET_TEAM_FRIENDLY,
+		DOTA_UNIT_TARGET_CREEP,
+		DOTA_UNIT_TARGET_FLAG_NONE,
+		FIND_ANY_ORDER,
+		false
+	)
+
+	for _, unit in pairs(units) do
+		if IsControlledByOrbOwner(unit, owner) then
+			unit:Kill(nil, nil)
+		end
+	end
+end
+
+local function DisableActiveAbilities(unit)
+	if not IsValidEntity(unit) then
+		return
+	end
+
+	local ability_count = unit:GetAbilityCount()
+
+	for index = 0, ability_count - 1 do
+		local ability = unit:GetAbilityByIndex(index)
+
+		if ability and not ability:IsPassive() then
+			ability:SetActivated(false)
+		end
+	end
+end
+
+local function ToggleOrb(caster, ability)
+	if not IsServer() or not IsValidEntity(caster) then
+		return
+	end
+
+	local active_modifier = caster:FindModifierByName(ORB_ACTIVE_MODIFIER)
+
+	if active_modifier then
+		active_modifier:DestroyControlledUnits()
+		caster:RemoveModifierByName(ORB_ACTIVE_MODIFIER)
+		return
+	end
+
+	caster:AddNewModifier(caster, ability, ORB_ACTIVE_MODIFIER, {})
+end
+
+local function GetOrbTexture(caster, active_texture, inactive_texture)
+	if IsValidEntity(caster) and caster:HasModifier(ORB_ACTIVE_MODIFIER) then
+		return active_texture
+	end
+
+	return inactive_texture
 end
 
 item_orb_of_darkness = item_orb_of_darkness or class({})
@@ -28,20 +133,12 @@ function item_orb_of_darkness:GetIntrinsicModifierName()
 end
 
 function item_orb_of_darkness:OnSpellStart()
-	if not IsServer() then return end
-
-	StartSpell(self:GetCaster(), self)
+	ToggleOrb(self:GetCaster(), self)
 end
 
 function item_orb_of_darkness:GetAbilityTextureName()
-	if self:GetCaster():HasModifier("modifier_orb_of_darkness_active") then
-		return "custom/orb_of_darkness"
-	end
-
-	return "custom/orb_of_darkness_off"
+	return GetOrbTexture(self:GetCaster(), "custom/orb_of_darkness", "custom/orb_of_darkness_off")
 end
-
---------------------------------------------------------------
 
 item_orb_of_darkness2 = item_orb_of_darkness2 or class({})
 
@@ -50,20 +147,12 @@ function item_orb_of_darkness2:GetIntrinsicModifierName()
 end
 
 function item_orb_of_darkness2:OnSpellStart()
-	if not IsServer() then return end
-
-	StartSpell(self:GetCaster(), self)
+	ToggleOrb(self:GetCaster(), self)
 end
 
 function item_orb_of_darkness2:GetAbilityTextureName()
-	if self:GetCaster():HasModifier("modifier_orb_of_darkness_active") then
-		return "custom/orb_of_darkness2"
-	end
-
-	return "custom/orb_of_darkness2_off"
+	return GetOrbTexture(self:GetCaster(), "custom/orb_of_darkness2", "custom/orb_of_darkness2_off")
 end
-
---------------------------------------------------------------
 
 item_bracer_of_the_void = item_bracer_of_the_void or class({})
 
@@ -72,33 +161,20 @@ function item_bracer_of_the_void:GetIntrinsicModifierName()
 end
 
 function item_bracer_of_the_void:OnSpellStart()
-	if not IsServer() then return end
-
-	StartSpell(self:GetCaster(), self)
+	ToggleOrb(self:GetCaster(), self)
 end
 
 function item_bracer_of_the_void:GetAbilityTextureName()
-	if self:GetCaster():HasModifier("modifier_orb_of_darkness_active") then
-		return "custom/bracer_of_the_void"
-	end
-
-	return "custom/bracer_of_the_void_off"
+	return GetOrbTexture(self:GetCaster(), "custom/bracer_of_the_void", "custom/bracer_of_the_void_off")
 end
-
---------------------------------------------------------------
 
 modifier_orb_of_darkness_active = modifier_orb_of_darkness_active or class({})
 
 function modifier_orb_of_darkness_active:IsHidden() return false end
-
 function modifier_orb_of_darkness_active:IsPurgable() return false end
-
 function modifier_orb_of_darkness_active:IsPurgeException() return false end
-
 function modifier_orb_of_darkness_active:IsDebuff() return false end
-
 function modifier_orb_of_darkness_active:RemoveOnDeath() return false end
-
 function modifier_orb_of_darkness_active:GetTexture() return "modifiers/orb_of_darkness" end
 
 function modifier_orb_of_darkness_active:GetEffectAttachType()
@@ -116,115 +192,218 @@ function modifier_orb_of_darkness_active:DeclareFunctions()
 end
 
 function modifier_orb_of_darkness_active:OnCreated()
-	--	self.ability = self:GetAbility()
-	self.duration = self:GetAbility():GetSpecialValueFor("duration")
-	self.max_units = self:GetAbility():GetSpecialValueFor("max_units")
+	self.controlled_units = {}
+	self:RefreshSpecialValues()
 
-	self:StartIntervalThink(0.1)
+	if IsServer() then
+		self:StartIntervalThink(0.5)
+	end
+end
+
+function modifier_orb_of_darkness_active:OnRefresh()
+	self:RefreshSpecialValues()
+
+	if IsServer() then
+		self:PruneControlledUnits()
+	end
+end
+
+function modifier_orb_of_darkness_active:OnDestroy()
+	if not IsServer() then
+		return
+	end
+
+	self:SetStackCount(0)
+end
+
+function modifier_orb_of_darkness_active:RefreshSpecialValues()
+	local ability = self:GetAbility()
+
+	if IsServer() then
+		ability = FindOrbItem(self:GetParent()) or ability
+	end
+
+	self.duration = ability and ability:GetSpecialValueFor("duration") or 25.0
+	self.max_units = ability and ability:GetSpecialValueFor("max_units") or 10
 end
 
 function modifier_orb_of_darkness_active:OnIntervalThink()
-	if not self or not self.GetParent or not self:GetParent().GetItemInSlot then return end
+	local parent = self:GetParent()
 
-	local has_parent_item = false
+	if not IsValidEntity(parent) then
+		self:Destroy()
+		return
+	end
 
-	for i = 0, 5 do
-		local item = self:GetParent():GetItemInSlot(i)
+	if not HasOrbItem(parent) then
+		self:DestroyControlledUnits()
+		parent:RemoveModifierByName(ORB_ACTIVE_MODIFIER)
+		return
+	end
 
-		if item then
-			for k, v in pairs(MODIFIER_ITEMS_WITH_LEVELS["modifier_orb_of_darkness_active"]) do
-				-- print(v, item:GetAbilityName())
-				if v == item:GetAbilityName() then
-					has_parent_item = true
+	self:PruneControlledUnits()
+end
 
-					break
-				end
-			end
+function modifier_orb_of_darkness_active:PruneControlledUnits()
+	if not self.controlled_units then
+		self.controlled_units = {}
+	end
+
+	local count = 0
+
+	for entindex, unit in pairs(self.controlled_units) do
+		if IsValidLivingUnit(unit) and IsControlledByOrbOwner(unit, self:GetParent()) then
+			count = count + 1
+		else
+			self.controlled_units[entindex] = nil
 		end
 	end
 
-	--	print("Has parent item?", has_parent_item)
-	if has_parent_item == false then
-		-- print("has_parent_item:", has_parent_item)
-		self:GetParent():RemoveModifierByName("modifier_orb_of_darkness_active")
+	self:SetStackCount(count)
+	return count
+end
+
+function modifier_orb_of_darkness_active:RegisterControlledUnit(unit)
+	if not IsValidEntity(unit) then
+		return
 	end
+
+	if not self.controlled_units then
+		self.controlled_units = {}
+	end
+
+	self.controlled_units[unit:entindex()] = unit
+	self:PruneControlledUnits()
+end
+
+function modifier_orb_of_darkness_active:UnregisterControlledUnit(unit)
+	if not self.controlled_units or not IsValidEntity(unit) then
+		return
+	end
+
+	self.controlled_units[unit:entindex()] = nil
+	self:PruneControlledUnits()
+end
+
+function modifier_orb_of_darkness_active:DestroyControlledUnits()
+	local parent = self:GetParent()
+
+	if self.controlled_units then
+		for entindex, unit in pairs(self.controlled_units) do
+			if IsValidLivingUnit(unit) then
+				unit:Kill(nil, nil)
+			end
+
+			self.controlled_units[entindex] = nil
+		end
+	end
+
+	KillOwnedOrbUnits(parent)
+	self:SetStackCount(0)
+end
+
+function modifier_orb_of_darkness_active:CanConvertUnit(unit)
+	if not IsValidEntity(unit) then
+		return false
+	end
+
+	if unit.no_corpse == true or unit:IsConsideredHero() then
+		return false
+	end
+
+	return LeavesCorpse(unit)
+end
+
+function modifier_orb_of_darkness_active:ConvertUnit(source_unit)
+	local owner = self:GetParent()
+
+	if not IsValidEntity(owner) or not self:CanConvertUnit(source_unit) then
+		return
+	end
+
+	if self:PruneControlledUnits() >= self.max_units then
+		return
+	end
+
+	local converted_unit = CreateUnitByName(
+		source_unit:GetUnitName(),
+		source_unit:GetAbsOrigin(),
+		true,
+		owner,
+		owner,
+		owner:GetTeamNumber()
+	)
+
+	converted_unit:SetControllableByPlayer(owner:GetPlayerID(), true)
+	converted_unit:SetOwner(owner)
+	converted_unit:SetForwardVector(source_unit:GetForwardVector())
+	converted_unit:AddAbility(ORB_VISUAL_ABILITY):SetLevel(1)
+	converted_unit:AddAbility(ORB_CONTROL_MARKER_ABILITY):SetLevel(1)
+
+	FindClearSpaceForUnit(converted_unit, source_unit:GetAbsOrigin(), true)
+
+	local ability = FindOrbItem(owner) or self:GetAbility()
+	converted_unit:AddNewModifier(owner, ability, ORB_CONTROLLED_MODIFIER, { duration = self.duration })
+	converted_unit:AddNewModifier(owner, ability, "modifier_kill", { duration = self.duration })
+	converted_unit:SetNoCorpse()
+	converted_unit.no_corpse = true
+
+	DisableActiveAbilities(converted_unit)
+
+	source_unit:AddNoDraw()
+	self:RegisterControlledUnit(converted_unit)
 end
 
 function modifier_orb_of_darkness_active:OnDeath(params)
-	if not IsServer() then return end
-	--	if self:GetAbility() == nil then
-	--		local items = {
-	--			"item_bracer_of_the_void",
-	--			"item_orb_of_darkness2",
-	--			"item_orb_of_darkness",
-	--		}
+	if not IsServer() or not params or not IsValidEntity(params.unit) then
+		return
+	end
 
-	--		local new_item = false
-	--		for _, item_name in ipairs(items) do
-	--			if self:GetParent():HasItemInInventory(item_name) then
-	--				print("Change main item with:", item_name)
-	--				self.ability = self:GetParent():FindItemByName(item_name, false)
-	--				new_item = true
-	--				break
-	--			end
-	--		end
-	--	end
+	local parent = self:GetParent()
 
-	--	if new_item == false then
-	--		print("No item for this modifier, remove it!")
-	--		self:GetParent():RemoveModifierByName("modifier_orb_of_darkness_active")
-	--
-	--		return
-	--	end
+	if params.attacker == parent then
+		self:ConvertUnit(params.unit)
+		return
+	end
 
-	if params.attacker == self:GetParent() and LeavesCorpse(params.unit) and params.unit.no_corpse ~= true and not params.unit:IsConsideredHero() then
-		if self:GetStackCount() < self.max_units then
-			local unit = CreateUnitByName(params.unit:GetUnitName(), params.unit:GetAbsOrigin(), true, self:GetParent(), self:GetParent(), self:GetParent():GetTeam())
-			unit:SetControllableByPlayer(self:GetParent():GetPlayerID(), true)
-			unit:SetOwner(self:GetParent())
-			unit:SetForwardVector(params.unit:GetForwardVector())
-			unit:AddAbility("holdout_blue_effect"):SetLevel(1)
-			unit:AddAbility("orb_of_darkness_unit"):SetLevel(1)
-			FindClearSpaceForUnit(unit, params.unit:GetAbsOrigin(), true)
-
-			unit:AddNewModifier(self:GetParent(), nil, "modifier_kill", { duration = self.duration })
-			unit:SetNoCorpse()
-			unit.no_corpse = true
-
-			for i = 0, 15 do
-				local a = unit:GetAbilityByIndex(i)
-				if a and not a:IsPassive() then
-					a:SetActivated(false)
-				end
-			end
-
-			-- the unit is reincarnated, don't want to see the previous unit dying
-			params.unit:AddNoDraw()
-
-			-- increase the number of units under your control
-			self:SetStackCount(self:GetStackCount() + 1)
-		end
-	elseif params.unit:HasAbility("orb_of_darkness_unit") then
-		-- reduce unit count under control when 1 of them is dying
-		self:SetStackCount(self:GetStackCount() - 1)
+	if IsControlledByOrbOwner(params.unit, parent) then
+		self:UnregisterControlledUnit(params.unit)
 	end
 end
 
---------------------------------------------------------------
+modifier_orb_of_darkness_controlled = modifier_orb_of_darkness_controlled or class({})
+
+function modifier_orb_of_darkness_controlled:IsHidden() return true end
+function modifier_orb_of_darkness_controlled:IsPurgable() return false end
+function modifier_orb_of_darkness_controlled:IsPurgeException() return false end
+function modifier_orb_of_darkness_controlled:IsDebuff() return false end
+
+function modifier_orb_of_darkness_controlled:OnDestroy()
+	if not IsServer() then
+		return
+	end
+
+	local owner = self:GetCaster()
+
+	if not IsValidEntity(owner) then
+		return
+	end
+
+	local active_modifier = owner:FindModifierByName(ORB_ACTIVE_MODIFIER)
+
+	if active_modifier then
+		active_modifier:UnregisterControlledUnit(self:GetParent())
+	end
+end
 
 modifier_orb_of_darkness_passive = modifier_orb_of_darkness_passive or class({})
 
 function modifier_orb_of_darkness_passive:IsHidden() return true end
-
 function modifier_orb_of_darkness_passive:IsPurgable() return false end
-
 function modifier_orb_of_darkness_passive:IsPurgeException() return false end
-
 function modifier_orb_of_darkness_passive:IsDebuff() return false end
-
 function modifier_orb_of_darkness_passive:RemoveOnDeath() return false end
 
--- allow multiple instances of that modifier
 function modifier_orb_of_darkness_passive:GetAttributes()
 	return MODIFIER_ATTRIBUTE_MULTIPLE
 end

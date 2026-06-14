@@ -1,11 +1,15 @@
 .Ads_Root {
-	width: 756px;
-	height: 546px;
-	margin-top: 150px;
+	width: 720px;
+	height: 430px;
+	margin-top: 194px;
+	margin-right: 18px;
 	align: right top;
 	opacity: 1;
 	transition: transform 0.4s ease-in-out 0s;
 	transform: translateX(100%);
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #101a2af6 ), color-stop( 0.58, #0b111df4 ), to( #070a10f7 ) );
+	border: 1px solid xhs_border;
+	box-shadow: fill #000000b8 0px 0px 16px 0px;
 }
 
 .Ads_Root.show {
@@ -13,60 +17,76 @@
 }
 
 #Ads_Image {
-	width: 100%;
-	height: 100%;
+	visibility: collapse;
 }
 #Ads_MainText {
-	width: 695px;
-	height: 100%;
+	width: 100%;
+	height: 342px;
 	align: right top;
-	margin-top: 170px;
-	margin-right: 10px;
+	margin-top: 0px;
+	margin-right: 0px;
+	padding: 20px 20px 0px 20px;
 	flow-children: down;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #111c2ff0 ), color-stop( 0.42, xhs_panel_bg_solid ), to( #070b13f0 ) );
+	border-bottom: 1px solid #77c8ff18;
 }
 #Ads_Header {
-	width: 400px;
+	width: fit-children;
+	min-width: 330px;
 	height: 42px;
-	background-color: #c5341a;
-	padding: 6px 0px 3px 10px;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( xhs_warning ), to( xhs_warning_dark ) );
+	padding: 6px 16px 4px 16px;
 	font-size: 30px;
 	color: white;
 	text-overflow: shrink;
 	font-weight: lighter;
 	text-transform: uppercase;
 	horizontal-align: right;
+	text-shadow: 0px 1px 3px #000000;
+	border-left: 2px solid #ffb08e66;
+	box-shadow: fill #0000007c 0px 0px 7px 0px;
 }
 #Ads_Description {
 	width: 100%;
-	max-height: 78%;
+	max-height: 276px;
 	text-overflow: shrink;
 	font-size: 17px;
-	background-color: rgba(0, 0, 0, 0.6);
-	padding: 4px 0px 4px 7px;
+	line-height: 21px;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #060a12d8 ), to( #0b1321d4 ) );
+	padding: 14px 16px 14px 16px;
 	color: #ffffff;
-	margin-top: 5px;
+	margin-top: 10px;
+	text-shadow: 0px 1px 2px #000000;
+	border-left: 2px solid #77c8ff36;
+	border-top: 1px solid #ffffff0e;
+	box-shadow: fill #0000007d 0px 0px 8px 0px;
 }
 #Ads_Footer {
-	height: 42px;
-	margin-right: 30px;
-	margin-bottom: 60px;
+	width: 100%;
+	height: 68px;
+	margin-right: 0px;
+	margin-bottom: 0px;
+	padding: 14px 20px;
 	font-size: 30px;
 	color: white;
 	text-overflow: shrink;
 	font-weight: lighter;
 	text-transform: uppercase;
-	align: right bottom;
+	align: center bottom;
 	flow-children: right;
+	background-color: #070b12de;
+	border-top: 1px solid #77c8ff24;
 }
 .Ads_Button {
-	width: 116px;
-	height: 29px;
-	background-color: #c5341a;
+	width: 138px;
+	height: 38px;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( xhs_warning ), to( xhs_warning_dark ) );
 	align: left bottom;
 	transition: brightness 0.1s ease-in-out 0s, box-shadow 0.1s ease-in-out 0s;
 	box-shadow: 0px 0px 0px 0px transparent;
-	margin-left: 5px;
-	margin-right: 5px;
+	margin-left: 6px;
+	margin-right: 6px;
+	border: 1px solid #ffffff18;
 }
 .Ads_Button:hover {
 	brightness: 1.3;
@@ -76,8 +96,9 @@
 	brightness: 0.9;
 }
 #Ads_Dismiss {
-	margin-left: 20px;
-	background-color: rgba(0, 0, 0, 0.6);
+	margin-left: 14px;
+	background-color: #090c12ee;
+	horizontal-align: right;
 }
 #Ads_Dismiss:hover {
 	box-shadow: 0px 0px 5px 0px #c5341a;
@@ -88,8 +109,10 @@
 .FixCH_ButtonText {
 	align: center center;
 	color: white;
-	text-shadow: 0px 1px 2px 2 rgba(0, 0, 0, 0.4);
+	font-size: 18px;
+	letter-spacing: 1px;
+	text-shadow: 0px 1px 2px 2 #00000066;
 }
 #Ads_More2 {
-	background-color: #5865F2;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #5865F2 ), to( #3843c7 ) );
 }
