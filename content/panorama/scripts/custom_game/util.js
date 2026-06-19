@@ -152,12 +152,12 @@ function GetDonatorColor(status) {
 
 	// Placeholder
 	var donator_colors = [];
-	donator_colors[1] = "#00CC00";
-	donator_colors[2] = "#DAA520";
-	donator_colors[3] = "#DC2828";
-	donator_colors[4] = "#993399";
-	donator_colors[5] = "#2F5B97";
-	donator_colors[6] = "#BB4B0A";
+	donator_colors[1] = "#45C46B";
+	donator_colors[2] = "#F2C94C";
+	donator_colors[3] = "#E4572E";
+	donator_colors[4] = "#7B8794";
+	donator_colors[5] = "#2EC4B6";
+	donator_colors[6] = "#2EC4B6";
 	donator_colors[100] = "#0066FF";
 	donator_colors[101] = "#641414";
 	donator_colors[102] = "#871414";

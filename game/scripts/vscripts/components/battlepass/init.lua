@@ -9,6 +9,7 @@ ListenToGameEvent('game_rules_state_change', function(keys)
 		require('components/battlepass/constants')
 		require('components/battlepass/util')
 		require('components/battlepass/donator_settings')
+		require('components/battlepass/supporter_pass')
 		require('components/battlepass/donator')
 		require('components/battlepass/experience')
 		require('libraries/wearables') -- this lib before items_game
@@ -24,6 +25,10 @@ ListenToGameEvent('game_rules_state_change', function(keys)
 
 		if Battlepass.Init then
 			Battlepass:Init()
+		end
+
+		if SupporterPass and SupporterPass.Init then
+			SupporterPass:Init()
 		end
 
 		Battlepass:GetPlayerInfoXP()
@@ -51,7 +56,7 @@ ListenToGameEvent('npc_spawned', function(event)
 		})
 	end
 
-	local ply_table = CustomNetTables:GetTableValue("battlepass_player", tostring(npc:GetPlayerOwnerID()))
+	local ply_table = CustomNetTables:GetTableValue("supporter_pass_player", tostring(npc:GetPlayerOwnerID()))
 	if type(ply_table) == nil then ply_table = nil end
 
 	if npc:IsIllusion() or string.find(npc:GetUnitName(), "npc_dota_lone_druid_bear") then

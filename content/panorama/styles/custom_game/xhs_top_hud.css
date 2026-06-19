@@ -1,22 +1,49 @@
 .XHSTopHudHost {
 	width: 100%;
-	height: 74px;
+	height: 78px;
 	vertical-align: top;
 }
 
 #XHSTopHudRoot {
 	width: 100%;
-	height: 62px;
+	height: 76px;
 	vertical-align: top;
-	background-color: gradient( linear, 0% 0%, 0% 100%, from( #030a12dd ), color-stop( 0.72, #0718278e ), to( #07182700 ) );
-	border-bottom: 1px solid xhs_border_soft;
+	background-color: gradient( linear, 0% 0%, 0% 100%, from( #06132698 ), color-stop( 0.58, #06132645 ), to( #06132600 ) );
+}
+
+#XHSTopHudBar {
+	width: fit-children;
+	height: 70px;
+	horizontal-align: center;
+	vertical-align: top;
+	flow-children: right;
+	padding: 6px 8px 0px 8px;
+}
+
+#XHSTopHudLeftSlot,
+#XHSTopHudRightSlot {
+	height: 60px;
+	vertical-align: top;
+}
+
+#XHSTopHudLeftSlot {
+	width: 350px;
+}
+
+#XHSTopHudRightSlot {
+	width: fit-children;
 }
 
 #XHSTopHudAllies {
-	horizontal-align: left;
 	vertical-align: top;
-	margin-left: 132px;
+	margin-right: 0px;
+	horizontal-align: right;
 	flow-children: right;
+	padding: 4px 5px 4px 8px;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #050b14cc ), color-stop( 0.62, #071827ee ), to( #0d2235e8 ) );
+	border: 1px solid #77c8ff3f;
+	border-right: 0px solid transparent;
+	box-shadow: fill #00000080 0px 0px 8px 0px;
 }
 
 #XHSAllyRoster,
@@ -30,13 +57,13 @@
 
 .XHSAllyCard,
 .XHSVipCard {
-	width: 72px;
-	height: 60px;
-	margin-right: 5px;
-	padding: 3px;
+	width: 66px;
+	height: 52px;
+	margin-right: 4px;
+	padding: 2px;
 	flow-children: down;
-	background-color: gradient( linear, 0% 0%, 0% 100%, from( xhs_panel_bg_strong ), to( #06101ee8 ) );
-	border: 1px solid xhs_border;
+	background-color: gradient( linear, 0% 0%, 0% 100%, from( #0e263df4 ), to( #050b14f4 ) );
+	border: 1px solid #77c8ff55;
 	box-shadow: fill #00000070 0px 0px 6px 0px;
 	transition-property: brightness, transform, border;
 	transition-duration: 0.12s;
@@ -60,7 +87,7 @@
 }
 
 .XHSAllyColorStrip {
-	width: 64px;
+	width: 58px;
 	height: 2px;
 	horizontal-align: center;
 	margin-bottom: 1px;
@@ -69,8 +96,8 @@
 
 .XHSAllyImageWrap,
 .XHSVipImageWrap {
-	width: 64px;
-	height: 34px;
+	width: 58px;
+	height: 32px;
 	horizontal-align: center;
 	border: 1px solid #000000cc;
 	background-color: #020812;
@@ -115,7 +142,7 @@
 
 .XHSAllyName,
 .XHSVipName {
-	width: 64px;
+	width: 58px;
 	height: 12px;
 	margin-top: -13px;
 	padding-left: 2px;
@@ -131,15 +158,15 @@
 }
 
 .XHSAllyBars {
-	width: 64px;
+	width: 58px;
 	height: 8px;
-	margin-top: 2px;
+	margin-top: 1px;
 	horizontal-align: center;
 	flow-children: down;
 }
 
 .XHSAllyHealthBar {
-	width: 64px;
+	width: 58px;
 	height: 5px;
 	border: 0px solid transparent;
 	background-color: #260b0d;
@@ -152,7 +179,7 @@
 }
 
 .XHSAllyManaBar {
-	width: 64px;
+	width: 58px;
 	height: 2px;
 	margin-top: 1px;
 	border: 0px solid transparent;
@@ -209,21 +236,20 @@
 }
 
 #XHSTopHudClock {
-	width: 122px;
-	height: 58px;
-	horizontal-align: center;
+	width: 146px;
+	height: 62px;
 	vertical-align: top;
-	padding: 6px 9px;
+	padding: 7px 12px;
 	flow-children: down;
-	background-color: gradient( linear, 0% 0%, 100% 0%, from( #39b9edf8 ), to( #72dbfff8 ) );
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #37beeef8 ), color-stop( 0.5, #65dcfff8 ), to( #37beeef8 ) );
 	border: 1px solid #d5f2ff95;
-	box-shadow: fill #00111fb5 0px 0px 7px 0px;
+	box-shadow: fill #00111fc5 0px 0px 10px 0px;
 }
 
 #XHSClockTitle {
 	width: 100%;
 	height: 13px;
-	font-size: 10px;
+	font-size: 11px;
 	font-weight: bold;
 	letter-spacing: 1px;
 	text-align: left;
@@ -233,9 +259,9 @@
 
 #XHSClockValue {
 	width: 100%;
-	height: 30px;
+	height: 34px;
 	margin-top: 1px;
-	font-size: 25px;
+	font-size: 31px;
 	font-weight: bold;
 	letter-spacing: 1px;
 	text-align: left;
@@ -244,27 +270,33 @@
 }
 
 #XHSTopHudTimers {
-	horizontal-align: right;
 	vertical-align: top;
-	margin-right: 194px;
-	padding: 5px;
+	margin-left: 0px;
+	horizontal-align: left;
+	padding: 4px 5px 4px 5px;
 	flow-children: right;
-	background-color: gradient( linear, 0% 0%, 100% 0%, from( #07111de8 ), color-stop( 0.55, #0d2235e2 ), to( #06101be8 ) );
-	border: 1px solid xhs_border;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #0d2235e8 ), color-stop( 0.38, #071827ee ), to( #050b14cc ) );
+	border: 1px solid #77c8ff3f;
+	border-left: 0px solid transparent;
 	box-shadow: fill #00000086 0px 0px 8px 0px;
 }
 
 .XHSTimerCard {
-	width: 104px;
-	min-height: 48px;
-	margin: 1px;
-	padding: 5px 7px;
+	width: 108px;
+	height: 52px;
+	margin: 0px;
+	padding: 5px 8px;
 	flow-children: down;
-	background-color: gradient( linear, 0% 0%, 0% 100%, from( #102238f5 ), to( #081522f0 ) );
-	border: 1px solid xhs_border;
+	background-color: gradient( linear, 0% 0%, 0% 100%, from( #0d2034f6 ), color-stop( 0.55, #071522f5 ), to( #040a12f4 ) );
+	border: 1px solid #77c8ff32;
+	border-left: 0px solid transparent;
 	box-shadow: fill #00000066 0px 0px 4px 0px;
 	transition-property: brightness, transform;
 	transition-duration: 0.12s;
+}
+
+.XHSDifficultyCard {
+	width: 104px;
 }
 
 .XHSTimerCard:hover {
@@ -279,7 +311,7 @@
 .XHSTimerTitle {
 	width: 100%;
 	height: 16px;
-	margin-bottom: 1px;
+	margin-bottom: 0px;
 	font-size: 10px;
 	font-weight: semi-bold;
 	letter-spacing: 1px;
@@ -291,8 +323,8 @@
 
 .XHSTimerValue {
 	width: 100%;
-	height: 24px;
-	font-size: 18px;
+	height: 27px;
+	font-size: 19px;
 	font-weight: bold;
 	text-align: left;
 	color: #ffffff;
@@ -302,7 +334,7 @@
 }
 
 .XHSDifficultyValue {
-	color: xhs_gold;
+	color: #ffcf66;
 }
 
 .XHSTimerValueRow {
@@ -329,19 +361,25 @@
 	100% { opacity: 0.6; box-shadow: 0 0 8px #69f2ff; }
 }
 
-.AspectRatio16x10 #XHSTopHudAllies,
-.AspectRatio4x3 #XHSTopHudAllies {
-	margin-left: 72px;
-}
-
-.AspectRatio16x10 #XHSTopHudTimers,
-.AspectRatio4x3 #XHSTopHudTimers {
-	margin-right: 24px;
-}
-
 .AspectRatio4x3 .XHSAllyCard {
-	width: 64px;
-	height: 58px;
+	width: 58px;
+	height: 50px;
+}
+
+.AspectRatio16x10 #XHSTopHudBar {
+	width: fit-children;
+}
+
+.AspectRatio16x10 #XHSTopHudLeftSlot {
+	width: 310px;
+}
+
+.AspectRatio4x3 #XHSTopHudBar {
+	width: fit-children;
+}
+
+.AspectRatio4x3 #XHSTopHudLeftSlot {
+	width: 268px;
 }
 
 .AspectRatio4x3 .XHSAllyImageWrap,
@@ -349,5 +387,15 @@
 .AspectRatio4x3 .XHSAllyBars,
 .AspectRatio4x3 .XHSAllyHealthBar,
 .AspectRatio4x3 .XHSAllyManaBar {
-	width: 56px;
+	width: 50px;
+}
+
+.AspectRatio4x3 .XHSTimerCard {
+	width: 94px;
+	padding-left: 6px;
+	padding-right: 6px;
+}
+
+.AspectRatio4x3 #XHSTopHudClock {
+	width: 132px;
 }

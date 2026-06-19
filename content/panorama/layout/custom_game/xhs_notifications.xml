@@ -1,0 +1,29 @@
+<root>
+	<styles>
+		<include src="s2r://panorama/styles/dotastyles.vcss_c" />
+		<include src="file://{resources}/styles/custom_game/xhs_theme.css" />
+		<include src="file://{resources}/styles/custom_game/xhs_notifications.css" />
+	</styles>
+
+	<scripts>
+		<include src="file://{resources}/scripts/custom_game/xhs_notifications.js" />
+	</scripts>
+
+	<Panel class="XHSNotificationsRoot" hittest="false">
+		<Panel id="XHSWaveCountdown" hittest="false" class="XHSWaveCountdown XHSNotificationHidden">
+			<Panel class="XHSWaveRingWrap">
+				<Panel class="XHSWaveRing" />
+				<Panel class="XHSWaveRingSweep" />
+				<Label id="XHSWaveCountdownValue" class="XHSWaveCountdownValue" text="30" />
+			</Panel>
+			<Panel class="XHSWaveCopy">
+				<Label id="XHSWaveEyebrow" class="XHSWaveEyebrow" text="WAVE INCOMING" />
+				<Label id="XHSWaveTitle" class="XHSWaveTitle" text="Wave of Darkness" />
+				<Label id="XHSWaveSubtitle" class="XHSWaveSubtitle" text="Prepare your lane" />
+			</Panel>
+		</Panel>
+
+		<Panel id="XHSTopNotifications" hittest="false" class="XHSNotificationStack XHSTopNotifications" />
+		<Panel id="XHSBottomNotifications" hittest="false" class="XHSNotificationStack XHSBottomNotifications" />
+	</Panel>
+</root>

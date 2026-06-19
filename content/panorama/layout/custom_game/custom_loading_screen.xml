@@ -102,13 +102,11 @@
 
 				<Panel id="BottomFooterRoot" class="footer">
 					<Panel class="bottom-button-container" hittest="false">
-					<RadioButton id="BottomRadioDiscord" class="bottom-radio-button" onactivate="SwitchTab(4)" text="#loading_screen_tab_discord" />
+					<RadioButton id="BottomRadioDiscord" class="bottom-radio-button" onactivate="SwitchTab(3)" text="#loading_screen_tab_discord" />
 					<Label class="bottom-radio-separator" text="/" />
-					<RadioButton id="BottomRadioPatreon" class="bottom-radio-button" onactivate="SwitchTab(3)" text="#loading_screen_tab_patreon" />
+					<RadioButton id="BottomRadioPatreon" class="bottom-radio-button" onactivate="SwitchTab(2)" text="#loading_screen_tab_patreon" />
 					<Label class="bottom-radio-separator" text="/" />
 					<RadioButton id="BottomRadioCustomGames" class="bottom-radio-button" onactivate="SwitchTab(1)" text="#loading_screen_tab_custom_games" />
-					<Label class="bottom-radio-separator" text="/" />
-					<RadioButton id="BottomRadioTransifex" class="bottom-radio-button" onactivate="SwitchTab(2)" text="#loading_screen_tab_transifex" />
 					<Panel id="BottomTabCountdownWrap" class="bottom-tab-countdown-wrap">
 						<Panel class="bottom-tab-countdown-dot" />
 						<Label id="BottomTabCountdown" class="bottom-tab-countdown" text="#loading_screen_tab_timer_default" />
@@ -194,33 +192,6 @@
 								<Label class="mod-name" text="#loading_screen_patreon_modlist6"/>
 							</Panel>
 						</Button> -->
-					</Panel>
-
-					<Panel class="bottom-transifex-container">
-						<Panel class="transifex-highlight-card">
-							<Panel class="transifex-highlight-copy">
-								<Label class="transifex-highlight-title" text="#loading_screen_transifex_section_title" />
-								<Label class="transifex-highlight-subtitle" text="#loading_screen_transifex_section_subtitle" />
-
-								<Panel class="transifex-benefits-list">
-									<Panel class="transifex-benefit-row">
-										<Panel class="transifex-benefit-dot" />
-										<Label class="transifex-benefit-text" text="#loading_screen_transifex_advantage_1" />
-									</Panel>
-									<Panel class="transifex-benefit-row">
-										<Panel class="transifex-benefit-dot" />
-										<Label class="transifex-benefit-text" text="#loading_screen_transifex_advantage_2" />
-									</Panel>
-								</Panel>
-
-								<Panel class="transifex-highlight-footer">
-									<Label class="transifex-highlight-support-note" text="#loading_screen_transifex_support_note" />
-								</Panel>
-							</Panel>
-							<Panel class="transifex-cta-side">
-								<Button class="transifex-cta-image-button" onactivate="OnTransifexButtonPressed();" />
-							</Panel>
-						</Panel>
 					</Panel>
 
 					<Panel class="bottom-patreon-container">

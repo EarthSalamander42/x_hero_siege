@@ -429,7 +429,18 @@ function RestartHeroes()
 	for _, hero in pairs(HeroList:GetAllHeroes()) do
 		if hero:IsRealHero() then
 			hero:RemoveModifierByName("modifier_pause_creeps")
+			hero:RemoveModifierByName("modifier_cinematic_pause")
 			hero:RemoveModifierByName("modifier_invulnerable")
+		end
+	end
+end
+
+function CinematicPauseHeroes(rampDuration)
+	RefreshPlayers()
+
+	for _, hero in pairs(HeroList:GetAllHeroes()) do
+		if hero:IsRealHero() then
+			hero:AddNewModifier(hero, nil, "modifier_cinematic_pause", { ramp_duration = rampDuration })
 		end
 	end
 end
@@ -467,6 +478,36 @@ function PauseCreeps(iTime)
 	end
 end
 
+function CinematicPauseCreeps(rampDuration, iTime)
+	if iTime then
+		print("Cinematic pausing creeps for " .. iTime .. " seconds")
+	else
+		print("Cinematic pausing creeps indefinitely")
+	end
+
+	local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_1, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER, false)
+	local units2 = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER, false)
+	local units3 = FindUnitsInRadius(DOTA_TEAM_BADGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER, false)
+
+	for _, v in pairs(units) do
+		if v:HasMovementCapability() and not v.Boss then
+			v:AddNewModifier(v, nil, "modifier_cinematic_pause", { duration = iTime, ramp_duration = rampDuration })
+		end
+	end
+
+	for _, v in pairs(units2) do
+		if v:HasMovementCapability() then
+			v:AddNewModifier(v, nil, "modifier_cinematic_pause", { duration = iTime, ramp_duration = rampDuration })
+		end
+	end
+
+	for _, v in pairs(units3) do
+		if v:HasMovementCapability() then
+			v:AddNewModifier(v, nil, "modifier_cinematic_pause", { duration = iTime, ramp_duration = rampDuration })
+		end
+	end
+end
+
 function KillCreeps(teamnumber)
 	local units = FindUnitsInRadius(teamnumber, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER, false)
 
@@ -496,6 +537,9 @@ function RestartCreeps(delay)
 				if v:HasModifier("modifier_pause_creeps") then
 					v:RemoveModifierByName("modifier_pause_creeps")
 				end
+				if v:HasModifier("modifier_cinematic_pause") then
+					v:RemoveModifierByName("modifier_cinematic_pause")
+				end
 				if v:HasModifier("modifier_invulnerable") then
 					v:RemoveModifierByName("modifier_invulnerable")
 				end
@@ -508,6 +552,9 @@ function RestartCreeps(delay)
 				if v:HasModifier("modifier_pause_creeps") then
 					v:RemoveModifierByName("modifier_pause_creeps")
 				end
+				if v:HasModifier("modifier_cinematic_pause") then
+					v:RemoveModifierByName("modifier_cinematic_pause")
+				end
 				if v:HasModifier("modifier_invulnerable") then
 					v:RemoveModifierByName("modifier_invulnerable")
 				end
@@ -519,6 +566,9 @@ function RestartCreeps(delay)
 			if IsValidEntity(v) then
 				if v:HasModifier("modifier_pause_creeps") then
 					v:RemoveModifierByName("modifier_pause_creeps")
+				end
+				if v:HasModifier("modifier_cinematic_pause") then
+					v:RemoveModifierByName("modifier_cinematic_pause")
 				end
 				if v:HasModifier("modifier_invulnerable") then
 					v:RemoveModifierByName("modifier_invulnerable")
@@ -837,10 +887,25 @@ end
 function GiveTomeToAllHeroes(iCount)
 	local sound_played = false
 
-	Notifications:TopToAll({ text = "Power Up: +250 to all stats!", style = { color = "green" }, duration = 10.0 })
+	Notifications:TopToAll({ text = "Power Up: +" .. iCount .. " to all stats!", style = { color = "green" }, duration = 10.0 })
 
 	for _, hero in pairs(HeroList:GetAllHeroes()) do
 		hero:IncrementAttributes(iCount)
+
+		if hero:IsHero() and not hero:IsIllusion() and hero.GetPlayerOwnerID then
+			local playerID = hero:GetPlayerOwnerID()
+			local player = PlayerResource:GetPlayer(playerID)
+
+			if player ~= nil then
+				CustomGameEventManager:Send_ServerToPlayer(player, "xhs_reward_notification", {
+					type = "stats",
+					amount = iCount,
+					title = "Stats Granted",
+					text = "+" .. iCount .. " all stats",
+					duration = 2.6,
+				})
+			end
+		end
 	end
 end
 

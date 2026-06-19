@@ -1,6 +1,7 @@
 <root>
 	<styles>
 		<include src="s2r://panorama/styles/dotastyles.vcss_c" />
+		<include src="file://{resources}/styles/custom_game/xhs_theme.css" />
 		<include src="file://{resources}/styles/custom_game/game_info.css" />
 	</styles>
 
@@ -26,19 +27,41 @@
 				<Panel id="HeroesTextBox" class="TextBox">
 					<Label id="HeroesTitle" class="Header" html="true" text="#tutorial_heroes_title" />
 					<Label id="Heroes01" class="InfoLine" html="true" text="#tutorial_heroes_01" />
-					<Label id="Heroes02" class="InfoLine" html="true" text="#tutorial_heroes_02" />
-					<Label id="Heroes03" class="InfoLine" html="true" text="#tutorial_heroes_03" />
+					<Panel class="InfoBulletList">
+						<Panel class="InfoBulletRow">
+							<Panel class="InfoBulletDot" />
+							<Label id="Heroes02" class="InfoBulletText" html="true" text="#tutorial_heroes_02" />
+						</Panel>
+						<Panel class="InfoBulletRow">
+							<Panel class="InfoBulletDot" />
+							<Label id="Heroes03" class="InfoBulletText" html="true" text="#tutorial_heroes_03" />
+						</Panel>
+					</Panel>
 				</Panel>
 			</Panel>
 
 			<Panel id="Items" class="InfoBox">
-				<Panel id="ItemsTextBox" class="TextBox">
+					<Panel id="ItemsTextBox" class="TextBox">
 					<Label id="ItemsTitle" class="Header" html="true" text="#tutorial_items_title" />
 					<Label id="Items01" class="InfoLine" html="true" text="#tutorial_items_01" />
-					<Label id="Items02" class="InfoLine" html="true" text="#tutorial_items_02" />
-					<Label id="Items03" class="InfoLine" html="true" text="#tutorial_items_03" />
-					<Label id="Items04" class="InfoLine" html="true" text="#tutorial_items_04" />
-					<Label id="Items05" class="InfoLine" html="true" text="#tutorial_items_05" />
+					<Panel class="InfoBulletList">
+						<Panel class="InfoBulletRow">
+							<Panel class="InfoBulletDot" />
+							<Label id="Items02" class="InfoBulletText" html="true" text="#tutorial_items_02" />
+						</Panel>
+						<Panel class="InfoBulletRow">
+							<Panel class="InfoBulletDot" />
+							<Label id="Items03" class="InfoBulletText" html="true" text="#tutorial_items_03" />
+						</Panel>
+						<Panel class="InfoBulletRow">
+							<Panel class="InfoBulletDot" />
+							<Label id="Items04" class="InfoBulletText" html="true" text="#tutorial_items_04" />
+						</Panel>
+						<Panel class="InfoBulletRow">
+							<Panel class="InfoBulletDot" />
+							<Label id="Items05" class="InfoBulletText" html="true" text="#tutorial_items_05" />
+						</Panel>
+					</Panel>
 				</Panel>
 			</Panel>
 
@@ -53,7 +76,12 @@
 				<Panel id="DevelopersTextBox" class="TextBox">
 					<Label id="DevelopersTitle" class="Header" html="true" text="#developer_credits_title" />
 					<Label id="Developers01" class="InfoLine" html="true" text="#developer_credits_01" />
-					<Label id="Developers02" class="InfoLine" html="true" text="#developer_credits_02" />
+					<Panel class="InfoBulletList Compact">
+						<Panel class="InfoBulletRow">
+							<Panel class="InfoBulletDot" />
+							<Label id="Developers02" class="InfoBulletText" html="true" text="#developer_credits_02" />
+						</Panel>
+					</Panel>
 				</Panel>
 			</Panel>
 
@@ -61,7 +89,40 @@
 				<Panel id="SupportersTextBox" class="TextBox">
 					<Label id="SupportersTitle" class="Header" html="true" text="#tutorial_credits_title" />
 					<Label id="Supporters01" class="InfoLine" html="true" text="#tutorial_credits_01" />
-					<Label id="Supporters02" class="InfoLine" html="true" text="#tutorial_credits_02" />
+					<Panel class="InfoBulletList ContributorsList">
+						<Panel class="InfoBulletRow">
+							<Panel class="InfoBulletDot" />
+							<Label class="InfoBulletText" html="true" text="#tutorial_credits_beast" />
+						</Panel>
+						<Panel class="InfoBulletRow">
+							<Panel class="InfoBulletDot" />
+							<Label class="InfoBulletText" html="true" text="#tutorial_credits_flotos" />
+						</Panel>
+						<Panel class="InfoBulletRow">
+							<Panel class="InfoBulletDot" />
+							<Label class="InfoBulletText" html="true" text="#tutorial_credits_gafu" />
+						</Panel>
+						<Panel class="InfoBulletRow">
+							<Panel class="InfoBulletDot" />
+							<Label class="InfoBulletText" html="true" text="#tutorial_credits_mugiwara" />
+						</Panel>
+						<Panel class="InfoBulletRow">
+							<Panel class="InfoBulletDot" />
+							<Label class="InfoBulletText" html="true" text="#tutorial_credits_oaeide" />
+						</Panel>
+						<Panel class="InfoBulletRow">
+							<Panel class="InfoBulletDot" />
+							<Label class="InfoBulletText" html="true" text="#tutorial_credits_sogat" />
+						</Panel>
+						<Panel class="InfoBulletRow">
+							<Panel class="InfoBulletDot" />
+							<Label class="InfoBulletText" html="true" text="#tutorial_credits_starboxx" />
+						</Panel>
+						<Panel class="InfoBulletRow">
+							<Panel class="InfoBulletDot" />
+							<Label class="InfoBulletText" html="true" text="#tutorial_credits_xero" />
+						</Panel>
+					</Panel>
 				</Panel>
 			</Panel>
 

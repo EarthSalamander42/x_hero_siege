@@ -3,6 +3,7 @@
 	custom_net_tables =
 	[
 		"battlepass_player",
+		"supporter_pass_player",
 		"zone_scores",
 		"player_zone_locations",
 		"zone_names",
@@ -14,5 +15,12 @@
 		"battlepass_js_free",
 		"battlepass_js_premium",
 		"battlepass_rewards",
+		"supporter_pass_rewards_free",
+		"supporter_pass_rewards_premium",
+		"supporter_pass_armory",
+		"supporter_pass_meta",
+		"supporter_pass_shop",
+		"supporter_pass_leaderboards",
+		"vips",
 	]
 }

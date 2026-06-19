@@ -116,6 +116,19 @@ ListenToGameEvent('game_rules_state_change', function()
 	end
 end, nil)
 
+local function SendXHSRewardNotification(playerID, rewardType, amount, title, text)
+	local player = PlayerResource:GetPlayer(playerID)
+	if player == nil then return end
+
+	CustomGameEventManager:Send_ServerToPlayer(player, "xhs_reward_notification", {
+		type = rewardType,
+		amount = amount,
+		title = title,
+		text = text,
+		duration = 2.6,
+	})
+end
+
 -- Cleanup a player when they leave
 --[[
 ListenToGameEvent('player_disconnect', function(keys)
@@ -709,7 +722,9 @@ ListenToGameEvent("player_chat", function(keys)
 				return
 			end
 
-			local hero = player:GetAssignedHero()
+			local hero = PlayerResource:GetSelectedHeroEntity(player:GetPlayerID()) or player:GetAssignedHero()
+			if hero == nil then return end
+
 			local gold = Gold:GetGold(userID)
 			local cost = 10000
 			local numberOfTomes = math.floor(gold / cost)
@@ -1082,18 +1097,18 @@ ListenToGameEvent('entity_killed', function(keys)
 						end
 
 						-- reward system based on kills, including kill events
-						if killer:GetKills() == 99 then
-							Notifications:Bottom(killer:GetPlayerOwnerID(), { text = "100 kills. You get 7500 gold.", duration = 5.0, style = { color = "yellow" } })
+						if killer:GetKills() == 100 then
+							SendXHSRewardNotification(killer:GetPlayerOwnerID(), "gold", 7500, "Kill Reward", "+7,500 gold")
 							PlayerResource:ModifyGold(killer:GetPlayerOwnerID(), 7500, false, DOTA_ModifyGold_Unspecified)
-						elseif killer:GetKills() == 199 then
-							Notifications:Bottom(killer:GetPlayerOwnerID(), { text = "200 kills. You get 25000 gold.", duration = 5.0, style = { color = "yellow" } })
+						elseif killer:GetKills() == 200 then
+							SendXHSRewardNotification(killer:GetPlayerOwnerID(), "gold", 25000, "Kill Reward", "+25,000 gold")
 							PlayerResource:ModifyGold(killer:GetPlayerOwnerID(), 25000, false, DOTA_ModifyGold_Unspecified)
-						elseif killer:GetKills() == 399 then
-							Notifications:Bottom(killer:GetPlayerOwnerID(), { text = "400 kills. You get 50000 gold.", duration = 5.0, style = { color = "yellow" } })
+						elseif killer:GetKills() == 400 then
+							SendXHSRewardNotification(killer:GetPlayerOwnerID(), "gold", 50000, "Kill Reward", "+50,000 gold")
 							PlayerResource:ModifyGold(killer:GetPlayerOwnerID(), 50000, false, DOTA_ModifyGold_Unspecified)
-						elseif killer:GetKills() >= 499 and SpecialEvents.Ramero_trigger == 0 then --500
+						elseif killer:GetKills() >= 500 and SpecialEvents.Ramero_trigger == 0 then
 							SpecialEvents:StartRameroAndBaristolEvent(killer)
-						elseif killer:GetKills() >= 749 and SpecialEvents.Ramero_trigger == 1 then --750
+						elseif killer:GetKills() >= 750 and SpecialEvents.Ramero_trigger == 1 then
 							SpecialEvents:StartSogatEvent(killer)
 						end
 					end

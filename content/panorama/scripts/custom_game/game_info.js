@@ -1,11 +1,72 @@
 "use strict";
 
 (function() {
-	// var parent = $.GetContextPanel().GetParent().GetParent().GetParent().GetParent().FindChildTraverse("GameInfoPanel");
-	
-	// if (parent) {
-	// 	parent.style.width = "600px";
-	// }
+	function FindAncestorPanel(id) {
+		var panel = $.GetContextPanel();
+
+		for (var i = 0; i < 12 && panel; i++) {
+			if (panel.id === id) {
+				return panel;
+			}
+
+			var match = panel.FindChildTraverse(id);
+			if (match) {
+				return match;
+			}
+
+			panel = panel.GetParent();
+		}
+
+		return null;
+	}
+
+	function AddClass(panel, className) {
+		if (panel && !panel.BHasClass(className)) {
+			panel.AddClass(className);
+		}
+	}
+
+	function StyleGameInfoShell() {
+		var shell = FindAncestorPanel("GameInfoPanel");
+
+		if (!shell) {
+			$.Schedule(0.1, StyleGameInfoShell);
+			return;
+		}
+
+		var button = shell.FindChildTraverse("GameInfoButton");
+		var icon = shell.FindChildTraverse("GameInfoIcon");
+		var openClose = shell.FindChildTraverse("GameInfoOpenClose");
+
+		AddClass(shell, "XHSGameInfoPanel");
+		AddClass(button, "XHSGameInfoButton");
+		AddClass(icon, "XHSGameInfoIcon");
+		AddClass(openClose, "XHSGameInfoOpenClose");
+
+		// Fallback styles for Valve's wrapper, which lives outside this custom layout.
+		shell.style.width = "600px";
+		shell.style.backgroundColor = "#061421ee";
+		shell.style.boxShadow = "fill #000000aa 0px 0px 12px 0px";
+
+		if (button) {
+			button.style.width = "38px";
+			button.style.height = "70px";
+			button.style.backgroundColor = "#071827f4";
+			button.style.border = "1px solid #5ad0ffaa";
+		}
+
+		if (icon) {
+			icon.style.washColor = "#77d8ff";
+			icon.style.opacity = "0.96";
+		}
+
+		if (openClose) {
+			openClose.style.washColor = "#dff6ff";
+			openClose.style.opacity = "0.9";
+		}
+	}
+
+	StyleGameInfoShell();
 
 
 	/*

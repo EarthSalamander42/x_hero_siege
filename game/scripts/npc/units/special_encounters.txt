@@ -21,6 +21,7 @@
 		"Ability3"					"roshan_bash"
 		"Ability4"					"muradin_avatar"
 		"Ability5"					"ability_no_health_bar"
+		"Ability6"					"muradin_true_strike"
 
 		"ArmorPhysical"				"500"                 // Physical protection.
 		"MagicalResistance"			"50"                 // Magical protection (percentage).

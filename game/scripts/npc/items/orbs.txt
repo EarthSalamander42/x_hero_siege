@@ -27,6 +27,7 @@
 
 		// Shops
 		"ItemCost"						"10000"
+		"ItemPurchasable"				"1"
 //		"ItemInitialStockTime"			"510.0"
 //		"ItemStockMax"					"2" 
 //		"ItemStockTime"					"30.0"
@@ -76,6 +77,7 @@
 
 		// Shops
 		"ItemCost"						"20000"
+		"ItemPurchasable"				"1"
 //		"ItemInitialStockTime"			"990.0"
 //		"ItemStockMax"					"2" 
 //		"ItemStockTime"					"30.0"
@@ -158,6 +160,7 @@
 
 		// Shops
 		"ItemCost"						"50000"
+		"ItemPurchasable"				"1"
 //		"ItemInitialStockTime"			"1470.0"
 //		"ItemStockMax"					"2" 
 //		"ItemStockTime"					"30.0"
@@ -208,6 +211,7 @@
 	
 		// Shops
 		"ItemCost"						"10000"
+		"ItemPurchasable"				"1"
 //		"ItemInitialStockTime"			"510.0"
 //		"ItemStockMax"					"2" 
 //		"ItemStockTime"					"30.0"
@@ -254,6 +258,7 @@
 
 		// Shops
 		"ItemCost"						"20000"
+		"ItemPurchasable"				"1"
 //		"ItemInitialStockTime"			"990.0"
 //		"ItemStockMax"					"2" 
 //		"ItemStockTime"					"30.0"
@@ -398,6 +403,7 @@
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
 		"ItemCost"						"50000"
+		"ItemPurchasable"				"1"
 //		"ItemInitialStockTime"			"1470.0"
 //		"ItemStockMax"					"2" 
 //		"ItemStockTime"					"30.0"
@@ -755,6 +761,7 @@
 	
 		// Shops
 		"ItemCost"						"10000"
+		"ItemPurchasable"				"1"
 		"AbilityCooldown"				"1.0"
 //		"ItemInitialStockTime"			"510.0"
 //		"ItemStockMax"					"2" 
@@ -800,6 +807,7 @@
 
 		// Shops
 		"ItemCost"						"20000"
+		"ItemPurchasable"				"1"
 		"AbilityCooldown"				"1.0"
 //		"ItemInitialStockTime"			"990.0"
 //		"ItemStockMax"					"2" 
@@ -881,6 +889,7 @@
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
 		"ItemCost"						"50000"
+		"ItemPurchasable"				"1"
 		"AbilityCooldown"				"1.0"
 //		"ItemInitialStockTime"			"1470.0"
 //		"ItemStockMax"					"2" 

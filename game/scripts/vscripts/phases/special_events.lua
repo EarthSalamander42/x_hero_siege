@@ -4,6 +4,8 @@ if not SpecialEvents then
 	SpecialEvents.Ramero_trigger = 0
 end
 
+local SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP = 2.75
+
 function SpecialEvents:MuradinEvent(time)
 	local stun_duration = 5.0
 
@@ -13,15 +15,14 @@ function SpecialEvents:MuradinEvent(time)
 	BT_ENABLED = 0
 
 	StunBuildings(time)
-	PauseCreeps()
-	PauseHeroes()
+	CinematicPauseCreeps(SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP)
+	CinematicPauseHeroes(SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP)
 
 	local mode = GameRules:GetGameModeEntity()
 	mode:SetFixedRespawnTime(1)
 
 	local Muradin = CreateUnitByName("npc_dota_creature_muradin_bronzebeard", Entities:FindByName(nil, "npc_dota_muradin_boss"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
-	Muradin:AddNewModifier(Muradin, nil, "modifier_pause_creeps", { duration = stun_duration }):SetStackCount(1)
-	Muradin:AddNewModifier(Muradin, nil, "modifier_invulnerable", { duration = stun_duration })
+	Muradin:AddNewModifier(Muradin, nil, "modifier_cinematic_pause", { duration = stun_duration, ramp_duration = SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP })
 	Muradin:SetAngles(0, 270, 0)
 	Notifications:TopToAll({ hero = "npc_dota_hero_zuus", duration = stun_duration })
 	Notifications:TopToAll({ text = " You can't kill him! Just survive the Countdown. ", continue = true })
@@ -130,8 +131,8 @@ function SpecialEvents:FarmEvent(time)
 	GameMode.FarmEvent_occuring = true
 
 	StunBuildings(time)
-	PauseCreeps()
-	PauseHeroes()
+	CinematicPauseCreeps(SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP)
+	CinematicPauseHeroes(SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP)
 
 	for k, v in pairs(HeroList:GetAllHeroes()) do
 		if v:IsRealHero() then
@@ -324,7 +325,7 @@ function SpecialEvents:StartRameroAndBaristolEvent(hero)
 
 	Notifications:TopToAll({ text = "A hero has reached 500 kills and will fight Ramero and Baristol!", style = { color = "white" }, duration = 5.0 })
 	TeleportHero(hero, point, delay)
-	PauseCreeps()
+	CinematicPauseCreeps(SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP)
 
 	SpecialEvents:RameroAndBaristolEvent(XHS_RAMERO_BARISTOL_TIME + delay)
 
@@ -341,13 +342,11 @@ function SpecialEvents:RameroAndBaristolEvent(time) -- 500 kills
 	GameMode.SpecialArena_occuring = true
 
 	SpecialEvents.Ramero = CreateUnitByName("npc_ramero", Entities:FindByName(nil, "roshan_wp_4"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
-	SpecialEvents.Ramero:AddNewModifier(SpecialEvents.Ramero, nil, "modifier_pause_creeps", { duration = stun_duration })
-	SpecialEvents.Ramero:AddNewModifier(SpecialEvents.Ramero, nil, "modifier_invulnerable", { duration = stun_duration })
+	SpecialEvents.Ramero:AddNewModifier(SpecialEvents.Ramero, nil, "modifier_cinematic_pause", { duration = stun_duration, ramp_duration = SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP })
 	SpecialEvents.Ramero:SetAngles(0, 45, 0)
 
 	SpecialEvents.Baristol = CreateUnitByName("npc_baristol", Entities:FindByName(nil, "roshan_wp_2"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
-	SpecialEvents.Baristol:AddNewModifier(SpecialEvents.Baristol, nil, "modifier_pause_creeps", { duration = stun_duration })
-	SpecialEvents.Baristol:AddNewModifier(SpecialEvents.Baristol, nil, "modifier_invulnerable", { duration = stun_duration })
+	SpecialEvents.Baristol:AddNewModifier(SpecialEvents.Baristol, nil, "modifier_cinematic_pause", { duration = stun_duration, ramp_duration = SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP })
 	SpecialEvents.Baristol:SetAngles(0, 325, 0)
 
 	EmitSoundOn("Muradin.StormEarthFire", SpecialEvents.Ramero)
@@ -402,7 +401,7 @@ function SpecialEvents:StartSogatEvent(hero)
 	local delay = 5.0
 
 	Notifications:TopToAll({ text = "A hero has reached 750 kills and will fight Ramero!", style = { color = "white" }, duration = 5.0 })
-	PauseCreeps()
+	CinematicPauseCreeps(SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP)
 	TeleportHero(hero, point, delay)
 
 	SpecialEvents:SogatEvent(120.0 + delay)
@@ -421,8 +420,7 @@ function SpecialEvents:SogatEvent(time) -- 750 kills
 	GameMode.SpecialArena_occuring = true
 
 	SpecialEvents.Sogat = CreateUnitByName("npc_ramero_2", Entities:FindByName(nil, "roshan_wp_4"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
-	SpecialEvents.Sogat:AddNewModifier(SpecialEvents.Sogat, nil, "modifier_pause_creeps", { duration = stun_duration })
-	SpecialEvents.Sogat:AddNewModifier(SpecialEvents.Sogat, nil, "modifier_invulnerable", { duration = stun_duration })
+	SpecialEvents.Sogat:AddNewModifier(SpecialEvents.Sogat, nil, "modifier_cinematic_pause", { duration = stun_duration, ramp_duration = SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP })
 	SpecialEvents.Sogat:SetAngles(0, 45, 0)
 	EmitSoundOn("Muradin.StormEarthFire", SpecialEvents.Sogat)
 	Notifications:TopToAll({ hero = "npc_dota_hero_sven", duration = stun_duration })
@@ -469,7 +467,7 @@ function SpecialEvents:EndSogatEvent(bWin)
 end
 
 function SpecialEvents:DuelEvent()
-	PauseCreeps()
+	CinematicPauseCreeps(SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP)
 	-- SpawnRunes()
 	CustomGameEventManager:Send_ServerToAllClients("show_duel", {})
 
@@ -569,7 +567,7 @@ function SpecialEvents:DuelEvent()
 end
 
 function SpecialEvents:DuelRanked()
-	PauseCreeps()
+	CinematicPauseCreeps(SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP)
 	-- SpawnRunes()
 	--	CustomGameEventManager:Send_ServerToAllClients("show_duel", {})
 

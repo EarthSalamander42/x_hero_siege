@@ -3,6 +3,9 @@ CustomNetTables.SubscribeNetTableListener( "zone_scores", ZoneScoresReceived )
 CustomNetTables.SubscribeNetTableListener( "player_zone_locations", UpdatePlayerZones )
 GameEvents.Subscribe( "zone_complete", OnZoneCompleted );
 
+var KILL_EVENT_THRESHOLDS = [100, 200, 400, 500, 750];
+var KILL_EVENT_VISIBLE_RATIO = 0.8;
+
 function intToARGB(i) 
 { 
                 return ('00' + ( i & 0xFF).toString( 16 ) ).substr( -2 ) +
@@ -58,9 +61,9 @@ function UpdatePlayerImages() {
 	var actualPlayerInfo = 1;
 
 	for(var i = 0; i < 8; i++) {
-		var player_info = CustomNetTables.GetTableValue("battlepass", i);
+		var player_info = CustomNetTables.GetTableValue("supporter_pass_player", i.toString());
 		if (player_info) {
-			playerImage.style.border = "2px solid " + player_info.donator_color;
+			playerImage.style.border = "2px solid " + (player_info.tier_color || player_info.donator_color || "#7DB9D8");
 		}
 
 		var ImbaXP_Panel = $.GetContextPanel().FindChildTraverse("es-player-xp" + i);
@@ -91,6 +94,95 @@ function UpdatePlayerImages() {
 //		friendlyBarImage.heroname = Players.GetPlayerSelectedHero( i );
 
 		actualPlayerInfo++;
+	}
+}
+
+function GetNextKillEvent(kills) {
+	for (var i = 0; i < KILL_EVENT_THRESHOLDS.length; i++) {
+		var target = KILL_EVENT_THRESHOLDS[i];
+		if (kills < target) {
+			return target;
+		}
+	}
+
+	return null;
+}
+
+function EnsureKillEventHint(displaySlot) {
+	var teamContainer = $("#ScoreboardTeamContainer");
+	if (!teamContainer) {
+		return null;
+	}
+
+	var row = teamContainer.GetChild(displaySlot + 1);
+	if (!row) {
+		return null;
+	}
+
+	var scoreContainer = row.FindChildTraverse("ScoreLabelsContainer");
+	if (!scoreContainer) {
+		return null;
+	}
+
+	var hint = scoreContainer.FindChildTraverse("KillEventHint" + displaySlot);
+	if (hint) {
+		return hint;
+	}
+
+	hint = $.CreatePanel("Panel", scoreContainer, "KillEventHint" + displaySlot);
+	hint.AddClass("KillEventHint");
+	hint.hittest = false;
+
+	var glow = $.CreatePanel("Panel", hint, "");
+	glow.AddClass("KillEventHintGlow");
+	glow.hittest = false;
+
+	var label = $.CreatePanel("Label", hint, "KillEventHintLabel" + displaySlot);
+	label.AddClass("KillEventHintLabel");
+	label.text = "";
+	label.hittest = false;
+
+	return hint;
+}
+
+function UpdateKillEventHint(displaySlot, kills) {
+	var hint = EnsureKillEventHint(displaySlot);
+	if (!hint) {
+		return;
+	}
+
+	var nextTarget = GetNextKillEvent(kills);
+	var remaining = nextTarget === null ? 0 : nextTarget - kills;
+	var visible = nextTarget !== null && remaining > 0 && kills >= Math.ceil(nextTarget * KILL_EVENT_VISIBLE_RATIO);
+
+	hint.SetHasClass("KillEventHintVisible", visible);
+
+	var label = hint.FindChildTraverse("KillEventHintLabel" + displaySlot);
+	if (label) {
+		label.text = remaining === 1 ? "1 kill remaining" : remaining + " kills remaining";
+	}
+}
+
+function UpdateKillEventHints(zoneData, localPlayerId) {
+	var localKills = 0;
+	if (zoneData[localPlayerId] && typeof(zoneData[localPlayerId]["Kills"]) !== "undefined") {
+		localKills = zoneData[localPlayerId]["Kills"];
+	}
+	UpdateKillEventHint(0, localKills);
+
+	var displaySlot = 1;
+	for (var playerId = 0; playerId < 8; playerId++) {
+		if (playerId === localPlayerId) {
+			continue;
+		}
+
+		var kills = 0;
+		if (zoneData[playerId] && typeof(zoneData[playerId]["Kills"]) !== "undefined") {
+			kills = zoneData[playerId]["Kills"];
+		}
+
+		UpdateKillEventHint(displaySlot, kills);
+		displaySlot++;
 	}
 }
 
@@ -226,6 +318,8 @@ function UpdateZoneScores( zoneName )
 				}
 			}
 		}
+
+		UpdateKillEventHints(zoneData, localPlayerId);
 	}
 }
 

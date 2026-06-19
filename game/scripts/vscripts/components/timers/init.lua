@@ -130,7 +130,7 @@ function CustomTimers:Think()
 
 					if CustomTimers.current_time["special_wave"] == 30 then
 						-- print("Special Wave in 30 seconds:", CustomTimers.special_wave_region[cardinal_point], CustomTimers.special_wave)
-						Notifications:TopToAll({ text = "WARNING: " .. CustomTimers.special_wave_region[cardinal_point] .. "!", duration = 25.0, style = { color = "red" } })
+						CustomTimers:ShowSpecialWaveCountdown(cardinal_point, 30)
 						-- SpawnRunes()
 						CustomTimers.enable_special_wave = true
 					elseif CustomTimers.current_time["special_wave"] == 0 then
@@ -202,6 +202,56 @@ function CustomTimers:IncrementGamePhase()
 	elseif CustomTimers.game_phase == 3 then
 		Notifications:TopToAll({ text = "Respawn disabled!", style = { continue = true } })
 	end
+end
+
+function CustomTimers:GetSpecialWavePoint(iCardinalPoint)
+	if iCardinalPoint > 4 then iCardinalPoint = iCardinalPoint - 4 end
+
+	local point = {
+		"west",
+		"north",
+		"east",
+		"south"
+	}
+
+	return point[iCardinalPoint]
+end
+
+function CustomTimers:ShowSpecialWaveCountdown(iCardinalPoint, duration)
+	local direction = CustomTimers:GetSpecialWavePoint(iCardinalPoint)
+	if direction == nil then return end
+
+	CustomGameEventManager:Send_ServerToAllClients("xhs_wave_timer", {
+		duration = duration,
+		eyebrow = "WAVE INCOMING",
+		title = "Wave of Darkness",
+		subtitle = string.upper(direction) .. " lane"
+	})
+
+	CustomTimers:CreateSpecialWaveTimerParticle(direction, duration)
+end
+
+function CustomTimers:CreateSpecialWaveTimerParticle(direction, duration)
+	local spawner = Entities:FindByName(nil, "npc_dota_spawner_" .. direction .. "_event")
+	if spawner == nil then return end
+
+	local dummy = CreateUnitByName("dummy_unit_invulnerable", spawner:GetAbsOrigin(), false, nil, nil, DOTA_TEAM_CUSTOM_1)
+	if dummy == nil then return end
+
+	dummy:AddNoDraw()
+
+	local particle = ParticleManager:CreateParticle("particles/items_fx/aegis_respawn_timer.vpcf", PATTACH_ABSORIGIN_FOLLOW, dummy)
+
+	Timers:CreateTimer(duration, function()
+		if particle ~= nil then
+			ParticleManager:DestroyParticle(particle, false)
+			ParticleManager:ReleaseParticleIndex(particle)
+		end
+
+		if dummy ~= nil and not dummy:IsNull() then
+			UTIL_Remove(dummy)
+		end
+	end)
 end
 
 function SpecialWave(iCardinalPoint)

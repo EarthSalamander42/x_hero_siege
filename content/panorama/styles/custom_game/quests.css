@@ -4,7 +4,7 @@
 	vertical-align: top;
 	margin-top: 238px;
 	margin-left: 24px;
-	width: 300px;
+	width: 340px;
 	max-height: 600px;
 	padding: 10px 12px 10px 12px;
 	border-radius: 2px;
@@ -94,9 +94,12 @@
 .QuestText
 {
 	color: xhs_text;
-	max-width: 224px;
+	width: fill-parent-flow( 1.0 );
+	height: fit-children;
+	/* max-width: none; */
 	text-align: left;
 	margin-left: 7px;
+	text-overflow: shrink;
 	
 	transition-property: opacity, color;
 	transition-duration: .32s;
@@ -155,9 +158,10 @@
 .Quest
 {
 	width: 100%;
-	min-height: 28px;
+	height: fit-children;
+	min-height: 30px;
 	margin-top: 2px;
-	padding: 2px 4px 2px 0px;
+	padding: 3px 6px 3px 0px;
 	background-color: #06203322;
 	border-left: 3px solid #77c8ff12;
 }
@@ -201,6 +205,9 @@
 	visibility: collapse;
 	margin-left: 4px;
 	color: #7ad7ff;
+	width: 54px;
+	text-align: right;
+	text-overflow: shrink;
 }
 
 .ShowNumbers #QuestNumbers
@@ -225,4 +232,14 @@
 .GoldReward #GoldReward
 {
 	visibility: visible;
+}
+
+.AspectRatio4x3 #QuestLog
+{
+	width: 320px;
+}
+
+.AspectRatio4x3 .QuestText
+{
+	font-size: 15px;
 }

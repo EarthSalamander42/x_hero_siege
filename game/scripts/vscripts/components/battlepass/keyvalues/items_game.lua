@@ -72,7 +72,7 @@ function ItemsGame:Init()
 
 	ItemsGame.battlepass = bp_reward_table
 
-	CustomNetTables:SetTableValue("battlepass_js_free", "rewards", { ItemsGame.battlepass })
+	CustomNetTables:SetTableValue("supporter_pass_rewards_free", "rewards", { ItemsGame.battlepass })
 
 	count = 1
 
@@ -106,8 +106,8 @@ function ItemsGame:Init()
 
 	ItemsGame.battlepass2 = bp_reward_table2
 
-	CustomNetTables:SetTableValue("battlepass_js_premium", "rewards", { ItemsGame.battlepass2 })
-	CustomNetTables:SetTableValue("battlepass_player", "companions", { ItemsGame.companions })
+	CustomNetTables:SetTableValue("supporter_pass_rewards_premium", "rewards", { ItemsGame.battlepass2 })
+	CustomNetTables:SetTableValue("supporter_pass_player", "companions", { ItemsGame.companions })
 end
 
 function ItemsGame:GetItemKV(item_id)

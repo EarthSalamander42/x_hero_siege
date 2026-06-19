@@ -1,149 +1,346 @@
-.EventsPanel
+@keyframes 'XHSEventPanelIn'
 {
-	width: 30%;
-	height: 50%;
-	border-radius: 4px;
-	overflow: clip;
-	background-color: none;
+	0%
+	{
+		opacity: 0;
+		transform: translateY(18px);
+		pre-transform-scale2d: 0.97;
+	}
+
+	100%
+	{
+		opacity: 1;
+		transform: translateY(0px);
+		pre-transform-scale2d: 1;
+	}
+}
+
+.EventsRoot
+{
+	width: 100%;
+	height: 100%;
+}
+
+.XHSEventsPanel
+{
+	width: 760px;
+	min-height: 430px;
 	align: center center;
-}
-
-#EventPanel
-{
-	width: 260px;
-	height: 380px;
-	horizontal-align: center;
-	background-color: gradient( linear, 0% 0%, 100% 50%, from( #25282a00 ), color-stop( .6, #25282acc), color-stop( .8, #25282a88), to( #00000022 ) );
-	border-radius: 4px;
-	box-shadow: fill #00000088 0px 0px 1px 1px;
-	overflow: clip;
+	flow-children: down;
+	padding: 18px;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #06121ff4 ), color-stop( 0.62, #081d2fde ), to( #04101ac8 ) );
+	border: 1px solid #2d9ad4aa;
+	box-shadow: fill #000000aa 0px 0px 18px 0px;
 	visibility: collapse;
+	opacity: 0;
+	transform: translateY(16px);
+	pre-transform-scale2d: 0.98;
+	transition-property: opacity, transform, pre-transform-scale2d, brightness;
+	transition-duration: 0.16s;
 }
 
-#Event1,
-#Event2,
-#Event3,
-#Event4
+.XHSEventsPanelVisible
 {
-	width: 155px;
-	height: 45px;
-	horizontal-align: center;
-	background-color: gradient( linear, 0% 0%, 100% 50%, from( #25282a00 ), color-stop( .6, #25282acc), color-stop( .8, #25282a88), to( #00000022 ) );
-	border-radius: 4px;
-	box-shadow: fill #00000088 0px 0px 1px 1px;
-	overflow: clip;
-/*	visibility: collapse;	*/
+	visibility: visible;
+	opacity: 1;
+	transform: translateY(0px);
+	pre-transform-scale2d: 1;
+	animation-name: XHSEventPanelIn;
+	animation-duration: 0.22s;
+	animation-timing-function: ease-out;
 }
 
-#Close
+.XHSEventsHeader
 {
-	width: 25px;
-	height: 25px;
-	margin-top: 5px;
-	margin-left: 230px;
-	background-color: none;
+	width: 100%;
+	height: 88px;
+	flow-children: right;
+	border-bottom: 1px solid #2a6f9a77;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #0b223744 ), color-stop( 0.72, #0b223722 ), to( #123e5c55 ) );
 }
 
-#Event1
+.XHSEventsHeaderCopy
 {
-	margin-top: 100px;
+	width: fill-parent-flow( 1 );
+	height: 100%;
+	flow-children: down;
+	padding: 10px 12px 8px 12px;
 }
 
-#Event2
+.XHSEventsEyebrow
 {
-	margin-top: 165px;
+	font-size: 12px;
+	letter-spacing: 4px;
+	color: #78dfff;
+	text-shadow: 0px 0px 8px #35c9ff55;
+	text-transform: uppercase;
 }
 
-#Event3
+.XHSEventsTitle
 {
-	margin-top: 230px;
+	margin-top: 3px;
+	font-size: 32px;
+	font-weight: bold;
+	color: #f4fbff;
+	text-shadow: 0px 1px 5px #000000dd;
+	text-transform: uppercase;
 }
 
-#Event4
-{
-	margin-top: 295px;
-}
-
-#Event1:hover,
-#Event2:hover,
-#Event3:hover,
-#Event4:hover,
-#Close:hover
-{
-	wash-color: #cccccc;
-}
-
-#Event1:active,
-#Event2:active,
-#Event3:active,
-#Event4:active,
-#Close:active
-{
-	wash-color: #aaaaaa;
-}
-
-.EventTitle
+.XHSEventsSubtitle
 {
 	margin-top: 0px;
-	margin-left: 0px;
-	width: 90%;
+	font-size: 16px;
+	color: #b8cee3;
+	text-shadow: 0px 1px 3px #000000aa;
+}
+
+.XHSEventsClose
+{
+	width: 42px;
+	height: 42px;
+	margin-top: 10px;
+	margin-right: 8px;
+	horizontal-align: right;
+	background-color: #071523ee;
+	border: 1px solid #5bbceaaa;
+	transition-property: brightness, background-color, border, pre-transform-scale2d;
+	transition-duration: 0.12s;
+}
+
+.XHSEventsClose Label
+{
+	align: center center;
+	font-size: 18px;
+	font-weight: bold;
+	color: #cfefff;
+}
+
+.XHSEventsClose:hover
+{
+	brightness: 1.8;
+	background-color: #0c2d45ee;
+	border: 1px solid #87dcff;
+}
+
+.XHSEventsClose:active
+{
+	pre-transform-scale2d: 0.94;
+}
+
+.XHSEventsGrid
+{
+	width: 100%;
+	height: 258px;
+	margin-top: 16px;
+	flow-children: down;
+}
+
+.XHSEventsRow
+{
+	width: 100%;
+	height: 120px;
+	margin-bottom: 12px;
+	flow-children: right;
+}
+
+.XHSEventCard
+{
+	width: 344px;
+	height: 120px;
+	margin-right: 12px;
+	margin-bottom: 0px;
+	flow-children: right;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #071626f5 ), color-stop( 0.58, #09263bed ), to( #06101bdc ) );
+	border: 1px solid #245d7ecc;
+	box-shadow: #00000088 0px 2px 10px 0px;
+	transition-property: brightness, background-color, border, transform, pre-transform-scale2d;
+	transition-duration: 0.12s;
+}
+
+.XHSEventCard:hover
+{
+	brightness: 1.55;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #092640f8 ), color-stop( 0.58, #0b3654ee ), to( #071827e4 ) );
+	border: 1px solid #53c8ff;
+	transform: translateY( -1px );
+}
+
+.XHSEventCard:active
+{
+	pre-transform-scale2d: 0.985;
+	transform: translateY( 1px );
+}
+
+.XHSEventAccent
+{
+	width: 4px;
+	height: 100%;
+	background-color: #48d7ff;
+	box-shadow: #48d7ff55 0px 0px 8px 0px;
+}
+
+.XHSEventCardBeast .XHSEventAccent
+{
+	background-color: #45c46b;
+	box-shadow: #45c46b66 0px 0px 8px 0px;
+}
+
+.XHSEventCardInfernal .XHSEventAccent
+{
+	background-color: #9fdcff;
+	box-shadow: #9fdcff66 0px 0px 8px 0px;
+}
+
+.XHSEventCardImages .XHSEventAccent
+{
+	background-color: #f2c94c;
+	box-shadow: #f2c94c66 0px 0px 8px 0px;
+}
+
+.XHSEventIcon
+{
+	width: 62px;
+	height: 62px;
+	margin-left: 14px;
+	margin-top: 16px;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #114b6acc ), to( #071320dd ) );
+	border: 1px solid #4bbcebaa;
+	box-shadow: inset #9ce9ff20 0px 0px 14px 0px;
+}
+
+.XHSEventIconHero
+{
+	background-image: url("s2r://panorama/images/spellicons/terrorblade_conjure_image_png.vtex");
+	background-size: 72% 72%;
+	background-position: center;
+	background-repeat: no-repeat;
+}
+
+.XHSEventIconBeast
+{
+	background-image: url("s2r://panorama/images/spellicons/chen_holy_persuasion_png.vtex");
+	background-size: 72% 72%;
+	background-position: center;
+	background-repeat: no-repeat;
+}
+
+.XHSEventIconInfernal
+{
+	background-image: url("s2r://panorama/images/spellicons/jakiro_ice_path_png.vtex");
+	background-size: 72% 72%;
+	background-position: center;
+	background-repeat: no-repeat;
+}
+
+.XHSEventIconImages
+{
+	background-image: url("s2r://panorama/images/spellicons/chaos_knight_phantasm_png.vtex");
+	background-size: 72% 72%;
+	background-position: center;
+	background-repeat: no-repeat;
+}
+
+.XHSEventBody
+{
+	width: fill-parent-flow( 1 );
+	height: 100%;
+	flow-children: down;
+	padding: 14px 12px 8px 12px;
+}
+
+.XHSEventTitle
+{
+	width: 100%;
+	height: 34px;
 	font-size: 20px;
-	color: white;
-	horizontal-align: center;
-	vertical-align: center;
-	text-align: center;
+	font-weight: semi-bold;
+	color: #f4fbff;
+	text-shadow: 0px 1px 4px #000000dd;
 	text-overflow: shrink;
 }
 
-#EventInfo
+.XHSEventDescription
 {
-	margin-top: 10px;
-	margin-left: 5px;
-	font-size: 20px;
-	color: white;
+	width: 100%;
+	height: 42px;
+	margin-top: 4px;
+	font-size: 14px;
+	color: #bdd0df;
+	text-shadow: 0px 1px 3px #000000aa;
+	text-overflow: shrink;
 }
 
-#Event1_info,
-#Event2_info,
-#Event3_info,
-#Event4_info
+.XHSEventReward
 {
-	margin-left: 0px;
-	width: 400px;
-	background-color: gradient( linear, 0% 0%, 100% 50%, from( #25282a00 ), color-stop( .6, #25282acc), color-stop( .8, #25282a88), to( #00000022 ) );
-	visibility: collapse;
+	margin-top: 5px;
+	padding: 3px 8px 3px 8px;
+	font-size: 13px;
+	font-weight: bold;
+	color: #081521;
+	background-color: #63d8ff;
+	text-transform: uppercase;
+	horizontal-align: left;
 }
 
-#Event1_info
+.XHSEventCardBeast .XHSEventReward
 {
-	margin-top: 215px;
-	height: 80px;
+	background-color: #63de83;
 }
 
-#Event2_info
+.XHSEventCardInfernal .XHSEventReward
 {
-	margin-top: 260px;
-	height: 120px;
+	background-color: #9fdcff;
 }
 
-#Event3_info
+.XHSEventCardImages .XHSEventReward
 {
-	margin-top: 305px;
-	height: 150px;
+	background-color: #f2c94c;
 }
 
-#Event4_info
+.XHSEventsFooter
 {
-	margin-top: 350px;
-	height: 360px;
+	width: 100%;
+	height: 32px;
+	margin-top: 4px;
+	flow-children: right;
+	background-color: #04101a88;
+	border-top: 1px solid #1b5e84aa;
 }
 
-#EventsText
+.XHSEventsFooterDot
 {
-	margin-top: 10px;
-	margin-left: 0px;
-	font-size: 18px;
+	width: 8px;
+	height: 8px;
+	margin-left: 12px;
+	margin-top: 12px;
+	background-color: #54d8ff;
+	border-radius: 50%;
+	box-shadow: #54d8ffaa 0px 0px 8px 0px;
+}
+
+.XHSEventsFooter Label
+{
+	margin-left: 8px;
 	vertical-align: center;
-	horizontal-align: center;
-	color: dodgerblue;
+	font-size: 14px;
+	color: #9fbbd0;
+	text-shadow: 0px 1px 3px #000000aa;
+}
+
+.AspectRatio4x3 .XHSEventsPanel
+{
+	width: 650px;
+}
+
+.AspectRatio4x3 .XHSEventCard
+{
+	width: 291px;
+	margin-right: 10px;
+}
+
+.AspectRatio4x3 .XHSEventIcon
+{
+	width: 54px;
+	height: 54px;
+	margin-left: 10px;
 }

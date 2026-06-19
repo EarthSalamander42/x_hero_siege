@@ -756,3 +756,265 @@
 	vertical-align: center;
 	text-align: center;
 }
+
+/* XHS 4.0 visual pass */
+.FlyoutScoreboardRoot {
+	width: 640px;
+	margin-top: 132px;
+	transform: translatex( -680px );
+}
+
+#DungeonScoreboard {
+	width: 100%;
+	height: 86%;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #071827f4 ), color-stop( 0.62, #091524ef ), to( #040914f7 ) );
+	border: 1px solid #77c8ff32;
+	border-left: 3px solid #5ad0ff;
+	box-shadow: fill #000000a8 0px 0px 14px 0px;
+}
+
+.ScoreboardHeaderContainer {
+	height: 148px;
+	padding: 14px 16px 10px 16px;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #0a2740f0 ), color-stop( 0.55, #071827e6 ), to( #040914ec ) );
+	background-image: none;
+	border-bottom: 1px solid #77c8ff2b;
+}
+
+.ZoneSelected_xhs_holdout .ScoreboardHeaderContainer {
+	background-image: none;
+}
+
+.ZoneTitle {
+	margin-top: 0px;
+	color: #f4fbff;
+	font-family: titleFont;
+	font-size: 30px;
+	letter-spacing: 2px;
+	text-shadow: 0px 2px 5px #000000;
+}
+
+.ActiveZone .ZoneTitle {
+	color: #8fdcff;
+}
+
+.ZoneTitle,
+.ZoneTimeLabel,
+.ZoneSubtitle {
+	color: #b9d9ff;
+	text-shadow: 0px 1px 3px #000000;
+}
+
+.ZoneTimeLabel {
+	color: #ffcf66;
+	font-size: 18px;
+	font-weight: bold;
+}
+
+.ZoneDescription {
+	max-height: 54px;
+	max-width: 440px;
+	color: #dceeff;
+	font-size: 14px;
+	line-height: 18px;
+	text-shadow: 0px 1px 3px #000000;
+}
+
+.OldBest.ZoneSubtitle,
+.NewBest.ZoneSubtitle {
+	color: #8fdcff;
+}
+
+#ZoneRequirementContainer {
+	height: 150px;
+	background-color: #050b14ee;
+	border-top: 1px solid #77c8ff18;
+	border-bottom: 1px solid #77c8ff18;
+}
+
+.ReqTitle {
+	color: #8fdcff;
+	font-size: 14px;
+	letter-spacing: 2px;
+}
+
+.ReqTab {
+	background-color: #071827e8;
+	border: 1px solid #77c8ff18;
+}
+
+.ReqTab:hover:selected,
+.ReqTab:selected {
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #0a2740f0 ), to( #06101de8 ) );
+	border: 1px solid #5ad0ff70;
+}
+
+#ZoneStarRequirementsDesc {
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #071827df ), to( #050b14c8 ) );
+}
+
+.ZoneReqLabel {
+	color: #dceeff;
+	font-size: 15px;
+	line-height: 19px;
+}
+
+#ScoreboardTeamContainer {
+	height: 430px;
+	padding: 8px 12px 10px 12px;
+	background-color: #0409148c;
+}
+
+.HeroRow {
+	height: 48px;
+	margin-bottom: 4px;
+	background-color: #07132188;
+	border: 1px solid #77c8ff12;
+}
+
+.HeroRow.CurrentPlayer {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #0a2740cc ), to( #071321a8 ) );
+	border: 1px solid #5ad0ff5a;
+}
+
+.HeroRow:hover {
+	brightness: 1.12;
+}
+
+.HeroImagePanel {
+	width: 86px;
+	height: 48px;
+}
+
+.HeroColorBar {
+	width: 3px;
+	height: 48px;
+	box-shadow: fill #00000080 0px 0px 4px 0px;
+}
+
+.PartyPortraitImage {
+	border: 1px solid #77c8ff20;
+	box-shadow: fill #00000070 0px 0px 5px 0px;
+}
+
+#ScoreLabelsContainer {
+	margin-left: 14px;
+}
+
+.ScoreLabel,
+.ScoreLabelValue,
+.ScoreLabelsWidth,
+.ScoreXPBar {
+	color: #b9d9ff;
+	font-size: 20px;
+	text-shadow: 0px 1px 3px #000000;
+}
+
+.ScoreLabel,
+.ScoreXPBar {
+	color: #8fdcff;
+	font-size: 13px;
+	letter-spacing: 1px;
+}
+
+.CurrentPlayer .ScoreLabelValue {
+	color: #f4fbff;
+}
+
+.HeroTotalLabel {
+	color: #8fdcff;
+	font-size: 14px;
+	letter-spacing: 1px;
+	text-shadow: 0px 1px 3px #000000;
+}
+
+.MuteButton {
+	width: 28px;
+	height: 28px;
+	opacity: 0.62;
+	wash-color: #b9d9ff;
+}
+
+.MuteButton:hover {
+	opacity: 1;
+	wash-color: #ffffff;
+}
+
+.es-player-xp {
+	width: 260px;
+	height: 28px;
+	background-color: #02060bcc;
+	border: 1px solid #77c8ff24;
+	box-shadow: inset #00000090 0px 1px 4px 0px;
+}
+
+.es-player-xp-progress {
+	height: 26px;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #0b6e97 ), color-stop( 0.55, #25b7ff ), to( #8fdcff ) );
+}
+
+.es-player-xp Label {
+	color: #f4fbff;
+	font-size: 14px;
+	text-shadow: 0px 1px 3px #000000;
+}
+
+.AspectRatio16x10 .FlyoutScoreboardRoot {
+	width: 600px;
+	margin-top: 118px;
+}
+
+.AspectRatio4x3 .FlyoutScoreboardRoot {
+	width: 540px;
+	margin-top: 104px;
+}
+
+.KillEventHint {
+	ignore-parent-flow: true;
+	width: 45%;
+	height: 14px;
+	margin-top: 31px;
+	margin-left: 0px;
+	flow-children: right;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #5d3b08ee ), color-stop( 0.48, #d99b20f0 ), to( #ffcf66f2 ) );
+	border: 1px solid #ffdf8a82;
+	box-shadow: fill #00000070 0px 0px 5px 0px;
+	opacity: 0;
+	transform: translateY( 4px );
+	transition-property: opacity, transform, brightness;
+	transition-duration: 0.18s;
+}
+
+.KillEventHintVisible {
+	opacity: 1;
+	transform: translateY( 0px );
+}
+
+.KillEventHintGlow {
+	width: 4px;
+	height: 100%;
+	background-color: #fff3b0;
+	box-shadow: #ffcf6680 0px 0px 8px 0px;
+}
+
+.KillEventHintLabel {
+	width: fill-parent-flow( 1.0 );
+	vertical-align: center;
+	text-align: center;
+	color: #171009;
+	font-size: 11px;
+	font-weight: bold;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	text-shadow: 0px 1px 0px #fff0b660;
+	text-overflow: shrink;
+}
+
+.CurrentPlayer .KillEventHint {
+	box-shadow: fill #00000080 0px 0px 7px 0px;
+	brightness: 1.12;
+}
+
+.AspectRatio4x3 .KillEventHint {
+	width: 47%;
+}

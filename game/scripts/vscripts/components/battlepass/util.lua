@@ -24,18 +24,23 @@ CustomGameEventManager:RegisterListener("change_companion", Dynamic_Wrap(Battlep
 CustomGameEventManager:RegisterListener("change_statue", Dynamic_Wrap(Battlepass, "DonatorStatueJS"))
 CustomGameEventManager:RegisterListener("change_emblem", Dynamic_Wrap(Battlepass, "DonatorEmblemJS"))
 CustomGameEventManager:RegisterListener("change_companion_skin", Dynamic_Wrap(Battlepass, "DonatorCompanionSkinJS"))
+CustomGameEventManager:RegisterListener("supporter_pass_change_companion", Dynamic_Wrap(Battlepass, "DonatorCompanionJS"))
+CustomGameEventManager:RegisterListener("supporter_pass_change_effigy", Dynamic_Wrap(Battlepass, "DonatorStatueJS"))
+CustomGameEventManager:RegisterListener("supporter_pass_change_emblem", Dynamic_Wrap(Battlepass, "DonatorEmblemJS"))
+CustomGameEventManager:RegisterListener("supporter_pass_buy_shop_item", Dynamic_Wrap(Battlepass, "SupporterPassBuyShopItem"))
+CustomGameEventManager:RegisterListener("supporter_pass_update_settings", Dynamic_Wrap(Battlepass, "SupporterPassUpdateSettings"))
 CustomGameEventManager:RegisterListener("toggle_ingame_tag", Dynamic_Wrap(Battlepass, 'ToggleDonatorTag'))
 CustomGameEventManager:RegisterListener("change_ingame_tag", Dynamic_Wrap(Battlepass, 'SetDonatorTag'))
-CustomGameEventManager:RegisterListener("change_battlepass_rewards", Dynamic_Wrap(Battlepass, 'BattlepassRewards'))
+CustomGameEventManager:RegisterListener("change_supporter_pass_rewards", Dynamic_Wrap(Battlepass, 'BattlepassRewards'))
 CustomGameEventManager:RegisterListener("change_player_xp", Dynamic_Wrap(Battlepass, 'PlayerXP'))
 CustomGameEventManager:RegisterListener("play_hero_taunt", Dynamic_Wrap(Battlepass, "PlayHeroTaunt"))
 CustomGameEventManager:RegisterListener("change_winrate", Dynamic_Wrap(Battlepass, 'Winrate'))
 
 function Battlepass:GetRewardUnlocked(ID)
 	if IsInToolsMode() then return 1000 end
-	if CustomNetTables:GetTableValue("battlepass_player", tostring(ID)) then
-		if CustomNetTables:GetTableValue("battlepass_player", tostring(ID)).Lvl then
-			return CustomNetTables:GetTableValue("battlepass_player", tostring(ID)).Lvl
+	if CustomNetTables:GetTableValue("supporter_pass_player", tostring(ID)) then
+		if CustomNetTables:GetTableValue("supporter_pass_player", tostring(ID)).Lvl then
+			return CustomNetTables:GetTableValue("supporter_pass_player", tostring(ID)).Lvl
 		end
 	end
 
@@ -80,7 +85,7 @@ end
 
 -- vanilla extension
 function CDOTA_BaseNPC:SetupHealthBarLabel(sCustomTag)
-	local ply_table = CustomNetTables:GetTableValue("battlepass_player", tostring(self:GetPlayerID()))
+	local ply_table = CustomNetTables:GetTableValue("supporter_pass_player", tostring(self:GetPlayerID()))
 	--	print(ply_table)
 	if not ply_table then return end
 
@@ -241,6 +246,34 @@ function Battlepass:DonatorCompanionSkinJS(event)
 	DonatorCompanionSkin(event.ID, event.unit, event.skin)
 end
 
+function Battlepass:SupporterPassBuyShopItem(event)
+	local playerID = event.PlayerID
+	local ply_table = CustomNetTables:GetTableValue("supporter_pass_player", tostring(playerID))
+
+	if not ply_table then
+		return
+	end
+
+	-- Backend persistence owns the purchase. The local table is only refreshed
+	-- once the backend returns the updated fragment balance/unlocks.
+	CustomGameEventManager:Send_ServerToPlayer(PlayerResource:GetPlayer(playerID), "supporter_pass_purchase_pending", {
+		item_id = event.item_id,
+	})
+end
+
+function Battlepass:SupporterPassUpdateSettings(event)
+	local playerID = event.PlayerID
+	local ply_table = CustomNetTables:GetTableValue("supporter_pass_player", tostring(playerID)) or {}
+
+	ply_table.toggle_tag = event.toggle_tag == 1 or event.toggle_tag == true
+	ply_table.pass_rewards = event.pass_rewards == 1 or event.pass_rewards == true
+	ply_table.bp_rewards = ply_table.pass_rewards
+	ply_table.player_xp = event.player_xp == 1 or event.player_xp == true
+	ply_table.winrate_toggle = event.winrate_toggle == 1 or event.winrate_toggle == true
+
+	CustomNetTables:SetTableValue("supporter_pass_player", tostring(playerID), ply_table)
+end
+
 function Battlepass:SetOverrideAssets(hero, modifier, table_name)
 	local asset_style = 0
 
@@ -262,18 +295,18 @@ function Battlepass:SetOverrideAssets(hero, modifier, table_name)
 						particle_table.modifier = j.modifier
 						particle_table.parent = hero
 
-						CustomNetTables:SetTableValue("battlepass_player", j.asset .. '_' .. hero:GetPlayerID(), { j.modifier })
+						CustomNetTables:SetTableValue("supporter_pass_player", j.asset .. '_' .. hero:GetPlayerID(), { j.modifier })
 					end
 				end
 			elseif j.type == "sound" then
 				if j.style == nil or j.style == asset_style then
 					--					print("Sound:", j)
-					CustomNetTables:SetTableValue("battlepass_player", j.asset .. '_' .. hero:GetPlayerID(), { j.modifier })
+					CustomNetTables:SetTableValue("supporter_pass_player", j.asset .. '_' .. hero:GetPlayerID(), { j.modifier })
 				end
 			elseif j.type == "ability_icon" then
 				if j.style == nil or j.style == asset_style then
 					--					print("ability icon:", j)
-					CustomNetTables:SetTableValue("battlepass_player", j.asset .. '_' .. hero:GetPlayerID(), { j.modifier })
+					CustomNetTables:SetTableValue("supporter_pass_player", j.asset .. '_' .. hero:GetPlayerID(), { j.modifier })
 				end
 			elseif j.type == "icon_replacement_hero" then
 				if j.style == nil or j.style == asset_style then
@@ -323,7 +356,7 @@ function Battlepass:GetHeroEffect(hero)
 		hero.tree_cleave_effect = "particles/units/heroes/hero_tiny/tiny_craggy_cleave.vpcf"
 	end
 
-	local ply_table = CustomNetTables:GetTableValue("battlepass_player", tostring(hero:GetPlayerID()))
+	local ply_table = CustomNetTables:GetTableValue("supporter_pass_player", tostring(hero:GetPlayerID()))
 
 	if ply_table and ply_table.bp_rewards == 0 then
 		return
@@ -334,7 +367,7 @@ function Battlepass:GetHeroEffect(hero)
 		--		print("Armory:", armory)
 		if not armory or armory and type(armory) ~= "table" then return end
 
-		CustomNetTables:SetTableValue("battlepass_rewards", "rewards_" .. hero:GetPlayerID(), armory)
+		CustomNetTables:SetTableValue("supporter_pass_armory", "rewards_" .. hero:GetPlayerID(), armory)
 
 		local battlepass_items = {}
 		battlepass_items["blink"] = ""
@@ -409,7 +442,7 @@ function Battlepass:GetHeroEffect(hero)
 					local images = ItemsGame:GetItemImages(v.item_id)
 
 					for k, v in pairs(images) do
-						CustomNetTables:SetTableValue("battlepass_player", v.asset .. '_' .. hero:GetPlayerID(), { v.modifier })
+						CustomNetTables:SetTableValue("supporter_pass_player", v.asset .. '_' .. hero:GetPlayerID(), { v.modifier })
 					end
 				end
 			end

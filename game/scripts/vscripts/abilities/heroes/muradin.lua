@@ -1,5 +1,6 @@
 LinkLuaModifier("modifier_muradin_avatar", "abilities/heroes/muradin.lua", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_muradin_avatar_buff", "abilities/heroes/muradin.lua", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_muradin_true_strike", "abilities/heroes/muradin.lua", LUA_MODIFIER_MOTION_NONE)
 
 muradin_avatar = muradin_avatar or class({})
 
@@ -54,4 +55,23 @@ end
 
 function modifier_muradin_avatar_buff:GetModifierModelScale()
 	return self:GetAbility():GetSpecialValueFor("bonus_model_scale")
+end
+
+muradin_true_strike = muradin_true_strike or class({})
+
+function muradin_true_strike:GetIntrinsicModifierName()
+	return "modifier_muradin_true_strike"
+end
+
+modifier_muradin_true_strike = modifier_muradin_true_strike or class({})
+
+function modifier_muradin_true_strike:IsHidden() return false end
+function modifier_muradin_true_strike:IsPurgable() return false end
+function modifier_muradin_true_strike:RemoveOnDeath() return false end
+function modifier_muradin_true_strike:GetTexture() return "item_monkey_king_bar" end
+
+function modifier_muradin_true_strike:CheckState()
+	return {
+		[MODIFIER_STATE_CANNOT_MISS] = true,
+	}
 end

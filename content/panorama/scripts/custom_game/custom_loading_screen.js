@@ -17,14 +17,13 @@ var profile_modal_fade_duration = 0.18;
 var LOADING_SCREEN_CONFIG = {
 	links: {
 		website: "https://mods.frostrose-studio.com",
-		transifex: "https://www.transifex.com/frostrose-studio/x-hero-siege/",
 		patreon: "https://www.patreon.com/bePatron?u=2533325",
 		discord: "https://discord.gg/frostrose",
 		artwork_instagram: "https://www.instagram.com/duongcua_art",
 	},
 	footer: {
 		auto_interval_seconds: 10.0,
-		rotation_order: [4, 3, 1, 2],
+		rotation_order: [3, 2, 1],
 		auto_tick_interval_seconds: 0.1,
 		mouse_move_pause_window_seconds: 0.22,
 	},
@@ -48,9 +47,8 @@ var LOADING_SCREEN_CONFIG = {
 	},
 	taglines: {
 		1: "loading_screen_tab_tagline_custom_games",
-		2: "loading_screen_tab_tagline_transifex",
-		3: "loading_screen_tab_tagline_patreon",
-		4: "loading_screen_tab_tagline_discord",
+		2: "loading_screen_tab_tagline_patreon",
+		3: "loading_screen_tab_tagline_discord",
 	},
 };
 var bottom_tab_current_panel_index = -1;
@@ -770,6 +768,18 @@ function GetDonatorLevelText(level) {
 	return LocalizeTemplate("loading_screen_donator_tier", { tier: normalized_level.toString() });
 }
 
+function GetSupporterTierText(profile_data) {
+	if (!profile_data) {
+		return L("loading_screen_none");
+	}
+
+	if (profile_data.supporter_tier_name) {
+		return profile_data.supporter_tier_name;
+	}
+
+	return GetDonatorLevelText(profile_data.donator_level);
+}
+
 function ParseRankTitle(raw_title) {
 	var result = {
 		rank_name: "",
@@ -954,7 +964,7 @@ function GetProfileDataForPlayer(player_id) {
 	}
 
 	if (player_id >= 0) {
-		player_table = CustomNetTables.GetTableValue("battlepass_player", player_id.toString()) || {};
+		player_table = CustomNetTables.GetTableValue("supporter_pass_player", player_id.toString()) || {};
 	}
 
 	for (var key in player_table) {
@@ -966,37 +976,44 @@ function GetProfileDataForPlayer(player_id) {
 		xp_max = Math.max(1, ToNumber(player_table.MaxXP, 1000));
 	}
 
-	if (player_table.XP !== undefined) {
+	if (player_table.season_xp_max !== undefined) {
+		xp_max = Math.max(1, ToNumber(player_table.season_xp_max, 1000));
+	}
+
+	if (player_table.season_xp !== undefined) {
+		xp_current = Math.max(0, ToNumber(player_table.season_xp, 0));
+		has_xp_data = true;
+	} else if (player_table.XP !== undefined) {
 		xp_current = Math.max(0, ToNumber(player_table.XP, 0));
 		has_xp_data = true;
-	} else if (player_table.whalepass_xp !== undefined) {
-		xp_current = Math.max(0, ToNumber(player_table.whalepass_xp, 0));
-		has_xp_data = true;
+	}
 
-		while (xp_current >= xp_max) {
-			xp_current = xp_current - xp_max;
-		}
+	while (xp_current >= xp_max) {
+		xp_current = xp_current - xp_max;
 	}
 
 	return {
 		player_id: player_id,
 		steam_id: GetSteamIDFromPlayerInfo(player_info, player_id),
 		player_name: GetPlayerDisplayName(player_id, player_info),
-		title: player_table.title || L("loading_screen_unavailable"),
+		title: player_table.account_title || player_table.title || L("loading_screen_unavailable"),
 		title_color: player_table.title_color || "#9eb0c9",
-		level: player_table.Lvl !== undefined ? player_table.Lvl : "-",
+		level: player_table.season_level !== undefined ? player_table.season_level : (player_table.Lvl !== undefined ? player_table.Lvl : "-"),
 		xp_current: xp_current,
 		xp_max: xp_max,
 		has_xp_data: has_xp_data,
 		seasonal_winrate: has_profile_data ? FormatPercentValue(player_table.winrate) : L("loading_screen_na"),
 		donator_level: player_table.donator_level,
-		donator_color: player_table.donator_color || "#f1e3c3",
+		donator_color: player_table.tier_color || player_table.donator_color || "#7db9d8",
+		supporter_tier: player_table.tier_id || player_table.supporter_tier || 0,
+		supporter_tier_name: player_table.tier_name || player_table.supporter_tier_name,
+		fragments: player_table.fragments || player_table.fragment_balance || 0,
 		mmr_title: player_table.mmr_title || L("loading_screen_na"),
 		connection_state: (player_info && player_info.player_connection_state !== undefined) ? player_info.player_connection_state : connection_state.NOT_YET_CONNECTED,
 		toggle_tag: player_table.toggle_tag,
 		player_xp: player_table.player_xp,
 		winrate_toggle: player_table.winrate_toggle,
-		bp_rewards: player_table.bp_rewards,
+		bp_rewards: player_table.pass_rewards !== undefined ? player_table.pass_rewards : player_table.bp_rewards,
 		has_profile_data: has_profile_data,
 	};
 }
@@ -1062,7 +1079,7 @@ function UpdateProfilePanels() {
 	}
 
 	if (summary_donator) {
-		summary_donator.text = GetDonatorLevelText(local_data.donator_level);
+		summary_donator.text = GetSupporterTierText(local_data);
 		summary_donator.style.color = local_data.donator_color ? local_data.donator_color : "#f1e3c3";
 	}
 
@@ -1077,7 +1094,7 @@ function UpdateProfilePanels() {
 	SafeSetText("ProfileModalXPValue", selected_data.has_xp_data ? (FormatIntegerValue(selected_data.xp_current) + " / " + FormatIntegerValue(selected_data.xp_max)) : L("loading_screen_na"));
 	SafeSetText("ProfileModalTitleValue", selected_data.title);
 	SafeSetText("ProfileModalWinrateValue", selected_data.seasonal_winrate);
-	SafeSetText("ProfileModalDonatorValue", GetDonatorLevelText(selected_data.donator_level));
+	SafeSetText("ProfileModalDonatorValue", GetSupporterTierText(selected_data));
 	SafeSetText("ProfileModalMMRTitleValue", selected_data.mmr_title);
 	SafeSetText("ProfileModalConnectionValue", GetConnectionStateText(selected_data.connection_state));
 	SafeSetText("ProfileModalTagVisibleValue", GetVisibilityStateText(selected_data.toggle_tag));
@@ -1256,10 +1273,6 @@ function ShowReadyToast(message_token) {
 
 function OnWebsiteButtonPressed() {
 	OpenExternalURL(LOADING_SCREEN_CONFIG.links.website);
-}
-
-function OnTransifexButtonPressed() {
-	OpenExternalURL(LOADING_SCREEN_CONFIG.links.transifex);
 }
 
 function OnPatreonButtonPressed() {
@@ -2312,20 +2325,16 @@ function GetBottomTabRotationPosition(panel_index) {
 }
 
 function GetBottomTabTargetRadio(panel_index) {
-	if (panel_index == 4) {
+	if (panel_index == 3) {
 		return $("#BottomRadioDiscord");
 	}
 
-	if (panel_index == 3) {
+	if (panel_index == 2) {
 		return $("#BottomRadioPatreon");
 	}
 
 	if (panel_index == 1) {
 		return $("#BottomRadioCustomGames");
-	}
-
-	if (panel_index == 2) {
-		return $("#BottomRadioTransifex");
 	}
 
 	return null;
@@ -2336,7 +2345,6 @@ function UpdateBottomTabHeader(panel_index) {
 		$("#BottomRadioDiscord"),
 		$("#BottomRadioPatreon"),
 		$("#BottomRadioCustomGames"),
-		$("#BottomRadioTransifex"),
 	];
 	var target_radio = GetBottomTabTargetRadio(panel_index);
 
@@ -3176,7 +3184,7 @@ function DisableRankingVoting() {
 	$.GetContextPanel().SetHasClass("ProfileModalClosing", false);
 
 	if (typeof CustomNetTables !== "undefined" && CustomNetTables && typeof CustomNetTables.SubscribeNetTableListener === "function") {
-		CustomNetTables.SubscribeNetTableListener("battlepass_player", function (table_name, key, data) {
+		CustomNetTables.SubscribeNetTableListener("supporter_pass_player", function (table_name, key, data) {
 			UpdateProfilePanels();
 		});
 	} else {

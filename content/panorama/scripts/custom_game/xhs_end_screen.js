@@ -229,7 +229,7 @@ var XHSEndScreen = (function () {
 	}
 
 	function GetBattlepassTable(playerID) {
-		return CustomNetTables.GetTableValue("battlepass_player", playerID.toString()) || {};
+		return CustomNetTables.GetTableValue("supporter_pass_player", playerID.toString()) || {};
 	}
 
 	function BuildPlayerModel(data, playerID) {
@@ -347,17 +347,19 @@ var XHSEndScreen = (function () {
 
 		var difficulty = Panel("XHSEndScreenDifficulty");
 		if (difficulty) {
-			difficulty.text = "Difficulty: " + GetDifficultyName(data);
+			difficulty.text = GetDifficultyName(data);
 		}
 
-		var map = Panel("XHSEndScreenMap");
-		if (map) {
-			map.text = "Map: " + (data.map || "-");
+		var mode = Panel("XHSEndScreenMode");
+		if (mode) {
+			var mapName = data.map || "XHS";
+			var gameMode = data.gamemode || data.game_type || "-";
+			mode.text = mapName + " / " + gameMode;
 		}
 
 		var gameID = Panel("XHSEndScreenGameId");
 		if (gameID) {
-			gameID.text = "Game: " + ((data.info && data.info.id) || data.game_id || "-");
+			gameID.text = ((data.info && data.info.id) || data.game_id || "-").toString();
 		}
 	}
 
@@ -433,12 +435,12 @@ var XHSEndScreen = (function () {
 			return;
 		}
 
-		var damage = FindMvp(players, "damageHeroes");
+		var kills = FindMvp(players, "kills");
 		var healing = FindMvp(players, "healing");
 		var tomes = FindMvp(players, "tomeStatsBonus");
 		var networth = FindMvp(players, "networth");
 
-		CreateMvpCard(parent, "Most Hero Damage", damage.model, damage.value, FormatNumber);
+		CreateMvpCard(parent, "Most Kills", kills.model, kills.value, FormatNumber);
 		CreateMvpCard(parent, "Most Healing", healing.model, healing.value, FormatNumber);
 		CreateMvpCard(parent, "Most Tome Stats", tomes.model, tomes.value, function (value) { return "+" + FormatNumber(value); });
 		CreateMvpCard(parent, "Richest Hero", networth.model, networth.value, FormatNumber);
@@ -551,11 +553,11 @@ var XHSEndScreen = (function () {
 		heroName.text = model.abandon ? model.heroLabel + " - Abandoned" : model.heroLabel;
 
 		CreateCell(row, "PlayerColSmall", model.level.toString());
-		CreateCell(row, "PlayerColKda", model.kills + "/" + model.deaths + "/" + model.assists);
+		CreateCell(row, "PlayerColKda", FormatNumber(model.kills));
 		CreateCell(row, "PlayerColNumber", FormatNumber(model.networth), "XHSPlayerCellGold");
-		CreateCell(row, "PlayerColNumber", FormatNumber(model.damageHeroes));
+		CreateCell(row, "PlayerColNumber", FormatNumber(model.deaths));
 		CreateCell(row, "PlayerColNumber", FormatNumber(model.healing));
-		CreateCell(row, "PlayerColSmall", "+" + FormatNumber(model.tomeStatsBonus));
+		CreateCell(row, "PlayerColNumber", "+" + FormatNumber(model.tomeStatsBonus));
 		CreateCell(row, "PlayerColNumber", FormatNumber(model.supportGold));
 		CreateBattlepassCell(row, model);
 	}
@@ -567,6 +569,11 @@ var XHSEndScreen = (function () {
 		var count = Panel("XHSEndScreenPlayerCount");
 		if (count) {
 			count.text = players.length + (players.length === 1 ? " player" : " players");
+		}
+
+		var playersMeta = Panel("XHSEndScreenPlayersMeta");
+		if (playersMeta) {
+			playersMeta.text = players.length.toString();
 		}
 
 		if (!rows) {
@@ -671,7 +678,7 @@ var XHSEndScreen = (function () {
 	}
 
 	function CreateBattlepassRewardPanel(level, levelupCount) {
-		var battlepass = CustomNetTables.GetTableValue("battlepass_js_free", "rewards");
+		var battlepass = CustomNetTables.GetTableValue("supporter_pass_rewards_free", "rewards");
 		if (battlepass && battlepass["1"]) {
 			battlepass = battlepass["1"];
 		}
@@ -756,14 +763,9 @@ var XHSEndScreen = (function () {
 			close.SetPanelEvent("onactivate", FinishGame);
 		}
 
-		var closeTop = Panel("XHSEndScreenCloseTopButton");
-		if (closeTop) {
-			closeTop.SetPanelEvent("onactivate", FinishGame);
-		}
-
 		var hall = Panel("XHSEndScreenHallButton");
 		if (hall) {
-			hall.SetPanelEvent("onactivate", OpenHallOfFame);
+			hall.enabled = false;
 		}
 
 		var hallClose = Panel("XHSEndScreenHallCloseButton");
@@ -789,6 +791,7 @@ var XHSEndScreen = (function () {
 	return {
 		Init: Init,
 		OpenHallOfFame: OpenHallOfFame,
+		CloseHallOfFame: CloseHallOfFame,
 	};
 })();
 

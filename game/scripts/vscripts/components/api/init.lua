@@ -378,6 +378,39 @@ function api:GetPlayerSeasonalWinrate(player_id)
 	end
 end
 
+function api:GetPlayerSupporterPass(player_id)
+	if not PlayerResource:IsValidPlayerID(player_id) then
+		return {}
+	end
+
+	local steamid = tostring(PlayerResource:GetSteamID(player_id))
+	if self.players == nil or self.players[steamid] == nil then
+		return {}
+	end
+
+	return self.players[steamid].supporter_pass or {}
+end
+
+function api:GetPlayerSupporterTier(player_id)
+	local supporter_pass = self:GetPlayerSupporterPass(player_id)
+	local tier_id = tonumber(supporter_pass.tier_id)
+
+	if tier_id ~= nil then
+		return tier_id
+	end
+
+	if SupporterPass and SupporterPass.GetTierForStatus then
+		return SupporterPass:GetTierForStatus(self:GetDonatorStatus(player_id))
+	end
+
+	return 0
+end
+
+function api:GetPlayerSupporterFragments(player_id)
+	local supporter_pass = self:GetPlayerSupporterPass(player_id)
+	return tonumber(supporter_pass.fragments or supporter_pass.fragment_balance) or 0
+end
+
 function api:GetPlayerMMR(player_id)
 	if not PlayerResource:IsValidPlayerID(player_id) then
 		native_print("api:GetPlayerMMR: Player ID not valid!")
@@ -679,40 +712,25 @@ end
 
 function api:RegisterGame(callback)
 	self:Request("game-register", function(data)
-		-- if IsInToolsMode() then
-		-- for k, v in pairs(data.players) do
-		-- print("Player SteamID: " .. k)
-		-- print("Whalepass:")
-		-- print(v.whalepass)
-
-		-- if v.whalepass then
-		-- 	for i, j in pairs(v.whalepass) do
-		-- 		print(i)
-		-- 		-- print(i, j)
-		-- 	end
-		-- end
-		-- end
-
-		-- print(data.players)
-		-- print(data.whalepass)
-		-- end
-
 		api.game_id = tonumber(data.game_id)
 		api.players = data.players
 		api.companions = data.companions or nil
 		api.emblems = data.emblems or nil
+		api.effigies = data.effigies or data.statues or nil
 		api.disabled_heroes = data.disabled_heroes or nil
+		api.supporter_pass = data.supporter_pass or nil
 
-		-- Whalepass
-		if data.whalepass and data.whalepass[1] then
-			api.whalepass = data.whalepass[1]
-		else
-			api.whalepass = nil
+		CustomNetTables:SetTableValue("supporter_pass_player", "companions", api.companions)
+		CustomNetTables:SetTableValue("supporter_pass_player", "emblems", api.emblems)
+		CustomNetTables:SetTableValue("supporter_pass_player", "effigies", api.effigies)
+
+		if data.supporter_pass and data.supporter_pass.shop then
+			CustomNetTables:SetTableValue("supporter_pass_shop", "featured", data.supporter_pass.shop)
 		end
 
-		CustomNetTables:SetTableValue("battlepass_player", "companions", api.companions)
-		CustomNetTables:SetTableValue("battlepass_player", "emblems", api.emblems)
-		CustomNetTables:SetTableValue("battlepass_player", "whalepass", api.whalepass)
+		if SupporterPass and SupporterPass.PublishPlayers then
+			SupporterPass:PublishPlayers()
+		end
 
 		if callback ~= nil then
 			callback(data)
@@ -727,7 +745,7 @@ function api:RegisterGame(callback)
 		cheat_mode = self:IsCheatGame(),
 	})
 
-	-- call in BP scripts after battlepass_player is set to show mmr medal in loading screen
+	-- call in supporter pass scripts after supporter_pass_player is set to show mmr medal in loading screen
 	--	print("ALL PLAYERS LOADED IN!")
 	--	CustomGameEventManager:Send_ServerToAllClients("all_players_loaded", {})
 end
@@ -772,6 +790,9 @@ function api:CompleteGame()
 		if PlayerResource:IsValidPlayerID(id) then
 			local items = {}
 			local heroEntity = PlayerResource:GetSelectedHeroEntity(id)
+			if heroEntity == nil and PlayerResource:GetPlayer(id) ~= nil then
+				heroEntity = PlayerResource:GetPlayer(id):GetAssignedHero()
+			end
 			local hero = json.null
 			local networth = 0
 			local healing = PlayerResource:GetHealing(id)
@@ -1063,9 +1084,9 @@ function api:GetParties(iPlayerID)
 	return self.parties
 end
 
-function api:GetPlayerWhalepassURL(player_id)
+function api:GetPlayerSupporterURL(player_id)
 	if not PlayerResource:IsValidPlayerID(player_id) then
-		native_print("api:GetPlayerWhalepassURL: Player ID not valid!")
+		native_print("api:GetPlayerSupporterURL: Player ID not valid!")
 		return false
 	end
 
@@ -1077,9 +1098,10 @@ function api:GetPlayerWhalepassURL(player_id)
 	end
 
 	if self.players[steamid] ~= nil then
-		return self.players[steamid].whalepass_url
+		local supporter_pass = self.players[steamid].supporter_pass or {}
+		return supporter_pass.url or self.players[steamid].supporter_url
 	else
-		native_print("api:GetPlayerWhalepassURL: api players steamid not valid!")
+		native_print("api:GetPlayerSupporterURL: api players steamid not valid!")
 		return false
 	end
 end
@@ -1097,17 +1119,18 @@ function api:GetPlayerAchievements(player_id)
 		return false
 	end
 
-	if self.players[steamid] ~= nil and self.players[steamid].whalepass then
-		return self.players[steamid].whalepass.challenges
+	if self.players[steamid] ~= nil then
+		local supporter_pass = self.players[steamid].supporter_pass or {}
+		return supporter_pass.challenges or supporter_pass.achievements or {}
 	else
 		native_print("api:GetPlayerAchievements: api players steamid not valid!")
 		return false
 	end
 end
 
-function api:GetPlayerWhalepassXP(player_id)
+function api:GetPlayerSupporterPassXP(player_id)
 	if not PlayerResource:IsValidPlayerID(player_id) then
-		native_print("api:GetPlayerWhalepassXP: Player ID not valid!")
+		native_print("api:GetPlayerSupporterPassXP: Player ID not valid!")
 		return 0
 	end
 
@@ -1118,21 +1141,17 @@ function api:GetPlayerWhalepassXP(player_id)
 	end
 
 	if self.players[steamid] ~= nil then
-		if self.players[steamid] ~= nil and self.players[steamid].whalepass then
-			return self.players[steamid].whalepass.currentExp
-		end
-
-		native_print("api:GetPlayerWhalepassXP: api players whalepass not valid!")
-		return 0
+		local supporter_pass = self.players[steamid].supporter_pass or {}
+		return tonumber(supporter_pass.season_xp or supporter_pass.current_exp) or 0
 	else
-		native_print("api:GetPlayerWhalepassXP: api players steamid not valid!")
+		native_print("api:GetPlayerSupporterPassXP: api players steamid not valid!")
 		return 0
 	end
 end
 
-function api:GetPlayerWhalepassLevel(player_id)
+function api:GetPlayerSupporterPassLevel(player_id)
 	if not PlayerResource:IsValidPlayerID(player_id) then
-		native_print("api:GetPlayerWhalepassLevel: Player ID not valid!")
+		native_print("api:GetPlayerSupporterPassLevel: Player ID not valid!")
 		return false
 	end
 
@@ -1143,16 +1162,10 @@ function api:GetPlayerWhalepassLevel(player_id)
 	end
 
 	if self.players[steamid] ~= nil then
-		if self.players[steamid].whalepass then
-			return self.players[steamid].whalepass.currentExp
-		else
-			native_print("api:GetPlayerWhalepassLevel: api players whalepass not valid!")
-			return false
-		end
-
-		return self.players[steamid].whalepass.lastCompletedLevel or 0
+		local supporter_pass = self.players[steamid].supporter_pass or {}
+		return tonumber(supporter_pass.season_level or supporter_pass.level) or 0
 	else
-		native_print("api:GetPlayerWhalepassLevel: api players steamid not valid!")
+		native_print("api:GetPlayerSupporterPassLevel: api players steamid not valid!")
 		return false
 	end
 end

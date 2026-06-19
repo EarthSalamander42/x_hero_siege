@@ -53,16 +53,18 @@
 .XHSEndScreenHeaderCopy {
 	width: fill-parent-flow( 1.0 );
 	height: 100%;
-	padding: 18px 24px;
+	padding: 14px 24px;
 	flow-children: down;
 }
 
 .XHSEndScreenResult {
-	font-size: 42px;
+	font-size: 38px;
 	font-weight: bold;
 	color: #f3fbff;
 	text-transform: uppercase;
 	text-shadow: 0px 2px 4px #00111f;
+	height: 48px;
+	text-overflow: shrink;
 }
 
 .XHSEndScreenResult.IsDefeat {
@@ -71,27 +73,51 @@
 
 .XHSEndScreenMeta {
 	width: 100%;
-	height: 32px;
-	margin-top: 8px;
+	height: 42px;
+	margin-top: 4px;
 	flow-children: right;
 }
 
-.XHSEndScreenMetaValue {
-	min-width: 130px;
-	height: 32px;
+.XHSEndScreenMetaItem {
+	width: 132px;
+	height: 42px;
 	margin-right: 8px;
-	padding: 6px 10px 4px 10px;
+	padding: 4px 9px 3px 9px;
+	flow-children: down;
 	background-color: #050b14b8;
 	border: 1px solid xhs_border_soft;
-	color: xhs_text_muted;
-	font-size: 16px;
+}
+
+.XHSEndScreenMetaItem:hover {
+	background-color: #071827e8;
+	border: 1px solid xhs_border;
+}
+
+.XHSEndScreenMetaLabel {
+	width: 100%;
+	height: 14px;
+	color: xhs_text_dim;
+	font-size: 11px;
+	letter-spacing: 1px;
 	text-transform: uppercase;
+	text-overflow: shrink;
+}
+
+.XHSEndScreenMetaValue {
+	width: 100%;
+	height: 22px;
+	margin-top: 1px;
+	color: xhs_text;
+	font-size: 17px;
+	font-weight: bold;
+	text-transform: uppercase;
+	text-overflow: shrink;
 }
 
 .XHSEndScreenHeaderActions {
-	width: 310px;
+	width: 170px;
 	height: 100%;
-	padding: 22px 20px;
+	padding: 36px 20px 0px 0px;
 	flow-children: right;
 }
 
@@ -114,6 +140,18 @@
 .XHSEndScreenButtonSecondary {
 	background-color: #071321e8;
 	border: 1px solid xhs_border;
+}
+
+.XHSEndScreenButtonDisabled {
+	brightness: 0.45;
+	saturation: 0.15;
+	wash-color: #9aa7b4aa;
+	border: 1px solid #ffffff12;
+}
+
+.XHSEndScreenButtonDisabled:hover {
+	brightness: 0.45;
+	box-shadow: none;
 }
 
 .XHSEndScreenDiscordButton {
@@ -189,12 +227,13 @@
 	height: fill-parent-flow( 1.0 );
 	margin-top: 10px;
 	flow-children: down;
+	overflow: squish scroll;
 }
 
 .XHSMvpCard {
 	width: 100%;
-	height: 96px;
-	margin-bottom: 10px;
+	height: 88px;
+	margin-bottom: 8px;
 	padding: 10px;
 	flow-children: right;
 	background-color: gradient( linear, 0% 0%, 100% 100%, from( #071827d8 ), to( #050b14c8 ) );
@@ -458,12 +497,18 @@
 .XHSEndScreenHallPanel {
 	width: 100%;
 	height: 100%;
-	background-color: #000000aa;
 	visibility: collapse;
+	flow-children: none;
 }
 
 .XHSEndScreenHallPanel.IsVisible {
 	visibility: visible;
+}
+
+.XHSEndScreenHallBackdrop {
+	width: 100%;
+	height: 100%;
+	background-color: #000000aa;
 }
 
 .XHSEndScreenHallWindow {
@@ -651,6 +696,10 @@
 	height: 780px;
 }
 
+.AspectRatio16x10 .XHSEndScreenMetaItem {
+	width: 120px;
+}
+
 .AspectRatio16x10 .XHSEndScreenLeft {
 	width: 286px;
 }
@@ -662,6 +711,14 @@
 
 .AspectRatio4x3 .XHSEndScreenLeft {
 	width: 270px;
+}
+
+.AspectRatio4x3 .XHSEndScreenMetaItem {
+	width: 104px;
+}
+
+.AspectRatio4x3 .XHSEndScreenResult {
+	font-size: 32px;
 }
 
 .AspectRatio4x3 .PlayerColNumber {

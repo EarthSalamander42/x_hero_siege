@@ -17,19 +17,32 @@
 				<Panel class="XHSEndScreenHeaderCopy">
 					<Label id="XHSEndScreenResult" class="XHSEndScreenResult" text="X HEROES VICTORY" />
 					<Panel class="XHSEndScreenMeta">
-						<Label id="XHSEndScreenTime" class="XHSEndScreenMetaValue" text="00:00" />
-						<Label id="XHSEndScreenDifficulty" class="XHSEndScreenMetaValue" text="Difficulty: -" />
-						<Label id="XHSEndScreenMap" class="XHSEndScreenMetaValue" text="Map: -" />
-						<Label id="XHSEndScreenGameId" class="XHSEndScreenMetaValue" text="Game: -" />
+						<Panel class="XHSEndScreenMetaItem">
+							<Label class="XHSEndScreenMetaLabel" text="Time" />
+							<Label id="XHSEndScreenTime" class="XHSEndScreenMetaValue" text="00:00" />
+						</Panel>
+						<Panel class="XHSEndScreenMetaItem">
+							<Label class="XHSEndScreenMetaLabel" text="Difficulty" />
+							<Label id="XHSEndScreenDifficulty" class="XHSEndScreenMetaValue" text="-" />
+						</Panel>
+						<Panel class="XHSEndScreenMetaItem">
+							<Label class="XHSEndScreenMetaLabel" text="Mode" />
+							<Label id="XHSEndScreenMode" class="XHSEndScreenMetaValue" text="-" />
+						</Panel>
+						<Panel class="XHSEndScreenMetaItem">
+							<Label class="XHSEndScreenMetaLabel" text="Game" />
+							<Label id="XHSEndScreenGameId" class="XHSEndScreenMetaValue" text="-" />
+						</Panel>
+						<Panel class="XHSEndScreenMetaItem">
+							<Label class="XHSEndScreenMetaLabel" text="Players" />
+							<Label id="XHSEndScreenPlayersMeta" class="XHSEndScreenMetaValue" text="0" />
+						</Panel>
 					</Panel>
 				</Panel>
 
 				<Panel class="XHSEndScreenHeaderActions">
-					<Button id="XHSEndScreenHallButton" class="XHSEndScreenButton XHSEndScreenButtonSecondary">
+					<Button id="XHSEndScreenHallButton" class="XHSEndScreenButton XHSEndScreenButtonSecondary XHSEndScreenButtonDisabled" enabled="false">
 						<Label text="Hall of Fame" />
-					</Button>
-					<Button id="XHSEndScreenCloseTopButton" class="XHSEndScreenButton">
-						<Label text="#CustomEndScreenClose" />
 					</Button>
 				</Panel>
 			</Panel>
@@ -49,13 +62,13 @@
 					<Panel class="XHSEndScreenPlayerHeader">
 						<Label class="PlayerColIdentity" text="Player" />
 						<Label class="PlayerColSmall" text="LVL" />
-						<Label class="PlayerColKda" text="KDA" />
+						<Label class="PlayerColKda" text="Kills" />
 						<Label class="PlayerColNumber" text="Networth" />
-						<Label class="PlayerColNumber" text="Hero DMG" />
+						<Label class="PlayerColNumber" text="Deaths" />
 						<Label class="PlayerColNumber" text="Healing" />
-						<Label class="PlayerColSmall" text="Tomes" />
+						<Label class="PlayerColNumber" text="Tome Stats" />
 						<Label class="PlayerColNumber" text="Support" />
-						<Label class="PlayerColBattlepass" text="Battlepass" />
+						<Label class="PlayerColBattlepass" text="Supporter Pass" />
 					</Panel>
 
 					<Panel id="XHSEndScreenPlayerRows" class="XHSEndScreenPlayerRows" />
@@ -76,13 +89,14 @@
 		</Panel>
 
 		<Panel id="XHSEndScreenHallPanel" class="XHSEndScreenHallPanel">
+			<Panel class="XHSEndScreenHallBackdrop" onactivate="XHSEndScreen.CloseHallOfFame()" />
 			<Panel class="XHSEndScreenHallWindow XHSPanel">
 				<Panel class="XHSEndScreenHallHeader">
 					<Panel>
 						<Label class="XHSEndScreenSectionTitle" text="Hall of Fame" />
 						<Label class="XHSEndScreenSectionNote" text="Diretide leaderboard" />
 					</Panel>
-					<Button id="XHSEndScreenHallCloseButton" class="XHSEndScreenIconButton">
+					<Button id="XHSEndScreenHallCloseButton" class="XHSEndScreenIconButton" onactivate="XHSEndScreen.CloseHallOfFame()">
 						<Label text="X" />
 					</Button>
 				</Panel>

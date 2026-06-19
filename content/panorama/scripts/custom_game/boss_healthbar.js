@@ -1,37 +1,82 @@
 "use strict";
 
+function GetBossPanels(index) {
+	return {
+		container: $("#BossHP" + index),
+		label: $("#BossLabel" + index),
+		level: $("#BossLevel" + index),
+		icon: $("#BossIcon" + index),
+		health: $("#BossHealth" + index),
+		bar: $("#BossProgressBar" + index),
+		barLeft: $("#BossProgressBar" + index + "_Left"),
+	};
+}
+
+function FormatBossHealth(value) {
+	var number = Number(value) || 0;
+
+	if (number >= 1000000) {
+		return (number / 1000000).toFixed(1).replace(".0", "") + "M";
+	}
+
+	if (number >= 10000) {
+		return (number / 1000).toFixed(1).replace(".0", "") + "k";
+	}
+
+	return Math.floor(number).toString();
+}
+
 function ShowBossBar(args) {
 	if (args.boss_count) {
-		var boss_icon = $("#BossIcon" + args.boss_count);
-		boss_icon.style.backgroundImage = 'url("file://{images}/heroes/icons/' + args.boss_icon + '.png")';
-		boss_icon.style.backgroundRepeat = "no-repeat";
-		boss_icon.style.backgroundPosition = "50% 0%";
-		boss_icon.style.backgroundSize = "90% 90%";
-		boss_icon.style.zIndex = "10";
+		var panels = GetBossPanels(args.boss_count);
 
-		$("#BossHP" + args.boss_count).style.visibility = "visible";
-		$("#BossLabel" + args.boss_count).text = $.Localize("#" + args.boss_name);
-		$("#BossLevel" + args.boss_count).text = "Level: " + args.difficulty;
-		$("#BossHealth" + args.boss_count).text = args.boss_health + " / " + args.boss_max_health;
-		$("#BossProgressBar" + args.boss_count).value = args.boss_health / args.boss_max_health;
-		$("#BossProgressBar" + args.boss_count + "_Left").style.backgroundColor = "gradient( linear, 0% 0%, 0% 100%, from( " + args.dark_color + " ), color-stop( 0.3, " + args.light_color + " ), color-stop( .5, " + args.light_color + " ), to( " + args.dark_color + " ) )";
+		if (!panels.container || !panels.bar) {
+			return;
+		}
+
+		if (panels.icon && args.boss_icon) {
+			panels.icon.style.backgroundImage = 'url("file://{images}/heroes/icons/' + args.boss_icon + '.png")';
+		}
+
+		panels.container.style.visibility = "visible";
+		panels.label.text = $.Localize("#" + args.boss_name);
+		panels.level.text = "Level " + args.difficulty;
+		panels.health.text = FormatBossHealth(args.boss_health) + " / " + FormatBossHealth(args.boss_max_health);
+		panels.bar.value = Math.max(0, Math.min(1, args.boss_health / args.boss_max_health));
+
+		if (panels.barLeft && args.dark_color && args.light_color) {
+			panels.barLeft.style.backgroundColor = "gradient( linear, 0% 0%, 100% 0%, from( " + args.dark_color + " ), color-stop( 0.55, " + args.light_color + " ), to( #ffffff ) )";
+		}
 	}
 }
 
 function UpdateBossBar(args) {
 	if (args.boss_count) {
-		$("#BossHealth" + args.boss_count).text = args.boss_health + " / " + args.boss_max_health;
-		$("#BossProgressBar" + args.boss_count).value = args.boss_health / args.boss_max_health;
+		var panels = GetBossPanels(args.boss_count);
+
+		if (!panels.health || !panels.bar) {
+			return;
+		}
+
+		panels.health.text = FormatBossHealth(args.boss_health) + " / " + FormatBossHealth(args.boss_max_health);
+		panels.bar.value = Math.max(0, Math.min(1, args.boss_health / args.boss_max_health));
 	}
 }
 
 function HideBossBar(args) {
 	if (args.boss_count) {
-		$("#BossHP" + args.boss_count).style.visibility = "collapse";
-		$("#BossLabel" + args.boss_count).text = "";
-		$("#BossIcon" + args.boss_count).style.backgroundImage = 'none';
-		$("#BossHealth" + args.boss_count).text = "";
-		$("#BossProgressBar" + args.boss_count).value = 100;
+		var panels = GetBossPanels(args.boss_count);
+
+		if (!panels.container) {
+			return;
+		}
+
+		panels.container.style.visibility = "collapse";
+		panels.label.text = "";
+		panels.level.text = "";
+		panels.icon.style.backgroundImage = "none";
+		panels.health.text = "";
+		panels.bar.value = 1;
 	}
 }
 

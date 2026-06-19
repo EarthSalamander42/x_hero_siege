@@ -13,6 +13,7 @@
 	PlayerTables.SubscribeNetTableListener('gold', onGoldChange);
 	// GameEvents.Subscribe('dota_player_update_query_unit', onQueryChange); // This doesn't work but I'm leaving it in
 	GameEvents.Subscribe('dota_player_update_selected_unit', onQueryChange);
+	$.Schedule(0.1, StyleGoldHud);
 })();
 	
 
@@ -51,7 +52,19 @@ function onGoldChange(table, data) {
 }
 
 function UpdateGoldHud (gold) {
-	var GoldLabel = FindDotaHudElement('ShopButton').FindChildTraverse('GoldLabel');
+	var shopButton = FindDotaHudElement('ShopButton');
+
+	if (!shopButton) {
+		return;
+	}
+
+	StyleGoldHud();
+
+	var GoldLabel = shopButton.FindChildTraverse('GoldLabel');
+
+	if (!GoldLabel) {
+		return;
+	}
 
 	if (useFormatting === 'full') {
 		GoldLabel.text = FormatGold(gold);
@@ -59,6 +72,42 @@ function UpdateGoldHud (gold) {
 		GoldLabel.text = FormatComma(gold);
 	} else {
 		GoldLabel.text = gold;
+	}
+}
+
+function StyleGoldHud() {
+	var shopButton = FindDotaHudElement('ShopButton');
+
+	if (!shopButton) {
+		return;
+	}
+
+	var goldLabel = shopButton.FindChildTraverse('GoldLabel');
+	var quickBuy = FindDotaHudElement('QuickBuyRows');
+
+	if (!shopButton.BHasClass('XHSGoldButton')) {
+		shopButton.AddClass('XHSGoldButton');
+	}
+
+	shopButton.style.backgroundColor = '#061421f2';
+	shopButton.style.border = '1px solid #ffcf6640';
+	shopButton.style.boxShadow = 'fill #00000090 0px 0px 8px 0px';
+
+	if (goldLabel) {
+		if (!goldLabel.BHasClass('XHSGoldLabel')) {
+			goldLabel.AddClass('XHSGoldLabel');
+		}
+
+		goldLabel.style.color = '#ffcf66';
+		goldLabel.style.fontSize = '22px';
+		goldLabel.style.fontWeight = 'bold';
+		goldLabel.style.textShadow = '0px 2px 4px #000000';
+	}
+
+	if (quickBuy && !quickBuy.BHasClass('XHSQuickBuyRows')) {
+		quickBuy.AddClass('XHSQuickBuyRows');
+		quickBuy.style.backgroundColor = '#061421d8';
+		quickBuy.style.border = '1px solid #77c8ff20';
 	}
 }
 

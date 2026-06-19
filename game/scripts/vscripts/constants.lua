@@ -312,6 +312,7 @@ _G.innate_abilities = {
 	"pugna_decrepify",
 	"holdout_giant_form",
 	"holdout_monkey_king_bar",
+	"muradin_true_strike",
 	"holdout_stitch",
 	"troll_warlord_berserkers_rage",
 	"holdout_lich_king_effects",

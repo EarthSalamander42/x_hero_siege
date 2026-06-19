@@ -931,7 +931,7 @@
 }
 
 .BattlepassRewardImageLabelContainer:hover {
-	background-color: none;
+	background-color: #00000000;
 	transition-property: background-color;
 	transition-duration: 0.2s;
 	transition-timing-function: ease-in-out;
@@ -1118,7 +1118,7 @@
 #CompanionNotification {
 	width: 100%;
 	height: 40px;
-	background-color: none;
+	background-color: #00000000;
 	align: center center;
 	visibility: visible;
 	margin-bottom: 15px;
@@ -1656,4 +1656,356 @@
 
 .BattlepassArmoryRowContainer {
 	height: 50%;
+}
+
+/* XHS 4.0 visual pass */
+#BattlepassButtonContainer {
+	margin-top: 42px;
+}
+
+#BattlepassButton {
+	width: 38px;
+	height: 38px;
+	background-size: 24px;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #0c2942f0 ), to( #050b14f0 ) );
+	border: 1px solid #77c8ff42;
+	opacity: 0.88;
+	wash-color: #8fdcff;
+	box-shadow: fill #00000090 0px 0px 7px 0px;
+	transition-property: brightness, pre-transform-scale2d, opacity;
+	transition-duration: 0.12s;
+}
+
+#BattlepassButton:hover {
+	opacity: 1;
+	brightness: 1.35;
+	pre-transform-scale2d: 1.04;
+}
+
+#BattlepassWindow {
+	width: 850px;
+	height: 860px;
+	padding: 12px;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #071827f8 ), color-stop( 0.62, #091524f2 ), to( #040914f9 ) );
+	border: 1px solid #77c8ff42;
+	border-right: 3px solid #5ad0ff;
+	box-shadow: fill #000000b8 0px 0px 16px 0px;
+}
+
+#InfoHeader {
+	height: 56px;
+	margin-bottom: 14px;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #0a2740e8 ), to( #050b14e8 ) );
+	border: 1px solid #77c8ff20;
+	border-left: 3px solid #5ad0ff;
+}
+
+#HoFTitle {
+	color: #f4fbff;
+	font-family: titleFont;
+	font-size: 24px;
+	letter-spacing: 2px;
+	text-shadow: 0px 2px 5px #000000;
+}
+
+#CloseButton,
+#SettingsButton {
+	width: 40px;
+	height: 40px;
+	margin: 8px;
+	background-color: #050b14d8;
+	border: 1px solid #77c8ff24;
+	transition-property: brightness, background-color;
+	transition-duration: 0.12s;
+}
+
+#CloseButton:hover,
+#SettingsButton:hover {
+	brightness: 1.35;
+	background-color: #0a2036e8;
+}
+
+#CloseButtonImage,
+#SettingsButtonImage {
+	width: 30px;
+	height: 30px;
+	align: center center;
+	opacity: 0.86;
+	wash-color: #b9d9ff;
+}
+
+#BattlepassInfoContainer,
+#DonatorInfoContainer,
+#LeaderboardInfoContainer,
+#SettingsInfoContainer {
+	height: 548px;
+	padding: 8px;
+	background-color: #04091478;
+	border: 1px solid #77c8ff14;
+}
+
+.TopLabelsContainer .TopLabel {
+	color: #dceeff;
+	font-size: 18px;
+	text-align: left;
+}
+
+.TopLabelsContainer .TopLabelSmall {
+	color: #b9d9ff;
+	font-size: 14px;
+	text-align: left;
+}
+
+#TabsButtonWrapper {
+	margin-top: 4px;
+	padding: 10px 8px;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #071827df ), to( #040914bf ) );
+	border-top: 1px solid #77c8ff20;
+	border-bottom: 1px solid #77c8ff10;
+}
+
+#TabButtonContainer {
+	margin-left: 4px;
+	margin-right: 4px;
+}
+
+#BattlepassTabButton,
+#DonatorTabButton,
+#LeaderboardTabButton {
+	width: 246px;
+	height: 44px;
+	margin-right: 6px;
+	padding-left: 14px;
+	background-image: none;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #0a2138e8 ), to( #071321e8 ) );
+	border: 1px solid #77c8ff24;
+	transition-property: brightness, background-color, border;
+	transition-duration: 0.12s;
+}
+
+#BattlepassTabButton:hover,
+#BattlepassTabButton:active,
+#DonatorTabButton:hover,
+#DonatorTabButton:active,
+#LeaderboardTabButton:hover,
+#LeaderboardTabButton:active {
+	brightness: 1.28;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #0c2942f0 ), to( #071827f0 ) );
+	border: 1px solid #5ad0ff6a;
+}
+
+#BattlepassTabButton .text,
+#DonatorTabButton .text,
+#LeaderboardTabButton .text {
+	padding-left: 24px;
+	color: #dceeff;
+	font-size: 17px;
+	letter-spacing: 1px;
+	text-shadow: 0px 1px 3px #000000;
+}
+
+#BattlepassTabButton .image,
+#DonatorTabButton .image,
+#LeaderboardTabButton .image {
+	width: 14px;
+	height: 14px;
+	background-image: none;
+	background-color: #5ad0ff;
+	border-radius: 50%;
+	box-shadow: fill #5ad0ff60 0px 0px 5px 0px;
+}
+
+.MiniTabButtonContainer {
+	margin: 8px 4px 0px 4px;
+	padding: 5px 8px;
+	background-color: #040914c8;
+	border: 1px solid #77c8ff14;
+}
+
+.sub_nav_tab {
+	padding: 8px 10px;
+	background-color: #07132188;
+	border: 1px solid #77c8ff0d;
+}
+
+.sub_nav_tab Label {
+	color: #7f9eb9;
+	font-size: 14px;
+	letter-spacing: 1px;
+}
+
+.sub_nav_tab.active,
+.sub_nav_tab:hover {
+	background-color: #0a2740d0;
+	border: 1px solid #5ad0ff46;
+}
+
+.sub_nav_tab.active Label,
+.sub_nav_tab:hover Label {
+	color: #f4fbff;
+	text-shadow: 0px 0px 8px #5ad0ff38;
+}
+
+.tab_separator {
+	margin: 0px 8px;
+}
+
+.LeaderboardTableWrapper,
+#LeaderboardExperienceTableWrapper,
+#OverviewTableWrapper,
+#ArmoryTableWrapper,
+#PatreonTableWrapper,
+#CompanionTableWrapper,
+#StatueTableWrapper,
+#EmblemTableWrapper {
+	background-color: #040914a8;
+	border: 1px solid #77c8ff18;
+	box-shadow: inset #00000066 0px 1px 5px 0px;
+}
+
+.LeaderboardLegend {
+	height: 38px;
+	background-color: #071827d8;
+	border-bottom: 1px solid #77c8ff20;
+}
+
+.LeaderboardGames {
+	height: 46px;
+	background-color: #071321a8;
+	border-top: 1px solid #77c8ff12;
+	transition-property: brightness, background-color;
+	transition-duration: 0.1s;
+}
+
+.LeaderboardGames:hover {
+	brightness: 1.16;
+	background-color: #0a2036d8;
+}
+
+.LeaderboardRankLabel,
+.LeaderboardXPLabel,
+.LeaderboardAvatarLabel,
+.LeaderboardAvatar_altLabel,
+.LeaderboardRank,
+.LeaderboardXP,
+.LeaderboardIMR,
+.LeaderboardAvatarDiretide {
+	color: #dceeff;
+	font-size: 16px;
+	text-shadow: 0px 1px 3px #000000;
+}
+
+#Rank,
+#SteamAvatar,
+#XP,
+.RoundOrder,
+.LeaderboardArrowButton {
+	background-color: #071827d8;
+	border: 1px solid #77c8ff18;
+}
+
+#Rank:hover,
+#SteamAvatar:hover,
+#XP:hover,
+#RoundOrderLeft:hover,
+.RoundOrder:hover,
+#RoundOrderRight:hover {
+	background-color: #0a2740e0;
+}
+
+.BattlepassParentRow {
+	background-color: #04091470;
+}
+
+.BattlepassRowTitle {
+	color: #8fdcff;
+	font-size: 15px;
+	letter-spacing: 2px;
+}
+
+#BattlepassRewardRowPremiumTitle {
+	color: #ffcf66;
+}
+
+.BattlepassRewardIcon {
+	border: 1px solid #77c8ff24;
+	background-color: #071321e0;
+	box-shadow: fill #0000007a 0px 0px 8px 0px;
+	transition-property: brightness, pre-transform-scale2d, border;
+	transition-duration: 0.12s;
+}
+
+.BattlepassRewardIcon:hover {
+	brightness: 1.14;
+	pre-transform-scale2d: 1.01;
+	border: 1px solid #5ad0ff70;
+}
+
+.BattlepassRewardTitleContainer,
+.BattlepassRewardImageLabelContainer {
+	background-color: #040914d8;
+}
+
+.BattlepassRewardTitle,
+.BattlepassRewardRarity,
+#BattlepassRewardImageLabel {
+	color: #dceeff;
+	text-shadow: 0px 1px 3px #000000;
+}
+
+.BattlepassRewardLabel.unlocked,
+.BattlepassRewardLabelUnlocked {
+	color: #8fd39d;
+}
+
+.BattlepassRewardLabel.locked,
+.BattlepassRewardLabelLocked {
+	color: #7f9eb9;
+}
+
+.BattlepassButton,
+.SettingsButtonClass {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #0a2740e8 ), to( #071321e8 ) );
+	border: 1px solid #77c8ff2a;
+	box-shadow: fill #00000070 0px 0px 7px 0px;
+}
+
+.BattlepassButton:hover,
+.SettingsButtonClass:hover {
+	brightness: 1.2;
+	border: 1px solid #5ad0ff60;
+}
+
+.BattlepassButton Label,
+.SettingsButtonClass Label {
+	color: #f4fbff;
+	text-shadow: 0px 1px 3px #000000;
+}
+
+.XPProgressBarContainer,
+#PanelImbaXP {
+	background-color: #071321d0;
+	border: 1px solid #77c8ff20;
+}
+
+#XPProgressBar {
+	background-color: #02060bcc;
+	border: 1px solid #77c8ff18;
+	box-shadow: inset #00000090 0px 1px 4px 0px;
+}
+
+#XPProgressBar_Left {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #0b6e97 ), color-stop( 0.55, #25b7ff ), to( #8fdcff ) );
+}
+
+#XPProgressBar_Right {
+	background-color: #02060b;
+}
+
+.ImbaXPRank,
+.ImbaXP,
+#ImbaXPEarned,
+#ImbaLvl {
+	color: #f4fbff;
+	text-shadow: 0px 1px 3px #000000;
 }

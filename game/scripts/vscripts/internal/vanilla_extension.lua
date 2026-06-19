@@ -189,7 +189,7 @@ CScriptParticleManager.CreateParticle = function(self, sParticleName, iAttachTyp
 	local override = nil
 
 	if hCaster then
-		override = CustomNetTables:GetTableValue("battlepass_player", sParticleName .. '_' .. hCaster:GetPlayerOwnerID())
+		override = CustomNetTables:GetTableValue("supporter_pass_player", sParticleName .. '_' .. hCaster:GetPlayerOwnerID())
 	end
 
 	if override then
@@ -220,7 +220,7 @@ CScriptParticleManager.CreateParticleForTeam = function(self, sParticleName, iAt
 	local override = nil
 
 	if hCaster then
-		override = CustomNetTables:GetTableValue("battlepass_player", sParticleName .. '_' .. hCaster:GetPlayerOwnerID())
+		override = CustomNetTables:GetTableValue("supporter_pass_player", sParticleName .. '_' .. hCaster:GetPlayerOwnerID())
 	end
 
 	if override then
@@ -241,7 +241,7 @@ CScriptParticleManager.CreateParticleForPlayer = function(self, sParticleName, i
 	local override = nil
 
 	if hCaster then
-		override = CustomNetTables:GetTableValue("battlepass_player", sParticleName .. '_' .. hCaster:GetPlayerOwnerID())
+		override = CustomNetTables:GetTableValue("supporter_pass_player", sParticleName .. '_' .. hCaster:GetPlayerOwnerID())
 	end
 
 	if override then
