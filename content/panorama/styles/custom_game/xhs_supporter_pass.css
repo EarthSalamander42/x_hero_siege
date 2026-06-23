@@ -7,6 +7,7 @@
 .XHSSupporterPassRoot {
 	width: 100%;
 	height: 100%;
+	z-index: 120;
 }
 
 .XHSSupporterPassButton {
@@ -22,6 +23,7 @@
 	box-shadow: fill #000000a0 0px 0px 10px 0px;
 	transition-property: brightness, border, transform;
 	transition-duration: 0.12s;
+	z-index: 121;
 }
 
 .XHSSupporterPassButton:hover {
@@ -67,6 +69,7 @@
 	transition-property: opacity, transform, pre-transform-scale2d, brightness;
 	transition-duration: 0.18s;
 	transition-timing-function: ease-out;
+	z-index: 130;
 }
 
 .XHSSupporterPassWindow.IsVisible {

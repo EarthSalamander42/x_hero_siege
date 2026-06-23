@@ -100,9 +100,7 @@ function Phantasm(keys)
 		--		illusion:HeroLevelUp(false)
 		--	end
 
-		for abilitySlot = 0, 15 do
-			local ability = caster:GetAbilityByIndex(abilitySlot)
-			if ability then
+		ForEachUnitAbility(caster, function(ability)
 				local abilityLevel = ability:GetLevel()
 				local abilityName = ability:GetAbilityName()
 				local illusionAbility = illusion:FindAbilityByName(abilityName)
@@ -114,8 +112,7 @@ function Phantasm(keys)
 				if ability:GetName() == "grom_hellscream_mirror_image" then
 					ability:SetActivated(false)
 				end
-			end
-		end
+		end)
 
 		-- Recreate the items of the caster
 		for itemSlot = 0, 5 do

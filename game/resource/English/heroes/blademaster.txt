@@ -2,7 +2,7 @@
 "DOTA_Tooltip_ability_holdout_windwalk"							"Wind Walk"
 "DOTA_Tooltip_ability_holdout_windwalk_Description"				"The Blademaster goes invisible, allowing him to move faster. Next attack deal double damage."
 "DOTA_Tooltip_ability_holdout_windwalk_duration"				"DURATION:"
-"DOTA_Tooltip_ability_holdout_windwalk_bonus_movespeed"			"%BONUS MOVESPEED:"
+"DOTA_Tooltip_ability_holdout_windwalk_bonus_movespeed"			"%BONUS MOVEMENT SPEED:"
 "DOTA_Tooltip_ability_holdout_windwalk_bonus_damage"			"%BONUS DAMAGE:"
 
 "DOTA_Tooltip_ability_xhs_blademaster_mirror_image"								"Mirror Image"
@@ -29,6 +29,6 @@
 "DOTA_Tooltip_ability_holdout_berserkers_rage_bonus_attack_speed"			"BONUS ATTACK SPEED:"
 
 "DOTA_Tooltip_modifier_berserkers_rage"					"Berserker's Rage"
-"DOTA_Tooltip_modifier_berserkers_rage_Description"		"Sends the Blademaster into a rage, attacking faster but receiving more damage."
+"DOTA_Tooltip_modifier_berserkers_rage_Description"		"Attack speed: %dMODIFIER_PROPERTY_ATTACKSPEED_BONUS_CONSTANT%. Damage taken: %dMODIFIER_PROPERTY_INCOMING_DAMAGE_PERCENTAGE%%%. Move speed: %dMODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE%%%."
 
 "DOTA_Tooltip_ability_juggernaut_blade_fury"								"Bladestorm"

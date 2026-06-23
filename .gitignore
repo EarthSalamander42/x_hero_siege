@@ -14,6 +14,8 @@
 *.fbx
 *.vmat
 *.vpcf
+!content/particles/custom/xhs_special_wave_timer_segment.vpcf
+!content/particles/custom/xhs_growth_overhead.vpcf
 *.cfg
 *.tga
 
@@ -28,3 +30,9 @@ game/scripts/vscripts/components/api/.gitattributes
 *.sqlite3-wal
 *.sqlite3
 *.sqlite3-shm
+
+
+*.vxml_c
+*.vjs_c
+*.vtex_c
+*.vcss_c

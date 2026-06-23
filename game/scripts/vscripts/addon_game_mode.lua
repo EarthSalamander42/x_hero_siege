@@ -1,4 +1,5 @@
 require('internal/util')
+require('components/precache/init')
 require('internal/vanilla_extension')
 require('gamemode')
 
@@ -13,6 +14,9 @@ function Precache(context)
 	LinkLuaModifier("modifier_pause_creeps", "modifiers/modifier_pause_creeps.lua", LUA_MODIFIER_MOTION_NONE)
 	LinkLuaModifier("modifier_cinematic_pause", "modifiers/modifier_cinematic_pause.lua", LUA_MODIFIER_MOTION_NONE)
 	LinkLuaModifier("modifier_custom_mechanics", "modifiers/modifier_custom_mechanics", LUA_MODIFIER_MOTION_NONE)
+	LinkLuaModifier("modifier_xhs_growth_overhead", "modifiers/modifier_xhs_growth_overhead.lua", LUA_MODIFIER_MOTION_NONE)
+
+	XHSPrecache:Run(context)
 
 	-- Not used currently
 	--	PrecacheResource("particle", "particles/units/heroes/hero_dazzle/dazzle_armor_enemy_ring_sink.vpcf", context) -- Armor Rune Effect (not used)
@@ -30,8 +34,6 @@ function Precache(context)
 	PrecacheResource("particle", "particles/econ/events/fall_major_2016/teleport_end_fm06_lvl3.vpcf", context) -- Immolation
 	PrecacheResource("particle_folder", "particles/custom", context)
 	PrecacheResource("particle_folder", "particles/custom/items/orb", context)
-	PrecacheResource("particle_folder", "models/items/lone_druid/true_form/form_of_the_atniw", context)
-	PrecacheResource("particle_folder", "models/items/lone_druid/bear/spirit_of_the_atniw", context)
 
 	PrecacheResource("particle_folder", "particles/econ/items/puck/puck_alliance_set", context)     -- Dark Portal attack projectile
 	PrecacheResource("particle_folder", "particles/econ/items/shadow_fiend/sf_desolation", context) -- Banehallow attack projectile
@@ -46,7 +48,8 @@ function Precache(context)
 	PrecacheResource("particle", "particles/camp_fire_buff.vpcf", context)
 	PrecacheResource("particle", "particles/custom/undead/disease_cloud.vpcf", context)
 	PrecacheResource("particle", "particles/darkmoon_last_hit_effect.vpcf", context)
-	PrecacheResource("particle", "particles/units/heroes/hero_abaddon/abaddon_curse_counter_stack.vpcf", context)            -- Farm event overhead
+	PrecacheResource("particle", "particles/custom/xhs_special_wave_timer_segment.vpcf", context)                 -- Special wave pre-spawn warning
+	PrecacheResource("particle", "particles/custom/xhs_growth_overhead.vpcf", context)                                      -- Farm event/Phase 2 overhead
 	PrecacheResource("particle", "particles/econ/items/shadow_fiend/sf_fire_arcana/sf_fire_arcana_shadowraze.vpcf", context) -- Boss death
 	PrecacheResource("particle", "particles/units/heroes/hero_morphling/morphling_ambient_new.vpcf", context)                -- Lightning Sword
 	PrecacheResource("particle", "particles/units/heroes/hero_ogre_magi/ogre_magi_ignite_debuff.vpcf", context)              -- Shield of Invincibility
@@ -69,7 +72,7 @@ function Precache(context)
 	PrecacheResource("model_folder", "models/items/furion/treant/the_ancient_guardian_the_ancient_treants", context)
 	PrecacheResource("model_folder", "models/items/dragon_knight/aurora_warrior_set_dragon_style2_aurora_warrior_set", context)
 	PrecacheResource("model_folder", "models/heroes/dragon_knight", context)         -- For some reason precaching the hero doesn't fix missing model
-	PrecacheResource("model_folder", "models/items/juggernaut/arcana", context)      -- Grom Hellscream
+	PrecacheResource("model_folder", "models/heroes/juggernaut", context)      -- Grom Hellscream
 	PrecacheResource("model_folder", "models/items/undying/idol_of_ruination", context) -- Archimonde minions
 
 	PrecacheResource("model", "models/creeps/neutral_creeps/n_creep_troll_skeleton/n_creep_troll_skeleton_fx.vmdl", context)
@@ -82,7 +85,6 @@ function Precache(context)
 	PrecacheResource("model", "models/props_items/ring_health.vmdl", context)                                                        -- Ring of Superiority
 	PrecacheResource("model", "models/heroes/witchdoctor/witchdoctor_ward.vmdl", context)                                            -- Archimonde Dark Portal
 	PrecacheResource("model", "models/props_items/staff_wizardry01.vmdl", context)                                                   -- Necklace of Spell Immunity
-	PrecacheResource("model", "models/items/juggernaut/arcana/juggernaut_arcana_mask.vmdl", context)                                 -- Grom Hellscream
 
 	-- TODO: remove all of those and precache them in abilities kv instead
 	-- PRECACHE HEROES (Particle effects for custom abilities)

@@ -2,13 +2,14 @@
 
 var XHSSupporterPass = (function () {
 	var SUPPORTER_URL = "https://www.patreon.com/bePatron?u=2533325";
-	var DISCORD_URL = "https://discord.gg/frostrose";
+	var DISCORD_URL = "https://discord.frostrose-studio.com/";
 	var WEEKLY_FRAGMENT_CAP = 100;
 	var LEGACY_FRAGMENT_CAP = 5000;
 	var currentArmoryFilter = "All";
 	var settingsOriginal = {};
 	var settingsDraft = {};
 	var settingsInitialized = false;
+	var backToTopPollScheduled = false;
 
 	var PAGE_IDS = {
 		overview: "XHSPassOverviewPage",
@@ -190,7 +191,7 @@ var XHSSupporterPass = (function () {
 			fragments: ToNumber(data.fragments || data.fragment_balance, 0),
 			weekly_fragments: ToNumber(data.weekly_fragments || data.weekly_earned, 0),
 			weekly_cap: ToNumber(data.weekly_cap, WEEKLY_FRAGMENT_CAP),
-			season_level: ToNumber(data.season_level || data.Lvl, 0),
+			season_level: Math.max(1, ToNumber(data.season_level || data.Lvl, 1)),
 			season_xp: ToNumber(data.season_xp || data.XP, 0),
 			season_xp_max: Math.max(ToNumber(data.season_xp_max || data.MaxXP, 2000), 1),
 			account_level: ToNumber(data.account_level || data.legacy_level, 0),
@@ -314,6 +315,9 @@ var XHSSupporterPass = (function () {
 		if (visible) {
 			RenderAll();
 			UpdateBackToTopButton();
+			ScheduleBackToTopPoll();
+		} else {
+			backToTopPollScheduled = false;
 		}
 	}
 
@@ -337,6 +341,7 @@ var XHSSupporterPass = (function () {
 		}
 
 		UpdateBackToTopButton();
+		ScheduleBackToTopPoll();
 	}
 
 	function GetCurrentScrollPanel() {
@@ -381,7 +386,28 @@ var XHSSupporterPass = (function () {
 		}
 
 		var panel = GetCurrentScrollPanel();
-		button.SetHasClass("IsVisible", !!panel);
+		var scrollOffset = panel && typeof panel.scrolloffset_y === "number" ? panel.scrolloffset_y : 0;
+		button.SetHasClass("IsVisible", scrollOffset > 40);
+	}
+
+	function ScheduleBackToTopPoll() {
+		var window = Panel("XHSSupporterPassWindow");
+		if (!window || !window.BHasClass("IsVisible") || backToTopPollScheduled) {
+			return;
+		}
+
+		backToTopPollScheduled = true;
+		$.Schedule(0.12, function () {
+			backToTopPollScheduled = false;
+			var currentWindow = Panel("XHSSupporterPassWindow");
+			if (!currentWindow || !currentWindow.BHasClass("IsVisible")) {
+				UpdateBackToTopButton();
+				return;
+			}
+
+			UpdateBackToTopButton();
+			ScheduleBackToTopPoll();
+		});
 	}
 
 	function ScrollCurrentPageToTop() {
@@ -391,14 +417,31 @@ var XHSSupporterPass = (function () {
 		}
 
 		if (typeof panel.ScrollToTop === "function") {
-			panel.ScrollToTop();
+			try {
+				panel.ScrollToTop();
+			} catch (e) {
+			}
 		}
-		panel.scrolloffset_y = 0;
+
+		if (typeof panel.GetChildCount === "function" && panel.GetChildCount() > 0) {
+			var firstChild = panel.GetChild(0);
+			if (firstChild) {
+				if (typeof firstChild.ScrollParentToMakePanelFit === "function") {
+					try {
+						firstChild.ScrollParentToMakePanelFit(0, false);
+					} catch (e2) {
+					}
+				}
+				$.DispatchEvent("ScrollPanelIntoView", firstChild);
+			}
+		}
 
 		var button = Panel("XHSPassBackToTopButton");
 		if (button) {
 			button.SetHasClass("IsVisible", false);
 		}
+
+		$.Schedule(0.05, UpdateBackToTopButton);
 	}
 
 	function CreateEmpty(parent, title, body) {

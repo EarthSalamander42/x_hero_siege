@@ -2,6 +2,7 @@
 {
 	width: 100%;
 	height: 100%;
+	z-index: 60;
 }
 
 .XHSNotificationStack
@@ -14,7 +15,8 @@
 .XHSTopNotifications
 {
 	horizontal-align: center;
-	margin-top: 112px;
+	margin-top: 150px;
+	z-index: 65;
 }
 
 .XHSBottomNotifications
@@ -59,6 +61,13 @@
 	background-color: gradient( linear, 0% 0%, 100% 0%, from( #071827e0 ), to( #050b14e0 ) );
 }
 
+.XHSNotificationToast.XHSNotificationBottom.XHSNotificationCompound
+{
+	min-width: 520px;
+	max-width: 760px;
+	min-height: 72px;
+}
+
 .XHSNotificationBody
 {
 	flow-children: right;
@@ -78,9 +87,38 @@
 
 .XHSNotificationContent
 {
-	flow-children: right-wrap;
+	flow-children: down;
 	vertical-align: center;
 	width: fill-parent-flow( 1.0 );
+}
+
+.XHSNotificationCompound .XHSNotificationContent
+{
+	flow-children: right-wrap;
+}
+
+.XHSNotificationBottom.XHSNotificationCompound .XHSNotificationContent
+{
+	flow-children: right;
+}
+
+.XHSNotificationCompound .XHSNotificationMessage,
+.XHSNotificationCompound .XHSNotificationContent .TitleText
+{
+	text-align: left;
+	width: fit-children;
+	max-width: 880px;
+	margin-right: 4px;
+	text-overflow: shrink;
+}
+
+.XHSNotificationSingleMessage .XHSNotificationMessage,
+.XHSNotificationSingleMessage .XHSNotificationContent .TitleText
+{
+	width: 100%;
+	max-width: 900px;
+	text-align: center;
+	text-overflow: shrink;
 }
 
 .XHSNotificationMessage,
@@ -102,11 +140,22 @@
 	font-size: 20px;
 }
 
+.XHSNotificationBottom.XHSNotificationCompound .XHSNotificationMessage,
+.XHSNotificationBottom.XHSNotificationCompound .XHSNotificationContent .NotificationMessage,
+.XHSNotificationBottom.XHSNotificationCompound .XHSNotificationContent .TitleText
+{
+	width: fit-children;
+	max-width: 650px;
+	text-align: left;
+	vertical-align: center;
+	margin-right: 4px;
+}
+
 .XHSNotificationImage
 {
 	width: 38px;
 	height: 38px;
-	margin-right: 8px;
+	margin-right: 12px;
 	vertical-align: center;
 	border: 1px solid #77c8ff55;
 	box-shadow: fill #00000070 0px 0px 6px 0px;
@@ -114,8 +163,10 @@
 
 .XHSNotificationBottom .XHSNotificationImage
 {
-	width: 30px;
-	height: 30px;
+	width: 38px;
+	height: 38px;
+	margin-right: 12px;
+	vertical-align: center;
 }
 
 .XHSNotificationProgressTrack
@@ -158,6 +209,71 @@
 {
 	background-color: gradient( linear, 0% 0%, 100% 0%, from( #9cf5b0 ), to( #2ec46e ) );
 	box-shadow: #8fd39d80 0px 0px 10px 0px;
+}
+
+.XHSNotificationMainQuest
+{
+	min-width: 560px;
+	max-width: 760px;
+	min-height: 92px;
+	border: 1px solid #a8efbf9a;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #0b2a1df4 ), color-stop( .56, #071421f4 ), to( #050910f4 ) );
+	box-shadow: fill #000000b8 0px 0px 18px 0px, #57df8b42 0px 0px 16px 0px;
+}
+
+.XHSNotificationMainQuest .XHSNotificationBody
+{
+	padding: 12px 20px 12px 16px;
+}
+
+.XHSNotificationMainQuest .XHSNotificationAccent
+{
+	width: 5px;
+	min-height: 62px;
+	background-color: gradient( linear, 0% 0%, 0% 100%, from( #e8ffe8 ), color-stop( .4, #8ff0b1 ), to( #2ec46e ) );
+	box-shadow: #8ff0b1b0 0px 0px 14px 0px;
+}
+
+.XHSNotificationMainQuest .XHSNotificationContent
+{
+	flow-children: down;
+	width: fill-parent-flow( 1.0 );
+}
+
+.XHSMainQuestEyebrow
+{
+	width: 100%;
+	height: 18px;
+	color: #9cf5b0;
+	font-size: 14px;
+	font-weight: bold;
+	letter-spacing: 2px;
+	text-align: left;
+	text-transform: uppercase;
+	text-shadow: 0px 0px 6px #45c46b66, 0px 1px 3px #000000;
+}
+
+.XHSMainQuestTitle
+{
+	width: 100%;
+	height: 31px;
+	color: #f7fff8;
+	font-size: 28px;
+	font-weight: bold;
+	text-align: left;
+	text-shadow: 0px 0px 8px #8ff0b155, 0px 2px 4px #000000;
+	text-overflow: shrink;
+}
+
+.XHSMainQuestSubtitle
+{
+	width: 100%;
+	height: 22px;
+	color: #cfe8da;
+	font-size: 17px;
+	text-align: left;
+	text-shadow: 0px 1px 3px #000000;
+	text-overflow: shrink;
 }
 
 .XHSNotificationReward
@@ -215,9 +331,9 @@
 
 .XHSRewardFlyoutGold
 {
-	border: 1px solid #ffcf6688;
-	background-color: gradient( linear, 0% 0%, 100% 0%, from( #4d350cf6 ), to( #15100af6 ) );
-	box-shadow: #ffcf6648 0px 0px 14px 0px;
+	border: 1px solid #fff1a8cc;
+	background-color: gradient( linear, 0% 0%, 0% 100%, from( #fff1a8 ), color-stop( 0.45, #ffc84a ), to( #c98714 ) );
+	box-shadow: fill #00000080 0px 0px 10px 0px, #ffcf66a0 0px 0px 16px 0px;
 }
 
 .XHSRewardFlyoutStats
@@ -243,6 +359,12 @@
 	text-overflow: shrink;
 }
 
+.XHSRewardFlyoutGold Label
+{
+	color: #241501;
+	text-shadow: 0px 1px 0px #fff4b866;
+}
+
 .XHSRewardTargetPulse
 {
 	brightness: 2.5;
@@ -253,7 +375,7 @@
 	flow-children: right;
 	horizontal-align: left;
 	margin-top: 116px;
-	margin-left: 18px;
+	margin-left: 40px;
 	width: 390px;
 	height: 96px;
 	padding: 10px 14px;
@@ -262,8 +384,42 @@
 	box-shadow: fill #000000a8 0px 0px 16px 0px;
 	opacity: 1;
 	transform: translateY( 0px ) scaleX( 1 ) scaleY( 1 );
-	transition-property: opacity, transform;
+	transition-property: opacity, transform, brightness, background-color, border;
 	transition-duration: 0.2s;
+}
+
+.XHSWaveCountdown.XHSWaveArrived
+{
+	animation-name: XHSWaveArrivedFlash;
+	animation-duration: .6s;
+	animation-iteration-count: 1;
+	border: 1px solid #ffcf66b8;
+	brightness: 2.1;
+}
+
+.XHSWaveCountdown.XHSWaveCompact
+{
+	width: 244px;
+	height: 48px;
+	margin-top: 128px;
+	margin-left: 34px;
+	padding: 6px 9px;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #061524dc ), to( #030810dc ) );
+	border: 1px solid #77c8ff3f;
+	box-shadow: fill #00000086 0px 0px 9px 0px;
+	brightness: 0.92;
+}
+
+.XHSWaveCountdown.XHSWaveActive
+{
+	border: 1px solid #ff684b9a;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #2b1018f2 ), color-stop( .55, #07111ff2 ), to( #050910f2 ) );
+}
+
+.XHSWaveCountdown.XHSWaveCleared
+{
+	border: 1px solid #8ff0b188;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #0b2a1af2 ), to( #050910f2 ) );
 }
 
 .XHSWaveCountdown.XHSNotificationHidden
@@ -272,12 +428,148 @@
 	transform: translateY( -14px ) scaleX( 0.98 ) scaleY( 0.98 );
 }
 
+.XHSRuneIndicator
+{
+	flow-children: right;
+	horizontal-align: left;
+	margin-top: 218px;
+	margin-left: 40px;
+	width: 304px;
+	height: 54px;
+	padding: 7px 10px 7px 0px;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #061524e8 ), to( #030810e8 ) );
+	border: 1px solid #77c8ff42;
+	box-shadow: fill #0000008f 0px 0px 10px 0px;
+	opacity: 1;
+	transform: translateY( 0px );
+	transition-property: opacity, transform, brightness, border, background-color;
+	transition-duration: 0.18s;
+}
+
+.XHSRuneIndicator.XHSRuneHidden
+{
+	opacity: 0;
+	transform: translateY( -8px );
+}
+
+.XHSRuneIndicator.XHSRunePicked
+{
+	border: 1px solid #8ff0b188;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #0b2a1ae8 ), to( #030810e8 ) );
+}
+
+.XHSRuneIndicator.XHSRuneExpired
+{
+	brightness: 0.72;
+	border: 1px solid #9aa6b244;
+}
+
+.XHSRuneAccent
+{
+	width: 4px;
+	height: 40px;
+	margin-left: 0px;
+	margin-right: 9px;
+	vertical-align: center;
+	background-color: gradient( linear, 0% 0%, 0% 100%, from( #7ee4ff ), to( #2778ff ) );
+	box-shadow: #44ccff70 0px 0px 9px 0px;
+}
+
+.XHSRuneRecovery .XHSRuneAccent
+{
+	background-color: gradient( linear, 0% 0%, 0% 100%, from( #c7ffd6 ), to( #45c46b ) );
+	box-shadow: #7df2a080 0px 0px 9px 0px;
+}
+
+.XHSRuneDefense .XHSRuneAccent
+{
+	background-color: gradient( linear, 0% 0%, 0% 100%, from( #c9ebff ), to( #4b8dff ) );
+	box-shadow: #77c8ff80 0px 0px 9px 0px;
+}
+
+.XHSRuneOffense .XHSRuneAccent
+{
+	background-color: gradient( linear, 0% 0%, 0% 100%, from( #ffd2a8 ), to( #e4572e ) );
+	box-shadow: #ff8d5c80 0px 0px 9px 0px;
+}
+
+.XHSRuneMisc .XHSRuneAccent
+{
+	background-color: gradient( linear, 0% 0%, 0% 100%, from( #efdcff ), to( #a264d6 ) );
+	box-shadow: #c894ff80 0px 0px 9px 0px;
+}
+
+.XHSRuneCopy
+{
+	flow-children: down;
+	width: fill-parent-flow( 1.0 );
+	height: 40px;
+	vertical-align: center;
+}
+
+.XHSRuneEyebrow
+{
+	height: 13px;
+	color: #8eaac4;
+	font-size: 10px;
+	font-weight: bold;
+	text-align: left;
+	text-transform: uppercase;
+	text-shadow: 0px 1px 3px #000000;
+}
+
+.XHSRuneName
+{
+	height: 17px;
+	color: #f5fbff;
+	font-size: 15px;
+	font-weight: bold;
+	text-align: left;
+	text-overflow: shrink;
+	text-shadow: 0px 1px 3px #000000;
+}
+
+.XHSRuneDetail
+{
+	ignore-parent-flow: true;
+	horizontal-align: right;
+	vertical-align: top;
+	width: 84px;
+	height: 13px;
+	color: #b9d9ff;
+	font-size: 11px;
+	text-align: right;
+	text-shadow: 0px 1px 3px #000000;
+	text-overflow: shrink;
+}
+
+.XHSRuneTime
+{
+	width: 34px;
+	height: 28px;
+	margin-left: 8px;
+	vertical-align: center;
+	color: #eaf8ff;
+	font-size: 18px;
+	font-weight: bold;
+	text-align: center;
+	text-shadow: 0px 0px 5px #5ad0ff66, 0px 1px 3px #000000;
+}
+
 .XHSWaveRingWrap
 {
 	width: 74px;
 	height: 74px;
 	margin-right: 14px;
 	vertical-align: center;
+	flow-children: none;
+}
+
+.XHSWaveCompact .XHSWaveRingWrap
+{
+	width: 34px;
+	height: 34px;
+	margin-right: 8px;
 }
 
 .XHSWaveRing
@@ -290,6 +582,15 @@
 	border: 2px solid #5ad0ff82;
 	background-color: #06101db8;
 	box-shadow: #5ad0ff70 0px 0px 20px 0px;
+}
+
+.XHSWaveCompact .XHSWaveRing
+{
+	width: 34px;
+	height: 34px;
+	border: 1px solid #5ad0ff66;
+	background-color: #06101da8;
+	box-shadow: #5ad0ff38 0px 0px 8px 0px;
 }
 
 .XHSWaveRingSweep
@@ -309,18 +610,68 @@
 	animation-timing-function: linear;
 }
 
+.XHSWaveCompact .XHSWaveRingSweep
+{
+	visibility: collapse;
+}
+
+.XHSWaveRingFill
+{
+	width: 58px;
+	height: 58px;
+	align: center center;
+	border-radius: 50%;
+	background-color: gradient( radial, 50% 50%, 0% 0%, 50% 50%, from( #ffcf6655 ), color-stop( .58, #ff684b30 ), to( #00000000 ) );
+	box-shadow: inset #ffcf6644 0px 0px 16px 0px;
+	transform: scaleX( 1 ) scaleY( 1 );
+	transition-property: transform, opacity, background-color, box-shadow;
+	transition-duration: .18s;
+	transition-timing-function: ease-out;
+}
+
+.XHSWaveCompact .XHSWaveRingFill
+{
+	width: 25px;
+	height: 25px;
+	background-color: gradient( radial, 50% 50%, 0% 0%, 50% 50%, from( #5ad0ff44 ), color-stop( .58, #347cff24 ), to( #00000000 ) );
+	box-shadow: inset #5ad0ff24 0px 0px 7px 0px;
+}
+
+.XHSWaveActive .XHSWaveRingFill
+{
+	background-color: gradient( radial, 50% 50%, 0% 0%, 50% 50%, from( #ff684b70 ), color-stop( .58, #d03a2430 ), to( #00000000 ) );
+	box-shadow: inset #ff684b55 0px 0px 18px 0px, #ff684b66 0px 0px 16px 0px;
+	animation-name: XHSWaveThreatPulse;
+	animation-duration: .72s;
+	animation-iteration-count: infinite;
+}
+
+.XHSWaveCleared .XHSWaveRingFill
+{
+	background-color: gradient( radial, 50% 50%, 0% 0%, 50% 50%, from( #8ff0b166 ), color-stop( .58, #45c46b33 ), to( #00000000 ) );
+	box-shadow: inset #8ff0b155 0px 0px 18px 0px, #8ff0b155 0px 0px 16px 0px;
+}
+
 .XHSWaveCountdownValue
 {
-	width: 74px;
-	height: 74px;
-	horizontal-align: center;
+	width: 54px;
+	height: 36px;
+	align: center center;
 	text-align: center;
-	vertical-align: center;
-	margin-top: 1px;
+	margin-top: 0px;
 	color: #ffffff;
 	font-size: 29px;
 	font-weight: bold;
 	text-shadow: 0px 2px 5px #000000;
+}
+
+.XHSWaveCompact .XHSWaveCountdownValue
+{
+	width: 38px;
+	height: 18px;
+	font-size: 14px;
+	color: #eaf8ff;
+	text-shadow: 0px 0px 5px #5ad0ff66, 0px 1px 3px #000000;
 }
 
 .XHSWaveCopy
@@ -328,6 +679,12 @@
 	flow-children: down;
 	vertical-align: center;
 	width: 268px;
+}
+
+.XHSWaveCompact .XHSWaveCopy
+{
+	width: 176px;
+	/* padding-right: 56px; */
 }
 
 .XHSWaveEyebrow
@@ -340,6 +697,28 @@
 	text-shadow: 0px 1px 3px #000000;
 }
 
+.XHSWaveCompact .XHSWaveEyebrow
+{
+	height: 12px;
+	width: 94px;
+	font-size: 9px;
+	letter-spacing: 1px;
+	color: #93c7e6;
+	text-shadow: 0px 1px 2px #000000;
+}
+
+.XHSWaveActive .XHSWaveEyebrow
+{
+	color: #ff8d6b;
+	text-shadow: 0px 0px 7px #ff684b66;
+}
+
+.XHSWaveCleared .XHSWaveEyebrow
+{
+	color: #8ff0b1;
+	text-shadow: 0px 0px 7px #45c46b66;
+}
+
 .XHSWaveTitle
 {
 	color: #f5fbff;
@@ -348,11 +727,39 @@
 	text-shadow: 0px 2px 5px #000000;
 }
 
+.XHSWaveCompact .XHSWaveTitle
+{
+	height: 18px;
+	width: 170px;
+	margin-top: 1px;
+	font-size: 16px;
+	color: #e8f6ff;
+	text-overflow: shrink;
+}
+
 .XHSWaveSubtitle
 {
 	color: #b9d9ff;
 	font-size: 17px;
 	text-shadow: 0px 1px 3px #000000;
+}
+
+.XHSWaveCompact .XHSWaveSubtitle
+{
+	ignore-parent-flow: true;
+	horizontal-align: right;
+	vertical-align: top;
+	margin-top: 0px;
+	margin-right: 6px;
+	width: 76px;
+	height: 15px;
+	font-size: 12px;
+	font-weight: bold;
+	color: #d8f4ff;
+	text-align: right;
+	text-transform: uppercase;
+	text-overflow: shrink;
+	text-shadow: 0px 0px 5px #5ad0ff70, 0px 1px 3px #000000;
 }
 
 @keyframes 'XHSNotificationIn'
@@ -380,5 +787,47 @@
 	to
 	{
 		transform: rotateZ( 360deg );
+	}
+}
+
+@keyframes 'XHSWaveArrivedFlash'
+{
+	0%
+	{
+		brightness: 1;
+		transform: translateY( 0px ) scaleX( 1 ) scaleY( 1 );
+	}
+
+	40%
+	{
+		brightness: 3.4;
+		transform: translateY( -2px ) scaleX( 1.035 ) scaleY( 1.035 );
+	}
+
+	100%
+	{
+		brightness: 1.25;
+		transform: translateY( 0px ) scaleX( 1 ) scaleY( 1 );
+	}
+}
+
+@keyframes 'XHSWaveThreatPulse'
+{
+	0%
+	{
+		opacity: .72;
+		pre-transform-scale2d: 1;
+	}
+
+	50%
+	{
+		opacity: 1;
+		pre-transform-scale2d: 1.08;
+	}
+
+	100%
+	{
+		opacity: .72;
+		pre-transform-scale2d: 1;
 	}
 }

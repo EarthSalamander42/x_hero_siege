@@ -1373,7 +1373,8 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"BaseClass"             		"ability_datadriven"
+		"BaseClass"             		"ability_lua"
+		"ScriptFile"					"abilities/heroes/hero_lich/frost_arrows.lua"
 		"AbilityTextureName"			"custom/holdout_frost_arrows"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_AUTOCAST | DOTA_ABILITY_BEHAVIOR_ATTACK"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
@@ -1402,8 +1403,9 @@
 
 		"precache"
 		{
-			"particle"		"particles/units/heroes/hero_drow/drow_silence_wave.vpcf"
+			"particle"		"particles/units/heroes/hero_drow/drow_frost_arrow.vpcf"
 			"particle"		"particles/generic_gameplay/generic_slowed_cold.vpcf"
+			"soundfile"		"soundevents/game_sounds_heroes/game_sounds_drowranger.vsndevts"
 		}
 
 		// Special
@@ -1415,87 +1417,6 @@
 			"bonus_damage"						"150 350 550 750"
 		}
 	
-		"Modifiers"
-		{
-			"modifier_frost_arrows_caster_datadriven"
-			{
-				"Passive"                       "1"
-				"IsHidden"                      "1"
-				"IsPurgable"                    "0"
-				
-				"Orb"
-				{
-					"Priority"                  "DOTA_ORB_PRIORITY_ABILITY"
-					"ProjectileName"            "particles/units/heroes/hero_drow/drow_frost_arrow.vpcf"
-					"CastAttack"                "1"
-				}
-	
-				"OnOrbFire"
-				{
-					"SpendMana"
-					{
-						"Mana"                  "%AbilityManaCost"
-					}
-					"FireSound"
-					{
-						"EffectName"            "Hero_DrowRanger.FrostArrows"
-						"Target"                "CASTER"
-					}
-				}
-	
-				"OnOrbImpact"
-				{
-	
-					"Damage"
-					{
-						"Type"          "DAMAGE_TYPE_PHYSICAL"
-						"Damage"        "%bonus_damage"
-						"Target"        "TARGET"
-					}
-					
-					"ApplyModifier"
-					{
-						"Target"
-						{
-							"Center"            "TARGET"
-							"Type"              "DOTA_UNIT_TARGET_BASIC"
-						}
-						"ModifierName"          "modifier_frost_arrows_slow_datadriven"
-						"Duration"              "%frost_arrows_duration"
-					}
-	
-					"RunScript"
-					{
-						"ScriptFile"	"abilities/heroes/hero_lich/frost_arrows.lua"
-						"Function"		"OnHitUnit"
-					}
-	
-					"ApplyModifier"
-					{
-						"Target"
-						{
-							"Center"            "TARGET"
-							"Type"              "DOTA_UNIT_TARGET_HERO"
-						}
-						"ModifierName"          "modifier_frost_arrows_slow_datadriven"
-						"Duration"              "%frost_arrows_duration"
-					}
-				}
-			}
-			
-			"modifier_frost_arrows_slow_datadriven"
-			{
-				"IsHidden"                      "0"
-				"IsDebuff"						"1"
-				"EffectName"                    "particles/generic_gameplay/generic_slowed_cold.vpcf"
-
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE"  "%frost_arrows_movement_speed"
-					"MODIFIER_PROPERTY_ATTACKSPEED_BONUS_CONSTANT" "%frost_arrows_attack_speed"
-				}
-			}
-		}
 	}
 
 	//=================================================================================================================
@@ -1507,6 +1428,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"             		"lich_frost_armor"
 		"AbilityTextureName"			"custom/holdout_frost_armor"
+		"AbilityCastSound"				"Hero_Lich.FrostArmor"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_AUTOCAST | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
@@ -1674,6 +1596,13 @@
 						"EffectAttachType"  "follow_origin"
 						"Target"            "TARGET"
 					}	
+
+					"RunScript"
+					{
+						"ScriptFile"		"abilities/heroes/hero_lich/frost_beast.lua"
+						"Function"			"OnFrostBeastSpawn"
+						"Target"			"TARGET"
+					}
 				}
 			}
 
@@ -4772,6 +4701,7 @@
 		"SpellImmunityType"             "SPELL_IMMUNITY_ENEMIES_NO"
 		"AbilityTextureName"            "custom/holdout_war_stomp"
 		"AbilityCastAnimation"			"ACT_DOTA_CAST_ABILITY_1"
+		"AnimationPlaybackRate"			"1.25"
 
 		// Stats
 		//-------------------------------------------------------------------------------------------------------------
@@ -4937,6 +4867,8 @@
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"   
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
 		"AbilityTextureName"			"custom/holdout_lightning_stroke"
+		"AbilityCastAnimation"			"ACT_DOTA_CAST_ABILITY_1"
+		"AnimationPlaybackRate"			"1.25"
 		"AbilityCastRange"				"1000"
 
 		// Casting
@@ -5158,6 +5090,7 @@
 		"AbilityTextureName"            "centaur_hoof_stomp"
 		"MaxLevel"						"1"
 		"AbilityCastAnimation"			"ACT_DOTA_CAST_ABILITY_1"
+		"AnimationPlaybackRate"			"1.25"
 
 		// Stats
 		//-------------------------------------------------------------------------------------------------------------

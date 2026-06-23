@@ -9,13 +9,13 @@
 		<include src="s2r://panorama/scripts/custom_game/xhs_top_hud.vjs_c" />
 	</scripts>
 
-	<Panel class="XHSTopHudHost" hittest="false">
-		<Panel id="XHSTopHudRoot" hittest="false">
-			<Panel id="XHSTopHudBar" hittest="false">
-				<Panel id="XHSTopHudLeftSlot" hittest="false">
-					<Panel id="XHSTopHudAllies" hittest="false">
-						<Panel id="XHSAllyRoster" hittest="false" />
-						<Panel id="XHSVipRoster" hittest="false" />
+	<Panel class="XHSTopHudHost" hittest="false" hittestchildren="true">
+		<Panel id="XHSTopHudRoot" hittest="false" hittestchildren="true">
+			<Panel id="XHSTopHudBar" hittest="false" hittestchildren="true">
+				<Panel id="XHSTopHudLeftSlot" hittest="false" hittestchildren="true">
+					<Panel id="XHSTopHudAllies" hittest="false" hittestchildren="true">
+						<Panel id="XHSAllyRosterLeft" class="XHSAllyRoster" hittest="false" hittestchildren="true" />
+						<Panel id="XHSVipRoster" hittest="false" hittestchildren="true" />
 					</Panel>
 				</Panel>
 
@@ -24,57 +24,30 @@
 					<Label id="XHSClockValue" text="--:--" />
 				</Panel>
 
-				<Panel id="XHSTopHudRightSlot" hittest="false">
-					<Panel id="XHSTopHudTimers" hittest="false">
-						<Panel id="XHSTimerCard_difficulty" class="XHSTimerCard XHSDifficultyCard">
-							<Label class="XHSTimerTitle" text="DIFFICULTY" />
-							<Label id="XHSTimerValue_difficulty" class="XHSTimerValue XHSDifficultyValue" text="-----" />
-						</Panel>
-
-						<Panel id="XHSTimerCard_special_event" class="XHSTimerCard">
-							<Label id="XHSTimerTitle_special_event" class="XHSTimerTitle" text="MURADIN EVENT" />
-							<Label id="XHSTimerValue_special_event" class="XHSTimerValue" text="--:--" />
-						</Panel>
-
-						<Panel id="XHSTimerCard_special_wave" class="XHSTimerCard">
-							<Label class="XHSTimerTitle" text="#IncomingWaveGoal" />
-							<Panel class="XHSTimerValueRow">
-								<Panel class="XHSTimerPulse" />
-								<Label id="XHSTimerValue_special_wave" class="XHSTimerValue" text="--:--" />
-							</Panel>
-						</Panel>
-
-						<Panel id="XHSTimerCard_creep_level" class="XHSTimerCard">
-							<Label class="XHSTimerTitle" text="#CreepLevelGoal" />
-							<Label id="XHSTimerValue_creep_level" class="XHSTimerValue" text="--:--" />
-						</Panel>
-
-						<Panel id="XHSTimerCard_special_arena" class="XHSTimerCard XHSOptionalTimer">
-							<Label class="XHSTimerTitle" text="SPECIAL ARENA" />
-							<Label id="XHSTimerValue_special_arena" class="XHSTimerValue" text="--:--" />
-						</Panel>
-
-						<Panel id="XHSTimerCard_hero_image" class="XHSTimerCard XHSOptionalTimer">
-							<Label class="XHSTimerTitle" text="HERO IMAGE" />
-							<Label id="XHSTimerValue_hero_image" class="XHSTimerValue" text="--:--" />
-						</Panel>
-
-						<Panel id="XHSTimerCard_spirit_beast" class="XHSTimerCard XHSOptionalTimer">
-							<Label class="XHSTimerTitle" text="SPIRIT BEAST" />
-							<Label id="XHSTimerValue_spirit_beast" class="XHSTimerValue" text="--:--" />
-						</Panel>
-
-						<Panel id="XHSTimerCard_frost_infernal" class="XHSTimerCard XHSOptionalTimer">
-							<Label class="XHSTimerTitle" text="FROST INFERNAL" />
-							<Label id="XHSTimerValue_frost_infernal" class="XHSTimerValue" text="--:--" />
-						</Panel>
-
-						<Panel id="XHSTimerCard_all_hero_images" class="XHSTimerCard XHSOptionalTimer">
-							<Label class="XHSTimerTitle" text="ALL HERO IMAGES" />
-							<Label id="XHSTimerValue_all_hero_images" class="XHSTimerValue" text="--:--" />
-						</Panel>
+				<Panel id="XHSTopHudRightSlot" hittest="false" hittestchildren="true">
+					<Panel id="XHSTopHudRightAllies" hittest="false" hittestchildren="true">
+						<Panel id="XHSAllyRosterRight" class="XHSAllyRoster" hittest="false" hittestchildren="true" />
 					</Panel>
 				</Panel>
+			</Panel>
+
+			<Panel id="XHSFocusTimers" hittest="false">
+				<Panel id="XHSArenaTimer" class="XHSFocusTimer XHSArenaFocusTimer XHSOptionalTimer" hittest="false">
+					<Label id="XHSCurrentEventTimerTitle" class="XHSFocusTimerTitle" text="EVENT" />
+					<Label id="XHSArenaTimerValue" class="XHSFocusTimerValue" text="--:--" />
+					<Panel id="XHSCurrentEventProgressTrack" class="XHSFocusTimerProgressTrack" hittest="false">
+						<Panel id="XHSCurrentEventProgressFill" class="XHSFocusTimerProgressFill" hittest="false" />
+					</Panel>
+				</Panel>
+
+				<Panel id="XHSPersonalEventTimer" class="XHSFocusTimer XHSPersonalFocusTimer XHSOptionalTimer" hittest="false">
+					<Label id="XHSPersonalEventTimerTitle" class="XHSFocusTimerTitle" text="EVENT" />
+					<Label id="XHSPersonalEventTimerValue" class="XHSFocusTimerValue" text="--:--" />
+				</Panel>
+			</Panel>
+
+			<Panel id="XHSDifficultyAltPanel" hittest="false">
+				<Label id="XHSDifficultyAltValue" text="DIFFICULTY: -----" />
 			</Panel>
 		</Panel>
 	</Panel>

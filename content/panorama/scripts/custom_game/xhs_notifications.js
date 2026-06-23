@@ -3,9 +3,11 @@
 	var BOTTOM_CONTAINER_ID = "#XHSBottomNotifications";
 	var WAVE_PANEL_ID = "#XHSWaveCountdown";
 	var MAX_NOTIFICATIONS = 4;
-	var lastTopNotification = null;
-	var lastBottomNotification = null;
 	var activeWaveSchedule = null;
+	var activeWaveTimerName = null;
+	var activeWaveDuration = 30;
+	var activeWaveMode = null;
+	var activeRuneRemaining = 0;
 
 	function getDuration(msg) {
 		if (typeof msg.duration === "number" && msg.duration > 0) {
@@ -13,10 +15,6 @@
 		}
 
 		return 3;
-	}
-
-	function isContinuation(msg) {
-		return msg.continue === true || (msg.style && msg.style.continue === true);
 	}
 
 	function getSeverity(msg) {
@@ -50,6 +48,14 @@
 	function formatRewardNumber(value) {
 		var number = Number(value) || 0;
 		return String(Math.floor(number)).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+	}
+
+	function formatGoldRewardText(amount, text) {
+		if (text) {
+			return String(text).replace(/^\s*\+\s*/, "");
+		}
+
+		return formatRewardNumber(amount) + " gold";
 	}
 
 	function getHudRoot() {
@@ -151,18 +157,64 @@
 		activeWaveSchedule = null;
 	}
 
+	function getTimerSeconds(msg) {
+		var minute10 = Number(msg.timer_minute_10 || 0);
+		var minute01 = Number(msg.timer_minute_01 || 0);
+		var second10 = Number(msg.timer_second_10 || 0);
+		var second01 = Number(msg.timer_second_01 || 0);
+
+		return ((minute10 * 10 + minute01) * 60) + (second10 * 10 + second01);
+	}
+
+	function isTruthy(value) {
+		return value === true || value === 1 || value === "1";
+	}
+
+	function formatWaveTime(seconds) {
+		seconds = Math.max(0, Math.floor(Number(seconds) || 0));
+		if (seconds >= 60) {
+			var minutes = Math.floor(seconds / 60);
+			var remainder = seconds - (minutes * 60);
+			return minutes + ":" + ("0" + remainder).slice(-2);
+		}
+
+		return String(seconds);
+	}
+
+	function getWaveDirectionLabel(direction) {
+		direction = String(direction || "").toUpperCase();
+		return direction ? direction + " lane" : "Preparing";
+	}
+
 	function applyStyle(panel, style) {
 		if (!style) {
 			return;
 		}
 
 		for (var key in style) {
-			if (key === "continue") {
-				continue;
-			}
-
 			panel.style[key] = style[key];
 		}
+	}
+
+	function getSegmentCount(msg) {
+		var segments = msg && msg.segments;
+		if (!segments) {
+			return 0;
+		}
+
+		if (typeof segments.length === "number") {
+			return segments.length;
+		}
+
+		var count = 0;
+		for (var key in segments) {
+			var index = Number(key);
+			if (index > 0 && Math.floor(index) === index) {
+				count++;
+			}
+		}
+
+		return count;
 	}
 
 	function createToast(container, lane, msg) {
@@ -188,6 +240,10 @@
 			} else if (msg.rewardType === "stats") {
 				toast.AddClass("XHSNotificationStatsReward");
 			}
+		}
+
+		if (getSegmentCount(msg) > 1) {
+			toast.AddClass("XHSNotificationCompound");
 		}
 
 		var body = $.CreatePanel("Panel", toast, "");
@@ -253,6 +309,49 @@
 		applyStyle(segment, msg.style);
 	}
 
+	function addSegments(toast, msg) {
+		var segments = msg && msg.segments;
+		if (!segments) {
+			toast.AddClass("XHSNotificationSingleMessage");
+			addSegment(toast, msg);
+			return;
+		}
+
+		var added = false;
+
+		if (typeof segments.length === "number") {
+			for (var i = 0; i < segments.length; i++) {
+				if (segments[i]) {
+					addSegment(toast, segments[i]);
+					added = true;
+				}
+			}
+		}
+
+		if (added) {
+			return;
+		}
+
+		var orderedSegments = [];
+		for (var key in segments) {
+			var index = Number(key);
+			if (index > 0 && Math.floor(index) === index) {
+				orderedSegments[index] = segments[key];
+			}
+		}
+
+		for (var j = 1; j < orderedSegments.length; j++) {
+			if (orderedSegments[j]) {
+				addSegment(toast, orderedSegments[j]);
+				added = true;
+			}
+		}
+
+		if (!added) {
+			addSegment(toast, msg);
+		}
+	}
+
 	function startProgress(toast, duration) {
 		if (!toast.progressPanel) {
 			return;
@@ -293,28 +392,16 @@
 		}
 
 		msg = msg || {};
-		var lastNotification = lane === "top" ? lastTopNotification : lastBottomNotification;
-		var usePrevious = isContinuation(msg) && lastNotification && !lastNotification.deleted;
+		var notification = createToast(container, lane, msg);
+		var duration = getDuration(msg);
+		startProgress(notification, duration);
+		$.Schedule(duration, function () {
+			closeToast(notification);
+		});
 
-		if (!usePrevious) {
-			lastNotification = createToast(container, lane, msg);
-			var duration = getDuration(msg);
-			startProgress(lastNotification, duration);
-			$.Schedule(duration, function () {
-				closeToast(lastNotification);
-			});
-
-			if (lane === "top") {
-				lastTopNotification = lastNotification;
-			} else {
-				lastBottomNotification = lastNotification;
-			}
-
-			trimStack(container);
-		}
-
-		addSegment(lastNotification, msg);
-		return lastNotification;
+		trimStack(container);
+		addSegments(notification, msg);
+		return notification;
 	}
 
 	function playRewardFlyout(toast, msg) {
@@ -383,7 +470,9 @@
 		if (!rewardText) {
 			rewardText = type === "stats"
 				? "+" + formatRewardNumber(amount) + " all stats"
-				: "+" + formatRewardNumber(amount) + " gold";
+				: formatGoldRewardText(amount);
+		} else if (type === "gold") {
+			rewardText = formatGoldRewardText(amount, rewardText);
 		}
 
 		var duration = getDuration(msg);
@@ -404,7 +493,7 @@
 			playRewardFlyout(toast, {
 				rewardType: type,
 				text: rewardText,
-				flyoutText: rewardText
+				flyoutText: type === "gold" ? formatRewardNumber(amount) : rewardText
 			});
 		});
 	}
@@ -465,26 +554,120 @@
 		panel.SetHasClass("XHSNotificationHidden", !visible);
 	}
 
-	function updateWaveCountdown(remaining) {
-		var label = $("#XHSWaveCountdownValue");
-		if (label) {
-			label.text = String(Math.max(0, remaining));
-		}
-	}
-
-	function tickWaveCountdown(remaining) {
-		updateWaveCountdown(remaining);
-
-		if (remaining <= 0) {
-			activeWaveSchedule = $.Schedule(0.35, function () {
-				setWaveVisible(false);
-			});
+	function setWaveMode(mode) {
+		var panel = $(WAVE_PANEL_ID);
+		if (!panel) {
 			return;
 		}
 
-		activeWaveSchedule = $.Schedule(1.0, function () {
-			tickWaveCountdown(remaining - 1);
-		});
+		activeWaveMode = mode || null;
+		panel.SetHasClass("XHSWaveCompact", mode === "compact");
+		panel.SetHasClass("XHSWaveWarning", mode === "warning");
+		panel.SetHasClass("XHSWaveActive", mode === "active");
+		panel.SetHasClass("XHSWaveCleared", mode === "cleared");
+	}
+
+	function updateWaveCountdown(remaining) {
+		var panel = $(WAVE_PANEL_ID);
+		var label = $("#XHSWaveCountdownValue");
+		var fill = $("#XHSWaveRingFill");
+		var duration = Math.max(1, activeWaveDuration || 30);
+		var ratio = Math.max(0, Math.min(1, remaining / duration));
+
+		if (label) {
+			label.text = activeWaveMode === "compact" ? formatWaveTime(remaining) : String(Math.max(0, remaining));
+		}
+
+		if (fill) {
+			fill.style.transform = "scaleX(" + ratio + ") scaleY(" + ratio + ")";
+			fill.style.opacity = String(Math.max(0.18, ratio));
+		}
+
+		if (panel) {
+			panel.SetHasClass("XHSWaveArrived", remaining <= 0);
+		}
+	}
+
+	function hideWavePanel() {
+		setWaveVisible(false);
+		activeWaveTimerName = null;
+		setWaveMode(null);
+	}
+
+	function showWaveCompact(msg, remaining) {
+		msg = msg || {};
+
+		var title = $("#XHSWaveTitle");
+		var subtitle = $("#XHSWaveSubtitle");
+		var eyebrow = $("#XHSWaveEyebrow");
+		var interval = Math.max(remaining, Number(msg.wave_interval || activeWaveDuration || remaining || 1));
+
+		cancelWaveSchedule();
+		activeWaveTimerName = "special_wave";
+		activeWaveDuration = interval;
+		setWaveMode("compact");
+
+		var panel = $(WAVE_PANEL_ID);
+		if (panel) {
+			panel.SetHasClass("XHSWaveArrived", false);
+		}
+
+		if (eyebrow) {
+			eyebrow.text = "NEXT WAVE";
+		}
+
+		if (title) {
+			title.text = "Wave of Darkness";
+		}
+
+		if (subtitle) {
+			subtitle.text = getWaveDirectionLabel(msg.direction);
+		}
+
+		setWaveVisible(true);
+		updateWaveCountdown(remaining);
+	}
+
+	function countdownTimer(msg) {
+		if (msg && msg.timer_name === "special_wave" && activeWaveMode !== "warning" && activeWaveMode !== "active" && activeWaveMode !== "cleared") {
+			var compactRemaining = getTimerSeconds(msg);
+			if (isTruthy(msg.show_compact) && compactRemaining > 30) {
+				showWaveCompact(msg, compactRemaining);
+				return;
+			}
+
+			if (activeWaveMode === "compact") {
+				hideWavePanel();
+			}
+		}
+
+		if (!activeWaveTimerName || !msg || msg.timer_name !== activeWaveTimerName) {
+			return;
+		}
+
+		var remaining = getTimerSeconds(msg);
+		updateWaveCountdown(remaining);
+
+		cancelWaveSchedule();
+		if (remaining <= 0) {
+			if (activeWaveTimerName === "special_wave") {
+				var eyebrow = $("#XHSWaveEyebrow");
+				var subtitle = $("#XHSWaveSubtitle");
+
+				if (eyebrow) {
+					eyebrow.text = "WAVE SPAWNED";
+				}
+
+				if (subtitle) {
+					subtitle.text = "Clear the attackers";
+				}
+			} else {
+				activeWaveSchedule = $.Schedule(0.35, function () {
+					hideWavePanel();
+					activeWaveSchedule = null;
+				});
+			}
+		}
 	}
 
 	function showWaveTimer(msg) {
@@ -494,6 +677,14 @@
 		var subtitle = $("#XHSWaveSubtitle");
 		var eyebrow = $("#XHSWaveEyebrow");
 		var duration = typeof msg.duration === "number" ? msg.duration : 30;
+		activeWaveTimerName = msg.timer_name || null;
+		activeWaveDuration = duration;
+
+		var panel = $(WAVE_PANEL_ID);
+		if (panel) {
+			panel.SetHasClass("XHSWaveArrived", false);
+		}
+		setWaveMode("warning");
 
 		if (eyebrow) {
 			eyebrow.text = msg.eyebrow || "WAVE INCOMING";
@@ -510,13 +701,236 @@
 		cancelWaveSchedule();
 
 		setWaveVisible(true);
-		tickWaveCountdown(duration);
+		updateWaveCountdown(duration);
+
+		if (!activeWaveTimerName) {
+			activeWaveSchedule = $.Schedule(duration, function () {
+				hideWavePanel();
+				activeWaveSchedule = null;
+			});
+		}
+	}
+
+	function showWaveActive(msg) {
+		msg = msg || {};
+		var panel = $(WAVE_PANEL_ID);
+		var title = $("#XHSWaveTitle");
+		var subtitle = $("#XHSWaveSubtitle");
+		var eyebrow = $("#XHSWaveEyebrow");
+		var label = $("#XHSWaveCountdownValue");
+		var fill = $("#XHSWaveRingFill");
+		var total = Math.max(1, Number(msg.total || 10));
+		var remaining = Math.max(0, Number(msg.remaining || 0));
+		var killed = Math.max(0, total - remaining);
+		var direction = String(msg.direction || "").toUpperCase();
+
+		cancelWaveSchedule();
+		activeWaveTimerName = null;
+
+		if (panel) {
+			panel.SetHasClass("XHSWaveArrived", false);
+		}
+		setWaveMode(remaining > 0 ? "active" : "cleared");
+
+		if (eyebrow) {
+			eyebrow.text = remaining > 0 ? "WAVE ACTIVE" : "WAVE CLEARED";
+		}
+
+		if (title) {
+			title.text = "Wave of Darkness";
+		}
+
+		if (subtitle) {
+			subtitle.text = remaining > 0
+				? (direction ? direction + " lane - " : "") + killed + "/" + total + " killed"
+				: "All attackers defeated";
+		}
+
+		if (label) {
+			label.text = String(remaining);
+		}
+
+		if (fill) {
+			var ratio = remaining / total;
+			fill.style.transform = "scaleX(" + ratio + ") scaleY(" + ratio + ")";
+			fill.style.opacity = remaining > 0 ? "1" : ".42";
+		}
+
+		setWaveVisible(true);
+
+		if (remaining <= 0) {
+			activeWaveSchedule = $.Schedule(2.4, function () {
+				hideWavePanel();
+				activeWaveSchedule = null;
+			});
+		}
+	}
+
+	function showWaveCleared(msg) {
+		msg = msg || {};
+		msg.remaining = 0;
+		showWaveActive(msg);
+	}
+
+	function hideWaveTimer() {
+		hideWavePanel();
+	}
+
+	function clearRuneClasses(panel) {
+		if (!panel) {
+			return;
+		}
+
+		var classes = [
+			"XHSRuneRecovery",
+			"XHSRuneDefense",
+			"XHSRuneOffense",
+			"XHSRuneMisc",
+			"XHSRunePicked",
+			"XHSRuneExpired"
+		];
+
+		for (var i = 0; i < classes.length; i++) {
+			panel.SetHasClass(classes[i], false);
+		}
+	}
+
+	function setRuneVisible(visible) {
+		var panel = $("#XHSRuneIndicator");
+		if (panel) {
+			panel.SetHasClass("XHSRuneHidden", !visible);
+		}
+	}
+
+	function getRuneCategoryClass(category) {
+		category = String(category || "").toLowerCase();
+		if (category === "recovery") {
+			return "XHSRuneRecovery";
+		}
+		if (category === "defense") {
+			return "XHSRuneDefense";
+		}
+		if (category === "offense") {
+			return "XHSRuneOffense";
+		}
+		return "XHSRuneMisc";
+	}
+
+	function formatRuneDirection(direction) {
+		direction = String(direction || "");
+		if (!direction) {
+			return "rune point";
+		}
+
+		return direction.toUpperCase() + " lane";
+	}
+
+	function updateRuneState(msg) {
+		msg = msg || {};
+
+		var panel = $("#XHSRuneIndicator");
+		if (!panel) {
+			return;
+		}
+
+		var eyebrow = $("#XHSRuneEyebrow");
+		var name = $("#XHSRuneName");
+		var detail = $("#XHSRuneDetail");
+		var time = $("#XHSRuneTime");
+		var state = String(msg.state || "spawned");
+		var category = String(msg.category || "Misc");
+
+		clearRuneClasses(panel);
+		panel.AddClass(getRuneCategoryClass(category));
+		panel.SetHasClass("XHSRunePicked", state === "picked");
+		panel.SetHasClass("XHSRuneExpired", state === "expired");
+
+		if (eyebrow) {
+			eyebrow.text = state === "picked" ? "RUNE CLAIMED" : (state === "expired" ? "RUNE EXPIRED" : category.toUpperCase() + " RUNE");
+		}
+
+		if (name) {
+			name.text = msg.name || "Rune";
+		}
+
+		if (detail) {
+			if (state === "picked") {
+				detail.text = msg.picker_hero_name ? msg.picker_hero_name + " picked it up" : "Picked up";
+			} else if (state === "expired") {
+				detail.text = "No hero reached it in time";
+			} else {
+				detail.text = formatRuneDirection(msg.direction);
+			}
+		}
+
+		activeRuneRemaining = Number(msg.remaining);
+		if (time) {
+			time.text = state === "spawned" && activeRuneRemaining >= 0 ? String(Math.max(0, activeRuneRemaining)) : "";
+		}
+
+		setRuneVisible(true);
+
+		if (state !== "spawned") {
+			$.Schedule(4.0, function () {
+				setRuneVisible(false);
+			});
+		}
+	}
+
+	function showMainQuestCompleted(msg) {
+		var container = $(TOP_CONTAINER_ID);
+		if (!container) {
+			return;
+		}
+
+		msg = msg || {};
+		var toast = createToast(container, "top", {
+			duration: msg.duration || 6.5,
+			severity: "success"
+		});
+		toast.AddClass("XHSNotificationMainQuest");
+
+		var content = toast.contentPanel || toast;
+		content.RemoveAndDeleteChildren();
+
+		var eyebrow = $.CreatePanel("Label", content, "");
+		eyebrow.AddClass("XHSMainQuestEyebrow");
+		eyebrow.text = msg.phase || "MAIN QUEST";
+		eyebrow.hittest = false;
+
+		var title = $.CreatePanel("Label", content, "");
+		title.AddClass("XHSMainQuestTitle");
+		title.text = msg.title || "Objective Complete";
+		title.hittest = false;
+
+		var subtitle = $.CreatePanel("Label", content, "");
+		subtitle.AddClass("XHSMainQuestSubtitle");
+		subtitle.text = msg.subtitle || "";
+		subtitle.hittest = false;
+
+		var duration = getDuration({ duration: msg.duration || 6.5 });
+		startProgress(toast, duration);
+		$.Schedule(duration, function () {
+			closeToast(toast);
+		});
+
+		trimStack(container);
+
+		if (msg.sound) {
+			Game.EmitSound(msg.sound);
+		}
 	}
 
 	GameEvents.Subscribe("top_notification", topNotification);
 	GameEvents.Subscribe("bottom_notification", bottomNotification);
 	GameEvents.Subscribe("top_remove_notification", topRemoveNotification);
 	GameEvents.Subscribe("bottom_remove_notification", bottomRemoveNotification);
+	GameEvents.Subscribe("countdown_timer", countdownTimer);
 	GameEvents.Subscribe("xhs_wave_timer", showWaveTimer);
+	GameEvents.Subscribe("xhs_wave_active", showWaveActive);
+	GameEvents.Subscribe("xhs_wave_cleared", showWaveCleared);
+	GameEvents.Subscribe("xhs_wave_hide", hideWaveTimer);
+	GameEvents.Subscribe("xhs_rune_state_update", updateRuneState);
+	GameEvents.Subscribe("xhs_main_quest_completed", showMainQuestCompleted);
 	GameEvents.Subscribe("xhs_reward_notification", showRewardNotification);
 })();

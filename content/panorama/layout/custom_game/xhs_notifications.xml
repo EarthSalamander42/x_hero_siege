@@ -13,6 +13,7 @@
 		<Panel id="XHSWaveCountdown" hittest="false" class="XHSWaveCountdown XHSNotificationHidden">
 			<Panel class="XHSWaveRingWrap">
 				<Panel class="XHSWaveRing" />
+				<Panel id="XHSWaveRingFill" class="XHSWaveRingFill" />
 				<Panel class="XHSWaveRingSweep" />
 				<Label id="XHSWaveCountdownValue" class="XHSWaveCountdownValue" text="30" />
 			</Panel>
@@ -21,6 +22,16 @@
 				<Label id="XHSWaveTitle" class="XHSWaveTitle" text="Wave of Darkness" />
 				<Label id="XHSWaveSubtitle" class="XHSWaveSubtitle" text="Prepare your lane" />
 			</Panel>
+		</Panel>
+
+		<Panel id="XHSRuneIndicator" hittest="false" class="XHSRuneIndicator XHSRuneHidden">
+			<Panel id="XHSRuneAccent" class="XHSRuneAccent" />
+			<Panel class="XHSRuneCopy">
+				<Label id="XHSRuneEyebrow" class="XHSRuneEyebrow" text="RUNE ACTIVE" />
+				<Label id="XHSRuneName" class="XHSRuneName" text="" />
+				<Label id="XHSRuneDetail" class="XHSRuneDetail" text="" />
+			</Panel>
+			<Label id="XHSRuneTime" class="XHSRuneTime" text="45" />
 		</Panel>
 
 		<Panel id="XHSTopNotifications" hittest="false" class="XHSNotificationStack XHSTopNotifications" />

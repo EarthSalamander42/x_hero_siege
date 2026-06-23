@@ -44,14 +44,11 @@ ListenToGameEvent('dota_player_used_ability', function(event)
 
 	if GameMode.m_bFreeSpellsEnabled == true then
 		for _, hero in pairs(HeroList:GetAllHeroes()) do
-			for i = 0, 24 - 1 do
-				if hero:GetAbilityByIndex(i) then
-					local ability = hero:GetAbilityByIndex(i)
+			ForEachUnitAbility(hero, function(ability)
 					ability:EndCooldown()
 					ability:RefundManaCost()
 					ability:RefreshCharges()
-				end
-			end
+			end)
 		end
 	end
 end, nil)
@@ -62,14 +59,11 @@ function GameMode:RefreshPlayers()
 			hero:RespawnHero(false, false)
 		end
 
-		for i = 0, 24 - 1 do
-			local ability = hero:GetAbilityByIndex(i)
-			if ability then
+		ForEachUnitAbility(hero, function(ability)
 				if not ability:IsCooldownReady() then
 					ability:EndCooldown()
 				end
-			end
-		end
+		end)
 
 		hero:SetHealth(hero:GetMaxHealth())
 		hero:SetMana(hero:GetMaxMana())
@@ -88,14 +82,10 @@ function GameMode:OnNewHeroChosen(event)
 end
 
 function GameMode:OnNewHeroSelected(event)
-	PrecacheUnitByNameAsync(event.hero, function()
-		local old_hero = PlayerResource:GetSelectedHeroEntity(event.PlayerID)
-		local hero = PlayerResource:ReplaceHeroWith(event.PlayerID, event.hero, 99999, 0)
-
-		Timers:CreateTimer(1.0, function()
-			old_hero:RemoveSelf()
-		end)
-	end, event.PlayerID)
+	local old_hero = PlayerResource:GetSelectedHeroEntity(event.PlayerID)
+	XHSPrecache:ReplaceHeroWith(event.PlayerID, event.hero, 99999, 0, old_hero, {
+		cleanupDelay = 1.0,
+	})
 end
 
 --------------------------------------------------------------------------------
@@ -177,14 +167,13 @@ function GameMode:OnMaxLevelButtonPressed(eventSourceIndex, data)
 	--hPlayerHero:HeroLevelUp( false )
 	--end
 
-	for i = 0, 24 - 1 do
-		local hAbility = hPlayerHero:GetAbilityByIndex(i)
+	ForEachUnitAbility(hPlayerHero, function(hAbility)
 		if hAbility and hAbility:CanAbilityBeUpgraded() == ABILITY_CAN_BE_UPGRADED and not hAbility:IsHidden() and not hAbility:IsAttributeBonus() then
 			while hAbility:GetLevel() < hAbility:GetMaxLevel() do
 				hPlayerHero:UpgradeAbility(hAbility)
 			end
 		end
-	end
+	end)
 
 	hPlayerHero:SetAbilityPoints(4)
 	self:BroadcastMsg("#MaxLevel_Msg")

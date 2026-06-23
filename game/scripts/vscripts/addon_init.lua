@@ -9,4 +9,5 @@ if IsClient() then
 	LinkLuaModifier("modifier_cinematic_pause", "modifiers/modifier_cinematic_pause.lua", LUA_MODIFIER_MOTION_NONE)
 	LinkLuaModifier("modifier_custom_mechanics", "modifiers/modifier_custom_mechanics", LUA_MODIFIER_MOTION_NONE)
 	LinkLuaModifier("modifier_corpse", "modifiers/modifier_corpse.lua", LUA_MODIFIER_MOTION_NONE)
+	LinkLuaModifier("modifier_xhs_growth_overhead", "modifiers/modifier_xhs_growth_overhead.lua", LUA_MODIFIER_MOTION_NONE)
 end

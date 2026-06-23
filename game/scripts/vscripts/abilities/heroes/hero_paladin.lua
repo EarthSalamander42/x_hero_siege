@@ -378,14 +378,11 @@ end
 
 function LightFrenzy(keys)
 	--Refresh all abilities on the target.
-	for i = 0, 16, 1 do --The maximum number of abilities a unit can have is currently 17.
-		local current_ability = keys.target:GetAbilityByIndex(i)
-		if current_ability ~= nil then
+	ForEachUnitAbility(keys.target, function(current_ability)
 			if current_ability:GetName() ~= "holdout_light_frenzy" then
 				current_ability:EndCooldown()
 			end
-		end
-	end
+	end)
 	
 	--Refresh all items the target has.
 	for i=0, 5, 1 do

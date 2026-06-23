@@ -60,9 +60,9 @@ function bristleback_takedamage(params)
 	-- If the amount of damage taken since the last Quill Spray proc is equal to or exceeds what's defined as the threshold, release a Quill Spray.
 	if params.unit.quill_threshold_counter >= ability:GetSpecialValueFor("quill_release_threshold") then
 		-- This should be Quill Spray, but in case something weird like AD is going on, we'll check anyway.
-		local ability_index_1 = params.unit:GetAbilityByIndex(1) 
+		local ability_index_1 = GetUnitAbilityBySafeIndex(params.unit, 1)
 
-		-- Just in case GetAbilityByIndex fails or something.
+		-- Just in case this unit does not expose the expected Quill Spray slot.
 		if ability_index_1 ~= nil then 
 			if ability_index_1:GetAbilityName() == "quill_spray_datadriven" or ability_index_1:GetAbilityName() == "bristleback_quill_spray" then
 				ability_index_1:CastAbility()

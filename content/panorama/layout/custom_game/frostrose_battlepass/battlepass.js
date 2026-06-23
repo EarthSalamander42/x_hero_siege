@@ -873,16 +873,7 @@ function GenerateBattlepassPanel(reward_list, reward_row, bRewardsDisabled) {
 
 			// 			if (bp_type == "bundle" || bp_type == "wearable" || bp_type == "taunt") {
 			// 				var hero_tooltip = $.Localize("#" + bp_hero);
-			// 				var new_hero_tooltip = undefined;
-
-			// 				if (hero_tooltip.indexOf(" (IMBA)") !== -1) {
-			// 					new_hero_tooltip = hero_tooltip.replace(" (IMBA)", "");
-			// 				}
-
-			// 				if (new_hero_tooltip)
-			// 					reward.FindChildTraverse("BattlepassRewardTitle").text = new_hero_tooltip + ": " + $.Localize("#" + bp_name);
-			// 				else
-			// 					reward.FindChildTraverse("BattlepassRewardTitle").text = hero_tooltip + ": " + $.Localize("#" + bp_name);
+			// 				reward.FindChildTraverse("BattlepassRewardTitle").text = hero_tooltip + ": " + $.Localize("#" + bp_name);
 			// 			} else
 			// 				reward.FindChildTraverse("BattlepassRewardTitle").text = $.Localize("#battlepass_" + bp_type) + ": " + $.Localize("#" + bp_name);
 
@@ -1035,16 +1026,7 @@ function GenerateArmoryPanel(reward_list, premium_reward_list, bRewardsDisabled)
 
 						if (bp_type == "bundle" || bp_type == "wearable" || bp_type == "taunt") {
 							var hero_tooltip = $.Localize("#" + bp_hero);
-							var new_hero_tooltip = undefined;
-
-							if (hero_tooltip.indexOf(" (IMBA)") !== -1) {
-								new_hero_tooltip = hero_tooltip.replace(" (IMBA)", "");
-							}
-
-							if (new_hero_tooltip)
-								reward.FindChildTraverse("BattlepassRewardTitle").text = new_hero_tooltip + ": " + $.Localize("#" + bp_name);
-							else
-								reward.FindChildTraverse("BattlepassRewardTitle").text = hero_tooltip + ": " + $.Localize("#" + bp_name);
+							reward.FindChildTraverse("BattlepassRewardTitle").text = hero_tooltip + ": " + $.Localize("#" + bp_name);
 						} else
 							reward.FindChildTraverse("BattlepassRewardTitle").text = $.Localize("#battlepass_" + bp_type) + ": " + $.Localize("#" + bp_name);
 
@@ -1174,16 +1156,7 @@ function GenerateArmoryPanel(reward_list, premium_reward_list, bRewardsDisabled)
 
 						if (bp_type == "bundle" || bp_type == "wearable" || bp_type == "taunt") {
 							var hero_tooltip = $.Localize("#" + bp_hero);
-							var new_hero_tooltip = undefined;
-
-							if (hero_tooltip.indexOf(" (IMBA)") !== -1) {
-								new_hero_tooltip = hero_tooltip.replace(" (IMBA)", "");
-							}
-
-							if (new_hero_tooltip)
-								reward.FindChildTraverse("BattlepassRewardTitle").text = new_hero_tooltip + ": " + $.Localize("#" + bp_name);
-							else
-								reward.FindChildTraverse("BattlepassRewardTitle").text = hero_tooltip + ": " + $.Localize("#" + bp_name);
+							reward.FindChildTraverse("BattlepassRewardTitle").text = hero_tooltip + ": " + $.Localize("#" + bp_name);
 						} else
 							reward.FindChildTraverse("BattlepassRewardTitle").text = $.Localize("#battlepass_" + bp_type) + ": " + $.Localize("#" + bp_name);
 
@@ -1606,7 +1579,7 @@ function _ScoreboardUpdater_UpdatePlayerPanelXP(playerId, playerPanel, ImbaXP_Pa
 
 	let current_xp = player_info.whalepass_xp;
 	const current_max_xp = 1000;
-	let level = 0;
+	let level = 1;
 
 	while (current_xp >= current_max_xp) {
 		current_xp -= 1000;
@@ -1778,57 +1751,38 @@ function PlayerQuests() {
 		}
 	}
 
-	if (game_type == "IMBA") {
-		var values = [
-			"bounty_multiplier", // todo: add % in text
-			"exp_multiplier", // todo: add % in text
-			"initial_gold",
-			"initial_level",
-			"max_level",
-			"gold_tick",
-		]
+	var panels = {
+		"bounty_multiplier": "BountyMultiplier",
+		"exp_multiplier": "ExpMultiplier",
+		"initial_gold": "InitialGold",
+		"initial_level": "InitialLevel",
+		"max_level": "MaxLevel",
+		"gold_tick": "GoldTick",
+	}
 
-		// Update the game options display
-		for (var i in values) {
-			var value = CustomNetTables.GetTableValue("game_options", values[i]);
+	for (var i in panels) {
+		const panel = panels[i];
 
-			if (value && value[1] && $("#" + value + "_value"))
-				$("#" + value + "_value").text = value[1];
-		}
-	} else {
-		var panels = {
-			"bounty_multiplier": "BountyMultiplier",
-			"exp_multiplier": "ExpMultiplier",
-			"initial_gold": "InitialGold",
-			"initial_level": "InitialLevel",
-			"max_level": "MaxLevel",
-			"gold_tick": "GoldTick",
+		if ($("#" + panel + "Desc")) {
+			$("#" + panel + "Desc").style.visibility = "collapse";
 		}
 
-		for (var i in panels) {
-			const panel = panels[i];
-
-			if ($("#" + panel + "Desc")) {
-				$("#" + panel + "Desc").style.visibility = "collapse";
-			}
-
-			if ($("#" + panel + "Value")) {
-				$("#" + panel + "Value").style.visibility = "collapse";
-			}
+		if ($("#" + panel + "Value")) {
+			$("#" + panel + "Value").style.visibility = "collapse";
 		}
+	}
 
-		if (game_type == "PW") {
-			var max_score = CustomNetTables.GetTableValue("game_score", "max_score");
+	if (game_type == "PW") {
+		var max_score = CustomNetTables.GetTableValue("game_score", "max_score");
 
-			if (max_score)
-				max_score = max_score.kills;
-			else
-				return;
+		if (max_score)
+			max_score = max_score.kills;
+		else
+			return;
 
-			$("#BountyMultiplierValue").text = max_score;
-			$("#BountyMultiplierDesc").style.visibility = "visible";
-			$("#BountyMultiplierValue").style.visibility = "visible";
-		}
+		$("#BountyMultiplierValue").text = max_score;
+		$("#BountyMultiplierDesc").style.visibility = "visible";
+		$("#BountyMultiplierValue").style.visibility = "visible";
 	}
 
 	GameEvents.Subscribe("safe_to_leave", SafeToLeave);

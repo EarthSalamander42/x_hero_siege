@@ -1051,6 +1051,18 @@ end
 
 --------------------------------------------------------------------
 
+local function CanQuestCountKilledUnit(quest, killedUnit)
+	if quest.szQuestName ~= "kill_final_wave" then
+		return true
+	end
+
+	return CustomTimers ~= nil
+		and CustomTimers.final_wave_kill_counting == true
+		and killedUnit.xhs_final_wave_unit == true
+end
+
+--------------------------------------------------------------------
+
 function CDungeonZone:OnEnemyKilled(killedUnit, Zone)
 	-- print("OnEnemyKilled", killedUnit:GetUnitName())
 	for _, quest in pairs(CDungeonZone.Quests) do
@@ -1082,7 +1094,7 @@ function CDungeonZone:OnEnemyKilled(killedUnit, Zone)
 			if quest.bActivated == true and quest.Completion.Type == QUEST_EVENT_ON_ENEMY_KILLED and quest.Completion.szNPCName == killedUnit:GetUnitName() and ((quest.Completion.szZoneName == Zone.szName) or (quest.Completion.szZoneName == nil)) then
 				GameRules.GameMode:OnQuestCompleted(CDungeonZone, quest)
 			end
-			if quest.bActivated == true and quest.Completion.Type == QUEST_EVENT_ON_TEAM_ENEMY_KILLED and quest.Completion.szTeamName == killedUnit:GetTeam() and ((quest.Completion.szZoneName == Zone.szName) or (quest.Completion.szZoneName == nil)) then
+			if quest.bActivated == true and CanQuestCountKilledUnit(quest, killedUnit) and quest.Completion.Type == QUEST_EVENT_ON_TEAM_ENEMY_KILLED and quest.Completion.szTeamName == killedUnit:GetTeam() and ((quest.Completion.szZoneName == Zone.szName) or (quest.Completion.szZoneName == nil)) then
 				GameRules.GameMode:OnQuestCompleted(CDungeonZone, quest)
 			end
 		end

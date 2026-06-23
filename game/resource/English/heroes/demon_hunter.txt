@@ -14,7 +14,7 @@
 "DOTA_Tooltip_ability_holdout_active_immolation_radius"					"RADIUS:"
 
 "DOTA_Tooltip_ability_xhs_vampiric_aura"							"Vampiric Aura"
-"DOTA_Tooltip_ability_xhs_vampiric_aura_Description"				"Nearby friendly units gain hit points when they hit enemy units.\n<font color='#FF7800'>WARNING: Does NOT stack with other source of lifesteal.</font>"
+"DOTA_Tooltip_ability_xhs_vampiric_aura_Description"				"Nearby friendly units gain hit points when they hit enemy units.\n<font color='#FF7800'>WARNING: Does not stack with other sources of lifesteal.</font>"
 "DOTA_Tooltip_ability_xhs_vampiric_aura_Lore"						""
 "DOTA_Tooltip_ability_xhs_vampiric_aura_aura_radius"				"RADIUS:"
 "DOTA_Tooltip_ability_xhs_vampiric_aura_lifesteal_pct"				"%LIFESTEAL:"
@@ -34,7 +34,7 @@
 "DOTA_Tooltip_ability_holdout_roar_duration"							"DURATION:"
 
 "DOTA_Tooltip_modifier_roar"							"Roar"
-"DOTA_Tooltip_modifier_roar_Description"				"Grants bonus damage % and armor."
+"DOTA_Tooltip_modifier_roar_Description"				"Damage dealt: %dMODIFIER_PROPERTY_BASEDAMAGEOUTGOING_PERCENTAGE%%%. Armor: %dMODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS%. Attack damage: %dMODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE%."
 
 "DOTA_Tooltip_ability_holdout_metamorphosis"								"Metamorphosis"
 "DOTA_Tooltip_ability_holdout_metamorphosis_Description"					"Transforms the Demon Hunter into a powerful Demon with a ranged attack and maximum movement speed."

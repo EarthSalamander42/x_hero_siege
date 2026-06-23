@@ -1,6 +1,6 @@
 // Turn off some default UI
-//		GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_TOP_BAR, true );
-//		GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_TOP_TIMEOFDAY, false );
+		GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_TOP_BAR, false );
+		GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_TOP_TIMEOFDAY, false );
 GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_TOP_HEROES, false );
 GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_FLYOUT_SCOREBOARD, false );
 GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_INVENTORY_QUICKBUY, true );
@@ -20,6 +20,97 @@ GameUI.CustomUIConfig().team_colors[DOTATeam_t.DOTA_TEAM_CUSTOM_4 ] = "#00963c;"
 
 var hudElements = $.GetContextPanel().GetParent().GetParent().FindChildTraverse("HUDElements");
 var center_block = hudElements.FindChildTraverse("lower_hud").FindChildTraverse("center_with_stats").FindChildTraverse("center_block");
+
+function OnXHSBuyTomeButtonPressed() {
+	GameEvents.SendCustomGameEventToServer("xhs_buy_tomes", {});
+}
+
+function ShowXHSBuyTomeTooltip() {
+	var button = GameUI.CustomUIConfig().XHSBuyTomeButton;
+	if (button) {
+		$.DispatchEvent("DOTAShowAbilityTooltip", button, "item_tome_small");
+	}
+}
+
+function HideXHSBuyTomeTooltip() {
+	var button = GameUI.CustomUIConfig().XHSBuyTomeButton;
+	if (button) {
+		$.DispatchEvent("DOTAHideAbilityTooltip", button);
+	}
+}
+
+function FindXHSBuyTomeInitAnchor(parent) {
+	var abilities = parent ? parent.FindChildTraverse("abilities") : null;
+	if (abilities) {
+		if (abilities.GetParent && abilities.GetParent() === parent) {
+			return abilities;
+		}
+
+		var abilityParent = abilities.GetParent ? abilities.GetParent() : null;
+		if (abilityParent && abilityParent.GetParent && abilityParent.GetParent() === parent) {
+			return abilityParent;
+		}
+	}
+
+	return null;
+}
+
+GameUI.CustomUIConfig().CreateXHSBuyTomeButton = function(parent) {
+	parent = parent || center_block;
+	if (!parent) {
+		return null;
+	}
+
+	var existing = parent.FindChildTraverse("XHSBuyTomeButton");
+	if (existing) {
+		var existingAnchor = FindXHSBuyTomeInitAnchor(parent);
+		if (existingAnchor && parent.MoveChildAfter) {
+			if (existing.SetParent) {
+				existing.SetParent(parent);
+			}
+
+			parent.MoveChildAfter(existing, existingAnchor);
+		}
+
+		GameUI.CustomUIConfig().XHSBuyTomeButton = existing;
+		return existing;
+	}
+
+	var button = $.CreatePanel("Button", parent, "XHSBuyTomeButton");
+	button.AddClass("XHSBuyTomeButton");
+	button.AddClass("NoTomes");
+	button.AddClass("XHSInjectedIntoCenterBlock");
+	button.hittest = true;
+	button.SetPanelEvent("onactivate", OnXHSBuyTomeButtonPressed);
+	button.SetPanelEvent("onmouseover", ShowXHSBuyTomeTooltip);
+	button.SetPanelEvent("onmouseout", HideXHSBuyTomeTooltip);
+	button.style.visibility = "collapse";
+
+	var icon = $.CreatePanel("DOTAItemImage", button, "XHSBuyTomeIcon");
+	icon.AddClass("XHSBuyTomeIcon");
+	icon.itemname = "item_tome_small";
+	icon.hittest = false;
+
+	var count = $.CreatePanel("Label", button, "XHSBuyTomeCount");
+	count.AddClass("XHSBuyTomeCount");
+	count.text = "x0";
+	count.hittest = false;
+
+	var anchor = FindXHSBuyTomeInitAnchor(parent);
+	if (anchor && parent.MoveChildAfter) {
+		if (button.SetParent) {
+			button.SetParent(parent);
+		}
+
+		parent.MoveChildAfter(button, anchor);
+	}
+
+	GameUI.CustomUIConfig().XHSBuyTomeButton = button;
+	return button;
+};
+
+GameUI.CustomUIConfig().CreateXHSBuyTomeButton(center_block);
+
 //Use this line if you want to keep 4 ability minimum size, and only use 160 if you want ~2 ability min size
 center_block.FindChildTraverse("AbilitiesAndStatBranch").style.minWidth = "386px";
 //center_block.FindChildTraverse("AbilitiesAndStatBranch").style.minWidth = "160px";
@@ -44,51 +135,6 @@ center_block.FindChildrenWithClassTraverse("RootInnateDisplay")[0].style.visibil
 center_block.FindChildTraverse("level_stats_frame").style.visibility = "collapse";
 
 center_block.FindChildTraverse("AghsStatusContainer").style.visibility = "collapse";
-
-//Skin Killer - TopBar
-var topbar = hudElements.FindChildTraverse("topbar");
-topbar.FindChildTraverse("HUDSkinTopBarBG").style.visibility = "collapse";
-for (var bg of topbar.FindChildrenWithClassTraverse("TopBarBackground")) {
-	bg.style.opacity = "1";
-	bg.style.backgroundImage = "none";
-	bg.style.backgroundColor = "#000000da";
-}
-
-topbar.style.width = "685px";
-
-var TopBarRadiantTeam = hudElements.FindChildTraverse("TopBarRadiantTeam");
-TopBarRadiantTeam.style.width = "320px";
-TopBarRadiantTeam.style.marginRight = "189px";
-
-var topbarRadiantPlayers = hudElements.FindChildTraverse("TopBarRadiantPlayers");
-topbarRadiantPlayers.style.width = "275px";
-
-var topbarRadiantPlayersContainer = hudElements.FindChildTraverse("TopBarRadiantPlayersContainer");
-topbarRadiantPlayersContainer.style.width = "275px";
-
-var map_info = Game.GetMapInfo();
-if (map_info.map_display_name == "x_hero_siege_8") {
-	topbar.style.width = "1112px";
-
-	//Top Bar Radiant
-	var TopBarRadiantTeam = hudElements.FindChildTraverse("TopBarRadiantTeam");
-	TopBarRadiantTeam.style.width = "1000px";
-	TopBarRadiantTeam.style.marginLeft = "100px";
-	TopBarRadiantTeam.style.marginRight = "0px";
-
-	var topbarRadiantPlayers = hudElements.FindChildTraverse("TopBarRadiantPlayers");
-	topbarRadiantPlayers.style.width = "504px";
-
-	var topbarRadiantPlayersContainer = hudElements.FindChildTraverse("TopBarRadiantPlayersContainer");
-	topbarRadiantPlayersContainer.style.width = "504px";
-
-	var RadiantTeamContainer = hudElements.FindChildTraverse("RadiantTeamContainer");
-	RadiantTeamContainer.style.height = "1000px";
-
-	var RadiantBackground = TopBarRadiantTeam.GetChild(0);
-	RadiantBackground.style.width = "1000px";
-	RadiantBackground.style.marginRight = "50px";
-}
 
 //Skin Killer - Portrait
 center_block.FindChildTraverse("HUDSkinPortrait").style.visibility = "collapse";

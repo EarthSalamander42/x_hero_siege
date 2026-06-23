@@ -5,6 +5,8 @@ var secret_key = {};
 var local_votes = {};
 var local_vote_confirmed = {};
 var vote_payload_cache = {};
+var active_vote_sequence = [];
+var active_vote_index = 0;
 var player_loading_rows = {};
 var player_loading_section_rows = {};
 var player_loading_order_signature = "";
@@ -18,14 +20,13 @@ var LOADING_SCREEN_CONFIG = {
 	links: {
 		website: "https://mods.frostrose-studio.com",
 		patreon: "https://www.patreon.com/bePatron?u=2533325",
-		discord: "https://discord.gg/frostrose",
+		discord: "https://discord.frostrose-studio.com/",
 		artwork_instagram: "https://www.instagram.com/duongcua_art",
 	},
 	footer: {
 		auto_interval_seconds: 10.0,
 		rotation_order: [3, 2, 1],
 		auto_tick_interval_seconds: 0.1,
-		mouse_move_pause_window_seconds: 0.22,
 	},
 	tools: {
 		lobby_simulation_enabled: true,
@@ -61,7 +62,7 @@ var bottom_tab_countdown_remaining = bottom_tab_auto_interval;
 var bottom_tab_last_tick_time = -1;
 var bottom_tab_mouse_over_footer = false;
 var bottom_tab_last_mouse_move_time = -1;
-var bottom_tab_mouse_move_pause_window = LOADING_SCREEN_CONFIG.footer.mouse_move_pause_window_seconds;
+var bottom_mods_current_page = 0;
 var custom_setup_failed_state = false;
 var local_ready_click_pending = false;
 var local_ready_click_token = 0;
@@ -77,6 +78,7 @@ var loading_screen_last_bottom_tab_countdown_bucket = -1;
 var tools_mode_last_lobby_signature = "";
 var loading_screen_last_fetch_stage = "";
 var loading_screen_last_profile_signature = "";
+var SUPPORTER_PASS_XP_PER_LEVEL = 1000;
 // Debug toggle: set to true to enable fake tools-mode player state simulation.
 var tools_mode_lobby_simulation_enabled = LOADING_SCREEN_CONFIG.tools.lobby_simulation_enabled;
 var tools_mode_lobby_sim_started_at = -1;
@@ -165,10 +167,8 @@ var view = {
 
 var vote_tooltips = {};
 var vote_array = {
-	"IMBA": {
-		"gamemode": 5,
-	},
 	"XHS": {
+		"gamemode": 2,
 		"difficulty": 5,
 	},
 	"PW": {
@@ -951,7 +951,7 @@ function GetProfileDataForPlayer(player_id) {
 	var player_info = null;
 	var player_table = {};
 	var xp_current = 0;
-	var xp_max = 1000;
+	var xp_max = SUPPORTER_PASS_XP_PER_LEVEL;
 	var has_profile_data = false;
 	var has_xp_data = false;
 
@@ -972,13 +972,7 @@ function GetProfileDataForPlayer(player_id) {
 		break;
 	}
 
-	if (player_table.MaxXP !== undefined) {
-		xp_max = Math.max(1, ToNumber(player_table.MaxXP, 1000));
-	}
-
-	if (player_table.season_xp_max !== undefined) {
-		xp_max = Math.max(1, ToNumber(player_table.season_xp_max, 1000));
-	}
+	xp_max = SUPPORTER_PASS_XP_PER_LEVEL;
 
 	if (player_table.season_xp !== undefined) {
 		xp_current = Math.max(0, ToNumber(player_table.season_xp, 0));
@@ -992,13 +986,15 @@ function GetProfileDataForPlayer(player_id) {
 		xp_current = xp_current - xp_max;
 	}
 
+	var supporter_level = Math.max(1, ToNumber(player_table.season_level !== undefined ? player_table.season_level : player_table.Lvl, 1));
+
 	return {
 		player_id: player_id,
 		steam_id: GetSteamIDFromPlayerInfo(player_info, player_id),
 		player_name: GetPlayerDisplayName(player_id, player_info),
-		title: player_table.account_title || player_table.title || L("loading_screen_unavailable"),
-		title_color: player_table.title_color || "#9eb0c9",
-		level: player_table.season_level !== undefined ? player_table.season_level : (player_table.Lvl !== undefined ? player_table.Lvl : "-"),
+		title: "Supporter Pass",
+		title_color: "#9eb0c9",
+		level: supporter_level,
 		xp_current: xp_current,
 		xp_max: xp_max,
 		has_xp_data: has_xp_data,
@@ -1056,6 +1052,9 @@ function UpdateProfilePanels() {
 	var summary_title = $("#ProfileSummaryTitle");
 	var summary_level = $("#ProfileSummaryLevel");
 	var summary_donator = $("#ProfileSummaryWinrate");
+	var summary_xp_wrap = $("#ProfileSummaryXPWrap");
+	var summary_xp_progress = $("#ProfileSummaryXPProgress");
+	var summary_xp_text = $("#ProfileSummaryXPText");
 
 	if (summary_avatar) {
 		summary_avatar.steamid = local_data.steam_id ? local_data.steam_id : "0";
@@ -1081,6 +1080,29 @@ function UpdateProfilePanels() {
 	if (summary_donator) {
 		summary_donator.text = GetSupporterTierText(local_data);
 		summary_donator.style.color = local_data.donator_color ? local_data.donator_color : "#f1e3c3";
+	}
+
+	if (summary_xp_progress) {
+		summary_xp_progress.value = local_data.has_xp_data ? Clamp01(local_data.xp_current / Math.max(1, local_data.xp_max)) : 0;
+	}
+
+	if (summary_xp_text) {
+		summary_xp_text.text = local_data.has_xp_data ? (FormatIntegerValue(local_data.xp_current) + " / " + FormatIntegerValue(local_data.xp_max)) : "";
+	}
+
+	if (summary_xp_wrap) {
+		summary_xp_wrap.SetHasClass("HasXPData", local_data.has_xp_data === true);
+		(function (panel, data) {
+			panel.SetPanelEvent("onmouseover", function () {
+				if (data.has_xp_data) {
+					$.DispatchEvent("UIShowTextTooltip", panel, "Season Pass XP: " + FormatIntegerValue(data.xp_current) + " / " + FormatIntegerValue(data.xp_max));
+				}
+			});
+
+			panel.SetPanelEvent("onmouseout", function () {
+				$.DispatchEvent("UIHideTextTooltip", panel);
+			});
+		})(summary_xp_wrap, local_data);
 	}
 
 	var modal_name = selected_data.player_name;
@@ -2286,6 +2308,116 @@ function UpdatePlayerLoadingSidebar() {
 	}
 }
 
+function GetBottomModCells() {
+	var track = $("#BottomModsTrack");
+	if (!track || typeof track.GetChildCount !== "function") {
+		return [];
+	}
+
+	var cells = [];
+	var child_count = track.GetChildCount();
+
+	for (var i = 0; i < child_count; i++) {
+		var child = track.GetChild(i);
+		if (child && child.BHasClass && child.BHasClass("mod-cell")) {
+			cells.push(child);
+		}
+	}
+
+	return cells;
+}
+
+function GetBottomModsVisibleCount() {
+	var root = $.GetContextPanel();
+
+	if (root && root.BHasClass && root.BHasClass("AspectRatio4x3")) {
+		return 2;
+	}
+
+	if (root && root.BHasClass && root.BHasClass("AspectRatio21x9")) {
+		return 4;
+	}
+
+	return 3;
+}
+
+function GetBottomModsPageCount(item_count, visible_count) {
+	if (visible_count <= 0) {
+		return 1;
+	}
+
+	return Math.max(1, Math.ceil(item_count / visible_count));
+}
+
+function UpdateBottomModsCarousel() {
+	var cells = GetBottomModCells();
+	var visible_count = GetBottomModsVisibleCount();
+	var page_count = GetBottomModsPageCount(cells.length, visible_count);
+
+	if (bottom_mods_current_page < 0) {
+		bottom_mods_current_page = 0;
+	}
+
+	if (bottom_mods_current_page >= page_count) {
+		bottom_mods_current_page = page_count - 1;
+	}
+
+	var start_index = bottom_mods_current_page * visible_count;
+	var end_index = start_index + visible_count;
+	for (var i = 0; i < cells.length; i++) {
+		var is_visible = i >= start_index && i < end_index;
+		cells[i].SetHasClass("IsHiddenByCarousel", !is_visible);
+		cells[i].style.visibility = is_visible ? "visible" : "collapse";
+	}
+
+	var prev_button = $("#BottomModsPrev");
+	var next_button = $("#BottomModsNext");
+	var can_go_prev = bottom_mods_current_page > 0;
+	var can_go_next = bottom_mods_current_page < page_count - 1;
+	var should_show_arrows = cells.length > visible_count;
+
+	if (prev_button) {
+		prev_button.enabled = should_show_arrows && can_go_prev;
+		prev_button.SetHasClass("IsDisabled", !should_show_arrows || !can_go_prev);
+		prev_button.style.visibility = should_show_arrows ? "visible" : "collapse";
+	}
+
+	if (next_button) {
+		next_button.enabled = should_show_arrows && can_go_next;
+		next_button.SetHasClass("IsDisabled", !should_show_arrows || !can_go_next);
+		next_button.style.visibility = should_show_arrows ? "visible" : "collapse";
+	}
+}
+
+function ShiftBottomMods(direction) {
+	var cells = GetBottomModCells();
+	var visible_count = GetBottomModsVisibleCount();
+	var page_count = GetBottomModsPageCount(cells.length, visible_count);
+	var target_page = bottom_mods_current_page + (direction < 0 ? -1 : 1);
+
+	if (target_page < 0) {
+		target_page = 0;
+	}
+
+	if (target_page >= page_count) {
+		target_page = page_count - 1;
+	}
+
+	if (target_page == bottom_mods_current_page) {
+		return;
+	}
+
+	bottom_mods_current_page = target_page;
+	UpdateBottomModsCarousel();
+	ResetBottomTabAutoTimer();
+}
+
+function InitializeBottomModsCarousel() {
+	bottom_mods_current_page = 0;
+	UpdateBottomModsCarousel();
+	$.Schedule(0.1, UpdateBottomModsCarousel);
+}
+
 function GetBottomTabPanels() {
 	var container = $.GetContextPanel().FindChildrenWithClassTraverse("bottom-footer-container");
 
@@ -2416,6 +2548,12 @@ function ResetBottomTabAutoTimer() {
 	UpdateBottomTabCountdownLabel(bottom_tab_countdown_remaining, false, false);
 }
 
+function ResetBottomTabAutoTimerForFooterHover() {
+	bottom_tab_countdown_remaining = bottom_tab_auto_interval;
+	bottom_tab_last_tick_time = GetCurrentTime();
+	UpdateBottomTabCountdownLabel(bottom_tab_countdown_remaining, true, false);
+}
+
 function InitializeBottomFooterMouseTracking() {
 	var footer_panel = $("#BottomFooterRoot");
 	if (!footer_panel) {
@@ -2424,22 +2562,21 @@ function InitializeBottomFooterMouseTracking() {
 
 	footer_panel.SetPanelEvent("onmouseover", function () {
 		bottom_tab_mouse_over_footer = true;
+		bottom_tab_last_mouse_move_time = GetCurrentTime();
+		ResetBottomTabAutoTimerForFooterHover();
 	});
 
 	footer_panel.SetPanelEvent("onmouseout", function () {
 		bottom_tab_mouse_over_footer = false;
 		bottom_tab_last_mouse_move_time = -1;
+		ResetBottomTabAutoTimer();
 	});
 
 	footer_panel.SetPanelEvent("onmousemove", function () {
 		var now = GetCurrentTime();
-		var first_move_after_idle = bottom_tab_last_mouse_move_time < 0 || (now - bottom_tab_last_mouse_move_time) > bottom_tab_mouse_move_pause_window;
 		bottom_tab_mouse_over_footer = true;
 		bottom_tab_last_mouse_move_time = now;
-		bottom_tab_countdown_remaining = bottom_tab_auto_interval;
-		UpdateBottomTabCountdownLabel(bottom_tab_countdown_remaining, true, false);
-		if (first_move_after_idle) {
-		}
+		ResetBottomTabAutoTimerForFooterHover();
 	});
 }
 
@@ -2464,9 +2601,7 @@ function AutoRotateBottomTabs() {
 		return;
 	}
 
-	var mouse_moving_now = bottom_tab_mouse_over_footer &&
-		bottom_tab_last_mouse_move_time >= 0 &&
-		(now - bottom_tab_last_mouse_move_time) <= bottom_tab_mouse_move_pause_window;
+	var mouse_moving_now = bottom_tab_mouse_over_footer;
 
 	if (mouse_moving_now) {
 		bottom_tab_countdown_remaining = bottom_tab_auto_interval;
@@ -2669,11 +2804,6 @@ function fetch() {
 
 	RequestProfilePositionForSelected();
 
-	if (Game.GetMapInfo().map_display_name == "imba_1v1")
-		DisableVoting();
-	else if (Game.GetMapInfo().map_display_name == "imbathrow_3v3v3v3")
-		DisableRankingVoting();
-
 	var game_version = game_options.value;
 
 	if (isInt(game_version))
@@ -2714,23 +2844,19 @@ function fetch() {
 };
 
 function HideVoteCategory(vote_type) {
-	const parent = $("#vote_" + vote_type);
-	const vote_content = $("#VoteContent");
-
-	if (parent) {
-		parent.visible = false;
-	}
-
-	if (!vote_content) {
+	if (active_vote_sequence.length <= 0) {
 		ToggleVoteContainer(false);
 		return;
 	}
 
-	const vote_children = vote_content.Children();
-	for (var i = 0; i < vote_children.length; i++) {
-		if (vote_children[i].visible == true) {
-			return;
-		}
+	var current_category = active_vote_sequence[active_vote_index];
+	if (vote_type == current_category) {
+		active_vote_index = active_vote_index + 1;
+	}
+
+	if (active_vote_index < active_vote_sequence.length) {
+		ShowCurrentVoteCategory();
+		return;
 	}
 
 	ToggleVoteContainer(false);
@@ -2748,6 +2874,225 @@ function ShowAllVoteCategories() {
 		vote_children[i].visible = true;
 	}
 
+}
+
+function SetVoteContentTitle(vote_type) {
+	const vote_title = $.GetContextPanel().FindChildrenWithClassTraverse("vote-content-title");
+
+	if (vote_title && vote_title[0]) {
+		vote_title[0].text = LocalizeWithFallback("#vote_" + vote_type);
+	}
+}
+
+function SetVoteCategoryVisible(vote_type, visible) {
+	const parent = $("#vote_" + vote_type);
+
+	if (parent) {
+		parent.visible = visible;
+	}
+
+	const vote_label_container = $("#vote-label-container");
+	if (!vote_label_container) {
+		return;
+	}
+
+	const labels = vote_label_container.FindChildrenWithClassTraverse("label_" + vote_type + "_reset") || [];
+	for (var i = 0; i < labels.length; i++) {
+		labels[i].visible = visible;
+	}
+}
+
+function ShowOnlyVoteCategory(vote_type) {
+	const vote_content = $("#VoteContent");
+
+	if (!vote_content) {
+		return;
+	}
+
+	const vote_children = vote_content.Children();
+	for (var i = 0; i < vote_children.length; i++) {
+		var child = vote_children[i];
+		child.visible = child.id == ("vote_" + vote_type);
+	}
+
+	for (var j = 0; j < active_vote_sequence.length; j++) {
+		SetVoteCategoryVisible(active_vote_sequence[j], active_vote_sequence[j] == vote_type);
+	}
+
+	SetVoteContentTitle(vote_type);
+}
+
+function ShowCurrentVoteCategory() {
+	if (active_vote_index < 0 || active_vote_index >= active_vote_sequence.length) {
+		ToggleVoteContainer(false);
+		return;
+	}
+
+	ShowOnlyVoteCategory(active_vote_sequence[active_vote_index]);
+}
+
+function SetVoteSummaryValue(panel_id, category, vote_index) {
+	var panel = $("#" + panel_id);
+
+	if (!panel) {
+		return;
+	}
+
+	var has_selection = vote_index !== undefined && vote_index !== null && !isNaN(parseInt(vote_index));
+	if (!has_selection) {
+		panel.text = L("loading_screen_not_selected");
+		panel.SetHasClass("HasSelection", false);
+		panel.SetHasClass("IsConfirmed", false);
+		return;
+	}
+
+	var parsed_vote = parseInt(vote_index);
+	var vote_weight = GetLocalVoteWeight(category, parsed_vote);
+	var vote_weight_text = vote_weight > 0 ? " +" + vote_weight : "";
+	panel.text = LocalizeWithFallback("#vote_" + category + "_" + parsed_vote) + vote_weight_text;
+	panel.SetHasClass("HasSelection", true);
+	panel.SetHasClass("IsConfirmed", local_vote_confirmed[category] === true);
+}
+
+function UpdateVoteSelectionSummary() {
+	SetVoteSummaryValue("VoteSelectionGamemode", "gamemode", local_votes["gamemode"]);
+	SetVoteSummaryValue("VoteSelectionDifficulty", "difficulty", local_votes["difficulty"]);
+}
+
+function GetVoteCategoryCount(category) {
+	if (game_options && game_options.game_type && vote_array[game_options.game_type] && vote_array[game_options.game_type][category]) {
+		return vote_array[game_options.game_type][category];
+	}
+
+	return 0;
+}
+
+function FormatVoteCountText(count) {
+	var vote_word = count > 1 ? L("loading_screen_vote_word_plural") : L("loading_screen_vote_word_single");
+	return count + " " + vote_word;
+}
+
+function GetVoteProgressModel(category) {
+	var vote_count = GetVoteCategoryCount(category);
+	var vote_counter = GetVoteCounterFromTable(vote_payload_cache[category] || {});
+	var leader_index = 0;
+	var leader_count = 0;
+	var total_votes = 0;
+	var details = [];
+	var options = [];
+
+	for (var i = 1; i <= vote_count; i++) {
+		var count = vote_counter[i] ? vote_counter[i] : 0;
+		var option_name = LocalizeWithFallback("#vote_" + category + "_" + i);
+		total_votes += count;
+		details.push(option_name + ": " + count);
+
+		if (count > leader_count) {
+			leader_count = count;
+			leader_index = i;
+		}
+	}
+
+	var leader_text = L("loading_screen_no_votes");
+	if (total_votes > 0 && leader_index > 0) {
+		leader_text = LocalizeWithFallback("#vote_" + category + "_" + leader_index) + " (" + FormatVoteCountText(leader_count) + ")";
+	}
+
+	for (var j = 1; j <= vote_count; j++) {
+		var option_count = vote_counter[j] ? vote_counter[j] : 0;
+		options.push({
+			index: j,
+			name: LocalizeWithFallback("#vote_" + category + "_" + j),
+			count: option_count,
+			percent: total_votes > 0 ? (option_count / total_votes) * 100 : 0,
+			is_leader: total_votes > 0 && j == leader_index
+		});
+	}
+
+	return {
+		leader: leader_text,
+		detail: details.join(" / "),
+		total: total_votes,
+		options: options
+	};
+}
+
+function UpdateVoteProgressTab(category, root_id, rows_id) {
+	var root = $("#" + root_id);
+	if (!root) {
+		return;
+	}
+
+	var vote_count = GetVoteCategoryCount(category);
+	root.visible = vote_count > 0;
+
+	if (vote_count <= 0) {
+		return;
+	}
+
+	var model = GetVoteProgressModel(category);
+	var rows = $("#" + rows_id);
+
+	if (rows) {
+		rows.RemoveAndDeleteChildren();
+		for (var i = 0; i < model.options.length; i++) {
+			var option = model.options[i];
+			var row = $.CreatePanel("Panel", rows, rows_id + "_" + option.index);
+			row.AddClass("vote-progress-option-row");
+			row.SetHasClass("IsWinning", option.is_leader);
+			row.SetHasClass("IsSelected", parseInt(local_votes[category]) == option.index);
+			row.SetHasClass("IsConfirmed", parseInt(local_votes[category]) == option.index && local_vote_confirmed[category] === true);
+
+			var top_line = $.CreatePanel("Panel", row, "");
+			top_line.AddClass("vote-progress-option-topline");
+
+			var name = $.CreatePanel("Label", top_line, "");
+			name.AddClass("vote-progress-option-name");
+			name.text = option.name;
+
+			var count = $.CreatePanel("Label", top_line, "");
+			count.AddClass("vote-progress-option-count");
+			count.text = FormatVoteCountText(option.count);
+
+			var bar = $.CreatePanel("ProgressBar", row, rows_id + "_" + option.index + "_Progress");
+			bar.AddClass("vote-progress-option-bar");
+			bar.value = Math.max(0, Math.min(1, option.percent / 100));
+
+			(function (panel, vote_type, index) {
+				panel.SetPanelEvent("onmouseover", function () {
+					$.DispatchEvent("UIShowTextTooltip", panel, LocalizeWithFallback("#vote_" + vote_type + "_" + index + "_description"));
+				});
+
+				panel.SetPanelEvent("onmouseout", function () {
+					$.DispatchEvent("UIHideTextTooltip", panel);
+				});
+			})(row, category, option.index);
+		}
+	}
+
+	root.SetHasClass("IsActive", active_vote_sequence[active_vote_index] == category);
+}
+
+function UpdateVoteProgressTabs() {
+	UpdateVoteProgressTab("gamemode", "VoteProgressGamemode", "VoteProgressGamemodeRows");
+	UpdateVoteProgressTab("difficulty", "VoteProgressDifficulty", "VoteProgressDifficultyRows");
+}
+
+function ShowVoteProgressCategory(category) {
+	if (GetVoteCategoryCount(category) <= 0) {
+		return;
+	}
+
+	for (var i = 0; i < active_vote_sequence.length; i++) {
+		SetVoteCategoryVisible(active_vote_sequence[i], active_vote_sequence[i] == category);
+	}
+
+	var category_index = active_vote_sequence.indexOf(category);
+	if (category_index >= 0) {
+		active_vote_index = category_index;
+	}
+
+	UpdateVoteProgressTabs();
 }
 
 function AllPlayersLoaded() {
@@ -2778,6 +3123,8 @@ function AllPlayersLoaded() {
 	// $.Msg(vote_array["XHS"]);
 	const vote_config = vote_array[game_options.game_type] || {};
 	const vote_categories = Object.keys(vote_config);
+	active_vote_sequence = vote_categories.slice(0);
+	active_vote_index = 0;
 	const vote_title = $.GetContextPanel().FindChildrenWithClassTraverse("vote-content-title");
 	const vote_dialog = $.GetContextPanel().FindChildrenWithClassTraverse("vote-content");
 
@@ -2790,7 +3137,7 @@ function AllPlayersLoaded() {
 	}
 
 	if (vote_dialog && vote_dialog[0]) {
-		vote_dialog[0].SetHasClass("SingleVoteCategory", vote_categories.length == 1);
+		vote_dialog[0].SetHasClass("SingleVoteCategory", vote_categories.length > 0);
 	}
 
 
@@ -2802,12 +3149,6 @@ function AllPlayersLoaded() {
 		panel.AddClass("vote-category-row");
 		// panel.AddClass("VotePanel");
 		var row_is_compact = true;
-
-		// mid-left ui
-		var gamemode_label = $.CreatePanel("Label", $("#vote-label-container"), "");
-		gamemode_label.AddClass("vote-label");
-		// gamemode_label.style.height = (100 / vote_count) + "%";
-		gamemode_label.text = LocalizeWithFallback("#vote_" + vote_type);
 
 		for (var i = 1; i <= vote_count; i++) {
 			var vote_button = $.CreatePanel("Panel", panel, "VoteGameMode" + i);
@@ -2821,35 +3162,31 @@ function AllPlayersLoaded() {
 				card_width = 248;
 			} else if (vote_count == 3) {
 				card_width = 280;
+			} else if (vote_count == 2) {
+				card_width = 340;
 			}
 
 			vote_button.style.width = card_width + "px";
 
-			// mid-left ui
-			var gamemode_label = $.CreatePanel("Label", $("#vote-label-container"), "leftui_vote_" + vote_type + "_" + i);
-			gamemode_label.AddClass("vote-label");
-			gamemode_label.AddClass("label_" + vote_type + "_reset");
-			// gamemode_label.style.height = (100 / vote_count) + "%";
-			gamemode_label.text = LocalizeWithFallback("#vote_" + vote_type + "_" + i) + " (0 " + L("loading_screen_vote_word_single") + ")";
-
-			(function (panel, vote_type, i) {
-				panel.SetPanelEvent("onmouseover", function () {
-					$.DispatchEvent("UIShowTextTooltip", panel, LocalizeWithFallback("#vote_" + vote_type + "_" + i + "_description"));
-				})
-
-				panel.SetPanelEvent("onmouseout", function () {
-					$.DispatchEvent("UIHideTextTooltip", panel);
-				})
-			})(gamemode_label, vote_type, i);
-
 			var option_title = LocalizeWithFallback("#vote_" + vote_type + "_" + i);
 			var option_description = LocalizeWithFallback("#vote_" + vote_type + "_" + i + "_description");
+			if (vote_type == "gamemode" && i == 2) {
+				option_description = [
+					"Reborn is the active Dota 2 ruleset:",
+					"- Reworked progression for the 4.0 direction",
+					"- Supporter pass XP and weighted votes",
+					"- Modern events, quests and special arenas",
+					"- Updated heroes, items and UI flow",
+					"- Future X Hero Siege content lands here first"
+				].join("\n");
+			}
 			var is_compact_description = option_description.length <= 120;
 
 			vote_button.GetChild(0).text = option_title;
 			vote_button.GetChild(1).text = option_description;
 
 			vote_button.SetHasClass("VotePanelCompact", is_compact_description);
+			vote_button.SetHasClass("VotePanelDetailed", vote_type == "gamemode" && i == 2);
 
 			if (!is_compact_description) {
 				row_is_compact = false;
@@ -2870,9 +3207,12 @@ function AllPlayersLoaded() {
 		}
 
 		panel.SetHasClass("VoteRowCompact", row_is_compact);
-		ApplyVoteCountsToLabels(vote_type, vote_payload_cache[vote_type] || {});
+		panel.SetHasClass("VoteRowDetailed", vote_type == "gamemode");
 		RefreshLocalVoteCategoryUI(vote_type);
 	}
+
+	UpdateVoteSelectionSummary();
+	UpdateVoteProgressTabs();
 
 	const has_vote_options = vote_categories.length > 0;
 
@@ -2882,6 +3222,9 @@ function AllPlayersLoaded() {
 	}
 
 	ToggleVoteContainer(has_vote_options);
+	if (has_vote_options) {
+		ShowCurrentVoteCategory();
+	}
 
 	//	$("#VoteGameMode1").checked = true;
 	//	OnVoteButtonPressed("gamemode", 1);
@@ -2897,13 +3240,17 @@ function ToggleVoteContainer(bBoolean) {
 
 	if (vote_container && vote_container[0]) {
 		var panel = vote_container[0];
+		if (bBoolean && active_vote_sequence.length > 0 && active_vote_index >= active_vote_sequence.length) {
+			active_vote_index = 0;
+		}
+
 		panel.SetHasClass("Visible", bBoolean);
 		panel.style.visibility = bBoolean ? "visible" : "collapse";
 		panel.hittest = bBoolean;
 		panel.hittestchildren = bBoolean;
 
 		if (bBoolean) {
-			ShowAllVoteCategories();
+			ShowCurrentVoteCategory();
 		}
 
 	} else {
@@ -2931,6 +3278,8 @@ function RefreshLocalVoteCategoryUI(category) {
 		labels[i].SetHasClass("VoteConfirmedOption", is_selected && vote_confirmed);
 	}
 
+	UpdateVoteSelectionSummary();
+	UpdateVoteProgressTabs();
 }
 
 function GetVoteChoiceFromEntry(vote_entry) {
@@ -2952,6 +3301,99 @@ function GetVoteChoiceFromEntry(vote_entry) {
 
 	var parsed = parseInt(vote_entry);
 	return isNaN(parsed) ? -1 : parsed;
+}
+
+function GetVoteWeightFromEntry(vote_entry) {
+	if (vote_entry === undefined || vote_entry === null) {
+		return 0;
+	}
+
+	if (vote_entry[2] !== undefined) {
+		var table_weight = parseInt(vote_entry[2]);
+		return isNaN(table_weight) || table_weight <= 0 ? 1 : table_weight;
+	}
+
+	if (vote_entry.weight !== undefined) {
+		var named_weight = parseInt(vote_entry.weight);
+		return isNaN(named_weight) || named_weight <= 0 ? 1 : named_weight;
+	}
+
+	if (vote_entry.votes !== undefined) {
+		var named_votes = parseInt(vote_entry.votes);
+		return isNaN(named_votes) || named_votes <= 0 ? 1 : named_votes;
+	}
+
+	return 0;
+}
+
+function GetVoteWeightForDonatorStatus(status) {
+	var parsed_status = parseInt(status);
+
+	if (parsed_status == 1 || parsed_status == 2) {
+		return 5;
+	}
+
+	if (parsed_status == 7) {
+		return 2;
+	}
+
+	if (parsed_status == 8 || parsed_status == 9) {
+		return 3;
+	}
+
+	return 1;
+}
+
+function GetLocalVoteWeightFallback() {
+	var local_player_id = GetLocalPlayerIDSafe();
+	if (local_player_id < 0 || typeof CustomNetTables === "undefined" || !CustomNetTables) {
+		return 1;
+	}
+
+	var player_info = Game.GetPlayerInfo(local_player_id);
+	if (!player_info || !player_info.player_steamid) {
+		return 1;
+	}
+
+	var donators = CustomNetTables.GetTableValue("game_options", "donators");
+	if (!donators) {
+		return 1;
+	}
+
+	var local_steamid = player_info.player_steamid.toString();
+	for (var key in donators) {
+		var row = donators[key];
+		var steamid = key;
+		var status = row;
+
+		if (row && typeof row === "object") {
+			steamid = row.steamid !== undefined ? row.steamid : key;
+			status = row.status !== undefined ? row.status : row.donator_status;
+		}
+
+		if (steamid !== undefined && steamid !== null && steamid.toString() == local_steamid) {
+			return GetVoteWeightForDonatorStatus(status);
+		}
+	}
+
+	return 1;
+}
+
+function GetLocalVoteWeight(category, vote_index) {
+	var local_player_id = GetLocalPlayerIDSafe();
+	var local_entry = FindPlayerVoteEntry(vote_payload_cache[category] || {}, local_player_id);
+	var server_vote = GetVoteChoiceFromEntry(local_entry);
+
+	if (server_vote == vote_index) {
+		var server_weight = GetVoteWeightFromEntry(local_entry);
+		return server_weight > 0 ? server_weight : 1;
+	}
+
+	if (parseInt(local_votes[category]) == vote_index) {
+		return GetLocalVoteWeightFallback();
+	}
+
+	return 0;
 }
 
 function FindPlayerVoteEntry(vote_table, player_id) {
@@ -3027,6 +3469,7 @@ function OnVoteButtonPressed(category, vote) {
 	local_votes[category] = vote;
 	local_vote_confirmed[category] = false;
 	RefreshLocalVoteCategoryUI(category);
+	UpdateVoteSelectionSummary();
 	if (typeof GameEvents !== "undefined" && GameEvents && typeof GameEvents.SendCustomGameEventToServer === "function") {
 		GameEvents.SendCustomGameEventToServer("setting_vote", { "category": category, "vote": vote, "PlayerID": Game.GetLocalPlayerID() });
 	} else {
@@ -3116,6 +3559,8 @@ function OnVotesReceived(data) {
 	// calculate number of people who voted
 	UpdateLocalVoteConfirmation(category, vote_table);
 	RefreshLocalVoteCategoryUI(category);
+	UpdateVoteSelectionSummary();
+	UpdateVoteProgressTabs();
 }
 
 function DisableVoting() {
@@ -3154,6 +3599,7 @@ function DisableRankingVoting() {
 		})
 	}
 
+	InitializeBottomModsCarousel();
 	InitializeBottomTabs();
 	InitializeBottomFooterMouseTracking();
 	UpdateLoadingQaPanelState();

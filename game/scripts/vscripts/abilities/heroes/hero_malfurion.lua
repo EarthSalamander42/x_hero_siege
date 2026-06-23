@@ -310,7 +310,7 @@ function modifier_imba_malfurion_living_tower:OnAttackStart(keys)
 
 	if keys.attacker == self:GetParent() then
 		self:GetParent():EmitSound("Tree.GrowBack")
-		self:GetParent():StartGestureWithPlaybackRate(ACT_DOTA_CUSTOM_TOWER_ATTACK, self:GetParent():GetAttacksPerSecond())
+		self:GetParent():StartGestureWithPlaybackRate(ACT_DOTA_CUSTOM_TOWER_ATTACK, self:GetParent():GetAttacksPerSecond(false))
 	end
 end
 

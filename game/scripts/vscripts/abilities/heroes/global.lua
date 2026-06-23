@@ -95,7 +95,7 @@ function CastleMuradin(event)
 
 		print("Castle will be invulnerable for " .. tostring(InvTime + PauseTime) .. " seconds.")
 		caster:AddNewModifier(caster, nil, "modifier_invulnerable", { duration = InvTime + PauseTime })
-		Notifications:TopToAll({ text = "Muradin is requested to defend your castle!", duration = PauseTime, continue = true })
+		Notifications:TopToAll({ text = "Muradin is requested to defend your castle!", duration = PauseTime })
 
 		Timers:CreateTimer(InvTime + PauseTime, function()
 			UTIL_Remove(Muradin)

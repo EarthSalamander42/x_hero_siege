@@ -216,7 +216,6 @@
 	"loading_screen_patreon_description"           "Apora a estudios Frostrose en Patreon y obtén recompensas en el juego! Amplificador de XP en pases de batalla, mascotas siguiéndote en el campo de batalla, y mucho más!"
 	"loading_screen_patreon_description_bottom"    "Las donaciones ayudan al desarrollo de los siguientes mods:"
 	"loading_screen_patreon_modlist1"              "Frostrose Battlefield (inéditos)"
-	"loading_screen_patreon_modlist2"              "Dota IMBA"
 	"loading_screen_patreon_modlist3"              "X Hero Siege"
 	"loading_screen_patreon_modlist4"              "Pudge Wars"
 	"loading_screen_patreon_modlist5"              "Hero Line Wars"

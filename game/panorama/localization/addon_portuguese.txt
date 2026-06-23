@@ -216,7 +216,6 @@
 	"loading_screen_patreon_description"           "Ajude o Frostrose Studio no Patreon e ganhe recompensas no jogo! Passe de batalha, boosters de XP, companheiro te seguindo no campo de batalha e mais!"
 	"loading_screen_patreon_description_bottom"    "Doações ajudam no desenvolvimento dos seguintes mods:"
 	"loading_screen_patreon_modlist1"              "Frostrose Battlefield (não lançado)"
-	"loading_screen_patreon_modlist2"              "Dota IMBA"
 	"loading_screen_patreon_modlist3"              "X Hero Siege"
 	"loading_screen_patreon_modlist4"              "Pudge Wars"
 	"loading_screen_patreon_modlist5"              "Hero Line Wars"

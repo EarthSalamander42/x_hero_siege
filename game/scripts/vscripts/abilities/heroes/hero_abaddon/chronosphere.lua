@@ -143,7 +143,7 @@ function modifier_creature_chronosphere_handler:OnIntervalThink()
 			-- Make certain people are stunned
 			self.parent:AddNewModifier(self.caster, self:GetAbility(), "modifier_stunned", { duration = FrameTime() })
 
-			-- Non-IMBA handling
+			-- Alternate handling
 			self.parent:InterruptMotionControllers(true)
 		end
 	end

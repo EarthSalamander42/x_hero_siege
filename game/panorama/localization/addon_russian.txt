@@ -216,7 +216,6 @@
 	"loading_screen_patreon_description"           "Поддержите студию Frostrose на Патреоне и получите внутриигровые награды! Множитель опыта Боевого пропуска, компаньона следующего за вами по полю боя и многое другое!"
 	"loading_screen_patreon_description_bottom"    "Пожертвования помогают в разработке следующих модов:"
 	"loading_screen_patreon_modlist1"              "Frostrose Battlefield (в разработке)"
-	"loading_screen_patreon_modlist2"              "Dota IMBA"
 	"loading_screen_patreon_modlist3"              "X Hero Siege"
 	"loading_screen_patreon_modlist4"              "Pudge Wars"
 	"loading_screen_patreon_modlist5"              "Hero Line Wars"

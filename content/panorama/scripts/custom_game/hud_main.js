@@ -227,6 +227,263 @@ function CreateErrorMessage(msg){
 
 GameUI.CreateErrorMessage = CreateErrorMessage;
 
+var XHS_TOME_COST = 10000;
+var g_nXHSBuyTomeCount = 0;
+var g_nXHSBuyTomeHeroEntIndex = -1;
+var g_nXHSBuyTomePositionRetries = 0;
+
+function GetXHSDotaHudRoot()
+{
+	var panel = $.GetContextPanel();
+	while ( panel && panel.id !== "Hud" )
+	{
+		panel = panel.GetParent();
+	}
+	return panel;
+}
+
+function FindXHSDotaHudElement( id )
+{
+	var hud = GetXHSDotaHudRoot();
+	return hud ? hud.FindChildTraverse( id ) : null;
+}
+
+function GetXHSBuyTomeButton()
+{
+	var config = GameUI.CustomUIConfig ? GameUI.CustomUIConfig() : null;
+	return ( config && config.XHSBuyTomeButton ) || FindXHSDotaHudElement( "XHSBuyTomeButton" ) || $( "#XHSBuyTomeButton" ) || FindXHSDotaHudElement( "XHSBuyTomeButtonDefault" );
+}
+
+function CreateXHSBuyTomeButton( parent )
+{
+	var config = GameUI.CustomUIConfig ? GameUI.CustomUIConfig() : null;
+	if ( config && config.CreateXHSBuyTomeButton )
+	{
+		return config.CreateXHSBuyTomeButton( parent );
+	}
+
+	return GetXHSBuyTomeButton();
+}
+
+function GetXHSActiveCenterBlock()
+{
+	var hud = GetXHSDotaHudRoot();
+	if ( !hud )
+	{
+		return null;
+	}
+
+	var hudElements = hud.FindChildTraverse( "HUDElements" );
+	var lowerHud = hudElements ? hudElements.FindChildTraverse( "lower_hud" ) : null;
+	var centerWithStats = lowerHud ? lowerHud.FindChildTraverse( "center_with_stats" ) : null;
+	return centerWithStats ? centerWithStats.FindChildTraverse( "center_block" ) : null;
+}
+
+function GetXHSLocalHeroInfo()
+{
+	var playerID = Players.GetLocalPlayer();
+	var entIndex = playerID >= 0 ? Players.GetPlayerHeroEntityIndex( playerID ) : -1;
+	var unitName = entIndex > 0 ? Entities.GetUnitName( entIndex ) : "";
+
+	return {
+		entIndex: entIndex,
+		unitName: unitName || ""
+	};
+}
+
+function IsXHSBuyTomeHeroReady()
+{
+	var hero = GetXHSLocalHeroInfo();
+
+	if ( hero.entIndex <= 0 || hero.unitName === "" || hero.unitName === "npc_dota_hero_wisp" )
+	{
+		return false;
+	}
+
+	if ( hero.entIndex !== g_nXHSBuyTomeHeroEntIndex )
+	{
+		g_nXHSBuyTomeHeroEntIndex = hero.entIndex;
+		g_nXHSBuyTomePositionRetries = 0;
+	}
+
+	return true;
+}
+
+function FindXHSBuyTomeInsertionAnchor( centerBlock )
+{
+	if ( !centerBlock )
+	{
+		return null;
+	}
+
+	var abilities = centerBlock.FindChildTraverse( "abilities" );
+	if ( abilities )
+	{
+		if ( abilities.GetParent && abilities.GetParent() === centerBlock )
+		{
+			return abilities;
+		}
+
+		var abilityParent = abilities.GetParent ? abilities.GetParent() : null;
+		if ( abilityParent && abilityParent.GetParent && abilityParent.GetParent() === centerBlock )
+		{
+			return abilityParent;
+		}
+	}
+
+	var ability0 = centerBlock.FindChildTraverse( "Ability0" );
+	var ability0Parent = ability0 && ability0.GetParent ? ability0.GetParent() : null;
+	if ( ability0Parent && ability0Parent.GetParent && ability0Parent.GetParent() === centerBlock )
+	{
+		return ability0Parent;
+	}
+
+	return centerBlock.FindChildTraverse( "AbilitiesAndStatBranch" );
+}
+
+function GetXHSLocalGold()
+{
+	var playerID = Players.GetLocalPlayer();
+
+	if ( typeof PlayerTables !== "undefined" && PlayerTables && PlayerTables.GetTableValue )
+	{
+		var goldTable = PlayerTables.GetTableValue( "gold", "gold" );
+		if ( goldTable && goldTable[playerID] !== undefined )
+		{
+			return Number( goldTable[playerID] ) || 0;
+		}
+	}
+
+	if ( Players.GetGold )
+	{
+		return Players.GetGold( playerID ) || 0;
+	}
+
+	return 0;
+}
+
+function InjectBuyTomeButtonIntoCenterBlock()
+{
+	var button = GetXHSBuyTomeButton();
+	var centerBlock = GetXHSActiveCenterBlock();
+	var anchor = FindXHSBuyTomeInsertionAnchor( centerBlock );
+	if ( !centerBlock || !anchor )
+	{
+		if ( button )
+		{
+			button.style.visibility = "collapse";
+		}
+		return false;
+	}
+
+	if ( !button || ( button.GetParent && button.GetParent() !== centerBlock && !button.SetParent ) )
+	{
+		button = CreateXHSBuyTomeButton( centerBlock );
+	}
+
+	if ( !button )
+	{
+		return false;
+	}
+
+	if ( !IsXHSBuyTomeHeroReady() )
+	{
+		button.style.visibility = "collapse";
+		return false;
+	}
+
+	var rootButton = $( "#XHSBuyTomeButton" );
+	if ( rootButton && rootButton !== button && rootButton.GetParent && rootButton.GetParent() !== centerBlock )
+	{
+		rootButton.style.visibility = "collapse";
+	}
+
+	if ( button.SetParent )
+	{
+		button.SetParent( centerBlock );
+	}
+
+	if ( centerBlock.MoveChildAfter )
+	{
+		centerBlock.MoveChildAfter( button, anchor );
+	}
+
+	button.AddClass( "XHSInjectedIntoCenterBlock" );
+	button.style.x = "0px";
+	button.style.y = "0px";
+	button.style.visibility = "visible";
+	return true;
+}
+
+function UpdateBuyTomeButton()
+{
+	var button = GetXHSBuyTomeButton();
+	if ( !button )
+	{
+		button = CreateXHSBuyTomeButton( GetXHSActiveCenterBlock() );
+	}
+
+	var countLabel = button ? ( button.FindChildTraverse( "XHSBuyTomeCount" ) || button.FindChildTraverse( "XHSBuyTomeCountDefault" ) ) : null;
+	if ( !button || !countLabel )
+	{
+		$.Schedule( 0.25, UpdateBuyTomeButton );
+		return;
+	}
+
+	var playerID = Players.GetLocalPlayer();
+	if ( playerID < 0 || Players.IsSpectator( playerID ) )
+	{
+		button.style.visibility = "collapse";
+		$.Schedule( 0.5, UpdateBuyTomeButton );
+		return;
+	}
+
+	if ( !IsXHSBuyTomeHeroReady() )
+	{
+		button.style.visibility = "collapse";
+		$.Schedule( 0.25, UpdateBuyTomeButton );
+		return;
+	}
+
+	var gold = GetXHSLocalGold();
+	g_nXHSBuyTomeCount = Math.max( 0, Math.floor( gold / XHS_TOME_COST ) );
+	countLabel.text = "x" + g_nXHSBuyTomeCount;
+	button.SetHasClass( "NoTomes", g_nXHSBuyTomeCount < 1 );
+
+	if ( !InjectBuyTomeButtonIntoCenterBlock() )
+	{
+		g_nXHSBuyTomePositionRetries++;
+		$.Schedule( g_nXHSBuyTomePositionRetries < 10 ? 0.1 : 0.25, UpdateBuyTomeButton );
+		return;
+	}
+
+	g_nXHSBuyTomePositionRetries = 0;
+	$.Schedule( 0.25, UpdateBuyTomeButton );
+}
+
+function OnBuyTomeButtonPressed()
+{
+	GameEvents.SendCustomGameEventToServer( "xhs_buy_tomes", {} );
+}
+
+function ShowBuyTomeTooltip()
+{
+	var button = GetXHSBuyTomeButton();
+	if ( button )
+	{
+		$.DispatchEvent( "DOTAShowAbilityTooltip", button, "item_tome_small" );
+	}
+}
+
+function HideBuyTomeTooltip()
+{
+	var button = GetXHSBuyTomeButton();
+	if ( button )
+	{
+		$.DispatchEvent( "DOTAHideAbilityTooltip", button );
+	}
+}
+
 // Ancient position: 0, -3500, 0
 
 /*
@@ -262,4 +519,11 @@ function SetPlayersCameraPosition(keys) {
 	GameEvents.Subscribe("hide_ui", HideUI);
 	GameEvents.Subscribe("dotacraft_error_message", CreateErrorMessage)
 	GameEvents.Subscribe("set_player_camera", SetPlayersCameraPosition)
+	var tomeButton = GetXHSBuyTomeButton();
+	if ( tomeButton )
+	{
+		tomeButton.SetPanelEvent( "onmouseover", ShowBuyTomeTooltip );
+		tomeButton.SetPanelEvent( "onmouseout", HideBuyTomeTooltip );
+	}
+	UpdateBuyTomeButton();
 })()

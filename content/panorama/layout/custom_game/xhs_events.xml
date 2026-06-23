@@ -26,21 +26,33 @@
 					<Button id="Event1" class="XHSEventCard XHSEventCardHero" onactivate="HeroImage();">
 						<Panel class="XHSEventAccent" />
 						<Panel class="XHSEventIcon XHSEventIconHero" />
+						<DOTAItemImage class="XHSEventRewardIcon XHSEventRewardBadge" itemname="item_tome_big" />
 						<Panel class="XHSEventBody">
 							<Label class="XHSEventTitle" text="#tooltip_event_hero_image" />
+							<Panel class="XHSEventRewardLine">
+								<Label class="XHSEventRewardText" text="#xhs_event_reward_hero_image" />
+							</Panel>
 							<Label class="XHSEventDescription" text="Face a stronger mirror boss in a short burst encounter." />
 						</Panel>
-						<Label class="XHSEventReward" text="x4 Stats" />
+						<Panel class="XHSEventLockOverlay">
+							<Label id="Event1LockLabel" text="Already completed" />
+						</Panel>
 					</Button>
 
 					<Button id="Event4" class="XHSEventCard XHSEventCardImages" onactivate="AllHeroImages();">
 						<Panel class="XHSEventAccent" />
 						<Panel class="XHSEventIcon XHSEventIconImages" />
+						<DOTAItemImage class="XHSEventRewardIcon XHSEventRewardBadge" itemname="item_necklace_of_spell_immunity" />
 						<Panel class="XHSEventBody">
 							<Label class="XHSEventTitle" text="#tooltip_event_all_hero_images" />
+							<Panel class="XHSEventRewardLine">
+								<Label class="XHSEventRewardText" text="#xhs_event_reward_all_hero_images" />
+							</Panel>
 							<Label class="XHSEventDescription" text="Every hero gets a mirror fight. Coordinate or get overwhelmed." />
 						</Panel>
-						<Label class="XHSEventReward" text="x2 Stats" />
+						<Panel class="XHSEventLockOverlay">
+							<Label id="Event4LockLabel" text="Already completed" />
+						</Panel>
 					</Button>
 				</Panel>
 
@@ -48,21 +60,27 @@
 					<Button id="Event2" class="XHSEventCard XHSEventCardBeast" onactivate="SpiritBeast();">
 						<Panel class="XHSEventAccent" />
 						<Panel class="XHSEventIcon XHSEventIconBeast" />
+						<DOTAItemImage class="XHSEventRewardIcon XHSEventRewardBadge" itemname="item_shield_of_invincibility" />
 						<Panel class="XHSEventBody">
 							<Label class="XHSEventTitle" text="#tooltip_event_spirit_beast" />
+							<Panel class="XHSEventRewardLine">
+								<Label class="XHSEventRewardText" text="#xhs_event_reward_spirit_beast" />
+							</Panel>
 							<Label class="XHSEventDescription" text="Hunt the guardian beast for a defensive relic reward." />
 						</Panel>
-						<Label class="XHSEventReward" text="Shield Relic" />
 					</Button>
 
 					<Button id="Event3" class="XHSEventCard XHSEventCardInfernal" onactivate="FrostInfernal();">
 						<Panel class="XHSEventAccent" />
 						<Panel class="XHSEventIcon XHSEventIconInfernal" />
+						<DOTAItemImage class="XHSEventRewardIcon XHSEventRewardBadge" itemname="item_key_of_the_three_moons" />
 						<Panel class="XHSEventBody">
 							<Label class="XHSEventTitle" text="#tooltip_event_frost_infernal" />
+							<Panel class="XHSEventRewardLine">
+								<Label class="XHSEventRewardText" text="#xhs_event_reward_frost_infernal" />
+							</Panel>
 							<Label class="XHSEventDescription" text="Break the frozen infernal before the arena becomes lethal." />
 						</Panel>
-						<Label class="XHSEventReward" text="3 Moons Key" />
 					</Button>
 				</Panel>
 			</Panel>

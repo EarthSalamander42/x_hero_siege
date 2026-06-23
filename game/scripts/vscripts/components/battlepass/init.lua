@@ -1,5 +1,5 @@
--- Copyright (C) 2018  The Dota IMBA Development Team
--- Battlepass System for Dota IMBA
+-- Copyright (C) 2018  Frostrose Studio
+-- Battlepass System
 
 ListenToGameEvent('game_rules_state_change', function(keys)
 	if GameRules:State_Get() == DOTA_GAMERULES_STATE_CUSTOM_GAME_SETUP then
@@ -15,7 +15,7 @@ ListenToGameEvent('game_rules_state_change', function(keys)
 		require('libraries/wearables') -- this lib before items_game
 		require('components/battlepass/keyvalues/items_game')
 
-		if CUSTOM_GAME_TYPE ~= "IMBA" and CUSTOM_GAME_TYPE ~= "PLS" then
+		if CUSTOM_GAME_TYPE ~= "PLS" then
 			require('components/battlepass/' .. CUSTOM_GAME_TYPE .. '_rewards')
 		end
 
@@ -47,13 +47,6 @@ ListenToGameEvent('npc_spawned', function(event)
 
 	if npc.GetPlayerID then
 		donator_level = api:GetDonatorStatus(npc:GetPlayerID())
-	end
-
-	if CUSTOM_GAME_TYPE == "IMBA" and npc.IsCustomHero and npc:IsCustomHero() then
-		CustomGameEventManager:Send_ServerToAllClients("override_hero_image", {
-			player_id = npc:GetPlayerID(),
-			icon_path = npc:GetUnitName(),
-		})
 	end
 
 	local ply_table = CustomNetTables:GetTableValue("supporter_pass_player", tostring(npc:GetPlayerOwnerID()))
@@ -108,19 +101,4 @@ ListenToGameEvent('npc_spawned', function(event)
 			end
 		end
 	end
-end, nil)
-
-ListenToGameEvent('dota_player_gained_level', function(keys)
-	if CUSTOM_GAME_TYPE ~= "IMBA" then return end
-	if not keys.player then return end
-
-	local player = EntIndexToHScript(keys.player)
-	local hero = player:GetAssignedHero()
-	if hero == nil then
-		return
-	end
-	local level = keys.level
-
-	local particleID = ParticleManager:CreateParticle("particles/generic_hero_status/hero_levelup_vanilla.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero, hero)
-	ParticleManager:ReleaseParticleIndex(particleID)
 end, nil)

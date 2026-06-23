@@ -1,6 +1,6 @@
 require("libraries/timers")
 
--- IMBA Shadowraze Function!
+-- Shadowraze helper
 function ShadowrazeCreateRaze(keys, point, radius, particle_raze)
 local caster = keys.caster
 local ability = keys.ability
@@ -56,7 +56,7 @@ local raze_particles = "particles/econ/items/shadow_fiend/sf_fire_arcana/sf_fire
 	end)
 end
 
--- IMBA Octarine Core
+-- Octarine Core handling
 function ConsumingFlame(keys)
 local caster = keys.caster
 local target = keys.unit
@@ -132,13 +132,12 @@ function Stitch(event)
 			unit:AddNewModifier(unit, nil, "modifier_phased", {})
 
 			-- Remove non-passive abilities
-			for i = 0, 15 do
-				local a = unit:GetAbilityByIndex(i)
+			ForEachUnitAbility(unit, function(a)
 				if a and not a:IsPassive() then
 --					UTIL_Remove(a)
 					a:SetActivated(false)
 				end
-			end
+			end)
 
 			-- Leave no corpses
 			unit:SetNoCorpse()

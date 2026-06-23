@@ -94,17 +94,14 @@ function Clone(keys)
 
 	-- Set the skill points to 0 and learn the skills of the caster
 	illusion:SetAbilityPoints(0)
-	for abilitySlot = 0, 15 do
-		local ability = target:GetAbilityByIndex(abilitySlot)
-		if ability ~= nil then
+	ForEachUnitAbility(target, function(ability)
 			local abilityLevel = ability:GetLevel()
 			local abilityName = ability:GetAbilityName()
 			local illusionAbility = illusion:FindAbilityByName(abilityName)
 			if IsValidEntity(illusionAbility) then
 				illusionAbility:SetLevel(abilityLevel)
 			end
-		end
-	end
+	end)
 
 	-- Recreate the items of the caster
 	for itemSlot = 0, 5 do

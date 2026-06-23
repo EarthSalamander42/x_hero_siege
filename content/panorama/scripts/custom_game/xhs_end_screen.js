@@ -2,7 +2,7 @@
 
 var XHSEndScreen = (function () {
 	var WEBSITE_URL = "https://mods.frostrose-studio.com";
-	var DISCORD_URL = "https://discord.gg/frostrose";
+	var DISCORD_URL = "https://discord.frostrose-studio.com/";
 
 	var TEAM_NAMES = {
 		2: "#DOTA_GoodGuys",
@@ -259,6 +259,7 @@ var XHSEndScreen = (function () {
 			damageHeroes: ToNumber(server.damage_done_to_heroes, 0),
 			damageBuildings: ToNumber(server.damage_done_to_buildings, 0),
 			healing: ToNumber(server.healing, 0),
+			potionsUsed: ToNumber(server.potions_used, 0),
 			tomeStatsBonus: ToNumber(server.tome_stats_bonus, 0),
 			tomesSmall: ToNumber(server.tomes_bought_small, 0),
 			tomesBig: ToNumber(server.tomes_bought_big, 0),
@@ -382,13 +383,13 @@ var XHSEndScreen = (function () {
 		}
 	}
 
-	function CreateMvpCard(parent, title, model, value, formatter) {
+	function CreateMvpCard(parent, title, model, value, formatter, valueClassName) {
 		var card = $.CreatePanel("Panel", parent, "");
 		card.AddClass("XHSMvpCard");
 
 		var heroImage = $.CreatePanel("DOTAHeroImage", card, "");
 		heroImage.AddClass("XHSMvpIcon");
-		heroImage.heroimagestyle = "icon";
+		heroImage.heroimagestyle = "landscape";
 		if (model && model.hero) {
 			heroImage.heroname = model.hero;
 		}
@@ -406,6 +407,9 @@ var XHSEndScreen = (function () {
 
 		var valuePanel = $.CreatePanel("Label", copy, "");
 		valuePanel.AddClass("XHSMvpValue");
+		if (valueClassName) {
+			valuePanel.AddClass(valueClassName);
+		}
 		valuePanel.text = formatter ? formatter(value) : FormatNumber(value);
 	}
 
@@ -436,14 +440,14 @@ var XHSEndScreen = (function () {
 		}
 
 		var kills = FindMvp(players, "kills");
-		var healing = FindMvp(players, "healing");
 		var tomes = FindMvp(players, "tomeStatsBonus");
 		var networth = FindMvp(players, "networth");
+		var potions = FindMvp(players, "potionsUsed");
 
-		CreateMvpCard(parent, "Most Kills", kills.model, kills.value, FormatNumber);
-		CreateMvpCard(parent, "Most Healing", healing.model, healing.value, FormatNumber);
-		CreateMvpCard(parent, "Most Tome Stats", tomes.model, tomes.value, function (value) { return "+" + FormatNumber(value); });
-		CreateMvpCard(parent, "Richest Hero", networth.model, networth.value, FormatNumber);
+		CreateMvpCard(parent, "Most Kills", kills.model, kills.value, FormatNumber, "MvpKills");
+		CreateMvpCard(parent, "Richest Hero", networth.model, networth.value, FormatNumber, "MvpGold");
+		CreateMvpCard(parent, "Most Tome Stats", tomes.model, tomes.value, function (value) { return "+" + FormatNumber(value); }, "MvpStats");
+		CreateMvpCard(parent, "Most Potions Used", potions.model, potions.value, FormatNumber, "MvpPotions");
 	}
 
 	function CreateCell(parent, className, text, extraClassName) {
@@ -496,7 +500,8 @@ var XHSEndScreen = (function () {
 			return;
 		}
 
-		var levelText = "Level " + (battlepass.Lvl || "-");
+		var passLevel = Math.max(1, ToNumber(battlepass.Lvl, 1));
+		var levelText = "Level " + passLevel;
 		if (battlepass.title) {
 			levelText += " - " + battlepass.title;
 			level.style.color = battlepass.title_color || "#dceeff";
@@ -517,7 +522,7 @@ var XHSEndScreen = (function () {
 
 		if (model.id === Players.GetLocalPlayer() && xpChange > 0 && levelUps >= 1) {
 			for (var i = 1; i <= levelUps; i++) {
-				CreateBattlepassRewardPanel(ToNumber(battlepass.Lvl, 0) + i, i);
+				CreateBattlepassRewardPanel(passLevel + i, i);
 			}
 		}
 	}
@@ -553,12 +558,11 @@ var XHSEndScreen = (function () {
 		heroName.text = model.abandon ? model.heroLabel + " - Abandoned" : model.heroLabel;
 
 		CreateCell(row, "PlayerColSmall", model.level.toString());
-		CreateCell(row, "PlayerColKda", FormatNumber(model.kills));
-		CreateCell(row, "PlayerColNumber", FormatNumber(model.networth), "XHSPlayerCellGold");
+		CreateCell(row, "PlayerColKda", FormatNumber(model.kills), "XHSPlayerCellKills");
 		CreateCell(row, "PlayerColNumber", FormatNumber(model.deaths));
-		CreateCell(row, "PlayerColNumber", FormatNumber(model.healing));
-		CreateCell(row, "PlayerColNumber", "+" + FormatNumber(model.tomeStatsBonus));
-		CreateCell(row, "PlayerColNumber", FormatNumber(model.supportGold));
+		CreateCell(row, "PlayerColNumber", FormatNumber(model.networth), "XHSPlayerCellGold");
+		CreateCell(row, "PlayerColNumber", "+" + FormatNumber(model.tomeStatsBonus), "XHSPlayerCellStats");
+		CreateCell(row, "PlayerColNumber", FormatNumber(model.potionsUsed), "XHSPlayerCellPotions");
 		CreateBattlepassCell(row, model);
 	}
 

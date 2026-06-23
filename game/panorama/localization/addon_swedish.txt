@@ -221,7 +221,6 @@
 	Battlepass XP boosters, en följeslagare som följer efter dig på slagfältet, och mycket mer!"
 	"loading_screen_patreon_description_bottom"    "Donationer hjälper utvecklingen av följande mods:"
 	"loading_screen_patreon_modlist1"              "Frostrose Battlefield (under utveckling)"
-	"loading_screen_patreon_modlist2"              "Dota IMBA"
 	"loading_screen_patreon_modlist3"              "X Hero Siege"
 	"loading_screen_patreon_modlist4"              "Pudge Wars"
 	"loading_screen_patreon_modlist5"              "Hero Line Wars"

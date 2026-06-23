@@ -71,7 +71,7 @@
 	{
 	
 		"BaseClass"					"npc_dota_creature"
-		"Model"						"models/heroes/juggernaut/juggernaut_arcana.vmdl"			// Model.
+		"Model"						"models/heroes/juggernaut/juggernaut.vmdl"			// Model.
 		"SoundSet"					"Hero_Juggernaut"							// Name of sound set.
 		"ConsideredHero"			"1"
 		"Portrait"					"vgui/hud/heroportraits/portrait_juggernaut"
@@ -133,11 +133,10 @@
 
 			"AttachWearables"   
 			{
-				"Wearable1" { "ItemDef" "9059" }
-				"Wearable2" { "ItemDef" "7481" } // Weapon - Serrakura
-				"Wearable3" { "ItemDef" "8" }
-				"Wearable4" { "ItemDef" "9" }
-				"Wearable5" { "ItemDef" "62"}
+				"Wearable1" { "ItemDef" "7481" } // Weapon - Serrakura
+				"Wearable2" { "ItemDef" "8" }
+				"Wearable3" { "ItemDef" "9" }
+				"Wearable4" { "ItemDef" "62"}
 			} 
 		}
 	}

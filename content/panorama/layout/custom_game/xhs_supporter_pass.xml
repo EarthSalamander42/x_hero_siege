@@ -78,7 +78,7 @@
 								</Panel>
 								<Panel class="XHSPassProgressBlock">
 									<Panel class="XHSPassProgressHeader">
-										<Label id="XHSPassLevelLabel" text="Season Level 0" />
+										<Label id="XHSPassLevelLabel" text="Season Level 1" />
 										<Label id="XHSPassXpLabel" text="0 / 2000 XP" />
 									</Panel>
 									<Panel class="XHSPassProgressBar">

@@ -626,6 +626,95 @@
 	background-image: url("file://panorama/images/interface/boss/sandking_psd.psd");
 }
 
+#XHSBuyTomeButton,
+.XHSBuyTomeButton
+{
+	width: 34px;
+	height: 34px;
+	horizontal-align: left;
+	vertical-align: top;
+	margin-left: 7px;
+	margin-top: 6px;
+	margin-bottom: 0px;
+	background-color: #0614219a;
+	border: 1px solid #7fd7ff2a;
+	border-radius: 4px;
+	box-shadow: fill #0000007a 0px 0px 5px 0px;
+	opacity: 0.9;
+	tooltip-position: top;
+	z-index: 1200;
+
+	transition-property: brightness, opacity, pre-transform-scale2d, border;
+	transition-duration: 0.12s;
+	transition-timing-function: ease-in-out;
+}
+
+#XHSBuyTomeButton.XHSInjectedIntoCenterBlock,
+.XHSBuyTomeButton.XHSInjectedIntoCenterBlock
+{
+	horizontal-align: left;
+	vertical-align: top;
+	margin-left: 7px;
+	margin-top: 6px;
+	margin-bottom: 0px;
+}
+
+#XHSBuyTomeButton:hover,
+.XHSBuyTomeButton:hover
+{
+	brightness: 1.55;
+	opacity: 1;
+	pre-transform-scale2d: 1.04;
+	border: 1px solid #9fe8ff64;
+}
+
+#XHSBuyTomeButton:active,
+.XHSBuyTomeButton:active
+{
+	pre-transform-scale2d: 0.96;
+	brightness: 1.2;
+}
+
+#XHSBuyTomeButton.NoTomes,
+.XHSBuyTomeButton.NoTomes
+{
+	opacity: 0.42;
+	saturation: 0.35;
+	brightness: 0.75;
+}
+
+#XHSBuyTomeIcon,
+.XHSBuyTomeIcon
+{
+	width: 28px;
+	height: 28px;
+	horizontal-align: center;
+	vertical-align: center;
+	border-radius: 3px;
+	opacity: 0.88;
+}
+
+#XHSBuyTomeCount,
+.XHSBuyTomeCount
+{
+	min-width: 22px;
+	height: 15px;
+	horizontal-align: right;
+	vertical-align: bottom;
+	margin-right: -5px;
+	margin-bottom: -4px;
+	padding: 0px 3px;
+	background-color: #07131ee8;
+	border: 1px solid #7fd7ff3c;
+	border-radius: 3px;
+	color: #d8f7ff;
+	font-size: 12px;
+	font-weight: bold;
+	text-align: center;
+	text-shadow: 0px 1px 2px 2 #000000;
+	text-overflow: shrink;
+}
+
 /*====================COMIC=====================*/
 
 #IntroComicContainer

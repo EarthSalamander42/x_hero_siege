@@ -311,14 +311,18 @@ function SkinChangerDragon(keys)
 	caster:SetAttackCapability(DOTA_UNIT_CAP_RANGED_ATTACK)
 	caster:SetOriginalModel(model)
 
-	local main_1 = caster:GetAbilityByIndex(0):GetName()
+	local ability_1 = GetUnitAbilityBySafeIndex(caster, 0)
+	local ability_2 = GetUnitAbilityBySafeIndex(caster, 1)
+	local ability_3 = GetUnitAbilityBySafeIndex(caster, 2)
+	if ability_1 == nil or ability_2 == nil or ability_3 == nil then return end
+
+	local main_1 = ability_1:GetName()
 	local sub_1 = keys.sub_ability_1
-	local main_2 = caster:GetAbilityByIndex(1):GetName()
+	local main_2 = ability_2:GetName()
 	local sub_2 = keys.sub_ability_2
-	local main_3 = caster:GetAbilityByIndex(2):GetName()
+	local main_3 = ability_3:GetName()
 	local main_3_alt = keys.main_ability_3
 	local sub_3 = keys.sub_ability_3
---	local main_4 = caster:GetAbilityByIndex(3):GetName()
 --	local sub_4 = keys.sub_ability_4
 	caster:FindAbilityByName(main_3):SetActivated(false)
 	caster:FindAbilityByName(sub_3):SetActivated(true)

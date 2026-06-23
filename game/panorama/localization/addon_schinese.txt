@@ -217,7 +217,6 @@
 	"loading_screen_patreon_description"           "如果在Patreon众筹网站上支持Frostrose工作室，您还可以获得游戏内的奖励！通行证经验加成，《战场》中的侍从，还有更多！"
 	"loading_screen_patreon_description_bottom"    "您的捐助将会帮助以下游戏的发展："
 	"loading_screen_patreon_modlist1"              "Frostrose战场（暂未推出）"
-	"loading_screen_patreon_modlist2"              "Dota英霸"
 	"loading_screen_patreon_modlist3"              "X Hero Siege"
 	"loading_screen_patreon_modlist4"              "勾肥大战"
 	"loading_screen_patreon_modlist5"              "Hero Line Wars"

@@ -12,4 +12,4 @@
 		"DOTA_Tooltip_ability_holdout_battle_trance_bat_reduction"			"BAT REDUCTION:"
 
 		"DOTA_Tooltip_modifier_battle_trance"					"Battle Trance"
-		"DOTA_Tooltip_modifier_battle_trance_Description"		"Base Attack Time reduced."
+		"DOTA_Tooltip_modifier_battle_trance_Description"		"Base attack time: %dMODIFIER_PROPERTY_BASE_ATTACK_TIME_CONSTANT%."

@@ -216,7 +216,6 @@
 	"loading_screen_patreon_description"           " Soutenez Frostrose Studio sur Patreon et obtenez des récompenses en jeu ! Des boosters d'expérience du battlepass, des compagnons vous suivant sur le champ de bataille, et bien d'autres récompenses !"
 	"loading_screen_patreon_description_bottom"    " Les dons soutiennent le développement des mods suivants :"
 	"loading_screen_patreon_modlist1"              "Frostrose Battlefield (sortie prochaine)"
-	"loading_screen_patreon_modlist2"              "Dota IMBA"
 	"loading_screen_patreon_modlist3"              "X Hero Siege"
 	"loading_screen_patreon_modlist4"              "Pudge Wars"
 	"loading_screen_patreon_modlist5"              "Hero Line Wars"

@@ -51,7 +51,7 @@
 
 // Items
 "npc_dota_crate"								"Wooden Crate"
-"DOTA_Tooltip_ability_item_tombstone"			"Revive Ally Hero!"
+"DOTA_Tooltip_ability_item_tombstone"			"Tombstone"
 "DOTA_Chat_Tombstone_Pinged"					"Fallen teammate here."
 
 "DOTA_Tooltip_ability_item_bag_of_gold"								"Bag of Gold"
@@ -64,7 +64,7 @@
 "DOTA_Tooltip_ability_item_book_of_intelligence_Description"		"Consume to gain 3 Intelligence permanently."
 
 "DOTA_Tooltip_modifier_campfire_effect"								"Campfire Warmth"
-"DOTA_Tooltip_modifier_campfire_effect_Description"					"The campfire warms you, warding off the Bonefrost as well as regenerating 30 health and 20 mana per second."
+"DOTA_Tooltip_modifier_campfire_effect_Description"					"Health regen: %dMODIFIER_PROPERTY_HEALTH_REGEN_PERCENTAGE%%%. mana regen total percentage: %dMODIFIER_PROPERTY_MANA_REGEN_TOTAL_PERCENTAGE%."
 
 "DOTA_Tooltip_modifier_book_of_strength"							"Book of Strength"
 "DOTA_Tooltip_modifier_book_of_strength_Description"				"Strength gained from consumed Books."

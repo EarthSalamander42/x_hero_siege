@@ -12,9 +12,9 @@
 "addonname"									"X Hero Siege"
 
 // Demo mode
-"Refresh_Msg"								"Hero Refreshed"
-"LevelUp_Msg"								"Hero Levelled Up"
-"MaxLevel_Msg"								"Hero Maxed Out"
+"Refresh_Msg"								"hero Refreshed"
+"LevelUp_Msg"								"hero Levelled Up"
+"MaxLevel_Msg"								"hero Maxed Out"
 "FreeSpellsOn_Msg"							"Free Spells: On"
 "FreeSpellsOff_Msg"							"Free Spells: Off"
 "InvulnerabilityOn_Msg"						"Invulnerability: On"
@@ -30,7 +30,7 @@
 
 "DemoOptions_MinimizeButton"				"Demo Options"
 "DemoOptions_UnMinimizeButton"				"  >&#xD;&#xD;&#xD;&#xD;  >"
-"Hero_ButtonCategory"						"Hero"
+"Hero_ButtonCategory"						"hero"
 "Spawn_ButtonCategory"						"Spawn"
 "Misc_ButtonCategory"						"Customize"
 
@@ -47,7 +47,7 @@
 "DummyTarget_Button"						"Dummy Target"
 "RemoveSpawns_Button"						"Remove Spawns"
 "SelectCosmetics_Button"					"Equip New Items"
-"ChangeHero_Button"							"Select New Hero"
+"ChangeHero_Button"							"Select New hero"
 "PauseDemo_Button"							"Pause"
 "QuitDemo_Button"							"Quit"
 

@@ -17,13 +17,7 @@ ListenToGameEvent('game_rules_state_change', function()
 				end, nil, "POST", payload)
 			end
 
-			if CUSTOM_GAME_TYPE == "IMBA" then
-				-- GameRules:GetGameModeEntity():SetContextThink(DoUniqueString("anti_stacks_fucker"), function()
-				-- TeamOrdering:OnPlayersLoaded()
-
-				-- return nil
-				-- end, 3.0)
-			elseif CUSTOM_GAME_TYPE == "PLS" then
+			if CUSTOM_GAME_TYPE == "PLS" then
 				api:GenerateGameModeLeaderboard()
 			end
 
@@ -37,20 +31,6 @@ ListenToGameEvent('game_rules_state_change', function()
 
 		if api.parties then
 			CustomNetTables:SetTableValue("game_options", "parties", api.parties)
-		end
-
-		if CUSTOM_GAME_TYPE == "IMBA" then
-			if api:GetCustomGamemode() == 4 then
-				api:DiretideHallOfFame(
-					function(data)
-						CustomNetTables:SetTableValue("battlepass", "leaderboard_diretide", { data = data })
-					end,
-
-					function(data)
-						print("FAIL:", data)
-					end
-				)
-			end
 		end
 
 		Timers:CreateTimer(function()
@@ -74,10 +54,6 @@ end, nil)
 ListenToGameEvent('dota_item_purchased', function(event)
 	-- itemcost, itemname, PlayerID, splitscreenplayer
 	local hero = PlayerResource:GetSelectedHeroEntity(event.PlayerID)
-
-	if CUSTOM_GAME_TYPE == "IMBA" then
-		PlayerResource:StoreItemBought(event.PlayerID, event.itemname)
-	end
 
 	--	if not PlayerResource.ItemTimer then PlayerResource.ItemTimer = {} end
 

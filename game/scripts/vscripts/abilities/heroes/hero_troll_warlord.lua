@@ -153,8 +153,11 @@ function modifier_battle_trance:OnCreated()
 local ability = self:GetAbility()
 local parent = self:GetParent()
 local bonus_bat = ability:GetSpecialValueFor("bonus_bat")
+local locked_ability = GetUnitAbilityBySafeIndex(parent, 5)
 
-	parent:GetAbilityByIndex(5):SetActivated(false)
+	if locked_ability ~= nil then
+		locked_ability:SetActivated(false)
+	end
 	if parent:IsRealHero() and IsServer() then
 		EmitSoundOnClient("Hero_TrollWarlord.BattleTrance.Cast.Team", parent:GetPlayerOwner())
 	end
@@ -172,7 +175,10 @@ end
 function modifier_battle_trance:OnDestroy()
 	if IsServer() then
 		local parent = self:GetParent()
-		parent:GetAbilityByIndex(5):SetActivated(true)
+		local locked_ability = GetUnitAbilityBySafeIndex(parent, 5)
+		if locked_ability ~= nil then
+			locked_ability:SetActivated(true)
+		end
 		if not parent:HasAbility("imba_troll_warlord_fervor") and parent:HasModifier("modifier_imba_fervor_stacks") then
 			parent:RemoveModifierByName("modifier_imba_fervor_stacks")
 		end

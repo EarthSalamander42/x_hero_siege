@@ -16,26 +16,28 @@
 			<Panel class="XHSEndScreenHeader">
 				<Panel class="XHSEndScreenHeaderCopy">
 					<Label id="XHSEndScreenResult" class="XHSEndScreenResult" text="X HEROES VICTORY" />
-					<Panel class="XHSEndScreenMeta">
-						<Panel class="XHSEndScreenMetaItem">
-							<Label class="XHSEndScreenMetaLabel" text="Time" />
-							<Label id="XHSEndScreenTime" class="XHSEndScreenMetaValue" text="00:00" />
-						</Panel>
-						<Panel class="XHSEndScreenMetaItem">
-							<Label class="XHSEndScreenMetaLabel" text="Difficulty" />
-							<Label id="XHSEndScreenDifficulty" class="XHSEndScreenMetaValue" text="-" />
-						</Panel>
-						<Panel class="XHSEndScreenMetaItem">
-							<Label class="XHSEndScreenMetaLabel" text="Mode" />
-							<Label id="XHSEndScreenMode" class="XHSEndScreenMetaValue" text="-" />
-						</Panel>
-						<Panel class="XHSEndScreenMetaItem">
-							<Label class="XHSEndScreenMetaLabel" text="Game" />
-							<Label id="XHSEndScreenGameId" class="XHSEndScreenMetaValue" text="-" />
-						</Panel>
-						<Panel class="XHSEndScreenMetaItem">
-							<Label class="XHSEndScreenMetaLabel" text="Players" />
-							<Label id="XHSEndScreenPlayersMeta" class="XHSEndScreenMetaValue" text="0" />
+					<Panel class="XHSEndScreenMetaSlot">
+						<Panel class="XHSEndScreenMeta">
+							<Panel class="XHSEndScreenMetaItem">
+								<Label class="XHSEndScreenMetaLabel" text="Time" />
+								<Label id="XHSEndScreenTime" class="XHSEndScreenMetaValue" text="00:00" />
+							</Panel>
+							<Panel class="XHSEndScreenMetaItem">
+								<Label class="XHSEndScreenMetaLabel" text="Difficulty" />
+								<Label id="XHSEndScreenDifficulty" class="XHSEndScreenMetaValue" text="-" />
+							</Panel>
+							<Panel class="XHSEndScreenMetaItem">
+								<Label class="XHSEndScreenMetaLabel" text="Mode" />
+								<Label id="XHSEndScreenMode" class="XHSEndScreenMetaValue" text="-" />
+							</Panel>
+							<Panel class="XHSEndScreenMetaItem">
+								<Label class="XHSEndScreenMetaLabel" text="Game" />
+								<Label id="XHSEndScreenGameId" class="XHSEndScreenMetaValue" text="-" />
+							</Panel>
+							<Panel class="XHSEndScreenMetaItem">
+								<Label class="XHSEndScreenMetaLabel" text="Players" />
+								<Label id="XHSEndScreenPlayersMeta" class="XHSEndScreenMetaValue" text="0" />
+							</Panel>
 						</Panel>
 					</Panel>
 				</Panel>
@@ -63,11 +65,10 @@
 						<Label class="PlayerColIdentity" text="Player" />
 						<Label class="PlayerColSmall" text="LVL" />
 						<Label class="PlayerColKda" text="Kills" />
-						<Label class="PlayerColNumber" text="Networth" />
 						<Label class="PlayerColNumber" text="Deaths" />
-						<Label class="PlayerColNumber" text="Healing" />
+						<Label class="PlayerColNumber" text="Networth" />
 						<Label class="PlayerColNumber" text="Tome Stats" />
-						<Label class="PlayerColNumber" text="Support" />
+						<Label class="PlayerColNumber" text="Potions" />
 						<Label class="PlayerColBattlepass" text="Supporter Pass" />
 					</Panel>
 

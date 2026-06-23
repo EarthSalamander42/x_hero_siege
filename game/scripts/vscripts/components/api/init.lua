@@ -394,21 +394,49 @@ end
 function api:GetPlayerSupporterTier(player_id)
 	local supporter_pass = self:GetPlayerSupporterPass(player_id)
 	local tier_id = tonumber(supporter_pass.tier_id)
-
-	if tier_id ~= nil then
-		return tier_id
-	end
+	local status_tier = 0
 
 	if SupporterPass and SupporterPass.GetTierForStatus then
-		return SupporterPass:GetTierForStatus(self:GetDonatorStatus(player_id))
+		status_tier = SupporterPass:GetTierForStatus(self:GetDonatorStatus(player_id))
 	end
 
-	return 0
+	if tier_id ~= nil then
+		return math.max(tier_id, status_tier)
+	end
+
+	return status_tier
 end
 
 function api:GetPlayerSupporterFragments(player_id)
 	local supporter_pass = self:GetPlayerSupporterPass(player_id)
 	return tonumber(supporter_pass.fragments or supporter_pass.fragment_balance) or 0
+end
+
+function api:GrantSupporterFragments(player_id, amount, reason, idempotency_key, callback)
+	if callback == nil then
+		callback = function() end
+	end
+
+	if not PlayerResource:IsValidPlayerID(player_id) then
+		return callback(false)
+	end
+
+	local payload = {
+		game_id = api:GetApiGameId(),
+		match_id = api:GetMatchID(),
+		steam_id = tostring(PlayerResource:GetSteamID(player_id)),
+		player_id = player_id,
+		amount = amount,
+		reason = reason,
+		idempotency_key = idempotency_key,
+		gamemode = api:GetCustomGamemode(),
+	}
+
+	api:Request("supporter-fragments/grant", function(data)
+		callback(true, data)
+	end, function()
+		callback(false)
+	end, "POST", payload)
 end
 
 function api:GetPlayerMMR(player_id)
@@ -786,16 +814,70 @@ function api:CompleteGame()
 		return count
 	end
 
+	local function CountPlayerZoneStat(playerID, statName)
+		local total = 0
+
+		if GameMode == nil or GameMode.Zones == nil then
+			return total
+		end
+
+		for _, zone in pairs(GameMode.Zones) do
+			if zone.PlayerStats ~= nil and zone.PlayerStats[playerID] ~= nil then
+				total = total + (tonumber(zone.PlayerStats[playerID][statName]) or 0)
+			end
+		end
+
+		return total
+	end
+
+	local function IsEndScreenHero(hero, playerID)
+		return hero ~= nil and not hero:IsNull() and hero:IsRealHero() and hero:GetPlayerID() == playerID
+	end
+
+	local function ResolveEndScreenHero(playerID)
+		local candidates = {}
+		local selectedHero = PlayerResource:GetSelectedHeroEntity(playerID)
+		local player = PlayerResource:GetPlayer(playerID)
+		local assignedHero = nil
+
+		if player ~= nil then
+			assignedHero = player:GetAssignedHero()
+		end
+
+		if IsEndScreenHero(selectedHero, playerID) then
+			table.insert(candidates, selectedHero)
+		end
+
+		if IsEndScreenHero(assignedHero, playerID) and assignedHero ~= selectedHero then
+			table.insert(candidates, assignedHero)
+		end
+
+		for _, hero in pairs(HeroList:GetAllHeroes()) do
+			if IsEndScreenHero(hero, playerID) and hero ~= selectedHero and hero ~= assignedHero then
+				table.insert(candidates, hero)
+			end
+		end
+
+		local fallbackHero = nil
+		for _, hero in pairs(candidates) do
+			fallbackHero = fallbackHero or hero
+
+			if hero:FindModifierByName("modifier_tome_of_stats") ~= nil then
+				return hero
+			end
+		end
+
+		return fallbackHero
+	end
+
 	for id = 0, PlayerResource:GetPlayerCount() - 1 do
 		if PlayerResource:IsValidPlayerID(id) then
 			local items = {}
-			local heroEntity = PlayerResource:GetSelectedHeroEntity(id)
-			if heroEntity == nil and PlayerResource:GetPlayer(id) ~= nil then
-				heroEntity = PlayerResource:GetPlayer(id):GetAssignedHero()
-			end
+			local heroEntity = ResolveEndScreenHero(id)
 			local hero = json.null
 			local networth = 0
 			local healing = PlayerResource:GetHealing(id)
+			local potions_used = CountPlayerZoneStat(id, "Potions")
 			local damage_done_to_heroes = 0
 			local damage_done_to_buildings = 0
 			local kills_done_to_hero = {}
@@ -878,6 +960,7 @@ function api:CompleteGame()
 				items = items,
 				networth = networth,
 				healing = healing,
+				potions_used = potions_used,
 				damage_done_to_heroes = damage_done_to_heroes,
 				damage_done_to_buildings = damage_done_to_buildings,
 				kills_done_to_hero = kills_done_to_hero,
@@ -913,16 +996,6 @@ function api:CompleteGame()
 	local rosh_lvl
 	local rosh_hp
 	local rosh_max_hp
-
-	if CUSTOM_GAME_TYPE == "IMBA" then
-		-- print("Cheat game?", api:IsCheatGame(), api:GetCustomGamemode() == 4)
-
-		if api:IsCheatGame() == false and api:GetCustomGamemode() == 4 then
-			rosh_lvl = ROSHAN_ENT:GetLevel()
-			rosh_hp = ROSHAN_ENT:GetHealth()
-			rosh_max_hp = ROSHAN_ENT:GetMaxHealth()
-		end
-	end
 
 	--	print(rosh_lvl, rosh_hp, rosh_max_hp)
 
@@ -1163,10 +1236,10 @@ function api:GetPlayerSupporterPassLevel(player_id)
 
 	if self.players[steamid] ~= nil then
 		local supporter_pass = self.players[steamid].supporter_pass or {}
-		return tonumber(supporter_pass.season_level or supporter_pass.level) or 0
+		return math.max(tonumber(supporter_pass.season_level or supporter_pass.level) or 1, 1)
 	else
 		native_print("api:GetPlayerSupporterPassLevel: api players steamid not valid!")
-		return false
+		return 1
 	end
 end
 

@@ -1,7 +1,7 @@
 const FIX_CG_ROOT = $.GetContextPanel();
 const ADS_URLS = {
 	website: "https://mods.frostrose-studio.com/watch",
-	discord: "https://discord.frostrose-studio.com",
+	discord: "https://discord.frostrose-studio.com/",
 };
 let adsDoNotShowAgain = false;
 

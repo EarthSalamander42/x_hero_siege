@@ -29,6 +29,15 @@ function modifier_ankh:IsHidden() return true end
 function modifier_ankh:OnCreated(keys)
 	if not IsServer() then return end
 
+	if self:GetParent():IsRealHero() and self:GetParent():IsOwnedByAnyPlayer() and IsPlayerXHSReincarnating ~= nil and IsPlayerXHSReincarnating(self:GetParent():GetPlayerID()) then
+		SendErrorMessage(self:GetParent():GetPlayerID(), "#error_reincarnation_inventory_locked")
+		if self:GetAbility() ~= nil and not self:GetAbility():IsNull() then
+			UTIL_Remove(self:GetAbility())
+		end
+		self:Destroy()
+		return
+	end
+
 	local mod = self:GetParent():FindModifierByName("modifier_ankh_passives")
 
 	if mod then
@@ -56,7 +65,9 @@ function modifier_ankh:OnCreated(keys)
 		end
 	end
 
-	UTIL_Remove(self:GetAbility())
+	if self:GetAbility() ~= nil and not self:GetAbility():IsNull() then
+		UTIL_Remove(self:GetAbility())
+	end
 	self:Destroy()
 end
 
@@ -93,6 +104,10 @@ function modifier_ankh_passives:OnIntervalThink()
 	end
 
 	self:GetParent().ankh_respawn = false
+	if self:GetParent():IsRealHero() and self:GetParent():IsOwnedByAnyPlayer() then
+		_G.XHS_REINCARNATING_PLAYERS = _G.XHS_REINCARNATING_PLAYERS or {}
+		_G.XHS_REINCARNATING_PLAYERS[self:GetParent():GetPlayerID()] = nil
+	end
 end
 
 function modifier_ankh_passives:OnDeath(params)
@@ -133,6 +148,10 @@ function modifier_ankh_passives:OnDeath(params)
 
 	AddFOWViewer(self:GetParent():GetTeamNumber(), self.position, 200, reincarnate_time, false)
 	self:GetParent().ankh_respawn = true
+	if self:GetParent():IsRealHero() and self:GetParent():IsOwnedByAnyPlayer() then
+		_G.XHS_REINCARNATING_PLAYERS = _G.XHS_REINCARNATING_PLAYERS or {}
+		_G.XHS_REINCARNATING_PLAYERS[self:GetParent():GetPlayerID()] = true
+	end
 
 	if self:GetParent():IsRealHero() then
 		self:GetParent():SetRespawnsDisabled(true)

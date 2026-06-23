@@ -10,11 +10,14 @@
 "loading_screen_patreon_description"			"Support Frostrose Studio on Patreon and get in-game rewards! Battlepass XP boosters, companion following you on the battlefield, and more!"
 "loading_screen_patreon_description_bottom"		"Donations support the development of the following mods:"
 "loading_screen_patreon_modlist1"				"Frostrose Battlefield (unreleased)"
-"loading_screen_patreon_modlist2"				"Dota IMBA"
+"loading_screen_patreon_modlist2"				"PLS: Olympics"
 "loading_screen_patreon_modlist3"				"X Hero Siege"
 "loading_screen_patreon_modlist4"				"Pudge Wars"
 "loading_screen_patreon_modlist5"				"Hero Line Wars"
 "loading_screen_patreon_modlist6"				"Diretide (unofficial)"
+"loading_screen_patreon_modlist7"				"PLS: Olympics"
+"loading_screen_patreon_modlist8"				"Warpath"
+"loading_screen_patreon_modlist9"				"Epic Boss Challenge"
 
 "votes"										"Votes"
 
@@ -23,8 +26,8 @@
 "vote_gamemode_1"							"Classic"
 "vote_gamemode_2"							"Reborn"
 
-"vote_gamemode_1_description"				"Play the original X Hero Siege based on the Warcraft III version."
-"vote_gamemode_2_description"				"Play the new X Hero Siege based on the Dota 2 version."
+"vote_gamemode_1_description"				"Current X Hero Siege experience.\nClassic rules and systems."
+"vote_gamemode_2_description"				"Experimental Reborn ruleset.\nNew 4.0 systems as they become available."
 
 "vote_difficulty"							"Difficulty:"
 "vote_difficulty_description"				"Difficulty Vote"
@@ -49,6 +52,11 @@
 
 "loading_screen_vote_button"				"Vote"
 "loading_screen_change_vote"				"Change Vote"
+"loading_screen_selected_settings"			"Selected Settings"
+"loading_screen_selected_mode"				"Mode"
+"loading_screen_selected_difficulty"		"Difficulty"
+"loading_screen_not_selected"				"Not selected"
+"loading_screen_no_votes"					"No votes"
 "loading_screen_artwork_credit"			"Artwork credit: @duongcua_art"
 "loading_screen_instagram_short"			"IG"
 

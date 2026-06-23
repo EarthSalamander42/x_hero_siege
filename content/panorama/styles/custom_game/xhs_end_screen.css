@@ -54,16 +54,18 @@
 	width: fill-parent-flow( 1.0 );
 	height: 100%;
 	padding: 14px 24px;
-	flow-children: down;
+	flow-children: right;
 }
 
 .XHSEndScreenResult {
+	width: 360px;
 	font-size: 38px;
 	font-weight: bold;
 	color: #f3fbff;
 	text-transform: uppercase;
 	text-shadow: 0px 2px 4px #00111f;
-	height: 48px;
+	height: 100%;
+	vertical-align: center;
 	text-overflow: shrink;
 }
 
@@ -72,17 +74,25 @@
 }
 
 .XHSEndScreenMeta {
-	width: 100%;
-	height: 42px;
-	margin-top: 4px;
+	width: fit-children;
+	height: 54px;
+	margin-top: 0px;
+	horizontal-align: center;
+	vertical-align: center;
 	flow-children: right;
 }
 
+.XHSEndScreenMetaSlot {
+	width: fill-parent-flow( 1.0 );
+	height: 100%;
+	flow-children: none;
+}
+
 .XHSEndScreenMetaItem {
-	width: 132px;
-	height: 42px;
-	margin-right: 8px;
-	padding: 4px 9px 3px 9px;
+	width: 148px;
+	height: 54px;
+	margin-right: 10px;
+	padding: 7px 11px 5px 11px;
 	flow-children: down;
 	background-color: #050b14b8;
 	border: 1px solid xhs_border_soft;
@@ -95,9 +105,9 @@
 
 .XHSEndScreenMetaLabel {
 	width: 100%;
-	height: 14px;
+	height: 17px;
 	color: xhs_text_dim;
-	font-size: 11px;
+	font-size: 13px;
 	letter-spacing: 1px;
 	text-transform: uppercase;
 	text-overflow: shrink;
@@ -105,10 +115,10 @@
 
 .XHSEndScreenMetaValue {
 	width: 100%;
-	height: 22px;
+	height: 26px;
 	margin-top: 1px;
 	color: xhs_text;
-	font-size: 17px;
+	font-size: 20px;
 	font-weight: bold;
 	text-transform: uppercase;
 	text-overflow: shrink;
@@ -166,6 +176,14 @@
 	box-shadow: fill #00000070 0px 0px 8px 0px;
 }
 
+.XHSEndScreenButtonDisabled,
+.XHSEndScreenButtonDisabled:hover {
+	brightness: 0.45;
+	saturation: 0.15;
+	wash-color: #9aa7b4aa;
+	box-shadow: none;
+}
+
 .XHSEndScreenButton Label,
 .XHSEndScreenButtonSecondary Label,
 .XHSEndScreenFooterButton Label,
@@ -174,6 +192,10 @@
 	color: #f4fbff;
 	font-size: 18px;
 	text-shadow: 0px 1px 2px #000000;
+}
+
+.XHSEndScreenButtonDisabled Label {
+	color: #8f9dab;
 }
 
 .XHSEndScreenBody {
@@ -241,8 +263,8 @@
 }
 
 .XHSMvpIcon {
-	width: 54px;
-	height: 54px;
+	width: 86px;
+	height: 48px;
 	margin-right: 10px;
 	align: left center;
 	border: 1px solid xhs_border;
@@ -265,6 +287,26 @@
 	color: xhs_gold;
 	font-size: 20px;
 	font-weight: bold;
+}
+
+.XHSMvpValue.MvpKills {
+	color: #ff6d6d;
+	text-shadow: 0px 1px 3px #2d0508;
+}
+
+.XHSMvpValue.MvpStats {
+	color: #79cfff;
+	text-shadow: 0px 1px 3px #031827;
+}
+
+.XHSMvpValue.MvpGold {
+	color: xhs_gold;
+	text-shadow: 0px 1px 3px #2d2105;
+}
+
+.XHSMvpValue.MvpPotions {
+	color: #79e6a6;
+	text-shadow: 0px 1px 3px #042510;
 }
 
 .XHSEndScreenPlayersPanel {
@@ -418,6 +460,18 @@
 
 .XHSPlayerCellGold {
 	color: xhs_gold;
+}
+
+.XHSPlayerCellKills {
+	color: #ff7b73;
+}
+
+.XHSPlayerCellStats {
+	color: #83d7ff;
+}
+
+.XHSPlayerCellPotions {
+	color: #82e8aa;
 }
 
 .XHSBattlepassCell {
@@ -697,7 +751,7 @@
 }
 
 .AspectRatio16x10 .XHSEndScreenMetaItem {
-	width: 120px;
+	width: 128px;
 }
 
 .AspectRatio16x10 .XHSEndScreenLeft {
@@ -714,10 +768,11 @@
 }
 
 .AspectRatio4x3 .XHSEndScreenMetaItem {
-	width: 104px;
+	width: 112px;
 }
 
 .AspectRatio4x3 .XHSEndScreenResult {
+	width: 310px;
 	font-size: 32px;
 }
 

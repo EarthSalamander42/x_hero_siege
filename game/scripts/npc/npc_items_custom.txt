@@ -14,6 +14,7 @@
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO"
 		"Model"							"models/props_gameplay/gold_bag.vmdl"
+		"AbilityTextureName"			"hand_of_midas"
 		"ItemKillable"					"0"
 
 		// Stats
@@ -80,6 +81,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK"
+		"AbilityTextureName"			"custom/tome_small"
 																																																																												 
 		// Stats		
 		//-------------------------------------------------------------------------------------------------------------
@@ -114,6 +116,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK"
+		"AbilityTextureName"			"custom/tome_small"
 																																																																												 
 		// Stats		
 		//-------------------------------------------------------------------------------------------------------------
@@ -148,6 +151,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK"
+		"AbilityTextureName"			"custom/tome_small"
 																																																																												 
 		// Stats		
 		//-------------------------------------------------------------------------------------------------------------
@@ -1573,6 +1577,7 @@
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO"
 		"Model"							"models/props_gameplay/gold_coin001.vmdl"
+		"AbilityTextureName"			"hand_of_midas"
 
 		// Stats
 		//-------------------------------------------------------------------------------------------------------------
@@ -2064,37 +2069,6 @@
 		}
 	}
 
-	//=================================================================================================================
-	// Armor Rune
-	//=================================================================================================================
-	"item_rune_armor"
-	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"ID"									"2536"
-		"BaseClass"								"item_lua"
-		"ScriptFile"							"items/item_rune_armor.lua"
-		"Model"									"models/props_items/assault_cuirass.vmdl"
-		"Effect"								"particles/units/heroes/hero_dazzle/dazzle_armor_enemy_ring_sink.vpcf"
-
-		// Item Info
-		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"								"0"
-		"ItemQuality"							"component"
-		"ItemPurchasable"						"0"
-		"ItemSellable"							"0"
-		"ItemKillable"							"1"
-		"ItemCastOnPickup"						"1"
-
-		// Special
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityValues"
-		{
-			"bonus_armor"				"30"
-			"duration"					"45"
-		}
-	}
-
 	//========================================================================================================
 	// Necklace of Spell Immunity
 	//========================================================================================================
@@ -2152,6 +2126,7 @@
 		"AbilityName"					"item_tombstone"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_CHANNELLED | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK"
 		"Model"							"models/props_gameplay/tombstoneb01.vmdl"
+		"AbilityTextureName"			"undying_tombstone"
 		"PingOverrideText"				"DOTA_Chat_Tombstone_Pinged"
 
 		// Stats
@@ -2174,36 +2149,4 @@
 		"ItemKillable"					"0"
 	}
 
-	//=================================================================================================================
-	// Immolation Rune
-	//=================================================================================================================
-	"item_rune_immolation"
-	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"ID"							"2548"
-		"BaseClass"						"item_lua"
-		"ScriptFile"					"items/item_rune_immolation.lua"
-		"Model"							"models/items/juggernaut/arcana/juggernaut_arcana_mask.vmdl"
-		"Effect"						"particles/econ/items/dazzle/dazzle_dark_light_weapon/dazzle_dark_shallow_grave_ground.vpcf"
-
-		// Item Info
-		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"						"0"
-		"ItemQuality"					"component"
-		"ItemPurchasable"				"0"
-		"ItemSellable"					"0"
-		"ItemKillable"					"1"
-		"ItemCastOnPickup"				"1"
-
-		// Special
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityValues"
-		{
-			"radius"			"375"
-			"damage_per_tick"	"75"
-			"tick_time"			"1.0"
-			"duration"			"45.0"
-		}
-	}
 }

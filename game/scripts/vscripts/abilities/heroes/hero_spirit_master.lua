@@ -107,7 +107,7 @@ function static_remnant_init(keys)
 	end
 end
 
--- Author: Fudge (Dota Imba)
+-- Author: Fudge
 --------------------------------------
 ---		   	  OVERLOAD		       ---
 --------------------------------------
@@ -345,9 +345,12 @@ function SpiritSwap(keys)
 		end
 	end
 
+	local targetHeroName = nil
+	local swapAbilityName = nil
+
 	if caster:GetUnitName() == "npc_dota_hero_storm_spirit" then
-		hero = PlayerResource:ReplaceHeroWith( PlayerID, "npc_dota_hero_earth_spirit", gold, 0)
-		local ability = hero:FindAbilityByName("holdout_spirit_str"):StartCooldown(20)
+		targetHeroName = "npc_dota_hero_earth_spirit"
+		swapAbilityName = "holdout_spirit_str"
 		local remnants = FindUnitsInRadius(caster:GetTeamNumber(), Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_ALL, DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER, false)
 		for _, remnant in pairs(remnants) do
 			if remnant:GetUnitName() == "npc_dota_storm_spirit_remnant" then
@@ -355,57 +358,69 @@ function SpiritSwap(keys)
 			end
 		end
 	elseif caster:GetUnitName() == "npc_dota_hero_earth_spirit" then
-		hero = PlayerResource:ReplaceHeroWith( PlayerID, "npc_dota_hero_ember_spirit", gold, 0)
-		local ability = hero:FindAbilityByName("holdout_spirit_agi"):StartCooldown(20)
+		targetHeroName = "npc_dota_hero_ember_spirit"
+		swapAbilityName = "holdout_spirit_agi"
 	elseif caster:GetUnitName() == "npc_dota_hero_ember_spirit" then
-		hero = PlayerResource:ReplaceHeroWith( PlayerID, "npc_dota_hero_storm_spirit", gold, 0)
-		local ability = hero:FindAbilityByName("holdout_spirit_int"):StartCooldown(20)
+		targetHeroName = "npc_dota_hero_storm_spirit"
+		swapAbilityName = "holdout_spirit_int"
 	end
 
-	for i = 0, 5 do 
-		local caster_ability = caster:GetAbilityByIndex(i)
-		local hero_ability = hero:GetAbilityByIndex(i)
+	if targetHeroName == nil then return end
 
-		if IsValidEntity(caster_ability) then
-			if i == 4 then -- Ignores Spirit Swap Ability
-			else
-				hero_ability:SetLevel(caster_ability:GetLevel())
-			end
+	XHSPrecache:ReplaceHeroWith(PlayerID, targetHeroName, gold, 0, caster, {
+		cleanupOld = false,
+	}, function(hero)
+		if hero == nil or hero:IsNull() then return end
 
-			cooldowns_caster[i] = caster_ability:GetCooldownTimeRemaining()
-			hero_ability:StartCooldown(cooldowns_caster[i])
+		local swapAbility = hero:FindAbilityByName(swapAbilityName)
+		if swapAbility ~= nil then
+			swapAbility:StartCooldown(20)
 		end
-	end
 
-	hero:AddExperience(CURRENT_XP, false, false)
-	hero:SetAbsOrigin(loc)
-	hero:SetBaseStrength(Strength)
-	hero:SetBaseIntellect(Intellect)
-	hero:SetBaseAgility(Agility)
-	hero:SetHealth(HP)
-	hero:SetMana(Mana)
-	hero:SetAbilityPoints(AbPoints)
+		for i = 0, math.min(5, GetUnitAbilityCount(caster) - 1, GetUnitAbilityCount(hero) - 1) do
+			local caster_ability = GetUnitAbilityBySafeIndex(caster, i)
+			local hero_ability = GetUnitAbilityBySafeIndex(hero, i)
 
-	if bonus_stats_stacks > 0 then
-		hero:AddNewModifier(hero, nil, "modifier_tome_of_stats", {}):SetStackCount(bonus_stats_stacks)
-	end
+			if IsValidEntity(caster_ability) and IsValidEntity(hero_ability) then
+				if i ~= 4 then -- Ignores Spirit Swap Ability
+					hero_ability:SetLevel(caster_ability:GetLevel())
+				end
 
-	for i = 0, 14 do
-		if items[i] then
-			local item = CreateItem(items[i][1], nil, nil)
-			hero:AddItem(item)
-
-			item:StartCooldown(items[i][2])
-
-			if item:GetCurrentCharges() ~= 0 then
-				item:SetCurrentCharges(items[i][3])
+				cooldowns_caster[i] = caster_ability:GetCooldownTimeRemaining()
+				hero_ability:StartCooldown(cooldowns_caster[i])
 			end
 		end
-	end
 
-	if not caster:IsNull() then
-		UTIL_Remove(caster)
-	end
+		hero:AddExperience(CURRENT_XP, false, false)
+		hero:SetAbsOrigin(loc)
+		hero:SetBaseStrength(Strength)
+		hero:SetBaseIntellect(Intellect)
+		hero:SetBaseAgility(Agility)
+		hero:SetHealth(HP)
+		hero:SetMana(Mana)
+		hero:SetAbilityPoints(AbPoints)
+
+		if bonus_stats_stacks > 0 then
+			hero:AddNewModifier(hero, nil, "modifier_tome_of_stats", {}):SetStackCount(bonus_stats_stacks)
+		end
+
+		for i = 0, 14 do
+			if items[i] then
+				local item = CreateItem(items[i][1], nil, nil)
+				hero:AddItem(item)
+
+				item:StartCooldown(items[i][2])
+
+				if item:GetCurrentCharges() ~= 0 then
+					item:SetCurrentCharges(items[i][3])
+				end
+			end
+		end
+
+		if not caster:IsNull() then
+			UTIL_Remove(caster)
+		end
+	end)
 end
 
 function EnhancedSpirit(keys)

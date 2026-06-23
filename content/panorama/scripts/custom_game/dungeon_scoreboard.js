@@ -63,7 +63,7 @@ function UpdatePlayerImages() {
 	for(var i = 0; i < 8; i++) {
 		var player_info = CustomNetTables.GetTableValue("supporter_pass_player", i.toString());
 		if (player_info) {
-			playerImage.style.border = "2px solid " + (player_info.tier_color || player_info.donator_color || "#7DB9D8");
+			playerImage.style.border = "1px solid " + (player_info.tier_color || player_info.donator_color || "#7DB9D8");
 		}
 
 		var ImbaXP_Panel = $.GetContextPanel().FindChildTraverse("es-player-xp" + i);
@@ -106,6 +106,19 @@ function GetNextKillEvent(kills) {
 	}
 
 	return null;
+}
+
+function GetDisplayedKillCount(playerId, zoneData) {
+	var playerInfo = Game.GetPlayerInfo(playerId);
+	if (playerInfo && typeof(playerInfo.player_kills) !== "undefined") {
+		return playerInfo.player_kills;
+	}
+
+	if (zoneData && zoneData[playerId] && typeof(zoneData[playerId]["Kills"]) !== "undefined") {
+		return zoneData[playerId]["Kills"];
+	}
+
+	return 0;
 }
 
 function EnsureKillEventHint(displaySlot) {
@@ -164,10 +177,7 @@ function UpdateKillEventHint(displaySlot, kills) {
 }
 
 function UpdateKillEventHints(zoneData, localPlayerId) {
-	var localKills = 0;
-	if (zoneData[localPlayerId] && typeof(zoneData[localPlayerId]["Kills"]) !== "undefined") {
-		localKills = zoneData[localPlayerId]["Kills"];
-	}
+	var localKills = GetDisplayedKillCount(localPlayerId, zoneData);
 	UpdateKillEventHint(0, localKills);
 
 	var displaySlot = 1;
@@ -176,12 +186,7 @@ function UpdateKillEventHints(zoneData, localPlayerId) {
 			continue;
 		}
 
-		var kills = 0;
-		if (zoneData[playerId] && typeof(zoneData[playerId]["Kills"]) !== "undefined") {
-			kills = zoneData[playerId]["Kills"];
-		}
-
-		UpdateKillEventHint(displaySlot, kills);
+		UpdateKillEventHint(displaySlot, GetDisplayedKillCount(playerId, zoneData));
 		displaySlot++;
 	}
 }
@@ -256,6 +261,10 @@ function UpdateZoneScores( zoneName )
 				if(typeof(zoneData[i]) != "undefined") 
 				{
 					var playerValue = zoneData[i][tablePropertyName];
+					if (tablePropertyName === "Kills") {
+						playerValue = GetDisplayedKillCount(i, zoneData);
+					}
+
 					if(typeof(playerValue) != "undefined")
 					{
 						playerValues[i] = playerValue;
@@ -381,7 +390,7 @@ function _ScoreboardUpdater_UpdatePlayerPanelXP(playerId, ImbaXP_Panel, player_i
 	// xp shown fix (temporary?)
 	_ScoreboardUpdater_SetTextSafe(ids.xpRank, player_info.title);
 	_ScoreboardUpdater_SetTextSafe(ids.xp, player_info.XP + "/" + player_info.MaxXP);
-	_ScoreboardUpdater_SetTextSafe(ids.level, "Level: " + player_info.Lvl);
+	_ScoreboardUpdater_SetTextSafe(ids.level, "Level: " + Math.max(1, Number(player_info.Lvl) || 1));
 	$.GetContextPanel().FindChildTraverse(ids.xpRank).style.color = player_info.title_color;
 
 	var progress_bar_value = player_info.XP / player_info.MaxXP * 100;

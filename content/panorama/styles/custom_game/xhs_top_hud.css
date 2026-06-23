@@ -1,113 +1,622 @@
 .XHSTopHudHost {
 	width: 100%;
-	height: 78px;
+	height: 96px;
 	vertical-align: top;
+	overflow: noclip;
 }
 
 #XHSTopHudRoot {
 	width: 100%;
-	height: 76px;
+	height: 96px;
 	vertical-align: top;
-	background-color: gradient( linear, 0% 0%, 0% 100%, from( #06132698 ), color-stop( 0.58, #06132645 ), to( #06132600 ) );
+	background-color: gradient( linear, 0% 0%, 0% 100%, from( #02050ed8 ), color-stop( 0.44, #0613266c ), to( #06132600 ) );
+	overflow: noclip;
+	flow-children: down;
 }
 
 #XHSTopHudBar {
-	width: fit-children;
-	height: 70px;
+	width: 1120px;
+	height: 84px;
 	horizontal-align: center;
 	vertical-align: top;
 	flow-children: right;
-	padding: 6px 8px 0px 8px;
+	padding: 0px;
+	background-image: url("file://{images}/custom_game/ui/xhs_top_bar_frame.png");
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+	background-position: center;
+	overflow: noclip;
+}
+
+#XHSFocusTimers {
+	horizontal-align: center;
+	vertical-align: top;
+	flow-children: right;
+	overflow: noclip;
+}
+
+#XHSDifficultyAltPanel {
+	width: 210px;
+	height: 24px;
+	horizontal-align: center;
+	margin-top: 4px;
+	padding: 2px 14px 2px 14px;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #020914de ), color-stop( 0.5, #092030e8 ), to( #020914de ) );
+	border: 1px solid #76ff5070;
+	box-shadow: fill #000000a0 0px 0px 7px 0px, fill #57ff3926 0px 0px 6px 0px, inset #d9ffd51d 0px 1px 0px 0px;
+	opacity: 0;
+	visibility: collapse;
+	transition-property: opacity, transform, brightness;
+	transition-duration: 0.12s;
+	transform: translateY( -3px );
+}
+
+.XHSAltDown #XHSDifficultyAltPanel {
+	opacity: 1;
+	visibility: visible;
+	transform: translateY( 0px );
+}
+
+#XHSDifficultyAltValue {
+	width: 100%;
+	height: 100%;
+	font-size: 12px;
+	font-weight: bold;
+	letter-spacing: 1px;
+	text-align: center;
+	text-overflow: shrink;
+	text-transform: uppercase;
+	color: #bbffad;
+	text-shadow: 0px 0px 7px #57ff3978, 0px 1px 3px #000000;
+}
+
+.XHSFocusTimer {
+	height: 52px;
+	margin-left: 5px;
+	margin-right: 5px;
+	padding: 6px 16px 4px 16px;
+	flow-children: down;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #020914e6 ), color-stop( 0.5, #082033ee ), to( #020914e6 ) );
+	border: 1px solid #65d8ff70;
+	box-shadow: fill #000000a8 0px 0px 8px 0px, inset #d9f8ff1d 0px 1px 0px 0px;
+	transition-property: opacity, transform, brightness;
+	transition-duration: 0.12s;
+}
+
+.XHSArenaFocusTimer {
+	width: 210px;
+	horizontal-align: center;
+	border: 1px solid #ffc36b9c;
+	box-shadow: fill #000000b8 0px 0px 10px 0px, fill #ffc36b2f 0px 0px 8px 0px, inset #fff1c81f 0px 1px 0px 0px;
+}
+
+.XHSPersonalFocusTimer {
+	width: 190px;
+	border: 1px solid #65d8ff8d;
+}
+
+.XHSFocusTimerTitle {
+	width: 100%;
+	height: 14px;
+	font-size: 11px;
+	font-weight: bold;
+	letter-spacing: 1px;
+	text-align: center;
+	color: #a9cce4;
+	text-transform: uppercase;
+	text-overflow: shrink;
+	text-shadow: 0px 1px 2px #000000;
+}
+
+.XHSArenaFocusTimer .XHSFocusTimerTitle {
+	color: #ffd18a;
+}
+
+.XHSFocusTimerValue {
+	width: 100%;
+	height: 25px;
+	margin-top: -1px;
+	font-size: 28px;
+	font-weight: bold;
+	text-align: center;
+	color: #eef9ff;
+	text-shadow: 0px 0px 8px #59dcff80, 0px 1px 4px #000000;
+	text-overflow: shrink;
+}
+
+.XHSArenaFocusTimer .XHSFocusTimerValue {
+	color: #ffe2a7;
+	text-shadow: 0px 0px 8px #ffc36b8a, 0px 1px 4px #000000;
+}
+
+.XHSFocusTimerProgressTrack {
+	width: 100%;
+	height: 4px;
+	margin-top: 1px;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #10080be6 ), color-stop( 0.5, #20120be0 ), to( #10080be6 ) );
+	border: 1px solid #ffc36b34;
+	box-shadow: inset #000000b8 0px 0px 4px 0px;
+	overflow: clip;
+}
+
+.XHSFocusTimerProgressFill {
+	width: 100%;
+	height: 100%;
+	horizontal-align: left;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #ffe6a8 ), color-stop( 0.42, #ffbd5a ), color-stop( 0.72, #ff7a3d ), to( #7ee4ff ) );
+	box-shadow: fill #ffc36b80 0px 0px 6px 0px, #7ee4ff40 0px 0px 5px 0px;
+	transition-property: width, brightness;
+	transition-duration: 0.18s;
+	transition-timing-function: linear;
+	animation-name: XHSArenaTimerProgressPulse;
+	animation-duration: 1.1s;
+	animation-iteration-count: infinite;
+	animation-timing-function: ease-in-out;
+}
+
+@keyframes 'XHSArenaTimerProgressPulse' {
+	0% {
+		brightness: 0.9;
+	}
+
+	50% {
+		brightness: 1.45;
+	}
+
+	100% {
+		brightness: 0.9;
+	}
 }
 
 #XHSTopHudLeftSlot,
 #XHSTopHudRightSlot {
-	height: 60px;
 	vertical-align: top;
+	margin-top: 18px;
+	overflow: noclip;
 }
 
 #XHSTopHudLeftSlot {
-	width: 350px;
+	width: 436px;
+	margin-left: 0px;
 }
 
 #XHSTopHudRightSlot {
-	width: fit-children;
+	width: 436px;
+	margin-left: 22px;
 }
 
-#XHSTopHudAllies {
+#XHSTopHudAllies,
+#XHSTopHudRightAllies {
+	width: 100%;
+	horizontal-align: left;
 	vertical-align: top;
-	margin-right: 0px;
-	horizontal-align: right;
-	flow-children: right;
-	padding: 4px 5px 4px 8px;
-	background-color: gradient( linear, 0% 0%, 100% 0%, from( #050b14cc ), color-stop( 0.62, #071827ee ), to( #0d2235e8 ) );
-	border: 1px solid #77c8ff3f;
-	border-right: 0px solid transparent;
-	box-shadow: fill #00000080 0px 0px 8px 0px;
+	flow-children: none;
+	background-color: #00000000;
+	border: 0px solid transparent;
+	box-shadow: none;
+	overflow: noclip;
 }
 
-#XHSAllyRoster,
-#XHSVipRoster {
+.XHSAllyRoster {
+	width: fit-children;
+	height: 50px;
+	margin-top: 0px;
 	flow-children: right;
+	overflow: noclip;
+}
+
+#XHSAllyRosterLeft {
+	margin-left: 60px;
+	align: left top;
+}
+
+#XHSAllyRosterRight {
+	margin-right: 60px;
+	align: right top;
 }
 
 #XHSVipRoster {
-	margin-left: 6px;
+	visibility: collapse;
 }
 
 .XHSAllyCard,
 .XHSVipCard {
-	width: 66px;
-	height: 52px;
-	margin-right: 4px;
-	padding: 2px;
-	flow-children: down;
-	background-color: gradient( linear, 0% 0%, 0% 100%, from( #0e263df4 ), to( #050b14f4 ) );
-	border: 1px solid #77c8ff55;
-	box-shadow: fill #00000070 0px 0px 6px 0px;
-	transition-property: brightness, transform, border;
+	width: 78px;
+	height: 50px;
+	margin-right: 9px;
+	padding: 0px;
+	flow-children: none;
+	background-color: #00000000;
+	border: 0px solid transparent;
+	box-shadow: none;
+	overflow: noclip;
+	transition-property: brightness, transform;
 	transition-duration: 0.12s;
 }
 
 .XHSAllyCard:hover,
 .XHSVipCard:hover {
-	brightness: 1.15;
-	transform: translateY(-1px);
-	border: 1px solid #9bdcff80;
-}
-
-.XHSAllyCard.IsDead {
-	saturation: 0.35;
-	wash-color: #7b1212;
-}
-
-.XHSAllyCard.IsDisconnected {
-	saturation: 0.2;
-	wash-color: #9b9b9b;
+	brightness: 1.18;
+	transform: translateY( -1px );
 }
 
 .XHSAllyColorStrip {
-	width: 58px;
-	height: 2px;
-	horizontal-align: center;
-	margin-bottom: 1px;
+	width: 2px;
+	height: 100%;
+	align: left top;
+	margin-top: 2px;
+	margin-bottom: 2px;
 	background-color: xhs_accent;
+	box-shadow: fill #6ee8ff80 0px 0px 2px 0px;
 }
 
 .XHSAllyImageWrap,
 .XHSVipImageWrap {
-	width: 58px;
-	height: 32px;
-	horizontal-align: center;
-	border: 1px solid #000000cc;
+	width: 72px;
+	height: 44px;
+	align: center top;
+	margin-top: 3px;
 	background-color: #020812;
-	box-shadow: inset #ffffff10 0px 1px 0px 0px;
+	border: 1px solid #000000dd;
+	box-shadow: inset #ffffff16 0px 1px 0px 0px, fill #0000008a 0px 0px 5px 0px;
+}
+
+.XHSAllyCard.XHSSupporterTier1 .XHSAllyImageWrap {
+	border: 1px solid #45c46b88;
+	box-shadow: inset #ffffff16 0px 1px 0px 0px, fill #45c46b36 0px 0px 5px 0px;
+}
+
+.XHSAllyCard.XHSSupporterTier2 .XHSAllyImageWrap {
+	border: 1px solid #f2c94ca0;
+	box-shadow: inset #fff2aa24 0px 1px 0px 0px, fill #f2c94c42 0px 0px 6px 0px;
+}
+
+.XHSAllyCard.XHSSupporterTier3 .XHSAllyImageWrap {
+	border: 1px solid #e4572ea0;
+	box-shadow: inset #ffd6bd24 0px 1px 0px 0px, fill #e4572e44 0px 0px 6px 0px;
+}
+
+.XHSAllyCard.XHSSupporterTier4 .XHSAllyImageWrap {
+	border: 1px solid #a7b2c0a8;
+	box-shadow: inset #ffffff24 0px 1px 0px 0px, fill #a7b2c048 0px 0px 7px 0px;
+}
+
+.XHSAllyCard.XHSSupporterTier5 .XHSAllyImageWrap {
+	border: 1px solid #65fff0cc;
+	box-shadow: inset #ffffff2e 0px 1px 0px 0px, fill #2ec4b68f 0px 0px 8px 0px, #d8faff55 0px 0px 3px 0px;
+}
+
+.XHSAllyCard.IsDead .XHSAllyImageWrap {
+	border: 1px solid #8f1d24cc;
+	box-shadow: inset #ffb2a522 0px 1px 0px 0px, fill #7b111a80 0px 0px 8px 0px;
 }
 
 .XHSAllyHeroImage,
 .XHSVipImage {
 	width: 100%;
+	height: 50px;
+	transition-property: brightness, saturation, wash-color;
+	transition-duration: 0.12s;
+}
+
+.XHSAllyCard.IsDead .XHSAllyHeroImage {
+	brightness: 0.52;
+	saturation: 0.22;
+	wash-color: #5f1115;
+}
+
+.XHSAllyImageWrap.IsDisconnected .XHSAllyHeroImage {
+	brightness: 0.16;
+	saturation: 0.08;
+	wash-color: #1b2638;
+}
+
+.XHSSupporterMark {
+	width: 9px;
+	height: 9px;
+	align: right top;
+	margin-top: 4px;
+	margin-right: 4px;
+	background-color: #00000000;
+	border: 0px solid transparent;
+	box-shadow: none;
+	visibility: collapse;
+	z-index: 4;
+}
+
+.XHSSupporterMark.XHSSupporterTier1 {
+	visibility: visible;
+	background-color: #45c46b;
+	box-shadow: fill #45c46b88 0px 0px 4px 0px;
+}
+
+.XHSSupporterMark.XHSSupporterTier2 {
+	visibility: visible;
+	background-color: #f2c94c;
+	box-shadow: fill #f2c94ca0 0px 0px 5px 0px;
+}
+
+.XHSSupporterMark.XHSSupporterTier3 {
+	visibility: visible;
+	background-color: #e4572e;
+	box-shadow: fill #e4572ea0 0px 0px 5px 0px;
+}
+
+.XHSSupporterMark.XHSSupporterTier4 {
+	visibility: visible;
+	background-color: #a7b2c0;
+	box-shadow: fill #a7b2c0aa 0px 0px 6px 0px;
+}
+
+.XHSSupporterMark.XHSSupporterTier5 {
+	visibility: visible;
+	background-color: gradient( radial, 50% 50%, 0% 0%, 65% 65%, from( #f8ffff ), color-stop( 0.42, #65fff0 ), to( #2ec4b6 ) );
+	border: 1px solid #e8ffffaa;
+	box-shadow: fill #2ec4b6c8 0px 0px 7px 0px, #ffffff55 0px 0px 3px 0px;
+}
+
+.XHSSupporterHoverCard {
+	width: 342px;
+	height: fit-children;
+	align: left top;
+	margin-top: 53px;
+	padding: 12px;
+	flow-children: down;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #061321f7 ), color-stop( 0.55, #081b2cf8 ), to( #030811fa ) );
+	border: 1px solid #62ceff66;
+	box-shadow: fill #000000d5 0px 0px 18px 0px, inset #ffffff15 0px 1px 0px 0px;
+	visibility: collapse;
+	opacity: 0;
+	transform: translateY( -5px );
+	pre-transform-scale2d: .985;
+	transition-property: opacity, transform, pre-transform-scale2d, brightness;
+	transition-duration: .12s;
+	transition-timing-function: ease-out;
+	z-index: 650;
+}
+
+.XHSSupporterHoverRight {
+	align: right top;
+}
+
+.XHSAllyCard.XHSHoverVisible .XHSSupporterHoverCard {
+	visibility: visible;
+	opacity: 1;
+	transform: translateY( 0px );
+	pre-transform-scale2d: 1;
+}
+
+.XHSSupporterHoverCard.XHSSupporterTier0 {
+	border: 1px solid #7db9d86a;
+	box-shadow: fill #000000d5 0px 0px 18px 0px, fill #7db9d820 0px 0px 10px 0px, inset #ffffff15 0px 1px 0px 0px;
+}
+
+.XHSSupporterHoverCard.XHSSupporterTier1 {
+	border: 1px solid #45c46b90;
+	box-shadow: fill #000000d5 0px 0px 18px 0px, fill #45c46b2f 0px 0px 11px 0px, inset #ffffff18 0px 1px 0px 0px;
+}
+
+.XHSSupporterHoverCard.XHSSupporterTier2 {
+	border: 1px solid #f2c94ca0;
+	box-shadow: fill #000000d5 0px 0px 18px 0px, fill #f2c94c38 0px 0px 12px 0px, inset #fff4b81f 0px 1px 0px 0px;
+}
+
+.XHSSupporterHoverCard.XHSSupporterTier3 {
+	border: 1px solid #e4572ea0;
+	box-shadow: fill #000000d5 0px 0px 18px 0px, fill #e4572e34 0px 0px 12px 0px, inset #ffd2bf1c 0px 1px 0px 0px;
+}
+
+.XHSSupporterHoverCard.XHSSupporterTier4 {
+	border: 1px solid #a7b2c0a8;
+	box-shadow: fill #000000d5 0px 0px 18px 0px, fill #a7b2c030 0px 0px 12px 0px, inset #ffffff1d 0px 1px 0px 0px;
+}
+
+.XHSSupporterHoverCard.XHSSupporterTier5 {
+	border: 1px solid #65fff0bf;
+	box-shadow: fill #000000d5 0px 0px 18px 0px, fill #2ec4b665 0px 0px 14px 0px, #d8faff42 0px 0px 4px 0px, inset #ffffff24 0px 1px 0px 0px;
+}
+
+.XHSSupporterHoverHeader {
+	width: 100%;
+	height: 58px;
+	flow-children: right;
+}
+
+.XHSSupporterHoverHeroFrame {
+	width: 86px;
+	height: 52px;
+	background-color: #020812;
+	border: 1px solid #62ceff4d;
+	box-shadow: inset #ffffff18 0px 1px 0px 0px, fill #0000008c 0px 0px 7px 0px;
+}
+
+.XHSSupporterHoverHeroImage {
+	width: 100%;
 	height: 100%;
+	brightness: .92;
+}
+
+.XHSSupporterHoverHeaderCopy {
+	width: fill-parent-flow( 1.0 );
+	height: 58px;
+	margin-left: 10px;
+	flow-children: down;
+}
+
+.XHSSupporterHoverEyebrow,
+.XHSSupporterHoverTierLabel,
+.XHSSupporterHoverStatLabel,
+.XHSSupporterHoverMeterLabel,
+.XHSSupporterHoverPerksTitle {
+	color: #86c9e8;
+	font-size: 10px;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+	text-shadow: 0px 1px 2px #000000;
+}
+
+.XHSSupporterHoverPlayerName {
+	width: 100%;
+	margin-top: 2px;
+	color: #f3fbff;
+	font-size: 22px;
+	font-weight: bold;
+	text-overflow: shrink;
+	text-shadow: 0px 0px 6px #5ad0ff3b, 0px 1px 3px #000000;
+}
+
+.XHSSupporterHoverHeroName {
+	width: 100%;
+	margin-top: 0px;
+	color: #b6cadd;
+	font-size: 13px;
+	text-overflow: shrink;
+	text-shadow: 0px 1px 2px #000000;
+}
+
+.XHSSupporterHoverTierBadge {
+	width: 100%;
+	height: 42px;
+	margin-top: 8px;
+	padding: 7px 10px 6px 10px;
+	flow-children: right;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #071827e8 ), color-stop( .5, #0b2c44d8 ), to( #071827e8 ) );
+	border: 1px solid #62ceff38;
+	box-shadow: inset #ffffff11 0px 1px 0px 0px;
+}
+
+.XHSSupporterHoverTierLabel {
+	width: 48px;
+	height: 100%;
+	vertical-align: center;
+}
+
+.XHSSupporterHoverTierValue {
+	width: fill-parent-flow( 1.0 );
+	height: 100%;
+	color: #f3fbff;
+	font-size: 18px;
+	font-weight: bold;
+	text-align: right;
+	text-transform: uppercase;
+	text-overflow: shrink;
+	text-shadow: 0px 1px 3px #000000;
+}
+
+.XHSSupporterHoverCard.XHSSupporterTier1 .XHSSupporterHoverTierValue { color: #67df8b; }
+.XHSSupporterHoverCard.XHSSupporterTier2 .XHSSupporterHoverTierValue { color: #ffe27a; }
+.XHSSupporterHoverCard.XHSSupporterTier3 .XHSSupporterHoverTierValue { color: #ff8b68; }
+.XHSSupporterHoverCard.XHSSupporterTier4 .XHSSupporterHoverTierValue { color: #d8e3ef; }
+.XHSSupporterHoverCard.XHSSupporterTier5 .XHSSupporterHoverTierValue {
+	color: #9ffff4;
+	text-shadow: 0px 0px 7px #2ec4b686, 0px 1px 3px #000000;
+}
+
+.XHSSupporterHoverStats {
+	width: 100%;
+	height: fit-children;
+	margin-top: 8px;
+	flow-children: right-wrap;
+}
+
+.XHSSupporterHoverStat {
+	width: 154px;
+	height: 45px;
+	margin-right: 8px;
+	margin-bottom: 8px;
+	padding: 6px 8px;
+	flow-children: down;
+	background-color: #020914a8;
+	border: 1px solid #62ceff24;
+}
+
+.XHSSupporterHoverStatValue {
+	width: 100%;
+	margin-top: 3px;
+	color: #eef9ff;
+	font-size: 18px;
+	font-weight: bold;
+	text-overflow: shrink;
+	text-shadow: 0px 1px 3px #000000;
+}
+
+.XHSSupporterHoverMeter {
+	width: 100%;
+	height: 38px;
+	margin-top: 1px;
+	flow-children: down;
+}
+
+.XHSSupporterHoverMeterRow {
+	width: 100%;
+	height: 17px;
+	flow-children: right;
+}
+
+.XHSSupporterHoverMeterLabel {
+	width: fill-parent-flow( 1.0 );
+	height: 100%;
+}
+
+.XHSSupporterHoverMeterValue {
+	width: 116px;
+	height: 100%;
+	color: #dceeff;
+	font-size: 12px;
+	text-align: right;
+	text-overflow: shrink;
+	text-shadow: 0px 1px 2px #000000;
+}
+
+.XHSSupporterHoverMeterTrack {
+	width: 100%;
+	height: 7px;
+	margin-top: 4px;
+	background-color: #020711d8;
+	border: 1px solid #62ceff1f;
+	box-shadow: inset #000000b0 0px 0px 4px 0px;
+}
+
+.XHSSupporterHoverMeterFill {
+	width: 0%;
+	height: 100%;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #2e8ac4 ), to( #5ad0ff ) );
+	box-shadow: fill #5ad0ff3b 0px 0px 5px 0px;
+}
+
+.XHSSupporterHoverCard.XHSSupporterTier1 .XHSSupporterHoverMeterFill { background-color: gradient( linear, 0% 0%, 100% 0%, from( #2d8a4d ), to( #67df8b ) ); }
+.XHSSupporterHoverCard.XHSSupporterTier2 .XHSSupporterHoverMeterFill { background-color: gradient( linear, 0% 0%, 100% 0%, from( #9c7924 ), to( #ffe27a ) ); }
+.XHSSupporterHoverCard.XHSSupporterTier3 .XHSSupporterHoverMeterFill { background-color: gradient( linear, 0% 0%, 100% 0%, from( #8d2f21 ), to( #ff8b68 ) ); }
+.XHSSupporterHoverCard.XHSSupporterTier4 .XHSSupporterHoverMeterFill { background-color: gradient( linear, 0% 0%, 100% 0%, from( #596677 ), to( #d8e3ef ) ); }
+.XHSSupporterHoverCard.XHSSupporterTier5 .XHSSupporterHoverMeterFill { background-color: gradient( linear, 0% 0%, 100% 0%, from( #168b86 ), to( #9ffff4 ) ); }
+
+.XHSSupporterHoverPerks {
+	width: 100%;
+	height: fit-children;
+	margin-top: 9px;
+	padding: 8px 10px;
+	flow-children: down;
+	background-color: #0209149c;
+	border: 1px solid #62ceff2d;
+}
+
+.XHSSupporterHoverPerk {
+	width: 100%;
+	margin-top: 4px;
+	color: #d7e5f2;
+	font-size: 13px;
+	text-overflow: shrink;
+	text-shadow: 0px 1px 2px #000000;
+}
+
+.XHSSupporterHoverFooter {
+	width: 100%;
+	margin-top: 9px;
+	color: #9fb5c8;
+	font-size: 12px;
+	text-align: center;
+	text-overflow: shrink;
+	text-shadow: 0px 1px 2px #000000;
 }
 
 .XHSAllyStatusOverlay {
@@ -117,285 +626,586 @@
 }
 
 .IsDead .XHSAllyStatusOverlay {
-	background-color: #7a0f1470;
+	background-color: #7a0f1474;
 }
 
-.IsDisconnected .XHSAllyStatusOverlay {
-	background-color: #00000088;
+.XHSAllyImageWrap.IsDisconnected .XHSAllyStatusOverlay {
+	background-color: gradient(linear, 0% 0%, 100% 100%, from(#000000dc), color-stop(0.48, #05080ce8), to(#000000ca));
+	border: 1px solid #00000088;
 }
 
 .XHSDisconnectIcon {
-	width: 28px;
-	height: 18px;
-	horizontal-align: center;
-	vertical-align: center;
-	background-image: url("file://panorama/images/hud/reborn/icon_disconnect_png.png");
+	width: 34px;
+	height: 24px;
+	align: center center;
+	background-image: url("file://{images}/custom_game/ui/xhs_disconnect_icon.png");
 	background-size: contain;
 	background-repeat: no-repeat;
 	background-position: 50% 50%;
+	background-color: #05080cf2;
+	border: 1px solid #d5b87866;
+	box-shadow: fill #000000d8 0px 0px 7px 0px, #5fdcff88 0px 0px 5px 0px;
 	visibility: collapse;
+	z-index: 5;
 }
 
-.IsDisconnected .XHSDisconnectIcon {
+.XHSAllyImageWrap.IsDisconnected .XHSDisconnectIcon {
 	visibility: visible;
 }
 
 .XHSAllyName,
-.XHSVipName {
-	width: 58px;
-	height: 12px;
-	margin-top: -13px;
-	padding-left: 2px;
-	padding-right: 2px;
-	horizontal-align: center;
-	text-align: center;
-	font-size: 9px;
-	font-weight: semi-bold;
-	color: xhs_text;
-	text-shadow: 0px 1px 2px #000000;
-	text-overflow: shrink;
-	background-color: #020812bb;
-}
-
-.XHSAllyBars {
-	width: 58px;
-	height: 8px;
-	margin-top: 1px;
-	horizontal-align: center;
-	flow-children: down;
-}
-
-.XHSAllyHealthBar {
-	width: 58px;
-	height: 5px;
-	border: 0px solid transparent;
-	background-color: #260b0d;
-}
-
-.XHSAllyHealthBar .ProgressBarLeft {
-	background-color: gradient( linear, 0% 0%, 100% 0%, from( #35d66a ), to( #9dff74 ) );
-	transition-property: width;
-	transition-duration: 0.16s;
-}
-
+.XHSVipName,
+.XHSAllyBars,
+.XHSAllyHealthBar,
 .XHSAllyManaBar {
-	width: 58px;
-	height: 2px;
-	margin-top: 1px;
-	border: 0px solid transparent;
-	background-color: #07101f;
-}
-
-.XHSAllyManaBar .ProgressBarLeft {
-	background-color: gradient( linear, 0% 0%, 100% 0%, from( #3b84ff ), to( #6ee5ff ) );
-	transition-property: width;
-	transition-duration: 0.16s;
+	visibility: collapse;
 }
 
 .XHSAnkhBadge {
 	width: 32px;
-	height: 18px;
-	margin-top: -19px;
-	margin-right: -1px;
-	horizontal-align: right;
+	height: 14px;
+	align: right bottom;
+	margin-right: 3px;
+	margin-bottom: 4px;
 	flow-children: right;
-	background-color: #030812e8;
-	border: 1px solid #ffd27360;
-	box-shadow: fill #00000080 0px 0px 4px 0px;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #020914f4 ), color-stop( 0.5, #0b1b26f4 ), to( #020914f4 ) );
+	border: 1px solid #71e4ff70;
+	box-shadow: fill #000000bd 0px 0px 5px 0px, inset #a7f2ff24 0px 1px 0px 0px;
+	z-index: 6;
 }
 
 .XHSAnkhIcon {
-	width: 16px;
-	height: 16px;
-	margin-left: 1px;
-	vertical-align: center;
+	width: 12px;
+	height: 12px;
+	margin-left: 2px;
+	align: left center;
+	border-radius: 2px;
 }
 
 .XHSAnkhCount {
-	width: 14px;
-	height: 16px;
-	margin-top: 1px;
+	width: 15px;
+	height: 13px;
+	align: right center;
+	margin-top: 0px;
+	margin-right: 1px;
 	text-align: center;
-	font-size: 12px;
+	font-size: 11px;
 	font-weight: bold;
-	color: xhs_gold;
-	text-shadow: 0px 1px 2px #000000;
+	color: #9defff;
+	text-shadow: 0px 0px 4px #1fcfff77, 0px 1px 3px #000000;
+}
+
+.XHSAnkhBadge .XHSSupporterMark {
+	ignore-parent-flow: true;
+	width: 9px;
+	height: 9px;
+	align: right top;
+	margin-top: -3px;
+	margin-right: -3px;
+	border-radius: 50%;
+	z-index: 12;
 }
 
 .NoAnkh .XHSAnkhBadge {
-	opacity: 0.35;
-	border: 1px solid xhs_border_soft;
+	opacity: 0.55;
+	border-top: 1px solid #6d7f8d55;
+}
+
+.NoAnkh .XHSAnkhIcon {
+	opacity: 0.62;
 }
 
 .NoAnkh .XHSAnkhCount {
-	color: xhs_text_dim;
-}
-
-.XHSVipCard {
-	border: 1px solid #ffcf6680;
+	color: #9eabb8;
 }
 
 #XHSTopHudClock {
-	width: 146px;
-	height: 62px;
+	width: fit-children;
+	height: 60px;
 	vertical-align: top;
-	padding: 7px 12px;
-	flow-children: down;
-	background-color: gradient( linear, 0% 0%, 100% 0%, from( #37beeef8 ), color-stop( 0.5, #65dcfff8 ), to( #37beeef8 ) );
-	border: 1px solid #d5f2ff95;
-	box-shadow: fill #00111fc5 0px 0px 10px 0px;
+	margin-top: 20px;
+	flow-children: none;
+	background-color: #00000000;
+	border: 0px solid transparent;
+	box-shadow: none;
+	overflow: noclip;
 }
 
 #XHSClockTitle {
-	width: 100%;
-	height: 13px;
-	font-size: 11px;
-	font-weight: bold;
-	letter-spacing: 1px;
-	text-align: left;
-	color: #07304d;
-	text-transform: uppercase;
+	visibility: collapse;
 }
 
 #XHSClockValue {
-	width: 100%;
-	height: 34px;
-	margin-top: 1px;
-	font-size: 31px;
+	width: 248px;
+	height: 60px;
+	align: center center;
+	margin-top: 0px;
+	font-size: 36px;
 	font-weight: bold;
 	letter-spacing: 1px;
-	text-align: left;
-	color: #071521;
-	text-shadow: 0px 1px 4px #ffffff55;
-}
-
-#XHSTopHudTimers {
-	vertical-align: top;
-	margin-left: 0px;
-	horizontal-align: left;
-	padding: 4px 5px 4px 5px;
-	flow-children: right;
-	background-color: gradient( linear, 0% 0%, 100% 0%, from( #0d2235e8 ), color-stop( 0.38, #071827ee ), to( #050b14cc ) );
-	border: 1px solid #77c8ff3f;
-	border-left: 0px solid transparent;
-	box-shadow: fill #00000086 0px 0px 8px 0px;
-}
-
-.XHSTimerCard {
-	width: 108px;
-	height: 52px;
-	margin: 0px;
-	padding: 5px 8px;
-	flow-children: down;
-	background-color: gradient( linear, 0% 0%, 0% 100%, from( #0d2034f6 ), color-stop( 0.55, #071522f5 ), to( #040a12f4 ) );
-	border: 1px solid #77c8ff32;
-	border-left: 0px solid transparent;
-	box-shadow: fill #00000066 0px 0px 4px 0px;
-	transition-property: brightness, transform;
-	transition-duration: 0.12s;
-}
-
-.XHSDifficultyCard {
-	width: 104px;
-}
-
-.XHSTimerCard:hover {
-	brightness: 1.16;
-	transform: translateY(-1px);
+	text-align: center;
+	color: #eef9ff;
+	text-shadow: 0px 0px 7px #5bd7ff88;
 }
 
 .XHSOptionalTimer {
 	visibility: collapse;
 }
 
-.XHSTimerTitle {
-	width: 100%;
-	height: 16px;
-	margin-bottom: 0px;
-	font-size: 10px;
-	font-weight: semi-bold;
-	letter-spacing: 1px;
-	text-align: left;
-	color: xhs_text_muted;
-	text-transform: uppercase;
-	text-overflow: shrink;
-}
-
-.XHSTimerValue {
-	width: 100%;
-	height: 27px;
-	font-size: 19px;
-	font-weight: bold;
-	text-align: left;
-	color: #ffffff;
-	text-shadow: 0px 1px 3px #000000;
-	text-transform: uppercase;
-	text-overflow: shrink;
-}
-
-.XHSDifficultyValue {
-	color: #ffcf66;
-}
-
-.XHSTimerValueRow {
-	width: 100%;
-	flow-children: right;
-}
-
-.XHSTimerPulse {
-	width: 8px;
-	height: 8px;
-	margin-right: 5px;
-	margin-top: 7px;
-	border-radius: 4px;
-	background-color: xhs_accent;
-	box-shadow: fill #67e7ff77 0px 0px 5px 0px;
-	animation-name: xhsTimerPulse;
-	animation-duration: 1.4s;
-	animation-iteration-count: infinite;
-}
-
-@keyframes 'xhsTimerPulse' {
-	0% { opacity: 0.6; box-shadow: 0 0 8px #69f2ff; }
-	50% { opacity: 1; box-shadow: 0 0 14px #69f2ff; }
-	100% { opacity: 0.6; box-shadow: 0 0 8px #69f2ff; }
-}
-
-.AspectRatio4x3 .XHSAllyCard {
-	width: 58px;
-	height: 50px;
-}
-
 .AspectRatio16x10 #XHSTopHudBar {
-	width: fit-children;
+	width: 1040px;
+	height: 80px;
+	padding: 0px;
+}
+
+.AspectRatio16x10 #XHSFocusTimers {
+	margin-top: 73px;
 }
 
 .AspectRatio16x10 #XHSTopHudLeftSlot {
-	width: 310px;
+	width: 405px;
+	margin-left: 0px;
+	margin-top: 11px;
+}
+
+.AspectRatio16x10 #XHSTopHudRightSlot {
+	width: 405px;
+	margin-right: 0px;
+	margin-top: 11px;
+}
+
+.AspectRatio16x10 #XHSAllyRosterLeft {
+	margin-left: 48px;
+}
+
+.AspectRatio16x10 #XHSAllyRosterRight {
+	margin-right: 48px;
+}
+
+.AspectRatio16x10 .XHSAllyCard {
+	width: 74px;
+	height: 48px;
+	margin-right: 7px;
+}
+
+.AspectRatio16x10 .XHSAllyImageWrap {
+	width: 68px;
+	height: 42px;
+}
+
+.AspectRatio16x10 .XHSAnkhBadge {
+	width: 30px;
+}
+
+.AspectRatio16x10 .XHSAnkhIcon {
+	margin-left: 2px;
+}
+
+.AspectRatio16x10 #XHSTopHudClock {
+	width: fit-children;
+	margin-top: 11px;
+}
+
+.AspectRatio16x10 #XHSClockValue {
+	width: 230px;
 }
 
 .AspectRatio4x3 #XHSTopHudBar {
-	width: fit-children;
+	width: 900px;
+	height: 76px;
+	padding: 0px;
+}
+
+.AspectRatio4x3 #XHSFocusTimers {
+	width: 450px;
+	margin-top: 69px;
+}
+
+.AspectRatio4x3 .XHSArenaFocusTimer {
+	width: 185px;
+}
+
+.AspectRatio4x3 .XHSPersonalFocusTimer {
+	width: 170px;
+}
+
+.AspectRatio4x3 .XHSFocusTimerValue {
+	font-size: 26px;
 }
 
 .AspectRatio4x3 #XHSTopHudLeftSlot {
-	width: 268px;
+	width: 350px;
+	margin-left: 0px;
+	margin-top: 10px;
 }
 
-.AspectRatio4x3 .XHSAllyImageWrap,
-.AspectRatio4x3 .XHSAllyName,
-.AspectRatio4x3 .XHSAllyBars,
-.AspectRatio4x3 .XHSAllyHealthBar,
-.AspectRatio4x3 .XHSAllyManaBar {
-	width: 50px;
+.AspectRatio4x3 #XHSTopHudRightSlot {
+	width: 350px;
+	margin-right: 0px;
+	margin-top: 10px;
 }
 
-.AspectRatio4x3 .XHSTimerCard {
-	width: 94px;
-	padding-left: 6px;
-	padding-right: 6px;
+.AspectRatio4x3 #XHSAllyRosterLeft {
+	margin-left: 43px;
+}
+
+.AspectRatio4x3 #XHSAllyRosterRight {
+	margin-right: 43px;
+}
+
+.AspectRatio4x3 .XHSAllyCard {
+	width: 62px;
+	height: 44px;
+	margin-right: 5px;
+}
+
+.AspectRatio4x3 .XHSAllyImageWrap {
+	width: 58px;
+	height: 38px;
+	margin-top: 3px;
+}
+
+.AspectRatio4x3 .XHSAllyColorStrip {
+	height: 32px;
+	margin-left: 3px;
+}
+
+.AspectRatio4x3 .XHSAnkhBadge {
+	width: 28px;
+	height: 12px;
+	margin-right: 2px;
+	margin-bottom: 3px;
+}
+
+.AspectRatio4x3 .XHSAnkhIcon {
+	width: 10px;
+	height: 10px;
+	margin-left: 2px;
+}
+
+.AspectRatio4x3 .XHSAnkhCount {
+	height: 11px;
+	font-size: 10px;
+}
+
+.AspectRatio4x3 .XHSSupporterHoverCard {
+	width: 304px;
+	padding: 10px;
+}
+
+.AspectRatio4x3 .XHSSupporterHoverHeroFrame {
+	width: 76px;
+	height: 47px;
+}
+
+.AspectRatio4x3 .XHSSupporterHoverPlayerName {
+	font-size: 19px;
+}
+
+.AspectRatio4x3 .XHSSupporterHoverStat {
+	width: 136px;
+	margin-right: 7px;
+}
+
+.AspectRatio4x3 .XHSSupporterHoverTierValue {
+	font-size: 16px;
 }
 
 .AspectRatio4x3 #XHSTopHudClock {
-	width: 132px;
+	width: fit-children;
+	margin-top: 10px;
+}
+
+.AspectRatio4x3 #XHSClockValue {
+	width: 200px;
+	font-size: 31px;
+}
+
+.XHSEightPlayers .XHSTopHudHost {
+	height: 128px;
+}
+
+.XHSEightPlayers #XHSTopHudRoot {
+	height: 128px;
+}
+
+.XHSEightPlayers #XHSTopHudBar {
+	width: 1140px;
+	height: 116px;
+	padding: 0px;
+	background-image: url("file://{images}/custom_game/ui/xhs_top_bar_frame_8p.png");
+}
+
+.XHSEightPlayers #XHSFocusTimers {
+	margin-top: 105px;
+}
+
+.XHSEightPlayers #XHSTopHudLeftSlot {
+	width: 435px;
+	height: 94px;
+	margin-left: 0px;
+	margin-top: 11px;
+}
+
+.XHSEightPlayers #XHSTopHudRightSlot {
+	width: 435px;
+	height: 94px;
+	margin-right: 0px;
+	margin-top: 11px;
+}
+
+.XHSEightPlayers #XHSTopHudAllies,
+.XHSEightPlayers #XHSTopHudRightAllies {
+	height: 94px;
+}
+
+.XHSEightPlayers .XHSAllyRoster {
+	width: fit-children;
+	height: 92px;
+	margin-top: 1px;
+	flow-children: right;
+}
+
+.XHSEightPlayers #XHSAllyRosterLeft {
+	margin-left: 72px;
+}
+
+.XHSEightPlayers #XHSAllyRosterRight {
+	margin-right: 72px;
+}
+
+.XHSEightPlayers .XHSAllyCard {
+	width: 66px;
+	height: 43px;
+	margin-right: 8px;
+	margin-bottom: 4px;
+	padding: 0px;
+}
+
+.XHSEightPlayers .XHSAllyColorStrip {
+	width: 2px;
+	height: 31px;
+	margin-left: 3px;
+	margin-top: 4px;
+}
+
+.XHSEightPlayers .XHSAllyImageWrap {
+	width: 61px;
+	height: 37px;
+	margin-top: 3px;
+}
+
+.XHSEightPlayers .XHSAnkhBadge {
+	width: 28px;
+	height: 12px;
+	margin-right: 2px;
+	margin-bottom: 3px;
+}
+
+.XHSEightPlayers .XHSAnkhIcon {
+	width: 10px;
+	height: 10px;
+	margin-left: 2px;
+}
+
+.XHSEightPlayers .XHSAnkhCount {
+	width: 15px;
+	height: 11px;
+	font-size: 10px;
+}
+
+.XHSEightPlayers .XHSSupporterHoverCard {
+	margin-top: 46px;
+	width: 322px;
+}
+
+.XHSEightPlayers .XHSSupporterHoverStat {
+	width: 144px;
+}
+
+.XHSEightPlayers #XHSTopHudClock {
+	width: fit-children;
+	height: 94px;
+	margin-top: 11px;
+}
+
+.XHSEightPlayers #XHSClockValue {
+	width: 270px;
+	height: 94px;
+	font-size: 36px;
+}
+
+.AspectRatio16x10.XHSEightPlayers #XHSTopHudBar {
+	width: 1060px;
+	height: 108px;
+	padding: 0px;
+}
+
+.AspectRatio16x10.XHSEightPlayers #XHSFocusTimers {
+	margin-top: 97px;
+}
+
+.AspectRatio16x10.XHSEightPlayers #XHSTopHudLeftSlot {
+	width: 405px;
+	margin-left: 0px;
+	margin-top: 10px;
+}
+
+.AspectRatio16x10.XHSEightPlayers #XHSTopHudRightSlot {
+	width: 405px;
+	margin-right: 0px;
+	margin-top: 10px;
+}
+
+.AspectRatio16x10.XHSEightPlayers .XHSAllyRoster {
+	width: fit-children;
+}
+
+.AspectRatio16x10.XHSEightPlayers #XHSAllyRosterLeft {
+	margin-left: 65px;
+}
+
+.AspectRatio16x10.XHSEightPlayers #XHSAllyRosterRight {
+	margin-right: 65px;
+}
+
+.AspectRatio16x10.XHSEightPlayers .XHSAllyCard {
+	width: 61px;
+	height: 42px;
+	margin-right: 6px;
+}
+
+.AspectRatio16x10.XHSEightPlayers .XHSAllyImageWrap {
+	width: 57px;
+	height: 36px;
+}
+
+.AspectRatio16x10.XHSEightPlayers .XHSAnkhBadge {
+	width: 28px;
+}
+
+.AspectRatio16x10.XHSEightPlayers .XHSAnkhIcon {
+	margin-left: 2px;
+}
+
+.AspectRatio16x10.XHSEightPlayers #XHSTopHudClock {
+	width: fit-children;
+	margin-top: 10px;
+}
+
+.AspectRatio16x10.XHSEightPlayers #XHSClockValue {
+	width: 250px;
+}
+
+.AspectRatio4x3.XHSEightPlayers #XHSTopHudBar {
+	width: 920px;
+	height: 100px;
+	padding: 0px;
+}
+
+.AspectRatio4x3.XHSEightPlayers #XHSFocusTimers {
+	margin-top: 89px;
+}
+
+.AspectRatio4x3.XHSEightPlayers #XHSTopHudLeftSlot {
+	width: 351px;
+	height: 82px;
+	margin-left: 0px;
+	margin-top: 9px;
+}
+
+.AspectRatio4x3.XHSEightPlayers #XHSTopHudRightSlot {
+	width: 351px;
+	height: 82px;
+	margin-right: 0px;
+	margin-top: 9px;
+}
+
+.AspectRatio4x3.XHSEightPlayers #XHSTopHudAllies,
+.AspectRatio4x3.XHSEightPlayers #XHSTopHudRightAllies {
+	height: 82px;
+}
+
+.AspectRatio4x3.XHSEightPlayers .XHSAllyRoster {
+	width: fit-children;
+	height: 80px;
+}
+
+.AspectRatio4x3.XHSEightPlayers #XHSAllyRosterLeft {
+	margin-left: 55px;
+}
+
+.AspectRatio4x3.XHSEightPlayers #XHSAllyRosterRight {
+	margin-right: 55px;
+}
+
+.AspectRatio4x3.XHSEightPlayers .XHSAllyCard {
+	width: 54px;
+	height: 37px;
+	margin-right: 6px;
+	margin-bottom: 3px;
+	padding: 0px;
+}
+
+.AspectRatio4x3.XHSEightPlayers .XHSAllyColorStrip {
+	height: 27px;
+	margin-left: 3px;
+	margin-top: 4px;
+}
+
+.AspectRatio4x3.XHSEightPlayers .XHSAllyImageWrap {
+	width: 50px;
+	height: 32px;
+	margin-top: 3px;
+}
+
+.AspectRatio4x3.XHSEightPlayers .XHSAnkhBadge {
+	width: 25px;
+	height: 11px;
+	margin-right: 2px;
+	margin-bottom: 3px;
+}
+
+.AspectRatio4x3.XHSEightPlayers .XHSAnkhIcon {
+	width: 9px;
+	height: 9px;
+	margin-left: 2px;
+}
+
+.AspectRatio4x3.XHSEightPlayers .XHSAnkhCount {
+	width: 13px;
+	height: 10px;
+	font-size: 9px;
+}
+
+.AspectRatio4x3.XHSEightPlayers .XHSSupporterHoverCard {
+	margin-top: 41px;
+	width: 292px;
+	padding: 9px;
+}
+
+.AspectRatio4x3.XHSEightPlayers .XHSSupporterHoverHeroFrame {
+	width: 70px;
+	height: 43px;
+}
+
+.AspectRatio4x3.XHSEightPlayers .XHSSupporterHoverPlayerName {
+	font-size: 18px;
+}
+
+.AspectRatio4x3.XHSEightPlayers .XHSSupporterHoverStat {
+	width: 130px;
+	height: 42px;
+}
+
+.AspectRatio4x3.XHSEightPlayers #XHSTopHudClock {
+	width: fit-children;
+	height: 82px;
+	margin-top: 9px;
+}
+
+.AspectRatio4x3.XHSEightPlayers #XHSClockValue {
+	width: 218px;
+	height: 82px;
+	font-size: 30px;
 }

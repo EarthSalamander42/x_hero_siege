@@ -108,9 +108,7 @@ function KoboldArmy(keys)
 		ability:ApplyDataDrivenModifier(caster, double, "modifier_kill", { duration = duration })
 
 		-- Learn the skills of the caster
-		for abilitySlot = 0, 15 do
-			local ability = caster:GetAbilityByIndex(abilitySlot)
-			if ability then
+		ForEachUnitAbility(caster, function(ability)
 				local abilityLevel = ability:GetLevel()
 				local abilityName = ability:GetAbilityName()
 				local doubleAbility = double:FindAbilityByName(abilityName)
@@ -124,8 +122,7 @@ function KoboldArmy(keys)
 					double:RemoveModifierByName("modifier_reincarnation")
 					double:SetRespawnsDisabled(true)
 				end
-			end
-		end
+		end)
 
 		-- Recreate the items of the caster
 		for itemSlot = 0, 5 do

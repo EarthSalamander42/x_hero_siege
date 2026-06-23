@@ -7,11 +7,14 @@
 			<Image src="file://panorama/images/custom_game/loading_screen/bg.png" hittest="false" />
 			<Image src="file://panorama/images/custom_game/loading_screen/patreon.png" hittest="false" />
 			<Image src="file://panorama/images/custom_game/loading_screen/xhs.jpg" hittest="false" />
-			<Image src="file://panorama/images/custom_game/loading_screen/mods/modlist1.jpg" hittest="false" />
-			<Image src="file://panorama/images/custom_game/loading_screen/mods/modlist2.jpg" hittest="false" />
-			<Image src="file://panorama/images/custom_game/loading_screen/mods/modlist3.jpg" hittest="false" />
-			<Image src="file://panorama/images/custom_game/loading_screen/mods/modlist4.jpg" hittest="false" />
-			<Image src="file://panorama/images/custom_game/loading_screen/mods/modlist6.jpg" hittest="false" />
+			<Image src="file://panorama/images/custom_game/mods/modlist1.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/mods/modlist2.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/mods/modlist3.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/mods/modlist4.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/mods/modlist5.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/mods/modlist6.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/mods/modlist8.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/mods/modlist9.png" hittest="false" />
 
 			<Image src="file://panorama/images/custom_game/gg/gg_background.png" hittest="false" />
 

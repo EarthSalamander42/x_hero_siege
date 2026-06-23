@@ -2,15 +2,21 @@
 {
 	width: 100%;
 	height: 100%;
-	z-index: -10;
+	z-index: 20;
 }
 
 #DiretidePanel
 {
-	margin-top: 108px;
+	margin-top: 110px;
 	horizontal-align: center;
 	flow-children: down;
-	z-index: -1000;
+	z-index: 20;
+}
+
+#DiretidePanel.MultiBossBars
+{
+	width: 1304px;
+	flow-children: right-wrap;
 }
 
 .QuestGenericText
@@ -28,16 +34,14 @@
 {
 	color: #f2fbff;
 	font-weight: bold;
-	text-align: center;
 	text-shadow: 0px 2px 4px #000000;
 
 	font-family: titleFont, Radiance,FZKai-Z03,TH Sarabun New,YDYGO 540;
 	letter-spacing: 2px;
-	text-overflow: clip;
+	text-overflow: shrink;
 
 	horizontal-align: center;
 	text-align: center;	
-	margin-top: 3px;
 	font-size: 16px;
 	text-transform: uppercase;
 }
@@ -51,12 +55,11 @@
 
 	font-family: Radiance,FZKai-Z03,TH Sarabun New,YDYGO 540;
 	font-size: 13px;
-	letter-spacing: 2px;
-	text-overflow: clip;
+	letter-spacing: 1px;
+	text-overflow: shrink;
 
-	horizontal-align: center;
+	horizontal-align: right;
 	text-align: center;	
-	margin-bottom: 0px;
 	text-transform: uppercase;
 }
 
@@ -68,92 +71,279 @@
 .HealthBarContainer
 {
 	width: 690px;
-	height: 72px;
-	margin-bottom: 8px;
-	padding: 7px 10px 8px 10px;
+	height: 74px;
+	margin: 0px 0px 8px 0px;
+	padding: 9px 12px 10px 12px;
 	flow-children: down;
 	background-color: gradient( linear, 0% 0%, 100% 100%, from( #071827f0 ), color-stop( 0.62, #0a1626ec ), to( #040914f2 ) );
 	border: 1px solid #77c8ff38;
 	border-left: 3px solid #5ad0ff;
 	box-shadow: fill #00000090 0px 0px 12px 0px;
 	visibility: collapse;
+	overflow: clip;
+	transition-property: height, brightness, transform;
+	transition-duration: .18s;
 }
 
-.BossProgressBar
+.MultiBossBars .HealthBarContainer
 {
-	width: fill-parent-flow( 1.0 );
-	height: 20px;
-	border-radius: 1px;
-	border: 0px;
-	background-color: #02060b;
-	vertical-align: middle;
-	horizontal-align: right;
-	box-shadow: inset #000000d0 0px 1px 4px 0px;
-	transition-property: value; /* Works for width but not for value */
-	transition-duration: 0.28s;
+	width: 640px;
+	margin: 0px 6px 8px 6px;
 }
 
-.ProgressBarLeft
+.HealthBarContainer.HasBossCounter
 {
-	background-color: gradient( linear, 0% 0%, 100% 0%, from( #2a0610 ), color-stop( 0.45, #c72542 ), to( #ff6f81 ) );
-	border-radius: 2px;
-	border-top: 0px;
+	height: 96px;
 }
 
-.ProgressBarRight
+.BossHeader
 {
-	background-color: gradient( linear, 0% 0%, 100% 0%, from( #06101a ), to( #020407 ) );
+	width: 100%;
+	height: 23px;
+	flow-children: none;
 }
 
 .BossProgressBarContainer
 {
 	width: 100%;
 	height: 34px;
-	margin-top: 3px;
+	margin-top: 0px;
 	flow-children: right;
 	vertical-align: bottom;
+	overflow: clip;
+}
+
+.BossBarMain
+{
+	width: 578px;
+	height: 26px;
+	vertical-align: center;
+	flow-children: none;
+}
+
+.MultiBossBars .BossBarMain
+{
+	width: 528px;
+}
+
+.BossProgressBar
+{
+	width: 100%;
+	height: 18px;
+	vertical-align: center;
+	border-radius: 2px;
+	border: 1px solid #b7d7e820;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #030911 ), to( #08101a ) );
+	box-shadow: inset #000000d0 0px 1px 4px 0px;
+	overflow: clip;
+}
+
+.BossProgressFill
+{
+	width: 100%;
+	height: 100%;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #2a0610 ), color-stop( 0.55, #c72542 ), to( #f5fff7 ) );
+	border-radius: 2px;
+	box-shadow: inset #ffffff20 0px 1px 0px 0px, #5ad0ff22 0px 0px 8px 0px;
+	transition-property: width, background-color;
+	transition-duration: 0.18s;
+	transition-timing-function: ease-out;
+	z-index: 2;
+}
+
+.BossDamageLag
+{
+	width: 100%;
+	height: 100%;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #4c130b ), color-stop( 0.58, #ff5a35 ), to( #ffd07a ) );
+	border-radius: 2px;
+	opacity: .72;
+	transition-property: width, opacity;
+	transition-duration: 0.72s;
+	transition-timing-function: ease-out;
+	z-index: 1;
+}
+
+.BossHealPulse
+{
+	width: 100%;
+	height: 100%;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #1b6c3d00 ), color-stop( .5, #8ff0b170 ), to( #eaffd200 ) );
+	border-radius: 2px;
+	opacity: 0;
+	z-index: 3;
+}
+
+.BossDamaged
+{
+	animation-name: XHSBossDamageFlash;
+	animation-duration: .32s;
+	animation-iteration-count: 1;
+}
+
+.BossHeavyDamage
+{
+	animation-name: XHSBossHeavyDamageFlash;
+	animation-duration: .38s;
+	animation-iteration-count: 1;
+}
+
+.BossHealed
+{
+	animation-name: XHSBossHealFlash;
+	animation-duration: .42s;
+	animation-iteration-count: 1;
+}
+
+.BossHealed .BossHealPulse
+{
+	animation-name: XHSBossHealPulse;
+	animation-duration: .42s;
+	animation-iteration-count: 1;
+}
+
+.BossDamaged .BossHealthLabel,
+.BossHeavyDamage .BossHealthLabel
+{
+	color: #ffe0d8;
+	text-shadow: 0px 0px 7px #ff543d88, 0px 1px 3px #000000;
+}
+
+.BossHealed .BossHealthLabel
+{
+	color: #eaffef;
+	text-shadow: 0px 0px 7px #8ff0b188, 0px 1px 3px #000000;
 }
 
 .BossIcon
 {
-	width: 42px;
-	height: 42px;
-	margin-right: 9px;
-	margin-top: -4px;
-//	background-image: url("file://{images}/heroes/icons/npc_dota_hero_abaddon.png");
-	background-repeat: no-repeat;
-	background-position: 50% 50%;
-	background-size: cover;
+	width: 44px;
+	height: 34px;
+	margin-right: 10px;
+	margin-top: 0px;
 	border: 1px solid #77c8ff42;
 	box-shadow: fill #00000090 0px 0px 8px 0px;
+	overflow: clip;
 	z-index: 10;
+}
+
+.BossIconImage
+{
+	width: 100%;
+	height: 100%;
+	horizontal-align: center;
+	vertical-align: center;
+	visibility: collapse;
 }
 
 #BossHealth1,
 #BossHealth2,
-#BossHealth3
+#BossHealth3,
+#BossHealth4
 {
+	ignore-parent-flow: true;
 	width: 100%;
-	height: 20px;
-	margin-top: -22px;
+	height: 18px;
+	horizontal-align: center;
+	vertical-align: center;
+	margin-top: 0px;
 	font-size: 14px;
 	color: #f4fbff;
 	text-align: center;
 	vertical-align: center;
 	text-shadow: 0px 1px 3px #000000;
+	z-index: 4;
 }
 
 #BossLevel1,
 #BossLevel2,
-#BossLevel3
+#BossLevel3,
+#BossLevel4
 {
 	margin-left: 0px;
-	horizontal-align: left;
+	margin-top: 2px;
+	horizontal-align: right;
 	color: #ffcf66;
 	font-size: 13px;
 	letter-spacing: 1px;
+	text-align: right;
+	text-shadow: 0px 1px 3px #000000;
+}
+
+.BossAnkhBadge
+{
+	min-width: 58px;
+	height: 18px;
+	padding: 1px 7px 0px 7px;
+	margin-top: 1px;
+	color: #e8f6ff;
+	font-size: 12px;
+	font-weight: bold;
+	letter-spacing: 1px;
+	text-align: center;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #06131fd8 ), color-stop( .48, #12324ad8 ), to( #07111dd8 ) );
+	border: 1px solid #7edcff60;
+	box-shadow: fill #00000085 0px 0px 5px 0px, #7edcff24 0px 0px 7px 0px;
+	text-shadow: 0px 0px 5px #79e6ff55, 0px 1px 3px #000000;
+}
+
+.BossCounter
+{
+	width: 578px;
+	height: 18px;
+	margin-left: 54px;
+	margin-top: 2px;
+	flow-children: right;
+	visibility: collapse;
+	opacity: 0;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #06121ef0 ), color-stop( .55, #0b231ff0 ), to( #06121e00 ) );
+	border-left: 2px solid #75e5a966;
+	transition-property: opacity, brightness;
+	transition-duration: .18s;
+}
+
+.MultiBossBars .BossCounter
+{
+	width: 528px;
+}
+
+.HasBossCounter .BossCounter
+{
+	visibility: visible;
+	opacity: 1;
+}
+
+.BossCounterLabel
+{
+	width: fill-parent-flow( 1.0 );
+	height: 18px;
+	margin-left: 7px;
+	color: #bfe9d2;
+	font-size: 13px;
+	font-weight: semi-bold;
 	text-align: left;
 	text-shadow: 0px 1px 3px #000000;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+}
+
+.BossCounterValue
+{
+	width: 72px;
+	height: 18px;
+	margin-right: 7px;
+	color: #f4fff8;
+	font-size: 13px;
+	font-weight: bold;
+	text-align: right;
+	text-shadow: 0px 0px 6px #75e5a955, 0px 1px 3px #000000;
+}
+
+.BossCounterTick
+{
+	animation-name: XHSBossCounterTick;
+	animation-duration: .26s;
+	animation-iteration-count: 1;
 }
 
 .AspectRatio16x10 #DiretidePanel {
@@ -162,4 +352,63 @@
 
 .AspectRatio4x3 .HealthBarContainer {
 	width: 560px;
+}
+
+.AspectRatio4x3 #DiretidePanel.MultiBossBars {
+	width: 1064px;
+}
+
+.AspectRatio4x3 .MultiBossBars .HealthBarContainer {
+	width: 520px;
+}
+
+.AspectRatio4x3 .BossBarMain {
+	width: 448px;
+}
+
+.AspectRatio4x3 .MultiBossBars .BossBarMain {
+	width: 408px;
+}
+
+.AspectRatio4x3 .BossCounter {
+	width: 448px;
+}
+
+.AspectRatio4x3 .MultiBossBars .BossCounter {
+	width: 408px;
+}
+
+@keyframes 'XHSBossDamageFlash'
+{
+	0% { brightness: 1.7; transform: translateX( -1px ); }
+	45% { brightness: 1.25; transform: translateX( 1px ); }
+	100% { brightness: 1; transform: translateX( 0px ); }
+}
+
+@keyframes 'XHSBossHeavyDamageFlash'
+{
+	0% { brightness: 2.15; transform: translateX( -3px ); }
+	28% { brightness: 1.45; transform: translateX( 3px ); }
+	55% { brightness: 1.25; transform: translateX( -1px ); }
+	100% { brightness: 1; transform: translateX( 0px ); }
+}
+
+@keyframes 'XHSBossHealFlash'
+{
+	0% { brightness: 1.6; }
+	55% { brightness: 1.25; }
+	100% { brightness: 1; }
+}
+
+@keyframes 'XHSBossHealPulse'
+{
+	0% { opacity: 0; }
+	22% { opacity: .95; }
+	100% { opacity: 0; }
+}
+
+@keyframes 'XHSBossCounterTick'
+{
+	0% { brightness: 2; }
+	100% { brightness: 1; }
 }

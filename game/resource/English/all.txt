@@ -8,6 +8,7 @@
 "error_shop_disabled"					"Shop disabled during special events!"
 "error_cant_close_lane_player_count"	"You can't close this lane, a player is using it!"
 "error_buy_tome_pause"					"You can't buy tome while the game is paused!"
+"error_reincarnation_inventory_locked"	"You can't buy or move items while reincarnating!"
 
 "DOTA_GoodGuys"									"X Heroes"
 "DOTA_BadGuys"									"Dark Forces"
@@ -37,7 +38,7 @@
 "DOTA_Tooltip_modifier_vip"									"VIP"
 "DOTA_Tooltip_modifier_vip_Description"						"You are in the VIP list."
 "DOTA_Tooltip_ability_ability_level_20"						"Level 20 Abilities"
-"DOTA_Tooltip_ability_ability_level_20_Description"			"Abilities on right of this ability are granted when the hero reach level 20. Some abilities replaces existing ones."
+"DOTA_Tooltip_ability_ability_level_20_Description"			"Abilities to the right are unlocked when the hero reaches level 20. Some replace existing abilities."
 
 //BUILDINGS
 "npc_dota_holdout_tower"						"Light Tower"
@@ -53,15 +54,15 @@
 //RUNES
 "DOTA_Tooltip_ability_item_rune_armor"					"Armor Rune"
 "DOTA_Tooltip_modifier_rune_armor"						"Armor Rune"
-"DOTA_Tooltip_modifier_rune_armor_Description"			"Armor increased by 30."
+"DOTA_Tooltip_modifier_rune_armor_Description"			"Armor: %dMODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS%."
 
 "DOTA_Tooltip_ability_item_rune_immolation"				"Immolation Rune"
 "DOTA_Tooltip_modifier_rune_immolation"					"Immolation Rune"
-"DOTA_Tooltip_modifier_rune_immolation_Description"		"Deals damage over the carrier."
+"DOTA_Tooltip_modifier_rune_immolation_Description"		"Deals periodic damage around the carrier."
 
 //CASTLE
 "DOTA_Tooltip_ability_castle_muradin_defend"						"Muradin Bronzebeard"
-"DOTA_Tooltip_ability_castle_muradin_defend_Description"			"Release Muradin Bronzebeard to defend the castle when below 40% Health. The Castle will stay Invulnerable for a short duration."
+"DOTA_Tooltip_ability_castle_muradin_defend_Description"			"Release Muradin Bronzebeard to defend the castle when below 40% health. The Castle stays invulnerable for a short duration."
 "DOTA_Tooltip_ability_castle_muradin_defend_hp_tooltip"				"%TRIGGER HEALTH:"
 "DOTA_Tooltip_ability_castle_muradin_defend_invulnerability_time"	"INVULNERABILITY TIME:"
 
@@ -73,7 +74,7 @@
 "DOTA_Tooltip_ability_holdout_bane_permanent_immolation"							"Permanent Immolation"
 "DOTA_Tooltip_ability_holdout_bane_permanent_immolation_Description"				"Engulfs Banehallow in flames, causing damage to nearby enemy units."
 "DOTA_Tooltip_ability_holdout_bane_permanent_immolation_Lore"						"Of the rituals learned at the Isle of Masks, tending wounds with a bit of voodoo magic has proven to be quite useful."
-"DOTA_Tooltip_ability_holdout_bane_permanent_immolation_Note0"						"Immolation do not drains mana, and can't be deactivated."
+"DOTA_Tooltip_ability_holdout_bane_permanent_immolation_Note0"						"Immolation does not drain mana and cannot be deactivated."
 "DOTA_Tooltip_ability_holdout_bane_permanent_immolation_damage_per_tick"			"DAMAGE PER SECOND:"
 "DOTA_Tooltip_ability_holdout_bane_permanent_immolation_radius"						"RADIUS:"
 
@@ -89,7 +90,7 @@
 
 "DOTA_Tooltip_ability_holdout_stampede"									"Stampede"
 "DOTA_Tooltip_ability_holdout_stampede_Description"						"Calls down death skulls, moving in front of Banehallow and dealing massive damage on hit."
-"DOTA_Tooltip_ability_holdout_stampede_Note0"							"Death Skulls explode when hit an unit."
+"DOTA_Tooltip_ability_holdout_stampede_Note0"							"Death Skulls explode when they hit a unit."
 "DOTA_Tooltip_ability_holdout_stampede_damage_per_skull"				"SKULLS DAMAGE:"
 "DOTA_Tooltip_ability_holdout_stampede_distance"						"SPAWN DISTANCE:"
 "DOTA_Tooltip_ability_holdout_stampede_speed"							"SKULLS SPEED:"
@@ -102,7 +103,7 @@
 "DOTA_Tooltip_ability_holdout_watery_minion"						"Watery Minion"
 "DOTA_Tooltip_ability_holdout_watery_minion_Description"			"The Light Forces summons a Watery Minion, under Priestess of the Moon orders."
 "DOTA_Tooltip_ability_holdout_watery_minion_duration"				"DURATION:"
-"DOTA_Tooltip_ability_holdout_watery_minion_ward_hp_tooltip"		"MINION HP:"
+"DOTA_Tooltip_ability_holdout_watery_minion_ward_hp_tooltip"		"MINION HEALTH:"
 "DOTA_Tooltip_ability_holdout_watery_minion_ward_damage_tooltip"	"MINION DAMAGE:"
 
 "DOTA_Tooltip_ability_holdout_distance_aura"						"Distance Aura"
@@ -119,19 +120,19 @@
 "DOTA_Tooltip_ability_holdout_storm_rain_damage"					"DAMAGE:"
 
 "DOTA_Tooltip_ability_holdout_rejuvenation"							"Rejuvenation"
-"DOTA_Tooltip_ability_holdout_rejuvenation_Description"				"Heals a friendly unit during 12 seconds for 600 hit points."
+"DOTA_Tooltip_ability_holdout_rejuvenation_Description"				"Heals a friendly unit over 12 seconds for 600 hit points."
 "DOTA_Tooltip_ability_holdout_rejuvenation_duration"				"DURATION:"
 "DOTA_Tooltip_ability_holdout_rejuvenation_tick_heal"				"HEAL PER SEC:"
 "DOTA_Tooltip_ability_holdout_rejuvenation_total_heal"				"TOTAL HEALING:"
 
 "DOTA_Tooltip_modifier_imba_shadow_word_buff"						"Rejuvenation"
-"DOTA_Tooltip_modifier_imba_shadow_word_buff_Description"			"Healed periodically."
+"DOTA_Tooltip_modifier_imba_shadow_word_buff_Description"			"Restores health over time."
 
 "DOTA_Tooltip_ability_holdout_monsoon"								"Monsoon"
 "DOTA_Tooltip_ability_holdout_monsoon_Description"					"Calls down the light spirits to deal damage all around a specific area."
 "DOTA_Tooltip_ability_holdout_monsoon_Note0"						"Stuns all enemy units in the radius for 0.1 seconds when cast."
 "DOTA_Tooltip_ability_holdout_monsoon_radius"						"RADIUS:"
-"DOTA_Tooltip_ability_holdout_monsoon_movespeed_slow"				"%MOVESPEED SLOW:"
+"DOTA_Tooltip_ability_holdout_monsoon_movespeed_slow"				"%MOVEMENT SPEED SLOW:"
 "DOTA_Tooltip_ability_holdout_monsoon_attack_slow"					"ATTACK SLOW:"
 "DOTA_Tooltip_ability_holdout_monsoon_damage"						"DAMAGE:"
 "DOTA_Tooltip_ability_holdout_monsoon_stun_duration"				"STUN DURATION:"
@@ -156,13 +157,13 @@
 "DOTA_Tooltip_ability_holdout_war_thunder_duration"					"DURATION:"
 
 "DOTA_Tooltip_ability_holdout_unholy_aura"							"Unholy Aura"
-"DOTA_Tooltip_ability_holdout_unholy_aura_Description"				"Increases Move Speed of allied units and grants hitpoints regeneration."
+"DOTA_Tooltip_ability_holdout_unholy_aura_Description"				"Increases movement speed of allied units and grants hitpoints regeneration."
 "DOTA_Tooltip_ability_holdout_unholy_aura_aura_radius"				"RADIUS:"
-"DOTA_Tooltip_ability_holdout_unholy_aura_bonus_health_regen"		"BONUS HP REGEN:"
-"DOTA_Tooltip_ability_holdout_unholy_aura_bonus_movement_speed"		"%BONUS MOVESPEED:"
+"DOTA_Tooltip_ability_holdout_unholy_aura_bonus_health_regen"		"BONUS HEALTH REGEN:"
+"DOTA_Tooltip_ability_holdout_unholy_aura_bonus_movement_speed"		"%BONUS MOVEMENT SPEED:"
 
 "DOTA_Tooltip_modifier_unholy_aura_buff"						"Unholy Aura"
-"DOTA_Tooltip_modifier_unholy_aura_buff_Description"			"Grants %dMODIFIER_PROPERTY_HEALTH_REGEN_CONSTANT% HP Regen and %dMODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE% percent Movespeed."
+"DOTA_Tooltip_modifier_unholy_aura_buff_Description"			"Grants %dMODIFIER_PROPERTY_HEALTH_REGEN_CONSTANT% HP Regen and %dMODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE% percent movement speed."
 
 "DOTA_Tooltip_ability_holdout_rain_of_chaos"						"Rain Of Chaos"
 "DOTA_Tooltip_ability_holdout_rain_of_chaos_Description"			"Calls down meteors around Abyssal Underlord, stunning enemy units. Abyssal Underlord receive 50% of the physical incoming damage during the process."
@@ -208,7 +209,7 @@
 "DOTA_Tooltip_modifier_divine_shield_Description"						"Immunised by all types of damage."
 
 "DOTA_Tooltip_ability_holdout_endurance_aura_alt"										"Endurance Aura"
-"DOTA_Tooltip_ability_holdout_endurance_aura_alt_Description"							"Increases the Movement Speed and Attack Rate of nearby friendly units."
+"DOTA_Tooltip_ability_holdout_endurance_aura_alt_Description"							"Increases the movement speed and Attack Rate of nearby friendly units."
 "DOTA_Tooltip_ability_holdout_endurance_aura_alt_Note0"									"Stacks with Divine aura ONLY!"
 "DOTA_Tooltip_ability_holdout_endurance_aura_alt_bat_reduction"							"BASE ATTACK TIME:"
 "DOTA_Tooltip_ability_holdout_endurance_aura_alt_endurance_bonus_movement_speed"		"%MOVEMENT SPEED:"
@@ -236,10 +237,10 @@
 "DOTA_Tooltip_ability_holdout_light_roar_bonus_damage_percentage"		"%BONUS DAMAGE:"
 "DOTA_Tooltip_ability_holdout_light_roar_armor_bonus"					"BONUS ARMOR:"
 "DOTA_Tooltip_ability_holdout_light_roar_duration"						"DURATION:"
-"DOTA_Tooltip_ability_holdout_light_roar_hp_regeneration"				"%HP REGEN:"
+"DOTA_Tooltip_ability_holdout_light_roar_hp_regeneration"				"%HEALTH REGEN:"
 
 "DOTA_Tooltip_modifier_light_roar"						"Light Roar"
-"DOTA_Tooltip_modifier_light_roar_Description"			"Grants extra life regen and bonus armor for a short duration."
+"DOTA_Tooltip_modifier_light_roar_Description"			"Damage dealt: %dMODIFIER_PROPERTY_BASEDAMAGEOUTGOING_PERCENTAGE%%%. Armor: %dMODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS%. Health regen: %dMODIFIER_PROPERTY_HEALTH_REGEN_PERCENTAGE%%%."
 
 "DOTA_Tooltip_ability_holdout_knights_armor"								"Knight's Armor"
 "DOTA_Tooltip_ability_holdout_knights_armor_Description"					"Returns a percentage of damage dealt to the attacker. Also reduce damage taken."
@@ -261,7 +262,7 @@
 "DOTA_Tooltip_ability_holdout_blizzard_total_damage"						"TOTAL DAMAGE:"
 
 "DOTA_Tooltip_modifier_blizzard_slow"									"Blizzard"
-"DOTA_Tooltip_modifier_blizzard_slow_Description"						"Slowed by Blizzard Waves!"
+"DOTA_Tooltip_modifier_blizzard_slow_Description"						"Move speed: %dMODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE%%%. Attack speed: %dMODIFIER_PROPERTY_ATTACKSPEED_BONUS_CONSTANT%."
 
 "DOTA_Tooltip_ability_holdout_frostbolt"									"Frostbolt"
 "DOTA_Tooltip_ability_holdout_frostbolt_Description"						"Hurls a coil of ice at a target enemy unit, dealing damage and stunning the target for 2 seconds."
@@ -305,7 +306,7 @@
 "DOTA_Tooltip_ability_holdout_drain"								"Drain"
 "DOTA_Tooltip_ability_holdout_drain_Description"					"The Archmage uses his magic to drain enemy's life and mana."
 "DOTA_Tooltip_ability_holdout_drain_Note0"							"Draining mana does not reduce enemy's mana."
-"DOTA_Tooltip_ability_holdout_drain_health_drain"					"HP/MP DRAIN:"
+"DOTA_Tooltip_ability_holdout_drain_health_drain"					"HEALTH/MANA DRAIN:"
 "DOTA_Tooltip_ability_holdout_drain_duration_tooltip"				"DURATION:"
 "DOTA_Tooltip_ability_holdout_drain_tick_rate"						"TICK RATE:"
 
@@ -317,7 +318,7 @@
 "DOTA_Tooltip_ability_holdout_elemental_wave"							"Elemental Wave"
 "DOTA_Tooltip_ability_holdout_elemental_wave_Description"				"Releases huge Crushing Waves that deals heavy damage."
 "DOTA_Tooltip_ability_holdout_elemental_wave_Note0"						"Crushing Waves stops when hit an enemy."
-"DOTA_Tooltip_ability_holdout_elemental_wave_health_drain"				"HP/MP DRAIN:"
+"DOTA_Tooltip_ability_holdout_elemental_wave_health_drain"				"HEALTH/MANA DRAIN:"
 "DOTA_Tooltip_ability_holdout_elemental_wave_cast_range_tooltip"		"RANGE:"
 "DOTA_Tooltip_ability_holdout_elemental_wave_duration_tooltip"			"DURATION:"
 "DOTA_Tooltip_ability_holdout_elemental_wave_tick_rate"					"TICK RATE:"
@@ -407,7 +408,7 @@
 "DOTA_Tooltip_ability_xhs_brewmaster_drunken_haze_total_damage_tooltip"	"BURN TOTAL DAMAGE:"
 
 "DOTA_Tooltip_modifier_xhs_brewmaster_drunken_haze_debuff"				"Drunken Haze"
-"DOTA_Tooltip_modifier_xhs_brewmaster_drunken_haze_debuff_Description"	"Attacks can miss and move speed reduced."
+"DOTA_Tooltip_modifier_xhs_brewmaster_drunken_haze_debuff_Description"	"Move speed: %dMODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE%%%. Miss chance: %dMODIFIER_PROPERTY_MISS_PERCENTAGE%%%."
 
 "DOTA_Tooltip_modifier_xhs_brewmaster_drunken_haze_burn"				"Burn!"
 "DOTA_Tooltip_modifier_xhs_brewmaster_drunken_haze_burn_Description"	"Taking periodical damage."
@@ -464,7 +465,7 @@
 "DOTA_Tooltip_ability_holdout_spiked_carapace_bonus_armor"					"BONUS ARMOR:"
 
 "DOTA_Tooltip_modifier_spiked_carapace"						"Spiked Carapace"
-"DOTA_Tooltip_modifier_spiked_carapace_Description"			"Increase Armor of the Crypt Lord and returns part of damage received."
+"DOTA_Tooltip_modifier_spiked_carapace_Description"			"Armor: %dMODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS%."
 
 
 "DOTA_Tooltip_ability_holdout_anubarak_claw"								"Anubarak's Claw"
@@ -497,7 +498,7 @@
 //DESERT WYRM
 "DOTA_Tooltip_ability_holdout_entrench"						"Entrench"
 "DOTA_Tooltip_ability_holdout_entrench_Description"			"Allows the Desert Wyrm to burrow under the earth, to avoid any source of damage. Deals damage and stun on release."
-"DOTA_Tooltip_ability_holdout_entrench_Note0"				"Desert Wyrm is invulnerable when borrowed."
+"DOTA_Tooltip_ability_holdout_entrench_Note0"				"Desert Wyrm is invulnerable when burrowed."
 "DOTA_Tooltip_ability_holdout_entrench_Note1"				"Desert Wyrm Unentrench after %max_duration% automatically."
 "DOTA_Tooltip_ability_holdout_entrench_disappear_time"		"BURROW TIME:"
 "DOTA_Tooltip_ability_holdout_entrench_radius"				"RADIUS (UNENTRENCH):"
@@ -517,7 +518,7 @@
 "DOTA_Tooltip_modifier_burrowing_Description"			"Digging gold!"
 
 "DOTA_Tooltip_modifier_burrowed"						"Burrowed"
-"DOTA_Tooltip_modifier_burrowed_Description"			"Desert Wyrm is Invulnerable while borrowed."
+"DOTA_Tooltip_modifier_burrowed_Description"			"Desert Wyrm is invulnerable while burrowed."
 
 "DOTA_Tooltip_ability_holdout_tornado_tempest"						"Tornado Tempest"
 "DOTA_Tooltip_ability_holdout_tornado_tempest_Description"			"Sends a Tornado throwing enemies in the air, damaging them on landing."
@@ -529,7 +530,7 @@
 
 "DOTA_Tooltip_ability_holdout_acid_skin"							"Acid Skin"
 "DOTA_Tooltip_ability_holdout_acid_skin_duration"					"DURATION:"
-"DOTA_Tooltip_ability_holdout_acid_skin_bonus_movement_speed"		"MOVE SPEED REDUCTION:"
+"DOTA_Tooltip_ability_holdout_acid_skin_bonus_movement_speed"		"%MOVE SPEED REDUCTION:"
 "DOTA_Tooltip_ability_holdout_acid_skin_bonus_attack_speed"			"ATTACK SPEED REDUCTION:"
 "DOTA_Tooltip_ability_holdout_acid_skin_bonus_magic_resistance"		"%BONUS MAGICAL RESISTANCE:"
 "DOTA_Tooltip_ability_holdout_acid_skin_damage"						"DAMAGE:"
@@ -575,12 +576,12 @@
 "DOTA_Tooltip_ability_holdout_arctic_skin_ensnare_chance"		"%STUN CHANCE:"
 
 "DOTA_Tooltip_ability_holdout_divine_aura_alt"										"Divine Aura"
-"DOTA_Tooltip_ability_holdout_divine_aura_alt_Description"							"Increases the Movement Speed, Attack Rate, Armor and Life Regen of nearby friendly units."
+"DOTA_Tooltip_ability_holdout_divine_aura_alt_Description"							"Increases the movement speed, Attack Rate, Armor and Life Regen of nearby friendly units."
 "DOTA_Tooltip_ability_holdout_divine_aura_alt_Note0"								"Stacks with Endurance Aura ONLY!"
 "DOTA_Tooltip_ability_holdout_divine_aura_alt_bat_reduction"						"BAT REDUCTION:"
 "DOTA_Tooltip_ability_holdout_divine_aura_alt_bonus_movement_speed_percentage"		"%MOVEMENT SPEED:"
 "DOTA_Tooltip_ability_holdout_divine_aura_alt_bonus_armor"							"BONUS ARMOR:"
-"DOTA_Tooltip_ability_holdout_divine_aura_alt_bonus_health_regen"					"BONUS HP REGEN:"
+"DOTA_Tooltip_ability_holdout_divine_aura_alt_bonus_health_regen"					"BONUS HEALTH REGEN:"
 "DOTA_Tooltip_ability_holdout_divine_aura_alt_radius"								"RADIUS:"
 
 
@@ -592,20 +593,20 @@
 "DOTA_Tooltip_ability_holdout_shockwave_speed"							"SPEED:"
 
 "DOTA_Tooltip_ability_holdout_war_stomp"								"War Stomp"
-"DOTA_Tooltip_ability_holdout_war_stomp_Description"					"Slams the ground, stunning anf damaging nearby enemy units."
+"DOTA_Tooltip_ability_holdout_war_stomp_Description"					"Slams the ground, stunning and damaging nearby enemy units."
 "DOTA_Tooltip_ability_holdout_war_stomp_radius"							"RADIUS:"
 "DOTA_Tooltip_ability_holdout_war_stomp_stun_duration"					"STUN DURATION:"
 "DOTA_Tooltip_ability_holdout_war_stomp_stomp_damage"					"DAMAGE:"
 
 "DOTA_Tooltip_ability_holdout_chieftain_endurance_aura"										"Endurance Aura"
-"DOTA_Tooltip_ability_holdout_chieftain_endurance_aura_Description"							"Increases the Movement Speed and Attack Rate of nearby friendly units."
+"DOTA_Tooltip_ability_holdout_chieftain_endurance_aura_Description"							"Increases the movement speed and Attack Rate of nearby friendly units."
 "DOTA_Tooltip_ability_holdout_chieftain_endurance_aura_Note0"								"Stacks with Divine aura ONLY!"
 "DOTA_Tooltip_ability_holdout_chieftain_endurance_aura_bat_reduction"						"BASE ATTACK TIME:"
 "DOTA_Tooltip_ability_holdout_chieftain_endurance_aura_endurance_bonus_movement_speed"		"%MOVEMENT SPEED:"
 "DOTA_Tooltip_ability_holdout_chieftain_endurance_aura_radius"								"RADIUS:"
 
 "DOTA_Tooltip_ability_holdout_pulverize"									"Pulverize"
-"DOTA_Tooltip_ability_holdout_pulverize_Description"						"Damage all nearby enemy units in a radius every time an active ability is casted by the Tauren Chieftain."
+"DOTA_Tooltip_ability_holdout_pulverize_Description"						"Damage all nearby enemy units in a radius every time an active ability is cast by the Tauren Chieftain."
 "DOTA_Tooltip_ability_holdout_pulverize_aftershock_range"					"RANGE:"
 "DOTA_Tooltip_ability_holdout_pulverize_aftershock_damage"					"DAMAGE:"
 
@@ -622,7 +623,7 @@
 "DOTA_Tooltip_ability_holdout_shockwave_20_speed"							"SPEED:"
 
 "DOTA_Tooltip_ability_holdout_war_stomp_20"									"War Stomp (Level 20)"
-"DOTA_Tooltip_ability_holdout_war_stomp_20_Description"						"Slams the ground, stunning anf damaging nearby enemy units."
+"DOTA_Tooltip_ability_holdout_war_stomp_20_Description"						"Slams the ground, stunning and damaging nearby enemy units."
 "DOTA_Tooltip_ability_holdout_war_stomp_20_radius"							"RADIUS:"
 "DOTA_Tooltip_ability_holdout_war_stomp_20_stun_duration"					"STUN DURATION:"
 "DOTA_Tooltip_ability_holdout_war_stomp_20_stomp_damage"					"DAMAGE:"
@@ -635,7 +636,7 @@
 "DOTA_Tooltip_ability_holdout_roar_20_duration"								"DURATION:"
 
 "DOTA_Tooltip_ability_holdout_reincarnation"							"Reincarnation"
-"DOTA_Tooltip_ability_holdout_reincarnation_Description"				"Allows the Hero to revive if killed."
+"DOTA_Tooltip_ability_holdout_reincarnation_Description"				"Allows the hero to revive if killed."
 "DOTA_Tooltip_ability_holdout_reincarnation_reincarnation_time"			"DURATION:"
 
 "DOTA_Tooltip_modifier_reincarnation"					"Reincarnation"
@@ -671,7 +672,7 @@
 "DOTA_Tooltip_ability_holdout_aura_of_blight_bonus_health_regen"		"HEALTH REGEN:"
 
 "DOTA_Tooltip_modifier_aura_of_blight"									"Aura of Blight"
-"DOTA_Tooltip_modifier_aura_of_blight_Description"						"Grants Passive HP Regeneration."
+"DOTA_Tooltip_modifier_aura_of_blight_Description"						"Grants passive health regeneration."
 
 "DOTA_Tooltip_ability_holdout_death_coil"								"Death Coil"
 "DOTA_Tooltip_ability_holdout_death_coil_Description"					"Hurls a coil of death at a target enemy unit, dealing damage and stunning the target for 1 second."
@@ -742,15 +743,15 @@
 "DOTA_Tooltip_ability_holdout_endurance_aura_radius"								"RADIUS:"
 
 "DOTA_Tooltip_modifier_endurance_buff"					"Endurance Aura"
-"DOTA_Tooltip_modifier_endurance_buff_Description"		"Increase Movespeed and Attack Speed"
+"DOTA_Tooltip_modifier_endurance_buff_Description"		"Move speed: %dMODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE%%%. Base attack time: %dMODIFIER_PROPERTY_BASE_ATTACK_TIME_CONSTANT%. Attack speed: %dMODIFIER_PROPERTY_ATTACKSPEED_BONUS_CONSTANT%."
 
 "DOTA_Tooltip_ability_xhs_trueshot_aura"								"Trueshot Aura"
-"DOTA_Tooltip_ability_xhs_trueshot_aura_Description"					"Adds bonus damage to the physical attack of allied, ranged Hero units on the map based on a percentage of Tyrande's agility."
+"DOTA_Tooltip_ability_xhs_trueshot_aura_Description"					"Adds bonus damage to the physical attack of allied, ranged hero units on the map based on a percentage of Tyrande's agility."
 "DOTA_Tooltip_ability_xhs_trueshot_aura_Lore"							"Tyrande time spent alone in the forests of her Light home has allowed her to teach other archers how to improve their Arrow skills."
 "DOTA_Tooltip_ability_xhs_trueshot_aura_trueshot_ranged_damage"			"%RANGE DAMAGE BONUS:"
 
 "DOTA_Tooltip_ability_xhs_trueshot_aura_alt"								"Trueshot Aura"
-"DOTA_Tooltip_ability_xhs_trueshot_aura_alt_Description"					"Adds bonus damage to the physical attack of allied, ranged Hero units on the map based on a percentage of Tyrande's agility."
+"DOTA_Tooltip_ability_xhs_trueshot_aura_alt_Description"					"Adds bonus damage to the physical attack of allied, ranged hero units on the map based on a percentage of Tyrande's agility."
 "DOTA_Tooltip_ability_xhs_trueshot_aura_alt_Lore"							"Tyrande time spent alone in the forests of her Light home has allowed her to teach other archers how to improve their Arrow skills."
 "DOTA_Tooltip_ability_xhs_trueshot_aura_alt_trueshot_ranged_damage"			"%RANGE DAMAGE BONUS:"
 
@@ -824,7 +825,7 @@
 "DOTA_Tooltip_ability_holdout_frost_breath"							"Frost Breath"
 "DOTA_Tooltip_ability_holdout_frost_breath_Description"				"Breathes a cone of frost at enemy units that deals initial damage, damage per second over 3 seconds, knockbacks units and slows them."
 "DOTA_Tooltip_ability_holdout_frost_breath_Lore"					"The Breath of the Lich King."		
-"DOTA_Tooltip_ability_holdout_frost_breath_breath_slow"				"BREATH SLOW:"
+"DOTA_Tooltip_ability_holdout_frost_breath_breath_slow"				"%BREATH SLOW:"
 "DOTA_Tooltip_ability_holdout_frost_breath_initial_damage"			"INITIAL DAMAGE:"
 "DOTA_Tooltip_ability_holdout_frost_breath_damage_per_second"		"DAMAGE PER SECOND:"
 "DOTA_Tooltip_ability_holdout_frost_breath_wave_range_tooltip"		"RANGE:"
@@ -832,7 +833,7 @@
 "DOTA_Tooltip_ability_holdout_frost_breath_knockback_duration"		"KNOCKBACK DURATION:"
 "DOTA_Tooltip_ability_holdout_frost_breath_total_damage_tooltip"	"TOTAL DAMAGE:"
 "DOTA_Tooltip_modifier_frost_breath_slow"							"Frost Breath"
-"DOTA_Tooltip_modifier_frost_breath_slow_Description"				"Unit Slowed and take damage on time."
+"DOTA_Tooltip_modifier_frost_breath_slow_Description"				"Move speed: %dMODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE%%%."
 
 "DOTA_Tooltip_ability_holdout_frost_armor"									"Frost Shield"
 "DOTA_Tooltip_ability_holdout_frost_armor_Description"						"Creates a shield around the target friendly unit or building, which adds armor and slows attacking units. Lasts 40 seconds."
@@ -842,9 +843,13 @@
 "DOTA_Tooltip_ability_holdout_frost_armor_slow_movement_speed"				"%ENEMY MOVE SLOW:"
 "DOTA_Tooltip_ability_holdout_frost_armor_slow_attack_speed"				"ENEMY ATTACK SLOW:"
 "DOTA_Tooltip_ability_holdout_frost_armor_slow_duration"					"SLOW DURATION:"
+"DOTA_Tooltip_modifier_lich_frost_armor"									"Frost Shield"
+"DOTA_Tooltip_modifier_lich_frost_armor_Description"						"Armor is increased. Enemies that attack this unit are slowed."
+"DOTA_Tooltip_modifier_lich_frost_armor_slow"								"Frost Shield Slow"
+"DOTA_Tooltip_modifier_lich_frost_armor_slow_Description"					"Movement speed and attack speed are reduced by Frost Shield."
 
 "DOTA_Tooltip_ability_holdout_frost_arrows"											"Frost Arrows"
-"DOTA_Tooltip_ability_holdout_frost_arrows_Description"								"Adds a freezing effect to Lich's attacks, slowing enemy movement. Lasts %frost_arrows_hero_duration_tooltip% seconds."
+"DOTA_Tooltip_ability_holdout_frost_arrows_Description"								"Adds a freezing effect to Lich's attacks, slowing enemy movement. Lasts %frost_arrows_duration% seconds."
 "DOTA_Tooltip_ability_holdout_frost_arrows_Lore"									"Ice-encased arrows pierce the silence, chilling their victims to the core."
 "DOTA_Tooltip_ability_holdout_frost_arrows_Note0"									"The slow duration is refreshed on successive casts."
 "DOTA_Tooltip_ability_holdout_frost_arrows_bonus_damage"							"BONUS DAMAGE:"
@@ -911,15 +916,15 @@
 "DOTA_Tooltip_ability_holdout_dwarf_toss_leap_speedbonus_as"		"ATTACK SPEED BONUS:"
 "DOTA_Tooltip_ability_holdout_dwarf_toss_radius"					"RADIUS:"
 "DOTA_Tooltip_ability_holdout_dwarf_toss_duration"					"SLOW DURATION:"
-"DOTA_Tooltip_ability_holdout_dwarf_toss_movement_slow"				"MOVEMENT SLOW:"
+"DOTA_Tooltip_ability_holdout_dwarf_toss_movement_slow"				"%MOVEMENT SLOW:"
 
 "DOTA_Tooltip_modifier_dwarf_toss"									"Dwarf Toss"
-"DOTA_Tooltip_modifier_dwarf_toss_Description"						"Increased move and attack speed"
+"DOTA_Tooltip_modifier_dwarf_toss_Description"						"Attack speed: %dMODIFIER_PROPERTY_ATTACKSPEED_BONUS_CONSTANT%. Move speed: %dMODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE%%%."
 
 "DOTA_Tooltip_ability_holdout_second_wind"							"Second Wind"
 "DOTA_Tooltip_ability_holdout_second_wind_Description"				"Passively regenerate 1.5% of the hero's health out of combat."
 "DOTA_Tooltip_ability_holdout_second_wind_Lore"						""
-"DOTA_Tooltip_ability_holdout_second_wind_noncombat_regen"			"%HP REGEN:"
+"DOTA_Tooltip_ability_holdout_second_wind_noncombat_regen"			"%HEALTH REGEN:"
 
 "DOTA_Tooltip_ability_elder_titan_earth_splitter"					"Earth Splitter"
 "DOTA_Tooltip_ability_elder_titan_earth_splitter_Description"		"Sends forth a jagged crack in front of the Stone Giant. After 3 seconds, the crack implodes, slowing movement while dealing damage to each enemy based on their maximum life. Half of the damage dealt is Magical damage, while the other half is Physical damage."
@@ -928,18 +933,18 @@
 "DOTA_Tooltip_ability_elder_titan_earth_splitter_crack_distance"	"CRACK LENGTH:"
 "DOTA_Tooltip_ability_elder_titan_earth_splitter_crack_time"		"EXPLODE DELAY:"
 "DOTA_Tooltip_ability_elder_titan_earth_splitter_slow_duration"		"SLOW DURATION:"
-"DOTA_Tooltip_ability_elder_titan_earth_splitter_damage_pct"		"%MAX HP AS DAMAGE:"
+"DOTA_Tooltip_ability_elder_titan_earth_splitter_damage_pct"		"%MAX HEALTH AS DAMAGE:"
 "DOTA_Tooltip_ability_elder_titan_earth_splitter_slow_pct"			"%MOVEMENT SLOW:"
 
 "DOTA_Tooltip_ability_holdout_giant_form"							"Giant Form"
 "DOTA_Tooltip_ability_holdout_giant_form_Description"				"Turns into a huge Stone Giant, dealing higher damage but slowing attack and move speed."
 "DOTA_Tooltip_ability_holdout_giant_form_bonus_damage"				"%BONUS DAMAGE:"
 "DOTA_Tooltip_ability_holdout_giant_form_bat_reduction"				"BAT REDUCTION:"
-"DOTA_Tooltip_ability_holdout_giant_form_bonus_ms"					"MOVESPEED REDUCTION:"
+"DOTA_Tooltip_ability_holdout_giant_form_bonus_ms"					"MOVEMENT SPEED REDUCTION:"
 
 "DOTA_Tooltip_ability_medusa_stone_gaze"								"Stone Gaze"
 "DOTA_Tooltip_ability_medusa_stone_gaze_Description"					"Any enemy units looking at the Stone Giant will have their movement and attack speed slowed. If 2 seconds of total time is accumulated looking at the Stone Giant while Stone Gaze is active, that unit will turn to stone. Petrified units are stunned, have 100%% magic damage resistance, and take bonus physical damage. If the petrified unit is an illusion, it is immediately killed."
-"DOTA_Tooltip_ability_medusa_stone_gaze_Note0"							"Affects Spell Immune units."
+"DOTA_Tooltip_ability_medusa_stone_gaze_Note0"							"Affects spell immune units."
 "DOTA_Tooltip_ability_medusa_stone_gaze_Note1"							"Regardless of when a unit receives the Stone Gaze buff while the ability is active on the Stone Giant, it will still receive the full debuff duration."
 "DOTA_Tooltip_ability_medusa_stone_gaze_radius"							"RADIUS:"
 "DOTA_Tooltip_ability_medusa_stone_gaze_slow"							"%SLOW:"
@@ -978,7 +983,7 @@
 "DOTA_Tooltip_ability_holdout_devotion_aura_bonus_armor"				"BONUS ARMOR:"
 
 "DOTA_Tooltip_modifier_devotion_buff"									"Devotion Aura"
-"DOTA_Tooltip_modifier_devotion_buff_Description"						"Grants Additional Armor"
+"DOTA_Tooltip_modifier_devotion_buff_Description"						"Armor: %dMODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS%."
 
 "DOTA_Tooltip_ability_holdout_howl_of_terror"								"Howl of Terror"
 "DOTA_Tooltip_ability_holdout_howl_of_terror_Description"					"The Lightbringer lets loose a wicked cry, weakening the damage and armor of enemies and giving vision of the path ahead."
@@ -986,10 +991,10 @@
 "DOTA_Tooltip_ability_holdout_howl_of_terror_armor_reduction"				"ARMOR REDUCTION:"
 "DOTA_Tooltip_ability_holdout_howl_of_terror_tooltip_duration"				"DEBUFF DURATION:"
 "DOTA_Tooltip_ability_holdout_howl_of_terror_vision_duration"				"VISION DURATION:"
-"DOTA_Tooltip_ability_holdout_howl_of_terror_damage_percentage_reduction"	"DAMAGE REDUCTION:"
+"DOTA_Tooltip_ability_holdout_howl_of_terror_damage_percentage_reduction"	"%DAMAGE REDUCTION:"
 
 "DOTA_Tooltip_modifier_howl_of_terror"					"Howl of Terror"
-"DOTA_Tooltip_modifier_howl_of_terror_Description"		"Reduces target damage and armor."
+"DOTA_Tooltip_modifier_howl_of_terror_Description"		"Armor: %dMODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS%. Damage dealt: %dMODIFIER_PROPERTY_BASEDAMAGEOUTGOING_PERCENTAGE%%%."
 
 "DOTA_Tooltip_ability_holdout_taunt"								"Taunt"
 "DOTA_Tooltip_ability_holdout_taunt_Description"					"Forces all enemy units around Paladin to attack him for a short duration."
@@ -1001,16 +1006,16 @@
 "DOTA_Tooltip_ability_holdout_pure_light_bat_reduction"					"BAT REDUCTION:"
 
 "DOTA_Tooltip_modifier_pure_light"										"Pure Light"
-"DOTA_Tooltip_modifier_pure_light_Description"							"Increase Attack Speed and Damage of Uther"
+"DOTA_Tooltip_modifier_pure_light_Description"							"Damage dealt: %dMODIFIER_PROPERTY_BASEDAMAGEOUTGOING_PERCENTAGE%%%."
 
 "DOTA_Tooltip_ability_holdout_light_frenzy"								"Light Frenzy"
-"DOTA_Tooltip_ability_holdout_light_frenzy_Description"					"Refresh all cooldowns of the target, inccrease Move Speed and reduce Base Attack Time of the hero."
+"DOTA_Tooltip_ability_holdout_light_frenzy_Description"					"Refresh all cooldowns of the target, increase movement speed and reduce Base Attack Time of the hero."
 "DOTA_Tooltip_ability_holdout_light_frenzy_duration"					"DURATION:"
 "DOTA_Tooltip_ability_holdout_light_frenzy_bonus_move_speed"			"%BONUS MOVE SPEED:"
 "DOTA_Tooltip_ability_holdout_light_frenzy_bat_reduction"				"BAT REDUCTION:"
 
 "DOTA_Tooltip_modifier_light_frenzy"									"Light Frenzy"
-"DOTA_Tooltip_modifier_light_frenzy_Description"						"Increases Move Speed and reduce BAT."
+"DOTA_Tooltip_modifier_light_frenzy_Description"						"Move speed: %dMODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE%%%."
 
 
 //RIFLEMAN
@@ -1019,7 +1024,7 @@
 "DOTA_Tooltip_ability_holdout_rocket_launcher_bonus_damage"			"%BONUS DAMAGE:"
 
 "DOTA_Tooltip_modifier_rocket_launcher"					"Rocket Launcher"
-"DOTA_Tooltip_modifier_rocket_launcher_Description"		"Add more damage."
+"DOTA_Tooltip_modifier_rocket_launcher_Description"		"Damage dealt: %dMODIFIER_PROPERTY_BASEDAMAGEOUTGOING_PERCENTAGE%%%."
 
 "DOTA_Tooltip_ability_holdout_plasma_rifle"							"Plasma Rifle"
 "DOTA_Tooltip_ability_holdout_plasma_rifle_Description"				"Adds splash to Rifleman, causing his attacks to do damage in an area.\n<font color='#FF7800'>WARNING: Does NOT stack with other Orbs effects.</font>"
@@ -1042,7 +1047,7 @@
 "DOTA_Tooltip_ability_rifleman_assassinate_Lore"					"In order to fulfill the prophecy and return to his home town, Kardel must make another shot as perfect as the one on the day of his ancient test."
 "DOTA_Tooltip_ability_rifleman_assassinate_Note0"					"Crosshair effect is only visible to allies."
 "DOTA_Tooltip_ability_rifleman_assassinate_Note1"					"Invisibility doesn't disjoint the projectile."
-"DOTA_Tooltip_ability_rifleman_assassinate_Note2"					"Interrupts channeling spell, including on Spell Immune units."
+"DOTA_Tooltip_ability_rifleman_assassinate_Note2"					"Interrupts channeling spell, including on spell immune units."
 "DOTA_Tooltip_ability_rifleman_assassinate_assassinate_damage"		"DAMAGE:"
 "DOTA_Tooltip_ability_rifleman_assassinate_scatter_range"			"SCATTER RANGE:"
 "DOTA_Tooltip_ability_rifleman_assassinate_tooltip_range"			"RANGE:"
@@ -1061,7 +1066,7 @@
 "DOTA_Tooltip_ability_holdout_serpent_ward"								"Serpent Ward"
 "DOTA_Tooltip_ability_holdout_serpent_ward_Description"					"Spawn a serpent ward to help shadow hunter in his fight."
 "DOTA_Tooltip_ability_holdout_serpent_ward_bonus_damage_percent"		"DURATION:"
-"DOTA_Tooltip_ability_holdout_serpent_ward_ward_hp_tooltip"				"WARD HP:"
+"DOTA_Tooltip_ability_holdout_serpent_ward_ward_hp_tooltip"				"WARD HEALTH:"
 "DOTA_Tooltip_ability_holdout_serpent_ward_ward_damage_tooltip"			"WARD DAMAGE:"
 "DOTA_Tooltip_ability_holdout_serpent_ward_duration"					"DURATION:"
 
@@ -1077,14 +1082,14 @@
 "DOTA_Tooltip_ability_holdout_laser_trap"							"Laser Trap"
 "DOTA_Tooltip_ability_holdout_laser_trap_Description"				"Spawn a trap that deals very high damage."
 "DOTA_Tooltip_ability_holdout_laser_trap_bonus_damage_percent"		"DURATION:"
-"DOTA_Tooltip_ability_holdout_laser_trap_ward_hp_tooltip"			"WARD HP:"
+"DOTA_Tooltip_ability_holdout_laser_trap_ward_hp_tooltip"			"WARD HEALTH:"
 "DOTA_Tooltip_ability_holdout_laser_trap_ward_damage_tooltip"		"WARD DAMAGE:"
 "DOTA_Tooltip_ability_holdout_laser_trap_unit_count"				"UNIT COUNT:"
 
 "DOTA_Tooltip_ability_holdout_hex"									"Hex"
 "DOTA_Tooltip_ability_holdout_hex_Description"						"Hex the target and spawn 6 laser traps around him."
 "DOTA_Tooltip_ability_holdout_hex_bonus_damage_percent"				"DURATION:"
-"DOTA_Tooltip_ability_holdout_hex_ward_hp_tooltip"					"WARD HP:"
+"DOTA_Tooltip_ability_holdout_hex_ward_hp_tooltip"					"WARD HEALTH:"
 "DOTA_Tooltip_ability_holdout_hex_ward_damage_tooltip"				"WARD DAMAGE:"
 "DOTA_Tooltip_ability_holdout_hex_unit_count"						"UNIT COUNT:"
 
@@ -1158,11 +1163,11 @@
 "DOTA_Tooltip_ability_holdout_splash_arrows_bonus_damage"				"BONUS DAMAGE:"
 
 "DOTA_Tooltip_modifier_splash_arrows"									"Splash Arrows"
-"DOTA_Tooltip_modifier_splash_arrows_Description"						"Engulfs Sylvanas arrows with magic, causing them to deal more damage, with a cleave radius."
+"DOTA_Tooltip_modifier_splash_arrows_Description"						"Attack damage: %dMODIFIER_PROPERTY_BASEATTACK_BONUSDAMAGE%."
 
 "DOTA_Tooltip_ability_holdout_rocket_hail"								"Rocket Hail"
 "DOTA_Tooltip_ability_holdout_rocket_hail_Description"					"Calls down rockets, moving in front of Windrunner and dealing massive damage on hit."
-"DOTA_Tooltip_ability_holdout_rocket_hail_Note0"						"Rockets explode when hit an unit."
+"DOTA_Tooltip_ability_holdout_rocket_hail_Note0"						"Rockets explode when they hit a unit."
 "DOTA_Tooltip_ability_holdout_rocket_hail_damage_per_skull"				"ROCKETS DAMAGE:"
 "DOTA_Tooltip_ability_holdout_rocket_hail_distance"						"SPAWN DISTANCE:"
 "DOTA_Tooltip_ability_holdout_rocket_hail_speed"						"ROCKETS SPEED:"
@@ -1183,11 +1188,11 @@
 "DOTA_Tooltip_ability_holdout_heat_seeking_daggers_duration"			"DURATION:"
 
 "DOTA_Tooltip_modifier_heat_seeking_daggers"					"Heat Seeking Daggers"
-"DOTA_Tooltip_modifier_heat_seeking_daggers_Description"		"Slowed by dagger!"
+"DOTA_Tooltip_modifier_heat_seeking_daggers_Description"		"Move speed: %dMODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE%%%."
 
 "DOTA_Tooltip_ability_holdout_shadow_strike"							"Shadow Strike"
 "DOTA_Tooltip_ability_holdout_shadow_strike_Description"				"Fires a poisoned strike, dealing damage/sec and slowing the opponent's attack speed and move speed."
-"DOTA_Tooltip_ability_holdout_shadow_strike_move_slow"					"MOVE SLOW:"
+"DOTA_Tooltip_ability_holdout_shadow_strike_move_slow"					"%MOVE SLOW:"
 "DOTA_Tooltip_ability_holdout_shadow_strike_dagger_speed"				"DAGGER SPEED:"
 "DOTA_Tooltip_ability_holdout_shadow_strike_duration"					"DURATION:"
 "DOTA_Tooltip_ability_holdout_shadow_strike_poison_damage"				"POISON DAMAGE:"
@@ -1195,13 +1200,13 @@
 "DOTA_Tooltip_ability_holdout_shadow_strike_total_damage_tooltip"		"TOTAL DAMAGE:"
 
 "DOTA_Tooltip_modifier_shadow_strike"					"Shadow Strike"
-"DOTA_Tooltip_modifier_shadow_strike_Description"		"Periodically taking damage from poison!"
+"DOTA_Tooltip_modifier_shadow_strike_Description"		"Move speed: %dMODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE%%%. Attack speed: %dMODIFIER_PROPERTY_ATTACKSPEED_BONUS_CONSTANT%."
 
 "DOTA_Tooltip_ability_holdout_permanent_stats"							"Permanent Stats"
 "DOTA_Tooltip_ability_holdout_permanent_stats_Description"				"Add more stats to Warden, these stats are permanent."
 "DOTA_Tooltip_ability_holdout_permanent_stats_stats_bonus"				"BONUS STATS:"
 "DOTA_Tooltip_modifier_permanent_stats"									"Permanent Stats"
-"DOTA_Tooltip_modifier_permanent_stats_Description"						"Gives Bonus Strength, Agility, Intelligence to the hero."
+"DOTA_Tooltip_modifier_permanent_stats_Description"						"Strength: %dMODIFIER_PROPERTY_STATS_STRENGTH_BONUS%. Agility: %dMODIFIER_PROPERTY_STATS_AGILITY_BONUS%. Intelligence: %dMODIFIER_PROPERTY_STATS_INTELLECT_BONUS%."
 
 "DOTA_Tooltip_ability_holdout_gust_pool"								"Gust Pool"
 "DOTA_Tooltip_ability_holdout_gust_pool_Description"					"Stuns enemies in a specific area, dealing damage/sec."
@@ -1219,7 +1224,7 @@
 "DOTA_Tooltip_ability_holdout_blink_blink_range"						"MAX RANGE:"
 
 "DOTA_Tooltip_ability_holdout_morph"									"Morph"
-"DOTA_Tooltip_ability_holdout_morph_Description"						"Turns an enemy unit into a hexed state, wich cannot cast spells or attack.\nPassively grants permanent invisibility."
+"DOTA_Tooltip_ability_holdout_morph_Description"						"Turns an enemy unit into a hexed state, which cannot cast spells or attack.\nPassively grants permanent invisibility."
 "DOTA_Tooltip_ability_holdout_morph_fade_time"							"FADE TIME:"
 "DOTA_Tooltip_ability_holdout_morph_voodoo_duration"					"VOODOO DURATION:"
 
@@ -1228,7 +1233,7 @@
 "DOTA_Tooltip_ability_holdout_dark_portal"								"Dark Portal"
 "DOTA_Tooltip_ability_holdout_dark_portal_Description"					"Summons an immobile dark portal to attack enemy units and structures. The portal is immune to magic."
 "DOTA_Tooltip_ability_holdout_dark_portal_duration"						"DURATION:"
-"DOTA_Tooltip_ability_holdout_dark_portal_ward_hp_tooltip"				"PORTAL HP:"
+"DOTA_Tooltip_ability_holdout_dark_portal_ward_hp_tooltip"				"PORTAL HEALTH:"
 "DOTA_Tooltip_ability_holdout_dark_portal_ward_damage_tooltip"			"PORTAL DAMAGE:"
 
 "DOTA_Tooltip_ability_holdout_spiritual_beast"							"Spiritual Beast"
@@ -1257,16 +1262,16 @@
 "DOTA_Tooltip_ability_holdout_archimonde_radius"						"SPLASH RADIUS:"
 "DOTA_Tooltip_ability_holdout_archimonde_bonus_damage"					"BONUS DAMAGE:"
 "DOTA_Tooltip_ability_holdout_archimonde_bonus_movement_speed"			"BONUS MOVEMENT SPEED:"
-"DOTA_Tooltip_ability_holdout_archimonde_cleave_pct"					"SPLASH PERCENT:"
+"DOTA_Tooltip_ability_holdout_archimonde_cleave_pct"					"%SPLASH PERCENT:"
 
 "DOTA_Tooltip_modifier_splash_attack"					"Archimonde"
 "DOTA_Tooltip_modifier_splash_attack_Description"		"Turns into a demonic form, increasing damage, move speed and grants cleave attacks."
 
 "DOTA_Tooltip_ability_holdout_cripple"									"Cripple"
-"DOTA_Tooltip_ability_holdout_cripple_Description"						"Reduce Movement Speed, Attack Speed and Damage of the target."
+"DOTA_Tooltip_ability_holdout_cripple_Description"						"Reduce movement speed, Attack Speed and Damage of the target."
 "DOTA_Tooltip_ability_holdout_cripple_bonus_attack_speed"				"ATTACK SLOW:"
 "DOTA_Tooltip_ability_holdout_cripple_bonus_movement_speed"				"MOVEMENT SLOW:"
-"DOTA_Tooltip_ability_holdout_cripple_extra_incoming_damage_tooltip"	"DAMAGE REDUCTION:"
+"DOTA_Tooltip_ability_holdout_cripple_extra_incoming_damage_tooltip"	"%DAMAGE REDUCTION:"
 "DOTA_Tooltip_ability_holdout_cripple_duration"							"DURATION:"
 
 
@@ -1286,7 +1291,7 @@
 "DOTA_Tooltip_ability_holdout_monsoon_small_Description"				"Calls down the light spirits to deal damage all around a specific area."
 "DOTA_Tooltip_ability_holdout_monsoon_small_Note0"						"Stuns all enemy units in the radius for 0.1 seconds when cast."
 "DOTA_Tooltip_ability_holdout_monsoon_small_radius"						"RADIUS:"
-"DOTA_Tooltip_ability_holdout_monsoon_small_movespeed_slow"				"%MOVESPEED SLOW:"
+"DOTA_Tooltip_ability_holdout_monsoon_small_movespeed_slow"				"%MOVEMENT SPEED SLOW:"
 "DOTA_Tooltip_ability_holdout_monsoon_small_attack_slow"				"ATTACK SLOW:"
 "DOTA_Tooltip_ability_holdout_monsoon_small_damage"						"DAMAGE:"
 "DOTA_Tooltip_ability_holdout_monsoon_small_stun_duration"				"STUN DURATION:"
@@ -1299,7 +1304,7 @@
 "DOTA_Tooltip_ability_holdout_phase_shift_duration"						"DURATION:"
 
 "DOTA_Tooltip_modifier_phase_shift"						"Phase Shift"
-"DOTA_Tooltip_modifier_phase_shift_Description"			"Attack Speed and Move Speed increased, with 100% evasion."
+"DOTA_Tooltip_modifier_phase_shift_Description"			"Attack speed: %dMODIFIER_PROPERTY_ATTACKSPEED_BONUS_CONSTANT%. Move speed: %dMODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE%%%. Evasion: %dMODIFIER_PROPERTY_EVASION_CONSTANT%%%."
 
 "DOTA_Tooltip_ability_holdout_life_regeneration_aura"						"Life Regeneration Aura"
 "DOTA_Tooltip_ability_holdout_life_regeneration_aura_Description"			"Gives all friendly units a bonus to hitpoints regeneration."
@@ -1307,7 +1312,7 @@
 "DOTA_Tooltip_ability_holdout_life_regeneration_aura_bonus_health_regen"	"HEALTH REGEN:"
 
 "DOTA_Tooltip_modifier_life_regeneration_aura_datadriven"				"Life Regeneration"
-"DOTA_Tooltip_modifier_life_regeneration_aura_datadriven_Description"	"Increase health regeneration."
+"DOTA_Tooltip_modifier_life_regeneration_aura_datadriven_Description"	"Health regen: %dMODIFIER_PROPERTY_HEALTH_REGEN_CONSTANT%."
 
 "DOTA_Tooltip_ability_holdout_permanent_lightning"							"Permanent Lightning"
 "DOTA_Tooltip_ability_holdout_permanent_lightning_Description"				"Engulfs the hero in lightning, causing damage to nearby enemy units."
@@ -1319,10 +1324,10 @@
 "DOTA_Tooltip_ability_holdout_resistant_skin_bonus_magical_resistance"		"%BONUS MAGICAL RESISTANCE:"
 
 "DOTA_Tooltip_modifier_resistant_skin"						"Resistant Skin"
-"DOTA_Tooltip_modifier_resistant_skin_Description"			"Reduces damage taken from magical sources by 50 percent."
+"DOTA_Tooltip_modifier_resistant_skin_Description"			"Magic resistance: %dMODIFIER_PROPERTY_MAGICAL_RESISTANCE_BONUS%%%."
 
 "DOTA_Tooltip_ability_pugna_life_drain"											"Lightning Shock"
-"DOTA_Tooltip_ability_pugna_life_drain_Description"								"CHANNELED - When cast on an enemy, The Sorceress drains health from the target enemy unit to heal himself. If The Sorceress has full HP, and the enemy target is a Hero, Life Drain will restore mana instead.\n\nWhen cast on an ally, The Sorceress will drain his own health into his ally."
+"DOTA_Tooltip_ability_pugna_life_drain_Description"								"CHANNELED - When cast on an enemy, The Sorceress drains health from the target enemy unit to heal himself. If The Sorceress has full health, and the enemy target is a hero, Life Drain will restore mana instead.\n\nWhen cast on an ally, The Sorceress will drain his own health into his ally."
 "DOTA_Tooltip_ability_pugna_life_drain_Lore"									"Sorceress has truly become more powerful than even the grandmaster of Oblivion."
 "DOTA_Tooltip_ability_pugna_life_drain_Note0"									"HP drained depends on the actual damage dealt."
 "DOTA_Tooltip_ability_pugna_life_drain_Note1"									"Illusions are destroyed on the first tick of damage."
@@ -1365,7 +1370,7 @@
 "DOTA_Tooltip_ability_holdout_wukong_army_angel_damage"				"ANGEL DAMAGE:"
 "DOTA_Tooltip_ability_holdout_wukong_army_notes"						"Notes:\n\nAffects allies with Magic Immunity."
 "DOTA_Tooltip_modifier_holdout_wukong_army_buff"						"Sun Wukong's Army"
-"DOTA_Tooltip_modifier_holdout_wukong_army_buff_Description"			"Immune to physical damage and protected by Guardians."
+"DOTA_Tooltip_modifier_holdout_wukong_army_buff_Description"			"Absolute No Damage Physical: %dMODIFIER_PROPERTY_ABSOLUTE_NO_DAMAGE_PHYSICAL%. Health regen: %dMODIFIER_PROPERTY_HEALTH_REGEN_CONSTANT%."
 
 
 "DOTA_Tooltip_ability_axe_battle_rage"									"Battle Rage"
@@ -1466,7 +1471,7 @@
 "npc_dota_hero_ursa"								"Malfurion"
 "npc_dota_hero_warlock"								"Archimonde"
 "npc_dota_hero_windrunner"							"Ranger"
-"npc_dota_hero_wisp"								"Choosing Hero..."
+"npc_dota_hero_wisp"								"Choosing hero..."
 
 //HERO CREEPS
 "npc_dota_golem_inferno"							"Inferno"
@@ -1661,7 +1666,7 @@
 "DOTA_Tooltip_ability_creature_death_pulse"						"Death Pulse"
 "DOTA_Tooltip_ability_serpent_splash_arrows"					"Splash Attack"
 "DOTA_Tooltip_modifier_unholy_buff"								"Unholy Aura"
-"DOTA_Tooltip_modifier_unholy_Description"						"Increase Movespeed and Attack Speed"
+"DOTA_Tooltip_modifier_unholy_Description"						"Increase movement speed and Attack Speed"
 
 "DOTA_Tooltip_ability_creature_aura_of_blight"							"Aura of Blight"
 "DOTA_Tooltip_ability_creature_aura_of_blight_Description"				"Gives all friendly units a bonus to hitpoints regeneration."
@@ -1674,7 +1679,7 @@
 "DOTA_Tooltip_ability_creature_starfall_starfall_secondary_radius"		"SECONDARY RADIUS:"
 
 "DOTA_Tooltip_ability_creature_war_stomp"						"War Stomp"
-"DOTA_Tooltip_ability_creature_war_stomp_Description"			"Slams the ground, stunning anf damaging nearby enemy units."
+"DOTA_Tooltip_ability_creature_war_stomp_Description"			"Slams the ground, stunning and damaging nearby enemy units."
 "DOTA_Tooltip_ability_creature_war_stomp_radius"				"RADIUS:"
 "DOTA_Tooltip_ability_creature_war_stomp_stun_duration"			"STUN DURATION:"
 "DOTA_Tooltip_ability_creature_war_stomp_stomp_damage"			"DAMAGE:"
@@ -1702,27 +1707,27 @@
 "DOTA_Tooltip_ability_creature_thunder_clap_damage"					"DAMAGE:"
 "DOTA_Tooltip_ability_creature_thunder_clap_radius"					"RADIUS:"
 "DOTA_Tooltip_ability_creature_thunder_clap_duration"				"DURATION:"
-"DOTA_Tooltip_ability_creature_thunder_clap_movement_slow"			"MOVEMENT SLOW:"
+"DOTA_Tooltip_ability_creature_thunder_clap_movement_slow"			"%MOVEMENT SLOW:"
 "DOTA_Tooltip_ability_creature_thunder_clap_attack_speed_slow"		"ATTACK SPEED SLOW:"
 
 "DOTA_Tooltip_modifier_thunder_clap"					"Thunder Clap"
-"DOTA_Tooltip_modifier_thunder_clap_Description"		"Attack and Move speed slowed!"
+"DOTA_Tooltip_modifier_thunder_clap_Description"		"Attack speed: %dMODIFIER_PROPERTY_ATTACKSPEED_BONUS_CONSTANT%. Move speed: %dMODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE%%%."
 
 "DOTA_Tooltip_ability_xhs_creeps_phase_2_unholy_aura"									"Unholy Aura"
-"DOTA_Tooltip_ability_xhs_creeps_phase_2_unholy_aura_Description"						"Increases the Movement Speed and HP Regen of nearby friendly units."
-"DOTA_Tooltip_ability_xhs_creeps_phase_2_unholy_aura_bonus_movement_speed"				"BONUS MOVEMENT SPEED:"
-"DOTA_Tooltip_ability_xhs_creeps_phase_2_unholy_aura_bonus_health_regen"				"BONUS HP REGEN:"
+"DOTA_Tooltip_ability_xhs_creeps_phase_2_unholy_aura_Description"						"Increases the movement speed and HP Regen of nearby friendly units."
+"DOTA_Tooltip_ability_xhs_creeps_phase_2_unholy_aura_bonus_movement_speed"				"%BONUS MOVEMENT SPEED:"
+"DOTA_Tooltip_ability_xhs_creeps_phase_2_unholy_aura_bonus_health_regen"				"BONUS HEALTH REGEN:"
 "DOTA_Tooltip_ability_xhs_creeps_phase_2_unholy_aura_radius"							"RADIUS:"
 
 "DOTA_Tooltip_modifier_unholy_buff"					"Unholy Aura"
-"DOTA_Tooltip_modifier_unholy_buff_Description"		"increase move speed and hp regen."
+"DOTA_Tooltip_modifier_unholy_buff_Description"		"Health regen: %dMODIFIER_PROPERTY_HEALTH_REGEN_CONSTANT%. Move speed: %dMODIFIER_PROPERTY_MOVESPEED_BONUS_CONSTANT%."
 
 "DOTA_Tooltip_ability_creature_thunder_clap_low"					"Thunder Clap"
 "DOTA_Tooltip_ability_creature_thunder_clap_low_Description"		"Stuns all enemy units in a specific radius, slowing attack speed and movement speed."
 "DOTA_Tooltip_ability_creature_thunder_clap_low_damage"				"DAMAGE:"
 "DOTA_Tooltip_ability_creature_thunder_clap_low_radius"				"RADIUS:"
 "DOTA_Tooltip_ability_creature_thunder_clap_low_duration"			"DURATION:"
-"DOTA_Tooltip_ability_creature_thunder_clap_low_movement_slow"		"MOVEMENT SLOW:"
+"DOTA_Tooltip_ability_creature_thunder_clap_low_movement_slow"		"%MOVEMENT SLOW:"
 "DOTA_Tooltip_ability_creature_thunder_clap_low_attack_speed_slow"	"ATTACK SPEED SLOW:"
 
 //GROM HELLSCREAM
@@ -1757,7 +1762,7 @@
 "DOTA_Tooltip_ability_proudmoore_divine_shield_duration"			"DURATION:"
 
 "DOTA_Tooltip_ability_xhs_creeps_phase_2_endurance_aura"									"Endurance Aura"
-"DOTA_Tooltip_ability_xhs_creeps_phase_2_endurance_aura_Description"						"Increases the Movement Speed and Attack Rate of nearby friendly units."
+"DOTA_Tooltip_ability_xhs_creeps_phase_2_endurance_aura_Description"						"Increases the movement speed and Attack Rate of nearby friendly units."
 "DOTA_Tooltip_ability_xhs_creeps_phase_2_endurance_aura_bonus_attack_speed"					"BONUS ATTACK SPEED:"
 "DOTA_Tooltip_ability_xhs_creeps_phase_2_endurance_aura_bonus_movement_speed_percentage"	"%BONUS MOVEMENT SPEED:"
 "DOTA_Tooltip_ability_xhs_creeps_phase_2_endurance_aura_radius"								"RADIUS:"
@@ -1800,11 +1805,11 @@
 "DOTA_Tooltip_ability_howl_of_terror_damage_percent"			"%DAMAGE REDUCTION:"
 
 "DOTA_Tooltip_ability_balanar_sleep"							"Sleep"
-"DOTA_Tooltip_ability_balanar_sleep_Description"				"Make a unit fall asleep, wich can't move and is invulnerable."
+"DOTA_Tooltip_ability_balanar_sleep_Description"				"Make a unit fall asleep, which can't move and is invulnerable."
 "DOTA_Tooltip_ability_balanar_sleep_duration"					"DURATION:"
 
 "DOTA_Tooltip_modifier_sleep"								"Sleep"
-"DOTA_Tooltip_modifier_sleep_Description"					"Sleeping unit can't move and is invulnerable."
+"DOTA_Tooltip_modifier_sleep_Description"					"Override Animation: %dMODIFIER_PROPERTY_OVERRIDE_ANIMATION%."
 
 "DOTA_Tooltip_ability_balanar_rain_of_chaos"						"Rain of Chaos"
 "DOTA_Tooltip_ability_balanar_rain_of_chaos_Description"			"Calls down meteors around Abyssal Underlord, stunning enemy units. Abyssal Underlord receive 50% of the physical incoming damage during the process."
@@ -1822,17 +1827,17 @@
 "DOTA_Tooltip_ability_arthas_frostmourne_stun_duration"		"STUN DURATION:"
 "DOTA_Tooltip_ability_arthas_frostmourne_bonus_damage_stun"	"STUN BONUS DAMAGE:"
 "DOTA_Tooltip_ability_arthas_frostmourne_critical_damage"	"%CRITICAL DAMAGE"
-"DOTA_Tooltip_ability_arthas_frostmourne_evasion_chance"	"EVASION:"
+"DOTA_Tooltip_ability_arthas_frostmourne_evasion_chance"	"%EVASION:"
 "DOTA_Tooltip_ability_arthas_frostmourne_stun_chance"		"%CHANCE TO STUN:"
 "DOTA_Tooltip_modifier_frostmourne"							"Frostmourne"
-"DOTA_Tooltip_modifier_frostmourne_Description"				"Gives to Arthas the chance to bash enemy units and deals critical shots."
+"DOTA_Tooltip_modifier_frostmourne_Description"				"Evasion: %dMODIFIER_PROPERTY_EVASION_CONSTANT%%%."
 
 "DOTA_Tooltip_ability_divine_aura"										"Divine Aura"
-"DOTA_Tooltip_ability_divine_aura_Description"							"Increases the Movement Speed, Attack Rate, Armor and Life Regen of nearby friendly units."
+"DOTA_Tooltip_ability_divine_aura_Description"							"Increases the movement speed, Attack Rate, Armor and Life Regen of nearby friendly units."
 "DOTA_Tooltip_ability_divine_aura_bat_reduction"						"BASE ATTACK TIME:"
 "DOTA_Tooltip_ability_divine_aura_bonus_movement_speed_percentage"		"%MOVEMENT SPEED:"
 "DOTA_Tooltip_ability_divine_aura_bonus_armor"							"BONUS ARMOR:"
-"DOTA_Tooltip_ability_divine_aura_bonus_health_regen"					"BONUS HP REGEN:"
+"DOTA_Tooltip_ability_divine_aura_bonus_health_regen"					"BONUS HEALTH REGEN:"
 "DOTA_Tooltip_ability_divine_aura_radius"								"RADIUS:"
 
 "DOTA_Tooltip_ability_arthas_holy_light"						"Holy Light"
@@ -1843,20 +1848,20 @@
 
 "DOTA_Tooltip_ability_arthas_knights_armor"							"Knight Armor"
 "DOTA_Tooltip_ability_arthas_knights_armor_Description"				"Grants bonus armor, and return damage to the target."
-"DOTA_Tooltip_ability_arthas_knights_armor_damage_return_factor"	"DAMAGE RETURNED:"
+"DOTA_Tooltip_ability_arthas_knights_armor_damage_return_factor"	"%DAMAGE RETURNED:"
 "DOTA_Tooltip_ability_arthas_knights_armor_armor_bonus"				"BONUS ARMOR:"
 
 "DOTA_Tooltip_ability_arthas_light_roar"								"Avatar"
 "DOTA_Tooltip_ability_arthas_light_roar_Description"					"Send Arthas into a rage. Gives bonus damage, armor, and hp regeneration. Lasts 45 seconds."
 "DOTA_Tooltip_ability_arthas_light_roar_bonus_damage_percentage"		"%BONUS DAMAGE:"
 "DOTA_Tooltip_ability_arthas_light_roar_armor_bonus"					"BONUS ARMOR:"
-"DOTA_Tooltip_ability_arthas_light_roar_hp_regeneration"				"BONUS HP REGEN:"
+"DOTA_Tooltip_ability_arthas_light_roar_hp_regeneration"				"BONUS HEALTH REGEN:"
 "DOTA_Tooltip_ability_arthas_light_roar_duration"						"DURATION:"
 
 //BANEHALLOW
 "DOTA_Tooltip_ability_banehallow_stampede"								"Stampede"
 "DOTA_Tooltip_ability_banehallow_stampede_Description"					"Calls down death skulls, moving in front of Banehallow and dealing massive damage on hit."
-"DOTA_Tooltip_ability_banehallow_stampede_Note0"						"Death Skulls explode when hit an unit."
+"DOTA_Tooltip_ability_banehallow_stampede_Note0"						"Death Skulls explode when they hit a unit."
 "DOTA_Tooltip_ability_banehallow_stampede_damage_per_skull"				"SKULLS DAMAGE:"
 "DOTA_Tooltip_ability_banehallow_stampede_distance"						"SPAWN DISTANCE:"
 "DOTA_Tooltip_ability_banehallow_stampede_speed"						"SKULLS SPEED:"
@@ -1993,7 +1998,7 @@
 "DOTA_Tooltip_ability_ghost_revenant_wraith_duration"         "DURATION:"
 
 "DOTA_Tooltip_modifier_ghost_revenant_wraith"             "Wraith"
-"DOTA_Tooltip_modifier_ghost_revenant_wraith_Description"       "Immune to physical damage."
+"DOTA_Tooltip_modifier_ghost_revenant_wraith_Description"       "Magic resistance: %dMODIFIER_PROPERTY_MAGICAL_RESISTANCE_BONUS%%%. Move speed: %dMODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE%%%."
 
 "DOTA_Tooltip_ability_ghost_revenant_miasma"              "Miasma"
 "DOTA_Tooltip_ability_ghost_revenant_miasma_Description"        "Deals damage to all enemy units in an x AoE and applies a buff. This buff reveals invisible units and deals damage over time."
@@ -2004,7 +2009,7 @@
 "DOTA_Tooltip_ability_ghost_revenant_miasma_dmg_pct_per_sec"      "%HEALTH AS DAMAGE PER SEC:"
 
 "DOTA_Tooltip_modifier_ghost_revenant_miasma"             "Miasma"
-"DOTA_Tooltip_modifier_ghost_revenant_miasma_Description"       "Taking %dmg_per_sec% damage over time, and revealed to enemies."
+"DOTA_Tooltip_modifier_ghost_revenant_miasma_Description"       "Move speed: %dMODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE%%%."
 
 "DOTA_Tooltip_ability_ghost_revenant_ghost_immolation"          "Ghost Immolation"
 "DOTA_Tooltip_ability_ghost_revenant_ghost_immolation_Description"    "Deal damage to enemies in 400 radius, dealing %health_as_damage_pct%% of the target’s health per second."
@@ -2021,7 +2026,7 @@
 "DOTA_Tooltip_ability_ghost_revenant_exhaustion_duration"       "DURATION:"
 
 "DOTA_Tooltip_modifier_ghost_revenant_exhaustion"           "Exhaustion"
-"DOTA_Tooltip_modifier_ghost_revenant_exhaustion_Description"     "Movespeed reduced by %ms_reduction_pct% ."
+"DOTA_Tooltip_modifier_ghost_revenant_exhaustion_Description"     "Move speed: %dMODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE%%%."
 
 "DOTA_Tooltip_ability_holdout_empower"							"Empower"
 "DOTA_Tooltip_ability_holdout_empower_Description"				"Grants %cleave_pct%%  cleave and bonus damage to ally heroes."
@@ -2029,7 +2034,7 @@
 "DOTA_Tooltip_ability_holdout_empower_aura_radius"				"AURA RADIUS:"
 
 "DOTA_Tooltip_modifier_empower_buff"						"Empower"
-"DOTA_Tooltip_modifier_empower_buff_Description"			"Grants %cleave_pct%% cleave and bonus damage."
+"DOTA_Tooltip_modifier_empower_buff_Description"			"Damage dealt: %dMODIFIER_PROPERTY_BASEDAMAGEOUTGOING_PERCENTAGE%%%."
 
 "DOTA_Tooltip_ability_magnataur_skewer_winter"				"Skewer"
 "DOTA_Tooltip_ability_magnataur_skewer_winter_Description"	"Charge in a direction, skewering all enemies along the way, dragging them with you to the destination, dealing damage and slowing them. <br>Gain %strength_gain% strength for %strength_gain_duration% seconds."

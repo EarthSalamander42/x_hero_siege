@@ -12,6 +12,7 @@
 	</styles>
 
 	<scripts>
+		<include src="s2r://panorama/scripts/custom_game/playertables/playertables_base.js" />
 		<include src="s2r://panorama/scripts/custom_game/hud_main.vjs_c" />
 		<include src="s2r://panorama/scripts/custom_game/quests.vjs_c" />
 <!--		<include src="s2r://panorama/scripts/custom_game/relic_courier.vjs_c" /> -->
