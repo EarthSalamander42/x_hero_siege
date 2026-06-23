@@ -1,3 +1,115 @@
+LinkLuaModifier("modifier_holdout_mana_shield", "abilities/heroes/hero_archmage.lua", LUA_MODIFIER_MOTION_NONE)
+
+holdout_mana_shield = holdout_mana_shield or class({})
+
+function holdout_mana_shield:ProcsMagicStick()
+	return false
+end
+
+function holdout_mana_shield:OnToggle()
+	if not IsServer() then return end
+
+	local caster = self:GetCaster()
+	if not caster or caster:IsNull() then return end
+
+	if self:GetToggleState() then
+		caster:EmitSound("Hero_Medusa.ManaShield.On")
+		caster:AddNewModifier(caster, self, "modifier_holdout_mana_shield", {})
+	else
+		caster:EmitSound("Hero_Medusa.ManaShield.Off")
+		caster:RemoveModifierByNameAndCaster("modifier_holdout_mana_shield", caster)
+	end
+end
+
+modifier_holdout_mana_shield = modifier_holdout_mana_shield or class({})
+
+function modifier_holdout_mana_shield:IsPurgable() return false end
+function modifier_holdout_mana_shield:RemoveOnDeath() return false end
+function modifier_holdout_mana_shield:GetTexture() return "custom/holdout_mana_shield" end
+function modifier_holdout_mana_shield:GetEffectName() return "particles/units/heroes/hero_medusa/medusa_mana_shield.vpcf" end
+function modifier_holdout_mana_shield:GetEffectAttachType() return PATTACH_ABSORIGIN_FOLLOW end
+
+local function SpendManaShieldMana(unit, mana, ability)
+	if not unit or unit:IsNull() or mana <= 0 then return end
+
+	if unit.SpendMana then
+		unit:SpendMana(mana, ability)
+	elseif unit.SetMana and unit.GetMana then
+		unit:SetMana(math.max(0, unit:GetMana() - mana))
+	end
+end
+
+function modifier_holdout_mana_shield:OnCreated()
+	local ability = self:GetAbility()
+	if not ability or ability:IsNull() then return end
+
+	self.damage_per_mana = ability:GetSpecialValueFor("damage_per_mana")
+	self.absorption_pct = ability:GetSpecialValueFor("absorption_tooltip")
+end
+
+function modifier_holdout_mana_shield:OnRefresh()
+	self:OnCreated()
+end
+
+function modifier_holdout_mana_shield:DeclareFunctions()
+	return {
+		MODIFIER_PROPERTY_INCOMING_DAMAGE_PERCENTAGE,
+	}
+end
+
+function modifier_holdout_mana_shield:GetModifierIncomingDamage_Percentage(keys)
+	if not IsServer() then return 0 end
+	if not keys then return 0 end
+
+	local parent = self:GetParent()
+	local ability = self:GetAbility()
+	if not parent or parent:IsNull() or not ability or ability:IsNull() then return 0 end
+	if keys.target and keys.target ~= parent then return 0 end
+	if keys.damage_type == DAMAGE_TYPE_MAGICAL and parent:IsMagicImmune() then return 0 end
+
+	local damage = keys.original_damage or keys.damage or 0
+	if damage <= 0 then return 0 end
+
+	local damage_per_mana = self.damage_per_mana or ability:GetSpecialValueFor("damage_per_mana")
+	local absorption_pct = self.absorption_pct or ability:GetSpecialValueFor("absorption_tooltip")
+	if damage_per_mana <= 0 or absorption_pct <= 0 then return 0 end
+
+	local current_mana = parent:GetMana()
+	if current_mana <= 0 then
+		self:DisableShield()
+		return 0
+	end
+
+	local desired_block = damage * absorption_pct * 0.01
+	local available_block = current_mana * damage_per_mana
+	local blocked_damage = math.min(desired_block, available_block)
+	if blocked_damage <= 0 then return 0 end
+
+	local mana_spent = blocked_damage / damage_per_mana
+	SpendManaShieldMana(parent, mana_spent, ability)
+	parent:EmitSound("Hero_Medusa.ManaShield.Proc")
+
+	local shield_particle = ParticleManager:CreateParticle("particles/units/heroes/hero_medusa/medusa_mana_shield_impact.vpcf", PATTACH_ABSORIGIN_FOLLOW, parent)
+	ParticleManager:ReleaseParticleIndex(shield_particle)
+
+	if parent:GetMana() <= 0 then
+		self:DisableShield()
+	end
+
+	return -blocked_damage / damage * 100
+end
+
+function modifier_holdout_mana_shield:DisableShield()
+	if not IsServer() then return end
+
+	local ability = self:GetAbility()
+	if ability and not ability:IsNull() and ability:GetToggleState() then
+		ability:ToggleAbility()
+	else
+		self:Destroy()
+	end
+end
+
 function march_of_the_machines_spawn( keys )
 local caster = keys.caster
 local ability = keys.ability

@@ -5483,7 +5483,8 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"BaseClass"						"medusa_mana_shield"
+		"BaseClass"						"ability_lua"
+		"ScriptFile"					"abilities/heroes/hero_archmage.lua"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_TOGGLE | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
 		"AbilityTextureName"			"custom/holdout_mana_shield"
 		"MaxLevel"						"1"
@@ -21158,6 +21159,89 @@
 			}
 
 			"modifier_healing_ward_datadriven"
+			{
+				"Passive"   "1"
+				"IsHidden"  "0"
+
+				"OnCreated"
+				{
+					"AttachEffect"
+					{
+						"EffectName"			"particles/units/heroes/hero_juggernaut/juggernaut_healing_ward_variation02.vpcf"
+						"EffectAttachType"		"follow_origin"
+						"Target"				"TARGET"
+					}
+				}
+
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_HEALTH_REGEN_PERCENTAGE"		"%bonus_health_regen"
+				}
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Items: Healing Ward 2
+	//=================================================================================================================
+	"holdout_healing_ward2"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"					"ability_datadriven"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityTextureName"    	"custom/healing_wards2"
+		"AbilityCastRange"			"600"
+		"MaxLevel"					"1"
+		"AbilityUnitTargetFlags"	"DOTA_UNIT_TARGET_FLAG_NOT_ANCIENTS"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityValues"
+		{
+			"radius"					"600"
+			"aura_radius"				"600"
+			"bonus_health_regen"		"8"
+		}
+
+		"OnCreated"
+		{
+			"FireEffect"
+			{
+				"EffectName"			"particles/units/heroes/hero_juggernaut/juggernaut_healing_ward.vpcf"
+				"EffectAttachType"		"follow_origin"
+				"EffectRadius"			"%radius"
+				"Target"				"CASTER"
+				"ControlPoints"
+				{
+					"01"		"%radius 0 %radius"
+				}
+			}
+
+			"AttachEffect"
+			{
+				"EffectName"			"particles/units/heroes/hero_juggernaut/juggernaut_healing_ward_eruption.vpcf"
+				"EffectAttachType"		"follow_origin"
+				"Target"				"CASTER"
+			}
+		}
+
+		"Modifiers"
+		{
+			"modifier_healing_ward2"
+			{
+				"Passive"           "1"
+				"IsHidden"          "1"
+				"IsBuff"            "1"
+
+				"Aura"              "modifier_healing_ward2_datadriven"
+				"Aura_Radius"       "%aura_radius"
+				"Aura_Teams"        "DOTA_UNIT_TARGET_TEAM_FRIENDLY"
+				"Aura_Types"        "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+				"Aura_Flags"		"DOTA_UNIT_TARGET_FLAG_NOT_ANCIENTS"
+			}
+
+			"modifier_healing_ward2_datadriven"
 			{
 				"Passive"   "1"
 				"IsHidden"  "0"

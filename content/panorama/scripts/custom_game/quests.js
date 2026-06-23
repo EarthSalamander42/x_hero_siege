@@ -33,13 +33,6 @@ var XHSStaticQuests = [
 		state: "Active"
 	},
 	{
-		id: "xhs_creep_level_1",
-		text: "Creep level 1 active",
-		type: "Explore",
-		state: "Completed",
-		subquest: true
-	},
-	{
 		id: "xhs_creep_level_2",
 		text: "Creep level 2 in --:--",
 		type: "Explore",
@@ -99,9 +92,8 @@ var XHSQuestUiOrder = [
 	"xhs_phase_1",
 	"defend_castle",
 	"kill_rax",
-	"xhs_creep_level_1",
-	"muradin_event",
 	"xhs_creep_level_2",
+	"muradin_event",
 	"xhs_creep_level_3",
 	"xhs_creep_level_4",
 	"xhs_phase_2",
@@ -309,14 +301,14 @@ function RefreshStaticQuests() {
 	SetStaticQuest("xhs_phase_2", "Phase 2: Break the enemy siege", phase === 2 ? "Active" : (phase > 2 ? "Completed" : "Inactive"));
 	SetStaticQuest("xhs_phase_3", "Phase 3: Defeat the enemy leaders", phase >= 3 ? "Active" : "Inactive");
 
-	for (var i = 1; i <= 4; i++) {
+	for (var i = 2; i <= 4; i++) {
 		var state = "Inactive";
 		var text = "Creep level " + i + " locked";
 
 		if (phase > 1 || i <= level) {
 			state = "Completed";
 			text = "Creep level " + i + " completed";
-		} else if (i === level + 1 && phase === 1 && (i !== 2 || XHSQuestState.muradinEventStarted)) {
+		} else if (i === level + 1 && phase === 1) {
 			state = "Active";
 			text = "Creep level " + i + " in " + (nextSeconds === null ? "--:--" : FormatQuestSeconds(nextSeconds));
 		}

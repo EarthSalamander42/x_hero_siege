@@ -316,6 +316,37 @@ var XHSEndScreen = (function () {
 		return DIFFICULTY_NAMES[difficulty] || (difficulty > 0 ? "Difficulty " + difficulty : "-");
 	}
 
+	function GetGameModeValue(data) {
+		var tableValue = CustomNetTables.GetTableValue("game_options", "gamemode");
+		return data.gamemode
+			|| (data.info && data.info.gamemode)
+			|| (data.data && data.data.gamemode)
+			|| (tableValue && tableValue["1"])
+			|| null;
+	}
+
+	function GetGameModeName(data) {
+		var gameMode = ToNumber(GetGameModeValue(data), 0);
+		if (gameMode > 0) {
+			var token = "#vote_gamemode_" + gameMode;
+			var localized = $.Localize(token);
+			if (localized && localized !== token) {
+				return localized;
+			}
+		}
+
+		return gameMode > 0 ? "Mode " + gameMode : "-";
+	}
+
+	function GetGameId(data) {
+		return (data.info && data.info.id)
+			|| data.game_id
+			|| (data.data && data.data.game_id)
+			|| data.match_id
+			|| (data.info && data.info.match_id)
+			|| "-";
+	}
+
 	function AddSummaryTile(parent, label, value) {
 		var tile = $.CreatePanel("Panel", parent, "");
 		tile.AddClass("XHSSummaryTile");
@@ -353,14 +384,13 @@ var XHSEndScreen = (function () {
 
 		var mode = Panel("XHSEndScreenMode");
 		if (mode) {
-			var mapName = data.map || "XHS";
-			var gameMode = data.gamemode || data.game_type || "-";
-			mode.text = mapName + " / " + gameMode;
+			var gameType = data.game_type || (data.info && data.info.game_type) || "XHS";
+			mode.text = gameType + " / " + GetGameModeName(data);
 		}
 
 		var gameID = Panel("XHSEndScreenGameId");
 		if (gameID) {
-			gameID.text = ((data.info && data.info.id) || data.game_id || "-").toString();
+			gameID.text = GetGameId(data).toString();
 		}
 	}
 
@@ -376,16 +406,19 @@ var XHSEndScreen = (function () {
 		AddSummaryTile(parent, "Winner", winnerTeam ? GetTeamName(winnerTeam) : "-");
 		AddSummaryTile(parent, "Run Time", FormatTime(data.game_time || Safe(function () { return Game.GetDOTATime(false, false); }, 0)));
 		AddSummaryTile(parent, "Players", players.length.toString());
-		AddSummaryTile(parent, "Mode", (data.game_type || "XHS") + " / " + (data.gamemode || "-"));
+		AddSummaryTile(parent, "Mode", (data.game_type || (data.info && data.info.game_type) || "XHS") + " / " + GetGameModeName(data));
 
 		if (data.rosh_lvl !== undefined && data.rosh_lvl !== null) {
 			AddSummaryTile(parent, "Roshan", "Lvl " + data.rosh_lvl + " - " + FormatNumber(data.rosh_hp) + "/" + FormatNumber(data.rosh_max_hp));
 		}
 	}
 
-	function CreateMvpCard(parent, title, model, value, formatter, valueClassName) {
+	function CreateMvpCard(parent, title, model, value, formatter, valueClassName, cardClassName) {
 		var card = $.CreatePanel("Panel", parent, "");
 		card.AddClass("XHSMvpCard");
+		if (cardClassName) {
+			card.AddClass(cardClassName);
+		}
 
 		var heroImage = $.CreatePanel("DOTAHeroImage", card, "");
 		heroImage.AddClass("XHSMvpIcon");
@@ -411,6 +444,7 @@ var XHSEndScreen = (function () {
 			valuePanel.AddClass(valueClassName);
 		}
 		valuePanel.text = formatter ? formatter(value) : FormatNumber(value);
+		return card;
 	}
 
 	function FindMvp(players, field) {
@@ -447,7 +481,7 @@ var XHSEndScreen = (function () {
 		CreateMvpCard(parent, "Most Kills", kills.model, kills.value, FormatNumber, "MvpKills");
 		CreateMvpCard(parent, "Richest Hero", networth.model, networth.value, FormatNumber, "MvpGold");
 		CreateMvpCard(parent, "Most Tome Stats", tomes.model, tomes.value, function (value) { return "+" + FormatNumber(value); }, "MvpStats");
-		CreateMvpCard(parent, "Most Potions Used", potions.model, potions.value, FormatNumber, "MvpPotions");
+		CreateMvpCard(parent, "Most Potions Used", potions.model, potions.value, FormatNumber, "MvpPotions", "XHSMvpCardLast");
 	}
 
 	function CreateCell(parent, className, text, extraClassName) {

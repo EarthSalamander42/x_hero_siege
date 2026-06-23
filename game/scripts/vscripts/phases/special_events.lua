@@ -6,10 +6,11 @@ end
 
 local SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP = 2.75
 
-local function ShowCurrentEventTimer(title)
+local function ShowCurrentEventTimer(title, duration)
 	CustomGameEventManager:Send_ServerToAllClients("show_current_event_timer", {
 		timer_name = "special_event",
 		title = title,
+		duration = duration,
 	})
 end
 
@@ -102,7 +103,7 @@ function SpecialEvents:MuradinEvent(time)
 	CustomTimers.timers_paused = 1
 	GameMode.Muradin_occuring = true
 	BT_ENABLED = 0
-	ShowCurrentEventTimer("MURADIN EVENT")
+	ShowCurrentEventTimer("MURADIN EVENT", time)
 	CustomTimers:BroadcastTimer("special_event")
 	CustomTimers:BroadcastTimer("creep_level")
 	UpdateGlobalObjective("muradin_event", "Active", "Muradin Event: " .. tostring(math.floor(time / 60)) .. ":" .. string.format("%02d", time % 60), time, true)
@@ -126,7 +127,6 @@ function SpecialEvents:MuradinEvent(time)
 	})
 
 	-- EmitSoundOn("SantaClaus.StartArena", Muradin) -- todo: add a variable in game-register endpoint to enable/disable this sound during december
-	EmitSoundOn("Muradin.StormEarthFire", Muradin)
 
 	for nPlayerID = 0, PlayerResource:GetPlayerCount() - 1 do
 		if PlayerResource:HasSelectedHero(nPlayerID) and PlayerResource:GetSelectedHeroEntity(nPlayerID) ~= "npc_dota_hero_wisp" then
@@ -145,6 +145,9 @@ function SpecialEvents:MuradinEvent(time)
 
 	GameRules:GetGameModeEntity():SetContextThink(DoUniqueString("muradin_event"), function()
 		RestartHeroes()
+		if Muradin and not Muradin:IsNull() then
+			EmitSoundOn("Muradin.StormEarthFire", Muradin)
+		end
 		CustomTimers.current_event_timer_paused = false
 
 		return nil
@@ -246,7 +249,7 @@ function SpecialEvents:FarmEvent(time)
 	CustomTimers.timers_paused = 1
 	BT_ENABLED = 0
 	GameMode.FarmEvent_occuring = true
-	ShowCurrentEventTimer("FARM EVENT")
+	ShowCurrentEventTimer("FARM EVENT", time)
 	UpdateGlobalObjective("farm_event", "Active", "Farm Event active", time)
 
 	StunBuildings(time)

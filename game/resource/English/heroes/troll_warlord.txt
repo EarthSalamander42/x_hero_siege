@@ -10,6 +10,3 @@
 		"DOTA_Tooltip_ability_holdout_battle_trance_Note0"					"Doesn't work on illusions."
 		"DOTA_Tooltip_ability_holdout_battle_trance_duration"				"TRANCE DURATION:"
 		"DOTA_Tooltip_ability_holdout_battle_trance_bat_reduction"			"BAT REDUCTION:"
-
-		"DOTA_Tooltip_modifier_battle_trance"					"Battle Trance"
-		"DOTA_Tooltip_modifier_battle_trance_Description"		"Base attack time: %dMODIFIER_PROPERTY_BASE_ATTACK_TIME_CONSTANT%."

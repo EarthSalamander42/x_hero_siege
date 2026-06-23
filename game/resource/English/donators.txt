@@ -17,7 +17,6 @@
 "npc_donator_companion_icefrog"					"About that cat.."
 "npc_donator_companion_amaterasu"				"Amaterasu"
 "npc_donator_companion_suthernfriend"			"Suthern-shan"
-"npc_donator_companion_devourling"				"Devourling"
 "npc_donator_companion_zonnoz"					"Pudgling"
 "npc_donator_companion_acalia"					"Desu"
 "npc_donator_companion_demi_doom"				"Doomling"

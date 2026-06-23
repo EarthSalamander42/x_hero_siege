@@ -1,10 +1,8 @@
 // XHS generated ability tooltips
 // Generated from the tooltip audit pass. Keep keys stable; split by topic for maintainability.
 
-"DOTA_Tooltip_ability_roshan_stormbolt"		"Storm Bolt"
 "DOTA_Tooltip_ability_roshan_stormbolt_Description"		"Throws a magical hammer at an enemy. On impact, enemies in a %bolt_aoe% radius take %AbilityDamage% magical damage and are stunned for %bolt_stun_duration% seconds."
 "DOTA_Tooltip_ability_roshan_stormbolt_bolt_speed"		"PROJECTILE SPEED:"
-"DOTA_Tooltip_ability_roshan_stormbolt_bolt_stun_duration"		"STUN DURATION:"
 "DOTA_Tooltip_ability_roshan_stormbolt_bolt_aoe"		"RADIUS:"
 "DOTA_Tooltip_ability_roshan_stormbolt_vision_radius"		"VISION RADIUS:"
 "DOTA_Tooltip_ability_campfire"		"Campfire"

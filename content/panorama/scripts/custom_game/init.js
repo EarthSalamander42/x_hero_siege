@@ -21,6 +21,66 @@ GameUI.CustomUIConfig().team_colors[DOTATeam_t.DOTA_TEAM_CUSTOM_4 ] = "#00963c;"
 var hudElements = $.GetContextPanel().GetParent().GetParent().FindChildTraverse("HUDElements");
 var center_block = hudElements.FindChildTraverse("lower_hud").FindChildTraverse("center_with_stats").FindChildTraverse("center_block");
 
+function ApplyXHSBuyTomeButtonStyle(button, options) {
+	if (!button) {
+		return;
+	}
+
+	options = options || {};
+	var noTomes = options.noTomes !== undefined ? options.noTomes : button.BHasClass("NoTomes");
+	var hovered = options.hovered !== undefined ? options.hovered === true : button.BHasClass("XHSBuyTomeHovered");
+
+	button.style.width = "34px";
+	button.style.height = "34px";
+	button.style.horizontalAlign = "left";
+	button.style.verticalAlign = "bottom";
+	button.style.marginLeft = "6px";
+	button.style.marginTop = "0px";
+	button.style.marginBottom = "14px";
+	button.style.backgroundColor = "#0614219a";
+	button.style.border = hovered ? "1px solid #9fe8ff64" : "1px solid #7fd7ff2a";
+	button.style.borderRadius = "4px";
+	button.style.boxShadow = "fill #0000007a 0px 0px 5px 0px";
+	button.style.opacity = noTomes ? "0.42" : (hovered ? "1" : "0.9");
+	button.style.saturation = noTomes ? "0.35" : "1";
+	button.style.brightness = noTomes ? "0.75" : (hovered ? "1.55" : "1");
+	button.style.preTransformScale2d = "1";
+	button.style.tooltipPosition = "top";
+	button.style.zIndex = "1200";
+
+	var icon = button.FindChildTraverse("XHSBuyTomeIcon");
+	if (icon) {
+		icon.style.width = "28px";
+		icon.style.height = "28px";
+		icon.style.horizontalAlign = "center";
+		icon.style.verticalAlign = "center";
+		icon.style.borderRadius = "3px";
+		icon.style.opacity = "0.88";
+	}
+
+	var count = button.FindChildTraverse("XHSBuyTomeCount");
+	if (count) {
+		count.style.minWidth = "22px";
+		count.style.height = "15px";
+		count.style.horizontalAlign = "right";
+		count.style.verticalAlign = "bottom";
+		count.style.marginRight = "-5px";
+		count.style.marginBottom = "-4px";
+		count.style.padding = "0px 3px";
+		count.style.backgroundColor = "#07131ee8";
+		count.style.border = "1px solid #7fd7ff3c";
+		count.style.borderRadius = "3px";
+		count.style.color = "#d8f7ff";
+		count.style.fontSize = "12px";
+		count.style.fontWeight = "bold";
+		count.style.textAlign = "center";
+		count.style.textShadow = "0px 1px 2px 2 #000000";
+		count.style.textOverflow = "shrink";
+	}
+}
+
+GameUI.CustomUIConfig().ApplyXHSBuyTomeButtonStyle = ApplyXHSBuyTomeButtonStyle;
+
 function OnXHSBuyTomeButtonPressed() {
 	GameEvents.SendCustomGameEventToServer("xhs_buy_tomes", {});
 }
@@ -28,6 +88,8 @@ function OnXHSBuyTomeButtonPressed() {
 function ShowXHSBuyTomeTooltip() {
 	var button = GameUI.CustomUIConfig().XHSBuyTomeButton;
 	if (button) {
+		button.AddClass("XHSBuyTomeHovered");
+		ApplyXHSBuyTomeButtonStyle(button, { hovered: true });
 		$.DispatchEvent("DOTAShowAbilityTooltip", button, "item_tome_small");
 	}
 }
@@ -35,20 +97,30 @@ function ShowXHSBuyTomeTooltip() {
 function HideXHSBuyTomeTooltip() {
 	var button = GameUI.CustomUIConfig().XHSBuyTomeButton;
 	if (button) {
+		button.RemoveClass("XHSBuyTomeHovered");
+		ApplyXHSBuyTomeButtonStyle(button, { hovered: false });
 		$.DispatchEvent("DOTAHideAbilityTooltip", button);
 	}
 }
 
-function FindXHSBuyTomeInitAnchor(parent) {
+function FindXHSBuyTomeInitTarget(parent) {
 	var abilities = parent ? parent.FindChildTraverse("abilities") : null;
 	if (abilities) {
+		var abilitiesParent = abilities.GetParent ? abilities.GetParent() : null;
+
 		if (abilities.GetParent && abilities.GetParent() === parent) {
-			return abilities;
+			return {
+				parent: parent,
+				anchor: abilities
+			};
 		}
 
-		var abilityParent = abilities.GetParent ? abilities.GetParent() : null;
-		if (abilityParent && abilityParent.GetParent && abilityParent.GetParent() === parent) {
-			return abilityParent;
+		var abilityParent = abilitiesParent;
+		if (abilityParent) {
+			return {
+				parent: abilityParent,
+				anchor: abilities
+			};
 		}
 	}
 
@@ -61,22 +133,25 @@ GameUI.CustomUIConfig().CreateXHSBuyTomeButton = function(parent) {
 		return null;
 	}
 
+	var insertionTarget = FindXHSBuyTomeInitTarget(parent);
+	var targetParent = insertionTarget ? insertionTarget.parent : parent;
+	var anchor = insertionTarget ? insertionTarget.anchor : null;
 	var existing = parent.FindChildTraverse("XHSBuyTomeButton");
 	if (existing) {
-		var existingAnchor = FindXHSBuyTomeInitAnchor(parent);
-		if (existingAnchor && parent.MoveChildAfter) {
+		if (anchor && targetParent.MoveChildAfter) {
 			if (existing.SetParent) {
-				existing.SetParent(parent);
+				existing.SetParent(targetParent);
 			}
 
-			parent.MoveChildAfter(existing, existingAnchor);
+			targetParent.MoveChildAfter(existing, anchor);
 		}
 
 		GameUI.CustomUIConfig().XHSBuyTomeButton = existing;
+		ApplyXHSBuyTomeButtonStyle(existing);
 		return existing;
 	}
 
-	var button = $.CreatePanel("Button", parent, "XHSBuyTomeButton");
+	var button = $.CreatePanel("Button", targetParent, "XHSBuyTomeButton");
 	button.AddClass("XHSBuyTomeButton");
 	button.AddClass("NoTomes");
 	button.AddClass("XHSInjectedIntoCenterBlock");
@@ -95,14 +170,14 @@ GameUI.CustomUIConfig().CreateXHSBuyTomeButton = function(parent) {
 	count.AddClass("XHSBuyTomeCount");
 	count.text = "x0";
 	count.hittest = false;
+	ApplyXHSBuyTomeButtonStyle(button, { noTomes: true });
 
-	var anchor = FindXHSBuyTomeInitAnchor(parent);
-	if (anchor && parent.MoveChildAfter) {
+	if (anchor && targetParent.MoveChildAfter) {
 		if (button.SetParent) {
-			button.SetParent(parent);
+			button.SetParent(targetParent);
 		}
 
-		parent.MoveChildAfter(button, anchor);
+		targetParent.MoveChildAfter(button, anchor);
 	}
 
 	GameUI.CustomUIConfig().XHSBuyTomeButton = button;

@@ -4,9 +4,21 @@
 LinkLuaModifier("modifier_orb_of_earth", "items/item_orb_of_earth.lua", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_orb_of_earth_bash", "items/item_orb_of_earth.lua", LUA_MODIFIER_MOTION_NONE)
 
-item_orb_of_earth = class({})
+item_orb_of_earth = item_orb_of_earth or class({})
 
 function item_orb_of_earth:GetIntrinsicModifierName()
+	return "modifier_orb_of_earth"
+end
+
+item_orb_of_earth2 = item_orb_of_earth2 or class({})
+
+function item_orb_of_earth2:GetIntrinsicModifierName()
+	return "modifier_orb_of_earth"
+end
+
+item_orb_of_earth3 = item_orb_of_earth3 or class({})
+
+function item_orb_of_earth3:GetIntrinsicModifierName()
 	return "modifier_orb_of_earth"
 end
 
@@ -63,7 +75,7 @@ function modifier_orb_of_earth:OnAttackLanded(params)
 			if RandomInt(1, 100) <= self:GetAbility():GetSpecialValueFor("bash_chance") then
 				if ability:IsCooldownReady() then
 					if not params.target:IsBuilding() then
-						params.target:AddNewModifier(caster, ability, "modifier_orb_of_earth_bash", {duration = self:GetAbility():GetSpecialValueFor("bash_duration")})
+						params.target:AddNewModifier(params.attacker, ability, "modifier_orb_of_earth_bash", {duration = self:GetAbility():GetSpecialValueFor("bash_duration")})
 						ability:StartCooldown(ability:GetCooldown(ability:GetLevel()))
 					end
 				end

@@ -25,8 +25,6 @@
 "DOTA_Tooltip_ability_item_bracer_of_the_void_duration"				"DURATION:"
 "DOTA_Tooltip_ability_item_bracer_of_the_void_max_units"			"MAX UNITS:"
 
-"DOTA_Tooltip_modifier_orb_of_darkness_active"						"Darkness Rise"
-"DOTA_Tooltip_modifier_orb_of_darkness_active_Description"			"Revive enemy units if dealing a fatal blow. Max units: 10."
 
 "DOTA_Tooltip_modifier_darkness_unit"				"Darkness Rise"
 "DOTA_Tooltip_modifier_darkness_unit_Description"	"This unit has been revived by Orb of Darkness."

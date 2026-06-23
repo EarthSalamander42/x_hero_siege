@@ -31,7 +31,7 @@
 
 "tutorial_credits_title"			"CONTRIBUTORS"
 "tutorial_credits_01"				"These people have contributed throughout X Hero Siege development:"
-"tutorial_credits_02"				"beast (alpha tester), Flotos (Dark and Light Fundamental custom icons), Gafu Ji (backend), Mugiwara (custom icons pre-3.0), oaeide (backend), Sogat (Created X Hero Siege in Warcraft 3), Starboxx (Door models), Xero (custom icons post 3.0)."
+"tutorial_credits_02"				"beast (alpha tester), Flotos (Dark and Light Fundamental custom icons), Gafu Ji (backend), Mugiwara (custom icons pre-3.0), oaeide (backend), Sogat (Created X Hero Siege in Warcraft 3), Starboxx (Door models)."
 "tutorial_credits_beast"			"beast - alpha tester."
 "tutorial_credits_flotos"			"Flotos - Dark and Light Fundamental custom icons."
 "tutorial_credits_gafu"				"Gafu Ji - backend."
@@ -39,7 +39,6 @@
 "tutorial_credits_oaeide"			"oaeide - backend."
 "tutorial_credits_sogat"			"Sogat - original X Hero Siege creator in Warcraft 3."
 "tutorial_credits_starboxx"			"Starboxx - door models."
-"tutorial_credits_xero"				"Xero - custom icons after 3.0."
 
 "tutorial_patreon_title"		"SUPPORT THE MOD"
 "tutorial_patreon_subtitle"		"Help keep X Hero Siege alive and get in-game supporter rewards."

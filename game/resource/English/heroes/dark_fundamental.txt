@@ -14,12 +14,6 @@
 "DOTA_Tooltip_ability_holdout_power_mount_agi_bonus_stats"			"BONUS AGILITY:"
 "DOTA_Tooltip_ability_holdout_power_mount_agi_transformation_time"	"TRANSFORMATION TIME:"
 
-"DOTA_Tooltip_modifier_power_mount_str"					"Power Mount (Strength)"
-"DOTA_Tooltip_modifier_power_mount_str_Description"		"Strength: %dMODIFIER_PROPERTY_STATS_STRENGTH_BONUS%."
-"DOTA_Tooltip_modifier_power_mount_int"					"Power Mount (Intellect)"
-"DOTA_Tooltip_modifier_power_mount_int_Description"		"Intelligence: %dMODIFIER_PROPERTY_STATS_INTELLECT_BONUS%."
-"DOTA_Tooltip_modifier_power_mount_agi"					"Power Mount (Agility)"
-"DOTA_Tooltip_modifier_power_mount_agi_Description"		"Agility: %dMODIFIER_PROPERTY_STATS_AGILITY_BONUS%."
 
 "DOTA_Tooltip_ability_holdout_dark_cleave"						"Dark Cleave"
 "DOTA_Tooltip_ability_holdout_dark_cleave_Description"			"Triggers a cleave attack when attacking an enemy unit, with bonus damage.\n<font color='#FF7800'> Level up multiplying the Damage by the Dark Fundamental's Level!</font>"
@@ -51,8 +45,6 @@
 "DOTA_Tooltip_ability_holdout_skin_changer_caster_bonus_movespeed"			"BONUS MOVE SPEED:"
 "DOTA_Tooltip_ability_holdout_skin_changer_caster_transformation_time"		"TRANSFORMATION TIME:"
 
-"DOTA_Tooltip_modifier_skin_changer_caster"						"Skin Changer (Caster)"
-"DOTA_Tooltip_modifier_skin_changer_caster_Description"			"Move speed: %dMODIFIER_PROPERTY_MOVESPEED_BONUS_CONSTANT%."
 
 "DOTA_Tooltip_ability_holdout_odin"									"Odin"
 "DOTA_Tooltip_ability_holdout_odin_Description"						"Turns the Dark Fundamental into a powerful god, Odin, increasing damage, health and armor."
@@ -62,8 +54,6 @@
 "DOTA_Tooltip_ability_holdout_odin_bonus_armor"						"BONUS ARMOR:"
 "DOTA_Tooltip_ability_holdout_odin_duration"						"DURATION:"
 
-"DOTA_Tooltip_modifier_odin"							"Odin"
-"DOTA_Tooltip_modifier_odin_Description"				"Attack damage: %dMODIFIER_PROPERTY_BASEATTACK_BONUSDAMAGE%. Armor: %dMODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS%. Health: %dMODIFIER_PROPERTY_HEALTH_BONUS%."
 
 //LIGHT FUNDAMENTAL
 "DOTA_Tooltip_ability_holdout_mechanism"						"Mechanism"
@@ -74,8 +64,6 @@
 "DOTA_Tooltip_ability_holdout_mechanism_heal_amount"			"HEAL AMOUNT:"
 "DOTA_Tooltip_ability_holdout_mechanism_heal_armor_duration"	"BONUS ARMOR DURATION:"
 
-"DOTA_Tooltip_modifier_mechanism_armor"					"Mechanism"
-"DOTA_Tooltip_modifier_mechanism_armor_Description"		"Physical Armor Bonus Unique Active: %dMODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS_UNIQUE_ACTIVE%. Health regen: %dMODIFIER_PROPERTY_HEALTH_REGEN_CONSTANT%."
 
 "DOTA_Tooltip_ability_holdout_light_stand"						"Light Stand"
 "DOTA_Tooltip_ability_holdout_light_stand_Description"			"Heals the Light Fundamental whenever he takes fatal damage.<font color='#FF7800'> Level up multiplying the Base Heal value by the Light Fundamental's Level!</font>"
@@ -114,5 +102,3 @@
 "DOTA_Tooltip_ability_holdout_guardian_angel_radius"					"RADIUS:"
 "DOTA_Tooltip_ability_holdout_guardian_angel_angel_damage"				"ANGEL DAMAGE:"
 "DOTA_Tooltip_ability_holdout_guardian_angel_notes"						"Notes:\n\nAffects allies with Magic Immunity."
-"DOTA_Tooltip_modifier_holdout_guardian_angel_buff"						"Wings of Omniscience"
-"DOTA_Tooltip_modifier_holdout_guardian_angel_buff_Description"			"Absolute No Damage Physical: %dMODIFIER_PROPERTY_ABSOLUTE_NO_DAMAGE_PHYSICAL%. Health regen: %dMODIFIER_PROPERTY_HEALTH_REGEN_CONSTANT%."

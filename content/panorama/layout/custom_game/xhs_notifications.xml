@@ -26,12 +26,22 @@
 
 		<Panel id="XHSRuneIndicator" hittest="false" class="XHSRuneIndicator XHSRuneHidden">
 			<Panel id="XHSRuneAccent" class="XHSRuneAccent" />
-			<Panel class="XHSRuneCopy">
-				<Label id="XHSRuneEyebrow" class="XHSRuneEyebrow" text="RUNE ACTIVE" />
-				<Label id="XHSRuneName" class="XHSRuneName" text="" />
-				<Label id="XHSRuneDetail" class="XHSRuneDetail" text="" />
+			<Panel class="XHSRuneBody">
+				<Panel class="XHSRuneHeader">
+					<Panel class="XHSRuneCopy">
+						<Label id="XHSRuneEyebrow" class="XHSRuneEyebrow" text="RUNE ACTIVE" />
+						<Label id="XHSRuneName" class="XHSRuneName" text="" />
+						<Label id="XHSRuneDetail" class="XHSRuneDetail" text="" />
+					</Panel>
+					<Label id="XHSRuneCount" class="XHSRuneCount" text="1/1" />
+				</Panel>
+				<Panel id="XHSRunePips" class="XHSRunePips">
+					<Panel id="XHSRunePip0" class="XHSRunePip" />
+					<Panel id="XHSRunePip1" class="XHSRunePip" />
+					<Panel id="XHSRunePip2" class="XHSRunePip" />
+					<Panel id="XHSRunePip3" class="XHSRunePip" />
+				</Panel>
 			</Panel>
-			<Label id="XHSRuneTime" class="XHSRuneTime" text="45" />
 		</Panel>
 
 		<Panel id="XHSTopNotifications" hittest="false" class="XHSNotificationStack XHSTopNotifications" />

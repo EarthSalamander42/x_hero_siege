@@ -19,8 +19,6 @@
 "DOTA_Tooltip_ability_holdout_malefice_aura_reduction_mr"				"%REDUCTION MAGICAL:"
 "DOTA_Tooltip_ability_holdout_malefice_aura_radius"						"RADIUS:"
 
-"DOTA_Tooltip_modifier_bonus_mr_buff"					"Malefice Aura"
-"DOTA_Tooltip_modifier_bonus_mr_buff_Description"		"Magic resistance: %dMODIFIER_PROPERTY_MAGICAL_RESISTANCE_BONUS%%%."
 "DOTA_Tooltip_modifier_reduction_mr_buff"				"Malefice Aura"
 "DOTA_Tooltip_modifier_reduction_mr_buff_Description"	"Magical Resistance reduced."
 

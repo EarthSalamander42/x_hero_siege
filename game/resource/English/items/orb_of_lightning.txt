@@ -32,5 +32,3 @@
 "DOTA_Tooltip_modifier_purge"						"Purge"
 "DOTA_Tooltip_modifier_purge_Description"			"Removes positive buffs from the enemy target and slows it."
 
-"DOTA_Tooltip_modifier_orb_of_lightning_active"					"Purification"
-"DOTA_Tooltip_modifier_orb_of_lightning_active_Description"		"Grants a chance to disarm, root and purge buffs of the enemy target."

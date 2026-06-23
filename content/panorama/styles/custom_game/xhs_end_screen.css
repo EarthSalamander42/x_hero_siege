@@ -254,12 +254,16 @@
 
 .XHSMvpCard {
 	width: 100%;
-	height: 88px;
+	height: 90px;
 	margin-bottom: 8px;
 	padding: 10px;
 	flow-children: right;
 	background-color: gradient( linear, 0% 0%, 100% 100%, from( #071827d8 ), to( #050b14c8 ) );
 	border: 1px solid xhs_border_soft;
+}
+
+.XHSMvpCardLast {
+	margin-bottom: 0px;
 }
 
 .XHSMvpIcon {

@@ -1,4 +1,16 @@
 local stored_companions = {}
+local companion_spawn_tokens = {}
+local DEFAULT_DONATOR_COMPANION = "npc_donator_companion_demi_doom"
+
+local function GetCompanionDefinition(unit_name)
+	local companions = LoadKeyValues("scripts/npc/units/companions.txt") or {}
+	local definition = companions[unit_name]
+	if type(definition) == "table" then
+		return definition
+	end
+
+	return nil
+end
 
 function Battlepass:DonatorCompanion(ID, unit_name, js)
 	local hero = PlayerResource:GetPlayer(ID):GetAssignedHero()
@@ -21,28 +33,48 @@ function Battlepass:DonatorCompanion(ID, unit_name, js)
 
 	-- set mini doom as default companion if something goes wrong
 	if unit_name == nil or unit_name == false then
-		unit_name = "npc_donator_companion_demi_doom"
+		unit_name = DEFAULT_DONATOR_COMPANION
 	end
 
 	if UNIQUE_DONATOR_COMPANION[tostring(PlayerResource:GetSteamID(ID))] and not js then
 		unit_name = UNIQUE_DONATOR_COMPANION[tostring(PlayerResource:GetSteamID(ID))]
 	end
 
-	local model
-	local model_scale
-
-	for key, value in pairs(LoadKeyValues("scripts/npc/units/companions.txt")) do
-		if key == unit_name then
-			model = value["Model"]
-			model_scale = value["ModelScale"]
-			break
+	local companionDefinition = GetCompanionDefinition(unit_name)
+	if companionDefinition == nil then
+		if IsInToolsMode() then
+			print("[Battlepass] Unknown companion '" .. tostring(unit_name) .. "', falling back to " .. DEFAULT_DONATOR_COMPANION)
 		end
+		unit_name = DEFAULT_DONATOR_COMPANION
+		companionDefinition = GetCompanionDefinition(unit_name) or {}
 	end
 
-	local companion = CreateUnitByName("npc_donator_companion", hero:GetAbsOrigin() + RandomVector(200), true, hero, hero, hero:GetTeamNumber())
-	companion:SetModel(model)
-	companion:SetOriginalModel(model)
+	local model = companionDefinition["Model"]
+	local model_scale = companionDefinition["ModelScale"]
+
+	companion_spawn_tokens[ID] = (companion_spawn_tokens[ID] or 0) + 1
+	local spawnToken = companion_spawn_tokens[ID]
+
+	XHSPrecache:PrecacheCompanion(unit_name, function()
+		if companion_spawn_tokens[ID] ~= spawnToken then return end
+		Battlepass:SpawnDonatorCompanion(ID, unit_name, model, model_scale)
+	end, ID)
+end
+
+function Battlepass:SpawnDonatorCompanion(ID, unit_name, model, model_scale)
+	local hero = PlayerResource:GetPlayer(ID):GetAssignedHero()
+	if hero == nil or hero:IsNull() then return end
+
+	local companion = CreateUnitByName(DEFAULT_DONATOR_COMPANION, hero:GetAbsOrigin() + RandomVector(200), true, hero, hero, hero:GetTeamNumber())
+	if companion == nil then return end
+
 	companion:SetOwner(hero)
+	companion.xhs_companion_unit_name = unit_name
+
+	if model then
+		companion:SetModel(model)
+		companion:SetOriginalModel(model)
+	end
 
 	companion:AddNewModifier(companion, nil, "modifier_companion", {})
 
@@ -88,14 +120,16 @@ function Battlepass:DonatorCompanion(ID, unit_name, js)
 		companion:SetMaterialGroup("1")
 	end
 
-	companion:SetModelScale(model_scale or 100)
+	companion:SetModelScale(tonumber(model_scale) or 1.0)
 
 	-- Pfx
-	if DONATOR_COMPANION_ADDITIONAL_INFO[model] and DONATOR_COMPANION_ADDITIONAL_INFO[model][1] then
-		local particle = ParticleManager:CreateParticle(DONATOR_COMPANION_ADDITIONAL_INFO[model][1], PATTACH_ABSORIGIN_FOLLOW, companion)
+	local currentModel = companion:GetModelName()
+	local additionalInfo = DONATOR_COMPANION_ADDITIONAL_INFO and DONATOR_COMPANION_ADDITIONAL_INFO[currentModel]
+	if additionalInfo and additionalInfo[1] then
+		local particle = ParticleManager:CreateParticle(additionalInfo[1], PATTACH_ABSORIGIN_FOLLOW, companion)
 
-		if DONATOR_COMPANION_ADDITIONAL_INFO[model][3] then
-			ParticleManager:SetParticleControlEnt(particle, 0, companion, PATTACH_POINT_FOLLOW, DONATOR_COMPANION_ADDITIONAL_INFO[model][3], companion:GetAbsOrigin(), true)
+		if additionalInfo[3] then
+			ParticleManager:SetParticleControlEnt(particle, 0, companion, PATTACH_POINT_FOLLOW, additionalInfo[3], companion:GetAbsOrigin(), true)
 		end
 
 		ParticleManager:ReleaseParticleIndex(particle)
@@ -106,7 +140,7 @@ function Battlepass:DonatorCompanion(ID, unit_name, js)
 end
 
 function CompanionCosmetics(unit, unit_name)
-	if not unit:IsNull() and UNIT_EQUIPMENT[unit_name] then
+	if not unit:IsNull() and UNIT_EQUIPMENT and UNIT_EQUIPMENT[unit_name] then
 		for _, wearable in pairs(UNIT_EQUIPMENT[unit_name]) do
 			local cosmetic = CreateUnitByName("wearable_dummy", unit:GetAbsOrigin(), false, nil, nil, unit:GetTeam())
 			cosmetic:SetOriginalModel(wearable)

@@ -1800,6 +1800,46 @@
 	}
 
 	//========================================================================================================
+	// Healing Wards 2
+	//========================================================================================================
+	"item_healing_wards2"
+	{
+		"BaseClass"						"item_datadriven"
+		"ID"							"2545"
+		"AbilityTextureName"			"custom/healing_wards2"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_AOE"
+
+		"AbilityCooldown"				"20.0"	
+		"AbilityCastRange"				"600"
+		"ItemCost"						"2500"
+		"ItemPurchasable"				"1"
+		"ItemQuality"					"rare"
+		"ItemStackable"					"1"
+		"ItemPermanent"					"0"
+		"ItemInitialCharges"			"3"
+		"AOERadius"						"600"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
+
+		"AbilityValues"
+		{
+			"duration"				"35"
+			"radius"				"600"
+			"regeneration"			"8"
+		}
+
+		"OnSpellStart"
+		{
+			"SpendCharge"	{}
+			"RunScript"
+			{
+				"ScriptFile"			"items/wards.lua"
+				"Function"				"SummonHealingWard"
+				"Target"				"POINT"
+			}
+		}
+	}
+
+	//========================================================================================================
 	// Potion of Full Restauration
 	//========================================================================================================
 	"item_potion_full"

@@ -8,6 +8,10 @@
 	var activeWaveDuration = 30;
 	var activeWaveMode = null;
 	var activeRuneRemaining = 0;
+	var activeRuneBatchId = null;
+	var activeRuneVersion = 0;
+	var activeRuneCompactSchedule = null;
+	var activeRuneHideSchedule = null;
 
 	function getDuration(msg) {
 		if (typeof msg.duration === "number" && msg.duration > 0) {
@@ -89,11 +93,19 @@
 
 	function getRewardTarget(type) {
 		if (type === "gold") {
-			return findFirstHudElement(["ShopButton", "GoldLabel"]);
+			var shopButton = findHudElement("ShopButton");
+			if (shopButton) {
+				var goldLabel = shopButton.FindChildTraverse("GoldLabel");
+				if (goldLabel) {
+					return goldLabel;
+				}
+			}
+
+			return findFirstHudElement(["GoldLabel", "ShopButton"]);
 		}
 
 		if (type === "stats") {
-			return findFirstHudElement(["stats_container", "stragiint", "stats"]);
+			return findFirstHudElement(["stragiint", "stats_container", "stats"]);
 		}
 
 		return null;
@@ -155,6 +167,20 @@
 		}
 
 		activeWaveSchedule = null;
+	}
+
+	function cancelRuneSchedule(schedule) {
+		if (schedule === null) {
+			return null;
+		}
+
+		if (typeof $.CancelScheduled === "function") {
+			$.CancelScheduled(schedule);
+		} else if (schedule.Cancel) {
+			schedule.Cancel();
+		}
+
+		return null;
 	}
 
 	function getTimerSeconds(msg) {
@@ -427,6 +453,25 @@
 		label.text = flyoutText;
 		label.hittest = false;
 
+		function createRewardImpact(center) {
+			var impact = $.CreatePanel("Panel", root, "");
+			impact.AddClass("XHSRewardImpact");
+			impact.SetHasClass("XHSRewardImpactGold", type === "gold");
+			impact.SetHasClass("XHSRewardImpactStats", type === "stats");
+			impact.hittest = false;
+			impact.style.marginLeft = Math.round(center.x - 26) + "px";
+			impact.style.marginTop = Math.round(center.y - 26) + "px";
+
+			$.Schedule(0.03, function () {
+				if (!impact || impact.deleted) {
+					return;
+				}
+				impact.AddClass("XHSRewardImpactActive");
+			});
+
+			impact.DeleteAsync(0.58);
+		}
+
 		$.Schedule(0.03, function () {
 			var start = getPanelCenter(toast);
 			var end = getPanelCenter(target);
@@ -445,14 +490,20 @@
 
 			$.Schedule(0.03, function () {
 				flyout.AddClass("XHSRewardFlyoutFlying");
-				flyout.style.transform = "translateX(" + deltaX + "px) translateY(" + deltaY + "px) scaleX(0.35) scaleY(0.35)";
+				flyout.style.transform = "translateX(" + deltaX + "px) translateY(" + deltaY + "px) scaleX(0.42) scaleY(0.42)";
 			});
 
-			$.Schedule(0.54, function () {
+			$.Schedule(0.76, function () {
+				flyout.AddClass("XHSRewardFlyoutArrived");
 				target.AddClass("XHSRewardTargetPulse");
+				createRewardImpact(end);
 			});
 
-			$.Schedule(0.9, function () {
+			$.Schedule(1.08, function () {
+				flyout.AddClass("XHSRewardFlyoutConsumed");
+			});
+
+			$.Schedule(1.34, function () {
 				target.RemoveClass("XHSRewardTargetPulse");
 				flyout.DeleteAsync(0);
 			});
@@ -802,6 +853,13 @@
 		}
 	}
 
+	function setRuneCompact(compact) {
+		var panel = $("#XHSRuneIndicator");
+		if (panel) {
+			panel.SetHasClass("XHSRuneCompact", compact);
+		}
+	}
+
 	function getRuneCategoryClass(category) {
 		category = String(category || "").toLowerCase();
 		if (category === "recovery") {
@@ -825,6 +883,87 @@
 		return direction.toUpperCase() + " lane";
 	}
 
+	function clampRuneNumber(value, min, max) {
+		value = Number(value);
+		if (isNaN(value)) {
+			value = min;
+		}
+
+		return Math.max(min, Math.min(max, Math.floor(value)));
+	}
+
+	function getRuneTotal(msg) {
+		var total = Number(msg.rune_total);
+		if (isNaN(total) || total <= 0) {
+			total = Number(msg.rune_count);
+		}
+		if (isNaN(total) || total <= 0) {
+			total = 1;
+		}
+
+		return clampRuneNumber(total, 1, 4);
+	}
+
+	function getRuneRemaining(msg, total) {
+		var remaining = Number(msg.rune_remaining);
+		if (isNaN(remaining)) {
+			remaining = Number(msg.rune_count);
+		}
+		if (isNaN(remaining)) {
+			remaining = total;
+		}
+
+		return clampRuneNumber(remaining, 0, total);
+	}
+
+	function formatRuneHeroName(heroName) {
+		heroName = String(heroName || "");
+		if (!heroName) {
+			return "A hero";
+		}
+
+		var localized = $.Localize("#" + heroName);
+		if (localized && localized !== "#" + heroName) {
+			return localized;
+		}
+
+		return heroName;
+	}
+
+	function updateRunePips(remaining, total) {
+		for (var i = 0; i < 4; i++) {
+			var pip = $("#XHSRunePip" + i);
+			if (!pip) {
+				continue;
+			}
+
+			var visible = i < total;
+			pip.SetHasClass("XHSRunePipVisible", visible);
+			pip.SetHasClass("XHSRunePipClaimed", visible && i < total - remaining);
+			pip.SetHasClass("XHSRunePipRemaining", visible && i >= total - remaining);
+		}
+	}
+
+	function scheduleRuneCompact(version, delay) {
+		activeRuneCompactSchedule = cancelRuneSchedule(activeRuneCompactSchedule);
+		activeRuneCompactSchedule = $.Schedule(delay, function () {
+			if (version === activeRuneVersion) {
+				setRuneCompact(true);
+			}
+			activeRuneCompactSchedule = null;
+		});
+	}
+
+	function scheduleRuneHide(version, delay) {
+		activeRuneHideSchedule = cancelRuneSchedule(activeRuneHideSchedule);
+		activeRuneHideSchedule = $.Schedule(delay, function () {
+			if (version === activeRuneVersion) {
+				setRuneVisible(false);
+			}
+			activeRuneHideSchedule = null;
+		});
+	}
+
 	function updateRuneState(msg) {
 		msg = msg || {};
 
@@ -836,44 +975,68 @@
 		var eyebrow = $("#XHSRuneEyebrow");
 		var name = $("#XHSRuneName");
 		var detail = $("#XHSRuneDetail");
-		var time = $("#XHSRuneTime");
+		var count = $("#XHSRuneCount");
 		var state = String(msg.state || "spawned");
 		var category = String(msg.category || "Misc");
+		var total = getRuneTotal(msg);
+		var remaining = getRuneRemaining(msg, total);
+		var batchId = Number(msg.batch_id || msg.wave_index || 0);
+		var isNewBatch = batchId !== activeRuneBatchId;
+
+		activeRuneBatchId = batchId;
+		activeRuneVersion += 1;
+		activeRuneCompactSchedule = cancelRuneSchedule(activeRuneCompactSchedule);
+		activeRuneHideSchedule = cancelRuneSchedule(activeRuneHideSchedule);
 
 		clearRuneClasses(panel);
 		panel.AddClass(getRuneCategoryClass(category));
 		panel.SetHasClass("XHSRunePicked", state === "picked");
 		panel.SetHasClass("XHSRuneExpired", state === "expired");
+		setRuneCompact(false);
 
 		if (eyebrow) {
-			eyebrow.text = state === "picked" ? "RUNE CLAIMED" : (state === "expired" ? "RUNE EXPIRED" : category.toUpperCase() + " RUNE");
+			if (state === "picked") {
+				eyebrow.text = remaining > 0 ? "RUNE CLAIMED" : "ALL RUNES CLAIMED";
+			} else if (state === "expired" || state === "removed") {
+				eyebrow.text = "RUNE LOST";
+			} else {
+				eyebrow.text = total > 1 ? category.toUpperCase() + " RUNES" : category.toUpperCase() + " RUNE";
+			}
 		}
 
 		if (name) {
-			name.text = msg.name || "Rune";
+			name.text = msg.name || (total > 1 ? "Runes" : "Rune");
 		}
 
 		if (detail) {
 			if (state === "picked") {
-				detail.text = msg.picker_hero_name ? msg.picker_hero_name + " picked it up" : "Picked up";
-			} else if (state === "expired") {
-				detail.text = "No hero reached it in time";
+				if (remaining > 0) {
+					detail.text = formatRuneHeroName(msg.picker_hero_name) + " claimed one - " + String(remaining) + " remaining";
+				} else {
+					detail.text = formatRuneHeroName(msg.picker_hero_name) + " claimed the last rune";
+				}
+			} else if (state === "expired" || state === "removed") {
+				detail.text = remaining > 0 ? String(remaining) + " remaining when it faded" : "No runes remaining";
 			} else {
-				detail.text = formatRuneDirection(msg.direction);
+				detail.text = formatRuneDirection(msg.direction) + " - " + String(remaining) + " remaining";
 			}
 		}
 
-		activeRuneRemaining = Number(msg.remaining);
-		if (time) {
-			time.text = state === "spawned" && activeRuneRemaining >= 0 ? String(Math.max(0, activeRuneRemaining)) : "";
+		activeRuneRemaining = remaining;
+		if (count) {
+			count.text = String(remaining) + "/" + String(total);
 		}
+		updateRunePips(remaining, total);
 
 		setRuneVisible(true);
 
-		if (state !== "spawned") {
-			$.Schedule(4.0, function () {
-				setRuneVisible(false);
-			});
+		var version = activeRuneVersion;
+		if (state === "spawned") {
+			scheduleRuneCompact(version, isNewBatch ? 4.5 : 1.8);
+		} else if (remaining > 0) {
+			scheduleRuneCompact(version, 3.0);
+		} else {
+			scheduleRuneHide(version, 4.0);
 		}
 	}
 

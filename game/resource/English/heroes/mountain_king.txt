@@ -32,8 +32,6 @@
 "DOTA_Tooltip_ability_holdout_avatar_gods_strength_armor"				"BONUS ARMOR:"
 "DOTA_Tooltip_ability_holdout_avatar_duration"							"DURATION:"
 
-"DOTA_Tooltip_modifier_gods_strength"					"Avatar"
-"DOTA_Tooltip_modifier_gods_strength_Description"		"Attack damage: %dMODIFIER_PROPERTY_BASEATTACK_BONUSDAMAGE%. Armor: %dMODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS%. Health: %dMODIFIER_PROPERTY_HEALTH_BONUS%."
 
 "DOTA_Tooltip_ability_holdout_storm_bolt_20"							"Storm Bolt (Level 20)"
 "DOTA_Tooltip_ability_holdout_storm_bolt_20_Description"				"Sends a hammer to the enemy unit, dealing damage and stunning."

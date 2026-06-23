@@ -49,7 +49,7 @@ ListenToGameEvent('npc_spawned', function(event)
 	end
 
 	local ply_table = CustomNetTables:GetTableValue("supporter_pass_player", tostring(npc:GetPlayerOwnerID()))
-	if type(ply_table) == nil then ply_table = nil end
+	if type(ply_table) ~= "table" then ply_table = nil end
 
 	if npc:IsIllusion() or string.find(npc:GetUnitName(), "npc_dota_lone_druid_bear") then
 		if ply_table then

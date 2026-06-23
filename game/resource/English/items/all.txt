@@ -18,10 +18,15 @@
 "DOTA_Tooltip_ability_item_healing_wards_radius"				"RADIUS:"
 "DOTA_Tooltip_ability_item_healing_wards_regeneration"			"%HEALTH REGEN:"
 
-"DOTA_Tooltip_ability_holdout_healing_ward"			"Healing Ward"
+"DOTA_Tooltip_ability_item_healing_wards2"						"Greater Healing Wards"
+"DOTA_Tooltip_ability_item_healing_wards2_Description"			"<h1><font color='#00CC00'>Active:</font></h1> Summons a stronger ward that heals allied units around it based on a percentage of their max health."
+"DOTA_Tooltip_ability_item_healing_wards2_duration"				"DURATION:"
+"DOTA_Tooltip_ability_item_healing_wards2_radius"				"RADIUS:"
+"DOTA_Tooltip_ability_item_healing_wards2_regeneration"			"%HEALTH REGEN:"
 
-"DOTA_Tooltip_modifier_healing_ward_datadriven"					"Healing Ward"
-"DOTA_Tooltip_modifier_healing_ward_datadriven_Description"		"Health regen: %dMODIFIER_PROPERTY_HEALTH_REGEN_PERCENTAGE%%%."
+"DOTA_Tooltip_ability_holdout_healing_ward"			"Healing Ward"
+"DOTA_Tooltip_ability_holdout_healing_ward2"		"Greater Healing Ward"
+
 
 "DOTA_Tooltip_ability_item_lightning_sword"								"<font color='#2a7fbf'>Lightning Sword</font>"
 "DOTA_Tooltip_ability_item_lightning_sword_Description"					"<h1><font color='#FF7800'>Passive:</h1> Grants lifesteal and bonus damage.</font>\n<h1><font color='#FF0000'>Restrictions:</font></h1> Does not stack with other sources of lifesteal."
@@ -30,8 +35,6 @@
 "DOTA_Tooltip_ability_item_lightning_sword_lifesteal_pct"				"%LIFESTEAL:"
 // "DOTA_Tooltip_ability_item_lightning_sword_bonus_armor"				"BONUS ARMOR:"
 
-"DOTA_Tooltip_modifier_lifesteal_mask"										"Lifesteal"
-"DOTA_Tooltip_modifier_lifesteal_mask_Description"							"Healed when attacking enemies for %dMODIFIER_PROPERTY_TOOLTIP%%%."
 
 "DOTA_Tooltip_ability_item_ring_of_superiority"								"<font color='#901bc2'>Ring of Superiority</font>"
 "DOTA_Tooltip_ability_item_ring_of_superiority_Description"					"<h1><font color='#FF7800'>Passive:</font></h1> Grants Endurance Aura, Unholy Aura, Command Aura and Devotion aura to the carrier.\n<h1><font color='#FF0000'>Restrictions:</font></h1> Auras are granted for the caster only. <br>Auras do not stack."
@@ -52,8 +55,6 @@
 "DOTA_Tooltip_ability_item_shield_of_invincibility_reincarnation_time"			"REINCARNATE TIME:"
 "DOTA_Tooltip_ability_item_shield_of_invincibility_lore"						"A shield made out of the corpse of Anub'arak."
 
-"DOTA_Tooltip_modifier_shield_of_invincibility"						"<font color='#cb2d2d'>Shield of Invincibility</font>"
-"DOTA_Tooltip_modifier_shield_of_invincibility_Description"			"Damage taken: %dMODIFIER_PROPERTY_INCOMING_DAMAGE_PERCENTAGE%%%. Health: %dMODIFIER_PROPERTY_HEALTH_BONUS%."
 
 "DOTA_Tooltip_ability_item_key_of_the_three_moons"					"<font color='#d5b61c'>Key of the 3 Moons</font>"
 "DOTA_Tooltip_ability_item_key_of_the_three_moons_bonus_stats"		"BONUS STATS:"
@@ -87,33 +88,38 @@
 "DOTA_Tooltip_ability_item_talisman_of_evasion_datadriven_Note0"				"Talisman of Evasion does not stack with itself."
 "DOTA_Tooltip_ability_item_talisman_of_evasion_datadriven_bonus_evasion"		"%+$evasion"
 
-"DOTA_Tooltip_Ability_item_orb_of_fire"								"Orb of Fire"
 "DOTA_Tooltip_ability_item_orb_of_fire_Description"					"<h1><font color='#00CC00'>Active:</font> Enable/Disable</h1> Fire Orb (Cleave).\n<h1><font color='#FF7800'>Passive:</font> Fire Orb (Cleave)</h1> Gives your basic attacks cleave.\n<h1><font color='#FF0000'>Restrictions:</h1></font> Does not stack with other cleave sources. <br>Does not work with ranged heroes."
 "DOTA_Tooltip_ability_item_orb_of_fire_Note0"						""
 "DOTA_Tooltip_ability_item_orb_of_fire_bonus_damage"				"BONUS DAMAGE:"
 "DOTA_Tooltip_ability_item_orb_of_fire_radius"						"CLEAVE RADIUS:"
 "DOTA_Tooltip_ability_item_orb_of_fire_cleave_pct"					"%CLEAVE DAMAGE:"
 
-"DOTA_Tooltip_Ability_item_orb_of_fire2"							"Blazing Gem"
 "DOTA_Tooltip_ability_item_orb_of_fire2_Description"				"<h1><font color='#00CC00'>Active:</font> Enable/Disable</h1> Blazing Gem (Cleave).\n<h1><font color='#FF7800'>Passive:</font> Fire Orb (Cleave)</h1> Gives your basic attacks cleave.\n<h1><font color='#FF0000'>Restrictions:</h1></font> Does not stack with other cleave sources. <br>Does not work with ranged heroes."
 "DOTA_Tooltip_ability_item_orb_of_fire2_Note0"						""
 "DOTA_Tooltip_ability_item_orb_of_fire2_bonus_damage"				"BONUS DAMAGE:"
 "DOTA_Tooltip_ability_item_orb_of_fire2_radius"						"CLEAVE RADIUS:"
 "DOTA_Tooltip_ability_item_orb_of_fire2_cleave_pct"					"%CLEAVE DAMAGE:"
 
-"DOTA_Tooltip_Ability_item_searing_blade"							"Searing Blade"
 "DOTA_Tooltip_ability_item_searing_blade_Description"				"<h1><font color='#00CC00'>Active:</font> Enable/Disable</h1> Searing Blade (Cleave).\n<h1><font color='#FF7800'>Passive:</font> Fire Orb (Cleave)</h1> Gives your basic attacks cleave.\n<h1><font color='#FF0000'>Restrictions:</h1></font> Does not stack with other cleave sources. <br>Does not work with ranged heroes."
 "DOTA_Tooltip_ability_item_searing_blade_bonus_damage"				"BONUS DAMAGE:"
 "DOTA_Tooltip_ability_item_searing_blade_radius"					"RADIUS:"
 "DOTA_Tooltip_ability_item_searing_blade_cleave_pct"				"%CLEAVE:"
 
-"DOTA_Tooltip_Ability_item_orb_of_earth"							"Orb of Earth"
-"DOTA_Tooltip_ability_item_orb_of_earth_Description"				"<h1><font color='#00CC00'>Active:</font> Enable/Disable</h1> Earth Orb (Bash).\n<h1><font color='#FF7800'>Passive:</font> Earth Orb (Bash)</h1> Grants a chance to bash the enemy for %bash_duration% seconds."
+"DOTA_Tooltip_ability_item_orb_of_earth_Description"				"<h1><font color='#FF7800'>Passive:</font></h1> Earth Orb (Bash). Grants bonus damage and a chance to bash the enemy for %bash_duration% seconds."
 "DOTA_Tooltip_ability_item_orb_of_earth_bonus_damage"				"BONUS DAMAGE:"
 "DOTA_Tooltip_ability_item_orb_of_earth_bash_chance"				"%BASH CHANCE:"
 "DOTA_Tooltip_ability_item_orb_of_earth_bash_duration"				"BASH DURATION:"
 
-"DOTA_Tooltip_Ability_item_orb_of_frost"							"Orb of Frost"
+"DOTA_Tooltip_ability_item_orb_of_earth2_Description"				"<h1><font color='#FF7800'>Passive:</font></h1> Gaia Gem (Bash). Grants bonus damage and a chance to bash the enemy for %bash_duration% seconds."
+"DOTA_Tooltip_ability_item_orb_of_earth2_bonus_damage"				"BONUS DAMAGE:"
+"DOTA_Tooltip_ability_item_orb_of_earth2_bash_chance"				"%BASH CHANCE:"
+"DOTA_Tooltip_ability_item_orb_of_earth2_bash_duration"				"BASH DURATION:"
+
+"DOTA_Tooltip_ability_item_orb_of_earth3_Description"				"<h1><font color='#FF7800'>Passive:</font></h1> Heart of the Mountain (Bash). Grants bonus damage and a chance to bash the enemy for %bash_duration% seconds."
+"DOTA_Tooltip_ability_item_orb_of_earth3_bonus_damage"				"BONUS DAMAGE:"
+"DOTA_Tooltip_ability_item_orb_of_earth3_bash_chance"				"%BASH CHANCE:"
+"DOTA_Tooltip_ability_item_orb_of_earth3_bash_duration"				"BASH DURATION:"
+
 "DOTA_Tooltip_ability_item_orb_of_frost_Description"				"<h1><font color='#00CC00'>Active:</font> Enable/Disable</h1> Frost Orb (Bash).\n<h1><font color='#FF7800'>Passive:</font> Frost Orb (Bash)</h1> Grants a chance to mini-bash attacked enemy unit."
 "DOTA_Tooltip_ability_item_orb_of_frost_bonus_damage"				"BONUS DAMAGE:"
 "DOTA_Tooltip_ability_item_orb_of_frost_freeze_cooldown"			"BASH DURATION:"
@@ -121,8 +127,6 @@
 
 "DOTA_Tooltip_modifier_orb_of_frost"							"Orb of Frost"
 "DOTA_Tooltip_modifier_orb_of_frost_Description"				"Grants chance for mini-bash."
-"DOTA_Tooltip_modifier_orb_of_earth"							"Orb of Earth"
-"DOTA_Tooltip_modifier_orb_of_earth_Description"				"Attack damage: %dMODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE%."
 "DOTA_Tooltip_modifier_orb_of_fire"								"Orb of Fire"
 "DOTA_Tooltip_modifier_orb_of_fire_Description"					"Grants cleave to melee attacks."
 "DOTA_Tooltip_modifier_orb_of_darkness"							"Orb of Darkness"
@@ -132,9 +136,7 @@
 "DOTA_Tooltip_modifier_orb_of_lightning_slow"					"Purge"
 "DOTA_Tooltip_modifier_orb_of_lightning_slow_Description"		"Rooted and disarmed."
 
-"DOTA_Tooltip_Ability_item_lifesteal_mask"						"Mask of Death"
 "DOTA_Tooltip_ability_item_lifesteal_mask_Description"			"<h1><font color='#FF7800'>Passive:</h1> Grants lifesteal.</font>\n<h1><font color='#FF0000'>Restrictions:</font></h1> Does not stack with other sources of lifesteal."
-"DOTA_Tooltip_Ability_item_lifesteal_mask_lifesteal_pct"		"%LIFESTEAL:"
 "DOTA_Tooltip_ability_item_lifesteal_mask_Note0"				"Lifesteal based on Damage Received by the Target. High Armor Target will give less Healing."
 
 "DOTA_Tooltip_modifier_imba_morbid_mask_unique"					"Lifesteal"
@@ -148,17 +150,4 @@
 "DOTA_Tooltip_modifier_immolation"								"Immolation"
 "DOTA_Tooltip_modifier_immolation_Description"					"Deals periodic damage around the carrier."
 
-"DOTA_Tooltip_Ability_item_health_potion"						"Healing Potion"
-"DOTA_Tooltip_Ability_item_health_potion_Description"			"<h1><font color='#00CC00'>Active:</font></h1> Instantly regenerate 3000 <font color='#00CC00'>Health</font>."
 
-"DOTA_Tooltip_Ability_item_mana_potion"							"Mana Potion"
-"DOTA_Tooltip_Ability_item_mana_potion_Description"				"<h1><font color='#00CC00'>Active:</font></h1> Instantly regenerate 3000 <font color='#1ea7d7'>Mana</font>."
-
-"DOTA_Tooltip_Ability_item_staff_of_mastery"					"Staff of Mastery"
-"DOTA_Tooltip_Ability_item_staff_of_mastery_Description"		"<h1><font color='#00CC00'>Active:</font></h1> Converts the target unit to ethereal form, rendering them immune to physical damage, unable to attack, slowed by 60% and take 50% more magic damage for 5 seconds."
-"DOTA_Tooltip_Ability_item_staff_of_mastery_mana_regen"			"MANA REGEN:"
-"DOTA_Tooltip_Ability_item_staff_of_mastery_bonus_armor"		"BONUS ARMOR:"
-
-"DOTA_Tooltip_Ability_item_amulet_of_the_wild"					"Amulet of the Wild"
-"DOTA_Tooltip_Ability_item_amulet_of_the_wild_Description"		"<h1><font color='#00CC00'>Active:</font></h1> Summons a Furbolg to fight for you, contains 3 furbolgs."
-"DOTA_Tooltip_Ability_item_amulet_of_the_wild_duration"			"DURATION:"

@@ -19,8 +19,6 @@
 "DOTA_Tooltip_ability_holdout_divine_aura_bonus_health_regen"					"BONUS HEALTH REGEN:"
 "DOTA_Tooltip_ability_holdout_divine_aura_radius"								"RADIUS:"
 
-"DOTA_Tooltip_modifier_divine_aura_buff"							"Divine Aura"
-"DOTA_Tooltip_modifier_divine_aura_buff_Description"				"Armor enhanced by %dMODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS%. \nLife Regen enhanced by %dMODIFIER_PROPERTY_HEALTH_REGEN_CONSTANT%. \nmovement speed enhanced by %dMODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE% percent. \nBase Attack Time: %dMODIFIER_PROPERTY_BASE_ATTACK_TIME_CONSTANT%."
 
 "DOTA_Tooltip_ability_holdout_kobold_army"							"Kobold Army"
 "DOTA_Tooltip_ability_holdout_kobold_army_Description"				"Creates perfect copies of the Kobold Knight, which can use items and abilities. Lasts 40 seconds."

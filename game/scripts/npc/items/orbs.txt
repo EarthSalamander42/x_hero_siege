@@ -749,6 +749,157 @@
 	}
 
 	//=================================================================================================================
+	// Orb of Earth 2
+	//=================================================================================================================
+	"item_orb_of_earth2"
+	{
+		"ID"							"2548"
+		"BaseClass"                     "item_lua"
+		"ScriptFile"					"items/item_orb_of_earth.lua"
+		"AbilityTextureName"			"custom/orb_of_earth2"
+		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+
+		// Shops
+		"ItemCost"						"20000"
+//		"ItemInitialStockTime"			"990.0"
+//		"ItemStockMax"					"2" 
+//		"ItemStockTime"					"30.0"
+//		"ItemStockInitial"				"0"
+		"AbilityCooldown"				"8.0"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
+		"ItemPurchasable"				"1"
+		"ItemKillable"					"1"
+		"ItemSellable"					"1"
+		"ItemDroppable"					"1"
+		"ItemQuality"					"artifact"
+		"ItemAliases"					"orb of earth 2"
+		"ItemBaseLevel"					"2"
+		"MaxUpgradeLevel"				"3"
+
+		"Model"							"models/props_gameplay/red_box.vmdl"
+		"Effect"						"particles/units/heroes/hero_earth_spirit/espirit_geomagentic_target_sphere.vpcf"
+	
+		"UIPickupSound"                 "Item.PickUpGemShop"
+		"UIDropSound"                   "Item.DropGemShop"
+		"WorldDropSound"                "Item.DropGemWorld"
+
+		"AbilityValues"
+		{
+			"bonus_damage"			"300"
+			"bash_duration"			"1.25"
+			"bash_chance"			"12"
+		}
+	}
+
+	//=================================================================================================================
+	// Recipe: Orb of Earth 2
+	//=================================================================================================================
+	"item_recipe_orb_of_earth2"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"ID"							"2549"
+		"BaseClass"             		"item_datadriven"
+		"Model"							"models/props_gameplay/recipe.vmdl"
+		"AbilityTextureName"			"custom/recipe"
+		
+		// Item Info
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemCost"						"10000"	
+		"ItemShopTags"					""
+//		"ItemInitialStockTime"			"990.0"
+//		"ItemStockMax"					"2" 
+//		"ItemStockTime"					"30.0"
+//		"ItemStockInitial"				"0"
+		
+		// Recipe
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemRecipe"					"1"
+		"ItemResult"					"item_orb_of_earth2"
+		"ItemRequirements"
+		{
+			"01"						"item_orb_of_earth"
+		}
+	}
+
+	//=================================================================================================================
+	// Orb of Earth 3
+	//=================================================================================================================
+	"item_orb_of_earth3"
+	{
+		"ID"							"2550"
+		"BaseClass"                     "item_lua"
+		"ScriptFile"					"items/item_orb_of_earth.lua"
+		"AbilityTextureName"			"custom/orb_of_earth2"
+		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+
+		// Shops
+		"ItemCost"						"50000"
+//		"ItemInitialStockTime"			"1470.0"
+//		"ItemStockMax"					"2" 
+//		"ItemStockTime"					"30.0"
+//		"ItemStockInitial"				"0"
+		"AbilityCooldown"				"6.0"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
+		"ItemPurchasable"				"1"
+		"ItemKillable"					"1"
+		"ItemSellable"					"1"
+		"ItemDroppable"					"1"
+		"ItemQuality"					"epic"
+		"ItemAliases"					"orb of earth 3"
+		"SecretShop"					"1"
+		"ItemBaseLevel"					"3"
+		"MaxUpgradeLevel"				"3"
+		"AllowedInBackpack"				"0"
+
+		"Model"							"models/props_gameplay/red_box.vmdl"
+		"Effect"						"particles/units/heroes/hero_earth_spirit/espirit_geomagentic_target_sphere.vpcf"
+	
+		"UIPickupSound"                 "Item.PickUpGemShop"
+		"UIDropSound"                   "Item.DropGemShop"
+		"WorldDropSound"                "Item.DropGemWorld"
+
+		"AbilityValues"
+		{
+			"bonus_damage"			"900"
+			"bash_duration"			"1.5"
+			"bash_chance"			"15"
+		}
+	}
+
+	//=================================================================================================================
+	// Recipe: Orb of Earth 3
+	//=================================================================================================================
+	"item_recipe_orb_of_earth3"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"ID"							"2551"
+		"BaseClass"             		"item_datadriven"
+		"Model"							"models/props_gameplay/recipe.vmdl"
+		"AbilityTextureName"			"custom/recipe"
+		
+		// Item Info
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemCost"						"30000"	
+		"ItemShopTags"					""
+//		"ItemInitialStockTime"			"1470.0"
+//		"ItemStockMax"					"2" 
+//		"ItemStockTime"					"30.0"
+//		"ItemStockInitial"				"0"
+		
+		// Recipe
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemRecipe"					"1"
+		"SecretShop"					"1"
+		"ItemResult"					"item_orb_of_earth3"
+		"ItemRequirements"
+		{
+			"01"						"item_orb_of_earth2"
+		}
+	}
+
+	//=================================================================================================================
 	// Orb of Darkness
 	//=================================================================================================================
 	"item_orb_of_darkness"

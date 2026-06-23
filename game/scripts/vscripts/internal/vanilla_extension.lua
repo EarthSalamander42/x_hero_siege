@@ -84,6 +84,10 @@ function CDOTA_BaseNPC:IncrementAttributes(amount, bAll)
 		self:AddNewModifier(self, nil, "modifier_tome_of_stats", {}):SetStackCount(amount)
 	end
 
+	if XHSRecordTomeStats ~= nil then
+		XHSRecordTomeStats(self, amount)
+	end
+
 	if not self.GetPlayerID then return end
 
 	local particle1 = ParticleManager:CreateParticle("particles/generic_hero_status/hero_levelup.vpcf", PATTACH_ABSORIGIN_FOLLOW, self, self)

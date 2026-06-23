@@ -31,7 +31,7 @@
 								<Label id="XHSEndScreenMode" class="XHSEndScreenMetaValue" text="-" />
 							</Panel>
 							<Panel class="XHSEndScreenMetaItem">
-								<Label class="XHSEndScreenMetaLabel" text="Game" />
+								<Label class="XHSEndScreenMetaLabel" text="Game ID" />
 								<Label id="XHSEndScreenGameId" class="XHSEndScreenMetaValue" text="-" />
 							</Panel>
 							<Panel class="XHSEndScreenMetaItem">

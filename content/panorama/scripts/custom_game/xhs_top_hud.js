@@ -12,6 +12,9 @@ var XHSTopHud = (function () {
 	var activeCurrentEventTimerName = null;
 	var activePersonalTimerName = null;
 	var currentEventTimerMaxRemaining = {};
+	var currentEventTimerProgressRunning = {};
+	var personalTimerMaxRemaining = {};
+	var personalTimerProgressRunning = {};
 
 	var DEFAULT_SUPPORTER_TIER_CATALOG = [
 		{ id: 0, name: "Free Player", color: "#7db9d8", fragments: 0, xpBoost: 0 },
@@ -141,10 +144,12 @@ var XHSTopHud = (function () {
 	function ResetCurrentEventProgress(timerName) {
 		if (timerName) {
 			currentEventTimerMaxRemaining[timerName] = 0;
+			currentEventTimerProgressRunning[timerName] = false;
 		}
 
 		var fill = Panel("XHSCurrentEventProgressFill");
 		if (fill) {
+			fill.style.transitionDuration = "0s";
 			fill.style.width = "100%";
 		}
 	}
@@ -156,10 +161,71 @@ var XHSTopHud = (function () {
 		}
 
 		var previousMax = currentEventTimerMaxRemaining[timerName] || 0;
-		var maxRemaining = Math.max(previousMax, remaining, 1);
+		var timerWasReset = previousMax <= 0 || remaining > previousMax;
+		var maxRemaining = timerWasReset ? Math.max(remaining, 1) : Math.max(previousMax, 1);
 		currentEventTimerMaxRemaining[timerName] = maxRemaining;
+		currentEventTimerProgressRunning[timerName] = true;
+
+		if (remaining <= 0) {
+			currentEventTimerProgressRunning[timerName] = false;
+			fill.style.transitionDuration = "0.18s";
+			fill.style.width = "0%";
+			return;
+		}
 
 		var percent = Clamp((remaining / maxRemaining) * 100, 0, 100);
+
+		if (timerWasReset) {
+			fill.style.transitionDuration = "0s";
+			fill.style.width = percent + "%";
+			return;
+		}
+
+		fill.style.transitionDuration = "0.92s";
+		fill.style.width = percent + "%";
+	}
+
+	function ResetPersonalEventProgress(timerName) {
+		if (timerName) {
+			personalTimerMaxRemaining[timerName] = 0;
+			personalTimerProgressRunning[timerName] = false;
+		}
+
+		var fill = Panel("XHSPersonalEventProgressFill");
+		if (fill) {
+			fill.style.transitionDuration = "0s";
+			fill.style.width = "100%";
+		}
+	}
+
+	function UpdatePersonalEventProgress(timerName, remaining) {
+		var fill = Panel("XHSPersonalEventProgressFill");
+		if (!fill || !timerName) {
+			return;
+		}
+
+		var previousMax = personalTimerMaxRemaining[timerName] || 0;
+		var timerWasReset = previousMax <= 0 || remaining > previousMax;
+		var maxRemaining = timerWasReset ? Math.max(remaining, 1) : Math.max(previousMax, 1);
+		personalTimerMaxRemaining[timerName] = maxRemaining;
+		personalTimerProgressRunning[timerName] = true;
+
+		if (remaining <= 0) {
+			personalTimerProgressRunning[timerName] = false;
+			fill.style.transitionDuration = "0.18s";
+			fill.style.width = "0%";
+			return;
+		}
+
+		var percent = Clamp((remaining / maxRemaining) * 100, 0, 100);
+
+		if (timerWasReset) {
+			fill.style.transitionDuration = "0s";
+			fill.style.width = percent + "%";
+			return;
+		}
+
+		fill.style.transitionDuration = "0.92s";
 		fill.style.width = percent + "%";
 	}
 
@@ -835,13 +901,17 @@ var XHSTopHud = (function () {
 		}
 	}
 
-	function ShowCurrentEventTimer(timerName, title, isVisible) {
+	function ShowCurrentEventTimer(timerName, title, isVisible, duration) {
 		if (isVisible) {
 			if (activeCurrentEventTimerName !== timerName) {
 				ResetCurrentEventProgress(timerName);
 			}
 
 			activeCurrentEventTimerName = timerName;
+			if (duration !== undefined && duration !== null && ToNumber(duration, 0) > 0) {
+				currentEventTimerMaxRemaining[timerName] = ToNumber(duration, 0);
+				currentEventTimerProgressRunning[timerName] = true;
+			}
 			SetText("XHSCurrentEventTimerTitle", title || currentEventTimerTitles[timerName] || "EVENT");
 			SetOptionalPanelVisible("XHSArenaTimer", true);
 
@@ -861,6 +931,10 @@ var XHSTopHud = (function () {
 
 	function ShowPersonalTimer(timerName, isVisible) {
 		if (isVisible) {
+			if (activePersonalTimerName !== timerName) {
+				ResetPersonalEventProgress(timerName);
+			}
+
 			activePersonalTimerName = timerName;
 			SetText("XHSPersonalEventTimerTitle", personalTimerTitles[timerName] || "EVENT");
 			SetOptionalPanelVisible("XHSPersonalEventTimer", true);
@@ -868,6 +942,7 @@ var XHSTopHud = (function () {
 		}
 
 		if (activePersonalTimerName === timerName) {
+			ResetPersonalEventProgress(timerName);
 			activePersonalTimerName = null;
 			SetOptionalPanelVisible("XHSPersonalEventTimer", false);
 		}
@@ -896,6 +971,7 @@ var XHSTopHud = (function () {
 
 		if (data.timer_name === activePersonalTimerName) {
 			SetText("XHSPersonalEventTimerValue", text);
+			UpdatePersonalEventProgress(data.timer_name, GetTimerSeconds(data));
 			return;
 		}
 
@@ -922,7 +998,7 @@ var XHSTopHud = (function () {
 		GameEvents.Subscribe("update_special_event_label_farm", function () {});
 		GameEvents.Subscribe("update_special_event_label_final", function () {});
 		GameEvents.Subscribe("show_current_event_timer", function (data) {
-			ShowCurrentEventTimer(data && data.timer_name ? data.timer_name : "special_event", data && data.title ? data.title : "EVENT", true);
+			ShowCurrentEventTimer(data && data.timer_name ? data.timer_name : "special_event", data && data.title ? data.title : "EVENT", true, data && data.duration);
 		});
 		GameEvents.Subscribe("hide_current_event_timer", function (data) {
 			ShowCurrentEventTimer(data && data.timer_name ? data.timer_name : activeCurrentEventTimerName, "", false);

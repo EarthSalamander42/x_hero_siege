@@ -24,6 +24,12 @@ Runes.VISION_RADIUS = 450
 Runes.VISION_DURATION = 999999
 Runes.FRAGMENT_AMOUNT = 50
 Runes.FRAGMENT_WAVES = { 2, 4, 5, 6, 7, 8 }
+Runes.VISUAL_MODELS = {
+	Recovery = "models/custom_game/runes/xhs_rune_recovery.vmdl",
+	Defense = "models/custom_game/runes/xhs_rune_defense.vmdl",
+	Offense = "models/custom_game/runes/xhs_rune_offense.vmdl",
+	Misc = "models/custom_game/runes/xhs_rune_misc.vmdl",
+}
 
 Runes.DEFINITIONS = {
 	healing = {
@@ -55,7 +61,7 @@ Runes.DEFINITIONS = {
 		scope = "team",
 		modifier = "modifier_xhs_rune_second_wind",
 		duration = 30,
-		values = { threshold_pct = 30, heal_pct = 30, guard_duration = 4, guard_reduction = 20 },
+		values = { threshold_pct = 30, heal_pct = 30, mana_pct = 30, recovery_duration = 3, guard_duration = 4, guard_reduction = 20 },
 	},
 	barrier = {
 		name = "Barrier Rune",
@@ -159,6 +165,24 @@ Runes.CATEGORY_RUNE_TYPES = {
 	Misc = { "tome", "bounty_surge", "momentum" },
 }
 
+Runes.EFFECT_SUMMARIES = {
+	healing = "+5% health regen, +8% mana regen",
+	revitalization = "-25% active cooldowns, +12% mana regen",
+	restoration = "Restores 35% missing health and mana",
+	second_wind = "Emergency heal and damage guard below 30% HP",
+	barrier = "Shield for 25% max HP, regenerates over time",
+	retaliation = "Reflects 25% incoming damage",
+	bulwark = "+35 armor, +25% magic resistance",
+	fortitude = "+35% status resistance, -20% incoming damage",
+	titan = "+30% max HP, +25% outgoing damage",
+	fury = "+160 attack speed, +25% spell amplification",
+	siegebreaker = "+45% damage against creeps and summons",
+	storm = "Strikes up to 4 nearby enemies every 1.2s",
+	tome = "+50 all stats",
+	bounty_surge = "+35% shared creep bounty bonus",
+	momentum = "+18% move speed, +20% creep gold and XP",
+}
+
 function Runes:Init()
 	if self.initialized then return end
 
@@ -166,6 +190,8 @@ function Runes:Init()
 	self.activeRune = nil
 	self.activeRunes = {}
 	self.nextRuneId = 1
+	self.nextRuneBatchId = 1
+	self.runeBatches = {}
 	self.fragmentWaveIndex = self.FRAGMENT_WAVES[RandomInt(1, #self.FRAGMENT_WAVES)]
 	self.fragmentSpawned = false
 	self.fragmentGrantAttempted = false
@@ -211,16 +237,18 @@ function Runes:OnSpecialWaveWarning(waveIndex, direction)
 		self.fragmentSpawned = true
 	end
 
+	local batchId = self.nextRuneBatchId
+	self.nextRuneBatchId = self.nextRuneBatchId + 1
+	self.runeBatches[batchId] = {
+		id = batchId,
+		total = #spawnOrigins,
+		pickedPlayers = {},
+	}
+
 	for _, spawnOrigin in pairs(spawnOrigins) do
-		self:SpawnRuneInstance(runeType, definition, waveIndex, direction, spawnOrigin)
+		self:SpawnRuneInstance(runeType, definition, waveIndex, direction, spawnOrigin, batchId, #spawnOrigins)
 	end
 
-	local countText = #spawnOrigins == 1 and "1 rune" or tostring(#spawnOrigins) .. " runes"
-	Notifications:TopToAll({
-		text = definition.name .. " spawned (" .. definition.category .. ", " .. countText .. ") near the " .. self:DirectionLabel(direction) .. " lane.",
-		duration = 5.0,
-		style = { color = "#9fe7ff" },
-	})
 	self:BroadcastRuneState("spawned")
 end
 
@@ -239,21 +267,25 @@ function Runes:GetRuneSpawnCount()
 	return math.max(1, math.min(4, count))
 end
 
-function Runes:SpawnRuneInstance(runeType, definition, waveIndex, direction, spawnOrigin)
+function Runes:SpawnRuneInstance(runeType, definition, waveIndex, direction, spawnOrigin, batchId, batchTotal)
 	local dummy = CreateUnitByName("dummy_unit_invulnerable", spawnOrigin, false, nil, nil, DOTA_TEAM_GOODGUYS)
 	if dummy == nil then return nil end
 
 	dummy:AddNewModifier(dummy, nil, "modifier_invulnerable", {})
 	dummy:AddNewModifier(dummy, nil, "modifier_phased", {})
-	local model = "models/props_gameplay/rune_bounty01.vmdl"
+	local visualModel = self.VISUAL_MODELS[definition.category] or self.VISUAL_MODELS.Misc
 	if dummy.SetModel then
-		dummy:SetModel(model)
+		dummy:SetModel(visualModel)
 	end
 	if dummy.SetOriginalModel then
-		dummy:SetOriginalModel(model)
+		dummy:SetOriginalModel(visualModel)
+	end
+	if dummy.SetRenderColor then
+		local color = self:GetCategoryColor(definition.category)
+		dummy:SetRenderColor(color.x, color.y, color.z)
 	end
 	if dummy.SetModelScale then
-		dummy:SetModelScale(1.25)
+		dummy:SetModelScale(1.05)
 	end
 	dummy:SetAbsOrigin(spawnOrigin)
 
@@ -269,6 +301,8 @@ function Runes:SpawnRuneInstance(runeType, definition, waveIndex, direction, spa
 		name = definition.name,
 		category = definition.category,
 		spawnedByWave = waveIndex,
+		batchId = batchId,
+		batchTotal = batchTotal or 1,
 		direction = direction or "",
 		entityIndex = dummy:entindex(),
 		particleIds = particleIds,
@@ -384,13 +418,7 @@ end
 function Runes:CreateRuneParticles(origin, category)
 	local particleIds = {}
 
-	local colors = {
-		Recovery = Vector(80, 220, 140),
-		Defense = Vector(100, 170, 255),
-		Offense = Vector(255, 105, 75),
-		Misc = Vector(220, 170, 255),
-	}
-	local color = colors[category] or Vector(160, 220, 255)
+	local color = self:GetCategoryColor(category)
 
 	local ring = ParticleManager:CreateParticle("particles/generic_gameplay/rune_bounty_owner.vpcf", PATTACH_WORLDORIGIN, nil)
 	ParticleManager:SetParticleControl(ring, 0, origin)
@@ -403,6 +431,17 @@ function Runes:CreateRuneParticles(origin, category)
 	table.insert(particleIds, glow)
 
 	return particleIds
+end
+
+function Runes:GetCategoryColor(category)
+	local colors = {
+		Recovery = Vector(80, 220, 140),
+		Defense = Vector(100, 170, 255),
+		Offense = Vector(255, 105, 75),
+		Misc = Vector(220, 170, 255),
+	}
+
+	return colors[category] or Vector(160, 220, 255)
 end
 
 function Runes:StartPickupThink(id, token)
@@ -420,7 +459,7 @@ function Runes:StartPickupThink(id, token)
 
 		local origin = dummy:GetAbsOrigin()
 		for _, hero in pairs(HeroList:GetAllHeroes()) do
-			if self:IsEligiblePicker(hero) and (hero:GetAbsOrigin() - origin):Length2D() <= self.PICKUP_RADIUS then
+			if self:IsEligiblePicker(hero) and not self:HasHeroPickedRuneBatch(active, hero) and (hero:GetAbsOrigin() - origin):Length2D() <= self.PICKUP_RADIUS then
 				self:PickupRune(hero, id, token)
 				return nil
 			end
@@ -453,20 +492,64 @@ function Runes:IsEligiblePicker(hero)
 		and hero:IsAlive()
 end
 
+function Runes:GetHeroPlayerID(hero)
+	if hero == nil or hero:IsNull() then return nil end
+
+	local playerID = hero:GetPlayerID()
+	if playerID == nil or playerID < 0 or not PlayerResource:IsValidPlayerID(playerID) then
+		return nil
+	end
+
+	return playerID
+end
+
+function Runes:HasHeroPickedRuneBatch(active, hero)
+	if active == nil then return false end
+	if active.batchId == nil then return false end
+
+	local playerID = self:GetHeroPlayerID(hero)
+	if playerID == nil then return true end
+
+	local batch = self.runeBatches and self.runeBatches[active.batchId] or nil
+	if batch == nil or batch.pickedPlayers == nil then return false end
+
+	return batch.pickedPlayers[playerID] == true
+end
+
+function Runes:MarkHeroPickedRuneBatch(active, hero)
+	if active == nil then return end
+
+	local playerID = self:GetHeroPlayerID(hero)
+	if playerID == nil then return end
+
+	if self.runeBatches == nil then
+		self.runeBatches = {}
+	end
+
+	local batchId = active.batchId
+	if batchId == nil then return end
+
+	if self.runeBatches[batchId] == nil then
+		self.runeBatches[batchId] = {
+			id = batchId,
+			total = active.batchTotal or 1,
+			pickedPlayers = {},
+		}
+	end
+
+	self.runeBatches[batchId].pickedPlayers[playerID] = true
+end
+
 function Runes:PickupRune(hero, id, token)
 	local active = self:GetActiveRune(id, token)
 	if active == nil then return end
+	if self:HasHeroPickedRuneBatch(active, hero) then return end
 
 	local definition = self.DEFINITIONS[active.type]
 	if definition == nil then return end
 
+	self:MarkHeroPickedRuneBatch(active, hero)
 	self:ApplyRune(definition, hero)
-
-	Notifications:TopToAll({
-		text = hero:GetUnitName() .. " picked up " .. definition.name .. ".",
-		duration = 5.0,
-		style = { color = "lightgreen" },
-	})
 
 	self:CleanupActiveRune("picked", hero, active)
 end
@@ -477,6 +560,9 @@ function Runes:ApplyRune(definition, picker)
 		return
 	elseif definition.instant == "tome" then
 		GiveTomeToAllHeroes(definition.values.stats or 50)
+		for _, hero in pairs(self:GetTargets(definition.scope, picker)) do
+			self:NotifyRuneApplied(hero, definition)
+		end
 		return
 	elseif definition.instant == "restoration" then
 		for _, hero in pairs(self:GetTargets(definition.scope, picker)) do
@@ -485,6 +571,7 @@ function Runes:ApplyRune(definition, picker)
 			hero:Heal(missingHealth * (definition.values.missing_pct or 35) * 0.01, hero)
 			hero:GiveMana(missingMana * (definition.values.missing_pct or 35) * 0.01)
 			self:PlayHeroRuneEffect(hero, definition.category)
+			self:NotifyRuneApplied(hero, definition)
 		end
 		return
 	end
@@ -495,7 +582,41 @@ function Runes:ApplyRune(definition, picker)
 		end
 		hero:AddNewModifier(hero, nil, definition.modifier, self:BuildModifierKv(definition))
 		self:PlayHeroRuneEffect(hero, definition.category)
+		self:NotifyRuneApplied(hero, definition)
 	end
+end
+
+function Runes:GetEffectSummary(definition)
+	if definition == nil then return "" end
+
+	for runeType, runeDefinition in pairs(self.DEFINITIONS or {}) do
+		if runeDefinition == definition then
+			return self.EFFECT_SUMMARIES[runeType] or ""
+		end
+	end
+
+	return ""
+end
+
+function Runes:NotifyRuneApplied(hero, definition)
+	if hero == nil or hero:IsNull() or not hero.GetPlayerOwner then return end
+
+	local player = hero:GetPlayerOwner()
+	if player == nil then return end
+
+	local summary = self:GetEffectSummary(definition)
+	local name = definition.name or "Rune"
+	local duration = tonumber(definition.duration) or 0
+	local text = summary ~= "" and (name .. ": " .. summary) or (name .. " applied")
+	if duration > 0 then
+		text = text .. " for " .. tostring(duration) .. "s"
+	end
+
+	Notifications:Bottom(player, {
+		text = text,
+		duration = 4.5,
+		severity = "success",
+	})
 end
 
 function Runes:ReduceCooldowns(hero, percent, cap)
@@ -609,6 +730,10 @@ function Runes:CleanupActiveRune(state, picker, active)
 	end
 
 	self:BroadcastRuneState(state or "removed", picker, active)
+
+	if active.batchId ~= nil and self:CountRunesInBatch(active.batchId) <= 0 and self.runeBatches ~= nil then
+		self.runeBatches[active.batchId] = nil
+	end
 end
 
 function Runes:CleanupAllActiveRunes(state)
@@ -625,17 +750,38 @@ function Runes:CleanupAllActiveRunes(state)
 	self.activeRunes = {}
 end
 
+function Runes:CountRunesInBatch(batchId)
+	local count = 0
+	for _, rune in pairs(self.activeRunes or {}) do
+		if rune.batchId == batchId then
+			count = count + 1
+		end
+	end
+
+	return count
+end
+
+function Runes:GetRuneBatchTotal(active)
+	if active == nil then return 1 end
+
+	local batch = self.runeBatches and self.runeBatches[active.batchId] or nil
+	if batch ~= nil and batch.total ~= nil then
+		return batch.total
+	end
+
+	return active.batchTotal or 1
+end
+
 function Runes:BroadcastRuneState(state, picker, active)
 	active = active or self.activeRune
 	if active == nil then return end
 
-	local runeCount = 0
-	for _, _ in pairs(self.activeRunes or {}) do
-		runeCount = runeCount + 1
-	end
+	local runeCount = self:CountRunesInBatch(active.batchId)
+	local runeTotal = self:GetRuneBatchTotal(active)
 
 	CustomGameEventManager:Send_ServerToAllClients("xhs_rune_state_update", {
 		id = active.id,
+		batch_id = active.batchId or 0,
 		type = active.type,
 		name = active.name,
 		category = active.category,
@@ -644,6 +790,8 @@ function Runes:BroadcastRuneState(state, picker, active)
 		direction = active.direction,
 		remaining = -1,
 		rune_count = runeCount,
+		rune_remaining = runeCount,
+		rune_total = runeTotal,
 		picker_player_id = picker and picker:GetPlayerID() or -1,
 		picker_hero_name = picker and picker:GetUnitName() or "",
 	})
@@ -780,43 +928,67 @@ function modifier_xhs_rune_revitalization:DeclareFunctions() return { MODIFIER_P
 function modifier_xhs_rune_revitalization:GetModifierTotalPercentageManaRegen() return self.mana_regen_pct end
 
 modifier_xhs_rune_second_wind = class({})
+function modifier_xhs_rune_second_wind:IsHidden() return false end
+function modifier_xhs_rune_second_wind:IsPurgable() return false end
 function modifier_xhs_rune_second_wind:OnCreated(kv)
+	kv = kv or {}
 	self.threshold_pct = tonumber(kv.threshold_pct) or 30
 	self.heal_pct = tonumber(kv.heal_pct) or 30
+	self.mana_pct = tonumber(kv.mana_pct) or 0
+	self.recovery_duration = tonumber(kv.recovery_duration) or 3
 	self.guard_duration = tonumber(kv.guard_duration) or 4
 	self.guard_reduction = tonumber(kv.guard_reduction) or 20
 	self.consumed = false
-	if IsServer() then self:StartIntervalThink(0.2) end
+	if IsServer() then
+		self:SetStackCount(1)
+		self:StartIntervalThink(0.2)
+	end
+end
+function modifier_xhs_rune_second_wind:OnRefresh(kv)
+	self:OnCreated(kv)
 end
 function modifier_xhs_rune_second_wind:GetTexture() return "oracle_false_promise" end
 function modifier_xhs_rune_second_wind:OnIntervalThink()
 	if self.consumed then return end
 	local parent = self:GetParent()
-	if parent:GetHealthPercent() > self.threshold_pct then return end
+	if parent == nil or parent:IsNull() or not parent:IsAlive() then return end
+
+	local thresholdHealth = parent:GetMaxHealth() * self.threshold_pct * 0.01
+	if parent:GetHealth() > thresholdHealth then return end
+
 	self.consumed = true
-	parent:AddNewModifier(parent, nil, "modifier_xhs_rune_second_wind_heal", { duration = 3, heal_pct = self.heal_pct })
+	self:SetStackCount(0)
+	parent:AddNewModifier(parent, nil, "modifier_xhs_rune_second_wind_heal", { duration = self.recovery_duration, recovery_duration = self.recovery_duration, heal_pct = self.heal_pct, mana_pct = self.mana_pct })
 	parent:AddNewModifier(parent, nil, "modifier_xhs_rune_second_wind_guard", { duration = self.guard_duration, guard_reduction = self.guard_reduction })
+	self:Destroy()
 end
 
 modifier_xhs_rune_second_wind_heal = class({})
-function modifier_xhs_rune_second_wind_heal:IsHidden() return true end
+function modifier_xhs_rune_second_wind_heal:IsHidden() return false end
+function modifier_xhs_rune_second_wind_heal:IsPurgable() return false end
 function modifier_xhs_rune_second_wind_heal:OnCreated(kv)
-	self.total_heal = self:GetParent():GetMaxHealth() * ((tonumber(kv.heal_pct) or 30) * 0.01)
-	self.healed = 0
-	self.tick = 0.25
-	if IsServer() then self:StartIntervalThink(self.tick) end
+	kv = kv or {}
+	self.heal_pct = tonumber(kv.heal_pct) or 30
+	self.mana_pct = tonumber(kv.mana_pct) or 0
+	self.recovery_duration = math.max(0.1, tonumber(kv.recovery_duration) or self:GetDuration() or 3)
+	self.health_regen = self:GetParent():GetMaxHealth() * self.heal_pct * 0.01 / self.recovery_duration
+	self.mana_regen = self:GetParent():GetMaxMana() * self.mana_pct * 0.01 / self.recovery_duration
 end
-function modifier_xhs_rune_second_wind_heal:OnIntervalThink()
-	local remaining = math.max(0, self.total_heal - self.healed)
-	local heal = math.min(remaining, self.total_heal * self.tick / math.max(0.1, self:GetDuration()))
-	self.healed = self.healed + heal
-	self:GetParent():Heal(heal, self:GetParent())
+function modifier_xhs_rune_second_wind_heal:OnRefresh(kv)
+	self:OnCreated(kv)
 end
+function modifier_xhs_rune_second_wind_heal:GetTexture() return "rune_regen" end
+function modifier_xhs_rune_second_wind_heal:DeclareFunctions() return { MODIFIER_PROPERTY_HEALTH_REGEN_CONSTANT, MODIFIER_PROPERTY_MANA_REGEN_CONSTANT } end
+function modifier_xhs_rune_second_wind_heal:GetModifierConstantHealthRegen() return self.health_regen or 0 end
+function modifier_xhs_rune_second_wind_heal:GetModifierConstantManaRegen() return self.mana_regen or 0 end
 
 modifier_xhs_rune_second_wind_guard = class({})
+function modifier_xhs_rune_second_wind_guard:IsHidden() return false end
+function modifier_xhs_rune_second_wind_guard:IsPurgable() return false end
 function modifier_xhs_rune_second_wind_guard:OnCreated(kv)
 	self.guard_reduction = tonumber(kv.guard_reduction) or 20
 end
+function modifier_xhs_rune_second_wind_guard:GetTexture() return "abaddon_borrowed_time" end
 function modifier_xhs_rune_second_wind_guard:DeclareFunctions() return { MODIFIER_PROPERTY_INCOMING_DAMAGE_PERCENTAGE } end
 function modifier_xhs_rune_second_wind_guard:GetModifierIncomingDamage_Percentage() return -self.guard_reduction end
 
@@ -971,5 +1143,35 @@ end
 function modifier_xhs_rune_momentum:GetTexture() return "rune_haste" end
 function modifier_xhs_rune_momentum:DeclareFunctions() return { MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE } end
 function modifier_xhs_rune_momentum:GetModifierMoveSpeedBonus_Percentage() return self.move_speed end
+
+local XHS_VISIBLE_RUNE_MODIFIERS = {
+	modifier_xhs_rune_healing,
+	modifier_xhs_rune_revitalization,
+	modifier_xhs_rune_second_wind,
+	modifier_xhs_rune_second_wind_heal,
+	modifier_xhs_rune_second_wind_guard,
+	modifier_xhs_rune_barrier,
+	modifier_xhs_rune_retaliation,
+	modifier_xhs_rune_bulwark,
+	modifier_xhs_rune_fortitude,
+	modifier_xhs_rune_titan,
+	modifier_xhs_rune_fury,
+	modifier_xhs_rune_siegebreaker,
+	modifier_xhs_rune_storm,
+	modifier_xhs_rune_bounty_surge,
+	modifier_xhs_rune_momentum,
+}
+
+for _, modifierClass in pairs(XHS_VISIBLE_RUNE_MODIFIERS) do
+	if modifierClass ~= nil then
+		if modifierClass.IsHidden == nil then
+			modifierClass.IsHidden = function() return false end
+		end
+
+		if modifierClass.IsPurgable == nil then
+			modifierClass.IsPurgable = function() return false end
+		end
+	end
+end
 
 Runes:Init()

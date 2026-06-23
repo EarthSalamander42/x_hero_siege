@@ -92,6 +92,7 @@
 	"dummy_unit_invulnerable"
 	{
 		"BaseClass"					"npc_dota_creature"
+		"Model"						"models/development/invisiblebox.vmdl"
 		"IsAncient"					"1"
 		"AttackCapabilities"		"DOTA_UNIT_CAP_NO_ATTACK"
 		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_WARD"

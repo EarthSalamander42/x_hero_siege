@@ -43,6 +43,9 @@
 				<Panel id="XHSPersonalEventTimer" class="XHSFocusTimer XHSPersonalFocusTimer XHSOptionalTimer" hittest="false">
 					<Label id="XHSPersonalEventTimerTitle" class="XHSFocusTimerTitle" text="EVENT" />
 					<Label id="XHSPersonalEventTimerValue" class="XHSFocusTimerValue" text="--:--" />
+					<Panel id="XHSPersonalEventProgressTrack" class="XHSFocusTimerProgressTrack XHSPersonalTimerProgressTrack" hittest="false">
+						<Panel id="XHSPersonalEventProgressFill" class="XHSFocusTimerProgressFill XHSPersonalTimerProgressFill" hittest="false" />
+					</Panel>
 				</Panel>
 			</Panel>
 

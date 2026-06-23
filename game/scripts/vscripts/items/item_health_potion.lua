@@ -12,11 +12,7 @@ function item_health_potion:OnSpellStart()
 		self:GetCaster():Heal(self.heal, self)
 		SendOverheadEventMessage(nil, OVERHEAD_ALERT_HEAL, self:GetCaster(), self.heal, nil)
 
-		for _, Zone in pairs(GameRules.GameMode.Zones) do
-			if Zone:ContainsUnit(self:GetCaster()) then
-				Zone:AddStat(self:GetCaster():GetPlayerID(), ZONE_STAT_POTIONS, 1)
-			end
-		end
+		XHSRecordPotionUse(self:GetCaster())
 
 		local nFXIndex = ParticleManager:CreateParticle("particles/items3_fx/fish_bones_active.vpcf", PATTACH_ABSORIGIN_FOLLOW, self:GetCaster())
 		ParticleManager:ReleaseParticleIndex(nFXIndex)

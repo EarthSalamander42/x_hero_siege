@@ -33,8 +33,6 @@
 "DOTA_Tooltip_ability_holdout_roar_bonus_armor"							"BONUS ARMOR:"
 "DOTA_Tooltip_ability_holdout_roar_duration"							"DURATION:"
 
-"DOTA_Tooltip_modifier_roar"							"Roar"
-"DOTA_Tooltip_modifier_roar_Description"				"Damage dealt: %dMODIFIER_PROPERTY_BASEDAMAGEOUTGOING_PERCENTAGE%%%. Armor: %dMODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS%. Attack damage: %dMODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE%."
 
 "DOTA_Tooltip_ability_holdout_metamorphosis"								"Metamorphosis"
 "DOTA_Tooltip_ability_holdout_metamorphosis_Description"					"Transforms the Demon Hunter into a powerful Demon with a ranged attack and maximum movement speed."

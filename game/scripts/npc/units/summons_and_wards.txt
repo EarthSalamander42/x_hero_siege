@@ -899,6 +899,50 @@
 		"VisionNighttimeRange"		"500"
 	}
 
+	"healing_ward2"
+	{
+		// General
+		"BaseClass"					"npc_dota_creature"
+		"Model"						"models/heroes/juggernaut/jugg_healing_ward.vmdl"
+		"SoundSet"					""
+		"Level"						"1"
+		"ModelScale"				"1"
+		"IsAncient"					"1"
+		"MinimapIcon"				"minimap_ward_invis"
+		"MinimapIconSize"			"300"
+		"UnitLabel"					"ward"
+
+		// Abilities
+		//----------------------------------------------------------------
+		"Ability1"					"holdout_healing_ward2"
+
+		// Bounds
+		//----------------------------------------------------------------
+		"BoundsHullName"			"DOTA_HULL_SIZE_SMALL"
+		"HealthBarOffset"			"140"
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_NONE"
+
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"1000"
+		"StatusHealthRegen"			"0"
+		"StatusMana"				"0"
+		"StatusManaRegen"			"0"
+
+		// Attack Damage types
+		//----------------------------------------------------------------
+		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_HERO"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_WARD"
+
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"600"
+		"VisionNighttimeRange"		"600"
+	}
+
 	"npc_dota_brewmaster_earth_1"
 	{										
 		// General

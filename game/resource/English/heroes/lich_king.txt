@@ -37,8 +37,6 @@
 "DOTA_Tooltip_ability_holdout_icy_heartstopper_aura_damage"					"%AURA DAMAGE:"
 "DOTA_Tooltip_ability_holdout_icy_heartstopper_max_stacks"					"MAX STACKS:"
 
-"DOTA_Tooltip_modifier_imba_frostmourne_buff"					"Icy Heartstopper"
-"DOTA_Tooltip_modifier_imba_frostmourne_buff_Description"		"Attack speed: %dMODIFIER_PROPERTY_ATTACKSPEED_BONUS_CONSTANT%."
 
 "DOTA_Tooltip_modifier_imba_heartstopper_aura_enemy"				"Icy Heartstopper"
 "DOTA_Tooltip_modifier_imba_heartstopper_aura_enemy_Description"	"Damage nearby enemies."

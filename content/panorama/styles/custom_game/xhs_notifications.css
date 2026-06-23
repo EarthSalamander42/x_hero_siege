@@ -325,8 +325,8 @@
 	opacity: 1;
 	transform: translateX( 0px ) translateY( 0px ) scaleX( 1 ) scaleY( 1 );
 	transition-property: transform, opacity, brightness;
-	transition-duration: 0.62s;
-	transition-timing-function: ease-in;
+	transition-duration: 0.72s;
+	transition-timing-function: ease-in-out;
 }
 
 .XHSRewardFlyoutGold
@@ -344,8 +344,24 @@
 
 .XHSRewardFlyoutFlying
 {
+	opacity: 1;
+	brightness: 1.35;
+}
+
+.XHSRewardFlyoutArrived
+{
+	opacity: 1;
+	brightness: 2.4;
+	transition-duration: 0.12s;
+	transition-timing-function: ease-out;
+}
+
+.XHSRewardFlyoutConsumed
+{
 	opacity: 0;
-	brightness: 1.8;
+	brightness: 2.8;
+	transition-duration: 0.2s;
+	transition-timing-function: ease-in;
 }
 
 .XHSRewardFlyout Label
@@ -368,6 +384,45 @@
 .XHSRewardTargetPulse
 {
 	brightness: 2.5;
+}
+
+.XHSRewardImpact
+{
+	ignore-parent-flow: true;
+	horizontal-align: left;
+	vertical-align: top;
+	width: 52px;
+	height: 52px;
+	border-radius: 50%;
+	border: 2px solid #ffffffcc;
+	background-color: #ffffff18;
+	box-shadow: #ffffff80 0px 0px 18px 0px;
+	opacity: 0.95;
+	transform: scaleX( 0.28 ) scaleY( 0.28 );
+	transition-property: transform, opacity, brightness;
+	transition-duration: 0.52s;
+	transition-timing-function: ease-out;
+}
+
+.XHSRewardImpactGold
+{
+	border: 2px solid #ffdf78dd;
+	background-color: #ffcf6622;
+	box-shadow: #ffcf66bb 0px 0px 20px 0px;
+}
+
+.XHSRewardImpactStats
+{
+	border: 2px solid #7ee4ffcc;
+	background-color: #7ee4ff20;
+	box-shadow: #7ee4ff99 0px 0px 20px 0px;
+}
+
+.XHSRewardImpactActive
+{
+	opacity: 0;
+	brightness: 2.2;
+	transform: scaleX( 1.45 ) scaleY( 1.45 );
 }
 
 .XHSWaveCountdown
@@ -434,16 +489,26 @@
 	horizontal-align: left;
 	margin-top: 218px;
 	margin-left: 40px;
-	width: 304px;
-	height: 54px;
+	width: 342px;
+	height: 70px;
 	padding: 7px 10px 7px 0px;
 	background-color: gradient( linear, 0% 0%, 100% 100%, from( #061524e8 ), to( #030810e8 ) );
 	border: 1px solid #77c8ff42;
 	box-shadow: fill #0000008f 0px 0px 10px 0px;
 	opacity: 1;
 	transform: translateY( 0px );
-	transition-property: opacity, transform, brightness, border, background-color;
+	transition-property: opacity, transform, brightness, border, background-color, width, height;
 	transition-duration: 0.18s;
+}
+
+.XHSRuneIndicator.XHSRuneCompact
+{
+	width: 238px;
+	height: 44px;
+	margin-top: 224px;
+	padding-top: 6px;
+	padding-bottom: 6px;
+	brightness: 0.9;
 }
 
 .XHSRuneIndicator.XHSRuneHidden
@@ -467,12 +532,18 @@
 .XHSRuneAccent
 {
 	width: 4px;
-	height: 40px;
+	height: 54px;
 	margin-left: 0px;
 	margin-right: 9px;
 	vertical-align: center;
 	background-color: gradient( linear, 0% 0%, 0% 100%, from( #7ee4ff ), to( #2778ff ) );
 	box-shadow: #44ccff70 0px 0px 9px 0px;
+}
+
+.XHSRuneCompact .XHSRuneAccent
+{
+	height: 30px;
+	margin-right: 8px;
 }
 
 .XHSRuneRecovery .XHSRuneAccent
@@ -499,61 +570,185 @@
 	box-shadow: #c894ff80 0px 0px 9px 0px;
 }
 
+.XHSRuneBody
+{
+	flow-children: down;
+	width: fill-parent-flow( 1.0 );
+	height: 56px;
+	vertical-align: center;
+}
+
+.XHSRuneCompact .XHSRuneBody
+{
+	height: 30px;
+}
+
+.XHSRuneHeader
+{
+	flow-children: right;
+	width: 100%;
+	height: 48px;
+}
+
+.XHSRuneCompact .XHSRuneHeader
+{
+	height: 23px;
+}
+
 .XHSRuneCopy
 {
 	flow-children: down;
 	width: fill-parent-flow( 1.0 );
-	height: 40px;
+	height: 48px;
 	vertical-align: center;
+}
+
+.XHSRuneCompact .XHSRuneCopy
+{
+	height: 23px;
 }
 
 .XHSRuneEyebrow
 {
-	height: 13px;
+	height: 15px;
 	color: #8eaac4;
-	font-size: 10px;
+	font-size: 11px;
 	font-weight: bold;
 	text-align: left;
 	text-transform: uppercase;
 	text-shadow: 0px 1px 3px #000000;
 }
 
+.XHSRuneCompact .XHSRuneEyebrow
+{
+	visibility: collapse;
+}
+
 .XHSRuneName
 {
-	height: 17px;
+	height: 20px;
 	color: #f5fbff;
-	font-size: 15px;
+	font-size: 17px;
 	font-weight: bold;
 	text-align: left;
 	text-overflow: shrink;
 	text-shadow: 0px 1px 3px #000000;
 }
 
+.XHSRuneCompact .XHSRuneName
+{
+	height: 20px;
+	font-size: 14px;
+	vertical-align: center;
+}
+
 .XHSRuneDetail
 {
-	ignore-parent-flow: true;
-	horizontal-align: right;
-	vertical-align: top;
-	width: 84px;
-	height: 13px;
+	width: 100%;
+	height: 15px;
 	color: #b9d9ff;
-	font-size: 11px;
-	text-align: right;
+	font-size: 12px;
+	text-align: left;
 	text-shadow: 0px 1px 3px #000000;
 	text-overflow: shrink;
 }
 
-.XHSRuneTime
+.XHSRuneCompact .XHSRuneDetail
 {
-	width: 34px;
+	visibility: collapse;
+}
+
+.XHSRuneCount
+{
+	width: 46px;
 	height: 28px;
 	margin-left: 8px;
 	vertical-align: center;
 	color: #eaf8ff;
-	font-size: 18px;
+	font-size: 16px;
 	font-weight: bold;
 	text-align: center;
+	background-color: #0d2235cc;
+	border: 1px solid #77c8ff3f;
 	text-shadow: 0px 0px 5px #5ad0ff66, 0px 1px 3px #000000;
+}
+
+.XHSRuneCompact .XHSRuneCount
+{
+	width: 38px;
+	height: 22px;
+	margin-left: 6px;
+	font-size: 13px;
+}
+
+.XHSRunePips
+{
+	flow-children: right;
+	width: 100%;
+	height: 9px;
+	margin-top: 2px;
+}
+
+.XHSRuneCompact .XHSRunePips
+{
+	height: 6px;
+	margin-top: 1px;
+}
+
+.XHSRunePip
+{
+	width: fill-parent-flow( 1.0 );
+	height: 6px;
+	margin-right: 4px;
+	background-color: #172538f0;
+	border: 1px solid #405b7466;
+	opacity: 0;
+}
+
+.XHSRunePip.XHSRunePipVisible
+{
+	opacity: 1;
+}
+
+.XHSRunePip.XHSRunePipRemaining
+{
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #8edcff ), to( #477dff ) );
+	border: 1px solid #9fe7ff80;
+	box-shadow: #5ad0ff44 0px 0px 5px 0px;
+}
+
+.XHSRuneRecovery .XHSRunePip.XHSRunePipRemaining
+{
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #c7ffd6 ), to( #45c46b ) );
+	border: 1px solid #8ff0b188;
+	box-shadow: #7df2a044 0px 0px 5px 0px;
+}
+
+.XHSRuneDefense .XHSRunePip.XHSRunePipRemaining
+{
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #c9ebff ), to( #4b8dff ) );
+	border: 1px solid #77c8ff88;
+	box-shadow: #77c8ff44 0px 0px 5px 0px;
+}
+
+.XHSRuneOffense .XHSRunePip.XHSRunePipRemaining
+{
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #ffd2a8 ), to( #e4572e ) );
+	border: 1px solid #ff9a6d88;
+	box-shadow: #ff8d5c44 0px 0px 5px 0px;
+}
+
+.XHSRuneMisc .XHSRunePip.XHSRunePipRemaining
+{
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #efdcff ), to( #a264d6 ) );
+	border: 1px solid #c894ff88;
+	box-shadow: #c894ff44 0px 0px 5px 0px;
+}
+
+.XHSRunePip.XHSRunePipClaimed
+{
+	background-color: #8ff0b147;
+	border: 1px solid #8ff0b166;
 }
 
 .XHSWaveRingWrap

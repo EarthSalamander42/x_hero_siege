@@ -18,6 +18,9 @@ function Precache(context)
 
 	XHSPrecache:Run(context)
 
+	-- Legacy keepalive: new assets should go through XHSPrecache groups or KV precache blocks.
+	-- Keep this block temporarily while missing Valve/econ assets are tested in-game.
+
 	-- Not used currently
 	--	PrecacheResource("particle", "particles/units/heroes/hero_dazzle/dazzle_armor_enemy_ring_sink.vpcf", context) -- Armor Rune Effect (not used)
 	--	PrecacheResource("particle_folder", "particles/econ/items/phoenix/phoenix_solar_forge/phoenix_sunray_solar_forge", context) -- Iron Man ult
@@ -88,54 +91,54 @@ function Precache(context)
 
 	-- TODO: remove all of those and precache them in abilities kv instead
 	-- PRECACHE HEROES (Particle effects for custom abilities)
-	PrecacheUnitByNameAsync("npc_dota_hero_antimage", context) -- Creeps level 3
-	PrecacheUnitByNameAsync("npc_dota_hero_centaur", context) -- Final Wave
-	-- PrecacheUnitByNameAsync("npc_dota_hero_chaos_knight", context)     -- Special Wave and creeps [what about dark fundamental?]
-	-- --	PrecacheUnitByNameAsync("npc_dota_hero_clinkz", context)		-- Windrunner
-	-- PrecacheUnitByNameAsync("npc_dota_hero_clockwerk", context)        -- Space Marine PC and NPC?
-	PrecacheUnitByNameAsync("npc_dota_hero_dark_seer", context)        -- Final Wave - East
-	PrecacheUnitByNameAsync("npc_dota_hero_dazzle", context)           -- Creep - orc ranged 2
-	PrecacheUnitByNameAsync("npc_dota_hero_dragon_knight", context)    -- Lich & Dryad [Creeps level 1]
-	PrecacheUnitByNameAsync("npc_dota_hero_drow_ranger", context)      -- Lich & Dryad [and apparently meepo wat]
-	PrecacheUnitByNameAsync("npc_dota_hero_death_prophet", context)    -- Final Wave
-	PrecacheUnitByNameAsync("npc_dota_hero_earthshaker", context)      -- Lich & Dryad [Creeps level 1]
-	PrecacheUnitByNameAsync("npc_dota_hero_huskar", context)           -- For creeps
-	PrecacheUnitByNameAsync("npc_dota_hero_jakiro", context)           -- For creeps
-	PrecacheUnitByNameAsync("npc_dota_hero_keeper_of_the_light", context) -- Light Fundamental?
-	-- PrecacheUnitByNameAsync("npc_dota_hero_kunkka", context)           -- last wave and 4 bosses kunkkas?
-	-- PrecacheUnitByNameAsync("npc_dota_hero_lifestealer", context)      -- creep wave 4? Meepo?
-	-- PrecacheUnitByNameAsync("npc_dota_hero_luna", context)             -- creep wave 1
-	-- --	PrecacheUnitByNameAsync("npc_dota_hero_lion", context) 			-- Warden &  Pit Lord
-	PrecacheUnitByNameAsync("npc_dota_hero_life_stealer", context) -- Creep wave 1 (undead)
-	-- PrecacheUnitByNameAsync("npc_dota_hero_lycan", context)            -- Archimonde??
-	-- --	PrecacheUnitByNameAsync("npc_dota_hero_magnataur", context) 	-- Magnataur & Tauren Chieftain
-	PrecacheUnitByNameAsync("npc_dota_hero_morphling", context) -- Archmage & Archimage
-	-- PrecacheUnitByNameAsync("npc_dota_hero_naga_siren", context)    -- Special Wave 2
-	-- PrecacheUnitByNameAsync("npc_dota_hero_necrolyte", context)     -- Special Wave 1 & Tauren Chieftain & Dark Summoner & LK & Paladin &
-	-- PrecacheUnitByNameAsync("npc_dota_hero_ogre_magi", context)     -- Sniper
-	-- PrecacheUnitByNameAsync("npc_dota_hero_phoenix", context)       -- Dragons Level 1 & Invo
-	-- PrecacheUnitByNameAsync("npc_dota_hero_razor", context)         -- Ghost Revenant? & Sniper [prolly the NPC revenants too]
-	-- --	PrecacheUnitByNameAsync("npc_dota_hero_silencer", context) 		-- Warden (PA) & Kobold (Meepo)
-	-- PrecacheUnitByNameAsync("npc_dota_hero_slardar", context)       -- Slardar (Centurion) & wind & LK
-	PrecacheUnitByNameAsync("npc_dota_hero_slark", context) -- Farm Event
-	-- PrecacheUnitByNameAsync("npc_dota_hero_storm_spirit", context)  -- For Spirit Master.
-	-- PrecacheUnitByNameAsync("npc_dota_hero_techies", context)       -- Shaman most likely
-	PrecacheUnitByNameAsync("npc_dota_hero_templar_assassin", context) -- Final Wave
-	-- --	PrecacheUnitByNameAsync("npc_dota_hero_tiny", context) 			-- For Mountain Giant
-	PrecacheUnitByNameAsync("npc_dota_hero_tusk", context)          -- Farm Event
-	-- --	PrecacheUnitByNameAsync("npc_dota_hero_treant", context) 		-- for Malfurion?
-	PrecacheUnitByNameAsync("npc_dota_hero_vengefulspirit", context) -- For Incoming Wave 3. & Paladin
-	PrecacheUnitByNameAsync("npc_dota_hero_weaver", context)        -- for creeps?
-	-- PrecacheUnitByNameAsync("npc_dota_hero_wisp", context)        -- For Connecting bug
-	-- PrecacheUnitByNameAsync("npc_dota_hero_zuus", context)        -- Muradin Bronzebeard
+	XHSPrecache:PrecacheUnit("npc_dota_hero_antimage", nil, -1) -- Creeps level 3
+	XHSPrecache:PrecacheUnit("npc_dota_hero_centaur", nil, -1) -- Final Wave
+	-- XHSPrecache:PrecacheUnit("npc_dota_hero_chaos_knight", nil, -1)     -- Special Wave and creeps [what about dark fundamental?]
+	-- --	XHSPrecache:PrecacheUnit("npc_dota_hero_clinkz", nil, -1)		-- Windrunner
+	-- XHSPrecache:PrecacheUnit("npc_dota_hero_clockwerk", nil, -1)        -- Space Marine PC and NPC?
+	XHSPrecache:PrecacheUnit("npc_dota_hero_dark_seer", nil, -1)        -- Final Wave - East
+	XHSPrecache:PrecacheUnit("npc_dota_hero_dazzle", nil, -1)           -- Creep - orc ranged 2
+	XHSPrecache:PrecacheUnit("npc_dota_hero_dragon_knight", nil, -1)    -- Lich & Dryad [Creeps level 1]
+	XHSPrecache:PrecacheUnit("npc_dota_hero_drow_ranger", nil, -1)      -- Lich & Dryad [and apparently meepo wat]
+	XHSPrecache:PrecacheUnit("npc_dota_hero_death_prophet", nil, -1)    -- Final Wave
+	XHSPrecache:PrecacheUnit("npc_dota_hero_earthshaker", nil, -1)      -- Lich & Dryad [Creeps level 1]
+	XHSPrecache:PrecacheUnit("npc_dota_hero_huskar", nil, -1)           -- For creeps
+	XHSPrecache:PrecacheUnit("npc_dota_hero_jakiro", nil, -1)           -- For creeps
+	XHSPrecache:PrecacheUnit("npc_dota_hero_keeper_of_the_light", nil, -1) -- Light Fundamental?
+	-- XHSPrecache:PrecacheUnit("npc_dota_hero_kunkka", nil, -1)           -- last wave and 4 bosses kunkkas?
+	-- XHSPrecache:PrecacheUnit("npc_dota_hero_lifestealer", nil, -1)      -- creep wave 4? Meepo?
+	-- XHSPrecache:PrecacheUnit("npc_dota_hero_luna", nil, -1)             -- creep wave 1
+	-- --	XHSPrecache:PrecacheUnit("npc_dota_hero_lion", nil, -1) 			-- Warden &  Pit Lord
+	XHSPrecache:PrecacheUnit("npc_dota_hero_life_stealer", nil, -1) -- Creep wave 1 (undead)
+	-- XHSPrecache:PrecacheUnit("npc_dota_hero_lycan", nil, -1)            -- Archimonde??
+	-- --	XHSPrecache:PrecacheUnit("npc_dota_hero_magnataur", nil, -1) 	-- Magnataur & Tauren Chieftain
+	XHSPrecache:PrecacheUnit("npc_dota_hero_morphling", nil, -1) -- Archmage & Archimage
+	-- XHSPrecache:PrecacheUnit("npc_dota_hero_naga_siren", nil, -1)    -- Special Wave 2
+	-- XHSPrecache:PrecacheUnit("npc_dota_hero_necrolyte", nil, -1)     -- Special Wave 1 & Tauren Chieftain & Dark Summoner & LK & Paladin &
+	-- XHSPrecache:PrecacheUnit("npc_dota_hero_ogre_magi", nil, -1)     -- Sniper
+	-- XHSPrecache:PrecacheUnit("npc_dota_hero_phoenix", nil, -1)       -- Dragons Level 1 & Invo
+	-- XHSPrecache:PrecacheUnit("npc_dota_hero_razor", nil, -1)         -- Ghost Revenant? & Sniper [prolly the NPC revenants too]
+	-- --	XHSPrecache:PrecacheUnit("npc_dota_hero_silencer", nil, -1) 		-- Warden (PA) & Kobold (Meepo)
+	-- XHSPrecache:PrecacheUnit("npc_dota_hero_slardar", nil, -1)       -- Slardar (Centurion) & wind & LK
+	XHSPrecache:PrecacheUnit("npc_dota_hero_slark", nil, -1) -- Farm Event
+	-- XHSPrecache:PrecacheUnit("npc_dota_hero_storm_spirit", nil, -1)  -- For Spirit Master.
+	-- XHSPrecache:PrecacheUnit("npc_dota_hero_techies", nil, -1)       -- Shaman most likely
+	XHSPrecache:PrecacheUnit("npc_dota_hero_templar_assassin", nil, -1) -- Final Wave
+	-- --	XHSPrecache:PrecacheUnit("npc_dota_hero_tiny", nil, -1) 			-- For Mountain Giant
+	XHSPrecache:PrecacheUnit("npc_dota_hero_tusk", nil, -1)          -- Farm Event
+	-- --	XHSPrecache:PrecacheUnit("npc_dota_hero_treant", nil, -1) 		-- for Malfurion?
+	XHSPrecache:PrecacheUnit("npc_dota_hero_vengefulspirit", nil, -1) -- For Incoming Wave 3. & Paladin
+	XHSPrecache:PrecacheUnit("npc_dota_hero_weaver", nil, -1)        -- for creeps?
+	-- XHSPrecache:PrecacheUnit("npc_dota_hero_wisp", nil, -1)        -- For Connecting bug
+	-- XHSPrecache:PrecacheUnit("npc_dota_hero_zuus", nil, -1)        -- Muradin Bronzebeard
 
-	PrecacheUnitByNameSync("npc_spirit_beast_bis", context)
-	PrecacheUnitByNameSync("npc_frost_infernal_bis", context)
+	XHSPrecache:PrecacheUnitSync("npc_spirit_beast_bis", context)
+	XHSPrecache:PrecacheUnitSync("npc_frost_infernal_bis", context)
 
-	PrecacheUnitByNameAsync("npc_dota_hero_grom_hellscream", context)
-	PrecacheUnitByNameAsync("npc_dota_hero_illidan", context)
-	PrecacheUnitByNameAsync("npc_dota_hero_balanar", context)
-	PrecacheUnitByNameAsync("npc_dota_hero_proudmoore", context)
+	XHSPrecache:PrecacheUnit("npc_dota_hero_grom_hellscream", nil, -1)
+	XHSPrecache:PrecacheUnit("npc_dota_hero_illidan", nil, -1)
+	XHSPrecache:PrecacheUnit("npc_dota_hero_balanar", nil, -1)
+	XHSPrecache:PrecacheUnit("npc_dota_hero_proudmoore", nil, -1)
 
 	-- PRECACHE SOUNDS
 	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_abaddon.vsndevts", context)    -- For Lich King shield spell
@@ -155,26 +158,26 @@ function Precache(context)
 	PrecacheResource("soundfile", "soundevents/game_sounds_dungeon_enemies.vsndevts", context)
 
 	-- Units Precache
-	PrecacheUnitByNameAsync("npc_dota_lycan_wolf1", context)
-	PrecacheUnitByNameAsync("npc_dota_shadowshaman_serpentward", context)
-	PrecacheUnitByNameAsync("npc_dota_furbolg", context)
-	PrecacheUnitByNameAsync("npc_dota_creature_muradin_bronzebeard", context)
+	XHSPrecache:PrecacheUnit("npc_dota_lycan_wolf1", nil, -1)
+	XHSPrecache:PrecacheUnit("npc_dota_shadowshaman_serpentward", nil, -1)
+	XHSPrecache:PrecacheUnit("npc_dota_furbolg", nil, -1)
+	XHSPrecache:PrecacheUnit("npc_dota_creature_muradin_bronzebeard", nil, -1)
 
 	-- Final Wave
-	PrecacheItemByNameSync("item_tombstone", context)
+	XHSPrecache:PrecacheItem("item_tombstone", context)
 
 	for _, hero in pairs(HEROLIST) do
 		-- local hero_folder_name = "models/heroes/" .. string.gsub(hero, "npc_dota_hero_", "") .. ".vmdl"
 		-- print("Precaching folder: " .. hero_folder_name)
 		-- PrecacheResource("model_folder", hero_folder_name, context)
-		PrecacheUnitByNameAsync("npc_dota_hero_" .. hero, context)
+		XHSPrecache:PrecacheUnit("npc_dota_hero_" .. hero, nil, -1)
 	end
 
 	for _, hero in pairs(HEROLIST_VIP) do
 		-- local hero_folder_name = "models/heroes/" .. string.gsub(hero, "npc_dota_hero_", "") .. ".vmdl"
 		-- print("Precaching folder: " .. hero_folder_name)
 		-- PrecacheResource("model_folder", hero_folder_name, context)
-		PrecacheUnitByNameAsync("npc_dota_hero_" .. hero, context)
+		XHSPrecache:PrecacheUnit("npc_dota_hero_" .. hero, nil, -1)
 
 		if hero == "npc_dota_hero_storm_spirit" then
 			print("Also precache brothers!")
@@ -182,15 +185,10 @@ function Precache(context)
 	end
 
 	-- Three spirits vip hero
-	PrecacheUnitByNameAsync("npc_dota_hero_ember_spirit", context)
-	PrecacheUnitByNameAsync("npc_dota_hero_earth_spirit", context)
+	XHSPrecache:PrecacheUnit("npc_dota_hero_ember_spirit", nil, -1)
+	XHSPrecache:PrecacheUnit("npc_dota_hero_earth_spirit", nil, -1)
 
-	-- Battle Pass precache
-	for key, value in pairs(LoadKeyValues("scripts/npc/units/companions.txt")) do
-		if value and type(value) == "table" and value["Model"] then
-			PrecacheResource("model", value["Model"], context) -- Balanar's Infernal Beast
-		end
-	end
+	XHSPrecache:PrecacheBattlepassCompanionAssets(context)
 end
 
 -- Create the game mode when we activate

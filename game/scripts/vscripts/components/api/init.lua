@@ -779,13 +779,26 @@ function api:RegisterGame(callback)
 end
 
 function api:ProcessCompletedGame(data, payload)
+	local game_id = payload.game_id or api:GetApiGameId() or api:GetMatchID()
+	local match_id = payload.match_id or api:GetMatchID()
+	local gamemode = payload.gamemode or api:GetCustomGamemode()
+	local game_type = payload.game_type or CUSTOM_GAME_TYPE
+
 	local full_data = {
 		players = payload.players,
 		data = data,
+		game_id = game_id,
+		match_id = match_id,
+		game_type = game_type,
+		gamemode = gamemode,
+		game_time = payload.game_time,
+		map = payload.map or GetMapName(),
 		info = {
 			winner = GAME_WINNER_TEAM,
-			id = api:GetApiGameId(),
-			gamemode = api:GetCustomGamemode(),
+			id = game_id,
+			match_id = match_id,
+			game_type = game_type,
+			gamemode = gamemode,
 		}
 	}
 	CustomNetTables:SetTableValue("game_options", "end_game", full_data)
@@ -816,12 +829,19 @@ function api:CompleteGame()
 
 	local function CountPlayerZoneStat(playerID, statName)
 		local total = 0
+		local zones = nil
 
-		if GameMode == nil or GameMode.Zones == nil then
+		if GameRules.GameMode ~= nil and GameRules.GameMode.Zones ~= nil then
+			zones = GameRules.GameMode.Zones
+		elseif GameMode ~= nil and GameMode.Zones ~= nil then
+			zones = GameMode.Zones
+		end
+
+		if zones == nil then
 			return total
 		end
 
-		for _, zone in pairs(GameMode.Zones) do
+		for _, zone in pairs(zones) do
 			if zone.PlayerStats ~= nil and zone.PlayerStats[playerID] ~= nil then
 				total = total + (tonumber(zone.PlayerStats[playerID][statName]) or 0)
 			end
@@ -877,7 +897,8 @@ function api:CompleteGame()
 			local hero = json.null
 			local networth = 0
 			local healing = PlayerResource:GetHealing(id)
-			local potions_used = CountPlayerZoneStat(id, "Potions")
+			local tracked_potions_used = XHSGetPotionUses ~= nil and XHSGetPotionUses(id) or 0
+			local potions_used = tracked_potions_used > 0 and tracked_potions_used or CountPlayerZoneStat(id, "Potions")
 			local damage_done_to_heroes = 0
 			local damage_done_to_buildings = 0
 			local kills_done_to_hero = {}
@@ -886,7 +907,8 @@ function api:CompleteGame()
 			local leaderboard = {}
 			local support_items = {}
 			local abilities_level_up_order = {}
-			local tome_stats_bonus = 0
+			local tracked_tome_stats_bonus = XHSGetTomeStats ~= nil and XHSGetTomeStats(id) or 0
+			local tome_stats_bonus = tracked_tome_stats_bonus
 
 			if PlayerResource.GetHasAbandonedDueToLongDisconnect then
 				abandon = PlayerResource:GetHasAbandonedDueToLongDisconnect(id)
@@ -918,7 +940,7 @@ function api:CompleteGame()
 
 				local tomeModifier = heroEntity:FindModifierByName("modifier_tome_of_stats")
 				if tomeModifier ~= nil then
-					tome_stats_bonus = tomeModifier:GetStackCount()
+					tome_stats_bonus = math.max(tome_stats_bonus, tomeModifier:GetStackCount())
 				end
 			end
 
@@ -999,9 +1021,15 @@ function api:CompleteGame()
 
 	--	print(rosh_lvl, rosh_hp, rosh_max_hp)
 
+	local api_game_id = self:GetApiGameId()
+	if api_game_id == nil or api_game_id == 0 then
+		api_game_id = self:GetMatchID()
+	end
+
 	local payload = {
 		winner = winnerTeam,
-		game_id = self:GetApiGameId(),
+		game_id = api_game_id,
+		match_id = self:GetMatchID(),
 		players = players,
 		-- radiant_score = self:GetKillsForTeam(2),
 		-- dire_score = self:GetKillsForTeam(3),

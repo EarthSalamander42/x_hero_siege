@@ -231,6 +231,7 @@ var XHS_TOME_COST = 10000;
 var g_nXHSBuyTomeCount = 0;
 var g_nXHSBuyTomeHeroEntIndex = -1;
 var g_nXHSBuyTomePositionRetries = 0;
+var g_nXHSBuyTomeSelectedPlayerID = -1;
 
 function GetXHSDotaHudRoot()
 {
@@ -265,6 +266,15 @@ function CreateXHSBuyTomeButton( parent )
 	return GetXHSBuyTomeButton();
 }
 
+function ApplyXHSBuyTomeButtonStyle( button, options )
+{
+	var config = GameUI.CustomUIConfig ? GameUI.CustomUIConfig() : null;
+	if ( config && config.ApplyXHSBuyTomeButtonStyle )
+	{
+		config.ApplyXHSBuyTomeButtonStyle( button, options || {} );
+	}
+}
+
 function GetXHSActiveCenterBlock()
 {
 	var hud = GetXHSDotaHudRoot();
@@ -291,11 +301,65 @@ function GetXHSLocalHeroInfo()
 	};
 }
 
-function IsXHSBuyTomeHeroReady()
+function IsXHSPlayerHeroEntity( entIndex )
 {
-	var hero = GetXHSLocalHeroInfo();
+	if ( entIndex <= 0 || !Entities.IsValidEntity || !Entities.IsValidEntity( entIndex ) )
+	{
+		return false;
+	}
 
-	if ( hero.entIndex <= 0 || hero.unitName === "" || hero.unitName === "npc_dota_hero_wisp" )
+	var playerID = Entities.GetPlayerOwnerID ? Entities.GetPlayerOwnerID( entIndex ) : -1;
+	if ( playerID < 0 )
+	{
+		return false;
+	}
+
+	if ( typeof PlayerResource !== "undefined" && PlayerResource.IsValidPlayerID && !PlayerResource.IsValidPlayerID( playerID ) )
+	{
+		return false;
+	}
+
+	if ( Entities.IsRealHero )
+	{
+		return Entities.IsRealHero( entIndex );
+	}
+
+	if ( Entities.IsHero )
+	{
+		return Entities.IsHero( entIndex ) && ( !Entities.IsIllusion || !Entities.IsIllusion( entIndex ) );
+	}
+
+	return entIndex === Players.GetPlayerHeroEntityIndex( playerID );
+}
+
+function GetXHSBuyTomeSelectedHeroInfo()
+{
+	var localPlayerID = Players.GetLocalPlayer();
+	var entIndex = Players.GetLocalPlayerPortraitUnit ? Players.GetLocalPlayerPortraitUnit() : -1;
+	var unitName = entIndex > 0 ? Entities.GetUnitName( entIndex ) : "";
+	var playerID = entIndex > 0 && Entities.GetPlayerOwnerID ? Entities.GetPlayerOwnerID( entIndex ) : -1;
+	var localTeam = localPlayerID >= 0 && Players.GetTeam ? Players.GetTeam( localPlayerID ) : -1;
+	var selectedTeam = entIndex > 0 && Entities.GetTeamNumber ? Entities.GetTeamNumber( entIndex ) : -1;
+	var isPlayerHero = IsXHSPlayerHeroEntity( entIndex );
+
+	if ( localTeam >= 0 && selectedTeam >= 0 && selectedTeam !== localTeam )
+	{
+		isPlayerHero = false;
+	}
+
+	return {
+		entIndex: entIndex,
+		playerID: playerID,
+		unitName: unitName || "",
+		isPlayerHero: isPlayerHero
+	};
+}
+
+function IsXHSBuyTomeHeroReady( hero )
+{
+	hero = hero || GetXHSBuyTomeSelectedHeroInfo();
+
+	if ( !hero.isPlayerHero || hero.entIndex <= 0 || hero.unitName === "" || hero.unitName === "npc_dota_hero_wisp" )
 	{
 		return false;
 	}
@@ -309,7 +373,7 @@ function IsXHSBuyTomeHeroReady()
 	return true;
 }
 
-function FindXHSBuyTomeInsertionAnchor( centerBlock )
+function FindXHSBuyTomeInsertionTarget( centerBlock )
 {
 	if ( !centerBlock )
 	{
@@ -319,32 +383,45 @@ function FindXHSBuyTomeInsertionAnchor( centerBlock )
 	var abilities = centerBlock.FindChildTraverse( "abilities" );
 	if ( abilities )
 	{
+		var abilitiesParent = abilities.GetParent ? abilities.GetParent() : null;
+
 		if ( abilities.GetParent && abilities.GetParent() === centerBlock )
 		{
-			return abilities;
+			return {
+				parent: centerBlock,
+				anchor: abilities
+			};
 		}
 
-		var abilityParent = abilities.GetParent ? abilities.GetParent() : null;
-		if ( abilityParent && abilityParent.GetParent && abilityParent.GetParent() === centerBlock )
+		var abilityParent = abilitiesParent;
+		if ( abilityParent )
 		{
-			return abilityParent;
+			return {
+				parent: abilityParent,
+				anchor: abilities
+			};
 		}
 	}
 
 	var ability0 = centerBlock.FindChildTraverse( "Ability0" );
 	var ability0Parent = ability0 && ability0.GetParent ? ability0.GetParent() : null;
-	if ( ability0Parent && ability0Parent.GetParent && ability0Parent.GetParent() === centerBlock )
+	if ( ability0Parent )
 	{
-		return ability0Parent;
+		return {
+			parent: ability0Parent,
+			anchor: ability0
+		};
 	}
 
-	return centerBlock.FindChildTraverse( "AbilitiesAndStatBranch" );
+	var fallback = centerBlock.FindChildTraverse( "AbilitiesAndStatBranch" );
+	return {
+		parent: centerBlock,
+		anchor: fallback
+	};
 }
 
-function GetXHSLocalGold()
+function GetXHSGoldForPlayer( playerID )
 {
-	var playerID = Players.GetLocalPlayer();
-
 	if ( typeof PlayerTables !== "undefined" && PlayerTables && PlayerTables.GetTableValue )
 	{
 		var goldTable = PlayerTables.GetTableValue( "gold", "gold" );
@@ -362,12 +439,19 @@ function GetXHSLocalGold()
 	return 0;
 }
 
+function GetXHSLocalGold()
+{
+	return GetXHSGoldForPlayer( Players.GetLocalPlayer() );
+}
+
 function InjectBuyTomeButtonIntoCenterBlock()
 {
 	var button = GetXHSBuyTomeButton();
 	var centerBlock = GetXHSActiveCenterBlock();
-	var anchor = FindXHSBuyTomeInsertionAnchor( centerBlock );
-	if ( !centerBlock || !anchor )
+	var insertionTarget = FindXHSBuyTomeInsertionTarget( centerBlock );
+	var targetParent = insertionTarget ? insertionTarget.parent : null;
+	var anchor = insertionTarget ? insertionTarget.anchor : null;
+	if ( !centerBlock || !targetParent || !anchor )
 	{
 		if ( button )
 		{
@@ -376,9 +460,9 @@ function InjectBuyTomeButtonIntoCenterBlock()
 		return false;
 	}
 
-	if ( !button || ( button.GetParent && button.GetParent() !== centerBlock && !button.SetParent ) )
+	if ( !button || ( button.GetParent && button.GetParent() !== targetParent && !button.SetParent ) )
 	{
-		button = CreateXHSBuyTomeButton( centerBlock );
+		button = CreateXHSBuyTomeButton( targetParent );
 	}
 
 	if ( !button )
@@ -393,25 +477,24 @@ function InjectBuyTomeButtonIntoCenterBlock()
 	}
 
 	var rootButton = $( "#XHSBuyTomeButton" );
-	if ( rootButton && rootButton !== button && rootButton.GetParent && rootButton.GetParent() !== centerBlock )
+	if ( rootButton && rootButton !== button && rootButton.GetParent && rootButton.GetParent() !== targetParent )
 	{
 		rootButton.style.visibility = "collapse";
 	}
 
 	if ( button.SetParent )
 	{
-		button.SetParent( centerBlock );
+		button.SetParent( targetParent );
 	}
 
-	if ( centerBlock.MoveChildAfter )
+	if ( targetParent.MoveChildAfter )
 	{
-		centerBlock.MoveChildAfter( button, anchor );
+		targetParent.MoveChildAfter( button, anchor );
 	}
 
 	button.AddClass( "XHSInjectedIntoCenterBlock" );
-	button.style.x = "0px";
-	button.style.y = "0px";
 	button.style.visibility = "visible";
+	ApplyXHSBuyTomeButtonStyle( button );
 	return true;
 }
 
@@ -438,17 +521,25 @@ function UpdateBuyTomeButton()
 		return;
 	}
 
-	if ( !IsXHSBuyTomeHeroReady() )
+	var selectedHero = GetXHSBuyTomeSelectedHeroInfo();
+	if ( !IsXHSBuyTomeHeroReady( selectedHero ) )
 	{
 		button.style.visibility = "collapse";
 		$.Schedule( 0.25, UpdateBuyTomeButton );
 		return;
 	}
 
-	var gold = GetXHSLocalGold();
+	g_nXHSBuyTomeSelectedPlayerID = selectedHero.playerID;
+
+	var gold = GetXHSGoldForPlayer( selectedHero.playerID );
 	g_nXHSBuyTomeCount = Math.max( 0, Math.floor( gold / XHS_TOME_COST ) );
 	countLabel.text = "x" + g_nXHSBuyTomeCount;
 	button.SetHasClass( "NoTomes", g_nXHSBuyTomeCount < 1 );
+	button.SetHasClass( "XHSBuyTomeOtherPlayer", selectedHero.playerID !== playerID );
+	ApplyXHSBuyTomeButtonStyle( button, {
+		noTomes: g_nXHSBuyTomeCount < 1,
+		hovered: button.BHasClass( "XHSBuyTomeHovered" )
+	} );
 
 	if ( !InjectBuyTomeButtonIntoCenterBlock() )
 	{
@@ -463,6 +554,11 @@ function UpdateBuyTomeButton()
 
 function OnBuyTomeButtonPressed()
 {
+	if ( g_nXHSBuyTomeSelectedPlayerID !== Players.GetLocalPlayer() )
+	{
+		return;
+	}
+
 	GameEvents.SendCustomGameEventToServer( "xhs_buy_tomes", {} );
 }
 
@@ -471,6 +567,8 @@ function ShowBuyTomeTooltip()
 	var button = GetXHSBuyTomeButton();
 	if ( button )
 	{
+		button.AddClass( "XHSBuyTomeHovered" );
+		ApplyXHSBuyTomeButtonStyle( button, { hovered: true } );
 		$.DispatchEvent( "DOTAShowAbilityTooltip", button, "item_tome_small" );
 	}
 }
@@ -480,6 +578,8 @@ function HideBuyTomeTooltip()
 	var button = GetXHSBuyTomeButton();
 	if ( button )
 	{
+		button.RemoveClass( "XHSBuyTomeHovered" );
+		ApplyXHSBuyTomeButtonStyle( button, { hovered: false } );
 		$.DispatchEvent( "DOTAHideAbilityTooltip", button );
 	}
 }
