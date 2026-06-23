@@ -38,7 +38,7 @@ function modifier_lightning_sword_unique:OnCreated()
 	if not IsServer() then return end
 
 	if _G.RAMERO_ARTIFACT_PICKED == false then
-		if self:GetParent():IsRealHero() then
+		if self:GetParent():IsRealHero() and SpecialEvents.RameroDead == true and SpecialEvents.BaristolDead == true then
 			SpecialEvents:EndRameroAndBaristolEvent(true)
 		end
 	end

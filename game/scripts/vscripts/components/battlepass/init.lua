@@ -8,7 +8,6 @@ ListenToGameEvent('game_rules_state_change', function(keys)
 
 		require('components/battlepass/constants')
 		require('components/battlepass/util')
-		require('components/battlepass/donator_settings')
 		require('components/battlepass/supporter_pass')
 		require('components/battlepass/donator')
 		require('components/battlepass/experience')

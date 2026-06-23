@@ -505,33 +505,39 @@ ListenToGameEvent('dota_player_gained_level', function(keys)
 			hero:RemoveAbility("ability_capture")
 		end
 
-		for i = 0, 17 do
-			local ability = hero:GetAbilityByIndex(i)
-
-			if IsValidEntity(ability) then
+		ForEachUnitAbility(hero, function(ability)
 				if ability:GetLevel() < ability:GetMaxLevel() then
 					for j = 1, ability:GetMaxLevel() - ability:GetLevel() do
 						hero:UpgradeAbility(ability)
 					end
 				end
-			end
-		end
+		end)
 
 		if AbilitiesHeroes_XX[hero:GetUnitName()] then
 			hero.lvl_20 = true
-			Notifications:Bottom(hero:GetPlayerOwnerID(), { text = "You've reached level 20. Check out your new abilities! ", duration = 10 })
+			local notification_segments = {
+				{ text = "You've reached level 20. Check out your new abilities! " },
+			}
+
 			for _, ability in pairs(AbilitiesHeroes_XX[hero:GetUnitName()]) do
 				if ability ~= nil then
-					Notifications:Bottom(hero:GetPlayerOwnerID(), { ability = ability[1], continue = true })
+					table.insert(notification_segments, { ability = ability[1] })
 					hero:AddAbility(ability[1])
 					hero:UpgradeAbility(hero:FindAbilityByName(ability[1]))
-					local oldab = hero:GetAbilityByIndex(ability[2])
-					if oldab:GetAutoCastState() then
+					local oldab = GetUnitAbilityBySafeIndex(hero, ability[2])
+					if oldab ~= nil and oldab:GetAutoCastState() then
 						oldab:ToggleAutoCast()
 					end
-					hero:SwapAbilities(oldab:GetName(), ability[1], true, true)
+					if oldab ~= nil then
+						hero:SwapAbilities(oldab:GetName(), ability[1], true, true)
+					end
 				end
 			end
+
+			Notifications:Bottom(hero:GetPlayerOwnerID(), {
+				duration = 10,
+				segments = notification_segments,
+			})
 		else
 			print("No Level 20 Ability for " .. hero:GetUnitName() .. " found!")
 		end
@@ -624,6 +630,10 @@ ListenToGameEvent("player_chat", function(keys)
 	end
 
 	for str in string.gmatch(text, "%S+") do
+		if str == "-xhs_precache_report" and IsInToolsMode() and XHSPrecache then
+			XHSPrecache:PrintReport()
+		end
+
 		if donator_level == 1 or donator_level == 2 or donator_level == 3 or IsInToolsMode() then
 			for Frozen = 0, PlayerResource:GetPlayerCount() - 1 do
 				local PlayerNames = { "Red", "Blue", "Cyan", "Purple", "Yellow", "Orange", "Green", "Pink" }
@@ -633,9 +643,14 @@ ListenToGameEvent("player_chat", function(keys)
 						hero:AddNewModifier(hero, nil, "modifier_pause_creeps", {})
 						hero:AddNewModifier(hero, nil, "modifier_invulnerable", {})
 						PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
-						Notifications:TopToAll({ text = "[ADMIN MOD]: ", duration = 6.0, style = { color = "red", ["font-size"] = "30px" } })
-						Notifications:TopToAll({ text = PlayerNames[Frozen + 1] .. " ", style = { color = PlayerNames[Frozen + 1], ["font-size"] = "25px" }, continue = true })
-						Notifications:TopToAll({ text = "player has been jailed!", style = { color = "white", ["font-size"] = "25px" }, continue = true })
+						Notifications:TopToAll({
+							duration = 6.0,
+							segments = {
+								{ text = "[ADMIN MOD]: ", style = { color = "red", ["font-size"] = "30px" } },
+								{ text = PlayerNames[Frozen + 1] .. " ", style = { color = PlayerNames[Frozen + 1], ["font-size"] = "25px" } },
+								{ text = "player has been jailed!", style = { color = "white", ["font-size"] = "25px" } },
+							},
+						})
 					end
 					if str == "-unfreeze_" .. Frozen + 1 then
 						local hero = PlayerResource:GetPlayer(Frozen):GetAssignedHero()
@@ -644,25 +659,40 @@ ListenToGameEvent("player_chat", function(keys)
 						hero:RemoveModifierByName("modifier_invulnerable")
 						hero:RemoveModifierByName("modifier_command_restricted")
 						PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
-						Notifications:TopToAll({ text = "[ADMIN MOD]: ", duration = 6.0, style = { color = "red", ["font-size"] = "30px" } })
-						Notifications:TopToAll({ text = PlayerNames[Frozen + 1] .. " ", style = { color = PlayerNames[Frozen + 1], ["font-size"] = "25px" }, continue = true })
-						Notifications:TopToAll({ text = "player has been released!", style = { color = "white", ["font-size"] = "25px" }, continue = true })
+						Notifications:TopToAll({
+							duration = 6.0,
+							segments = {
+								{ text = "[ADMIN MOD]: ", style = { color = "red", ["font-size"] = "30px" } },
+								{ text = PlayerNames[Frozen + 1] .. " ", style = { color = PlayerNames[Frozen + 1], ["font-size"] = "25px" } },
+								{ text = "player has been released!", style = { color = "white", ["font-size"] = "25px" } },
+							},
+						})
 					end
 					if str == "-kill_" .. Frozen + 1 then
 						local hero = PlayerResource:GetPlayer(Frozen):GetAssignedHero()
 						if hero:IsAlive() then
 							hero:Kill(nil, nil)
-							Notifications:TopToAll({ text = "[ADMIN MOD]: ", duration = 6.0, style = { color = "red", ["font-size"] = "30px" } })
-							Notifications:TopToAll({ text = PlayerNames[Frozen + 1] .. " ", style = { color = PlayerNames[Frozen + 1], ["font-size"] = "25px" }, continue = true })
-							Notifications:TopToAll({ text = "player has been slayed!", style = { color = "white", ["font-size"] = "25px" }, continue = true })
+							Notifications:TopToAll({
+								duration = 6.0,
+								segments = {
+									{ text = "[ADMIN MOD]: ", style = { color = "red", ["font-size"] = "30px" } },
+									{ text = PlayerNames[Frozen + 1] .. " ", style = { color = PlayerNames[Frozen + 1], ["font-size"] = "25px" } },
+									{ text = "player has been slayed!", style = { color = "white", ["font-size"] = "25px" } },
+								},
+							})
 						end
 					end
 					if str == "-revive_" .. Frozen + 1 then
 						local hero = PlayerResource:GetPlayer(Frozen):GetAssignedHero()
 						hero:RespawnHero(false, false)
-						Notifications:TopToAll({ text = "[ADMIN MOD]: ", duration = 6.0, style = { color = "red", ["font-size"] = "30px" } })
-						Notifications:TopToAll({ text = PlayerNames[Frozen + 1] .. " ", style = { color = PlayerNames[Frozen + 1], ["font-size"] = "25px" }, continue = true })
-						Notifications:TopToAll({ text = "player has been revived!", style = { color = "white", ["font-size"] = "25px" }, continue = true })
+						Notifications:TopToAll({
+							duration = 6.0,
+							segments = {
+								{ text = "[ADMIN MOD]: ", style = { color = "red", ["font-size"] = "30px" } },
+								{ text = PlayerNames[Frozen + 1] .. " ", style = { color = PlayerNames[Frozen + 1], ["font-size"] = "25px" } },
+								{ text = "player has been revived!", style = { color = "white", ["font-size"] = "25px" } },
+							},
+						})
 					end
 					if str == "-yolo_" .. Frozen + 1 then
 						local hero = PlayerResource:GetPlayer(Frozen):GetAssignedHero()
@@ -673,9 +703,14 @@ ListenToGameEvent("player_chat", function(keys)
 						yolo2 = ParticleManager:CreateParticle("particles/units/heroes/hero_ember_spirit/ember_spirit_flameguard.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
 						hero:EmitSound("Hero_Batrider.Firefly.Cast")
 						hero:EmitSound("Hero_Batrider.Firefly.Loop")
-						Notifications:TopToAll({ text = "[ADMIN MOD]: ", duration = 6.0, style = { color = "red", ["font-size"] = "30px" } })
-						Notifications:TopToAll({ text = PlayerNames[Frozen + 1] .. " ", style = { color = PlayerNames[Frozen + 1], ["font-size"] = "25px" }, continue = true })
-						Notifications:TopToAll({ text = "player is in YOLO state!", style = { color = "white", ["font-size"] = "25px" }, continue = true })
+						Notifications:TopToAll({
+							duration = 6.0,
+							segments = {
+								{ text = "[ADMIN MOD]: ", style = { color = "red", ["font-size"] = "30px" } },
+								{ text = PlayerNames[Frozen + 1] .. " ", style = { color = PlayerNames[Frozen + 1], ["font-size"] = "25px" } },
+								{ text = "player is in YOLO state!", style = { color = "white", ["font-size"] = "25px" } },
+							},
+						})
 					end
 					if str == "-unyolo_" .. Frozen + 1 then
 						local hero = PlayerResource:GetPlayer(Frozen):GetAssignedHero()
@@ -684,9 +719,14 @@ ListenToGameEvent("player_chat", function(keys)
 						hero:StopSound("Hero_Batrider.Firefly.Loop")
 						ParticleManager:DestroyParticle(yolo, true)
 						ParticleManager:DestroyParticle(yolo2, true)
-						Notifications:TopToAll({ text = "[ADMIN MOD]: ", duration = 6.0, style = { color = "red", ["font-size"] = "30px" } })
-						Notifications:TopToAll({ text = PlayerNames[Frozen + 1] .. " ", style = { color = PlayerNames[Frozen + 1], ["font-size"] = "25px" }, continue = true })
-						Notifications:TopToAll({ text = "player is not in YOLO state anymore.", style = { color = "white", ["font-size"] = "25px" }, continue = true })
+						Notifications:TopToAll({
+							duration = 6.0,
+							segments = {
+								{ text = "[ADMIN MOD]: ", style = { color = "red", ["font-size"] = "30px" } },
+								{ text = PlayerNames[Frozen + 1] .. " ", style = { color = PlayerNames[Frozen + 1], ["font-size"] = "25px" } },
+								{ text = "player is not in YOLO state anymore.", style = { color = "white", ["font-size"] = "25px" } },
+							},
+						})
 					end
 				end
 			end
@@ -697,18 +737,10 @@ ListenToGameEvent("player_chat", function(keys)
 
 				if PlayerResource:GetSelectedHeroName(hero:GetPlayerID()) ~= "npc_dota_hero_" .. text then
 					--					if KeyValues.HeroKV["npc_dota_hero_"..text] then
-					PrecacheUnitByNameAsync("npc_dota_hero_" .. text, function()
-						local wisp = PlayerResource:GetSelectedHeroEntity(hero:GetPlayerID())
-						PlayerResource:ReplaceHeroWith(hero:GetPlayerID(), "npc_dota_hero_" .. text, 0, 0)
-
-						GameRules:GetGameModeEntity():SetContextThink("PreGame", function()
-							if wisp then
-								UTIL_Remove(wisp)
-							end
-
-							return nil
-						end, 1.0)
-					end, userID)
+					local wisp = PlayerResource:GetSelectedHeroEntity(hero:GetPlayerID())
+					XHSPrecache:ReplaceHeroWith(hero:GetPlayerID(), "npc_dota_hero_" .. text, 0, 0, wisp, {
+						cleanupDelay = 1.0,
+					})
 					-- else
 					-- 	Notifications:TopToAll({text="Hero don't exist!", duration=6.0, style={color="red", ["font-size"]="30px"}})
 					-- end
@@ -717,47 +749,7 @@ ListenToGameEvent("player_chat", function(keys)
 		end
 
 		if str == "-bt" then
-			if GameRules:IsGamePaused() then
-				SendErrorMessage(hero:GetPlayerID(), "#error_buy_tome_pause")
-				return
-			end
-
-			local hero = PlayerResource:GetSelectedHeroEntity(player:GetPlayerID()) or player:GetAssignedHero()
-			if hero == nil then return end
-
-			local gold = Gold:GetGold(userID)
-			local cost = 10000
-			local numberOfTomes = math.floor(gold / cost)
-
-			if BT_ENABLED == 1 then
-				if numberOfTomes < 1 then
-					SendErrorMessage(hero:GetPlayerID(), "#error_cant_afford_tomes")
-					return
-				end
-
-				local i = 0
-
-				Notifications:Bottom(player, { text = "You've bought " .. numberOfTomes .. " Tomes!", duration = 5.0, style = { color = "white" } })
-				PlayerResource:SpendGold(player:GetPlayerID(), (numberOfTomes) * cost, DOTA_ModifyGold_PurchaseItem)
-
-				GameRules:GetGameModeEntity():SetContextThink("PreGame", function()
-					hero:IncrementAttributes(50)
-					hero:EmitSound("ui.trophy_levelup")
-
-					local pfx = ParticleManager:CreateParticle("particles/generic_hero_status/hero_levelup.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero, hero)
-					ParticleManager:SetParticleControl(pfx, 0, hero:GetAbsOrigin())
-
-					i = i + 1
-
-					if i >= numberOfTomes then
-						return nil
-					else
-						return 0.1
-					end
-				end, FrameTime())
-			elseif BT_ENABLED == 0 then
-				SendErrorMessage(hero:GetPlayerID(), "#error_buy_tome_disabled")
-			end
+			BuyMaxSmallTomesForPlayer(userID)
 		end
 
 		if str == "-info" then
@@ -961,6 +953,18 @@ ListenToGameEvent('entity_killed', function(keys)
 		end
 	end
 
+	if killedUnit:GetUnitName() == "npc_dota_hero_grom_hellscream" and not killedUnit:IsIllusion() then
+		if killedUnit.phantasm_illusions ~= nil then
+			for _, illusion in pairs(killedUnit.phantasm_illusions) do
+				if illusion ~= nil and IsValidEntity(illusion) and not illusion:IsNull() and illusion:IsAlive() then
+					illusion:Kill(nil, nil)
+				end
+			end
+
+			killedUnit.phantasm_illusions = {}
+		end
+	end
+
 	if killedUnit:IsRealHero() and (killedUnit:GetTeamNumber() == DOTA_TEAM_GOODGUYS) then
 		-- local netTable = {}
 		--		CustomGameEventManager:Send_ServerToPlayer(killedUnit:GetPlayerOwner(), "life_lost", netTable)
@@ -1011,22 +1015,26 @@ ListenToGameEvent('entity_killed', function(keys)
 		end
 		return
 	elseif killedUnit:IsCreature() then
-		local ramero_check = 0
+		if killedUnit:GetUnitName() == "npc_death_revenant_banehallow" and GameMode.BanehallowRevenantsRemaining ~= nil then
+			GameMode.BanehallowRevenantsRemaining = math.max(0, GameMode.BanehallowRevenantsRemaining - 1)
+			CustomGameEventManager:Send_ServerToAllClients("xhs_boss_counter_update", {
+				boss_count = 1,
+				label = "Ghost Revenants",
+				remaining = GameMode.BanehallowRevenantsRemaining,
+				total = GameMode.BanehallowRevenantsTotal or 12,
+			})
+		end
+
 		if killedUnit:GetUnitName() == "npc_ramero" then
-			DropNeutralItemAtPositionForHero("item_lightning_sword", killedUnit:GetAbsOrigin(), killer, killer:GetTeam(), true)
-			ramero_check = ramero_check + 1
+			SpecialEvents.RameroDead = true
+			local rewardHero = GetPlayerHeroFromUnit(killer)
+			if rewardHero ~= nil then
+				SpecialEvents.RameroRewardHero = rewardHero
+				SpecialEvents.RameroRewardPending = true
+			end
 		elseif killedUnit:GetUnitName() == "npc_baristol" then
-			local hero = killer
-
-			if not killer:IsRealHero() then
-				hero = killer:GetPlayerOwner():GetAssignedHero()
-			end
-
-			if hero then
-				hero:IncrementAttributes(250)
-			end
-
-			ramero_check = ramero_check + 1
+			SpecialEvents.BaristolDead = true
+			GrantTomeStatsToHero(killer, 250, "Tome Granted", "+250 all stats")
 		elseif killedUnit:GetUnitName() == "npc_ramero_2" then
 			DropNeutralItemAtPositionForHero("item_ring_of_superiority", killedUnit:GetAbsOrigin(), killer, killer:GetTeam(), true)
 			DOOM_FIRST_TIME = true
@@ -1037,8 +1045,8 @@ ListenToGameEvent('entity_killed', function(keys)
 			FROST_FIRST_TIME = true
 		end
 
-		if ramero_check == 2 then
-			GameRules:GetGameModeEntity():SetContextThink("RameroAndBaristol", nil, 0)
+		if SpecialEvents.RameroDead == true and SpecialEvents.BaristolDead == true then
+			SpecialEvents:EndRameroAndBaristolEvent(true)
 		end
 
 		if killedUnit:GetUnitName() == "npc_dota_creature_muradin_bronzebeard" and killedUnit:GetTeamNumber() ~= 2 then
@@ -1374,8 +1382,58 @@ end
 
 ---------------------------------------------------------
 
+local XHS_QUEST_FOCUS_TARGETS = {
+	teleport_top = "npc_xhs_paladin",
+}
+
+function GameMode:OnQuestFocusRequested(_, event)
+	local playerID = event and event.PlayerID
+	local questName = event and event.quest_id
+	local targetName = questName and XHS_QUEST_FOCUS_TARGETS[questName]
+	if playerID == nil or targetName == nil then return end
+
+	local player = PlayerResource:GetPlayer(playerID)
+	if player == nil then return end
+	if GameMode:IsQuestActive(questName) ~= true then return end
+
+	local units = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_ALL, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, FIND_ANY_ORDER, false)
+	for _, unit in pairs(units) do
+		if unit ~= nil and IsValidEntity(unit) and not unit:IsNull() and unit:GetUnitName() == targetName then
+			CustomGameEventManager:Send_ServerToPlayer(player, "set_player_camera", {
+				hPosition = unit:GetAbsOrigin(),
+				iSpeed = 0.55,
+			})
+			return
+		end
+	end
+end
+
+---------------------------------------------------------
+
+local XHS_MAIN_QUEST_NOTIFICATIONS = {
+	kill_rax = {
+		phase = "Phase 1",
+		title = "Castle Defense Complete",
+		subtitle = "The siege has been held. Prepare for the Destroyer Magnataurs.",
+		sound = "Dungeon.Stinger01",
+	},
+	kill_ice_towers = {
+		phase = "Final Wave",
+		title = "Castle Breach Sealed",
+		subtitle = "Return to the castle and survive the last assault.",
+		sound = "Dungeon.Stinger01",
+	},
+	kill_final_wave = {
+		phase = "Phase 2 Finished",
+		title = "Final Wave Cleared",
+		subtitle = "The castle is safe. Advance to the enemy leaders.",
+		sound = "Dungeon.Stinger01",
+	},
+}
+
 function GameMode:OnQuestCompleted(questZone, quest)
 	--	print("GameMode:OnQuestCompleted - Quest " .. quest.szQuestName .. " in Zone " .. questZone.szName .. " completed.")
+	local bQuestPreviouslyCompleted = quest.bCompleted == true
 	quest.nCompleted = quest.nCompleted + 1
 	if quest.nCompleted >= quest.nCompleteLimit then
 		quest.bCompleted = true
@@ -1420,6 +1478,20 @@ function GameMode:OnQuestCompleted(questZone, quest)
 		if quest.szQuestName == "kill_dest_mag" then
 			-- timers remains paused until magnataurs are killed
 			StartPhase2()
+		elseif quest.szQuestName == "kill_final_wave" then
+			if XHSSetGlobalObjectiveState ~= nil then
+				XHSSetGlobalObjectiveState("final_wave", "Completed", "Final Wave completed")
+			else
+				CustomGameEventManager:Send_ServerToAllClients("xhs_global_objective_update", {
+					id = "final_wave",
+					state = "Completed",
+					text = "Final Wave completed",
+				})
+			end
+
+			if CustomTimers ~= nil and CustomTimers.game_phase < 3 then
+				CustomTimers:IncrementGamePhase()
+			end
 		elseif quest.szQuestName == "teleport_top" then
 			StartMagtheridonArena()
 		elseif quest.szQuestName == "teleport_arthas" then
@@ -1440,6 +1512,17 @@ function GameMode:OnQuestCompleted(questZone, quest)
 	netTable["ZoneStars"] = questZone.nStars
 
 	CustomGameEventManager:Send_ServerToAllClients("quest_completed", netTable)
+
+	if bQuestPreviouslyCompleted == false and quest.bCompleted == true and XHS_MAIN_QUEST_NOTIFICATIONS[quest.szQuestName] ~= nil then
+		local notification = XHS_MAIN_QUEST_NOTIFICATIONS[quest.szQuestName]
+		CustomGameEventManager:Send_ServerToAllClients("xhs_main_quest_completed", {
+			phase = notification.phase,
+			title = notification.title,
+			subtitle = notification.subtitle,
+			sound = notification.sound,
+			duration = 6.5,
+		})
+	end
 end
 
 ---------------------------------------------------------

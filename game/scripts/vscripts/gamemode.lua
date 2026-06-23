@@ -33,6 +33,7 @@ if IsInToolsMode() then
 end
 require('components/battlepass/init')
 require('components/timers/init')
+require('components/runes/init')
 
 if GetMapName() == "x_hero_siege_demo" then
 	require('components/hero_selection/init')
@@ -207,6 +208,7 @@ function GameMode:InitGameMode()
 	LinkLuaModifier("modifier_creature_techies_land_mine", "modifiers/modifier_creature_techies_land_mine", LUA_MODIFIER_MOTION_NONE)
 	LinkLuaModifier("modifier_ankh", "items/ankh_of_reincarnation.lua", LUA_MODIFIER_MOTION_NONE)
 	LinkLuaModifier("modifier_cinematic_pause", "modifiers/modifier_cinematic_pause.lua", LUA_MODIFIER_MOTION_NONE)
+	LinkLuaModifier("modifier_xhs_growth_overhead", "modifiers/modifier_xhs_growth_overhead.lua", LUA_MODIFIER_MOTION_NONE)
 
 	CustomGameEventManager:RegisterListener("setting_vote", Dynamic_Wrap(GameMode, "OnSettingVote"))
 	CustomGameEventManager:RegisterListener("custom_setup_ready", Dynamic_Wrap(GameMode, "OnCustomSetupReady"))
@@ -223,6 +225,7 @@ function GameMode:InitGameMode()
 
 	mode:SetThink("OnThink", GameMode, 1)
 	mode:SetModifyGoldFilter(Dynamic_Wrap(GameMode, "GoldFilter"), GameMode)
+	mode:SetModifyExperienceFilter(Dynamic_Wrap(GameMode, "ExperienceFilter"), GameMode)
 	-- mode:SetModifierGainedFilter(Dynamic_Wrap(GameMode, "ModifierFilter"), GameMode)
 
 	if IsInToolsMode() then
@@ -263,6 +266,8 @@ function GameMode:InitGameMode()
 	CustomGameEventManager:RegisterListener("dialog_confirm", function(...) return GameMode:OnDialogConfirm(...) end)
 	CustomGameEventManager:RegisterListener("dialog_confirm_expire",
 		function(...) return GameMode:OnDialogConfirmExpired(...) end)
+	CustomGameEventManager:RegisterListener("xhs_quest_focus", function(...) return GameMode:OnQuestFocusRequested(...) end)
+	CustomGameEventManager:RegisterListener("xhs_buy_tomes", function(...) return GameMode:OnBuyTomesRequested(...) end)
 
 	ListenToGameEvent("dota_holdout_revive_complete", Dynamic_Wrap(GameMode, "OnPlayerRevived"), GameMode)
 
@@ -398,6 +403,10 @@ end
 ---------------------------------------------------------------------------
 
 function GameMode:DamageFilter(filterTable)
+	if Runes and Runes.OnDamageFilter then
+		Runes:OnDamageFilter(filterTable)
+	end
+
 	local flDamage = filterTable["damage"]
 
 	if filterTable["entindex_attacker_const"] == nil then
@@ -434,8 +443,29 @@ function GameMode:FilterExecuteOrder(filterTable)
 	local z = tonumber(filterTable["position_z"])
 	local point = Vector(x, y, z)
 	local queue = filterTable["queue"] == 1
-
 	local unit
+
+	local function IsAnkhReincarnationInventoryOrder(orderType)
+		return orderType == DOTA_UNIT_ORDER_PURCHASE_ITEM
+			or (DOTA_UNIT_ORDER_MOVE_ITEM ~= nil and orderType == DOTA_UNIT_ORDER_MOVE_ITEM)
+			or (DOTA_UNIT_ORDER_SELL_ITEM ~= nil and orderType == DOTA_UNIT_ORDER_SELL_ITEM)
+			or (DOTA_UNIT_ORDER_DROP_ITEM ~= nil and orderType == DOTA_UNIT_ORDER_DROP_ITEM)
+			or (DOTA_UNIT_ORDER_DISASSEMBLE_ITEM ~= nil and orderType == DOTA_UNIT_ORDER_DISASSEMBLE_ITEM)
+			or (DOTA_UNIT_ORDER_SET_ITEM_COMBINE_LOCK ~= nil and orderType == DOTA_UNIT_ORDER_SET_ITEM_COMBINE_LOCK)
+	end
+
+	local function GetOrderHero()
+		if unit ~= nil and not unit:IsNull() and unit.IsRealHero and unit:IsRealHero() then
+			return unit
+		end
+
+		if issuer ~= nil and issuer >= 0 and PlayerResource:HasSelectedHero(issuer) then
+			return PlayerResource:GetSelectedHeroEntity(issuer)
+		end
+
+		return nil
+	end
+
 	local numUnits = 0
 	local numBuildings = 0
 	if units then
@@ -460,6 +490,19 @@ function GameMode:FilterExecuteOrder(filterTable)
 				--					numUnits = numUnits + 1
 				--				end
 			end
+		end
+	end
+
+	if IsAnkhReincarnationInventoryOrder(order_type) then
+		if issuer ~= nil and issuer >= 0 and IsPlayerXHSReincarnating ~= nil and IsPlayerXHSReincarnating(issuer) then
+			SendErrorMessage(issuer, "#error_reincarnation_inventory_locked")
+			return false
+		end
+
+		local orderHero = GetOrderHero()
+		if orderHero ~= nil and not orderHero:IsNull() and orderHero.IsXHSReincarnating and orderHero:IsXHSReincarnating() then
+			SendErrorMessage(orderHero:GetPlayerID(), "#error_reincarnation_inventory_locked")
+			return false
 		end
 	end
 
@@ -506,6 +549,46 @@ function GameMode:FilterExecuteOrder(filterTable)
 	end
 --]]
 	if order_type == DOTA_UNIT_ORDER_PURCHASE_ITEM then
+		if issuer ~= nil and issuer >= 0 and IsPlayerXHSReincarnating ~= nil and IsPlayerXHSReincarnating(issuer) then
+			SendErrorMessage(issuer, "#error_reincarnation_inventory_locked")
+			return false
+		end
+
+		local buyer = unit
+		if (buyer == nil or buyer:IsNull() or not buyer:IsRealHero()) and issuer ~= nil then
+			buyer = PlayerResource:GetSelectedHeroEntity(issuer)
+		end
+
+		local purchasedItemName = filterTable.shop_item_name or filterTable.item_name or filterTable.abilityname
+		if purchasedItemName == nil and abilityIndex ~= nil and abilityIndex > 0 then
+			local purchasedItem = EntIndexToHScript(abilityIndex)
+			if purchasedItem ~= nil and not purchasedItem:IsNull() then
+				if purchasedItem.GetAbilityName then
+					purchasedItemName = purchasedItem:GetAbilityName()
+				elseif purchasedItem.GetName then
+					purchasedItemName = purchasedItem:GetName()
+				end
+			end
+		end
+
+		if IsTomeItemName(purchasedItemName) then
+			if buyer ~= nil and not buyer:IsNull() and IsHeroOptionalEventTomeLocked(buyer) then
+				SendErrorMessage(buyer:GetPlayerID(), "#error_buy_tome_disabled")
+				return false
+			end
+
+			if IsTomePurchaseGloballyLocked() then
+				local playerID = issuer
+				if (playerID == nil or playerID < 0) and buyer ~= nil and not buyer:IsNull() then
+					playerID = buyer:GetPlayerID()
+				end
+				if playerID ~= nil and playerID >= 0 then
+					SendErrorMessage(playerID, "#error_buy_tome_disabled")
+				end
+				return false
+			end
+		end
+
 		if CustomTimers.timers_paused == 1 then
 			SendErrorMessage(unit:GetPlayerID(), "#error_shop_disabled")
 			return false
@@ -552,65 +635,111 @@ function GameMode:FilterExecuteOrder(filterTable)
 	return true
 end
 
+function GameMode:ReturnHeroFromOptionalEvent(hero, timerName)
+	if hero == nil or not IsValidEntity(hero) or hero:IsNull() then return end
+
+	hero:Stop()
+	SetHeroOptionalEventTomeLock(hero, nil, false)
+	hero:RemoveModifierByName("modifier_pause_creeps")
+	hero:RemoveModifierByName("modifier_cinematic_pause")
+	hero:RemoveModifierByName("modifier_invulnerable")
+	EnableItems(hero)
+
+	local trigger = Entities:FindByName(nil, "trigger_special_event")
+	if trigger ~= nil then
+		trigger:Enable()
+	end
+
+	if timerName ~= nil then
+		CustomGameEventManager:Send_ServerToAllClients("hide_timer_" .. timerName, {})
+	end
+
+	if hero:GetTeamNumber() == DOTA_TEAM_GOODGUYS then
+		local base = BASE_GOOD
+		if base == nil or base:IsNull() then
+			base = Entities:FindByName(nil, "base_spawn")
+		end
+		if base ~= nil then
+			TeleportHero(hero, base:GetAbsOrigin())
+		end
+	end
+end
+
 function GameMode:HeroImage(event)
 	local PlayerID = event.pID
 	local player = PlayerResource:GetPlayer(PlayerID)
+	if player == nil then return end
+
 	local hero = player:GetAssignedHero()
+	if hero == nil or not IsValidEntity(hero) then return end
+
 	local point_hero = Entities:FindByName(nil, "hero_image_player")
 	local point_beast = Entities:FindByName(nil, "hero_image_boss"):GetAbsOrigin()
 
 	if GameMode.HeroImage_occuring == true then
 		GameMode:SpecialEventTPQuit(hero)
 		Notifications:Bottom(hero:GetPlayerOwnerID(),
-			{ text = "Hero Image is already occuring, please choose another event.", duration = 7.5 })
+			{ text = "Another hero is already fighting Hero Image. Please choose another event.", duration = 7.5 })
+		CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "xhs_event_usage_update", {
+			hero_image_busy = true,
+		})
+		return
 	end
 
 	if hero.hero_image then
 		Notifications:Bottom(hero:GetPlayerOwnerID(), { text = "You can do hero image only once!", duration = 5.0 })
+		CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "xhs_event_usage_update", {
+			hero_image_used = true,
+			hero_image_busy = false,
+		})
+		return
 	else
 		GameMode.HeroImage_occuring = true
+		CustomGameEventManager:Send_ServerToAllClients("xhs_event_usage_update", {
+			hero_image_busy = true,
+		})
 		Entities:FindByName(nil, "trigger_special_event_back4"):Enable()
-		CustomGameEventManager:Send_ServerToAllClients("show_timer_hero_image", {})
+		CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "show_timer_hero_image", {})
 		CustomTimers.current_time["hero_image"] = SPECIAL_ARENA_DURATION
 
-		GameMode.HeroImage = CreateUnitByName(hero:GetUnitName(), point_beast, true, nil, nil, DOTA_TEAM_CUSTOM_1)
-		GameMode.HeroImage:SetAngles(0, 210, 0)
+		GameMode.HeroImageUnit = CreateUnitByName(hero:GetUnitName(), point_beast, true, nil, nil, DOTA_TEAM_CUSTOM_1)
+		GameMode.HeroImageUnit:SetAngles(0, 210, 0)
 
-		GameMode.HeroImage:SetBaseStrength(hero:GetStrength() * 4)
-		GameMode.HeroImage:SetBaseIntellect(hero:GetIntellect(true) * 4)
-		GameMode.HeroImage:SetBaseAgility(hero:GetAgility() * 4)
-		--		GameMode.HeroImage:SetHasInventory(true)
+		GameMode.HeroImageUnit:SetBaseStrength(hero:GetStrength() * 4)
+		GameMode.HeroImageUnit:SetBaseIntellect(hero:GetIntellect(true) * 4)
+		GameMode.HeroImageUnit:SetBaseAgility(hero:GetAgility() * 4)
+		--		GameMode.HeroImageUnit:SetHasInventory(true)
 
-		for i = 0, GameMode.HeroImage:GetAbilityCount() - 1 do
-			local ability = GameMode.HeroImage:GetAbilityByIndex(i)
+		ForEachUnitAbility(GameMode.HeroImageUnit, function(ability)
 			if ability then
 				ability:SetLevel(ability:GetMaxLevel())
 			end
-		end
+		end)
 
 		for i = 0, 5 do
 			local item = hero:GetItemInSlot(i)
 
 			if item then
-				local newItem = CreateItem(item:GetName(), GameMode.HeroImage, GameMode.HeroImage)
-				GameMode.HeroImage:AddItem(newItem)
+				local newItem = CreateItem(item:GetName(), GameMode.HeroImageUnit, GameMode.HeroImageUnit)
+				GameMode.HeroImageUnit:AddItem(newItem)
 			end
 		end
 
-		GameMode.HeroImage:AddNewModifier(GameMode.HeroImage, nil, "modifier_pause_creeps", { Duration = 5, IsHidden = true })
-		GameMode.HeroImage:AddNewModifier(GameMode.HeroImage, nil, "modifier_invulnerable", { Duration = 5, IsHidden = true })
-		GameMode.HeroImage:MakeIllusion()
-		GameMode.HeroImage:AddAbility("hero_image_death")
-		GameMode.HeroImage.Boss = true
-		GameMode.HeroImage:SetHealth(99999999)
-		GameMode.HeroImage:SetMana(99999999)
+		GameMode.HeroImageUnit:AddNewModifier(GameMode.HeroImageUnit, nil, "modifier_pause_creeps", { Duration = 5, IsHidden = true })
+		GameMode.HeroImageUnit:AddNewModifier(GameMode.HeroImageUnit, nil, "modifier_invulnerable", { Duration = 5, IsHidden = true })
+		GameMode.HeroImageUnit:MakeIllusion()
+		GameMode.HeroImageUnit:AddAbility("hero_image_death")
+		GameMode.HeroImageUnit.Boss = true
+		GameMode.HeroImageUnit:SetHealth(99999999)
+		GameMode.HeroImageUnit:SetMana(99999999)
 
-		local ability = GameMode.HeroImage:FindAbilityByName("hero_image_death")
-		ability:ApplyDataDrivenModifier(GameMode.HeroImage, GameMode.HeroImage, "modifier_hero_image", {})
+		local ability = GameMode.HeroImageUnit:FindAbilityByName("hero_image_death")
+		ability:ApplyDataDrivenModifier(GameMode.HeroImageUnit, GameMode.HeroImageUnit, "modifier_hero_image", {})
 
 		if IsValidEntity(hero) then
 			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
 				GameMode:SpecialEventTPQuit(hero)
+				SetHeroOptionalEventTomeLock(hero, "hero_image", true)
 				DisableItems(hero, SPECIAL_ARENA_DURATION)
 				Notifications:Bottom(hero:GetPlayerOwnerID(),
 					{ text = "Special Event: Kill Hero Image for +250 Stats. You have 2 minutes.", duration = 5.0 })
@@ -619,16 +748,31 @@ function GameMode:HeroImage(event)
 		end
 
 		timers.HeroImage = Timers:CreateTimer(SPECIAL_ARENA_DURATION, function()
-			Entities:FindByName(nil, "trigger_hero_image_duration"):Enable()
-			GameMode.SpiritBeast_occuring = false
+			local durationTrigger = Entities:FindByName(nil, "trigger_hero_image_duration")
+			if durationTrigger ~= nil then
+				durationTrigger:Enable()
+			end
+			GameMode.HeroImage_occuring = false
+			SetHeroOptionalEventTomeLock(hero, "hero_image", false)
+			GameMode:ReturnHeroFromOptionalEvent(hero, "hero_image")
+			CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "xhs_event_usage_update", {
+				hero_image_used = hero.hero_image == true,
+				hero_image_busy = false,
+			})
+			CustomGameEventManager:Send_ServerToAllClients("xhs_event_usage_update", {
+				hero_image_busy = false,
+			})
 
 			Timers:CreateTimer(5.5, function() --Debug time in case Hero Image kills the player at the very last second
-				Entities:FindByName(nil, "trigger_hero_image_duration"):Disable()
+				local trigger = Entities:FindByName(nil, "trigger_hero_image_duration")
+				if trigger ~= nil then
+					trigger:Disable()
+				end
 			end)
-			if not GameMode.HeroImage:IsNull() then
-				GameMode.HeroImage:RemoveSelf()
-			else
+			if GameMode.HeroImageUnit ~= nil and IsValidEntity(GameMode.HeroImageUnit) and not GameMode.HeroImageUnit:IsNull() then
+				GameMode.HeroImageUnit:RemoveSelf()
 			end
+			GameMode.HeroImageUnit = nil
 		end)
 	end
 end
@@ -647,7 +791,7 @@ function GameMode:SpiritBeast(event)
 	elseif GameMode.SpiritBeast_killed == false then
 		GameMode.SpiritBeast_occuring = true
 		Entities:FindByName(nil, "trigger_special_event_back3"):Enable()
-		CustomGameEventManager:Send_ServerToAllClients("show_timer_spirit_beast", {})
+		CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "show_timer_spirit_beast", {})
 		CustomTimers.current_time["spirit_beast"] = SPECIAL_ARENA_DURATION
 
 		timers.SpiritBeast = Timers:CreateTimer(SPECIAL_ARENA_DURATION, function()
@@ -656,6 +800,7 @@ function GameMode:SpiritBeast(event)
 			end
 
 			GameMode.SpiritBeast_occuring = false
+			SetHeroOptionalEventTomeLock(hero, "spirit_beast", false)
 			GameMode.spirit_beast:RemoveSelf()
 
 			Timers:CreateTimer(5.5, function() --Debug time in case Spirit Beast kills the player at the very last second
@@ -671,6 +816,7 @@ function GameMode:SpiritBeast(event)
 
 		if IsValidEntity(hero) then
 			GameMode:SpecialEventTPQuit(hero)
+			SetHeroOptionalEventTomeLock(hero, "spirit_beast", true)
 			Notifications:Bottom(hero:GetPlayerOwnerID(),
 				{
 					text = "Special Event: Kill Spirit Beast for the Shield of Invincibility. You have 2 minutes.",
@@ -702,7 +848,7 @@ function GameMode:FrostInfernal(event)
 	elseif GameMode.FrostInfernal_killed == false then
 		GameMode.FrostInfernal_occuring = true
 		Entities:FindByName(nil, "trigger_special_event_back2"):Enable()
-		CustomGameEventManager:Send_ServerToAllClients("show_timer_frost_infernal", {})
+		CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "show_timer_frost_infernal", {})
 		CustomTimers.current_time["frost_infernal"] = SPECIAL_ARENA_DURATION
 
 		timers.FrostInfernal = Timers:CreateTimer(SPECIAL_ARENA_DURATION, function()
@@ -711,6 +857,7 @@ function GameMode:FrostInfernal(event)
 			end
 
 			GameMode.FrostInfernal_occuring = false
+			SetHeroOptionalEventTomeLock(hero, "frost_infernal", false)
 			GameMode.frost_infernal:RemoveSelf()
 
 			Timers:CreateTimer(5.5,
@@ -728,6 +875,7 @@ function GameMode:FrostInfernal(event)
 		GameMode.frost_infernal.Boss = true
 
 		GameMode:SpecialEventTPQuit(hero)
+		SetHeroOptionalEventTomeLock(hero, "frost_infernal", true)
 		Notifications:Bottom(hero:GetPlayerOwnerID(),
 			{ text = "Special Event: Kill Frost Infernal for the Key of the 3 Moons. You have 2 minutes.", duration = 5.0 })
 
@@ -750,48 +898,64 @@ function GameMode:AllHeroImages(event)
 	local point = Entities:FindByName(nil, "all_hero_image_player")
 
 	if GameMode.AllHeroImagesDead == true then
+		CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "xhs_event_usage_update", {
+			all_hero_images_used = true,
+			all_hero_images_busy = false,
+		})
 		Notifications:Bottom(hero:GetPlayerOwnerID(), { text = "All Hero Image has already been done!", duration = 5.0 })
 		return
 	end
 
 	if GameMode.AllHeroImages_occuring == true then
+		CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "xhs_event_usage_update", {
+			all_hero_images_busy = true,
+		})
 		Notifications:Bottom(hero:GetPlayerOwnerID(),
 			{ text = "All Hero Images is already occuring, please choose another event.", duration = 7.5 })
 	elseif GameMode.AllHeroImages_occuring == false then
 		GameMode.AllHeroImages_occuring = true
+		CustomGameEventManager:Send_ServerToAllClients("xhs_event_usage_update", {
+			all_hero_images_busy = true,
+		})
 		Entities:FindByName(nil, "trigger_special_event_back5"):Enable()
-		CustomGameEventManager:Send_ServerToAllClients("show_timer_all_hero_image", {})
+		CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "show_timer_all_hero_image", {})
 		CustomTimers.current_time["all_hero_images"] = SPECIAL_ARENA_DURATION
 
 		local illusion_spawn = 0
+		local spawnedImages = 0
 		Timers:CreateTimer(0.25, function()
 			local random = RandomInt(1, #HEROLIST)
 			illusion_spawn = illusion_spawn + 1
 			local point_image = Entities:FindByName(nil, "special_event_all_" .. illusion_spawn)
-			GameMode.AllHeroImage = CreateUnitByName("npc_dota_hero_" .. HEROLIST[random], point_image:GetAbsOrigin(),
-				true, nil, nil, DOTA_TEAM_CUSTOM_2)
-			GameMode.AllHeroImage:SetAngles(0, 45 - 45 * illusion_spawn, 0)
+			local heroImageName = "npc_dota_hero_" .. HEROLIST[random]
+			local spawnIndex = illusion_spawn
 
-			GameMode.AllHeroImage:SetBaseStrength(hero:GetStrength() * 2)
-			GameMode.AllHeroImage:SetBaseIntellect(hero:GetIntellect(true) * 2)
-			GameMode.AllHeroImage:SetBaseAgility(hero:GetAgility() * 2)
+			XHSPrecache:CreateUnitByName(heroImageName, point_image:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2, function(heroImage)
+				GameMode.AllHeroImage = heroImage
+				GameMode.AllHeroImage:SetAngles(0, 45 - 45 * spawnIndex, 0)
 
-			for i = 0, 5 do
-				local item = hero:GetItemInSlot(i)
+				GameMode.AllHeroImage:SetBaseStrength(hero:GetStrength() * 2)
+				GameMode.AllHeroImage:SetBaseIntellect(hero:GetIntellect(true) * 2)
+				GameMode.AllHeroImage:SetBaseAgility(hero:GetAgility() * 2)
 
-				if item then
-					local newItem = CreateItem(item:GetName(), GameMode.AllHeroImage, GameMode.AllHeroImage)
-					GameMode.AllHeroImage:AddItem(newItem)
+				for i = 0, 5 do
+					local item = hero:GetItemInSlot(i)
+
+					if item then
+						local newItem = CreateItem(item:GetName(), GameMode.AllHeroImage, GameMode.AllHeroImage)
+						GameMode.AllHeroImage:AddItem(newItem)
+					end
 				end
-			end
 
-			GameMode.AllHeroImage:AddNewModifier(GameMode.AllHeroImage, nil, "modifier_pause_creeps", { Duration = 5, IsHidden = true })
-			GameMode.AllHeroImage:AddNewModifier(GameMode.AllHeroImage, nil, "modifier_invulnerable", { Duration = 5, IsHidden = true })
+				GameMode.AllHeroImage:AddNewModifier(GameMode.AllHeroImage, nil, "modifier_pause_creeps", { Duration = 5, IsHidden = true })
+				GameMode.AllHeroImage:AddNewModifier(GameMode.AllHeroImage, nil, "modifier_invulnerable", { Duration = 5, IsHidden = true })
 
-			GameMode.AllHeroImage:MakeIllusion()
-			GameMode.AllHeroImage.Boss = true
-			GameMode.AllHeroImage:SetHealth(99999999)
-			GameMode.AllHeroImage:SetMana(99999999)
+				GameMode.AllHeroImage:MakeIllusion()
+				GameMode.AllHeroImage.Boss = true
+				GameMode.AllHeroImage:SetHealth(99999999)
+				GameMode.AllHeroImage:SetMana(99999999)
+				spawnedImages = spawnedImages + 1
+			end, hero:GetPlayerID())
 
 			local return_time = nil
 
@@ -805,6 +969,7 @@ function GameMode:AllHeroImages(event)
 		if IsValidEntity(hero) then
 			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
 				GameMode:SpecialEventTPQuit(hero)
+				SetHeroOptionalEventTomeLock(hero, "all_hero_images", true)
 				Notifications:Bottom(hero:GetPlayerOwnerID(),
 					{
 						text = "Special Event: Kill All Heroes for Necklace of Immunity. You have 2 minutes.",
@@ -817,6 +982,10 @@ function GameMode:AllHeroImages(event)
 		DisableItems(hero, SPECIAL_ARENA_DURATION)
 
 		timers.AllHeroImage = Timers:CreateTimer(0.5, function()
+			if spawnedImages < 8 then
+				return 1.0
+			end
+
 			ALL_HERO_IMAGE_DEAD = 0
 			local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_2, point:GetAbsOrigin(), nil, 2500,
 				DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_ALL, DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER,
@@ -827,10 +996,16 @@ function GameMode:AllHeroImages(event)
 
 			if ALL_HERO_IMAGE_DEAD == 0 then
 				GameMode.AllHeroImagesDead = true
+				GameMode.AllHeroImages_occuring = false
 				DoEntFire("trigger_all_hero_image_duration", "Kill", nil, 0, nil, nil)
 				CustomGameEventManager:Send_ServerToAllClients("hide_timer_all_hero_image", {})
+				CustomGameEventManager:Send_ServerToAllClients("xhs_event_usage_update", {
+					all_hero_images_used = true,
+					all_hero_images_busy = false,
+				})
 				Timers:RemoveTimer(timers.AllHeroImage)
 				Timers:RemoveTimer(timers.AllHeroImage2)
+				SetHeroOptionalEventTomeLock(hero, "all_hero_images", false)
 				Timers:CreateTimer(0.5, function()
 					local pos = Entities:FindByName(nil, "all_hero_image_player"):GetAbsOrigin()
 					DropNeutralItemAtPositionForHero("item_necklace_of_spell_immunity", pos, hero, hero:GetTeam(), true)
@@ -841,8 +1016,16 @@ function GameMode:AllHeroImages(event)
 		end)
 
 		timers.AllHeroImage2 = Timers:CreateTimer(SPECIAL_ARENA_DURATION, function()
-			Entities:FindByName(nil, "trigger_all_hero_image_duration"):Enable()
+			local durationTrigger = Entities:FindByName(nil, "trigger_all_hero_image_duration")
+			if durationTrigger ~= nil then
+				durationTrigger:Enable()
+			end
 			GameMode.AllHeroImages_occuring = false
+			GameMode:ReturnHeroFromOptionalEvent(hero, "all_hero_image")
+			CustomGameEventManager:Send_ServerToAllClients("xhs_event_usage_update", {
+				all_hero_images_busy = false,
+			})
+			SetHeroOptionalEventTomeLock(hero, "all_hero_images", false)
 
 			Timers:CreateTimer(5.5,
 				function() --Debug time in case Frost Infernal kills the player at the very last second
@@ -864,6 +1047,7 @@ end
 function GameMode:SpecialEventTPQuit(hero)
 	CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "quit_events", {})
 	hero:Stop()
+	SetHeroOptionalEventTomeLock(hero, nil, false)
 	Entities:FindByName(nil, "trigger_special_event"):Enable()
 	hero:RemoveModifierByName("modifier_pause_creeps")
 	hero:RemoveModifierByName("modifier_cinematic_pause")
@@ -877,6 +1061,7 @@ function GameMode:SpecialEventTPQuit2(event)
 	local hero = player:GetAssignedHero()
 
 	hero:Stop()
+	SetHeroOptionalEventTomeLock(hero, nil, false)
 	hero:RemoveModifierByName("modifier_pause_creeps")
 	hero:RemoveModifierByName("modifier_cinematic_pause")
 	hero:RemoveModifierByName("modifier_invulnerable")
@@ -900,6 +1085,18 @@ function GameMode:GoldFilter(keys)
 	--		if keys.reason_const == DOTA_ModifyGold_Unspecified then return true end
 	--		SendOverheadEventMessage(PlayerResource:GetPlayer(keys.player_id_const), OVERHEAD_ALERT_GOLD, hero, keys.gold, nil)
 	--	end
+
+	if Runes and Runes.OnGoldFilter then
+		return Runes:OnGoldFilter(keys)
+	end
+
+	return true
+end
+
+function GameMode:ExperienceFilter(keys)
+	if Runes and Runes.OnExperienceFilter then
+		return Runes:OnExperienceFilter(keys)
+	end
 
 	return true
 end
@@ -1334,4 +1531,51 @@ function GameMode:OnCustomSetupReady(event_source_index, keys)
 
 	GameMode.CustomSetupState.ready_players[player_id] = true
 	GameMode:PushCustomSetupNetTable()
+end
+
+function GameMode:OnBuyTomesRequested(event_source_index, keys)
+	local payload = keys
+
+	if type(event_source_index) == "table" and payload == nil then
+		payload = event_source_index
+	end
+
+	if not payload then
+		return
+	end
+
+	local player_id = -1
+
+	if type(event_source_index) == "number" and event_source_index > 0 then
+		local ok, sender = pcall(EntIndexToHScript, event_source_index)
+		if ok and sender ~= nil and sender.GetPlayerID then
+			local sender_player_id = sender:GetPlayerID()
+			if sender_player_id ~= nil and sender_player_id >= 0 then
+				player_id = sender_player_id
+			end
+		end
+	end
+
+	if player_id < 0 then
+		player_id = tonumber(payload.PlayerID or -1) or -1
+	end
+
+	if player_id < 0 or not PlayerResource:IsValidPlayerID(player_id) then
+		return
+	end
+
+	local player = PlayerResource:GetPlayer(player_id)
+	if player == nil then
+		return
+	end
+
+	self.XHSBuyTomeRequestTimes = self.XHSBuyTomeRequestTimes or {}
+	local now = GameRules:GetGameTime()
+	local last_request_time = self.XHSBuyTomeRequestTimes[player_id] or -999
+	if now - last_request_time < 0.25 then
+		return
+	end
+	self.XHSBuyTomeRequestTimes[player_id] = now
+
+	return BuyMaxSmallTomesForPlayer(player_id)
 end

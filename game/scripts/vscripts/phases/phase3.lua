@@ -167,6 +167,8 @@ function StartBanehallowArena()
 	TeleportAllHeroes("point_teleport_boss_", 25.0, 3.0)
 	local banehallow
 	local index = 1
+	GameMode.BanehallowRevenantsTotal = 12
+	GameMode.BanehallowRevenantsRemaining = GameMode.BanehallowRevenantsTotal
 
 	Timers:CreateTimer(8.0, function()
 		banehallow = CreateUnitByName("npc_dota_hero_banehallow", Entities:FindByName(nil, "npc_dota_spawner_magtheridon_arena"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
@@ -175,6 +177,12 @@ function StartBanehallowArena()
 		banehallow:AddNewModifier(banehallow, nil, "modifier_invulnerable", { Duration = 20, IsHidden = true })
 		banehallow:EmitSound("shop_jbrice_01.stinger.radiant_lose")
 		banehallow.zone = "xhs_holdout"
+		CustomGameEventManager:Send_ServerToAllClients("xhs_boss_counter_update", {
+			boss_count = 1,
+			label = "Ghost Revenants",
+			remaining = GameMode.BanehallowRevenantsRemaining,
+			total = GameMode.BanehallowRevenantsTotal,
+		})
 
 		local pos = banehallow:GetAbsOrigin()
 
@@ -275,6 +283,7 @@ function StartSpiritMasterArena()
 	spirit_master:AddNewModifier(spirit_master, nil, "modifier_invulnerable", { Duration = start_time, IsHidden = true })
 	spirit_master:EmitSound("SpiritMaster.StartArena")
 	spirit_master.zone = "xhs_holdout"
+	ShowBossBar(spirit_master)
 
 	Timers:CreateTimer(start_time / 2, function()
 		Notifications:TopToAll({ text = "Spirits. Assemble!", duration = 5.0 })
@@ -293,9 +302,14 @@ function StartSecretArena(hero)
 
 		TeleportHero(hero, hero:GetAbsOrigin())
 
-		Notifications:BottomToAll({ hero = hero:GetUnitName(), duration = 5.0 })
-		Notifications:BottomToAll({ text = PlayerResource:GetPlayerName(hero:GetPlayerID()) .. " ", duration = 5.0, continue = true })
-		Notifications:BottomToAll({ text = "found the secret arena!!! GOOD LUCK!", duration = 5.0, style = { color = "red" }, continue = true })
+		Notifications:BottomToAll({
+			duration = 5.0,
+			segments = {
+				{ hero = hero:GetUnitName() },
+				{ text = PlayerResource:GetPlayerName(hero:GetPlayerID()) .. " " },
+				{ text = "found the secret arena!!! GOOD LUCK!", style = { color = "red" } },
+			},
+		})
 
 		local secret = CreateUnitByName("npc_dota_hero_secret", Entities:FindByName(nil, "npc_dota_muradin_boss"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 		secret:SetAngles(0, 270, 0)

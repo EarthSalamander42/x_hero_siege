@@ -103,64 +103,61 @@ function IsDeveloper(ID) {
 	return false;
 }
 
-// temporary
+var DONATOR_STATUS_TO_TIER_FALLBACK = {
+	"1": 5,
+	"2": 5,
+	"3": 5,
+	"4": 3,
+	"5": 2,
+	"6": 1,
+	"7": 4,
+	"8": 5,
+	"9": 5
+};
+
+var DONATOR_TIER_TO_STATUS_FALLBACK = {
+	"1": 6,
+	"2": 5,
+	"3": 4,
+	"4": 7,
+	"5": 8,
+	"6": 9
+};
+
+var DONATOR_TIER_COLOR_FALLBACK = {
+	"0": "#7DB9D8",
+	"1": "#45C46B",
+	"2": "#F2C94C",
+	"3": "#E4572E",
+	"4": "#7B8794",
+	"5": "#2EC4B6",
+	"6": "#2EC4B6"
+};
+
+function GetDonatorColorMeta() {
+	return CustomNetTables.GetTableValue("game_options", "donator_colors") || {};
+}
+
 function DonatorStatusConverter(new_status) {
-	if (new_status == 6)
-		return 1;
-	else if (new_status == 5)
-		return 2;
-	else if (new_status == 4)
-		return 3;
-	else if (new_status == 7)
-		return 4;
-	else if (new_status == 8)
-		return 5;
-	else if (new_status == 9)
-		return 6;
-	else if (new_status == 1)
-		return 102;
-	else if (new_status == 2)
-		return 101;
-	else if (new_status == 3)
-		return 100;
+	var status = (Number(new_status) || 0).toString();
+	var meta = GetDonatorColorMeta();
+	var statusToTier = meta.status_to_tier || DONATOR_STATUS_TO_TIER_FALLBACK;
+
+	return statusToTier[status] || 0;
 }
 
 function DonatorStatusConverterReverse(new_status) {
-	if (new_status == 1)
-		return 6;
-	else if (new_status == 2)
-		return 5;
-	else if (new_status == 3)
-		return 4;
-	else if (new_status == 4)
-		return 7;
-	else if (new_status == 5)
-		return 8;
-	else if (new_status == 6)
-		return 9;
-	else if (new_status == 100)
-		return 3;
-	else if (new_status == 101)
-		return 2;
-	else if (new_status == 102)
-		return 1;
+	var tier = (Number(new_status) || 0).toString();
+	var meta = GetDonatorColorMeta();
+	var tierToStatus = meta.tier_to_status || DONATOR_TIER_TO_STATUS_FALLBACK;
+
+	return tierToStatus[tier] || 0;
 }
 
 function GetDonatorColor(status) {
-	// lua donator status are still using old numbers
-//	var donator_colors = CustomNetTables.GetTableValue("game_options", "donator_colors")
+	var tier = (Number(status) || 0).toString();
+	var meta = GetDonatorColorMeta();
+	var tierColors = meta.tier || DONATOR_TIER_COLOR_FALLBACK;
 
-	// Placeholder
-	var donator_colors = [];
-	donator_colors[1] = "#45C46B";
-	donator_colors[2] = "#F2C94C";
-	donator_colors[3] = "#E4572E";
-	donator_colors[4] = "#7B8794";
-	donator_colors[5] = "#2EC4B6";
-	donator_colors[6] = "#2EC4B6";
-	donator_colors[100] = "#0066FF";
-	donator_colors[101] = "#641414";
-	donator_colors[102] = "#871414";
-
-	return donator_colors[status];
+	return tierColors[tier] || DONATOR_TIER_COLOR_FALLBACK[tier];
 }

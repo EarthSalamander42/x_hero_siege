@@ -1,6 +1,35 @@
 LinkLuaModifier("modifier_cant_die_generic", "npc_abilities/cant_die.lua", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_dying_generic", "npc_abilities/cant_die.lua", LUA_MODIFIER_MOTION_NONE)
 
+local function GetBossFromDataDrivenKeys(keys)
+	if keys == nil then return nil end
+
+	local boss = keys.caster or keys.unit or keys.target
+	if boss ~= nil and IsValidEntity(boss) and not boss:IsNull() then
+		return boss
+	end
+
+	return nil
+end
+
+function OnCreated(keys)
+	local boss = GetBossFromDataDrivenKeys(keys)
+	if boss ~= nil and IsPrivateBossBarBoss and IsPrivateBossBarBoss(boss) then
+		return
+	end
+
+	if boss ~= nil and ShowBossBar then
+		ShowBossBar(boss)
+	end
+end
+
+function BossTakeDamage(keys)
+	local boss = GetBossFromDataDrivenKeys(keys)
+	if boss ~= nil and UpdateBossBar then
+		UpdateBossBar(boss, keys and keys.attacker)
+	end
+end
+
 cant_die_generic = cant_die_generic or class({})
 
 function cant_die_generic:GetIntrinsicModifierName()
@@ -26,17 +55,12 @@ function modifier_cant_die_generic:OnCreated()
 	self.parent = self:GetParent()
 	self.disable_on_takedamage = false
 
-	local blacklist = {
-		["npc_dota_hero_grom_hellscream"] = true,
-		["npc_dota_hero_illidan"] = true,
-		["npc_dota_hero_balanar"] = true,
-		["npc_dota_hero_proudmoore"] = true,
-		["npc_dota_boss_spirit_master_storm"] = true,
-		["npc_dota_boss_spirit_master_earth"] = true,
-		["npc_dota_boss_spirit_master_fire"] = true,
-	}
+	local is_private_boss_bar_boss = IsPrivateBossBarBoss and IsPrivateBossBarBoss(self.parent)
 
-	if not blacklist[self.parent:GetUnitName()] then
+	if not is_private_boss_bar_boss
+		and self.parent:GetUnitName() ~= "npc_dota_boss_spirit_master_storm"
+		and self.parent:GetUnitName() ~= "npc_dota_boss_spirit_master_earth"
+		and self.parent:GetUnitName() ~= "npc_dota_boss_spirit_master_fire" then
 		if ShowBossBar then
 			ShowBossBar(self.parent)
 		end
@@ -64,7 +88,17 @@ function modifier_cant_die_generic:OnTakeDamage(event)
 
 			parent:SetBaseHealthRegen(0.0)
 			parent:AddNewModifier(parent, nil, "modifier_dying_generic", { duration = 15.0 })
-			CustomGameEventManager:Send_ServerToAllClients("hide_boss_hp", { boss_count = parent.boss_count })
+			if HideBossBar then
+				HideBossBar(parent)
+			end
+			if parent:GetUnitName() == "npc_dota_hero_banehallow" then
+				CustomGameEventManager:Send_ServerToAllClients("xhs_boss_counter_hide", {
+					boss_count = parent.boss_count,
+					boss_bar_id = GetBossBarId and GetBossBarId(parent) or nil,
+				})
+				GameMode.BanehallowRevenantsRemaining = nil
+				GameMode.BanehallowRevenantsTotal = nil
+			end
 
 			parent.deathStart = true
 

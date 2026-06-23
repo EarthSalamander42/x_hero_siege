@@ -91,15 +91,11 @@ local function DisableActiveAbilities(unit)
 		return
 	end
 
-	local ability_count = unit:GetAbilityCount()
-
-	for index = 0, ability_count - 1 do
-		local ability = unit:GetAbilityByIndex(index)
-
+	ForEachUnitAbility(unit, function(ability)
 		if ability and not ability:IsPassive() then
 			ability:SetActivated(false)
 		end
-	end
+	end)
 end
 
 local function ToggleOrb(caster, ability)

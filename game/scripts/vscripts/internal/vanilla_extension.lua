@@ -196,6 +196,10 @@ CScriptParticleManager.CreateParticle = function(self, sParticleName, iAttachTyp
 		sParticleName = override["1"]
 	end
 
+	if XHSPrecache and XHSPrecache.NoteRuntimeAsset then
+		XHSPrecache:NoteRuntimeAsset("particle", sParticleName, "CreateParticle")
+	end
+
 	-- call the original function
 	local response = original_CreateParticle(self, sParticleName, iAttachType, hParent)
 
@@ -227,6 +231,10 @@ CScriptParticleManager.CreateParticleForTeam = function(self, sParticleName, iAt
 		sParticleName = override["1"]
 	end
 
+	if XHSPrecache and XHSPrecache.NoteRuntimeAsset then
+		XHSPrecache:NoteRuntimeAsset("particle", sParticleName, "CreateParticleForTeam")
+	end
+
 	-- call the original function
 	local response = original_CreateParticleForTeam(self, sParticleName, iAttachType, hParent, iTeamNumber)
 
@@ -246,6 +254,10 @@ CScriptParticleManager.CreateParticleForPlayer = function(self, sParticleName, i
 
 	if override then
 		sParticleName = override["1"]
+	end
+
+	if XHSPrecache and XHSPrecache.NoteRuntimeAsset then
+		XHSPrecache:NoteRuntimeAsset("particle", sParticleName, "CreateParticleForPlayer")
 	end
 
 	-- call the original function

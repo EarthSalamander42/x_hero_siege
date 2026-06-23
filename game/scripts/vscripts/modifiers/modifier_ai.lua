@@ -132,8 +132,8 @@ function modifier_ai:OnIntervalThink()
 
 	-- print(self.parent:GetCurrentActiveAbility())
 	-- print("Caster is not casting an ability")
-	for ability_index = 0, self.parent:GetAbilityCount() - 1 do
-		local ability = self.parent:GetAbilityByIndex(ability_index)
+	for ability_index = 0, GetUnitAbilityCount(self.parent) - 1 do
+		local ability = GetUnitAbilityBySafeIndex(self.parent, ability_index)
 
 		if ability and not ability:IsInAbilityPhase() and not ability:IsPassive() and ability:IsActivated() and ability:IsCooldownReady() and ability:GetLevel() > 0 then
 			-- print("Ability is castable:", ability:GetAbilityName())

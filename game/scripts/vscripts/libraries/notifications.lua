@@ -5,17 +5,16 @@ NOTIFICATIONS_VERSION = "0.89"
 
   Installation
   -"require" this file inside your code in order to gain access to the Notifications class for sending notifications to players, teams, or all clients.
-  -Additionally, ensure that you have the barebones_notifications.xml, barebones_notifications.js, and barebones_notifications.css files in your panorama content folder.
+  -Additionally, ensure that you have the xhs_notifications.xml, xhs_notifications.js, and xhs_notifications.css files in your panorama content folder.
 
   Usage
   -Notifications can be sent to the Top or Bottom notification panel of an individual player, a whole team, or all clients at once.
-  -Notifications can be sent in pieces consisting of Labels, Images, HeroImages, and AbilityImages.
-  -Notifications are specified by a table which has 4 potential parameters:
-    -duration: The duration to display the notification for on screen.  Ignored for a notification which "continues" a previous notification line.
+  -Notifications can be sent as a single piece or as one payload with multiple segments consisting of Labels, Images, HeroImages, AbilityImages, and ItemImages.
+  -Notifications are specified by a table which has these potential parameters:
+    -duration: The duration to display the notification for on screen.
     -class: An optional (leave as nil for default) string which will be used as the class to add to the notification piece.
     -style: An optional (leave as nil for default) table of css properties to add to this notification, such as {["font-size"]="60px", color="green"}.
-    -continue: An optional (leave as nil for false) boolean which tells the notification system to add this notification to the current notification line if 'true'.  
-      This lets you place multiple individual notification pieces on the same overall notification.
+    -segments: An optional array of notification pieces to render on the same notification line.
   -For Labels, there is one additional mandatory parameter:
     -text:  The text to display in the notification.  Can provide localization tokens ("#addonname") or non-localized text.
   -For HeroImages, there is two additional parameters:
@@ -41,19 +40,29 @@ NOTIFICATIONS_VERSION = "0.89"
 
   -- Send a notification to all players that displays up top for 5 seconds
   Notifications:TopToAll({text="Top Notification for 5 seconds ", duration=5.0})
-  -- Send a notification to playerID 0 which will display up top for 9 seconds and be green, on the same line as the previous notification
-  Notifications:Top(0, {text="GREEEENNNN", duration=9, style={color="green"}, continue=true})
+  -- Send a notification to playerID 0 which will display up top for 9 seconds and be green
+  Notifications:Top(0, {text="GREEEENNNN", duration=9, style={color="green"}})
 
   -- Display 3 styles of hero icons on the same line for 5 seconds.
-  Notifications:TopToAll({hero="npc_dota_hero_axe", duration=5.0})
-  Notifications:TopToAll({hero="npc_dota_hero_axe", imagestyle="landscape", continue=true})
-  Notifications:TopToAll({hero="npc_dota_hero_axe", imagestyle="portrait", continue=true})
+  Notifications:TopToAll({
+    duration=5.0,
+    segments={
+      {hero="npc_dota_hero_axe"},
+      {hero="npc_dota_hero_axe", imagestyle="landscape"},
+      {hero="npc_dota_hero_axe", imagestyle="portrait"},
+    }
+  })
 
   -- Display a generic image and then 2 ability icons and an item on the same line for 5 seconds
-  Notifications:TopToAll({image="file://{images}/status_icons/dota_generic.psd", duration=5.0})
-  Notifications:TopToAll({ability="nyx_assassin_mana_burn", continue=true})
-  Notifications:TopToAll({ability="lina_fiery_soul", continue=true})
-  Notifications:TopToAll({item="item_force_staff", continue=true})
+  Notifications:TopToAll({
+    duration=5.0,
+    segments={
+      {image="file://{images}/status_icons/dota_generic.psd"},
+      {ability="nyx_assassin_mana_burn"},
+      {ability="lina_fiery_soul"},
+      {item="item_force_staff"},
+    }
+  })
 
 
   -- Send a notification to all players on radiant (GOODGUYS) that displays near the bottom of the screen for 10 seconds to be displayed with the NotificationMessage class added
@@ -79,6 +88,29 @@ NOTIFICATIONS_VERSION = "0.89"
 
 if Notifications == nil then
   Notifications = class({})
+end
+
+local function BuildNotificationPayload(table)
+  local text = table.text
+  if text == nil and table.hero == nil and table.image == nil and table.ability == nil and table.item == nil and table.segments == nil then
+    text = "No TEXT provided."
+  end
+
+  return {
+    text = text,
+    hero = table.hero,
+    imagestyle = table.imagestyle,
+    image = table.image,
+    ability = table.ability,
+    item = table.item,
+    segments = table.segments,
+    duration = table.duration,
+    class = table.class,
+    style = table.style,
+    severity = table.severity,
+    rewardType = table.rewardType,
+    flyoutText = table.flyoutText,
+  }
 end
 
 function Notifications:ClearTop(player)
@@ -144,51 +176,15 @@ function Notifications:Top(player, table)
     player = PlayerResource:GetPlayer(player)
   end
 
-  if table.text ~= nil then
-    CustomGameEventManager:Send_ServerToPlayer(player, "top_notification", {text=table.text, duration=table.duration, class=table.class, style=table.style, continue=table.continue} )
-  elseif table.hero ~= nil then
-    CustomGameEventManager:Send_ServerToPlayer(player, "top_notification", {hero=table.hero, imagestyle=table.imagestyle, duration=table.duration, class=table.class, style=table.style, continue=table.continue} )
-  elseif table.image ~= nil then
-    CustomGameEventManager:Send_ServerToPlayer(player, "top_notification", {image=table.image, duration=table.duration, class=table.class, style=table.style, continue=table.continue} )
-  elseif table.ability ~= nil then
-    CustomGameEventManager:Send_ServerToPlayer(player, "top_notification", {ability=table.ability, duration=table.duration, class=table.class, style=table.style, continue=table.continue} )
-  elseif table.item ~= nil then
-    CustomGameEventManager:Send_ServerToPlayer(player, "top_notification", {item=table.item, duration=table.duration, class=table.class, style=table.style, continue=table.continue} )
-  else
-    CustomGameEventManager:Send_ServerToPlayer(player, "top_notification", {text="No TEXT provided.", duration=table.duration, class=table.class, style=table.style, continue=table.continue} )
-  end
+  CustomGameEventManager:Send_ServerToPlayer(player, "top_notification", BuildNotificationPayload(table))
 end
 
 function Notifications:TopToAll(table)
-  if table.text ~= nil then
-    CustomGameEventManager:Send_ServerToAllClients("top_notification", {text=table.text, duration=table.duration, class=table.class, style=table.style, continue=table.continue} )
-  elseif table.hero ~= nil then
-    CustomGameEventManager:Send_ServerToAllClients("top_notification", {hero=table.hero, imagestyle=table.imagestyle, duration=table.duration, class=table.class, style=table.style, continue=table.continue} )
-  elseif table.image ~= nil then
-    CustomGameEventManager:Send_ServerToAllClients("top_notification", {image=table.image, duration=table.duration, class=table.class, style=table.style, continue=table.continue} )
-  elseif table.ability ~= nil then
-    CustomGameEventManager:Send_ServerToAllClients("top_notification", {ability=table.ability, duration=table.duration, class=table.class, style=table.style, continue=table.continue} )
-  elseif table.item ~= nil then
-    CustomGameEventManager:Send_ServerToAllClients("top_notification", {item=table.item, duration=table.duration, class=table.class, style=table.style, continue=table.continue} )
-  else
-    CustomGameEventManager:Send_ServerToAllClients("top_notification", {text="No TEXT provided.", duration=table.duration, class=table.class, style=table.style, continue=table.continue} )
-  end
+  CustomGameEventManager:Send_ServerToAllClients("top_notification", BuildNotificationPayload(table))
 end
 
 function Notifications:TopToTeam(team, table)
-  if table.text ~= nil then
-    CustomGameEventManager:Send_ServerToTeam(team, "top_notification", {text=table.text, duration=table.duration, class=table.class, style=table.style, continue=table.continue} )
-  elseif table.hero ~= nil then
-    CustomGameEventManager:Send_ServerToTeam(team, "top_notification", {hero=table.hero, imagestyle=table.imagestyle, duration=table.duration, class=table.class, style=table.style, continue=table.continue} )
-  elseif table.image ~= nil then
-    CustomGameEventManager:Send_ServerToTeam(team, "top_notification", {image=table.image, duration=table.duration, class=table.class, style=table.style, continue=table.continue} )
-  elseif table.ability ~= nil then
-    CustomGameEventManager:Send_ServerToTeam(team, "top_notification", {ability=table.ability, duration=table.duration, class=table.class, style=table.style, continue=table.continue} )
-  elseif table.item ~= nil then
-    CustomGameEventManager:Send_ServerToTeam(team, "top_notification", {item=table.item, duration=table.duration, class=table.class, style=table.style, continue=table.continue} )
-  else
-    CustomGameEventManager:Send_ServerToTeam(team, "top_notification", {text="No TEXT provided.", duration=table.duration, class=table.class, style=table.style, continue=table.continue} )
-  end
+  CustomGameEventManager:Send_ServerToTeam(team, "top_notification", BuildNotificationPayload(table))
 end
 
 
@@ -197,49 +193,13 @@ function Notifications:Bottom(player, table)
     player = PlayerResource:GetPlayer(player)
   end
 
-  if table.text ~= nil then
-    CustomGameEventManager:Send_ServerToPlayer(player, "bottom_notification", {text=table.text, duration=table.duration, class=table.class, style=table.style, continue=table.continue} )
-  elseif table.hero ~= nil then
-    CustomGameEventManager:Send_ServerToPlayer(player, "bottom_notification", {hero=table.hero, imagestyle=table.imagestyle, duration=table.duration, class=table.class, style=table.style, continue=table.continue} )
-  elseif table.image ~= nil then
-    CustomGameEventManager:Send_ServerToPlayer(player, "bottom_notification", {image=table.image, duration=table.duration, class=table.class, style=table.style, continue=table.continue} )
-  elseif table.ability ~= nil then
-    CustomGameEventManager:Send_ServerToPlayer(player, "bottom_notification", {ability=table.ability, duration=table.duration, class=table.class, style=table.style, continue=table.continue} )
-  elseif table.item ~= nil then
-    CustomGameEventManager:Send_ServerToPlayer(player, "bottom_notification", {item=table.item, duration=table.duration, class=table.class, style=table.style, continue=table.continue} )
-  else
-    CustomGameEventManager:Send_ServerToPlayer(player, "bottom_notification", {text="No TEXT provided.", duration=table.duration, class=table.class, style=table.style, continue=table.continue} )
-  end
+  CustomGameEventManager:Send_ServerToPlayer(player, "bottom_notification", BuildNotificationPayload(table))
 end
 
 function Notifications:BottomToAll(table)
-  if table.text ~= nil then
-    CustomGameEventManager:Send_ServerToAllClients("bottom_notification", {text=table.text, duration=table.duration, class=table.class, style=table.style, continue=table.continue} )
-  elseif table.hero ~= nil then
-    CustomGameEventManager:Send_ServerToAllClients("bottom_notification", {hero=table.hero, imagestyle=table.imagestyle, duration=table.duration, class=table.class, style=table.style, continue=table.continue} )
-  elseif table.image ~= nil then
-    CustomGameEventManager:Send_ServerToAllClients("bottom_notification", {image=table.image, duration=table.duration, class=table.class, style=table.style, continue=table.continue} )
-  elseif table.ability ~= nil then
-    CustomGameEventManager:Send_ServerToAllClients("bottom_notification", {ability=table.ability, duration=table.duration, class=table.class, style=table.style, continue=table.continue} )
-  elseif table.item ~= nil then
-    CustomGameEventManager:Send_ServerToAllClients("bottom_notification", {item=table.item, duration=table.duration, class=table.class, style=table.style, continue=table.continue} )
-  else
-    CustomGameEventManager:Send_ServerToAllClients("bottom_notification", {text="No TEXT provided.", duration=table.duration, class=table.class, style=table.style, continue=table.continue} )
-  end
+  CustomGameEventManager:Send_ServerToAllClients("bottom_notification", BuildNotificationPayload(table))
 end
 
 function Notifications:BottomToTeam(team, table)
-  if table.text ~= nil then
-    CustomGameEventManager:Send_ServerToTeam(team, "bottom_notification", {text=table.text, duration=table.duration, class=table.class, style=table.style, continue=table.continue} )
-  elseif table.hero ~= nil then
-    CustomGameEventManager:Send_ServerToTeam(team, "bottom_notification", {hero=table.hero, imagestyle=table.imagestyle, duration=table.duration, class=table.class, style=table.style, continue=table.continue} )
-  elseif table.image ~= nil then
-    CustomGameEventManager:Send_ServerToTeam(team, "bottom_notification", {image=table.image, duration=table.duration, class=table.class, style=table.style, continue=table.continue} )
-  elseif table.ability ~= nil then
-    CustomGameEventManager:Send_ServerToTeam(team, "bottom_notification", {ability=table.ability, duration=table.duration, class=table.class, style=table.style, continue=table.continue} )
-  elseif table.item ~= nil then
-    CustomGameEventManager:Send_ServerToTeam(team, "bottom_notification", {item=table.item, duration=table.duration, class=table.class, style=table.style, continue=table.continue} )
-  else
-    CustomGameEventManager:Send_ServerToTeam(team, "bottom_notification", {text="No TEXT provided.", duration=table.duration, class=table.class, style=table.style, continue=table.continue} )
-  end
+  CustomGameEventManager:Send_ServerToTeam(team, "bottom_notification", BuildNotificationPayload(table))
 end

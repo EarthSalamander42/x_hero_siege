@@ -12,7 +12,12 @@ function SpecialEventTPEnabled(event)
 	local point = Entities:FindByName(nil, "event_tp_fix"):GetAbsOrigin()
 	if PlayerResource:GetConnectionState(hero:GetPlayerID()) ~= 2 then return end
 
-	CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "show_events", {})
+	CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "show_events", {
+		hero_image_used = hero.hero_image == true,
+		hero_image_busy = GameMode.HeroImage_occuring == true,
+		all_hero_images_used = GameMode.AllHeroImagesDead == true,
+		all_hero_images_busy = GameMode.AllHeroImages_occuring == true,
+	})
 	Entities:FindByName(nil, "trigger_special_event"):Disable()
 	TeleportHero(hero, point)
 	hero:AddNewModifier(hero, nil, "modifier_pause_creeps", { IsHidden = true })
@@ -23,33 +28,75 @@ end
 function HeroImageBack(event)
 	local hero = event.activator
 
+	if hero == nil or hero:IsNull() then return end
+
+	local heroImageCompleted = hero.hero_image == true
+	local heroImageUnitMissing = GameMode.HeroImageUnit == nil or not IsValidEntity(GameMode.HeroImageUnit) or GameMode.HeroImageUnit:IsNull()
+	if heroImageCompleted or heroImageUnitMissing then
+		SetHeroOptionalEventTomeLock(hero, "hero_image", false)
+		GameMode.HeroImage_occuring = false
+		GameMode.HeroImageUnit = nil
+		CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "xhs_event_usage_update", {
+			hero_image_used = heroImageCompleted,
+			hero_image_busy = false,
+		})
+		CustomGameEventManager:Send_ServerToAllClients("xhs_event_usage_update", {
+			hero_image_busy = false,
+		})
+		GameMode:ReturnHeroFromOptionalEvent(hero, "hero_image")
+		return
+	end
+
 	SpecialEventBack(event)
 	Timers:RemoveTimer(timers.HeroImage)
 	GameMode.HeroImage_occuring = false
 
-	if GameMode.HeroImage:IsAlive() then
-		UTIL_Remove(GameMode.HeroImage)
+	if GameMode.HeroImageUnit ~= nil and IsValidEntity(GameMode.HeroImageUnit) and not GameMode.HeroImageUnit:IsNull() then
+		UTIL_Remove(GameMode.HeroImageUnit)
 	end
-	hero.hero_image = true
-	Notifications:Bottom(hero:GetPlayerOwnerID(), { text = "You can do this event only 1 time!", duration = 5.0 })
+	GameMode.HeroImageUnit = nil
+
+	CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "xhs_event_usage_update", {
+		hero_image_used = false,
+		hero_image_busy = false,
+	})
+	CustomGameEventManager:Send_ServerToAllClients("xhs_event_usage_update", {
+		hero_image_busy = false,
+	})
+	Notifications:Bottom(hero:GetPlayerOwnerID(), { text = "Hero Image failed. You can try again.", duration = 5.0 })
 	CustomGameEventManager:Send_ServerToAllClients("hide_timer_hero_image", {})
 end
 
 function HeroImageDead(event)
-	local caster = event.caster
-	local point_beast = Entities:FindByName(nil, "hero_image_boss"):GetAbsOrigin()
+	local hero = event.attacker
 
+	if timers.HeroImage then
+		Timers:RemoveTimer(timers.HeroImage)
+	end
+
+	SetHeroOptionalEventTomeLock(hero, "hero_image", false)
+	GameMode.HeroImage_occuring = false
+	GameMode.HeroImageUnit = nil
 	CustomGameEventManager:Send_ServerToAllClients("hide_timer_hero_image", {})
+	hero.hero_image = true
+	CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "xhs_event_usage_update", {
+		hero_image_used = true,
+		hero_image_busy = false,
+	})
+	CustomGameEventManager:Send_ServerToAllClients("xhs_event_usage_update", {
+		hero_image_busy = false,
+	})
 
 	Timers:CreateTimer(0.5, function()
-		local pos_launch = point_beast + RandomVector(RandomFloat(150, 200))
-		DropNeutralItemAtPositionForHero("item_tome_big", pos_launch, caster, caster:GetTeam(), true)
+		GrantTomeStatsToHero(hero, 250, "Tome Granted", "+250 all stats")
 	end)
 end
 
 function SpecialEventBack(event)
 	local caller = event.caller
 	local hero = event.activator
+
+	SetHeroOptionalEventTomeLock(hero, nil, false)
 
 	if hero:GetTeamNumber() == 2 then
 		TeleportHero(hero, BASE_GOOD:GetAbsOrigin())
@@ -86,6 +133,7 @@ end
 function SpiritBeastDead(event)
 	local hero = event.attacker
 
+	SetHeroOptionalEventTomeLock(hero, "spirit_beast", false)
 	DoEntFire("trigger_spirit_beast_duration", "Kill", nil, 0, nil, nil)
 	GameMode.SpiritBeast_killed = true
 	CustomGameEventManager:Send_ServerToAllClients("hide_timer_spirit_beast", {})
@@ -111,6 +159,7 @@ end
 function FrostInfernalDead(event)
 	local hero = event.attacker
 
+	SetHeroOptionalEventTomeLock(hero, "frost_infernal", false)
 	DoEntFire("trigger_frost_infernal_duration", "Kill", nil, 0, nil, nil)
 	GameMode.FrostInfernal_killed = 1
 	CustomGameEventManager:Send_ServerToAllClients("hide_timer_frost_infernal", {})
@@ -126,6 +175,9 @@ function AllHeroImageBack(event)
 
 	CustomGameEventManager:Send_ServerToAllClients("hide_timer_all_hero_image", {})
 	GameMode.AllHeroImages_occuring = false
+	CustomGameEventManager:Send_ServerToAllClients("xhs_event_usage_update", {
+		all_hero_images_busy = false,
+	})
 	SpecialEventBack(event)
 
 	local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_2, point, nil, 2500, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_ALL, DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER, false)

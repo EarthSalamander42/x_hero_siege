@@ -93,13 +93,7 @@ _G.ZonesDefinition =
 			{
 				szQuestName = "kill_final_wave",
 				szQuestType = "Kill",
-				Activators =
-				{
-					{
-						Type = QUEST_EVENT_ON_QUEST_COMPLETE,
-						szQuestName = "kill_ice_towers",
-					},
-				},
+				Activators = {},
 				Completion =
 				{
 					Type = QUEST_EVENT_ON_TEAM_ENEMY_KILLED,

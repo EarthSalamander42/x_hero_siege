@@ -119,6 +119,16 @@ function CreepLevels(level)
 		end
 	end
 
+	CustomGameEventManager:Send_ServerToAllClients("xhs_creep_level_update", {
+		level = level,
+	})
+	if CustomTimers ~= nil then
+		CustomTimers.creep_level = math.max(CustomTimers.creep_level or level, level)
+	end
+	if XHSPersistQuestTimingState ~= nil then
+		XHSPersistQuestTimingState()
+	end
+
 	Notifications:TopToAll({ text = "Creep Level " .. level .. " enabled!", style = { color = "lightgreen" }, duration = 5.0 })
 end
 

@@ -13,12 +13,12 @@ var XHSTopHud = (function () {
 	var activePersonalTimerName = null;
 	var currentEventTimerMaxRemaining = {};
 
-	var supporterTierCatalog = [
+	var DEFAULT_SUPPORTER_TIER_CATALOG = [
 		{ id: 0, name: "Free Player", color: "#7db9d8", fragments: 0, xpBoost: 0 },
 		{ id: 1, name: "Donator", color: "#45C46B", fragments: 150, xpBoost: 10 },
 		{ id: 2, name: "Golden Donator", color: "#F2C94C", fragments: 400, xpBoost: 20 },
 		{ id: 3, name: "Ember Donator", color: "#E4572E", fragments: 900, xpBoost: 30 },
-		{ id: 4, name: "Stoneguard Donator", color: "#A7B2C0", fragments: 1800, xpBoost: 40 },
+		{ id: 4, name: "Stoneguard Donator", color: "#7B8794", fragments: 1800, xpBoost: 40 },
 		{ id: 5, name: "Earthwarden Donator", color: "#2EC4B6", fragments: 1800, xpBoost: 40 },
 	];
 
@@ -432,7 +432,40 @@ var XHSTopHud = (function () {
 
 	function GetSupporterTierInfo(tier) {
 		tier = Clamp(ToNumber(tier, 0), 0, 5);
-		return supporterTierCatalog[tier] || supporterTierCatalog[0];
+		return GetSupporterTierCatalog()[tier] || DEFAULT_SUPPORTER_TIER_CATALOG[0];
+	}
+
+	function GetSupporterTierCatalog() {
+		var catalog = DEFAULT_SUPPORTER_TIER_CATALOG.slice(0);
+		var tiers = CustomNetTables.GetTableValue("supporter_pass_meta", "tiers");
+
+		if (!tiers) {
+			return catalog;
+		}
+
+		for (var key in tiers) {
+			if (!tiers.hasOwnProperty(key)) {
+				continue;
+			}
+
+			var tier = tiers[key];
+			if (!tier) {
+				continue;
+			}
+
+			var tierID = Clamp(ToNumber(tier.id || key, 0), 0, 5);
+			var fallback = catalog[tierID] || DEFAULT_SUPPORTER_TIER_CATALOG[0];
+
+			catalog[tierID] = {
+				id: tierID,
+				name: tier.name || fallback.name,
+				color: tier.color || fallback.color,
+				fragments: ToNumber(tier.fragments || tier.monthly_fragments, fallback.fragments),
+				xpBoost: ToNumber(tier.xp_boost || tier.xpBoost, fallback.xpBoost),
+			};
+		}
+
+		return catalog;
 	}
 
 	function GetSupporterTierData(playerID) {
@@ -943,6 +976,9 @@ var XHSTopHud = (function () {
 
 		SubscribeTimerEvents();
 		CustomNetTables.SubscribeNetTableListener("vips", RefreshVipRoster);
+		CustomNetTables.SubscribeNetTableListener("supporter_pass_meta", function () {
+			RefreshAllyRoster();
+		});
 		CustomNetTables.SubscribeNetTableListener("supporter_pass_player", function () {
 			RefreshAllyRoster();
 		});

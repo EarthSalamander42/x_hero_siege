@@ -130,20 +130,18 @@ function ChooseHero(event)
 				EmitSoundOnClient("ui.trophy_levelup", PlayerResource:GetPlayer(id))
 				hero:AddNewModifier(hero, nil, "modifier_command_restricted", {})
 				local picked_hero_name = "npc_dota_hero_" .. HEROLIST[i]
-				Notifications:Bottom(hero:GetPlayerOwnerID(), { hero = picked_hero_name, duration = 5.0 })
-				Notifications:Bottom(hero:GetPlayerOwnerID(), { text = "HERO: ", duration = 5.0, style = { color = "white" }, continue = true })
-				Notifications:Bottom(hero:GetPlayerOwnerID(), { text = "#" .. picked_hero_name, duration = 5.0, style = { color = "white" }, continue = true })
+				Notifications:Bottom(hero:GetPlayerOwnerID(), {
+					duration = 5.0,
+					segments = {
+						{ hero = picked_hero_name },
+						{ text = "HERO: ", style = { color = "white" } },
+						{ text = "#" .. picked_hero_name, style = { color = "white" } },
+					},
+				})
 
-				PrecacheUnitByNameAsync(picked_hero_name, function()
-					local newHero = PlayerResource:ReplaceHeroWith(id, picked_hero_name, XHS_STARTING_GOLD[difficulty], 0)
-					StartingItems(hero, newHero)
-
-					Timers:CreateTimer(0.1, function()
-						if not hero:IsNull() then
-							UTIL_Remove(hero)
-						end
-					end)
-				end, id)
+				XHSPrecache:ReplaceHeroWith(id, picked_hero_name, XHS_STARTING_GOLD[difficulty], 0, hero, {
+					startingItems = true,
+				})
 
 				return
 			end
@@ -167,26 +165,22 @@ function ChooseHeroVIP(event)
 				ParticleManager:SetParticleControl(particle, 0, hero:GetAbsOrigin())
 				EmitSoundOnClient("ui.trophy_levelup", PlayerResource:GetPlayer(id))
 				hero:AddNewModifier(hero, nil, "modifier_command_restricted", {})
-				Notifications:Bottom(hero:GetPlayerOwnerID(), { hero = picked_hero_name, duration = 5.0 })
-				Notifications:Bottom(hero:GetPlayerOwnerID(), { text = "HERO: ", duration = 5.0, style = { color = "white" }, continue = true })
-				Notifications:Bottom(hero:GetPlayerOwnerID(), { text = "#npc_dota_hero_" .. HEROLIST_VIP[i], duration = 5.0, style = { color = "white" }, continue = true })
+				Notifications:Bottom(hero:GetPlayerOwnerID(), {
+					duration = 5.0,
+					segments = {
+						{ hero = picked_hero_name },
+						{ text = "HERO: ", style = { color = "white" } },
+						{ text = "#npc_dota_hero_" .. HEROLIST_VIP[i], style = { color = "white" } },
+					},
+				})
 
-				PrecacheUnitByNameAsync(picked_hero_name, function()
-					local newHero = PlayerResource:ReplaceHeroWith(id, picked_hero_name, XHS_STARTING_GOLD[difficulty], 0)
-					StartingItems(hero, newHero)
-
-					Timers:CreateTimer(0.1, function()
-						if not hero:IsNull() then
-							UTIL_Remove(hero)
-						end
-					end)
-				end, id)
+				XHSPrecache:ReplaceHeroWith(id, picked_hero_name, XHS_STARTING_GOLD[difficulty], 0, hero, {
+					startingItems = true,
+				})
 
 				if picked_hero_name == "npc_dota_hero_storm_spirit" then
-					PrecacheUnitByNameAsync("npc_dota_hero_ember_spirit", function()
-					end, id)
-					PrecacheUnitByNameAsync("npc_dota_hero_earth_spirit", function()
-					end, id)
+					XHSPrecache:PrecacheUnit("npc_dota_hero_ember_spirit", nil, id)
+					XHSPrecache:PrecacheUnit("npc_dota_hero_earth_spirit", nil, id)
 				end
 
 				return

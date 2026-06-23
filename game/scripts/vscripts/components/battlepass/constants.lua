@@ -1,17 +1,78 @@
 DONATOR_COLOR = {}
 DONATOR_COLOR[0] = {255, 255, 255} -- Not a donator
-DONATOR_COLOR[1] = {135, 20, 20} -- IMBA Lead-Developer
-DONATOR_COLOR[2] = {100, 20, 20} -- IMBA Developer
+DONATOR_COLOR[1] = {135, 20, 20} -- Lead Developer
+DONATOR_COLOR[2] = {100, 20, 20} -- Developer
 DONATOR_COLOR[3] = {0, 102, 255} -- Administrator
-DONATOR_COLOR[4] = {220, 40, 40} -- Ember Donator
-DONATOR_COLOR[5] = {218, 165, 32} -- Golden Donator
-DONATOR_COLOR[6] = {0, 204, 0} -- Green Donator (basic)
-DONATOR_COLOR[7] = {153, 51, 153} -- Salamander Donator (purple)
-DONATOR_COLOR[8] = {47, 91, 151} -- Icefrog Donator (blue)
-DONATOR_COLOR[9] = {185, 75, 10} -- Gaben Donator
+DONATOR_COLOR[4] = {228, 87, 46} -- Ember Donator
+DONATOR_COLOR[5] = {242, 201, 76} -- Golden Donator
+DONATOR_COLOR[6] = {69, 196, 107} -- Donator
+DONATOR_COLOR[7] = {123, 135, 148} -- Stoneguard Donator
+DONATOR_COLOR[8] = {46, 196, 182} -- Earthwarden Donator
+DONATOR_COLOR[9] = {46, 196, 182} -- Legacy Gaben Donator maps to Earthwarden
 DONATOR_COLOR[10] = {255, 255, 255}
 
-CustomNetTables:SetTableValue("game_options", "donator_colors", DONATOR_COLOR)
+DONATOR_STATUS_TO_TIER = {
+	[1] = 5, -- Lead Developer
+	[2] = 5, -- Developer
+	[3] = 5, -- Administrator
+	[4] = 3, -- Ember Donator
+	[5] = 2, -- Golden Donator
+	[6] = 1, -- Donator
+	[7] = 4, -- Stoneguard Donator
+	[8] = 5, -- Earthwarden Donator
+	[9] = 5, -- Legacy Gaben Donator maps to Earthwarden
+}
+
+DONATOR_TIER_TO_STATUS = {
+	[1] = 6,
+	[2] = 5,
+	[3] = 4,
+	[4] = 7,
+	[5] = 8,
+	[6] = 9, -- Legacy compatibility for old UI requirements.
+}
+
+local function DonatorRGBToHex(color)
+	if color == nil then
+		return "#ffffff"
+	end
+
+	return string.format("#%02X%02X%02X", color[1] or 255, color[2] or 255, color[3] or 255)
+end
+
+function BuildDonatorColorMeta(supporterTiers)
+	local statusColors = {}
+	local tierColors = {
+		[0] = "#7DB9D8",
+	}
+
+	if supporterTiers ~= nil then
+		for tier, tierData in pairs(supporterTiers) do
+			if tierData.color ~= nil then
+				tierColors[tier] = tierData.color
+			end
+		end
+	end
+
+	for status, color in pairs(DONATOR_COLOR) do
+		statusColors[status] = DonatorRGBToHex(color)
+	end
+
+	for status, tier in pairs(DONATOR_STATUS_TO_TIER) do
+		if tierColors[tier] == nil then
+			tierColors[tier] = DonatorRGBToHex(DONATOR_COLOR[status])
+		end
+	end
+
+	return {
+		status = statusColors,
+		tier = tierColors,
+		status_to_tier = DONATOR_STATUS_TO_TIER,
+		tier_to_status = DONATOR_TIER_TO_STATUS,
+	}
+end
+
+CustomNetTables:SetTableValue("game_options", "donator_colors", BuildDonatorColorMeta())
 
 UNIQUE_DONATOR_COMPANION = {}
 -- UNIQUE_DONATOR_COMPANION["76561198015161808"] = "npc_donator_companion_zonnoz" -- EarthSalamander

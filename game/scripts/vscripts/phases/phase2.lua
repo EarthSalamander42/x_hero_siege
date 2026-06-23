@@ -35,7 +35,9 @@ function Phase2CreepsLeft()
 	local wave_count = 0
 
 	Timers:CreateTimer(function()
-		if not EntIceTower:IsNull() and CustomTimers.timers_paused == 0 then
+		if EntIceTower == nil or EntIceTower:IsNull() or not EntIceTower:IsAlive() or CustomTimers.proc_final_wave == true or CustomTimers.game_phase >= 3 then
+			return nil
+		elseif CustomTimers.timers_paused == 0 then
 			wave_count = wave_count + 1
 
 			for j = 1, 8 do
@@ -46,18 +48,10 @@ function Phase2CreepsLeft()
 				unit:SetBaseMaxHealth(unit:GetMaxHealth() + (PHASE_2_UPGRADE["health"][difficulty] * wave_count))
 				unit:SetHealth(unit:GetMaxHealth())
 				unit:SetPhysicalArmorBaseValue(unit:GetPhysicalArmorValue(false) + (PHASE_2_UPGRADE["armor"][difficulty] * wave_count))
-				if not unit.GrowthOverheadPfx then
-					unit.GrowthOverheadPfx = ParticleManager:CreateParticle("particles/units/heroes/hero_abaddon/abaddon_curse_counter_stack.vpcf", PATTACH_OVERHEAD_FOLLOW, unit)
-				end
-
-				ParticleManager:SetParticleControl(unit.GrowthOverheadPfx, 1, Vector(0, wave_count, 0))
-				--				local stack_10 = math.floor(wave_count / 10)
-				--				ParticleManager:SetParticleControl(unit.GrowthOverheadPfx, 2, Vector(stack_10, wave_count - stack_10*10, 0))
+				ApplyGrowthOverheadMarker(unit, wave_count)
 			end
 
 			return XHS_CREEPS_INTERVAL
-		elseif EntIceTower:IsNull() then
-			return nil
 		else -- if CustomTimers.timers_paused == 1 or 2
 			return XHS_CREEPS_INTERVAL
 		end
@@ -71,7 +65,9 @@ function Phase2CreepsRight()
 	local wave_count = 0
 
 	Timers:CreateTimer(0, function()
-		if not EntIceTower:IsNull() and CustomTimers.timers_paused ~= 1 then
+		if EntIceTower == nil or EntIceTower:IsNull() or not EntIceTower:IsAlive() or CustomTimers.proc_final_wave == true or CustomTimers.game_phase >= 3 then
+			return nil
+		elseif CustomTimers.timers_paused ~= 1 then
 			wave_count = wave_count + 1
 			for j = 1, 8 do
 				local unit = CreateUnitByName("npc_orc_II", point + RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_CUSTOM_1)
@@ -81,19 +77,11 @@ function Phase2CreepsRight()
 				unit:SetBaseMaxHealth(unit:GetMaxHealth() + (PHASE_2_UPGRADE["health"][difficulty] * wave_count))
 				unit:SetHealth(unit:GetMaxHealth())
 				unit:SetPhysicalArmorBaseValue(unit:GetPhysicalArmorValue(false) + (PHASE_2_UPGRADE["armor"][difficulty] * wave_count))
-				if not unit.GrowthOverheadPfx then
-					unit.GrowthOverheadPfx = ParticleManager:CreateParticle("particles/units/heroes/hero_abaddon/abaddon_curse_counter_stack.vpcf", PATTACH_OVERHEAD_FOLLOW, unit)
-				end
-
-				ParticleManager:SetParticleControl(unit.GrowthOverheadPfx, 1, Vector(0, wave_count, 0))
-				--				local stack_10 = math.floor(wave_count / 10)
-				--				ParticleManager:SetParticleControl(unit.GrowthOverheadPfx, 2, Vector(stack_10, wave_count - stack_10*10, 0))
+				ApplyGrowthOverheadMarker(unit, wave_count)
 			end
 			return 30
 		elseif CustomTimers.timers_paused == 1 then
 			return 30
-		elseif EntIceTower:IsNull() then
-			return nil
 		end
 	end)
 end
@@ -110,7 +98,87 @@ function EndPhase2()
 	end
 end
 
+local FINAL_WAVE_QUEST_NAME = "kill_final_wave"
+local FINAL_WAVE_TOTAL_UNITS = 52
+local final_wave_stun_time = 0
+
+local function FindFinalWaveQuest()
+	if GameMode == nil or GameMode.Zones == nil then
+		return nil, nil
+	end
+
+	for _, zone in pairs(GameMode.Zones) do
+		if zone ~= nil and zone.Quests ~= nil then
+			for _, quest in pairs(zone.Quests) do
+				if quest ~= nil and quest.szQuestName == FINAL_WAVE_QUEST_NAME then
+					return zone, quest
+				end
+			end
+		end
+	end
+
+	return nil, nil
+end
+
+local function SendFinalWaveQuestProgress(zone, quest)
+	if zone == nil or quest == nil then return end
+
+	CustomGameEventManager:Send_ServerToAllClients("quest_completed", {
+		ZoneName = zone.szName,
+		QuestName = quest.szQuestName,
+		QuestType = quest.szQuestType,
+		Completed = quest.nCompleted,
+		CompleteLimit = quest.nCompleteLimit,
+		XPReward = quest.RewardXP or 0,
+		GoldReward = quest.RewardGold or 0,
+		ZoneCompleted = false,
+		Optional = quest.bOptional,
+		ZoneStars = zone.nStars,
+	})
+end
+
+local function UpdateFinalWaveQuestLimit()
+	local spawnedCount = math.min(CustomTimers.final_wave_spawned_kill_limit or 0, FINAL_WAVE_TOTAL_UNITS)
+	if spawnedCount <= 0 then return end
+
+	local zone, quest = FindFinalWaveQuest()
+	if zone == nil or quest == nil or quest.bCompleted == true then return end
+
+	quest.nCompleteLimit = spawnedCount
+
+	if quest.bActivated ~= true then
+		quest.nCompleted = 0
+		GameRules.GameMode:OnQuestStarted(zone, quest)
+	else
+		SendFinalWaveQuestProgress(zone, quest)
+	end
+end
+
+local function RegisterFinalWaveUnit(unit)
+	if unit == nil then return end
+
+	unit.zone = "xhs_holdout"
+	unit.xhs_final_wave_unit = true
+	CustomTimers.final_wave_spawned_kill_limit = (CustomTimers.final_wave_spawned_kill_limit or 0) + 1
+end
+
 function FinalWave()
+	CustomTimers.proc_final_wave = true
+	CustomTimers.final_wave_kill_counting = false
+	CustomTimers.final_wave_spawned_kill_limit = 0
+	final_wave_stun_time = 0
+
+	CustomTimers.current_time["special_event"] = 1
+	CustomTimers:Countdown("special_event")
+	if XHSSetGlobalObjectiveState ~= nil then
+		XHSSetGlobalObjectiveState("final_wave", "Active", "Final Wave active")
+	else
+		CustomGameEventManager:Send_ServerToAllClients("xhs_global_objective_update", {
+			id = "final_wave",
+			state = "Active",
+			text = "Final Wave active",
+		})
+	end
 	KillCreeps(DOTA_TEAM_CUSTOM_1)
 	RefreshPlayers()
 	GameRules:SetHeroRespawnEnabled(false)
@@ -159,37 +227,40 @@ function FinalWave()
 	end)
 end
 
-local final_wave_stun_time = 0
-
 function FinalWaveSpawner(creep1, creep2, creep3, creep4, boss_name, angles, direction, waypoint)
 	local number = 1
 	local waypoint = Entities:FindByName(nil, "final_wave_player_2")
 
 	for i = 1, 3 do
 		local unit = CreateUnitByName(creep1 .. "_final_wave", Entities:FindByName(nil, "final_wave_" .. direction .. "_" .. number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+		RegisterFinalWaveUnit(unit)
 		unit:SetAngles(0, angles, 0)
 		number = number + 1
 	end
 
 	for i = 1, 3 do
 		local unit = CreateUnitByName(creep2 .. "_final_wave", Entities:FindByName(nil, "final_wave_" .. direction .. "_" .. number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+		RegisterFinalWaveUnit(unit)
 		unit:SetAngles(0, angles, 0)
 		number = number + 1
 	end
 
 	for i = 1, 3 do
 		local unit = CreateUnitByName(creep3 .. "_final_wave", Entities:FindByName(nil, "final_wave_" .. direction .. "_" .. number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+		RegisterFinalWaveUnit(unit)
 		unit:SetAngles(0, angles, 0)
 		number = number + 1
 	end
 
 	for i = 1, 3 do
 		local unit = CreateUnitByName(creep4 .. "_final_wave", Entities:FindByName(nil, "final_wave_" .. direction .. "_" .. number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+		RegisterFinalWaveUnit(unit)
 		unit:SetAngles(0, angles, 0)
 		number = number + 1
 	end
 
 	local boss = CreateUnitByName(boss_name .. "_final_wave", Entities:FindByName(nil, "final_wave_" .. direction .. "_" .. number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+	RegisterFinalWaveUnit(boss)
 	boss:SetAngles(0, angles, 0)
 	boss:EmitSound("Hero_TemplarAssassin.Trap")
 	boss:SetInitialGoalEntity(waypoint)
@@ -198,6 +269,9 @@ function FinalWaveSpawner(creep1, creep2, creep3, creep4, boss_name, angles, dir
 		OrderType = DOTA_UNIT_ORDER_ATTACK_MOVE,
 		Position = waypoint:GetAbsOrigin(),
 	})
+
+	UpdateFinalWaveQuestLimit()
+	CustomTimers.final_wave_kill_counting = (CustomTimers.final_wave_spawned_kill_limit or 0) >= FINAL_WAVE_TOTAL_UNITS
 
 	local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_1, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)
 	for _, v in pairs(units) do

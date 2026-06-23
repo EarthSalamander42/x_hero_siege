@@ -58,21 +58,24 @@ function Battlepass:GetPlayerInfoXP() -- yet it has too much useless loops, form
 			end
 
 			local supporter_table = SupporterPass and SupporterPass:BuildPlayerTable(player_id) or nil
-			local current_xp = supporter_table and supporter_table.season_xp or 0
-			local xp_in_level = current_xp
-			local level = supporter_table and supporter_table.season_level or 0
+			local season_xp = supporter_table and supporter_table.season_xp or 0
+			local season_xp_max = supporter_table and supporter_table.season_xp_max or 1000
+			local season_level = supporter_table and supporter_table.season_level or 1
 
-			while xp_in_level > 2000 do
-				xp_in_level = xp_in_level - 2000
+			if season_xp_max <= 0 then
+				season_xp_max = 1000
+			end
+			if season_level <= 0 then
+				season_level = 1
 			end
 
 			CustomNetTables:SetTableValue("supporter_pass_player", tostring(player_id), {
-				XP = xp_in_level,
-				MaxXP = supporter_table and supporter_table.season_xp_max or 2000,
-				Lvl = level,
+				XP = season_xp,
+				MaxXP = season_xp_max,
+				Lvl = season_level,
 				ply_color = rgbToHex(color),
-				title = api.players[steamid].rank_title,
-				title_color = rgbToHex(Battlepass:GetTitleColorXP(api.players[steamid].rank_title)),
+				title = "Supporter Pass",
+				title_color = "#9eb0c9",
 				donator_level = api:GetDonatorStatus(player_id),
 				donator_color = rgbToHex(donator_color),
 				tier_id = supporter_table and supporter_table.tier_id or 0,
@@ -83,11 +86,11 @@ function Battlepass:GetPlayerInfoXP() -- yet it has too much useless loops, form
 				weekly_cap = supporter_table and supporter_table.weekly_cap or 100,
 				monthly_fragments = supporter_table and supporter_table.monthly_fragments or 0,
 				xp_boost = supporter_table and supporter_table.xp_boost or 0,
-				season_level = level,
-				season_xp = current_xp,
-				season_xp_max = supporter_table and supporter_table.season_xp_max or 2000,
+				season_level = season_level,
+				season_xp = season_xp,
+				season_xp_max = season_xp_max,
 				account_level = supporter_table and supporter_table.account_level or 0,
-				account_title = supporter_table and supporter_table.account_title or api.players[steamid].rank_title,
+				account_title = "Supporter Pass",
 				legacy_fragments = supporter_table and supporter_table.legacy_fragments or 0,
 				toggle_tag = api:GetPlayerTagEnabled(player_id),
 				bp_rewards = api:GetPlayerBPRewardsEnabled(player_id),
