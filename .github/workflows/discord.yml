@@ -1,0 +1,47 @@
+name: Discord Notifications
+
+on:
+  push:
+  pull_request:
+    types: [opened, closed, reopened, edited, ready_for_review, converted_to_draft]
+  pull_request_review:
+    types: [submitted, edited, dismissed]
+  pull_request_review_comment:
+    types: [created, edited, deleted]
+  issues:
+    types: [opened, closed, reopened, edited, assigned, unassigned, labeled, unlabeled]
+  issue_comment:
+    types: [created, edited, deleted]
+  release:
+    types: [published, edited, deleted]
+  fork:
+  watch:
+    types: [started]
+  discussion:
+    types: [created, edited, deleted, answered, unanswered, labeled, unlabeled]
+  discussion_comment:
+    types: [created, edited, deleted]
+  create:
+  delete:
+  label:
+    types: [created, edited, deleted]
+  milestone:
+    types: [created, closed, opened, edited, deleted]
+  gollum:
+  workflow_run:
+    types: [requested, in_progress, completed]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Send Discord notification
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          GITHUB_EVENT_PATH: ${{ github.event_path }}
+        run: node scripts/discord.js
