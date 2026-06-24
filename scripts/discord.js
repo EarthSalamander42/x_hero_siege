@@ -217,6 +217,19 @@ function releaseEmbed() {
 	});
 }
 
+function watchEmbed() {
+	return baseEmbed({
+		title: "Repository Starred",
+		description: `**${sender.login || "Someone"}** starred **${repoName}**.`,
+		url: repoUrl,
+		color: COLORS.warning,
+		fields: [
+			field("Stars", String(repo.stargazers_count ?? "N/A")),
+			field("Action", titleCase(event.action || "started"))
+		]
+	});
+}
+
 function discussionEmbed() {
 	const discussion = event.discussion;
 
@@ -263,6 +276,9 @@ function buildEmbed() {
 
 		case "release":
 			return releaseEmbed();
+
+		case "watch":
+			return watchEmbed();
 
 		case "discussion":
 			return discussionEmbed();
