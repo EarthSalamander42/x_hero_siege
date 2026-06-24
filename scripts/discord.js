@@ -14,31 +14,22 @@ const repo = event.repository || {};
 const sender = event.sender || {};
 const repoName = repo.full_name || "Unknown repository";
 const repoUrl = repo.html_url || "";
-const avatarUrl = sender.avatar_url || repo.owner?.avatar_url || null;
+const avatarUrl = sender.avatar_url || repo.owner?.avatar_url || undefined;
 
-const colors = {
-	push: 0x2ecc71,
-	pull_request: 0x3498db,
-	pull_request_review: 0x9b59b6,
-	pull_request_review_comment: 0x9b59b6,
-	issues: 0xe74c3c,
-	issue_comment: 0xf1c40f,
-	release: 0x1abc9c,
-	fork: 0x95a5a6,
-	watch: 0xf1c40f,
-	discussion: 0x5865f2,
-	discussion_comment: 0x5865f2,
-	create: 0x2ecc71,
-	delete: 0xe74c3c,
-	label: 0x95a5a6,
-	milestone: 0xe67e22,
-	gollum: 0x34495e,
-	workflow_run: 0xe67e22
+const COLORS = {
+	success: 0x2ecc71,
+	info: 0x3498db,
+	warning: 0xf1c40f,
+	danger: 0xe74c3c,
+	purple: 0x9b59b6,
+	gray: 0x95a5a6,
+	discord: 0x5865f2
 };
 
 function truncate(text, max = 1000) {
 	if (!text) return "";
-	return text.length > max ? `${text.slice(0, max - 3)}...` : text;
+	const value = String(text);
+	return value.length > max ? `${value.slice(0, max - 3)}...` : value;
 }
 
 function titleCase(value) {
@@ -47,157 +38,261 @@ function titleCase(value) {
 		.replace(/\b\w/g, char => char.toUpperCase());
 }
 
-function makeEmbed(title, description, url = repoUrl) {
+function shortSha(value) {
+	return value ? value.slice(0, 7) : "unknown";
+}
+
+function field(name, value, inline = true) {
+	return {
+		name,
+		value: truncate(value || "N/A", 1024),
+		inline
+	};
+}
+
+function baseEmbed({ title, description, url, color = COLORS.discord, fields = [] }) {
 	return {
 		title,
 		description: truncate(description, 3900),
-		url,
-		color: colors[eventName] || 0x5865f2,
+		url: url || repoUrl,
+		color,
 		author: {
 			name: sender.login || "GitHub",
-			icon_url: avatarUrl || undefined,
+			icon_url: avatarUrl,
 			url: sender.html_url || undefined
 		},
 		fields: [
-			{
-				name: "Repository",
-				value: repoUrl ? `[${repoName}](${repoUrl})` : repoName,
-				inline: true
-			}
+			field("Repository", repoUrl ? `[${repoName}](${repoUrl})` : repoName),
+			...fields
 		],
 		timestamp: new Date().toISOString(),
 		footer: {
-			text: "GitHub"
+			text: "GitHub Notifications"
 		}
 	};
 }
 
-function getPushEmbed() {
+function pushEmbed() {
 	const branch = (event.ref || "").replace("refs/heads/", "");
 	const commits = event.commits || [];
-	const commitList = commits
-		.slice(0, 8)
-		.map(commit => `• [${commit.id.slice(0, 7)}](${commit.url}) ${truncate(commit.message.split("\n")[0], 120)}`)
+
+	const commitLines = commits
+		.slice(0, 10)
+		.map(commit => `• [${shortSha(commit.id)}](${commit.url}) ${truncate(commit.message.split("\n")[0], 130)}`)
 		.join("\n");
 
-	const extra = commits.length > 8 ? `\n…and ${commits.length - 8} more commit(s).` : "";
+	const extra = commits.length > 10 ? `\n…and ${commits.length - 10} more commit(s).` : "";
 
-	return makeEmbed(
-		"🚀 New Push",
-		`**Branch:** \`${branch}\`\n**Pusher:** ${event.pusher?.name || sender.login}\n\n${commitList || "No commits listed."}${extra}`,
-		event.compare || repoUrl
-	);
+	return baseEmbed({
+		title: "🚀 New Push",
+		description: commitLines || "No commits listed.",
+		url: event.compare || repoUrl,
+		color: COLORS.success,
+		fields: [
+			field("Branch", `\`${branch}\``),
+			field("Pusher", event.pusher?.name || sender.login),
+			field("Commit count", String(commits.length))
+		]
+	});
 }
 
-function getPullRequestEmbed() {
+function pullRequestEmbed() {
 	const pr = event.pull_request;
 	const merged = event.action === "closed" && pr.merged;
-	const icon = merged ? "✅" : event.action === "closed" ? "❌" : "🔀";
 
-	return makeEmbed(
-		`${icon} Pull Request ${titleCase(merged ? "merged" : event.action)}`,
-		`**#${pr.number}:** ${pr.title}\n**Author:** ${pr.user.login}\n**Branch:** \`${pr.head.ref}\` → \`${pr.base.ref}\``,
-		pr.html_url
-	);
+	let icon = "🔀";
+	let color = COLORS.info;
+	let action = titleCase(event.action);
+
+	if (merged) {
+		icon = "✅";
+		color = COLORS.success;
+		action = "Merged";
+	} else if (event.action === "closed") {
+		icon = "❌";
+		color = COLORS.danger;
+	} else if (event.action === "ready_for_review") {
+		icon = "👀";
+		color = COLORS.purple;
+		action = "Ready For Review";
+	} else if (event.action === "converted_to_draft") {
+		icon = "📝";
+		color = COLORS.gray;
+		action = "Converted To Draft";
+	} else if (event.action === "synchronize") {
+		icon = "🔄";
+		color = COLORS.info;
+		action = "Updated";
+	}
+
+	return baseEmbed({
+		title: `${icon} Pull Request ${action}`,
+		description: `**#${pr.number}: ${pr.title}**\n${truncate(pr.body || "No description.", 1200)}`,
+		url: pr.html_url,
+		color,
+		fields: [
+			field("Author", pr.user.login),
+			field("Branch", `\`${pr.head.ref}\` → \`${pr.base.ref}\``),
+			field("Changed files", String(pr.changed_files ?? "N/A")),
+			field("Additions", `+${pr.additions ?? 0}`),
+			field("Deletions", `-${pr.deletions ?? 0}`)
+		]
+	});
 }
 
-function getIssueEmbed() {
+function issueEmbed() {
 	const issue = event.issue;
+	const labels = (issue.labels || []).map(label => `\`${label.name}\``).join(", ") || "None";
 
-	return makeEmbed(
-		`🐛 Issue ${titleCase(event.action)}`,
-		`**#${issue.number}:** ${issue.title}\n**Author:** ${issue.user.login}`,
-		issue.html_url
-	);
+	let color = COLORS.warning;
+	if (event.action === "closed") color = COLORS.success;
+	if (event.action === "reopened") color = COLORS.info;
+
+	return baseEmbed({
+		title: `🐛 Issue ${titleCase(event.action)}`,
+		description: `**#${issue.number}: ${issue.title}**\n${truncate(issue.body || "No description.", 1200)}`,
+		url: issue.html_url,
+		color,
+		fields: [
+			field("Author", issue.user.login),
+			field("State", issue.state),
+			field("Labels", labels, false)
+		]
+	});
 }
 
-function getCommentEmbed(type, item, comment) {
-	return makeEmbed(
-		`💬 ${type} Comment ${titleCase(event.action)}`,
-		`**Target:** ${item.title || item.html_url || repoName}\n**Author:** ${comment.user.login}\n\n${truncate(comment.body, 1200)}`,
-		comment.html_url
-	);
+function commentEmbed(type, item, comment) {
+	return baseEmbed({
+		title: `💬 ${type} Comment ${titleCase(event.action)}`,
+		description: truncate(comment.body || "No content.", 1600),
+		url: comment.html_url,
+		color: COLORS.warning,
+		fields: [
+			field("Author", comment.user.login),
+			field("Target", item.title ? `#${item.number || ""} ${item.title}` : repoName, false)
+		]
+	});
 }
 
-function getReleaseEmbed() {
+function reviewEmbed() {
+	const review = event.review;
+	const pr = event.pull_request;
+
+	let icon = "📝";
+	let color = COLORS.purple;
+
+	if (review.state === "approved") {
+		icon = "✅";
+		color = COLORS.success;
+	} else if (review.state === "changes_requested") {
+		icon = "❌";
+		color = COLORS.danger;
+	}
+
+	return baseEmbed({
+		title: `${icon} Pull Request Review ${titleCase(review.state)}`,
+		description: truncate(review.body || "No review message.", 1200),
+		url: review.html_url,
+		color,
+		fields: [
+			field("Reviewer", review.user.login),
+			field("Pull Request", `#${pr.number} ${pr.title}`, false)
+		]
+	});
+}
+
+function releaseEmbed() {
 	const release = event.release;
 
-	return makeEmbed(
-		`📦 Release ${titleCase(event.action)}`,
-		`**${release.name || release.tag_name}**\n**Tag:** \`${release.tag_name}\`\n\n${truncate(release.body || "No release notes.", 1500)}`,
-		release.html_url
-	);
+	return baseEmbed({
+		title: `📦 Release ${titleCase(event.action)}`,
+		description: `**${release.name || release.tag_name}**\n\n${truncate(release.body || "No release notes.", 1800)}`,
+		url: release.html_url,
+		color: COLORS.success,
+		fields: [
+			field("Tag", `\`${release.tag_name}\``),
+			field("Draft", release.draft ? "Yes" : "No"),
+			field("Prerelease", release.prerelease ? "Yes" : "No")
+		]
+	});
 }
 
-function getSimpleEmbed(icon, title, description, url = repoUrl) {
-	return makeEmbed(`${icon} ${title}`, description, url);
+function discussionEmbed() {
+	const discussion = event.discussion;
+
+	return baseEmbed({
+		title: `💬 Discussion ${titleCase(event.action)}`,
+		description: `**${discussion.title}**\n${truncate(discussion.body || "No content.", 1400)}`,
+		url: discussion.html_url,
+		color: COLORS.discord,
+		fields: [
+			field("Author", discussion.user.login),
+			field("Category", discussion.category?.name || "N/A")
+		]
+	});
+}
+
+function simpleEmbed(icon, title, description, url = repoUrl, color = COLORS.gray) {
+	return baseEmbed({
+		title: `${icon} ${title}`,
+		description,
+		url,
+		color
+	});
 }
 
 function buildEmbed() {
 	switch (eventName) {
 		case "push":
-			return getPushEmbed();
+			return pushEmbed();
 
 		case "pull_request":
-			return getPullRequestEmbed();
+			return pullRequestEmbed();
 
 		case "pull_request_review":
-			return getSimpleEmbed(
-				"📝",
-				`Pull Request Review ${titleCase(event.action)}`,
-				`**PR:** #${event.pull_request.number} ${event.pull_request.title}\n**Reviewer:** ${event.review.user.login}\n**State:** ${event.review.state}`,
-				event.review.html_url
-			);
+			return reviewEmbed();
 
 		case "pull_request_review_comment":
-			return getCommentEmbed("Pull Request Review", event.pull_request, event.comment);
+			return commentEmbed("Pull Request Review", event.pull_request, event.comment);
 
 		case "issues":
-			return getIssueEmbed();
+			return issueEmbed();
 
 		case "issue_comment":
-			return getCommentEmbed("Issue", event.issue, event.comment);
+			return commentEmbed("Issue", event.issue, event.comment);
 
 		case "release":
-			return getReleaseEmbed();
-
-		case "fork":
-			return getSimpleEmbed("🍴", "Repository Forked", `**Forked by:** ${event.forkee.owner.login}`, event.forkee.html_url);
-
-		case "watch":
-			return getSimpleEmbed("⭐", "Repository Starred", `**Starred by:** ${sender.login}\n**Total stars:** ${repo.stargazers_count}`);
+			return releaseEmbed();
 
 		case "discussion":
-			return getSimpleEmbed("💬", `Discussion ${titleCase(event.action)}`, `**${event.discussion.title}**\n**Author:** ${event.discussion.user.login}`, event.discussion.html_url);
+			return discussionEmbed();
 
 		case "discussion_comment":
-			return getSimpleEmbed("💬", `Discussion Comment ${titleCase(event.action)}`, `**Author:** ${event.comment.user.login}\n\n${truncate(event.comment.body, 1200)}`, event.comment.html_url);
+			return commentEmbed("Discussion", event.discussion, event.comment);
 
 		case "create":
-			return getSimpleEmbed("🌱", `${titleCase(event.ref_type)} Created`, `**Name:** \`${event.ref}\``);
+			return simpleEmbed("🌱", `${titleCase(event.ref_type)} Created`, `**Name:** \`${event.ref}\``, repoUrl, COLORS.success);
 
 		case "delete":
-			return getSimpleEmbed("🗑️", `${titleCase(event.ref_type)} Deleted`, `**Name:** \`${event.ref}\``);
+			return simpleEmbed("🗑️", `${titleCase(event.ref_type)} Deleted`, `**Name:** \`${event.ref}\``, repoUrl, COLORS.danger);
 
 		case "label":
-			return getSimpleEmbed("🏷️", `Label ${titleCase(event.action)}`, `**Label:** ${event.label.name}`);
+			return simpleEmbed("🏷️", `Label ${titleCase(event.action)}`, `**Label:** \`${event.label.name}\``, repoUrl, COLORS.gray);
 
 		case "milestone":
-			return getSimpleEmbed("🎯", `Milestone ${titleCase(event.action)}`, `**Milestone:** ${event.milestone.title}`, event.milestone.html_url);
+			return simpleEmbed("🎯", `Milestone ${titleCase(event.action)}`, `**Milestone:** ${event.milestone.title}`, event.milestone.html_url, COLORS.warning);
 
 		case "gollum":
-			return getSimpleEmbed("📚", "Wiki Updated", event.pages.map(page => `• [${page.title}](${page.html_url}) — ${page.action}`).join("\n"));
-
-		case "workflow_run":
-			return getSimpleEmbed(
-				event.workflow_run.conclusion === "success" ? "✅" : event.workflow_run.conclusion === "failure" ? "❌" : "⚙️",
-				`Workflow ${titleCase(event.action)}`,
-				`**Workflow:** ${event.workflow_run.name}\n**Branch:** \`${event.workflow_run.head_branch}\`\n**Status:** ${event.workflow_run.status}\n**Conclusion:** ${event.workflow_run.conclusion || "pending"}`,
-				event.workflow_run.html_url
+			return simpleEmbed(
+				"📚",
+				"Wiki Updated",
+				event.pages.map(page => `• [${page.title}](${page.html_url}) — ${page.action}`).join("\n"),
+				repoUrl,
+				COLORS.info
 			);
 
 		default:
-			return getSimpleEmbed("ℹ️", `GitHub Event: ${eventName}`, `Action: ${event.action || "unknown"}`);
+			return simpleEmbed("ℹ️", `GitHub Event: ${eventName}`, `Action: ${event.action || "unknown"}`, repoUrl, COLORS.discord);
 	}
 }
 
@@ -224,4 +319,7 @@ async function sendToDiscord() {
 	}
 }
 
-sendToDiscord();
+sendToDiscord().catch(error => {
+	console.error(error);
+	process.exit(1);
+});
