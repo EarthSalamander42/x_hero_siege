@@ -28,8 +28,6 @@ on:
   milestone:
     types: [created, closed, opened, edited, deleted]
   gollum:
-  workflow_run:
-    types: [requested, in_progress, completed]
 
 jobs:
   notify:
