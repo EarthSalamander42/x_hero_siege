@@ -206,6 +206,7 @@ UNIT_EQUIPMENT["npc_donator_companion_acalia"] = {
 	"models/items/enchantress/anuxi_summer_shoulder/anuxi_summer_shoulder.vmdl",
 	"models/items/enchantress/anuxi_wildkin_arm/anuxi_wildkin_arm.vmdl",
 }
+UNIT_EQUIPMENT["npc_xhs_elf_creep_ranged_4"] = UNIT_EQUIPMENT["npc_donator_companion_acalia"]
 UNIT_EQUIPMENT["npc_donator_companion_gordon_ramsay"] = {
 	"models/heroes/phoenix/phoenix_wings.vmdl",
 	"models/heroes/phoenix/phoenix_bird_head.vmdl",

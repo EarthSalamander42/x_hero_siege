@@ -3,6 +3,7 @@
 var BossBarState = {};
 var BossBarIdentity = {};
 var MAX_BOSS_BARS = 4;
+var DEFAULT_BOSS_FILL_BACKGROUND = "gradient( linear, 0% 0%, 100% 0%, from( #2a0610 ), color-stop( 0.55, #c72542 ), to( #f5fff7 ) )";
 
 function GetBossPanels(index) {
 	return {
@@ -16,6 +17,7 @@ function GetBossPanels(index) {
 		fill: $("#BossProgressFill" + index),
 		damageLag: $("#BossDamageLag" + index),
 		healPulse: $("#BossHealPulse" + index),
+		markers: $("#BossMarkers" + index),
 		counter: $("#BossCounter" + index),
 		counterLabel: $("#BossCounterLabel" + index),
 		counterValue: $("#BossCounterValue" + index),
@@ -64,17 +66,28 @@ function ShouldAcceptBossBarEvent(index, args) {
 function UpdateBossBarLayout() {
 	var visibleCount = 0;
 	var root = $("#DiretidePanel");
+	var visiblePanels = [];
 
 	for (var i = 1; i <= MAX_BOSS_BARS; i++) {
 		var panels = GetBossPanels(i);
+		if (panels.container) {
+			panels.container.SetHasClass("CenteredBossBar", false);
+		}
+
 		var visible = panels.container && panels.container.style.visibility === "visible";
 		if (visible) {
 			visibleCount++;
+			visiblePanels.push(panels.container);
 		}
 	}
 
 	if (root) {
 		root.SetHasClass("MultiBossBars", visibleCount > 1);
+		root.SetHasClass("ThreeBossBars", visibleCount === 3);
+	}
+
+	if (visibleCount === 3 && visiblePanels[2]) {
+		visiblePanels[2].SetHasClass("CenteredBossBar", true);
 	}
 }
 
@@ -97,7 +110,7 @@ function ResetBossPanels(index, panels) {
 
 	if (panels.fill) {
 		panels.fill.style.width = "100%";
-		panels.fill.style.backgroundColor = "";
+		panels.fill.style.backgroundColor = DEFAULT_BOSS_FILL_BACKGROUND;
 	}
 	if (panels.damageLag) {
 		panels.damageLag.style.width = "100%";
@@ -111,6 +124,7 @@ function ResetBossPanels(index, panels) {
 	if (panels.counterValue) {
 		panels.counterValue.text = "";
 	}
+	SetBossBarMarkers(panels, null);
 
 	delete BossBarState[index];
 	delete BossBarIdentity[index];
@@ -214,6 +228,8 @@ function SetBossHealthFill(index, panels, health, maxHealth, args, isInitial) {
 
 		if (args && args.dark_color && args.light_color) {
 			panels.fill.style.backgroundColor = "gradient( linear, 0% 0%, 100% 0%, from( " + args.dark_color + " ), color-stop( 0.55, " + args.light_color + " ), to( #f5fff7 ) )";
+		} else {
+			panels.fill.style.backgroundColor = DEFAULT_BOSS_FILL_BACKGROUND;
 		}
 	}
 
@@ -246,6 +262,64 @@ function SetBossAnkhCount(panels, args) {
 	panels.level.SetHasClass("BossAnkhBadge", false);
 }
 
+function NormalizeBossBarMarkers(markers) {
+	var result = [];
+	if (!markers) {
+		return result;
+	}
+
+	if (markers instanceof Array) {
+		for (var i = 0; i < markers.length; i++) {
+			if (markers[i]) {
+				result.push(markers[i]);
+			}
+		}
+		return result;
+	}
+
+	for (var key in markers) {
+		if (markers.hasOwnProperty(key) && markers[key]) {
+			result.push(markers[key]);
+		}
+	}
+
+	result.sort(function (a, b) {
+		return (Number(b.pct || b.percent || b.health_pct) || 0) - (Number(a.pct || a.percent || a.health_pct) || 0);
+	});
+	return result;
+}
+
+function SetBossBarMarkers(panels, markers) {
+	if (!panels || !panels.markers) {
+		return;
+	}
+
+	panels.markers.RemoveAndDeleteChildren();
+	var normalized = NormalizeBossBarMarkers(markers);
+	for (var i = 0; i < normalized.length; i++) {
+		var marker = normalized[i];
+		var pct = Math.max(0, Math.min(100, Number(marker.pct || marker.percent || marker.health_pct) || 0));
+		if (pct <= 0 || pct >= 100) {
+			continue;
+		}
+
+		var panel = $.CreatePanel("Panel", panels.markers, "BossThresholdMarker" + i);
+		panel.AddClass("BossThresholdMarker");
+		panel.SetHasClass("CompanionMarker", marker.kind === "companion");
+		panel.SetHasClass("Triggered", marker.triggered === true || marker.triggered === 1);
+		panel.style.position = pct + "% 0px 0px";
+		panel.SetPanelEvent("onmouseover", (function (markerPanel, markerData, markerPct) {
+			return function () {
+				var label = markerData.label || "Boss mechanic";
+				$.DispatchEvent("DOTAShowTextTooltip", markerPanel, label + " at " + markerPct + "%");
+			};
+		})(panel, marker, pct));
+		panel.SetPanelEvent("onmouseout", function () {
+			$.DispatchEvent("DOTAHideTextTooltip");
+		});
+	}
+}
+
 function ShowBossBar(args) {
 	if (args.boss_count) {
 		var index = GetBossBarIndex(args);
@@ -265,6 +339,7 @@ function ShowBossBar(args) {
 		panels.label.text = FormatBossName(args.boss_name);
 		SetBossAnkhCount(panels, args);
 		panels.health.text = FormatBossHealth(health) + " / " + FormatBossHealth(maxHealth);
+		SetBossBarMarkers(panels, args.boss_bar_markers);
 		SetBossHealthFill(index, panels, health, maxHealth, args, true);
 		UpdateBossBarLayout();
 	}
@@ -285,9 +360,17 @@ function UpdateBossBar(args) {
 			return;
 		}
 
+		if (args.boss_name) {
+			panels.label.text = FormatBossName(args.boss_name);
+		}
+		if (args.boss_icon) {
+			SetBossIcon(panels, args.boss_icon);
+		}
 		SetBossAnkhCount(panels, args);
 		panels.health.text = FormatBossHealth(health) + " / " + FormatBossHealth(maxHealth);
+		SetBossBarMarkers(panels, args.boss_bar_markers);
 		SetBossHealthFill(index, panels, health, maxHealth, args, false);
+		UpdateBossBarLayout();
 	}
 }
 

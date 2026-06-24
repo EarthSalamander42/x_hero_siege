@@ -20,6 +20,7 @@ if CustomTimers == nil then
 	CustomTimers.muradin_creep_level_delay_applied = false
 	CustomTimers.special_wave = 1
 	CustomTimers.enable_special_wave = false -- todo: use this to enable/disable special waves when notification happens 30s before and disable it when it has spawned. This will allow waves to spawn exactly when supposed to, rather than a few seconds before/after
+	CustomTimers.special_waves_disabled = false
 	CustomTimers.active_special_wave_units = {}
 	CustomTimers.active_special_wave_count = 0
 	CustomTimers.active_special_wave_total = 0
@@ -56,6 +57,11 @@ if XHSQuestState == nil then
 				state = "Inactive",
 				text = "Farm Event locked",
 				default_text = "Farm Event locked",
+			},
+			phase2_creeps = {
+				state = "Inactive",
+				text = "Phase 2 creeps locked",
+				default_text = "Phase 2 creeps locked",
 			},
 			final_wave = {
 				state = "Inactive",
@@ -120,9 +126,7 @@ end
 
 ListenToGameEvent('game_rules_state_change', function()
 	if GameRules:State_Get() == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
-		print("Attempt to increment game phase...")
 		CustomTimers:IncrementGamePhase()
-		print("Game phase incremented!")
 	end
 end, nil)
 
@@ -177,6 +181,7 @@ function CustomTimers:PrepareFinalWaveCountdown()
 	Notifications:TopToAll({ text = "WARNING! Final Wave incoming. Arriving in 60 seconds! Back to the Castle!", duration = 10.0 })
 
 	CustomGameEventManager:Send_ServerToAllClients("update_special_event_label_final", {})
+	XHSSetGlobalObjectiveState("phase2_creeps", "Completed", "Phase 2 creep assault survived", nil)
 	XHSSetGlobalObjectiveState("final_wave", "Active", "Final Wave in " .. math.floor(CustomTimers.final_wave_delay) .. "s", CustomTimers.final_wave_delay)
 	CustomTimers.current_time["special_event"] = CustomTimers.final_wave_delay + 1
 	CustomTimers.current_time["special_wave"] = 1
@@ -231,7 +236,7 @@ function CustomTimers:Think()
 				CustomTimers:TickCreepLevel()
 			end
 
-			if CustomTimers.game_phase < 3 and CustomTimers.proc_final_wave ~= true and GameMode.SpecialArena_occuring ~= true then
+			if CustomTimers.game_phase < 3 and CustomTimers.proc_final_wave ~= true and GameMode.SpecialArena_occuring ~= true and CustomTimers.special_waves_disabled ~= true then
 				if CustomTimers.special_wave <= 8 then
 					CustomTimers:Countdown("special_wave")
 
@@ -516,9 +521,10 @@ function CustomTimers:CreateSpecialWaveTimerParticle(direction, duration)
 	end)
 end
 
-function SpecialWave(iCardinalPoint)
+function SpecialWave(iCardinalPoint, force)
 	if CustomTimers.game_phase > 2 then return end
 	if CustomTimers.proc_final_wave == true then return end
+	if CustomTimers.special_waves_disabled == true and force ~= true then return end
 
 	CustomTimers.enable_special_wave = false
 	CustomTimers.current_time["special_wave"] = XHS_SPECIAL_WAVE_INTERVAL + 1

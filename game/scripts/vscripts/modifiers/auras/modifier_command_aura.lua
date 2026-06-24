@@ -9,6 +9,7 @@ function modifier_command_aura:GetAuraSearchTeam() return self:GetAbility():GetA
 function modifier_command_aura:GetAuraSearchType() return self:GetAbility():GetAbilityTargetType() end
 function modifier_command_aura:GetAuraSearchFlags() return self:GetAbility():GetAbilityTargetFlags() end
 function modifier_command_aura:GetModifierAura() return "modifier_command_buff" end
+function modifier_command_aura:GetAuraEntityReject(target) return IsXHSRuneUnit and IsXHSRuneUnit(target) end
 
 function modifier_command_aura:IsHidden() return true end
 function modifier_command_aura:IsPurgable() return false end

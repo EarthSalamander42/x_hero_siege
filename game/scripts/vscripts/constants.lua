@@ -64,6 +64,25 @@ _G.SOGAT_ARTIFACT_PICKED               = false
 _G.DOOM_ARTIFACT_MERGED                = false
 _G.MAGNATAURS_TO_KILL                  = 1
 
+function GetXHSMagtheridonKillLimit(difficulty)
+	if difficulty == nil and GameRules ~= nil then
+		difficulty = GameRules:GetCustomGameDifficulty()
+	end
+
+	difficulty = tonumber(difficulty) or 1
+
+	local limits = {
+		[0] = 1,
+		[1] = 1,
+		[2] = 2,
+		[3] = 4,
+		[4] = 4,
+		[5] = 6,
+	}
+
+	return limits[difficulty] or 1
+end
+
 if IsInToolsMode() then
 	_G.PREGAMETIME = 15.0
 end

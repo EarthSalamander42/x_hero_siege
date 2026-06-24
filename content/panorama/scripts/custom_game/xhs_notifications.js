@@ -99,16 +99,22 @@
 				if (goldLabel) {
 					return goldLabel;
 				}
+
+				return shopButton;
 			}
 
 			return findFirstHudElement(["GoldLabel", "ShopButton"]);
 		}
 
 		if (type === "stats") {
-			return findFirstHudElement(["stragiint", "stats_container", "stats"]);
+			return findFirstHudElement(["stats", "stats_container", "stats_tooltip_region", "stragiint"]);
 		}
 
 		return null;
+	}
+
+	function getRewardFlyoutLayer() {
+		return $("#XHSRewardFlyoutLayer") || $("#XHSNotificationsRoot") || $.GetContextPanel();
 	}
 
 	function getPanelCenter(panel) {
@@ -133,6 +139,27 @@
 		return {
 			x: x + Number(panel.actuallayoutwidth || 0) * 0.5,
 			y: y + Number(panel.actuallayoutheight || 0) * 0.5
+		};
+	}
+
+	function getPanelTopLeft(panel) {
+		if (!panel) {
+			return { x: 0, y: 0 };
+		}
+
+		if (panel.GetPositionWithinWindow) {
+			var position = panel.GetPositionWithinWindow();
+			if (position) {
+				return {
+					x: Number(position.x || position[0] || 0),
+					y: Number(position.y || position[1] || 0)
+				};
+			}
+		}
+
+		return {
+			x: Number(panel.actualxoffset || 0),
+			y: Number(panel.actualyoffset || 0)
 		};
 	}
 
@@ -442,7 +469,7 @@
 		}
 
 		var flyoutText = msg.flyoutText || msg.text || "";
-		var root = $.GetContextPanel();
+		var root = getRewardFlyoutLayer();
 		var flyout = $.CreatePanel("Panel", root, "");
 		flyout.AddClass("XHSRewardFlyout");
 		flyout.SetHasClass("XHSRewardFlyoutGold", type === "gold");
@@ -459,8 +486,9 @@
 			impact.SetHasClass("XHSRewardImpactGold", type === "gold");
 			impact.SetHasClass("XHSRewardImpactStats", type === "stats");
 			impact.hittest = false;
-			impact.style.marginLeft = Math.round(center.x - 26) + "px";
-			impact.style.marginTop = Math.round(center.y - 26) + "px";
+			var rootOrigin = getPanelTopLeft(root);
+			impact.style.marginLeft = Math.round(center.x - rootOrigin.x - 26) + "px";
+			impact.style.marginTop = Math.round(center.y - rootOrigin.y - 26) + "px";
 
 			$.Schedule(0.03, function () {
 				if (!impact || impact.deleted) {
@@ -480,17 +508,22 @@
 				return;
 			}
 
+			var rootOrigin = getPanelTopLeft(root);
+			var localStartX = start.x - rootOrigin.x;
+			var localStartY = start.y - rootOrigin.y;
 			var flyoutWidth = Number(flyout.actuallayoutwidth || 136);
 			var flyoutHeight = Number(flyout.actuallayoutheight || 34);
+			var finalScale = 0.42;
 			var deltaX = Math.round(end.x - start.x);
 			var deltaY = Math.round(end.y - start.y);
 
-			flyout.style.marginLeft = Math.round(start.x - flyoutWidth * 0.5) + "px";
-			flyout.style.marginTop = Math.round(start.y - flyoutHeight * 0.5) + "px";
+			flyout.style.marginLeft = Math.round(localStartX - flyoutWidth * 0.5) + "px";
+			flyout.style.marginTop = Math.round(localStartY - flyoutHeight * 0.5) + "px";
 
 			$.Schedule(0.03, function () {
 				flyout.AddClass("XHSRewardFlyoutFlying");
-				flyout.style.transform = "translateX(" + deltaX + "px) translateY(" + deltaY + "px) scaleX(0.42) scaleY(0.42)";
+				flyout.style.transform = "translateX(" + deltaX + "px) translateY(" + deltaY + "px)";
+				flyout.style.preTransformScale2d = finalScale + ", " + finalScale;
 			});
 
 			$.Schedule(0.76, function () {
@@ -499,11 +532,11 @@
 				createRewardImpact(end);
 			});
 
-			$.Schedule(1.08, function () {
+			$.Schedule(0.84, function () {
 				flyout.AddClass("XHSRewardFlyoutConsumed");
 			});
 
-			$.Schedule(1.34, function () {
+			$.Schedule(1.08, function () {
 				target.RemoveClass("XHSRewardTargetPulse");
 				flyout.DeleteAsync(0);
 			});

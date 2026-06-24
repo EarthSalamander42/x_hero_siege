@@ -83,10 +83,59 @@
 
 "DOTA_Tooltip_modifier_ankh_passives"                                           "Reincarnation"
 
-"DOTA_Tooltip_ability_item_talisman_of_evasion_datadriven"						"Talisman of Evasion"
-"DOTA_Tooltip_ability_item_talisman_of_evasion_datadriven_Lore"					"A necklace that allows you to anticipate enemy attacks."
-"DOTA_Tooltip_ability_item_talisman_of_evasion_datadriven_Note0"				"Talisman of Evasion does not stack with itself."
-"DOTA_Tooltip_ability_item_talisman_of_evasion_datadriven_bonus_evasion"		"%+$evasion"
+"DOTA_Tooltip_ability_item_orb_of_wind_Description"				"<h1><font color='#FF7800'>Passive:</font></h1> Wind Orb (Evasion). Grants evasion and movement speed."
+"DOTA_Tooltip_ability_item_orb_of_wind_bonus_evasion"				"%EVASION:"
+"DOTA_Tooltip_ability_item_orb_of_wind_bonus_movement_speed"		"BONUS MOVEMENT SPEED:"
+
+"DOTA_Tooltip_ability_item_zephyr_gem_Description"				"<h1><font color='#FF7800'>Passive:</font></h1> Wind Orb (Evasion). Grants evasion and movement speed. After evading an attack, briefly gains bonus movement speed."
+"DOTA_Tooltip_ability_item_zephyr_gem_bonus_evasion"				"%EVASION:"
+"DOTA_Tooltip_ability_item_zephyr_gem_bonus_movement_speed"		"BONUS MOVEMENT SPEED:"
+"DOTA_Tooltip_ability_item_zephyr_gem_evasion_proc_movespeed_pct"	"%EVASION MOVE SPEED:"
+"DOTA_Tooltip_ability_item_zephyr_gem_evasion_proc_duration"		"PROC DURATION:"
+"DOTA_Tooltip_ability_item_zephyr_gem_evasion_proc_cooldown"		"PROC COOLDOWN:"
+
+"DOTA_Tooltip_ability_item_tempest_aegis_Description"				"<h1><font color='#FF7800'>Passive:</font></h1> Wind Orb (Evasion). Grants evasion and movement speed. After evading an attack, briefly gains movement speed and damage reduction."
+"DOTA_Tooltip_ability_item_tempest_aegis_bonus_evasion"			"%EVASION:"
+"DOTA_Tooltip_ability_item_tempest_aegis_bonus_movement_speed"		"BONUS MOVEMENT SPEED:"
+"DOTA_Tooltip_ability_item_tempest_aegis_evasion_proc_movespeed_pct"	"%EVASION MOVE SPEED:"
+"DOTA_Tooltip_ability_item_tempest_aegis_evasion_proc_damage_reduction_pct"	"%DAMAGE REDUCTION:"
+"DOTA_Tooltip_ability_item_tempest_aegis_evasion_proc_duration"		"PROC DURATION:"
+"DOTA_Tooltip_ability_item_tempest_aegis_evasion_proc_cooldown"		"PROC COOLDOWN:"
+
+"DOTA_Tooltip_ability_item_orb_of_arcane_Description"				"<h1><font color='#FF7800'>Passive:</font></h1> Arcane Orb. Grants spell amplification and mana regeneration."
+"DOTA_Tooltip_ability_item_orb_of_arcane_spell_amp"					"%SPELL AMPLIFICATION:"
+"DOTA_Tooltip_ability_item_orb_of_arcane_mana_regen"					"MANA REGEN:"
+
+"DOTA_Tooltip_ability_item_mystic_gem_Description"					"<h1><font color='#FF7800'>Passive:</font></h1> Arcane Orb. Grants spell amplification, mana regeneration, and reduced mana costs."
+"DOTA_Tooltip_ability_item_mystic_gem_spell_amp"						"%SPELL AMPLIFICATION:"
+"DOTA_Tooltip_ability_item_mystic_gem_mana_regen"					"MANA REGEN:"
+"DOTA_Tooltip_ability_item_mystic_gem_mana_cost_reduction_pct"		"%MANA COST REDUCTION:"
+
+"DOTA_Tooltip_ability_item_astral_core_Description"					"<h1><font color='#FF7800'>Passive:</font></h1> Arcane Orb. Grants spell amplification, mana regeneration, reduced mana costs, and cooldown reduction. Your spells apply Arcane Exposure, briefly reducing enemy magic resistance."
+"DOTA_Tooltip_ability_item_astral_core_spell_amp"					"%SPELL AMPLIFICATION:"
+"DOTA_Tooltip_ability_item_astral_core_mana_regen"					"MANA REGEN:"
+"DOTA_Tooltip_ability_item_astral_core_mana_cost_reduction_pct"		"%MANA COST REDUCTION:"
+"DOTA_Tooltip_ability_item_astral_core_cooldown_reduction_pct"		"%COOLDOWN REDUCTION:"
+"DOTA_Tooltip_ability_item_astral_core_exposure_magic_resist_reduction"	"%MAGIC RESISTANCE REDUCTION:"
+"DOTA_Tooltip_ability_item_astral_core_exposure_duration"			"EXPOSURE DURATION:"
+
+"DOTA_Tooltip_ability_item_orb_of_venom_Description"					"<h1><font color='#FF7800'>Passive:</font></h1> Venom Orb. Attacks poison enemies, dealing damage over time."
+"DOTA_Tooltip_ability_item_orb_of_venom_bonus_damage"				"BONUS DAMAGE:"
+"DOTA_Tooltip_ability_item_orb_of_venom_poison_damage_per_second"	"DAMAGE PER SECOND:"
+"DOTA_Tooltip_ability_item_orb_of_venom_poison_duration"				"POISON DURATION:"
+
+"DOTA_Tooltip_ability_item_viridian_gem_Description"					"<h1><font color='#FF7800'>Passive:</font></h1> Venom Orb. Attacks poison enemies, dealing damage over time and reducing armor."
+"DOTA_Tooltip_ability_item_viridian_gem_bonus_damage"				"BONUS DAMAGE:"
+"DOTA_Tooltip_ability_item_viridian_gem_poison_damage_per_second"		"DAMAGE PER SECOND:"
+"DOTA_Tooltip_ability_item_viridian_gem_poison_duration"				"POISON DURATION:"
+"DOTA_Tooltip_ability_item_viridian_gem_armor_reduction"				"ARMOR REDUCTION:"
+
+"DOTA_Tooltip_ability_item_plagueheart_Description"					"<h1><font color='#FF7800'>Passive:</font></h1> Venom Orb. Attacks poison enemies, dealing damage over time and reducing armor. Attacking an already poisoned enemy deals bonus magical damage."
+"DOTA_Tooltip_ability_item_plagueheart_bonus_damage"					"BONUS DAMAGE:"
+"DOTA_Tooltip_ability_item_plagueheart_poison_damage_per_second"		"DAMAGE PER SECOND:"
+"DOTA_Tooltip_ability_item_plagueheart_poison_duration"				"POISON DURATION:"
+"DOTA_Tooltip_ability_item_plagueheart_armor_reduction"				"ARMOR REDUCTION:"
+"DOTA_Tooltip_ability_item_plagueheart_toxic_saturation_damage"		"SATURATION DAMAGE:"
 
 "DOTA_Tooltip_ability_item_orb_of_fire_Description"					"<h1><font color='#00CC00'>Active:</font> Enable/Disable</h1> Fire Orb (Cleave).\n<h1><font color='#FF7800'>Passive:</font> Fire Orb (Cleave)</h1> Gives your basic attacks cleave.\n<h1><font color='#FF0000'>Restrictions:</h1></font> Does not stack with other cleave sources. <br>Does not work with ranged heroes."
 "DOTA_Tooltip_ability_item_orb_of_fire_Note0"						""
@@ -149,5 +198,3 @@
 
 "DOTA_Tooltip_modifier_immolation"								"Immolation"
 "DOTA_Tooltip_modifier_immolation_Description"					"Deals periodic damage around the carrier."
-
-

@@ -5,7 +5,7 @@
 	margin-top: 280px;
 	margin-left: 24px;
 	width: 400px;
-	max-height: 600px;
+	max-height: 480px;
 	padding: 10px 12px 10px 12px;
 	border-radius: 2px;
 	background-color: gradient( linear, 0% 0%, 100% 100%, from( xhs_panel_bg ), to( xhs_panel_bg_deep ) );
@@ -24,8 +24,60 @@
 	brightness: 1.05;
 }
 
+#QuestLog.QuestLogPinnedBackground
+{
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( xhs_panel_bg_strong ), to( #06101dcc ) );
+}
+
 .HUDFlipped #QuestLog {
 	horizontal-align: right;
+}
+
+.QuestLogPinButton
+{
+	width: 24px;
+	height: 22px;
+	horizontal-align: right;
+	vertical-align: top;
+	margin-top: 8px;
+	margin-right: 9px;
+	ignore-parent-flow: true;
+	background-color: #07131dcc;
+	border: 1px solid #77c8ff2d;
+	box-shadow: fill #00111f88 0px 0px 4px 0px;
+	transition-property: brightness, background-color, border;
+	transition-duration: .14s;
+}
+
+.QuestLogPinButton:hover,
+.QuestLogPinButton.Checked
+{
+	background-color: #102536e8;
+	border: 1px solid #77c8ff70;
+	brightness: 1.15;
+}
+
+.QuestLogPinButton.Checked
+{
+	background-color: #12364be8;
+	border: 1px solid #9be6ffcc;
+	box-shadow: fill #00111f88 0px 0px 4px 0px, #5ad0ff44 0px 0px 6px 0px;
+}
+
+.QuestLogPinCheckMark
+{
+	width: 10px;
+	height: 10px;
+	horizontal-align: center;
+	vertical-align: center;
+	background-color: #9be6ff;
+	box-shadow: #5ad0ff80 0px 0px 6px 0px;
+	visibility: collapse;
+}
+
+.QuestLogPinButton.Checked .QuestLogPinCheckMark
+{
+	visibility: visible;
 }
 
 .Zone
@@ -40,8 +92,11 @@
 #QuestsContainer
 {
 	width: 100%;
-	height: fit-children;
+	height: fill-parent-flow( 1.0 );
+	max-height: 430px;
 	flow-children: down;
+	overflow: squish scroll;
+	padding-right: 6px;
 }
 
 .QuestLogHeader
@@ -411,6 +466,12 @@
 .AspectRatio4x3 #QuestLog
 {
 	width: 320px;
+	max-height: 400px;
+}
+
+.AspectRatio4x3 #QuestsContainer
+{
+	max-height: 350px;
 }
 
 .AspectRatio4x3 .QuestText

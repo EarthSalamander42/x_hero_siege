@@ -1,0 +1,375 @@
+.XHSDevToolsRoot {
+	width: 100%;
+	height: 100%;
+	z-index: 9000;
+}
+
+.XHSDevToolsHost {
+	width: 100%;
+	height: 100%;
+	visibility: collapse;
+	z-index: 9000;
+}
+
+.XHSDevToolsToggle {
+	width: 52px;
+	height: 30px;
+	horizontal-align: right;
+	vertical-align: top;
+	margin-top: 168px;
+	margin-right: 18px;
+	background-color: #111a22ee;
+	border: 1px solid #69d7ff88;
+	box-shadow: fill #000000aa 0px 0px 8px 0px;
+	z-index: 9010;
+}
+
+.XHSDevToolsToggle:hover {
+	brightness: 1.6;
+}
+
+.XHSDevToolsToggle.Disabled {
+	background-color: #2b1e10ee;
+	border: 1px solid #ffbd5f88;
+}
+
+.XHSDevToolsToggle Label {
+	horizontal-align: center;
+	vertical-align: center;
+	color: #d8f7ff;
+	font-size: 14px;
+	font-weight: bold;
+	text-shadow: 0px 1px 3px 2 #000000;
+}
+
+.XHSDevToolsPanel {
+	width: 760px;
+	height: 780px;
+	horizontal-align: right;
+	vertical-align: center;
+	margin-right: 18px;
+	background-color: #091017f4;
+	border: 1px solid #7ddcff66;
+	box-shadow: fill #000000dd 0px 0px 18px 0px;
+	flow-children: down;
+	padding: 12px;
+	visibility: collapse;
+	z-index: 9020;
+}
+
+.XHSDevToolsPanel.Visible {
+	visibility: visible;
+}
+
+.XHSDevToolsHeader {
+	width: 100%;
+	height: 54px;
+	flow-children: right;
+}
+
+.XHSDevToolsEyebrow {
+	color: #79d9ff;
+	font-size: 12px;
+	font-weight: bold;
+	letter-spacing: 0px;
+	text-shadow: 0px 1px 2px 2 #000000;
+}
+
+.XHSDevToolsTitle {
+	color: #f2fbff;
+	font-size: 24px;
+	font-weight: bold;
+	text-shadow: 0px 1px 3px 2 #000000;
+}
+
+.XHSDevToolsClose {
+	width: 32px;
+	height: 32px;
+	horizontal-align: right;
+	margin-left: 430px;
+	background-color: #2a1111ee;
+	border: 1px solid #ff7f7f66;
+}
+
+.XHSDevToolsClose:hover {
+	brightness: 1.8;
+}
+
+.XHSDevToolsClose Label {
+	horizontal-align: center;
+	vertical-align: center;
+	color: #ffdada;
+	font-size: 16px;
+	font-weight: bold;
+}
+
+.XHSDevToolsStatus {
+	width: 100%;
+	min-height: 28px;
+	padding: 5px 8px;
+	background-color: #101b24dd;
+	border: 1px solid #ffffff12;
+}
+
+.XHSDevToolsStatus Label {
+	color: #c8dfe8;
+	font-size: 13px;
+	text-shadow: 0px 1px 2px 2 #000000;
+}
+
+.XHSDevToolsStatus Label.Error {
+	color: #ffaaaa;
+}
+
+.XHSDevToolsTabs {
+	width: 100%;
+	height: 38px;
+	margin-top: 10px;
+	flow-children: right;
+}
+
+.XHSDevToolsTab {
+	width: 116px;
+	height: 32px;
+	margin-right: 6px;
+	background-color: #162530ee;
+	border: 1px solid #ffffff18;
+}
+
+.XHSDevToolsTab.Active {
+	background-color: #1c4861ee;
+	border: 1px solid #7fdcff88;
+}
+
+.XHSDevToolsTab:hover {
+	brightness: 1.5;
+}
+
+.XHSDevToolsTab Label,
+.XHSDevToolsButton Label {
+	horizontal-align: center;
+	vertical-align: center;
+	color: #eefaff;
+	font-size: 13px;
+	font-weight: semi-bold;
+	text-shadow: 0px 1px 2px 2 #000000;
+	text-overflow: shrink;
+}
+
+.XHSDevToolsContent {
+	width: 100%;
+	height: fill-parent-flow(1);
+	margin-top: 6px;
+	flow-children: down;
+	overflow: squish scroll;
+}
+
+.XHSDevToolsSection {
+	width: 100%;
+	margin-bottom: 12px;
+	padding: 10px;
+	background-color: #101820dd;
+	border: 1px solid #ffffff14;
+	flow-children: down;
+}
+
+.XHSDevToolsSectionTitle {
+	color: #9fe8ff;
+	font-size: 15px;
+	font-weight: bold;
+	margin-bottom: 8px;
+	text-shadow: 0px 1px 2px 2 #000000;
+}
+
+.XHSDevToolsSubsectionTitle {
+	width: 100%;
+	margin-top: 4px;
+	margin-bottom: 7px;
+	color: #7ccfe8;
+	font-size: 12px;
+	font-weight: bold;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	text-shadow: 0px 1px 2px 2 #000000;
+}
+
+.XHSDevToolsGrid {
+	width: 100%;
+	flow-children: right-wrap;
+}
+
+.XHSDevToolsButton {
+	width: 132px;
+	height: 32px;
+	margin-right: 6px;
+	margin-bottom: 6px;
+	background-color: #22313cee;
+	border: 1px solid #ffffff1f;
+}
+
+.XHSDevToolsButton:hover {
+	brightness: 1.45;
+}
+
+.XHSDevToolsButton:active {
+	brightness: 0.85;
+}
+
+.XHSDevToolsButton.Small {
+	width: 76px;
+}
+
+.XHSDevToolsButton.Tiny {
+	width: 38px;
+}
+
+.XHSDevToolsButton.Accent {
+	background-color: #1b4657ee;
+	border-color: #7fdcff66;
+}
+
+.XHSDevToolsButton.Warn {
+	background-color: #4b3513ee;
+	border-color: #ffcc6a66;
+}
+
+.XHSDevToolsButton.Danger {
+	background-color: #4a1717ee;
+	border-color: #ff777766;
+}
+
+.XHSDevToolsButton.Active {
+	background-color: #216a80ee;
+	border-color: #9fe8ff99;
+}
+
+.XHSDevToolsQuestGrid {
+	width: 100%;
+	flow-children: right-wrap;
+}
+
+.XHSDevToolsQuestRow {
+	width: 342px;
+	min-height: 42px;
+	margin-right: 6px;
+	margin-bottom: 6px;
+	padding: 4px;
+	background-color: #080d12a8;
+	flow-children: right;
+}
+
+.XHSDevToolsBossGrid {
+	width: 100%;
+	flow-children: right-wrap;
+}
+
+.XHSDevToolsBossCard {
+	width: 228px;
+	min-height: 104px;
+	margin-right: 7px;
+	margin-bottom: 7px;
+	padding: 8px;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #0b1720dd ), to( #080d12dd ) );
+	border: 1px solid #ffffff18;
+	flow-children: down;
+}
+
+.XHSDevToolsBossCardHeader {
+	width: 100%;
+	min-height: 46px;
+	margin-bottom: 7px;
+	flow-children: right;
+}
+
+.XHSDevToolsHeroIconFrame {
+	width: 42px;
+	height: 42px;
+	margin-right: 9px;
+	background-color: #05090dcc;
+	border: 1px solid #7fdcff44;
+	box-shadow: #00000099 0px 0px 8px 0px;
+}
+
+.XHSDevToolsHeroIcon {
+	width: 100%;
+	height: 100%;
+}
+
+.XHSDevToolsBossText {
+	width: fill-parent-flow(1);
+	vertical-align: center;
+	flow-children: down;
+}
+
+.XHSDevToolsBossCard.Active {
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #123348e8 ), to( #081119e8 ) );
+	border: 1px solid #7fdcff88;
+	box-shadow: #5ad0ff22 0px 0px 10px 0px;
+}
+
+.XHSDevToolsBossName {
+	width: 100%;
+	color: #eefaff;
+	font-size: 14px;
+	font-weight: bold;
+	text-shadow: 0px 1px 2px 2 #000000;
+	text-overflow: shrink;
+}
+
+.XHSDevToolsBossStatus {
+	width: 100%;
+	margin-top: 2px;
+	color: #8fa5ae;
+	font-size: 12px;
+	text-shadow: 0px 1px 2px 2 #000000;
+}
+
+.XHSDevToolsBossCard.Active .XHSDevToolsBossStatus {
+	color: #9fe8ff;
+}
+
+.XHSDevToolsLaneRow {
+	width: 100%;
+	min-height: 36px;
+	margin-bottom: 4px;
+	padding: 3px;
+	background-color: #080d12a8;
+	flow-children: right;
+}
+
+.XHSDevToolsQuestName {
+	width: fill-parent-flow(1);
+	vertical-align: center;
+	color: #d9edf5;
+	font-size: 13px;
+	margin-left: 3px;
+	margin-right: 4px;
+	text-shadow: 0px 1px 2px 2 #000000;
+	text-overflow: shrink;
+}
+
+.XHSDevToolsLaneName {
+	width: 70px;
+	vertical-align: center;
+	color: #d9edf5;
+	font-size: 13px;
+	font-weight: bold;
+	text-shadow: 0px 1px 2px 2 #000000;
+}
+
+.XHSDevToolsBossLine,
+.XHSDevToolsMuted,
+.XHSDevToolsUnavailableLine {
+	color: #c8dfe8;
+	font-size: 13px;
+	margin-bottom: 4px;
+	text-shadow: 0px 1px 2px 2 #000000;
+}
+
+.XHSDevToolsUnavailableLine {
+	color: #ffd18a;
+}
+
+.XHSDevToolsMuted {
+	color: #8fa5ae;
+}

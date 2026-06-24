@@ -190,6 +190,7 @@ function modifier_blademaster_wardrums_aura:GetAuraSearchTeam() return self:GetA
 function modifier_blademaster_wardrums_aura:GetAuraSearchType() return self:GetAbility():GetAbilityTargetType() end
 
 function modifier_blademaster_wardrums_aura:GetModifierAura() return "modifier_blademaster_wardrums" end
+function modifier_blademaster_wardrums_aura:GetAuraEntityReject(target) return IsXHSRuneUnit and IsXHSRuneUnit(target) end
 
 modifier_blademaster_wardrums = modifier_blademaster_wardrums or class({})
 

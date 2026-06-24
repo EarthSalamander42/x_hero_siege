@@ -57,6 +57,10 @@ function modifier_xhs_vampiric_aura:GetModifierAura()
 	return "modifier_xhs_vampiric"
 end
 
+function modifier_xhs_vampiric_aura:GetAuraEntityReject(target)
+	return IsXHSRuneUnit and IsXHSRuneUnit(target)
+end
+
 function modifier_xhs_vampiric_aura:OnCreated()
 	self.caster = self:GetCaster()
 	self.ability = self:GetAbility()

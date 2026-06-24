@@ -9,6 +9,7 @@ function modifier_endurance_aura:GetAuraSearchTeam() return self:GetAbility():Ge
 function modifier_endurance_aura:GetAuraSearchType() return self:GetAbility():GetAbilityTargetType() end
 function modifier_endurance_aura:GetAuraSearchFlags() return self:GetAbility():GetAbilityTargetFlags() end
 function modifier_endurance_aura:GetModifierAura() return "modifier_endurance_buff" end
+function modifier_endurance_aura:GetAuraEntityReject(target) return IsXHSRuneUnit and IsXHSRuneUnit(target) end
 
 function modifier_endurance_aura:IsHidden() return true end
 function modifier_endurance_aura:IsPurgable() return false end

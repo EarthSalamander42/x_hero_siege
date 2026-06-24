@@ -87,6 +87,10 @@ function modifier_xhs_cloak_of_flames_aura:GetAuraRadius()
 	return self:GetAbility():GetSpecialValueFor("radius")
 end
 
+function modifier_xhs_cloak_of_flames_aura:GetAuraEntityReject(target)
+	return IsXHSRuneUnit and IsXHSRuneUnit(target)
+end
+
 -----------------------------------------------------------------------------------------------------------
 --	Aura effect (damage)
 -----------------------------------------------------------------------------------------------------------

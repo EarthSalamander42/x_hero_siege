@@ -1,6 +1,19 @@
+local function FormatPhase2CreepTimer(seconds)
+	seconds = math.max(0, math.floor(seconds or 0))
+	return tostring(math.floor(seconds / 60)) .. ":" .. string.format("%02d", seconds % 60)
+end
+
+local function ActivatePhase2CreepTimer()
+	if XHSSetGlobalObjectiveState == nil or CustomTimers == nil then return end
+
+	local remaining = math.max(0, (CustomTimers.current_time and CustomTimers.current_time["special_event"] or XHS_SPECIAL_EVENT_INTERVAL) - 1)
+	XHSSetGlobalObjectiveState("phase2_creeps", "Active", "Phase 2 creeps: " .. FormatPhase2CreepTimer(remaining), remaining)
+end
+
 function StartPhase2()
 	CustomTimers:IncrementGamePhase() -- Phase 1 to Phase 2
 	CustomTimers.timers_paused = 0
+	ActivatePhase2CreepTimer()
 
 	local DoorObs = Entities:FindAllByName("obstruction_phase2_1")
 
@@ -87,6 +100,10 @@ function Phase2CreepsRight()
 end
 
 function EndPhase2()
+	if XHSSetGlobalObjectiveState ~= nil then
+		XHSSetGlobalObjectiveState("phase2_creeps", "Completed", "Phase 2 creep assault survived", nil)
+	end
+
 	local ice_towers = Entities:FindAllByName("npc_tower_death")
 	for _, tower in pairs(ice_towers) do
 		tower:Kill(nil, nil)

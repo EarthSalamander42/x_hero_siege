@@ -320,6 +320,7 @@ XHSPrecache:RegisterGroup("runes", {
 		"particles/generic_gameplay/rune_bounty_owner.vpcf",
 		"particles/generic_hero_status/hero_levelup.vpcf",
 		"particles/units/heroes/hero_zuus/zuus_arc_lightning.vpcf",
+		"particles/units/heroes/hero_stormspirit/stormspirit_overload_ambient.vpcf",
 	},
 	models = {
 		"models/custom_game/runes/xhs_rune_recovery.vmdl",
@@ -425,6 +426,7 @@ XHSPrecache:RegisterGroup("waves", {
 		"models/creeps/lane_creeps/creep_bad_melee_diretide/creep_bad_melee_diretide.vmdl",
 		"models/items/warlock/golem/mystery_of_the_lost_ores_golem/mystery_of_the_lost_ores_golem.vmdl",
 		"models/items/warlock/golem/obsidian_golem/obsidian_golem.vmdl",
+		"models/heroes/lycan/lycan.vmdl",
 		"models/heroes/witchdoctor/witchdoctor_ward.vmdl",
 	},
 	units = {

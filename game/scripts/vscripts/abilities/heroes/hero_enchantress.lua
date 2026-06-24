@@ -99,6 +99,10 @@ function modifier_xhs_trueshot_aura:GetModifierAura()
 	return "modifier_xhs_trueshot"
 end
 
+function modifier_xhs_trueshot_aura:GetAuraEntityReject(target)
+	return IsXHSRuneUnit and IsXHSRuneUnit(target)
+end
+
 modifier_xhs_trueshot = modifier_xhs_trueshot or class({})
 
 -- Modifier properties

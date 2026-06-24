@@ -5,6 +5,7 @@ var XHSQuestState = {
 	gamePhase: 1,
 	creepLevel: 1,
 	nextCreepSeconds: null,
+	specialEventSeconds: null,
 	muradinEventStarted: false,
 	globalObjectives: {
 		muradin_event: {
@@ -17,6 +18,11 @@ var XHSQuestState = {
 			text: "Farm Event locked",
 			defaultText: "Farm Event locked"
 		},
+		phase2_creeps: {
+			state: "Inactive",
+			text: "Phase 2 creeps locked",
+			defaultText: "Phase 2 creeps locked"
+		},
 		final_wave: {
 			state: "Inactive",
 			text: "Final Wave locked",
@@ -24,6 +30,31 @@ var XHSQuestState = {
 		}
 	}
 };
+
+var XHSQuestLogPinnedBackground = false;
+
+function RefreshXHSQuestLogBackgroundToggle() {
+	var questLog = $("#QuestLog");
+	var button = $("#QuestLogPinButton");
+
+	if (questLog) {
+		questLog.SetHasClass("QuestLogPinnedBackground", XHSQuestLogPinnedBackground);
+	}
+
+	if (button) {
+		button.SetHasClass("Checked", XHSQuestLogPinnedBackground);
+	}
+}
+
+function ToggleXHSQuestLogBackground() {
+	XHSQuestLogPinnedBackground = !XHSQuestLogPinnedBackground;
+
+	if (typeof GameUI !== "undefined" && GameUI.CustomUIConfig) {
+		GameUI.CustomUIConfig().xhsQuestLogPinnedBackground = XHSQuestLogPinnedBackground;
+	}
+
+	RefreshXHSQuestLogBackgroundToggle();
+}
 
 var XHSStaticQuests = [
 	{
@@ -74,6 +105,13 @@ var XHSStaticQuests = [
 		subquest: true
 	},
 	{
+		id: "phase2_creeps",
+		text: "Phase 2 creeps locked",
+		type: "Explore",
+		state: "Inactive",
+		subquest: true
+	},
+	{
 		id: "final_wave",
 		text: "Final Wave locked",
 		type: "Explore",
@@ -99,11 +137,17 @@ var XHSQuestUiOrder = [
 	"xhs_phase_2",
 	"farm_event",
 	"kill_dest_mag",
+	"phase2_creeps",
 	"final_wave",
 	"kill_ice_towers",
 	"kill_final_wave",
 	"xhs_phase_3",
-	"teleport_top"
+	"teleport_top",
+	"kill_grom",
+	"kill_illidan",
+	"kill_balanar",
+	"kill_proudmoore",
+	"teleport_arthas"
 ];
 
 var XHSQuestUiMeta = {
@@ -111,16 +155,23 @@ var XHSQuestUiMeta = {
 	kill_rax: { phase: 1, subquest: true },
 	muradin_event: { phase: 1, subquest: true },
 	farm_event: { phase: 2, subquest: true },
+	phase2_creeps: { phase: 2, subquest: true },
 	final_wave: { phase: 2, subquest: true },
 	kill_dest_mag: { phase: 2, subquest: true },
 	kill_ice_towers: { phase: 2, subquest: true },
 	kill_final_wave: { phase: 2, subquest: true },
-	teleport_top: { phase: 3, subquest: true, infoTarget: "npc_xhs_paladin" }
+	teleport_top: { phase: 3, subquest: true, infoTarget: "npc_xhs_paladin" },
+	kill_grom: { phase: 3, subquest: true, infoTarget: "npc_dota_hero_grom_hellscream" },
+	kill_illidan: { phase: 3, subquest: true, infoTarget: "npc_dota_hero_illidan" },
+	kill_balanar: { phase: 3, subquest: true, infoTarget: "npc_dota_hero_balanar" },
+	kill_proudmoore: { phase: 3, subquest: true, infoTarget: "npc_dota_hero_proudmoore" },
+	teleport_arthas: { phase: 3, subquest: true, infoTarget: "npc_xhs_paladin_2" }
 };
 
 var XHSHiddenQuestIds = {
 	defend_castle: true,
-	kill_rax: true
+	kill_rax: true,
+	kill_ice_towers: true
 };
 
 function IsXHSHiddenQuest(questID) {
@@ -292,14 +343,62 @@ function SetStaticQuest(id, text, state) {
 	ReorderXHSQuestPanels(zonePanel);
 }
 
-function RefreshStaticQuests() {
-	var phase = XHSQuestState.gamePhase || 1;
-	var level = XHSQuestState.creepLevel || 1;
-	var nextSeconds = XHSQuestState.nextCreepSeconds;
+function GetEffectiveQuestPhase() {
+	var phase = Math.max(1, Number(XHSQuestState.gamePhase) || 1);
+	for (var id in XHSQuestState.globalObjectives) {
+		if (!XHSQuestState.globalObjectives.hasOwnProperty(id)) {
+			continue;
+		}
 
+		var meta = XHSQuestUiMeta[id] || null;
+		if (!meta || !meta.phase) {
+			continue;
+		}
+
+		var objective = XHSQuestState.globalObjectives[id];
+		var state = objective ? objective.state : "";
+		if (state === "Active" || state === "Completed") {
+			phase = Math.max(phase, meta.phase);
+		}
+	}
+
+	var questsContainer = $("#QuestsContainer");
+	if (questsContainer) {
+		var questPanels = questsContainer.FindChildrenWithClassTraverse("Quest");
+		for (var i = 0; i < questPanels.length; i++) {
+			var panel = questPanels[i];
+			if (!panel || (!panel.BHasClass("Active") && !panel.BHasClass("Completed"))) {
+				continue;
+			}
+
+			var questID = panel.GetAttributeString("quest_id", panel.id || "");
+			var panelMeta = XHSQuestUiMeta[questID] || null;
+			if (panelMeta && panelMeta.phase) {
+				phase = Math.max(phase, panelMeta.phase);
+			}
+		}
+	}
+
+	if (phase > (Number(XHSQuestState.gamePhase) || 1)) {
+		XHSQuestState.gamePhase = phase;
+	}
+
+	return phase;
+}
+
+function RefreshPhaseQuestHeaders(phase) {
+	phase = phase || GetEffectiveQuestPhase();
 	SetStaticQuest("xhs_phase_1", "Phase 1: Defend the Castle", phase > 1 ? "Completed" : "Active");
 	SetStaticQuest("xhs_phase_2", "Phase 2: Break the enemy siege", phase === 2 ? "Active" : (phase > 2 ? "Completed" : "Inactive"));
 	SetStaticQuest("xhs_phase_3", "Phase 3: Defeat the enemy leaders", phase >= 3 ? "Active" : "Inactive");
+}
+
+function RefreshStaticQuests() {
+	var phase = GetEffectiveQuestPhase();
+	var level = XHSQuestState.creepLevel || 1;
+	var nextSeconds = XHSQuestState.nextCreepSeconds;
+
+	RefreshPhaseQuestHeaders(phase);
 
 	for (var i = 2; i <= 4; i++) {
 		var state = "Inactive";
@@ -331,7 +430,7 @@ function RefreshGlobalObjectiveQuests() {
 }
 
 function GetActiveGlobalObjectiveId() {
-	var order = ["muradin_event", "farm_event", "final_wave"];
+	var order = ["muradin_event", "farm_event", "phase2_creeps", "final_wave"];
 	for (var i = 0; i < order.length; i++) {
 		var id = order[i];
 		var objective = XHSQuestState.globalObjectives[id];
@@ -364,6 +463,57 @@ function SetGlobalObjective(id, text, state, seconds) {
 	RefreshGlobalObjectiveQuests();
 }
 
+function RemoveQuestPanelById(questID) {
+	var questsContainer = $("#QuestsContainer");
+	if (!questsContainer || !questID) {
+		return;
+	}
+
+	var zones = questsContainer.FindChildrenWithClassTraverse("Zone");
+	for (var i = 0; i < zones.length; i++) {
+		var zoneQuestsContainer = zones[i].FindChildInLayoutFile("ZoneQuestsContainer");
+		if (!zoneQuestsContainer) {
+			continue;
+		}
+
+		var questPanel = zoneQuestsContainer.FindChild(questID);
+		if (questPanel) {
+			questPanel.DeleteAsync(0.0);
+		}
+	}
+}
+
+function ActivateFinalWaveWaitObjective() {
+	var objective = XHSQuestState.globalObjectives.final_wave;
+	if (!objective || objective.state === "Completed") {
+		return;
+	}
+
+	var phase2Creeps = XHSQuestState.globalObjectives.phase2_creeps;
+	if (phase2Creeps && phase2Creeps.state === "Active") {
+		return;
+	}
+
+	var seconds = XHSQuestState.specialEventSeconds;
+	var text = seconds !== null && seconds !== undefined
+		? GetGlobalObjectiveTimerText("final_wave", seconds)
+		: "Final Wave in --:--";
+
+	SetGlobalObjective("final_wave", text, "Active");
+}
+
+function ApplyHiddenQuestSideEffects(data) {
+	if (!data) {
+		return;
+	}
+
+	if (data["QuestName"] === "kill_ice_towers") {
+		RemoveQuestPanelById("kill_ice_towers");
+		ActivateFinalWaveWaitObjective();
+		RefreshStaticQuests();
+	}
+}
+
 function GetGlobalObjectiveTimerText(id, seconds) {
 	if (id === "muradin_event") {
 		return "Muradin Event: " + FormatQuestSeconds(seconds);
@@ -371,6 +521,10 @@ function GetGlobalObjectiveTimerText(id, seconds) {
 
 	if (id === "farm_event") {
 		return "Farm Event: " + FormatQuestSeconds(seconds);
+	}
+
+	if (id === "phase2_creeps") {
+		return "Phase 2 creeps: " + FormatQuestSeconds(seconds);
 	}
 
 	if (id === "final_wave") {
@@ -438,6 +592,10 @@ function ApplyQuestStateSnapshot(data) {
 		XHSQuestState.nextCreepSeconds = Math.max(0, GetQuestSnapshotNumber(data.creep_seconds, 0));
 	}
 
+	if (data.special_event_seconds !== undefined && data.special_event_seconds !== null) {
+		XHSQuestState.specialEventSeconds = Math.max(0, GetQuestSnapshotNumber(data.special_event_seconds, 0));
+	}
+
 	if (IsQuestSnapshotTruthy(data.muradin_event_started)) {
 		XHSQuestState.muradinEventStarted = true;
 	}
@@ -465,6 +623,11 @@ function InitStaticQuestLog() {
 	}
 
 	XHSQuestState.initialized = true;
+	if (typeof GameUI !== "undefined" && GameUI.CustomUIConfig) {
+		XHSQuestLogPinnedBackground = GameUI.CustomUIConfig().xhsQuestLogPinnedBackground === true;
+	}
+	RefreshXHSQuestLogBackgroundToggle();
+
 	for (var i = 0; i < XHSStaticQuests.length; i++) {
 		SetStaticQuest(XHSStaticQuests[i].id, XHSStaticQuests[i].text, XHSStaticQuests[i].state);
 	}
@@ -483,7 +646,10 @@ function OnQuestActivated( data ) {
 	if ( szZoneName === null || szQuestName === null )
 		return;
 	if ( IsXHSHiddenQuest( szQuestName ) )
+	{
+		ApplyHiddenQuestSideEffects(data);
 		return;
+	}
 
 	var ZonePanel = QuestsContainerPanel.FindChild( szZoneName );
 	if ( ZonePanel === null )
@@ -517,6 +683,7 @@ function OnQuestActivated( data ) {
 	QuestPanel.SetHasClass( "Active", data["Completed"] < data["CompleteLimit"] );
 	QuestPanel.SetHasClass( "Inactive", false );
 	ReorderXHSQuestPanels(ZonePanel);
+	RefreshPhaseQuestHeaders();
 	ZonePanel.SetHasClass( "Completed", false );
 }
 GameEvents.Subscribe( "quest_activated", OnQuestActivated );
@@ -594,6 +761,7 @@ function OnQuestCompleted( data )
 {
 	if ( data && IsXHSHiddenQuest( data["QuestName"] ) )
 	{
+		ApplyHiddenQuestSideEffects(data);
 		return;
 	}
 
@@ -618,7 +786,6 @@ function OnQuestCompleted( data )
 	var szQuestName = data["QuestName"];
 	if ( szZoneName === null || szQuestName === null )
 		return;
-
 	var ZonePanel = QuestsContainerPanel.FindChild( szZoneName );
 	if ( ZonePanel === null )
 		return;
@@ -656,6 +823,7 @@ function OnQuestCompleted( data )
 	}
 
 	ZonePanel.SetHasClass( "Completed", bAllComplete || data["ZoneCompleted"] );
+	RefreshPhaseQuestHeaders();
 }
 
 GameEvents.Subscribe( "quest_completed", OnQuestCompleted );
@@ -720,6 +888,7 @@ function OnQuestCountdownTimer(data) {
 		return;
 	}
 
+	XHSQuestState.specialEventSeconds = seconds;
 	var activeObjectiveId = GetActiveGlobalObjectiveId();
 	if (activeObjectiveId) {
 		SetGlobalObjective(activeObjectiveId, GetGlobalObjectiveTimerText(activeObjectiveId, seconds), "Active");

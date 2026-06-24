@@ -69,8 +69,10 @@ local function NotifySpecialArenaStarted(hero, target_text)
 	if hero_unit_name ~= nil and hero_unit_name ~= "" then
 		table.insert(segments, { hero = hero_unit_name, imagestyle = "icon" })
 	end
-	table.insert(segments, { text = hero_name, style = { color = hero_color } })
-	table.insert(segments, { text = " has reached the kill milestone and will fight " .. target_text .. "!" })
+	table.insert(segments, {
+		text = "<font color='" .. hero_color .. "'>" .. hero_name .. "</font> has reached the kill milestone and will fight " .. target_text .. "!",
+		class = "XHSSpecialArenaText",
+	})
 
 	Notifications:TopToAll({
 		duration = 5.0,
@@ -93,10 +95,54 @@ local function NotifySpecialArenaInstructions(hero, boss_hero, text)
 	})
 end
 
+local STORM_EARTH_FIRE_SOUND = "Muradin.StormEarthFire"
+
+local function StopStormEarthFireSound(entity)
+	if entity == nil or not IsValidEntity(entity) or entity:IsNull() then return end
+
+	StopSoundOn(STORM_EARTH_FIRE_SOUND, entity)
+	if entity.StopSound ~= nil then
+		entity:StopSound(STORM_EARTH_FIRE_SOUND)
+	end
+end
+
+local function StopAllStormEarthFireSounds()
+	if SpecialEvents.stormEarthFireEmitters == nil then return end
+
+	for _, info in pairs(SpecialEvents.stormEarthFireEmitters) do
+		if info ~= nil then
+			StopStormEarthFireSound(info.entity)
+		end
+	end
+
+	SpecialEvents.stormEarthFireEmitters = {}
+end
+
+local function PlayStormEarthFireSound(entity)
+	if entity == nil or not IsValidEntity(entity) or entity:IsNull() then return end
+
+	SpecialEvents.stormEarthFireEmitters = SpecialEvents.stormEarthFireEmitters or {}
+
+	local key = tostring(entity:entindex())
+	local now = GameRules:GetGameTime()
+	local previous = SpecialEvents.stormEarthFireEmitters[key]
+	if previous ~= nil and previous.lastPlayed ~= nil and now - previous.lastPlayed < 1.0 then
+		return
+	end
+
+	StopStormEarthFireSound(entity)
+	EmitSoundOn(STORM_EARTH_FIRE_SOUND, entity)
+	SpecialEvents.stormEarthFireEmitters[key] = {
+		entity = entity,
+		lastPlayed = now,
+	}
+end
+
 function SpecialEvents:MuradinEvent(time)
 	local stun_duration = 5.0
 	local event_end_delay = time + stun_duration
 
+	StopAllStormEarthFireSounds()
 	CustomTimers.current_time["special_event"] = time
 	CustomTimers.current_time["creep_level"] = time
 	CustomTimers.current_event_timer_paused = true
@@ -146,7 +192,7 @@ function SpecialEvents:MuradinEvent(time)
 	GameRules:GetGameModeEntity():SetContextThink(DoUniqueString("muradin_event"), function()
 		RestartHeroes()
 		if Muradin and not Muradin:IsNull() then
-			EmitSoundOn("Muradin.StormEarthFire", Muradin)
+			PlayStormEarthFireSound(Muradin)
 		end
 		CustomTimers.current_event_timer_paused = false
 
@@ -154,6 +200,8 @@ function SpecialEvents:MuradinEvent(time)
 	end, stun_duration)
 
 	GameRules:GetGameModeEntity():SetContextThink(DoUniqueString("muradin_event"), function()
+		if CustomTimers.special_waves_disabled == true then return nil end
+
 		CustomTimers.current_time["special_wave"] = 30
 		CustomTimers:ShowSpecialWaveCountdown(3, 30)
 		if Runes and Runes.OnSpecialWaveWarning then
@@ -184,8 +232,11 @@ function SpecialEvents:MuradinEvent(time)
 		UpdateGlobalObjective("muradin_event", "Completed", "Muradin Event completed", nil, true)
 		UpdateGlobalObjective("farm_event", "Active", "Farm Event in --:--", nil)
 		CustomGameEventManager:Send_ServerToAllClients("update_special_event_label_farm", {})
+		StopAllStormEarthFireSounds()
 		SpecialEvents:EndMuradinEvent()
-		SpecialWave(3)
+		if CustomTimers.special_waves_disabled ~= true then
+			SpecialWave(3)
+		end
 
 		return nil
 	end, event_end_delay)
@@ -195,6 +246,7 @@ function SpecialEvents:MuradinEvent(time)
 		SpecialEvents:EndMuradinEvent()
 
 		RestartCreeps(0.0)
+		StopAllStormEarthFireSounds()
 		UTIL_Remove(Muradin)
 
 		return nil
@@ -245,6 +297,7 @@ function SpecialEvents:FarmEvent(time)
 	local tp_delay = 3.0
 	local start_delay = tp_delay + 3.0
 
+	StopAllStormEarthFireSounds()
 	CustomTimers.current_time["special_event"] = time
 	CustomTimers.timers_paused = 1
 	BT_ENABLED = 0
@@ -290,7 +343,7 @@ function SpecialEvents:FarmEvent(time)
 
 				for j = 1, 10 do
 					if FarmEvent_Creeps[1] and point then
-						EmitSoundOn("Muradin.StormEarthFire", point)
+						PlayStormEarthFireSound(point)
 
 						local unit = CreateUnitByName(FarmEvent_Creeps[1], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 						unit:SetBaseDamageMin(unit:GetRealDamageDone(unit) + (FARM_EVENT_UPGRADE["damage"][difficulty] * SpecialEvents.hero_farm_event[nPlayerID]["level"]))
@@ -311,6 +364,8 @@ function SpecialEvents:FarmEvent(time)
 	end, start_delay)
 
 	GameRules:GetGameModeEntity():SetContextThink(DoUniqueString("muradin_event"), function()
+		if CustomTimers.special_waves_disabled == true then return nil end
+
 		Notifications:TopToAll({ text = "WARNING: Incoming Wave of Darkness from the North!", duration = 25.0, style = { color = "red" } })
 		if Runes and Runes.OnSpecialWaveWarning then
 			Runes:OnSpecialWaveWarning(6, CustomTimers:GetSpecialWavePoint(6))
@@ -331,7 +386,9 @@ function SpecialEvents:FarmEvent(time)
 
 	GameRules:GetGameModeEntity():SetContextThink(DoUniqueString("muradin_event"), function()
 		RestartCreeps(0.0)
-		SpecialWave(6)
+		if CustomTimers.special_waves_disabled ~= true then
+			SpecialWave(6)
+		end
 
 		return nil
 	end, time + 10)
@@ -374,6 +431,7 @@ end
 
 function SpecialEvents:EndFarmEvent()
 	CustomTimers.timers_paused = 2
+	StopAllStormEarthFireSounds()
 
 	for _, hero in pairs(HeroList:GetAllHeroes()) do
 		RefreshPlayers()
@@ -439,13 +497,17 @@ function SpecialEvents:StartRameroAndBaristolEvent(hero)
 
 	local point = Entities:FindByName(nil, "npc_dota_muradin_player_1"):GetAbsOrigin()
 	local delay = 5.0
+	StopAllStormEarthFireSounds()
 	CustomTimers.timers_paused = 2
 	CustomTimers:HideSpecialWaveCountdown()
+	GameMode.SpecialArena_occuring = true
+	CustomTimers.current_time["special_arena"] = XHS_RAMERO_BARISTOL_TIME + delay
 	BT_ENABLED = 0
 
 	NotifySpecialArenaStarted(hero, "Ramero and Baristol")
 	TeleportHero(hero, point, delay)
 	CinematicPauseCreeps(SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP)
+	StartCinematicPauseCreepsWatch("xhs_ramero_baristol_creep_pause_watch", SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP)
 
 	Timers:CreateTimer(delay, function()
 		SpecialEvents:RameroAndBaristolEvent(XHS_RAMERO_BARISTOL_TIME, hero)
@@ -477,7 +539,7 @@ function SpecialEvents:RameroAndBaristolEvent(time, hero) -- 500 kills
 	SpecialEvents.Baristol:AddNewModifier(SpecialEvents.Baristol, nil, "modifier_cinematic_pause", { duration = stun_duration, ramp_duration = SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP })
 	SpecialEvents.Baristol:SetAngles(0, 325, 0)
 
-	EmitSoundOn("Muradin.StormEarthFire", SpecialEvents.Ramero)
+	PlayStormEarthFireSound(SpecialEvents.Ramero)
 
 	NotifySpecialArenaInstructions(hero, "npc_dota_hero_sven", "Kill Ramero and Baristol to get special items! Reward: Lightning Sword and Tome of Stats +250.")
 
@@ -500,6 +562,7 @@ function SpecialEvents:EndRameroAndBaristolEvent(bWin)
 	mode:SetContextThink("RameroAndBaristol", nil, 0)
 
 	RestartCreeps(teleport_time + 3.0)
+	StopAllStormEarthFireSounds()
 	UTIL_Remove(_G.RAMERO_DUMMY)
 	UTIL_Remove(_G.BARISTOL_DUMMY)
 
@@ -535,12 +598,16 @@ end
 function SpecialEvents:StartSogatEvent(hero)
 	local point = Entities:FindByName(nil, "npc_dota_muradin_player_1"):GetAbsOrigin()
 	local delay = 5.0
+	StopAllStormEarthFireSounds()
 	CustomTimers.timers_paused = 2
 	CustomTimers:HideSpecialWaveCountdown()
+	GameMode.SpecialArena_occuring = true
+	CustomTimers.current_time["special_arena"] = 120.0 + delay
 	BT_ENABLED = 0
 
 	NotifySpecialArenaStarted(hero, "Sogat")
 	CinematicPauseCreeps(SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP)
+	StartCinematicPauseCreepsWatch("xhs_sogat_creep_pause_watch", SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP)
 	TeleportHero(hero, point, delay)
 
 	Timers:CreateTimer(delay, function()
@@ -565,7 +632,7 @@ function SpecialEvents:SogatEvent(time, hero) -- 750 kills
 	SpecialEvents.Sogat = CreateUnitByName("npc_ramero_2", Entities:FindByName(nil, "roshan_wp_4"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 	SpecialEvents.Sogat:AddNewModifier(SpecialEvents.Sogat, nil, "modifier_cinematic_pause", { duration = stun_duration, ramp_duration = SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP })
 	SpecialEvents.Sogat:SetAngles(0, 45, 0)
-	EmitSoundOn("Muradin.StormEarthFire", SpecialEvents.Sogat)
+	PlayStormEarthFireSound(SpecialEvents.Sogat)
 	NotifySpecialArenaInstructions(hero, "npc_dota_hero_sven", "Kill Sogat to get a special item! Reward: Ring of Superiority.")
 
 	GameRules:GetGameModeEntity():SetContextThink("Sogat", function()
@@ -586,6 +653,7 @@ function SpecialEvents:EndSogatEvent(bWin)
 	mode:SetContextThink("Sogat", nil, 0)
 
 	RestartCreeps(teleport_time + 3.0)
+	StopAllStormEarthFireSounds()
 	UTIL_Remove(_G.RAMERO_BIS_DUMMY)
 
 	CustomGameEventManager:Send_ServerToAllClients("hide_timer_special_arena", {})
@@ -797,9 +865,11 @@ function SpecialEvents:ReturnFromSpecialArena()
 	CustomGameEventManager:Send_ServerToAllClients("hide_timer_special_arena", {})
 
 	local SpecialArenaCheck = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, Entities:FindByName(nil, "npc_dota_muradin_boss"):GetAbsOrigin(), nil, 2000, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER, false)
+	local returnedHero = false
 
 	for _, hero in pairs(SpecialArenaCheck) do
 		if hero:IsRealHero() then
+			returnedHero = true
 			print(hero:GetUnitName() .. " was in an arena when it ended, teleporting to base")
 
 			local teleport_time = 3.0
@@ -823,5 +893,10 @@ function SpecialEvents:ReturnFromSpecialArena()
 				CustomTimers:ResumeSpecialWaveCountdown()
 			end, teleport_time + 1.0)
 		end
+	end
+
+	if returnedHero ~= true then
+		GameMode.SpecialArena_occuring = false
+		CustomTimers:ResumeSpecialWaveCountdown()
 	end
 end

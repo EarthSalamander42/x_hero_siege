@@ -716,9 +716,15 @@
 		"ScriptFile"					"items/item_orb_of_earth.lua"
 		"AbilityTextureName"			"custom/orb_of_earth"
 		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"ItemShopTags"					"damage"
+		"ItemAliases"					"orb of earth"
+		"ItemPermanent"					"0"
+		"ItemStackable"					"0"
+		"Orb"							"1"
 
 		// Shops
 		"ItemCost"						"10000"
+		"SecretShop"					"0"
 //		"ItemInitialStockTime"			"510.0"
 //		"ItemStockMax"					"2" 
 //		"ItemStockTime"					"30.0"
@@ -756,7 +762,7 @@
 		"ID"							"2548"
 		"BaseClass"                     "item_lua"
 		"ScriptFile"					"items/item_orb_of_earth.lua"
-		"AbilityTextureName"			"custom/orb_of_earth2"
+		"AbilityTextureName"			"custom/orb_of_earth3"
 		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_PASSIVE"
 
 		// Shops
@@ -805,7 +811,7 @@
 		
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"						"10000"	
+		"ItemCost"						"10000"
 		"ItemShopTags"					""
 //		"ItemInitialStockTime"			"990.0"
 //		"ItemStockMax"					"2" 
@@ -881,7 +887,7 @@
 		
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"						"30000"	
+		"ItemCost"						"30000"
 		"ItemShopTags"					""
 //		"ItemInitialStockTime"			"1470.0"
 //		"ItemStockMax"					"2" 
@@ -1066,6 +1072,343 @@
 			"bonus_armor"			"20"
 			"bonus_health_regen"	"20"
 			"max_units"				"10"
+		}
+	}
+
+	//=================================================================================================================
+	// Orb of Arcane
+	//=================================================================================================================
+	"item_orb_of_arcane"
+	{
+		"ID"							"2556"
+		"BaseClass"						"item_lua"
+		"ScriptFile"					"items/item_orb_of_arcane.lua"
+		"AbilityTextureName"			"kaya"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
+		"ItemShopTags"					"spell_amp;mana_regen"
+		"ItemQuality"					"artifact"
+		"ItemAliases"					"orb of arcane"
+		"ItemPermanent"					"0"
+		"ItemStackable"					"0"
+		"ItemKillable"					"1"
+		"ItemSellable"					"1"
+		"ItemDroppable"					"1"
+		"ItemBaseLevel"					"1"
+		"MaxUpgradeLevel"				"3"
+
+		"ItemCost"						"10000"
+		"ItemPurchasable"				"1"
+
+		"Model"							"models/props_gameplay/red_box.vmdl"
+		"Effect"						"particles/items_fx/ethereal_blade_explosion.vpcf"
+
+		"UIPickupSound"					"Item.PickUpGemShop"
+		"UIDropSound"					"Item.DropGemShop"
+		"WorldDropSound"				"Item.DropGemWorld"
+
+		"AbilityValues"
+		{
+			"spell_amp"							"8"
+			"mana_regen"						"5"
+			"mana_cost_reduction_pct"			"0"
+			"cooldown_reduction_pct"			"0"
+			"exposure_magic_resist_reduction"	"0"
+			"exposure_duration"					"0"
+		}
+	}
+
+	//=================================================================================================================
+	// Mystic Gem
+	//=================================================================================================================
+	"item_mystic_gem"
+	{
+		"ID"							"2557"
+		"BaseClass"						"item_lua"
+		"ScriptFile"					"items/item_orb_of_arcane.lua"
+		"AbilityTextureName"			"yasha_and_kaya"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
+		"ItemShopTags"					"spell_amp;mana_regen"
+		"ItemQuality"					"artifact"
+		"ItemAliases"					"mystic gem"
+		"ItemPermanent"					"0"
+		"ItemStackable"					"0"
+		"ItemKillable"					"1"
+		"ItemSellable"					"1"
+		"ItemDroppable"					"1"
+		"ItemBaseLevel"					"2"
+		"MaxUpgradeLevel"				"3"
+
+		"ItemCost"						"20000"
+		"ItemPurchasable"				"1"
+
+		"Model"							"models/props_gameplay/red_box.vmdl"
+		"Effect"						"particles/items_fx/ethereal_blade_explosion.vpcf"
+
+		"UIPickupSound"					"Item.PickUpGemShop"
+		"UIDropSound"					"Item.DropGemShop"
+		"WorldDropSound"				"Item.DropGemWorld"
+
+		"AbilityValues"
+		{
+			"spell_amp"							"16"
+			"mana_regen"						"10"
+			"mana_cost_reduction_pct"			"10"
+			"cooldown_reduction_pct"			"0"
+			"exposure_magic_resist_reduction"	"0"
+			"exposure_duration"					"0"
+		}
+	}
+
+	//=================================================================================================================
+	// Recipe: Mystic Gem
+	//=================================================================================================================
+	"item_recipe_mystic_gem"
+	{
+		"ID"							"2558"
+		"BaseClass"             		"item_datadriven"
+		"Model"							"models/props_gameplay/recipe.vmdl"
+		"AbilityTextureName"			"custom/recipe"
+		"ItemCost"						"10000"
+		"ItemShopTags"					""
+		"ItemRecipe"					"1"
+		"ItemResult"					"item_mystic_gem"
+		"ItemRequirements"
+		{
+			"01"						"item_orb_of_arcane"
+		}
+	}
+
+	//=================================================================================================================
+	// Astral Core
+	//=================================================================================================================
+	"item_astral_core"
+	{
+		"ID"							"2559"
+		"BaseClass"						"item_lua"
+		"ScriptFile"					"items/item_orb_of_arcane.lua"
+		"AbilityTextureName"			"octarine_core"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
+		"ItemShopTags"					"spell_amp;mana_regen"
+		"ItemQuality"					"epic"
+		"ItemAliases"					"astral core"
+		"ItemPermanent"					"0"
+		"ItemStackable"					"0"
+		"ItemKillable"					"1"
+		"ItemSellable"					"1"
+		"ItemDroppable"					"1"
+		"SecretShop"					"1"
+		"ItemBaseLevel"					"3"
+		"MaxUpgradeLevel"				"3"
+		"AllowedInBackpack"				"0"
+
+		"ItemCost"						"50000"
+		"ItemPurchasable"				"1"
+
+		"Model"							"models/props_gameplay/red_box.vmdl"
+		"Effect"						"particles/items_fx/ethereal_blade_explosion.vpcf"
+
+		"UIPickupSound"					"Item.PickUpGemShop"
+		"UIDropSound"					"Item.DropGemShop"
+		"WorldDropSound"				"Item.DropGemWorld"
+
+		"AbilityValues"
+		{
+			"spell_amp"							"25"
+			"mana_regen"						"20"
+			"mana_cost_reduction_pct"			"15"
+			"cooldown_reduction_pct"			"10"
+			"exposure_magic_resist_reduction"	"15"
+			"exposure_duration"					"3.0"
+		}
+	}
+
+	//=================================================================================================================
+	// Recipe: Astral Core
+	//=================================================================================================================
+	"item_recipe_astral_core"
+	{
+		"ID"							"2560"
+		"BaseClass"             		"item_datadriven"
+		"Model"							"models/props_gameplay/recipe.vmdl"
+		"AbilityTextureName"			"custom/recipe"
+		"ItemCost"						"30000"
+		"ItemShopTags"					""
+		"ItemRecipe"					"1"
+		"SecretShop"					"1"
+		"ItemResult"					"item_astral_core"
+		"ItemRequirements"
+		{
+			"01"						"item_mystic_gem"
+		}
+	}
+
+	//=================================================================================================================
+	// Orb of Venom
+	//=================================================================================================================
+	"item_orb_of_venom"
+	{
+		"ID"							"2561"
+		"BaseClass"						"item_lua"
+		"ScriptFile"					"items/item_orb_of_venom_xhs.lua"
+		"AbilityTextureName"			"orb_of_venom"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
+		"ItemShopTags"					"damage"
+		"ItemQuality"					"artifact"
+		"ItemAliases"					"orb of venom"
+		"ItemPermanent"					"0"
+		"ItemStackable"					"0"
+		"ItemKillable"					"1"
+		"ItemSellable"					"1"
+		"ItemDroppable"					"1"
+		"ItemBaseLevel"					"1"
+		"MaxUpgradeLevel"				"3"
+
+		"ItemCost"						"10000"
+		"ItemPurchasable"				"1"
+
+		"Model"							"models/props_gameplay/red_box.vmdl"
+		"Effect"						"particles/units/heroes/hero_viper/viper_poison_debuff.vpcf"
+
+		"UIPickupSound"					"Item.PickUpGemShop"
+		"UIDropSound"					"Item.DropGemShop"
+		"WorldDropSound"				"Item.DropGemWorld"
+
+		"AbilityValues"
+		{
+			"bonus_damage"					"50"
+			"poison_damage_per_second"		"100"
+			"poison_duration"				"4.0"
+			"armor_reduction"				"0"
+			"toxic_saturation_damage"		"0"
+		}
+	}
+
+	//=================================================================================================================
+	// Viridian Gem
+	//=================================================================================================================
+	"item_viridian_gem"
+	{
+		"ID"							"2562"
+		"BaseClass"						"item_lua"
+		"ScriptFile"					"items/item_orb_of_venom_xhs.lua"
+		"AbilityTextureName"			"orb_of_corrosion"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
+		"ItemShopTags"					"damage"
+		"ItemQuality"					"artifact"
+		"ItemAliases"					"viridian gem"
+		"ItemPermanent"					"0"
+		"ItemStackable"					"0"
+		"ItemKillable"					"1"
+		"ItemSellable"					"1"
+		"ItemDroppable"					"1"
+		"ItemBaseLevel"					"2"
+		"MaxUpgradeLevel"				"3"
+
+		"ItemCost"						"20000"
+		"ItemPurchasable"				"1"
+
+		"Model"							"models/props_gameplay/red_box.vmdl"
+		"Effect"						"particles/units/heroes/hero_viper/viper_poison_debuff.vpcf"
+
+		"UIPickupSound"					"Item.PickUpGemShop"
+		"UIDropSound"					"Item.DropGemShop"
+		"WorldDropSound"				"Item.DropGemWorld"
+
+		"AbilityValues"
+		{
+			"bonus_damage"					"150"
+			"poison_damage_per_second"		"250"
+			"poison_duration"				"4.0"
+			"armor_reduction"				"5"
+			"toxic_saturation_damage"		"0"
+		}
+	}
+
+	//=================================================================================================================
+	// Recipe: Viridian Gem
+	//=================================================================================================================
+	"item_recipe_viridian_gem"
+	{
+		"ID"							"2563"
+		"BaseClass"             		"item_datadriven"
+		"Model"							"models/props_gameplay/recipe.vmdl"
+		"AbilityTextureName"			"custom/recipe"
+		"ItemCost"						"10000"
+		"ItemShopTags"					""
+		"ItemRecipe"					"1"
+		"ItemResult"					"item_viridian_gem"
+		"ItemRequirements"
+		{
+			"01"						"item_orb_of_venom"
+		}
+	}
+
+	//=================================================================================================================
+	// Plagueheart
+	//=================================================================================================================
+	"item_plagueheart"
+	{
+		"ID"							"2564"
+		"BaseClass"						"item_lua"
+		"ScriptFile"					"items/item_orb_of_venom_xhs.lua"
+		"AbilityTextureName"			"orb_of_destruction"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
+		"ItemShopTags"					"damage"
+		"ItemQuality"					"epic"
+		"ItemAliases"					"plagueheart"
+		"ItemPermanent"					"0"
+		"ItemStackable"					"0"
+		"ItemKillable"					"1"
+		"ItemSellable"					"1"
+		"ItemDroppable"					"1"
+		"SecretShop"					"1"
+		"ItemBaseLevel"					"3"
+		"MaxUpgradeLevel"				"3"
+		"AllowedInBackpack"				"0"
+
+		"ItemCost"						"50000"
+		"ItemPurchasable"				"1"
+
+		"Model"							"models/props_gameplay/red_box.vmdl"
+		"Effect"						"particles/units/heroes/hero_viper/viper_poison_debuff.vpcf"
+
+		"UIPickupSound"					"Item.PickUpGemShop"
+		"UIDropSound"					"Item.DropGemShop"
+		"WorldDropSound"				"Item.DropGemWorld"
+
+		"AbilityValues"
+		{
+			"bonus_damage"					"450"
+			"poison_damage_per_second"		"600"
+			"poison_duration"				"4.0"
+			"armor_reduction"				"12"
+			"toxic_saturation_damage"		"500"
+		}
+	}
+
+	//=================================================================================================================
+	// Recipe: Plagueheart
+	//=================================================================================================================
+	"item_recipe_plagueheart"
+	{
+		"ID"							"2565"
+		"BaseClass"             		"item_datadriven"
+		"Model"							"models/props_gameplay/recipe.vmdl"
+		"AbilityTextureName"			"custom/recipe"
+		"ItemCost"						"30000"
+		"ItemShopTags"					""
+		"ItemRecipe"					"1"
+		"SecretShop"					"1"
+		"ItemResult"					"item_plagueheart"
+		"ItemRequirements"
+		{
+			"01"						"item_viridian_gem"
 		}
 	}
 }

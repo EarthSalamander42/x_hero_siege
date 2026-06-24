@@ -37,6 +37,10 @@ function modifier_campfire:GetAuraRadius()
 	return self.aura_radius
 end
 
+function modifier_campfire:GetAuraEntityReject(target)
+	return IsXHSRuneUnit and IsXHSRuneUnit(target)
+end
+
 function modifier_campfire:OnCreated(kv)
 	if IsServer() then
 		self.aura_radius = self:GetAbility():GetSpecialValueFor("aura_radius")
@@ -168,9 +172,9 @@ function modifier_disease_cloud_aura:GetAuraSearchTeam()
 	return DOTA_UNIT_TARGET_TEAM_ENEMY
 end
 
---  function modifier_disease_cloud_aura:GetAuraEntityReject(target)
---		return IsBuilding()
---	end
+function modifier_disease_cloud_aura:GetAuraEntityReject(target)
+	return IsXHSRuneUnit and IsXHSRuneUnit(target)
+end
 
 function modifier_disease_cloud_aura:GetAuraSearchType()
 	return DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC

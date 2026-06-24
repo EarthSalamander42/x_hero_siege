@@ -65,11 +65,19 @@ function modifier_balanar_rain_of_chaos:OnCreated()
 
 	self.caster = self:GetCaster()
 	self.ability = self:GetAbility()
+	if self.caster == nil or self.caster:IsNull() or self.ability == nil or self.ability:IsNull() then
+		self:Destroy()
+		return
+	end
 
 	self:StartIntervalThink(self.ability.interval)
 end
 
 function modifier_balanar_rain_of_chaos:OnIntervalThink()
+	if self.caster == nil or self.caster:IsNull() or self.ability == nil or self.ability:IsNull() then
+		return
+	end
+
 	local enemies = FindUnitsInRadius(self.caster:GetTeamNumber(), self.caster:GetAbsOrigin(), nil, self.ability.seek_radius, self.ability:GetAbilityTargetTeam(), self.ability:GetAbilityTargetType(), self.ability:GetAbilityTargetFlags(), FIND_ANY_ORDER, false)
 	local point
 
@@ -83,6 +91,10 @@ function modifier_balanar_rain_of_chaos:OnIntervalThink()
 		end
 	end
 
+	if point == nil then
+		point = self.caster:GetAbsOrigin() + RandomInt(200, self.ability.radius) * RandomVector(1)
+	end
+
 	for i = 1, self.ability.meteors_per_tick do
 		local meteor = ParticleManager:CreateParticle("particles/units/heroes/hero_invoker/invoker_chaos_meteor_fly.vpcf", PATTACH_CUSTOMORIGIN, self.caster)
 		ParticleManager:SetParticleControl(meteor, 0, point + Vector(0, 0, 500))
@@ -91,19 +103,23 @@ function modifier_balanar_rain_of_chaos:OnIntervalThink()
 
 		local warning = ParticleManager:CreateParticle("particles/econ/events/darkmoon_2017/darkmoon_generic_aoe.vpcf", PATTACH_CUSTOMORIGIN, self.caster)
 		ParticleManager:SetParticleControl(warning, 0, point)
-		ParticleManager:SetParticleControl(warning, 1, Vector(self.radius_explosion, 0, 0))
+		ParticleManager:SetParticleControl(warning, 1, Vector(self.ability.radius_explosion, 0, 0))
 		ParticleManager:SetParticleControl(warning, 2, Vector(6, 0, 1))
 		ParticleManager:SetParticleControl(warning, 3, Vector(200, 0, 0))
 		ParticleManager:SetParticleControl(warning, 4, point)
 
 		local unit = CreateUnitByName("dummy_unit_invulnerable", point, true, nil, nil, self.caster:GetTeamNumber())
+		if unit == nil or unit:IsNull() then
+			return
+		end
+
 		unit:EmitSound("Hero_Invoker.ChaosMeteor.Loop")
 		unit:AddNewModifier(self.caster, self.ability, "modifier_balanar_rain_of_chaos_dummy", { duration = self.ability.interval })
 	end
 end
 
 function modifier_balanar_rain_of_chaos:GetModifierIncomingDamage_Percentage()
-	if self.ability.damage_reduction then
+	if self.ability and self.ability.damage_reduction then
 		return self.ability.damage_reduction * (-1)
 	end
 end
@@ -131,36 +147,53 @@ end
 function modifier_balanar_rain_of_chaos_dummy:OnDestroy()
 	if not IsServer() then return end
 
-	self.parent:EmitSound("Hero_Invoker.ChaosMeteor.Impact")
-	self.parent:StopSound("Hero_Invoker.ChaosMeteor.Loop")
+	local parent = self.parent
+	local caster = self.caster
+	local ability = self.ability
+	if parent == nil or parent:IsNull() or ability == nil or ability:IsNull() then
+		return
+	end
+	local attacker = caster
+	if attacker == nil or attacker:IsNull() then
+		attacker = parent
+	end
 
-	local enemies = FindUnitsInRadius(self.parent:GetTeamNumber(), self.parent:GetAbsOrigin(), nil, self.ability.radius_explosion, self.ability:GetAbilityTargetTeam(), self.ability:GetAbilityTargetType(), self.ability:GetAbilityTargetFlags(), FIND_ANY_ORDER, false)
+	parent:EmitSound("Hero_Invoker.ChaosMeteor.Impact")
+	parent:StopSound("Hero_Invoker.ChaosMeteor.Loop")
+
+	local enemies = FindUnitsInRadius(parent:GetTeamNumber(), parent:GetAbsOrigin(), nil, ability.radius_explosion, ability:GetAbilityTargetTeam(), ability:GetAbilityTargetType(), ability:GetAbilityTargetFlags(), FIND_ANY_ORDER, false)
 
 	for _, enemy in pairs(enemies) do
-		ApplyDamage({
-			victim = enemy,
-			attacker = self.caster,
-			damage = self.ability.damage,
-			damage_type = self.ability:GetAbilityDamageType(),
-			ability = self.ability
-		})
+		if enemy ~= nil and not enemy:IsNull() then
+			enemy:AddNewModifier(parent, ability, "modifier_stunned", { duration = ability.stun_duration })
+		end
 
-		enemy:AddNewModifier(self.parent, self.ability, "modifier_stunned", { duration = self.ability.stun_duration })
+		if enemy ~= nil and not enemy:IsNull() then
+			ApplyDamage({
+				victim = enemy,
+				attacker = attacker,
+				damage = ability.damage,
+				damage_type = ability:GetAbilityDamageType(),
+				ability = ability
+			})
+		end
 	end
 
-	local soil = ParticleManager:CreateParticle("particles/units/heroes/hero_invoker/invoker_chaos_meteor_land_soil.vpcf", PATTACH_CUSTOMORIGIN, caster)
-	ParticleManager:SetParticleControl(soil, 3, self.parent:GetAbsOrigin() + Vector(0, 0, 40))
+	local soil = ParticleManager:CreateParticle("particles/units/heroes/hero_invoker/invoker_chaos_meteor_land_soil.vpcf", PATTACH_CUSTOMORIGIN, attacker)
+	ParticleManager:SetParticleControl(soil, 3, parent:GetAbsOrigin() + Vector(0, 0, 40))
 
-	local crumble = ParticleManager:CreateParticle("particles/units/heroes/hero_invoker/invoker_chaos_meteor_crumble.vpcf", PATTACH_CUSTOMORIGIN, caster)
-	ParticleManager:SetParticleControl(crumble, 3, self.parent:GetAbsOrigin())
+	local crumble = ParticleManager:CreateParticle("particles/units/heroes/hero_invoker/invoker_chaos_meteor_crumble.vpcf", PATTACH_CUSTOMORIGIN, attacker)
+	ParticleManager:SetParticleControl(crumble, 3, parent:GetAbsOrigin())
 
 	-- only balanar boss should spawn golems
-	if self.ability.golem_duration and self.ability.golem_duration > 0 then
-		local unit = CreateUnitByName("npc_infernal_beast", self.parent:GetAbsOrigin(), true, caster, caster, self.parent:GetTeamNumber())
-		unit:AddNewModifier(unit, nil, "modifier_kill", { duration = self.ability.duration })
+	if ability.golem_duration and ability.golem_duration > 0 then
+		local unit = CreateUnitByName("npc_infernal_beast", parent:GetAbsOrigin(), true, attacker, attacker, parent:GetTeamNumber())
+		if unit ~= nil and not unit:IsNull() then
+			unit:AddNewModifier(unit, nil, "modifier_kill", { duration = ability.duration })
+		end
 	end
 
-	if self.parent then
-		self.parent:RemoveSelf()
+	if parent then
+		parent:RemoveSelf()
 	end
 end

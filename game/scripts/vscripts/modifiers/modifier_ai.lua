@@ -212,6 +212,17 @@ function modifier_ai:OnIntervalThink()
 			elseif bit.band(tonumber(tostring(ability:GetBehavior())), DOTA_ABILITY_BEHAVIOR_UNIT_TARGET) == DOTA_ABILITY_BEHAVIOR_UNIT_TARGET then
 				-- print("Cast On Target:", ability:GetAbilityName())
 
+				if ability:GetAbilityName() == "arthas_holy_light" then
+					local healthThreshold = ability:GetSpecialValueFor("health_threshold")
+					if healthThreshold <= 0 then healthThreshold = 70 end
+					if self.parent:GetHealthPercent() <= healthThreshold then
+						self.parent:Stop()
+						self.parent:CastAbilityOnTarget(self.parent, ability, -1)
+					end
+
+					return
+				end
+
 				if self.parent:GetTeam() == ability:GetAbilityTargetTeam() then
 					self.parent:Stop()
 					self.parent:CastAbilityOnTarget(allies[RandomInt(1, #allies)], ability, -1)

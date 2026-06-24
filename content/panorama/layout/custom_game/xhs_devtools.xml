@@ -1,0 +1,36 @@
+<root>
+	<styles>
+		<include src="s2r://panorama/styles/custom_game/xhs_devtools.css" />
+	</styles>
+
+	<scripts>
+		<include src="s2r://panorama/scripts/custom_game/xhs_devtools.js" />
+	</scripts>
+
+	<Panel class="XHSDevToolsRoot" hittest="false" hittestchildren="true">
+		<Panel id="XHSDevToolsRoot" class="XHSDevToolsHost" hittest="false" hittestchildren="true">
+			<Button id="XHSDevToolsToggle" class="XHSDevToolsToggle" onactivate="XHSDevToolsTogglePanel();">
+				<Label text="DEV" />
+			</Button>
+
+			<Panel id="XHSDevToolsPanel" class="XHSDevToolsPanel">
+				<Panel class="XHSDevToolsHeader">
+					<Panel>
+						<Label class="XHSDevToolsEyebrow" text="TOOLS MODE" />
+						<Label class="XHSDevToolsTitle" text="XHS Dev Sandbox" />
+					</Panel>
+					<Button class="XHSDevToolsClose" onactivate="XHSDevToolsTogglePanel();">
+						<Label text="X" />
+					</Button>
+				</Panel>
+
+				<Panel id="XHSDevToolsStatus" class="XHSDevToolsStatus">
+					<Label id="XHSDevToolsStatusText" text="Requesting state..." />
+				</Panel>
+
+				<Panel id="XHSDevToolsTabs" class="XHSDevToolsTabs" />
+				<Panel id="XHSDevToolsContent" class="XHSDevToolsContent" />
+			</Panel>
+		</Panel>
+	</Panel>
+</root>

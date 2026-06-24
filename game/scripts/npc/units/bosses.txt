@@ -2841,6 +2841,7 @@
 		"ProjectileModel"			"particles/econ/items/shadow_fiend/sf_desolation/sf_base_attack_desolation_fire_arcana.vpcf"
 		"ProjectileSpeed"			"1200"
 		"ConsideredHero"			"1"
+		"Portrait"					"vgui/hud/heroportraits/portrait_nevermore"
 		"ModelScale"                "1.7"
 		"LeavesCorpse"				"0"
 
@@ -2857,7 +2858,7 @@
 		"Ability9"					"boss_health"
 		"Ability10"					"cant_die_generic"
 
-		"ArmorPhysical"				"180"                  // Physical protection.
+		"ArmorPhysical"				"230"                  // Physical protection.
 		"MagicalResistance"			"50"                 // Magical protection (percentage).
 
 		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
@@ -2929,14 +2930,14 @@
 
 		// Armor
 		//----------------------------------------------------------------
-		"ArmorPhysical"			"150"     // Physical protection.
-		"MagicalResistance"		"50"     // Magical protection.
+		"ArmorPhysical"			"75"     // Physical protection.
+		"MagicalResistance"		"25"     // Magical protection.
 
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"    // Type of attack - melee, ranged, etc.
-		"AttackDamageMin"			"5499"     // Damage range min.
-		"AttackDamageMax"			"5501"     // Damage range max.
+		"AttackDamageMin"			"13999"     // Damage range min.
+		"AttackDamageMax"			"16001"     // Damage range max.
 		"AttackDamageType"			"DAMAGE_TYPE_ArmorPhysical"
 		"AttackRate"				"0.65"     // Speed of attack.
 		"AttackAnimationPoint"		"0.6"   // Normalized time in animation cycle to attack.
@@ -2963,8 +2964,8 @@
 	
 		// Status
 		//----------------------------------------------------------------
-		"StatusHealth"        "40000"     // Base health.
-		"StatusHealthRegen"     "2"     // Health regeneration rate.
+		"StatusHealth"        "25000"     // Base health.
+		"StatusHealthRegen"     "0"     // Health regeneration rate.
 		"StatusMana"        "600"     // Base mana.
 		"StatusManaRegen"     "0.67"     // Mana regeneration rate.
 	

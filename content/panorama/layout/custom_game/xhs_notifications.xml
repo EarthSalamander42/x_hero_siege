@@ -10,6 +10,8 @@
 	</scripts>
 
 	<Panel class="XHSNotificationsRoot" hittest="false">
+		<Panel id="XHSRewardFlyoutLayer" class="XHSRewardFlyoutLayer" hittest="false" />
+
 		<Panel id="XHSWaveCountdown" hittest="false" class="XHSWaveCountdown XHSNotificationHidden">
 			<Panel class="XHSWaveRingWrap">
 				<Panel class="XHSWaveRing" />

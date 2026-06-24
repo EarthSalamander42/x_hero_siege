@@ -42,6 +42,12 @@ ListenToGameEvent('npc_spawned', function(event)
 	if npc.bp_init == true then return end
 	npc.bp_init = true
 
+	local unit_name = npc:GetUnitName()
+
+	if unit_name == "npc_xhs_elf_creep_ranged_4" and CompanionCosmetics then
+		CompanionCosmetics(npc, unit_name)
+	end
+
 	local donator_level = nil
 
 	if npc.GetPlayerID then
@@ -63,8 +69,6 @@ ListenToGameEvent('npc_spawned', function(event)
 		if ply_table and ply_table.bp_rewards == 1 then
 			Battlepass:AddItemEffects(npc, ply_table)
 		end
-
-		local unit_name = npc:GetUnitName()
 
 		if Battlepass.ENTITY_MODEL_OVERRIDE[unit_name] then
 			npc:SetOriginalModel(Battlepass.ENTITY_MODEL_OVERRIDE[unit_name])

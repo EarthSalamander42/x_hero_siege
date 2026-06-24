@@ -72,6 +72,10 @@ end
 
 -- "Faceless Void and illusions of him (be it his own, enemy or allied illusions) are never disabled by any Chronosphere."
 function modifier_creature_chronosphere_aura:GetAuraEntityReject(target)
+	if IsXHSRuneUnit and IsXHSRuneUnit(target) then
+		return true
+	end
+
 	if target == self:GetCaster() then
 		return true
 	end

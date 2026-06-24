@@ -42,6 +42,7 @@ end
 
 -- new bosses system
 require('boss_scripts/boss_functions')
+require('components/devtools/init')
 
 function GameMode:OnFirstPlayerLoaded()
 	BASE_GOOD = Entities:FindByName(nil, "base_spawn")
@@ -275,6 +276,10 @@ function GameMode:InitGameMode()
 	GameMode.PrecachedVIPs = {}
 	GameMode.CheckpointsActivated = {}
 	GameMode.Zones = {}
+
+	if XHSDevTools ~= nil then
+		XHSDevTools:Init()
+	end
 end
 
 local CheckTeamDeath = 0
@@ -450,6 +455,10 @@ function GameMode:FilterExecuteOrder(filterTable)
 			or (DOTA_UNIT_ORDER_MOVE_ITEM ~= nil and orderType == DOTA_UNIT_ORDER_MOVE_ITEM)
 			or (DOTA_UNIT_ORDER_SELL_ITEM ~= nil and orderType == DOTA_UNIT_ORDER_SELL_ITEM)
 			or (DOTA_UNIT_ORDER_DROP_ITEM ~= nil and orderType == DOTA_UNIT_ORDER_DROP_ITEM)
+			or (DOTA_UNIT_ORDER_GIVE_ITEM ~= nil and orderType == DOTA_UNIT_ORDER_GIVE_ITEM)
+			or (DOTA_UNIT_ORDER_PICKUP_ITEM ~= nil and orderType == DOTA_UNIT_ORDER_PICKUP_ITEM)
+			or (DOTA_UNIT_ORDER_TAKE_ITEM_FROM_STASH ~= nil and orderType == DOTA_UNIT_ORDER_TAKE_ITEM_FROM_STASH)
+			or (DOTA_UNIT_ORDER_EJECT_ITEM_FROM_STASH ~= nil and orderType == DOTA_UNIT_ORDER_EJECT_ITEM_FROM_STASH)
 			or (DOTA_UNIT_ORDER_DISASSEMBLE_ITEM ~= nil and orderType == DOTA_UNIT_ORDER_DISASSEMBLE_ITEM)
 			or (DOTA_UNIT_ORDER_SET_ITEM_COMBINE_LOCK ~= nil and orderType == DOTA_UNIT_ORDER_SET_ITEM_COMBINE_LOCK)
 	end

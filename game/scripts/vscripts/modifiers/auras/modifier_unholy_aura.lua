@@ -9,6 +9,7 @@ function modifier_unholy_aura:GetAuraSearchTeam() return self:GetAbility():GetAb
 function modifier_unholy_aura:GetAuraSearchType() return self:GetAbility():GetAbilityTargetType() end
 function modifier_unholy_aura:GetAuraSearchFlags() return self:GetAbility():GetAbilityTargetFlags() end
 function modifier_unholy_aura:GetModifierAura() return "modifier_unholy_buff" end
+function modifier_unholy_aura:GetAuraEntityReject(target) return IsXHSRuneUnit and IsXHSRuneUnit(target) end
 
 function modifier_unholy_aura:IsHidden() return true end
 function modifier_unholy_aura:IsPurgable() return false end

@@ -1599,13 +1599,14 @@
 	}
 
 	//========================================================================================================
-	// Talisman of Evasion
+	// Orb of Wind
 	//========================================================================================================
-	"item_talisman_of_evasion_datadriven"
+	"item_orb_of_wind"
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"BaseClass"						"item_datadriven"
+		"BaseClass"						"item_lua"
+		"ScriptFile"					"items/item_orb_of_wind.lua"
 		"ID"							"2523"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"Model"							"models/props_gameplay/red_box.vmdl" 
@@ -1614,33 +1615,133 @@
 
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"						"5000"
+		"ItemCost"						"10000"
 		"ItemPurchasable"				"1"
 		"ItemShopTags"					"evasion"
-		"ItemQuality"					"rare"
-		"ItemAliases"					"talisman of evasion"
+		"ItemQuality"					"artifact"
+		"ItemAliases"					"orb of wind"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
 		"ItemDeclarations"				"DECLARE_PURCHASES_TO_TEAMMATES | DECLARE_PURCHASES_IN_SPEECH | DECLARE_PURCHASES_TO_SPECTATORS"
-		"SecretShop"					"1"
+		"ItemBaseLevel"					"1"
+		"MaxUpgradeLevel"				"3"
 
 		// Special	
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityValues"
 		{
-			"bonus_evasion"				"17"
+			"bonus_evasion"						"17"
+			"bonus_movement_speed"				"40"
+			"evasion_proc_duration"				"0"
+			"evasion_proc_cooldown"				"0"
+			"evasion_proc_movespeed_pct"		"0"
+			"evasion_proc_damage_reduction_pct"	"0"
 		}
+	}
 
-		"Modifiers"
+	//========================================================================================================
+	// Zephyr Gem
+	//========================================================================================================
+	"item_zephyr_gem"
+	{
+		"BaseClass"						"item_lua"
+		"ScriptFile"					"items/item_orb_of_wind.lua"
+		"ID"							"2552"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"Model"							"models/props_gameplay/red_box.vmdl" 
+		"Effect"						"particles/generic_gameplay/dropped_item.vpcf"
+		"AbilityTextureName"			"custom/zephyr_gem"
+
+		"ItemCost"						"20000"
+		"ItemPurchasable"				"1"
+		"ItemShopTags"					"evasion"
+		"ItemQuality"					"artifact"
+		"ItemAliases"					"zephyr gem"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
+		"ItemBaseLevel"					"2"
+		"MaxUpgradeLevel"				"3"
+
+		"AbilityValues"
 		{
-			"modifier_talisman_of_evasion_datadriven"
-			{
-				"Passive"			"1"
-				"IsHidden"			"1"
+			"bonus_evasion"						"25"
+			"bonus_movement_speed"				"70"
+			"evasion_proc_duration"				"2.0"
+			"evasion_proc_cooldown"				"8.0"
+			"evasion_proc_movespeed_pct"		"20"
+			"evasion_proc_damage_reduction_pct"	"0"
+		}
+	}
 
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_EVASION_CONSTANT"	"%bonus_evasion" 
-				}
-			}
+	//========================================================================================================
+	// Recipe: Zephyr Gem
+	//========================================================================================================
+	"item_recipe_zephyr_gem"
+	{
+		"ID"							"2553"
+		"BaseClass"             		"item_datadriven"
+		"Model"							"models/props_gameplay/recipe.vmdl"
+		"AbilityTextureName"			"custom/recipe"
+		"ItemCost"						"10000"
+		"ItemShopTags"					""
+		"ItemRecipe"					"1"
+		"ItemResult"					"item_zephyr_gem"
+		"ItemRequirements"
+		{
+			"01"						"item_orb_of_wind"
+		}
+	}
+
+	//========================================================================================================
+	// Tempest Aegis
+	//========================================================================================================
+	"item_tempest_aegis"
+	{
+		"BaseClass"						"item_lua"
+		"ScriptFile"					"items/item_orb_of_wind.lua"
+		"ID"							"2554"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"Model"							"models/props_gameplay/red_box.vmdl" 
+		"Effect"						"particles/generic_gameplay/dropped_item.vpcf"
+		"AbilityTextureName"			"custom/tempest_aegis"
+
+		"ItemCost"						"50000"
+		"ItemPurchasable"				"1"
+		"ItemShopTags"					"evasion"
+		"ItemQuality"					"epic"
+		"ItemAliases"					"tempest aegis"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
+		"SecretShop"					"1"
+		"ItemBaseLevel"					"3"
+		"MaxUpgradeLevel"				"3"
+		"AllowedInBackpack"				"0"
+
+		"AbilityValues"
+		{
+			"bonus_evasion"						"35"
+			"bonus_movement_speed"				"100"
+			"evasion_proc_duration"				"2.0"
+			"evasion_proc_cooldown"				"8.0"
+			"evasion_proc_movespeed_pct"		"20"
+			"evasion_proc_damage_reduction_pct"	"20"
+		}
+	}
+
+	//========================================================================================================
+	// Recipe: Tempest Aegis
+	//========================================================================================================
+	"item_recipe_tempest_aegis"
+	{
+		"ID"							"2555"
+		"BaseClass"             		"item_datadriven"
+		"Model"							"models/props_gameplay/recipe.vmdl"
+		"AbilityTextureName"			"custom/recipe"
+		"ItemCost"						"30000"
+		"ItemShopTags"					""
+		"ItemRecipe"					"1"
+		"SecretShop"					"1"
+		"ItemResult"					"item_tempest_aegis"
+		"ItemRequirements"
+		{
+			"01"						"item_zephyr_gem"
 		}
 	}
 
@@ -1811,7 +1912,7 @@
 
 		"AbilityCooldown"				"20.0"	
 		"AbilityCastRange"				"600"
-		"ItemCost"						"2500"
+		"ItemCost"						"10000"
 		"ItemPurchasable"				"1"
 		"ItemQuality"					"rare"
 		"ItemStackable"					"1"

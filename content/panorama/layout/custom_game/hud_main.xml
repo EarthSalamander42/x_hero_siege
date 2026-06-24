@@ -62,9 +62,12 @@
 		</Panel>
 	</Panel>
 
-	<Panel id="QuestLog" class="TopBottomFlow" hittest="false" require-composition-layer="true" always-cache-composition-layer="true">
+	<Panel id="QuestLog" class="TopBottomFlow" hittest="false" hittestchildren="true" require-composition-layer="true" always-cache-composition-layer="true">
 		<Label hittest="false" text="#DOTA_Siltbreaker_Quests" class="QuestLogHeader"/>
-		<Panel id="QuestsContainer" class="TopBottomFlow"/>
+		<Button id="QuestLogPinButton" class="QuestLogPinButton" hittest="true" onactivate="ToggleXHSQuestLogBackground();" onmouseover="$.DispatchEvent('DOTAShowTextTooltip', this, 'Keep quest panel background dark');" onmouseout="$.DispatchEvent('DOTAHideTextTooltip');">
+			<Panel class="QuestLogPinCheckMark" hittest="false"/>
+		</Button>
+		<Panel id="QuestsContainer" class="TopBottomFlow" hittest="true" hittestchildren="true"/>
 	</Panel>
 
 	<Panel id="BossHP" hittest="false">

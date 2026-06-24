@@ -38,6 +38,29 @@ end
 
 modifier_cant_die_generic = modifier_cant_die_generic or class({})
 
+local function CleanupBanehallowRevenants()
+	local units = FindUnitsInRadius(
+		DOTA_TEAM_CUSTOM_2,
+		Vector(0, 0, 0),
+		nil,
+		FIND_UNITS_EVERYWHERE,
+		DOTA_UNIT_TARGET_TEAM_FRIENDLY,
+		DOTA_UNIT_TARGET_ALL,
+		DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES + DOTA_UNIT_TARGET_FLAG_INVULNERABLE,
+		FIND_ANY_ORDER,
+		false
+	)
+
+	for _, unit in pairs(units) do
+		if unit ~= nil
+			and IsValidEntity(unit)
+			and not unit:IsNull()
+			and unit:GetUnitName() == "npc_death_revenant_banehallow" then
+			UTIL_Remove(unit)
+		end
+	end
+end
+
 function modifier_cant_die_generic:IsHidden() return true end
 
 function modifier_cant_die_generic:IsPurgable() return false end
@@ -96,14 +119,16 @@ function modifier_cant_die_generic:OnTakeDamage(event)
 					boss_count = parent.boss_count,
 					boss_bar_id = GetBossBarId and GetBossBarId(parent) or nil,
 				})
+				CleanupBanehallowRevenants()
 				GameMode.BanehallowRevenantsRemaining = nil
 				GameMode.BanehallowRevenantsTotal = nil
 			end
 
 			parent.deathStart = true
+			local bDevSandbox = XHSDevTools ~= nil and XHSDevTools:IsSandboxActive()
 
 			-- specific interaction for first 4 bosses
-			if XHS_BOSSES_TABLE[parent:GetUnitName()] and XHS_BOSSES_TABLE[parent:GetUnitName()].four_bosses_kill_count then
+			if bDevSandbox ~= true and XHS_BOSSES_TABLE[parent:GetUnitName()] and XHS_BOSSES_TABLE[parent:GetUnitName()].four_bosses_kill_count then
 				FourBossesKillCount()
 			end
 
@@ -139,7 +164,14 @@ function modifier_cant_die_generic:OnTakeDamage(event)
 						EmitGlobalSound("Loot_Drop_Stinger_Arcana")
 					end)
 
-					EndGame()
+					if bDevSandbox == true then
+						Notifications:TopToAll({ text = "Dev sandbox: Spirit Master cleared. EndGame blocked.", duration = 6.0 })
+						if XHSDevTools ~= nil then
+							XHSDevTools:PushState()
+						end
+					else
+						EndGame()
+					end
 				else -- normal spirit master boss death
 					Timers:CreateTimer(1.0, function()
 						EmitGlobalSound("Loot_Drop_Stinger_Mythical")
@@ -148,19 +180,21 @@ function modifier_cant_die_generic:OnTakeDamage(event)
 					return
 				end
 			else -- normal boss death
-				GiveTomeToAllHeroes(250)
+				if bDevSandbox ~= true then
+					GiveTomeToAllHeroes(250)
+				end
 				EmitGlobalSound("Loot_Drop_Stinger_Arcana")
 			end
 
 			-- open doors if any
 			Timers:CreateTimer(6.0, function()
-				if XHS_BOSSES_TABLE[parent:GetUnitName()] and XHS_BOSSES_TABLE[parent:GetUnitName()].doors_to_open then
+				if bDevSandbox ~= true and XHS_BOSSES_TABLE[parent:GetUnitName()] and XHS_BOSSES_TABLE[parent:GetUnitName()].doors_to_open then
 					for _, door_name in pairs(XHS_BOSSES_TABLE[parent:GetUnitName()].doors_to_open) do
 						DoEntFire(door_name, "SetAnimation", "gate_02_open", 0, nil, nil)
 					end
 				end
 
-				if XHS_BOSSES_TABLE[parent:GetUnitName()] and XHS_BOSSES_TABLE[parent:GetUnitName()].obstructions_to_disable then
+				if bDevSandbox ~= true and XHS_BOSSES_TABLE[parent:GetUnitName()] and XHS_BOSSES_TABLE[parent:GetUnitName()].obstructions_to_disable then
 					for _, obs_name in pairs(XHS_BOSSES_TABLE[parent:GetUnitName()].obstructions_to_disable) do
 						for _, obs in pairs(Entities:FindAllByName(obs_name)) do
 							obs:SetEnabled(false, true)
@@ -176,9 +210,13 @@ function modifier_cant_die_generic:OnTakeDamage(event)
 			local delay = XHS_BOSSES_TABLE[parent:GetUnitName()].func_next_delay or 0.0
 			local func = XHS_BOSSES_TABLE[parent:GetUnitName()].func_next
 
-			if delay and func then
+			if bDevSandbox ~= true and delay and func then
 				Timers:CreateTimer(delay, function()
 					func()
+				end)
+			elseif bDevSandbox == true and XHSDevTools ~= nil then
+				Timers:CreateTimer(delay or 0.0, function()
+					XHSDevTools:PushState()
 				end)
 			end
 		end

@@ -14,6 +14,9 @@ const DEFAULT_FILES = [
   'content/panorama/layout/custom_game/xhs_end_screen.xml',
   'content/panorama/styles/custom_game/xhs_end_screen.css',
   'content/panorama/scripts/custom_game/xhs_end_screen.js',
+  'content/panorama/layout/custom_game/xhs_devtools.xml',
+  'content/panorama/styles/custom_game/xhs_devtools.css',
+  'content/panorama/scripts/custom_game/xhs_devtools.js',
 ];
 
 function fail(message) {

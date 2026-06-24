@@ -392,7 +392,7 @@ function modifier_ghost_revenant_ghost_immolation:OnRefresh()
 end
 
 function modifier_ghost_revenant_ghost_immolation:GetAuraEntityReject(target)
-	return false
+	return IsXHSRuneUnit and IsXHSRuneUnit(target)
 end
 
 function modifier_ghost_revenant_ghost_immolation:GetAuraRadius()

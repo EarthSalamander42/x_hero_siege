@@ -202,9 +202,10 @@ function modifier_earthquake_aura:GetAuraSearchTeam()
 	return DOTA_UNIT_TARGET_TEAM_ENEMY
 end
 
---	function modifier_earthquake_aura:GetAuraEntityReject(target)
---		return target:IsWard() or target:IsFlyingUnit()
---	end
+function modifier_earthquake_aura:GetAuraEntityReject(target)
+	if IsXHSRuneUnit and IsXHSRuneUnit(target) then return true end
+	return target:IsWard() or target:IsFlyingUnit()
+end
 
 function modifier_earthquake_aura:GetAuraSearchFlags()
 	return DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES

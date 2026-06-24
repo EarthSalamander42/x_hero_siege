@@ -1,3 +1,35 @@
+local function RegisterXHSDevSpawn(unit)
+	if XHSDevTools ~= nil and XHSDevTools:IsSandboxActive() then
+		XHSDevTools:RegisterSpawnedUnit(unit)
+	end
+end
+
+local function FaceUnitTowardsPosition(unit, position)
+	if unit == nil or not IsValidEntity(unit) or unit:IsNull() or position == nil then return end
+
+	local direction = position - unit:GetAbsOrigin()
+	direction.z = 0
+	if direction:Length2D() <= 0 then return end
+
+	unit:SetForwardVector(direction:Normalized())
+	unit:FaceTowards(position)
+end
+
+local function SpawnBanehallowRevenant(spawnerName, banehallow, pauseDuration)
+	local spawner = Entities:FindByName(nil, spawnerName)
+	if spawner == nil then return nil end
+
+	local revenant = CreateUnitByName("npc_death_revenant_banehallow", spawner:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
+	local targetPosition = banehallow ~= nil and not banehallow:IsNull() and banehallow:GetAbsOrigin() or nil
+	FaceUnitTowardsPosition(revenant, targetPosition)
+	revenant:AddNewModifier(revenant, nil, "modifier_pause_creeps", { duration = pauseDuration, IsHidden = true })
+	revenant:AddNewModifier(revenant, nil, "modifier_invulnerable", { duration = pauseDuration, IsHidden = true }):SetStackCount(1)
+	revenant:SetRenderColor(20, 200, 20)
+	RegisterXHSDevSpawn(revenant)
+
+	return revenant
+end
+
 function StartMagtheridonArena(bConsole)
 	if bConsole == true then
 		local newZone = CDungeonZone()
@@ -17,6 +49,7 @@ function StartMagtheridonArena(bConsole)
 		local magtheridon = CreateUnitByName("npc_dota_hero_magtheridon", point_mag, true, nil, nil, DOTA_TEAM_CUSTOM_2)
 		magtheridon:SetAngles(0, 180, 0)
 		magtheridon.zone = "xhs_holdout"
+		RegisterXHSDevSpawn(magtheridon)
 
 		if difficulty == 2 then
 			magtheridon:AddNewModifier(magtheridon, nil, "modifier_ankh", { charges = 1 })
@@ -32,6 +65,7 @@ function StartMagtheridonArena(bConsole)
 			magtheridon2:AddNewModifier(magtheridon2, nil, "modifier_invulnerable", { Duration = 10, IsHidden = true })
 			magtheridon2.zone = "xhs_holdout"
 			magtheridon2.boss_count = 2
+			RegisterXHSDevSpawn(magtheridon2)
 		elseif difficulty == 5 then
 			magtheridon:AddNewModifier(magtheridon, nil, "modifier_ankh", { charges = 2 })
 
@@ -42,6 +76,7 @@ function StartMagtheridonArena(bConsole)
 			magtheridon2:AddNewModifier(magtheridon2, nil, "modifier_invulnerable", { Duration = 10, IsHidden = true })
 			magtheridon2.zone = "xhs_holdout"
 			magtheridon2.boss_count = 2
+			RegisterXHSDevSpawn(magtheridon2)
 		end
 
 		magtheridon:AddNewModifier(magtheridon, nil, "modifier_pause_creeps", { Duration = 10, IsHidden = true }):SetStackCount(1)
@@ -50,6 +85,15 @@ function StartMagtheridonArena(bConsole)
 end
 
 function EndMagtheridonArena()
+	if XHSDevTools ~= nil and XHSDevTools:IsSandboxActive() then
+		CustomGameEventManager:Send_ServerToAllClients("hide_boss_hp", { boss_count = 1 })
+		CustomGameEventManager:Send_ServerToAllClients("hide_boss_hp", { boss_count = 2 })
+		CustomGameEventManager:Send_ServerToAllClients("hide_ui", {})
+		Notifications:TopToAll({ text = "Dev sandbox: Magtheridon cleared. Door and four-boss progression blocked.", duration = 6.0 })
+		XHSDevTools:PushState()
+		return
+	end
+
 	Entities:FindByName(nil, "trigger_teleport_phase3_creeps"):Enable()
 
 	CustomGameEventManager:Send_ServerToAllClients("hide_boss_hp", { boss_count = 1 })
@@ -69,24 +113,28 @@ function EndMagtheridonArena()
 		local grom = CreateUnitByName("npc_dota_hero_grom_hellscream", Entities:FindByName(nil, "spawn_grom_hellscream"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 		grom.zone = "xhs_holdout"
 		grom:SetAngles(0, 270, 0)
+		RegisterXHSDevSpawn(grom)
 	end)
 
 	Timers:CreateTimer(4.0, function()
 		local illidan = CreateUnitByName("npc_dota_hero_illidan", Entities:FindByName(nil, "spawn_illidan"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 		illidan.zone = "xhs_holdout"
 		illidan:SetAngles(0, 0, 0)
+		RegisterXHSDevSpawn(illidan)
 	end)
 
 	Timers:CreateTimer(6.0, function()
 		local balanar = CreateUnitByName("npc_dota_hero_balanar", Entities:FindByName(nil, "spawn_balanar"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 		balanar.zone = "xhs_holdout"
 		balanar:SetAngles(0, 90, 0)
+		RegisterXHSDevSpawn(balanar)
 	end)
 
 	Timers:CreateTimer(8.0, function()
 		local proudmoore = CreateUnitByName("npc_dota_hero_proudmoore", Entities:FindByName(nil, "spawn_admiral_proudmore"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 		proudmoore.zone = "xhs_holdout"
 		proudmoore:SetAngles(0, 180, 0)
+		RegisterXHSDevSpawn(proudmoore)
 	end)
 end
 
@@ -128,6 +176,12 @@ function DarkProtectors(keys)
 end
 
 function FourBossesKillCount()
+	if XHSDevTools ~= nil and XHSDevTools:IsSandboxActive() then
+		Notifications:TopToAll({ text = "Dev sandbox: four-boss gate progression blocked.", duration = 5.0 })
+		XHSDevTools:PushState()
+		return
+	end
+
 	local teleporters = Entities:FindAllByName("trigger_teleport3")
 	FOUR_BOSSES = FOUR_BOSSES + 1
 
@@ -159,6 +213,7 @@ function StartArthasArena(bConsole)
 	arthas:AddNewModifier(arthas, nil, "modifier_invulnerable", { Duration = 7, IsHidden = true })
 	--	BossBar(arthas, "arthas")
 	arthas.zone = "xhs_holdout"
+	RegisterXHSDevSpawn(arthas)
 
 	TeleportAllHeroes("point_teleport_boss_", 7.0, 3.0)
 end
@@ -177,6 +232,7 @@ function StartBanehallowArena()
 		banehallow:AddNewModifier(banehallow, nil, "modifier_invulnerable", { Duration = 20, IsHidden = true })
 		banehallow:EmitSound("shop_jbrice_01.stinger.radiant_lose")
 		banehallow.zone = "xhs_holdout"
+		RegisterXHSDevSpawn(banehallow)
 		CustomGameEventManager:Send_ServerToAllClients("xhs_boss_counter_update", {
 			boss_count = 1,
 			label = "Ghost Revenants",
@@ -184,29 +240,19 @@ function StartBanehallowArena()
 			total = GameMode.BanehallowRevenantsTotal,
 		})
 
-		local pos = banehallow:GetAbsOrigin()
-
 		for i = 1, 6 do
 			local delay = i * 1.0
 
 			Timers:CreateTimer(delay, function()
-				local green_revenant = CreateUnitByName("npc_death_revenant_banehallow", Entities:FindByName(nil, "npc_dota_spawner_green_revenant_" .. index):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
-				green_revenant:FaceTowards(pos)
-				green_revenant:AddNewModifier(green_revenant, nil, "modifier_pause_creeps", { duration = 20 - delay, IsHidden = true })
-				green_revenant:AddNewModifier(green_revenant, nil, "modifier_invulnerable", { duration = 20 - delay, IsHidden = true }):SetStackCount(1)
-				green_revenant:SetRenderColor(20, 200, 20)
-
-				local green_revenant = CreateUnitByName("npc_death_revenant_banehallow", Entities:FindByName(nil, "npc_dota_spawner_green_revenant_" .. index + 6):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
-				green_revenant:FaceTowards(pos)
-				green_revenant:AddNewModifier(green_revenant, nil, "modifier_pause_creeps", { duration = 20 - delay, IsHidden = true })
-				green_revenant:AddNewModifier(green_revenant, nil, "modifier_invulnerable", { duration = 20 - delay, IsHidden = true }):SetStackCount(1)
-				green_revenant:SetRenderColor(20, 200, 20)
+				local pauseDuration = 20 - delay
+				SpawnBanehallowRevenant("npc_dota_spawner_green_revenant_" .. index, banehallow, pauseDuration)
+				SpawnBanehallowRevenant("npc_dota_spawner_green_revenant_" .. (index + 6), banehallow, pauseDuration)
 
 				index = index + 1
 
 				if i == 6 then
 					if banehallow then
-						banehallow:AddNewModifier(banehallow, nil, "boss_thinker_nevermore", {})
+						banehallow:AddNewModifier(banehallow, nil, "modifier_xhs_banehallow_phase3_ai", {})
 					end
 				end
 			end)
@@ -257,6 +303,7 @@ function StartLichKingArena()
 			lich_king_boss:SetMoveCapability(DOTA_UNIT_CAP_MOVE_GROUND)
 			--			BossBar(lich_king_boss, "lich_king")
 			lich_king_boss.zone = "xhs_holdout"
+			RegisterXHSDevSpawn(lich_king_boss)
 
 			for _, hero in pairs(HeroList:GetAllHeroes()) do
 				if hero:IsRealHero() and hero:GetTeam() == DOTA_TEAM_GOODGUYS then
@@ -283,6 +330,7 @@ function StartSpiritMasterArena()
 	spirit_master:AddNewModifier(spirit_master, nil, "modifier_invulnerable", { Duration = start_time, IsHidden = true })
 	spirit_master:EmitSound("SpiritMaster.StartArena")
 	spirit_master.zone = "xhs_holdout"
+	RegisterXHSDevSpawn(spirit_master)
 	ShowBossBar(spirit_master)
 
 	Timers:CreateTimer(start_time / 2, function()
@@ -319,6 +367,12 @@ function StartSecretArena(hero)
 end
 
 function EndGame()
+	if XHSDevTools ~= nil and XHSDevTools:IsSandboxActive() then
+		Notifications:TopToAll({ text = "Dev sandbox: EndGame blocked.", duration = 6.0 })
+		XHSDevTools:PushState()
+		return
+	end
+
 	GameRules:SetGameWinner(DOTA_TEAM_GOODGUYS)
 
 	--		Notifications:TopToAll({text="It's Duel Time!", duration=5.0, style={color="white"}})

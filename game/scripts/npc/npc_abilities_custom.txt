@@ -19048,7 +19048,7 @@
 		{
 			"heal"					"8000 12000 16000 20000 24000"
 			"radius"				"900"
-			"health_threshold"		"80"
+			"health_threshold"		"70"
 		}
 	}
 
@@ -21118,7 +21118,8 @@
 		"AbilityValues"
 		{
 			"aura_radius"				"900"
-			"bonus_health_regen"		"2"
+			"bonus_health_regen"		"0.75"
+			"bonus_health_regen_flat"	"75"
 		}
 
 		"OnCreated"
@@ -21175,6 +21176,7 @@
 
 				"Properties"
 				{
+					"MODIFIER_PROPERTY_HEALTH_REGEN_CONSTANT"		"%bonus_health_regen_flat"
 					"MODIFIER_PROPERTY_HEALTH_REGEN_PERCENTAGE"		"%bonus_health_regen"
 				}
 			}
@@ -21201,7 +21203,8 @@
 		{
 			"radius"					"600"
 			"aura_radius"				"600"
-			"bonus_health_regen"		"8"
+			"bonus_health_regen"		"1.5"
+			"bonus_health_regen_flat"	"200"
 		}
 
 		"OnCreated"
@@ -21258,6 +21261,7 @@
 
 				"Properties"
 				{
+					"MODIFIER_PROPERTY_HEALTH_REGEN_CONSTANT"		"%bonus_health_regen_flat"
 					"MODIFIER_PROPERTY_HEALTH_REGEN_PERCENTAGE"		"%bonus_health_regen"
 				}
 			}

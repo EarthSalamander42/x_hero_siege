@@ -441,6 +441,8 @@
 		"npc_dota_frozen_throne"                                                                 "Le Trône Gelé"
 		"DOTA_Tooltip_ability_item_rune_armor"                                                   "Rune d'Armure"
 		"DOTA_Tooltip_ability_item_rune_immolation"                                              "Rune d'Immolation"
+		"DOTA_Tooltip_modifier_xhs_rune_storm"                                                   "Rune de Tempete"
+		"DOTA_Tooltip_modifier_xhs_rune_storm_Description"                                       "Frappe periodiquement les ennemis proches avec des eclairs."
 		"DOTA_Tooltip_ability_castle_muradin_defend"                                             "Muradin Bronzebeard"
 		"DOTA_Tooltip_ability_castle_muradin_defend_Description"                                 "Release Muradin Bronzebeard to defend the castle when below 40% health. The Castle stays invulnerable for a short duration."
 		"DOTA_Tooltip_ability_castle_muradin_defend_hp_tooltip"                                  "%TRIGGER HEALTH:"

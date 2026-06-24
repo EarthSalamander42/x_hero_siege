@@ -356,6 +356,146 @@ function GameMode:OnPlayerChangedName(keys)
 end
 
 --]]
+
+local function RemoveNewestPurchasedItem(hero, itemName, itemEntIndex, minPurchaseTime)
+	if hero == nil or hero:IsNull() or itemName == nil or itemName == "" then return false end
+
+	local itemToRemove = nil
+	local newestPurchaseTime = -1
+	local fallbackItem = nil
+	local fallbackPurchaseTime = -1
+	if itemEntIndex ~= nil and itemEntIndex > 0 then
+		local eventItem = EntIndexToHScript(itemEntIndex)
+		if eventItem ~= nil and not eventItem:IsNull() then
+			local eventItemName = eventItem.GetAbilityName and eventItem:GetAbilityName() or eventItem:GetName()
+			if eventItemName == itemName then
+				itemToRemove = eventItem
+			end
+		end
+	end
+
+	if itemToRemove == nil then
+		for slot = 0, 14 do
+			local item = hero:GetItemInSlot(slot)
+			if item ~= nil and not item:IsNull() then
+				local slotItemName = item.GetAbilityName and item:GetAbilityName() or item:GetName()
+				if slotItemName == itemName then
+					local purchaseTime = item.GetPurchaseTime and item:GetPurchaseTime() or 0
+					if itemToRemove == nil or purchaseTime >= newestPurchaseTime then
+						itemToRemove = item
+						newestPurchaseTime = purchaseTime
+					end
+				end
+
+				local purchaseTime = item.GetPurchaseTime and item:GetPurchaseTime() or 0
+				if minPurchaseTime ~= nil and purchaseTime >= minPurchaseTime and purchaseTime >= fallbackPurchaseTime then
+					fallbackItem = item
+					fallbackPurchaseTime = purchaseTime
+				end
+			end
+		end
+	end
+
+	if fallbackItem ~= nil and (itemToRemove == nil or (minPurchaseTime ~= nil and newestPurchaseTime < minPurchaseTime)) then
+		itemToRemove = fallbackItem
+	end
+
+	if itemToRemove ~= nil and not itemToRemove:IsNull() then
+		hero:RemoveItem(itemToRemove)
+		return true
+	end
+
+	return false
+end
+
+ListenToGameEvent('dota_item_purchased', function(keys)
+	local playerID = tonumber(keys.PlayerID)
+	if playerID == nil or playerID < 0 then return end
+	if IsPlayerXHSReincarnating == nil or not IsPlayerXHSReincarnating(playerID) then return end
+
+	local itemName = keys.itemname or ""
+	local itemCost = tonumber(keys.itemcost) or 0
+	local itemEntIndex = tonumber(keys.item_entindex or keys.ItemEntityIndex or keys.item_ent_index) or -1
+	local purchaseGameTime = GameRules:GetGameTime()
+
+	SendErrorMessage(playerID, "#error_reincarnation_inventory_locked")
+
+	GameRules:GetGameModeEntity():SetContextThink(DoUniqueString("xhs_reincarnation_purchase_rollback"), function()
+		local hero = PlayerResource:GetSelectedHeroEntity(playerID)
+		if hero == nil or hero:IsNull() then
+			local player = PlayerResource:GetPlayer(playerID)
+			hero = player and player:GetAssignedHero() or nil
+		end
+
+		RemoveNewestPurchasedItem(hero, itemName, itemEntIndex, purchaseGameTime - 0.5)
+
+		if itemCost > 0 then
+			PlayerResource:ModifyGold(playerID, itemCost, false, DOTA_ModifyGold_Unspecified)
+		end
+
+		return nil
+	end, 0)
+end, nil)
+
+local function GetHeroFromInventoryEvent(keys)
+	local unitEntIndex = tonumber(keys.unit_entindex or keys.inventory_parent_entindex or keys.entindex or keys.entityIndex)
+	if unitEntIndex ~= nil and unitEntIndex > 0 then
+		local unit = EntIndexToHScript(unitEntIndex)
+		if unit ~= nil and not unit:IsNull() and unit.IsRealHero and unit:IsRealHero() then
+			return unit
+		end
+	end
+
+	local playerID = tonumber(keys.PlayerID or keys.player_id or keys.playerid)
+	if playerID ~= nil and playerID >= 0 then
+		local hero = nil
+		if PlayerResource:IsValidPlayerID(playerID) and PlayerResource:HasSelectedHero(playerID) then
+			hero = PlayerResource:GetSelectedHeroEntity(playerID)
+		end
+
+		if hero == nil or hero:IsNull() then
+			local player = PlayerResource:GetPlayer(playerID)
+			hero = player and player:GetAssignedHero() or nil
+		end
+
+		if hero ~= nil and not hero:IsNull() then
+			return hero
+		end
+	end
+
+	return nil
+end
+
+local function RestoreReincarnationInventoryForHero(hero)
+	if hero == nil or hero:IsNull() then return end
+	if IsPlayerXHSReincarnating == nil or RestoreXHSReincarnationInventory == nil then return end
+	if not hero.GetPlayerID or not IsPlayerXHSReincarnating(hero:GetPlayerID()) then return end
+
+	if RestoreXHSReincarnationInventory(hero) and SendXHSReincarnationInventoryLockedError ~= nil then
+		SendXHSReincarnationInventoryLockedError(hero)
+	end
+end
+
+local function OnReincarnationInventoryChanged(keys)
+	local hero = GetHeroFromInventoryEvent(keys or {})
+	if hero ~= nil then
+		RestoreReincarnationInventoryForHero(hero)
+		return
+	end
+
+	for playerID = 0, PlayerResource:GetPlayerCount() - 1 do
+		if IsPlayerXHSReincarnating ~= nil and IsPlayerXHSReincarnating(playerID) then
+			RestoreReincarnationInventoryForHero(PlayerResource:GetSelectedHeroEntity(playerID))
+		end
+	end
+end
+
+ListenToGameEvent('dota_inventory_changed', OnReincarnationInventoryChanged, nil)
+ListenToGameEvent('dota_inventory_item_changed', OnReincarnationInventoryChanged, nil)
+ListenToGameEvent('dota_inventory_item_added', OnReincarnationInventoryChanged, nil)
+ListenToGameEvent('dota_inventory_player_got_item', OnReincarnationInventoryChanged, nil)
+ListenToGameEvent('inventory_updated', OnReincarnationInventoryChanged, nil)
+
 ListenToGameEvent('dota_player_learned_ability', function(keys)
 	local player = EntIndexToHScript(keys.player)
 	local hero = player:GetAssignedHero()
@@ -1058,16 +1198,15 @@ ListenToGameEvent('entity_killed', function(keys)
 
 			MAGTHERIDON = MAGTHERIDON + 1
 
-			if MAGTHERIDON > 0 and difficulty == 1 then
-				EndMagtheridonArena()
-			elseif MAGTHERIDON > 1 and difficulty == 2 then
-				EndMagtheridonArena()
-			elseif MAGTHERIDON > 3 and difficulty == 3 then
-				EndMagtheridonArena()
-			elseif MAGTHERIDON > 3 and difficulty == 4 then
-				EndMagtheridonArena()
-			elseif MAGTHERIDON > 5 and difficulty == 5 then
-				EndMagtheridonArena()
+			if MAGTHERIDON >= GetXHSMagtheridonKillLimit(difficulty) then
+				if XHSDevTools ~= nil and XHSDevTools:IsSandboxActive() then
+					CustomGameEventManager:Send_ServerToAllClients("hide_boss_hp", { boss_count = 1 })
+					CustomGameEventManager:Send_ServerToAllClients("hide_boss_hp", { boss_count = 2 })
+					Notifications:TopToAll({ text = "Dev sandbox: Magtheridon cleared. Campaign progression blocked.", duration = 6.0 })
+					XHSDevTools:PushState()
+				else
+					EndMagtheridonArena()
+				end
 			end
 		end
 
@@ -1349,10 +1488,18 @@ end
 
 function GameMode:OnQuestStarted(zone, quest)
 	--	print("GameMode:OnQuestStarted - Quest " .. quest.szQuestName .. " in Zone " .. zone.szName .. " started.")
-	quest.bActivated = true
+	local bDevSandbox = XHSDevTools ~= nil and XHSDevTools:IsSandboxActive()
+	if quest.szQuestName == "kill_mag" then
+		quest.nCompleteLimit = GetXHSMagtheridonKillLimit()
+	end
 
-	for _, zone in pairs(GameMode.Zones) do
-		zone:OnQuestStarted(quest)
+	quest.bActivated = true
+	self:StartQuestBossVision(quest.szQuestName)
+
+	if bDevSandbox ~= true then
+		for _, zone in pairs(GameMode.Zones) do
+			zone:OnQuestStarted(quest)
+		end
 	end
 
 	if quest.Completion.Type == QUEST_EVENT_ON_DIALOG or quest.Completion.Type == QUEST_EVENT_ON_DIALOG_ALL_CONFIRMED then
@@ -1384,7 +1531,75 @@ end
 
 local XHS_QUEST_FOCUS_TARGETS = {
 	teleport_top = "npc_xhs_paladin",
+	teleport_arthas = "npc_xhs_paladin_2",
+	kill_grom = "npc_dota_hero_grom_hellscream",
+	kill_illidan = "npc_dota_hero_illidan",
+	kill_balanar = "npc_dota_hero_balanar",
+	kill_proudmoore = "npc_dota_hero_proudmoore",
 }
+
+local XHS_BOSS_QUEST_VISION_TARGETS = {
+	kill_mag = "npc_dota_hero_magtheridon",
+	kill_grom = "npc_dota_hero_grom_hellscream",
+	kill_illidan = "npc_dota_hero_illidan",
+	kill_balanar = "npc_dota_hero_balanar",
+	kill_proudmoore = "npc_dota_hero_proudmoore",
+	kill_arthas = "npc_dota_hero_arthas",
+	kill_banehallow = "npc_dota_hero_banehallow",
+	kill_lich_king = "npc_dota_boss_lich_king",
+	kill_spirit_master = "npc_dota_boss_spirit_master",
+}
+
+local XHS_BOSS_QUEST_FOW_RADIUS = 500
+local XHS_BOSS_QUEST_FOW_DURATION = 0.75
+local XHS_BOSS_QUEST_FOW_INTERVAL = 0.5
+
+local function FindXHSQuestTargetUnits(targetName)
+	local targets = {}
+	if targetName == nil then return targets end
+
+	local units = FindUnitsInRadius(
+		DOTA_TEAM_GOODGUYS,
+		Vector(0, 0, 0),
+		nil,
+		FIND_UNITS_EVERYWHERE,
+		DOTA_UNIT_TARGET_TEAM_BOTH,
+		DOTA_UNIT_TARGET_ALL,
+		DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES + DOTA_UNIT_TARGET_FLAG_INVULNERABLE,
+		FIND_ANY_ORDER,
+		false
+	)
+
+	for _, unit in pairs(units) do
+		if unit ~= nil and IsValidEntity(unit) and not unit:IsNull() and unit:IsAlive() and unit:GetUnitName() == targetName then
+			table.insert(targets, unit)
+		end
+	end
+
+	return targets
+end
+
+function GameMode:StartQuestBossVision(questName)
+	local targetName = questName and XHS_BOSS_QUEST_VISION_TARGETS[questName]
+	if targetName == nil or Timers == nil then return end
+
+	self.XHSQuestBossVisionWatchers = self.XHSQuestBossVisionWatchers or {}
+	if self.XHSQuestBossVisionWatchers[questName] == true then return end
+	self.XHSQuestBossVisionWatchers[questName] = true
+
+	Timers:CreateTimer(0.0, function()
+		if GameMode:IsQuestActive(questName) ~= true then
+			GameMode.XHSQuestBossVisionWatchers[questName] = nil
+			return nil
+		end
+
+		for _, unit in pairs(FindXHSQuestTargetUnits(targetName)) do
+			AddFOWViewer(DOTA_TEAM_GOODGUYS, unit:GetAbsOrigin(), XHS_BOSS_QUEST_FOW_RADIUS, XHS_BOSS_QUEST_FOW_DURATION, false)
+		end
+
+		return XHS_BOSS_QUEST_FOW_INTERVAL
+	end)
+end
 
 function GameMode:OnQuestFocusRequested(_, event)
 	local playerID = event and event.PlayerID
@@ -1396,9 +1611,8 @@ function GameMode:OnQuestFocusRequested(_, event)
 	if player == nil then return end
 	if GameMode:IsQuestActive(questName) ~= true then return end
 
-	local units = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_ALL, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, FIND_ANY_ORDER, false)
-	for _, unit in pairs(units) do
-		if unit ~= nil and IsValidEntity(unit) and not unit:IsNull() and unit:GetUnitName() == targetName then
+	for _, unit in pairs(FindXHSQuestTargetUnits(targetName)) do
+		if unit ~= nil and IsValidEntity(unit) and not unit:IsNull() then
 			CustomGameEventManager:Send_ServerToPlayer(player, "set_player_camera", {
 				hPosition = unit:GetAbsOrigin(),
 				iSpeed = 0.55,
@@ -1433,6 +1647,7 @@ local XHS_MAIN_QUEST_NOTIFICATIONS = {
 
 function GameMode:OnQuestCompleted(questZone, quest)
 	--	print("GameMode:OnQuestCompleted - Quest " .. quest.szQuestName .. " in Zone " .. questZone.szName .. " completed.")
+	local bDevSandbox = XHSDevTools ~= nil and XHSDevTools:IsSandboxActive()
 	local bQuestPreviouslyCompleted = quest.bCompleted == true
 	quest.nCompleted = quest.nCompleted + 1
 	if quest.nCompleted >= quest.nCompleteLimit then
@@ -1441,13 +1656,15 @@ function GameMode:OnQuestCompleted(questZone, quest)
 
 	local bZonePreviouslyCompleted = questZone.bZoneCompleted
 
-	if quest.bOptional ~= true then
+	if quest.bOptional ~= true and bDevSandbox ~= true then
 		questZone:CheckForZoneComplete()
 	end
 
 	if quest.bCompleted == true then
-		for _, zone in pairs(GameMode.Zones) do
-			zone:OnQuestCompleted(quest)
+		if bDevSandbox ~= true then
+			for _, zone in pairs(GameMode.Zones) do
+				zone:OnQuestCompleted(quest)
+			end
 		end
 
 		if quest.Completion.Type == QUEST_EVENT_ON_DIALOG or quest.Completion.Type == QUEST_EVENT_ON_DIALOG_ALL_CONFIRMED then
@@ -1460,7 +1677,7 @@ function GameMode:OnQuestCompleted(questZone, quest)
 		end
 
 		local hLogicRelay = Entities:FindByName(nil, quest.szCompletionLogicRelay)
-		if hLogicRelay then
+		if hLogicRelay and bDevSandbox ~= true then
 			hLogicRelay:Trigger()
 		end
 
@@ -1475,7 +1692,12 @@ function GameMode:OnQuestCompleted(questZone, quest)
 			end
 		end
 
-		if quest.szQuestName == "kill_dest_mag" then
+		if bDevSandbox == true then
+			Notifications:TopToAll({ text = "Dev sandbox: quest completed without campaign follow-up.", duration = 4.0 })
+			if XHSDevTools ~= nil then
+				XHSDevTools:PushState()
+			end
+		elseif quest.szQuestName == "kill_dest_mag" then
 			-- timers remains paused until magnataurs are killed
 			StartPhase2()
 		elseif quest.szQuestName == "kill_final_wave" then

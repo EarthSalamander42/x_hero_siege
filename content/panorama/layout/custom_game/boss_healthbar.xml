@@ -24,6 +24,7 @@
 							<Panel id="BossDamageLag1" class="BossDamageLag" hittest="false"/>
 							<Panel id="BossProgressFill1" class="BossProgressFill" hittest="false"/>
 							<Panel id="BossHealPulse1" class="BossHealPulse" hittest="false"/>
+							<Panel id="BossMarkers1" class="BossMarkers" hittest="false"/>
 							<Label id="BossHealth1" class="HoldoutLabelSmall BossHealthLabel" hittest="false" text=""/>
 						</Panel>
 					</Panel>
@@ -48,6 +49,7 @@
 							<Panel id="BossDamageLag2" class="BossDamageLag" hittest="false"/>
 							<Panel id="BossProgressFill2" class="BossProgressFill" hittest="false"/>
 							<Panel id="BossHealPulse2" class="BossHealPulse" hittest="false"/>
+							<Panel id="BossMarkers2" class="BossMarkers" hittest="false"/>
 							<Label id="BossHealth2" class="HoldoutLabelSmall BossHealthLabel" hittest="false" text=""/>
 						</Panel>
 					</Panel>
@@ -72,6 +74,7 @@
 							<Panel id="BossDamageLag3" class="BossDamageLag" hittest="false"/>
 							<Panel id="BossProgressFill3" class="BossProgressFill" hittest="false"/>
 							<Panel id="BossHealPulse3" class="BossHealPulse" hittest="false"/>
+							<Panel id="BossMarkers3" class="BossMarkers" hittest="false"/>
 							<Label id="BossHealth3" class="HoldoutLabelSmall BossHealthLabel" hittest="false" text=""/>
 						</Panel>
 					</Panel>
@@ -96,6 +99,7 @@
 							<Panel id="BossDamageLag4" class="BossDamageLag" hittest="false"/>
 							<Panel id="BossProgressFill4" class="BossProgressFill" hittest="false"/>
 							<Panel id="BossHealPulse4" class="BossHealPulse" hittest="false"/>
+							<Panel id="BossMarkers4" class="BossMarkers" hittest="false"/>
 							<Label id="BossHealth4" class="HoldoutLabelSmall BossHealthLabel" hittest="false" text=""/>
 						</Panel>
 					</Panel>

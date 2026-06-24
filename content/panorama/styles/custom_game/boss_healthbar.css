@@ -91,6 +91,11 @@
 	margin: 0px 6px 8px 6px;
 }
 
+.MultiBossBars .HealthBarContainer.CenteredBossBar
+{
+	margin-left: 332px;
+}
+
 .HealthBarContainer.HasBossCounter
 {
 	height: 96px;
@@ -172,6 +177,43 @@
 	border-radius: 2px;
 	opacity: 0;
 	z-index: 3;
+}
+
+.BossMarkers
+{
+	width: 100%;
+	height: 100%;
+	overflow: noclip;
+	z-index: 5;
+}
+
+.BossThresholdMarker
+{
+	ignore-parent-flow: true;
+	width: 10px;
+	height: 24px;
+	margin-top: -4px;
+	margin-left: -5px;
+	background-color: gradient( linear, 0% 0%, 0% 100%, from( #f8fff6 ), color-stop( .46, #a5ffca ), to( #31d17a ) );
+	border: 1px solid #dffff0;
+	border-radius: 1px;
+	box-shadow: #95ffc466 0px 0px 8px 0px, fill #000000aa 0px 0px 2px 0px;
+	tooltip-position: top;
+	transition-property: opacity, brightness, transform;
+	transition-duration: .18s;
+}
+
+.BossThresholdMarker.CompanionMarker
+{
+	background-color: gradient( linear, 0% 0%, 0% 100%, from( #ffffff ), color-stop( .42, #b7ffd4 ), to( #37d97e ) );
+	border-color: #bfffd8;
+}
+
+.BossThresholdMarker.Triggered
+{
+	opacity: .32;
+	brightness: .55;
+	transform: scaleY( .78 );
 }
 
 .BossDamaged
@@ -360,6 +402,10 @@
 
 .AspectRatio4x3 .MultiBossBars .HealthBarContainer {
 	width: 520px;
+}
+
+.AspectRatio4x3 .MultiBossBars .HealthBarContainer.CenteredBossBar {
+	margin-left: 272px;
 }
 
 .AspectRatio4x3 .BossBarMain {
