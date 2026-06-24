@@ -4,6 +4,8 @@ local function RegisterXHSDevSpawn(unit)
 	end
 end
 
+require("boss_scripts/phase3_ai/magtheridon")
+
 local function FaceUnitTowardsPosition(unit, position)
 	if unit == nil or not IsValidEntity(unit) or unit:IsNull() or position == nil then return end
 
@@ -30,6 +32,18 @@ local function SpawnBanehallowRevenant(spawnerName, banehallow, pauseDuration)
 	return revenant
 end
 
+local function SetupMagtheridonPhase3Boss(magtheridon, bossCount)
+	if magtheridon == nil then return end
+
+	magtheridon.boss_count = bossCount or magtheridon.boss_count or 1
+	magtheridon.zone = "xhs_holdout"
+	RegisterXHSDevSpawn(magtheridon)
+
+	if XHSMagtheridon_AttachPhase3AI ~= nil then
+		XHSMagtheridon_AttachPhase3AI(magtheridon)
+	end
+end
+
 function StartMagtheridonArena(bConsole)
 	if bConsole == true then
 		local newZone = CDungeonZone()
@@ -48,8 +62,6 @@ function StartMagtheridonArena(bConsole)
 	Timers:CreateTimer(delay, function()
 		local magtheridon = CreateUnitByName("npc_dota_hero_magtheridon", point_mag, true, nil, nil, DOTA_TEAM_CUSTOM_2)
 		magtheridon:SetAngles(0, 180, 0)
-		magtheridon.zone = "xhs_holdout"
-		RegisterXHSDevSpawn(magtheridon)
 
 		if difficulty == 2 then
 			magtheridon:AddNewModifier(magtheridon, nil, "modifier_ankh", { charges = 1 })
@@ -63,9 +75,7 @@ function StartMagtheridonArena(bConsole)
 			magtheridon2:AddNewModifier(magtheridon2, nil, "modifier_ankh", { charges = 1 })
 			magtheridon2:AddNewModifier(magtheridon2, nil, "modifier_pause_creeps", { Duration = 10, IsHidden = true }):SetStackCount(1)
 			magtheridon2:AddNewModifier(magtheridon2, nil, "modifier_invulnerable", { Duration = 10, IsHidden = true })
-			magtheridon2.zone = "xhs_holdout"
-			magtheridon2.boss_count = 2
-			RegisterXHSDevSpawn(magtheridon2)
+			SetupMagtheridonPhase3Boss(magtheridon2, 2)
 		elseif difficulty == 5 then
 			magtheridon:AddNewModifier(magtheridon, nil, "modifier_ankh", { charges = 2 })
 
@@ -74,11 +84,10 @@ function StartMagtheridonArena(bConsole)
 			magtheridon2:AddNewModifier(magtheridon2, nil, "modifier_ankh", { charges = 2 })
 			magtheridon2:AddNewModifier(magtheridon2, nil, "modifier_pause_creeps", { Duration = 10, IsHidden = true }):SetStackCount(1)
 			magtheridon2:AddNewModifier(magtheridon2, nil, "modifier_invulnerable", { Duration = 10, IsHidden = true })
-			magtheridon2.zone = "xhs_holdout"
-			magtheridon2.boss_count = 2
-			RegisterXHSDevSpawn(magtheridon2)
+			SetupMagtheridonPhase3Boss(magtheridon2, 2)
 		end
 
+		SetupMagtheridonPhase3Boss(magtheridon, 1)
 		magtheridon:AddNewModifier(magtheridon, nil, "modifier_pause_creeps", { Duration = 10, IsHidden = true }):SetStackCount(1)
 		magtheridon:AddNewModifier(magtheridon, nil, "modifier_invulnerable", { Duration = 10, IsHidden = true })
 	end)
@@ -88,6 +97,14 @@ function EndMagtheridonArena()
 	if XHSDevTools ~= nil and XHSDevTools:IsSandboxActive() then
 		CustomGameEventManager:Send_ServerToAllClients("hide_boss_hp", { boss_count = 1 })
 		CustomGameEventManager:Send_ServerToAllClients("hide_boss_hp", { boss_count = 2 })
+		if XHSMagtheridon_HideBossTimer ~= nil then
+			XHSMagtheridon_HideBossTimer(1)
+			XHSMagtheridon_HideBossTimer(2)
+		end
+		if XHSMagtheridon_HideFragmentCounter ~= nil then
+			XHSMagtheridon_HideFragmentCounter(1)
+			XHSMagtheridon_HideFragmentCounter(2)
+		end
 		CustomGameEventManager:Send_ServerToAllClients("hide_ui", {})
 		Notifications:TopToAll({ text = "Dev sandbox: Magtheridon cleared. Door and four-boss progression blocked.", duration = 6.0 })
 		XHSDevTools:PushState()
@@ -98,6 +115,14 @@ function EndMagtheridonArena()
 
 	CustomGameEventManager:Send_ServerToAllClients("hide_boss_hp", { boss_count = 1 })
 	CustomGameEventManager:Send_ServerToAllClients("hide_boss_hp", { boss_count = 2 })
+	if XHSMagtheridon_HideBossTimer ~= nil then
+		XHSMagtheridon_HideBossTimer(1)
+		XHSMagtheridon_HideBossTimer(2)
+	end
+	if XHSMagtheridon_HideFragmentCounter ~= nil then
+		XHSMagtheridon_HideFragmentCounter(1)
+		XHSMagtheridon_HideFragmentCounter(2)
+	end
 	CustomGameEventManager:Send_ServerToAllClients("hide_ui", {})
 
 	Notifications:TopToAll({ text = "Magtheridon has been killed! Door opened.", style = { color = "white" }, duration = 10.0 })

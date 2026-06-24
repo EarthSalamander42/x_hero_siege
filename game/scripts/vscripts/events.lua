@@ -1202,6 +1202,14 @@ ListenToGameEvent('entity_killed', function(keys)
 				if XHSDevTools ~= nil and XHSDevTools:IsSandboxActive() then
 					CustomGameEventManager:Send_ServerToAllClients("hide_boss_hp", { boss_count = 1 })
 					CustomGameEventManager:Send_ServerToAllClients("hide_boss_hp", { boss_count = 2 })
+					if XHSMagtheridon_HideBossTimer ~= nil then
+						XHSMagtheridon_HideBossTimer(1)
+						XHSMagtheridon_HideBossTimer(2)
+					end
+					if XHSMagtheridon_HideFragmentCounter ~= nil then
+						XHSMagtheridon_HideFragmentCounter(1)
+						XHSMagtheridon_HideFragmentCounter(2)
+					end
 					Notifications:TopToAll({ text = "Dev sandbox: Magtheridon cleared. Campaign progression blocked.", duration = 6.0 })
 					XHSDevTools:PushState()
 				else

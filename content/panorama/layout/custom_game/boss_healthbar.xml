@@ -33,6 +33,13 @@
 					<Label id="BossCounterLabel1" class="BossCounterLabel" hittest="false" text=""/>
 					<Label id="BossCounterValue1" class="BossCounterValue" hittest="false" text=""/>
 				</Panel>
+				<Panel id="BossTimer1" class="BossTimer" hittest="false">
+					<Label id="BossTimerLabel1" class="BossTimerLabel" hittest="false" text=""/>
+					<Label id="BossTimerValue1" class="BossTimerValue" hittest="false" text=""/>
+					<Panel id="BossTimerTrack1" class="BossTimerTrack" hittest="false">
+						<Panel id="BossTimerFill1" class="BossTimerFill" hittest="false"/>
+					</Panel>
+				</Panel>
 			</Panel>
 
 			<Panel id="BossHP2" class="HealthBarContainer" hittest="false">
@@ -57,6 +64,13 @@
 				<Panel id="BossCounter2" class="BossCounter" hittest="false">
 					<Label id="BossCounterLabel2" class="BossCounterLabel" hittest="false" text=""/>
 					<Label id="BossCounterValue2" class="BossCounterValue" hittest="false" text=""/>
+				</Panel>
+				<Panel id="BossTimer2" class="BossTimer" hittest="false">
+					<Label id="BossTimerLabel2" class="BossTimerLabel" hittest="false" text=""/>
+					<Label id="BossTimerValue2" class="BossTimerValue" hittest="false" text=""/>
+					<Panel id="BossTimerTrack2" class="BossTimerTrack" hittest="false">
+						<Panel id="BossTimerFill2" class="BossTimerFill" hittest="false"/>
+					</Panel>
 				</Panel>
 			</Panel>
 
@@ -83,6 +97,13 @@
 					<Label id="BossCounterLabel3" class="BossCounterLabel" hittest="false" text=""/>
 					<Label id="BossCounterValue3" class="BossCounterValue" hittest="false" text=""/>
 				</Panel>
+				<Panel id="BossTimer3" class="BossTimer" hittest="false">
+					<Label id="BossTimerLabel3" class="BossTimerLabel" hittest="false" text=""/>
+					<Label id="BossTimerValue3" class="BossTimerValue" hittest="false" text=""/>
+					<Panel id="BossTimerTrack3" class="BossTimerTrack" hittest="false">
+						<Panel id="BossTimerFill3" class="BossTimerFill" hittest="false"/>
+					</Panel>
+				</Panel>
 			</Panel>
 
 			<Panel id="BossHP4" class="HealthBarContainer" hittest="false">
@@ -107,6 +128,13 @@
 				<Panel id="BossCounter4" class="BossCounter" hittest="false">
 					<Label id="BossCounterLabel4" class="BossCounterLabel" hittest="false" text=""/>
 					<Label id="BossCounterValue4" class="BossCounterValue" hittest="false" text=""/>
+				</Panel>
+				<Panel id="BossTimer4" class="BossTimer" hittest="false">
+					<Label id="BossTimerLabel4" class="BossTimerLabel" hittest="false" text=""/>
+					<Label id="BossTimerValue4" class="BossTimerValue" hittest="false" text=""/>
+					<Panel id="BossTimerTrack4" class="BossTimerTrack" hittest="false">
+						<Panel id="BossTimerFill4" class="BossTimerFill" hittest="false"/>
+					</Panel>
 				</Panel>
 			</Panel>
 		</Panel>

@@ -21,6 +21,10 @@ function GetBossPanels(index) {
 		counter: $("#BossCounter" + index),
 		counterLabel: $("#BossCounterLabel" + index),
 		counterValue: $("#BossCounterValue" + index),
+		timer: $("#BossTimer" + index),
+		timerLabel: $("#BossTimerLabel" + index),
+		timerValue: $("#BossTimerValue" + index),
+		timerFill: $("#BossTimerFill" + index),
 	};
 }
 
@@ -98,6 +102,8 @@ function ResetBossPanels(index, panels) {
 
 	panels.container.style.visibility = "collapse";
 	panels.container.RemoveClass("HasBossCounter");
+	panels.container.RemoveClass("HasBossTimer");
+	panels.container.RemoveClass("BossTimerStyleMagtheridon");
 	panels.container.RemoveClass("BossDamaged");
 	panels.container.RemoveClass("BossHealed");
 	panels.container.RemoveClass("BossHeavyDamage");
@@ -124,6 +130,15 @@ function ResetBossPanels(index, panels) {
 	if (panels.counterValue) {
 		panels.counterValue.text = "";
 	}
+	if (panels.timerLabel) {
+		panels.timerLabel.text = "";
+	}
+	if (panels.timerValue) {
+		panels.timerValue.text = "";
+	}
+	if (panels.timerFill) {
+		panels.timerFill.style.width = "0%";
+	}
 	SetBossBarMarkers(panels, null);
 
 	delete BossBarState[index];
@@ -146,6 +161,13 @@ function FormatBossHealth(value) {
 
 function FormatBossRatio(ratio) {
 	return Math.round(Math.max(0, Math.min(1, ratio)) * 1000) / 10 + "%";
+}
+
+function FormatBossTimerSeconds(value) {
+	var seconds = Math.max(0, Math.ceil(Number(value) || 0));
+	var minutes = Math.floor(seconds / 60);
+	var rest = seconds % 60;
+	return minutes + ":" + (rest < 10 ? "0" : "") + rest;
 }
 
 function FormatBossName(unitName) {
@@ -311,7 +333,12 @@ function SetBossBarMarkers(panels, markers) {
 		panel.SetPanelEvent("onmouseover", (function (markerPanel, markerData, markerPct) {
 			return function () {
 				var label = markerData.label || "Boss mechanic";
-				$.DispatchEvent("DOTAShowTextTooltip", markerPanel, label + " at " + markerPct + "%");
+				var details = markerData.description || markerData.details || markerData.tooltip || "";
+				var text = label + " at " + Math.round(markerPct) + "%";
+				if (details) {
+					text = text + "\n" + details;
+				}
+				$.DispatchEvent("DOTAShowTextTooltip", markerPanel, text);
 			};
 		})(panel, marker, pct));
 		panel.SetPanelEvent("onmouseout", function () {
@@ -434,10 +461,58 @@ function HideBossCounter(args) {
 	}
 }
 
+function UpdateBossTimer(args) {
+	var index = GetBossBarIndex(args);
+	var panels = GetBossPanels(index);
+	if (!panels.container || !panels.timer || !panels.timerLabel || !panels.timerValue || !panels.timerFill) {
+		return;
+	}
+
+	if (!ShouldAcceptBossBarEvent(index, args)) {
+		return;
+	}
+
+	var remaining = Math.max(0, Number(args.remaining) || 0);
+	var duration = Math.max(1, Number(args.duration) || 1);
+	var ratio = Math.max(0, Math.min(1, remaining / duration));
+
+	panels.timerLabel.text = args.label || "Timer";
+	panels.timerValue.text = FormatBossTimerSeconds(remaining);
+	panels.timerFill.style.width = FormatBossRatio(ratio);
+	panels.container.AddClass("HasBossTimer");
+	panels.container.SetHasClass("BossTimerStyleMagtheridon", args.style === "magtheridon");
+	UpdateBossBarLayout();
+}
+
+function HideBossTimer(args) {
+	var index = GetBossBarIndex(args);
+	var panels = GetBossPanels(index);
+	if (!ShouldAcceptBossBarEvent(index, args)) {
+		return;
+	}
+
+	if (panels.container) {
+		panels.container.RemoveClass("HasBossTimer");
+		panels.container.RemoveClass("BossTimerStyleMagtheridon");
+	}
+	if (panels.timerLabel) {
+		panels.timerLabel.text = "";
+	}
+	if (panels.timerValue) {
+		panels.timerValue.text = "";
+	}
+	if (panels.timerFill) {
+		panels.timerFill.style.width = "0%";
+	}
+	UpdateBossBarLayout();
+}
+
 (function () {
 	GameEvents.Subscribe("show_boss_hp", ShowBossBar);
 	GameEvents.Subscribe("update_boss_hp", UpdateBossBar);
 	GameEvents.Subscribe("hide_boss_hp", HideBossBar);
 	GameEvents.Subscribe("xhs_boss_counter_update", UpdateBossCounter);
 	GameEvents.Subscribe("xhs_boss_counter_hide", HideBossCounter);
+	GameEvents.Subscribe("xhs_boss_timer_update", UpdateBossTimer);
+	GameEvents.Subscribe("xhs_boss_timer_hide", HideBossTimer);
 })();

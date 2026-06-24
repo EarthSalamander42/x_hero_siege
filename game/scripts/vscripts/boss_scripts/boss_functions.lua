@@ -6,6 +6,12 @@
 ---------------------
 LinkLuaModifier("boss_thinker_nevermore", "boss_scripts/boss_thinker_nevermore.lua", LUA_MODIFIER_MOTION_NONE )
 LinkLuaModifier("modifier_xhs_banehallow_phase3_ai", "boss_scripts/phase3_ai/banehallow.lua", LUA_MODIFIER_MOTION_NONE )
+LinkLuaModifier("modifier_xhs_magtheridon_phase3_ai", "boss_scripts/phase3_ai/magtheridon.lua", LUA_MODIFIER_MOTION_NONE )
+LinkLuaModifier("modifier_xhs_magtheridon_fragment", "boss_scripts/phase3_ai/magtheridon.lua", LUA_MODIFIER_MOTION_NONE )
+LinkLuaModifier("modifier_xhs_magtheridon_empower", "boss_scripts/phase3_ai/magtheridon.lua", LUA_MODIFIER_MOTION_NONE )
+LinkLuaModifier("modifier_xhs_magtheridon_twin_lockout", "boss_scripts/phase3_ai/magtheridon.lua", LUA_MODIFIER_MOTION_NONE )
+LinkLuaModifier("modifier_xhs_magtheridon_slow", "boss_scripts/phase3_ai/magtheridon.lua", LUA_MODIFIER_MOTION_NONE )
+LinkLuaModifier("modifier_xhs_magtheridon_cast_lock", "boss_scripts/phase3_ai/magtheridon.lua", LUA_MODIFIER_MOTION_NONE )
 
 ---------------------
 -- Other stuff

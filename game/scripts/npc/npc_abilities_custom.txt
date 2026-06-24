@@ -21865,6 +21865,176 @@
 	//=================================================================================================================
 	// Magtheridon: Firestorm
 	//=================================================================================================================
+	"xhs_magtheridon_brutal_slam"
+	{
+		"BaseClass"						"ability_lua"
+		"ScriptFile"					"boss_scripts/phase3_ai/magtheridon_abilities.lua"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_HIDDEN"
+		"AbilityTextureName"			"abyssal_underlord_atrophy_aura"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_PHYSICAL"
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_YES"
+		"AbilityCastAnimation"			"ACT_DOTA_ATTACK"
+		"AbilityCastPoint"				"0.85 0.75 0.70 0.65 0.60"
+		"AbilityCooldown"				"0.5"
+		"AbilityManaCost"				"0"
+		"MaxLevel"						"5"
+		"AbilityValues"
+		{
+			"cast_point"					"0.85 0.75 0.70 0.65 0.60"
+			"radius"						"170"
+			"attack_damage_pct"			"55"
+		}
+	}
+
+	"xhs_magtheridon_fel_stomp"
+	{
+		"BaseClass"						"ability_lua"
+		"ScriptFile"					"boss_scripts/phase3_ai/magtheridon_abilities.lua"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityTextureName"			"custom/brewmaster_thunder_clap_new"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_PURE"
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_YES"
+		"AbilityCastAnimation"			"ACT_DOTA_CAST_ABILITY_2"
+		"AbilityCastPoint"				"1.65 1.50 1.40 1.30 1.25"
+		"AbilityCooldown"				"0.5"
+		"AbilityManaCost"				"0"
+		"MaxLevel"						"5"
+		"AbilityValues"
+		{
+			"cast_point"					"1.65 1.50 1.40 1.30 1.25"
+			"radius"						"500 600 700 800 900"
+			"damage"						"25000 50000 75000 100000 125000"
+			"damage_pct"					"82"
+			"slow_duration"				"5.00 4.00 3.60 3.28 2.88"
+			"movement_slow"				"-35"
+			"attack_slow"					"-220"
+		}
+	}
+
+	"xhs_magtheridon_targeted_firestorms"
+	{
+		"BaseClass"						"ability_lua"
+		"ScriptFile"					"boss_scripts/phase3_ai/magtheridon_abilities.lua"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityTextureName"			"abyssal_underlord_firestorm"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_PURE"
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_YES"
+		"AbilityCastAnimation"			"ACT_DOTA_CAST_ABILITY_1"
+		"AbilityCastPoint"				"1.55 1.40 1.30 1.20 1.10"
+		"AbilityCooldown"				"0.5"
+		"AbilityManaCost"				"0"
+		"MaxLevel"						"5"
+		"AbilityValues"
+		{
+			"cast_point"					"1.55 1.40 1.30 1.20 1.10"
+			"radius"						"245"
+			"target_count"				"3"
+			"waves"						"2"
+			"wave_interval"				"0.55"
+			"target_stagger"				"0.18"
+			"wave_damage"					"2000 4000 6000 8000 10000"
+			"damage_pct"					"58"
+		}
+	}
+
+	"xhs_magtheridon_fel_fissure"
+	{
+		"BaseClass"						"ability_lua"
+		"ScriptFile"					"boss_scripts/phase3_ai/magtheridon_abilities.lua"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityTextureName"			"abyssal_underlord_firestorm"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_PURE"
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_YES"
+		"AbilityCastAnimation"			"ACT_DOTA_CAST_ABILITY_1"
+		"AbilityCastPoint"				"1.50 1.35 1.25 1.15 1.05"
+		"AbilityCooldown"				"0.5"
+		"AbilityManaCost"				"0"
+		"MaxLevel"						"5"
+		"AbilityValues"
+		{
+			"cast_point"					"1.50 1.35 1.25 1.15 1.05"
+			"radius"						"175"
+			"impact_count"				"7"
+			"start_distance"				"260"
+			"spacing"						"150"
+			"impact_stagger"				"0.04"
+			"wave_damage"					"2000 4000 6000 8000 10000"
+			"damage_pct"					"72"
+		}
+	}
+
+	"xhs_magtheridon_infernal_rings"
+	{
+		"BaseClass"						"ability_lua"
+		"ScriptFile"					"boss_scripts/phase3_ai/magtheridon_abilities.lua"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityTextureName"			"abyssal_underlord_pit_of_malice"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_PURE"
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_YES"
+		"AbilityCastAnimation"			"ACT_DOTA_CAST_ABILITY_3"
+		"AbilityCastPoint"				"1.60 1.45 1.35 1.25 1.15"
+		"AbilityCooldown"				"0.5"
+		"AbilityManaCost"				"0"
+		"MaxLevel"						"5"
+		"AbilityValues"
+		{
+			"cast_point"					"1.60 1.45 1.35 1.25 1.15"
+			"radius"						"185"
+			"inner_ring_radius"			"520"
+			"outer_ring_radius"			"850"
+			"inner_count"					"10"
+			"outer_count"					"14"
+			"impact_stagger"				"0.12"
+			"wave_damage"					"2000 4000 6000 8000 10000"
+			"damage_pct"					"70"
+		}
+	}
+
+	"xhs_magtheridon_demonic_howl"
+	{
+		"BaseClass"						"ability_lua"
+		"ScriptFile"					"boss_scripts/phase3_ai/magtheridon_abilities.lua"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityTextureName"			"custom/holdout_howl_of_terror"
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+		"AbilityUnitTargetFlags"		"DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES"
+		"AbilityCastAnimation"			"ACT_DOTA_CAST_ABILITY_4"
+		"AbilityCastPoint"				"1.70 1.50 1.40 1.30 1.20"
+		"AbilityCooldown"				"0.5"
+		"AbilityManaCost"				"0"
+		"MaxLevel"						"5"
+		"AbilityValues"
+		{
+			"cast_point"					"1.70 1.50 1.40 1.30 1.20"
+			"radius"						"1000"
+			"duration"					"10.00 8.00 7.20 6.56 5.76"
+			"movement_slow"				"-18"
+			"attack_slow"					"-120"
+		}
+	}
+
+	"xhs_magtheridon_rupture"
+	{
+		"BaseClass"						"ability_lua"
+		"ScriptFile"					"boss_scripts/phase3_ai/magtheridon_abilities.lua"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityTextureName"			"modifiers/ankh_of_reincarnation"
+		"MaxLevel"						"5"
+		"AbilityValues"
+		{
+			"reincarnate_time"			"20"
+			"medium_fragments"			"8"
+			"small_fragments"			"16"
+			"empower_fragments_per_stack"	"3"
+			"max_empower_stacks"			"10"
+			"empower_duration"			"35"
+			"damage_per_stack"			"5"
+			"armor_per_stack"			"5"
+			"model_scale_per_stack"		"3"
+		}
+	}
+
 	"creature_firestorm"
 	{
 		// General
@@ -23555,8 +23725,13 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"ability_lua"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"ScriptFile"					"boss_scripts/phase3_ai/banehallow_abilities.lua"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_HIDDEN"
 		"AbilityTextureName"			"custom/ragna_blade"
+		"AbilityCastAnimation"			"ACT_DOTA_VICTORY"
+		"AbilityCastPoint"				"3.125 2.4 2.07 1.804 1.44"
+		"AbilityCooldown"				"0.5"
+		"AbilityManaCost"				"0"
 		"MaxLevel"						"5"
 
 		// Special
@@ -23577,8 +23752,13 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"ability_lua"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"ScriptFile"					"boss_scripts/phase3_ai/banehallow_abilities.lua"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_HIDDEN"
 		"AbilityTextureName"			"custom/meteorain"
+		"AbilityCastAnimation"			"ACT_DOTA_IDLE_RARE"
+		"AbilityCastPoint"				"3.75 2.5 1.8 1.23 0.72"
+		"AbilityCooldown"				"0.5"
+		"AbilityManaCost"				"0"
 		"MaxLevel"						"5"
 
 		// Special
@@ -23602,8 +23782,13 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"ability_lua"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"ScriptFile"					"boss_scripts/phase3_ai/banehallow_abilities.lua"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_HIDDEN"
 		"AbilityTextureName"			"nevermore_shadowraze2"
+		"AbilityCastAnimation"			"ACT_DOTA_RAZE_2"
+		"AbilityCastPoint"				"1.875 1.45 1.26 1.107 0.9"
+		"AbilityCooldown"				"0.5"
+		"AbilityManaCost"				"0"
 		"MaxLevel"						"5"
 
 		// Special
@@ -23625,10 +23810,14 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"ability_lua"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_HIDDEN"
 		"AbilityTextureName"			"custom/soul_harvest"
-		"ScriptFile"					"boss_scripts/boss_abilities/soul_harvest.lua"
-		"MaxLevel"						"1"
+		"ScriptFile"					"boss_scripts/phase3_ai/banehallow_abilities.lua"
+		"AbilityCastAnimation"			"ACT_DOTA_ATTACK"
+		"AbilityCastPoint"				"0.5"
+		"AbilityCooldown"				"0.5"
+		"AbilityManaCost"				"0"
+		"MaxLevel"						"5"
 	}
 
 	//=================================================================================================================
@@ -23639,9 +23828,14 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"ability_lua"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"ScriptFile"					"boss_scripts/phase3_ai/banehallow_abilities.lua"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_HIDDEN"
 		"AbilityTextureName"			"custom/nevermore"
-		"MaxLevel"						"1"
+		"AbilityCastAnimation"			"ACT_DOTA_VERSUS"
+		"AbilityCastPoint"				"3.75 3.0 2.7 2.46 2.16"
+		"AbilityCooldown"				"0.5"
+		"AbilityManaCost"				"0"
+		"MaxLevel"						"5"
 
 		"AbilityValues"
 		{
@@ -23658,10 +23852,14 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"ability_lua"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_HIDDEN"
 		"AbilityTextureName"			"nevermore_requiem"
-		"ScriptFile"					"boss_scripts/boss_abilities/requiem_of_souls.lua"
-		"MaxLevel"						"1"
+		"ScriptFile"					"boss_scripts/phase3_ai/banehallow_abilities.lua"
+		"AbilityCastAnimation"			"ACT_DOTA_RAZE_3"
+		"AbilityCastPoint"				"4.375 3.0 3.15 2.46 1.44"
+		"AbilityCooldown"				"0.5"
+		"AbilityManaCost"				"0"
+		"MaxLevel"						"5"
 
 		"AbilityValues"
 		{

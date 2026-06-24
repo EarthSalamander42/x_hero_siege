@@ -101,6 +101,16 @@
 	height: 96px;
 }
 
+.HealthBarContainer.HasBossTimer
+{
+	height: 99px;
+}
+
+.HealthBarContainer.HasBossCounter.HasBossTimer
+{
+	height: 121px;
+}
+
 .BossHeader
 {
 	width: 100%;
@@ -388,6 +398,99 @@
 	animation-iteration-count: 1;
 }
 
+.BossTimer
+{
+	width: 578px;
+	height: 20px;
+	margin-left: 54px;
+	margin-top: 2px;
+	visibility: collapse;
+	opacity: 0;
+	flow-children: none;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #081810f0 ), color-stop( .55, #11351ff0 ), to( #06121e00 ) );
+	border-left: 2px solid #7eff9566;
+	transition-property: opacity, brightness;
+	transition-duration: .18s;
+}
+
+.MultiBossBars .BossTimer
+{
+	width: 528px;
+}
+
+.HasBossTimer .BossTimer
+{
+	visibility: visible;
+	opacity: 1;
+}
+
+.BossTimerLabel
+{
+	width: 430px;
+	height: 18px;
+	margin-left: 7px;
+	color: #caffbd;
+	font-size: 13px;
+	font-weight: semi-bold;
+	text-align: left;
+	text-shadow: 0px 1px 3px #000000;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	z-index: 2;
+}
+
+.BossTimerValue
+{
+	width: 58px;
+	height: 18px;
+	horizontal-align: right;
+	margin-right: 7px;
+	color: #f3ffe8;
+	font-size: 13px;
+	font-weight: bold;
+	text-align: right;
+	text-shadow: 0px 0px 7px #91ff5e70, 0px 1px 3px #000000;
+	z-index: 2;
+}
+
+.MultiBossBars .BossTimerLabel
+{
+	width: 380px;
+}
+
+.BossTimerTrack
+{
+	ignore-parent-flow: true;
+	width: 100%;
+	height: 3px;
+	vertical-align: bottom;
+	background-color: #07130cc0;
+	z-index: 1;
+}
+
+.BossTimerFill
+{
+	width: 0%;
+	height: 100%;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #3bff5d ), color-stop( .55, #caff72 ), to( #fff6b0 ) );
+	box-shadow: #82ff4f66 0px 0px 7px 0px;
+	transition-property: width;
+	transition-duration: .18s;
+	transition-timing-function: linear;
+}
+
+.BossTimerStyleMagtheridon .BossTimer
+{
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #06150bf0 ), color-stop( .45, #103b18ee ), to( #07120a00 ) );
+	border-left-color: #74ff5f88;
+	box-shadow: #53d63b30 0px 0px 10px 0px;
+}
+
+.BossTimerStyleMagtheridon .BossTimerFill
+{
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #34e95d ), color-stop( .48, #8fff42 ), to( #f7ff9b ) );
+}
+
 .AspectRatio16x10 #DiretidePanel {
 	margin-top: 96px;
 }
@@ -418,6 +521,22 @@
 
 .AspectRatio4x3 .BossCounter {
 	width: 448px;
+}
+
+.AspectRatio4x3 .BossTimer {
+	width: 448px;
+}
+
+.AspectRatio4x3 .BossTimerLabel {
+	width: 300px;
+}
+
+.AspectRatio4x3 .MultiBossBars .BossTimer {
+	width: 408px;
+}
+
+.AspectRatio4x3 .MultiBossBars .BossTimerLabel {
+	width: 260px;
 }
 
 .AspectRatio4x3 .MultiBossBars .BossCounter {

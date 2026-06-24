@@ -15,13 +15,17 @@
 		"LeavesCorpse"				"0"
 		"UseAI"						"2"
 
-		"Ability1"					"creature_firestorm"
-		"Ability2"					"creature_thunder_clap"
-		"Ability3"					"xhs_creeps_phase_2_unholy_aura"
-		"Ability4"					"command_aura"
-		"Ability5"					"howl_of_terror"
-		"Ability6"					"necronomicon_warrior_sight"
-		"Ability7"					"boss_health"
+		"Ability1"					"xhs_magtheridon_brutal_slam"
+		"Ability2"					"xhs_magtheridon_fel_stomp"
+		"Ability3"					"xhs_magtheridon_targeted_firestorms"
+		"Ability4"					"xhs_magtheridon_fel_fissure"
+		"Ability5"					"xhs_magtheridon_infernal_rings"
+		"Ability6"					"xhs_magtheridon_demonic_howl"
+		"Ability7"					"xhs_magtheridon_rupture"
+		"Ability8"					"xhs_creeps_phase_2_unholy_aura"
+		"Ability9"					"command_aura"
+		"Ability10"					"necronomicon_warrior_sight"
+		"Ability11"					"boss_health"
 
 		"ArmorPhysical"				"200"                 // Physical protection.
 		"MagicalResistance"			"40"                 // Magical protection (percentage).

@@ -17,10 +17,4 @@ function modifier_magtheridon_medium:DeclareFunctions() return {
 
 function modifier_magtheridon_medium:OnDeath(params)
 	if not IsServer() then return end
-
-	if params.unit == self:GetParent() then
-		for i = 1, 2 do
-			CreateUnitByName("npc_dota_hero_magtheridon_small", self:GetParent():GetAbsOrigin() + RandomVector(100), true, nil, nil, DOTA_TEAM_CUSTOM_2)
-		end
-	end
 end
