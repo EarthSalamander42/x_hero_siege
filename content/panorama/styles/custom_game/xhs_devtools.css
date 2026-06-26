@@ -121,6 +121,43 @@
 	color: #ffaaaa;
 }
 
+.XHSDevToolsSandboxBar {
+	width: 100%;
+	min-height: 46px;
+	margin-top: 8px;
+	padding: 7px 8px;
+	background-color: #0c1620ee;
+	border: 1px solid #ffffff18;
+	flow-children: right;
+}
+
+.XHSDevToolsSandboxText {
+	width: fill-parent-flow(1);
+	vertical-align: center;
+	flow-children: down;
+}
+
+.XHSDevToolsSandboxTitle {
+	color: #eefaff;
+	font-size: 14px;
+	font-weight: bold;
+	text-shadow: 0px 1px 2px 2 #000000;
+}
+
+.XHSDevToolsSandboxHint {
+	color: #8fa5ae;
+	font-size: 12px;
+	margin-top: 1px;
+	text-shadow: 0px 1px 2px 2 #000000;
+}
+
+.XHSDevToolsSandboxToggleButton {
+	width: 150px;
+	vertical-align: center;
+	margin-right: 0px;
+	margin-bottom: 0px;
+}
+
 .XHSDevToolsTabs {
 	width: 100%;
 	height: 38px;
@@ -231,6 +268,11 @@
 .XHSDevToolsButton.Warn {
 	background-color: #4b3513ee;
 	border-color: #ffcc6a66;
+}
+
+.XHSDevToolsButton.Flow {
+	background-color: #183f2bee;
+	border-color: #74f0a666;
 }
 
 .XHSDevToolsButton.Danger {

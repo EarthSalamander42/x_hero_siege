@@ -1,13 +1,53 @@
 LinkLuaModifier("modifier_orb_of_venom_xhs", "items/item_orb_of_venom_xhs.lua", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_orb_of_venom_xhs_active", "items/item_orb_of_venom_xhs.lua", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_orb_of_venom_poison", "items/item_orb_of_venom_xhs.lua", LUA_MODIFIER_MOTION_NONE)
 
-item_orb_of_venom = item_orb_of_venom or class({})
+item_xhs_orb_of_venom = item_xhs_orb_of_venom or class({})
 item_viridian_gem = item_viridian_gem or class({})
 item_plagueheart = item_plagueheart or class({})
 
-function item_orb_of_venom:GetIntrinsicModifierName() return "modifier_orb_of_venom_xhs" end
+local function ToggleVenomOrb(caster, ability)
+	if caster:HasModifier("modifier_orb_of_venom_xhs_active") then
+		caster:RemoveModifierByName("modifier_orb_of_venom_xhs_active")
+	else
+		caster:AddNewModifier(caster, ability, "modifier_orb_of_venom_xhs_active", {})
+	end
+end
+
+local function GetVenomOrbTexture(caster, active_texture, inactive_texture)
+	if caster and not caster:IsNull() and caster:HasModifier("modifier_orb_of_venom_xhs_active") then
+		return active_texture
+	end
+
+	return inactive_texture
+end
+
+function item_xhs_orb_of_venom:GetIntrinsicModifierName() return "modifier_orb_of_venom_xhs" end
 function item_viridian_gem:GetIntrinsicModifierName() return "modifier_orb_of_venom_xhs" end
 function item_plagueheart:GetIntrinsicModifierName() return "modifier_orb_of_venom_xhs" end
+
+function item_xhs_orb_of_venom:OnSpellStart() if IsServer() then ToggleVenomOrb(self:GetCaster(), self) end end
+function item_viridian_gem:OnSpellStart() if IsServer() then ToggleVenomOrb(self:GetCaster(), self) end end
+function item_plagueheart:OnSpellStart() if IsServer() then ToggleVenomOrb(self:GetCaster(), self) end end
+
+function item_xhs_orb_of_venom:GetAbilityTextureName()
+	return GetVenomOrbTexture(self:GetCaster(), "custom/orb_of_venom", "custom/orb_of_venom_off")
+end
+
+function item_viridian_gem:GetAbilityTextureName()
+	return GetVenomOrbTexture(self:GetCaster(), "custom/viridian_gem", "custom/viridian_gem_off")
+end
+
+function item_plagueheart:GetAbilityTextureName()
+	return GetVenomOrbTexture(self:GetCaster(), "custom/plagueheart", "custom/plagueheart_off")
+end
+
+modifier_orb_of_venom_xhs_active = modifier_orb_of_venom_xhs_active or class({})
+
+function modifier_orb_of_venom_xhs_active:IsHidden() return false end
+function modifier_orb_of_venom_xhs_active:IsPurgable() return false end
+function modifier_orb_of_venom_xhs_active:RemoveOnDeath() return false end
+function modifier_orb_of_venom_xhs_active:GetTexture() return "custom/orb_of_venom" end
 
 modifier_orb_of_venom_xhs = modifier_orb_of_venom_xhs or class({})
 
@@ -33,6 +73,10 @@ function modifier_orb_of_venom_xhs:OnAttackLanded(params)
 	end
 
 	if params.target:GetTeamNumber() == params.attacker:GetTeamNumber() or params.target:IsBuilding() then
+		return
+	end
+
+	if not self:GetParent():HasModifier("modifier_orb_of_venom_xhs_active") then
 		return
 	end
 

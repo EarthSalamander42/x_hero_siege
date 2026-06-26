@@ -26,6 +26,10 @@ end
 function BossTakeDamage(keys)
 	local boss = GetBossFromDataDrivenKeys(keys)
 	if boss ~= nil and UpdateBossBar then
+		if XHSSpiritMaster_ConfigureSpiritBossBar ~= nil
+			and string.find(boss:GetUnitName(), "npc_dota_boss_spirit_master_") then
+			XHSSpiritMaster_ConfigureSpiritBossBar(boss)
+		end
 		UpdateBossBar(boss, keys and keys.attacker)
 	end
 end
@@ -104,9 +108,39 @@ function modifier_cant_die_generic:OnTakeDamage(event)
 	local attacker = event.attacker
 
 	if parent == self.parent then
+		if XHSSpiritMaster_ConfigureSpiritBossBar ~= nil
+			and string.find(parent:GetUnitName(), "npc_dota_boss_spirit_master_") then
+			XHSSpiritMaster_ConfigureSpiritBossBar(parent)
+		end
 		UpdateBossBar(parent, attacker)
 
 		if parent:GetHealth() <= 100 and not parent:IsIllusion() and parent.deathStart ~= true then
+			if XHSSpiritMasterEncounter ~= nil
+				and XHSSpiritMasterEncounter.GetNextThreshold ~= nil
+				and parent:GetUnitName() == "npc_dota_boss_spirit_master"
+				and XHSSpiritMasterEncounter.phase ~= nil then
+				if XHSSpiritMasterEncounter.phase ~= "master" then
+					local finalDeathReady = XHSSpiritMasterEncounter.IsFinalDeathReady ~= nil
+						and XHSSpiritMasterEncounter:IsFinalDeathReady() == true
+					if finalDeathReady ~= true then
+						parent:SetHealth(math.max(parent:GetHealth(), XHSSpiritMasterEncounter.return_health or 1))
+						return
+					end
+				else
+					local threshold = XHSSpiritMasterEncounter:GetNextThreshold(parent)
+					if threshold ~= nil and XHSSpiritMasterEncounter:TriggerSplit(parent, threshold) == true then
+						return
+					end
+				end
+			end
+
+			if XHSSpiritMasterEncounter ~= nil
+				and XHSSpiritMasterEncounter.HandleSpiritLethal ~= nil
+				and string.find(parent:GetUnitName(), "npc_dota_boss_spirit_master_")
+				and XHSSpiritMasterEncounter:HandleSpiritLethal(parent, attacker) == true then
+				return
+			end
+
 			self.disable_on_takedamage = true
 
 			parent:SetBaseHealthRegen(0.0)

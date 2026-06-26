@@ -28,6 +28,7 @@
 					<Label id="XHSDevToolsStatusText" text="Requesting state..." />
 				</Panel>
 
+				<Panel id="XHSDevToolsSandboxBar" class="XHSDevToolsSandboxBar" />
 				<Panel id="XHSDevToolsTabs" class="XHSDevToolsTabs" />
 				<Panel id="XHSDevToolsContent" class="XHSDevToolsContent" />
 			</Panel>

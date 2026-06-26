@@ -1,0 +1,1165 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Frostrose Mods Homepage Revamp Mockups</title>
+	<style>
+		:root {
+			--bg: #040812;
+			--panel: rgba(7, 24, 39, 0.9);
+			--panel-dark: rgba(3, 9, 17, 0.92);
+			--line: rgba(88, 200, 255, 0.42);
+			--line-soft: rgba(88, 200, 255, 0.2);
+			--text: #eef8ff;
+			--muted: #95b4c8;
+			--blue: #5ad0ff;
+			--gold: #ffcf66;
+			--green: #70e39a;
+			--red: #ff5a43;
+			--violet: #b187ff;
+			--ember: #ef7b45;
+		}
+
+		* {
+			box-sizing: border-box;
+		}
+
+		html {
+			scroll-behavior: smooth;
+		}
+
+		body {
+			margin: 0;
+			min-height: 100vh;
+			background:
+				radial-gradient(circle at 50% 0%, rgba(88, 200, 255, 0.11), transparent 32%),
+				linear-gradient(180deg, #07101d 0%, var(--bg) 58%, #02040a 100%);
+			color: var(--text);
+			font-family: Inter, "Segoe UI", Arial, sans-serif;
+		}
+
+		a {
+			color: inherit;
+			text-decoration: none;
+		}
+
+		img {
+			display: block;
+			max-width: 100%;
+		}
+
+		.page {
+			width: min(1320px, calc(100vw - 48px));
+			margin: 0 auto;
+			padding: 28px 0 64px;
+		}
+
+		.mockup-header {
+			position: sticky;
+			top: 0;
+			z-index: 20;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 24px;
+			padding: 14px 0 18px;
+			background: linear-gradient(180deg, rgba(4, 8, 18, 0.98), rgba(4, 8, 18, 0.82) 72%, transparent);
+			backdrop-filter: blur(10px);
+		}
+
+		.identity {
+			display: flex;
+			align-items: center;
+			gap: 12px;
+			min-width: 0;
+		}
+
+		.identity img {
+			width: 42px;
+			height: auto;
+			filter: drop-shadow(0 0 14px rgba(90, 208, 255, 0.2));
+		}
+
+		.identity strong {
+			display: block;
+			font-size: 15px;
+			line-height: 1;
+			text-transform: uppercase;
+		}
+
+		.identity span {
+			display: block;
+			margin-top: 4px;
+			color: var(--muted);
+			font-size: 12px;
+		}
+
+		.nav {
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: flex-end;
+			gap: 8px;
+		}
+
+		.nav a,
+		.cta {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			min-height: 36px;
+			padding: 0 13px;
+			border: 1px solid var(--line-soft);
+			background: rgba(5, 11, 20, 0.74);
+			color: #cfeeff;
+			font-size: 12px;
+			font-weight: 800;
+			text-transform: uppercase;
+		}
+
+		.nav a:hover,
+		.cta:hover {
+			border-color: var(--line);
+			color: #fff;
+			box-shadow: 0 0 18px rgba(90, 208, 255, 0.16);
+		}
+
+		.mockup {
+			position: relative;
+			min-height: 760px;
+			margin: 18px 0 36px;
+			overflow: hidden;
+			border: 1px solid var(--line-soft);
+			background:
+				linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px) 0 0 / 64px 64px,
+				linear-gradient(0deg, rgba(255, 255, 255, 0.028) 1px, transparent 1px) 0 0 / 64px 64px,
+				radial-gradient(circle at 22% 52%, rgba(112, 227, 154, 0.12), transparent 23%),
+				radial-gradient(circle at 72% 42%, rgba(224, 67, 49, 0.13), transparent 24%),
+				linear-gradient(135deg, #10263d 0%, #07111d 42%, #050913 100%);
+			box-shadow: inset 0 0 90px rgba(0, 0, 0, 0.58), 0 18px 52px rgba(0, 0, 0, 0.34);
+		}
+
+		.mockup::before {
+			content: "";
+			position: absolute;
+			inset: 0;
+			background:
+				linear-gradient(180deg, rgba(2, 5, 10, 0.22), rgba(2, 5, 10, 0.88)),
+				radial-gradient(circle at 50% 24%, rgba(90, 208, 255, 0.16), transparent 34%);
+			pointer-events: none;
+		}
+
+		.mockup::after {
+			content: "";
+			position: absolute;
+			inset: auto 0 0;
+			height: 130px;
+			background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.42));
+			pointer-events: none;
+		}
+
+		.mockup-inner {
+			position: relative;
+			z-index: 2;
+			display: grid;
+			gap: 26px;
+			min-height: inherit;
+			padding: 30px;
+		}
+
+		.sitebar {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 20px;
+			min-height: 54px;
+		}
+
+		.brand {
+			display: flex;
+			align-items: center;
+			gap: 13px;
+			min-width: 0;
+		}
+
+		.brand img {
+			width: 56px;
+			filter: drop-shadow(0 0 16px rgba(90, 208, 255, 0.23));
+		}
+
+		.brand-title {
+			font-size: 17px;
+			font-weight: 900;
+			line-height: 1;
+			text-transform: uppercase;
+		}
+
+		.brand-kicker,
+		.eyebrow,
+		.panel-title,
+		.micro {
+			color: var(--muted);
+			font-size: 11px;
+			font-weight: 800;
+			letter-spacing: 0;
+			text-transform: uppercase;
+		}
+
+		.site-links {
+			display: flex;
+			align-items: center;
+			gap: 18px;
+			color: #c9e8f7;
+			font-size: 12px;
+			font-weight: 800;
+			text-transform: uppercase;
+		}
+
+		.hero-grid {
+			display: grid;
+			grid-template-columns: minmax(0, 0.95fr) minmax(420px, 1.05fr);
+			align-items: center;
+			gap: 34px;
+		}
+
+		.hero-copy {
+			max-width: 590px;
+		}
+
+		.eyebrow {
+			display: inline-flex;
+			gap: 8px;
+			align-items: center;
+			margin-bottom: 14px;
+			color: var(--gold);
+		}
+
+		.eyebrow::before {
+			content: "";
+			width: 28px;
+			height: 2px;
+			background: var(--gold);
+			box-shadow: 0 0 12px rgba(255, 207, 102, 0.65);
+		}
+
+		h1 {
+			margin: 0;
+			font-size: clamp(44px, 7vw, 92px);
+			font-weight: 950;
+			line-height: 0.88;
+			letter-spacing: 0;
+			text-transform: uppercase;
+			text-shadow: 0 3px 18px rgba(0, 0, 0, 0.6);
+		}
+
+		h2 {
+			margin: 0;
+			font-size: clamp(28px, 4vw, 54px);
+			font-weight: 950;
+			line-height: 0.96;
+			letter-spacing: 0;
+			text-transform: uppercase;
+		}
+
+		.lead {
+			max-width: 530px;
+			margin: 18px 0 0;
+			color: #b9d2df;
+			font-size: 16px;
+			line-height: 1.55;
+		}
+
+		.actions {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 10px;
+			margin-top: 24px;
+		}
+
+		.cta {
+			min-height: 44px;
+			padding: 0 16px;
+			border-color: rgba(90, 208, 255, 0.48);
+			background: linear-gradient(90deg, rgba(17, 78, 108, 0.9), rgba(7, 24, 39, 0.9));
+			box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+		}
+
+		.cta.gold {
+			border-color: rgba(255, 207, 102, 0.52);
+			background: linear-gradient(90deg, rgba(117, 79, 18, 0.86), rgba(7, 24, 39, 0.9));
+			color: #ffe7a7;
+		}
+
+		.stage {
+			position: relative;
+			min-height: 430px;
+			overflow: hidden;
+			border: 1px solid var(--line-soft);
+			background:
+				linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px) 0 0 / 48px 48px,
+				linear-gradient(0deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px) 0 0 / 48px 48px,
+				radial-gradient(circle at 22% 58%, rgba(112, 227, 154, 0.14), transparent 25%),
+				radial-gradient(circle at 72% 44%, rgba(224, 67, 49, 0.15), transparent 24%),
+				linear-gradient(135deg, rgba(16, 38, 61, 0.96), rgba(5, 9, 19, 0.96));
+			box-shadow: inset 0 0 70px rgba(0, 0, 0, 0.58);
+		}
+
+		.stage.photo {
+			background:
+				linear-gradient(180deg, rgba(2, 6, 12, 0.08), rgba(2, 6, 12, 0.82)),
+				linear-gradient(90deg, rgba(2, 6, 12, 0.55), transparent 42%),
+				url("../img/hero_selection_head.jpg") center / cover;
+		}
+
+		.stage.scene {
+			background:
+				linear-gradient(180deg, rgba(2, 6, 12, 0.18), rgba(2, 6, 12, 0.82)),
+				url("../img/hero_scene.jpeg") center / cover;
+		}
+
+		.hero-unit {
+			position: absolute;
+			width: 58px;
+			height: 58px;
+			border: 2px solid rgba(170, 235, 255, 0.72);
+			border-radius: 50%;
+			background: radial-gradient(circle at 45% 35%, #e7f8ff 0 9%, #65d8ff 10% 34%, #1a5573 35% 64%, #07131f 65% 100%);
+			box-shadow: 0 12px 26px rgba(0, 0, 0, 0.75), 0 0 24px rgba(90, 208, 255, 0.28);
+		}
+
+		.hero-unit::after {
+			content: "";
+			position: absolute;
+			left: 50%;
+			top: 50%;
+			width: 110px;
+			height: 36px;
+			transform: translate(-50%, 28px);
+			border-radius: 50%;
+			background: radial-gradient(ellipse, rgba(0, 0, 0, 0.42), transparent 68%);
+		}
+
+		.nameplate {
+			position: absolute;
+			width: 206px;
+			padding: 6px 8px 7px;
+			border: 1px solid rgba(88, 200, 255, 0.46);
+			border-left: 3px solid var(--blue);
+			background: linear-gradient(135deg, rgba(7, 24, 39, 0.96), rgba(5, 11, 20, 0.94));
+			filter: drop-shadow(0 7px 10px rgba(0, 0, 0, 0.65));
+			transform: translate(-50%, -100%);
+		}
+
+		.name-row {
+			display: flex;
+			align-items: center;
+			gap: 6px;
+			min-width: 0;
+		}
+
+		.badge {
+			display: grid;
+			place-items: center;
+			width: 20px;
+			height: 20px;
+			flex: 0 0 auto;
+			border: 1px solid rgba(255, 207, 102, 0.7);
+			background: linear-gradient(135deg, rgba(255, 207, 102, 0.2), rgba(255, 207, 102, 0.04));
+			color: var(--gold);
+			font-size: 11px;
+			font-weight: 900;
+		}
+
+		.player-name {
+			overflow: hidden;
+			font-size: 13px;
+			font-weight: 900;
+			line-height: 1;
+			text-overflow: ellipsis;
+			text-transform: uppercase;
+			white-space: nowrap;
+			text-shadow: 0 1px 2px #000;
+		}
+
+		.tier {
+			margin-left: auto;
+			color: var(--gold);
+			font-size: 10px;
+			font-weight: 900;
+			text-transform: uppercase;
+			white-space: nowrap;
+		}
+
+		.hp-track {
+			position: relative;
+			height: 7px;
+			margin-top: 6px;
+			overflow: hidden;
+			border: 1px solid rgba(255, 255, 255, 0.08);
+			background: #03070d;
+		}
+
+		.hp-fill {
+			position: absolute;
+			inset: 0 auto 0 0;
+			width: var(--hp, 78%);
+			background: linear-gradient(90deg, #11874c, #70e39a);
+			box-shadow: 0 0 10px rgba(112, 227, 154, 0.5);
+		}
+
+		.mp-fill {
+			position: absolute;
+			left: 0;
+			bottom: 0;
+			width: var(--mp, 62%);
+			height: 2px;
+			background: linear-gradient(90deg, #2687ff, #5ad0ff);
+		}
+
+		.anchor-line {
+			position: absolute;
+			left: 50%;
+			top: 100%;
+			width: 1px;
+			height: 22px;
+			background: linear-gradient(180deg, rgba(90, 208, 255, 0.65), transparent);
+		}
+
+		.hud-panel {
+			border: 1px solid var(--line-soft);
+			background: linear-gradient(135deg, rgba(7, 24, 39, 0.88), rgba(3, 9, 17, 0.92));
+			box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+		}
+
+		.status-grid {
+			display: grid;
+			grid-template-columns: repeat(3, 1fr);
+			gap: 12px;
+			margin-top: 26px;
+		}
+
+		.stat {
+			min-height: 94px;
+			padding: 14px;
+		}
+
+		.stat strong {
+			display: block;
+			margin-top: 8px;
+			color: #fff;
+			font-size: 22px;
+			line-height: 1;
+			text-transform: uppercase;
+		}
+
+		.stat span {
+			display: block;
+			margin-top: 7px;
+			color: var(--muted);
+			font-size: 12px;
+			line-height: 1.35;
+		}
+
+		.patch-strip {
+			display: grid;
+			grid-template-columns: 1fr 1fr 1fr;
+			gap: 12px;
+			align-self: end;
+		}
+
+		.patch-card {
+			position: relative;
+			min-height: 166px;
+			padding: 14px;
+			overflow: hidden;
+			border: 1px solid var(--line-soft);
+			background: rgba(3, 9, 17, 0.78);
+		}
+
+		.patch-card::after {
+			content: "";
+			position: absolute;
+			inset: auto 0 0;
+			height: 3px;
+			background: linear-gradient(90deg, var(--blue), transparent);
+		}
+
+		.patch-card.gold::after {
+			background: linear-gradient(90deg, var(--gold), transparent);
+		}
+
+		.patch-card.red::after {
+			background: linear-gradient(90deg, var(--red), transparent);
+		}
+
+		.patch-card h3,
+		.panel h3 {
+			margin: 8px 0 0;
+			color: #fff;
+			font-size: 17px;
+			line-height: 1.05;
+			text-transform: uppercase;
+		}
+
+		.patch-card p,
+		.panel p {
+			margin: 10px 0 0;
+			color: var(--muted);
+			font-size: 13px;
+			line-height: 1.45;
+		}
+
+		.console-layout {
+			display: grid;
+			grid-template-columns: 340px minmax(0, 1fr);
+			gap: 20px;
+			align-items: stretch;
+		}
+
+		.side-stack {
+			display: grid;
+			gap: 12px;
+			align-content: start;
+		}
+
+		.panel {
+			padding: 16px;
+		}
+
+		.module-list {
+			display: grid;
+			gap: 8px;
+			margin-top: 14px;
+		}
+
+		.module-row {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 10px;
+			min-height: 42px;
+			padding: 0 10px;
+			border-left: 2px solid rgba(90, 208, 255, 0.45);
+			background: rgba(2, 6, 12, 0.54);
+			color: #d9f3ff;
+			font-size: 12px;
+			font-weight: 900;
+			text-transform: uppercase;
+		}
+
+		.module-row span {
+			color: var(--gold);
+			font-size: 10px;
+		}
+
+		.command-map {
+			position: relative;
+			min-height: 520px;
+			overflow: hidden;
+			border: 1px solid var(--line-soft);
+			background:
+				linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px) 0 0 / 58px 58px,
+				linear-gradient(0deg, rgba(255, 255, 255, 0.026) 1px, transparent 1px) 0 0 / 58px 58px,
+				radial-gradient(circle at 35% 52%, rgba(112, 227, 154, 0.14), transparent 23%),
+				radial-gradient(circle at 74% 38%, rgba(255, 90, 67, 0.15), transparent 24%),
+				linear-gradient(135deg, #10263d 0%, #07111d 42%, #050913 100%);
+		}
+
+		.command-map .panel {
+			position: absolute;
+			width: 240px;
+			background: rgba(3, 9, 17, 0.76);
+		}
+
+		.ring {
+			position: absolute;
+			width: 190px;
+			height: 190px;
+			border: 1px solid rgba(90, 208, 255, 0.28);
+			border-radius: 50%;
+			box-shadow: inset 0 0 36px rgba(90, 208, 255, 0.09), 0 0 24px rgba(90, 208, 255, 0.12);
+		}
+
+		.ring::before,
+		.ring::after {
+			content: "";
+			position: absolute;
+			inset: 38px;
+			border: 1px solid rgba(255, 207, 102, 0.28);
+			border-radius: 50%;
+		}
+
+		.ring::after {
+			inset: 76px;
+			background: rgba(90, 208, 255, 0.85);
+			box-shadow: 0 0 22px rgba(90, 208, 255, 0.78);
+		}
+
+		.feed {
+			display: grid;
+			gap: 10px;
+			align-self: end;
+		}
+
+		.feed-row {
+			display: grid;
+			grid-template-columns: 78px 1fr auto;
+			gap: 12px;
+			align-items: center;
+			min-height: 52px;
+			padding: 0 12px;
+			border: 1px solid var(--line-soft);
+			background: rgba(3, 9, 17, 0.68);
+			font-size: 12px;
+			font-weight: 800;
+			text-transform: uppercase;
+		}
+
+		.feed-row time {
+			color: var(--gold);
+		}
+
+		.feed-row span {
+			color: var(--muted);
+			font-weight: 700;
+			text-transform: none;
+		}
+
+		.split-showcase {
+			display: grid;
+			grid-template-columns: minmax(0, 1fr) 390px;
+			gap: 22px;
+			align-items: stretch;
+		}
+
+		.live-board {
+			position: relative;
+			min-height: 520px;
+			overflow: hidden;
+			border: 1px solid var(--line-soft);
+			background:
+				linear-gradient(180deg, rgba(2, 6, 12, 0.22), rgba(2, 6, 12, 0.88)),
+				url("../img/hero_selection_head.jpg") center / cover;
+		}
+
+		.live-board::after {
+			content: "";
+			position: absolute;
+			inset: 0;
+			background:
+				linear-gradient(90deg, rgba(2, 6, 12, 0.88), transparent 55%),
+				linear-gradient(0deg, rgba(2, 6, 12, 0.82), transparent 45%);
+		}
+
+		.live-content {
+			position: relative;
+			z-index: 2;
+			display: grid;
+			align-content: end;
+			min-height: inherit;
+			padding: 24px;
+		}
+
+		.scoreline {
+			display: grid;
+			grid-template-columns: repeat(3, 1fr);
+			gap: 1px;
+			margin-top: 20px;
+			border: 1px solid var(--line-soft);
+			background: var(--line-soft);
+		}
+
+		.scoreline div {
+			min-height: 72px;
+			padding: 12px;
+			background: rgba(3, 9, 17, 0.78);
+		}
+
+		.scoreline strong {
+			display: block;
+			font-size: 22px;
+			line-height: 1;
+		}
+
+		.scoreline span {
+			display: block;
+			margin-top: 5px;
+			color: var(--muted);
+			font-size: 11px;
+			text-transform: uppercase;
+		}
+
+		.player-panel {
+			display: grid;
+			gap: 12px;
+			align-content: start;
+		}
+
+		.player-card {
+			display: grid;
+			grid-template-columns: 44px 1fr auto;
+			gap: 12px;
+			align-items: center;
+			min-height: 70px;
+			padding: 12px;
+			border: 1px solid var(--line-soft);
+			background: rgba(3, 9, 17, 0.8);
+		}
+
+		.avatar {
+			display: grid;
+			place-items: center;
+			width: 44px;
+			height: 44px;
+			border: 1px solid rgba(255, 207, 102, 0.66);
+			background: radial-gradient(circle, rgba(255, 207, 102, 0.26), rgba(255, 207, 102, 0.06));
+			color: var(--gold);
+			font-weight: 950;
+		}
+
+		.player-card strong {
+			display: block;
+			color: #fff;
+			font-size: 13px;
+			line-height: 1;
+			text-transform: uppercase;
+		}
+
+		.player-card span {
+			display: block;
+			margin-top: 5px;
+			color: var(--muted);
+			font-size: 12px;
+		}
+
+		.rank {
+			color: var(--green);
+			font-size: 12px;
+			font-weight: 900;
+		}
+
+		.direction-note {
+			display: grid;
+			grid-template-columns: 190px 1fr;
+			gap: 18px;
+			margin: -14px 0 34px;
+			padding: 16px;
+			border: 1px solid var(--line-soft);
+			background: rgba(3, 9, 17, 0.64);
+			color: var(--muted);
+			font-size: 13px;
+			line-height: 1.5;
+		}
+
+		.direction-note strong {
+			color: #fff;
+			text-transform: uppercase;
+		}
+
+		@media (max-width: 1060px) {
+			.hero-grid,
+			.console-layout,
+			.split-showcase {
+				grid-template-columns: 1fr;
+			}
+
+			.stage,
+			.command-map,
+			.live-board {
+				min-height: 460px;
+			}
+		}
+
+		@media (max-width: 760px) {
+			.page {
+				width: min(100% - 28px, 1320px);
+				padding-top: 14px;
+			}
+
+			.mockup-header,
+			.sitebar {
+				align-items: flex-start;
+				flex-direction: column;
+			}
+
+			.nav,
+			.site-links,
+			.actions {
+				justify-content: flex-start;
+			}
+
+			.mockup {
+				min-height: auto;
+			}
+
+			.mockup-inner {
+				padding: 18px;
+			}
+
+			.status-grid,
+			.patch-strip,
+			.scoreline {
+				grid-template-columns: 1fr;
+			}
+
+			.direction-note {
+				grid-template-columns: 1fr;
+			}
+
+			.feed-row,
+			.player-card {
+				grid-template-columns: 1fr;
+			}
+		}
+	</style>
+</head>
+<body>
+	<div class="page">
+		<header class="mockup-header">
+			<a class="identity" href="#direction-a">
+				<img src="../img/logo.png" alt="Frostrose Studio">
+				<span>
+					<strong>Homepage Revamp Mockups</strong>
+					<span>mods.frostrose-studio.com visual directions</span>
+				</span>
+			</a>
+			<nav class="nav" aria-label="Mockup directions">
+				<a href="#direction-a">A. Tactical Home</a>
+				<a href="#direction-b">B. Command Center</a>
+				<a href="#direction-c">C. Live Hub</a>
+			</nav>
+		</header>
+
+		<section class="mockup" id="direction-a" aria-label="Tactical homepage mockup">
+			<div class="mockup-inner">
+				<header class="sitebar">
+					<a class="brand" href="#">
+						<img src="../img/logo.png" alt="Frostrose Studio">
+						<span>
+							<span class="brand-title">Frostrose Mods</span>
+							<span class="brand-kicker">Dota 2 custom games</span>
+						</span>
+					</a>
+					<nav class="site-links" aria-label="Main navigation">
+						<a href="#">Watch</a>
+						<a href="#">Learn</a>
+						<a href="#">Ranking</a>
+						<a href="#">History</a>
+						<a href="#">Sign In</a>
+					</nav>
+				</header>
+
+				<div class="hero-grid">
+					<div class="hero-copy">
+						<div class="eyebrow">Featured update</div>
+						<h1>X Hero Siege</h1>
+						<p class="lead">Fast custom-game action, readable patch history, live match surfaces, and supporter identity presented like an in-game tactical layer.</p>
+						<div class="actions">
+							<a class="cta gold" href="#">View Patch 3.51d</a>
+							<a class="cta" href="#">Open Ranking</a>
+							<a class="cta" href="#">Join Discord</a>
+						</div>
+						<div class="status-grid">
+							<div class="stat hud-panel">
+								<div class="panel-title">Active mod</div>
+								<strong>XHS 3.51d</strong>
+								<span>Bug fixes after the 7.33 game update.</span>
+							</div>
+							<div class="stat hud-panel">
+								<div class="panel-title">Next module</div>
+								<strong>Supporter Pass</strong>
+								<span>Premium labels, badges, and profile identity.</span>
+							</div>
+							<div class="stat hud-panel">
+								<div class="panel-title">Primary path</div>
+								<strong>Watch</strong>
+								<span>Make recent games and rankings feel alive.</span>
+							</div>
+						</div>
+					</div>
+
+					<div class="stage" aria-label="Mock battle HUD">
+						<div class="hero-unit" style="left: 22%; top: 58%;"></div>
+						<div class="nameplate" style="left: 22%; top: 51%;">
+							<div class="name-row">
+								<div class="badge">S</div>
+								<div class="player-name">Jeizy</div>
+								<div class="tier">Ember</div>
+							</div>
+							<div class="hp-track" style="--hp: 82%; --mp: 56%;">
+								<div class="hp-fill"></div>
+								<div class="mp-fill"></div>
+							</div>
+							<div class="anchor-line"></div>
+						</div>
+
+						<div class="hero-unit" style="left: 57%; top: 42%;"></div>
+						<div class="nameplate" style="left: 57%; top: 35%; border-color: rgba(255, 207, 102, 0.48); border-left-color: var(--gold);">
+							<div class="name-row">
+								<div class="badge">V</div>
+								<div class="player-name">Frost Patron</div>
+								<div class="tier">Divine</div>
+							</div>
+							<div class="hp-track" style="--hp: 64%; --mp: 88%;">
+								<div class="hp-fill"></div>
+								<div class="mp-fill"></div>
+							</div>
+							<div class="anchor-line"></div>
+						</div>
+
+						<div class="hero-unit" style="left: 78%; top: 69%;"></div>
+						<div class="nameplate" style="left: 78%; top: 62%; width: 178px; text-align: center;">
+							<div class="name-row">
+								<div class="player-name">Low HP Carry</div>
+							</div>
+							<div class="hp-track" style="--hp: 23%; --mp: 30%;">
+								<div class="hp-fill" style="background: linear-gradient(90deg, #a31418, #ff5a43);"></div>
+								<div class="mp-fill"></div>
+							</div>
+							<div class="anchor-line"></div>
+						</div>
+
+						<div class="patch-card hud-panel" style="position: absolute; right: 18px; bottom: 18px; width: 260px; z-index: 3;">
+							<div class="panel-title">Implementation target</div>
+							<h3>HUD first home</h3>
+							<p>Feels closest to the supplied mockup. Strong first direction if the new homepage should look like an extension of the game client.</p>
+						</div>
+					</div>
+				</div>
+
+				<div class="patch-strip">
+					<article class="patch-card gold">
+						<div class="panel-title">Patch notes</div>
+						<h3>XHS 3.51d</h3>
+						<p>Make the latest XHS build the main signal instead of burying it in the carousel.</p>
+					</article>
+					<article class="patch-card">
+						<div class="panel-title">Learn</div>
+						<h3>Heroes and items</h3>
+						<p>Wiki entry points stay available, but visually quieter than the featured game.</p>
+					</article>
+					<article class="patch-card red">
+						<div class="panel-title">Community</div>
+						<h3>Discord and support</h3>
+						<p>Supporter identity can be teased without turning the page into a donation splash.</p>
+					</article>
+				</div>
+			</div>
+		</section>
+		<div class="direction-note">
+			<strong>Direction A</strong>
+			<span>Best if the homepage should be immediately branded around X Hero Siege and the overhead-label aesthetic. It is compact, game-native, and keeps navigation simple.</span>
+		</div>
+
+		<section class="mockup" id="direction-b" aria-label="Command center homepage mockup">
+			<div class="mockup-inner">
+				<header class="sitebar">
+					<a class="brand" href="#">
+						<img src="../img/logo.png" alt="Frostrose Studio">
+						<span>
+							<span class="brand-title">Frostrose Mods</span>
+							<span class="brand-kicker">Command center</span>
+						</span>
+					</a>
+					<nav class="site-links" aria-label="Main navigation">
+						<a href="#">Watch</a>
+						<a href="#">Learn</a>
+						<a href="#">Ranking</a>
+						<a href="#">History</a>
+						<a href="#">Sign In</a>
+					</nav>
+				</header>
+
+				<div class="console-layout">
+					<aside class="side-stack">
+						<section class="panel hud-panel">
+							<div class="eyebrow">Operations</div>
+							<h2>Choose your front</h2>
+							<p>More dashboard-like, useful if the site needs to represent several Frostrose projects rather than only one featured patch.</p>
+							<div class="actions">
+								<a class="cta gold" href="#">Play XHS</a>
+								<a class="cta" href="#">Explore IMBA</a>
+							</div>
+						</section>
+
+						<section class="panel hud-panel">
+							<div class="panel-title">Modules</div>
+							<div class="module-list">
+								<div class="module-row">X Hero Siege <span>Live</span></div>
+								<div class="module-row">Dota IMBA <span>Archive</span></div>
+								<div class="module-row">Hero Wiki <span>Data</span></div>
+								<div class="module-row">Ranking <span>Season</span></div>
+								<div class="module-row">Supporter Pass <span>Study</span></div>
+							</div>
+						</section>
+					</aside>
+
+					<section class="command-map" aria-label="Command map">
+						<div class="ring" style="left: 42%; top: 20%;"></div>
+						<div class="ring" style="left: 16%; top: 52%; width: 130px; height: 130px;"></div>
+						<div class="hero-unit" style="left: 49%; top: 43%;"></div>
+						<div class="nameplate" style="left: 49%; top: 36%; border-color: rgba(255, 207, 102, 0.48); border-left-color: var(--gold);">
+							<div class="name-row">
+								<div class="badge">V</div>
+								<div class="player-name">Season Patron</div>
+								<div class="tier">Lv 42</div>
+							</div>
+							<div class="hp-track" style="--hp: 74%; --mp: 72%;">
+								<div class="hp-fill"></div>
+								<div class="mp-fill"></div>
+							</div>
+							<div class="anchor-line"></div>
+						</div>
+
+						<article class="panel hud-panel" style="left: 24px; top: 24px;">
+							<div class="panel-title">Status</div>
+							<h3>3.51d deployed</h3>
+							<p>Latest XHS patch gets a permanent high-visibility slot.</p>
+						</article>
+						<article class="panel hud-panel" style="right: 24px; top: 72px;">
+							<div class="panel-title">Signal</div>
+							<h3>Supporter identity</h3>
+							<p>Badge, title, and season level become part of the site language.</p>
+						</article>
+						<article class="panel hud-panel" style="right: 34px; bottom: 28px;">
+							<div class="panel-title">Primary CTA</div>
+							<h3>Watch games</h3>
+							<p>Turns the homepage into a live-service surface.</p>
+						</article>
+					</section>
+				</div>
+
+				<section class="feed" aria-label="Latest activity">
+					<div class="feed-row">
+						<time>Now</time>
+						<div>XHS match parser online <span>recent games can become the moving part of the home</span></div>
+						<strong>Watch</strong>
+					</div>
+					<div class="feed-row">
+						<time>3.51d</time>
+						<div>Stability patch highlighted <span>short patch copy plus fast path to full notes</span></div>
+						<strong>Notes</strong>
+					</div>
+					<div class="feed-row">
+						<time>Season</time>
+						<div>Ranking and supporter identity <span>ties community progression to the new visual system</span></div>
+						<strong>Rank</strong>
+					</div>
+				</section>
+			</div>
+		</section>
+		<div class="direction-note">
+			<strong>Direction B</strong>
+			<span>Best if Frostrose wants a broader studio/mod portal. It is more system-like, with multiple modules visible above the fold and less dependency on one big hero image.</span>
+		</div>
+
+		<section class="mockup" id="direction-c" aria-label="Live hub homepage mockup">
+			<div class="mockup-inner">
+				<header class="sitebar">
+					<a class="brand" href="#">
+						<img src="../img/logo.png" alt="Frostrose Studio">
+						<span>
+							<span class="brand-title">Frostrose Mods</span>
+							<span class="brand-kicker">Live hub</span>
+						</span>
+					</a>
+					<nav class="site-links" aria-label="Main navigation">
+						<a href="#">Watch</a>
+						<a href="#">Learn</a>
+						<a href="#">Ranking</a>
+						<a href="#">History</a>
+						<a href="#">Sign In</a>
+					</nav>
+				</header>
+
+				<div class="split-showcase">
+					<section class="live-board" aria-label="Live game hero">
+						<div class="live-content">
+							<div class="eyebrow">Live surface</div>
+							<h1>Dota IMBA<br>and XHS</h1>
+							<p class="lead">A homepage that behaves like a match hub: current activity, top players, current patch, and supporter presence in one high-density screen.</p>
+							<div class="actions">
+								<a class="cta gold" href="#">Watch Recent Games</a>
+								<a class="cta" href="#">View Leaderboard</a>
+							</div>
+							<div class="scoreline">
+								<div>
+									<strong>3.51d</strong>
+									<span>Current XHS patch</span>
+								</div>
+								<div>
+									<strong>7.23c</strong>
+									<span>IMBA archive</span>
+								</div>
+								<div>
+									<strong>Top 100</strong>
+									<span>Season ranking</span>
+								</div>
+							</div>
+						</div>
+					</section>
+
+					<aside class="player-panel">
+						<section class="panel hud-panel">
+							<div class="panel-title">Top players</div>
+							<h3>Season board</h3>
+							<p>A visible player ladder gives the homepage a reason to be revisited.</p>
+						</section>
+						<div class="player-card">
+							<div class="avatar">S</div>
+							<div>
+								<strong>Jeizy</strong>
+								<span>XHS Supporter Pass</span>
+							</div>
+							<div class="rank">#01</div>
+						</div>
+						<div class="player-card">
+							<div class="avatar">V</div>
+							<div>
+								<strong>Frost Patron</strong>
+								<span>Divine title unlocked</span>
+							</div>
+							<div class="rank">#02</div>
+						</div>
+						<div class="player-card">
+							<div class="avatar">M</div>
+							<div>
+								<strong>Midnight</strong>
+								<span>Recent match winner</span>
+							</div>
+							<div class="rank">#03</div>
+						</div>
+						<section class="panel hud-panel">
+							<div class="panel-title">Homepage rhythm</div>
+							<h3>Dynamic first</h3>
+							<p>Ideal if the backend can feed recent games, rankings, profile badges, and current patch metadata.</p>
+						</section>
+					</aside>
+				</div>
+
+				<div class="patch-strip">
+					<article class="patch-card">
+						<div class="panel-title">Watch</div>
+						<h3>Recent games</h3>
+						<p>Make the home useful immediately for returning players.</p>
+					</article>
+					<article class="patch-card gold">
+						<div class="panel-title">Profile</div>
+						<h3>Supporter labels</h3>
+						<p>Carry the overhead label treatment into player cards.</p>
+					</article>
+					<article class="patch-card red">
+						<div class="panel-title">Patch stream</div>
+						<h3>Latest notes</h3>
+						<p>Small release cards replace the current full-width carousel.</p>
+					</article>
+				</div>
+			</div>
+		</section>
+		<div class="direction-note">
+			<strong>Direction C</strong>
+			<span>Best if the site should feel alive every visit. It needs more live data to shine, but it could become the strongest product direction once match and ranking feeds are reliable.</span>
+		</div>
+	</div>
+</body>
+</html>

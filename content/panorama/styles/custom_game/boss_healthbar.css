@@ -7,6 +7,7 @@
 
 #DiretidePanel
 {
+	width: 100%;
 	margin-top: 110px;
 	horizontal-align: center;
 	flow-children: down;
@@ -15,7 +16,7 @@
 
 #DiretidePanel.MultiBossBars
 {
-	width: 1304px;
+	width: 1320px;
 	flow-children: right-wrap;
 }
 
@@ -81,6 +82,7 @@
 	box-shadow: fill #00000090 0px 0px 12px 0px;
 	visibility: collapse;
 	overflow: clip;
+	horizontal-align: center;
 	transition-property: height, brightness, transform;
 	transition-duration: .18s;
 }
@@ -89,11 +91,12 @@
 {
 	width: 640px;
 	margin: 0px 6px 8px 6px;
+	horizontal-align: left;
 }
 
 .MultiBossBars .HealthBarContainer.CenteredBossBar
 {
-	margin-left: 332px;
+	margin-left: 340px;
 }
 
 .HealthBarContainer.HasBossCounter
@@ -109,6 +112,26 @@
 .HealthBarContainer.HasBossCounter.HasBossTimer
 {
 	height: 121px;
+}
+
+.HealthBarContainer.HasBossCast
+{
+	height: 112px;
+}
+
+.HealthBarContainer.HasBossCast.HasBossCounter
+{
+	height: 134px;
+}
+
+.HealthBarContainer.HasBossCast.HasBossTimer
+{
+	height: 137px;
+}
+
+.HealthBarContainer.HasBossCast.HasBossCounter.HasBossTimer
+{
+	height: 159px;
 }
 
 .BossHeader
@@ -286,6 +309,337 @@
 	horizontal-align: center;
 	vertical-align: center;
 	visibility: collapse;
+}
+
+.BossCastBar
+{
+	width: 578px;
+	height: 34px;
+	margin-left: 54px;
+	margin-top: 3px;
+	flow-children: right;
+	visibility: collapse;
+	opacity: 0;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #04111df2 ), color-stop( .55, #0b1b2df0 ), to( #04101c00 ) );
+	border-left: 2px solid #69d7ff80;
+	box-shadow: fill #00000070 0px 0px 8px 0px, #5ad0ff20 0px 0px 10px 0px;
+	transition-property: opacity, brightness, transform;
+	transition-duration: .16s;
+}
+
+.MultiBossBars .BossCastBar
+{
+	width: 528px;
+}
+
+.HasBossCast .BossCastBar
+{
+	visibility: visible;
+	opacity: 1;
+}
+
+.BossCastEntering
+{
+	animation-name: XHSBossCastEnter;
+	animation-duration: .22s;
+	animation-iteration-count: 1;
+}
+
+.BossCastIcon
+{
+	width: 30px;
+	height: 30px;
+	margin-left: 4px;
+	margin-top: 2px;
+	border: 1px solid #c8f2ff55;
+	box-shadow: fill #000000a0 0px 0px 6px 0px, #69d7ff35 0px 0px 9px 0px;
+	overflow: clip;
+}
+
+.BossCastIconImage
+{
+	width: 100%;
+	height: 100%;
+	visibility: collapse;
+}
+
+.BossCastBody
+{
+	width: fill-parent-flow( 1.0 );
+	height: 30px;
+	margin-left: 7px;
+	margin-right: 8px;
+	margin-top: 2px;
+	flow-children: down;
+}
+
+.BossCastHeader
+{
+	width: 100%;
+	height: 17px;
+	flow-children: none;
+}
+
+.BossCastLabel
+{
+	width: 420px;
+	height: 17px;
+	color: #e8faff;
+	font-size: 13px;
+	font-weight: semi-bold;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	text-align: left;
+	text-shadow: 0px 0px 6px #65d8ff50, 0px 1px 3px #000000;
+	text-overflow: shrink;
+}
+
+.MultiBossBars .BossCastLabel
+{
+	width: 372px;
+}
+
+.BossCastTime
+{
+	width: 52px;
+	height: 17px;
+	horizontal-align: right;
+	color: #f5fdff;
+	font-size: 13px;
+	font-weight: bold;
+	text-align: right;
+	text-shadow: 0px 0px 8px #69d7ff77, 0px 1px 3px #000000;
+}
+
+.BossCastTrack
+{
+	width: 100%;
+	height: 8px;
+	margin-top: 2px;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #02070ce0 ), to( #071521e0 ) );
+	border: 1px solid #c8f2ff18;
+	box-shadow: inset #000000cc 0px 1px 3px 0px;
+	overflow: clip;
+}
+
+.BossCastFill
+{
+	width: 0%;
+	height: 100%;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #2ed4ff ), color-stop( .48, #a6f3ff ), to( #ffffff ) );
+	box-shadow: #71e4ff60 0px 0px 9px 0px;
+	transition-property: width;
+	transition-duration: 1s;
+	transition-timing-function: linear;
+}
+
+.BossCastGlow
+{
+	ignore-parent-flow: true;
+	width: 26px;
+	height: 100%;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #ffffff00 ), color-stop( .45, #ffffff90 ), to( #ffffff00 ) );
+	opacity: .35;
+	animation-name: XHSBossCastSweep;
+	animation-duration: 1.2s;
+	animation-iteration-count: infinite;
+}
+
+.BossCastStyleMagtheridon .BossCastBar
+{
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #140a04f2 ), color-stop( .52, #241706f0 ), to( #09120500 ) );
+	border-left-color: #7fff58aa;
+	box-shadow: fill #00000080 0px 0px 8px 0px, #ff8d3328 0px 0px 12px 0px;
+}
+
+.BossCastStyleMagtheridon .BossCastFill
+{
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #ff7a22 ), color-stop( .5, #f7e177 ), to( #7fff58 ) );
+	box-shadow: #ff8d336a 0px 0px 10px 0px;
+}
+
+.BossCastStyleMagtheridon .BossCastLabel,
+.BossCastStyleMagtheridon .BossCastTime
+{
+	text-shadow: 0px 0px 7px #ff8d3370, 0px 1px 3px #000000;
+}
+
+.BossCastStyleBanehallow .BossCastBar
+{
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #130417f2 ), color-stop( .55, #210719f0 ), to( #09040e00 ) );
+	border-left-color: #ff365faa;
+	box-shadow: fill #00000080 0px 0px 8px 0px, #cc2cff24 0px 0px 12px 0px;
+}
+
+.BossCastStyleBanehallow .BossCastFill
+{
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #741cff ), color-stop( .5, #ff2d61 ), to( #ffb3c2 ) );
+	box-shadow: #ff2d616a 0px 0px 10px 0px;
+}
+
+.BossCastStyleBanehallow .BossCastLabel,
+.BossCastStyleBanehallow .BossCastTime
+{
+	text-shadow: 0px 0px 7px #ff2d6170, 0px 1px 3px #000000;
+}
+
+.BossCastStyleGrom .BossCastBar
+{
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #160403f2 ), color-stop( .52, #2b0905f0 ), to( #12080400 ) );
+	border-left-color: #ffb13aaa;
+	box-shadow: fill #00000080 0px 0px 8px 0px, #ff3d2228 0px 0px 12px 0px;
+}
+
+.BossCastStyleGrom .BossCastFill
+{
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #d82118 ), color-stop( .48, #ffb13a ), to( #fff0a6 ) );
+	box-shadow: #ff5a326a 0px 0px 10px 0px;
+}
+
+.BossCastStyleGrom .BossCastLabel,
+.BossCastStyleGrom .BossCastTime
+{
+	text-shadow: 0px 0px 7px #ff5a3270, 0px 1px 3px #000000;
+}
+
+.BossCastStyleIllidan .BossCastBar
+{
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #070412f2 ), color-stop( .52, #12072bf0 ), to( #07130600 ) );
+	border-left-color: #77ff3daa;
+	box-shadow: fill #00000080 0px 0px 8px 0px, #8e42ff30 0px 0px 12px 0px;
+}
+
+.BossCastStyleIllidan .BossCastFill
+{
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #8e42ff ), color-stop( .46, #77ff3d ), to( #d8ffba ) );
+	box-shadow: #77ff3d70 0px 0px 10px 0px;
+}
+
+.BossCastStyleIllidan .BossCastLabel,
+.BossCastStyleIllidan .BossCastTime
+{
+	text-shadow: 0px 0px 7px #77ff3d70, 0px 1px 3px #000000;
+}
+
+.BossCastStyleBalanar .BossCastBar
+{
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #0b0415f2 ), color-stop( .52, #1a0732f0 ), to( #04110800 ) );
+	border-left-color: #35ff7caa;
+	box-shadow: fill #00000080 0px 0px 8px 0px, #9b37ff30 0px 0px 12px 0px;
+}
+
+.BossCastStyleBalanar .BossCastFill
+{
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #9b37ff ), color-stop( .46, #35ff7c ), to( #d6ffdf ) );
+	box-shadow: #9b37ff70 0px 0px 10px 0px;
+}
+
+.BossCastStyleBalanar .BossCastLabel,
+.BossCastStyleBalanar .BossCastTime
+{
+	text-shadow: 0px 0px 7px #9b37ff70, 0px 1px 3px #000000;
+}
+
+.BossCastStyleProudmoore .BossCastBar
+{
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #03101af2 ), color-stop( .52, #08243af0 ), to( #17110400 ) );
+	border-left-color: #f0ca4faa;
+	box-shadow: fill #00000080 0px 0px 8px 0px, #46beff30 0px 0px 12px 0px;
+}
+
+.BossCastStyleProudmoore .BossCastFill
+{
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #46beff ), color-stop( .48, #f0ca4f ), to( #fff2bd ) );
+	box-shadow: #46beff70 0px 0px 10px 0px;
+}
+
+.BossCastStyleProudmoore .BossCastLabel,
+.BossCastStyleProudmoore .BossCastTime
+{
+	text-shadow: 0px 0px 7px #46beff70, 0px 1px 3px #000000;
+}
+
+.BossCastStyleLichKing .BossCastBar
+{
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #020715f2 ), color-stop( .52, #061b35f0 ), to( #07120a00 ) );
+	border-left-color: #9ee8ffaa;
+	box-shadow: fill #00000080 0px 0px 8px 0px, #72cfff35 0px 0px 12px 0px;
+}
+
+.BossCastStyleLichKing .BossCastFill
+{
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #72cfff ), color-stop( .48, #eaf8ff ), to( #ffffff ) );
+	box-shadow: #72cfff70 0px 0px 10px 0px;
+}
+
+.BossCastStyleLichKing .BossCastLabel,
+.BossCastStyleLichKing .BossCastTime
+{
+	text-shadow: 0px 0px 7px #72cfff70, 0px 1px 3px #000000;
+}
+
+.BossCastStyleSpiritMaster .BossCastBar
+{
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #07111bf2 ), color-stop( .52, #13212df0 ), to( #17110400 ) );
+	border-left-color: #ffffffaa;
+	box-shadow: fill #00000080 0px 0px 8px 0px, #75dfff35 0px 0px 12px 0px;
+}
+
+.BossCastStyleSpiritMaster .BossCastFill
+{
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #ffffff ), color-stop( .42, #75dfff ), color-stop( .72, #ff9a2f ), to( #79d67b ) );
+	box-shadow: #75dfff70 0px 0px 10px 0px;
+}
+
+.BossCastStyleSpiritStorm .BossCastBar
+{
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #021826f2 ), color-stop( .52, #053f66f0 ), to( #17110400 ) );
+	border-left-color: #48d9ffaa;
+	box-shadow: fill #00000080 0px 0px 8px 0px, #48d9ff35 0px 0px 12px 0px;
+}
+
+.BossCastStyleSpiritStorm .BossCastFill
+{
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #48d9ff ), color-stop( .5, #bdf7ff ), to( #ffffff ) );
+	box-shadow: #48d9ff70 0px 0px 10px 0px;
+}
+
+.BossCastStyleSpiritEarth .BossCastBar
+{
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #071b0af2 ), color-stop( .52, #1f4d20f0 ), to( #17110400 ) );
+	border-left-color: #79d67baa;
+	box-shadow: fill #00000080 0px 0px 8px 0px, #79d67b35 0px 0px 12px 0px;
+}
+
+.BossCastStyleSpiritEarth .BossCastFill
+{
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #79d67b ), color-stop( .5, #d7ff9f ), to( #ffffff ) );
+	box-shadow: #79d67b70 0px 0px 10px 0px;
+}
+
+.BossCastStyleSpiritFire .BossCastBar
+{
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #200700f2 ), color-stop( .52, #5a1300f0 ), to( #17110400 ) );
+	border-left-color: #ff9a2faa;
+	box-shadow: fill #00000080 0px 0px 8px 0px, #ff9a2f35 0px 0px 12px 0px;
+}
+
+.BossCastStyleSpiritFire .BossCastFill
+{
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #ff6f22 ), color-stop( .5, #ffcf5a ), to( #ffffff ) );
+	box-shadow: #ff9a2f70 0px 0px 10px 0px;
+}
+
+.BossCastStyleSpiritMaster .BossCastLabel,
+.BossCastStyleSpiritMaster .BossCastTime,
+.BossCastStyleSpiritStorm .BossCastLabel,
+.BossCastStyleSpiritStorm .BossCastTime,
+.BossCastStyleSpiritEarth .BossCastLabel,
+.BossCastStyleSpiritEarth .BossCastTime,
+.BossCastStyleSpiritFire .BossCastLabel,
+.BossCastStyleSpiritFire .BossCastTime
+{
+	text-shadow: 0px 0px 7px #ffffff55, 0px 1px 3px #000000;
 }
 
 #BossHealth1,
@@ -491,6 +845,18 @@
 	background-color: gradient( linear, 0% 0%, 100% 0%, from( #34e95d ), color-stop( .48, #8fff42 ), to( #f7ff9b ) );
 }
 
+.BossTimerStyleSpiritMaster .BossTimer
+{
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #07111bf0 ), color-stop( .45, #102936ee ), to( #07120a00 ) );
+	border-left-color: #75dfff88;
+	box-shadow: #75dfff30 0px 0px 10px 0px;
+}
+
+.BossTimerStyleSpiritMaster .BossTimerFill
+{
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #48d9ff ), color-stop( .35, #79d67b ), color-stop( .68, #ff9a2f ), to( #ffffff ) );
+}
+
 .AspectRatio16x10 #DiretidePanel {
 	margin-top: 96px;
 }
@@ -500,7 +866,7 @@
 }
 
 .AspectRatio4x3 #DiretidePanel.MultiBossBars {
-	width: 1064px;
+	width: 1080px;
 }
 
 .AspectRatio4x3 .MultiBossBars .HealthBarContainer {
@@ -508,7 +874,7 @@
 }
 
 .AspectRatio4x3 .MultiBossBars .HealthBarContainer.CenteredBossBar {
-	margin-left: 272px;
+	margin-left: 280px;
 }
 
 .AspectRatio4x3 .BossBarMain {
@@ -521,6 +887,14 @@
 
 .AspectRatio4x3 .BossCounter {
 	width: 448px;
+}
+
+.AspectRatio4x3 .BossCastBar {
+	width: 448px;
+}
+
+.AspectRatio4x3 .BossCastLabel {
+	width: 290px;
 }
 
 .AspectRatio4x3 .BossTimer {
@@ -541,6 +915,14 @@
 
 .AspectRatio4x3 .MultiBossBars .BossCounter {
 	width: 408px;
+}
+
+.AspectRatio4x3 .MultiBossBars .BossCastBar {
+	width: 408px;
+}
+
+.AspectRatio4x3 .MultiBossBars .BossCastLabel {
+	width: 250px;
 }
 
 @keyframes 'XHSBossDamageFlash'
@@ -576,4 +958,19 @@
 {
 	0% { brightness: 2; }
 	100% { brightness: 1; }
+}
+
+@keyframes 'XHSBossCastEnter'
+{
+	0% { opacity: 0; transform: translateY( -5px ); brightness: 1.65; }
+	55% { opacity: 1; transform: translateY( 1px ); brightness: 1.25; }
+	100% { opacity: 1; transform: translateY( 0px ); brightness: 1; }
+}
+
+@keyframes 'XHSBossCastSweep'
+{
+	0% { opacity: 0; transform: translateX( -40px ); }
+	12% { opacity: .85; }
+	70% { opacity: .45; }
+	100% { opacity: 0; transform: translateX( 318px ); }
 }

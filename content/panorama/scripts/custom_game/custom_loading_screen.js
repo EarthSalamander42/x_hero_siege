@@ -1,19 +1,17 @@
 "use strict";
 
 var game_options;
-var secret_key = {};
 var local_votes = {};
 var local_vote_confirmed = {};
 var vote_payload_cache = {};
+var api_request_sequence = 0;
+var api_pending_requests = {};
 var active_vote_sequence = [];
 var active_vote_index = 0;
 var player_loading_rows = {};
 var player_loading_section_rows = {};
 var player_loading_order_signature = "";
 var selected_profile_player_id = -1;
-var profile_position_cache = {};
-var profile_position_pending = {};
-var profile_position_retry_at = {};
 var profile_modal_transition_token = 0;
 var profile_modal_fade_duration = 0.18;
 var LOADING_SCREEN_CONFIG = {
@@ -107,52 +105,52 @@ var mmr_rank_to_medals = {
 };
 
 var api = {
-	base: "https://api.frostrose-studio.com/",
 	urls: {
-		loadingScreenMessage: "imba/loading-screen-info",
-		playerPosition: "imba/trackme",
+		loadingScreenMessage: "loading-screen-info",
+	},
+	getGameType: function () {
+		if (game_options && game_options.game_type) {
+			return String(game_options.game_type);
+		}
+		return "XHS";
+	},
+	getModPrefix: function () {
+		return api.getGameType().toLowerCase() + "/";
+	},
+	request: function (request_type, data, success_callback, error_callback) {
+		if (!IsServerApiAvailable()) {
+			if (error_callback) {
+				error_callback();
+			}
+			return;
+		}
+
+		api_request_sequence = api_request_sequence + 1;
+		var request_id = api.getGameType() + "_" + Game.GetLocalPlayerID() + "_" + api_request_sequence;
+		api_pending_requests[request_id] = {
+			success: success_callback || function () {},
+			error: error_callback || function () {},
+		};
+
+		GameEvents.SendCustomGameEventToServer("loading_screen_api_request", {
+			request_id: request_id,
+			request_type: request_type,
+			data: data || {},
+			PlayerID: Game.GetLocalPlayerID(),
+		});
+
+		$.Schedule(5.0, function () {
+			var pending = api_pending_requests[request_id];
+			if (!pending) {
+				return;
+			}
+
+			delete api_pending_requests[request_id];
+			pending.error();
+		});
 	},
 	getLoadingScreenMessage: function (success_callback, error_callback) {
-		$.AsyncWebRequest(api.base + api.urls.loadingScreenMessage, {
-			type: "GET",
-			dataType: "json",
-			timeout: 5000,
-			headers: { 'X-Dota-Server-Key': secret_key },
-			success: function (obj) {
-				if (obj.error) {
-					$.Msg("Error loading screen info");
-					error_callback();
-				} else {
-					$.Msg("Get loading screen info successful");
-					success_callback(obj);
-				}
-			},
-			error: function (err) {
-				$.Msg("Error loading screen info" + JSON.stringify(err));
-				error_callback();
-			}
-		});
-	},
-	getPlayerPosition: function (data, success_callback, error_callback) {
-		$.AsyncWebRequest(api.base + api.urls.playerPosition, {
-			type: "GET",
-			data: data,
-			dataType: "json",
-			timeout: 5000,
-			headers: { 'X-Dota-Server-Key': secret_key },
-			success: function (obj) {
-				if (obj.error) {
-					$.Msg("Error loading player position");
-					error_callback();
-				} else {
-					success_callback(obj.data);
-				}
-			},
-			error: function (err) {
-				$.Msg("Error loading player position " + JSON.stringify(err));
-				error_callback();
-			}
-		});
+		api.request(api.urls.loadingScreenMessage, {}, success_callback, error_callback);
 	},
 }
 
@@ -646,8 +644,30 @@ function GetAvatarSteamIDFromPlayerInfo(player_info, player_id) {
 	return "";
 }
 
-function HasServerKey() {
-	return typeof secret_key === "string" && secret_key.length > 0;
+function IsServerApiAvailable() {
+	return typeof GameEvents !== "undefined" &&
+		GameEvents &&
+		typeof GameEvents.SendCustomGameEventToServer === "function";
+}
+
+function OnLoadingScreenApiResponse(payload) {
+	if (!payload || !payload.request_id) {
+		return;
+	}
+
+	var pending = api_pending_requests[payload.request_id];
+	if (!pending) {
+		return;
+	}
+
+	delete api_pending_requests[payload.request_id];
+
+	if (payload.ok === true || payload.ok === 1 || payload.ok === "1") {
+		pending.success(payload.data || {});
+		return;
+	}
+
+	pending.error(payload.message || "");
 }
 
 function GetCustomSetupStatus() {
@@ -828,122 +848,10 @@ function SetRankMedal(panel_tier_id, panel_pips_id, raw_title) {
 	pips_panel.style.backgroundImage = 'url("s2r://panorama/images/rank_tier_icons/pip' + parsed_rank.stars + '_psd.vtex")';
 }
 
-function ExtractProfilePosition(data, steam_id) {
-	if (data === undefined || data === null) {
-		return null;
-	}
-
-	if (typeof data !== "object") {
-		return null;
-	}
-
-	if (data.position !== undefined) {
-		return data.position;
-	}
-
-	if (data.rank !== undefined) {
-		return data.rank;
-	}
-
-	if (data.leaderboard_position !== undefined) {
-		return data.leaderboard_position;
-	}
-
-	if (data instanceof Array) {
-		for (var i = 0; i < data.length; i++) {
-			var child = data[i];
-
-			if (!child || typeof child !== "object") {
-				continue;
-			}
-
-			var child_steam_id = child.steamid || child.username || child.player_steamid || child.id;
-			var child_rank = child.position || child.rank || child.leaderboard_position;
-
-			if (steam_id && child_steam_id && child_steam_id.toString() == steam_id.toString() && child_rank !== undefined) {
-				return child_rank;
-			}
-
-			var fallback_rank = ExtractProfilePosition(child, steam_id);
-			if (fallback_rank !== null) {
-				return fallback_rank;
-			}
-		}
-
-		return null;
-	}
-
-	if (data.players !== undefined) {
-		var players_rank = ExtractProfilePosition(data.players, steam_id);
-		if (players_rank !== null) {
-			return players_rank;
-		}
-	}
-
-	if (data.data !== undefined) {
-		var nested_rank = ExtractProfilePosition(data.data, steam_id);
-		if (nested_rank !== null) {
-			return nested_rank;
-		}
-	}
-
-	for (var key in data) {
-		if (key == "players" || key == "data") {
-			continue;
-		}
-
-		var deeper_rank = ExtractProfilePosition(data[key], steam_id);
-		if (deeper_rank !== null) {
-			return deeper_rank;
-		}
-	}
-
-	return null;
-}
-
 function RequestProfilePositionForSteam(steam_id) {
-	steam_id = NormalizeSteamID64(steam_id);
-
-	if (!steam_id || !HasServerKey()) {
-		return;
-	}
-
-	if (profile_position_cache[steam_id] !== undefined) {
-		return;
-	}
-
-	if (profile_position_pending[steam_id]) {
-		return;
-	}
-
-	if (profile_position_retry_at[steam_id] !== undefined && GetCurrentTime() < profile_position_retry_at[steam_id]) {
-		return;
-	}
-
-	profile_position_pending[steam_id] = true;
-
-	api.getPlayerPosition({
-		steamid: steam_id,
-		language: $.Localize("#lang"),
-	}, function (data) {
-		profile_position_cache[steam_id] = ExtractProfilePosition(data, steam_id);
-		profile_position_pending[steam_id] = false;
-		profile_position_retry_at[steam_id] = 0;
-		UpdateProfilePanels();
-	}, function () {
-		profile_position_pending[steam_id] = false;
-		profile_position_retry_at[steam_id] = GetCurrentTime() + 5;
-	});
 }
 
 function RequestProfilePositionForSelected() {
-	var selected_player_data = GetProfileDataForPlayer(GetSelectedProfilePlayerID());
-
-	if (!selected_player_data.steam_id) {
-		return;
-	}
-
-	RequestProfilePositionForSteam(selected_player_data.steam_id);
 }
 
 function GetProfileDataForPlayer(player_id) {
@@ -1019,19 +927,7 @@ function GetLeaderboardTextForSteam(steam_id) {
 		return L("loading_screen_unavailable");
 	}
 
-	if (profile_position_pending[steam_id]) {
-		return L("loading_screen_loading");
-	}
-
-	if (profile_position_cache[steam_id] === undefined) {
-		return L("loading_screen_loading");
-	}
-
-	if (profile_position_cache[steam_id] === null || profile_position_cache[steam_id] === false || profile_position_cache[steam_id] === "") {
-		return L("loading_screen_na");
-	}
-
-	return "#" + profile_position_cache[steam_id];
+	return L("loading_screen_na");
 }
 
 function UpdateProfilePanels() {
@@ -2783,19 +2679,12 @@ function fetch() {
 		return;
 	}
 
-	secret_key = CustomNetTables.GetTableValue("game_options", "server_key");
-	if (secret_key == undefined) {
-		if (loading_screen_last_fetch_stage !== "waiting_server_key") {
-			loading_screen_last_fetch_stage = "waiting_server_key";
+	if (!IsServerApiAvailable()) {
+		if (loading_screen_last_fetch_stage !== "waiting_server_api") {
+			loading_screen_last_fetch_stage = "waiting_server_api";
 		}
 		$.Schedule(0.1, fetch);
 		return;
-	} else {
-		secret_key = secret_key["1"];
-
-		if (secret_key !== undefined && secret_key !== null) {
-			secret_key = secret_key.toString();
-		}
 	}
 
 	if (loading_screen_last_fetch_stage !== "ready") {
@@ -3637,6 +3526,7 @@ function DisableRankingVoting() {
 	}
 
 	if (typeof GameEvents !== "undefined" && GameEvents && typeof GameEvents.Subscribe === "function") {
+		GameEvents.Subscribe("loading_screen_api_response", OnLoadingScreenApiResponse);
 		GameEvents.Subscribe("loading_screen_debug", LoadingScreenDebug);
 		GameEvents.Subscribe("send_votes", function (payload) {
 			OnVotesReceived(payload);

@@ -31,8 +31,9 @@ game/scripts/vscripts/components/api/.gitattributes
 *.sqlite3
 *.sqlite3-shm
 
-
 *.vxml_c
 *.vjs_c
 *.vtex_c
 *.vcss_c
+
+.codex_ssh_tmp/*

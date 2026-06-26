@@ -136,13 +136,30 @@ _G.ZonesDefinition =
 				nCompleteLimit = GetXHSMagtheridonKillLimit(),
 			},
 			{
-				szQuestName = "kill_grom",
+				szQuestName = "clear_grom_vanguard",
 				szQuestType = "Kill",
 				Activators =
 				{
 					{
 						Type = QUEST_EVENT_ON_QUEST_COMPLETE,
 						szQuestName = "kill_mag",
+					},
+				},
+				Completion =
+				{
+					Type = QUEST_EVENT_ON_TEAM_ENEMY_KILLED,
+					szTeamName = DOTA_TEAM_CUSTOM_2,
+				},
+				nCompleteLimit = GetXHSGromVanguardKillLimit(),
+			},
+			{
+				szQuestName = "kill_grom",
+				szQuestType = "Kill",
+				Activators =
+				{
+					{
+						Type = QUEST_EVENT_ON_QUEST_COMPLETE,
+						szQuestName = "clear_grom_vanguard",
 					},
 				},
 				Completion =
@@ -378,7 +395,7 @@ _G.ZonesDefinition =
 					"item_orb_of_earth",
 					"item_orb_of_wind",
 					"item_orb_of_arcane",
-					"item_orb_of_venom",
+					"item_xhs_orb_of_venom",
 				},
 				fRareItemChance = 0.001,
 			},

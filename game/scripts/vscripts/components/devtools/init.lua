@@ -102,6 +102,7 @@ function XHSDevTools:Init()
 	self.sandbox_active = false
 	self.spawned_units = {}
 	self.invulnerable_players = false
+	self.campaign_flow_active = false
 	self.last_result = {
 		action = "",
 		ok = true,
@@ -125,8 +126,30 @@ function XHSDevTools:IsSandboxActive()
 end
 
 function XHSDevTools:ActivateSandbox(reason)
-	self.sandbox_active = true
-	self.sandbox_reason = reason or "dev action"
+	self:SetSandboxActive(true, reason or "dev action")
+end
+
+function XHSDevTools:SetSandboxActive(enabled, reason)
+	self.sandbox_active = enabled == true
+	self.sandbox_reason = self.sandbox_active and (reason or "manual toggle") or nil
+	self.campaign_flow_active = false
+
+	if CustomTimers ~= nil then
+		CustomTimers.special_waves_disabled = self.sandbox_active
+		CustomTimers.enable_special_wave = false
+		CustomTimers.timers_paused = self.sandbox_active and 2 or 0
+		if self.sandbox_active and CustomTimers.HideSpecialWaveCountdown ~= nil then
+			CustomTimers:HideSpecialWaveCountdown()
+		end
+		if CustomTimers.BroadcastTimer ~= nil then
+			CustomTimers:BroadcastTimer("special_wave")
+			CustomTimers:BroadcastTimer("special_event")
+		end
+	end
+
+	if self.sandbox_active and KillCreeps ~= nil then
+		KillCreeps(DOTA_TEAM_CUSTOM_1)
+	end
 end
 
 function XHSDevTools:SetResult(action, ok, message)
@@ -174,10 +197,16 @@ function XHSDevTools:RunAction(action, event)
 	elseif action == "start_boss" then
 		self:ActivateSandbox("boss")
 		return self:StartBoss(event.boss)
+	elseif action == "start_boss_flow" then
+		return self:StartCampaignFlow(event.boss)
+	elseif action == "set_sandbox" then
+		local enabled = IsTruthy(event.enabled)
+		self:SetSandboxActive(enabled, "manual toggle")
+		return enabled and "Sandbox enabled" or "Sandbox disabled"
 	elseif action == "start_final_wave" then
 		self:ActivateSandbox("final_wave")
 		if FinalWave then
-			FinalWave()
+			FinalWave(true)
 			return "Final Wave started in sandbox"
 		end
 		return "FinalWave() is unavailable"
@@ -193,8 +222,6 @@ function XHSDevTools:RunAction(action, event)
 		end
 		SpecialWave(math.max(1, math.min(8, wave)), true)
 		return "Special wave " .. tostring(wave) .. " triggered"
-	elseif action == "set_special_waves_disabled" then
-		return self:SetSpecialWavesDisabled(IsTruthy(event.disabled))
 	elseif action == "pause_timers" then
 		if CustomTimers then CustomTimers.timers_paused = 2 end
 		return "Timers paused"
@@ -226,8 +253,7 @@ function XHSDevTools:RunAction(action, event)
 		return self:Cleanup()
 	elseif action == "reset_sandbox" then
 		self:Cleanup()
-		self.sandbox_active = false
-		self.sandbox_reason = nil
+		self:SetSandboxActive(false)
 		return "Sandbox reset"
 	end
 
@@ -374,6 +400,9 @@ function XHSDevTools:StartBoss(boss)
 		return "Lich King started"
 	elseif boss == "spirit_master" then
 		SPIRIT_MASTER_KILLED_BOSS_COUNT = 0
+		if XHSSpiritMasterEncounter ~= nil then
+			XHSSpiritMasterEncounter:Reset()
+		end
 		self:ActivateQuestByName("kill_spirit_master")
 		StartSpiritMasterArena()
 		return "Spirit Master started"
@@ -382,6 +411,73 @@ function XHSDevTools:StartBoss(boss)
 	end
 
 	return "Unknown boss: " .. tostring(boss)
+end
+
+function XHSDevTools:PrepareCampaignFlow()
+	self:Cleanup()
+	self:SetSandboxActive(false)
+	self.campaign_flow_active = true
+
+	if CustomTimers ~= nil then
+		CustomTimers.game_phase = 3
+		CustomGameEventManager:Send_ServerToAllClients("xhs_game_phase_update", { phase = 3 })
+		if XHSPersistQuestTimingState then
+			XHSPersistQuestTimingState()
+		end
+	end
+
+	if RefreshPlayers then
+		RefreshPlayers()
+	end
+end
+
+function XHSDevTools:StartCampaignFlow(boss)
+	boss = boss or ""
+	if DIRECT_BOSSES[boss] ~= nil then
+		boss = "four_bosses"
+	end
+
+	self:PrepareCampaignFlow()
+
+	if boss == "magtheridon" then
+		MAGTHERIDON = 0
+		FOUR_BOSSES = 0
+		self:ActivateQuestByName("kill_mag")
+		StartMagtheridonArena(false)
+		return "Campaign flow started at Magtheridon"
+	elseif boss == "four_bosses" then
+		FOUR_BOSSES = 0
+		self:ActivateQuestByName("kill_grom")
+		self:ActivateQuestByName("kill_illidan")
+		self:ActivateQuestByName("kill_balanar")
+		self:ActivateQuestByName("kill_proudmoore")
+		EndMagtheridonArena()
+		return "Campaign flow started at the four bosses"
+	elseif boss == "arthas" then
+		self:ActivateQuestByName("kill_arthas")
+		StartArthasArena(false)
+		return "Campaign flow started at Arthas"
+	elseif boss == "banehallow" then
+		self:ActivateQuestByName("kill_banehallow")
+		StartBanehallowArena()
+		return "Campaign flow started at Banehallow"
+	elseif boss == "lich_king" then
+		self:ActivateQuestByName("kill_lich_king")
+		self:EnsureLichKing()
+		StartLichKingArena()
+		return "Campaign flow started at Lich King"
+	elseif boss == "spirit_master" then
+		SPIRIT_MASTER_KILLED_BOSS_COUNT = 0
+		if XHSSpiritMasterEncounter ~= nil then
+			XHSSpiritMasterEncounter:Reset()
+		end
+		self:ActivateQuestByName("kill_spirit_master")
+		StartSpiritMasterArena()
+		return "Campaign flow started at Spirit Master"
+	end
+
+	self.campaign_flow_active = false
+	return "Unknown campaign flow checkpoint: " .. tostring(boss)
 end
 
 function XHSDevTools:SpawnDirectBoss(def)
@@ -398,6 +494,21 @@ function XHSDevTools:SpawnDirectBoss(def)
 	unit:SetAngles(0, def.yaw or 0, 0)
 	unit:AddNewModifier(unit, nil, "modifier_pause_creeps", { Duration = 3, IsHidden = true }):SetStackCount(1)
 	unit:AddNewModifier(unit, nil, "modifier_invulnerable", { Duration = 3, IsHidden = true })
+	if unit:GetUnitName() == "npc_dota_hero_grom_hellscream" and XHSGrom_AttachPhase3AI ~= nil then
+		XHSGrom_AttachPhase3AI(unit)
+	end
+	if unit:GetUnitName() == "npc_dota_hero_illidan" and XHSIllidan_AttachPhase3AI ~= nil then
+		XHSIllidan_AttachPhase3AI(unit)
+	end
+	if unit:GetUnitName() == "npc_dota_hero_balanar" and XHSBalanar_AttachPhase3AI ~= nil then
+		XHSBalanar_AttachPhase3AI(unit)
+	end
+	if unit:GetUnitName() == "npc_dota_hero_proudmoore" and XHSProudmoore_AttachPhase3AI ~= nil then
+		XHSProudmoore_AttachPhase3AI(unit)
+	end
+	if unit:GetUnitName() == "npc_dota_hero_arthas" and XHSArthas_AttachPhase3AI ~= nil then
+		XHSArthas_AttachPhase3AI(unit)
+	end
 	self:RegisterSpawnedUnit(unit)
 	self:FocusAllPlayers(unit)
 
@@ -421,6 +532,9 @@ function XHSDevTools:EnsureLichKing()
 	unit:SetAttackCapability(DOTA_UNIT_CAP_NO_ATTACK)
 	unit:SetMoveCapability(DOTA_UNIT_CAP_MOVE_NONE)
 	unit.zone = "xhs_holdout"
+	if XHSLichKing_AttachPhase3AI ~= nil then
+		XHSLichKing_AttachPhase3AI(unit)
+	end
 	self:RegisterSpawnedUnit(unit)
 	return unit
 end
@@ -462,7 +576,7 @@ end
 
 function XHSDevTools:SpawnLaneWave(lane)
 	if lane == nil or lane <= 0 then
-		SpawnCreeps()
+		SpawnCreeps(true)
 		return "Spawned enabled lane waves"
 	end
 
@@ -475,7 +589,7 @@ function XHSDevTools:SpawnLaneWave(lane)
 		end
 	end
 
-	SpawnCreeps()
+	SpawnCreeps(true)
 
 	for i = 1, 8 do
 		if CREEP_LANES[i] then
@@ -497,24 +611,6 @@ function XHSDevTools:SetPhase(phase)
 		end
 	end
 	return "Phase set to " .. phase
-end
-
-function XHSDevTools:SetSpecialWavesDisabled(disabled)
-	if CustomTimers then
-		CustomTimers.special_waves_disabled = disabled == true
-		CustomTimers.enable_special_wave = false
-		if disabled == true then
-			CustomTimers.current_time["special_wave"] = XHS_SPECIAL_WAVE_INTERVAL + 1
-			if CustomTimers.HideSpecialWaveCountdown then
-				CustomTimers:HideSpecialWaveCountdown()
-			end
-		end
-		if CustomTimers.BroadcastTimer then
-			CustomTimers:BroadcastTimer("special_wave")
-		end
-	end
-
-	return disabled == true and "Automatic special waves disabled" or "Automatic special waves enabled"
 end
 
 function XHSDevTools:SetDifficulty(difficulty, respawn_bosses)
@@ -586,7 +682,7 @@ function XHSDevTools:TriggerEvent(event_name)
 		return "Sogat event triggered"
 	elseif event_name == "final_countdown" then
 		if CustomTimers and CustomTimers.PrepareFinalWaveCountdown then
-			CustomTimers:PrepareFinalWaveCountdown()
+			CustomTimers:PrepareFinalWaveCountdown(true)
 			return "Final wave countdown triggered"
 		end
 	end
@@ -796,13 +892,13 @@ function XHSDevTools:PushState()
 	CustomNetTables:SetTableValue("xhs_devtools", "state", {
 		enabled = self.enabled == true,
 		sandbox_active = self.sandbox_active == true,
+		campaign_flow_active = self.campaign_flow_active == true,
 		sandbox_reason = self.sandbox_reason or "",
 		game_phase = CustomTimers and CustomTimers.game_phase or 0,
 		difficulty = GameRules:GetCustomGameDifficulty() or 1,
 		timers_paused = CustomTimers and CustomTimers.timers_paused or 0,
 		creep_level = CustomTimers and CustomTimers.creep_level or 1,
 		special_wave = CustomTimers and CustomTimers.special_wave or 1,
-		special_waves_disabled = CustomTimers and CustomTimers.special_waves_disabled == true or false,
 		invulnerable_players = self.invulnerable_players == true,
 		lanes = self.enabled and self:BuildLaneState() or {},
 		quests = self.enabled and self:BuildQuestState() or {},

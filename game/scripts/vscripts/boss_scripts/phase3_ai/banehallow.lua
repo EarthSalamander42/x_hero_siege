@@ -15,7 +15,13 @@ local BANEHALLOW_ABILITIES = {
 	"frostivus_boss_requiem_of_souls",
 }
 
-local BANEHALLOW_HP_THRESHOLDS = { 75, 50, 25 }
+local BANEHALLOW_THRESHOLD_CONFIG = {
+	[1] = { thresholds = { 50 }, revenants_per_point = 3 },
+	[2] = { thresholds = { 66, 33 }, revenants_per_point = 4 },
+	[3] = { thresholds = { 75, 50, 25 }, revenants_per_point = 5 },
+	[4] = { thresholds = { 80, 60, 40, 20 }, revenants_per_point = 6 },
+	[5] = { thresholds = { 85, 70, 55, 40, 25 }, revenants_per_point = 8 },
+}
 
 local function IsValidAlive(unit)
 	return unit ~= nil and IsValidEntity(unit) and not unit:IsNull() and unit:IsAlive()
@@ -42,17 +48,24 @@ local function GetAbilityCastPoint(ability)
 	return ability:GetSpecialValueFor("cast_point")
 end
 
+local function GetThresholdConfig()
+	local difficulty = XHSPhase3BossAI:GetDifficulty()
+	return BANEHALLOW_THRESHOLD_CONFIG[difficulty] or BANEHALLOW_THRESHOLD_CONFIG[1]
+end
+
 local function CastPreparedAbility(boss, abilityName, context, facePosition)
 	if not IsValidAlive(boss) then return nil end
 
 	local ability = boss:FindAbilityByName(abilityName)
 	if ability == nil or ability:IsNull() then return nil end
+	if XHSPhase3BossAI:IsCastBlocked(boss) then return nil end
 
 	ability.xhs_banehallow_context = context or {}
 	if facePosition ~= nil then
 		FaceUnitTowardsPosition(boss, facePosition)
 	end
 
+	XHSPhase3BossAI:ProtectCast(boss, ability)
 	boss:CastAbilityNoTarget(ability, -1)
 	return ability
 end
@@ -64,6 +77,7 @@ function modifier_xhs_banehallow_phase3_ai:OnCreated(params)
 	if not IsServer() then return end
 
 	local boss = self:GetParent()
+	boss.xhs_banehallow_stopped = nil
 	self.team = DOTA_TEAM_GOODGUYS
 	self.arena_center = Entities:FindByName(nil, "npc_dota_spawner_magtheridon_arena"):GetAbsOrigin()
 	self.recent_positions = {}
@@ -77,9 +91,11 @@ function modifier_xhs_banehallow_phase3_ai:OnCreated(params)
 	self.force_pattern = nil
 	self.threshold_next_allowed_at = 0
 
+	XHSPhase3BossAI:HideVanillaHealthBar(boss)
 	XHSPhase3BossAI:SetAbilityLevels(boss, BANEHALLOW_ABILITIES)
 	self:UpdateBossBarMarkers()
 	self:CreateCosmetics()
+	XHSPhase3BossAI:RevealBossBarOnce(self)
 	self:BuildPatternDeck()
 	self:StartIntervalThink(0.25)
 end
@@ -87,6 +103,10 @@ end
 function modifier_xhs_banehallow_phase3_ai:OnDestroy()
 	if not IsServer() then return end
 
+	local boss = self:GetParent()
+	if boss ~= nil and not boss:IsNull() then
+		boss.xhs_banehallow_stopped = true
+	end
 	self:DestroyCosmeticEntity("head")
 	self:DestroyCosmeticEntity("wings")
 	self:DestroyCosmeticEntity("shoulders")
@@ -190,6 +210,7 @@ function modifier_xhs_banehallow_phase3_ai:OnIntervalThink()
 		return
 	end
 
+	XHSPhase3BossAI:RevealBossBarOnce(self)
 	self:CheckHpThresholds(now)
 
 	if self.state == "casting" then
@@ -231,7 +252,7 @@ function modifier_xhs_banehallow_phase3_ai:CheckHpThresholds(now)
 	local boss = self:GetParent()
 	local hpPct = boss:GetHealth() / math.max(1, boss:GetMaxHealth()) * 100
 
-	for _, threshold in pairs(BANEHALLOW_HP_THRESHOLDS) do
+	for _, threshold in ipairs(GetThresholdConfig().thresholds or {}) do
 		if hpPct <= threshold and self.thresholds_done[threshold] ~= true then
 			self.thresholds_done[threshold] = true
 			self.force_pattern = "requiem"
@@ -245,13 +266,17 @@ end
 
 function modifier_xhs_banehallow_phase3_ai:UpdateBossBarMarkers()
 	local boss = self:GetParent()
+	local config = GetThresholdConfig()
+	local thresholds = config.thresholds or {}
+	local revenantsPerPoint = config.revenants_per_point or 3
 	boss.xhs_boss_bar_markers = {}
 
-	for index, threshold in pairs(BANEHALLOW_HP_THRESHOLDS) do
+	for index, threshold in ipairs(thresholds) do
 		boss.xhs_boss_bar_markers[index] = {
 			pct = threshold,
 			kind = "companion",
-			label = "Ghost Revenants",
+			label = "Ghost Revenants x" .. revenantsPerPoint,
+			description = revenantsPerPoint .. " Ghost Revenants spawn at this point. This difficulty has " .. #thresholds .. " revenant points.",
 			triggered = self.thresholds_done[threshold] == true,
 		}
 	end
@@ -469,22 +494,19 @@ function modifier_xhs_banehallow_phase3_ai:CastMeteorHunt()
 	local duration = XHSPhase3BossAI:ScaleDelay(ability:GetSpecialValueFor("duration"))
 	local spawnDelay = XHSPhase3BossAI:ScaleDelay(ability:GetSpecialValueFor("spawn_delay"))
 	local spawnAmount = XHSPhase3BossAI:ScaleDensity(ability:GetSpecialValueFor("spawn_amount"), 2)
+	local batchSize = math.min(2, math.max(1, math.floor(spawnAmount / 8)))
+	local waveCount = math.max(1, math.floor(duration / math.max(0.1, spawnDelay) + 0.5))
 	local heroes = XHSPhase3BossAI:GetLivingHeroes(self.arena_center, 2200, true)
 	if #heroes <= 0 then return nil end
 
-	local impacts = {}
-	for i = 1, spawnAmount do
-		local hero = heroes[((i - 1) % #heroes) + 1]
-		impacts[#impacts + 1] = {
-			position = self:GetPredictedHeroPosition(hero),
-		}
-	end
-
 	local castAbility = CastPreparedAbility(boss, "frostivus_boss_meteorain", {
+		chase = true,
+		arena_center = self.arena_center,
+		target_radius = 2200,
 		duration = duration,
 		spawn_delay = spawnDelay,
-		impacts = impacts,
-		batch_size = #heroes,
+		total_meteors = math.max(spawnAmount, waveCount * batchSize),
+		batch_size = batchSize,
 	}, self.arena_center)
 	if castAbility == nil then return nil end
 
@@ -566,7 +588,7 @@ function modifier_xhs_banehallow_phase3_ai:CastDarkness()
 		duration = duration,
 		team = self.team,
 		inner_impacts = impacts,
-		inner_delay = GetAbilityCastPoint(shadowraze),
+		inner_activity = distance > 450 and ACT_DOTA_RAZE_2 or ACT_DOTA_RAZE_1,
 	}, self.arena_center)
 	if castAbility == nil then return nil end
 
@@ -593,7 +615,7 @@ end
 
 function modifier_xhs_banehallow_phase3_ai:SummonThresholdRevenants(threshold)
 	local boss = self:GetParent()
-	local count = XHSPhase3BossAI:ScaleDensity(4, 3)
+	local count = GetThresholdConfig().revenants_per_point or 3
 	GameMode.BanehallowRevenantsTotal = (GameMode.BanehallowRevenantsTotal or 0) + count
 	GameMode.BanehallowRevenantsRemaining = (GameMode.BanehallowRevenantsRemaining or 0) + count
 
@@ -610,6 +632,7 @@ function modifier_xhs_banehallow_phase3_ai:SummonThresholdRevenants(threshold)
 
 	CustomGameEventManager:Send_ServerToAllClients("xhs_boss_counter_update", {
 		boss_count = 1,
+		boss_bar_id = GetBossBarId and GetBossBarId(boss) or boss.xhs_boss_bar_id,
 		label = "Ghost Revenants",
 		remaining = GameMode.BanehallowRevenantsRemaining,
 		total = GameMode.BanehallowRevenantsTotal,

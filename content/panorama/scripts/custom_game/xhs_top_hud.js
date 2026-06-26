@@ -1,7 +1,8 @@
 "use strict";
 
 var XHSTopHud = (function () {
-	var MAX_PLAYER_SLOTS = 8;
+	var MAX_PLAYER_DISPLAY_SLOTS = 8;
+	var MAX_PLAYER_ID_SCAN = 23;
 	var HERO_REFRESH_SECONDS = 0.75;
 	var VITALS_REFRESH_SECONDS = 0.12;
 	var SLOW_REFRESH_SECONDS = 1.0;
@@ -330,10 +331,10 @@ var XHSTopHud = (function () {
 		fill.AddClass("XHSSupporterHoverMeterFill");
 	}
 
-	function CreateAllyHoverCard(card, playerID) {
+	function CreateAllyHoverCard(card, playerID, isRightSide) {
 		var hover = $.CreatePanel("Panel", card, "XHSSupporterHoverCard_" + playerID);
 		hover.AddClass("XHSSupporterHoverCard");
-		hover.AddClass(playerID < 4 ? "XHSSupporterHoverLeft" : "XHSSupporterHoverRight");
+		hover.AddClass(isRightSide ? "XHSSupporterHoverRight" : "XHSSupporterHoverLeft");
 		hover.hittest = false;
 
 		var header = $.CreatePanel("Panel", hover, "XHSSupporterHoverHeader_" + playerID);
@@ -397,8 +398,9 @@ var XHSTopHud = (function () {
 		footer.AddClass("XHSSupporterHoverFooter");
 	}
 
-	function CreateAllyCard(playerID) {
-		var roster = Panel(playerID < 4 ? "XHSAllyRosterLeft" : "XHSAllyRosterRight");
+	function CreateAllyCard(playerID, rosterIndex) {
+		var isRightSide = rosterIndex >= 4;
+		var roster = Panel(isRightSide ? "XHSAllyRosterRight" : "XHSAllyRosterLeft");
 		if (!roster) {
 			return null;
 		}
@@ -407,6 +409,7 @@ var XHSTopHud = (function () {
 		card.AddClass("XHSAllyCard");
 		card.SetAttributeInt("player_id", playerID);
 		card.SetAttributeInt("ent_index", -1);
+		card.SetAttributeInt("roster_side", isRightSide ? 1 : 0);
 		card.hittest = true;
 
 		var colorStrip = $.CreatePanel("Panel", card, "XHSAllyColorStrip_" + playerID);
@@ -465,7 +468,7 @@ var XHSTopHud = (function () {
 			$.DispatchEvent("UIHideTextTooltip", supporterMark);
 		});
 
-		CreateAllyHoverCard(card, playerID);
+		CreateAllyHoverCard(card, playerID, isRightSide);
 
 		card.SetPanelEvent("onmouseover", function () {
 			ShowAllyHover(card, playerID);
@@ -484,6 +487,50 @@ var XHSTopHud = (function () {
 		});
 
 		return card;
+	}
+
+	function GetRosterPlayerIDs() {
+		var ids = SafeValue(function () {
+			return Game.GetAllPlayerIDs();
+		}, null);
+
+		if (!ids || !ids.length) {
+			ids = [];
+			for (var scanID = 0; scanID <= MAX_PLAYER_ID_SCAN; scanID++) {
+				var playerInfo = SafeValue(function () { return Game.GetPlayerInfo(scanID); }, null);
+				var entIndex = SafeValue(function () { return Players.GetPlayerHeroEntityIndex(scanID); }, -1);
+				if (playerInfo || IsValidEntityIndex(entIndex)) {
+					ids.push(scanID);
+				}
+			}
+		}
+
+		var unique = {};
+		var normalized = [];
+		for (var i = 0; i < ids.length; i++) {
+			var playerID = parseInt(ids[i], 10);
+			if (isNaN(playerID) || playerID < 0 || unique[playerID]) {
+				continue;
+			}
+
+			unique[playerID] = true;
+			normalized.push(playerID);
+		}
+
+		normalized.sort(function (a, b) { return a - b; });
+		return normalized.slice(0, MAX_PLAYER_DISPLAY_SLOTS);
+	}
+
+	function IsEightPlayerMap() {
+		var mapInfo = SafeValue(function () {
+			return Game.GetMapInfo();
+		}, null);
+
+		if (!mapInfo) {
+			return false;
+		}
+
+		return mapInfo.map_display_name === "x_hero_siege_8" || mapInfo.map_name === "x_hero_siege_8";
 	}
 
 	function ClearSupporterTierClasses(panel) {
@@ -769,7 +816,14 @@ var XHSTopHud = (function () {
 	}
 
 	function RefreshAllyRoster() {
-		for (var playerID = 0; playerID < MAX_PLAYER_SLOTS; playerID++) {
+		var playerIDs = GetRosterPlayerIDs();
+		var activePlayerIDs = {};
+		$.GetContextPanel().SetHasClass("XHSEightPlayers", IsEightPlayerMap() || playerIDs.length > 4);
+
+		for (var slotIndex = 0; slotIndex < playerIDs.length; slotIndex++) {
+			var playerID = playerIDs[slotIndex];
+			activePlayerIDs[playerID] = true;
+
 			var entIndex = Players.GetPlayerHeroEntityIndex(playerID);
 			var playerInfo = Game.GetPlayerInfo(playerID);
 
@@ -781,13 +835,30 @@ var XHSTopHud = (function () {
 				continue;
 			}
 
+			var expectedSide = slotIndex >= 4 ? 1 : 0;
+			if (allyCards[playerID] && allyCards[playerID].GetAttributeInt("roster_side", -1) !== expectedSide) {
+				allyCards[playerID].DeleteAsync(0);
+				delete allyCards[playerID];
+			}
+
 			if (!allyCards[playerID]) {
-				allyCards[playerID] = CreateAllyCard(playerID);
+				allyCards[playerID] = CreateAllyCard(playerID, slotIndex);
 			}
 
 			if (allyCards[playerID]) {
 				UpdateAllyIdentity(allyCards[playerID], playerID, entIndex, playerInfo);
 				UpdateAllyAnkh(allyCards[playerID], playerID, entIndex);
+			}
+		}
+
+		for (var cardPlayerID in allyCards) {
+			if (!allyCards.hasOwnProperty(cardPlayerID)) {
+				continue;
+			}
+
+			if (!activePlayerIDs[parseInt(cardPlayerID, 10)]) {
+				allyCards[cardPlayerID].DeleteAsync(0);
+				delete allyCards[cardPlayerID];
 			}
 		}
 	}
@@ -1045,10 +1116,7 @@ var XHSTopHud = (function () {
 	}
 
 	function Initialize() {
-		var mapInfo = Game.GetMapInfo();
-		if (mapInfo && mapInfo.map_display_name === "x_hero_siege_8") {
-			$.GetContextPanel().AddClass("XHSEightPlayers");
-		}
+		$.GetContextPanel().SetHasClass("XHSEightPlayers", IsEightPlayerMap());
 
 		SubscribeTimerEvents();
 		CustomNetTables.SubscribeNetTableListener("vips", RefreshVipRoster);

@@ -27,7 +27,7 @@
 		"item"		"item_orb_of_darkness"
 		"item"		"item_orb_of_wind"
 		"item"		"item_orb_of_arcane"
-		"item"		"item_orb_of_venom"
+		"item"		"item_xhs_orb_of_venom"
 		"item"		"item_orb_of_lightning2"
 		"item"		"item_orb_of_fire2"
 		"item"		"item_orb_of_darkness2"

@@ -6,9 +6,50 @@ item_orb_of_wind = item_orb_of_wind or class({})
 item_zephyr_gem = item_zephyr_gem or class({})
 item_tempest_aegis = item_tempest_aegis or class({})
 
+local function ToggleWindOrb(caster, ability)
+	if caster:HasModifier("modifier_orb_of_wind_active") then
+		caster:RemoveModifierByName("modifier_orb_of_wind_active")
+	else
+		caster:AddNewModifier(caster, ability, "modifier_orb_of_wind_active", {})
+	end
+end
+
+local function GetWindOrbTexture(caster, active_texture, inactive_texture)
+	if caster and not caster:IsNull() and caster:HasModifier("modifier_orb_of_wind_active") then
+		return active_texture
+	end
+
+	return inactive_texture
+end
+
+LinkLuaModifier("modifier_orb_of_wind_active", "items/item_orb_of_wind.lua", LUA_MODIFIER_MOTION_NONE)
+
 function item_orb_of_wind:GetIntrinsicModifierName() return "modifier_orb_of_wind" end
 function item_zephyr_gem:GetIntrinsicModifierName() return "modifier_orb_of_wind" end
 function item_tempest_aegis:GetIntrinsicModifierName() return "modifier_orb_of_wind" end
+
+function item_orb_of_wind:OnSpellStart() if IsServer() then ToggleWindOrb(self:GetCaster(), self) end end
+function item_zephyr_gem:OnSpellStart() if IsServer() then ToggleWindOrb(self:GetCaster(), self) end end
+function item_tempest_aegis:OnSpellStart() if IsServer() then ToggleWindOrb(self:GetCaster(), self) end end
+
+function item_orb_of_wind:GetAbilityTextureName()
+	return GetWindOrbTexture(self:GetCaster(), "custom/talisman_of_evasion_datadriven", "custom/talisman_of_evasion_datadriven_off")
+end
+
+function item_zephyr_gem:GetAbilityTextureName()
+	return GetWindOrbTexture(self:GetCaster(), "custom/zephyr_gem", "custom/zephyr_gem_off")
+end
+
+function item_tempest_aegis:GetAbilityTextureName()
+	return GetWindOrbTexture(self:GetCaster(), "custom/tempest_aegis", "custom/tempest_aegis_off")
+end
+
+modifier_orb_of_wind_active = modifier_orb_of_wind_active or class({})
+
+function modifier_orb_of_wind_active:IsHidden() return false end
+function modifier_orb_of_wind_active:IsPurgable() return false end
+function modifier_orb_of_wind_active:RemoveOnDeath() return false end
+function modifier_orb_of_wind_active:GetTexture() return "custom/talisman_of_evasion_datadriven" end
 
 modifier_orb_of_wind = modifier_orb_of_wind or class({})
 
@@ -44,6 +85,10 @@ function modifier_orb_of_wind:OnAttackFail(params)
 
 	local ability = self:GetAbility()
 	if not ability or ability:IsNull() then
+		return
+	end
+
+	if not self:GetParent():HasModifier("modifier_orb_of_wind_active") then
 		return
 	end
 

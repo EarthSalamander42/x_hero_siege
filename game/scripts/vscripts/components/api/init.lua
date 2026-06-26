@@ -5,12 +5,13 @@ api = api or class({})
 
 local baseUrl = "https://api.frostrose-studio.com/"
 local endUrlWebsite = "website/"
-local endUrlFrostrose = "imba/"
+local endUrlFrostrose = string.lower(CUSTOM_GAME_TYPE or "xhs") .. "/"
 local timeout = 5000
 local native_print = print
 
 function api:Init()
 	CustomGameEventManager:RegisterListener("api_change_companion", Dynamic_Wrap(self, "SetCompanion"))
+	CustomGameEventManager:RegisterListener("loading_screen_api_request", Dynamic_Wrap(self, "OnLoadingScreenApiRequest"))
 end
 
 -- Utils
@@ -412,6 +413,88 @@ function api:GetPlayerSupporterFragments(player_id)
 	return tonumber(supporter_pass.fragments or supporter_pass.fragment_balance) or 0
 end
 
+function api:MergeSupporterPassResponse(steamid, data)
+	if not steamid or not data or not api.players or not api.players[steamid] then
+		return
+	end
+
+	local player = api.players[steamid]
+	player.supporter_pass = player.supporter_pass or {}
+	local supporter_pass = player.supporter_pass
+	local profile = data.profile or {}
+	local season = data.season or profile.season or supporter_pass.season or {}
+
+	if profile.fragments ~= nil then
+		supporter_pass.fragments = profile.fragments
+		supporter_pass.fragment_balance = profile.fragments
+	end
+	if profile.weekly_fragments ~= nil then
+		supporter_pass.weekly_fragments = profile.weekly_fragments
+		supporter_pass.weekly_earned = profile.weekly_fragments
+	end
+	if profile.weekly_cap ~= nil then
+		supporter_pass.weekly_cap = profile.weekly_cap
+	end
+	if profile.legacy_fragments ~= nil then
+		supporter_pass.legacy_fragments = profile.legacy_fragments
+	end
+
+	if season.xp ~= nil or season.level ~= nil or season.xp_per_level ~= nil then
+		supporter_pass.season = supporter_pass.season or {}
+		supporter_pass.season.xp = season.xp or supporter_pass.season.xp
+		supporter_pass.season.level = season.level or supporter_pass.season.level
+		supporter_pass.season.xp_per_level = season.xp_per_level or supporter_pass.season.xp_per_level
+	end
+
+	local season_xp = season.xp or profile.season_xp
+	local season_level = season.level or profile.season_level
+	if season_xp ~= nil then
+		supporter_pass.season_xp = season_xp
+		supporter_pass.current_exp = season_xp
+	end
+	if season_level ~= nil then
+		supporter_pass.season_level = season_level
+		supporter_pass.level = season_level
+	end
+
+	if data.entitlements ~= nil then
+		supporter_pass.entitlements = data.entitlements
+	end
+	if data.purchases ~= nil then
+		supporter_pass.purchases = data.purchases
+	end
+	if data.loadout ~= nil then
+		supporter_pass.loadout = data.loadout
+	end
+	if data.armory ~= nil then
+		supporter_pass.armory = data.armory
+	end
+	if data.equipped ~= nil then
+		supporter_pass.loadout = data.equipped
+		player.armory = data.equipped
+	end
+	if data.claimed_rewards ~= nil then
+		supporter_pass.claimed_rewards = data.claimed_rewards
+	end
+end
+
+function api:PublishSupporterPassArmory(player_id, armory)
+	if not PlayerResource:IsValidPlayerID(player_id) then
+		return
+	end
+
+	if armory == nil then
+		local steamid = tostring(PlayerResource:GetSteamID(player_id))
+		local player = api.players and api.players[steamid] or nil
+		local supporter_pass = player and player.supporter_pass or nil
+		armory = supporter_pass and supporter_pass.armory or nil
+	end
+
+	if armory ~= nil then
+		CustomNetTables:SetTableValue("supporter_pass_armory", "rewards_" .. player_id, armory)
+	end
+end
+
 function api:GrantSupporterFragments(player_id, amount, reason, idempotency_key, callback)
 	if callback == nil then
 		callback = function() end
@@ -433,9 +516,145 @@ function api:GrantSupporterFragments(player_id, amount, reason, idempotency_key,
 	}
 
 	api:Request("supporter-fragments/grant", function(data)
+		local steamid = tostring(PlayerResource:GetSteamID(player_id))
+		api:MergeSupporterPassResponse(steamid, data)
+
+		if SupporterPass and SupporterPass.PublishPlayer then
+			SupporterPass:PublishPlayer(player_id)
+		end
+
 		callback(true, data)
-	end, function()
-		callback(false)
+	end, function(error)
+		callback(false, error)
+	end, "POST", payload)
+end
+
+function api:UpdateSupporterPassSettings(player_id, settings, callback)
+	if callback == nil then
+		callback = function() end
+	end
+
+	if not PlayerResource:IsValidPlayerID(player_id) then
+		return callback(false)
+	end
+
+	local steamid = tostring(PlayerResource:GetSteamID(player_id))
+	local payload = {
+		steamid = steamid,
+		toggle_tag = settings.toggle_tag == true or settings.toggle_tag == 1,
+		pass_rewards = settings.pass_rewards == true or settings.pass_rewards == 1,
+		player_xp = settings.player_xp == true or settings.player_xp == 1,
+		winrate_toggle = settings.winrate_toggle == true or settings.winrate_toggle == 1,
+	}
+
+	api:Request("supporter-pass/settings", function(data)
+		if api.players and api.players[steamid] then
+			api.players[steamid].toggle_tag = data.toggle_tag
+			api.players[steamid].bp_rewards = data.bp_rewards
+			api.players[steamid].pass_rewards = data.pass_rewards
+			api.players[steamid].player_xp = data.player_xp
+			api.players[steamid].winrate = data.winrate_toggle and 1 or 0
+			api.players[steamid].winrate_toggle = data.winrate_toggle
+		end
+
+		callback(true, data)
+	end, function(error)
+		callback(false, error)
+	end, "POST", payload)
+end
+
+function api:BuySupporterPassShopItem(player_id, item_id, callback)
+	if callback == nil then
+		callback = function() end
+	end
+
+	if not PlayerResource:IsValidPlayerID(player_id) then
+		return callback(false)
+	end
+
+	local steamid = tostring(PlayerResource:GetSteamID(player_id))
+	local payload = {
+		steamid = steamid,
+		item_id = item_id,
+	}
+
+	api:Request("supporter-pass/buy-shop-item", function(data)
+		api:MergeSupporterPassResponse(steamid, data)
+		api:PublishSupporterPassArmory(player_id, data.armory)
+
+		if SupporterPass and SupporterPass.PublishPlayer then
+			SupporterPass:PublishPlayer(player_id)
+		end
+
+		callback(true, data)
+	end, function(error)
+		callback(false, error)
+	end, "POST", payload)
+end
+
+function api:ClaimSupporterPassReward(player_id, reward_id, callback)
+	if callback == nil then
+		callback = function() end
+	end
+
+	if not PlayerResource:IsValidPlayerID(player_id) then
+		return callback(false)
+	end
+
+	local steamid = tostring(PlayerResource:GetSteamID(player_id))
+	local payload = {
+		steamid = steamid,
+		reward_id = reward_id,
+	}
+
+	api:Request("supporter-pass/claim-reward", function(data)
+		api:MergeSupporterPassResponse(steamid, data)
+
+		if data.armory then
+			api:PublishSupporterPassArmory(player_id, data.armory)
+		end
+
+		if SupporterPass and SupporterPass.PublishPlayer then
+			SupporterPass:PublishPlayer(player_id)
+		end
+
+		callback(true, data)
+	end, function(error)
+		callback(false, error)
+	end, "POST", payload)
+end
+
+function api:EquipSupporterPassItem(player_id, item_id, hero, slot_id, callback)
+	if callback == nil then
+		callback = function() end
+	end
+
+	if not PlayerResource:IsValidPlayerID(player_id) then
+		return callback(false)
+	end
+
+	local steamid = tostring(PlayerResource:GetSteamID(player_id))
+	local payload = {
+		steamid = steamid,
+		item_id = item_id,
+		hero = hero,
+		slot_id = slot_id,
+	}
+
+	api:Request("supporter-pass/equip", function(data)
+		api:MergeSupporterPassResponse(steamid, data)
+
+		if data.armory then
+			api:PublishSupporterPassArmory(player_id, data.armory)
+		end
+
+		if api.players and api.players[steamid] and data.equipped then
+			api.players[steamid].armory = data.equipped
+		end
+
+		callback(true, data)
+	end, function(error)
+		callback(false, error)
 	end, "POST", payload)
 end
 
@@ -643,6 +862,100 @@ function api:Message(message, _type)
 	end)
 end
 
+function api:GetEventPlayerID(event_source_index, payload)
+	local player_id = tonumber(payload and payload.PlayerID or -1) or -1
+
+	if type(event_source_index) == "number" and event_source_index > 0 then
+		local ok, sender = pcall(EntIndexToHScript, event_source_index)
+		if ok and sender ~= nil and sender.GetPlayerID then
+			local sender_player_id = sender:GetPlayerID()
+			if sender_player_id ~= nil and sender_player_id >= 0 then
+				player_id = sender_player_id
+			end
+		end
+	end
+
+	if not PlayerResource:IsValidPlayerID(player_id) then
+		return nil
+	end
+
+	return player_id
+end
+
+function api:SendLoadingScreenApiResponse(player_id, request_id, ok, data, message)
+	local player = PlayerResource:GetPlayer(player_id)
+	if player == nil then
+		return
+	end
+
+	CustomGameEventManager:Send_ServerToPlayer(player, "loading_screen_api_response", {
+		request_id = request_id or "",
+		ok = ok and 1 or 0,
+		data = data or {},
+		message = message or "",
+	})
+end
+
+function api:IsLoadingScreenApiRateLimited(player_id, request_type)
+	self.loading_screen_api_last_request = self.loading_screen_api_last_request or {}
+
+	local key = tostring(player_id) .. ":" .. tostring(request_type)
+	local now = GameRules:GetGameTime()
+	local last_request = self.loading_screen_api_last_request[key]
+
+	if last_request ~= nil and now - last_request < 0.5 then
+		return true
+	end
+
+	self.loading_screen_api_last_request[key] = now
+	return false
+end
+
+function api:OnLoadingScreenApiRequest(event_source_index, keys)
+	local payload = keys
+
+	if type(event_source_index) == "table" and payload == nil then
+		payload = event_source_index
+	end
+
+	if payload == nil then
+		return
+	end
+
+	local player_id = self:GetEventPlayerID(event_source_index, payload)
+	if player_id == nil then
+		return
+	end
+
+	local request_id = tostring(payload.request_id or "")
+	if request_id == "" then
+		return
+	end
+
+	local request_type = tostring(payload.request_type or "")
+	if self:IsLoadingScreenApiRateLimited(player_id, request_type) then
+		self:SendLoadingScreenApiResponse(player_id, request_id, false, {}, "rate limited")
+		return
+	end
+
+	if request_type == "loading-screen-info" then
+		if self.loading_screen_info_cache ~= nil then
+			self:SendLoadingScreenApiResponse(player_id, request_id, true, { data = self.loading_screen_info_cache })
+			return
+		end
+
+		self:Request("loading-screen-info", function(data)
+			self.loading_screen_info_cache = data
+			self:SendLoadingScreenApiResponse(player_id, request_id, true, { data = data })
+		end, function()
+			self:SendLoadingScreenApiResponse(player_id, request_id, false, {}, "loading-screen-info failed")
+		end)
+		return
+	end
+
+	self:SendLoadingScreenApiResponse(player_id, request_id, false, {}, "unknown request")
+end
+
 -- Core
 function api:Request(endpoint, okCallback, failCallback, method, payload)
 	if okCallback == nil then
@@ -658,6 +971,7 @@ function api:Request(endpoint, okCallback, failCallback, method, payload)
 	if method == nil then
 		method = "GET"
 	end
+	method = string.upper(method)
 
 	local request = CreateHTTPRequestScriptVM(method, self:GetUrl(endpoint))
 
@@ -680,15 +994,21 @@ function api:Request(endpoint, okCallback, failCallback, method, payload)
 		end
 	end
 
-	CustomNetTables:SetTableValue("game_options", "server_key", { header_key })
-
 	request:SetHTTPRequestHeaderValue("X-Dota-Server-Key", header_key)
 	request:SetHTTPRequestHeaderValue("X-Dota-Game-Type", CUSTOM_GAME_TYPE)
 
 	-- encode payload
 	if payload ~= nil then
-		local encoded = json.encode(payload)
-		request:SetHTTPRequestRawPostBody("application/json", encoded)
+		if method == "GET" then
+			for key, value in pairs(payload) do
+				if value ~= nil and value ~= json.null then
+					request:SetHTTPRequestGetOrPostParameter(tostring(key), tostring(value))
+				end
+			end
+		else
+			local encoded = json.encode(payload)
+			request:SetHTTPRequestRawPostBody("application/json", encoded)
+		end
 	end
 
 	request:Send(function(result)
@@ -701,7 +1021,11 @@ function api:Request(endpoint, okCallback, failCallback, method, payload)
 			end
 
 			print("Request to " .. endpoint .. " failed with message " .. message .. " (" .. tostring(code) .. ")")
-			failCallback()
+			failCallback({
+				message = message,
+				status_code = code,
+				endpoint = endpoint,
+			})
 		end
 
 		if code == 0 then
@@ -710,7 +1034,7 @@ function api:Request(endpoint, okCallback, failCallback, method, payload)
 			return fail("Server Error")
 		elseif code == 204 then
 			print("Request to " .. endpoint .. " succeeded with no content")
-			return okCallback(obj.data or {})
+			return okCallback({})
 		else
 			local obj, pos, err = json.decode(result.Body)
 
@@ -758,6 +1082,32 @@ function api:RegisterGame(callback)
 
 		if SupporterPass and SupporterPass.PublishPlayers then
 			SupporterPass:PublishPlayers()
+		end
+
+		for player_id = 0, PlayerResource:GetPlayerCount() - 1 do
+			if PlayerResource:IsValidPlayerID(player_id) then
+				api:PublishSupporterPassArmory(player_id)
+			end
+		end
+
+		if IsInToolsMode() then
+			for player_id = 0, PlayerResource:GetPlayerCount() - 1 do
+				if PlayerResource:IsValidPlayerID(player_id) then
+					local steamid = tostring(PlayerResource:GetSteamID(player_id))
+					local player = api.players and api.players[steamid] or nil
+					local supporter_pass = player and player.supporter_pass or {}
+					local season = supporter_pass.season or {}
+					print("XHS Supporter Pass register: player=" .. tostring(player_id)
+						.. " steamid=" .. steamid
+						.. " tier=" .. tostring(supporter_pass.tier_id)
+						.. " fragments=" .. tostring(supporter_pass.fragments or supporter_pass.fragment_balance)
+						.. " season_xp=" .. tostring(season.xp or supporter_pass.season_xp or supporter_pass.current_exp)
+						.. " season_level=" .. tostring(season.level or supporter_pass.season_level or supporter_pass.level))
+					if not player then
+						print("XHS Supporter Pass register: missing backend player row for steamid=" .. steamid)
+					end
+				end
+			end
 		end
 
 		if callback ~= nil then

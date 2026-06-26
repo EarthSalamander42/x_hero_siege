@@ -2,6 +2,12 @@ if XHSPhase3BossAI == nil then
 	XHSPhase3BossAI = {}
 end
 
+LinkLuaModifier("modifier_xhs_boss_cast_protection", "boss_scripts/phase3_ai/core.lua", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_xhs_phase3_hide_overhead_bar", "boss_scripts/phase3_ai/core.lua", LUA_MODIFIER_MOTION_NONE)
+
+modifier_xhs_boss_cast_protection = modifier_xhs_boss_cast_protection or class({})
+modifier_xhs_phase3_hide_overhead_bar = modifier_xhs_phase3_hide_overhead_bar or class({})
+
 local DIFFICULTY_SCALE = {
 	[1] = { damage = 0.70, delay = 1.25, density = 0.65 },
 	[2] = { damage = 1.00, delay = 1.00, density = 1.00 },
@@ -9,6 +15,8 @@ local DIFFICULTY_SCALE = {
 	[4] = { damage = 1.40, delay = 0.82, density = 1.30 },
 	[5] = { damage = 1.70, delay = 0.72, density = 1.55 },
 }
+
+local DEFAULT_CAST_AGGRO_RADIUS = 2600
 
 function XHSPhase3BossAI:GetDifficulty()
 	if GameRules == nil then return 1 end
@@ -96,6 +104,41 @@ function XHSPhase3BossAI:MoveBoss(boss, position)
 	})
 end
 
+function XHSPhase3BossAI:HideVanillaHealthBar(unit)
+	if unit == nil or not IsValidEntity(unit) or unit:IsNull() then return end
+	if not unit:HasModifier("modifier_xhs_phase3_hide_overhead_bar") then
+		unit:AddNewModifier(unit, nil, "modifier_xhs_phase3_hide_overhead_bar", {})
+	end
+end
+
+function XHSPhase3BossAI:DestroyParticle(particle, immediate)
+	if particle == nil then return end
+	ParticleManager:DestroyParticle(particle, immediate == true)
+	ParticleManager:ReleaseParticleIndex(particle)
+end
+
+function XHSPhase3BossAI:ReleaseParticleAfter(particle, duration, immediate)
+	if particle == nil then return end
+	Timers:CreateTimer(math.max(0.03, duration or 0.1), function()
+		XHSPhase3BossAI:DestroyParticle(particle, immediate)
+		return nil
+	end)
+end
+
+function XHSPhase3BossAI:EmitSoundOnce(unit, soundName, key, cooldown)
+	if unit == nil or soundName == nil or soundName == "" then return false end
+	local now = GameRules:GetGameTime()
+	unit.xhs_phase3_sound_locks = unit.xhs_phase3_sound_locks or {}
+	local lockKey = key or soundName
+	if (unit.xhs_phase3_sound_locks[lockKey] or 0) > now then
+		return false
+	end
+
+	unit.xhs_phase3_sound_locks[lockKey] = now + (cooldown or 0.35)
+	unit:EmitSound(soundName)
+	return true
+end
+
 function XHSPhase3BossAI:WeightedChoice(entries, now)
 	local total = 0
 	for _, entry in pairs(entries) do
@@ -130,4 +173,129 @@ function XHSPhase3BossAI:SetAbilityLevels(boss, abilityNames)
 			ability:SetLevel(difficulty)
 		end
 	end
+end
+
+function XHSPhase3BossAI:HasNearbyEnemyUnits(unit, radius)
+	if unit == nil or not IsValidEntity(unit) or unit:IsNull() then return false end
+
+	local enemies = FindUnitsInRadius(
+		unit:GetTeamNumber(),
+		unit:GetAbsOrigin(),
+		nil,
+		radius or DEFAULT_CAST_AGGRO_RADIUS,
+		DOTA_UNIT_TARGET_TEAM_ENEMY,
+		DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC,
+		DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES,
+		FIND_ANY_ORDER,
+		false
+	)
+
+	for _, enemy in pairs(enemies) do
+		if enemy ~= nil and IsValidEntity(enemy) and not enemy:IsNull() and enemy:IsAlive() then
+			return true
+		end
+	end
+
+	return false
+end
+
+function XHSPhase3BossAI:IsCastBlocked(unit)
+	if unit == nil or not IsValidEntity(unit) or unit:IsNull() then return true end
+	if unit.IsStunned ~= nil and unit:IsStunned() then return true end
+	if unit.IsSilenced ~= nil and unit:IsSilenced() then return true end
+	if unit.IsHexed ~= nil and unit:IsHexed() then return true end
+	if not self:HasNearbyEnemyUnits(unit, unit.xhs_boss_ai_cast_radius) then return true end
+	return false
+end
+
+function XHSPhase3BossAI:ProtectCast(boss, ability, extraDuration)
+	if boss == nil or not IsValidEntity(boss) or boss:IsNull() then return end
+
+	local castPoint = 0
+	if ability ~= nil and not ability:IsNull() then
+		if ability.GetCastPoint ~= nil then
+			castPoint = ability:GetCastPoint() or 0
+		end
+		if castPoint <= 0 and ability.GetSpecialValueFor ~= nil then
+			castPoint = ability:GetSpecialValueFor("cast_point") or 0
+		end
+	end
+
+	boss:AddNewModifier(boss, nil, "modifier_xhs_boss_cast_protection", {
+		duration = math.max(0.1, castPoint + (extraDuration or 0.25)),
+	})
+end
+
+function XHSPhase3BossAI:ShouldRevealBossBarFromDamageEvent(modifier, event)
+	if modifier == nil or event == nil then return false end
+	if event.unit ~= modifier:GetParent() then return false end
+	if event.attacker == nil or event.attacker:GetTeamNumber() ~= DOTA_TEAM_GOODGUYS then return false end
+	if event.damage == nil or event.damage <= 0 then return false end
+	return true
+end
+
+function XHSPhase3BossAI:ShouldRevealBossBarFromAttackEvent(modifier, event)
+	if modifier == nil or event == nil then return false end
+	if event.target ~= modifier:GetParent() then return false end
+	if event.attacker == nil or event.attacker:GetTeamNumber() ~= DOTA_TEAM_GOODGUYS then return false end
+	return true
+end
+
+function XHSPhase3BossAI:RevealBossBarOnce(modifier)
+	if modifier == nil or modifier.xhs_boss_bar_revealed == true then return end
+
+	local boss = modifier:GetParent()
+	if boss == nil or not IsValidEntity(boss) or boss:IsNull() or not boss:IsAlive() then return end
+	if boss:HasModifier("modifier_invulnerable") or boss:HasModifier("modifier_pause_creeps") then return end
+
+	modifier.xhs_boss_bar_revealed = true
+	if ShowBossBar ~= nil then
+		ShowBossBar(boss)
+	end
+end
+
+function modifier_xhs_boss_cast_protection:IsHidden() return true end
+function modifier_xhs_boss_cast_protection:IsPurgable() return false end
+function modifier_xhs_boss_cast_protection:RemoveOnDeath() return true end
+
+function modifier_xhs_boss_cast_protection:OnCreated()
+	if not IsServer() then return end
+	self:StartIntervalThink(0.03)
+	self:OnIntervalThink()
+end
+
+function modifier_xhs_boss_cast_protection:OnIntervalThink()
+	if not IsServer() then return end
+	local parent = self:GetParent()
+	if parent == nil or parent:IsNull() or not parent:IsAlive() then return end
+	parent:Purge(false, true, false, true, true)
+end
+
+function modifier_xhs_boss_cast_protection:DeclareFunctions()
+	return {
+		MODIFIER_PROPERTY_STATUS_RESISTANCE_STACKING,
+	}
+end
+
+function modifier_xhs_boss_cast_protection:GetModifierStatusResistanceStacking()
+	return 100
+end
+
+function modifier_xhs_boss_cast_protection:CheckState()
+	return {
+		[MODIFIER_STATE_ROOTED] = false,
+		[MODIFIER_STATE_HEXED] = false,
+		[MODIFIER_STATE_SILENCED] = false,
+		[MODIFIER_STATE_STUNNED] = false,
+	}
+end
+
+function modifier_xhs_phase3_hide_overhead_bar:IsHidden() return true end
+function modifier_xhs_phase3_hide_overhead_bar:IsPurgable() return false end
+function modifier_xhs_phase3_hide_overhead_bar:RemoveOnDeath() return false end
+
+function modifier_xhs_phase3_hide_overhead_bar:CheckState()
+	return {
+		[MODIFIER_STATE_NO_HEALTH_BAR] = true,
+	}
 end

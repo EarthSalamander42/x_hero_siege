@@ -1052,13 +1052,17 @@ end
 --------------------------------------------------------------------
 
 local function CanQuestCountKilledUnit(quest, killedUnit)
-	if quest.szQuestName ~= "kill_final_wave" then
-		return true
+	if quest.szQuestName == "kill_final_wave" then
+		return CustomTimers ~= nil
+			and CustomTimers.final_wave_kill_counting == true
+			and killedUnit.xhs_final_wave_unit == true
 	end
 
-	return CustomTimers ~= nil
-		and CustomTimers.final_wave_kill_counting == true
-		and killedUnit.xhs_final_wave_unit == true
+	if quest.szQuestName == "clear_grom_vanguard" then
+		return killedUnit.xhs_grom_vanguard_unit == true
+	end
+
+	return true
 end
 
 --------------------------------------------------------------------

@@ -58,9 +58,13 @@ function Battlepass:GetPlayerInfoXP() -- yet it has too much useless loops, form
 			end
 
 			local supporter_table = SupporterPass and SupporterPass:BuildPlayerTable(player_id) or nil
-			local season_xp = supporter_table and supporter_table.season_xp or 0
-			local season_xp_max = supporter_table and supporter_table.season_xp_max or 1000
-			local season_level = supporter_table and supporter_table.season_level or 1
+			if type(supporter_table) ~= "table" then
+				supporter_table = CustomNetTables:GetTableValue("supporter_pass_player", tostring(player_id)) or {}
+			end
+
+			local season_xp = tonumber(supporter_table.season_xp or supporter_table.XP) or 0
+			local season_xp_max = tonumber(supporter_table.season_xp_max or supporter_table.MaxXP) or 1000
+			local season_level = tonumber(supporter_table.season_level or supporter_table.Lvl) or 1
 
 			if season_xp_max <= 0 then
 				season_xp_max = 1000
@@ -69,42 +73,40 @@ function Battlepass:GetPlayerInfoXP() -- yet it has too much useless loops, form
 				season_level = 1
 			end
 
-			CustomNetTables:SetTableValue("supporter_pass_player", tostring(player_id), {
-				XP = season_xp,
-				MaxXP = season_xp_max,
-				Lvl = season_level,
-				ply_color = rgbToHex(color),
-				title = "Supporter Pass",
-				title_color = "#9eb0c9",
-				donator_level = api:GetDonatorStatus(player_id),
-				donator_color = rgbToHex(donator_color),
-				tier_id = supporter_table and supporter_table.tier_id or 0,
-				tier_name = supporter_table and supporter_table.tier_name or "Free Player",
-				tier_color = supporter_table and supporter_table.tier_color or "#7DB9D8",
-				fragments = supporter_table and supporter_table.fragments or 0,
-				weekly_fragments = supporter_table and supporter_table.weekly_fragments or 0,
-				weekly_cap = supporter_table and supporter_table.weekly_cap or 100,
-				monthly_fragments = supporter_table and supporter_table.monthly_fragments or 0,
-				xp_boost = supporter_table and supporter_table.xp_boost or 0,
-				season_level = season_level,
-				season_xp = season_xp,
-				season_xp_max = season_xp_max,
-				account_level = supporter_table and supporter_table.account_level or 0,
-				account_title = "Supporter Pass",
-				legacy_fragments = supporter_table and supporter_table.legacy_fragments or 0,
-				toggle_tag = api:GetPlayerTagEnabled(player_id),
-				bp_rewards = api:GetPlayerBPRewardsEnabled(player_id),
-				pass_rewards = api:GetPlayerBPRewardsEnabled(player_id),
-				player_xp = api:GetPlayerXPEnabled(player_id),
-				winrate = api:GetPlayerSeasonalWinrate(player_id),
-				winrate_toggle = api:GetPlayerWinrateShown(player_id),
-				XP_change = 0,
-				ingame_tag = api:GetPlayerIngameTag(player_id),
-				achievements = api:GetPlayerAchievements(player_id),
-				supporter_url = supporter_table and supporter_table.supporter_url or "https://www.patreon.com/frostrose",
-				-- mmr = api:GetPlayerMMR(player_id),
-				-- mmr_title = api:GetPlayerRankMMR(player_id),
-			})
+			supporter_table.XP = season_xp
+			supporter_table.MaxXP = season_xp_max
+			supporter_table.Lvl = season_level
+			supporter_table.ply_color = rgbToHex(color)
+			supporter_table.title = supporter_table.title or "Supporter Pass"
+			supporter_table.title_color = supporter_table.title_color or "#9eb0c9"
+			supporter_table.donator_level = api:GetDonatorStatus(player_id)
+			supporter_table.donator_color = rgbToHex(donator_color)
+			supporter_table.tier_id = supporter_table.tier_id or 0
+			supporter_table.tier_name = supporter_table.tier_name or "Free Player"
+			supporter_table.tier_color = supporter_table.tier_color or "#7DB9D8"
+			supporter_table.fragments = supporter_table.fragments or 0
+			supporter_table.weekly_fragments = supporter_table.weekly_fragments or 0
+			supporter_table.weekly_cap = supporter_table.weekly_cap or 100
+			supporter_table.monthly_fragments = supporter_table.monthly_fragments or 0
+			supporter_table.xp_boost = supporter_table.xp_boost or 0
+			supporter_table.season_level = season_level
+			supporter_table.season_xp = season_xp
+			supporter_table.season_xp_max = season_xp_max
+			supporter_table.account_level = supporter_table.account_level or 0
+			supporter_table.account_title = supporter_table.account_title or "Supporter Pass"
+			supporter_table.legacy_fragments = supporter_table.legacy_fragments or 0
+			if supporter_table.toggle_tag == nil then supporter_table.toggle_tag = api:GetPlayerTagEnabled(player_id) end
+			if supporter_table.bp_rewards == nil then supporter_table.bp_rewards = api:GetPlayerBPRewardsEnabled(player_id) end
+			if supporter_table.pass_rewards == nil then supporter_table.pass_rewards = api:GetPlayerBPRewardsEnabled(player_id) end
+			if supporter_table.player_xp == nil then supporter_table.player_xp = api:GetPlayerXPEnabled(player_id) end
+			supporter_table.winrate = supporter_table.winrate or api:GetPlayerSeasonalWinrate(player_id)
+			if supporter_table.winrate_toggle == nil then supporter_table.winrate_toggle = api:GetPlayerWinrateShown(player_id) end
+			supporter_table.XP_change = supporter_table.XP_change or 0
+			supporter_table.ingame_tag = supporter_table.ingame_tag or api:GetPlayerIngameTag(player_id)
+			supporter_table.achievements = supporter_table.achievements or api:GetPlayerAchievements(player_id)
+			supporter_table.supporter_url = supporter_table.supporter_url or "https://www.patreon.com/bePatron?u=2533325"
+
+			CustomNetTables:SetTableValue("supporter_pass_player", tostring(player_id), supporter_table)
 		end
 	end
 end

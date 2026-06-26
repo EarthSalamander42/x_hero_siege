@@ -1608,7 +1608,7 @@
 		"BaseClass"						"item_lua"
 		"ScriptFile"					"items/item_orb_of_wind.lua"
 		"ID"							"2523"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"Model"							"models/props_gameplay/red_box.vmdl" 
 		"Effect"						"particles/generic_gameplay/dropped_item.vpcf"
 		"AbilityTextureName"			"custom/talisman_of_evasion_datadriven"
@@ -1646,7 +1646,7 @@
 		"BaseClass"						"item_lua"
 		"ScriptFile"					"items/item_orb_of_wind.lua"
 		"ID"							"2552"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"Model"							"models/props_gameplay/red_box.vmdl" 
 		"Effect"						"particles/generic_gameplay/dropped_item.vpcf"
 		"AbilityTextureName"			"custom/zephyr_gem"
@@ -1698,7 +1698,7 @@
 		"BaseClass"						"item_lua"
 		"ScriptFile"					"items/item_orb_of_wind.lua"
 		"ID"							"2554"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"Model"							"models/props_gameplay/red_box.vmdl" 
 		"Effect"						"particles/generic_gameplay/dropped_item.vpcf"
 		"AbilityTextureName"			"custom/tempest_aegis"
@@ -1865,19 +1865,21 @@
 	//========================================================================================================
 	"item_healing_wards"
 	{
-		"BaseClass"						"item_datadriven"
+		"BaseClass"						"item_lua"
+		"ScriptFile"					"items/wards"
 		"ID"							"2528"
 		"AbilityTextureName"			"custom/healing_wards"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_AOE"
 
 		"AbilityCooldown"				"20.0"	
 		"AbilityCastRange"				"500"
-		"ItemCost"						"1000"
+		"ItemCost"						"3000"
 		"ItemPurchasable"				"1"
 		"ItemQuality"					"rare"
 		"ItemStackable"					"1"
 		"ItemPermanent"					"0"
 		"ItemInitialCharges"			"3"
+		"ItemDisplayCharges"			"1"
 		"AOERadius"						"500"
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
 
@@ -1885,18 +1887,8 @@
 		{
 			"duration"				"30"
 			"radius"				"500"
-			"regeneration"			"5"
-		}
-
-		"OnSpellStart"
-		{
-			"SpendCharge"	{}
-			"RunScript"
-			{
-				"ScriptFile"			"items/wards.lua"
-				"Function"				"SummonHealingWard"
-				"Target"				"POINT"
-			}
+			"regeneration"			"0.5"
+			"flat_regeneration"		"75"
 		}
 	}
 
@@ -1905,19 +1897,21 @@
 	//========================================================================================================
 	"item_healing_wards2"
 	{
-		"BaseClass"						"item_datadriven"
+		"BaseClass"						"item_lua"
+		"ScriptFile"					"items/wards"
 		"ID"							"2545"
 		"AbilityTextureName"			"custom/healing_wards2"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_AOE"
 
 		"AbilityCooldown"				"20.0"	
 		"AbilityCastRange"				"600"
-		"ItemCost"						"10000"
+		"ItemCost"						"30000"
 		"ItemPurchasable"				"1"
 		"ItemQuality"					"rare"
 		"ItemStackable"					"1"
 		"ItemPermanent"					"0"
 		"ItemInitialCharges"			"3"
+		"ItemDisplayCharges"			"1"
 		"AOERadius"						"600"
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
 
@@ -1925,18 +1919,8 @@
 		{
 			"duration"				"35"
 			"radius"				"600"
-			"regeneration"			"8"
-		}
-
-		"OnSpellStart"
-		{
-			"SpendCharge"	{}
-			"RunScript"
-			{
-				"ScriptFile"			"items/wards.lua"
-				"Function"				"SummonHealingWard"
-				"Target"				"POINT"
-			}
+			"regeneration"			"1.0"
+			"flat_regeneration"		"300"
 		}
 	}
 

@@ -14,6 +14,9 @@ modifier_xhs_magtheridon_twin_lockout = modifier_xhs_magtheridon_twin_lockout or
 modifier_xhs_magtheridon_slow = modifier_xhs_magtheridon_slow or class({})
 modifier_xhs_magtheridon_cast_lock = modifier_xhs_magtheridon_cast_lock or class({})
 
+local INFERNAL_ROOT_MODIFIER = "modifier_xhs_magtheridon_infernal_root"
+local EMPOWER_OVERHEAD_PARTICLE = "particles/units/heroes/hero_abaddon/abaddon_curse_counter_stack.vpcf"
+
 local MAGTHERIDON_ABILITIES = {
 	"xhs_magtheridon_brutal_slam",
 	"xhs_magtheridon_fel_stomp",
@@ -30,12 +33,8 @@ local MAGTHERIDON_ABILITIES = {
 
 local WARNING_PARTICLE = "particles/econ/events/darkmoon_2017/darkmoon_generic_aoe.vpcf"
 local FEL_WARNING_PARTICLE = "particles/events/darkmoon_generic_aoe_green.vpcf"
-local FIRE_IMPACT_PARTICLE = "particles/units/heroes/hero_invoker/invoker_chaos_meteor_land_soil.vpcf"
-local FIRE_CRUMBLE_PARTICLE = "particles/units/heroes/hero_invoker/invoker_chaos_meteor_crumble.vpcf"
 local SPAWN_WARNING_PARTICLE = "particles/units/heroes/hero_templar_assassin/templar_assassin_trap_rings_inner.vpcf"
 local SPAWN_PARTICLE = "particles/units/heroes/hero_shadowshaman/shadow_shaman_dust_hit.vpcf"
-local STOMP_PARTICLE = "particles/units/heroes/hero_brewmaster/brewmaster_thunder_clap.vpcf"
-local HOWL_PARTICLE = "particles/units/heroes/hero_lycan/lycan_howl_cast.vpcf"
 
 local RUPTURE_REINCARNATE_TIME = 20.0
 local MEDIUM_FRAGMENT_COUNT = 8
@@ -126,7 +125,7 @@ local function CreateWarning(position, radius, delay, fel)
 end
 
 local function CreateImpact(position, radius, particleName)
-	local particle = ParticleManager:CreateParticle(particleName or FIRE_IMPACT_PARTICLE, PATTACH_WORLDORIGIN, nil)
+	local particle = ParticleManager:CreateParticle(particleName or SPAWN_PARTICLE, PATTACH_WORLDORIGIN, nil)
 	ParticleManager:SetParticleControl(particle, 0, position)
 	ParticleManager:SetParticleControl(particle, 1, Vector(radius, 0, 0))
 	ParticleManager:ReleaseParticleIndex(particle)
@@ -211,6 +210,7 @@ local function CastPreparedAbility(boss, abilityName, context, facePosition)
 
 	local ability = boss:FindAbilityByName(abilityName)
 	if ability == nil or ability:IsNull() then return nil end
+	if XHSPhase3BossAI:IsCastBlocked(boss) then return nil end
 
 	ability.xhs_magtheridon_context = context or {}
 	ability.xhs_magtheridon_context.arena_center = ability.xhs_magtheridon_context.arena_center or GetArenaCenter()
@@ -219,6 +219,7 @@ local function CastPreparedAbility(boss, abilityName, context, facePosition)
 		FaceUnitTowardsPosition(boss, facePosition)
 	end
 
+	XHSPhase3BossAI:ProtectCast(boss, ability)
 	boss:CastAbilityNoTarget(ability, -1)
 	return ability
 end
@@ -260,6 +261,7 @@ local function UpdateFragmentCounter(bossCount)
 
 	CustomGameEventManager:Send_ServerToAllClients("xhs_boss_counter_update", {
 		boss_count = bossCount or 1,
+		boss_bar_id = "magtheridon_" .. tostring(bossCount or 1),
 		label = "Fragments left",
 		remaining = CountLivingFragments(bossCount),
 		total = rupture.total or RUPTURE_FRAGMENT_TOTAL,
@@ -269,12 +271,14 @@ end
 local function HideFragmentCounter(bossCount)
 	CustomGameEventManager:Send_ServerToAllClients("xhs_boss_counter_hide", {
 		boss_count = bossCount or 1,
+		boss_bar_id = "magtheridon_" .. tostring(bossCount or 1),
 	})
 end
 
 local function UpdateBossTimer(bossCount, label, remaining, duration)
 	CustomGameEventManager:Send_ServerToAllClients("xhs_boss_timer_update", {
 		boss_count = bossCount or 1,
+		boss_bar_id = "magtheridon_" .. tostring(bossCount or 1),
 		label = label or "Reincarnation",
 		remaining = math.max(0, remaining or 0),
 		duration = math.max(1, duration or 1),
@@ -285,6 +289,7 @@ end
 local function HideBossTimer(bossCount)
 	CustomGameEventManager:Send_ServerToAllClients("xhs_boss_timer_hide", {
 		boss_count = bossCount or 1,
+		boss_bar_id = "magtheridon_" .. tostring(bossCount or 1),
 	})
 end
 
@@ -337,6 +342,50 @@ local function PositionOnRing(center, radius, index, count, offsetDegrees)
 	return RotatePosition(center, QAngle(0, angle, 0), center + Vector(radius, 0, 0))
 end
 
+local function PickClosestHeroFromPosition(position)
+	local heroes = XHSPhase3BossAI:GetLivingHeroes(GetArenaCenter(), 2800, true)
+	local best = nil
+	local bestDistance = nil
+
+	for _, hero in pairs(heroes) do
+		if IsValidAlive(hero) then
+			local distance = (hero:GetAbsOrigin() - position):Length2D()
+			if best == nil or distance < bestDistance then
+				best = hero
+				bestDistance = distance
+			end
+		end
+	end
+
+	return best
+end
+
+local function StartFragmentSeek(fragment)
+	if not IsValidAlive(fragment) then return end
+
+	local contextName = "xhs_magtheridon_fragment_seek_" .. tostring(fragment:entindex())
+	fragment:SetContextThink(contextName, function()
+		if not IsValidAlive(fragment) then return nil end
+
+		local target = PickClosestHeroFromPosition(fragment:GetAbsOrigin())
+		if IsValidAlive(target) then
+			ExecuteOrderFromTable({
+				UnitIndex = fragment:entindex(),
+				OrderType = DOTA_UNIT_ORDER_ATTACK_TARGET,
+				TargetIndex = target:entindex(),
+			})
+		else
+			ExecuteOrderFromTable({
+				UnitIndex = fragment:entindex(),
+				OrderType = DOTA_UNIT_ORDER_ATTACK_MOVE,
+				Position = GetArenaCenter(),
+			})
+		end
+
+		return 1.0
+	end, 0.25)
+end
+
 local function SpawnFragment(unitName, bossCount, position, center, delay, ringName)
 	CreateWarning(position, unitName == "npc_dota_hero_magtheridon_medium" and 190 or 135, delay + 0.35, true)
 
@@ -356,6 +405,7 @@ local function SpawnFragment(unitName, bossCount, position, center, delay, ringN
 		fragment:AddNewModifier(fragment, nil, "modifier_xhs_magtheridon_fragment", {})
 		FaceUnitTowardsPosition(fragment, center)
 		RegisterDevSpawn(fragment)
+		StartFragmentSeek(fragment)
 
 		local rupture = GetRupture(bossCount)
 		rupture.fragments[tostring(fragment:entindex())] = fragment
@@ -400,6 +450,7 @@ function XHSMagtheridon_AttachPhase3AI(boss)
 
 	boss:RemoveModifierByName("modifier_ai")
 	if boss:HasModifier("modifier_xhs_magtheridon_phase3_ai") then return end
+	XHSPhase3BossAI:HideVanillaHealthBar(boss)
 	boss:AddNewModifier(boss, nil, "modifier_xhs_magtheridon_phase3_ai", {})
 end
 
@@ -412,12 +463,12 @@ function XHSMagtheridon_StartRupture(deadBoss, bossCount, position, charges, rei
 	LockOtherMagtheridons(bossCount, reincarnateTime)
 	SpawnRuptureFragments(bossCount, position, deadBoss)
 	GetRupture(bossCount).config = config
-	UpdateBossTimer(bossCount, "Rupture: kill fragments", reincarnateTime, reincarnateTime)
+	UpdateBossTimer(bossCount, "Rebirth: kill fragments", reincarnateTime, reincarnateTime)
 
 	local startedAt = GameRules:GetGameTime()
 	Timers:CreateTimer(0.25, function()
 		local remaining = math.max(0, reincarnateTime - (GameRules:GetGameTime() - startedAt))
-		UpdateBossTimer(bossCount, "Rupture: kill fragments", math.ceil(remaining), reincarnateTime)
+		UpdateBossTimer(bossCount, "Rebirth: kill fragments", math.ceil(remaining), reincarnateTime)
 		if remaining > 0 then return 0.25 end
 		return nil
 	end)
@@ -436,6 +487,7 @@ function XHSMagtheridon_OnRespawned(boss, bossCount, empowerStacks)
 	if boss == nil or not IsValidEntity(boss) or boss:IsNull() then return end
 
 	boss.boss_count = bossCount or boss.boss_count or 1
+	boss.xhs_boss_bar_id = "magtheridon_" .. tostring(boss.boss_count)
 	boss.zone = "xhs_holdout"
 	RegisterDevSpawn(boss)
 	XHSMagtheridon_AttachPhase3AI(boss)
@@ -493,6 +545,7 @@ function modifier_xhs_magtheridon_phase3_ai:OnCreated()
 	self.basic_ready_at = 0
 	self.last_pattern = nil
 	self.major_lock_id = tostring(boss:entindex())
+	self.thresholds_done = {}
 
 	boss:RemoveModifierByName("modifier_ai")
 	XHSPhase3BossAI:SetAbilityLevels(boss, MAGTHERIDON_ABILITIES)
@@ -511,7 +564,7 @@ function modifier_xhs_magtheridon_phase3_ai:BuildPatternDeck()
 	self.patterns = {
 		{ id = "fel_stomp", weight = 4, cooldown = 8.0, ready_at = 0, run = function() return self:CastFelStomp() end },
 		{ id = "targeted_firestorms", weight = 4, cooldown = 10.0, ready_at = 0, run = function() return self:CastTargetedFirestorms() end },
-		{ id = "fel_fissure", weight = 3, cooldown = 9.0, ready_at = 0, run = function() return self:CastFelFissure() end },
+		{ id = "rupture", weight = 3, cooldown = 9.0, ready_at = 0, run = function() return self:CastRupture() end },
 		{ id = "infernal_rings", weight = 3, cooldown = 11.0, ready_at = now + 3.0, run = function() return self:CastInfernalRings() end },
 		{ id = "demonic_howl", weight = 2, cooldown = 18.0, ready_at = now + 7.0, run = function() return self:CastDemonicHowl() end },
 	}
@@ -523,14 +576,12 @@ function modifier_xhs_magtheridon_phase3_ai:UpdateBossBarMarkers()
 	local charges = ankh ~= nil and ankh:GetStackCount() or 0
 	boss.xhs_boss_bar_markers = {}
 
-	if charges <= 0 then return end
-
-	for i = 1, math.min(4, charges) do
-		boss.xhs_boss_bar_markers[i] = {
-			pct = math.max(10, 100 - (i * (100 / (charges + 1)))),
+	if charges > 0 then
+		boss.xhs_boss_bar_markers[#boss.xhs_boss_bar_markers + 1] = {
+			pct = 0,
 			kind = "companion",
-			label = "Rupture on death",
-			description = "Magtheridon reincarnates after 20s. Kill 8 medium and 16 small fragments before he returns; surviving fragments empower his damage and armor.",
+			label = "Demonic Rebirth",
+			description = "On death with ankh charges, Magtheridon reincarnates after 20s. Kill fragments before he returns; survivors empower his damage and armor.",
 			triggered = false,
 		}
 	end
@@ -577,6 +628,7 @@ end
 
 function modifier_xhs_magtheridon_phase3_ai:TrackHeroPositions()
 	local heroes = XHSPhase3BossAI:GetLivingHeroes(self.arena_center, 2500, true)
+	local now = GameRules:GetGameTime()
 	for _, hero in pairs(heroes) do
 		if IsValidAlive(hero) then
 			local key = tostring(hero:entindex())
@@ -584,6 +636,8 @@ function modifier_xhs_magtheridon_phase3_ai:TrackHeroPositions()
 			self.recent_positions[key] = {
 				current = hero:GetAbsOrigin(),
 				previous = previous and previous.current or hero:GetAbsOrigin(),
+				current_time = now,
+				previous_time = previous and previous.current_time or now,
 			}
 		end
 	end
@@ -600,6 +654,42 @@ function modifier_xhs_magtheridon_phase3_ai:GetPredictedHeroPosition(hero, lead)
 	return tracked.current + velocity * (lead or 1.2)
 end
 
+function modifier_xhs_magtheridon_phase3_ai:GetPredictedHeroDropPosition(hero, secondsAhead)
+	if hero == nil then return self.arena_center end
+
+	local position = hero:GetAbsOrigin()
+	local tracked = self.recent_positions[tostring(hero:entindex())]
+	if tracked == nil then return position end
+
+	local dt = math.max(0.03, (tracked.current_time or GameRules:GetGameTime()) - (tracked.previous_time or tracked.current_time or GameRules:GetGameTime()))
+	local velocity = (tracked.current - tracked.previous) * (1 / dt)
+	velocity.z = 0
+	local speed = velocity:Length2D()
+	local maxSpeed = hero.GetIdealSpeed ~= nil and math.max(350, hero:GetIdealSpeed() * 1.35) or 900
+	if speed > maxSpeed then
+		velocity = velocity:Normalized() * maxSpeed
+	end
+
+	return tracked.current + velocity * math.max(0, secondsAhead or 0)
+end
+
+function modifier_xhs_magtheridon_phase3_ai:GetRootedHeroes()
+	local rooted = {}
+	local heroes = XHSPhase3BossAI:GetLivingHeroes(self.arena_center, 2500, true)
+
+	for _, hero in pairs(heroes) do
+		if IsValidAlive(hero) and hero:HasModifier(INFERNAL_ROOT_MODIFIER) then
+			rooted[#rooted + 1] = hero
+		end
+	end
+
+	return rooted
+end
+
+function modifier_xhs_magtheridon_phase3_ai:HasRootedHeroForFirestorm()
+	return #self:GetRootedHeroes() > 0
+end
+
 function modifier_xhs_magtheridon_phase3_ai:CanUseMajorPattern(now)
 	GameMode.MagtheridonMajorCastLockUntil = GameMode.MagtheridonMajorCastLockUntil or 0
 	if now >= GameMode.MagtheridonMajorCastLockUntil then return true end
@@ -609,6 +699,14 @@ end
 
 function modifier_xhs_magtheridon_phase3_ai:GetNextPattern(now)
 	if not self:CanUseMajorPattern(now) then return nil end
+	if self:HasRootedHeroForFirestorm() then
+		for _, entry in pairs(self.patterns) do
+			if entry.id == "targeted_firestorms" and now >= (entry.ready_at or 0) then
+				return entry
+			end
+		end
+	end
+
 	return XHSPhase3BossAI:WeightedChoice(self.patterns, now)
 end
 
@@ -626,6 +724,14 @@ function modifier_xhs_magtheridon_phase3_ai:RunPattern(entry, now)
 	self.recover_until = self.cast_until + XHSPhase3BossAI:ScaleDelay(1.0)
 	GameMode.MagtheridonMajorCastOwner = self.major_lock_id
 	GameMode.MagtheridonMajorCastLockUntil = self.recover_until
+
+	if entry.id == "infernal_rings" then
+		for _, pattern in pairs(self.patterns) do
+			if pattern.id == "targeted_firestorms" then
+				pattern.ready_at = math.min(pattern.ready_at or self.recover_until, self.recover_until)
+			end
+		end
+	end
 end
 
 function modifier_xhs_magtheridon_phase3_ai:Reposition()
@@ -678,22 +784,25 @@ end
 function modifier_xhs_magtheridon_phase3_ai:CastTargetedFirestorms()
 	local boss = self:GetParent()
 	local ability = boss:FindAbilityByName("xhs_magtheridon_targeted_firestorms")
-	local heroes = XHSPhase3BossAI:GetLivingHeroes(self.arena_center, 2500, true)
+	local rootedHeroes = self:GetRootedHeroes()
+	local heroes = #rootedHeroes > 0 and rootedHeroes or XHSPhase3BossAI:GetLivingHeroes(self.arena_center, 2500, true)
 	if ability == nil or #heroes <= 0 then return nil end
 
 	local count = XHSPhase3BossAI:ScaleDensity(ability:GetSpecialValueFor("target_count"), 2)
 	local waves = XHSPhase3BossAI:ScaleDensity(ability:GetSpecialValueFor("waves"), 2)
 	local waveInterval = XHSPhase3BossAI:ScaleDelay(ability:GetSpecialValueFor("wave_interval"))
 	local targetStagger = XHSPhase3BossAI:ScaleDelay(ability:GetSpecialValueFor("target_stagger"))
+	local castPoint = GetAbilityCastPoint(ability)
 	local impacts = {}
 
 	for i = 1, count do
 		local hero = heroes[((i - 1) % #heroes) + 1]
-		local basePosition = self:GetPredictedHeroPosition(hero, 1.4) + RandomVector(RandomFloat(0, 120))
 		for wave = 1, waves do
+			local impactDelay = (wave - 1) * waveInterval + (i - 1) * targetStagger
+			local dropPosition = self:GetPredictedHeroDropPosition(hero, castPoint + impactDelay)
 			impacts[#impacts + 1] = {
-				position = basePosition + RandomVector((wave - 1) * 85),
-				delay = (wave - 1) * waveInterval + (i - 1) * targetStagger,
+				position = dropPosition + RandomVector(RandomFloat(0, 120)) + RandomVector((wave - 1) * 85),
+				delay = impactDelay,
 			}
 		end
 	end
@@ -702,7 +811,7 @@ function modifier_xhs_magtheridon_phase3_ai:CastTargetedFirestorms()
 	local castAbility = CastPreparedAbility(boss, "xhs_magtheridon_targeted_firestorms", { impacts = impacts }, castFacePosition)
 	if castAbility == nil then return nil end
 
-	return GetAbilityCastPoint(castAbility) + waves * waveInterval + count * targetStagger + 0.4
+	return castPoint + waves * waveInterval + count * targetStagger + 0.4
 end
 
 function modifier_xhs_magtheridon_phase3_ai:CastFelFissure()
@@ -739,25 +848,45 @@ function modifier_xhs_magtheridon_phase3_ai:CastInfernalRings()
 	local ability = boss:FindAbilityByName("xhs_magtheridon_infernal_rings")
 	if ability == nil then return nil end
 
-	local closeHeroes = XHSPhase3BossAI:GetLivingHeroes(self.arena_center, 620, true)
-	local ringRadius = #closeHeroes >= 2 and ability:GetSpecialValueFor("outer_ring_radius") or ability:GetSpecialValueFor("inner_ring_radius")
+	local bossPosition = boss:GetAbsOrigin()
+	local target = XHSPhase3BossAI:PickClosestHero(bossPosition, 2500)
+	if target == nil then return nil end
+
+	local castPoint = GetAbilityCastPoint(ability)
+	local nodeRadius = ability:GetSpecialValueFor("radius")
+	local innerRingRadius = ability:GetSpecialValueFor("inner_ring_radius")
+	local predictedTargetPosition = self:GetPredictedHeroDropPosition(target, castPoint)
+	local targetDistance = (predictedTargetPosition - bossPosition):Length2D()
+	local center = predictedTargetPosition
+	local ringRadius = math.max(nodeRadius * 1.4, math.min(innerRingRadius, nodeRadius * 1.75))
+
+	if targetDistance <= innerRingRadius + nodeRadius then
+		center = bossPosition
+		ringRadius = math.max(nodeRadius * 1.25, math.min(innerRingRadius, targetDistance + nodeRadius * 0.35))
+	end
+
 	local baseCount = ringRadius > 600 and ability:GetSpecialValueFor("outer_count") or ability:GetSpecialValueFor("inner_count")
 	local count = XHSPhase3BossAI:ScaleDensity(baseCount, 8)
 	local stagger = XHSPhase3BossAI:ScaleDelay(ability:GetSpecialValueFor("impact_stagger"))
-	local impacts = {}
+	local impacts = {
+		{
+			position = predictedTargetPosition,
+			delay = 0,
+		},
+	}
 
 	for i = 1, count do
-		local position = PositionOnRing(self.arena_center, ringRadius, i, count, self.last_pattern == "infernal_rings" and 18 or 0)
+		local position = PositionOnRing(center, ringRadius, i, count, self.last_pattern == "infernal_rings" and 18 or 0)
 		impacts[#impacts + 1] = {
 			position = position,
 			delay = (i % 2) * stagger,
 		}
 	end
 
-	local castAbility = CastPreparedAbility(boss, "xhs_magtheridon_infernal_rings", { impacts = impacts }, self.arena_center)
+	local castAbility = CastPreparedAbility(boss, "xhs_magtheridon_infernal_rings", { impacts = impacts }, center)
 	if castAbility == nil then return nil end
 
-	return GetAbilityCastPoint(castAbility) + stagger + 0.5
+	return castPoint + stagger + 0.5
 end
 
 function modifier_xhs_magtheridon_phase3_ai:CastDemonicHowl()
@@ -766,6 +895,42 @@ function modifier_xhs_magtheridon_phase3_ai:CastDemonicHowl()
 	if ability == nil then return nil end
 
 	return GetAbilityCastPoint(ability) + 0.55
+end
+
+function modifier_xhs_magtheridon_phase3_ai:CastRupture()
+	local boss = self:GetParent()
+	local ability = boss:FindAbilityByName("xhs_magtheridon_rupture")
+	local target = XHSPhase3BossAI:PickFarthestHero(self.arena_center, 2500)
+	if ability == nil then return nil end
+
+	local lineCount = math.max(1, ability:GetSpecialValueFor("line_count"))
+	local lineSpread = ability:GetSpecialValueFor("line_spread_degrees")
+	local lineLength = ability:GetSpecialValueFor("line_length")
+	local spacing = ability:GetSpecialValueFor("segment_spacing")
+	local segmentCount = math.max(1, math.floor(lineLength / math.max(1, spacing)) + 1)
+	local targetPosition = target ~= nil and target:GetAbsOrigin() or self.arena_center + Vector(1, 0, 0)
+	local baseDirection = targetPosition - boss:GetAbsOrigin()
+	baseDirection.z = 0
+	if baseDirection:Length2D() <= 0 then baseDirection = Vector(1, 0, 0) end
+	baseDirection = baseDirection:Normalized()
+
+	local lines = {}
+	for i = 1, lineCount do
+		local offset = lineCount == 1 and 0 or (((i - 1) / (lineCount - 1)) - 0.5) * lineSpread
+		lines[#lines + 1] = {
+			start = boss:GetAbsOrigin(),
+			direction = RotatePosition(Vector(0, 0, 0), QAngle(0, offset, 0), baseDirection),
+			segment_count = segmentCount,
+		}
+	end
+
+	local castAbility = CastPreparedAbility(boss, "xhs_magtheridon_rupture", {
+		lines = lines,
+		arena_center = self.arena_center,
+	}, targetPosition)
+	if castAbility == nil then return nil end
+
+	return GetAbilityCastPoint(castAbility) + 0.65
 end
 
 function modifier_xhs_magtheridon_fragment:IsHidden() return true end
@@ -814,10 +979,41 @@ function modifier_xhs_magtheridon_empower:OnCreated(params)
 	self.damage_per_stack = params.damage_per_stack or RUPTURE_DAMAGE_PER_STACK
 	self.armor_per_stack = params.armor_per_stack or RUPTURE_ARMOR_PER_STACK
 	self.model_scale_per_stack = params.model_scale_per_stack or RUPTURE_MODEL_SCALE_PER_STACK
+
+	if not IsServer() then return end
+	self.overhead_particle = ParticleManager:CreateParticle(EMPOWER_OVERHEAD_PARTICLE, PATTACH_OVERHEAD_FOLLOW, self:GetParent())
+	self:UpdateOverheadParticle()
 end
 
 function modifier_xhs_magtheridon_empower:OnRefresh(params)
-	self:OnCreated(params)
+	params = params or {}
+	self.damage_per_stack = params.damage_per_stack or self.damage_per_stack or RUPTURE_DAMAGE_PER_STACK
+	self.armor_per_stack = params.armor_per_stack or self.armor_per_stack or RUPTURE_ARMOR_PER_STACK
+	self.model_scale_per_stack = params.model_scale_per_stack or self.model_scale_per_stack or RUPTURE_MODEL_SCALE_PER_STACK
+
+	if IsServer() then
+		self:UpdateOverheadParticle()
+	end
+end
+
+function modifier_xhs_magtheridon_empower:OnStackCountChanged()
+	if not IsServer() then return end
+	self:UpdateOverheadParticle()
+end
+
+function modifier_xhs_magtheridon_empower:UpdateOverheadParticle()
+	if self.overhead_particle ~= nil then
+		ParticleManager:SetParticleControl(self.overhead_particle, 1, Vector(0, self:GetStackCount(), 0))
+	end
+end
+
+function modifier_xhs_magtheridon_empower:OnDestroy()
+	if not IsServer() then return end
+	if self.overhead_particle ~= nil then
+		ParticleManager:DestroyParticle(self.overhead_particle, false)
+		ParticleManager:ReleaseParticleIndex(self.overhead_particle)
+		self.overhead_particle = nil
+	end
 end
 
 function modifier_xhs_magtheridon_empower:DeclareFunctions() return {
@@ -839,11 +1035,11 @@ function modifier_xhs_magtheridon_empower:GetModifierModelScale()
 end
 
 function modifier_xhs_magtheridon_empower:GetEffectName()
-	return "particles/items_fx/aura_shivas.vpcf"
+	return nil
 end
 
 function modifier_xhs_magtheridon_empower:GetEffectAttachType()
-	return PATTACH_ABSORIGIN_FOLLOW
+	return PATTACH_OVERHEAD_FOLLOW
 end
 
 function modifier_xhs_magtheridon_twin_lockout:IsHidden() return false end

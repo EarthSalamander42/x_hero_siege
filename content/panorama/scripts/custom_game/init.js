@@ -186,6 +186,156 @@ GameUI.CustomUIConfig().CreateXHSBuyTomeButton = function(parent) {
 
 GameUI.CustomUIConfig().CreateXHSBuyTomeButton(center_block);
 
+function OpenXHSExternalURL(url) {
+	if (!url) {
+		return;
+	}
+
+	if (typeof ExternalBrowserGoToURL === "function") {
+		ExternalBrowserGoToURL(url);
+		return;
+	}
+
+	try {
+		$.DispatchEvent("ExternalBrowserGoToURL", url);
+	} catch (err) {
+		try {
+			$.DispatchEvent("DOTADisplayURL", url);
+		} catch (err2) {
+			$.Msg("Unable to open external URL: " + url);
+		}
+	}
+}
+
+function ApplyXHSReportBugButtonStyle(button) {
+	if (!button) {
+		return;
+	}
+
+	button.style.width = "34px";
+	button.style.height = "34px";
+	button.style.minWidth = "34px";
+	button.style.minHeight = "34px";
+	button.style.horizontalAlign = "left";
+	button.style.verticalAlign = "center";
+	button.style.marginLeft = "4px";
+	button.style.marginRight = "0px";
+	button.style.marginTop = "0px";
+	button.style.marginBottom = "0px";
+	button.style.backgroundColor = "#151c24ee";
+	button.style.border = "1px solid #ff8d5c66";
+	button.style.boxShadow = "fill #00000099 0px 0px 6px 0px";
+	button.style.zIndex = "5000";
+	button.style.tooltipPosition = "bottom";
+
+	var label = button.FindChildTraverse("XHSReportBugButtonLabel");
+	if (label) {
+		label.style.width = "100%";
+		label.style.height = "100%";
+		label.style.color = "#ffd8c8";
+		label.style.fontSize = "19px";
+		label.style.fontWeight = "bold";
+		label.style.textAlign = "center";
+		label.style.verticalAlign = "center";
+		label.style.textShadow = "0px 1px 3px 2 #000000";
+	}
+}
+
+function GetXHSButtonBar() {
+	var root = $.GetContextPanel().GetParent().GetParent();
+	if (!root) {
+		return null;
+	}
+
+	return root.FindChildTraverse("ButtonBar");
+}
+
+function FindXHSFlyoutScoreboardButton(buttonBar) {
+	if (!buttonBar || !buttonBar.GetChildCount) {
+		return null;
+	}
+
+	var firstOtherChild = null;
+	for (var i = 0; i < buttonBar.GetChildCount(); i++) {
+		var child = buttonBar.GetChild(i);
+		if (!child || child.id === "XHSReportBugButton") {
+			continue;
+		}
+
+		if (!firstOtherChild) {
+			firstOtherChild = child;
+		}
+
+		var id = child && child.id ? child.id.toLowerCase() : "";
+
+		if (id.indexOf("scoreboard") !== -1 || id.indexOf("flyout") !== -1) {
+			return child;
+		}
+	}
+
+	return firstOtherChild;
+}
+
+function PlaceXHSReportBugButton(button) {
+	var buttonBar = GetXHSButtonBar();
+	if (!buttonBar || !button) {
+		return false;
+	}
+
+	if (button.SetParent && button.GetParent && button.GetParent() !== buttonBar) {
+		button.SetParent(buttonBar);
+	}
+
+	var scoreboardButton = FindXHSFlyoutScoreboardButton(buttonBar);
+	if (scoreboardButton && buttonBar.MoveChildAfter) {
+		buttonBar.MoveChildAfter(button, scoreboardButton);
+	}
+
+	return true;
+}
+
+function CreateXHSReportBugButton() {
+	var root = $.GetContextPanel().GetParent().GetParent();
+	if (!root) {
+		$.Schedule(0.5, CreateXHSReportBugButton);
+		return;
+	}
+
+	var buttonBar = GetXHSButtonBar();
+	if (!buttonBar) {
+		$.Schedule(0.5, CreateXHSReportBugButton);
+		return;
+	}
+
+	var existing = root.FindChildTraverse("XHSReportBugButton");
+	if (existing) {
+		PlaceXHSReportBugButton(existing);
+		ApplyXHSReportBugButtonStyle(existing);
+		return;
+	}
+
+	var button = $.CreatePanel("Button", buttonBar, "XHSReportBugButton");
+	button.hittest = true;
+	button.SetPanelEvent("onactivate", function() {
+		OpenXHSExternalURL("https://discord.frostrose-studio.com/");
+	});
+	button.SetPanelEvent("onmouseover", function() {
+		$.DispatchEvent("UIShowTextTooltip", button, "Report a bug");
+	});
+	button.SetPanelEvent("onmouseout", function() {
+		$.DispatchEvent("UIHideTextTooltip", button);
+	});
+
+	var label = $.CreatePanel("Label", button, "XHSReportBugButtonLabel");
+	label.text = "!";
+	label.hittest = false;
+
+	PlaceXHSReportBugButton(button);
+	ApplyXHSReportBugButtonStyle(button);
+}
+
+CreateXHSReportBugButton();
+
 //Use this line if you want to keep 4 ability minimum size, and only use 160 if you want ~2 ability min size
 center_block.FindChildTraverse("AbilitiesAndStatBranch").style.minWidth = "386px";
 //center_block.FindChildTraverse("AbilitiesAndStatBranch").style.minWidth = "160px";
@@ -224,6 +374,25 @@ center_block.FindChildTraverse("center_bg").style.backgroundImage = "url('s2r://
 //Skin Killer - inventory
 center_block.FindChildTraverse("inventory").FindChildTraverse("HUDSkinInventoryBG").style.visibility = "collapse";
 center_block.FindChildTraverse("inventory").FindChildTraverse("inventory_list_container").style.backgroundColor = "#ffffff00"; //0% opacity on colour
+
+function HideXHSTpCharges(retryCount) {
+	var inventory = center_block.FindChildTraverse("inventory");
+	var tpCharges = inventory ? inventory.FindChildTraverse("tpCharges") : null;
+	console.log(tpCharges);
+
+	if (tpCharges) {
+		tpCharges.style.opacity = "0";
+	}
+
+	if (retryCount > 0) {
+		$.Schedule(0.5, function() {
+			HideXHSTpCharges(retryCount - 1);
+		});
+	}
+}
+
+HideXHSTpCharges(20);
+
 //Skin Killer - minimap
 hudElements.FindChildTraverse("HUDSkinMinimap").style.visibility = "collapse";
 

@@ -199,7 +199,7 @@
 								</Button>
 
 								<!-- Warpath -->
-								<Button class="mod-cell" onactivate="DOTADisplayURL('https://steamcommunity.com/sharedfiles/filedetails/?id=492195751');">
+								<Button class="mod-cell" onactivate="DOTADisplayURL('https://steamcommunity.com/sharedfiles/filedetails/?id=3137888062');">
 									<Panel class="mod-image-container">
 										<Image class="mod-image" src="file://panorama/images/custom_game/mods/modlist8.png"/>
 										<Panel class="mod-background"/>
@@ -207,18 +207,6 @@
 
 									<Panel class="mod-footer">
 										<Label class="mod-name" text="#loading_screen_patreon_modlist8"/>
-									</Panel>
-								</Button>
-
-								<!-- Epic Boss Challenge -->
-								<Button class="mod-cell" onactivate="DOTADisplayURL('https://steamcommunity.com/sharedfiles/filedetails/?id=1138461301');">
-									<Panel class="mod-image-container">
-										<Image class="mod-image" src="file://panorama/images/custom_game/mods/modlist9.png"/>
-										<Panel class="mod-background"/>
-									</Panel>
-
-									<Panel class="mod-footer">
-										<Label class="mod-name" text="#loading_screen_patreon_modlist9"/>
 									</Panel>
 								</Button>
 
@@ -231,6 +219,18 @@
 
 									<Panel class="mod-footer">
 										<Label class="mod-name" text="#loading_screen_patreon_modlist5"/>
+									</Panel>
+								</Button>
+
+								<!-- Epic Boss Challenge -->
+								<Button class="mod-cell" onactivate="DOTADisplayURL('https://steamcommunity.com/sharedfiles/filedetails/?id=1138461301');">
+									<Panel class="mod-image-container">
+										<Image class="mod-image" src="file://panorama/images/custom_game/mods/modlist9.png"/>
+										<Panel class="mod-background"/>
+									</Panel>
+
+									<Panel class="mod-footer">
+										<Label class="mod-name" text="#loading_screen_patreon_modlist9"/>
 									</Panel>
 								</Button>
 							</Panel>

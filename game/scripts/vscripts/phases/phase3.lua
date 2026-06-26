@@ -5,6 +5,10 @@ local function RegisterXHSDevSpawn(unit)
 end
 
 require("boss_scripts/phase3_ai/magtheridon")
+require("boss_scripts/phase3_ai/grom")
+require("boss_scripts/phase3_ai/illidan")
+require("boss_scripts/phase3_ai/balanar")
+require("boss_scripts/phase3_ai/proudmoore")
 
 local function FaceUnitTowardsPosition(unit, position)
 	if unit == nil or not IsValidEntity(unit) or unit:IsNull() or position == nil then return end
@@ -36,6 +40,7 @@ local function SetupMagtheridonPhase3Boss(magtheridon, bossCount)
 	if magtheridon == nil then return end
 
 	magtheridon.boss_count = bossCount or magtheridon.boss_count or 1
+	magtheridon.xhs_boss_bar_id = "magtheridon_" .. tostring(magtheridon.boss_count)
 	magtheridon.zone = "xhs_holdout"
 	RegisterXHSDevSpawn(magtheridon)
 
@@ -51,7 +56,6 @@ function StartMagtheridonArena(bConsole)
 	end
 
 	local point_mag = Entities:FindByName(nil, "npc_dota_spawner_magtheridon_arena"):GetAbsOrigin()
-	local point_mag2 = Entities:FindByName(nil, "npc_dota_spawner_magtheridon_arena2"):GetAbsOrigin()
 	local difficulty = GameRules:GetCustomGameDifficulty()
 	local delay = 3.0
 
@@ -69,22 +73,8 @@ function StartMagtheridonArena(bConsole)
 			magtheridon:AddNewModifier(magtheridon, nil, "modifier_ankh", { charges = 3 })
 		elseif difficulty == 4 then
 			magtheridon:AddNewModifier(magtheridon, nil, "modifier_ankh", { charges = 1 })
-
-			local magtheridon2 = CreateUnitByName("npc_dota_hero_magtheridon", point_mag2, true, nil, nil, DOTA_TEAM_CUSTOM_2)
-			magtheridon2:SetAngles(0, 0, 0)
-			magtheridon2:AddNewModifier(magtheridon2, nil, "modifier_ankh", { charges = 1 })
-			magtheridon2:AddNewModifier(magtheridon2, nil, "modifier_pause_creeps", { Duration = 10, IsHidden = true }):SetStackCount(1)
-			magtheridon2:AddNewModifier(magtheridon2, nil, "modifier_invulnerable", { Duration = 10, IsHidden = true })
-			SetupMagtheridonPhase3Boss(magtheridon2, 2)
 		elseif difficulty == 5 then
 			magtheridon:AddNewModifier(magtheridon, nil, "modifier_ankh", { charges = 2 })
-
-			local magtheridon2 = CreateUnitByName("npc_dota_hero_magtheridon", point_mag2, true, nil, nil, DOTA_TEAM_CUSTOM_2)
-			magtheridon2:SetAngles(0, 0, 0)
-			magtheridon2:AddNewModifier(magtheridon2, nil, "modifier_ankh", { charges = 2 })
-			magtheridon2:AddNewModifier(magtheridon2, nil, "modifier_pause_creeps", { Duration = 10, IsHidden = true }):SetStackCount(1)
-			magtheridon2:AddNewModifier(magtheridon2, nil, "modifier_invulnerable", { Duration = 10, IsHidden = true })
-			SetupMagtheridonPhase3Boss(magtheridon2, 2)
 		end
 
 		SetupMagtheridonPhase3Boss(magtheridon, 1)
@@ -137,65 +127,296 @@ function EndMagtheridonArena()
 	Timers:CreateTimer(2.0, function()
 		local grom = CreateUnitByName("npc_dota_hero_grom_hellscream", Entities:FindByName(nil, "spawn_grom_hellscream"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 		grom.zone = "xhs_holdout"
+		grom.boss_count = 1
 		grom:SetAngles(0, 270, 0)
 		RegisterXHSDevSpawn(grom)
+		if XHSGrom_AttachPhase3AI ~= nil then
+			XHSGrom_AttachPhase3AI(grom)
+		end
 	end)
 
 	Timers:CreateTimer(4.0, function()
 		local illidan = CreateUnitByName("npc_dota_hero_illidan", Entities:FindByName(nil, "spawn_illidan"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 		illidan.zone = "xhs_holdout"
+		illidan.boss_count = 2
 		illidan:SetAngles(0, 0, 0)
 		RegisterXHSDevSpawn(illidan)
+		if XHSIllidan_AttachPhase3AI ~= nil then
+			XHSIllidan_AttachPhase3AI(illidan)
+		end
 	end)
 
 	Timers:CreateTimer(6.0, function()
 		local balanar = CreateUnitByName("npc_dota_hero_balanar", Entities:FindByName(nil, "spawn_balanar"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 		balanar.zone = "xhs_holdout"
+		balanar.boss_count = 3
 		balanar:SetAngles(0, 90, 0)
 		RegisterXHSDevSpawn(balanar)
+		if XHSBalanar_AttachPhase3AI ~= nil then
+			XHSBalanar_AttachPhase3AI(balanar)
+		end
 	end)
 
 	Timers:CreateTimer(8.0, function()
 		local proudmoore = CreateUnitByName("npc_dota_hero_proudmoore", Entities:FindByName(nil, "spawn_admiral_proudmore"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 		proudmoore.zone = "xhs_holdout"
+		proudmoore.boss_count = 4
 		proudmoore:SetAngles(0, 180, 0)
 		RegisterXHSDevSpawn(proudmoore)
+		if XHSProudmoore_AttachPhase3AI ~= nil then
+			XHSProudmoore_AttachPhase3AI(proudmoore)
+		end
 	end)
 end
 
+local function CloseMagtheridonGate()
+	DoEntFire("door_magtheridon", "SetAnimation", "gate_02_close", 0, nil, nil)
+
+	local DoorObs = Entities:FindAllByName("obstruction_magtheridon")
+	for _, obs in pairs(DoorObs) do
+		obs:SetEnabled(true, false)
+	end
+end
+
+local GROM_VANGUARD_ROUNDS = {
+	{
+		"npc_orc_raider_final_wave",
+		"npc_chaos_orc_final_wave",
+		"npc_warlock_final_wave",
+	},
+	{
+		"npc_necro_final_wave",
+		"npc_banshee_final_wave",
+		"npc_abomination_final_wave",
+	},
+	{
+		"npc_tauren_final_wave",
+		"npc_orc_raider_final_wave",
+		"npc_warlock_final_wave",
+		"npc_magnataur_final_wave",
+	},
+	{
+		"npc_chaos_orc_final_wave",
+		"npc_tauren_final_wave",
+		"npc_banshee_final_wave",
+		"npc_necro_final_wave",
+		"npc_magnataur_final_wave",
+	},
+}
+
+local GROM_VANGUARD_ROUND_TOTALS = {
+	[0] = { 8, 8, 8, 8 },
+	[1] = { 8, 8, 8, 8 },
+	[2] = { 10, 10, 12, 12 },
+	[3] = { 14, 14, 16, 16 },
+	[4] = { 16, 18, 18, 20 },
+	[5] = { 22, 22, 24, 24 },
+}
+
+local GROM_VANGUARD_BOUNTIES = {
+	npc_orc_raider_final_wave = { gold_min = 55, gold_max = 75, xp = 45 },
+	npc_chaos_orc_final_wave = { gold_min = 55, gold_max = 75, xp = 45 },
+	npc_warlock_final_wave = { gold_min = 80, gold_max = 110, xp = 60 },
+	npc_necro_final_wave = { gold_min = 80, gold_max = 110, xp = 60 },
+	npc_banshee_final_wave = { gold_min = 80, gold_max = 110, xp = 60 },
+	npc_abomination_final_wave = { gold_min = 130, gold_max = 170, xp = 85 },
+	npc_tauren_final_wave = { gold_min = 130, gold_max = 170, xp = 85 },
+	npc_magnataur_final_wave = { gold_min = 130, gold_max = 170, xp = 85 },
+}
+
+local function GetGromVanguardState()
+	GameMode.GromVanguard = GameMode.GromVanguard or {}
+	return GameMode.GromVanguard
+end
+
+local function GetGromVanguardAttackPosition()
+	local center = nil
+	local count = 0
+
+	for _, hero in pairs(HeroList:GetAllHeroes()) do
+		if hero ~= nil and hero:IsRealHero() and hero:GetTeamNumber() == DOTA_TEAM_GOODGUYS and hero:IsAlive() then
+			center = center == nil and hero:GetAbsOrigin() or center + hero:GetAbsOrigin()
+			count = count + 1
+		end
+	end
+
+	if center ~= nil and count > 0 then
+		return center / count
+	end
+
+	local fallback = Entities:FindByName(nil, "point_teleport_phase3_creeps_1")
+	if fallback ~= nil then
+		return fallback:GetAbsOrigin()
+	end
+
+	return Vector(0, 0, 0)
+end
+
+local function OrderGromVanguardUnit(unit)
+	if unit == nil or not IsValidEntity(unit) or unit:IsNull() or not unit:IsAlive() then return nil end
+
+	local targetPosition = GetGromVanguardAttackPosition()
+	ExecuteOrderFromTable({
+		UnitIndex = unit:entindex(),
+		OrderType = DOTA_UNIT_ORDER_ATTACK_MOVE,
+		Position = targetPosition,
+		Queue = false,
+	})
+
+	return 3.0
+end
+
+local function ApplyGromVanguardBounty(unit, unitName)
+	local bounty = GROM_VANGUARD_BOUNTIES[unitName]
+	if unit == nil or bounty == nil then return end
+
+	unit:SetMinimumGoldBounty(bounty.gold_min)
+	unit:SetMaximumGoldBounty(bounty.gold_max)
+	unit:SetDeathXP(bounty.xp)
+end
+
+local function SpawnGromVanguardUnit(unitName, spawnPosition)
+	local unit = CreateUnitByName(unitName, spawnPosition, true, nil, nil, DOTA_TEAM_CUSTOM_2)
+	if unit == nil then return nil end
+
+	local state = GetGromVanguardState()
+	unit.zone = "xhs_holdout"
+	unit.xhs_grom_vanguard_unit = true
+	ApplyGromVanguardBounty(unit, unitName)
+	state.active_units = state.active_units or {}
+	state.active_units[unit:entindex()] = true
+
+	if RegisterXHSDevSpawn ~= nil then
+		RegisterXHSDevSpawn(unit)
+	end
+
+	Timers:CreateTimer(0.2, function()
+		return OrderGromVanguardUnit(unit)
+	end)
+
+	return unit
+end
+
+local function CountLivingGromVanguardUnits()
+	local state = GetGromVanguardState()
+	local activeUnits = state.active_units or {}
+	local count = 0
+
+	for entindex, _ in pairs(activeUnits) do
+		local unit = EntIndexToHScript(entindex)
+		if unit ~= nil and IsValidEntity(unit) and not unit:IsNull() and unit:IsAlive() then
+			count = count + 1
+		else
+			activeUnits[entindex] = nil
+		end
+	end
+
+	return count
+end
+
+local function EnsureGromVanguardQuestStarted()
+	if GameMode == nil or GameMode.Zones == nil or GameMode:IsQuestActive("clear_grom_vanguard") == true then
+		return
+	end
+
+	for _, zone in pairs(GameMode.Zones) do
+		if zone ~= nil and zone.StartQuestByName ~= nil and zone:IsQuestComplete("clear_grom_vanguard") ~= true then
+			zone:StartQuestByName("clear_grom_vanguard")
+			return
+		end
+	end
+end
+
+local function SpawnGromVanguardRound(roundIndex)
+	local round = GROM_VANGUARD_ROUNDS[roundIndex]
+	if round == nil then return end
+
+	local difficulty = GameRules:GetCustomGameDifficulty() or 1
+	local roundTotals = GROM_VANGUARD_ROUND_TOTALS[difficulty] or GROM_VANGUARD_ROUND_TOTALS[1]
+	local totalCount = roundTotals[roundIndex] or 0
+	local westCount = math.ceil(totalCount / 2)
+	local eastCount = totalCount - westCount
+	local westSpawner = Entities:FindByName(nil, "spawner_phase3_creeps_west")
+	local eastSpawner = Entities:FindByName(nil, "spawner_phase3_creeps_east")
+
+	if westSpawner == nil or eastSpawner == nil then
+		print("SpawnGromVanguardRound - missing phase 3 creep spawners")
+		return
+	end
+
+	Notifications:TopToAll({
+		text = "Grom's Vanguard - wave " .. roundIndex .. " of " .. #GROM_VANGUARD_ROUNDS,
+		duration = 4.0,
+	})
+
+	local function SpawnSide(spawner, count)
+		for i = 1, count do
+			local unitName = round[((i - 1) % #round) + 1]
+			local position = spawner:GetAbsOrigin() + RandomVector(RandomInt(0, 120))
+			SpawnGromVanguardUnit(unitName, position)
+		end
+	end
+
+	SpawnSide(westSpawner, westCount)
+	SpawnSide(eastSpawner, eastCount)
+
+	local state = GetGromVanguardState()
+	state.round = roundIndex
+
+	Timers:CreateTimer(1.0, function()
+		if CountLivingGromVanguardUnits() > 0 then
+			return 1.0
+		end
+
+		if state.round < #GROM_VANGUARD_ROUNDS then
+			Timers:CreateTimer(4.0, function()
+				SpawnGromVanguardRound(state.round + 1)
+			end)
+		end
+
+		return nil
+	end)
+end
+
+function OpenGromGate()
+	local state = GetGromVanguardState()
+	if state.gate_opened == true then return end
+
+	state.gate_opened = true
+
+	local DoorObs = Entities:FindAllByName("obstruction_grom")
+	for _, obs in pairs(DoorObs) do
+		obs:SetEnabled(false, true)
+	end
+
+	DoEntFire("door_grom", "SetAnimation", "gate_02_open", 0, nil, nil)
+	DoEntFire("door_grom2", "SetAnimation", "gate_02_open", 0, nil, nil)
+
+	Notifications:TopToAll({
+		text = "Grom's vanguard has fallen. The gate is open.",
+		duration = 8.0,
+	})
+end
+
 function DarkProtectors(keys)
-	-- local activator = keys.activator
-	local point2 = Entities:FindByName(nil, "spawner_phase3_creeps_west"):GetAbsOrigin()
-	local point3 = Entities:FindByName(nil, "spawner_phase3_creeps_east"):GetAbsOrigin()
+	local state = GetGromVanguardState()
+	if state.started == true then return end
+	state.started = true
+	state.round = 0
+	state.active_units = {}
+	state.gate_opened = false
 
 	RefreshPlayers()
+	CloseMagtheridonGate()
+	EnsureGromVanguardQuestStarted()
 
 	Timers:CreateTimer(0.5, function()
 		DoEntFire("trigger_teleport_phase3_creeps", "Kill", nil, 0, nil, nil)
 		TeleportAllHeroes("point_teleport_phase3_creeps_", 5.0)
 		GiveTomeToAllHeroes(250)
 
-		for i = 0, PlayerResource:GetPlayerCount() - 1 do
-			Timers:CreateTimer(3.0, function()
-				for i = 1, 4 * GameRules:GetCustomGameDifficulty() do
-					CreateUnitByName("npc_dota_creep_dire_hulk", point2 + RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_CUSTOM_2)
-				end
-			end)
-
-			Timers:CreateTimer(5.0, function()
-				for i = 1, 4 * GameRules:GetCustomGameDifficulty() do
-					CreateUnitByName("npc_dota_creep_dire_hulk", point3 + RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_CUSTOM_2)
-				end
-			end)
-		end
-
-		Timers:CreateTimer(10, function()
-			local DoorObs = Entities:FindAllByName("obstruction_grom")
-			for _, obs in pairs(DoorObs) do
-				obs:SetEnabled(false, true)
-			end
-			DoEntFire("door_grom", "SetAnimation", "gate_02_open", 0, nil, nil)
-			DoEntFire("door_grom2", "SetAnimation", "gate_02_open", 0, nil, nil)
+		Timers:CreateTimer(3.0, function()
+			SpawnGromVanguardRound(1)
 		end)
 	end)
 end
@@ -224,20 +445,16 @@ function StartArthasArena(bConsole)
 		newZone:StartQuestByName("kill_arthas")
 	end
 
-	DoEntFire("door_magtheridon", "SetAnimation", "gate_02_close", 0, nil, nil)
-
-	local DoorObs = Entities:FindAllByName("obstruction_magtheridon")
-
-	for _, obs in pairs(DoorObs) do
-		obs:SetEnabled(true, false)
-	end
+	CloseMagtheridonGate()
 
 	local arthas = CreateUnitByName("npc_dota_hero_arthas", Entities:FindByName(nil, "npc_dota_spawner_magtheridon_arena"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 	arthas:SetAngles(0, 270, 0)
 	arthas:AddNewModifier(arthas, nil, "modifier_pause_creeps", { Duration = 7, IsHidden = true }):SetStackCount(1)
 	arthas:AddNewModifier(arthas, nil, "modifier_invulnerable", { Duration = 7, IsHidden = true })
-	--	BossBar(arthas, "arthas")
 	arthas.zone = "xhs_holdout"
+	if XHSArthas_AttachPhase3AI ~= nil then
+		XHSArthas_AttachPhase3AI(arthas)
+	end
 	RegisterXHSDevSpawn(arthas)
 
 	TeleportAllHeroes("point_teleport_boss_", 7.0, 3.0)
@@ -298,12 +515,12 @@ function StartLichKingArena()
 		end
 	end
 
-	ShowBossBar(lich_king_boss)
-
 	if not lich_king_boss then
 		Notifications:TopToAll({ text = "Something went wrong, please report Lich King not spawning on Discord!", duration = 5.0 })
 		return
 	end
+
+	ShowBossBar(lich_king_boss)
 
 	TeleportAllHeroes("point_teleport_boss_", 20.0, 3.0)
 
@@ -329,6 +546,9 @@ function StartLichKingArena()
 			--			BossBar(lich_king_boss, "lich_king")
 			lich_king_boss.zone = "xhs_holdout"
 			RegisterXHSDevSpawn(lich_king_boss)
+			if XHSLichKing_AttachPhase3AI ~= nil then
+				XHSLichKing_AttachPhase3AI(lich_king_boss)
+			end
 
 			for _, hero in pairs(HeroList:GetAllHeroes()) do
 				if hero:IsRealHero() and hero:GetTeam() == DOTA_TEAM_GOODGUYS then
@@ -347,6 +567,10 @@ function StartSpiritMasterArena()
 	local point_boss = Entities:FindByName(nil, "npc_dota_spawner_lich_king_bis"):GetAbsOrigin()
 	local start_time = 15.0
 
+	if XHSSpiritMasterEncounter ~= nil then
+		XHSSpiritMasterEncounter:Reset()
+	end
+
 	TeleportAllHeroes("point_teleport_boss_", start_time + 1, 3.0)
 
 	local spirit_master = CreateUnitByName("npc_dota_boss_spirit_master", Entities:FindByName(nil, "npc_dota_spawner_magtheridon_arena"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
@@ -357,6 +581,9 @@ function StartSpiritMasterArena()
 	spirit_master.zone = "xhs_holdout"
 	RegisterXHSDevSpawn(spirit_master)
 	ShowBossBar(spirit_master)
+	if XHSSpiritMaster_AttachPhase3AI ~= nil then
+		XHSSpiritMaster_AttachPhase3AI(spirit_master)
+	end
 
 	Timers:CreateTimer(start_time / 2, function()
 		Notifications:TopToAll({ text = "Spirits. Assemble!", duration = 5.0 })

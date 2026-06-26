@@ -17,25 +17,31 @@
 
 		<Panel id="XHSSupporterPassWindow" class="XHSSupporterPassWindow" hittest="true">
 			<Panel class="XHSPassHeader">
+				<Panel class="XHSPassHeaderMedia" hittest="false" ignore-parent-flow="true" />
+				<Panel class="XHSPassHeaderVeil" hittest="false" ignore-parent-flow="true" />
 				<Panel class="XHSPassHeaderCopy">
-					<Label class="XHSPassEyebrow" text="X Hero Siege" />
-					<Label class="XHSPassTitle" text="XHS Supporter Pass" />
-					<Label id="XHSPassSeasonLabel" class="XHSPassSubtitle" text="Seasonal cosmetic progression" />
+					<Label class="XHSPassEyebrow" text="Supporter Pass" />
 				</Panel>
 
-				<Panel class="XHSPassHeaderStats">
-					<Panel class="XHSPassHeaderStat">
-						<Label class="XHSPassHeaderStatLabel" text="Tier" />
-						<Label id="XHSPassTierValue" class="XHSPassHeaderStatValue" text="Free" />
-					</Panel>
-					<Panel class="XHSPassHeaderStat">
-						<Label class="XHSPassHeaderStatLabel" text="Fragments" />
-						<Label id="XHSPassFragmentsValue" class="XHSPassHeaderStatValue" text="0" />
-					</Panel>
-					<Panel class="XHSPassHeaderStat">
-						<Label class="XHSPassHeaderStatLabel" text="Weekly Cap" />
-						<Label id="XHSPassWeeklyCapValue" class="XHSPassHeaderStatValue" text="0 / 100" />
-					</Panel>
+				<Panel class="XHSPassTopBar">
+					<Button id="XHSPassTabOverview" class="XHSPassTab IsActive">
+						<Label text="Overview" />
+					</Button>
+					<Button id="XHSPassTabRewards" class="XHSPassTab">
+						<Label text="Rewards" />
+					</Button>
+					<Button id="XHSPassTabShop" class="XHSPassTab">
+						<Label text="Shop" />
+					</Button>
+					<Button id="XHSPassTabArmory" class="XHSPassTab">
+						<Label text="Armory" />
+					</Button>
+					<Button id="XHSPassTabLeaderboards" class="XHSPassTab">
+						<Label text="Ranking" />
+					</Button>
+					<Button id="XHSPassTabSettings" class="XHSPassTab">
+						<Label text="Settings" />
+					</Button>
 				</Panel>
 
 				<Button id="XHSPassCloseButton" class="XHSPassIconButton">
@@ -44,75 +50,55 @@
 			</Panel>
 
 			<Panel class="XHSPassBody">
-				<Panel class="XHSPassSidebar">
-					<Button id="XHSPassTabOverview" class="XHSPassTab IsActive">
-						<Label text="Overview" />
-					</Button>
-					<Button id="XHSPassTabRewards" class="XHSPassTab">
-						<Label text="Rewards" />
-					</Button>
-					<Button id="XHSPassTabShop" class="XHSPassTab">
-						<Label text="Fragment Shop" />
-					</Button>
-					<Button id="XHSPassTabArmory" class="XHSPassTab">
-						<Label text="Armory" />
-					</Button>
-					<Button id="XHSPassTabLeaderboards" class="XHSPassTab">
-						<Label text="Leaderboards" />
-					</Button>
-					<Button id="XHSPassTabSettings" class="XHSPassTab">
-						<Label text="Settings" />
-					</Button>
-				</Panel>
-
 				<Panel class="XHSPassContent">
 					<Panel id="XHSPassOverviewPage" class="XHSPassPage IsVisible">
 						<Panel id="XHSPassOverviewGrid" class="XHSPassOverviewGrid">
-							<Panel class="XHSPassProfileCard XHSPanel">
-								<Panel class="XHSPassProfileTop">
-									<DOTAAvatarImage id="XHSPassAvatar" class="XHSPassAvatar" />
-									<Panel class="XHSPassProfileCopy">
-										<Label id="XHSPassPlayerName" class="XHSPassProfileName" text="Player" />
-										<Label id="XHSPassPlayerTier" class="XHSPassProfileTier" text="Free Player" />
+							<Panel class="XHSPassHeroRow">
+								<Panel class="XHSPassProfileCard XHSPanel">
+									<Panel class="XHSPassProfileTop">
+										<DOTAAvatarImage id="XHSPassAvatar" class="XHSPassAvatar" />
+										<Panel class="XHSPassProfileCopy">
+											<Label id="XHSPassPlayerName" class="XHSPassProfileName" text="Player" />
+											<Label id="XHSPassPlayerTier" class="XHSPassProfileTier" text="Free Player" />
+										</Panel>
+									</Panel>
+									<Panel class="XHSPassProgressBlock">
+										<Panel class="XHSPassProgressHeader">
+											<Label id="XHSPassLevelLabel" text="Season Level 1" />
+											<Label id="XHSPassXpLabel" text="0 / 2000 XP" />
+										</Panel>
+										<Panel class="XHSPassProgressBar">
+											<Panel id="XHSPassXpProgress" class="XHSPassProgressFill" />
+										</Panel>
+									</Panel>
+									<Panel class="XHSPassLegacyRow">
+										<Label text="Legacy conversion" />
+										<Label id="XHSPassLegacyValue" text="0 fragments" />
 									</Panel>
 								</Panel>
-								<Panel class="XHSPassProgressBlock">
-									<Panel class="XHSPassProgressHeader">
-										<Label id="XHSPassLevelLabel" text="Season Level 1" />
-										<Label id="XHSPassXpLabel" text="0 / 2000 XP" />
-									</Panel>
-									<Panel class="XHSPassProgressBar">
-										<Panel id="XHSPassXpProgress" class="XHSPassProgressFill" />
-									</Panel>
-								</Panel>
-								<Panel class="XHSPassLegacyRow">
-									<Label text="Legacy conversion" />
-									<Label id="XHSPassLegacyValue" text="0 fragments" />
-								</Panel>
-							</Panel>
 
-							<Panel class="XHSPassSupportCard XHSPanel">
-								<Label class="XHSPassCardTitle" text="Support without pay-to-win" />
-								<Label class="XHSPassCardBody" text="Cosmetics, account progression, companions, emblems, effigies, and profile prestige. No combat power is sold." />
-								<Button id="XHSPassSupportButton" class="XHSPassPrimaryButton">
-									<Label text="Become a Supporter" />
-								</Button>
+								<Panel class="XHSPassProfileStats">
+									<Panel class="XHSPassHeaderStat">
+										<Label class="XHSPassHeaderStatLabel" text="Tier" />
+										<Label id="XHSPassTierValue" class="XHSPassHeaderStatValue" text="Free" />
+									</Panel>
+									<Panel class="XHSPassHeaderStat">
+										<Label class="XHSPassHeaderStatLabel" text="Fragments" />
+										<Label id="XHSPassFragmentsValue" class="XHSPassHeaderStatValue" text="0" />
+									</Panel>
+									<Panel class="XHSPassHeaderStat">
+										<Label class="XHSPassHeaderStatLabel" text="Weekly Cap" />
+										<Label id="XHSPassWeeklyCapValue" class="XHSPassHeaderStatValue" text="0 / 100" />
+									</Panel>
+								</Panel>
 							</Panel>
 
 							<Panel class="XHSPassTiersCard XHSPanel">
 								<Panel class="XHSPassSectionHeader">
 									<Label class="XHSPassSectionTitle" text="Supporter Tiers" />
-									<Label class="XHSPassSectionNote" text="3 companions + 1 emblem + 1 effigy per tier" />
+									<Label class="XHSPassSectionNote" text="Monthly fragments + identity color" />
 								</Panel>
 								<Panel id="XHSPassTierRows" class="XHSPassTierRows" />
-							</Panel>
-
-							<Panel class="XHSPassWeeklyCard XHSPanel">
-								<Label class="XHSPassCardTitle" text="Weekly Free Path" />
-								<Label class="XHSPassCardBody" text="Earn fragments by playing every week. Free players can build a collection over time; supporters progress faster through monthly grants." />
-								<Panel class="XHSPassProgressBar">
-									<Panel id="XHSPassWeeklyProgress" class="XHSPassProgressFill XHSPassProgressFillGold" />
-								</Panel>
 							</Panel>
 						</Panel>
 					</Panel>
@@ -159,7 +145,7 @@
 						</Panel>
 						<Panel id="XHSPassSettingsRows" class="XHSPassSettingsRows" />
 						<Panel id="XHSPassSettingsSaveBar" class="XHSPassSettingsSaveBar">
-							<Label class="XHSPassSettingsSaveText" text="Unsaved changes" />
+							<Label id="XHSPassSettingsSaveText" class="XHSPassSettingsSaveText" text="Unsaved changes" />
 							<Button id="XHSPassSettingsCancelButton" class="XHSPassSecondaryButton">
 								<Label text="Cancel" />
 							</Button>

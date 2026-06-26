@@ -12,6 +12,7 @@
 			<Panel id="QuestIconCheckMark" class="QuestIconCheckMark" hittest="false"/>
 			<Label id="QuestText" class="QuestText" text="" hittest="false"/>
 			<Label id="QuestNumbers" class="QuestText" text="({d:completed} / {d:complete_limit})" hittest="false"/>
+			<Panel id="QuestCollapseChevron" class="QuestCollapseChevron" hittest="false"/>
 			<Button id="QuestInfoButton" class="QuestInfoButton" hittest="true">
 				<Label class="QuestInfoLabel" text="i" hittest="false"/>
 			</Button>

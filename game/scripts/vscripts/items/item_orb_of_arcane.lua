@@ -1,13 +1,53 @@
 LinkLuaModifier("modifier_orb_of_arcane", "items/item_orb_of_arcane.lua", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_orb_of_arcane_active", "items/item_orb_of_arcane.lua", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_orb_of_arcane_exposure", "items/item_orb_of_arcane.lua", LUA_MODIFIER_MOTION_NONE)
 
 item_orb_of_arcane = item_orb_of_arcane or class({})
 item_mystic_gem = item_mystic_gem or class({})
 item_astral_core = item_astral_core or class({})
 
+local function ToggleArcaneOrb(caster, ability)
+	if caster:HasModifier("modifier_orb_of_arcane_active") then
+		caster:RemoveModifierByName("modifier_orb_of_arcane_active")
+	else
+		caster:AddNewModifier(caster, ability, "modifier_orb_of_arcane_active", {})
+	end
+end
+
+local function GetArcaneOrbTexture(caster, active_texture, inactive_texture)
+	if caster and not caster:IsNull() and caster:HasModifier("modifier_orb_of_arcane_active") then
+		return active_texture
+	end
+
+	return inactive_texture
+end
+
 function item_orb_of_arcane:GetIntrinsicModifierName() return "modifier_orb_of_arcane" end
 function item_mystic_gem:GetIntrinsicModifierName() return "modifier_orb_of_arcane" end
 function item_astral_core:GetIntrinsicModifierName() return "modifier_orb_of_arcane" end
+
+function item_orb_of_arcane:OnSpellStart() if IsServer() then ToggleArcaneOrb(self:GetCaster(), self) end end
+function item_mystic_gem:OnSpellStart() if IsServer() then ToggleArcaneOrb(self:GetCaster(), self) end end
+function item_astral_core:OnSpellStart() if IsServer() then ToggleArcaneOrb(self:GetCaster(), self) end end
+
+function item_orb_of_arcane:GetAbilityTextureName()
+	return GetArcaneOrbTexture(self:GetCaster(), "custom/orb_of_arcane", "custom/orb_of_arcane_off")
+end
+
+function item_mystic_gem:GetAbilityTextureName()
+	return GetArcaneOrbTexture(self:GetCaster(), "custom/mystic_gem", "custom/mystic_gem_off")
+end
+
+function item_astral_core:GetAbilityTextureName()
+	return GetArcaneOrbTexture(self:GetCaster(), "custom/astral_core", "custom/astral_core_off")
+end
+
+modifier_orb_of_arcane_active = modifier_orb_of_arcane_active or class({})
+
+function modifier_orb_of_arcane_active:IsHidden() return false end
+function modifier_orb_of_arcane_active:IsPurgable() return false end
+function modifier_orb_of_arcane_active:RemoveOnDeath() return false end
+function modifier_orb_of_arcane_active:GetTexture() return "custom/orb_of_arcane" end
 
 modifier_orb_of_arcane = modifier_orb_of_arcane or class({})
 
@@ -52,6 +92,10 @@ function modifier_orb_of_arcane:OnTakeDamage(params)
 	end
 
 	if params.inflictor.IsItem and params.inflictor:IsItem() then
+		return
+	end
+
+	if not self:GetParent():HasModifier("modifier_orb_of_arcane_active") then
 		return
 	end
 

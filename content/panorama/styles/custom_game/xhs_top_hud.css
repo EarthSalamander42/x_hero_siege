@@ -17,6 +17,7 @@
 #XHSTopHudBar {
 	width: 1120px;
 	height: 84px;
+	margin-top: 11px;
 	horizontal-align: center;
 	vertical-align: top;
 	flow-children: right;
@@ -754,13 +755,11 @@
 .AspectRatio16x10 #XHSTopHudLeftSlot {
 	width: 405px;
 	margin-left: 0px;
-	margin-top: 11px;
 }
 
 .AspectRatio16x10 #XHSTopHudRightSlot {
 	width: 405px;
 	margin-right: 0px;
-	margin-top: 11px;
 }
 
 .AspectRatio16x10 #XHSAllyRosterLeft {
@@ -792,7 +791,6 @@
 
 .AspectRatio16x10 #XHSTopHudClock {
 	width: fit-children;
-	margin-top: 11px;
 }
 
 .AspectRatio16x10 #XHSClockValue {
@@ -933,14 +931,12 @@
 	width: 435px;
 	height: 94px;
 	margin-left: 0px;
-	margin-top: 11px;
 }
 
 .XHSEightPlayers #XHSTopHudRightSlot {
 	width: 435px;
 	height: 94px;
 	margin-right: 0px;
-	margin-top: 11px;
 }
 
 .XHSEightPlayers #XHSTopHudAllies,
@@ -1015,7 +1011,6 @@
 .XHSEightPlayers #XHSTopHudClock {
 	width: fit-children;
 	height: 94px;
-	margin-top: 11px;
 }
 
 .XHSEightPlayers #XHSClockValue {

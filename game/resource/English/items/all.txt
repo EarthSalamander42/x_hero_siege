@@ -13,15 +13,17 @@
 
 "healing_ward"													"Healing Ward"
 "DOTA_Tooltip_ability_item_healing_wards"						"Healing Wards"
-"DOTA_Tooltip_ability_item_healing_wards_Description"			"<h1><font color='#00CC00'>Active:</font></h1> Heals all allied units around, based on a percentage of their max health."
+"DOTA_Tooltip_ability_item_healing_wards_Description"			"<h1><font color='#00CC00'>Active:</font></h1> Summons a ward that heals nearby allied units with flat health regeneration plus a small percentage of their max health."
 "DOTA_Tooltip_ability_item_healing_wards_duration"				"DURATION:"
 "DOTA_Tooltip_ability_item_healing_wards_radius"				"RADIUS:"
+"DOTA_Tooltip_ability_item_healing_wards_flat_regeneration"		"FLAT HEALTH REGEN:"
 "DOTA_Tooltip_ability_item_healing_wards_regeneration"			"%HEALTH REGEN:"
 
 "DOTA_Tooltip_ability_item_healing_wards2"						"Greater Healing Wards"
-"DOTA_Tooltip_ability_item_healing_wards2_Description"			"<h1><font color='#00CC00'>Active:</font></h1> Summons a stronger ward that heals allied units around it based on a percentage of their max health."
+"DOTA_Tooltip_ability_item_healing_wards2_Description"			"<h1><font color='#00CC00'>Active:</font></h1> Summons a stronger ward that heals nearby allied units with flat health regeneration plus a small percentage of their max health."
 "DOTA_Tooltip_ability_item_healing_wards2_duration"				"DURATION:"
 "DOTA_Tooltip_ability_item_healing_wards2_radius"				"RADIUS:"
+"DOTA_Tooltip_ability_item_healing_wards2_flat_regeneration"	"FLAT HEALTH REGEN:"
 "DOTA_Tooltip_ability_item_healing_wards2_regeneration"			"%HEALTH REGEN:"
 
 "DOTA_Tooltip_ability_holdout_healing_ward"			"Healing Ward"
@@ -123,6 +125,12 @@
 "DOTA_Tooltip_ability_item_orb_of_venom_bonus_damage"				"BONUS DAMAGE:"
 "DOTA_Tooltip_ability_item_orb_of_venom_poison_damage_per_second"	"DAMAGE PER SECOND:"
 "DOTA_Tooltip_ability_item_orb_of_venom_poison_duration"				"POISON DURATION:"
+
+"DOTA_Tooltip_ability_item_xhs_orb_of_venom"							"Orb of Venom"
+"DOTA_Tooltip_ability_item_xhs_orb_of_venom_Description"				"<h1><font color='#FF7800'>Passive:</font></h1> Venom Orb. Attacks poison enemies, dealing damage over time."
+"DOTA_Tooltip_ability_item_xhs_orb_of_venom_bonus_damage"				"BONUS DAMAGE:"
+"DOTA_Tooltip_ability_item_xhs_orb_of_venom_poison_damage_per_second"	"DAMAGE PER SECOND:"
+"DOTA_Tooltip_ability_item_xhs_orb_of_venom_poison_duration"			"POISON DURATION:"
 
 "DOTA_Tooltip_ability_item_viridian_gem_Description"					"<h1><font color='#FF7800'>Passive:</font></h1> Venom Orb. Attacks poison enemies, dealing damage over time and reducing armor."
 "DOTA_Tooltip_ability_item_viridian_gem_bonus_damage"				"BONUS DAMAGE:"

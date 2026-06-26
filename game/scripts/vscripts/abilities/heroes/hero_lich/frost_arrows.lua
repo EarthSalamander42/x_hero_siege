@@ -43,6 +43,7 @@ function modifier_holdout_frost_arrows:ShouldUseFrostArrow(target)
 	local ability = self:GetAbility()
 	if parent == nil or ability == nil then return false end
 	if target == nil or target:IsNull() then return false end
+	if target.GetTeamNumber == nil or target.IsBuilding == nil or target.IsOther == nil or target.IsMagicImmune == nil then return false end
 	if target:GetTeamNumber() == parent:GetTeamNumber() then return false end
 	if target:IsBuilding() or target:IsOther() then return false end
 	if target:IsMagicImmune() then return false end

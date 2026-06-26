@@ -29,6 +29,7 @@
 "DOTA_Tooltip_ability_item_mystic_gem"		"Mystic Gem"
 "DOTA_Tooltip_ability_item_astral_core"		"Astral Core"
 "DOTA_Tooltip_ability_item_orb_of_venom"		"Orb of Venom"
+"DOTA_Tooltip_ability_item_xhs_orb_of_venom"		"Orb of Venom"
 "DOTA_Tooltip_ability_item_viridian_gem"		"Viridian Gem"
 "DOTA_Tooltip_ability_item_plagueheart"		"Plagueheart"
 "DOTA_Tooltip_ability_item_recipe_orb_of_earth2"		"Recipe: Gaia Gem"

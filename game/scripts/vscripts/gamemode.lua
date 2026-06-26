@@ -271,6 +271,7 @@ function GameMode:InitGameMode()
 	CustomGameEventManager:RegisterListener("xhs_buy_tomes", function(...) return GameMode:OnBuyTomesRequested(...) end)
 
 	ListenToGameEvent("dota_holdout_revive_complete", Dynamic_Wrap(GameMode, "OnPlayerRevived"), GameMode)
+	ListenToGameEvent("dota_pause_event", Dynamic_Wrap(GameMode, "OnDotaPauseEvent"), GameMode)
 
 	--Dungeon
 	GameMode.PrecachedVIPs = {}
@@ -280,6 +281,25 @@ function GameMode:InitGameMode()
 	if XHSDevTools ~= nil then
 		XHSDevTools:Init()
 	end
+end
+
+function GameMode:OnDotaPauseEvent(event)
+	local paused = GameRules:IsGamePaused()
+	local eventPaused = nil
+	if event ~= nil then
+		eventPaused = event.paused
+		if eventPaused == nil then
+			eventPaused = event.game_paused
+		end
+	end
+	if eventPaused ~= nil then
+		local value = tostring(eventPaused)
+		paused = eventPaused == true or value == "1" or value == "true"
+	end
+
+	CustomGameEventManager:Send_ServerToAllClients("xhs_game_pause_state", {
+		paused = paused and 1 or 0,
+	})
 end
 
 local CheckTeamDeath = 0

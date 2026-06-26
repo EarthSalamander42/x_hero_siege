@@ -3,6 +3,12 @@
 		<Panel id="container" style="visibility:collapse;">
 			<Image src="file://panorama/images/custom_game/close.png" hittest="false" />
 			<Image src="file://panorama/images/custom_game/patreon.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/patreon/patreon_cover_frostrose_studio_v2.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/patreon/donator_01_emerald.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/patreon/donator_02_solar_gold.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/patreon/donator_03_ember_red.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/patreon/donator_04_storm_blue.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/patreon/donator_05_amethyst_violet.png" hittest="false" />
 
 			<Image src="file://panorama/images/custom_game/loading_screen/bg.png" hittest="false" />
 			<Image src="file://panorama/images/custom_game/loading_screen/patreon.png" hittest="false" />
@@ -74,6 +80,74 @@
 
 			<Image src="file://panorama/images/custom_game/battlepass/kill_effect_rubick_free.png" hittest="false" />
 			<Image src="file://panorama/images/custom_game/battlepass/kill_effect_rubick.png" hittest="false" />
+
+			<Image src="file://panorama/images/spellicons/custom/arthas_frostmourne.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/arthas_holy_light.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/arthas_judgement_light.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/arthas_knights_armor.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/arthas_light_roar.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/arthas_oathbreaker_crown.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_balanar_carrion_swarm.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_balanar_dread_howl.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_balanar_nightfall.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_balanar_rain_of_chaos.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_balanar_sleeping_terror.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_balanar_vampiric_presence.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_banehallow_darkness.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_banehallow_immolation.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_banehallow_meteorain.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_banehallow_necromastery.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_banehallow_ragna_blade.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_banehallow_requiem_of_souls.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_banehallow_shadowraze.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_banehallow_soul_harvest.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_grom_blade_storm.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_grom_blood_frenzy.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_grom_mirror_cleave.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_grom_mirror_trial.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_grom_warsong_leap.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_grom_windwalk_ambush.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_illidan_demon_hunter.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_illidan_fel_beam.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_illidan_glaive_storm.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_illidan_immolation_burst.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_illidan_metamorphosis.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_illidan_shadow_dash.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_lich_king_defile.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_lich_king_frostmourne_hunger.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_lich_king_frozen_throne.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_lich_king_glacial_spikes.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_lich_king_howling_blast.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_lich_king_remorseless_winter.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_lich_king_sindragosa_flyby.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_magtheridon_brutal_slam.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_magtheridon_demonic_howl.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_magtheridon_fel_fissure.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_magtheridon_fel_stomp.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_magtheridon_infernal_rings.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_magtheridon_rupture.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_magtheridon_targeted_firestorms.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_proudmoore_admirals_command.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_proudmoore_anchor_smash.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_proudmoore_broadside.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_proudmoore_command_aura.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_proudmoore_focus_fire.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_proudmoore_torrent_line.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_spirit_earth_fault_line.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_spirit_earth_resonant_pillar.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_spirit_earth_stone_guard.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_spirit_fire_cinder_step.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_spirit_fire_solar_flare.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_spirit_fire_wildfire_ring.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_spirit_master_convergence.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_spirit_master_elemental_mandala.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_spirit_master_palm_of_balance.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_spirit_master_spirit_call.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_spirit_master_trinity_cycle.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_spirit_storm_arc_dash.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_spirit_storm_chain_focus.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_spirit_storm_static_orbs.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/custom/xhs_trueshot_aura.png" hittest="false" />
 
 			<Image src="file://panorama/images/items/doom_artifact.png" hittest="false" />
 			<Image src="file://panorama/images/items/key_of_the_three_moons.png" hittest="false" />

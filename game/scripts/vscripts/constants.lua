@@ -83,6 +83,25 @@ function GetXHSMagtheridonKillLimit(difficulty)
 	return limits[difficulty] or 1
 end
 
+function GetXHSGromVanguardKillLimit(difficulty)
+	if difficulty == nil and GameRules ~= nil then
+		difficulty = GameRules:GetCustomGameDifficulty()
+	end
+
+	difficulty = tonumber(difficulty) or 1
+
+	local limits = {
+		[0] = 32,
+		[1] = 32,
+		[2] = 44,
+		[3] = 60,
+		[4] = 72,
+		[5] = 92,
+	}
+
+	return limits[difficulty] or limits[1]
+end
+
 if IsInToolsMode() then
 	_G.PREGAMETIME = 15.0
 end
@@ -472,6 +491,14 @@ XHS_BOSSES_TABLE = {
 		refresh_players = true,
 		func_next_delay = 17.0,
 		func_next = function() StartSpiritMasterArena() end
+	},
+	npc_dota_boss_spirit_master = {
+		death_animation = { duration = 10.0, activity = ACT_DOTA_DIE, rate = 0.3 },
+		death_sound = "razor_raz_death_04",
+		death_no_draw_delay = 10.0,
+		refresh_players = true,
+		func_next_delay = 14.0,
+		func_next = function() EndGame() end
 	},
 	npc_dota_boss_spirit_master_storm = {
 		death_animation = { duration = 10.0, activity = ACT_DOTA_DIE, rate = 0.3 },

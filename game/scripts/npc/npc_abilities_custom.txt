@@ -2996,7 +2996,7 @@
 		"RequiredLevel"				"5"
 		"AbilityCastRange"			"900"
 		"AbilityUnitTargetFlags"	"DOTA_UNIT_TARGET_FLAG_NOT_ANCIENTS"
-		
+
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityValues"
@@ -8466,7 +8466,7 @@
 		"AbilityValues"
 		{
 			"radius"						"325 350 375 400"
-			"stun_duration"					"1.5 2.0 2.5 3.0"
+			"stun_duration"					"0.75 1.0 1.25 1.5"
 			"LinkedSpecialBonus"			"special_bonus_unique_centaur_2"
 			"stomp_damage"					"150 350 550 750"
 		}
@@ -18665,6 +18665,123 @@
 		}
 	}
 
+	"xhs_grom_mirror_trial"
+	{
+		"BaseClass"						"ability_lua"
+		"ScriptFile"					"boss_scripts/phase3_ai/grom_abilities.lua"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityTextureName"			"custom/xhs_grom_mirror_trial"
+		"MaxLevel"						"5"
+		"AbilityCastPoint"				"1.45 1.30 1.20 1.10 1.00"
+		"AbilityCooldown"				"0"
+		"AbilityManaCost"				"0"
+		"AbilityValues"
+		{
+			"clone_count"				"2 3 4 5 6"
+			"trial_duration"			"10.0 10.0 10.0 10.0 10.0"
+			"split_delay"				"0.65"
+			"spawn_radius"				"360"
+			"clone_health"				"4500 6500 8500 10500 13000"
+			"fake_punish_radius"		"260"
+			"fake_punish_damage"		"1800 2600 3600 4800 6200"
+		}
+	}
+
+	"xhs_grom_blade_storm"
+	{
+		"BaseClass"						"ability_lua"
+		"ScriptFile"					"boss_scripts/phase3_ai/grom_abilities.lua"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityTextureName"			"custom/xhs_grom_blade_storm"
+		"MaxLevel"						"5"
+		"AbilityCastPoint"				"1.35 1.25 1.15 1.05 1.00"
+		"AbilityCooldown"				"8.0"
+		"AbilityManaCost"				"0"
+		"AbilityValues"
+		{
+			"radius"					"330"
+			"duration"					"3.2"
+			"tick_rate"					"0.25"
+			"damage_per_second"			"2800 4200 5600 7200 9200"
+		}
+	}
+
+	"xhs_grom_mirror_cleave"
+	{
+		"BaseClass"						"ability_lua"
+		"ScriptFile"					"boss_scripts/phase3_ai/grom_abilities.lua"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityTextureName"			"custom/xhs_grom_mirror_cleave"
+		"MaxLevel"						"5"
+		"AbilityCastPoint"				"1.25 1.15 1.08 1.00 0.95"
+		"AbilityCooldown"				"7.0"
+		"AbilityManaCost"				"0"
+		"AbilityValues"
+		{
+			"source_count"				"1 2 2 3 4"
+			"source_stagger"			"0.18"
+			"length"					"950"
+			"width"						"130"
+			"damage"					"3200 4600 6200 8200 10600"
+		}
+	}
+
+	"xhs_grom_windwalk_ambush"
+	{
+		"BaseClass"						"ability_lua"
+		"ScriptFile"					"boss_scripts/phase3_ai/grom_abilities.lua"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityTextureName"			"custom/xhs_grom_windwalk_ambush"
+		"MaxLevel"						"5"
+		"AbilityCastPoint"				"1.45 1.30 1.20 1.10 1.00"
+		"AbilityCooldown"				"12.0"
+		"AbilityManaCost"				"0"
+		"AbilityValues"
+		{
+			"target_radius"				"180"
+			"vanish_delay"				"0.35"
+			"strike_delay"				"0.85 0.8 0.75 0.7 0.65"
+			"length"					"760"
+			"width"						"150"
+			"damage"					"4200 6200 8200 10800 14000"
+		}
+	}
+
+	"xhs_grom_warsong_leap"
+	{
+		"BaseClass"						"ability_lua"
+		"ScriptFile"					"boss_scripts/phase3_ai/grom_abilities.lua"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityTextureName"			"custom/xhs_grom_warsong_leap"
+		"MaxLevel"						"5"
+		"AbilityCastPoint"				"1.30 1.20 1.10 1.00 0.95"
+		"AbilityCooldown"				"10.0"
+		"AbilityManaCost"				"0"
+		"AbilityValues"
+		{
+			"radius"					"300"
+			"travel_delay"				"0.45"
+			"damage"					"3600 5400 7200 9500 12200"
+			"slow_duration"				"2.5"
+		}
+	}
+
+	"xhs_grom_blood_frenzy"
+	{
+		"BaseClass"						"ability_lua"
+		"ScriptFile"					"boss_scripts/phase3_ai/grom_abilities.lua"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityTextureName"			"custom/xhs_grom_blood_frenzy"
+		"MaxLevel"						"5"
+		"AbilityValues"
+		{
+			"stack_duration"			"20"
+			"damage_per_stack"			"3"
+			"attack_speed_per_stack"	"10"
+			"max_stacks"				"8"
+		}
+	}
+
 	//=================================================================================================================
 	// Grom Hellscream: Devotion Aura
 	//=================================================================================================================
@@ -18869,7 +18986,7 @@
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
 		"AbilityUnitTargetType"		"DOTA_UNIT_TARGET_BASIC | DOTA_UNIT_TARGET_HERO"
-		"AbilityTextureName"		"abaddon_frostmourne"
+		"AbilityTextureName"		"custom/arthas_frostmourne"
 		"MaxLevel"					"5"
 
 		"AbilityValues"
@@ -18989,6 +19106,7 @@
 		"AbilityUnitTargetFlags"		"DOTA_UNIT_TARGET_FLAG_NOT_MAGIC_IMMUNE_ALLIES"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_PURE"
 		"SpellImmunityType"				"SPELL_IMMUNITY_ALLIES_NO"
+		"AbilityTextureName"			"custom/arthas_holy_light"
 		"MaxLevel"						"5"
 
 		// Casting
@@ -19058,7 +19176,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"					"ability_datadriven"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-		"AbilityTextureName"		"centaur_return"
+		"AbilityTextureName"		"custom/arthas_knights_armor"
 		"MaxLevel"					"5"
 
 		"AbilityValues"
@@ -19108,7 +19226,7 @@
 		"AbilityCastPoint"			"0.5"
 		"AbilityCooldown"			"60.0"
 		"AbilityManaCost"			"0"
-		"AbilityTextureName"		"fountain_glyph"
+		"AbilityTextureName"		"custom/arthas_light_roar"
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
 		"AbilityUnitTargetFlags"	"DOTA_UNIT_TARGET_FLAG_INVULNERABLE | DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES"
 	
@@ -21117,8 +21235,9 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityValues"
 		{
-			"aura_radius"				"900"
-			"bonus_health_regen"		"0.75"
+			"radius"					"500"
+			"aura_radius"				"500"
+			"bonus_health_regen"		"0.5"
 			"bonus_health_regen_flat"	"75"
 		}
 
@@ -21203,7 +21322,7 @@
 		{
 			"radius"					"600"
 			"aura_radius"				"600"
-			"bonus_health_regen"		"1.5"
+			"bonus_health_regen"		"0.75"
 			"bonus_health_regen_flat"	"200"
 		}
 
@@ -21869,8 +21988,8 @@
 	{
 		"BaseClass"						"ability_lua"
 		"ScriptFile"					"boss_scripts/phase3_ai/magtheridon_abilities.lua"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_HIDDEN"
-		"AbilityTextureName"			"abyssal_underlord_atrophy_aura"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityTextureName"			"custom/xhs_magtheridon_brutal_slam"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_PHYSICAL"
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_YES"
 		"AbilityCastAnimation"			"ACT_DOTA_ATTACK"
@@ -21891,17 +22010,17 @@
 		"BaseClass"						"ability_lua"
 		"ScriptFile"					"boss_scripts/phase3_ai/magtheridon_abilities.lua"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-		"AbilityTextureName"			"custom/brewmaster_thunder_clap_new"
+		"AbilityTextureName"			"custom/xhs_magtheridon_fel_stomp"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_PURE"
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_YES"
 		"AbilityCastAnimation"			"ACT_DOTA_CAST_ABILITY_2"
-		"AbilityCastPoint"				"1.65 1.50 1.40 1.30 1.25"
+		"AbilityCastPoint"				"2.40 2.25 2.10 2.00 1.90"
 		"AbilityCooldown"				"0.5"
 		"AbilityManaCost"				"0"
 		"MaxLevel"						"5"
 		"AbilityValues"
 		{
-			"cast_point"					"1.65 1.50 1.40 1.30 1.25"
+			"cast_point"					"2.40 2.25 2.10 2.00 1.90"
 			"radius"						"500 600 700 800 900"
 			"damage"						"25000 50000 75000 100000 125000"
 			"damage_pct"					"82"
@@ -21916,7 +22035,7 @@
 		"BaseClass"						"ability_lua"
 		"ScriptFile"					"boss_scripts/phase3_ai/magtheridon_abilities.lua"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-		"AbilityTextureName"			"abyssal_underlord_firestorm"
+		"AbilityTextureName"			"custom/xhs_magtheridon_targeted_firestorms"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_PURE"
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_YES"
 		"AbilityCastAnimation"			"ACT_DOTA_CAST_ABILITY_1"
@@ -21942,7 +22061,7 @@
 		"BaseClass"						"ability_lua"
 		"ScriptFile"					"boss_scripts/phase3_ai/magtheridon_abilities.lua"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-		"AbilityTextureName"			"abyssal_underlord_firestorm"
+		"AbilityTextureName"			"custom/xhs_magtheridon_fel_fissure"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_PURE"
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_YES"
 		"AbilityCastAnimation"			"ACT_DOTA_CAST_ABILITY_1"
@@ -21968,7 +22087,7 @@
 		"BaseClass"						"ability_lua"
 		"ScriptFile"					"boss_scripts/phase3_ai/magtheridon_abilities.lua"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-		"AbilityTextureName"			"abyssal_underlord_pit_of_malice"
+		"AbilityTextureName"			"custom/xhs_magtheridon_infernal_rings"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_PURE"
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_YES"
 		"AbilityCastAnimation"			"ACT_DOTA_CAST_ABILITY_3"
@@ -21987,6 +22106,7 @@
 			"impact_stagger"				"0.12"
 			"wave_damage"					"2000 4000 6000 8000 10000"
 			"damage_pct"					"70"
+			"root_duration"				"2.4"
 		}
 	}
 
@@ -21995,7 +22115,7 @@
 		"BaseClass"						"ability_lua"
 		"ScriptFile"					"boss_scripts/phase3_ai/magtheridon_abilities.lua"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-		"AbilityTextureName"			"custom/holdout_howl_of_terror"
+		"AbilityTextureName"			"custom/xhs_magtheridon_demonic_howl"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
 		"AbilityUnitTargetFlags"		"DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES"
@@ -22008,9 +22128,10 @@
 		{
 			"cast_point"					"1.70 1.50 1.40 1.30 1.20"
 			"radius"						"1000"
-			"duration"					"10.00 8.00 7.20 6.56 5.76"
-			"movement_slow"				"-18"
-			"attack_slow"					"-120"
+			"duration"					"7.00 8.50 10.00 11.50 13.00"
+			"movement_slow"				"-20 -24 -28 -32 -36"
+			"attack_slow"					"-120 -150 -180 -220 -260"
+			"damage_reduction_pct"		"35 45 55 65 75"
 		}
 	}
 
@@ -22018,11 +22139,30 @@
 	{
 		"BaseClass"						"ability_lua"
 		"ScriptFile"					"boss_scripts/phase3_ai/magtheridon_abilities.lua"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-		"AbilityTextureName"			"modifiers/ankh_of_reincarnation"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityTextureName"			"custom/xhs_magtheridon_rupture"
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+		"AbilityUnitTargetFlags"		"DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES"
+		"AbilityCastAnimation"			"ACT_DOTA_CAST_ABILITY_4"
+		"AbilityCastPoint"				"1.80 1.60 1.45 1.30 1.20"
+		"AbilityCooldown"				"0.5"
+		"AbilityManaCost"				"0"
 		"MaxLevel"						"5"
 		"AbilityValues"
 		{
+			"cast_point"					"1.80 1.60 1.45 1.30 1.20"
+			"line_count"					"1 2 3 5 8"
+			"line_length"					"2800"
+			"line_spread_degrees"		"105"
+			"segment_spacing"			"170"
+			"start_distance"				"0"
+			"node_radius"					"185"
+			"damage"						"13000 26000 39000 52000 65000"
+			"slow_duration"				"4.2"
+			"visual_delay"				"0.65"
+			"movement_slow"				"-28"
+			"attack_slow"					"-140"
 			"reincarnate_time"			"20"
 			"medium_fragments"			"8"
 			"small_fragments"			"16"
@@ -22576,6 +22716,123 @@
 		}
 	}
 
+	"xhs_illidan_metamorphosis"
+	{
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"boss_scripts/phase3_ai/illidan_abilities.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityTextureName"		"custom/xhs_illidan_metamorphosis"
+		"MaxLevel"					"5"
+		"AbilityCastPoint"			"1.50 1.35 1.25 1.15 1.05"
+		"AbilityCooldown"			"0"
+		"AbilityManaCost"			"0"
+		"AbilityValues"
+		{
+			"radius"				"475 500 525 550 575"
+			"damage"				"18000 28000 42000 56000 76000"
+			"duration"				"18 20 22 24 26"
+			"bonus_damage_pct"		"12 16 20 24 30"
+			"bonus_attack_speed"	"60 75 90 110 130"
+			"bonus_attack_range"	"325 350 375 400 425"
+			"cleave_radius"			"325 350 375 400 425"
+			"cleave_pct"			"25 30 35 40 45"
+			"model_scale_bonus"		"12 15 18 21 24"
+			"cast_point"			"1.50 1.35 1.25 1.15 1.05"
+		}
+	}
+
+	"xhs_illidan_fel_beam"
+	{
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"boss_scripts/phase3_ai/illidan_abilities.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityTextureName"		"custom/xhs_illidan_fel_beam"
+		"MaxLevel"					"5"
+		"AbilityCastPoint"			"1.30 1.20 1.12 1.05 0.95"
+		"AbilityCooldown"			"7.0"
+		"AbilityManaCost"			"0"
+		"AbilityValues"
+		{
+			"length"				"1250 1350 1450 1550 1650"
+			"width"					"125 135 145 155 165"
+			"damage"				"16000 26000 39000 52000 70000"
+			"cast_point"			"1.30 1.20 1.12 1.05 0.95"
+		}
+	}
+
+	"xhs_illidan_shadow_dash"
+	{
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"boss_scripts/phase3_ai/illidan_abilities.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityTextureName"		"custom/xhs_illidan_shadow_dash"
+		"MaxLevel"					"5"
+		"AbilityCastPoint"			"1.25 1.15 1.08 1.00 0.92"
+		"AbilityCooldown"			"9.0"
+		"AbilityManaCost"			"0"
+		"AbilityValues"
+		{
+			"target_radius"			"180 190 200 210 220"
+			"width"					"135 145 155 165 175"
+			"max_distance"			"950 1050 1150 1250 1350"
+			"damage"				"15000 24000 36000 50000 68000"
+			"cast_point"			"1.25 1.15 1.08 1.00 0.92"
+		}
+	}
+
+	"xhs_illidan_immolation_burst"
+	{
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"boss_scripts/phase3_ai/illidan_abilities.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityTextureName"		"custom/xhs_illidan_immolation_burst"
+		"MaxLevel"					"5"
+		"AbilityCastPoint"			"1.20 1.12 1.05 1.00 0.95"
+		"AbilityCooldown"			"11.0"
+		"AbilityManaCost"			"0"
+		"AbilityValues"
+		{
+			"radius"				"430 460 490 520 560"
+			"duration"				"3.0 3.2 3.4 3.6 3.8"
+			"tick_rate"				"0.5"
+			"damage_per_second"		"8500 13000 18000 25000 34000"
+			"cast_point"			"1.20 1.12 1.05 1.00 0.95"
+		}
+	}
+
+	"xhs_illidan_glaive_storm"
+	{
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"boss_scripts/phase3_ai/illidan_abilities.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityTextureName"		"custom/xhs_illidan_glaive_storm"
+		"MaxLevel"					"5"
+		"AbilityCastPoint"			"1.35 1.25 1.15 1.08 1.00"
+		"AbilityCooldown"			"10.0"
+		"AbilityManaCost"			"0"
+		"AbilityValues"
+		{
+			"point_count"			"3 4 5 6 7"
+			"point_delay"			"0.22 0.20 0.18 0.16 0.14"
+			"radius"				"210 225 240 255 270"
+			"damage"				"13000 21000 32000 44000 60000"
+			"cast_point"			"1.35 1.25 1.15 1.08 1.00"
+		}
+	}
+
+	"xhs_illidan_demon_hunter"
+	{
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"boss_scripts/phase3_ai/illidan_abilities.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityTextureName"		"custom/xhs_illidan_demon_hunter"
+		"MaxLevel"					"5"
+		"AbilityValues"
+		{
+			"evasion"				"12 15 18 22 26"
+		}
+	}
+
 	"demonhunter_roar"
 	{
 		// General
@@ -22828,7 +23085,7 @@
 			"radius"				"500"
 			"stun_duration"			"0.5"
 			"time_between_meteors"	"1"
-			"meteors_per_tick"		"1 2 3 4 5"
+			"meteors_per_tick"		"1"
 			"radius_explosion"		"250"
 			"duration"				"10"
 			"golem_duration"		"30"
@@ -23690,7 +23947,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"ability_lua"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-		"AbilityTextureName"			"nevermore_necromastery"
+		"AbilityTextureName"			"custom/xhs_banehallow_necromastery"
 		"ScriptFile"					"boss_scripts/boss_abilities/necromastery.lua"
 		"MaxLevel"						"5"
 	}
@@ -23704,7 +23961,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"ability_lua"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-		"AbilityTextureName"			"custom/holdout_immolation"
+		"AbilityTextureName"			"custom/xhs_banehallow_immolation"
 		"MaxLevel"						"5"
 
 		// Special
@@ -23726,8 +23983,8 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"ability_lua"
 		"ScriptFile"					"boss_scripts/phase3_ai/banehallow_abilities.lua"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_HIDDEN"
-		"AbilityTextureName"			"custom/ragna_blade"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityTextureName"			"custom/xhs_banehallow_ragna_blade"
 		"AbilityCastAnimation"			"ACT_DOTA_VICTORY"
 		"AbilityCastPoint"				"3.125 2.4 2.07 1.804 1.44"
 		"AbilityCooldown"				"0.5"
@@ -23753,8 +24010,8 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"ability_lua"
 		"ScriptFile"					"boss_scripts/phase3_ai/banehallow_abilities.lua"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_HIDDEN"
-		"AbilityTextureName"			"custom/meteorain"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityTextureName"			"custom/xhs_banehallow_meteorain"
 		"AbilityCastAnimation"			"ACT_DOTA_IDLE_RARE"
 		"AbilityCastPoint"				"3.75 2.5 1.8 1.23 0.72"
 		"AbilityCooldown"				"0.5"
@@ -23783,8 +24040,8 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"ability_lua"
 		"ScriptFile"					"boss_scripts/phase3_ai/banehallow_abilities.lua"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_HIDDEN"
-		"AbilityTextureName"			"nevermore_shadowraze2"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityTextureName"			"custom/xhs_banehallow_shadowraze"
 		"AbilityCastAnimation"			"ACT_DOTA_RAZE_2"
 		"AbilityCastPoint"				"1.875 1.45 1.26 1.107 0.9"
 		"AbilityCooldown"				"0.5"
@@ -23810,8 +24067,8 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"ability_lua"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_HIDDEN"
-		"AbilityTextureName"			"custom/soul_harvest"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityTextureName"			"custom/xhs_banehallow_soul_harvest"
 		"ScriptFile"					"boss_scripts/phase3_ai/banehallow_abilities.lua"
 		"AbilityCastAnimation"			"ACT_DOTA_ATTACK"
 		"AbilityCastPoint"				"0.5"
@@ -23829,8 +24086,8 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"ability_lua"
 		"ScriptFile"					"boss_scripts/phase3_ai/banehallow_abilities.lua"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_HIDDEN"
-		"AbilityTextureName"			"custom/nevermore"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityTextureName"			"custom/xhs_banehallow_darkness"
 		"AbilityCastAnimation"			"ACT_DOTA_VERSUS"
 		"AbilityCastPoint"				"3.75 3.0 2.7 2.46 2.16"
 		"AbilityCooldown"				"0.5"
@@ -23852,8 +24109,8 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"ability_lua"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_HIDDEN"
-		"AbilityTextureName"			"nevermore_requiem"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityTextureName"			"custom/xhs_banehallow_requiem_of_souls"
 		"ScriptFile"					"boss_scripts/phase3_ai/banehallow_abilities.lua"
 		"AbilityCastAnimation"			"ACT_DOTA_RAZE_3"
 		"AbilityCastPoint"				"4.375 3.0 3.15 2.46 1.44"
@@ -24373,6 +24630,682 @@
 		}
 	}
 
+	"xhs_balanar_nightfall"
+	{
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"boss_scripts/phase3_ai/balanar_abilities.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityTextureName"		"custom/xhs_balanar_nightfall"
+		"MaxLevel"					"5"
+		"AbilityCastPoint"			"1.45 1.30 1.18 1.08 1.00"
+		"AbilityCooldown"			"0"
+		"AbilityManaCost"			"0"
+		"AbilityValues"
+		{
+			"radius"				"520 550 580 610 650"
+			"damage"				"15000 23000 34000 47000 65000"
+			"duration"				"14 16 18 20 22"
+			"bonus_damage_pct"		"10 14 18 22 28"
+			"bonus_attack_speed"	"45 60 75 95 120"
+			"cast_point"			"1.45 1.30 1.18 1.08 1.00"
+		}
+	}
+
+	"xhs_balanar_dread_howl"
+	{
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"boss_scripts/phase3_ai/balanar_abilities.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityTextureName"		"custom/xhs_balanar_dread_howl"
+		"MaxLevel"					"5"
+		"AbilityCastPoint"			"1.25 1.15 1.08 1.00 0.95"
+		"AbilityCooldown"			"8.0"
+		"AbilityManaCost"			"0"
+		"AbilityValues"
+		{
+			"radius"				"420 450 480 510 550"
+			"damage"				"10000 16000 24000 34000 48000"
+			"slow_duration"			"2.6"
+			"slow_pct"				"30 34 38 42 48"
+			"damage_reduction_pct"	"15 18 21 24 28"
+			"cast_point"			"1.25 1.15 1.08 1.00 0.95"
+		}
+	}
+
+	"xhs_balanar_sleeping_terror"
+	{
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"boss_scripts/phase3_ai/balanar_abilities.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityTextureName"		"custom/xhs_balanar_sleeping_terror"
+		"MaxLevel"					"5"
+		"AbilityCastPoint"			"1.35 1.25 1.15 1.05 1.00"
+		"AbilityCooldown"			"9.0"
+		"AbilityManaCost"			"0"
+		"AbilityValues"
+		{
+			"radius"				"210 225 240 255 275"
+			"damage"				"12000 19000 28000 39000 54000"
+			"nightmare_duration"	"2.0 2.1 2.2 2.3 2.5"
+			"nightmare_slow_pct"	"55 58 61 64 68"
+			"cast_point"			"1.35 1.25 1.15 1.05 1.00"
+		}
+	}
+
+	"xhs_balanar_carrion_swarm"
+	{
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"boss_scripts/phase3_ai/balanar_abilities.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityTextureName"		"custom/xhs_balanar_carrion_swarm"
+		"MaxLevel"					"5"
+		"AbilityCastPoint"			"1.20 1.12 1.05 1.00 0.92"
+		"AbilityCooldown"			"7.0"
+		"AbilityManaCost"			"0"
+		"AbilityValues"
+		{
+			"length"				"1050 1150 1250 1350 1500"
+			"width"					"135 145 155 165 180"
+			"damage"				"13000 21000 32000 44000 62000"
+			"cast_point"			"1.20 1.12 1.05 1.00 0.92"
+		}
+	}
+
+	"xhs_balanar_rain_of_chaos"
+	{
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"boss_scripts/phase3_ai/balanar_abilities.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityUnitTargetFlags"	"DOTA_UNIT_TARGET_FLAG_INVULNERABLE | DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES"
+		"AbilityTextureName"		"custom/xhs_balanar_rain_of_chaos"
+		"MaxLevel"					"5"
+		"AbilityCastPoint"			"1.50 1.35 1.25 1.15 1.05"
+		"AbilityCooldown"			"35.0 31.0 27.0 23.0 20.0"
+		"AbilityManaCost"			"0"
+		"AbilityUnitDamageType"		"DAMAGE_TYPE_PURE"
+		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"AbilityUnitTargetType"		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+		"AbilityValues"
+		{
+			"damage_per_unit"		"15000 30000 45000 60000 75000"
+			"radius"				"500"
+			"stun_duration"			"0.5"
+			"time_between_meteors"	"1"
+			"unit_per_meteor"		"1"
+			"radius_explosion"		"250"
+			"duration"				"10"
+			"golem_duration"		"30"
+			"seek_radius"			"1000"
+			"cast_point"			"1.50 1.35 1.25 1.15 1.05"
+		}
+	}
+
+	"xhs_balanar_vampiric_presence"
+	{
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"boss_scripts/phase3_ai/balanar_abilities.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityTextureName"		"custom/xhs_balanar_vampiric_presence"
+		"MaxLevel"					"5"
+		"AbilityValues"
+		{
+			"lifesteal_pct"			"5 5 5 5 5"
+		}
+	}
+
+	"xhs_proudmoore_admirals_command"
+	{
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"boss_scripts/phase3_ai/proudmoore_abilities.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityTextureName"		"custom/xhs_proudmoore_admirals_command"
+		"MaxLevel"					"5"
+		"AbilityCastPoint"			"1.45 1.32 1.22 1.12 1.02"
+		"AbilityCooldown"			"0"
+		"AbilityManaCost"			"0"
+		"AbilityValues"
+		{
+			"radius"				"450 480 510 540 580"
+			"damage"				"13000 21000 32000 45000 62000"
+			"duration"				"12 14 16 18 20"
+			"bonus_armor"			"20 25 30 38 48"
+			"bonus_damage_pct"		"8 12 16 20 26"
+			"strike_count"			"3 4 5 6 8"
+			"strike_delay"			"0.25 0.23 0.21 0.19 0.17"
+			"strike_radius"			"220 235 250 265 285"
+			"strike_damage"			"12000 19000 29000 42000 59000"
+			"cast_point"			"1.45 1.32 1.22 1.12 1.02"
+		}
+	}
+
+	"xhs_proudmoore_torrent_line"
+	{
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"boss_scripts/phase3_ai/proudmoore_abilities.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityTextureName"		"custom/xhs_proudmoore_torrent_line"
+		"MaxLevel"					"5"
+		"AbilityCastPoint"			"1.25 1.15 1.08 1.00 0.95"
+		"AbilityCooldown"			"7.0"
+		"AbilityManaCost"			"0"
+		"AbilityValues"
+		{
+			"length"				"1100 1200 1300 1400 1550"
+			"width"					"145 155 165 175 190"
+			"damage"				"13000 21000 32000 44000 62000"
+			"torrent_stun_duration"	"1.15"
+			"torrent_slow_duration"	"2.2"
+			"torrent_slow_pct"		"40"
+			"torrent_height"		"360"
+			"cast_point"			"1.25 1.15 1.08 1.00 0.95"
+		}
+	}
+
+	"xhs_proudmoore_broadside"
+	{
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"boss_scripts/phase3_ai/proudmoore_abilities.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityTextureName"		"custom/xhs_proudmoore_broadside"
+		"MaxLevel"					"5"
+		"AbilityCastPoint"			"1.35 1.25 1.15 1.08 1.00"
+		"AbilityCooldown"			"10.0"
+		"AbilityManaCost"			"0"
+		"AbilityValues"
+		{
+			"point_count"			"3 4 5 6 7"
+			"strike_delay"			"0.22 0.20 0.18 0.16 0.14"
+			"radius"				"225 240 255 270 290"
+			"damage"				"13000 21000 32000 45000 64000"
+			"cast_point"			"1.35 1.25 1.15 1.08 1.00"
+		}
+	}
+
+	"xhs_proudmoore_anchor_smash"
+	{
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"boss_scripts/phase3_ai/proudmoore_abilities.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityTextureName"		"custom/xhs_proudmoore_anchor_smash"
+		"MaxLevel"					"5"
+		"AbilityCastPoint"			"1.20 1.12 1.05 1.00 0.95"
+		"AbilityCooldown"			"8.0"
+		"AbilityManaCost"			"0"
+		"AbilityValues"
+		{
+			"radius"				"360 390 420 455 500"
+			"damage"				"12000 19000 29000 41000 58000"
+			"slow_duration"			"2.4"
+			"slow_pct"				"30 34 38 42 48"
+			"attack_slow"			"45 55 65 80 100"
+			"cast_point"			"1.20 1.12 1.05 1.00 0.95"
+		}
+	}
+
+	"xhs_proudmoore_focus_fire"
+	{
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"boss_scripts/phase3_ai/proudmoore_abilities.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityTextureName"		"custom/xhs_proudmoore_focus_fire"
+		"MaxLevel"					"5"
+		"AbilityCastPoint"			"1.30 1.20 1.12 1.05 0.98"
+		"AbilityCooldown"			"9.0"
+		"AbilityManaCost"			"0"
+		"AbilityValues"
+		{
+			"radius"				"210 225 240 255 275"
+			"damage"				"15000 24000 36000 50000 70000"
+			"cast_point"			"1.30 1.20 1.12 1.05 0.98"
+		}
+	}
+
+	"xhs_proudmoore_command_aura"
+	{
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"boss_scripts/phase3_ai/proudmoore_abilities.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityTextureName"		"custom/xhs_proudmoore_command_aura"
+		"MaxLevel"					"5"
+		"AbilityValues"
+		{
+			"armor"					"8 10 12 15 18"
+		}
+	}
+
+	//=================================================================================================================
+	// Lich King: Frozen Throne
+	//=================================================================================================================
+	"xhs_lich_king_frozen_throne"
+	{
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"boss_scripts/phase3_ai/lich_king_abilities.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityTextureName"		"custom/xhs_lich_king_frozen_throne"
+		"MaxLevel"					"5"
+		"AbilityValues"
+		{
+			"thresholds"				"75 50 25"
+			"soul_cap"					"24 30 36 42 50"
+			"sindragosa_soul_cost"		"18 22 26 30 34"
+			"bonus_lane_soul_cost"		"8"
+			"max_bonus_lanes"			"3"
+			"frostbite_duration"			"12"
+			"frostbite_cap"				"6"
+			"frostbite_move_slow_pct"	"2"
+			"frostbite_attack_slow"		"4"
+			"frostbite_hunger_damage_pct"	"4"
+			"soul_damage_pct"			"0.4"
+			"soul_armor"				"0.5"
+		}
+	}
+
+	"xhs_lich_king_remorseless_winter"
+	{
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"boss_scripts/phase3_ai/lich_king_abilities.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_AOE"
+		"AbilityTextureName"		"custom/xhs_lich_king_remorseless_winter"
+		"MaxLevel"					"5"
+		"AbilityCastPoint"			"1.65 1.50 1.35 1.22 1.10"
+		"AbilityCooldown"			"1.0"
+		"AbilityManaCost"			"0"
+		"AbilityValues"
+		{
+			"damage"					"12000 20000 30000 42000 58000"
+			"radius"					"850 900 950 1000 1050"
+			"slow_duration"				"2.0"
+			"buff_duration"				"10.0"
+			"cast_point"				"1.65 1.50 1.35 1.22 1.10"
+		}
+	}
+
+	"xhs_lich_king_frostmourne_hunger"
+	{
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"boss_scripts/phase3_ai/lich_king_abilities.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE"
+		"AbilityTextureName"		"custom/xhs_lich_king_frostmourne_hunger"
+		"MaxLevel"					"5"
+		"AbilityCastPoint"			"1.25 1.16 1.08 1.02 0.98"
+		"AbilityCastRange"			"2600"
+		"AbilityCooldown"			"8.0"
+		"AbilityManaCost"			"0"
+		"AbilityValues"
+		{
+			"damage"					"9000 16000 24000 34000 48000"
+			"radius"					"230 245 260 280 300"
+			"heal_pct"					"8"
+			"slow_duration"				"1.4"
+			"cast_point"				"1.25 1.16 1.08 1.02 0.98"
+		}
+	}
+
+	"xhs_lich_king_howling_blast"
+	{
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"boss_scripts/phase3_ai/lich_king_abilities.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE"
+		"AbilityTextureName"		"custom/xhs_lich_king_howling_blast"
+		"MaxLevel"					"5"
+		"AbilityCastPoint"			"1.35 1.24 1.14 1.06 1.00"
+		"AbilityCastRange"			"2600"
+		"AbilityCooldown"			"7.0"
+		"AbilityManaCost"			"0"
+		"AbilityValues"
+		{
+			"damage"					"8000 14000 21000 30000 42000"
+			"radius"					"175 190 205 220 235"
+			"spacing"					"190"
+			"nodes"						"8"
+			"slow_duration"				"1.5"
+			"cast_point"				"1.35 1.24 1.14 1.06 1.00"
+		}
+	}
+
+	"xhs_lich_king_glacial_spikes"
+	{
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"boss_scripts/phase3_ai/lich_king_abilities.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE"
+		"AbilityTextureName"		"custom/xhs_lich_king_glacial_spikes"
+		"MaxLevel"					"5"
+		"AbilityCastPoint"			"1.38 1.28 1.18 1.08 1.00"
+		"AbilityCastRange"			"2600"
+		"AbilityCooldown"			"9.0"
+		"AbilityManaCost"			"0"
+		"AbilityValues"
+		{
+			"damage"					"7000 11000 16500 23500 33000"
+			"radius"					"210 225 240 255 275"
+			"slow_duration"				"1.8"
+			"cast_point"				"1.38 1.28 1.18 1.08 1.00"
+		}
+	}
+
+	"xhs_lich_king_defile"
+	{
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"boss_scripts/phase3_ai/lich_king_abilities.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE"
+		"AbilityTextureName"		"custom/xhs_lich_king_defile"
+		"MaxLevel"					"5"
+		"AbilityCastPoint"			"1.45 1.32 1.20 1.10 1.02"
+		"AbilityCastRange"			"2600"
+		"AbilityCooldown"			"11.0"
+		"AbilityManaCost"			"0"
+		"AbilityValues"
+		{
+			"damage_per_tick"			"1800 3200 4800 6800 9600"
+			"radius"					"260 275 295 315 335"
+			"duration"					"4.0"
+			"tick_rate"					"0.5"
+			"cast_point"				"1.45 1.32 1.20 1.10 1.02"
+		}
+	}
+
+	"xhs_lich_king_sindragosa_flyby"
+	{
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"boss_scripts/phase3_ai/lich_king_abilities.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE"
+		"AbilityTextureName"		"custom/xhs_lich_king_sindragosa_flyby"
+		"MaxLevel"					"5"
+		"AbilityCastPoint"			"1.75 1.60 1.45 1.30 1.18"
+		"AbilityCastRange"			"2600"
+		"AbilityCooldown"			"16.0"
+		"AbilityManaCost"			"0"
+		"AbilityValues"
+		{
+			"damage"					"9000 15000 22500 32000 45000"
+			"radius"					"185 200 215 230 245"
+			"spacing"					"205"
+			"nodes"						"10"
+			"lane_offset"				"270"
+			"slow_duration"				"1.8"
+			"cast_point"				"1.75 1.60 1.45 1.30 1.18"
+		}
+	}
+
+	//=================================================================================================================
+	// Spirit Master: Tri-Spirit Cycle
+	//=================================================================================================================
+	"xhs_spirit_master_trinity_cycle"
+	{
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"boss_scripts/phase3_ai/spirit_master_abilities.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityTextureName"		"custom/xhs_spirit_master_trinity_cycle"
+		"MaxLevel"					"5"
+		"AbilityValues"
+		{
+			"sync_window"			"24 22 20 18 16"
+		}
+	}
+
+	"xhs_spirit_master_palm_of_balance"
+	{
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"boss_scripts/phase3_ai/spirit_master_abilities.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE"
+		"AbilityTextureName"		"custom/xhs_spirit_master_palm_of_balance"
+		"MaxLevel"					"5"
+		"AbilityCastPoint"			"1.35 1.25 1.15 1.08 1.00"
+		"AbilityCastRange"			"2200"
+		"AbilityCooldown"			"6.0"
+		"AbilityManaCost"			"0"
+		"AbilityValues"
+		{
+			"damage"				"14000 23000 34000 48000 66000"
+			"radius"				"190 205 220 235 250"
+			"spacing"				"170"
+			"nodes"					"4"
+			"slow_duration"			"1.2"
+			"cast_point"			"1.35 1.25 1.15 1.08 1.00"
+		}
+	}
+
+	"xhs_spirit_master_elemental_mandala"
+	{
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"boss_scripts/phase3_ai/spirit_master_abilities.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE"
+		"AbilityTextureName"		"custom/xhs_spirit_master_elemental_mandala"
+		"MaxLevel"					"5"
+		"AbilityCastPoint"			"1.65 1.50 1.38 1.25 1.12"
+		"AbilityCastRange"			"2500"
+		"AbilityCooldown"			"12.0"
+		"AbilityManaCost"			"0"
+		"AbilityValues"
+		{
+			"damage"				"12000 20000 30000 43000 61000"
+			"ring_radius"			"760 780 800 825 850"
+			"node_radius"			"175 185 195 205 215"
+			"wave_delay"			"1.15 1.08 1.02 0.96 0.90"
+			"cast_point"			"1.65 1.50 1.38 1.25 1.12"
+		}
+	}
+
+	"xhs_spirit_master_spirit_call"
+	{
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"boss_scripts/phase3_ai/spirit_master_abilities.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityTextureName"		"custom/xhs_spirit_master_spirit_call"
+		"MaxLevel"					"5"
+		"AbilityCastPoint"			"1.60 1.45 1.32 1.20 1.10"
+		"AbilityCooldown"			"1.0"
+		"AbilityManaCost"			"0"
+		"AbilityValues"
+		{
+			"radius"				"900"
+			"cast_point"			"1.60 1.45 1.32 1.20 1.10"
+		}
+	}
+
+	"xhs_spirit_master_convergence"
+	{
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"boss_scripts/phase3_ai/spirit_master_abilities.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityTextureName"		"custom/xhs_spirit_master_convergence"
+		"MaxLevel"					"5"
+		"AbilityCastPoint"			"1.10 1.00 0.92 0.85 0.80"
+		"AbilityCooldown"			"1.0"
+		"AbilityManaCost"			"0"
+		"AbilityValues"
+		{
+			"radius"				"700"
+			"cast_point"			"1.10 1.00 0.92 0.85 0.80"
+		}
+	}
+
+	"xhs_spirit_storm_arc_dash"
+	{
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"boss_scripts/phase3_ai/spirit_master_abilities.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE"
+		"AbilityTextureName"		"custom/xhs_spirit_storm_arc_dash"
+		"MaxLevel"					"5"
+		"AbilityCastPoint"			"1.25 1.15 1.06 1.00 0.95"
+		"AbilityCastRange"			"2500"
+		"AbilityCooldown"			"7.0"
+		"AbilityManaCost"			"0"
+		"AbilityValues"
+		{
+			"damage"				"12000 21000 32000 46000 65000"
+			"radius"				"170 180 190 205 220"
+			"spacing"				"185"
+			"nodes"					"5"
+			"dash_distance"			"620"
+			"cast_point"			"1.25 1.15 1.06 1.00 0.95"
+		}
+	}
+
+	"xhs_spirit_storm_static_orbs"
+	{
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"boss_scripts/phase3_ai/spirit_master_abilities.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE"
+		"AbilityTextureName"		"custom/xhs_spirit_storm_static_orbs"
+		"MaxLevel"					"5"
+		"AbilityCastPoint"			"1.35 1.25 1.15 1.08 1.00"
+		"AbilityCastRange"			"2500"
+		"AbilityCooldown"			"9.0"
+		"AbilityManaCost"			"0"
+		"AbilityValues"
+		{
+			"damage"				"11000 19000 29000 42000 59000"
+			"radius"				"180 190 200 215 230"
+			"ring_radius"			"460 500 540 580 620"
+			"orb_count"				"4 5 5 6 6"
+			"cast_point"			"1.35 1.25 1.15 1.08 1.00"
+		}
+	}
+
+	"xhs_spirit_storm_chain_focus"
+	{
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"boss_scripts/phase3_ai/spirit_master_abilities.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE"
+		"AbilityTextureName"		"custom/xhs_spirit_storm_chain_focus"
+		"MaxLevel"					"5"
+		"AbilityCastPoint"			"1.30 1.20 1.10 1.04 1.00"
+		"AbilityCastRange"			"2500"
+		"AbilityCooldown"			"8.0"
+		"AbilityManaCost"			"0"
+		"AbilityValues"
+		{
+			"damage"				"15000 25000 37000 52000 73000"
+			"radius"				"210 220 235 250 265"
+			"slow_duration"			"1.4"
+			"cast_point"			"1.30 1.20 1.10 1.04 1.00"
+		}
+	}
+
+	"xhs_spirit_earth_fault_line"
+	{
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"boss_scripts/phase3_ai/spirit_master_abilities.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE"
+		"AbilityTextureName"		"custom/xhs_spirit_earth_fault_line"
+		"MaxLevel"					"5"
+		"AbilityCastPoint"			"1.45 1.32 1.20 1.10 1.02"
+		"AbilityCastRange"			"2500"
+		"AbilityCooldown"			"8.0"
+		"AbilityManaCost"			"0"
+		"AbilityValues"
+		{
+			"damage"				"14000 23000 35000 50000 70000"
+			"radius"				"185 200 215 230 245"
+			"spacing"				"190"
+			"nodes"					"6"
+			"slow_duration"			"1.6"
+			"cast_point"			"1.45 1.32 1.20 1.10 1.02"
+		}
+	}
+
+	"xhs_spirit_earth_stone_guard"
+	{
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"boss_scripts/phase3_ai/spirit_master_abilities.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE"
+		"AbilityTextureName"		"custom/xhs_spirit_earth_stone_guard"
+		"MaxLevel"					"5"
+		"AbilityCastPoint"			"1.30 1.20 1.10 1.04 1.00"
+		"AbilityCooldown"			"9.0"
+		"AbilityManaCost"			"0"
+		"AbilityValues"
+		{
+			"damage"				"12000 21000 32000 46000 65000"
+			"radius"				"420 450 480 520 560"
+			"slow_duration"			"1.8"
+			"cast_point"			"1.30 1.20 1.10 1.04 1.00"
+		}
+	}
+
+	"xhs_spirit_earth_resonant_pillar"
+	{
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"boss_scripts/phase3_ai/spirit_master_abilities.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE"
+		"AbilityTextureName"		"custom/xhs_spirit_earth_resonant_pillar"
+		"MaxLevel"					"5"
+		"AbilityCastPoint"			"1.40 1.28 1.16 1.08 1.00"
+		"AbilityCastRange"			"2500"
+		"AbilityCooldown"			"10.0"
+		"AbilityManaCost"			"0"
+		"AbilityValues"
+		{
+			"damage"				"13000 22000 34000 49000 68000"
+			"radius"				"210 225 240 255 270"
+			"ring_radius"			"430 470 510 550 590"
+			"cast_point"			"1.40 1.28 1.16 1.08 1.00"
+		}
+	}
+
+	"xhs_spirit_fire_cinder_step"
+	{
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"boss_scripts/phase3_ai/spirit_master_abilities.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE"
+		"AbilityTextureName"		"custom/xhs_spirit_fire_cinder_step"
+		"MaxLevel"					"5"
+		"AbilityCastPoint"			"1.15 1.08 1.02 0.98 0.94"
+		"AbilityCastRange"			"2500"
+		"AbilityCooldown"			"7.0"
+		"AbilityManaCost"			"0"
+		"AbilityValues"
+		{
+			"damage"				"12500 21500 32500 47000 66000"
+			"radius"				"170 180 190 205 220"
+			"spacing"				"175"
+			"nodes"					"5"
+			"dash_distance"			"560"
+			"cast_point"			"1.15 1.08 1.02 0.98 0.94"
+		}
+	}
+
+	"xhs_spirit_fire_solar_flare"
+	{
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"boss_scripts/phase3_ai/spirit_master_abilities.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE"
+		"AbilityTextureName"		"custom/xhs_spirit_fire_solar_flare"
+		"MaxLevel"					"5"
+		"AbilityCastPoint"			"1.25 1.15 1.08 1.02 0.98"
+		"AbilityCastRange"			"2500"
+		"AbilityCooldown"			"8.0"
+		"AbilityManaCost"			"0"
+		"AbilityValues"
+		{
+			"damage"				"15000 25000 38000 54000 76000"
+			"radius"				"230 245 260 280 300"
+			"cast_point"			"1.25 1.15 1.08 1.02 0.98"
+		}
+	}
+
+	"xhs_spirit_fire_wildfire_ring"
+	{
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"boss_scripts/phase3_ai/spirit_master_abilities.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE"
+		"AbilityTextureName"		"custom/xhs_spirit_fire_wildfire_ring"
+		"MaxLevel"					"5"
+		"AbilityCastPoint"			"1.45 1.32 1.20 1.10 1.02"
+		"AbilityCastRange"			"2500"
+		"AbilityCooldown"			"10.0"
+		"AbilityManaCost"			"0"
+		"AbilityValues"
+		{
+			"damage"				"11500 19500 30000 43000 61000"
+			"inner_radius"			"360 380 400 420 440"
+			"outer_radius"			"710 730 750 775 800"
+			"node_radius"			"175 185 195 205 215"
+			"cast_point"			"1.45 1.32 1.20 1.10 1.02"
+		}
+	}
+
 	//=================================================================================================================
 	// Snapfire: Snappy Aura
 	//=================================================================================================================
@@ -24386,7 +25319,6 @@
 		"MaxLevel"					"1"
 		"AbilityCastRange"			"900"
 		"AbilityUnitTargetFlags"	"DOTA_UNIT_TARGET_FLAG_NOT_ANCIENTS"
-		
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityValues"
@@ -24424,6 +25356,85 @@
 					"MODIFIER_PROPERTY_BASEDAMAGEOUTGOING_PERCENTAGE"	"%bonus_damage_percent"
 				}
 			}
+		}
+	}
+	//=================================================================================================================
+	// Phase 3 Arthas
+	//=================================================================================================================
+	"xhs_arthas_frostmourne_mark"
+	{
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"boss_scripts/phase3_ai/arthas_abilities.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityTextureName"		"custom/arthas_frostmourne"
+		"MaxLevel"					"5"
+		"AbilityCastPoint"			"0.95 0.9 0.85 0.8 0.75"
+		"AbilityCooldown"			"7.5"
+		"AbilityManaCost"			"0"
+		"AbilityValues"
+		{
+			"radius"				"180"
+			"duration"				"7.0"
+			"cast_point"			"0.95 0.9 0.85 0.8 0.75"
+		}
+	}
+
+	"xhs_arthas_frozen_chains"
+	{
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"boss_scripts/phase3_ai/arthas_abilities.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityTextureName"		"lich_frost_nova"
+		"MaxLevel"					"5"
+		"AbilityCastPoint"			"1.25 1.18 1.1 1.02 0.95"
+		"AbilityCooldown"			"8.5"
+		"AbilityManaCost"			"0"
+		"AbilityValues"
+		{
+			"radius"				"230 245 260 280 305"
+			"damage"				"12000 19000 29000 41000 58000"
+			"root_duration"			"2.2"
+			"marked_bonus_pct"		"40"
+			"cast_point"			"1.25 1.18 1.1 1.02 0.95"
+		}
+	}
+
+	"xhs_arthas_death_advance"
+	{
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"boss_scripts/phase3_ai/arthas_abilities.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityTextureName"		"custom/arthas_light_roar"
+		"MaxLevel"					"5"
+		"AbilityCastPoint"			"1.05 1.0 0.95 0.9 0.85"
+		"AbilityCooldown"			"7.0"
+		"AbilityManaCost"			"0"
+		"AbilityValues"
+		{
+			"range"					"900 980 1060 1140 1240"
+			"width"					"150 165 180 195 215"
+			"damage"				"14000 23000 35000 50000 70000"
+			"marked_bonus_pct"		"35"
+			"cast_point"			"1.05 1.0 0.95 0.9 0.85"
+		}
+	}
+
+	"xhs_arthas_frostmourne_execute"
+	{
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"boss_scripts/phase3_ai/arthas_abilities.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityTextureName"		"custom/arthas_frostmourne"
+		"MaxLevel"					"5"
+		"AbilityCastPoint"			"1.65 1.5 1.38 1.25 1.12"
+		"AbilityCooldown"			"12.0"
+		"AbilityManaCost"			"0"
+		"AbilityValues"
+		{
+			"radius"				"260 280 305 330 360"
+			"damage"				"26000 42000 64000 91000 128000"
+			"marked_bonus_pct"		"55"
+			"cast_point"			"1.65 1.5 1.38 1.25 1.12"
 		}
 	}
 } // End

@@ -12,6 +12,10 @@ local function ConfigureSpiritBossBar(boss, bossCount, bossBarId, bossName, boss
 		light_color = lightColor,
 	}
 
+	if XHSPhase3BossAI ~= nil and XHSPhase3BossAI.HideVanillaHealthBar ~= nil then
+		XHSPhase3BossAI:HideVanillaHealthBar(boss)
+	end
+
 	ShowBossBar(boss)
 end
 

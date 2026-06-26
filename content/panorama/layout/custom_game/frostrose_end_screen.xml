@@ -160,7 +160,7 @@
 			</Panel>
 
 			<Panel id="es-buttons">
-				<!-- <Button id="es-buttons-survey" onactivate="ExternalBrowserGoToURL('https://www.patreon.com/earthsalamander42');">
+				<!-- <Button id="es-buttons-survey" onactivate="ExternalBrowserGoToURL('https://www.patreon.com/bePatron?u=2533325');">
 					<Label text="Support us on Patreon!" />
 				</Button> -->
 				<Button id="es-buttons-website" onactivate="ExternalBrowserGoToURL('https://mods.frostrose-studio.com');">

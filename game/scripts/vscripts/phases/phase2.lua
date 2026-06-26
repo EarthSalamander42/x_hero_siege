@@ -50,6 +50,8 @@ function Phase2CreepsLeft()
 	Timers:CreateTimer(function()
 		if EntIceTower == nil or EntIceTower:IsNull() or not EntIceTower:IsAlive() or CustomTimers.proc_final_wave == true or CustomTimers.game_phase >= 3 then
 			return nil
+		elseif XHSDevTools ~= nil and XHSDevTools:IsSandboxActive() then
+			return XHS_CREEPS_INTERVAL
 		elseif CustomTimers.timers_paused == 0 then
 			wave_count = wave_count + 1
 
@@ -80,7 +82,9 @@ function Phase2CreepsRight()
 	Timers:CreateTimer(0, function()
 		if EntIceTower == nil or EntIceTower:IsNull() or not EntIceTower:IsAlive() or CustomTimers.proc_final_wave == true or CustomTimers.game_phase >= 3 then
 			return nil
-		elseif CustomTimers.timers_paused ~= 1 then
+		elseif XHSDevTools ~= nil and XHSDevTools:IsSandboxActive() then
+			return 30
+		elseif CustomTimers.timers_paused == 0 then
 			wave_count = wave_count + 1
 			for j = 1, 8 do
 				local unit = CreateUnitByName("npc_orc_II", point + RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_CUSTOM_1)
@@ -93,7 +97,7 @@ function Phase2CreepsRight()
 				ApplyGrowthOverheadMarker(unit, wave_count)
 			end
 			return 30
-		elseif CustomTimers.timers_paused == 1 then
+		elseif CustomTimers.timers_paused ~= 0 then
 			return 30
 		end
 	end)
@@ -179,7 +183,9 @@ local function RegisterFinalWaveUnit(unit)
 	CustomTimers.final_wave_spawned_kill_limit = (CustomTimers.final_wave_spawned_kill_limit or 0) + 1
 end
 
-function FinalWave()
+function FinalWave(force)
+	if force ~= true and XHSDevTools ~= nil and XHSDevTools:IsSandboxActive() then return end
+
 	CustomTimers.proc_final_wave = true
 	CustomTimers.final_wave_kill_counting = false
 	CustomTimers.final_wave_spawned_kill_limit = 0

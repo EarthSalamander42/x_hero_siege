@@ -163,8 +163,9 @@ ListenToGameEvent('entity_killed', function(keys)
 	--	if keys.entindex_attacker then killer = EntIndexToHScript(keys.entindex_attacker) end
 end, nil)
 
-function CustomTimers:PrepareFinalWaveCountdown()
+function CustomTimers:PrepareFinalWaveCountdown(force)
 	if CustomTimers.proc_final_wave == true then return end
+	if force ~= true and XHSDevTools ~= nil and XHSDevTools:IsSandboxActive() then return end
 
 	CustomTimers.proc_final_wave = true
 	CustomTimers.final_wave_kill_counting = false
@@ -190,6 +191,10 @@ function CustomTimers:PrepareFinalWaveCountdown()
 end
 
 function CustomTimers:Think()
+	if XHSDevTools ~= nil and XHSDevTools:IsSandboxActive() then
+		return
+	end
+
 	-- If no events is happening, keep running
 	if CustomTimers.timers_paused == 0 and GameMode.SpecialArena_occuring ~= true then
 		CustomTimers:Countdown("game_time")
@@ -524,6 +529,7 @@ end
 function SpecialWave(iCardinalPoint, force)
 	if CustomTimers.game_phase > 2 then return end
 	if CustomTimers.proc_final_wave == true then return end
+	if force ~= true and XHSDevTools ~= nil and XHSDevTools:IsSandboxActive() then return end
 	if CustomTimers.special_waves_disabled == true and force ~= true then return end
 
 	CustomTimers.enable_special_wave = false

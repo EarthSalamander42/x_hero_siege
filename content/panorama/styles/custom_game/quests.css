@@ -262,7 +262,49 @@
 	transition-duration: .18s;
 }
 
+.Quest.CollapsibleMainQuest
+{
+	transition-property: opacity, brightness, background-color, border, wash-color;
+}
+
+.Quest.CollapsibleMainQuest:hover
+{
+	brightness: 1.14;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #0d2b426e ), to( #06142328 ) );
+}
+
+.QuestCollapseChevron
+{
+	width: 8px;
+	height: 8px;
+	margin-left: 7px;
+	margin-right: 2px;
+	margin-top: 8px;
+	border-top: 2px solid #9be6ffbb;
+	border-right: 2px solid #9be6ffbb;
+	transform: rotateZ( 135deg );
+	visibility: collapse;
+	transition-property: transform, brightness;
+	transition-duration: .14s;
+}
+
+.Quest.CollapsibleMainQuest .QuestCollapseChevron
+{
+	visibility: visible;
+}
+
+.Quest.CollapsibleMainQuest.XHSMainQuestCollapsed .QuestCollapseChevron
+{
+	transform: rotateZ( 45deg );
+	brightness: .85;
+}
+
 .Quest.XHSHiddenQuest
+{
+	visibility: collapse;
+}
+
+.Quest.XHSCollapsedByMainQuest
 {
 	visibility: collapse;
 }

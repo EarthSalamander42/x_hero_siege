@@ -9,6 +9,7 @@ var XHSSupporterPass = (function () {
 	var settingsOriginal = {};
 	var settingsDraft = {};
 	var settingsInitialized = false;
+	var settingsSaving = false;
 	var backToTopPollScheduled = false;
 
 	var PAGE_IDS = {
@@ -30,53 +31,130 @@ var XHSSupporterPass = (function () {
 	};
 
 	var DEFAULT_TIERS = [
-		{ id: 1, name: "Donator", price: "$2", color: "#45C46B", fragments: 150, xp_boost: 10 },
-		{ id: 2, name: "Golden Donator", price: "$5", color: "#F2C94C", fragments: 400, xp_boost: 20 },
-		{ id: 3, name: "Ember Donator", price: "$10", color: "#E4572E", fragments: 900, xp_boost: 30 },
-		{ id: 4, name: "Stoneguard Donator", price: "$20", color: "#7B8794", fragments: 1800, xp_boost: 40 },
-		{ id: 5, name: "Earthwarden Donator", price: "$50", color: "#2EC4B6", fragments: 1800, xp_boost: 40, prestige: true },
+		{ id: 1, name: "Donator", price: "2\u20ac/month", color: "#70e39a", fragments: 150, xp_boost: 10 },
+		{ id: 2, name: "Golden Donator", price: "4.50\u20ac/month", color: "#ffcf66", fragments: 400, xp_boost: 20 },
+		{ id: 3, name: "Ember Donator", price: "9\u20ac/month", color: "#ff5a43", fragments: 900, xp_boost: 30 },
+		{ id: 4, name: "Stoneguard Donator", price: "18\u20ac/month", color: "#5ad0ff", fragments: 1800, xp_boost: 40 },
+		{ id: 5, name: "Earthwarden Donator", price: "27\u20ac/month", color: "#c99cff", fragments: 1800, xp_boost: 40, prestige: true },
 	];
 
+	var SITE_TIER_META = {
+		1: {
+			label: "Tier 1",
+			price: "2\u20ac/month",
+			image: "patreon/donator_01_emerald.png",
+			text: "Start supporting XHS with monthly fragments, Emerald identity, a Discord role, and visible profile prestige.",
+			perks: ["150 fragments", "+10% XP", "Emerald Green", "Discord role"],
+		},
+		2: {
+			label: "Tier 2",
+			price: "4.50\u20ac/month",
+			image: "patreon/donator_02_solar_gold.png",
+			text: "Upgrade to Solar Gold for a stronger monthly fragment pack, faster progression, and all Tier 1 benefits.",
+			perks: ["400 fragments", "+20% XP", "Solar Gold"],
+			featured: true,
+		},
+		3: {
+			label: "Tier 3",
+			price: "9\u20ac/month",
+			image: "patreon/donator_03_ember_red.png",
+			text: "Stand out with Ember Red styling, 900 monthly fragments, and a sharper supporter presence in every XHS space.",
+			perks: ["900 fragments", "+30% XP", "Ember Red"],
+		},
+		4: {
+			label: "Tier 4",
+			price: "18\u20ac/month",
+			image: "patreon/donator_04_storm_blue.png",
+			text: "Lock in Storm Blue status with the top XP boost, 1800 monthly fragments, and a premium supporter look.",
+			perks: ["1800 fragments", "+40% XP", "Storm Blue"],
+		},
+		5: {
+			label: "Tier 5",
+			price: "27\u20ac/month",
+			image: "patreon/donator_05_amethyst_violet.png",
+			text: "The prestige tier for core supporters: Amethyst identity, top XP boost, and the full supporter stack.",
+			perks: ["1800 fragments", "+40% XP", "Amethyst Violet"],
+		},
+	};
+
 	var DEFAULT_SHOP_ITEMS = [
-		{ id: "companion_azure_wisp", name: "Azure Wisp Companion", type: "Companion", rarity: "Rare", price: 650, image: "battlepass/assets/btn_donator.png" },
-		{ id: "companion_frostling", name: "Frostling Companion", type: "Companion", rarity: "Epic", price: 950, image: "battlepass/assets/btn_donator_icon.png" },
-		{ id: "emblem_siege_blue", name: "Azure Siege Emblem", type: "Emblem", rarity: "Rare", price: 500, image: "battlepass/assets/btn_battlepass.png" },
-		{ id: "emblem_warden", name: "Stoneguard Emblem", type: "Emblem", rarity: "Epic", price: 850, image: "battlepass/assets/btn_leaderboard_icon.png" },
-		{ id: "effigy_castle_guard", name: "Castle Guard Effigy", type: "Effigy", rarity: "Epic", price: 900, image: "battlepass/assets/btn_leaderboard.png" },
-		{ id: "effigy_muradin", name: "Muradin Event Effigy", type: "Effigy", rarity: "Mythical", price: 1400, image: "battlepass/levelup.png" },
-		{ id: "bundle_blue_siege", name: "Blue Siege Bundle", type: "Bundle", rarity: "Mythical", price: 1600, image: "battlepass/battlepass_new.png" },
-		{ id: "bundle_founder_cache", name: "Founder Cache", type: "Bundle", rarity: "Legendary", price: 2400, image: "battlepass/levelup2.png" },
+		{ id: "legacy_bp_emblem_sunken", item_id: "21", name: "battlepass_emblem_sunken", type: "Emblem", rarity: "immortal", price: 500, image: "battlepass/emblem_sunken" },
+		{ id: "legacy_bp_emblem_aghanim", item_id: "24", name: "battlepass_emblem_aghanim", type: "Emblem", rarity: "immortal", price: 900, image: "battlepass/emblem_aghanim" },
+		{ id: "legacy_bp_teleport_ti2018", item_id: "15", name: "battlepass_teleport22", type: "Teleport FX", rarity: "uncommon", price: 450, image: "battlepass/teleport22" },
+		{ id: "legacy_bp_teleport_ti2018_premium", item_id: "16", name: "battlepass_teleport24", type: "Teleport FX", rarity: "uncommon", price: 650, image: "battlepass/teleport24" },
+		{ id: "legacy_bp_kill_rubick", item_id: "36", name: "battlepass_kill_effect_rubick", type: "Kill FX", rarity: "uncommon", price: 750, image: "battlepass/kill_effect_rubick" },
+		{ id: "legacy_bp_kill_spectre", item_id: "32", name: "battlepass_kill_effect_spectre", type: "Kill FX", rarity: "uncommon", price: 750, image: "battlepass/kill_effect_spectre" },
+		{ id: "legacy_bp_tome_fall2022", item_id: "40", name: "battlepass_levelup8", type: "Tome FX", rarity: "legendary", price: 1200, image: "battlepass/levelup8" },
+		{ id: "legacy_bp_emblem_diretide", item_id: "26", name: "battlepass_emblem_diretide_red", type: "Emblem", rarity: "immortal", price: 1600, image: "battlepass/emblem_diretide_red" },
 	];
 
 	var DEFAULT_REWARDS_FREE = [
-		{ level: 1, name: "100 Fragments", type: "Fragments", rarity: "Common", image: "battlepass/levelup.png" },
-		{ level: 3, name: "Azure Spray", type: "Emblem", rarity: "Common", image: "battlepass/assets/btn_battlepass_icon.png" },
-		{ level: 5, name: "50 Fragments", type: "Fragments", rarity: "Common", image: "battlepass/levelup2.png" },
-		{ level: 8, name: "Siege Banner", type: "Emblem", rarity: "Rare", image: "battlepass/assets/btn_battlepass.png" },
-		{ level: 12, name: "Frost Trail", type: "Effect", rarity: "Rare", image: "battlepass/levelup3.png" },
-		{ level: 16, name: "100 Fragments", type: "Fragments", rarity: "Common", image: "battlepass/levelup4.png" },
-		{ level: 20, name: "Castle Guard Effigy", type: "Effigy", rarity: "Epic", image: "battlepass/assets/btn_leaderboard.png" },
+		{ level: 1, name: "battlepass_teleport2", type: "teleport", rarity: "uncommon", image: "battlepass/teleport2", item_id: "1", slot_id: "teleport", hero: "teleport" },
+		{ level: 2, name: "battlepass_teleport6", type: "teleport", rarity: "uncommon", image: "battlepass/teleport6", item_id: "3", slot_id: "teleport", hero: "teleport" },
+		{ level: 3, name: "battlepass_teleport8", type: "teleport", rarity: "uncommon", image: "battlepass/teleport8", item_id: "5", slot_id: "teleport", hero: "teleport" },
+		{ level: 4, name: "battlepass_teleport10", type: "teleport", rarity: "uncommon", image: "battlepass/teleport10", item_id: "7", slot_id: "teleport", hero: "teleport" },
+		{ level: 5, name: "battlepass_emblem_sunken", type: "emblem", rarity: "immortal", image: "battlepass/emblem_sunken", item_id: "21", slot_id: "emblem", hero: "emblem" },
+		{ level: 6, name: "battlepass_teleport13", type: "teleport", rarity: "uncommon", image: "battlepass/teleport13", item_id: "9", slot_id: "teleport", hero: "teleport" },
+		{ level: 7, name: "battlepass_teleport16", type: "teleport", rarity: "uncommon", image: "battlepass/teleport16", item_id: "11", slot_id: "teleport", hero: "teleport" },
+		{ level: 8, name: "battlepass_teleport19", type: "teleport", rarity: "uncommon", image: "battlepass/teleport19", item_id: "13", slot_id: "teleport", hero: "teleport" },
+		{ level: 9, name: "battlepass_teleport22", type: "teleport", rarity: "uncommon", image: "battlepass/teleport22", item_id: "15", slot_id: "teleport", hero: "teleport" },
+		{ level: 10, name: "battlepass_emblem_overgrown", type: "emblem", rarity: "immortal", image: "battlepass/emblem_overgrown", item_id: "22", slot_id: "emblem", hero: "emblem" },
+		{ level: 11, name: "battlepass_kill_effect_culling_blade", type: "kill_effect", rarity: "uncommon", image: "battlepass/kill_effect_culling_blade", item_id: "27", slot_id: "kill_effect", hero: "kill_effect" },
+		{ level: 12, name: "battlepass_levelup1", type: "levelup", rarity: "legendary", image: "battlepass/levelup", item_id: "17", slot_id: "levelup", hero: "levelup" },
+		{ level: 13, name: "battlepass_kill_effect_radiant_tower", type: "kill_effect", rarity: "uncommon", image: "battlepass/kill_effect_radiant_tower", item_id: "29", slot_id: "kill_effect", hero: "kill_effect" },
+		{ level: 14, name: "battlepass_levelup3", type: "levelup", rarity: "legendary", image: "battlepass/levelup3", item_id: "19", slot_id: "levelup", hero: "levelup" },
+		{ level: 15, name: "battlepass_kill_effect_spectre_free", type: "kill_effect", rarity: "uncommon", image: "battlepass/kill_effect_spectre_free", item_id: "31", slot_id: "kill_effect", hero: "kill_effect" },
+		{ level: 16, name: "battlepass_levelup5", type: "levelup", rarity: "legendary", image: "battlepass/levelup5", item_id: "37", slot_id: "levelup", hero: "levelup" },
+		{ level: 17, name: "battlepass_kill_effect_gyro_free", type: "kill_effect", rarity: "uncommon", image: "battlepass/kill_effect_purple_smoke_free", item_id: "33", slot_id: "kill_effect", hero: "kill_effect" },
+		{ level: 18, name: "battlepass_levelup7", type: "levelup", rarity: "legendary", image: "battlepass/levelup7", item_id: "39", slot_id: "levelup", hero: "levelup" },
+		{ level: 19, name: "battlepass_kill_effect_rubick_free", type: "kill_effect", rarity: "uncommon", image: "battlepass/kill_effect_rubick_free", item_id: "35", slot_id: "kill_effect", hero: "kill_effect" },
+		{ level: 20, name: "battlepass_emblem_divinity", type: "emblem", rarity: "immortal", image: "battlepass/emblem_divinity", item_id: "23", slot_id: "emblem", hero: "emblem" },
 	];
 
 	var DEFAULT_REWARDS_PREMIUM = [
-		{ level: 1, name: "Supporter Cache", type: "Bundle", rarity: "Rare", image: "battlepass/battlepass_new.png" },
-		{ level: 2, name: "Azure Wisp", type: "Companion", rarity: "Rare", image: "battlepass/assets/btn_donator.png" },
-		{ level: 4, name: "Hero Glow Blue", type: "Effect", rarity: "Epic", image: "battlepass/levelup5.png" },
-		{ level: 7, name: "Stoneguard Emblem", type: "Emblem", rarity: "Epic", image: "battlepass/assets/btn_leaderboard_icon.png" },
-		{ level: 10, name: "500 Fragments", type: "Fragments", rarity: "Rare", image: "battlepass/levelup6.png" },
-		{ level: 14, name: "Frostling", type: "Companion", rarity: "Epic", image: "battlepass/assets/btn_donator_icon.png" },
-		{ level: 18, name: "Muradin Event Effigy", type: "Effigy", rarity: "Mythical", image: "battlepass/levelup7.png" },
-		{ level: 25, name: "Earthwarden Prestige", type: "Bundle", rarity: "Legendary", image: "battlepass/levelup8.png" },
+		{ level: 1, name: "battlepass_teleport5", type: "teleport", rarity: "uncommon", image: "battlepass/teleport5", item_id: "2", slot_id: "teleport", hero: "teleport", track: "premium" },
+		{ level: 2, name: "battlepass_teleport7", type: "teleport", rarity: "uncommon", image: "battlepass/teleport7", item_id: "4", slot_id: "teleport", hero: "teleport", track: "premium" },
+		{ level: 3, name: "battlepass_teleport9", type: "teleport", rarity: "uncommon", image: "battlepass/teleport9", item_id: "6", slot_id: "teleport", hero: "teleport", track: "premium" },
+		{ level: 4, name: "battlepass_teleport12", type: "teleport", rarity: "uncommon", image: "battlepass/teleport12", item_id: "8", slot_id: "teleport", hero: "teleport", track: "premium" },
+		{ level: 5, name: "battlepass_emblem_aghanim", type: "emblem", rarity: "immortal", image: "battlepass/emblem_aghanim", item_id: "24", slot_id: "emblem", hero: "emblem", track: "premium" },
+		{ level: 6, name: "battlepass_teleport15", type: "teleport", rarity: "uncommon", image: "battlepass/teleport15", item_id: "10", slot_id: "teleport", hero: "teleport", track: "premium" },
+		{ level: 7, name: "battlepass_teleport18", type: "teleport", rarity: "uncommon", image: "battlepass/teleport18", item_id: "12", slot_id: "teleport", hero: "teleport", track: "premium" },
+		{ level: 8, name: "battlepass_teleport21", type: "teleport", rarity: "uncommon", image: "battlepass/teleport21", item_id: "14", slot_id: "teleport", hero: "teleport", track: "premium" },
+		{ level: 9, name: "battlepass_teleport24", type: "teleport", rarity: "uncommon", image: "battlepass/teleport24", item_id: "16", slot_id: "teleport", hero: "teleport", track: "premium" },
+		{ level: 10, name: "battlepass_emblem_nemestice", type: "emblem", rarity: "immortal", image: "battlepass/emblem_nemestice", item_id: "25", slot_id: "emblem", hero: "emblem", track: "premium" },
+		{ level: 11, name: "battlepass_kill_effect_faceless_void", type: "kill_effect", rarity: "uncommon", image: "battlepass/kill_effect_faceless_void", item_id: "28", slot_id: "kill_effect", hero: "kill_effect", track: "premium" },
+		{ level: 12, name: "battlepass_levelup2", type: "levelup", rarity: "legendary", image: "battlepass/levelup2", item_id: "18", slot_id: "levelup", hero: "levelup", track: "premium" },
+		{ level: 13, name: "battlepass_kill_effect_razor", type: "kill_effect", rarity: "uncommon", image: "battlepass/kill_effect_razor", item_id: "30", slot_id: "kill_effect", hero: "kill_effect", track: "premium" },
+		{ level: 14, name: "battlepass_levelup4", type: "levelup", rarity: "legendary", image: "battlepass/levelup4", item_id: "20", slot_id: "levelup", hero: "levelup", track: "premium" },
+		{ level: 15, name: "battlepass_kill_effect_spectre", type: "kill_effect", rarity: "uncommon", image: "battlepass/kill_effect_spectre", item_id: "32", slot_id: "kill_effect", hero: "kill_effect", track: "premium" },
+		{ level: 16, name: "battlepass_levelup6", type: "levelup", rarity: "legendary", image: "battlepass/levelup6", item_id: "38", slot_id: "levelup", hero: "levelup", track: "premium" },
+		{ level: 17, name: "battlepass_kill_effect_gyro", type: "kill_effect", rarity: "uncommon", image: "battlepass/kill_effect_purple_smoke", item_id: "34", slot_id: "kill_effect", hero: "kill_effect", track: "premium" },
+		{ level: 18, name: "battlepass_levelup8", type: "levelup", rarity: "legendary", image: "battlepass/levelup8", item_id: "40", slot_id: "levelup", hero: "levelup", track: "premium" },
+		{ level: 19, name: "battlepass_kill_effect_rubick", type: "kill_effect", rarity: "uncommon", image: "battlepass/kill_effect_rubick", item_id: "36", slot_id: "kill_effect", hero: "kill_effect", track: "premium" },
+		{ level: 20, name: "battlepass_emblem_diretide_red", type: "emblem", rarity: "immortal", image: "battlepass/emblem_diretide_red", item_id: "26", slot_id: "emblem", hero: "emblem", track: "premium" },
 	];
 
-	var DEFAULT_ARMORY_ITEMS = [
-		{ id: "armory_companion_azure_wisp", name: "Azure Wisp", type: "Companion", rarity: "Rare", price: 0, image: "battlepass/assets/btn_donator.png", equipped: true },
-		{ id: "armory_companion_frostling", name: "Frostling", type: "Companion", rarity: "Epic", price: 0, image: "battlepass/assets/btn_donator_icon.png", equipped: false },
-		{ id: "armory_emblem_siege", name: "Azure Siege", type: "Emblem", rarity: "Rare", price: 0, image: "battlepass/assets/btn_battlepass.png", equipped: true },
-		{ id: "armory_emblem_stoneguard", name: "Stoneguard", type: "Emblem", rarity: "Epic", price: 0, image: "battlepass/assets/btn_leaderboard_icon.png", equipped: false },
-		{ id: "armory_effigy_castle_guard", name: "Castle Guard", type: "Effigy", rarity: "Epic", price: 0, image: "battlepass/assets/btn_leaderboard.png", equipped: true },
-		{ id: "armory_effect_frost_trail", name: "Frost Trail", type: "Effect", rarity: "Rare", price: 0, image: "battlepass/levelup3.png", equipped: false },
-		{ id: "armory_bundle_founder", name: "Founder Cache", type: "Bundle", rarity: "Legendary", price: 0, image: "battlepass/battlepass_new.png", equipped: false },
+	var DEFAULT_COMPANION_ITEMS = [
+		"npc_donator_companion_cookies",
+		"npc_donator_companion_admiral_bulldog",
+		"npc_donator_companion_baumi",
+		"npc_donator_companion_icefrog",
+		"npc_donator_companion_amaterasu",
+		"npc_donator_companion_demi_doom",
+		"npc_donator_companion_carty",
+		"npc_donator_companion_llama",
+		"npc_donator_companion_jumo",
+		"npc_donator_companion_baekho",
+		"npc_donator_companion_devourling",
+		"npc_donator_companion_sappling",
+		"npc_donator_companion_golem",
+		"npc_donator_companion_duskie",
+		"npc_donator_companion_rubick_arcana",
+		"npc_donator_companion_juggernaut_arcana",
+		"npc_donator_companion_terrorblade_arcana",
+		"npc_donator_companion_tinkbot",
+		"npc_donator_companion_hollow_jack",
+		"npc_donator_companion_chocobo",
 	];
 
 	var DEFAULT_LEADERBOARD_ENTRIES = [
@@ -121,6 +199,36 @@ var XHSSupporterPass = (function () {
 
 		var localized = $.Localize(value);
 		return localized === value ? value.replace("#", "") : localized;
+	}
+
+	function LocalizeMaybeKey(value) {
+		if (!value) {
+			return "";
+		}
+
+		if (typeof value === "string" && value.charAt(0) === "#") {
+			return Localize(value);
+		}
+
+		return Localize("#" + value);
+	}
+
+	function NormalizeImagePath(imagePath) {
+		if (!imagePath) {
+			return "";
+		}
+
+		var path = imagePath.toString();
+		path = path.replace(/^custom_game\//, "");
+		path = path.replace(/\.png$/, "");
+		return path + ".png";
+	}
+
+	function SetCustomGameImage(panel, imagePath) {
+		var normalized = NormalizeImagePath(imagePath);
+		if (panel && normalized) {
+			panel.style.backgroundImage = 'url("file://{images}/custom_game/' + normalized + '")';
+		}
 	}
 
 	function FormatNumber(value) {
@@ -205,6 +313,25 @@ var XHSSupporterPass = (function () {
 		return AsArray(GetTable("supporter_pass_meta", "tiers", DEFAULT_TIERS));
 	}
 
+	function GetTierMeta(tier) {
+		var tierID = ToNumber(tier.id || tier.tier_id, 0);
+		var meta = SITE_TIER_META[tierID] || {};
+		return {
+			id: tierID,
+			label: meta.label || ("Tier " + tierID),
+			name: tier.name || meta.name || "Supporter",
+			price: meta.price || tier.price || "",
+			text: meta.text || "",
+			perks: meta.perks || [
+				FormatNumber(tier.fragments || 0) + " fragments",
+				"+" + FormatNumber(tier.xp_boost || 0) + "% XP",
+			],
+			image: meta.image || tier.image || "",
+			color: tier.color || meta.color || "#5ad0ff",
+			featured: meta.featured === true,
+		};
+	}
+
 	function GetRewards(track) {
 		var tableName = track === "premium" ? "supporter_pass_rewards_premium" : "supporter_pass_rewards_free";
 		var rewards = AsArray(GetTable(tableName, "rewards", []));
@@ -215,16 +342,184 @@ var XHSSupporterPass = (function () {
 		return track === "premium" ? DEFAULT_REWARDS_PREMIUM : DEFAULT_REWARDS_FREE;
 	}
 
+	function NormalizeRewardType(type) {
+		var normalized = (type || "cosmetic").toString().toLowerCase();
+		if (normalized === "teleport") {
+			return "Teleport FX";
+		}
+		if (normalized === "levelup") {
+			return "Tome FX";
+		}
+		if (normalized === "kill_effect") {
+			return "Kill FX";
+		}
+		if (normalized === "emblem") {
+			return "Emblem";
+		}
+		if (normalized === "courier" || normalized === "companion") {
+			return "Companion";
+		}
+		if (normalized === "effigy" || normalized === "statue") {
+			return "Effigy";
+		}
+		if (normalized === "bundle") {
+			return "Bundle";
+		}
+		return normalized.charAt(0).toUpperCase() + normalized.slice(1);
+	}
+
+	function ReadLoadoutValue(loadout, slotNames) {
+		if (!loadout) {
+			return "";
+		}
+
+		for (var i = 0; i < slotNames.length; i++) {
+			var value = loadout[slotNames[i]];
+			if (value && typeof value === "object") {
+				return value.item_id || value.id || value.entitlement_id || value.unit || "";
+			}
+			if (value) {
+				return value;
+			}
+		}
+
+		return "";
+	}
+
+	function IsArmoryItemEquipped(player, item) {
+		var raw = player.raw || {};
+		var loadout = raw.loadout || {};
+		var itemID = item.item_id || item.id || item.entitlement_id || "";
+		var unit = item.unit || "";
+		var type = NormalizeRewardType(item.type || item.item_type);
+		var equippedValue = "";
+
+		if (type === "Companion") {
+			equippedValue = ReadLoadoutValue(loadout, ["companion", "companions"]) || raw.companion || raw.companion_id;
+			return equippedValue && (equippedValue === itemID || equippedValue === unit);
+		}
+		if (type === "Emblem") {
+			equippedValue = ReadLoadoutValue(loadout, ["emblem", "emblems"]) || raw.emblem || raw.emblem_id;
+			return equippedValue && equippedValue === itemID;
+		}
+		if (type === "Teleport FX") {
+			equippedValue = ReadLoadoutValue(loadout, ["teleport", "teleport_fx"]);
+			return equippedValue && equippedValue === itemID;
+		}
+		if (type === "Tome FX") {
+			equippedValue = ReadLoadoutValue(loadout, ["levelup", "tome", "tome_fx"]);
+			return equippedValue && equippedValue === itemID;
+		}
+		if (type === "Kill FX") {
+			equippedValue = ReadLoadoutValue(loadout, ["kill_effect", "kill_fx"]);
+			return equippedValue && equippedValue === itemID;
+		}
+
+		return item.equipped === true;
+	}
+
+	function BuildArmoryItemFromReward(reward, player, track) {
+		var requiredLevel = ToNumber(reward.level_required || reward.level, 1);
+		var isPremium = track === "premium" || reward.track === "premium" || reward.premium === 1 || reward.premium === "1";
+		var premiumLocked = isPremium && player.tier_id < 1;
+		var levelLocked = player.season_level < requiredLevel;
+		var item = {
+			id: "battlepass_" + (reward.item_id || reward.id || reward.name),
+			item_id: reward.item_id || reward.id || reward.reward_id,
+			name: reward.name || reward.item_name || reward.id,
+			type: NormalizeRewardType(reward.type || reward.item_type),
+			rarity: reward.rarity || reward.item_rarity || (isPremium ? "premium" : "season"),
+			image: reward.image,
+			hero: reward.hero || reward.used_by_heroes || reward.type || reward.item_type || "global",
+			slot_id: reward.slot_id || reward.type || reward.item_type || "default",
+			level: requiredLevel,
+			track: isPremium ? "Supporter Track" : "Free Track",
+		};
+
+		item.locked = premiumLocked || levelLocked;
+		item.lock_reason = premiumLocked ? "Supporter Track" : ("Level " + requiredLevel);
+		item.equipped = !item.locked && IsArmoryItemEquipped(player, item);
+		return item;
+	}
+
+	function BuildCompanionArmoryItems(player) {
+		var companions = AsArray(GetTable("supporter_pass_player", "companions", []));
+		var items = [];
+
+		if (companions.length === 0) {
+			for (var i = 0; i < DEFAULT_COMPANION_ITEMS.length; i++) {
+				companions.push({ unit: DEFAULT_COMPANION_ITEMS[i], item_name: DEFAULT_COMPANION_ITEMS[i] });
+			}
+		}
+
+		for (var j = 0; j < companions.length; j++) {
+			var companion = companions[j];
+			var unit = companion.unit || companion.unit_name || companion.item_name || companion.name || DEFAULT_COMPANION_ITEMS[j];
+			if (!unit) {
+				continue;
+			}
+
+			var item = {
+				id: "companion_" + unit,
+				item_id: companion.item_id || unit,
+				unit: unit,
+				name: companion.name || companion.item_name || unit,
+				type: "Companion",
+				rarity: companion.rarity || companion.item_rarity || "supporter",
+				image: companion.image || companion.image_inventory || "battlepass/assets/btn_donator_icon",
+				hero: "global",
+				slot_id: "companion",
+				locked: player.tier_id < 1,
+				lock_reason: "Supporter Tier",
+			};
+			item.equipped = !item.locked && IsArmoryItemEquipped(player, item);
+			items.push(item);
+		}
+
+		return items;
+	}
+
+	function BuildLegacyBattlepassArmory(player) {
+		var items = [];
+		var freeRewards = GetRewards("free");
+		var premiumRewards = GetRewards("premium");
+
+		for (var i = 0; i < freeRewards.length; i++) {
+			items.push(BuildArmoryItemFromReward(freeRewards[i], player, "free"));
+		}
+		for (var j = 0; j < premiumRewards.length; j++) {
+			items.push(BuildArmoryItemFromReward(premiumRewards[j], player, "premium"));
+		}
+
+		var companions = BuildCompanionArmoryItems(player);
+		for (var c = 0; c < companions.length; c++) {
+			items.push(companions[c]);
+		}
+
+		return items;
+	}
+
+	function NormalizeBackendArmoryItems(items, player) {
+		var normalizedItems = [];
+		for (var i = 0; i < items.length; i++) {
+			var item = items[i];
+			item.type = NormalizeRewardType(item.type || item.item_type);
+			item.equipped = item.equipped === true || IsArmoryItemEquipped(player, item);
+			normalizedItems.push(item);
+		}
+		return normalizedItems;
+	}
+
 	function GetShopItems() {
 		var data = GetTable("supporter_pass_shop", "featured", null);
 		var items = AsArray(data && data.items ? data.items : data);
 		return items.length > 0 ? items : DEFAULT_SHOP_ITEMS;
 	}
 
-	function GetArmoryItems() {
+	function GetArmoryItems(player) {
 		var playerID = Players.GetLocalPlayer();
 		var items = AsArray(GetTable("supporter_pass_armory", "rewards_" + playerID, []));
-		return items.length > 0 ? items : DEFAULT_ARMORY_ITEMS;
+		return items.length > 0 ? NormalizeBackendArmoryItems(items, player) : BuildLegacyBattlepassArmory(player);
 	}
 
 	function GetLeaderboardEntries() {
@@ -265,9 +560,10 @@ var XHSSupporterPass = (function () {
 	}
 
 	function BuildSettingsFromPlayer(player) {
+		var passRewards = player.raw.pass_rewards !== undefined ? player.raw.pass_rewards : player.raw.bp_rewards;
 		return {
 			toggle_tag: IsTruthy(player.raw.toggle_tag, true),
-			pass_rewards: player.raw.pass_rewards === 0 ? false : IsTruthy(player.raw.pass_rewards, true),
+			pass_rewards: passRewards === 0 ? false : IsTruthy(passRewards, true),
 			player_xp: IsTruthy(player.raw.player_xp, true),
 			winrate_toggle: IsTruthy(player.raw.winrate_toggle, true),
 		};
@@ -298,6 +594,15 @@ var XHSSupporterPass = (function () {
 		}
 
 		$.DispatchEvent("ExternalBrowserGoToURL", url);
+	}
+
+	function ShowActionMessage(message, success) {
+		if (typeof GameUI !== "undefined" && GameUI && typeof GameUI.CreateErrorMessage === "function") {
+			GameUI.CreateErrorMessage(message);
+			return;
+		}
+
+		$.Msg("[XHS Supporter Pass] " + (success ? "OK: " : "ERROR: ") + message);
 	}
 
 	function ToggleWindow(forceVisible) {
@@ -489,43 +794,101 @@ var XHSSupporterPass = (function () {
 		var parent = Panel("XHSPassTierRows");
 		ClearPanel(parent);
 
+		var player = GetLocalPlayerData();
+		var supporterURL = player.supporter_url || SUPPORTER_URL;
 		var tiers = GetTiers();
 		for (var i = 0; i < tiers.length; i++) {
-			var tier = tiers[i];
+			var tier = GetTierMeta(tiers[i]);
+			var isOwnedTier = tier.id > 0 && tier.id === player.tier_id;
 			var row = $.CreatePanel("Panel", parent, "");
-			row.AddClass("XHSPassTierRow");
+			row.AddClass("XHSPassTierCard");
+			row.AddClass("Tier" + tier.id);
+			row.SetHasClass("Featured", tier.featured);
+			row.SetHasClass("IsOwnedTier", isOwnedTier);
+			row.SetHasClass("IsClickable", !isOwnedTier);
+			row.hittest = true;
+			if (!isOwnedTier) {
+				(function (url) {
+					row.SetPanelEvent("onactivate", function () {
+						Game.EmitSound("General.ButtonClick");
+						OpenExternalURL(url);
+					});
+				})(supporterURL);
+			}
 
-			var color = $.CreatePanel("Panel", row, "");
-			color.AddClass("XHSPassTierColor");
-			color.style.backgroundColor = tier.color || "#5ad0ff";
+			var art = $.CreatePanel("Panel", row, "");
+			art.AddClass("XHSPassTierArt");
+			art.hittest = false;
+			if (tier.image) {
+				art.style.backgroundImage = 'url("file://{images}/custom_game/' + tier.image + '")';
+			}
 
-			var copy = $.CreatePanel("Panel", row, "");
-			copy.AddClass("XHSPassTierCopy");
+			var shade = $.CreatePanel("Panel", row, "");
+			shade.AddClass("XHSPassTierShade");
+			shade.hittest = false;
 
-			var name = $.CreatePanel("Label", copy, "");
+			if (isOwnedTier) {
+				var owned = $.CreatePanel("Panel", row, "");
+				owned.AddClass("XHSPassTierOwnedTooltip");
+				owned.hittest = false;
+
+				var ownedTitle = $.CreatePanel("Label", owned, "");
+				ownedTitle.AddClass("XHSPassTierOwnedTitle");
+				ownedTitle.text = "Current Tier";
+
+				var ownedText = $.CreatePanel("Label", owned, "");
+				ownedText.AddClass("XHSPassTierOwnedText");
+				ownedText.text = "You already have this tier";
+			}
+
+			var top = $.CreatePanel("Panel", row, "");
+			top.AddClass("XHSPassTierTopline");
+			top.hittest = false;
+
+			var mark = $.CreatePanel("Label", top, "");
+			mark.AddClass("XHSPassTierMark");
+			mark.text = tier.label;
+			mark.hittest = false;
+
+			var name = $.CreatePanel("Label", row, "");
 			name.AddClass("XHSPassTierName");
-			name.text = tier.name || "Supporter";
-			name.style.color = tier.color || "#f3fbff";
-
-			var details = $.CreatePanel("Label", copy, "");
-			details.AddClass("XHSPassTierDetails");
-			details.text = FormatNumber(tier.fragments || 0) + " fragments/month - +" + FormatNumber(tier.xp_boost || 0) + "% XP - 3 companions, 1 emblem, 1 effigy";
+			name.text = tier.name;
+			name.hittest = false;
 
 			var price = $.CreatePanel("Label", row, "");
 			price.AddClass("XHSPassTierPrice");
-			price.text = tier.price || "";
+			price.text = tier.price;
+			price.hittest = false;
+
+			var copy = $.CreatePanel("Label", row, "");
+			copy.AddClass("XHSPassTierCopy");
+			copy.text = tier.text;
+			copy.hittest = false;
+
+			var tagList = $.CreatePanel("Panel", row, "");
+			tagList.AddClass("XHSPassTagList");
+			tagList.hittest = false;
+			for (var p = 0; p < tier.perks.length; p++) {
+				var tag = $.CreatePanel("Label", tagList, "");
+				tag.AddClass("XHSPassTag");
+				tag.text = tier.perks[p];
+				tag.hittest = false;
+			}
+
+			var cta = $.CreatePanel("Label", row, "");
+			cta.AddClass("XHSPassTierCTA");
+			cta.text = isOwnedTier ? "Active on your account" : "Support on Patreon";
+			cta.hittest = false;
 		}
 	}
 
-	function CreateRewardCard(parent, reward) {
+	function CreateRewardCard(parent, reward, player) {
 		var card = $.CreatePanel("Panel", parent, "");
 		card.AddClass("XHSPassRewardCard");
 
 		var image = $.CreatePanel("Panel", card, "");
 		image.AddClass("XHSPassRewardImage");
-		if (reward.image) {
-			image.style.backgroundImage = 'url("file://{images}/custom_game/' + reward.image + '")';
-		}
+		SetCustomGameImage(image, reward.image);
 
 		var level = $.CreatePanel("Label", card, "");
 		level.AddClass("XHSPassRewardLevel");
@@ -533,14 +896,36 @@ var XHSSupporterPass = (function () {
 
 		var name = $.CreatePanel("Label", card, "");
 		name.AddClass("XHSPassRewardName");
-		name.text = Localize("#" + (reward.name || reward.item_name || "Reward"));
+		name.text = LocalizeMaybeKey(reward.name || reward.item_name || "Reward");
 
 		var type = $.CreatePanel("Label", card, "");
 		type.AddClass("XHSPassRewardType");
-		type.text = reward.type || reward.item_type || "Reward";
+		type.text = reward.claimed ? "Claimed" : NormalizeRewardType(reward.type || reward.item_type || "Reward");
+
+		var rewardID = reward.reward_id || reward.id;
+		if (rewardID) {
+			var button = $.CreatePanel("Button", card, "");
+			button.AddClass("XHSPassShopButton");
+			var requiredLevel = ToNumber(reward.level_required || reward.level, 1);
+			var premiumLocked = reward.track === "premium" && player.tier_id < 1;
+			var canClaim = !reward.claimed && player.season_level >= requiredLevel && !premiumLocked;
+			button.SetHasClass("IsLocked", !canClaim);
+			button.SetPanelEvent("onactivate", function () {
+				if (!canClaim) {
+					Game.EmitSound("General.Cancel");
+					return;
+				}
+				GameEvents.SendCustomGameEventToServer("supporter_pass_claim_reward", {
+					reward_id: rewardID,
+				});
+			});
+
+			var label = $.CreatePanel("Label", button, "");
+			label.text = reward.claimed ? "Claimed" : (canClaim ? "Claim" : "Locked");
+		}
 	}
 
-	function RenderRewardTrack(parent, title, rewards) {
+	function RenderRewardTrack(parent, title, rewards, player) {
 		var track = $.CreatePanel("Panel", parent, "");
 		track.AddClass("XHSPassRewardTrack");
 
@@ -559,11 +944,11 @@ var XHSSupporterPass = (function () {
 		}
 
 		for (var i = 0; i < rewards.length; i++) {
-			CreateRewardCard(row, rewards[i]);
+			CreateRewardCard(row, rewards[i], player);
 		}
 	}
 
-	function RenderRewards() {
+	function RenderRewards(player) {
 		var parent = Panel("XHSPassRewardTracks");
 		ClearPanel(parent);
 
@@ -571,8 +956,8 @@ var XHSSupporterPass = (function () {
 			return;
 		}
 
-		RenderRewardTrack(parent, "Free Track", GetRewards("free"));
-		RenderRewardTrack(parent, "Supporter Track", GetRewards("premium"));
+		RenderRewardTrack(parent, "Free Track", GetRewards("free"), player);
+		RenderRewardTrack(parent, "Supporter Track", GetRewards("premium"), player);
 	}
 
 	function CreateShopCard(parent, item, player, mode) {
@@ -581,13 +966,11 @@ var XHSSupporterPass = (function () {
 
 		var image = $.CreatePanel("Panel", card, "");
 		image.AddClass("XHSPassShopImage");
-		if (item.image) {
-			image.style.backgroundImage = 'url("file://{images}/custom_game/' + item.image + '")';
-		}
+		SetCustomGameImage(image, item.image);
 
 		var name = $.CreatePanel("Label", card, "");
 		name.AddClass("XHSPassShopName");
-		name.text = Localize("#" + (item.name || item.item_name || item.id || "Shop Item"));
+		name.text = LocalizeMaybeKey(item.name || item.item_name || item.id || "Shop Item");
 
 		var meta = $.CreatePanel("Label", card, "");
 		meta.AddClass("XHSPassShopMeta");
@@ -596,14 +979,14 @@ var XHSSupporterPass = (function () {
 		var price = $.CreatePanel("Label", card, "");
 		price.AddClass("XHSPassShopPrice");
 		if (mode === "armory") {
-			price.text = item.equipped ? "Equipped" : "Unlocked";
+			price.text = item.locked ? (item.lock_reason || "Locked") : (item.equipped ? "Equipped" : "Unlocked");
 		} else {
 			price.text = FormatNumber(item.price || item.fragment_price || 0) + " fragments";
 		}
 
 		var button = $.CreatePanel("Button", card, "");
 		button.AddClass("XHSPassShopButton");
-		var canAfford = mode === "armory" || player.fragments >= ToNumber(item.price || item.fragment_price, 0);
+		var canAfford = mode === "armory" ? item.locked !== true : player.fragments >= ToNumber(item.price || item.fragment_price, 0);
 		button.SetHasClass("IsLocked", !canAfford);
 		button.SetPanelEvent("onactivate", function () {
 			if (!canAfford) {
@@ -612,6 +995,11 @@ var XHSSupporterPass = (function () {
 			}
 
 			if (mode === "armory") {
+				GameEvents.SendCustomGameEventToServer("supporter_pass_equip_item", {
+					item_id: item.entitlement_id || item.id || item.item_id,
+					hero: item.hero || "global",
+					slot_id: item.slot_id || "default",
+				});
 				Game.EmitSound("General.ButtonClick");
 				return;
 			}
@@ -622,7 +1010,7 @@ var XHSSupporterPass = (function () {
 		});
 
 		var label = $.CreatePanel("Label", button, "");
-		label.text = mode === "armory" ? (item.equipped ? "Equipped" : "Equip") : (canAfford ? "Buy" : "Locked");
+		label.text = mode === "armory" ? (item.locked ? "Locked" : (item.equipped ? "Equipped" : "Equip")) : (canAfford ? "Buy" : "Locked");
 	}
 
 	function RenderShop(player) {
@@ -690,7 +1078,7 @@ var XHSSupporterPass = (function () {
 		var parent = Panel("XHSPassArmoryGrid");
 		ClearPanel(parent);
 
-		var items = GetArmoryItems();
+		var items = GetArmoryItems(player);
 		RenderArmoryFilters(items, player);
 
 		var filteredItems = [];
@@ -737,30 +1125,55 @@ var XHSSupporterPass = (function () {
 			return;
 		}
 
-		bar.SetHasClass("IsDirty", !SettingsEqual(settingsOriginal, settingsDraft));
+		bar.SetHasClass("IsDirty", !SettingsEqual(settingsOriginal, settingsDraft) || settingsSaving);
+		bar.SetHasClass("IsSaving", settingsSaving);
+
+		var label = bar.FindChildTraverse("XHSPassSettingsSaveText");
+		if (label) {
+			label.text = settingsSaving ? "Saving settings..." : "Unsaved changes";
+		}
 	}
 
 	function CreateSettingRow(parent, key, title, description) {
 		var row = $.CreatePanel("Panel", parent, "");
 		row.AddClass("XHSPassSettingRow");
+		row.SetHasClass("IsEnabled", settingsDraft[key] === true);
+		row.hittest = true;
 
 		var copy = $.CreatePanel("Panel", row, "");
 		copy.AddClass("XHSPassRowMain");
+		copy.hittest = false;
 
 		var titlePanel = $.CreatePanel("Label", copy, "");
 		titlePanel.AddClass("XHSPassRowTitle");
 		titlePanel.text = title;
+		titlePanel.hittest = false;
 
 		var descPanel = $.CreatePanel("Label", copy, "");
 		descPanel.AddClass("XHSPassRowDescription");
 		descPanel.text = description;
+		descPanel.hittest = false;
 
-		var checkbox = $.CreatePanel("DOTASettingsCheckbox", row, "XHSPassSetting_" + key);
-		checkbox.AddClass("XHSPassSettingCheckbox");
-		checkbox.checked = settingsDraft[key] === true;
-		checkbox.SetPanelEvent("onactivate", function () {
-			settingsDraft[key] = checkbox.checked === true;
+		var toggle = $.CreatePanel("Panel", row, "XHSPassSetting_" + key);
+		toggle.AddClass("XHSPassSettingToggle");
+		toggle.SetHasClass("IsEnabled", settingsDraft[key] === true);
+		toggle.hittest = false;
+
+		var knob = $.CreatePanel("Panel", toggle, "");
+		knob.AddClass("XHSPassSettingToggleKnob");
+		knob.hittest = false;
+
+		row.SetPanelEvent("onactivate", function () {
+			if (settingsSaving) {
+				Game.EmitSound("General.Cancel");
+				return;
+			}
+
+			settingsDraft[key] = settingsDraft[key] !== true;
+			row.SetHasClass("IsEnabled", settingsDraft[key] === true);
+			toggle.SetHasClass("IsEnabled", settingsDraft[key] === true);
 			UpdateSettingsSaveBar();
+			Game.EmitSound("General.ButtonClick");
 		});
 	}
 
@@ -817,7 +1230,7 @@ var XHSSupporterPass = (function () {
 		var player = GetLocalPlayerData();
 		RenderHeader(player);
 		RenderTiers();
-		RenderRewards();
+		RenderRewards(player);
 		RenderShop(player);
 		RenderArmory(player);
 		RenderLeaderboards();
@@ -853,11 +1266,18 @@ var XHSSupporterPass = (function () {
 		var saveSettings = Panel("XHSPassSettingsSaveButton");
 		if (saveSettings) {
 			saveSettings.SetPanelEvent("onactivate", function () {
-				settingsOriginal = CopySettings(settingsDraft);
-				UpdateSettingsSaveBar();
+				if (settingsSaving || SettingsEqual(settingsOriginal, settingsDraft)) {
+					return;
+				}
+
+				settingsSaving = true;
 				Game.EmitSound("General.ButtonClick");
+				UpdateSettingsSaveBar();
 				if (GameEvents && GameEvents.SendCustomGameEventToServer) {
 					GameEvents.SendCustomGameEventToServer("supporter_pass_update_settings", CopySettings(settingsDraft));
+				} else {
+					settingsSaving = false;
+					UpdateSettingsSaveBar();
 				}
 			});
 		}
@@ -865,6 +1285,11 @@ var XHSSupporterPass = (function () {
 		var cancelSettings = Panel("XHSPassSettingsCancelButton");
 		if (cancelSettings) {
 			cancelSettings.SetPanelEvent("onactivate", function () {
+				if (settingsSaving) {
+					Game.EmitSound("General.Cancel");
+					return;
+				}
+
 				settingsDraft = CopySettings(settingsOriginal);
 				RenderSettings(GetLocalPlayerData());
 				Game.EmitSound("General.Cancel");
@@ -880,6 +1305,45 @@ var XHSSupporterPass = (function () {
 					}
 				})(page);
 			}
+		}
+
+		if (GameEvents && GameEvents.Subscribe) {
+			GameEvents.Subscribe("supporter_pass_purchase_pending", function () {
+				ShowActionMessage("Supporter Pass purchase pending...", true);
+			});
+			GameEvents.Subscribe("supporter_pass_purchase_success", function (payload) {
+				ShowActionMessage(payload && payload.already_owned ? "Already owned." : "Purchase complete.", true);
+				RenderAll();
+			});
+			GameEvents.Subscribe("supporter_pass_purchase_failed", function (payload) {
+				ShowActionMessage((payload && payload.message) || "Purchase failed.", false);
+			});
+			GameEvents.Subscribe("supporter_pass_claim_success", function (payload) {
+				ShowActionMessage(payload && payload.already_claimed ? "Reward already claimed." : "Reward claimed.", true);
+				RenderAll();
+			});
+			GameEvents.Subscribe("supporter_pass_claim_failed", function (payload) {
+				ShowActionMessage((payload && payload.message) || "Reward claim failed.", false);
+			});
+			GameEvents.Subscribe("supporter_pass_equip_success", function () {
+				ShowActionMessage("Cosmetic equipped.", true);
+				RenderAll();
+			});
+			GameEvents.Subscribe("supporter_pass_equip_failed", function (payload) {
+				ShowActionMessage((payload && payload.message) || "Equip failed.", false);
+			});
+			GameEvents.Subscribe("supporter_pass_settings_failed", function () {
+				settingsSaving = false;
+				settingsDraft = CopySettings(settingsOriginal);
+				RenderSettings(GetLocalPlayerData());
+				ShowActionMessage("Settings save failed.", false);
+			});
+			GameEvents.Subscribe("supporter_pass_settings_success", function () {
+				settingsSaving = false;
+				settingsOriginal = CopySettings(settingsDraft);
+				UpdateSettingsSaveBar();
+				ShowActionMessage("Settings saved.", true);
+			});
 		}
 	}
 

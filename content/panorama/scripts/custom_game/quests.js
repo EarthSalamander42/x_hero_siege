@@ -32,6 +32,13 @@ var XHSQuestState = {
 };
 
 var XHSQuestLogPinnedBackground = false;
+var XHSCollapsedMainQuestPhases = {};
+
+var XHSMainQuestPhases = {
+	xhs_phase_1: 1,
+	xhs_phase_2: 2,
+	xhs_phase_3: 3
+};
 
 function RefreshXHSQuestLogBackgroundToggle() {
 	var questLog = $("#QuestLog");
@@ -54,6 +61,108 @@ function ToggleXHSQuestLogBackground() {
 	}
 
 	RefreshXHSQuestLogBackgroundToggle();
+}
+
+function GetXHSQuestPhase(questID) {
+	if (XHSMainQuestPhases[questID]) {
+		return XHSMainQuestPhases[questID];
+	}
+
+	var meta = XHSQuestUiMeta[questID] || null;
+	return meta && meta.phase ? meta.phase : 0;
+}
+
+function LoadXHSCollapsedMainQuestPhases() {
+	if (typeof GameUI === "undefined" || !GameUI.CustomUIConfig) {
+		return;
+	}
+
+	var saved = GameUI.CustomUIConfig().xhsCollapsedMainQuestPhases || {};
+	XHSCollapsedMainQuestPhases = {};
+
+	for (var phase in saved) {
+		if (!saved.hasOwnProperty(phase)) {
+			continue;
+		}
+
+		if (saved[phase] === true) {
+			XHSCollapsedMainQuestPhases[phase] = true;
+		}
+	}
+}
+
+function SaveXHSCollapsedMainQuestPhases() {
+	if (typeof GameUI !== "undefined" && GameUI.CustomUIConfig) {
+		GameUI.CustomUIConfig().xhsCollapsedMainQuestPhases = XHSCollapsedMainQuestPhases;
+	}
+}
+
+function ApplyXHSQuestPanelVisibility(panel) {
+	if (!panel) {
+		return;
+	}
+
+	var questID = panel.GetAttributeString("quest_id", panel.id || "");
+	var phase = Number(panel.GetAttributeString("xhs_phase", "0")) || 0;
+	var hidden = IsXHSHiddenQuest(questID);
+	var collapsedByMainQuest = panel.BHasClass("SubQuest")
+		&& phase > 0
+		&& XHSCollapsedMainQuestPhases[phase] === true
+		&& !panel.BHasClass("Active");
+
+	panel.SetHasClass("XHSCollapsedByMainQuest", collapsedByMainQuest);
+	panel.style.visibility = hidden || collapsedByMainQuest ? "collapse" : "visible";
+}
+
+function RefreshXHSQuestCollapseState() {
+	var questsContainer = $("#QuestsContainer");
+	if (!questsContainer) {
+		return;
+	}
+
+	var questPanels = questsContainer.FindChildrenWithClassTraverse("Quest");
+	for (var i = 0; i < questPanels.length; i++) {
+		var panel = questPanels[i];
+		if (!panel) {
+			continue;
+		}
+
+		var questID = panel.GetAttributeString("quest_id", panel.id || "");
+		var mainQuestPhase = XHSMainQuestPhases[questID] || 0;
+		panel.SetHasClass("XHSMainQuestCollapsed", mainQuestPhase > 0 && XHSCollapsedMainQuestPhases[mainQuestPhase] === true);
+		ApplyXHSQuestPanelVisibility(panel);
+	}
+}
+
+function ToggleXHSMainQuestPhase(phase) {
+	phase = Number(phase) || 0;
+	if (phase <= 0) {
+		return;
+	}
+
+	XHSCollapsedMainQuestPhases[phase] = XHSCollapsedMainQuestPhases[phase] !== true;
+	SaveXHSCollapsedMainQuestPhases();
+	RefreshXHSQuestCollapseState();
+}
+
+function ApplyXHSMainQuestToggle(panel, questID) {
+	if (!panel) {
+		return;
+	}
+
+	var phase = XHSMainQuestPhases[questID] || 0;
+	panel.SetHasClass("CollapsibleMainQuest", phase > 0);
+	panel.SetHasClass("XHSMainQuestCollapsed", phase > 0 && XHSCollapsedMainQuestPhases[phase] === true);
+
+	if (phase <= 0) {
+		return;
+	}
+
+	panel.hittest = true;
+	panel.hittestchildren = true;
+	panel.SetPanelEvent("onactivate", function () {
+		ToggleXHSMainQuestPhase(phase);
+	});
 }
 
 var XHSStaticQuests = [
@@ -143,14 +252,23 @@ var XHSQuestUiOrder = [
 	"kill_final_wave",
 	"xhs_phase_3",
 	"teleport_top",
+	"kill_mag",
+	"clear_grom_vanguard",
 	"kill_grom",
 	"kill_illidan",
 	"kill_balanar",
 	"kill_proudmoore",
-	"teleport_arthas"
+	"teleport_arthas",
+	"kill_arthas",
+	"kill_banehallow",
+	"kill_lich_king",
+	"kill_spirit_master"
 ];
 
 var XHSQuestUiMeta = {
+	xhs_creep_level_2: { phase: 1, subquest: true },
+	xhs_creep_level_3: { phase: 1, subquest: true },
+	xhs_creep_level_4: { phase: 1, subquest: true },
 	defend_castle: { phase: 1, subquest: true },
 	kill_rax: { phase: 1, subquest: true },
 	muradin_event: { phase: 1, subquest: true },
@@ -161,11 +279,17 @@ var XHSQuestUiMeta = {
 	kill_ice_towers: { phase: 2, subquest: true },
 	kill_final_wave: { phase: 2, subquest: true },
 	teleport_top: { phase: 3, subquest: true, infoTarget: "npc_xhs_paladin" },
+	kill_mag: { phase: 3, subquest: true },
+	clear_grom_vanguard: { phase: 3, subquest: true },
 	kill_grom: { phase: 3, subquest: true, infoTarget: "npc_dota_hero_grom_hellscream" },
 	kill_illidan: { phase: 3, subquest: true, infoTarget: "npc_dota_hero_illidan" },
 	kill_balanar: { phase: 3, subquest: true, infoTarget: "npc_dota_hero_balanar" },
 	kill_proudmoore: { phase: 3, subquest: true, infoTarget: "npc_dota_hero_proudmoore" },
-	teleport_arthas: { phase: 3, subquest: true, infoTarget: "npc_xhs_paladin_2" }
+	teleport_arthas: { phase: 3, subquest: true, infoTarget: "npc_xhs_paladin_2" },
+	kill_arthas: { phase: 3, subquest: true },
+	kill_banehallow: { phase: 3, subquest: true },
+	kill_lich_king: { phase: 3, subquest: true },
+	kill_spirit_master: { phase: 3, subquest: true }
 };
 
 var XHSHiddenQuestIds = {
@@ -191,7 +315,7 @@ function ApplyXHSQuestMetadata(panel, questID, isSubquest) {
 	}
 
 	var meta = XHSQuestUiMeta[questID] || null;
-	var phase = meta ? meta.phase : 0;
+	var phase = GetXHSQuestPhase(questID);
 	var subquest = !!isSubquest || !!(meta && meta.subquest);
 	var hidden = IsXHSHiddenQuest(questID);
 
@@ -200,9 +324,11 @@ function ApplyXHSQuestMetadata(panel, questID, isSubquest) {
 	panel.SetHasClass("XHSPhase2Quest", phase === 2);
 	panel.SetHasClass("XHSPhase3Quest", phase === 3);
 	panel.SetHasClass("XHSHiddenQuest", hidden);
-	panel.style.visibility = hidden ? "collapse" : "visible";
 	panel.SetHasClass("HasQuestInfo", !!(meta && meta.infoTarget));
 	panel.SetAttributeString("quest_id", questID || "");
+	panel.SetAttributeString("xhs_phase", phase.toString());
+	ApplyXHSMainQuestToggle(panel, questID);
+	ApplyXHSQuestPanelVisibility(panel);
 
 	var infoButton = panel.FindChildInLayoutFile("QuestInfoButton");
 	if (infoButton) {
@@ -246,6 +372,8 @@ function ReorderXHSQuestPanels(zonePanel) {
 		}
 		previous = child;
 	}
+
+	RefreshXHSQuestCollapseState();
 }
 
 function EnsureQuestZone(zoneName, zoneLabel) {
@@ -309,6 +437,7 @@ function SetQuestVisualState(panel, state) {
 	panel.SetHasClass("Active", state === "Active");
 	panel.SetHasClass("Inactive", state === "Inactive");
 	panel.SetHasClass("Completed", state === "Completed");
+	ApplyXHSQuestPanelVisibility(panel);
 }
 
 function SetStaticQuest(id, text, state) {
@@ -341,6 +470,7 @@ function SetStaticQuest(id, text, state) {
 
 	SetQuestVisualState(panel, state || quest.state);
 	ReorderXHSQuestPanels(zonePanel);
+	RefreshXHSQuestCollapseState();
 }
 
 function GetEffectiveQuestPhase() {
@@ -626,6 +756,7 @@ function InitStaticQuestLog() {
 	if (typeof GameUI !== "undefined" && GameUI.CustomUIConfig) {
 		XHSQuestLogPinnedBackground = GameUI.CustomUIConfig().xhsQuestLogPinnedBackground === true;
 	}
+	LoadXHSCollapsedMainQuestPhases();
 	RefreshXHSQuestLogBackgroundToggle();
 
 	for (var i = 0; i < XHSStaticQuests.length; i++) {
@@ -633,6 +764,7 @@ function InitStaticQuestLog() {
 	}
 	ApplyQuestStateSnapshot(CustomNetTables.GetTableValue("xhs_quest_state", "state"));
 	RefreshStaticQuests();
+	RefreshXHSQuestCollapseState();
 }
 
 function OnQuestActivated( data ) {
@@ -682,7 +814,9 @@ function OnQuestActivated( data ) {
 	QuestPanel.SetHasClass( "Completed", data["Completed"] >= data["CompleteLimit"] );
 	QuestPanel.SetHasClass( "Active", data["Completed"] < data["CompleteLimit"] );
 	QuestPanel.SetHasClass( "Inactive", false );
+	ApplyXHSQuestPanelVisibility(QuestPanel);
 	ReorderXHSQuestPanels(ZonePanel);
+	RefreshXHSQuestCollapseState();
 	RefreshPhaseQuestHeaders();
 	ZonePanel.SetHasClass( "Completed", false );
 }
@@ -804,6 +938,7 @@ function OnQuestCompleted( data )
 	QuestPanel.SetHasClass( "Completed", data["Completed"] >= data["CompleteLimit"] );
 	QuestPanel.SetHasClass( "Active", data["Completed"] < data["CompleteLimit"] );
 	QuestPanel.SetHasClass( "Inactive", false );
+	ApplyXHSQuestPanelVisibility(QuestPanel);
 
 	QuestPanel.SetDialogVariableInt( "xp_reward", data["XPReward"] );
 	QuestPanel.SetHasClass( "XPReward", data["XPReward"] > 0 );
@@ -824,6 +959,7 @@ function OnQuestCompleted( data )
 
 	ZonePanel.SetHasClass( "Completed", bAllComplete || data["ZoneCompleted"] );
 	RefreshPhaseQuestHeaders();
+	RefreshXHSQuestCollapseState();
 }
 
 GameEvents.Subscribe( "quest_completed", OnQuestCompleted );

@@ -29,6 +29,21 @@
 						</Panel>
 					</Panel>
 				</Panel>
+				<Panel id="BossCastBar1" class="BossCastBar" hittest="false">
+					<Panel id="BossCastIcon1" class="BossCastIcon" hittest="false">
+						<Image id="BossCastIconImage1" class="BossCastIconImage" hittest="false" scaling="stretch-to-cover-preserve-aspect"/>
+					</Panel>
+					<Panel class="BossCastBody" hittest="false">
+						<Panel class="BossCastHeader" hittest="false">
+							<Label id="BossCastLabel1" class="BossCastLabel" hittest="false" text=""/>
+							<Label id="BossCastTime1" class="BossCastTime" hittest="false" text=""/>
+						</Panel>
+						<Panel id="BossCastTrack1" class="BossCastTrack" hittest="false">
+							<Panel id="BossCastFill1" class="BossCastFill" hittest="false"/>
+							<Panel id="BossCastGlow1" class="BossCastGlow" hittest="false"/>
+						</Panel>
+					</Panel>
+				</Panel>
 				<Panel id="BossCounter1" class="BossCounter" hittest="false">
 					<Label id="BossCounterLabel1" class="BossCounterLabel" hittest="false" text=""/>
 					<Label id="BossCounterValue1" class="BossCounterValue" hittest="false" text=""/>
@@ -58,6 +73,21 @@
 							<Panel id="BossHealPulse2" class="BossHealPulse" hittest="false"/>
 							<Panel id="BossMarkers2" class="BossMarkers" hittest="false"/>
 							<Label id="BossHealth2" class="HoldoutLabelSmall BossHealthLabel" hittest="false" text=""/>
+						</Panel>
+					</Panel>
+				</Panel>
+				<Panel id="BossCastBar2" class="BossCastBar" hittest="false">
+					<Panel id="BossCastIcon2" class="BossCastIcon" hittest="false">
+						<Image id="BossCastIconImage2" class="BossCastIconImage" hittest="false" scaling="stretch-to-cover-preserve-aspect"/>
+					</Panel>
+					<Panel class="BossCastBody" hittest="false">
+						<Panel class="BossCastHeader" hittest="false">
+							<Label id="BossCastLabel2" class="BossCastLabel" hittest="false" text=""/>
+							<Label id="BossCastTime2" class="BossCastTime" hittest="false" text=""/>
+						</Panel>
+						<Panel id="BossCastTrack2" class="BossCastTrack" hittest="false">
+							<Panel id="BossCastFill2" class="BossCastFill" hittest="false"/>
+							<Panel id="BossCastGlow2" class="BossCastGlow" hittest="false"/>
 						</Panel>
 					</Panel>
 				</Panel>
@@ -93,6 +123,21 @@
 						</Panel>
 					</Panel>
 				</Panel>
+				<Panel id="BossCastBar3" class="BossCastBar" hittest="false">
+					<Panel id="BossCastIcon3" class="BossCastIcon" hittest="false">
+						<Image id="BossCastIconImage3" class="BossCastIconImage" hittest="false" scaling="stretch-to-cover-preserve-aspect"/>
+					</Panel>
+					<Panel class="BossCastBody" hittest="false">
+						<Panel class="BossCastHeader" hittest="false">
+							<Label id="BossCastLabel3" class="BossCastLabel" hittest="false" text=""/>
+							<Label id="BossCastTime3" class="BossCastTime" hittest="false" text=""/>
+						</Panel>
+						<Panel id="BossCastTrack3" class="BossCastTrack" hittest="false">
+							<Panel id="BossCastFill3" class="BossCastFill" hittest="false"/>
+							<Panel id="BossCastGlow3" class="BossCastGlow" hittest="false"/>
+						</Panel>
+					</Panel>
+				</Panel>
 				<Panel id="BossCounter3" class="BossCounter" hittest="false">
 					<Label id="BossCounterLabel3" class="BossCounterLabel" hittest="false" text=""/>
 					<Label id="BossCounterValue3" class="BossCounterValue" hittest="false" text=""/>
@@ -122,6 +167,21 @@
 							<Panel id="BossHealPulse4" class="BossHealPulse" hittest="false"/>
 							<Panel id="BossMarkers4" class="BossMarkers" hittest="false"/>
 							<Label id="BossHealth4" class="HoldoutLabelSmall BossHealthLabel" hittest="false" text=""/>
+						</Panel>
+					</Panel>
+				</Panel>
+				<Panel id="BossCastBar4" class="BossCastBar" hittest="false">
+					<Panel id="BossCastIcon4" class="BossCastIcon" hittest="false">
+						<Image id="BossCastIconImage4" class="BossCastIconImage" hittest="false" scaling="stretch-to-cover-preserve-aspect"/>
+					</Panel>
+					<Panel class="BossCastBody" hittest="false">
+						<Panel class="BossCastHeader" hittest="false">
+							<Label id="BossCastLabel4" class="BossCastLabel" hittest="false" text=""/>
+							<Label id="BossCastTime4" class="BossCastTime" hittest="false" text=""/>
+						</Panel>
+						<Panel id="BossCastTrack4" class="BossCastTrack" hittest="false">
+							<Panel id="BossCastFill4" class="BossCastFill" hittest="false"/>
+							<Panel id="BossCastGlow4" class="BossCastGlow" hittest="false"/>
 						</Panel>
 					</Panel>
 				</Panel>

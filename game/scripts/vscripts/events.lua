@@ -181,6 +181,69 @@ ListenToGameEvent('npc_spawned', function(keys)
 			end, 0.1)
 		end
 
+		if npc:GetUnitName() == "npc_dota_hero_grom_hellscream" and XHSGrom_AttachPhase3AI ~= nil then
+			GameRules:GetGameModeEntity():SetContextThink("AttachGromPhase3AI" .. tostring(npc:entindex()), function()
+				if npc ~= nil and IsValidEntity(npc) and not npc:IsNull() then
+					XHSGrom_AttachPhase3AI(npc)
+				end
+				return nil
+			end, 0.1)
+		end
+
+		if npc:GetUnitName() == "npc_dota_hero_illidan" and XHSIllidan_AttachPhase3AI ~= nil then
+			GameRules:GetGameModeEntity():SetContextThink("AttachIllidanPhase3AI" .. tostring(npc:entindex()), function()
+				if npc ~= nil and IsValidEntity(npc) and not npc:IsNull() then
+					XHSIllidan_AttachPhase3AI(npc)
+				end
+				return nil
+			end, 0.1)
+		end
+
+		if npc:GetUnitName() == "npc_dota_hero_balanar" and XHSBalanar_AttachPhase3AI ~= nil then
+			GameRules:GetGameModeEntity():SetContextThink("AttachBalanarPhase3AI" .. tostring(npc:entindex()), function()
+				if npc ~= nil and IsValidEntity(npc) and not npc:IsNull() then
+					XHSBalanar_AttachPhase3AI(npc)
+				end
+				return nil
+			end, 0.1)
+		end
+
+		if npc:GetUnitName() == "npc_dota_hero_proudmoore" and XHSProudmoore_AttachPhase3AI ~= nil then
+			GameRules:GetGameModeEntity():SetContextThink("AttachProudmoorePhase3AI" .. tostring(npc:entindex()), function()
+				if npc ~= nil and IsValidEntity(npc) and not npc:IsNull() then
+					XHSProudmoore_AttachPhase3AI(npc)
+				end
+				return nil
+			end, 0.1)
+		end
+
+		if npc:GetUnitName() == "npc_dota_hero_arthas" and XHSArthas_AttachPhase3AI ~= nil then
+			GameRules:GetGameModeEntity():SetContextThink("AttachArthasPhase3AI" .. tostring(npc:entindex()), function()
+				if npc ~= nil and IsValidEntity(npc) and not npc:IsNull() then
+					XHSArthas_AttachPhase3AI(npc)
+				end
+				return nil
+			end, 0.1)
+		end
+
+		if npc:GetUnitName() == "npc_dota_boss_lich_king" and XHSLichKing_AttachPhase3AI ~= nil then
+			GameRules:GetGameModeEntity():SetContextThink("AttachLichKingPhase3AI" .. tostring(npc:entindex()), function()
+				if npc ~= nil and IsValidEntity(npc) and not npc:IsNull() and not npc:IsInvulnerable() then
+					XHSLichKing_AttachPhase3AI(npc)
+				end
+				return nil
+			end, 0.1)
+		end
+
+		if npc:GetUnitName() == "npc_dota_boss_spirit_master" and XHSSpiritMaster_AttachPhase3AI ~= nil then
+			GameRules:GetGameModeEntity():SetContextThink("AttachSpiritMasterPhase3AI" .. tostring(npc:entindex()), function()
+				if npc ~= nil and IsValidEntity(npc) and not npc:IsNull() then
+					XHSSpiritMaster_AttachPhase3AI(npc)
+				end
+				return nil
+			end, 0.1)
+		end
+
 		-- HERO NPC
 		if npc:IsRealHero() and npc:GetTeamNumber() == DOTA_TEAM_GOODGUYS then
 			if npc.bFirstSpawnComplete == nil then
@@ -1261,9 +1324,9 @@ ListenToGameEvent('entity_killed', function(keys)
 						elseif killer:GetKills() == 400 then
 							SendXHSRewardNotification(killer:GetPlayerOwnerID(), "gold", 50000, "Kill Reward", "+50,000 gold")
 							PlayerResource:ModifyGold(killer:GetPlayerOwnerID(), 50000, false, DOTA_ModifyGold_Unspecified)
-						elseif killer:GetKills() >= 500 and SpecialEvents.Ramero_trigger == 0 then
+						elseif killer:GetKills() >= 500 and SpecialEvents.Ramero_trigger == 0 and not (XHSDevTools ~= nil and XHSDevTools:IsSandboxActive()) then
 							SpecialEvents:StartRameroAndBaristolEvent(killer)
-						elseif killer:GetKills() >= 750 and SpecialEvents.Ramero_trigger == 1 then
+						elseif killer:GetKills() >= 750 and SpecialEvents.Ramero_trigger == 1 and not (XHSDevTools ~= nil and XHSDevTools:IsSandboxActive()) then
 							SpecialEvents:StartSogatEvent(killer)
 						end
 					end
@@ -1499,6 +1562,8 @@ function GameMode:OnQuestStarted(zone, quest)
 	local bDevSandbox = XHSDevTools ~= nil and XHSDevTools:IsSandboxActive()
 	if quest.szQuestName == "kill_mag" then
 		quest.nCompleteLimit = GetXHSMagtheridonKillLimit()
+	elseif quest.szQuestName == "clear_grom_vanguard" then
+		quest.nCompleteLimit = GetXHSGromVanguardKillLimit()
 	end
 
 	quest.bActivated = true
@@ -1593,11 +1658,12 @@ function GameMode:StartQuestBossVision(questName)
 
 	self.XHSQuestBossVisionWatchers = self.XHSQuestBossVisionWatchers or {}
 	if self.XHSQuestBossVisionWatchers[questName] == true then return end
-	self.XHSQuestBossVisionWatchers[questName] = true
+	local watchers = self.XHSQuestBossVisionWatchers
+	watchers[questName] = true
 
 	Timers:CreateTimer(0.0, function()
 		if GameMode:IsQuestActive(questName) ~= true then
-			GameMode.XHSQuestBossVisionWatchers[questName] = nil
+			watchers[questName] = nil
 			return nil
 		end
 
@@ -1649,6 +1715,12 @@ local XHS_MAIN_QUEST_NOTIFICATIONS = {
 		phase = "Phase 2 Finished",
 		title = "Final Wave Cleared",
 		subtitle = "The castle is safe. Advance to the enemy leaders.",
+		sound = "Dungeon.Stinger01",
+	},
+	clear_grom_vanguard = {
+		phase = "Phase 3",
+		title = "Grom's Vanguard Broken",
+		subtitle = "The way to Grom Hellscream is open.",
 		sound = "Dungeon.Stinger01",
 	},
 }
@@ -1721,6 +1793,10 @@ function GameMode:OnQuestCompleted(questZone, quest)
 
 			if CustomTimers ~= nil and CustomTimers.game_phase < 3 then
 				CustomTimers:IncrementGamePhase()
+			end
+		elseif quest.szQuestName == "clear_grom_vanguard" then
+			if OpenGromGate ~= nil then
+				OpenGromGate()
 			end
 		elseif quest.szQuestName == "teleport_top" then
 			StartMagtheridonArena()

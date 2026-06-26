@@ -28,6 +28,8 @@ CustomGameEventManager:RegisterListener("supporter_pass_change_companion", Dynam
 CustomGameEventManager:RegisterListener("supporter_pass_change_effigy", Dynamic_Wrap(Battlepass, "DonatorStatueJS"))
 CustomGameEventManager:RegisterListener("supporter_pass_change_emblem", Dynamic_Wrap(Battlepass, "DonatorEmblemJS"))
 CustomGameEventManager:RegisterListener("supporter_pass_buy_shop_item", Dynamic_Wrap(Battlepass, "SupporterPassBuyShopItem"))
+CustomGameEventManager:RegisterListener("supporter_pass_claim_reward", Dynamic_Wrap(Battlepass, "SupporterPassClaimReward"))
+CustomGameEventManager:RegisterListener("supporter_pass_equip_item", Dynamic_Wrap(Battlepass, "SupporterPassEquipItem"))
 CustomGameEventManager:RegisterListener("supporter_pass_update_settings", Dynamic_Wrap(Battlepass, "SupporterPassUpdateSettings"))
 CustomGameEventManager:RegisterListener("toggle_ingame_tag", Dynamic_Wrap(Battlepass, 'ToggleDonatorTag'))
 CustomGameEventManager:RegisterListener("change_ingame_tag", Dynamic_Wrap(Battlepass, 'SetDonatorTag'))
@@ -246,32 +248,166 @@ function Battlepass:DonatorCompanionSkinJS(event)
 	DonatorCompanionSkin(event.ID, event.unit, event.skin)
 end
 
-function Battlepass:SupporterPassBuyShopItem(event)
+function Battlepass:GetSupporterPassEventPayload(event_source_index, event)
+	local payload = event
+	if type(event_source_index) == "table" and payload == nil then
+		payload = event_source_index
+	end
+	if type(payload) ~= "table" then
+		payload = {}
+	end
+
+	if payload.PlayerID == nil and payload.player_id ~= nil then
+		payload.PlayerID = payload.player_id
+	end
+
+	if payload.PlayerID == nil and api and api.GetEventPlayerID then
+		local playerID = api:GetEventPlayerID(event_source_index, payload)
+		if playerID ~= nil then
+			payload.PlayerID = playerID
+		end
+	end
+
+	return payload
+end
+
+function Battlepass:SupporterPassBuyShopItem(event_source_index, event)
+	event = self:GetSupporterPassEventPayload(event_source_index, event)
 	local playerID = event.PlayerID
 	local ply_table = CustomNetTables:GetTableValue("supporter_pass_player", tostring(playerID))
 
-	if not ply_table then
+	if playerID == nil or not ply_table or not api or not api.BuySupporterPassShopItem then
 		return
 	end
 
-	-- Backend persistence owns the purchase. The local table is only refreshed
-	-- once the backend returns the updated fragment balance/unlocks.
 	CustomGameEventManager:Send_ServerToPlayer(PlayerResource:GetPlayer(playerID), "supporter_pass_purchase_pending", {
 		item_id = event.item_id,
 	})
+
+	api:BuySupporterPassShopItem(playerID, event.item_id, function(success, data)
+		local player = PlayerResource:GetPlayer(playerID)
+		if not success then
+			if player then
+				CustomGameEventManager:Send_ServerToPlayer(player, "supporter_pass_purchase_failed", {
+					item_id = event.item_id,
+					message = data and data.message or nil,
+				})
+			end
+			return
+		end
+
+		if SupporterPass and SupporterPass.PublishPlayer then
+			SupporterPass:PublishPlayer(playerID)
+		end
+
+		if player then
+			CustomGameEventManager:Send_ServerToPlayer(player, "supporter_pass_purchase_success", {
+				item_id = event.item_id,
+				already_owned = data and data.already_owned or false,
+			})
+		end
+	end)
 end
 
-function Battlepass:SupporterPassUpdateSettings(event)
+function Battlepass:SupporterPassClaimReward(event_source_index, event)
+	event = self:GetSupporterPassEventPayload(event_source_index, event)
 	local playerID = event.PlayerID
-	local ply_table = CustomNetTables:GetTableValue("supporter_pass_player", tostring(playerID)) or {}
+	if playerID == nil or not api or not api.ClaimSupporterPassReward then
+		return
+	end
 
-	ply_table.toggle_tag = event.toggle_tag == 1 or event.toggle_tag == true
-	ply_table.pass_rewards = event.pass_rewards == 1 or event.pass_rewards == true
+	api:ClaimSupporterPassReward(playerID, event.reward_id, function(success, data)
+		local player = PlayerResource:GetPlayer(playerID)
+		if not player then return end
+		CustomGameEventManager:Send_ServerToPlayer(player, success and "supporter_pass_claim_success" or "supporter_pass_claim_failed", {
+			reward_id = event.reward_id,
+			already_claimed = data and data.already_claimed or false,
+			message = data and data.message or nil,
+		})
+	end)
+end
+
+function Battlepass:SupporterPassEquipItem(event_source_index, event)
+	event = self:GetSupporterPassEventPayload(event_source_index, event)
+	local playerID = event.PlayerID
+	if playerID == nil or not api or not api.EquipSupporterPassItem then
+		return
+	end
+
+	api:EquipSupporterPassItem(playerID, event.item_id, event.hero, event.slot_id, function(success, data)
+		local player = PlayerResource:GetPlayer(playerID)
+		if not player then return end
+		CustomGameEventManager:Send_ServerToPlayer(player, success and "supporter_pass_equip_success" or "supporter_pass_equip_failed", {
+			item_id = event.item_id,
+			message = data and data.message or nil,
+		})
+	end)
+end
+
+function Battlepass:SupporterPassUpdateSettings(event_source_index, event)
+	event = self:GetSupporterPassEventPayload(event_source_index, event)
+	local playerID = event.PlayerID
+	if playerID == nil then
+		return
+	end
+
+	local ply_table = CustomNetTables:GetTableValue("supporter_pass_player", tostring(playerID)) or {}
+	local previous_table = {}
+	for key, value in pairs(ply_table) do
+		previous_table[key] = value
+	end
+
+	local settings = {
+		toggle_tag = event.toggle_tag == 1 or event.toggle_tag == true,
+		pass_rewards = event.pass_rewards == 1 or event.pass_rewards == true,
+		player_xp = event.player_xp == 1 or event.player_xp == true,
+		winrate_toggle = event.winrate_toggle == 1 or event.winrate_toggle == true,
+	}
+
+	ply_table.toggle_tag = settings.toggle_tag
+	ply_table.pass_rewards = settings.pass_rewards
 	ply_table.bp_rewards = ply_table.pass_rewards
-	ply_table.player_xp = event.player_xp == 1 or event.player_xp == true
-	ply_table.winrate_toggle = event.winrate_toggle == 1 or event.winrate_toggle == true
+	ply_table.player_xp = settings.player_xp
+	ply_table.winrate_toggle = settings.winrate_toggle
 
 	CustomNetTables:SetTableValue("supporter_pass_player", tostring(playerID), ply_table)
+
+	if api and api.UpdateSupporterPassSettings then
+		api:UpdateSupporterPassSettings(playerID, settings, function(success)
+			local player = PlayerResource:GetPlayer(playerID)
+
+			if not success then
+				CustomNetTables:SetTableValue("supporter_pass_player", tostring(playerID), previous_table)
+				if player then
+					CustomGameEventManager:Send_ServerToPlayer(player, "supporter_pass_settings_failed", {})
+				end
+				return
+			end
+
+			if SupporterPass and SupporterPass.PublishPlayer then
+				SupporterPass:PublishPlayer(playerID)
+			end
+
+			local hero = PlayerResource:GetSelectedHeroEntity(playerID)
+			if hero ~= nil and not hero:IsNull() then
+				if settings.toggle_tag then
+					hero:SetupHealthBarLabel()
+				else
+					hero:RemoveHealthBarLabel()
+				end
+			end
+
+			if player then
+				CustomGameEventManager:Send_ServerToPlayer(player, "supporter_pass_settings_success", {})
+			end
+		end)
+	else
+		CustomNetTables:SetTableValue("supporter_pass_player", tostring(playerID), previous_table)
+		local player = PlayerResource:GetPlayer(playerID)
+		if player then
+			CustomGameEventManager:Send_ServerToPlayer(player, "supporter_pass_settings_failed", {})
+		end
+	end
 end
 
 function Battlepass:SetOverrideAssets(hero, modifier, table_name)

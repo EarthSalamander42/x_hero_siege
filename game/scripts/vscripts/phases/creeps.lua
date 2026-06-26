@@ -1,4 +1,6 @@
-function SpawnCreeps()
+function SpawnCreeps(force)
+	if force ~= true and XHSDevTools ~= nil and XHSDevTools:IsSandboxActive() then return end
+
 	if GameMode.creep_roll["race"] < 4 then
 		GameMode.creep_roll["race"] = GameMode.creep_roll["race"] + 1
 	else

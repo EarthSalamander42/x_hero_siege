@@ -13,7 +13,6 @@
 		"ModelScale"				"1.8"
 		"Level"						"1"
 		"LeavesCorpse"				"0"
-		"UseAI"						"2"
 
 		"Ability1"					"xhs_magtheridon_brutal_slam"
 		"Ability2"					"xhs_magtheridon_fel_stomp"
@@ -83,14 +82,16 @@
 		"HealthBarOffset"			"200"
 		"Level"						"1"
 		"LeavesCorpse"				"0"
-		"UseAI"						"2"
-
-		"Ability1"					"grom_hellscream_mirror_image"
+		"Ability1"					"xhs_grom_mirror_trial"
 		"Ability2"					"juggernaut_blade_dance" 
 		"Ability3"					"chaos_knight_chaos_strike"
-		"Ability4"					"grom_hellscream_bladefury"
-		"Ability5"					"boss_health"
-		"Ability6"					"cant_die_generic"
+		"Ability4"					"xhs_grom_blade_storm"
+		"Ability5"					"xhs_grom_mirror_cleave"
+		"Ability6"					"xhs_grom_windwalk_ambush"
+		"Ability7"					"xhs_grom_warsong_leap"
+		"Ability8"					"xhs_grom_blood_frenzy"
+		"Ability9"					"boss_health"
+		"Ability10"					"cant_die_generic"
 	
 		"HasInventory"				"0"
 		"ArmorPhysical"				"200"                 // Physical protection.
@@ -142,6 +143,60 @@
 				"Wearable3" { "ItemDef" "9" }
 				"Wearable4" { "ItemDef" "62"}
 			} 
+		}
+	}
+
+	"npc_dota_hero_grom_hellscream_clone"
+	{
+		"BaseClass"					"npc_dota_creature"
+		"Model"						"models/heroes/juggernaut/juggernaut.vmdl"
+		"SoundSet"					"Hero_Juggernaut"
+		"ConsideredHero"			"1"
+		"ModelScale"                "1.8"
+		"HealthBarOffset"			"200"
+		"Level"						"1"
+		"LeavesCorpse"				"0"
+
+		"HasInventory"				"0"
+		"ArmorPhysical"				"80"
+		"MagicalResistance"			"25"
+
+		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
+		"AttackDamageMin"			"2500"
+		"AttackDamageMax"			"3200"
+		"AttackRate"				"0.75"
+		"AttackAnimationPoint"		"0.33"
+		"AttackAcquisitionRange"	"900"
+		"AttackRange"				"200"
+
+		"BountyXP"					"0"
+		"BountyGoldMin"				"0"
+		"BountyGoldMax"				"0"
+
+		"BoundsHullName"			"DOTA_HULL_SIZE_HERO"
+		"RingRadius"				"130"
+
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"
+		"MovementSpeed"				"390"
+		"MovementTurnRate"			"0.7"
+
+		"StatusHealth"				"6000"
+		"StatusHealthRegen"			"0"
+		"StatusMana"				"0"
+		"StatusManaRegen"			"0"
+
+		"VisionDaytimeRange"		"900"
+		"VisionNighttimeRange"		"900"
+
+		"Creature"
+		{
+			"AttachWearables"
+			{
+				"Wearable1" { "ItemDef" "7481" }
+				"Wearable2" { "ItemDef" "8" }
+				"Wearable3" { "ItemDef" "9" }
+				"Wearable4" { "ItemDef" "62"}
+			}
 		}
 	}
 
@@ -351,13 +406,15 @@
 		"HealthBarOffset"			"200"
 		"Level"						"1"
 		"LeavesCorpse"				"0"
-		"UseAI"						"2"
 
-		"Ability1"					"proudmoore_divine_shield" 
-		"Ability2"					"lion_voodoo"
-		"Ability3"					"xhs_creeps_phase_2_endurance_aura"
-		"Ability4"					"boss_health"
-		"Ability5"					"cant_die_generic"
+		"Ability1"					"xhs_proudmoore_admirals_command"
+		"Ability2"					"xhs_proudmoore_torrent_line"
+		"Ability3"					"xhs_proudmoore_broadside"
+		"Ability4"					"xhs_proudmoore_anchor_smash"
+		"Ability5"					"xhs_proudmoore_focus_fire"
+		"Ability6"					"xhs_proudmoore_command_aura"
+		"Ability7"					"boss_health"
+		"Ability8"					"cant_die_generic"
 
 		"ArmorPhysical"				"200"			// Physical protection.
 		"MagicalResistance"			"50"			// Magical protection (percentage).
@@ -1657,13 +1714,15 @@
 		"HealthBarOffset"			"300"
 		"ConsideredHero"			"1"
 		"LeavesCorpse"				"0"
-		"UseAI"						"2"
 
-		"Ability1"					"demonhunter_negative_energy"
-		"Ability2"					"demonhunter_immolation"
-		"Ability3"					"demonhunter_evasion"
-		"Ability4"					"cant_die_generic"
-		"Ability5"					"boss_health"
+		"Ability1"					"xhs_illidan_metamorphosis"
+		"Ability2"					"xhs_illidan_fel_beam"
+		"Ability3"					"xhs_illidan_shadow_dash"
+		"Ability4"					"xhs_illidan_immolation_burst"
+		"Ability5"					"xhs_illidan_glaive_storm"
+		"Ability6"					"xhs_illidan_demon_hunter"
+		"Ability7"					"boss_health"
+		"Ability8"					"cant_die_generic"
 
 		"ArmorPhysical"				"200"                 // Physical protection.
 		"MagicalResistance"			"50"                 // Magical protection (percentage).
@@ -1710,18 +1769,18 @@
 		"ModelScale"				"1.9"
 		"HealthBarOffset"			"300"
 		"LeavesCorpse"				"0"
-		"UseAI"						"2"
 
-		"Ability1"					"howl_of_terror"
-		"Ability2"					"demonhunter_vampiric_aura"
-		"Ability3"					"balanar_rain_of_chaos"
-		"Ability4"					"balanar_sleep"
-		"Ability5"					"neutral_spell_immunity"
-		"Ability6"					"boss_health"
-		"Ability7"					"cant_die_generic"
+		"Ability1"					"xhs_balanar_nightfall"
+		"Ability2"					"xhs_balanar_dread_howl"
+		"Ability3"					"xhs_balanar_sleeping_terror"
+		"Ability4"					"xhs_balanar_carrion_swarm"
+		"Ability5"					"xhs_balanar_rain_of_chaos"
+		"Ability6"					"xhs_balanar_vampiric_presence"
+		"Ability7"					"boss_health"
+		"Ability8"					"cant_die_generic"
 
 		"ArmorPhysical"				"150"                 // Physical protection.
-		"MagicalResistance"			"100"                 // Magical protection (percentage).
+		"MagicalResistance"			"50"                 // Magical protection (percentage).
 
 		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
 		"AttackDamageMin"			"25002"                   // Damage range min.
@@ -2577,7 +2636,6 @@
 		"Level"						"1"
 		"HasInventory"				"1"
 		"LeavesCorpse"				"0"
-		"UseAI"						"2"
 
 		"Ability1"					"arthas_holy_light"
 		"Ability2"					"proudmoore_divine_shield" 
@@ -2656,7 +2714,6 @@
 		"Level"						"7777"
 		"HasInventory"				"0"
 		"LeavesCorpse"				"0"
-		"UseAI"						"2"
 
 		"Ability1"					"arthas_holy_light"
 		"Ability2"					"enigma_black_hole"
@@ -2733,19 +2790,21 @@
 		"Level"						"1"
 		"ConsideredHero"			"1"
 		"SoundSet"					"Hero_SkeletonKing"
-		"UseAI"						"2"
 
 		// Abilities
 		//----------------------------------------------------------------
-		"Ability1"					"abaddon_aphotic_shield"
-		"Ability2"					"demonhunter_immolation"
-		"Ability3"					"creature_chronosphere"
-		"Ability4"					"necronomicon_warrior_sight"
-		"Ability5"					"boss_health"
-		"Ability6"					"arthas_frostmourne"
-		"Ability7"					"cant_die_generic"
-		"Ability8"					"holdout_blue_effect"
-		"Ability9"					"holdout_lich_king_effects"
+		"Ability1"					"xhs_lich_king_remorseless_winter"
+		"Ability2"					"xhs_lich_king_frostmourne_hunger"
+		"Ability3"					"xhs_lich_king_howling_blast"
+		"Ability4"					"xhs_lich_king_glacial_spikes"
+		"Ability5"					"xhs_lich_king_defile"
+		"Ability6"					"xhs_lich_king_sindragosa_flyby"
+		"Ability7"					"xhs_lich_king_frozen_throne"
+		"Ability8"					"boss_health"
+		"Ability9"					"cant_die_generic"
+		"Ability10"					"necronomicon_warrior_sight"
+		"Ability11"					"holdout_blue_effect"
+		"Ability12"					"holdout_lich_king_effects"
 
 		// Armor
 		//----------------------------------------------------------------
@@ -3008,17 +3067,18 @@
 		"ConsideredHero"			"1"
 		"LeavesCorpse"				"0"
 		"SoundSet"					"Hero_MonkeyKing"
-		"UseAI"						"2"
+		"UseAI"						"0"
 
 		// Abilities
 		//----------------------------------------------------------------
-		"Ability1"					"monkey_king_boundless_strike"
-		"Ability2"					"demonhunter_immolation"
+		"Ability1"					"xhs_spirit_master_palm_of_balance"
+		"Ability2"					"xhs_spirit_master_elemental_mandala"
 		"Ability3"					"boss_health"
-		"Ability4"					"arthas_frostmourne"
-		"Ability5"					"creature_primal_split"
-		"Ability6"					"necronomicon_warrior_sight"
-//		"Ability7"					"holdout_red_effect"
+		"Ability4"					"xhs_spirit_master_trinity_cycle"
+		"Ability5"					"xhs_spirit_master_spirit_call"
+		"Ability6"					"xhs_spirit_master_convergence"
+		"Ability7"					"necronomicon_warrior_sight"
+		"Ability8"					"cant_die_generic"
 
 		// Armor
 		//----------------------------------------------------------------
@@ -3103,14 +3163,14 @@
 		"Level"						"1"
 		"ConsideredHero"			"1"
 		"SoundSet"					"Hero_EmberSpirit"
-		"UseAI"						"2"
+		"UseAI"						"0"
 
 		// Abilities
 		//----------------------------------------------------------------
-		"Ability1"					"cant_die_generic"
-		"Ability2"					"demonhunter_immolation"
-		"Ability3"					"xhs_creeps_phase_2_endurance_aura"
-		"Ability4"					"arthas_frostmourne"
+		"Ability1"					"xhs_spirit_fire_cinder_step"
+		"Ability2"					"xhs_spirit_fire_solar_flare"
+		"Ability3"					"xhs_spirit_fire_wildfire_ring"
+		"Ability4"					"cant_die_generic"
 		"Ability5"					"boss_health"
 		"Ability6"					"holdout_red_effect"
 
@@ -3206,15 +3266,16 @@
 		"Level"						"1"
 		"ConsideredHero"			"1"
 		"SoundSet"					"Hero_StormSpirit"
-		"UseAI"						"2"
+		"UseAI"						"0"
 
 		// Abilities
 		//----------------------------------------------------------------
-		"Ability1"					"cant_die_generic"
-		"Ability2"					"holdout_electric_vortex"
-		"Ability3"					"xhs_creeps_phase_2_unholy_aura"
+		"Ability1"					"xhs_spirit_storm_arc_dash"
+		"Ability2"					"xhs_spirit_storm_static_orbs"
+		"Ability3"					"xhs_spirit_storm_chain_focus"
 		"Ability4"					"boss_health"
 		"Ability5"					"holdout_blue_effect"
+		"Ability6"					"cant_die_generic"
 
 		// Armor
 		//----------------------------------------------------------------
@@ -3305,14 +3366,14 @@
 		"Level"						"1"
 		"ConsideredHero"			"1"
 		"SoundSet"					"Hero_EarthSpirit"
-		"UseAI"						"2"
+		"UseAI"						"0"
 
 		// Abilities
 		//----------------------------------------------------------------
-		"Ability1"					"monkey_king_boundless_strike"
-		"Ability2"					"necronomicon_warrior_sight"
-		"Ability3"					"command_aura"
-		"Ability4"					"neutral_spell_immunity"
+		"Ability1"					"xhs_spirit_earth_fault_line"
+		"Ability2"					"xhs_spirit_earth_stone_guard"
+		"Ability3"					"xhs_spirit_earth_resonant_pillar"
+		"Ability4"					"necronomicon_warrior_sight"
 		"Ability5"					"boss_health"
 		"Ability6"					"holdout_green_effect"
 		"Ability7"					"cant_die_generic"

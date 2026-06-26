@@ -165,14 +165,39 @@ function XHSDevToolsRenderStatus() {
 	}
 
 	var result = XHSDevToolsState.last_result || {};
-	var sandbox = XHSDevToolsState.sandbox_active ? "Sandbox ON" : "Sandbox off";
+	var sandbox = XHSDevToolsState.campaign_flow_active ? "Flow ON" : (XHSDevToolsState.sandbox_active ? "Sandbox ON" : "Sandbox off");
 	var phase = XHSDevToolsState.game_phase || 0;
 	var difficulty = XHSDevToolsState.difficulty || 1;
 	var paused = XHSDevToolsState.timers_paused || 0;
-	var specialWaves = XHSDevToolsState.special_waves_disabled ? "Special waves OFF" : "Special waves ON";
 	var message = result.message || "Ready";
-	label.text = sandbox + " | Phase " + phase + " | Difficulty " + difficulty + " | Pause " + paused + " | " + specialWaves + " | " + message;
+	label.text = sandbox + " | Phase " + phase + " | Difficulty " + difficulty + " | Pause " + paused + " | " + message;
 	label.SetHasClass("Error", result.ok === false);
+}
+
+function XHSDevToolsRenderSandboxBar() {
+	var bar = $("#XHSDevToolsSandboxBar");
+	XHSDevToolsClear(bar);
+	if (!bar) {
+		return;
+	}
+
+	if (!XHSDevToolsState.enabled) {
+		bar.style.visibility = "collapse";
+		return;
+	}
+
+	bar.style.visibility = "visible";
+	var active = XHSDevToolsState.sandbox_active === true;
+	var text = $.CreatePanel("Panel", bar, "");
+	text.AddClass("XHSDevToolsSandboxText");
+	XHSDevToolsMakeLabel(text, "XHSDevToolsSandboxTitle", "Sandbox");
+	XHSDevToolsMakeLabel(text, "XHSDevToolsSandboxHint", active ? "Automatic creeps, events, timers and final wave are disabled." : "Normal automatic game flow is running.");
+
+	var button = XHSDevToolsMakeButton(bar, active ? "Disable Sandbox" : "Enable Sandbox", active ? "Warn" : "Accent", function() {
+		XHSDevToolsSend("set_sandbox", { enabled: active ? 0 : 1 });
+	});
+	button.AddClass("XHSDevToolsSandboxToggleButton");
+	button.SetHasClass("Active", active);
 }
 
 function XHSDevToolsRenderUnavailable(parent) {
@@ -249,7 +274,7 @@ function XHSDevToolsRenderScenarios(parent) {
 
 function XHSDevToolsRenderBosses(parent) {
 	var bosses = XHSDevToolsMakeSection(parent, "Bosses");
-	XHSDevToolsMakeLabel(bosses, "XHSDevToolsMuted", "Start a boss test in sandbox. Active boss tests are shown directly on their card.");
+	XHSDevToolsMakeLabel(bosses, "XHSDevToolsMuted", "Start Test isolates the boss in sandbox. Start Flow launches a campaign checkpoint and lets normal progression continue.");
 	var bossGrid = $.CreatePanel("Panel", bosses, "");
 	bossGrid.AddClass("XHSDevToolsBossGrid");
 	for (var i = 0; i < XHS_DEVTOOLS_BOSSES.length; i++) {
@@ -268,8 +293,11 @@ function XHSDevToolsRenderBosses(parent) {
 			XHSDevToolsMakeLabel(text, "XHSDevToolsBossName", boss.label);
 			XHSDevToolsMakeLabel(text, "XHSDevToolsBossStatus", activity.active ? ("Active - " + activity.health + "%") : "Ready");
 
-			XHSDevToolsMakeButton(card, "Start", "Accent", function() {
+			XHSDevToolsMakeButton(card, "Start Test", "Accent", function() {
 				XHSDevToolsSend("start_boss", { boss: boss.id });
+			});
+			XHSDevToolsMakeButton(card, "Start Flow", "Flow", function() {
+				XHSDevToolsSend("start_boss_flow", { boss: boss.id });
 			});
 		})(XHS_DEVTOOLS_BOSSES[i]);
 	}
@@ -322,13 +350,9 @@ function XHSDevToolsRenderLanes(parent) {
 	}
 
 	var waveSection = XHSDevToolsMakeSection(parent, "Wave Tools");
-	var disabled = XHSDevToolsState.special_waves_disabled === true;
-	XHSDevToolsMakeLabel(waveSection, "XHSDevToolsMuted", disabled ? "Automatic special waves are disabled. Manual triggers still work." : "Automatic special waves are enabled.");
+	XHSDevToolsMakeLabel(waveSection, "XHSDevToolsMuted", "Use the global Sandbox toggle above to stop automatic waves and timers. Manual triggers still work.");
 	var grid = $.CreatePanel("Panel", waveSection, "");
 	grid.AddClass("XHSDevToolsGrid");
-	XHSDevToolsMakeButton(grid, disabled ? "Enable Special Waves" : "Disable Special Waves", disabled ? "Accent" : "Warn", function() {
-		XHSDevToolsSend("set_special_waves_disabled", { disabled: disabled ? 0 : 1 });
-	});
 	XHSDevToolsMakeButton(grid, "Spawn Enabled Lanes", "", function() {
 		XHSDevToolsSend("spawn_lane_wave", { lane: 0 });
 	});
@@ -427,6 +451,7 @@ function XHSDevToolsRender() {
 	}
 
 	XHSDevToolsRenderStatus();
+	XHSDevToolsRenderSandboxBar();
 
 	var tabs = $("#XHSDevToolsTabs");
 	var content = $("#XHSDevToolsContent");

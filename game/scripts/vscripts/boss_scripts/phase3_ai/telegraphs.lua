@@ -20,7 +20,11 @@ local function CreateWarning(position, radius, duration, primary, secondary, sty
 	ParticleManager:SetParticleControl(particle, 3, primary or XHSBossTelegraphs.DEFAULT_PRIMARY)
 	ParticleManager:SetParticleControl(particle, 4, secondary or XHSBossTelegraphs.DEFAULT_SECONDARY)
 	ParticleManager:SetParticleControl(particle, 5, Vector(style or 0, 0, 0))
-	ParticleManager:ReleaseParticleIndex(particle)
+	Timers:CreateTimer(math.max(0.1, duration or 1.0) + 0.15, function()
+		ParticleManager:DestroyParticle(particle, false)
+		ParticleManager:ReleaseParticleIndex(particle)
+		return nil
+	end)
 	return particle
 end
 

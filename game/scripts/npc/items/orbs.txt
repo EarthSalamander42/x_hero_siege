@@ -715,7 +715,7 @@
 		"BaseClass"                     "item_lua"
 		"ScriptFile"					"items/item_orb_of_earth.lua"
 		"AbilityTextureName"			"custom/orb_of_earth"
-		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"ItemShopTags"					"damage"
 		"ItemAliases"					"orb of earth"
 		"ItemPermanent"					"0"
@@ -763,7 +763,7 @@
 		"BaseClass"                     "item_lua"
 		"ScriptFile"					"items/item_orb_of_earth.lua"
 		"AbilityTextureName"			"custom/orb_of_earth3"
-		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 
 		// Shops
 		"ItemCost"						"20000"
@@ -837,7 +837,7 @@
 		"BaseClass"                     "item_lua"
 		"ScriptFile"					"items/item_orb_of_earth.lua"
 		"AbilityTextureName"			"custom/orb_of_earth2"
-		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 
 		// Shops
 		"ItemCost"						"50000"
@@ -1084,7 +1084,7 @@
 		"BaseClass"						"item_lua"
 		"ScriptFile"					"items/item_orb_of_arcane.lua"
 		"AbilityTextureName"			"custom/orb_of_arcane"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
 		"ItemShopTags"					"spell_amp;mana_regen"
 		"ItemQuality"					"artifact"
@@ -1127,7 +1127,7 @@
 		"BaseClass"						"item_lua"
 		"ScriptFile"					"items/item_orb_of_arcane.lua"
 		"AbilityTextureName"			"custom/mystic_gem"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
 		"ItemShopTags"					"spell_amp;mana_regen"
 		"ItemQuality"					"artifact"
@@ -1189,7 +1189,7 @@
 		"BaseClass"						"item_lua"
 		"ScriptFile"					"items/item_orb_of_arcane.lua"
 		"AbilityTextureName"			"custom/astral_core"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
 		"ItemShopTags"					"spell_amp;mana_regen"
 		"ItemQuality"					"epic"
@@ -1248,13 +1248,13 @@
 	//=================================================================================================================
 	// Orb of Venom
 	//=================================================================================================================
-	"item_orb_of_venom"
+	"item_xhs_orb_of_venom"
 	{
 		"ID"							"2561"
 		"BaseClass"						"item_lua"
 		"ScriptFile"					"items/item_orb_of_venom_xhs.lua"
 		"AbilityTextureName"			"custom/orb_of_venom"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
 		"ItemShopTags"					"damage"
 		"ItemQuality"					"artifact"
@@ -1296,7 +1296,7 @@
 		"BaseClass"						"item_lua"
 		"ScriptFile"					"items/item_orb_of_venom_xhs.lua"
 		"AbilityTextureName"			"custom/viridian_gem"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
 		"ItemShopTags"					"damage"
 		"ItemQuality"					"artifact"
@@ -1344,7 +1344,7 @@
 		"ItemResult"					"item_viridian_gem"
 		"ItemRequirements"
 		{
-			"01"						"item_orb_of_venom"
+			"01"						"item_xhs_orb_of_venom"
 		}
 	}
 
@@ -1357,7 +1357,7 @@
 		"BaseClass"						"item_lua"
 		"ScriptFile"					"items/item_orb_of_venom_xhs.lua"
 		"AbilityTextureName"			"custom/plagueheart"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
 		"ItemShopTags"					"damage"
 		"ItemQuality"					"epic"

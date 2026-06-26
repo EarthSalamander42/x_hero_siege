@@ -5,6 +5,17 @@ SupporterPass.LEGACY_FRAGMENT_PER_LEVEL = 50
 SupporterPass.LEGACY_FRAGMENT_CAP = 5000
 SupporterPass.SEASON_XP_PER_LEVEL = 1000
 
+local function FirstSupporterValue(...)
+	for i = 1, select("#", ...) do
+		local value = select(i, ...)
+		if value ~= nil then
+			return value
+		end
+	end
+
+	return nil
+end
+
 SupporterPass.TIERS = {
 	[1] = {
 		id = 1,
@@ -120,40 +131,49 @@ function SupporterPass:PublishMeta()
 end
 
 function SupporterPass:PublishFeaturedShop()
+	if api and api.supporter_pass and api.supporter_pass.shop then
+		CustomNetTables:SetTableValue("supporter_pass_shop", "featured", api.supporter_pass.shop)
+		return
+	end
+
 	CustomNetTables:SetTableValue("supporter_pass_shop", "featured", {
 		refresh_label = "Weekly featured rotation",
 		items = {
 			{
-				id = "companion_featured_001",
-				name = "Featured Companion",
-				type = "Companion",
-				rarity = "Rare",
-				price = 650,
-				image = "battlepass/assets/btn_donator.png",
-			},
-			{
-				id = "emblem_featured_001",
-				name = "Azure Emblem",
+				id = "legacy_bp_emblem_sunken",
+				item_id = "21",
+				name = "battlepass_emblem_sunken",
 				type = "Emblem",
-				rarity = "Rare",
+				rarity = "immortal",
 				price = 500,
-				image = "battlepass/assets/btn_battlepass.png",
+				image = "battlepass/emblem_sunken",
 			},
 			{
-				id = "effigy_featured_001",
-				name = "Base Effigy",
-				type = "Effigy",
-				rarity = "Epic",
+				id = "legacy_bp_emblem_aghanim",
+				item_id = "24",
+				name = "battlepass_emblem_aghanim",
+				type = "Emblem",
+				rarity = "immortal",
 				price = 900,
-				image = "battlepass/assets/btn_leaderboard.png",
+				image = "battlepass/emblem_aghanim",
 			},
 			{
-				id = "bundle_featured_001",
-				name = "Blue Siege Bundle",
-				type = "Bundle",
-				rarity = "Mythical",
-				price = 1600,
-				image = "battlepass/battlepass_new.png",
+				id = "legacy_bp_kill_rubick",
+				item_id = "36",
+				name = "battlepass_kill_effect_rubick",
+				type = "Kill FX",
+				rarity = "uncommon",
+				price = 750,
+				image = "battlepass/kill_effect_rubick",
+			},
+			{
+				id = "legacy_bp_tome_fall2022",
+				item_id = "40",
+				name = "battlepass_levelup8",
+				type = "Tome FX",
+				rarity = "legendary",
+				price = 1200,
+				image = "battlepass/levelup8",
 			},
 		},
 	})
@@ -165,40 +185,59 @@ function SupporterPass:BuildPlayerTable(playerID)
 	end
 
 	local steamID = tostring(PlayerResource:GetSteamID(playerID))
+	local current = CustomNetTables:GetTableValue("supporter_pass_player", tostring(playerID)) or {}
 	local player = api and api.players and api.players[steamID] or {}
 	local supporterPass = player.supporter_pass or {}
-	local passTierID = tonumber(supporterPass.tier_id) or 0
-	local statusTierID = api and api.GetDonatorStatus and self:GetTierForStatus(api:GetDonatorStatus(playerID)) or 0
+	local season = supporterPass.season or {}
+	local account = supporterPass.account or {}
+	local settings = supporterPass.settings or player.settings or {}
+	local passTierID = tonumber(FirstSupporterValue(supporterPass.tier_id, current.tier_id)) or 0
+	local donatorStatus = api and api.GetDonatorStatus and api:GetDonatorStatus(playerID) or 0
+	local statusTierID = self:GetTierForStatus(donatorStatus)
 	local tierID = math.max(passTierID, statusTierID)
 	local tier = self:GetTierByID(tierID)
-	local accountLevel = tonumber(player.account_level or player.xp_level or supporterPass.account_level) or 0
-	local seasonLevel = math.max(tonumber(supporterPass.season_level or supporterPass.level) or 1, 1)
-	local seasonXP = tonumber(supporterPass.season_xp or supporterPass.current_exp) or 0
-	local seasonXPMax = self.SEASON_XP_PER_LEVEL
+	local accountLevel = tonumber(FirstSupporterValue(account.level, player.account_level, player.xp_level, supporterPass.account_level, current.account_level)) or 0
+	local seasonLevel = math.max(tonumber(FirstSupporterValue(season.level, supporterPass.season_level, supporterPass.level, current.season_level, current.Lvl)) or 1, 1)
+	local seasonXP = tonumber(FirstSupporterValue(season.xp, supporterPass.season_xp, supporterPass.current_exp, current.season_xp, current.XP)) or 0
+	local seasonXPMax = tonumber(FirstSupporterValue(season.xp_per_level, supporterPass.season_xp_max, supporterPass.xp_per_level, current.season_xp_max, current.MaxXP)) or self.SEASON_XP_PER_LEVEL
+	local passRewards = FirstSupporterValue(settings.pass_rewards, player.pass_rewards)
+	if passRewards == nil then
+		passRewards = player.bp_rewards
+	end
 
 	return {
 		steamid = steamID,
+		XP = seasonXP,
+		MaxXP = seasonXPMax,
+		Lvl = seasonLevel,
+		title = "Supporter Pass",
+		donator_level = donatorStatus,
 		tier_id = tierID,
-		tier_name = supporterPass.tier_name or self:GetTierName(tierID),
-		tier_color = supporterPass.tier_color or self:GetTierColor(tierID),
-		fragments = tonumber(supporterPass.fragments or supporterPass.fragment_balance) or 0,
-		weekly_fragments = tonumber(supporterPass.weekly_fragments or supporterPass.weekly_earned) or 0,
-		weekly_cap = tonumber(supporterPass.weekly_cap) or self.WEEKLY_FRAGMENT_CAP,
-		monthly_fragments = tier and tier.fragments or 0,
-		xp_boost = tier and tier.xp_boost or 0,
+		tier_name = FirstSupporterValue(supporterPass.tier_name, current.tier_name, self:GetTierName(tierID)),
+		tier_color = FirstSupporterValue(supporterPass.tier_color, current.tier_color, self:GetTierColor(tierID)),
+		fragments = tonumber(FirstSupporterValue(supporterPass.fragments, supporterPass.fragment_balance, current.fragments, current.fragment_balance)) or 0,
+		weekly_fragments = tonumber(FirstSupporterValue(supporterPass.weekly_fragments, supporterPass.weekly_earned, current.weekly_fragments, current.weekly_earned)) or 0,
+		weekly_cap = tonumber(FirstSupporterValue(supporterPass.weekly_cap, current.weekly_cap)) or self.WEEKLY_FRAGMENT_CAP,
+		monthly_fragments = tonumber(FirstSupporterValue(supporterPass.monthly_fragments, current.monthly_fragments)) or (tier and tier.fragments or 0),
+		xp_boost = tonumber(FirstSupporterValue(supporterPass.xp_boost, current.xp_boost)) or (tier and tier.xp_boost or 0),
 		season_level = seasonLevel,
 		season_xp = seasonXP,
 		season_xp_max = seasonXPMax,
 		account_level = accountLevel,
-		account_title = "Supporter Pass",
-		legacy_fragments = tonumber(supporterPass.legacy_fragments) or self:LegacyFragments(accountLevel),
-		toggle_tag = player.toggle_tag,
-		pass_rewards = player.pass_rewards or player.bp_rewards,
-		player_xp = player.player_xp,
-		winrate = player.winrate or player.winrate_x_hero_siege,
-		winrate_toggle = player.winrate_toggle,
-		ingame_tag = player.ingame_tag,
-		supporter_url = supporterPass.url or player.supporter_url or "https://www.patreon.com/frostrose",
+		account_title = FirstSupporterValue(account.title, current.account_title, "Supporter Pass"),
+		legacy_fragments = tonumber(FirstSupporterValue(supporterPass.legacy_fragments, current.legacy_fragments)) or self:LegacyFragments(accountLevel),
+		toggle_tag = FirstSupporterValue(settings.toggle_tag, player.toggle_tag, current.toggle_tag),
+		pass_rewards = passRewards,
+		bp_rewards = passRewards,
+		player_xp = FirstSupporterValue(settings.player_xp, player.player_xp, current.player_xp),
+		winrate = FirstSupporterValue(player.winrate, player.winrate_x_hero_siege, current.winrate),
+		winrate_toggle = FirstSupporterValue(settings.winrate_toggle, player.winrate_toggle, current.winrate_toggle),
+		ingame_tag = FirstSupporterValue(player.ingame_tag, current.ingame_tag),
+		supporter_url = FirstSupporterValue(supporterPass.url, supporterPass.supporter_url, player.supporter_url, current.supporter_url, "https://www.patreon.com/bePatron?u=2533325"),
+		purchases = supporterPass.purchases or current.purchases,
+		entitlements = supporterPass.entitlements or current.entitlements,
+		loadout = supporterPass.loadout or current.loadout,
+		claimed_rewards = supporterPass.claimed_rewards or current.claimed_rewards,
 	}
 end
 
@@ -212,6 +251,20 @@ end
 function SupporterPass:PublishPlayers()
 	self:PublishMeta()
 	self:PublishFeaturedShop()
+
+	if api and api.supporter_pass and api.supporter_pass.rewards then
+		local freeRewards = {}
+		local premiumRewards = {}
+		for _, reward in pairs(api.supporter_pass.rewards) do
+			if reward.track == "premium" then
+				table.insert(premiumRewards, reward)
+			else
+				table.insert(freeRewards, reward)
+			end
+		end
+		CustomNetTables:SetTableValue("supporter_pass_rewards_free", "rewards", freeRewards)
+		CustomNetTables:SetTableValue("supporter_pass_rewards_premium", "rewards", premiumRewards)
+	end
 
 	for playerID = 0, PlayerResource:GetPlayerCount() - 1 do
 		self:PublishPlayer(playerID)

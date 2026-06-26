@@ -3216,6 +3216,39 @@
 	text-overflow: shrink;
 }
 
+#vote_difficulty .vote-choice-cell {
+	margin-left: 10px;
+	margin-right: 10px;
+}
+
+#vote_difficulty .vote-select-panel {
+	height: 290px;
+	min-height: 290px;
+	padding: 20px 10px 14px 10px;
+}
+
+#vote_difficulty .vote-select-title {
+	margin-top: 0px;
+	margin-bottom: 18px;
+	font-size: 42px;
+	line-height: 48px;
+}
+
+#vote_difficulty .vote-select-description {
+	padding-left: 0px;
+	padding-right: 0px;
+	font-size: 20px;
+	line-height: 24px;
+	text-align: left top;
+	text-overflow: shrink;
+}
+
+#vote_difficulty .vote-select-panel .vote-button {
+	width: 86%;
+	height: 42px;
+	margin-top: 8px;
+}
+
 .vote-select-panel .vote-button {
 	width: 84%;
 	height: 38px;

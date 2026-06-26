@@ -132,6 +132,11 @@
 	border-top-right-radius: 6px;
 }
 
+#tpCharges
+{
+	opacity: 0;
+}
+
 #DialogPanel
 {
 	horizontal-align: center;

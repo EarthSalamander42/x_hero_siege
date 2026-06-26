@@ -5,12 +5,19 @@ balanar_rain_of_chaos = balanar_rain_of_chaos or class({})
 holdout_rain_of_chaos = balanar_rain_of_chaos
 holdout_rain_of_chaos_20 = balanar_rain_of_chaos
 
+local METEOR_FLY_PARTICLE = "particles/units/heroes/hero_invoker/invoker_chaos_meteor_fly.vpcf"
+local METEOR_WARNING_PARTICLE = "particles/econ/events/darkmoon_2017/darkmoon_generic_aoe.vpcf"
+local METEOR_IMPACT_PARTICLE = "particles/units/heroes/hero_invoker/invoker_chaos_meteor_land_soil.vpcf"
+local METEOR_CRUMBLE_PARTICLE = "particles/units/heroes/hero_invoker/invoker_chaos_meteor_crumble.vpcf"
+local WARNING_LIFETIME = 1.2
+
 function balanar_rain_of_chaos:OnSpellStart()
 	local caster = self:GetCaster()
 
 	self.radius = self:GetSpecialValueFor("radius")
 	self.radius_explosion = self:GetSpecialValueFor("radius_explosion")
 	self.meteors_per_tick = self:GetSpecialValueFor("meteors_per_tick")
+	self.unit_per_meteor = self:GetSpecialValueFor("unit_per_meteor")
 	self.interval = self:GetSpecialValueFor("time_between_meteors")
 	self.duration = self:GetSpecialValueFor("duration")
 	self.damage = self:GetSpecialValueFor("damage_per_unit")
@@ -78,35 +85,73 @@ function modifier_balanar_rain_of_chaos:OnIntervalThink()
 		return
 	end
 
-	local enemies = FindUnitsInRadius(self.caster:GetTeamNumber(), self.caster:GetAbsOrigin(), nil, self.ability.seek_radius, self.ability:GetAbilityTargetTeam(), self.ability:GetAbilityTargetType(), self.ability:GetAbilityTargetFlags(), FIND_ANY_ORDER, false)
-	local point
+	local points = {}
+	local unitPerMeteor = tonumber(self.ability.unit_per_meteor) or 0
 
-	if #enemies == 0 then
-		point = self.caster:GetAbsOrigin() + RandomInt(200, self.ability.radius) * RandomVector(1)
+	if unitPerMeteor > 0 then
+		unitPerMeteor = math.max(1, math.floor(unitPerMeteor))
+		local heroes = FindUnitsInRadius(
+			self.caster:GetTeamNumber(),
+			self.caster:GetAbsOrigin(),
+			nil,
+			self.ability.seek_radius,
+			DOTA_UNIT_TARGET_TEAM_ENEMY,
+			DOTA_UNIT_TARGET_HERO,
+			self.ability:GetAbilityTargetFlags(),
+			FIND_ANY_ORDER,
+			false
+		)
+
+		for index, hero in ipairs(heroes) do
+			if hero ~= nil and not hero:IsNull() and hero:IsAlive() and ((index - 1) % unitPerMeteor) == 0 then
+				points[#points + 1] = hero:GetAbsOrigin()
+			end
+		end
 	else
-		local random_enemy = enemies[RandomInt(1, #enemies)]
+		local enemies = FindUnitsInRadius(self.caster:GetTeamNumber(), self.caster:GetAbsOrigin(), nil, self.ability.seek_radius, self.ability:GetAbilityTargetTeam(), self.ability:GetAbilityTargetType(), self.ability:GetAbilityTargetFlags(), FIND_ANY_ORDER, false)
+		local point
 
-		if random_enemy and not random_enemy:IsNull() then
-			point = random_enemy:GetAbsOrigin()
+		if #enemies == 0 then
+			point = self.caster:GetAbsOrigin() + RandomInt(200, self.ability.radius) * RandomVector(1)
+		else
+			local random_enemy = enemies[RandomInt(1, #enemies)]
+
+			if random_enemy and not random_enemy:IsNull() then
+				point = random_enemy:GetAbsOrigin()
+			end
+		end
+
+		if point == nil then
+			point = self.caster:GetAbsOrigin() + RandomInt(200, self.ability.radius) * RandomVector(1)
+		end
+
+		for i = 1, math.max(1, self.ability.meteors_per_tick or 1) do
+			points[#points + 1] = point
 		end
 	end
 
-	if point == nil then
-		point = self.caster:GetAbsOrigin() + RandomInt(200, self.ability.radius) * RandomVector(1)
+	if #points == 0 then
+		points[1] = self.caster:GetAbsOrigin() + RandomInt(200, self.ability.radius) * RandomVector(1)
 	end
 
-	for i = 1, self.ability.meteors_per_tick do
-		local meteor = ParticleManager:CreateParticle("particles/units/heroes/hero_invoker/invoker_chaos_meteor_fly.vpcf", PATTACH_CUSTOMORIGIN, self.caster)
+	for _, point in ipairs(points) do
+		local meteor = ParticleManager:CreateParticle(METEOR_FLY_PARTICLE, PATTACH_CUSTOMORIGIN, self.caster)
 		ParticleManager:SetParticleControl(meteor, 0, point + Vector(0, 0, 500))
 		ParticleManager:SetParticleControl(meteor, 1, point)
 		ParticleManager:SetParticleControl(meteor, 2, Vector(1.2, 0, 0))
+		ParticleManager:ReleaseParticleIndex(meteor)
 
-		local warning = ParticleManager:CreateParticle("particles/econ/events/darkmoon_2017/darkmoon_generic_aoe.vpcf", PATTACH_CUSTOMORIGIN, self.caster)
+		local warning = ParticleManager:CreateParticle(METEOR_WARNING_PARTICLE, PATTACH_CUSTOMORIGIN, self.caster)
 		ParticleManager:SetParticleControl(warning, 0, point)
 		ParticleManager:SetParticleControl(warning, 1, Vector(self.ability.radius_explosion, 0, 0))
-		ParticleManager:SetParticleControl(warning, 2, Vector(6, 0, 1))
+		ParticleManager:SetParticleControl(warning, 2, Vector(WARNING_LIFETIME, 0, 1))
 		ParticleManager:SetParticleControl(warning, 3, Vector(200, 0, 0))
 		ParticleManager:SetParticleControl(warning, 4, point)
+		Timers:CreateTimer(WARNING_LIFETIME + 0.1, function()
+			ParticleManager:DestroyParticle(warning, false)
+			ParticleManager:ReleaseParticleIndex(warning)
+			return nil
+		end)
 
 		local unit = CreateUnitByName("dummy_unit_invulnerable", point, true, nil, nil, self.caster:GetTeamNumber())
 		if unit == nil or unit:IsNull() then
@@ -179,11 +224,13 @@ function modifier_balanar_rain_of_chaos_dummy:OnDestroy()
 		end
 	end
 
-	local soil = ParticleManager:CreateParticle("particles/units/heroes/hero_invoker/invoker_chaos_meteor_land_soil.vpcf", PATTACH_CUSTOMORIGIN, attacker)
+	local soil = ParticleManager:CreateParticle(METEOR_IMPACT_PARTICLE, PATTACH_CUSTOMORIGIN, attacker)
 	ParticleManager:SetParticleControl(soil, 3, parent:GetAbsOrigin() + Vector(0, 0, 40))
+	ParticleManager:ReleaseParticleIndex(soil)
 
-	local crumble = ParticleManager:CreateParticle("particles/units/heroes/hero_invoker/invoker_chaos_meteor_crumble.vpcf", PATTACH_CUSTOMORIGIN, attacker)
+	local crumble = ParticleManager:CreateParticle(METEOR_CRUMBLE_PARTICLE, PATTACH_CUSTOMORIGIN, attacker)
 	ParticleManager:SetParticleControl(crumble, 3, parent:GetAbsOrigin())
+	ParticleManager:ReleaseParticleIndex(crumble)
 
 	-- only balanar boss should spawn golems
 	if ability.golem_duration and ability.golem_duration > 0 then
