@@ -249,6 +249,39 @@ function XHSDevTools:RunAction(action, event)
 		return "Tomes granted"
 	elseif action == "toggle_invulnerable" then
 		return self:ToggleInvulnerable()
+	elseif action == "set_temporary_donator_status" then
+		return self:SetTemporaryDonatorStatus(event)
+	elseif action == "fragment_quests_reroll" then
+		if FragmentQuests == nil then return "FragmentQuests is unavailable" end
+		FragmentQuests:DevReroll()
+		return "Fragment quests rerolled"
+	elseif action == "fragment_quest_force" then
+		if FragmentQuests == nil then return "FragmentQuests is unavailable" end
+		local ok, message = FragmentQuests:ForceQuest(event.template_id, event.target_id, ToNumber(event.slot, 1))
+		if ok ~= true then error(message or "Failed to force fragment quest") end
+		return message or "Fragment quest forced"
+	elseif action == "fragment_quest_progress" then
+		if FragmentQuests == nil then return "FragmentQuests is unavailable" end
+		FragmentQuests:DevAddProgress(event.metric, ToNumber(event.amount, 1))
+		return "Fragment quest progress added"
+	elseif action == "fragment_quest_backend_success" then
+		if FragmentQuests == nil then return "FragmentQuests is unavailable" end
+		FragmentQuests:DevSimulateBackend(true)
+		return "Fragment quest backend success simulated"
+	elseif action == "fragment_quest_backend_error" then
+		if FragmentQuests == nil then return "FragmentQuests is unavailable" end
+		FragmentQuests:DevSimulateBackend(false)
+		return "Fragment quest backend error simulated"
+	elseif action == "fragment_quest_dump_payload" then
+		if FragmentQuests == nil then return "FragmentQuests is unavailable" end
+		FragmentQuests:DevDumpPayload()
+		return "Fragment quest analytics payload dumped to console"
+	elseif action == "fragment_quest_complete_window" then
+		if FragmentQuests == nil then return "FragmentQuests is unavailable" end
+		if FragmentQuests:DevCompleteWindow(event.window, event.value) ~= true then
+			error("Unknown fragment quest window")
+		end
+		return "Fragment quest window completed"
 	elseif action == "cleanup" then
 		return self:Cleanup()
 	elseif action == "reset_sandbox" then
@@ -723,6 +756,73 @@ function XHSDevTools:ToggleInvulnerable()
 	return self.invulnerable_players and "Hero invulnerability enabled" or "Hero invulnerability disabled"
 end
 
+function XHSDevTools:SetTemporaryDonatorStatus(event)
+	if api == nil or api.SetTemporaryDonatorStatus == nil then
+		return "Donator API is unavailable"
+	end
+
+	local playerID = ToNumber(event.target_player_id, ToNumber(event.PlayerID, -1))
+	if not PlayerResource:IsValidPlayerID(playerID) then
+		return "Invalid player ID for temporary donator status"
+	end
+
+	if IsTruthy(event.clear) then
+		api:SetTemporaryDonatorStatus(playerID, nil)
+		self:RefreshTemporaryDonatorStatus(playerID)
+		return "Temporary donator status cleared"
+	end
+
+	local status = math.max(0, math.min(10, math.floor(ToNumber(event.status, 0))))
+	api:SetTemporaryDonatorStatus(playerID, status)
+	self:RefreshTemporaryDonatorStatus(playerID)
+	return "Temporary donator status set to " .. tostring(status)
+end
+
+function XHSDevTools:RefreshTemporaryDonatorStatus(playerID)
+	if api ~= nil and api.InitDonatorTableJS ~= nil then
+		api:InitDonatorTableJS()
+	end
+
+	if SupporterPass ~= nil and SupporterPass.PublishPlayer ~= nil then
+		SupporterPass:PublishPlayer(playerID)
+	elseif CustomNetTables ~= nil and api ~= nil and api.GetDonatorStatus ~= nil then
+		local playerTable = CustomNetTables:GetTableValue("supporter_pass_player", tostring(playerID)) or {}
+		playerTable.donator_level = api:GetDonatorStatus(playerID)
+		CustomNetTables:SetTableValue("supporter_pass_player", tostring(playerID), playerTable)
+	end
+
+	local hero = PlayerResource:GetSelectedHeroEntity(playerID)
+	if hero ~= nil and not hero:IsNull() then
+		local status = api:GetDonatorStatus(playerID)
+		local modifier = hero:FindModifierByName("modifier_patreon_donator")
+
+		if status == 10 then
+			if modifier ~= nil then
+				hero:RemoveModifierByName("modifier_patreon_donator")
+			end
+		else
+			if modifier == nil then
+				modifier = hero:AddNewModifier(hero, nil, "modifier_patreon_donator", {})
+			end
+
+			if modifier ~= nil then
+				modifier:SetStackCount(status)
+				modifier.current_effect_name = nil
+
+				if modifier.SetDonatorEffect ~= nil and api.GetPlayerEmblem ~= nil then
+					modifier:SetDonatorEffect(api:GetPlayerEmblem(playerID))
+				elseif modifier.RefreshEffect ~= nil then
+					modifier:RefreshEffect()
+				end
+			end
+		end
+
+		if hero.SetupHealthBarLabel ~= nil then
+			hero:SetupHealthBarLabel()
+		end
+	end
+end
+
 function XHSDevTools:Cleanup()
 	self:RemoveDevSpawnedUnits()
 	if KillCreeps then
@@ -884,6 +984,30 @@ function XHSDevTools:BuildBossState()
 	return bosses
 end
 
+function XHSDevTools:BuildDonatorState()
+	local statuses = {}
+	if api == nil or api.GetDonatorStatus == nil then
+		return statuses
+	end
+
+	for playerID = 0, PlayerResource:GetPlayerCount() - 1 do
+		if PlayerResource:IsValidPlayerID(playerID) then
+			local temporaryStatus = nil
+			if api.GetTemporaryDonatorStatus ~= nil then
+				temporaryStatus = api:GetTemporaryDonatorStatus(playerID)
+			end
+
+			statuses[tostring(playerID)] = {
+				status = api:GetDonatorStatus(playerID),
+				temporary_status = temporaryStatus,
+				has_override = temporaryStatus ~= nil,
+			}
+		end
+	end
+
+	return statuses
+end
+
 function XHSDevTools:PushState()
 	if CustomNetTables == nil then return end
 
@@ -903,6 +1027,8 @@ function XHSDevTools:PushState()
 		lanes = self.enabled and self:BuildLaneState() or {},
 		quests = self.enabled and self:BuildQuestState() or {},
 		bosses = self.enabled and self:BuildBossState() or {},
+		donator_statuses = self.enabled and self:BuildDonatorState() or {},
+		fragment_quests = self.enabled and FragmentQuests ~= nil and FragmentQuests:BuildDevtoolsState() or {},
 		last_result = self.last_result or {},
 	})
 end

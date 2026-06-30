@@ -115,6 +115,7 @@ xhs_spirit_master_overload = xhs_spirit_master_overload or class({})
 LinkLuaModifier("modifier_imba_overload",			"abilities/heroes/hero_spirit_master.lua", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_imba_overload_buff",		"abilities/heroes/hero_spirit_master.lua", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_imba_overload_debuff",	"abilities/heroes/hero_spirit_master.lua", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_xhs_spirit_master_ball_lightning", "abilities/heroes/hero_spirit_master.lua", LUA_MODIFIER_MOTION_NONE)
 
 function xhs_spirit_master_overload:GetIntrinsicModifierName()
 	return "modifier_imba_overload"
@@ -297,6 +298,104 @@ end
 
 function modifier_imba_overload_debuff:GetModifierAttackSpeedBonus_Constant()
 	return self.attack_slow
+end
+
+xhs_spirit_master_ball_lightning = xhs_spirit_master_ball_lightning or class({})
+
+function xhs_spirit_master_ball_lightning:OnSpellStart()
+	if not IsServer() then return end
+
+	local caster = self:GetCaster()
+	local origin = caster:GetAbsOrigin()
+	local target = self:GetCursorPosition()
+	local direction = target - origin
+	direction.z = 0
+
+	if direction:Length2D() < 1 then
+		direction = caster:GetForwardVector()
+	else
+		direction = direction:Normalized()
+	end
+
+	local distance = math.min((target - origin):Length2D(), self:GetCastRange(origin, caster))
+	local speed = self:GetSpecialValueFor("ball_lightning_move_speed")
+	local duration = math.max(distance / speed, 0.03)
+	local destination = origin + direction * distance
+
+	self:SpendTravelMana(distance)
+	ProjectileManager:ProjectileDodge(caster)
+	caster:AddNewModifier(caster, self, "modifier_xhs_spirit_master_ball_lightning", { duration = duration + 0.05 })
+	caster:EmitSound("Hero_StormSpirit.BallLightning")
+
+	local pfx = ParticleManager:CreateParticle("particles/units/heroes/hero_stormspirit/stormspirit_ball_lightning.vpcf", PATTACH_ABSORIGIN_FOLLOW, caster)
+	local hit = {}
+	local elapsed = 0
+
+	Timers:CreateTimer(0, function()
+		if caster:IsNull() then return end
+
+		elapsed = elapsed + 0.03
+		local progress = math.min(elapsed / duration, 1)
+		local position = origin + direction * distance * progress
+		caster:SetAbsOrigin(position)
+
+		local enemies = FindUnitsInRadius(
+			caster:GetTeamNumber(),
+			position,
+			nil,
+			self:GetSpecialValueFor("ball_lightning_aoe"),
+			DOTA_UNIT_TARGET_TEAM_ENEMY,
+			DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC,
+			DOTA_UNIT_TARGET_FLAG_NONE,
+			FIND_ANY_ORDER,
+			false
+		)
+
+		for _, enemy in pairs(enemies) do
+			local index = enemy:entindex()
+			if not hit[index] then
+				hit[index] = true
+				ApplyDamage({
+					victim = enemy,
+					attacker = caster,
+					damage = self:GetAbilityDamage(),
+					damage_type = self:GetAbilityDamageType(),
+					ability = self
+				})
+			end
+		end
+
+		if progress < 1 then
+			return 0.03
+		end
+
+		ParticleManager:DestroyParticle(pfx, false)
+		ParticleManager:ReleaseParticleIndex(pfx)
+		FindClearSpaceForUnit(caster, destination, true)
+		AddFOWViewer(caster:GetTeamNumber(), destination, self:GetSpecialValueFor("ball_lightning_vision_radius"), 1.0, false)
+	end)
+end
+
+function xhs_spirit_master_ball_lightning:SpendTravelMana(distance)
+	local caster = self:GetCaster()
+	local initial = self:GetSpecialValueFor("ball_lightning_initial_mana_base") + caster:GetMaxMana() * self:GetSpecialValueFor("ball_lightning_initial_mana_percentage") / 100
+	local travel = (distance / 100) * (self:GetSpecialValueFor("ball_lightning_travel_cost_base") + caster:GetMaxMana() * self:GetSpecialValueFor("ball_lightning_travel_cost_percent") / 100)
+	local paid_by_kv = self:GetManaCost(self:GetLevel() - 1)
+	local extra = math.max(0, initial + travel - paid_by_kv)
+
+	caster:SpendMana(math.min(caster:GetMana(), extra), self)
+end
+
+modifier_xhs_spirit_master_ball_lightning = modifier_xhs_spirit_master_ball_lightning or class({})
+
+function modifier_xhs_spirit_master_ball_lightning:IsHidden() return true end
+function modifier_xhs_spirit_master_ball_lightning:IsPurgable() return false end
+
+function modifier_xhs_spirit_master_ball_lightning:CheckState()
+	return {
+		[MODIFIER_STATE_NO_UNIT_COLLISION] = true,
+		[MODIFIER_STATE_DISARMED] = true,
+	}
 end
 
 --[[

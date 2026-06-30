@@ -3,14 +3,19 @@
 var XHSSupporterPass = (function () {
 	var SUPPORTER_URL = "https://www.patreon.com/bePatron?u=2533325";
 	var DISCORD_URL = "https://discord.frostrose-studio.com/";
-	var WEEKLY_FRAGMENT_CAP = 100;
-	var LEGACY_FRAGMENT_CAP = 5000;
+	var DAILY_FRAGMENT_CAP = 100;
+	var WEEKLY_FRAGMENT_CAP = DAILY_FRAGMENT_CAP;
+	var currentShopFilter = "All";
 	var currentArmoryFilter = "All";
 	var settingsOriginal = {};
 	var settingsDraft = {};
 	var settingsInitialized = false;
 	var settingsSaving = false;
 	var backToTopPollScheduled = false;
+	var fragmentCounterInitialized = false;
+	var lastLocalFragmentBalance = 0;
+	var fragmentFlyoutIndex = 0;
+	var actionToastSerial = 0;
 
 	var PAGE_IDS = {
 		overview: "XHSPassOverviewPage",
@@ -30,12 +35,16 @@ var XHSSupporterPass = (function () {
 		settings: "XHSPassTabSettings",
 	};
 
+	var DISABLED_PAGES = {
+		leaderboards: true,
+	};
+
 	var DEFAULT_TIERS = [
-		{ id: 1, name: "Donator", price: "2\u20ac/month", color: "#70e39a", fragments: 150, xp_boost: 10 },
-		{ id: 2, name: "Golden Donator", price: "4.50\u20ac/month", color: "#ffcf66", fragments: 400, xp_boost: 20 },
-		{ id: 3, name: "Ember Donator", price: "9\u20ac/month", color: "#ff5a43", fragments: 900, xp_boost: 30 },
-		{ id: 4, name: "Stoneguard Donator", price: "18\u20ac/month", color: "#5ad0ff", fragments: 1800, xp_boost: 40 },
-		{ id: 5, name: "Earthwarden Donator", price: "27\u20ac/month", color: "#c99cff", fragments: 1800, xp_boost: 40, prestige: true },
+		{ id: 1, name: "Donator", price: "2\u20ac/month", color: "#70e39a", fragments: 150, xp_boost: 10, vote_power: 1 },
+		{ id: 2, name: "Golden Donator", price: "4.50\u20ac/month", color: "#ffcf66", fragments: 400, xp_boost: 20, vote_power: 2 },
+		{ id: 3, name: "Ember Donator", price: "9\u20ac/month", color: "#ff5a43", fragments: 900, xp_boost: 30, vote_power: 3 },
+		{ id: 4, name: "Stoneguard Donator", price: "18\u20ac/month", color: "#5ad0ff", fragments: 1800, xp_boost: 40, vote_power: 4 },
+		{ id: 5, name: "Earthwarden Donator", price: "27\u20ac/month", color: "#c99cff", fragments: 1800, xp_boost: 40, vote_power: 5, prestige: true },
 	];
 
 	var SITE_TIER_META = {
@@ -43,37 +52,37 @@ var XHSSupporterPass = (function () {
 			label: "Tier 1",
 			price: "2\u20ac/month",
 			image: "patreon/donator_01_emerald.png",
-			text: "Start supporting XHS with monthly fragments, Emerald identity, a Discord role, and visible profile prestige.",
-			perks: ["150 fragments", "+10% XP", "Emerald Green", "Discord role"],
+			text: "Start supporting XHS with monthly fragments, Emerald identity, a Discord role, visible profile prestige, and 1 vote in game setup.",
+			perks: ["150 fragments", "+10% XP", "1 vote", "Emerald Green", "Discord role"],
 		},
 		2: {
 			label: "Tier 2",
 			price: "4.50\u20ac/month",
 			image: "patreon/donator_02_solar_gold.png",
-			text: "Upgrade to Solar Gold for a stronger monthly fragment pack, faster progression, and all Tier 1 benefits.",
-			perks: ["400 fragments", "+20% XP", "Solar Gold"],
+			text: "Upgrade to Solar Gold for a stronger monthly fragment pack, faster progression, 2 setup votes, and all Tier 1 benefits.",
+			perks: ["400 fragments", "+20% XP", "2 votes", "Solar Gold"],
 			featured: true,
 		},
 		3: {
 			label: "Tier 3",
 			price: "9\u20ac/month",
 			image: "patreon/donator_03_ember_red.png",
-			text: "Stand out with Ember Red styling, 900 monthly fragments, and a sharper supporter presence in every XHS space.",
-			perks: ["900 fragments", "+30% XP", "Ember Red"],
+			text: "Stand out with Ember Red styling, 900 monthly fragments, 3 setup votes, and a sharper supporter presence in every XHS space.",
+			perks: ["900 fragments", "+30% XP", "3 votes", "Ember Red"],
 		},
 		4: {
 			label: "Tier 4",
 			price: "18\u20ac/month",
 			image: "patreon/donator_04_storm_blue.png",
-			text: "Lock in Storm Blue status with the top XP boost, 1800 monthly fragments, and a premium supporter look.",
-			perks: ["1800 fragments", "+40% XP", "Storm Blue"],
+			text: "Lock in Storm Blue status with the top XP boost, 1800 monthly fragments, 4 setup votes, and a premium supporter look.",
+			perks: ["1800 fragments", "+40% XP", "4 votes", "Storm Blue"],
 		},
 		5: {
 			label: "Tier 5",
 			price: "27\u20ac/month",
 			image: "patreon/donator_05_amethyst_violet.png",
-			text: "The prestige tier for core supporters: Amethyst identity, top XP boost, and the full supporter stack.",
-			perks: ["1800 fragments", "+40% XP", "Amethyst Violet"],
+			text: "The prestige tier for core supporters: Amethyst identity, top XP boost, 5 setup votes, and the full supporter stack.",
+			perks: ["1800 fragments", "+40% XP", "5 votes", "Amethyst Violet"],
 		},
 	};
 
@@ -192,6 +201,53 @@ var XHSSupporterPass = (function () {
 		return Math.max(minValue, Math.min(maxValue, value));
 	}
 
+	function IsEarthwardenSupporterData(data) {
+		if (!data) {
+			return false;
+		}
+
+		var donatorLevel = Math.floor(ToNumber(data.donator_level || data.donator_status, 0));
+		if (donatorLevel === 8 || donatorLevel === 9) {
+			return true;
+		}
+
+		var tierName = (data.tier_name || data.supporter_tier_name || "").toString().toLowerCase();
+		if (tierName.indexOf("earthwarden") >= 0) {
+			return true;
+		}
+
+		var tierColor = (data.tier_color || "").toString().toLowerCase();
+		return tierColor === "#c99cff";
+	}
+
+	function NormalizeSupporterTierID(tierID, data) {
+		if (IsEarthwardenSupporterData(data)) {
+			return 5;
+		}
+
+		var normalizedTier = Math.floor(ToNumber(tierID, 0));
+		var statusToTier = {
+			6: 1,
+			7: 4,
+			8: 5,
+			9: 5
+		};
+
+		if (normalizedTier > 5 && statusToTier[normalizedTier] !== undefined) {
+			normalizedTier = statusToTier[normalizedTier];
+		}
+
+		return Clamp(normalizedTier, 0, 5);
+	}
+
+	function NormalizeSupporterTierColor(data, tierID) {
+		if (IsEarthwardenSupporterData(data)) {
+			return "#c99cff";
+		}
+
+		return data.tier_color || GetTierColorByID(tierID);
+	}
+
 	function Localize(value) {
 		if (!value) {
 			return "";
@@ -228,6 +284,21 @@ var XHSSupporterPass = (function () {
 		var normalized = NormalizeImagePath(imagePath);
 		if (panel && normalized) {
 			panel.style.backgroundImage = 'url("file://{images}/custom_game/' + normalized + '")';
+			panel.style.backgroundSize = "contain";
+			panel.style.backgroundPosition = "50% 50%";
+			panel.style.backgroundRepeat = "no-repeat";
+		}
+	}
+
+	function ApplySupporterTierClasses(panel, tierID) {
+		if (!panel) {
+			return;
+		}
+
+		var normalizedTier = NormalizeSupporterTierID(tierID);
+		panel.SetHasClass("HasSupporterTier", normalizedTier > 0);
+		for (var tier = 0; tier <= 5; tier++) {
+			panel.SetHasClass("SupporterTier" + tier, tier === normalizedTier);
 		}
 	}
 
@@ -245,6 +316,11 @@ var XHSSupporterPass = (function () {
 		}
 
 		return sign + Math.floor(absValue).toString();
+	}
+
+	function FormatVotePower(value) {
+		var votes = Math.max(1, Math.floor(ToNumber(value, 1)));
+		return votes + " " + (votes > 1 ? "votes" : "vote");
 	}
 
 	function AsArray(value) {
@@ -280,33 +356,106 @@ var XHSSupporterPass = (function () {
 		}
 	}
 
+	function NormalizeSeasonProgress(level, xp, maxXp) {
+		var normalizedLevel = Math.max(1, ToNumber(level, 1));
+		var normalizedMax = Math.max(ToNumber(maxXp, 2000), 1);
+		var normalizedXP = Math.max(0, ToNumber(xp, 0));
+
+		if (normalizedXP >= normalizedMax) {
+			var completedLevels = Math.floor(normalizedXP / normalizedMax);
+			normalizedXP = normalizedXP - completedLevels * normalizedMax;
+			normalizedLevel = Math.max(normalizedLevel, 1 + completedLevels);
+		}
+
+		return {
+			level: normalizedLevel,
+			xp: normalizedXP,
+			maxXp: normalizedMax,
+		};
+	}
+
 	function GetTable(tableName, keyName, fallbackValue) {
 		return CustomNetTables.GetTableValue(tableName, keyName) || fallbackValue;
+	}
+
+	function CopyMissingFields(target, source) {
+		if (!target || !source) {
+			return target || {};
+		}
+
+		for (var key in source) {
+			if (source.hasOwnProperty(key) && target[key] === undefined) {
+				target[key] = source[key];
+			}
+		}
+
+		return target;
 	}
 
 	function GetLocalPlayerData() {
 		var playerID = Players.GetLocalPlayer();
 		var data = GetTable("supporter_pass_player", playerID.toString(), {}) || {};
+		var legacyData = GetTable("battlepass_player", playerID.toString(), null) || GetTable("battlepass_player", playerID, null);
+		data = CopyMissingFields(data, legacyData);
 		var info = Safe(function () { return Game.GetPlayerInfo(playerID); }, {});
+		var tierID = NormalizeSupporterTierID(data.tier_id || data.supporter_tier || data.donator_level || 0, data);
+		var season = NormalizeSeasonProgress(
+			data.season_level !== undefined ? data.season_level : data.Lvl,
+			data.season_xp !== undefined ? data.season_xp : data.XP,
+			data.season_xp_max !== undefined ? data.season_xp_max : data.MaxXP
+		);
 
 		return {
 			id: playerID,
 			name: Safe(function () { return Players.GetPlayerName(playerID); }, info.player_name || "Player"),
 			steamID: info.player_steamid || "",
-			tier_id: ToNumber(data.tier_id || data.supporter_tier || 0, 0),
+			tier_id: tierID,
 			tier_name: data.tier_name || "Free Player",
-			tier_color: data.tier_color || "#7db9d8",
+			tier_color: NormalizeSupporterTierColor(data, tierID),
 			fragments: ToNumber(data.fragments || data.fragment_balance, 0),
-			weekly_fragments: ToNumber(data.weekly_fragments || data.weekly_earned, 0),
-			weekly_cap: ToNumber(data.weekly_cap, WEEKLY_FRAGMENT_CAP),
-			season_level: Math.max(1, ToNumber(data.season_level || data.Lvl, 1)),
-			season_xp: ToNumber(data.season_xp || data.XP, 0),
-			season_xp_max: Math.max(ToNumber(data.season_xp_max || data.MaxXP, 2000), 1),
-			account_level: ToNumber(data.account_level || data.legacy_level, 0),
-			legacy_fragments: Clamp(ToNumber(data.legacy_fragments, ToNumber(data.account_level || data.legacy_level, 0) * 50), 0, LEGACY_FRAGMENT_CAP),
+			has_fragment_balance: data.fragments !== undefined || data.fragment_balance !== undefined,
+			daily_fragments: ToNumber(data.daily_fragments || data.daily_earned || data.weekly_fragments || data.weekly_earned, 0),
+			daily_cap: ToNumber(data.daily_cap || data.weekly_cap, DAILY_FRAGMENT_CAP),
+			weekly_fragments: ToNumber(data.daily_fragments || data.daily_earned || data.weekly_fragments || data.weekly_earned, 0),
+			weekly_cap: ToNumber(data.daily_cap || data.weekly_cap, DAILY_FRAGMENT_CAP),
+			xp_boost: ToNumber(data.xp_boost, 0),
+			vote_power: Math.max(1, ToNumber(data.vote_power, tierID > 0 ? tierID : 1)),
+			season_level: season.level,
+			season_xp: season.xp,
+			season_xp_max: season.maxXp,
+			account_level: ToNumber(data.account_level !== undefined ? data.account_level : data.legacy_level, 0),
+			xhs_account_level: ToNumber(data.xhs_account_level, 0),
+			xhs_xp_current: ToNumber(data.xhs_xp_current, 0),
+			xhs_xp_max: ToNumber(data.xhs_xp_max, 0),
+			xhs_xp_total: ToNumber(data.xhs_xp, 0),
 			supporter_url: data.supporter_url || SUPPORTER_URL,
 			raw: data,
 		};
+	}
+
+	function FormatXHSAccountXPSummary(player) {
+		var level = Math.max(0, ToNumber(player.xhs_account_level, 0));
+		var total = Math.max(0, ToNumber(player.xhs_xp_total, 0));
+		var current = Math.max(0, ToNumber(player.xhs_xp_current, 0));
+		var max = Math.max(0, ToNumber(player.xhs_xp_max, 0));
+
+		if (level <= 0 && total <= 0 && current <= 0 && max <= 0) {
+			return "-";
+		}
+
+		if (total > 0) {
+			return "L" + Math.max(1, level) + " " + FormatNumber(total);
+		}
+
+		if (max > 0) {
+			return "L" + Math.max(1, level) + " " + FormatNumber(current) + "/" + FormatNumber(max);
+		}
+
+		return "L" + Math.max(1, level);
+	}
+
+	function FormatSupporterXPSummary(player) {
+		return "L" + player.season_level + " " + FormatNumber(player.season_xp) + "/" + FormatNumber(player.season_xp_max);
 	}
 
 	function GetTiers() {
@@ -325,6 +474,7 @@ var XHSSupporterPass = (function () {
 			perks: meta.perks || [
 				FormatNumber(tier.fragments || 0) + " fragments",
 				"+" + FormatNumber(tier.xp_boost || 0) + "% XP",
+				FormatVotePower(tier.vote_power || tierID),
 			],
 			image: meta.image || tier.image || "",
 			color: tier.color || meta.color || "#5ad0ff",
@@ -332,14 +482,108 @@ var XHSSupporterPass = (function () {
 		};
 	}
 
+	function GetTierColorByID(tierID) {
+		var normalizedTier = NormalizeSupporterTierID(tierID);
+		if (normalizedTier <= 0) {
+			return "#7db9d8";
+		}
+
+		var tiers = GetTiers();
+		for (var i = 0; i < tiers.length; i++) {
+			var tier = tiers[i] || {};
+			var currentTierID = ToNumber(tier.id || tier.tier_id, 0);
+			if (currentTierID === normalizedTier && tier.color) {
+				return tier.color;
+			}
+		}
+
+		for (var j = 0; j < DEFAULT_TIERS.length; j++) {
+			if (DEFAULT_TIERS[j].id === normalizedTier) {
+				return DEFAULT_TIERS[j].color;
+			}
+		}
+
+		return "#5ad0ff";
+	}
+
 	function GetRewards(track) {
-		var tableName = track === "premium" ? "supporter_pass_rewards_premium" : "supporter_pass_rewards_free";
+		var tableName = "supporter_pass_rewards_free";
+		if (track === "premium") {
+			tableName = "supporter_pass_rewards_premium";
+		}
+
 		var rewards = AsArray(GetTable(tableName, "rewards", []));
 		if (rewards.length > 0) {
 			return rewards;
 		}
 
 		return track === "premium" ? DEFAULT_REWARDS_PREMIUM : DEFAULT_REWARDS_FREE;
+	}
+
+	function GetRewardID(reward) {
+		if (!reward) {
+			return "";
+		}
+
+		return (reward.reward_id || reward.id || reward.item_id || "").toString();
+	}
+
+	function RewardValueMatches(value, reward, rewardID) {
+		if (value === undefined || value === null) {
+			return false;
+		}
+
+		if (typeof value === "object") {
+			return RewardValueMatches(value.reward_id, reward, rewardID) ||
+				RewardValueMatches(value.id, reward, rewardID) ||
+				RewardValueMatches(value.item_id, reward, rewardID) ||
+				RewardValueMatches(value.name, reward, rewardID);
+		}
+
+		var stringValue = value.toString();
+		return stringValue === rewardID ||
+			stringValue === (reward.item_id || "").toString() ||
+			stringValue === (reward.id || "").toString() ||
+			stringValue === (reward.name || "").toString();
+	}
+
+	function IsRewardClaimed(reward, player) {
+		if (reward.claimed === true || reward.claimed === 1 || reward.claimed === "1") {
+			return true;
+		}
+
+		var rewardID = GetRewardID(reward);
+		if (rewardID === "") {
+			return false;
+		}
+
+		var claimed = player.raw && player.raw.claimed_rewards;
+		if (!claimed) {
+			return false;
+		}
+
+		if (Object.prototype.toString.call(claimed) === "[object Array]") {
+			for (var i = 0; i < claimed.length; i++) {
+				if (RewardValueMatches(claimed[i], reward, rewardID)) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		if (typeof claimed === "object") {
+			if (IsTruthy(claimed[rewardID], false) || IsTruthy(claimed[reward.item_id], false) || IsTruthy(claimed[reward.id], false)) {
+				return true;
+			}
+
+			for (var key in claimed) {
+				if (claimed.hasOwnProperty(key) && (key === rewardID || RewardValueMatches(claimed[key], reward, rewardID))) {
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 
 	function NormalizeRewardType(type) {
@@ -364,6 +608,15 @@ var XHSSupporterPass = (function () {
 		}
 		if (normalized === "bundle") {
 			return "Bundle";
+		}
+		if (normalized === "pudge_hook") {
+			return "Pudge Hook";
+		}
+		if (normalized === "pudge_arcana") {
+			return "Pudge Arcana";
+		}
+		if (normalized === "streak_counter") {
+			return "Streak Counter";
 		}
 		return normalized.charAt(0).toUpperCase() + normalized.slice(1);
 	}
@@ -583,6 +836,94 @@ var XHSSupporterPass = (function () {
 		}
 	}
 
+	function PulseFragmentsCounter() {
+		var counter = Panel("XHSSupporterFragmentsCounter");
+		if (!counter) {
+			return;
+		}
+
+		counter.SetHasClass("IsPulsing", false);
+		$.Schedule(0.01, function () {
+			if (counter && (!counter.IsValid || counter.IsValid())) {
+				counter.SetHasClass("IsPulsing", true);
+			}
+		});
+		$.Schedule(0.38, function () {
+			if (counter && (!counter.IsValid || counter.IsValid())) {
+				counter.SetHasClass("IsPulsing", false);
+			}
+		});
+	}
+
+	function ShowFragmentGainFlyout(amount, tierID) {
+		if (amount <= 0) {
+			return;
+		}
+
+		var button = Panel("XHSSupporterPassButton");
+		if (!button) {
+			return;
+		}
+
+		var flyout = $.CreatePanel("Panel", button, "XHSSupporterFragmentFlyout" + fragmentFlyoutIndex++);
+		flyout.AddClass("XHSSupporterFragmentFlyout");
+		flyout.hittest = false;
+		ApplySupporterTierClasses(flyout, tierID);
+
+		var icon = $.CreatePanel("Label", flyout, "");
+		icon.AddClass("XHSSupporterFragmentFlyoutIcon");
+		icon.hittest = false;
+		icon.text = "F";
+
+		var value = $.CreatePanel("Label", flyout, "");
+		value.AddClass("XHSSupporterFragmentFlyoutValue");
+		value.hittest = false;
+		value.text = "+" + FormatNumber(amount);
+
+		$.Schedule(0.03, function () {
+			if (flyout && (!flyout.IsValid || flyout.IsValid())) {
+				flyout.AddClass("IsFlying");
+			}
+		});
+		$.Schedule(0.46, PulseFragmentsCounter);
+		$.Schedule(0.9, function () {
+			if (flyout && (!flyout.IsValid || flyout.IsValid())) {
+				flyout.DeleteAsync(0.0);
+			}
+		});
+	}
+
+	function UpdateFragmentsCounter(player) {
+		var button = Panel("XHSSupporterPassButton");
+		if (button) {
+			ApplySupporterTierClasses(button, player.tier_id);
+		}
+
+		var fragments = Math.max(0, ToNumber(player.fragments, 0));
+		SetText("XHSSupporterFragmentsCounterValue", FormatNumber(fragments));
+
+		var counter = Panel("XHSSupporterFragmentsCounter");
+		if (counter) {
+			counter.SetHasClass("HasFragments", fragments > 0);
+		}
+
+		if (!player.has_fragment_balance && !fragmentCounterInitialized) {
+			return;
+		}
+
+		if (!fragmentCounterInitialized) {
+			lastLocalFragmentBalance = fragments;
+			fragmentCounterInitialized = true;
+			return;
+		}
+
+		if (fragments > lastLocalFragmentBalance) {
+			ShowFragmentGainFlyout(fragments - lastLocalFragmentBalance, player.tier_id);
+		}
+
+		lastLocalFragmentBalance = fragments;
+	}
+
 	function OpenExternalURL(url) {
 		if (!url) {
 			return;
@@ -597,12 +938,28 @@ var XHSSupporterPass = (function () {
 	}
 
 	function ShowActionMessage(message, success) {
-		if (typeof GameUI !== "undefined" && GameUI && typeof GameUI.CreateErrorMessage === "function") {
-			GameUI.CreateErrorMessage(message);
+		var toast = Panel("XHSPassActionToast");
+		var label = Panel("XHSPassActionToastText");
+		var text = message || (success ? "Done." : "Action failed.");
+
+		if (!toast || !label) {
+			$.Msg("[XHS Supporter Pass] " + (success ? "OK: " : "ERROR: ") + text);
 			return;
 		}
 
-		$.Msg("[XHS Supporter Pass] " + (success ? "OK: " : "ERROR: ") + message);
+		actionToastSerial++;
+		var serial = actionToastSerial;
+		label.text = text;
+		toast.SetHasClass("IsSuccess", success === true);
+		toast.SetHasClass("IsError", success !== true);
+		toast.SetHasClass("IsVisible", true);
+		$.Msg("[XHS Supporter Pass] " + (success ? "OK: " : "ERROR: ") + text);
+
+		$.Schedule(3.0, function () {
+			if (serial === actionToastSerial && toast && (!toast.IsValid || toast.IsValid())) {
+				toast.SetHasClass("IsVisible", false);
+			}
+		});
 	}
 
 	function ToggleWindow(forceVisible) {
@@ -627,6 +984,11 @@ var XHSSupporterPass = (function () {
 	}
 
 	function SwitchPage(pageName) {
+		if (DISABLED_PAGES[pageName]) {
+			Game.EmitSound("General.Cancel");
+			return;
+		}
+
 		for (var page in PAGE_IDS) {
 			if (PAGE_IDS.hasOwnProperty(page)) {
 				var pagePanel = Panel(PAGE_IDS[page]);
@@ -768,6 +1130,9 @@ var XHSSupporterPass = (function () {
 	}
 
 	function RenderHeader(player) {
+		ApplySupporterTierClasses(Panel("XHSSupporterPassWindow"), player.tier_id);
+		UpdateFragmentsCounter(player);
+
 		var avatar = Panel("XHSPassAvatar");
 		if (avatar && player.steamID) {
 			avatar.steamid = player.steamID;
@@ -775,18 +1140,36 @@ var XHSSupporterPass = (function () {
 
 		SetText("XHSPassTierValue", player.tier_name);
 		SetText("XHSPassFragmentsValue", FormatNumber(player.fragments));
-		SetText("XHSPassWeeklyCapValue", FormatNumber(player.weekly_fragments) + " / " + FormatNumber(player.weekly_cap));
+		SetText("XHSPassWeeklyCapValue", FormatNumber(player.daily_fragments || player.weekly_fragments) + " / " + FormatNumber(player.daily_cap || player.weekly_cap));
+		SetText("XHSPassGlobalXPValue", FormatXHSAccountXPSummary(player));
+		SetText("XHSPassSeasonXPValue", FormatSupporterXPSummary(player));
+		SetText("XHSPassXPBoostValue", "+" + FormatNumber(player.xp_boost) + "%");
+		SetText("XHSPassVotePowerValue", FormatVotePower(player.vote_power));
 		SetText("XHSPassPlayerName", player.name);
 		SetText("XHSPassPlayerTier", player.tier_name);
 		SetText("XHSPassLevelLabel", "Season Level " + player.season_level);
 		SetText("XHSPassXpLabel", FormatNumber(player.season_xp) + " / " + FormatNumber(player.season_xp_max) + " XP");
-		SetText("XHSPassLegacyValue", FormatNumber(player.legacy_fragments) + " fragments");
 		SetPercent(Panel("XHSPassXpProgress"), player.season_xp, player.season_xp_max);
-		SetPercent(Panel("XHSPassWeeklyProgress"), player.weekly_fragments, player.weekly_cap);
+		SetPercent(Panel("XHSPassWeeklyProgress"), player.daily_fragments || player.weekly_fragments, player.daily_cap || player.weekly_cap);
 
 		var tierLabel = Panel("XHSPassPlayerTier");
 		if (tierLabel) {
 			tierLabel.style.color = player.tier_color;
+		}
+
+		var tierValue = Panel("XHSPassTierValue");
+		if (tierValue) {
+			tierValue.style.color = player.tier_color;
+		}
+
+		var boostValue = Panel("XHSPassXPBoostValue");
+		if (boostValue) {
+			boostValue.style.color = player.tier_id > 0 ? player.tier_color : "#f3fbff";
+		}
+
+		var votePowerValue = Panel("XHSPassVotePowerValue");
+		if (votePowerValue) {
+			votePowerValue.style.color = player.tier_id > 0 ? player.tier_color : "#f3fbff";
 		}
 	}
 
@@ -826,6 +1209,10 @@ var XHSSupporterPass = (function () {
 			var shade = $.CreatePanel("Panel", row, "");
 			shade.AddClass("XHSPassTierShade");
 			shade.hittest = false;
+
+			var sweep = $.CreatePanel("Panel", row, "");
+			sweep.AddClass("XHSPassTierSweep");
+			sweep.hittest = false;
 
 			if (isOwnedTier) {
 				var owned = $.CreatePanel("Panel", row, "");
@@ -882,9 +1269,12 @@ var XHSSupporterPass = (function () {
 		}
 	}
 
-	function CreateRewardCard(parent, reward, player) {
+	function CreateRewardCard(parent, reward, player, track) {
 		var card = $.CreatePanel("Panel", parent, "");
 		card.AddClass("XHSPassRewardCard");
+		var legacyReward = IsTruthy(reward.legacy, false) || reward.claimable === false;
+		var rewardClaimed = IsRewardClaimed(reward, player);
+		card.SetHasClass("IsLegacyReward", legacyReward);
 
 		var image = $.CreatePanel("Panel", card, "");
 		image.AddClass("XHSPassRewardImage");
@@ -900,15 +1290,15 @@ var XHSSupporterPass = (function () {
 
 		var type = $.CreatePanel("Label", card, "");
 		type.AddClass("XHSPassRewardType");
-		type.text = reward.claimed ? "Claimed" : NormalizeRewardType(reward.type || reward.item_type || "Reward");
+		type.text = rewardClaimed ? "Claimed" : (legacyReward ? "Legacy Reward" : NormalizeRewardType(reward.type || reward.item_type || "Reward"));
 
-		var rewardID = reward.reward_id || reward.id;
+		var rewardID = GetRewardID(reward);
 		if (rewardID) {
 			var button = $.CreatePanel("Button", card, "");
 			button.AddClass("XHSPassShopButton");
 			var requiredLevel = ToNumber(reward.level_required || reward.level, 1);
-			var premiumLocked = reward.track === "premium" && player.tier_id < 1;
-			var canClaim = !reward.claimed && player.season_level >= requiredLevel && !premiumLocked;
+			var premiumLocked = (track === "premium" || reward.track === "premium" || reward.premium === 1 || reward.premium === "1") && player.tier_id < 1;
+			var canClaim = !legacyReward && !rewardClaimed && player.season_level >= requiredLevel && !premiumLocked;
 			button.SetHasClass("IsLocked", !canClaim);
 			button.SetPanelEvent("onactivate", function () {
 				if (!canClaim) {
@@ -917,23 +1307,24 @@ var XHSSupporterPass = (function () {
 				}
 				GameEvents.SendCustomGameEventToServer("supporter_pass_claim_reward", {
 					reward_id: rewardID,
+					item_id: reward.item_id || rewardID,
 				});
 			});
 
 			var label = $.CreatePanel("Label", button, "");
-			label.text = reward.claimed ? "Claimed" : (canClaim ? "Claim" : "Locked");
+			label.text = legacyReward ? "Legacy" : (rewardClaimed ? "Claimed" : (canClaim ? "Claim" : "Locked"));
 		}
 	}
 
-	function RenderRewardTrack(parent, title, rewards, player) {
-		var track = $.CreatePanel("Panel", parent, "");
-		track.AddClass("XHSPassRewardTrack");
+	function RenderRewardTrack(parent, title, rewards, player, track) {
+		var trackPanel = $.CreatePanel("Panel", parent, "");
+		trackPanel.AddClass("XHSPassRewardTrack");
 
-		var titlePanel = $.CreatePanel("Label", track, "");
+		var titlePanel = $.CreatePanel("Label", trackPanel, "");
 		titlePanel.AddClass("XHSPassRewardTrackTitle");
 		titlePanel.text = title;
 
-		var row = $.CreatePanel("Panel", track, "");
+		var row = $.CreatePanel("Panel", trackPanel, "");
 		row.AddClass("XHSPassRewardRow");
 
 		if (!rewards || rewards.length === 0) {
@@ -944,7 +1335,7 @@ var XHSSupporterPass = (function () {
 		}
 
 		for (var i = 0; i < rewards.length; i++) {
-			CreateRewardCard(row, rewards[i], player);
+			CreateRewardCard(row, rewards[i], player, track);
 		}
 	}
 
@@ -956,8 +1347,8 @@ var XHSSupporterPass = (function () {
 			return;
 		}
 
-		RenderRewardTrack(parent, "Free Track", GetRewards("free"), player);
-		RenderRewardTrack(parent, "Supporter Track", GetRewards("premium"), player);
+		RenderRewardTrack(parent, "Free Track", GetRewards("free"), player, "free");
+		RenderRewardTrack(parent, "Supporter Track", GetRewards("premium"), player, "premium");
 	}
 
 	function CreateShopCard(parent, item, player, mode) {
@@ -1022,20 +1413,35 @@ var XHSSupporterPass = (function () {
 		SetText("XHSPassShopRefresh", refresh.toString());
 
 		var items = GetShopItems();
+		currentShopFilter = RenderCategoryTabs("XHSPassShopFilters", items, currentShopFilter, function (filterName) {
+			currentShopFilter = filterName;
+			RenderShop(player);
+		});
+
 		if (items.length === 0) {
 			CreateEmpty(parent, "Shop unavailable", "The Fragment Shop catalog has not been sent by the backend yet.");
 			return;
 		}
 
-		for (var i = 0; i < items.length; i++) {
-			CreateShopCard(parent, items[i], player, "shop");
+		var filteredItems = FilterItemsByCategory(items, currentShopFilter);
+		if (filteredItems.length === 0) {
+			CreateEmpty(parent, "No shop items", "No Fragment Shop items match this category.");
+			return;
+		}
+
+		for (var i = 0; i < filteredItems.length; i++) {
+			CreateShopCard(parent, filteredItems[i], player, "shop");
 		}
 	}
 
-	function GetArmoryFilters(items) {
+	function GetItemCategory(item) {
+		return NormalizeRewardType(item.type || item.item_type || "Cosmetic");
+	}
+
+	function GetItemCategories(items) {
 		var filters = ["All"];
 		for (var i = 0; i < items.length; i++) {
-			var type = items[i].type || items[i].item_type || "Cosmetic";
+			var type = GetItemCategory(items[i]);
 			var exists = false;
 			for (var j = 0; j < filters.length; j++) {
 				if (filters[j] === type) {
@@ -1050,28 +1456,54 @@ var XHSSupporterPass = (function () {
 		return filters;
 	}
 
-	function RenderArmoryFilters(items, player) {
-		var parent = Panel("XHSPassArmoryFilters");
-		ClearPanel(parent);
-		if (!parent) {
-			return;
+	function FilterItemsByCategory(items, category) {
+		if (category === "All") {
+			return items;
 		}
 
-		var filters = GetArmoryFilters(items);
+		var filtered = [];
+		for (var i = 0; i < items.length; i++) {
+			if (GetItemCategory(items[i]) === category) {
+				filtered.push(items[i]);
+			}
+		}
+		return filtered;
+	}
+
+	function RenderCategoryTabs(parentID, items, activeFilter, onSelect) {
+		var parent = Panel(parentID);
+		ClearPanel(parent);
+		if (!parent) {
+			return activeFilter;
+		}
+
+		var filters = GetItemCategories(items);
+		var activeExists = false;
+		for (var f = 0; f < filters.length; f++) {
+			if (filters[f] === activeFilter) {
+				activeExists = true;
+				break;
+			}
+		}
+		if (!activeExists) {
+			activeFilter = "All";
+		}
+
 		for (var i = 0; i < filters.length; i++) {
 			(function (filterName) {
 				var button = $.CreatePanel("Button", parent, "");
-				button.AddClass("XHSPassArmoryFilterButton");
-				button.SetHasClass("IsActive", currentArmoryFilter === filterName);
+				button.AddClass("XHSPassFilterTab");
+				button.SetHasClass("IsActive", activeFilter === filterName);
 				button.SetPanelEvent("onactivate", function () {
-					currentArmoryFilter = filterName;
-					RenderArmory(player);
+					onSelect(filterName);
 				});
 
 				var label = $.CreatePanel("Label", button, "");
 				label.text = filterName;
 			})(filters[i]);
 		}
+
+		return activeFilter;
 	}
 
 	function RenderArmory(player) {
@@ -1079,18 +1511,19 @@ var XHSSupporterPass = (function () {
 		ClearPanel(parent);
 
 		var items = GetArmoryItems(player);
-		RenderArmoryFilters(items, player);
-
-		var filteredItems = [];
-		for (var i = 0; i < items.length; i++) {
-			var type = items[i].type || items[i].item_type || "Cosmetic";
-			if (currentArmoryFilter === "All" || currentArmoryFilter === type) {
-				filteredItems.push(items[i]);
-			}
-		}
+		currentArmoryFilter = RenderCategoryTabs("XHSPassArmoryFilters", items, currentArmoryFilter, function (filterName) {
+			currentArmoryFilter = filterName;
+			RenderArmory(player);
+		});
 
 		if (items.length === 0) {
 			CreateEmpty(parent, "No equipped cosmetics", "Unlock cosmetics through the Supporter Pass or Fragment Shop, then equip them here.");
+			return;
+		}
+
+		var filteredItems = FilterItemsByCategory(items, currentArmoryFilter);
+		if (filteredItems.length === 0) {
+			CreateEmpty(parent, "No armory items", "No unlocked cosmetics match this category.");
 			return;
 		}
 
@@ -1177,6 +1610,34 @@ var XHSSupporterPass = (function () {
 		});
 	}
 
+	function CreateSettingActionRow(parent, title, description, buttonText, callback) {
+		var row = $.CreatePanel("Panel", parent, "");
+		row.AddClass("XHSPassSettingRow");
+		row.AddClass("XHSPassSettingActionRow");
+		row.hittest = true;
+
+		var copy = $.CreatePanel("Panel", row, "");
+		copy.AddClass("XHSPassRowMain");
+		copy.hittest = false;
+
+		var titlePanel = $.CreatePanel("Label", copy, "");
+		titlePanel.AddClass("XHSPassRowTitle");
+		titlePanel.text = title;
+		titlePanel.hittest = false;
+
+		var descPanel = $.CreatePanel("Label", copy, "");
+		descPanel.AddClass("XHSPassRowDescription");
+		descPanel.text = description;
+		descPanel.hittest = false;
+
+		var button = $.CreatePanel("Button", row, "");
+		button.AddClass("XHSPassSettingActionButton");
+		button.SetPanelEvent("onactivate", callback);
+
+		var label = $.CreatePanel("Label", button, "");
+		label.text = buttonText;
+	}
+
 	function RenderSettings(player) {
 		var parent = Panel("XHSPassSettingsRows");
 		ClearPanel(parent);
@@ -1191,6 +1652,17 @@ var XHSSupporterPass = (function () {
 		CreateSettingRow(parent, "pass_rewards", "Cosmetic rewards", "Enable or disable equipped pass cosmetics in-game.");
 		CreateSettingRow(parent, "player_xp", "XP visibility", "Show seasonal and account XP in social UI surfaces.");
 		CreateSettingRow(parent, "winrate_toggle", "Winrate visibility", "Show your seasonal winrate in public profile surfaces.");
+		CreateSettingActionRow(parent, "Companion", "Remove your current supporter companion for this match.", "Disable", function () {
+			if (GameEvents && GameEvents.SendCustomGameEventToServer) {
+				GameEvents.SendCustomGameEventToServer("supporter_pass_change_companion", {
+					ID: Players.GetLocalPlayer(),
+					unit: "",
+					js: true,
+				});
+				ShowActionMessage("Companion disabled.", true);
+				Game.EmitSound("General.ButtonClick");
+			}
+		});
 		UpdateSettingsSaveBar();
 	}
 
@@ -1274,7 +1746,19 @@ var XHSSupporterPass = (function () {
 				Game.EmitSound("General.ButtonClick");
 				UpdateSettingsSaveBar();
 				if (GameEvents && GameEvents.SendCustomGameEventToServer) {
-					GameEvents.SendCustomGameEventToServer("supporter_pass_update_settings", CopySettings(settingsDraft));
+					var payload = CopySettings(settingsDraft);
+					payload.player_id = Players.GetLocalPlayer();
+					GameEvents.SendCustomGameEventToServer("supporter_pass_update_settings", payload);
+					$.Schedule(8.0, function () {
+						if (!settingsSaving) {
+							return;
+						}
+
+						settingsSaving = false;
+						settingsDraft = CopySettings(settingsOriginal);
+						RenderSettings(GetLocalPlayerData());
+						ShowActionMessage("Settings save timed out.", false);
+					});
 				} else {
 					settingsSaving = false;
 					UpdateSettingsSaveBar();
@@ -1301,6 +1785,8 @@ var XHSSupporterPass = (function () {
 				(function (pageName) {
 					var tab = Panel(TAB_IDS[pageName]);
 					if (tab) {
+						var isDisabled = DISABLED_PAGES[pageName] === true;
+						tab.SetHasClass("IsDisabled", isDisabled);
 						tab.SetPanelEvent("onactivate", function () { SwitchPage(pageName); });
 					}
 				})(page);
@@ -1332,11 +1818,11 @@ var XHSSupporterPass = (function () {
 			GameEvents.Subscribe("supporter_pass_equip_failed", function (payload) {
 				ShowActionMessage((payload && payload.message) || "Equip failed.", false);
 			});
-			GameEvents.Subscribe("supporter_pass_settings_failed", function () {
+			GameEvents.Subscribe("supporter_pass_settings_failed", function (payload) {
 				settingsSaving = false;
 				settingsDraft = CopySettings(settingsOriginal);
 				RenderSettings(GetLocalPlayerData());
-				ShowActionMessage("Settings save failed.", false);
+				ShowActionMessage((payload && payload.message) || "Settings save failed.", false);
 			});
 			GameEvents.Subscribe("supporter_pass_settings_success", function () {
 				settingsSaving = false;
@@ -1356,6 +1842,8 @@ var XHSSupporterPass = (function () {
 			CustomNetTables.SubscribeNetTableListener("supporter_pass_player", RenderAll);
 			CustomNetTables.SubscribeNetTableListener("supporter_pass_shop", RenderAll);
 			CustomNetTables.SubscribeNetTableListener("supporter_pass_meta", RenderAll);
+			CustomNetTables.SubscribeNetTableListener("supporter_pass_rewards_free", RenderAll);
+			CustomNetTables.SubscribeNetTableListener("supporter_pass_rewards_premium", RenderAll);
 		}
 	}
 

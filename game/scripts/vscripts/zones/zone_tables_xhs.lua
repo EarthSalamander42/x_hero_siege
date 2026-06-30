@@ -9,18 +9,7 @@ _G.ZonesDefinition =
 		Type = ZONE_TYPE_EXPLORE,
 		--		szTeleportEntityName = "forest_holdout_zone_darkforest_death_maze",
 		--		bNoLeaderboard = true,
-		StarCriteria =
-		{
-			{
-				Type = ZONE_STAR_CRITERIA_DEATHS,
-				Values =
-				{
-					7,
-					4,
-					0,
-				},
-			},
-		},
+		StarCriteria = {},
 		Quests =
 		{
 			{

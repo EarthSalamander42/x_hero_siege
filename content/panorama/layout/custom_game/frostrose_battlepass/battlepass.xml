@@ -295,8 +295,8 @@
 							<Panel id="BattlepassRewardRowPremiumContainer" class="BattlepassRow" hittest="false">
 							</Panel>
 
-							<Button id="BattlepassRewardRowPremiumButton" class="BattlepassRowTitle" onactivate="OpenWhalepass();">
-								<Label id="BattlepassRewardRowPremiumSubscription" class="BattlepassRowTitle" text="#battlepass_whalepass_subscription" hittest="false"/>
+							<Button id="BattlepassRewardRowPremiumButton" class="BattlepassRowTitle" onactivate="OpenSupporterPass();">
+								<Label id="BattlepassRewardRowPremiumSubscription" class="BattlepassRowTitle" text="#battlepass_supporter_subscription" hittest="false"/>
 							</Button>
 						</Panel>
 					</Panel>

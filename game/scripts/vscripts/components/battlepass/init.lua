@@ -88,7 +88,9 @@ ListenToGameEvent('npc_spawned', function(event)
 				npc:SetOriginalModel("models/items/courier/kanyu_shark/kanyu_shark.vmdl")
 				npc:CenterCameraOnEntity(npc, -1)
 			else
-				npc:AddNewModifier(npc, nil, "modifier_patreon_donator", {})
+				if unit_name ~= "npc_dota_hero_wisp" then
+					npc:AddNewModifier(npc, nil, "modifier_patreon_donator", {})
+				end
 
 				if string.find(GetMapName(), "demo") then return end
 

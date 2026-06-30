@@ -403,7 +403,6 @@
 }
 
 .vote-content {
-	width: 70%;
 	height: 55%;
 	margin-right: 20%;
 	padding: 0% 5% 0% 5%;
@@ -1040,7 +1039,7 @@
 
 .player-loading-sidebar {
 	width: 22%;
-	height: 100%;
+	height: 93.5%;
 	margin: 8px 0px 8px 0px;
 	flow-children: down;
 	background-color: gradient(linear, 0% 0%, 100% 100%, from(#131a27ef), to(#0b1018ef));
@@ -1050,14 +1049,16 @@
 
 .player-loading-header {
 	width: 100%;
-	height: 14%;
-	padding: 8px 10px 6px 10px;
+	height: 156px;
+	padding: 8px 10px 8px 10px;
 	flow-children: down;
 	border-bottom: 1px solid #d5b87833;
+	overflow: clip;
 }
 
 .player-loading-title {
 	width: 100%;
+	height: 31px;
 	font-size: 28px;
 	text-transform: uppercase;
 	letter-spacing: 1px;
@@ -1108,6 +1109,7 @@
 .player-loading-row {
 	width: 100%;
 	height: 36px;
+	margin-right: 0px;
 	margin-bottom: 6px;
 	padding: 4px 8px;
 	flow-children: right;
@@ -1260,6 +1262,391 @@
 
 .player-loading-dot.PlayerLoadingIssue {
 	background-color: #e69494;
+}
+
+.player-loading-avatar-wrap {
+	width: 24px;
+	height: 24px;
+	margin-right: 8px;
+	vertical-align: center;
+	flow-children: none;
+	overflow: clip clip;
+	border: 1px solid #d5b87855;
+	background-color: #04060b;
+	transition-property: brightness, pre-transform-scale2d, border, box-shadow;
+	transition-duration: 0.12s;
+}
+
+.player-loading-avatar-wrap:hover {
+	brightness: 1.25;
+	pre-transform-scale2d: 1.08;
+	border: 1px solid #f2dfb8aa;
+	box-shadow: #d5b87855 0px 0px 8px 0px;
+}
+
+.player-loading-avatar-fallback {
+	width: 100%;
+	height: 100%;
+	background-color: #0d1420;
+	border: 1px solid #ffffff10;
+}
+
+.player-loading-supporter-badge {
+	width: 18px;
+	height: 18px;
+	margin-right: 6px;
+	vertical-align: center;
+	visibility: collapse;
+	background-color: #080c12e8;
+	box-shadow: #000000cc 0px 1px 3px 0px;
+}
+
+.player-loading-supporter-badge.PlayerLoadingSupporterBadgeVisible {
+	visibility: visible;
+}
+
+.player-loading-supporter-badge-label {
+	width: 100%;
+	height: 100%;
+	text-align: center center;
+	font-size: 13px;
+	font-weight: bold;
+	text-shadow: 0px 0px 5px #000000;
+	font-family: Reaver;
+}
+
+.player-loading-row.PlayerLoadingDonator {
+	background-color: gradient(linear, 0% 0%, 100% 0%, from(#121b2a), color-stop(0.55, #101923), to(#1d1624));
+	border: 1px solid #c99cff66;
+	box-shadow: fill #b47cff16 0px 0px 8px 0px;
+}
+
+.player-loading-row.PlayerLoadingDonator:hover {
+	brightness: 1.16;
+	border: 1px solid #f0d39aaa;
+	box-shadow: fill #d5b87824 0px 0px 10px 0px;
+}
+
+.player-loading-row.PlayerLoadingDonator .player-loading-name {
+	color: #f0e6d2;
+	text-shadow: 0px 0px 5px #000000;
+}
+
+.player-loading-row.PlayerLoadingDonatorTier1,
+.player-loading-supporter-badge.PlayerLoadingDonatorTier1,
+.loading-profile-hover.PlayerLoadingDonatorTier1 {
+	border-color: #70e39aaa;
+	box-shadow: fill #3fdc7a18 0px 0px 8px 0px;
+}
+
+.player-loading-row.PlayerLoadingDonatorTier2,
+.player-loading-supporter-badge.PlayerLoadingDonatorTier2,
+.loading-profile-hover.PlayerLoadingDonatorTier2 {
+	border-color: #ffcf66aa;
+	box-shadow: fill #ffcf661c 0px 0px 8px 0px;
+}
+
+.player-loading-row.PlayerLoadingDonatorTier3,
+.player-loading-supporter-badge.PlayerLoadingDonatorTier3,
+.loading-profile-hover.PlayerLoadingDonatorTier3 {
+	border-color: #ff5a43aa;
+	box-shadow: fill #ff5a4318 0px 0px 8px 0px;
+}
+
+.player-loading-row.PlayerLoadingDonatorTier4,
+.player-loading-supporter-badge.PlayerLoadingDonatorTier4,
+.loading-profile-hover.PlayerLoadingDonatorTier4 {
+	border-color: #5ad0ffaa;
+	box-shadow: fill #32bde91c 0px 0px 8px 0px;
+}
+
+.player-loading-row.PlayerLoadingDonatorTier5,
+.player-loading-supporter-badge.PlayerLoadingDonatorTier5,
+.loading-profile-hover.PlayerLoadingDonatorTier5 {
+	border-color: #c99cffbb;
+	box-shadow: fill #c99cff20 0px 0px 8px 0px;
+}
+
+.loading-profile-hover {
+	width: 352px;
+	padding: 10px;
+	flow-children: down;
+	ignore-parent-flow: true;
+	position: 0px 0px 0px;
+	z-index: 80;
+	visibility: collapse;
+	opacity: 0.0;
+	background-color: gradient(linear, 0% 0%, 100% 100%, from(#101a27fa), color-stop(0.55, #07111cf7), to(#0b0d16fa));
+	border: 1px solid #d5b87866;
+	box-shadow: #000000dd 0px 4px 18px 0px;
+	transition-property: opacity, pre-transform-scale2d, position;
+	transition-duration: 0.1s;
+}
+
+.loading-profile-hover.PlayerLoadingProfileHoverVisible {
+	visibility: visible;
+	opacity: 1.0;
+	pre-transform-scale2d: 1.0;
+}
+
+.loading-profile-hover-header {
+	width: 100%;
+	height: 64px;
+	flow-children: right;
+	margin-bottom: 8px;
+	padding-bottom: 8px;
+	border-bottom: 1px solid #7db9d82e;
+}
+
+.loading-profile-hover-avatar {
+	width: 54px;
+	height: 54px;
+	margin-right: 10px;
+	border: 1px solid #d5b87880;
+	background-color: #03070d;
+	vertical-align: center;
+}
+
+.loading-profile-hover-identity {
+	width: fill-parent-flow(1.0);
+	height: 100%;
+	flow-children: down;
+}
+
+.loading-profile-hover-eyebrow {
+	width: 100%;
+	height: 15px;
+	font-size: 10px;
+	letter-spacing: 1.3px;
+	text-transform: uppercase;
+	color: #86dfff;
+	font-family: Reaver;
+}
+
+.loading-profile-hover-name {
+	width: 100%;
+	height: 24px;
+	font-size: 20px;
+	font-weight: bold;
+	color: #f2dfb8;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	text-shadow: 0px 1px 4px #000000;
+	font-family: Reaver;
+}
+
+.loading-profile-hover-tier {
+	width: 100%;
+	height: 20px;
+	font-size: 15px;
+	text-transform: uppercase;
+	letter-spacing: 0.6px;
+	text-overflow: shrink;
+	text-shadow: 0px 0px 8px #000000;
+	font-family: Reaver;
+}
+
+.loading-profile-hover-grid {
+	width: 100%;
+	flow-children: right-wrap;
+	margin-bottom: 8px;
+}
+
+.loading-profile-hover-season-pass {
+	width: 100%;
+	height: 92px;
+	margin-bottom: 8px;
+	padding: 8px 10px;
+	flow-children: down;
+	background-color: gradient(linear, 0% 0%, 100% 100%, from(#081321ee), color-stop(0.62, #0d1f31e8), to(#060b12ee));
+	border: 1px solid #7db9d846;
+	box-shadow: inset #ffffff12 0px 1px 0px 0px, fill #00000066 0px 0px 8px 0px;
+}
+
+.loading-profile-hover-season-header {
+	width: 100%;
+	height: 20px;
+	flow-children: right;
+}
+
+.loading-profile-hover-season-title {
+	width: fill-parent-flow(1.0);
+	height: 100%;
+	font-size: 12px;
+	letter-spacing: 1.1px;
+	text-transform: uppercase;
+	color: #8fdcff;
+	text-shadow: 0px 1px 3px #000000;
+	font-family: Reaver;
+}
+
+.loading-profile-hover-season-level {
+	width: 92px;
+	height: 100%;
+	font-size: 16px;
+	font-weight: bold;
+	text-align: right center;
+	text-transform: uppercase;
+	color: #f2dfb8;
+	text-overflow: shrink;
+	text-shadow: 0px 1px 4px #000000;
+	font-family: Reaver;
+}
+
+.loading-profile-hover-season-progress-row {
+	width: 100%;
+	height: 18px;
+	margin-top: 3px;
+	flow-children: right;
+}
+
+.loading-profile-hover-season-xp {
+	width: fill-parent-flow(1.0);
+	height: 100%;
+	font-size: 13px;
+	color: #d8e0ef;
+	text-shadow: 0px 1px 3px #000000;
+	font-family: Reaver;
+}
+
+.loading-profile-hover-season-percent {
+	width: 48px;
+	height: 100%;
+	font-size: 13px;
+	text-align: right center;
+	color: #8fdcff;
+	text-shadow: 0px 1px 3px #000000;
+	font-family: Reaver;
+}
+
+.loading-profile-hover-season-track {
+	width: 100%;
+	height: 9px;
+	margin-top: 4px;
+	background-color: #03070dd8;
+	border: 1px solid #7db9d82d;
+	box-shadow: inset #000000aa 0px 0px 5px 0px;
+	overflow: clip;
+}
+
+.loading-profile-hover-season-fill {
+	width: 0%;
+	height: 100%;
+	background-color: gradient(linear, 0% 0%, 100% 0%, from(#268fc7), color-stop(0.58, #5ad0ff), to(#d5b878));
+	box-shadow: fill #5ad0ff55 0px 0px 8px 0px;
+	transition-property: width;
+	transition-duration: 0.24s;
+	transition-timing-function: ease-in-out;
+}
+
+.loading-profile-hover-season-meta {
+	width: 100%;
+	height: 18px;
+	margin-top: 6px;
+	flow-children: right;
+}
+
+.loading-profile-hover-season-chip {
+	width: fill-parent-flow(1.0);
+	height: 100%;
+	font-size: 11px;
+	text-transform: uppercase;
+	color: #9fb8d4;
+	text-overflow: shrink;
+	text-shadow: 0px 1px 3px #000000;
+	font-family: Reaver;
+}
+
+.loading-profile-hover-season-chip.Right {
+	text-align: right center;
+}
+
+.loading-profile-hover.PlayerLoadingDonatorTier1 .loading-profile-hover-season-pass {
+	border-color: #70e39a66;
+}
+
+.loading-profile-hover.PlayerLoadingDonatorTier1 .loading-profile-hover-season-fill {
+	background-color: gradient(linear, 0% 0%, 100% 0%, from(#2d8a4d), color-stop(0.58, #70e39a), to(#c8ffd6));
+	box-shadow: fill #70e39a5c 0px 0px 8px 0px;
+}
+
+.loading-profile-hover.PlayerLoadingDonatorTier2 .loading-profile-hover-season-pass {
+	border-color: #ffcf6666;
+}
+
+.loading-profile-hover.PlayerLoadingDonatorTier2 .loading-profile-hover-season-fill {
+	background-color: gradient(linear, 0% 0%, 100% 0%, from(#9c7924), color-stop(0.58, #ffcf66), to(#fff4bd));
+	box-shadow: fill #ffcf665c 0px 0px 8px 0px;
+}
+
+.loading-profile-hover.PlayerLoadingDonatorTier3 .loading-profile-hover-season-pass {
+	border-color: #ff5a4366;
+}
+
+.loading-profile-hover.PlayerLoadingDonatorTier3 .loading-profile-hover-season-fill {
+	background-color: gradient(linear, 0% 0%, 100% 0%, from(#8d2f21), color-stop(0.58, #ff5a43), to(#ffd7ca));
+	box-shadow: fill #ff5a435c 0px 0px 8px 0px;
+}
+
+.loading-profile-hover.PlayerLoadingDonatorTier4 .loading-profile-hover-season-pass {
+	border-color: #5ad0ff70;
+}
+
+.loading-profile-hover.PlayerLoadingDonatorTier4 .loading-profile-hover-season-fill {
+	background-color: gradient(linear, 0% 0%, 100% 0%, from(#0a7ca8), color-stop(0.58, #5ad0ff), to(#e6fbff));
+	box-shadow: fill #5ad0ff66 0px 0px 9px 0px;
+}
+
+.loading-profile-hover.PlayerLoadingDonatorTier5 .loading-profile-hover-season-pass {
+	border-color: #c99cff88;
+}
+
+.loading-profile-hover.PlayerLoadingDonatorTier5 .loading-profile-hover-season-fill {
+	background-color: gradient(linear, 0% 0%, 100% 0%, from(#7d4bb5), color-stop(0.5, #c99cff), to(#fff8ff));
+	box-shadow: fill #c99cff78 0px 0px 10px 0px;
+}
+
+.loading-profile-hover-stat {
+	width: 158px;
+	height: 48px;
+	margin-right: 6px;
+	margin-bottom: 6px;
+	padding: 6px 8px;
+	flow-children: down;
+	background-color: #07111dd4;
+	border: 1px solid #7db9d83a;
+}
+
+.loading-profile-hover-stat-label {
+	width: 100%;
+	height: 14px;
+	font-size: 10px;
+	letter-spacing: 1.0px;
+	text-transform: uppercase;
+	color: #8fdcff;
+	font-family: Reaver;
+}
+
+.loading-profile-hover-stat-value {
+	width: 100%;
+	height: 22px;
+	font-size: 15px;
+	color: #f0e6d2;
+	text-overflow: shrink;
+	text-shadow: 0px 1px 3px #000000;
+	font-family: Reaver;
+}
+
+.loading-profile-hover-status {
+	width: 100%;
+	min-height: 24px;
+	padding: 6px 8px;
+	font-size: 12px;
+	text-align: center center;
+	color: #c7d5eb;
+	background-color: #050a10c8;
+	border: 1px solid #d5b87832;
+	font-family: Reaver;
 }
 
 .description-background {
@@ -1917,7 +2304,6 @@
 }
 
 .vote-content {
-	width: 84%;
 	height: fit-children;
 	min-height: 36%;
 	max-height: 74%;
@@ -2016,7 +2402,7 @@
 }
 
 .vote-select-description {
-	width: 100%;
+	width: 91%;
 	height: fill-parent-flow(1.0);
 	max-height: 200px;
 	padding: 0px 8px;
@@ -2117,14 +2503,13 @@
 }
 
 #ProfileSummaryTextWrap {
-	width: fill-parent-flow(1.0);
 	vertical-align: center;
 	flow-children: down;
 }
 
 #ProfileSummaryName {
-	width: 100%;
 	font-size: 24px;
+	margin-right: 6px;
 	color: #f1e4c7;
 	text-overflow: shrink;
 	font-family: Reaver;
@@ -2222,7 +2607,7 @@
 .player-loading-progress {
 	width: 95%;
 	height: 10px;
-	margin-top: 4px;
+	margin-top: 2px;
 	align: center center;
 	border: 1px solid #d5b87844;
 	background-color: #00000066;
@@ -2245,8 +2630,9 @@
 
 .player-loading-status {
 	width: 100%;
+	height: 18px;
 	font-size: 14px;
-	margin-top: 4px;
+	margin-top: 2px;
 	color: #9eb0c9;
 	text-overflow: shrink;
 	font-family: Reaver;
@@ -2255,12 +2641,14 @@
 
 .player-loading-status-wrap {
 	width: 100%;
+	height: 20px;
 	flow-children: down;
 }
 
 .player-force-launch-label {
 	width: 100%;
-	margin-top: 4px;
+	height: 18px;
+	margin-top: 2px;
 	font-size: 15px;
 	color: #f2dfb8;
 	text-overflow: shrink;
@@ -2271,7 +2659,7 @@
 .player-ready-button {
 	width: 95%;
 	height: 28px;
-	margin-top: 4px;
+	margin-top: 6px;
 	align: center center;
 	border: 1px solid #d5b87866;
 	background-color: gradient(linear, 0% 0%, 0% 100%, from(#24374f), to(#162334));
@@ -2643,8 +3031,8 @@
 }
 
 .player-loading-header {
-	height: 15%;
-	padding: 6px 10px 34px 10px;
+	height: 156px;
+	padding: 8px 10px 8px 10px;
 }
 
 .player-loading-title {
@@ -2665,11 +3053,10 @@
 }
 
 .player-ready-button {
-	height: 24px;
-	margin-top: 0px;
-	margin-bottom: 4px;
-	align: center bottom;
-	ignore-parent-flow: true;
+	height: 28px;
+	margin-top: 6px;
+	margin-bottom: 0px;
+	align: center center;
 }
 
 .player-loading-list {
@@ -2778,7 +3165,7 @@
 }
 
 .AspectRatio4x3 .player-loading-header {
-	height: 22%;
+	height: 156px;
 }
 
 .AspectRatio16x10 .patreon-highlight-title,
@@ -2876,26 +3263,6 @@
 	flow-children: right;
 }
 
-#ProfileSummaryName {
-	width: fill-parent-flow(1.0);
-	margin-right: 6px;
-}
-
-#ProfileSummaryNameArrow {
-	width: 14px;
-	height: 14px;
-	margin: 4px 0px 0px 0px;
-	horizontal-align: right;
-	vertical-align: center;
-	background-size: 14px 14px;
-	wash-color: #f1dfbb;
-	opacity: 0.92;
-}
-
-#HomeProfileContainer:hover #ProfileSummaryNameArrow {
-	wash-color: white;
-}
-
 /* -------------------------------------------------------------------------- */
 /* Vote Sidebar Compact Pass                                                  */
 /* -------------------------------------------------------------------------- */
@@ -2939,13 +3306,6 @@
 
 .profile-summary-value {
 	font-size: 14px;
-}
-
-#ProfileSummaryNameArrow {
-	width: 12px;
-	height: 12px;
-	margin-top: 3px;
-	background-size: 12px 12px;
 }
 
 .vote-header-container {
@@ -3154,18 +3514,345 @@
 	width: 100%;
 }
 
-#ProfileSummaryTextWrap {
-	width: fill-parent-flow(1.0);
+#ProfileSummaryCard.ProfileSummaryDonator {
+	padding: 5px 8px 6px 8px;
+	background-color: gradient(linear, 0% 0%, 100% 100%, from(#111b29cc), color-stop(0.62, #08111bd8), to(#1a1422cc));
+	border: 1px solid #c99cff66;
+	box-shadow: fill #c99cff16 0px 0px 8px 0px;
+}
+
+#HomeProfileContainer:hover #ProfileSummaryCard.ProfileSummaryDonator {
+	brightness: 1.12;
+	box-shadow: fill #d5b87824 0px 0px 10px 0px;
+}
+
+#ProfileSummaryCard.ProfileSummaryDonator.PlayerLoadingDonatorTier1 {
+	border-color: #70e39aaa;
+	box-shadow: fill #3fdc7a18 0px 0px 9px 0px;
+}
+
+#ProfileSummaryCard.ProfileSummaryDonator.PlayerLoadingDonatorTier2 {
+	border-color: #ffcf66aa;
+	box-shadow: fill #ffcf661c 0px 0px 9px 0px;
+}
+
+#ProfileSummaryCard.ProfileSummaryDonator.PlayerLoadingDonatorTier3 {
+	border-color: #ff5a43aa;
+	box-shadow: fill #ff5a4318 0px 0px 9px 0px;
+}
+
+#ProfileSummaryCard.ProfileSummaryDonator.PlayerLoadingDonatorTier4 {
+	border-color: #5ad0ffaa;
+	box-shadow: fill #32bde91c 0px 0px 9px 0px;
+}
+
+#ProfileSummaryCard.ProfileSummaryDonator.PlayerLoadingDonatorTier5 {
+	border-color: #c99cffbb;
+	box-shadow: fill #c99cff20 0px 0px 9px 0px;
+}
+
+#ProfileSummaryAvatar.ProfileSummaryDonatorAvatar {
+	box-shadow: #000000cc 0px 1px 4px 0px;
+}
+
+#ProfileSummaryCard.ProfileSummaryDonator #ProfileSummaryWinrate {
+	font-weight: bold;
+	text-shadow: 0px 0px 7px #000000;
+}
+
+/* -------------------------------------------------------------------------- */
+/* XHS Profile Modal Refresh                                                  */
+/* -------------------------------------------------------------------------- */
+
+#ProfileModalBackdrop {
+	background-color: gradient(radial, 50% 48%, 0% 0%, 78% 82%, from(#03070bd8), color-stop(0.52, #02050ae8), to(#000000f6));
+}
+
+#ProfileModal {
+	width: 76%;
+	height: 64%;
+	padding: 18px;
+	background-color: gradient(linear, 0% 0%, 100% 100%, from(#07131ffb), color-stop(0.52, #0a1624fb), to(#03070dfd));
+	border: 1px solid #62ceff6a;
+	box-shadow: fill #000000eb 0px 0px 30px 0px, fill #5ad0ff18 0px 0px 18px 0px, inset #ffffff10 0px 1px 0px 0px;
+}
+
+#ProfileModal.PlayerLoadingDonatorTier1 { border-color: #70e39aaa; box-shadow: fill #000000eb 0px 0px 30px 0px, fill #70e39a22 0px 0px 20px 0px, inset #ffffff12 0px 1px 0px 0px; }
+#ProfileModal.PlayerLoadingDonatorTier2 { border-color: #ffcf66aa; box-shadow: fill #000000eb 0px 0px 30px 0px, fill #ffcf6624 0px 0px 20px 0px, inset #ffffff12 0px 1px 0px 0px; }
+#ProfileModal.PlayerLoadingDonatorTier3 { border-color: #ff5a43aa; box-shadow: fill #000000eb 0px 0px 30px 0px, fill #ff5a4320 0px 0px 20px 0px, inset #ffffff12 0px 1px 0px 0px; }
+#ProfileModal.PlayerLoadingDonatorTier4 { border-color: #5ad0ffbf; box-shadow: fill #000000eb 0px 0px 30px 0px, fill #5ad0ff28 0px 0px 22px 0px, inset #ffffff14 0px 1px 0px 0px; }
+#ProfileModal.PlayerLoadingDonatorTier5 { border-color: #c99cffd0; box-shadow: fill #000000eb 0px 0px 30px 0px, fill #c99cff34 0px 0px 24px 0px, #ead8ff40 0px 0px 5px 0px, inset #ffffff18 0px 1px 0px 0px; }
+
+#ProfileModalHeader {
+	height: 96px;
+	padding: 0px 0px 14px 0px;
+	border-bottom: 1px solid #62ceff2f;
+}
+
+#ProfileModalIdentity {
+	background-color: gradient(linear, 0% 0%, 100% 0%, from(#06111dea), color-stop(0.68, #08182696), to(#06111d00));
+	border-left: 2px solid #62ceff8a;
+	padding-left: 14px;
+}
+
+#ProfileModalAvatar {
+	width: 72px;
+	height: 72px;
+	margin-right: 14px;
+	border: 1px solid #62ceff66;
+	box-shadow: fill #000000aa 0px 0px 9px 0px, inset #ffffff16 0px 1px 0px 0px;
+}
+
+#ProfileModalName {
+	height: 42px;
+	font-size: 34px;
+	color: #f6fbff;
+	text-shadow: 0px 0px 10px #5ad0ff2f, 0px 1px 4px #000000;
+}
+
+#ProfileModalSubtitle {
+	height: 26px;
+	font-size: 17px;
+	letter-spacing: 0.8px;
+	color: #a9cce4;
+	text-overflow: shrink;
+}
+
+#ProfileModalClose {
+	width: 46px;
+	height: 46px;
+	margin-right: 0px;
+	background-color: gradient(linear, 0% 0%, 0% 100%, from(#102235e6), to(#07101be8));
+	border: 1px solid #62ceff7a;
+	box-shadow: fill #00000094 0px 0px 7px 0px, inset #ffffff12 0px 1px 0px 0px;
+}
+
+#ProfileModalClose:hover {
+	brightness: 1.18;
+	border: 1px solid #ffcf66aa;
+	background-color: gradient(linear, 0% 0%, 0% 100%, from(#17334ded), to(#091723f0));
+	box-shadow: fill #5ad0ff36 0px 0px 11px 0px;
+}
+
+#ProfileModalClose Label {
+	font-size: 21px;
+	color: #ffcf66;
+	text-shadow: 0px 0px 7px #ffcf665c, 0px 1px 3px #000000;
+}
+
+#ProfileModalBody {
+	padding: 14px 0px 12px 0px;
+}
+
+.profile-modal-main-column {
+	width: 51%;
+}
+
+.profile-modal-side-column {
+	width: 49%;
+}
+
+.profile-modal-column {
+	padding: 0px 7px;
+}
+
+.profile-modal-block {
+	padding: 12px 14px;
+	margin-bottom: 12px;
+	background-color: gradient(linear, 0% 0%, 100% 100%, from(#081725e8), color-stop(0.64, #07111de2), to(#040910e8));
+	border: 1px solid #62ceff34;
+	box-shadow: inset #ffffff0e 0px 1px 0px 0px, fill #00000050 0px 0px 9px 0px;
+}
+
+.profile-modal-pass-block {
+	border-color: #62ceff50;
+	box-shadow: inset #ffffff10 0px 1px 0px 0px, fill #5ad0ff14 0px 0px 12px 0px;
+}
+
+.profile-modal-block-title {
+	height: 32px;
+	margin-bottom: 8px;
+	font-size: 24px;
+	letter-spacing: 0.8px;
+	color: #f6fbff;
+	text-shadow: 0px 0px 8px #5ad0ff42, 0px 1px 3px #000000;
+	border-bottom: 1px solid #62ceff2a;
+}
+
+.profile-modal-row {
+	height: 34px;
+	margin-bottom: 6px;
+	padding: 4px 8px;
+	background-color: #0209148f;
+	border: 1px solid #62ceff18;
+}
+
+.profile-modal-key {
+	font-size: 15px;
+	letter-spacing: 0.7px;
+	text-transform: uppercase;
+	color: #86c9e8;
+	text-overflow: shrink;
+}
+
+.profile-modal-value {
+	width: 52%;
+	font-size: 18px;
+	font-weight: bold;
+	text-align: right center;
+	color: #f2dfb8;
+	text-overflow: shrink;
+	text-shadow: 0px 1px 3px #000000;
+}
+
+.profile-modal-progress {
+	width: 100%;
+	height: 16px;
+	margin: 4px 0px 10px 0px;
+	border: 1px solid #62ceff42;
+	background-color: #020711d8;
+	box-shadow: inset #000000b0 0px 0px 5px 0px;
+}
+
+.profile-modal-progress .ProgressBarLeft {
+	background-color: gradient(linear, 0% 0%, 100% 0%, from(#2e8ac4), color-stop(0.58, #5ad0ff), to(#ffcf66));
+	box-shadow: fill #5ad0ff55 0px 0px 8px 0px;
+}
+
+#ProfileModal.PlayerLoadingDonatorTier1 .profile-modal-progress .ProgressBarLeft { background-color: gradient(linear, 0% 0%, 100% 0%, from(#2d8a4d), color-stop(0.58, #70e39a), to(#c8ffd6)); box-shadow: fill #70e39a5c 0px 0px 8px 0px; }
+#ProfileModal.PlayerLoadingDonatorTier2 .profile-modal-progress .ProgressBarLeft { background-color: gradient(linear, 0% 0%, 100% 0%, from(#9c7924), color-stop(0.58, #ffcf66), to(#fff4bd)); box-shadow: fill #ffcf665c 0px 0px 8px 0px; }
+#ProfileModal.PlayerLoadingDonatorTier3 .profile-modal-progress .ProgressBarLeft { background-color: gradient(linear, 0% 0%, 100% 0%, from(#8d2f21), color-stop(0.58, #ff5a43), to(#ffd7ca)); box-shadow: fill #ff5a435c 0px 0px 8px 0px; }
+#ProfileModal.PlayerLoadingDonatorTier4 .profile-modal-progress .ProgressBarLeft { background-color: gradient(linear, 0% 0%, 100% 0%, from(#0a7ca8), color-stop(0.58, #5ad0ff), to(#e6fbff)); box-shadow: fill #5ad0ff66 0px 0px 9px 0px; }
+#ProfileModal.PlayerLoadingDonatorTier5 .profile-modal-progress .ProgressBarLeft { background-color: gradient(linear, 0% 0%, 100% 0%, from(#7d4bb5), color-stop(0.5, #c99cff), to(#fff8ff)); box-shadow: fill #c99cff78 0px 0px 10px 0px; }
+
+#ProfileModalRankBadge {
+	width: 118px;
+	height: 118px;
+	margin: 0px 0px 8px 0px;
+	padding: 6px;
+	background-color: gradient(radial, 50% 50%, 0% 0%, 70% 70%, from(#10253bde), to(#02091400));
+	border: 1px solid #62ceff22;
+}
+
+.profile-modal-rank-block {
+	height: fill-parent-flow(0.9);
+}
+
+.profile-modal-visibility-block {
+	height: fill-parent-flow(1.1);
+}
+
+#ProfileModalFooter {
+	height: 70px;
+	padding-top: 12px;
+	border-top: 1px solid #62ceff2f;
+}
+
+#ProfileModalFooter .vote-button {
+	width: 260px;
+	height: 44px;
+	margin-right: 12px;
+	background-color: gradient(linear, 0% 0%, 100% 0%, from(#0d2134e8), color-stop(0.5, #173a56e8), to(#0d2134e8));
+	border: 1px solid #62ceff7a;
+	box-shadow: fill #00000072 0px 0px 8px 0px, inset #ffffff12 0px 1px 0px 0px;
+	transition-property: brightness, border, background-color, pre-transform-scale2d, box-shadow;
+	transition-duration: 0.14s;
+}
+
+#ProfileModalFooter .vote-button:hover {
+	brightness: 1.18;
+	pre-transform-scale2d: 1.02;
+	border: 1px solid #ffcf66aa;
+	background-color: gradient(linear, 0% 0%, 100% 0%, from(#12304aee), color-stop(0.5, #205176ee), to(#12304aee));
+	box-shadow: fill #5ad0ff3a 0px 0px 12px 0px;
+}
+
+#ProfileModalFooter .vote-button .vote-button-label {
+	font-size: 17px;
+	letter-spacing: 0.8px;
+	color: #eaf8ff;
+	text-shadow: 0px 1px 3px #000000;
+	font-family: Reaver;
+	font-weight: bold;
+}
+
+#ProfileModalSteamButton.IsDisabled {
+	opacity: 0.42;
+	saturation: 0.25;
 }
 
 .profile-summary-xp-wrap {
 	width: 100%;
+	height: 26px;
+	margin-top: 4px;
 	padding-right: 0px;
+	flow-children: none;
 }
 
 .profile-summary-xp-progress {
-	width: fill-parent-flow(1.0);
-	margin-right: 6px;
+	width: 100%;
+	height: 9px;
+	margin-top: 15px;
+	margin-right: 0px;
+	border: 1px solid #7db9d846;
+	background-color: #02060cc8;
+	box-shadow: inset #000000aa 0px 0px 5px 0px;
+}
+
+.profile-summary-xp-text {
+	width: 100%;
+	height: 14px;
+	margin-top: 0px;
+	font-size: 10px;
+	letter-spacing: 0.5px;
+	text-align: right center;
+	text-transform: uppercase;
+	color: #aee9ff;
+}
+
+#ProfileSummaryCard.ProfileSummaryDonator.PlayerLoadingDonatorTier1 .profile-summary-xp-progress {
+	border-color: #70e39a66;
+}
+
+#ProfileSummaryCard.ProfileSummaryDonator.PlayerLoadingDonatorTier1 .profile-summary-xp-progress .ProgressBarLeft {
+	background-color: gradient(linear, 0% 0%, 100% 0%, from(#2d8a4d), color-stop(0.58, #70e39a), to(#c8ffd6));
+	box-shadow: fill #70e39a5c 0px 0px 8px 0px;
+}
+
+#ProfileSummaryCard.ProfileSummaryDonator.PlayerLoadingDonatorTier2 .profile-summary-xp-progress {
+	border-color: #ffcf6666;
+}
+
+#ProfileSummaryCard.ProfileSummaryDonator.PlayerLoadingDonatorTier2 .profile-summary-xp-progress .ProgressBarLeft {
+	background-color: gradient(linear, 0% 0%, 100% 0%, from(#9c7924), color-stop(0.58, #ffcf66), to(#fff4bd));
+	box-shadow: fill #ffcf665c 0px 0px 8px 0px;
+}
+
+#ProfileSummaryCard.ProfileSummaryDonator.PlayerLoadingDonatorTier3 .profile-summary-xp-progress {
+	border-color: #ff5a4366;
+}
+
+#ProfileSummaryCard.ProfileSummaryDonator.PlayerLoadingDonatorTier3 .profile-summary-xp-progress .ProgressBarLeft {
+	background-color: gradient(linear, 0% 0%, 100% 0%, from(#8d2f21), color-stop(0.58, #ff5a43), to(#ffd7ca));
+	box-shadow: fill #ff5a435c 0px 0px 8px 0px;
+}
+
+#ProfileSummaryCard.ProfileSummaryDonator.PlayerLoadingDonatorTier4 .profile-summary-xp-progress {
+	border-color: #5ad0ff70;
+}
+
+#ProfileSummaryCard.ProfileSummaryDonator.PlayerLoadingDonatorTier4 .profile-summary-xp-progress .ProgressBarLeft {
+	background-color: gradient(linear, 0% 0%, 100% 0%, from(#0a7ca8), color-stop(0.58, #5ad0ff), to(#e6fbff));
+	box-shadow: fill #5ad0ff66 0px 0px 9px 0px;
+}
+
+#ProfileSummaryCard.ProfileSummaryDonator.PlayerLoadingDonatorTier5 .profile-summary-xp-progress {
+	border-color: #c99cff88;
+}
+
+#ProfileSummaryCard.ProfileSummaryDonator.PlayerLoadingDonatorTier5 .profile-summary-xp-progress .ProgressBarLeft {
+	background-color: gradient(linear, 0% 0%, 100% 0%, from(#7d4bb5), color-stop(0.5, #c99cff), to(#fff8ff));
+	box-shadow: fill #c99cff78 0px 0px 10px 0px;
 }
 
 .profile-summary-xp-progress .ProgressBarLeft,
@@ -3344,7 +4031,8 @@
 
 .player-loading-global-status {
 	width: 100%;
-	margin-top: 3px;
+	height: 20px;
+	margin-top: 2px;
 	font-size: 15px;
 	letter-spacing: 0.7px;
 	text-transform: uppercase;
@@ -3522,4 +4210,737 @@
 .AspectRatio4x3 .loading-qa-panel {
 	margin-top: 188px;
 	width: 232px;
+}
+
+/* Profile summary two-column pass */
+#ProfileSummaryCard {
+	height: 100%;
+	padding: 6px 8px 5px 8px;
+	flow-children: right;
+}
+
+#ProfileSummaryCard.ProfileSummaryDonator {
+	padding: 6px 8px 5px 8px;
+}
+
+#ProfileSummaryAvatar {
+	width: 56px;
+	height: 56px;
+	margin-right: 8px;
+	vertical-align: center;
+}
+
+#ProfileSummaryTextWrap {
+	width: fill-parent-flow(1.0);
+	height: 100%;
+	vertical-align: center;
+	flow-children: down;
+	overflow: noclip;
+}
+
+#ProfileSummaryTopRow {
+	width: 100%;
+	height: 25px;
+	flow-children: right;
+}
+
+#ProfileSummaryTitle {
+	width: 42%;
+	height: 100%;
+	font-size: 15px;
+	text-align: left center;
+	text-overflow: shrink;
+}
+
+#ProfileSummaryNameRow {
+	width: fill-parent-flow(1.0);
+	height: 100%;
+	flow-children: none;
+}
+
+#ProfileSummaryName {
+	width: 100%;
+	height: 100%;
+	margin-right: 0px;
+	font-size: 22px;
+	text-align: right center;
+	text-overflow: shrink;
+}
+
+#ProfileSummaryDataGrid {
+	width: 100%;
+	height: 35px;
+	margin-top: 0px;
+	flow-children: right;
+}
+
+.profile-summary-column {
+	width: fill-parent-flow(1.0);
+	height: 100%;
+	flow-children: down;
+}
+
+.profile-summary-column-right {
+	margin-left: 8px;
+}
+
+.profile-summary-column .profile-summary-row {
+	width: 100%;
+	height: 35px;
+	margin-top: 0px;
+	flow-children: down;
+}
+
+.profile-summary-column .profile-summary-key {
+	width: 100%;
+	height: 15px;
+	font-size: 12px;
+	text-align: left center;
+	text-overflow: shrink;
+}
+
+.profile-summary-column .profile-summary-value {
+	width: 100%;
+	height: 19px;
+	font-size: 13px;
+	text-align: left center;
+	text-overflow: shrink;
+}
+
+.profile-summary-column-right .profile-summary-key,
+.profile-summary-column-right .profile-summary-value {
+	text-align: right center;
+}
+
+.profile-summary-xp-wrap {
+	width: 100%;
+	height: 30px;
+	margin-top: 1px;
+	flow-children: none;
+	overflow: noclip;
+}
+
+.profile-summary-xp-progress {
+	width: 100%;
+	height: 10px;
+	margin-top: 16px;
+	margin-right: 0px;
+}
+
+.profile-summary-xp-text {
+	width: 100%;
+	height: 15px;
+	margin-top: 0px;
+	font-size: 10px;
+	text-align: center center;
+	text-overflow: shrink;
+}
+
+/* Profile summary layout fix: avatar + labels on top, full-width XP below */
+#ProfileSummaryCard {
+	height: 100%;
+	padding: 5px 8px 5px 8px;
+	flow-children: down;
+	overflow: clip;
+}
+
+#ProfileSummaryCard.ProfileSummaryDonator {
+	padding: 5px 8px 5px 8px;
+}
+
+#ProfileSummaryMainRow {
+	width: 100%;
+	height: fill-parent-flow(1.0);
+	min-height: 58px;
+	flow-children: right;
+	overflow: clip;
+}
+
+#ProfileSummaryAvatar {
+	width: 56px;
+	height: 56px;
+	margin-right: 8px;
+	margin-top: 0px;
+	vertical-align: center;
+}
+
+#ProfileSummaryTextWrap {
+	width: fill-parent-flow(1.0);
+	height: 58px;
+	vertical-align: center;
+	flow-children: down;
+	overflow: clip;
+}
+
+#ProfileSummaryTopRow {
+	width: 100%;
+	height: 25px;
+	flow-children: right;
+}
+
+#ProfileSummaryTitle {
+	width: 42%;
+	height: 100%;
+	font-size: 15px;
+	text-align: left center;
+	text-overflow: shrink;
+}
+
+#ProfileSummaryNameRow {
+	width: fill-parent-flow(1.0);
+	height: 100%;
+	flow-children: none;
+}
+
+#ProfileSummaryName {
+	width: 100%;
+	height: 100%;
+	margin-right: 0px;
+	font-size: 21px;
+	text-align: right center;
+	text-overflow: shrink;
+}
+
+#ProfileSummaryDataGrid {
+	width: 100%;
+	height: 31px;
+	margin-top: 1px;
+	flow-children: right;
+}
+
+.profile-summary-column {
+	width: fill-parent-flow(1.0);
+	height: 100%;
+	flow-children: down;
+}
+
+.profile-summary-column-right {
+	margin-left: 8px;
+}
+
+.profile-summary-column .profile-summary-row {
+	width: 100%;
+	height: 31px;
+	margin-top: 0px;
+	flow-children: down;
+}
+
+.profile-summary-column .profile-summary-key {
+	width: 100%;
+	height: 14px;
+	font-size: 11px;
+	text-align: left center;
+	text-overflow: shrink;
+}
+
+.profile-summary-column .profile-summary-value {
+	width: 100%;
+	height: 17px;
+	font-size: 12px;
+	text-align: left center;
+	text-overflow: shrink;
+}
+
+.profile-summary-column-right .profile-summary-key,
+.profile-summary-column-right .profile-summary-value {
+	text-align: right center;
+}
+
+.profile-summary-xp-wrap {
+	width: 100%;
+	height: 24px;
+	margin-top: 2px;
+	flow-children: none;
+	overflow: clip;
+}
+
+.profile-summary-xp-progress {
+	width: 100%;
+	height: 10px;
+	margin-top: 13px;
+	margin-right: 0px;
+}
+
+.profile-summary-xp-text {
+	width: 100%;
+	height: 13px;
+	margin-top: 0px;
+	font-size: 10px;
+	text-align: center center;
+	text-overflow: shrink;
+}
+
+/* Profile summary right-column alignment */
+#ProfileSummaryTitle {
+	width: fill-parent-flow(1.0);
+}
+
+#ProfileSummaryNameRow {
+	width: 132px;
+	horizontal-align: right;
+}
+
+#ProfileSummaryName {
+	text-align: center center;
+}
+
+#ProfileSummaryDataGrid .profile-summary-column {
+	width: fill-parent-flow(1.0);
+}
+
+#ProfileSummaryDataGrid .profile-summary-column-right {
+	width: 132px;
+	margin-left: 8px;
+}
+
+.profile-summary-column-right .profile-summary-key,
+.profile-summary-column-right .profile-summary-value {
+	text-align: center center;
+}
+
+/* Profile modal XP bar should align with the surrounding stat rows */
+#ProfileModalXPProgress {
+    width: 96%;
+    horizontal-align: center;
+    margin-left: 0px;
+    margin-right: 0px;
+}
+
+/* Ready toast label centering */
+#ReadyToast {
+    min-width: 190px;
+}
+
+#ReadyToastLabel {
+    width: 100%;
+    height: 100%;
+    horizontal-align: center;
+    vertical-align: center;
+    text-align: center center;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Localization safety pass                                                   */
+/* -------------------------------------------------------------------------- */
+
+.vote-content,
+.vote-select-panel,
+.vote-progress-tab,
+.vote-selection-summary,
+.player-loading-sidebar,
+.player-loading-header,
+.player-loading-row,
+.patreon-highlight-card,
+.discord-highlight-card,
+.transifex-highlight-card,
+.patreon-highlight-copy,
+.discord-highlight-copy,
+.transifex-highlight-copy {
+	overflow: clip;
+}
+
+.vote-content-title,
+.vote-select-title,
+.vote-select-description,
+.vote-button-label,
+.vote-progress-tab-title,
+.vote-progress-option-name,
+.vote-progress-option-count,
+.vote-selection-summary-title,
+.vote-selection-summary-key,
+.vote-selection-summary-value,
+.player-loading-title,
+.player-loading-counter,
+.player-loading-status,
+.player-loading-global-status,
+.player-force-launch-label,
+.player-ready-button Label,
+.player-loading-section,
+.player-loading-name,
+.player-loading-state,
+.bottom-tab-tagline,
+.patreon-highlight-title,
+.discord-highlight-title,
+.transifex-highlight-title,
+.patreon-highlight-subtitle,
+.discord-highlight-subtitle,
+.transifex-highlight-subtitle,
+.patreon-benefit-text,
+.discord-benefit-text,
+.transifex-benefit-text,
+.patreon-highlight-support-note,
+.discord-highlight-support-note,
+.transifex-highlight-support-note,
+.profile-summary-key,
+.profile-summary-value,
+#ProfileSummaryName,
+#ProfileSummaryTitle {
+	text-overflow: shrink;
+}
+
+.vote-select-description,
+.patreon-benefit-text,
+.discord-benefit-text,
+.transifex-benefit-text,
+.patreon-highlight-support-note,
+.discord-highlight-support-note,
+.transifex-highlight-support-note {
+	white-space: normal;
+	overflow: clip;
+}
+
+.vote-content {
+	width: 70%;
+	max-width: 1320px;
+	max-height: 78%;
+	padding: 20px 22px 18px 22px;
+}
+
+.vote-content-title {
+	height: 62px;
+	margin-bottom: 14px;
+	font-size: 46px;
+	line-height: 54px;
+}
+
+.vote-category-row {
+	width: 100%;
+	flow-children: right;
+}
+
+.vote-choice-cell {
+	width: fill-parent-flow(1.0);
+	min-width: 0px;
+	margin-left: 6px;
+	margin-right: 6px;
+}
+
+.vote-select-panel,
+#vote_difficulty .vote-select-panel,
+.vote-category-row.VoteRowDetailed .vote-select-panel {
+	width: 100%;
+	height: 288px;
+	min-height: 288px;
+	padding: 18px 10px 14px 10px;
+}
+
+.vote-select-title,
+#vote_difficulty .vote-select-title {
+	height: 54px;
+	margin-bottom: 10px;
+	font-size: 38px;
+	line-height: 44px;
+}
+
+.vote-select-description,
+#vote_difficulty .vote-select-description,
+.vote-category-row.VoteRowDetailed .vote-select-description,
+.vote-choice-cell.VotePanelDetailed .vote-select-description {
+	width: 100%;
+	height: fill-parent-flow(1.0);
+	max-height: 118px;
+	padding-left: 0px;
+	padding-right: 0px;
+	font-size: 17px;
+	line-height: 21px;
+}
+
+.vote-select-panel .vote-button,
+#vote_difficulty .vote-select-panel .vote-button {
+	width: 88%;
+	height: 40px;
+	margin-top: 8px;
+}
+
+.vote-select-panel .vote-button .vote-button-label,
+.description-text-container > .vote-button .vote-button-label,
+#MainVoteButton .vote-button-label {
+	font-size: 17px;
+	letter-spacing: 0px;
+}
+
+.player-loading-header {
+	height: 160px;
+	padding: 8px 10px 7px 10px;
+}
+
+.player-loading-title {
+	height: 28px;
+	font-size: 23px;
+	letter-spacing: 0px;
+}
+
+.player-loading-counter {
+	height: 22px;
+	font-size: 15px;
+	letter-spacing: 0px;
+}
+
+.player-loading-status,
+.player-loading-global-status,
+.player-force-launch-label {
+	width: 100%;
+	height: 18px;
+	font-size: 12px;
+	letter-spacing: 0px;
+}
+
+.player-ready-button {
+	width: 92%;
+	height: 28px;
+	margin-top: 5px;
+}
+
+.player-ready-button Label {
+	width: 100%;
+	font-size: 14px;
+	letter-spacing: 0px;
+	text-align: center center;
+}
+
+.player-loading-list {
+	padding-left: 10px;
+	padding-right: 10px;
+}
+
+.player-loading-section {
+	height: 18px;
+	font-size: 12px;
+	letter-spacing: 0px;
+	text-overflow: ellipsis;
+}
+
+.player-loading-row {
+	height: 36px;
+	padding-left: 6px;
+	padding-right: 6px;
+}
+
+.player-loading-name {
+	min-width: 0px;
+	font-size: 16px;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.player-loading-state {
+	width: 72px;
+	min-width: 72px;
+	margin-top: 2px;
+	font-size: 12px;
+	letter-spacing: 0px;
+	text-overflow: shrink;
+}
+
+.player-loading-avatar,
+.player-loading-avatar-wrap {
+	width: 22px;
+	height: 22px;
+	margin-right: 6px;
+}
+
+.vote-selection-summary {
+	height: 82px;
+	padding: 5px 8px;
+}
+
+.vote-selection-summary-title {
+	height: 15px;
+	font-size: 11px;
+	letter-spacing: 0px;
+}
+
+.vote-selection-summary-row {
+	height: 24px;
+}
+
+.vote-selection-summary-key {
+	width: 42%;
+	font-size: 12px;
+	letter-spacing: 0px;
+}
+
+.vote-selection-summary-value {
+	width: 58%;
+	font-size: 14px;
+	text-align: right center;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.vote-progress-tab-title {
+	font-size: 11px;
+	letter-spacing: 0px;
+}
+
+.vote-progress-option-name {
+	min-width: 0px;
+	font-size: 12px;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.vote-progress-option-count {
+	width: 58px;
+	font-size: 11px;
+	text-overflow: shrink;
+}
+
+.patreon-highlight-title,
+.discord-highlight-title,
+.transifex-highlight-title {
+	height: 34px;
+	font-size: 26px;
+	letter-spacing: 0px;
+	white-space: nowrap;
+	text-overflow: shrink;
+}
+
+.patreon-highlight-subtitle,
+.discord-highlight-subtitle,
+.transifex-highlight-subtitle {
+	height: 24px;
+	font-size: 18px;
+	letter-spacing: 0px;
+	white-space: nowrap;
+	text-overflow: shrink;
+}
+
+.patreon-benefits-list,
+.discord-benefits-list,
+.transifex-benefits-list {
+	height: fill-parent-flow(1.0);
+	overflow: clip;
+}
+
+.patreon-benefit-row,
+.discord-benefit-row,
+.transifex-benefit-row {
+	height: 20px;
+	margin-bottom: 1px;
+}
+
+.patreon-benefit-dot,
+.discord-benefit-dot,
+.transifex-benefit-dot {
+	margin-right: 8px;
+}
+
+.patreon-benefit-text,
+.discord-benefit-text,
+.transifex-benefit-text {
+	height: 20px;
+	font-size: 14px;
+	line-height: 17px;
+}
+
+.patreon-highlight-footer,
+.discord-highlight-footer,
+.transifex-highlight-footer {
+	height: 20px;
+	margin-top: 1px;
+}
+
+.patreon-highlight-support-note,
+.discord-highlight-support-note,
+.transifex-highlight-support-note {
+	height: 20px;
+	font-size: 12px;
+	line-height: 15px;
+}
+
+.patreon-cta-side,
+.discord-cta-side,
+.transifex-cta-side {
+	width: 32%;
+	max-width: 434px;
+	min-width: 260px;
+	margin-left: 10px;
+	overflow: clip;
+}
+
+.patreon-cta-image-button,
+.transifex-cta-image-button {
+	width: 100%;
+	height: 84px;
+}
+
+.discord-cta-image-button {
+	width: 100%;
+	height: 118px;
+}
+
+#ProfileSummaryName {
+	max-width: 145px;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+#ProfileSummaryTitle {
+	max-width: 150px;
+	font-size: 13px;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.profile-summary-row {
+	overflow: clip;
+}
+
+.profile-summary-key {
+	width: 48%;
+	font-size: 11px;
+	letter-spacing: 0px;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.profile-summary-value {
+	width: 52%;
+	font-size: 12px;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.AspectRatio4x3 .vote-content {
+	width: 78%;
+}
+
+.AspectRatio4x3 .vote-content-title {
+	font-size: 40px;
+	line-height: 48px;
+}
+
+.AspectRatio4x3 .vote-select-title,
+.AspectRatio4x3 #vote_difficulty .vote-select-title {
+	font-size: 32px;
+	line-height: 38px;
+}
+
+.AspectRatio4x3 .vote-select-description,
+.AspectRatio4x3 #vote_difficulty .vote-select-description {
+	font-size: 14px;
+	line-height: 18px;
+}
+
+.AspectRatio4x3 .player-loading-title {
+	font-size: 20px;
+}
+
+.AspectRatio4x3 .player-loading-state {
+	width: 62px;
+	min-width: 62px;
+	font-size: 11px;
+}
+
+.AspectRatio4x3 .patreon-highlight-title,
+.AspectRatio4x3 .discord-highlight-title,
+.AspectRatio4x3 .transifex-highlight-title {
+	font-size: 22px;
+}
+
+.AspectRatio4x3 .patreon-highlight-subtitle,
+.AspectRatio4x3 .discord-highlight-subtitle,
+.AspectRatio4x3 .transifex-highlight-subtitle {
+	font-size: 15px;
 }

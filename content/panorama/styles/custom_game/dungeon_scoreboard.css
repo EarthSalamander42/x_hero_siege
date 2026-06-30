@@ -252,7 +252,6 @@
 
 #ScoreboardTeamContainer
 {
-	height: 450px;
 	vertical-align: bottom;
 	width: 100%;
 	padding-top: 0px;
@@ -294,6 +293,7 @@
 	vertical-align: bottom;
 	text-transform: uppercase;
 	text-align: right;
+	vertical-align: center;
 }
 
 .HeroImagePanel
@@ -641,9 +641,12 @@
 #ZoneRequirementContainer
 {
 	width: 100%;
-	height: 165px;
+	height: 200px;
 	margin-bottom: 0px;
-	background-color: black;
+	background-color: #050b14ee;
+	border-top: 1px solid #77c8ff18;
+	border-bottom: 1px solid #77c8ff18;
+
 }
 
 .ReqTitle
@@ -758,15 +761,31 @@
 }
 
 /* XHS 4.0 visual pass */
+@keyframes 'XHSScoreboardSupporterPulse'
+{
+	0% { brightness: 0.98; }
+	50% { brightness: 1.15; }
+	100% { brightness: 0.98; }
+}
+
+@keyframes 'XHSScoreboardSupporterSweep'
+{
+	0% { opacity: 0; transform: translateX( -72px ); }
+	25% { opacity: 0; transform: translateX( -72px ); }
+	50% { opacity: 0.65; }
+	78% { opacity: 0; transform: translateX( 92px ); }
+	100% { opacity: 0; transform: translateX( 92px ); }
+}
+
 .FlyoutScoreboardRoot {
-	width: 640px;
+	width: 700px;
 	margin-top: 132px;
-	transform: translatex( -680px );
+	transform: translatex( -740px );
 }
 
 #DungeonScoreboard {
 	width: 100%;
-	height: 86%;
+	height: 100%;
 	background-color: gradient( linear, 0% 0%, 100% 100%, from( #071827f4 ), color-stop( 0.62, #091524ef ), to( #040914f7 ) );
 	border: 1px solid #77c8ff32;
 	border-left: 3px solid #5ad0ff;
@@ -825,13 +844,6 @@
 	color: #8fdcff;
 }
 
-#ZoneRequirementContainer {
-	height: 150px;
-	background-color: #050b14ee;
-	border-top: 1px solid #77c8ff18;
-	border-bottom: 1px solid #77c8ff18;
-}
-
 .ReqTitle {
 	color: #8fdcff;
 	font-size: 14px;
@@ -853,6 +865,143 @@
 	background-color: gradient( linear, 0% 0%, 100% 100%, from( #071827df ), to( #050b14c8 ) );
 }
 
+.FragmentQuestCards {
+	flow-children: right;
+	width: 100%;
+	height: 100%;
+	padding: 7px 10px 9px 10px;
+}
+
+#ZoneStarRequirementsDesc.FragmentQuestCards {
+	flow-children: right;
+	padding: 7px 10px 9px 10px;
+}
+
+.FragmentQuestCard {
+	flow-children: down;
+	width: fill-parent-flow(1);
+	height: 100%;
+	margin-left: 4px;
+	margin-right: 4px;
+	padding: 7px 8px 6px 8px;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #081624f2 ), to( #050a12dc ) );
+	border: 1px solid #77c8ff26;
+	border-radius: 6px;
+	box-shadow: fill #00000055 0px 0px 8px 0px;
+}
+
+.FragmentQuestCardActive {
+	border: 1px solid #5ad0ff66;
+}
+
+.FragmentQuestCardComplete {
+	border: 1px solid #ffcf6680;
+}
+
+.FragmentQuestHeader {
+	flow-children: right;
+	width: 100%;
+	height: 20px;
+}
+
+.FragmentQuestTitle {
+	width: fill-parent-flow(1);
+	height: 20px;
+	color: #f4fbff;
+	font-size: 14px;
+	font-weight: semi-bold;
+	text-transform: uppercase;
+	text-overflow: shrink;
+}
+
+.FragmentQuestStars {
+	flow-children: right;
+	width: 54px;
+	height: 18px;
+	horizontal-align: right;
+}
+
+.FragmentQuestStar {
+	width: 16px;
+	height: 16px;
+	margin-left: 2px;
+	background-image: url("s2r://panorama/images/status_icons/star_raised_filled.psd");
+	background-size: 100%;
+	background-repeat: no-repeat;
+	background-position: 50% 50%;
+	wash-color: #7b8797;
+}
+
+.FragmentQuestStarActive {
+	background-image: url("s2r://panorama/images/status_icons/star_raised_filled.psd");
+	wash-color: #ffb83d;
+}
+
+.FragmentQuestDescription {
+	width: 100%;
+	height: 34px;
+	margin-top: 2px;
+	color: #cfe8ff;
+	font-size: 13px;
+	line-height: 16px;
+	text-overflow: shrink;
+}
+
+.FragmentQuestMeta {
+	flow-children: right;
+	width: 100%;
+	height: 19px;
+	margin-top: 2px;
+}
+
+.FragmentQuestProgress {
+	width: 72px;
+	color: #ffcf66;
+	font-size: 14px;
+	font-weight: bold;
+	text-align: left;
+}
+
+.FragmentQuestThresholds {
+	width: fill-parent-flow(1);
+	color: #8fdcff;
+	font-size: 12px;
+	text-align: right;
+	text-overflow: shrink;
+}
+
+.FragmentQuestProgressBar {
+	width: 100%;
+	height: 5px;
+	margin-top: 4px;
+	background-color: #02060ccc;
+	border: 1px solid #77c8ff20;
+}
+
+.FragmentQuestProgressFill {
+	height: 100%;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #5ad0ff ), to( #ffcf66 ) );
+}
+
+.FragmentQuestReward {
+	width: 100%;
+	height: 16px;
+	margin-top: 4px;
+	color: #d9f7ff;
+	font-size: 12px;
+	text-align: right;
+	text-overflow: shrink;
+}
+
+.FragmentQuestEmpty {
+	width: 100%;
+	height: 100%;
+	color: #8fdcff;
+	font-size: 15px;
+	text-align: center;
+	vertical-align: center;
+}
+
 .ZoneReqLabel {
 	color: #dceeff;
 	font-size: 15px;
@@ -860,7 +1009,6 @@
 }
 
 #ScoreboardTeamContainer {
-	height: 430px;
 	padding: 8px 12px 10px 12px;
 	background-color: #0409148c;
 }
@@ -870,6 +1018,9 @@
 	margin-bottom: 4px;
 	background-color: #07132188;
 	border: 1px solid #77c8ff12;
+	overflow: noclip;
+	transition-property: brightness, background-color, border, box-shadow;
+	transition-duration: 0.12s;
 }
 
 .HeroRow.CurrentPlayer {
@@ -883,18 +1034,391 @@
 
 .HeroImagePanel {
 	width: 86px;
-	height: 48px;
+	height: 45px;
+	overflow: noclip;
 }
 
 .HeroColorBar {
 	width: 3px;
-	height: 48px;
+	height: 43px;
 	box-shadow: fill #00000080 0px 0px 4px 0px;
 }
 
 .PartyPortraitImage {
 	border: 1px solid #77c8ff20;
 	box-shadow: fill #00000070 0px 0px 5px 0px;
+	transition-property: brightness, border, box-shadow, wash-color;
+	transition-duration: 0.12s;
+}
+
+.HeroRow.ScoreboardSupporterTier1 {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #123524c8 ), color-stop( 0.35, #071321aa ), to( #07132188 ) );
+	border: 1px solid #70e39a38;
+	box-shadow: fill #70e39a12 0px 0px 8px 0px;
+}
+
+.HeroRow.ScoreboardSupporterTier2 {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #3b2c12c8 ), color-stop( 0.35, #071321aa ), to( #07132188 ) );
+	border: 1px solid #ffcf6644;
+	box-shadow: fill #ffcf6615 0px 0px 8px 0px;
+}
+
+.HeroRow.ScoreboardSupporterTier3 {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #401916c8 ), color-stop( 0.35, #071321aa ), to( #07132188 ) );
+	border: 1px solid #ff5a4344;
+	box-shadow: fill #ff5a4315 0px 0px 8px 0px;
+}
+
+.HeroRow.ScoreboardSupporterTier4 {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #0a2f45d0 ), color-stop( 0.38, #071321b8 ), to( #07132188 ) );
+	border: 1px solid #5ad0ff52;
+	box-shadow: fill #5ad0ff1f 0px 0px 10px 0px;
+}
+
+.HeroRow.ScoreboardSupporterTier5 {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #2c1743d8 ), color-stop( 0.42, #111428ca ), to( #07132190 ) );
+	border: 1px solid #c99cff72;
+	box-shadow: fill #c99cff28 0px 0px 12px 0px, inset #ffffff10 0px 1px 0px 0px;
+	animation-name: XHSScoreboardSupporterPulse;
+	animation-duration: 2.35s;
+	animation-iteration-count: infinite;
+	animation-timing-function: ease-in-out;
+}
+
+.HeroImagePanel.ScoreboardSupporterTier1 .PartyPortraitImage {
+	border: 1px solid #70e39aaa;
+	box-shadow: fill #70e39a50 0px 0px 8px 0px, inset #ffffff20 0px 1px 0px 0px;
+}
+
+.HeroImagePanel.ScoreboardSupporterTier2 .PartyPortraitImage {
+	border: 1px solid #ffcf66bd;
+	box-shadow: fill #ffcf665c 0px 0px 9px 0px, inset #fff2aa22 0px 1px 0px 0px;
+}
+
+.HeroImagePanel.ScoreboardSupporterTier3 .PartyPortraitImage {
+	border: 1px solid #ff5a43b8;
+	box-shadow: fill #ff5a435a 0px 0px 9px 0px, inset #ffd6bd20 0px 1px 0px 0px;
+}
+
+.HeroImagePanel.ScoreboardSupporterTier4 .PartyPortraitImage {
+	border: 1px solid #5ad0ffd0;
+	box-shadow: fill #5ad0ff70 0px 0px 10px 0px, #ffffff38 0px 0px 3px 0px, inset #ffffff24 0px 1px 0px 0px;
+}
+
+.HeroImagePanel.ScoreboardSupporterTier5 .PartyPortraitImage {
+	border: 1px solid #c99cffed;
+	box-shadow: fill #c99cff9c 0px 0px 12px 0px, #ffffff50 0px 0px 4px 0px, inset #ffffff32 0px 1px 0px 0px;
+}
+
+.ScoreboardSupporterSweep {
+	width: 24px;
+	height: 66px;
+	margin-top: -8px;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #ffffff00 ), color-stop( 0.46, #ffffff70 ), to( #ffffff00 ) );
+	opacity: 0;
+	visibility: collapse;
+	ignore-parent-flow: true;
+	z-index: 3;
+}
+
+.HeroImagePanel.ScoreboardSupporterTier3 .ScoreboardSupporterSweep,
+.HeroImagePanel.ScoreboardSupporterTier4 .ScoreboardSupporterSweep,
+.HeroImagePanel.ScoreboardSupporterTier5 .ScoreboardSupporterSweep {
+	visibility: visible;
+	animation-name: XHSScoreboardSupporterSweep;
+	animation-duration: 2.7s;
+	animation-iteration-count: infinite;
+	animation-timing-function: ease-in-out;
+}
+
+.HeroImagePanel.ScoreboardSupporterTier5 .ScoreboardSupporterSweep {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #ffffff00 ), color-stop( 0.46, #f3ddff99 ), to( #ffffff00 ) );
+	animation-duration: 2.05s;
+}
+
+.ScoreboardSupporterBadge {
+	width: 20px;
+	height: 20px;
+	align: right top;
+	margin-top: -3px;
+	margin-right: -4px;
+	background-color: #00000000;
+	border: 0px solid transparent;
+	box-shadow: none;
+	visibility: collapse;
+	ignore-parent-flow: true;
+	z-index: 6;
+}
+
+.ScoreboardSupporterBadgeLabel {
+	width: 100%;
+	height: 100%;
+	color: #ffffff;
+	font-size: 12px;
+	font-weight: bold;
+	text-align: center;
+	text-shadow: 0px 1px 3px #000000;
+}
+
+.ScoreboardSupporterBadge.ScoreboardSupporterTier1 {
+	visibility: visible;
+	background-color: gradient( radial, 50% 50%, 0% 0%, 70% 70%, from( #d9ffe3 ), color-stop( .45, #70e39a ), to( #1d6b39 ) );
+	border: 1px solid #d9ffe3aa;
+	box-shadow: fill #70e39a9c 0px 0px 7px 0px;
+}
+
+.ScoreboardSupporterBadge.ScoreboardSupporterTier2 {
+	visibility: visible;
+	background-color: gradient( radial, 50% 50%, 0% 0%, 70% 70%, from( #fff4bd ), color-stop( .45, #ffcf66 ), to( #805c14 ) );
+	border: 1px solid #fff4bdba;
+	box-shadow: fill #ffcf66a8 0px 0px 8px 0px;
+}
+
+.ScoreboardSupporterBadge.ScoreboardSupporterTier3 {
+	visibility: visible;
+	background-color: gradient( radial, 50% 50%, 0% 0%, 70% 70%, from( #ffd7ca ), color-stop( .45, #ff5a43 ), to( #7e251b ) );
+	border: 1px solid #ffd7caba;
+	box-shadow: fill #ff5a43a8 0px 0px 8px 0px;
+}
+
+.ScoreboardSupporterBadge.ScoreboardSupporterTier4 {
+	visibility: visible;
+	background-color: gradient( radial, 50% 50%, 0% 0%, 70% 70%, from( #e6fbff ), color-stop( .45, #5ad0ff ), to( #0a6185 ) );
+	border: 1px solid #e6fbffbd;
+	box-shadow: fill #5ad0ffb8 0px 0px 9px 0px, #ffffff44 0px 0px 3px 0px;
+}
+
+.ScoreboardSupporterBadge.ScoreboardSupporterTier5 {
+	visibility: visible;
+	background-color: gradient( radial, 50% 50%, 0% 0%, 70% 70%, from( #fff8ff ), color-stop( .42, #d9b7ff ), to( #7d4bb5 ) );
+	border: 1px solid #fff0ffcc;
+	box-shadow: fill #c99cffd0 0px 0px 11px 0px, #ffffff66 0px 0px 4px 0px;
+	animation-name: XHSScoreboardSupporterPulse;
+	animation-duration: 1.7s;
+	animation-iteration-count: infinite;
+	animation-timing-function: ease-in-out;
+}
+
+.ScoreboardXHSSupporterHover {
+	width: 304px;
+	padding: 10px;
+	flow-children: down;
+	ignore-parent-flow: true;
+	position: 0px 0px 0px;
+	z-index: 50;
+	visibility: collapse;
+	opacity: 0;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #101a27f8 ), color-stop( 0.58, #07111cf8 ), to( #0b0d16f8 ) );
+	border: 1px solid #77c8ff4a;
+	box-shadow: #000000de 0px 4px 16px 0px;
+	transition-property: opacity, pre-transform-scale2d;
+	transition-duration: 0.1s;
+}
+
+.ScoreboardXHSSupporterHover.ScoreboardXHSHoverVisible {
+	visibility: visible;
+	opacity: 1;
+	pre-transform-scale2d: 1;
+}
+
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier1 {
+	border-color: #70e39a8a;
+	box-shadow: #000000de 0px 4px 16px 0px, #70e39a24 0px 0px 10px 0px;
+}
+
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier2 {
+	border-color: #ffcf6694;
+	box-shadow: #000000de 0px 4px 16px 0px, #ffcf6628 0px 0px 10px 0px;
+}
+
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier3 {
+	border-color: #ff5a4394;
+	box-shadow: #000000de 0px 4px 16px 0px, #ff5a4328 0px 0px 10px 0px;
+}
+
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier4 {
+	border-color: #5ad0ffaa;
+	box-shadow: #000000de 0px 4px 16px 0px, #5ad0ff38 0px 0px 11px 0px;
+}
+
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier5 {
+	border-color: #c99cffba;
+	box-shadow: #000000de 0px 4px 16px 0px, #c99cff44 0px 0px 12px 0px;
+}
+
+.ScoreboardXHSHoverHeader {
+	width: 100%;
+	height: 56px;
+	flow-children: right;
+	margin-bottom: 8px;
+	padding-bottom: 8px;
+	border-bottom: 1px solid #77c8ff22;
+}
+
+.ScoreboardXHSHoverHeroFrame {
+	width: 70px;
+	height: 42px;
+	margin-right: 10px;
+	vertical-align: center;
+	border: 1px solid #77c8ff44;
+	background-color: #02060b;
+	overflow: clip;
+}
+
+.ScoreboardXHSHoverHeroImage {
+	width: 100%;
+	height: 100%;
+}
+
+.ScoreboardXHSHoverCopy {
+	width: fill-parent-flow( 1.0 );
+	height: 100%;
+	flow-children: down;
+}
+
+.ScoreboardXHSHoverEyebrow,
+.ScoreboardXHSHoverStatLabel,
+.ScoreboardXHSHoverMeterLabel {
+	font-size: 10px;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+	color: #86dfff;
+	font-family: Reaver;
+	text-shadow: 0px 1px 3px #000000;
+}
+
+.ScoreboardXHSHoverPlayerName {
+	width: 100%;
+	height: 22px;
+	font-size: 18px;
+	font-weight: bold;
+	color: #f2dfb8;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	font-family: Reaver;
+	text-shadow: 0px 1px 4px #000000;
+}
+
+.ScoreboardXHSHoverHeroName {
+	width: 100%;
+	height: 17px;
+	font-size: 13px;
+	color: #b9d9ff;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	font-family: Reaver;
+	text-shadow: 0px 1px 3px #000000;
+}
+
+.ScoreboardXHSHoverTier {
+	width: 100%;
+	height: 28px;
+	margin-bottom: 7px;
+	padding: 5px 8px;
+	font-size: 15px;
+	font-weight: bold;
+	text-transform: uppercase;
+	letter-spacing: 0.6px;
+	text-align: center center;
+	color: #f2dfb8;
+	background-color: #050a10b8;
+	border: 1px solid #77c8ff2d;
+	text-overflow: shrink;
+	font-family: Reaver;
+	text-shadow: 0px 1px 4px #000000;
+}
+
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier1 .ScoreboardXHSHoverTier { color: #bfffd0; }
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier2 .ScoreboardXHSHoverTier { color: #ffe7a6; }
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier3 .ScoreboardXHSHoverTier { color: #ffb8aa; }
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier4 .ScoreboardXHSHoverTier { color: #d8f7ff; }
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier5 .ScoreboardXHSHoverTier { color: #f0dcff; }
+
+.ScoreboardXHSHoverStats {
+	width: 100%;
+	flow-children: right-wrap;
+	margin-bottom: 2px;
+}
+
+.ScoreboardXHSHoverStat {
+	width: 137px;
+	height: 42px;
+	margin-right: 6px;
+	margin-bottom: 6px;
+	padding: 5px 7px;
+	flow-children: down;
+	background-color: #07111dc8;
+	border: 1px solid #77c8ff24;
+}
+
+.ScoreboardXHSHoverStatValue {
+	width: 100%;
+	height: 20px;
+	font-size: 14px;
+	color: #f4fbff;
+	text-overflow: shrink;
+	font-family: Reaver;
+	text-shadow: 0px 1px 3px #000000;
+}
+
+.ScoreboardXHSHoverMeter {
+	width: 100%;
+	height: 38px;
+	margin-bottom: 6px;
+	flow-children: down;
+}
+
+.ScoreboardXHSHoverMeterRow {
+	width: 100%;
+	height: 16px;
+	flow-children: right;
+}
+
+.ScoreboardXHSHoverMeterLabel {
+	width: fill-parent-flow( 1.0 );
+}
+
+.ScoreboardXHSHoverMeterValue {
+	width: 118px;
+	text-align: right center;
+	font-size: 12px;
+	color: #d8e9ff;
+	text-overflow: shrink;
+	font-family: Reaver;
+	text-shadow: 0px 1px 3px #000000;
+}
+
+.ScoreboardXHSHoverMeterTrack {
+	width: 100%;
+	height: 8px;
+	background-color: #02060bcc;
+	border: 1px solid #77c8ff24;
+}
+
+.ScoreboardXHSHoverMeterFill {
+	width: 0%;
+	height: 100%;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #0b6e97 ), color-stop( 0.55, #25b7ff ), to( #8fdcff ) );
+}
+
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier1 .ScoreboardXHSHoverMeterFill { background-color: gradient( linear, 0% 0%, 100% 0%, from( #2d8a4d ), to( #70e39a ) ); }
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier2 .ScoreboardXHSHoverMeterFill { background-color: gradient( linear, 0% 0%, 100% 0%, from( #9c7924 ), to( #ffcf66 ) ); }
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier3 .ScoreboardXHSHoverMeterFill { background-color: gradient( linear, 0% 0%, 100% 0%, from( #8d2f21 ), to( #ff5a43 ) ); }
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier4 .ScoreboardXHSHoverMeterFill { background-color: gradient( linear, 0% 0%, 100% 0%, from( #0a7ca8 ), to( #5ad0ff ) ); }
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier5 .ScoreboardXHSHoverMeterFill { background-color: gradient( linear, 0% 0%, 100% 0%, from( #7d4bb5 ), to( #c99cff ) ); }
+
+.ScoreboardXHSHoverFooter {
+	width: 100%;
+	min-height: 24px;
+	padding: 5px 7px;
+	font-size: 12px;
+	text-align: center center;
+	color: #c7d5eb;
+	background-color: #050a10b8;
+	border: 1px solid #77c8ff24;
+	text-overflow: shrink;
+	font-family: Reaver;
+	text-shadow: 0px 1px 3px #000000;
 }
 
 #ScoreLabelsContainer {
@@ -946,11 +1470,64 @@
 	background-color: #02060bcc;
 	border: 1px solid #77c8ff24;
 	box-shadow: inset #00000090 0px 1px 4px 0px;
+	transition-property: brightness, border, box-shadow, background-color;
+	transition-duration: 0.12s;
 }
 
 .es-player-xp-progress {
 	height: 26px;
 	background-color: gradient( linear, 0% 0%, 100% 0%, from( #0b6e97 ), color-stop( 0.55, #25b7ff ), to( #8fdcff ) );
+}
+
+.es-player-xp.ScoreboardSupporterTier1 {
+	border: 1px solid #70e39a70;
+	box-shadow: inset #00000090 0px 1px 4px 0px, fill #70e39a22 0px 0px 6px 0px;
+}
+
+.es-player-xp.ScoreboardSupporterTier1 .es-player-xp-progress {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #2d8a4d ), color-stop( 0.55, #44c46b ), to( #9df5b3 ) );
+}
+
+.es-player-xp.ScoreboardSupporterTier2 {
+	border: 1px solid #ffcf667a;
+	box-shadow: inset #00000090 0px 1px 4px 0px, fill #ffcf6628 0px 0px 7px 0px;
+}
+
+.es-player-xp.ScoreboardSupporterTier2 .es-player-xp-progress {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #9c7924 ), color-stop( 0.55, #ffcf66 ), to( #fff2aa ) );
+}
+
+.es-player-xp.ScoreboardSupporterTier3 {
+	border: 1px solid #ff5a4378;
+	box-shadow: inset #00000090 0px 1px 4px 0px, fill #ff5a4328 0px 0px 7px 0px;
+}
+
+.es-player-xp.ScoreboardSupporterTier3 .es-player-xp-progress {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #8d2f21 ), color-stop( 0.55, #ff5a43 ), to( #ffb09a ) );
+}
+
+.es-player-xp.ScoreboardSupporterTier4 {
+	border: 1px solid #5ad0ff88;
+	box-shadow: inset #00000090 0px 1px 4px 0px, fill #5ad0ff30 0px 0px 8px 0px;
+}
+
+.es-player-xp.ScoreboardSupporterTier4 .es-player-xp-progress {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #0a7ca8 ), color-stop( 0.55, #5ad0ff ), to( #d7f7ff ) );
+}
+
+.es-player-xp.ScoreboardSupporterTier5 {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #12081dcc ), to( #03060bcc ) );
+	border: 1px solid #c99cffa0;
+	box-shadow: inset #00000090 0px 1px 4px 0px, fill #c99cff42 0px 0px 9px 0px;
+}
+
+.es-player-xp.ScoreboardSupporterTier5 .es-player-xp-progress {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #7d4bb5 ), color-stop( 0.55, #c99cff ), to( #fff0ff ) );
+}
+
+.es-player-xp.ScoreboardSupporterTier5 .es-player-xp-rank-name {
+	color: #f1e6ff;
+	text-shadow: 0px 0px 6px #c99cff88, 0px 1px 3px #000000;
 }
 
 .es-player-xp Label {
@@ -976,12 +1553,13 @@
 	margin-top: 31px;
 	margin-left: 0px;
 	flow-children: right;
-	background-color: gradient( linear, 0% 0%, 100% 0%, from( #5d3b08ee ), color-stop( 0.48, #d99b20f0 ), to( #ffcf66f2 ) );
-	border: 1px solid #ffdf8a82;
-	box-shadow: fill #00000070 0px 0px 5px 0px;
+	background-color: #00000000;
+	border-top: 1px solid #77c8ff26;
+	border-bottom: 1px solid #77c8ff18;
+	box-shadow: none;
 	opacity: 0;
 	transform: translateY( 4px );
-	transition-property: opacity, transform, brightness;
+	transition-property: opacity, transform, brightness, border, box-shadow;
 	transition-duration: 0.18s;
 }
 
@@ -993,26 +1571,107 @@
 .KillEventHintGlow {
 	width: 4px;
 	height: 100%;
-	background-color: #fff3b0;
-	box-shadow: #ffcf6680 0px 0px 8px 0px;
+	background-color: #77c8ff70;
+	box-shadow: #77c8ff34 0px 0px 5px 0px;
 }
 
 .KillEventHintLabel {
 	width: fill-parent-flow( 1.0 );
 	vertical-align: center;
 	text-align: center;
-	color: #171009;
+	color: #9fd7ff;
 	font-size: 11px;
 	font-weight: bold;
 	text-transform: uppercase;
 	letter-spacing: 1px;
-	text-shadow: 0px 1px 0px #fff0b660;
+	text-shadow: 0px 1px 3px #000000;
 	text-overflow: shrink;
 }
 
 .CurrentPlayer .KillEventHint {
-	box-shadow: fill #00000080 0px 0px 7px 0px;
-	brightness: 1.12;
+	border-top-color: #9fd7ff42;
+	border-bottom-color: #77c8ff2a;
+	brightness: 1.06;
+}
+
+.KillEventHint.ScoreboardSupporterTier1 {
+	border-top: 1px solid #70e39a70;
+	border-bottom: 1px solid #70e39a44;
+	box-shadow: #70e39a24 0px 0px 8px 0px;
+}
+
+.KillEventHint.ScoreboardSupporterTier1 .KillEventHintGlow {
+	background-color: #70e39a;
+	box-shadow: #70e39a80 0px 0px 8px 0px;
+}
+
+.KillEventHint.ScoreboardSupporterTier1 .KillEventHintLabel {
+	color: #bfffd0;
+	text-shadow: 0px 0px 5px #70e39a55, 0px 1px 3px #000000;
+}
+
+.KillEventHint.ScoreboardSupporterTier2 {
+	border-top: 1px solid #ffcf6680;
+	border-bottom: 1px solid #ffcf6652;
+	box-shadow: #ffcf662a 0px 0px 9px 0px;
+}
+
+.KillEventHint.ScoreboardSupporterTier2 .KillEventHintGlow {
+	background-color: #ffcf66;
+	box-shadow: #ffcf6688 0px 0px 9px 0px;
+}
+
+.KillEventHint.ScoreboardSupporterTier2 .KillEventHintLabel {
+	color: #ffe7a6;
+	text-shadow: 0px 0px 5px #ffcf665d, 0px 1px 3px #000000;
+}
+
+.KillEventHint.ScoreboardSupporterTier3 {
+	border-top: 1px solid #ff5a4382;
+	border-bottom: 1px solid #ff5a4354;
+	box-shadow: #ff5a432a 0px 0px 9px 0px;
+}
+
+.KillEventHint.ScoreboardSupporterTier3 .KillEventHintGlow {
+	background-color: #ff5a43;
+	box-shadow: #ff5a4388 0px 0px 9px 0px;
+}
+
+.KillEventHint.ScoreboardSupporterTier3 .KillEventHintLabel {
+	color: #ffb8aa;
+	text-shadow: 0px 0px 5px #ff5a4360, 0px 1px 3px #000000;
+}
+
+.KillEventHint.ScoreboardSupporterTier4 {
+	border-top: 1px solid #5ad0ff8c;
+	border-bottom: 1px solid #5ad0ff60;
+	box-shadow: #5ad0ff34 0px 0px 10px 0px;
+}
+
+.KillEventHint.ScoreboardSupporterTier4 .KillEventHintGlow {
+	background-color: #5ad0ff;
+	box-shadow: #5ad0ff96 0px 0px 10px 0px;
+}
+
+.KillEventHint.ScoreboardSupporterTier4 .KillEventHintLabel {
+	color: #d8f7ff;
+	text-shadow: 0px 0px 6px #5ad0ff70, 0px 1px 3px #000000;
+}
+
+.KillEventHint.ScoreboardSupporterTier5 {
+	border-top: 1px solid #c99cff9c;
+	border-bottom: 1px solid #c99cff68;
+	box-shadow: #c99cff45 0px 0px 11px 0px;
+}
+
+.KillEventHint.ScoreboardSupporterTier5 .KillEventHintGlow {
+	background-color: #c99cff;
+	box-shadow: #c99cffaa 0px 0px 11px 0px;
+}
+
+.KillEventHint.ScoreboardSupporterTier5 .KillEventHintLabel {
+	color: #f0dcff;
+	text-shadow: 0px 0px 7px #c99cff88, 0px 1px 3px #000000;
 }
 
 .AspectRatio4x3 .KillEventHint {

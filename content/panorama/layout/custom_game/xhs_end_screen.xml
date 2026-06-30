@@ -15,7 +15,7 @@
 		<Panel id="XHSEndScreenMain" class="XHSEndScreenMain">
 			<Panel class="XHSEndScreenHeader">
 				<Panel class="XHSEndScreenHeaderCopy">
-					<Label id="XHSEndScreenResult" class="XHSEndScreenResult" text="X HEROES VICTORY" />
+					<Label id="XHSEndScreenResult" class="XHSEndScreenResult" text="Victory" />
 					<Panel class="XHSEndScreenMetaSlot">
 						<Panel class="XHSEndScreenMeta">
 							<Panel class="XHSEndScreenMetaItem">
@@ -52,6 +52,7 @@
 			<Panel class="XHSEndScreenBody">
 				<Panel class="XHSEndScreenLeft">
 					<Panel id="XHSEndScreenRunSummary" class="XHSEndScreenSummary" />
+					<Panel id="XHSEndScreenFragmentQuests" class="XHSEndScreenFragmentQuests" />
 					<Panel id="XHSEndScreenMvpCards" class="XHSEndScreenMvpGrid" />
 				</Panel>
 
@@ -74,6 +75,22 @@
 
 					<Panel id="XHSEndScreenPlayerRows" class="XHSEndScreenPlayerRows" />
 				</Panel>
+			</Panel>
+
+			<Panel class="XHSEndScreenSupportCta">
+				<Panel class="XHSEndScreenSupportMark">
+					<Label text="S" />
+				</Panel>
+				<Panel class="XHSEndScreenSupportCopy">
+					<Panel class="XHSEndScreenSupportHeader">
+						<Label class="XHSEndScreenSupportTitle" text="Support X Hero Siege" />
+						<Label class="XHSEndScreenSupportTag" text="In-game rewards included" />
+					</Panel>
+					<Label class="XHSEndScreenSupportText" text="Rebuilding XHS for modern Dota is a huge ongoing job: systems, servers, assets, balance, and fixed monthly costs. Supporter Pass donations help keep it moving, with monthly fragments, XP boosts, cosmetics, and 1-5 setup votes by tier." />
+				</Panel>
+				<Button id="XHSEndScreenSupportButton" class="XHSEndScreenSupportButton">
+					<Label text="Support & Rewards" />
+				</Button>
 			</Panel>
 
 			<Panel class="XHSEndScreenFooter">

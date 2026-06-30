@@ -40,26 +40,35 @@
 					<Panel class="top-left-container">
 					<Button id="HomeProfileContainer" onactivate="ToggleProfileModal(true);">
 						<Panel id="ProfileSummaryCard" hittest="false">
-							<DOTAAvatarImage id="ProfileSummaryAvatar" />
+							<Panel id="ProfileSummaryMainRow">
+								<DOTAAvatarImage id="ProfileSummaryAvatar" />
 
-							<Panel id="ProfileSummaryTextWrap">
-								<Panel id="ProfileSummaryNameRow">
-									<Label id="ProfileSummaryName" text="#loading_screen_loading" />
-									<Panel id="ProfileSummaryNameArrow" class="DemoArrow" />
+								<Panel id="ProfileSummaryTextWrap">
+									<Panel id="ProfileSummaryTopRow">
+										<Label id="ProfileSummaryTitle" text="#loading_screen_unavailable" />
+										<Panel id="ProfileSummaryNameRow">
+											<Label id="ProfileSummaryName" text="#loading_screen_loading" />
+										</Panel>
+									</Panel>
+									<Panel id="ProfileSummaryDataGrid">
+										<Panel class="profile-summary-column">
+											<Panel class="profile-summary-row">
+												<Label class="profile-summary-key" text="#loading_screen_player_level" />
+												<Label id="ProfileSummaryLevel" class="profile-summary-value" text="-" />
+											</Panel>
+										</Panel>
+										<Panel class="profile-summary-column profile-summary-column-right">
+											<Panel class="profile-summary-row">
+												<Label class="profile-summary-key" text="#loading_screen_donator" />
+												<Label id="ProfileSummaryWinrate" class="profile-summary-value" text="-" />
+											</Panel>
+										</Panel>
+									</Panel>
 								</Panel>
-								<Label id="ProfileSummaryTitle" text="#loading_screen_unavailable" />
-								<Panel class="profile-summary-row">
-									<Label class="profile-summary-key" text="#loading_screen_player_level" />
-									<Label id="ProfileSummaryLevel" class="profile-summary-value" text="-" />
-								</Panel>
-								<Panel class="profile-summary-row">
-									<Label class="profile-summary-key" text="#loading_screen_donator" />
-									<Label id="ProfileSummaryWinrate" class="profile-summary-value" text="-" />
-								</Panel>
-								<Panel id="ProfileSummaryXPWrap" class="profile-summary-xp-wrap">
-									<ProgressBar id="ProfileSummaryXPProgress" class="profile-summary-xp-progress" value="0.0" />
-									<Label id="ProfileSummaryXPText" class="profile-summary-xp-text" text="" />
-								</Panel>
+							</Panel>
+							<Panel id="ProfileSummaryXPWrap" class="profile-summary-xp-wrap">
+								<ProgressBar id="ProfileSummaryXPProgress" class="profile-summary-xp-progress" value="0.0" />
+								<Label id="ProfileSummaryXPText" class="profile-summary-xp-text" text="" />
 							</Panel>
 						</Panel>
 					</Button>
@@ -371,9 +380,9 @@
 				</Panel>
 
 				<Panel id="ProfileModalBody">
-					<Panel class="profile-modal-column">
-						<Panel class="profile-modal-block">
-							<Label class="profile-modal-block-title" text="#loading_screen_battle_pass" />
+					<Panel class="profile-modal-column profile-modal-main-column">
+						<Panel class="profile-modal-block profile-modal-pass-block">
+							<Label class="profile-modal-block-title" text="SUPPORTER PASS" />
 							<Panel class="profile-modal-row">
 								<Label class="profile-modal-key" text="#loading_screen_level" />
 								<Label id="ProfileModalLevelValue" class="profile-modal-value" text="-" />
@@ -383,6 +392,10 @@
 								<Label id="ProfileModalXPValue" class="profile-modal-value" text="-" />
 							</Panel>
 							<ProgressBar id="ProfileModalXPProgress" class="profile-modal-progress" value="0.0" />
+							<Panel class="profile-modal-row">
+								<Label class="profile-modal-key" text="XHS Account" />
+								<Label id="ProfileModalXHSXPValue" class="profile-modal-value" text="-" />
+							</Panel>
 							<Panel class="profile-modal-row">
 								<Label class="profile-modal-key" text="#loading_screen_title" />
 								<Label id="ProfileModalTitleValue" class="profile-modal-value" text="-" />
@@ -398,8 +411,8 @@
 						</Panel>
 					</Panel>
 
-					<Panel class="profile-modal-column">
-						<Panel class="profile-modal-block">
+					<Panel class="profile-modal-column profile-modal-side-column">
+						<Panel class="profile-modal-block profile-modal-rank-block">
 							<Label class="profile-modal-block-title" text="#loading_screen_rank" />
 
 							<Panel id="ProfileModalRankBadge">
@@ -421,7 +434,7 @@
 							</Panel>
 						</Panel>
 
-						<Panel class="profile-modal-block">
+						<Panel class="profile-modal-block profile-modal-visibility-block">
 							<Label class="profile-modal-block-title" text="#loading_screen_visibility" />
 							<Panel class="profile-modal-row">
 								<Label class="profile-modal-key" text="#loading_screen_tag" />
@@ -436,7 +449,7 @@
 								<Label id="ProfileModalWinrateVisibleValue" class="profile-modal-value" text="-" />
 							</Panel>
 							<Panel class="profile-modal-row">
-								<Label class="profile-modal-key" text="#loading_screen_bp_rewards" />
+								<Label class="profile-modal-key" text="Rewards" />
 								<Label id="ProfileModalRewardsVisibleValue" class="profile-modal-value" text="-" />
 							</Panel>
 						</Panel>

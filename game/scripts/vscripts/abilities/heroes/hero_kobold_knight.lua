@@ -141,3 +141,77 @@ function KoboldArmy(keys)
 		table.insert(caster.kobold_super_illusions, double)
 	end
 end
+
+xhs_kobold_poof = xhs_kobold_poof or class({})
+
+function xhs_kobold_poof:OnAbilityPhaseStart()
+	if not IsServer() then return true end
+
+	self:GetCaster():StartGesture(ACT_DOTA_CAST_ABILITY_2)
+	self:GetCaster():EmitSound("Hero_Meepo.Poof.Channel")
+
+	return true
+end
+
+function xhs_kobold_poof:OnAbilityPhaseInterrupted()
+	if not IsServer() then return end
+
+	self:GetCaster():FadeGesture(ACT_DOTA_CAST_ABILITY_2)
+	self:GetCaster():StopSound("Hero_Meepo.Poof.Channel")
+end
+
+function xhs_kobold_poof:OnSpellStart()
+	if not IsServer() then return end
+
+	local caster = self:GetCaster()
+	local origin = caster:GetAbsOrigin()
+	local destination = self:GetCursorPosition()
+	local target = self:GetCursorTarget()
+
+	if target and not target:IsNull() then
+		destination = target:GetAbsOrigin()
+	end
+
+	caster:StopSound("Hero_Meepo.Poof.Channel")
+	self:PoofBurst(origin)
+
+	local start_pfx = ParticleManager:CreateParticle("particles/units/heroes/hero_meepo/meepo_poof_start.vpcf", PATTACH_WORLDORIGIN, caster)
+	ParticleManager:SetParticleControl(start_pfx, 0, origin)
+	ParticleManager:ReleaseParticleIndex(start_pfx)
+
+	FindClearSpaceForUnit(caster, destination, true)
+	ProjectileManager:ProjectileDodge(caster)
+
+	self:PoofBurst(caster:GetAbsOrigin())
+
+	local end_pfx = ParticleManager:CreateParticle("particles/units/heroes/hero_meepo/meepo_poof_end.vpcf", PATTACH_WORLDORIGIN, caster)
+	ParticleManager:SetParticleControl(end_pfx, 0, caster:GetAbsOrigin())
+	ParticleManager:ReleaseParticleIndex(end_pfx)
+
+	caster:EmitSound("Hero_Meepo.Poof.End")
+end
+
+function xhs_kobold_poof:PoofBurst(position)
+	local caster = self:GetCaster()
+	local enemies = FindUnitsInRadius(
+		caster:GetTeamNumber(),
+		position,
+		nil,
+		self:GetSpecialValueFor("radius"),
+		DOTA_UNIT_TARGET_TEAM_ENEMY,
+		DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC,
+		DOTA_UNIT_TARGET_FLAG_NONE,
+		FIND_ANY_ORDER,
+		false
+	)
+
+	for _, enemy in pairs(enemies) do
+		ApplyDamage({
+			victim = enemy,
+			attacker = caster,
+			damage = self:GetSpecialValueFor("poof_damage"),
+			damage_type = self:GetAbilityDamageType(),
+			ability = self
+		})
+	end
+end

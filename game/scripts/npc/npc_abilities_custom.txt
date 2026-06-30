@@ -13535,6 +13535,53 @@
 	}
 
 	//=================================================================================================================
+	// Centurion: Necromastery
+	//=================================================================================================================
+	"xhs_centurion_necromastery"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"abilities/heroes/hero_centurion.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityTextureName"		"nevermore_necromastery"
+		"RequiredLevel"				"5"
+
+		"AbilityValues"
+		{
+			"necromastery_damage_per_soul"		"1 2 3 4"
+			"necromastery_max_souls"			"700"
+			"necromastery_soul_release"			"1.0"
+			"necromastery_souls_hero_bonus"		"0"
+		}
+	}
+
+	//=================================================================================================================
+	// Centurion: Atrophy Aura
+	//=================================================================================================================
+	"xhs_centurion_atrophy_aura"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"abilities/heroes/hero_centurion.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityTextureName"		"abyssal_underlord_atrophy_aura"
+		"AbilityCastRange"			"1200"
+		"RequiredLevel"				"8"
+		"LevelsBetweenUpgrades"		"3"
+
+		"AbilityValues"
+		{
+			"radius"					"1200"
+			"damage_reduction_pct"		"10 20 30 40"
+			"bonus_damage_from_creep"	"4 8 12 16"
+			"bonus_damage_from_hero"	"30"
+			"bonus_damage_duration"		"40"
+		}
+	}
+
+	//=================================================================================================================
 	// Centurion: Dark Pact
 	//=================================================================================================================
 	"holdout_dark_pact"
@@ -14973,6 +15020,50 @@
 	}
 
 	//=================================================================================================================
+	// Kobold Knight: Poof
+	//=================================================================================================================
+	"xhs_kobold_poof"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"abilities/heroes/hero_kobold_knight.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_NORMAL_WHEN_STOLEN | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING"
+		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
+		"AbilityUnitTargetType"		"DOTA_UNIT_TARGET_HERO"
+		"AbilityUnitDamageType"		"DAMAGE_TYPE_MAGICAL"
+		"SpellImmunityType"			"SPELL_IMMUNITY_ENEMIES_NO"
+		"AbilityTextureName"		"meepo_poof"
+		"FightRecapLevel"			"1"
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"			"99999"
+		"AbilityCastPoint"			"1.5"
+
+		// Time
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"			"10"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"			"90 180 270 360"
+
+		"precache"
+		{
+			"particle"		"particles/units/heroes/hero_meepo/meepo_poof_start.vpcf"
+			"particle"		"particles/units/heroes/hero_meepo/meepo_poof_end.vpcf"
+			"soundfile"		"soundevents/game_sounds_heroes/game_sounds_meepo.vsndevts"
+		}
+
+		"AbilityValues"
+		{
+			"radius"		"375"
+			"poof_damage"	"160 250 340 430"
+		}
+	}
+
+	//=================================================================================================================
 	// Kobold Knight: Life Steal
 	//=================================================================================================================
 	"holdout_life_steal"
@@ -15446,6 +15537,128 @@
 	}
 
 	//=================================================================================================================
+	// Stone Giant: Earth Splitter
+	//=================================================================================================================
+	"xhs_stone_giant_earth_splitter"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"abilities/heroes/hero_mountain_giant.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE"
+		"AbilityUnitDamageType"		"DAMAGE_TYPE_MAGICAL"
+		"SpellImmunityType"			"SPELL_IMMUNITY_ENEMIES_YES"
+		"AbilityType"				"DOTA_ABILITY_TYPE_BASIC"
+		"AbilityTextureName"		"elder_titan_earth_splitter"
+		"RequiredLevel"				"8"
+		"LevelsBetweenUpgrades"		"3"
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"			"2400"
+		"AbilityCastPoint"			"0.4"
+
+		// Time
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"			"30.0"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"			"150 225 300 375"
+
+		"precache"
+		{
+			"particle"		"particles/units/heroes/hero_elder_titan/elder_titan_earth_splitter.vpcf"
+			"soundfile"		"soundevents/game_sounds_heroes/game_sounds_elder_titan.vsndevts"
+		}
+
+		"AbilityValues"
+		{
+			"crack_time"		"3.14"
+			"crack_width"		"350"
+			"crack_distance"	"2400"
+			"slow_pct"			"30 40 50 60"
+			"slow_duration"		"4.0 6.0 8.0 10.0"
+			"speed"				"910"
+			"damage_pct"		"15"
+			"vision_width"		"500"
+			"vision_interval"	"0.22"
+			"vision_duration"	"4.0"
+			"vision_step"		"200"
+		}
+	}
+
+	//=================================================================================================================
+	// Stone Giant: Stone Gaze
+	//=================================================================================================================
+	"xhs_stone_giant_stone_gaze"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"abilities/heroes/hero_mountain_giant.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING"
+		"AbilityUnitDamageType"		"DAMAGE_TYPE_MAGICAL"
+		"SpellImmunityType"			"SPELL_IMMUNITY_ENEMIES_YES"
+		"AbilityType"				"DOTA_ABILITY_TYPE_BASIC"
+		"AbilityTextureName"		"medusa_stone_gaze"
+		"RequiredLevel"				"10"
+		"LevelsBetweenUpgrades"		"5"
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastPoint"			"0.3"
+
+		// Time
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"			"100.0"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"			"200 400 600"
+
+		"precache"
+		{
+			"soundfile"				"soundevents/game_sounds_heroes/game_sounds_medusa.vsndevts"
+		}
+
+		"AbilityValues"
+		{
+			"radius"					"1200"
+			"duration"					"7"
+			"slow"						"25"
+			"stone_duration"			"4 6 8"
+			"face_duration"				"2.0"
+			"vision_cone"				"0.08715"
+			"bonus_physical_damage"		"50 75 100"
+		}
+	}
+
+	//=================================================================================================================
+	// Stone Giant: Craggy Exterior
+	//=================================================================================================================
+	"holdout_craggy_exterior"
+	{
+		"BaseClass"						"ability_lua"
+		"ScriptFile"					"abilities/heroes/hero_mountain_giant.lua"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityTextureName"			"tiny_craggy_exterior"
+
+		"precache"
+		{
+			"soundfile" "soundevents/game_sounds_heroes/game_sounds_tiny.vsndevts"
+		}
+
+		"AbilityValues"
+		{
+			"bonus_armor"			"2 3 4 5"
+			"stun_chance"			"10 15 20 25"
+			"stun_duration"			"1.0 1.1 1.2 1.3"
+			"damage"				"60 90 120 150"
+		}
+	}
+
+	//=================================================================================================================
 	// Stone Giant: War Club (Permanent)
 	//=================================================================================================================
 	"holdout_war_club_20"
@@ -15665,11 +15878,6 @@
 				"IsHidden"				"1"
 				"IsPurgable"			"0"
 				"IsDebuff"				"1"
-
-				"States"
-				{
-					"MODIFIER_STATE_ROOTED"		"MODIFIER_STATE_VALUE_ENABLED"
-				}
 			}
 
 			"modifier_dwarf_toss_slow"
@@ -15799,7 +16007,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"			"scripts/vscripts/abilities/heroes/hero_mountain_giant.lua"
+				"ScriptFile"			"abilities/heroes/hero_mountain_giant.lua"
 				"Function"				"ToggleOn"
 				"modifier"				"modifier_giant_model"
 			}
@@ -15821,7 +16029,7 @@
 		{
 			"RunScript"
 			{
-				"ScriptFile"			"scripts/vscripts/abilities/heroes/hero_mountain_giant.lua"
+				"ScriptFile"			"abilities/heroes/hero_mountain_giant.lua"
 				"Function"				"ToggleOff"
 			}
 
@@ -21632,6 +21840,56 @@
 			"move_slow"						"-80"
 			"attack_slow"					"-25 -50 -75 -100"
 			"slow_duration"					"0.6 0.6 0.6 0.6 0.8 1.0 1.2"
+		}
+	}
+
+	//=================================================================================================================
+	// Spirit Master: Ball Lightning
+	//=================================================================================================================
+	"xhs_spirit_master_ball_lightning"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"abilities/heroes/hero_spirit_master"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_ROOT_DISABLES"
+		"AbilityType"				"DOTA_ABILITY_TYPE_BASIC"
+		"AbilityUnitDamageType"		"DAMAGE_TYPE_MAGICAL"
+		"SpellImmunityType"			"SPELL_IMMUNITY_ENEMIES_NO"
+		"RequiredLevel"				"8"
+		"LevelsBetweenUpgrades"		"3"
+		"AbilityTextureName"		"storm_spirit_ball_lightning"
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"			"1200"
+		"AbilityCastPoint"			"0.3"
+		"AbilityCooldown"			"15.0"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"			"30"
+
+		// Damage
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityDamage"				"50 100 150 200"
+
+		"precache"
+		{
+			"particle"				"particles/units/heroes/hero_stormspirit/stormspirit_ball_lightning.vpcf"
+			"soundfile"				"soundevents/game_sounds_heroes/game_sounds_stormspirit.vsndevts"
+		}
+
+		"AbilityValues"
+		{
+			"ball_lightning_initial_mana_percentage"		"8"
+			"ball_lightning_initial_mana_base"			"30"
+			"ball_lightning_move_speed"					"1250 1750 2250 2750"
+			"ball_lightning_aoe"						"250"
+			"ball_lightning_travel_cost_base"			"12"
+			"ball_lightning_travel_cost_percent"		"2.0"
+			"ball_lightning_vision_radius"				"400"
+			"blocker_duration"							"5"
 		}
 	}
 

@@ -21,6 +21,7 @@
 		"supporter_pass_meta",
 		"supporter_pass_shop",
 		"supporter_pass_leaderboards",
+		"fragment_quests",
 		"xhs_quest_state",
 		"xhs_devtools",
 		"vips",

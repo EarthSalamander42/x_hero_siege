@@ -544,7 +544,11 @@ XHSPrecache:RegisterGroup("items_lua", {
 
 XHSPrecache:RegisterGroup("supporter_pass", {
 	particles = {
-		"particles/custom/xhs_supporter_wisp_ambient.vpcf",
+		"particles/units/heroes/hero_abaddon/holdout_borrowed_time.vpcf",
+		"particles/units/heroes/hero_abaddon/holdout_borrowed_time_2.vpcf",
+		"particles/units/heroes/hero_abaddon/holdout_borrowed_time_3.vpcf",
+		"particles/units/heroes/hero_abaddon/holdout_borrowed_time_4.vpcf",
+		"particles/units/heroes/hero_abaddon/holdout_borrowed_time_purple.vpcf",
 	},
 })
 

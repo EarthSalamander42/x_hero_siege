@@ -1337,7 +1337,7 @@ function _ScoreboardUpdater_UpdatePlayerPanelXP(playerId, playerPanel, ImbaXP_Pa
 	// const current_max_xp = player_info.MaxXP;
 	// const level = player_info.Lvl;
 
-	let current_xp = player_info.whalepass_xp;
+	let current_xp = player_info.supporter_pass_xp || player_info.XP || 0;
 	const current_max_xp = 1000;
 	let level = 1;
 
@@ -1411,16 +1411,16 @@ function CreateBattlepassButton() {
 	BattlepassButton.SetParent(Parent);
 }
 
-function OpenWhalepass() {
+function OpenSupporterPass() {
 	const bp_player = CustomNetTables.GetTableValue("battlepass_player", Players.GetLocalPlayer());
 
 	if (bp_player) {
-		const whalepass_url = bp_player.whalepass_url;
+		const supporter_url = bp_player.supporter_url;
 
-		if (whalepass_url) {
-			$.DispatchEvent('ExternalBrowserGoToURL', whalepass_url);
+		if (supporter_url) {
+			$.DispatchEvent('ExternalBrowserGoToURL', supporter_url);
 		} else {
-			$.Msg("Whalepass URL not available");
+			$.Msg("Supporter Pass URL not available");
 		}
 	} else {
 		$.Msg("Battlepass player info not available");

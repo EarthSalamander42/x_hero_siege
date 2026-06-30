@@ -8,14 +8,39 @@
 	max-height: 480px;
 	padding: 10px 12px 10px 12px;
 	border-radius: 2px;
+	overflow: noclip;
 	background-color: gradient( linear, 0% 0%, 100% 100%, from( xhs_panel_bg ), to( xhs_panel_bg_deep ) );
 	border-left: 2px solid #5ad0ff78;
 	border-top: 1px solid xhs_border_soft;
 	border-bottom: 1px solid #77c8ff14;
 	box-shadow: fill #00111f42 0px 0px 5px 0px;
 
-	transition-property: background-color, brightness;
+	transform: translatex( 0px );
+	transition-property: background-color, brightness, transform, opacity;
 	transition-duration: .18s;
+}
+
+@keyframes 'XHSQuestActivatedPulse'
+{
+	0% {
+		brightness: 2.0;
+		background-color: gradient( linear, 0% 0%, 100% 0%, from( #5ad0ff88 ), color-stop( .52, #12364be8 ), to( #06142322 ) );
+		transform: translatex( -12px );
+	}
+	34% {
+		brightness: 1.35;
+		background-color: gradient( linear, 0% 0%, 100% 0%, from( #12364be8 ), color-stop( .5, #5ad0ff55 ), to( #06142322 ) );
+		transform: translatex( 0px );
+	}
+	70% {
+		brightness: 1.18;
+		background-color: gradient( linear, 0% 0%, 100% 0%, from( #0b223466 ), to( #06142322 ) );
+		transform: translatex( 0px );
+	}
+	100% {
+		brightness: 1.0;
+		transform: translatex( 0px );
+	}
 }
 
 #QuestLog:hover
@@ -29,8 +54,95 @@
 	background-color: gradient( linear, 0% 0%, 100% 100%, from( xhs_panel_bg_strong ), to( #06101dcc ) );
 }
 
+#QuestLog.QuestLogCollapsed
+{
+	transform: translatex( -360px );
+	opacity: .72;
+}
+
+#QuestLog.QuestLogCollapsed:hover,
+#QuestLog.QuestLogCollapsed.QuestLogTemporaryReveal
+{
+	transform: translatex( 0px );
+	opacity: 1;
+}
+
 .HUDFlipped #QuestLog {
 	horizontal-align: right;
+}
+
+.HUDFlipped #QuestLog.QuestLogCollapsed
+{
+	transform: translatex( 360px );
+}
+
+.HUDFlipped #QuestLog.QuestLogCollapsed:hover,
+.HUDFlipped #QuestLog.QuestLogCollapsed.QuestLogTemporaryReveal
+{
+	transform: translatex( 0px );
+}
+
+.QuestLogCollapseButton
+{
+	width: 24px;
+	height: 24px;
+	horizontal-align: right;
+	vertical-align: top;
+	margin-top: 8px;
+	margin-right: 9px;
+	ignore-parent-flow: true;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #07131df4 ), to( #102536f4 ) );
+	border: 1px solid #77c8ff3c;
+	box-shadow: fill #00111faa 0px 0px 5px 0px;
+	transition-property: brightness, background-color, border, transform;
+	transition-duration: .14s;
+}
+
+.QuestLogCollapseButton:hover
+{
+	brightness: 1.2;
+	background-color: #12364be8;
+	border: 1px solid #77c8ff7a;
+}
+
+.QuestLogCollapseArrow
+{
+	width: 9px;
+	height: 9px;
+	horizontal-align: center;
+	vertical-align: center;
+	margin-left: 2px;
+	border-top: 2px solid #9be6ff;
+	border-right: 2px solid #9be6ff;
+	box-shadow: #5ad0ff55 0px 0px 5px 0px;
+	transform: rotateZ( 225deg );
+	transition-property: transform, brightness;
+	transition-duration: .14s;
+}
+
+.QuestLogCollapseButton.QuestLogCollapsed .QuestLogCollapseArrow
+{
+	margin-left: -2px;
+	transform: rotateZ( 45deg );
+}
+
+.HUDFlipped .QuestLogCollapseButton
+{
+	horizontal-align: left;
+	margin-left: 9px;
+	margin-right: 0px;
+}
+
+.HUDFlipped .QuestLogCollapseButton .QuestLogCollapseArrow
+{
+	margin-left: -2px;
+	transform: rotateZ( 45deg );
+}
+
+.HUDFlipped .QuestLogCollapseButton.QuestLogCollapsed .QuestLogCollapseArrow
+{
+	margin-left: 2px;
+	transform: rotateZ( 225deg );
 }
 
 .QuestLogPinButton
@@ -40,7 +152,7 @@
 	horizontal-align: right;
 	vertical-align: top;
 	margin-top: 8px;
-	margin-right: 9px;
+	margin-right: 39px;
 	ignore-parent-flow: true;
 	background-color: #07131dcc;
 	border: 1px solid #77c8ff2d;
@@ -78,6 +190,13 @@
 .QuestLogPinButton.Checked .QuestLogPinCheckMark
 {
 	visibility: visible;
+}
+
+.HUDFlipped .QuestLogPinButton
+{
+	horizontal-align: left;
+	margin-left: 39px;
+	margin-right: 0px;
 }
 
 .Zone
@@ -314,6 +433,16 @@
 	background-color: gradient( linear, 0% 0%, 100% 0%, from( #0b223466 ), to( #06142322 ) );
 	border-left: 3px solid #7fd8ff88;
 	box-shadow: inset #5ad0ff18 0px 0px 12px 0px;
+}
+
+.Quest.QuestJustActivated
+{
+	animation-name: XHSQuestActivatedPulse;
+	animation-duration: 1.6s;
+	animation-iteration-count: 1;
+	animation-timing-function: ease-out;
+	border-left-color: #9be6ff;
+	box-shadow: inset #5ad0ff28 0px 0px 14px 0px, #5ad0ff36 0px 0px 10px 0px;
 }
 
 .Quest.Active .QuestText

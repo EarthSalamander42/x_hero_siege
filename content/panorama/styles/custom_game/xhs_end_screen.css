@@ -20,6 +20,13 @@
 	100% { box-shadow: fill #5ad0ff00 0px 0px 0px 0px; }
 }
 
+@keyframes 'xhs_end_result_glow'
+{
+	0% { brightness: 1; }
+	50% { brightness: 1.35; }
+	100% { brightness: 1; }
+}
+
 .XHSEndScreenRoot {
 	width: 100%;
 	height: 100%;
@@ -59,18 +66,28 @@
 
 .XHSEndScreenResult {
 	width: 360px;
-	font-size: 38px;
+	font-size: 54px;
 	font-weight: bold;
-	color: #f3fbff;
+	color: #8cffad;
 	text-transform: uppercase;
-	text-shadow: 0px 2px 4px #00111f;
+	text-shadow: 0px 0px 12px #39ff7d;
 	height: 100%;
 	vertical-align: center;
 	text-overflow: shrink;
+	animation-name: xhs_end_result_glow;
+	animation-duration: 2.2s;
+	animation-iteration-count: infinite;
+	animation-timing-function: ease-in-out;
+}
+
+.XHSEndScreenResult.IsVictory {
+	color: #8cffad;
+	text-shadow: 0px 0px 12px #39ff7d;
 }
 
 .XHSEndScreenResult.IsDefeat {
-	color: #ffb6a8;
+	color: #ff7a6b;
+	text-shadow: 0px 0px 12px #ff2c1f;
 }
 
 .XHSEndScreenMeta {
@@ -214,7 +231,7 @@
 
 .XHSEndScreenSummary {
 	width: 100%;
-	height: 252px;
+	height: 210px;
 	flow-children: down;
 	padding: 14px;
 	background-color: gradient( linear, 0% 0%, 100% 100%, from( #071827dc ), to( #050b14cc ) );
@@ -242,6 +259,107 @@
 	font-size: 24px;
 	font-weight: bold;
 	text-shadow: 0px 1px 3px xhs_shadow;
+}
+
+.XHSEndScreenFragmentQuests {
+	width: 100%;
+	height: 0px;
+	visibility: collapse;
+	flow-children: down;
+}
+
+.XHSEndScreenFragmentQuests.IsVisible {
+	height: 178px;
+	margin-top: 10px;
+	padding: 10px;
+	visibility: visible;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #071827dc ), to( #050b14cc ) );
+	border: 1px solid xhs_border;
+	box-shadow: fill #00000070 0px 0px 8px 0px;
+}
+
+.XHSEndFragmentQuestHeader {
+	width: 100%;
+	height: 28px;
+	flow-children: right;
+}
+
+.XHSEndFragmentQuestTitle {
+	width: fill-parent-flow( 1.0 );
+	color: xhs_accent_text;
+	font-size: 16px;
+	font-weight: bold;
+	text-transform: uppercase;
+}
+
+.XHSEndFragmentQuestTotal {
+	width: 104px;
+	color: #ffd76a;
+	font-size: 14px;
+	font-weight: bold;
+	text-align: right;
+	vertical-align: center;
+}
+
+.XHSEndFragmentQuestRow {
+	width: 100%;
+	height: 42px;
+	margin-top: 4px;
+	flow-children: right;
+	border-top: 1px solid #9adfff16;
+}
+
+.XHSEndFragmentQuestCopy {
+	width: fill-parent-flow( 1.0 );
+	vertical-align: center;
+	flow-children: down;
+}
+
+.XHSEndFragmentQuestName {
+	width: 100%;
+	color: xhs_text;
+	font-size: 14px;
+	font-weight: bold;
+	text-overflow: shrink;
+}
+
+.XHSEndFragmentQuestStatus {
+	width: 100%;
+	color: xhs_text_dim;
+	font-size: 11px;
+	text-transform: uppercase;
+	text-overflow: shrink;
+}
+
+.XHSEndFragmentQuestStars {
+	width: 56px;
+	height: 16px;
+	margin-right: 6px;
+	vertical-align: center;
+	flow-children: right;
+}
+
+.XHSEndFragmentQuestStar {
+	width: 14px;
+	height: 14px;
+	margin-right: 3px;
+	background-image: url("s2r://panorama/images/control_icons/star_filled_png.vtex");
+	background-size: contain;
+	background-repeat: no-repeat;
+	wash-color: #3f4a55;
+}
+
+.XHSEndFragmentQuestStar.IsActive {
+	wash-color: #ffb931;
+}
+
+.XHSEndFragmentQuestAmount {
+	width: 44px;
+	color: #ffd76a;
+	font-size: 14px;
+	font-weight: bold;
+	text-align: right;
+	vertical-align: center;
 }
 
 .XHSEndScreenMvpGrid {
@@ -485,21 +603,21 @@
 
 .XHSBattlepassTop {
 	width: 100%;
-	height: 22px;
+	height: 19px;
 	flow-children: right;
 }
 
 .XHSBattlepassLevel {
 	width: fill-parent-flow( 1.0 );
 	color: xhs_text;
-	font-size: 14px;
+	font-size: 13px;
 	text-overflow: shrink;
 }
 
 .XHSBattlepassEarned {
 	width: 58px;
 	color: xhs_success;
-	font-size: 14px;
+	font-size: 13px;
 	text-align: right;
 }
 
@@ -509,8 +627,8 @@
 
 .XHSBattlepassBar {
 	width: 100%;
-	height: 12px;
-	margin-top: 4px;
+	height: 10px;
+	margin-top: 2px;
 	flow-children: none;
 	background-color: #020712;
 	border: 1px solid #77c8ff18;
@@ -533,6 +651,112 @@
 	animation-name: xhs_reward_pulse;
 	animation-duration: 1.4s;
 	animation-iteration-count: infinite;
+}
+
+.XHSAccountXpLine {
+	width: 100%;
+	height: 14px;
+	margin-top: 2px;
+	color: #9eb0c9;
+	font-size: 11px;
+	text-align: left;
+	text-overflow: shrink;
+}
+
+.XHSEndScreenSupportCta {
+	width: 100%;
+	height: 88px;
+	margin-top: 10px;
+	padding: 10px 12px;
+	flow-children: right;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #0b2130f2 ), color-stop( 0.55, #0a1825ee ), to( #101622f2 ) );
+	border: 1px solid #7bd8ff34;
+	box-shadow: fill #00000070 0px 0px 8px 0px;
+}
+
+.XHSEndScreenSupportMark {
+	width: 48px;
+	height: 48px;
+	margin-right: 12px;
+	vertical-align: center;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #1aa9d6 ), to( #0a5f88 ) );
+	border: 1px solid #b9f1ff44;
+	box-shadow: fill #45d5ff24 0px 0px 12px 0px;
+}
+
+.XHSEndScreenSupportMark Label {
+	align: center center;
+	color: #f4fbff;
+	font-size: 25px;
+	font-weight: bold;
+	text-shadow: 0px 1px 3px #000000;
+}
+
+.XHSEndScreenSupportCopy {
+	width: fill-parent-flow( 1.0 );
+	height: 100%;
+	flow-children: down;
+}
+
+.XHSEndScreenSupportHeader {
+	width: 100%;
+	height: 24px;
+	flow-children: right;
+}
+
+.XHSEndScreenSupportTitle {
+	width: fill-parent-flow( 1.0 );
+	color: xhs_accent_text;
+	font-size: 20px;
+	font-weight: bold;
+	text-transform: uppercase;
+	text-shadow: 0px 1px 3px xhs_shadow;
+}
+
+.XHSEndScreenSupportTag {
+	width: 250px;
+	color: #ffd76a;
+	font-size: 13px;
+	font-weight: bold;
+	text-align: right;
+	text-transform: uppercase;
+	vertical-align: center;
+	text-overflow: shrink;
+}
+
+.XHSEndScreenSupportText {
+	width: 100%;
+	height: 42px;
+	margin-top: 4px;
+	color: #d6e9f7;
+	font-size: 15px;
+	line-height: 18px;
+	text-overflow: shrink;
+}
+
+.XHSEndScreenSupportButton {
+	width: 190px;
+	height: 46px;
+	margin-left: 14px;
+	vertical-align: center;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #d69827 ), to( #f1c45a ) );
+	border: 1px solid #fff1b040;
+	transition-property: brightness, box-shadow;
+	transition-duration: 0.12s;
+}
+
+.XHSEndScreenSupportButton:hover {
+	brightness: 1.18;
+	box-shadow: fill #00000080 0px 0px 10px 0px;
+}
+
+.XHSEndScreenSupportButton Label {
+	align: center center;
+	color: #08111b;
+	font-size: 17px;
+	font-weight: bold;
+	text-transform: uppercase;
+	text-shadow: 0px 1px 1px #ffffff55;
 }
 
 .XHSEndScreenFooter {

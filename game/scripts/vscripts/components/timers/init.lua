@@ -153,6 +153,9 @@ ListenToGameEvent('entity_killed', function(keys)
 				total = CustomTimers.active_special_wave_total,
 				direction = CustomTimers.active_special_wave_direction,
 			})
+			if FragmentQuests ~= nil then
+				FragmentQuests:OnSpecialWaveEnd(true)
+			end
 			CustomTimers.active_special_wave_total = 0
 			CustomTimers.active_special_wave_direction = ""
 		end
@@ -567,6 +570,9 @@ function SpecialWave(iCardinalPoint, force)
 	CustomTimers.active_special_wave_count = 10
 	CustomTimers.active_special_wave_total = 10
 	CustomTimers.active_special_wave_direction = point[iCardinalPoint]
+	if FragmentQuests ~= nil then
+		FragmentQuests:OnSpecialWaveStart(waveIndex, CustomTimers.active_special_wave_direction, CustomTimers.active_special_wave_total)
+	end
 
 	for j = 1, 10 do
 		local spawned_unit = CreateUnitByName(unit[waveIndex], real_point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)

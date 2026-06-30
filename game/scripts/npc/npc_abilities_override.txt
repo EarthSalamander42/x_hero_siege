@@ -18,6 +18,7 @@
 		"AbilityTextureName"			"custom/tp_scroll"
 		"ItemCost"						"50"
 		"ItemInitialCharges"			"1000"
+		"ItemDisplayCharges"			"0"
 		
 		// Special	
 		//-------------------------------------------------------------------------------------------------------------

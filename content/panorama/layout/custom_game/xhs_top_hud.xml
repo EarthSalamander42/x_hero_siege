@@ -24,9 +24,9 @@
 					<Label id="XHSClockValue" text="--:--" />
 				</Panel>
 
-				<Panel id="XHSTopHudRightSlot" hittest="false" hittestchildren="true">
-					<Panel id="XHSTopHudRightAllies" hittest="false" hittestchildren="true">
-						<Panel id="XHSAllyRosterRight" class="XHSAllyRoster" hittest="false" hittestchildren="true" />
+				<Panel id="XHSTopHudRightSlot" hittest="true" hittestchildren="true">
+					<Panel id="XHSTopHudRightAllies" hittest="true" hittestchildren="true">
+						<Panel id="XHSAllyRosterRight" class="XHSAllyRoster" hittest="true" hittestchildren="true" />
 					</Panel>
 				</Panel>
 			</Panel>
@@ -53,5 +53,6 @@
 				<Label id="XHSDifficultyAltValue" text="DIFFICULTY: -----" />
 			</Panel>
 		</Panel>
+		<Panel id="XHSOverheadRoot" hittest="false" />
 	</Panel>
 </root>

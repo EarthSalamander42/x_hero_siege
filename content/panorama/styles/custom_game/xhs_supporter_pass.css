@@ -4,55 +4,278 @@
 	100% { opacity: 1; transform: translateY( 0px ); }
 }
 
+@keyframes 'xhs_pass_tier_sweep'
+{
+	0% { opacity: 0; transform: translateX( -132px ) translateY( -76px ) rotateZ( 24deg ); }
+	24% { opacity: 0; transform: translateX( -132px ) translateY( -76px ) rotateZ( 24deg ); }
+	49% { opacity: 0.62; }
+	78% { opacity: 0; transform: translateX( 278px ) translateY( 102px ) rotateZ( 24deg ); }
+	100% { opacity: 0; transform: translateX( 278px ) translateY( 102px ) rotateZ( 24deg ); }
+}
+
+@keyframes 'xhs_pass_fragment_counter_pulse'
+{
+	0% { pre-transform-scale2d: 1; brightness: 1; }
+	45% { pre-transform-scale2d: 1.18; brightness: 1.8; }
+	100% { pre-transform-scale2d: 1; brightness: 1; }
+}
+
 .XHSSupporterPassRoot {
 	width: 100%;
 	height: 100%;
 	z-index: 120;
+	overflow: noclip;
 }
 
 .XHSSupporterPassButton {
-	width: 72px;
-	height: 72px;
+	width: 78px;
+	height: 86px;
 	margin-right: 12px;
 	margin-top: 88px;
 	horizontal-align: right;
 	vertical-align: top;
-	flow-children: down;
-	background-color: gradient( linear, 0% 0%, 100% 100%, from( #071827f4 ), to( #050b14f2 ) );
+	flow-children: none;
+	padding: 6px 6px 5px 6px;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #071827f8 ), color-stop( 0.62, #06111def ), to( #02070df4 ) );
 	border: 1px solid #58c8ff80;
-	box-shadow: fill #000000a0 0px 0px 10px 0px;
-	transition-property: brightness, border, transform;
+	box-shadow: fill #000000b8 0px 0px 10px 0px, inset #ffffff12 0px 1px 0px 0px;
+	transition-property: brightness, border, transform, background-color, box-shadow;
 	transition-duration: 0.12s;
 	z-index: 121;
+	overflow: noclip;
+}
+
+.XHSSupporterPassButtonContent {
+	height: 100%;
+	flow-children: down;
+}
+
+.XHSSupporterPassButtonGlow {
+	width: 100%;
+	height: 100%;
+	align: center center;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #ffffff00 ), color-stop( 0.48, #5ad0ff18 ), to( #ffffff00 ) );
+	opacity: 0.75;
+	z-index: 0;
 }
 
 .XHSSupporterPassButton:hover {
 	brightness: 1.25;
 	border: 1px solid #5ad0ff;
 	transform: translateX( -2px );
+	box-shadow: fill #000000c8 0px 0px 12px 0px, fill #5ad0ff38 0px 0px 9px 0px, inset #ffffff18 0px 1px 0px 0px;
 }
 
 .XHSSupporterPassButtonIcon {
-	width: 34px;
-	height: 34px;
-	margin-top: 9px;
-	horizontal-align: center;
-	background-image: url("file://{images}/custom_game/battlepass/battlepass_new.png");
-	background-size: contain;
-	background-repeat: no-repeat;
-	background-position: center;
-	wash-color: #5ad0ff;
+	width: 100%;
+	height: 40px;
+	align: center top;
+	margin-top: 6px;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #10334cf6 ), to( #03101cf8 ) );
+	border: 1px solid #5ad0ff9a;
+	box-shadow: fill #0000009c 0px 0px 6px 0px, fill #5ad0ff26 0px 0px 8px 0px, inset #ffffff18 0px 1px 0px 0px;
+	z-index: 3;
+}
+
+.XHSSupporterPassButtonIconText {
+	width: 100%;
+	height: 100%;
+	color: #f3fbff;
+	font-size: 14px;
+	font-weight: bold;
+	text-align: center center;
+	text-shadow: 0px 0px 6px #5ad0ff70, 0px 1px 3px #000000;
+}
+
+.XHSSupporterPassButtonCopy {
+	width: 66px;
+	align: center bottom;
+	margin-top: 5px;
+	flow-children: down;
+	overflow: clip;
+	z-index: 3;
 }
 
 .XHSSupporterPassButtonText {
 	width: 100%;
-	margin-top: 2px;
+	height: 22px;
+	margin-top: 0px;
 	color: #dceeff;
 	font-size: 10px;
+	font-weight: bold;
 	text-align: center;
 	text-transform: uppercase;
 	text-overflow: shrink;
+	text-shadow: 0px 1px 3px #000000;
 }
+
+.XHSSupporterFragmentsCounter {
+	width: 100%;
+	height: 18px;
+	margin-top: 1px;
+	padding: 1px 4px 1px 4px;
+	horizontal-align: center;
+	flow-children: right;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #020811f4 ), color-stop( 0.55, #092034f2 ), to( #020811f4 ) );
+	border: 1px solid #58c8ffcc;
+	box-shadow: fill #000000bb 0px 0px 7px 0px, inset #ffffff12 0px 1px 0px 0px;
+	opacity: 0.96;
+	z-index: 125;
+	transition-property: brightness, border, background-color, pre-transform-scale2d;
+	transition-duration: 0.12s;
+}
+
+.XHSSupporterFragmentsCounterIcon {
+	width: 10px;
+	margin-top: -1px;
+	margin-right: 2px;
+	color: #5ad0ff;
+	font-size: 10px;
+	font-weight: bold;
+	text-align: center center;
+	align: center center;
+	text-shadow: 0px 0px 5px #5ad0ffaa;
+}
+
+.XHSSupporterFragmentsCounterValue {
+	width: fill-parent-flow( 1.0 );
+	height: 100%;
+	color: #ffffff;
+	font-size: 12px;
+	font-weight: bold;
+	text-align: right center;
+	text-overflow: shrink;
+	text-shadow: 0px 1px 3px #000000;
+}
+
+.XHSSupporterFragmentsCounter.IsPulsing {
+	animation-name: xhs_pass_fragment_counter_pulse;
+	animation-duration: 0.34s;
+	animation-timing-function: ease-out;
+}
+
+.XHSSupporterPassButton:hover .XHSSupporterFragmentsCounter {
+	brightness: 1.25;
+}
+
+.XHSSupporterPassButton.HasSupporterTier .XHSSupporterPassButtonText {
+	color: #ffffff;
+}
+
+.XHSSupporterPassButton.SupporterTier1 {
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #092218fa ), color-stop( 0.62, #06161bf2 ), to( #02070df6 ) );
+	border-color: #70e39aaa;
+	box-shadow: fill #000000b8 0px 0px 10px 0px, fill #70e39a28 0px 0px 10px 0px, inset #ffffff14 0px 1px 0px 0px;
+}
+
+.XHSSupporterPassButton.SupporterTier2 {
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #2b210dfa ), color-stop( 0.62, #111721f2 ), to( #02070df6 ) );
+	border-color: #ffcf66b8;
+	box-shadow: fill #000000b8 0px 0px 10px 0px, fill #ffcf662c 0px 0px 11px 0px, inset #ffffff16 0px 1px 0px 0px;
+}
+
+.XHSSupporterPassButton.SupporterTier3 {
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #2a100cfa ), color-stop( 0.62, #12151ef2 ), to( #02070df6 ) );
+	border-color: #ff5a43b8;
+	box-shadow: fill #000000b8 0px 0px 10px 0px, fill #ff5a432a 0px 0px 11px 0px, inset #ffffff14 0px 1px 0px 0px;
+}
+
+.XHSSupporterPassButton.SupporterTier4 {
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #082235fb ), color-stop( 0.62, #071826f4 ), to( #02070df7 ) );
+	border-color: #5ad0ffbf;
+	box-shadow: fill #000000b8 0px 0px 10px 0px, fill #5ad0ff36 0px 0px 12px 0px, inset #ffffff18 0px 1px 0px 0px;
+}
+
+.XHSSupporterPassButton.SupporterTier5 {
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #24133ffa ), color-stop( 0.62, #101626f4 ), to( #02070df7 ) );
+	border-color: #c99cffd6;
+	box-shadow: fill #000000b8 0px 0px 10px 0px, fill #c99cff44 0px 0px 13px 0px, #ead8ff38 0px 0px 4px 0px, inset #ffffff1b 0px 1px 0px 0px;
+}
+
+.XHSSupporterPassButton.SupporterTier1 .XHSSupporterPassButtonIcon { border-color: #70e39acc; background-color: gradient( linear, 0% 0%, 100% 100%, from( #17462ef6 ), to( #06150dfa ) ); box-shadow: fill #0000009c 0px 0px 6px 0px, fill #70e39a30 0px 0px 8px 0px, inset #ffffff18 0px 1px 0px 0px; }
+.XHSSupporterPassButton.SupporterTier2 .XHSSupporterPassButtonIcon { border-color: #ffcf66d8; background-color: gradient( linear, 0% 0%, 100% 100%, from( #4a3510f6 ), to( #171107fa ) ); box-shadow: fill #0000009c 0px 0px 6px 0px, fill #ffcf6630 0px 0px 8px 0px, inset #ffffff1a 0px 1px 0px 0px; }
+.XHSSupporterPassButton.SupporterTier3 .XHSSupporterPassButtonIcon { border-color: #ff5a43d8; background-color: gradient( linear, 0% 0%, 100% 100%, from( #43180ff6 ), to( #170806fa ) ); box-shadow: fill #0000009c 0px 0px 6px 0px, fill #ff5a432d 0px 0px 8px 0px, inset #ffffff18 0px 1px 0px 0px; }
+.XHSSupporterPassButton.SupporterTier4 .XHSSupporterPassButtonIcon { border-color: #5ad0ffe0; background-color: gradient( linear, 0% 0%, 100% 100%, from( #10334cf6 ), to( #04111afa ) ); box-shadow: fill #0000009c 0px 0px 6px 0px, fill #5ad0ff34 0px 0px 8px 0px, inset #ffffff1c 0px 1px 0px 0px; }
+.XHSSupporterPassButton.SupporterTier5 .XHSSupporterPassButtonIcon { border-color: #c99cffeb; background-color: gradient( linear, 0% 0%, 100% 100%, from( #382158f8 ), to( #130a20fa ) ); box-shadow: fill #0000009c 0px 0px 6px 0px, fill #c99cff42 0px 0px 9px 0px, inset #ffffff20 0px 1px 0px 0px; }
+
+.XHSSupporterPassButton.SupporterTier1 .XHSSupporterPassButtonIconText { color: #dcffe5; text-shadow: 0px 0px 6px #70e39a88, 0px 1px 3px #000000; }
+.XHSSupporterPassButton.SupporterTier2 .XHSSupporterPassButtonIconText { color: #fff2bd; text-shadow: 0px 0px 6px #ffcf6688, 0px 1px 3px #000000; }
+.XHSSupporterPassButton.SupporterTier3 .XHSSupporterPassButtonIconText { color: #ffd4c9; text-shadow: 0px 0px 6px #ff5a4388, 0px 1px 3px #000000; }
+.XHSSupporterPassButton.SupporterTier4 .XHSSupporterPassButtonIconText { color: #e6fbff; text-shadow: 0px 0px 6px #5ad0ff88, 0px 1px 3px #000000; }
+.XHSSupporterPassButton.SupporterTier5 .XHSSupporterPassButtonIconText { color: #f3e6ff; text-shadow: 0px 0px 7px #c99cff99, 0px 1px 3px #000000; }
+
+.XHSSupporterPassButton.SupporterTier1 .XHSSupporterPassButtonGlow { background-color: gradient( linear, 0% 0%, 100% 0%, from( #ffffff00 ), color-stop( 0.5, #70e39a1c ), to( #ffffff00 ) ); }
+.XHSSupporterPassButton.SupporterTier2 .XHSSupporterPassButtonGlow { background-color: gradient( linear, 0% 0%, 100% 0%, from( #ffffff00 ), color-stop( 0.5, #ffcf6620 ), to( #ffffff00 ) ); }
+.XHSSupporterPassButton.SupporterTier3 .XHSSupporterPassButtonGlow { background-color: gradient( linear, 0% 0%, 100% 0%, from( #ffffff00 ), color-stop( 0.5, #ff5a431c ), to( #ffffff00 ) ); }
+.XHSSupporterPassButton.SupporterTier4 .XHSSupporterPassButtonGlow { background-color: gradient( linear, 0% 0%, 100% 0%, from( #ffffff00 ), color-stop( 0.5, #5ad0ff22 ), to( #ffffff00 ) ); }
+.XHSSupporterPassButton.SupporterTier5 .XHSSupporterPassButtonGlow { background-color: gradient( linear, 0% 0%, 100% 0%, from( #ffffff00 ), color-stop( 0.5, #c99cff2a ), to( #ffffff00 ) ); }
+
+.XHSSupporterPassButton.SupporterTier1 .XHSSupporterFragmentsCounter { border-color: #70e39add; background-color: gradient( linear, 0% 0%, 100% 0%, from( #06150dfa ), color-stop( 0.55, #0f2c1dfa ), to( #06150dfa ) ); }
+.XHSSupporterPassButton.SupporterTier2 .XHSSupporterFragmentsCounter { border-color: #ffcf66dd; background-color: gradient( linear, 0% 0%, 100% 0%, from( #171107fa ), color-stop( 0.55, #35280dfa ), to( #171107fa ) ); }
+.XHSSupporterPassButton.SupporterTier3 .XHSSupporterFragmentsCounter { border-color: #ff5a43dd; background-color: gradient( linear, 0% 0%, 100% 0%, from( #170806fa ), color-stop( 0.55, #32110cfa ), to( #170806fa ) ); }
+.XHSSupporterPassButton.SupporterTier4 .XHSSupporterFragmentsCounter { border-color: #5ad0ffdd; background-color: gradient( linear, 0% 0%, 100% 0%, from( #04111afa ), color-stop( 0.55, #0a2a3dfa ), to( #04111afa ) ); }
+.XHSSupporterPassButton.SupporterTier5 .XHSSupporterFragmentsCounter { border-color: #c99cffdd; background-color: gradient( linear, 0% 0%, 100% 0%, from( #130a20fa ), color-stop( 0.55, #2a1845fa ), to( #130a20fa ) ); }
+
+.XHSSupporterPassButton.SupporterTier1 .XHSSupporterFragmentsCounterIcon { color: #70e39a; text-shadow: 0px 0px 5px #70e39aaa; }
+.XHSSupporterPassButton.SupporterTier2 .XHSSupporterFragmentsCounterIcon { color: #ffcf66; text-shadow: 0px 0px 5px #ffcf66aa; }
+.XHSSupporterPassButton.SupporterTier3 .XHSSupporterFragmentsCounterIcon { color: #ff5a43; text-shadow: 0px 0px 5px #ff5a43aa; }
+.XHSSupporterPassButton.SupporterTier4 .XHSSupporterFragmentsCounterIcon { color: #5ad0ff; text-shadow: 0px 0px 5px #5ad0ffaa; }
+.XHSSupporterPassButton.SupporterTier5 .XHSSupporterFragmentsCounterIcon { color: #c99cff; text-shadow: 0px 0px 5px #c99cffaa; }
+
+.XHSSupporterFragmentFlyout {
+	height: 24px;
+	min-width: 58px;
+	margin-right: -7px;
+	margin-bottom: -8px;
+	padding: 2px 8px;
+	horizontal-align: right;
+	vertical-align: bottom;
+	flow-children: right;
+	ignore-parent-flow: true;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #061421f8 ), to( #123b55f0 ) );
+	border: 1px solid #5ad0ffcc;
+	box-shadow: fill #000000dd 0px 0px 8px 0px;
+	opacity: 1;
+	transform: translateX( -98px ) translateY( -22px );
+	pre-transform-scale2d: 1.05;
+	z-index: 126;
+	transition-property: transform, opacity, pre-transform-scale2d, brightness;
+	transition-duration: 0.72s;
+	transition-timing-function: ease-in;
+}
+
+.XHSSupporterFragmentFlyout.IsFlying {
+	opacity: 0;
+	transform: translateX( 0px ) translateY( 0px );
+	pre-transform-scale2d: 0.58;
+	brightness: 1.8;
+}
+
+.XHSSupporterFragmentFlyoutIcon {
+	margin-right: 5px;
+	color: #5ad0ff;
+	font-size: 12px;
+	text-shadow: 0px 0px 6px #5ad0ffaa;
+}
+
+.XHSSupporterFragmentFlyoutValue {
+	color: #ffffff;
+	font-size: 13px;
+	font-weight: bold;
+	text-shadow: 0px 1px 3px #000000;
+}
+
+.XHSSupporterFragmentFlyout.SupporterTier1 { border-color: #70e39add; }
+.XHSSupporterFragmentFlyout.SupporterTier2 { border-color: #ffcf66dd; }
+.XHSSupporterFragmentFlyout.SupporterTier3 { border-color: #ff5a43dd; }
+.XHSSupporterFragmentFlyout.SupporterTier4 { border-color: #5ad0ffdd; }
+.XHSSupporterFragmentFlyout.SupporterTier5 { border-color: #c99cffdd; }
+
+.XHSSupporterFragmentFlyout.SupporterTier1 .XHSSupporterFragmentFlyoutIcon { color: #70e39a; text-shadow: 0px 0px 6px #70e39aaa; }
+.XHSSupporterFragmentFlyout.SupporterTier2 .XHSSupporterFragmentFlyoutIcon { color: #ffcf66; text-shadow: 0px 0px 6px #ffcf66aa; }
+.XHSSupporterFragmentFlyout.SupporterTier3 .XHSSupporterFragmentFlyoutIcon { color: #ff5a43; text-shadow: 0px 0px 6px #ff5a43aa; }
+.XHSSupporterFragmentFlyout.SupporterTier4 .XHSSupporterFragmentFlyoutIcon { color: #5ad0ff; text-shadow: 0px 0px 6px #5ad0ffaa; }
+.XHSSupporterFragmentFlyout.SupporterTier5 .XHSSupporterFragmentFlyoutIcon { color: #c99cff; text-shadow: 0px 0px 6px #c99cffaa; }
 
 .XHSSupporterPassWindow {
 	width: 1320px;
@@ -146,9 +369,9 @@
 }
 
 .XHSPassTopBar {
-	width: 690px;
+	width: 724px;
 	height: 100%;
-	padding-top: 24px;
+	padding-top: 26px;
 	flow-children: right;
 }
 
@@ -197,29 +420,83 @@
 }
 
 .XHSPassTab {
-	width: 106px;
-	height: 42px;
-	margin-left: 6px;
-	background-color: #02050bc8;
-	border: 1px solid #58c8ff30;
-	transition-property: brightness, background-color, border;
+	width: fit-children;
+	height: 32px;
+	margin-left: 20px;
+	padding: 0px 0px 8px 0px;
+	background-color: #00000000;
+	border: 0px solid #00000000;
+	border-bottom: 2px solid #00000000;
+	box-shadow: fill #00000000 0px 0px 0px 0px;
+	transition-property: brightness, border;
 	transition-duration: 0.12s;
 }
 
-.XHSPassTab:hover,
+.XHSPassTab:hover {
+	brightness: 1.25;
+	background-color: #00000000;
+	border-bottom: 2px solid #5ad0ff;
+	box-shadow: fill #00000000 0px 0px 0px 0px;
+}
+
 .XHSPassTab.IsActive {
 	brightness: 1.15;
-	background-color: gradient( linear, 0% 0%, 100% 0%, from( #754f12a6 ), to( #071827d8 ) );
-	border: 1px solid #ffcf6698;
+	background-color: #00000000;
+	border-bottom: 2px solid #5ad0ff;
+	box-shadow: fill #00000000 0px 0px 0px 0px;
 }
 
 .XHSPassTab Label {
 	align: center center;
-	color: #dceeff;
-	font-size: 13px;
+	color: #7f91a7;
+	font-size: 12px;
 	font-weight: bold;
 	text-transform: uppercase;
 	text-overflow: shrink;
+}
+
+.XHSPassTab:hover Label,
+.XHSPassTab.IsActive Label {
+	color: #ffffff;
+	text-shadow: 0px 1px 2px #000000;
+}
+
+.XHSSupporterPassWindow.SupporterTier1 .XHSPassTab:hover,
+.XHSSupporterPassWindow.SupporterTier1 .XHSPassTab.IsActive { border-bottom: 2px solid #70e39a; }
+
+.XHSSupporterPassWindow.SupporterTier2 .XHSPassTab:hover,
+.XHSSupporterPassWindow.SupporterTier2 .XHSPassTab.IsActive { border-bottom: 2px solid #ffcf66; }
+
+.XHSSupporterPassWindow.SupporterTier3 .XHSPassTab:hover,
+.XHSSupporterPassWindow.SupporterTier3 .XHSPassTab.IsActive { border-bottom: 2px solid #ff5a43; }
+
+.XHSSupporterPassWindow.SupporterTier4 .XHSPassTab:hover,
+.XHSSupporterPassWindow.SupporterTier4 .XHSPassTab.IsActive { border-bottom: 2px solid #5ad0ff; }
+
+.XHSSupporterPassWindow.SupporterTier5 .XHSPassTab:hover,
+.XHSSupporterPassWindow.SupporterTier5 .XHSPassTab.IsActive { border-bottom: 2px solid #c99cff; }
+
+.XHSSupporterPassWindow.SupporterTier5 .XHSPassTab:hover Label,
+.XHSSupporterPassWindow.SupporterTier5 .XHSPassTab.IsActive Label {
+	color: #f1e6ff;
+	text-shadow: 0px 0px 6px #c99cff66, 0px 1px 2px #000000;
+}
+
+.XHSSupporterPassWindow .XHSPassTab.IsDisabled,
+.XHSSupporterPassWindow .XHSPassTab.IsDisabled:hover,
+.XHSSupporterPassWindow .XHSPassTab.IsDisabled.IsActive {
+	brightness: 0.55;
+	saturation: 0.0;
+	wash-color: #5c6672;
+	border-bottom: 2px solid #00000000;
+	box-shadow: fill #00000000 0px 0px 0px 0px;
+}
+
+.XHSSupporterPassWindow .XHSPassTab.IsDisabled Label,
+.XHSSupporterPassWindow .XHSPassTab.IsDisabled:hover Label,
+.XHSSupporterPassWindow .XHSPassTab.IsDisabled.IsActive Label {
+	color: #586273;
+	text-shadow: none;
 }
 
 .XHSPassContent {
@@ -238,6 +515,81 @@
 .XHSPassPage.IsVisible {
 	visibility: visible;
 }
+
+.XHSPassPage.IsComingSoon .XHSPassSectionHeader,
+.XHSPassPage.IsComingSoon .XHSPassRewardTracks,
+.XHSPassPage.IsComingSoon .XHSPassShopGrid,
+.XHSPassPage.IsComingSoon .XHSPassArmoryGrid {
+	brightness: 0.58;
+	saturation: 0.0;
+	wash-color: #7f8a96;
+}
+
+.XHSPassComingSoonOverlay {
+	width: 100%;
+	height: 100%;
+	align: center center;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #050912c8 ), color-stop( 0.48, #0a121fd8 ), to( #050912d0 ) );
+	border: 1px solid #7f8a9630;
+	box-shadow: inset #ffffff10 0px 1px 0px 0px, fill #00000080 0px 0px 18px 0px;
+	z-index: 90;
+}
+
+.XHSPassComingSoonCard {
+	width: 430px;
+	height: 144px;
+	align: center center;
+	padding: 18px 24px;
+	flow-children: down;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #071827f8 ), color-stop( 0.56, #081f32f5 ), to( #02050bf8 ) );
+	border: 1px solid #5ad0ff88;
+	box-shadow: fill #000000b8 0px 0px 18px 0px, fill #5ad0ff22 0px 0px 16px 0px, inset #ffffff16 0px 1px 0px 0px;
+}
+
+.XHSPassComingSoonEyebrow {
+	width: 100%;
+	color: #88dfff;
+	font-size: 12px;
+	font-weight: bold;
+	letter-spacing: 2px;
+	text-align: center;
+	text-transform: uppercase;
+	text-shadow: 0px 1px 2px #000000;
+}
+
+.XHSPassComingSoonTitle {
+	width: 100%;
+	margin-top: 8px;
+	color: #f3fbff;
+	font-size: 36px;
+	font-weight: bold;
+	text-align: center;
+	text-transform: uppercase;
+	text-overflow: shrink;
+	text-shadow: 0px 0px 10px #5ad0ff55, 0px 1px 3px #000000;
+}
+
+.XHSPassComingSoonText {
+	width: 100%;
+	margin-top: 8px;
+	color: #b8c9d8;
+	font-size: 14px;
+	text-align: center;
+	text-overflow: shrink;
+	text-shadow: 0px 1px 2px #000000;
+}
+
+.XHSSupporterPassWindow.SupporterTier1 .XHSPassComingSoonCard { border-color: #70e39a99; box-shadow: fill #000000b8 0px 0px 18px 0px, fill #70e39a22 0px 0px 16px 0px, inset #ffffff16 0px 1px 0px 0px; }
+.XHSSupporterPassWindow.SupporterTier2 .XHSPassComingSoonCard { border-color: #ffcf66aa; box-shadow: fill #000000b8 0px 0px 18px 0px, fill #ffcf6628 0px 0px 16px 0px, inset #ffffff16 0px 1px 0px 0px; }
+.XHSSupporterPassWindow.SupporterTier3 .XHSPassComingSoonCard { border-color: #ff5a4399; box-shadow: fill #000000b8 0px 0px 18px 0px, fill #ff5a4326 0px 0px 16px 0px, inset #ffffff16 0px 1px 0px 0px; }
+.XHSSupporterPassWindow.SupporterTier4 .XHSPassComingSoonCard { border-color: #5ad0ffaa; box-shadow: fill #000000b8 0px 0px 18px 0px, fill #5ad0ff28 0px 0px 16px 0px, inset #ffffff16 0px 1px 0px 0px; }
+.XHSSupporterPassWindow.SupporterTier5 .XHSPassComingSoonCard { border-color: #c99cffbb; box-shadow: fill #000000b8 0px 0px 18px 0px, fill #c99cff32 0px 0px 18px 0px, inset #ffffff16 0px 1px 0px 0px; }
+
+.XHSSupporterPassWindow.SupporterTier1 .XHSPassComingSoonEyebrow { color: #70e39a; }
+.XHSSupporterPassWindow.SupporterTier2 .XHSPassComingSoonEyebrow { color: #ffcf66; }
+.XHSSupporterPassWindow.SupporterTier3 .XHSPassComingSoonEyebrow { color: #ff8b68; }
+.XHSSupporterPassWindow.SupporterTier4 .XHSPassComingSoonEyebrow { color: #88dfff; }
+.XHSSupporterPassWindow.SupporterTier5 .XHSPassComingSoonEyebrow { color: #d9b7ff; }
 
 .XHSPassOverviewGrid {
 	width: 100%;
@@ -258,14 +610,14 @@
 
 .XHSPassHeroRow {
 	width: 100%;
-	height: 236px;
+	height: 176px;
 	margin-bottom: 14px;
 	flow-children: right;
 }
 
 .XHSPassProfileCard {
 	width: 468px;
-	height: 236px;
+	height: 166px;
 	margin-right: 14px;
 	padding: 18px;
 	flow-children: down;
@@ -273,19 +625,28 @@
 
 .XHSPassProfileStats {
 	width: fill-parent-flow( 1.0 );
-	height: 236px;
-	padding: 78px 0px 0px 0px;
+	height: 176px;
+	padding: 0px 0px 0px 2px;
+	flow-children: down;
+}
+
+.XHSPassStatsRow {
+	width: 100%;
+	height: 82px;
+	margin-bottom: 12px;
 	flow-children: right;
 }
 
 .XHSPassProfileStats .XHSPassHeaderStat {
-	width: 170px;
-	height: 78px;
-	margin-right: 10px;
+	width: fill-parent-flow( 1.0 );
+	height: 100%;
+	margin-right: 12px;
+	padding: 12px 14px;
 }
 
 .XHSPassProfileStats .XHSPassHeaderStatValue {
-	font-size: 24px;
+	margin-top: 8px;
+	font-size: 26px;
 }
 
 .XHSPassSupportCard {
@@ -349,19 +710,17 @@
 
 .XHSPassProgressBlock {
 	width: 100%;
-	margin-top: 18px;
+	margin-top: 12px;
 	flow-children: down;
 }
 
-.XHSPassProgressHeader,
-.XHSPassLegacyRow {
+.XHSPassProgressHeader {
 	width: 100%;
 	height: 24px;
 	flow-children: right;
 }
 
-.XHSPassProgressHeader Label,
-.XHSPassLegacyRow Label {
+.XHSPassProgressHeader Label {
 	width: fill-parent-flow( 1.0 );
 	color: #b0c3d9;
 	font-size: 15px;
@@ -385,11 +744,71 @@
 	background-color: gradient( linear, 0% 0%, 100% 0%, from( #754f12 ), to( #ffcf66 ) );
 }
 
-.XHSPassLegacyRow {
-	margin-top: 18px;
-	padding-top: 6px;
-	border-top: 1px solid #58c8ff24;
+.XHSSupporterPassWindow.HasSupporterTier .XHSPassProfileCard {
+	border-left: 4px solid #5ad0ff;
 }
+
+.XHSSupporterPassWindow.HasSupporterTier .XHSPassProfileStats .XHSPassHeaderStat {
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #071827e8 ), to( #02050bf0 ) );
+}
+
+.XHSSupporterPassWindow.HasSupporterTier .XHSPassProfileTier,
+.XHSSupporterPassWindow.HasSupporterTier #XHSPassTierValue,
+.XHSSupporterPassWindow.HasSupporterTier #XHSPassXPBoostValue,
+.XHSSupporterPassWindow.HasSupporterTier #XHSPassVotePowerValue {
+	text-shadow: 0px 0px 8px #5ad0ff55, 0px 1px 3px #000000;
+}
+
+.XHSSupporterPassWindow.SupporterTier1 .XHSPassProfileTier,
+.XHSSupporterPassWindow.SupporterTier1 #XHSPassTierValue,
+.XHSSupporterPassWindow.SupporterTier1 #XHSPassXPBoostValue,
+.XHSSupporterPassWindow.SupporterTier1 #XHSPassVotePowerValue { color: #70e39a; text-shadow: 0px 0px 8px #70e39a66, 0px 1px 3px #000000; }
+.XHSSupporterPassWindow.SupporterTier2 .XHSPassProfileTier,
+.XHSSupporterPassWindow.SupporterTier2 #XHSPassTierValue,
+.XHSSupporterPassWindow.SupporterTier2 #XHSPassXPBoostValue,
+.XHSSupporterPassWindow.SupporterTier2 #XHSPassVotePowerValue { color: #ffcf66; text-shadow: 0px 0px 8px #ffcf6666, 0px 1px 3px #000000; }
+.XHSSupporterPassWindow.SupporterTier3 .XHSPassProfileTier,
+.XHSSupporterPassWindow.SupporterTier3 #XHSPassTierValue,
+.XHSSupporterPassWindow.SupporterTier3 #XHSPassXPBoostValue,
+.XHSSupporterPassWindow.SupporterTier3 #XHSPassVotePowerValue { color: #ff5a43; text-shadow: 0px 0px 8px #ff5a4366, 0px 1px 3px #000000; }
+.XHSSupporterPassWindow.SupporterTier4 .XHSPassProfileTier,
+.XHSSupporterPassWindow.SupporterTier4 #XHSPassTierValue,
+.XHSSupporterPassWindow.SupporterTier4 #XHSPassXPBoostValue,
+.XHSSupporterPassWindow.SupporterTier4 #XHSPassVotePowerValue { color: #5ad0ff; text-shadow: 0px 0px 8px #5ad0ff66, 0px 1px 3px #000000; }
+.XHSSupporterPassWindow.SupporterTier5 .XHSPassProfileTier,
+.XHSSupporterPassWindow.SupporterTier5 #XHSPassTierValue,
+.XHSSupporterPassWindow.SupporterTier5 #XHSPassXPBoostValue,
+.XHSSupporterPassWindow.SupporterTier5 #XHSPassVotePowerValue { color: #c99cff; text-shadow: 0px 0px 8px #c99cff77, 0px 1px 3px #000000; }
+
+.XHSSupporterPassWindow.SupporterTier1 .XHSPassProfileCard,
+.XHSSupporterPassWindow.SupporterTier1 .XHSPassProfileStats .XHSPassHeaderStat,
+.XHSSupporterPassWindow.SupporterTier1 .XHSPassAvatar,
+.XHSSupporterPassWindow.SupporterTier1 .XHSPassProgressBar { border-color: #70e39a88; }
+.XHSSupporterPassWindow.SupporterTier1 .XHSPassProgressFill { background-color: gradient( linear, 0% 0%, 100% 0%, from( #2d8a4d ), to( #70e39a ) ); box-shadow: fill #70e39a44 0px 0px 6px 0px; }
+
+.XHSSupporterPassWindow.SupporterTier2 .XHSPassProfileCard,
+.XHSSupporterPassWindow.SupporterTier2 .XHSPassProfileStats .XHSPassHeaderStat,
+.XHSSupporterPassWindow.SupporterTier2 .XHSPassAvatar,
+.XHSSupporterPassWindow.SupporterTier2 .XHSPassProgressBar { border-color: #ffcf66a8; }
+.XHSSupporterPassWindow.SupporterTier2 .XHSPassProgressFill { background-color: gradient( linear, 0% 0%, 100% 0%, from( #9c7924 ), to( #ffcf66 ) ); box-shadow: fill #ffcf6644 0px 0px 6px 0px; }
+
+.XHSSupporterPassWindow.SupporterTier3 .XHSPassProfileCard,
+.XHSSupporterPassWindow.SupporterTier3 .XHSPassProfileStats .XHSPassHeaderStat,
+.XHSSupporterPassWindow.SupporterTier3 .XHSPassAvatar,
+.XHSSupporterPassWindow.SupporterTier3 .XHSPassProgressBar { border-color: #ff5a4388; }
+.XHSSupporterPassWindow.SupporterTier3 .XHSPassProgressFill { background-color: gradient( linear, 0% 0%, 100% 0%, from( #8d2f21 ), to( #ff5a43 ) ); box-shadow: fill #ff5a4344 0px 0px 6px 0px; }
+
+.XHSSupporterPassWindow.SupporterTier4 .XHSPassProfileCard,
+.XHSSupporterPassWindow.SupporterTier4 .XHSPassProfileStats .XHSPassHeaderStat,
+.XHSSupporterPassWindow.SupporterTier4 .XHSPassAvatar,
+.XHSSupporterPassWindow.SupporterTier4 .XHSPassProgressBar { border-color: #5ad0ff99; }
+.XHSSupporterPassWindow.SupporterTier4 .XHSPassProgressFill { background-color: gradient( linear, 0% 0%, 100% 0%, from( #0a7ca8 ), to( #5ad0ff ) ); box-shadow: fill #5ad0ff44 0px 0px 6px 0px; }
+
+.XHSSupporterPassWindow.SupporterTier5 .XHSPassProfileCard,
+.XHSSupporterPassWindow.SupporterTier5 .XHSPassProfileStats .XHSPassHeaderStat,
+.XHSSupporterPassWindow.SupporterTier5 .XHSPassAvatar,
+.XHSSupporterPassWindow.SupporterTier5 .XHSPassProgressBar { border-color: #c99cffbb; }
+.XHSSupporterPassWindow.SupporterTier5 .XHSPassProgressFill { background-color: gradient( linear, 0% 0%, 100% 0%, from( #7d4bb5 ), to( #c99cff ) ); box-shadow: fill #c99cff55 0px 0px 7px 0px; }
 
 .XHSPassCardTitle,
 .XHSPassSectionTitle {
@@ -455,10 +874,78 @@
 	font-size: 24px;
 }
 
+.XHSPassSectionHeader.HasFilters .XHSPassSectionTitle {
+	width: 260px;
+}
+
 .XHSPassSectionNote {
 	width: 360px;
 	text-align: right;
 	vertical-align: center;
+}
+
+.XHSPassSectionFilterTabs {
+	width: fill-parent-flow( 1.0 );
+	height: 100%;
+	flow-children: right;
+	overflow: squish scroll;
+	vertical-align: center;
+}
+
+.XHSPassFilterTab {
+	width: fit-children;
+	height: 28px;
+	margin-left: 16px;
+	padding: 0px 0px 6px 0px;
+	vertical-align: center;
+	background-color: #00000000;
+	border: 0px solid #00000000;
+	border-bottom: 2px solid #00000000;
+	box-shadow: fill #00000000 0px 0px 0px 0px;
+	transition-property: brightness, border;
+	transition-duration: 0.12s;
+}
+
+.XHSPassFilterTab:hover,
+.XHSPassFilterTab.IsActive {
+	brightness: 1.18;
+	border-bottom: 2px solid #5ad0ff;
+}
+
+.XHSPassFilterTab Label {
+	align: center center;
+	color: #7f91a7;
+	font-size: 11px;
+	font-weight: bold;
+	text-transform: uppercase;
+	text-overflow: shrink;
+}
+
+.XHSPassFilterTab:hover Label,
+.XHSPassFilterTab.IsActive Label {
+	color: #ffffff;
+	text-shadow: 0px 1px 2px #000000;
+}
+
+.XHSSupporterPassWindow.SupporterTier1 .XHSPassFilterTab:hover,
+.XHSSupporterPassWindow.SupporterTier1 .XHSPassFilterTab.IsActive { border-bottom: 2px solid #70e39a; }
+
+.XHSSupporterPassWindow.SupporterTier2 .XHSPassFilterTab:hover,
+.XHSSupporterPassWindow.SupporterTier2 .XHSPassFilterTab.IsActive { border-bottom: 2px solid #ffcf66; }
+
+.XHSSupporterPassWindow.SupporterTier3 .XHSPassFilterTab:hover,
+.XHSSupporterPassWindow.SupporterTier3 .XHSPassFilterTab.IsActive { border-bottom: 2px solid #ff5a43; }
+
+.XHSSupporterPassWindow.SupporterTier4 .XHSPassFilterTab:hover,
+.XHSSupporterPassWindow.SupporterTier4 .XHSPassFilterTab.IsActive { border-bottom: 2px solid #5ad0ff; }
+
+.XHSSupporterPassWindow.SupporterTier5 .XHSPassFilterTab:hover,
+.XHSSupporterPassWindow.SupporterTier5 .XHSPassFilterTab.IsActive { border-bottom: 2px solid #c99cff; }
+
+.XHSSupporterPassWindow.SupporterTier5 .XHSPassFilterTab:hover Label,
+.XHSSupporterPassWindow.SupporterTier5 .XHSPassFilterTab.IsActive Label {
+	color: #f1e6ff;
+	text-shadow: 0px 0px 6px #c99cff66, 0px 1px 2px #000000;
 }
 
 .XHSPassTierRows,
@@ -466,6 +953,7 @@
 .XHSPassShopGrid,
 .XHSPassLeaderboardRows,
 .XHSPassSettingsRows {
+	width: 100%;
 	height: fill-parent-flow( 1.0 );
 	margin-top: 10px;
 	flow-children: down;
@@ -493,14 +981,20 @@
 	overflow: clip;
 	transition-property: brightness, border, pre-transform-scale2d, box-shadow;
 	transition-duration: 0.12s;
+	pre-transform-scale2d: 0.97;
 }
 
-.XHSPassTierArt {
+.XHSPassTierArt,
+.XHSPassTierShade,
+.XHSPassTierSweep {
 	width: 228px;
 	height: 398px;
 	margin-left: -14px;
 	margin-top: -16px;
 	ignore-parent-flow: true;
+}
+
+.XHSPassTierArt {
 	background-size: cover;
 	background-position: center;
 	background-repeat: no-repeat;
@@ -508,10 +1002,25 @@
 }
 
 .XHSPassTierShade {
-	width: 100%;
-	height: 100%;
-	ignore-parent-flow: true;
 	background-color: gradient( linear, 0% 0%, 0% 100%, from( #00000008 ), color-stop( 0.48, #02050b88 ), to( #02050bf2 ) );
+}
+
+.XHSPassTierSweep {
+	width: 46px;
+	height: 570px;
+	margin-left: -78px;
+	margin-top: -108px;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #ffffff00 ), color-stop( 0.46, #ffffff70 ), to( #ffffff00 ) );
+	opacity: 0;
+	z-index: 2;
+	animation-name: xhs_pass_tier_sweep;
+	animation-duration: 2.7s;
+	animation-iteration-count: infinite;
+	animation-timing-function: ease-in-out;
+}
+
+.XHSPassTierCard.Tier5 .XHSPassTierSweep {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #ffffff00 ), color-stop( 0.46, #f3ddff99 ), to( #ffffff00 ) );
 }
 
 .XHSPassTierCard:hover,
@@ -522,7 +1031,7 @@
 
 .XHSPassTierCard:hover {
 	box-shadow: fill #000000aa 0px 0px 16px 0px;
-	pre-transform-scale2d: 1.025;
+	pre-transform-scale2d: 1.0;
 	z-index: 3;
 }
 
@@ -534,6 +1043,28 @@
 
 .XHSPassTierCard.IsOwnedTier:hover {
 	brightness: 1.18;
+}
+
+.XHSPassTierCard.IsOwnedTier .XHSPassTierArt {
+	opacity: 0.24;
+	brightness: 0.56;
+	saturation: 0.0;
+	wash-color: #687284;
+}
+
+.XHSPassTierCard.IsOwnedTier .XHSPassTierShade {
+	background-color: gradient( linear, 0% 0%, 0% 100%, from( #00000096 ), color-stop( 0.5, #02050bd8 ), to( #02050bf8 ) );
+}
+
+.XHSPassTierCard.IsOwnedTier .XHSPassTierTopline,
+.XHSPassTierCard.IsOwnedTier .XHSPassTierName,
+.XHSPassTierCard.IsOwnedTier .XHSPassTierCopy,
+.XHSPassTierCard.IsOwnedTier .XHSPassTierPrice,
+.XHSPassTierCard.IsOwnedTier .XHSPassTagList,
+.XHSPassTierCard.IsOwnedTier .XHSPassTierCTA {
+	brightness: 0.64;
+	saturation: 0.0;
+	wash-color: #6b7482;
 }
 
 .XHSPassTierCard.Tier1 {
@@ -561,6 +1092,34 @@
 	border-color: #c99cff99;
 }
 
+.XHSPassTierCard.Tier1.IsOwnedTier { border-color: #70e39aee; box-shadow: fill #70e39a26 0px 0px 18px 0px; }
+.XHSPassTierCard.Tier2.IsOwnedTier { border-color: #ffcf66ee; box-shadow: fill #ffcf6628 0px 0px 18px 0px; }
+.XHSPassTierCard.Tier3.IsOwnedTier { border-color: #ff5a43ee; box-shadow: fill #ff5a4328 0px 0px 18px 0px; }
+.XHSPassTierCard.Tier4.IsOwnedTier { border-color: #5ad0ffee; box-shadow: fill #5ad0ff28 0px 0px 18px 0px; }
+.XHSPassTierCard.Tier5.IsOwnedTier { border-color: #c99cffee; box-shadow: fill #c99cff30 0px 0px 18px 0px; }
+
+.XHSPassTierCard.Tier1 .XHSPassTierMark,
+.XHSPassTierCard.Tier1 .XHSPassTag,
+.XHSPassTierCard.Tier1 .XHSPassTierOwnedTooltip { border-color: #70e39a88; }
+.XHSPassTierCard.Tier2 .XHSPassTierMark,
+.XHSPassTierCard.Tier2 .XHSPassTag,
+.XHSPassTierCard.Tier2 .XHSPassTierOwnedTooltip { border-color: #ffcf66a8; }
+.XHSPassTierCard.Tier3 .XHSPassTierMark,
+.XHSPassTierCard.Tier3 .XHSPassTag,
+.XHSPassTierCard.Tier3 .XHSPassTierOwnedTooltip { border-color: #ff5a4388; }
+.XHSPassTierCard.Tier4 .XHSPassTierMark,
+.XHSPassTierCard.Tier4 .XHSPassTag,
+.XHSPassTierCard.Tier4 .XHSPassTierOwnedTooltip { border-color: #5ad0ff99; }
+.XHSPassTierCard.Tier5 .XHSPassTierMark,
+.XHSPassTierCard.Tier5 .XHSPassTag,
+.XHSPassTierCard.Tier5 .XHSPassTierOwnedTooltip { border-color: #c99cffbb; }
+
+.XHSPassTierCard.Tier1 .XHSPassTierOwnedTitle { color: #70e39a; }
+.XHSPassTierCard.Tier2 .XHSPassTierOwnedTitle { color: #ffcf66; }
+.XHSPassTierCard.Tier3 .XHSPassTierOwnedTitle { color: #ff5a43; }
+.XHSPassTierCard.Tier4 .XHSPassTierOwnedTitle { color: #5ad0ff; }
+.XHSPassTierCard.Tier5 .XHSPassTierOwnedTitle { color: #c99cff; }
+
 .XHSPassTierTopline {
 	width: 100%;
 	height: 28px;
@@ -584,14 +1143,21 @@
 	width: 174px;
 	height: 54px;
 	horizontal-align: center;
-	margin-top: 48px;
+	vertical-align: center;
+	margin-top: 0px;
 	padding: 8px 10px 0px 10px;
 	flow-children: down;
 	ignore-parent-flow: true;
-	background-color: gradient( linear, 0% 0%, 100% 100%, from( #02050bf7 ), color-stop( 0.5, #071827f2 ), to( #02050bf7 ) );
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #02050bff ), color-stop( 0.5, #071827fb ), to( #02050bff ) );
 	border: 1px solid #ffcf66d8;
-	box-shadow: fill #000000bb 0px 0px 10px 0px;
+	box-shadow: fill #000000dd 0px 0px 14px 0px;
 	z-index: 4;
+}
+
+.XHSPassTierCard.IsOwnedTier .XHSPassTierOwnedTooltip {
+	brightness: 1.16;
+	saturation: 1.0;
+	box-shadow: fill #000000e8 0px 0px 18px 0px, fill #ffffff18 0px 0px 6px 0px;
 }
 
 .XHSPassTierOwnedTitle {
@@ -772,10 +1338,12 @@
 .XHSPassRewardImage {
 	width: 100%;
 	height: 92px;
-	background-size: cover;
-	background-position: center;
+	background-size: contain;
+	background-position: 50% 50%;
 	background-repeat: no-repeat;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #071321 ), color-stop( 0.55, #0b2634 ), to( #030811 ) );
 	border: 1px solid #58c8ff24;
+	overflow: clip;
 }
 
 .XHSPassRewardLevel,
@@ -810,52 +1378,8 @@
 	flow-children: right-wrap;
 }
 
-.XHSPassArmoryLayout {
-	width: 100%;
-	height: fill-parent-flow( 1.0 );
-	margin-top: 10px;
-	flow-children: right;
-}
-
-.XHSPassArmoryFilters {
-	width: 190px;
-	height: 100%;
-	margin-right: 14px;
-	padding: 12px;
-	flow-children: down;
-	background-color: #030812e8;
-	border: 1px solid #58c8ff30;
-}
-
-.XHSPassArmoryFilterButton {
-	width: 100%;
-	height: 42px;
-	margin-bottom: 8px;
-	padding-left: 12px;
-	background-color: #071827b8;
-	border: 1px solid #58c8ff24;
-	transition-property: brightness, border, background-color;
-	transition-duration: 0.12s;
-}
-
-.XHSPassArmoryFilterButton:hover,
-.XHSPassArmoryFilterButton.IsActive {
-	brightness: 1.15;
-	background-color: #0a2d4ff2;
-	border: 1px solid #5ad0ff;
-}
-
-.XHSPassArmoryFilterButton Label {
-	vertical-align: center;
-	color: #dceeff;
-	font-size: 15px;
-	text-transform: uppercase;
-	text-overflow: shrink;
-}
-
 .XHSPassArmoryGrid {
-	width: fill-parent-flow( 1.0 );
-	margin-top: 0px;
+	width: 100%;
 }
 
 .XHSPassShopCard {
@@ -870,9 +1394,12 @@
 .XHSPassShopImage {
 	width: 100%;
 	height: 126px;
-	background-size: cover;
-	background-position: center;
+	background-size: contain;
+	background-position: 50% 50%;
+	background-repeat: no-repeat;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #071321 ), color-stop( 0.55, #0b2634 ), to( #030811 ) );
 	border: 1px solid #58c8ff30;
+	overflow: clip;
 }
 
 .XHSPassShopName {
@@ -973,6 +1500,31 @@
 	border: 1px solid #ffcf6655;
 }
 
+.XHSPassSettingActionButton {
+	width: 170px;
+	height: 38px;
+	margin-left: 14px;
+	vertical-align: center;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #361126 ), to( #7d2b6b ) );
+	border: 1px solid #d87cff70;
+	box-shadow: fill #00000080 0px 0px 8px 0px;
+	transition-property: brightness, border;
+	transition-duration: 0.12s;
+}
+
+.XHSPassSettingActionButton:hover {
+	brightness: 1.25;
+	border: 1px solid #f2b4ff;
+}
+
+.XHSPassSettingActionButton Label {
+	align: center center;
+	color: #f8eaff;
+	font-size: 15px;
+	font-weight: bold;
+	text-transform: uppercase;
+}
+
 .XHSPassRowTitle {
 	color: #f3fbff;
 	font-size: 18px;
@@ -1062,6 +1614,51 @@
 	margin-left: 10px;
 }
 
+.XHSPassActionToast {
+	width: 520px;
+	min-height: 48px;
+	padding: 10px 18px;
+	align: center bottom;
+	margin-bottom: 86px;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #061421fa ), color-stop( 0.55, #0a2d4ffa ), to( #061421fa ) );
+	border: 1px solid #5ad0ff9c;
+	box-shadow: fill #000000c0 0px 0px 14px 0px, fill #5ad0ff28 0px 0px 12px 0px, inset #ffffff16 0px 1px 0px 0px;
+	opacity: 0;
+	visibility: collapse;
+	transform: translateY( 10px );
+	transition-property: opacity, transform, brightness;
+	transition-duration: 0.14s;
+	z-index: 140;
+}
+
+.XHSPassActionToast.IsVisible {
+	opacity: 1;
+	visibility: visible;
+	transform: translateY( 0px );
+}
+
+.XHSPassActionToast.IsError {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #2a0c12fa ), color-stop( 0.55, #3a1218fa ), to( #12070bfa ) );
+	border: 1px solid #ff5a43b8;
+	box-shadow: fill #000000c0 0px 0px 14px 0px, fill #ff5a432a 0px 0px 12px 0px, inset #ffffff12 0px 1px 0px 0px;
+}
+
+.XHSPassActionToast.IsSuccess {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #06150dfa ), color-stop( 0.55, #103824fa ), to( #06150dfa ) );
+	border: 1px solid #70e39ab0;
+	box-shadow: fill #000000c0 0px 0px 14px 0px, fill #70e39a28 0px 0px 12px 0px, inset #ffffff12 0px 1px 0px 0px;
+}
+
+.XHSPassActionToastText {
+	width: 100%;
+	color: #f3fbff;
+	font-size: 16px;
+	font-weight: bold;
+	text-align: center;
+	text-overflow: shrink;
+	text-shadow: 0px 1px 3px #000000;
+}
+
 .XHSPassBackToTopButton {
 	width: 44px;
 	height: 44px;
@@ -1124,11 +1721,12 @@
 }
 
 .AspectRatio16x10 .XHSPassTopBar {
-	width: 660px;
+	width: 684px;
 }
 
 .AspectRatio16x10 .XHSPassTab {
-	width: 100px;
+	width: fit-children;
+	margin-left: 18px;
 }
 
 .AspectRatio16x10 .XHSPassTierRows {
@@ -1139,7 +1737,8 @@
 	width: 216px;
 }
 
-.AspectRatio16x10 .XHSPassTierArt {
+.AspectRatio16x10 .XHSPassTierArt,
+.AspectRatio16x10 .XHSPassTierShade {
 	width: 216px;
 }
 
@@ -1148,15 +1747,31 @@
 }
 
 .AspectRatio4x3 .XHSPassTab {
-	width: 84px;
+	width: fit-children;
+	margin-left: 12px;
 }
 
 .AspectRatio4x3 .XHSPassProfileCard {
 	width: 390px;
 }
 
+.AspectRatio4x3 .XHSPassProfileStats {
+	padding-top: 0px;
+}
+
+.AspectRatio4x3 .XHSPassStatsRow {
+	height: 78px;
+	margin-bottom: 10px;
+}
+
 .AspectRatio4x3 .XHSPassProfileStats .XHSPassHeaderStat {
-	width: 136px;
+	width: fill-parent-flow( 1.0 );
+	margin-right: 8px;
+	padding: 10px 11px;
+}
+
+.AspectRatio4x3 .XHSPassProfileStats .XHSPassHeaderStatValue {
+	font-size: 22px;
 }
 
 .AspectRatio4x3 .XHSPassTierRows {
@@ -1167,6 +1782,12 @@
 	width: 170px;
 }
 
-.AspectRatio4x3 .XHSPassTierArt {
+.AspectRatio4x3 .XHSPassTierArt,
+.AspectRatio4x3 .XHSPassTierShade {
 	width: 170px;
+}
+
+.AspectRatio4x3 .XHSPassTierOwnedTooltip {
+	width: 150px;
+	height: 58px;
 }

@@ -32,6 +32,9 @@ var XHSQuestState = {
 };
 
 var XHSQuestLogPinnedBackground = false;
+var XHSQuestLogCollapsed = false;
+var XHSQuestLogTemporaryRevealToken = 0;
+var XHSQuestLogSuppressActivationEffects = false;
 var XHSCollapsedMainQuestPhases = {};
 
 var XHSMainQuestPhases = {
@@ -53,6 +56,95 @@ function RefreshXHSQuestLogBackgroundToggle() {
 	}
 }
 
+function RefreshXHSQuestLogCollapsedState() {
+	var questLog = $("#QuestLog");
+	var button = $("#QuestLogCollapseButton");
+
+	if (questLog) {
+		questLog.SetHasClass("QuestLogCollapsed", XHSQuestLogCollapsed);
+	}
+
+	if (button) {
+		button.SetHasClass("QuestLogCollapsed", XHSQuestLogCollapsed);
+	}
+}
+
+function SaveXHSQuestLogCollapsedState() {
+	if (typeof GameUI !== "undefined" && GameUI.CustomUIConfig) {
+		GameUI.CustomUIConfig().xhsQuestLogCollapsed = XHSQuestLogCollapsed;
+	}
+}
+
+function ToggleXHSQuestLogCollapsed() {
+	XHSQuestLogCollapsed = !XHSQuestLogCollapsed;
+	XHSQuestLogTemporaryRevealToken++;
+
+	var questLog = $("#QuestLog");
+	if (questLog) {
+		questLog.SetHasClass("QuestLogTemporaryReveal", false);
+	}
+
+	SaveXHSQuestLogCollapsedState();
+	RefreshXHSQuestLogCollapsedState();
+}
+
+function TemporarilyRevealXHSQuestLog(seconds) {
+	if (!XHSQuestLogCollapsed) {
+		return;
+	}
+
+	var questLog = $("#QuestLog");
+	if (!questLog) {
+		return;
+	}
+
+	seconds = Math.max(1.0, Number(seconds) || 4.0);
+	XHSQuestLogTemporaryRevealToken++;
+	var token = XHSQuestLogTemporaryRevealToken;
+
+	questLog.SetHasClass("QuestLogTemporaryReveal", true);
+	RefreshXHSQuestLogCollapsedState();
+
+	$.Schedule(seconds, function () {
+		if (token !== XHSQuestLogTemporaryRevealToken) {
+			return;
+		}
+
+		var currentQuestLog = $("#QuestLog");
+		if (currentQuestLog) {
+			currentQuestLog.SetHasClass("QuestLogTemporaryReveal", false);
+		}
+	});
+}
+
+function PulseXHSQuestPanel(panel) {
+	if (!panel || XHSQuestLogSuppressActivationEffects) {
+		return;
+	}
+
+	panel.SetHasClass("QuestJustActivated", false);
+	$.Schedule(0.01, function () {
+		if (panel && panel.IsValid && panel.IsValid()) {
+			panel.SetHasClass("QuestJustActivated", true);
+		}
+	});
+
+	$.Schedule(2.2, function () {
+		if (panel && panel.IsValid && panel.IsValid()) {
+			panel.SetHasClass("QuestJustActivated", false);
+		}
+	});
+}
+
+function NotifyXHSQuestBecameActive(panel) {
+	if (!panel || XHSQuestLogSuppressActivationEffects) {
+		return;
+	}
+
+	TemporarilyRevealXHSQuestLog(5.0);
+	PulseXHSQuestPanel(panel);
+}
+
 function ToggleXHSQuestLogBackground() {
 	XHSQuestLogPinnedBackground = !XHSQuestLogPinnedBackground;
 
@@ -61,6 +153,36 @@ function ToggleXHSQuestLogBackground() {
 	}
 
 	RefreshXHSQuestLogBackgroundToggle();
+}
+
+function BindXHSQuestLogBackgroundToggle() {
+	var button = $("#QuestLogPinButton");
+	if (!button) {
+		return;
+	}
+
+	button.SetPanelEvent("onmouseover", function () {
+		$.DispatchEvent("DOTAShowTextTooltip", button, "Keep quest panel background dark");
+	});
+
+	button.SetPanelEvent("onmouseout", function () {
+		$.DispatchEvent("DOTAHideTextTooltip");
+	});
+}
+
+function BindXHSQuestLogCollapseToggle() {
+	var button = $("#QuestLogCollapseButton");
+	if (!button) {
+		return;
+	}
+
+	button.SetPanelEvent("onmouseover", function () {
+		$.DispatchEvent("DOTAShowTextTooltip", button, XHSQuestLogCollapsed ? "Show quest panel" : "Hide quest panel");
+	});
+
+	button.SetPanelEvent("onmouseout", function () {
+		$.DispatchEvent("DOTAHideTextTooltip");
+	});
 }
 
 function GetXHSQuestPhase(questID) {
@@ -434,10 +556,16 @@ function SetQuestVisualState(panel, state) {
 		return;
 	}
 
+	var previousState = panel.GetAttributeString("xhs_state", "");
 	panel.SetHasClass("Active", state === "Active");
 	panel.SetHasClass("Inactive", state === "Inactive");
 	panel.SetHasClass("Completed", state === "Completed");
+	panel.SetAttributeString("xhs_state", state || "");
 	ApplyXHSQuestPanelVisibility(panel);
+
+	if (state === "Active" && previousState !== "" && previousState !== "Active") {
+		NotifyXHSQuestBecameActive(panel);
+	}
 }
 
 function SetStaticQuest(id, text, state) {
@@ -755,16 +883,22 @@ function InitStaticQuestLog() {
 	XHSQuestState.initialized = true;
 	if (typeof GameUI !== "undefined" && GameUI.CustomUIConfig) {
 		XHSQuestLogPinnedBackground = GameUI.CustomUIConfig().xhsQuestLogPinnedBackground === true;
+		XHSQuestLogCollapsed = GameUI.CustomUIConfig().xhsQuestLogCollapsed === true;
 	}
 	LoadXHSCollapsedMainQuestPhases();
+	BindXHSQuestLogBackgroundToggle();
+	BindXHSQuestLogCollapseToggle();
 	RefreshXHSQuestLogBackgroundToggle();
+	RefreshXHSQuestLogCollapsedState();
 
+	XHSQuestLogSuppressActivationEffects = true;
 	for (var i = 0; i < XHSStaticQuests.length; i++) {
 		SetStaticQuest(XHSStaticQuests[i].id, XHSStaticQuests[i].text, XHSStaticQuests[i].state);
 	}
 	ApplyQuestStateSnapshot(CustomNetTables.GetTableValue("xhs_quest_state", "state"));
 	RefreshStaticQuests();
 	RefreshXHSQuestCollapseState();
+	XHSQuestLogSuppressActivationEffects = false;
 }
 
 function OnQuestActivated( data ) {
@@ -814,7 +948,11 @@ function OnQuestActivated( data ) {
 	QuestPanel.SetHasClass( "Completed", data["Completed"] >= data["CompleteLimit"] );
 	QuestPanel.SetHasClass( "Active", data["Completed"] < data["CompleteLimit"] );
 	QuestPanel.SetHasClass( "Inactive", false );
+	QuestPanel.SetAttributeString("xhs_state", data["Completed"] < data["CompleteLimit"] ? "Active" : "Completed");
 	ApplyXHSQuestPanelVisibility(QuestPanel);
+	if (data["Completed"] < data["CompleteLimit"]) {
+		NotifyXHSQuestBecameActive(QuestPanel);
+	}
 	ReorderXHSQuestPanels(ZonePanel);
 	RefreshXHSQuestCollapseState();
 	RefreshPhaseQuestHeaders();

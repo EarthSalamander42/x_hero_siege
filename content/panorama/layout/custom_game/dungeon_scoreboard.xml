@@ -57,71 +57,8 @@
 				</Panel>
 			</Panel>
 			<Panel id="ZoneRequirementContainer" class="TopBottomFlow">
-				<Label class="ReqTitle" text="Zone Star Requirements"/>
-				<Panel id="ZoneRequirementsTab" class="LeftRightFlow">
-					<RadioButton id="1StarReq" class="ReqTab HasStars1" selected="true" onactivate="SwitchStyle( ZoneRequirementContainer, TabSlot, Tab1Selected )"  >
-						<Panel id="StarContainerReplays">
-							<Panel id="ZoneStar1" class="Star"/>
-							<Panel id="ZoneStar2" class="Star"/>
-							<Panel id="ZoneStar3" class="Star"/>
-						</Panel>
-					</RadioButton>
-					<RadioButton id="2StarReq" class="ReqTab HasStars2" onactivate="SwitchStyle( ZoneRequirementContainer, TabSlot, Tab2Selected )" >
-						<Panel id="StarContainerReplays">
-							<Panel id="ZoneStar1" class="Star"/>
-							<Panel id="ZoneStar2" class="Star"/>
-							<Panel id="ZoneStar3" class="Star"/>
-						</Panel>
-					</RadioButton>
-					<RadioButton id="3StarReq" class="ReqTab HasStars3" onactivate="SwitchStyle( ZoneRequirementContainer, TabSlot, Tab3Selected )" >
-						<Panel id="StarContainerReplays">
-							<Panel id="ZoneStar1" class="Star"/>
-							<Panel id="ZoneStar2" class="Star"/>
-							<Panel id="ZoneStar3" class="Star"/>
-						</Panel>
-					</RadioButton>
-				</Panel>
-				<Panel id="ZoneStarRequirementsDesc">
-					<Label id="Zone01_1_Desc" class="ZoneReqLabel" html="true" text="#DOTA_TI7_CampaignDetails_Zone01_1_Req"/>
-					<Label id="Zone01_2_Desc" class="ZoneReqLabel" html="true" text="#DOTA_TI7_CampaignDetails_Zone01_2_Req"/>
-					<Label id="Zone01_3_Desc" class="ZoneReqLabel" html="true" text="#DOTA_TI7_CampaignDetails_Zone01_3_Req"/>
-
-					<Label id="Zone02_1_Desc" class="ZoneReqLabel" html="true" text="#DOTA_TI7_CampaignDetails_Zone02_1_Req"/>
-					<Label id="Zone02_2_Desc" class="ZoneReqLabel" html="true" text="#DOTA_TI7_CampaignDetails_Zone02_2_Req"/>
-					<Label id="Zone02_3_Desc" class="ZoneReqLabel" html="true" text="#DOTA_TI7_CampaignDetails_Zone02_3_Req"/>
-
-					<Label id="Zone03_1_Desc" class="ZoneReqLabel" html="true" text="#DOTA_TI7_CampaignDetails_Zone03_1_Req"/>
-					<Label id="Zone03_2_Desc" class="ZoneReqLabel" html="true" text="#DOTA_TI7_CampaignDetails_Zone03_2_Req"/>
-					<Label id="Zone03_3_Desc" class="ZoneReqLabel" html="true" text="#DOTA_TI7_CampaignDetails_Zone03_3_Req"/>
-
-					<Label id="Zone04_1_Desc" class="ZoneReqLabel" html="true" text="#DOTA_TI7_CampaignDetails_Zone04_1_Req"/>
-					<Label id="Zone04_2_Desc" class="ZoneReqLabel" html="true" text="#DOTA_TI7_CampaignDetails_Zone04_2_Req"/>
-					<Label id="Zone04_3_Desc" class="ZoneReqLabel" html="true" text="#DOTA_TI7_CampaignDetails_Zone04_3_Req"/>
-
-					<Label id="Zone05_1_Desc" class="ZoneReqLabel" html="true" text="#DOTA_TI7_CampaignDetails_Zone05_1_Req"/>
-					<Label id="Zone05_2_Desc" class="ZoneReqLabel" html="true" text="#DOTA_TI7_CampaignDetails_Zone05_2_Req"/>
-					<Label id="Zone05_3_Desc" class="ZoneReqLabel" html="true" text="#DOTA_TI7_CampaignDetails_Zone05_3_Req"/>
-
-					<Label id="Zone06_1_Desc" class="ZoneReqLabel" html="true" text="#DOTA_TI7_CampaignDetails_Zone06_1_Req"/>
-					<Label id="Zone06_2_Desc" class="ZoneReqLabel" html="true" text="#DOTA_TI7_CampaignDetails_Zone06_2_Req"/>
-					<Label id="Zone06_3_Desc" class="ZoneReqLabel" html="true" text="#DOTA_TI7_CampaignDetails_Zone06_3_Req"/>
-
-					<Label id="Zone07_1_Desc" class="ZoneReqLabel" html="true" text="#DOTA_TI7_CampaignDetails_Zone07_1_Req"/>
-					<Label id="Zone07_2_Desc" class="ZoneReqLabel" html="true" text="#DOTA_TI7_CampaignDetails_Zone07_2_Req"/>
-					<Label id="Zone07_3_Desc" class="ZoneReqLabel" html="true" text="#DOTA_TI7_CampaignDetails_Zone07_3_Req"/>
-
-					<Label id="Zone08_1_Desc" class="ZoneReqLabel" html="true" text="#DOTA_TI7_CampaignDetails_Zone08_1_Req"/>
-					<Label id="Zone08_2_Desc" class="ZoneReqLabel" html="true" text="#DOTA_TI7_CampaignDetails_Zone08_2_Req"/>
-					<Label id="Zone08_3_Desc" class="ZoneReqLabel" html="true" text="#DOTA_TI7_CampaignDetails_Zone08_3_Req"/>
-
-					<Label id="Zone09_1_Desc" class="ZoneReqLabel" html="true" text="#DOTA_TI7_CampaignDetails_Zone09_1_Req"/>
-					<Label id="Zone09_2_Desc" class="ZoneReqLabel" html="true" text="#DOTA_TI7_CampaignDetails_Zone09_2_Req"/>
-					<Label id="Zone09_3_Desc" class="ZoneReqLabel" html="true" text="#DOTA_TI7_CampaignDetails_Zone09_3_Req"/>
-
-					<Label id="Zone10_1_Desc" class="ZoneReqLabel" html="true" text="#DOTA_TI7_CampaignDetails_Zone10_1_Req"/>
-					<Label id="Zone10_2_Desc" class="ZoneReqLabel" html="true" text="#DOTA_TI7_CampaignDetails_Zone10_2_Req"/>
-					<Label id="Zone10_3_Desc" class="ZoneReqLabel" html="true" text="#DOTA_TI7_CampaignDetails_Zone10_3_Req"/>
-				</Panel>
+				<Label class="ReqTitle" text="Fragment Quests"/>
+				<Panel id="ZoneStarRequirementsDesc" class="FragmentQuestCards"/>
 			</Panel>		
 			<Panel id="ScoreboardTeamContainer" class="TopBottomFlow">
 				<Panel class="HeroRow LeftRightFlow">

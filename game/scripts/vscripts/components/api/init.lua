@@ -52,6 +52,10 @@ function api:GetDonatorStatus(player_id)
 		return 0
 	end
 
+	if self.temporary_donator_status ~= nil and self.temporary_donator_status[player_id] ~= nil then
+		return self.temporary_donator_status[player_id]
+	end
+
 	local steamid = tostring(PlayerResource:GetSteamID(player_id))
 
 	-- if the game isnt registered yet, we have no way to know if the player is a donator
@@ -65,6 +69,36 @@ function api:GetDonatorStatus(player_id)
 		--		native_print("api:GetDonatorStatus: api players steamid not valid!")
 		return 0
 	end
+end
+
+function api:GetTemporaryDonatorStatus(player_id)
+	if not PlayerResource:IsValidPlayerID(player_id) then
+		return nil
+	end
+
+	if self.temporary_donator_status == nil then
+		return nil
+	end
+
+	return self.temporary_donator_status[player_id]
+end
+
+function api:SetTemporaryDonatorStatus(player_id, status)
+	if not PlayerResource:IsValidPlayerID(player_id) then
+		return false
+	end
+
+	self.temporary_donator_status = self.temporary_donator_status or {}
+
+	if status == nil then
+		self.temporary_donator_status[player_id] = nil
+		return true
+	end
+
+	status = tonumber(status) or 0
+	status = math.max(0, math.min(10, math.floor(status)))
+	self.temporary_donator_status[player_id] = status
+	return true
 end
 
 function api:GetPlayerIngameTag(player_id)
@@ -335,6 +369,35 @@ function api:GetPlayerWinrateShown(player_id)
 	end
 end
 
+function api:GetPlayerIngameAdvertizeHidden(player_id)
+	if not PlayerResource:IsValidPlayerID(player_id) then
+		return nil
+	end
+
+	local steamid = tostring(PlayerResource:GetSteamID(player_id))
+	if self.players == nil or self.players[steamid] == nil then
+		return nil
+	end
+
+	local player = self.players[steamid]
+	local supporter_pass = player.supporter_pass or {}
+	local settings = supporter_pass.settings or player.settings or {}
+	local values = {
+		settings.xhs_ingame_advertize_hidden,
+		settings.ingame_advertize_hidden,
+		player.xhs_ingame_advertize_hidden,
+		player.ingame_advertize_hidden,
+	}
+
+	for _, value in pairs(values) do
+		if value ~= nil then
+			return value
+		end
+	end
+
+	return nil
+end
+
 function api:GetPlayerWinrate(player_id)
 	if not PlayerResource:IsValidPlayerID(player_id) then
 		native_print("api:GetPlayerWinrate: Player ID not valid!")
@@ -428,15 +491,17 @@ function api:MergeSupporterPassResponse(steamid, data)
 		supporter_pass.fragments = profile.fragments
 		supporter_pass.fragment_balance = profile.fragments
 	end
-	if profile.weekly_fragments ~= nil then
-		supporter_pass.weekly_fragments = profile.weekly_fragments
-		supporter_pass.weekly_earned = profile.weekly_fragments
+	local daily_fragments = profile.daily_fragments or profile.daily_earned or profile.weekly_fragments
+	if daily_fragments ~= nil then
+		supporter_pass.daily_fragments = daily_fragments
+		supporter_pass.daily_earned = daily_fragments
+		supporter_pass.weekly_fragments = daily_fragments
+		supporter_pass.weekly_earned = daily_fragments
 	end
-	if profile.weekly_cap ~= nil then
-		supporter_pass.weekly_cap = profile.weekly_cap
-	end
-	if profile.legacy_fragments ~= nil then
-		supporter_pass.legacy_fragments = profile.legacy_fragments
+	local daily_cap = profile.daily_cap or profile.weekly_cap
+	if daily_cap ~= nil then
+		supporter_pass.daily_cap = daily_cap
+		supporter_pass.weekly_cap = daily_cap
 	end
 
 	if season.xp ~= nil or season.level ~= nil or season.xp_per_level ~= nil then
@@ -448,6 +513,7 @@ function api:MergeSupporterPassResponse(steamid, data)
 
 	local season_xp = season.xp or profile.season_xp
 	local season_level = season.level or profile.season_level
+	local season_xp_change = season.xp_change or season.gained_xp or profile.season_xp_change or profile.xp_change or data.season_xp_change or data.supporter_pass_xp_change or data.xp_change
 	if season_xp ~= nil then
 		supporter_pass.season_xp = season_xp
 		supporter_pass.current_exp = season_xp
@@ -455,6 +521,12 @@ function api:MergeSupporterPassResponse(steamid, data)
 	if season_level ~= nil then
 		supporter_pass.season_level = season_level
 		supporter_pass.level = season_level
+	end
+	if season_xp_change ~= nil then
+		supporter_pass.season_xp_change = season_xp_change
+		supporter_pass.xp_change = season_xp_change
+		supporter_pass.season = supporter_pass.season or {}
+		supporter_pass.season.xp_change = season_xp_change
 	end
 
 	if data.entitlements ~= nil then
@@ -541,20 +613,38 @@ function api:UpdateSupporterPassSettings(player_id, settings, callback)
 	local steamid = tostring(PlayerResource:GetSteamID(player_id))
 	local payload = {
 		steamid = steamid,
-		toggle_tag = settings.toggle_tag == true or settings.toggle_tag == 1,
-		pass_rewards = settings.pass_rewards == true or settings.pass_rewards == 1,
-		player_xp = settings.player_xp == true or settings.player_xp == 1,
-		winrate_toggle = settings.winrate_toggle == true or settings.winrate_toggle == 1,
 	}
+
+	if settings.toggle_tag ~= nil then payload.toggle_tag = settings.toggle_tag == true or settings.toggle_tag == 1 end
+	if settings.pass_rewards ~= nil then payload.pass_rewards = settings.pass_rewards == true or settings.pass_rewards == 1 end
+	if settings.player_xp ~= nil then payload.player_xp = settings.player_xp == true or settings.player_xp == 1 end
+	if settings.winrate_toggle ~= nil then payload.winrate_toggle = settings.winrate_toggle == true or settings.winrate_toggle == 1 end
+	if settings.xhs_ingame_advertize_hidden ~= nil then payload.xhs_ingame_advertize_hidden = settings.xhs_ingame_advertize_hidden == true or settings.xhs_ingame_advertize_hidden == 1 end
 
 	api:Request("supporter-pass/settings", function(data)
 		if api.players and api.players[steamid] then
-			api.players[steamid].toggle_tag = data.toggle_tag
-			api.players[steamid].bp_rewards = data.bp_rewards
-			api.players[steamid].pass_rewards = data.pass_rewards
-			api.players[steamid].player_xp = data.player_xp
-			api.players[steamid].winrate = data.winrate_toggle and 1 or 0
-			api.players[steamid].winrate_toggle = data.winrate_toggle
+			if data.toggle_tag ~= nil then api.players[steamid].toggle_tag = data.toggle_tag elseif settings.toggle_tag ~= nil then api.players[steamid].toggle_tag = settings.toggle_tag end
+			if data.bp_rewards ~= nil then api.players[steamid].bp_rewards = data.bp_rewards end
+			if data.pass_rewards ~= nil then
+				api.players[steamid].pass_rewards = data.pass_rewards
+				api.players[steamid].bp_rewards = data.pass_rewards
+			elseif settings.pass_rewards ~= nil then
+				api.players[steamid].pass_rewards = settings.pass_rewards
+				api.players[steamid].bp_rewards = settings.pass_rewards
+			end
+			if data.player_xp ~= nil then api.players[steamid].player_xp = data.player_xp elseif settings.player_xp ~= nil then api.players[steamid].player_xp = settings.player_xp end
+			if data.winrate_toggle ~= nil then
+				api.players[steamid].winrate = data.winrate_toggle and 1 or 0
+				api.players[steamid].winrate_toggle = data.winrate_toggle
+			elseif settings.winrate_toggle ~= nil then
+				api.players[steamid].winrate = settings.winrate_toggle and 1 or 0
+				api.players[steamid].winrate_toggle = settings.winrate_toggle
+			end
+			if data.xhs_ingame_advertize_hidden ~= nil then
+				api.players[steamid].xhs_ingame_advertize_hidden = data.xhs_ingame_advertize_hidden
+			elseif settings.xhs_ingame_advertize_hidden ~= nil then
+				api.players[steamid].xhs_ingame_advertize_hidden = settings.xhs_ingame_advertize_hidden
+			end
 		end
 
 		callback(true, data)
@@ -864,18 +954,29 @@ end
 
 function api:GetEventPlayerID(event_source_index, payload)
 	local player_id = tonumber(payload and payload.PlayerID or -1) or -1
+	local source_index = tonumber(event_source_index) or -1
 
-	if type(event_source_index) == "number" and event_source_index > 0 then
-		local ok, sender = pcall(EntIndexToHScript, event_source_index)
-		if ok and sender ~= nil and sender.GetPlayerID then
-			local sender_player_id = sender:GetPlayerID()
+	if source_index > 0 then
+		local ok, sender_player_id = pcall(function()
+			local sender = EntIndexToHScript(source_index)
+			if sender ~= nil and sender.GetPlayerID then
+				return sender:GetPlayerID()
+			end
+			return nil
+		end)
+
+		if ok then
 			if sender_player_id ~= nil and sender_player_id >= 0 then
 				player_id = sender_player_id
 			end
 		end
 	end
 
-	if not PlayerResource:IsValidPlayerID(player_id) then
+	local valid_ok, valid_player_id = pcall(function()
+		return PlayerResource:IsValidPlayerID(player_id)
+	end)
+
+	if not valid_ok or not valid_player_id then
 		return nil
 	end
 
@@ -1134,6 +1235,42 @@ function api:ProcessCompletedGame(data, payload)
 	local gamemode = payload.gamemode or api:GetCustomGamemode()
 	local game_type = payload.game_type or CUSTOM_GAME_TYPE
 
+	local function MergeCompletedPlayers(response)
+		if type(response) ~= "table" then
+			return
+		end
+
+		local response_players = response.players
+		if response_players == nil and type(response.data) == "table" then
+			response_players = response.data.players
+		end
+		if type(response_players) ~= "table" then
+			return
+		end
+
+		api.players = api.players or {}
+
+		for key, player_data in pairs(response_players) do
+			if type(player_data) == "table" then
+				local steamid = tostring(player_data.steamid or player_data.steam_id or player_data.steamID or key)
+				api.players[steamid] = api.players[steamid] or {}
+
+				for field, value in pairs(player_data) do
+					api.players[steamid][field] = value
+				end
+
+				if api.MergeSupporterPassResponse then
+					api:MergeSupporterPassResponse(steamid, player_data)
+				end
+			end
+		end
+	end
+
+	MergeCompletedPlayers(data)
+	if SupporterPass and SupporterPass.PublishPlayers then
+		SupporterPass:PublishPlayers()
+	end
+
 	local full_data = {
 		players = payload.players,
 		data = data,
@@ -1391,16 +1528,23 @@ function api:CompleteGame()
 		rosh_max_hp = rosh_max_hp,
 		cheat_mode = self:IsCheatGame(),
 		map = GetMapName(),
+		fragment_quests = FragmentQuests ~= nil and FragmentQuests:BuildAnalyticsPayload() or nil,
 	}
 
 	self:Request("game-complete", function(data)
 			print("game-complete: Game complete successful!")
+			if FragmentQuests ~= nil then
+				FragmentQuests:OnBackendComplete(true, data)
+			end
 			api:ProcessCompletedGame(data, payload)
 		end,
 
 		function(data)
 			print("game-complete: Error on game complete!")
 			print(data)
+			if FragmentQuests ~= nil then
+				FragmentQuests:OnBackendComplete(false, data)
+			end
 			api:ProcessCompletedGame(data, payload)
 		end,
 		"POST", payload

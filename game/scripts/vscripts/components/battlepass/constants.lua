@@ -6,9 +6,9 @@ DONATOR_COLOR[3] = {0, 102, 255} -- Administrator
 DONATOR_COLOR[4] = {228, 87, 46} -- Ember Donator
 DONATOR_COLOR[5] = {242, 201, 76} -- Golden Donator
 DONATOR_COLOR[6] = {69, 196, 107} -- Donator
-DONATOR_COLOR[7] = {123, 135, 148} -- Stoneguard Donator
-DONATOR_COLOR[8] = {46, 196, 182} -- Earthwarden Donator
-DONATOR_COLOR[9] = {46, 196, 182} -- Legacy Gaben Donator maps to Earthwarden
+DONATOR_COLOR[7] = {90, 208, 255} -- Stoneguard Donator
+DONATOR_COLOR[8] = {201, 156, 255} -- Earthwarden Donator
+DONATOR_COLOR[9] = {201, 156, 255} -- Legacy Gaben Donator maps to Earthwarden
 DONATOR_COLOR[10] = {255, 255, 255}
 
 DONATOR_STATUS_TO_TIER = {

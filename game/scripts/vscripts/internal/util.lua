@@ -1508,6 +1508,10 @@ function XHSRecordPotionUse(caster)
 	_G.XHS_POTION_USES = _G.XHS_POTION_USES or {}
 	_G.XHS_POTION_USES[playerID] = (_G.XHS_POTION_USES[playerID] or 0) + 1
 
+	if FragmentQuests ~= nil then
+		FragmentQuests:OnPotionUsed(caster)
+	end
+
 	if ZONE_STAT_POTIONS ~= nil and GameRules.GameMode ~= nil and GameRules.GameMode.Zones ~= nil then
 		for _, Zone in pairs(GameRules.GameMode.Zones) do
 			if Zone ~= nil and Zone.ContainsUnit ~= nil and Zone:ContainsUnit(caster) then

@@ -6,6 +6,12 @@ function modifier_custom_mechanics:IsPurgable() return false end
 
 function modifier_custom_mechanics:RemoveOnDeath() return false end
 
+function modifier_custom_mechanics:CheckState()
+	return {
+		[MODIFIER_STATE_NO_HEALTH_BAR] = true,
+	}
+end
+
 function modifier_custom_mechanics:DeclareFunctions()
 	return {
 		--	MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS,

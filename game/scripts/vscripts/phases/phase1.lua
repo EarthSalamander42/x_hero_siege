@@ -33,6 +33,9 @@ function HeroImageBack(event)
 	local heroImageCompleted = hero.hero_image == true
 	local heroImageUnitMissing = GameMode.HeroImageUnit == nil or not IsValidEntity(GameMode.HeroImageUnit) or GameMode.HeroImageUnit:IsNull()
 	if heroImageCompleted or heroImageUnitMissing then
+		if FragmentQuests ~= nil then
+			FragmentQuests:OnOptionalEventEnd("hero_image", heroImageCompleted)
+		end
 		SetHeroOptionalEventTomeLock(hero, "hero_image", false)
 		GameMode.HeroImage_occuring = false
 		GameMode.HeroImageUnit = nil
@@ -50,6 +53,9 @@ function HeroImageBack(event)
 	SpecialEventBack(event)
 	Timers:RemoveTimer(timers.HeroImage)
 	GameMode.HeroImage_occuring = false
+	if FragmentQuests ~= nil then
+		FragmentQuests:OnOptionalEventEnd("hero_image", false)
+	end
 
 	if GameMode.HeroImageUnit ~= nil and IsValidEntity(GameMode.HeroImageUnit) and not GameMode.HeroImageUnit:IsNull() then
 		UTIL_Remove(GameMode.HeroImageUnit)
@@ -79,6 +85,9 @@ function HeroImageDead(event)
 	GameMode.HeroImageUnit = nil
 	CustomGameEventManager:Send_ServerToAllClients("hide_timer_hero_image", {})
 	hero.hero_image = true
+	if FragmentQuests ~= nil then
+		FragmentQuests:OnOptionalEventEnd("hero_image", true)
+	end
 	CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "xhs_event_usage_update", {
 		hero_image_used = true,
 		hero_image_busy = false,
@@ -123,6 +132,9 @@ function SpiritBeastBack(event)
 	SpecialEventBack(event)
 	Timers:RemoveTimer(timers.SpiritBeast)
 	GameMode.SpiritBeast_occuring = false
+	if FragmentQuests ~= nil then
+		FragmentQuests:OnOptionalEventEnd("spirit_beast", false)
+	end
 
 	if not GameMode.spirit_beast:IsNull() then
 		GameMode.spirit_beast:RemoveSelf()
@@ -137,6 +149,9 @@ function SpiritBeastDead(event)
 	DoEntFire("trigger_spirit_beast_duration", "Kill", nil, 0, nil, nil)
 	GameMode.SpiritBeast_killed = true
 	CustomGameEventManager:Send_ServerToAllClients("hide_timer_spirit_beast", {})
+	if FragmentQuests ~= nil then
+		FragmentQuests:OnOptionalEventEnd("spirit_beast", true)
+	end
 
 	local pos = GameMode.spirit_beast:GetAbsOrigin()
 	DropNeutralItemAtPositionForHero("item_shield_of_invincibility", pos, hero, hero:GetTeam(), true)
@@ -148,6 +163,9 @@ function FrostInfernalBack(event)
 	SpecialEventBack(event)
 	Timers:RemoveTimer(timers.FrostInfernal)
 	GameMode.FrostInfernal_occuring = false
+	if FragmentQuests ~= nil then
+		FragmentQuests:OnOptionalEventEnd("frost_infernal", false)
+	end
 
 	if not GameMode.frost_infernal:IsNull() then
 		GameMode.frost_infernal:RemoveSelf()
@@ -163,6 +181,9 @@ function FrostInfernalDead(event)
 	DoEntFire("trigger_frost_infernal_duration", "Kill", nil, 0, nil, nil)
 	GameMode.FrostInfernal_killed = 1
 	CustomGameEventManager:Send_ServerToAllClients("hide_timer_frost_infernal", {})
+	if FragmentQuests ~= nil then
+		FragmentQuests:OnOptionalEventEnd("frost_infernal", true)
+	end
 
 	local pos = GameMode.frost_infernal:GetAbsOrigin()
 	DropNeutralItemAtPositionForHero("item_key_of_the_three_moons", pos, hero, hero:GetTeam(), true)
@@ -178,6 +199,9 @@ function AllHeroImageBack(event)
 	CustomGameEventManager:Send_ServerToAllClients("xhs_event_usage_update", {
 		all_hero_images_busy = false,
 	})
+	if FragmentQuests ~= nil then
+		FragmentQuests:OnOptionalEventEnd("all_hero_images", false)
+	end
 	SpecialEventBack(event)
 
 	local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_2, point, nil, 2500, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_ALL, DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER, false)

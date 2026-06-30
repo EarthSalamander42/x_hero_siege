@@ -16,8 +16,8 @@
 	height: 30px;
 	horizontal-align: right;
 	vertical-align: top;
-	margin-top: 168px;
-	margin-right: 18px;
+	margin-top: 48px;
+	margin-right: 48px;
 	background-color: #111a22ee;
 	border: 1px solid #69d7ff88;
 	box-shadow: fill #000000aa 0px 0px 8px 0px;
@@ -75,18 +75,23 @@
 	text-shadow: 0px 1px 2px 2 #000000;
 }
 
+.XHSDevToolsHeaderText {
+	width: 100%;
+	flow-children: right;
+}
+
 .XHSDevToolsTitle {
 	color: #f2fbff;
 	font-size: 24px;
 	font-weight: bold;
 	text-shadow: 0px 1px 3px 2 #000000;
+	align: center center;
 }
 
 .XHSDevToolsClose {
 	width: 32px;
 	height: 32px;
 	horizontal-align: right;
-	margin-left: 430px;
 	background-color: #2a1111ee;
 	border: 1px solid #ff7f7f66;
 }

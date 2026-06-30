@@ -207,47 +207,123 @@ function OpenXHSExternalURL(url) {
 	}
 }
 
-function ApplyXHSReportBugButtonStyle(button) {
+function ApplyXHSTopBarUtilityButtonStyle(button, options) {
 	if (!button) {
 		return;
 	}
 
-	button.style.width = "34px";
-	button.style.height = "34px";
-	button.style.minWidth = "34px";
-	button.style.minHeight = "34px";
-	button.style.horizontalAlign = "left";
-	button.style.verticalAlign = "center";
-	button.style.marginLeft = "4px";
-	button.style.marginRight = "0px";
+	options = options || {};
+	var icon = options.icon || "";
+	var iconId = options.iconId || "";
+	var hovered = options.hovered === true || button.BHasClass("XHSTopBarUtilityHovered");
+
+	button.style.width = "30px";
+	button.style.height = "30px";
+	button.style.minWidth = "30px";
+	button.style.minHeight = "30px";
+	button.style.horizontalAlign = "center";
+	button.style.verticalAlign = "middle";
+	button.style.marginLeft = "8px";
+	button.style.marginRight = "8px";
 	button.style.marginTop = "0px";
 	button.style.marginBottom = "0px";
-	button.style.backgroundColor = "#151c24ee";
-	button.style.border = "1px solid #ff8d5c66";
-	button.style.boxShadow = "fill #00000099 0px 0px 6px 0px";
+	button.style.backgroundColor = "#00000000";
+	button.style.border = "0px solid #00000000";
+	button.style.boxShadow = "none";
+	button.style.backgroundImage = "none";
+	button.style.backgroundRepeat = "no-repeat";
+	button.style.backgroundSize = "100% 100%";
+	button.style.backgroundPosition = "center";
+	button.style.opacity = hovered ? "1.0" : "0.5";
+	button.style.washColor = "#ccddffff";
+	button.style.imgShadow = "0px 0px 3px 3 black";
+	button.style.transitionProperty = "opacity";
+	button.style.transitionDuration = "0.2s";
 	button.style.zIndex = "5000";
 	button.style.tooltipPosition = "bottom";
 
-	var label = button.FindChildTraverse("XHSReportBugButtonLabel");
-	if (label) {
-		label.style.width = "100%";
-		label.style.height = "100%";
-		label.style.color = "#ffd8c8";
-		label.style.fontSize = "19px";
-		label.style.fontWeight = "bold";
-		label.style.textAlign = "center";
-		label.style.verticalAlign = "center";
-		label.style.textShadow = "0px 1px 3px 2 #000000";
+	var iconPanel = iconId ? button.FindChildTraverse(iconId) : null;
+	if (!iconPanel && iconId) {
+		iconPanel = $.CreatePanel("Image", button, iconId);
+		iconPanel.hittest = false;
+	}
+
+	if (iconPanel) {
+		if (iconPanel.SetImage) {
+			iconPanel.SetImage(icon);
+		} else {
+			iconPanel.src = icon;
+		}
+		iconPanel.style.width = "26px";
+		iconPanel.style.height = "26px";
+		iconPanel.style.horizontalAlign = "center";
+		iconPanel.style.verticalAlign = "middle";
+		iconPanel.style.washColor = "#ffffffff";
+		iconPanel.style.imgShadow = "0px 0px 3px 3 black";
+		iconPanel.style.opacity = "1.0";
 	}
 }
 
-function GetXHSButtonBar() {
-	var root = $.GetContextPanel().GetParent().GetParent();
-	if (!root) {
-		return null;
+function ApplyXHSReportBugButtonStyle(button) {
+	ApplyXHSTopBarUtilityButtonStyle(button, {
+		icon: "file://{images}/custom_game/hud/xhs_bug_report_icon.png",
+		iconId: "XHSReportBugButtonIcon"
+	});
+}
+
+function ApplyXHSAdvertizeButtonStyle(button) {
+	ApplyXHSTopBarUtilityButtonStyle(button, {
+		icon: "file://{images}/custom_game/hud/xhs_advertize_icon.png",
+		iconId: "XHSAdvertizeButtonIcon"
+	});
+}
+
+function SetXHSTopBarUtilityButtonHover(button, styleFn, hovered) {
+	if (!button || !styleFn) {
+		return;
 	}
 
-	return root.FindChildTraverse("ButtonBar");
+	if (hovered) {
+		button.AddClass("XHSTopBarUtilityHovered");
+	} else {
+		button.RemoveClass("XHSTopBarUtilityHovered");
+	}
+
+	styleFn(button);
+}
+
+function GetXHSButtonBar() {
+	var panel = $.GetContextPanel();
+	var safety = 0;
+	while (panel && safety < 12) {
+		var buttonBar = panel.FindChildTraverse ? panel.FindChildTraverse("ButtonBar") : null;
+		if (buttonBar) {
+			return buttonBar;
+		}
+
+		panel = panel.GetParent ? panel.GetParent() : null;
+		safety++;
+	}
+
+	return null;
+}
+
+function GetXHSHudRoot() {
+	var buttonBar = GetXHSButtonBar();
+	if (buttonBar) {
+		var panel = buttonBar;
+		var safety = 0;
+		while (panel && safety < 12) {
+			if (panel.id === "Hud") {
+				return panel;
+			}
+
+			panel = panel.GetParent ? panel.GetParent() : null;
+			safety++;
+		}
+	}
+
+	return $.GetContextPanel().GetParent ? $.GetContextPanel().GetParent() : $.GetContextPanel();
 }
 
 function FindXHSFlyoutScoreboardButton(buttonBar) {
@@ -258,7 +334,7 @@ function FindXHSFlyoutScoreboardButton(buttonBar) {
 	var firstOtherChild = null;
 	for (var i = 0; i < buttonBar.GetChildCount(); i++) {
 		var child = buttonBar.GetChild(i);
-		if (!child || child.id === "XHSReportBugButton") {
+		if (!child || child.id === "XHSReportBugButton" || child.id === "XHSAdvertizeButton") {
 			continue;
 		}
 
@@ -276,7 +352,15 @@ function FindXHSFlyoutScoreboardButton(buttonBar) {
 	return firstOtherChild;
 }
 
-function PlaceXHSReportBugButton(button) {
+function FindXHSAdvertizeButton(buttonBar) {
+	if (!buttonBar) {
+		return null;
+	}
+
+	return buttonBar.FindChildTraverse("XHSAdvertizeButton");
+}
+
+function PlaceXHSAdvertizeButton(button) {
 	var buttonBar = GetXHSButtonBar();
 	if (!buttonBar || !button) {
 		return false;
@@ -294,8 +378,90 @@ function PlaceXHSReportBugButton(button) {
 	return true;
 }
 
+function PlaceXHSReportBugButton(button) {
+	var buttonBar = GetXHSButtonBar();
+	if (!buttonBar || !button) {
+		return false;
+	}
+
+	if (button.SetParent && button.GetParent && button.GetParent() !== buttonBar) {
+		button.SetParent(buttonBar);
+	}
+
+	var advertizeButton = FindXHSAdvertizeButton(buttonBar);
+	if (advertizeButton && buttonBar.MoveChildAfter) {
+		buttonBar.MoveChildAfter(button, advertizeButton);
+	} else {
+		var scoreboardButton = FindXHSFlyoutScoreboardButton(buttonBar);
+		if (scoreboardButton && buttonBar.MoveChildAfter) {
+			buttonBar.MoveChildAfter(button, scoreboardButton);
+		}
+	}
+
+	return true;
+}
+
+function OpenXHSIngameAdvertizeFromButton(retriesLeft) {
+	var config = GameUI.CustomUIConfig ? GameUI.CustomUIConfig() : null;
+	if (config && typeof config.OpenXHSIngameAdvertize === "function") {
+		config.OpenXHSIngameAdvertize();
+		return;
+	}
+
+	if (config) {
+		config.XHSOpenAdvertizeRequested = true;
+	}
+
+	if (retriesLeft > 0) {
+		$.Schedule(0.25, function() {
+			OpenXHSIngameAdvertizeFromButton(retriesLeft - 1);
+		});
+	}
+}
+
+function CreateXHSAdvertizeButton() {
+	var root = GetXHSHudRoot();
+	if (!root) {
+		$.Schedule(0.5, CreateXHSAdvertizeButton);
+		return;
+	}
+
+	var buttonBar = GetXHSButtonBar();
+	if (!buttonBar) {
+		$.Schedule(0.5, CreateXHSAdvertizeButton);
+		return;
+	}
+
+	var existing = root.FindChildTraverse("XHSAdvertizeButton");
+	if (existing) {
+		PlaceXHSAdvertizeButton(existing);
+		ApplyXHSAdvertizeButtonStyle(existing);
+		return;
+	}
+
+	var button = $.CreatePanel("Button", buttonBar, "XHSAdvertizeButton");
+	button.hittest = true;
+	button.SetPanelEvent("onactivate", function() {
+		OpenXHSIngameAdvertizeFromButton(8);
+	});
+	button.SetPanelEvent("onmouseover", function() {
+		SetXHSTopBarUtilityButtonHover(button, ApplyXHSAdvertizeButtonStyle, true);
+		$.DispatchEvent("UIShowTextTooltip", button, "Open advertize");
+	});
+	button.SetPanelEvent("onmouseout", function() {
+		SetXHSTopBarUtilityButtonHover(button, ApplyXHSAdvertizeButtonStyle, false);
+		$.DispatchEvent("UIHideTextTooltip", button);
+	});
+
+	var icon = $.CreatePanel("Image", button, "XHSAdvertizeButtonIcon");
+	icon.hittest = false;
+
+	PlaceXHSAdvertizeButton(button);
+	ApplyXHSAdvertizeButtonStyle(button);
+}
+
 function CreateXHSReportBugButton() {
-	var root = $.GetContextPanel().GetParent().GetParent();
+	var root = GetXHSHudRoot();
 	if (!root) {
 		$.Schedule(0.5, CreateXHSReportBugButton);
 		return;
@@ -320,20 +486,22 @@ function CreateXHSReportBugButton() {
 		OpenXHSExternalURL("https://discord.frostrose-studio.com/");
 	});
 	button.SetPanelEvent("onmouseover", function() {
+		SetXHSTopBarUtilityButtonHover(button, ApplyXHSReportBugButtonStyle, true);
 		$.DispatchEvent("UIShowTextTooltip", button, "Report a bug");
 	});
 	button.SetPanelEvent("onmouseout", function() {
+		SetXHSTopBarUtilityButtonHover(button, ApplyXHSReportBugButtonStyle, false);
 		$.DispatchEvent("UIHideTextTooltip", button);
 	});
 
-	var label = $.CreatePanel("Label", button, "XHSReportBugButtonLabel");
-	label.text = "!";
-	label.hittest = false;
+	var icon = $.CreatePanel("Image", button, "XHSReportBugButtonIcon");
+	icon.hittest = false;
 
 	PlaceXHSReportBugButton(button);
 	ApplyXHSReportBugButtonStyle(button);
 }
 
+CreateXHSAdvertizeButton();
 CreateXHSReportBugButton();
 
 //Use this line if you want to keep 4 ability minimum size, and only use 160 if you want ~2 ability min size

@@ -153,6 +153,9 @@ function SpecialEvents:MuradinEvent(time)
 	CustomTimers:BroadcastTimer("special_event")
 	CustomTimers:BroadcastTimer("creep_level")
 	UpdateGlobalObjective("muradin_event", "Active", "Muradin Event: " .. tostring(math.floor(time / 60)) .. ":" .. string.format("%02d", time % 60), time, true)
+	if FragmentQuests ~= nil then
+		FragmentQuests:OnMuradinStart(time)
+	end
 
 	StunBuildings(event_end_delay)
 	CinematicPauseCreeps(SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP)
@@ -260,6 +263,10 @@ function SpecialEvents:MuradinEvent(time)
 end
 
 function SpecialEvents:EndMuradinEvent()
+	if FragmentQuests ~= nil then
+		FragmentQuests:OnMuradinEnd()
+	end
+
 	local MuradinCheck = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, Entities:FindByName(nil, "npc_dota_muradin_boss"):GetAbsOrigin(), nil, 2000, DOTA_UNIT_TARGET_TEAM_BOTH, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER, false)
 
 	for _, hero in pairs(MuradinCheck) do
@@ -304,6 +311,9 @@ function SpecialEvents:FarmEvent(time)
 	GameMode.FarmEvent_occuring = true
 	ShowCurrentEventTimer("FARM EVENT", time)
 	UpdateGlobalObjective("farm_event", "Active", "Farm Event active", time)
+	if FragmentQuests ~= nil then
+		FragmentQuests:OnFarmEventStart(time)
+	end
 
 	StunBuildings(time)
 	CinematicPauseCreeps(SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP)
@@ -432,6 +442,10 @@ end
 function SpecialEvents:EndFarmEvent()
 	CustomTimers.timers_paused = 2
 	StopAllStormEarthFireSounds()
+	if FragmentQuests ~= nil then
+		FragmentQuests:OnFarmEventEnd()
+		FragmentQuests:OnPhase2Start()
+	end
 
 	for _, hero in pairs(HeroList:GetAllHeroes()) do
 		RefreshPlayers()
@@ -530,6 +544,9 @@ function SpecialEvents:RameroAndBaristolEvent(time, hero) -- 500 kills
 	CustomGameEventManager:Send_ServerToAllClients("show_timer_special_arena", {})
 	CustomTimers:BroadcastTimer("special_arena")
 	GameMode.SpecialArena_occuring = true
+	if FragmentQuests ~= nil then
+		FragmentQuests:OnArenaStart("ramero_baristol", time)
+	end
 
 	SpecialEvents.Ramero = CreateUnitByName("npc_ramero", Entities:FindByName(nil, "roshan_wp_4"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 	SpecialEvents.Ramero:AddNewModifier(SpecialEvents.Ramero, nil, "modifier_cinematic_pause", { duration = stun_duration, ramp_duration = SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP })
@@ -555,6 +572,9 @@ function SpecialEvents:EndRameroAndBaristolEvent(bWin)
 
 	bWin = bWin == true or (SpecialEvents.RameroDead == true and SpecialEvents.BaristolDead == true)
 	_G.RAMERO_ARTIFACT_PICKED = true
+	if FragmentQuests ~= nil then
+		FragmentQuests:OnArenaEnd("ramero_baristol", bWin)
+	end
 
 	local teleport_time = 3.0
 	local mode = GameRules:GetGameModeEntity()
@@ -628,6 +648,9 @@ function SpecialEvents:SogatEvent(time, hero) -- 750 kills
 	CustomGameEventManager:Send_ServerToAllClients("show_timer_special_arena", {})
 	CustomTimers:BroadcastTimer("special_arena")
 	GameMode.SpecialArena_occuring = true
+	if FragmentQuests ~= nil then
+		FragmentQuests:OnArenaStart("sogat", time)
+	end
 
 	SpecialEvents.Sogat = CreateUnitByName("npc_ramero_2", Entities:FindByName(nil, "roshan_wp_4"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 	SpecialEvents.Sogat:AddNewModifier(SpecialEvents.Sogat, nil, "modifier_cinematic_pause", { duration = stun_duration, ramp_duration = SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP })
@@ -646,6 +669,9 @@ function SpecialEvents:EndSogatEvent(bWin)
 	-- if _G.SOGAT_ARTIFACT_PICKED == true then return end -- if timer is not removed, uncomment this
 
 	_G.SOGAT_ARTIFACT_PICKED = true
+	if FragmentQuests ~= nil then
+		FragmentQuests:OnArenaEnd("sogat", bWin == true)
+	end
 
 	local teleport_time = 3.0
 	local mode = GameRules:GetGameModeEntity()

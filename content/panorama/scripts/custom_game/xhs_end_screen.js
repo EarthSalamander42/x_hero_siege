@@ -3,19 +3,7 @@
 var XHSEndScreen = (function () {
 	var WEBSITE_URL = "https://mods.frostrose-studio.com";
 	var DISCORD_URL = "https://discord.frostrose-studio.com/";
-
-	var TEAM_NAMES = {
-		2: "#DOTA_GoodGuys",
-		3: "#DOTA_BadGuys",
-		6: "#DOTA_Custom1",
-		7: "#DOTA_Custom2",
-		8: "#DOTA_Custom3",
-		9: "#DOTA_Custom4",
-		10: "#DOTA_Custom5",
-		11: "#DOTA_Custom6",
-		12: "#DOTA_Custom7",
-		13: "#DOTA_Custom8",
-	};
+	var SUPPORTER_URL = "https://www.patreon.com/bePatron?u=2533325";
 
 	var DIFFICULTY_NAMES = {
 		1: "Easy",
@@ -45,6 +33,16 @@ var XHSEndScreen = (function () {
 		}
 
 		return numberValue;
+	}
+
+	function FirstDefined() {
+		for (var i = 0; i < arguments.length; i++) {
+			if (arguments[i] !== undefined && arguments[i] !== null) {
+				return arguments[i];
+			}
+		}
+
+		return undefined;
 	}
 
 	function Clamp(value, minValue, maxValue) {
@@ -232,6 +230,63 @@ var XHSEndScreen = (function () {
 		return CustomNetTables.GetTableValue("supporter_pass_player", playerID.toString()) || {};
 	}
 
+	function GetSupporterURL() {
+		var playerID = Safe(function () {
+			return Players.GetLocalPlayer();
+		}, -1);
+		var table = playerID >= 0 ? GetBattlepassTable(playerID) : {};
+		return table.supporter_url || table.support_url || SUPPORTER_URL;
+	}
+
+	function MergeCompletedSupporterPass(battlepass, apiData) {
+		var merged = {};
+		battlepass = battlepass || {};
+		apiData = apiData || {};
+
+		for (var key in battlepass) {
+			if (battlepass.hasOwnProperty(key)) {
+				merged[key] = battlepass[key];
+			}
+		}
+
+		var supporterPass = apiData.supporter_pass || apiData.supporterPass || {};
+		var season = supporterPass.season || {};
+
+		var seasonLevel = FirstDefined(season.level, supporterPass.season_level, supporterPass.level, apiData.supporter_pass_level);
+		var seasonXP = FirstDefined(season.xp, supporterPass.season_xp, supporterPass.current_exp, apiData.supporter_pass_xp);
+		var seasonMax = FirstDefined(season.xp_per_level, supporterPass.season_xp_max, supporterPass.xp_per_level, apiData.supporter_pass_xp_max);
+		var seasonChange = FirstDefined(
+			season.xp_change,
+			season.gained_xp,
+			supporterPass.season_xp_change,
+			supporterPass.xp_change,
+			supporterPass.gained_xp,
+			apiData.supporter_pass_xp_change,
+			apiData.supporter_xp_change,
+			apiData.season_xp_change
+		);
+
+		if (seasonLevel !== undefined) {
+			merged.season_level = seasonLevel;
+			merged.Lvl = seasonLevel;
+		}
+		if (seasonXP !== undefined) {
+			merged.season_xp = seasonXP;
+			merged.XP = seasonXP;
+		}
+		if (seasonMax !== undefined) {
+			merged.season_xp_max = seasonMax;
+			merged.MaxXP = seasonMax;
+		}
+		if (seasonChange !== undefined) {
+			merged.season_xp_change = seasonChange;
+			merged.XP_change = seasonChange;
+		}
+
+		merged.title = merged.title || "Supporter Pass";
+		return merged;
+	}
+
 	function BuildPlayerModel(data, playerID) {
 		var info = Safe(function () {
 			return Game.GetPlayerInfo(playerID);
@@ -240,7 +295,7 @@ var XHSEndScreen = (function () {
 		var steamID = info && info.player_steamid ? info.player_steamid.toString() : playerID.toString();
 		var server = FindServerPlayer(data, steamID, playerID) || {};
 		var api = FindApiPlayer(data, steamID) || {};
-		var battlepass = GetBattlepassTable(playerID);
+		var battlepass = MergeCompletedSupporterPass(GetBattlepassTable(playerID), api);
 		var heroName = server.hero || (info && info.player_selected_hero) || "";
 		var team = ToNumber(server.team, info ? info.player_team_id : 0);
 
@@ -297,16 +352,9 @@ var XHSEndScreen = (function () {
 		);
 	}
 
-	function GetTeamName(teamID) {
-		var detailsName = Safe(function () {
-			return Game.GetTeamDetails(teamID).team_name;
-		}, null);
-
-		if (detailsName) {
-			return Localize(detailsName);
-		}
-
-		return Localize(TEAM_NAMES[teamID] || ("Team " + teamID));
+	function IsPlayerVictory(data) {
+		var winnerTeam = GetWinnerTeam(data);
+		return winnerTeam === 2;
 	}
 
 	function GetDifficultyName(data) {
@@ -361,13 +409,12 @@ var XHSEndScreen = (function () {
 	}
 
 	function RenderHeader(data) {
-		var winnerTeam = GetWinnerTeam(data);
 		var result = Panel("XHSEndScreenResult");
-		var winnerName = winnerTeam ? GetTeamName(winnerTeam) : "Unknown";
-		var isXHeroesVictory = winnerTeam === 2 || winnerTeam === 6;
+		var isXHeroesVictory = IsPlayerVictory(data);
 
 		if (result) {
-			result.text = winnerName + " Victory";
+			result.text = isXHeroesVictory ? "Victory" : "Defeat";
+			result.SetHasClass("IsVictory", isXHeroesVictory);
 			result.SetHasClass("IsDefeat", !isXHeroesVictory);
 		}
 
@@ -402,14 +449,143 @@ var XHSEndScreen = (function () {
 			return;
 		}
 
-		var winnerTeam = GetWinnerTeam(data);
-		AddSummaryTile(parent, "Winner", winnerTeam ? GetTeamName(winnerTeam) : "-");
+		AddSummaryTile(parent, "Result", IsPlayerVictory(data) ? "Victory" : "Defeat");
 		AddSummaryTile(parent, "Run Time", FormatTime(data.game_time || Safe(function () { return Game.GetDOTATime(false, false); }, 0)));
 		AddSummaryTile(parent, "Players", players.length.toString());
 		AddSummaryTile(parent, "Mode", (data.game_type || (data.info && data.info.game_type) || "XHS") + " / " + GetGameModeName(data));
 
 		if (data.rosh_lvl !== undefined && data.rosh_lvl !== null) {
 			AddSummaryTile(parent, "Roshan", "Lvl " + data.rosh_lvl + " - " + FormatNumber(data.rosh_hp) + "/" + FormatNumber(data.rosh_max_hp));
+		}
+	}
+
+	function TableToArray(tableValue) {
+		var result = [];
+		if (!tableValue) {
+			return result;
+		}
+
+		for (var key in tableValue) {
+			if (tableValue.hasOwnProperty(key) && tableValue[key]) {
+				result.push(tableValue[key]);
+			}
+		}
+
+		result.sort(function (a, b) {
+			return ToNumber(a.slot, 0) - ToNumber(b.slot, 0);
+		});
+		return result;
+	}
+
+	function IsSyncedFragmentQuestStatus(status) {
+		status = (status || "").toString().toLowerCase();
+		return status === "synced" || status === "confirmed" || status === "success" || status === "ok";
+	}
+
+	function FindSelectedFragmentQuest(selected, instanceID) {
+		if (!selected || !instanceID) {
+			return null;
+		}
+
+		var needle = instanceID.toString();
+		for (var key in selected) {
+			if (selected.hasOwnProperty(key) && selected[key] && selected[key].instance_id && selected[key].instance_id.toString() === needle) {
+				return selected[key];
+			}
+		}
+
+		return null;
+	}
+
+	function GetConfirmedFragmentQuestState(data) {
+		var live = CustomNetTables.GetTableValue("fragment_quests", "state") || {};
+		var liveConfirmed = TableToArray(live.confirmed_quests);
+		if (live.backend_status === "synced" && liveConfirmed.length > 0) {
+			return {
+				quests: liveConfirmed,
+				selected: live.selected || {},
+				total: ToNumber(live.confirmed_total_fragments, 0),
+			};
+		}
+
+		var response = data && data.data ? data.data : {};
+		var block = response.fragment_quests || (data && data.fragment_quests);
+		if (!block || !IsSyncedFragmentQuestStatus(block.status || block.backend_status)) {
+			return null;
+		}
+
+		var quests = TableToArray(block.quests);
+		if (quests.length === 0) {
+			return null;
+		}
+
+		return {
+			quests: quests,
+			selected: live.selected || {},
+			total: ToNumber(block.total_fragments_awarded || block.total_fragments, 0),
+		};
+	}
+
+	function AddFragmentQuestStars(parent, stars) {
+		stars = Clamp(ToNumber(stars, 0), 0, 3);
+		for (var i = 1; i <= 3; i++) {
+			var star = $.CreatePanel("Panel", parent, "");
+			star.AddClass("XHSEndFragmentQuestStar");
+			star.SetHasClass("IsActive", i <= stars);
+		}
+	}
+
+	function RenderFragmentQuests(data) {
+		var parent = Panel("XHSEndScreenFragmentQuests");
+		ClearPanel(parent);
+
+		if (!parent) {
+			return;
+		}
+
+		parent.RemoveClass("IsVisible");
+		var state = GetConfirmedFragmentQuestState(data);
+		if (!state) {
+			return;
+		}
+
+		parent.AddClass("IsVisible");
+
+		var header = $.CreatePanel("Panel", parent, "");
+		header.AddClass("XHSEndFragmentQuestHeader");
+
+		var title = $.CreatePanel("Label", header, "");
+		title.AddClass("XHSEndFragmentQuestTitle");
+		title.text = "Fragment Quests";
+
+		var total = $.CreatePanel("Label", header, "");
+		total.AddClass("XHSEndFragmentQuestTotal");
+		total.text = "+" + FormatNumber(state.total) + " fragments";
+
+		for (var i = 0; i < state.quests.length; i++) {
+			var quest = state.quests[i];
+			var selected = FindSelectedFragmentQuest(state.selected, quest.instance_id) || {};
+			var row = $.CreatePanel("Panel", parent, "");
+			row.AddClass("XHSEndFragmentQuestRow");
+
+			var copy = $.CreatePanel("Panel", row, "");
+			copy.AddClass("XHSEndFragmentQuestCopy");
+
+			var questTitle = $.CreatePanel("Label", copy, "");
+			questTitle.AddClass("XHSEndFragmentQuestName");
+			questTitle.text = selected.title || quest.title || quest.template_id || "Fragment Quest";
+
+			var status = $.CreatePanel("Label", copy, "");
+			status.AddClass("XHSEndFragmentQuestStatus");
+			status.text = quest.grant_status || "confirmed";
+
+			var stars = $.CreatePanel("Panel", row, "");
+			stars.AddClass("XHSEndFragmentQuestStars");
+			AddFragmentQuestStars(stars, quest.stars);
+
+			var amount = $.CreatePanel("Label", row, "");
+			amount.AddClass("XHSEndFragmentQuestAmount");
+			amount.text = "+" + FormatNumber(quest.fragments_awarded || 0);
 		}
 	}
 
@@ -497,6 +673,68 @@ var XHSEndScreen = (function () {
 		return cell;
 	}
 
+	function NormalizeSupporterProgress(battlepass) {
+		var xp = Math.max(0, ToNumber(battlepass.season_xp !== undefined ? battlepass.season_xp : battlepass.XP, 0));
+		var max = Math.max(ToNumber(battlepass.season_xp_max !== undefined ? battlepass.season_xp_max : battlepass.MaxXP, 500), 1);
+		var level = Math.max(1, ToNumber(battlepass.season_level !== undefined ? battlepass.season_level : battlepass.Lvl, 1));
+
+		if (xp >= max) {
+			var completedLevels = Math.floor(xp / max);
+			xp = xp - completedLevels * max;
+			level = Math.max(level, 1 + completedLevels);
+		}
+
+		return {
+			xp: xp,
+			max: max,
+			level: level,
+		};
+	}
+
+	function GetXHSAccountProgress(apiData, battlepass) {
+		apiData = apiData || {};
+		battlepass = battlepass || {};
+
+		var hasApiLevel = apiData.xp_level !== undefined && apiData.xp_level !== null;
+		var level = hasApiLevel ? ToNumber(apiData.xp_level, 0) + 1 : ToNumber(battlepass.xhs_account_level, 0);
+		var current = ToNumber(apiData.xp_in_level !== undefined ? apiData.xp_in_level : battlepass.xhs_xp_current, 0);
+		var max = ToNumber(apiData.xp_next_level !== undefined ? apiData.xp_next_level : battlepass.xhs_xp_max, 0);
+		var total = ToNumber(apiData.xp !== undefined ? apiData.xp : battlepass.xhs_xp, 0);
+		var change = ToNumber(apiData.xp_change, 0);
+
+		return {
+			hasData: level > 0 || current > 0 || max > 0 || total > 0 || change !== 0,
+			level: Math.max(1, level),
+			current: Math.max(0, current),
+			max: Math.max(0, max),
+			total: Math.max(0, total),
+			change: change,
+		};
+	}
+
+	function FormatSignedNumber(value) {
+		return value >= 0 ? "+" + FormatNumber(value) : FormatNumber(value);
+	}
+
+	function FormatXHSAccountProgress(progress) {
+		if (!progress || !progress.hasData) {
+			return "XHS N/A";
+		}
+
+		var text = "XHS L" + progress.level;
+		if (progress.max > 0) {
+			text += " " + FormatNumber(progress.current) + "/" + FormatNumber(progress.max);
+		} else if (progress.total > 0) {
+			text += " " + FormatNumber(progress.total) + " XP";
+		}
+
+		if (progress.change !== 0) {
+			text += " (" + FormatSignedNumber(progress.change) + ")";
+		}
+
+		return text;
+	}
+
 	function CreateBattlepassCell(parent, model) {
 		var cell = $.CreatePanel("Panel", parent, "");
 		cell.AddClass("PlayerColBattlepass");
@@ -520,43 +758,62 @@ var XHSEndScreen = (function () {
 		var diffPanel = $.CreatePanel("Panel", bar, "");
 		diffPanel.AddClass("XHSBattlepassDiff");
 
+		var accountLine = $.CreatePanel("Label", cell, "");
+		accountLine.AddClass("XHSAccountXpLine");
+
 		var battlepass = model.battlepass || {};
-		var xpEnabled = battlepass.player_xp === 1 || battlepass.player_xp === "1";
-		var xpCurrent = ToNumber(battlepass.XP, 0);
-		var xpMax = Math.max(ToNumber(battlepass.MaxXP, 500), 1);
-		var xpChange = ToNumber(model.api && model.api.xp_change, 0);
+		var xpEnabled = battlepass.player_xp !== 0 && battlepass.player_xp !== "0" && battlepass.player_xp !== false;
+		var supporter = NormalizeSupporterProgress(battlepass);
+		var supporterChange = ToNumber(
+			battlepass.XP_change !== undefined ? battlepass.XP_change
+				: (battlepass.season_xp_change !== undefined ? battlepass.season_xp_change : 0),
+			0
+		);
+		var xhsProgress = GetXHSAccountProgress(model.api, battlepass);
 
 		if (!xpEnabled) {
 			level.text = "N/A";
 			earned.text = "N/A";
 			progressPanel.style.width = "0%";
 			diffPanel.style.width = "0%";
+			accountLine.text = "XHS N/A";
 			return;
 		}
 
-		var passLevel = Math.max(1, ToNumber(battlepass.Lvl, 1));
-		var levelText = "Level " + passLevel;
+		var levelText = "Level " + supporter.level;
 		if (battlepass.title) {
 			levelText += " - " + battlepass.title;
 			level.style.color = battlepass.title_color || "#dceeff";
 		}
 
 		level.text = levelText;
-		earned.text = xpChange > 0 ? "+" + FormatNumber(xpChange) : FormatNumber(xpChange);
-		earned.SetHasClass("IsNegative", xpChange < 0);
+		earned.text = FormatSignedNumber(supporterChange);
+		earned.SetHasClass("IsNegative", supporterChange < 0);
+		accountLine.text = FormatXHSAccountProgress(xhsProgress);
 
-		var progress = Clamp(Math.floor((xpCurrent / xpMax) * 100), 0, 100);
-		var diff = Clamp(Math.floor((xpChange / xpMax) * 100), 0, 100);
+		var progress = Clamp(Math.floor((supporter.xp / supporter.max) * 100), 0, 100);
+		var diff = Clamp(Math.floor((supporterChange / supporter.max) * 100), 0, 100);
 		progressPanel.style.width = progress + "%";
 		diffPanel.style.width = diff + "%";
 		diffPanel.style.marginLeft = Math.max(0, progress - 1) + "%";
 
-		var levelUps = Math.floor((xpCurrent + xpChange) / xpMax);
-		bar.SetHasClass("LevelUp", xpChange > 0 && levelUps >= 1);
+		var tooltip = "Supporter Pass: Level " + supporter.level + " - " + FormatNumber(supporter.xp) + "/" + FormatNumber(supporter.max) + " XP";
+		if (xhsProgress.hasData) {
+			tooltip += "\n" + FormatXHSAccountProgress(xhsProgress);
+		}
+		cell.SetPanelEvent("onmouseover", function () {
+			$.DispatchEvent("UIShowTextTooltip", cell, tooltip);
+		});
+		cell.SetPanelEvent("onmouseout", function () {
+			$.DispatchEvent("UIHideTextTooltip", cell);
+		});
 
-		if (model.id === Players.GetLocalPlayer() && xpChange > 0 && levelUps >= 1) {
+		var levelUps = Math.floor((supporter.xp + supporterChange) / supporter.max);
+		bar.SetHasClass("LevelUp", supporterChange > 0 && levelUps >= 1);
+
+		if (model.id === Players.GetLocalPlayer() && supporterChange > 0 && levelUps >= 1) {
 			for (var i = 1; i <= levelUps; i++) {
-				CreateBattlepassRewardPanel(passLevel + i, i);
+				CreateBattlepassRewardPanel(supporter.level + i, i);
 			}
 		}
 	}
@@ -796,6 +1053,13 @@ var XHSEndScreen = (function () {
 			});
 		}
 
+		var support = Panel("XHSEndScreenSupportButton");
+		if (support) {
+			support.SetPanelEvent("onactivate", function () {
+				OpenExternalURL(GetSupporterURL());
+			});
+		}
+
 		var close = Panel("XHSEndScreenCloseButton");
 		if (close) {
 			close.SetPanelEvent("onactivate", FinishGame);
@@ -821,6 +1085,7 @@ var XHSEndScreen = (function () {
 
 		RenderHeader(data);
 		RenderSummary(data, players);
+		RenderFragmentQuests(data);
 		RenderMvpCards(players);
 		RenderPlayers(players);
 		RenderHallOfFame();

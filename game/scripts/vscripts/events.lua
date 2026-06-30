@@ -156,6 +156,10 @@ ListenToGameEvent('npc_spawned', function(keys)
 	end
 
 	if npc and IsValidEntity(npc) then
+		if FragmentQuests ~= nil then
+			FragmentQuests:OnBossUnitSpawned(npc)
+		end
+
 		--ALL NPC
 		for i = 1, #innate_abilities do
 			local current_ability = npc:FindAbilityByName(innate_abilities[i])
@@ -1150,6 +1154,10 @@ ListenToGameEvent('entity_killed', function(keys)
 	local difficulty = GameRules:GetCustomGameDifficulty()
 	local Zone = killedUnit.zone
 
+	if FragmentQuests ~= nil then
+		FragmentQuests:OnEntityKilled(killedUnit, killer)
+	end
+
 	if Zone then
 		for _, zone in pairs(GameMode.Zones) do
 			zone:OnEnemyKilled(killedUnit, Zone)
@@ -1169,6 +1177,10 @@ ListenToGameEvent('entity_killed', function(keys)
 	end
 
 	if killedUnit:IsRealHero() and (killedUnit:GetTeamNumber() == DOTA_TEAM_GOODGUYS) then
+		if FragmentQuests ~= nil then
+			FragmentQuests:OnHeroDeath(killedUnit)
+		end
+
 		-- local netTable = {}
 		--		CustomGameEventManager:Send_ServerToPlayer(killedUnit:GetPlayerOwner(), "life_lost", netTable)
 
@@ -1778,9 +1790,17 @@ function GameMode:OnQuestCompleted(questZone, quest)
 				XHSDevTools:PushState()
 			end
 		elseif quest.szQuestName == "kill_dest_mag" then
+			if FragmentQuests ~= nil then
+				FragmentQuests:OnPhase2End()
+			end
+
 			-- timers remains paused until magnataurs are killed
 			StartPhase2()
 		elseif quest.szQuestName == "kill_final_wave" then
+			if FragmentQuests ~= nil then
+				FragmentQuests:OnFinalWaveEnd()
+			end
+
 			if XHSSetGlobalObjectiveState ~= nil then
 				XHSSetGlobalObjectiveState("final_wave", "Completed", "Final Wave completed")
 			else

@@ -34,6 +34,7 @@ end
 require('components/battlepass/init')
 require('components/timers/init')
 require('components/runes/init')
+require('components/fragment_quests/init')
 
 if GetMapName() == "x_hero_siege_demo" then
 	require('components/hero_selection/init')
@@ -278,6 +279,10 @@ function GameMode:InitGameMode()
 	GameMode.CheckpointsActivated = {}
 	GameMode.Zones = {}
 
+	if FragmentQuests ~= nil then
+		FragmentQuests:Init()
+	end
+
 	if XHSDevTools ~= nil then
 		XHSDevTools:Init()
 	end
@@ -316,6 +321,9 @@ function GameMode:OnThink()
 
 	if newState >= DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
 		GameRules:SetTimeOfDay(0) -- always night
+		if FragmentQuests ~= nil then
+			FragmentQuests:Think()
+		end
 	end
 
 	if not GameMode.Zones then GameMode.Zones = {} end
@@ -408,6 +416,10 @@ function GameMode:HealingFilter(filterTable)
 
 	local hHealingHero = EntIndexToHScript(filterTable["entindex_healer_const"])
 	if nHeal > 0 and hHealingHero ~= nil and hHealingHero:IsRealHero() then
+		if FragmentQuests ~= nil then
+			FragmentQuests:AddHealing(hHealingHero:GetPlayerID(), nHeal)
+		end
+
 		for _, Zone in pairs(GameMode.Zones) do
 			if Zone:ContainsUnit(hHealingHero) then
 				Zone:AddStat(hHealingHero:GetPlayerID(), ZONE_STAT_HEALING, nHeal)
@@ -430,6 +442,10 @@ end
 function GameMode:DamageFilter(filterTable)
 	if Runes and Runes.OnDamageFilter then
 		Runes:OnDamageFilter(filterTable)
+	end
+
+	if FragmentQuests ~= nil then
+		FragmentQuests:OnDamage(filterTable)
 	end
 
 	local flDamage = filterTable["damage"]
@@ -730,6 +746,9 @@ function GameMode:HeroImage(event)
 		Entities:FindByName(nil, "trigger_special_event_back4"):Enable()
 		CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "show_timer_hero_image", {})
 		CustomTimers.current_time["hero_image"] = SPECIAL_ARENA_DURATION
+		if FragmentQuests ~= nil then
+			FragmentQuests:OnOptionalEventStart("hero_image", SPECIAL_ARENA_DURATION)
+		end
 
 		GameMode.HeroImageUnit = CreateUnitByName(hero:GetUnitName(), point_beast, true, nil, nil, DOTA_TEAM_CUSTOM_1)
 		GameMode.HeroImageUnit:SetAngles(0, 210, 0)
@@ -783,6 +802,9 @@ function GameMode:HeroImage(event)
 			end
 			GameMode.HeroImage_occuring = false
 			SetHeroOptionalEventTomeLock(hero, "hero_image", false)
+			if FragmentQuests ~= nil then
+				FragmentQuests:OnOptionalEventEnd("hero_image", hero.hero_image == true)
+			end
 			GameMode:ReturnHeroFromOptionalEvent(hero, "hero_image")
 			CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "xhs_event_usage_update", {
 				hero_image_used = hero.hero_image == true,
@@ -822,6 +844,9 @@ function GameMode:SpiritBeast(event)
 		Entities:FindByName(nil, "trigger_special_event_back3"):Enable()
 		CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "show_timer_spirit_beast", {})
 		CustomTimers.current_time["spirit_beast"] = SPECIAL_ARENA_DURATION
+		if FragmentQuests ~= nil then
+			FragmentQuests:OnOptionalEventStart("spirit_beast", SPECIAL_ARENA_DURATION)
+		end
 
 		timers.SpiritBeast = Timers:CreateTimer(SPECIAL_ARENA_DURATION, function()
 			if Entities:FindByName(nil, "trigger_spirit_beast_duration") then
@@ -830,6 +855,9 @@ function GameMode:SpiritBeast(event)
 
 			GameMode.SpiritBeast_occuring = false
 			SetHeroOptionalEventTomeLock(hero, "spirit_beast", false)
+			if FragmentQuests ~= nil then
+				FragmentQuests:OnOptionalEventEnd("spirit_beast", false)
+			end
 			GameMode.spirit_beast:RemoveSelf()
 
 			Timers:CreateTimer(5.5, function() --Debug time in case Spirit Beast kills the player at the very last second
@@ -879,6 +907,9 @@ function GameMode:FrostInfernal(event)
 		Entities:FindByName(nil, "trigger_special_event_back2"):Enable()
 		CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "show_timer_frost_infernal", {})
 		CustomTimers.current_time["frost_infernal"] = SPECIAL_ARENA_DURATION
+		if FragmentQuests ~= nil then
+			FragmentQuests:OnOptionalEventStart("frost_infernal", SPECIAL_ARENA_DURATION)
+		end
 
 		timers.FrostInfernal = Timers:CreateTimer(SPECIAL_ARENA_DURATION, function()
 			if Entities:FindByName(nil, "trigger_frost_infernal_duration") then
@@ -887,6 +918,9 @@ function GameMode:FrostInfernal(event)
 
 			GameMode.FrostInfernal_occuring = false
 			SetHeroOptionalEventTomeLock(hero, "frost_infernal", false)
+			if FragmentQuests ~= nil then
+				FragmentQuests:OnOptionalEventEnd("frost_infernal", false)
+			end
 			GameMode.frost_infernal:RemoveSelf()
 
 			Timers:CreateTimer(5.5,
@@ -949,6 +983,9 @@ function GameMode:AllHeroImages(event)
 		Entities:FindByName(nil, "trigger_special_event_back5"):Enable()
 		CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "show_timer_all_hero_image", {})
 		CustomTimers.current_time["all_hero_images"] = SPECIAL_ARENA_DURATION
+		if FragmentQuests ~= nil then
+			FragmentQuests:OnOptionalEventStart("all_hero_images", SPECIAL_ARENA_DURATION)
+		end
 
 		local illusion_spawn = 0
 		local spawnedImages = 0
@@ -1026,6 +1063,9 @@ function GameMode:AllHeroImages(event)
 			if ALL_HERO_IMAGE_DEAD == 0 then
 				GameMode.AllHeroImagesDead = true
 				GameMode.AllHeroImages_occuring = false
+				if FragmentQuests ~= nil then
+					FragmentQuests:OnOptionalEventEnd("all_hero_images", true)
+				end
 				DoEntFire("trigger_all_hero_image_duration", "Kill", nil, 0, nil, nil)
 				CustomGameEventManager:Send_ServerToAllClients("hide_timer_all_hero_image", {})
 				CustomGameEventManager:Send_ServerToAllClients("xhs_event_usage_update", {
@@ -1050,6 +1090,9 @@ function GameMode:AllHeroImages(event)
 				durationTrigger:Enable()
 			end
 			GameMode.AllHeroImages_occuring = false
+			if FragmentQuests ~= nil then
+				FragmentQuests:OnOptionalEventEnd("all_hero_images", false)
+			end
 			GameMode:ReturnHeroFromOptionalEvent(hero, "all_hero_image")
 			CustomGameEventManager:Send_ServerToAllClients("xhs_event_usage_update", {
 				all_hero_images_busy = false,
@@ -1214,7 +1257,7 @@ end
 -- 	end
 -- end
 
--- new system, double votes for donators
+-- Supporter vote power scales with tier: tier 1 gives 1 vote, tier 5 gives 5 votes.
 ListenToGameEvent('game_rules_state_change', function(keys)
 	local game_state = GameRules:State_Get()
 
@@ -1307,11 +1350,13 @@ end, nil)
 local donator_list = {}
 donator_list[1] = 5 -- Lead-Dev
 donator_list[2] = 5 -- Dev
--- donator_list[3] = 5 -- Administrator
-donator_list[4] = 1 -- Ember Donator
-donator_list[7] = 2 -- Salamander Donator
-donator_list[8] = 3 -- Icefrog Donator
-donator_list[9] = 3 -- Gaben Donator
+donator_list[3] = 5 -- Administrator
+donator_list[4] = 3 -- Ember Donator
+donator_list[5] = 2 -- Golden Donator
+donator_list[6] = 1 -- Donator
+donator_list[7] = 4 -- Stoneguard Donator
+donator_list[8] = 5 -- Earthwarden Donator
+donator_list[9] = 5 -- Legacy Gaben Donator maps to Earthwarden
 
 function GameMode:OnSettingVote(event_source_index, keys)
 	local payload = keys

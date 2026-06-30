@@ -11,7 +11,11 @@ ListenToGameEvent('game_rules_state_change', function()
 		local herolistFile = "scripts/npc/herolist.txt"
 
 		for key, value in pairs(LoadKeyValues(herolistFile)) do
-			if KeyValues.HeroKV[key] == nil then -- Cookies: If the hero is not in custom file, load vanilla KV's
+			local isDisabled = tonumber(value) == 0
+
+			if isDisabled then
+				hotdisabledlist[key] = 1
+			elseif KeyValues.HeroKV[key] == nil then -- Cookies: If the hero is not in custom file, load vanilla KV's
 				--				print(key .. " is not in custom file!")
 				local data = LoadKeyValues("scripts/npc/npc_heroes.txt")
 				if data and data[key] then
@@ -19,15 +23,12 @@ ListenToGameEvent('game_rules_state_change', function()
 				end
 			end
 
-			herolist[key] = KeyValues.HeroKV[key].AttributePrimary
-
 			--			if api.imba.hero_is_disabled(key) then
 			--				hotdisabledlist[key] = 1
 			--			end
 
-			if value == 0 then
-				hotdisabledlist[key] = 1
-			else
+			if not isDisabled and KeyValues.HeroKV[key] then
+				herolist[key] = KeyValues.HeroKV[key].AttributePrimary
 				totalheroes = totalheroes + 1
 				assert(key ~= "npc_dota_hero_wisp", "npc_dota_hero_wisp cannot be a pickable hero")
 			end

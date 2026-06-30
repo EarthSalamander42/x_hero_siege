@@ -106,6 +106,15 @@ function ItemsGame:Init()
 
 	ItemsGame.battlepass2 = bp_reward_table2
 
+	if BuildXHSSupporterBonusRewards then
+		for _, reward in pairs(BuildXHSSupporterBonusRewards()) do
+			table.insert(ItemsGame.battlepass2, reward)
+		end
+		table.sort(ItemsGame.battlepass2, function(a, b)
+			return (tonumber(a.level) or 0) < (tonumber(b.level) or 0)
+		end)
+	end
+
 	CustomNetTables:SetTableValue("supporter_pass_rewards_premium", "rewards", { ItemsGame.battlepass2 })
 	CustomNetTables:SetTableValue("supporter_pass_player", "companions", { ItemsGame.companions })
 end

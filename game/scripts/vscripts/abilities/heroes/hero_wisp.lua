@@ -1,5 +1,45 @@
 LinkLuaModifier("modifier_wisp_passive", "abilities/heroes/hero_wisp.lua", LUA_MODIFIER_MOTION_NONE)
 
+local WISP_SUPPORTER_AMBIENT_PARTICLES = {
+	blue = "particles/units/heroes/hero_abaddon/holdout_borrowed_time.vpcf",
+	green = "particles/units/heroes/hero_abaddon/holdout_borrowed_time_2.vpcf",
+	red = "particles/units/heroes/hero_abaddon/holdout_borrowed_time_3.vpcf",
+	gold = "particles/units/heroes/hero_abaddon/holdout_borrowed_time_4.vpcf",
+	purple = "particles/units/heroes/hero_abaddon/holdout_borrowed_time_purple.vpcf",
+}
+
+local WISP_SUPPORTER_STATUS_PARTICLES = {
+	[1] = WISP_SUPPORTER_AMBIENT_PARTICLES.red, -- Lead Developer
+	[2] = WISP_SUPPORTER_AMBIENT_PARTICLES.red, -- Developer
+	[3] = WISP_SUPPORTER_AMBIENT_PARTICLES.blue, -- Administrator
+	[4] = WISP_SUPPORTER_AMBIENT_PARTICLES.red, -- Ember Donator
+	[5] = WISP_SUPPORTER_AMBIENT_PARTICLES.gold, -- Golden Donator
+	[6] = WISP_SUPPORTER_AMBIENT_PARTICLES.green, -- Donator
+	[7] = WISP_SUPPORTER_AMBIENT_PARTICLES.blue, -- Stoneguard Donator
+	[8] = WISP_SUPPORTER_AMBIENT_PARTICLES.purple, -- Earthwarden Donator
+	[9] = WISP_SUPPORTER_AMBIENT_PARTICLES.purple, -- Legacy Gaben Donator
+}
+
+local function GetWispDonatorLevel(parent)
+	if not api or not parent then
+		return 0
+	end
+
+	return tonumber(api:GetDonatorStatus(parent:GetPlayerID())) or 0
+end
+
+local function GetWispSupporterParticle(donator_level)
+	return WISP_SUPPORTER_STATUS_PARTICLES[tonumber(donator_level) or 0]
+end
+
+local function HasWispSupporterAmbient(donator_level)
+	return GetWispSupporterParticle(donator_level) ~= nil
+end
+
+local function ApplyWispSupporterAmbientControls(particle, parent)
+	ParticleManager:SetParticleControl(particle, 0, parent:GetAbsOrigin())
+end
+
 wisp_pick_random_hero = wisp_pick_random_hero or class({})
 
 function wisp_pick_random_hero:OnSpellStart()
@@ -34,7 +74,7 @@ function wisp_pick_random_hero:OnSpellStart()
 		duration = 5.0,
 		segments = {
 			{ hero = hero_name },
-			{ text = "HERO: ", style = { color = "white" } },
+			{ text = "HERO: ",                              style = { color = "white" } },
 			{ text = "#npc_dota_hero_" .. HEROLIST[random], style = { color = "white" } },
 		},
 	})
@@ -67,82 +107,72 @@ end
 function modifier_wisp_passive:OnCreated()
 	if not IsServer() then return end
 
-	local donator_level = 0
+	local parent = self:GetParent()
+	local donator_level = GetWispDonatorLevel(parent)
+	local particleName = GetWispSupporterParticle(donator_level)
 
-	if api then
-		donator_level = api:GetDonatorStatus(self:GetParent():GetPlayerID())
-	end
+	if particleName then
+		self.supporterAmbientParticleName = particleName
+		self.supporterAmbientPfx = ParticleManager:CreateParticle(self.supporterAmbientParticleName, PATTACH_ABSORIGIN_FOLLOW, parent)
+		ApplyWispSupporterAmbientControls(self.supporterAmbientPfx, parent)
 
-	--	print("Donator level:", donator_level)
-	if donator_level then
-		local stack_count = {}
-		stack_count[0] = ""
-		stack_count[1] = "_3"
-		stack_count[2] = ""
-		stack_count[3] = ""
-		stack_count[4] = "_3"
-		stack_count[5] = "_4"
-		stack_count[6] = "_6"
-
-		--		print("Donator string pfx:", stack_count[donator_level])
-		if stack_count[donator_level] then
-			local vip_effect = ParticleManager:CreateParticle("particles/status_fx/status_effect_holdout_borrowed_time" .. stack_count[donator_level] .. ".vpcf", PATTACH_ABSORIGIN_FOLLOW, self:GetParent())
-			ParticleManager:SetParticleControl(vip_effect, 0, self:GetParent():GetAbsOrigin())
-			ParticleManager:SetParticleControl(vip_effect, 1, self:GetParent():GetAbsOrigin())
-
-			local vip_effect2 = ParticleManager:CreateParticle("particles/units/heroes/hero_abaddon/holdout_borrowed_time" .. stack_count[donator_level] .. ".vpcf", PATTACH_ABSORIGIN_FOLLOW, self:GetParent())
-			ParticleManager:SetParticleControl(vip_effect2, 0, self:GetParent():GetAbsOrigin())
-			ParticleManager:SetParticleControl(vip_effect2, 1, self:GetParent():GetAbsOrigin())
+		if IsInToolsMode() then
+			print("[XHS Wisp] supporter ambient created, donator status:", donator_level, self.supporterAmbientParticleName)
 		end
+
+		self.supporterAmbientRefreshAttempts = 0
+		self:StartIntervalThink(1.0)
 	end
 end
 
---[[
-function WispEffects(caster)
-	if caster:GetUnitName() == "npc_dota_hero_wisp" then
-		local donator_level = api:GetDonatorStatus(caster:GetPlayerID())
+function modifier_wisp_passive:OnIntervalThink()
+	if not IsServer() then return end
 
-		if donator_level == 1 then
-			local vip_effect = ParticleManager:CreateParticle("particles/status_fx/status_effect_holdout_borrowed_time_3.vpcf", PATTACH_ABSORIGIN_FOLLOW, caster)
-			ParticleManager:SetParticleControl(vip_effect, 0, caster:GetAbsOrigin())
-			ParticleManager:SetParticleControl(vip_effect, 1, caster:GetAbsOrigin())
+	if not self.supporterAmbientPfx then
+		self:StartIntervalThink(-1)
+		return
+	end
 
-			local vip_effect2 = ParticleManager:CreateParticle("particles/units/heroes/hero_abaddon/holdout_borrowed_time_3.vpcf", PATTACH_ABSORIGIN_FOLLOW, caster)
-			ParticleManager:SetParticleControl(vip_effect2, 0, caster:GetAbsOrigin())
-			ParticleManager:SetParticleControl(vip_effect2, 1, caster:GetAbsOrigin())
-		elseif donator_level == 2 or donator_level == 3 then
-			local vip_effect = ParticleManager:CreateParticle("particles/status_fx/status_effect_holdout_borrowed_time.vpcf", PATTACH_ABSORIGIN_FOLLOW, caster)
-			ParticleManager:SetParticleControl(vip_effect, 0, caster:GetAbsOrigin())
-			ParticleManager:SetParticleControl(vip_effect, 1, caster:GetAbsOrigin())
+	self.supporterAmbientRefreshAttempts = (self.supporterAmbientRefreshAttempts or 0) + 1
 
-			local vip_effect2 = ParticleManager:CreateParticle("particles/units/heroes/hero_abaddon/holdout_borrowed_time.vpcf", PATTACH_ABSORIGIN_FOLLOW, caster)
-			ParticleManager:SetParticleControl(vip_effect2, 0, caster:GetAbsOrigin())
-			ParticleManager:SetParticleControl(vip_effect2, 1, caster:GetAbsOrigin())
-		elseif donator_level == 4 then
-			local vip_effect = ParticleManager:CreateParticle("particles/status_fx/status_effect_holdout_borrowed_time_3.vpcf", PATTACH_ABSORIGIN_FOLLOW, caster)
-			ParticleManager:SetParticleControl(vip_effect, 0, caster:GetAbsOrigin())
-			ParticleManager:SetParticleControl(vip_effect, 1, caster:GetAbsOrigin())
+	local parent = self:GetParent()
+	local donator_level = GetWispDonatorLevel(parent)
+	local particleName = GetWispSupporterParticle(donator_level)
 
-			local vip_effect2 = ParticleManager:CreateParticle("particles/units/heroes/hero_abaddon/holdout_borrowed_time_3.vpcf", PATTACH_ABSORIGIN_FOLLOW, caster)
-			ParticleManager:SetParticleControl(vip_effect2, 0, caster:GetAbsOrigin())
-			ParticleManager:SetParticleControl(vip_effect2, 1, caster:GetAbsOrigin())
-		elseif donator_level == 5 then
-			local vip_effect = ParticleManager:CreateParticle("particles/status_fx/status_effect_holdout_borrowed_time_4.vpcf", PATTACH_ABSORIGIN_FOLLOW, caster)
-			ParticleManager:SetParticleControl(vip_effect, 0, caster:GetAbsOrigin())
-			ParticleManager:SetParticleControl(vip_effect, 1, caster:GetAbsOrigin())
+	if not particleName then
+		ParticleManager:DestroyParticle(self.supporterAmbientPfx, false)
+		ParticleManager:ReleaseParticleIndex(self.supporterAmbientPfx)
+		self.supporterAmbientPfx = nil
+		self.supporterAmbientParticleName = nil
+		self:StartIntervalThink(-1)
+		return
+	end
 
-			local vip_effect2 = ParticleManager:CreateParticle("particles/units/heroes/hero_abaddon/holdout_borrowed_time_4.vpcf", PATTACH_ABSORIGIN_FOLLOW, caster)
-			ParticleManager:SetParticleControl(vip_effect2, 0, caster:GetAbsOrigin())
-			ParticleManager:SetParticleControl(vip_effect2, 1, caster:GetAbsOrigin())
-		elseif donator_level == 6 then
-			local vip_effect = ParticleManager:CreateParticle("particles/status_fx/status_effect_holdout_borrowed_time_2.vpcf", PATTACH_ABSORIGIN_FOLLOW, caster)
-			ParticleManager:SetParticleControl(vip_effect, 0, caster:GetAbsOrigin())
-			ParticleManager:SetParticleControl(vip_effect, 1, caster:GetAbsOrigin())
+	if self.supporterAmbientParticleName ~= particleName then
+		ParticleManager:DestroyParticle(self.supporterAmbientPfx, false)
+		ParticleManager:ReleaseParticleIndex(self.supporterAmbientPfx)
+		self.supporterAmbientParticleName = particleName
+		self.supporterAmbientPfx = ParticleManager:CreateParticle(particleName, PATTACH_ABSORIGIN_FOLLOW, parent)
+	end
 
-			local vip_effect2 = ParticleManager:CreateParticle("particles/units/heroes/hero_abaddon/holdout_borrowed_time_2.vpcf", PATTACH_ABSORIGIN_FOLLOW, caster)
-			ParticleManager:SetParticleControl(vip_effect2, 0, caster:GetAbsOrigin())
-			ParticleManager:SetParticleControl(vip_effect2, 1, caster:GetAbsOrigin())
+	ApplyWispSupporterAmbientControls(self.supporterAmbientPfx, parent)
+
+	if donator_level > 0 or self.supporterAmbientRefreshAttempts >= 10 then
+		if IsInToolsMode() then
+			print("[XHS Wisp] supporter ambient finalized, donator status:", donator_level, self.supporterAmbientParticleName)
 		end
+
+		self:StartIntervalThink(-1)
 	end
 end
---]]
+
+function modifier_wisp_passive:OnDestroy()
+	if not IsServer() then return end
+
+	if self.supporterAmbientPfx then
+		ParticleManager:DestroyParticle(self.supporterAmbientPfx, false)
+		ParticleManager:ReleaseParticleIndex(self.supporterAmbientPfx)
+		self.supporterAmbientPfx = nil
+		self.supporterAmbientParticleName = nil
+	end
+end

@@ -23,6 +23,75 @@ function _ScoreboardUpdater_SetValueSafe(panel, childName, Value) {
 	childPanel.value = Value;
 }
 
+var XHS_SCOREBOARD_PLAYER_COLOR_FALLBACKS = [
+	"#c80000ff",
+	"#0032c8ff",
+	"#00ffffff",
+	"#640064ff",
+	"#ffff00ff",
+	"#ff9600ff",
+	"#007d00ff",
+	"#ff64ffff",
+];
+
+function _ScoreboardUpdater_IntToColorString(value) {
+	return "#" +
+		("00" + (value & 0xFF).toString(16)).substr(-2) +
+		("00" + ((value >> 8) & 0xFF).toString(16)).substr(-2) +
+		("00" + ((value >> 16) & 0xFF).toString(16)).substr(-2) +
+		"ff";
+}
+
+function _ScoreboardUpdater_NormalizeColorString(color) {
+	if (color === undefined || color === null) {
+		return "";
+	}
+
+	var colorString = color.toString();
+	if (colorString.charAt(0) !== "#") {
+		colorString = "#" + colorString;
+	}
+
+	if (colorString.length === 7) {
+		colorString += "ff";
+	}
+
+	return colorString.toLowerCase();
+}
+
+function _ScoreboardUpdater_IsInvalidPlayerColorString(colorString) {
+	return !colorString || colorString === "#ffffffff" || colorString === "#ffffff";
+}
+
+function _ScoreboardUpdater_GetFallbackPlayerColorString(playerId) {
+	var fallbackIndex = ((playerId % XHS_SCOREBOARD_PLAYER_COLOR_FALLBACKS.length) + XHS_SCOREBOARD_PLAYER_COLOR_FALLBACKS.length) % XHS_SCOREBOARD_PLAYER_COLOR_FALLBACKS.length;
+	return XHS_SCOREBOARD_PLAYER_COLOR_FALLBACKS[fallbackIndex];
+}
+
+function _ScoreboardUpdater_GetPlayerColorString(playerId) {
+	var playerColors = CustomNetTables.GetTableValue("game_options", "player_colors");
+	var tableColor = playerColors ? playerColors[playerId] : null;
+	var normalizedTableColor = _ScoreboardUpdater_NormalizeColorString(tableColor);
+
+	if (!_ScoreboardUpdater_IsInvalidPlayerColorString(normalizedTableColor)) {
+		return normalizedTableColor;
+	}
+
+	var engineColor = null;
+	try {
+		engineColor = Players.GetPlayerColor(playerId);
+	} catch (error) {
+		engineColor = null;
+	}
+
+	var engineColorString = engineColor === null ? "" : _ScoreboardUpdater_IntToColorString(engineColor);
+	if (!_ScoreboardUpdater_IsInvalidPlayerColorString(engineColorString)) {
+		return engineColorString;
+	}
+
+	return _ScoreboardUpdater_GetFallbackPlayerColorString(playerId);
+}
+
 function _ScoreboardUpdater_UpdatePlayerPanelImr(playerId, playerPanel) {
 	var ids = {
 		_5v5: {
@@ -225,12 +294,7 @@ function _ScoreboardUpdater_UpdatePlayerPanel(scoreboardConfig, playersContainer
 
 		var playerColorBar = playerPanel.FindChildInLayoutFile("PlayerColorBar");
 		if (playerColorBar !== null) {
-			var PlyColors = CustomNetTables.GetTableValue("game_options", "player_colors");
-			if (PlyColors != undefined)
-			{
-				if (PlyColors[playerId] != undefined)
-					playerColorBar.style.backgroundColor = PlyColors[playerId];
-			}
+			playerColorBar.style.backgroundColor = _ScoreboardUpdater_GetPlayerColorString(playerId);
 		}
 	}
 

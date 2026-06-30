@@ -48,6 +48,20 @@ var XHS_DEVTOOLS_DIFFICULTIES = [
 	{ id: 5, label: "Divine" }
 ];
 
+var XHS_DEVTOOLS_DONATOR_STATUSES = [
+	{ id: 0, label: "0 None" },
+	{ id: 1, label: "1 Lead" },
+	{ id: 2, label: "2 Dev" },
+	{ id: 3, label: "3 Admin" },
+	{ id: 4, label: "4 Ember" },
+	{ id: 5, label: "5 Golden" },
+	{ id: 6, label: "6 Donator" },
+	{ id: 7, label: "7 Stone" },
+	{ id: 8, label: "8 Earth" },
+	{ id: 9, label: "9 Legacy" },
+	{ id: 10, label: "10 Hidden" }
+];
+
 function XHSDevToolsPanel() {
 	return $("#XHSDevToolsPanel");
 }
@@ -247,6 +261,118 @@ function XHSDevToolsRenderScenarios(parent) {
 		XHSDevToolsSend("start_final_wave", {});
 	});
 
+	var fragmentSection = XHSDevToolsMakeSection(parent, "Fragment Quests");
+	var fragmentState = XHSDevToolsState.fragment_quests || {};
+	XHSDevToolsMakeLabel(fragmentSection, "XHSDevToolsMuted", "Backend: " + (fragmentState.backend_status || "pending") + " / confirmed +" + (fragmentState.confirmed_total_fragments || 0) + " fragments");
+	if (fragmentState.last_payload_dump && fragmentState.last_payload_dump.version) {
+		var dump = fragmentState.last_payload_dump;
+		XHSDevToolsMakeLabel(fragmentSection, "XHSDevToolsMuted", "Last payload: v" + dump.version + " / " + (dump.selected_count || 0) + " quests / " + (dump.event_count || 0) + " events / +" + (dump.total_fragments_preview || 0) + " preview");
+	}
+
+	var selected = fragmentState.selected || {};
+	for (var slot = 1; slot <= 3; slot++) {
+		var quest = selected[String(slot)];
+		if (quest) {
+			XHSDevToolsMakeLabel(fragmentSection, "XHSDevToolsMuted", slot + ". " + quest.title + " - " + (quest.stars || 0) + " stars - " + (quest.progress_text || "0"));
+		}
+	}
+
+	var fragmentGrid = $.CreatePanel("Panel", fragmentSection, "");
+	fragmentGrid.AddClass("XHSDevToolsGrid");
+	XHSDevToolsMakeButton(fragmentGrid, "Reroll", "Accent", function() {
+		XHSDevToolsSend("fragment_quests_reroll", {});
+	});
+	XHSDevToolsMakeButton(fragmentGrid, "Force Farm", "Small", function() {
+		XHSDevToolsSend("fragment_quest_force", { slot: 2, template_id: "farm_event_kills", target_id: "team" });
+	});
+	XHSDevToolsMakeButton(fragmentGrid, "Force Muradin", "Small", function() {
+		XHSDevToolsSend("fragment_quest_force", { slot: 2, template_id: "muradin_death_cap", target_id: "team" });
+	});
+	XHSDevToolsMakeButton(fragmentGrid, "Force Ramero", "Small", function() {
+		XHSDevToolsSend("fragment_quest_force", { slot: 2, template_id: "arena_remaining_time", target_id: "ramero_baristol" });
+	});
+	XHSDevToolsMakeButton(fragmentGrid, "Force Sogat", "Small", function() {
+		XHSDevToolsSend("fragment_quest_force", { slot: 2, template_id: "arena_remaining_time", target_id: "sogat" });
+	});
+	XHSDevToolsMakeButton(fragmentGrid, "Force Grom", "Small", function() {
+		XHSDevToolsSend("fragment_quest_force", { slot: 3, template_id: "boss_death_cap", target_id: "grom" });
+	});
+	XHSDevToolsMakeButton(fragmentGrid, "Force Illidan", "Small", function() {
+		XHSDevToolsSend("fragment_quest_force", { slot: 3, template_id: "boss_timer", target_id: "illidan" });
+	});
+	XHSDevToolsMakeButton(fragmentGrid, "Force LK", "Small", function() {
+		XHSDevToolsSend("fragment_quest_force", { slot: 3, template_id: "boss_timer", target_id: "lich_king" });
+	});
+
+	var fragmentBackendGrid = $.CreatePanel("Panel", fragmentSection, "");
+	fragmentBackendGrid.AddClass("XHSDevToolsGrid");
+	XHSDevToolsMakeButton(fragmentBackendGrid, "Backend OK", "Small Accent", function() {
+		XHSDevToolsSend("fragment_quest_backend_success", {});
+	});
+	XHSDevToolsMakeButton(fragmentBackendGrid, "Backend Error", "Small Danger", function() {
+		XHSDevToolsSend("fragment_quest_backend_error", {});
+	});
+	XHSDevToolsMakeButton(fragmentBackendGrid, "Dump Payload", "Small", function() {
+		XHSDevToolsSend("fragment_quest_dump_payload", {});
+	});
+
+	var fragmentProgressGrid = $.CreatePanel("Panel", fragmentSection, "");
+	fragmentProgressGrid.AddClass("XHSDevToolsGrid");
+	XHSDevToolsMakeButton(fragmentProgressGrid, "+5M Damage", "Small Accent", function() {
+		XHSDevToolsSend("fragment_quest_progress", { metric: "damage", amount: 5000000 });
+	});
+	XHSDevToolsMakeButton(fragmentProgressGrid, "+500k Heal", "Small Accent", function() {
+		XHSDevToolsSend("fragment_quest_progress", { metric: "healing", amount: 500000 });
+	});
+	XHSDevToolsMakeButton(fragmentProgressGrid, "+10 Potions", "Small", function() {
+		XHSDevToolsSend("fragment_quest_progress", { metric: "potions", amount: 10 });
+	});
+	XHSDevToolsMakeButton(fragmentProgressGrid, "+1 Death", "Small Warn", function() {
+		XHSDevToolsSend("fragment_quest_progress", { metric: "death", amount: 1 });
+	});
+	XHSDevToolsMakeButton(fragmentProgressGrid, "+60 Farm", "Small", function() {
+		XHSDevToolsSend("fragment_quest_progress", { metric: "farm_kills", amount: 60 });
+	});
+	XHSDevToolsMakeButton(fragmentProgressGrid, "+500k Tanked", "Small", function() {
+		XHSDevToolsSend("fragment_quest_progress", { metric: "frontline", amount: 500000 });
+	});
+	XHSDevToolsMakeButton(fragmentProgressGrid, "+1 Tower Kill", "Small Warn", function() {
+		XHSDevToolsSend("fragment_quest_progress", { metric: "tower_kills", amount: 1 });
+	});
+	XHSDevToolsMakeButton(fragmentProgressGrid, "Base 100%", "Small Accent", function() {
+		XHSDevToolsSend("fragment_quest_progress", { metric: "base_hp", amount: 100 });
+	});
+
+	var fragmentWindowGrid = $.CreatePanel("Panel", fragmentSection, "");
+	fragmentWindowGrid.AddClass("XHSDevToolsGrid");
+	XHSDevToolsMakeButton(fragmentWindowGrid, "Complete Farm", "Small Accent", function() {
+		XHSDevToolsSend("fragment_quest_complete_window", { window: "farm", value: 240 });
+	});
+	XHSDevToolsMakeButton(fragmentWindowGrid, "Complete Muradin", "Small Accent", function() {
+		XHSDevToolsSend("fragment_quest_complete_window", { window: "muradin", value: 0 });
+	});
+	XHSDevToolsMakeButton(fragmentWindowGrid, "Complete Ramero", "Small Accent", function() {
+		XHSDevToolsSend("fragment_quest_complete_window", { window: "ramero", value: 60 });
+	});
+	XHSDevToolsMakeButton(fragmentWindowGrid, "Complete Sogat", "Small Accent", function() {
+		XHSDevToolsSend("fragment_quest_complete_window", { window: "sogat", value: 45 });
+	});
+	XHSDevToolsMakeButton(fragmentWindowGrid, "Complete Phase2", "Small Accent", function() {
+		XHSDevToolsSend("fragment_quest_complete_window", { window: "phase2", value: 180 });
+	});
+	XHSDevToolsMakeButton(fragmentWindowGrid, "Complete Grom", "Small Accent", function() {
+		XHSDevToolsSend("fragment_quest_complete_window", { window: "grom", value: 0 });
+	});
+	XHSDevToolsMakeButton(fragmentWindowGrid, "Complete Illidan", "Small Accent", function() {
+		XHSDevToolsSend("fragment_quest_complete_window", { window: "illidan", value: 120 });
+	});
+	XHSDevToolsMakeButton(fragmentWindowGrid, "Complete LK", "Small Accent", function() {
+		XHSDevToolsSend("fragment_quest_complete_window", { window: "lich_king", value: 270 });
+	});
+	XHSDevToolsMakeButton(fragmentWindowGrid, "Complete Final", "Small Accent", function() {
+		XHSDevToolsSend("fragment_quest_complete_window", { window: "final", value: 100 });
+	});
+
 	XHSDevToolsMakeLabel(quests, "XHSDevToolsSubsectionTitle", "Quest State");
 	var questGrid = $.CreatePanel("Panel", quests, "");
 	questGrid.AddClass("XHSDevToolsQuestGrid");
@@ -423,6 +549,30 @@ function XHSDevToolsRenderPlayers(parent) {
 	});
 	XHSDevToolsMakeButton(grid, XHSDevToolsState.invulnerable_players ? "Disable Invuln" : "Enable Invuln", "Warn", function() {
 		XHSDevToolsSend("toggle_invulnerable", {});
+	});
+
+	var donator = XHSDevToolsMakeSection(parent, "Temporary Donator Status");
+	var localPlayerID = Players.GetLocalPlayer();
+	var donatorStatuses = XHSDevToolsState.donator_statuses || {};
+	var current = donatorStatuses[String(localPlayerID)] || {};
+	var hasOverride = current.has_override === true;
+	var currentStatus = Number(current.status || 0);
+	var temporaryStatus = hasOverride ? Number(current.temporary_status || 0) : null;
+	XHSDevToolsMakeLabel(donator, "XHSDevToolsMuted", "Current: " + currentStatus + (hasOverride ? " temporary" : " API"));
+
+	var donatorGrid = $.CreatePanel("Panel", donator, "");
+	donatorGrid.AddClass("XHSDevToolsGrid");
+	for (var i = 0; i < XHS_DEVTOOLS_DONATOR_STATUSES.length; i++) {
+		(function(option) {
+			var button = XHSDevToolsMakeButton(donatorGrid, option.label, "Small", function() {
+				XHSDevToolsSend("set_temporary_donator_status", { status: option.id });
+			});
+			button.SetHasClass("Active", hasOverride && temporaryStatus === option.id);
+		})(XHS_DEVTOOLS_DONATOR_STATUSES[i]);
+	}
+
+	XHSDevToolsMakeButton(donatorGrid, "Restore API", "Small Warn", function() {
+		XHSDevToolsSend("set_temporary_donator_status", { clear: 1 });
 	});
 }
 

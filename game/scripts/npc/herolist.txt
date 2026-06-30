@@ -4,15 +4,15 @@
 "activelist"
 {
 	// Vanilla heroes
-	"npc_dota_hero_axe"					"1" 	// Axe
-	"npc_dota_hero_bristleback"			"1"		// Bristleback
-	"npc_dota_hero_doom_bringer"		"1" 	// Doom
-	"npc_dota_hero_magnataur"			"1"		// Magnus
-	"npc_dota_hero_naga_siren"			"1"		// Naga Siren
-	"npc_dota_hero_tidehunter"			"1"		// Tidehunter
-	"npc_dota_hero_troll_warlord"		"1"		// Troll Warlord
-	"npc_dota_hero_void_spirit"			"1"		// Void Spirit
-	"npc_dota_hero_snapfire"			"1"		// Snapfire
+	"npc_dota_hero_axe"					"0" 	// Axe
+	"npc_dota_hero_bristleback"			"0"		// Bristleback
+	"npc_dota_hero_doom_bringer"		"0" 	// Doom
+	"npc_dota_hero_magnataur"			"0"		// Magnus
+	"npc_dota_hero_naga_siren"			"0"		// Naga Siren
+	"npc_dota_hero_tidehunter"			"0"		// Tidehunter
+	"npc_dota_hero_troll_warlord"		"0"		// Troll Warlord
+	"npc_dota_hero_void_spirit"			"0"		// Void Spirit
+	"npc_dota_hero_snapfire"			"0"		// Snapfire
 
 	// X heroes
 	"npc_dota_hero_abyssal_underlord"	"1" 	// Pit Lord

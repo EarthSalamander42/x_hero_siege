@@ -2,6 +2,8 @@
 	<Panel style="visibility:collapse;">
 		<Panel id="container" style="visibility:collapse;">
 			<Image src="file://panorama/images/custom_game/close.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/hud/xhs_advertize_icon.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/hud/xhs_bug_report_icon.png" hittest="false" />
 			<Image src="file://panorama/images/custom_game/patreon.png" hittest="false" />
 			<Image src="file://panorama/images/custom_game/patreon/patreon_cover_frostrose_studio_v2.png" hittest="false" />
 			<Image src="file://panorama/images/custom_game/patreon/donator_01_emerald.png" hittest="false" />

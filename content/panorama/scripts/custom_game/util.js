@@ -130,8 +130,8 @@ var DONATOR_TIER_COLOR_FALLBACK = {
 	"2": "#F2C94C",
 	"3": "#E4572E",
 	"4": "#7B8794",
-	"5": "#2EC4B6",
-	"6": "#2EC4B6"
+	"5": "#C99CFF",
+	"6": "#C99CFF"
 };
 
 function GetDonatorColorMeta() {

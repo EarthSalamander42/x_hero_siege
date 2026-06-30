@@ -15,13 +15,14 @@
 
 			<Panel id="XHSDevToolsPanel" class="XHSDevToolsPanel">
 				<Panel class="XHSDevToolsHeader">
-					<Panel>
+					<Panel class="XHSDevToolsHeaderText">
 						<Label class="XHSDevToolsEyebrow" text="TOOLS MODE" />
 						<Label class="XHSDevToolsTitle" text="XHS Dev Sandbox" />
+
+						<Button class="XHSDevToolsClose" onactivate="XHSDevToolsTogglePanel();">
+							<Label text="X" />
+						</Button>
 					</Panel>
-					<Button class="XHSDevToolsClose" onactivate="XHSDevToolsTogglePanel();">
-						<Label text="X" />
-					</Button>
 				</Panel>
 
 				<Panel id="XHSDevToolsStatus" class="XHSDevToolsStatus">

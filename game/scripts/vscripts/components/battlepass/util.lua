@@ -240,7 +240,11 @@ function Battlepass:DonatorEmblemJS(event)
 	if hero:HasModifier("modifier_patreon_donator") then
 		local modifier = hero:FindModifierByName("modifier_patreon_donator")
 
-		modifier.effect_name = event.unit
+		if modifier.SetDonatorEffect then
+			modifier:SetDonatorEffect(event.unit)
+		else
+			modifier.effect_name = event.unit
+		end
 	end
 end
 
@@ -271,12 +275,35 @@ function Battlepass:GetSupporterPassEventPayload(event_source_index, event)
 	return payload
 end
 
+function Battlepass:SendSupporterPassFailure(playerID, eventName, message, payload)
+	if playerID == nil or not PlayerResource:IsValidPlayerID(playerID) then
+		return
+	end
+
+	local player = PlayerResource:GetPlayer(playerID)
+	if not player then
+		return
+	end
+
+	payload = payload or {}
+	payload.message = payload.message or message
+	CustomGameEventManager:Send_ServerToPlayer(player, eventName, payload)
+end
+
 function Battlepass:SupporterPassBuyShopItem(event_source_index, event)
 	event = self:GetSupporterPassEventPayload(event_source_index, event)
 	local playerID = event.PlayerID
 	local ply_table = CustomNetTables:GetTableValue("supporter_pass_player", tostring(playerID))
 
 	if playerID == nil or not ply_table or not api or not api.BuySupporterPassShopItem then
+		self:SendSupporterPassFailure(playerID, "supporter_pass_purchase_failed", "Fragment Shop is unavailable.", {
+			item_id = event.item_id,
+		})
+		return
+	end
+
+	if event.item_id == nil or tostring(event.item_id) == "" then
+		self:SendSupporterPassFailure(playerID, "supporter_pass_purchase_failed", "Shop item is invalid.", {})
 		return
 	end
 
@@ -313,6 +340,14 @@ function Battlepass:SupporterPassClaimReward(event_source_index, event)
 	event = self:GetSupporterPassEventPayload(event_source_index, event)
 	local playerID = event.PlayerID
 	if playerID == nil or not api or not api.ClaimSupporterPassReward then
+		self:SendSupporterPassFailure(playerID, "supporter_pass_claim_failed", "Reward backend is unavailable.", {
+			reward_id = event.reward_id,
+		})
+		return
+	end
+
+	if event.reward_id == nil or tostring(event.reward_id) == "" then
+		self:SendSupporterPassFailure(playerID, "supporter_pass_claim_failed", "Reward is invalid.", {})
 		return
 	end
 
@@ -331,6 +366,14 @@ function Battlepass:SupporterPassEquipItem(event_source_index, event)
 	event = self:GetSupporterPassEventPayload(event_source_index, event)
 	local playerID = event.PlayerID
 	if playerID == nil or not api or not api.EquipSupporterPassItem then
+		self:SendSupporterPassFailure(playerID, "supporter_pass_equip_failed", "Armory backend is unavailable.", {
+			item_id = event.item_id,
+		})
+		return
+	end
+
+	if event.item_id == nil or tostring(event.item_id) == "" then
+		self:SendSupporterPassFailure(playerID, "supporter_pass_equip_failed", "Armory item is invalid.", {})
 		return
 	end
 
@@ -357,29 +400,38 @@ function Battlepass:SupporterPassUpdateSettings(event_source_index, event)
 		previous_table[key] = value
 	end
 
-	local settings = {
-		toggle_tag = event.toggle_tag == 1 or event.toggle_tag == true,
-		pass_rewards = event.pass_rewards == 1 or event.pass_rewards == true,
-		player_xp = event.player_xp == 1 or event.player_xp == true,
-		winrate_toggle = event.winrate_toggle == 1 or event.winrate_toggle == true,
-	}
+	local settings = {}
+	if event.toggle_tag ~= nil then settings.toggle_tag = event.toggle_tag == 1 or event.toggle_tag == true end
+	if event.pass_rewards ~= nil then settings.pass_rewards = event.pass_rewards == 1 or event.pass_rewards == true end
+	if event.player_xp ~= nil then settings.player_xp = event.player_xp == 1 or event.player_xp == true end
+	if event.winrate_toggle ~= nil then settings.winrate_toggle = event.winrate_toggle == 1 or event.winrate_toggle == true end
+	if event.xhs_ingame_advertize_hidden ~= nil then settings.xhs_ingame_advertize_hidden = event.xhs_ingame_advertize_hidden == 1 or event.xhs_ingame_advertize_hidden == true end
 
-	ply_table.toggle_tag = settings.toggle_tag
-	ply_table.pass_rewards = settings.pass_rewards
-	ply_table.bp_rewards = ply_table.pass_rewards
-	ply_table.player_xp = settings.player_xp
-	ply_table.winrate_toggle = settings.winrate_toggle
+	if next(settings) == nil then
+		return
+	end
+
+	if settings.toggle_tag ~= nil then ply_table.toggle_tag = settings.toggle_tag end
+	if settings.pass_rewards ~= nil then
+		ply_table.pass_rewards = settings.pass_rewards
+		ply_table.bp_rewards = ply_table.pass_rewards
+	end
+	if settings.player_xp ~= nil then ply_table.player_xp = settings.player_xp end
+	if settings.winrate_toggle ~= nil then ply_table.winrate_toggle = settings.winrate_toggle end
+	if settings.xhs_ingame_advertize_hidden ~= nil then ply_table.xhs_ingame_advertize_hidden = settings.xhs_ingame_advertize_hidden end
 
 	CustomNetTables:SetTableValue("supporter_pass_player", tostring(playerID), ply_table)
 
 	if api and api.UpdateSupporterPassSettings then
-		api:UpdateSupporterPassSettings(playerID, settings, function(success)
+		api:UpdateSupporterPassSettings(playerID, settings, function(success, data)
 			local player = PlayerResource:GetPlayer(playerID)
 
 			if not success then
 				CustomNetTables:SetTableValue("supporter_pass_player", tostring(playerID), previous_table)
 				if player then
-					CustomGameEventManager:Send_ServerToPlayer(player, "supporter_pass_settings_failed", {})
+					CustomGameEventManager:Send_ServerToPlayer(player, "supporter_pass_settings_failed", {
+						message = data and data.message or "Settings save failed.",
+					})
 				end
 				return
 			end
@@ -389,7 +441,7 @@ function Battlepass:SupporterPassUpdateSettings(event_source_index, event)
 			end
 
 			local hero = PlayerResource:GetSelectedHeroEntity(playerID)
-			if hero ~= nil and not hero:IsNull() then
+			if settings.toggle_tag ~= nil and hero ~= nil and not hero:IsNull() then
 				if settings.toggle_tag then
 					hero:SetupHealthBarLabel()
 				else
@@ -402,10 +454,18 @@ function Battlepass:SupporterPassUpdateSettings(event_source_index, event)
 			end
 		end)
 	else
-		CustomNetTables:SetTableValue("supporter_pass_player", tostring(playerID), previous_table)
+		local hero = PlayerResource:GetSelectedHeroEntity(playerID)
+		if settings.toggle_tag ~= nil and hero ~= nil and not hero:IsNull() then
+			if settings.toggle_tag then
+				hero:SetupHealthBarLabel()
+			else
+				hero:RemoveHealthBarLabel()
+			end
+		end
+
 		local player = PlayerResource:GetPlayer(playerID)
 		if player then
-			CustomGameEventManager:Send_ServerToPlayer(player, "supporter_pass_settings_failed", {})
+			CustomGameEventManager:Send_ServerToPlayer(player, "supporter_pass_settings_success", {})
 		end
 	end
 end

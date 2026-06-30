@@ -85,8 +85,10 @@ function Battlepass:GetPlayerInfoXP() -- yet it has too much useless loops, form
 			supporter_table.tier_name = supporter_table.tier_name or "Free Player"
 			supporter_table.tier_color = supporter_table.tier_color or "#7DB9D8"
 			supporter_table.fragments = supporter_table.fragments or 0
-			supporter_table.weekly_fragments = supporter_table.weekly_fragments or 0
-			supporter_table.weekly_cap = supporter_table.weekly_cap or 100
+			supporter_table.daily_fragments = supporter_table.daily_fragments or supporter_table.weekly_fragments or 0
+			supporter_table.daily_cap = supporter_table.daily_cap or supporter_table.weekly_cap or 100
+			supporter_table.weekly_fragments = supporter_table.daily_fragments
+			supporter_table.weekly_cap = supporter_table.daily_cap
 			supporter_table.monthly_fragments = supporter_table.monthly_fragments or 0
 			supporter_table.xp_boost = supporter_table.xp_boost or 0
 			supporter_table.season_level = season_level
@@ -94,13 +96,13 @@ function Battlepass:GetPlayerInfoXP() -- yet it has too much useless loops, form
 			supporter_table.season_xp_max = season_xp_max
 			supporter_table.account_level = supporter_table.account_level or 0
 			supporter_table.account_title = supporter_table.account_title or "Supporter Pass"
-			supporter_table.legacy_fragments = supporter_table.legacy_fragments or 0
 			if supporter_table.toggle_tag == nil then supporter_table.toggle_tag = api:GetPlayerTagEnabled(player_id) end
 			if supporter_table.bp_rewards == nil then supporter_table.bp_rewards = api:GetPlayerBPRewardsEnabled(player_id) end
 			if supporter_table.pass_rewards == nil then supporter_table.pass_rewards = api:GetPlayerBPRewardsEnabled(player_id) end
 			if supporter_table.player_xp == nil then supporter_table.player_xp = api:GetPlayerXPEnabled(player_id) end
 			supporter_table.winrate = supporter_table.winrate or api:GetPlayerSeasonalWinrate(player_id)
 			if supporter_table.winrate_toggle == nil then supporter_table.winrate_toggle = api:GetPlayerWinrateShown(player_id) end
+			if supporter_table.xhs_ingame_advertize_hidden == nil and api.GetPlayerIngameAdvertizeHidden ~= nil then supporter_table.xhs_ingame_advertize_hidden = api:GetPlayerIngameAdvertizeHidden(player_id) end
 			supporter_table.XP_change = supporter_table.XP_change or 0
 			supporter_table.ingame_tag = supporter_table.ingame_tag or api:GetPlayerIngameTag(player_id)
 			supporter_table.achievements = supporter_table.achievements or api:GetPlayerAchievements(player_id)

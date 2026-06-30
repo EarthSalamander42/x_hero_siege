@@ -180,20 +180,6 @@ HEROLIST[25] = "nevermore"        -- Banehallow
 HEROLIST[26] = "brewmaster"       -- Pandaren Brewmaster
 HEROLIST[27] = "warlock"          -- Archimonde
 HEROLIST[28] = "razor"            -- Ghost Revenant
--- DOTA 2
-HEROLIST[29] = "axe"
-HEROLIST[30] = "monkey_king"
-HEROLIST[31] = "medusa"
-HEROLIST[32] = "doom_bringer"
-HEROLIST[33] = "bristleback"
-HEROLIST[34] = "leshrac"
-HEROLIST[35] = "naga_siren"
-HEROLIST[36] = "magnataur"
-if IsInToolsMode() then
-	HEROLIST[37] = "troll_warlord"
-	HEROLIST[38] = "snapfire"
-	HEROLIST[39] = "void_spirit"
-end
 
 HEROLIST_VIP = {}
 HEROLIST_VIP[1] = "slardar"       -- Centurion
