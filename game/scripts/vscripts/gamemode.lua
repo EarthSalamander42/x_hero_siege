@@ -1257,7 +1257,7 @@ end
 -- 	end
 -- end
 
--- Supporter vote power scales with tier: tier 1 gives 1 vote, tier 5 gives 5 votes.
+-- Supporter vote power starts at 2 votes for tier 1 and caps at 5 votes.
 ListenToGameEvent('game_rules_state_change', function(keys)
 	local game_state = GameRules:State_Get()
 
@@ -1351,12 +1351,31 @@ local donator_list = {}
 donator_list[1] = 5 -- Lead-Dev
 donator_list[2] = 5 -- Dev
 donator_list[3] = 5 -- Administrator
-donator_list[4] = 3 -- Ember Donator
-donator_list[5] = 2 -- Golden Donator
-donator_list[6] = 1 -- Donator
-donator_list[7] = 4 -- Stoneguard Donator
+donator_list[4] = 4 -- Ember Donator
+donator_list[5] = 3 -- Golden Donator
+donator_list[6] = 2 -- Donator
+donator_list[7] = 5 -- Stoneguard Donator
 donator_list[8] = 5 -- Earthwarden Donator
 donator_list[9] = 5 -- Legacy Gaben Donator maps to Earthwarden
+
+local function GetPlayerVotePower(pid)
+	local vote_power = 1
+
+	if api then
+		if api.GetDonatorStatus then
+			vote_power = math.max(vote_power, donator_list[api:GetDonatorStatus(pid)] or 1)
+		end
+
+		if api.GetPlayerSupporterTier then
+			local supporter_tier = math.floor(tonumber(api:GetPlayerSupporterTier(pid)) or 0)
+			if supporter_tier > 0 then
+				vote_power = math.max(vote_power, math.min(supporter_tier + 1, 5))
+			end
+		end
+	end
+
+	return vote_power
+end
 
 function GameMode:OnSettingVote(event_source_index, keys)
 	local payload = keys
@@ -1398,11 +1417,7 @@ function GameMode:OnSettingVote(event_source_index, keys)
 
 		GameMode.VoteTable[category][pid][1] = vote
 
-		if api and donator_list[api:GetDonatorStatus(pid)] then
-			GameMode.VoteTable[category][pid][2] = donator_list[api:GetDonatorStatus(pid)]
-		else
-			GameMode.VoteTable[category][pid][2] = 1
-		end
+		GameMode.VoteTable[category][pid][2] = GetPlayerVotePower(pid)
 	end
 
 	-- TODO: Finish votes show up

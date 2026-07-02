@@ -32,6 +32,21 @@ DONATOR_TIER_TO_STATUS = {
 	[6] = 9, -- Legacy compatibility for old UI requirements.
 }
 
+DONATOR_VISUAL_STATUS_OVERRIDE = {
+	[1] = 8, -- Lead Developer displays as Earthwarden in-game.
+	[2] = 8, -- Developer displays as Earthwarden in-game.
+	[3] = 8, -- Administrator displays as Earthwarden in-game.
+}
+
+function GetDonatorVisualStatus(status)
+	local normalizedStatus = tonumber(status) or 0
+	return DONATOR_VISUAL_STATUS_OVERRIDE[normalizedStatus] or normalizedStatus
+end
+
+function GetDonatorVisualTier(status)
+	return DONATOR_STATUS_TO_TIER[GetDonatorVisualStatus(status)] or 0
+end
+
 local function DonatorRGBToHex(color)
 	if color == nil then
 		return "#ffffff"

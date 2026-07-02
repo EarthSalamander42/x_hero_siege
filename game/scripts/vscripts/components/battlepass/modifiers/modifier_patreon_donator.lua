@@ -30,13 +30,35 @@ local BORROWED_TIME_PARTICLES = {
 	["particles/units/heroes/hero_abaddon/holdout_borrowed_time_purple.vpcf"] = true,
 }
 
+local function NormalizeDonatorVisualStatus(status)
+	if GetDonatorVisualStatus ~= nil then
+		return GetDonatorVisualStatus(status)
+	end
+
+	local normalizedStatus = tonumber(status) or 0
+	if normalizedStatus == 1 or normalizedStatus == 2 or normalizedStatus == 3 then
+		return 8
+	end
+
+	return normalizedStatus
+end
+
 local function GetDonatorBorrowedTimeParticle(playerID)
 	local donatorLevel = 0
 	if api and api.GetDonatorStatus then
 		donatorLevel = tonumber(api:GetDonatorStatus(playerID)) or 0
 	end
+	donatorLevel = NormalizeDonatorVisualStatus(donatorLevel)
 
 	return DONATOR_STATUS_BORROWED_TIME_PARTICLES[donatorLevel]
+end
+
+local function GetModifierStackDonatorStatus(playerID)
+	local donatorLevel = 0
+	if api and api.GetDonatorStatus then
+		donatorLevel = tonumber(api:GetDonatorStatus(playerID)) or 0
+	end
+	return NormalizeDonatorVisualStatus(donatorLevel)
 end
 
 local function NormalizeDonatorEffect(effectName, playerID)
@@ -53,7 +75,7 @@ function modifier_patreon_donator:IsPurgable() return false end
 function modifier_patreon_donator:OnCreated()
 	if not IsServer() then return end
 
-	self:SetStackCount(api:GetDonatorStatus(self:GetParent():GetPlayerID()))
+	self:SetStackCount(GetModifierStackDonatorStatus(self:GetParent():GetPlayerID()))
 	self.current_effect_name = ""
 	self:SetDonatorEffect(api:GetPlayerEmblem(self:GetParent():GetPlayerID()))
 	self:StartIntervalThink(0.2)
@@ -68,7 +90,7 @@ end
 function modifier_patreon_donator:OnIntervalThink()
 	if not IsServer() then return end
 
-	self:SetStackCount(api:GetDonatorStatus(self:GetParent():GetPlayerID()))
+	self:SetStackCount(GetModifierStackDonatorStatus(self:GetParent():GetPlayerID()))
 	self.effect_name = NormalizeDonatorEffect(self.base_effect_name, self:GetParent():GetPlayerID())
 	for _, v in ipairs(SHARED_NODRAW_MODIFIERS) do
 		if self:GetParent():HasModifier(v) then

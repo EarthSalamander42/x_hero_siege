@@ -403,6 +403,11 @@ function PlaceXHSReportBugButton(button) {
 
 function OpenXHSIngameAdvertizeFromButton(retriesLeft) {
 	var config = GameUI.CustomUIConfig ? GameUI.CustomUIConfig() : null;
+	if (config && typeof config.ToggleXHSIngameAdvertize === "function") {
+		config.ToggleXHSIngameAdvertize();
+		return;
+	}
+
 	if (config && typeof config.OpenXHSIngameAdvertize === "function") {
 		config.OpenXHSIngameAdvertize();
 		return;
@@ -446,7 +451,7 @@ function CreateXHSAdvertizeButton() {
 	});
 	button.SetPanelEvent("onmouseover", function() {
 		SetXHSTopBarUtilityButtonHover(button, ApplyXHSAdvertizeButtonStyle, true);
-		$.DispatchEvent("UIShowTextTooltip", button, "Open advertize");
+		$.DispatchEvent("UIShowTextTooltip", button, "Toggle advertize");
 	});
 	button.SetPanelEvent("onmouseout", function() {
 		SetXHSTopBarUtilityButtonHover(button, ApplyXHSAdvertizeButtonStyle, false);

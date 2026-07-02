@@ -484,7 +484,7 @@ function api:MergeSupporterPassResponse(steamid, data)
 	local player = api.players[steamid]
 	player.supporter_pass = player.supporter_pass or {}
 	local supporter_pass = player.supporter_pass
-	local profile = data.profile or {}
+	local profile = data.profile or data.supporter_pass or {}
 	local season = data.season or profile.season or supporter_pass.season or {}
 
 	if profile.fragments ~= nil then
@@ -514,6 +514,9 @@ function api:MergeSupporterPassResponse(steamid, data)
 	local season_xp = season.xp or profile.season_xp
 	local season_level = season.level or profile.season_level
 	local season_xp_change = season.xp_change or season.gained_xp or profile.season_xp_change or profile.xp_change or data.season_xp_change or data.supporter_pass_xp_change or data.xp_change
+	local base_xp_change = season.base_xp_change or profile.base_xp_change or data.base_xp_change
+	local xp_boost = season.xp_boost or profile.xp_boost or data.xp_boost
+	local xp_bonus = season.xp_bonus or profile.xp_bonus or data.xp_bonus
 	if season_xp ~= nil then
 		supporter_pass.season_xp = season_xp
 		supporter_pass.current_exp = season_xp
@@ -527,6 +530,21 @@ function api:MergeSupporterPassResponse(steamid, data)
 		supporter_pass.xp_change = season_xp_change
 		supporter_pass.season = supporter_pass.season or {}
 		supporter_pass.season.xp_change = season_xp_change
+	end
+	if base_xp_change ~= nil then
+		supporter_pass.base_xp_change = base_xp_change
+		supporter_pass.season = supporter_pass.season or {}
+		supporter_pass.season.base_xp_change = base_xp_change
+	end
+	if xp_boost ~= nil then
+		supporter_pass.xp_boost = xp_boost
+		supporter_pass.season = supporter_pass.season or {}
+		supporter_pass.season.xp_boost = xp_boost
+	end
+	if xp_bonus ~= nil then
+		supporter_pass.xp_bonus = xp_bonus
+		supporter_pass.season = supporter_pass.season or {}
+		supporter_pass.season.xp_bonus = xp_bonus
 	end
 
 	if data.entitlements ~= nil then
@@ -954,7 +972,11 @@ end
 
 function api:GetEventPlayerID(event_source_index, payload)
 	local player_id = tonumber(payload and payload.PlayerID or -1) or -1
-	local source_index = tonumber(event_source_index) or -1
+	local source_index = -1
+
+	if type(event_source_index) == "number" or type(event_source_index) == "string" then
+		source_index = tonumber(event_source_index) or -1
+	end
 
 	if source_index > 0 then
 		local ok, sender_player_id = pcall(function()
@@ -966,8 +988,9 @@ function api:GetEventPlayerID(event_source_index, payload)
 		end)
 
 		if ok then
-			if sender_player_id ~= nil and sender_player_id >= 0 then
-				player_id = sender_player_id
+			local resolved_player_id = tonumber(sender_player_id)
+			if resolved_player_id ~= nil and resolved_player_id >= 0 then
+				player_id = resolved_player_id
 			end
 		end
 	end
@@ -984,24 +1007,36 @@ function api:GetEventPlayerID(event_source_index, payload)
 end
 
 function api:SendLoadingScreenApiResponse(player_id, request_id, ok, data, message)
-	local player = PlayerResource:GetPlayer(player_id)
-	if player == nil then
+	local player_ok, player = pcall(function()
+		return PlayerResource:GetPlayer(player_id)
+	end)
+	if not player_ok or player == nil then
 		return
 	end
 
-	CustomGameEventManager:Send_ServerToPlayer(player, "loading_screen_api_response", {
-		request_id = request_id or "",
-		ok = ok and 1 or 0,
-		data = data or {},
-		message = message or "",
-	})
+	local send_ok, send_err = pcall(function()
+		CustomGameEventManager:Send_ServerToPlayer(player, "loading_screen_api_response", {
+			request_id = request_id or "",
+			ok = ok and 1 or 0,
+			data = data or {},
+			message = message or "",
+		})
+	end)
 end
 
 function api:IsLoadingScreenApiRateLimited(player_id, request_type)
 	self.loading_screen_api_last_request = self.loading_screen_api_last_request or {}
 
 	local key = tostring(player_id) .. ":" .. tostring(request_type)
-	local now = GameRules:GetGameTime()
+	local now = 0
+	local ok, game_time = pcall(function()
+		return GameRules:GetGameTime()
+	end)
+	if ok and tonumber(game_time) ~= nil then
+		now = tonumber(game_time)
+	elseif Time ~= nil then
+		now = Time()
+	end
 	local last_request = self.loading_screen_api_last_request[key]
 
 	if last_request ~= nil and now - last_request < 0.5 then
@@ -1013,18 +1048,44 @@ function api:IsLoadingScreenApiRateLimited(player_id, request_type)
 end
 
 function api:OnLoadingScreenApiRequest(event_source_index, keys)
+	local ok = xpcall(function()
+		api.OnLoadingScreenApiRequestSafe(api, event_source_index, keys)
+	end, function(error_message)
+		return tostring(error_message)
+	end)
+end
+
+function api:OnLoadingScreenApiRequestSafe(event_source_index, keys)
 	local payload = keys
 
-	if type(event_source_index) == "table" and payload == nil then
+	if type(event_source_index) == "table" and type(payload) ~= "table" then
 		payload = event_source_index
+		event_source_index = nil
 	end
 
-	if payload == nil then
+	if type(payload) ~= "table" then
 		return
 	end
 
-	local player_id = self:GetEventPlayerID(event_source_index, payload)
+	local player_id = tonumber(payload.PlayerID)
 	if player_id == nil then
+		local ok, resolved_player_id = pcall(function()
+			return self:GetEventPlayerID(event_source_index, payload)
+		end)
+
+		if ok then
+			player_id = resolved_player_id
+		end
+	end
+
+	if player_id == nil then
+		return
+	end
+
+	local valid_ok, valid_player_id = pcall(function()
+		return PlayerResource:IsValidPlayerID(player_id)
+	end)
+	if not valid_ok or not valid_player_id then
 		return
 	end
 
@@ -1034,7 +1095,10 @@ function api:OnLoadingScreenApiRequest(event_source_index, keys)
 	end
 
 	local request_type = tostring(payload.request_type or "")
-	if self:IsLoadingScreenApiRateLimited(player_id, request_type) then
+	local rate_limit_ok, is_rate_limited = pcall(function()
+		return self:IsLoadingScreenApiRateLimited(player_id, request_type)
+	end)
+	if rate_limit_ok and is_rate_limited then
 		self:SendLoadingScreenApiResponse(player_id, request_id, false, {}, "rate limited")
 		return
 	end
@@ -1045,12 +1109,18 @@ function api:OnLoadingScreenApiRequest(event_source_index, keys)
 			return
 		end
 
-		self:Request("loading-screen-info", function(data)
-			self.loading_screen_info_cache = data
-			self:SendLoadingScreenApiResponse(player_id, request_id, true, { data = data })
-		end, function()
-			self:SendLoadingScreenApiResponse(player_id, request_id, false, {}, "loading-screen-info failed")
+		local request_ok = pcall(function()
+			self:Request("loading-screen-info", function(data)
+				self.loading_screen_info_cache = data
+				self:SendLoadingScreenApiResponse(player_id, request_id, true, { data = data })
+			end, function()
+				self:SendLoadingScreenApiResponse(player_id, request_id, false, {}, "loading-screen-info failed")
+			end)
 		end)
+
+		if not request_ok then
+			self:SendLoadingScreenApiResponse(player_id, request_id, false, {}, "loading-screen-info failed")
+		end
 		return
 	end
 

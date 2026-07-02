@@ -11,10 +11,10 @@ var scoreboard_supporter_hover_player_id = -1;
 
 var SCOREBOARD_SUPPORTER_TIER_CATALOG = [
 	{ name: "Free Player", color: "#7db9d8", fragments: 0, xpBoost: 0, votePower: 1 },
-	{ name: "Donator", color: "#45C46B", fragments: 150, xpBoost: 10, votePower: 1 },
-	{ name: "Golden Donator", color: "#F2C94C", fragments: 400, xpBoost: 20, votePower: 2 },
-	{ name: "Ember Donator", color: "#E4572E", fragments: 900, xpBoost: 30, votePower: 3 },
-	{ name: "Stoneguard Donator", color: "#5AD0FF", fragments: 1800, xpBoost: 40, votePower: 4 },
+	{ name: "Donator", color: "#45C46B", fragments: 150, xpBoost: 10, votePower: 2 },
+	{ name: "Golden Donator", color: "#F2C94C", fragments: 400, xpBoost: 20, votePower: 3 },
+	{ name: "Ember Donator", color: "#E4572E", fragments: 900, xpBoost: 30, votePower: 4 },
+	{ name: "Stoneguard Donator", color: "#5AD0FF", fragments: 1800, xpBoost: 40, votePower: 5 },
 	{ name: "Earthwarden Donator", color: "#C99CFF", fragments: 1800, xpBoost: 40, votePower: 5 }
 ];
 

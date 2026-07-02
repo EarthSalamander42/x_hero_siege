@@ -1706,7 +1706,7 @@
 .description-text-container {
 	width: 100%;
 	height: 40%;
-	padding: 20px 22px 12px 22px;
+	padding: 0px 22px 12px 22px;
 	flow-children: down;
 	background-color: gradient(linear, 0% 0%, 100% 100%, from(#131a27f5), to(#0a0f17f0));
 }
@@ -1914,6 +1914,23 @@
 	height: 100%;
 	align: center center;
 	flow-children: right;
+	opacity: 1.0;
+	transform: translateX(0px);
+	transition-property: opacity, transform;
+	transition-duration: 0.18s;
+	transition-timing-function: ease-in-out;
+}
+
+.bottom-mods-track.IsCarouselOutLeft,
+.bottom-mods-track.IsCarouselInFromLeft {
+	opacity: 0.0;
+	transform: translateX(-28px);
+}
+
+.bottom-mods-track.IsCarouselOutRight,
+.bottom-mods-track.IsCarouselInFromRight {
+	opacity: 0.0;
+	transform: translateX(28px);
 }
 
 .bottom-mods-arrow {
@@ -2173,6 +2190,7 @@
 	width: 8px;
 	height: 8px;
 	margin-top: 6px;
+	margin-left: 6px;
 	margin-right: 10px;
 	border-radius: 50%;
 }
@@ -4619,8 +4637,8 @@
 #vote_difficulty .vote-select-panel,
 .vote-category-row.VoteRowDetailed .vote-select-panel {
 	width: 100%;
-	height: 288px;
-	min-height: 288px;
+	height: 308px;
+	min-height: 308px;
 	padding: 18px 10px 14px 10px;
 }
 
@@ -4712,7 +4730,7 @@
 
 .player-loading-row {
 	height: 36px;
-	padding-left: 6px;
+	margin-left: 6px;
 	padding-right: 6px;
 }
 
@@ -4859,17 +4877,6 @@
 	overflow: clip;
 }
 
-.patreon-cta-image-button,
-.transifex-cta-image-button {
-	width: 100%;
-	height: 84px;
-}
-
-.discord-cta-image-button {
-	width: 100%;
-	height: 118px;
-}
-
 #ProfileSummaryName {
 	max-width: 145px;
 	white-space: nowrap;
@@ -4943,4 +4950,47 @@
 .AspectRatio4x3 .discord-highlight-subtitle,
 .AspectRatio4x3 .transifex-highlight-subtitle {
 	font-size: 15px;
+}
+
+/* Vote modal visibility fix */
+.vote-content {
+	width: fit-children;
+	min-width: 0px;
+}
+
+#VoteContent {
+	width: fit-children;
+	min-height: 0px;
+	height: fit-children;
+	horizontal-align: center;
+	overflow: noclip;
+}
+
+#VoteContent .vote-category-row {
+	width: fit-children;
+	height: fit-children;
+	horizontal-align: center;
+	vertical-align: center;
+	flow-children: right;
+	overflow: noclip;
+}
+
+#VoteContent .vote-choice-cell {
+	height: fit-children;
+	vertical-align: center;
+	opacity: 1.0;
+	visibility: visible;
+	overflow: noclip;
+}
+
+#VoteContent .vote-select-panel {
+	width: 100%;
+	min-height: 288px;
+	opacity: 1.0;
+	visibility: visible;
+}
+
+#VoteContent .vote-category-row.VoteRowDetailed .vote-select-panel {
+	min-height: 288px;
+	height: 288px;
 }

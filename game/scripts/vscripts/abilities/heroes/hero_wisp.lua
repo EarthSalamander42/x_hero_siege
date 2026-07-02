@@ -20,12 +20,26 @@ local WISP_SUPPORTER_STATUS_PARTICLES = {
 	[9] = WISP_SUPPORTER_AMBIENT_PARTICLES.purple, -- Legacy Gaben Donator
 }
 
+local function NormalizeWispDonatorLevel(donator_level)
+	if GetDonatorVisualStatus ~= nil then
+		return GetDonatorVisualStatus(donator_level)
+	end
+
+	local normalized_level = tonumber(donator_level) or 0
+	if normalized_level == 1 or normalized_level == 2 or normalized_level == 3 then
+		return 8
+	end
+
+	return normalized_level
+end
+
 local function GetWispDonatorLevel(parent)
 	if not api or not parent then
 		return 0
 	end
 
-	return tonumber(api:GetDonatorStatus(parent:GetPlayerID())) or 0
+	local donator_level = tonumber(api:GetDonatorStatus(parent:GetPlayerID())) or 0
+	return NormalizeWispDonatorLevel(donator_level)
 end
 
 local function GetWispSupporterParticle(donator_level)

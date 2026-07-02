@@ -86,7 +86,7 @@
 						<Label class="XHSEndScreenSupportTitle" text="Support X Hero Siege" />
 						<Label class="XHSEndScreenSupportTag" text="In-game rewards included" />
 					</Panel>
-					<Label class="XHSEndScreenSupportText" text="Rebuilding XHS for modern Dota is a huge ongoing job: systems, servers, assets, balance, and fixed monthly costs. Supporter Pass donations help keep it moving, with monthly fragments, XP boosts, cosmetics, and 1-5 setup votes by tier." />
+					<Label class="XHSEndScreenSupportText" text="Rebuilding XHS for modern Dota is a huge ongoing job: systems, servers, assets, balance, and fixed monthly costs. Supporter Pass donations help keep it moving, with monthly fragments, XP boosts, cosmetics, and 2-5 setup votes by tier." />
 				</Panel>
 				<Button id="XHSEndScreenSupportButton" class="XHSEndScreenSupportButton">
 					<Label text="Support & Rewards" />

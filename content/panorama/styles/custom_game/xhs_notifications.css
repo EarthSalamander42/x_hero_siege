@@ -810,14 +810,19 @@
 	horizontal-align: center;
 	vertical-align: center;
 	border-radius: 50%;
-	border-top: 4px solid #ffcf66;
-	border-right: 4px solid #d03a24;
-	border-bottom: 4px solid #00000000;
-	border-left: 4px solid #00000000;
-	animation-name: XHSWaveRingSpin;
-	animation-duration: 1s;
-	animation-iteration-count: infinite;
-	animation-timing-function: linear;
+	border: 4px solid #ffcf66;
+	clip: radial( 50% 50%, 0.0deg, -360deg );
+	opacity: 1.0;
+	box-shadow: #ffcf6690 0px 0px 8px 0px;
+	transition-property: clip, opacity, border, box-shadow;
+	transition-duration: .18s;
+	transition-timing-function: ease-out;
+}
+
+.XHSWaveRingSweep.XHSWaveRingSweepWarning
+{
+	border: 4px solid #ff684b;
+	box-shadow: #ff684ba0 0px 0px 10px 0px;
 }
 
 .XHSWaveCompact .XHSWaveRingSweep

@@ -1,4 +1,14 @@
-require("libraries/timers")
+local function KoboldCleanupTimer(delay, callback)
+	if Timers and Timers.CreateTimer then
+		Timers:CreateTimer(delay, callback)
+		return
+	end
+
+	local game_mode = GameRules:GetGameModeEntity()
+	if game_mode then
+		game_mode:SetContextThink(DoUniqueString("kobold_cleanup"), callback, delay)
+	end
+end
 
 function LifeSteal(keys)
 	local caster = keys.caster
@@ -100,8 +110,10 @@ function KoboldArmy(keys)
 		double:SetHasInventory(true)
 		double:SetCanSellItems(false)
 
-		Timers:CreateTimer(duration - 0.1, function()
-			UTIL_Remove(double)
+		KoboldCleanupTimer(duration - 0.1, function()
+			if double and IsValidEntity(double) then
+				UTIL_Remove(double)
+			end
 		end)
 
 		-- Useless since they are removed before, just shows duration of the illusions

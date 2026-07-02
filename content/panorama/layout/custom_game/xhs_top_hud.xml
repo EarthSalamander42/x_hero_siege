@@ -23,6 +23,7 @@
 					<Label id="XHSClockTitle" text="TIME" />
 					<Label id="XHSClockValue" text="--:--" />
 				</Panel>
+				<Panel id="XHSOverheadTopStatusMockupRoot" hittest="false" />
 
 				<Panel id="XHSTopHudRightSlot" hittest="true" hittestchildren="true">
 					<Panel id="XHSTopHudRightAllies" hittest="true" hittestchildren="true">
@@ -52,6 +53,8 @@
 			<Panel id="XHSDifficultyAltPanel" hittest="false">
 				<Label id="XHSDifficultyAltValue" text="DIFFICULTY: -----" />
 			</Panel>
+
+			<Panel id="XHSOverheadMockupRoot" hittest="false" />
 		</Panel>
 		<Panel id="XHSOverheadRoot" hittest="false" />
 	</Panel>

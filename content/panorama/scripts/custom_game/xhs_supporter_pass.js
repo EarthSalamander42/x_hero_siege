@@ -40,10 +40,10 @@ var XHSSupporterPass = (function () {
 	};
 
 	var DEFAULT_TIERS = [
-		{ id: 1, name: "Donator", price: "2\u20ac/month", color: "#70e39a", fragments: 150, xp_boost: 10, vote_power: 1 },
-		{ id: 2, name: "Golden Donator", price: "4.50\u20ac/month", color: "#ffcf66", fragments: 400, xp_boost: 20, vote_power: 2 },
-		{ id: 3, name: "Ember Donator", price: "9\u20ac/month", color: "#ff5a43", fragments: 900, xp_boost: 30, vote_power: 3 },
-		{ id: 4, name: "Stoneguard Donator", price: "18\u20ac/month", color: "#5ad0ff", fragments: 1800, xp_boost: 40, vote_power: 4 },
+		{ id: 1, name: "Donator", price: "2\u20ac/month", color: "#70e39a", fragments: 150, xp_boost: 10, vote_power: 2 },
+		{ id: 2, name: "Golden Donator", price: "4.50\u20ac/month", color: "#ffcf66", fragments: 400, xp_boost: 20, vote_power: 3 },
+		{ id: 3, name: "Ember Donator", price: "9\u20ac/month", color: "#ff5a43", fragments: 900, xp_boost: 30, vote_power: 4 },
+		{ id: 4, name: "Stoneguard Donator", price: "18\u20ac/month", color: "#5ad0ff", fragments: 1800, xp_boost: 40, vote_power: 5 },
 		{ id: 5, name: "Earthwarden Donator", price: "27\u20ac/month", color: "#c99cff", fragments: 1800, xp_boost: 40, vote_power: 5, prestige: true },
 	];
 
@@ -52,30 +52,30 @@ var XHSSupporterPass = (function () {
 			label: "Tier 1",
 			price: "2\u20ac/month",
 			image: "patreon/donator_01_emerald.png",
-			text: "Start supporting XHS with monthly fragments, Emerald identity, a Discord role, visible profile prestige, and 1 vote in game setup.",
-			perks: ["150 fragments", "+10% XP", "1 vote", "Emerald Green", "Discord role"],
+			text: "Start supporting XHS with monthly fragments, Emerald identity, a Discord role, visible profile prestige, and 2 votes in game setup.",
+			perks: ["150 fragments", "+10% XP", "2 votes", "Emerald Green", "Discord role"],
 		},
 		2: {
 			label: "Tier 2",
 			price: "4.50\u20ac/month",
 			image: "patreon/donator_02_solar_gold.png",
-			text: "Upgrade to Solar Gold for a stronger monthly fragment pack, faster progression, 2 setup votes, and all Tier 1 benefits.",
-			perks: ["400 fragments", "+20% XP", "2 votes", "Solar Gold"],
+			text: "Upgrade to Solar Gold for a stronger monthly fragment pack, faster progression, 3 setup votes, and all Tier 1 benefits.",
+			perks: ["400 fragments", "+20% XP", "3 votes", "Solar Gold"],
 			featured: true,
 		},
 		3: {
 			label: "Tier 3",
 			price: "9\u20ac/month",
 			image: "patreon/donator_03_ember_red.png",
-			text: "Stand out with Ember Red styling, 900 monthly fragments, 3 setup votes, and a sharper supporter presence in every XHS space.",
-			perks: ["900 fragments", "+30% XP", "3 votes", "Ember Red"],
+			text: "Stand out with Ember Red styling, 900 monthly fragments, 4 setup votes, and a sharper supporter presence in every XHS space.",
+			perks: ["900 fragments", "+30% XP", "4 votes", "Ember Red"],
 		},
 		4: {
 			label: "Tier 4",
 			price: "18\u20ac/month",
 			image: "patreon/donator_04_storm_blue.png",
-			text: "Lock in Storm Blue status with the top XP boost, 1800 monthly fragments, 4 setup votes, and a premium supporter look.",
-			perks: ["1800 fragments", "+40% XP", "4 votes", "Storm Blue"],
+			text: "Lock in Storm Blue status with the top XP boost, 1800 monthly fragments, 5 setup votes, and a premium supporter look.",
+			perks: ["1800 fragments", "+40% XP", "5 votes", "Storm Blue"],
 		},
 		5: {
 			label: "Tier 5",
@@ -419,7 +419,9 @@ var XHSSupporterPass = (function () {
 			weekly_fragments: ToNumber(data.daily_fragments || data.daily_earned || data.weekly_fragments || data.weekly_earned, 0),
 			weekly_cap: ToNumber(data.daily_cap || data.weekly_cap, DAILY_FRAGMENT_CAP),
 			xp_boost: ToNumber(data.xp_boost, 0),
-			vote_power: Math.max(1, ToNumber(data.vote_power, tierID > 0 ? tierID : 1)),
+			base_xp_change: ToNumber(data.base_xp_change, 0),
+			xp_bonus: ToNumber(data.xp_bonus, 0),
+			vote_power: Math.max(1, ToNumber(data.vote_power, tierID > 0 ? Math.min(tierID + 1, 5) : 1)),
 			season_level: season.level,
 			season_xp: season.xp,
 			season_xp_max: season.maxXp,
@@ -474,7 +476,7 @@ var XHSSupporterPass = (function () {
 			perks: meta.perks || [
 				FormatNumber(tier.fragments || 0) + " fragments",
 				"+" + FormatNumber(tier.xp_boost || 0) + "% XP",
-				FormatVotePower(tier.vote_power || tierID),
+				FormatVotePower(tier.vote_power || (tierID > 0 ? Math.min(tierID + 1, 5) : 1)),
 			],
 			image: meta.image || tier.image || "",
 			color: tier.color || meta.color || "#5ad0ff",
@@ -1143,7 +1145,11 @@ var XHSSupporterPass = (function () {
 		SetText("XHSPassWeeklyCapValue", FormatNumber(player.daily_fragments || player.weekly_fragments) + " / " + FormatNumber(player.daily_cap || player.weekly_cap));
 		SetText("XHSPassGlobalXPValue", FormatXHSAccountXPSummary(player));
 		SetText("XHSPassSeasonXPValue", FormatSupporterXPSummary(player));
-		SetText("XHSPassXPBoostValue", "+" + FormatNumber(player.xp_boost) + "%");
+		var xpBoostText = "+" + FormatNumber(player.xp_boost) + "%";
+		if (player.xp_bonus > 0) {
+			xpBoostText += " (+" + FormatNumber(player.xp_bonus) + " XP)";
+		}
+		SetText("XHSPassXPBoostValue", xpBoostText);
 		SetText("XHSPassVotePowerValue", FormatVotePower(player.vote_power));
 		SetText("XHSPassPlayerName", player.name);
 		SetText("XHSPassPlayerTier", player.tier_name);

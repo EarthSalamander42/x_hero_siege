@@ -43,6 +43,8 @@
 	transition-duration: 0.12s;
 	z-index: 121;
 	overflow: noclip;
+	visibility: collapse;
+	opacity: 0;
 }
 
 .XHSSupporterPassButtonContent {

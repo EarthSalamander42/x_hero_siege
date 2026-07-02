@@ -51,7 +51,9 @@ function Battlepass:GetPlayerInfoXP() -- yet it has too much useless loops, form
 
 			local color = PLAYER_COLORS[player_id]
 
-			local donator_color = DONATOR_COLOR[api:GetDonatorStatus(player_id)]
+			local raw_donator_status = api:GetDonatorStatus(player_id)
+			local donator_status = GetDonatorVisualStatus ~= nil and GetDonatorVisualStatus(raw_donator_status) or raw_donator_status
+			local donator_color = DONATOR_COLOR[donator_status]
 
 			if donator_color == nil then
 				donator_color = DONATOR_COLOR[0]
@@ -79,7 +81,8 @@ function Battlepass:GetPlayerInfoXP() -- yet it has too much useless loops, form
 			supporter_table.ply_color = rgbToHex(color)
 			supporter_table.title = supporter_table.title or "Supporter Pass"
 			supporter_table.title_color = supporter_table.title_color or "#9eb0c9"
-			supporter_table.donator_level = api:GetDonatorStatus(player_id)
+			supporter_table.donator_level = donator_status
+			supporter_table.raw_donator_level = raw_donator_status
 			supporter_table.donator_color = rgbToHex(donator_color)
 			supporter_table.tier_id = supporter_table.tier_id or 0
 			supporter_table.tier_name = supporter_table.tier_name or "Free Player"

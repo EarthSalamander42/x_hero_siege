@@ -16,7 +16,7 @@
 			<Panel class="XHSWaveRingWrap">
 				<Panel class="XHSWaveRing" />
 				<Panel id="XHSWaveRingFill" class="XHSWaveRingFill" />
-				<Panel class="XHSWaveRingSweep" />
+				<Panel id="XHSWaveRingSweep" class="XHSWaveRingSweep" />
 				<Label id="XHSWaveCountdownValue" class="XHSWaveCountdownValue" text="30" />
 			</Panel>
 			<Panel class="XHSWaveCopy">

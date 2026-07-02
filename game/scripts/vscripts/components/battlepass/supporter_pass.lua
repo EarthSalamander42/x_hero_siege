@@ -59,7 +59,7 @@ SupporterPass.TIERS = {
 		color = "#45C46B",
 		fragments = 150,
 		xp_boost = 10,
-		vote_power = 1,
+		vote_power = 2,
 		companion_unlocks = 3,
 		emblem_unlocks = 1,
 		effigy_unlocks = 1,
@@ -71,7 +71,7 @@ SupporterPass.TIERS = {
 		color = "#F2C94C",
 		fragments = 400,
 		xp_boost = 20,
-		vote_power = 2,
+		vote_power = 3,
 		companion_unlocks = 3,
 		emblem_unlocks = 1,
 		effigy_unlocks = 1,
@@ -83,7 +83,7 @@ SupporterPass.TIERS = {
 		color = "#E4572E",
 		fragments = 900,
 		xp_boost = 30,
-		vote_power = 3,
+		vote_power = 4,
 		companion_unlocks = 3,
 		emblem_unlocks = 1,
 		effigy_unlocks = 1,
@@ -95,7 +95,7 @@ SupporterPass.TIERS = {
 		color = "#5AD0FF",
 		fragments = 1800,
 		xp_boost = 40,
-		vote_power = 4,
+		vote_power = 5,
 		companion_unlocks = 3,
 		emblem_unlocks = 1,
 		effigy_unlocks = 1,
@@ -127,6 +127,10 @@ function SupporterPass:GetTierByID(tierID)
 end
 
 function SupporterPass:GetTierForStatus(status)
+	if GetDonatorVisualTier ~= nil then
+		return GetDonatorVisualTier(status)
+	end
+
 	return self.STATUS_TO_TIER[tonumber(status) or 0] or 0
 end
 
@@ -226,7 +230,8 @@ function SupporterPass:BuildPlayerTable(playerID)
 	local account = supporterPass.account or {}
 	local settings = supporterPass.settings or player.settings or {}
 	local passTierID = tonumber(FirstSupporterValue(supporterPass.tier_id, current.tier_id)) or 0
-	local donatorStatus = api and api.GetDonatorStatus and api:GetDonatorStatus(playerID) or 0
+	local rawDonatorStatus = api and api.GetDonatorStatus and api:GetDonatorStatus(playerID) or 0
+	local donatorStatus = GetDonatorVisualStatus ~= nil and GetDonatorVisualStatus(rawDonatorStatus) or rawDonatorStatus
 	local rawTierName = FirstSupporterValue(supporterPass.tier_name, current.tier_name)
 	local rawTierColor = FirstSupporterValue(supporterPass.tier_color, current.tier_color)
 	local statusTierID = self:GetTierForStatus(donatorStatus)
@@ -274,6 +279,8 @@ function SupporterPass:BuildPlayerTable(playerID)
 		local currentXPMax = tonumber(FirstSupporterValue(current.season_xp_max, current.MaxXP)) or seasonXPMax
 		seasonXPChange = SeasonProgressTotal(seasonLevel, seasonXP, seasonXPMax) - SeasonProgressTotal(currentLevel, currentXP, currentXPMax)
 	end
+	local baseXPChange = tonumber(FirstSupporterValue(season.base_xp_change, supporterPass.base_xp_change, player.base_xp_change, current.base_xp_change)) or 0
+	local xpBonus = tonumber(FirstSupporterValue(season.xp_bonus, supporterPass.xp_bonus, player.xp_bonus, current.xp_bonus)) or 0
 	local passRewards = FirstSupporterValue(settings.pass_rewards, player.pass_rewards)
 	if passRewards == nil then
 		passRewards = player.bp_rewards
@@ -286,6 +293,7 @@ function SupporterPass:BuildPlayerTable(playerID)
 		Lvl = seasonLevel,
 		title = "Supporter Pass",
 		donator_level = donatorStatus,
+		raw_donator_level = rawDonatorStatus,
 		tier_id = tierID,
 		tier_name = tierName,
 		tier_color = tierColor,
@@ -296,13 +304,15 @@ function SupporterPass:BuildPlayerTable(playerID)
 		weekly_cap = tonumber(FirstSupporterValue(supporterPass.daily_cap, supporterPass.weekly_cap, current.daily_cap, current.weekly_cap)) or self.DAILY_FRAGMENT_CAP,
 		monthly_fragments = tonumber(FirstSupporterValue(supporterPass.monthly_fragments, current.monthly_fragments)) or (tier and tier.fragments or 0),
 		xp_boost = tonumber(FirstSupporterValue(supporterPass.xp_boost, current.xp_boost)) or (tier and tier.xp_boost or 0),
-		vote_power = tonumber(FirstSupporterValue(supporterPass.vote_power, current.vote_power)) or (tier and tier.vote_power or math.max(1, math.min(tierID, 5))),
+		vote_power = tonumber(FirstSupporterValue(supporterPass.vote_power, current.vote_power)) or (tier and tier.vote_power or math.max(1, math.min(tierID + 1, 5))),
 		season_level = seasonLevel,
 		season_xp = seasonXP,
 		season_xp_max = seasonXPMax,
 		season_total_xp = seasonTotalXP,
 		season_xp_change = seasonXPChange,
 		XP_change = seasonXPChange,
+		base_xp_change = baseXPChange,
+		xp_bonus = xpBonus,
 		account_level = accountLevel,
 		xhs_account_level = xhsAccountLevel,
 		xhs_xp = xhsXP,

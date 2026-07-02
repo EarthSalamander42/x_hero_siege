@@ -104,7 +104,9 @@ function CDOTA_BaseNPC:SetupHealthBarLabel(sCustomTag)
 	--	print("Donator Player ID / status:", self:GetPlayerOwnerID(), api:GetDonatorStatus(self:GetPlayerOwnerID()))
 	if api:IsDonator(self:GetPlayerOwnerID()) ~= false then
 		if ply_table.donator_level and ply_table.donator_level > 0 then
-			self:SetCustomHealthLabel(sCustomTag, DONATOR_COLOR[ply_table.donator_level][1], DONATOR_COLOR[ply_table.donator_level][2], DONATOR_COLOR[ply_table.donator_level][3])
+			local visual_donator_level = GetDonatorVisualStatus ~= nil and GetDonatorVisualStatus(ply_table.donator_level) or ply_table.donator_level
+			local donator_color = DONATOR_COLOR[visual_donator_level] or DONATOR_COLOR[0]
+			self:SetCustomHealthLabel(sCustomTag, donator_color[1], donator_color[2], donator_color[3])
 		end
 	end
 end
@@ -326,6 +328,9 @@ function Battlepass:SupporterPassBuyShopItem(event_source_index, event)
 		if SupporterPass and SupporterPass.PublishPlayer then
 			SupporterPass:PublishPlayer(playerID)
 		end
+		if api and api.PublishSupporterPassArmory then
+			api:PublishSupporterPassArmory(playerID, data and data.armory or nil)
+		end
 
 		if player then
 			CustomGameEventManager:Send_ServerToPlayer(player, "supporter_pass_purchase_success", {
@@ -354,6 +359,14 @@ function Battlepass:SupporterPassClaimReward(event_source_index, event)
 	api:ClaimSupporterPassReward(playerID, event.reward_id, function(success, data)
 		local player = PlayerResource:GetPlayer(playerID)
 		if not player then return end
+		if success then
+			if SupporterPass and SupporterPass.PublishPlayer then
+				SupporterPass:PublishPlayer(playerID)
+			end
+			if api and api.PublishSupporterPassArmory then
+				api:PublishSupporterPassArmory(playerID, data and data.armory or nil)
+			end
+		end
 		CustomGameEventManager:Send_ServerToPlayer(player, success and "supporter_pass_claim_success" or "supporter_pass_claim_failed", {
 			reward_id = event.reward_id,
 			already_claimed = data and data.already_claimed or false,
@@ -380,6 +393,14 @@ function Battlepass:SupporterPassEquipItem(event_source_index, event)
 	api:EquipSupporterPassItem(playerID, event.item_id, event.hero, event.slot_id, function(success, data)
 		local player = PlayerResource:GetPlayer(playerID)
 		if not player then return end
+		if success then
+			if SupporterPass and SupporterPass.PublishPlayer then
+				SupporterPass:PublishPlayer(playerID)
+			end
+			if api and api.PublishSupporterPassArmory then
+				api:PublishSupporterPassArmory(playerID, data and data.armory or nil)
+			end
+		end
 		CustomGameEventManager:Send_ServerToPlayer(player, success and "supporter_pass_equip_success" or "supporter_pass_equip_failed", {
 			item_id = event.item_id,
 			message = data and data.message or nil,

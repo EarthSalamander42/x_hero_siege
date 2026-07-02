@@ -10,7 +10,7 @@
 	</scripts>
 
 	<Panel class="XHSSupporterPassRoot" hittest="false">
-		<Button id="XHSSupporterPassButton" class="XHSSupporterPassButton" hittest="true">
+		<Button id="XHSSupporterPassButton" class="XHSSupporterPassButton" hittest="false" style="visibility: collapse; opacity: 0;">
 			<Panel class="XHSSupporterPassButtonGlow" hittest="false" ignore-parent-flow="true" />
 
 			<Panel class="XHSSupporterPassButtonContent" hittest="false">

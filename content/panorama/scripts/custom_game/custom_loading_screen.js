@@ -65,6 +65,9 @@ var bottom_tab_last_tick_time = -1;
 var bottom_tab_mouse_over_footer = false;
 var bottom_tab_last_mouse_move_time = -1;
 var bottom_mods_current_page = 0;
+var bottom_mods_auto_elapsed = 0;
+var bottom_mods_transition_token = 0;
+var bottom_mods_transition_duration = 0.18;
 var custom_setup_failed_state = false;
 var local_ready_click_pending = false;
 var local_ready_click_token = 0;
@@ -2739,6 +2742,110 @@ function GetBottomModsPageCount(item_count, visible_count) {
 	return Math.max(1, Math.ceil(item_count / visible_count));
 }
 
+function GetBottomModsTrack() {
+	return $("#BottomModsTrack");
+}
+
+function IsBottomModsTabActive() {
+	return bottom_tab_current_panel_index == 1;
+}
+
+function ResetBottomModsAutoScroll(reset_page) {
+	bottom_mods_auto_elapsed = 0;
+
+	if (reset_page === true && bottom_mods_current_page != 0) {
+		SetBottomModsPage(0, 0);
+	}
+}
+
+function AutoAdvanceBottomModsCarousel(delta, is_paused) {
+	if (!IsBottomModsTabActive()) {
+		bottom_mods_auto_elapsed = 0;
+		return;
+	}
+
+	var cells = GetBottomModCells();
+	var visible_count = GetBottomModsVisibleCount();
+	var page_count = GetBottomModsPageCount(cells.length, visible_count);
+
+	if (page_count <= 1) {
+		bottom_mods_auto_elapsed = 0;
+		return;
+	}
+
+	if (is_paused) {
+		return;
+	}
+
+	var page_interval = bottom_tab_auto_interval / page_count;
+	if (page_interval <= 0) {
+		page_interval = bottom_tab_auto_interval;
+	}
+
+	bottom_mods_auto_elapsed = bottom_mods_auto_elapsed + Math.max(0, delta);
+
+	while (bottom_mods_auto_elapsed >= page_interval) {
+		bottom_mods_auto_elapsed = bottom_mods_auto_elapsed - page_interval;
+		SetBottomModsPage((bottom_mods_current_page + 1) % page_count, 1);
+	}
+}
+
+function ClearBottomModsTransitionClasses(track) {
+	if (!track) {
+		return;
+	}
+
+	track.SetHasClass("IsCarouselOutLeft", false);
+	track.SetHasClass("IsCarouselOutRight", false);
+	track.SetHasClass("IsCarouselInFromLeft", false);
+	track.SetHasClass("IsCarouselInFromRight", false);
+}
+
+function SetBottomModsPage(target_page, direction) {
+	var cells = GetBottomModCells();
+	var visible_count = GetBottomModsVisibleCount();
+	var page_count = GetBottomModsPageCount(cells.length, visible_count);
+	var clamped_page = Math.max(0, Math.min(page_count - 1, target_page));
+	var animate_direction = direction || 0;
+
+	if (clamped_page == bottom_mods_current_page) {
+		return false;
+	}
+
+	var track = GetBottomModsTrack();
+	if (!track || animate_direction == 0) {
+		bottom_mods_current_page = clamped_page;
+		UpdateBottomModsCarousel();
+		return true;
+	}
+
+	bottom_mods_transition_token = bottom_mods_transition_token + 1;
+	var transition_token = bottom_mods_transition_token;
+	ClearBottomModsTransitionClasses(track);
+	track.SetHasClass(animate_direction > 0 ? "IsCarouselOutLeft" : "IsCarouselOutRight", true);
+
+	$.Schedule(bottom_mods_transition_duration * 0.5, function () {
+		if (transition_token != bottom_mods_transition_token) {
+			return;
+		}
+
+		bottom_mods_current_page = clamped_page;
+		UpdateBottomModsCarousel();
+		ClearBottomModsTransitionClasses(track);
+		track.SetHasClass(animate_direction > 0 ? "IsCarouselInFromRight" : "IsCarouselInFromLeft", true);
+
+		$.Schedule(0.01, function () {
+			if (transition_token != bottom_mods_transition_token) {
+				return;
+			}
+
+			ClearBottomModsTransitionClasses(track);
+		});
+	});
+
+	return true;
+}
+
 function UpdateBottomModsCarousel() {
 	var cells = GetBottomModCells();
 	var visible_count = GetBottomModsVisibleCount();
@@ -2797,13 +2904,16 @@ function ShiftBottomMods(direction) {
 		return;
 	}
 
-	bottom_mods_current_page = target_page;
-	UpdateBottomModsCarousel();
+	bottom_mods_auto_elapsed = 0;
+	SetBottomModsPage(target_page, direction < 0 ? -1 : 1);
 	ResetBottomTabAutoTimer();
 }
 
 function InitializeBottomModsCarousel() {
 	bottom_mods_current_page = 0;
+	bottom_mods_auto_elapsed = 0;
+	bottom_mods_transition_token = bottom_mods_transition_token + 1;
+	ClearBottomModsTransitionClasses(GetBottomModsTrack());
 	UpdateBottomModsCarousel();
 	$.Schedule(0.1, UpdateBottomModsCarousel);
 }
@@ -3004,6 +3114,7 @@ function AutoRotateBottomTabs() {
 	}
 
 	UpdateBottomTabCountdownLabel(bottom_tab_countdown_remaining, mouse_moving_now, false);
+	AutoAdvanceBottomModsCarousel(delta, mouse_moving_now);
 
 	if (bottom_tab_countdown_remaining <= 0) {
 		SwitchTab(GetNextBottomTabPanelIndex(), true);
@@ -3058,6 +3169,10 @@ function SwitchTab(count, is_auto) {
 
 		bottom_tab_current_panel_index = target_panel_index;
 		UpdateBottomTabHeader(target_panel_index);
+
+		if (target_panel_index == 1) {
+			ResetBottomModsAutoScroll(true);
+		}
 
 		if (!switched_by_auto) {
 			ResetBottomTabAutoTimer();
@@ -3139,6 +3254,10 @@ function SwitchTab(count, is_auto) {
 
 	bottom_tab_current_panel_index = target_panel_index;
 	UpdateBottomTabHeader(target_panel_index);
+
+	if (target_panel_index == 1) {
+		ResetBottomModsAutoScroll(true);
+	}
 
 	if (!switched_by_auto) {
 		ResetBottomTabAutoTimer();
@@ -3520,7 +3639,7 @@ function AllPlayersLoaded() {
 	}
 
 	if (vote_dialog && vote_dialog[0]) {
-		vote_dialog[0].SetHasClass("SingleVoteCategory", vote_categories.length > 0);
+		vote_dialog[0].SetHasClass("SingleVoteCategory", vote_categories.length == 1);
 	}
 
 
@@ -3565,8 +3684,16 @@ function AllPlayersLoaded() {
 			}
 			var is_compact_description = option_description.length <= 120;
 
-			vote_button.GetChild(0).text = option_title;
-			vote_button.GetChild(1).text = option_description;
+			var title_labels = vote_button.FindChildrenWithClassTraverse("vote-select-title");
+			var description_labels = vote_button.FindChildrenWithClassTraverse("vote-select-description");
+
+			if (title_labels && title_labels[0]) {
+				title_labels[0].text = option_title;
+			}
+
+			if (description_labels && description_labels[0]) {
+				description_labels[0].text = option_description;
+			}
 
 			vote_button.SetHasClass("VotePanelCompact", is_compact_description);
 			vote_button.SetHasClass("VotePanelDetailed", vote_type == "gamemode" && i == 2);
@@ -3575,7 +3702,8 @@ function AllPlayersLoaded() {
 				row_is_compact = false;
 			}
 
-			var choice_card = vote_button.GetChild(2);
+			var choice_cards = vote_button.FindChildrenWithClassTraverse("vote-button");
+			var choice_card = choice_cards && choice_cards[0] ? choice_cards[0] : null;
 
 			(function (button, vote_type, i) {
 				if (!button) {
@@ -3717,11 +3845,11 @@ function GetVoteWeightForDonatorStatus(status) {
 	}
 
 	if (parsed_status == 4) {
-		return 3;
+		return 4;
 	}
 
 	if (parsed_status == 5) {
-		return 2;
+		return 3;
 	}
 
 	if (parsed_status == 8 || parsed_status == 9) {
@@ -3729,7 +3857,11 @@ function GetVoteWeightForDonatorStatus(status) {
 	}
 
 	if (parsed_status == 7) {
-		return 4;
+		return 5;
+	}
+
+	if (parsed_status == 6) {
+		return 2;
 	}
 
 	return 1;
@@ -3746,9 +3878,20 @@ function GetLocalVoteWeightFallback() {
 		return 1;
 	}
 
+	var vote_power = 1;
+	var supporter_table = CustomNetTables.GetTableValue("supporter_pass_player", local_player_id.toString()) || {};
+	if (supporter_table.vote_power !== undefined) {
+		vote_power = Math.max(vote_power, Math.floor(ToNumber(supporter_table.vote_power, 1)));
+	} else {
+		var supporter_tier = Math.floor(ToNumber(supporter_table.tier_id || supporter_table.supporter_tier, 0));
+		if (supporter_tier > 0) {
+			vote_power = Math.max(vote_power, Math.min(supporter_tier + 1, 5));
+		}
+	}
+
 	var donators = CustomNetTables.GetTableValue("game_options", "donators");
 	if (!donators) {
-		return 1;
+		return vote_power;
 	}
 
 	var local_steamid = player_info.player_steamid.toString();
@@ -3763,11 +3906,11 @@ function GetLocalVoteWeightFallback() {
 		}
 
 		if (steamid !== undefined && steamid !== null && steamid.toString() == local_steamid) {
-			return GetVoteWeightForDonatorStatus(status);
+			return Math.max(vote_power, GetVoteWeightForDonatorStatus(status));
 		}
 	}
 
-	return 1;
+	return vote_power;
 }
 
 function GetLocalVoteWeight(category, vote_index) {
@@ -3920,7 +4063,7 @@ function ApplyVoteCountsToLabels(category, vote_table) {
 	return true;
 }
 
-/* Supporter vote power scales from 1 to 5 votes by tier. */
+/* Supporter vote power starts at 2 votes for tier 1 and caps at 5 votes. */
 
 function OnVotesReceived(data) {
 	if (!data || !data.category) {

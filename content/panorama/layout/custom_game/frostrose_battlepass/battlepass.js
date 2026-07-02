@@ -1395,20 +1395,6 @@ function CreateBattlepassButton() {
 	if (Parent.FindChildTraverse("BattlepassButton")) {
 		Parent.FindChildTraverse("BattlepassButton").DeleteAsync(0);
 	}
-
-	var BattlepassButton = $.CreatePanel("Button", $.GetContextPanel(), "BattlepassButton");
-	BattlepassButton.SetPanelEvent("onactivate", function () {
-		ToggleBattlepass();
-	});
-
-	BattlepassButton.SetPanelEvent("onmouseover", function () {
-		$.DispatchEvent("UIShowTextTooltip", BattlepassButton, $.Localize("#battlepass"));
-	})
-
-	BattlepassButton.SetPanelEvent("onmouseout", function () {
-		$.DispatchEvent("UIHideTextTooltip", BattlepassButton);
-	})
-	BattlepassButton.SetParent(Parent);
 }
 
 function OpenSupporterPass() {
