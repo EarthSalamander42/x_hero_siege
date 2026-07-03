@@ -463,8 +463,8 @@
 	animation-name: XHSWaveArrivedFlash;
 	animation-duration: .6s;
 	animation-iteration-count: 1;
-	border: 1px solid #ffcf66b8;
-	brightness: 2.1;
+	border: 1px solid #5ad0ffb8;
+	brightness: 1.65;
 }
 
 .XHSWaveCountdown.XHSWaveCompact
@@ -482,8 +482,9 @@
 
 .XHSWaveCountdown.XHSWaveActive
 {
-	border: 1px solid #ff684b9a;
-	background-color: gradient( linear, 0% 0%, 100% 100%, from( #2b1018f2 ), color-stop( .55, #07111ff2 ), to( #050910f2 ) );
+	border: 1px solid #ff684bc0;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #23080cf5 ), color-stop( .52, #07111ff2 ), to( #050910f5 ) );
+	box-shadow: fill #000000bc 0px 0px 16px 0px, #ff3f2a32 0px 0px 12px 0px;
 }
 
 .XHSWaveCountdown.XHSWaveCleared
@@ -790,8 +791,8 @@
 	vertical-align: center;
 	border-radius: 50%;
 	border: 2px solid #5ad0ff82;
-	background-color: #06101db8;
-	box-shadow: #5ad0ff70 0px 0px 20px 0px;
+	background-color: #030914d8;
+	box-shadow: #5ad0ff88 0px 0px 22px 0px;
 }
 
 .XHSWaveCompact .XHSWaveRing
@@ -799,8 +800,8 @@
 	width: 34px;
 	height: 34px;
 	border: 1px solid #5ad0ff66;
-	background-color: #06101da8;
-	box-shadow: #5ad0ff38 0px 0px 8px 0px;
+	background-color: #030914c8;
+	box-shadow: #5ad0ff4a 0px 0px 9px 0px;
 }
 
 .XHSWaveRingSweep
@@ -810,10 +811,10 @@
 	horizontal-align: center;
 	vertical-align: center;
 	border-radius: 50%;
-	border: 4px solid #ffcf66;
+	border: 4px solid #72d9ff;
 	clip: radial( 50% 50%, 0.0deg, -360deg );
 	opacity: 1.0;
-	box-shadow: #ffcf6690 0px 0px 8px 0px;
+	box-shadow: #5ad0ffb0 0px 0px 12px 0px;
 	transition-property: clip, opacity, border, box-shadow;
 	transition-duration: .18s;
 	transition-timing-function: ease-out;
@@ -821,8 +822,8 @@
 
 .XHSWaveRingSweep.XHSWaveRingSweepWarning
 {
-	border: 4px solid #ff684b;
-	box-shadow: #ff684ba0 0px 0px 10px 0px;
+	border: 4px solid #ffb06a;
+	box-shadow: #ff684bd0 0px 0px 15px 0px, #ffcf6638 0px 0px 24px 0px;
 }
 
 .XHSWaveCompact .XHSWaveRingSweep
@@ -836,8 +837,8 @@
 	height: 58px;
 	align: center center;
 	border-radius: 50%;
-	background-color: gradient( radial, 50% 50%, 0% 0%, 50% 50%, from( #ffcf6655 ), color-stop( .58, #ff684b30 ), to( #00000000 ) );
-	box-shadow: inset #ffcf6644 0px 0px 16px 0px;
+	background-color: gradient( radial, 50% 50%, 0% 0%, 50% 50%, from( #7edfff24 ), color-stop( .34, #17486630 ), color-stop( .70, #04101d72 ), to( #00000000 ) );
+	box-shadow: inset #061423d8 0px 0px 14px 0px, inset #5ad0ff1f 0px 0px 18px 0px, #5ad0ff28 0px 0px 13px 0px;
 	transform: scaleX( 1 ) scaleY( 1 );
 	transition-property: transform, opacity, background-color, box-shadow;
 	transition-duration: .18s;
@@ -848,17 +849,42 @@
 {
 	width: 25px;
 	height: 25px;
-	background-color: gradient( radial, 50% 50%, 0% 0%, 50% 50%, from( #5ad0ff44 ), color-stop( .58, #347cff24 ), to( #00000000 ) );
-	box-shadow: inset #5ad0ff24 0px 0px 7px 0px;
+	background-color: gradient( radial, 50% 50%, 0% 0%, 50% 50%, from( #5ad0ff22 ), color-stop( .52, #17486624 ), color-stop( .76, #04101d66 ), to( #00000000 ) );
+	box-shadow: inset #061423c8 0px 0px 7px 0px, inset #5ad0ff18 0px 0px 8px 0px;
 }
 
 .XHSWaveActive .XHSWaveRingFill
 {
-	background-color: gradient( radial, 50% 50%, 0% 0%, 50% 50%, from( #ff684b70 ), color-stop( .58, #d03a2430 ), to( #00000000 ) );
-	box-shadow: inset #ff684b55 0px 0px 18px 0px, #ff684b66 0px 0px 16px 0px;
+	background-color: gradient( radial, 50% 50%, 0% 0%, 50% 50%, from( #ff684b38 ), color-stop( .34, #6b171b44 ), color-stop( .70, #12040884 ), to( #00000000 ) );
+	box-shadow: inset #160408e0 0px 0px 15px 0px, inset #ff684b2a 0px 0px 18px 0px, #ff3f2a34 0px 0px 14px 0px;
 	animation-name: XHSWaveThreatPulse;
 	animation-duration: .72s;
 	animation-iteration-count: infinite;
+}
+
+.XHSWaveActive .XHSWaveRing
+{
+	border: 2px solid #ff684b92;
+	background-color: #110407e0;
+	box-shadow: #ff3f2a8c 0px 0px 24px 0px, #00000090 0px 0px 8px 0px;
+}
+
+.XHSWaveActive .XHSWaveRingSweep
+{
+	border: 4px solid #ff5a43;
+	box-shadow: #ff3f2ab8 0px 0px 14px 0px, #ff8d6b42 0px 0px 23px 0px;
+}
+
+.XHSWaveActive .XHSWaveRingSweep.XHSWaveRingSweepWarning
+{
+	border: 4px solid #ffbd72;
+	box-shadow: #ff4a32e0 0px 0px 17px 0px, #ffd18a58 0px 0px 28px 0px;
+}
+
+.XHSWaveActive .XHSWaveCountdownValue
+{
+	color: #fff1eb;
+	text-shadow: 0px 0px 7px #ff684b8c, 0px 2px 5px #000000;
 }
 
 .XHSWaveCleared .XHSWaveRingFill
@@ -874,10 +900,10 @@
 	align: center center;
 	text-align: center;
 	margin-top: 0px;
-	color: #ffffff;
+	color: #edfaff;
 	font-size: 29px;
 	font-weight: bold;
-	text-shadow: 0px 2px 5px #000000;
+	text-shadow: 0px 0px 6px #5ad0ff60, 0px 2px 5px #000000;
 }
 
 .XHSWaveCompact .XHSWaveCountdownValue

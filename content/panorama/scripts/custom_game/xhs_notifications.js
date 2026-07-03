@@ -7,6 +7,7 @@
 	var activeWaveTimerName = null;
 	var activeWaveDuration = 30;
 	var activeWaveMode = null;
+	var WAVE_RING_COUNTDOWN_SECONDS = 30;
 	var activeRuneRemaining = 0;
 	var activeRuneBatchId = null;
 	var activeRuneVersion = 0;
@@ -651,21 +652,34 @@
 		panel.SetHasClass("XHSWaveCleared", mode === "cleared");
 	}
 
+	function updateWaveRingProgress(ratio) {
+		var sweep = $("#XHSWaveRingSweep");
+		if (!sweep) {
+			return;
+		}
+
+		ratio = Math.max(0, Math.min(1, Number(ratio) || 0));
+		sweep.style.clip = "radial(50% 50%, 0.0deg, " + (ratio * -360).toFixed(2) + "deg)";
+		sweep.style.opacity = ratio > 0 ? String(Math.max(0.22, ratio)) : "0";
+		sweep.SetHasClass("XHSWaveRingSweepWarning", ratio > 0 && ratio <= 0.25);
+	}
+
 	function updateWaveCountdown(remaining) {
 		var panel = $(WAVE_PANEL_ID);
 		var label = $("#XHSWaveCountdownValue");
 		var fill = $("#XHSWaveRingFill");
-		var duration = Math.max(1, activeWaveDuration || 30);
-		var ratio = Math.max(0, Math.min(1, remaining / duration));
+		var ringRatio = Math.max(0, Math.min(1, Math.min(remaining, WAVE_RING_COUNTDOWN_SECONDS) / WAVE_RING_COUNTDOWN_SECONDS));
 
 		if (label) {
 			label.text = activeWaveMode === "compact" ? formatWaveTime(remaining) : String(Math.max(0, remaining));
 		}
 
 		if (fill) {
-			fill.style.transform = "scaleX(" + ratio + ") scaleY(" + ratio + ")";
-			fill.style.opacity = String(Math.max(0.18, ratio));
+			fill.style.transform = "scaleX(1) scaleY(1)";
+			fill.style.opacity = remaining > 0 ? "1" : ".42";
 		}
+
+		updateWaveRingProgress(ringRatio);
 
 		if (panel) {
 			panel.SetHasClass("XHSWaveArrived", remaining <= 0);
@@ -676,6 +690,7 @@
 		setWaveVisible(false);
 		activeWaveTimerName = null;
 		setWaveMode(null);
+		updateWaveRingProgress(1);
 	}
 
 	function showWaveCompact(msg, remaining) {
@@ -835,10 +850,10 @@
 		}
 
 		if (fill) {
-			var ratio = remaining / total;
-			fill.style.transform = "scaleX(" + ratio + ") scaleY(" + ratio + ")";
+			fill.style.transform = "scaleX(1) scaleY(1)";
 			fill.style.opacity = remaining > 0 ? "1" : ".42";
 		}
+		updateWaveRingProgress(remaining > 0 ? remaining / total : 0);
 
 		setWaveVisible(true);
 

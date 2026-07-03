@@ -395,19 +395,6 @@ var XHSEndScreen = (function () {
 			|| "-";
 	}
 
-	function AddSummaryTile(parent, label, value) {
-		var tile = $.CreatePanel("Panel", parent, "");
-		tile.AddClass("XHSSummaryTile");
-
-		var labelPanel = $.CreatePanel("Label", tile, "");
-		labelPanel.AddClass("XHSSummaryLabel");
-		labelPanel.text = label;
-
-		var valuePanel = $.CreatePanel("Label", tile, "");
-		valuePanel.AddClass("XHSSummaryValue");
-		valuePanel.text = value;
-	}
-
 	function RenderHeader(data) {
 		var result = Panel("XHSEndScreenResult");
 		var isXHeroesVictory = IsPlayerVictory(data);
@@ -438,24 +425,6 @@ var XHSEndScreen = (function () {
 		var gameID = Panel("XHSEndScreenGameId");
 		if (gameID) {
 			gameID.text = GetGameId(data).toString();
-		}
-	}
-
-	function RenderSummary(data, players) {
-		var parent = Panel("XHSEndScreenRunSummary");
-		ClearPanel(parent);
-
-		if (!parent) {
-			return;
-		}
-
-		AddSummaryTile(parent, "Result", IsPlayerVictory(data) ? "Victory" : "Defeat");
-		AddSummaryTile(parent, "Run Time", FormatTime(data.game_time || Safe(function () { return Game.GetDOTATime(false, false); }, 0)));
-		AddSummaryTile(parent, "Players", players.length.toString());
-		AddSummaryTile(parent, "Mode", (data.game_type || (data.info && data.info.game_type) || "XHS") + " / " + GetGameModeName(data));
-
-		if (data.rosh_lvl !== undefined && data.rosh_lvl !== null) {
-			AddSummaryTile(parent, "Roshan", "Lvl " + data.rosh_lvl + " - " + FormatNumber(data.rosh_hp) + "/" + FormatNumber(data.rosh_max_hp));
 		}
 	}
 
@@ -1084,7 +1053,6 @@ var XHSEndScreen = (function () {
 		var players = BuildPlayerModels(data);
 
 		RenderHeader(data);
-		RenderSummary(data, players);
 		RenderFragmentQuests(data);
 		RenderMvpCards(players);
 		RenderPlayers(players);

@@ -12,10 +12,11 @@ var XHSTopHud = (function () {
 	var OVERHEAD_PERSPECTIVE_BIAS = 38;
 	var OVERHEAD_PLATE_WIDTH = 210;
 	var OVERHEAD_PLATE_HEIGHT = 50;
-	var OVERHEAD_LABEL_HEIGHT = 82;
+	var OVERHEAD_LABEL_HEIGHT = 96;
 	var OVERHEAD_FADE_MARGIN = 96;
 	var OVERHEAD_HEALTH_TICK_INTERVAL = 250;
-	var OVERHEAD_MOCKUP_MODE = true;
+	// Flip this back to true to show the static overhead health bar design sandbox.
+	var OVERHEAD_MOCKUP_MODE = false;
 	var DAILY_FRAGMENT_CAP = 100;
 	var WEEKLY_FRAGMENT_CAP = DAILY_FRAGMENT_CAP;
 
@@ -721,9 +722,17 @@ var XHSTopHud = (function () {
 		topRow.AddClass("XHSOverheadTopRow");
 		topRow.hittest = false;
 
+		var tierOverline = $.CreatePanel("Label", topRow, "XHSOverheadTierOverline_" + playerID);
+		tierOverline.AddClass("XHSOverheadTierOverline");
+		tierOverline.hittest = false;
+
 		var nameBg = $.CreatePanel("Panel", topRow, "XHSOverheadNameBg_" + playerID);
 		nameBg.AddClass("XHSOverheadNameBg");
 		nameBg.hittest = false;
+
+		var nameShimmer = $.CreatePanel("Panel", topRow, "XHSOverheadNameShimmer_" + playerID);
+		nameShimmer.AddClass("XHSOverheadNameShimmer");
+		nameShimmer.hittest = false;
 
 		var name = $.CreatePanel("Label", topRow, "XHSOverheadName_" + playerID);
 		name.AddClass("XHSOverheadName");
@@ -928,6 +937,10 @@ var XHSTopHud = (function () {
 		var nameBg = $.CreatePanel("Panel", topRow, "XHSOverheadNameBg_" + key);
 		nameBg.AddClass("XHSOverheadNameBg");
 		nameBg.hittest = false;
+
+		var nameShimmer = $.CreatePanel("Panel", topRow, "XHSOverheadNameShimmer_" + key);
+		nameShimmer.AddClass("XHSOverheadNameShimmer");
+		nameShimmer.hittest = false;
 
 		var name = $.CreatePanel("Label", topRow, "XHSOverheadName_" + key);
 		name.AddClass("XHSOverheadName");
@@ -1136,18 +1149,20 @@ var XHSTopHud = (function () {
 		return overheadLabels[playerID];
 	}
 
-	function SetOverheadAccent(label, playerID) {
+	function SetOverheadAccent(label, playerID, data) {
 		if (!label) {
 			return;
 		}
 
-		var playerColor = GetPlayerColorString(playerID);
-		var accent = playerColor;
-		var playerGlow = ColorWithAlpha(playerColor, "88");
+		var supporterTier = data ? ToNumber(data.tier, 0) : 0;
+		var supporterColor = data ? NormalizeColorString(data.tierColor) : "";
+		var accent = supporterTier > 0 && supporterColor ? supporterColor : "#5ad0ff";
+		var playerGlow = ColorWithAlpha(accent, "88");
 		var accentGlow = ColorWithAlpha(accent, "88");
 		var content = label.FindChildTraverse("XHSOverheadContent_" + playerID);
 		var name = label.FindChildTraverse("XHSOverheadName_" + playerID);
 		var node = label.FindChildTraverse("XHSOverheadStatusNode_" + playerID);
+		var anchor = label.FindChildTraverse("XHSOverheadAnchor_" + playerID);
 		var anchorDot = label.FindChildTraverse("XHSOverheadAnchorDot_" + playerID);
 
 		if (content) {
@@ -1155,12 +1170,16 @@ var XHSTopHud = (function () {
 			content.style.borderLeft = "0px solid transparent";
 		}
 		if (name) {
-			name.style.color = playerColor;
+			name.style.color = accent;
 			name.style.textShadow = "0px 2px 3px #000000, 0px 0px 6px #000000, 0px 0px 5px " + playerGlow;
 		}
 		if (node) {
 			node.style.backgroundColor = accent;
 			node.style.boxShadow = "fill " + accentGlow + " 0px 0px 7px 0px";
+		}
+		if (anchor) {
+			anchor.style.backgroundColor = "gradient( linear, 0% 0%, 0% 100%, from( " + ColorWithAlpha(accent, "b8") + " ), to( " + ColorWithAlpha(accent, "00") + " ) )";
+			anchor.style.boxShadow = "fill " + accentGlow + " 0px 0px 5px 0px";
 		}
 		if (anchorDot) {
 			anchorDot.style.backgroundColor = accent;
@@ -1183,7 +1202,15 @@ var XHSTopHud = (function () {
 	}
 
 	function FormatOverheadAltStatus(data) {
-		return "SEASON " + data.seasonLevel + " / HERO LEVEL " + Math.max(1, ToNumber(data.heroLevel, 1));
+		return FormatOverheadGameplayStatus(data);
+	}
+
+	function FormatOverheadTierOverline(data) {
+		if (!data || ToNumber(data.tier, 0) <= 0) {
+			return "";
+		}
+
+		return data.tierName || "DONATOR";
 	}
 
 	function UpdateOverheadLabelData(playerID, entIndex) {
@@ -1200,9 +1227,14 @@ var XHSTopHud = (function () {
 		label.SetHasClass("IsDisconnected", !!data.disconnected);
 
 		ClearSupporterTierClasses(label);
-		SetOverheadAccent(label, playerID);
+		label.AddClass("XHSSupporterTier" + data.tier);
+		SetOverheadAccent(label, playerID, data);
+
+		var tierOverline = FormatOverheadTierOverline(data);
+		label.SetHasClass("XHSOverheadHasTierOverline", tierOverline !== "");
 
 		SetChildText(label, "XHSOverheadName_" + playerID, heroName);
+		SetChildText(label, "XHSOverheadTierOverline_" + playerID, tierOverline);
 		SetChildText(label, "XHSOverheadGameplayStatus_" + playerID, FormatOverheadGameplayStatus(data));
 		SetChildText(label, "XHSOverheadAltStatus_" + playerID, FormatOverheadAltStatus(data));
 		SetChildText(label, "XHSOverheadHealthLevel_" + playerID, Math.max(1, ToNumber(data.heroLevel, 1)).toString());

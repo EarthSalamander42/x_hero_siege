@@ -522,6 +522,28 @@ function CinematicPauseHeroes(rampDuration)
 	end
 end
 
+function CinematicPauseHero(hero, rampDuration, duration)
+	if hero == nil or hero:IsNull() or not hero:IsRealHero() then return end
+
+	hero:AddNewModifier(hero, nil, "modifier_cinematic_pause", {
+		duration = duration,
+		ramp_duration = rampDuration,
+	})
+end
+
+function CinematicPauseHeroesForDuration(rampDuration, duration)
+	RefreshPlayers()
+
+	for _, hero in pairs(HeroList:GetAllHeroes()) do
+		CinematicPauseHero(hero, rampDuration, duration)
+	end
+end
+
+function CinematicPauseGame(rampDuration, duration)
+	CinematicPauseCreeps(rampDuration, duration)
+	CinematicPauseHeroesForDuration(rampDuration, duration)
+end
+
 function PauseCreeps(iTime)
 	if iTime then
 		print("Pausing creeps for " .. iTime .. " seconds")
@@ -1457,8 +1479,14 @@ function XHSGetPlayerIDFromUnit(unit)
 	if unit == nil or unit:IsNull() then return nil end
 	local playerID = -1
 
+	if unit.xhs_player_id ~= nil then
+		playerID = tonumber(unit.xhs_player_id) or -1
+	end
+
 	if unit.GetPlayerID then
-		playerID = unit:GetPlayerID()
+		if playerID == nil or playerID < 0 then
+			playerID = unit:GetPlayerID()
+		end
 	end
 
 	if (playerID == nil or playerID < 0) and unit.GetPlayerOwnerID then
@@ -1469,6 +1497,25 @@ function XHSGetPlayerIDFromUnit(unit)
 		local player = unit:GetPlayerOwner()
 		if player ~= nil and player.GetPlayerID then
 			playerID = player:GetPlayerID()
+		end
+	end
+
+	if (playerID == nil or playerID < 0) and PlayerResource ~= nil then
+		for id = 0, PlayerResource:GetPlayerCount() - 1 do
+			if PlayerResource:IsValidPlayerID(id) then
+				local selectedHero = PlayerResource:GetSelectedHeroEntity(id)
+				if selectedHero ~= nil and not selectedHero:IsNull() and selectedHero == unit then
+					playerID = id
+					break
+				end
+
+				local player = PlayerResource:GetPlayer(id)
+				local assignedHero = player ~= nil and player:GetAssignedHero() or nil
+				if assignedHero ~= nil and not assignedHero:IsNull() and assignedHero == unit then
+					playerID = id
+					break
+				end
+			end
 		end
 	end
 

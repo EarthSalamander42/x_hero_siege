@@ -444,6 +444,7 @@ function FragmentQuests:ResetRuntime()
 	self.confirmed_quests_by_instance = {}
 	self.confirmed_total_fragments = 0
 	self.last_dev_payload_dump_summary = {}
+	self.suppress_star_notifications = false
 end
 
 function FragmentQuests:GetSeedSource()
@@ -522,6 +523,7 @@ function FragmentQuests:IsTemplateAllowed(template)
 end
 
 function FragmentQuests:SelectQuests()
+	self.suppress_star_notifications = true
 	self.selected = {}
 	self.selected_template_ids = {}
 
@@ -551,6 +553,7 @@ function FragmentQuests:SelectQuests()
 		seed = self.seed,
 	})
 	self:RecomputeAll()
+	self.suppress_star_notifications = false
 	self:PublishState("selected", true)
 end
 
@@ -623,7 +626,9 @@ function FragmentQuests:ForceQuest(templateID, targetID, slot)
 		target_id = targetID,
 		slot = slot,
 	})
+	self.suppress_star_notifications = true
 	self:RecomputeAll()
+	self.suppress_star_notifications = false
 	self:PublishState("dev_force", true)
 	return true, "Fragment quest forced"
 end
@@ -663,7 +668,40 @@ function FragmentQuests:RecomputeQuest(quest)
 			stars = quest.stars,
 			value = value,
 		})
+		if self:ShouldSendStarNotification(quest) then
+			self:SendStarNotification(quest, previousStars)
+		end
 	end
+end
+
+function FragmentQuests:ShouldSendStarNotification(quest)
+	if self.suppress_star_notifications == true then return false end
+	if quest == nil then return false end
+
+	if quest.score_mode == "higher_is_better" then
+		return true
+	end
+
+	return quest.final_value ~= nil
+end
+
+function FragmentQuests:SendStarNotification(quest, previousStars)
+	if CustomGameEventManager == nil or quest == nil then return end
+
+	CustomGameEventManager:Send_ServerToAllClients("xhs_fragment_quest_star", {
+		instance_id = quest.instance_id,
+		template_id = quest.template_id,
+		target_id = quest.target_id,
+		title = quest.title or quest.template_id or "Fragment Quest",
+		description = quest.description or "",
+		stars = quest.stars or 0,
+		previous_stars = previousStars or 0,
+		progress_text = self:BuildProgressText(quest),
+		threshold_text = self:BuildThresholdText(quest),
+		fragments_preview = quest.fragments_awarded or 0,
+		reward_per_star = quest.reward_per_star or DEFAULT_REWARD_PER_STAR,
+		duration = 6.0,
+	})
 end
 
 function FragmentQuests:GetCurrentValue(quest)

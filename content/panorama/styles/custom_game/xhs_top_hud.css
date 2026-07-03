@@ -50,9 +50,10 @@
 
 .XHSOverheadLabel {
 	width: 210px;
-	height: 86px;
+	height: 96px;
 	padding: 0px;
 	flow-children: down;
+	overflow: noclip;
 	background-color: #00000000;
 	border: 0px solid transparent;
 	box-shadow: none;
@@ -113,6 +114,7 @@
 	height: 41px;
 	padding: 4px 8px 1px 8px;
 	flow-children: down;
+	overflow: noclip;
 	background-color: #00000000;
 	border: 0px solid transparent;
 	border-left: 0px solid transparent;
@@ -129,6 +131,40 @@
 	width: 100%;
 	height: 21px;
 	flow-children: none;
+	overflow: noclip;
+}
+
+.XHSOverheadTierOverline {
+	width: fit-children;
+	min-width: 92px;
+	max-width: 190px;
+	height: 13px;
+	padding: 0px 8px;
+	margin-top: -12px;
+	horizontal-align: center;
+	ignore-parent-flow: true;
+	color: #cfeeff;
+	font-size: 8px;
+	font-weight: bold;
+	letter-spacing: 1px;
+	text-align: center center;
+	text-overflow: shrink;
+	text-transform: uppercase;
+	text-shadow: 0px 1px 2px #000000, 0px 0px 5px #5ad0ff44;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #00000000 ), color-stop( .18, #061321e8 ), color-stop( .50, #102336f4 ), color-stop( .82, #061321e8 ), to( #00000000 ) );
+	border-top: 1px solid #5ad0ff3c;
+	border-bottom: 1px solid #5ad0ff24;
+	box-shadow: fill #00000096 0px 1px 4px 0px, fill #5ad0ff1d 0px 0px 7px 0px;
+	visibility: collapse;
+	opacity: 0;
+	z-index: 6;
+	transition-property: opacity, brightness, transform;
+	transition-duration: 0.12s;
+}
+
+.XHSOverheadLabel.XHSOverheadHasTierOverline .XHSOverheadTierOverline {
+	visibility: visible;
+	opacity: 1;
 }
 
 .XHSOverheadNameBg {
@@ -139,6 +175,17 @@
 	background-color: gradient( linear, 0% 0%, 100% 0%, from( #00000000 ), color-stop( .16, #02070dc8 ), color-stop( .50, #071522ea ), color-stop( .84, #02070dc8 ), to( #00000000 ) );
 	box-shadow: fill #0000007c 0px 1px 6px 0px, fill #5ad0ff1f 0px 0px 9px 0px;
 	z-index: 0;
+}
+
+.XHSOverheadNameShimmer {
+	width: 44px;
+	height: 21px;
+	align: left center;
+	ignore-parent-flow: true;
+	opacity: 0;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #ffffff00 ), color-stop( .45, #ffffff42 ), color-stop( .62, #fff0ff66 ), to( #ffffff00 ) );
+	transform: translateX( -72px );
+	z-index: 1;
 }
 
 .XHSOverheadBadge {
@@ -248,7 +295,8 @@
 	text-transform: uppercase;
 	text-shadow: 0px 1px 2px #000000;
 	transition-property: opacity, transform;
-	transition-duration: 0.08s;
+	transition-duration: 0.12s;
+	transition-timing-function: ease-out;
 }
 
 .XHSOverheadAltStatus {
@@ -293,14 +341,14 @@
 }
 
 .XHSOverheadVitalsFrame {
-	width: 142px;
-	height: 17px;
+	width: 150px;
+	height: 20px;
 	align: left top;
-	margin-left: 21px;
-	margin-top: 1px;
-	background-color: #00000000;
+	margin-left: 15px;
+	margin-top: 0px;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #02060bd8 ), color-stop( .20, #050b12f0 ), color-stop( .72, #050b12f0 ), to( #02060bd8 ) );
 	border: 0px solid transparent;
-	box-shadow: none;
+	box-shadow: fill #00000096 0px 1px 5px 0px, inset #ffffff0a 0px 1px 0px 0px;
 	transition-property: brightness;
 	transition-duration: 0.12s;
 	z-index: 0;
@@ -312,10 +360,12 @@
 	align: left top;
 	margin-left: 16px;
 	margin-top: -1px;
-	background-color: #00000000;
-	box-shadow: fill #000000b8 0px 1px 4px 0px;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #07121cf4 ), color-stop( .62, #02070df4 ), to( #050b12f2 ) );
+	border: 0px solid transparent;
+	border-radius: 0px;
+	box-shadow: fill #000000c8 0px 1px 4px 0px, inset #ffffff0d 0px 1px 0px 0px;
 	overflow: clip;
-	z-index: 4;
+	z-index: 5;
 }
 
 .XHSOverheadHeroPortrait {
@@ -345,7 +395,7 @@
 	overflow: clip;
 	transition-property: width, height;
 	transition-duration: 0.1s;
-	z-index: 1;
+	z-index: 2;
 }
 
 .XHSOverheadHealthLag {
@@ -406,7 +456,7 @@
 	overflow: clip;
 	transition-property: width, height, margin-top;
 	transition-duration: 0.1s;
-	z-index: 1;
+	z-index: 2;
 }
 
 .XHSOverheadManaFill {
@@ -446,10 +496,11 @@
 	text-shadow: 0px 1px 2px #000000, 0px 0px 5px #000000;
 	transition-property: opacity, pre-transform-scale2d;
 	transition-duration: 0.1s;
+	z-index: 4;
 }
 
 .XHSOverheadLabel.XHSOverheadSelectedHero .XHSOverheadHeroPortraitFrame {
-	box-shadow: none;
+	brightness: 1.05;
 }
 
 .XHSOverheadLabel.XHSOverheadSelectedCompact .XHSOverheadContent {
@@ -480,10 +531,10 @@
 }
 
 .XHSOverheadLabel.XHSOverheadSelectedCompact .XHSOverheadVitalsFrame {
-	width: 142px;
+	width: 150px;
 	height: 20px;
-	margin-left: 21px;
-	margin-top: 1px;
+	margin-left: 15px;
+	margin-top: 0px;
 }
 
 .XHSOverheadLabel.XHSOverheadSelectedCompact .XHSOverheadHeroPortraitFrame {
@@ -525,20 +576,22 @@
 }
 
 .XHSOverheadAnchor {
-	width: 1px;
-	height: 18px;
+	width: 2px;
+	height: 20px;
 	horizontal-align: center;
 	margin-top: 4px;
 	background-color: gradient( linear, 0% 0%, 0% 100%, from( #5ad0ffb0 ), to( #5ad0ff00 ) );
+	box-shadow: fill #5ad0ff66 0px 0px 5px 0px;
 }
 
 .XHSOverheadAnchorDot {
-	width: 5px;
-	height: 5px;
+	width: 8px;
+	height: 8px;
 	horizontal-align: center;
-	margin-top: -2px;
+	margin-top: -3px;
+	border-radius: 50%;
 	background-color: #5ad0ff;
-	box-shadow: fill #5ad0ff88 0px 0px 8px 0px;
+	box-shadow: fill #5ad0ffaa 0px 0px 10px 0px;
 }
 
 .XHSOverheadLabel.XHSSupporterTier1 .XHSOverheadBadge {
@@ -821,6 +874,272 @@
 	border-color: #d5b87845;
 }
 
+/* Subtle supporter motion. Gameplay states below override this when needed. */
+.XHSOverheadLabel.XHSSupporterTier1 .XHSOverheadNameBg,
+.XHSOverheadLabel.XHSSupporterTier1 .XHSOverheadHealthLevel {
+	animation-name: XHSOverheadDonatorBreath;
+	animation-duration: 4.2s;
+	animation-iteration-count: infinite;
+	animation-timing-function: ease-in-out;
+}
+
+.XHSOverheadLabel.XHSSupporterTier1 .XHSOverheadNameBg {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #00000000 ), color-stop( .14, #0f3620d8 ), color-stop( .50, #267347f2 ), color-stop( .86, #0f3620d8 ), to( #00000000 ) );
+	box-shadow: fill #0000007c 0px 1px 6px 0px, fill #70e39a32 0px 0px 10px 0px;
+}
+
+.XHSOverheadLabel.XHSSupporterTier1 .XHSOverheadTierOverline {
+	color: #d9ffe3;
+	text-shadow: 0px 1px 2px #000000, 0px 0px 5px #70e39a4c;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #00000000 ), color-stop( .18, #082012e8 ), color-stop( .50, #123821f4 ), color-stop( .82, #082012e8 ), to( #00000000 ) );
+	border-top-color: #70e39a4a;
+	border-bottom-color: #70e39a28;
+	box-shadow: fill #00000096 0px 1px 4px 0px, fill #70e39a22 0px 0px 7px 0px;
+}
+
+.XHSOverheadLabel.XHSSupporterTier2 .XHSOverheadNameBg,
+.XHSOverheadLabel.XHSSupporterTier2 .XHSOverheadHealthLevel {
+	animation-name: XHSOverheadDonatorBreath;
+	animation-duration: 3.8s;
+	animation-delay: 0.2s;
+	animation-iteration-count: infinite;
+	animation-timing-function: ease-in-out;
+}
+
+.XHSOverheadLabel.XHSSupporterTier2 .XHSOverheadNameBg {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #00000000 ), color-stop( .14, #3a2b0bd8 ), color-stop( .50, #80621cf2 ), color-stop( .86, #3a2b0bd8 ), to( #00000000 ) );
+	box-shadow: fill #0000007c 0px 1px 6px 0px, fill #ffcf6638 0px 0px 10px 0px;
+}
+
+.XHSOverheadLabel.XHSSupporterTier2 .XHSOverheadTierOverline {
+	color: #fff1bd;
+	text-shadow: 0px 1px 2px #000000, 0px 0px 6px #ffcf6652;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #00000000 ), color-stop( .18, #241a07e8 ), color-stop( .50, #3d2d0df4 ), color-stop( .82, #241a07e8 ), to( #00000000 ) );
+	border-top-color: #ffcf6650;
+	border-bottom-color: #ffcf662d;
+	box-shadow: fill #00000096 0px 1px 4px 0px, fill #ffcf6624 0px 0px 7px 0px;
+}
+
+.XHSOverheadLabel.XHSSupporterTier3 .XHSOverheadNameBg,
+.XHSOverheadLabel.XHSSupporterTier3 .XHSOverheadHealthLevel {
+	animation-name: XHSOverheadDonatorBreath;
+	animation-duration: 3.4s;
+	animation-delay: 0.35s;
+	animation-iteration-count: infinite;
+	animation-timing-function: ease-in-out;
+}
+
+.XHSOverheadLabel.XHSSupporterTier3 .XHSOverheadNameBg {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #00000000 ), color-stop( .14, #42180fd8 ), color-stop( .50, #8a2c1ef2 ), color-stop( .86, #42180fd8 ), to( #00000000 ) );
+	box-shadow: fill #0000007c 0px 1px 6px 0px, fill #ff5a4338 0px 0px 10px 0px;
+}
+
+.XHSOverheadLabel.XHSSupporterTier3 .XHSOverheadTierOverline {
+	color: #ffd4c7;
+	text-shadow: 0px 1px 2px #000000, 0px 0px 6px #ff5a434e;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #00000000 ), color-stop( .18, #2a0d08e8 ), color-stop( .50, #44150df4 ), color-stop( .82, #2a0d08e8 ), to( #00000000 ) );
+	border-top-color: #ff5a434c;
+	border-bottom-color: #ff5a4328;
+	box-shadow: fill #00000096 0px 1px 4px 0px, fill #ff5a4322 0px 0px 8px 0px;
+}
+
+.XHSOverheadLabel.XHSSupporterTier4 .XHSOverheadNameBg,
+.XHSOverheadLabel.XHSSupporterTier4 .XHSOverheadHealthLevel {
+	animation-name: XHSOverheadDonatorBreathStrong;
+	animation-duration: 3.1s;
+	animation-delay: 0.15s;
+	animation-iteration-count: infinite;
+	animation-timing-function: ease-in-out;
+}
+
+.XHSOverheadLabel.XHSSupporterTier4 .XHSOverheadNameBg {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #00000000 ), color-stop( .14, #062238d8 ), color-stop( .50, #0a5f82f2 ), color-stop( .86, #062238d8 ), to( #00000000 ) );
+	box-shadow: fill #0000007c 0px 1px 6px 0px, fill #5ad0ff3e 0px 0px 11px 0px;
+}
+
+.XHSOverheadLabel.XHSSupporterTier4 .XHSOverheadTierOverline {
+	color: #dcf7ff;
+	text-shadow: 0px 1px 2px #000000, 0px 0px 7px #5ad0ff5a;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #00000000 ), color-stop( .18, #051b2be8 ), color-stop( .50, #0b3047f4 ), color-stop( .82, #051b2be8 ), to( #00000000 ) );
+	border-top-color: #5ad0ff54;
+	border-bottom-color: #5ad0ff30;
+	box-shadow: fill #00000096 0px 1px 4px 0px, fill #5ad0ff28 0px 0px 8px 0px;
+}
+
+.XHSOverheadLabel.XHSSupporterTier5 .XHSOverheadNameBg,
+.XHSOverheadLabel.XHSSupporterTier5 .XHSOverheadHealthLevel {
+	animation-name: XHSOverheadDonatorBreathStrong;
+	animation-duration: 2.7s;
+	animation-delay: 0.3s;
+	animation-iteration-count: infinite;
+	animation-timing-function: ease-in-out;
+}
+
+.XHSOverheadLabel.XHSSupporterTier5 .XHSOverheadNameBg {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #00000000 ), color-stop( .14, #2a1741d8 ), color-stop( .50, #5d318ff2 ), color-stop( .86, #2a1741d8 ), to( #00000000 ) );
+	box-shadow: fill #0000007c 0px 1px 6px 0px, fill #c99cff4a 0px 0px 12px 0px;
+}
+
+.XHSOverheadLabel.XHSSupporterTier5 .XHSOverheadTierOverline {
+	color: #f4e5ff;
+	text-shadow: 0px 1px 2px #000000, 0px 0px 8px #c99cff76;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #00000000 ), color-stop( .15, #1c0e2ce8 ), color-stop( .50, #38204ff6 ), color-stop( .85, #1c0e2ce8 ), to( #00000000 ) );
+	border-top-color: #c99cff6a;
+	border-bottom-color: #c99cff3a;
+	box-shadow: fill #0000009e 0px 1px 4px 0px, fill #c99cff34 0px 0px 10px 0px;
+	animation-name: XHSOverheadDonatorBreathStrong;
+	animation-duration: 2.8s;
+	animation-iteration-count: infinite;
+	animation-timing-function: ease-in-out;
+}
+
+.XHSOverheadLabel.XHSSupporterTier5 .XHSOverheadNameShimmer {
+	animation-name: XHSSupporterTopSweep;
+	animation-duration: 3.6s;
+	animation-delay: 0.4s;
+	animation-iteration-count: infinite;
+	animation-timing-function: ease-in-out;
+}
+
+.XHSOverheadLabel.XHSSupporterTier1 .XHSOverheadHeroPortraitFrame {
+	border: 0px solid transparent;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #0c1c14f4 ), color-stop( .58, #05110af4 ), to( #10291bf0 ) );
+	box-shadow: fill #000000c8 0px 1px 4px 0px, fill #70e39a18 0px 0px 5px 0px, inset #70e39a18 0px 1px 0px 0px;
+}
+
+.XHSOverheadLabel.XHSSupporterTier2 .XHSOverheadHeroPortraitFrame {
+	border: 0px solid transparent;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #211908f4 ), color-stop( .58, #100b03f4 ), to( #31220af0 ) );
+	box-shadow: fill #000000c8 0px 1px 4px 0px, fill #ffcf661a 0px 0px 5px 0px, inset #ffcf661c 0px 1px 0px 0px;
+}
+
+.XHSOverheadLabel.XHSSupporterTier3 .XHSOverheadHeroPortraitFrame {
+	border: 0px solid transparent;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #24100df4 ), color-stop( .58, #130605f4 ), to( #33120ef0 ) );
+	box-shadow: fill #000000c8 0px 1px 4px 0px, fill #ff5a4318 0px 0px 6px 0px, inset #ff5a4318 0px 1px 0px 0px;
+}
+
+.XHSOverheadLabel.XHSSupporterTier4 .XHSOverheadHeroPortraitFrame {
+	border: 0px solid transparent;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #082033f4 ), color-stop( .58, #03101af4 ), to( #0b2b42f0 ) );
+	box-shadow: fill #000000c8 0px 1px 4px 0px, fill #5ad0ff20 0px 0px 7px 0px, inset #5ad0ff1f 0px 1px 0px 0px;
+}
+
+.XHSOverheadLabel.XHSSupporterTier5 .XHSOverheadHeroPortraitFrame {
+	border: 0px solid transparent;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #211230f4 ), color-stop( .58, #100718f4 ), to( #2d1843f0 ) );
+	box-shadow: fill #000000c8 0px 1px 4px 0px, fill #c99cff24 0px 0px 8px 0px, inset #c99cff24 0px 1px 0px 0px;
+}
+
+.XHSOverheadLabel.XHSSupporterTier1 .XHSOverheadHealthLevel {
+	color: #e5ffec;
+	border-color: #70e39aa8;
+	background-color: gradient( linear, 0% 0%, 0% 100%, from( #174c2df4 ), to( #08140df2 ) );
+	box-shadow: fill #000000a0 0px 1px 3px 0px, fill #70e39a42 0px 0px 6px 0px, inset #ffffff18 0px 1px 0px 0px;
+}
+
+.XHSOverheadLabel.XHSSupporterTier2 .XHSOverheadHealthLevel {
+	color: #fff4bd;
+	border-color: #ffcf66b8;
+	background-color: gradient( linear, 0% 0%, 0% 100%, from( #6b4a10f4 ), to( #160f04f2 ) );
+	box-shadow: fill #000000a0 0px 1px 3px 0px, fill #ffcf6646 0px 0px 6px 0px, inset #ffffff1c 0px 1px 0px 0px;
+}
+
+.XHSOverheadLabel.XHSSupporterTier3 .XHSOverheadHealthLevel {
+	color: #ffd7ca;
+	border-color: #ff5a43b8;
+	background-color: gradient( linear, 0% 0%, 0% 100%, from( #642015f4 ), to( #150604f2 ) );
+	box-shadow: fill #000000a0 0px 1px 3px 0px, fill #ff5a4340 0px 0px 6px 0px, inset #ffffff18 0px 1px 0px 0px;
+}
+
+.XHSOverheadLabel.XHSSupporterTier4 .XHSOverheadHealthLevel {
+	color: #e6fbff;
+	border-color: #5ad0ffc0;
+	background-color: gradient( linear, 0% 0%, 0% 100%, from( #0a526ff4 ), to( #03121af2 ) );
+	box-shadow: fill #000000a0 0px 1px 3px 0px, fill #5ad0ff4a 0px 0px 7px 0px, inset #ffffff1c 0px 1px 0px 0px;
+}
+
+.XHSOverheadLabel.XHSSupporterTier5 .XHSOverheadHealthLevel {
+	color: #fff8ff;
+	border-color: #c99cffd0;
+	background-color: gradient( linear, 0% 0%, 0% 100%, from( #5d318ff4 ), to( #14091ff2 ) );
+	box-shadow: fill #000000a0 0px 1px 3px 0px, fill #c99cff55 0px 0px 8px 0px, inset #ffffff20 0px 1px 0px 0px;
+}
+
+.XHSOverheadLabel.XHSOverheadLowHealth .XHSOverheadNameBg,
+.XHSOverheadLabel.XHSOverheadLowHealth .XHSOverheadHealthLevel {
+	animation-name: XHSOverheadCriticalPulse;
+	animation-duration: 0.85s;
+	animation-delay: 0s;
+	animation-iteration-count: infinite;
+	animation-timing-function: ease-in-out;
+}
+
+.XHSOverheadLabel.XHSOverheadLowHealth .XHSOverheadNameBg {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #00000000 ), color-stop( .14, #42120fdc ), color-stop( .50, #8b211cf4 ), color-stop( .86, #42120fdc ), to( #00000000 ) );
+	box-shadow: fill #0000007c 0px 1px 6px 0px, fill #ff5a4340 0px 0px 12px 0px;
+}
+
+.XHSOverheadLabel.XHSOverheadLowHealth .XHSOverheadHeroPortraitFrame {
+	border: 0px solid transparent;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #24110ff4 ), color-stop( .58, #120605f4 ), to( #2b0d0bf0 ) );
+	box-shadow: fill #000000c8 0px 1px 4px 0px, fill #ff5a4322 0px 0px 7px 0px, inset #ff5a431c 0px 1px 0px 0px;
+}
+
+.XHSOverheadLabel.IsDead .XHSOverheadNameBg,
+.XHSOverheadLabel.IsDead .XHSOverheadHealthLevel,
+.XHSOverheadLabel.IsDisconnected .XHSOverheadNameBg,
+.XHSOverheadLabel.IsDisconnected .XHSOverheadHealthLevel {
+	animation-name: none;
+	brightness: 1.0;
+}
+
+.XHSOverheadLabel.XHSOverheadLowHealth .XHSOverheadNameShimmer,
+.XHSOverheadLabel.IsDead .XHSOverheadNameShimmer,
+.XHSOverheadLabel.IsDisconnected .XHSOverheadNameShimmer {
+	animation-name: none;
+	opacity: 0;
+}
+
+.XHSOverheadLabel.IsReincarnating .XHSOverheadNameBg,
+.XHSOverheadLabel.IsReincarnating .XHSOverheadHealthLevel,
+.XHSOverheadMockupPlate.XHSOverheadMockupReincarnating .XHSOverheadNameBg,
+.XHSOverheadMockupPlate.XHSOverheadMockupReincarnating .XHSOverheadHealthLevel {
+	animation-name: XHSOverheadStatusWarningPulse;
+	animation-duration: 1.05s;
+	animation-delay: 0s;
+	animation-iteration-count: infinite;
+	animation-timing-function: ease-in-out;
+}
+
+.XHSOverheadTopStatusRespawn {
+	animation-name: XHSOverheadStatusWarningPulse;
+	animation-duration: 1.7s;
+	animation-iteration-count: infinite;
+	animation-timing-function: ease-in-out;
+}
+
+.XHSOverheadTopStatusRespawn .XHSOverheadTopStatusTimer {
+	animation-name: XHSOverheadTopTimerPulse;
+	animation-duration: 0.95s;
+	animation-iteration-count: infinite;
+	animation-timing-function: ease-in-out;
+}
+
+.XHSOverheadTopStatusTombstone {
+	animation-name: XHSOverheadCriticalPulse;
+	animation-duration: 1.2s;
+	animation-iteration-count: infinite;
+	animation-timing-function: ease-in-out;
+}
+
+.XHSOverheadTopStatusTombstone .XHSOverheadTopStatusTimer {
+	animation-name: XHSOverheadTopTimerPulse;
+	animation-duration: 0.78s;
+	animation-iteration-count: infinite;
+	animation-timing-function: ease-in-out;
+}
+
 #XHSTopHudBar {
 	width: 1140px;
 	height: 106px;
@@ -839,7 +1158,7 @@
 #XHSFocusTimers {
 	horizontal-align: center;
 	vertical-align: top;
-	margin-top: 105px;
+	margin-top: 15px;
 	flow-children: right;
 	overflow: noclip;
 	visibility: collapse;
@@ -1032,6 +1351,41 @@
 	45% { opacity: 0.72; }
 	78% { opacity: 0; transform: translateX( 82px ); }
 	100% { opacity: 0; transform: translateX( 82px ); }
+}
+
+@keyframes 'XHSOverheadDonatorBreath'
+{
+	0% { brightness: 0.98; }
+	50% { brightness: 1.08; }
+	100% { brightness: 0.98; }
+}
+
+@keyframes 'XHSOverheadDonatorBreathStrong'
+{
+	0% { brightness: 0.98; }
+	50% { brightness: 1.16; }
+	100% { brightness: 0.98; }
+}
+
+@keyframes 'XHSOverheadCriticalPulse'
+{
+	0% { brightness: 0.92; }
+	50% { brightness: 1.18; }
+	100% { brightness: 0.92; }
+}
+
+@keyframes 'XHSOverheadStatusWarningPulse'
+{
+	0% { brightness: 0.96; }
+	50% { brightness: 1.14; }
+	100% { brightness: 0.96; }
+}
+
+@keyframes 'XHSOverheadTopTimerPulse'
+{
+	0% { brightness: 0.95; pre-transform-scale2d: 1.0; }
+	50% { brightness: 1.18; pre-transform-scale2d: 1.06; }
+	100% { brightness: 0.95; pre-transform-scale2d: 1.0; }
 }
 
 .XHSAllyCard {

@@ -211,10 +211,6 @@
 				{
 					"ItemDef"			"312" //OffWeapon
 				}
-				"Wearable6"
-				{
-					"ItemDef"			"532" //Ambient Effects
-				}
 			}
 		}
 	}

@@ -49,7 +49,7 @@ modifier_orb_of_wind_active = modifier_orb_of_wind_active or class({})
 function modifier_orb_of_wind_active:IsHidden() return false end
 function modifier_orb_of_wind_active:IsPurgable() return false end
 function modifier_orb_of_wind_active:RemoveOnDeath() return false end
-function modifier_orb_of_wind_active:GetTexture() return "custom/talisman_of_evasion_datadriven" end
+function modifier_orb_of_wind_active:GetTexture() return "modifiers/talisman_of_evasion_datadriven" end
 
 modifier_orb_of_wind = modifier_orb_of_wind or class({})
 

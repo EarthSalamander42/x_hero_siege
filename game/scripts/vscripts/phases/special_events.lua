@@ -158,8 +158,7 @@ function SpecialEvents:MuradinEvent(time)
 	end
 
 	StunBuildings(event_end_delay)
-	CinematicPauseCreeps(SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP)
-	CinematicPauseHeroes(SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP)
+	CinematicPauseGame(SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP)
 
 	local mode = GameRules:GetGameModeEntity()
 	mode:SetFixedRespawnTime(1)
@@ -316,8 +315,7 @@ function SpecialEvents:FarmEvent(time)
 	end
 
 	StunBuildings(time)
-	CinematicPauseCreeps(SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP)
-	CinematicPauseHeroes(SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP)
+	CinematicPauseGame(SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP)
 
 	for k, v in pairs(HeroList:GetAllHeroes()) do
 		if v:IsRealHero() then
@@ -519,8 +517,9 @@ function SpecialEvents:StartRameroAndBaristolEvent(hero)
 	BT_ENABLED = 0
 
 	NotifySpecialArenaStarted(hero, "Ramero and Baristol")
-	TeleportHero(hero, point, delay)
 	CinematicPauseCreeps(SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP)
+	CinematicPauseHeroesForDuration(SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP, delay)
+	TeleportHero(hero, point, delay)
 	StartCinematicPauseCreepsWatch("xhs_ramero_baristol_creep_pause_watch", SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP)
 
 	Timers:CreateTimer(delay, function()
@@ -627,6 +626,7 @@ function SpecialEvents:StartSogatEvent(hero)
 
 	NotifySpecialArenaStarted(hero, "Sogat")
 	CinematicPauseCreeps(SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP)
+	CinematicPauseHeroesForDuration(SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP, delay)
 	StartCinematicPauseCreepsWatch("xhs_sogat_creep_pause_watch", SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP)
 	TeleportHero(hero, point, delay)
 
@@ -704,6 +704,7 @@ end
 
 function SpecialEvents:DuelEvent()
 	CinematicPauseCreeps(SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP)
+	CinematicPauseHeroesForDuration(SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP, 3.0)
 	CustomGameEventManager:Send_ServerToAllClients("show_duel", {})
 
 	Notifications:TopToAll({ text = "Fight your team mates until 1 team survives!", duration = 10.0, style = { color = "white" } })
@@ -803,6 +804,7 @@ end
 
 function SpecialEvents:DuelRanked()
 	CinematicPauseCreeps(SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP)
+	CinematicPauseHeroesForDuration(SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP, 3.0)
 	--	CustomGameEventManager:Send_ServerToAllClients("show_duel", {})
 
 	Notifications:TopToAll({ text = "It's Duel Time!", duration = 5.0, style = { color = "white" } })

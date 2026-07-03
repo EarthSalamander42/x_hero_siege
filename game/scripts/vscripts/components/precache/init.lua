@@ -143,6 +143,10 @@ function XHSPrecache:ReplaceHeroWith(playerID, heroName, gold, xp, oldHero, opti
 		local newHero = PlayerResource:ReplaceHeroWith(playerID, heroName, gold or 0, xp or 0)
 		self.replaceInProgress = false
 
+		if newHero ~= nil and not newHero:IsNull() then
+			newHero.xhs_player_id = playerID
+		end
+
 		if options.startingItems == true and oldHero ~= nil and newHero ~= nil then
 			StartingItems(oldHero, newHero)
 		end

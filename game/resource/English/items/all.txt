@@ -192,6 +192,8 @@
 "DOTA_Tooltip_modifier_orb_of_lightning_Description"			"Grants a chance to root and disarm the target (cooldown on success)"
 "DOTA_Tooltip_modifier_orb_of_lightning_slow"					"Purge"
 "DOTA_Tooltip_modifier_orb_of_lightning_slow_Description"		"Rooted and disarmed."
+"DOTA_Tooltip_modifier_orb_of_wind_active"						"Orb of Wind"
+"DOTA_Tooltip_modifier_orb_of_wind_active_Description"			"Wind Orb is enabled. Evading attacks can trigger Zephyr and Tempest Guard."
 
 "DOTA_Tooltip_ability_item_lifesteal_mask_Description"			"<h1><font color='#FF7800'>Passive:</h1> Grants lifesteal.</font>\n<h1><font color='#FF0000'>Restrictions:</font></h1> Does not stack with other sources of lifesteal."
 "DOTA_Tooltip_ability_item_lifesteal_mask_Note0"				"Lifesteal based on Damage Received by the Target. High Armor Target will give less Healing."

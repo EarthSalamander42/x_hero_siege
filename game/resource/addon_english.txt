@@ -3607,6 +3607,8 @@
 		"DOTA_Tooltip_modifier_orb_of_darkness_active_Description"		"Orb Of Darkness Active is active."
 		"DOTA_Tooltip_modifier_orb_of_earth"		"Orb of Earth"
 		"DOTA_Tooltip_modifier_orb_of_earth_Description"		"Attack damage: %dMODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE%."
+		"DOTA_Tooltip_modifier_orb_of_wind_active"		"Orb of Wind"
+		"DOTA_Tooltip_modifier_orb_of_wind_active_Description"		"Wind Orb is enabled. Evading attacks can trigger Zephyr and Tempest Guard."
 		"DOTA_Tooltip_modifier_orb_of_wind_zephyr"		"Zephyr"
 		"DOTA_Tooltip_modifier_orb_of_wind_zephyr_Description"		"Move speed: %dMODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE%%%."
 		"DOTA_Tooltip_modifier_orb_of_wind_guard"		"Tempest Guard"

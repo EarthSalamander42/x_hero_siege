@@ -50,6 +50,20 @@
 				</Panel>
 			</Panel>
 
+			<Panel id="XHSFragmentQuestIntro" class="XHSFragmentQuestIntro" hittest="false">
+				<Panel class="XHSFragmentQuestIntroHeader">
+					<Panel class="XHSFragmentQuestIntroMark">
+						<Label text="FQ" />
+					</Panel>
+					<Panel class="XHSFragmentQuestIntroCopy">
+						<Label class="XHSFragmentQuestIntroEyebrow" text="TEAM OBJECTIVES" />
+						<Label class="XHSFragmentQuestIntroTitle" text="Fragment Quests Active" />
+						<Label class="XHSFragmentQuestIntroSub" text="Earn stars together. Backend-confirmed stars grant shop fragments at the end of the run." />
+					</Panel>
+				</Panel>
+				<Panel id="XHSFragmentQuestIntroList" class="XHSFragmentQuestIntroList" hittest="false" />
+			</Panel>
+
 			<Panel id="XHSDifficultyAltPanel" hittest="false">
 				<Label id="XHSDifficultyAltValue" text="DIFFICULTY: -----" />
 			</Panel>

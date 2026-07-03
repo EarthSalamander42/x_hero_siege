@@ -13,6 +13,7 @@ function Precache(context)
 	LinkLuaModifier("modifier_tome_of_stats", "items/tomes.lua", LUA_MODIFIER_MOTION_NONE)
 	LinkLuaModifier("modifier_pause_creeps", "modifiers/modifier_pause_creeps.lua", LUA_MODIFIER_MOTION_NONE)
 	LinkLuaModifier("modifier_cinematic_pause", "modifiers/modifier_cinematic_pause.lua", LUA_MODIFIER_MOTION_NONE)
+	LinkLuaModifier("modifier_cinematic_pause_release", "modifiers/modifier_cinematic_pause.lua", LUA_MODIFIER_MOTION_NONE)
 	LinkLuaModifier("modifier_custom_mechanics", "modifiers/modifier_custom_mechanics", LUA_MODIFIER_MOTION_NONE)
 	LinkLuaModifier("modifier_xhs_growth_overhead", "modifiers/modifier_xhs_growth_overhead.lua", LUA_MODIFIER_MOTION_NONE)
 
@@ -76,6 +77,7 @@ function Precache(context)
 	PrecacheResource("model_folder", "models/items/dragon_knight/aurora_warrior_set_dragon_style2_aurora_warrior_set", context)
 	PrecacheResource("model_folder", "models/heroes/dragon_knight", context)         -- For some reason precaching the hero doesn't fix missing model
 	PrecacheResource("model_folder", "models/heroes/juggernaut", context)      -- Grom Hellscream
+	PrecacheResource("model_folder", "models/heroes/troll_warlord", context)   -- Orc ranged wave 3
 	PrecacheResource("model_folder", "models/items/undying/idol_of_ruination", context) -- Archimonde minions
 
 	PrecacheResource("model", "models/creeps/neutral_creeps/n_creep_troll_skeleton/n_creep_troll_skeleton_fx.vmdl", context)
@@ -113,10 +115,11 @@ function Precache(context)
 	XHSPrecache:PrecacheUnit("npc_dota_hero_lycan", nil, -1)            -- Creep level 4 human melee
 	-- --	XHSPrecache:PrecacheUnit("npc_dota_hero_magnataur", nil, -1) 	-- Magnataur & Tauren Chieftain
 	XHSPrecache:PrecacheUnit("npc_dota_hero_morphling", nil, -1) -- Archmage & Archimage
-	-- XHSPrecache:PrecacheUnit("npc_dota_hero_naga_siren", nil, -1)    -- Special Wave 2
+	XHSPrecache:PrecacheUnit("npc_dota_hero_naga_siren", nil, -1)    -- Special Wave 2
 	-- XHSPrecache:PrecacheUnit("npc_dota_hero_necrolyte", nil, -1)     -- Special Wave 1 & Tauren Chieftain & Dark Summoner & LK & Paladin &
 	-- XHSPrecache:PrecacheUnit("npc_dota_hero_ogre_magi", nil, -1)     -- Sniper
 	-- XHSPrecache:PrecacheUnit("npc_dota_hero_phoenix", nil, -1)       -- Dragons Level 1 & Invo
+	XHSPrecache:PrecacheUnit("npc_dota_hero_troll_warlord", nil, -1) -- Orc ranged wave 3
 	-- XHSPrecache:PrecacheUnit("npc_dota_hero_razor", nil, -1)         -- Ghost Revenant? & Sniper [prolly the NPC revenants too]
 	-- --	XHSPrecache:PrecacheUnit("npc_dota_hero_silencer", nil, -1) 		-- Warden (PA) & Kobold (Meepo)
 	-- XHSPrecache:PrecacheUnit("npc_dota_hero_slardar", nil, -1)       -- Slardar (Centurion) & wind & LK

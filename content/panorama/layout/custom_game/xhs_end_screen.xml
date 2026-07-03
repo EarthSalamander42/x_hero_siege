@@ -51,9 +51,8 @@
 
 			<Panel class="XHSEndScreenBody">
 				<Panel class="XHSEndScreenLeft">
-					<Panel id="XHSEndScreenRunSummary" class="XHSEndScreenSummary" />
-					<Panel id="XHSEndScreenFragmentQuests" class="XHSEndScreenFragmentQuests" />
 					<Panel id="XHSEndScreenMvpCards" class="XHSEndScreenMvpGrid" />
+					<Panel id="XHSEndScreenFragmentQuests" class="XHSEndScreenFragmentQuests" />
 				</Panel>
 
 				<Panel class="XHSEndScreenPlayersPanel XHSPanel">

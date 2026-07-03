@@ -663,6 +663,11 @@ function api:UpdateSupporterPassSettings(player_id, settings, callback)
 			elseif settings.xhs_ingame_advertize_hidden ~= nil then
 				api.players[steamid].xhs_ingame_advertize_hidden = settings.xhs_ingame_advertize_hidden
 			end
+			if api.players[steamid].xhs_ingame_advertize_hidden ~= nil then
+				api.players[steamid].supporter_pass = api.players[steamid].supporter_pass or {}
+				api.players[steamid].supporter_pass.settings = api.players[steamid].supporter_pass.settings or {}
+				api.players[steamid].supporter_pass.settings.xhs_ingame_advertize_hidden = api.players[steamid].xhs_ingame_advertize_hidden
+			end
 		end
 
 		callback(true, data)
@@ -1407,8 +1412,30 @@ function api:CompleteGame()
 		return total
 	end
 
+	local function GetEndScreenHeroPlayerID(hero)
+		if hero == nil or hero:IsNull() or not hero:IsRealHero() then
+			return nil
+		end
+
+		if XHSGetPlayerIDFromUnit ~= nil then
+			local playerID = XHSGetPlayerIDFromUnit(hero)
+			if playerID ~= nil then
+				return playerID
+			end
+		end
+
+		if hero.GetPlayerID ~= nil then
+			local playerID = hero:GetPlayerID()
+			if playerID ~= nil and playerID >= 0 and PlayerResource:IsValidPlayerID(playerID) then
+				return playerID
+			end
+		end
+
+		return nil
+	end
+
 	local function IsEndScreenHero(hero, playerID)
-		return hero ~= nil and not hero:IsNull() and hero:IsRealHero() and hero:GetPlayerID() == playerID
+		return GetEndScreenHeroPlayerID(hero) == playerID
 	end
 
 	local function ResolveEndScreenHero(playerID)
