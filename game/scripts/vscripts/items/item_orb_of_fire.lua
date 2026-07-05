@@ -79,6 +79,7 @@ end
 --------------------------------------------------------------
 
 modifier_orb_of_fire_active = class({})
+modifier_orb_of_fire_active.XHS_LINK_CLIENT = true
 
 function modifier_orb_of_fire_active:IsHidden() return false end
 function modifier_orb_of_fire_active:IsPurgable() return false end
@@ -144,6 +145,7 @@ end
 --------------------------------------------------------------
 
 modifier_orb_of_fire_passive = class({})
+modifier_orb_of_fire_passive.XHS_LINK_CLIENT = true
 
 function modifier_orb_of_fire_passive:IsHidden() return true end
 function modifier_orb_of_fire_passive:IsPurgable() return false end

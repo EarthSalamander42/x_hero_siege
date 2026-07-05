@@ -37,6 +37,7 @@ end
 ---------------------------------
 
 if modifier_creature_chronosphere_aura == nil then modifier_creature_chronosphere_aura = class({}) end
+modifier_creature_chronosphere_aura.XHS_LINK_CLIENT = true
 
 function modifier_creature_chronosphere_aura:IsPurgable() return false end
 
@@ -101,6 +102,7 @@ end
 -----	Chronosphere Handler	-----
 -------------------------------------
 if modifier_creature_chronosphere_handler == nil then modifier_creature_chronosphere_handler = class({}) end
+modifier_creature_chronosphere_handler.XHS_LINK_CLIENT = true
 
 function modifier_creature_chronosphere_handler:IsHidden() return true end
 

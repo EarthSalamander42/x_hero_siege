@@ -1,4 +1,5 @@
 modifier_provides_fow_position = class({})
+modifier_provides_fow_position.XHS_LINK_CLIENT = true
 
 --------------------------------------------------------------------------------
 

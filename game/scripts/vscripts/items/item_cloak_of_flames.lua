@@ -23,6 +23,7 @@ end
 --	Basic modifier definition
 -----------------------------------------------------------------------------------------------------------
 if modifier_xhs_cloak_of_flames_basic == nil then modifier_xhs_cloak_of_flames_basic = class({}) end
+modifier_xhs_cloak_of_flames_basic.XHS_LINK_CLIENT = true
 
 function modifier_xhs_cloak_of_flames_basic:IsHidden() return true end
 function modifier_xhs_cloak_of_flames_basic:IsPurgable() return false end
@@ -67,6 +68,7 @@ end
 --	Aura definition
 -----------------------------------------------------------------------------------------------------------
 if modifier_xhs_cloak_of_flames_aura == nil then modifier_xhs_cloak_of_flames_aura = class({}) end
+modifier_xhs_cloak_of_flames_aura.XHS_LINK_CLIENT = true
 function modifier_xhs_cloak_of_flames_aura:IsAura() return true end
 function modifier_xhs_cloak_of_flames_aura:IsHidden() return true end
 function modifier_xhs_cloak_of_flames_aura:IsDebuff() return false end
@@ -95,6 +97,7 @@ end
 --	Aura effect (damage)
 -----------------------------------------------------------------------------------------------------------
 if modifier_xhs_cloak_of_flames_burn == nil then modifier_xhs_cloak_of_flames_burn = class({}) end
+modifier_xhs_cloak_of_flames_burn.XHS_LINK_CLIENT = true
 function modifier_xhs_cloak_of_flames_burn:IsHidden() return false end
 function modifier_xhs_cloak_of_flames_burn:IsDebuff() return true end
 function modifier_xhs_cloak_of_flames_burn:IsPurgable() return false end

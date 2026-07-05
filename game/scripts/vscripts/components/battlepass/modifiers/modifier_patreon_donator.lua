@@ -1,4 +1,5 @@
 modifier_patreon_donator = class({})
+modifier_patreon_donator.XHS_LINK_CLIENT = true
 
 local DONATOR_BORROWED_TIME_PARTICLES = {
 	blue = "particles/units/heroes/hero_abaddon/holdout_borrowed_time.vpcf",

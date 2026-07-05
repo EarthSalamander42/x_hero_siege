@@ -6,7 +6,7 @@ var XHSTopHud = (function () {
 	var HERO_REFRESH_SECONDS = 0.75;
 	var VITALS_REFRESH_SECONDS = 0.12;
 	var SLOW_REFRESH_SECONDS = 1.0;
-	var OVERHEAD_REFRESH_SECONDS = 0.03;
+	var OVERHEAD_REFRESH_SECONDS = 0.01;
 	var OVERHEAD_WORLD_Z_OFFSET = 238;
 	var OVERHEAD_SCREEN_Y_OFFSET = 22;
 	var OVERHEAD_PERSPECTIVE_BIAS = 38;
@@ -14,15 +14,22 @@ var XHSTopHud = (function () {
 	var OVERHEAD_PLATE_HEIGHT = 50;
 	var OVERHEAD_LABEL_HEIGHT = 96;
 	var OVERHEAD_FADE_MARGIN = 96;
+	var OVERHEAD_BLOCKER_REFRESH_SECONDS = 0.12;
 	var OVERHEAD_HEALTH_TICK_INTERVAL = 250;
 	// Flip this back to true to show the static overhead health bar design sandbox.
 	var OVERHEAD_MOCKUP_MODE = false;
+	var OVERHEAD_TIER_DEV_VIEW = false;
 	var DAILY_FRAGMENT_CAP = 100;
 	var WEEKLY_FRAGMENT_CAP = DAILY_FRAGMENT_CAP;
 
 	var allyCards = {};
 	var vipCards = {};
 	var overheadLabels = {};
+	var overheadUiBlockerRects = [];
+	var overheadUiBlockerRefreshAt = 0;
+	var overheadUiBlockerRootWidth = 0;
+	var overheadUiBlockerRootHeight = 0;
+	var isSpecialEventPanelVisible = false;
 	var activeCurrentEventTimerName = null;
 	var activePersonalTimerName = null;
 	var currentEventTimerMaxRemaining = {};
@@ -601,6 +608,148 @@ var XHSTopHud = (function () {
 		return Clamp(edgeDistance / OVERHEAD_FADE_MARGIN, 0, 1);
 	}
 
+	function GetNowSeconds() {
+		return SafeValue(function () {
+			return Date.now() / 1000;
+		}, SafeValue(function () {
+			return Game.GetGameTime();
+		}, 0));
+	}
+
+	function RectIntersects(a, b) {
+		return a.left < b.right &&
+			a.right > b.left &&
+			a.top < b.bottom &&
+			a.bottom > b.top;
+	}
+
+	function AddOverheadBlockerRect(blockers, left, top, right, bottom, padding) {
+		padding = ToNumber(padding, 0);
+
+		if (right <= left || bottom <= top) {
+			return;
+		}
+
+		blockers.push({
+			left: left - padding,
+			top: top - padding,
+			right: right + padding,
+			bottom: bottom + padding
+		});
+	}
+
+	function IsPanelUsableOverheadBlocker(panel) {
+		if (!panel || panel.visible === false) {
+			return false;
+		}
+
+		if (panel.BHasClass && panel.BHasClass("XHSOptionalTimer")) {
+			return false;
+		}
+
+		var width = Number(panel.actuallayoutwidth || panel.desiredlayoutwidth || 0);
+		var height = Number(panel.actuallayoutheight || panel.desiredlayoutheight || 0);
+		return width > 0 && height > 0;
+	}
+
+	function AddPanelOverheadBlocker(blockers, panelID, rootPosition, padding) {
+		var panel = Panel(panelID);
+		if (!IsPanelUsableOverheadBlocker(panel)) {
+			return;
+		}
+
+		var position = GetPanelWindowPosition(panel);
+		var width = Number(panel.actuallayoutwidth || panel.desiredlayoutwidth || 0);
+		var height = Number(panel.actuallayoutheight || panel.desiredlayoutheight || 0);
+
+		AddOverheadBlockerRect(
+			blockers,
+			position.x - rootPosition.x,
+			position.y - rootPosition.y,
+			position.x - rootPosition.x + width,
+			position.y - rootPosition.y + height,
+			padding
+		);
+	}
+
+	function BuildOverheadUiBlockers(root, rootWidth, rootHeight) {
+		var blockers = [];
+		var rootPosition = GetPanelWindowPosition(root);
+		var minimapSize = Clamp(rootWidth * 0.16, 260, 330);
+		var bottomHudTop = Math.max(rootHeight - 190, rootHeight * 0.80);
+
+		AddOverheadBlockerRect(blockers, 0, 0, rootWidth, 126, 0);
+		AddOverheadBlockerRect(blockers, rootWidth * 0.24, bottomHudTop, rootWidth * 0.76, rootHeight, 0);
+		AddOverheadBlockerRect(blockers, 0, rootHeight - minimapSize - 14, minimapSize + 22, rootHeight, 0);
+		AddOverheadBlockerRect(blockers, rootWidth - 335, rootHeight - 160, rootWidth, rootHeight, 0);
+		AddOverheadBlockerRect(blockers, 0, 120, Math.min(430, rootWidth * 0.26), rootHeight - minimapSize - 28, 0);
+
+		AddPanelOverheadBlocker(blockers, "XHSTopHudBar", rootPosition, 8);
+		AddPanelOverheadBlocker(blockers, "XHSFocusTimers", rootPosition, 8);
+		AddPanelOverheadBlocker(blockers, "XHSDifficultyAltPanel", rootPosition, 8);
+		AddPanelOverheadBlocker(blockers, "XHSFragmentQuestIntro", rootPosition, 10);
+
+		if (IsSpecialEventPanelBlockingUi()) {
+			var eventWidth = Math.min(1040, rootWidth * 0.64);
+			var eventHeight = Math.min(620, rootHeight * 0.62);
+			AddOverheadBlockerRect(
+				blockers,
+				(rootWidth - eventWidth) * 0.5,
+				(rootHeight - eventHeight) * 0.5,
+				(rootWidth + eventWidth) * 0.5,
+				(rootHeight + eventHeight) * 0.5,
+				16
+			);
+		}
+
+		return blockers;
+	}
+
+	function GetOverheadUiBlockers(root, rootWidth, rootHeight) {
+		var now = GetNowSeconds();
+		if (now < overheadUiBlockerRefreshAt &&
+			rootWidth === overheadUiBlockerRootWidth &&
+			rootHeight === overheadUiBlockerRootHeight) {
+			return overheadUiBlockerRects;
+		}
+
+		overheadUiBlockerRootWidth = rootWidth;
+		overheadUiBlockerRootHeight = rootHeight;
+		overheadUiBlockerRects = BuildOverheadUiBlockers(root, rootWidth, rootHeight);
+		overheadUiBlockerRefreshAt = now + OVERHEAD_BLOCKER_REFRESH_SECONDS;
+		return overheadUiBlockerRects;
+	}
+
+	function DoesOverheadOverlapUi(labelRect, root, rootWidth, rootHeight) {
+		var blockers = GetOverheadUiBlockers(root, rootWidth, rootHeight);
+		for (var i = 0; i < blockers.length; i++) {
+			if (RectIntersects(labelRect, blockers[i])) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	function InvalidateOverheadBlockers() {
+		overheadUiBlockerRefreshAt = 0;
+	}
+
+	function SetSharedSpecialEventVisible(isVisible) {
+		SafeValue(function () {
+			if (GameUI.CustomUIConfig) {
+				GameUI.CustomUIConfig().xhsSpecialEventVisible = !!isVisible;
+			}
+			return true;
+		}, false);
+	}
+
+	function IsSpecialEventPanelBlockingUi() {
+		return isSpecialEventPanelVisible || SafeValue(function () {
+			return GameUI.CustomUIConfig && GameUI.CustomUIConfig().xhsSpecialEventVisible === true;
+		}, false);
+	}
+
 	function CreateOverheadHeroImage(parent, id) {
 		var portrait = SafeValue(function () {
 			return $.CreatePanel("DOTAHeroImage", parent, id);
@@ -709,6 +858,10 @@ var XHSTopHud = (function () {
 		label.SetAttributeInt("player_id", playerID);
 		label.SetAttributeInt("ent_index", -1);
 		label.hittest = false;
+
+		var frameArt = $.CreatePanel("Panel", label, "XHSOverheadFrameArt_" + playerID);
+		frameArt.AddClass("XHSOverheadFrameArt");
+		frameArt.hittest = false;
 
 		var value = $.CreatePanel("Label", label, "XHSOverheadValue_" + playerID);
 		value.AddClass("XHSOverheadValue");
@@ -915,11 +1068,25 @@ var XHSTopHud = (function () {
 
 	function CreateOverheadMockupPlate(parent, data, index) {
 		var key = "Mock" + index;
-		var label = $.CreatePanel("Panel", parent, "XHSOverheadMockup_" + key);
+		var cell = $.CreatePanel("Panel", parent, "XHSOverheadMockupCell_" + key);
+		cell.AddClass("XHSOverheadTierDevCell");
+		cell.hittest = false;
+
+		var caption = $.CreatePanel("Label", cell, "XHSOverheadTierDevCaption_" + key);
+		caption.AddClass("XHSOverheadTierDevCaption");
+		caption.text = data.caption || "";
+		caption.SetHasClass("XHSOverheadTierDevCaptionVisible", !!data.caption);
+		caption.hittest = false;
+
+		var label = $.CreatePanel("Panel", cell, "XHSOverheadMockup_" + key);
 		label.AddClass("XHSOverheadLabel");
 		label.AddClass("XHSOverheadMockupPlate");
 		label.hittest = false;
 		AddMockupClassList(label, data.classes);
+
+		var frameArt = $.CreatePanel("Panel", label, "XHSOverheadFrameArt_" + key);
+		frameArt.AddClass("XHSOverheadFrameArt");
+		frameArt.hittest = false;
 
 		var value = $.CreatePanel("Label", label, "XHSOverheadValue_" + key);
 		value.AddClass("XHSOverheadValue");
@@ -933,6 +1100,11 @@ var XHSTopHud = (function () {
 		var topRow = $.CreatePanel("Panel", content, "XHSOverheadTopRow_" + key);
 		topRow.AddClass("XHSOverheadTopRow");
 		topRow.hittest = false;
+
+		var tierOverline = $.CreatePanel("Label", topRow, "XHSOverheadTierOverline_" + key);
+		tierOverline.AddClass("XHSOverheadTierOverline");
+		tierOverline.text = data.tierOverline || "";
+		tierOverline.hittest = false;
 
 		var nameBg = $.CreatePanel("Panel", topRow, "XHSOverheadNameBg_" + key);
 		nameBg.AddClass("XHSOverheadNameBg");
@@ -1030,6 +1202,7 @@ var XHSTopHud = (function () {
 		label.SetHasClass("IsReincarnating", !!data.reincarnating);
 		label.SetHasClass("IsDisconnected", !!data.disconnected);
 		label.SetHasClass("XHSOverheadMockupDualStatus", !!data.altStatus);
+		label.SetHasClass("XHSOverheadHasTierOverline", !!data.tierOverline);
 
 		SetOverheadMockupAccent(label, key, data.color);
 		return label;
@@ -1101,20 +1274,80 @@ var XHSTopHud = (function () {
 		}
 	}
 
-	function BuildOverheadMockups() {
-		if (!OVERHEAD_MOCKUP_MODE) {
-			return;
+	function GetOverheadTierDevMockups() {
+		var heroName = "npc_dota_hero_juggernaut";
+		var common = {
+			name: "BLADEMASTER",
+			heroName: heroName,
+			value: "5760 / 5760",
+			status: "ANKH x2 / HERO LEVEL 16",
+			level: 16,
+			healthPercent: 86,
+			manaPercent: 68,
+			maxHealth: 5760,
+		};
+
+		function Entry(tier, caption, tierOverline, color, extraClasses) {
+			var classes = ["XHSOverheadTierDevPlate", "XHSOverheadFrameTier" + tier, "XHSSupporterTier" + tier];
+			if (tier > 0) {
+				classes.push("XHSOverheadMockupDonator");
+			}
+			if (extraClasses) {
+				for (var i = 0; i < extraClasses.length; i++) {
+					classes.push(extraClasses[i]);
+				}
+			}
+
+			return {
+				name: common.name,
+				heroName: common.heroName,
+				value: common.value,
+				status: common.status,
+				level: common.level,
+				healthPercent: common.healthPercent,
+				manaPercent: common.manaPercent,
+				maxHealth: common.maxHealth,
+				caption: caption,
+				tierOverline: tierOverline,
+				color: color,
+				classes: classes,
+			};
 		}
 
+		return [
+			Entry(0, "A / NON DONATOR", "", "#7db9d8"),
+			Entry(1, "B / DONATOR", "DONATOR", "#70e39a"),
+			Entry(2, "C / GOLDEN DONATOR", "GOLDEN DONATOR", "#ffcf66"),
+			Entry(3, "D / EMBER DONATOR", "EMBER DONATOR", "#ff5a43"),
+			Entry(4, "E / STONEGUARD DONATOR", "STONEGUARD DONATOR", "#5ad0ff", ["XHSOverheadSelectedHero"]),
+			Entry(5, "F / EARTHWARDEN DONATOR", "EARTHWARDEN DONATOR", "#c99cff"),
+		];
+	}
+
+	function BuildOverheadMockups() {
 		var root = Panel("XHSOverheadMockupRoot");
 		if (!root) {
 			return;
 		}
 
 		root.RemoveAndDeleteChildren();
-		BuildOverheadTopStatusMockups();
+		root.SetHasClass("XHSOverheadTierDevView", OVERHEAD_TIER_DEV_VIEW);
+		root.SetHasClass("XHSOverheadLegacyMockupView", OVERHEAD_MOCKUP_MODE && !OVERHEAD_TIER_DEV_VIEW);
 
-		var mockups = [
+		var topRoot = Panel("XHSOverheadTopStatusMockupRoot");
+		if (topRoot && (!OVERHEAD_MOCKUP_MODE || OVERHEAD_TIER_DEV_VIEW)) {
+			topRoot.RemoveAndDeleteChildren();
+		}
+
+		if (!OVERHEAD_MOCKUP_MODE && !OVERHEAD_TIER_DEV_VIEW) {
+			return;
+		}
+
+		if (OVERHEAD_MOCKUP_MODE && !OVERHEAD_TIER_DEV_VIEW) {
+			BuildOverheadTopStatusMockups();
+		}
+
+		var mockups = OVERHEAD_TIER_DEV_VIEW ? GetOverheadTierDevMockups() : [
 			{ name: "MIRANA", heroName: "npc_dota_hero_mirana", value: "2140 / 2140", status: "ANKH x1 / HERO LEVEL 12", altStatus: "DEFAULT STATE", level: 12, healthPercent: 100, manaPercent: 68, maxHealth: 2140, color: "#7db9ff", classes: ["XHSOverheadMockupDefault"] },
 			{ name: "JUGGERNAUT", heroName: "npc_dota_hero_juggernaut", value: "2840 / 2840", status: "SELECTING HERO", altStatus: "LOCK-IN PREVIEW", level: 18, healthPercent: 100, manaPercent: 82, maxHealth: 2840, color: "#5ad0ff", classes: ["XHSOverheadMockupSelecting", "XHSOverheadSelectedHero"] },
 			{ name: "CRYSTAL MAIDEN", heroName: "npc_dota_hero_crystal_maiden", value: "1860 / 1860", status: "ANKH x2 / HERO LEVEL 16", altStatus: "GOLDEN DONATOR", level: 16, healthPercent: 88, manaPercent: 100, maxHealth: 1860, color: "#ffcf66", classes: ["XHSOverheadMockupDonator", "XHSSupporterTier2"] },
@@ -1228,6 +1461,7 @@ var XHSTopHud = (function () {
 
 		ClearSupporterTierClasses(label);
 		label.AddClass("XHSSupporterTier" + data.tier);
+		label.AddClass("XHSOverheadFrameTier" + data.tier);
 		SetOverheadAccent(label, playerID, data);
 
 		var tierOverline = FormatOverheadTierOverline(data);
@@ -1261,6 +1495,7 @@ var XHSTopHud = (function () {
 		if (value) {
 			value.text = FormatNumber(currentHealth) + " / " + FormatNumber(currentMaxHealth);
 		}
+		label.SetHasClass("XHSOverheadHasVitals", currentMaxHealth > 1 || currentHealth > 0);
 
 		if (healthFill) {
 			healthFill.style.width = clampedHealth + "%";
@@ -1315,9 +1550,20 @@ var XHSTopHud = (function () {
 		var x = screen.x + bias - (OVERHEAD_PLATE_WIDTH * 0.5);
 		var y = screen.y - OVERHEAD_SCREEN_Y_OFFSET - OVERHEAD_PLATE_HEIGHT;
 		var edgeFade = GetOverheadEdgeFade(x, y, rootWidth, rootHeight);
+		var labelRect = {
+			left: x,
+			top: y,
+			right: x + OVERHEAD_PLATE_WIDTH,
+			bottom: y + OVERHEAD_LABEL_HEIGHT
+		};
 		var isVisible = edgeFade > 0;
 
 		label.style.position = Math.floor(x) + "px " + Math.floor(y) + "px 0px";
+		if (isVisible && DoesOverheadOverlapUi(labelRect, root, rootWidth, rootHeight)) {
+			SetOverheadLabelVisible(label, false);
+			return;
+		}
+
 		label.style.opacity = edgeFade.toFixed(2);
 		SetOverheadLabelVisible(label, isVisible);
 	}
@@ -1514,6 +1760,14 @@ var XHSTopHud = (function () {
 			MoveCameraToUnit(card.GetAttributeInt("ent_index", -1));
 		});
 
+		card.SetPanelEvent("onmouseover", function () {
+			ShowAllyHover(card, playerID);
+		});
+
+		card.SetPanelEvent("onmouseout", function () {
+			HideAllyHover(card);
+		});
+
 		return card;
 	}
 
@@ -1556,6 +1810,7 @@ var XHSTopHud = (function () {
 
 		for (var tier = 0; tier <= 5; tier++) {
 			panel.RemoveClass("XHSSupporterTier" + tier);
+			panel.RemoveClass("XHSOverheadFrameTier" + tier);
 		}
 	}
 
@@ -2219,6 +2474,17 @@ var XHSTopHud = (function () {
 		GameEvents.Subscribe("hide_timer_spirit_beast", function () { ShowPersonalTimer("spirit_beast", false); });
 		GameEvents.Subscribe("hide_timer_frost_infernal", function () { ShowPersonalTimer("frost_infernal", false); });
 		GameEvents.Subscribe("hide_timer_all_hero_image", function () { ShowPersonalTimer("all_hero_images", false); });
+
+		GameEvents.Subscribe("show_events", function () {
+			isSpecialEventPanelVisible = true;
+			SetSharedSpecialEventVisible(true);
+			InvalidateOverheadBlockers();
+		});
+		GameEvents.Subscribe("quit_events", function () {
+			isSpecialEventPanelVisible = false;
+			SetSharedSpecialEventVisible(false);
+			InvalidateOverheadBlockers();
+		});
 	}
 
 	function StartHeroRefreshLoop() {

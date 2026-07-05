@@ -1,4 +1,5 @@
 modifier_pause_creeps = modifier_pause_creeps or class({})
+modifier_pause_creeps.XHS_LINK_CLIENT = true
 
 function modifier_pause_creeps:IsHidden() return true end
 function modifier_pause_creeps:IsPurgable() return false end

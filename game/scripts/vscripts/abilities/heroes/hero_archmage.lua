@@ -22,6 +22,7 @@ function holdout_mana_shield:OnToggle()
 end
 
 modifier_holdout_mana_shield = modifier_holdout_mana_shield or class({})
+modifier_holdout_mana_shield.XHS_LINK_CLIENT = true
 
 function modifier_holdout_mana_shield:IsPurgable() return false end
 function modifier_holdout_mana_shield:RemoveOnDeath() return false end

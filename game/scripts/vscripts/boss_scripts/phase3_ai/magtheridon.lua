@@ -8,11 +8,17 @@ LinkLuaModifier("modifier_xhs_magtheridon_slow", "boss_scripts/phase3_ai/magther
 LinkLuaModifier("modifier_xhs_magtheridon_cast_lock", "boss_scripts/phase3_ai/magtheridon.lua", LUA_MODIFIER_MOTION_NONE)
 
 modifier_xhs_magtheridon_phase3_ai = modifier_xhs_magtheridon_phase3_ai or class({})
+modifier_xhs_magtheridon_phase3_ai.XHS_LINK_CLIENT = true
 modifier_xhs_magtheridon_fragment = modifier_xhs_magtheridon_fragment or class({})
+modifier_xhs_magtheridon_fragment.XHS_LINK_CLIENT = true
 modifier_xhs_magtheridon_empower = modifier_xhs_magtheridon_empower or class({})
+modifier_xhs_magtheridon_empower.XHS_LINK_CLIENT = true
 modifier_xhs_magtheridon_twin_lockout = modifier_xhs_magtheridon_twin_lockout or class({})
+modifier_xhs_magtheridon_twin_lockout.XHS_LINK_CLIENT = true
 modifier_xhs_magtheridon_slow = modifier_xhs_magtheridon_slow or class({})
+modifier_xhs_magtheridon_slow.XHS_LINK_CLIENT = true
 modifier_xhs_magtheridon_cast_lock = modifier_xhs_magtheridon_cast_lock or class({})
+modifier_xhs_magtheridon_cast_lock.XHS_LINK_CLIENT = true
 
 local INFERNAL_ROOT_MODIFIER = "modifier_xhs_magtheridon_infernal_root"
 local EMPOWER_OVERHEAD_PARTICLE = "particles/units/heroes/hero_abaddon/abaddon_curse_counter_stack.vpcf"

@@ -31,6 +31,7 @@ function item_tome_of_power:OnSpellStart()
 end
 
 modifier_tome_of_stats = modifier_tome_of_stats or class({})
+modifier_tome_of_stats.XHS_LINK_CLIENT = true
 
 function modifier_tome_of_stats:IsHidden() return true end
 

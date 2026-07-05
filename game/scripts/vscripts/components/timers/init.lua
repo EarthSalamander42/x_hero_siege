@@ -1,5 +1,7 @@
 -- require("components/timers/events")
 
+local SPECIAL_WAVE_WARNING_SOUND = "Dungeon.Stinger03"
+
 if CustomTimers == nil then
 	CustomTimers = class({})
 
@@ -21,10 +23,12 @@ if CustomTimers == nil then
 	CustomTimers.special_wave = 1
 	CustomTimers.enable_special_wave = false -- todo: use this to enable/disable special waves when notification happens 30s before and disable it when it has spawned. This will allow waves to spawn exactly when supposed to, rather than a few seconds before/after
 	CustomTimers.special_waves_disabled = false
+	CustomTimers.active_special_waves = {}
 	CustomTimers.active_special_wave_units = {}
 	CustomTimers.active_special_wave_count = 0
 	CustomTimers.active_special_wave_total = 0
 	CustomTimers.active_special_wave_direction = ""
+	CustomTimers.pending_special_wave_display_id = nil
 	CustomTimers.active_special_wave_timer_particles = {}
 	CustomTimers.proc_final_wave = false
 	CustomTimers.final_wave_delay = 60.0
@@ -124,6 +128,82 @@ function XHSSetGlobalObjectiveState(id, state, text, seconds, started)
 	})
 end
 
+function CustomTimers:GetVisibleSpecialWave()
+	local waves = CustomTimers.active_special_waves or {}
+	return waves[1]
+end
+
+function CustomTimers:SyncVisibleSpecialWaveFields()
+	local wave = CustomTimers:GetVisibleSpecialWave()
+	if wave ~= nil then
+		CustomTimers.active_special_wave_count = wave.remaining or 0
+		CustomTimers.active_special_wave_total = wave.total or 0
+		CustomTimers.active_special_wave_direction = wave.direction or ""
+	else
+		CustomTimers.active_special_wave_count = 0
+		CustomTimers.active_special_wave_total = 0
+		CustomTimers.active_special_wave_direction = ""
+	end
+
+	return wave
+end
+
+function CustomTimers:IsSpecialWaveDisplayPending(wave)
+	return wave ~= nil and CustomTimers.pending_special_wave_display_id ~= nil and CustomTimers.pending_special_wave_display_id == wave.id
+end
+
+function CustomTimers:BroadcastSpecialWaveActive(wave)
+	if wave == nil then return end
+
+	CustomGameEventManager:Send_ServerToAllClients("xhs_wave_active", {
+		remaining = wave.remaining or 0,
+		total = wave.total or 0,
+		direction = wave.direction or "",
+		wave_index = wave.wave_index or 0,
+	})
+end
+
+function CustomTimers:BroadcastVisibleSpecialWave()
+	local wave = CustomTimers:SyncVisibleSpecialWaveFields()
+	if wave == nil or CustomTimers:IsSpecialWaveDisplayPending(wave) then return end
+
+	CustomTimers:BroadcastSpecialWaveActive(wave)
+end
+
+function CustomTimers:RemoveSpecialWave(wave)
+	if wave == nil then return false end
+
+	local waves = CustomTimers.active_special_waves or {}
+	for index, activeWave in ipairs(waves) do
+		if activeWave == wave then
+			table.remove(waves, index)
+			break
+		end
+	end
+
+	if CustomTimers.pending_special_wave_display_id == wave.id then
+		CustomTimers.pending_special_wave_display_id = nil
+	end
+
+	CustomTimers:SyncVisibleSpecialWaveFields()
+	return true
+end
+
+function CustomTimers:ScheduleVisibleSpecialWaveAfterClear()
+	local wave = CustomTimers:GetVisibleSpecialWave()
+	if wave == nil then return end
+
+	CustomTimers.pending_special_wave_display_id = wave.id
+	Timers:CreateTimer(2.4, function()
+		local visibleWave = CustomTimers:GetVisibleSpecialWave()
+		if visibleWave == nil or visibleWave.id ~= wave.id then return nil end
+
+		CustomTimers.pending_special_wave_display_id = nil
+		CustomTimers:BroadcastVisibleSpecialWave()
+		return nil
+	end)
+end
+
 ListenToGameEvent('game_rules_state_change', function()
 	if GameRules:State_Get() == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
 		CustomTimers:IncrementGamePhase()
@@ -138,26 +218,40 @@ ListenToGameEvent('entity_killed', function(keys)
 		CustomTimers:PrepareFinalWaveCountdown()
 	end
 
-	if CustomTimers.active_special_wave_units[keys.entindex_killed] then
+	CustomTimers.active_special_wave_units = CustomTimers.active_special_wave_units or {}
+	local specialWave = CustomTimers.active_special_wave_units[keys.entindex_killed]
+	if specialWave ~= nil then
 		CustomTimers.active_special_wave_units[keys.entindex_killed] = nil
-		CustomTimers.active_special_wave_count = math.max(0, CustomTimers.active_special_wave_count - 1)
+		if specialWave.units ~= nil then
+			specialWave.units[keys.entindex_killed] = nil
+		end
 
-		CustomGameEventManager:Send_ServerToAllClients("xhs_wave_active", {
-			remaining = CustomTimers.active_special_wave_count,
-			total = CustomTimers.active_special_wave_total,
-			direction = CustomTimers.active_special_wave_direction,
-		})
+		specialWave.remaining = math.max(0, (specialWave.remaining or 0) - 1)
 
-		if CustomTimers.active_special_wave_count <= 0 then
-			CustomGameEventManager:Send_ServerToAllClients("xhs_wave_cleared", {
-				total = CustomTimers.active_special_wave_total,
-				direction = CustomTimers.active_special_wave_direction,
-			})
-			if FragmentQuests ~= nil then
-				FragmentQuests:OnSpecialWaveEnd(true)
+		local visibleWave = CustomTimers:GetVisibleSpecialWave()
+		local wasVisible = specialWave == visibleWave
+
+		if wasVisible and specialWave.remaining > 0 then
+			CustomTimers:SyncVisibleSpecialWaveFields()
+			CustomTimers:BroadcastVisibleSpecialWave()
+		elseif specialWave.remaining <= 0 then
+			CustomTimers:RemoveSpecialWave(specialWave)
+
+			if wasVisible then
+				CustomGameEventManager:Send_ServerToAllClients("xhs_wave_cleared", {
+					total = specialWave.total or 0,
+					direction = specialWave.direction or "",
+					wave_index = specialWave.wave_index or 0,
+				})
+
+				if CustomTimers:GetVisibleSpecialWave() ~= nil then
+					CustomTimers:ScheduleVisibleSpecialWaveAfterClear()
+				elseif FragmentQuests ~= nil then
+					FragmentQuests:OnSpecialWaveEnd(true)
+				end
+			elseif CustomTimers:IsSpecialWaveDisplayPending(specialWave) and CustomTimers:GetVisibleSpecialWave() ~= nil then
+				CustomTimers:ScheduleVisibleSpecialWaveAfterClear()
 			end
-			CustomTimers.active_special_wave_total = 0
-			CustomTimers.active_special_wave_direction = ""
 		end
 	end
 
@@ -435,7 +529,8 @@ function CustomTimers:ShowSpecialWaveCountdown(iCardinalPoint, duration)
 		timer_name = "special_wave",
 		eyebrow = "WAVE INCOMING",
 		title = "Wave of Darkness",
-		subtitle = string.upper(direction) .. " lane"
+		subtitle = string.upper(direction) .. " lane",
+		sound = duration == 30 and SPECIAL_WAVE_WARNING_SOUND or nil
 	})
 
 	CustomTimers:CreateSpecialWaveTimerParticle(direction, duration)
@@ -566,26 +661,34 @@ function SpecialWave(iCardinalPoint, force)
 		return
 	end
 
-	CustomTimers.active_special_wave_units = {}
-	CustomTimers.active_special_wave_count = 10
-	CustomTimers.active_special_wave_total = 10
-	CustomTimers.active_special_wave_direction = point[iCardinalPoint]
+	local wave = {
+		id = DoUniqueString("xhs_special_wave"),
+		wave_index = waveIndex,
+		direction = point[iCardinalPoint],
+		total = 10,
+		remaining = 10,
+		units = {},
+	}
+	CustomTimers.active_special_waves = CustomTimers.active_special_waves or {}
+	CustomTimers.active_special_wave_units = CustomTimers.active_special_wave_units or {}
+	table.insert(CustomTimers.active_special_waves, wave)
+	CustomTimers:SyncVisibleSpecialWaveFields()
+
 	if FragmentQuests ~= nil then
-		FragmentQuests:OnSpecialWaveStart(waveIndex, CustomTimers.active_special_wave_direction, CustomTimers.active_special_wave_total)
+		FragmentQuests:OnSpecialWaveStart(waveIndex, wave.direction, wave.total)
 	end
 
 	for j = 1, 10 do
 		local spawned_unit = CreateUnitByName(unit[waveIndex], real_point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
 		if spawned_unit ~= nil then
-			CustomTimers.active_special_wave_units[spawned_unit:entindex()] = true
+			wave.units[spawned_unit:entindex()] = true
+			CustomTimers.active_special_wave_units[spawned_unit:entindex()] = wave
 		end
 	end
 
-	CustomGameEventManager:Send_ServerToAllClients("xhs_wave_active", {
-		remaining = CustomTimers.active_special_wave_count,
-		total = CustomTimers.active_special_wave_total,
-		direction = CustomTimers.active_special_wave_direction,
-	})
+	if CustomTimers:GetVisibleSpecialWave() == wave then
+		CustomTimers:BroadcastVisibleSpecialWave()
+	end
 
 	CustomTimers.special_wave = CustomTimers.special_wave + 1
 

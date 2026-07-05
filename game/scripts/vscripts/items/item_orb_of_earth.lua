@@ -48,6 +48,7 @@ end
 --------------------------------------------------------------
 
 modifier_orb_of_earth = class({})
+modifier_orb_of_earth.XHS_LINK_CLIENT = true
 
 function modifier_orb_of_earth:IsHidden() return true end
 function modifier_orb_of_earth:IsPurgable() return false end
@@ -75,6 +76,7 @@ function modifier_orb_of_earth:OnCreated()
 end
 
 modifier_orb_of_earth_active = modifier_orb_of_earth_active or class({})
+modifier_orb_of_earth_active.XHS_LINK_CLIENT = true
 
 function modifier_orb_of_earth_active:IsHidden() return false end
 function modifier_orb_of_earth_active:IsPurgable() return false end
@@ -130,6 +132,7 @@ end
 --------------------------------------------------------------
 
 modifier_orb_of_earth_bash = class({})
+modifier_orb_of_earth_bash.XHS_LINK_CLIENT = true
 
 function modifier_orb_of_earth_bash:IsHidden() return false end
 function modifier_orb_of_earth_bash:IsPurgable() return false end

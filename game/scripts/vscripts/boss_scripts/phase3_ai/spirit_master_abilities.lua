@@ -19,7 +19,9 @@ xhs_spirit_fire_solar_flare = xhs_spirit_fire_solar_flare or class({})
 xhs_spirit_fire_wildfire_ring = xhs_spirit_fire_wildfire_ring or class({})
 
 modifier_xhs_spirit_master_slow = modifier_xhs_spirit_master_slow or class({})
+modifier_xhs_spirit_master_slow.XHS_LINK_CLIENT = true
 modifier_xhs_spirit_discordant_echo = modifier_xhs_spirit_discordant_echo or class({})
+modifier_xhs_spirit_discordant_echo.XHS_LINK_CLIENT = true
 
 LinkLuaModifier("modifier_xhs_spirit_master_slow", "boss_scripts/phase3_ai/spirit_master_abilities.lua", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_xhs_spirit_discordant_echo", "boss_scripts/phase3_ai/spirit_master_abilities.lua", LUA_MODIFIER_MOTION_NONE)

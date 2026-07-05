@@ -417,6 +417,16 @@ function GameMode:HealingFilter(filterTable)
 
 	local hHealingHero = EntIndexToHScript(filterTable["entindex_healer_const"])
 	if nHeal > 0 and hHealingHero ~= nil and hHealingHero:IsRealHero() then
+		if filterTable["entindex_target_const"] ~= nil and XHSRecordEndScreenStat ~= nil and XHSGetPlayerIDFromUnit ~= nil then
+			local hHealingTarget = EntIndexToHScript(filterTable["entindex_target_const"])
+			local healerPlayerID = XHSGetPlayerIDFromUnit(hHealingHero)
+			local targetPlayerID = XHSGetPlayerIDFromUnit(hHealingTarget)
+
+			if healerPlayerID ~= nil and healerPlayerID == targetPlayerID then
+				XHSRecordEndScreenStat(healerPlayerID, "self_healing", nHeal)
+			end
+		end
+
 		if FragmentQuests ~= nil then
 			FragmentQuests:AddHealing(hHealingHero:GetPlayerID(), nHeal)
 		end
@@ -456,6 +466,24 @@ function GameMode:DamageFilter(filterTable)
 	end
 
 	local hAttackerHero = EntIndexToHScript(filterTable["entindex_attacker_const"])
+	local hVictim = nil
+	if filterTable["entindex_victim_const"] ~= nil then
+		hVictim = EntIndexToHScript(filterTable["entindex_victim_const"])
+	end
+
+	if flDamage > 0 and XHSRecordEndScreenStat ~= nil and XHSGetPlayerIDFromUnit ~= nil then
+		local attackerPlayerID = XHSGetPlayerIDFromUnit(hAttackerHero)
+		if attackerPlayerID ~= nil and XHSIsBossDamageTarget ~= nil and XHSIsBossDamageTarget(hVictim) then
+			XHSRecordEndScreenStat(attackerPlayerID, "boss_damage", flDamage)
+		end
+
+		if hVictim ~= nil and hVictim:IsRealHero() then
+			local victimPlayerID = XHSGetPlayerIDFromUnit(hVictim)
+			if victimPlayerID ~= nil then
+				XHSRecordEndScreenStat(victimPlayerID, "damage_taken", flDamage)
+			end
+		end
+	end
 
 	if flDamage > 0 and hAttackerHero ~= nil and hAttackerHero:IsRealHero() then
 		for _, Zone in pairs(GameMode.Zones) do

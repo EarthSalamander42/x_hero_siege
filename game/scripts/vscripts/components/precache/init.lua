@@ -339,8 +339,13 @@ XHSPrecache:RegisterGroup("runes", {
 
 XHSPrecache:RegisterGroup("hero_abilities", {
 	particles = {
+		"particles/units/heroes/hero_zuus/zuus_arc_lightning.vpcf",
+		"particles/units/heroes/hero_zuus/zuus_arc_lightning_head.vpcf",
 		"particles/units/heroes/hero_razor_reduced_flash/razor_rain_storm_reduced_flash.vpcf",
 		"particles/econ/items/mirana/mirana_starstorm_bow/mirana_starstorm_starfall_attack.vpcf",
+	},
+	soundfiles = {
+		"soundevents/game_sounds_heroes/game_sounds_zuus.vsndevts",
 	},
 })
 

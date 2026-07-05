@@ -19,6 +19,7 @@ function holdout_frost_arrows:OnSpellStart()
 end
 
 modifier_holdout_frost_arrows = modifier_holdout_frost_arrows or class({})
+modifier_holdout_frost_arrows.XHS_LINK_CLIENT = true
 
 function modifier_holdout_frost_arrows:IsHidden() return true end
 function modifier_holdout_frost_arrows:IsPurgable() return false end
@@ -106,6 +107,7 @@ function modifier_holdout_frost_arrows:GetModifierProjectileName()
 end
 
 modifier_holdout_frost_arrows_slow = modifier_holdout_frost_arrows_slow or class({})
+modifier_holdout_frost_arrows_slow.XHS_LINK_CLIENT = true
 
 function modifier_holdout_frost_arrows_slow:IsDebuff() return true end
 function modifier_holdout_frost_arrows_slow:IsHidden() return false end

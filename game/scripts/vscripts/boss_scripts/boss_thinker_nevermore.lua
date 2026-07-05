@@ -478,6 +478,7 @@ end
 -- Immolation buff
 LinkLuaModifier("modifier_frostivus_immolation", "boss_scripts/boss_thinker_nevermore.lua", LUA_MODIFIER_MOTION_NONE )
 modifier_frostivus_immolation = modifier_frostivus_immolation or class({})
+modifier_frostivus_immolation.XHS_LINK_CLIENT = true
 
 function modifier_frostivus_immolation:IsHidden() return true end
 function modifier_frostivus_immolation:IsPurgable() return false end

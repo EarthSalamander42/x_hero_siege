@@ -8,6 +8,7 @@ function campfire:GetIntrinsicModifierName()
 end
 
 modifier_campfire = modifier_campfire or class({})
+modifier_campfire.XHS_LINK_CLIENT = true
 
 function modifier_campfire:IsHidden()
 	return true
@@ -87,6 +88,7 @@ function modifier_campfire:OnDestroy()
 end
 
 modifier_campfire_effect = class({})
+modifier_campfire_effect.XHS_LINK_CLIENT = true
 
 function modifier_campfire_effect:GetEffectName()
 	return "particles/camp_fire_buff.vpcf"
@@ -125,6 +127,7 @@ end
 --------------------------------------------------------------------------------
 
 modifier_disease_cloud_aura = class({})
+modifier_disease_cloud_aura.XHS_LINK_CLIENT = true
 
 function modifier_disease_cloud_aura:OnCreated()
 	if IsServer() then
@@ -187,6 +190,7 @@ end
 --------------------------------------------------------------------------------
 
 modifier_disease_cloud_debuff = class({})
+modifier_disease_cloud_debuff.XHS_LINK_CLIENT = true
 
 function modifier_disease_cloud_debuff:IsPurgable()
 	return false

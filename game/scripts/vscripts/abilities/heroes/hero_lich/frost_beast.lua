@@ -31,6 +31,7 @@ function OnFrostBeastSpawn(event)
 end
 
 modifier_lich_frost_beast_spawn_growth = modifier_lich_frost_beast_spawn_growth or class({})
+modifier_lich_frost_beast_spawn_growth.XHS_LINK_CLIENT = true
 
 function modifier_lich_frost_beast_spawn_growth:IsHidden() return true end
 function modifier_lich_frost_beast_spawn_growth:IsPurgable() return false end

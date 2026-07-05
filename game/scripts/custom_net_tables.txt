@@ -25,5 +25,6 @@
 		"xhs_quest_state",
 		"xhs_devtools",
 		"vips",
+		"xhs_lua_modifiers",
 	]
 }

@@ -1,4 +1,5 @@
 if modifier_battlepass_wearable_spellicons == nil then modifier_battlepass_wearable_spellicons = class({}) end
+modifier_battlepass_wearable_spellicons.XHS_LINK_CLIENT = true
 
 function modifier_battlepass_wearable_spellicons:IsHidden() return true end
 function modifier_battlepass_wearable_spellicons:RemoveOnDeath() return false end

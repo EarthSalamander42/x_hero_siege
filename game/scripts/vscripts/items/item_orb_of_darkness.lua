@@ -165,6 +165,7 @@ function item_bracer_of_the_void:GetAbilityTextureName()
 end
 
 modifier_orb_of_darkness_active = modifier_orb_of_darkness_active or class({})
+modifier_orb_of_darkness_active.XHS_LINK_CLIENT = true
 
 function modifier_orb_of_darkness_active:IsHidden() return false end
 function modifier_orb_of_darkness_active:IsPurgable() return false end
@@ -368,6 +369,7 @@ function modifier_orb_of_darkness_active:OnDeath(params)
 end
 
 modifier_orb_of_darkness_controlled = modifier_orb_of_darkness_controlled or class({})
+modifier_orb_of_darkness_controlled.XHS_LINK_CLIENT = true
 
 function modifier_orb_of_darkness_controlled:IsHidden() return true end
 function modifier_orb_of_darkness_controlled:IsPurgable() return false end
@@ -393,6 +395,7 @@ function modifier_orb_of_darkness_controlled:OnDestroy()
 end
 
 modifier_orb_of_darkness_passive = modifier_orb_of_darkness_passive or class({})
+modifier_orb_of_darkness_passive.XHS_LINK_CLIENT = true
 
 function modifier_orb_of_darkness_passive:IsHidden() return true end
 function modifier_orb_of_darkness_passive:IsPurgable() return false end

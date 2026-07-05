@@ -1537,6 +1537,10 @@ function XHSRecordTomeStats(unit, amount)
 	_G.XHS_TOME_STATS = _G.XHS_TOME_STATS or {}
 	_G.XHS_TOME_STATS[playerID] = (_G.XHS_TOME_STATS[playerID] or 0) + amount
 
+	if XHSRecordEndScreenStat ~= nil then
+		XHSRecordEndScreenStat(playerID, "tome_stats_bonus", amount)
+	end
+
 	return _G.XHS_TOME_STATS[playerID]
 end
 
@@ -1554,6 +1558,10 @@ function XHSRecordPotionUse(caster)
 
 	_G.XHS_POTION_USES = _G.XHS_POTION_USES or {}
 	_G.XHS_POTION_USES[playerID] = (_G.XHS_POTION_USES[playerID] or 0) + 1
+
+	if XHSRecordEndScreenStat ~= nil then
+		XHSRecordEndScreenStat(playerID, "potions_used", 1)
+	end
 
 	if FragmentQuests ~= nil then
 		FragmentQuests:OnPotionUsed(caster)
@@ -1575,6 +1583,41 @@ function XHSGetPotionUses(playerID)
 
 	_G.XHS_POTION_USES = _G.XHS_POTION_USES or {}
 	return tonumber(_G.XHS_POTION_USES[playerID]) or 0
+end
+
+function XHSRecordEndScreenStat(playerID, statName, amount)
+	playerID = tonumber(playerID)
+	amount = tonumber(amount) or 0
+
+	if playerID == nil or playerID < 0 or statName == nil or amount <= 0 then
+		return 0
+	end
+
+	_G.XHS_END_SCREEN_STATS = _G.XHS_END_SCREEN_STATS or {}
+	_G.XHS_END_SCREEN_STATS[playerID] = _G.XHS_END_SCREEN_STATS[playerID] or {}
+	_G.XHS_END_SCREEN_STATS[playerID][statName] = (_G.XHS_END_SCREEN_STATS[playerID][statName] or 0) + amount
+
+	return _G.XHS_END_SCREEN_STATS[playerID][statName]
+end
+
+function XHSGetEndScreenStat(playerID, statName)
+	playerID = tonumber(playerID)
+	if playerID == nil or statName == nil then return 0 end
+
+	_G.XHS_END_SCREEN_STATS = _G.XHS_END_SCREEN_STATS or {}
+	local playerStats = _G.XHS_END_SCREEN_STATS[playerID]
+	if playerStats == nil then return 0 end
+
+	return tonumber(playerStats[statName]) or 0
+end
+
+function XHSIsBossDamageTarget(unit)
+	if unit == nil or unit:IsNull() then return false end
+	if unit.Boss == true or unit.bBoss == true then return true end
+	if unit.FindAbilityByName ~= nil and unit:FindAbilityByName("boss_health") ~= nil then return true end
+
+	local unitName = unit.GetUnitName ~= nil and unit:GetUnitName() or ""
+	return string.find(unitName, "boss") ~= nil
 end
 
 local function XHSEnsurePermanentTownPortalScroll(hero)

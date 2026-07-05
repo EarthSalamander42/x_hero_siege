@@ -2,6 +2,14 @@ function GetEventPanel() {
 	return $.GetContextPanel().FindChildTraverse("EventPanel");
 }
 
+function SetSharedEventsVisible(visible) {
+	if (typeof GameUI === "undefined" || !GameUI.CustomUIConfig) {
+		return;
+	}
+
+	GameUI.CustomUIConfig().xhsSpecialEventVisible = !!visible;
+}
+
 var EventUsageState = {
 	hero_image_used: false,
 	hero_image_busy: false,
@@ -75,6 +83,7 @@ function SetEventsVisible(visible) {
 		return;
 	}
 
+	SetSharedEventsVisible(visible);
 	panel.SetHasClass("XHSEventsPanelVisible", visible);
 }
 
@@ -132,6 +141,7 @@ function OnQuit() {
 }
 
 (function() {
+	SetSharedEventsVisible(false);
 	GameEvents.Subscribe("show_events", OnShowEvents);
 	GameEvents.Subscribe("xhs_event_usage_update", UpdateEventUsage);
 	GameEvents.Subscribe("quit_events", function() {

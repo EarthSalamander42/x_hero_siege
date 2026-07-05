@@ -15,9 +15,13 @@ LinkLuaModifier("modifier_xhs_proudmoore_torrent_slow", "boss_scripts/phase3_ai/
 LinkLuaModifier("modifier_xhs_proudmoore_command_aura", "boss_scripts/phase3_ai/proudmoore_abilities.lua", LUA_MODIFIER_MOTION_NONE)
 
 modifier_xhs_proudmoore_command = modifier_xhs_proudmoore_command or class({})
+modifier_xhs_proudmoore_command.XHS_LINK_CLIENT = true
 modifier_xhs_proudmoore_anchor_slow = modifier_xhs_proudmoore_anchor_slow or class({})
+modifier_xhs_proudmoore_anchor_slow.XHS_LINK_CLIENT = true
 modifier_xhs_proudmoore_torrent_slow = modifier_xhs_proudmoore_torrent_slow or class({})
+modifier_xhs_proudmoore_torrent_slow.XHS_LINK_CLIENT = true
 modifier_xhs_proudmoore_command_aura = modifier_xhs_proudmoore_command_aura or class({})
+modifier_xhs_proudmoore_command_aura.XHS_LINK_CLIENT = true
 
 local PROUDMOORE_COLORS = {
 	primary = Vector(70, 190, 255),

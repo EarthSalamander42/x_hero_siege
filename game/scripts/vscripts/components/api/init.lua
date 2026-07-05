@@ -1481,8 +1481,12 @@ function api:CompleteGame()
 			local hero = json.null
 			local networth = 0
 			local healing = PlayerResource:GetHealing(id)
+			local boss_damage = XHSGetEndScreenStat ~= nil and XHSGetEndScreenStat(id, "boss_damage") or 0
+			local damage_taken = XHSGetEndScreenStat ~= nil and XHSGetEndScreenStat(id, "damage_taken") or 0
+			local self_healing = XHSGetEndScreenStat ~= nil and XHSGetEndScreenStat(id, "self_healing") or 0
 			local tracked_potions_used = XHSGetPotionUses ~= nil and XHSGetPotionUses(id) or 0
-			local potions_used = tracked_potions_used > 0 and tracked_potions_used or CountPlayerZoneStat(id, "Potions")
+			local end_screen_potions_used = XHSGetEndScreenStat ~= nil and XHSGetEndScreenStat(id, "potions_used") or 0
+			local potions_used = math.max(tracked_potions_used, end_screen_potions_used, CountPlayerZoneStat(id, "Potions"))
 			local damage_done_to_heroes = 0
 			local damage_done_to_buildings = 0
 			local kills_done_to_hero = {}
@@ -1492,7 +1496,8 @@ function api:CompleteGame()
 			local support_items = {}
 			local abilities_level_up_order = {}
 			local tracked_tome_stats_bonus = XHSGetTomeStats ~= nil and XHSGetTomeStats(id) or 0
-			local tome_stats_bonus = tracked_tome_stats_bonus
+			local end_screen_tome_stats_bonus = XHSGetEndScreenStat ~= nil and XHSGetEndScreenStat(id, "tome_stats_bonus") or 0
+			local tome_stats_bonus = math.max(tracked_tome_stats_bonus, end_screen_tome_stats_bonus)
 
 			if PlayerResource.GetHasAbandonedDueToLongDisconnect then
 				abandon = PlayerResource:GetHasAbandonedDueToLongDisconnect(id)
@@ -1566,6 +1571,9 @@ function api:CompleteGame()
 				items = items,
 				networth = networth,
 				healing = healing,
+				boss_damage = boss_damage,
+				damage_taken = damage_taken,
+				self_healing = self_healing,
 				potions_used = potions_used,
 				damage_done_to_heroes = damage_done_to_heroes,
 				damage_done_to_buildings = damage_done_to_buildings,

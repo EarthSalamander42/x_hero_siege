@@ -1,4 +1,5 @@
 modifier_breakable_container = class({})
+modifier_breakable_container.XHS_LINK_CLIENT = true
 
 --------------------------------------------------------------------------------
 

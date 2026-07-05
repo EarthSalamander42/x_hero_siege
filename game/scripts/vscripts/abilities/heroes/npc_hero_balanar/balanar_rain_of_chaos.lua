@@ -36,6 +36,7 @@ function balanar_rain_of_chaos:OnSpellStart()
 end
 
 modifier_balanar_rain_of_chaos = modifier_balanar_rain_of_chaos or class({})
+modifier_balanar_rain_of_chaos.XHS_LINK_CLIENT = true
 
 function modifier_balanar_rain_of_chaos:IsHidden() return true end
 
@@ -170,6 +171,7 @@ function modifier_balanar_rain_of_chaos:GetModifierIncomingDamage_Percentage()
 end
 
 modifier_balanar_rain_of_chaos_dummy = modifier_balanar_rain_of_chaos_dummy or class({})
+modifier_balanar_rain_of_chaos_dummy.XHS_LINK_CLIENT = true
 
 function modifier_balanar_rain_of_chaos_dummy:IsHidden() return true end
 

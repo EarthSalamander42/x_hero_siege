@@ -105,6 +105,7 @@ function wisp_passives:GetIntrinsicModifierName()
 end
 
 modifier_wisp_passive = modifier_wisp_passive or class({})
+modifier_wisp_passive.XHS_LINK_CLIENT = true
 
 function modifier_wisp_passive:IsHidden() return true end
 

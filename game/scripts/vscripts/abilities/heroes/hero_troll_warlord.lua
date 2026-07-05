@@ -133,6 +133,7 @@ end
 
 -------------------------------------------
 modifier_battle_trance = modifier_battle_trance or class({})
+modifier_battle_trance.XHS_LINK_CLIENT = true
 function modifier_battle_trance:IsDebuff() return false end
 function modifier_battle_trance:IsHidden() return false end
 function modifier_battle_trance:IsPurgable() return false end

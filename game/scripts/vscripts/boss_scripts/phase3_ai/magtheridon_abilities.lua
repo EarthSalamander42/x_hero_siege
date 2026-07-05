@@ -700,6 +700,7 @@ function xhs_magtheridon_rupture:OnSpellStart()
 end
 
 modifier_xhs_magtheridon_demonic_howl = modifier_xhs_magtheridon_demonic_howl or class({})
+modifier_xhs_magtheridon_demonic_howl.XHS_LINK_CLIENT = true
 
 function modifier_xhs_magtheridon_demonic_howl:IsHidden() return false end
 function modifier_xhs_magtheridon_demonic_howl:IsDebuff() return true end
@@ -741,6 +742,7 @@ function modifier_xhs_magtheridon_demonic_howl:OnTooltip()
 end
 
 modifier_xhs_magtheridon_infernal_root = modifier_xhs_magtheridon_infernal_root or class({})
+modifier_xhs_magtheridon_infernal_root.XHS_LINK_CLIENT = true
 
 function modifier_xhs_magtheridon_infernal_root:IsHidden() return false end
 function modifier_xhs_magtheridon_infernal_root:IsDebuff() return true end

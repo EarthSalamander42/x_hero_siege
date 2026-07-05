@@ -9,6 +9,7 @@ end
 LinkLuaModifier("modifier_frostivus_boss", "boss_scripts/boss_innate", LUA_MODIFIER_MOTION_NONE)
 
 modifier_frostivus_boss = modifier_frostivus_boss or class({})
+modifier_frostivus_boss.XHS_LINK_CLIENT = true
 
 function modifier_frostivus_boss:IsHidden() return false end
 function modifier_frostivus_boss:IsPurgable() return false end
@@ -114,6 +115,7 @@ end
 LinkLuaModifier("modifier_frostivus_boss_add", "boss_scripts/boss_innate", LUA_MODIFIER_MOTION_NONE)
 
 modifier_frostivus_boss_add = modifier_frostivus_boss_add or class({})
+modifier_frostivus_boss_add.XHS_LINK_CLIENT = true
 
 function modifier_frostivus_boss_add:IsHidden() return true end
 function modifier_frostivus_boss_add:IsPurgable() return false end

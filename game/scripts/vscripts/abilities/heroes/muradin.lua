@@ -13,6 +13,7 @@ function muradin_avatar:GetAbilityTextureName()
 end
 
 modifier_muradin_avatar = modifier_muradin_avatar or class({})
+modifier_muradin_avatar.XHS_LINK_CLIENT = true
 
 function modifier_muradin_avatar:IsHidden() return true end
 
@@ -32,6 +33,7 @@ function modifier_muradin_avatar:OnIntervalThink()
 end
 
 modifier_muradin_avatar_buff = modifier_muradin_avatar_buff or class({})
+modifier_muradin_avatar_buff.XHS_LINK_CLIENT = true
 
 function modifier_muradin_avatar_buff:GetHeroEffectName() return "particles/units/heroes/hero_sven/sven_gods_strength_hero_effect.vpcf" end
 function modifier_muradin_avatar_buff:HeroEffectPriority() return 10 end
@@ -64,6 +66,7 @@ function muradin_true_strike:GetIntrinsicModifierName()
 end
 
 modifier_muradin_true_strike = modifier_muradin_true_strike or class({})
+modifier_muradin_true_strike.XHS_LINK_CLIENT = true
 
 function modifier_muradin_true_strike:IsHidden() return false end
 function modifier_muradin_true_strike:IsPurgable() return false end

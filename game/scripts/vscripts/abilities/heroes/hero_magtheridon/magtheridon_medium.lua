@@ -10,6 +10,7 @@ function magtheridon_medium:GetIntrinsicModifierName()
 end
 
 modifier_magtheridon_medium = modifier_magtheridon_medium or class({})
+modifier_magtheridon_medium.XHS_LINK_CLIENT = true
 
 function modifier_magtheridon_medium:DeclareFunctions() return {
 	MODIFIER_EVENT_ON_DEATH,

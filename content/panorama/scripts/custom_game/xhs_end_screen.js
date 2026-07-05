@@ -45,6 +45,14 @@ var XHSEndScreen = (function () {
 		return undefined;
 	}
 
+	function MaxNumber() {
+		var best = 0;
+		for (var i = 0; i < arguments.length; i++) {
+			best = Math.max(best, ToNumber(arguments[i], 0));
+		}
+		return best;
+	}
+
 	function Clamp(value, minValue, maxValue) {
 		return Math.max(minValue, Math.min(maxValue, value));
 	}
@@ -298,6 +306,30 @@ var XHSEndScreen = (function () {
 		var battlepass = MergeCompletedSupporterPass(GetBattlepassTable(playerID), api);
 		var heroName = server.hero || (info && info.player_selected_hero) || "";
 		var team = ToNumber(server.team, info ? info.player_team_id : 0);
+		var tomesSmall = MaxNumber(server.tomes_bought_small, server.tomes_small, server.tome_small, api.tomes_bought_small, api.tomes_small, api.tome_small);
+		var tomesBig = MaxNumber(server.tomes_bought_big, server.tomes_big, server.tome_big, api.tomes_bought_big, api.tomes_big, api.tome_big);
+		var tomesPower = MaxNumber(server.tomes_bought_power, server.tomes_power, server.tome_power, api.tomes_bought_power, api.tomes_power, api.tome_power);
+		var tomeStatsBonus = MaxNumber(
+			server.tome_stats_bonus,
+			server.tome_stats,
+			server.tomes_stats,
+			server.stats_from_tomes,
+			api.tome_stats_bonus,
+			api.tome_stats,
+			api.tomes_stats,
+			api.stats_from_tomes,
+			tomesSmall * 50 + tomesBig * 250
+		);
+		var potionsUsed = MaxNumber(
+			server.potions_used,
+			server.potion_uses,
+			server.potions,
+			server.potionsUsed,
+			api.potions_used,
+			api.potion_uses,
+			api.potions,
+			api.potionsUsed
+		);
 
 		return {
 			id: playerID,
@@ -313,12 +345,15 @@ var XHSEndScreen = (function () {
 			networth: ToNumber(server.networth, info ? info.player_gold : 0),
 			damageHeroes: ToNumber(server.damage_done_to_heroes, 0),
 			damageBuildings: ToNumber(server.damage_done_to_buildings, 0),
+			bossDamage: ToNumber(server.boss_damage, 0),
+			damageTaken: ToNumber(server.damage_taken, 0),
+			selfHealing: ToNumber(server.self_healing, 0),
 			healing: ToNumber(server.healing, 0),
-			potionsUsed: ToNumber(server.potions_used, 0),
-			tomeStatsBonus: ToNumber(server.tome_stats_bonus, 0),
-			tomesSmall: ToNumber(server.tomes_bought_small, 0),
-			tomesBig: ToNumber(server.tomes_bought_big, 0),
-			tomesPower: ToNumber(server.tomes_bought_power, 0),
+			potionsUsed: potionsUsed,
+			tomeStatsBonus: tomeStatsBonus,
+			tomesSmall: tomesSmall,
+			tomesBig: tomesBig,
+			tomesPower: tomesPower,
 			supportGold: ToNumber(server.gold_spent_on_support, 0),
 			abandon: !!server.abandon,
 			api: api,
@@ -622,11 +657,17 @@ var XHSEndScreen = (function () {
 		var tomes = FindMvp(players, "tomeStatsBonus");
 		var networth = FindMvp(players, "networth");
 		var potions = FindMvp(players, "potionsUsed");
+		var bossDamage = FindMvp(players, "bossDamage");
+		var damageTaken = FindMvp(players, "damageTaken");
+		var selfHealing = FindMvp(players, "selfHealing");
 
 		CreateMvpCard(parent, "Most Kills", kills.model, kills.value, FormatNumber, "MvpKills");
 		CreateMvpCard(parent, "Richest Hero", networth.model, networth.value, FormatNumber, "MvpGold");
 		CreateMvpCard(parent, "Most Tome Stats", tomes.model, tomes.value, function (value) { return "+" + FormatNumber(value); }, "MvpStats");
-		CreateMvpCard(parent, "Most Potions Used", potions.model, potions.value, FormatNumber, "MvpPotions", "XHSMvpCardLast");
+		CreateMvpCard(parent, "Most Potions Used", potions.model, potions.value, FormatNumber, "MvpPotions");
+		CreateMvpCard(parent, "Most Boss Damage", bossDamage.model, bossDamage.value, FormatNumber, "MvpBossDamage");
+		CreateMvpCard(parent, "Most Damage Taken", damageTaken.model, damageTaken.value, FormatNumber, "MvpDamageTaken");
+		CreateMvpCard(parent, "Most Self Healing", selfHealing.model, selfHealing.value, FormatNumber, "MvpSustain", "XHSMvpCardLast");
 	}
 
 	function CreateCell(parent, className, text, extraClassName) {

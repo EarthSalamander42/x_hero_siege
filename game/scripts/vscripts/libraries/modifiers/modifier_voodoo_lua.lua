@@ -1,4 +1,5 @@
 modifier_voodoo_lua = class({})
+modifier_voodoo_lua.XHS_LINK_CLIENT = true
 
 --[[Author: Noya, Pizzalol
 	Date: 27.09.2015.

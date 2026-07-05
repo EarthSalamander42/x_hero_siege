@@ -26,6 +26,7 @@ end
 
 -- Fountain aura
 modifier_xhs_vampiric_aura = modifier_xhs_vampiric_aura or class({})
+modifier_xhs_vampiric_aura.XHS_LINK_CLIENT = true
 
 function modifier_xhs_vampiric_aura:IsHidden() return true end
 

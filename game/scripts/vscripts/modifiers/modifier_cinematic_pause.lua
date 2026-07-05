@@ -1,8 +1,10 @@
 modifier_cinematic_pause = modifier_cinematic_pause or class({})
+modifier_cinematic_pause.XHS_LINK_CLIENT = true
 modifier_cinematic_pause_release = modifier_cinematic_pause_release or class({})
+modifier_cinematic_pause_release.XHS_LINK_CLIENT = true
 
 local CINEMATIC_PAUSE_LOG_PREFIX = "[modifier_cinematic_pause]"
-local CINEMATIC_PAUSE_RELEASE_DURATION = 0.2
+local CINEMATIC_PAUSE_RELEASE_DURATION = 0.8
 local CINEMATIC_PAUSE_INTERVAL = 0.03
 
 local function CinematicPauseEntityID(entity)
@@ -152,13 +154,13 @@ function modifier_cinematic_pause:CheckState()
 	self:LogOnce("CheckState", "CheckState first call")
 	local state = {
 		[MODIFIER_STATE_INVULNERABLE] = true,
-		[MODIFIER_STATE_DISARMED] = true,
-		[MODIFIER_STATE_SILENCED] = true,
-		[MODIFIER_STATE_MUTED] = true,
 	}
 
 	if self:GetSlowProgress() >= 1 then
 		self:LogOnce("CheckStateFullPause", "CheckState applying stunned/command_restricted/frozen")
+		state[MODIFIER_STATE_DISARMED] = true
+		state[MODIFIER_STATE_SILENCED] = true
+		state[MODIFIER_STATE_MUTED] = true
 		state[MODIFIER_STATE_STUNNED] = true
 		state[MODIFIER_STATE_COMMAND_RESTRICTED] = true
 		state[MODIFIER_STATE_FROZEN] = true

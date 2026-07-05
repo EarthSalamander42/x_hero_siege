@@ -90,6 +90,7 @@ function xhs_centurion_necromastery:GetIntrinsicModifierName()
 end
 
 modifier_xhs_centurion_necromastery = modifier_xhs_centurion_necromastery or class({})
+modifier_xhs_centurion_necromastery.XHS_LINK_CLIENT = true
 
 function modifier_xhs_centurion_necromastery:IsHidden() return false end
 function modifier_xhs_centurion_necromastery:IsPurgable() return false end
@@ -143,6 +144,7 @@ function xhs_centurion_atrophy_aura:GetIntrinsicModifierName()
 end
 
 modifier_xhs_centurion_atrophy_aura = modifier_xhs_centurion_atrophy_aura or class({})
+modifier_xhs_centurion_atrophy_aura.XHS_LINK_CLIENT = true
 
 function modifier_xhs_centurion_atrophy_aura:IsHidden() return true end
 function modifier_xhs_centurion_atrophy_aura:IsPurgable() return false end
@@ -184,6 +186,7 @@ function modifier_xhs_centurion_atrophy_aura:OnDeath(keys)
 end
 
 modifier_xhs_centurion_atrophy_debuff = modifier_xhs_centurion_atrophy_debuff or class({})
+modifier_xhs_centurion_atrophy_debuff.XHS_LINK_CLIENT = true
 
 function modifier_xhs_centurion_atrophy_debuff:IsDebuff() return true end
 function modifier_xhs_centurion_atrophy_debuff:IsPurgable() return false end
@@ -202,6 +205,7 @@ function modifier_xhs_centurion_atrophy_debuff:GetModifierBaseDamageOutgoing_Per
 end
 
 modifier_xhs_centurion_atrophy_bonus = modifier_xhs_centurion_atrophy_bonus or class({})
+modifier_xhs_centurion_atrophy_bonus.XHS_LINK_CLIENT = true
 
 function modifier_xhs_centurion_atrophy_bonus:IsHidden() return false end
 function modifier_xhs_centurion_atrophy_bonus:IsPurgable() return false end

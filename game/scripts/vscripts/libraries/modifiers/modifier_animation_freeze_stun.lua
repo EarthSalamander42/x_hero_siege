@@ -1,4 +1,5 @@
 modifier_animation_freeze_stun = class({})
+modifier_animation_freeze_stun.XHS_LINK_CLIENT = true
 
 function modifier_animation_freeze_stun:OnCreated(keys) 
 

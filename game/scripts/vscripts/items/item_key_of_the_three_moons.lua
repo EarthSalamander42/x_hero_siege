@@ -10,6 +10,7 @@ function item_key_of_the_three_moons:GetIntrinsicModifierName()
 end
 
 modifier_key_passives = modifier_key_passives or class({})
+modifier_key_passives.XHS_LINK_CLIENT = true
 
 function modifier_key_passives:IsHidden() return true end
 

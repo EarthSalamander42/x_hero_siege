@@ -115,6 +115,7 @@ function xhs_blademaster_mirror_image:SetInventory(illusion)
 end
 
 modifier_xhs_blademaster_mirror_image_invulnerable = modifier_xhs_blademaster_mirror_image_invulnerable or class({})
+modifier_xhs_blademaster_mirror_image_invulnerable.XHS_LINK_CLIENT = true
 
 function modifier_xhs_blademaster_mirror_image_invulnerable:IsHidden() return true end
 
@@ -131,6 +132,7 @@ function modifier_xhs_blademaster_mirror_image_invulnerable:CheckState()
 end
 
 if modifier_xhs_blademaster_mirror_image_handler == nil then modifier_xhs_blademaster_mirror_image_handler = class({}) end
+modifier_xhs_blademaster_mirror_image_handler.XHS_LINK_CLIENT = true
 function modifier_xhs_blademaster_mirror_image_handler:IsHidden() return true end
 
 function modifier_xhs_blademaster_mirror_image_handler:IsPurgable() return false end
@@ -166,6 +168,7 @@ blademaster_wardrums_aura = blademaster_wardrums_aura or class({})
 function blademaster_wardrums_aura:GetIntrinsicModifierName() return "modifier_blademaster_wardrums_aura" end
 
 modifier_blademaster_wardrums_aura = modifier_blademaster_wardrums_aura or class({})
+modifier_blademaster_wardrums_aura.XHS_LINK_CLIENT = true
 
 -- Modifier properties
 function modifier_blademaster_wardrums_aura:IsAura() return true end
@@ -193,6 +196,7 @@ function modifier_blademaster_wardrums_aura:GetModifierAura() return "modifier_b
 function modifier_blademaster_wardrums_aura:GetAuraEntityReject(target) return IsXHSRuneUnit and IsXHSRuneUnit(target) end
 
 modifier_blademaster_wardrums = modifier_blademaster_wardrums or class({})
+modifier_blademaster_wardrums.XHS_LINK_CLIENT = true
 
 -- Modifier properties
 function modifier_blademaster_wardrums:IsPurgable() return false end

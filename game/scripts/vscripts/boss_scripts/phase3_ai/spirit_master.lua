@@ -7,8 +7,11 @@ if XHSSpiritMasterEncounter == nil then
 end
 
 modifier_xhs_spirit_master_phase_ai = modifier_xhs_spirit_master_phase_ai or class({})
+modifier_xhs_spirit_master_phase_ai.XHS_LINK_CLIENT = true
 modifier_xhs_tri_spirit_phase_ai = modifier_xhs_tri_spirit_phase_ai or class({})
+modifier_xhs_tri_spirit_phase_ai.XHS_LINK_CLIENT = true
 modifier_xhs_spirit_dormant = modifier_xhs_spirit_dormant or class({})
+modifier_xhs_spirit_dormant.XHS_LINK_CLIENT = true
 
 LinkLuaModifier("modifier_xhs_spirit_master_phase_ai", "boss_scripts/phase3_ai/spirit_master.lua", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_xhs_tri_spirit_phase_ai", "boss_scripts/phase3_ai/spirit_master.lua", LUA_MODIFIER_MOTION_NONE)

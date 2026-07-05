@@ -190,6 +190,7 @@ end
 -----------------------------------
 
 modifier_imba_torrent_handler = class({})
+modifier_imba_torrent_handler.XHS_LINK_CLIENT = true
 
 function modifier_imba_torrent_handler:IsHidden()	return true end
 
@@ -233,6 +234,7 @@ function modifier_imba_torrent_handler:GetModifierDisableTurning()
 end
 
 modifier_imba_torrent_phase = class({})
+modifier_imba_torrent_phase.XHS_LINK_CLIENT = true
 
 function modifier_imba_torrent_phase:CheckState()
 	local state = {[MODIFIER_STATE_NO_UNIT_COLLISION] = true}
@@ -248,6 +250,7 @@ function modifier_imba_torrent_phase:IsDebuff()
 end
 
 modifier_imba_torrent_slow_tide = class({})
+modifier_imba_torrent_slow_tide.XHS_LINK_CLIENT = true
 
 function modifier_imba_torrent_slow_tide:IsHidden()
 	return true
@@ -262,6 +265,7 @@ function modifier_imba_torrent_slow_tide:IsPurgable()
 end
 
 modifier_imba_torrent_slow = class({})
+modifier_imba_torrent_slow.XHS_LINK_CLIENT = true
 
 function modifier_imba_torrent_slow:DeclareFunctions()
 	local decFuncs =
@@ -293,6 +297,7 @@ function modifier_imba_torrent_slow:IsPurgable()
 end
 
 modifier_imba_sec_torrent_slow = class({})
+modifier_imba_sec_torrent_slow.XHS_LINK_CLIENT = true
 
 function modifier_imba_sec_torrent_slow:DeclareFunctions()
 	local decFuncs =
@@ -321,6 +326,7 @@ end
 -- Modifier for casting torrent without showing cast direction
 -- Modifier is added in the OrderFilter in imba.lua !
 modifier_imba_torrent_cast = class({})
+modifier_imba_torrent_cast.XHS_LINK_CLIENT = true
 
 function modifier_imba_torrent_cast:DeclareFunctions()
 	local decFuncs =
@@ -356,6 +362,7 @@ function modifier_imba_torrent_cast:OnDestroy( params )
 end
 
 modifier_imba_kunkka_torrent_talent_thinker = class({})
+modifier_imba_kunkka_torrent_talent_thinker.XHS_LINK_CLIENT = true
 
 function modifier_imba_kunkka_torrent_talent_thinker:IsHidden()
 	return false
@@ -775,6 +782,7 @@ function imba_kunkka_ghostship:OnProjectileHit_ExtraData(target, location, Extra
 end
 
 modifier_imba_ghostship_drag = class({})
+modifier_imba_ghostship_drag.XHS_LINK_CLIENT = true
 
 function modifier_imba_ghostship_drag:IsHidden()
 	return false
@@ -865,6 +873,7 @@ function modifier_imba_ghostship_drag:OnDestroy()
 end
 
 modifier_imba_ghostship_rum = class({})
+modifier_imba_ghostship_rum.XHS_LINK_CLIENT = true
 
 function modifier_imba_ghostship_rum:GetModifierMoveSpeedBonus_Percentage()
 	return self:GetAbility():GetSpecialValueFor("rum_speed")
@@ -936,6 +945,7 @@ function modifier_imba_ghostship_rum:IsDebuff( )
 end
 
 modifier_imba_ghostship_rum_damage = class({})
+modifier_imba_ghostship_rum_damage.XHS_LINK_CLIENT = true
 
 function modifier_imba_ghostship_rum_damage:GetCustomIncomingDamagePct()
 	return self:GetAbility():GetSpecialValueFor("rum_reduce_pct")
@@ -998,6 +1008,7 @@ function modifier_imba_ghostship_rum_damage:OnCreated( params )
 end
 
 modifier_imba_ghostship_tide_slow = class({})
+modifier_imba_ghostship_tide_slow.XHS_LINK_CLIENT = true
 
 function modifier_imba_ghostship_tide_slow:DeclareFunctions()
 	local decFuncs =

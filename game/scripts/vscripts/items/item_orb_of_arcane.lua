@@ -43,6 +43,7 @@ function item_astral_core:GetAbilityTextureName()
 end
 
 modifier_orb_of_arcane_active = modifier_orb_of_arcane_active or class({})
+modifier_orb_of_arcane_active.XHS_LINK_CLIENT = true
 
 function modifier_orb_of_arcane_active:IsHidden() return false end
 function modifier_orb_of_arcane_active:IsPurgable() return false end
@@ -50,6 +51,7 @@ function modifier_orb_of_arcane_active:RemoveOnDeath() return false end
 function modifier_orb_of_arcane_active:GetTexture() return "custom/orb_of_arcane" end
 
 modifier_orb_of_arcane = modifier_orb_of_arcane or class({})
+modifier_orb_of_arcane.XHS_LINK_CLIENT = true
 
 function modifier_orb_of_arcane:IsHidden() return true end
 function modifier_orb_of_arcane:IsPurgable() return false end
@@ -115,6 +117,7 @@ function modifier_orb_of_arcane:OnTakeDamage(params)
 end
 
 modifier_orb_of_arcane_exposure = modifier_orb_of_arcane_exposure or class({})
+modifier_orb_of_arcane_exposure.XHS_LINK_CLIENT = true
 
 function modifier_orb_of_arcane_exposure:IsHidden() return false end
 function modifier_orb_of_arcane_exposure:IsDebuff() return true end

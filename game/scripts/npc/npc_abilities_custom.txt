@@ -10095,7 +10095,8 @@
 			"duration"				"12"
 			"tick_interval"			"1.0"
 			"tick_heal"				"100"
-			"total_heal"			"600"
+			"tick_heal_pct"			"1"
+			"total_heal"			"1200"
 		}
 
 		"OnSpellStart"

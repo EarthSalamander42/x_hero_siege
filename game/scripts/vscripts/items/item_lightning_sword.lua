@@ -14,6 +14,7 @@ function item_lightning_sword:GetIntrinsicModifierName()
 end
 
 modifier_lightning_sword_unique = class({})
+modifier_lightning_sword_unique.XHS_LINK_CLIENT = true
 
 function modifier_lightning_sword_unique:IsHidden() return true end
 

@@ -1,6 +1,7 @@
 LinkLuaModifier("modifier_command_buff", "modifiers/auras/modifier_command_aura.lua", LUA_MODIFIER_MOTION_NONE)
 
 modifier_command_aura = modifier_command_aura or class({})
+modifier_command_aura.XHS_LINK_CLIENT = true
 
 function modifier_command_aura:IsAura() return true end
 function modifier_command_aura:GetAuraDuration() return 0.2 end
@@ -17,6 +18,7 @@ function modifier_command_aura:IsPurgeException() return false end
 function modifier_command_aura:RemoveOnDeath() return false end
 
 modifier_command_buff = modifier_command_buff or class({})
+modifier_command_buff.XHS_LINK_CLIENT = true
 
 function modifier_command_buff:GetTexture()
 	return "custom/holdout_command_aura"

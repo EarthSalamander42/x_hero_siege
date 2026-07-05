@@ -14,6 +14,7 @@ function item_lifesteal_mask:GetIntrinsicModifierName()
 end
 
 modifier_lifesteal_mask = modifier_lifesteal_mask or class({})
+modifier_lifesteal_mask.XHS_LINK_CLIENT = true
 
 function modifier_lifesteal_mask:GetTexture()
 	return "modifiers/lifesteal_mask"

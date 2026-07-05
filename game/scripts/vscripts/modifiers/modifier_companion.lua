@@ -1,4 +1,5 @@
 modifier_companion = class({})
+modifier_companion.XHS_LINK_CLIENT = true
 
 function modifier_companion:IsHidden() return true end
 

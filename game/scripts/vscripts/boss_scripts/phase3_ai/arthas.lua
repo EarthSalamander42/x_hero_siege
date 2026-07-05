@@ -3,6 +3,7 @@ require("boss_scripts/phase3_ai/telegraphs")
 require("boss_scripts/phase3_ai/arthas_abilities")
 
 modifier_xhs_arthas_phase3_ai = modifier_xhs_arthas_phase3_ai or class({})
+modifier_xhs_arthas_phase3_ai.XHS_LINK_CLIENT = true
 LinkLuaModifier("modifier_xhs_arthas_phase3_ai", "boss_scripts/phase3_ai/arthas.lua", LUA_MODIFIER_MOTION_NONE)
 
 local ARTHAS_ABILITIES = {

@@ -5,6 +5,7 @@ require("boss_scripts/phase3_ai/proudmoore_abilities")
 LinkLuaModifier("modifier_xhs_proudmoore_phase3_ai", "boss_scripts/phase3_ai/proudmoore.lua", LUA_MODIFIER_MOTION_NONE)
 
 modifier_xhs_proudmoore_phase3_ai = modifier_xhs_proudmoore_phase3_ai or class({})
+modifier_xhs_proudmoore_phase3_ai.XHS_LINK_CLIENT = true
 
 local PROUDMOORE_ABILITIES = {
 	"xhs_proudmoore_admirals_command",

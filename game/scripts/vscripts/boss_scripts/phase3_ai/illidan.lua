@@ -5,6 +5,7 @@ require("boss_scripts/phase3_ai/illidan_abilities")
 LinkLuaModifier("modifier_xhs_illidan_phase3_ai", "boss_scripts/phase3_ai/illidan.lua", LUA_MODIFIER_MOTION_NONE)
 
 modifier_xhs_illidan_phase3_ai = modifier_xhs_illidan_phase3_ai or class({})
+modifier_xhs_illidan_phase3_ai.XHS_LINK_CLIENT = true
 
 local ILLIDAN_ABILITIES = {
 	"xhs_illidan_metamorphosis",

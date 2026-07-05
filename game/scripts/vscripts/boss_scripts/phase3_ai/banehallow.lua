@@ -3,6 +3,7 @@ require("boss_scripts/phase3_ai/core")
 LinkLuaModifier("modifier_xhs_banehallow_phase3_ai", "boss_scripts/phase3_ai/banehallow.lua", LUA_MODIFIER_MOTION_NONE)
 
 modifier_xhs_banehallow_phase3_ai = modifier_xhs_banehallow_phase3_ai or class({})
+modifier_xhs_banehallow_phase3_ai.XHS_LINK_CLIENT = true
 
 local BANEHALLOW_ABILITIES = {
 	"frostivus_boss_necromastery",

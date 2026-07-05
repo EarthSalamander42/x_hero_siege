@@ -1,4 +1,5 @@
 modifier_npc_dialog = class({})
+modifier_npc_dialog.XHS_LINK_CLIENT = true
 
 -----------------------------------------------------------------------
 

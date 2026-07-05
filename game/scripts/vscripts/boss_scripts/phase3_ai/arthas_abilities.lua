@@ -8,7 +8,9 @@ xhs_arthas_death_advance = xhs_arthas_death_advance or class({})
 xhs_arthas_frostmourne_execute = xhs_arthas_frostmourne_execute or class({})
 
 modifier_xhs_arthas_mark = modifier_xhs_arthas_mark or class({})
+modifier_xhs_arthas_mark.XHS_LINK_CLIENT = true
 modifier_xhs_arthas_chains = modifier_xhs_arthas_chains or class({})
+modifier_xhs_arthas_chains.XHS_LINK_CLIENT = true
 
 LinkLuaModifier("modifier_xhs_arthas_mark", "boss_scripts/phase3_ai/arthas_abilities.lua", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_xhs_arthas_chains", "boss_scripts/phase3_ai/arthas_abilities.lua", LUA_MODIFIER_MOTION_NONE)

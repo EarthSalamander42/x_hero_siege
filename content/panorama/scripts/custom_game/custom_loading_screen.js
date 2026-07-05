@@ -197,6 +197,14 @@ var vote_array = {
 	},
 };
 
+var XHS_DIFFICULTY_VOTE_STATS = {
+	1: { starting_gold: 10000, ankhs: 4, bonus_item: "item_lifesteal_mask" },
+	2: { starting_gold: 5000, ankhs: 3 },
+	3: { starting_gold: 4000, ankhs: 2 },
+	4: { starting_gold: 3000, ankhs: 1 },
+	5: { starting_gold: 2000, ankhs: 0 },
+};
+
 var vote_fallbacks = {};
 
 var link_targets = "";
@@ -262,6 +270,139 @@ function LocalizeTemplate(token, values) {
 	}
 
 	return localized;
+}
+
+function FormatLoadingScreenNumber(value) {
+	var text = Math.floor(value || 0).toString();
+	var separator = L("loading_screen_number_group_separator");
+	if (separator == "loading_screen_number_group_separator") {
+		separator = ",";
+	}
+	return text.replace(/\B(?=(\d{3})+(?!\d))/g, separator);
+}
+
+function GetDifficultyVoteExtraDescription(difficulty_index) {
+	var stats = XHS_DIFFICULTY_VOTE_STATS[difficulty_index];
+	if (!stats) {
+		return "";
+	}
+
+	var lines = [
+		LocalizeTemplate("loading_screen_vote_difficulty_starting_gold", {
+			amount: FormatLoadingScreenNumber(stats.starting_gold)
+		}),
+		LocalizeTemplate("loading_screen_vote_difficulty_ankhs", {
+			count: stats.ankhs.toString()
+		})
+	];
+
+	if (stats.bonus_item) {
+		lines.push(LocalizeTemplate("loading_screen_vote_difficulty_bonus_item", {
+			item: GetLocalizedItemName(stats.bonus_item)
+		}));
+	}
+
+	return lines.join("\n");
+}
+
+function AppendVoteDescriptionExtra(description, extra) {
+	if (!extra || extra.length <= 0) {
+		return description;
+	}
+
+	if (!description || description.length <= 0) {
+		return extra;
+	}
+
+	return description + "\n" + extra;
+}
+
+function GetVoteOptionDescription(vote_type, vote_index, include_extra) {
+	if (include_extra === undefined) {
+		include_extra = true;
+	}
+
+	var option_description = LocalizeWithFallback("#vote_" + vote_type + "_" + vote_index + "_description");
+
+	if (include_extra && vote_type == "difficulty") {
+		option_description = AppendVoteDescriptionExtra(option_description, GetDifficultyVoteExtraDescription(vote_index));
+	}
+
+	return option_description;
+}
+
+function GetLocalizedItemName(item_name) {
+	return LocalizeWithFallback("#DOTA_Tooltip_ability_" + item_name);
+}
+
+function CreateDifficultyVoteStat(parent, item_name, label_text, value_text, class_name) {
+	var row = $.CreatePanel("Panel", parent, "");
+	row.AddClass("vote-difficulty-stat-row");
+	if (class_name) {
+		row.AddClass(class_name);
+	}
+
+	var icon = $.CreatePanel("DOTAItemImage", row, "");
+	icon.AddClass("vote-difficulty-stat-icon");
+	icon.itemname = item_name;
+
+	var copy = $.CreatePanel("Panel", row, "");
+	copy.AddClass("vote-difficulty-stat-copy");
+
+	var label = $.CreatePanel("Label", copy, "");
+	label.AddClass("vote-difficulty-stat-label");
+	label.text = label_text;
+
+	var value = $.CreatePanel("Label", copy, "");
+	value.AddClass("vote-difficulty-stat-value");
+	value.text = value_text;
+}
+
+function CreateDifficultyVoteStats(vote_button, difficulty_index) {
+	var stats = XHS_DIFFICULTY_VOTE_STATS[difficulty_index];
+	if (!stats || !vote_button) {
+		return;
+	}
+
+	var panels = vote_button.FindChildrenWithClassTraverse("vote-select-panel");
+	var parent = panels && panels[0] ? panels[0] : null;
+	if (!parent) {
+		return;
+	}
+
+	var stats_panel = $.CreatePanel("Panel", parent, "");
+	stats_panel.AddClass("vote-difficulty-stats");
+
+	CreateDifficultyVoteStat(
+		stats_panel,
+		"item_bag_of_gold",
+		L("loading_screen_vote_difficulty_starting_gold_short"),
+		FormatLoadingScreenNumber(stats.starting_gold),
+		"VoteDifficultyGold"
+	);
+	CreateDifficultyVoteStat(
+		stats_panel,
+		"item_ankh_of_reincarnation",
+		L("loading_screen_vote_difficulty_ankhs_short"),
+		stats.ankhs.toString(),
+		"VoteDifficultyAnkhs"
+	);
+
+	if (stats.bonus_item == "item_lifesteal_mask") {
+		CreateDifficultyVoteStat(
+			stats_panel,
+			stats.bonus_item,
+			L("loading_screen_vote_difficulty_bonus_short"),
+			GetLocalizedItemName(stats.bonus_item),
+			"VoteDifficultyBonus"
+		);
+	}
+
+	var buttons = parent.FindChildrenWithClassTraverse("vote-button");
+	var choice_button = buttons && buttons[0] ? buttons[0] : null;
+	if (choice_button && parent.MoveChildBefore) {
+		parent.MoveChildBefore(stats_panel, choice_button);
+	}
 }
 
 function SafeSerializeForLog(data) {
@@ -3562,7 +3703,7 @@ function UpdateVoteProgressTab(category, root_id, rows_id) {
 
 			(function (panel, vote_type, index) {
 				panel.SetPanelEvent("onmouseover", function () {
-					$.DispatchEvent("UIShowTextTooltip", panel, LocalizeWithFallback("#vote_" + vote_type + "_" + index + "_description"));
+					$.DispatchEvent("UIShowTextTooltip", panel, GetVoteOptionDescription(vote_type, index));
 				});
 
 				panel.SetPanelEvent("onmouseout", function () {
@@ -3671,17 +3812,7 @@ function AllPlayersLoaded() {
 			vote_button.style.width = card_width + "px";
 
 			var option_title = LocalizeWithFallback("#vote_" + vote_type + "_" + i);
-			var option_description = LocalizeWithFallback("#vote_" + vote_type + "_" + i + "_description");
-			if (vote_type == "gamemode" && i == 2) {
-				option_description = [
-					"Reborn is the active Dota 2 ruleset:",
-					"- Reworked progression for the 4.0 direction",
-					"- Supporter pass XP and weighted votes",
-					"- Modern events, quests and special arenas",
-					"- Updated heroes, items and UI flow",
-					"- Future X Hero Siege content lands here first"
-				].join("\n");
-			}
+			var option_description = GetVoteOptionDescription(vote_type, i, vote_type != "difficulty");
 			var is_compact_description = option_description.length <= 120;
 
 			var title_labels = vote_button.FindChildrenWithClassTraverse("vote-select-title");
@@ -3693,6 +3824,10 @@ function AllPlayersLoaded() {
 
 			if (description_labels && description_labels[0]) {
 				description_labels[0].text = option_description;
+			}
+
+			if (vote_type == "difficulty") {
+				CreateDifficultyVoteStats(vote_button, i);
 			}
 
 			vote_button.SetHasClass("VotePanelCompact", is_compact_description);

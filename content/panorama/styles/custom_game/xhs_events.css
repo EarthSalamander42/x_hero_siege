@@ -19,15 +19,16 @@
 {
 	width: 100%;
 	height: 100%;
+	z-index: 700;
 }
 
 .XHSEventsPanel
 {
-	width: 760px;
-	min-height: 430px;
+	width: 980px;
+	min-height: 560px;
 	align: center center;
 	flow-children: down;
-	padding: 18px;
+	padding: 22px;
 	background-color: gradient( linear, 0% 0%, 100% 100%, from( #06121ff4 ), color-stop( 0.62, #081d2fde ), to( #04101ac8 ) );
 	border: 1px solid #2d9ad4aa;
 	box-shadow: fill #000000aa 0px 0px 18px 0px;
@@ -37,6 +38,7 @@
 	pre-transform-scale2d: 0.98;
 	transition-property: opacity, transform, pre-transform-scale2d, brightness;
 	transition-duration: 0.16s;
+	z-index: 720;
 }
 
 .XHSEventsPanelVisible
@@ -53,7 +55,7 @@
 .XHSEventsHeader
 {
 	width: 100%;
-	height: 88px;
+	height: 108px;
 	flow-children: right;
 	border-bottom: 1px solid #2a6f9a77;
 	background-color: gradient( linear, 0% 0%, 100% 0%, from( #0b223744 ), color-stop( 0.72, #0b223722 ), to( #123e5c55 ) );
@@ -64,12 +66,12 @@
 	width: fill-parent-flow( 1 );
 	height: 100%;
 	flow-children: down;
-	padding: 10px 12px 8px 12px;
+	padding: 12px 14px 10px 14px;
 }
 
 .XHSEventsEyebrow
 {
-	font-size: 12px;
+	font-size: 13px;
 	letter-spacing: 4px;
 	color: #78dfff;
 	text-shadow: 0px 0px 8px #35c9ff55;
@@ -79,7 +81,7 @@
 .XHSEventsTitle
 {
 	margin-top: 3px;
-	font-size: 32px;
+	font-size: 40px;
 	font-weight: bold;
 	color: #f4fbff;
 	text-shadow: 0px 1px 5px #000000dd;
@@ -89,17 +91,17 @@
 .XHSEventsSubtitle
 {
 	margin-top: 0px;
-	font-size: 16px;
+	font-size: 18px;
 	color: #b8cee3;
 	text-shadow: 0px 1px 3px #000000aa;
 }
 
 .XHSEventsClose
 {
-	width: 42px;
-	height: 42px;
-	margin-top: 10px;
-	margin-right: 8px;
+	width: 50px;
+	height: 50px;
+	margin-top: 12px;
+	margin-right: 10px;
 	horizontal-align: right;
 	background-color: #071523ee;
 	border: 1px solid #5bbceaaa;
@@ -110,7 +112,7 @@
 .XHSEventsClose Label
 {
 	align: center center;
-	font-size: 18px;
+	font-size: 22px;
 	font-weight: bold;
 	color: #cfefff;
 }
@@ -130,24 +132,24 @@
 .XHSEventsGrid
 {
 	width: 100%;
-	height: 258px;
-	margin-top: 16px;
+	height: 350px;
+	margin-top: 18px;
 	flow-children: down;
 }
 
 .XHSEventsRow
 {
 	width: 100%;
-	height: 120px;
-	margin-bottom: 12px;
+	height: 164px;
+	margin-bottom: 14px;
 	flow-children: right;
 }
 
 .XHSEventCard
 {
-	width: 344px;
-	height: 120px;
-	margin-right: 12px;
+	width: 452px;
+	height: 164px;
+	margin-right: 14px;
 	margin-bottom: 0px;
 	flow-children: right;
 	background-color: gradient( linear, 0% 0%, 100% 100%, from( #071626f5 ), color-stop( 0.58, #09263bed ), to( #06101bdc ) );
@@ -242,10 +244,10 @@
 
 .XHSEventIcon
 {
-	width: 62px;
-	height: 62px;
-	margin-left: 14px;
-	margin-top: 16px;
+	width: 92px;
+	height: 92px;
+	margin-left: 18px;
+	margin-top: 30px;
 	background-color: gradient( linear, 0% 0%, 100% 100%, from( #114b6acc ), to( #071320dd ) );
 	border: 1px solid #4bbcebaa;
 	box-shadow: inset #9ce9ff20 0px 0px 14px 0px;
@@ -279,14 +281,14 @@
 	width: fill-parent-flow( 1 );
 	height: 100%;
 	flow-children: down;
-	padding: 14px 52px 8px 12px;
+	padding: 18px 64px 12px 16px;
 }
 
 .XHSEventTitle
 {
 	width: 100%;
-	height: 28px;
-	font-size: 20px;
+	height: 32px;
+	font-size: 24px;
 	font-weight: semi-bold;
 	color: #f4fbff;
 	text-shadow: 0px 1px 4px #000000dd;
@@ -296,15 +298,15 @@
 .XHSEventRewardLine
 {
 	width: 100%;
-	height: 25px;
-	margin-top: 1px;
+	height: 32px;
+	margin-top: 2px;
 	flow-children: right;
 }
 
 .XHSEventRewardIcon
 {
-	width: 42px;
-	height: 30px;
+	width: 54px;
+	height: 40px;
 	border: 1px solid #69cfff88;
 	box-shadow: fill #00000088 0px 0px 5px 0px, #1bc7ff33 0px 0px 7px 0px;
 	background-color: #04101aee;
@@ -315,8 +317,8 @@
 	ignore-parent-flow: true;
 	horizontal-align: right;
 	vertical-align: top;
-	margin-top: 8px;
-	margin-right: 9px;
+	margin-top: 12px;
+	margin-right: 12px;
 	padding: 1px;
 	z-index: 4;
 }
@@ -324,10 +326,10 @@
 .XHSEventRewardText
 {
 	width: fill-parent-flow( 1 );
-	height: 24px;
+	height: 32px;
 	margin-left: 0px;
 	vertical-align: center;
-	font-size: 13px;
+	font-size: 16px;
 	font-weight: semi-bold;
 	color: #7fdfff;
 	text-shadow: 0px 1px 3px #000000cc;
@@ -371,9 +373,9 @@
 .XHSEventDescription
 {
 	width: 100%;
-	height: 34px;
-	margin-top: 4px;
-	font-size: 14px;
+	height: 56px;
+	margin-top: 8px;
+	font-size: 18px;
 	color: #bdd0df;
 	text-shadow: 0px 1px 3px #000000aa;
 	text-overflow: shrink;
@@ -382,8 +384,8 @@
 .XHSEventsFooter
 {
 	width: 100%;
-	height: 32px;
-	margin-top: 4px;
+	height: 40px;
+	margin-top: 8px;
 	flow-children: right;
 	background-color: #04101a88;
 	border-top: 1px solid #1b5e84aa;
@@ -391,10 +393,10 @@
 
 .XHSEventsFooterDot
 {
-	width: 8px;
-	height: 8px;
-	margin-left: 12px;
-	margin-top: 12px;
+	width: 10px;
+	height: 10px;
+	margin-left: 14px;
+	margin-top: 15px;
 	background-color: #54d8ff;
 	border-radius: 50%;
 	box-shadow: #54d8ffaa 0px 0px 8px 0px;
@@ -402,27 +404,30 @@
 
 .XHSEventsFooter Label
 {
-	margin-left: 8px;
+	margin-left: 10px;
 	vertical-align: center;
-	font-size: 14px;
+	font-size: 16px;
 	color: #9fbbd0;
 	text-shadow: 0px 1px 3px #000000aa;
 }
 
 .AspectRatio4x3 .XHSEventsPanel
 {
-	width: 650px;
+	width: 760px;
+	min-height: 520px;
 }
 
 .AspectRatio4x3 .XHSEventCard
 {
-	width: 291px;
+	width: 352px;
+	height: 150px;
 	margin-right: 10px;
 }
 
 .AspectRatio4x3 .XHSEventIcon
 {
-	width: 54px;
-	height: 54px;
+	width: 78px;
+	height: 78px;
 	margin-left: 10px;
+	margin-top: 30px;
 }

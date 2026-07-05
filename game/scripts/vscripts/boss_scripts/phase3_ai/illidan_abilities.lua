@@ -13,7 +13,9 @@ LinkLuaModifier("modifier_xhs_illidan_metamorphosis", "boss_scripts/phase3_ai/il
 LinkLuaModifier("modifier_xhs_illidan_demon_hunter", "boss_scripts/phase3_ai/illidan_abilities.lua", LUA_MODIFIER_MOTION_NONE)
 
 modifier_xhs_illidan_metamorphosis = modifier_xhs_illidan_metamorphosis or class({})
+modifier_xhs_illidan_metamorphosis.XHS_LINK_CLIENT = true
 modifier_xhs_illidan_demon_hunter = modifier_xhs_illidan_demon_hunter or class({})
+modifier_xhs_illidan_demon_hunter.XHS_LINK_CLIENT = true
 
 local ILLIDAN_COLORS = {
 	primary = Vector(102, 255, 64),

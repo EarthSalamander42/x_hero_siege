@@ -45,6 +45,7 @@ function item_tempest_aegis:GetAbilityTextureName()
 end
 
 modifier_orb_of_wind_active = modifier_orb_of_wind_active or class({})
+modifier_orb_of_wind_active.XHS_LINK_CLIENT = true
 
 function modifier_orb_of_wind_active:IsHidden() return false end
 function modifier_orb_of_wind_active:IsPurgable() return false end
@@ -52,6 +53,7 @@ function modifier_orb_of_wind_active:RemoveOnDeath() return false end
 function modifier_orb_of_wind_active:GetTexture() return "modifiers/talisman_of_evasion_datadriven" end
 
 modifier_orb_of_wind = modifier_orb_of_wind or class({})
+modifier_orb_of_wind.XHS_LINK_CLIENT = true
 
 function modifier_orb_of_wind:IsHidden() return true end
 function modifier_orb_of_wind:IsPurgable() return false end
@@ -115,6 +117,7 @@ function modifier_orb_of_wind:OnAttackFail(params)
 end
 
 modifier_orb_of_wind_zephyr = modifier_orb_of_wind_zephyr or class({})
+modifier_orb_of_wind_zephyr.XHS_LINK_CLIENT = true
 
 function modifier_orb_of_wind_zephyr:IsHidden() return false end
 function modifier_orb_of_wind_zephyr:IsPurgable() return true end
@@ -138,6 +141,7 @@ function modifier_orb_of_wind_zephyr:GetEffectAttachType()
 end
 
 modifier_orb_of_wind_guard = modifier_orb_of_wind_guard or class({})
+modifier_orb_of_wind_guard.XHS_LINK_CLIENT = true
 
 function modifier_orb_of_wind_guard:IsHidden() return false end
 function modifier_orb_of_wind_guard:IsPurgable() return true end

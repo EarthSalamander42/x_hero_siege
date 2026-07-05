@@ -2,6 +2,7 @@
 -- Date:	05.11.2017
 
 modifier_ai = modifier_ai or class({})
+modifier_ai.XHS_LINK_CLIENT = true
 
 function modifier_ai:GetAttributes() return MODIFIER_ATTRIBUTE_IGNORE_INVULNERABLE end
 

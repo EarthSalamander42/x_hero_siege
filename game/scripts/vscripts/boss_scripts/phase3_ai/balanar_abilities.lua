@@ -17,9 +17,13 @@ LinkLuaModifier("modifier_balanar_rain_of_chaos", "abilities/heroes/npc_hero_bal
 LinkLuaModifier("modifier_balanar_rain_of_chaos_dummy", "abilities/heroes/npc_hero_balanar/balanar_rain_of_chaos.lua", LUA_MODIFIER_MOTION_NONE)
 
 modifier_xhs_balanar_nightfall = modifier_xhs_balanar_nightfall or class({})
+modifier_xhs_balanar_nightfall.XHS_LINK_CLIENT = true
 modifier_xhs_balanar_dread = modifier_xhs_balanar_dread or class({})
+modifier_xhs_balanar_dread.XHS_LINK_CLIENT = true
 modifier_xhs_balanar_nightmare = modifier_xhs_balanar_nightmare or class({})
+modifier_xhs_balanar_nightmare.XHS_LINK_CLIENT = true
 modifier_xhs_balanar_vampiric_presence = modifier_xhs_balanar_vampiric_presence or class({})
+modifier_xhs_balanar_vampiric_presence.XHS_LINK_CLIENT = true
 
 local BALANAR_COLORS = {
 	primary = Vector(155, 55, 255),

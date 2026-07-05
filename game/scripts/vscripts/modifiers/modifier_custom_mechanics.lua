@@ -1,4 +1,5 @@
 modifier_custom_mechanics = modifier_custom_mechanics or class({})
+modifier_custom_mechanics.XHS_LINK_CLIENT = true
 
 function modifier_custom_mechanics:IsHidden() return true end
 

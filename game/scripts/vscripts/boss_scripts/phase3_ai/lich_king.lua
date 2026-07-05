@@ -3,6 +3,7 @@ require("boss_scripts/phase3_ai/telegraphs")
 require("boss_scripts/phase3_ai/lich_king_abilities")
 
 modifier_xhs_lich_king_phase3_ai = modifier_xhs_lich_king_phase3_ai or class({})
+modifier_xhs_lich_king_phase3_ai.XHS_LINK_CLIENT = true
 LinkLuaModifier("modifier_xhs_lich_king_phase3_ai", "boss_scripts/phase3_ai/lich_king.lua", LUA_MODIFIER_MOTION_NONE)
 
 local LICH_KING_ABILITIES = {

@@ -11,9 +11,13 @@ xhs_lich_king_defile = xhs_lich_king_defile or class({})
 xhs_lich_king_sindragosa_flyby = xhs_lich_king_sindragosa_flyby or class({})
 
 modifier_xhs_lich_king_frost_slow = modifier_xhs_lich_king_frost_slow or class({})
+modifier_xhs_lich_king_frost_slow.XHS_LINK_CLIENT = true
 modifier_xhs_lich_king_remorseless = modifier_xhs_lich_king_remorseless or class({})
+modifier_xhs_lich_king_remorseless.XHS_LINK_CLIENT = true
 modifier_xhs_lich_king_frozen_throne = modifier_xhs_lich_king_frozen_throne or class({})
+modifier_xhs_lich_king_frozen_throne.XHS_LINK_CLIENT = true
 modifier_xhs_lich_king_frostbite = modifier_xhs_lich_king_frostbite or class({})
+modifier_xhs_lich_king_frostbite.XHS_LINK_CLIENT = true
 
 LinkLuaModifier("modifier_xhs_lich_king_frost_slow", "boss_scripts/phase3_ai/lich_king_abilities.lua", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_xhs_lich_king_remorseless", "boss_scripts/phase3_ai/lich_king_abilities.lua", LUA_MODIFIER_MOTION_NONE)

@@ -15,6 +15,7 @@ local function ApplyVisibleRuneModifierDefaults(modifierClass)
 end
 
 modifier_xhs_rune_healing = modifier_xhs_rune_healing or class({})
+modifier_xhs_rune_healing.XHS_LINK_CLIENT = true
 function modifier_xhs_rune_healing:OnCreated(kv)
 	kv = kv or {}
 	self.hp_regen_pct = tonumber(kv.hp_regen_pct) or 5
@@ -27,6 +28,7 @@ function modifier_xhs_rune_healing:GetModifierHealthRegenPercentage() return sel
 function modifier_xhs_rune_healing:GetModifierTotalPercentageManaRegen() return self.mana_regen_pct or 0 end
 
 modifier_xhs_rune_revitalization = modifier_xhs_rune_revitalization or class({})
+modifier_xhs_rune_revitalization.XHS_LINK_CLIENT = true
 function modifier_xhs_rune_revitalization:OnCreated(kv)
 	kv = kv or {}
 	self.mana_regen_pct = tonumber(kv.mana_regen_pct) or 12
@@ -37,6 +39,7 @@ function modifier_xhs_rune_revitalization:DeclareFunctions() return { MODIFIER_P
 function modifier_xhs_rune_revitalization:GetModifierTotalPercentageManaRegen() return self.mana_regen_pct or 0 end
 
 modifier_xhs_rune_second_wind = modifier_xhs_rune_second_wind or class({})
+modifier_xhs_rune_second_wind.XHS_LINK_CLIENT = true
 function modifier_xhs_rune_second_wind:OnCreated(kv)
 	kv = kv or {}
 	self.threshold_pct = tonumber(kv.threshold_pct) or 30
@@ -70,6 +73,7 @@ function modifier_xhs_rune_second_wind:OnIntervalThink()
 end
 
 modifier_xhs_rune_second_wind_heal = modifier_xhs_rune_second_wind_heal or class({})
+modifier_xhs_rune_second_wind_heal.XHS_LINK_CLIENT = true
 function modifier_xhs_rune_second_wind_heal:OnCreated(kv)
 	kv = kv or {}
 	self.heal_pct = tonumber(kv.heal_pct) or 30
@@ -85,6 +89,7 @@ function modifier_xhs_rune_second_wind_heal:GetModifierConstantHealthRegen() ret
 function modifier_xhs_rune_second_wind_heal:GetModifierConstantManaRegen() return self.mana_regen or 0 end
 
 modifier_xhs_rune_second_wind_guard = modifier_xhs_rune_second_wind_guard or class({})
+modifier_xhs_rune_second_wind_guard.XHS_LINK_CLIENT = true
 function modifier_xhs_rune_second_wind_guard:OnCreated(kv)
 	kv = kv or {}
 	self.guard_reduction = tonumber(kv.guard_reduction) or 20
@@ -95,6 +100,7 @@ function modifier_xhs_rune_second_wind_guard:DeclareFunctions() return { MODIFIE
 function modifier_xhs_rune_second_wind_guard:GetModifierIncomingDamage_Percentage() return -(self.guard_reduction or 0) end
 
 modifier_xhs_rune_barrier = modifier_xhs_rune_barrier or class({})
+modifier_xhs_rune_barrier.XHS_LINK_CLIENT = true
 function modifier_xhs_rune_barrier:OnCreated(kv)
 	kv = kv or {}
 	self.max_shield = self:GetParent():GetMaxHealth() * ((tonumber(kv.shield_pct) or 25) * 0.01)
@@ -120,6 +126,7 @@ function modifier_xhs_rune_barrier:AbsorbDamage(damage)
 end
 
 modifier_xhs_rune_retaliation = modifier_xhs_rune_retaliation or class({})
+modifier_xhs_rune_retaliation.XHS_LINK_CLIENT = true
 function modifier_xhs_rune_retaliation:OnCreated(kv)
 	kv = kv or {}
 	self.reflect_pct = tonumber(kv.reflect_pct) or 25
@@ -145,6 +152,7 @@ function modifier_xhs_rune_retaliation:OnTakeDamage(params)
 end
 
 modifier_xhs_rune_bulwark = modifier_xhs_rune_bulwark or class({})
+modifier_xhs_rune_bulwark.XHS_LINK_CLIENT = true
 function modifier_xhs_rune_bulwark:OnCreated(kv)
 	kv = kv or {}
 	self.armor = tonumber(kv.armor) or 35
@@ -157,6 +165,7 @@ function modifier_xhs_rune_bulwark:GetModifierPhysicalArmorBonus() return self.a
 function modifier_xhs_rune_bulwark:GetModifierMagicalResistanceBonus() return self.magic_resist or 0 end
 
 modifier_xhs_rune_fortitude = modifier_xhs_rune_fortitude or class({})
+modifier_xhs_rune_fortitude.XHS_LINK_CLIENT = true
 function modifier_xhs_rune_fortitude:OnCreated(kv)
 	kv = kv or {}
 	self.status_resist = tonumber(kv.status_resist) or 35
@@ -169,6 +178,7 @@ function modifier_xhs_rune_fortitude:GetModifierStatusResistanceStacking() retur
 function modifier_xhs_rune_fortitude:GetModifierIncomingDamage_Percentage() return -(self.damage_reduction or 0) end
 
 modifier_xhs_rune_titan = modifier_xhs_rune_titan or class({})
+modifier_xhs_rune_titan.XHS_LINK_CLIENT = true
 function modifier_xhs_rune_titan:OnCreated(kv)
 	kv = kv or {}
 	self.model_scale = tonumber(kv.model_scale) or 18
@@ -188,6 +198,7 @@ function modifier_xhs_rune_titan:OnDestroy()
 end
 
 modifier_xhs_rune_fury = modifier_xhs_rune_fury or class({})
+modifier_xhs_rune_fury.XHS_LINK_CLIENT = true
 function modifier_xhs_rune_fury:OnCreated(kv)
 	kv = kv or {}
 	self.attack_speed = tonumber(kv.attack_speed) or 160
@@ -200,6 +211,7 @@ function modifier_xhs_rune_fury:GetModifierAttackSpeedBonus_Constant() return se
 function modifier_xhs_rune_fury:GetModifierSpellAmplify_Percentage() return self.spell_amp or 0 end
 
 modifier_xhs_rune_siegebreaker = modifier_xhs_rune_siegebreaker or class({})
+modifier_xhs_rune_siegebreaker.XHS_LINK_CLIENT = true
 function modifier_xhs_rune_siegebreaker:OnCreated(kv)
 	kv = kv or {}
 	self.bonus_damage = tonumber(kv.bonus_damage) or 45
@@ -217,6 +229,7 @@ function modifier_xhs_rune_siegebreaker:GetModifierTotalDamageOutgoing_Percentag
 end
 
 modifier_xhs_rune_storm = modifier_xhs_rune_storm or class({})
+modifier_xhs_rune_storm.XHS_LINK_CLIENT = true
 function modifier_xhs_rune_storm:IsHidden() return false end
 function modifier_xhs_rune_storm:IsDebuff() return false end
 function modifier_xhs_rune_storm:IsPurgable() return false end
@@ -253,6 +266,7 @@ function modifier_xhs_rune_storm:OnIntervalThink()
 end
 
 modifier_xhs_rune_bounty_surge = modifier_xhs_rune_bounty_surge or class({})
+modifier_xhs_rune_bounty_surge.XHS_LINK_CLIENT = true
 function modifier_xhs_rune_bounty_surge:OnCreated(kv)
 	kv = kv or {}
 	self.bounty_pct = tonumber(kv.bounty_pct) or 35
@@ -262,6 +276,7 @@ function modifier_xhs_rune_bounty_surge:OnRefresh(kv) self:OnCreated(kv) end
 function modifier_xhs_rune_bounty_surge:GetTexture() return "bounty_hunter_track" end
 
 modifier_xhs_rune_momentum = modifier_xhs_rune_momentum or class({})
+modifier_xhs_rune_momentum.XHS_LINK_CLIENT = true
 function modifier_xhs_rune_momentum:OnCreated(kv)
 	kv = kv or {}
 	self.move_speed = tonumber(kv.move_speed) or 18

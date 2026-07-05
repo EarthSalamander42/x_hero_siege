@@ -38,6 +38,7 @@ end
 
 LinkLuaModifier("modifier_xhs_brewmaster_drunken_haze_debuff", "abilities/heroes/hero_brewmaster.lua", LUA_MODIFIER_MOTION_NONE)
 if modifier_xhs_brewmaster_drunken_haze_debuff == nil then modifier_xhs_brewmaster_drunken_haze_debuff = class({}) end
+modifier_xhs_brewmaster_drunken_haze_debuff.XHS_LINK_CLIENT = true
 function modifier_xhs_brewmaster_drunken_haze_debuff:IsPurgable() return true end
 
 function modifier_xhs_brewmaster_drunken_haze_debuff:IsHidden() return false end
@@ -86,6 +87,7 @@ end
 
 LinkLuaModifier("modifier_xhs_brewmaster_drunken_haze_burn", "abilities/heroes/hero_brewmaster.lua", LUA_MODIFIER_MOTION_NONE)
 if modifier_xhs_brewmaster_drunken_haze_burn == nil then modifier_xhs_brewmaster_drunken_haze_burn = class({}) end
+modifier_xhs_brewmaster_drunken_haze_burn.XHS_LINK_CLIENT = true
 function modifier_xhs_brewmaster_drunken_haze_burn:IsPurgable() return true end
 
 function modifier_xhs_brewmaster_drunken_haze_burn:IsHidden() return false end
@@ -161,6 +163,7 @@ end
 ------------------------------------------------
 
 modifier_earthquake_aura = class({})
+modifier_earthquake_aura.XHS_LINK_CLIENT = true
 
 LinkLuaModifier("modifier_earthquake", "abilities/heroes/hero_brewmaster", LUA_MODIFIER_MOTION_NONE)
 
@@ -222,6 +225,7 @@ end
 --------------------------------------------------------------------------------
 
 modifier_earthquake = class({})
+modifier_earthquake.XHS_LINK_CLIENT = true
 
 function modifier_earthquake:DeclareFunctions()
 	return { MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE }

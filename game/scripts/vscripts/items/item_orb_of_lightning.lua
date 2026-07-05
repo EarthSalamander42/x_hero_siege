@@ -116,6 +116,7 @@ end
 --------------------------------------------------------------
 
 modifier_orb_of_lightning_active = modifier_orb_of_lightning_active or class({})
+modifier_orb_of_lightning_active.XHS_LINK_CLIENT = true
 
 function modifier_orb_of_lightning_active:IsHidden() return false end
 
@@ -195,6 +196,7 @@ end
 --------------------------------------------------------------
 
 modifier_orb_of_lightning_passive = modifier_orb_of_lightning_passive or class({})
+modifier_orb_of_lightning_passive.XHS_LINK_CLIENT = true
 
 function modifier_orb_of_lightning_passive:IsHidden() return true end
 
@@ -230,6 +232,7 @@ end
 --------------------------------------------------------------
 
 modifier_orb_of_lightning_purge = modifier_orb_of_lightning_purge or class({})
+modifier_orb_of_lightning_purge.XHS_LINK_CLIENT = true
 
 function modifier_orb_of_lightning_purge:IsHidden() return false end
 

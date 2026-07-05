@@ -1,4 +1,5 @@
 modifier_animation_translate = class({})
+modifier_animation_translate.XHS_LINK_CLIENT = true
 
 require('libraries/modifiers/animation_code')
 

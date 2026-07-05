@@ -10,6 +10,7 @@ function item_shield_of_invincibility:GetIntrinsicModifierName()
 end
 
 modifier_shield_of_invincibility = modifier_shield_of_invincibility or class({})
+modifier_shield_of_invincibility.XHS_LINK_CLIENT = true
 
 function modifier_shield_of_invincibility:RemoveOnDeath() return false end
 

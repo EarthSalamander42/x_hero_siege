@@ -4994,3 +4994,161 @@
 	min-height: 288px;
 	height: 288px;
 }
+
+#VoteContent #vote_difficulty .vote-select-panel {
+	height: 342px;
+	min-height: 342px;
+	padding: 16px 10px 14px 10px;
+}
+
+#VoteContent #vote_difficulty .vote-select-title {
+	height: 52px;
+	margin-bottom: 7px;
+	font-size: 38px;
+	line-height: 44px;
+}
+
+#VoteContent #vote_difficulty .vote-select-description {
+	height: 58px;
+	max-height: 58px;
+	margin-bottom: 5px;
+	font-size: 15px;
+	line-height: 19px;
+	color: #dce6f6;
+	text-shadow: 0px 1px 2px #000000;
+}
+
+#VoteContent #vote_difficulty .vote-select-panel .vote-button {
+	height: 40px;
+	margin-top: 6px;
+}
+
+.vote-difficulty-stats {
+	width: 100%;
+	height: fit-children;
+	flow-children: down;
+	margin-top: 2px;
+	margin-bottom: 2px;
+}
+
+.vote-difficulty-stat-row {
+	width: 100%;
+	height: 28px;
+	flow-children: right;
+	margin-bottom: 4px;
+	background-color: gradient(linear, 0% 0%, 100% 0%, from(#07101ccc), color-stop(0.55, #152235cc), to(#07101c99));
+	border: 1px solid #d5b87824;
+	box-shadow: fill #00000033 0px 0px 5px 0px;
+}
+
+.vote-difficulty-stat-icon {
+	width: 24px;
+	height: 24px;
+	margin-left: 4px;
+	margin-right: 6px;
+	vertical-align: center;
+}
+
+.vote-difficulty-stat-copy {
+	width: fill-parent-flow(1.0);
+	height: 100%;
+	flow-children: right;
+	vertical-align: center;
+	padding-right: 6px;
+}
+
+.vote-difficulty-stat-label {
+	width: fill-parent-flow(1.0);
+	height: 100%;
+	font-size: 12px;
+	line-height: 28px;
+	color: #9baec4;
+	text-align: left center;
+	text-overflow: shrink;
+	text-shadow: 0px 1px 2px #000000;
+}
+
+.vote-difficulty-stat-value {
+	min-width: 42px;
+	height: 100%;
+	font-size: 15px;
+	line-height: 28px;
+	color: #eef7ff;
+	text-align: right center;
+	text-overflow: shrink;
+	text-shadow: 0px 1px 2px #000000;
+}
+
+.VoteDifficultyGold {
+	border-color: #f0c24a42;
+}
+
+.VoteDifficultyGold .vote-difficulty-stat-value {
+	color: #ffd767;
+}
+
+.VoteDifficultyAnkhs {
+	border-color: #7bcaff36;
+}
+
+.VoteDifficultyAnkhs .vote-difficulty-stat-value {
+	color: #8bd8ff;
+}
+
+.VoteDifficultyBonus {
+	background-color: gradient(linear, 0% 0%, 100% 0%, from(#071a12d8), color-stop(0.55, #12321dcc), to(#071a1299));
+	border-color: #72d17b55;
+}
+
+.VoteDifficultyBonus .vote-difficulty-stat-label {
+	color: #9ee4a8;
+}
+
+.VoteDifficultyBonus .vote-difficulty-stat-value {
+	width: fill-parent-flow(1.0);
+	min-width: 0px;
+	color: #d5ffd9;
+	text-align: left center;
+}
+
+.AspectRatio4x3 #VoteContent #vote_difficulty .vote-select-panel {
+	height: 326px;
+	min-height: 326px;
+	padding-top: 14px;
+}
+
+.AspectRatio4x3 #VoteContent #vote_difficulty .vote-select-title {
+	height: 46px;
+	margin-bottom: 5px;
+	font-size: 32px;
+	line-height: 38px;
+}
+
+.AspectRatio4x3 #VoteContent #vote_difficulty .vote-select-description {
+	height: 50px;
+	max-height: 50px;
+	font-size: 13px;
+	line-height: 16px;
+}
+
+.AspectRatio4x3 .vote-difficulty-stat-row {
+	height: 25px;
+	margin-bottom: 3px;
+}
+
+.AspectRatio4x3 .vote-difficulty-stat-icon {
+	width: 21px;
+	height: 21px;
+	margin-left: 3px;
+	margin-right: 5px;
+}
+
+.AspectRatio4x3 .vote-difficulty-stat-label {
+	font-size: 10px;
+	line-height: 25px;
+}
+
+.AspectRatio4x3 .vote-difficulty-stat-value {
+	font-size: 12px;
+	line-height: 25px;
+}

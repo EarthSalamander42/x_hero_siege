@@ -7,6 +7,7 @@ function tyrande_multiple_arrows:GetIntrinsicModifierName()
 end
 
 modifier_tyrande_multiple_arrows = modifier_tyrande_multiple_arrows or class({})
+modifier_tyrande_multiple_arrows.XHS_LINK_CLIENT = true
 
 function modifier_tyrande_multiple_arrows:IsHidden() return true end
 
@@ -69,6 +70,7 @@ function xhs_trueshot_aura:GetIntrinsicModifierName()
 end
 
 modifier_xhs_trueshot_aura = modifier_xhs_trueshot_aura or class({})
+modifier_xhs_trueshot_aura.XHS_LINK_CLIENT = true
 
 -- Modifier properties
 function modifier_xhs_trueshot_aura:IsAura() return true end
@@ -104,6 +106,7 @@ function modifier_xhs_trueshot_aura:GetAuraEntityReject(target)
 end
 
 modifier_xhs_trueshot = modifier_xhs_trueshot or class({})
+modifier_xhs_trueshot.XHS_LINK_CLIENT = true
 
 -- Modifier properties
 function modifier_xhs_trueshot:IsDebuff() return false end

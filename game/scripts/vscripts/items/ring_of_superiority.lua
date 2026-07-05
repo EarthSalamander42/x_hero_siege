@@ -11,6 +11,7 @@ function item_ring_of_superiority:GetIntrinsicModifierName()
 end
 
 modifier_ring_of_superiority = modifier_ring_of_superiority or class({})
+modifier_ring_of_superiority.XHS_LINK_CLIENT = true
 
 function modifier_ring_of_superiority:IsHidden() return true end
 
@@ -37,6 +38,7 @@ function modifier_ring_of_superiority:OnRemoved()
 end
 
 modifier_devotion_buff = modifier_devotion_buff or class({})
+modifier_devotion_buff.XHS_LINK_CLIENT = true
 
 function modifier_devotion_buff:GetTexture() return "omniknight_degen_aura" end
 

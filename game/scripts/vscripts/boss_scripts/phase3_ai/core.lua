@@ -6,7 +6,9 @@ LinkLuaModifier("modifier_xhs_boss_cast_protection", "boss_scripts/phase3_ai/cor
 LinkLuaModifier("modifier_xhs_phase3_hide_overhead_bar", "boss_scripts/phase3_ai/core.lua", LUA_MODIFIER_MOTION_NONE)
 
 modifier_xhs_boss_cast_protection = modifier_xhs_boss_cast_protection or class({})
+modifier_xhs_boss_cast_protection.XHS_LINK_CLIENT = true
 modifier_xhs_phase3_hide_overhead_bar = modifier_xhs_phase3_hide_overhead_bar or class({})
+modifier_xhs_phase3_hide_overhead_bar.XHS_LINK_CLIENT = true
 
 local DIFFICULTY_SCALE = {
 	[1] = { damage = 0.70, delay = 1.25, density = 0.65 },

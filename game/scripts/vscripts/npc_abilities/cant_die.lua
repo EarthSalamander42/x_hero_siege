@@ -41,6 +41,7 @@ function cant_die_generic:GetIntrinsicModifierName()
 end
 
 modifier_cant_die_generic = modifier_cant_die_generic or class({})
+modifier_cant_die_generic.XHS_LINK_CLIENT = true
 
 local function CleanupBanehallowRevenants()
 	local units = FindUnitsInRadius(
@@ -258,6 +259,7 @@ function modifier_cant_die_generic:OnTakeDamage(event)
 end
 
 modifier_dying_generic = modifier_dying_generic or class({})
+modifier_dying_generic.XHS_LINK_CLIENT = true
 
 function modifier_dying_generic:IsHidden() return true end
 

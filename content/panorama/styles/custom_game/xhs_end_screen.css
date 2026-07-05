@@ -368,6 +368,20 @@
 	margin-top: 0px;
 	flow-children: down;
 	overflow: squish scroll;
+	padding-right: 5px;
+}
+
+.XHSEndScreenMvpGrid VerticalScrollBar {
+	width: 5px;
+	margin-left: 3px;
+	background-color: #020712aa;
+	border: 1px solid #77c8ff16;
+	visibility: visible;
+}
+
+.XHSEndScreenMvpGrid VerticalScrollBar .ScrollThumb {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #2c6f94 ), to( #7bd8ff ) );
+	border: 1px solid #b9f1ff44;
 }
 
 .XHSMvpCard {
@@ -429,6 +443,21 @@
 .XHSMvpValue.MvpPotions {
 	color: #79e6a6;
 	text-shadow: 0px 1px 3px #042510;
+}
+
+.XHSMvpValue.MvpBossDamage {
+	color: #ff9f5a;
+	text-shadow: 0px 1px 3px #2d1205;
+}
+
+.XHSMvpValue.MvpDamageTaken {
+	color: #d69cff;
+	text-shadow: 0px 1px 3px #19052d;
+}
+
+.XHSMvpValue.MvpSustain {
+	color: #5df0c7;
+	text-shadow: 0px 1px 3px #03261f;
 }
 
 .XHSEndScreenPlayersPanel {

@@ -6,7 +6,9 @@ LinkLuaModifier("modifier_xhs_grom_phase3_ai", "boss_scripts/phase3_ai/grom.lua"
 LinkLuaModifier("modifier_xhs_grom_clone", "boss_scripts/phase3_ai/grom.lua", LUA_MODIFIER_MOTION_NONE)
 
 modifier_xhs_grom_phase3_ai = modifier_xhs_grom_phase3_ai or class({})
+modifier_xhs_grom_phase3_ai.XHS_LINK_CLIENT = true
 modifier_xhs_grom_clone = modifier_xhs_grom_clone or class({})
+modifier_xhs_grom_clone.XHS_LINK_CLIENT = true
 
 local GROM_ABILITIES = {
 	"xhs_grom_mirror_trial",

@@ -5,6 +5,8 @@ if not SpecialEvents then
 end
 
 local SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP = 2.75
+local CINEMATIC_EVENT_PRE_TELEPORT_DELAY = 4.0
+local CINEMATIC_EVENT_POST_TELEPORT_HOLD = 1.5
 
 local function ShowCurrentEventTimer(title, duration)
 	CustomGameEventManager:Send_ServerToAllClients("show_current_event_timer", {
@@ -95,6 +97,35 @@ local function NotifySpecialArenaInstructions(hero, boss_hero, text)
 	})
 end
 
+local function StartCinematicDelayedTeleport(hero, point, delay)
+	if hero == nil or hero:IsNull() or point == nil then return end
+
+	Timers:CreateTimer(delay, function()
+		if hero ~= nil and not hero:IsNull() then
+			TeleportHero(hero, point, 0.0)
+		end
+		return nil
+	end)
+end
+
+local function StartSpecialArenaCinematicIntro(hero, point, creep_watch_name, on_complete)
+	local intro_duration = CINEMATIC_EVENT_PRE_TELEPORT_DELAY + CINEMATIC_EVENT_POST_TELEPORT_HOLD
+
+	CinematicPauseCreeps(SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP)
+	CinematicPauseHeroesForDuration(SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP, intro_duration)
+	StartCinematicPauseCreepsWatch(creep_watch_name, SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP)
+
+	StartCinematicDelayedTeleport(hero, point, CINEMATIC_EVENT_PRE_TELEPORT_DELAY)
+
+	Timers:CreateTimer(intro_duration, function()
+		if on_complete ~= nil then
+			on_complete()
+		end
+	end)
+
+	return intro_duration
+end
+
 local STORM_EARTH_FIRE_SOUND = "Muradin.StormEarthFire"
 
 local function StopStormEarthFireSound(entity)
@@ -139,7 +170,7 @@ local function PlayStormEarthFireSound(entity)
 end
 
 function SpecialEvents:MuradinEvent(time)
-	local stun_duration = 5.0
+	local stun_duration = CINEMATIC_EVENT_PRE_TELEPORT_DELAY + CINEMATIC_EVENT_POST_TELEPORT_HOLD
 	local event_end_delay = time + stun_duration
 
 	StopAllStormEarthFireSounds()
@@ -186,7 +217,9 @@ function SpecialEvents:MuradinEvent(time)
 				local point = Entities:FindByName(nil, "npc_dota_muradin_player_" .. id)
 
 				DisableItems(hero, event_end_delay)
-				TeleportHero(hero, point:GetAbsOrigin(), stun_duration - 2.0)
+				if point ~= nil then
+					StartCinematicDelayedTeleport(hero, point:GetAbsOrigin(), CINEMATIC_EVENT_PRE_TELEPORT_DELAY)
+				end
 			end
 		end
 	end
@@ -300,8 +333,8 @@ end
 
 function SpecialEvents:FarmEvent(time)
 	local difficulty = GameRules:GetCustomGameDifficulty()
-	local tp_delay = 3.0
-	local start_delay = tp_delay + 3.0
+	local tp_delay = CINEMATIC_EVENT_PRE_TELEPORT_DELAY
+	local start_delay = tp_delay + CINEMATIC_EVENT_POST_TELEPORT_HOLD
 
 	StopAllStormEarthFireSounds()
 	CustomTimers.current_time["special_event"] = time
@@ -324,7 +357,9 @@ function SpecialEvents:FarmEvent(time)
 
 			if nPlayerID >= 0 then
 				v.old_pos = v:GetAbsOrigin()
-				TeleportHero(v, point:GetAbsOrigin(), tp_delay)
+				if point ~= nil then
+					StartCinematicDelayedTeleport(v, point:GetAbsOrigin(), tp_delay)
+				end
 			end
 		end
 	end
@@ -508,27 +543,25 @@ function SpecialEvents:StartRameroAndBaristolEvent(hero)
 	end
 
 	local point = Entities:FindByName(nil, "npc_dota_muradin_player_1"):GetAbsOrigin()
-	local delay = 5.0
+	local intro_delay = CINEMATIC_EVENT_PRE_TELEPORT_DELAY + CINEMATIC_EVENT_POST_TELEPORT_HOLD
 	StopAllStormEarthFireSounds()
 	CustomTimers.timers_paused = 2
 	CustomTimers:HideSpecialWaveCountdown()
 	GameMode.SpecialArena_occuring = true
-	CustomTimers.current_time["special_arena"] = XHS_RAMERO_BARISTOL_TIME + delay
+	CustomTimers.current_time["special_arena"] = XHS_RAMERO_BARISTOL_TIME + intro_delay
 	BT_ENABLED = 0
 
 	NotifySpecialArenaStarted(hero, "Ramero and Baristol")
-	CinematicPauseCreeps(SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP)
-	CinematicPauseHeroesForDuration(SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP, delay)
-	TeleportHero(hero, point, delay)
-	StartCinematicPauseCreepsWatch("xhs_ramero_baristol_creep_pause_watch", SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP)
-
-	Timers:CreateTimer(delay, function()
-		SpecialEvents:RameroAndBaristolEvent(XHS_RAMERO_BARISTOL_TIME, hero)
-	end)
 
 	SpecialEvents.Ramero_trigger = 1
 
-	hero.old_pos = hero:GetAbsOrigin()
+	if hero ~= nil and not hero:IsNull() then
+		hero.old_pos = hero:GetAbsOrigin()
+	end
+
+	StartSpecialArenaCinematicIntro(hero, point, "xhs_ramero_baristol_creep_pause_watch", function()
+		SpecialEvents:RameroAndBaristolEvent(XHS_RAMERO_BARISTOL_TIME, hero)
+	end)
 end
 
 function SpecialEvents:RameroAndBaristolEvent(time, hero) -- 500 kills
@@ -616,27 +649,25 @@ end
 
 function SpecialEvents:StartSogatEvent(hero)
 	local point = Entities:FindByName(nil, "npc_dota_muradin_player_1"):GetAbsOrigin()
-	local delay = 5.0
+	local intro_delay = CINEMATIC_EVENT_PRE_TELEPORT_DELAY + CINEMATIC_EVENT_POST_TELEPORT_HOLD
 	StopAllStormEarthFireSounds()
 	CustomTimers.timers_paused = 2
 	CustomTimers:HideSpecialWaveCountdown()
 	GameMode.SpecialArena_occuring = true
-	CustomTimers.current_time["special_arena"] = 120.0 + delay
+	CustomTimers.current_time["special_arena"] = 120.0 + intro_delay
 	BT_ENABLED = 0
 
 	NotifySpecialArenaStarted(hero, "Sogat")
-	CinematicPauseCreeps(SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP)
-	CinematicPauseHeroesForDuration(SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP, delay)
-	StartCinematicPauseCreepsWatch("xhs_sogat_creep_pause_watch", SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP)
-	TeleportHero(hero, point, delay)
-
-	Timers:CreateTimer(delay, function()
-		SpecialEvents:SogatEvent(120.0, hero)
-	end)
 
 	SpecialEvents.Ramero_trigger = 2
 
-	hero.old_pos = hero:GetAbsOrigin()
+	if hero ~= nil and not hero:IsNull() then
+		hero.old_pos = hero:GetAbsOrigin()
+	end
+
+	StartSpecialArenaCinematicIntro(hero, point, "xhs_sogat_creep_pause_watch", function()
+		SpecialEvents:SogatEvent(120.0, hero)
+	end)
 end
 
 function SpecialEvents:SogatEvent(time, hero) -- 750 kills

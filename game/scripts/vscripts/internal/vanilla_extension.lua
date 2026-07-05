@@ -1,3 +1,116 @@
+if IsServer() and LinkLuaModifier ~= nil and _G.XHS_NATIVE_LINK_LUA_MODIFIER == nil then
+	_G.XHS_NATIVE_LINK_LUA_MODIFIER = LinkLuaModifier
+	_G.XHS_LINK_LUA_MODIFIER_REGISTRY = _G.XHS_LINK_LUA_MODIFIER_REGISTRY or {}
+	_G.XHS_CLIENT_LINKED_LUA_MODIFIERS = _G.XHS_CLIENT_LINKED_LUA_MODIFIERS or {}
+	_G.XHS_PENDING_CLIENT_LINK_LUA_MODIFIERS = _G.XHS_PENDING_CLIENT_LINK_LUA_MODIFIERS or {}
+	_G.XHS_CLIENT_LINK_LUA_MODIFIER_THINK_ACTIVE = _G.XHS_CLIENT_LINK_LUA_MODIFIER_THINK_ACTIVE or false
+
+	local function XHSPublishClientLinkedLuaModifiers()
+		if CustomNetTables == nil then return end
+
+		local payload = {}
+		for name, entry in pairs(_G.XHS_CLIENT_LINKED_LUA_MODIFIERS) do
+			payload[name] = {
+				name = entry.name,
+				path = entry.path,
+				motion = entry.motion,
+			}
+		end
+
+		CustomNetTables:SetTableValue("xhs_lua_modifiers", "client_links", payload)
+	end
+
+	local function XHSInspectClientLuaModifierLink(name, entry)
+		if name == nil or entry == nil then return false, false end
+		if _G.XHS_CLIENT_LINKED_LUA_MODIFIERS[name] ~= nil then return false, false end
+
+		local modifierClass = _G[name]
+		if modifierClass ~= nil and modifierClass.XHS_LINK_CLIENT == true then
+			_G.XHS_CLIENT_LINKED_LUA_MODIFIERS[name] = entry
+			_G.XHS_PENDING_CLIENT_LINK_LUA_MODIFIERS[name] = nil
+			return true, false
+		end
+
+		if modifierClass ~= nil then
+			_G.XHS_PENDING_CLIENT_LINK_LUA_MODIFIERS[name] = nil
+			return false, false
+		end
+
+		entry.attempts = (entry.attempts or 0) + 1
+		if entry.attempts >= 20 then
+			_G.XHS_PENDING_CLIENT_LINK_LUA_MODIFIERS[name] = nil
+			return false, false
+		end
+
+		return false, true
+	end
+
+	local function XHSInspectPendingClientLuaModifierLinks()
+		local hasPending = false
+		local changed = false
+
+		for name, entry in pairs(_G.XHS_PENDING_CLIENT_LINK_LUA_MODIFIERS) do
+			local entryChanged, entryPending = XHSInspectClientLuaModifierLink(name, entry)
+			changed = changed or entryChanged
+			hasPending = hasPending or entryPending
+		end
+
+		if changed then
+			XHSPublishClientLinkedLuaModifiers()
+		end
+
+		if hasPending then
+			return 0.1
+		end
+
+		_G.XHS_CLIENT_LINK_LUA_MODIFIER_THINK_ACTIVE = false
+		return nil
+	end
+
+	local function XHSScheduleClientLuaModifierLinkInspect()
+		if _G.XHS_CLIENT_LINK_LUA_MODIFIER_THINK_ACTIVE == true then return end
+		if GameRules == nil or GameRules.GetGameModeEntity == nil then return end
+
+		local mode = GameRules:GetGameModeEntity()
+		if mode == nil then return end
+
+		_G.XHS_CLIENT_LINK_LUA_MODIFIER_THINK_ACTIVE = true
+		mode:SetContextThink("xhs_client_link_lua_modifier_inspect", XHSInspectPendingClientLuaModifierLinks, 0.0)
+	end
+
+	LinkLuaModifier = function(name, path, motion)
+		_G.XHS_NATIVE_LINK_LUA_MODIFIER(name, path, motion)
+
+		if name == nil or path == nil then return end
+
+		_G.XHS_LINK_LUA_MODIFIER_REGISTRY[name] = {
+			name = name,
+			path = path,
+			motion = motion or LUA_MODIFIER_MOTION_NONE,
+		}
+		_G.XHS_PENDING_CLIENT_LINK_LUA_MODIFIERS[name] = _G.XHS_LINK_LUA_MODIFIER_REGISTRY[name]
+
+		XHSScheduleClientLuaModifierLinkInspect()
+	end
+
+	if CDOTA_BaseNPC ~= nil and CDOTA_BaseNPC.AddNewModifier ~= nil and _G.XHS_NATIVE_ADD_NEW_MODIFIER == nil then
+		_G.XHS_NATIVE_ADD_NEW_MODIFIER = CDOTA_BaseNPC.AddNewModifier
+
+		CDOTA_BaseNPC.AddNewModifier = function(self, caster, ability, modifierName, modifierTable)
+			local modifier = _G.XHS_NATIVE_ADD_NEW_MODIFIER(self, caster, ability, modifierName, modifierTable)
+			local entry = _G.XHS_LINK_LUA_MODIFIER_REGISTRY[modifierName]
+			if entry ~= nil then
+				local changed = XHSInspectClientLuaModifierLink(modifierName, entry)
+				if changed then
+					XHSPublishClientLinkedLuaModifiers()
+				end
+			end
+
+			return modifier
+		end
+	end
+end
+
 function GetReductionFromArmor(armor)
 	return ((0.052 * armor) / (0.9 + 0.048 * armor))
 end

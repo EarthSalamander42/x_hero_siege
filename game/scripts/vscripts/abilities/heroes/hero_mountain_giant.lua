@@ -15,6 +15,7 @@ function holdout_craggy_exterior:GetAbilityTextureName()
 end
 
 modifier_holdout_craggy_exterior = modifier_holdout_craggy_exterior or class({})
+modifier_holdout_craggy_exterior.XHS_LINK_CLIENT = true
 
 function modifier_holdout_craggy_exterior:IsHidden() return true end
 function modifier_holdout_craggy_exterior:IsPurgable() return false end
@@ -123,6 +124,7 @@ function xhs_stone_giant_earth_splitter:OnSpellStart()
 end
 
 modifier_xhs_stone_giant_earth_splitter_slow = modifier_xhs_stone_giant_earth_splitter_slow or class({})
+modifier_xhs_stone_giant_earth_splitter_slow.XHS_LINK_CLIENT = true
 
 function modifier_xhs_stone_giant_earth_splitter_slow:IsDebuff() return true end
 function modifier_xhs_stone_giant_earth_splitter_slow:IsPurgable() return true end
@@ -148,6 +150,7 @@ function xhs_stone_giant_stone_gaze:OnSpellStart()
 end
 
 modifier_xhs_stone_giant_stone_gaze = modifier_xhs_stone_giant_stone_gaze or class({})
+modifier_xhs_stone_giant_stone_gaze.XHS_LINK_CLIENT = true
 
 function modifier_xhs_stone_giant_stone_gaze:IsHidden() return false end
 function modifier_xhs_stone_giant_stone_gaze:IsPurgable() return false end
@@ -159,6 +162,7 @@ function modifier_xhs_stone_giant_stone_gaze:GetAuraSearchType() return DOTA_UNI
 function modifier_xhs_stone_giant_stone_gaze:GetAuraSearchFlags() return DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES end
 
 modifier_xhs_stone_giant_stone_gaze_debuff = modifier_xhs_stone_giant_stone_gaze_debuff or class({})
+modifier_xhs_stone_giant_stone_gaze_debuff.XHS_LINK_CLIENT = true
 
 function modifier_xhs_stone_giant_stone_gaze_debuff:IsDebuff() return true end
 function modifier_xhs_stone_giant_stone_gaze_debuff:IsPurgable() return true end
@@ -210,6 +214,7 @@ function modifier_xhs_stone_giant_stone_gaze_debuff:OnIntervalThink()
 end
 
 modifier_xhs_stone_giant_petrified = modifier_xhs_stone_giant_petrified or class({})
+modifier_xhs_stone_giant_petrified.XHS_LINK_CLIENT = true
 
 function modifier_xhs_stone_giant_petrified:IsDebuff() return true end
 function modifier_xhs_stone_giant_petrified:IsPurgable() return true end

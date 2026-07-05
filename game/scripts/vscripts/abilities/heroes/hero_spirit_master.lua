@@ -127,6 +127,7 @@ end
 
 --- OVERLOAD PASSIVE MODIFIER
 modifier_imba_overload = modifier_imba_overload or class({})
+modifier_imba_overload.XHS_LINK_CLIENT = true
 
 -- Modifier properties
 function modifier_imba_overload:IsPassive() return true end
@@ -166,6 +167,7 @@ end
 --- OVERLOAD "ACTIVE" MODIFIER
 --------------------------------
 modifier_imba_overload_buff = modifier_imba_overload_buff or class({})
+modifier_imba_overload_buff.XHS_LINK_CLIENT = true
 
 -- Modifier properties
 function modifier_imba_overload_buff:IsDebuff() return false end
@@ -269,6 +271,7 @@ end
 
 --- OVERLOAD DEBUFF MODIFIER
 modifier_imba_overload_debuff = modifier_imba_overload_debuff or class({})
+modifier_imba_overload_debuff.XHS_LINK_CLIENT = true
 
 -- Modifier properties
 function modifier_imba_overload_debuff:IsDebuff() return true end
@@ -387,6 +390,7 @@ function xhs_spirit_master_ball_lightning:SpendTravelMana(distance)
 end
 
 modifier_xhs_spirit_master_ball_lightning = modifier_xhs_spirit_master_ball_lightning or class({})
+modifier_xhs_spirit_master_ball_lightning.XHS_LINK_CLIENT = true
 
 function modifier_xhs_spirit_master_ball_lightning:IsHidden() return true end
 function modifier_xhs_spirit_master_ball_lightning:IsPurgable() return false end

@@ -68,6 +68,7 @@ function item_ankh_of_reincarnation:GetIntrinsicModifierName()
 end
 
 modifier_ankh = modifier_ankh or class({})
+modifier_ankh.XHS_LINK_CLIENT = true
 
 function modifier_ankh:IsHidden() return true end
 
@@ -127,6 +128,7 @@ function modifier_ankh:OnCreated(keys)
 end
 
 modifier_ankh_passives = modifier_ankh_passives or class({})
+modifier_ankh_passives.XHS_LINK_CLIENT = true
 
 function modifier_ankh_passives:IsHidden() return true end
 function modifier_ankh_passives:RemoveOnDeath() return false end

@@ -13,7 +13,9 @@ LinkLuaModifier("modifier_xhs_grom_blood_frenzy", "boss_scripts/phase3_ai/grom_a
 LinkLuaModifier("modifier_xhs_grom_slow", "boss_scripts/phase3_ai/grom_abilities.lua", LUA_MODIFIER_MOTION_NONE)
 
 modifier_xhs_grom_blood_frenzy = modifier_xhs_grom_blood_frenzy or class({})
+modifier_xhs_grom_blood_frenzy.XHS_LINK_CLIENT = true
 modifier_xhs_grom_slow = modifier_xhs_grom_slow or class({})
+modifier_xhs_grom_slow.XHS_LINK_CLIENT = true
 
 local GROM_COLORS = {
 	primary = Vector(255, 62, 34),

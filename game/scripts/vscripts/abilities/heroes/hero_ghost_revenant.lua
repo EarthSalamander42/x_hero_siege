@@ -34,6 +34,7 @@ end
 -- Wraith modifier
 -----------------------------------------------------------------------------------------------------------
 modifier_ghost_revenant_wraith = class({})
+modifier_ghost_revenant_wraith.XHS_LINK_CLIENT = true
 
 function modifier_ghost_revenant_wraith:OnRefresh()
 	if IsServer() then
@@ -184,6 +185,7 @@ end
 -----------------------------------------------------------------------------------------------------------
 
 if modifier_ghost_revenant_blackjack_debuff == nil then modifier_ghost_revenant_blackjack_debuff = class({}) end
+modifier_ghost_revenant_blackjack_debuff.XHS_LINK_CLIENT = true
 
 function modifier_ghost_revenant_blackjack_debuff:OnCreated()
 	local ability = self:GetAbility()
@@ -256,6 +258,7 @@ end
 -----------------------------------------------------------------------------------------------------------
 
 if modifier_ghost_revenant_miasma == nil then modifier_ghost_revenant_miasma = class({}) end
+modifier_ghost_revenant_miasma.XHS_LINK_CLIENT = true
 function modifier_ghost_revenant_miasma:IsDebuff() return true end
 function modifier_ghost_revenant_miasma:IsHidden() return false end
 function modifier_ghost_revenant_miasma:IsPurgable() return true end
@@ -366,6 +369,7 @@ LinkLuaModifier("modifier_ghost_revenant_ghost_immolation", "abilities/heroes/he
 LinkLuaModifier("modifier_ghost_revenant_ghost_immolation_debuff", "abilities/heroes/hero_ghost_revenant", LUA_MODIFIER_MOTION_NONE)
 
 modifier_ghost_revenant_ghost_immolation = class({})
+modifier_ghost_revenant_ghost_immolation.XHS_LINK_CLIENT = true
 
 function modifier_ghost_revenant_ghost_immolation:GetEffectName()
 	return "particles/hero/ghost_revenant/ambient_effects.vpcf"
@@ -439,6 +443,7 @@ function modifier_ghost_revenant_ghost_immolation:GetModifierAura()
 end
 
 modifier_ghost_revenant_ghost_immolation_debuff = modifier_ghost_revenant_ghost_immolation_debuff or class({})
+modifier_ghost_revenant_ghost_immolation_debuff.XHS_LINK_CLIENT = true
 
 function modifier_ghost_revenant_ghost_immolation_debuff:IsHidden()
 	return false
@@ -500,6 +505,7 @@ function ghost_revenant_exhaustion:OnSpellStart()
 end
 
 if modifier_ghost_revenant_exhaustion == nil then modifier_ghost_revenant_exhaustion = class({}) end
+modifier_ghost_revenant_exhaustion.XHS_LINK_CLIENT = true
 function modifier_ghost_revenant_exhaustion:IsDebuff() return true end
 function modifier_ghost_revenant_exhaustion:IsHidden() return false end
 function modifier_ghost_revenant_exhaustion:IsPurgable() return true end

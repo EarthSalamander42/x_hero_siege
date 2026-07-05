@@ -1,4 +1,5 @@
 modifier_corpse = modifier_corpse or class({})
+modifier_corpse.XHS_LINK_CLIENT = true
 
 function modifier_corpse:IsHidden() return true end
 

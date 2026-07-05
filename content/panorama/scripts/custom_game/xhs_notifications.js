@@ -772,6 +772,13 @@
 	function showWaveTimer(msg) {
 		msg = msg || {};
 
+		if (msg.timer_name === "special_wave" && (activeWaveMode === "active" || activeWaveMode === "cleared")) {
+			if (msg.sound) {
+				Game.EmitSound(msg.sound);
+			}
+			return;
+		}
+
 		var title = $("#XHSWaveTitle");
 		var subtitle = $("#XHSWaveSubtitle");
 		var eyebrow = $("#XHSWaveEyebrow");
@@ -801,6 +808,10 @@
 
 		setWaveVisible(true);
 		updateWaveCountdown(duration);
+
+		if (msg.sound) {
+			Game.EmitSound(msg.sound);
+		}
 
 		if (!activeWaveTimerName) {
 			activeWaveSchedule = $.Schedule(duration, function () {

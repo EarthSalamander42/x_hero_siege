@@ -78,7 +78,7 @@
 "DOTA_Tooltip_modifier_xhs_rune_fortitude"				"Fortitude Rune"
 "DOTA_Tooltip_modifier_xhs_rune_fortitude_Description"	"Grants 35% status resistance and reduces incoming damage by 20%."
 "DOTA_Tooltip_modifier_xhs_rune_titan"					"Titan Rune"
-"DOTA_Tooltip_modifier_xhs_rune_titan_Description"		"Grants 30% max health, increases outgoing damage by 25%, and increases model size."
+"DOTA_Tooltip_modifier_xhs_rune_titan_Description"		"Max health: +30%. Damage dealt: +25%. Model scale increased."
 "DOTA_Tooltip_modifier_xhs_rune_fury"					"Fury Rune"
 "DOTA_Tooltip_modifier_xhs_rune_fury_Description"		"Grants 160 attack speed and 25% spell amplification."
 "DOTA_Tooltip_modifier_xhs_rune_siegebreaker"			"Siegebreaker Rune"
@@ -148,9 +148,10 @@
 "DOTA_Tooltip_ability_holdout_storm_rain_damage"					"DAMAGE:"
 
 "DOTA_Tooltip_ability_holdout_rejuvenation"							"Rejuvenation"
-"DOTA_Tooltip_ability_holdout_rejuvenation_Description"				"Heals a friendly unit over 12 seconds for 600 hit points."
+"DOTA_Tooltip_ability_holdout_rejuvenation_Description"				"Heals a friendly unit over 12 seconds for %total_heal% hit points plus %tick_heal_pct%%% of its max health per second."
 "DOTA_Tooltip_ability_holdout_rejuvenation_duration"				"DURATION:"
 "DOTA_Tooltip_ability_holdout_rejuvenation_tick_heal"				"HEAL PER SEC:"
+"DOTA_Tooltip_ability_holdout_rejuvenation_tick_heal_pct"			"MAX HEALTH HEAL PER SEC:"
 "DOTA_Tooltip_ability_holdout_rejuvenation_total_heal"				"TOTAL HEALING:"
 
 "DOTA_Tooltip_modifier_imba_shadow_word_buff"						"Rejuvenation"

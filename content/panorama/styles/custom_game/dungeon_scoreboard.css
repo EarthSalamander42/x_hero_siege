@@ -1200,7 +1200,7 @@
 }
 
 .ScoreboardXHSSupporterHover {
-	width: 304px;
+	width: 336px;
 	padding: 10px;
 	flow-children: down;
 	ignore-parent-flow: true;
@@ -1223,47 +1223,64 @@
 
 .ScoreboardXHSSupporterHover.ScoreboardSupporterTier1 {
 	border-color: #70e39a8a;
-	box-shadow: #000000de 0px 4px 16px 0px, #70e39a24 0px 0px 10px 0px;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #102f20f4 ), color-stop( 0.48, #071421f4 ), to( #03080cf4 ) );
+	box-shadow: #000000de 0px 4px 16px 0px, #70e39a34 0px 0px 14px 0px;
 }
 
 .ScoreboardXHSSupporterHover.ScoreboardSupporterTier2 {
 	border-color: #ffcf6694;
-	box-shadow: #000000de 0px 4px 16px 0px, #ffcf6628 0px 0px 10px 0px;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #332812f4 ), color-stop( 0.48, #071421f4 ), to( #04070bf4 ) );
+	box-shadow: #000000de 0px 4px 16px 0px, #ffcf6638 0px 0px 14px 0px;
 }
 
 .ScoreboardXHSSupporterHover.ScoreboardSupporterTier3 {
 	border-color: #ff5a4394;
-	box-shadow: #000000de 0px 4px 16px 0px, #ff5a4328 0px 0px 10px 0px;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #361712f4 ), color-stop( 0.48, #071421f4 ), to( #05080cf4 ) );
+	box-shadow: #000000de 0px 4px 16px 0px, #ff5a4338 0px 0px 14px 0px;
 }
 
 .ScoreboardXHSSupporterHover.ScoreboardSupporterTier4 {
 	border-color: #5ad0ffaa;
-	box-shadow: #000000de 0px 4px 16px 0px, #5ad0ff38 0px 0px 11px 0px;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #08283bf4 ), color-stop( 0.48, #071421f4 ), to( #03080cf4 ) );
+	box-shadow: #000000de 0px 4px 16px 0px, #5ad0ff48 0px 0px 15px 0px;
 }
 
 .ScoreboardXHSSupporterHover.ScoreboardSupporterTier5 {
 	border-color: #c99cffba;
-	box-shadow: #000000de 0px 4px 16px 0px, #c99cff44 0px 0px 12px 0px;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #211134f6 ), color-stop( 0.48, #0d1024f6 ), to( #05050bf6 ) );
+	box-shadow: #000000de 0px 4px 16px 0px, #c99cff62 0px 0px 18px 0px, inset #ffffff10 0px 1px 0px 0px;
 }
 
 .ScoreboardXHSHoverHeader {
 	width: 100%;
-	height: 56px;
+	height: 64px;
 	flow-children: right;
 	margin-bottom: 8px;
 	padding-bottom: 8px;
 	border-bottom: 1px solid #77c8ff22;
 }
 
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier1 .ScoreboardXHSHoverHeader { border-bottom-color: #70e39a38; }
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier2 .ScoreboardXHSHoverHeader { border-bottom-color: #ffcf6640; }
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier3 .ScoreboardXHSHoverHeader { border-bottom-color: #ff5a4340; }
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier4 .ScoreboardXHSHoverHeader { border-bottom-color: #5ad0ff48; }
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier5 .ScoreboardXHSHoverHeader { border-bottom-color: #c99cff60; }
+
 .ScoreboardXHSHoverHeroFrame {
-	width: 70px;
-	height: 42px;
+	width: 76px;
+	height: 46px;
 	margin-right: 10px;
 	vertical-align: center;
 	border: 1px solid #77c8ff44;
 	background-color: #02060b;
 	overflow: clip;
 }
+
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier1 .ScoreboardXHSHoverHeroFrame { border-color: #70e39aaa; box-shadow: fill #70e39a38 0px 0px 8px 0px; }
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier2 .ScoreboardXHSHoverHeroFrame { border-color: #ffcf66bb; box-shadow: fill #ffcf6640 0px 0px 9px 0px; }
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier3 .ScoreboardXHSHoverHeroFrame { border-color: #ff5a43b8; box-shadow: fill #ff5a433e 0px 0px 9px 0px; }
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier4 .ScoreboardXHSHoverHeroFrame { border-color: #5ad0ffd0; box-shadow: fill #5ad0ff50 0px 0px 10px 0px; }
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier5 .ScoreboardXHSHoverHeroFrame { border-color: #c99cffed; box-shadow: fill #c99cff70 0px 0px 12px 0px, #ffffff32 0px 0px 3px 0px; }
 
 .ScoreboardXHSHoverHeroImage {
 	width: 100%;
@@ -1287,9 +1304,29 @@
 	text-shadow: 0px 1px 3px #000000;
 }
 
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier1 .ScoreboardXHSHoverEyebrow,
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier1 .ScoreboardXHSHoverStatLabel,
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier1 .ScoreboardXHSHoverMeterLabel { color: #9fd7ff; }
+
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier2 .ScoreboardXHSHoverEyebrow,
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier2 .ScoreboardXHSHoverStatLabel,
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier2 .ScoreboardXHSHoverMeterLabel { color: #9fd7ff; }
+
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier3 .ScoreboardXHSHoverEyebrow,
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier3 .ScoreboardXHSHoverStatLabel,
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier3 .ScoreboardXHSHoverMeterLabel { color: #9fd7ff; }
+
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier4 .ScoreboardXHSHoverEyebrow,
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier4 .ScoreboardXHSHoverStatLabel,
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier4 .ScoreboardXHSHoverMeterLabel { color: #9fd7ff; }
+
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier5 .ScoreboardXHSHoverEyebrow,
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier5 .ScoreboardXHSHoverStatLabel,
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier5 .ScoreboardXHSHoverMeterLabel { color: #9fd7ff; }
+
 .ScoreboardXHSHoverPlayerName {
 	width: 100%;
-	height: 22px;
+	height: 25px;
 	font-size: 18px;
 	font-weight: bold;
 	color: #f2dfb8;
@@ -1299,9 +1336,15 @@
 	text-shadow: 0px 1px 4px #000000;
 }
 
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier1 .ScoreboardXHSHoverPlayerName,
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier2 .ScoreboardXHSHoverPlayerName,
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier3 .ScoreboardXHSHoverPlayerName,
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier4 .ScoreboardXHSHoverPlayerName,
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier5 .ScoreboardXHSHoverPlayerName { color: #f2dfb8; text-shadow: 0px 1px 4px #000000; }
+
 .ScoreboardXHSHoverHeroName {
 	width: 100%;
-	height: 17px;
+	height: 21px;
 	font-size: 13px;
 	color: #b9d9ff;
 	text-overflow: ellipsis;
@@ -1328,11 +1371,17 @@
 	text-shadow: 0px 1px 4px #000000;
 }
 
-.ScoreboardXHSSupporterHover.ScoreboardSupporterTier1 .ScoreboardXHSHoverTier { color: #bfffd0; }
-.ScoreboardXHSSupporterHover.ScoreboardSupporterTier2 .ScoreboardXHSHoverTier { color: #ffe7a6; }
-.ScoreboardXHSSupporterHover.ScoreboardSupporterTier3 .ScoreboardXHSHoverTier { color: #ffb8aa; }
-.ScoreboardXHSSupporterHover.ScoreboardSupporterTier4 .ScoreboardXHSHoverTier { color: #d8f7ff; }
-.ScoreboardXHSSupporterHover.ScoreboardSupporterTier5 .ScoreboardXHSHoverTier { color: #f0dcff; }
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier1 .ScoreboardXHSHoverTier,
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier2 .ScoreboardXHSHoverTier,
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier3 .ScoreboardXHSHoverTier,
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier4 .ScoreboardXHSHoverTier,
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier5 .ScoreboardXHSHoverTier { color: #eef9ff; }
+
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier1 .ScoreboardXHSHoverTier { background-color: gradient( linear, 0% 0%, 100% 0%, from( #123b25cc ), to( #07111dcc ) ); border-color: #70e39a55; box-shadow: fill #70e39a18 0px 0px 8px 0px; }
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier2 .ScoreboardXHSHoverTier { background-color: gradient( linear, 0% 0%, 100% 0%, from( #3b2c12cc ), to( #07111dcc ) ); border-color: #ffcf665c; box-shadow: fill #ffcf661b 0px 0px 8px 0px; }
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier3 .ScoreboardXHSHoverTier { background-color: gradient( linear, 0% 0%, 100% 0%, from( #401916cc ), to( #07111dcc ) ); border-color: #ff5a435a; box-shadow: fill #ff5a431b 0px 0px 8px 0px; }
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier4 .ScoreboardXHSHoverTier { background-color: gradient( linear, 0% 0%, 100% 0%, from( #0a2f45d0 ), to( #07111dcc ) ); border-color: #5ad0ff68; box-shadow: fill #5ad0ff24 0px 0px 9px 0px; }
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier5 .ScoreboardXHSHoverTier { background-color: gradient( linear, 0% 0%, 100% 0%, from( #2c1743d8 ), to( #0a0d1bcc ) ); border-color: #c99cff82; box-shadow: fill #c99cff35 0px 0px 11px 0px, inset #ffffff12 0px 1px 0px 0px; }
 
 .ScoreboardXHSHoverStats {
 	width: 100%;
@@ -1341,7 +1390,7 @@
 }
 
 .ScoreboardXHSHoverStat {
-	width: 137px;
+	width: 150px;
 	height: 42px;
 	margin-right: 6px;
 	margin-bottom: 6px;
@@ -1350,6 +1399,12 @@
 	background-color: #07111dc8;
 	border: 1px solid #77c8ff24;
 }
+
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier1 .ScoreboardXHSHoverStat { background-color: #071a12d8; border-color: #70e39a38; box-shadow: fill #70e39a10 0px 0px 5px 0px; }
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier2 .ScoreboardXHSHoverStat { background-color: #1d1709d8; border-color: #ffcf663d; box-shadow: fill #ffcf6610 0px 0px 5px 0px; }
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier3 .ScoreboardXHSHoverStat { background-color: #1d0c09d8; border-color: #ff5a433a; box-shadow: fill #ff5a4310 0px 0px 5px 0px; }
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier4 .ScoreboardXHSHoverStat { background-color: #061a26d8; border-color: #5ad0ff44; box-shadow: fill #5ad0ff15 0px 0px 6px 0px; }
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier5 .ScoreboardXHSHoverStat { background-color: #130b20e0; border-color: #c99cff56; box-shadow: fill #c99cff20 0px 0px 7px 0px; }
 
 .ScoreboardXHSHoverStatValue {
 	width: 100%;
@@ -1395,6 +1450,12 @@
 	border: 1px solid #77c8ff24;
 }
 
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier1 .ScoreboardXHSHoverMeterTrack { border-color: #70e39a38; }
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier2 .ScoreboardXHSHoverMeterTrack { border-color: #ffcf663d; }
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier3 .ScoreboardXHSHoverMeterTrack { border-color: #ff5a433a; }
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier4 .ScoreboardXHSHoverMeterTrack { border-color: #5ad0ff44; }
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier5 .ScoreboardXHSHoverMeterTrack { border-color: #c99cff56; }
+
 .ScoreboardXHSHoverMeterFill {
 	width: 0%;
 	height: 100%;
@@ -1420,6 +1481,18 @@
 	font-family: Reaver;
 	text-shadow: 0px 1px 3px #000000;
 }
+
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier1 .ScoreboardXHSHoverHeroName,
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier2 .ScoreboardXHSHoverHeroName,
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier3 .ScoreboardXHSHoverHeroName,
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier4 .ScoreboardXHSHoverHeroName,
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier5 .ScoreboardXHSHoverHeroName { color: #b9d9ff; }
+
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier1 .ScoreboardXHSHoverFooter { color: #c7d5eb; background-color: #071a12d8; border-color: #70e39a42; }
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier2 .ScoreboardXHSHoverFooter { color: #c7d5eb; background-color: #1d1709d8; border-color: #ffcf6648; }
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier3 .ScoreboardXHSHoverFooter { color: #c7d5eb; background-color: #1d0c09d8; border-color: #ff5a4344; }
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier4 .ScoreboardXHSHoverFooter { color: #c7d5eb; background-color: #061a26d8; border-color: #5ad0ff50; }
+.ScoreboardXHSSupporterHover.ScoreboardSupporterTier5 .ScoreboardXHSHoverFooter { color: #c7d5eb; background-color: #130b20e0; border-color: #c99cff68; box-shadow: fill #c99cff1b 0px 0px 7px 0px; }
 
 #ScoreLabelsContainer {
 	margin-left: 14px;

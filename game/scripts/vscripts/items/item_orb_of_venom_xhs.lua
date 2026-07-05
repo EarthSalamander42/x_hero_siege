@@ -43,6 +43,7 @@ function item_plagueheart:GetAbilityTextureName()
 end
 
 modifier_orb_of_venom_xhs_active = modifier_orb_of_venom_xhs_active or class({})
+modifier_orb_of_venom_xhs_active.XHS_LINK_CLIENT = true
 
 function modifier_orb_of_venom_xhs_active:IsHidden() return false end
 function modifier_orb_of_venom_xhs_active:IsPurgable() return false end
@@ -50,6 +51,7 @@ function modifier_orb_of_venom_xhs_active:RemoveOnDeath() return false end
 function modifier_orb_of_venom_xhs_active:GetTexture() return "custom/orb_of_venom" end
 
 modifier_orb_of_venom_xhs = modifier_orb_of_venom_xhs or class({})
+modifier_orb_of_venom_xhs.XHS_LINK_CLIENT = true
 
 function modifier_orb_of_venom_xhs:IsHidden() return true end
 function modifier_orb_of_venom_xhs:IsPurgable() return false end
@@ -102,6 +104,7 @@ function modifier_orb_of_venom_xhs:OnAttackLanded(params)
 end
 
 modifier_orb_of_venom_poison = modifier_orb_of_venom_poison or class({})
+modifier_orb_of_venom_poison.XHS_LINK_CLIENT = true
 
 function modifier_orb_of_venom_poison:IsHidden() return false end
 function modifier_orb_of_venom_poison:IsDebuff() return true end
