@@ -792,7 +792,7 @@
 	border-radius: 50%;
 	border: 2px solid #5ad0ff82;
 	background-color: #030914d8;
-	box-shadow: #5ad0ff88 0px 0px 22px 0px;
+	box-shadow: #5ad0ff42 0px 0px 14px 0px, #000000a8 0px 0px 10px 0px;
 }
 
 .XHSWaveCompact .XHSWaveRing
@@ -814,7 +814,7 @@
 	border: 4px solid #72d9ff;
 	clip: radial( 50% 50%, 0.0deg, -360deg );
 	opacity: 1.0;
-	box-shadow: #5ad0ffb0 0px 0px 12px 0px;
+	box-shadow: #5ad0ffcc 0px 0px 9px 0px, #e8fbff3a 0px 0px 14px 0px;
 	transition-property: clip, opacity, border, box-shadow;
 	transition-duration: .18s;
 	transition-timing-function: ease-out;
@@ -823,7 +823,7 @@
 .XHSWaveRingSweep.XHSWaveRingSweepWarning
 {
 	border: 4px solid #ffb06a;
-	box-shadow: #ff684bd0 0px 0px 15px 0px, #ffcf6638 0px 0px 24px 0px;
+	box-shadow: #ff684bcc 0px 0px 10px 0px, #ffcf6648 0px 0px 16px 0px;
 }
 
 .XHSWaveCompact .XHSWaveRingSweep
@@ -837,8 +837,8 @@
 	height: 58px;
 	align: center center;
 	border-radius: 50%;
-	background-color: gradient( radial, 50% 50%, 0% 0%, 50% 50%, from( #7edfff24 ), color-stop( .34, #17486630 ), color-stop( .70, #04101d72 ), to( #00000000 ) );
-	box-shadow: inset #061423d8 0px 0px 14px 0px, inset #5ad0ff1f 0px 0px 18px 0px, #5ad0ff28 0px 0px 13px 0px;
+	background-color: gradient( radial, 50% 50%, 0% 0%, 50% 50%, from( #5ad0ff14 ), color-stop( .38, #12344a24 ), color-stop( .72, #0208118a ), to( #00000000 ) );
+	box-shadow: inset #020914e8 0px 0px 15px 0px, inset #5ad0ff12 0px 0px 16px 0px, #5ad0ff12 0px 0px 9px 0px;
 	transform: scaleX( 1 ) scaleY( 1 );
 	transition-property: transform, opacity, background-color, box-shadow;
 	transition-duration: .18s;
@@ -855,8 +855,8 @@
 
 .XHSWaveActive .XHSWaveRingFill
 {
-	background-color: gradient( radial, 50% 50%, 0% 0%, 50% 50%, from( #ff684b38 ), color-stop( .34, #6b171b44 ), color-stop( .70, #12040884 ), to( #00000000 ) );
-	box-shadow: inset #160408e0 0px 0px 15px 0px, inset #ff684b2a 0px 0px 18px 0px, #ff3f2a34 0px 0px 14px 0px;
+	background-color: gradient( radial, 50% 50%, 0% 0%, 50% 50%, from( #ff684b18 ), color-stop( .38, #54111630 ), color-stop( .72, #0c02058f ), to( #00000000 ) );
+	box-shadow: inset #0b0205ec 0px 0px 16px 0px, inset #ff684b16 0px 0px 16px 0px, #ff3f2a12 0px 0px 9px 0px;
 	animation-name: XHSWaveThreatPulse;
 	animation-duration: .72s;
 	animation-iteration-count: infinite;
@@ -866,19 +866,19 @@
 {
 	border: 2px solid #ff684b92;
 	background-color: #110407e0;
-	box-shadow: #ff3f2a8c 0px 0px 24px 0px, #00000090 0px 0px 8px 0px;
+	box-shadow: #ff3f2a46 0px 0px 15px 0px, #000000a8 0px 0px 10px 0px;
 }
 
 .XHSWaveActive .XHSWaveRingSweep
 {
 	border: 4px solid #ff5a43;
-	box-shadow: #ff3f2ab8 0px 0px 14px 0px, #ff8d6b42 0px 0px 23px 0px;
+	box-shadow: #ff3f2ace 0px 0px 9px 0px, #ffb0974a 0px 0px 15px 0px;
 }
 
 .XHSWaveActive .XHSWaveRingSweep.XHSWaveRingSweepWarning
 {
 	border: 4px solid #ffbd72;
-	box-shadow: #ff4a32e0 0px 0px 17px 0px, #ffd18a58 0px 0px 28px 0px;
+	box-shadow: #ff4a32de 0px 0px 11px 0px, #ffd18a66 0px 0px 18px 0px;
 }
 
 .XHSWaveActive .XHSWaveCountdownValue
@@ -889,8 +889,8 @@
 
 .XHSWaveCleared .XHSWaveRingFill
 {
-	background-color: gradient( radial, 50% 50%, 0% 0%, 50% 50%, from( #8ff0b166 ), color-stop( .58, #45c46b33 ), to( #00000000 ) );
-	box-shadow: inset #8ff0b155 0px 0px 18px 0px, #8ff0b155 0px 0px 16px 0px;
+	background-color: gradient( radial, 50% 50%, 0% 0%, 50% 50%, from( #8ff0b124 ), color-stop( .58, #45c46b18 ), to( #00000000 ) );
+	box-shadow: inset #07170dea 0px 0px 18px 0px, inset #8ff0b11c 0px 0px 15px 0px, #8ff0b11a 0px 0px 10px 0px;
 }
 
 .XHSWaveCountdownValue
@@ -1056,19 +1056,19 @@
 {
 	0%
 	{
-		opacity: .72;
+		opacity: .42;
 		pre-transform-scale2d: 1;
 	}
 
 	50%
 	{
-		opacity: 1;
-		pre-transform-scale2d: 1.08;
+		opacity: .58;
+		pre-transform-scale2d: 1.04;
 	}
 
 	100%
 	{
-		opacity: .72;
+		opacity: .42;
 		pre-transform-scale2d: 1;
 	}
 }

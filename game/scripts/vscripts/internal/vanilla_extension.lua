@@ -185,11 +185,16 @@ function CDOTA_BaseNPC:RemoveItemByName(ItemName, bStash)
 	end
 end
 
-function CDOTA_BaseNPC:IncrementAttributes(amount, bAll)
+function CDOTA_BaseNPC:IncrementAttributes(amount, options)
 	if self:IsIllusion() then return end
 	if not self:IsAlive() then return end
 
-	local bSoundPlayed = false
+	local playSound = true
+	if type(options) == "table" and options.play_sound == false then
+		playSound = false
+	elseif options == false then
+		playSound = false
+	end
 
 	if self:HasModifier("modifier_tome_of_stats") then
 		self:FindModifierByName("modifier_tome_of_stats"):SetStackCount(self:FindModifierByName("modifier_tome_of_stats"):GetStackCount() + amount)
@@ -206,8 +211,7 @@ function CDOTA_BaseNPC:IncrementAttributes(amount, bAll)
 	local particle1 = ParticleManager:CreateParticle("particles/generic_hero_status/hero_levelup.vpcf", PATTACH_ABSORIGIN_FOLLOW, self, self)
 	ParticleManager:SetParticleControl(particle1, 0, self:GetAbsOrigin())
 
-	if bSoundPlayed == false then
-		bSoundPlayed = true
+	if playSound == true then
 		self:EmitSound("ui.trophy_levelup")
 	end
 

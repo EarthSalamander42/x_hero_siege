@@ -10,12 +10,8 @@
 *.qc
 
 # Compiled formats
-*.vmdl
 *.fbx
 *.vmat
-*.vpcf
-!content/particles/custom/xhs_special_wave_timer_segment.vpcf
-!content/particles/custom/xhs_growth_overhead.vpcf
 *.cfg
 *.tga
 

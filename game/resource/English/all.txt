@@ -19,6 +19,7 @@
 "DOTA_MiniKillcam_KilledByCustom1"				"Killed by Dark Forces!"
 
 //HUD STUFF
+"DOTA_XHS_Overhead_Reincarnation_In"	"REINCARNATION IN {seconds}s"
 "DOTA_Hud_Error_tutorial_shop_not_in_range"		"Shop Not In Range!"
 "DOTA_Hud_Error_error_no_usable_corpses"		"No usable corpse!"
 

@@ -80,8 +80,8 @@
 "DOTA_Tooltip_ability_item_tome_of_power_Description"		"<h1><font color='#00CC00'>Active:</font></h1> Increases the level of the hero by 1 when used."
 
 "DOTA_Tooltip_ability_item_ankh_of_reincarnation"						"Ankh of Reincarnation"
-"DOTA_Tooltip_ability_item_ankh_of_reincarnation_Description"			"<h1><font color='#FF7800'>Passive:</font></h1> Reincarnate the hero with full health and mana after death. Contains 3 charges.\n<h1><font color='#FF0000'>Restrictions:</h1> Consume 1 charge on death.</font>"
-"DOTA_Tooltip_ability_item_ankh_of_reincarnation_reincarnation_time"	"REINCARNATE TIME:"
+"DOTA_Tooltip_ability_item_ankh_of_reincarnation_Description"			"<h1><font color='#FF7800'>Passive:</font></h1> When you die, reincarnates your hero with full health and mana. Starts with 3 charges.\n<h1><font color='#FF0000'>Restriction:</font></h1> Consumes 1 charge each time it triggers."
+"DOTA_Tooltip_ability_item_ankh_of_reincarnation_reincarnation_time"	"REINCARNATION TIME:"
 
 "DOTA_Tooltip_modifier_ankh_passives"                                           "Reincarnation"
 
@@ -195,8 +195,8 @@
 "DOTA_Tooltip_modifier_orb_of_wind_active"						"Orb of Wind"
 "DOTA_Tooltip_modifier_orb_of_wind_active_Description"			"Wind Orb is enabled. Evading attacks can trigger Zephyr and Tempest Guard."
 
-"DOTA_Tooltip_ability_item_lifesteal_mask_Description"			"<h1><font color='#FF7800'>Passive:</h1> Grants lifesteal.</font>\n<h1><font color='#FF0000'>Restrictions:</font></h1> Does not stack with other sources of lifesteal."
-"DOTA_Tooltip_ability_item_lifesteal_mask_Note0"				"Lifesteal based on Damage Received by the Target. High Armor Target will give less Healing."
+"DOTA_Tooltip_ability_item_lifesteal_mask_Description"			"<h1><font color='#FF7800'>Passive:</font></h1> Your attacks heal you for a percentage of the damage dealt.\n<h1><font color='#FF0000'>Restriction:</font></h1> Does not stack with other sources of lifesteal."
+"DOTA_Tooltip_ability_item_lifesteal_mask_Note0"				"Lifesteal is calculated from the damage the target actually takes. Heavily armored targets return less health."
 
 "DOTA_Tooltip_modifier_imba_morbid_mask_unique"					"Lifesteal"
 "DOTA_Tooltip_modifier_imba_morbid_mask_unique_Description"		"Heals when attacking enemies."

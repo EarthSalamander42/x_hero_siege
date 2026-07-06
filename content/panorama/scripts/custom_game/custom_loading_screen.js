@@ -331,20 +331,45 @@ function GetVoteOptionDescription(vote_type, vote_index, include_extra) {
 	return option_description;
 }
 
+function IsGameModeVoteType(vote_type) {
+	return vote_type == "gamemode" || vote_type == "mode";
+}
+
 function GetLocalizedItemName(item_name) {
 	return LocalizeWithFallback("#DOTA_Tooltip_ability_" + item_name);
 }
 
-function CreateDifficultyVoteStat(parent, item_name, label_text, value_text, class_name) {
+var XHS_DIFFICULTY_VOTE_ICONS = {
+	gold: { image: "s2r://panorama/images/items/hand_of_midas_png.vtex" },
+	ankh: { item: "item_ankh_of_reincarnation" },
+	lifesteal: { item: "item_lifesteal_mask" },
+};
+
+function CreateDifficultyVoteIcon(parent, icon_config) {
+	if (icon_config && icon_config.item) {
+		var item_icon = $.CreatePanel("DOTAItemImage", parent, "");
+		item_icon.AddClass("vote-difficulty-stat-icon");
+		item_icon.itemname = icon_config.item;
+		return item_icon;
+	}
+
+	var icon = $.CreatePanel("Panel", parent, "");
+	icon.AddClass("vote-difficulty-stat-icon");
+	if (icon_config && icon_config.image) {
+		icon.style.backgroundImage = 'url("' + icon_config.image + '")';
+	}
+
+	return icon;
+}
+
+function CreateDifficultyVoteStat(parent, icon_config, label_text, value_text, class_name) {
 	var row = $.CreatePanel("Panel", parent, "");
 	row.AddClass("vote-difficulty-stat-row");
 	if (class_name) {
 		row.AddClass(class_name);
 	}
 
-	var icon = $.CreatePanel("DOTAItemImage", row, "");
-	icon.AddClass("vote-difficulty-stat-icon");
-	icon.itemname = item_name;
+	CreateDifficultyVoteIcon(row, icon_config);
 
 	var copy = $.CreatePanel("Panel", row, "");
 	copy.AddClass("vote-difficulty-stat-copy");
@@ -358,31 +383,90 @@ function CreateDifficultyVoteStat(parent, item_name, label_text, value_text, cla
 	value.text = value_text;
 }
 
-function CreateDifficultyVoteStats(vote_button, difficulty_index) {
+function CreateDifficultyVoteDescription(parent, description_text) {
+	var description = $.CreatePanel("Panel", parent, "");
+	description.AddClass("vote-difficulty-description");
+
+	var lines = (description_text || "").split("\n");
+	for (var i = 0; i < lines.length; i++) {
+		var line_text = lines[i];
+		if (!line_text) {
+			continue;
+		}
+
+		var row = $.CreatePanel("Panel", description, "");
+		row.AddClass("vote-difficulty-description-row");
+
+		var dot = $.CreatePanel("Panel", row, "");
+		dot.AddClass("vote-difficulty-description-dot");
+
+		var separator_index = line_text.lastIndexOf(":");
+		if (separator_index > 0) {
+			var name = $.CreatePanel("Label", row, "");
+			name.AddClass("vote-difficulty-description-name");
+			name.text = line_text.substring(0, separator_index + 1);
+
+			var value = $.CreatePanel("Label", row, "");
+			value.AddClass("vote-difficulty-description-value");
+			value.text = line_text.substring(separator_index + 1).trim();
+		} else {
+			var line = $.CreatePanel("Label", row, "");
+			line.AddClass("vote-difficulty-description-line");
+			line.text = line_text;
+		}
+	}
+}
+
+function CreateModeVoteDescription(vote_button, description_text) {
+	if (!vote_button) {
+		return false;
+	}
+
+	var native_descriptions = vote_button.FindChildrenWithClassTraverse("vote-select-description");
+	var description = native_descriptions && native_descriptions[0] ? native_descriptions[0] : null;
+	if (!description) {
+		return false;
+	}
+
+	var lines = (description_text || "").split("\n");
+	var formatted_lines = [];
+	for (var i = 0; i < lines.length; i++) {
+		var line_text = lines[i];
+		if (!line_text) {
+			continue;
+		}
+
+		line_text = line_text.replace(/^\s*-\s*/, "");
+		formatted_lines.push("• " + line_text);
+	}
+
+	description.text = formatted_lines.join("\n");
+	description.AddClass("vote-mode-description-native");
+
+	return true;
+}
+
+function CreateDifficultyVoteStats(vote_button, difficulty_index, description_text) {
 	var stats = XHS_DIFFICULTY_VOTE_STATS[difficulty_index];
 	if (!stats || !vote_button) {
-		return;
+		return false;
 	}
 
-	var panels = vote_button.FindChildrenWithClassTraverse("vote-select-panel");
-	var parent = panels && panels[0] ? panels[0] : null;
-	if (!parent) {
-		return;
-	}
-
-	var stats_panel = $.CreatePanel("Panel", parent, "");
+	var stats_panel = $.CreatePanel("Panel", vote_button, "");
 	stats_panel.AddClass("vote-difficulty-stats");
+
+	CreateDifficultyVoteDescription(stats_panel, description_text);
 
 	CreateDifficultyVoteStat(
 		stats_panel,
-		"item_bag_of_gold",
+		XHS_DIFFICULTY_VOTE_ICONS.gold,
 		L("loading_screen_vote_difficulty_starting_gold_short"),
 		FormatLoadingScreenNumber(stats.starting_gold),
 		"VoteDifficultyGold"
 	);
 	CreateDifficultyVoteStat(
 		stats_panel,
-		"item_ankh_of_reincarnation",
+		XHS_DIFFICULTY_VOTE_ICONS.ankh,
 		L("loading_screen_vote_difficulty_ankhs_short"),
 		stats.ankhs.toString(),
 		"VoteDifficultyAnkhs"
@@ -391,18 +475,20 @@ function CreateDifficultyVoteStats(vote_button, difficulty_index) {
 	if (stats.bonus_item == "item_lifesteal_mask") {
 		CreateDifficultyVoteStat(
 			stats_panel,
-			stats.bonus_item,
+			XHS_DIFFICULTY_VOTE_ICONS.lifesteal,
 			L("loading_screen_vote_difficulty_bonus_short"),
 			GetLocalizedItemName(stats.bonus_item),
 			"VoteDifficultyBonus"
 		);
 	}
 
-	var buttons = parent.FindChildrenWithClassTraverse("vote-button");
+	var buttons = vote_button.FindChildrenWithClassTraverse("vote-button");
 	var choice_button = buttons && buttons[0] ? buttons[0] : null;
-	if (choice_button && parent.MoveChildBefore) {
-		parent.MoveChildBefore(stats_panel, choice_button);
+	if (choice_button && vote_button.MoveChildBefore) {
+		vote_button.MoveChildBefore(stats_panel, choice_button);
 	}
+
+	return true;
 }
 
 function SafeSerializeForLog(data) {
@@ -3747,7 +3833,6 @@ function AllPlayersLoaded() {
 		return;
 	}
 
-
 	// Rebuild from scratch to avoid stale hidden panels / duplicate rows.
 	vote_parent.RemoveAndDeleteChildren();
 	if (vote_label_container) {
@@ -3826,12 +3911,20 @@ function AllPlayersLoaded() {
 				description_labels[0].text = option_description;
 			}
 
+			var is_gamemode_vote = IsGameModeVoteType(vote_type);
+			vote_button.SetHasClass("VotePanelModeStyled", is_gamemode_vote);
+			vote_button.SetHasClass("VotePanelDetailed", is_gamemode_vote && i == 2);
+
 			if (vote_type == "difficulty") {
-				CreateDifficultyVoteStats(vote_button, i);
+				var created_difficulty_stats = CreateDifficultyVoteStats(vote_button, i, option_description);
+				if (!created_difficulty_stats && description_labels && description_labels[0]) {
+					description_labels[0].text = GetVoteOptionDescription(vote_type, i, true);
+				}
+			} else if (is_gamemode_vote) {
+				CreateModeVoteDescription(vote_button, option_description);
 			}
 
 			vote_button.SetHasClass("VotePanelCompact", is_compact_description);
-			vote_button.SetHasClass("VotePanelDetailed", vote_type == "gamemode" && i == 2);
 
 			if (!is_compact_description) {
 				row_is_compact = false;
@@ -3853,7 +3946,7 @@ function AllPlayersLoaded() {
 		}
 
 		panel.SetHasClass("VoteRowCompact", row_is_compact);
-		panel.SetHasClass("VoteRowDetailed", vote_type == "gamemode");
+		panel.SetHasClass("VoteRowDetailed", IsGameModeVoteType(vote_type));
 		RefreshLocalVoteCategoryUI(vote_type);
 	}
 

@@ -488,6 +488,11 @@ end
 
 function CustomTimers:IncrementGamePhase()
 	CustomTimers.game_phase = CustomTimers.game_phase + 1
+
+	if CustomTimers.game_phase == 3 and RespawnDeadHeroesForPhase3Start ~= nil then
+		RespawnDeadHeroesForPhase3Start()
+	end
+
 	CustomGameEventManager:Send_ServerToAllClients("xhs_game_phase_update", {
 		phase = CustomTimers.game_phase,
 	})

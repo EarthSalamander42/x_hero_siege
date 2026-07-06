@@ -581,11 +581,11 @@ function SpecialEvents:RameroAndBaristolEvent(time, hero) -- 500 kills
 	end
 
 	SpecialEvents.Ramero = CreateUnitByName("npc_ramero", Entities:FindByName(nil, "roshan_wp_4"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
-	SpecialEvents.Ramero:AddNewModifier(SpecialEvents.Ramero, nil, "modifier_cinematic_pause", { duration = stun_duration, ramp_duration = SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP })
+	SpecialEvents.Ramero:AddNewModifier(SpecialEvents.Ramero, nil, "modifier_pause_creeps", { duration = stun_duration, IsHidden = true })
 	SpecialEvents.Ramero:SetAngles(0, 45, 0)
 
 	SpecialEvents.Baristol = CreateUnitByName("npc_baristol", Entities:FindByName(nil, "roshan_wp_2"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
-	SpecialEvents.Baristol:AddNewModifier(SpecialEvents.Baristol, nil, "modifier_cinematic_pause", { duration = stun_duration, ramp_duration = SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP })
+	SpecialEvents.Baristol:AddNewModifier(SpecialEvents.Baristol, nil, "modifier_pause_creeps", { duration = stun_duration, IsHidden = true })
 	SpecialEvents.Baristol:SetAngles(0, 325, 0)
 
 	PlayStormEarthFireSound(SpecialEvents.Ramero)
@@ -684,7 +684,7 @@ function SpecialEvents:SogatEvent(time, hero) -- 750 kills
 	end
 
 	SpecialEvents.Sogat = CreateUnitByName("npc_ramero_2", Entities:FindByName(nil, "roshan_wp_4"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
-	SpecialEvents.Sogat:AddNewModifier(SpecialEvents.Sogat, nil, "modifier_cinematic_pause", { duration = stun_duration, ramp_duration = SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP })
+	SpecialEvents.Sogat:AddNewModifier(SpecialEvents.Sogat, nil, "modifier_pause_creeps", { duration = stun_duration, IsHidden = true })
 	SpecialEvents.Sogat:SetAngles(0, 45, 0)
 	PlayStormEarthFireSound(SpecialEvents.Sogat)
 	NotifySpecialArenaInstructions(hero, "npc_dota_hero_sven", "Kill Sogat to get a special item! Reward: Ring of Superiority.")

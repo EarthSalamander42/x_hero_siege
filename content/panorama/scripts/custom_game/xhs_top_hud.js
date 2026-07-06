@@ -16,6 +16,21 @@ var XHSTopHud = (function () {
 	var OVERHEAD_FADE_MARGIN = 96;
 	var OVERHEAD_BLOCKER_REFRESH_SECONDS = 0.12;
 	var OVERHEAD_HEALTH_TICK_INTERVAL = 250;
+	var OVERHEAD_HEALTH_MAX_TICKS = 32;
+	var OVERHEAD_HEALTH_TICK_INTERVALS = [
+		250,
+		500,
+		1000,
+		2500,
+		5000,
+		10000,
+		25000,
+		50000,
+		100000,
+		250000,
+		500000,
+		1000000,
+	];
 	// Flip this back to true to show the static overhead health bar design sandbox.
 	var OVERHEAD_MOCKUP_MODE = false;
 	var OVERHEAD_TIER_DEV_VIEW = false;
@@ -961,6 +976,35 @@ var XHSTopHud = (function () {
 		return label;
 	}
 
+	function GetOverheadHealthTickInterval(maxHealth) {
+		var currentMaxHealth = Math.max(1, Math.floor(ToNumber(maxHealth, 1)));
+		var minimumInterval = Math.max(OVERHEAD_HEALTH_TICK_INTERVAL, Math.ceil(currentMaxHealth / Math.max(1, OVERHEAD_HEALTH_MAX_TICKS)));
+
+		for (var index = 0; index < OVERHEAD_HEALTH_TICK_INTERVALS.length; index++) {
+			if (OVERHEAD_HEALTH_TICK_INTERVALS[index] >= minimumInterval) {
+				return OVERHEAD_HEALTH_TICK_INTERVALS[index];
+			}
+		}
+
+		return Math.ceil(minimumInterval / 1000000) * 1000000;
+	}
+
+	function GetOverheadHealthTickClass(interval) {
+		if (interval >= 100000) {
+			return "XHSOverheadHealthTickMassive";
+		}
+
+		if (interval >= 10000) {
+			return "XHSOverheadHealthTickHuge";
+		}
+
+		if (interval > OVERHEAD_HEALTH_TICK_INTERVAL) {
+			return "XHSOverheadHealthTickLarge";
+		}
+
+		return "";
+	}
+
 	function UpdateOverheadHealthTicks(label, playerID, maxHealth) {
 		var ticks = label ? label.FindChildTraverse("XHSOverheadHealthTicks_" + playerID) : null;
 		if (!ticks) {
@@ -968,16 +1012,23 @@ var XHSTopHud = (function () {
 		}
 
 		var currentMaxHealth = Math.max(1, Math.floor(ToNumber(maxHealth, 1)));
-		var tickCount = Math.max(0, Math.floor((currentMaxHealth - 1) / OVERHEAD_HEALTH_TICK_INTERVAL));
+		var tickInterval = GetOverheadHealthTickInterval(currentMaxHealth);
+		var tickCount = Math.max(0, Math.floor((currentMaxHealth - 1) / tickInterval));
+		var tickClass = GetOverheadHealthTickClass(tickInterval);
 		var previousTickCount = ticks.GetAttributeInt("xhs_tick_count", -1);
+		var previousTickInterval = ticks.GetAttributeInt("xhs_tick_interval", -1);
 
-		if (previousTickCount !== tickCount) {
+		if (previousTickCount !== tickCount || previousTickInterval !== tickInterval) {
 			ticks.RemoveAndDeleteChildren();
 			ticks.SetAttributeInt("xhs_tick_count", tickCount);
+			ticks.SetAttributeInt("xhs_tick_interval", tickInterval);
 
 			for (var tickIndex = 0; tickIndex < tickCount; tickIndex++) {
 				var tick = $.CreatePanel("Panel", ticks, "XHSOverheadHealthTick_" + playerID + "_" + tickIndex);
 				tick.AddClass("XHSOverheadHealthTick");
+				if (tickClass !== "") {
+					tick.AddClass(tickClass);
+				}
 				tick.hittest = false;
 			}
 		}
@@ -988,8 +1039,7 @@ var XHSTopHud = (function () {
 				continue;
 			}
 
-			var tickHealth = (index + 1) * OVERHEAD_HEALTH_TICK_INTERVAL;
-			var tickPercent = Clamp((tickHealth / currentMaxHealth) * 100, 0, 100);
+			var tickPercent = Clamp(((index + 1) / (tickCount + 1)) * 100, 0, 100);
 			tickPanel.style.position = tickPercent.toFixed(3) + "% 0px 0px";
 		}
 	}
@@ -1351,7 +1401,7 @@ var XHSTopHud = (function () {
 			{ name: "MIRANA", heroName: "npc_dota_hero_mirana", value: "2140 / 2140", status: "ANKH x1 / HERO LEVEL 12", altStatus: "DEFAULT STATE", level: 12, healthPercent: 100, manaPercent: 68, maxHealth: 2140, color: "#7db9ff", classes: ["XHSOverheadMockupDefault"] },
 			{ name: "JUGGERNAUT", heroName: "npc_dota_hero_juggernaut", value: "2840 / 2840", status: "SELECTING HERO", altStatus: "LOCK-IN PREVIEW", level: 18, healthPercent: 100, manaPercent: 82, maxHealth: 2840, color: "#5ad0ff", classes: ["XHSOverheadMockupSelecting", "XHSOverheadSelectedHero"] },
 			{ name: "CRYSTAL MAIDEN", heroName: "npc_dota_hero_crystal_maiden", value: "1860 / 1860", status: "ANKH x2 / HERO LEVEL 16", altStatus: "GOLDEN DONATOR", level: 16, healthPercent: 88, manaPercent: 100, maxHealth: 1860, color: "#ffcf66", classes: ["XHSOverheadMockupDonator", "XHSSupporterTier2"] },
-			{ name: "WRAITH KING", heroName: "npc_dota_hero_skeleton_king", value: "0 / 3920", status: "REINCARNATING IN 7", altStatus: "EARTHWARDEN DONATOR", level: 22, healthPercent: 0, manaPercent: 18, maxHealth: 3920, color: "#c99cff", dead: true, reincarnating: true, classes: ["XHSOverheadMockupDonator", "XHSOverheadMockupReincarnating", "XHSSupporterTier5"] },
+			{ name: "WRAITH KING", heroName: "npc_dota_hero_skeleton_king", value: "0 / 3920", status: "REINCARNATION IN 7s", altStatus: "EARTHWARDEN DONATOR", level: 22, healthPercent: 0, manaPercent: 18, maxHealth: 3920, color: "#c99cff", dead: true, reincarnating: true, classes: ["XHSOverheadMockupDonator", "XHSOverheadMockupReincarnating", "XHSSupporterTier5"] },
 			{ name: "SNIPER", heroName: "npc_dota_hero_sniper", value: "1190 / 2140", status: "DISCONNECTED", altStatus: "LAST SEEN 00:41", level: 13, healthPercent: 56, manaPercent: 44, maxHealth: 2140, color: "#9fb2cc", disconnected: true, classes: ["XHSOverheadMockupDisconnected"] },
 			{ name: "DROW RANGER", heroName: "npc_dota_hero_drow_ranger", value: "420 / 2360", status: "NO ANKH / HERO LEVEL 14", altStatus: "CRITICAL HEALTH", level: 14, healthPercent: 18, manaPercent: 23, maxHealth: 2360, color: "#ff735a", classes: ["XHSOverheadMockupCritical"] },
 			{ name: "AXE", heroName: "npc_dota_hero_axe", value: "3060 / 4200", status: "NO MANA HERO", altStatus: "TANK FRONTLINE", level: 19, healthPercent: 73, manaPercent: 0, maxHealth: 4200, color: "#f05c45", noMana: true, classes: ["XHSOverheadMockupNoMana"] },
@@ -1389,9 +1439,10 @@ var XHSTopHud = (function () {
 
 		var supporterTier = data ? ToNumber(data.tier, 0) : 0;
 		var supporterColor = data ? NormalizeColorString(data.tierColor) : "";
-		var accent = supporterTier > 0 && supporterColor ? supporterColor : "#5ad0ff";
-		var playerGlow = ColorWithAlpha(accent, "88");
-		var accentGlow = ColorWithAlpha(accent, "88");
+		var supporterAccent = supporterTier > 0 && supporterColor ? supporterColor : "#5ad0ff";
+		var playerAccent = GetPlayerColorString(playerID);
+		var playerGlow = ColorWithAlpha(playerAccent, "88");
+		var supporterGlow = ColorWithAlpha(supporterAccent, "88");
 		var content = label.FindChildTraverse("XHSOverheadContent_" + playerID);
 		var name = label.FindChildTraverse("XHSOverheadName_" + playerID);
 		var node = label.FindChildTraverse("XHSOverheadStatusNode_" + playerID);
@@ -1403,20 +1454,20 @@ var XHSTopHud = (function () {
 			content.style.borderLeft = "0px solid transparent";
 		}
 		if (name) {
-			name.style.color = accent;
+			name.style.color = playerAccent;
 			name.style.textShadow = "0px 2px 3px #000000, 0px 0px 6px #000000, 0px 0px 5px " + playerGlow;
 		}
 		if (node) {
-			node.style.backgroundColor = accent;
-			node.style.boxShadow = "fill " + accentGlow + " 0px 0px 7px 0px";
+			node.style.backgroundColor = supporterAccent;
+			node.style.boxShadow = "fill " + supporterGlow + " 0px 0px 7px 0px";
 		}
 		if (anchor) {
-			anchor.style.backgroundColor = "gradient( linear, 0% 0%, 0% 100%, from( " + ColorWithAlpha(accent, "b8") + " ), to( " + ColorWithAlpha(accent, "00") + " ) )";
-			anchor.style.boxShadow = "fill " + accentGlow + " 0px 0px 5px 0px";
+			anchor.style.backgroundColor = "gradient( linear, 0% 0%, 0% 100%, from( " + ColorWithAlpha(supporterAccent, "b8") + " ), to( " + ColorWithAlpha(supporterAccent, "00") + " ) )";
+			anchor.style.boxShadow = "fill " + supporterGlow + " 0px 0px 5px 0px";
 		}
 		if (anchorDot) {
-			anchorDot.style.backgroundColor = accent;
-			anchorDot.style.boxShadow = "fill " + accentGlow + " 0px 0px 8px 0px";
+			anchorDot.style.backgroundColor = supporterAccent;
+			anchorDot.style.boxShadow = "fill " + supporterGlow + " 0px 0px 8px 0px";
 		}
 	}
 
@@ -1768,7 +1819,20 @@ var XHSTopHud = (function () {
 			HideAllyHover(card);
 		});
 
+		CreateAllyHoverCard(card, playerID, isRightSide);
 		return card;
+	}
+
+	function DeleteAllyCard(playerID) {
+		if (allyCards[playerID]) {
+			allyCards[playerID].DeleteAsync(0);
+			delete allyCards[playerID];
+		}
+
+		var hover = Panel("XHSSupporterHoverCard_" + playerID);
+		if (hover) {
+			hover.DeleteAsync(0);
+		}
 	}
 
 	function GetRosterPlayerIDs() {
@@ -2106,7 +2170,12 @@ var XHSTopHud = (function () {
 	}
 
 	function FormatReincarnationStatus(state) {
-		return "REINCARNATING IN " + Math.ceil(Math.max(0, state.remaining || 0)).toString();
+		var seconds = Math.ceil(Math.max(0, state.remaining || 0)).toString();
+		var localized = $.Localize("#DOTA_XHS_Overhead_Reincarnation_In");
+		if (!localized || localized === "#DOTA_XHS_Overhead_Reincarnation_In") {
+			localized = "REINCARNATION IN {seconds}s";
+		}
+		return localized.replace("{seconds}", seconds);
 	}
 
 	function UpdateAllyVitals(card, playerID, entIndex) {
@@ -2195,8 +2264,7 @@ var XHSTopHud = (function () {
 
 			if (!IsValidEntityIndex(entIndex)) {
 				if (allyCards[playerID]) {
-					allyCards[playerID].DeleteAsync(0);
-					delete allyCards[playerID];
+					DeleteAllyCard(playerID);
 				}
 				ClearOverheadLabel(playerID);
 				continue;
@@ -2204,8 +2272,7 @@ var XHSTopHud = (function () {
 
 			var expectedSide = slotIndex >= 4 ? 1 : 0;
 			if (allyCards[playerID] && allyCards[playerID].GetAttributeInt("roster_side", -1) !== expectedSide) {
-				allyCards[playerID].DeleteAsync(0);
-				delete allyCards[playerID];
+				DeleteAllyCard(playerID);
 			}
 
 			if (!allyCards[playerID]) {
@@ -2226,8 +2293,7 @@ var XHSTopHud = (function () {
 			}
 
 			if (!activePlayerIDs[parseInt(cardPlayerID, 10)]) {
-				allyCards[cardPlayerID].DeleteAsync(0);
-				delete allyCards[cardPlayerID];
+				DeleteAllyCard(cardPlayerID);
 				ClearOverheadLabel(cardPlayerID);
 			}
 		}

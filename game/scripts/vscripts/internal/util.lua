@@ -760,6 +760,50 @@ function RefreshPlayers()
 	end
 end
 
+function RespawnDeadHeroesForPhase3Start()
+	local respawnedCount = 0
+	_G.XHS_REINCARNATING_PLAYERS = _G.XHS_REINCARNATING_PLAYERS or {}
+
+	for nPlayerID = 0, PlayerResource:GetPlayerCount() - 1 do
+		if PlayerResource:HasSelectedHero(nPlayerID) then
+			local hero = PlayerResource:GetSelectedHeroEntity(nPlayerID)
+
+			if hero ~= nil and not hero:IsNull() and hero:GetTeamNumber() == DOTA_TEAM_GOODGUYS and not hero:IsAlive() then
+				local playerID = hero:GetPlayerID()
+
+				if hero.respawn_timer ~= nil and Timers ~= nil then
+					Timers:RemoveTimer(hero.respawn_timer)
+					hero.respawn_timer = nil
+				end
+
+				local ankhModifier = hero:FindModifierByName("modifier_ankh_passives")
+				if ankhModifier ~= nil then
+					ankhModifier:StartIntervalThink(-1)
+				end
+
+				hero.ankh_respawn = false
+				_G.XHS_REINCARNATING_PLAYERS[playerID] = nil
+				CustomNetTables:SetTableValue("player_table", tostring(hero:entindex()).."_reincarnation", {
+					active = 0,
+					duration = 0,
+					end_time = 0,
+				})
+				if StopXHSReincarnationInventoryLock ~= nil then
+					StopXHSReincarnationInventoryLock(hero)
+				end
+
+				hero:SetRespawnsDisabled(false)
+				hero:RespawnHero(false, false)
+				hero:SetHealth(hero:GetMaxHealth())
+				hero:SetMana(hero:GetMaxMana())
+				respawnedCount = respawnedCount + 1
+			end
+		end
+	end
+
+	return respawnedCount
+end
+
 function TeleportHero(hero, point, delay, iCameraSpeed)
 	if not hero.GetPlayerID then return end
 	if hero:GetPlayerID() == -1 then return end
@@ -1404,10 +1448,18 @@ function TeleportAllHeroes(sEvent, iInvulnDelay, iTPDelay)
 end
 
 function GiveTomeToAllHeroes(iCount)
+	local granted = false
+
 	for _, hero in pairs(HeroList:GetAllHeroes()) do
 		if hero:IsRealHero() and not hero:IsIllusion() then
-			GrantTomeStatsToHero(hero, iCount)
+			if GrantTomeStatsToHero(hero, iCount, nil, nil, { play_sound = false }) ~= nil then
+				granted = true
+			end
 		end
+	end
+
+	if granted == true then
+		EmitGlobalSound("ui.trophy_levelup")
 	end
 end
 
@@ -1457,11 +1509,11 @@ function SendStatsGrantedNotification(hero, amount, title, text)
 	})
 end
 
-function GrantTomeStatsToHero(unit, amount, title, text)
+function GrantTomeStatsToHero(unit, amount, title, text, options)
 	local hero = GetPlayerHeroFromUnit(unit)
 	if hero == nil then return nil end
 
-	hero:IncrementAttributes(amount)
+	hero:IncrementAttributes(amount, options)
 	SendStatsGrantedNotification(hero, amount, title, text)
 
 	return hero

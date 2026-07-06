@@ -12,10 +12,10 @@
 	<Panel class="XHSTopHudHost" hittest="false" hittestchildren="true">
 		<Panel id="XHSTopHudRoot" hittest="false" hittestchildren="true">
 			<Panel id="XHSTopHudBar" hittest="false" hittestchildren="true">
-				<Panel id="XHSTopHudLeftSlot" hittest="false" hittestchildren="true">
-					<Panel id="XHSTopHudAllies" hittest="false" hittestchildren="true">
-						<Panel id="XHSAllyRosterLeft" class="XHSAllyRoster" hittest="false" hittestchildren="true" />
-						<Panel id="XHSVipRoster" hittest="false" hittestchildren="true" />
+				<Panel id="XHSTopHudLeftSlot" hittest="true" hittestchildren="true">
+					<Panel id="XHSTopHudAllies" hittest="true" hittestchildren="true">
+						<Panel id="XHSAllyRosterLeft" class="XHSAllyRoster" hittest="true" hittestchildren="true" />
+						<Panel id="XHSVipRoster" hittest="true" hittestchildren="true" />
 					</Panel>
 				</Panel>
 

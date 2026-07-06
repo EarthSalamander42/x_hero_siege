@@ -97,6 +97,7 @@
 }
 
 .XHSOverheadLabel.IsReincarnating {
+	opacity: 1.0;
 	saturation: 0.78;
 }
 
@@ -171,7 +172,7 @@
 	margin-left: 44px;
 	flow-children: none;
 	overflow: noclip;
-	margin-top: 15px;
+	margin-top: 12px;
 }
 
 .XHSOverheadTierOverline {
@@ -348,11 +349,6 @@
 	transform: translateY( -2px );
 }
 
-.XHSOverheadLabel.IsReincarnating .XHSOverheadGameplayStatus {
-	color: #ffd36a;
-	text-shadow: 0px 0px 5px #ffb13d73, 0px 1px 2px #000000;
-}
-
 .XHSAltDown .XHSOverheadGameplayStatus {
 	opacity: 0;
 	transform: translateY( 2px );
@@ -392,11 +388,11 @@
 }
 
 .XHSOverheadHeroPortraitFrame {
-	width: 16px;
-	height: 16px;
+	width: 24px;
+	height: 24px;
 	align: left top;
-	margin-left: 14px;
-	margin-top: 7px;
+	margin-left: 12px;
+	margin-top: 3px;
 	background-color: #00000000;
 	border: 0px solid transparent;
 	border-radius: 0px;
@@ -424,7 +420,7 @@
 	height: 9px;
 	align: left top;
 	margin-left: 45px;
-	margin-top: 7px;
+	margin-top: 9px;
 	border-radius: 0px;
 	background-color: #00000000;
 	border: 0px solid transparent;
@@ -480,12 +476,30 @@
 	ignore-parent-flow: true;
 }
 
+.XHSOverheadHealthTickLarge {
+	width: 2px;
+	background-color: #050f05dd;
+	box-shadow: #dfffd830 0px 0px 1px 0px;
+}
+
+.XHSOverheadHealthTickHuge {
+	width: 3px;
+	background-color: #031004f0;
+	box-shadow: #f4ffdc55 0px 0px 2px 0px;
+}
+
+.XHSOverheadHealthTickMassive {
+	width: 4px;
+	background-color: #010a03f4;
+	box-shadow: #f8ffd36a 0px 0px 3px 0px;
+}
+
 .XHSOverheadManaFrame {
 	width: 123px;
-	height: 2px;
+	height: 3px;
 	align: left top;
 	margin-left: 45px;
-	margin-top: 19px;
+	margin-top: 22px;
 	border-radius: 0px;
 	background-color: #00000000;
 	border: 0px solid transparent;
@@ -514,17 +528,17 @@
 
 .XHSOverheadLabel.XHSNoMana .XHSOverheadHealthFrame {
 	height: 11px;
-	margin-top: 7px;
+	margin-top: 9px;
 }
 
 .XHSOverheadHealthLevel {
-	width: 15px;
-	height: 13px;
+	width: 18px;
+	height: 18px;
 	align: left top;
-	margin-left: 174px;
-	margin-top: 6px;
+	margin-left: 176px;
+	margin-top: 10px;
 	color: #edf7e8;
-	font-size: 8px;
+	font-size: 12px;
 	font-weight: bold;
 	text-align: center center;
 	background-color: #00000000;
@@ -570,28 +584,29 @@
 }
 
 .XHSOverheadLabel.XHSOverheadSelectedCompact .XHSOverheadHeroPortraitFrame {
-	width: 16px;
-	height: 16px;
-	margin-left: 14px;
+	width: 24px;
+	height: 24px;
+	margin-left: 12px;
+	margin-top: 3px;
 }
 
 .XHSOverheadLabel.XHSOverheadSelectedCompact .XHSOverheadHealthFrame {
 	width: 123px;
 	height: 9px;
 	margin-left: 45px;
-	margin-top: 7px;
+	margin-top: 9px;
 }
 
 .XHSOverheadLabel.XHSOverheadSelectedCompact.XHSNoMana .XHSOverheadHealthFrame {
 	height: 11px;
-	margin-top: 7px;
+	margin-top: 9px;
 }
 
 .XHSOverheadLabel.XHSOverheadSelectedCompact .XHSOverheadManaFrame {
 	width: 123px;
-	height: 2px;
+	height: 3px;
 	margin-left: 45px;
-	margin-top: 19px;
+	margin-top: 22px;
 }
 
 .XHSOverheadLabel.XHSOverheadSelectedCompact .XHSOverheadHealthLevel {
@@ -782,9 +797,9 @@
 }
 
 #XHSOverheadMockupRoot.XHSOverheadTierDevView .XHSOverheadManaFrame {
-	width: 150px;
+	width: 92px;
 	height: 2px;
-	margin-left: 55px;
+	margin-left: 70px;
 	margin-top: 23px;
 	background-color: #00000000;
 	box-shadow: none;
@@ -830,8 +845,6 @@
 
 .XHSOverheadFrameTier4 .XHSOverheadFrameArt {
 	background-image: url("file://{images}/custom_game/overhead/xhs_overhead_frame_tier4.png");
-	brightness: 1.18;
-	saturation: 1.18;
 }
 
 .XHSOverheadFrameTier5 .XHSOverheadFrameArt {
@@ -1014,15 +1027,15 @@
 }
 
 .XHSOverheadMockupDonator.XHSSupporterTier4 .XHSOverheadNameBg {
-	background-color: gradient( linear, 0% 0%, 100% 0%, from( #00000000 ), color-stop( .14, #06304bdc ), color-stop( .50, #0b79a4f6 ), color-stop( .86, #06304bdc ), to( #00000000 ) );
-	box-shadow: fill #0000007c 0px 1px 6px 0px, fill #5ad0ff62 0px 0px 13px 0px, fill #d7f7ff28 0px 0px 4px 0px;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #00000000 ), color-stop( .14, #062238d8 ), color-stop( .50, #0a5f82f2 ), color-stop( .86, #062238d8 ), to( #00000000 ) );
+	box-shadow: fill #0000007c 0px 1px 6px 0px, fill #5ad0ff3e 0px 0px 11px 0px;
 }
 
 .XHSOverheadMockupDonator.XHSSupporterTier4 .XHSOverheadHealthLevel {
 	color: #e6fbff;
-	border-color: #87e4ffdc;
-	background-color: gradient( linear, 0% 0%, 0% 100%, from( #0d6b8ff6 ), to( #031a27f2 ) );
-	box-shadow: fill #000000a0 0px 1px 3px 0px, fill #5ad0ff72 0px 0px 8px 0px, #d7f7ff42 0px 0px 3px 0px, inset #ffffff28 0px 1px 0px 0px;
+	border-color: #5ad0ffc0;
+	background-color: gradient( linear, 0% 0%, 0% 100%, from( #0a526ff4 ), to( #03121af2 ) );
+	box-shadow: fill #000000a0 0px 1px 3px 0px, fill #5ad0ff4a 0px 0px 7px 0px, inset #ffffff1c 0px 1px 0px 0px;
 }
 
 .XHSOverheadMockupDonator.XHSSupporterTier5 .XHSOverheadNameBg {
@@ -1157,17 +1170,17 @@
 }
 
 .XHSOverheadLabel.XHSSupporterTier4 .XHSOverheadNameBg {
-	background-color: gradient( linear, 0% 0%, 100% 0%, from( #00000000 ), color-stop( .14, #06304bdc ), color-stop( .50, #0b79a4f6 ), color-stop( .86, #06304bdc ), to( #00000000 ) );
-	box-shadow: fill #0000007c 0px 1px 6px 0px, fill #5ad0ff62 0px 0px 13px 0px, fill #d7f7ff28 0px 0px 4px 0px;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #00000000 ), color-stop( .14, #062238d8 ), color-stop( .50, #0a5f82f2 ), color-stop( .86, #062238d8 ), to( #00000000 ) );
+	box-shadow: fill #0000007c 0px 1px 6px 0px, fill #5ad0ff3e 0px 0px 11px 0px;
 }
 
 .XHSOverheadLabel.XHSSupporterTier4 .XHSOverheadTierOverline {
 	color: #dcf7ff;
-	text-shadow: 0px 1px 2px #000000, 0px 0px 8px #5ad0ff82;
-	background-color: gradient( linear, 0% 0%, 100% 0%, from( #00000000 ), color-stop( .18, #06263ae8 ), color-stop( .50, #0d4260f6 ), color-stop( .82, #06263ae8 ), to( #00000000 ) );
-	border-top-color: #87e4ff78;
-	border-bottom-color: #5ad0ff48;
-	box-shadow: fill #00000096 0px 1px 4px 0px, fill #5ad0ff42 0px 0px 9px 0px, fill #d7f7ff20 0px 0px 4px 0px;
+	text-shadow: 0px 1px 2px #000000, 0px 0px 7px #5ad0ff5a;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #00000000 ), color-stop( .18, #051b2be8 ), color-stop( .50, #0b3047f4 ), color-stop( .82, #051b2be8 ), to( #00000000 ) );
+	border-top-color: #5ad0ff54;
+	border-bottom-color: #5ad0ff30;
+	box-shadow: fill #00000096 0px 1px 4px 0px, fill #5ad0ff28 0px 0px 8px 0px;
 }
 
 .XHSOverheadLabel.XHSSupporterTier5 .XHSOverheadNameBg,
@@ -1225,8 +1238,8 @@
 
 .XHSOverheadLabel.XHSSupporterTier4 .XHSOverheadHeroPortraitFrame {
 	border: 0px solid transparent;
-	background-color: gradient( linear, 0% 0%, 100% 100%, from( #0a2c45f4 ), color-stop( .58, #03131ff4 ), to( #0d3a59f2 ) );
-	box-shadow: fill #000000c8 0px 1px 4px 0px, fill #5ad0ff3a 0px 0px 8px 0px, #d7f7ff28 0px 0px 3px 0px, inset #5ad0ff30 0px 1px 0px 0px;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #082033f4 ), color-stop( .58, #03101af4 ), to( #0b2b42f0 ) );
+	box-shadow: fill #000000c8 0px 1px 4px 0px, fill #5ad0ff20 0px 0px 7px 0px, inset #5ad0ff1f 0px 1px 0px 0px;
 }
 
 .XHSOverheadLabel.XHSSupporterTier5 .XHSOverheadHeroPortraitFrame {
@@ -1258,9 +1271,9 @@
 
 .XHSOverheadLabel.XHSSupporterTier4 .XHSOverheadHealthLevel {
 	color: #e6fbff;
-	border-color: #87e4ffdc;
-	background-color: gradient( linear, 0% 0%, 0% 100%, from( #0d6b8ff6 ), to( #031a27f2 ) );
-	box-shadow: fill #000000a0 0px 1px 3px 0px, fill #5ad0ff72 0px 0px 8px 0px, #d7f7ff42 0px 0px 3px 0px, inset #ffffff28 0px 1px 0px 0px;
+	border-color: #5ad0ffc0;
+	background-color: gradient( linear, 0% 0%, 0% 100%, from( #0a526ff4 ), to( #03121af2 ) );
+	box-shadow: fill #000000a0 0px 1px 3px 0px, fill #5ad0ff4a 0px 0px 7px 0px, inset #ffffff1c 0px 1px 0px 0px;
 }
 
 .XHSOverheadLabel.XHSSupporterTier5 .XHSOverheadHealthLevel {
@@ -1314,6 +1327,180 @@
 	animation-delay: 0s;
 	animation-iteration-count: infinite;
 	animation-timing-function: ease-in-out;
+}
+
+.XHSOverheadLabel.IsReincarnating {
+	opacity: 1.0;
+	saturation: 0.92;
+}
+
+.XHSOverheadLabel.IsReincarnating .XHSOverheadFrameArt,
+.XHSOverheadLabel.IsReincarnating .XHSOverheadBars,
+.XHSOverheadLabel.IsReincarnating .XHSOverheadValue,
+.XHSOverheadLabel.IsReincarnating .XHSOverheadTierOverline,
+.XHSOverheadLabel.IsReincarnating .XHSOverheadTagWrap {
+	visibility: collapse;
+	opacity: 0;
+}
+
+.XHSOverheadLabel.IsReincarnating .XHSOverheadContent {
+	width: 210px;
+	height: 43px;
+	margin-top: 0px;
+	/* background-color: gradient( linear, 0% 0%, 100% 100%, from( #160b20f1 ), color-stop( .52, #0a101df2 ), to( #281136ed ) ); */
+	border: 1px solid #c99cff80;
+	/* box-shadow: fill #000000bf 0px 4px 10px 0px, fill #c99cff28 0px 0px 13px 0px, inset #ffffff18 0px 1px 0px 0px; */
+	brightness: 1.0;
+}
+
+.XHSOverheadLabel.IsReincarnating .XHSOverheadTopRow {
+	width: 176px;
+	height: 16px;
+	margin-left: 17px;
+	margin-top: 5px;
+}
+
+.XHSOverheadLabel.IsReincarnating .XHSOverheadNameBg {
+	width: 176px;
+	height: 16px;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #00000000 ), color-stop( .16, #2a1741e8 ), color-stop( .50, #5d318ff4 ), color-stop( .84, #2a1741e8 ), to( #00000000 ) );
+	box-shadow: fill #00000085 0px 1px 6px 0px, fill #c99cff46 0px 0px 10px 0px;
+}
+
+.XHSOverheadLabel.IsReincarnating .XHSOverheadName {
+	width: 176px;
+	height: 16px;
+	margin-left: 0px;
+	color: #f5e8ff;
+	font-size: 11px;
+	text-shadow: 0px 1px 2px #000000, 0px 0px 7px #c99cff8a;
+}
+
+.XHSOverheadLabel.IsReincarnating .XHSOverheadStatusRow {
+	width: 176px;
+	height: 17px;
+	margin-left: 17px;
+	margin-top: 2px;
+	visibility: visible;
+	opacity: 1;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #00000000 ), color-stop( .16, #291018de ), color-stop( .50, #3f1710ee ), color-stop( .84, #291018de ), to( #00000000 ) );
+	border-top: 1px solid #ffcf6656;
+	border-bottom: 1px solid #c99cff32;
+	box-shadow: fill #0000008a 0px 1px 4px 0px, fill #ffb13d2e 0px 0px 9px 0px;
+}
+
+.XHSOverheadLabel.IsReincarnating .XHSOverheadStatusNode {
+	width: 6px;
+	height: 6px;
+	margin-left: 8px;
+	background-color: #ffd36a;
+	box-shadow: fill #ffd36ab8 0px 0px 8px 0px;
+}
+
+.XHSOverheadLabel.IsReincarnating .XHSOverheadGameplayStatus {
+	width: 150px;
+	height: 17px;
+	margin-right: 6px;
+	color: #ffe7b0;
+	font-size: 11px;
+	text-align: center;
+	text-shadow: 0px 0px 7px #ffb13d9a, 0px 1px 2px #000000;
+	opacity: 1;
+	transform: translateY( 0px );
+}
+
+.XHSOverheadLabel.IsReincarnating .XHSOverheadAltStatus {
+	visibility: collapse;
+	opacity: 0;
+}
+
+.XHSOverheadLabel .XHSOverheadHeroPortraitFrame,
+.XHSOverheadMockupPlate .XHSOverheadHeroPortraitFrame {
+	background-color: #00000000;
+	background-image: none;
+	border: 0px solid transparent;
+	box-shadow: none;
+}
+
+.XHSOverheadLabel.XHSSupporterTier1 .XHSOverheadHeroPortraitFrame,
+.XHSOverheadLabel.XHSSupporterTier2 .XHSOverheadHeroPortraitFrame,
+.XHSOverheadLabel.XHSSupporterTier3 .XHSOverheadHeroPortraitFrame,
+.XHSOverheadLabel.XHSSupporterTier4 .XHSOverheadHeroPortraitFrame,
+.XHSOverheadLabel.XHSSupporterTier5 .XHSOverheadHeroPortraitFrame,
+.XHSOverheadLabel.XHSOverheadLowHealth .XHSOverheadHeroPortraitFrame,
+.XHSOverheadMockupDonator.XHSSupporterTier1 .XHSOverheadHeroPortraitFrame,
+.XHSOverheadMockupDonator.XHSSupporterTier2 .XHSOverheadHeroPortraitFrame,
+.XHSOverheadMockupDonator.XHSSupporterTier3 .XHSOverheadHeroPortraitFrame,
+.XHSOverheadMockupDonator.XHSSupporterTier4 .XHSOverheadHeroPortraitFrame,
+.XHSOverheadMockupDonator.XHSSupporterTier5 .XHSOverheadHeroPortraitFrame {
+	background-color: #00000000;
+	background-image: none;
+	border: 0px solid transparent;
+	box-shadow: none;
+}
+
+.XHSOverheadHeroPortrait {
+	background-color: #00000000;
+	background-image: none;
+	border: 0px solid transparent;
+	box-shadow: none;
+}
+
+.XHSOverheadLabel .XHSOverheadHealthLevel,
+.XHSOverheadMockupPlate .XHSOverheadHealthLevel {
+	background-color: #00000000;
+	background-image: none;
+	border: 0px solid transparent;
+	box-shadow: none;
+	color: #edf7e8;
+	text-shadow: 0px 1px 3px #000000, 0px 0px 3px #000000;
+}
+
+.XHSOverheadLabel.XHSSupporterTier1 .XHSOverheadHealthLevel,
+.XHSOverheadLabel.XHSSupporterTier2 .XHSOverheadHealthLevel,
+.XHSOverheadLabel.XHSSupporterTier3 .XHSOverheadHealthLevel,
+.XHSOverheadLabel.XHSSupporterTier4 .XHSOverheadHealthLevel,
+.XHSOverheadLabel.XHSSupporterTier5 .XHSOverheadHealthLevel,
+.XHSOverheadLabel.XHSOverheadLowHealth .XHSOverheadHealthLevel,
+.XHSOverheadMockupDonator.XHSSupporterTier1 .XHSOverheadHealthLevel,
+.XHSOverheadMockupDonator.XHSSupporterTier2 .XHSOverheadHealthLevel,
+.XHSOverheadMockupDonator.XHSSupporterTier3 .XHSOverheadHealthLevel,
+.XHSOverheadMockupDonator.XHSSupporterTier4 .XHSOverheadHealthLevel,
+.XHSOverheadMockupDonator.XHSSupporterTier5 .XHSOverheadHealthLevel {
+	background-color: #00000000;
+	background-image: none;
+	border: 0px solid transparent;
+	box-shadow: none;
+}
+
+.XHSOverheadLabel.XHSSupporterTier1 .XHSOverheadHealthLevel,
+.XHSOverheadMockupDonator.XHSSupporterTier1 .XHSOverheadHealthLevel {
+	color: #a7ffc0;
+	text-shadow: 0px 1px 3px #000000, 0px 0px 6px #70e39aaa;
+}
+
+.XHSOverheadLabel.XHSSupporterTier2 .XHSOverheadHealthLevel,
+.XHSOverheadMockupDonator.XHSSupporterTier2 .XHSOverheadHealthLevel {
+	color: #ffe27a;
+	text-shadow: 0px 1px 3px #000000, 0px 0px 7px #ffcf66b0;
+}
+
+.XHSOverheadLabel.XHSSupporterTier3 .XHSOverheadHealthLevel,
+.XHSOverheadMockupDonator.XHSSupporterTier3 .XHSOverheadHealthLevel {
+	color: #ff9a78;
+	text-shadow: 0px 1px 3px #000000, 0px 0px 7px #ff5a43a8;
+}
+
+.XHSOverheadLabel.XHSSupporterTier4 .XHSOverheadHealthLevel,
+.XHSOverheadMockupDonator.XHSSupporterTier4 .XHSOverheadHealthLevel {
+	color: #8ee4ff;
+	text-shadow: 0px 1px 3px #000000, 0px 0px 8px #5ad0ffc0;
+}
+
+.XHSOverheadLabel.XHSSupporterTier5 .XHSOverheadHealthLevel,
+.XHSOverheadMockupDonator.XHSSupporterTier5 .XHSOverheadHealthLevel {
+	color: #dec0ff;
+	text-shadow: 0px 1px 3px #000000, 0px 0px 9px #c99cffd0, 0px 0px 3px #ffffff80;
 }
 
 .XHSOverheadTopStatusRespawn {
@@ -2644,8 +2831,7 @@
 .XHSSupporterPortraitTint,
 .XHSSupporterPortraitSweep,
 .XHSSupporterCrest,
-.XHSSupporterMark,
-.XHSSupporterHoverCard {
+.XHSSupporterMark {
 	visibility: collapse;
 	opacity: 0;
 	animation-name: none;

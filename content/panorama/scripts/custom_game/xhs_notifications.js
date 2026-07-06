@@ -660,7 +660,7 @@
 
 		ratio = Math.max(0, Math.min(1, Number(ratio) || 0));
 		sweep.style.clip = "radial(50% 50%, 0.0deg, " + (ratio * -360).toFixed(2) + "deg)";
-		sweep.style.opacity = ratio > 0 ? String(Math.max(0.22, ratio)) : "0";
+		sweep.style.opacity = ratio > 0 ? String(Math.max(0.72, ratio)) : "0";
 		sweep.SetHasClass("XHSWaveRingSweepWarning", ratio > 0 && ratio <= 0.25);
 	}
 
@@ -676,7 +676,7 @@
 
 		if (fill) {
 			fill.style.transform = "scaleX(1) scaleY(1)";
-			fill.style.opacity = remaining > 0 ? "1" : ".42";
+			fill.style.opacity = remaining > 0 ? ".68" : ".32";
 		}
 
 		updateWaveRingProgress(ringRatio);
