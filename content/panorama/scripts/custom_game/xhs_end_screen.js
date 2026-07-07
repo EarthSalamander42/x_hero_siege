@@ -4,6 +4,33 @@ var XHSEndScreen = (function () {
 	var WEBSITE_URL = "https://mods.frostrose-studio.com";
 	var DISCORD_URL = "https://discord.frostrose-studio.com/";
 	var SUPPORTER_URL = "https://www.patreon.com/bePatron?u=2533325";
+	var PLAYER_COLOR_FALLBACKS = [
+		"#0032c8ff",
+		"#00ffffff",
+		"#640064ff",
+		"#ffff00ff",
+		"#ff9600ff",
+		"#ff64ffff",
+		"#a3b000ff",
+		"#65d9f7ff",
+		"#007d00ff",
+		"#a46900ff",
+		"#78ff50ff",
+		"#50a0ffff",
+		"#b464ffff",
+		"#ffd250ff",
+		"#50ffbeff",
+		"#ff6eaaff",
+		"#a0d2ffff",
+		"#8296aaff",
+		"#d28250ff",
+		"#785a3cff",
+		"#d2ff78ff",
+		"#ff96d2ff",
+		"#64dcdcff",
+		"#bebeffff",
+		"#e6e6e6ff",
+	];
 
 	var DIFFICULTY_NAMES = {
 		1: "Easy",
@@ -55,6 +82,72 @@ var XHSEndScreen = (function () {
 
 	function Clamp(value, minValue, maxValue) {
 		return Math.max(minValue, Math.min(maxValue, value));
+	}
+
+	function IntToColorString(value) {
+		return "#" +
+			("00" + (value & 0xFF).toString(16)).substr(-2) +
+			("00" + ((value >> 8) & 0xFF).toString(16)).substr(-2) +
+			("00" + ((value >> 16) & 0xFF).toString(16)).substr(-2) +
+			"ff";
+	}
+
+	function NormalizeColorString(color) {
+		if (color === undefined || color === null) {
+			return "";
+		}
+
+		var colorString = color.toString();
+		if (colorString.charAt(0) !== "#") {
+			colorString = "#" + colorString;
+		}
+
+		if (colorString.length === 7) {
+			colorString += "ff";
+		}
+
+		return colorString.toLowerCase();
+	}
+
+	function IsInvalidPlayerColorString(colorString) {
+		return !colorString || colorString === "#ffffffff" || colorString === "#ffffff";
+	}
+
+	function GetFallbackPlayerColorString(playerID) {
+		var fallbackIndex = ((playerID % PLAYER_COLOR_FALLBACKS.length) + PLAYER_COLOR_FALLBACKS.length) % PLAYER_COLOR_FALLBACKS.length;
+		return PLAYER_COLOR_FALLBACKS[fallbackIndex];
+	}
+
+	function GetPlayerColorString(playerID, tableColor) {
+		var normalizedTableColor = NormalizeColorString(tableColor);
+		if (!IsInvalidPlayerColorString(normalizedTableColor)) {
+			return normalizedTableColor;
+		}
+
+		var playerColors = CustomNetTables.GetTableValue("game_options", "player_colors");
+		normalizedTableColor = NormalizeColorString(playerColors ? playerColors[playerID] : null);
+		if (!IsInvalidPlayerColorString(normalizedTableColor)) {
+			return normalizedTableColor;
+		}
+
+		var engineColor = Safe(function () {
+			return Players.GetPlayerColor(playerID);
+		}, null);
+		var engineColorString = engineColor === null ? "" : IntToColorString(engineColor);
+		if (!IsInvalidPlayerColorString(engineColorString)) {
+			return engineColorString;
+		}
+
+		return GetFallbackPlayerColorString(playerID);
+	}
+
+	function ColorWithAlpha(colorString, alpha) {
+		colorString = NormalizeColorString(colorString);
+		if (!colorString || colorString.length < 7) {
+			return colorString;
+		}
+
+		return colorString.substr(0, 7) + alpha;
 	}
 
 	function FormatTime(time) {
@@ -354,6 +447,7 @@ var XHSEndScreen = (function () {
 			tomesSmall: tomesSmall,
 			tomesBig: tomesBig,
 			tomesPower: tomesPower,
+			playerColor: GetPlayerColorString(playerID, FirstDefined(battlepass.ply_color, server.ply_color, api.ply_color)),
 			supportGold: ToNumber(server.gold_spent_on_support, 0),
 			abandon: !!server.abandon,
 			api: api,
@@ -832,11 +926,22 @@ var XHSEndScreen = (function () {
 		var row = $.CreatePanel("Panel", parent, "XHSEndScreenPlayerRow_" + model.id);
 		row.AddClass("XHSEndScreenPlayerRow");
 		row.SetHasClass("IsAbandoned", model.abandon);
+		row.hittest = true;
+		row.hittestchildren = true;
 
 		var identity = $.CreatePanel("Panel", row, "");
 		identity.AddClass("XHSPlayerIdentity");
+		identity.hittest = true;
 
-		var heroImage = $.CreatePanel("DOTAHeroImage", identity, "");
+		var heroFrame = $.CreatePanel("Panel", identity, "");
+		heroFrame.AddClass("XHSPlayerHeroFrame");
+		heroFrame.style.boxShadow = "fill " + ColorWithAlpha(model.playerColor, "66") + " 0px 0px 8px 0px";
+
+		var playerColor = $.CreatePanel("Panel", heroFrame, "");
+		playerColor.AddClass("XHSPlayerColorStrip");
+		playerColor.style.backgroundColor = model.playerColor;
+
+		var heroImage = $.CreatePanel("DOTAHeroImage", heroFrame, "");
 		heroImage.AddClass("XHSPlayerHeroImage");
 		heroImage.heroimagestyle = "landscape";
 		if (model.hero) {
@@ -865,6 +970,29 @@ var XHSEndScreen = (function () {
 		CreateCell(row, "PlayerColNumber", "+" + FormatNumber(model.tomeStatsBonus), "XHSPlayerCellStats");
 		CreateCell(row, "PlayerColNumber", FormatNumber(model.potionsUsed), "XHSPlayerCellPotions");
 		CreateBattlepassCell(row, model);
+
+		if (typeof XHSSupporterHover !== "undefined" && XHSSupporterHover.Create) {
+			var hoverID = "End_" + model.id;
+			var hoverRoot = Panel("XHSEndScreenMain") || row;
+			var hover = XHSSupporterHover.Create(hoverRoot, hoverID, { className: "XHSEndScreenSupporterHover" });
+			var showHover = function () {
+				var data = XHSSupporterHover.GetPlayerData(model.id, {
+					model: model,
+					tableData: model.battlepass || {},
+				});
+				XHSSupporterHover.Update(hover, hoverID, data);
+				XHSSupporterHover.PositionNearAnchor(identity, hover, hoverRoot, { gap: 12 });
+				XHSSupporterHover.Show(row, hover);
+			};
+			var hideHover = function () {
+				XHSSupporterHover.Hide(row, hover);
+			};
+
+			row.SetPanelEvent("onmouseover", showHover);
+			row.SetPanelEvent("onmouseout", hideHover);
+			identity.SetPanelEvent("onmouseover", showHover);
+			identity.SetPanelEvent("onmouseout", hideHover);
+		}
 	}
 
 	function RenderPlayers(players) {

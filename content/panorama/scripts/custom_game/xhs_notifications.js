@@ -13,6 +13,9 @@
 	var activeRuneVersion = 0;
 	var activeRuneCompactSchedule = null;
 	var activeRuneHideSchedule = null;
+	var fragmentQuestNotificationQueue = [];
+	var fragmentQuestNotificationActive = false;
+	var FRAGMENT_QUEST_QUEUE_GAP = 0.35;
 
 	function getDuration(msg) {
 		if (typeof msg.duration === "number" && msg.duration > 0) {
@@ -1143,6 +1146,172 @@
 		}
 	}
 
+	function getFragmentQuestStars(msg) {
+		return Math.max(0, Math.min(3, Math.floor(Number(msg && msg.stars) || 0)));
+	}
+
+	function getFragmentQuestPreviousStars(msg) {
+		return Math.max(0, Math.min(3, Math.floor(Number(msg && msg.previous_stars) || 0)));
+	}
+
+	function addFragmentQuestToastStars(parent, stars, previousStars) {
+		for (var i = 1; i <= 3; i++) {
+			var star = $.CreatePanel("Panel", parent, "");
+			star.AddClass("XHSFragmentQuestToastStar");
+			star.SetHasClass("IsActive", i <= stars);
+			star.SetHasClass("IsNew", i > previousStars && i <= stars);
+			star.hittest = false;
+		}
+	}
+
+	function renderFragmentQuestStarToast(msg, onDone) {
+		var container = $(TOP_CONTAINER_ID);
+		if (!container) {
+			if (onDone) {
+				$.Schedule(FRAGMENT_QUEST_QUEUE_GAP, onDone);
+			}
+			return;
+		}
+
+		msg = msg || {};
+		var stars = getFragmentQuestStars(msg);
+		var previousStars = getFragmentQuestPreviousStars(msg);
+		var duration = getDuration({ duration: msg.duration || 5.4 });
+		var toast = createToast(container, "top", {
+			duration: duration,
+			severity: "success"
+		});
+		toast.AddClass("XHSNotificationFragmentQuest");
+
+		var content = toast.contentPanel || toast;
+		content.RemoveAndDeleteChildren();
+
+		var header = $.CreatePanel("Panel", content, "");
+		header.AddClass("XHSFragmentQuestToastHeader");
+		header.hittest = false;
+
+		var copy = $.CreatePanel("Panel", header, "");
+		copy.AddClass("XHSFragmentQuestToastCopy");
+		copy.hittest = false;
+
+		var eyebrow = $.CreatePanel("Label", copy, "");
+		eyebrow.AddClass("XHSFragmentQuestToastEyebrow");
+		eyebrow.text = "FRAGMENT QUEST";
+		eyebrow.hittest = false;
+
+		var title = $.CreatePanel("Label", copy, "");
+		title.AddClass("XHSFragmentQuestToastTitle");
+		title.text = msg.title || "Fragment Quest";
+		title.hittest = false;
+
+		var starsPanel = $.CreatePanel("Panel", header, "");
+		starsPanel.AddClass("XHSFragmentQuestToastStars");
+		starsPanel.hittest = false;
+		addFragmentQuestToastStars(starsPanel, stars, previousStars);
+
+		var subtitle = $.CreatePanel("Label", content, "");
+		subtitle.AddClass("XHSFragmentQuestToastSubtitle");
+		subtitle.text = stars + "/3 stars reached" + (msg.progress_text ? " - " + msg.progress_text : "");
+		subtitle.hittest = false;
+
+		var details = $.CreatePanel("Panel", content, "");
+		details.AddClass("XHSFragmentQuestToastDetails");
+		details.hittest = false;
+
+		var threshold = $.CreatePanel("Label", details, "");
+		threshold.AddClass("XHSFragmentQuestToastThreshold");
+		threshold.text = msg.threshold_text || msg.description || "";
+		threshold.hittest = false;
+
+		var fragments = Number(msg.fragments_preview || msg.preview_fragments || 0);
+		if (fragments <= 0 && msg.reward_per_star !== undefined) {
+			fragments = Number(msg.reward_per_star || 0) * stars;
+		}
+
+		var reward = $.CreatePanel("Label", details, "");
+		reward.AddClass("XHSFragmentQuestToastReward");
+		reward.text = fragments > 0 ? "+" + formatRewardNumber(fragments) + " fragments earned" : "Fragments earned";
+		reward.hittest = false;
+
+		startProgress(toast, duration);
+		$.Schedule(duration, function () {
+			closeToast(toast);
+			if (onDone) {
+				$.Schedule(FRAGMENT_QUEST_QUEUE_GAP, onDone);
+			}
+		});
+
+		trimStack(container);
+
+		if (msg.sound && msg.sound !== "none") {
+			Game.EmitSound(msg.sound);
+		}
+	}
+
+	function processFragmentQuestNotificationQueue() {
+		if (fragmentQuestNotificationActive) {
+			return;
+		}
+
+		if (fragmentQuestNotificationQueue.length <= 0) {
+			return;
+		}
+
+		fragmentQuestNotificationActive = true;
+		var msg = fragmentQuestNotificationQueue.shift();
+		renderFragmentQuestStarToast(msg, function () {
+			fragmentQuestNotificationActive = false;
+			processFragmentQuestNotificationQueue();
+		});
+	}
+
+	function showFragmentQuestStar(msg) {
+		fragmentQuestNotificationQueue.push(msg || {});
+		processFragmentQuestNotificationQueue();
+	}
+
+	function enqueueFragmentQuestToolsPreview() {
+		if (!Game.IsInToolsMode || !Game.IsInToolsMode()) {
+			return;
+		}
+
+		$.Schedule(0.7, function () {
+			showFragmentQuestStar({
+				title: "War Healers",
+				description: "Reach team healing milestones.",
+				stars: 1,
+				previous_stars: 0,
+				progress_text: "250k healing",
+				threshold_text: "250k / 500k / 1M",
+				fragments_preview: 5,
+				duration: 3.6,
+				sound: "none"
+			});
+			showFragmentQuestStar({
+				title: "Grom Executed",
+				description: "Kill Grom with few deaths.",
+				stars: 2,
+				previous_stars: 1,
+				progress_text: "2 deaths",
+				threshold_text: "4 / 2 / 0 deaths",
+				fragments_preview: 10,
+				duration: 3.6,
+				sound: "none"
+			});
+			showFragmentQuestStar({
+				title: "Lich King's End",
+				description: "Defeat the Lich King quickly.",
+				stars: 3,
+				previous_stars: 2,
+				progress_text: "4:28",
+				threshold_text: "7:00 / 5:30 / 4:30",
+				fragments_preview: 15,
+				duration: 3.6,
+				sound: "none"
+			});
+		});
+	}
+
 	GameEvents.Subscribe("top_notification", topNotification);
 	GameEvents.Subscribe("bottom_notification", bottomNotification);
 	GameEvents.Subscribe("top_remove_notification", topRemoveNotification);
@@ -1155,4 +1324,6 @@
 	GameEvents.Subscribe("xhs_rune_state_update", updateRuneState);
 	GameEvents.Subscribe("xhs_main_quest_completed", showMainQuestCompleted);
 	GameEvents.Subscribe("xhs_reward_notification", showRewardNotification);
+	GameEvents.Subscribe("xhs_fragment_quest_star", showFragmentQuestStar);
+	enqueueFragmentQuestToolsPreview();
 })();

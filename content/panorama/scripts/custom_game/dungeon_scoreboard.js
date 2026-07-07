@@ -9,15 +9,6 @@ var KILL_EVENT_VISIBLE_RATIO = 0.8;
 var scoreboard_supporter_hover = null;
 var scoreboard_supporter_hover_player_id = -1;
 
-var SCOREBOARD_SUPPORTER_TIER_CATALOG = [
-	{ name: "Free Player", color: "#7db9d8", fragments: 0, xpBoost: 0, votePower: 1 },
-	{ name: "Donator", color: "#45C46B", fragments: 150, xpBoost: 10, votePower: 2 },
-	{ name: "Golden Donator", color: "#F2C94C", fragments: 400, xpBoost: 20, votePower: 3 },
-	{ name: "Ember Donator", color: "#E4572E", fragments: 900, xpBoost: 30, votePower: 4 },
-	{ name: "Stoneguard Donator", color: "#5AD0FF", fragments: 1800, xpBoost: 40, votePower: 5 },
-	{ name: "Earthwarden Donator", color: "#C99CFF", fragments: 1800, xpBoost: 40, votePower: 5 }
-];
-
 function intToARGB(i) 
 { 
                 return ('00' + ( i & 0xFF).toString( 16 ) ).substr( -2 ) +
@@ -114,40 +105,6 @@ function ScoreboardToNumber(value, fallbackValue) {
 	return numberValue;
 }
 
-function ScoreboardFormatNumber(value) {
-	var numberValue = Math.max(0, ScoreboardToNumber(value, 0));
-	if (numberValue >= 1000000) {
-		return (numberValue / 1000000).toFixed(1) + "M";
-	}
-	if (numberValue >= 10000) {
-		return (numberValue / 1000).toFixed(1) + "k";
-	}
-
-	return Math.floor(numberValue).toString();
-}
-
-function ScoreboardFormatVotePower(value) {
-	var votes = Math.max(1, Math.floor(ScoreboardToNumber(value, 1)));
-	return votes + " setup " + (votes > 1 ? "votes" : "vote");
-}
-
-function ScoreboardFormatWinrate(value) {
-	if (value === undefined || value === null || value === "") {
-		return "-";
-	}
-
-	var numberValue = Number(value);
-	if (isNaN(numberValue)) {
-		return value.toString();
-	}
-
-	if (numberValue > 0 && numberValue <= 1) {
-		numberValue = numberValue * 100;
-	}
-
-	return Math.round(numberValue) + "%";
-}
-
 function ScoreboardSafeCall(callback, fallbackValue) {
 	try {
 		var value = callback();
@@ -178,211 +135,17 @@ function GetScoreboardNetTableValue(tableName, key) {
 	}, null);
 }
 
-function GetScoreboardSupporterTierInfo(tier) {
-	tier = Math.max(0, Math.min(5, Math.floor(Number(tier) || 0)));
-	return SCOREBOARD_SUPPORTER_TIER_CATALOG[tier] || SCOREBOARD_SUPPORTER_TIER_CATALOG[0];
-}
-
-function GetScoreboardWindowRect(panel) {
-	if (!panel || typeof panel.GetPositionWithinWindow !== "function") {
-		return { x: 0, y: 0, w: 0, h: 0 };
-	}
-
-	var position = panel.GetPositionWithinWindow();
-	return {
-		x: Number(position.x || position[0] || 0),
-		y: Number(position.y || position[1] || 0),
-		w: Number(panel.actuallayoutwidth || panel.desiredlayoutwidth || 0),
-		h: Number(panel.actuallayoutheight || panel.desiredlayoutheight || 0)
-	};
-}
-
-function GetScoreboardSupporterPlayerData(playerID, playerInfo) {
-	playerInfo = playerInfo || {};
-	var tier = GetScoreboardSupporterTier(playerInfo);
-	var tierInfo = GetScoreboardSupporterTierInfo(tier);
-	var gamePlayerInfo = ScoreboardSafeCall(function () { return Game.GetPlayerInfo(playerID); }, {}) || {};
-	var heroName = ScoreboardSafeCall(function () { return Players.GetPlayerSelectedHero(playerID); }, "");
-	var accountLevel = ScoreboardToNumber(playerInfo.xhs_account_level || playerInfo.account_level || playerInfo.legacy_level, 0);
-	var accountCurrent = ScoreboardToNumber(playerInfo.xhs_xp_current, 0);
-	var accountMax = ScoreboardToNumber(playerInfo.xhs_xp_max, 0);
-	var accountTotal = ScoreboardToNumber(playerInfo.xhs_xp || playerInfo.xhs_xp_total, 0);
-
-	return {
-		playerID: playerID,
-		playerName: ScoreboardSafeCall(function () { return Players.GetPlayerName(playerID); }, "") || gamePlayerInfo.player_name || ("Player " + (playerID + 1)),
-		heroName: heroName,
-		localHeroName: heroName ? $.Localize("#" + heroName) : "-",
-		tier: tier,
-		tierName: playerInfo.tier_name || playerInfo.supporter_tier_name || tierInfo.name,
-		tierColor: playerInfo.tier_color || tierInfo.color,
-		fragments: ScoreboardToNumber(playerInfo.fragments || playerInfo.fragment_balance, 0),
-		weeklyFragments: ScoreboardToNumber(playerInfo.daily_fragments || playerInfo.daily_earned || playerInfo.weekly_fragments || playerInfo.weekly_earned, 0),
-		weeklyCap: Math.max(ScoreboardToNumber(playerInfo.daily_cap || playerInfo.weekly_cap, 100), 1),
-		seasonLevel: Math.max(1, ScoreboardToNumber(playerInfo.season_level || playerInfo.Lvl, 1)),
-		seasonXP: ScoreboardToNumber(playerInfo.season_xp || playerInfo.XP, 0),
-		seasonXPMax: Math.max(ScoreboardToNumber(playerInfo.season_xp_max || playerInfo.MaxXP, 1000), 1),
-		accountLevel: accountLevel,
-		accountXPCurrent: accountCurrent,
-		accountXPMax: accountMax,
-		accountXPTotal: accountTotal,
-		winrate: playerInfo.winrate,
-		fragmentsPerMonth: ScoreboardToNumber(playerInfo.tier_fragments || tierInfo.fragments, tierInfo.fragments),
-		xpBoost: ScoreboardToNumber(playerInfo.tier_xp_boost || playerInfo.xp_boost || tierInfo.xpBoost, tierInfo.xpBoost),
-		votePower: Math.max(1, ScoreboardToNumber(playerInfo.vote_power, tierInfo.votePower))
-	};
-}
-
-function ScoreboardFormatAccountXP(data) {
-	if (!data || (data.accountLevel <= 0 && data.accountXPCurrent <= 0 && data.accountXPMax <= 0 && data.accountXPTotal <= 0)) {
-		return "-";
-	}
-
-	if (data.accountXPTotal > 0) {
-		return "L" + Math.max(1, data.accountLevel) + " " + ScoreboardFormatNumber(data.accountXPTotal);
-	}
-
-	if (data.accountXPMax > 0) {
-		return "L" + Math.max(1, data.accountLevel) + " " + ScoreboardFormatNumber(data.accountXPCurrent) + " / " + ScoreboardFormatNumber(data.accountXPMax);
-	}
-
-	return "L" + Math.max(1, data.accountLevel);
-}
-
-function ScoreboardSetChildText(parent, childID, value) {
-	if (!parent) {
-		return;
-	}
-
-	var child = parent.FindChildTraverse(childID);
-	if (child) {
-		child.text = value === undefined || value === null ? "" : value.toString();
-	}
-}
-
-function ScoreboardSetFillPercent(parent, childID, current, max) {
-	if (!parent) {
-		return;
-	}
-
-	var child = parent.FindChildTraverse(childID);
-	if (!child) {
-		return;
-	}
-
-	var percent = Math.max(0, Math.min(100, Math.floor((ScoreboardToNumber(current, 0) / Math.max(ScoreboardToNumber(max, 1), 1)) * 100)));
-	child.style.width = percent + "%";
-}
-
-function CreateScoreboardHoverStat(parent, id, labelText) {
-	var stat = $.CreatePanel("Panel", parent, "ScoreboardXHSHoverStat_" + id);
-	stat.AddClass("ScoreboardXHSHoverStat");
-
-	var label = $.CreatePanel("Label", stat, "ScoreboardXHSHoverStatLabel_" + id);
-	label.AddClass("ScoreboardXHSHoverStatLabel");
-	label.text = labelText;
-
-	var value = $.CreatePanel("Label", stat, "ScoreboardXHSHoverStatValue_" + id);
-	value.AddClass("ScoreboardXHSHoverStatValue");
-	value.text = "-";
-}
-
-function CreateScoreboardHoverMeter(parent, id, labelText) {
-	var meter = $.CreatePanel("Panel", parent, "ScoreboardXHSHoverMeter_" + id);
-	meter.AddClass("ScoreboardXHSHoverMeter");
-
-	var row = $.CreatePanel("Panel", meter, "ScoreboardXHSHoverMeterRow_" + id);
-	row.AddClass("ScoreboardXHSHoverMeterRow");
-
-	var label = $.CreatePanel("Label", row, "ScoreboardXHSHoverMeterLabel_" + id);
-	label.AddClass("ScoreboardXHSHoverMeterLabel");
-	label.text = labelText;
-
-	var value = $.CreatePanel("Label", row, "ScoreboardXHSHoverMeterValue_" + id);
-	value.AddClass("ScoreboardXHSHoverMeterValue");
-	value.text = "-";
-
-	var track = $.CreatePanel("Panel", meter, "ScoreboardXHSHoverMeterTrack_" + id);
-	track.AddClass("ScoreboardXHSHoverMeterTrack");
-
-	var fill = $.CreatePanel("Panel", track, "ScoreboardXHSHoverMeterFill_" + id);
-	fill.AddClass("ScoreboardXHSHoverMeterFill");
-}
-
 function EnsureScoreboardSupporterHover() {
 	if (scoreboard_supporter_hover && scoreboard_supporter_hover.IsValid && scoreboard_supporter_hover.IsValid()) {
 		return scoreboard_supporter_hover;
 	}
 
-	scoreboard_supporter_hover = $.CreatePanel("Panel", $.GetContextPanel(), "ScoreboardXHSSupporterHover");
-	scoreboard_supporter_hover.AddClass("ScoreboardXHSSupporterHover");
-	scoreboard_supporter_hover.hittest = false;
-	scoreboard_supporter_hover.hittestchildren = false;
-
-	var header = $.CreatePanel("Panel", scoreboard_supporter_hover, "ScoreboardXHSHoverHeader");
-	header.AddClass("ScoreboardXHSHoverHeader");
-
-	var heroFrame = $.CreatePanel("Panel", header, "ScoreboardXHSHoverHeroFrame");
-	heroFrame.AddClass("ScoreboardXHSHoverHeroFrame");
-
-	var heroImage = $.CreatePanel("DOTAHeroImage", heroFrame, "ScoreboardXHSHoverHeroImage");
-	heroImage.AddClass("ScoreboardXHSHoverHeroImage");
-	heroImage.heroimagestyle = "landscape";
-	heroImage.scaling = "stretch-to-cover-preserve-aspect";
-	heroImage.hittest = false;
-
-	var copy = $.CreatePanel("Panel", header, "ScoreboardXHSHoverCopy");
-	copy.AddClass("ScoreboardXHSHoverCopy");
-
-	var eyebrow = $.CreatePanel("Label", copy, "ScoreboardXHSHoverEyebrow");
-	eyebrow.AddClass("ScoreboardXHSHoverEyebrow");
-	eyebrow.text = "SUPPORTER PROFILE";
-
-	var name = $.CreatePanel("Label", copy, "ScoreboardXHSHoverPlayerName");
-	name.AddClass("ScoreboardXHSHoverPlayerName");
-
-	var hero = $.CreatePanel("Label", copy, "ScoreboardXHSHoverHeroName");
-	hero.AddClass("ScoreboardXHSHoverHeroName");
-
-	var tier = $.CreatePanel("Label", scoreboard_supporter_hover, "ScoreboardXHSHoverTier");
-	tier.AddClass("ScoreboardXHSHoverTier");
-
-	var stats = $.CreatePanel("Panel", scoreboard_supporter_hover, "ScoreboardXHSHoverStats");
-	stats.AddClass("ScoreboardXHSHoverStats");
-	CreateScoreboardHoverStat(stats, "AccountLevel", "XHS Level");
-	CreateScoreboardHoverStat(stats, "SeasonLevel", "Season Level");
-	CreateScoreboardHoverStat(stats, "Fragments", "Fragments");
-	CreateScoreboardHoverStat(stats, "Winrate", "Winrate");
-
-	CreateScoreboardHoverMeter(scoreboard_supporter_hover, "SeasonXP", "Season XP");
-	CreateScoreboardHoverMeter(scoreboard_supporter_hover, "GlobalXP", "Global XP");
-	CreateScoreboardHoverMeter(scoreboard_supporter_hover, "Weekly", "Daily Cap");
-
-	var footer = $.CreatePanel("Label", scoreboard_supporter_hover, "ScoreboardXHSHoverFooter");
-	footer.AddClass("ScoreboardXHSHoverFooter");
-
-	return scoreboard_supporter_hover;
-}
-
-function PositionScoreboardSupporterHover(anchorPanel, hover) {
-	var root = $.GetContextPanel();
-	var rootRect = GetScoreboardWindowRect(root);
-	var anchorRect = GetScoreboardWindowRect(anchorPanel);
-	var hoverWidth = Number(hover.actuallayoutwidth || hover.desiredlayoutwidth || 300);
-	var hoverHeight = Number(hover.actuallayoutheight || hover.desiredlayoutheight || 330);
-	var rootWidth = Number(root.actuallayoutwidth || root.desiredlayoutwidth || 600);
-	var rootHeight = Number(root.actuallayoutheight || root.desiredlayoutheight || 900);
-	var margin = 8;
-	var x = anchorRect.x - rootRect.x + anchorRect.w + margin;
-	var y = anchorRect.y - rootRect.y - 10;
-
-	if (x + hoverWidth > rootWidth - margin) {
-		x = anchorRect.x - rootRect.x - hoverWidth - margin;
+	if (typeof XHSSupporterHover === "undefined" || !XHSSupporterHover.Create) {
+		return null;
 	}
 
-	x = Math.max(margin, Math.min(rootWidth - hoverWidth - margin, x));
-	y = Math.max(margin, Math.min(rootHeight - hoverHeight - margin, y));
-	hover.style.position = Math.floor(x) + "px " + Math.floor(y) + "px 0px";
+	scoreboard_supporter_hover = XHSSupporterHover.Create($.GetContextPanel(), "Scoreboard", { className: "ScoreboardXHSSupporterHover" });
+	return scoreboard_supporter_hover;
 }
 
 function ShowScoreboardSupporterHover(playerID, anchorPanel) {
@@ -391,44 +154,23 @@ function ShowScoreboardSupporterHover(playerID, anchorPanel) {
 	}
 
 	var playerInfo = GetScoreboardNetTableValue("supporter_pass_player", playerID) || {};
-	var data = GetScoreboardSupporterPlayerData(playerID, playerInfo);
 	var hover = EnsureScoreboardSupporterHover();
+	if (!hover || typeof XHSSupporterHover === "undefined") {
+		return;
+	}
 
 	scoreboard_supporter_hover_player_id = playerID;
-	ClearScoreboardSupporterTierClasses(hover);
-	hover.AddClass("ScoreboardSupporterTier" + data.tier);
-
-	var heroImage = hover.FindChildTraverse("ScoreboardXHSHoverHeroImage");
-	if (heroImage && data.heroName) {
-		heroImage.heroname = data.heroName;
-	}
-
-	ScoreboardSetChildText(hover, "ScoreboardXHSHoverPlayerName", data.playerName);
-	ScoreboardSetChildText(hover, "ScoreboardXHSHoverHeroName", data.localHeroName || data.heroName);
-	ScoreboardSetChildText(hover, "ScoreboardXHSHoverTier", data.tierName);
-	ScoreboardSetChildText(hover, "ScoreboardXHSHoverStatValue_AccountLevel", data.accountLevel > 0 ? data.accountLevel : "-");
-	ScoreboardSetChildText(hover, "ScoreboardXHSHoverStatValue_SeasonLevel", data.seasonLevel);
-	ScoreboardSetChildText(hover, "ScoreboardXHSHoverStatValue_Fragments", ScoreboardFormatNumber(data.fragments));
-	ScoreboardSetChildText(hover, "ScoreboardXHSHoverStatValue_Winrate", ScoreboardFormatWinrate(data.winrate));
-	ScoreboardSetChildText(hover, "ScoreboardXHSHoverMeterValue_SeasonXP", ScoreboardFormatNumber(data.seasonXP) + " / " + ScoreboardFormatNumber(data.seasonXPMax));
-	ScoreboardSetChildText(hover, "ScoreboardXHSHoverMeterValue_GlobalXP", ScoreboardFormatAccountXP(data));
-	ScoreboardSetChildText(hover, "ScoreboardXHSHoverMeterValue_Weekly", ScoreboardFormatNumber(data.weeklyFragments) + " / " + ScoreboardFormatNumber(data.weeklyCap));
-	ScoreboardSetFillPercent(hover, "ScoreboardXHSHoverMeterFill_SeasonXP", data.seasonXP, data.seasonXPMax);
-	ScoreboardSetFillPercent(hover, "ScoreboardXHSHoverMeterFill_GlobalXP", data.accountXPCurrent, data.accountXPMax > 0 ? data.accountXPMax : 1);
-	ScoreboardSetFillPercent(hover, "ScoreboardXHSHoverMeterFill_Weekly", data.weeklyFragments, data.weeklyCap);
-
-	if (data.tier > 0) {
-		ScoreboardSetChildText(hover, "ScoreboardXHSHoverFooter", "+" + ScoreboardFormatNumber(data.fragmentsPerMonth) + " monthly fragments / +" + ScoreboardFormatNumber(data.xpBoost) + "% season XP / " + ScoreboardFormatVotePower(data.votePower));
-	} else {
-		ScoreboardSetChildText(hover, "ScoreboardXHSHoverFooter", "No active supporter tier");
-	}
-
-	PositionScoreboardSupporterHover(anchorPanel, hover);
-	hover.AddClass("ScoreboardXHSHoverVisible");
+	var data = XHSSupporterHover.GetPlayerData(playerID, {
+		tableData: playerInfo,
+		heroName: ScoreboardSafeCall(function () { return Players.GetPlayerSelectedHero(playerID); }, ""),
+	});
+	XHSSupporterHover.Update(hover, "Scoreboard", data);
+	XHSSupporterHover.PositionNearAnchor(anchorPanel, hover, $.GetContextPanel(), { gap: 8, width: 336, height: 330 });
+	XHSSupporterHover.Show(anchorPanel, hover);
 
 	$.Schedule(0.01, function () {
 		if (scoreboard_supporter_hover_player_id == playerID && hover && hover.IsValid && hover.IsValid()) {
-			PositionScoreboardSupporterHover(anchorPanel, hover);
+			XHSSupporterHover.PositionNearAnchor(anchorPanel, hover, $.GetContextPanel(), { gap: 8, width: 336, height: 330 });
 		}
 	});
 }
@@ -437,7 +179,7 @@ function HideScoreboardSupporterHover() {
 	scoreboard_supporter_hover_player_id = -1;
 
 	if (scoreboard_supporter_hover && scoreboard_supporter_hover.IsValid && scoreboard_supporter_hover.IsValid()) {
-		scoreboard_supporter_hover.RemoveClass("ScoreboardXHSHoverVisible");
+		XHSSupporterHover.Hide(null, scoreboard_supporter_hover);
 	}
 }
 
@@ -479,7 +221,7 @@ function ApplyScoreboardSupporterVisuals(playerID, displaySlot, playerInfo) {
 	var heroImage = teamContainer.FindChildTraverse(heroImageName);
 	var imagePanel = heroImage ? heroImage.GetParent() : null;
 	var row = imagePanel ? imagePanel.GetParent() : null;
-	var xpPanel = $.GetContextPanel().FindChildTraverse("es-player-xp" + playerID);
+	var xpPanel = $.GetContextPanel().FindChildTraverse("es-player-xp" + displaySlot);
 	var badge = EnsureScoreboardSupporterDecor(imagePanel, displaySlot);
 	var tierName = playerInfo && (playerInfo.tier_name || playerInfo.supporter_tier_name || playerInfo.title) || "Supporter";
 
@@ -539,6 +281,22 @@ function ApplyScoreboardSupporterVisuals(playerID, displaySlot, playerInfo) {
 	}
 }
 
+function SetScoreboardDisplaySlotVisible(displaySlot, visible) {
+	var teamContainer = $("#ScoreboardTeamContainer");
+	if (!teamContainer || displaySlot <= 0) {
+		return;
+	}
+
+	var heroImage = teamContainer.FindChildTraverse("HeroImage" + displaySlot);
+	var imagePanel = heroImage ? heroImage.GetParent() : null;
+	var row = imagePanel ? imagePanel.GetParent() : null;
+	if (row) {
+		row.style.visibility = visible ? "visible" : "collapse";
+		row.hittest = visible;
+		row.hittestchildren = visible;
+	}
+}
+
 function UpdatePlayerImages() {
 	var teamContainer = $("#ScoreboardTeamContainer");
 	if (!teamContainer) {
@@ -566,16 +324,16 @@ function UpdatePlayerImages() {
 	var actualPlayerInfo = 1;
 	var localSupporterInfo = GetScoreboardNetTableValue("supporter_pass_player", localPlayerId);
 	ApplyScoreboardSupporterVisuals(localPlayerId, 0, localSupporterInfo);
+	var localXPPanel = $.GetContextPanel().FindChildTraverse("es-player-xp0");
+	if (localXPPanel != undefined && localSupporterInfo != undefined) {
+		_ScoreboardUpdater_UpdatePlayerPanelXP(0, localXPPanel, localSupporterInfo);
+	}
+	for (var displaySlot = 1; displaySlot <= 7; displaySlot++) {
+		SetScoreboardDisplaySlotVisible(displaySlot, false);
+	}
 
 	for(var i = 0; i < 8; i++) {
 		var player_info = GetScoreboardNetTableValue("supporter_pass_player", i);
-
-		var ImbaXP_Panel = $.GetContextPanel().FindChildTraverse("es-player-xp" + i);
-
-		if (ImbaXP_Panel != undefined && player_info != undefined) {
-			// set xp values
-			_ScoreboardUpdater_UpdatePlayerPanelXP(i, ImbaXP_Panel, player_info);
-		}
 
 		if(i == localPlayerId)
 		{
@@ -584,6 +342,14 @@ function UpdatePlayerImages() {
 
 		if (!IsScoreboardPlayerValid(i) || actualPlayerInfo > 7) {
 			continue;
+		}
+		SetScoreboardDisplaySlotVisible(actualPlayerInfo, true);
+
+		var ImbaXP_Panel = $.GetContextPanel().FindChildTraverse("es-player-xp" + actualPlayerInfo);
+
+		if (ImbaXP_Panel != undefined && player_info != undefined) {
+			// set xp values for the display slot occupied by this player.
+			_ScoreboardUpdater_UpdatePlayerPanelXP(actualPlayerInfo, ImbaXP_Panel, player_info);
 		}
 
 		var muteButton =  teamContainer.FindChildTraverse( "PlayerMuteButton" + actualPlayerInfo );
@@ -827,9 +593,9 @@ function BuildFragmentQuestCard(parent, quest, index, backendStatus) {
 	if (backendStatus === "synced" && (quest.confirmed === true || quest.confirmed === 1)) {
 		reward.text = "+" + confirmedFragments + " fragments confirmed";
 	} else if (backendStatus === "error") {
-		reward.text = "Potential only: +" + previewFragments + " / " + maxFragments + " fragments";
+		reward.text = "Earned: +" + previewFragments + " / " + maxFragments + " fragments";
 	} else {
-		reward.text = "Potential: +" + previewFragments + " / " + maxFragments + " fragments";
+		reward.text = "Earned: +" + previewFragments + " / " + maxFragments + " fragments";
 	}
 }
 

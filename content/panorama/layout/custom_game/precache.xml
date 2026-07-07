@@ -12,6 +12,13 @@
 			<Image src="file://panorama/images/custom_game/patreon/donator_04_storm_blue.png" hittest="false" />
 			<Image src="file://panorama/images/custom_game/patreon/donator_05_amethyst_violet.png" hittest="false" />
 
+			<Image src="file://panorama/images/custom_game/overhead/xhs_overhead_frame_tier0_small.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/overhead/xhs_overhead_frame_tier1_small.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/overhead/xhs_overhead_frame_tier2_small.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/overhead/xhs_overhead_frame_tier3_small.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/overhead/xhs_overhead_frame_tier4_small.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/overhead/xhs_overhead_frame_tier5_small.png" hittest="false" />
+
 			<Image src="file://panorama/images/custom_game/loading_screen/bg.png" hittest="false" />
 			<Image src="file://panorama/images/custom_game/loading_screen/patreon.png" hittest="false" />
 			<Image src="file://panorama/images/custom_game/loading_screen/xhs.jpg" hittest="false" />

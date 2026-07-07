@@ -234,7 +234,13 @@ function SupporterPass:BuildPlayerTable(playerID)
 	local donatorStatus = GetDonatorVisualStatus ~= nil and GetDonatorVisualStatus(rawDonatorStatus) or rawDonatorStatus
 	local rawTierName = FirstSupporterValue(supporterPass.tier_name, current.tier_name)
 	local rawTierColor = FirstSupporterValue(supporterPass.tier_color, current.tier_color)
-	local statusTierID = self:GetTierForStatus(donatorStatus)
+	local botTierID = api and api.GetBotSupporterTier and api:GetBotSupporterTier(playerID) or 0
+	if botTierID > 0 then
+		passTierID = botTierID
+		rawTierName = nil
+		rawTierColor = nil
+	end
+	local statusTierID = botTierID > 0 and botTierID or self:GetTierForStatus(donatorStatus)
 
 	if IsEarthwardenSupporterValue(rawTierName, rawTierColor, donatorStatus) then
 		passTierID = math.max(passTierID, 5)

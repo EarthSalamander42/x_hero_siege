@@ -289,6 +289,166 @@
 	text-overflow: shrink;
 }
 
+.XHSNotificationFragmentQuest
+{
+	min-width: 620px;
+	max-width: 820px;
+	min-height: 108px;
+	border: 1px solid #ffcf668a;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #11243bf4 ), color-stop( .48, #071421f4 ), to( #050910f4 ) );
+	box-shadow: fill #000000b8 0px 0px 18px 0px, #ffcf6630 0px 0px 16px 0px, #5ad0ff24 0px 0px 18px 0px;
+}
+
+.XHSNotificationFragmentQuest .XHSNotificationBody
+{
+	padding: 12px 18px 12px 16px;
+}
+
+.XHSNotificationFragmentQuest .XHSNotificationAccent
+{
+	width: 5px;
+	min-height: 78px;
+	background-color: gradient( linear, 0% 0%, 0% 100%, from( #fff4bd ), color-stop( .48, #ffbf3d ), to( #5ad0ff ) );
+	box-shadow: #ffcf66a8 0px 0px 14px 0px, #5ad0ff66 0px 0px 10px 0px;
+}
+
+.XHSNotificationFragmentQuest .XHSNotificationContent
+{
+	flow-children: down;
+	width: fill-parent-flow( 1.0 );
+}
+
+.XHSNotificationFragmentQuest .XHSNotificationProgress
+{
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #fff0a8 ), color-stop( .5, #ffbf3d ), to( #5ad0ff ) );
+	box-shadow: #ffcf6680 0px 0px 10px 0px;
+}
+
+.XHSFragmentQuestToastHeader
+{
+	width: 100%;
+	height: 44px;
+	flow-children: right;
+}
+
+.XHSFragmentQuestToastCopy
+{
+	width: fill-parent-flow( 1.0 );
+	height: 100%;
+	flow-children: down;
+}
+
+.XHSFragmentQuestToastEyebrow
+{
+	width: 100%;
+	height: 16px;
+	color: #9fd7ff;
+	font-size: 12px;
+	font-weight: bold;
+	letter-spacing: 0px;
+	text-align: left;
+	text-transform: uppercase;
+	text-shadow: 0px 0px 6px #5ad0ff66, 0px 1px 3px #000000;
+}
+
+.XHSFragmentQuestToastTitle
+{
+	width: 100%;
+	height: 27px;
+	color: #f8fcff;
+	font-size: 24px;
+	font-weight: bold;
+	letter-spacing: 0px;
+	text-align: left;
+	text-shadow: 0px 0px 8px #ffcf6655, 0px 2px 4px #000000;
+	text-overflow: shrink;
+}
+
+.XHSFragmentQuestToastStars
+{
+	width: 92px;
+	height: 32px;
+	margin-left: 14px;
+	vertical-align: center;
+	flow-children: right;
+}
+
+.XHSFragmentQuestToastStar
+{
+	width: 26px;
+	height: 26px;
+	margin-left: 4px;
+	vertical-align: center;
+	background-image: url("s2r://panorama/images/status_icons/star_raised_filled.psd");
+	background-size: 100%;
+	background-repeat: no-repeat;
+	background-position: 50% 50%;
+	wash-color: #4b5968;
+	brightness: 0.85;
+}
+
+.XHSFragmentQuestToastStar.IsActive
+{
+	wash-color: #ffbf3d;
+	brightness: 1.6;
+	box-shadow: #ffcf66a0 0px 0px 8px 0px;
+}
+
+.XHSFragmentQuestToastStar.IsNew
+{
+	animation-name: XHSFragmentQuestStarPop;
+	animation-duration: 0.56s;
+	animation-timing-function: ease-out;
+	animation-iteration-count: 1;
+}
+
+.XHSFragmentQuestToastSubtitle
+{
+	width: 100%;
+	height: 24px;
+	margin-top: 3px;
+	color: #f2dfb8;
+	font-size: 17px;
+	font-weight: bold;
+	letter-spacing: 0px;
+	text-align: left;
+	text-shadow: 0px 1px 3px #000000;
+	text-overflow: shrink;
+}
+
+.XHSFragmentQuestToastDetails
+{
+	width: 100%;
+	height: 22px;
+	margin-top: 2px;
+	flow-children: right;
+}
+
+.XHSFragmentQuestToastThreshold
+{
+	width: fill-parent-flow( 1.0 );
+	height: 20px;
+	color: #c7d5eb;
+	font-size: 14px;
+	letter-spacing: 0px;
+	text-align: left;
+	text-shadow: 0px 1px 3px #000000;
+	text-overflow: shrink;
+}
+
+.XHSFragmentQuestToastReward
+{
+	width: 190px;
+	height: 20px;
+	color: #ffcf66;
+	font-size: 14px;
+	font-weight: bold;
+	letter-spacing: 0px;
+	text-align: right;
+	text-shadow: 0px 0px 6px #ffcf6660, 0px 1px 3px #000000;
+	text-overflow: shrink;
+}
+
 .XHSNotificationReward
 {
 	min-width: 380px;
@@ -1015,6 +1175,27 @@
 	{
 		opacity: 1;
 		transform: translateY( 0px ) scaleX( 1 ) scaleY( 1 );
+	}
+}
+
+@keyframes 'XHSFragmentQuestStarPop'
+{
+	0%
+	{
+		pre-transform-scale2d: 0.55;
+		brightness: 1.0;
+	}
+
+	45%
+	{
+		pre-transform-scale2d: 1.32;
+		brightness: 2.8;
+	}
+
+	100%
+	{
+		pre-transform-scale2d: 1.0;
+		brightness: 1.6;
 	}
 }
 

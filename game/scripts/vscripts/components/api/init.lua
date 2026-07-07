@@ -47,11 +47,33 @@ function api:IsDeveloper(player_id)
 end
 
 function api:GetBotDonatorStatus(player_id)
+	local bot_supporter_tier = self:GetBotSupporterTier(player_id)
+	if bot_supporter_tier <= 0 then
+		return 0
+	end
+
+	if DONATOR_TIER_TO_STATUS ~= nil and DONATOR_TIER_TO_STATUS[bot_supporter_tier] ~= nil then
+		return DONATOR_TIER_TO_STATUS[bot_supporter_tier]
+	end
+
+	local tier_to_status = {
+		[1] = 6,
+		[2] = 5,
+		[3] = 4,
+		[4] = 7,
+		[5] = 8,
+	}
+
+	return tier_to_status[bot_supporter_tier] or 0
+end
+
+function api:GetBotSupporterTier(player_id)
 	if not PlayerResource:IsValidPlayerID(player_id) then
 		return 0
 	end
 
-	if player_id >= 1 and player_id <= 5 and PlayerResource:GetConnectionState(player_id) == 1 then
+	local connection_state = PlayerResource:GetConnectionState(player_id)
+	if player_id >= 1 and player_id <= 5 and (connection_state == 1 or connection_state == 2) then
 		return player_id
 	end
 

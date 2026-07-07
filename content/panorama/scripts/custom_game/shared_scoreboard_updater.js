@@ -24,14 +24,16 @@ function _ScoreboardUpdater_SetValueSafe(panel, childName, Value) {
 }
 
 var XHS_SCOREBOARD_PLAYER_COLOR_FALLBACKS = [
-	"#c80000ff",
 	"#0032c8ff",
 	"#00ffffff",
 	"#640064ff",
 	"#ffff00ff",
 	"#ff9600ff",
-	"#007d00ff",
 	"#ff64ffff",
+	"#a3b000ff",
+	"#65d9f7ff",
+	"#007d00ff",
+	"#a46900ff",
 ];
 
 function _ScoreboardUpdater_IntToColorString(value) {

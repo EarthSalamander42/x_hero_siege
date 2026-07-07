@@ -1,11 +1,13 @@
 <root>
 	<styles>
 		<include src="file://{resources}/styles/custom_game/xhs_theme.css" />
+		<include src="file://{resources}/styles/custom_game/xhs_supporter_hover.css" />
 		<include src="file://{resources}/styles/custom_game/xhs_end_screen.css" />
 	</styles>
 
 	<scripts>
 		<include src="file://{resources}/scripts/custom_game/util.js" />
+		<include src="file://{resources}/scripts/custom_game/xhs_supporter_hover.js" />
 		<include src="file://{resources}/scripts/custom_game/xhs_end_screen.js" />
 	</scripts>
 

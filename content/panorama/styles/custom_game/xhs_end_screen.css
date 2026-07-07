@@ -565,12 +565,25 @@
 	flow-children: right;
 }
 
-.XHSPlayerHeroImage {
-	width: 74px;
+.XHSPlayerHeroFrame {
+	width: 86px;
 	height: 42px;
 	margin-right: 8px;
+	flow-children: right;
+	background-color: #020712;
 	border: 1px solid xhs_border;
 	vertical-align: center;
+}
+
+.XHSPlayerColorStrip {
+	width: 7px;
+	height: 100%;
+	background-color: #77c8ff;
+}
+
+.XHSPlayerHeroImage {
+	width: fill-parent-flow( 1.0 );
+	height: 100%;
 }
 
 .XHSPlayerAvatar {

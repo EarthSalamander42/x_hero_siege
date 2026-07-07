@@ -138,8 +138,9 @@
 
 .XHSOverheadContent {
 	width: 210px;
-	height: 25px;
-	flow-children: down;
+	height: 34px;
+	margin-top: 17px;
+	flow-children: right;
 	overflow: noclip;
 	background-color: #00000000;
 	border: 0px solid transparent;
@@ -147,6 +148,27 @@
 	box-shadow: none;
 	transition-property: height, padding, brightness;
 	transition-duration: 0.1s;
+}
+
+.XHSOverheadLeftContent {
+	width: 42px;
+	height: 34px;
+	flow-children: none;
+	overflow: noclip;
+}
+
+.XHSOverheadCenterContent {
+	width: 130px;
+	height: 34px;
+	flow-children: down;
+	overflow: noclip;
+}
+
+.XHSOverheadRightContent {
+	width: 38px;
+	height: 34px;
+	flow-children: none;
+	overflow: noclip;
 }
 
 .XHSOverheadLabel.XHSOverheadLocalPlayer .XHSOverheadContent {
@@ -167,12 +189,11 @@
 }
 
 .XHSOverheadTopRow {
-	width: 123px;
-	height: 12px;
-	margin-left: 44px;
+	width: 130px;
+	height: 15px;
+	margin-left: 0px;
 	flow-children: none;
 	overflow: noclip;
-	margin-top: 12px;
 }
 
 .XHSOverheadTierOverline {
@@ -359,6 +380,82 @@
 	transform: translateY( 0px );
 }
 
+.XHSOverheadLabel.XHSOverheadHasStatusEffect .XHSOverheadName {
+	opacity: 0;
+}
+
+.XHSOverheadLabel.XHSOverheadHasStatusEffect .XHSOverheadStatusRow {
+	width: 123px;
+	height: 15px;
+	horizontal-align: center;
+	margin-left: 0px;
+	margin-top: 0px;
+	ignore-parent-flow: true;
+	visibility: visible;
+	opacity: 1;
+	z-index: 8;
+}
+
+.XHSOverheadLabel.XHSOverheadHasStatusEffect .XHSOverheadStatusNode {
+	visibility: collapse;
+	opacity: 0;
+}
+
+.XHSOverheadLabel.XHSOverheadHasStatusEffect .XHSOverheadGameplayStatus,
+.XHSOverheadLabel.XHSOverheadHasStatusEffect .XHSOverheadAltStatus {
+	width: 123px;
+	height: 15px;
+	margin-left: 0px;
+	margin-right: 0px;
+	align: center center;
+	color: #ffe7b0;
+	font-size: 10px;
+	font-weight: bold;
+	text-align: center;
+	text-shadow: 0px 1px 2px #000000, 0px 0px 6px #ffb13d82;
+	opacity: 1;
+	transform: translateY( 0px );
+}
+
+.XHSOverheadLabel.XHSOverheadHasStatusEffect .XHSOverheadAltStatus {
+	visibility: collapse;
+	opacity: 0;
+}
+
+.XHSOverheadLabel.XHSOverheadHasStatusEffect .XHSOverheadNameBg {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #00000000 ), color-stop( .16, #291018de ), color-stop( .50, #3f1710f2 ), color-stop( .84, #291018de ), to( #00000000 ) );
+	box-shadow: fill #00000085 0px 1px 6px 0px, fill #ffb13d32 0px 0px 10px 0px;
+}
+
+.XHSOverheadLabel.XHSStatusStunned .XHSOverheadGameplayStatus,
+.XHSOverheadLabel.XHSStatusHexed .XHSOverheadGameplayStatus,
+.XHSOverheadLabel.XHSStatusSleep .XHSOverheadGameplayStatus,
+.XHSOverheadLabel.XHSStatusFeared .XHSOverheadGameplayStatus,
+.XHSOverheadLabel.XHSStatusTaunted .XHSOverheadGameplayStatus,
+.XHSOverheadLabel.XHSStatusCycloned .XHSOverheadGameplayStatus {
+	color: #ffd36a;
+	text-shadow: 0px 1px 2px #000000, 0px 0px 7px #ffb13d9a;
+}
+
+.XHSOverheadLabel.XHSStatusRooted .XHSOverheadGameplayStatus,
+.XHSOverheadLabel.XHSStatusLeashed .XHSOverheadGameplayStatus {
+	color: #c9ffdc;
+	text-shadow: 0px 1px 2px #000000, 0px 0px 7px #70e39a76;
+}
+
+.XHSOverheadLabel.XHSStatusSilenced .XHSOverheadGameplayStatus,
+.XHSOverheadLabel.XHSStatusMuted .XHSOverheadGameplayStatus,
+.XHSOverheadLabel.XHSStatusDisarmed .XHSOverheadGameplayStatus,
+.XHSOverheadLabel.XHSStatusBroken .XHSOverheadGameplayStatus {
+	color: #d8f4ff;
+	text-shadow: 0px 1px 2px #000000, 0px 0px 7px #5ad0ff78;
+}
+
+.XHSOverheadLabel.XHSStatusInvulnerable .XHSOverheadGameplayStatus {
+	color: #f4e5ff;
+	text-shadow: 0px 1px 2px #000000, 0px 0px 8px #c99cff80;
+}
+
 .XHSAltDown .XHSOverheadMockupPlate .XHSOverheadGameplayStatus,
 .XHSAltDown .XHSOverheadMockupPlate .XHSOverheadAltStatus {
 	opacity: 1;
@@ -366,8 +463,8 @@
 }
 
 .XHSOverheadBars {
-	width: 210px;
-	height: 34px;
+	width: 130px;
+	height: 16px;
 	horizontal-align: center;
 	margin-top: 0px;
 	flow-children: none;
@@ -390,9 +487,9 @@
 .XHSOverheadHeroPortraitFrame {
 	width: 24px;
 	height: 24px;
-	align: left top;
-	margin-left: 12px;
-	margin-top: 3px;
+	align: center center;
+	margin-left: 0px;
+	margin-top: 0px;
 	background-color: #00000000;
 	border: 0px solid transparent;
 	border-radius: 0px;
@@ -416,11 +513,11 @@
 }
 
 .XHSOverheadHealthFrame {
-	width: 123px;
+	width: 132px;
 	height: 9px;
 	align: left top;
-	margin-left: 45px;
-	margin-top: 9px;
+	margin-left: 0px;
+	margin-top: 0px;
 	border-radius: 0px;
 	background-color: #00000000;
 	border: 0px solid transparent;
@@ -495,11 +592,11 @@
 }
 
 .XHSOverheadManaFrame {
-	width: 123px;
+	width: 132px;
 	height: 3px;
 	align: left top;
-	margin-left: 45px;
-	margin-top: 22px;
+	margin-left: 0px;
+	margin-top: 13px;
 	border-radius: 0px;
 	background-color: #00000000;
 	border: 0px solid transparent;
@@ -526,17 +623,12 @@
 	opacity: 0;
 }
 
-.XHSOverheadLabel.XHSNoMana .XHSOverheadHealthFrame {
-	height: 11px;
-	margin-top: 9px;
-}
-
 .XHSOverheadHealthLevel {
 	width: 18px;
 	height: 18px;
-	align: left top;
-	margin-left: 176px;
-	margin-top: 10px;
+	align: center center;
+	margin-left: 0px;
+	margin-top: 7px;
 	color: #edf7e8;
 	font-size: 12px;
 	font-weight: bold;
@@ -552,74 +644,6 @@
 
 .XHSOverheadLabel.XHSOverheadSelectedHero .XHSOverheadHeroPortraitFrame {
 	brightness: 1.05;
-}
-
-.XHSOverheadLabel.XHSOverheadSelectedCompact .XHSOverheadContent {
-	brightness: 1.05;
-}
-
-.XHSOverheadLabel.XHSOverheadSelectedCompact .XHSOverheadStatusRow,
-.XHSOverheadLabel.XHSOverheadSelectedCompact .XHSOverheadTagWrap,
-.XHSOverheadLabel.XHSOverheadSelectedCompact .XHSOverheadTierOverline {
-	visibility: visible;
-	opacity: 0;
-}
-
-.XHSOverheadLabel.XHSOverheadSelectedCompact .XHSOverheadName {
-	font-size: 11px;
-	margin-left: 0px;
-}
-
-.XHSOverheadLabel.XHSOverheadSelectedCompact .XHSOverheadBars {
-	width: 210px;
-	height: 34px;
-	margin-top: 0px;
-}
-
-.XHSOverheadLabel.XHSOverheadSelectedCompact .XHSOverheadVitalsFrame {
-	width: 150px;
-	height: 20px;
-	margin-left: 15px;
-	margin-top: 0px;
-}
-
-.XHSOverheadLabel.XHSOverheadSelectedCompact .XHSOverheadHeroPortraitFrame {
-	width: 24px;
-	height: 24px;
-	margin-left: 12px;
-	margin-top: 3px;
-}
-
-.XHSOverheadLabel.XHSOverheadSelectedCompact .XHSOverheadHealthFrame {
-	width: 123px;
-	height: 9px;
-	margin-left: 45px;
-	margin-top: 9px;
-}
-
-.XHSOverheadLabel.XHSOverheadSelectedCompact.XHSNoMana .XHSOverheadHealthFrame {
-	height: 11px;
-	margin-top: 9px;
-}
-
-.XHSOverheadLabel.XHSOverheadSelectedCompact .XHSOverheadManaFrame {
-	width: 123px;
-	height: 3px;
-	margin-left: 45px;
-	margin-top: 22px;
-}
-
-.XHSOverheadLabel.XHSOverheadSelectedCompact .XHSOverheadHealthLevel {
-	opacity: 1;
-	pre-transform-scale2d: 1.0;
-	visibility: visible;
-}
-
-.XHSOverheadLabel.XHSOverheadSelectedCompact.XHSOverheadLowHealth .XHSOverheadValue {
-	color: #fff1e8;
-	border: 0px solid transparent;
-	box-shadow: fill #000000b0 0px 1px 5px 0px, fill #ff4d3f42 0px 0px 8px 0px;
-	text-shadow: 0px 1px 2px #000000, 0px 0px 6px #ff4d3f99;
 }
 
 .XHSOverheadAnchor {
@@ -828,27 +852,27 @@
 }
 
 .XHSOverheadFrameTier0 .XHSOverheadFrameArt {
-	background-image: url("file://{images}/custom_game/overhead/xhs_overhead_frame_tier0.png");
+	background-image: url("file://{images}/custom_game/overhead/xhs_overhead_frame_tier0_small.png");
 }
 
 .XHSOverheadFrameTier1 .XHSOverheadFrameArt {
-	background-image: url("file://{images}/custom_game/overhead/xhs_overhead_frame_tier1.png");
+	background-image: url("file://{images}/custom_game/overhead/xhs_overhead_frame_tier1_small.png");
 }
 
 .XHSOverheadFrameTier2 .XHSOverheadFrameArt {
-	background-image: url("file://{images}/custom_game/overhead/xhs_overhead_frame_tier2.png");
+	background-image: url("file://{images}/custom_game/overhead/xhs_overhead_frame_tier2_small.png");
 }
 
 .XHSOverheadFrameTier3 .XHSOverheadFrameArt {
-	background-image: url("file://{images}/custom_game/overhead/xhs_overhead_frame_tier3.png");
+	background-image: url("file://{images}/custom_game/overhead/xhs_overhead_frame_tier3_small.png");
 }
 
 .XHSOverheadFrameTier4 .XHSOverheadFrameArt {
-	background-image: url("file://{images}/custom_game/overhead/xhs_overhead_frame_tier4.png");
+	background-image: url("file://{images}/custom_game/overhead/xhs_overhead_frame_tier4_small.png");
 }
 
 .XHSOverheadFrameTier5 .XHSOverheadFrameArt {
-	background-image: url("file://{images}/custom_game/overhead/xhs_overhead_frame_tier5.png");
+	background-image: url("file://{images}/custom_game/overhead/xhs_overhead_frame_tier5_small.png");
 }
 
 .XHSOverheadMockupPlate .XHSOverheadContent {
@@ -1303,6 +1327,16 @@
 	box-shadow: fill #000000c8 0px 1px 4px 0px, fill #ff5a4322 0px 0px 7px 0px, inset #ff5a431c 0px 1px 0px 0px;
 }
 
+.XHSOverheadLabel.XHSOverheadHasStatusEffect .XHSOverheadNameBg {
+	animation-name: XHSOverheadStatusWarningPulse;
+	animation-duration: 1.05s;
+	animation-delay: 0s;
+	animation-iteration-count: infinite;
+	animation-timing-function: ease-in-out;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #00000000 ), color-stop( .16, #291018de ), color-stop( .50, #3f1710f2 ), color-stop( .84, #291018de ), to( #00000000 ) );
+	box-shadow: fill #00000085 0px 1px 6px 0px, fill #ffb13d32 0px 0px 10px 0px;
+}
+
 .XHSOverheadLabel.IsDead .XHSOverheadNameBg,
 .XHSOverheadLabel.IsDead .XHSOverheadHealthLevel,
 .XHSOverheadLabel.IsDisconnected .XHSOverheadNameBg,
@@ -1353,6 +1387,17 @@
 	brightness: 1.0;
 }
 
+.XHSOverheadLabel.IsReincarnating .XHSOverheadLeftContent,
+.XHSOverheadLabel.IsReincarnating .XHSOverheadRightContent {
+	visibility: collapse;
+	opacity: 0;
+}
+
+.XHSOverheadLabel.IsReincarnating .XHSOverheadCenterContent {
+	width: 210px;
+	height: 43px;
+}
+
 .XHSOverheadLabel.IsReincarnating .XHSOverheadTopRow {
 	width: 176px;
 	height: 16px;
@@ -1374,6 +1419,7 @@
 	color: #f5e8ff;
 	font-size: 11px;
 	text-shadow: 0px 1px 2px #000000, 0px 0px 7px #c99cff8a;
+	opacity: 1;
 }
 
 .XHSOverheadLabel.IsReincarnating .XHSOverheadStatusRow {
@@ -2075,271 +2121,6 @@
 	box-shadow: fill #c99cffc8 0px 0px 7px 0px, #ffffff55 0px 0px 3px 0px;
 }
 
-.XHSSupporterHoverCard {
-	/* TODO: Fix override */
-	width: 322px;
-	height: fit-children;
-	align: left top;
-	margin-top: 0px;
-	padding: 12px;
-	ignore-parent-flow: true;
-	flow-children: down;
-	background-color: gradient( linear, 0% 0%, 100% 100%, from( #061321f7 ), color-stop( 0.55, #081b2cf8 ), to( #030811fa ) );
-	border: 1px solid #62ceff66;
-	box-shadow: fill #000000d5 0px 0px 18px 0px, inset #ffffff15 0px 1px 0px 0px;
-	visibility: visible;
-	opacity: 0;
-	transform: translateY( -5px );
-	pre-transform-scale2d: .985;
-	transition-property: opacity, transform, pre-transform-scale2d, brightness;
-	transition-duration: .12s;
-	transition-timing-function: ease-out;
-	z-index: 650;
-}
-
-.XHSSupporterHoverRight {
-	align: right top;
-}
-
-.XHSSupporterHoverCard.XHSHoverVisible {
-	visibility: visible;
-	opacity: 1;
-	transform: translateY( 0px );
-	pre-transform-scale2d: 1;
-}
-
-.XHSSupporterHoverCard.XHSSupporterTier0 {
-	border: 1px solid #7db9d86a;
-	box-shadow: fill #000000d5 0px 0px 18px 0px, fill #7db9d820 0px 0px 10px 0px, inset #ffffff15 0px 1px 0px 0px;
-}
-
-.XHSSupporterHoverCard.XHSSupporterTier1 {
-	border: 1px solid #45c46b90;
-	box-shadow: fill #000000d5 0px 0px 18px 0px, fill #45c46b2f 0px 0px 11px 0px, inset #ffffff18 0px 1px 0px 0px;
-}
-
-.XHSSupporterHoverCard.XHSSupporterTier2 {
-	border: 1px solid #f2c94ca0;
-	box-shadow: fill #000000d5 0px 0px 18px 0px, fill #f2c94c38 0px 0px 12px 0px, inset #fff4b81f 0px 1px 0px 0px;
-}
-
-.XHSSupporterHoverCard.XHSSupporterTier3 {
-	border: 1px solid #e4572ea0;
-	box-shadow: fill #000000d5 0px 0px 18px 0px, fill #e4572e34 0px 0px 12px 0px, inset #ffd2bf1c 0px 1px 0px 0px;
-}
-
-.XHSSupporterHoverCard.XHSSupporterTier4 {
-	border: 1px solid #5ad0ff99;
-	box-shadow: fill #000000d5 0px 0px 18px 0px, fill #5ad0ff30 0px 0px 12px 0px, inset #ffffff1d 0px 1px 0px 0px;
-}
-
-.XHSSupporterHoverCard.XHSSupporterTier5 {
-	border: 1px solid #c99cffbf;
-	box-shadow: fill #000000d5 0px 0px 18px 0px, fill #c99cff55 0px 0px 14px 0px, #ead8ff42 0px 0px 4px 0px, inset #ffffff24 0px 1px 0px 0px;
-}
-
-.XHSSupporterHoverHeader {
-	width: 100%;
-	height: 58px;
-	flow-children: right;
-}
-
-.XHSSupporterHoverHeroFrame {
-	width: 86px;
-	height: 52px;
-	background-color: #020812;
-	border: 1px solid #62ceff4d;
-	box-shadow: inset #ffffff18 0px 1px 0px 0px, fill #0000008c 0px 0px 7px 0px;
-}
-
-.XHSSupporterHoverHeroImage {
-	width: 100%;
-	height: 100%;
-	brightness: .92;
-}
-
-.XHSSupporterHoverHeaderCopy {
-	width: fill-parent-flow( 1.0 );
-	height: 58px;
-	margin-left: 10px;
-	flow-children: down;
-}
-
-.XHSSupporterHoverEyebrow,
-.XHSSupporterHoverTierLabel,
-.XHSSupporterHoverStatLabel,
-.XHSSupporterHoverMeterLabel,
-.XHSSupporterHoverPerksTitle {
-	color: #86c9e8;
-	font-size: 10px;
-	letter-spacing: 1px;
-	text-transform: uppercase;
-	text-shadow: 0px 1px 2px #000000;
-}
-
-.XHSSupporterHoverPlayerName {
-	width: 100%;
-	margin-top: 2px;
-	color: #f3fbff;
-	font-size: 22px;
-	font-weight: bold;
-	text-overflow: shrink;
-	text-shadow: 0px 0px 6px #5ad0ff3b, 0px 1px 3px #000000;
-}
-
-.XHSSupporterHoverHeroName {
-	width: 100%;
-	margin-top: 0px;
-	color: #b6cadd;
-	font-size: 13px;
-	text-overflow: shrink;
-	text-shadow: 0px 1px 2px #000000;
-}
-
-.XHSSupporterHoverTierBadge {
-	width: 100%;
-	height: 42px;
-	margin-top: 8px;
-	padding: 7px 10px 6px 10px;
-	flow-children: right;
-	background-color: gradient( linear, 0% 0%, 100% 0%, from( #071827e8 ), color-stop( .5, #0b2c44d8 ), to( #071827e8 ) );
-	border: 1px solid #62ceff38;
-	box-shadow: inset #ffffff11 0px 1px 0px 0px;
-}
-
-.XHSSupporterHoverTierLabel {
-	width: 48px;
-	height: 100%;
-	vertical-align: center;
-}
-
-.XHSSupporterHoverTierValue {
-	width: fill-parent-flow( 1.0 );
-	height: 100%;
-	color: #f3fbff;
-	font-size: 18px;
-	font-weight: bold;
-	text-align: right;
-	text-transform: uppercase;
-	text-overflow: shrink;
-	text-shadow: 0px 1px 3px #000000;
-}
-
-.XHSSupporterHoverCard.XHSSupporterTier1 .XHSSupporterHoverTierValue { color: #67df8b; }
-.XHSSupporterHoverCard.XHSSupporterTier2 .XHSSupporterHoverTierValue { color: #ffe27a; }
-.XHSSupporterHoverCard.XHSSupporterTier3 .XHSSupporterHoverTierValue { color: #ff8b68; }
-.XHSSupporterHoverCard.XHSSupporterTier4 .XHSSupporterHoverTierValue { color: #5ad0ff; }
-.XHSSupporterHoverCard.XHSSupporterTier5 .XHSSupporterHoverTierValue {
-	color: #c99cff;
-	text-shadow: 0px 0px 7px #c99cff86, 0px 1px 3px #000000;
-}
-
-.XHSSupporterHoverStats {
-	width: 100%;
-	height: fit-children;
-	margin-top: 8px;
-	flow-children: right-wrap;
-}
-
-.XHSSupporterHoverStat {
-	width: 137px;
-	height: 45px;
-	margin-right: 8px;
-	margin-bottom: 8px;
-	padding: 6px 8px;
-	flow-children: down;
-	background-color: #020914a8;
-	border: 1px solid #62ceff24;
-}
-
-.XHSSupporterHoverStatValue {
-	width: 100%;
-	margin-top: 3px;
-	color: #eef9ff;
-	font-size: 18px;
-	font-weight: bold;
-	text-overflow: shrink;
-	text-shadow: 0px 1px 3px #000000;
-}
-
-.XHSSupporterHoverMeter {
-	width: 100%;
-	height: 38px;
-	margin-top: 1px;
-	flow-children: down;
-}
-
-.XHSSupporterHoverMeterRow {
-	width: 100%;
-	height: 17px;
-	flow-children: right;
-}
-
-.XHSSupporterHoverMeterLabel {
-	width: fill-parent-flow( 1.0 );
-	height: 100%;
-}
-
-.XHSSupporterHoverMeterValue {
-	width: 116px;
-	height: 100%;
-	color: #dceeff;
-	font-size: 12px;
-	text-align: right;
-	text-overflow: shrink;
-	text-shadow: 0px 1px 2px #000000;
-}
-
-.XHSSupporterHoverMeterTrack {
-	width: 100%;
-	height: 7px;
-	margin-top: 4px;
-	background-color: #020711d8;
-	border: 1px solid #62ceff1f;
-	box-shadow: inset #000000b0 0px 0px 4px 0px;
-}
-
-.XHSSupporterHoverMeterFill {
-	width: 0%;
-	height: 100%;
-	background-color: gradient( linear, 0% 0%, 100% 0%, from( #2e8ac4 ), to( #5ad0ff ) );
-	box-shadow: fill #5ad0ff3b 0px 0px 5px 0px;
-}
-
-.XHSSupporterHoverCard.XHSSupporterTier1 .XHSSupporterHoverMeterFill { background-color: gradient( linear, 0% 0%, 100% 0%, from( #2d8a4d ), to( #67df8b ) ); }
-.XHSSupporterHoverCard.XHSSupporterTier2 .XHSSupporterHoverMeterFill { background-color: gradient( linear, 0% 0%, 100% 0%, from( #9c7924 ), to( #ffe27a ) ); }
-.XHSSupporterHoverCard.XHSSupporterTier3 .XHSSupporterHoverMeterFill { background-color: gradient( linear, 0% 0%, 100% 0%, from( #8d2f21 ), to( #ff8b68 ) ); }
-.XHSSupporterHoverCard.XHSSupporterTier4 .XHSSupporterHoverMeterFill { background-color: gradient( linear, 0% 0%, 100% 0%, from( #0a7ca8 ), to( #5ad0ff ) ); }
-.XHSSupporterHoverCard.XHSSupporterTier5 .XHSSupporterHoverMeterFill { background-color: gradient( linear, 0% 0%, 100% 0%, from( #7d4bb5 ), to( #c99cff ) ); }
-
-.XHSSupporterHoverPerks {
-	width: 100%;
-	height: fit-children;
-	margin-top: 9px;
-	padding: 8px 10px;
-	flow-children: down;
-	background-color: #0209149c;
-	border: 1px solid #62ceff2d;
-}
-
-.XHSSupporterHoverPerk {
-	width: 100%;
-	margin-top: 4px;
-	color: #d7e5f2;
-	font-size: 13px;
-	text-overflow: shrink;
-	text-shadow: 0px 1px 2px #000000;
-}
-
-.XHSSupporterHoverFooter {
-	width: 100%;
-	margin-top: 9px;
-	color: #9fb5c8;
-	font-size: 12px;
-	text-align: center;
-	text-overflow: shrink;
-	text-shadow: 0px 1px 2px #000000;
-}
 
 .XHSAllyStatusOverlay {
 	width: 100%;
@@ -2810,20 +2591,7 @@
 	margin-right: 2px;
 }
 
-.AspectRatio4x3 .XHSSupporterHoverCard {
-	margin-top: 0px;
-	/* TODO: Fix override */
-	width: 292px;
-	/* TODO: Fix override */
-	padding: 9px;
-}
 
-.AspectRatio4x3 .XHSSupporterHoverHeroFrame {
-	/* TODO: Fix override */
-	width: 70px;
-	/* TODO: Fix override */
-	height: 43px;
-}
 
 /* Donator UI reset: visual treatment is removed until the next mockup pass. */
 .XHSOverheadBadge,
@@ -2847,20 +2615,8 @@
 	animation-name: none;
 }
 
-.AspectRatio4x3 .XHSSupporterHoverPlayerName {
-	/* TODO: Fix override */
-	font-size: 18px;
-}
 
-.AspectRatio4x3 .XHSSupporterHoverStat {
-	width: 124px;
-	height: 42px;
-	margin-right: 7px;
-}
 
-.AspectRatio4x3 .XHSSupporterHoverTierValue {
-	font-size: 16px;
-}
 
 .AspectRatio4x3 #XHSTopHudClock {
 	width: fit-children;

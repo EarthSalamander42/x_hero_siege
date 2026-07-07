@@ -2,10 +2,12 @@
 	<styles>
 		<include src="s2r://panorama/styles/dotastyles.vcss_c" />
 		<include src="s2r://panorama/styles/custom_game/xhs_theme.vcss_c" />
+		<include src="s2r://panorama/styles/custom_game/xhs_supporter_hover.vcss_c" />
 		<include src="s2r://panorama/styles/custom_game/xhs_top_hud.vcss_c" />
 	</styles>
 
 	<scripts>
+		<include src="s2r://panorama/scripts/custom_game/xhs_supporter_hover.vjs_c" />
 		<include src="s2r://panorama/scripts/custom_game/xhs_top_hud.vjs_c" />
 	</scripts>
 
