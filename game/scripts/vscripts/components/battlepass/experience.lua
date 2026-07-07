@@ -45,8 +45,10 @@ function Battlepass:GetPlayerInfoXP() -- yet it has too much useless loops, form
 
 	for player_id = 0, PlayerResource:GetPlayerCount() - 1 do
 		local steamid = tostring(PlayerResource:GetSteamID(player_id))
+		local has_backend_player = api.players[steamid] ~= nil
+		local is_bot_donator = api.GetBotDonatorStatus ~= nil and api:GetBotDonatorStatus(player_id) ~= 0
 
-		if api.players[steamid] then
+		if has_backend_player or is_bot_donator then
 			--			print("Player XP:", api.players[steamid].xp_in_level, api.players[steamid].xp_next_level, api.players[steamid].xp_level)
 
 			local color = PLAYER_COLORS[player_id]
@@ -99,16 +101,16 @@ function Battlepass:GetPlayerInfoXP() -- yet it has too much useless loops, form
 			supporter_table.season_xp_max = season_xp_max
 			supporter_table.account_level = supporter_table.account_level or 0
 			supporter_table.account_title = supporter_table.account_title or "Supporter Pass"
-			if supporter_table.toggle_tag == nil then supporter_table.toggle_tag = api:GetPlayerTagEnabled(player_id) end
-			if supporter_table.bp_rewards == nil then supporter_table.bp_rewards = api:GetPlayerBPRewardsEnabled(player_id) end
-			if supporter_table.pass_rewards == nil then supporter_table.pass_rewards = api:GetPlayerBPRewardsEnabled(player_id) end
-			if supporter_table.player_xp == nil then supporter_table.player_xp = api:GetPlayerXPEnabled(player_id) end
-			supporter_table.winrate = supporter_table.winrate or api:GetPlayerSeasonalWinrate(player_id)
-			if supporter_table.winrate_toggle == nil then supporter_table.winrate_toggle = api:GetPlayerWinrateShown(player_id) end
-			if supporter_table.xhs_ingame_advertize_hidden == nil and api.GetPlayerIngameAdvertizeHidden ~= nil then supporter_table.xhs_ingame_advertize_hidden = api:GetPlayerIngameAdvertizeHidden(player_id) end
+			if has_backend_player and supporter_table.toggle_tag == nil then supporter_table.toggle_tag = api:GetPlayerTagEnabled(player_id) end
+			if has_backend_player and supporter_table.bp_rewards == nil then supporter_table.bp_rewards = api:GetPlayerBPRewardsEnabled(player_id) end
+			if has_backend_player and supporter_table.pass_rewards == nil then supporter_table.pass_rewards = api:GetPlayerBPRewardsEnabled(player_id) end
+			if has_backend_player and supporter_table.player_xp == nil then supporter_table.player_xp = api:GetPlayerXPEnabled(player_id) end
+			if has_backend_player then supporter_table.winrate = supporter_table.winrate or api:GetPlayerSeasonalWinrate(player_id) end
+			if has_backend_player and supporter_table.winrate_toggle == nil then supporter_table.winrate_toggle = api:GetPlayerWinrateShown(player_id) end
+			if has_backend_player and supporter_table.xhs_ingame_advertize_hidden == nil and api.GetPlayerIngameAdvertizeHidden ~= nil then supporter_table.xhs_ingame_advertize_hidden = api:GetPlayerIngameAdvertizeHidden(player_id) end
 			supporter_table.XP_change = supporter_table.XP_change or 0
-			supporter_table.ingame_tag = supporter_table.ingame_tag or api:GetPlayerIngameTag(player_id)
-			supporter_table.achievements = supporter_table.achievements or api:GetPlayerAchievements(player_id)
+			if has_backend_player then supporter_table.ingame_tag = supporter_table.ingame_tag or api:GetPlayerIngameTag(player_id) end
+			if has_backend_player then supporter_table.achievements = supporter_table.achievements or api:GetPlayerAchievements(player_id) end
 			supporter_table.supporter_url = supporter_table.supporter_url or "https://www.patreon.com/bePatron?u=2533325"
 
 			CustomNetTables:SetTableValue("supporter_pass_player", tostring(player_id), supporter_table)

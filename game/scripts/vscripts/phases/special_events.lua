@@ -213,6 +213,7 @@ function SpecialEvents:MuradinEvent(time)
 
 			if hero and not hero:IsNull() and hero:IsRealHero() and not hero:HasModifier("modifier_fountain_invulnerability") then
 				hero.old_pos = hero:GetAbsOrigin()
+				CreateXHSReturnMarker(hero, hero.old_pos)
 				local id = hero:GetPlayerID()
 				local point = Entities:FindByName(nil, "npc_dota_muradin_player_" .. id)
 
@@ -357,6 +358,7 @@ function SpecialEvents:FarmEvent(time)
 
 			if nPlayerID >= 0 then
 				v.old_pos = v:GetAbsOrigin()
+				CreateXHSReturnMarker(v, v.old_pos)
 				if point ~= nil then
 					StartCinematicDelayedTeleport(v, point:GetAbsOrigin(), tp_delay)
 				end
@@ -557,6 +559,7 @@ function SpecialEvents:StartRameroAndBaristolEvent(hero)
 
 	if hero ~= nil and not hero:IsNull() then
 		hero.old_pos = hero:GetAbsOrigin()
+		CreateXHSReturnMarker(hero, hero.old_pos)
 	end
 
 	StartSpecialArenaCinematicIntro(hero, point, "xhs_ramero_baristol_creep_pause_watch", function()
@@ -631,7 +634,17 @@ function SpecialEvents:EndRameroAndBaristolEvent(bWin)
 			local rewardHero = SpecialEvents.RameroRewardHero
 			Timers:CreateTimer(teleport_time + 0.3, function()
 				if rewardHero ~= nil and IsValidEntity(rewardHero) and not rewardHero:IsNull() then
-					DropNeutralItemAtPositionForHero("item_lightning_sword", rewardHero:GetAbsOrigin(), rewardHero, rewardHero:GetTeam(), true)
+					if rewardHero:HasAnyAvailableInventorySpace() then
+						local item = CreateItem("item_lightning_sword", rewardHero, rewardHero)
+						if item ~= nil then
+							item:SetPurchaseTime(GameRules:GetGameTime())
+							item:SetPurchaser(rewardHero)
+							rewardHero:AddItem(item)
+						end
+					else
+						local dropTarget = rewardHero:GetAbsOrigin() + RandomVector(RandomFloat(50, 150))
+						DropNeutralItemAtPositionForHero("item_lightning_sword", dropTarget, rewardHero, rewardHero:GetTeam(), true)
+					end
 				end
 			end)
 		end
@@ -663,6 +676,7 @@ function SpecialEvents:StartSogatEvent(hero)
 
 	if hero ~= nil and not hero:IsNull() then
 		hero.old_pos = hero:GetAbsOrigin()
+		CreateXHSReturnMarker(hero, hero.old_pos)
 	end
 
 	StartSpecialArenaCinematicIntro(hero, point, "xhs_sogat_creep_pause_watch", function()

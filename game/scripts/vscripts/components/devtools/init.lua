@@ -817,9 +817,9 @@ function XHSDevTools:RefreshTemporaryDonatorStatus(playerID)
 			end
 		end
 
-		if hero.SetupHealthBarLabel ~= nil then
-			hero:SetupHealthBarLabel()
-		end
+		-- if hero.SetupHealthBarLabel ~= nil then
+		-- hero:SetupHealthBarLabel()
+		-- end
 	end
 end
 

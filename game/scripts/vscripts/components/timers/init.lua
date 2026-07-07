@@ -586,47 +586,8 @@ function CustomTimers:CreateSpecialWaveTimerParticle(direction, duration)
 	CustomTimers:ClearSpecialWaveTimerParticles()
 
 	local origin = spawner:GetAbsOrigin()
-	local radius = 700
-	local segmentCount = 64
-	local segmentRadius = 55
-	local segmentParticles = {}
-	CustomTimers.active_special_wave_timer_particles = segmentParticles
-
-	for i = 1, segmentCount do
-		local angle = (math.pi * 2) * ((i - 1) / segmentCount)
-		local segmentOrigin = origin + Vector(math.cos(angle) * radius, math.sin(angle) * radius, 0)
-		local particle = ParticleManager:CreateParticle("particles/custom/xhs_special_wave_timer_segment.vpcf", PATTACH_WORLDORIGIN, nil)
-		ParticleManager:SetParticleControl(particle, 0, segmentOrigin)
-		ParticleManager:SetParticleControl(particle, 1, Vector(segmentRadius, 0, 0))
-		ParticleManager:SetParticleControl(particle, 2, Vector(duration, 0, 1))
-		ParticleManager:SetParticleControl(particle, 3, Vector(200, 0, 0))
-		ParticleManager:SetParticleControl(particle, 4, segmentOrigin)
-		segmentParticles[i] = particle
-	end
 
 	AddFOWViewer(DOTA_TEAM_GOODGUYS, origin, radius, duration, false)
-
-	local function DestroySegment(index)
-		local particle = segmentParticles[index]
-		if particle ~= nil then
-			ParticleManager:DestroyParticle(particle, false)
-			ParticleManager:ReleaseParticleIndex(particle)
-			segmentParticles[index] = nil
-		end
-	end
-
-	for i = 1, segmentCount do
-		local segmentIndex = i
-		Timers:CreateTimer((i / segmentCount) * duration, function()
-			DestroySegment(segmentIndex)
-		end)
-	end
-
-	Timers:CreateTimer(duration, function()
-		for i = 1, segmentCount do
-			DestroySegment(i)
-		end
-	end)
 end
 
 function SpecialWave(iCardinalPoint, force)

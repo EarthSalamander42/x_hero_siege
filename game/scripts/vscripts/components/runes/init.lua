@@ -583,9 +583,10 @@ function Runes:ApplyRune(definition, picker)
 			local missingMana = hero:GetMaxMana() - hero:GetMana()
 			hero:Heal(missingHealth * (definition.values.missing_pct or 35) * 0.01, hero)
 			hero:GiveMana(missingMana * (definition.values.missing_pct or 35) * 0.01)
-			self:PlayHeroRuneEffect(hero, definition.category)
+			self:PlayHeroRuneEffect(hero, definition.category, false)
 			self:NotifyRuneApplied(hero, definition)
 		end
+		self:PlayRunePickupSound(picker)
 		return
 	end
 
@@ -594,9 +595,10 @@ function Runes:ApplyRune(definition, picker)
 			self:ReduceCooldowns(hero, definition.values.cooldown_pct, definition.values.cooldown_cap)
 		end
 		hero:AddNewModifier(hero, nil, definition.modifier, self:BuildModifierKv(definition))
-		self:PlayHeroRuneEffect(hero, definition.category)
+		self:PlayHeroRuneEffect(hero, definition.category, false)
 		self:NotifyRuneApplied(hero, definition)
 	end
+	self:PlayRunePickupSound(picker)
 end
 
 function Runes:GetEffectSummary(definition)
@@ -815,11 +817,23 @@ function Runes:DirectionLabel(direction)
 	return tostring(direction)
 end
 
-function Runes:PlayHeroRuneEffect(hero, category)
+function Runes:PlayRunePickupSound(hero)
+	if hero == nil or hero:IsNull() then return end
+
+	if hero.EmitSoundParams ~= nil then
+		hero:EmitSoundParams("Rune.Regen", 0, 0.35, 0)
+	else
+		hero:EmitSound("Rune.Regen")
+	end
+end
+
+function Runes:PlayHeroRuneEffect(hero, category, playSound)
 	local particle = ParticleManager:CreateParticle("particles/generic_hero_status/hero_levelup.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
 	ParticleManager:SetParticleControl(particle, 0, hero:GetAbsOrigin())
 	ParticleManager:ReleaseParticleIndex(particle)
-	hero:EmitSound("Rune.Regen")
+	if playSound == true then
+		self:PlayRunePickupSound(hero)
+	end
 end
 
 function Runes:OnDamageFilter(filterTable)

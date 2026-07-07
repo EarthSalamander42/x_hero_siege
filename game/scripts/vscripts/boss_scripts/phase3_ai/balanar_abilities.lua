@@ -139,7 +139,11 @@ local function CreateRadialImpact(position, radius, particleName)
 	local particle = ParticleManager:CreateParticle(particleName, PATTACH_WORLDORIGIN, nil)
 	ParticleManager:SetParticleControl(particle, 0, position)
 	ParticleManager:SetParticleControl(particle, 1, Vector(radius or 250, 0, 0))
-	ParticleManager:ReleaseParticleIndex(particle)
+	Timers:CreateTimer(1.2, function()
+		ParticleManager:DestroyParticle(particle, false)
+		ParticleManager:ReleaseParticleIndex(particle)
+		return nil
+	end)
 end
 
 local function CreateOverheadCast(caster, particleName)

@@ -47,6 +47,9 @@ require('components/devtools/init')
 
 function GameMode:OnFirstPlayerLoaded()
 	BASE_GOOD = Entities:FindByName(nil, "base_spawn")
+	if BASE_GOOD ~= nil and BASE_GOOD.SetHullRadius ~= nil then
+		BASE_GOOD:SetHullRadius(420)
+	end
 end
 
 function GameMode:OnHeroInGame(hero)

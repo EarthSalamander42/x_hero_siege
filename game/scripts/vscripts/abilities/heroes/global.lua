@@ -73,6 +73,8 @@ function CastleMuradin(event)
 	local Health = ability:GetSpecialValueFor("hp_tooltip")
 	local InvTime = ability:GetSpecialValueFor("invulnerability_time")
 	local PauseTime = 10.0
+	local defendDuration = InvTime + PauseTime
+	local timerName = "castle_muradin"
 
 	if caster:GetHealthPercent() <= Health then
 		PauseCreeps(PauseTime)
@@ -94,10 +96,28 @@ function CastleMuradin(event)
 		end
 
 		print("Castle will be invulnerable for " .. tostring(InvTime + PauseTime) .. " seconds.")
-		caster:AddNewModifier(caster, nil, "modifier_invulnerable", { duration = InvTime + PauseTime })
+		caster:AddNewModifier(caster, nil, "modifier_invulnerable", { duration = defendDuration })
 		Notifications:TopToAll({ text = "Muradin is requested to defend your castle!", duration = PauseTime })
 
-		Timers:CreateTimer(InvTime + PauseTime, function()
+		CustomTimers.current_time[timerName] = math.ceil(defendDuration)
+		CustomGameEventManager:Send_ServerToAllClients("show_current_event_timer", {
+			timer_name = timerName,
+			title = "MURADIN DEFENDS",
+			duration = defendDuration,
+		})
+		CustomTimers:BroadcastTimer(timerName)
+
+		Timers:CreateTimer(1.0, function()
+			if CustomTimers.current_time[timerName] == nil then return nil end
+			if CustomTimers.current_time[timerName] <= 0 then return nil end
+
+			CustomTimers:Countdown(timerName)
+			return CustomTimers.current_time[timerName] > 0 and 1.0 or nil
+		end)
+
+		Timers:CreateTimer(defendDuration, function()
+			CustomGameEventManager:Send_ServerToAllClients("hide_current_event_timer", { timer_name = timerName })
+			CustomTimers.current_time[timerName] = nil
 			UTIL_Remove(Muradin)
 		end)
 

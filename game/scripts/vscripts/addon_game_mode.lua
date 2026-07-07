@@ -33,6 +33,7 @@ function Precache(context)
 	--	PrecacheResource("particle", "particles/units/heroes/hero_ember_spirit/ember_spirit_flameguard.vpcf", context) -- Immolation
 	PrecacheResource("particle", "particles/items2_fx/teleport_start.vpcf", context)                          -- Immolation
 	PrecacheResource("particle", "particles/items2_fx/teleport_end.vpcf", context)                            -- Immolation
+	PrecacheResource("particle", "particles/units/heroes/hero_wisp/wisp_relocate_marker.vpcf", context)       -- Return position marker
 	PrecacheResource("particle", "particles/econ/events/fall_major_2016/teleport_start_fm06_lvl3.vpcf", context) -- Immolation
 	PrecacheResource("particle", "particles/econ/events/fall_major_2016/teleport_end_fm06_lvl3.vpcf", context) -- Immolation
 	PrecacheResource("particle_folder", "particles/custom", context)
@@ -51,8 +52,7 @@ function Precache(context)
 	PrecacheResource("particle", "particles/camp_fire_buff.vpcf", context)
 	PrecacheResource("particle", "particles/custom/undead/disease_cloud.vpcf", context)
 	PrecacheResource("particle", "particles/darkmoon_last_hit_effect.vpcf", context)
-	PrecacheResource("particle", "particles/custom/xhs_special_wave_timer_segment.vpcf", context)                 -- Special wave pre-spawn warning
-	PrecacheResource("particle", "particles/custom/xhs_growth_overhead.vpcf", context)                                      -- Farm event/Phase 2 overhead
+	PrecacheResource("particle", "particles/custom/xhs_growth_overhead.vpcf", context)                                       -- Farm event/Phase 2 overhead
 	PrecacheResource("particle", "particles/econ/items/shadow_fiend/sf_fire_arcana/sf_fire_arcana_shadowraze.vpcf", context) -- Boss death
 	PrecacheResource("particle", "particles/units/heroes/hero_morphling/morphling_ambient_new.vpcf", context)                -- Lightning Sword
 	PrecacheResource("particle", "particles/units/heroes/hero_ogre_magi/ogre_magi_ignite_debuff.vpcf", context)              -- Shield of Invincibility
@@ -75,8 +75,8 @@ function Precache(context)
 	PrecacheResource("model_folder", "models/items/furion/treant/the_ancient_guardian_the_ancient_treants", context)
 	PrecacheResource("model_folder", "models/items/dragon_knight/aurora_warrior_set_dragon_style2_aurora_warrior_set", context)
 	PrecacheResource("model_folder", "models/heroes/dragon_knight", context)         -- For some reason precaching the hero doesn't fix missing model
-	PrecacheResource("model_folder", "models/heroes/juggernaut", context)      -- Grom Hellscream
-	PrecacheResource("model_folder", "models/heroes/troll_warlord", context)   -- Orc ranged wave 3
+	PrecacheResource("model_folder", "models/heroes/juggernaut", context)            -- Grom Hellscream
+	PrecacheResource("model_folder", "models/heroes/troll_warlord", context)         -- Orc ranged wave 3
 	PrecacheResource("model_folder", "models/items/undying/idol_of_ruination", context) -- Archimonde minions
 
 	PrecacheResource("model", "models/creeps/neutral_creeps/n_creep_troll_skeleton/n_creep_troll_skeleton_fx.vmdl", context)
@@ -111,10 +111,10 @@ function Precache(context)
 	-- XHSPrecache:PrecacheUnit("npc_dota_hero_luna", nil, -1)             -- creep wave 1
 	-- --	XHSPrecache:PrecacheUnit("npc_dota_hero_lion", nil, -1) 			-- Warden &  Pit Lord
 	XHSPrecache:PrecacheUnit("npc_dota_hero_life_stealer", nil, -1) -- Creep wave 1 (undead)
-	XHSPrecache:PrecacheUnit("npc_dota_hero_lycan", nil, -1)            -- Creep level 4 human melee
+	XHSPrecache:PrecacheUnit("npc_dota_hero_lycan", nil, -1)     -- Creep level 4 human melee
 	-- --	XHSPrecache:PrecacheUnit("npc_dota_hero_magnataur", nil, -1) 	-- Magnataur & Tauren Chieftain
 	XHSPrecache:PrecacheUnit("npc_dota_hero_morphling", nil, -1) -- Archmage & Archimage
-	XHSPrecache:PrecacheUnit("npc_dota_hero_naga_siren", nil, -1)    -- Special Wave 2
+	XHSPrecache:PrecacheUnit("npc_dota_hero_naga_siren", nil, -1) -- Special Wave 2
 	-- XHSPrecache:PrecacheUnit("npc_dota_hero_necrolyte", nil, -1)     -- Special Wave 1 & Tauren Chieftain & Dark Summoner & LK & Paladin &
 	-- XHSPrecache:PrecacheUnit("npc_dota_hero_ogre_magi", nil, -1)     -- Sniper
 	-- XHSPrecache:PrecacheUnit("npc_dota_hero_phoenix", nil, -1)       -- Dragons Level 1 & Invo

@@ -38,7 +38,7 @@ function item_orb_of_earth:GetAbilityTextureName()
 end
 
 function item_orb_of_earth2:GetAbilityTextureName()
-	return GetEarthOrbTexture(self:GetCaster(), "custom/orb_of_earth3", "custom/orb_of_earth3_off")
+	return GetEarthOrbTexture(self:GetCaster(), "custom/orb_of_earth3", "custom/orb_of_earth3")
 end
 
 function item_orb_of_earth3:GetAbilityTextureName()

@@ -247,8 +247,9 @@ function xhs_spirit_master_elemental_mandala:OnAbilityPhaseStart()
 	if not IsServer() then return true end
 	local caster = self:GetCaster()
 	local center = GetContext(self).position or caster:GetAbsOrigin()
+	local ringRadius = self:GetSpecialValueFor("ring_radius")
 	StartBossCastBar(self, "Elemental Mandala")
-	XHSBossTelegraphs:Ring(center, self:GetSpecialValueFor("ring_radius"), self:GetSpecialValueFor("node_radius"), 12, self:GetCastPoint(), COLORS.storm, 0)
+	XHSBossTelegraphs:Ring(center, ringRadius * 0.36, self:GetSpecialValueFor("node_radius"), 6, self:GetCastPoint(), COLORS.fire, 40)
 	StartAnimation(caster, { duration = self:GetCastPoint() + 0.4, activity = ACT_DOTA_CAST_ABILITY_4, rate = 0.75 })
 	caster:EmitSound("Hero_Brewmaster.PrimalSplit.Cast")
 	return true
@@ -267,9 +268,9 @@ function xhs_spirit_master_elemental_mandala:OnSpellStart()
 	local damage = ScaleDamage(self:GetSpecialValueFor("damage"))
 	local waveDelay = math.max(0.25, self:GetSpecialValueFor("wave_delay"))
 	local waves = {
-		{ key = "storm", radius = ringRadius, count = 12, offset = 0, delay = 0, colors = COLORS.storm, particle = STORM_OVERLOAD_PARTICLE, sound = "Hero_StormSpirit.StaticRemnantExplode" },
-		{ key = "earth", radius = ringRadius * 0.68, count = 9, offset = 20, delay = waveDelay, colors = COLORS.earth, particle = EARTH_GUARD_PARTICLE, sound = "Hero_ElderTitan.EarthSplitter.Destroy" },
-		{ key = "fire", radius = ringRadius * 0.36, count = 6, offset = 40, delay = waveDelay * 2, colors = COLORS.fire, particle = FIRE_WILDFIRE_PARTICLE, sound = "Ability.LightStrikeArray" },
+		{ key = "fire", radius = ringRadius * 0.36, count = 6, offset = 40, delay = 0, colors = COLORS.fire, particle = FIRE_WILDFIRE_PARTICLE, sound = "Ability.LightStrikeArray" },
+		{ key = "earth", radius = ringRadius * 0.68, count = 9, offset = 20, delay = waveDelay, colors = COLORS.earth, particle = EARTH_PILLAR_PARTICLE, sound = "Hero_ElderTitan.EarthSplitter.Destroy" },
+		{ key = "storm", radius = ringRadius, count = 12, offset = 0, delay = waveDelay * 2, colors = COLORS.storm, particle = STORM_OVERLOAD_PARTICLE, sound = "Hero_StormSpirit.StaticRemnantExplode" },
 	}
 
 	for waveIndex, wave in ipairs(waves) do

@@ -804,6 +804,66 @@ function RespawnDeadHeroesForPhase3Start()
 	return respawnedCount
 end
 
+local XHS_RETURN_MARKER_PARTICLE = "particles/units/heroes/hero_wisp/wisp_relocate_marker.vpcf"
+
+local function XHSHexToRgbVector(value)
+	if type(value) ~= "string" then return nil end
+
+	local hex = string.gsub(value, "#", "")
+	if string.len(hex) ~= 6 then return nil end
+
+	local r = tonumber(string.sub(hex, 1, 2), 16)
+	local g = tonumber(string.sub(hex, 3, 4), 16)
+	local b = tonumber(string.sub(hex, 5, 6), 16)
+	if r == nil or g == nil or b == nil then return nil end
+
+	return Vector(r, g, b)
+end
+
+local function XHSGetHeroPlayerColorVector(hero)
+	if hero == nil or hero:IsNull() or not hero.GetPlayerID then return Vector(255, 255, 255) end
+
+	local player_id = hero:GetPlayerID()
+	local color = PLAYER_COLORS and PLAYER_COLORS[player_id]
+	if type(color) == "table" then
+		if type(color[1]) == "number" and type(color[2]) == "number" and type(color[3]) == "number" then
+			return Vector(color[1], color[2], color[3])
+		end
+
+		if type(color.r) == "number" and type(color.g) == "number" and type(color.b) == "number" then
+			return Vector(color.r, color.g, color.b)
+		end
+	elseif type(color) == "string" then
+		return XHSHexToRgbVector(color) or Vector(255, 255, 255)
+	end
+
+	return Vector(255, 255, 255)
+end
+
+function DestroyXHSReturnMarker(hero)
+	if hero == nil or hero:IsNull() or hero.xhs_return_marker_pfx == nil then return end
+
+	ParticleManager:DestroyParticle(hero.xhs_return_marker_pfx, false)
+	ParticleManager:ReleaseParticleIndex(hero.xhs_return_marker_pfx)
+	hero.xhs_return_marker_pfx = nil
+	hero.xhs_return_marker_position = nil
+end
+
+function CreateXHSReturnMarker(hero, position)
+	if hero == nil or hero:IsNull() or position == nil then return end
+
+	DestroyXHSReturnMarker(hero)
+
+	local marker_position = GetGroundPosition(position, hero)
+	local marker = ParticleManager:CreateParticle(XHS_RETURN_MARKER_PARTICLE, PATTACH_WORLDORIGIN, nil)
+	ParticleManager:SetParticleControl(marker, 0, marker_position)
+	ParticleManager:SetParticleControl(marker, 60, XHSGetHeroPlayerColorVector(hero))
+	ParticleManager:SetParticleControl(marker, 61, Vector(1, 0, 0))
+
+	hero.xhs_return_marker_pfx = marker
+	hero.xhs_return_marker_position = marker_position
+end
+
 function TeleportHero(hero, point, delay, iCameraSpeed)
 	if not hero.GetPlayerID then return end
 	if hero:GetPlayerID() == -1 then return end
@@ -848,6 +908,10 @@ function TeleportHero(hero, point, delay, iCameraSpeed)
 		else
 			FindClearSpaceForUnit(hero, point, true)
 			hero:Stop()
+		end
+
+		if hero.xhs_return_marker_position ~= nil and (point - hero.xhs_return_marker_position):Length2D() <= 128 then
+			DestroyXHSReturnMarker(hero)
 		end
 
 		EmitSoundOnLocationWithCaster(hero:GetAbsOrigin(), "Portal.Hero_Appear", hero)
@@ -1190,6 +1254,10 @@ function GetBossBarId(boss)
 	return boss.xhs_boss_bar_id or tostring(boss:entindex())
 end
 
+function IsBossBarSuppressed(boss)
+	return boss ~= nil and IsValidEntity(boss) and not boss:IsNull() and boss.xhs_boss_bar_suppressed == true
+end
+
 local function GetBossBarMarkers(boss)
 	if boss == nil or not IsValidEntity(boss) or boss:IsNull() then return nil end
 	if type(boss.xhs_boss_bar_markers) ~= "table" then return nil end
@@ -1300,6 +1368,9 @@ local function StartBossBarHealthThink(boss)
 			XHS_PRIVATE_BOSS_BAR_LAST[key] = nil
 			return nil
 		end
+		if IsBossBarSuppressed(boss) then
+			return XHS_BOSS_BAR_POLL_INTERVAL
+		end
 
 		if IsPrivateBossBarBoss(boss) then
 			SendPrivateBossBarUpdateIfChanged(boss, false)
@@ -1338,6 +1409,7 @@ end
 
 local function ShowBossBarToPlayer(caster, playerID)
 	if caster.deathStart or playerID == nil then return end
+	if IsBossBarSuppressed(caster) then return end
 
 	if caster.boss_count == nil then caster.boss_count = 1 end
 	local player = PlayerResource:GetPlayer(playerID)
@@ -1357,6 +1429,7 @@ end
 
 function ShowBossBar(caster)
 	if caster.deathStart then return end
+	if IsBossBarSuppressed(caster) then return end
 	local boss_health = caster:FindAbilityByName("boss_health")
 	if boss_health and boss_health:GetLevel() < 1 then
 		boss_health:SetLevel(1)
@@ -1387,6 +1460,7 @@ end
 function UpdateBossBar(boss, attacker)
 	if boss == nil or not IsValidEntity(boss) or boss:IsNull() then return end
 	if boss.deathStart then return end
+	if IsBossBarSuppressed(boss) then return end
 	if boss.boss_count == nil then boss.boss_count = 1 end
 
 	if IsPrivateBossBarBoss(boss) then

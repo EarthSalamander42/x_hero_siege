@@ -128,7 +128,9 @@ function EndMagtheridonArena()
 		local grom = CreateUnitByName("npc_dota_hero_grom_hellscream", Entities:FindByName(nil, "spawn_grom_hellscream"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 		grom.zone = "xhs_holdout"
 		grom.boss_count = 1
+		grom.xhs_boss_bar_suppressed = true
 		grom:SetAngles(0, 270, 0)
+		GameMode.GromPhase3Boss = grom
 		RegisterXHSDevSpawn(grom)
 		if XHSGrom_AttachPhase3AI ~= nil then
 			XHSGrom_AttachPhase3AI(grom)
@@ -392,6 +394,18 @@ function OpenGromGate()
 	DoEntFire("door_grom", "SetAnimation", "gate_02_open", 0, nil, nil)
 	DoEntFire("door_grom2", "SetAnimation", "gate_02_open", 0, nil, nil)
 
+	local grom = GameMode.GromPhase3Boss
+	if grom ~= nil and IsValidEntity(grom) and not grom:IsNull() then
+		if HideBossBar then
+			HideBossBar(grom)
+		end
+		grom.xhs_boss_bar_suppressed = false
+		local ai = grom:FindModifierByName("modifier_xhs_grom_phase3_ai")
+		if ai ~= nil then
+			ai.xhs_boss_bar_revealed = false
+		end
+	end
+
 	Notifications:TopToAll({
 		text = "Grom's vanguard has fallen. The gate is open.",
 		duration = 8.0,
@@ -580,7 +594,6 @@ function StartSpiritMasterArena()
 	spirit_master:EmitSound("SpiritMaster.StartArena")
 	spirit_master.zone = "xhs_holdout"
 	RegisterXHSDevSpawn(spirit_master)
-	ShowBossBar(spirit_master)
 	if XHSSpiritMaster_AttachPhase3AI ~= nil then
 		XHSSpiritMaster_AttachPhase3AI(spirit_master)
 	end

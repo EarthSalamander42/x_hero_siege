@@ -46,6 +46,18 @@ function api:IsDeveloper(player_id)
 	end
 end
 
+function api:GetBotDonatorStatus(player_id)
+	if not PlayerResource:IsValidPlayerID(player_id) then
+		return 0
+	end
+
+	if player_id >= 1 and player_id <= 5 and PlayerResource:GetConnectionState(player_id) == 1 then
+		return player_id
+	end
+
+	return 0
+end
+
 function api:GetDonatorStatus(player_id)
 	if not PlayerResource:IsValidPlayerID(player_id) then
 		--		native_print("api:GetDonatorStatus: Player ID not valid!")
@@ -54,6 +66,11 @@ function api:GetDonatorStatus(player_id)
 
 	if self.temporary_donator_status ~= nil and self.temporary_donator_status[player_id] ~= nil then
 		return self.temporary_donator_status[player_id]
+	end
+
+	local bot_donator_status = self:GetBotDonatorStatus(player_id)
+	if bot_donator_status ~= 0 then
+		return bot_donator_status
 	end
 
 	local steamid = tostring(PlayerResource:GetSteamID(player_id))

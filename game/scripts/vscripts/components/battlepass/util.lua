@@ -86,35 +86,30 @@ function Battlepass:HasArcana(ID, hero_name)
 end
 
 -- vanilla extension
-function CDOTA_BaseNPC:SetupHealthBarLabel(sCustomTag)
-	local ply_table = CustomNetTables:GetTableValue("supporter_pass_player", tostring(self:GetPlayerID()))
-	--	print(ply_table)
-	if not ply_table then return end
+-- function CDOTA_BaseNPC:SetupHealthBarLabel(sCustomTag)
+-- 	local ply_table = CustomNetTables:GetTableValue("supporter_pass_player", tostring(self:GetPlayerID()))
+-- 	--	print(ply_table)
+-- 	if not ply_table then return end
 
-	--	print(sCustomTag)
-	if not sCustomTag then
-		if ply_table.ingame_tag then
-			sCustomTag = ply_table.ingame_tag
-		else
-			sCustomTag = "#donator_label_" .. ply_table.donator_level
-		end
-	end
-	--	print(sCustomTag)
+-- 	--	print(sCustomTag)
+-- 	if not sCustomTag then
+-- 		if ply_table.ingame_tag then
+-- 			sCustomTag = ply_table.ingame_tag
+-- 		else
+-- 			sCustomTag = "#donator_label_" .. ply_table.donator_level
+-- 		end
+-- 	end
+-- 	--	print(sCustomTag)
 
-	--	print("Donator Player ID / status:", self:GetPlayerOwnerID(), api:GetDonatorStatus(self:GetPlayerOwnerID()))
-	if api:IsDonator(self:GetPlayerOwnerID()) ~= false then
-		if ply_table.donator_level and ply_table.donator_level > 0 then
-			local visual_donator_level = GetDonatorVisualStatus ~= nil and GetDonatorVisualStatus(ply_table.donator_level) or ply_table.donator_level
-			local donator_color = DONATOR_COLOR[visual_donator_level] or DONATOR_COLOR[0]
-			self:SetCustomHealthLabel(sCustomTag, donator_color[1], donator_color[2], donator_color[3])
-		end
-	end
-end
-
-function CDOTA_BaseNPC:RemoveHealthBarLabel()
-	print("Set no tag")
-	self:SetCustomHealthLabel("", 0, 0, 0)
-end
+-- 	--	print("Donator Player ID / status:", self:GetPlayerOwnerID(), api:GetDonatorStatus(self:GetPlayerOwnerID()))
+-- 	if api:IsDonator(self:GetPlayerOwnerID()) ~= false then
+-- 		if ply_table.donator_level and ply_table.donator_level > 0 then
+-- 			local visual_donator_level = GetDonatorVisualStatus ~= nil and GetDonatorVisualStatus(ply_table.donator_level) or ply_table.donator_level
+-- 			local donator_color = DONATOR_COLOR[visual_donator_level] or DONATOR_COLOR[0]
+-- 			self:SetCustomHealthLabel(sCustomTag, donator_color[1], donator_color[2], donator_color[3])
+-- 		end
+-- 	end
+-- end
 
 function CDOTA_BaseNPC:CenterCameraOnEntity(hTarget, iDuration)
 	PlayerResource:SetCameraTarget(self:GetPlayerID(), hTarget)
@@ -141,9 +136,9 @@ function Battlepass:ToggleDonatorTag(keys)
 	Battlepass:UpdatePlayerTable(keys.PlayerID, "toggle_tag", keys.tag)
 
 	if keys.tag == 0 then
-		hero:RemoveHealthBarLabel()
+		-- hero:RemoveHealthBarLabel()
 	else
-		hero:SetupHealthBarLabel()
+		-- hero:SetupHealthBarLabel()
 	end
 end
 
@@ -154,8 +149,8 @@ function Battlepass:SetDonatorTag(keys)
 	--	if api.players[steamid].changed_tag_this_game then
 	--		DisplayError(keys.PlayerID, "Don't abuse the fucking feature!")
 	--	else
-	api:SetPlayerIngameTag(keys.PlayerID, keys.ingame_tag)
-	hero:SetupHealthBarLabel(keys.ingame_tag)
+	-- api:SetPlayerIngameTag(keys.PlayerID, keys.ingame_tag)
+	-- hero:SetupHealthBarLabel(keys.ingame_tag)
 	--	end
 end
 
@@ -464,9 +459,9 @@ function Battlepass:SupporterPassUpdateSettings(event_source_index, event)
 			local hero = PlayerResource:GetSelectedHeroEntity(playerID)
 			if settings.toggle_tag ~= nil and hero ~= nil and not hero:IsNull() then
 				if settings.toggle_tag then
-					hero:SetupHealthBarLabel()
+					-- hero:SetupHealthBarLabel()
 				else
-					hero:RemoveHealthBarLabel()
+					-- hero:RemoveHealthBarLabel()
 				end
 			end
 
@@ -478,9 +473,9 @@ function Battlepass:SupporterPassUpdateSettings(event_source_index, event)
 		local hero = PlayerResource:GetSelectedHeroEntity(playerID)
 		if settings.toggle_tag ~= nil and hero ~= nil and not hero:IsNull() then
 			if settings.toggle_tag then
-				hero:SetupHealthBarLabel()
+				-- hero:SetupHealthBarLabel()
 			else
-				hero:RemoveHealthBarLabel()
+				-- hero:RemoveHealthBarLabel()
 			end
 		end
 

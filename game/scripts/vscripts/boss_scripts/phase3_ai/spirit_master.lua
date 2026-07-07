@@ -301,6 +301,18 @@ function XHSSpiritMasterEncounter:RegisterMaster(master)
 	self.master = master
 	self.arena_center = GetArenaCenter(master:GetAbsOrigin())
 	self.thresholds = THRESHOLDS[GetDifficulty()] or THRESHOLDS[1]
+	master.boss_count = 1
+	master.xhs_boss_bar_id = "spirit_master"
+	master.xhs_boss_bar_name = "npc_dota_boss_spirit_master"
+	master.xhs_boss_bar_icon = "npc_dota_hero_brewmaster"
+	master.xhs_boss_bar_colors = {
+		dark_color = "#11263d",
+		light_color = "#87d7ff",
+	}
+	if master.xhs_spirit_master_bar_initialized ~= true then
+		CustomGameEventManager:Send_ServerToAllClients("hide_boss_hp", { boss_count = 1 })
+		master.xhs_spirit_master_bar_initialized = true
+	end
 	master.xhs_boss_bar_markers = {}
 	for _, threshold in pairs(self.thresholds) do
 		table.insert(master.xhs_boss_bar_markers, {

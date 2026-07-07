@@ -56,6 +56,19 @@ ListenToGameEvent('npc_spawned', function(event)
 
 	local ply_table = CustomNetTables:GetTableValue("supporter_pass_player", tostring(npc:GetPlayerOwnerID()))
 	if type(ply_table) ~= "table" then ply_table = nil end
+	local npc_player_id = npc.GetPlayerID and npc:GetPlayerID() or npc:GetPlayerOwnerID()
+	if api.GetBotDonatorStatus ~= nil and api:GetBotDonatorStatus(npc_player_id) ~= 0 and SupporterPass and SupporterPass.BuildPlayerTable then
+		local bot_ply_table = CustomNetTables:GetTableValue("supporter_pass_player", tostring(npc_player_id))
+		if type(bot_ply_table) ~= "table" then
+			bot_ply_table = SupporterPass:BuildPlayerTable(npc_player_id)
+			if bot_ply_table ~= nil then
+				CustomNetTables:SetTableValue("supporter_pass_player", tostring(npc_player_id), bot_ply_table)
+			end
+		end
+		if bot_ply_table ~= nil then
+			ply_table = bot_ply_table
+		end
+	end
 
 	if npc:IsIllusion() or string.find(npc:GetUnitName(), "npc_dota_lone_druid_bear") then
 		if ply_table then
@@ -76,7 +89,7 @@ ListenToGameEvent('npc_spawned', function(event)
 		end
 
 		-- The commented out lines here are what I used to test in tools mode
-		if api:IsDonator(npc:GetPlayerID()) and PlayerResource:GetConnectionState(npc:GetPlayerID()) ~= 1 or string.find(GetMapName(), "demo") then
+		if api:IsDonator(npc:GetPlayerID()) or string.find(GetMapName(), "demo") then
 			-- if api:IsDonator(npc:GetPlayerID()) and PlayerResource:GetConnectionState(npc:GetPlayerID()) ~= 1 or (IsInToolsMode()) then
 			if ply_table then
 				if ply_table.toggle_tag ~= nil and ply_table.toggle_tag == 1 or ply_table.toggle_tag ~= nil and ply_table.toggle_tag == true then

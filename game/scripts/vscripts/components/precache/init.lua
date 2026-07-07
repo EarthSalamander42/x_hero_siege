@@ -351,7 +351,6 @@ XHSPrecache:RegisterGroup("hero_abilities", {
 
 XHSPrecache:RegisterGroup("events", {
 	particles = {
-		"particles/custom/xhs_special_wave_timer_segment.vpcf",
 		"particles/custom/xhs_growth_overhead.vpcf",
 		"particles/units/heroes/hero_morphling/morphling_ambient_new.vpcf",
 		"particles/units/heroes/hero_ogre_magi/ogre_magi_ignite_debuff.vpcf",

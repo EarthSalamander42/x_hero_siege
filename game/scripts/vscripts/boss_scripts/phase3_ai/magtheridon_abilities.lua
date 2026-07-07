@@ -675,7 +675,7 @@ function xhs_magtheridon_rupture:OnSpellStart()
 	local slowDuration = self:GetSpecialValueFor("slow_duration")
 	local visualDelay = self:GetSpecialValueFor("visual_delay")
 
-	caster:EmitSound(RUPTURE_PRECAST_SOUND)
+	caster:EmitSound(RUPTURE_IMPACT_SOUND)
 	for _, line in pairs(context.lines or {}) do
 		local startPosition = line.start or caster:GetAbsOrigin()
 		local direction = line.direction or Vector(1, 0, 0)
@@ -690,6 +690,7 @@ function xhs_magtheridon_rupture:OnSpellStart()
 			EmitLocationSound(caster, lineEnd, RUPTURE_IMPACT_SOUND)
 			local units = DamageLineEnemies(caster, self, startPosition, direction, spacing, radius, count, damage, DAMAGE_TYPE_PURE, startDistance)
 			for _, unit in pairs(units) do
+				unit:EmitSound(RUPTURE_IMPACT_SOUND)
 				ApplySlow(caster, unit, slowDuration, self:GetSpecialValueFor("movement_slow"), self:GetSpecialValueFor("attack_slow"))
 			end
 			return nil
