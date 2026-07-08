@@ -52,14 +52,32 @@ var XHSTopHud = (function () {
 	var personalTimerMaxRemaining = {};
 	var personalTimerProgressRunning = {};
 	var XHS_PLAYER_COLOR_FALLBACKS = [
-		"#c80000ff",
 		"#0032c8ff",
 		"#00ffffff",
 		"#640064ff",
 		"#ffff00ff",
 		"#ff9600ff",
-		"#007d00ff",
 		"#ff64ffff",
+		"#a3b000ff",
+		"#65d9f7ff",
+		"#007d00ff",
+		"#a46900ff",
+	];
+
+	var OVERHEAD_STATUS_CLASSES = [
+		"XHSStatusStunned",
+		"XHSStatusHexed",
+		"XHSStatusSleep",
+		"XHSStatusFeared",
+		"XHSStatusTaunted",
+		"XHSStatusCycloned",
+		"XHSStatusRooted",
+		"XHSStatusLeashed",
+		"XHSStatusSilenced",
+		"XHSStatusMuted",
+		"XHSStatusDisarmed",
+		"XHSStatusBroken",
+		"XHSStatusInvulnerable",
 	];
 
 	var DEFAULT_SUPPORTER_TIER_CATALOG = [
@@ -106,31 +124,6 @@ var XHSTopHud = (function () {
 			x: Number(panel.actualxoffset || 0),
 			y: Number(panel.actualyoffset || 0)
 		};
-	}
-
-	function PositionAllyHover(card, hover) {
-		var root = Panel("XHSTopHudRoot");
-		if (!card || !hover || !root) {
-			return;
-		}
-
-		var cardPosition = GetPanelWindowPosition(card);
-		var rootPosition = GetPanelWindowPosition(root);
-		var cardWidth = Number(card.actuallayoutwidth || card.desiredlayoutwidth || 0);
-		var cardHeight = Number(card.actuallayoutheight || card.desiredlayoutheight || 0);
-		var hoverWidth = Number(hover.actuallayoutwidth || hover.desiredlayoutwidth || 322);
-		var rootWidth = Number(root.actuallayoutwidth || root.desiredlayoutwidth || 1920);
-
-		var x = cardPosition.x - rootPosition.x;
-		var y = cardPosition.y - rootPosition.y + cardHeight + 8;
-
-		if (x + hoverWidth > rootWidth - 12) {
-			x = cardPosition.x - rootPosition.x + cardWidth - hoverWidth;
-		}
-
-		x = Math.max(12, Math.floor(x));
-		y = Math.max(0, Math.floor(y));
-		hover.style.position = x + "px " + y + "px 0px";
 	}
 
 	function SetText(id, value) {
@@ -263,49 +256,6 @@ var XHSTopHud = (function () {
 		return localized;
 	}
 
-	function FormatVotePower(value) {
-		var votes = Math.max(1, Math.floor(ToNumber(value, 1)));
-		return votes + " setup " + (votes > 1 ? "votes" : "vote");
-	}
-
-	function FormatWinrate(value) {
-		if (value === undefined || value === null || value === "") {
-			return "-";
-		}
-
-		var numberValue = Number(value);
-		if (isNaN(numberValue)) {
-			return value.toString();
-		}
-
-		if (numberValue > 0 && numberValue <= 1) {
-			numberValue = numberValue * 100;
-		}
-
-		return Math.round(numberValue) + "%";
-	}
-
-	function FormatAccountXPSummary(data) {
-		var level = Math.max(0, ToNumber(data.accountLevel, 0));
-		var total = Math.max(0, ToNumber(data.accountXPTotal, 0));
-		var current = Math.max(0, ToNumber(data.accountXPCurrent, 0));
-		var max = Math.max(0, ToNumber(data.accountXPMax, 0));
-
-		if (level <= 0 && total <= 0 && current <= 0 && max <= 0) {
-			return "-";
-		}
-
-		if (total > 0) {
-			return "L" + Math.max(1, level) + " " + FormatNumber(total);
-		}
-
-		if (max > 0) {
-			return "L" + Math.max(1, level) + " " + FormatNumber(current) + " / " + FormatNumber(max);
-		}
-
-		return "L" + Math.max(1, level);
-	}
-
 	function SetChildText(parent, childID, value) {
 		if (!parent) {
 			return;
@@ -315,20 +265,6 @@ var XHSTopHud = (function () {
 		if (child) {
 			child.text = value === undefined || value === null ? "" : value.toString();
 		}
-	}
-
-	function SetFillPercent(parent, childID, current, max) {
-		if (!parent) {
-			return;
-		}
-
-		var child = parent.FindChildTraverse(childID);
-		if (!child) {
-			return;
-		}
-
-		var percent = Clamp(Math.floor((ToNumber(current, 0) / Math.max(ToNumber(max, 1), 1)) * 100), 0, 100);
-		child.style.width = percent + "%";
 	}
 
 	function IntToColorString(value) {
@@ -857,7 +793,6 @@ var XHSTopHud = (function () {
 			if (label) {
 				label.SetHasClass("IsSelectedHero", isSelected);
 				label.SetHasClass("XHSOverheadSelectedHero", isSelected);
-				label.SetHasClass("XHSOverheadSelectedCompact", isSelected && !isAltDown && !isReincarnating);
 			}
 		}
 	}
@@ -886,7 +821,25 @@ var XHSTopHud = (function () {
 		content.AddClass("XHSOverheadContent");
 		content.hittest = false;
 
-		var topRow = $.CreatePanel("Panel", content, "XHSOverheadTopRow_" + playerID);
+		var leftContent = $.CreatePanel("Panel", content, "XHSOverheadLeftContent_" + playerID);
+		leftContent.AddClass("XHSOverheadLeftContent");
+		leftContent.hittest = false;
+
+		var centerContent = $.CreatePanel("Panel", content, "XHSOverheadCenterContent_" + playerID);
+		centerContent.AddClass("XHSOverheadCenterContent");
+		centerContent.hittest = false;
+
+		var rightContent = $.CreatePanel("Panel", content, "XHSOverheadRightContent_" + playerID);
+		rightContent.AddClass("XHSOverheadRightContent");
+		rightContent.hittest = false;
+
+		var portraitFrame = $.CreatePanel("Panel", leftContent, "XHSOverheadHeroPortraitFrame_" + playerID);
+		portraitFrame.AddClass("XHSOverheadHeroPortraitFrame");
+		portraitFrame.hittest = false;
+
+		CreateOverheadHeroImage(portraitFrame, "XHSOverheadHeroPortrait_" + playerID);
+
+		var topRow = $.CreatePanel("Panel", centerContent, "XHSOverheadTopRow_" + playerID);
 		topRow.AddClass("XHSOverheadTopRow");
 		topRow.hittest = false;
 
@@ -906,7 +859,7 @@ var XHSTopHud = (function () {
 		name.AddClass("XHSOverheadName");
 		name.hittest = false;
 
-		var statusRow = $.CreatePanel("Panel", content, "XHSOverheadStatusRow_" + playerID);
+		var statusRow = $.CreatePanel("Panel", centerContent, "XHSOverheadStatusRow_" + playerID);
 		statusRow.AddClass("XHSOverheadStatusRow");
 		statusRow.hittest = false;
 
@@ -922,15 +875,9 @@ var XHSTopHud = (function () {
 		altStatus.AddClass("XHSOverheadAltStatus");
 		altStatus.hittest = false;
 
-		var bars = $.CreatePanel("Panel", label, "XHSOverheadBars_" + playerID);
+		var bars = $.CreatePanel("Panel", centerContent, "XHSOverheadBars_" + playerID);
 		bars.AddClass("XHSOverheadBars");
 		bars.hittest = false;
-
-		var portraitFrame = $.CreatePanel("Panel", bars, "XHSOverheadHeroPortraitFrame_" + playerID);
-		portraitFrame.AddClass("XHSOverheadHeroPortraitFrame");
-		portraitFrame.hittest = false;
-
-		CreateOverheadHeroImage(portraitFrame, "XHSOverheadHeroPortrait_" + playerID);
 
 		var vitalsFrame = $.CreatePanel("Panel", bars, "XHSOverheadVitalsFrame_" + playerID);
 		vitalsFrame.AddClass("XHSOverheadVitalsFrame");
@@ -961,7 +908,7 @@ var XHSTopHud = (function () {
 		manaFill.AddClass("XHSOverheadManaFill");
 		manaFill.hittest = false;
 
-		var healthLevel = $.CreatePanel("Label", bars, "XHSOverheadHealthLevel_" + playerID);
+		var healthLevel = $.CreatePanel("Label", rightContent, "XHSOverheadHealthLevel_" + playerID);
 		healthLevel.AddClass("XHSOverheadHealthLevel");
 		healthLevel.hittest = false;
 
@@ -1147,7 +1094,25 @@ var XHSTopHud = (function () {
 		content.AddClass("XHSOverheadContent");
 		content.hittest = false;
 
-		var topRow = $.CreatePanel("Panel", content, "XHSOverheadTopRow_" + key);
+		var leftContent = $.CreatePanel("Panel", content, "XHSOverheadLeftContent_" + key);
+		leftContent.AddClass("XHSOverheadLeftContent");
+		leftContent.hittest = false;
+
+		var centerContent = $.CreatePanel("Panel", content, "XHSOverheadCenterContent_" + key);
+		centerContent.AddClass("XHSOverheadCenterContent");
+		centerContent.hittest = false;
+
+		var rightContent = $.CreatePanel("Panel", content, "XHSOverheadRightContent_" + key);
+		rightContent.AddClass("XHSOverheadRightContent");
+		rightContent.hittest = false;
+
+		var portraitFrame = $.CreatePanel("Panel", leftContent, "XHSOverheadHeroPortraitFrame_" + key);
+		portraitFrame.AddClass("XHSOverheadHeroPortraitFrame");
+		portraitFrame.hittest = false;
+		var portrait = CreateOverheadHeroImage(portraitFrame, "XHSOverheadHeroPortrait_" + key);
+		SetOverheadHeroImage(portrait, data.heroName);
+
+		var topRow = $.CreatePanel("Panel", centerContent, "XHSOverheadTopRow_" + key);
 		topRow.AddClass("XHSOverheadTopRow");
 		topRow.hittest = false;
 
@@ -1169,7 +1134,7 @@ var XHSTopHud = (function () {
 		name.text = data.name || "";
 		name.hittest = false;
 
-		var statusRow = $.CreatePanel("Panel", content, "XHSOverheadStatusRow_" + key);
+		var statusRow = $.CreatePanel("Panel", centerContent, "XHSOverheadStatusRow_" + key);
 		statusRow.AddClass("XHSOverheadStatusRow");
 		statusRow.hittest = false;
 
@@ -1187,15 +1152,9 @@ var XHSTopHud = (function () {
 		altStatus.text = data.altStatus || "";
 		altStatus.hittest = false;
 
-		var bars = $.CreatePanel("Panel", label, "XHSOverheadBars_" + key);
+		var bars = $.CreatePanel("Panel", centerContent, "XHSOverheadBars_" + key);
 		bars.AddClass("XHSOverheadBars");
 		bars.hittest = false;
-
-		var portraitFrame = $.CreatePanel("Panel", bars, "XHSOverheadHeroPortraitFrame_" + key);
-		portraitFrame.AddClass("XHSOverheadHeroPortraitFrame");
-		portraitFrame.hittest = false;
-		var portrait = CreateOverheadHeroImage(portraitFrame, "XHSOverheadHeroPortrait_" + key);
-		SetOverheadHeroImage(portrait, data.heroName);
 
 		var vitalsFrame = $.CreatePanel("Panel", bars, "XHSOverheadVitalsFrame_" + key);
 		vitalsFrame.AddClass("XHSOverheadVitalsFrame");
@@ -1226,7 +1185,7 @@ var XHSTopHud = (function () {
 		manaFill.AddClass("XHSOverheadManaFill");
 		manaFill.hittest = false;
 
-		var healthLevel = $.CreatePanel("Label", bars, "XHSOverheadHealthLevel_" + key);
+		var healthLevel = $.CreatePanel("Label", rightContent, "XHSOverheadHealthLevel_" + key);
 		healthLevel.AddClass("XHSOverheadHealthLevel");
 		healthLevel.text = Math.max(1, ToNumber(data.level, 1)).toString();
 		healthLevel.hittest = false;
@@ -1471,6 +1430,66 @@ var XHSTopHud = (function () {
 		}
 	}
 
+	function GetOverheadStatusEffect(entIndex) {
+		if (!IsValidEntityIndex(entIndex)) {
+			return null;
+		}
+
+		var data = CustomNetTables.GetTableValue("player_table", entIndex.toString() + "_status_effect") || {};
+		if (ToNumber(data.active, 0) <= 0 || !data.label || !data.class_name) {
+			return null;
+		}
+
+		return data;
+	}
+
+	function ClearOverheadStatusClasses(label) {
+		if (!label) {
+			return;
+		}
+
+		for (var i = 0; i < OVERHEAD_STATUS_CLASSES.length; i++) {
+			label.SetHasClass(OVERHEAD_STATUS_CLASSES[i], false);
+		}
+	}
+
+	function FormatOverheadStatusLabel(statusEffect) {
+		if (!statusEffect) {
+			return "";
+		}
+
+		var label = NormalizeTextValue(statusEffect.label);
+		var remaining = ToNumber(statusEffect.remaining, 0);
+		var endTime = ToNumber(statusEffect.end_time, 0);
+
+		if (endTime > 0) {
+			remaining = Math.max(0, endTime - GetCurrentGameTime());
+		}
+
+		if (remaining > 0) {
+			return label + " " + Math.ceil(remaining).toString() + "s";
+		}
+
+		return label;
+	}
+
+	function ApplyOverheadStatusEffect(label, playerID, statusEffect) {
+		if (!label) {
+			return;
+		}
+
+		ClearOverheadStatusClasses(label);
+
+		var hasStatus = !!statusEffect;
+		label.SetHasClass("XHSOverheadHasStatusEffect", hasStatus);
+		if (hasStatus) {
+			label.SetHasClass(statusEffect.class_name, true);
+			var statusText = FormatOverheadStatusLabel(statusEffect);
+			SetChildText(label, "XHSOverheadGameplayStatus_" + playerID, statusText);
+			SetChildText(label, "XHSOverheadAltStatus_" + playerID, statusText);
+		}
+	}
+
 	function FormatOverheadGameplayStatus(data) {
 		if (data.reincarnationState && data.reincarnationState.active) {
 			return FormatReincarnationStatus(data.reincarnationState);
@@ -1523,6 +1542,7 @@ var XHSTopHud = (function () {
 		SetChildText(label, "XHSOverheadGameplayStatus_" + playerID, FormatOverheadGameplayStatus(data));
 		SetChildText(label, "XHSOverheadAltStatus_" + playerID, FormatOverheadAltStatus(data));
 		SetChildText(label, "XHSOverheadHealthLevel_" + playerID, Math.max(1, ToNumber(data.heroLevel, 1)).toString());
+		ApplyOverheadStatusEffect(label, playerID, GetOverheadStatusEffect(entIndex));
 
 		var portrait = label.FindChildTraverse("XHSOverheadHeroPortrait_" + playerID);
 		SetOverheadHeroImage(portrait, data.heroName);
@@ -1562,6 +1582,7 @@ var XHSTopHud = (function () {
 		label.SetHasClass("XHSOverheadLowHealth", clampedHealth > 0 && clampedHealth <= 30);
 		label.SetHasClass("XHSNoMana", !hasMana);
 		label.SetAttributeInt("death_hidden", shouldHideDeadOverhead ? 1 : 0);
+		ApplyOverheadStatusEffect(label, playerID, GetOverheadStatusEffect(entIndex));
 
 		if (reincarnationState.active) {
 			SetChildText(label, "XHSOverheadGameplayStatus_" + playerID, FormatReincarnationStatus(reincarnationState));
@@ -1631,118 +1652,66 @@ var XHSTopHud = (function () {
 		}
 	}
 
-	function CreateHoverStat(parent, id, labelText) {
-		var stat = $.CreatePanel("Panel", parent, "XHSSupporterHoverStat_" + id);
-		stat.AddClass("XHSSupporterHoverStat");
-
-		var label = $.CreatePanel("Label", stat, "XHSSupporterHoverStatLabel_" + id);
-		label.AddClass("XHSSupporterHoverStatLabel");
-		label.text = labelText;
-
-		var value = $.CreatePanel("Label", stat, "XHSSupporterHoverStatValue_" + id);
-		value.AddClass("XHSSupporterHoverStatValue");
-		value.text = "-";
-	}
-
-	function CreateHoverMeter(parent, id, labelText) {
-		var meter = $.CreatePanel("Panel", parent, "XHSSupporterHoverMeter_" + id);
-		meter.AddClass("XHSSupporterHoverMeter");
-
-		var row = $.CreatePanel("Panel", meter, "XHSSupporterHoverMeterRow_" + id);
-		row.AddClass("XHSSupporterHoverMeterRow");
-
-		var label = $.CreatePanel("Label", row, "XHSSupporterHoverMeterLabel_" + id);
-		label.AddClass("XHSSupporterHoverMeterLabel");
-		label.text = labelText;
-
-		var value = $.CreatePanel("Label", row, "XHSSupporterHoverMeterValue_" + id);
-		value.AddClass("XHSSupporterHoverMeterValue");
-		value.text = "-";
-
-		var track = $.CreatePanel("Panel", meter, "XHSSupporterHoverMeterTrack_" + id);
-		track.AddClass("XHSSupporterHoverMeterTrack");
-
-		var fill = $.CreatePanel("Panel", track, "XHSSupporterHoverMeterFill_" + id);
-		fill.AddClass("XHSSupporterHoverMeterFill");
-	}
-
 	function CreateAllyHoverCard(card, playerID, isRightSide) {
 		var hoverParent = Panel("XHSTopHudRoot") || card;
-		var hover = $.CreatePanel("Panel", hoverParent, "XHSSupporterHoverCard_" + playerID);
-		hover.AddClass("XHSSupporterHoverCard");
-		hover.AddClass(isRightSide ? "XHSSupporterHoverRight" : "XHSSupporterHoverLeft");
-		hover.hittest = false;
-
-		var header = $.CreatePanel("Panel", hover, "XHSSupporterHoverHeader_" + playerID);
-		header.AddClass("XHSSupporterHoverHeader");
-
-		var heroFrame = $.CreatePanel("Panel", header, "XHSSupporterHoverHeroFrame_" + playerID);
-		heroFrame.AddClass("XHSSupporterHoverHeroFrame");
-
-		var heroImage = $.CreatePanel("DOTAHeroImage", heroFrame, "XHSSupporterHoverHeroImage_" + playerID);
-		heroImage.AddClass("XHSSupporterHoverHeroImage");
-		heroImage.heroimagestyle = "landscape";
-		heroImage.scaling = "stretch-to-cover-preserve-aspect";
-
-		var headerCopy = $.CreatePanel("Panel", header, "XHSSupporterHoverHeaderCopy_" + playerID);
-		headerCopy.AddClass("XHSSupporterHoverHeaderCopy");
-
-		var eyebrow = $.CreatePanel("Label", headerCopy, "XHSSupporterHoverEyebrow_" + playerID);
-		eyebrow.AddClass("XHSSupporterHoverEyebrow");
-		eyebrow.text = "SUPPORTER PROFILE";
-
-		var playerName = $.CreatePanel("Label", headerCopy, "XHSSupporterHoverPlayerName_" + playerID);
-		playerName.AddClass("XHSSupporterHoverPlayerName");
-
-		var heroName = $.CreatePanel("Label", headerCopy, "XHSSupporterHoverHeroName_" + playerID);
-		heroName.AddClass("XHSSupporterHoverHeroName");
-
-		var tierBadge = $.CreatePanel("Panel", hover, "XHSSupporterHoverTierBadge_" + playerID);
-		tierBadge.AddClass("XHSSupporterHoverTierBadge");
-
-		var tierLabel = $.CreatePanel("Label", tierBadge, "XHSSupporterHoverTierLabel_" + playerID);
-		tierLabel.AddClass("XHSSupporterHoverTierLabel");
-		tierLabel.text = "TIER";
-
-		var tierValue = $.CreatePanel("Label", tierBadge, "XHSSupporterHoverTierValue_" + playerID);
-		tierValue.AddClass("XHSSupporterHoverTierValue");
-
-		var stats = $.CreatePanel("Panel", hover, "XHSSupporterHoverStats_" + playerID);
-		stats.AddClass("XHSSupporterHoverStats");
-		CreateHoverStat(stats, "AccountLevel_" + playerID, "XHS Level");
-		CreateHoverStat(stats, "SeasonLevel_" + playerID, "Season Level");
-		CreateHoverStat(stats, "Fragments_" + playerID, "Fragments");
-		CreateHoverStat(stats, "Winrate_" + playerID, "Winrate");
-		CreateHoverStat(stats, "HeroLevel_" + playerID, "Hero Level");
-		CreateHoverStat(stats, "Ankh_" + playerID, "Ankh");
-
-		CreateHoverMeter(hover, "XP_" + playerID, "Season XP");
-		CreateHoverMeter(hover, "AccountXP_" + playerID, "Global XP");
-		CreateHoverMeter(hover, "Weekly_" + playerID, "Daily Cap");
-
-		var perks = $.CreatePanel("Panel", hover, "XHSSupporterHoverPerks_" + playerID);
-		perks.AddClass("XHSSupporterHoverPerks");
-
-		var perksTitle = $.CreatePanel("Label", perks, "XHSSupporterHoverPerksTitle_" + playerID);
-		perksTitle.AddClass("XHSSupporterHoverPerksTitle");
-
-		for (var i = 1; i <= 3; i++) {
-			var perk = $.CreatePanel("Label", perks, "XHSSupporterHoverPerk" + i + "_" + playerID);
-			perk.AddClass("XHSSupporterHoverPerk");
+		if (typeof XHSSupporterHover !== "undefined" && XHSSupporterHover.Create) {
+			XHSSupporterHover.Create(hoverParent, playerID, { isRightSide: isRightSide, extraStats: true });
 		}
-
-		var footer = $.CreatePanel("Label", hover, "XHSSupporterHoverFooter_" + playerID);
-		footer.AddClass("XHSSupporterHoverFooter");
 	}
 
-	function CreateAllyCard(playerID, rosterIndex) {
+	function GetFixedRosterSlotIndex(playerID, playerInfo) {
+		var playerSlot = playerInfo ? parseInt(playerInfo.player_slot, 10) : NaN;
+		if (!isNaN(playerSlot)) {
+			if (playerSlot >= 128) {
+				playerSlot -= 128;
+			}
+
+			if (playerSlot >= 0 && playerSlot < MAX_PLAYER_DISPLAY_SLOTS) {
+				return playerSlot;
+			}
+		}
+
+		playerID = parseInt(playerID, 10);
+		if (isNaN(playerID) || playerID < 0 || playerID >= MAX_PLAYER_DISPLAY_SLOTS) {
+			return -1;
+		}
+
+		return playerID;
+	}
+
+	function EnsureAllyRosterSlot(rosterIndex) {
 		var isRightSide = rosterIndex >= 4;
 		var roster = Panel(isRightSide ? "XHSAllyRosterRight" : "XHSAllyRosterLeft");
 		if (!roster) {
 			return null;
 		}
 
-		var card = $.CreatePanel("Panel", roster, "XHSAllyCard_" + playerID);
+		var slot = roster.FindChild("XHSAllySlot_" + rosterIndex);
+		if (!slot) {
+			slot = $.CreatePanel("Panel", roster, "XHSAllySlot_" + rosterIndex);
+			slot.AddClass("XHSAllySlot");
+			slot.SetAttributeInt("roster_index", rosterIndex);
+			slot.hittest = false;
+			slot.hittestchildren = true;
+		}
+
+		return slot;
+	}
+
+	function EnsureAllyRosterSlots() {
+		for (var rosterIndex = 0; rosterIndex < MAX_PLAYER_DISPLAY_SLOTS; rosterIndex++) {
+			EnsureAllyRosterSlot(rosterIndex);
+		}
+	}
+
+	function CreateAllyCard(playerID, rosterIndex) {
+		var isRightSide = rosterIndex >= 4;
+		var slot = EnsureAllyRosterSlot(rosterIndex);
+		if (!slot) {
+			return null;
+		}
+
+		var card = $.CreatePanel("Panel", slot, "XHSAllyCard_" + playerID);
 		card.AddClass("XHSAllyCard");
 		card.SetAttributeInt("player_id", playerID);
 		card.SetAttributeInt("ent_index", -1);
@@ -1762,6 +1731,18 @@ var XHSTopHud = (function () {
 		heroImage.heroimagestyle = "landscape";
 		heroImage.scaling = "stretch-to-cover-preserve-aspect";
 		heroImage.hittest = false;
+
+		var supporterTint = $.CreatePanel("Panel", imageWrap, "XHSSupporterPortraitTint_" + playerID);
+		supporterTint.AddClass("XHSSupporterPortraitTint");
+		supporterTint.hittest = false;
+
+		var supporterSweep = $.CreatePanel("Panel", imageWrap, "XHSSupporterPortraitSweep_" + playerID);
+		supporterSweep.AddClass("XHSSupporterPortraitSweep");
+		supporterSweep.hittest = false;
+
+		var supporterMark = $.CreatePanel("Panel", imageWrap, "XHSSupporterMark_" + playerID);
+		supporterMark.AddClass("XHSSupporterMark");
+		supporterMark.hittest = false;
 
 		var overlay = $.CreatePanel("Panel", imageWrap, "XHSAllyStatusOverlay_" + playerID);
 		overlay.AddClass("XHSAllyStatusOverlay");
@@ -2003,10 +1984,9 @@ var XHSTopHud = (function () {
 			return;
 		}
 
-		card.AddClass("XHSHoverVisible");
 		var hover = Panel("XHSSupporterHoverCard_" + playerID);
-		if (hover) {
-			hover.AddClass("XHSHoverVisible");
+		if (typeof XHSSupporterHover !== "undefined" && XHSSupporterHover.Show) {
+			XHSSupporterHover.Show(card, hover);
 		}
 		UpdateAllyHover(card, playerID);
 	}
@@ -2014,10 +1994,9 @@ var XHSTopHud = (function () {
 	function HideAllyHover(card) {
 		if (card) {
 			var hover = Panel("XHSSupporterHoverCard_" + card.GetAttributeInt("player_id", -1));
-			if (hover) {
-				hover.RemoveClass("XHSHoverVisible");
+			if (typeof XHSSupporterHover !== "undefined" && XHSSupporterHover.Hide) {
+				XHSSupporterHover.Hide(card, hover);
 			}
-			card.RemoveClass("XHSHoverVisible");
 		}
 	}
 
@@ -2037,56 +2016,37 @@ var XHSTopHud = (function () {
 		}
 
 		var data = GetSupporterPlayerData(playerID, entIndex);
-		ClearSupporterTierClasses(hover);
-		hover.AddClass("XHSSupporterTier" + data.tier);
-
-		var heroImage = hover.FindChildTraverse("XHSSupporterHoverHeroImage_" + playerID);
-		if (heroImage && data.heroName) {
-			heroImage.heroname = data.heroName;
-		}
-
-		SetChildText(hover, "XHSSupporterHoverPlayerName_" + playerID, data.playerName);
-		SetChildText(hover, "XHSSupporterHoverHeroName_" + playerID, data.localHeroName || data.heroName);
-		SetChildText(hover, "XHSSupporterHoverTierValue_" + playerID, data.tierName);
-		SetChildText(hover, "XHSSupporterHoverStatValue_AccountLevel_" + playerID, data.accountLevel > 0 ? data.accountLevel : "-");
-		SetChildText(hover, "XHSSupporterHoverStatValue_SeasonLevel_" + playerID, data.seasonLevel);
-		SetChildText(hover, "XHSSupporterHoverStatValue_Fragments_" + playerID, FormatNumber(data.fragments));
-		SetChildText(hover, "XHSSupporterHoverStatValue_Winrate_" + playerID, FormatWinrate(data.winrate));
-		SetChildText(hover, "XHSSupporterHoverStatValue_HeroLevel_" + playerID, data.heroLevel);
-		SetChildText(hover, "XHSSupporterHoverStatValue_Ankh_" + playerID, data.ankhCharges);
-		SetChildText(hover, "XHSSupporterHoverMeterValue_XP_" + playerID, FormatNumber(data.seasonXP) + " / " + FormatNumber(data.seasonXPMax));
-		SetChildText(hover, "XHSSupporterHoverMeterValue_AccountXP_" + playerID, FormatAccountXPSummary(data));
-		SetChildText(hover, "XHSSupporterHoverMeterValue_Weekly_" + playerID, FormatNumber(data.weeklyFragments) + " / " + FormatNumber(data.weeklyCap));
-		SetFillPercent(hover, "XHSSupporterHoverMeterFill_XP_" + playerID, data.seasonXP, data.seasonXPMax);
-		SetFillPercent(hover, "XHSSupporterHoverMeterFill_AccountXP_" + playerID, data.accountXPCurrent, data.accountXPMax > 0 ? data.accountXPMax : 1);
-		SetFillPercent(hover, "XHSSupporterHoverMeterFill_Weekly_" + playerID, data.weeklyFragments, data.weeklyCap);
-		PositionAllyHover(card, hover);
-
-		if (data.tier > 0) {
-			SetChildText(hover, "XHSSupporterHoverPerksTitle_" + playerID, "Active status");
-			SetChildText(hover, "XHSSupporterHoverPerk1_" + playerID, "+" + FormatNumber(data.fragmentsPerMonth) + " monthly fragments");
-			SetChildText(hover, "XHSSupporterHoverPerk2_" + playerID, "+" + FormatNumber(data.xpBoost) + "% season XP");
-			SetChildText(hover, "XHSSupporterHoverPerk3_" + playerID, FormatVotePower(data.votePower));
-			SetChildText(hover, "XHSSupporterHoverFooter_" + playerID, "Cosmetic prestige only. No combat power is sold.");
-		} else {
-			var entryTier = GetSupporterTierInfo(1);
-			SetChildText(hover, "XHSSupporterHoverPerksTitle_" + playerID, "Supporter upgrade");
-			SetChildText(hover, "XHSSupporterHoverPerk1_" + playerID, "+" + FormatNumber(entryTier.fragments) + " monthly fragments");
-			SetChildText(hover, "XHSSupporterHoverPerk2_" + playerID, "+" + FormatNumber(entryTier.xpBoost) + "% season XP");
-			SetChildText(hover, "XHSSupporterHoverPerk3_" + playerID, FormatVotePower(entryTier.votePower));
-			SetChildText(hover, "XHSSupporterHoverFooter_" + playerID, "Match this status from the Supporter Pass panel.");
+		if (typeof XHSSupporterHover !== "undefined" && XHSSupporterHover.Update) {
+			XHSSupporterHover.Update(hover, playerID, data);
+			XHSSupporterHover.PositionNearAnchor(card, hover, Panel("XHSTopHudRoot"), {
+				side: card.GetAttributeInt("roster_side", 0) === 1 ? "left" : "right",
+			});
 		}
 	}
 
 	function UpdateAllySupporterTier(card, playerID) {
 		var supporterMark = card.FindChildTraverse("XHSSupporterMark_" + playerID);
 		var supporterCrestLabel = card.FindChildTraverse("XHSSupporterCrestLabel_" + playerID);
+		var tierData = GetSupporterTierData(playerID);
+		var tier = Clamp(ToNumber(tierData.tier, 0), 0, 5);
 
 		ClearSupporterTierClasses(card);
 		ClearSupporterTierClasses(supporterMark);
+		card.SetHasClass("XHSAllySupporter", tier > 0);
+
+		if (tier > 0) {
+			card.AddClass("XHSSupporterTier" + tier);
+		}
+
+		if (supporterMark) {
+			supporterMark.SetHasClass("XHSAllySupporter", tier > 0);
+			if (tier > 0) {
+				supporterMark.AddClass("XHSSupporterTier" + tier);
+			}
+		}
 
 		if (supporterCrestLabel) {
-			supporterCrestLabel.text = "";
+			supporterCrestLabel.text = tier > 0 ? GetSupporterTierBadgeLetter(tierData) : "";
 		}
 	}
 
@@ -2252,15 +2212,22 @@ var XHSTopHud = (function () {
 	}
 
 	function RefreshAllyRoster() {
+		EnsureAllyRosterSlots();
+
 		var playerIDs = GetRosterPlayerIDs();
 		var activePlayerIDs = {};
 
-		for (var slotIndex = 0; slotIndex < playerIDs.length; slotIndex++) {
-			var playerID = playerIDs[slotIndex];
+		for (var i = 0; i < playerIDs.length; i++) {
+			var playerID = playerIDs[i];
+			var playerInfo = Game.GetPlayerInfo(playerID);
+			var slotIndex = GetFixedRosterSlotIndex(playerID, playerInfo);
+			if (slotIndex < 0) {
+				continue;
+			}
+
 			activePlayerIDs[playerID] = true;
 
 			var entIndex = Players.GetPlayerHeroEntityIndex(playerID);
-			var playerInfo = Game.GetPlayerInfo(playerID);
 
 			if (!IsValidEntityIndex(entIndex)) {
 				if (allyCards[playerID]) {
@@ -2598,6 +2565,7 @@ var XHSTopHud = (function () {
 		});
 
 		UpdateFocusTimersVisibility();
+		EnsureAllyRosterSlots();
 		BuildOverheadMockups();
 		StartHeroRefreshLoop();
 		StartVitalsRefreshLoop();

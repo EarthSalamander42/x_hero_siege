@@ -586,6 +586,9 @@ function CustomTimers:CreateSpecialWaveTimerParticle(direction, duration)
 	CustomTimers:ClearSpecialWaveTimerParticles()
 
 	local origin = spawner:GetAbsOrigin()
+	local radius = 1000
+
+	--TODO: Add a particle effect for the special wave timer countdown
 
 	AddFOWViewer(DOTA_TEAM_GOODGUYS, origin, radius, duration, false)
 end

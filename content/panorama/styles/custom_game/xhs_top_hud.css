@@ -412,6 +412,7 @@
 	font-size: 10px;
 	font-weight: bold;
 	text-align: center;
+	text-overflow: shrink;
 	text-shadow: 0px 1px 2px #000000, 0px 0px 6px #ffb13d82;
 	opacity: 1;
 	transform: translateY( 0px );
@@ -1760,6 +1761,13 @@
 	overflow: noclip;
 }
 
+.XHSAllySlot {
+	width: 88px;
+	height: 89px;
+	flow-children: none;
+	overflow: noclip;
+}
+
 #XHSAllyRosterLeft {
 	align: left top;
 }
@@ -1837,6 +1845,10 @@
 	overflow: noclip;
 	transition-property: brightness, transform;
 	transition-duration: 0.12s;
+}
+
+#XHSAllyRosterRight .XHSAllySlot {
+	margin-right: 2px;
 }
 
 #XHSAllyRosterRight .XHSAllyCard {
@@ -2404,6 +2416,12 @@
 	margin-right: 6px;
 }
 
+.AspectRatio16x10 .XHSAllySlot {
+	width: 61px;
+	height: 82px;
+	margin-right: 6px;
+}
+
 .AspectRatio16x10 .XHSAllyImageWrap {
 	width: 57px;
 	height: 36px;
@@ -2529,6 +2547,13 @@
 	padding: 0px;
 }
 
+.AspectRatio4x3 .XHSAllySlot {
+	width: 54px;
+	height: 77px;
+	margin-right: 6px;
+	margin-bottom: 3px;
+}
+
 .AspectRatio4x3 .XHSAllyImageWrap {
 	width: 50px;
 	height: 32px;
@@ -2593,25 +2618,13 @@
 
 
 
-/* Donator UI reset: visual treatment is removed until the next mockup pass. */
+/* Legacy overhead donor pieces stay hidden; top bar portraits use the lightweight treatment above. */
 .XHSOverheadBadge,
 .XHSOverheadTagWrap,
-.XHSSupporterPortraitTint,
-.XHSSupporterPortraitSweep,
 .XHSSupporterCrest,
 .XHSSupporterMark {
 	visibility: collapse;
 	opacity: 0;
-	animation-name: none;
-}
-
-.XHSAllyCard.XHSSupporterTier1 .XHSAllyImageWrap,
-.XHSAllyCard.XHSSupporterTier2 .XHSAllyImageWrap,
-.XHSAllyCard.XHSSupporterTier3 .XHSAllyImageWrap,
-.XHSAllyCard.XHSSupporterTier4 .XHSAllyImageWrap,
-.XHSAllyCard.XHSSupporterTier5 .XHSAllyImageWrap {
-	border: 1px solid #000000dd;
-	box-shadow: inset #ffffff16 0px 1px 0px 0px, fill #0000008a 0px 0px 5px 0px;
 	animation-name: none;
 }
 

@@ -1933,7 +1933,7 @@
 
 .bottom-mods-arrow {
 	width: 38px;
-	height: 100%;
+	height: 55%;
 	margin: 0px 4px;
 	vertical-align: center;
 	background-color: #0b111bcc;
@@ -2792,7 +2792,7 @@
 }
 
 #ProfileModalIdentity {
-	width: fill-parent-flow(1.0);
+	width: 95%;
 	height: 100%;
 	flow-children: right;
 }

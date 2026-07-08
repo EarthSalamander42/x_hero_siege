@@ -1325,5 +1325,4 @@
 	GameEvents.Subscribe("xhs_main_quest_completed", showMainQuestCompleted);
 	GameEvents.Subscribe("xhs_reward_notification", showRewardNotification);
 	GameEvents.Subscribe("xhs_fragment_quest_star", showFragmentQuestStar);
-	enqueueFragmentQuestToolsPreview();
 })();

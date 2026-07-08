@@ -3,7 +3,7 @@
 "DOTA_Tooltip_ability_holdout_entrangling_roots_Note0"					"The first damage instance occurs on cast."
 "DOTA_Tooltip_ability_holdout_entrangling_roots_Lore"					""
 "DOTA_Tooltip_ability_holdout_entrangling_roots_dmg_per_sec"				"DAMAGE PER SECOND:"
-"DOTA_Tooltip_ability_holdout_entrangling_roots_duration"				"#{DOTA_Tooltip_ability_courier_shield_duration}"
+"DOTA_Tooltip_ability_holdout_entrangling_roots_duration"				"#{DOTA_Tooltip_ability_abaddon_borrowed_time_duration}"
 "DOTA_Tooltip_ability_holdout_entrangling_roots_total_damage_tooltip"	"TOTAL DAMAGE:"
 
 "DOTA_Tooltip_ability_holdout_rejuvenation_alt"								"Rejuvenation"
@@ -15,7 +15,7 @@
 "DOTA_Tooltip_ability_holdout_rejuvenation_alt_heal_per_sec_building_pct"	"%HEAL PER SEC (BUILDINGS):"
 "DOTA_Tooltip_ability_holdout_rejuvenation_alt_total_heal_tooltip"			"TOTAL HEAL:"
 "DOTA_Tooltip_ability_holdout_rejuvenation_alt_radius"						"RADIUS:"
-"DOTA_Tooltip_ability_holdout_rejuvenation_alt_duration"						"#{DOTA_Tooltip_ability_courier_shield_duration}"
+"DOTA_Tooltip_ability_holdout_rejuvenation_alt_duration"						"#{DOTA_Tooltip_ability_abaddon_borrowed_time_duration}"
 
 "DOTA_Tooltip_modifier_rejuvenation"										"Rejuvenation"
 "DOTA_Tooltip_modifier_rejuvenation_Description"							"Restores health over time."

@@ -33,6 +33,7 @@ if IsInToolsMode() then
 end
 require('components/battlepass/init')
 require('components/timers/init')
+require('components/overhead_status/init')
 require('components/runes/init')
 require('components/fragment_quests/init')
 
@@ -285,6 +286,10 @@ function GameMode:InitGameMode()
 
 	if FragmentQuests ~= nil then
 		FragmentQuests:Init()
+	end
+
+	if XHSOverheadStatus ~= nil then
+		XHSOverheadStatus:Init()
 	end
 
 	if XHSDevTools ~= nil then

@@ -86,14 +86,15 @@
 {
 	width: 24px;
 	height: 24px;
-	horizontal-align: right;
+	horizontal-align: left;
 	vertical-align: top;
-	margin-top: 8px;
-	margin-right: 9px;
+	margin-top: 280px;
+	margin-left: 428px;
 	ignore-parent-flow: true;
 	background-color: gradient( linear, 0% 0%, 100% 100%, from( #07131df4 ), to( #102536f4 ) );
 	border: 1px solid #77c8ff3c;
 	box-shadow: fill #00111faa 0px 0px 5px 0px;
+	z-index: 12;
 	transition-property: brightness, background-color, border, transform;
 	transition-duration: .14s;
 }
@@ -126,11 +127,16 @@
 	transform: rotateZ( 45deg );
 }
 
+.QuestLogCollapseButton.QuestLogCollapsed
+{
+	transform: translatex( -360px );
+}
+
 .HUDFlipped .QuestLogCollapseButton
 {
-	horizontal-align: left;
-	margin-left: 9px;
-	margin-right: 0px;
+	horizontal-align: right;
+	margin-left: 0px;
+	margin-right: 428px;
 }
 
 .HUDFlipped .QuestLogCollapseButton .QuestLogCollapseArrow
@@ -143,6 +149,11 @@
 {
 	margin-left: 2px;
 	transform: rotateZ( 225deg );
+}
+
+.HUDFlipped .QuestLogCollapseButton.QuestLogCollapsed
+{
+	transform: translatex( 360px );
 }
 
 .QuestLogPinButton
@@ -638,6 +649,17 @@
 {
 	width: 320px;
 	max-height: 400px;
+}
+
+.AspectRatio4x3 .QuestLogCollapseButton
+{
+	margin-left: 348px;
+}
+
+.AspectRatio4x3.HUDFlipped .QuestLogCollapseButton
+{
+	margin-left: 0px;
+	margin-right: 348px;
 }
 
 .AspectRatio4x3 #QuestsContainer

@@ -656,6 +656,13 @@ function FragmentQuests:RecomputeQuest(quest)
 	end
 
 	quest.current_value = value
+	if self:CanScoreQuest(quest) ~= true then
+		quest.stars = 0
+		quest.fragments_awarded = 0
+		quest.completed = false
+		return
+	end
+
 	quest.stars = self:CalculateStars(quest.score_mode, value, quest.thresholds)
 	quest.fragments_awarded = quest.stars * (quest.reward_per_star or DEFAULT_REWARD_PER_STAR)
 	quest.completed = quest.stars > 0
@@ -767,6 +774,12 @@ function FragmentQuests:CalculateStars(scoreMode, value, thresholds)
 	end
 
 	return math.max(0, math.min(3, stars))
+end
+
+function FragmentQuests:CanScoreQuest(quest)
+	if quest == nil then return false end
+	if quest.score_mode == "higher_is_better" then return true end
+	return quest.final_value ~= nil
 end
 
 function FragmentQuests:MarkQuestStarted(templateID, targetID)
