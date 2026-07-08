@@ -33,6 +33,7 @@ function Precache(context)
 	--	PrecacheResource("particle", "particles/units/heroes/hero_ember_spirit/ember_spirit_flameguard.vpcf", context) -- Immolation
 	PrecacheResource("particle", "particles/items2_fx/teleport_start.vpcf", context)                          -- Immolation
 	PrecacheResource("particle", "particles/items2_fx/teleport_end.vpcf", context)                            -- Immolation
+	PrecacheResource("particle", "particles/units/heroes/hero_templar_assassin/templar_assassin_trap_rings_inner.vpcf", context) -- Final Wave dark portals
 	PrecacheResource("particle", "particles/units/heroes/hero_wisp/wisp_relocate_marker.vpcf", context)       -- Return position marker
 	PrecacheResource("particle", "particles/econ/events/fall_major_2016/teleport_start_fm06_lvl3.vpcf", context) -- Immolation
 	PrecacheResource("particle", "particles/econ/events/fall_major_2016/teleport_end_fm06_lvl3.vpcf", context) -- Immolation

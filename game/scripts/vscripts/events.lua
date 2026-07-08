@@ -1576,6 +1576,8 @@ function GameMode:OnQuestStarted(zone, quest)
 		quest.nCompleteLimit = GetXHSMagtheridonKillLimit()
 	elseif quest.szQuestName == "clear_grom_vanguard" then
 		quest.nCompleteLimit = GetXHSGromVanguardKillLimit()
+	elseif quest.szQuestName == "kill_dest_mag" then
+		quest.nCompleteLimit = GetXHSDestroyerMagnataurKillLimit()
 	end
 
 	quest.bActivated = true

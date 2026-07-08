@@ -339,6 +339,26 @@ var XHSEndScreen = (function () {
 		return table.supporter_url || table.support_url || SUPPORTER_URL;
 	}
 
+	function GetSupporterTierData(playerID, battlepass) {
+		battlepass = battlepass || {};
+
+		if (typeof XHSSupporterHover !== "undefined" && XHSSupporterHover.GetTierData) {
+			var hoverTier = XHSSupporterHover.GetTierData(playerID, battlepass);
+			return {
+				tier: Clamp(ToNumber(hoverTier.tier, 0), 0, 5),
+				name: hoverTier.name || battlepass.title || "Supporter Pass",
+				color: NormalizeColorString(hoverTier.color || battlepass.tier_color || battlepass.title_color || "#5ad0ff") || "#5ad0ffff"
+			};
+		}
+
+		var tier = Clamp(ToNumber(FirstDefined(battlepass.tier_id, battlepass.supporter_tier, battlepass.donator_level, 0), 0), 0, 5);
+		return {
+			tier: tier,
+			name: battlepass.tier_name || battlepass.supporter_tier_name || battlepass.title || "Supporter Pass",
+			color: NormalizeColorString(battlepass.tier_color || battlepass.title_color || "#5ad0ff") || "#5ad0ffff"
+		};
+	}
+
 	function MergeCompletedSupporterPass(battlepass, apiData) {
 		var merged = {};
 		battlepass = battlepass || {};
@@ -397,6 +417,7 @@ var XHSEndScreen = (function () {
 		var server = FindServerPlayer(data, steamID, playerID) || {};
 		var api = FindApiPlayer(data, steamID) || {};
 		var battlepass = MergeCompletedSupporterPass(GetBattlepassTable(playerID), api);
+		var supporterTier = GetSupporterTierData(playerID, battlepass);
 		var heroName = server.hero || (info && info.player_selected_hero) || "";
 		var team = ToNumber(server.team, info ? info.player_team_id : 0);
 		var tomesSmall = MaxNumber(server.tomes_bought_small, server.tomes_small, server.tome_small, api.tomes_bought_small, api.tomes_small, api.tome_small);
@@ -448,6 +469,9 @@ var XHSEndScreen = (function () {
 			tomesBig: tomesBig,
 			tomesPower: tomesPower,
 			playerColor: GetPlayerColorString(playerID, FirstDefined(battlepass.ply_color, server.ply_color, api.ply_color)),
+			supporterTier: supporterTier.tier,
+			supporterTierName: supporterTier.name,
+			supporterTierColor: supporterTier.color,
 			supportGold: ToNumber(server.gold_spent_on_support, 0),
 			abandon: !!server.abandon,
 			api: api,
@@ -843,6 +867,11 @@ var XHSEndScreen = (function () {
 		var cell = $.CreatePanel("Panel", parent, "");
 		cell.AddClass("PlayerColBattlepass");
 		cell.AddClass("XHSBattlepassCell");
+		var hasSupporterTier = ToNumber(model.supporterTier, 0) > 0;
+		cell.SetHasClass("XHSBattlepassSupporterCell", hasSupporterTier);
+		if (hasSupporterTier) {
+			cell.AddClass("XHSSupporterTier" + model.supporterTier);
+		}
 
 		var top = $.CreatePanel("Panel", cell, "");
 		top.AddClass("XHSBattlepassTop");
@@ -889,6 +918,13 @@ var XHSEndScreen = (function () {
 			levelText += " - " + battlepass.title;
 			level.style.color = battlepass.title_color || "#dceeff";
 		}
+		if (hasSupporterTier) {
+			level.style.color = model.supporterTierColor;
+			bar.style.border = "1px solid " + ColorWithAlpha(model.supporterTierColor, "78");
+			bar.style.boxShadow = "fill " + ColorWithAlpha(model.supporterTierColor, "1f") + " 0px 0px 8px 0px";
+			progressPanel.style.backgroundColor = "gradient( linear, 0% 0%, 100% 0%, from( " + ColorWithAlpha(model.supporterTierColor, "70") + " ), to( " + model.supporterTierColor + " ) )";
+			diffPanel.style.backgroundColor = "gradient( linear, 0% 0%, 100% 0%, from( #ffe28a ), to( " + model.supporterTierColor + " ) )";
+		}
 
 		level.text = levelText;
 		earned.text = FormatSignedNumber(supporterChange);
@@ -926,6 +962,13 @@ var XHSEndScreen = (function () {
 		var row = $.CreatePanel("Panel", parent, "XHSEndScreenPlayerRow_" + model.id);
 		row.AddClass("XHSEndScreenPlayerRow");
 		row.SetHasClass("IsAbandoned", model.abandon);
+		var hasSupporterTier = ToNumber(model.supporterTier, 0) > 0;
+		row.SetHasClass("XHSEndScreenSupporterRow", hasSupporterTier);
+		if (hasSupporterTier) {
+			row.AddClass("XHSSupporterTier" + model.supporterTier);
+			row.style.border = "1px solid " + ColorWithAlpha(model.supporterTierColor, "62");
+			row.style.boxShadow = "inset " + ColorWithAlpha(model.supporterTierColor, "1a") + " 0px 0px 18px 0px";
+		}
 		row.hittest = true;
 		row.hittestchildren = true;
 
@@ -935,7 +978,10 @@ var XHSEndScreen = (function () {
 
 		var heroFrame = $.CreatePanel("Panel", identity, "");
 		heroFrame.AddClass("XHSPlayerHeroFrame");
-		heroFrame.style.boxShadow = "fill " + ColorWithAlpha(model.playerColor, "66") + " 0px 0px 8px 0px";
+		heroFrame.style.boxShadow = "fill " + ColorWithAlpha(model.playerColor, "66") + " 0px 0px 8px 0px" + (hasSupporterTier ? ", fill " + ColorWithAlpha(model.supporterTierColor, "70") + " 0px 0px 11px 0px" : "");
+		if (hasSupporterTier) {
+			heroFrame.style.border = "1px solid " + ColorWithAlpha(model.supporterTierColor, "c8");
+		}
 
 		var playerColor = $.CreatePanel("Panel", heroFrame, "");
 		playerColor.AddClass("XHSPlayerColorStrip");
@@ -958,6 +1004,10 @@ var XHSEndScreen = (function () {
 		var name = $.CreatePanel("Label", text, "");
 		name.AddClass("XHSPlayerName");
 		name.text = model.name;
+		if (hasSupporterTier) {
+			name.style.color = model.supporterTierColor;
+			name.style.textShadow = "0px 1px 2px #000000, 0px 0px 7px " + ColorWithAlpha(model.supporterTierColor, "82");
+		}
 
 		var heroName = $.CreatePanel("Label", text, "");
 		heroName.AddClass("XHSPlayerHeroName");

@@ -102,6 +102,21 @@ function GetXHSGromVanguardKillLimit(difficulty)
 	return limits[difficulty] or limits[1]
 end
 
+function GetXHSDestroyerMagnataurKillLimit(difficulty)
+	if difficulty == nil and GameRules ~= nil then
+		difficulty = GameRules:GetCustomGameDifficulty()
+	end
+
+	difficulty = tonumber(difficulty) or 1
+
+	local players = 1
+	if PlayerResource ~= nil and PlayerResource.GetPlayerCount ~= nil then
+		players = PlayerResource:GetPlayerCount()
+	end
+
+	return math.max(1, (MAGNATAURS_TO_KILL or 1) * players * (CREEP_LANES_TYPE or 1) * difficulty)
+end
+
 if IsInToolsMode() then
 	_G.PREGAMETIME = 15.0
 end

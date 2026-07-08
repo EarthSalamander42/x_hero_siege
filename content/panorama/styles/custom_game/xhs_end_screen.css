@@ -532,6 +532,34 @@
 	brightness: 1.08;
 }
 
+.XHSEndScreenPlayerRow.XHSEndScreenSupporterRow {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #071827d8 ), color-stop( .62, #0b1d2dc8 ), to( #15182cc8 ) );
+}
+
+.XHSEndScreenPlayerRow.XHSEndScreenSupporterRow:hover {
+	brightness: 1.13;
+}
+
+.XHSEndScreenPlayerRow.XHSSupporterTier1 {
+	border-color: #45c46b62;
+}
+
+.XHSEndScreenPlayerRow.XHSSupporterTier2 {
+	border-color: #f2c94c62;
+}
+
+.XHSEndScreenPlayerRow.XHSSupporterTier3 {
+	border-color: #e4572e62;
+}
+
+.XHSEndScreenPlayerRow.XHSSupporterTier4 {
+	border-color: #5ad0ff62;
+}
+
+.XHSEndScreenPlayerRow.XHSSupporterTier5 {
+	border-color: #c99cff72;
+}
+
 .XHSEndScreenPlayerRow.IsAbandoned {
 	background-color: #321015b8;
 	border: 1px solid #ff6d6d30;
@@ -674,6 +702,14 @@
 	flow-children: none;
 	background-color: #020712;
 	border: 1px solid #77c8ff18;
+}
+
+.XHSBattlepassCell.XHSBattlepassSupporterCell .XHSBattlepassBar {
+	background-color: #040914;
+}
+
+.XHSBattlepassCell.XHSBattlepassSupporterCell .XHSBattlepassLevel {
+	text-shadow: 0px 1px 2px #000000, 0px 0px 6px #ffffff28;
 }
 
 .XHSBattlepassProgress,

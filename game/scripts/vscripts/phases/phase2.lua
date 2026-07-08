@@ -121,7 +121,58 @@ end
 
 local FINAL_WAVE_QUEST_NAME = "kill_final_wave"
 local FINAL_WAVE_TOTAL_UNITS = 52
-local final_wave_stun_time = 0
+local FINAL_WAVE_INTRO_DURATION = 52.0
+local FINAL_WAVE_CARDINAL_REVEAL_DELAY = 2.8
+local FINAL_WAVE_UNIT_SPAWN_INTERVAL = 0.18
+local FINAL_WAVE_PORTAL_FOW_RADIUS = 900
+local FINAL_WAVE_PORTAL_FOW_DURATION = 9.0
+local FINAL_WAVE_MUSIC_SOUND = "yaskar_01.music.ui_hero_select"
+local FINAL_WAVE_PORTAL_START_PARTICLE = "particles/items2_fx/teleport_start.vpcf"
+local FINAL_WAVE_PORTAL_END_PARTICLE = "particles/items2_fx/teleport_end.vpcf"
+local FINAL_WAVE_PORTAL_RING_PARTICLE = "particles/units/heroes/hero_templar_assassin/templar_assassin_trap_rings_inner.vpcf"
+
+local FINAL_WAVE_CARDINALS = {
+	{
+		delay = 8.0,
+		direction = "west",
+		direction_label = "West",
+		boss_label = "Balanar",
+		angle = 0,
+		waypoint = "final_wave_player_2",
+		boss = "npc_dota_hero_balanar",
+		creeps = { "npc_abomination", "npc_banshee", "npc_necro", "npc_magnataur" },
+	},
+	{
+		delay = 18.0,
+		direction = "north",
+		direction_label = "North",
+		boss_label = "Grom",
+		angle = 270,
+		waypoint = "final_wave_player_4",
+		boss = "npc_dota_hero_grom_hellscream",
+		creeps = { "npc_tauren", "npc_chaos_orc", "npc_warlock", "npc_orc_raider" },
+	},
+	{
+		delay = 28.0,
+		direction = "east",
+		direction_label = "East",
+		boss_label = "Illidan",
+		angle = 180,
+		waypoint = "final_wave_player_6",
+		boss = "npc_dota_hero_illidan",
+		creeps = { "npc_druid", "npc_guard", "npc_keeper", "npc_luna" },
+	},
+	{
+		delay = 38.0,
+		direction = "south",
+		direction_label = "South",
+		boss_label = "Proudmoore",
+		angle = 90,
+		waypoint = "final_wave_player_0",
+		boss = "npc_dota_hero_proudmoore",
+		creeps = { "npc_captain", "npc_marine", "npc_marine", "npc_knight" },
+	},
+}
 
 local function FindFinalWaveQuest()
 	if GameMode == nil or GameMode.Zones == nil then
@@ -183,13 +234,164 @@ local function RegisterFinalWaveUnit(unit)
 	CustomTimers.final_wave_spawned_kill_limit = (CustomTimers.final_wave_spawned_kill_limit or 0) + 1
 end
 
+local function IsFinalWaveSequenceActive(sequenceId)
+	return sequenceId == nil or CustomTimers.final_wave_sequence_id == sequenceId
+end
+
+local function GetFinalWaveFort()
+	return Entities:FindByClassname(nil, "npc_dota_fort")
+end
+
+local function FindFinalWaveSpawner(direction, index)
+	return Entities:FindByName(nil, "final_wave_" .. direction .. "_" .. index)
+end
+
+local function GetFinalWavePortalOrigin(config)
+	local bossSpawner = FindFinalWaveSpawner(config.direction, 13)
+	if bossSpawner ~= nil then
+		return bossSpawner:GetAbsOrigin()
+	end
+
+	local firstSpawner = FindFinalWaveSpawner(config.direction, 1)
+	if firstSpawner ~= nil then
+		return firstSpawner:GetAbsOrigin()
+	end
+
+	return Vector(0, 0, 0)
+end
+
+local function SendFinalWaveCamera(position, speed)
+	for _, hero in pairs(HeroList:GetAllHeroes()) do
+		if hero:IsRealHero() and hero:GetTeam() == DOTA_TEAM_GOODGUYS then
+			CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "set_player_camera", {
+				hPosition = position,
+				iSpeed = speed or 0.65,
+			})
+		end
+	end
+end
+
+local function ApplyFinalWaveCinematicLock(unit, duration)
+	if unit == nil or unit:IsNull() then return end
+	if duration <= 0 then return end
+
+	local pauseModifier = unit:AddNewModifier(unit, nil, "modifier_pause_creeps", { duration = duration, IsHidden = true })
+	if pauseModifier ~= nil then
+		pauseModifier:SetStackCount(1)
+	end
+	unit:AddNewModifier(unit, nil, "modifier_invulnerable", { duration = duration, IsHidden = true })
+end
+
+local function QueueFinalWaveRelease(unit, waypoint)
+	if unit == nil or unit:IsNull() then return end
+
+	CustomTimers.final_wave_pending_units = CustomTimers.final_wave_pending_units or {}
+	table.insert(CustomTimers.final_wave_pending_units, {
+		unit = unit,
+		waypoint = waypoint,
+	})
+end
+
+local function ReleaseFinalWaveUnit(unit, waypoint)
+	if unit == nil or unit:IsNull() or not unit:IsAlive() then return end
+
+	unit:RemoveModifierByName("modifier_pause_creeps")
+	unit:RemoveModifierByName("modifier_invulnerable")
+
+	if waypoint ~= nil and not waypoint:IsNull() then
+		unit:SetInitialGoalEntity(waypoint)
+		ExecuteOrderFromTable({
+			UnitIndex = unit:entindex(),
+			OrderType = DOTA_UNIT_ORDER_ATTACK_MOVE,
+			Position = waypoint:GetAbsOrigin(),
+		})
+	end
+end
+
+local function ReleaseFinalWavePendingUnits()
+	if CustomTimers.final_wave_pending_units ~= nil then
+		for _, data in pairs(CustomTimers.final_wave_pending_units) do
+			ReleaseFinalWaveUnit(data.unit, data.waypoint)
+		end
+	end
+
+	CustomTimers.final_wave_pending_units = nil
+	UpdateFinalWaveQuestLimit()
+	CustomTimers.final_wave_kill_counting = (CustomTimers.final_wave_spawned_kill_limit or 0) >= FINAL_WAVE_TOTAL_UNITS
+end
+
+local function CreateFinalWaveParticle(particleName, origin, duration)
+	local particle = ParticleManager:CreateParticle(particleName, PATTACH_WORLDORIGIN, nil)
+	ParticleManager:SetParticleControl(particle, 0, origin)
+
+	Timers:CreateTimer(duration, function()
+		ParticleManager:DestroyParticle(particle, false)
+		ParticleManager:ReleaseParticleIndex(particle)
+	end)
+
+	return particle
+end
+
+local function CreateFinalWavePortalEffects(origin)
+	CreateFinalWaveParticle(FINAL_WAVE_PORTAL_RING_PARTICLE, origin, FINAL_WAVE_PORTAL_FOW_DURATION)
+	CreateFinalWaveParticle(FINAL_WAVE_PORTAL_START_PARTICLE, origin, FINAL_WAVE_PORTAL_FOW_DURATION)
+	AddFOWViewer(DOTA_TEAM_GOODGUYS, origin, FINAL_WAVE_PORTAL_FOW_RADIUS, FINAL_WAVE_PORTAL_FOW_DURATION, false)
+end
+
+local function PlayFinalWaveArrivalEffects(unit, playSound)
+	if unit == nil or unit:IsNull() then return end
+
+	local origin = unit:GetAbsOrigin()
+	local particle = ParticleManager:CreateParticle(FINAL_WAVE_PORTAL_END_PARTICLE, PATTACH_ABSORIGIN_FOLLOW, unit)
+	ParticleManager:SetParticleControl(particle, 0, origin)
+	ParticleManager:ReleaseParticleIndex(particle)
+
+	if playSound == true then
+		unit:EmitSound("Portal.Hero_Disappear")
+	end
+end
+
+local function NotifyFinalWaveArrival(config)
+	if Notifications == nil then return end
+
+	Notifications:TopToAll({
+		text = config.boss_label .. " arrives from the " .. config.direction_label,
+		duration = 4.0,
+		style = { color = "#ffdc73", ["font-size"] = "28px", ["font-weight"] = "bold" },
+	})
+end
+
+local function SpawnFinalWaveUnit(unitName, spawner, angle, releaseWaypoint, lockDuration, playSound)
+	if spawner == nil then return nil end
+
+	local unit = CreateUnitByName(unitName .. "_final_wave", spawner:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+	if unit == nil then return nil end
+
+	RegisterFinalWaveUnit(unit)
+	unit:SetAngles(0, angle, 0)
+	ApplyFinalWaveCinematicLock(unit, lockDuration)
+	QueueFinalWaveRelease(unit, releaseWaypoint)
+	PlayFinalWaveArrivalEffects(unit, playSound)
+
+	if playSound == true then
+		unit:EmitSound("Hero_TemplarAssassin.Trap")
+	end
+
+	UpdateFinalWaveQuestLimit()
+	CustomTimers.final_wave_kill_counting = (CustomTimers.final_wave_spawned_kill_limit or 0) >= FINAL_WAVE_TOTAL_UNITS
+
+	return unit
+end
+
 function FinalWave(force)
 	if force ~= true and XHSDevTools ~= nil and XHSDevTools:IsSandboxActive() then return end
 
 	CustomTimers.proc_final_wave = true
 	CustomTimers.final_wave_kill_counting = false
 	CustomTimers.final_wave_spawned_kill_limit = 0
-	final_wave_stun_time = 0
+	CustomTimers.final_wave_pending_units = {}
+	CustomTimers.final_wave_sequence_id = (CustomTimers.final_wave_sequence_id or 0) + 1
+	local finalWaveSequenceId = CustomTimers.final_wave_sequence_id
 
 	CustomTimers.current_time["special_event"] = 1
 	CustomTimers:Countdown("special_event")
@@ -206,109 +408,103 @@ function FinalWave(force)
 	RefreshPlayers()
 	GameRules:SetHeroRespawnEnabled(false)
 
-	TeleportAllHeroes("final_wave_player_", 30.0)
+	TeleportAllHeroes("final_wave_player_", FINAL_WAVE_INTRO_DURATION)
 
-	EmitSoundOn("yaskar_01.music.ui_hero_select", Entities:FindByClassname(nil, "npc_dota_fort"))
+	local fort = GetFinalWaveFort()
+	if fort ~= nil then
+		EmitSoundOn(FINAL_WAVE_MUSIC_SOUND, fort)
+	end
 
-	Timers:CreateTimer(10, function()
-		FinalWaveSpawner("npc_abomination", "npc_banshee", "npc_necro", "npc_magnataur", "npc_dota_hero_balanar", 0, "west", "final_wave_player_2")
-	end)
+	for _, config in ipairs(FINAL_WAVE_CARDINALS) do
+		Timers:CreateTimer(config.delay, function()
+			if not IsFinalWaveSequenceActive(finalWaveSequenceId) then return end
+			FinalWaveSpawner(config, finalWaveSequenceId)
+		end)
+	end
 
-	Timers:CreateTimer(15, function()
-		FinalWaveSpawner("npc_tauren", "npc_chaos_orc", "npc_warlock", "npc_orc_raider", "npc_dota_hero_grom_hellscream", 270, "north", "final_wave_player_4")
-	end)
+	Timers:CreateTimer(FINAL_WAVE_INTRO_DURATION, function()
+		if not IsFinalWaveSequenceActive(finalWaveSequenceId) then return end
 
-	Timers:CreateTimer(20, function()
-		FinalWaveSpawner("npc_druid", "npc_guard", "npc_keeper", "npc_luna", "npc_dota_hero_illidan", 180, "east", "final_wave_player_6")
-	end)
-
-	Timers:CreateTimer(25, function()
-		FinalWaveSpawner("npc_captain", "npc_marine", "npc_marine", "npc_knight", "npc_dota_hero_proudmoore", 90, "south", "final_wave_player_0")
-	end)
-
-	Timers:CreateTimer(30, function()
 		for _, hero in pairs(HeroList:GetAllHeroes()) do
 			if hero:IsRealHero() and hero:GetTeam() == DOTA_TEAM_GOODGUYS then
-				CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "set_player_camera", { hPosition = hero:GetAbsOrigin() })
+				CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "set_player_camera", {
+					hPosition = hero:GetAbsOrigin(),
+					iSpeed = 0.85,
+				})
 			end
 		end
-	end)
 
-	Timers:CreateTimer(31, function()
-		StopSoundOn("yaskar_01.music.ui_hero_select", Entities:FindByClassname(nil, 'npc_dota_fort'))
+		ReleaseFinalWavePendingUnits()
 
-		local units = FindUnitsInRadius(DOTA_TEAM_NEUTRALS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_ALL, DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER, false)
-		local number = 0
-
-		for _, v in pairs(units) do
-			number = number + 1
-		end
-
-		if number > 0 then
-			return 1
+		local finalWaveFort = GetFinalWaveFort()
+		if finalWaveFort ~= nil then
+			StopSoundOn(FINAL_WAVE_MUSIC_SOUND, finalWaveFort)
+			EmitSoundOn("Hero_TemplarAssassin.Trap", finalWaveFort)
 		end
 	end)
 end
 
-function FinalWaveSpawner(creep1, creep2, creep3, creep4, boss_name, angles, direction, waypoint)
-	local number = 1
-	local waypoint = Entities:FindByName(nil, "final_wave_player_2")
-
-	for i = 1, 3 do
-		local unit = CreateUnitByName(creep1 .. "_final_wave", Entities:FindByName(nil, "final_wave_" .. direction .. "_" .. number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-		RegisterFinalWaveUnit(unit)
-		unit:SetAngles(0, angles, 0)
-		number = number + 1
+function FinalWaveSpawner(configOrCreep1, creep2, creep3, creep4, bossName, angle, direction, waypointName)
+	local config = configOrCreep1
+	local sequenceId = nil
+	if type(configOrCreep1) == "table" then
+		sequenceId = creep2
 	end
 
-	for i = 1, 3 do
-		local unit = CreateUnitByName(creep2 .. "_final_wave", Entities:FindByName(nil, "final_wave_" .. direction .. "_" .. number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-		RegisterFinalWaveUnit(unit)
-		unit:SetAngles(0, angles, 0)
-		number = number + 1
+	if not IsFinalWaveSequenceActive(sequenceId) then return end
+
+	if type(configOrCreep1) ~= "table" then
+		config = {
+			delay = 0,
+			direction = direction,
+			direction_label = direction or "",
+			boss_label = bossName or "",
+			angle = angle or 0,
+			waypoint = waypointName,
+			boss = bossName,
+			creeps = { configOrCreep1, creep2, creep3, creep4 },
+		}
 	end
 
-	for i = 1, 3 do
-		local unit = CreateUnitByName(creep3 .. "_final_wave", Entities:FindByName(nil, "final_wave_" .. direction .. "_" .. number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-		RegisterFinalWaveUnit(unit)
-		unit:SetAngles(0, angles, 0)
-		number = number + 1
+	if config == nil or config.direction == nil or config.boss == nil then return end
+
+	local releaseWaypoint = Entities:FindByName(nil, config.waypoint)
+	local lockDuration = math.max(1.0, FINAL_WAVE_INTRO_DURATION - (config.delay or 0))
+	local portalOrigin = GetFinalWavePortalOrigin(config)
+	local bossSpawner = FindFinalWaveSpawner(config.direction, 13)
+	if bossSpawner == nil then return end
+
+	CreateFinalWavePortalEffects(portalOrigin)
+	NotifyFinalWaveArrival(config)
+
+	local boss = SpawnFinalWaveUnit(config.boss, bossSpawner, config.angle, releaseWaypoint, lockDuration, true)
+	if boss ~= nil then
+		boss:EmitSound("Portal.Loop_Appear")
+		SendFinalWaveCamera(boss:GetAbsOrigin(), 0.65)
+
+		Timers:CreateTimer(FINAL_WAVE_CARDINAL_REVEAL_DELAY, function()
+			if boss ~= nil and not boss:IsNull() then
+				if not IsFinalWaveSequenceActive(sequenceId) then
+					StopSoundOn("Portal.Loop_Appear", boss)
+					return
+				end
+				StopSoundOn("Portal.Loop_Appear", boss)
+				boss:EmitSound("Hero_TemplarAssassin.Trap")
+			end
+		end)
 	end
 
-	for i = 1, 3 do
-		local unit = CreateUnitByName(creep4 .. "_final_wave", Entities:FindByName(nil, "final_wave_" .. direction .. "_" .. number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-		RegisterFinalWaveUnit(unit)
-		unit:SetAngles(0, angles, 0)
-		number = number + 1
-	end
-
-	local boss = CreateUnitByName(boss_name .. "_final_wave", Entities:FindByName(nil, "final_wave_" .. direction .. "_" .. number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-	RegisterFinalWaveUnit(boss)
-	boss:SetAngles(0, angles, 0)
-	boss:EmitSound("Hero_TemplarAssassin.Trap")
-	boss:SetInitialGoalEntity(waypoint)
-	ExecuteOrderFromTable({
-		UnitIndex = boss:entindex(),
-		OrderType = DOTA_UNIT_ORDER_ATTACK_MOVE,
-		Position = waypoint:GetAbsOrigin(),
-	})
-
-	UpdateFinalWaveQuestLimit()
-	CustomTimers.final_wave_kill_counting = (CustomTimers.final_wave_spawned_kill_limit or 0) >= FINAL_WAVE_TOTAL_UNITS
-
-	local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_1, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)
-	for _, v in pairs(units) do
-		if v:IsCreature() and v:HasMovementCapability() then
-			v:AddNewModifier(v, nil, "modifier_pause_creeps", { duration = 25 + final_wave_stun_time, IsHidden = true }):SetStackCount(1)
-			v:AddNewModifier(v, nil, "modifier_invulnerable", { duration = 25 + final_wave_stun_time, IsHidden = true })
-		end
-	end
-
-	final_wave_stun_time = final_wave_stun_time - 5
-
-	for _, hero in pairs(HeroList:GetAllHeroes()) do
-		if hero:IsRealHero() and hero:GetTeam() == DOTA_TEAM_GOODGUYS then
-			CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "set_player_camera", { hPosition = boss:GetAbsOrigin() })
+	local spawnSlot = 1
+	for _, creepName in ipairs(config.creeps) do
+		for _ = 1, 3 do
+			local currentSlot = spawnSlot
+			local currentCreepName = creepName
+			Timers:CreateTimer(FINAL_WAVE_CARDINAL_REVEAL_DELAY + (spawnSlot * FINAL_WAVE_UNIT_SPAWN_INTERVAL), function()
+				if not IsFinalWaveSequenceActive(sequenceId) then return end
+				local spawner = FindFinalWaveSpawner(config.direction, currentSlot)
+				SpawnFinalWaveUnit(currentCreepName, spawner, config.angle, releaseWaypoint, lockDuration, currentSlot == 1)
+			end)
+			spawnSlot = spawnSlot + 1
 		end
 	end
 end

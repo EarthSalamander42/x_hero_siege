@@ -1226,10 +1226,15 @@ function FragmentQuests:OnPhase2End()
 end
 
 function FragmentQuests:GetExpectedMagnataurKills()
+	if GetXHSDestroyerMagnataurKillLimit ~= nil then
+		return GetXHSDestroyerMagnataurKillLimit()
+	end
+
 	local players = PlayerResource ~= nil and PlayerResource.GetPlayerCount ~= nil and PlayerResource:GetPlayerCount() or 1
 	local lanes = CREEP_LANES_TYPE or 1
 	local perLane = MAGNATAURS_TO_KILL or 1
-	return math.max(1, perLane * players * lanes)
+	local difficulty = GameRules ~= nil and GameRules.GetCustomGameDifficulty ~= nil and GameRules:GetCustomGameDifficulty() or 1
+	return math.max(1, perLane * players * lanes * difficulty)
 end
 
 function FragmentQuests:OnBossSpawned(bossID)

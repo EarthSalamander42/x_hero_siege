@@ -381,7 +381,11 @@
 }
 
 .XHSOverheadLabel.XHSOverheadHasStatusEffect .XHSOverheadName {
-	opacity: 0;
+	opacity: 1;
+	color: #ffe7b0;
+	font-size: 10px;
+	font-weight: bold;
+	text-shadow: 0px 1px 2px #000000, 0px 0px 6px #ffb13d82;
 }
 
 .XHSOverheadLabel.XHSOverheadHasStatusEffect .XHSOverheadStatusRow {
@@ -391,8 +395,8 @@
 	margin-left: 0px;
 	margin-top: 0px;
 	ignore-parent-flow: true;
-	visibility: visible;
-	opacity: 1;
+	visibility: collapse;
+	opacity: 0;
 	z-index: 8;
 }
 
@@ -433,13 +437,21 @@
 .XHSOverheadLabel.XHSStatusSleep .XHSOverheadGameplayStatus,
 .XHSOverheadLabel.XHSStatusFeared .XHSOverheadGameplayStatus,
 .XHSOverheadLabel.XHSStatusTaunted .XHSOverheadGameplayStatus,
-.XHSOverheadLabel.XHSStatusCycloned .XHSOverheadGameplayStatus {
+.XHSOverheadLabel.XHSStatusCycloned .XHSOverheadGameplayStatus,
+.XHSOverheadLabel.XHSStatusStunned .XHSOverheadName,
+.XHSOverheadLabel.XHSStatusHexed .XHSOverheadName,
+.XHSOverheadLabel.XHSStatusSleep .XHSOverheadName,
+.XHSOverheadLabel.XHSStatusFeared .XHSOverheadName,
+.XHSOverheadLabel.XHSStatusTaunted .XHSOverheadName,
+.XHSOverheadLabel.XHSStatusCycloned .XHSOverheadName {
 	color: #ffd36a;
 	text-shadow: 0px 1px 2px #000000, 0px 0px 7px #ffb13d9a;
 }
 
 .XHSOverheadLabel.XHSStatusRooted .XHSOverheadGameplayStatus,
-.XHSOverheadLabel.XHSStatusLeashed .XHSOverheadGameplayStatus {
+.XHSOverheadLabel.XHSStatusLeashed .XHSOverheadGameplayStatus,
+.XHSOverheadLabel.XHSStatusRooted .XHSOverheadName,
+.XHSOverheadLabel.XHSStatusLeashed .XHSOverheadName {
 	color: #c9ffdc;
 	text-shadow: 0px 1px 2px #000000, 0px 0px 7px #70e39a76;
 }
@@ -447,12 +459,17 @@
 .XHSOverheadLabel.XHSStatusSilenced .XHSOverheadGameplayStatus,
 .XHSOverheadLabel.XHSStatusMuted .XHSOverheadGameplayStatus,
 .XHSOverheadLabel.XHSStatusDisarmed .XHSOverheadGameplayStatus,
-.XHSOverheadLabel.XHSStatusBroken .XHSOverheadGameplayStatus {
+.XHSOverheadLabel.XHSStatusBroken .XHSOverheadGameplayStatus,
+.XHSOverheadLabel.XHSStatusSilenced .XHSOverheadName,
+.XHSOverheadLabel.XHSStatusMuted .XHSOverheadName,
+.XHSOverheadLabel.XHSStatusDisarmed .XHSOverheadName,
+.XHSOverheadLabel.XHSStatusBroken .XHSOverheadName {
 	color: #d8f4ff;
 	text-shadow: 0px 1px 2px #000000, 0px 0px 7px #5ad0ff78;
 }
 
-.XHSOverheadLabel.XHSStatusInvulnerable .XHSOverheadGameplayStatus {
+.XHSOverheadLabel.XHSStatusInvulnerable .XHSOverheadGameplayStatus,
+.XHSOverheadLabel.XHSStatusInvulnerable .XHSOverheadName {
 	color: #f4e5ff;
 	text-shadow: 0px 1px 2px #000000, 0px 0px 8px #c99cff80;
 }

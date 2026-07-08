@@ -1485,8 +1485,14 @@ var XHSTopHud = (function () {
 		if (hasStatus) {
 			label.SetHasClass(statusEffect.class_name, true);
 			var statusText = FormatOverheadStatusLabel(statusEffect);
+			SetChildText(label, "XHSOverheadName_" + playerID, statusText);
 			SetChildText(label, "XHSOverheadGameplayStatus_" + playerID, statusText);
 			SetChildText(label, "XHSOverheadAltStatus_" + playerID, statusText);
+		} else {
+			var heroNameText = label.GetAttributeString("xhs_overhead_hero_label", "");
+			if (heroNameText) {
+				SetChildText(label, "XHSOverheadName_" + playerID, heroNameText);
+			}
 		}
 	}
 
@@ -1536,6 +1542,7 @@ var XHSTopHud = (function () {
 
 		var tierOverline = FormatOverheadTierOverline(data);
 		label.SetHasClass("XHSOverheadHasTierOverline", tierOverline !== "");
+		label.SetAttributeString("xhs_overhead_hero_label", heroName);
 
 		SetChildText(label, "XHSOverheadName_" + playerID, heroName);
 		SetChildText(label, "XHSOverheadTierOverline_" + playerID, tierOverline);

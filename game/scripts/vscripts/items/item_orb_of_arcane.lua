@@ -22,6 +22,20 @@ local function GetArcaneOrbTexture(caster, active_texture, inactive_texture)
 	return inactive_texture
 end
 
+local ARCANE_ACTIVE_MODIFIER_TEXTURES = {
+	item_astral_core = "custom/astral_core",
+	item_mystic_gem = "custom/mystic_gem",
+	item_orb_of_arcane = "custom/orb_of_arcane",
+}
+
+local function GetArcaneActiveModifierTexture(ability)
+	if ability and not ability:IsNull() then
+		return ARCANE_ACTIVE_MODIFIER_TEXTURES[ability:GetName()] or "custom/orb_of_arcane"
+	end
+
+	return "custom/orb_of_arcane"
+end
+
 function item_orb_of_arcane:GetIntrinsicModifierName() return "modifier_orb_of_arcane" end
 function item_mystic_gem:GetIntrinsicModifierName() return "modifier_orb_of_arcane" end
 function item_astral_core:GetIntrinsicModifierName() return "modifier_orb_of_arcane" end
@@ -48,7 +62,7 @@ modifier_orb_of_arcane_active.XHS_LINK_CLIENT = true
 function modifier_orb_of_arcane_active:IsHidden() return false end
 function modifier_orb_of_arcane_active:IsPurgable() return false end
 function modifier_orb_of_arcane_active:RemoveOnDeath() return false end
-function modifier_orb_of_arcane_active:GetTexture() return "custom/orb_of_arcane" end
+function modifier_orb_of_arcane_active:GetTexture() return GetArcaneActiveModifierTexture(self:GetAbility()) end
 
 modifier_orb_of_arcane = modifier_orb_of_arcane or class({})
 modifier_orb_of_arcane.XHS_LINK_CLIENT = true

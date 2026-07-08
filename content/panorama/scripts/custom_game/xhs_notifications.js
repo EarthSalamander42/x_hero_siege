@@ -16,6 +16,12 @@
 	var fragmentQuestNotificationQueue = [];
 	var fragmentQuestNotificationActive = false;
 	var FRAGMENT_QUEST_QUEUE_GAP = 0.35;
+	var activeCurrentEventNotificationOffset = false;
+
+	function setCurrentEventNotificationOffset(isVisible) {
+		activeCurrentEventNotificationOffset = !!isVisible;
+		$.GetContextPanel().SetHasClass("XHSCurrentEventNotificationOffset", activeCurrentEventNotificationOffset);
+	}
 
 	function getDuration(msg) {
 		if (typeof msg.duration === "number" && msg.duration > 0) {
@@ -1325,4 +1331,10 @@
 	GameEvents.Subscribe("xhs_main_quest_completed", showMainQuestCompleted);
 	GameEvents.Subscribe("xhs_reward_notification", showRewardNotification);
 	GameEvents.Subscribe("xhs_fragment_quest_star", showFragmentQuestStar);
+	GameEvents.Subscribe("show_current_event_timer", function () {
+		setCurrentEventNotificationOffset(true);
+	});
+	GameEvents.Subscribe("hide_current_event_timer", function () {
+		setCurrentEventNotificationOffset(false);
+	});
 })();

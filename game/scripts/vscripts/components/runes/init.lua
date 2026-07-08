@@ -328,9 +328,31 @@ function Runes:SpawnRuneInstance(runeType, definition, waveIndex, direction, spa
 	end
 
 	AddFOWViewer(DOTA_TEAM_GOODGUYS, spawnOrigin, self.VISION_RADIUS, self.VISION_DURATION, false)
+	self:StartRuneIdleThink(id, token)
 	self:StartPickupThink(id, token)
 
 	return rune
+end
+
+function Runes:StartRuneIdleThink(id, token)
+	Timers:CreateTimer(0.03, function()
+		local active = self:GetActiveRune(id, token)
+		if active == nil then return nil end
+
+		local dummy = EntIndexToHScript(active.entityIndex)
+		if dummy == nil or dummy:IsNull() then return nil end
+
+		if dummy.FadeGesture then
+			dummy:FadeGesture(ACT_DOTA_IDLE)
+		end
+		if dummy.StartGestureWithPlaybackRate then
+			dummy:StartGestureWithPlaybackRate(ACT_DOTA_IDLE, 1.0)
+		elseif dummy.StartGesture then
+			dummy:StartGesture(ACT_DOTA_IDLE)
+		end
+
+		return 2.5
+	end)
 end
 
 function Runes:StartStateThink(id, token)

@@ -56,11 +56,10 @@
 
 #QuestLog.QuestLogCollapsed
 {
-	transform: translatex( -360px );
-	opacity: .72;
+	transform: translatex( -460px );
+	opacity: 0;
 }
 
-#QuestLog.QuestLogCollapsed:hover,
 #QuestLog.QuestLogCollapsed.QuestLogTemporaryReveal
 {
 	transform: translatex( 0px );
@@ -73,10 +72,9 @@
 
 .HUDFlipped #QuestLog.QuestLogCollapsed
 {
-	transform: translatex( 360px );
+	transform: translatex( 460px );
 }
 
-.HUDFlipped #QuestLog.QuestLogCollapsed:hover,
 .HUDFlipped #QuestLog.QuestLogCollapsed.QuestLogTemporaryReveal
 {
 	transform: translatex( 0px );
@@ -89,18 +87,21 @@
 	horizontal-align: left;
 	vertical-align: top;
 	margin-top: 280px;
-	margin-left: 428px;
+	margin-left: 368px;
 	ignore-parent-flow: true;
-	background-color: gradient( linear, 0% 0%, 100% 100%, from( #07131df4 ), to( #102536f4 ) );
-	border: 1px solid #77c8ff3c;
-	box-shadow: fill #00111faa 0px 0px 5px 0px;
+	opacity: .42;
+	brightness: .82;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #06111ac0 ), to( #102536c8 ) );
+	border: 1px solid #77c8ff24;
+	box-shadow: fill #00111f78 0px 0px 4px 0px;
 	z-index: 12;
-	transition-property: brightness, background-color, border, transform;
+	transition-property: opacity, brightness, background-color, border, transform;
 	transition-duration: .14s;
 }
 
 .QuestLogCollapseButton:hover
 {
+	opacity: 1;
 	brightness: 1.2;
 	background-color: #12364be8;
 	border: 1px solid #77c8ff7a;
@@ -113,12 +114,21 @@
 	horizontal-align: center;
 	vertical-align: center;
 	margin-left: 2px;
+	opacity: .72;
+	border-top: 2px solid #9be6ff9a;
+	border-right: 2px solid #9be6ff9a;
+	box-shadow: #5ad0ff24 0px 0px 5px 0px;
+	transform: rotateZ( 225deg );
+	transition-property: opacity, transform, brightness;
+	transition-duration: .14s;
+}
+
+.QuestLogCollapseButton:hover .QuestLogCollapseArrow
+{
+	opacity: 1;
 	border-top: 2px solid #9be6ff;
 	border-right: 2px solid #9be6ff;
 	box-shadow: #5ad0ff55 0px 0px 5px 0px;
-	transform: rotateZ( 225deg );
-	transition-property: transform, brightness;
-	transition-duration: .14s;
 }
 
 .QuestLogCollapseButton.QuestLogCollapsed .QuestLogCollapseArrow
@@ -136,7 +146,7 @@
 {
 	horizontal-align: right;
 	margin-left: 0px;
-	margin-right: 428px;
+	margin-right: 388px;
 }
 
 .HUDFlipped .QuestLogCollapseButton .QuestLogCollapseArrow

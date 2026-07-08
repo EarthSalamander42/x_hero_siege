@@ -22,6 +22,20 @@ local function GetVenomOrbTexture(caster, active_texture, inactive_texture)
 	return inactive_texture
 end
 
+local VENOM_ACTIVE_MODIFIER_TEXTURES = {
+	item_plagueheart = "custom/plagueheart",
+	item_viridian_gem = "custom/viridian_gem",
+	item_xhs_orb_of_venom = "custom/orb_of_venom",
+}
+
+local function GetVenomActiveModifierTexture(ability)
+	if ability and not ability:IsNull() then
+		return VENOM_ACTIVE_MODIFIER_TEXTURES[ability:GetName()] or "custom/orb_of_venom"
+	end
+
+	return "custom/orb_of_venom"
+end
+
 function item_xhs_orb_of_venom:GetIntrinsicModifierName() return "modifier_orb_of_venom_xhs" end
 function item_viridian_gem:GetIntrinsicModifierName() return "modifier_orb_of_venom_xhs" end
 function item_plagueheart:GetIntrinsicModifierName() return "modifier_orb_of_venom_xhs" end
@@ -48,7 +62,7 @@ modifier_orb_of_venom_xhs_active.XHS_LINK_CLIENT = true
 function modifier_orb_of_venom_xhs_active:IsHidden() return false end
 function modifier_orb_of_venom_xhs_active:IsPurgable() return false end
 function modifier_orb_of_venom_xhs_active:RemoveOnDeath() return false end
-function modifier_orb_of_venom_xhs_active:GetTexture() return "custom/orb_of_venom" end
+function modifier_orb_of_venom_xhs_active:GetTexture() return GetVenomActiveModifierTexture(self:GetAbility()) end
 
 modifier_orb_of_venom_xhs = modifier_orb_of_venom_xhs or class({})
 modifier_orb_of_venom_xhs.XHS_LINK_CLIENT = true

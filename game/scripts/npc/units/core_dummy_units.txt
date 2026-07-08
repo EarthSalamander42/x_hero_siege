@@ -101,6 +101,20 @@
 	}
 
 	//=================================================================================
+	// Dummy: Wearable attachment host
+	//=================================================================================
+	"wearable_dummy"
+	{
+		"BaseClass"					"npc_dota_creature"
+		"Model"						"models/development/invisiblebox.vmdl"
+		"IsAncient"					"1"
+		"AttackCapabilities"		"DOTA_UNIT_CAP_NO_ATTACK"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_WARD"
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_NONE"
+		"Ability1"					"dummy_passive_invulnerable"
+	}
+
+	//=================================================================================
 	// Dummy: Unit Invulnerable (Used for Abilities)
 	//=================================================================================
 	"dummy_unit_phase_2_invulnerable"
