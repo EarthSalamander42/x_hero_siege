@@ -1,0 +1,62 @@
+{
+  "version": "4.0",
+  "title": "X Hero Siege 4.0",
+  "status": "current",
+  "statusLabel": "Current",
+  "route": "/patches/xhs/4.0",
+  "summary": "Generated draft from the v4.0 Git diff. Needs human review.",
+  "details": [
+    {
+      "title": "Highlights",
+      "items": [
+        "TODO: Add 3-5 player-facing highlights after reviewing the generated draft."
+      ]
+    },
+    {
+      "title": "Gameplay",
+      "items": [
+        "TODO: Summarize gameplay, hero, item, boss, wave, and balance changes by player impact."
+      ]
+    },
+    {
+      "title": "UI and quality of life",
+      "items": [
+        "TODO: Summarize visible UI, localization, loading screen, end screen, and tooltip changes."
+      ]
+    },
+    {
+      "title": "Technical changes",
+      "items": [
+        "Lua gameplay: 175 files, +24,726 / -1,873 lines.",
+        "Panorama/UI: 343 files, +34,186 / -1,842 lines.",
+        "Localization: 199 files, +21,109 / -6,584 lines.",
+        "KV data: 23 files, +17,415 / -14,754 lines.",
+        "Assets: 70 files, +3,480 / -0 lines.",
+        "Scripts/Tooling: 5 files, +729 / -40 lines.",
+        "Docs: 2 files, +78 / -8 lines.",
+        "Other: 3 files, +53 / -6 lines."
+      ]
+    },
+    {
+      "title": "Release audit",
+      "items": [
+        "Diff analyzed: 820 files, 31 commits, +101,776 / -25,107 lines."
+      ]
+    }
+  ],
+  "sections": [],
+  "impact": [],
+  "meta": {
+    "baseRef": "master",
+    "releaseRef": "v4.0",
+    "compareUrl": "https://github.com/EarthSalamander42/x_hero_siege/compare/master...v4.0",
+    "diffStats": {
+      "changedFiles": 820,
+      "commitCount": 31,
+      "insertions": 101776,
+      "deletions": 25107,
+      "footer": "Diff analyzed: 820 files, 31 commits, +101,776 / -25,107 lines."
+    },
+    "generatedAt": "2026-07-09T13:00:54.319Z"
+  }
+}

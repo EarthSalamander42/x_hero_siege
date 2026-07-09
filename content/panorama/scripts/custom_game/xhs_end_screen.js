@@ -517,28 +517,6 @@ var XHSEndScreen = (function () {
 		return DIFFICULTY_NAMES[difficulty] || (difficulty > 0 ? "Difficulty " + difficulty : "-");
 	}
 
-	function GetGameModeValue(data) {
-		var tableValue = CustomNetTables.GetTableValue("game_options", "gamemode");
-		return data.gamemode
-			|| (data.info && data.info.gamemode)
-			|| (data.data && data.data.gamemode)
-			|| (tableValue && tableValue["1"])
-			|| null;
-	}
-
-	function GetGameModeName(data) {
-		var gameMode = ToNumber(GetGameModeValue(data), 0);
-		if (gameMode > 0) {
-			var token = "#vote_gamemode_" + gameMode;
-			var localized = $.Localize(token);
-			if (localized && localized !== token) {
-				return localized;
-			}
-		}
-
-		return gameMode > 0 ? "Mode " + gameMode : "-";
-	}
-
 	function GetGameId(data) {
 		return (data.info && data.info.id)
 			|| data.game_id
@@ -567,12 +545,6 @@ var XHSEndScreen = (function () {
 		var difficulty = Panel("XHSEndScreenDifficulty");
 		if (difficulty) {
 			difficulty.text = GetDifficultyName(data);
-		}
-
-		var mode = Panel("XHSEndScreenMode");
-		if (mode) {
-			var gameType = data.game_type || (data.info && data.info.game_type) || "XHS";
-			mode.text = gameType + " / " + GetGameModeName(data);
 		}
 
 		var gameID = Panel("XHSEndScreenGameId");

@@ -1301,7 +1301,7 @@ ListenToGameEvent('game_rules_state_change', function(keys)
 	if game_state == DOTA_GAMERULES_STATE_CUSTOM_GAME_SETUP then
 		GameMode:StartCustomSetupFlow()
 	elseif game_state == DOTA_GAMERULES_STATE_HERO_SELECTION then
-		local default_gamemode = XHS_GAMEMODE_CLASSIC or 1
+		local default_gamemode = XHS_GAMEMODE_REBORN or 2
 		local default_difficulty = 1
 
 		if api then
@@ -1357,18 +1357,7 @@ ListenToGameEvent('game_rules_state_change', function(keys)
 			end
 
 			-- Act on the winning vote
-			if category == "gamemode" then
-				local selected_gamemode = tonumber(highest_key) or default_gamemode
-
-				if api then
-					api:SetCustomGamemode(selected_gamemode)
-				else
-					CustomNetTables:SetTableValue("game_options", "gamemode", { tostring(selected_gamemode) })
-				end
-
-				XHS_GAMEMODE_ACTIVE = selected_gamemode
-				GameMode.SelectedGameMode = selected_gamemode
-			elseif category == "difficulty" then
+			if category == "difficulty" then
 				local selected_difficulty = tonumber(highest_key) or default_difficulty
 
 				if api then
@@ -1443,6 +1432,10 @@ function GameMode:OnSettingVote(event_source_index, keys)
 	end
 
 	if category == nil or vote == nil then
+		return
+	end
+
+	if category == "gamemode" then
 		return
 	end
 

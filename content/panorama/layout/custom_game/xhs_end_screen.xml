@@ -29,10 +29,6 @@
 								<Label id="XHSEndScreenDifficulty" class="XHSEndScreenMetaValue" text="-" />
 							</Panel>
 							<Panel class="XHSEndScreenMetaItem">
-								<Label class="XHSEndScreenMetaLabel" text="Mode" />
-								<Label id="XHSEndScreenMode" class="XHSEndScreenMetaValue" text="-" />
-							</Panel>
-							<Panel class="XHSEndScreenMetaItem">
 								<Label class="XHSEndScreenMetaLabel" text="Game ID" />
 								<Label id="XHSEndScreenGameId" class="XHSEndScreenMetaValue" text="-" />
 							</Panel>

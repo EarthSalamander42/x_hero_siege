@@ -80,10 +80,6 @@
 						</Panel>
 
 						<Panel id="VoteProgressTabs" class="vote-progress-tabs">
-							<Button id="VoteProgressGamemode" class="vote-progress-tab" onactivate="ShowVoteProgressCategory('gamemode');">
-								<Label class="vote-progress-tab-title" text="#loading_screen_selected_mode" />
-								<Panel id="VoteProgressGamemodeRows" class="vote-progress-options" />
-							</Button>
 							<Button id="VoteProgressDifficulty" class="vote-progress-tab" onactivate="ShowVoteProgressCategory('difficulty');">
 								<Label class="vote-progress-tab-title" text="#loading_screen_selected_difficulty" />
 								<Panel id="VoteProgressDifficultyRows" class="vote-progress-options" />
@@ -92,10 +88,6 @@
 
 						<Panel id="VoteSelectionSummary" class="vote-selection-summary">
 							<Label class="vote-selection-summary-title" text="#loading_screen_selected_settings" />
-							<Panel class="vote-selection-summary-row">
-								<Label class="vote-selection-summary-key" text="#loading_screen_selected_mode" />
-								<Label id="VoteSelectionGamemode" class="vote-selection-summary-value" text="#loading_screen_not_selected" />
-							</Panel>
 							<Panel class="vote-selection-summary-row">
 								<Label class="vote-selection-summary-key" text="#loading_screen_selected_difficulty" />
 								<Label id="VoteSelectionDifficulty" class="vote-selection-summary-value" text="#loading_screen_not_selected" />

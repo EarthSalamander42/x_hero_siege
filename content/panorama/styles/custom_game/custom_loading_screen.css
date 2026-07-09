@@ -5443,3 +5443,225 @@
 	margin-right: 7px;
 	margin-top: 6px;
 }
+
+/* -------------------------------------------------------------------------- */
+/* Single-mode loading sidebar balance                                        */
+/* -------------------------------------------------------------------------- */
+
+#HomeProfileContainer {
+	height: 170px;
+	min-height: 170px;
+	margin-bottom: 8px;
+}
+
+#vote-container {
+	height: fill-parent-flow(1.0);
+	min-height: 0px;
+	padding-bottom: 8px;
+}
+
+#ProfileSummaryCard,
+#ProfileSummaryCard.ProfileSummaryDonator {
+	padding: 8px 10px 7px 10px;
+}
+
+#ProfileSummaryMainRow {
+	height: fill-parent-flow(1.0);
+	min-height: 76px;
+}
+
+#ProfileSummaryAvatar {
+	width: 64px;
+	height: 64px;
+	margin-right: 10px;
+}
+
+#ProfileSummaryTextWrap {
+	height: 76px;
+}
+
+#ProfileSummaryTopRow {
+	height: 38px;
+}
+
+#ProfileSummaryTitle {
+	max-width: 190px;
+	font-size: 13px;
+	line-height: 16px;
+}
+
+#ProfileSummaryName {
+	max-width: 190px;
+	font-size: 23px;
+	line-height: 28px;
+}
+
+#ProfileSummaryDataGrid {
+	height: 37px;
+	margin-top: 1px;
+}
+
+.profile-summary-column .profile-summary-row {
+	height: 36px;
+}
+
+.profile-summary-column .profile-summary-key {
+	height: 15px;
+	font-size: 11px;
+}
+
+.profile-summary-column .profile-summary-value {
+	height: 19px;
+	font-size: 13px;
+}
+
+.profile-summary-xp-wrap {
+	height: 30px;
+	margin-top: 6px;
+}
+
+.profile-summary-xp-progress {
+	height: 11px;
+	margin-top: 16px;
+}
+
+.profile-summary-xp-text {
+	height: 15px;
+	font-size: 10px;
+}
+
+.vote-header-container {
+	height: 44px;
+}
+
+.vote-title {
+	font-size: 31px;
+	line-height: 36px;
+}
+
+.vote-progress-tabs {
+	height: fill-parent-flow(1.0);
+	padding: 5px 8px 3px 8px;
+}
+
+.vote-progress-option-row {
+	height: 28px;
+	margin-bottom: 3px;
+	padding: 2px 5px;
+}
+
+.vote-progress-option-topline {
+	height: 14px;
+}
+
+.vote-progress-option-name {
+	font-size: 12px;
+}
+
+.vote-progress-option-count {
+	width: 58px;
+	font-size: 11px;
+}
+
+.vote-progress-option-bar {
+	height: 4px;
+	margin-top: 3px;
+}
+
+.vote-selection-summary {
+	height: 56px;
+	margin: 0px 10px 6px 10px;
+	padding: 5px 8px;
+}
+
+.vote-selection-summary-title {
+	height: 13px;
+	font-size: 10px;
+}
+
+.vote-selection-summary-row {
+	height: 21px;
+}
+
+.vote-selection-summary-key {
+	font-size: 11px;
+}
+
+.vote-selection-summary-value {
+	font-size: 13px;
+}
+
+#MainVoteButton {
+	height: 34px;
+	margin-top: 0px;
+}
+
+.AspectRatio4x3 #HomeProfileContainer {
+	height: 154px;
+	min-height: 154px;
+}
+
+.AspectRatio4x3 #ProfileSummaryCard,
+.AspectRatio4x3 #ProfileSummaryCard.ProfileSummaryDonator {
+	padding: 6px 8px 6px 8px;
+}
+
+.AspectRatio4x3 #ProfileSummaryMainRow {
+	min-height: 66px;
+}
+
+.AspectRatio4x3 #ProfileSummaryAvatar {
+	width: 56px;
+	height: 56px;
+	margin-right: 8px;
+}
+
+.AspectRatio4x3 #ProfileSummaryTextWrap {
+	height: 66px;
+}
+
+.AspectRatio4x3 #ProfileSummaryTopRow {
+	height: 34px;
+}
+
+.AspectRatio4x3 #ProfileSummaryName {
+	max-width: 150px;
+	font-size: 20px;
+	line-height: 24px;
+}
+
+.AspectRatio4x3 #ProfileSummaryTitle {
+	max-width: 150px;
+	font-size: 12px;
+	line-height: 15px;
+}
+
+.AspectRatio4x3 #ProfileSummaryDataGrid {
+	height: 31px;
+}
+
+.AspectRatio4x3 .profile-summary-column .profile-summary-row {
+	height: 31px;
+}
+
+.AspectRatio4x3 .vote-header-container {
+	height: 40px;
+}
+
+.AspectRatio4x3 .vote-title {
+	font-size: 28px;
+	line-height: 32px;
+}
+
+.AspectRatio4x3 .vote-progress-option-row {
+	height: 26px;
+	margin-bottom: 3px;
+}
+
+.AspectRatio4x3 .vote-selection-summary {
+	height: 52px;
+}
+
+.AspectRatio4x3 #MainVoteButton {
+	height: 32px;
+}

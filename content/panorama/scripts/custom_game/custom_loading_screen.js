@@ -186,7 +186,6 @@ var view = {
 var vote_tooltips = {};
 var vote_array = {
 	"XHS": {
-		"gamemode": 2,
 		"difficulty": 5,
 	},
 	"PW": {
@@ -3684,7 +3683,6 @@ function SetVoteSummaryValue(panel_id, category, vote_index) {
 }
 
 function UpdateVoteSelectionSummary() {
-	SetVoteSummaryValue("VoteSelectionGamemode", "gamemode", local_votes["gamemode"]);
 	SetVoteSummaryValue("VoteSelectionDifficulty", "difficulty", local_votes["difficulty"]);
 }
 
@@ -3803,7 +3801,6 @@ function UpdateVoteProgressTab(category, root_id, rows_id) {
 }
 
 function UpdateVoteProgressTabs() {
-	UpdateVoteProgressTab("gamemode", "VoteProgressGamemode", "VoteProgressGamemodeRows");
 	UpdateVoteProgressTab("difficulty", "VoteProgressDifficulty", "VoteProgressDifficultyRows");
 }
 
