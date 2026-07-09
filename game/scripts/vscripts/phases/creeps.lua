@@ -1,3 +1,79 @@
+local function OrderWaveCreep(unit, waypoint)
+	if unit == nil or unit:IsNull() then return end
+
+	for abilityIndex = 0, 15 do
+		local ability = unit:GetAbilityByIndex(abilityIndex)
+		if ability ~= nil and ability:GetLevel() <= 0 then
+			ability:SetLevel(1)
+		end
+	end
+
+	if unit:GetUnitName() == "npc_magnataur_destroyer_crypt" then
+		local thunderClap = unit:FindAbilityByName("creature_thunder_clap_low")
+		if thunderClap ~= nil then
+			thunderClap:StartCooldown(RandomFloat(1.5, 6.0))
+		end
+	end
+
+	if waypoint ~= nil and unit.SetInitialGoalEntity ~= nil then
+		unit:SetInitialGoalEntity(waypoint)
+	end
+
+	local target = waypoint or BASE_GOOD
+	if target == nil or target.GetAbsOrigin == nil then return end
+
+	Timers:CreateTimer(0.1, function()
+		if unit == nil or unit:IsNull() or not unit:IsAlive() then return nil end
+		ExecuteOrderFromTable({
+			UnitIndex = unit:entindex(),
+			OrderType = DOTA_UNIT_ORDER_ATTACK_MOVE,
+			Position = target:GetAbsOrigin(),
+		})
+
+		return nil
+	end)
+
+	Timers:CreateTimer(8.0, function()
+		if unit == nil or unit:IsNull() or not unit:IsAlive() then return nil end
+		if unit:GetAttackTarget() ~= nil then return nil end
+		ExecuteOrderFromTable({
+			UnitIndex = unit:entindex(),
+			OrderType = DOTA_UNIT_ORDER_ATTACK_MOVE,
+			Position = target:GetAbsOrigin(),
+		})
+
+		return nil
+	end)
+end
+
+local function SpawnWaveCreep(unitName, point, waypoint)
+	if point == nil then return nil end
+
+	local unit = CreateUnitByName(unitName, point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+	OrderWaveCreep(unit, waypoint)
+	return unit
+end
+
+function ReissueWaveCreepOrders(delay)
+	local target = BASE_GOOD
+	if target == nil or target.GetAbsOrigin == nil then return end
+
+	Timers:CreateTimer(delay or 0.1, function()
+		local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_1, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER, false)
+		for _, unit in pairs(units) do
+			if unit ~= nil and not unit:IsNull() and unit:IsAlive() and unit:HasMovementCapability() and not unit.Boss and unit:GetAttackTarget() == nil and not unit:HasModifier("modifier_cinematic_pause") then
+				ExecuteOrderFromTable({
+					UnitIndex = unit:entindex(),
+					OrderType = DOTA_UNIT_ORDER_ATTACK_MOVE,
+					Position = target:GetAbsOrigin(),
+				})
+			end
+		end
+
+		return nil
+	end)
+end
+
 function SpawnCreeps(force)
 	if force ~= true and XHSDevTools ~= nil and XHSDevTools:IsSandboxActive() then return end
 
@@ -65,38 +141,38 @@ function SpawnCreeps(force)
 
 	for c = 1, 8 do -- replace 8 with player count, to open and close lanes super easily
 		local point = Entities:FindByName(nil, "npc_dota_spawner_" .. c)
-		--	local Waypoint = Entities:FindByName( nil, "creep_path_"..c)
+		local waypoint = Entities:FindByName(nil, "creep_path_" .. c)
 
 		if not point.disabled then
 			if CREEP_LANES[c][1] == 1 then -- Lane Activated?
 				if CREEP_LANES[c][3] == 1 then -- Barrack Alive?
 					if CREEP_LANES[c][2] == 1 then -- Lane Level
 						for j = 1, 4 do
-							CreateUnitByName(melee_1[GameMode.creep_roll["race"]], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+							SpawnWaveCreep(melee_1[GameMode.creep_roll["race"]], point, waypoint)
 						end
 						for j = 1, 2 do
-							CreateUnitByName(ranged_1[GameMode.creep_roll["race"]], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+							SpawnWaveCreep(ranged_1[GameMode.creep_roll["race"]], point, waypoint)
 						end
 					elseif CREEP_LANES[c][2] == 2 then
 						for j = 1, 4 do
-							CreateUnitByName(melee_2[GameMode.creep_roll["race"]], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+							SpawnWaveCreep(melee_2[GameMode.creep_roll["race"]], point, waypoint)
 						end
 						for j = 1, 2 do
-							CreateUnitByName(ranged_2[GameMode.creep_roll["race"]], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+							SpawnWaveCreep(ranged_2[GameMode.creep_roll["race"]], point, waypoint)
 						end
 					elseif CREEP_LANES[c][2] == 3 then
 						for j = 1, 4 do
-							CreateUnitByName(melee_3[GameMode.creep_roll["race"]], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+							SpawnWaveCreep(melee_3[GameMode.creep_roll["race"]], point, waypoint)
 						end
 						for j = 1, 2 do
-							CreateUnitByName(ranged_3[GameMode.creep_roll["race"]], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+							SpawnWaveCreep(ranged_3[GameMode.creep_roll["race"]], point, waypoint)
 						end
 					elseif CREEP_LANES[c][2] >= 4 then
 						for j = 1, 4 do
-							CreateUnitByName(melee_4[GameMode.creep_roll["race"]], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+							SpawnWaveCreep(melee_4[GameMode.creep_roll["race"]], point, waypoint)
 						end
 						for j = 1, 2 do
-							CreateUnitByName(ranged_4[GameMode.creep_roll["race"]], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+							SpawnWaveCreep(ranged_4[GameMode.creep_roll["race"]], point, waypoint)
 						end
 					end
 				end
@@ -156,7 +232,8 @@ end
 
 function SpawnMagnataur(hPos)
 	for i = 1, GameRules:GetCustomGameDifficulty() do
-		CreateUnitByName("npc_magnataur_destroyer_crypt", hPos, true, nil, nil, DOTA_TEAM_CUSTOM_1)
+		local unit = CreateUnitByName("npc_magnataur_destroyer_crypt", hPos, true, nil, nil, DOTA_TEAM_CUSTOM_1)
+		OrderWaveCreep(unit, nil)
 	end
 end
 
@@ -164,8 +241,9 @@ function SpawnDragons(dragon)
 	for c = 1, 8 do
 		if CREEP_LANES[c][1] == 1 and CREEP_LANES[c][3] == 1 then
 			local point = Entities:FindByName(nil, "npc_dota_spawner_" .. c)
+			local waypoint = Entities:FindByName(nil, "creep_path_" .. c)
 			for j = 1, GameRules:GetCustomGameDifficulty() do
-				local dragon = CreateUnitByName(dragon, point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+				SpawnWaveCreep(dragon, point, waypoint)
 			end
 		end
 	end

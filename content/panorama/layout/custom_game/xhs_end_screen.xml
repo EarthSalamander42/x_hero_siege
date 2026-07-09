@@ -76,7 +76,7 @@
 
 			<Panel class="XHSEndScreenSupportCta">
 				<Panel class="XHSEndScreenSupportMark">
-					<Label text="S" />
+					<Image class="XHSEndScreenSupportLogo" src="file://{images}/custom_game/logo/logo-xhs-transparent.png" />
 				</Panel>
 				<Panel class="XHSEndScreenSupportCopy">
 					<Panel class="XHSEndScreenSupportHeader">

@@ -217,7 +217,30 @@ local XHS_TOME_ITEM_NAMES = {
 }
 
 function IsTomeItemName(itemName)
-	return itemName ~= nil and XHS_TOME_ITEM_NAMES[itemName] == true
+	return itemName ~= nil and XHS_TOME_ITEM_NAMES[tostring(itemName)] == true
+end
+
+local XHS_TOME_STAT_VALUES = {
+	item_tome_small = 50,
+	item_tome_big = 250,
+}
+
+local XHS_POTION_ITEM_NAMES = {
+	item_health_potion = true,
+	item_mana_potion = true,
+	item_potion_full = true,
+	item_potion_of_invulnerability = true,
+	item_potion_of_antimagic = true,
+}
+
+function XHSGetTomeStatValue(itemName)
+	if itemName == nil then return 0 end
+
+	return tonumber(XHS_TOME_STAT_VALUES[tostring(itemName)]) or 0
+end
+
+function XHSIsPotionItemName(itemName)
+	return itemName ~= nil and XHS_POTION_ITEM_NAMES[tostring(itemName)] == true
 end
 
 function SetHeroOptionalEventTomeLock(hero, eventName, isLocked)
@@ -276,11 +299,15 @@ function BuyMaxSmallTomesForPlayer(playerID)
 	Notifications:Bottom(player, { text = "You've bought " .. numberOfTomes .. " Tomes!", duration = 5.0, style = { color = "white" } })
 	PlayerResource:SpendGold(playerID, numberOfTomes * cost, DOTA_ModifyGold_PurchaseItem)
 
+	if XHSRecordTomeStatsForPlayer ~= nil then
+		XHSRecordTomeStatsForPlayer(playerID, numberOfTomes * 50)
+	end
+
 	local i = 0
 	GameRules:GetGameModeEntity():SetContextThink("PreGame", function()
 		if hero == nil or hero:IsNull() then return nil end
 
-		hero:IncrementAttributes(50)
+		hero:IncrementAttributes(50, { record_stats = false })
 		hero:EmitSound("ui.trophy_levelup")
 
 		local pfx = ParticleManager:CreateParticle("particles/generic_hero_status/hero_levelup.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero, hero)
@@ -1652,11 +1679,11 @@ function XHSGetPlayerIDFromUnit(unit)
 	return playerID
 end
 
-function XHSRecordTomeStats(unit, amount)
-	local playerID = XHSGetPlayerIDFromUnit(unit)
+function XHSRecordTomeStatsForPlayer(playerID, amount)
+	playerID = tonumber(playerID)
 	amount = tonumber(amount) or 0
 
-	if playerID == nil or amount <= 0 then
+	if playerID == nil or playerID < 0 or not PlayerResource:IsValidPlayerID(playerID) or amount <= 0 then
 		return 0
 	end
 
@@ -1670,6 +1697,10 @@ function XHSRecordTomeStats(unit, amount)
 	return _G.XHS_TOME_STATS[playerID]
 end
 
+function XHSRecordTomeStats(unit, amount)
+	return XHSRecordTomeStatsForPlayer(XHSGetPlayerIDFromUnit(unit), amount)
+end
+
 function XHSGetTomeStats(playerID)
 	if playerID == nil then return 0 end
 
@@ -1677,10 +1708,22 @@ function XHSGetTomeStats(playerID)
 	return tonumber(_G.XHS_TOME_STATS[playerID]) or 0
 end
 
-function XHSRecordPotionUse(caster)
-	local playerID = XHSGetPlayerIDFromUnit(caster)
+function XHSRecordPotionUseForPlayer(playerID, caster, itemName)
+	playerID = tonumber(playerID)
 
-	if playerID == nil then return 0 end
+	if playerID == nil or playerID < 0 or not PlayerResource:IsValidPlayerID(playerID) then return 0 end
+
+	if itemName ~= nil then
+		_G.XHS_POTION_RECORD_TIMES = _G.XHS_POTION_RECORD_TIMES or {}
+		local key = tostring(playerID) .. ":" .. tostring(itemName)
+		local now = GameRules ~= nil and GameRules:GetGameTime() or 0
+		local last = _G.XHS_POTION_RECORD_TIMES[key]
+		if last ~= nil and now - last < 0.12 then
+			_G.XHS_POTION_USES = _G.XHS_POTION_USES or {}
+			return tonumber(_G.XHS_POTION_USES[playerID]) or 0
+		end
+		_G.XHS_POTION_RECORD_TIMES[key] = now
+	end
 
 	_G.XHS_POTION_USES = _G.XHS_POTION_USES or {}
 	_G.XHS_POTION_USES[playerID] = (_G.XHS_POTION_USES[playerID] or 0) + 1
@@ -1689,11 +1732,11 @@ function XHSRecordPotionUse(caster)
 		XHSRecordEndScreenStat(playerID, "potions_used", 1)
 	end
 
-	if FragmentQuests ~= nil then
+	if FragmentQuests ~= nil and caster ~= nil then
 		FragmentQuests:OnPotionUsed(caster)
 	end
 
-	if ZONE_STAT_POTIONS ~= nil and GameRules.GameMode ~= nil and GameRules.GameMode.Zones ~= nil then
+	if caster ~= nil and ZONE_STAT_POTIONS ~= nil and GameRules.GameMode ~= nil and GameRules.GameMode.Zones ~= nil then
 		for _, Zone in pairs(GameRules.GameMode.Zones) do
 			if Zone ~= nil and Zone.ContainsUnit ~= nil and Zone:ContainsUnit(caster) then
 				Zone:AddStat(playerID, ZONE_STAT_POTIONS, 1)
@@ -1702,6 +1745,10 @@ function XHSRecordPotionUse(caster)
 	end
 
 	return _G.XHS_POTION_USES[playerID]
+end
+
+function XHSRecordPotionUse(caster, itemName)
+	return XHSRecordPotionUseForPlayer(XHSGetPlayerIDFromUnit(caster), caster, itemName)
 end
 
 function XHSGetPotionUses(playerID)

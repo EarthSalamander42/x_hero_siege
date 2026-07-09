@@ -5541,31 +5541,33 @@
 
 .vote-progress-tabs {
 	height: fill-parent-flow(1.0);
-	padding: 5px 8px 3px 8px;
+	padding: 7px 8px 5px 8px;
 }
 
 .vote-progress-option-row {
-	height: 28px;
-	margin-bottom: 3px;
-	padding: 2px 5px;
+	height: 41px;
+	margin-bottom: 7px;
+	padding: 5px 7px;
 }
 
 .vote-progress-option-topline {
-	height: 14px;
+	height: 20px;
 }
 
 .vote-progress-option-name {
-	font-size: 12px;
+	font-size: 15px;
+	line-height: 18px;
 }
 
 .vote-progress-option-count {
-	width: 58px;
-	font-size: 11px;
+	width: 78px;
+	font-size: 13px;
+	line-height: 16px;
 }
 
 .vote-progress-option-bar {
-	height: 4px;
-	margin-top: 3px;
+	height: 7px;
+	margin-top: 5px;
 }
 
 .vote-selection-summary {
@@ -5654,8 +5656,8 @@
 }
 
 .AspectRatio4x3 .vote-progress-option-row {
-	height: 26px;
-	margin-bottom: 3px;
+	height: 36px;
+	margin-bottom: 5px;
 }
 
 .AspectRatio4x3 .vote-selection-summary {

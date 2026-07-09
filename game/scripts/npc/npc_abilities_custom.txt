@@ -1440,6 +1440,11 @@
 		"AbilityCastRange"				"1000"
 		"AbilityCastPoint"				"0.2"
 
+		"precache"
+		{
+			"soundfile"					"soundevents/game_sounds_heroes/game_sounds_lich.vsndevts"
+		}
+
 		// Time		
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityCooldown"				"10.0"
@@ -1961,9 +1966,11 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityManaCost"               "80 100 120 140"
 		
-		// Damage
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityDamage"                 "100 250 550 900"
+		"precache"
+		{
+			"particle"		"particles/units/heroes/hero_dazzle/dazzle_shadow_wave.vpcf"
+			"particle"		"particles/units/heroes/hero_dazzle/dazzle_shadow_wave_impact_damage.vpcf"
+		}
 	
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
@@ -1974,6 +1981,7 @@
 			"max_targets"       "8"
 			"tooltip_max_targets"	"8"
 			"damage"            "150 250 550 900"
+			"heal_pct"          "5"
 		}
 	
 		"OnSpellStart"
@@ -1988,8 +1996,8 @@
 			{
 				"ScriptFile"    "abilities/heroes/hero_paladin.lua"
 				"Function"      "ShadowWave"
-				"shadow_wave_particle"  "particles/units/heroes/hero_uther/uther_healing_wave.vpcf"
-				"damage_particle"       "particles/units/heroes/hero_uther/uther_healing_wave_impact_damage.vpcf"
+				"shadow_wave_particle"  "particles/units/heroes/hero_dazzle/dazzle_shadow_wave.vpcf"
+				"damage_particle"       "particles/units/heroes/hero_dazzle/dazzle_shadow_wave_impact_damage.vpcf"
 			}
 		}
 	}
@@ -2257,12 +2265,21 @@
 		"AbilityCastPoint"			"0.3"
 		"AbilityCooldown"			"20.0"
 		"AbilityManaCost"			"50"
+
+		"precache"
+		{
+			"particle"		"particles/units/heroes/hero_axe/axe_beserkers_call_owner.vpcf"
+			"particle"		"particles/units/heroes/hero_axe/axe_beserkers_call.vpcf"
+			"particle"		"particles/status_fx/status_effect_beserkers_call.vpcf"
+			"soundfile"		"soundevents/game_sounds_heroes/game_sounds_axe.vsndevts"
+		}
 			
 		"AbilityCastRange"			"%radius"
 		"AbilityValues"
 		{
 			"radius"			"450"
 			"max_units"			"20"
+			"duration"			"3.0"
 		}
 	
 		"OnSpellStart"
@@ -2286,6 +2303,7 @@
 		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_IGNORE_CHANNEL"
 		"AbilityType" 					"DOTA_ABILITY_TYPE_ULTIMATE"
 		"SpellImmunityType"             "SPELL_IMMUNITY_ENEMIES_YES"
+		"MaxLevel"						"3"
 		"RequiredLevel"					"10"
 		"LevelsBetweenUpgrades"			"5"
 		"AbilityTextureName"            "custom/holdout_pure_light"

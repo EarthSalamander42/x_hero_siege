@@ -9,7 +9,7 @@ local Mana = 30000
 	caster:SetMana(caster:GetMana() + Mana)
 	SendOverheadEventMessage(nil, OVERHEAD_ALERT_MANA_ADD, caster, Mana, nil)
 
-	XHSRecordPotionUse(caster)
+	XHSRecordPotionUse(caster, ability and ability:GetAbilityName())
 end
 
 function Invulnerability(event)
@@ -19,9 +19,10 @@ local duration = ability:GetLevelSpecialValueFor("duration", (ability:GetLevel()
 
 	caster:AddNewModifier( caster, nil, "modifier_invulnerable", {duration = duration})
 
-	XHSRecordPotionUse(caster)
+	XHSRecordPotionUse(caster, ability and ability:GetAbilityName())
 end
 
 function AntiMagic(event)
-	XHSRecordPotionUse(event.caster)
+	local ability = event.ability
+	XHSRecordPotionUse(event.caster, ability and ability:GetAbilityName())
 end

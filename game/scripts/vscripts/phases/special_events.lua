@@ -7,6 +7,8 @@ end
 local SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP = 2.75
 local CINEMATIC_EVENT_PRE_TELEPORT_DELAY = 4.0
 local CINEMATIC_EVENT_POST_TELEPORT_HOLD = 1.5
+local MURADIN_ENTRY_EXTRA_STUN = 3.0
+local MURADIN_EXIT_STUN_DURATION = 5.0
 
 local function ShowCurrentEventTimer(title, duration)
 	CustomGameEventManager:Send_ServerToAllClients("show_current_event_timer", {
@@ -170,7 +172,7 @@ local function PlayStormEarthFireSound(entity)
 end
 
 function SpecialEvents:MuradinEvent(time)
-	local stun_duration = CINEMATIC_EVENT_PRE_TELEPORT_DELAY + CINEMATIC_EVENT_POST_TELEPORT_HOLD
+	local stun_duration = CINEMATIC_EVENT_PRE_TELEPORT_DELAY + CINEMATIC_EVENT_POST_TELEPORT_HOLD + MURADIN_ENTRY_EXTRA_STUN
 	local event_end_delay = time + stun_duration
 
 	StopAllStormEarthFireSounds()
@@ -260,7 +262,7 @@ function SpecialEvents:MuradinEvent(time)
 		end
 		BT_ENABLED = 1
 		CustomTimers.timers_paused = 0
-		RestartCreeps(3.0)
+		RestartCreeps(MURADIN_EXIT_STUN_DURATION)
 		Notifications:TopToAll({ text = "Special Events are unlocked!", style = { color = "DodgerBlue" }, duration = 5.0 })
 		Entities:FindByName(nil, "trigger_special_event_tp_off"):Disable()
 		Entities:FindByName(nil, "trigger_special_event"):Enable()
@@ -273,6 +275,7 @@ function SpecialEvents:MuradinEvent(time)
 		if CustomTimers.special_waves_disabled ~= true then
 			SpecialWave(3)
 		end
+		CinematicPauseGame(SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP, MURADIN_EXIT_STUN_DURATION)
 
 		return nil
 	end, event_end_delay)

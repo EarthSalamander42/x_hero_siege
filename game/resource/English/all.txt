@@ -999,13 +999,14 @@
 
 //PALADIN
 "DOTA_Tooltip_ability_holdout_healing_wave"								"Healing Wave"
-"DOTA_Tooltip_ability_holdout_healing_wave_Description"					"Sends out a bolt of power that arcs between allies, healing them while damaging any units standing nearby. Uther is always healed by Healing Wave."
+"DOTA_Tooltip_ability_holdout_healing_wave_Description"					"Sends out a bolt of power that arcs between allies, healing them for a flat amount plus a percentage of max health while damaging any units standing nearby. Uther is always healed by Healing Wave."
 "DOTA_Tooltip_ability_holdout_healing_wave_Lore"						"While it is a simplistic and routine rite among Light Priests, the Healing Wave is also the most critical for success."
 "DOTA_Tooltip_ability_holdout_healing_wave_Note0"						"Prioritizes allied heroes over creeps."
 "DOTA_Tooltip_ability_holdout_healing_wave_Note1"						"If enemies are near multiple allied units affected by Healing Wave, they will take multiple instances of damage."
 "DOTA_Tooltip_ability_holdout_healing_wave_bounce_radius"				"HEAL ARC RADIUS:"
 "DOTA_Tooltip_ability_holdout_healing_wave_tooltip_max_targets"			"MAX HEAL TARGETS:"
 "DOTA_Tooltip_ability_holdout_healing_wave_damage_radius"				"DAMAGE RADIUS:"
+"DOTA_Tooltip_ability_holdout_healing_wave_heal_pct"					"%MAX HEALTH HEAL:"
 
 "DOTA_Tooltip_ability_holdout_fan_of_light"								"Fan of Light"
 "DOTA_Tooltip_ability_holdout_fan_of_light_Description"					"Uther releases a wave of light around him, dealing damage to enemy units."
@@ -1031,6 +1032,7 @@
 
 "DOTA_Tooltip_ability_holdout_taunt"								"Taunt"
 "DOTA_Tooltip_ability_holdout_taunt_Description"					"Forces all enemy units around Paladin to attack him for a short duration."
+"DOTA_Tooltip_ability_holdout_taunt_duration"						"DURATION:"
 
 "DOTA_Tooltip_ability_holdout_pure_light"								"Pure Light"
 "DOTA_Tooltip_ability_holdout_pure_light_Description"					"Calls an invulnerable sphere of concentrated light energy, increasing base damage and attack rate."

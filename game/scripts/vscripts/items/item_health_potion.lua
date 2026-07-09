@@ -12,7 +12,7 @@ function item_health_potion:OnSpellStart()
 		self:GetCaster():Heal(self.heal, self)
 		SendOverheadEventMessage(nil, OVERHEAD_ALERT_HEAL, self:GetCaster(), self.heal, nil)
 
-		XHSRecordPotionUse(self:GetCaster())
+		XHSRecordPotionUse(self:GetCaster(), self:GetAbilityName())
 
 		local nFXIndex = ParticleManager:CreateParticle("particles/items3_fx/fish_bones_active.vpcf", PATTACH_ABSORIGIN_FOLLOW, self:GetCaster())
 		ParticleManager:ReleaseParticleIndex(nFXIndex)

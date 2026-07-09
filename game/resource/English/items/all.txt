@@ -104,14 +104,20 @@
 "DOTA_Tooltip_ability_item_tempest_aegis_evasion_proc_duration"		"PROC DURATION:"
 "DOTA_Tooltip_ability_item_tempest_aegis_evasion_proc_cooldown"		"PROC COOLDOWN:"
 
-"DOTA_Tooltip_ability_item_orb_of_arcane_Description"				"<h1><font color='#FF7800'>Passive:</font></h1> Arcane Orb. Grants spell amplification and mana regeneration."
+"DOTA_Tooltip_ability_item_orb_of_arcane_Description"				"<h1><font color='#FF7800'>Passive:</font></h1> Arcane Orb. Grants spell amplification, mana regeneration, reduced mana costs, and Arcane Exposure on spells."
 "DOTA_Tooltip_ability_item_orb_of_arcane_spell_amp"					"%SPELL AMPLIFICATION:"
 "DOTA_Tooltip_ability_item_orb_of_arcane_mana_regen"					"MANA REGEN:"
+"DOTA_Tooltip_ability_item_orb_of_arcane_mana_cost_reduction_pct"		"%MANA COST REDUCTION:"
+"DOTA_Tooltip_ability_item_orb_of_arcane_exposure_magic_resist_reduction"	"%MAGIC RESISTANCE REDUCTION:"
+"DOTA_Tooltip_ability_item_orb_of_arcane_exposure_duration"			"EXPOSURE DURATION:"
 
-"DOTA_Tooltip_ability_item_mystic_gem_Description"					"<h1><font color='#FF7800'>Passive:</font></h1> Arcane Orb. Grants spell amplification, mana regeneration, and reduced mana costs."
+"DOTA_Tooltip_ability_item_mystic_gem_Description"					"<h1><font color='#FF7800'>Passive:</font></h1> Arcane Orb. Grants spell amplification, mana regeneration, reduced mana costs, cooldown reduction, and stronger Arcane Exposure."
 "DOTA_Tooltip_ability_item_mystic_gem_spell_amp"						"%SPELL AMPLIFICATION:"
 "DOTA_Tooltip_ability_item_mystic_gem_mana_regen"					"MANA REGEN:"
 "DOTA_Tooltip_ability_item_mystic_gem_mana_cost_reduction_pct"		"%MANA COST REDUCTION:"
+"DOTA_Tooltip_ability_item_mystic_gem_cooldown_reduction_pct"			"%COOLDOWN REDUCTION:"
+"DOTA_Tooltip_ability_item_mystic_gem_exposure_magic_resist_reduction"	"%MAGIC RESISTANCE REDUCTION:"
+"DOTA_Tooltip_ability_item_mystic_gem_exposure_duration"				"EXPOSURE DURATION:"
 
 "DOTA_Tooltip_ability_item_astral_core_Description"					"<h1><font color='#FF7800'>Passive:</font></h1> Arcane Orb. Grants spell amplification, mana regeneration, reduced mana costs, and cooldown reduction. Your spells apply Arcane Exposure, briefly reducing enemy magic resistance."
 "DOTA_Tooltip_ability_item_astral_core_spell_amp"					"%SPELL AMPLIFICATION:"

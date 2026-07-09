@@ -371,6 +371,13 @@ function buildMarkdown(data) {
   lines.push(`> ${data.summary}`);
   lines.push('> Draft generated from Git diff. Needs human review before publishing.');
   lines.push('');
+  lines.push('## Authoring Rules');
+  lines.push('');
+  lines.push('- Sort entries alphabetically inside each patch-note category.');
+  lines.push('- For hero or unit ability changes, use a second hierarchy: entity, then ability section, then ability entries.');
+  lines.push('- Do not publish internal Lua rewrites unless they change visible behavior, repair ability behavior, or add readable combat mechanics.');
+  lines.push('- Label bug fixes only when the diff provides visible gameplay evidence or after manual review.');
+  lines.push('');
   lines.push('## Highlights');
   lines.push('');
   lines.push('- TODO: Add 3-5 player-facing highlights after reviewing the generated evidence below.');
@@ -513,6 +520,12 @@ function buildWebJson(data) {
         footer: data.diffFooter,
       },
       generatedAt: data.generatedAt,
+      changelogRules: [
+        'Entries inside a category are displayed alphabetically by title.',
+        'Hero and unit ability changes use a second hierarchy: entity, then ability section, then ability entries.',
+        'Internal Lua rewrites are not player-facing notes unless they change visible behavior, repair ability behavior, or add readable combat mechanics.',
+        'Potential bug fixes inferred from code need visible gameplay evidence or manual review before being labeled as fixes.',
+      ],
     },
   };
 }

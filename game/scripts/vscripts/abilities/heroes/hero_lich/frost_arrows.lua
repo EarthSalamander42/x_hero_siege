@@ -33,6 +33,7 @@ end
 function modifier_holdout_frost_arrows:DeclareFunctions()
 	return {
 		MODIFIER_EVENT_ON_ATTACK_RECORD,
+		MODIFIER_EVENT_ON_ATTACK,
 		MODIFIER_EVENT_ON_ATTACK_LANDED,
 		MODIFIER_EVENT_ON_ATTACK_RECORD_DESTROY,
 		MODIFIER_PROPERTY_PROJECTILE_NAME,
@@ -69,6 +70,13 @@ function modifier_holdout_frost_arrows:OnAttackRecord(keys)
 	else
 		self:GetParent():SpendMana(ability:GetManaCost(ability:GetLevel() - 1), ability)
 	end
+end
+
+function modifier_holdout_frost_arrows:OnAttack(keys)
+	if not IsServer() then return end
+	if keys.attacker ~= self:GetParent() then return end
+	if self.attack_records[keys.record] ~= true then return end
+
 	self:GetParent():EmitSound("Hero_DrowRanger.FrostArrows")
 end
 

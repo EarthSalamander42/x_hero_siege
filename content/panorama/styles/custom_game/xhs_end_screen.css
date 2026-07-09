@@ -757,17 +757,16 @@
 	height: 48px;
 	margin-right: 12px;
 	vertical-align: center;
-	background-color: gradient( linear, 0% 0%, 100% 100%, from( #1aa9d6 ), to( #0a5f88 ) );
-	border: 1px solid #b9f1ff44;
-	box-shadow: fill #45d5ff24 0px 0px 12px 0px;
+	background-color: gradient( radial, 50% 50%, 0% 0%, 82% 82%, from( #10364fe8 ), color-stop( 0.62, #071522ef ), to( #020711f2 ) );
+	border: 1px solid #7bd8ff44;
+	box-shadow: fill #45d5ff20 0px 0px 12px 0px;
 }
 
-.XHSEndScreenSupportMark Label {
+.XHSEndScreenSupportLogo {
+	width: 42px;
+	height: 42px;
 	align: center center;
-	color: #f4fbff;
-	font-size: 25px;
-	font-weight: bold;
-	text-shadow: 0px 1px 3px #000000;
+	img-shadow: 0px 0px 8px #70dfff66;
 }
 
 .XHSEndScreenSupportCopy {

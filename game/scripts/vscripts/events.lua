@@ -504,6 +504,27 @@ ListenToGameEvent('dota_item_purchased', function(keys)
 	end, 0)
 end, nil)
 
+local function GetXHSTrackedPlayerHero(playerID)
+	if playerID == nil or playerID < 0 or not PlayerResource:IsValidPlayerID(playerID) then return nil end
+
+	local hero = PlayerResource:GetSelectedHeroEntity(playerID)
+	if hero ~= nil and not hero:IsNull() then return hero end
+
+	local player = PlayerResource:GetPlayer(playerID)
+	return player ~= nil and player:GetAssignedHero() or nil
+end
+
+ListenToGameEvent('dota_player_used_ability', function(keys)
+	local playerID = tonumber(keys.PlayerID or keys.player_id or keys.playerid)
+	if playerID == nil or playerID < 0 then return end
+
+	local abilityName = keys.abilityname or keys.itemname or keys.ability_name
+	if XHSIsPotionItemName == nil or XHSIsPotionItemName(abilityName) ~= true then return end
+	if XHSRecordPotionUseForPlayer == nil then return end
+
+	XHSRecordPotionUseForPlayer(playerID, GetXHSTrackedPlayerHero(playerID), abilityName)
+end, nil)
+
 local function GetHeroFromInventoryEvent(keys)
 	local unitEntIndex = tonumber(keys.unit_entindex or keys.inventory_parent_entindex or keys.entindex or keys.entityIndex)
 	if unitEntIndex ~= nil and unitEntIndex > 0 then
@@ -1180,6 +1201,9 @@ ListenToGameEvent('entity_killed', function(keys)
 		if FragmentQuests ~= nil then
 			FragmentQuests:OnHeroDeath(killedUnit)
 		end
+		if ReissueWaveCreepOrders ~= nil then
+			ReissueWaveCreepOrders(0.5)
+		end
 
 		-- local netTable = {}
 		--		CustomGameEventManager:Send_ServerToPlayer(killedUnit:GetPlayerOwner(), "life_lost", netTable)
@@ -1794,6 +1818,10 @@ function GameMode:OnQuestCompleted(questZone, quest)
 		elseif quest.szQuestName == "kill_dest_mag" then
 			if FragmentQuests ~= nil then
 				FragmentQuests:OnPhase2End()
+			end
+
+			if bQuestPreviouslyCompleted == false then
+				Notifications:TopToAll({ text = "Phase 2 Creeps enabled!", style = { color = "lightgreen" }, duration = 5.0 })
 			end
 
 			-- timers remains paused until magnataurs are killed

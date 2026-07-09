@@ -87,7 +87,7 @@
 	horizontal-align: left;
 	vertical-align: top;
 	margin-top: 280px;
-	margin-left: 368px;
+	margin-left: 424px;
 	ignore-parent-flow: true;
 	opacity: .42;
 	brightness: .82;
@@ -139,14 +139,14 @@
 
 .QuestLogCollapseButton.QuestLogCollapsed
 {
-	transform: translatex( -360px );
+	transform: translatex( -416px );
 }
 
 .HUDFlipped .QuestLogCollapseButton
 {
 	horizontal-align: right;
 	margin-left: 0px;
-	margin-right: 388px;
+	margin-right: 424px;
 }
 
 .HUDFlipped .QuestLogCollapseButton .QuestLogCollapseArrow
@@ -163,7 +163,7 @@
 
 .HUDFlipped .QuestLogCollapseButton.QuestLogCollapsed
 {
-	transform: translatex( 360px );
+	transform: translatex( 416px );
 }
 
 .QuestLogPinButton

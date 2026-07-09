@@ -113,7 +113,7 @@ function Precache(context)
 	-- --	XHSPrecache:PrecacheUnit("npc_dota_hero_lion", nil, -1) 			-- Warden &  Pit Lord
 	XHSPrecache:PrecacheUnit("npc_dota_hero_life_stealer", nil, -1) -- Creep wave 1 (undead)
 	XHSPrecache:PrecacheUnit("npc_dota_hero_lycan", nil, -1)     -- Creep level 4 human melee
-	-- --	XHSPrecache:PrecacheUnit("npc_dota_hero_magnataur", nil, -1) 	-- Magnataur & Tauren Chieftain
+	XHSPrecache:PrecacheUnit("npc_dota_hero_magnataur", nil, -1) 	-- Magnataur & Tauren Chieftain
 	XHSPrecache:PrecacheUnit("npc_dota_hero_morphling", nil, -1) -- Archmage & Archimage
 	XHSPrecache:PrecacheUnit("npc_dota_hero_naga_siren", nil, -1) -- Special Wave 2
 	-- XHSPrecache:PrecacheUnit("npc_dota_hero_necrolyte", nil, -1)     -- Special Wave 1 & Tauren Chieftain & Dark Summoner & LK & Paladin &

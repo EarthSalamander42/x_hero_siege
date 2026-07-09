@@ -202,7 +202,7 @@ function CDOTA_BaseNPC:IncrementAttributes(amount, options)
 		self:AddNewModifier(self, nil, "modifier_tome_of_stats", {}):SetStackCount(amount)
 	end
 
-	if XHSRecordTomeStats ~= nil then
+	if XHSRecordTomeStats ~= nil and (type(options) ~= "table" or options.record_stats ~= false) then
 		XHSRecordTomeStats(self, amount)
 	end
 

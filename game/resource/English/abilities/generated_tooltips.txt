@@ -30,6 +30,7 @@
 "DOTA_Tooltip_ability_holdout_frost_chaos_tick_rate"		"TICK RATE:"
 "DOTA_Tooltip_ability_holdout_healing_wave_max_targets"		"MAX TARGETS:"
 "DOTA_Tooltip_ability_holdout_healing_wave_damage"		"DAMAGE:"
+"DOTA_Tooltip_ability_holdout_healing_wave_heal_pct"		"%MAX HEALTH HEAL:"
 "DOTA_Tooltip_ability_holdout_fan_of_light_projectile_speed"		"PROJECTILE SPEED:"
 "DOTA_Tooltip_ability_holdout_howl_of_terror_wave_speed"		"WAVE SPEED:"
 "DOTA_Tooltip_ability_holdout_howl_of_terror_wave_width"		"WAVE WIDTH:"

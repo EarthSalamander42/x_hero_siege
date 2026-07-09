@@ -1115,12 +1115,12 @@
 
 		"AbilityValues"
 		{
-			"spell_amp"							"8"
+			"spell_amp"							"35"
 			"mana_regen"						"5"
-			"mana_cost_reduction_pct"			"0"
+			"mana_cost_reduction_pct"			"5"
 			"cooldown_reduction_pct"			"0"
-			"exposure_magic_resist_reduction"	"0"
-			"exposure_duration"					"0"
+			"exposure_magic_resist_reduction"	"6"
+			"exposure_duration"					"3.0"
 		}
 	}
 
@@ -1160,12 +1160,12 @@
 
 		"AbilityValues"
 		{
-			"spell_amp"							"16"
-			"mana_regen"						"10"
+			"spell_amp"							"35"
+			"mana_regen"						"12"
 			"mana_cost_reduction_pct"			"10"
-			"cooldown_reduction_pct"			"0"
-			"exposure_magic_resist_reduction"	"0"
-			"exposure_duration"					"0"
+			"cooldown_reduction_pct"			"5"
+			"exposure_magic_resist_reduction"	"10"
+			"exposure_duration"					"3.0"
 		}
 	}
 
@@ -1226,7 +1226,7 @@
 
 		"AbilityValues"
 		{
-			"spell_amp"							"25"
+			"spell_amp"							"35"
 			"mana_regen"						"20"
 			"mana_cost_reduction_pct"			"15"
 			"cooldown_reduction_pct"			"10"

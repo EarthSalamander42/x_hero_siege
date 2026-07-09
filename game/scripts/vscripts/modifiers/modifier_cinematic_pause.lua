@@ -100,10 +100,10 @@ end
 function modifier_cinematic_pause:CheckState()
 	local state = {
 		[MODIFIER_STATE_INVULNERABLE] = true,
+		[MODIFIER_STATE_DISARMED] = true,
 	}
 
 	if self:GetSlowProgress() >= 1 then
-		state[MODIFIER_STATE_DISARMED] = true
 		state[MODIFIER_STATE_SILENCED] = true
 		state[MODIFIER_STATE_MUTED] = true
 		state[MODIFIER_STATE_STUNNED] = true
