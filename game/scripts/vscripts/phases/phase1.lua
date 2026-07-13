@@ -11,9 +11,12 @@ function SpecialEventTPEnabled(event)
 	local hero = event.activator
 	local point = Entities:FindByName(nil, "event_tp_fix"):GetAbsOrigin()
 	if PlayerResource:GetConnectionState(hero:GetPlayerID()) ~= 2 then return end
+	local heroImageUsed = GameMode.IsHeroImageCompleted ~= nil
+		and GameMode:IsHeroImageCompleted(hero:GetPlayerID(), hero)
+		or hero.hero_image == true
 
 	CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "show_events", {
-		hero_image_used = hero.hero_image == true,
+		hero_image_used = heroImageUsed,
 		hero_image_busy = GameMode.HeroImage_occuring == true,
 		all_hero_images_used = GameMode.AllHeroImagesDead == true,
 		all_hero_images_busy = GameMode.AllHeroImages_occuring == true,
@@ -30,7 +33,9 @@ function HeroImageBack(event)
 
 	if hero == nil or hero:IsNull() then return end
 
-	local heroImageCompleted = hero.hero_image == true
+	local heroImageCompleted = GameMode.IsHeroImageCompleted ~= nil
+		and GameMode:IsHeroImageCompleted(hero:GetPlayerID(), hero)
+		or hero.hero_image == true
 	local heroImageUnitMissing = GameMode.HeroImageUnit == nil or not IsValidEntity(GameMode.HeroImageUnit) or GameMode.HeroImageUnit:IsNull()
 	if heroImageCompleted or heroImageUnitMissing then
 		if FragmentQuests ~= nil then
@@ -74,7 +79,7 @@ function HeroImageBack(event)
 end
 
 function HeroImageDead(event)
-	local hero = event.attacker
+	local hero = GetPlayerHeroFromUnit(event.attacker) or event.attacker
 
 	if timers.HeroImage then
 		Timers:RemoveTimer(timers.HeroImage)
@@ -84,7 +89,11 @@ function HeroImageDead(event)
 	GameMode.HeroImage_occuring = false
 	GameMode.HeroImageUnit = nil
 	CustomGameEventManager:Send_ServerToAllClients("hide_timer_hero_image", {})
-	hero.hero_image = true
+	if GameMode.MarkHeroImageCompleted ~= nil then
+		GameMode:MarkHeroImageCompleted(hero)
+	else
+		hero.hero_image = true
+	end
 	if FragmentQuests ~= nil then
 		FragmentQuests:OnOptionalEventEnd("hero_image", true)
 	end
@@ -127,7 +136,7 @@ function SpecialEventBack(event)
 end
 
 function SpiritBeastBack(event)
-	-- local hero = event.activator
+	local hero = event.activator
 
 	SpecialEventBack(event)
 	Timers:RemoveTimer(timers.SpiritBeast)
@@ -136,29 +145,37 @@ function SpiritBeastBack(event)
 		FragmentQuests:OnOptionalEventEnd("spirit_beast", false)
 	end
 
-	if not GameMode.spirit_beast:IsNull() then
+	if GameMode.spirit_beast ~= nil and IsValidEntity(GameMode.spirit_beast) and not GameMode.spirit_beast:IsNull() then
+		GameMode:HideOptionalEventBossBar("spirit_beast", GameMode.spirit_beast)
 		GameMode.spirit_beast:RemoveSelf()
 	end
+	GameMode.spirit_beast = nil
 	CustomGameEventManager:Send_ServerToAllClients("hide_timer_spirit_beast", {})
 end
 
 function SpiritBeastDead(event)
-	local hero = event.attacker
+	local hero = GetPlayerHeroFromUnit(event.attacker) or event.attacker
 
 	SetHeroOptionalEventTomeLock(hero, "spirit_beast", false)
 	DoEntFire("trigger_spirit_beast_duration", "Kill", nil, 0, nil, nil)
 	GameMode.SpiritBeast_killed = true
 	CustomGameEventManager:Send_ServerToAllClients("hide_timer_spirit_beast", {})
+	if GameMode.spirit_beast ~= nil and IsValidEntity(GameMode.spirit_beast) and not GameMode.spirit_beast:IsNull() then
+		GameMode:HideOptionalEventBossBar("spirit_beast", GameMode.spirit_beast)
+	end
 	if FragmentQuests ~= nil then
 		FragmentQuests:OnOptionalEventEnd("spirit_beast", true)
 	end
 
 	local pos = GameMode.spirit_beast:GetAbsOrigin()
 	DropNeutralItemAtPositionForHero("item_shield_of_invincibility", pos, hero, hero:GetTeam(), true)
+	if GameMode.CreateShieldOfInvincibilityDropEffect ~= nil then
+		GameMode:CreateShieldOfInvincibilityDropEffect(pos)
+	end
 end
 
 function FrostInfernalBack(event)
-	-- local hero = event.activator
+	local hero = event.activator
 
 	SpecialEventBack(event)
 	Timers:RemoveTimer(timers.FrostInfernal)
@@ -167,20 +184,25 @@ function FrostInfernalBack(event)
 		FragmentQuests:OnOptionalEventEnd("frost_infernal", false)
 	end
 
-	if not GameMode.frost_infernal:IsNull() then
+	if GameMode.frost_infernal ~= nil and IsValidEntity(GameMode.frost_infernal) and not GameMode.frost_infernal:IsNull() then
+		GameMode:HideOptionalEventBossBar("frost_infernal", GameMode.frost_infernal)
 		GameMode.frost_infernal:RemoveSelf()
 	end
+	GameMode.frost_infernal = nil
 
 	CustomGameEventManager:Send_ServerToAllClients("hide_timer_frost_infernal", {})
 end
 
 function FrostInfernalDead(event)
-	local hero = event.attacker
+	local hero = GetPlayerHeroFromUnit(event.attacker) or event.attacker
 
 	SetHeroOptionalEventTomeLock(hero, "frost_infernal", false)
 	DoEntFire("trigger_frost_infernal_duration", "Kill", nil, 0, nil, nil)
 	GameMode.FrostInfernal_killed = 1
 	CustomGameEventManager:Send_ServerToAllClients("hide_timer_frost_infernal", {})
+	if GameMode.frost_infernal ~= nil and IsValidEntity(GameMode.frost_infernal) and not GameMode.frost_infernal:IsNull() then
+		GameMode:HideOptionalEventBossBar("frost_infernal", GameMode.frost_infernal)
+	end
 	if FragmentQuests ~= nil then
 		FragmentQuests:OnOptionalEventEnd("frost_infernal", true)
 	end

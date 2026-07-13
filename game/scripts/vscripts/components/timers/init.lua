@@ -276,8 +276,6 @@ function CustomTimers:PrepareFinalWaveCountdown(force)
 		end
 	end
 
-	Notifications:TopToAll({ text = "WARNING! Final Wave incoming. Arriving in 60 seconds! Back to the Castle!", duration = 10.0 })
-
 	CustomGameEventManager:Send_ServerToAllClients("update_special_event_label_final", {})
 	XHSSetGlobalObjectiveState("phase2_creeps", "Completed", "Phase 2 creep assault survived", nil)
 	XHSSetGlobalObjectiveState("final_wave", "Active", "Final Wave in " .. math.floor(CustomTimers.final_wave_delay) .. "s", CustomTimers.final_wave_delay)
@@ -575,7 +573,8 @@ function CustomTimers:ShowFinalWaveCountdown(duration)
 		timer_name = "special_event",
 		eyebrow = "FINAL WAVE",
 		title = "Back to the Castle",
-		subtitle = "Final wave incoming"
+		subtitle = "Final wave incoming in 60 seconds",
+		sound = SPECIAL_WAVE_WARNING_SOUND
 	})
 end
 

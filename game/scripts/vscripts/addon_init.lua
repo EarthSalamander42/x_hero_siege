@@ -19,6 +19,7 @@ if IsClient() then
 	local xhsRuneModifierScript = "components/runes/modifiers.lua"
 	LinkLuaModifier("modifier_xhs_rune_healing", xhsRuneModifierScript, LUA_MODIFIER_MOTION_NONE)
 	LinkLuaModifier("modifier_xhs_rune_revitalization", xhsRuneModifierScript, LUA_MODIFIER_MOTION_NONE)
+	LinkLuaModifier("modifier_xhs_rune_restoration", xhsRuneModifierScript, LUA_MODIFIER_MOTION_NONE)
 	LinkLuaModifier("modifier_xhs_rune_second_wind", xhsRuneModifierScript, LUA_MODIFIER_MOTION_NONE)
 	LinkLuaModifier("modifier_xhs_rune_second_wind_heal", xhsRuneModifierScript, LUA_MODIFIER_MOTION_NONE)
 	LinkLuaModifier("modifier_xhs_rune_second_wind_guard", xhsRuneModifierScript, LUA_MODIFIER_MOTION_NONE)

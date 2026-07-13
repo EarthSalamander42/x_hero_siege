@@ -27,6 +27,12 @@
 	100% { brightness: 1; }
 }
 
+@keyframes 'xhs_end_loading_spin'
+{
+	0% { transform: rotateZ(0deg); }
+	100% { transform: rotateZ(360deg); }
+}
+
 .XHSEndScreenRoot {
 	width: 100%;
 	height: 100%;
@@ -46,6 +52,62 @@
 	height: 840px;
 	align: center center;
 	flow-children: down;
+}
+
+.XHSEndScreenRoot.IsLoading .XHSEndScreenMain {
+	visibility: collapse;
+}
+
+.XHSEndScreenLoading {
+	width: 420px;
+	height: 190px;
+	align: center center;
+	flow-children: down;
+	visibility: collapse;
+	opacity: 0;
+	transition-property: opacity;
+	transition-duration: 0.18s;
+}
+
+.XHSEndScreenRoot.IsLoading .XHSEndScreenLoading {
+	visibility: visible;
+	opacity: 1;
+}
+
+.XHSEndScreenLoadingSpinner {
+	width: 58px;
+	height: 58px;
+	horizontal-align: center;
+	margin-bottom: 24px;
+	border-radius: 50%;
+	border: 3px solid #5ad0ff33;
+	border-top: 3px solid #8ee8ff;
+	box-shadow: fill #5ad0ff20 0px 0px 18px 0px;
+	animation-name: xhs_end_loading_spin;
+	animation-duration: 0.85s;
+	animation-iteration-count: infinite;
+	animation-timing-function: linear;
+}
+
+.XHSEndScreenLoadingTitle {
+	width: 100%;
+	height: 32px;
+	text-align: center center;
+	color: #e6f7ff;
+	font-size: 24px;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	text-shadow: 0px 0px 8px #5ad0ff88;
+}
+
+.XHSEndScreenLoadingText {
+	width: 100%;
+	height: 24px;
+	margin-top: 7px;
+	text-align: center center;
+	color: #9fb4c8;
+	font-size: 16px;
+	text-shadow: 0px 1px 3px #000000;
 }
 
 .XHSEndScreenHeader {
@@ -753,18 +815,15 @@
 }
 
 .XHSEndScreenSupportMark {
-	width: 48px;
-	height: 48px;
+	width: 64px;
+	height: 64px;
 	margin-right: 12px;
 	vertical-align: center;
-	background-color: gradient( radial, 50% 50%, 0% 0%, 82% 82%, from( #10364fe8 ), color-stop( 0.62, #071522ef ), to( #020711f2 ) );
-	border: 1px solid #7bd8ff44;
-	box-shadow: fill #45d5ff20 0px 0px 12px 0px;
 }
 
 .XHSEndScreenSupportLogo {
-	width: 42px;
-	height: 42px;
+	width: 64px;
+	height: 64px;
 	align: center center;
 	img-shadow: 0px 0px 8px #70dfff66;
 }

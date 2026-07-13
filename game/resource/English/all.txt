@@ -64,6 +64,8 @@
 "DOTA_Tooltip_modifier_xhs_rune_healing_Description"	"Health regeneration increased by 5%. Mana regeneration increased by 8%."
 "DOTA_Tooltip_modifier_xhs_rune_revitalization"			"Revitalization Rune"
 "DOTA_Tooltip_modifier_xhs_rune_revitalization_Description"	"Mana regeneration increased by 12%. Active cooldowns were reduced when the rune was picked up."
+"DOTA_Tooltip_modifier_xhs_rune_restoration"			"Restoration Rune"
+"DOTA_Tooltip_modifier_xhs_rune_restoration_Description"	"Restored %dMODIFIER_PROPERTY_TOOLTIP%%% of missing health and mana."
 "DOTA_Tooltip_modifier_xhs_rune_second_wind"			"Second Wind Rune"
 "DOTA_Tooltip_modifier_xhs_rune_second_wind_Description"	"Triggers once below 30% health, restoring health and mana and briefly reducing incoming damage."
 "DOTA_Tooltip_modifier_xhs_rune_second_wind_heal"		"Second Wind Recovery"
@@ -93,7 +95,7 @@
 
 //ORBS
 "DOTA_Tooltip_modifier_orb_of_arcane_active"				"Arcane Orb Active"
-"DOTA_Tooltip_modifier_orb_of_arcane_active_Description"	"Spell damage applies Arcane Exposure."
+"DOTA_Tooltip_modifier_orb_of_arcane_active_Description"	"Arcane Exposure enabled. The orb grants %dMODIFIER_PROPERTY_TOOLTIP%%% spell amplification."
 "DOTA_Tooltip_modifier_orb_of_arcane_exposure"			"Arcane Exposure"
 "DOTA_Tooltip_modifier_orb_of_arcane_exposure_Description"	"Magic resistance reduced."
 "DOTA_Tooltip_modifier_orb_of_venom_xhs_active"			"Venom Orb Active"

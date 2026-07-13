@@ -28,6 +28,7 @@ require('units/breakable_container_surprises')
 require('units/treasure_chest_surprises')
 require('triggers')
 require('components/api/init')
+require('components/custom_polls/init')
 if IsInToolsMode() then
 	require('libraries/adv_log')
 end
@@ -278,6 +279,8 @@ function GameMode:InitGameMode()
 
 	ListenToGameEvent("dota_holdout_revive_complete", Dynamic_Wrap(GameMode, "OnPlayerRevived"), GameMode)
 	ListenToGameEvent("dota_pause_event", Dynamic_Wrap(GameMode, "OnDotaPauseEvent"), GameMode)
+	ListenToGameEvent("dota_player_update_selected_unit", Dynamic_Wrap(GameMode, "OnPlayerSelectedUnit"), GameMode)
+	ListenToGameEvent("dota_item_picked_up", Dynamic_Wrap(GameMode, "OnDotaItemPickedUp"), GameMode)
 
 	--Dungeon
 	GameMode.PrecachedVIPs = {}
@@ -747,6 +750,257 @@ function GameMode:ReturnHeroFromOptionalEvent(hero, timerName)
 	end
 end
 
+function GameMode:IsHeroImageCompleted(playerID, hero)
+	self.HeroImageCompletedByPlayer = self.HeroImageCompletedByPlayer or {}
+
+	if playerID ~= nil and self.HeroImageCompletedByPlayer[playerID] == true then
+		return true
+	end
+
+	return hero ~= nil and IsValidEntity(hero) and not hero:IsNull() and hero.hero_image == true
+end
+
+function GameMode:MarkHeroImageCompleted(hero)
+	if hero == nil or not IsValidEntity(hero) or hero:IsNull() then return end
+
+	hero.hero_image = true
+	self.HeroImageCompletedByPlayer = self.HeroImageCompletedByPlayer or {}
+
+	local playerID = hero:GetPlayerID()
+	if playerID ~= nil and playerID >= 0 then
+		self.HeroImageCompletedByPlayer[playerID] = true
+	end
+end
+
+local XHS_OPTIONAL_EVENT_BOSS_BARS = {
+	spirit_beast = {
+		id = "optional_spirit_beast",
+		name = "npc_spirit_beast",
+		icon = "npc_dota_hero_lone_druid",
+		light_color = "#72e8be",
+		dark_color = "#123229",
+	},
+	frost_infernal = {
+		id = "optional_frost_infernal",
+		name = "npc_frost_infernal",
+		icon = "npc_dota_hero_tiny",
+		light_color = "#8fe8ff",
+		dark_color = "#102b42",
+	},
+}
+
+function GameMode:ShowOptionalEventBossBar(eventName, boss, hero)
+	if boss == nil or not IsValidEntity(boss) or boss:IsNull() then return end
+	if hero == nil or not IsValidEntity(hero) or hero:IsNull() then return end
+
+	local playerID = hero:GetPlayerID()
+	if playerID == nil or playerID < 0 then return end
+
+	local config = XHS_OPTIONAL_EVENT_BOSS_BARS[eventName] or {}
+	boss.boss_count = 1
+	boss.xhs_boss_bar_id = config.id or eventName
+	boss.xhs_boss_bar_name = config.name or boss:GetUnitName()
+	boss.xhs_boss_bar_icon = config.icon
+	boss.xhs_boss_bar_colors = {
+		light_color = config.light_color or "#9be7ff",
+		dark_color = config.dark_color or "#102533",
+	}
+	boss.xhs_optional_event_player_id = playerID
+	boss.xhs_boss_bar_lock_to_registered = true
+	boss.xhs_boss_bar_suppressed = nil
+
+	local noHealthBar = boss:FindAbilityByName("ability_no_health_bar") or boss:AddAbility("ability_no_health_bar")
+	if noHealthBar ~= nil and noHealthBar:GetLevel() < 1 then
+		noHealthBar:SetLevel(1)
+	end
+
+	ShowPrivateBossBar(boss, playerID)
+end
+
+function GameMode:HideOptionalEventBossBar(eventName, boss)
+	if boss == nil or not IsValidEntity(boss) or boss:IsNull() then return end
+
+	HideBossBar(boss)
+	boss.xhs_boss_bar_suppressed = true
+	boss.xhs_boss_bar_players = nil
+	boss.xhs_optional_event_player_id = nil
+	boss.xhs_boss_bar_lock_to_registered = nil
+end
+
+function GameMode:GetPlayerIDFromEvent(event)
+	if event == nil then return nil end
+
+	local playerID = tonumber(event.PlayerID or event.player_id or event.playerid)
+	if playerID ~= nil and playerID >= 0 then return playerID end
+
+	local userID = tonumber(event.userid or event.UserID)
+	if userID ~= nil then
+		if PlayerResource.GetPlayerIDForUserID ~= nil then
+			playerID = PlayerResource:GetPlayerIDForUserID(userID)
+			if playerID ~= nil and playerID >= 0 then
+				return playerID
+			end
+		end
+
+		return userID
+	end
+
+	return nil
+end
+
+function GameMode:GetSelectedUnitFromEvent(event, playerID)
+	if event ~= nil then
+		for _, key in pairs({ "entindex", "entity_index", "selected_unit_entindex", "selected_unit" }) do
+			local entIndex = tonumber(event[key])
+			if entIndex ~= nil and entIndex > 0 then
+				local unit = EntIndexToHScript(entIndex)
+				if unit ~= nil and IsValidEntity(unit) and not unit:IsNull() then
+					return unit
+				end
+			end
+		end
+	end
+
+	if playerID ~= nil and PlayerResource.GetSelectedEntity ~= nil then
+		local unit = PlayerResource:GetSelectedEntity(playerID)
+		if unit ~= nil and IsValidEntity(unit) and not unit:IsNull() then
+			return unit
+		end
+	end
+
+	return nil
+end
+
+function GameMode:IsOptionalEventBossBarUnit(unit)
+	return unit ~= nil
+		and IsValidEntity(unit)
+		and not unit:IsNull()
+		and unit.xhs_optional_event_player_id ~= nil
+		and IsBossBarSuppressed(unit) ~= true
+end
+
+function GameMode:OnPlayerSelectedUnit(event)
+	local playerID = self:GetPlayerIDFromEvent(event)
+	if playerID == nil or playerID < 0 then return end
+
+	self.OptionalBossBarSelectionByPlayer = self.OptionalBossBarSelectionByPlayer or {}
+	local selected = self:GetSelectedUnitFromEvent(event, playerID)
+	local previous = self.OptionalBossBarSelectionByPlayer[playerID]
+
+	if previous ~= nil
+		and IsValidEntity(previous)
+		and not previous:IsNull()
+		and previous ~= selected
+		and previous.xhs_optional_event_player_id ~= playerID
+	then
+		HideBossBarForPlayer(previous, playerID)
+	end
+
+	if self:IsOptionalEventBossBarUnit(selected) then
+		ShowPrivateBossBar(selected, playerID)
+		self.OptionalBossBarSelectionByPlayer[playerID] = selected
+	else
+		self.OptionalBossBarSelectionByPlayer[playerID] = nil
+	end
+end
+
+function GameMode:CreateShieldOfInvincibilityDropEffect(position)
+	if position == nil then return end
+
+	self.ShieldOfInvincibilityDropEffects = self.ShieldOfInvincibilityDropEffects or {}
+
+	local key = DoUniqueString("xhs_shield_drop")
+	local basePosition = Vector(position.x, position.y, position.z + 36)
+	local color = Vector(110, 210, 255)
+	local particles = {}
+
+	local ring = ParticleManager:CreateParticle("particles/generic_gameplay/rune_bounty_owner.vpcf", PATTACH_WORLDORIGIN, nil)
+	ParticleManager:SetParticleControl(ring, 0, basePosition)
+	ParticleManager:SetParticleControl(ring, 1, color)
+	table.insert(particles, ring)
+
+	local glow = ParticleManager:CreateParticle("particles/generic_hero_status/hero_levelup.vpcf", PATTACH_WORLDORIGIN, nil)
+	ParticleManager:SetParticleControl(glow, 0, basePosition)
+	ParticleManager:SetParticleControl(glow, 1, color)
+	table.insert(particles, glow)
+
+	self.ShieldOfInvincibilityDropEffects[key] = {
+		position = basePosition,
+		particles = particles,
+		started_at = GameRules:GetGameTime(),
+	}
+
+	Timers:CreateTimer(0.03, function()
+		local effect = self.ShieldOfInvincibilityDropEffects and self.ShieldOfInvincibilityDropEffects[key] or nil
+		if effect == nil then return nil end
+
+		local elapsed = GameRules:GetGameTime() - effect.started_at
+		local animatedPosition = effect.position + Vector(0, 0, math.sin(elapsed * 3.5) * 8)
+		for _, particle in pairs(effect.particles or {}) do
+			ParticleManager:SetParticleControl(particle, 0, animatedPosition)
+		end
+
+		if elapsed >= 180 then
+			self:CleanupShieldOfInvincibilityDropEffect(key)
+			return nil
+		end
+
+		return 0.03
+	end)
+end
+
+function GameMode:CleanupShieldOfInvincibilityDropEffect(key)
+	if self.ShieldOfInvincibilityDropEffects == nil then return end
+
+	local effect = self.ShieldOfInvincibilityDropEffects[key]
+	if effect == nil then return end
+
+	for _, particle in pairs(effect.particles or {}) do
+		ParticleManager:DestroyParticle(particle, false)
+		ParticleManager:ReleaseParticleIndex(particle)
+	end
+
+	self.ShieldOfInvincibilityDropEffects[key] = nil
+end
+
+function GameMode:CleanupNearestShieldOfInvincibilityDropEffect(position)
+	if position == nil or self.ShieldOfInvincibilityDropEffects == nil then return end
+
+	local nearestKey = nil
+	local nearestDistance = nil
+
+	for key, effect in pairs(self.ShieldOfInvincibilityDropEffects) do
+		local distance = (effect.position - position):Length2D()
+		if distance <= 900 and (nearestDistance == nil or distance < nearestDistance) then
+			nearestKey = key
+			nearestDistance = distance
+		end
+	end
+
+	if nearestKey ~= nil then
+		self:CleanupShieldOfInvincibilityDropEffect(nearestKey)
+	end
+end
+
+function GameMode:OnDotaItemPickedUp(event)
+	if event == nil then return end
+
+	local itemName = event.itemname or event.item_name or event.ItemName
+	if itemName ~= "item_shield_of_invincibility" then return end
+
+	local playerID = self:GetPlayerIDFromEvent(event)
+	local hero = playerID ~= nil and PlayerResource:GetSelectedHeroEntity(playerID) or nil
+	if (hero == nil or not IsValidEntity(hero) or hero:IsNull()) then
+		local heroIndex = tonumber(event.HeroEntityIndex or event.HeroEntIndex or event.hero_entindex or event.UnitEntityIndex)
+		if heroIndex ~= nil and heroIndex > 0 then
+			hero = EntIndexToHScript(heroIndex)
+		end
+	end
+	if hero ~= nil and IsValidEntity(hero) and not hero:IsNull() then
+		self:CleanupNearestShieldOfInvincibilityDropEffect(hero:GetAbsOrigin())
+	end
+end
+
 function GameMode:HeroImage(event)
 	local PlayerID = event.pID
 	local player = PlayerResource:GetPlayer(PlayerID)
@@ -768,7 +1022,7 @@ function GameMode:HeroImage(event)
 		return
 	end
 
-	if hero.hero_image then
+	if GameMode:IsHeroImageCompleted(PlayerID, hero) then
 		Notifications:Bottom(hero:GetPlayerOwnerID(), { text = "You can do hero image only once!", duration = 5.0 })
 		CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "xhs_event_usage_update", {
 			hero_image_used = true,
@@ -839,12 +1093,13 @@ function GameMode:HeroImage(event)
 			end
 			GameMode.HeroImage_occuring = false
 			SetHeroOptionalEventTomeLock(hero, "hero_image", false)
+			local heroImageCompleted = GameMode:IsHeroImageCompleted(PlayerID, hero)
 			if FragmentQuests ~= nil then
-				FragmentQuests:OnOptionalEventEnd("hero_image", hero.hero_image == true)
+				FragmentQuests:OnOptionalEventEnd("hero_image", heroImageCompleted)
 			end
 			GameMode:ReturnHeroFromOptionalEvent(hero, "hero_image")
 			CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "xhs_event_usage_update", {
-				hero_image_used = hero.hero_image == true,
+				hero_image_used = heroImageCompleted,
 				hero_image_busy = false,
 			})
 			CustomGameEventManager:Send_ServerToAllClients("xhs_event_usage_update", {
@@ -895,7 +1150,11 @@ function GameMode:SpiritBeast(event)
 			if FragmentQuests ~= nil then
 				FragmentQuests:OnOptionalEventEnd("spirit_beast", false)
 			end
-			GameMode.spirit_beast:RemoveSelf()
+			if GameMode.spirit_beast ~= nil and IsValidEntity(GameMode.spirit_beast) and not GameMode.spirit_beast:IsNull() then
+				GameMode:HideOptionalEventBossBar("spirit_beast", GameMode.spirit_beast)
+				GameMode.spirit_beast:RemoveSelf()
+			end
+			GameMode.spirit_beast = nil
 
 			Timers:CreateTimer(5.5, function() --Debug time in case Spirit Beast kills the player at the very last second
 				Entities:FindByName(nil, "trigger_spirit_beast_duration"):Disable()
@@ -907,6 +1166,7 @@ function GameMode:SpiritBeast(event)
 		GameMode.spirit_beast:AddNewModifier(GameMode.spirit_beast, nil, "modifier_pause_creeps", { Duration = 5, IsHidden = true })
 		GameMode.spirit_beast:AddNewModifier(GameMode.spirit_beast, nil, "modifier_invulnerable", { Duration = 5, IsHidden = true })
 		GameMode.spirit_beast.Boss = true
+		GameMode:ShowOptionalEventBossBar("spirit_beast", GameMode.spirit_beast, hero)
 
 		if IsValidEntity(hero) then
 			GameMode:SpecialEventTPQuit(hero)
@@ -958,7 +1218,11 @@ function GameMode:FrostInfernal(event)
 			if FragmentQuests ~= nil then
 				FragmentQuests:OnOptionalEventEnd("frost_infernal", false)
 			end
-			GameMode.frost_infernal:RemoveSelf()
+			if GameMode.frost_infernal ~= nil and IsValidEntity(GameMode.frost_infernal) and not GameMode.frost_infernal:IsNull() then
+				GameMode:HideOptionalEventBossBar("frost_infernal", GameMode.frost_infernal)
+				GameMode.frost_infernal:RemoveSelf()
+			end
+			GameMode.frost_infernal = nil
 
 			Timers:CreateTimer(5.5,
 				function() --Debug time in case Frost Infernal kills the player at the very last second
@@ -973,6 +1237,7 @@ function GameMode:FrostInfernal(event)
 		GameMode.frost_infernal:AddNewModifier(GameMode.frost_infernal, nil, "modifier_pause_creeps", { Duration = 5, IsHidden = true })
 		GameMode.frost_infernal:AddNewModifier(GameMode.frost_infernal, nil, "modifier_invulnerable", { Duration = 5, IsHidden = true })
 		GameMode.frost_infernal.Boss = true
+		GameMode:ShowOptionalEventBossBar("frost_infernal", GameMode.frost_infernal, hero)
 
 		GameMode:SpecialEventTPQuit(hero)
 		SetHeroOptionalEventTomeLock(hero, "frost_infernal", true)

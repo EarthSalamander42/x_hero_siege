@@ -72,6 +72,9 @@
 							</Panel>
 						</Panel>
 					</Button>
+					<Button id="CustomPollReviewButton" class="custom-poll-review-button" onactivate="OpenCustomPollReview();" hittest="true">
+						<Label class="custom-poll-review-label" text="VOTE" />
+					</Button>
 
 					<Panel id="vote-container" class="vote-container">
 						<Panel class="vote-header-container">
@@ -96,7 +99,7 @@
 
 						<!-- <Label id="VoteGameModeCheck" class="vote-label vote-check" text="You have not voted yet." /> -->
 
-						<Button id="MainVoteButton" class="vote-button" onactivate="ToggleVoteContainer(true);">
+						<Button id="MainVoteButton" class="vote-button" onactivate="OpenSettingsVoteContainer();">
 							<Label class="vote-button-label" text="#loading_screen_change_vote" />
 						</Button>
 					</Panel>

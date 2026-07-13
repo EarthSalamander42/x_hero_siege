@@ -320,21 +320,46 @@ local function ReleaseFinalWavePendingUnits()
 	CustomTimers.final_wave_kill_counting = (CustomTimers.final_wave_spawned_kill_limit or 0) >= FINAL_WAVE_TOTAL_UNITS
 end
 
+local function DestroyFinalWaveParticle(particle)
+	if particle == nil then return end
+
+	ParticleManager:DestroyParticle(particle, false)
+	ParticleManager:ReleaseParticleIndex(particle)
+end
+
 local function CreateFinalWaveParticle(particleName, origin, duration)
 	local particle = ParticleManager:CreateParticle(particleName, PATTACH_WORLDORIGIN, nil)
 	ParticleManager:SetParticleControl(particle, 0, origin)
 
 	Timers:CreateTimer(duration, function()
-		ParticleManager:DestroyParticle(particle, false)
-		ParticleManager:ReleaseParticleIndex(particle)
+		DestroyFinalWaveParticle(particle)
 	end)
 
 	return particle
 end
 
+local function CreateFinalWaveSpawnMarker(spawner)
+	if spawner == nil or spawner:IsNull() then return nil end
+
+	local particle = ParticleManager:CreateParticle(FINAL_WAVE_PORTAL_RING_PARTICLE, PATTACH_WORLDORIGIN, nil)
+	ParticleManager:SetParticleControl(particle, 0, spawner:GetAbsOrigin())
+	return particle
+end
+
+local function CreateFinalWaveTeleportStart(origin)
+	local particle = ParticleManager:CreateParticle(FINAL_WAVE_PORTAL_START_PARTICLE, PATTACH_WORLDORIGIN, nil)
+	ParticleManager:SetParticleControl(particle, 0, origin)
+	ParticleManager:SetParticleControl(particle, 1, origin)
+	ParticleManager:SetParticleControl(particle, 2, Vector(FINAL_WAVE_CARDINAL_REVEAL_DELAY, 0, 0))
+
+	Timers:CreateTimer(FINAL_WAVE_CARDINAL_REVEAL_DELAY, function()
+		DestroyFinalWaveParticle(particle)
+	end)
+end
+
 local function CreateFinalWavePortalEffects(origin)
 	CreateFinalWaveParticle(FINAL_WAVE_PORTAL_RING_PARTICLE, origin, FINAL_WAVE_PORTAL_FOW_DURATION)
-	CreateFinalWaveParticle(FINAL_WAVE_PORTAL_START_PARTICLE, origin, FINAL_WAVE_PORTAL_FOW_DURATION)
+	CreateFinalWaveTeleportStart(origin)
 	AddFOWViewer(DOTA_TEAM_GOODGUYS, origin, FINAL_WAVE_PORTAL_FOW_RADIUS, FINAL_WAVE_PORTAL_FOW_DURATION, false)
 end
 
@@ -344,6 +369,7 @@ local function PlayFinalWaveArrivalEffects(unit, playSound)
 	local origin = unit:GetAbsOrigin()
 	local particle = ParticleManager:CreateParticle(FINAL_WAVE_PORTAL_END_PARTICLE, PATTACH_ABSORIGIN_FOLLOW, unit)
 	ParticleManager:SetParticleControl(particle, 0, origin)
+	ParticleManager:SetParticleControl(particle, 1, origin)
 	ParticleManager:ReleaseParticleIndex(particle)
 
 	if playSound == true then
@@ -361,20 +387,26 @@ local function NotifyFinalWaveArrival(config)
 	})
 end
 
-local function SpawnFinalWaveUnit(unitName, spawner, angle, releaseWaypoint, lockDuration, playSound)
+local function SpawnFinalWaveUnit(unitName, spawner, angle, releaseWaypoint, lockDuration, playSound, hiddenUntilReveal)
 	if spawner == nil then return nil end
 
 	local unit = CreateUnitByName(unitName .. "_final_wave", spawner:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
 	if unit == nil then return nil end
 
+	if hiddenUntilReveal == true then
+		unit:AddNoDraw()
+	end
+
 	RegisterFinalWaveUnit(unit)
 	unit:SetAngles(0, angle, 0)
 	ApplyFinalWaveCinematicLock(unit, lockDuration)
 	QueueFinalWaveRelease(unit, releaseWaypoint)
-	PlayFinalWaveArrivalEffects(unit, playSound)
 
-	if playSound == true then
-		unit:EmitSound("Hero_TemplarAssassin.Trap")
+	if hiddenUntilReveal ~= true then
+		PlayFinalWaveArrivalEffects(unit, playSound)
+		if playSound == true then
+			unit:EmitSound("Hero_TemplarAssassin.Trap")
+		end
 	end
 
 	UpdateFinalWaveQuestLimit()
@@ -477,7 +509,16 @@ function FinalWaveSpawner(configOrCreep1, creep2, creep3, creep4, bossName, angl
 	CreateFinalWavePortalEffects(portalOrigin)
 	NotifyFinalWaveArrival(config)
 
-	local boss = SpawnFinalWaveUnit(config.boss, bossSpawner, config.angle, releaseWaypoint, lockDuration, true)
+	local spawnMarkers = {}
+	local spawnSlotCount = #config.creeps * 3
+	for slot = 1, spawnSlotCount do
+		local spawner = FindFinalWaveSpawner(config.direction, slot)
+		if spawner ~= nil then
+			spawnMarkers[slot] = CreateFinalWaveSpawnMarker(spawner)
+		end
+	end
+
+	local boss = SpawnFinalWaveUnit(config.boss, bossSpawner, config.angle, releaseWaypoint, lockDuration, true, true)
 	if boss ~= nil then
 		boss:EmitSound("Portal.Loop_Appear")
 		SendFinalWaveCamera(boss:GetAbsOrigin(), 0.65)
@@ -486,9 +527,12 @@ function FinalWaveSpawner(configOrCreep1, creep2, creep3, creep4, bossName, angl
 			if boss ~= nil and not boss:IsNull() then
 				if not IsFinalWaveSequenceActive(sequenceId) then
 					StopSoundOn("Portal.Loop_Appear", boss)
+					boss:RemoveNoDraw()
 					return
 				end
 				StopSoundOn("Portal.Loop_Appear", boss)
+				boss:RemoveNoDraw()
+				PlayFinalWaveArrivalEffects(boss, true)
 				boss:EmitSound("Hero_TemplarAssassin.Trap")
 			end
 		end)
@@ -500,8 +544,12 @@ function FinalWaveSpawner(configOrCreep1, creep2, creep3, creep4, bossName, angl
 			local currentSlot = spawnSlot
 			local currentCreepName = creepName
 			Timers:CreateTimer(FINAL_WAVE_CARDINAL_REVEAL_DELAY + (spawnSlot * FINAL_WAVE_UNIT_SPAWN_INTERVAL), function()
+				DestroyFinalWaveParticle(spawnMarkers[currentSlot])
+				spawnMarkers[currentSlot] = nil
+
 				if not IsFinalWaveSequenceActive(sequenceId) then return end
 				local spawner = FindFinalWaveSpawner(config.direction, currentSlot)
+				if spawner == nil then return end
 				SpawnFinalWaveUnit(currentCreepName, spawner, config.angle, releaseWaypoint, lockDuration, currentSlot == 1)
 			end)
 			spawnSlot = spawnSlot + 1

@@ -11,8 +11,13 @@
 		<include src="file://{resources}/scripts/custom_game/xhs_end_screen.js" />
 	</scripts>
 
-	<Panel class="XHSEndScreenRoot">
+	<Panel id="XHSEndScreenRoot" class="XHSEndScreenRoot IsLoading">
 		<Panel class="XHSEndScreenBackdrop" hittest="false" />
+		<Panel id="XHSEndScreenLoading" class="XHSEndScreenLoading">
+			<Panel class="XHSEndScreenLoadingSpinner" />
+			<Label class="XHSEndScreenLoadingTitle" text="Loading run summary" />
+			<Label class="XHSEndScreenLoadingText" text="Waiting for final game data..." />
+		</Panel>
 
 		<Panel id="XHSEndScreenMain" class="XHSEndScreenMain">
 			<Panel class="XHSEndScreenHeader">

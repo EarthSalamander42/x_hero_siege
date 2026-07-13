@@ -2,7 +2,7 @@
 {
 	horizontal-align: left;
 	vertical-align: top;
-	margin-top: 280px;
+	margin-top: 295px;
 	margin-left: 24px;
 	width: 400px;
 	max-height: 480px;
@@ -86,7 +86,7 @@
 	height: 24px;
 	horizontal-align: left;
 	vertical-align: top;
-	margin-top: 280px;
+	margin-top: 295px;
 	margin-left: 424px;
 	ignore-parent-flow: true;
 	opacity: .42;
@@ -172,8 +172,6 @@
 	height: 22px;
 	horizontal-align: right;
 	vertical-align: top;
-	margin-top: 8px;
-	margin-right: 39px;
 	ignore-parent-flow: true;
 	background-color: #07131dcc;
 	border: 1px solid #77c8ff2d;

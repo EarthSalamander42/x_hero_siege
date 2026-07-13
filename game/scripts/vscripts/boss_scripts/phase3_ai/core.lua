@@ -228,10 +228,32 @@ function XHSPhase3BossAI:ProtectCast(boss, ability, extraDuration)
 	})
 end
 
+function XHSPhase3BossAI:IsPlayerControlledAttacker(attacker)
+	if attacker == nil or not IsValidEntity(attacker) or attacker:IsNull() then return false end
+	if attacker:GetTeamNumber() ~= DOTA_TEAM_GOODGUYS then return false end
+
+	if attacker.GetPlayerOwnerID ~= nil then
+		local playerID = attacker:GetPlayerOwnerID()
+		if playerID ~= nil and playerID >= 0 then
+			return true
+		end
+	end
+
+	local owner = attacker.GetOwnerEntity ~= nil and attacker:GetOwnerEntity() or nil
+	if owner ~= nil and IsValidEntity(owner) and not owner:IsNull() and owner.GetPlayerOwnerID ~= nil then
+		local ownerPlayerID = owner:GetPlayerOwnerID()
+		if ownerPlayerID ~= nil and ownerPlayerID >= 0 then
+			return true
+		end
+	end
+
+	return false
+end
+
 function XHSPhase3BossAI:ShouldRevealBossBarFromDamageEvent(modifier, event)
 	if modifier == nil or event == nil then return false end
 	if event.unit ~= modifier:GetParent() then return false end
-	if event.attacker == nil or event.attacker:GetTeamNumber() ~= DOTA_TEAM_GOODGUYS then return false end
+	if not self:IsPlayerControlledAttacker(event.attacker) then return false end
 	if event.damage == nil or event.damage <= 0 then return false end
 	return true
 end
@@ -239,7 +261,7 @@ end
 function XHSPhase3BossAI:ShouldRevealBossBarFromAttackEvent(modifier, event)
 	if modifier == nil or event == nil then return false end
 	if event.target ~= modifier:GetParent() then return false end
-	if event.attacker == nil or event.attacker:GetTeamNumber() ~= DOTA_TEAM_GOODGUYS then return false end
+	if not self:IsPlayerControlledAttacker(event.attacker) then return false end
 	return true
 end
 
@@ -250,6 +272,7 @@ function XHSPhase3BossAI:RevealBossBarOnce(modifier)
 	if boss == nil or not IsValidEntity(boss) or boss:IsNull() or not boss:IsAlive() then return end
 	if boss:HasModifier("modifier_invulnerable") or boss:HasModifier("modifier_pause_creeps") then return end
 
+	boss.xhs_boss_bar_suppressed = false
 	modifier.xhs_boss_bar_revealed = true
 	if ShowBossBar ~= nil then
 		ShowBossBar(boss)

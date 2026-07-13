@@ -244,6 +244,7 @@ function XHSPrecache:PrecacheBattlepassCompanionAssets(context)
 		"particles/econ/items/phantom_assassin/phantom_assassin_arcana_elder_smith/pa_arcana_elder_ambient.vpcf",
 		"particles/econ/items/phantom_assassin/phantom_assassin_arcana_elder_smith/pa_arcana_elder_eyes_l.vpcf",
 		"particles/econ/items/phantom_assassin/phantom_assassin_arcana_elder_smith/pa_arcana_elder_eyes_r.vpcf",
+		"particles/econ/items/phantom_assassin/phantom_assassin_arcana_elder_smith/phantom_assassin_stifling_dagger_arcana.vpcf",
 	}
 
 	for _, particle in pairs(cosmeticParticles) do
@@ -321,8 +322,14 @@ XHSPrecache:RegisterGroup("core", {
 
 XHSPrecache:RegisterGroup("runes", {
 	particles = {
-		"particles/generic_gameplay/rune_bounty_owner.vpcf",
-		"particles/generic_hero_status/hero_levelup.vpcf",
+		"particles/generic_gameplay/rune_arcane.vpcf",
+		"particles/generic_gameplay/rune_bounty.vpcf",
+		"particles/generic_gameplay/rune_doubledamage.vpcf",
+		"particles/generic_gameplay/rune_haste.vpcf",
+		"particles/generic_gameplay/rune_regeneration.vpcf",
+		"particles/generic_gameplay/rune_shield.vpcf",
+		"particles/generic_gameplay/rune_water.vpcf",
+		"particles/generic_gameplay/rune_wisdom.vpcf",
 		"particles/units/heroes/hero_zuus/zuus_arc_lightning.vpcf",
 		"particles/units/heroes/hero_stormspirit/stormspirit_overload_ambient.vpcf",
 	},

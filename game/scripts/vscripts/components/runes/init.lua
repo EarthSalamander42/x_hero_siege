@@ -7,6 +7,7 @@ require("components/runes/modifiers")
 local XHS_RUNE_MODIFIER_SCRIPT = "components/runes/modifiers.lua"
 LinkLuaModifier("modifier_xhs_rune_healing", XHS_RUNE_MODIFIER_SCRIPT, LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_xhs_rune_revitalization", XHS_RUNE_MODIFIER_SCRIPT, LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_xhs_rune_restoration", XHS_RUNE_MODIFIER_SCRIPT, LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_xhs_rune_second_wind", XHS_RUNE_MODIFIER_SCRIPT, LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_xhs_rune_second_wind_heal", XHS_RUNE_MODIFIER_SCRIPT, LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_xhs_rune_second_wind_guard", XHS_RUNE_MODIFIER_SCRIPT, LUA_MODIFIER_MOTION_NONE)
@@ -32,6 +33,32 @@ Runes.VISUAL_MODELS = {
 	Defense = "models/custom_game/runes/xhs_rune_defense.vmdl",
 	Offense = "models/custom_game/runes/xhs_rune_offense.vmdl",
 	Misc = "models/custom_game/runes/xhs_rune_misc.vmdl",
+}
+
+Runes.RUNE_PARTICLES = {
+	healing = "particles/generic_gameplay/rune_regeneration.vpcf",
+	revitalization = "particles/generic_gameplay/rune_arcane.vpcf",
+	restoration = "particles/generic_gameplay/rune_water.vpcf",
+	second_wind = "particles/generic_gameplay/rune_haste.vpcf",
+	barrier = "particles/generic_gameplay/rune_shield.vpcf",
+	retaliation = "particles/generic_gameplay/rune_doubledamage.vpcf",
+	bulwark = "particles/generic_gameplay/rune_shield.vpcf",
+	fortitude = "particles/generic_gameplay/rune_shield.vpcf",
+	titan = "particles/generic_gameplay/rune_doubledamage.vpcf",
+	fury = "particles/generic_gameplay/rune_haste.vpcf",
+	siegebreaker = "particles/generic_gameplay/rune_doubledamage.vpcf",
+	storm = "particles/generic_gameplay/rune_arcane.vpcf",
+	fragment = "particles/generic_gameplay/rune_bounty.vpcf",
+	tome = "particles/generic_gameplay/rune_wisdom.vpcf",
+	bounty_surge = "particles/generic_gameplay/rune_bounty.vpcf",
+	momentum = "particles/generic_gameplay/rune_haste.vpcf",
+}
+
+Runes.CATEGORY_PARTICLES = {
+	Recovery = "particles/generic_gameplay/rune_regeneration.vpcf",
+	Defense = "particles/generic_gameplay/rune_shield.vpcf",
+	Offense = "particles/generic_gameplay/rune_doubledamage.vpcf",
+	Misc = "particles/generic_gameplay/rune_wisdom.vpcf",
 }
 
 Runes.DEFINITIONS = {
@@ -305,7 +332,7 @@ function Runes:SpawnRuneInstance(runeType, definition, waveIndex, direction, spa
 	local id = self.nextRuneId
 	self.nextRuneId = self.nextRuneId + 1
 
-	local particleIds = self:CreateRuneParticles(spawnOrigin, definition.category)
+	local particleIds = self:CreateRuneParticles(dummy, spawnOrigin, definition.category, runeType)
 	local token = tostring(RandomInt(100000, 999999)) .. ":" .. tostring(id) .. ":" .. tostring(waveIndex)
 
 	local rune = {
@@ -317,6 +344,8 @@ function Runes:SpawnRuneInstance(runeType, definition, waveIndex, direction, spa
 		batchId = batchId,
 		batchTotal = batchTotal or 1,
 		direction = direction or "",
+		baseOrigin = spawnOrigin,
+		animationPhase = RandomFloat(0, math.pi * 2),
 		entityIndex = dummy:entindex(),
 		particleIds = particleIds,
 		secureToken = token,
@@ -329,6 +358,7 @@ function Runes:SpawnRuneInstance(runeType, definition, waveIndex, direction, spa
 
 	AddFOWViewer(DOTA_TEAM_GOODGUYS, spawnOrigin, self.VISION_RADIUS, self.VISION_DURATION, false)
 	self:StartRuneIdleThink(id, token)
+	self:StartRuneAnimationThink(id, token)
 	self:StartPickupThink(id, token)
 
 	return rune
@@ -352,6 +382,29 @@ function Runes:StartRuneIdleThink(id, token)
 		end
 
 		return 2.5
+	end)
+end
+
+function Runes:StartRuneAnimationThink(id, token)
+	Timers:CreateTimer(0.03, function()
+		local active = self:GetActiveRune(id, token)
+		if active == nil then return nil end
+
+		local dummy = EntIndexToHScript(active.entityIndex)
+		if dummy == nil or dummy:IsNull() then return nil end
+
+		local baseOrigin = active.baseOrigin or dummy:GetAbsOrigin()
+		local elapsed = GameRules:GetGameTime() + (active.animationPhase or 0)
+		local heightOffset = math.sin(elapsed * 2.8) * 10
+		local yaw = (elapsed * 75) % 360
+
+		dummy:SetAbsOrigin(baseOrigin + Vector(0, 0, heightOffset))
+		dummy:SetAngles(0, yaw, 0)
+		for _, particle in pairs(active.particleIds or {}) do
+			ParticleManager:SetParticleControl(particle, 0, baseOrigin + Vector(0, 0, heightOffset))
+		end
+
+		return 0.03
 	end)
 end
 
@@ -450,20 +503,13 @@ function Runes:FindSpawnOrigins(direction, count)
 	return origins
 end
 
-function Runes:CreateRuneParticles(origin, category)
+function Runes:CreateRuneParticles(dummy, origin, category, runeType)
 	local particleIds = {}
 
-	local color = self:GetCategoryColor(category)
-
-	local ring = ParticleManager:CreateParticle("particles/generic_gameplay/rune_bounty_owner.vpcf", PATTACH_WORLDORIGIN, nil)
-	ParticleManager:SetParticleControl(ring, 0, origin)
-	ParticleManager:SetParticleControl(ring, 1, color)
-	table.insert(particleIds, ring)
-
-	local glow = ParticleManager:CreateParticle("particles/generic_hero_status/hero_levelup.vpcf", PATTACH_WORLDORIGIN, nil)
-	ParticleManager:SetParticleControl(glow, 0, origin)
-	ParticleManager:SetParticleControl(glow, 1, color)
-	table.insert(particleIds, glow)
+	local particlePath = self.RUNE_PARTICLES[runeType] or self.CATEGORY_PARTICLES[category] or self.CATEGORY_PARTICLES.Misc
+	local particle = ParticleManager:CreateParticle(particlePath, PATTACH_ABSORIGIN_FOLLOW, dummy)
+	ParticleManager:SetParticleControl(particle, 0, origin)
+	table.insert(particleIds, particle)
 
 	return particleIds
 end
@@ -603,8 +649,10 @@ function Runes:ApplyRune(definition, picker)
 		for _, hero in pairs(self:GetTargets(definition.scope, picker)) do
 			local missingHealth = hero:GetMaxHealth() - hero:GetHealth()
 			local missingMana = hero:GetMaxMana() - hero:GetMana()
-			hero:Heal(missingHealth * (definition.values.missing_pct or 35) * 0.01, hero)
-			hero:GiveMana(missingMana * (definition.values.missing_pct or 35) * 0.01)
+			local restoredPct = definition.values.missing_pct or 35
+			hero:Heal(missingHealth * restoredPct * 0.01, hero)
+			hero:GiveMana(missingMana * restoredPct * 0.01)
+			hero:AddNewModifier(hero, nil, "modifier_xhs_rune_restoration", { duration = 3, restored_pct = restoredPct })
 			self:PlayHeroRuneEffect(hero, definition.category, false)
 			self:NotifyRuneApplied(hero, definition)
 		end
@@ -660,8 +708,7 @@ function Runes:ReduceCooldowns(hero, percent, cap)
 	percent = tonumber(percent) or 25
 	cap = tonumber(cap) or 20
 
-	for index = 0, 23 do
-		local ability = hero:GetAbilityByIndex(index)
+	ForEachUnitAbility(hero, function(ability)
 		if ability ~= nil and not ability:IsNull() and ability.GetCooldownTimeRemaining then
 			local remaining = ability:GetCooldownTimeRemaining()
 			if remaining ~= nil and remaining > 0 then
@@ -673,7 +720,7 @@ function Runes:ReduceCooldowns(hero, percent, cap)
 				end
 			end
 		end
-	end
+	end)
 
 	for index = 0, 8 do
 		local item = hero:GetItemInSlot(index)

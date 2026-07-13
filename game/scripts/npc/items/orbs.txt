@@ -1292,7 +1292,7 @@
 		"AbilityValues"
 		{
 			"bonus_damage"					"50"
-			"poison_damage_per_second"		"100"
+			"poison_damage_per_second"		"25"
 			"poison_duration"				"4.0"
 			"armor_reduction"				"0"
 			"toxic_saturation_damage"		"0"
@@ -1336,7 +1336,7 @@
 		"AbilityValues"
 		{
 			"bonus_damage"					"150"
-			"poison_damage_per_second"		"250"
+			"poison_damage_per_second"		"75"
 			"poison_duration"				"4.0"
 			"armor_reduction"				"5"
 			"toxic_saturation_damage"		"0"
@@ -1401,7 +1401,7 @@
 		"AbilityValues"
 		{
 			"bonus_damage"					"450"
-			"poison_damage_per_second"		"600"
+			"poison_damage_per_second"		"150"
 			"poison_duration"				"4.0"
 			"armor_reduction"				"12"
 			"toxic_saturation_damage"		"500"

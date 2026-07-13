@@ -1,3 +1,45 @@
+local MONSOON_CAST_GESTURE = ACT_DOTA_CAST_ABILITY_4
+
+local function IsValidMonsoonEntity(entity)
+	return entity ~= nil and IsValidEntity(entity)
+end
+
+local function DestroyMonsoonParticle(caster, immediate)
+	if caster.freezing_field_particle == nil then
+		return
+	end
+
+	ParticleManager:DestroyParticle(caster.freezing_field_particle, immediate == true)
+	ParticleManager:ReleaseParticleIndex(caster.freezing_field_particle)
+	caster.freezing_field_particle = nil
+end
+
+local function CleanupFreezingField(caster, immediate)
+	if not IsValidMonsoonEntity(caster) then
+		return
+	end
+
+	local center = caster.freezing_field_center
+	if IsValidMonsoonEntity(center) then
+		center:StopSound("Hero_Razor.Storm.Cast")
+		center:StopSound("Hero_Razor.Storm.Loop")
+		center:StopSound("Hero_Zuus.LightningBolt.Cast.Righteous")
+		UTIL_Remove(center)
+	end
+
+	DestroyMonsoonParticle(caster, immediate)
+	caster.freezing_field_center = nil
+	caster:FadeGesture(MONSOON_CAST_GESTURE)
+end
+
+local function IsCurrentFreezingField(caster, center, ability)
+	return IsValidMonsoonEntity(caster)
+		and IsValidMonsoonEntity(center)
+		and ability ~= nil
+		and not ability:IsNull()
+		and caster.freezing_field_center == center
+end
+
 function FreezingFieldCast(keys)
 	local caster = keys.caster
 	local ability = keys.ability
@@ -7,7 +49,7 @@ function FreezingFieldCast(keys)
 	local modifier_sector_2 = keys.modifier_sector_2
 	local modifier_sector_3 = keys.modifier_sector_3
 
-	caster:StartGesture(ACT_DOTA_TELEPORT)
+	caster:StartGesture(MONSOON_CAST_GESTURE)
 
 	-- Defines the center point (caster or dummy unit)
 	caster.freezing_field_center = CreateUnitByName("dummy_unit_invulnerable", keys.target_points[1], false, nil, nil, caster:GetTeamNumber())
@@ -24,30 +66,50 @@ function FreezingFieldCast(keys)
 	-- Grants the slowing aura to the center unit
 	ability:ApplyDataDrivenModifier(caster, caster.freezing_field_center, modifier_aura, {})
 
+	local center = caster.freezing_field_center
+
 	-- Initializes each sector's thinkers
 	Timers:CreateTimer(0.1, function()
-		ability:ApplyDataDrivenModifier(caster, caster.freezing_field_center, modifier_sector_0, {})
+		if IsCurrentFreezingField(caster, center, ability) then
+			ability:ApplyDataDrivenModifier(caster, center, modifier_sector_0, {})
+		end
 	end)
 
 	Timers:CreateTimer(0.2, function()
-		ability:ApplyDataDrivenModifier(caster, caster.freezing_field_center, modifier_sector_1, {})
+		if IsCurrentFreezingField(caster, center, ability) then
+			ability:ApplyDataDrivenModifier(caster, center, modifier_sector_1, {})
+		end
 	end)
 
 	Timers:CreateTimer(0.3, function()
-		ability:ApplyDataDrivenModifier(caster, caster.freezing_field_center, modifier_sector_2, {})
+		if IsCurrentFreezingField(caster, center, ability) then
+			ability:ApplyDataDrivenModifier(caster, center, modifier_sector_2, {})
+		end
 	end)
 
 	Timers:CreateTimer(0.4, function()
-		ability:ApplyDataDrivenModifier(caster, caster.freezing_field_center, modifier_sector_3, {})
+		if IsCurrentFreezingField(caster, center, ability) then
+			ability:ApplyDataDrivenModifier(caster, center, modifier_sector_3, {})
+		end
 	end)
 
 	Timers:CreateTimer(20.0, function()
-		UTIL_Remove(caster.freezing_field_center)
+		if IsValidMonsoonEntity(caster) and caster.freezing_field_center == center then
+			CleanupFreezingField(caster, false)
+		elseif IsValidMonsoonEntity(center) then
+			UTIL_Remove(center)
+		end
 	end)
 end
 
 function FreezingFieldExplode(keys)
-	if not keys.caster or not keys.caster.freezing_field_center or keys.caster.freezing_field_center and not IsValidEntity(keys.caster.freezing_field_center) then return end
+	if not keys or not IsValidMonsoonEntity(keys.caster) then
+		return
+	end
+
+	if not IsValidMonsoonEntity(keys.caster.freezing_field_center) then
+		return
+	end
 
 	local ability = keys.ability
 	local ability_level = ability:GetLevel() - 1
@@ -95,18 +157,17 @@ function FreezingFieldExplode(keys)
 	-- Fire sound at the center position
 	explosion_dummy:EmitSound(sound_name)
 
-	-- Destroy dummy
-	explosion_dummy:IsNull()
+	ParticleManager:ReleaseParticleIndex(fxIndex)
 
 	Timers:CreateTimer(9.0, function()
-		for _, v in pairs(explosion_dummy) do
+		if IsValidMonsoonEntity(explosion_dummy) then
 			UTIL_Remove(explosion_dummy)
 		end
 	end)
 end
 
 function FreezingFieldStopSound(keys)
-	if not keys.caster or not keys.caster.freezing_field_center then return end
+	if not keys or not IsValidMonsoonEntity(keys.caster) then return end
 	local caster = keys.caster
 	local ability = keys.ability
 	local modifier_aura = keys.modifier_aura
@@ -116,14 +177,6 @@ function FreezingFieldStopSound(keys)
 	local modifier_SW = keys.modifier_SW
 	local modifier_SE = keys.modifier_SE
 
-	-- Stop playing sounds
-	caster.freezing_field_center:StopSound("Hero_Razor.Storm.Cast")
-	caster.freezing_field_center:StopSound("Hero_Razor.Storm.Loop")
-	caster.freezing_field_center:StopSound("Hero_Zuus.LightningBolt.Cast.Righteous")
-
-	-- Stop animation
-	--EndAnimation(caster)
-
 	-- Removes auras and modifiers
 	caster:RemoveModifierByName(modifier_caster)
 	caster:RemoveModifierByName(modifier_aura)
@@ -132,17 +185,11 @@ function FreezingFieldStopSound(keys)
 	caster:RemoveModifierByName(modifier_SW)
 	caster:RemoveModifierByName(modifier_SE)
 
-	-- Destroy center particle
-	ParticleManager:DestroyParticle(caster.freezing_field_particle, true)
-
-	-- Resets the center position
-	caster.freezing_field_center = nil
-	caster.freezing_field_particle = nil
-
-	caster:FadeGesture(ACT_DOTA_TELEPORT)
+	CleanupFreezingField(caster, true)
 end
 
 function FreezingFieldEnd(keys)
+	if not keys or not IsValidMonsoonEntity(keys.caster) then return end
 	local caster = keys.caster
 	local ability = keys.ability
 	local modifier_aura = keys.modifier_aura
@@ -153,7 +200,6 @@ function FreezingFieldEnd(keys)
 	local modifier_SE = keys.modifier_SE
 
 	-- Removes auras and modifiers
-	caster.freezing_field_center:IsNull()
 	caster:RemoveModifierByName(modifier_caster)
 	caster:RemoveModifierByName(modifier_aura)
 	caster:RemoveModifierByName(modifier_NE)
@@ -161,12 +207,5 @@ function FreezingFieldEnd(keys)
 	caster:RemoveModifierByName(modifier_SW)
 	caster:RemoveModifierByName(modifier_SE)
 
-	-- Destroy center particle
-	ParticleManager:DestroyParticle(caster.freezing_field_particle, false)
-
-	-- Resets the center position
-	caster.freezing_field_center = nil
-	caster.freezing_field_particle = nil
-
-	caster:FadeGesture(ACT_DOTA_TELEPORT)
+	CleanupFreezingField(caster, false)
 end

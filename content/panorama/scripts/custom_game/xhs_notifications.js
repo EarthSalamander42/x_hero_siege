@@ -13,6 +13,8 @@
 	var activeRuneVersion = 0;
 	var activeRuneCompactSchedule = null;
 	var activeRuneHideSchedule = null;
+	var activeRuneCompact = false;
+	var activeRuneAltDown = false;
 	var fragmentQuestNotificationQueue = [];
 	var fragmentQuestNotificationActive = false;
 	var FRAGMENT_QUEST_QUEUE_GAP = 0.35;
@@ -921,11 +923,31 @@
 		}
 	}
 
-	function setRuneCompact(compact) {
+	function applyRuneCompactState() {
 		var panel = $("#XHSRuneIndicator");
 		if (panel) {
-			panel.SetHasClass("XHSRuneCompact", compact);
+			panel.SetHasClass("XHSRuneCompact", activeRuneCompact && !activeRuneAltDown);
 		}
+	}
+
+	function setRuneCompact(compact) {
+		activeRuneCompact = !!compact;
+		applyRuneCompactState();
+	}
+
+	function refreshRuneAltState() {
+		var isAltDown = false;
+		try {
+			isAltDown = !!GameUI.IsAltDown();
+		} catch (error) {
+			isAltDown = false;
+		}
+
+		if (isAltDown !== activeRuneAltDown) {
+			activeRuneAltDown = isAltDown;
+			applyRuneCompactState();
+		}
+		$.Schedule(0.03, refreshRuneAltState);
 	}
 
 	function getRuneCategoryClass(category) {
@@ -1337,4 +1359,6 @@
 	GameEvents.Subscribe("hide_current_event_timer", function () {
 		setCurrentEventNotificationOffset(false);
 	});
+
+	refreshRuneAltState();
 })();

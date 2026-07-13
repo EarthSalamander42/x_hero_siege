@@ -876,6 +876,13 @@ function DestroyXHSReturnMarker(hero)
 	hero.xhs_return_marker_position = nil
 end
 
+function ClearXHSReturnMarker(hero)
+	if hero == nil or hero:IsNull() then return end
+
+	DestroyXHSReturnMarker(hero)
+	hero.old_pos = nil
+end
+
 function CreateXHSReturnMarker(hero, position)
 	if hero == nil or hero:IsNull() or position == nil then return end
 
@@ -937,8 +944,9 @@ function TeleportHero(hero, point, delay, iCameraSpeed)
 			hero:Stop()
 		end
 
-		if hero.xhs_return_marker_position ~= nil and (point - hero.xhs_return_marker_position):Length2D() <= 128 then
-			DestroyXHSReturnMarker(hero)
+		local return_position = hero.xhs_return_marker_position or hero.old_pos
+		if return_position ~= nil and (point - return_position):Length2D() <= 128 then
+			ClearXHSReturnMarker(hero)
 		end
 
 		EmitSoundOnLocationWithCaster(hero:GetAbsOrigin(), "Portal.Hero_Appear", hero)
@@ -1268,7 +1276,7 @@ function IsPrivateBossBarBoss(boss)
 	return boss ~= nil
 		and IsValidEntity(boss)
 		and not boss:IsNull()
-		and XHS_PRIVATE_BOSS_BAR_BOSSES[boss:GetUnitName()] == true
+		and (XHS_PRIVATE_BOSS_BAR_BOSSES[boss:GetUnitName()] == true or boss.xhs_boss_bar_players ~= nil)
 end
 
 local function GetBossBarStateKey(boss)
@@ -1454,6 +1462,26 @@ local function ShowBossBarToPlayer(caster, playerID)
 	StartBossBarHealthThink(caster)
 end
 
+function ShowPrivateBossBar(caster, playerID)
+	ShowBossBarToPlayer(caster, playerID)
+end
+
+function HideBossBarForPlayer(boss, playerID)
+	if boss == nil or not IsValidEntity(boss) or boss:IsNull() or playerID == nil then return end
+
+	local player = PlayerResource:GetPlayer(playerID)
+	if player == nil then return end
+
+	CustomGameEventManager:Send_ServerToPlayer(player, "hide_boss_hp", {
+		boss_count = boss.boss_count,
+		boss_bar_id = GetBossBarId and GetBossBarId(boss) or nil,
+	})
+
+	if boss.xhs_boss_bar_players ~= nil then
+		boss.xhs_boss_bar_players[playerID] = nil
+	end
+end
+
 function ShowBossBar(caster)
 	if caster.deathStart then return end
 	if IsBossBarSuppressed(caster) then return end
@@ -1491,7 +1519,9 @@ function UpdateBossBar(boss, attacker)
 	if boss.boss_count == nil then boss.boss_count = 1 end
 
 	if IsPrivateBossBarBoss(boss) then
-		ShowBossBarToPlayer(boss, GetBossBarPlayerIDFromAttacker(attacker))
+		if boss.xhs_boss_bar_lock_to_registered ~= true then
+			ShowBossBarToPlayer(boss, GetBossBarPlayerIDFromAttacker(attacker))
+		end
 		SendPrivateBossBarUpdateIfChanged(boss, true)
 	else
 		SendBossBarUpdateIfChanged(boss, true)

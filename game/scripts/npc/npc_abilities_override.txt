@@ -3128,6 +3128,7 @@
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_PHYSICAL"
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_YES"
 		"SpellDispellableType"			"SPELL_DISPELLABLE_NO"
+		"AbilityTextureName"				"ursa_fury_swipes"
 		"MaxLevel"						"5"
 
 		// Special

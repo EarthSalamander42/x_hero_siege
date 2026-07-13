@@ -23,17 +23,17 @@ local function GetVenomOrbTexture(caster, active_texture, inactive_texture)
 end
 
 local VENOM_ACTIVE_MODIFIER_TEXTURES = {
-	item_plagueheart = "custom/plagueheart",
-	item_viridian_gem = "custom/viridian_gem",
-	item_xhs_orb_of_venom = "custom/orb_of_venom",
+	item_plagueheart = "modifiers/plagueheart",
+	item_viridian_gem = "modifiers/viridian_gem",
+	item_xhs_orb_of_venom = "modifiers/orb_of_venom",
 }
 
 local function GetVenomActiveModifierTexture(ability)
 	if ability and not ability:IsNull() then
-		return VENOM_ACTIVE_MODIFIER_TEXTURES[ability:GetName()] or "custom/orb_of_venom"
+		return VENOM_ACTIVE_MODIFIER_TEXTURES[ability:GetName()] or "modifiers/orb_of_venom"
 	end
 
-	return "custom/orb_of_venom"
+	return "modifiers/orb_of_venom"
 end
 
 function item_xhs_orb_of_venom:GetIntrinsicModifierName() return "modifier_orb_of_venom_xhs" end
@@ -84,15 +84,21 @@ function modifier_orb_of_venom_xhs:GetModifierPreAttack_BonusDamage()
 end
 
 function modifier_orb_of_venom_xhs:OnAttackLanded(params)
-	if not IsServer() or params.attacker ~= self:GetParent() then
+	if not IsServer() or not params or params.attacker ~= self:GetParent() then
 		return
 	end
 
-	if params.target:GetTeamNumber() == params.attacker:GetTeamNumber() or params.target:IsBuilding() then
+	local attacker = params.attacker
+	local target = params.target
+	if not IsValidEntity(attacker) or not IsValidEntity(target) then
 		return
 	end
 
-	if not self:GetParent():HasModifier("modifier_orb_of_venom_xhs_active") then
+	if target:GetTeamNumber() == attacker:GetTeamNumber() or target:IsBuilding() then
+		return
+	end
+
+	if not attacker:HasModifier("modifier_orb_of_venom_xhs_active") then
 		return
 	end
 
@@ -102,17 +108,25 @@ function modifier_orb_of_venom_xhs:OnAttackLanded(params)
 	end
 
 	local toxic_damage = ability:GetSpecialValueFor("toxic_saturation_damage")
-	if toxic_damage > 0 and params.target:HasModifier("modifier_orb_of_venom_poison") then
+	if toxic_damage > 0 and target:HasModifier("modifier_orb_of_venom_poison") then
 		ApplyDamage({
-			victim = params.target,
-			attacker = params.attacker,
+			victim = target,
+			attacker = attacker,
 			damage = toxic_damage,
 			damage_type = DAMAGE_TYPE_MAGICAL,
 			ability = ability,
 		})
 	end
 
-	params.target:AddNewModifier(params.attacker, ability, "modifier_orb_of_venom_poison", {
+	if not IsValidEntity(target)
+		or not target:IsAlive()
+		or not IsValidEntity(attacker)
+		or ability:IsNull()
+	then
+		return
+	end
+
+	target:AddNewModifier(attacker, ability, "modifier_orb_of_venom_poison", {
 		duration = ability:GetSpecialValueFor("poison_duration")
 	})
 end
@@ -123,6 +137,7 @@ modifier_orb_of_venom_poison.XHS_LINK_CLIENT = true
 function modifier_orb_of_venom_poison:IsHidden() return false end
 function modifier_orb_of_venom_poison:IsDebuff() return true end
 function modifier_orb_of_venom_poison:IsPurgable() return true end
+function modifier_orb_of_venom_poison:GetTexture() return "modifiers/orb_of_venom" end
 
 function modifier_orb_of_venom_poison:OnCreated()
 	self:RefreshSpecialValues()

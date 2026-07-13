@@ -39,6 +39,9 @@ var XHSEndScreen = (function () {
 		4: "Extreme",
 		5: "Divine",
 	};
+	var endGameSubscription = null;
+	var hasRenderedEndGame = false;
+	var shownRewardKeys = {};
 
 	function Panel(id) {
 		return $("#" + id);
@@ -241,38 +244,7 @@ var XHSEndScreen = (function () {
 	}
 
 	function GetEndGameData() {
-		var data = CustomNetTables.GetTableValue("game_options", "end_game");
-
-		if (data) {
-			return data;
-		}
-
-		var fallbackPlayers = {};
-		for (var playerID = 0; playerID < 24; playerID++) {
-			var info = Safe(function () {
-				return Game.GetPlayerInfo(playerID);
-			}, null);
-
-			if (info) {
-				fallbackPlayers[info.player_steamid || playerID.toString()] = {
-					id: playerID,
-					kills: info.player_kills,
-					deaths: info.player_deaths,
-					assists: info.player_assists,
-					level: info.player_level,
-					team: info.player_team_id,
-					hero: info.player_selected_hero,
-					networth: info.player_gold,
-				};
-			}
-		}
-
-		return {
-			players: fallbackPlayers,
-			data: { players: {} },
-			info: {},
-			game_time: Safe(function () { return Game.GetDOTATime(false, false); }, 0),
-		};
+		return CustomNetTables.GetTableValue("game_options", "end_game");
 	}
 
 	function FindServerPlayer(data, steamID, playerID) {
@@ -306,7 +278,7 @@ var XHSEndScreen = (function () {
 	function GetPlayerIDsFromData(data) {
 		var ids = {};
 		var ordered = [];
-		var players = data.players || {};
+		var players = (data && data.players) || {};
 
 		for (var steamID in players) {
 			if (players.hasOwnProperty(steamID) && players[steamID] && players[steamID].id !== undefined) {
@@ -314,16 +286,13 @@ var XHSEndScreen = (function () {
 			}
 		}
 
-		for (var playerID = 0; playerID < 24; playerID++) {
-			var info = Safe(function () {
-				return Game.GetPlayerInfo(playerID);
-			}, null);
-
-			if (info || ids[playerID]) {
-				ordered.push(playerID);
+		for (var playerIDKey in ids) {
+			if (ids.hasOwnProperty(playerIDKey)) {
+				ordered.push(ToNumber(playerIDKey, 0));
 			}
 		}
 
+		ordered.sort(function (a, b) { return a - b; });
 		return ordered;
 	}
 
@@ -925,7 +894,12 @@ var XHSEndScreen = (function () {
 
 		if (model.id === Players.GetLocalPlayer() && supporterChange > 0 && levelUps >= 1) {
 			for (var i = 1; i <= levelUps; i++) {
-				CreateBattlepassRewardPanel(supporter.level + i, i);
+				var rewardLevel = supporter.level + i;
+				var rewardKey = model.id + ":" + rewardLevel;
+				if (!shownRewardKeys[rewardKey]) {
+					shownRewardKeys[rewardKey] = true;
+					CreateBattlepassRewardPanel(rewardLevel, i);
+				}
 			}
 		}
 	}
@@ -1236,11 +1210,20 @@ var XHSEndScreen = (function () {
 		}
 	}
 
-	function Init() {
-		HideVanillaHud();
-		BindButtons();
+	function SetLoading(isLoading) {
+		var root = Panel("XHSEndScreenRoot");
+		if (root) {
+			root.SetHasClass("IsLoading", isLoading);
+		}
+	}
 
-		var data = GetEndGameData();
+	function RenderEndGameData(data) {
+		if (!data || hasRenderedEndGame) {
+			return;
+		}
+
+		hasRenderedEndGame = true;
+		SetLoading(false);
 		var players = BuildPlayerModels(data);
 
 		RenderHeader(data);
@@ -1248,6 +1231,26 @@ var XHSEndScreen = (function () {
 		RenderMvpCards(players);
 		RenderPlayers(players);
 		RenderHallOfFame();
+	}
+
+	function SubscribeEndGameData() {
+		if (endGameSubscription !== null || !CustomNetTables || !CustomNetTables.SubscribeNetTableListener) {
+			return;
+		}
+
+		endGameSubscription = CustomNetTables.SubscribeNetTableListener("game_options", function (tableName, key, data) {
+			if (key === "end_game") {
+				RenderEndGameData(data);
+			}
+		});
+	}
+
+	function Init() {
+		HideVanillaHud();
+		BindButtons();
+		SubscribeEndGameData();
+		SetLoading(true);
+		RenderEndGameData(GetEndGameData());
 	}
 
 	return {

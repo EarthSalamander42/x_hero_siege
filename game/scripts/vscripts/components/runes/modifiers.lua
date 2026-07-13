@@ -38,6 +38,17 @@ function modifier_xhs_rune_revitalization:GetTexture() return "rune_arcane" end
 function modifier_xhs_rune_revitalization:DeclareFunctions() return { MODIFIER_PROPERTY_MANA_REGEN_TOTAL_PERCENTAGE } end
 function modifier_xhs_rune_revitalization:GetModifierTotalPercentageManaRegen() return self.mana_regen_pct or 0 end
 
+modifier_xhs_rune_restoration = modifier_xhs_rune_restoration or class({})
+modifier_xhs_rune_restoration.XHS_LINK_CLIENT = true
+function modifier_xhs_rune_restoration:OnCreated(kv)
+	kv = kv or {}
+	self.restored_pct = tonumber(kv.restored_pct) or 35
+end
+function modifier_xhs_rune_restoration:OnRefresh(kv) self:OnCreated(kv) end
+function modifier_xhs_rune_restoration:GetTexture() return "rune_regen" end
+function modifier_xhs_rune_restoration:DeclareFunctions() return { MODIFIER_PROPERTY_TOOLTIP } end
+function modifier_xhs_rune_restoration:OnTooltip() return self.restored_pct or 35 end
+
 modifier_xhs_rune_second_wind = modifier_xhs_rune_second_wind or class({})
 modifier_xhs_rune_second_wind.XHS_LINK_CLIENT = true
 function modifier_xhs_rune_second_wind:OnCreated(kv)
@@ -290,6 +301,7 @@ function modifier_xhs_rune_momentum:GetModifierMoveSpeedBonus_Percentage() retur
 
 ApplyVisibleRuneModifierDefaults(modifier_xhs_rune_healing)
 ApplyVisibleRuneModifierDefaults(modifier_xhs_rune_revitalization)
+ApplyVisibleRuneModifierDefaults(modifier_xhs_rune_restoration)
 ApplyVisibleRuneModifierDefaults(modifier_xhs_rune_second_wind)
 ApplyVisibleRuneModifierDefaults(modifier_xhs_rune_second_wind_heal)
 ApplyVisibleRuneModifierDefaults(modifier_xhs_rune_second_wind_guard)

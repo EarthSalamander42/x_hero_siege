@@ -97,6 +97,10 @@ if IsServer() and LinkLuaModifier ~= nil and _G.XHS_NATIVE_LINK_LUA_MODIFIER == 
 		_G.XHS_NATIVE_ADD_NEW_MODIFIER = CDOTA_BaseNPC.AddNewModifier
 
 		CDOTA_BaseNPC.AddNewModifier = function(self, caster, ability, modifierName, modifierTable)
+			if self == nil or (IsValidEntity ~= nil and not IsValidEntity(self)) then
+				return nil
+			end
+
 			local modifier = _G.XHS_NATIVE_ADD_NEW_MODIFIER(self, caster, ability, modifierName, modifierTable)
 			local entry = _G.XHS_LINK_LUA_MODIFIER_REGISTRY[modifierName]
 			if entry ~= nil then

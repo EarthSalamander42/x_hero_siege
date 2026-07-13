@@ -23,17 +23,17 @@ local function GetArcaneOrbTexture(caster, active_texture, inactive_texture)
 end
 
 local ARCANE_ACTIVE_MODIFIER_TEXTURES = {
-	item_astral_core = "custom/astral_core",
-	item_mystic_gem = "custom/mystic_gem",
-	item_orb_of_arcane = "custom/orb_of_arcane",
+	item_astral_core = "item_astral_core",
+	item_mystic_gem = "item_mystic_gem",
+	item_orb_of_arcane = "item_orb_of_arcane",
 }
 
 local function GetArcaneActiveModifierTexture(ability)
 	if ability and not ability:IsNull() then
-		return ARCANE_ACTIVE_MODIFIER_TEXTURES[ability:GetName()] or "custom/orb_of_arcane"
+		return ARCANE_ACTIVE_MODIFIER_TEXTURES[ability:GetName()] or "item_orb_of_arcane"
 	end
 
-	return "custom/orb_of_arcane"
+	return "item_orb_of_arcane"
 end
 
 function item_orb_of_arcane:GetIntrinsicModifierName() return "modifier_orb_of_arcane" end
@@ -63,6 +63,12 @@ function modifier_orb_of_arcane_active:IsHidden() return false end
 function modifier_orb_of_arcane_active:IsPurgable() return false end
 function modifier_orb_of_arcane_active:RemoveOnDeath() return false end
 function modifier_orb_of_arcane_active:GetTexture() return GetArcaneActiveModifierTexture(self:GetAbility()) end
+function modifier_orb_of_arcane_active:DeclareFunctions() return { MODIFIER_PROPERTY_TOOLTIP } end
+function modifier_orb_of_arcane_active:OnTooltip()
+	local ability = self:GetAbility()
+	if ability == nil or ability:IsNull() then return 0 end
+	return ability:GetSpecialValueFor("spell_amp")
+end
 
 modifier_orb_of_arcane = modifier_orb_of_arcane or class({})
 modifier_orb_of_arcane.XHS_LINK_CLIENT = true
@@ -99,11 +105,15 @@ function modifier_orb_of_arcane:GetModifierPercentageCooldown()
 end
 
 function modifier_orb_of_arcane:OnTakeDamage(params)
-	if not IsServer() or params.attacker ~= self:GetParent() then
+	if not IsServer() or not params or params.attacker ~= self:GetParent() then
 		return
 	end
 
-	if not params.unit or not params.inflictor or params.unit:GetTeamNumber() == params.attacker:GetTeamNumber() then
+	if not IsValidEntity(params.attacker)
+		or not IsValidEntity(params.unit)
+		or not IsValidEntity(params.inflictor)
+		or params.unit:GetTeamNumber() == params.attacker:GetTeamNumber()
+	then
 		return
 	end
 
@@ -125,6 +135,10 @@ function modifier_orb_of_arcane:OnTakeDamage(params)
 		return
 	end
 
+	if not params.unit:IsAlive() then
+		return
+	end
+
 	params.unit:AddNewModifier(params.attacker, ability, "modifier_orb_of_arcane_exposure", {
 		duration = ability:GetSpecialValueFor("exposure_duration")
 	})
@@ -137,6 +151,24 @@ function modifier_orb_of_arcane_exposure:IsHidden() return false end
 function modifier_orb_of_arcane_exposure:IsDebuff() return true end
 function modifier_orb_of_arcane_exposure:IsPurgable() return true end
 
+function modifier_orb_of_arcane_exposure:OnCreated()
+	self:RefreshSpecialValues()
+end
+
+function modifier_orb_of_arcane_exposure:OnRefresh()
+	self:RefreshSpecialValues()
+end
+
+function modifier_orb_of_arcane_exposure:RefreshSpecialValues()
+	local ability = self:GetAbility()
+	if ability == nil or ability:IsNull() then
+		self.magic_resist_reduction = 0
+		return
+	end
+
+	self.magic_resist_reduction = ability:GetSpecialValueFor("exposure_magic_resist_reduction")
+end
+
 function modifier_orb_of_arcane_exposure:DeclareFunctions()
 	return {
 		MODIFIER_PROPERTY_MAGICAL_RESISTANCE_BONUS,
@@ -144,7 +176,7 @@ function modifier_orb_of_arcane_exposure:DeclareFunctions()
 end
 
 function modifier_orb_of_arcane_exposure:GetModifierMagicalResistanceBonus()
-	return 0 - self:GetAbility():GetSpecialValueFor("exposure_magic_resist_reduction")
+	return 0 - (self.magic_resist_reduction or 0)
 end
 
 function modifier_orb_of_arcane_exposure:GetEffectName()

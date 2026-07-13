@@ -859,37 +859,34 @@ function modifier_xhs_magtheridon_phase3_ai:CastInfernalRings()
 	if target == nil then return nil end
 
 	local castPoint = GetAbilityCastPoint(ability)
-	local nodeRadius = ability:GetSpecialValueFor("radius")
 	local innerRingRadius = ability:GetSpecialValueFor("inner_ring_radius")
-	local predictedTargetPosition = self:GetPredictedHeroDropPosition(target, castPoint)
-	local targetDistance = (predictedTargetPosition - bossPosition):Length2D()
-	local center = predictedTargetPosition
-	local ringRadius = math.max(nodeRadius * 1.4, math.min(innerRingRadius, nodeRadius * 1.75))
-
-	if targetDistance <= innerRingRadius + nodeRadius then
-		center = bossPosition
-		ringRadius = math.max(nodeRadius * 1.25, math.min(innerRingRadius, targetDistance + nodeRadius * 0.35))
-	end
-
-	local baseCount = ringRadius > 600 and ability:GetSpecialValueFor("outer_count") or ability:GetSpecialValueFor("inner_count")
-	local count = XHSPhase3BossAI:ScaleDensity(baseCount, 8)
+	local outerRingRadius = ability:GetSpecialValueFor("outer_ring_radius")
+	local innerCount = math.max(1, ability:GetSpecialValueFor("inner_count"))
+	local outerCount = math.max(0, ability:GetSpecialValueFor("outer_count"))
 	local stagger = XHSPhase3BossAI:ScaleDelay(ability:GetSpecialValueFor("impact_stagger"))
-	local impacts = {
-		{
-			position = predictedTargetPosition,
-			delay = 0,
-		},
-	}
+	local rotationOffset = self.last_pattern == "infernal_rings" and 18 or 0
+	local impacts = {}
 
-	for i = 1, count do
-		local position = PositionOnRing(center, ringRadius, i, count, self.last_pattern == "infernal_rings" and 18 or 0)
+	for i = 1, innerCount do
+		local position = PositionOnRing(bossPosition, innerRingRadius, i, innerCount, rotationOffset)
 		impacts[#impacts + 1] = {
 			position = position,
-			delay = (i % 2) * stagger,
+			delay = ((i - 1) % 2) * stagger,
 		}
 	end
 
-	local castAbility = CastPreparedAbility(boss, "xhs_magtheridon_infernal_rings", { impacts = impacts }, center)
+	if outerCount > 0 then
+		local outerOffset = rotationOffset + 180 / outerCount
+		for i = 1, outerCount do
+			local position = PositionOnRing(bossPosition, outerRingRadius, i, outerCount, outerOffset)
+			impacts[#impacts + 1] = {
+				position = position,
+				delay = ((i - 1) % 2) * stagger,
+			}
+		end
+	end
+
+	local castAbility = CastPreparedAbility(boss, "xhs_magtheridon_infernal_rings", { impacts = impacts }, bossPosition)
 	if castAbility == nil then return nil end
 
 	return castPoint + stagger + 0.5
@@ -1067,11 +1064,23 @@ end
 function modifier_xhs_magtheridon_slow:IsHidden() return false end
 function modifier_xhs_magtheridon_slow:IsDebuff() return true end
 function modifier_xhs_magtheridon_slow:IsPurgable() return true end
+function modifier_xhs_magtheridon_slow:GetTexture()
+	local ability = self:GetAbility()
+	if ability ~= nil and not ability:IsNull() then
+		return ability:GetAbilityTextureName()
+	end
+
+	return "custom/xhs_magtheridon_fel_fissure"
+end
 
 function modifier_xhs_magtheridon_slow:OnCreated(params)
 	params = params or {}
 	self.movement_slow = params.movement_slow or -20
 	self.attack_slow = params.attack_slow or -120
+end
+
+function modifier_xhs_magtheridon_slow:OnRefresh(params)
+	self:OnCreated(params)
 end
 
 function modifier_xhs_magtheridon_slow:DeclareFunctions() return {

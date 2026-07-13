@@ -131,8 +131,9 @@ local function EmitLocationSound(caster, position, soundName)
 end
 
 local function DamageEnemies(attacker, ability, position, radius, damage, damageType)
-	if not IsValidAlive(attacker) then return end
+	if not IsValidAlive(attacker) then return {} end
 
+	local hitUnits = {}
 	local units = FindUnitsInRadius(
 		attacker:GetTeamNumber(),
 		position,
@@ -154,8 +155,11 @@ local function DamageEnemies(attacker, ability, position, radius, damage, damage
 				damage = ScaleDamage(damage),
 				damage_type = damageType or DAMAGE_TYPE_PURE,
 			})
+			hitUnits[#hitUnits + 1] = target
 		end
 	end
+
+	return hitUnits
 end
 
 local function DamageLineEnemies(attacker, ability, startPosition, direction, spacing, radius, count, damage, damageType, startDistance)
@@ -201,10 +205,10 @@ local function DamageLineEnemies(attacker, ability, startPosition, direction, sp
 	return hitUnits
 end
 
-local function ApplySlow(attacker, target, duration, movementSlow, attackSlow)
+local function ApplySlow(attacker, ability, target, duration, movementSlow, attackSlow)
 	if not IsValidAlive(target) then return end
 
-	target:AddNewModifier(attacker, nil, "modifier_xhs_magtheridon_slow", {
+	target:AddNewModifier(attacker, ability, "modifier_xhs_magtheridon_slow", {
 		duration = duration,
 		movement_slow = movementSlow,
 		attack_slow = attackSlow,
@@ -404,7 +408,7 @@ function xhs_magtheridon_fel_stomp:OnSpellStart()
 
 	local units = FindUnitsInRadius(caster:GetTeamNumber(), caster:GetAbsOrigin(), nil, radius, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, FIND_ANY_ORDER, false)
 	for _, unit in pairs(units) do
-		ApplySlow(caster, unit, slowDuration, self:GetSpecialValueFor("movement_slow"), self:GetSpecialValueFor("attack_slow"))
+		ApplySlow(caster, self, unit, slowDuration, self:GetSpecialValueFor("movement_slow"), self:GetSpecialValueFor("attack_slow"))
 	end
 
 	ClearContext(self)
@@ -495,13 +499,19 @@ function xhs_magtheridon_fel_fissure:OnSpellStart()
 	local caster = self:GetCaster()
 	local radius = self:GetSpecialValueFor("radius")
 	local damage = self:GetSpecialValueFor("wave_damage") * self:GetSpecialValueFor("damage_pct") * 0.01
+	local slowDuration = self:GetSpecialValueFor("slow_duration")
+	local movementSlow = self:GetSpecialValueFor("movement_slow")
+	local attackSlow = self:GetSpecialValueFor("attack_slow")
 
 	for _, entry in pairs(context.impacts or {}) do
 		local position = entry.position
 		Timers:CreateTimer(entry.delay or 0, function()
 			if not IsValidAlive(caster) then return nil end
 			EmitLocationSound(caster, position, FEL_FISSURE_IMPACT_SOUND)
-			DamageEnemies(caster, self, position, radius, damage, DAMAGE_TYPE_PURE)
+			local hitUnits = DamageEnemies(caster, self, position, radius, damage, DAMAGE_TYPE_PURE)
+			for _, unit in pairs(hitUnits) do
+				ApplySlow(caster, self, unit, slowDuration, movementSlow, attackSlow)
+			end
 			return nil
 		end)
 	end
@@ -691,7 +701,7 @@ function xhs_magtheridon_rupture:OnSpellStart()
 			local units = DamageLineEnemies(caster, self, startPosition, direction, spacing, radius, count, damage, DAMAGE_TYPE_PURE, startDistance)
 			for _, unit in pairs(units) do
 				unit:EmitSound(RUPTURE_IMPACT_SOUND)
-				ApplySlow(caster, unit, slowDuration, self:GetSpecialValueFor("movement_slow"), self:GetSpecialValueFor("attack_slow"))
+				ApplySlow(caster, self, unit, slowDuration, self:GetSpecialValueFor("movement_slow"), self:GetSpecialValueFor("attack_slow"))
 			end
 			return nil
 		end)

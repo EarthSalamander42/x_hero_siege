@@ -1286,6 +1286,7 @@ function api:RegisterGame(callback)
 		api.effigies = data.effigies or data.statues or nil
 		api.disabled_heroes = data.disabled_heroes or nil
 		api.supporter_pass = data.supporter_pass or nil
+		api.custom_polls = data.custom_polls or nil
 
 		CustomNetTables:SetTableValue("supporter_pass_player", "companions", api.companions)
 		CustomNetTables:SetTableValue("supporter_pass_player", "emblems", api.emblems)
@@ -1297,6 +1298,10 @@ function api:RegisterGame(callback)
 
 		if SupporterPass and SupporterPass.PublishPlayers then
 			SupporterPass:PublishPlayers()
+		end
+
+		if CustomPolls and CustomPolls.SetBackendPayload then
+			CustomPolls:SetBackendPayload(api.custom_polls)
 		end
 
 		for player_id = 0, PlayerResource:GetPlayerCount() - 1 do
@@ -1341,6 +1346,35 @@ function api:RegisterGame(callback)
 	-- call in supporter pass scripts after supporter_pass_player is set to show mmr medal in loading screen
 	--	print("ALL PLAYERS LOADED IN!")
 	--	CustomGameEventManager:Send_ServerToAllClients("all_players_loaded", {})
+end
+
+function api:SubmitCustomPollVote(player_id, poll_id, option_id, callback)
+	if callback == nil then
+		callback = function() end
+	end
+
+	if player_id == nil or not PlayerResource:IsValidPlayerID(player_id) then
+		callback(false, { message = "Invalid player." })
+		return
+	end
+
+	local steamid = tostring(PlayerResource:GetSteamID(player_id))
+	if steamid == nil or steamid == "0" then
+		callback(false, { message = "Invalid SteamID." })
+		return
+	end
+
+	self:Request("custom-polls/vote", function(data)
+		callback(true, data or {})
+	end, function(err)
+		callback(false, err or { message = "Vote backend unavailable." })
+	end, "POST", {
+		game_id = api:GetApiGameId(),
+		match_id = api:GetMatchID(),
+		steamid = steamid,
+		poll_id = tostring(poll_id or ""),
+		option_id = tostring(option_id or ""),
+	})
 end
 
 function api:ProcessCompletedGame(data, payload)

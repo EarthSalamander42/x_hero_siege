@@ -1,12 +1,11 @@
 local function OrderWaveCreep(unit, waypoint)
 	if unit == nil or unit:IsNull() then return end
 
-	for abilityIndex = 0, 15 do
-		local ability = unit:GetAbilityByIndex(abilityIndex)
+	ForEachUnitAbility(unit, function(ability)
 		if ability ~= nil and ability:GetLevel() <= 0 then
 			ability:SetLevel(1)
 		end
-	end
+	end)
 
 	if unit:GetUnitName() == "npc_magnataur_destroyer_crypt" then
 		local thunderClap = unit:FindAbilityByName("creature_thunder_clap_low")

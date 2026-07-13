@@ -537,8 +537,6 @@ function SpecialEvents:EndFarmEvent()
 	CustomTimers:Countdown("special_event")
 	CustomTimers:Countdown("special_wave")
 
-	Notifications:TopToAll({ text = "Phase 2 begins! (Destroyer Magnataur launched)", duration = 10.0, style = { color = "red" } })
-
 	GameMode.FarmEvent_occuring = false
 end
 

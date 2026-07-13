@@ -49,6 +49,34 @@ local function SetupMagtheridonPhase3Boss(magtheridon, bossCount)
 	end
 end
 
+local MAGTHERIDON_DEATH_PARTICLE = "particles/econ/items/shadow_fiend/sf_fire_arcana/sf_fire_arcana_shadowraze.vpcf"
+local MAGTHERIDON_DEATH_BURSTS = {
+	{ delay = 0.00, offset = Vector(0, 0, 80) },
+	{ delay = 0.18, offset = Vector(150, 60, 40) },
+	{ delay = 0.34, offset = Vector(-130, 95, 65) },
+	{ delay = 0.52, offset = Vector(70, -155, 50) },
+	{ delay = 0.75, offset = Vector(-90, -110, 100) },
+}
+
+function PlayMagtheridonFinalDeathSequence(magtheridon)
+	if magtheridon == nil or not IsValidEntity(magtheridon) or magtheridon:IsNull() then return end
+
+	local origin = magtheridon:GetAbsOrigin()
+	EmitSoundOnLocationWithCaster(origin, "Hero_Techies.RemoteMine.Detonate", magtheridon)
+	for _, burst in ipairs(MAGTHERIDON_DEATH_BURSTS) do
+		Timers:CreateTimer(burst.delay, function()
+			local position = origin + burst.offset
+			local particle = ParticleManager:CreateParticle(MAGTHERIDON_DEATH_PARTICLE, PATTACH_WORLDORIGIN, nil)
+			ParticleManager:SetParticleControl(particle, 0, position)
+			ParticleManager:ReleaseParticleIndex(particle)
+		end)
+	end
+
+	Timers:CreateTimer(0.35, function()
+		EmitGlobalSound("Loot_Drop_Stinger_Arcana")
+	end)
+end
+
 function StartMagtheridonArena(bConsole)
 	if bConsole == true then
 		local newZone = CDungeonZone()
@@ -141,6 +169,7 @@ function EndMagtheridonArena()
 		local illidan = CreateUnitByName("npc_dota_hero_illidan", Entities:FindByName(nil, "spawn_illidan"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 		illidan.zone = "xhs_holdout"
 		illidan.boss_count = 2
+		illidan.xhs_boss_bar_suppressed = true
 		illidan:SetAngles(0, 0, 0)
 		RegisterXHSDevSpawn(illidan)
 		if XHSIllidan_AttachPhase3AI ~= nil then
@@ -152,6 +181,7 @@ function EndMagtheridonArena()
 		local balanar = CreateUnitByName("npc_dota_hero_balanar", Entities:FindByName(nil, "spawn_balanar"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 		balanar.zone = "xhs_holdout"
 		balanar.boss_count = 3
+		balanar.xhs_boss_bar_suppressed = true
 		balanar:SetAngles(0, 90, 0)
 		RegisterXHSDevSpawn(balanar)
 		if XHSBalanar_AttachPhase3AI ~= nil then
@@ -163,6 +193,7 @@ function EndMagtheridonArena()
 		local proudmoore = CreateUnitByName("npc_dota_hero_proudmoore", Entities:FindByName(nil, "spawn_admiral_proudmore"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 		proudmoore.zone = "xhs_holdout"
 		proudmoore.boss_count = 4
+		proudmoore.xhs_boss_bar_suppressed = true
 		proudmoore:SetAngles(0, 180, 0)
 		RegisterXHSDevSpawn(proudmoore)
 		if XHSProudmoore_AttachPhase3AI ~= nil then
@@ -399,17 +430,11 @@ function OpenGromGate()
 		if HideBossBar then
 			HideBossBar(grom)
 		end
-		grom.xhs_boss_bar_suppressed = false
 		local ai = grom:FindModifierByName("modifier_xhs_grom_phase3_ai")
 		if ai ~= nil then
 			ai.xhs_boss_bar_revealed = false
 		end
 	end
-
-	Notifications:TopToAll({
-		text = "Grom's vanguard has fallen. The gate is open.",
-		duration = 8.0,
-	})
 end
 
 function DarkProtectors(keys)
@@ -620,7 +645,7 @@ function StartSecretArena(hero)
 			segments = {
 				{ hero = hero:GetUnitName() },
 				{ text = PlayerResource:GetPlayerName(hero:GetPlayerID()) .. " " },
-				{ text = "found the secret arena!!! GOOD LUCK!", style = { color = "red" } },
+				{ text = "found the secret arena!!! GOOD LUCK!",                 style = { color = "red" } },
 			},
 		})
 

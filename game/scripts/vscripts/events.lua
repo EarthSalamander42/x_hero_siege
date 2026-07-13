@@ -1201,6 +1201,9 @@ ListenToGameEvent('entity_killed', function(keys)
 		if FragmentQuests ~= nil then
 			FragmentQuests:OnHeroDeath(killedUnit)
 		end
+		if DestroyXHSReturnMarker ~= nil then
+			DestroyXHSReturnMarker(killedUnit)
+		end
 		if ReissueWaveCreepOrders ~= nil then
 			ReissueWaveCreepOrders(0.5)
 		end
@@ -1298,6 +1301,10 @@ ListenToGameEvent('entity_killed', function(keys)
 			MAGTHERIDON = MAGTHERIDON + 1
 
 			if MAGTHERIDON >= GetXHSMagtheridonKillLimit(difficulty) then
+				if PlayMagtheridonFinalDeathSequence ~= nil then
+					PlayMagtheridonFinalDeathSequence(killedUnit)
+				end
+
 				if XHSDevTools ~= nil and XHSDevTools:IsSandboxActive() then
 					CustomGameEventManager:Send_ServerToAllClients("hide_boss_hp", { boss_count = 1 })
 					CustomGameEventManager:Send_ServerToAllClients("hide_boss_hp", { boss_count = 2 })

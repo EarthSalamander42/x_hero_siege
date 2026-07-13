@@ -22,6 +22,7 @@
 		"supporter_pass_shop",
 		"supporter_pass_leaderboards",
 		"fragment_quests",
+		"custom_polls",
 		"xhs_quest_state",
 		"xhs_devtools",
 		"vips",
