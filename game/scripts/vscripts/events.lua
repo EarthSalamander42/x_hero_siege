@@ -29,6 +29,13 @@ ListenToGameEvent('game_rules_state_change', function()
 		require('zones/dialog_xhs')
 		require('zones/zone_tables_xhs')
 	elseif newState == DOTA_GAMERULES_STATE_PRE_GAME then
+		local player_count = PlayerResource:GetPlayerCount()
+		if player_count <= 4 then
+			_G.CREEP_LANES_TYPE = 2
+		else
+			_G.CREEP_LANES_TYPE = 1
+		end
+
 		if Gold then
 			Gold:Init()
 		end
@@ -101,7 +108,9 @@ ListenToGameEvent('game_rules_state_change', function()
 			end
 		end
 
-		for NumPlayers = 1, PlayerResource:GetPlayerCount() * CREEP_LANES_TYPE do
+		local lane_count = math.min(8, PlayerResource:GetPlayerCount() * CREEP_LANES_TYPE)
+
+		for NumPlayers = 1, lane_count do
 			CREEP_LANES[NumPlayers][1] = 1
 			local DoorObs = Entities:FindAllByName("obstruction_lane" .. NumPlayers)
 			for _, obs in pairs(DoorObs) do
@@ -150,16 +159,7 @@ ListenToGameEvent('npc_spawned', function(keys)
 	local normal_max_damage = npc:GetBaseDamageMax()
 	local hero_level = npc:GetLevel()
 
-	if GetMapName() == "x_hero_siege_8" then
-		local normal_bounty = npc:GetGoldBounty() * 2
-		local normal_xp = npc:GetDeathXP() * 2
-	end
-
 	if npc and IsValidEntity(npc) then
-		if FragmentQuests ~= nil then
-			FragmentQuests:OnBossUnitSpawned(npc)
-		end
-
 		--ALL NPC
 		for i = 1, #innate_abilities do
 			local current_ability = npc:FindAbilityByName(innate_abilities[i])
@@ -734,11 +734,11 @@ ListenToGameEvent('dota_player_gained_level', function(keys)
 		end
 
 		ForEachUnitAbility(hero, function(ability)
-				if ability:GetLevel() < ability:GetMaxLevel() then
-					for j = 1, ability:GetMaxLevel() - ability:GetLevel() do
-						hero:UpgradeAbility(ability)
-					end
+			if ability:GetLevel() < ability:GetMaxLevel() then
+				for j = 1, ability:GetMaxLevel() - ability:GetLevel() do
+					hero:UpgradeAbility(ability)
 				end
+			end
 		end)
 
 		if AbilitiesHeroes_XX[hero:GetUnitName()] then
@@ -874,9 +874,9 @@ ListenToGameEvent("player_chat", function(keys)
 						Notifications:TopToAll({
 							duration = 6.0,
 							segments = {
-								{ text = "[ADMIN MOD]: ", style = { color = "red", ["font-size"] = "30px" } },
+								{ text = "[ADMIN MOD]: ",                style = { color = "red", ["font-size"] = "30px" } },
 								{ text = PlayerNames[Frozen + 1] .. " ", style = { color = PlayerNames[Frozen + 1], ["font-size"] = "25px" } },
-								{ text = "player has been jailed!", style = { color = "white", ["font-size"] = "25px" } },
+								{ text = "player has been jailed!",      style = { color = "white", ["font-size"] = "25px" } },
 							},
 						})
 					end
@@ -890,9 +890,9 @@ ListenToGameEvent("player_chat", function(keys)
 						Notifications:TopToAll({
 							duration = 6.0,
 							segments = {
-								{ text = "[ADMIN MOD]: ", style = { color = "red", ["font-size"] = "30px" } },
+								{ text = "[ADMIN MOD]: ",                style = { color = "red", ["font-size"] = "30px" } },
 								{ text = PlayerNames[Frozen + 1] .. " ", style = { color = PlayerNames[Frozen + 1], ["font-size"] = "25px" } },
-								{ text = "player has been released!", style = { color = "white", ["font-size"] = "25px" } },
+								{ text = "player has been released!",    style = { color = "white", ["font-size"] = "25px" } },
 							},
 						})
 					end
@@ -903,9 +903,9 @@ ListenToGameEvent("player_chat", function(keys)
 							Notifications:TopToAll({
 								duration = 6.0,
 								segments = {
-									{ text = "[ADMIN MOD]: ", style = { color = "red", ["font-size"] = "30px" } },
+									{ text = "[ADMIN MOD]: ",                style = { color = "red", ["font-size"] = "30px" } },
 									{ text = PlayerNames[Frozen + 1] .. " ", style = { color = PlayerNames[Frozen + 1], ["font-size"] = "25px" } },
-									{ text = "player has been slayed!", style = { color = "white", ["font-size"] = "25px" } },
+									{ text = "player has been slayed!",      style = { color = "white", ["font-size"] = "25px" } },
 								},
 							})
 						end
@@ -916,9 +916,9 @@ ListenToGameEvent("player_chat", function(keys)
 						Notifications:TopToAll({
 							duration = 6.0,
 							segments = {
-								{ text = "[ADMIN MOD]: ", style = { color = "red", ["font-size"] = "30px" } },
+								{ text = "[ADMIN MOD]: ",                style = { color = "red", ["font-size"] = "30px" } },
 								{ text = PlayerNames[Frozen + 1] .. " ", style = { color = PlayerNames[Frozen + 1], ["font-size"] = "25px" } },
-								{ text = "player has been revived!", style = { color = "white", ["font-size"] = "25px" } },
+								{ text = "player has been revived!",     style = { color = "white", ["font-size"] = "25px" } },
 							},
 						})
 					end
@@ -934,9 +934,9 @@ ListenToGameEvent("player_chat", function(keys)
 						Notifications:TopToAll({
 							duration = 6.0,
 							segments = {
-								{ text = "[ADMIN MOD]: ", style = { color = "red", ["font-size"] = "30px" } },
+								{ text = "[ADMIN MOD]: ",                style = { color = "red", ["font-size"] = "30px" } },
 								{ text = PlayerNames[Frozen + 1] .. " ", style = { color = PlayerNames[Frozen + 1], ["font-size"] = "25px" } },
-								{ text = "player is in YOLO state!", style = { color = "white", ["font-size"] = "25px" } },
+								{ text = "player is in YOLO state!",     style = { color = "white", ["font-size"] = "25px" } },
 							},
 						})
 					end
@@ -950,8 +950,8 @@ ListenToGameEvent("player_chat", function(keys)
 						Notifications:TopToAll({
 							duration = 6.0,
 							segments = {
-								{ text = "[ADMIN MOD]: ", style = { color = "red", ["font-size"] = "30px" } },
-								{ text = PlayerNames[Frozen + 1] .. " ", style = { color = PlayerNames[Frozen + 1], ["font-size"] = "25px" } },
+								{ text = "[ADMIN MOD]: ",                        style = { color = "red", ["font-size"] = "30px" } },
+								{ text = PlayerNames[Frozen + 1] .. " ",         style = { color = PlayerNames[Frozen + 1], ["font-size"] = "25px" } },
 								{ text = "player is not in YOLO state anymore.", style = { color = "white", ["font-size"] = "25px" } },
 							},
 						})

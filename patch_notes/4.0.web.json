@@ -1,40 +1,144 @@
 {
   "version": "4.0",
   "title": "X Hero Siege 4.0",
-  "status": "current",
-  "statusLabel": "Current",
+  "status": "draft",
+  "statusLabel": "Draft",
   "route": "/patches/xhs/4.0",
-  "summary": "Generated draft from the v4.0 Git diff. Needs human review.",
+  "summary": "Version 4.0 is a systems and encounter update: Phase 3 bosses have been rebuilt with telegraphed pattern AI, runes and Fragment Quests add new match goals, and the HUD, end screen, Supporter Pass foundation, items, events, and hero implementations received a broad pass.",
   "details": [
     {
       "title": "Highlights",
       "items": [
-        "TODO: Add 3-5 player-facing highlights after reviewing the generated draft."
+        "Phase 3 boss fights were rebuilt around dynamic pattern AI, visible warning zones, cast bars, HP markers, counters, timers, and difficulty-scaled pressure.",
+        "Runes are now a match system with Recovery, Defense, Offense, and Misc categories that create short team or nearby power spikes.",
+        "Fragment Quests add optional objectives for healing, damage, potion discipline, event performance, boss kills, deaths, base health, orb variety, and more.",
+        "Supporter Pass groundwork is visible in-game through tier identity, fragments, XP progress, settings, profile elements, and end-screen displays.",
+        "The HUD and end screen were rebuilt with ally status, supporter marks, ankh/reincarnation visibility, event timers, special wave countdowns, and richer match stats.",
+        "Items and orbs received active/off states, new Arcane/Venom/Wind lines, refreshed orb scripting, and a large icon readability pass."
       ]
     },
     {
-      "title": "Gameplay",
+      "title": "Phase 3 Boss Encounters",
       "items": [
-        "TODO: Summarize gameplay, hero, item, boss, wave, and balance changes by player impact."
+        "Phase 3 bosses now share encounter AI for target selection, cooldown handling, movement, pattern weighting, warning telegraphs, and difficulty scaling.",
+        "Boss mechanics stay recognizable across difficulties while damage, delays, density, thresholds, and recovery windows scale upward.",
+        "Boss bars now support cast bars, delayed health feedback, heal pulses, counters, timers, HP markers, multi-boss states, and special mechanics such as ankh counters.",
+        "Grom Hellscream now uses Mirror Trial, Blade Storm, Mirror Cleave, Windwalk Ambush, Warsong Leap, and Blood Frenzy.",
+        "Illidan now uses Fel Beam, Shadow Dash, Immolation Burst, Glaive Storm, and Metamorphosis pressure.",
+        "Balanar now uses Nightfall, Dread Howl, Sleeping Terror, Carrion Swarm, Rain of Chaos, and Vampiric Presence.",
+        "Proudmoore now uses Admiral's Command, Torrent Line, Broadside, Anchor Smash, and Focus Fire.",
+        "Arthas now uses Frostmourne Mark, Frozen Chains, Death Advance, and Frostmourne Execute.",
+        "The Lich King now uses Remorseless Winter, Frostmourne Hunger, Howling Blast, Glacial Spikes, Defile, Sindragosa Flyby, and Frozen Throne mechanics.",
+        "Spirit Master now has a multi-spirit structure built around Storm, Earth, Fire, and a coordinated final fight.",
+        "Banehallow now uses Soul Harvest, Shadow Line, Soul Rings, Meteor Hunt, Ragna Mark, Darkness, Requiem, Ghost Revenant management, and HP-threshold pressure.",
+        "Magtheridon now uses an ankh/reincarnation encounter loop with repeated kills, rupture fragments, respawn empowerment, and difficulty-scaled life counts."
       ]
     },
     {
-      "title": "UI and quality of life",
+      "title": "Rune System",
       "items": [
-        "TODO: Summarize visible UI, localization, loading screen, end screen, and tooltip changes."
+        "Runes now spawn as a match system with Recovery, Defense, Offense, and Misc visual categories.",
+        "Rune spawns are tied into special wave flow, show map/UI state, and can be claimed once per hero per batch.",
+        "Recovery runes:\n- Healing Rune: team buff for 30 seconds, granting +5% health regen and +8% mana regen.\n- Revitalization Rune: team buff for 20 seconds, reducing active cooldowns by 25% up to 20 seconds and granting +12% mana regen.\n- Restoration Rune: instant team recovery for 35% of missing health and mana.\n- Second Wind Rune: 30-second safety buff that triggers below 30% health, restores 30% health/mana over 3 seconds, and grants a short 20% guard window.",
+        "Defense runes:\n- Barrier Rune: team buff for 30 seconds, granting a shield worth 25% max health and +4% regen.\n- Retaliation Rune: nearby buff for 25 seconds, reflecting 25% of incoming damage.\n- Bulwark Rune: nearby buff for 35 seconds, granting +35 armor and +25% magic resistance.\n- Fortitude Rune: nearby buff for 25 seconds, granting +35% status resistance and reducing incoming damage by 20%.",
+        "Offense runes:\n- Titan Rune: nearby buff for 35 seconds, granting +30% max health, +25% outgoing damage, and a larger model scale.\n- Fury Rune: nearby buff for 30 seconds, granting +160 attack speed and +25% spell amplification.\n- Siegebreaker Rune: nearby buff for 35 seconds, granting +45% damage against creeps and summons.\n- Storm Rune: nearby buff for 30 seconds, striking up to 4 nearby enemies every 1.2 seconds for 550 damage.",
+        "Misc runes:\n- Fragment Rune: instant picker reward tied to Supporter Fragments; currently configured for 50 fragments and flagged for backend validation before publication.\n- Tome Rune: instant team reward granting +50 all stats.\n- Bounty Surge Rune: team buff for 45 seconds, granting +35% shared creep bounty bonus.\n- Momentum Rune: team buff for 45 seconds, granting +18% movement speed and +20% creep gold/XP.",
+        "Rune notifications now announce rune state, claims, expiration, category, and nearby availability.",
+        "Custom rune models and materials make rune type readable in the world, not only in UI text."
       ]
     },
     {
-      "title": "Technical changes",
+      "title": "Fragment Quests",
       "items": [
-        "Lua gameplay: 175 files, +24,726 / -1,873 lines.",
-        "Panorama/UI: 343 files, +34,186 / -1,842 lines.",
-        "Localization: 199 files, +21,109 / -6,584 lines.",
-        "KV data: 23 files, +17,415 / -14,754 lines.",
-        "Assets: 70 files, +3,480 / -0 lines.",
-        "Scripts/Tooling: 5 files, +729 / -40 lines.",
-        "Docs: 2 files, +78 / -8 lines.",
-        "Other: 3 files, +53 / -6 lines."
+        "Fragment Quests are optional side objectives that can award stars and fragments during a match.",
+        "General team quests track War Healers, Coordinated Carnage, Potion Discipline, Potion Panic, Orbs of War, Frontline Pact, No Lane Falls, and Final Stand.",
+        "Event quests track Farm Event Mastery, Muradin Survivors, Ramero and Baristol, Sogat Slayer, Hero Image, All Hero Images, Spirit Beast, and Frost Infernal performance.",
+        "Boss and Phase 3 quests track Clean Assault, Grom Executed, Illidan Hunter, Lich King's End, and Spirit Master completion speed or survival rules.",
+        "Quest progress is pushed to the UI during the match with star states, objective progress, and reward feedback.",
+        "The end screen now shows confirmed Fragment Quest results and fragment gains.",
+        "Death-sensitive quests can count normal deaths and ankh/reincarnation deaths."
+      ]
+    },
+    {
+      "title": "Supporter Pass Foundation",
+      "items": [
+        "The Supporter Pass foundation is present in-game with player tier data, fragment wallet data, season XP, level progress, and public profile surfaces.",
+        "Supporter identity appears through tier marks, badges, colors, end-screen rows, top HUD elements, and Wisp-related supporter visuals.",
+        "Supporter vote power is wired into custom setup voting.",
+        "A Supporter Pass window exists with Rewards, Shop, Armory, Leaderboards, and Settings tabs.",
+        "Rewards, Shop, and Armory are treated as groundwork for 4.1 in the UI, so 4.0 should be presented as a foundation release rather than a fully launched shop.",
+        "Supporter settings include toggles for supporter identity, cosmetic reward display, XP visibility, and companion-related controls."
+      ]
+    },
+    {
+      "title": "UI, HUD, And Quality Of Life",
+      "items": [
+        "The top HUD was rebuilt with a fixed ally roster, health/mana state, hero status, supporter marks, tier crests, hover details, ankh charges, reincarnation state, event timers, and difficulty display.",
+        "Overhead status labels now surface important control states such as stunned, hexed, sleep, feared, taunted, cycloned, rooted, leashed, silenced, muted, disarmed, broken, and invulnerable.",
+        "The boss health bar now supports multi-boss fights, cast bars, counters, timers, HP threshold markers, ankh badges, and clearer heal/damage feedback.",
+        "The notification layer was expanded with top and bottom toasts, reward flyouts, rune indicators, Fragment Quest star feedback, special wave countdowns, and main quest completion messaging.",
+        "The end screen now summarizes MVP-style categories such as kills, tome stats, potion usage, boss damage, damage taken, and self-healing.",
+        "End-screen player rows now include richer stats such as net worth, boss damage, damage taken, healing, self-healing, tomes, supporter tier, and pass progress.",
+        "Custom game setup was cleaned around Reborn mode, difficulty voting, ready-up flow, vote progress, and safer player vote handling.",
+        "A buy-max-small-tomes shortcut was added and routed through server-side validation, with restrictions during events or locked arenas."
+      ]
+    },
+    {
+      "title": "Special Events And Match Flow",
+      "items": [
+        "Muradin, Farm Event, Ramero and Baristol, and Sogat now connect into the newer timer, notification, reward, rune, and Fragment Quest systems.",
+        "Optional encounters such as Hero Image, All Hero Images, Spirit Beast, and Frost Infernal now have clearer personal timers, return markers, win/fail cleanup, and Fragment Quest hooks.",
+        "Event transitions use more controlled teleport and cinematic pause flows.",
+        "Tome purchasing and special wave behavior are restricted during specific arenas and events.",
+        "Reward flyouts and event timer messaging make event outcomes more visible without relying on hidden state."
+      ]
+    },
+    {
+      "title": "Items And Orbs",
+      "items": [
+        "Orb items received a large active/off visual pass, including refreshed item icons and modifier icons.",
+        "The Arcane orb line adds spell amp, mana sustain, mana cost reduction, cooldown reduction at higher tiers, and active Arcane Exposure that lowers enemy magic resistance after spells.",
+        "The Venom orb line adds attack poison, damage over time, armor reduction at higher tiers, and bonus magic damage when hitting already poisoned enemies.",
+        "The Wind orb line adds evasion and movement speed, with upgraded evasion procs that grant movement speed and later damage reduction.",
+        "Earth orb scripting was refreshed around active bash behavior while keeping the line focused on heavy damage and stun pressure.",
+        "Darkness orb scripting was rebuilt around active conversion of slain eligible enemies into temporary controlled units, with higher-tier survivability and damage stats.",
+        "Item image coverage was expanded for Arcane, Venom, Wind, Earth, Darkness, Fire, Frost, Lightning, major utility items, and active/off states."
+      ]
+    },
+    {
+      "title": "Heroes And Abilities",
+      "items": [
+        "Archmage now has a Lua Mana Shield implementation that spends mana to absorb incoming damage and turns itself off when mana cannot sustain it.",
+        "Centurion gained Lua implementations for Necromastery and Atrophy Aura, adding soul-based damage scaling and enemy damage suppression themes.",
+        "Huntress gained safer lightning ability handling with bounce logic, particle feedback, sound, spell absorb handling, and no-repeat target behavior.",
+        "Mountain Giant received a major implementation pass for Craggy Exterior, Earth Splitter, Stone Gaze, growth/model handling, and Toss cleanup.",
+        "Priestess of the Moon received a small Rejuvenation reliability pass.",
+        "Wisp received a safer random-hero replacement flow, starting item/gold handling, command restrictions during replacement, and supporter-colored ambient visuals.",
+        "Spirit Master received ability logic for Overload, Ball Lightning, transformation handling, cooldown preservation, tome stat preservation, and remnant/modifier cleanup.",
+        "Lich abilities received Lua work for Frost Arrows and Summon Frost Beast, including projectile behavior, attack record handling, slow logic, and visual growth handling.",
+        "Additional hero files were touched for smaller ability ports, cleanup, talent/tooltip alignment, or implementation fixes; exact balance claims should be reviewed before publication."
+      ]
+    },
+    {
+      "title": "Technical And Content Pipeline",
+      "items": [
+        "NPC unit data was split into focused files for bosses, events, buildings, summons, wave creeps, special encounters, neutral dragons, allies, VIPs, and dummy units.",
+        "A central precache component was added for bosses, items, runes, UI assets, and other common content groups.",
+        "Custom net table coverage was expanded for runes, Fragment Quests, supporter pass data, overhead status, timers, end-screen stats, and other UI-driven systems.",
+        "Internal devtools were added for faster testing and iteration.",
+        "Loading screen and game info assets were refreshed for the 4.0 flow.",
+        "GitHub/Discord workflow scripts were updated, but these are release operations changes rather than player-facing gameplay content."
+      ]
+    },
+    {
+      "title": "Needs Review Before Publishing",
+      "items": [
+        "Supporter Pass wording needs confirmation: Rewards, Shop, and Armory are visible in UI, but the UI marks them as available in 4.1.",
+        "Supporter tier prices, monthly fragments, XP boosts, and vote power should be confirmed before listing exact commercial values.",
+        "Fragment Rune reward behavior should only be promised publicly after server-side reward validation is confirmed.",
+        "Many hero files changed, but several look like ports, cleanup, tooltip work, or implementation fixes; verify exact buff/nerf wording in gameplay review.",
+        "Phase 3 boss values should be published only after final balance validation because several boss tooltips are still generic.",
+        "The release audit should be regenerated if the v4.0 branch moves before publication."
       ]
     },
     {
@@ -44,8 +148,1023 @@
       ]
     }
   ],
-  "sections": [],
-  "impact": [],
+  "breakdown": [
+    {
+      "title": "General Changes",
+      "groups": [
+        {
+          "title": "Mechanics",
+          "entries": [
+            {
+              "title": "Fragment Quests",
+              "image": "https://cdn.frostrose-studio.com/static/images/achievements/xhs-4.0/weekly-reward-icon-png.png",
+              "items": [
+                "Introduces a match-long team objective board. Each game selects a set of Fragment Quests, with progress and milestone notifications shown in-game.",
+                "Quest pools cover team damage and healing, potion discipline or emergency potion use, survival, base defense, special events, boss kills, and timed phase challenges.",
+                "Every completed threshold awards stars; each star converts into Supporter Fragments. Results, stars, and confirmed rewards carry through to the end screen.",
+                "Some objectives track reincarnation and ankh deaths as well as normal deaths, so their requirements reflect the full match state."
+              ],
+              "status": "new"
+            },
+            {
+              "title": "Rune System",
+              "image": "https://cdn.frostrose-studio.com/static/images/abilities/holdout-thunder-spirit.png",
+              "items": [
+                "Introduces map runes as coordinated special-wave rewards. Batches draw from Recovery, Defense, Offense, and Misc pools, with distinct world models and colors.",
+                "A rune window can spawn multiple pickup points, but each hero may claim only one rune from that batch. This makes route choice and team coordination matter.",
+                "The HUD communicates the active rune type, category, claim state, nearby availability, and expiration while the reward is on the map.",
+                "The four rune categories and all sixteen effects are detailed below."
+              ],
+              "status": "new"
+            },
+            {
+              "title": "Supporter Pass Foundation",
+              "image": "https://cdn.frostrose-studio.com/static/images/battlepass/xhs-4.0/supporter-pass-cover.png",
+              "items": [
+                "Introduces the in-game Supporter Pass foundation: tier identity, fragment balance, seasonal XP, level progress, vote power, and account-facing status.",
+                "Supporter markers and tier crests are integrated into the HUD, profile surfaces, cosmetic effects, and the end-of-match presentation.",
+                "The pass UI exposes current progression and reward tracks. Rewards, Shop, and Armory remain 4.1 groundwork and are not presented as a completed 4.0 feature."
+              ],
+              "status": "new"
+            }
+          ]
+        },
+        {
+          "title": "Interface",
+          "entries": [
+            {
+              "title": "End Screen",
+              "image": "https://cdn.frostrose-studio.com/static/images/achievements/xhs-4.0/mvp-icon-png.png",
+              "items": [
+                "Introduces a full post-match screen rather than a basic scoreboard: kills, tome statistics, potion usage, boss damage, damage taken, self-healing, net worth, and supporter progress are presented together.",
+                "The result screen also resolves Fragment Quest stars and rewards, so the team can see its objective outcome before leaving the match."
+              ],
+              "status": "new"
+            },
+            {
+              "title": "Notifications",
+              "image": "https://cdn.frostrose-studio.com/static/images/events/xhs-4.0/event-hero-image.png",
+              "items": [
+                "Introduces a unified match notification layer for top and bottom toasts, reward flyouts, rune alerts, Fragment Quest stars, special-wave countdowns, and quest completion.",
+                "Special events use the same layer to explain timers, teleport and return flow, and rewards at the moment they matter."
+              ],
+              "status": "new"
+            },
+            {
+              "title": "Top HUD",
+              "image": "https://cdn.frostrose-studio.com/static/images/ui/xhs/xhs-top-bar-frame.png",
+              "items": [
+                "Introduces an expanded ally and match-status HUD: health, mana, hero state, supporter marks, tier crests, ankh charges, reincarnation state, event timers, and difficulty context are visible in one place.",
+                "It also adds explicit overhead control-state labels for stun, hex, fear, root, silence, break, and invulnerability."
+              ],
+              "status": "new"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Boss Encounters",
+      "entries": [
+        {
+          "title": "Arthas",
+          "image": "https://cdn.frostrose-studio.com/static/images/heroes/dragon_knight.png",
+          "items": [
+            "A new Phase 3 combines marks, roots, a line dash, and a high-damage finishing zone.",
+            "Marked heroes take increased damage from Arthas's other Phase 3 attacks."
+          ],
+          "status": "new",
+          "subsections": [
+            {
+              "title": "Abilities",
+              "entries": [
+                {
+                  "title": "Frostmourne Mark",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/arthas-frostmourne.png",
+                  "items": [
+                    "Telegraphs a target and marks them. While marked, Arthas's other Phase 3 attacks deal increased damage."
+                  ],
+                  "status": "new"
+                },
+                {
+                  "title": "Frozen Chains",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/lich_frost_nova.png",
+                  "items": [
+                    "Strikes a marked circle, damaging and rooting heroes caught inside."
+                  ],
+                  "status": "new"
+                },
+                {
+                  "title": "Death Advance",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/arthas-light-roar.png",
+                  "items": [
+                    "Telegraphs a line, damages everyone in its path, then sends Arthas to its endpoint."
+                  ],
+                  "status": "new"
+                },
+                {
+                  "title": "Frostmourne Execute",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/arthas-frostmourne.png",
+                  "items": [
+                    "Detonates a telegraphed circle for heavy pure damage, prioritizing marked or rooted heroes."
+                  ],
+                  "status": "new"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Balanar",
+          "image": "https://cdn.frostrose-studio.com/static/images/heroes/night_stalker.png",
+          "items": [
+            "Phase 3 now uses Nightfall, Dread Howl, Sleeping Terror, Carrion Swarm, Rain of Chaos, and Vampiric Presence.",
+            "Warnings and boss-bar feedback make the fight state easier to read."
+          ],
+          "status": "new",
+          "subsections": [
+            {
+              "title": "Abilities",
+              "entries": [
+                {
+                  "title": "Nightfall",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-balanar-nightfall.png",
+                  "items": [
+                    "Shifts the encounter into a darker pressure phase."
+                  ],
+                  "status": "new"
+                },
+                {
+                  "title": "Dread Howl",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-balanar-dread-howl.png",
+                  "items": [
+                    "Adds a readable fear-style control moment."
+                  ],
+                  "status": "new"
+                },
+                {
+                  "title": "Sleeping Terror",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-balanar-sleeping-terror.png",
+                  "items": [
+                    "Creates dangerous sleep windows that must be respected."
+                  ],
+                  "status": "new"
+                },
+                {
+                  "title": "Carrion Swarm",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-balanar-carrion-swarm.png",
+                  "items": [
+                    "Sends a directional wave through the arena."
+                  ],
+                  "status": "new"
+                },
+                {
+                  "title": "Rain of Chaos",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-balanar-rain-of-chaos.png",
+                  "items": [
+                    "Calls down impact zones with visible warnings."
+                  ],
+                  "status": "new"
+                },
+                {
+                  "title": "Vampiric Presence",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-balanar-vampiric-presence.png",
+                  "items": [
+                    "Adds sustain pressure while the fight escalates."
+                  ],
+                  "status": "new"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Banehallow",
+          "image": "https://cdn.frostrose-studio.com/static/images/heroes/nevermore.png",
+          "items": [
+            "Phase 3 now uses Soul Harvest, Shadow Line, Soul Rings, Meteor Hunt, Ragna Mark, Darkness, Requiem, and Ghost Revenant management.",
+            "HP thresholds add escalating Ghost Revenant pressure and forced pattern moments."
+          ],
+          "status": "new",
+          "subsections": [
+            {
+              "title": "Abilities",
+              "entries": [
+                {
+                  "title": "Soul Harvest",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-banehallow-soul-harvest.png",
+                  "items": [
+                    "Builds soul pressure during the encounter."
+                  ],
+                  "status": "new"
+                },
+                {
+                  "title": "Shadowraze",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-banehallow-shadowraze.png",
+                  "items": [
+                    "Adds marked shadow zones that punish poor positioning."
+                  ],
+                  "status": "new"
+                },
+                {
+                  "title": "Soul Rings",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-banehallow-necromastery.png",
+                  "items": [
+                    "Creates rotating arena constraints around the team."
+                  ],
+                  "status": "new"
+                },
+                {
+                  "title": "Meteor Rain",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-banehallow-meteorain.png",
+                  "items": [
+                    "Drops repeated impact warnings across the fight space."
+                  ],
+                  "status": "new"
+                },
+                {
+                  "title": "Ragna Blade",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-banehallow-ragna-blade.png",
+                  "items": [
+                    "Adds a focused burst pattern players can read and dodge."
+                  ],
+                  "status": "new"
+                },
+                {
+                  "title": "Darkness",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-banehallow-darkness.png",
+                  "items": [
+                    "Changes fight visibility and timing pressure."
+                  ],
+                  "status": "new"
+                },
+                {
+                  "title": "Requiem of Souls",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-banehallow-requiem-of-souls.png",
+                  "items": [
+                    "Turns stored pressure into a major threshold release."
+                  ],
+                  "status": "new"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Grom Hellscream",
+          "image": "https://cdn.frostrose-studio.com/static/images/heroes/juggernaut.png",
+          "items": [
+            "Phase 3 now uses Mirror Trial, Blade Storm, Mirror Cleave, Windwalk Ambush, Warsong Leap, and Blood Frenzy.",
+            "The fight is now driven by encounter AI, telegraphs, cast bars, and difficulty-scaled pressure."
+          ],
+          "status": "new",
+          "subsections": [
+            {
+              "title": "Abilities",
+              "entries": [
+                {
+                  "title": "Mirror Trial",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-grom-mirror-trial.png",
+                  "items": [
+                    "Starts a clone-focused trial that tests target recognition."
+                  ],
+                  "status": "new"
+                },
+                {
+                  "title": "Blade Storm",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-grom-blade-storm.png",
+                  "items": [
+                    "Creates a spinning threat with clear movement pressure."
+                  ],
+                  "status": "new"
+                },
+                {
+                  "title": "Mirror Cleave",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-grom-mirror-cleave.png",
+                  "items": [
+                    "Adds clone-assisted cleave patterns."
+                  ],
+                  "status": "new"
+                },
+                {
+                  "title": "Windwalk Ambush",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-grom-windwalk-ambush.png",
+                  "items": [
+                    "Creates delayed ambush moments after repositioning."
+                  ],
+                  "status": "new"
+                },
+                {
+                  "title": "Warsong Leap",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-grom-warsong-leap.png",
+                  "items": [
+                    "Lets Grom jump into new pressure zones."
+                  ],
+                  "status": "new"
+                },
+                {
+                  "title": "Blood Frenzy",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-grom-blood-frenzy.png",
+                  "items": [
+                    "Escalates the fight when the team loses control."
+                  ],
+                  "status": "new"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Illidan",
+          "image": "https://cdn.frostrose-studio.com/static/images/heroes/terrorblade.png",
+          "items": [
+            "Phase 3 now uses Fel Beam, Shadow Dash, Immolation Burst, Glaive Storm, and Metamorphosis.",
+            "The encounter now emphasizes readable movement pressure and reaction windows."
+          ],
+          "status": "new",
+          "subsections": [
+            {
+              "title": "Abilities",
+              "entries": [
+                {
+                  "title": "Fel Beam",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-illidan-fel-beam.png",
+                  "items": [
+                    "Fires a visible beam pattern through the arena."
+                  ],
+                  "status": "new"
+                },
+                {
+                  "title": "Shadow Dash",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-illidan-shadow-dash.png",
+                  "items": [
+                    "Repositions Illidan with a punishable dash line."
+                  ],
+                  "status": "new"
+                },
+                {
+                  "title": "Immolation Burst",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-illidan-immolation-burst.png",
+                  "items": [
+                    "Creates close-range pressure around the boss."
+                  ],
+                  "status": "new"
+                },
+                {
+                  "title": "Glaive Storm",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-illidan-glaive-storm.png",
+                  "items": [
+                    "Adds rotating glaive movement checks."
+                  ],
+                  "status": "new"
+                },
+                {
+                  "title": "Metamorphosis",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-illidan-metamorphosis.png",
+                  "items": [
+                    "Signals a major encounter state shift."
+                  ],
+                  "status": "new"
+                },
+                {
+                  "title": "Demon Hunter",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-illidan-demon-hunter.png",
+                  "items": [
+                    "Supports the new demon-hunter themed pressure package."
+                  ],
+                  "status": "new"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Magtheridon",
+          "image": "https://cdn.frostrose-studio.com/static/images/heroes/abyssal_underlord.png",
+          "items": [
+            "The encounter now revolves around repeated kills, ankh/reincarnation charges, rupture fragments, and respawn empowerment.",
+            "Higher difficulties add more life-count pressure and stricter fragment management."
+          ],
+          "status": "new",
+          "subsections": [
+            {
+              "title": "Abilities",
+              "entries": [
+                {
+                  "title": "Brutal Slam",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-magtheridon-brutal-slam.png",
+                  "items": [
+                    "Adds a heavy melee impact pattern."
+                  ],
+                  "status": "new"
+                },
+                {
+                  "title": "Fel Stomp",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-magtheridon-fel-stomp.png",
+                  "items": [
+                    "Creates stomp pressure around the boss."
+                  ],
+                  "status": "new"
+                },
+                {
+                  "title": "Targeted Firestorms",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-magtheridon-targeted-firestorms.png",
+                  "items": [
+                    "Drops readable firestorm pressure on selected areas."
+                  ],
+                  "status": "new"
+                },
+                {
+                  "title": "Fel Fissure",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-magtheridon-fel-fissure.png",
+                  "items": [
+                    "Splits the arena with dangerous fracture lines."
+                  ],
+                  "status": "new"
+                },
+                {
+                  "title": "Infernal Rings",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-magtheridon-infernal-rings.png",
+                  "items": [
+                    "Adds ring patterns that force coordinated movement."
+                  ],
+                  "status": "new"
+                },
+                {
+                  "title": "Demonic Howl",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-magtheridon-demonic-howl.png",
+                  "items": [
+                    "Signals an encounter-wide pressure spike."
+                  ],
+                  "status": "new"
+                },
+                {
+                  "title": "Rupture",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-magtheridon-rupture.png",
+                  "items": [
+                    "Breaks the fight into fragment-management moments."
+                  ],
+                  "status": "new"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Proudmoore",
+          "image": "https://cdn.frostrose-studio.com/static/images/heroes/kunkka.png",
+          "items": [
+            "Phase 3 now uses Admiral's Command, Torrent Line, Broadside, Anchor Smash, and Focus Fire.",
+            "The fight now has stronger naval-themed pattern identity and clearer cast communication."
+          ],
+          "status": "new",
+          "subsections": [
+            {
+              "title": "Abilities",
+              "entries": [
+                {
+                  "title": "Admiral's Command",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-proudmoore-admirals-command.png",
+                  "items": [
+                    "Starts command windows that reshape the next pattern."
+                  ],
+                  "status": "new"
+                },
+                {
+                  "title": "Torrent Line",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-proudmoore-torrent-line.png",
+                  "items": [
+                    "Creates a lined water eruption path."
+                  ],
+                  "status": "new"
+                },
+                {
+                  "title": "Broadside",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-proudmoore-broadside.png",
+                  "items": [
+                    "Adds artillery-style lane pressure."
+                  ],
+                  "status": "new"
+                },
+                {
+                  "title": "Anchor Smash",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-proudmoore-anchor-smash.png",
+                  "items": [
+                    "Punishes close positioning around the boss."
+                  ],
+                  "status": "new"
+                },
+                {
+                  "title": "Focus Fire",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-proudmoore-focus-fire.png",
+                  "items": [
+                    "Creates a focused threat moment against selected targets."
+                  ],
+                  "status": "new"
+                },
+                {
+                  "title": "Command Aura",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-proudmoore-command-aura.png",
+                  "items": [
+                    "Supports Proudmoore's command-state identity."
+                  ],
+                  "status": "new"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Spirit Master",
+          "image": "https://cdn.frostrose-studio.com/static/images/heroes/brewmaster.png",
+          "items": [
+            "The encounter now uses Storm, Earth, Fire, and final-fight mechanics with a multi-spirit structure.",
+            "Players must handle spirit pressure while managing the coordinated final phase."
+          ],
+          "status": "new",
+          "subsections": [
+            {
+              "title": "Abilities",
+              "entries": [
+                {
+                  "title": "Trinity Cycle",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-spirit-master-trinity-cycle.png",
+                  "items": [
+                    "Tracks the rotating spirit state of the fight."
+                  ],
+                  "status": "new"
+                },
+                {
+                  "title": "Palm of Balance",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-spirit-master-palm-of-balance.png",
+                  "items": [
+                    "Adds a directional balance strike."
+                  ],
+                  "status": "new"
+                },
+                {
+                  "title": "Elemental Mandala",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-spirit-master-elemental-mandala.png",
+                  "items": [
+                    "Creates elemental zones that control the arena."
+                  ],
+                  "status": "new"
+                },
+                {
+                  "title": "Spirit Call",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-spirit-master-spirit-call.png",
+                  "items": [
+                    "Summons coordinated spirit pressure."
+                  ],
+                  "status": "new"
+                },
+                {
+                  "title": "Convergence",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-spirit-master-convergence.png",
+                  "items": [
+                    "Brings the spirit structure together for a final pressure moment."
+                  ],
+                  "status": "new"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "The Lich King",
+          "image": "https://cdn.frostrose-studio.com/static/images/heroes/skeleton_king.png",
+          "items": [
+            "Phase 3 now uses Remorseless Winter, Frostmourne Hunger, Howling Blast, Glacial Spikes, Defile, Sindragosa Flyby, and Frozen Throne.",
+            "Boss UI now exposes timers, markers, and cast states for the encounter."
+          ],
+          "status": "new",
+          "subsections": [
+            {
+              "title": "Abilities",
+              "entries": [
+                {
+                  "title": "Remorseless Winter",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-lich-king-remorseless-winter.png",
+                  "items": [
+                    "Applies persistent arena pressure around the boss."
+                  ],
+                  "status": "new"
+                },
+                {
+                  "title": "Frostmourne Hunger",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-lich-king-frostmourne-hunger.png",
+                  "items": [
+                    "Turns Frostmourne soul buildup into a visible threat."
+                  ],
+                  "status": "new"
+                },
+                {
+                  "title": "Howling Blast",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-lich-king-howling-blast.png",
+                  "items": [
+                    "Creates a targeted frost burst players can read."
+                  ],
+                  "status": "new"
+                },
+                {
+                  "title": "Glacial Spikes",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-lich-king-glacial-spikes.png",
+                  "items": [
+                    "Adds spike patterns that control movement lanes."
+                  ],
+                  "status": "new"
+                },
+                {
+                  "title": "Defile",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-lich-king-defile.png",
+                  "items": [
+                    "Creates dangerous ground that changes positioning decisions."
+                  ],
+                  "status": "new"
+                },
+                {
+                  "title": "Sindragosa Flyby",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-lich-king-sindragosa-flyby.png",
+                  "items": [
+                    "Calls a dragon threshold attack across the arena."
+                  ],
+                  "status": "new"
+                },
+                {
+                  "title": "Frozen Throne",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-lich-king-frozen-throne.png",
+                  "items": [
+                    "Marks the encounter's final frozen-state pressure."
+                  ],
+                  "status": "new"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Rune Breakdown",
+      "entries": [
+        {
+          "title": "Defense Runes",
+          "image": "https://cdn.frostrose-studio.com/static/images/abilities/holdout-shield.png",
+          "items": [
+            "Barrier Rune: team buff for 30 seconds, granting a shield worth 25% max health and +4% regen.",
+            "Retaliation Rune: nearby buff for 25 seconds, reflecting 25% of incoming damage.",
+            "Bulwark Rune: nearby buff for 35 seconds, granting +35 armor and +25% magic resistance.",
+            "Fortitude Rune: nearby buff for 25 seconds, granting +35% status resistance and reducing incoming damage by 20%."
+          ],
+          "status": "new"
+        },
+        {
+          "title": "Misc Runes",
+          "image": "https://cdn.frostrose-studio.com/static/images/items/xhs/tome-big.png",
+          "items": [
+            "Fragment Rune: instant picker reward tied to Supporter Fragments; currently configured for 50 fragments and flagged for backend validation before publication.",
+            "Tome Rune: instant team reward granting +50 all stats.",
+            "Bounty Surge Rune: team buff for 45 seconds, granting +35% shared creep bounty bonus.",
+            "Momentum Rune: team buff for 45 seconds, granting +18% movement speed and +20% creep gold/XP."
+          ],
+          "status": "new"
+        },
+        {
+          "title": "Offense Runes",
+          "image": "https://cdn.frostrose-studio.com/static/images/abilities/holdout-gods-strength.png",
+          "items": [
+            "Titan Rune: nearby buff for 35 seconds, granting +30% max health, +25% outgoing damage, and a larger model scale.",
+            "Fury Rune: nearby buff for 30 seconds, granting +160 attack speed and +25% spell amplification.",
+            "Siegebreaker Rune: nearby buff for 35 seconds, granting +45% damage against creeps and summons.",
+            "Storm Rune: nearby buff for 30 seconds, striking up to 4 nearby enemies every 1.2 seconds for 550 damage."
+          ],
+          "status": "new"
+        },
+        {
+          "title": "Recovery Runes",
+          "image": "https://cdn.frostrose-studio.com/static/images/abilities/holdout-heal.png",
+          "items": [
+            "Healing Rune: team buff for 30 seconds, granting +5% health regen and +8% mana regen.",
+            "Revitalization Rune: team buff for 20 seconds, reducing active cooldowns by 25% up to 20 seconds and granting +12% mana regen.",
+            "Restoration Rune: instant team recovery for 35% of missing health and mana.",
+            "Second Wind Rune: 30-second safety buff that triggers below 30% health, restores 30% health/mana over 3 seconds, and grants a short 20% guard window."
+          ],
+          "status": "new"
+        }
+      ]
+    },
+    {
+      "title": "Item Changes",
+      "entries": [
+        {
+          "title": "Arcane Orb",
+          "image": "https://cdn.frostrose-studio.com/static/images/items/xhs/orb-of-arcane.png",
+          "items": [
+            "New caster orb: spell amplification, mana regeneration, mana-cost reduction, and an active that lowers an enemy's magic resistance.",
+            "Its upgrades, Mystic Gem and Astral Core, increase the line's spellcasting power."
+          ],
+          "status": "new"
+        },
+        {
+          "title": "Earth Orb II and III",
+          "image": "https://cdn.frostrose-studio.com/static/images/items/xhs/orb-of-earth3.png",
+          "items": [
+            "New upgrades extend the Earth Orb line with substantially stronger damage and bash pressure.",
+            "The line is now an active item with a shared one-second cooldown."
+          ],
+          "status": "new"
+        },
+        {
+          "title": "Venom Orb",
+          "image": "https://cdn.frostrose-studio.com/static/images/items/xhs/orb-of-venom.png",
+          "items": [
+            "New poison orb for attack damage, damage over time, and later armor reduction.",
+            "Viridian Gem and Plagueheart extend the line and reward attacking poisoned enemies."
+          ],
+          "status": "new"
+        },
+        {
+          "title": "Wind Orb",
+          "image": "https://cdn.frostrose-studio.com/static/images/items/xhs/tempest-aegis.png",
+          "items": [
+            "Wind upgrades retain their evasion and movement-speed identity, with stronger proc rewards at higher tiers."
+          ]
+        },
+        {
+          "title": "Orb usability",
+          "image": "https://cdn.frostrose-studio.com/static/images/items/xhs/orb-of-darkness2.png",
+          "items": [
+            "Existing Fire, Frost, Earth, and Darkness orbs received purchase, cooldown, or active-behavior updates."
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Hero And Ability Changes",
+      "entries": [
+        {
+          "title": "Archmage",
+          "image": "https://cdn.frostrose-studio.com/static/images/heroes/crystal_maiden.png",
+          "items": [
+            "Mana Shield now has a Lua implementation with safer toggle behavior, mana absorption, visual state, and modifier cleanup."
+          ],
+          "subsections": [
+            {
+              "title": "Abilities",
+              "entries": [
+                {
+                  "title": "Mana Shield",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/holdout-mana-shield.png",
+                  "items": [
+                    "Absorbs incoming damage through mana with clearer on/off behavior."
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Banehallow",
+          "image": "https://cdn.frostrose-studio.com/static/images/heroes/nevermore.png",
+          "items": [
+            "Necromastery and soul handling received Lua work to make stacks, visuals, and related cleanup more reliable."
+          ],
+          "subsections": [
+            {
+              "title": "Abilities",
+              "entries": [
+                {
+                  "title": "Necromastery",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-banehallow-necromastery.png",
+                  "items": [
+                    "Improves soul stack handling and visual cleanup."
+                  ]
+                },
+                {
+                  "title": "Requiem of Souls",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-banehallow-requiem-of-souls.png",
+                  "items": [
+                    "Keeps the soul-release package aligned with the newer implementation."
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Huntress",
+          "image": "https://cdn.frostrose-studio.com/static/images/heroes/luna.png",
+          "items": [
+            "Lightning and moon-themed abilities received Lua-side reliability work for bounce targeting, repeated hits, particles, and cleanup."
+          ],
+          "subsections": [
+            {
+              "title": "Abilities",
+              "entries": [
+                {
+                  "title": "Owl Lightning",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/holdout-owl-lightning.png",
+                  "items": [
+                    "Bounces through enemies with no-repeat target tracking and clearer particle feedback."
+                  ]
+                },
+                {
+                  "title": "Forked Lightning",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/holdout-forked-lightning.png",
+                  "items": [
+                    "Improves multi-target shock handling around the selected target."
+                  ]
+                },
+                {
+                  "title": "Lunar Glaive",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/holdout-innate-lunar-glaive.png",
+                  "items": [
+                    "Keeps passive bounce behavior aligned with the current implementation."
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Lich",
+          "image": "https://cdn.frostrose-studio.com/static/images/heroes/lich.png",
+          "items": [
+            "Frost abilities received player-visible implementation fixes; exact balance wording still needs final validation."
+          ],
+          "subsections": [
+            {
+              "title": "Abilities",
+              "entries": [
+                {
+                  "title": "Frost Arrows",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/holdout-frost-arrows.png",
+                  "items": [
+                    "Improves projectile, attack record, and slow application behavior."
+                  ]
+                },
+                {
+                  "title": "Summon Frost Beast",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/holdout-frost-beast.png",
+                  "items": [
+                    "Improves spawn handling, growth visuals, and summon cleanup."
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Priestess of the Moon",
+          "image": "https://cdn.frostrose-studio.com/static/images/heroes/mirana.png",
+          "items": [
+            "Rejuvenation received a small reliability pass in its Lua helper."
+          ],
+          "subsections": [
+            {
+              "title": "Abilities",
+              "entries": [
+                {
+                  "title": "Rejuvenation",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/holdout-rejuvenation.png",
+                  "items": [
+                    "Keeps the heal-over-time flow safer when the buff is applied and expires."
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Spirit Master",
+          "image": "https://cdn.frostrose-studio.com/static/images/heroes/storm_spirit.png",
+          "items": [
+            "Storm Spirit received a rewritten movement/combat implementation for Arc Dash and Static Orbs.",
+            "Spirit Master transformations now keep hero state, ability flow, and visuals more consistent."
+          ],
+          "subsections": [
+            {
+              "title": "Abilities",
+              "entries": [
+                {
+                  "title": "Arc Dash",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-spirit-storm-arc-dash.png",
+                  "items": [
+                    "Reworks short movement bursts with clearer targeting and cleanup."
+                  ]
+                },
+                {
+                  "title": "Static Orbs",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/xhs-spirit-storm-static-orbs.png",
+                  "items": [
+                    "Improves orb creation, tracking, and detonation flow."
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Tauren Chieftain",
+          "image": "https://cdn.frostrose-studio.com/static/images/heroes/elder_titan.png",
+          "items": [
+            "Earthquake moved closer to a dedicated Lua implementation with cleaner area pressure and effect handling."
+          ],
+          "subsections": [
+            {
+              "title": "Abilities",
+              "entries": [
+                {
+                  "title": "Earthquake",
+                  "image": "https://cdn.frostrose-studio.com/static/images/abilities/holdout-earthquake.png",
+                  "items": [
+                    "Creates ground pressure with clearer effect ownership and cleanup."
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Wisp",
+          "image": "https://cdn.frostrose-studio.com/static/images/heroes/wisp.png",
+          "items": [
+            "Random hero replacement is now safer, including starting item and gold handling.",
+            "Replacement flow now restricts commands while changing hero and applies supporter-colored ambient visuals."
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Events And Match Flow",
+      "entries": [
+        {
+          "title": "Content Pipeline",
+          "image": "https://cdn.frostrose-studio.com/static/images/achievements/xhs-4.0/view-post-game-analytics-icon-png.png",
+          "items": [
+            "NPC unit data was split into focused files for bosses, events, buildings, summons, wave creeps, special encounters, neutral dragons, allies, VIPs, and dummy units.",
+            "A central precache component was added for bosses, items, runes, UI assets, and other shared content."
+          ]
+        },
+        {
+          "title": "Custom Setup",
+          "image": "https://cdn.frostrose-studio.com/static/images/achievements/xhs-4.0/select-plus-guide-icon-png.png",
+          "items": [
+            "Custom setup was cleaned around Reborn mode, difficulty voting, ready-up flow, vote progress, and safer vote handling.",
+            "Supporter vote power is wired into difficulty voting."
+          ]
+        },
+        {
+          "title": "Special Events",
+          "image": "https://cdn.frostrose-studio.com/static/images/events/xhs-4.0/event-all-hero-images.png",
+          "items": [
+            "Muradin, Farm Event, Ramero and Baristol, and Sogat now connect into the newer timer, notification, reward, rune, and Fragment Quest systems.",
+            "Hero Image, All Hero Images, Spirit Beast, and Frost Infernal now have clearer personal timers, return markers, cleanup, and quest hooks."
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Needs Review Before Publishing",
+      "entries": [
+        {
+          "title": "Audit Items",
+          "image": "https://cdn.frostrose-studio.com/static/images/hud/xhs/xhs-bug-report-icon.png",
+          "items": [
+            "Confirm Supporter Pass public wording because Rewards, Shop, and Armory are visible but marked as 4.1.",
+            "Confirm public tier prices, monthly fragments, XP boosts, and vote power before listing exact commercial values.",
+            "Confirm Fragment Rune reward validation before promising fragment payouts publicly.",
+            "Review hero micro-changes before calling anything a buff or nerf.",
+            "Regenerate the diff audit if the v4.0 branch moves before publication."
+          ]
+        },
+        {
+          "title": "Release Audit",
+          "image": "https://cdn.frostrose-studio.com/static/images/achievements/xhs-4.0/view-hero-trends-icon-png.png",
+          "items": [
+            "Diff analyzed: 820 files, 31 commits, +101,776 / -25,107 lines."
+          ]
+        }
+      ]
+    }
+  ],
+  "sections": [
+    {
+      "title": "Highlights",
+      "items": [
+        "Phase 3 boss fights rebuilt around telegraphed pattern AI.",
+        "Runes and Fragment Quests add new match objectives.",
+        "HUD, end screen, boss bars, notifications, and supporter identity were expanded.",
+        "Orbs, item icons, event flow, and selected hero implementations received major work."
+      ]
+    }
+  ],
+  "impact": [
+    "More readable Phase 3 fights with clearer mechanics and fewer invisible boss states.",
+    "More mid-match decisions through runes, Fragment Quests, and event objectives.",
+    "Better match clarity through HUD, notifications, end-screen stats, and boss bars.",
+    "Foundation work for Supporter Pass features planned beyond 4.0."
+  ],
   "meta": {
     "baseRef": "master",
     "releaseRef": "v4.0",
@@ -57,6 +1176,12 @@
       "deletions": 25107,
       "footer": "Diff analyzed: 820 files, 31 commits, +101,776 / -25,107 lines."
     },
-    "generatedAt": "2026-07-09T13:00:54.319Z"
+    "generatedAt": "2026-07-09T13:00:54.319Z",
+    "changelogRules": [
+      "Entries inside a category are displayed alphabetically by title.",
+      "Hero and unit ability changes use a second hierarchy: entity, then ability section, then ability entries.",
+      "Internal Lua rewrites are not player-facing notes unless they change visible behavior, repair ability behavior, or add readable combat mechanics.",
+      "Potential bug fixes inferred from code need visible gameplay evidence or manual review before being labeled as fixes."
+    ]
   }
 }

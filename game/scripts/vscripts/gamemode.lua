@@ -151,7 +151,7 @@ function GameMode:InitGameMode()
 	GameRules:SetGoldTickTime(0.0)
 	GameRules:SetGoldPerTick(0.0)
 	GameRules:SetCustomGameSetupAutoLaunchDelay(9999.0) -- disabled, custom setup flow handles launch
-	GameRules:SetCustomGameSetupTimeout(-1.0) -- keep setup open until custom logic starts the game
+	GameRules:SetCustomGameSetupTimeout(-1.0)        -- keep setup open until custom logic starts the game
 	GameRules:SetPreGameTime(PREGAMETIME)
 
 	-- mode:SetCustomAttributeDerivedStatValue(DOTA_ATTRIBUTE_AGILITY_ARMOR, 0) -- default: 0.016 armor per agility point
@@ -205,9 +205,6 @@ function GameMode:InitGameMode()
 	GameRules:LockCustomGameSetupTeamAssignment(true)
 	mode:SetFixedRespawnTime(RESPAWN_TIME)
 	GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_GOODGUYS, 8)
-	if GetMapName() == "x_hero_siege_4" then
-		GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_GOODGUYS, 4)
-	end
 	GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_BADGUYS, 0)
 	GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_CUSTOM_1, 0)
 	GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_CUSTOM_2, 0)

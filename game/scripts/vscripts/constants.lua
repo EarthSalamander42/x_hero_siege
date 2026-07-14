@@ -43,9 +43,9 @@ _G.ZONE_STAR_CRITERIA_KILLS            = 2
 _G.ZONE_STAR_CRITERIA_QUEST_COMPLETE   = 3
 
 -- X Hero Siege
-_G.XHS_GAMEMODE_CLASSIC               = 1
-_G.XHS_GAMEMODE_REBORN                = 2
-_G.XHS_GAMEMODE_ACTIVE                = XHS_GAMEMODE_REBORN
+_G.XHS_GAMEMODE_CLASSIC                = 1
+_G.XHS_GAMEMODE_REBORN                 = 2
+_G.XHS_GAMEMODE_ACTIVE                 = XHS_GAMEMODE_REBORN
 
 _G.PREGAMETIME                         = 90.0
 _G.SPECIAL_ARENA_DURATION              = 120.0
@@ -121,10 +121,6 @@ if IsInToolsMode() then
 	_G.PREGAMETIME = 15.0
 end
 
-if GetMapName() == "x_hero_siege_4" then
-	_G.CREEP_LANES_TYPE = 2
-end
-
 _G.BT_ENABLED = 1
 _G.MURADIN_DEFEND = false
 _G.STORM_SPIRIT = 0
@@ -156,26 +152,26 @@ CREEP_LANES[6] = { 0, 1, 1 }
 CREEP_LANES[7] = { 0, 1, 1 }
 CREEP_LANES[8] = { 0, 1, 1 }
 
-PLAYER_COLORS = {}                   -- Stores individual player colors
-PLAYER_COLORS[0] = { 0, 50, 200 }    --Blue
-PLAYER_COLORS[1] = { 0, 255, 255 }   --Cyan
-PLAYER_COLORS[2] = { 100, 0, 100 }   --Purple
-PLAYER_COLORS[3] = { 255, 255, 0 }   --Yellow
-PLAYER_COLORS[4] = { 255, 150, 0 }   --Orange
-PLAYER_COLORS[5] = { 255, 100, 255 } --Pink
-PLAYER_COLORS[6] = { 163, 176, 0 }   --Olive
-PLAYER_COLORS[7] = { 101, 217, 247 } --Light Blue
-PLAYER_COLORS[8] = { 0, 125, 0 }     --Green (Dark)
-PLAYER_COLORS[9] = { 164, 105, 0 }   --Brown
-PLAYER_COLORS[10] = { 120, 255, 80 } --Light Green
+PLAYER_COLORS = {}                    -- Stores individual player colors
+PLAYER_COLORS[0] = { 0, 50, 200 }     --Blue
+PLAYER_COLORS[1] = { 0, 255, 255 }    --Cyan
+PLAYER_COLORS[2] = { 100, 0, 100 }    --Purple
+PLAYER_COLORS[3] = { 255, 255, 0 }    --Yellow
+PLAYER_COLORS[4] = { 255, 150, 0 }    --Orange
+PLAYER_COLORS[5] = { 255, 100, 255 }  --Pink
+PLAYER_COLORS[6] = { 163, 176, 0 }    --Olive
+PLAYER_COLORS[7] = { 101, 217, 247 }  --Light Blue
+PLAYER_COLORS[8] = { 0, 125, 0 }      --Green (Dark)
+PLAYER_COLORS[9] = { 164, 105, 0 }    --Brown
+PLAYER_COLORS[10] = { 120, 255, 80 }  --Light Green
 PLAYER_COLORS[11] = { 180, 100, 255 } --Light Purple
-PLAYER_COLORS[12] = { 255, 210, 80 } --Gold
-PLAYER_COLORS[13] = { 80, 255, 190 } --Mint
+PLAYER_COLORS[12] = { 255, 210, 80 }  --Gold
+PLAYER_COLORS[13] = { 80, 255, 190 }  --Mint
 PLAYER_COLORS[14] = { 255, 110, 170 } --Rose
 PLAYER_COLORS[15] = { 160, 210, 255 } --Sky
 PLAYER_COLORS[16] = { 130, 150, 170 } --Steel
-PLAYER_COLORS[17] = { 210, 130, 80 } --Copper
-PLAYER_COLORS[18] = { 120, 90, 60 }  --Bronze
+PLAYER_COLORS[17] = { 210, 130, 80 }  --Copper
+PLAYER_COLORS[18] = { 120, 90, 60 }   --Bronze
 PLAYER_COLORS[19] = { 210, 255, 120 } --Lime
 PLAYER_COLORS[20] = { 255, 150, 210 } --Light Pink
 PLAYER_COLORS[21] = { 100, 220, 220 } --Teal

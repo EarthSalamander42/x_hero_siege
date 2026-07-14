@@ -146,31 +146,31 @@ function SpawnCreeps(force)
 			if CREEP_LANES[c][1] == 1 then -- Lane Activated?
 				if CREEP_LANES[c][3] == 1 then -- Barrack Alive?
 					if CREEP_LANES[c][2] == 1 then -- Lane Level
-						for j = 1, 4 do
+						for j = 1, 2 do
 							SpawnWaveCreep(melee_1[GameMode.creep_roll["race"]], point, waypoint)
 						end
-						for j = 1, 2 do
+						for j = 1, 1 do
 							SpawnWaveCreep(ranged_1[GameMode.creep_roll["race"]], point, waypoint)
 						end
 					elseif CREEP_LANES[c][2] == 2 then
-						for j = 1, 4 do
+						for j = 1, 2 do
 							SpawnWaveCreep(melee_2[GameMode.creep_roll["race"]], point, waypoint)
 						end
-						for j = 1, 2 do
+						for j = 1, 1 do
 							SpawnWaveCreep(ranged_2[GameMode.creep_roll["race"]], point, waypoint)
 						end
 					elseif CREEP_LANES[c][2] == 3 then
-						for j = 1, 4 do
+						for j = 1, 2 do
 							SpawnWaveCreep(melee_3[GameMode.creep_roll["race"]], point, waypoint)
 						end
-						for j = 1, 2 do
+						for j = 1, 1 do
 							SpawnWaveCreep(ranged_3[GameMode.creep_roll["race"]], point, waypoint)
 						end
 					elseif CREEP_LANES[c][2] >= 4 then
-						for j = 1, 4 do
+						for j = 1, 2 do
 							SpawnWaveCreep(melee_4[GameMode.creep_roll["race"]], point, waypoint)
 						end
-						for j = 1, 2 do
+						for j = 1, 1 do
 							SpawnWaveCreep(ranged_4[GameMode.creep_roll["race"]], point, waypoint)
 						end
 					end

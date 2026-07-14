@@ -6533,16 +6533,6 @@
       "status": "M",
       "statusCode": "M",
       "oldPath": null,
-      "path": "game/scripts/shops/x_hero_siege_4_shops.txt",
-      "category": "KV data",
-      "insertions": 12,
-      "deletions": 1,
-      "binary": false
-    },
-    {
-      "status": "M",
-      "statusCode": "M",
-      "oldPath": null,
       "path": "game/scripts/shops/x_hero_siege_8_shops.txt",
       "category": "KV data",
       "insertions": 12,
@@ -15769,16 +15759,6 @@
           "category": "KV data",
           "insertions": 2741,
           "deletions": 0,
-          "binary": false
-        },
-        {
-          "status": "M",
-          "statusCode": "M",
-          "oldPath": null,
-          "path": "game/scripts/shops/x_hero_siege_4_shops.txt",
-          "category": "KV data",
-          "insertions": 12,
-          "deletions": 1,
           "binary": false
         },
         {
