@@ -61,7 +61,7 @@
 "DOTA_Tooltip_modifier_rune_immolation"					"Immolation Rune"
 "DOTA_Tooltip_modifier_rune_immolation_Description"		"Deals periodic damage around the carrier."
 "DOTA_Tooltip_modifier_xhs_rune_healing"				"Healing Rune"
-"DOTA_Tooltip_modifier_xhs_rune_healing_Description"	"Health regeneration increased by 5%. Mana regeneration increased by 8%."
+"DOTA_Tooltip_modifier_xhs_rune_healing_Description"	"Health regeneration: %dMODIFIER_PROPERTY_HEALTH_REGEN_PERCENTAGE%%%. Mana regeneration: %dMODIFIER_PROPERTY_MANA_REGEN_TOTAL_PERCENTAGE%%%."
 "DOTA_Tooltip_modifier_xhs_rune_revitalization"			"Revitalization Rune"
 "DOTA_Tooltip_modifier_xhs_rune_revitalization_Description"	"Mana regeneration increased by 12%. Active cooldowns were reduced when the rune was picked up."
 "DOTA_Tooltip_modifier_xhs_rune_restoration"			"Restoration Rune"

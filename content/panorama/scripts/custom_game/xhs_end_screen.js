@@ -1211,7 +1211,8 @@ var XHSEndScreen = (function () {
 	}
 
 	function SetLoading(isLoading) {
-		var root = Panel("XHSEndScreenRoot");
+		var root = $.GetContextPanel();
+
 		if (root) {
 			root.SetHasClass("IsLoading", isLoading);
 		}

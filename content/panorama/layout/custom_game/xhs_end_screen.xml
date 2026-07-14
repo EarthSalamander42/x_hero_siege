@@ -11,7 +11,7 @@
 		<include src="file://{resources}/scripts/custom_game/xhs_end_screen.js" />
 	</scripts>
 
-	<Panel id="XHSEndScreenRoot" class="XHSEndScreenRoot IsLoading">
+	<Panel class="XHSEndScreenRoot IsLoading">
 		<Panel class="XHSEndScreenBackdrop" hittest="false" />
 		<Panel id="XHSEndScreenLoading" class="XHSEndScreenLoading">
 			<Panel class="XHSEndScreenLoadingSpinner" />
