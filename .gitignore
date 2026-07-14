@@ -33,3 +33,6 @@ game/scripts/vscripts/components/api/.gitattributes
 *.vcss_c
 
 .codex_ssh_tmp/*
+tmp/*
+patch_notes/*
+patch_notes_*.txt
