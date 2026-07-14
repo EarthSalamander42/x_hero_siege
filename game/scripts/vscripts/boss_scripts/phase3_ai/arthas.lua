@@ -51,20 +51,7 @@ local function CastPreparedAbility(boss, abilityName, context, position)
 
 	ability.xhs_arthas_context = context or {}
 	XHSPhase3BossAI:ProtectCast(boss, ability, 0.25)
-	if position ~= nil then
-		ExecuteOrderFromTable({
-			UnitIndex = boss:entindex(),
-			OrderType = DOTA_UNIT_ORDER_CAST_POSITION,
-			AbilityIndex = ability:entindex(),
-			Position = position,
-		})
-	else
-		ExecuteOrderFromTable({
-			UnitIndex = boss:entindex(),
-			OrderType = DOTA_UNIT_ORDER_CAST_NO_TARGET,
-			AbilityIndex = ability:entindex(),
-		})
-	end
+	boss:CastAbilityNoTarget(ability, -1)
 	return ability
 end
 

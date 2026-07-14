@@ -92,6 +92,21 @@ local function GetFrozenThroneAbility(caster)
 	return ability
 end
 
+function XHSLichKing_UpdateSoulCounter(caster)
+	if caster == nil or caster:IsNull() then return end
+	local ability = GetFrozenThroneAbility(caster)
+	if ability == nil then return end
+	local modifier = caster:FindModifierByName("modifier_xhs_lich_king_frozen_throne")
+	local souls = modifier and modifier:GetStackCount() or 0
+	CustomGameEventManager:Send_ServerToAllClients("xhs_boss_counter_update", {
+		boss_count = caster.boss_count or 1,
+		boss_bar_id = GetBossBarId and GetBossBarId(caster) or caster.xhs_boss_bar_id,
+		label = "Frostmourne Souls",
+		remaining = souls,
+		total = math.max(1, ability:GetSpecialValueFor("soul_cap")),
+	})
+end
+
 local function GrantFrostmourneSouls(caster, amount)
 	local ability = GetFrozenThroneAbility(caster)
 	if ability == nil then return end
@@ -104,6 +119,7 @@ local function GrantFrostmourneSouls(caster, amount)
 
 	local cap = math.max(1, ability:GetSpecialValueFor("soul_cap"))
 	modifier:SetStackCount(math.min(cap, modifier:GetStackCount() + math.max(1, amount or 1)))
+	XHSLichKing_UpdateSoulCounter(caster)
 end
 
 local function ApplyFrostbite(caster, sourceAbility, enemy, amount)
@@ -331,6 +347,7 @@ end
 
 function xhs_lich_king_glacial_spikes:OnAbilityPhaseStart()
 	if not IsServer() then return true end
+	local caster = self:GetCaster()
 	StartBossCastBar(self, "Glacial Spikes")
 	local points = GetContext(self).points or {}
 	if #points <= 0 then
@@ -339,7 +356,8 @@ function xhs_lich_king_glacial_spikes:OnAbilityPhaseStart()
 	for _, point in pairs(points) do
 		XHSBossTelegraphs:Target(point.position, self:GetSpecialValueFor("radius"), self:GetCastPoint(), LICH_COLORS)
 	end
-	StartAnimation(self:GetCaster(), { duration = self:GetCastPoint() + 0.1, activity = ACT_DOTA_CAST_ABILITY_3, rate = 0.9 })
+	StartAnimation(caster, { duration = self:GetCastPoint() + 0.1, activity = ACT_DOTA_CAST_ABILITY_3, rate = 0.9 })
+	caster:EmitSound("Hero_Crystal.CrystalNova")
 	return true
 end
 
@@ -355,7 +373,7 @@ function xhs_lich_king_glacial_spikes:OnSpellStart()
 		DamageEnemies(caster, self, point.position, radius, ScaleDamage(self:GetSpecialValueFor("damage")), DAMAGE_TYPE_PURE, 1)
 		SlowEnemies(caster, self, point.position, radius, self:GetSpecialValueFor("slow_duration"))
 		CreateImpact(point.position, GLACIAL_SPIKE_PARTICLE, radius, 0.8)
-		EmitLocationSound(caster, point.position, "Hero_Lich.FrostBlast")
+		EmitLocationSound(caster, point.position, "Hero_Crystal.CrystalNova")
 	end
 	ClearContext(self)
 end

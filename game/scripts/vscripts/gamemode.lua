@@ -47,6 +47,8 @@ end
 require('boss_scripts/boss_functions')
 require('components/devtools/init')
 
+LinkLuaModifier("modifier_xhs_end_screen_stat_tracker", "modifiers/modifier_xhs_end_screen_stat_tracker.lua", LUA_MODIFIER_MOTION_NONE)
+
 function GameMode:OnFirstPlayerLoaded()
 	BASE_GOOD = Entities:FindByName(nil, "base_spawn")
 	if BASE_GOOD ~= nil and BASE_GOOD.SetHullRadius ~= nil then
@@ -82,6 +84,10 @@ function GameMode:OnHeroInGame(hero)
 
 	hero:SetDayTimeVisionRange(XHS_HERO_VISION)
 	hero:SetNightTimeVisionRange(XHS_HERO_VISION)
+
+	if hero:IsRealHero() and id ~= nil and id >= 0 and hero:GetUnitName() ~= "npc_dota_hero_wisp" then
+		hero:AddNewModifier(hero, nil, "modifier_xhs_end_screen_stat_tracker", {})
+	end
 
 	-- debugging tool
 	-- if IsInToolsMode() and hero:GetUnitName() == "npc_dota_hero_terrorblade" and hero:IsOwnedByAnyPlayer() then
@@ -434,7 +440,11 @@ function GameMode:HealingFilter(filterTable)
 			local targetPlayerID = XHSGetPlayerIDFromUnit(hHealingTarget)
 
 			if healerPlayerID ~= nil and healerPlayerID == targetPlayerID then
-				XHSRecordEndScreenStat(healerPlayerID, "self_healing", nHeal)
+				if XHSRecordEndScreenStatSource ~= nil then
+					XHSRecordEndScreenStatSource(healerPlayerID, "self_healing", nHeal, "filter")
+				else
+					XHSRecordEndScreenStat(healerPlayerID, "self_healing", nHeal)
+				end
 			end
 		end
 
@@ -485,13 +495,21 @@ function GameMode:DamageFilter(filterTable)
 	if flDamage > 0 and XHSRecordEndScreenStat ~= nil and XHSGetPlayerIDFromUnit ~= nil then
 		local attackerPlayerID = XHSGetPlayerIDFromUnit(hAttackerHero)
 		if attackerPlayerID ~= nil and XHSIsBossDamageTarget ~= nil and XHSIsBossDamageTarget(hVictim) then
-			XHSRecordEndScreenStat(attackerPlayerID, "boss_damage", flDamage)
+			if XHSRecordEndScreenStatSource ~= nil then
+				XHSRecordEndScreenStatSource(attackerPlayerID, "boss_damage", flDamage, "filter")
+			else
+				XHSRecordEndScreenStat(attackerPlayerID, "boss_damage", flDamage)
+			end
 		end
 
 		if hVictim ~= nil and hVictim:IsRealHero() then
 			local victimPlayerID = XHSGetPlayerIDFromUnit(hVictim)
 			if victimPlayerID ~= nil then
-				XHSRecordEndScreenStat(victimPlayerID, "damage_taken", flDamage)
+				if XHSRecordEndScreenStatSource ~= nil then
+					XHSRecordEndScreenStatSource(victimPlayerID, "damage_taken", flDamage, "filter")
+				else
+					XHSRecordEndScreenStat(victimPlayerID, "damage_taken", flDamage)
+				end
 			end
 		end
 	end

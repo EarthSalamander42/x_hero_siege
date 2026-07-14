@@ -75,7 +75,7 @@ local function DamageEnemies(caster, ability, position, radius, damage, damageTy
 		radius,
 		DOTA_UNIT_TARGET_TEAM_FRIENDLY,
 		DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC,
-		DOTA_UNIT_TARGET_FLAG_NONE,
+		DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES,
 		FIND_ANY_ORDER,
 		false
 	)
@@ -341,11 +341,16 @@ function frostivus_boss_ragna_blade:OnAbilityPhaseStart()
 	StartBossCastBar(self, "Ragna Blade")
 	for _, target in pairs(context.targets or {}) do
 		if IsValidAlive(target) then
-			local warning = ParticleManager:CreateParticle(RAGNA_WARNING_PARTICLE, PATTACH_OVERHEAD_FOLLOW, target)
-			ParticleManager:SetParticleControl(warning, 0, target:GetAbsOrigin())
+			local warning = ParticleManager:CreateParticle(RAGNA_WARNING_PARTICLE, PATTACH_WORLDORIGIN, nil)
+			local warningEndsAt = GameRules:GetGameTime() + castPoint
+			ParticleManager:SetParticleControl(warning, 0, target:GetAbsOrigin() + Vector(0, 0, 280))
 			target:EmitSound("Frostivus.AbilityWarning")
 
-			Timers:CreateTimer(castPoint, function()
+			Timers:CreateTimer(0, function()
+				if IsValidAlive(target) and GameRules:GetGameTime() < warningEndsAt then
+					ParticleManager:SetParticleControl(warning, 0, target:GetAbsOrigin() + Vector(0, 0, 280))
+					return 0.03
+				end
 				ParticleManager:DestroyParticle(warning, true)
 				ParticleManager:ReleaseParticleIndex(warning)
 				return nil
@@ -571,7 +576,7 @@ function frostivus_boss_requiem_of_souls:OnSpellStart()
 
 		DamageRequiemLine(caster, self, bossLoc, velocity, distance, 160, lineDamage)
 	end
-	DamageEnemies(caster, self, bossLoc, distance, lineDamage, DAMAGE_TYPE_MAGICAL, OVERHEAD_ALERT_DAMAGE)
+	DamageEnemies(caster, self, bossLoc, distance, lineDamage, DAMAGE_TYPE_PURE, OVERHEAD_ALERT_DAMAGE)
 
 	ClearContext(self)
 end

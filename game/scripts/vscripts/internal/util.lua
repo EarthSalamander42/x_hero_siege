@@ -1803,15 +1803,42 @@ function XHSRecordEndScreenStat(playerID, statName, amount)
 	return _G.XHS_END_SCREEN_STATS[playerID][statName]
 end
 
+-- Keep independent collectors for fragile engine callbacks. The public getter
+-- takes the largest collector total, so the damage/heal filter and the hero
+-- modifier can back each other up without counting the same event twice.
+function XHSRecordEndScreenStatSource(playerID, statName, amount, sourceName)
+	playerID = tonumber(playerID)
+	amount = tonumber(amount) or 0
+	sourceName = tostring(sourceName or "unknown")
+
+	if playerID == nil or playerID < 0 or statName == nil or amount <= 0 then
+		return 0
+	end
+
+	_G.XHS_END_SCREEN_STAT_SOURCES = _G.XHS_END_SCREEN_STAT_SOURCES or {}
+	_G.XHS_END_SCREEN_STAT_SOURCES[playerID] = _G.XHS_END_SCREEN_STAT_SOURCES[playerID] or {}
+	_G.XHS_END_SCREEN_STAT_SOURCES[playerID][statName] = _G.XHS_END_SCREEN_STAT_SOURCES[playerID][statName] or {}
+	local sources = _G.XHS_END_SCREEN_STAT_SOURCES[playerID][statName]
+	sources[sourceName] = (sources[sourceName] or 0) + amount
+	return sources[sourceName]
+end
+
 function XHSGetEndScreenStat(playerID, statName)
 	playerID = tonumber(playerID)
 	if playerID == nil or statName == nil then return 0 end
 
 	_G.XHS_END_SCREEN_STATS = _G.XHS_END_SCREEN_STATS or {}
 	local playerStats = _G.XHS_END_SCREEN_STATS[playerID]
-	if playerStats == nil then return 0 end
+	local best = playerStats and tonumber(playerStats[statName]) or 0
 
-	return tonumber(playerStats[statName]) or 0
+	_G.XHS_END_SCREEN_STAT_SOURCES = _G.XHS_END_SCREEN_STAT_SOURCES or {}
+	local playerSources = _G.XHS_END_SCREEN_STAT_SOURCES[playerID]
+	local statSources = playerSources and playerSources[statName]
+	for _, value in pairs(statSources or {}) do
+		best = math.max(best, tonumber(value) or 0)
+	end
+
+	return best
 end
 
 function XHSIsBossDamageTarget(unit)

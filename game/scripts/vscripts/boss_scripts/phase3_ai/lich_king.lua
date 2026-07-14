@@ -90,7 +90,16 @@ function modifier_xhs_lich_king_phase3_ai:OnCreated()
 	self.patterns = self:BuildPatternDeck()
 	self:UpdateBossBarMarkers()
 	ShowBossBar(self.boss)
+	if XHSLichKing_UpdateSoulCounter ~= nil then XHSLichKing_UpdateSoulCounter(self.boss) end
 	self:StartIntervalThink(0.25)
+end
+
+function modifier_xhs_lich_king_phase3_ai:OnDestroy()
+	if not IsServer() then return end
+	CustomGameEventManager:Send_ServerToAllClients("xhs_boss_counter_hide", {
+		boss_count = self.boss and self.boss.boss_count or 1,
+		boss_bar_id = self.boss and (GetBossBarId and GetBossBarId(self.boss) or self.boss.xhs_boss_bar_id) or nil,
+	})
 end
 
 function modifier_xhs_lich_king_phase3_ai:BuildPatternDeck()
@@ -104,9 +113,9 @@ end
 
 function modifier_xhs_lich_king_phase3_ai:UpdateBossBarMarkers()
 	self.boss.xhs_boss_bar_markers = {
-		{ percent = 75, label = "Sindragosa Flyby", tooltip = "Dragon threshold cast. Frostmourne souls still drive Sindragosa between thresholds." },
-		{ percent = 50, label = "Sindragosa Flyby", tooltip = "Dragon threshold cast. Frostmourne souls still drive Sindragosa between thresholds." },
-		{ percent = 25, label = "Sindragosa Flyby", tooltip = "Dragon threshold cast. Frostmourne souls still drive Sindragosa between thresholds." },
+		{ percent = 75, label = "Sindragosa Flyby", tooltip = "Sindragosa attacks when this health threshold is crossed." },
+		{ percent = 50, label = "Sindragosa Flyby", tooltip = "Sindragosa attacks when this health threshold is crossed." },
+		{ percent = 25, label = "Sindragosa Flyby", tooltip = "Sindragosa attacks when this health threshold is crossed." },
 	}
 end
 
@@ -125,7 +134,7 @@ function modifier_xhs_lich_king_phase3_ai:OnIntervalThink()
 	if self:TryThresholdWinter(now) then
 		return
 	end
-	if self:TryFrostmourneOverflow(now) then
+	if self:TrySoulPoweredWinter(now) then
 		return
 	end
 
@@ -215,22 +224,23 @@ function modifier_xhs_lich_king_phase3_ai:ConsumeFrostmourneSouls(amount)
 	local current = modifier:GetStackCount()
 	local consumed = math.min(current, amount or current)
 	modifier:SetStackCount(math.max(0, current - consumed))
+	if XHSLichKing_UpdateSoulCounter ~= nil then XHSLichKing_UpdateSoulCounter(self.boss) end
 	return consumed
 end
 
-function modifier_xhs_lich_king_phase3_ai:TryFrostmourneOverflow(now)
+function modifier_xhs_lich_king_phase3_ai:TrySoulPoweredWinter(now)
 	if now < (self.next_action or 0) then return false end
 
 	local ability = self:GetFrozenThroneAbility()
 	if ability == nil then return false end
 
 	local souls = self:GetFrostmourneSouls()
-	local cost = math.max(1, ability:GetSpecialValueFor("sindragosa_soul_cost"))
+	local cost = math.max(1, ability:GetSpecialValueFor("winter_soul_cost"))
 	if souls < cost then return false end
 
-	local consumed = self:ConsumeFrostmourneSouls(souls)
-	if self:CastSindragosaFlyby(consumed) then
-		self.next_action = now + 4.0
+	local consumed = self:ConsumeFrostmourneSouls(cost)
+	if self:CastRemorselessWinter(consumed) then
+		self.next_action = now + 3.5
 		return true
 	end
 
@@ -238,7 +248,15 @@ function modifier_xhs_lich_king_phase3_ai:TryFrostmourneOverflow(now)
 	if modifier ~= nil then
 		modifier:SetStackCount(souls)
 	end
+	if XHSLichKing_UpdateSoulCounter ~= nil then XHSLichKing_UpdateSoulCounter(self.boss) end
 	return false
+end
+
+function modifier_xhs_lich_king_phase3_ai:CastRemorselessWinter(consumedSouls)
+	local ability = CastPreparedAbility(self.boss, "xhs_lich_king_remorseless_winter", {
+		consumed_souls = consumedSouls or 0,
+	}, nil)
+	return ability ~= nil
 end
 
 function modifier_xhs_lich_king_phase3_ai:CastFrostmourneHunger()

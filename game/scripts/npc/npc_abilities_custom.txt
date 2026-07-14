@@ -23019,7 +23019,7 @@
 			"duration"				"18 20 22 24 26"
 			"bonus_damage_pct"		"12 16 20 24 30"
 			"bonus_attack_speed"	"60 75 90 110 130"
-			"bonus_attack_range"	"325 350 375 400 425"
+			"bonus_attack_range"	"775 800 825 850 875"
 			"cleave_radius"			"325 350 375 400 425"
 			"cleave_pct"			"25 30 35 40 45"
 			"model_scale_bonus"		"12 15 18 21 24"
@@ -23387,7 +23387,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"					"ability_datadriven"
-		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_HIDDEN"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"AbilityTextureName"    	"rubick_empty1"
 		"MaxLevel"					"1"
 		
@@ -25173,6 +25173,7 @@
 		{
 			"thresholds"				"75 50 25"
 			"soul_cap"					"24 30 36 42 50"
+			"winter_soul_cost"			"8 10 12 14 16"
 			"sindragosa_soul_cost"		"18 22 26 30 34"
 			"bonus_lane_soul_cost"		"8"
 			"max_bonus_lanes"			"3"
@@ -25368,6 +25369,13 @@
 			"ring_radius"			"760 780 800 825 850"
 			"node_radius"			"175 185 195 205 215"
 			"wave_delay"			"1.15 1.08 1.02 0.96 0.90"
+			"fire_burn_duration"	"4.0"
+			"fire_burn_damage"		"1800 3000 4500 6450 9150"
+			"earth_damage_pct"		"60"
+			"earth_slow_duration"	"2.5"
+			"storm_damage_pct"		"145"
+			"storm_vulnerability"	"25"
+			"storm_debuff_duration"	"4.0"
 			"cast_point"			"1.65 1.50 1.38 1.25 1.12"
 		}
 	}
@@ -25424,6 +25432,7 @@
 			"spacing"				"185"
 			"nodes"					"5"
 			"dash_distance"			"620"
+			"silence_duration"		"1.0"
 			"cast_point"			"1.25 1.15 1.06 1.00 0.95"
 		}
 	}
@@ -25445,6 +25454,7 @@
 			"radius"				"180 190 200 215 230"
 			"ring_radius"			"460 500 540 580 620"
 			"orb_count"				"4 5 5 6 6"
+			"stun_duration"			"0.7"
 			"cast_point"			"1.35 1.25 1.15 1.08 1.00"
 		}
 	}
@@ -25465,6 +25475,7 @@
 			"damage"				"15000 25000 37000 52000 73000"
 			"radius"				"210 220 235 250 265"
 			"slow_duration"			"1.4"
+			"silence_duration"		"2.0"
 			"cast_point"			"1.30 1.20 1.10 1.04 1.00"
 		}
 	}
@@ -25487,6 +25498,7 @@
 			"spacing"				"190"
 			"nodes"					"6"
 			"slow_duration"			"1.6"
+			"stun_duration"			"0.45"
 			"cast_point"			"1.45 1.32 1.20 1.10 1.02"
 		}
 	}
@@ -25506,6 +25518,8 @@
 			"damage"				"12000 21000 32000 46000 65000"
 			"radius"				"420 450 480 520 560"
 			"slow_duration"			"1.8"
+			"guard_duration"			"5.0"
+			"damage_reduction"		"25 28 31 34 38"
 			"cast_point"			"1.30 1.20 1.10 1.04 1.00"
 		}
 	}
@@ -25526,6 +25540,7 @@
 			"damage"				"13000 22000 34000 49000 68000"
 			"radius"				"210 225 240 255 270"
 			"ring_radius"			"430 470 510 550 590"
+			"stun_duration"			"1.0"
 			"cast_point"			"1.40 1.28 1.16 1.08 1.00"
 		}
 	}
@@ -25548,6 +25563,8 @@
 			"spacing"				"175"
 			"nodes"					"5"
 			"dash_distance"			"560"
+			"burn_duration"			"4.0"
+			"burn_damage"			"1500 2500 3800 5500 7800"
 			"cast_point"			"1.15 1.08 1.02 0.98 0.94"
 		}
 	}
@@ -25567,6 +25584,9 @@
 		{
 			"damage"				"15000 25000 38000 54000 76000"
 			"radius"				"230 245 260 280 300"
+			"stun_duration"			"1.0"
+			"burn_duration"			"4.0"
+			"burn_damage"			"1800 3000 4500 6500 9200"
 			"cast_point"			"1.25 1.15 1.08 1.02 0.98"
 		}
 	}
@@ -25588,6 +25608,8 @@
 			"inner_radius"			"360 380 400 420 440"
 			"outer_radius"			"710 730 750 775 800"
 			"node_radius"			"175 185 195 205 215"
+			"burn_duration"			"4.0"
+			"burn_damage"			"1600 2700 4100 5900 8400"
 			"cast_point"			"1.45 1.32 1.20 1.10 1.02"
 		}
 	}

@@ -301,7 +301,9 @@ function XHSSpiritMasterEncounter:RegisterMaster(master)
 	self.master = master
 	self.arena_center = GetArenaCenter(master:GetAbsOrigin())
 	self.thresholds = THRESHOLDS[GetDifficulty()] or THRESHOLDS[1]
-	master.boss_count = 1
+	-- Keep the master on its own fourth slot. Slots 1-3 belong to Storm,
+	-- Earth and Fire while the master is hidden during the split.
+	master.boss_count = 4
 	master.xhs_boss_bar_id = "spirit_master"
 	master.xhs_boss_bar_name = "npc_dota_boss_spirit_master"
 	master.xhs_boss_bar_icon = "npc_dota_hero_brewmaster"
@@ -310,7 +312,10 @@ function XHSSpiritMasterEncounter:RegisterMaster(master)
 		light_color = "#87d7ff",
 	}
 	if master.xhs_spirit_master_bar_initialized ~= true then
-		CustomGameEventManager:Send_ServerToAllClients("hide_boss_hp", { boss_count = 1 })
+		CustomGameEventManager:Send_ServerToAllClients("hide_boss_hp", {
+			boss_count = 4,
+			boss_bar_id = "spirit_master",
+		})
 		master.xhs_spirit_master_bar_initialized = true
 	end
 	master.xhs_boss_bar_markers = {}

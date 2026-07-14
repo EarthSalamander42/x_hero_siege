@@ -32,7 +32,7 @@ local PROUDMOORE_COLORS = {
 local TORRENT_SPLASH_PARTICLE = "particles/hero/kunkka/torrent_splash.vpcf"
 local GHOSTSHIP_SPLASH_PARTICLE = "particles/econ/items/kunkka/kunkka_immortal/kunkka_immortal_ghost_ship_splash.vpcf"
 local ANCHOR_SMASH_PARTICLE = "particles/units/heroes/hero_tidehunter/tidehunter_anchor_hero.vpcf"
-local TIDEBRINGER_PARTICLE = "particles/econ/items/kunkka/kunkka_weapon_whaleblade/kunkka_spell_tidebringer.vpcf"
+local POWERSHOT_PARTICLE = "particles/units/heroes/hero_windrunner/windrunner_spell_powershot.vpcf"
 
 local function IsValidAlive(unit)
 	return unit ~= nil and IsValidEntity(unit) and not unit:IsNull() and unit:IsAlive()
@@ -76,30 +76,35 @@ local function ScaleDamage(value)
 	return value or 0
 end
 
+local function CollectTargets(caster, position, radius)
+	local targets = {}
+	local seen = {}
+	local function AddUnits(units)
+		for _, unit in pairs(units or {}) do
+			if unit ~= nil and IsValidEntity(unit) and not unit:IsNull() and seen[unit:entindex()] ~= true then
+				seen[unit:entindex()] = true
+				table.insert(targets, unit)
+			end
+		end
+	end
+	AddUnits(FindUnitsInRadius(caster:GetTeamNumber(), position, nil, radius, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, FIND_ANY_ORDER, false))
+	AddUnits(FindUnitsInRadius(DOTA_TEAM_GOODGUYS, position, nil, radius, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, FIND_ANY_ORDER, false))
+	return targets
+end
+
 local function DamageEnemies(caster, ability, position, radius, damage, damageType, onHit)
 	if not IsValidAlive(caster) then return end
 
-	local enemies = FindUnitsInRadius(
-		caster:GetTeamNumber(),
-		position,
-		nil,
-		radius,
-		DOTA_UNIT_TARGET_TEAM_ENEMY,
-		DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC,
-		DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES,
-		FIND_ANY_ORDER,
-		false
-	)
-
-	for _, enemy in pairs(enemies) do
+	for _, enemy in pairs(CollectTargets(caster, position, radius)) do
 		if IsValidAlive(enemy) and not enemy:IsInvulnerable() then
-			ApplyDamage({
+			local dealt = ApplyDamage({
 				victim = enemy,
 				attacker = caster,
 				ability = ability,
 				damage = damage,
 				damage_type = damageType or DAMAGE_TYPE_MAGICAL,
 			})
+			SendOverheadEventMessage(nil, OVERHEAD_ALERT_DAMAGE, enemy, dealt, nil)
 			if onHit ~= nil then
 				onHit(enemy)
 			end
@@ -180,13 +185,6 @@ local function CreateAnchorSmash(caster, radius)
 	local particle = ParticleManager:CreateParticle(ANCHOR_SMASH_PARTICLE, PATTACH_ABSORIGIN_FOLLOW, caster)
 	ParticleManager:SetParticleControlEnt(particle, 0, caster, PATTACH_ABSORIGIN_FOLLOW, "attach_hitloc", caster:GetAbsOrigin(), true)
 	ParticleManager:SetParticleControl(particle, 1, Vector(radius or 400, 0, 0))
-	ParticleManager:ReleaseParticleIndex(particle)
-end
-
-local function CreateTidebringerImpact(position, radius)
-	local particle = ParticleManager:CreateParticle(TIDEBRINGER_PARTICLE, PATTACH_WORLDORIGIN, nil)
-	ParticleManager:SetParticleControl(particle, 0, position)
-	ParticleManager:SetParticleControl(particle, 1, Vector(radius or 240, 0, 0))
 	ParticleManager:ReleaseParticleIndex(particle)
 end
 
@@ -344,11 +342,15 @@ end
 function xhs_proudmoore_focus_fire:OnAbilityPhaseStart()
 	if not IsServer() then return true end
 
-	local position = GetContext(self).position or self:GetCaster():GetAbsOrigin()
+	local caster = self:GetCaster()
+	local position = GetContext(self).position or caster:GetAbsOrigin()
+	local direction = NormalizeDirection(position - caster:GetAbsOrigin())
+	local distance = math.max(400, (position - caster:GetAbsOrigin()):Length2D() + self:GetSpecialValueFor("radius"))
+	local spacing = math.max(120, self:GetSpecialValueFor("radius") * 1.25)
 	StartBossCastBar(self, "Focus Fire")
-	XHSBossTelegraphs:Target(position, self:GetSpecialValueFor("radius"), self:GetCastPoint(), PROUDMOORE_COLORS)
-	StartAnimation(self:GetCaster(), { duration = self:GetCastPoint() + 0.15, activity = ACT_DOTA_CAST_ABILITY_3, rate = 1.0 })
-	self:GetCaster():EmitSound("Hero_Kunkka.Tidebringer")
+	XHSBossTelegraphs:Line(caster:GetAbsOrigin(), direction, spacing, self:GetSpecialValueFor("radius"), math.ceil(distance / spacing), self:GetCastPoint(), PROUDMOORE_COLORS, spacing * 0.5)
+	StartAnimation(caster, { duration = self:GetCastPoint() + 0.15, activity = ACT_DOTA_CAST_ABILITY_3, rate = 1.0 })
+	caster:EmitSound("Ability.Powershot")
 	return true
 end
 
@@ -362,10 +364,42 @@ function xhs_proudmoore_focus_fire:OnSpellStart()
 	local caster = self:GetCaster()
 	local position = GetContext(self).position or caster:GetAbsOrigin()
 	local radius = self:GetSpecialValueFor("radius")
-	DamageEnemies(caster, self, position, radius, ScaleDamage(self:GetSpecialValueFor("damage")), DAMAGE_TYPE_PURE)
-	CreateTidebringerImpact(position, radius)
-	EmitLocationSound(caster, position, "Hero_Kunkka.Tidebringer")
+	local direction = NormalizeDirection(position - caster:GetAbsOrigin())
+	local distance = math.max(400, (position - caster:GetAbsOrigin()):Length2D() + radius)
+	ProjectileManager:CreateLinearProjectile({
+		Ability = self,
+		EffectName = POWERSHOT_PARTICLE,
+		vSpawnOrigin = caster:GetAbsOrigin(),
+		fDistance = distance,
+		fStartRadius = radius,
+		fEndRadius = radius,
+		Source = caster,
+		bHasFrontalCone = false,
+		bReplaceExisting = false,
+		iUnitTargetTeam = DOTA_UNIT_TARGET_TEAM_ENEMY,
+		iUnitTargetFlags = DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES,
+		iUnitTargetType = DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC,
+		fExpireTime = GameRules:GetGameTime() + 3.0,
+		bDeleteOnHit = false,
+		vVelocity = direction * 1600,
+		bProvidesVision = false,
+		ExtraData = { damage = ScaleDamage(self:GetSpecialValueFor("damage")) },
+	})
 	ClearContext(self)
+end
+
+function xhs_proudmoore_focus_fire:OnProjectileHit_ExtraData(target, location, extraData)
+	if not IsServer() or not IsValidAlive(target) or target:IsInvulnerable() then return false end
+	local dealt = ApplyDamage({
+		victim = target,
+		attacker = self:GetCaster(),
+		ability = self,
+		damage = tonumber(extraData.damage) or 0,
+		damage_type = DAMAGE_TYPE_PURE,
+	})
+	SendOverheadEventMessage(nil, OVERHEAD_ALERT_DAMAGE, target, dealt, nil)
+	target:EmitSound("Hero_Windrunner.PowershotDamage")
+	return false
 end
 
 function xhs_proudmoore_command_aura:GetIntrinsicModifierName()

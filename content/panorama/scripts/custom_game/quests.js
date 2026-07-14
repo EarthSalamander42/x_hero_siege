@@ -40,7 +40,8 @@ var XHSCollapsedMainQuestPhases = {};
 var XHSMainQuestPhases = {
 	xhs_phase_1: 1,
 	xhs_phase_2: 2,
-	xhs_phase_3: 3
+	xhs_phase_3: 3,
+	xhs_phase_4: 4
 };
 
 function RefreshXHSQuestLogBackgroundToggle() {
@@ -354,6 +355,12 @@ var XHSStaticQuests = [
 		text: "Phase 3: Defeat the enemy leaders",
 		type: "Holdout",
 		state: "Inactive"
+	},
+	{
+		id: "xhs_phase_4",
+		text: "Phase 4: Defeat the final enemies",
+		type: "Holdout",
+		state: "Inactive"
 	}
 ];
 
@@ -380,6 +387,7 @@ var XHSQuestUiOrder = [
 	"kill_illidan",
 	"kill_balanar",
 	"kill_proudmoore",
+	"xhs_phase_4",
 	"teleport_arthas",
 	"kill_arthas",
 	"kill_banehallow",
@@ -407,11 +415,11 @@ var XHSQuestUiMeta = {
 	kill_illidan: { phase: 3, subquest: true, infoTarget: "npc_dota_hero_illidan" },
 	kill_balanar: { phase: 3, subquest: true, infoTarget: "npc_dota_hero_balanar" },
 	kill_proudmoore: { phase: 3, subquest: true, infoTarget: "npc_dota_hero_proudmoore" },
-	teleport_arthas: { phase: 3, subquest: true, infoTarget: "npc_xhs_paladin_2" },
-	kill_arthas: { phase: 3, subquest: true },
-	kill_banehallow: { phase: 3, subquest: true },
-	kill_lich_king: { phase: 3, subquest: true },
-	kill_spirit_master: { phase: 3, subquest: true }
+	teleport_arthas: { phase: 4, subquest: true, infoTarget: "npc_xhs_paladin_2" },
+	kill_arthas: { phase: 4, subquest: true },
+	kill_banehallow: { phase: 4, subquest: true },
+	kill_lich_king: { phase: 4, subquest: true },
+	kill_spirit_master: { phase: 4, subquest: true }
 };
 
 var XHSHiddenQuestIds = {
@@ -445,6 +453,7 @@ function ApplyXHSQuestMetadata(panel, questID, isSubquest) {
 	panel.SetHasClass("XHSPhase1Quest", phase === 1);
 	panel.SetHasClass("XHSPhase2Quest", phase === 2);
 	panel.SetHasClass("XHSPhase3Quest", phase === 3);
+	panel.SetHasClass("XHSPhase4Quest", phase === 4);
 	panel.SetHasClass("XHSHiddenQuest", hidden);
 	panel.SetHasClass("HasQuestInfo", !!(meta && meta.infoTarget));
 	panel.SetAttributeString("quest_id", questID || "");
@@ -685,10 +694,12 @@ function IsXHSQuestCompleted(questID) {
 
 function RefreshPhaseQuestHeaders(phase) {
 	phase = phase || GetEffectiveQuestPhase();
-	var phase3Completed = IsXHSQuestCompleted("kill_spirit_master");
+	var phase3Completed = IsXHSQuestCompleted("kill_proudmoore");
+	var phase4Completed = IsXHSQuestCompleted("kill_spirit_master");
 	SetStaticQuest("xhs_phase_1", "Phase 1: Defend the Castle", phase > 1 ? "Completed" : "Active");
 	SetStaticQuest("xhs_phase_2", "Phase 2: Break the enemy siege", phase === 2 ? "Active" : (phase > 2 ? "Completed" : "Inactive"));
 	SetStaticQuest("xhs_phase_3", "Phase 3: Defeat the enemy leaders", phase3Completed ? "Completed" : (phase >= 3 ? "Active" : "Inactive"));
+	SetStaticQuest("xhs_phase_4", "Phase 4: Defeat the final enemies", phase4Completed ? "Completed" : (phase >= 4 ? "Active" : "Inactive"));
 }
 
 function RefreshStaticQuests() {

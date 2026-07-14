@@ -205,7 +205,6 @@ function xhs_balanar_nightfall:OnSpellStart()
 	DamageEnemies(caster, self, caster:GetAbsOrigin(), radius, ScaleDamage(self:GetSpecialValueFor("damage")), DAMAGE_TYPE_MAGICAL)
 	caster:AddNewModifier(caster, self, "modifier_xhs_balanar_nightfall", { duration = self:GetSpecialValueFor("duration") })
 	CreateRadialImpact(caster:GetAbsOrigin(), radius, NIGHTFALL_PARTICLE)
-	caster:EmitSound("Hero_Nightstalker.Darkness")
 	ClearContext(self)
 end
 
@@ -216,7 +215,6 @@ function xhs_balanar_dread_howl:OnAbilityPhaseStart()
 	StartBossCastBar(self, "Dread Howl")
 	CreateDarkmoonPrecast(caster:GetAbsOrigin(), self:GetSpecialValueFor("radius"), self:GetCastPoint())
 	StartAnimation(caster, { duration = self:GetCastPoint() + 0.2, activity = ACT_DOTA_CAST_ABILITY_1, rate = 0.9 })
-	caster:EmitSound("Hero_Nightstalker.Void")
 	return true
 end
 
@@ -238,7 +236,7 @@ function xhs_balanar_dread_howl:OnSpellStart()
 		end
 	end
 	CreateOverheadCast(caster, DREAD_HOWL_PARTICLE)
-	caster:EmitSound("Hero_Nightstalker.Void")
+	caster:EmitSound("Hero_Lycan.Howl")
 	ClearContext(self)
 end
 
@@ -250,7 +248,6 @@ function xhs_balanar_sleeping_terror:OnAbilityPhaseStart()
 	StartBossCastBar(self, "Sleeping Terror")
 	XHSBossTelegraphs:Target(position, self:GetSpecialValueFor("radius"), self:GetCastPoint(), BALANAR_COLORS)
 	StartAnimation(self:GetCaster(), { duration = self:GetCastPoint() + 0.15, activity = ACT_DOTA_CAST_ABILITY_2, rate = 1.0 })
-	self:GetCaster():EmitSound("Hero_Bane.Nightmare")
 	return true
 end
 
@@ -291,7 +288,6 @@ function xhs_balanar_carrion_swarm:OnAbilityPhaseStart()
 	StartBossCastBar(self, "Carrion Swarm")
 	XHSBossTelegraphs:Line(caster:GetAbsOrigin(), direction, spacing, width, math.max(1, math.floor(length / spacing)), self:GetCastPoint(), BALANAR_COLORS, 120)
 	StartAnimation(caster, { duration = self:GetCastPoint() + 0.15, activity = ACT_DOTA_CAST_ABILITY_3, rate = 1.0 })
-	caster:EmitSound("Hero_DeathProphet.CarrionSwarm")
 	return true
 end
 

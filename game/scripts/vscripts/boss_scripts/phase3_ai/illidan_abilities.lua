@@ -26,6 +26,7 @@ local ILLIDAN_COLORS = {
 local METAMORPHOSIS_PARTICLE = "particles/units/heroes/hero_terrorblade/terrorblade_metamorphosis_transform.vpcf"
 local METAMORPHOSIS_AMBIENT_PARTICLE = "particles/units/heroes/hero_terrorblade/terrorblade_metamorphosis.vpcf"
 local METAMORPHOSIS_ATTACK_PARTICLE = "particles/units/heroes/hero_terrorblade/terrorblade_metamorphosis_base_attack.vpcf"
+local METAMORPHOSIS_MODEL = "models/heroes/terrorblade/demon.vmdl"
 local METAMORPHOSIS_CLEAVE_PARTICLE = "particles/econ/items/faceless_void/faceless_void_weapon_bfury/faceless_void_weapon_bfury_cleave.vpcf"
 local FEL_BEAM_PARTICLE = "particles/units/heroes/hero_lina/lina_spell_dragon_slave.vpcf"
 local FEL_BEAM_IMPACT_PARTICLE = "particles/units/heroes/hero_lina/lina_spell_dragon_slave_impact.vpcf"
@@ -521,6 +522,7 @@ function modifier_xhs_illidan_metamorphosis:DeclareFunctions()
 		MODIFIER_PROPERTY_BASEDAMAGEOUTGOING_PERCENTAGE,
 		MODIFIER_PROPERTY_ATTACKSPEED_BONUS_CONSTANT,
 		MODIFIER_PROPERTY_ATTACK_RANGE_BONUS,
+		MODIFIER_PROPERTY_MODEL_CHANGE,
 		MODIFIER_PROPERTY_MODEL_SCALE,
 		MODIFIER_EVENT_ON_ATTACK_LANDED,
 	}
@@ -536,6 +538,10 @@ end
 
 function modifier_xhs_illidan_metamorphosis:GetModifierAttackRangeBonus()
 	return self.attack_range or 350
+end
+
+function modifier_xhs_illidan_metamorphosis:GetModifierModelChange()
+	return METAMORPHOSIS_MODEL
 end
 
 function modifier_xhs_illidan_metamorphosis:GetModifierModelScale()

@@ -233,7 +233,7 @@ _G.ZonesDefinition =
 				{
 					{
 						Type = QUEST_EVENT_ON_QUEST_COMPLETE,
-						szQuestName = "kill_proudmoore",
+						szQuestName = "teleport_arthas",
 					},
 				},
 				Completion =
@@ -289,10 +289,9 @@ _G.ZonesDefinition =
 				},
 				Completion =
 				{
-					Type = QUEST_EVENT_ON_TEAM_ENEMY_KILLED,
-					szTeamName = DOTA_TEAM_CUSTOM_1,
+					Type = QUEST_EVENT_ON_ENEMY_KILLED,
+					szNPCName = "npc_dota_boss_spirit_master",
 				},
-				nCompleteLimit = 4,
 			},
 		},
 		VIPs =

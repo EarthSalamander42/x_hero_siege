@@ -352,6 +352,11 @@ end
 
 function modifier_xhs_proudmoore_phase3_ai:CastAnchorSmash()
 	local boss = self:GetParent()
+	local anchor = boss:FindAbilityByName("xhs_proudmoore_anchor_smash")
+	if anchor == nil then return nil end
+	local nearbyHeroes = XHSPhase3BossAI:GetLivingHeroes(boss:GetAbsOrigin(), anchor:GetSpecialValueFor("radius") + 80)
+	if #nearbyHeroes <= 0 then return nil end
+	FaceUnitTowardsPosition(boss, nearbyHeroes[1]:GetAbsOrigin())
 	local ability = CastPreparedAbility(boss, "xhs_proudmoore_anchor_smash", {}, boss:GetAbsOrigin() + boss:GetForwardVector() * 100)
 	if ability == nil then return nil end
 	return GetAbilityCastPoint(ability) + 0.25
