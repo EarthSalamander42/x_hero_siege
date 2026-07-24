@@ -177,6 +177,8 @@ function modifier_xhs_balanar_phase3_ai:UpdateBossBarMarkers()
 end
 
 function modifier_xhs_balanar_phase3_ai:OnIntervalThink()
+	XHSPhase3BossAI:RevealBossBarFromAggro(self)
+
 	if not self:IsBossActive() then
 		self.state = "dead"
 		self:StartIntervalThink(-1)

@@ -153,7 +153,7 @@ local function DamageEnemies(attacker, ability, position, radius, damage, damage
 				attacker = attacker,
 				ability = ability,
 				damage = ScaleDamage(damage),
-				damage_type = damageType or DAMAGE_TYPE_PURE,
+				damage_type = damageType or ability:GetAbilityDamageType(),
 			})
 			hitUnits[#hitUnits + 1] = target
 		end
@@ -195,7 +195,7 @@ local function DamageLineEnemies(attacker, ability, startPosition, direction, sp
 					attacker = attacker,
 					ability = ability,
 					damage = ScaleDamage(damage),
-					damage_type = damageType or DAMAGE_TYPE_PURE,
+					damage_type = damageType or ability:GetAbilityDamageType(),
 				})
 				hitUnits[#hitUnits + 1] = target
 			end
@@ -367,7 +367,7 @@ function xhs_magtheridon_brutal_slam:OnSpellStart()
 
 	CreateRadialParticle(position, radius, BRUTAL_SLAM_PARTICLE)
 	EmitLocationSound(caster, position, BRUTAL_SLAM_IMPACT_SOUND)
-	DamageEnemies(caster, self, position, radius, damage, DAMAGE_TYPE_PHYSICAL)
+	DamageEnemies(caster, self, position, radius, damage, self:GetAbilityDamageType())
 	ClearContext(self)
 end
 
@@ -381,7 +381,13 @@ function xhs_magtheridon_fel_stomp:OnAbilityPhaseStart()
 	StartBossCastBar(self, "Fel Stomp")
 	CreateDarkmoonAOEPrecast(self, caster:GetAbsOrigin(), radius, castPoint)
 	caster:EmitSound(FEL_STOMP_PRECAST_SOUND)
-	StartAnimation(caster, { duration = castPoint + 0.2, activity = ACT_DOTA_CAST_ABILITY_2, rate = 0.85 })
+	local animationDuration = castPoint + 0.1
+	local animationRate = math.max(0.45, math.min(1.0, 1.6 / math.max(castPoint, 0.1)))
+	StartAnimation(caster, {
+		duration = animationDuration,
+		activity = ACT_DOTA_CAST_ABILITY_2,
+		rate = animationRate,
+	})
 	return true
 end
 
@@ -404,7 +410,7 @@ function xhs_magtheridon_fel_stomp:OnSpellStart()
 
 	caster:EmitSound(FEL_STOMP_IMPACT_SOUND)
 	CreateRadialParticle(caster:GetAbsOrigin(), radius, FEL_STOMP_PARTICLE)
-	DamageEnemies(caster, self, caster:GetAbsOrigin(), radius, damage, DAMAGE_TYPE_PURE)
+	DamageEnemies(caster, self, caster:GetAbsOrigin(), radius, damage, self:GetAbilityDamageType())
 
 	local units = FindUnitsInRadius(caster:GetTeamNumber(), caster:GetAbsOrigin(), nil, radius, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, FIND_ANY_ORDER, false)
 	for _, unit in pairs(units) do
@@ -457,7 +463,7 @@ function xhs_magtheridon_targeted_firestorms:OnSpellStart()
 			if not IsValidAlive(caster) then return nil end
 			CreateFirestormWave(position, radius)
 			EmitLocationSound(caster, position, FIRESTORM_IMPACT_SOUND)
-			DamageEnemies(caster, self, position, radius, damage, DAMAGE_TYPE_PURE)
+			DamageEnemies(caster, self, position, radius, damage, self:GetAbilityDamageType())
 			return nil
 		end)
 	end
@@ -508,7 +514,7 @@ function xhs_magtheridon_fel_fissure:OnSpellStart()
 		Timers:CreateTimer(entry.delay or 0, function()
 			if not IsValidAlive(caster) then return nil end
 			EmitLocationSound(caster, position, FEL_FISSURE_IMPACT_SOUND)
-			local hitUnits = DamageEnemies(caster, self, position, radius, damage, DAMAGE_TYPE_PURE)
+			local hitUnits = DamageEnemies(caster, self, position, radius, damage, self:GetAbilityDamageType())
 			for _, unit in pairs(hitUnits) do
 				ApplySlow(caster, self, unit, slowDuration, movementSlow, attackSlow)
 			end
@@ -562,7 +568,7 @@ function xhs_magtheridon_infernal_rings:OnSpellStart()
 			if not IsValidAlive(caster) then return nil end
 			CreatePitOfMaliceZone(position, radius, INFERNAL_RING_VISUAL_DURATION)
 			EmitLocationSound(caster, position, INFERNAL_RINGS_IMPACT_SOUND)
-			DamageEnemies(caster, self, position, radius, damage, DAMAGE_TYPE_PURE)
+			DamageEnemies(caster, self, position, radius, damage, self:GetAbilityDamageType())
 			local units = FindUnitsInRadius(caster:GetTeamNumber(), position, nil, radius, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, FIND_ANY_ORDER, false)
 			for _, unit in pairs(units) do
 				ApplyRoot(caster, self, unit, rootDuration)
@@ -698,7 +704,7 @@ function xhs_magtheridon_rupture:OnSpellStart()
 		Timers:CreateTimer(visualDelay, function()
 			if not IsValidAlive(caster) then return nil end
 			EmitLocationSound(caster, lineEnd, RUPTURE_IMPACT_SOUND)
-			local units = DamageLineEnemies(caster, self, startPosition, direction, spacing, radius, count, damage, DAMAGE_TYPE_PURE, startDistance)
+			local units = DamageLineEnemies(caster, self, startPosition, direction, spacing, radius, count, damage, self:GetAbilityDamageType(), startDistance)
 			for _, unit in pairs(units) do
 				unit:EmitSound(RUPTURE_IMPACT_SOUND)
 				ApplySlow(caster, self, unit, slowDuration, self:GetSpecialValueFor("movement_slow"), self:GetSpecialValueFor("attack_slow"))
@@ -767,7 +773,7 @@ function modifier_xhs_magtheridon_infernal_root:CheckState()
 end
 
 function modifier_xhs_magtheridon_infernal_root:GetEffectName()
-	return "particles/units/heroes/heroes_underlord/underlord_pitofmalice_stun.vpcf"
+	return "particles/units/heroes/heroes_underlord/abyssal_underlord_pitofmalice_stun.vpcf"
 end
 
 function modifier_xhs_magtheridon_infernal_root:GetEffectAttachType()

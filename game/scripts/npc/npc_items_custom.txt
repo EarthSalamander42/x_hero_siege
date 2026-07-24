@@ -2254,7 +2254,8 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"ID"							"2547"														// unique ID number for this item.  Do not change this once established or it will invalidate collected stats.
-		"AbilityName"					"item_tombstone"
+		"BaseClass"						"item_lua"
+		"ScriptFile"					"items/item_tombstone.lua"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_CHANNELLED | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK"
 		"Model"							"models/props_gameplay/tombstoneb01.vmdl"
 		"AbilityTextureName"			"undying_tombstone"
@@ -2264,7 +2265,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityCastRange"				"100"
 		"AbilityCastPoint"				"0.0"
-		"AbilityChannelTime"			"6.0"
+		"AbilityChannelTime"			"5.0"
 		
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------

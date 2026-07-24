@@ -31,6 +31,8 @@ CustomGameEventManager:RegisterListener("supporter_pass_buy_shop_item", Dynamic_
 CustomGameEventManager:RegisterListener("supporter_pass_claim_reward", Dynamic_Wrap(Battlepass, "SupporterPassClaimReward"))
 CustomGameEventManager:RegisterListener("supporter_pass_equip_item", Dynamic_Wrap(Battlepass, "SupporterPassEquipItem"))
 CustomGameEventManager:RegisterListener("supporter_pass_update_settings", Dynamic_Wrap(Battlepass, "SupporterPassUpdateSettings"))
+CustomGameEventManager:RegisterListener("supporter_pass_dev_test_reward", Dynamic_Wrap(Battlepass, "SupporterPassDevTestReward"))
+CustomGameEventManager:RegisterListener("supporter_pass_dev_stop_test", Dynamic_Wrap(Battlepass, "SupporterPassDevStopTest"))
 CustomGameEventManager:RegisterListener("toggle_ingame_tag", Dynamic_Wrap(Battlepass, 'ToggleDonatorTag'))
 CustomGameEventManager:RegisterListener("change_ingame_tag", Dynamic_Wrap(Battlepass, 'SetDonatorTag'))
 CustomGameEventManager:RegisterListener("change_supporter_pass_rewards", Dynamic_Wrap(Battlepass, 'BattlepassRewards'))
@@ -85,31 +87,41 @@ function Battlepass:HasArcana(ID, hero_name)
 	return nil
 end
 
--- vanilla extension
--- function CDOTA_BaseNPC:SetupHealthBarLabel(sCustomTag)
--- 	local ply_table = CustomNetTables:GetTableValue("supporter_pass_player", tostring(self:GetPlayerID()))
--- 	--	print(ply_table)
--- 	if not ply_table then return end
+function CDOTA_BaseNPC:RemoveHealthBarLabel()
+	if self.SetCustomHealthLabel then
+		self:SetCustomHealthLabel("", 255, 255, 255)
+	end
+end
 
--- 	--	print(sCustomTag)
--- 	if not sCustomTag then
--- 		if ply_table.ingame_tag then
--- 			sCustomTag = ply_table.ingame_tag
--- 		else
--- 			sCustomTag = "#donator_label_" .. ply_table.donator_level
--- 		end
--- 	end
--- 	--	print(sCustomTag)
+function CDOTA_BaseNPC:SetupHealthBarLabel(customTag)
+	if not self.GetPlayerOwnerID or not self.SetCustomHealthLabel then return end
 
--- 	--	print("Donator Player ID / status:", self:GetPlayerOwnerID(), api:GetDonatorStatus(self:GetPlayerOwnerID()))
--- 	if api:IsDonator(self:GetPlayerOwnerID()) ~= false then
--- 		if ply_table.donator_level and ply_table.donator_level > 0 then
--- 			local visual_donator_level = GetDonatorVisualStatus ~= nil and GetDonatorVisualStatus(ply_table.donator_level) or ply_table.donator_level
--- 			local donator_color = DONATOR_COLOR[visual_donator_level] or DONATOR_COLOR[0]
--- 			self:SetCustomHealthLabel(sCustomTag, donator_color[1], donator_color[2], donator_color[3])
--- 		end
--- 	end
--- end
+	local playerID = self:GetPlayerOwnerID()
+	if not PlayerResource:IsValidPlayerID(playerID) then return end
+	local playerTable = CustomNetTables:GetTableValue("supporter_pass_player", tostring(playerID))
+	if type(playerTable) ~= "table" then return end
+
+	local donatorLevel = tonumber(playerTable.donator_level) or 0
+	if donatorLevel <= 0 then
+		self:RemoveHealthBarLabel()
+		return
+	end
+
+	local visualLevel = GetDonatorVisualStatus ~= nil and GetDonatorVisualStatus(donatorLevel) or donatorLevel
+	local color = DONATOR_COLOR[visualLevel] or DONATOR_COLOR[0] or { 255, 255, 255 }
+	local label = customTag or playerTable.ingame_tag or ("#donator_label_" .. tostring(donatorLevel))
+	self:SetCustomHealthLabel(label, color[1], color[2], color[3])
+end
+
+function Battlepass:ApplySupporterTag(hero, enabled)
+	if hero == nil or hero:IsNull() then return end
+
+	if enabled == true then
+		hero:SetupHealthBarLabel()
+	else
+		hero:RemoveHealthBarLabel()
+	end
+end
 
 function CDOTA_BaseNPC:CenterCameraOnEntity(hTarget, iDuration)
 	PlayerResource:SetCameraTarget(self:GetPlayerID(), hTarget)
@@ -127,22 +139,19 @@ function CDOTA_BaseNPC:CenterCameraOnEntity(hTarget, iDuration)
 	end
 end
 
-function Battlepass:ToggleDonatorTag(keys)
-	local hero = PlayerResource:GetPlayer(keys.PlayerID):GetAssignedHero()
-
-	print(keys)
-	print(type(keys.tag))
+function Battlepass:ToggleDonatorTag(event_source_index, event)
+	local keys = self:GetSupporterPassEventPayload(event_source_index, event)
+	if keys.PlayerID == nil then return end
+	local player = PlayerResource:GetPlayer(keys.PlayerID)
+	local hero = player and player:GetAssignedHero() or nil
 
 	Battlepass:UpdatePlayerTable(keys.PlayerID, "toggle_tag", keys.tag)
-
-	if keys.tag == 0 then
-		-- hero:RemoveHealthBarLabel()
-	else
-		-- hero:SetupHealthBarLabel()
-	end
+	Battlepass:ApplySupporterTag(hero, keys.tag == 1 or keys.tag == true)
 end
 
-function Battlepass:SetDonatorTag(keys)
+function Battlepass:SetDonatorTag(event_source_index, event)
+	local keys = self:GetSupporterPassEventPayload(event_source_index, event)
+	if keys.PlayerID == nil then return end
 	--	print(keys)
 	local hero = PlayerResource:GetSelectedHeroEntity(keys.PlayerID)
 
@@ -154,29 +163,35 @@ function Battlepass:SetDonatorTag(keys)
 	--	end
 end
 
-function Battlepass:BattlepassRewards(keys)
+function Battlepass:BattlepassRewards(event_source_index, event)
+	local keys = self:GetSupporterPassEventPayload(event_source_index, event)
+	if keys.PlayerID == nil then return end
 	Battlepass:UpdatePlayerTable(keys.PlayerID, "bp_rewards", keys.bp_rewards)
+	Battlepass:ApplySupporterLoadout(keys.PlayerID)
 end
 
-function Battlepass:PlayerXP(keys)
+function Battlepass:PlayerXP(event_source_index, event)
+	local keys = self:GetSupporterPassEventPayload(event_source_index, event)
+	if keys.PlayerID == nil then return end
 	Battlepass:UpdatePlayerTable(keys.PlayerID, "player_xp", keys.player_xp)
 end
 
 function Battlepass:RegisterHeroTaunt(hero)
-	local armory = api:GetArmory(hero:GetPlayerID()) or {}
+	local armory = Battlepass:GetEquippedSupporterItems(hero:GetPlayerID()) or {}
 
 	--	print("Armory:", armory)
 
 	if armory and type(armory) == "table" then
 		for k, v in pairs(armory) do
-			if v.slot_id == "taunt" then
-				if hero:GetUnitName() == v.hero and Battlepass:GetRewardUnlocked(hero:GetPlayerID()) >= ItemsGame:GetItemUnlockLevel(v.item_id) then
-					if ItemsGame:GetItemVisuals(v.item_id)["asset_modifier1"] then
-						hero.bp_taunt = ItemsGame:GetItemVisuals(v.item_id)["asset_modifier1"].modifier
-					elseif ItemsGame:GetItemVisuals(v.item_id)["asset_modifier0"] then
-						hero.bp_taunt = ItemsGame:GetItemVisuals(v.item_id)["asset_modifier0"].modifier
-					elseif ItemsGame:GetItemVisuals(v.item_id)["asset_modifier"] then
-						hero.bp_taunt = ItemsGame:GetItemVisuals(v.item_id)["asset_modifier"].modifier
+			local catalogItemID = Battlepass:GetSupporterCatalogItemID(v)
+			if catalogItemID and v.slot_id == "taunt" then
+				if hero:GetUnitName() == v.hero and Battlepass:GetRewardUnlocked(hero:GetPlayerID()) >= ItemsGame:GetItemUnlockLevel(catalogItemID) then
+					if ItemsGame:GetItemVisuals(catalogItemID)["asset_modifier1"] then
+						hero.bp_taunt = ItemsGame:GetItemVisuals(catalogItemID)["asset_modifier1"].modifier
+					elseif ItemsGame:GetItemVisuals(catalogItemID)["asset_modifier0"] then
+						hero.bp_taunt = ItemsGame:GetItemVisuals(catalogItemID)["asset_modifier0"].modifier
+					elseif ItemsGame:GetItemVisuals(catalogItemID)["asset_modifier"] then
+						hero.bp_taunt = ItemsGame:GetItemVisuals(catalogItemID)["asset_modifier"].modifier
 					end
 
 					return
@@ -186,8 +201,11 @@ function Battlepass:RegisterHeroTaunt(hero)
 	end
 end
 
-function Battlepass:PlayHeroTaunt(keys)
-	local hero = PlayerResource:GetSelectedHeroEntity(keys.ID)
+function Battlepass:PlayHeroTaunt(event_source_index, event)
+	local keys = self:GetSupporterPassEventPayload(event_source_index, event)
+	if keys.PlayerID == nil then return end
+	local hero = PlayerResource:GetSelectedHeroEntity(keys.PlayerID)
+	if hero == nil or hero:IsNull() then return end
 
 	if hero.can_cast_taunt == false then
 		-- Notification: You can cast it again in x seconds
@@ -218,35 +236,812 @@ function Battlepass:PlayHeroTaunt(keys)
 	end
 end
 
-function Battlepass:Winrate(keys)
+function Battlepass:Winrate(event_source_index, event)
+	local keys = self:GetSupporterPassEventPayload(event_source_index, event)
+	if keys.PlayerID == nil then return end
 	Battlepass:UpdatePlayerTable(keys.PlayerID, "winrate", keys.winrate)
 end
 
-function Battlepass:DonatorCompanionJS(event)
-	Battlepass:DonatorCompanion(event.ID, event.unit, event.js)
+local SUPPORTER_SLOT_ALIASES = {
+	teleport_fx = "teleport",
+	["teleport fx"] = "teleport",
+	tome = "levelup",
+	tome_fx = "levelup",
+	["tome fx"] = "levelup",
+	kill_fx = "kill_effect",
+	["kill fx"] = "kill_effect",
+	courier = "companion",
+	companions = "companion",
+	statue = "effigy",
+	emblems = "emblem",
+}
+
+local function CopySupporterItem(source)
+	local copy = {}
+	if type(source) ~= "table" then return copy end
+	for key, value in pairs(source) do
+		copy[key] = value
+	end
+	return copy
 end
 
-function Battlepass:DonatorStatueJS(event)
-	-- need to update the current statue with the new one
-	--	Battlepass:DonatorCompanion(event.ID, event.unit, event.js)
+local function NormalizeSupporterSlot(slot)
+	local normalized = string.lower(tostring(slot or "default"))
+	return SUPPORTER_SLOT_ALIASES[normalized] or normalized
 end
 
-function Battlepass:DonatorEmblemJS(event)
-	local hero = PlayerResource:GetSelectedHeroEntity(event.ID)
+local function RequiredSupporterTier(value, fallback)
+	if type(value) ~= "table" then return fallback or 0 end
+	local tier = tonumber(value.required_tier or value.tier_id)
+	if tier == nil and DONATOR_STATUS_TO_TIER ~= nil then
+		tier = DONATOR_STATUS_TO_TIER[tonumber(value.required_status)]
+	end
+	return tier or fallback or 0
+end
 
-	if hero:HasModifier("modifier_patreon_donator") then
-		local modifier = hero:FindModifierByName("modifier_patreon_donator")
+local function NormalizeSupporterList(value)
+	if type(value) ~= "table" then return {} end
+	if #value > 0 then return value end
 
-		if modifier.SetDonatorEffect then
-			modifier:SetDonatorEffect(event.unit)
-		else
-			modifier.effect_name = event.unit
+	local keyCount = 0
+	local onlyKey = nil
+	local numericKeys = {}
+	for key, _ in pairs(value) do
+		keyCount = keyCount + 1
+		onlyKey = key
+		if tonumber(key) ~= nil then
+			table.insert(numericKeys, tonumber(key))
 		end
+	end
+
+	if keyCount == 1 and tostring(onlyKey) == "1" and type(value[onlyKey]) == "table"
+		and value.item_id == nil and value.id == nil and value.entitlement_id == nil then
+		return NormalizeSupporterList(value[onlyKey])
+	end
+
+	if #numericKeys > 0 then
+		table.sort(numericKeys)
+		local result = {}
+		for _, numericKey in ipairs(numericKeys) do
+			local item = value[numericKey] or value[tostring(numericKey)]
+			if type(item) == "table" then
+				table.insert(result, item)
+			end
+		end
+		return result
+	end
+
+	if value.item_id ~= nil or value.id ~= nil or value.entitlement_id ~= nil or value.unit ~= nil then
+		return { value }
+	end
+
+	return {}
+end
+
+local function SupporterItemMatches(item, itemID)
+	if type(item) ~= "table" or itemID == nil then return false end
+	local expected = tostring(itemID)
+	local fields = {
+		item.entitlement_id,
+		item.id,
+		item.item_id,
+		item.catalog_item_id,
+		item.reward_item_id,
+		item.unit,
+		item.unit_name,
+		item.name,
+	}
+	for _, value in ipairs(fields) do
+		if value ~= nil and tostring(value) == expected then
+			return true
+		end
+	end
+	return false
+end
+
+function Battlepass:GetOwnedSupporterItems(playerID)
+	local armory = api and api.GetSupporterPassArmory and api:GetSupporterPassArmory(playerID) or {}
+	if type(armory) ~= "table" or next(armory) == nil then
+		armory = CustomNetTables:GetTableValue("supporter_pass_armory", "rewards_" .. tostring(playerID)) or {}
+	end
+	local items = NormalizeSupporterList(armory)
+	if #items > 0 then return items end
+
+	for _, item in pairs(armory) do
+		if type(item) == "table" then
+			table.insert(items, item)
+		end
+	end
+	return items
+end
+
+function Battlepass:FindOwnedSupporterItem(playerID, itemID)
+	for _, item in ipairs(self:GetOwnedSupporterItems(playerID)) do
+		if SupporterItemMatches(item, itemID) then
+			return CopySupporterItem(item)
+		end
+	end
+	return nil
+end
+
+function Battlepass:BuildLegacySupporterItem(playerID, itemID, requestedSlot)
+	if ItemsGame == nil or ItemsGame.GetItemKV == nil then return nil end
+	local definition = ItemsGame:GetItemKV(itemID)
+	if type(definition) ~= "table" then return nil end
+
+	local requiredLevel = tonumber(ItemsGame:GetItemUnlockLevel(itemID)) or 1
+	if self:GetRewardUnlocked(playerID) < requiredLevel then return nil end
+	if ItemsGame:IsPremiumReward(itemID) and (SupporterPass == nil or SupporterPass:GetTierForPlayer(playerID) < 1) then
+		return nil
+	end
+	if definition.item_unreleased == 1 or definition.item_unreleased == "1" then return nil end
+
+	local itemType = ItemsGame:GetItemType(itemID)
+	return {
+		id = tostring(itemID),
+		item_id = tostring(itemID),
+		name = ItemsGame:GetItemName(itemID),
+		type = itemType,
+		item_type = itemType,
+		slot_id = NormalizeSupporterSlot(requestedSlot ~= "default" and requestedSlot or itemType),
+		hero = ItemsGame:GetItemHero(itemID) or itemType or "global",
+		legacy = true,
+	}
+end
+
+function Battlepass:ResolveSupporterItem(playerID, itemID, requestedSlot)
+	local item = self:FindOwnedSupporterItem(playerID, itemID)
+	if item == nil then
+		item = self:BuildLegacySupporterItem(playerID, itemID, requestedSlot)
+	end
+	if item == nil and SupporterPass and SupporterPass:GetTierForPlayer(playerID) > 0 then
+		local slot = NormalizeSupporterSlot(requestedSlot)
+		local catalogs = {
+			companion = api and api.companions or {},
+			emblem = api and api.emblems or {},
+			effigy = api and api.effigies or {},
+		}
+		for _, cosmetic in pairs(catalogs[slot] or {}) do
+			if SupporterItemMatches(cosmetic, itemID) then
+				local requiredTier = RequiredSupporterTier(cosmetic, 1)
+				if SupporterPass:GetTierForPlayer(playerID) >= requiredTier then
+					item = CopySupporterItem(cosmetic)
+					item.id = item.id or tostring(itemID)
+					item.item_id = item.item_id or item.id or tostring(itemID)
+					item.type = slot
+					item.slot_id = slot
+					item.hero = "global"
+					item.legacy = true
+					if slot == "companion" or slot == "effigy" then
+						item.unit = item.unit or item.unit_name or item.file
+					elseif slot == "emblem" then
+						item.particle = item.particle or item.file
+					end
+				end
+				break
+			end
+		end
+		if item == nil and slot == "companion" then
+			local companions = LoadKeyValues("scripts/npc/units/companions.txt") or {}
+			if type(companions[tostring(itemID)]) == "table" then
+				item = {
+					id = tostring(itemID), item_id = tostring(itemID), unit = tostring(itemID),
+					type = "companion", slot_id = "companion", hero = "global", legacy = true,
+				}
+			end
+		elseif item == nil and slot == "effigy" then
+			local statues = LoadKeyValues("scripts/npc/units/statues.txt") or {}
+			if type(statues[tostring(itemID)]) == "table" then
+				item = {
+					id = tostring(itemID), item_id = tostring(itemID), unit = tostring(itemID),
+					type = "effigy", slot_id = "effigy", hero = "global", legacy = true,
+				}
+			end
+		end
+	end
+	if item == nil then return nil end
+
+	item.item_id = item.item_id or item.catalog_item_id or item.reward_item_id or item.id
+	item.slot_id = NormalizeSupporterSlot(item.slot_id or item.item_type or item.type or requestedSlot)
+
+	-- Backend loadouts intentionally contain only identity and slot fields. Rehydrate
+	-- cosmetic runtime metadata from the legacy catalogs before applying the item.
+	local catalogs = {
+		companion = api and api.companions or {},
+		emblem = api and api.emblems or {},
+		effigy = api and (api.effigies or api.statues) or {},
+	}
+	for _, cosmetic in pairs(catalogs[item.slot_id] or {}) do
+		if SupporterItemMatches(cosmetic, itemID)
+			or SupporterItemMatches(cosmetic, item.item_id)
+			or SupporterItemMatches(cosmetic, item.entitlement_id) then
+			for key, value in pairs(cosmetic) do
+				if (item[key] == nil or item[key] == "") and value ~= nil and value ~= "" then
+					item[key] = value
+				end
+			end
+			break
+		end
+	end
+
+	if item.slot_id == "companion" or item.slot_id == "effigy" then
+		item.unit = item.unit or item.unit_name or item.file
+		local definitionsFile = item.slot_id == "companion"
+			and "scripts/npc/units/companions.txt"
+			or "scripts/npc/units/statues.txt"
+		local definitions = LoadKeyValues(definitionsFile) or {}
+		local unitCandidate = tostring(item.unit or item.item_id or item.id or "")
+		if type(definitions[unitCandidate]) == "table" then
+			item.unit = unitCandidate
+		end
+	elseif item.slot_id == "emblem" then
+		item.particle = item.particle or item.file
+	end
+
+	return item
+end
+
+local function HydrateSupporterLoadoutItem(battlepass, playerID, value, requestedSlot)
+	local item = type(value) == "table" and CopySupporterItem(value) or {}
+	local itemID = type(value) == "table"
+		and (value.entitlement_id or value.item_id or value.catalog_item_id or value.reward_item_id or value.id or value.unit)
+		or value
+	local slot = NormalizeSupporterSlot(item.slot_id or item.item_type or item.type or requestedSlot)
+	local resolved = itemID ~= nil and battlepass:ResolveSupporterItem(playerID, itemID, slot) or nil
+
+	if resolved ~= nil then
+		for key, fieldValue in pairs(item) do
+			if fieldValue ~= nil and fieldValue ~= "" then
+				resolved[key] = fieldValue
+			end
+		end
+		item = resolved
+	end
+
+	if next(item) == nil then return nil end
+	item.slot_id = NormalizeSupporterSlot(item.slot_id or item.item_type or item.type or slot)
+	return item
+end
+
+function Battlepass:GetEquippedSupporterItems(playerID)
+	local loadout = api and api.GetSupporterPassLoadout and api:GetSupporterPassLoadout(playerID) or {}
+	if type(loadout) ~= "table" or next(loadout) == nil then
+		local playerTable = CustomNetTables:GetTableValue("supporter_pass_player", tostring(playerID)) or {}
+		loadout = playerTable.loadout or {}
+	end
+
+	local list = NormalizeSupporterList(loadout)
+	local result = {}
+	if #list > 0 then
+		for _, value in ipairs(list) do
+			local item = HydrateSupporterLoadoutItem(self, playerID, value, value.slot_id or value.item_type or value.type)
+			if item ~= nil then
+				table.insert(result, item)
+			end
+		end
+		return result
+	end
+
+	for slot, value in pairs(loadout) do
+		local item = HydrateSupporterLoadoutItem(self, playerID, value, slot)
+		if item ~= nil then
+			item.slot_id = NormalizeSupporterSlot(item.slot_id or slot)
+			table.insert(result, item)
+		end
+	end
+	return result
+end
+
+function Battlepass:GetEquippedSupporterItem(playerID, slot)
+	local expectedSlot = NormalizeSupporterSlot(slot)
+	for _, item in ipairs(self:GetEquippedSupporterItems(playerID)) do
+		local itemSlot = NormalizeSupporterSlot(item.slot_id or item.item_type or item.type or item.hero)
+		if itemSlot == expectedSlot then
+			return item
+		end
+	end
+	return nil
+end
+
+function Battlepass:SetLocalSupporterLoadoutItem(playerID, item)
+	if not api or not api.players or type(item) ~= "table" then return false end
+	local steamID = tostring(PlayerResource:GetSteamID(playerID))
+	local player = api.players[steamID]
+	if type(player) ~= "table" then return false end
+
+	local loadout = {}
+	for _, equipped in ipairs(self:GetEquippedSupporterItems(playerID)) do
+		local equippedSlot = NormalizeSupporterSlot(equipped.slot_id or equipped.item_type or equipped.type)
+		loadout[equippedSlot] = CopySupporterItem(equipped)
+	end
+	local slot = NormalizeSupporterSlot(item.slot_id or item.item_type or item.type)
+	loadout[slot] = CopySupporterItem(item)
+	player.supporter_pass = player.supporter_pass or {}
+	player.supporter_pass.loadout = loadout
+
+	if SupporterPass and SupporterPass.PublishPlayer then
+		SupporterPass:PublishPlayer(playerID)
+	else
+		self:ApplySupporterLoadout(playerID)
+	end
+	return true
+end
+
+function Battlepass:AreSupporterRewardsEnabled(playerID)
+	local playerTable = CustomNetTables:GetTableValue("supporter_pass_player", tostring(playerID)) or {}
+	local value = playerTable.pass_rewards
+	if value == nil then value = playerTable.bp_rewards end
+	return value ~= false and value ~= 0 and value ~= "0"
+end
+
+function Battlepass:GetSupporterItemParticle(item, expectedAsset)
+	if type(item) ~= "table" or ItemsGame == nil then return nil end
+	local itemID = self:GetSupporterCatalogItemID(item)
+	if itemID == nil then return nil end
+	local visuals = ItemsGame:GetItemVisuals(itemID)
+	if type(visuals) ~= "table" then return nil end
+
+	for _, visual in pairs(visuals) do
+		if type(visual) == "table" and visual.type == "particle"
+			and (expectedAsset == nil or visual.asset == expectedAsset) then
+			return visual.modifier
+		end
+	end
+	return nil
+end
+
+function Battlepass:GetSupporterCatalogItemID(item)
+	if type(item) ~= "table" or ItemsGame == nil then return nil end
+	local candidates = { item.catalog_item_id, item.reward_item_id, item.item_id, item.id }
+	for _, candidate in ipairs(candidates) do
+		if candidate ~= nil and ItemsGame:GetItemKV(candidate) ~= nil then
+			return tostring(candidate)
+		end
+	end
+	return nil
+end
+
+function Battlepass:ClearSupporterOverrides(playerID)
+	self.SUPPORTER_OVERRIDE_ASSETS = self.SUPPORTER_OVERRIDE_ASSETS or {}
+	for asset, _ in pairs(self.SUPPORTER_OVERRIDE_ASSETS[playerID] or {}) do
+		CustomNetTables:SetTableValue("supporter_pass_player", asset .. "_" .. tostring(playerID), { asset })
+	end
+	self.SUPPORTER_OVERRIDE_ASSETS[playerID] = {}
+end
+
+function Battlepass:ApplySupporterEmblem(hero, item)
+	if hero == nil or hero:IsNull() then return end
+	local particle = item and (item.particle or item.file or self:GetSupporterItemParticle(item, "particles/hero_emblem/default.vpcf")) or ""
+	if particle ~= "" and not hero:HasModifier("modifier_patreon_donator") then
+		hero:AddNewModifier(hero, nil, "modifier_patreon_donator", {})
+	end
+	local modifier = hero:FindModifierByName("modifier_patreon_donator")
+	if modifier and modifier.SetDonatorEffect then
+		modifier:SetDonatorEffect(particle)
 	end
 end
 
-function Battlepass:DonatorCompanionSkinJS(event)
-	DonatorCompanionSkin(event.ID, event.unit, event.skin)
+function Battlepass:ApplySupporterLoadout(playerID, hero)
+	if not PlayerResource:IsValidPlayerID(playerID) then return end
+	hero = hero or PlayerResource:GetSelectedHeroEntity(playerID)
+	if hero == nil or hero:IsNull() then return end
+
+	self:ClearSupporterOverrides(playerID)
+	if not self:AreSupporterRewardsEnabled(playerID) then
+		self:ApplySupporterEmblem(hero, nil)
+		self:DonatorCompanion(playerID, "", true)
+		if self.RemoveDonatorStatue then self:RemoveDonatorStatue(playerID) end
+		return
+	end
+
+	self:RegisterHeroTaunt(hero)
+	self:GetHeroEffect(hero)
+
+	local companion = self:GetEquippedSupporterItem(playerID, "companion")
+	local companionUnit = companion and (
+		companion.unit
+		or companion.unit_name
+		or companion.file
+		or companion.item_id
+		or companion.id
+	) or ""
+	if companionUnit == "" and api and api.GetPlayerCompanion then
+		companionUnit = api:GetPlayerCompanion(playerID) or ""
+	end
+	self:DonatorCompanion(playerID, companionUnit, true)
+
+	local emblem = self:GetEquippedSupporterItem(playerID, "emblem")
+	if emblem == nil and api and api.GetPlayerEmblem then
+		local particle = api:GetPlayerEmblem(playerID)
+		if particle then emblem = { particle = particle } end
+	end
+	self:ApplySupporterEmblem(hero, emblem)
+
+	local effigy = self:GetEquippedSupporterItem(playerID, "effigy")
+	local effigyUnit = effigy and (effigy.unit or effigy.unit_name or effigy.file) or ""
+	if effigyUnit == "" and api and api.GetPlayerStatue then
+		effigyUnit = api:GetPlayerStatue(playerID) or ""
+	end
+	if effigyUnit ~= "" then
+		self:DonatorStatue(playerID, effigyUnit, true)
+	elseif self.RemoveDonatorStatue then
+		self:RemoveDonatorStatue(playerID)
+	end
+end
+
+function Battlepass:PlaySupporterKillEffect(hero, victim, item)
+	if hero == nil or victim == nil or item == nil or hero:IsNull() or victim:IsNull() then return false end
+	local played = false
+	local targetParticle = self:GetSupporterItemParticle(item, "particles/kill_effect/default_target.vpcf")
+	if targetParticle then
+		local particle = ParticleManager:CreateParticle(targetParticle, PATTACH_ABSORIGIN_FOLLOW, victim)
+		ParticleManager:SetParticleControl(particle, 0, victim:GetAbsOrigin())
+		ParticleManager:ReleaseParticleIndex(particle)
+		played = true
+	end
+
+	local casterParticle = self:GetSupporterItemParticle(item, "particles/kill_effect/default_caster.vpcf")
+	if casterParticle then
+		local particle = ParticleManager:CreateParticle(casterParticle, PATTACH_ABSORIGIN_FOLLOW, hero)
+		ParticleManager:SetParticleControl(particle, 0, hero:GetAbsOrigin())
+		ParticleManager:ReleaseParticleIndex(particle)
+		played = true
+	end
+	return played
+end
+
+function Battlepass:OnSupporterPassEntityKilled(event)
+	local victim = event.entindex_killed and EntIndexToHScript(event.entindex_killed) or nil
+	local attacker = event.entindex_attacker and EntIndexToHScript(event.entindex_attacker) or nil
+	if victim == nil or attacker == nil or victim:IsNull() or attacker:IsNull() then return end
+	if victim.xhs_supporter_dev_test_target == true then return end
+	if victim.IsIllusion and victim:IsIllusion() then return end
+	if attacker.IsIllusion and attacker:IsIllusion() then return end
+
+	local hero = attacker
+	if not hero:IsRealHero() and attacker.GetOwnerEntity then
+		local owner = attacker:GetOwnerEntity()
+		if owner and owner.IsRealHero and owner:IsRealHero() then
+			hero = owner
+		end
+	end
+	if not hero:IsRealHero() then return end
+	if victim.GetTeamNumber and victim:GetTeamNumber() == hero:GetTeamNumber() then return end
+
+	local playerID = hero:GetPlayerOwnerID()
+	if not PlayerResource:IsValidPlayerID(playerID) or not self:AreSupporterRewardsEnabled(playerID) then return end
+	local item = self:GetEquippedSupporterItem(playerID, "kill_effect")
+	if item == nil then return end
+	self:PlaySupporterKillEffect(hero, victim, item)
+end
+
+local SUPPORTER_DEV_TEST_SLOTS = {
+	teleport = true,
+	levelup = true,
+	kill_effect = true,
+	emblem = true,
+	companion = true,
+	effigy = true,
+}
+
+function Battlepass:IsSupporterDevTestAllowed(playerID)
+	return IsInToolsMode()
+		and api ~= nil
+		and api.IsDeveloper ~= nil
+		and api:IsDeveloper(playerID)
+end
+
+function Battlepass:SendSupporterDevTestResult(playerID, requestID, itemID, slot, status, message)
+	if not PlayerResource:IsValidPlayerID(playerID) then return end
+	local player = PlayerResource:GetPlayer(playerID)
+	if player == nil then return end
+	CustomGameEventManager:Send_ServerToPlayer(player, "supporter_pass_dev_test_result", {
+		request_id = tostring(requestID or ""),
+		item_id = tostring(itemID or ""),
+		slot_id = tostring(slot or ""),
+		status = tostring(status or "error"),
+		message = message,
+	})
+end
+
+function Battlepass:ResolveSupporterDevTestItem(itemID, requestedSlot)
+	if itemID == nil or tostring(itemID) == "" then return nil end
+	local expectedSlot = NormalizeSupporterSlot(requestedSlot)
+	local item = nil
+
+	local catalogs = {
+		companion = api and api.companions or {},
+		emblem = api and api.emblems or {},
+		effigy = api and (api.effigies or api.statues) or {},
+	}
+	if catalogs[expectedSlot] ~= nil then
+		for _, cosmetic in pairs(catalogs[expectedSlot]) do
+			if SupporterItemMatches(cosmetic, itemID) then
+				item = CopySupporterItem(cosmetic)
+				item.item_id = item.item_id or item.id or tostring(itemID)
+				item.slot_id = expectedSlot
+				item.type = expectedSlot
+				break
+			end
+		end
+	end
+
+	-- Backend entitlement identifiers can be numeric and collide with legacy
+	-- ItemsGame IDs, so only consult the historical catalog after the requested
+	-- runtime slot catalog has had a chance to resolve the identity.
+	if item == nil and ItemsGame ~= nil and ItemsGame.GetItemKV ~= nil and ItemsGame:GetItemKV(itemID) ~= nil then
+		local itemType = NormalizeSupporterSlot(ItemsGame:GetItemType(itemID))
+		item = {
+			id = tostring(itemID),
+			item_id = tostring(itemID),
+			name = ItemsGame:GetItemName(itemID),
+			type = itemType,
+			item_type = itemType,
+			slot_id = itemType,
+			unit = ItemsGame:GetItemInfo(itemID, "unit", "nope")
+				or ItemsGame:GetItemInfo(itemID, "unit_name", "nope")
+				or ItemsGame:GetItemInfo(itemID, "file", "nope"),
+		}
+	end
+
+	if item == nil and expectedSlot == "companion" then
+		local definitions = LoadKeyValues("scripts/npc/units/companions.txt") or {}
+		if type(definitions[tostring(itemID)]) == "table" then
+			item = { id = tostring(itemID), item_id = tostring(itemID), unit = tostring(itemID), type = expectedSlot, slot_id = expectedSlot }
+		end
+	elseif item == nil and expectedSlot == "effigy" then
+		local definitions = LoadKeyValues("scripts/npc/units/statues.txt") or {}
+		if type(definitions[tostring(itemID)]) == "table" then
+			item = { id = tostring(itemID), item_id = tostring(itemID), unit = tostring(itemID), type = expectedSlot, slot_id = expectedSlot }
+		end
+	end
+
+	if item == nil then return nil end
+	local actualSlot = NormalizeSupporterSlot(item.slot_id or item.item_type or item.type)
+	if expectedSlot ~= actualSlot or SUPPORTER_DEV_TEST_SLOTS[actualSlot] ~= true then return nil end
+	item.slot_id = actualSlot
+	if actualSlot == "companion" or actualSlot == "effigy" then
+		item.unit = item.unit or item.unit_name or item.file or item.item_id
+	elseif actualSlot == "emblem" then
+		item.particle = item.particle or item.file
+	end
+	return item
+end
+
+function Battlepass:CleanupSupporterDevTest(playerID, restoreLoadout)
+	self.SUPPORTER_DEV_TESTS = self.SUPPORTER_DEV_TESTS or {}
+	local state = self.SUPPORTER_DEV_TESTS[playerID]
+	if state ~= nil then
+		state.cancelled = true
+		if state.timer ~= nil and Timers ~= nil then
+			Timers:RemoveTimer(state.timer)
+		end
+		if state.target ~= nil and not state.target:IsNull() then
+			UTIL_Remove(state.target)
+		end
+	end
+	self.SUPPORTER_DEV_TESTS[playerID] = nil
+
+	local hero = PlayerResource:GetSelectedHeroEntity(playerID)
+	self:ClearSupporterOverrides(playerID)
+	if hero ~= nil and not hero:IsNull() then
+		self:ApplySupporterEmblem(hero, nil)
+	end
+	self:DonatorCompanion(playerID, "", true)
+	if self.RemoveDonatorStatue then self:RemoveDonatorStatue(playerID) end
+	if restoreLoadout ~= false then
+		self:ApplySupporterLoadout(playerID, hero)
+	end
+end
+
+function Battlepass:ApplySupporterDevTestItem(playerID, state, hero, reapply)
+	if state == nil or hero == nil or hero:IsNull() then return false, "#xhs_sp_dev_test_error_hero" end
+	local item = state.item
+	local slot = state.slot
+
+	if slot == "emblem" then
+		self:ApplySupporterEmblem(hero, item)
+		return true
+	elseif slot == "companion" then
+		local unitName = tostring(item.unit or "")
+		local definitions = LoadKeyValues("scripts/npc/units/companions.txt") or {}
+		if type(definitions[unitName]) ~= "table" then return false, "#xhs_sp_dev_test_error_item" end
+		self:DonatorCompanion(playerID, unitName, true)
+		return true
+	elseif slot == "effigy" then
+		local unitName = tostring(item.unit or "")
+		local definitions = LoadKeyValues("scripts/npc/units/statues.txt") or {}
+		if type(definitions[unitName]) ~= "table" then return false, "#xhs_sp_dev_test_error_item" end
+		self:DonatorStatue(playerID, unitName, true)
+		return true
+	end
+
+	if reapply == true then return true end
+	if slot == "teleport" or slot == "levelup" then
+		local catalogItemID = self:GetSupporterCatalogItemID(item)
+		local visuals = catalogItemID and ItemsGame:GetItemVisuals(catalogItemID) or nil
+		if type(visuals) ~= "table" then return false, "#xhs_sp_dev_test_error_asset" end
+		self:SetOverrideAssets(hero, nil, visuals)
+	end
+
+	if slot == "teleport" then
+		local respawn = BASE_GOOD
+		if respawn == nil or respawn:IsNull() then
+			respawn = Entities:FindByName(nil, "base_spawn")
+		end
+		if respawn == nil then return false, "#xhs_sp_dev_test_error_respawn" end
+		TeleportHero(hero, respawn:GetAbsOrigin(), 3.0, 1.0)
+		return true
+	elseif slot == "levelup" then
+		local particle = ParticleManager:CreateParticle("particles/generic_hero_status/hero_levelup.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero, hero)
+		ParticleManager:SetParticleControl(particle, 0, hero:GetAbsOrigin())
+		ParticleManager:ReleaseParticleIndex(particle)
+		hero:EmitSound("ui.trophy_levelup")
+		return true
+	elseif slot == "kill_effect" then
+		local target = CreateUnitByName("npc_dota_creep_badguys_melee", hero:GetAbsOrigin() + hero:GetForwardVector() * 220, false, hero, hero, DOTA_TEAM_BADGUYS)
+		if target == nil then return false, "#xhs_sp_dev_test_error_target" end
+		target.xhs_supporter_dev_test_target = true
+		target:AddNewModifier(target, nil, "modifier_invulnerable", {})
+		target:AddNewModifier(target, nil, "modifier_command_restricted", {})
+		state.target = target
+		if not self:PlaySupporterKillEffect(hero, target, item) then
+			UTIL_Remove(target)
+			state.target = nil
+			return false, "#xhs_sp_dev_test_error_asset"
+		end
+		return true
+	end
+	return false, "#xhs_sp_dev_test_error_type"
+end
+
+function Battlepass:ReapplySupporterDevTest(playerID, hero)
+	self.SUPPORTER_DEV_TESTS = self.SUPPORTER_DEV_TESTS or {}
+	local state = self.SUPPORTER_DEV_TESTS[playerID]
+	if state == nil or state.persistent ~= true or not self:IsSupporterDevTestAllowed(playerID) then return end
+	self:ApplySupporterDevTestItem(playerID, state, hero, true)
+end
+
+function Battlepass:SupporterPassDevTestReward(event_source_index, event)
+	event = self:GetSupporterPassEventPayload(event_source_index, event)
+	local playerID = event.PlayerID
+	if playerID == nil then return end
+	local requestID = tostring(event.request_id or "")
+	local itemID = tostring(event.item_id or "")
+	local slot = NormalizeSupporterSlot(event.slot_id)
+
+	if not self:IsSupporterDevTestAllowed(playerID) then
+		self:SendSupporterDevTestResult(playerID, requestID, itemID, slot, "error", "#xhs_sp_dev_test_error_forbidden")
+		return
+	end
+	if tostring(event.action or "") ~= "test" then
+		self:SendSupporterDevTestResult(playerID, requestID, itemID, slot, "error", "#xhs_sp_dev_test_error_item")
+		return
+	end
+	self.SUPPORTER_DEV_TEST_LAST_REQUEST = self.SUPPORTER_DEV_TEST_LAST_REQUEST or {}
+	local now = GameRules:GetGameTime()
+	if now - (self.SUPPORTER_DEV_TEST_LAST_REQUEST[playerID] or -10) < 0.35 then
+		self:SendSupporterDevTestResult(playerID, requestID, itemID, slot, "error", "#xhs_sp_dev_test_error_rate")
+		return
+	end
+	self.SUPPORTER_DEV_TEST_LAST_REQUEST[playerID] = now
+
+	self.SUPPORTER_DEV_TESTS = self.SUPPORTER_DEV_TESTS or {}
+	local previous = self.SUPPORTER_DEV_TESTS[playerID]
+	if previous ~= nil and previous.transient == true then
+		self:SendSupporterDevTestResult(playerID, requestID, itemID, slot, "error", "#xhs_sp_dev_test_error_busy")
+		return
+	end
+	local item = self:ResolveSupporterDevTestItem(itemID, slot)
+	if item == nil then
+		self:SendSupporterDevTestResult(playerID, requestID, itemID, slot, "error", "#xhs_sp_dev_test_error_item")
+		return
+	end
+	local hero = PlayerResource:GetSelectedHeroEntity(playerID)
+	if hero == nil or hero:IsNull() then
+		self:SendSupporterDevTestResult(playerID, requestID, itemID, slot, "error", "#xhs_sp_dev_test_error_hero")
+		return
+	end
+
+	self:CleanupSupporterDevTest(playerID, true)
+	local persistent = slot == "emblem" or slot == "companion" or slot == "effigy"
+	local state = {
+		item = item,
+		item_id = itemID,
+		slot = slot,
+		request_id = requestID,
+		persistent = persistent,
+		transient = not persistent,
+	}
+	self.SUPPORTER_DEV_TESTS[playerID] = state
+	local success, message = self:ApplySupporterDevTestItem(playerID, state, hero, false)
+	if not success then
+		self:CleanupSupporterDevTest(playerID, true)
+		self:SendSupporterDevTestResult(playerID, requestID, itemID, slot, "error", message)
+		return
+	end
+
+	self:SendSupporterDevTestResult(playerID, requestID, itemID, slot, "active", "#xhs_sp_dev_test_active")
+	if not persistent then
+		local duration = slot == "teleport" and 3.6 or 1.8
+		state.timer = Timers:CreateTimer(duration, function()
+			if self.SUPPORTER_DEV_TESTS[playerID] == state then
+				self:CleanupSupporterDevTest(playerID, true)
+				self:SendSupporterDevTestResult(playerID, requestID, itemID, slot, "success", "#xhs_sp_dev_test_success")
+			end
+			return nil
+		end)
+	end
+end
+
+function Battlepass:SupporterPassDevStopTest(event_source_index, event)
+	event = self:GetSupporterPassEventPayload(event_source_index, event)
+	local playerID = event.PlayerID
+	if playerID == nil then return end
+	local requestID = tostring(event.request_id or "")
+	if not self:IsSupporterDevTestAllowed(playerID) then
+		self:SendSupporterDevTestResult(playerID, requestID, "", "", "error", "#xhs_sp_dev_test_error_forbidden")
+		return
+	end
+	if tostring(event.action or "") ~= "stop" then
+		self:SendSupporterDevTestResult(playerID, requestID, "", "", "error", "#xhs_sp_dev_test_error_item")
+		return
+	end
+	self:CleanupSupporterDevTest(playerID, true)
+	self:SendSupporterDevTestResult(playerID, requestID, "", "", "idle", "#xhs_sp_dev_test_stopped")
+end
+
+function Battlepass:DonatorCompanionJS(event_source_index, event)
+	event = self:GetSupporterPassEventPayload(event_source_index, event)
+	local playerID = event.PlayerID
+	if playerID == nil then return end
+	local unitName = tostring(event.unit or "")
+	if unitName ~= "" then
+		local companions = LoadKeyValues("scripts/npc/units/companions.txt") or {}
+		if type(companions[unitName]) ~= "table" or not api:IsDonator(playerID) then
+			self:SendSupporterPassFailure(playerID, "supporter_pass_equip_failed", "#xhs_sp_error_companion_unavailable", {
+				item_id = unitName,
+			})
+			return
+		end
+	end
+	Battlepass:DonatorCompanion(playerID, unitName, true)
+end
+
+function Battlepass:DonatorStatueJS(event_source_index, event)
+	event = self:GetSupporterPassEventPayload(event_source_index, event)
+	local playerID = event.PlayerID
+	if playerID == nil then return end
+	local unitName = tostring(event.unit or "")
+	local statues = LoadKeyValues("scripts/npc/units/statues.txt") or {}
+	if unitName == "" then
+		if self.RemoveDonatorStatue then self:RemoveDonatorStatue(playerID) end
+		return
+	end
+	if type(statues[unitName]) ~= "table" or not api:IsDonator(playerID) then
+		self:SendSupporterPassFailure(playerID, "supporter_pass_equip_failed", "#xhs_sp_error_effigy_unavailable", {
+			item_id = unitName,
+		})
+		return
+	end
+	Battlepass:DonatorStatue(playerID, unitName, true)
+end
+
+function Battlepass:DonatorEmblemJS(event_source_index, event)
+	event = self:GetSupporterPassEventPayload(event_source_index, event)
+	local playerID = event.PlayerID
+	if playerID == nil then return end
+	local hero = PlayerResource:GetSelectedHeroEntity(playerID)
+	local equipped = self:GetEquippedSupporterItem(playerID, "emblem")
+	local expectedParticle = equipped and self:GetSupporterItemParticle(equipped, "particles/hero_emblem/default.vpcf") or ""
+	if tostring(event.unit or "") ~= tostring(expectedParticle) then return end
+	self:ApplySupporterEmblem(hero, equipped)
+end
+
+function Battlepass:DonatorCompanionSkinJS(event_source_index, event)
+	event = self:GetSupporterPassEventPayload(event_source_index, event)
+	if event.PlayerID == nil then return end
+	DonatorCompanionSkin(event.PlayerID, event.unit, event.skin)
 end
 
 function Battlepass:GetSupporterPassEventPayload(event_source_index, event)
@@ -258,14 +1053,15 @@ function Battlepass:GetSupporterPassEventPayload(event_source_index, event)
 		payload = {}
 	end
 
-	if payload.PlayerID == nil and payload.player_id ~= nil then
-		payload.PlayerID = payload.player_id
-	end
-
-	if payload.PlayerID == nil and api and api.GetEventPlayerID then
-		local playerID = api:GetEventPlayerID(event_source_index, payload)
-		if playerID ~= nil then
-			payload.PlayerID = playerID
+	payload.PlayerID = nil
+	local sourceIndex = tonumber(event_source_index)
+	if sourceIndex ~= nil and sourceIndex > 0 then
+		local ok, sender = pcall(EntIndexToHScript, sourceIndex)
+		if ok and sender ~= nil and sender.GetPlayerID then
+			local playerID = tonumber(sender:GetPlayerID())
+			if playerID ~= nil and PlayerResource:IsValidPlayerID(playerID) then
+				payload.PlayerID = playerID
+			end
 		end
 	end
 
@@ -287,20 +1083,50 @@ function Battlepass:SendSupporterPassFailure(playerID, eventName, message, paylo
 	CustomGameEventManager:Send_ServerToPlayer(player, eventName, payload)
 end
 
+function Battlepass:FindSupporterPassShopItem(itemID)
+	local featured = CustomNetTables:GetTableValue("supporter_pass_shop", "featured") or {}
+	for _, item in ipairs(NormalizeSupporterList(featured.items or featured)) do
+		if SupporterItemMatches(item, itemID) then
+			return item
+		end
+	end
+	return nil
+end
+
+function Battlepass:FindSupporterPassReward(rewardID)
+	local tableNames = { "supporter_pass_rewards_free", "supporter_pass_rewards_premium" }
+	for _, tableName in ipairs(tableNames) do
+		local rewards = CustomNetTables:GetTableValue(tableName, "rewards") or {}
+		for _, reward in ipairs(NormalizeSupporterList(rewards)) do
+			if tostring(reward.reward_id or reward.id or "") == tostring(rewardID) then
+				return reward, tableName == "supporter_pass_rewards_premium"
+			end
+		end
+	end
+	return nil, false
+end
+
 function Battlepass:SupporterPassBuyShopItem(event_source_index, event)
 	event = self:GetSupporterPassEventPayload(event_source_index, event)
 	local playerID = event.PlayerID
 	local ply_table = CustomNetTables:GetTableValue("supporter_pass_player", tostring(playerID))
 
 	if playerID == nil or not ply_table or not api or not api.BuySupporterPassShopItem then
-		self:SendSupporterPassFailure(playerID, "supporter_pass_purchase_failed", "Fragment Shop is unavailable.", {
+		self:SendSupporterPassFailure(playerID, "supporter_pass_purchase_failed", "#xhs_sp_error_shop_unavailable", {
 			item_id = event.item_id,
 		})
 		return
 	end
 
 	if event.item_id == nil or tostring(event.item_id) == "" then
-		self:SendSupporterPassFailure(playerID, "supporter_pass_purchase_failed", "Shop item is invalid.", {})
+		self:SendSupporterPassFailure(playerID, "supporter_pass_purchase_failed", "#xhs_sp_error_shop_item_invalid", {})
+		return
+	end
+
+	if self:FindSupporterPassShopItem(event.item_id) == nil then
+		self:SendSupporterPassFailure(playerID, "supporter_pass_purchase_failed", "#xhs_sp_error_shop_item_inactive", {
+			item_id = event.item_id,
+		})
 		return
 	end
 
@@ -340,14 +1166,29 @@ function Battlepass:SupporterPassClaimReward(event_source_index, event)
 	event = self:GetSupporterPassEventPayload(event_source_index, event)
 	local playerID = event.PlayerID
 	if playerID == nil or not api or not api.ClaimSupporterPassReward then
-		self:SendSupporterPassFailure(playerID, "supporter_pass_claim_failed", "Reward backend is unavailable.", {
+		self:SendSupporterPassFailure(playerID, "supporter_pass_claim_failed", "#xhs_sp_error_reward_backend_unavailable", {
 			reward_id = event.reward_id,
 		})
 		return
 	end
 
 	if event.reward_id == nil or tostring(event.reward_id) == "" then
-		self:SendSupporterPassFailure(playerID, "supporter_pass_claim_failed", "Reward is invalid.", {})
+		self:SendSupporterPassFailure(playerID, "supporter_pass_claim_failed", "#xhs_sp_error_reward_invalid", {})
+		return
+	end
+
+	local reward, premiumTrack = self:FindSupporterPassReward(event.reward_id)
+	local playerTable = CustomNetTables:GetTableValue("supporter_pass_player", tostring(playerID)) or {}
+	local rewardClaimable = reward and reward.legacy ~= true and reward.legacy ~= 1 and reward.legacy ~= "1"
+		and reward.claimable ~= false and reward.claimable ~= 0 and reward.claimable ~= "0"
+	local requiredLevel = reward and tonumber(reward.level_required or reward.level) or math.huge
+	local currentLevel = tonumber(playerTable.season_level or playerTable.Lvl) or 1
+	local tierID = tonumber(playerTable.tier_id) or 0
+	local requiredTier = RequiredSupporterTier(reward, premiumTrack and 1 or 0)
+	if reward == nil or not rewardClaimable or currentLevel < requiredLevel or tierID < requiredTier then
+		self:SendSupporterPassFailure(playerID, "supporter_pass_claim_failed", "#xhs_sp_error_reward_not_claimable", {
+			reward_id = event.reward_id,
+		})
 		return
 	end
 
@@ -373,21 +1214,62 @@ end
 function Battlepass:SupporterPassEquipItem(event_source_index, event)
 	event = self:GetSupporterPassEventPayload(event_source_index, event)
 	local playerID = event.PlayerID
-	if playerID == nil or not api or not api.EquipSupporterPassItem then
-		self:SendSupporterPassFailure(playerID, "supporter_pass_equip_failed", "Armory backend is unavailable.", {
+	if playerID == nil then return end
+
+	if event.item_id == nil or tostring(event.item_id) == "" then
+		self:SendSupporterPassFailure(playerID, "supporter_pass_equip_failed", "#xhs_sp_error_armory_item_invalid", {})
+		return
+	end
+
+	local item = self:ResolveSupporterItem(playerID, event.item_id, event.slot_id)
+	if item == nil then
+		self:SendSupporterPassFailure(playerID, "supporter_pass_equip_failed", "#xhs_sp_error_armory_item_not_owned", {
 			item_id = event.item_id,
 		})
 		return
 	end
 
-	if event.item_id == nil or tostring(event.item_id) == "" then
-		self:SendSupporterPassFailure(playerID, "supporter_pass_equip_failed", "Armory item is invalid.", {})
+	local requestedSlot = NormalizeSupporterSlot(event.slot_id)
+	local itemSlot = NormalizeSupporterSlot(item.slot_id or item.item_type or item.type)
+	local currentTier = SupporterPass and SupporterPass:GetTierForPlayer(playerID) or 0
+	local requiredTier = RequiredSupporterTier(item, 0)
+	if currentTier < requiredTier then
+		self:SendSupporterPassFailure(playerID, "supporter_pass_equip_failed", "#xhs_sp_error_armory_tier_insufficient", {
+			item_id = event.item_id,
+		})
+		return
+	end
+	if requestedSlot ~= "default" and requestedSlot ~= "global" and itemSlot ~= "default" and requestedSlot ~= itemSlot then
+		self:SendSupporterPassFailure(playerID, "supporter_pass_equip_failed", "#xhs_sp_error_armory_slot_mismatch", {
+			item_id = event.item_id,
+		})
 		return
 	end
 
-	api:EquipSupporterPassItem(playerID, event.item_id, event.hero, event.slot_id, function(success, data)
+	if not api or not api.EquipSupporterPassItem then
+		if item.legacy and self:SetLocalSupporterLoadoutItem(playerID, item) then
+			local player = PlayerResource:GetPlayer(playerID)
+			if player then
+				CustomGameEventManager:Send_ServerToPlayer(player, "supporter_pass_equip_success", {
+					item_id = event.item_id,
+					local_only = true,
+				})
+			end
+			return
+		end
+		self:SendSupporterPassFailure(playerID, "supporter_pass_equip_failed", "#xhs_sp_error_armory_backend_unavailable", {
+			item_id = event.item_id,
+		})
+		return
+	end
+
+	api:EquipSupporterPassItem(playerID, event.item_id, event.hero, itemSlot, function(success, data)
 		local player = PlayerResource:GetPlayer(playerID)
 		if not player then return end
+		if not success and item.legacy and Battlepass:SetLocalSupporterLoadoutItem(playerID, item) then
+			success = true
+			data = { local_only = true }
+		end
 		if success then
 			if SupporterPass and SupporterPass.PublishPlayer then
 				SupporterPass:PublishPlayer(playerID)
@@ -395,10 +1277,12 @@ function Battlepass:SupporterPassEquipItem(event_source_index, event)
 			if api and api.PublishSupporterPassArmory then
 				api:PublishSupporterPassArmory(playerID, data and data.armory or nil)
 			end
+			Battlepass:ApplySupporterLoadout(playerID)
 		end
 		CustomGameEventManager:Send_ServerToPlayer(player, success and "supporter_pass_equip_success" or "supporter_pass_equip_failed", {
 			item_id = event.item_id,
 			message = data and data.message or nil,
+			local_only = data and data.local_only or false,
 		})
 	end)
 end
@@ -444,9 +1328,12 @@ function Battlepass:SupporterPassUpdateSettings(event_source_index, event)
 
 			if not success then
 				CustomNetTables:SetTableValue("supporter_pass_player", tostring(playerID), previous_table)
+				local hero = PlayerResource:GetSelectedHeroEntity(playerID)
+				Battlepass:ApplySupporterTag(hero, previous_table.toggle_tag == true or previous_table.toggle_tag == 1)
+				Battlepass:ApplySupporterLoadout(playerID, hero)
 				if player then
 					CustomGameEventManager:Send_ServerToPlayer(player, "supporter_pass_settings_failed", {
-						message = data and data.message or "Settings save failed.",
+						message = data and data.message or "#xhs_sp_settings_failed",
 					})
 				end
 				return
@@ -458,11 +1345,10 @@ function Battlepass:SupporterPassUpdateSettings(event_source_index, event)
 
 			local hero = PlayerResource:GetSelectedHeroEntity(playerID)
 			if settings.toggle_tag ~= nil and hero ~= nil and not hero:IsNull() then
-				if settings.toggle_tag then
-					-- hero:SetupHealthBarLabel()
-				else
-					-- hero:RemoveHealthBarLabel()
-				end
+				Battlepass:ApplySupporterTag(hero, settings.toggle_tag)
+			end
+			if settings.pass_rewards ~= nil then
+				Battlepass:ApplySupporterLoadout(playerID, hero)
 			end
 
 			if player then
@@ -472,11 +1358,10 @@ function Battlepass:SupporterPassUpdateSettings(event_source_index, event)
 	else
 		local hero = PlayerResource:GetSelectedHeroEntity(playerID)
 		if settings.toggle_tag ~= nil and hero ~= nil and not hero:IsNull() then
-			if settings.toggle_tag then
-				-- hero:SetupHealthBarLabel()
-			else
-				-- hero:RemoveHealthBarLabel()
-			end
+			Battlepass:ApplySupporterTag(hero, settings.toggle_tag)
+		end
+		if settings.pass_rewards ~= nil then
+			Battlepass:ApplySupporterLoadout(playerID, hero)
 		end
 
 		local player = PlayerResource:GetPlayer(playerID)
@@ -487,7 +1372,11 @@ function Battlepass:SupporterPassUpdateSettings(event_source_index, event)
 end
 
 function Battlepass:SetOverrideAssets(hero, modifier, table_name)
+	if hero == nil or hero:IsNull() or type(table_name) ~= "table" then return end
 	local asset_style = 0
+	local playerID = hero:GetPlayerID()
+	self.SUPPORTER_OVERRIDE_ASSETS = self.SUPPORTER_OVERRIDE_ASSETS or {}
+	self.SUPPORTER_OVERRIDE_ASSETS[playerID] = self.SUPPORTER_OVERRIDE_ASSETS[playerID] or {}
 
 	if modifier and hero:HasModifier(modifier) and hero:FindModifierByName(modifier):GetStackCount() then
 		asset_style = hero:FindModifierByName(modifier):GetStackCount()
@@ -507,18 +1396,21 @@ function Battlepass:SetOverrideAssets(hero, modifier, table_name)
 						particle_table.modifier = j.modifier
 						particle_table.parent = hero
 
-						CustomNetTables:SetTableValue("supporter_pass_player", j.asset .. '_' .. hero:GetPlayerID(), { j.modifier })
+						CustomNetTables:SetTableValue("supporter_pass_player", j.asset .. '_' .. playerID, { j.modifier })
+						self.SUPPORTER_OVERRIDE_ASSETS[playerID][j.asset] = true
 					end
 				end
 			elseif j.type == "sound" then
 				if j.style == nil or j.style == asset_style then
 					--					print("Sound:", j)
-					CustomNetTables:SetTableValue("supporter_pass_player", j.asset .. '_' .. hero:GetPlayerID(), { j.modifier })
+					CustomNetTables:SetTableValue("supporter_pass_player", j.asset .. '_' .. playerID, { j.modifier })
+					self.SUPPORTER_OVERRIDE_ASSETS[playerID][j.asset] = true
 				end
 			elseif j.type == "ability_icon" then
 				if j.style == nil or j.style == asset_style then
 					--					print("ability icon:", j)
-					CustomNetTables:SetTableValue("supporter_pass_player", j.asset .. '_' .. hero:GetPlayerID(), { j.modifier })
+					CustomNetTables:SetTableValue("supporter_pass_player", j.asset .. '_' .. playerID, { j.modifier })
+					self.SUPPORTER_OVERRIDE_ASSETS[playerID][j.asset] = true
 				end
 			elseif j.type == "icon_replacement_hero" then
 				if j.style == nil or j.style == asset_style then
@@ -575,11 +1467,9 @@ function Battlepass:GetHeroEffect(hero)
 	end
 
 	if tostring(PlayerResource:GetSteamID(hero:GetPlayerID())) ~= "0" then
-		local armory = api:GetArmory(hero:GetPlayerID())
+		local armory = Battlepass:GetEquippedSupporterItems(hero:GetPlayerID())
 		--		print("Armory:", armory)
 		if not armory or armory and type(armory) ~= "table" then return end
-
-		CustomNetTables:SetTableValue("supporter_pass_armory", "rewards_" .. hero:GetPlayerID(), armory)
 
 		local battlepass_items = {}
 		battlepass_items["blink"] = ""
@@ -593,12 +1483,13 @@ function Battlepass:GetHeroEffect(hero)
 		battlepass_items["shiva"] = ""
 
 		for k, v in pairs(armory) do
+			local catalogItemID = Battlepass:GetSupporterCatalogItemID(v)
 			-- HEROES HANDLE
-			if hero:GetUnitName() == v.hero then
-				for item_id, slot_id in pairs(ItemsGame:GetItemWearables(v.item_id) or {}) do
+			if catalogItemID ~= nil and hero:GetUnitName() == v.hero then
+				for item_id, slot_id in pairs(ItemsGame:GetItemWearables(catalogItemID) or {}) do
 					if type(item_id) == "number" then item_id = tostring(item_id) end
 
-					local modifier = ItemsGame:GetItemModifier(v.item_id)
+					local modifier = ItemsGame:GetItemModifier(catalogItemID)
 					local style = 0
 
 					if modifier then
@@ -629,16 +1520,17 @@ function Battlepass:GetHeroEffect(hero)
 						Battlepass:SetOverrideAssets(hero, modifier, Wearable.items_game["items"][item_id]["visuals"])
 					end
 
-					if hero:GetUnitName() == "npc_dota_hero_crystal_maiden" and v.item_id == "117" then
+					if hero:GetUnitName() == "npc_dota_hero_crystal_maiden" and catalogItemID == "117" then
 						-- timer to let donator companion spawn if any, to then override it with arcana companion
 						Timers:CreateTimer(2.0, function()
 							Battlepass:DonatorCompanion(hero:GetPlayerID(), "npc_donator_companion_crystal_maiden_puppy")
 						end)
 					end
 				end
-			else
-				if v.hero == "levelup" then
-					Battlepass:SetOverrideAssets(hero, nil, ItemsGame:GetItemVisuals(v.item_id))
+			elseif catalogItemID ~= nil then
+				local itemType = ItemsGame:GetItemType(catalogItemID)
+				if itemType == "levelup" or itemType == "teleport" then
+					Battlepass:SetOverrideAssets(hero, nil, ItemsGame:GetItemVisuals(catalogItemID))
 				end
 
 				local item_name = v.hero
@@ -646,12 +1538,12 @@ function Battlepass:GetHeroEffect(hero)
 				-- items rewards only
 				if battlepass_items[item_name] then
 					--					print(v.item_id, item_name)
-					local item_effects = ItemsGame:GetItemVisuals(v.item_id)
+					local item_effects = ItemsGame:GetItemVisuals(catalogItemID)
 
 					--					print(item_effects)
-					Battlepass:SetOverrideAssets(hero, nil, ItemsGame:GetItemVisuals(v.item_id))
+					Battlepass:SetOverrideAssets(hero, nil, ItemsGame:GetItemVisuals(catalogItemID))
 
-					local images = ItemsGame:GetItemImages(v.item_id)
+					local images = ItemsGame:GetItemImages(catalogItemID)
 
 					for k, v in pairs(images) do
 						CustomNetTables:SetTableValue("supporter_pass_player", v.asset .. '_' .. hero:GetPlayerID(), { v.modifier })

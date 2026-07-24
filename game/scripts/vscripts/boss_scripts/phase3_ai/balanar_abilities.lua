@@ -10,6 +10,7 @@ xhs_balanar_rain_of_chaos = xhs_balanar_rain_of_chaos or class({})
 xhs_balanar_vampiric_presence = xhs_balanar_vampiric_presence or class({})
 
 LinkLuaModifier("modifier_xhs_balanar_nightfall", "boss_scripts/phase3_ai/balanar_abilities.lua", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_xhs_balanar_nightfall_vision", "boss_scripts/phase3_ai/balanar_abilities.lua", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_xhs_balanar_dread", "boss_scripts/phase3_ai/balanar_abilities.lua", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_xhs_balanar_nightmare", "boss_scripts/phase3_ai/balanar_abilities.lua", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_xhs_balanar_vampiric_presence", "boss_scripts/phase3_ai/balanar_abilities.lua", LUA_MODIFIER_MOTION_NONE)
@@ -18,6 +19,8 @@ LinkLuaModifier("modifier_balanar_rain_of_chaos_dummy", "abilities/heroes/npc_he
 
 modifier_xhs_balanar_nightfall = modifier_xhs_balanar_nightfall or class({})
 modifier_xhs_balanar_nightfall.XHS_LINK_CLIENT = true
+modifier_xhs_balanar_nightfall_vision = modifier_xhs_balanar_nightfall_vision or class({})
+modifier_xhs_balanar_nightfall_vision.XHS_LINK_CLIENT = true
 modifier_xhs_balanar_dread = modifier_xhs_balanar_dread or class({})
 modifier_xhs_balanar_dread.XHS_LINK_CLIENT = true
 modifier_xhs_balanar_nightmare = modifier_xhs_balanar_nightmare or class({})
@@ -101,35 +104,7 @@ local function DamageEnemies(caster, ability, position, radius, damage, damageTy
 				attacker = caster,
 				ability = ability,
 				damage = damage,
-				damage_type = damageType or DAMAGE_TYPE_MAGICAL,
-			})
-		end
-	end
-end
-
-local function DamageLine(caster, ability, startPosition, direction, length, width, damage)
-	if not IsValidAlive(caster) then return end
-
-	direction = NormalizeDirection(direction)
-	local enemies = FindUnitsInLine(
-		caster:GetTeamNumber(),
-		startPosition,
-		startPosition + direction * length,
-		nil,
-		width,
-		DOTA_UNIT_TARGET_TEAM_ENEMY,
-		DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC,
-		DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES
-	)
-
-	for _, enemy in pairs(enemies) do
-		if IsValidAlive(enemy) and not enemy:IsInvulnerable() then
-			ApplyDamage({
-				victim = enemy,
-				attacker = caster,
-				ability = ability,
-				damage = damage,
-				damage_type = DAMAGE_TYPE_PURE,
+				damage_type = damageType or ability:GetAbilityDamageType(),
 			})
 		end
 	end
@@ -153,16 +128,6 @@ local function CreateOverheadCast(caster, particleName)
 	ParticleManager:ReleaseParticleIndex(particle)
 end
 
-local function CreateCarrionSwarmLine(startPosition, direction, length, spacing)
-	direction = NormalizeDirection(direction)
-	local endPosition = startPosition + direction * length
-	local particle = ParticleManager:CreateParticle(CARRION_SWARM_PARTICLE, PATTACH_WORLDORIGIN, nil)
-	ParticleManager:SetParticleControl(particle, 0, startPosition)
-	ParticleManager:SetParticleControl(particle, 1, endPosition)
-	ParticleManager:SetParticleControlForward(particle, 0, direction)
-	ParticleManager:ReleaseParticleIndex(particle)
-end
-
 local function CreateDarkmoonPrecast(position, radius, duration)
 	local particle = ParticleManager:CreateParticle(DARKMOON_AOE_PARTICLE, PATTACH_WORLDORIGIN, nil)
 	ParticleManager:SetParticleControl(particle, 0, position)
@@ -173,6 +138,12 @@ local function CreateDarkmoonPrecast(position, radius, duration)
 		ParticleManager:ReleaseParticleIndex(particle)
 		return nil
 	end)
+end
+
+local function CreateNightfallScreenEffects(duration)
+	CustomGameEventManager:Send_ServerToAllClients("xhs_nightfall_vignette", {
+		duration = math.max(0.1, duration or 1.0),
+	})
 end
 
 local function EmitLocationSound(caster, position, soundName)
@@ -188,8 +159,9 @@ function xhs_balanar_nightfall:OnAbilityPhaseStart()
 	local radius = self:GetSpecialValueFor("radius")
 	StartBossCastBar(self, "Nightfall")
 	XHSBossTelegraphs:Circle(caster:GetAbsOrigin(), radius, self:GetCastPoint(), BALANAR_COLORS)
+	CreateDarkmoonPrecast(caster:GetAbsOrigin(), radius, self:GetCastPoint())
 	StartAnimation(caster, { duration = self:GetCastPoint() + 0.25, activity = ACT_DOTA_CAST_ABILITY_4, rate = 0.8 })
-	caster:EmitSound("Hero_Nightstalker.Darkness")
+	caster:EmitSound("Hero_Nightstalker.Void")
 	return true
 end
 
@@ -202,9 +174,33 @@ function xhs_balanar_nightfall:OnSpellStart()
 
 	local caster = self:GetCaster()
 	local radius = self:GetSpecialValueFor("radius")
-	DamageEnemies(caster, self, caster:GetAbsOrigin(), radius, ScaleDamage(self:GetSpecialValueFor("damage")), DAMAGE_TYPE_MAGICAL)
-	caster:AddNewModifier(caster, self, "modifier_xhs_balanar_nightfall", { duration = self:GetSpecialValueFor("duration") })
+	local duration = self:GetSpecialValueFor("duration")
+	local visionReduction = self:GetSpecialValueFor("vision_reduction")
+	GameRules:SetTimeOfDay(0)
+	DamageEnemies(caster, self, caster:GetAbsOrigin(), radius, ScaleDamage(self:GetSpecialValueFor("damage")), self:GetAbilityDamageType())
+	caster:AddNewModifier(caster, self, "modifier_xhs_balanar_nightfall", { duration = duration })
+	local radiantUnits = FindUnitsInRadius(
+		DOTA_TEAM_GOODGUYS,
+		caster:GetAbsOrigin(),
+		nil,
+		FIND_UNITS_EVERYWHERE,
+		DOTA_UNIT_TARGET_TEAM_FRIENDLY,
+		DOTA_UNIT_TARGET_ALL,
+		DOTA_UNIT_TARGET_FLAG_INVULNERABLE,
+		FIND_ANY_ORDER,
+		false
+	)
+	for _, unit in pairs(radiantUnits) do
+		if unit ~= nil and not unit:IsNull() then
+			unit:AddNewModifier(caster, self, "modifier_xhs_balanar_nightfall_vision", {
+				duration = duration,
+				vision_reduction = visionReduction,
+			})
+		end
+	end
 	CreateRadialImpact(caster:GetAbsOrigin(), radius, NIGHTFALL_PARTICLE)
+	CreateNightfallScreenEffects(duration)
+	caster:EmitSound("Hero_Nightstalker.Darkness")
 	ClearContext(self)
 end
 
@@ -227,7 +223,7 @@ function xhs_balanar_dread_howl:OnSpellStart()
 
 	local caster = self:GetCaster()
 	local radius = self:GetSpecialValueFor("radius")
-	DamageEnemies(caster, self, caster:GetAbsOrigin(), radius, ScaleDamage(self:GetSpecialValueFor("damage")), DAMAGE_TYPE_MAGICAL)
+	DamageEnemies(caster, self, caster:GetAbsOrigin(), radius, ScaleDamage(self:GetSpecialValueFor("damage")), self:GetAbilityDamageType())
 
 	local enemies = FindUnitsInRadius(caster:GetTeamNumber(), caster:GetAbsOrigin(), nil, radius, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, FIND_ANY_ORDER, false)
 	for _, enemy in pairs(enemies) do
@@ -262,7 +258,7 @@ function xhs_balanar_sleeping_terror:OnSpellStart()
 	local context = GetContext(self)
 	local position = context.position or caster:GetAbsOrigin()
 	local radius = self:GetSpecialValueFor("radius")
-	DamageEnemies(caster, self, position, radius, ScaleDamage(self:GetSpecialValueFor("damage")), DAMAGE_TYPE_MAGICAL)
+	DamageEnemies(caster, self, position, radius, ScaleDamage(self:GetSpecialValueFor("damage")), self:GetAbilityDamageType())
 
 	local enemies = FindUnitsInRadius(caster:GetTeamNumber(), position, nil, radius, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, FIND_ANY_ORDER, false)
 	for _, enemy in pairs(enemies) do
@@ -302,10 +298,47 @@ function xhs_balanar_carrion_swarm:OnSpellStart()
 	local context = GetContext(self)
 	local direction = NormalizeDirection(context.direction or caster:GetForwardVector())
 	local length = self:GetSpecialValueFor("length")
-	DamageLine(caster, self, caster:GetAbsOrigin(), direction, length, self:GetSpecialValueFor("width"), ScaleDamage(self:GetSpecialValueFor("damage")))
-	CreateCarrionSwarmLine(caster:GetAbsOrigin(), direction, length, 260)
-	EmitLocationSound(caster, caster:GetAbsOrigin() + direction * (length * 0.5), "Hero_DeathProphet.CarrionSwarm")
+	local endRadius = self:GetSpecialValueFor("width")
+	local startRadius = math.max(1, endRadius * (160 / 300))
+	local speed = math.max(1, self:GetSpecialValueFor("projectile_speed"))
+
+	ProjectileManager:CreateLinearProjectile({
+		Ability = self,
+		EffectName = CARRION_SWARM_PARTICLE,
+		vSpawnOrigin = caster:GetAbsOrigin(),
+		fDistance = length,
+		fStartRadius = startRadius,
+		fEndRadius = endRadius,
+		Source = caster,
+		bHasFrontalCone = true,
+		bReplaceExisting = false,
+		iUnitTargetTeam = DOTA_UNIT_TARGET_TEAM_ENEMY,
+		iUnitTargetFlags = DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES,
+		iUnitTargetType = DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC,
+		fExpireTime = GameRules:GetGameTime() + (length / speed) + 1.0,
+		bDeleteOnHit = false,
+		vVelocity = direction * speed,
+		bProvidesVision = false,
+		ExtraData = {
+			damage = ScaleDamage(self:GetSpecialValueFor("damage")),
+		},
+	})
+	caster:EmitSound("Hero_DeathProphet.CarrionSwarm")
 	ClearContext(self)
+end
+
+function xhs_balanar_carrion_swarm:OnProjectileHit_ExtraData(target, location, extraData)
+	if not IsServer() or not IsValidAlive(target) or target:IsInvulnerable() then return false end
+
+	local dealt = ApplyDamage({
+		victim = target,
+		attacker = self:GetCaster(),
+		ability = self,
+		damage = tonumber(extraData.damage) or 0,
+		damage_type = self:GetAbilityDamageType(),
+	})
+	SendOverheadEventMessage(nil, OVERHEAD_ALERT_DAMAGE, target, dealt, nil)
+	return false
 end
 
 function xhs_balanar_rain_of_chaos:OnAbilityPhaseStart()
@@ -356,6 +389,21 @@ function modifier_xhs_balanar_nightfall:GetModifierBaseDamageOutgoing_Percentage
 end
 function modifier_xhs_balanar_nightfall:GetModifierAttackSpeedBonus_Constant()
 	return self:GetAbility() and self:GetAbility():GetSpecialValueFor("bonus_attack_speed") or 0
+end
+
+function modifier_xhs_balanar_nightfall_vision:IsHidden() return true end
+function modifier_xhs_balanar_nightfall_vision:IsPurgable() return false end
+function modifier_xhs_balanar_nightfall_vision:DeclareFunctions()
+	return {
+		MODIFIER_PROPERTY_BONUS_DAY_VISION,
+		MODIFIER_PROPERTY_BONUS_NIGHT_VISION,
+	}
+end
+function modifier_xhs_balanar_nightfall_vision:GetBonusDayVision()
+	return -(self:GetAbility() and self:GetAbility():GetSpecialValueFor("vision_reduction") or self:GetStackCount() or 0)
+end
+function modifier_xhs_balanar_nightfall_vision:GetBonusNightVision()
+	return -(self:GetAbility() and self:GetAbility():GetSpecialValueFor("vision_reduction") or self:GetStackCount() or 0)
 end
 
 function modifier_xhs_balanar_dread:IsPurgable() return true end

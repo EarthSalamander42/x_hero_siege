@@ -145,12 +145,17 @@ function EndMagtheridonArena()
 
 	Notifications:TopToAll({ text = "Magtheridon has been killed! Door opened.", style = { color = "white" }, duration = 10.0 })
 
-	DoEntFire("door_magtheridon", "SetAnimation", "gate_02_open", 0, nil, nil)
-
-	local DoorObs = Entities:FindAllByName("obstruction_magtheridon")
-	for _, obs in pairs(DoorObs) do
-		obs:SetEnabled(false, true)
-	end
+	XHSOpenDoorsWithCinematic(
+		{ "door_magtheridon" },
+		{ "obstruction_magtheridon" },
+		"gate_02_open",
+		nil,
+		{
+			move_duration = 1.35,
+			hold_duration = 1.25,
+			return_duration = 1.0,
+		}
+	)
 
 	Timers:CreateTimer(2.0, function()
 		local grom = CreateUnitByName("npc_dota_hero_grom_hellscream", Entities:FindByName(nil, "spawn_grom_hellscream"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
@@ -417,24 +422,22 @@ function OpenGromGate()
 
 	state.gate_opened = true
 
-	local DoorObs = Entities:FindAllByName("obstruction_grom")
-	for _, obs in pairs(DoorObs) do
-		obs:SetEnabled(false, true)
-	end
-
-	DoEntFire("door_grom", "SetAnimation", "gate_02_open", 0, nil, nil)
-	DoEntFire("door_grom2", "SetAnimation", "gate_02_open", 0, nil, nil)
-
-	local grom = GameMode.GromPhase3Boss
-	if grom ~= nil and IsValidEntity(grom) and not grom:IsNull() then
-		if HideBossBar then
-			HideBossBar(grom)
+	XHSOpenDoorsWithCinematic({ "door_grom", "door_grom2" }, { "obstruction_grom" }, "gate_02_open", function()
+		local grom = GameMode.GromPhase3Boss
+		if grom ~= nil and IsValidEntity(grom) and not grom:IsNull() then
+			if HideBossBar then
+				HideBossBar(grom)
+			end
+			local ai = grom:FindModifierByName("modifier_xhs_grom_phase3_ai")
+			if ai ~= nil then
+				ai.xhs_boss_bar_revealed = false
+			end
 		end
-		local ai = grom:FindModifierByName("modifier_xhs_grom_phase3_ai")
-		if ai ~= nil then
-			ai.xhs_boss_bar_revealed = false
-		end
-	end
+	end, {
+		move_duration = 1.35,
+		hold_duration = 1.25,
+		return_duration = 1.0,
+	})
 end
 
 function DarkProtectors(keys)

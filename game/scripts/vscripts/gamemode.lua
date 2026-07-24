@@ -5,6 +5,7 @@ end
 require('addon_init')
 require('events')
 require('constants') -- in cause?
+require('components/creep_passives/init')
 
 require('libraries/notifications')
 require('libraries/animations')
@@ -364,9 +365,11 @@ function GameMode:OnThink()
 			local Hero = PlayerResource:GetSelectedHeroEntity(nPlayerID)
 
 			if Hero then
-				-- Check for all players death in Phase 3
-				if CustomTimers.game_phase == 3 then
-					if Hero:IsAlive() then
+				-- From phase 3 onward, reincarnating heroes still keep the team alive.
+				if CustomTimers.game_phase >= 3 then
+					local isReincarnating = IsPlayerXHSReincarnating ~= nil
+						and IsPlayerXHSReincarnating(nPlayerID)
+					if Hero:IsAlive() or isReincarnating then
 						IsTeamAlive = true
 					end
 				end
@@ -388,15 +391,25 @@ function GameMode:OnThink()
 		SpecialEvents:ReturnFromSpecialArena()
 	end
 
-	if CustomTimers.game_phase == 3 then
+	if CustomTimers.game_phase >= 3 then
 		if IsTeamAlive == false then
+			if CheckTeamDeath == 0 and Notifications ~= nil then
+				Notifications:TopToAll({
+					text = "#xhs_team_defeat_countdown_started",
+					duration = 5.0,
+					severity = "warning",
+					style = { color = "#ff5a52" },
+				})
+			end
 			CheckTeamDeath = CheckTeamDeath + 1
 		else
 			CheckTeamDeath = 0
 		end
+	else
+		CheckTeamDeath = 0
 	end
 
-	-- after 6 seconds of death for the whole team, end the game
+	-- After ten consecutive checks with nobody alive or reincarnating, end the game.
 	if CheckTeamDeath == 10 then
 		GameRules:SetGameWinner(3)
 	end

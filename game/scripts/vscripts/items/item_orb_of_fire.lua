@@ -4,12 +4,10 @@
 LinkLuaModifier("modifier_orb_of_fire_active", "items/item_orb_of_fire.lua", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_orb_of_fire_passive", "items/item_orb_of_fire.lua", LUA_MODIFIER_MOTION_NONE)
 
+require("items/orb_toggle")
+
 local function StartSpell(caster, ability)
-	if caster:HasModifier("modifier_orb_of_fire_active") then
-		caster:RemoveModifierByName("modifier_orb_of_fire_active")
-	else
-		caster:AddNewModifier(caster, ability, "modifier_orb_of_fire_active", {})
-	end
+	XHSOrbToggle.Toggle(caster, ability, "modifier_orb_of_fire_active")
 end
 
 item_orb_of_fire = class({})
@@ -137,6 +135,13 @@ function modifier_orb_of_fire_active:OnAttackLanded(params)
 				event.target = params.target
 				event.ability = ability
 				Splash(event)
+
+				local cleaveParticle = ParticleManager:CreateParticle(
+					"particles/econ/items/faceless_void/faceless_void_weapon_bfury/faceless_void_weapon_bfury_cleave.vpcf",
+					PATTACH_ABSORIGIN_FOLLOW,
+					params.target
+				)
+				ParticleManager:ReleaseParticleIndex(cleaveParticle)
 			end
 		end
 	end
@@ -156,6 +161,14 @@ function modifier_orb_of_fire_passive:RemoveOnDeath() return false end
 -- allow multiple instances of that modifier
 function modifier_orb_of_fire_passive:GetAttributes()
 	return MODIFIER_ATTRIBUTE_MULTIPLE
+end
+
+function modifier_orb_of_fire_passive:OnCreated()
+	XHSOrbToggle.OnIntrinsicCreated(self, "modifier_orb_of_fire_active")
+end
+
+function modifier_orb_of_fire_passive:OnDestroy()
+	XHSOrbToggle.OnIntrinsicDestroyed(self, "modifier_orb_of_fire_active")
 end
 
 function modifier_orb_of_fire_passive:DeclareFunctions()

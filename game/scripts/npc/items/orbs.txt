@@ -751,8 +751,9 @@
 		"AbilityValues"
 		{
 			"bonus_damage"			"100"
-			"bash_duration"			"1.0"
-			"bash_chance"			"10"
+			"bonus_armor"			"5"
+			"bash_duration"			"0.5"
+			"bash_chance"			"7"
 		}
 	}
 
@@ -795,8 +796,9 @@
 		"AbilityValues"
 		{
 			"bonus_damage"			"300"
-			"bash_duration"			"1.25"
-			"bash_chance"			"12"
+			"bonus_armor"			"15"
+			"bash_duration"			"0.5"
+			"bash_chance"			"7"
 		}
 	}
 
@@ -872,8 +874,9 @@
 		"AbilityValues"
 		{
 			"bonus_damage"			"900"
-			"bash_duration"			"1.5"
-			"bash_chance"			"15"
+			"bonus_armor"			"30"
+			"bash_duration"			"0.5"
+			"bash_chance"			"7"
 		}
 	}
 
@@ -1092,7 +1095,7 @@
 		"AbilityCooldown"				"1.0"
 		"AbilitySharedCooldown"         "orb_of_arcane"
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
-		"ItemShopTags"					"spell_amp;mana_regen"
+		"ItemShopTags"                    "spell_amp;cooldown_reduction"
 		"ItemQuality"					"artifact"
 		"ItemAliases"					"orb of arcane"
 		"ItemPermanent"					"0"
@@ -1116,11 +1119,9 @@
 		"AbilityValues"
 		{
 			"spell_amp"							"35"
-			"mana_regen"						"5"
-			"mana_cost_reduction_pct"			"5"
-			"cooldown_reduction_pct"			"0"
-			"exposure_magic_resist_reduction"	"6"
-			"exposure_duration"					"3.0"
+			"cooldown_reduction_pct"                "5"
+			"exposure_magic_resist_reduction"  "8"
+			"exposure_duration"                    "4.0"
 		}
 	}
 
@@ -1137,7 +1138,7 @@
 		"AbilityCooldown"				"1.0"
 		"AbilitySharedCooldown"         "orb_of_arcane"
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
-		"ItemShopTags"					"spell_amp;mana_regen"
+		"ItemShopTags"                    "spell_amp;cooldown_reduction"
 		"ItemQuality"					"artifact"
 		"ItemAliases"					"mystic gem"
 		"ItemPermanent"					"0"
@@ -1160,12 +1161,10 @@
 
 		"AbilityValues"
 		{
-			"spell_amp"							"35"
-			"mana_regen"						"12"
-			"mana_cost_reduction_pct"			"10"
-			"cooldown_reduction_pct"			"5"
-			"exposure_magic_resist_reduction"	"10"
-			"exposure_duration"					"3.0"
+			"spell_amp"                         "50"
+			"cooldown_reduction_pct"                "12"
+			"exposure_magic_resist_reduction"  "16"
+			"exposure_duration"                    "5.0"
 		}
 	}
 
@@ -1201,7 +1200,7 @@
 		"AbilityCooldown"				"1.0"
 		"AbilitySharedCooldown"         "orb_of_arcane"
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
-		"ItemShopTags"					"spell_amp;mana_regen"
+		"ItemShopTags"                    "spell_amp;cooldown_reduction"
 		"ItemQuality"					"epic"
 		"ItemAliases"					"astral core"
 		"ItemPermanent"					"0"
@@ -1226,12 +1225,10 @@
 
 		"AbilityValues"
 		{
-			"spell_amp"							"35"
-			"mana_regen"						"20"
-			"mana_cost_reduction_pct"			"15"
-			"cooldown_reduction_pct"			"10"
-			"exposure_magic_resist_reduction"	"15"
-			"exposure_duration"					"3.0"
+			"spell_amp"                         "70"
+			"cooldown_reduction_pct"                "20"
+			"exposure_magic_resist_reduction"  "25"
+			"exposure_duration"                    "6.0"
 		}
 	}
 

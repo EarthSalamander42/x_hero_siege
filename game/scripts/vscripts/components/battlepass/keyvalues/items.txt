@@ -891,7 +891,7 @@
 			{
 				"type"			"particle"
 				"asset"			"particles/hero_emblem/default.vpcf"
-				"modifier"		"particles/econ/events/ti10/ti10_emblem_effect.vpcf"
+				"modifier"		"particles/econ/events/ti10/emblem/ti10_emblem_effect.vpcf"
 			}
 		}
 	}

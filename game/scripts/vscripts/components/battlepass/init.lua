@@ -34,6 +34,21 @@ ListenToGameEvent('game_rules_state_change', function(keys)
 	end
 end, nil)
 
+ListenToGameEvent("entity_killed", function(event)
+	if Battlepass and Battlepass.OnSupporterPassEntityKilled then
+		Battlepass:OnSupporterPassEntityKilled(event)
+	end
+end, nil)
+
+ListenToGameEvent("player_disconnect", function(event)
+	local playerID = tonumber(event.PlayerID or event.playerid)
+	if playerID == nil or not Battlepass then return end
+	if Battlepass.CleanupSupporterDevTest then Battlepass:CleanupSupporterDevTest(playerID, false) end
+	if Battlepass.DonatorCompanion then Battlepass:DonatorCompanion(playerID, "", true) end
+	if Battlepass.RemoveDonatorStatue then Battlepass:RemoveDonatorStatue(playerID) end
+	if Battlepass.ClearSupporterOverrides then Battlepass:ClearSupporterOverrides(playerID) end
+end, nil)
+
 ListenToGameEvent('npc_spawned', function(event)
 	local npc = EntIndexToHScript(event.entindex)
 
@@ -73,16 +88,12 @@ ListenToGameEvent('npc_spawned', function(event)
 	if npc:IsIllusion() or string.find(npc:GetUnitName(), "npc_dota_lone_druid_bear") then
 		if ply_table then
 			if ply_table.toggle_tag ~= nil and ply_table.toggle_tag == 1 or ply_table.toggle_tag ~= nil and ply_table.toggle_tag == true then
-				npc:SetupHealthBarLabel()
+				Battlepass:ApplySupporterTag(npc, true)
 			end
 		end
 
 		return
 	elseif npc:IsRealHero() then
-		if ply_table and ply_table.bp_rewards == 1 then
-			Battlepass:AddItemEffects(npc, ply_table)
-		end
-
 		if Battlepass.ENTITY_MODEL_OVERRIDE[unit_name] then
 			npc:SetOriginalModel(Battlepass.ENTITY_MODEL_OVERRIDE[unit_name])
 			npc:SetModel(Battlepass.ENTITY_MODEL_OVERRIDE[unit_name])
@@ -93,7 +104,7 @@ ListenToGameEvent('npc_spawned', function(event)
 			-- if api:IsDonator(npc:GetPlayerID()) and PlayerResource:GetConnectionState(npc:GetPlayerID()) ~= 1 or (IsInToolsMode()) then
 			if ply_table then
 				if ply_table.toggle_tag ~= nil and ply_table.toggle_tag == 1 or ply_table.toggle_tag ~= nil and ply_table.toggle_tag == true then
-					npc:SetupHealthBarLabel()
+					Battlepass:ApplySupporterTag(npc, true)
 				end
 			end
 
@@ -105,18 +116,16 @@ ListenToGameEvent('npc_spawned', function(event)
 					npc:AddNewModifier(npc, nil, "modifier_patreon_donator", {})
 				end
 
-				if string.find(GetMapName(), "demo") then return end
-
-				if api:GetDonatorStatus(npc:GetPlayerID()) ~= 6 then
-					Timers:CreateTimer(1.5, function()
-						local companion = api:GetPlayerCompanion(npc:GetPlayerID())
-
-						if companion then
-							Battlepass:DonatorCompanion(npc:GetPlayerID(), companion)
-						end
-					end)
-				end
 			end
 		end
+
+		Timers:CreateTimer(0.1, function()
+			if npc and not npc:IsNull() then
+				Battlepass:ApplySupporterLoadout(npc:GetPlayerID(), npc)
+				if Battlepass.ReapplySupporterDevTest then
+					Battlepass:ReapplySupporterDevTest(npc:GetPlayerID(), npc)
+				end
+			end
+		end)
 	end
 end, nil)

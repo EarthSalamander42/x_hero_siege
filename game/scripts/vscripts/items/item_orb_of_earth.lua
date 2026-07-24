@@ -5,16 +5,14 @@ LinkLuaModifier("modifier_orb_of_earth", "items/item_orb_of_earth.lua", LUA_MODI
 LinkLuaModifier("modifier_orb_of_earth_active", "items/item_orb_of_earth.lua", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_orb_of_earth_bash", "items/item_orb_of_earth.lua", LUA_MODIFIER_MOTION_NONE)
 
+require("items/orb_toggle")
+
 item_orb_of_earth = item_orb_of_earth or class({})
 item_orb_of_earth2 = item_orb_of_earth2 or class({})
 item_orb_of_earth3 = item_orb_of_earth3 or class({})
 
 local function ToggleEarthOrb(caster, ability)
-	if caster:HasModifier("modifier_orb_of_earth_active") then
-		caster:RemoveModifierByName("modifier_orb_of_earth_active")
-	else
-		caster:AddNewModifier(caster, ability, "modifier_orb_of_earth_active", {})
-	end
+	XHSOrbToggle.Toggle(caster, ability, "modifier_orb_of_earth_active")
 end
 
 local function GetEarthOrbTexture(caster, active_texture, inactive_texture)
@@ -60,11 +58,16 @@ function modifier_orb_of_earth:GetAttributes() return MODIFIER_ATTRIBUTE_MULTIPL
 function modifier_orb_of_earth:DeclareFunctions()
 	return {
 		MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE,
+		MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS,
 	}
 end
 
 function modifier_orb_of_earth:GetModifierPreAttack_BonusDamage()
 	return self:GetAbility():GetSpecialValueFor("bonus_damage")
+end
+
+function modifier_orb_of_earth:GetModifierPhysicalArmorBonus()
+	return self:GetAbility():GetSpecialValueFor("bonus_armor")
 end
 
 function modifier_orb_of_earth:OnCreated()
@@ -73,6 +76,12 @@ function modifier_orb_of_earth:OnCreated()
 
 		return
 	end
+
+	XHSOrbToggle.OnIntrinsicCreated(self, "modifier_orb_of_earth_active")
+end
+
+function modifier_orb_of_earth:OnDestroy()
+	XHSOrbToggle.OnIntrinsicDestroyed(self, "modifier_orb_of_earth_active")
 end
 
 modifier_orb_of_earth_active = modifier_orb_of_earth_active or class({})
@@ -121,7 +130,7 @@ function modifier_orb_of_earth_active:OnAttackLanded(params)
 				if ability:IsCooldownReady() then
 					if not params.target:IsBuilding() then
 						params.target:AddNewModifier(params.attacker, ability, "modifier_orb_of_earth_bash", {duration = ability:GetSpecialValueFor("bash_duration")})
-						ability:StartCooldown(ability:GetCooldown(ability:GetLevel()))
+						ability:StartCooldown(3.0)
 					end
 				end
 			end

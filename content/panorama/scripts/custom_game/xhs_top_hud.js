@@ -44,7 +44,9 @@ var XHSTopHud = (function () {
 	var overheadUiBlockerRefreshAt = 0;
 	var overheadUiBlockerRootWidth = 0;
 	var overheadUiBlockerRootHeight = 0;
+	var topHudLayerApplied = false;
 	var isSpecialEventPanelVisible = false;
+	var nightfallVignetteToken = 0;
 	var activeCurrentEventTimerName = null;
 	var activePersonalTimerName = null;
 	var currentEventTimerMaxRemaining = {};
@@ -126,6 +128,63 @@ var XHSTopHud = (function () {
 		};
 	}
 
+	function GetHudAncestor(panel) {
+		var current = panel;
+		while (current) {
+			if (current.id === "Hud") {
+				return current;
+			}
+			current = current.GetParent();
+		}
+		return null;
+	}
+
+	function GetHudDirectChild(panel, hud) {
+		var current = panel;
+		var parent = current && current.GetParent ? current.GetParent() : null;
+		while (current && parent && parent !== hud) {
+			current = parent;
+			parent = current.GetParent ? current.GetParent() : null;
+		}
+		return parent === hud ? current : null;
+	}
+
+
+	function EnsureTopHudBelowShop() {
+		if (topHudLayerApplied) {
+			return;
+		}
+
+		if (typeof FindDotaHudElement !== "function") {
+			$.Schedule(0.5, EnsureTopHudBelowShop);
+			return;
+		}
+
+		var host = $.GetContextPanel();
+		var shop = FindDotaHudElement("shop");
+		if (!host || !shop) {
+			$.Schedule(0.5, EnsureTopHudBelowShop);
+			return;
+		}
+
+		var hostHud = GetHudAncestor(host);
+		var shopHud = GetHudAncestor(shop);
+		var hud = hostHud || shopHud;
+		var hostChild = GetHudDirectChild(host, hud);
+		var shopChild = GetHudDirectChild(shop, hud);
+
+		if (!hud || !hostChild || !shopChild || hostChild === shopChild || typeof hud.MoveChildBefore !== "function") {
+			$.Schedule(0.5, EnsureTopHudBelowShop);
+			return;
+		}
+
+		try {
+			hud.MoveChildBefore(hostChild, shopChild);
+			topHudLayerApplied = true;
+		} catch (error) {
+			$.Schedule(0.5, EnsureTopHudBelowShop);
+		}
+	}
 	function SetText(id, value) {
 		var panel = Panel(id);
 		if (panel) {
@@ -590,7 +649,12 @@ var XHSTopHud = (function () {
 	}
 
 	function IsPanelUsableOverheadBlocker(panel) {
-		if (!panel || panel.visible === false) {
+		if (!panel || panel.visible === false || (panel.style && panel.style.visibility === "collapse")) {
+			return false;
+		}
+
+		// Vanilla shop toggles its open state through opacity rather than visibility.
+		if (panel.style && panel.style.opacity !== undefined && panel.style.opacity !== "" && Number(panel.style.opacity) <= 0) {
 			return false;
 		}
 
@@ -633,13 +697,35 @@ var XHSTopHud = (function () {
 		AddOverheadBlockerRect(blockers, rootWidth * 0.24, bottomHudTop, rootWidth * 0.76, rootHeight, 0);
 		AddOverheadBlockerRect(blockers, 0, rootHeight - minimapSize - 14, minimapSize + 22, rootHeight, 0);
 		AddOverheadBlockerRect(blockers, rootWidth - 335, rootHeight - 160, rootWidth, rootHeight, 0);
-		AddOverheadBlockerRect(blockers, 0, 120, Math.min(430, rootWidth * 0.26), rootHeight - minimapSize - 28, 0);
+		var questLogBlocksWorld = SafeValue(function () {
+			return GameUI.CustomUIConfig().xhsQuestLogBlocksWorld;
+		}, true);
+		if (questLogBlocksWorld !== false) {
+			AddOverheadBlockerRect(blockers, 0, 120, Math.min(430, rootWidth * 0.26), rootHeight - minimapSize - 28, 0);
+		}
 
 		AddPanelOverheadBlocker(blockers, "XHSTopHudBar", rootPosition, 8);
 		AddPanelOverheadBlocker(blockers, "XHSFocusTimers", rootPosition, 8);
 		AddPanelOverheadBlocker(blockers, "XHSDifficultyAltPanel", rootPosition, 8);
 		AddPanelOverheadBlocker(blockers, "XHSFragmentQuestIntro", rootPosition, 10);
-
+		// The vanilla shop is outside the custom HUD tree, so register it explicitly.
+		if (typeof FindDotaHudElement === "function") {
+			var shop = FindDotaHudElement("shop");
+			var shopUsable = IsPanelUsableOverheadBlocker(shop);
+			if (shopUsable) {
+				var shopPosition = GetPanelWindowPosition(shop);
+				var shopWidth = Number(shop.actuallayoutwidth || shop.desiredlayoutwidth || 0);
+				var shopHeight = Number(shop.actuallayoutheight || shop.desiredlayoutheight || 0);
+				AddOverheadBlockerRect(
+					blockers,
+					shopPosition.x - rootPosition.x,
+					shopPosition.y - rootPosition.y,
+					shopPosition.x - rootPosition.x + shopWidth,
+					shopPosition.y - rootPosition.y + shopHeight,
+					8
+				);
+			}
+		}
 		if (IsSpecialEventPanelBlockingUi()) {
 			var eventWidth = Math.min(1040, rootWidth * 0.64);
 			var eventHeight = Math.min(620, rootHeight * 0.62);
@@ -2490,10 +2576,32 @@ var XHSTopHud = (function () {
 		$.Schedule(0.03, RefreshAltState);
 	}
 
+	function ShowNightfallVignette(data) {
+		var panel = $("#XHSNightfallVignette");
+		if (!panel) {
+			return;
+		}
+
+		var duration = Math.max(0.1, Number(data && data.duration) || 1.0);
+		nightfallVignetteToken++;
+		var token = nightfallVignetteToken;
+		panel.SetHasClass("XHSNightfallActive", true);
+		$.Schedule(duration, function () {
+			if (token !== nightfallVignetteToken) {
+				return;
+			}
+			var currentPanel = $("#XHSNightfallVignette");
+			if (currentPanel) {
+				currentPanel.SetHasClass("XHSNightfallActive", false);
+			}
+		});
+	}
+
 	function SubscribeTimerEvents() {
 		GameEvents.Subscribe("countdown_timer", CountdownTimer);
 		GameEvents.Subscribe("show_timer_bar", function () {});
 		GameEvents.Subscribe("game_difficulty", SetDifficulty);
+		GameEvents.Subscribe("xhs_nightfall_vignette", ShowNightfallVignette);
 		GameEvents.Subscribe("update_special_event_label_farm", function () {});
 		GameEvents.Subscribe("update_special_event_label_final", function () {});
 		GameEvents.Subscribe("show_current_event_timer", function (data) {
@@ -2563,6 +2671,7 @@ var XHSTopHud = (function () {
 
 	function Initialize() {
 		SubscribeTimerEvents();
+		EnsureTopHudBelowShop();
 		CustomNetTables.SubscribeNetTableListener("vips", RefreshVipRoster);
 		CustomNetTables.SubscribeNetTableListener("supporter_pass_meta", function () {
 			RefreshAllyRoster();

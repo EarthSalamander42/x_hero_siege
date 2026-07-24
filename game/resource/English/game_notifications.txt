@@ -1,1 +1,2 @@
 "xhs_doom_artifact_merged"				"merged 4 ancient artifacts to craft the Doom Artifact!"
+"xhs_team_defeat_countdown_started"		"All heroes have fallen. The defeat countdown has begun!"

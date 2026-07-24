@@ -98,7 +98,7 @@ local function DamageEnemies(caster, ability, position, radius, damage, damageTy
 				attacker = caster,
 				ability = ability,
 				damage = damage,
-				damage_type = damageType or DAMAGE_TYPE_PURE,
+				damage_type = damageType or ability:GetAbilityDamageType(),
 			})
 			if onHit ~= nil then
 				onHit(enemy)
@@ -133,7 +133,7 @@ local function DamageLine(caster, ability, startPosition, direction, length, wid
 				attacker = caster,
 				ability = ability,
 				damage = damage,
-				damage_type = damageType or DAMAGE_TYPE_PURE,
+				damage_type = damageType or ability:GetAbilityDamageType(),
 			})
 		end
 	end
@@ -226,7 +226,11 @@ function xhs_grom_blade_storm:OnSpellStart()
 	local elapsed = 0
 	local nextImpactFx = 0
 
-	StartAnimation(caster, { duration = duration, activity = ACT_DOTA_CAST_ABILITY_1, rate = 1.2 })
+	-- Keep Grom in the actual Blade Fury spin translation for the whole damage window.
+	-- The generic cast activity alone only shows the PFX and leaves the model idle.
+	-- Blade Fury uses an override activity while channeling; the cast activity
+	-- only plays the one-shot cast gesture and leaves Grom visually idle.
+	StartAnimation(caster, { duration = duration, activity = ACT_DOTA_OVERRIDE_ABILITY_1, rate = 1.0, translate = "spin" })
 	local particle = ParticleManager:CreateParticle(BLADE_STORM_PARTICLE, PATTACH_ABSORIGIN_FOLLOW, caster)
 	ParticleManager:SetParticleControlEnt(particle, 0, caster, PATTACH_ABSORIGIN_FOLLOW, "attach_hitloc", caster:GetAbsOrigin(), true)
 	ParticleManager:SetParticleControl(particle, 5, Vector(radius * 1.2, 0, 0))
@@ -248,7 +252,7 @@ function xhs_grom_blade_storm:OnSpellStart()
 		ParticleManager:SetParticleControl(nullParticle, 1, Vector(radius * 1.2, 0, 0))
 		ParticleManager:SetParticleControl(nullParticle, 5, Vector(radius * 1.2, 0, 0))
 		local now = GameRules:GetGameTime()
-		DamageEnemies(caster, self, caster:GetAbsOrigin(), radius, damagePerSecond * tick, DAMAGE_TYPE_PURE, function(enemy)
+		DamageEnemies(caster, self, caster:GetAbsOrigin(), radius, damagePerSecond * tick, self:GetAbilityDamageType(), function(enemy)
 			if now >= nextImpactFx then
 				enemy:EmitSound("Hero_Juggernaut.BladeFury.Impact")
 				local hit = ParticleManager:CreateParticle(BLADE_STORM_HIT_PARTICLE, PATTACH_ABSORIGIN_FOLLOW, enemy)
@@ -266,6 +270,7 @@ function xhs_grom_blade_storm:OnSpellStart()
 		ParticleManager:ReleaseParticleIndex(particle)
 		ParticleManager:DestroyParticle(nullParticle, false)
 		ParticleManager:ReleaseParticleIndex(nullParticle)
+		EndAnimation(caster)
 		caster:StopSound("Hero_Juggernaut.BladeFuryStart")
 		caster:EmitSound("Hero_Juggernaut.BladeFuryStop")
 		return nil
@@ -312,7 +317,7 @@ function xhs_grom_mirror_cleave:OnSpellStart()
 			if not IsValidAlive(caster) then return nil end
 			CreateLineParticle(cleave.start, cleave.direction, length, CLEAVE_PARTICLE, 0.65)
 			caster:EmitSound("Hero_Juggernaut.PreAttack")
-			DamageLine(caster, self, cleave.start, cleave.direction, length, width, damage * (cleave.damage_scale or 1.0), DAMAGE_TYPE_PURE)
+			DamageLine(caster, self, cleave.start, cleave.direction, length, width, damage * (cleave.damage_scale or 1.0), self:GetAbilityDamageType())
 			return nil
 		end)
 	end
@@ -376,7 +381,7 @@ function xhs_grom_windwalk_ambush:OnSpellStart()
 			if not IsValidAlive(caster) then return nil end
 			CreateLineParticle(caster:GetAbsOrigin(), direction, length, CLEAVE_PARTICLE, 0.55)
 			caster:EmitSound("Hero_Juggernaut.PreAttack")
-			DamageLine(caster, self, caster:GetAbsOrigin(), direction, length, width, damage, DAMAGE_TYPE_PURE)
+			DamageLine(caster, self, caster:GetAbsOrigin(), direction, length, width, damage, self:GetAbilityDamageType())
 			return nil
 		end)
 
@@ -454,7 +459,7 @@ function xhs_grom_warsong_leap:OnSpellStart()
 					attacker = caster,
 					ability = self,
 					damage = damage,
-					damage_type = DAMAGE_TYPE_PURE,
+					damage_type = self:GetAbilityDamageType(),
 				})
 				enemy:AddNewModifier(caster, self, "modifier_xhs_grom_slow", { duration = slowDuration })
 			end

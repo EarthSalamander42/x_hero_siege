@@ -15,6 +15,135 @@ local function FirstSupporterValue(...)
 	return nil
 end
 
+local function CopySupporterTable(source)
+	local copy = {}
+	if type(source) ~= "table" then
+		return copy
+	end
+
+	for key, value in pairs(source) do
+		copy[key] = value
+	end
+	return copy
+end
+
+local function RewardIdentity(reward, index, sourceName)
+	if type(reward) ~= "table" then
+		return sourceName .. ":" .. tostring(index)
+	end
+
+	local itemID = reward.item_id or reward.catalog_item_id
+	if itemID ~= nil and tostring(itemID) ~= "" then
+		local itemType = string.lower(tostring(reward.type or reward.item_type or reward.slot_id or "default"))
+		return "item:" .. itemType .. ":" .. tostring(itemID)
+	end
+
+	local rewardID = reward.reward_id or reward.id
+	if rewardID ~= nil and tostring(rewardID) ~= "" then
+		return "reward:" .. tostring(rewardID)
+	end
+
+	return sourceName .. ":" .. tostring(index)
+end
+
+local function IsSupporterRewardRecord(value)
+	return type(value) == "table" and (
+		value.reward_id ~= nil
+		or value.item_id ~= nil
+		or value.catalog_item_id ~= nil
+		or value.item_type ~= nil
+		or value.type ~= nil
+		or (value.id ~= nil and (value.name ~= nil or value.track ~= nil or value.level ~= nil or value.level_required ~= nil))
+	)
+end
+
+local function CollectSupporterRewards(value, forcedTrack, result)
+	result = result or {}
+	if type(value) ~= "table" then return result end
+
+	if IsSupporterRewardRecord(value) then
+		local reward = CopySupporterTable(value)
+		reward.track = reward.track or forcedTrack
+		table.insert(result, reward)
+		return result
+	end
+
+	if value.rewards ~= nil then
+		CollectSupporterRewards(value.rewards, forcedTrack, result)
+	end
+	if value.free ~= nil then
+		CollectSupporterRewards(value.free, "free", result)
+	end
+	if value.premium ~= nil then
+		CollectSupporterRewards(value.premium, "premium", result)
+	end
+
+	local numericKeys = {}
+	for key, nested in pairs(value) do
+		if tonumber(key) ~= nil and type(nested) == "table" then
+			table.insert(numericKeys, tonumber(key))
+		end
+	end
+	table.sort(numericKeys)
+	for _, numericKey in ipairs(numericKeys) do
+		local nested = value[numericKey] or value[tostring(numericKey)]
+		CollectSupporterRewards(nested, forcedTrack, result)
+	end
+
+	if #numericKeys == 0 and value.rewards == nil and value.free == nil and value.premium == nil then
+		for _, nested in pairs(value) do
+			if type(nested) == "table" then
+				CollectSupporterRewards(nested, forcedTrack, result)
+			end
+		end
+	end
+
+	return result
+end
+
+local function MergeRewardTracks(legacyRewards, backendRewards, track)
+	local merged = {}
+	local order = {}
+
+	for index, reward in ipairs(legacyRewards or {}) do
+		local normalized = CopySupporterTable(reward)
+		normalized.track = track
+		normalized.legacy = true
+		normalized.claimable = false
+		local key = RewardIdentity(normalized, index, "legacy")
+		merged[key] = normalized
+		table.insert(order, key)
+	end
+
+	for index, reward in ipairs(CollectSupporterRewards(backendRewards)) do
+		if type(reward) == "table" and (reward.track or "free") == track then
+			local normalized = CopySupporterTable(reward)
+			normalized.track = track
+			normalized.legacy = false
+			local key = RewardIdentity(normalized, index, "backend")
+			if merged[key] == nil then
+				table.insert(order, key)
+			else
+				for field, value in pairs(merged[key]) do
+					if normalized[field] == nil then
+						normalized[field] = value
+					end
+				end
+			end
+			merged[key] = normalized
+		end
+	end
+
+	local rewards = {}
+	for _, key in ipairs(order) do
+		table.insert(rewards, merged[key])
+	end
+	table.sort(rewards, function(a, b)
+		return (tonumber(a.level_required or a.level) or 0) < (tonumber(b.level_required or b.level) or 0)
+	end)
+	return rewards
+end
+
 local function IsEarthwardenSupporterValue(tierName, tierColor, donatorStatus)
 	local status = tonumber(donatorStatus) or 0
 	if status == 8 or status == 9 then
@@ -170,50 +299,13 @@ end
 
 function SupporterPass:PublishFeaturedShop()
 	if api and api.supporter_pass and api.supporter_pass.shop then
-		CustomNetTables:SetTableValue("supporter_pass_shop", "featured", api.supporter_pass.shop)
+		local shop = api.supporter_pass.shop
+		CustomNetTables:SetTableValue("supporter_pass_shop", "featured", shop.featured or shop)
 		return
 	end
 
 	CustomNetTables:SetTableValue("supporter_pass_shop", "featured", {
-		refresh_label = "Weekly featured rotation",
-		items = {
-			{
-				id = "legacy_bp_emblem_sunken",
-				item_id = "21",
-				name = "battlepass_emblem_sunken",
-				type = "Emblem",
-				rarity = "immortal",
-				price = 500,
-				image = "battlepass/emblem_sunken",
-			},
-			{
-				id = "legacy_bp_emblem_aghanim",
-				item_id = "24",
-				name = "battlepass_emblem_aghanim",
-				type = "Emblem",
-				rarity = "immortal",
-				price = 900,
-				image = "battlepass/emblem_aghanim",
-			},
-			{
-				id = "legacy_bp_kill_rubick",
-				item_id = "36",
-				name = "battlepass_kill_effect_rubick",
-				type = "Kill FX",
-				rarity = "uncommon",
-				price = 750,
-				image = "battlepass/kill_effect_rubick",
-			},
-			{
-				id = "legacy_bp_tome_fall2022",
-				item_id = "40",
-				name = "battlepass_levelup8",
-				type = "Tome FX",
-				rarity = "legendary",
-				price = 1200,
-				image = "battlepass/levelup8",
-			},
-		},
+		items = {},
 	})
 end
 
@@ -336,6 +428,7 @@ function SupporterPass:BuildPlayerTable(playerID)
 		supporter_url = FirstSupporterValue(supporterPass.url, supporterPass.supporter_url, player.supporter_url, current.supporter_url, "https://www.patreon.com/bePatron?u=2533325"),
 		purchases = supporterPass.purchases or current.purchases,
 		entitlements = supporterPass.entitlements or current.entitlements,
+		armory = supporterPass.armory or current.armory,
 		loadout = supporterPass.loadout or current.loadout,
 		claimed_rewards = supporterPass.claimed_rewards or current.claimed_rewards,
 	}
@@ -345,6 +438,9 @@ function SupporterPass:PublishPlayer(playerID)
 	local playerTable = self:BuildPlayerTable(playerID)
 	if playerTable then
 		CustomNetTables:SetTableValue("supporter_pass_player", tostring(playerID), playerTable)
+		if api and api.PublishSupporterPassArmory then
+			api:PublishSupporterPassArmory(playerID, playerTable.armory)
+		end
 	end
 end
 
@@ -352,19 +448,11 @@ function SupporterPass:PublishPlayers()
 	self:PublishMeta()
 	self:PublishFeaturedShop()
 
-	if api and api.supporter_pass and api.supporter_pass.rewards then
-		local freeRewards = {}
-		local premiumRewards = {}
-		for _, reward in pairs(api.supporter_pass.rewards) do
-			if reward.track == "premium" then
-				table.insert(premiumRewards, reward)
-			else
-				table.insert(freeRewards, reward)
-			end
-		end
-		CustomNetTables:SetTableValue("supporter_pass_rewards_free", "rewards", freeRewards)
-		CustomNetTables:SetTableValue("supporter_pass_rewards_premium", "rewards", premiumRewards)
-	end
+	local backendRewards = api and api.supporter_pass and api.supporter_pass.rewards or {}
+	local legacyFree = ItemsGame and ItemsGame.battlepass or {}
+	local legacyPremium = ItemsGame and ItemsGame.battlepass2 or {}
+	CustomNetTables:SetTableValue("supporter_pass_rewards_free", "rewards", MergeRewardTracks(legacyFree, backendRewards, "free"))
+	CustomNetTables:SetTableValue("supporter_pass_rewards_premium", "rewards", MergeRewardTracks(legacyPremium, backendRewards, "premium"))
 
 	for playerID = 0, PlayerResource:GetPlayerCount() - 1 do
 		self:PublishPlayer(playerID)

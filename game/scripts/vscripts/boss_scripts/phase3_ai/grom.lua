@@ -32,6 +32,51 @@ local function IsValidAlive(unit)
 	return unit ~= nil and IsValidEntity(unit) and not unit:IsNull() and unit:IsAlive()
 end
 
+local function FindNearestPlayerTarget(unit)
+	if not IsValidAlive(unit) then return nil end
+
+	local targets = FindUnitsInRadius(
+		unit:GetTeamNumber(),
+		unit:GetAbsOrigin(),
+		nil,
+		FIND_UNITS_EVERYWHERE,
+		DOTA_UNIT_TARGET_TEAM_ENEMY,
+		DOTA_UNIT_TARGET_HERO,
+		DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES,
+		FIND_CLOSEST,
+		false
+	)
+	for _, target in pairs(targets or {}) do
+		if IsValidAlive(target) and XHSPhase3BossAI:IsPlayerControlledAttacker(target) then
+			return target
+		end
+	end
+
+	return nil
+end
+
+local function OrderCloneToAttack(clone, fallbackPosition)
+	if not IsValidAlive(clone) then return end
+
+	local target = FindNearestPlayerTarget(clone)
+	if target ~= nil then
+		ExecuteOrderFromTable({
+			UnitIndex = clone:entindex(),
+			OrderType = DOTA_UNIT_ORDER_ATTACK_TARGET,
+			TargetIndex = target:entindex(),
+			Queue = false,
+		})
+		return
+	end
+
+	ExecuteOrderFromTable({
+		UnitIndex = clone:entindex(),
+		OrderType = DOTA_UNIT_ORDER_ATTACK_MOVE,
+		Position = fallbackPosition or clone:GetAbsOrigin(),
+		Queue = false,
+	})
+end
+
 local function GetGromArenaCenter(fallback)
 	local spawner = Entities:FindByName(nil, "spawn_grom_hellscream")
 	if spawner ~= nil then
@@ -108,7 +153,7 @@ local function DamageEnemies(attacker, ability, position, radius, damage)
 				attacker = attacker,
 				ability = ability,
 				damage = XHSPhase3BossAI:ScaleDamage(damage),
-				damage_type = DAMAGE_TYPE_PURE,
+				damage_type = ability:GetAbilityDamageType(),
 			})
 		end
 	end
@@ -232,6 +277,8 @@ function modifier_xhs_grom_phase3_ai:UpdateBossBarMarkers()
 end
 
 function modifier_xhs_grom_phase3_ai:OnIntervalThink()
+	XHSPhase3BossAI:RevealBossBarFromAggro(self)
+
 	if not self:IsBossActive() then
 		self.state = "dead"
 		self:CleanupClones()
@@ -504,11 +551,7 @@ function modifier_xhs_grom_phase3_ai:BeginMirrorTrial(ability)
 					clone:AddNewModifier(clone, nil, "modifier_kill", { duration = duration + 0.5 })
 					self.clones[tostring(clone:entindex())] = clone
 
-					ExecuteOrderFromTable({
-						UnitIndex = clone:entindex(),
-						OrderType = DOTA_UNIT_ORDER_ATTACK_MOVE,
-						Position = self.arena_center,
-					})
+					OrderCloneToAttack(clone, self.arena_center)
 				end
 			end
 		end
@@ -636,7 +679,22 @@ function modifier_xhs_grom_clone:OnCreated(params)
 	parent:SetBaseDamageMin(math.floor(2500 * XHSPhase3BossAI:GetScale().damage))
 	parent:SetBaseDamageMax(math.floor(3200 * XHSPhase3BossAI:GetScale().damage))
 	parent:SetPhysicalArmorBaseValue(80)
+	XHSPhase3BossAI:SetAbilityLevels(parent, GROM_ABILITIES)
 	XHSPhase3BossAI:HideVanillaHealthBar(parent)
+	self:StartIntervalThink(0.75)
+	self:OnIntervalThink()
+end
+
+function modifier_xhs_grom_clone:OnIntervalThink()
+	if not IsServer() then return end
+
+	local parent = self:GetParent()
+	if not IsValidAlive(parent) then
+		self:StartIntervalThink(-1)
+		return
+	end
+
+	OrderCloneToAttack(parent, GetGromArenaCenter(parent:GetAbsOrigin()))
 end
 
 function modifier_xhs_grom_clone:CheckState()
@@ -649,7 +707,9 @@ function modifier_xhs_grom_clone:DeclareFunctions()
 	return {
 		MODIFIER_EVENT_ON_DEATH,
 		MODIFIER_EVENT_ON_ATTACK_LANDED,
-		MODIFIER_PROPERTY_INCOMING_DAMAGE_PERCENTAGE,
+		MODIFIER_PROPERTY_ABSOLUTE_NO_DAMAGE_PHYSICAL,
+		MODIFIER_PROPERTY_ABSOLUTE_NO_DAMAGE_MAGICAL,
+		MODIFIER_PROPERTY_ABSOLUTE_NO_DAMAGE_PURE,
 	}
 end
 
@@ -673,6 +733,6 @@ function modifier_xhs_grom_clone:OnAttackLanded(event)
 	event.target:Kill(nil, event.attacker)
 end
 
-function modifier_xhs_grom_clone:GetModifierIncomingDamage_Percentage()
-	return -100
-end
+function modifier_xhs_grom_clone:GetAbsoluteNoDamagePhysical() return 1 end
+function modifier_xhs_grom_clone:GetAbsoluteNoDamageMagical() return 1 end
+function modifier_xhs_grom_clone:GetAbsoluteNoDamagePure() return 1 end

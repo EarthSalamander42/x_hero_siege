@@ -501,10 +501,10 @@ function CustomTimers:IncrementGamePhase()
 
 	if CustomTimers.game_phase == 2 then
 		return
-	elseif CustomTimers.game_phase == 3 then
-		Notifications:TopToAll({ text = "Phase 3 begins. Respawn disabled!", duration = 5.0, severity = "warning" })
-	else
-		Notifications:TopToAll({ text = "GAME PHASE: Entering phase " .. CustomTimers.game_phase .. " !", duration = 5.0 })
+		-- elseif CustomTimers.game_phase == 3 then
+		-- 	Notifications:TopToAll({ text = "Phase 3 begins. Respawn disabled!", duration = 5.0, severity = "warning" })
+		-- else
+		-- 	Notifications:TopToAll({ text = "GAME PHASE: Entering phase " .. CustomTimers.game_phase .. " !", duration = 5.0 })
 	end
 end
 

@@ -102,7 +102,7 @@ local function DamageEnemies(caster, ability, position, radius, damage, damageTy
 				attacker = caster,
 				ability = ability,
 				damage = damage,
-				damage_type = damageType or DAMAGE_TYPE_MAGICAL,
+				damage_type = damageType or ability:GetAbilityDamageType(),
 			})
 			SendOverheadEventMessage(nil, OVERHEAD_ALERT_DAMAGE, enemy, dealt, nil)
 			if onHit ~= nil then
@@ -134,7 +134,7 @@ local function DamageLine(caster, ability, startPosition, direction, length, wid
 				attacker = caster,
 				ability = ability,
 				damage = damage,
-				damage_type = DAMAGE_TYPE_PURE,
+				damage_type = ability:GetAbilityDamageType(),
 			})
 		end
 	end
@@ -219,12 +219,12 @@ function xhs_proudmoore_admirals_command:OnSpellStart()
 	local caster = self:GetCaster()
 	local context = GetContext(self)
 	caster:AddNewModifier(caster, self, "modifier_xhs_proudmoore_command", { duration = self:GetSpecialValueFor("duration") })
-	DamageEnemies(caster, self, caster:GetAbsOrigin(), self:GetSpecialValueFor("radius"), ScaleDamage(self:GetSpecialValueFor("damage")), DAMAGE_TYPE_MAGICAL)
+	DamageEnemies(caster, self, caster:GetAbsOrigin(), self:GetSpecialValueFor("radius"), ScaleDamage(self:GetSpecialValueFor("damage")), self:GetAbilityDamageType())
 
 	for _, point in pairs(context.points or {}) do
 		Timers:CreateTimer(point.delay or 0, function()
 			if not IsValidAlive(caster) then return nil end
-			DamageEnemies(caster, self, point.position, self:GetSpecialValueFor("strike_radius"), ScaleDamage(self:GetSpecialValueFor("strike_damage")), DAMAGE_TYPE_MAGICAL)
+			DamageEnemies(caster, self, point.position, self:GetSpecialValueFor("strike_radius"), ScaleDamage(self:GetSpecialValueFor("strike_damage")), self:GetAbilityDamageType())
 			CreateGhostshipImpact(point.position)
 			EmitLocationSound(caster, point.position, "Hero_Kunkka.Torrent")
 			return nil
@@ -270,7 +270,7 @@ function xhs_proudmoore_torrent_line:OnSpellStart()
 		local position = caster:GetAbsOrigin() + direction * (startDistance + spacing * (i - 1))
 		CreateTorrentImpact(position, width)
 		EmitLocationSound(caster, position, "Ability.Torrent")
-		DamageEnemies(caster, self, position, width, damage, DAMAGE_TYPE_PURE, function(enemy)
+		DamageEnemies(caster, self, position, width, damage, self:GetAbilityDamageType(), function(enemy)
 			ApplyTorrentControl(caster, self, enemy, position)
 		end)
 	end
@@ -302,7 +302,7 @@ function xhs_proudmoore_broadside:OnSpellStart()
 	for _, point in pairs(GetContext(self).points or {}) do
 		Timers:CreateTimer(point.delay or 0, function()
 			if not IsValidAlive(caster) then return nil end
-			DamageEnemies(caster, self, point.position, self:GetSpecialValueFor("radius"), damage, DAMAGE_TYPE_MAGICAL)
+			DamageEnemies(caster, self, point.position, self:GetSpecialValueFor("radius"), damage, self:GetAbilityDamageType())
 			CreateGhostshipImpact(point.position)
 			EmitLocationSound(caster, point.position, "Hero_Kunkka.Ghostship")
 			return nil
@@ -331,7 +331,7 @@ function xhs_proudmoore_anchor_smash:OnSpellStart()
 
 	local caster = self:GetCaster()
 	local radius = self:GetSpecialValueFor("radius")
-	DamageEnemies(caster, self, caster:GetAbsOrigin(), radius, ScaleDamage(self:GetSpecialValueFor("damage")), DAMAGE_TYPE_PURE, function(enemy)
+	DamageEnemies(caster, self, caster:GetAbsOrigin(), radius, ScaleDamage(self:GetSpecialValueFor("damage")), self:GetAbilityDamageType(), function(enemy)
 		enemy:AddNewModifier(caster, self, "modifier_xhs_proudmoore_anchor_slow", { duration = self:GetSpecialValueFor("slow_duration") })
 	end)
 	CreateAnchorSmash(caster, radius)
@@ -395,7 +395,7 @@ function xhs_proudmoore_focus_fire:OnProjectileHit_ExtraData(target, location, e
 		attacker = self:GetCaster(),
 		ability = self,
 		damage = tonumber(extraData.damage) or 0,
-		damage_type = DAMAGE_TYPE_PURE,
+		damage_type = self:GetAbilityDamageType(),
 	})
 	SendOverheadEventMessage(nil, OVERHEAD_ALERT_DAMAGE, target, dealt, nil)
 	target:EmitSound("Hero_Windrunner.PowershotDamage")

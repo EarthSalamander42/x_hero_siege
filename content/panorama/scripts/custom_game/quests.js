@@ -36,6 +36,10 @@ var XHSQuestLogCollapsed = false;
 var XHSQuestLogTemporaryRevealToken = 0;
 var XHSQuestLogSuppressActivationEffects = false;
 var XHSCollapsedMainQuestPhases = {};
+var XHS_QUEST_STARTED_SOUND = "Dungeon.Stinger03";
+var XHS_QUEST_COMPLETED_SOUND = "Dungeon.Stinger01";
+var XHSQuestStartedSoundPlaying = false;
+var XHSQuestCompletedSoundPlaying = false;
 
 var XHSMainQuestPhases = {
 	xhs_phase_1: 1,
@@ -67,6 +71,11 @@ function RefreshXHSQuestLogCollapsedState() {
 
 	if (button) {
 		button.SetHasClass("QuestLogCollapsed", XHSQuestLogCollapsed);
+	}
+
+	if (typeof GameUI !== "undefined" && GameUI.CustomUIConfig) {
+		var temporarilyVisible = questLog && questLog.BHasClass("QuestLogTemporaryReveal");
+		GameUI.CustomUIConfig().xhsQuestLogBlocksWorld = !XHSQuestLogCollapsed || !!temporarilyVisible;
 	}
 }
 
@@ -115,6 +124,7 @@ function TemporarilyRevealXHSQuestLog(seconds) {
 		if (currentQuestLog) {
 			currentQuestLog.SetHasClass("QuestLogTemporaryReveal", false);
 		}
+		RefreshXHSQuestLogCollapsedState();
 	});
 }
 
@@ -142,8 +152,29 @@ function NotifyXHSQuestBecameActive(panel) {
 		return;
 	}
 
+	if (!XHSQuestStartedSoundPlaying) {
+		XHSQuestStartedSoundPlaying = true;
+		Game.EmitSound(XHS_QUEST_STARTED_SOUND);
+		$.Schedule(0.2, function () {
+			XHSQuestStartedSoundPlaying = false;
+		});
+	}
 	TemporarilyRevealXHSQuestLog(5.0);
 	PulseXHSQuestPanel(panel);
+}
+
+function NotifyXHSQuestCompleted(panel) {
+	if (!panel || XHSQuestLogSuppressActivationEffects) {
+		return;
+	}
+
+	if (!XHSQuestCompletedSoundPlaying) {
+		XHSQuestCompletedSoundPlaying = true;
+		Game.EmitSound(XHS_QUEST_COMPLETED_SOUND);
+		$.Schedule(0.2, function () {
+			XHSQuestCompletedSoundPlaying = false;
+		});
+	}
 }
 
 function ToggleXHSQuestLogBackground() {
@@ -592,6 +623,9 @@ function SetQuestVisualState(panel, state) {
 	if (state === "Active" && previousState !== "" && previousState !== "Active") {
 		NotifyXHSQuestBecameActive(panel);
 	}
+	if (state === "Completed" && previousState !== "" && previousState !== "Completed") {
+		NotifyXHSQuestCompleted(panel);
+	}
 }
 
 function SetStaticQuest(id, text, state) {
@@ -981,6 +1015,7 @@ function OnQuestActivated( data ) {
 		return;
 
 	var QuestPanel = ZoneQuestsContainer.FindChild( szQuestName );
+	var previousState = QuestPanel ? QuestPanel.GetAttributeString("xhs_state", "") : "";
 	if ( QuestPanel === null )
 	{
 		QuestPanel = $.CreatePanel( "Panel", ZoneQuestsContainer, szQuestName );
@@ -1001,7 +1036,7 @@ function OnQuestActivated( data ) {
 	QuestPanel.SetHasClass( "Inactive", false );
 	QuestPanel.SetAttributeString("xhs_state", data["Completed"] < data["CompleteLimit"] ? "Active" : "Completed");
 	ApplyXHSQuestPanelVisibility(QuestPanel);
-	if (data["Completed"] < data["CompleteLimit"]) {
+	if (data["Completed"] < data["CompleteLimit"] && previousState !== "Active") {
 		NotifyXHSQuestBecameActive(QuestPanel);
 	}
 	ReorderXHSQuestPanels(ZonePanel);
@@ -1090,14 +1125,6 @@ function OnQuestCompleted( data )
 
 	if ( data["Completed"] === data["CompleteLimit"] && ( data["Optional"] || data["ZoneCompleted"] ) )
 	{
-		if ( data["ZoneCompleted"] )
-		{
-			Game.EmitSound( "Dungeon.Stinger01" );
-		}
-		else
-		{
-			Game.EmitSound( "Dungeon.Stinger03" );
-		}
 		ShowQuestCompletePopup( data );
 	}
 
@@ -1121,14 +1148,19 @@ function OnQuestCompleted( data )
 	if ( QuestPanel === null )
 		return;
 
+	var previousState = QuestPanel.GetAttributeString("xhs_state", "");
+	var questCompleted = data["Completed"] >= data["CompleteLimit"];
 	QuestPanel.SetDialogVariableInt( "completed", data["Completed"] );
 	QuestPanel.SetDialogVariableInt( "complete_limit", data["CompleteLimit"] );
 	QuestPanel.SetHasClass( "ShowNumbers", data["CompleteLimit"] !== 1 );
-	QuestPanel.SetHasClass( "Completed", data["Completed"] >= data["CompleteLimit"] );
-	QuestPanel.SetHasClass( "Active", data["Completed"] < data["CompleteLimit"] );
+	QuestPanel.SetHasClass( "Completed", questCompleted );
+	QuestPanel.SetHasClass( "Active", !questCompleted );
 	QuestPanel.SetHasClass( "Inactive", false );
-	QuestPanel.SetAttributeString("xhs_state", data["Completed"] >= data["CompleteLimit"] ? "Completed" : "Active");
+	QuestPanel.SetAttributeString("xhs_state", questCompleted ? "Completed" : "Active");
 	ApplyXHSQuestPanelVisibility(QuestPanel);
+	if (questCompleted && previousState !== "Completed") {
+		NotifyXHSQuestCompleted(QuestPanel);
+	}
 
 	QuestPanel.SetDialogVariableInt( "xp_reward", data["XPReward"] );
 	QuestPanel.SetHasClass( "XPReward", data["XPReward"] > 0 );

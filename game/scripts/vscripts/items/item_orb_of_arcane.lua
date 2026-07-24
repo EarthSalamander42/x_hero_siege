@@ -2,16 +2,14 @@ LinkLuaModifier("modifier_orb_of_arcane", "items/item_orb_of_arcane.lua", LUA_MO
 LinkLuaModifier("modifier_orb_of_arcane_active", "items/item_orb_of_arcane.lua", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_orb_of_arcane_exposure", "items/item_orb_of_arcane.lua", LUA_MODIFIER_MOTION_NONE)
 
+require("items/orb_toggle")
+
 item_orb_of_arcane = item_orb_of_arcane or class({})
 item_mystic_gem = item_mystic_gem or class({})
 item_astral_core = item_astral_core or class({})
 
 local function ToggleArcaneOrb(caster, ability)
-	if caster:HasModifier("modifier_orb_of_arcane_active") then
-		caster:RemoveModifierByName("modifier_orb_of_arcane_active")
-	else
-		caster:AddNewModifier(caster, ability, "modifier_orb_of_arcane_active", {})
-	end
+	XHSOrbToggle.Toggle(caster, ability, "modifier_orb_of_arcane_active")
 end
 
 local function GetArcaneOrbTexture(caster, active_texture, inactive_texture)
@@ -77,12 +75,12 @@ function modifier_orb_of_arcane:IsHidden() return true end
 function modifier_orb_of_arcane:IsPurgable() return false end
 function modifier_orb_of_arcane:RemoveOnDeath() return false end
 function modifier_orb_of_arcane:GetAttributes() return MODIFIER_ATTRIBUTE_MULTIPLE end
+function modifier_orb_of_arcane:OnCreated() XHSOrbToggle.OnIntrinsicCreated(self, "modifier_orb_of_arcane_active") end
+function modifier_orb_of_arcane:OnDestroy() XHSOrbToggle.OnIntrinsicDestroyed(self, "modifier_orb_of_arcane_active") end
 
 function modifier_orb_of_arcane:DeclareFunctions()
 	return {
 		MODIFIER_PROPERTY_SPELL_AMPLIFY_PERCENTAGE,
-		MODIFIER_PROPERTY_MANA_REGEN_CONSTANT,
-		MODIFIER_PROPERTY_MANACOST_PERCENTAGE,
 		MODIFIER_PROPERTY_COOLDOWN_PERCENTAGE,
 		MODIFIER_EVENT_ON_TAKEDAMAGE,
 	}
@@ -90,14 +88,6 @@ end
 
 function modifier_orb_of_arcane:GetModifierSpellAmplify_Percentage()
 	return self:GetAbility():GetSpecialValueFor("spell_amp")
-end
-
-function modifier_orb_of_arcane:GetModifierConstantManaRegen()
-	return self:GetAbility():GetSpecialValueFor("mana_regen")
-end
-
-function modifier_orb_of_arcane:GetModifierPercentageManacost()
-	return 0 - self:GetAbility():GetSpecialValueFor("mana_cost_reduction_pct")
 end
 
 function modifier_orb_of_arcane:GetModifierPercentageCooldown()

@@ -149,6 +149,11 @@ ListenToGameEvent('player_disconnect', function(keys)
 --	CloseLane(userid)
 end, nil)
 --]]
+local hidden_innate_abilities = {
+	"necronomicon_warrior_sight",
+	"holdout_blue_effect",
+}
+
 -- An NPC has spawned somewhere in game. This includes heroes
 ListenToGameEvent('npc_spawned', function(keys)
 	local difficulty = GameRules:GetCustomGameDifficulty()
@@ -165,6 +170,35 @@ ListenToGameEvent('npc_spawned', function(keys)
 			local current_ability = npc:FindAbilityByName(innate_abilities[i])
 			if current_ability then
 				current_ability:SetLevel(1)
+			end
+		end
+
+		-- Technical innates must keep functioning without occupying HUD slots.
+		for i = 1, #hidden_innate_abilities do
+			local hidden_ability = npc:FindAbilityByName(hidden_innate_abilities[i])
+			if hidden_ability then
+				hidden_ability:SetHidden(true)
+			end
+		end
+
+		if npc:GetUnitName() == "npc_dota_dungeon_checkpoint" then
+			npc:SetMaterialGroup("1")
+
+			if npc.xhs_outpost_ambient_particle == nil then
+				npc.xhs_outpost_ambient_particle = ParticleManager:CreateParticle(
+					"particles/world_outpost/world_outpost_radiant_ambient.vpcf",
+					PATTACH_ABSORIGIN_FOLLOW,
+					npc
+				)
+				ParticleManager:SetParticleControlEnt(
+					npc.xhs_outpost_ambient_particle,
+					0,
+					npc,
+					PATTACH_ABSORIGIN_FOLLOW,
+					nil,
+					npc:GetAbsOrigin(),
+					true
+				)
 			end
 		end
 
@@ -310,6 +344,10 @@ ListenToGameEvent('npc_spawned', function(keys)
 
 		-- CREATURES NPC
 		if not npc:IsRealHero() and (npc:GetTeamNumber() == DOTA_TEAM_CUSTOM_1 or npc:GetTeamNumber() == DOTA_TEAM_CUSTOM_2 or npc:GetTeamNumber() == DOTA_TEAM_NEUTRALS) then
+			if XHSCreepPassives ~= nil then
+				XHSCreepPassives:Apply(npc, difficulty)
+			end
+
 			if difficulty == 1 then
 				npc:SetMinimumGoldBounty(normal_bounty * 1.5)
 				npc:SetMaximumGoldBounty(normal_bounty * 1.5)
@@ -750,8 +788,10 @@ ListenToGameEvent('dota_player_gained_level', function(keys)
 			for _, ability in pairs(AbilitiesHeroes_XX[hero:GetUnitName()]) do
 				if ability ~= nil then
 					table.insert(notification_segments, { ability = ability[1] })
-					hero:AddAbility(ability[1])
-					hero:UpgradeAbility(hero:FindAbilityByName(ability[1]))
+					local new_ability = hero:AddAbility(ability[1])
+					if new_ability ~= nil then
+						new_ability:SetLevel(new_ability:GetMaxLevel())
+					end
 					local oldab = GetUnitAbilityBySafeIndex(hero, ability[2])
 					if oldab ~= nil and oldab:GetAutoCastState() then
 						oldab:ToggleAutoCast()
@@ -1163,6 +1203,26 @@ end
 -- * damagebits
 ---------------------------------------------------------
 
+local function IsValidXHSTombstoneEntity(entity)
+	return entity ~= nil and IsValidEntity(entity) and not entity:IsNull()
+end
+
+local function RemoveXHSTombstoneForHero(hero)
+	if hero == nil then return end
+
+	local drop = hero.xhs_tombstone_drop
+	local item = hero.xhs_tombstone_item
+	hero.xhs_tombstone_drop = nil
+	hero.xhs_tombstone_item = nil
+
+	if IsValidXHSTombstoneEntity(item) then
+		UTIL_Remove(item)
+	end
+	if IsValidXHSTombstoneEntity(drop) then
+		UTIL_Remove(drop)
+	end
+end
+
 ListenToGameEvent('entity_killed', function(keys)
 	local killedUnit = EntIndexToHScript(keys.entindex_killed)
 	if killedUnit == nil then return end
@@ -1239,13 +1299,38 @@ ListenToGameEvent('entity_killed', function(keys)
 		if CustomTimers.game_phase == 3 then
 			if killedUnit.ankh_respawn == true then
 			else
+				RemoveXHSTombstoneForHero(killedUnit)
+				local deathPosition = killedUnit:GetAbsOrigin()
 				local newItem = CreateItem("item_tombstone", killedUnit, killedUnit)
 				newItem:SetPurchaseTime(0)
 				newItem:SetPurchaser(killedUnit)
+				newItem.xhs_revive_hero_entindex = killedUnit:entindex()
+				newItem.xhs_tombstone_position = Vector(deathPosition.x, deathPosition.y, deathPosition.z)
 				local tombstone = SpawnEntityFromTableSynchronous("dota_item_tombstone_drop", {})
 				tombstone:SetContainedItem(newItem)
 				tombstone:SetAngles(0, RandomFloat(0, 360), 0)
-				FindClearSpaceForUnit(tombstone, killedUnit:GetAbsOrigin(), true)
+				FindClearSpaceForUnit(tombstone, deathPosition, true)
+				newItem.xhs_tombstone_drop_entindex = tombstone:entindex()
+				killedUnit.xhs_tombstone_item = newItem
+				killedUnit.xhs_tombstone_drop = tombstone
+
+				Timers:CreateTimer(0.5, function()
+					if not IsValidXHSTombstoneEntity(killedUnit) then
+						if IsValidXHSTombstoneEntity(tombstone) then UTIL_Remove(tombstone) end
+						if IsValidXHSTombstoneEntity(newItem) then UTIL_Remove(newItem) end
+						return nil
+					end
+					if killedUnit:IsAlive() then
+						RemoveXHSTombstoneForHero(killedUnit)
+						return nil
+					end
+					if not IsValidXHSTombstoneEntity(tombstone) and not IsValidXHSTombstoneEntity(newItem) then
+						killedUnit.xhs_tombstone_drop = nil
+						killedUnit.xhs_tombstone_item = nil
+						return nil
+					end
+					return 0.5
+				end)
 			end
 		end
 
@@ -1278,9 +1363,14 @@ ListenToGameEvent('entity_killed', function(keys)
 			SpecialEvents.BaristolDead = true
 			GrantTomeStatsToHero(killer, 250, "Tome Granted", "+250 all stats")
 		elseif killedUnit:GetUnitName() == "npc_ramero_2" then
-			DropNeutralItemAtPositionForHero("item_ring_of_superiority", killedUnit:GetAbsOrigin(), killer, killer:GetTeam(), true)
+			local rewardHero = GetPlayerHeroFromUnit(killer)
+			if rewardHero ~= nil then
+				SpecialEvents.SogatRewardHero = rewardHero
+				SpecialEvents.SogatRewardPending = true
+			end
 			DOOM_FIRST_TIME = true
 			GameRules:GetGameModeEntity():SetContextThink("Sogat", nil, 0)
+			SpecialEvents:EndSogatEvent(true)
 		elseif killedUnit:GetUnitName() == "npc_dota_hero_secret" then
 			local pos = killedUnit:GetAbsOrigin()
 			DropNeutralItemAtPositionForHero("item_orb_of_frost", pos, killer, killer:GetTeam(), true)
@@ -1358,18 +1448,18 @@ ListenToGameEvent('entity_killed', function(keys)
 						end
 
 						-- reward system based on kills, including kill events
-						if killer:GetKills() == 100 then
+						if killer:GetKills() == 50 then
 							SendXHSRewardNotification(killer:GetPlayerOwnerID(), "gold", 7500, "Kill Reward", "+7,500 gold")
 							PlayerResource:ModifyGold(killer:GetPlayerOwnerID(), 7500, false, DOTA_ModifyGold_Unspecified)
-						elseif killer:GetKills() == 200 then
+						elseif killer:GetKills() == 100 then
 							SendXHSRewardNotification(killer:GetPlayerOwnerID(), "gold", 25000, "Kill Reward", "+25,000 gold")
 							PlayerResource:ModifyGold(killer:GetPlayerOwnerID(), 25000, false, DOTA_ModifyGold_Unspecified)
-						elseif killer:GetKills() == 400 then
+						elseif killer:GetKills() == 200 then
 							SendXHSRewardNotification(killer:GetPlayerOwnerID(), "gold", 50000, "Kill Reward", "+50,000 gold")
 							PlayerResource:ModifyGold(killer:GetPlayerOwnerID(), 50000, false, DOTA_ModifyGold_Unspecified)
-						elseif killer:GetKills() >= 500 and SpecialEvents.Ramero_trigger == 0 and not (XHSDevTools ~= nil and XHSDevTools:IsSandboxActive()) then
+						elseif killer:GetKills() >= 250 and SpecialEvents.Ramero_trigger == 0 and not (XHSDevTools ~= nil and XHSDevTools:IsSandboxActive()) then
 							SpecialEvents:StartRameroAndBaristolEvent(killer)
-						elseif killer:GetKills() >= 750 and SpecialEvents.Ramero_trigger == 1 and not (XHSDevTools ~= nil and XHSDevTools:IsSandboxActive()) then
+						elseif killer:GetKills() >= 400 and SpecialEvents.Ramero_trigger == 1 and not (XHSDevTools ~= nil and XHSDevTools:IsSandboxActive()) then
 							SpecialEvents:StartSogatEvent(killer)
 						end
 					end

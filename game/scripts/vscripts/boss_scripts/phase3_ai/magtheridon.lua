@@ -159,7 +159,7 @@ local function DamageEnemies(attacker, ability, position, radius, damage, damage
 				attacker = attacker,
 				ability = ability,
 				damage = XHSPhase3BossAI:ScaleDamage(damage),
-				damage_type = damageType or DAMAGE_TYPE_PURE,
+				damage_type = damageType or ability:GetAbilityDamageType(),
 			})
 		end
 	end
@@ -826,7 +826,7 @@ function modifier_xhs_magtheridon_phase3_ai:CastFelFissure()
 	local target = XHSPhase3BossAI:PickFarthestHero(self.arena_center, 2500)
 	if ability == nil or target == nil then return nil end
 
-	local count = XHSPhase3BossAI:ScaleDensity(ability:GetSpecialValueFor("impact_count"), 6)
+	local count = math.max(3, ability:GetSpecialValueFor("impact_count"))
 	local spacing = ability:GetSpecialValueFor("spacing")
 	local startDistance = ability:GetSpecialValueFor("start_distance")
 	local stagger = XHSPhase3BossAI:ScaleDelay(ability:GetSpecialValueFor("impact_stagger"))

@@ -252,17 +252,30 @@ end
 
 function XHSPhase3BossAI:ShouldRevealBossBarFromDamageEvent(modifier, event)
 	if modifier == nil or event == nil then return false end
-	if event.unit ~= modifier:GetParent() then return false end
-	if not self:IsPlayerControlledAttacker(event.attacker) then return false end
 	if event.damage == nil or event.damage <= 0 then return false end
-	return true
+
+	local boss = modifier:GetParent()
+	return (event.unit == boss and self:IsPlayerControlledAttacker(event.attacker))
+		or (event.attacker == boss and self:IsPlayerControlledAttacker(event.unit))
 end
 
 function XHSPhase3BossAI:ShouldRevealBossBarFromAttackEvent(modifier, event)
 	if modifier == nil or event == nil then return false end
-	if event.target ~= modifier:GetParent() then return false end
-	if not self:IsPlayerControlledAttacker(event.attacker) then return false end
-	return true
+
+	local boss = modifier:GetParent()
+	return (event.target == boss and self:IsPlayerControlledAttacker(event.attacker))
+		or (event.attacker == boss and self:IsPlayerControlledAttacker(event.target))
+end
+
+function XHSPhase3BossAI:RevealBossBarFromAggro(modifier)
+	if modifier == nil or modifier.xhs_boss_bar_revealed == true then return end
+
+	local boss = modifier:GetParent()
+	if boss == nil or not IsValidEntity(boss) or boss:IsNull() then return end
+	local target = boss.GetAggroTarget ~= nil and boss:GetAggroTarget() or nil
+	if self:IsPlayerControlledAttacker(target) then
+		self:RevealBossBarOnce(modifier)
+	end
 end
 
 function XHSPhase3BossAI:RevealBossBarOnce(modifier)

@@ -2,16 +2,14 @@ LinkLuaModifier("modifier_orb_of_venom_xhs", "items/item_orb_of_venom_xhs.lua", 
 LinkLuaModifier("modifier_orb_of_venom_xhs_active", "items/item_orb_of_venom_xhs.lua", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_orb_of_venom_poison", "items/item_orb_of_venom_xhs.lua", LUA_MODIFIER_MOTION_NONE)
 
+require("items/orb_toggle")
+
 item_xhs_orb_of_venom = item_xhs_orb_of_venom or class({})
 item_viridian_gem = item_viridian_gem or class({})
 item_plagueheart = item_plagueheart or class({})
 
 local function ToggleVenomOrb(caster, ability)
-	if caster:HasModifier("modifier_orb_of_venom_xhs_active") then
-		caster:RemoveModifierByName("modifier_orb_of_venom_xhs_active")
-	else
-		caster:AddNewModifier(caster, ability, "modifier_orb_of_venom_xhs_active", {})
-	end
+	XHSOrbToggle.Toggle(caster, ability, "modifier_orb_of_venom_xhs_active")
 end
 
 local function GetVenomOrbTexture(caster, active_texture, inactive_texture)
@@ -71,6 +69,8 @@ function modifier_orb_of_venom_xhs:IsHidden() return true end
 function modifier_orb_of_venom_xhs:IsPurgable() return false end
 function modifier_orb_of_venom_xhs:RemoveOnDeath() return false end
 function modifier_orb_of_venom_xhs:GetAttributes() return MODIFIER_ATTRIBUTE_MULTIPLE end
+function modifier_orb_of_venom_xhs:OnCreated() XHSOrbToggle.OnIntrinsicCreated(self, "modifier_orb_of_venom_xhs_active") end
+function modifier_orb_of_venom_xhs:OnDestroy() XHSOrbToggle.OnIntrinsicDestroyed(self, "modifier_orb_of_venom_xhs_active") end
 
 function modifier_orb_of_venom_xhs:DeclareFunctions()
 	return {

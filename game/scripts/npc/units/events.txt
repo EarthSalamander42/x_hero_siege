@@ -458,7 +458,7 @@
 
 		// Abilities
 		//----------------------------------------------------------------
-		"Ability1"					"slardar_bash"				// Ability 1.
+		"Ability1"					"xhs_special_wave_bash"				// Ability 1.
 		"Ability2"					""		// Ability 2.
 		"Ability3"					""		// Ability 3.
 		"Ability4"					""		// Ability 4.
@@ -566,8 +566,8 @@
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
-		"AttackDamageMin"			"500"						// Damage range min.
-		"AttackDamageMax"			"700"						// Damage range max.
+		"AttackDamageMin"			"700"						// Damage range min.
+		"AttackDamageMax"			"980"						// Damage range max.
 		"AttackRate"				"0.75"						// Speed of attack.
 		"AttackAnimationPoint"		"0.4"						// Normalized time in animation cycle to attack.
 		"AttackAcquisitionRange"	"1000"						// Range within a target can be acquired.
@@ -598,7 +598,7 @@
 
 		// Status
 		//----------------------------------------------------------------
-		"StatusHealth"				"18000"			// Base health.
+		"StatusHealth"				"22500"			// Base health.
 		"StatusHealthRegen"			"10.0"			// Health regeneration rate.
 		"StatusMana"				"4270"			// Base mana.
 		"StatusManaRegen"			"1.0"			// Mana regeneration rate.

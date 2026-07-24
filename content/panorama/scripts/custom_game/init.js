@@ -271,6 +271,20 @@ function ApplyXHSReportBugButtonStyle(button) {
 	});
 }
 
+function ApplyXHSSupporterPassButtonStyle(button) {
+	ApplyXHSTopBarUtilityButtonStyle(button, {
+		icon: "file://{images}/items/shield_of_invincibility.png",
+		iconId: "XHSSupporterPassTopBarIcon"
+	});
+
+	if (button && button.BHasClass("XHSSupporterPassAttention")) {
+		button.style.opacity = "1.0";
+		button.style.brightness = "1.45";
+		button.style.preTransformScale2d = "1.08";
+		button.style.imgShadow = "0px 0px 7px 3 #ffb34d";
+	}
+}
+
 function ApplyXHSAdvertizeButtonStyle(button) {
 	ApplyXHSTopBarUtilityButtonStyle(button, {
 		icon: "file://{images}/custom_game/hud/xhs_advertize_icon.png",
@@ -334,7 +348,7 @@ function FindXHSFlyoutScoreboardButton(buttonBar) {
 	var firstOtherChild = null;
 	for (var i = 0; i < buttonBar.GetChildCount(); i++) {
 		var child = buttonBar.GetChild(i);
-		if (!child || child.id === "XHSReportBugButton" || child.id === "XHSAdvertizeButton") {
+		if (!child || child.id === "XHSReportBugButton" || child.id === "XHSAdvertizeButton" || child.id === "XHSSupporterPassTopBarButton") {
 			continue;
 		}
 
@@ -358,6 +372,14 @@ function FindXHSAdvertizeButton(buttonBar) {
 	}
 
 	return buttonBar.FindChildTraverse("XHSAdvertizeButton");
+}
+
+function FindXHSReportBugButton(buttonBar) {
+	if (!buttonBar) {
+		return null;
+	}
+
+	return buttonBar.FindChildTraverse("XHSReportBugButton");
 }
 
 function PlaceXHSAdvertizeButton(button) {
@@ -401,6 +423,29 @@ function PlaceXHSReportBugButton(button) {
 	return true;
 }
 
+function PlaceXHSSupporterPassButton(button) {
+	var buttonBar = GetXHSButtonBar();
+	if (!buttonBar || !button) {
+		return false;
+	}
+
+	if (button.SetParent && button.GetParent && button.GetParent() !== buttonBar) {
+		button.SetParent(buttonBar);
+	}
+
+	var reportButton = FindXHSReportBugButton(buttonBar);
+	if (reportButton && buttonBar.MoveChildAfter) {
+		buttonBar.MoveChildAfter(button, reportButton);
+	} else {
+		var advertizeButton = FindXHSAdvertizeButton(buttonBar);
+		if (advertizeButton && buttonBar.MoveChildAfter) {
+			buttonBar.MoveChildAfter(button, advertizeButton);
+		}
+	}
+
+	return true;
+}
+
 function OpenXHSIngameAdvertizeFromButton(retriesLeft) {
 	var config = GameUI.CustomUIConfig ? GameUI.CustomUIConfig() : null;
 	if (config && typeof config.ToggleXHSIngameAdvertize === "function") {
@@ -422,6 +467,135 @@ function OpenXHSIngameAdvertizeFromButton(retriesLeft) {
 			OpenXHSIngameAdvertizeFromButton(retriesLeft - 1);
 		});
 	}
+}
+
+function OpenXHSSupporterPassFromButton(retriesLeft) {
+	var config = GameUI.CustomUIConfig ? GameUI.CustomUIConfig() : null;
+	if (config && typeof config.OpenXHSSupporterPass === "function") {
+		config.OpenXHSSupporterPass();
+		return;
+	}
+
+	if (config) {
+		config.XHSOpenSupporterPassRequested = true;
+	}
+
+	if (retriesLeft > 0) {
+		$.Schedule(0.25, function() {
+			OpenXHSSupporterPassFromButton(retriesLeft - 1);
+		});
+	}
+}
+
+function HideXHSSupporterPassCTA(button, popup) {
+	if (button && (!button.IsValid || button.IsValid())) {
+		button.RemoveClass("XHSSupporterPassAttention");
+		ApplyXHSSupporterPassButtonStyle(button);
+	}
+
+	if (!popup || (popup.IsValid && !popup.IsValid())) {
+		return;
+	}
+
+	popup.style.opacity = "0";
+	popup.style.transform = "translateY( -7px )";
+	$.Schedule(0.22, function() {
+		if (popup && (!popup.IsValid || popup.IsValid())) {
+			popup.style.visibility = "collapse";
+		}
+	});
+}
+
+function ShowXHSSupporterPassCTA(button, popup) {
+	if (!button || !popup || (popup.IsValid && !popup.IsValid())) {
+		return;
+	}
+
+	button.AddClass("XHSSupporterPassAttention");
+	ApplyXHSSupporterPassButtonStyle(button);
+	popup.style.visibility = "visible";
+	$.Schedule(0.01, function() {
+		if (popup && (!popup.IsValid || popup.IsValid())) {
+			popup.style.opacity = "1";
+			popup.style.transform = "translateY( 0px )";
+		}
+	});
+
+	$.Schedule(10.0, function() {
+		HideXHSSupporterPassCTA(button, popup);
+	});
+}
+
+function CreateXHSSupporterPassCTA(button) {
+	var existing = button.FindChildTraverse("XHSSupporterPassTopBarCTA");
+	if (existing) {
+		return existing;
+	}
+
+	button.style.overflow = "noclip";
+	var buttonBar = GetXHSButtonBar();
+	if (buttonBar) {
+		buttonBar.style.overflow = "noclip";
+	}
+
+	var popup = $.CreatePanel("Panel", button, "XHSSupporterPassTopBarCTA");
+	popup.hittest = true;
+	popup.style.width = "286px";
+	popup.style.height = "88px";
+	popup.style.position = "-92px 38px 0px";
+	popup.style.padding = "10px 12px 9px 12px";
+	popup.style.flowChildren = "down";
+	popup.style.backgroundColor = "gradient( linear, 0% 0%, 100% 100%, from( #251407fa ), color-stop( 0.58, #0d1b2dfa ), to( #05090ffa ) )";
+	popup.style.border = "1px solid #ffbd62cc";
+	popup.style.borderRadius = "5px";
+	popup.style.boxShadow = "fill #000000cc 0px 0px 14px 0px, fill #ff9f302c 0px 0px 10px 0px";
+	popup.style.opacity = "0";
+	popup.style.transform = "translateY( -7px )";
+	popup.style.transitionProperty = "opacity, transform, brightness";
+	popup.style.transitionDuration = "0.2s";
+	popup.style.visibility = "collapse";
+	popup.style.zIndex = "9000";
+	popup.SetPanelEvent("onactivate", function() {
+		HideXHSSupporterPassCTA(button, popup);
+		OpenXHSSupporterPassFromButton(8);
+	});
+	popup.SetPanelEvent("onmouseover", function() {
+		popup.style.brightness = "1.16";
+	});
+	popup.SetPanelEvent("onmouseout", function() {
+		popup.style.brightness = "1";
+	});
+
+	var title = $.CreatePanel("Label", popup, "XHSSupporterPassTopBarCTATitle");
+	title.hittest = false;
+	title.text = $.Localize("#xhs_sp_topbar_cta_title");
+	title.style.width = "100%";
+	title.style.color = "#ffe2a8";
+	title.style.fontSize = "18px";
+	title.style.fontWeight = "bold";
+	title.style.textTransform = "uppercase";
+	title.style.textShadow = "0px 1px 3px 2 #000000";
+
+	var body = $.CreatePanel("Label", popup, "XHSSupporterPassTopBarCTABody");
+	body.hittest = false;
+	body.text = $.Localize("#xhs_sp_topbar_cta_body");
+	body.style.width = "100%";
+	body.style.marginTop = "3px";
+	body.style.color = "#d8e8f7";
+	body.style.fontSize = "14px";
+	body.style.textShadow = "0px 1px 2px 2 #000000";
+
+	var action = $.CreatePanel("Label", popup, "XHSSupporterPassTopBarCTAAction");
+	action.hittest = false;
+	action.text = $.Localize("#xhs_sp_topbar_cta_action");
+	action.style.horizontalAlign = "right";
+	action.style.marginTop = "4px";
+	action.style.color = "#ffbd62";
+	action.style.fontSize = "13px";
+	action.style.fontWeight = "bold";
+	action.style.textTransform = "uppercase";
+
+	return popup;
 }
 
 function CreateXHSAdvertizeButton() {
@@ -506,8 +680,56 @@ function CreateXHSReportBugButton() {
 	ApplyXHSReportBugButtonStyle(button);
 }
 
+function CreateXHSSupporterPassButton() {
+	var root = GetXHSHudRoot();
+	if (!root) {
+		$.Schedule(0.5, CreateXHSSupporterPassButton);
+		return;
+	}
+
+	var buttonBar = GetXHSButtonBar();
+	if (!buttonBar) {
+		$.Schedule(0.5, CreateXHSSupporterPassButton);
+		return;
+	}
+
+	var existing = root.FindChildTraverse("XHSSupporterPassTopBarButton");
+	if (existing) {
+		PlaceXHSSupporterPassButton(existing);
+		ApplyXHSSupporterPassButtonStyle(existing);
+		return;
+	}
+
+	var button = $.CreatePanel("Button", buttonBar, "XHSSupporterPassTopBarButton");
+	button.hittest = true;
+	button.SetPanelEvent("onactivate", function() {
+		var popup = button.FindChildTraverse("XHSSupporterPassTopBarCTA");
+		HideXHSSupporterPassCTA(button, popup);
+		OpenXHSSupporterPassFromButton(8);
+	});
+	button.SetPanelEvent("onmouseover", function() {
+		SetXHSTopBarUtilityButtonHover(button, ApplyXHSSupporterPassButtonStyle, true);
+		$.DispatchEvent("UIShowTextTooltip", button, $.Localize("#xhs_sp_topbar_tooltip"));
+	});
+	button.SetPanelEvent("onmouseout", function() {
+		SetXHSTopBarUtilityButtonHover(button, ApplyXHSSupporterPassButtonStyle, false);
+		$.DispatchEvent("UIHideTextTooltip", button);
+	});
+
+	var icon = $.CreatePanel("Image", button, "XHSSupporterPassTopBarIcon");
+	icon.hittest = false;
+
+	PlaceXHSSupporterPassButton(button);
+	ApplyXHSSupporterPassButtonStyle(button);
+	var popup = CreateXHSSupporterPassCTA(button);
+	$.Schedule(3.0, function() {
+		ShowXHSSupporterPassCTA(button, popup);
+	});
+}
+
 CreateXHSAdvertizeButton();
 CreateXHSReportBugButton();
+CreateXHSSupporterPassButton();
 
 //Use this line if you want to keep 4 ability minimum size, and only use 160 if you want ~2 ability min size
 center_block.FindChildTraverse("AbilitiesAndStatBranch").style.minWidth = "386px";
@@ -549,9 +771,7 @@ center_block.FindChildTraverse("inventory").FindChildTraverse("HUDSkinInventoryB
 center_block.FindChildTraverse("inventory").FindChildTraverse("inventory_list_container").style.backgroundColor = "#ffffff00"; //0% opacity on colour
 
 function HideXHSTpCharges(retryCount) {
-	var inventory = center_block.FindChildTraverse("inventory");
-	var tpCharges = inventory ? inventory.FindChildTraverse("tpCharges") : null;
-	console.log(tpCharges);
+	var tpCharges = center_block.FindChildTraverse("tpCharges");
 
 	if (tpCharges) {
 		tpCharges.style.opacity = "0";
@@ -565,6 +785,456 @@ function HideXHSTpCharges(retryCount) {
 }
 
 HideXHSTpCharges(20);
+
+var g_XHSEnemyAbilityUpdateScheduled = false;
+var g_XHSEnemyAbilityWasActive = false;
+
+function GetXHSPortraitUnit() {
+	if (Players.GetLocalPlayerPortraitUnit) {
+		return Players.GetLocalPlayerPortraitUnit();
+	}
+
+	var selected = Players.GetSelectedEntities(Players.GetLocalPlayer());
+	return selected && selected.length > 0 ? selected[0] : -1;
+}
+
+function IsXHSEnemyPortraitUnit(unit) {
+	if (unit === undefined || unit === null || unit < 0) {
+		return false;
+	}
+
+	var localPlayer = Players.GetLocalPlayer();
+	var localTeam = Players.GetTeam(localPlayer);
+	var unitTeam = Entities.GetTeamNumber(unit);
+	return localTeam >= 0 && unitTeam >= 0 && localTeam !== unitTeam;
+}
+
+function GetXHSAbilityPanels() {
+	var parent = center_block && center_block.FindChildTraverse("abilities");
+	var panels = [];
+	if (!parent) {
+		return panels;
+	}
+
+	for (var i = 0; i < parent.GetChildCount(); i++) {
+		var child = parent.GetChild(i);
+		if (!child) {
+			continue;
+		}
+
+		if (child.FindChildTraverse("Cooldown") ||
+			child.FindChildTraverse("CooldownOverlay") ||
+			child.FindChildTraverse("AbilityImage")) {
+			panels.push(child);
+		}
+	}
+
+	return panels;
+}
+
+function GetXHSDisplayedAbilities(unit) {
+	var displayed = [];
+	for (var slot = 0; slot < 24; slot++) {
+		var ability = Entities.GetAbility(unit, slot);
+		if (ability === undefined || ability === null || ability < 0) {
+			continue;
+		}
+		if (Abilities.IsHidden && Abilities.IsHidden(ability)) {
+			continue;
+		}
+		if (Abilities.IsAttributeBonus && Abilities.IsAttributeBonus(ability)) {
+			continue;
+		}
+		displayed.push(ability);
+	}
+	return displayed;
+}
+
+function GetXHSPanelAbility(panel, panelIndex, unit, displayedAbilities) {
+	var abilityImage = panel.FindChildTraverse("AbilityImage");
+	var panelAbilityName = abilityImage && abilityImage.abilityname;
+
+	if (panelAbilityName && Abilities.GetAbilityName) {
+		for (var slot = 0; slot < 24; slot++) {
+			var namedAbility = Entities.GetAbility(unit, slot);
+			if (namedAbility >= 0 && Abilities.GetAbilityName(namedAbility) === panelAbilityName) {
+				return namedAbility;
+			}
+		}
+	}
+
+	var idMatch = panel.id && panel.id.match(/(?:Ability|ability)(\d+)$/);
+	if (idMatch) {
+		var slottedAbility = Entities.GetAbility(unit, Number(idMatch[1]));
+		if (slottedAbility >= 0) {
+			return slottedAbility;
+		}
+	}
+
+	return panelIndex < displayedAbilities.length ? displayedAbilities[panelIndex] : -1;
+}
+
+function GetXHSAbilityIconHost(panel) {
+	// Valve's AbilityImage is smaller than its surrounding ability-button
+	// container. Parent every XHS visual layer to the stock image so custom
+	// enemy icons keep the exact native size, clipping and HUD scaling.
+	return panel.FindChildTraverse("AbilityImage") || panel;
+}
+
+function GetXHSCooldownLabelHost(panel) {
+	// The stock radial cooldown mask is drawn by this panel. A label parented
+	// to AbilityImage cannot render above it, regardless of its z-index.
+	return panel.FindChildTraverse("Cooldown") || GetXHSAbilityIconHost(panel);
+}
+
+function PlaceXHSCooldownLabelAboveMask(panel, label) {
+	if (!label) {
+		return;
+	}
+
+	var host = label.GetParent();
+	var stockOverlay = panel.FindChildTraverse("CooldownOverlay");
+	if (host && stockOverlay && stockOverlay.GetParent() === host && host.MoveChildAfter) {
+		host.MoveChildAfter(label, stockOverlay);
+	}
+}
+
+function GetOrCreateXHSEnemyManaLabel(panel) {
+	var iconContainer = GetXHSAbilityIconHost(panel);
+	var container = panel.FindChildTraverse("XHSEnemyManaCostContainer");
+	if (!container) {
+		container = $.CreatePanel("Panel", iconContainer, "XHSEnemyManaCostContainer");
+	} else if (container.GetParent() !== iconContainer) {
+		container.SetParent(iconContainer);
+	}
+
+	var label = panel.FindChildTraverse("XHSEnemyManaCost");
+	if (label && label.GetParent() === container) {
+		return label;
+	}
+	if (label) {
+		label.SetParent(container);
+		return label;
+	}
+
+	container.hittest = false;
+	container.style.horizontalAlign = "right";
+	container.style.verticalAlign = "bottom";
+	container.style.marginRight = "2px";
+	container.style.marginBottom = "2px";
+	container.style.padding = "0px 3px";
+	container.style.minWidth = "18px";
+	container.style.height = "18px";
+	container.style.backgroundColor = "#071522ed";
+	container.style.border = "1px solid #367aa5cc";
+	container.style.borderRadius = "3px";
+	container.style.boxShadow = "fill #000000aa 0px 0px 2px 1px";
+	container.style.zIndex = "62";
+
+	label = $.CreatePanel("Label", container, "XHSEnemyManaCost");
+	label.hittest = false;
+	label.AddClass("ManaCostLabel");
+	label.style.horizontalAlign = "center";
+	label.style.verticalAlign = "center";
+	label.style.color = "#78c8ff";
+	label.style.fontSize = "13px";
+	label.style.fontWeight = "semi-bold";
+	label.style.textShadow = "1px 1px 2px 2 #000000";
+	return label;
+}
+
+function GetOrCreateXHSEnemyCooldownLabel(panel) {
+	var cooldownContainer = GetXHSCooldownLabelHost(panel);
+	var label = panel.FindChildTraverse("XHSEnemyCooldownTimer");
+	if (label && label.GetParent() !== cooldownContainer) {
+		label.SetParent(cooldownContainer);
+	}
+
+	if (!label) {
+		label = $.CreatePanel("Label", cooldownContainer, "XHSEnemyCooldownTimer");
+		label.hittest = false;
+		label.AddClass("CooldownTimer");
+		label.style.horizontalAlign = "center";
+		label.style.verticalAlign = "center";
+		label.style.color = "white";
+		label.style.fontSize = "20px";
+		label.style.fontWeight = "bold";
+		label.style.textShadow = "1px 1px 3px 3 #000000";
+	}
+
+	label.style.zIndex = "80";
+	PlaceXHSCooldownLabelAboveMask(panel, label);
+	return label;
+}
+
+function GetOrCreateXHSEnemyCooldownOverlay(panel) {
+	var overlay = panel.FindChildTraverse("XHSEnemyCooldownOverlay");
+	var iconContainer = GetXHSAbilityIconHost(panel);
+	if (overlay && overlay.GetParent() === iconContainer) {
+		return overlay;
+	}
+	if (overlay) {
+		overlay.SetParent(iconContainer);
+		return overlay;
+	}
+
+	overlay = $.CreatePanel("Panel", iconContainer, "XHSEnemyCooldownOverlay");
+	overlay.hittest = false;
+	overlay.style.width = "100%";
+	overlay.style.height = "100%";
+	overlay.style.horizontalAlign = "center";
+	overlay.style.verticalAlign = "center";
+	overlay.style.backgroundColor = "#000000c8";
+	overlay.style.zIndex = "60";
+	return overlay;
+}
+
+function GetOrCreateXHSEnemyAbilityImage(panel) {
+	var enemyImage = panel.FindChildTraverse("XHSEnemyAbilityImage");
+	var iconContainer = GetXHSAbilityIconHost(panel);
+	if (enemyImage && enemyImage.GetParent() === iconContainer) {
+		return enemyImage;
+	}
+	if (enemyImage) {
+		enemyImage.SetParent(iconContainer);
+		return enemyImage;
+	}
+
+	enemyImage = $.CreatePanel("DOTAAbilityImage", iconContainer, "XHSEnemyAbilityImage");
+	enemyImage.hittest = false;
+	enemyImage.style.width = "100%";
+	enemyImage.style.height = "100%";
+	enemyImage.style.horizontalAlign = "center";
+	enemyImage.style.verticalAlign = "center";
+	enemyImage.style.saturation = "1";
+	enemyImage.style.brightness = "1";
+	enemyImage.style.washColor = "#ffffffff";
+	enemyImage.style.zIndex = "50";
+	return enemyImage;
+}
+
+function SetXHSEnemyAbilityImageReveal(panel, reveal) {
+	var abilityImage = panel.FindChildTraverse("AbilityImage");
+	if (!abilityImage) {
+		return;
+	}
+
+	if (reveal) {
+		if (!abilityImage._xhsEnemyStyleCaptured) {
+			abilityImage._xhsEnemyStyleCaptured = true;
+			abilityImage._xhsOldSaturation = abilityImage.style.saturation;
+			abilityImage._xhsOldBrightness = abilityImage.style.brightness;
+			abilityImage._xhsOldWashColor = abilityImage.style.washColor;
+			abilityImage._xhsOldOpacity = abilityImage.style.opacity;
+		}
+		abilityImage.style.saturation = "1";
+		abilityImage.style.brightness = "1";
+		abilityImage.style.washColor = "#ffffffff";
+		abilityImage.style.opacity = "1";
+	} else if (abilityImage._xhsEnemyStyleCaptured) {
+		abilityImage.style.saturation = abilityImage._xhsOldSaturation || null;
+		abilityImage.style.brightness = abilityImage._xhsOldBrightness || null;
+		abilityImage.style.washColor = abilityImage._xhsOldWashColor || null;
+		abilityImage.style.opacity = abilityImage._xhsOldOpacity || null;
+		abilityImage._xhsEnemyStyleCaptured = false;
+	}
+}
+
+function HideXHSEnemyAbilityPanel(panel) {
+	SetXHSEnemyAbilityImageReveal(panel, false);
+	var enemyImage = panel.FindChildTraverse("XHSEnemyAbilityImage");
+	var manaContainer = panel.FindChildTraverse("XHSEnemyManaCostContainer");
+	var manaLabel = panel.FindChildTraverse("XHSEnemyManaCost");
+	var cooldownLabel = panel.FindChildTraverse("XHSEnemyCooldownTimer");
+	var cooldownOverlay = panel.FindChildTraverse("XHSEnemyCooldownOverlay");
+	if (manaContainer) {
+		manaContainer.visible = false;
+	}
+	if (enemyImage) {
+		enemyImage.visible = false;
+	}
+	if (manaLabel && (!manaContainer || manaLabel.GetParent() !== manaContainer)) {
+		manaLabel.visible = false;
+		manaLabel.DeleteAsync(0);
+	}
+	if (cooldownLabel) {
+		cooldownLabel.visible = false;
+	}
+	if (cooldownOverlay) {
+		cooldownOverlay.visible = false;
+	}
+}
+
+function HideXHSEnemyAbilityLabels() {
+	var panels = GetXHSAbilityPanels();
+	for (var i = 0; i < panels.length; i++) {
+		HideXHSEnemyAbilityPanel(panels[i]);
+	}
+}
+
+function RestoreXHSStockAbilityPanels(unit) {
+	var panels = GetXHSAbilityPanels();
+	var displayedAbilities = unit >= 0 ? GetXHSDisplayedAbilities(unit) : [];
+
+	for (var i = 0; i < panels.length; i++) {
+		var panel = panels[i];
+		var ability = unit >= 0 ? GetXHSPanelAbility(panel, i, unit, displayedAbilities) : -1;
+		var remaining = ability >= 0 ? Math.max(0, Abilities.GetCooldownTimeRemaining(ability) || 0) : 0;
+		var inCooldown = remaining > 0.01;
+		var cooldown = ability >= 0 ?
+			(Abilities.GetCooldownLength ? Abilities.GetCooldownLength(ability) : Abilities.GetCooldown(ability)) :
+			0;
+		var cooldownPanel = panel.FindChildTraverse("Cooldown");
+		var stockTimer = panel.FindChildTraverse("CooldownTimer");
+		var stockOverlay = panel.FindChildTraverse("CooldownOverlay");
+
+		panel.SetHasClass("in_cooldown", inCooldown);
+		panel.SetHasClass("cooldown_ready", !inCooldown);
+		panel.SetHasClass("can_cast_again", false);
+		if (cooldownPanel) {
+			// The previous enemy HUD implementation wrote directly to .visible.
+			// Restore the native panels permanently; Valve's cooldown classes own
+			// their actual visibility from this point onward.
+			cooldownPanel.visible = true;
+			cooldownPanel.style.visibility = null;
+			cooldownPanel.style.opacity = null;
+		}
+		if (stockTimer) {
+			// Its text binding was broken by the legacy enemy cooldown hack.
+			// Keep it hidden: XHSEnemyCooldownTimer now owns the numeric label
+			// for both friendly and enemy portrait units.
+			stockTimer.visible = false;
+			stockTimer.style.visibility = null;
+			stockTimer.style.opacity = null;
+		}
+		if (stockOverlay) {
+			stockOverlay.visible = true;
+			stockOverlay.style.visibility = null;
+			stockOverlay.style.opacity = null;
+			stockOverlay.style.clip = null;
+		}
+	}
+}
+
+function UpdateXHSFriendlyCooldownLabels(unit) {
+	if (unit === undefined || unit === null || unit < 0) {
+		return;
+	}
+
+	var panels = GetXHSAbilityPanels();
+	var displayedAbilities = GetXHSDisplayedAbilities(unit);
+	for (var i = 0; i < panels.length; i++) {
+		var panel = panels[i];
+		var ability = GetXHSPanelAbility(panel, i, unit, displayedAbilities);
+		var timer = GetOrCreateXHSEnemyCooldownLabel(panel);
+		var stockTimer = panel.FindChildTraverse("CooldownTimer");
+
+		if (stockTimer) {
+			stockTimer.visible = false;
+		}
+		if (ability < 0) {
+			timer.visible = false;
+			continue;
+		}
+
+		var remaining = Math.max(0, Abilities.GetCooldownTimeRemaining(ability) || 0);
+		var inCooldown = remaining > 0.01;
+		timer.visible = inCooldown;
+		timer.text = inCooldown ? String(Math.max(1, Math.ceil(remaining))) : "";
+	}
+}
+
+function UpdateXHSEnemyAbilityPanel(panel, ability) {
+	if (ability === undefined || ability === null || ability < 0) {
+		HideXHSEnemyAbilityPanel(panel);
+		return;
+	}
+
+	// The custom image now lives inside Valve's stock AbilityImage to inherit
+	// its exact geometry. Remove the enemy grayscale filter from that parent
+	// while the replacement is visible, otherwise it also desaturates children.
+	SetXHSEnemyAbilityImageReveal(panel, true);
+	var enemyImage = GetOrCreateXHSEnemyAbilityImage(panel);
+	enemyImage.abilityname = Abilities.GetAbilityName(ability);
+	enemyImage.visible = true;
+
+	var cooldown = Abilities.GetCooldownLength ?
+		Abilities.GetCooldownLength(ability) :
+		Abilities.GetCooldown(ability);
+	var remaining = Math.max(0, Abilities.GetCooldownTimeRemaining(ability) || 0);
+	var inCooldown = remaining > 0.01;
+	var overlay = GetOrCreateXHSEnemyCooldownOverlay(panel);
+	var timer = GetOrCreateXHSEnemyCooldownLabel(panel);
+	var stockTimer = panel.FindChildTraverse("CooldownTimer");
+
+	if (stockTimer) {
+		stockTimer.visible = false;
+	}
+	if (timer) {
+		timer.visible = inCooldown;
+		timer.text = inCooldown ? String(Math.max(1, Math.ceil(remaining))) : "";
+	}
+	if (overlay) {
+		overlay.visible = inCooldown;
+		if (inCooldown) {
+			var duration = Math.max(remaining, cooldown || 0.01);
+			var remainingDegrees = Math.max(0, Math.min(360, 360 * remaining / duration));
+			overlay.style.clip = "radial(50% 50%, 0deg, -" + remainingDegrees.toFixed(1) + "deg)";
+		}
+	}
+
+	var manaCost = Abilities.GetEffectiveManaCost ?
+		Abilities.GetEffectiveManaCost(ability) :
+		Abilities.GetManaCost(ability);
+	manaCost = Math.max(0, Number(manaCost) || 0);
+
+	var manaLabel = GetOrCreateXHSEnemyManaLabel(panel);
+	var manaContainer = panel.FindChildTraverse("XHSEnemyManaCostContainer");
+	if (manaContainer) {
+		manaContainer.visible = manaCost > 0;
+	}
+	manaLabel.text = manaCost > 0 ? String(Math.floor(manaCost + 0.5)) : "";
+}
+
+function UpdateXHSEnemyAbilityCooldowns() {
+	var unit = GetXHSPortraitUnit();
+	if (!IsXHSEnemyPortraitUnit(unit)) {
+		if (g_XHSEnemyAbilityWasActive) {
+			HideXHSEnemyAbilityLabels();
+			RestoreXHSStockAbilityPanels(unit);
+			g_XHSEnemyAbilityWasActive = false;
+		}
+		UpdateXHSFriendlyCooldownLabels(unit);
+		return;
+	}
+
+	g_XHSEnemyAbilityWasActive = true;
+	var panels = GetXHSAbilityPanels();
+	var displayedAbilities = GetXHSDisplayedAbilities(unit);
+	for (var i = 0; i < panels.length; i++) {
+		var ability = GetXHSPanelAbility(panels[i], i, unit, displayedAbilities);
+		UpdateXHSEnemyAbilityPanel(panels[i], ability);
+	}
+}
+
+function ShowEnemyAbilityCooldown() {
+	UpdateXHSEnemyAbilityCooldowns();
+
+	if (!g_XHSEnemyAbilityUpdateScheduled) {
+		g_XHSEnemyAbilityUpdateScheduled = true;
+		$.Schedule(0.1, function() {
+			g_XHSEnemyAbilityUpdateScheduled = false;
+			ShowEnemyAbilityCooldown();
+		});
+	}
+}
+
+GameEvents.Subscribe("dota_player_update_selected_unit", UpdateXHSEnemyAbilityCooldowns);
+GameEvents.Subscribe("dota_player_update_query_unit", UpdateXHSEnemyAbilityCooldowns);
+HideXHSEnemyAbilityLabels();
+RestoreXHSStockAbilityPanels(GetXHSPortraitUnit());
+ShowEnemyAbilityCooldown();
+
 
 //Skin Killer - minimap
 hudElements.FindChildTraverse("HUDSkinMinimap").style.visibility = "collapse";

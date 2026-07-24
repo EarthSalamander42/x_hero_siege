@@ -31,12 +31,12 @@ modifier_xhs_rune_revitalization = modifier_xhs_rune_revitalization or class({})
 modifier_xhs_rune_revitalization.XHS_LINK_CLIENT = true
 function modifier_xhs_rune_revitalization:OnCreated(kv)
 	kv = kv or {}
-	self.mana_regen_pct = tonumber(kv.mana_regen_pct) or 12
+	self.cooldown_reduction_pct = tonumber(kv.cooldown_reduction_pct) or 30
 end
 function modifier_xhs_rune_revitalization:OnRefresh(kv) self:OnCreated(kv) end
 function modifier_xhs_rune_revitalization:GetTexture() return "rune_arcane" end
-function modifier_xhs_rune_revitalization:DeclareFunctions() return { MODIFIER_PROPERTY_MANA_REGEN_TOTAL_PERCENTAGE } end
-function modifier_xhs_rune_revitalization:GetModifierTotalPercentageManaRegen() return self.mana_regen_pct or 0 end
+function modifier_xhs_rune_revitalization:DeclareFunctions() return { MODIFIER_PROPERTY_COOLDOWN_PERCENTAGE } end
+function modifier_xhs_rune_revitalization:GetModifierPercentageCooldown() return self.cooldown_reduction_pct or 0 end
 
 modifier_xhs_rune_restoration = modifier_xhs_rune_restoration or class({})
 modifier_xhs_rune_restoration.XHS_LINK_CLIENT = true
@@ -78,6 +78,13 @@ function modifier_xhs_rune_second_wind:OnIntervalThink()
 
 	self.consumed = true
 	self:SetStackCount(0)
+	local healBurst = ParticleManager:CreateParticle("particles/units/heroes/hero_abaddon/abaddon_borrowed_time_heal.vpcf", PATTACH_ABSORIGIN_FOLLOW, parent)
+	ParticleManager:ReleaseParticleIndex(healBurst)
+	local impact = ParticleManager:CreateParticle("particles/units/heroes/hero_abaddon/abaddon_aphotic_shield_explosion.vpcf", PATTACH_ABSORIGIN, parent)
+	ParticleManager:SetParticleControl(impact, 0, parent:GetAbsOrigin())
+	ParticleManager:ReleaseParticleIndex(impact)
+	parent:EmitSound("Hero_Abaddon.BorrowedTime")
+	parent:EmitSound("Hero_Abaddon.AphoticShield.Cast")
 	parent:AddNewModifier(parent, nil, "modifier_xhs_rune_second_wind_heal", { duration = self.recovery_duration, recovery_duration = self.recovery_duration, heal_pct = self.heal_pct, mana_pct = self.mana_pct })
 	parent:AddNewModifier(parent, nil, "modifier_xhs_rune_second_wind_guard", { duration = self.guard_duration, guard_reduction = self.guard_reduction })
 	self:Destroy()
@@ -104,6 +111,11 @@ modifier_xhs_rune_second_wind_guard.XHS_LINK_CLIENT = true
 function modifier_xhs_rune_second_wind_guard:OnCreated(kv)
 	kv = kv or {}
 	self.guard_reduction = tonumber(kv.guard_reduction) or 20
+	if IsServer() then
+		local guard_particle = ParticleManager:CreateParticle("particles/units/heroes/hero_abaddon/holdout_borrowed_time_4.vpcf", PATTACH_ABSORIGIN_FOLLOW, self:GetParent())
+		ParticleManager:SetParticleControl(guard_particle, 1, Vector(1.35, 0, 0))
+		self:AddParticle(guard_particle, false, false, -1, false, false)
+	end
 end
 function modifier_xhs_rune_second_wind_guard:OnRefresh(kv) self:OnCreated(kv) end
 function modifier_xhs_rune_second_wind_guard:GetTexture() return "abaddon_borrowed_time" end
@@ -116,24 +128,82 @@ function modifier_xhs_rune_barrier:OnCreated(kv)
 	kv = kv or {}
 	self.max_shield = self:GetParent():GetMaxHealth() * ((tonumber(kv.shield_pct) or 25) * 0.01)
 	self.shield = self.max_shield
-	self.regen_per_second = self:GetParent():GetMaxHealth() * ((tonumber(kv.regen_pct) or 4) * 0.01)
-	self:SetStackCount(math.floor(self.shield))
-	if IsServer() then self:StartIntervalThink(0.25) end
+	self.health_regen = self:GetParent():GetMaxHealth() * ((tonumber(kv.health_regen_pct) or tonumber(kv.regen_pct) or 4) * 0.01)
+	if IsServer() then
+		self:SetHasCustomTransmitterData(true)
+		self:RefreshShieldVisual()
+		self:UpdateShieldState()
+	end
 end
 function modifier_xhs_rune_barrier:OnRefresh(kv) self:OnCreated(kv) end
 function modifier_xhs_rune_barrier:GetTexture() return "roshan_spell_block" end
-function modifier_xhs_rune_barrier:OnIntervalThink()
-	self.shield = math.min(self.max_shield, self.shield + self.regen_per_second * 0.25)
-	self:SetStackCount(math.floor(self.shield))
+function modifier_xhs_rune_barrier:DeclareFunctions()
+	return {
+		MODIFIER_PROPERTY_INCOMING_DAMAGE_CONSTANT,
+		MODIFIER_PROPERTY_HEALTH_REGEN_CONSTANT,
+		MODIFIER_PROPERTY_TOOLTIP,
+		MODIFIER_PROPERTY_TOOLTIP2,
+	}
 end
-function modifier_xhs_rune_barrier:AbsorbDamage(damage)
-	damage = tonumber(damage) or 0
-	if damage <= 0 or self.shield <= 0 then return damage end
+function modifier_xhs_rune_barrier:AddCustomTransmitterData()
+	return {
+		shield = self.shield or 0,
+		max_shield = self.max_shield or 0,
+		health_regen = self.health_regen or 0,
+	}
+end
+function modifier_xhs_rune_barrier:HandleCustomTransmitterData(data)
+	self.shield = data.shield or 0
+	self.max_shield = data.max_shield or 0
+	self.health_regen = data.health_regen or 0
+end
+function modifier_xhs_rune_barrier:UpdateShieldState()
+	self:SetStackCount(math.floor(self.shield or 0))
+	self:SendBuffRefreshToClients()
+end
+function modifier_xhs_rune_barrier:RefreshShieldVisual()
+	if not IsServer() then return end
+	if (self.shield or 0) > 0 and self.shield_particle == nil then
+		self.shield_particle = ParticleManager:CreateParticle("particles/neutral_fx/miniboss_shield.vpcf", PATTACH_ABSORIGIN_FOLLOW, self:GetParent())
+	elseif (self.shield or 0) <= 0 and self.shield_particle ~= nil then
+		ParticleManager:DestroyParticle(self.shield_particle, true)
+		ParticleManager:ReleaseParticleIndex(self.shield_particle)
+		self.shield_particle = nil
+	end
+end
+function modifier_xhs_rune_barrier:PlayShieldImpact()
+	local parent = self:GetParent()
+	local particle = ParticleManager:CreateParticle("particles/neutral_fx/miniboss_damage_impact.vpcf", PATTACH_ABSORIGIN_FOLLOW, parent)
+	ParticleManager:SetParticleControlEnt(particle, 0, parent, PATTACH_POINT_FOLLOW, "attach_hitloc", parent:GetAbsOrigin(), true)
+	ParticleManager:ReleaseParticleIndex(particle)
+
+	local now = GameRules:GetGameTime()
+	if (self.next_impact_sound or 0) <= now then
+		parent:EmitSound("Miniboss.Tormenter.Target")
+		self.next_impact_sound = now + 0.12
+	end
+end
+function modifier_xhs_rune_barrier:GetModifierIncomingDamageConstant(event)
+	if not IsServer() then return self.shield or 0 end
+
+	local damage = tonumber(event.damage) or 0
+	if damage <= 0 or (self.shield or 0) <= 0 then return 0 end
 
 	local absorbed = math.min(damage, self.shield)
 	self.shield = self.shield - absorbed
-	self:SetStackCount(math.floor(self.shield))
-	return damage - absorbed
+	self:PlayShieldImpact()
+	self:RefreshShieldVisual()
+	self:UpdateShieldState()
+	return -absorbed
+end
+function modifier_xhs_rune_barrier:OnTooltip() return math.floor(self.shield or 0) end
+function modifier_xhs_rune_barrier:OnTooltip2() return math.floor(self.health_regen or 0) end
+function modifier_xhs_rune_barrier:GetModifierConstantHealthRegen() return self.health_regen or 0 end
+function modifier_xhs_rune_barrier:OnDestroy()
+	if not IsServer() or self.shield_particle == nil then return end
+	ParticleManager:DestroyParticle(self.shield_particle, true)
+	ParticleManager:ReleaseParticleIndex(self.shield_particle)
+	self.shield_particle = nil
 end
 
 modifier_xhs_rune_retaliation = modifier_xhs_rune_retaliation or class({})
@@ -144,6 +214,8 @@ function modifier_xhs_rune_retaliation:OnCreated(kv)
 end
 function modifier_xhs_rune_retaliation:OnRefresh(kv) self:OnCreated(kv) end
 function modifier_xhs_rune_retaliation:GetTexture() return "blade_mail" end
+function modifier_xhs_rune_retaliation:GetEffectName() return "particles/items_fx/blademail.vpcf" end
+function modifier_xhs_rune_retaliation:GetEffectAttachType() return PATTACH_ABSORIGIN_FOLLOW end
 function modifier_xhs_rune_retaliation:DeclareFunctions() return { MODIFIER_EVENT_ON_TAKEDAMAGE } end
 function modifier_xhs_rune_retaliation:OnTakeDamage(params)
 	if not IsServer() or _G.XHS_RUNE_REFLECTING == true then return end
@@ -159,6 +231,10 @@ function modifier_xhs_rune_retaliation:OnTakeDamage(params)
 		damage_type = params.damage_type or DAMAGE_TYPE_PURE,
 		damage_flags = DOTA_DAMAGE_FLAG_REFLECTION,
 	})
+	local returnFx = ParticleManager:CreateParticle("particles/units/heroes/hero_centaur/centaur_return.vpcf", PATTACH_ABSORIGIN, self:GetParent())
+	ParticleManager:SetParticleControlEnt(returnFx, 0, self:GetParent(), PATTACH_POINT_FOLLOW, "attach_hitloc", self:GetParent():GetAbsOrigin(), true)
+	ParticleManager:SetParticleControlEnt(returnFx, 1, params.attacker, PATTACH_POINT_FOLLOW, "attach_hitloc", params.attacker:GetAbsOrigin(), true)
+	ParticleManager:ReleaseParticleIndex(returnFx)
 	_G.XHS_RUNE_REFLECTING = nil
 end
 
@@ -258,7 +334,13 @@ function modifier_xhs_rune_storm:GetTexture() return "zuus_arc_lightning" end
 function modifier_xhs_rune_storm:GetEffectName() return "particles/units/heroes/hero_stormspirit/stormspirit_overload_ambient.vpcf" end
 function modifier_xhs_rune_storm:GetEffectAttachType() return PATTACH_ABSORIGIN_FOLLOW end
 function modifier_xhs_rune_storm:DeclareFunctions() return { MODIFIER_PROPERTY_TOOLTIP } end
-function modifier_xhs_rune_storm:OnTooltip() return self.damage or 0 end
+function modifier_xhs_rune_storm:OnTooltip()
+	local parent = self:GetParent()
+	if parent ~= nil and not parent:IsNull() and parent.GetAttackDamage ~= nil then
+		return math.floor(parent:GetAttackDamage())
+	end
+	return self.damage or 0
+end
 function modifier_xhs_rune_storm:OnIntervalThink()
 	local parent = self:GetParent()
 	local enemies = FindUnitsInRadius(parent:GetTeamNumber(), parent:GetAbsOrigin(), nil, self.radius, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_CLOSEST, false)
@@ -270,7 +352,13 @@ function modifier_xhs_rune_storm:OnIntervalThink()
 			ParticleManager:SetParticleControlEnt(particle, 0, parent, PATTACH_POINT_FOLLOW, "attach_hitloc", parent:GetAbsOrigin(), true)
 			ParticleManager:SetParticleControlEnt(particle, 1, enemy, PATTACH_POINT_FOLLOW, "attach_hitloc", enemy:GetAbsOrigin(), true)
 			ParticleManager:ReleaseParticleIndex(particle)
-			ApplyDamage({ attacker = parent, victim = enemy, damage = self.damage, damage_type = DAMAGE_TYPE_MAGICAL })
+			local physicalDamage = self.damage
+			if parent.GetAverageTrueAttackDamage ~= nil then
+				physicalDamage = parent:GetAverageTrueAttackDamage(parent)
+			elseif parent.GetAttackDamage ~= nil then
+				physicalDamage = parent:GetAttackDamage()
+			end
+			ApplyDamage({ attacker = parent, victim = enemy, damage = physicalDamage, damage_type = DAMAGE_TYPE_PHYSICAL })
 			if count >= self.targets then return end
 		end
 	end

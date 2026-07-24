@@ -340,6 +340,10 @@
 		var content = toast.contentPanel || toast;
 		var segment = null;
 
+		if (msg.class === "XHSSpecialArenaText") {
+			toast.AddClass("XHSNotificationSpecialArena");
+		}
+
 		if (msg.hero != null) {
 			segment = $.CreatePanel("DOTAHeroImage", content, "");
 			segment.heroimagestyle = msg.imagestyle || "icon";
@@ -665,12 +669,17 @@
 
 	function updateWaveRingProgress(ratio) {
 		var sweep = $("#XHSWaveRingSweep");
+		var fill = $("#XHSWaveRingFill");
 		if (!sweep) {
 			return;
 		}
 
 		ratio = Math.max(0, Math.min(1, Number(ratio) || 0));
-		sweep.style.clip = "radial(50% 50%, 0.0deg, " + (ratio * -360).toFixed(2) + "deg)";
+		var radialClip = "radial(50% 50%, 0.0deg, " + (ratio * -360).toFixed(2) + "deg)";
+		sweep.style.clip = radialClip;
+		if (fill) {
+			fill.style.clip = radialClip;
+		}
 		sweep.style.opacity = ratio > 0 ? String(Math.max(0.72, ratio)) : "0";
 		sweep.SetHasClass("XHSWaveRingSweepWarning", ratio > 0 && ratio <= 0.25);
 	}

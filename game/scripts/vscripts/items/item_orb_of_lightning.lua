@@ -5,12 +5,10 @@ LinkLuaModifier("modifier_orb_of_lightning_active", "items/item_orb_of_lightning
 LinkLuaModifier("modifier_orb_of_lightning_passive", "items/item_orb_of_lightning.lua", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_orb_of_lightning_purge", "items/item_orb_of_lightning.lua", LUA_MODIFIER_MOTION_NONE)
 
+require("items/orb_toggle")
+
 local function StartSpell(caster, ability)
-	if caster:HasModifier("modifier_orb_of_lightning_active") then
-		caster:RemoveModifierByName("modifier_orb_of_lightning_active")
-	else
-		caster:AddNewModifier(caster, ability, "modifier_orb_of_lightning_active", {})
-	end
+	XHSOrbToggle.Toggle(caster, ability, "modifier_orb_of_lightning_active")
 end
 
 local function StartLightningOrbsCooldown(hero, cooldown)
@@ -211,6 +209,14 @@ function modifier_orb_of_lightning_passive:RemoveOnDeath() return false end
 -- allow multiple instances of that modifier
 function modifier_orb_of_lightning_passive:GetAttributes()
 	return MODIFIER_ATTRIBUTE_MULTIPLE
+end
+
+function modifier_orb_of_lightning_passive:OnCreated()
+	XHSOrbToggle.OnIntrinsicCreated(self, "modifier_orb_of_lightning_active")
+end
+
+function modifier_orb_of_lightning_passive:OnDestroy()
+	XHSOrbToggle.OnIntrinsicDestroyed(self, "modifier_orb_of_lightning_active")
 end
 
 function modifier_orb_of_lightning_passive:DeclareFunctions()

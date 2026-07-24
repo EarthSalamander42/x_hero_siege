@@ -7,6 +7,8 @@ modifier_xhs_arthas_phase3_ai.XHS_LINK_CLIENT = true
 LinkLuaModifier("modifier_xhs_arthas_phase3_ai", "boss_scripts/phase3_ai/arthas.lua", LUA_MODIFIER_MOTION_NONE)
 
 local ARTHAS_ABILITIES = {
+	"arthas_holy_light",
+	"xhs_arthas_judgment_of_lordaeron",
 	"xhs_arthas_frostmourne_mark",
 	"xhs_arthas_frozen_chains",
 	"xhs_arthas_death_advance",
@@ -14,6 +16,8 @@ local ARTHAS_ABILITIES = {
 	"boss_health",
 	"cant_die_generic",
 }
+
+local JUDGMENT_THRESHOLDS = { 66, 33 }
 
 local function IsValidAlive(unit)
 	return unit ~= nil and IsValidEntity(unit) and not unit:IsNull() and unit:IsAlive()
@@ -55,6 +59,18 @@ local function CastPreparedAbility(boss, abilityName, context, position)
 	return ability
 end
 
+local function CastPreparedAbilityOnTarget(boss, abilityName, target, context)
+	if not IsValidAlive(boss) or not IsValidAlive(target) then return nil end
+	local ability = boss:FindAbilityByName(abilityName)
+	if ability == nil or ability:IsNull() or not ability:IsCooldownReady() then return nil end
+	if XHSPhase3BossAI:IsCastBlocked(boss) then return nil end
+
+	ability.xhs_arthas_context = context or {}
+	XHSPhase3BossAI:ProtectCast(boss, ability, 0.25)
+	boss:CastAbilityOnTarget(target, ability, -1)
+	return ability
+end
+
 function XHSArthas_AttachPhase3AI(boss)
 	if boss == nil or not IsValidEntity(boss) or boss:IsNull() then return end
 	if boss:GetUnitName() ~= "npc_dota_hero_arthas" then return end
@@ -84,18 +100,29 @@ function modifier_xhs_arthas_phase3_ai:OnCreated()
 	self.hero_positions = {}
 	self.next_action = GameRules:GetGameTime() + 3.0
 	self.patterns = self:BuildPatternDeck()
+	self.judgment_thresholds_done = {}
+	self.pending_judgment_threshold = nil
 
 	self.boss.xhs_boss_bar_icon = "spellicons/custom/arthas_frostmourne"
 	self.boss.xhs_boss_bar_colors = {
 		dark_color = "#08223a",
 		light_color = "#bff4ff",
 	}
-	self.boss.xhs_boss_bar_markers = {
-		{ percent = 66, label = "Frostmourne Mark", tooltip = "Marked heroes take amplified Arthas burst." },
-		{ percent = 33, label = "Execute Priority", tooltip = "Arthas prefers rooted or marked heroes for Execute." },
-	}
+	self:UpdateBossBarMarkers()
 	ShowBossBar(self.boss)
 	self:StartIntervalThink(0.25)
+end
+
+function modifier_xhs_arthas_phase3_ai:UpdateBossBarMarkers()
+	self.boss.xhs_boss_bar_markers = {}
+	for index, threshold in ipairs(JUDGMENT_THRESHOLDS) do
+		self.boss.xhs_boss_bar_markers[index] = {
+			percent = threshold,
+			label = "Judgment of Lordaeron",
+			tooltip = "Intercept the pillars of light before their rays empower Arthas's final judgment.",
+			triggered = self.judgment_thresholds_done[threshold] == true,
+		}
+	end
 end
 
 function modifier_xhs_arthas_phase3_ai:IsBossActive()
@@ -117,9 +144,12 @@ function modifier_xhs_arthas_phase3_ai:OnIntervalThink()
 	if not self:IsBossActive() then return end
 	if XHSPhase3BossAI:IsCastBlocked(self.boss) then return end
 
-	self:TrackHeroPositions()
 	local now = GameRules:GetGameTime()
+	if self:TryJudgment(now) then return end
 	if now < (self.next_action or 0) then return end
+	if self:TryHolyLight(now) then return end
+
+	self:TrackHeroPositions()
 
 	local entry = XHSPhase3BossAI:WeightedChoice(self.patterns, now)
 	if entry == nil then
@@ -137,11 +167,64 @@ function modifier_xhs_arthas_phase3_ai:OnIntervalThink()
 	end
 end
 
+function modifier_xhs_arthas_phase3_ai:TryJudgment(now)
+	if self.pending_judgment_threshold ~= nil then return false end
+
+	local hpPct = self.boss:GetHealthPercent()
+	for _, threshold in ipairs(JUDGMENT_THRESHOLDS) do
+		if hpPct <= threshold and self.judgment_thresholds_done[threshold] ~= true then
+			local ability = CastPreparedAbility(self.boss, "xhs_arthas_judgment_of_lordaeron", {
+				threshold = threshold,
+				arena_center = self.arena_center,
+			}, self.arena_center)
+			if ability == nil then return false end
+
+			self.pending_judgment_threshold = threshold
+			self.next_action = now + math.max(1.0, ability:GetCastPoint() + 0.5)
+			return true
+		end
+	end
+
+	return false
+end
+
+function modifier_xhs_arthas_phase3_ai:CommitJudgment(threshold, sequenceDuration)
+	threshold = threshold or self.pending_judgment_threshold
+	if threshold == nil or self.judgment_thresholds_done[threshold] == true then return end
+
+	self.pending_judgment_threshold = nil
+	self.judgment_thresholds_done[threshold] = true
+	self.next_action = GameRules:GetGameTime() + math.max(1.0, sequenceDuration or 1.0)
+	self:UpdateBossBarMarkers()
+	if UpdateBossBar ~= nil then
+		UpdateBossBar(self.boss)
+	end
+end
+
+function modifier_xhs_arthas_phase3_ai:CancelJudgment(threshold)
+	if threshold ~= nil and self.pending_judgment_threshold ~= threshold then return end
+	self.pending_judgment_threshold = nil
+	self.next_action = GameRules:GetGameTime() + 0.6
+end
+
 function modifier_xhs_arthas_phase3_ai:GetAbilityNameForPattern(id)
 	if id == "mark" then return "xhs_arthas_frostmourne_mark" end
 	if id == "chains" then return "xhs_arthas_frozen_chains" end
 	if id == "advance" then return "xhs_arthas_death_advance" end
 	return "xhs_arthas_frostmourne_execute"
+end
+
+function modifier_xhs_arthas_phase3_ai:TryHolyLight(now)
+	local ability = self.boss:FindAbilityByName("arthas_holy_light")
+	if ability == nil or ability:IsNull() or not ability:IsCooldownReady() then return false end
+
+	local threshold = ability:GetSpecialValueFor("health_threshold")
+	if threshold <= 0 then threshold = 70 end
+	if self.boss:GetHealthPercent() > threshold then return false end
+
+	if CastPreparedAbilityOnTarget(self.boss, "arthas_holy_light", self.boss, {}) == nil then return false end
+	self.next_action = now + math.max(1.0, (ability:GetCastPoint() or 0) + 0.8)
+	return true
 end
 
 function modifier_xhs_arthas_phase3_ai:TrackHeroPositions()

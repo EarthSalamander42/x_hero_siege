@@ -214,6 +214,10 @@ function XHSDevTools:RunAction(action, event)
 		return self:SetLane(event)
 	elseif action == "spawn_lane_wave" then
 		return self:SpawnLaneWave(ToNumber(event.lane, 0))
+	elseif action == "spawn_phase2_wave" then
+		return self:SpawnPhase2Wave(event.side)
+	elseif action == "start_phase2" then
+		return self:StartPhase2()
 	elseif action == "special_wave" then
 		self:ActivateSandbox("special_wave")
 		local wave = ToNumber(event.wave, CustomTimers and CustomTimers.special_wave or 1)
@@ -633,6 +637,32 @@ function XHSDevTools:SpawnLaneWave(lane)
 	return "Spawned wave on lane " .. lane
 end
 
+function XHSDevTools:SpawnPhase2Wave(side)
+	side = string.lower(tostring(side or "both"))
+	if side ~= "left" and side ~= "right" and side ~= "both" then
+		return "Unknown Phase 2 side: " .. tostring(side)
+	end
+
+	if OpenPhase2Doors == nil or SpawnPhase2CreepWave == nil then
+		return "Phase 2 wave helpers are unavailable"
+	end
+
+	OpenPhase2Doors(side, false)
+	local spawned = SpawnPhase2CreepWave(side, true)
+	return "Spawned " .. tostring(spawned) .. " Phase 2 creeps (" .. side .. ")"
+end
+
+function XHSDevTools:StartPhase2()
+	if _G.StartPhase2 == nil or CustomTimers == nil then
+		return "StartPhase2() is unavailable"
+	end
+
+	self:SetSandboxActive(false)
+	CustomTimers.game_phase = 1
+	_G.StartPhase2()
+	return "Phase 2 activated with recurring waves"
+end
+
 function XHSDevTools:SetPhase(phase)
 	phase = math.max(1, math.min(3, phase))
 	if CustomTimers then
@@ -825,6 +855,9 @@ end
 
 function XHSDevTools:Cleanup()
 	self:RemoveDevSpawnedUnits()
+	if ResetPhase2CreepWaveCounts ~= nil then
+		ResetPhase2CreepWaveCounts()
+	end
 	if KillCreeps then
 		KillCreeps(DOTA_TEAM_CUSTOM_1)
 	end

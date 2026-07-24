@@ -36,6 +36,7 @@ local CAST_BAR_TEXTURES = {
 	xhs_proudmoore_broadside = "custom/xhs_proudmoore_broadside",
 	xhs_proudmoore_anchor_smash = "custom/xhs_proudmoore_anchor_smash",
 	xhs_proudmoore_focus_fire = "custom/xhs_proudmoore_focus_fire",
+	xhs_arthas_judgment_of_lordaeron = "omniknight_guardian_angel",
 	xhs_lich_king_remorseless_winter = "custom/xhs_lich_king_remorseless_winter",
 	xhs_lich_king_frostmourne_hunger = "custom/xhs_lich_king_frostmourne_hunger",
 	xhs_lich_king_howling_blast = "custom/xhs_lich_king_howling_blast",

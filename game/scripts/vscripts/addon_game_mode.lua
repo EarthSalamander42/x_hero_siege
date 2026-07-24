@@ -51,7 +51,8 @@ function Precache(context)
 	PrecacheResource("particle", "particles/units/heroes/hero_terrorblade/terrorblade_metamorphosis_base_attack.vpcf", context)      -- Illidan boss attack projectile
 	PrecacheResource("particle", "particles/act_2/campfire_flame.vpcf", context)
 	PrecacheResource("particle", "particles/camp_fire_buff.vpcf", context)
-	PrecacheResource("particle", "particles/custom/undead/disease_cloud.vpcf", context)
+	PrecacheResource("particle", "particles/units/heroes/hero_pudge/pudge_rot.vpcf", context)
+	PrecacheResource("particle", "particles/units/heroes/hero_pudge/pudge_rot_recipient.vpcf", context)
 	PrecacheResource("particle", "particles/darkmoon_last_hit_effect.vpcf", context)
 	PrecacheResource("particle", "particles/custom/xhs_growth_overhead.vpcf", context)                                       -- Farm event/Phase 2 overhead
 	PrecacheResource("particle", "particles/econ/items/shadow_fiend/sf_fire_arcana/sf_fire_arcana_shadowraze.vpcf", context) -- Boss death
@@ -142,6 +143,7 @@ function Precache(context)
 	XHSPrecache:PrecacheUnit("npc_dota_hero_illidan", nil, -1)
 	XHSPrecache:PrecacheUnit("npc_dota_hero_balanar", nil, -1)
 	XHSPrecache:PrecacheUnit("npc_dota_hero_proudmoore", nil, -1)
+	XHSPrecache:PrecacheUnit("npc_dota_lich_king_sindragosa", nil, -1)
 
 	-- PRECACHE SOUNDS
 	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_abaddon.vsndevts", context)    -- For Lich King shield spell

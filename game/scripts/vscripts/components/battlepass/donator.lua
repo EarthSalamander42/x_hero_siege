@@ -1,5 +1,7 @@
 local stored_companions = {}
 local companion_spawn_tokens = {}
+local stored_statues = {}
+local statue_slots = {}
 local DEFAULT_DONATOR_COMPANION = "npc_donator_companion_demi_doom"
 
 local function GetCompanionDefinition(unit_name)
@@ -29,6 +31,11 @@ function Battlepass:DonatorCompanion(ID, unit_name, js)
 		end
 	end
 
+	-- Invalidate any asynchronous precache callback before disabling or replacing
+	-- the current companion, otherwise an older preview can respawn after cleanup.
+	companion_spawn_tokens[ID] = (companion_spawn_tokens[ID] or 0) + 1
+	local spawnToken = companion_spawn_tokens[ID]
+
 	-- Disabled companion
 	if unit_name == "" then
 		stored_companions[ID] = nil
@@ -55,9 +62,6 @@ function Battlepass:DonatorCompanion(ID, unit_name, js)
 
 	local model = companionDefinition["Model"]
 	local model_scale = companionDefinition["ModelScale"]
-
-	companion_spawn_tokens[ID] = (companion_spawn_tokens[ID] or 0) + 1
-	local spawnToken = companion_spawn_tokens[ID]
 
 	XHSPrecache:PrecacheCompanion(unit_name, function()
 		if companion_spawn_tokens[ID] ~= spawnToken then return end
@@ -210,29 +214,40 @@ function DonatorCompanionSkin(id, unit, skin)
 	end
 end
 
-function Battlepass:DonatorStatue(ID, statue_unit)
+function Battlepass:RemoveDonatorStatue(ID)
+	local stored = stored_statues[ID]
+	if stored then
+		if stored.unit and not stored.unit:IsNull() then
+			stored.unit:RemoveSelf()
+		end
+		if stored.pedestal and not stored.pedestal:IsNull() then
+			stored.pedestal:RemoveSelf()
+		end
+	end
+	stored_statues[ID] = nil
+
+	local player = PlayerResource:GetPlayer(ID)
+	local hero = player and player:GetAssignedHero() or nil
+	if hero and not hero:IsNull() then
+		hero.donator_statue = nil
+	end
+end
+
+function Battlepass:DonatorStatue(ID, statue_unit, js)
+	if not PlayerResource:IsValidPlayerID(ID) then return end
+	local player = PlayerResource:GetPlayer(ID)
+	if player == nil or statue_unit == nil or statue_unit == "" then return end
+
 	if UNIQUE_DONATOR_STATUE[tostring(PlayerResource:GetSteamID(ID))] and not js then
 		statue_unit = UNIQUE_DONATOR_STATUE[tostring(PlayerResource:GetSteamID(ID))]
 	end
 
 	local pedestal_name = "npc_donator_pedestal"
 	local hero = PlayerResource:GetSelectedHeroEntity(ID)
-
-	--	if hero.donator_statue then
-	--		hero.donator_statue:ForceKill(false)
-
-	--		local unit = CreateUnitByName(statue_unit[2], abs, true, nil, nil, PlayerResource:GetPlayer(ID):GetTeam())
-	--		unit:SetModelScale(statue_unit[1])
-	--		unit:SetAbsOrigin(abs + Vector(0, 0, 17))
-	--		unit:AddNewModifier(unit, nil, "modifier_contributor_statue", {})
-	--		hero.donator_statue = unit
-
-	--		return
-	--	end
+	if hero == nil or hero:IsNull() then return end
 
 	local team = "good"
-
-	if PlayerResource:GetPlayer(ID):GetTeam() == 3 then
+	if player:GetTeam() == DOTA_TEAM_BADGUYS then
 		team = "bad"
 	end
 
@@ -243,85 +258,82 @@ function Battlepass:DonatorStatue(ID, statue_unit)
 		team .. "_filler_7",
 	}
 
-	local model_scale = nil
+	local definitions = LoadKeyValues("scripts/npc/units/statues.txt") or {}
+	local definition = definitions[statue_unit]
+	if type(definition) ~= "table" then return end
+	local model_scale = tonumber(definition.ModelScale) or 1.0
 
-	for key, value in pairs(LoadKeyValues("scripts/npc/units/statues.txt")) do
-		if key == statue_unit then
-			model_scale = value["ModelScale"]
-			break
+	local abs = statue_slots[ID]
+	if abs == nil then
+		for _, ent_name in pairs(fillers) do
+			local filler = Entities:FindByName(nil, ent_name)
+			if filler then
+				abs = filler:GetAbsOrigin()
+				statue_slots[ID] = abs
+				filler:RemoveSelf()
+				break
+			end
 		end
 	end
+	if abs == nil then return end
 
-	if model_scale == nil then model_scale = 1.0 end
+	self:RemoveDonatorStatue(ID)
+	local unit = CreateUnitByName(statue_unit, abs, true, nil, nil, player:GetTeam())
+	if unit == nil then return end
+	unit:SetModelScale(model_scale)
+	unit:SetAbsOrigin(abs + Vector(0, 0, 45))
+	unit:AddNewModifier(unit, nil, "modifier_invulnerable", {})
+	hero.donator_statue = unit
 
-	if statue_unit == nil then return end
-	for _, ent_name in pairs(fillers) do
-		local filler = Entities:FindByName(nil, ent_name)
-		if filler then
-			local abs = filler:GetAbsOrigin()
+	local name = PlayerResource:GetPlayerName(ID)
+	local donator_status = api:GetDonatorStatus(ID)
+	if GetDonatorVisualStatus ~= nil then
+		donator_status = GetDonatorVisualStatus(donator_status)
+	end
 
-			filler:RemoveSelf()
+	if donator_status == 1 then
+		unit:SetCustomHealthLabel(name, 160, 20, 20)
+		pedestal_name = "npc_donator_pedestal_cookies"
+	elseif donator_status == 2 then
+		unit:SetCustomHealthLabel(name, 0, 204, 255)
+		pedestal_name = "npc_donator_pedestal_developer_" .. team
+	elseif donator_status == 3 then
+		unit:SetCustomHealthLabel(name, 160, 20, 20)
+	elseif donator_status == 4 then
+		unit:SetCustomHealthLabel(name, 240, 50, 50)
+		pedestal_name = "npc_donator_pedestal_ember_" .. team
+	elseif donator_status == 5 then
+		unit:SetCustomHealthLabel(name, 218, 165, 32)
+		pedestal_name = "npc_donator_pedestal_golden_" .. team
+	elseif donator_status == 7 then
+		unit:SetCustomHealthLabel(name, 47, 91, 151)
+		pedestal_name = "npc_donator_pedestal_salamander_" .. team
+	elseif donator_status == 8 then
+		unit:SetCustomHealthLabel(name, 153, 51, 153)
+		pedestal_name = "npc_donator_pedestal_icefrog"
+	elseif donator_status and donator_status > 0 then
+		unit:SetCustomHealthLabel(name, 45, 200, 45)
+	end
 
-			local unit = CreateUnitByName(statue_unit, abs, true, nil, nil, PlayerResource:GetPlayer(ID):GetTeam())
-			if unit == nil then return end
-			unit:SetModelScale(model_scale)
-			unit:SetAbsOrigin(abs + Vector(0, 0, 45))
-			--			unit:AddNewModifier(unit, nil, "modifier_donator_statue", {})
-			unit:AddNewModifier(unit, nil, "modifier_invulnerable", {})
-			hero.donator_statue = unit
+	if statue_unit == "npc_donator_statue_suthernfriend" then
+		unit:SetMaterialGroup("1")
+	elseif statue_unit == "npc_donator_statue_tabisama" then
+		unit:SetAbsOrigin(unit:GetAbsOrigin() + Vector(0, 0, 40))
+	elseif statue_unit == "npc_donator_statue_zonnoz" then
+		pedestal_name = "npc_donator_pedestal_pudge_arcana"
+	elseif statue_unit == "npc_donator_statue_crystal_maiden_arcana" then
+		local particle = ParticleManager:CreateParticle("particles/econ/items/crystal_maiden/crystal_maiden_maiden_of_icewrack/maiden_arcana_base_ambient.vpcf", PATTACH_ABSORIGIN_FOLLOW, unit)
+		ParticleManager:ReleaseParticleIndex(particle)
+	end
 
-			local steam_id = tostring(PlayerResource:GetSteamID(hero:GetPlayerID()))
-			local name = PlayerResource:GetPlayerName(ID)
-			local donator_status = api:GetDonatorStatus(ID)
-			if GetDonatorVisualStatus ~= nil then
-				donator_status = GetDonatorVisualStatus(donator_status)
-			end
-
-			if donator_status == 1 then
-				unit:SetCustomHealthLabel(name, 160, 20, 20)
-				pedestal_name = "npc_donator_pedestal_cookies"
-			elseif donator_status == 2 then
-				unit:SetCustomHealthLabel("sutherncuck", 0, 204, 255)
-				pedestal_name = "npc_donator_pedestal_developer_" .. team
-			elseif donator_status == 3 then
-				unit:SetCustomHealthLabel(name, 160, 20, 20)
-			elseif donator_status == 4 then
-				unit:SetCustomHealthLabel(name, 240, 50, 50)
-				pedestal_name = "npc_donator_pedestal_ember_" .. team
-			elseif donator_status == 5 then
-				unit:SetCustomHealthLabel(name, 218, 165, 32)
-				pedestal_name = "npc_donator_pedestal_golden_" .. team
-			elseif donator_status == 7 then
-				unit:SetCustomHealthLabel(name, 47, 91, 151)
-				pedestal_name = "npc_donator_pedestal_salamander_" .. team
-			elseif donator_status == 8 then
-				unit:SetCustomHealthLabel(name, 153, 51, 153)
-				pedestal_name = "npc_donator_pedestal_icefrog"
-			elseif donator_status then -- 6: donator, 0: lesser donator
-				unit:SetCustomHealthLabel(name, 45, 200, 45)
-			end
-
-			if statue_unit == "npc_donator_statue_suthernfriend" then
-				unit:SetMaterialGroup("1")
-			elseif statue_unit == "npc_donator_statue_tabisama" then
-				unit:SetAbsOrigin(unit:GetAbsOrigin() + Vector(0, 0, 40))
-			elseif statue_unit == "npc_donator_statue_zonnoz" then
-				pedestal_name = "npc_donator_pedestal_pudge_arcana"
-			elseif statue_unit == "npc_donator_statue_crystal_maiden_arcana" then
-				local particle = ParticleManager:CreateParticle("particles/econ/items/crystal_maiden/crystal_maiden_maiden_of_icewrack/maiden_arcana_base_ambient.vpcf", PATTACH_ABSORIGIN_FOLLOW, unit)
-				ParticleManager:ReleaseParticleIndex(particle)
-			end
-
-			local pedestal = CreateUnitByName(pedestal_name, abs, true, nil, nil, PlayerResource:GetPlayer(ID):GetTeam())
-			pedestal:AddNewModifier(pedestal, nil, "modifier_contributor_statue", {})
-			pedestal:SetAbsOrigin(abs + Vector(0, 0, 45))
-			unit.pedestal = pedestal
-
-			if statue_unit == "npc_donator_statue_zonnoz" then
-				pedestal:SetMaterialGroup("1")
-			end
-
-			return
+	local pedestal = CreateUnitByName(pedestal_name, abs, true, nil, nil, player:GetTeam())
+	if pedestal then
+		pedestal:AddNewModifier(pedestal, nil, "modifier_contributor_statue", {})
+		pedestal:SetAbsOrigin(abs + Vector(0, 0, 45))
+		if statue_unit == "npc_donator_statue_zonnoz" then
+			pedestal:SetMaterialGroup("1")
 		end
 	end
+	unit.pedestal = pedestal
+	stored_statues[ID] = { unit = unit, pedestal = pedestal }
 end

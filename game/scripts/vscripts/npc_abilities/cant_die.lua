@@ -1,6 +1,21 @@
 LinkLuaModifier("modifier_cant_die_generic", "npc_abilities/cant_die.lua", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_dying_generic", "npc_abilities/cant_die.lua", LUA_MODIFIER_MOTION_NONE)
 
+local XHS_DEFERRED_PHASE3_BOSS_BARS = {
+	["npc_dota_hero_grom_hellscream"] = true,
+	["npc_dota_hero_illidan"] = true,
+	["npc_dota_hero_balanar"] = true,
+	["npc_dota_hero_proudmoore"] = true,
+	["npc_dota_boss_spirit_master"] = true,
+}
+
+local function IsDeferredPhase3BossBar(boss)
+	return boss ~= nil
+		and IsValidEntity(boss)
+		and not boss:IsNull()
+		and XHS_DEFERRED_PHASE3_BOSS_BARS[boss:GetUnitName()] == true
+end
+
 local function GetBossFromDataDrivenKeys(keys)
 	if keys == nil then return nil end
 
@@ -14,7 +29,7 @@ end
 
 function OnCreated(keys)
 	local boss = GetBossFromDataDrivenKeys(keys)
-	if boss ~= nil and IsPrivateBossBarBoss and IsPrivateBossBarBoss(boss) then
+	if boss ~= nil and ((IsPrivateBossBarBoss and IsPrivateBossBarBoss(boss)) or IsDeferredPhase3BossBar(boss)) then
 		return
 	end
 
@@ -86,6 +101,7 @@ function modifier_cant_die_generic:OnCreated()
 	local is_private_boss_bar_boss = IsPrivateBossBarBoss and IsPrivateBossBarBoss(self.parent)
 
 	if not is_private_boss_bar_boss
+		and not IsDeferredPhase3BossBar(self.parent)
 		and self.parent:GetUnitName() ~= "npc_dota_boss_spirit_master_storm"
 		and self.parent:GetUnitName() ~= "npc_dota_boss_spirit_master_earth"
 		and self.parent:GetUnitName() ~= "npc_dota_boss_spirit_master_fire" then
@@ -121,12 +137,10 @@ function modifier_cant_die_generic:OnTakeDamage(event)
 				and parent:GetUnitName() == "npc_dota_boss_spirit_master"
 				and XHSSpiritMasterEncounter.phase ~= nil then
 				if XHSSpiritMasterEncounter.phase ~= "master" then
-					local finalDeathReady = XHSSpiritMasterEncounter.IsFinalDeathReady ~= nil
-						and XHSSpiritMasterEncounter:IsFinalDeathReady() == true
-					if finalDeathReady ~= true then
-						parent:SetHealth(math.max(parent:GetHealth(), XHSSpiritMasterEncounter.return_health or 1))
-						return
-					end
+					-- The real Spirit Master is only an encounter anchor during a
+					-- split/finale. It must never enter the generic boss death path.
+					parent:SetHealth(math.max(1, parent:GetHealth()))
+					return
 				else
 					local threshold = XHSSpiritMasterEncounter:GetNextThreshold(parent)
 					if threshold ~= nil and XHSSpiritMasterEncounter:TriggerSplit(parent, threshold) == true then
@@ -221,25 +235,31 @@ function modifier_cant_die_generic:OnTakeDamage(event)
 				EmitGlobalSound("Loot_Drop_Stinger_Arcana")
 			end
 
-			-- open doors if any
-			Timers:CreateTimer(6.0, function()
-				if bDevSandbox ~= true and XHS_BOSSES_TABLE[parent:GetUnitName()] and XHS_BOSSES_TABLE[parent:GetUnitName()].doors_to_open then
-					for _, door_name in pairs(XHS_BOSSES_TABLE[parent:GetUnitName()].doors_to_open) do
-						DoEntFire(door_name, "SetAnimation", "gate_02_open", 0, nil, nil)
-					end
-				end
-
-				if bDevSandbox ~= true and XHS_BOSSES_TABLE[parent:GetUnitName()] and XHS_BOSSES_TABLE[parent:GetUnitName()].obstructions_to_disable then
-					for _, obs_name in pairs(XHS_BOSSES_TABLE[parent:GetUnitName()].obstructions_to_disable) do
-						for _, obs in pairs(Entities:FindAllByName(obs_name)) do
-							obs:SetEnabled(false, true)
-						end
-					end
-				end
-
+			local bossConfig = XHS_BOSSES_TABLE[parent:GetUnitName()]
+			local function FinishBossDoorTransition()
 				StartAnimation(parent, XHS_BOSSES_TABLE[parent:GetUnitName()].death_animation)
 				EmitSoundOn("skeleton_king_wraith_death_long_09", parent)
-			end)
+			end
+
+			-- Start moving the camera before the six-second death beat, then open
+			-- the next arena exactly when the camera reaches its doors.
+			if bDevSandbox ~= true and bossConfig.doors_to_open ~= nil and XHSOpenDoorsWithCinematic ~= nil then
+				Timers:CreateTimer(4.65, function()
+					XHSOpenDoorsWithCinematic(
+						bossConfig.doors_to_open,
+						bossConfig.obstructions_to_disable,
+						"gate_02_open",
+						FinishBossDoorTransition,
+						{
+							move_duration = 1.35,
+							hold_duration = 1.25,
+							return_duration = 1.0,
+						}
+					)
+				end)
+			else
+				Timers:CreateTimer(6.0, FinishBossDoorTransition)
+			end
 
 			-- next boss
 			local delay = XHS_BOSSES_TABLE[parent:GetUnitName()].func_next_delay or 0.0

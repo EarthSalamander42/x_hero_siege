@@ -232,6 +232,18 @@ function XHSPrecache:PrecacheBattlepassCompanionAssets(context)
 		end
 	end
 
+	for _, definitionsPath in ipairs({
+		"scripts/npc/units/companions.txt",
+		"scripts/npc/units/statues.txt",
+	}) do
+		local definitions = LoadKeyValues(definitionsPath) or {}
+		for _, definition in pairs(definitions) do
+			if type(definition) == "table" then
+				addUnique(models, modelSet, definition.Model)
+			end
+		end
+	end
+
 	local cosmeticParticles = {
 		"particles/econ/items/pudge/pudge_scorching_talon/pudge_scorching_talon_ambient.vpcf",
 		"particles/econ/items/pudge/pudge_arcana/pudge_arcana_back_ambient.vpcf",
@@ -245,10 +257,22 @@ function XHSPrecache:PrecacheBattlepassCompanionAssets(context)
 		"particles/econ/items/phantom_assassin/phantom_assassin_arcana_elder_smith/pa_arcana_elder_eyes_l.vpcf",
 		"particles/econ/items/phantom_assassin/phantom_assassin_arcana_elder_smith/pa_arcana_elder_eyes_r.vpcf",
 		"particles/econ/items/phantom_assassin/phantom_assassin_arcana_elder_smith/phantom_assassin_stifling_dagger_arcana.vpcf",
+		"particles/econ/items/crystal_maiden/crystal_maiden_maiden_of_icewrack/maiden_arcana_base_ambient.vpcf",
 	}
 
 	for _, particle in pairs(cosmeticParticles) do
 		addUnique(particles, particleSet, particle)
+	end
+
+	local rewardDefinitions = LoadKeyValues("scripts/vscripts/components/battlepass/keyvalues/items.txt") or {}
+	for _, reward in pairs(rewardDefinitions) do
+		if type(reward) == "table" and type(reward.visuals) == "table" then
+			for _, visual in pairs(reward.visuals) do
+				if type(visual) == "table" and visual.type == "particle" then
+					addUnique(particles, particleSet, visual.modifier)
+				end
+			end
+		end
 	end
 
 	for _, model in pairs(models) do
@@ -310,8 +334,16 @@ XHSPrecache:RegisterGroup("core", {
 		"particles/econ/events/fall_major_2016/teleport_end_fm06_lvl3.vpcf",
 		"particles/generic_hero_status/hero_levelup.vpcf",
 		"particles/generic_gameplay/generic_lifesteal.vpcf",
+		"particles/units/heroes/hero_brewmaster/brewmaster_pulverize.vpcf",
+		"particles/units/heroes/hero_juggernaut/juggernaut_healing_ward.vpcf",
+		"particles/units/heroes/hero_juggernaut/juggernaut_healing_ward_eruption.vpcf",
+		"particles/units/heroes/hero_juggernaut/juggernaut_healing_ward_variation02.vpcf",
 		"particles/items_fx/blink_dagger_start.vpcf",
 		"particles/items_fx/blink_dagger_end.vpcf",
+		"particles/world_outpost/world_outpost_radiant_ambient.vpcf",
+	},
+	models = {
+		"models/props_structures/outpost.vmdl",
 	},
 	soundfiles = {
 		"soundevents/game_sounds_custom.vsndevts",
@@ -350,7 +382,6 @@ XHSPrecache:RegisterGroup("hero_abilities", {
 		"particles/units/heroes/hero_zuus/zuus_arc_lightning_head.vpcf",
 		"particles/units/heroes/hero_razor_reduced_flash/razor_rain_storm_reduced_flash.vpcf",
 		"particles/econ/items/mirana/mirana_starstorm_bow/mirana_starstorm_starfall_attack.vpcf",
-		"particles/units/heroes/hero_morphling/morphling_ebb_and_flow_hero_effect.vpcf",
 	},
 	soundfiles = {
 		"soundevents/game_sounds_heroes/game_sounds_zuus.vsndevts",
@@ -397,6 +428,7 @@ XHSPrecache:RegisterGroup("bosses", {
 		"particles/boss_nevermore/immolation_warning.vpcf",
 		"particles/boss_nevermore/ragna_blade_pre_warning.vpcf",
 		"particles/boss_nevermore/ragna_blade.vpcf",
+		"particles/boss_nevermore/screen_requiem_indicator.vpcf",
 		"particles/units/heroes/hero_nevermore/nevermore_requiemofsouls_line.vpcf",
 		"particles/custom/xhs_boss_warning_circle.vpcf",
 		"particles/events/darkmoon_generic_aoe_green.vpcf",
@@ -413,7 +445,7 @@ XHSPrecache:RegisterGroup("bosses", {
 		"particles/units/heroes/hero_elder_titan/elder_titan_earth_splitter.vpcf",
 		"particles/units/heroes/heroes_underlord/underlord_pitofmalice.vpcf",
 		"particles/units/heroes/heroes_underlord/underlord_pitofmalice_pre.vpcf",
-		"particles/units/heroes/heroes_underlord/underlord_pitofmalice_stun.vpcf",
+		"particles/units/heroes/heroes_underlord/abyssal_underlord_pitofmalice_stun.vpcf",
 		"particles/units/heroes/hero_lycan/lycan_howl_cast.vpcf",
 		"particles/units/heroes/hero_earthshaker/earthshaker_fissure.vpcf",
 		"particles/units/heroes/hero_abaddon/abaddon_curse_counter_stack.vpcf",
@@ -425,7 +457,7 @@ XHSPrecache:RegisterGroup("bosses", {
 		"particles/hero/kunkka/torrent_splash.vpcf",
 		"particles/econ/items/kunkka/kunkka_immortal/kunkka_immortal_ghost_ship_splash.vpcf",
 		"particles/units/heroes/hero_tidehunter/tidehunter_anchor_hero.vpcf",
-		"particles/econ/items/kunkka/kunkka_weapon_whaleblade/kunkka_spell_tidebringer.vpcf",
+		"particles/econ/items/kunkka/kunkka_tidebringer_base/kunkka_spell_tidebringer.vpcf",
 		"particles/units/heroes/hero_terrorblade/terrorblade_metamorphosis_transform.vpcf",
 		"particles/units/heroes/hero_lina/lina_spell_dragon_slave.vpcf",
 		"particles/units/heroes/hero_lina/lina_spell_dragon_slave_impact.vpcf",
@@ -441,7 +473,11 @@ XHSPrecache:RegisterGroup("bosses", {
 		"particles/units/heroes/hero_abaddon/abaddon_death_coil_explosion.vpcf",
 		"particles/econ/items/crystal_maiden/crystal_maiden_cowl_of_ice/maiden_crystal_nova_cowlofice.vpcf",
 		"particles/units/heroes/hero_abaddon/abaddon_aphotic_shield_explosion.vpcf",
+		"particles/items_fx/blademail.vpcf",
+		"particles/units/heroes/hero_centaur/centaur_return.vpcf",
+		"particles/units/heroes/hero_abaddon/abaddon_borrowed_time_heal.vpcf",
 		"particles/units/heroes/hero_winter_wyvern/wyvern_splinter_blast.vpcf",
+		"particles/units/heroes/hero_winter_wyvern/wyvern_ambient_dryice_soft.vpcf",
 		"particles/units/heroes/hero_nevermore/nevermore_requiemofsouls.vpcf",
 		"particles/units/heroes/hero_sven/sven_spell_storm_bolt.vpcf",
 		"particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast_explosion.vpcf",
@@ -514,7 +550,8 @@ XHSPrecache:RegisterGroup("bosses", {
 
 XHSPrecache:RegisterGroup("waves", {
 	particles = {
-		"particles/custom/undead/disease_cloud.vpcf",
+		"particles/units/heroes/hero_pudge/pudge_rot.vpcf",
+		"particles/units/heroes/hero_pudge/pudge_rot_recipient.vpcf",
 		"particles/darkmoon_last_hit_effect.vpcf",
 		"particles/units/heroes/hero_jakiro/jakiro_base_attack.vpcf",
 		"particles/units/heroes/hero_ancient_apparition/ancient_apparition_base_attack.vpcf",

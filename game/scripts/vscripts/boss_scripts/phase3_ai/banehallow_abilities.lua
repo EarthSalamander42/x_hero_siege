@@ -12,6 +12,7 @@ local RAZE_WARNING_PARTICLE = "particles/boss_nevermore/pre_raze.vpcf"
 local RAZE_IMPACT_PARTICLE = "particles/boss_nevermore/raze_blast.vpcf"
 local METEOR_WARNING_PARTICLE = "particles/boss_nevermore/meteorain_pre.vpcf"
 local METEOR_IMPACT_PARTICLE = "particles/boss_nevermore/meteorain.vpcf"
+local METEOR_PARTICLE_FALL_TIME = 1.5
 local RAGNA_WARNING_PARTICLE = "particles/boss_nevermore/ragna_blade_pre_warning.vpcf"
 local RAGNA_IMPACT_PARTICLE = "particles/boss_nevermore/ragna_blade.vpcf"
 local REQUIEM_PRECAST_PARTICLE = "particles/units/heroes/hero_nevermore/nevermore_requiemofsouls.vpcf"
@@ -87,7 +88,7 @@ local function DamageEnemies(caster, ability, position, radius, damage, damageTy
 				attacker = caster,
 				ability = ability,
 				damage = damage,
-				damage_type = damageType or DAMAGE_TYPE_PURE,
+				damage_type = damageType or ability:GetAbilityDamageType(),
 			})
 			SendOverheadEventMessage(nil, overheadType or OVERHEAD_ALERT_BONUS_SPELL_DAMAGE, enemy, damageDealt, nil)
 			ApplyNecromastery(caster, 1)
@@ -114,7 +115,7 @@ local function ImpactRaze(caster, ability, position, radius, damage, playImpactS
 	ParticleManager:SetParticleControl(particle, 1, Vector(0, 0, 0))
 	ParticleManager:ReleaseParticleIndex(particle)
 
-	DamageEnemies(caster, ability, position, radius, damage, DAMAGE_TYPE_PURE, OVERHEAD_ALERT_BONUS_SPELL_DAMAGE)
+	DamageEnemies(caster, ability, position, radius, damage, ability:GetAbilityDamageType(), OVERHEAD_ALERT_BONUS_SPELL_DAMAGE)
 end
 
 local function PickMeteorRainTarget(caster, center, radius, excluded)
@@ -147,16 +148,32 @@ local function CreateMeteor(caster, ability, position, radius, damage, fallDelay
 		return nil
 	end)
 
-	local meteor = ParticleManager:CreateParticle(METEOR_IMPACT_PARTICLE, PATTACH_WORLDORIGIN, nil)
-	ParticleManager:SetParticleControl(meteor, 0, position + Vector(300, -300, 1000))
-	ParticleManager:SetParticleControl(meteor, 1, position)
-	ParticleManager:SetParticleControl(meteor, 2, Vector(fallDelay, 0, 0))
-	ParticleManager:ReleaseParticleIndex(meteor)
+	-- This legacy particle completes its visible fall in at most 1.5 seconds,
+	-- independently of longer difficulty telegraphs. Start it late so its
+	-- ground contact, impact sound and gameplay damage happen together.
+	local meteorFallTime = math.min(fallDelay, METEOR_PARTICLE_FALL_TIME)
+	local meteorStartDelay = math.max(0, fallDelay - meteorFallTime)
+	local function SpawnFallingMeteor()
+		if not IsValidAlive(caster) or caster.xhs_banehallow_stopped == true then return nil end
+
+		local meteor = ParticleManager:CreateParticle(METEOR_IMPACT_PARTICLE, PATTACH_WORLDORIGIN, nil)
+		ParticleManager:SetParticleControl(meteor, 0, position + Vector(300, -300, 1000))
+		ParticleManager:SetParticleControl(meteor, 1, position)
+		ParticleManager:SetParticleControl(meteor, 2, Vector(meteorFallTime, 0, 0))
+		ParticleManager:ReleaseParticleIndex(meteor)
+		return nil
+	end
+
+	if meteorStartDelay > 0 then
+		Timers:CreateTimer(meteorStartDelay, SpawnFallingMeteor)
+	else
+		SpawnFallingMeteor()
+	end
 
 	Timers:CreateTimer(fallDelay, function()
 		if not IsValidAlive(caster) or caster.xhs_banehallow_stopped == true then return nil end
 		caster:EmitSound("Hero_Invoker.ChaosMeteor.Impact")
-		DamageEnemies(caster, ability, position, radius, damage, DAMAGE_TYPE_PURE, OVERHEAD_ALERT_BONUS_SPELL_DAMAGE)
+		DamageEnemies(caster, ability, position, radius, damage, ability:GetAbilityDamageType(), OVERHEAD_ALERT_BONUS_SPELL_DAMAGE)
 		return nil
 	end)
 end
@@ -205,7 +222,7 @@ local function DamageRequiemLine(caster, ability, origin, velocity, distance, wi
 				attacker = caster,
 				ability = ability,
 				damage = damage * RandomInt(90, 110) * 0.01,
-				damage_type = DAMAGE_TYPE_MAGICAL,
+				damage_type = ability:GetAbilityDamageType(),
 			})
 			SendOverheadEventMessage(nil, OVERHEAD_ALERT_DAMAGE, enemy, damageDealt, nil)
 		end
@@ -393,7 +410,7 @@ function frostivus_boss_ragna_blade:OnSpellStart()
 			ParticleManager:ReleaseParticleIndex(impact)
 
 			local damage = target:GetMaxHealth() / 100 * damagePct
-			local damageDealt = ApplyDamage({ victim = target, attacker = caster, ability = self, damage = damage, damage_type = DAMAGE_TYPE_PURE })
+			local damageDealt = ApplyDamage({ victim = target, attacker = caster, ability = self, damage = damage, damage_type = self:GetAbilityDamageType() })
 			SendOverheadEventMessage(nil, OVERHEAD_ALERT_DAMAGE, target, damageDealt, nil)
 			ApplyNecromastery(caster, 1)
 		end
@@ -455,7 +472,7 @@ function frostivus_boss_soul_harvest:OnProjectileHit_ExtraData(target, location,
 		attacker = self:GetCaster(),
 		ability = self,
 		damage = (keys.damage or 0) * RandomInt(90, 110) * 0.01,
-		damage_type = DAMAGE_TYPE_PHYSICAL,
+		damage_type = self:GetAbilityDamageType(),
 	})
 	SendOverheadEventMessage(nil, OVERHEAD_ALERT_DAMAGE, target, damageDealt, nil)
 end
@@ -576,7 +593,7 @@ function frostivus_boss_requiem_of_souls:OnSpellStart()
 
 		DamageRequiemLine(caster, self, bossLoc, velocity, distance, 160, lineDamage)
 	end
-	DamageEnemies(caster, self, bossLoc, distance, lineDamage, DAMAGE_TYPE_PURE, OVERHEAD_ALERT_DAMAGE)
+	DamageEnemies(caster, self, bossLoc, distance, lineDamage, self:GetAbilityDamageType(), OVERHEAD_ALERT_DAMAGE)
 
 	ClearContext(self)
 end

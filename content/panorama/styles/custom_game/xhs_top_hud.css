@@ -3,6 +3,7 @@
 	height: 100%;
 	vertical-align: top;
 	overflow: noclip;
+	z-index: 100;
 }
 
 #XHSTopHudRoot {
@@ -2661,4 +2662,48 @@
 	height: 82px;
 	/* TODO: Fix override */
 	font-size: 30px;
+}
+
+#XHSNightfallVignette {
+	width: 100%;
+	height: 100%;
+	opacity: 0;
+	transition-property: opacity;
+	transition-duration: 0.35s;
+}
+
+#XHSNightfallVignette.XHSNightfallActive {
+	opacity: 1;
+}
+
+.XHSNightfallEdge {
+	background-color: #02030df2;
+}
+
+.XHSNightfallTop {
+	width: 100%;
+	height: 25%;
+	vertical-align: top;
+	background-color: gradient(linear, 0% 0%, 0% 100%, from(#02030dfa), to(#02030d00));
+}
+
+.XHSNightfallBottom {
+	width: 100%;
+	height: 25%;
+	vertical-align: bottom;
+	background-color: gradient(linear, 0% 100%, 0% 0%, from(#02030dfa), to(#02030d00));
+}
+
+.XHSNightfallLeft {
+	width: 22%;
+	height: 100%;
+	horizontal-align: left;
+	background-color: gradient(linear, 0% 0%, 100% 0%, from(#02030dfa), to(#02030d00));
+}
+
+.XHSNightfallRight {
+	width: 22%;
+	height: 100%;
+	horizontal-align: right;
+	background-color: gradient(linear, 100% 0%, 0% 0%, from(#02030dfa), to(#02030d00));
 }

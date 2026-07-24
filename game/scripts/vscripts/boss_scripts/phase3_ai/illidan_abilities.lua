@@ -33,6 +33,7 @@ local FEL_BEAM_IMPACT_PARTICLE = "particles/units/heroes/hero_lina/lina_spell_dr
 local SHADOW_DASH_START_PARTICLE = "particles/items_fx/blink_dagger_start.vpcf"
 local SHADOW_DASH_END_PARTICLE = "particles/items_fx/blink_dagger_end.vpcf"
 local IMMOLATION_PARTICLE = "particles/units/heroes/hero_ember_spirit/ember_spirit_flameguard.vpcf"
+local IMMOLATION_PRECAST_PARTICLE = "particles/econ/events/darkmoon_2017/darkmoon_generic_aoe.vpcf"
 local GLAIVE_STORM_PARTICLE = "particles/econ/items/luna/luna_lucent_ti5/luna_eclipse_impact_moonfall.vpcf"
 local GLAIVE_STORM_CAST_PARTICLE = "particles/units/heroes/hero_luna/luna_eclipse_cast.vpcf"
 
@@ -46,6 +47,34 @@ end
 
 local function ClearContext(ability)
 	ability.xhs_illidan_context = nil
+end
+
+local function ClearImmolationPrecast(ability, immediate)
+	local particle = ability and ability.xhs_illidan_immolation_precast_particle
+	if particle == nil then return end
+
+	ability.xhs_illidan_immolation_precast_particle = nil
+	ParticleManager:DestroyParticle(particle, immediate == true)
+	ParticleManager:ReleaseParticleIndex(particle)
+end
+
+local function CreateImmolationPrecast(ability, position, radius, duration)
+	ClearImmolationPrecast(ability, true)
+
+	local particle = ParticleManager:CreateParticle(IMMOLATION_PRECAST_PARTICLE, PATTACH_WORLDORIGIN, nil)
+	ParticleManager:SetParticleControl(particle, 0, position)
+	ParticleManager:SetParticleControl(particle, 1, Vector(radius, 0, 0))
+	ParticleManager:SetParticleControl(particle, 2, Vector(duration or 1.0, 0, 1))
+	ParticleManager:SetParticleControl(particle, 3, ILLIDAN_COLORS.primary)
+	ParticleManager:SetParticleControl(particle, 4, position)
+	ability.xhs_illidan_immolation_precast_particle = particle
+
+	Timers:CreateTimer(math.max(duration or 1.0, 0.03), function()
+		if ability.xhs_illidan_immolation_precast_particle == particle then
+			ClearImmolationPrecast(ability, false)
+		end
+		return nil
+	end)
 end
 
 local function StartBossCastBar(ability, displayName)
@@ -100,7 +129,7 @@ local function DamageEnemies(caster, ability, position, radius, damage, damageTy
 				attacker = caster,
 				ability = ability,
 				damage = damage,
-				damage_type = damageType or DAMAGE_TYPE_PURE,
+				damage_type = damageType or ability:GetAbilityDamageType(),
 			})
 		end
 	end
@@ -129,7 +158,7 @@ local function DamageLine(caster, ability, startPosition, direction, length, wid
 				attacker = caster,
 				ability = ability,
 				damage = damage,
-				damage_type = damageType or DAMAGE_TYPE_PURE,
+				damage_type = damageType or ability:GetAbilityDamageType(),
 			})
 			if onHit ~= nil then
 				onHit(enemy)
@@ -271,7 +300,7 @@ function xhs_illidan_metamorphosis:OnSpellStart()
 	local damage = ScaleDamage(self:GetSpecialValueFor("damage"))
 	local duration = self:GetSpecialValueFor("duration")
 
-	DamageEnemies(caster, self, caster:GetAbsOrigin(), radius, damage, DAMAGE_TYPE_MAGICAL)
+	DamageEnemies(caster, self, caster:GetAbsOrigin(), radius, damage, self:GetAbilityDamageType())
 	CreateRadialImpact(caster:GetAbsOrigin(), radius, METAMORPHOSIS_PARTICLE)
 	EmitLocationSound(caster, caster:GetAbsOrigin(), "Hero_Terrorblade.Metamorphosis")
 	caster:AddNewModifier(caster, self, "modifier_xhs_illidan_metamorphosis", { duration = duration })
@@ -312,7 +341,7 @@ function xhs_illidan_fel_beam:OnSpellStart()
 	local width = self:GetSpecialValueFor("width")
 	local damage = ScaleDamage(self:GetSpecialValueFor("damage"))
 
-	DamageLine(caster, self, startPosition, direction, length, width, damage, DAMAGE_TYPE_PURE, function(enemy)
+	DamageLine(caster, self, startPosition, direction, length, width, damage, self:GetAbilityDamageType(), function(enemy)
 		local impact = ParticleManager:CreateParticle(FEL_BEAM_IMPACT_PARTICLE, PATTACH_ABSORIGIN_FOLLOW, enemy)
 		ParticleManager:SetParticleControlEnt(impact, 0, enemy, PATTACH_ABSORIGIN_FOLLOW, "attach_hitloc", enemy:GetAbsOrigin(), true)
 		ParticleManager:SetParticleControlForward(impact, 1, direction)
@@ -364,7 +393,7 @@ function xhs_illidan_shadow_dash:OnSpellStart()
 	local damage = ScaleDamage(self:GetSpecialValueFor("damage"))
 
 	CreateBlinkImpact(startPosition, SHADOW_DASH_START_PARTICLE, 1.0)
-	DamageLine(caster, self, startPosition, direction, travelDistance, width, damage, DAMAGE_TYPE_PURE)
+	DamageLine(caster, self, startPosition, direction, travelDistance, width, damage, self:GetAbilityDamageType())
 	CreateDragonSlaveParticle(caster, self, startPosition, direction, travelDistance, width, 0.55)
 	FindClearSpaceForUnit(caster, endPosition, true)
 	CreateBlinkImpact(endPosition, SHADOW_DASH_END_PARTICLE, 1.0)
@@ -380,17 +409,22 @@ function xhs_illidan_immolation_burst:OnAbilityPhaseStart()
 	local radius = self:GetSpecialValueFor("radius")
 	StartBossCastBar(self, "Immolation Burst")
 	XHSBossTelegraphs:Circle(caster:GetAbsOrigin(), radius, self:GetCastPoint(), ILLIDAN_COLORS)
+	CreateImmolationPrecast(self, caster:GetAbsOrigin(), radius, self:GetCastPoint())
 	StartAnimation(caster, { duration = self:GetCastPoint() + 0.35, activity = ACT_DOTA_CAST_ABILITY_3, rate = 0.9 })
 	caster:EmitSound("Hero_EmberSpirit.FlameGuard.Cast")
 	return true
 end
 
 function xhs_illidan_immolation_burst:OnAbilityPhaseInterrupted()
-	if IsServer() then HideBossCastBar(self) end
+	if IsServer() then
+		ClearImmolationPrecast(self, true)
+		HideBossCastBar(self)
+	end
 end
 
 function xhs_illidan_immolation_burst:OnSpellStart()
 	if not IsServer() then return end
+	ClearImmolationPrecast(self, false)
 
 	local caster = self:GetCaster()
 	local radius = self:GetSpecialValueFor("radius")
@@ -409,7 +443,7 @@ function xhs_illidan_immolation_burst:OnSpellStart()
 			return nil
 		end
 
-		DamageEnemies(caster, self, caster:GetAbsOrigin(), radius, damage, DAMAGE_TYPE_MAGICAL)
+		DamageEnemies(caster, self, caster:GetAbsOrigin(), radius, damage, self:GetAbilityDamageType())
 		elapsed = elapsed + tick
 		if elapsed < duration then return tick end
 
@@ -456,7 +490,7 @@ function xhs_illidan_glaive_storm:OnSpellStart()
 	for _, point in pairs(context.points or {}) do
 		Timers:CreateTimer(point.delay or 0, function()
 			if not IsValidAlive(caster) then return nil end
-			DamageEnemies(caster, self, point.position, radius, damage, DAMAGE_TYPE_PURE)
+			DamageEnemies(caster, self, point.position, radius, damage, self:GetAbilityDamageType())
 			CreateGlaiveStormImpact(caster, point.position, radius)
 			EmitLocationSound(caster, point.position, "Hero_Luna.Eclipse.Target")
 			caster:EmitSound("Hero_Terrorblade_Morphed.Attack")
@@ -582,7 +616,7 @@ function modifier_xhs_illidan_metamorphosis:OnAttackLanded(event)
 				attacker = parent,
 				ability = ability,
 				damage = cleaveDamage,
-				damage_type = DAMAGE_TYPE_PURE,
+				damage_type = self:GetAbility():GetAbilityDamageType(),
 			})
 		end
 	end

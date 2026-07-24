@@ -619,9 +619,37 @@ function api:PublishSupporterPassArmory(player_id, armory)
 		armory = supporter_pass and supporter_pass.armory or nil
 	end
 
-	if armory ~= nil then
-		CustomNetTables:SetTableValue("supporter_pass_armory", "rewards_" .. player_id, armory)
+	CustomNetTables:SetTableValue("supporter_pass_armory", "rewards_" .. player_id, armory or {})
+
+	if Battlepass and Battlepass.ApplySupporterLoadout then
+		Battlepass:ApplySupporterLoadout(player_id)
 	end
+end
+
+function api:GetSupporterPassArmory(player_id)
+	if not PlayerResource:IsValidPlayerID(player_id) then
+		return {}
+	end
+
+	local steamid = tostring(PlayerResource:GetSteamID(player_id))
+	local player = self.players and self.players[steamid] or nil
+	local supporter_pass = player and player.supporter_pass or nil
+	return supporter_pass and supporter_pass.armory or {}
+end
+
+function api:GetSupporterPassLoadout(player_id)
+	if not PlayerResource:IsValidPlayerID(player_id) then
+		return {}
+	end
+
+	local steamid = tostring(PlayerResource:GetSteamID(player_id))
+	local player = self.players and self.players[steamid] or nil
+	local supporter_pass = player and player.supporter_pass or nil
+	if supporter_pass and supporter_pass.loadout then
+		return supporter_pass.loadout
+	end
+
+	return player and player.armory or {}
 end
 
 function api:GrantSupporterFragments(player_id, amount, reason, idempotency_key, callback)
@@ -1377,7 +1405,7 @@ function api:SubmitCustomPollVote(player_id, poll_id, option_id, callback)
 	})
 end
 
-function api:ProcessCompletedGame(data, payload)
+function api:ProcessCompletedGame(data, payload, skipWinner)
 	local game_id = payload.game_id or api:GetApiGameId() or api:GetMatchID()
 	local match_id = payload.match_id or api:GetMatchID()
 	local gamemode = payload.gamemode or api:GetCustomGamemode()
@@ -1439,7 +1467,9 @@ function api:ProcessCompletedGame(data, payload)
 	CustomNetTables:SetTableValue("game_options", "end_game", full_data)
 	-- CustomGameEventManager:Send_ServerToAllClients("end_game", full_data)
 
-	GameRules:SetGameWinner(GAME_WINNER_TEAM, true)
+	if not skipWinner then
+		GameRules:SetGameWinner(GAME_WINNER_TEAM, true)
+	end
 end
 
 function api:CompleteGame()
@@ -1708,6 +1738,10 @@ function api:CompleteGame()
 		map = GetMapName(),
 		fragment_quests = FragmentQuests ~= nil and FragmentQuests:BuildAnalyticsPayload() or nil,
 	}
+
+	-- Publish the complete local snapshot immediately. The backend response below
+	-- enriches this table later, but must never block the EndScreen from appearing.
+	self:ProcessCompletedGame({}, payload, true)
 
 	self:Request("game-complete", function(data)
 			print("game-complete: Game complete successful!")

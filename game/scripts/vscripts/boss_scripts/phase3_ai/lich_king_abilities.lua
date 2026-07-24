@@ -40,7 +40,9 @@ local FROST_NOVA_PARTICLE = "particles/units/heroes/hero_lich/lich_frost_nova.vp
 local FROSTMOURNE_PARTICLE = "particles/units/heroes/hero_abaddon/abaddon_death_coil_explosion.vpcf"
 local GLACIAL_SPIKE_PARTICLE = "particles/econ/items/crystal_maiden/crystal_maiden_cowl_of_ice/maiden_crystal_nova_cowlofice.vpcf"
 local DEFILE_PARTICLE = "particles/units/heroes/hero_abaddon/abaddon_aphotic_shield_explosion.vpcf"
-local SINDRAGOSA_PARTICLE = "particles/units/heroes/hero_winter_wyvern/wyvern_splinter_blast.vpcf"
+local SINDRAGOSA_BREATH_PARTICLE = "particles/custom/bosses/lich_king/sindragosa_dragon_slave.vpcf"
+local SINDRAGOSA_AURA_PARTICLE = "particles/units/heroes/hero_winter_wyvern/wyvern_ambient_dryice_soft.vpcf"
+local SINDRAGOSA_VISUAL_UNIT = "npc_dota_lich_king_sindragosa"
 
 local CollectTargets
 
@@ -206,7 +208,7 @@ local function DamageEnemies(caster, ability, position, radius, damage, damageTy
 				attacker = caster,
 				ability = ability,
 				damage = damage or 0,
-				damage_type = damageType or DAMAGE_TYPE_MAGICAL,
+				damage_type = damageType or ability:GetAbilityDamageType(),
 			})
 			if frostbiteStacks ~= nil and frostbiteStacks > 0 then
 				ApplyFrostbite(caster, ability, enemy, frostbiteStacks)
@@ -231,6 +233,49 @@ local function CreateImpact(position, particleName, radius, duration)
 		ParticleManager:DestroyParticle(particle, false)
 		ParticleManager:ReleaseParticleIndex(particle)
 		return nil
+	end)
+end
+
+-- Purely visual flyby pass. These units never participate in combat; the
+-- progressive breath projectile is the mechanical source of truth.
+local function SpawnSindragosaFlybyVisual(caster, startPosition, direction, distance, height, travelDuration)
+	local spawnPosition = startPosition - direction * 600 + Vector(0, 0, height)
+	local endPosition = startPosition + direction * (distance + 600) + Vector(0, 0, height)
+	local dragon = CreateUnitByName(SINDRAGOSA_VISUAL_UNIT, spawnPosition, false, caster, caster, caster:GetTeamNumber())
+	if not IsValidEntity(dragon) or dragon:IsNull() then
+		return
+	end
+
+	dragon:SetModelScale(1.5)
+	dragon:SetForwardVector(direction)
+	dragon:AddNewModifier(caster, nil, "modifier_invulnerable", { duration = travelDuration + 0.5 })
+	dragon:AddNewModifier(caster, nil, "modifier_phased", { duration = travelDuration + 0.5 })
+	dragon:AddNewModifier(caster, nil, "modifier_silence", { duration = travelDuration + 0.5 })
+	dragon:AddNewModifier(caster, nil, "modifier_disarmed", { duration = travelDuration + 0.5 })
+
+	local aura = ParticleManager:CreateParticle(SINDRAGOSA_AURA_PARTICLE, PATTACH_ABSORIGIN_FOLLOW, dragon)
+	ParticleManager:SetParticleControl(aura, 1, Vector(1.5, 0, 0))
+
+	local elapsed = 0
+	Timers:CreateTimer(0, function()
+		if not IsValidAlive(dragon) then
+			ParticleManager:DestroyParticle(aura, true)
+			ParticleManager:ReleaseParticleIndex(aura)
+			return nil
+		end
+
+		local progress = math.min(1, elapsed / math.max(0.1, travelDuration))
+		dragon:SetAbsOrigin(spawnPosition + (endPosition - spawnPosition) * progress)
+		dragon:SetForwardVector(direction)
+		if progress >= 1 then
+			ParticleManager:DestroyParticle(aura, false)
+			ParticleManager:ReleaseParticleIndex(aura)
+			UTIL_Remove(dragon)
+			return nil
+		end
+
+		elapsed = elapsed + 0.03
+		return 0.03
 	end)
 end
 
@@ -264,7 +309,7 @@ function xhs_lich_king_remorseless_winter:OnSpellStart()
 	if not IsServer() then return end
 	local caster = self:GetCaster()
 	local radius = self:GetSpecialValueFor("radius")
-	DamageEnemies(caster, self, caster:GetAbsOrigin(), radius, ScaleDamage(self:GetSpecialValueFor("damage")), DAMAGE_TYPE_PURE, 2)
+	DamageEnemies(caster, self, caster:GetAbsOrigin(), radius, ScaleDamage(self:GetSpecialValueFor("damage")), self:GetAbilityDamageType(), 2)
 	SlowEnemies(caster, self, caster:GetAbsOrigin(), radius, self:GetSpecialValueFor("slow_duration"))
 	caster:AddNewModifier(caster, self, "modifier_xhs_lich_king_remorseless", { duration = self:GetSpecialValueFor("buff_duration") })
 	CreateImpact(caster:GetAbsOrigin(), FROST_NOVA_PARTICLE, radius, 0.9)
@@ -304,7 +349,7 @@ function xhs_lich_king_frostmourne_hunger:OnSpellStart()
 	local throne = GetFrozenThroneAbility(caster)
 	local bonusPct = throne and throne:GetSpecialValueFor("frostbite_hunger_damage_pct") or 0
 	local damage = ScaleDamage(self:GetSpecialValueFor("damage")) * (1 + consumedFrostbite * bonusPct * 0.01)
-	DamageEnemies(caster, self, position, radius, damage, DAMAGE_TYPE_PURE, 1)
+	DamageEnemies(caster, self, position, radius, damage, self:GetAbilityDamageType(), 1)
 	SlowEnemies(caster, self, position, radius, self:GetSpecialValueFor("slow_duration"))
 	caster:Heal(damage * self:GetSpecialValueFor("heal_pct") * 0.01, self)
 	CreateImpact(position, FROSTMOURNE_PARTICLE, radius, 0.8)
@@ -337,7 +382,7 @@ function xhs_lich_king_howling_blast:OnSpellStart()
 	caster:EmitSound("Hero_Lich.ChainFrost")
 	for i = 1, self:GetSpecialValueFor("nodes") do
 		local position = caster:GetAbsOrigin() + direction * (160 + spacing * (i - 1))
-		DamageEnemies(caster, self, position, radius, ScaleDamage(self:GetSpecialValueFor("damage")), DAMAGE_TYPE_PURE, 1)
+		DamageEnemies(caster, self, position, radius, ScaleDamage(self:GetSpecialValueFor("damage")), self:GetAbilityDamageType(), 1)
 		SlowEnemies(caster, self, position, radius, self:GetSpecialValueFor("slow_duration"))
 		CreateImpact(position, FROST_NOVA_PARTICLE, radius, 0.65)
 		EmitLocationSound(caster, position, "Hero_Lich.FrostBlast")
@@ -370,7 +415,7 @@ function xhs_lich_king_glacial_spikes:OnSpellStart()
 	local caster = self:GetCaster()
 	local radius = self:GetSpecialValueFor("radius")
 	for _, point in pairs(GetContext(self).points or {}) do
-		DamageEnemies(caster, self, point.position, radius, ScaleDamage(self:GetSpecialValueFor("damage")), DAMAGE_TYPE_PURE, 1)
+		DamageEnemies(caster, self, point.position, radius, ScaleDamage(self:GetSpecialValueFor("damage")), self:GetAbilityDamageType(), 1)
 		SlowEnemies(caster, self, point.position, radius, self:GetSpecialValueFor("slow_duration"))
 		CreateImpact(point.position, GLACIAL_SPIKE_PARTICLE, radius, 0.8)
 		EmitLocationSound(caster, point.position, "Hero_Crystal.CrystalNova")
@@ -408,7 +453,7 @@ function xhs_lich_king_defile:OnSpellStart()
 		local elapsed = 0
 		Timers:CreateTimer(0.0, function()
 			if not IsValidAlive(caster) or elapsed > duration then return nil end
-			DamageEnemies(caster, self, position, radius, damage, DAMAGE_TYPE_PURE, elapsed == 0 and 1 or 0)
+			DamageEnemies(caster, self, position, radius, damage, self:GetAbilityDamageType(), elapsed == 0 and 1 or 0)
 			SlowEnemies(caster, self, position, radius, tick + 0.1)
 			elapsed = elapsed + tick
 			return tick
@@ -449,6 +494,13 @@ function xhs_lich_king_sindragosa_flyby:OnSpellStart()
 	local radius = self:GetSpecialValueFor("radius")
 	local spacing = self:GetSpecialValueFor("spacing")
 	local nodes = self:GetSpecialValueFor("nodes")
+	local distance = math.max(1, (nodes - 1) * spacing)
+	local breathSpeed = math.max(1, self:GetSpecialValueFor("breath_speed"))
+	local breathStartRadius = math.max(1, self:GetSpecialValueFor("breath_start_radius"))
+	local breathHeight = self:GetSpecialValueFor("breath_height")
+	local visualHeight = self:GetSpecialValueFor("visual_height")
+	local damage = ScaleDamage(self:GetSpecialValueFor("damage"))
+	local slowDuration = self:GetSpecialValueFor("slow_duration")
 	if XHSPhase3BossAI ~= nil then
 		XHSPhase3BossAI:EmitSoundOnce(caster, "Hero_Winter_Wyvern.SplinterBlast.Cast", "sindragosa_cast", 2.0)
 	else
@@ -458,14 +510,56 @@ function xhs_lich_king_sindragosa_flyby:OnSpellStart()
 		local normalized = NormalizeDirection(direction)
 		local side = RotatePosition(Vector(0, 0, 0), QAngle(0, 90, 0), normalized)
 		local start = center - normalized * 850 + side * ((index - ((#directions + 1) / 2)) * self:GetSpecialValueFor("lane_offset"))
-		for i = 1, nodes do
-			local position = start + normalized * (spacing * (i - 1))
-			DamageEnemies(caster, self, position, radius, ScaleDamage(self:GetSpecialValueFor("damage")), DAMAGE_TYPE_PURE, 1)
-			SlowEnemies(caster, self, position, radius, self:GetSpecialValueFor("slow_duration"))
-			CreateImpact(position, SINDRAGOSA_PARTICLE, radius, 0.65)
-		end
+		local travelDuration = distance / breathSpeed
+		SpawnSindragosaFlybyVisual(caster, start, normalized, distance, visualHeight, travelDuration + 0.8)
+		ProjectileManager:CreateLinearProjectile({
+			Ability = self,
+			EffectName = SINDRAGOSA_BREATH_PARTICLE,
+			vSpawnOrigin = start + Vector(0, 0, breathHeight),
+			fDistance = distance,
+			fStartRadius = breathStartRadius,
+			fEndRadius = radius,
+			Source = caster,
+			bHasFrontalCone = true,
+			bReplaceExisting = false,
+			iUnitTargetTeam = DOTA_UNIT_TARGET_TEAM_ENEMY,
+			iUnitTargetType = DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC,
+			iUnitTargetFlags = DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES,
+			bDeleteOnHit = false,
+			vVelocity = normalized * breathSpeed,
+			bProvidesVision = false,
+			ExtraData = {
+				damage = damage,
+				slow_duration = slowDuration,
+			},
+		})
 	end
 	ClearContext(self)
+end
+
+function xhs_lich_king_sindragosa_flyby:OnProjectileHit_ExtraData(target, location, extraData)
+	if not IsServer() or target == nil then return false end
+	local caster = self:GetCaster()
+	if not IsValidAlive(caster) or not IsValidAlive(target) or target:IsInvulnerable() then
+		return false
+	end
+
+	ApplyDamage({
+		victim = target,
+		attacker = caster,
+		ability = self,
+		damage = extraData.damage or 0,
+		damage_type = self:GetAbilityDamageType(),
+	})
+
+	if target:IsHero() then
+		target:AddNewModifier(caster, self, "modifier_xhs_lich_king_frost_slow", {
+			duration = extraData.slow_duration or 1.5,
+		})
+		ApplyFrostbite(caster, self, target, 1)
+	end
+
+	return false
 end
 
 function modifier_xhs_lich_king_frost_slow:IsPurgable() return true end

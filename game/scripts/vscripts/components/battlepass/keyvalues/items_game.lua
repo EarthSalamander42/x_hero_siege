@@ -48,12 +48,16 @@ function ItemsGame:Init()
 			if not itemKV.item_name then
 				itemKV.item_name = ItemsGame:GetItemName(count)
 			end
+			itemKV.unit = itemKV.unit or itemKV.unit_name or itemKV.file
+			itemKV.image = itemKV.image or itemKV.image_inventory
+			itemKV.rarity = itemKV.rarity or itemKV.item_rarity
 
 			table.insert(ItemsGame.companions, itemKV)
 		else
 			if ItemsGame:IsPremiumReward(count) == false then
 				local reward_table = {}
 				reward_table.image = ItemsGame:GetItemImage(count)
+				reward_table.image_inventory = reward_table.image
 				reward_table.level = ItemsGame:GetItemUnlockLevel(count)
 				reward_table.name = ItemsGame:GetItemName(count)
 				reward_table.rarity = ItemsGame:GetItemRarity(count)
@@ -72,7 +76,7 @@ function ItemsGame:Init()
 
 	ItemsGame.battlepass = bp_reward_table
 
-	CustomNetTables:SetTableValue("supporter_pass_rewards_free", "rewards", { ItemsGame.battlepass })
+	CustomNetTables:SetTableValue("supporter_pass_rewards_free", "rewards", ItemsGame.battlepass)
 
 	count = 1
 
@@ -83,12 +87,16 @@ function ItemsGame:Init()
 			if not itemKV.item_name then
 				itemKV.item_name = ItemsGame:GetItemName(count)
 			end
+			itemKV.unit = itemKV.unit or itemKV.unit_name or itemKV.file
+			itemKV.image = itemKV.image or itemKV.image_inventory
+			itemKV.rarity = itemKV.rarity or itemKV.item_rarity
 
 			table.insert(ItemsGame.companions, itemKV)
 		else
 			if ItemsGame:IsPremiumReward(count) then
 				local reward_table = {}
 				reward_table.image = ItemsGame:GetItemImage(count)
+				reward_table.image_inventory = reward_table.image
 				reward_table.level = ItemsGame:GetItemUnlockLevel(count)
 				reward_table.name = ItemsGame:GetItemName(count)
 				reward_table.rarity = ItemsGame:GetItemRarity(count)
@@ -115,8 +123,8 @@ function ItemsGame:Init()
 		end)
 	end
 
-	CustomNetTables:SetTableValue("supporter_pass_rewards_premium", "rewards", { ItemsGame.battlepass2 })
-	CustomNetTables:SetTableValue("supporter_pass_player", "companions", { ItemsGame.companions })
+	CustomNetTables:SetTableValue("supporter_pass_rewards_premium", "rewards", ItemsGame.battlepass2)
+	CustomNetTables:SetTableValue("supporter_pass_player", "companions", ItemsGame.companions)
 end
 
 function ItemsGame:GetItemKV(item_id)

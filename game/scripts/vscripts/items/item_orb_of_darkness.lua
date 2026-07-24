@@ -5,6 +5,8 @@ LinkLuaModifier("modifier_orb_of_darkness_active", "items/item_orb_of_darkness.l
 LinkLuaModifier("modifier_orb_of_darkness_controlled", "items/item_orb_of_darkness.lua", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_orb_of_darkness_passive", "items/item_orb_of_darkness.lua", LUA_MODIFIER_MOTION_NONE)
 
+require("items/orb_toggle")
+
 local ORB_CONTROL_MARKER_ABILITY = "orb_of_darkness_unit"
 local ORB_VISUAL_ABILITY = "holdout_blue_effect"
 local ORB_ACTIVE_MODIFIER = "modifier_orb_of_darkness_active"
@@ -98,20 +100,31 @@ local function DisableActiveAbilities(unit)
 	end)
 end
 
+local function CopyAbilityLevels(source_unit, converted_unit)
+	if not IsValidEntity(source_unit) or not IsValidEntity(converted_unit) then
+		return
+	end
+
+	ForEachUnitAbility(source_unit, function(source_ability)
+		if not source_ability then
+			return
+		end
+
+		local ability_name = source_ability:GetAbilityName()
+		local converted_ability = converted_unit:FindAbilityByName(ability_name)
+
+		if not converted_ability then
+			converted_ability = converted_unit:AddAbility(ability_name)
+		end
+
+		if converted_ability then
+			converted_ability:SetLevel(source_ability:GetLevel())
+		end
+	end)
+end
+
 local function ToggleOrb(caster, ability)
-	if not IsServer() or not IsValidEntity(caster) then
-		return
-	end
-
-	local active_modifier = caster:FindModifierByName(ORB_ACTIVE_MODIFIER)
-
-	if active_modifier then
-		active_modifier:DestroyControlledUnits()
-		caster:RemoveModifierByName(ORB_ACTIVE_MODIFIER)
-		return
-	end
-
-	caster:AddNewModifier(caster, ability, ORB_ACTIVE_MODIFIER, {})
+	XHSOrbToggle.Toggle(caster, ability, ORB_ACTIVE_MODIFIER)
 end
 
 local function GetOrbTexture(caster, active_texture, inactive_texture)
@@ -334,6 +347,7 @@ function modifier_orb_of_darkness_active:ConvertUnit(source_unit)
 	converted_unit:SetControllableByPlayer(owner:GetPlayerID(), true)
 	converted_unit:SetOwner(owner)
 	converted_unit:SetForwardVector(source_unit:GetForwardVector())
+	CopyAbilityLevels(source_unit, converted_unit)
 	converted_unit:AddAbility(ORB_VISUAL_ABILITY):SetLevel(1)
 	converted_unit:AddAbility(ORB_CONTROL_MARKER_ABILITY):SetLevel(1)
 
@@ -405,6 +419,14 @@ function modifier_orb_of_darkness_passive:RemoveOnDeath() return false end
 
 function modifier_orb_of_darkness_passive:GetAttributes()
 	return MODIFIER_ATTRIBUTE_MULTIPLE
+end
+
+function modifier_orb_of_darkness_passive:OnCreated()
+	XHSOrbToggle.OnIntrinsicCreated(self, ORB_ACTIVE_MODIFIER)
+end
+
+function modifier_orb_of_darkness_passive:OnDestroy()
+	XHSOrbToggle.OnIntrinsicDestroyed(self, ORB_ACTIVE_MODIFIER)
 end
 
 function modifier_orb_of_darkness_passive:DeclareFunctions()

@@ -33,6 +33,21 @@
 	100% { transform: rotateZ(360deg); }
 }
 
+@keyframes 'xhs_end_loading_blade'
+{
+	0% { opacity: 0.22; brightness: 0.8; }
+	45% { opacity: 1; brightness: 1.7; }
+	60% { opacity: 1; brightness: 1.7; }
+	100% { opacity: 0.22; brightness: 0.8; }
+}
+
+@keyframes 'xhs_end_loading_core'
+{
+	0% { transform: rotateZ(45deg) scale3d(0.82, 0.82, 1); opacity: 0.72; }
+	50% { transform: rotateZ(225deg) scale3d(1, 1, 1); opacity: 1; }
+	100% { transform: rotateZ(405deg) scale3d(0.82, 0.82, 1); opacity: 0.72; }
+}
+
 .XHSEndScreenRoot {
 	width: 100%;
 	height: 100%;
@@ -75,18 +90,54 @@
 }
 
 .XHSEndScreenLoadingSpinner {
-	width: 58px;
-	height: 58px;
+	width: 76px;
+	height: 76px;
 	horizontal-align: center;
 	margin-bottom: 24px;
-	border-radius: 50%;
-	border: 3px solid #5ad0ff33;
-	border-top: 3px solid #8ee8ff;
-	box-shadow: fill #5ad0ff20 0px 0px 18px 0px;
+	flow-children: none;
 	animation-name: xhs_end_loading_spin;
-	animation-duration: 0.85s;
+	animation-duration: 2.8s;
 	animation-iteration-count: infinite;
 	animation-timing-function: linear;
+}
+
+.XHSEndScreenSpinnerBlade {
+	width: 6px;
+	height: 21px;
+	horizontal-align: center;
+	vertical-align: center;
+	background-color: #8ee8ff;
+	border-radius: 3px;
+	box-shadow: fill #5ad0ff99 0px 0px 8px 0px;
+	transform-origin: 50% 100%;
+	animation-name: xhs_end_loading_blade;
+	animation-duration: 1.15s;
+	animation-iteration-count: infinite;
+	animation-timing-function: ease-in-out;
+}
+
+.XHSEndScreenSpinnerBlade.Blade1 { transform: rotateZ(0deg) translateY(-17px); animation-delay: -1.00s; }
+.XHSEndScreenSpinnerBlade.Blade2 { transform: rotateZ(45deg) translateY(-17px); animation-delay: -0.86s; }
+.XHSEndScreenSpinnerBlade.Blade3 { transform: rotateZ(90deg) translateY(-17px); animation-delay: -0.72s; }
+.XHSEndScreenSpinnerBlade.Blade4 { transform: rotateZ(135deg) translateY(-17px); animation-delay: -0.58s; }
+.XHSEndScreenSpinnerBlade.Blade5 { transform: rotateZ(180deg) translateY(-17px); animation-delay: -0.44s; }
+.XHSEndScreenSpinnerBlade.Blade6 { transform: rotateZ(225deg) translateY(-17px); animation-delay: -0.30s; }
+.XHSEndScreenSpinnerBlade.Blade7 { transform: rotateZ(270deg) translateY(-17px); animation-delay: -0.16s; }
+.XHSEndScreenSpinnerBlade.Blade8 { transform: rotateZ(315deg) translateY(-17px); animation-delay: -0.02s; }
+
+.XHSEndScreenSpinnerCore {
+	width: 22px;
+	height: 22px;
+	horizontal-align: center;
+	vertical-align: center;
+	background-color: #0b2940;
+	border: 2px solid #b6f4ff;
+	box-shadow: fill #5ad0ff99 0px 0px 16px 0px;
+	transform: rotateZ(45deg);
+	animation-name: xhs_end_loading_core;
+	animation-duration: 1.6s;
+	animation-iteration-count: infinite;
+	animation-timing-function: ease-in-out;
 }
 
 .XHSEndScreenLoadingTitle {
@@ -108,6 +159,73 @@
 	color: #9fb4c8;
 	font-size: 16px;
 	text-shadow: 0px 1px 3px #000000;
+}
+
+.XHSEndScreenFallback {
+	width: 100%;
+	height: 100%;
+	align: center center;
+	visibility: collapse;
+	flow-children: down;
+}
+
+.XHSEndScreenRoot.IsFallback .XHSEndScreenMain,
+.XHSEndScreenRoot.IsFallback .XHSEndScreenLoading {
+	visibility: collapse;
+}
+
+.XHSEndScreenRoot.IsFallback .XHSEndScreenFallback {
+	visibility: visible;
+}
+
+.XHSEndScreenFallbackCard {
+	width: 520px;
+	min-height: 300px;
+	align: center center;
+	flow-children: down;
+	padding: 30px 42px 34px 42px;
+	background-color: gradient( linear, 0% 0%, 0% 100%, from( #0c2238f5 ), to( #071321f5 ) );
+	border: 1px solid #e26d6d99;
+	box-shadow: fill #000000aa 0px 0px 28px 0px;
+}
+
+.XHSEndScreenFallbackIcon {
+	width: 56px;
+	height: 56px;
+	margin-bottom: 18px;
+	text-align: center center;
+	font-size: 34px;
+	font-weight: bold;
+	color: #ffb2a8;
+	border: 2px solid #e26d6d;
+	border-radius: 50%;
+	box-shadow: fill #e26d6d66 0px 0px 16px 0px;
+}
+
+.XHSEndScreenFallbackTitle {
+	width: 100%;
+	height: 34px;
+	text-align: center center;
+	font-size: 24px;
+	font-weight: bold;
+	color: #f4f8ff;
+	text-shadow: 0px 0px 8px #e26d6d66;
+}
+
+.XHSEndScreenFallbackText {
+	width: 100%;
+	min-height: 48px;
+	margin-top: 12px;
+	text-align: center center;
+	color: #b8c7d8;
+	font-size: 16px;
+}
+
+.XHSEndScreenFallbackButton {
+	width: 190px;
+	height: 42px;
+	horizontal-align: center;
+	margin-top: 24px;
 }
 
 .XHSEndScreenHeader {
@@ -825,6 +943,10 @@
 	width: 64px;
 	height: 64px;
 	align: center center;
+	background-image: url("file://{images}/custom_game/logo/logo-xhs-transparent.png");
+	background-size: contain;
+	background-position: center;
+	background-repeat: no-repeat;
 	img-shadow: 0px 0px 8px #70dfff66;
 }
 

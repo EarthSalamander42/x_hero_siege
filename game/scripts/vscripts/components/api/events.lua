@@ -83,8 +83,11 @@ CDOTAGameRules.SetGameWinner = function(self, iTeamNumber, bSkipRecord)
 		return original_SetGameWinner(self, iTeamNumber)
 	end
 
+	if api.end_game_started then
+		return
+	end
+	api.end_game_started = true
 	api:CompleteGame()
-
-	-- Ending the game so fast causes game-complete endpoint to not return anything
-	-- return original_SetGameWinner(self, iTeamNumber)
+	-- The Panorama EndScreen must not depend on the backend response time.
+	return original_SetGameWinner(self, iTeamNumber)
 end

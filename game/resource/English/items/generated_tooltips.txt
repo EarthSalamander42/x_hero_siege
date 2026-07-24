@@ -196,7 +196,7 @@
 "DOTA_Tooltip_ability_item_rune_armor_Description"		"<h1><font color='#FF7800'>Passive:</font></h1> Grants the listed bonuses and effects."
 "DOTA_Tooltip_ability_item_rune_armor_bonus_armor"		"BONUS ARMOR:"
 "DOTA_Tooltip_ability_item_rune_armor_duration"		"DURATION:"
-"DOTA_Tooltip_ability_item_tombstone_Description"		"<h1><font color='#00CC00'>Active:</font></h1> Channels for 6 seconds to revive an allied hero."
+"DOTA_Tooltip_ability_item_tombstone_Description"		"<h1><font color='#00CC00'>Active:</font></h1> Channel for 5 seconds at a fallen ally's Tombstone to revive them at that location."
 "DOTA_Tooltip_ability_item_rune_immolation_Description"		"<h1><font color='#FF7800'>Passive:</font></h1> Grants the listed bonuses and effects."
 "DOTA_Tooltip_ability_item_rune_immolation_radius"		"RADIUS:"
 "DOTA_Tooltip_ability_item_rune_immolation_damage_per_tick"		"DAMAGE PER SECOND:"

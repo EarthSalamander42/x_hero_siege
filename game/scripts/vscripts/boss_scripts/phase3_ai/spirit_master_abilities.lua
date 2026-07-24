@@ -145,6 +145,64 @@ local function NormalizeDirection(direction)
 	return direction:Normalized()
 end
 
+local function GetSpiritRound(ability)
+	local caster = ability and ability:GetCaster()
+	if caster ~= nil and caster.xhs_spirit_round ~= nil then
+		return math.max(1, math.min(3, caster.xhs_spirit_round))
+	end
+	if XHSSpiritMasterEncounter ~= nil and XHSSpiritMasterEncounter.GetSplitRound ~= nil then
+		return XHSSpiritMasterEncounter:GetSplitRound()
+	end
+	return 1
+end
+
+local function GetRoundSpecialValue(ability, name)
+	return ability:GetSpecialValueFor("round_" .. tostring(GetSpiritRound(ability)) .. "_" .. name)
+end
+
+local function RotateDirection(direction, degrees)
+	return NormalizeDirection(RotatePosition(Vector(0, 0, 0), QAngle(0, degrees or 0, 0), direction))
+end
+
+local function GetRoundLineDirections(ability, direction)
+	local count = math.max(1, GetRoundSpecialValue(ability, "line_count"))
+	local angle = GetRoundSpecialValue(ability, "line_angle")
+	local directions = {}
+	for index = 1, count do
+		local offset = (index - ((count + 1) * 0.5)) * angle
+		table.insert(directions, RotateDirection(direction, offset))
+	end
+	return directions
+end
+
+local function GetSolarPositions(ability, center)
+	local count = math.max(1, GetRoundSpecialValue(ability, "impact_count"))
+	local spacing = GetRoundSpecialValue(ability, "impact_spacing")
+	local caster = ability:GetCaster()
+	local forward = NormalizeDirection(center - caster:GetAbsOrigin())
+	local side = Vector(-forward.y, forward.x, 0)
+	local positions = {}
+	for index = 1, count do
+		local offset = (index - ((count + 1) * 0.5)) * spacing
+		table.insert(positions, center + side * offset)
+	end
+	return positions
+end
+
+local function GetPalmLine(ability)
+	local caster = ability:GetCaster()
+	local rawDirection = GetContext(ability).direction or caster:GetForwardVector()
+	rawDirection.z = 0
+	local baseSpacing = math.max(1, ability:GetSpecialValueFor("spacing"))
+	local baseNodes = math.max(1, ability:GetSpecialValueFor("nodes"))
+	local targetDistance = math.min(
+		math.max(140, rawDirection:Length2D()),
+		math.max(140, ability:GetCastRange(caster:GetAbsOrigin(), nil))
+	)
+	local nodes = math.max(baseNodes, math.ceil(math.max(0, targetDistance - 140) / baseSpacing) + 1)
+	return NormalizeDirection(rawDirection), baseSpacing, nodes
+end
+
 local function ScaleDamage(value)
 	if XHSPhase3BossAI ~= nil and XHSPhase3BossAI.ScaleDamage ~= nil then
 		return XHSPhase3BossAI:ScaleDamage(value)
@@ -178,7 +236,7 @@ local function DamageEnemies(caster, ability, position, radius, damage, damageTy
 				attacker = caster,
 				ability = ability,
 				damage = damage or 0,
-				damage_type = damageType or DAMAGE_TYPE_MAGICAL,
+				damage_type = damageType or ability:GetAbilityDamageType(),
 			})
 			if dealt > 0 then SendOverheadEventMessage(nil, OVERHEAD_ALERT_DAMAGE, enemy, dealt, nil) end
 			if onHit ~= nil then onHit(enemy) end
@@ -231,9 +289,9 @@ end
 function xhs_spirit_master_palm_of_balance:OnAbilityPhaseStart()
 	if not IsServer() then return true end
 	local caster = self:GetCaster()
-	local direction = NormalizeDirection(GetContext(self).direction or caster:GetForwardVector())
+	local direction, spacing, nodes = GetPalmLine(self)
 	StartBossCastBar(self, "Palm of Balance")
-	XHSBossTelegraphs:Line(caster:GetAbsOrigin(), direction, self:GetSpecialValueFor("spacing"), self:GetSpecialValueFor("radius"), self:GetSpecialValueFor("nodes"), self:GetCastPoint(), COLORS.master, 140)
+	XHSBossTelegraphs:Line(caster:GetAbsOrigin(), direction, spacing, self:GetSpecialValueFor("radius"), nodes, self:GetCastPoint(), COLORS.master, 140)
 	StartAnimation(caster, { duration = self:GetCastPoint() + 0.15, activity = ACT_DOTA_CAST_ABILITY_1, rate = 0.9 })
 	caster:EmitSound("Hero_Brewmaster.ThunderClap")
 	return true
@@ -246,14 +304,12 @@ end
 function xhs_spirit_master_palm_of_balance:OnSpellStart()
 	if not IsServer() then return end
 	local caster = self:GetCaster()
-	local context = GetContext(self)
-	local direction = NormalizeDirection(context.direction or caster:GetForwardVector())
+	local direction, spacing, nodes = GetPalmLine(self)
 	local origin = caster:GetAbsOrigin()
-	local spacing = self:GetSpecialValueFor("spacing")
 	local radius = self:GetSpecialValueFor("radius")
-	for i = 1, self:GetSpecialValueFor("nodes") do
+	for i = 1, nodes do
 		local pos = origin + direction * (140 + spacing * (i - 1))
-		DamageEnemies(caster, self, pos, radius, ScaleDamage(self:GetSpecialValueFor("damage")), DAMAGE_TYPE_MAGICAL)
+		DamageEnemies(caster, self, pos, radius, ScaleDamage(self:GetSpecialValueFor("damage")), self:GetAbilityDamageType())
 		SlowEnemies(caster, self, pos, radius, self:GetSpecialValueFor("slow_duration"))
 		CreateImpact(pos, PALM_PARTICLE, radius)
 		EmitSoundOnLocationWithCaster(pos, "Hero_Brewmaster.ThunderClap", caster)
@@ -307,14 +363,14 @@ function xhs_spirit_master_elemental_mandala:OnSpellStart()
 			for i = 1, waveData.count do
 				local pos = RotatePosition(center, QAngle(0, ((i - 1) / waveData.count) * 360 + waveData.offset, 0), center + Vector(waveData.radius, 0, 0))
 				if waveData.key == "fire" then
-					DamageEnemies(caster, self, pos, nodeRadius, damage * 0.45, DAMAGE_TYPE_MAGICAL, function(enemy)
+					DamageEnemies(caster, self, pos, nodeRadius, damage * 0.45, self:GetAbilityDamageType(), function(enemy)
 						enemy:AddNewModifier(caster, self, "modifier_xhs_spirit_mandala_burn", { duration = self:GetSpecialValueFor("fire_burn_duration") })
 					end)
 				elseif waveData.key == "earth" then
-					DamageEnemies(caster, self, pos, nodeRadius, damage * self:GetSpecialValueFor("earth_damage_pct") * 0.01, DAMAGE_TYPE_MAGICAL)
+					DamageEnemies(caster, self, pos, nodeRadius, damage * self:GetSpecialValueFor("earth_damage_pct") * 0.01, self:GetAbilityDamageType())
 					SlowEnemies(caster, self, pos, nodeRadius, self:GetSpecialValueFor("earth_slow_duration"))
 				else
-					DamageEnemies(caster, self, pos, nodeRadius, damage * self:GetSpecialValueFor("storm_damage_pct") * 0.01, DAMAGE_TYPE_PURE, function(enemy)
+					DamageEnemies(caster, self, pos, nodeRadius, damage * self:GetSpecialValueFor("storm_damage_pct") * 0.01, self:GetAbilityDamageType(), function(enemy)
 						enemy:AddNewModifier(caster, self, "modifier_xhs_spirit_mandala_storm", { duration = self:GetSpecialValueFor("storm_debuff_duration") })
 					end)
 				end
@@ -337,7 +393,12 @@ function xhs_spirit_master_spirit_call:OnAbilityPhaseStart()
 end
 
 function xhs_spirit_master_spirit_call:OnAbilityPhaseInterrupted()
-	if IsServer() then HideBossCastBar(self) end
+	if not IsServer() then return end
+	HideBossCastBar(self)
+	if XHSSpiritMasterEncounter ~= nil and XHSSpiritMasterEncounter.CancelPendingSplit ~= nil then
+		XHSSpiritMasterEncounter:CancelPendingSplit(self:GetCaster(), GetContext(self).threshold)
+	end
+	ClearContext(self)
 end
 
 function xhs_spirit_master_spirit_call:OnSpellStart()
@@ -367,7 +428,7 @@ end
 function xhs_spirit_master_convergence:OnSpellStart()
 	if not IsServer() then return end
 	local caster = self:GetCaster()
-	DamageEnemies(caster, self, caster:GetAbsOrigin(), self:GetSpecialValueFor("radius"), 0, DAMAGE_TYPE_MAGICAL)
+	DamageEnemies(caster, self, caster:GetAbsOrigin(), self:GetSpecialValueFor("radius"), 0, self:GetAbilityDamageType())
 	CreateImpact(caster:GetAbsOrigin(), TRINITY_SPLIT_PARTICLE, self:GetSpecialValueFor("radius"))
 	caster:EmitSound("Hero_Brewmaster.CinderBrew.Cast")
 	ClearContext(self)
@@ -380,7 +441,9 @@ function xhs_spirit_storm_arc_dash:OnAbilityPhaseStart()
 	local target = context.position or caster:GetAbsOrigin() + caster:GetForwardVector() * 500
 	local direction = NormalizeDirection(target - caster:GetAbsOrigin())
 	StartBossCastBar(self, "Arc Dash")
-	XHSBossTelegraphs:Line(caster:GetAbsOrigin(), direction, self:GetSpecialValueFor("spacing"), self:GetSpecialValueFor("radius"), self:GetSpecialValueFor("nodes"), self:GetCastPoint(), COLORS.storm, 120)
+	for _, lineDirection in ipairs(GetRoundLineDirections(self, direction)) do
+		XHSBossTelegraphs:Line(caster:GetAbsOrigin(), lineDirection, self:GetSpecialValueFor("spacing"), self:GetSpecialValueFor("radius"), self:GetSpecialValueFor("nodes"), self:GetCastPoint(), COLORS.storm, 120)
+	end
 	StartAnimation(caster, { duration = self:GetCastPoint() + 0.1, activity = ACT_DOTA_CAST_ABILITY_1, rate = 1.0 })
 	caster:EmitSound("Hero_StormSpirit.StaticRemnantPlant")
 	return true
@@ -391,13 +454,15 @@ function xhs_spirit_storm_arc_dash:OnSpellStart()
 	if not IsServer() then return end
 	local caster = self:GetCaster()
 	local direction = NormalizeDirection((GetContext(self).position or caster:GetAbsOrigin()) - caster:GetAbsOrigin())
-	for i = 1, self:GetSpecialValueFor("nodes") do
-		local pos = caster:GetAbsOrigin() + direction * (120 + self:GetSpecialValueFor("spacing") * (i - 1))
-		DamageEnemies(caster, self, pos, self:GetSpecialValueFor("radius"), ScaleDamage(self:GetSpecialValueFor("damage")), DAMAGE_TYPE_PURE, function(enemy)
-			enemy:AddNewModifier(caster, self, "modifier_silence", { duration = self:GetSpecialValueFor("silence_duration") })
-		end)
-		CreateImpact(pos, STORM_OVERLOAD_PARTICLE, self:GetSpecialValueFor("radius"), SHORT_IMPACT_DURATION)
-		EmitSoundOnLocationWithCaster(pos, "Hero_StormSpirit.Overload", caster)
+	for _, lineDirection in ipairs(GetRoundLineDirections(self, direction)) do
+		for i = 1, self:GetSpecialValueFor("nodes") do
+			local pos = caster:GetAbsOrigin() + lineDirection * (120 + self:GetSpecialValueFor("spacing") * (i - 1))
+			DamageEnemies(caster, self, pos, self:GetSpecialValueFor("radius"), ScaleDamage(self:GetSpecialValueFor("damage")), self:GetAbilityDamageType(), function(enemy)
+				enemy:AddNewModifier(caster, self, "modifier_silence", { duration = self:GetSpecialValueFor("silence_duration") })
+			end)
+			CreateImpact(pos, STORM_OVERLOAD_PARTICLE, self:GetSpecialValueFor("radius"), SHORT_IMPACT_DURATION)
+			EmitSoundOnLocationWithCaster(pos, "Hero_StormSpirit.Overload", caster)
+		end
 	end
 	FindClearSpaceForUnit(caster, caster:GetAbsOrigin() + direction * self:GetSpecialValueFor("dash_distance"), true)
 	ClearContext(self)
@@ -410,6 +475,9 @@ function xhs_spirit_storm_static_orbs:OnAbilityPhaseStart()
 	local center = GetContext(self).position or caster:GetAbsOrigin()
 	caster:EmitSound("Hero_StormSpirit.StaticRemnantPlant")
 	XHSBossTelegraphs:Ring(center, self:GetSpecialValueFor("ring_radius"), self:GetSpecialValueFor("radius"), self:GetSpecialValueFor("orb_count"), self:GetCastPoint(), COLORS.storm, 15)
+	if GetRoundSpecialValue(self, "ring_count") >= 2 then
+		XHSBossTelegraphs:Ring(center, self:GetSpecialValueFor("ring_radius") * self:GetSpecialValueFor("inner_radius_pct") * 0.01, self:GetSpecialValueFor("radius"), self:GetSpecialValueFor("inner_orb_count"), self:GetCastPoint(), COLORS.storm, 0)
+	end
 	StartAnimation(caster, { duration = self:GetCastPoint() + 0.1, activity = ACT_DOTA_CAST_ABILITY_2, rate = 1.0 })
 	return true
 end
@@ -419,13 +487,25 @@ function xhs_spirit_storm_static_orbs:OnSpellStart()
 	if not IsServer() then return end
 	local caster = self:GetCaster()
 	local center = GetContext(self).position or caster:GetAbsOrigin()
-	for i = 1, self:GetSpecialValueFor("orb_count") do
-		local pos = RotatePosition(center, QAngle(0, ((i - 1) / self:GetSpecialValueFor("orb_count")) * 360 + 15, 0), center + Vector(self:GetSpecialValueFor("ring_radius"), 0, 0))
-		DamageEnemies(caster, self, pos, self:GetSpecialValueFor("radius"), ScaleDamage(self:GetSpecialValueFor("damage")), DAMAGE_TYPE_PURE, function(enemy)
-			enemy:AddNewModifier(caster, self, "modifier_stunned", { duration = self:GetSpecialValueFor("stun_duration") })
-		end)
-		CreateImpact(pos, STORM_REMNANT_PARTICLE, self:GetSpecialValueFor("radius"), SHORT_IMPACT_DURATION)
-		EmitSoundOnLocationWithCaster(pos, "Hero_StormSpirit.StaticRemnantExplode", caster)
+	local rings = {
+		{ radius = self:GetSpecialValueFor("ring_radius"), count = self:GetSpecialValueFor("orb_count"), offset = 15 },
+	}
+	if GetRoundSpecialValue(self, "ring_count") >= 2 then
+		table.insert(rings, {
+			radius = self:GetSpecialValueFor("ring_radius") * self:GetSpecialValueFor("inner_radius_pct") * 0.01,
+			count = self:GetSpecialValueFor("inner_orb_count"),
+			offset = 0,
+		})
+	end
+	for _, ring in ipairs(rings) do
+		for i = 1, ring.count do
+			local pos = RotatePosition(center, QAngle(0, ((i - 1) / ring.count) * 360 + ring.offset, 0), center + Vector(ring.radius, 0, 0))
+			DamageEnemies(caster, self, pos, self:GetSpecialValueFor("radius"), ScaleDamage(self:GetSpecialValueFor("damage")), self:GetAbilityDamageType(), function(enemy)
+				enemy:AddNewModifier(caster, self, "modifier_stunned", { duration = self:GetSpecialValueFor("stun_duration") })
+			end)
+			CreateImpact(pos, STORM_REMNANT_PARTICLE, self:GetSpecialValueFor("radius"), SHORT_IMPACT_DURATION)
+			EmitSoundOnLocationWithCaster(pos, "Hero_StormSpirit.StaticRemnantExplode", caster)
+		end
 	end
 	ClearContext(self)
 end
@@ -443,7 +523,7 @@ function xhs_spirit_storm_chain_focus:OnAbilityPhaseInterrupted() if IsServer() 
 function xhs_spirit_storm_chain_focus:OnSpellStart()
 	if not IsServer() then return end
 	local position = GetContext(self).position or self:GetCaster():GetAbsOrigin()
-	DamageEnemies(self:GetCaster(), self, position, self:GetSpecialValueFor("radius"), ScaleDamage(self:GetSpecialValueFor("damage")), DAMAGE_TYPE_PURE, function(enemy)
+	DamageEnemies(self:GetCaster(), self, position, self:GetSpecialValueFor("radius"), ScaleDamage(self:GetSpecialValueFor("damage")), self:GetAbilityDamageType(), function(enemy)
 		enemy:AddNewModifier(self:GetCaster(), self, "modifier_silence", { duration = self:GetSpecialValueFor("silence_duration") })
 	end)
 	SlowEnemies(self:GetCaster(), self, position, self:GetSpecialValueFor("radius"), self:GetSpecialValueFor("slow_duration"))
@@ -457,7 +537,9 @@ function xhs_spirit_earth_fault_line:OnAbilityPhaseStart()
 	local caster = self:GetCaster()
 	local direction = NormalizeDirection((GetContext(self).position or caster:GetAbsOrigin()) - caster:GetAbsOrigin())
 	StartBossCastBar(self, "Fault Line")
-	XHSBossTelegraphs:Line(caster:GetAbsOrigin(), direction, self:GetSpecialValueFor("spacing"), self:GetSpecialValueFor("radius"), self:GetSpecialValueFor("nodes"), self:GetCastPoint(), COLORS.earth, 120)
+	for _, lineDirection in ipairs(GetRoundLineDirections(self, direction)) do
+		XHSBossTelegraphs:Line(caster:GetAbsOrigin(), lineDirection, self:GetSpecialValueFor("spacing"), self:GetSpecialValueFor("radius"), self:GetSpecialValueFor("nodes"), self:GetCastPoint(), COLORS.earth, 120)
+	end
 	caster:EmitSound("Hero_ElderTitan.EarthSplitter.Cast")
 	return true
 end
@@ -468,13 +550,15 @@ function xhs_spirit_earth_fault_line:OnSpellStart()
 	local caster = self:GetCaster()
 	local direction = NormalizeDirection((GetContext(self).position or caster:GetAbsOrigin()) - caster:GetAbsOrigin())
 	local length = self:GetSpecialValueFor("spacing") * math.max(self:GetSpecialValueFor("nodes") - 1, 1)
-	CreateEarthSplitterImpact(caster:GetAbsOrigin() + direction * 120, direction, length)
-	for i = 1, self:GetSpecialValueFor("nodes") do
-		local pos = caster:GetAbsOrigin() + direction * (120 + self:GetSpecialValueFor("spacing") * (i - 1))
-		DamageEnemies(caster, self, pos, self:GetSpecialValueFor("radius"), ScaleDamage(self:GetSpecialValueFor("damage")), DAMAGE_TYPE_PURE, function(enemy)
-			enemy:AddNewModifier(caster, self, "modifier_stunned", { duration = self:GetSpecialValueFor("stun_duration") })
-		end)
-		SlowEnemies(caster, self, pos, self:GetSpecialValueFor("radius"), self:GetSpecialValueFor("slow_duration"))
+	for _, lineDirection in ipairs(GetRoundLineDirections(self, direction)) do
+		CreateEarthSplitterImpact(caster:GetAbsOrigin() + lineDirection * 120, lineDirection, length)
+		for i = 1, self:GetSpecialValueFor("nodes") do
+			local pos = caster:GetAbsOrigin() + lineDirection * (120 + self:GetSpecialValueFor("spacing") * (i - 1))
+			DamageEnemies(caster, self, pos, self:GetSpecialValueFor("radius"), ScaleDamage(self:GetSpecialValueFor("damage")), self:GetAbilityDamageType(), function(enemy)
+				enemy:AddNewModifier(caster, self, "modifier_stunned", { duration = self:GetSpecialValueFor("stun_duration") })
+			end)
+			SlowEnemies(caster, self, pos, self:GetSpecialValueFor("radius"), self:GetSpecialValueFor("slow_duration"))
+		end
 	end
 	caster:EmitSound("Hero_ElderTitan.EarthSplitter.Destroy")
 	ClearContext(self)
@@ -484,6 +568,9 @@ function xhs_spirit_earth_stone_guard:OnAbilityPhaseStart()
 	if not IsServer() then return true end
 	StartBossCastBar(self, "Stone Guard")
 	XHSBossTelegraphs:Circle(self:GetCaster():GetAbsOrigin(), self:GetSpecialValueFor("radius"), self:GetCastPoint(), COLORS.earth)
+	if GetRoundSpecialValue(self, "pulse_count") >= 2 then
+		XHSBossTelegraphs:Circle(self:GetCaster():GetAbsOrigin(), self:GetSpecialValueFor("radius") * self:GetSpecialValueFor("outer_radius_pct") * 0.01, self:GetCastPoint() + self:GetSpecialValueFor("pulse_delay"), COLORS.earth)
+	end
 	self:GetCaster():EmitSound("Hero_EarthSpirit.StoneRemnant.Impact")
 	return true
 end
@@ -492,19 +579,34 @@ function xhs_spirit_earth_stone_guard:OnAbilityPhaseInterrupted() if IsServer() 
 function xhs_spirit_earth_stone_guard:OnSpellStart()
 	if not IsServer() then return end
 	local caster = self:GetCaster()
-	DamageEnemies(caster, self, caster:GetAbsOrigin(), self:GetSpecialValueFor("radius"), ScaleDamage(self:GetSpecialValueFor("damage")), DAMAGE_TYPE_PURE)
+	DamageEnemies(caster, self, caster:GetAbsOrigin(), self:GetSpecialValueFor("radius"), ScaleDamage(self:GetSpecialValueFor("damage")), self:GetAbilityDamageType())
 	SlowEnemies(caster, self, caster:GetAbsOrigin(), self:GetSpecialValueFor("radius"), self:GetSpecialValueFor("slow_duration"))
 	caster:AddNewModifier(caster, self, "modifier_xhs_spirit_earth_guard", { duration = self:GetSpecialValueFor("guard_duration") })
 	CreateImpact(caster:GetAbsOrigin(), EARTH_GUARD_PARTICLE, self:GetSpecialValueFor("radius"), SHORT_IMPACT_DURATION)
 	caster:EmitSound("Hero_EarthSpirit.StoneRemnant.Impact")
+	if GetRoundSpecialValue(self, "pulse_count") >= 2 then
+		local ability = self
+		local delay = self:GetSpecialValueFor("pulse_delay")
+		Timers:CreateTimer(delay, function()
+			if not IsValidAlive(caster) or ability == nil or ability:IsNull() then return nil end
+			local radius = ability:GetSpecialValueFor("radius") * ability:GetSpecialValueFor("outer_radius_pct") * 0.01
+			local damage = ScaleDamage(ability:GetSpecialValueFor("damage")) * ability:GetSpecialValueFor("second_pulse_damage_pct") * 0.01
+			DamageEnemies(caster, ability, caster:GetAbsOrigin(), radius, damage, ability:GetAbilityDamageType())
+			SlowEnemies(caster, ability, caster:GetAbsOrigin(), radius, ability:GetSpecialValueFor("slow_duration"))
+			CreateImpact(caster:GetAbsOrigin(), EARTH_GUARD_PARTICLE, radius, SHORT_IMPACT_DURATION)
+			caster:EmitSound("Hero_EarthSpirit.StoneRemnant.Impact")
+			return nil
+		end)
+	end
 	ClearContext(self)
 end
 
 function xhs_spirit_earth_resonant_pillar:OnAbilityPhaseStart()
 	if not IsServer() then return true end
 	local center = GetContext(self).position or self:GetCaster():GetAbsOrigin()
+	local count = math.max(1, GetRoundSpecialValue(self, "pillar_count"))
 	StartBossCastBar(self, "Resonant Pillar")
-	XHSBossTelegraphs:Ring(center, self:GetSpecialValueFor("ring_radius"), self:GetSpecialValueFor("radius"), 3, self:GetCastPoint(), COLORS.earth, 90)
+	XHSBossTelegraphs:Ring(center, self:GetSpecialValueFor("ring_radius"), self:GetSpecialValueFor("radius"), count, self:GetCastPoint(), COLORS.earth, 90)
 	self:GetCaster():EmitSound("Hero_EarthSpirit.BoulderSmash.Cast")
 	return true
 end
@@ -514,9 +616,10 @@ function xhs_spirit_earth_resonant_pillar:OnSpellStart()
 	if not IsServer() then return end
 	local caster = self:GetCaster()
 	local center = GetContext(self).position or caster:GetAbsOrigin()
-	for i = 1, 3 do
-		local pos = RotatePosition(center, QAngle(0, ((i - 1) / 3) * 360 + 90, 0), center + Vector(self:GetSpecialValueFor("ring_radius"), 0, 0))
-		DamageEnemies(caster, self, pos, self:GetSpecialValueFor("radius"), ScaleDamage(self:GetSpecialValueFor("damage")), DAMAGE_TYPE_PURE, function(enemy)
+	local count = math.max(1, GetRoundSpecialValue(self, "pillar_count"))
+	for i = 1, count do
+		local pos = RotatePosition(center, QAngle(0, ((i - 1) / count) * 360 + 90, 0), center + Vector(self:GetSpecialValueFor("ring_radius"), 0, 0))
+		DamageEnemies(caster, self, pos, self:GetSpecialValueFor("radius"), ScaleDamage(self:GetSpecialValueFor("damage")), self:GetAbilityDamageType(), function(enemy)
 			enemy:AddNewModifier(caster, self, "modifier_stunned", { duration = self:GetSpecialValueFor("stun_duration") })
 		end)
 		CreateImpact(pos, EARTH_PILLAR_PARTICLE, self:GetSpecialValueFor("radius"), SHORT_IMPACT_DURATION)
@@ -530,7 +633,9 @@ function xhs_spirit_fire_cinder_step:OnAbilityPhaseStart()
 	local caster = self:GetCaster()
 	local direction = NormalizeDirection((GetContext(self).position or caster:GetAbsOrigin()) - caster:GetAbsOrigin())
 	StartBossCastBar(self, "Cinder Step")
-	XHSBossTelegraphs:Line(caster:GetAbsOrigin(), direction, self:GetSpecialValueFor("spacing"), self:GetSpecialValueFor("radius"), self:GetSpecialValueFor("nodes"), self:GetCastPoint(), COLORS.fire, 100)
+	for _, lineDirection in ipairs(GetRoundLineDirections(self, direction)) do
+		XHSBossTelegraphs:Line(caster:GetAbsOrigin(), lineDirection, self:GetSpecialValueFor("spacing"), self:GetSpecialValueFor("radius"), self:GetSpecialValueFor("nodes"), self:GetCastPoint(), COLORS.fire, 100)
+	end
 	caster:EmitSound("Hero_EmberSpirit.FireRemnant.Activate")
 	return true
 end
@@ -540,13 +645,15 @@ function xhs_spirit_fire_cinder_step:OnSpellStart()
 	if not IsServer() then return end
 	local caster = self:GetCaster()
 	local direction = NormalizeDirection((GetContext(self).position or caster:GetAbsOrigin()) - caster:GetAbsOrigin())
-	for i = 1, self:GetSpecialValueFor("nodes") do
-		local pos = caster:GetAbsOrigin() + direction * (100 + self:GetSpecialValueFor("spacing") * (i - 1))
-		DamageEnemies(caster, self, pos, self:GetSpecialValueFor("radius"), ScaleDamage(self:GetSpecialValueFor("damage")), DAMAGE_TYPE_PURE, function(enemy)
-			enemy:AddNewModifier(caster, self, "modifier_xhs_spirit_fire_burn", { duration = self:GetSpecialValueFor("burn_duration") })
-		end)
-		CreateImpact(pos, FIRE_CINDER_PARTICLE, self:GetSpecialValueFor("radius"))
-		EmitSoundOnLocationWithCaster(pos, "Hero_EmberSpirit.FireRemnant.Explode", caster)
+	for _, lineDirection in ipairs(GetRoundLineDirections(self, direction)) do
+		for i = 1, self:GetSpecialValueFor("nodes") do
+			local pos = caster:GetAbsOrigin() + lineDirection * (100 + self:GetSpecialValueFor("spacing") * (i - 1))
+			DamageEnemies(caster, self, pos, self:GetSpecialValueFor("radius"), ScaleDamage(self:GetSpecialValueFor("damage")), self:GetAbilityDamageType(), function(enemy)
+				enemy:AddNewModifier(caster, self, "modifier_xhs_spirit_fire_burn", { duration = self:GetSpecialValueFor("burn_duration") })
+			end)
+			CreateImpact(pos, FIRE_CINDER_PARTICLE, self:GetSpecialValueFor("radius"))
+			EmitSoundOnLocationWithCaster(pos, "Hero_EmberSpirit.FireRemnant.Explode", caster)
+		end
 	end
 	FindClearSpaceForUnit(caster, caster:GetAbsOrigin() + direction * self:GetSpecialValueFor("dash_distance"), true)
 	ClearContext(self)
@@ -556,7 +663,9 @@ function xhs_spirit_fire_solar_flare:OnAbilityPhaseStart()
 	if not IsServer() then return true end
 	local position = GetContext(self).position or self:GetCaster():GetAbsOrigin()
 	StartBossCastBar(self, "Solar Flare")
-	XHSBossTelegraphs:Target(position, self:GetSpecialValueFor("radius"), self:GetCastPoint(), COLORS.fire)
+	for _, impactPosition in ipairs(GetSolarPositions(self, position)) do
+		XHSBossTelegraphs:Target(impactPosition, self:GetSpecialValueFor("radius"), self:GetCastPoint(), COLORS.fire)
+	end
 	self:GetCaster():EmitSound("Hero_EmberSpirit.FlameGuard.Cast")
 	return true
 end
@@ -565,12 +674,14 @@ function xhs_spirit_fire_solar_flare:OnAbilityPhaseInterrupted() if IsServer() t
 function xhs_spirit_fire_solar_flare:OnSpellStart()
 	if not IsServer() then return end
 	local position = GetContext(self).position or self:GetCaster():GetAbsOrigin()
-	DamageEnemies(self:GetCaster(), self, position, self:GetSpecialValueFor("radius"), ScaleDamage(self:GetSpecialValueFor("damage")), DAMAGE_TYPE_PURE, function(enemy)
-		enemy:AddNewModifier(self:GetCaster(), self, "modifier_stunned", { duration = self:GetSpecialValueFor("stun_duration") })
-		enemy:AddNewModifier(self:GetCaster(), self, "modifier_xhs_spirit_fire_burn", { duration = self:GetSpecialValueFor("burn_duration") })
-	end)
-	CreateImpact(position, FIRE_SOLAR_PARTICLE, self:GetSpecialValueFor("radius"))
-	EmitSoundOnLocationWithCaster(position, "Ability.LightStrikeArray", self:GetCaster())
+	for _, impactPosition in ipairs(GetSolarPositions(self, position)) do
+		DamageEnemies(self:GetCaster(), self, impactPosition, self:GetSpecialValueFor("radius"), ScaleDamage(self:GetSpecialValueFor("damage")), self:GetAbilityDamageType(), function(enemy)
+			enemy:AddNewModifier(self:GetCaster(), self, "modifier_stunned", { duration = self:GetSpecialValueFor("stun_duration") })
+			enemy:AddNewModifier(self:GetCaster(), self, "modifier_xhs_spirit_fire_burn", { duration = self:GetSpecialValueFor("burn_duration") })
+		end)
+		CreateImpact(impactPosition, FIRE_SOLAR_PARTICLE, self:GetSpecialValueFor("radius"))
+		EmitSoundOnLocationWithCaster(impactPosition, "Ability.LightStrikeArray", self:GetCaster())
+	end
 	ClearContext(self)
 end
 
@@ -580,6 +691,9 @@ function xhs_spirit_fire_wildfire_ring:OnAbilityPhaseStart()
 	StartBossCastBar(self, "Wildfire Ring")
 	XHSBossTelegraphs:Ring(center, self:GetSpecialValueFor("outer_radius"), self:GetSpecialValueFor("node_radius"), 12, self:GetCastPoint(), COLORS.fire, 0)
 	XHSBossTelegraphs:Ring(center, self:GetSpecialValueFor("inner_radius"), self:GetSpecialValueFor("node_radius"), 8, self:GetCastPoint(), COLORS.fire, 22)
+	if GetRoundSpecialValue(self, "ring_count") >= 3 then
+		XHSBossTelegraphs:Ring(center, (self:GetSpecialValueFor("outer_radius") + self:GetSpecialValueFor("inner_radius")) * 0.5, self:GetSpecialValueFor("node_radius"), self:GetSpecialValueFor("middle_node_count"), self:GetCastPoint(), COLORS.fire, 11)
+	end
 	self:GetCaster():EmitSound("Hero_Phoenix.FireSpirits.Cast")
 	return true
 end
@@ -591,10 +705,14 @@ function xhs_spirit_fire_wildfire_ring:OnSpellStart()
 	local center = GetContext(self).position or caster:GetAbsOrigin()
 	local damage = ScaleDamage(self:GetSpecialValueFor("damage"))
 	local nodeRadius = self:GetSpecialValueFor("node_radius")
-	for _, ring in pairs({ { self:GetSpecialValueFor("outer_radius"), 12 }, { self:GetSpecialValueFor("inner_radius"), 8 } }) do
+	local rings = { { self:GetSpecialValueFor("outer_radius"), 12 }, { self:GetSpecialValueFor("inner_radius"), 8 } }
+	if GetRoundSpecialValue(self, "ring_count") >= 3 then
+		table.insert(rings, { (self:GetSpecialValueFor("outer_radius") + self:GetSpecialValueFor("inner_radius")) * 0.5, self:GetSpecialValueFor("middle_node_count") })
+	end
+	for _, ring in ipairs(rings) do
 		for i = 1, ring[2] do
 			local pos = RotatePosition(center, QAngle(0, ((i - 1) / ring[2]) * 360, 0), center + Vector(ring[1], 0, 0))
-			DamageEnemies(caster, self, pos, nodeRadius, damage, DAMAGE_TYPE_PURE, function(enemy)
+			DamageEnemies(caster, self, pos, nodeRadius, damage, self:GetAbilityDamageType(), function(enemy)
 				enemy:AddNewModifier(caster, self, "modifier_xhs_spirit_fire_burn", { duration = self:GetSpecialValueFor("burn_duration") })
 			end)
 			CreateImpact(pos, FIRE_WILDFIRE_PARTICLE, nodeRadius)
@@ -623,7 +741,7 @@ function modifier_xhs_spirit_mandala_burn:OnIntervalThink()
 	local ability = self:GetAbility()
 	local parent = self:GetParent()
 	if not IsValidAlive(caster) or not IsValidAlive(parent) or ability == nil then return end
-	ApplyDamage({ victim = parent, attacker = caster, ability = ability, damage = ScaleDamage(ability:GetSpecialValueFor("fire_burn_damage")), damage_type = DAMAGE_TYPE_MAGICAL })
+	ApplyDamage({ victim = parent, attacker = caster, ability = ability, damage = ScaleDamage(ability:GetSpecialValueFor("fire_burn_damage")), damage_type = self:GetAbility():GetAbilityDamageType() })
 end
 
 function modifier_xhs_spirit_mandala_storm:IsDebuff() return true end
@@ -653,7 +771,7 @@ function modifier_xhs_spirit_fire_burn:OnIntervalThink()
 		attacker = caster,
 		ability = ability,
 		damage = ScaleDamage(ability:GetSpecialValueFor("burn_damage")),
-		damage_type = DAMAGE_TYPE_PURE,
+		damage_type = self:GetAbility():GetAbilityDamageType(),
 	})
 end
 

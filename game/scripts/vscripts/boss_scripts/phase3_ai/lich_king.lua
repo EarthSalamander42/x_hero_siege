@@ -112,11 +112,15 @@ function modifier_xhs_lich_king_phase3_ai:BuildPatternDeck()
 end
 
 function modifier_xhs_lich_king_phase3_ai:UpdateBossBarMarkers()
-	self.boss.xhs_boss_bar_markers = {
-		{ percent = 75, label = "Sindragosa Flyby", tooltip = "Sindragosa attacks when this health threshold is crossed." },
-		{ percent = 50, label = "Sindragosa Flyby", tooltip = "Sindragosa attacks when this health threshold is crossed." },
-		{ percent = 25, label = "Sindragosa Flyby", tooltip = "Sindragosa attacks when this health threshold is crossed." },
-	}
+	self.boss.xhs_boss_bar_markers = {}
+	for index, threshold in ipairs(THRESHOLDS) do
+		self.boss.xhs_boss_bar_markers[index] = {
+			percent = threshold,
+			label = "Sindragosa Flyby",
+			tooltip = "Sindragosa attacks when this health threshold is crossed.",
+			triggered = self.thresholds_done[threshold] == true,
+		}
+	end
 end
 
 function modifier_xhs_lich_king_phase3_ai:IsBossActive()
@@ -191,9 +195,13 @@ end
 
 function modifier_xhs_lich_king_phase3_ai:TryThresholdWinter(now)
 	local pct = (self.boss:GetHealth() / math.max(1, self.boss:GetMaxHealth())) * 100
-	for _, threshold in pairs(THRESHOLDS) do
+	for _, threshold in ipairs(THRESHOLDS) do
 		if self.thresholds_done[threshold] ~= true and pct <= threshold then
 			self.thresholds_done[threshold] = true
+			self:UpdateBossBarMarkers()
+			if UpdateBossBar ~= nil then
+				UpdateBossBar(self.boss)
+			end
 			if self:CastSindragosaFlyby(0) then
 				self.next_action = now + 4.5
 				return true

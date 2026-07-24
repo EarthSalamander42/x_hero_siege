@@ -98,6 +98,92 @@ function ApplyGrowthOverheadMarker(unit, value)
 	end
 end
 
+local function GetDoorCinematicCenter(doorNames)
+	local center = Vector(0, 0, 0)
+	local count = 0
+
+	for _, doorName in ipairs(doorNames or {}) do
+		for _, door in ipairs(Entities:FindAllByName(doorName)) do
+			if door ~= nil and IsValidEntity(door) then
+				center = center + door:GetAbsOrigin()
+				count = count + 1
+			end
+		end
+	end
+
+	if count == 0 then return nil end
+	return center / count
+end
+
+local function SendDoorCameraPosition(playerID, position, duration)
+	local player = PlayerResource:GetPlayer(playerID)
+	if player == nil or position == nil then return end
+
+	CustomGameEventManager:Send_ServerToPlayer(player, "set_player_camera", {
+		hPosition = position,
+		iSpeed = duration,
+	})
+end
+
+-- Moves every active player's camera to a door group, executes the opening once
+-- the camera has arrived, then smoothly returns each player to their own hero.
+function XHSPlayDoorOpeningCinematic(doorNames, onCameraArrived, options)
+	options = options or {}
+	local target = options.camera_position or GetDoorCinematicCenter(doorNames)
+	if target == nil then
+		if onCameraArrived ~= nil then onCameraArrived() end
+		return
+	end
+
+	local moveDuration = tonumber(options.move_duration) or 1.25
+	local holdDuration = tonumber(options.hold_duration) or 1.15
+	local returnDuration = tonumber(options.return_duration) or 1.0
+	local maxPlayers = DOTA_MAX_TEAM_PLAYERS or 24
+
+	_G.XHSDoorCinematicSerial = (_G.XHSDoorCinematicSerial or 0) + 1
+	local serial = _G.XHSDoorCinematicSerial
+
+	for playerID = 0, maxPlayers - 1 do
+		if PlayerResource:IsValidPlayerID(playerID) and PlayerResource:GetPlayer(playerID) ~= nil then
+			SendDoorCameraPosition(playerID, target, moveDuration)
+		end
+	end
+
+	Timers:CreateTimer(moveDuration, function()
+		if serial ~= _G.XHSDoorCinematicSerial then return end
+		if onCameraArrived ~= nil then onCameraArrived() end
+
+		Timers:CreateTimer(holdDuration, function()
+			if serial ~= _G.XHSDoorCinematicSerial then return end
+
+			for playerID = 0, maxPlayers - 1 do
+				if PlayerResource:IsValidPlayerID(playerID) and PlayerResource:GetPlayer(playerID) ~= nil then
+					local hero = PlayerResource:GetSelectedHeroEntity(playerID)
+					if hero ~= nil and IsValidEntity(hero) and not hero:IsNull() then
+						SendDoorCameraPosition(playerID, hero:GetAbsOrigin(), returnDuration)
+					end
+				end
+			end
+		end)
+	end)
+end
+
+function XHSOpenDoorsWithCinematic(doorNames, obstructionNames, animationName, onOpened, options)
+	XHSPlayDoorOpeningCinematic(doorNames, function()
+		for _, doorName in ipairs(doorNames or {}) do
+			DoEntFire(doorName, "SetAnimation", animationName or "gate_02_open", 0, nil, nil)
+		end
+
+		for _, obstructionName in ipairs(obstructionNames or {}) do
+			for _, obstruction in ipairs(Entities:FindAllByName(obstructionName)) do
+				obstruction:SetEnabled(false, true)
+			end
+		end
+
+		if onOpened ~= nil then onOpened() end
+	end, options)
+end
+
 function GetUnitAbilityCount(unit)
 	if unit == nil or not IsValidEntity(unit) or unit:IsNull() then return 0 end
 	if unit.GetAbilityCount == nil then return 0 end

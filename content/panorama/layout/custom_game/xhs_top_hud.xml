@@ -9,6 +9,7 @@
 	<scripts>
 		<include src="s2r://panorama/scripts/custom_game/xhs_supporter_hover.vjs_c" />
 		<include src="s2r://panorama/scripts/custom_game/xhs_top_hud.vjs_c" />
+		<include src="file://{resources}/scripts/custom_game/util.js" />
 	</scripts>
 
 	<Panel class="XHSTopHudHost" hittest="false" hittestchildren="true">
@@ -73,5 +74,11 @@
 			<Panel id="XHSOverheadMockupRoot" hittest="false" />
 		</Panel>
 		<Panel id="XHSOverheadRoot" hittest="false" />
+		<Panel id="XHSNightfallVignette" hittest="false">
+			<Panel class="XHSNightfallEdge XHSNightfallTop" hittest="false" />
+			<Panel class="XHSNightfallEdge XHSNightfallBottom" hittest="false" />
+			<Panel class="XHSNightfallEdge XHSNightfallLeft" hittest="false" />
+			<Panel class="XHSNightfallEdge XHSNightfallRight" hittest="false" />
+		</Panel>
 	</Panel>
 </root>

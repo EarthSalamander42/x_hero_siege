@@ -142,6 +142,7 @@
 				"Wearable2" { "ItemDef" "8" }
 				"Wearable3" { "ItemDef" "9" }
 				"Wearable4" { "ItemDef" "62"}
+				"Wearable5" { "ItemDef" "6" } // Default Juggernaut mask
 			} 
 		}
 	}
@@ -156,6 +157,15 @@
 		"HealthBarOffset"			"200"
 		"Level"						"1"
 		"LeavesCorpse"				"0"
+
+		"Ability1"					"xhs_grom_mirror_trial"
+		"Ability2"					"juggernaut_blade_dance"
+		"Ability3"					"chaos_knight_chaos_strike"
+		"Ability4"					"xhs_grom_blade_storm"
+		"Ability5"					"xhs_grom_mirror_cleave"
+		"Ability6"					"xhs_grom_windwalk_ambush"
+		"Ability7"					"xhs_grom_warsong_leap"
+		"Ability8"					"xhs_grom_blood_frenzy"
 
 		"HasInventory"				"0"
 		"ArmorPhysical"				"80"
@@ -196,6 +206,7 @@
 				"Wearable2" { "ItemDef" "8" }
 				"Wearable3" { "ItemDef" "9" }
 				"Wearable4" { "ItemDef" "62"}
+				"Wearable5" { "ItemDef" "6" } // Default Juggernaut mask
 			}
 		}
 	}
@@ -1755,6 +1766,17 @@
 	
 		"VisionDaytimeRange"		"1200"                  // Range of vision at night time.
 		"VisionNighttimeRange"		"1000"                  // Range of vision at night time.
+
+		"Creature"
+		{
+			"AttachWearables"
+			{
+				"Wearable1" { "ItemDef" "306" } // Default Terrorblade wings
+				"Wearable2" { "ItemDef" "307" } // Default Terrorblade weapons
+				"Wearable3" { "ItemDef" "476" } // Default Terrorblade armor
+				"Wearable4" { "ItemDef" "478" } // Default Terrorblade head
+			}
+		}
 	}
 
 	//=================================================================================
@@ -2956,9 +2978,10 @@
 		{
 			"AttachWearables"   
 			{
-				"Wearable1"	{ "ItemDef" "6996" } // Demon Eater/Head Slot/ Original = 387
-				"Wearable2"	{ "ItemDef" "8259" } // Arms of Desolation/Arms Slot/ Original = 488
-				"Wearable3"	{ "ItemDef" "486" }		//Shoulders
+				"Wearable1"	{ "ItemDef" "6996" } // Demon Eater arcana base
+				"Wearable2"	{ "ItemDef" "8259" } // Arms of Desolation
+				"Wearable3"	{ "ItemDef" "486" }  // Shoulders
+				"Wearable4"	{ "ItemDef" "7188" } // Horns of the Diabolical Fiend (head)
 			}
 
 			"DisableResistance"			"50.0"

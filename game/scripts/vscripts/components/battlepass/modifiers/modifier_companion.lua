@@ -15,6 +15,8 @@ local COMPANION_FOLLOW_ORDER_INTERVAL = 0.35
 local COMPANION_RECENT_HIT_WINDOW = 1.25
 local COMPANION_HIDE_HIT_COUNT = 4
 local COMPANION_VANISH_DELAY = 0.18
+local COMPANION_MAX_HIDE_DURATION = 4.5
+local COMPANION_HIDE_COOLDOWN = 6.0
 
 function modifier_companion:IsHidden() return true end
 
@@ -81,6 +83,8 @@ function modifier_companion:OnCreated()
 		self.recent_hit_times = {}
 		self.last_hero_health = nil
 		self.hidden_by_combat = false
+		self.hidden_since = nil
+		self.combat_hide_cooldown_until = 0
 
 		if GetMapName() == "imba_1v1" then
 			self:GetParent():Kill(nil, nil)
@@ -263,6 +267,7 @@ function modifier_companion:HideForCombat()
 	if companion == nil or companion:IsNull() then return end
 
 	self.hidden_by_combat = true
+	self.hidden_since = GameRules:GetGameTime()
 	self.companion_state = COMPANION_STATE_HIDDEN
 	self.next_follow_order_time = 0
 	companion:Stop()
@@ -286,6 +291,8 @@ function modifier_companion:ReturnFromCombat(hero)
 	companion:RemoveNoDraw()
 	self:PlayCompanionParticle("particles/items_fx/blink_dagger_end.vpcf")
 	self.hidden_by_combat = false
+	self.hidden_since = nil
+	self.combat_hide_cooldown_until = GameRules:GetGameTime() + COMPANION_HIDE_COOLDOWN
 	self.companion_state = COMPANION_STATE_RETURNING
 	self.next_follow_order_time = 0
 
@@ -350,36 +357,27 @@ function modifier_companion:OnIntervalThink()
 		local hero = self:GetAssignedHero()
 		if hero == nil then return end
 		hero.companion = companion
-		local fountain_abs
+		local fountain_abs = Vector(0, 0, 0)
+		local map_name = GetMapName()
 
-		if GetMapName() == "imbathrow_ffa" then
+		if map_name == "imbathrow_ffa" then
 			fountain_abs = Entities:FindByName(nil, "@overboss"):GetAbsOrigin()
-		elseif GetMapName() == "imba_demo" then
+		elseif map_name == "imba_demo" then
 			for _, ent in pairs(Entities:FindAllByClassname("ent_dota_fountain")) do
 				if ent:GetTeamNumber() == companion:GetTeamNumber() then
 					fountain_abs = ent:GetAbsOrigin()
 					break
 				end
 			end
-		elseif GetMapName() == "pudgewars_new" then
+		elseif map_name == "pudgewars_new" then
 			fountain_abs = _G.rune_spell_caster_good:GetAbsOrigin()
-		elseif GetMapName() == "battle_royale_ffa" or "battle_royale_2v2v2v2v2" then
-			fountain_abs = Vector(0, 0, 0)
+		elseif map_name == "battle_royale_ffa" or map_name == "battle_royale_2v2v2v2v2" then
+			-- These maps intentionally use the world origin as their return point.
 		else
-			if GoodCamera then
-				if hero:GetTeamNumber() == 2 then
-					fountain_abs = GoodCamera:GetAbsOrigin()
-				end
-			else
-				fountain_abs = Vector(0, 0, 0)
-			end
-
-			if BadCamera then
-				if hero:GetTeamNumber() == 3 then
-					fountain_abs = BadCamera:GetAbsOrigin()
-				end
-			else
-				fountain_abs = Vector(0, 0, 0)
+			if hero:GetTeamNumber() == DOTA_TEAM_GOODGUYS and GoodCamera then
+				fountain_abs = GoodCamera:GetAbsOrigin()
+			elseif hero:GetTeamNumber() == DOTA_TEAM_BADGUYS and BadCamera then
+				fountain_abs = BadCamera:GetAbsOrigin()
 			end
 		end
 
@@ -399,14 +397,16 @@ function modifier_companion:OnIntervalThink()
 		local recentCombat = now - (self.last_damage_time or -999) <= COMPANION_SAFE_DELAY
 		local recentHitCount = self:GetRecentHitCount(now)
 		local crowdedDanger = threatInfo.count >= COMPANION_HIDE_ENEMY_COUNT
-		local highDanger = recentCombat and (
+		local highDanger = now >= (self.combat_hide_cooldown_until or 0) and recentCombat and (
 			crowdedDanger
 			or threatInfo.nearest_distance <= COMPANION_HIDE_THREAT_DISTANCE
 			or recentHitCount >= COMPANION_HIDE_HIT_COUNT
 		)
-		local safeToReturn = not recentCombat
-			and threatInfo.count <= 1
+		local hiddenDuration = self.hidden_since ~= nil and now - self.hidden_since or 0
+		local safeToReturn = (
+			not recentCombat
 			and threatInfo.nearest_distance > COMPANION_HIDE_THREAT_DISTANCE
+		) or hiddenDuration >= COMPANION_MAX_HIDE_DURATION
 
 		if companion:GetIdealSpeed() ~= hero:GetIdealSpeed() - 70 then
 			companion:SetBaseMoveSpeed(hero:GetIdealSpeed() - 70)

@@ -168,18 +168,21 @@
 "DOTA_Tooltip_ability_item_searing_blade_radius"					"RADIUS:"
 "DOTA_Tooltip_ability_item_searing_blade_cleave_pct"				"%CLEAVE:"
 
-"DOTA_Tooltip_ability_item_orb_of_earth_Description"				"<h1><font color='#FF7800'>Passive:</font></h1> Earth Orb (Bash). Grants bonus damage and a chance to bash the enemy for %bash_duration% seconds."
+"DOTA_Tooltip_ability_item_orb_of_earth_Description"				"<h1><font color='#FF7800'>Passive:</font></h1> Earth Orb (Bash). Grants bonus damage and armor. Attacks have a %bash_chance%%% chance to bash for %bash_duration% seconds."
 "DOTA_Tooltip_ability_item_orb_of_earth_bonus_damage"				"BONUS DAMAGE:"
+"DOTA_Tooltip_ability_item_orb_of_earth_bonus_armor"				"BONUS ARMOR:"
 "DOTA_Tooltip_ability_item_orb_of_earth_bash_chance"				"%BASH CHANCE:"
 "DOTA_Tooltip_ability_item_orb_of_earth_bash_duration"				"BASH DURATION:"
 
-"DOTA_Tooltip_ability_item_orb_of_earth2_Description"				"<h1><font color='#FF7800'>Passive:</font></h1> Gaia Gem (Bash). Grants bonus damage and a chance to bash the enemy for %bash_duration% seconds."
+"DOTA_Tooltip_ability_item_orb_of_earth2_Description"				"<h1><font color='#FF7800'>Passive:</font></h1> Gaia Gem (Bash). Grants bonus damage and armor. Attacks have a %bash_chance%%% chance to bash for %bash_duration% seconds."
 "DOTA_Tooltip_ability_item_orb_of_earth2_bonus_damage"				"BONUS DAMAGE:"
+"DOTA_Tooltip_ability_item_orb_of_earth2_bonus_armor"				"BONUS ARMOR:"
 "DOTA_Tooltip_ability_item_orb_of_earth2_bash_chance"				"%BASH CHANCE:"
 "DOTA_Tooltip_ability_item_orb_of_earth2_bash_duration"				"BASH DURATION:"
 
-"DOTA_Tooltip_ability_item_orb_of_earth3_Description"				"<h1><font color='#FF7800'>Passive:</font></h1> Heart of the Mountain (Bash). Grants bonus damage and a chance to bash the enemy for %bash_duration% seconds."
+"DOTA_Tooltip_ability_item_orb_of_earth3_Description"				"<h1><font color='#FF7800'>Passive:</font></h1> Heart of the Mountain (Bash). Grants bonus damage and armor. Attacks have a %bash_chance%%% chance to bash for %bash_duration% seconds."
 "DOTA_Tooltip_ability_item_orb_of_earth3_bonus_damage"				"BONUS DAMAGE:"
+"DOTA_Tooltip_ability_item_orb_of_earth3_bonus_armor"				"BONUS ARMOR:"
 "DOTA_Tooltip_ability_item_orb_of_earth3_bash_chance"				"%BASH CHANCE:"
 "DOTA_Tooltip_ability_item_orb_of_earth3_bash_duration"				"BASH DURATION:"
 

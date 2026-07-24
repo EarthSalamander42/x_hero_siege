@@ -131,6 +131,18 @@
 {
 	width: fill-parent-flow( 1.0 );
 	max-width: 880px;
+	margin-right: 0px;
+	text-shadow: 0px 0px 2px #ffffff80, 0px 2px 4px #000000;
+}
+
+.XHSNotificationSpecialArena .XHSNotificationContent
+{
+	flow-children: right;
+}
+
+.XHSNotificationSpecialArena .XHSNotificationImage
+{
+	min-width: 38px;
 }
 
 .XHSNotificationSingleMessage .XHSNotificationMessage,
@@ -1005,10 +1017,10 @@
 	height: 58px;
 	align: center center;
 	border-radius: 50%;
-	background-color: gradient( radial, 50% 50%, 0% 0%, 50% 50%, from( #5ad0ff14 ), color-stop( .38, #12344a24 ), color-stop( .72, #0208118a ), to( #00000000 ) );
-	box-shadow: inset #020914e8 0px 0px 15px 0px, inset #5ad0ff12 0px 0px 16px 0px, #5ad0ff12 0px 0px 9px 0px;
+	background-color: gradient( radial, 50% 50%, 0% 0%, 50% 50%, from( #5ad0ff09 ), color-stop( .38, #12344a14 ), color-stop( .72, #02081166 ), to( #00000000 ) );
+	box-shadow: inset #020914b8 0px 0px 15px 0px, inset #5ad0ff09 0px 0px 16px 0px, #5ad0ff09 0px 0px 9px 0px;
 	transform: scaleX( 1 ) scaleY( 1 );
-	transition-property: transform, opacity, background-color, box-shadow;
+	transition-property: clip, transform, opacity, background-color, box-shadow;
 	transition-duration: .18s;
 	transition-timing-function: ease-out;
 }
@@ -1023,8 +1035,8 @@
 
 .XHSWaveActive .XHSWaveRingFill
 {
-	background-color: gradient( radial, 50% 50%, 0% 0%, 50% 50%, from( #ff684b18 ), color-stop( .38, #54111630 ), color-stop( .72, #0c02058f ), to( #00000000 ) );
-	box-shadow: inset #0b0205ec 0px 0px 16px 0px, inset #ff684b16 0px 0px 16px 0px, #ff3f2a12 0px 0px 9px 0px;
+	background-color: gradient( radial, 50% 50%, 0% 0%, 50% 50%, from( #ff684b0b ), color-stop( .38, #54111618 ), color-stop( .72, #0c020568 ), to( #00000000 ) );
+	box-shadow: inset #0b0205b8 0px 0px 16px 0px, inset #ff684b0a 0px 0px 16px 0px, #ff3f2a08 0px 0px 9px 0px;
 	animation-name: XHSWaveThreatPulse;
 	animation-duration: .72s;
 	animation-iteration-count: infinite;

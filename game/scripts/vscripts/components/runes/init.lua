@@ -39,7 +39,7 @@ Runes.RUNE_PARTICLES = {
 	healing = "particles/generic_gameplay/rune_regeneration.vpcf",
 	revitalization = "particles/generic_gameplay/rune_arcane.vpcf",
 	restoration = "particles/generic_gameplay/rune_water.vpcf",
-	second_wind = "particles/generic_gameplay/rune_haste.vpcf",
+	second_wind = "particles/generic_gameplay/rune_shield.vpcf",
 	barrier = "particles/generic_gameplay/rune_shield.vpcf",
 	retaliation = "particles/generic_gameplay/rune_doubledamage.vpcf",
 	bulwark = "particles/generic_gameplay/rune_shield.vpcf",
@@ -76,7 +76,7 @@ Runes.DEFINITIONS = {
 		scope = "team",
 		modifier = "modifier_xhs_rune_revitalization",
 		duration = 20,
-		values = { cooldown_pct = 25, cooldown_cap = 20, mana_regen_pct = 12 },
+		values = { cooldown_reduction_pct = 30 },
 	},
 	restoration = {
 		name = "Restoration Rune",
@@ -99,7 +99,7 @@ Runes.DEFINITIONS = {
 		scope = "team",
 		modifier = "modifier_xhs_rune_barrier",
 		duration = 30,
-		values = { shield_pct = 25, regen_pct = 4 },
+		values = { shield_pct = 25, health_regen_pct = 4 },
 	},
 	retaliation = {
 		name = "Retaliation Rune",
@@ -197,10 +197,10 @@ Runes.CATEGORY_RUNE_TYPES = {
 
 Runes.EFFECT_SUMMARIES = {
 	healing = "+5% health regen, +8% mana regen",
-	revitalization = "-25% active cooldowns, +12% mana regen",
+	revitalization = "-30% cooldowns",
 	restoration = "Restores 35% missing health and mana",
 	second_wind = "Emergency heal and damage guard below 30% HP",
-	barrier = "Shield for 25% max HP, regenerates over time",
+	barrier = "Shield for 25% max HP plus health regeneration",
 	retaliation = "Reflects 25% incoming damage",
 	bulwark = "+35 armor, +25% magic resistance",
 	fortitude = "+35% status resistance, -20% incoming damage",
@@ -222,6 +222,7 @@ function Runes:Init()
 	self.nextRuneId = 1
 	self.nextRuneBatchId = 1
 	self.runeBatches = {}
+	self.pickupBlockedNotices = {}
 	self.fragmentWaveIndex = self.FRAGMENT_WAVES[RandomInt(1, #self.FRAGMENT_WAVES)]
 	self.fragmentSpawned = false
 	self.fragmentGrantAttempted = false
@@ -268,6 +269,7 @@ function Runes:OnSpecialWaveWarning(waveIndex, direction)
 		self.activeRunes = self.activeRunes or {}
 	end
 	self.runeBatches = {}
+	self.pickupBlockedNotices = {}
 
 	if runeType == "fragment" then
 		self.fragmentSpawned = true
@@ -540,9 +542,13 @@ function Runes:StartPickupThink(id, token)
 
 		local origin = dummy:GetAbsOrigin()
 		for _, hero in pairs(HeroList:GetAllHeroes()) do
-			if self:IsEligiblePicker(hero) and not self:HasHeroPickedRuneBatch(active, hero) and (hero:GetAbsOrigin() - origin):Length2D() <= self.PICKUP_RADIUS then
-				self:PickupRune(hero, id, token)
-				return nil
+			if self:IsEligiblePicker(hero) and (hero:GetAbsOrigin() - origin):Length2D() <= self.PICKUP_RADIUS then
+				if self:HasHeroPickedRuneBatch(active, hero) then
+					self:NotifyRuneBatchPickupBlocked(hero, active)
+				else
+					self:PickupRune(hero, id, token)
+					return nil
+				end
 			end
 		end
 
@@ -619,6 +625,25 @@ function Runes:MarkHeroPickedRuneBatch(active, hero)
 	end
 
 	self.runeBatches[batchId].pickedPlayers[playerID] = true
+end
+
+function Runes:NotifyRuneBatchPickupBlocked(hero, active)
+	local playerID = self:GetHeroPlayerID(hero)
+	if playerID == nil or hero.GetPlayerOwner == nil then return end
+
+	local player = hero:GetPlayerOwner()
+	if player == nil then return end
+
+	self.pickupBlockedNotices = self.pickupBlockedNotices or {}
+	local noticeKey = tostring(active and active.batchId or 0) .. ":" .. tostring(playerID)
+	if self.pickupBlockedNotices[noticeKey] == true then return end
+
+	self.pickupBlockedNotices[noticeKey] = true
+	Notifications:Bottom(player, {
+		text = "You already picked up a rune from this batch.",
+		duration = 3.0,
+		severity = "warning",
+	})
 end
 
 function Runes:PickupRune(hero, id, token)
@@ -906,17 +931,6 @@ function Runes:PlayHeroRuneEffect(hero, category, playSound)
 end
 
 function Runes:OnDamageFilter(filterTable)
-	if filterTable == nil then return true end
-
-	local victimIndex = filterTable.entindex_victim_const
-	local victim = victimIndex and EntIndexToHScript(victimIndex) or nil
-	if victim ~= nil and not victim:IsNull() then
-		local barrier = victim:FindModifierByName("modifier_xhs_rune_barrier")
-		if barrier ~= nil and barrier.AbsorbDamage ~= nil then
-			filterTable.damage = barrier:AbsorbDamage(filterTable.damage or 0)
-		end
-	end
-
 	return true
 end
 

@@ -1,5 +1,5 @@
 #base units/companions.txt
-// #base units/statues.txt
+#base units/statues.txt
 #base units/emblems.txt
 #base units/core_dummy_units.txt
 #base units/buildings.txt

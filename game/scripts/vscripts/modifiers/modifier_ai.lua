@@ -4,6 +4,13 @@
 modifier_ai = modifier_ai or class({})
 modifier_ai.XHS_LINK_CLIENT = true
 
+local function IsBreakableTarget(target)
+	if target == nil or target:IsNull() or target.GetUnitName == nil then return false end
+
+	local unitName = target:GetUnitName()
+	return unitName == "npc_dota_crate" or unitName == "npc_dota_chest" or unitName == "npc_dota_vase"
+end
+
 function modifier_ai:GetAttributes() return MODIFIER_ATTRIBUTE_IGNORE_INVULNERABLE end
 
 function modifier_ai:IsPurgeException() return false end
@@ -45,13 +52,49 @@ function modifier_ai:OnCreated(params)
 	end
 end
 
+function modifier_ai:MovePastBreakable()
+	local ancient = Entities:FindByName(nil, "dota_goodguys_fort")
+	if ancient == nil then return end
+
+	self.isAttacking = false
+	self.parent.xhs_breakable_ignore_until = GameRules:GetGameTime() + 1.5
+	self.parent:SetForceAttackTarget(nil)
+	if self.parent.SetAttacking ~= nil then
+		self.parent:SetAttacking(nil)
+	end
+	self.parent:Stop()
+	ExecuteOrderFromTable({
+		UnitIndex = self.parent:entindex(),
+		OrderType = DOTA_UNIT_ORDER_MOVE_TO_POSITION,
+		Position = ancient:GetAbsOrigin(),
+	})
+end
+
 function modifier_ai:OnIntervalThink()
 	if self.parent:IsIllusion() then return end
 	if Entities:FindByName(nil, "dota_goodguys_fort") == nil then return end
 	if self.parent:IsStunned() or self.parent:IsSilenced() or self.parent:IsHexed() or self.parent:IsChanneling() or self.parent:GetCurrentActiveAbility() then return end
-	if self.parent:GetAggroTarget() ~= nil then return end
 
 	local now = GameRules:GetGameTime()
+	local aggroTarget = self.parent:GetAggroTarget()
+	local attackTarget = self.parent:GetAttackTarget()
+
+	-- Aggro is assigned before GetAttackTarget is always populated. Handle both
+	-- states before the normal "already has a target" early return, otherwise a
+	-- wave can remain permanently focused on an untouchable breakable.
+	if IsBreakableTarget(aggroTarget) or IsBreakableTarget(attackTarget) then
+		self:MovePastBreakable()
+		return
+	end
+	if aggroTarget ~= nil then return end
+
+	-- Wave creeps temporarily ignore breakable containers while they move past
+	-- them. The wave controller owns that movement window; issuing another
+	-- order here would make the creep oscillate between the crate and the lane.
+	if self.parent.xhs_breakable_ignore_until ~= nil and now < self.parent.xhs_breakable_ignore_until then
+		self.parent:SetForceAttackTarget(nil)
+		return
+	end
 
 	if self.last_attack_time and now - self.last_attack_time < 0.5 then
 		return
@@ -99,12 +142,7 @@ function modifier_ai:OnIntervalThink()
 			local chests = Entities:FindAllByClassnameWithin("npc_dota_chest", self.parent:GetAbsOrigin(), attack_range + 500)
 
 			if #crates > 0 or #chests > 0 then
-				self.parent:SetForceAttackTarget(nil)
-				ExecuteOrderFromTable({
-					UnitIndex = self.parent:entindex(),
-					OrderType = DOTA_UNIT_ORDER_MOVE_TO_POSITION,
-					Position = ancient_position,
-				})
+				self:MovePastBreakable()
 				-- print("Crate or chest here, move to ancient")
 				return
 			end
@@ -179,16 +217,8 @@ function modifier_ai:OnIntervalThink()
 			elseif bit.band(tonumber(tostring(ability:GetBehavior())), DOTA_ABILITY_BEHAVIOR_NO_TARGET) == DOTA_ABILITY_BEHAVIOR_NO_TARGET then
 				-- print("Cast No Target:", ability:GetAbilityName())
 
-				if ability:GetAbilityName() == "arthas_holy_light" then
-					-- print(self.parent:GetHealthPercent(), ability:GetSpecialValueFor("health_threshold"))
-					if self.parent:GetHealthPercent() <= ability:GetSpecialValueFor("health_threshold") then
-						self.parent:Stop()
-						self.parent:CastAbilityNoTarget(ability, -1)
-					end
-				else
-					self.parent:Stop()
-					self.parent:CastAbilityNoTarget(ability, -1)
-				end
+				self.parent:Stop()
+				self.parent:CastAbilityNoTarget(ability, -1)
 
 				return
 			elseif bit.band(tonumber(tostring(ability:GetBehavior())), DOTA_ABILITY_BEHAVIOR_POINT) == DOTA_ABILITY_BEHAVIOR_POINT then
@@ -212,17 +242,6 @@ function modifier_ai:OnIntervalThink()
 				return
 			elseif bit.band(tonumber(tostring(ability:GetBehavior())), DOTA_ABILITY_BEHAVIOR_UNIT_TARGET) == DOTA_ABILITY_BEHAVIOR_UNIT_TARGET then
 				-- print("Cast On Target:", ability:GetAbilityName())
-
-				if ability:GetAbilityName() == "arthas_holy_light" then
-					local healthThreshold = ability:GetSpecialValueFor("health_threshold")
-					if healthThreshold <= 0 then healthThreshold = 70 end
-					if self.parent:GetHealthPercent() <= healthThreshold then
-						self.parent:Stop()
-						self.parent:CastAbilityOnTarget(self.parent, ability, -1)
-					end
-
-					return
-				end
 
 				if self.parent:GetTeam() == ability:GetAbilityTargetTeam() then
 					self.parent:Stop()
@@ -250,6 +269,10 @@ end
 function modifier_ai:OnAttackStart(keys)
 	if IsServer() then
 		if self.parent == keys.attacker then
+			if IsBreakableTarget(keys.target) then
+				self:MovePastBreakable()
+				return
+			end
 			self.isAttacking = true
 		end
 	end

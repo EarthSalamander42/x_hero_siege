@@ -479,8 +479,20 @@ function XHSDevToolsRenderLanes(parent) {
 	XHSDevToolsMakeLabel(waveSection, "XHSDevToolsMuted", "Use the global Sandbox toggle above to stop automatic waves and timers. Manual triggers still work.");
 	var grid = $.CreatePanel("Panel", waveSection, "");
 	grid.AddClass("XHSDevToolsGrid");
+	XHSDevToolsMakeButton(grid, "Activate Phase 2", "Warn", function() {
+		XHSDevToolsSend("start_phase2", {});
+	});
 	XHSDevToolsMakeButton(grid, "Spawn Enabled Lanes", "", function() {
 		XHSDevToolsSend("spawn_lane_wave", { lane: 0 });
+	});
+	XHSDevToolsMakeButton(grid, "Phase 2 Left", "Small Accent", function() {
+		XHSDevToolsSend("spawn_phase2_wave", { side: "left" });
+	});
+	XHSDevToolsMakeButton(grid, "Phase 2 Right", "Small Accent", function() {
+		XHSDevToolsSend("spawn_phase2_wave", { side: "right" });
+	});
+	XHSDevToolsMakeButton(grid, "Phase 2 Both", "Accent", function() {
+		XHSDevToolsSend("spawn_phase2_wave", { side: "both" });
 	});
 	for (var wave = 1; wave <= 8; wave++) {
 		(function(w) {

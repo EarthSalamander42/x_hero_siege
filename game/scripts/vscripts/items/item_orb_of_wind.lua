@@ -2,16 +2,14 @@ LinkLuaModifier("modifier_orb_of_wind", "items/item_orb_of_wind.lua", LUA_MODIFI
 LinkLuaModifier("modifier_orb_of_wind_zephyr", "items/item_orb_of_wind.lua", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_orb_of_wind_guard", "items/item_orb_of_wind.lua", LUA_MODIFIER_MOTION_NONE)
 
+require("items/orb_toggle")
+
 item_orb_of_wind = item_orb_of_wind or class({})
 item_zephyr_gem = item_zephyr_gem or class({})
 item_tempest_aegis = item_tempest_aegis or class({})
 
 local function ToggleWindOrb(caster, ability)
-	if caster:HasModifier("modifier_orb_of_wind_active") then
-		caster:RemoveModifierByName("modifier_orb_of_wind_active")
-	else
-		caster:AddNewModifier(caster, ability, "modifier_orb_of_wind_active", {})
-	end
+	XHSOrbToggle.Toggle(caster, ability, "modifier_orb_of_wind_active")
 end
 
 local function GetWindOrbTexture(caster, active_texture, inactive_texture)
@@ -78,6 +76,11 @@ end
 
 function modifier_orb_of_wind:OnCreated()
 	self.next_proc_time = 0
+	XHSOrbToggle.OnIntrinsicCreated(self, "modifier_orb_of_wind_active")
+end
+
+function modifier_orb_of_wind:OnDestroy()
+	XHSOrbToggle.OnIntrinsicDestroyed(self, "modifier_orb_of_wind_active")
 end
 
 function modifier_orb_of_wind:OnAttackFail(params)

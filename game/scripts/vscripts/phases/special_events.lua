@@ -9,6 +9,9 @@ local CINEMATIC_EVENT_PRE_TELEPORT_DELAY = 4.0
 local CINEMATIC_EVENT_POST_TELEPORT_HOLD = 1.5
 local MURADIN_ENTRY_EXTRA_STUN = 3.0
 local MURADIN_EXIT_STUN_DURATION = 5.0
+local MURADIN_TELEPORT_OUT_DURATION = 3.0
+local MURADIN_TELEPORT_START_PARTICLE = "particles/items2_fx/teleport_start.vpcf"
+local MURADIN_TELEPORT_END_PARTICLE = "particles/items2_fx/teleport_end.vpcf"
 
 local function ShowCurrentEventTimer(title, duration)
 	CustomGameEventManager:Send_ServerToAllClients("show_current_event_timer", {
@@ -110,6 +113,52 @@ local function StartCinematicDelayedTeleport(hero, point, delay)
 	end)
 end
 
+local function PlayMuradinTeleportIn(unit)
+	if unit == nil or unit:IsNull() then return end
+
+	local position = unit:GetAbsOrigin()
+	unit:AddNoDraw()
+
+	Timers:CreateTimer(0.15, function()
+		if unit == nil or unit:IsNull() then return nil end
+
+		local particle = ParticleManager:CreateParticle(MURADIN_TELEPORT_END_PARTICLE, PATTACH_WORLDORIGIN, nil)
+		ParticleManager:SetParticleControl(particle, 0, position)
+		ParticleManager:SetParticleControl(particle, 1, position)
+		ParticleManager:ReleaseParticleIndex(particle)
+
+		unit:RemoveNoDraw()
+		EmitSoundOnLocationWithCaster(position, "Portal.Hero_Appear", unit)
+		return nil
+	end)
+end
+
+local function StartMuradinTeleportOut(unit)
+	if unit == nil or unit:IsNull() or unit.xhs_teleport_out_started then return end
+
+	unit.xhs_teleport_out_started = true
+	unit:AddNewModifier(unit, nil, "modifier_cinematic_pause", {
+		duration = MURADIN_TELEPORT_OUT_DURATION,
+		ramp_duration = 0,
+	})
+
+	local particle = ParticleManager:CreateParticle(MURADIN_TELEPORT_START_PARTICLE, PATTACH_ABSORIGIN_FOLLOW, unit)
+	unit:EmitSound("Portal.Loop_Appear")
+
+	Timers:CreateTimer(MURADIN_TELEPORT_OUT_DURATION, function()
+		if unit ~= nil and not unit:IsNull() then
+			local position = unit:GetAbsOrigin()
+			unit:StopSound("Portal.Loop_Appear")
+			EmitSoundOnLocationWithCaster(position, "Portal.Hero_Disappear", unit)
+			unit:AddNoDraw()
+		end
+
+		ParticleManager:DestroyParticle(particle, false)
+		ParticleManager:ReleaseParticleIndex(particle)
+		return nil
+	end)
+end
+
 local function StartSpecialArenaCinematicIntro(hero, point, creep_watch_name, on_complete)
 	local intro_duration = CINEMATIC_EVENT_PRE_TELEPORT_DELAY + CINEMATIC_EVENT_POST_TELEPORT_HOLD
 
@@ -199,6 +248,7 @@ function SpecialEvents:MuradinEvent(time)
 	local Muradin = CreateUnitByName("npc_dota_creature_muradin_bronzebeard", Entities:FindByName(nil, "npc_dota_muradin_boss"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 	Muradin:AddNewModifier(Muradin, nil, "modifier_cinematic_pause", { duration = stun_duration, ramp_duration = SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP })
 	Muradin:SetAngles(0, 270, 0)
+	PlayMuradinTeleportIn(Muradin)
 	Notifications:TopToAll({
 		duration = stun_duration,
 		segments = {
@@ -271,6 +321,7 @@ function SpecialEvents:MuradinEvent(time)
 		UpdateGlobalObjective("farm_event", "Active", "Farm Event in --:--", nil)
 		CustomGameEventManager:Send_ServerToAllClients("update_special_event_label_farm", {})
 		StopAllStormEarthFireSounds()
+		StartMuradinTeleportOut(Muradin)
 		SpecialEvents:EndMuradinEvent()
 		if CustomTimers.special_waves_disabled ~= true then
 			SpecialWave(3)
@@ -694,6 +745,8 @@ function SpecialEvents:SogatEvent(time, hero) -- 750 kills
 	CustomGameEventManager:Send_ServerToAllClients("show_timer_special_arena", {})
 	CustomTimers:BroadcastTimer("special_arena")
 	GameMode.SpecialArena_occuring = true
+	SpecialEvents.SogatRewardHero = nil
+	SpecialEvents.SogatRewardPending = false
 	if FragmentQuests ~= nil then
 		FragmentQuests:OnArenaStart("sogat", time)
 	end
@@ -736,6 +789,24 @@ function SpecialEvents:EndSogatEvent(bWin)
 
 	if bWin then
 		Notifications:TopToAll({ text = "Sogat arena has been won!", duration = 5.0 })
+		if SpecialEvents.SogatRewardPending == true and SpecialEvents.SogatRewardHero ~= nil then
+			local rewardHero = SpecialEvents.SogatRewardHero
+			Timers:CreateTimer(teleport_time + 0.3, function()
+				if rewardHero ~= nil and IsValidEntity(rewardHero) and not rewardHero:IsNull() then
+					if rewardHero:HasAnyAvailableInventorySpace() then
+						local item = CreateItem("item_ring_of_superiority", rewardHero, rewardHero)
+						if item ~= nil then
+							item:SetPurchaseTime(GameRules:GetGameTime())
+							item:SetPurchaser(rewardHero)
+							rewardHero:AddItem(item)
+						end
+					else
+						local dropTarget = rewardHero:GetAbsOrigin() + RandomVector(RandomFloat(50, 150))
+						DropNeutralItemAtPositionForHero("item_ring_of_superiority", dropTarget, rewardHero, rewardHero:GetTeam(), true)
+					end
+				end
+			end)
+		end
 	else
 		Notifications:TopToAll({ text = "Sogat arena has been loss!", duration = 5.0 })
 	end

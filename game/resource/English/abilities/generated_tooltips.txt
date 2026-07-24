@@ -443,3 +443,8 @@
 "DOTA_Tooltip_ability_xhs_spirit_fire_solar_flare_Description"		"Explodes a marked area for heavy pure damage, stunning and igniting heroes hit."
 "DOTA_Tooltip_ability_xhs_spirit_fire_wildfire_ring"		"Wildfire Ring"
 "DOTA_Tooltip_ability_xhs_spirit_fire_wildfire_ring_Description"		"Detonates two rings of wildfire nodes that deal pure damage and ignite heroes hit."
+"DOTA_Tooltip_ability_xhs_special_wave_bash"		"Bash of the Deep"
+"DOTA_Tooltip_ability_xhs_special_wave_bash_Description"		"Every %attack_count% valid attacks deal %bonus_damage% bonus physical damage and stun for %duration% seconds. Attacking an already stunned unit cannot proc Bash and resets this unit's attack counter."
+"DOTA_Tooltip_ability_xhs_special_wave_bash_bonus_damage"		"BONUS DAMAGE:"
+"DOTA_Tooltip_ability_xhs_special_wave_bash_duration"		"STUN DURATION:"
+"DOTA_Tooltip_ability_xhs_special_wave_bash_attack_count"		"ATTACKS TO BASH:"

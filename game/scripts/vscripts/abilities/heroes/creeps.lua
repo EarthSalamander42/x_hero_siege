@@ -131,7 +131,7 @@ modifier_disease_cloud_aura.XHS_LINK_CLIENT = true
 
 function modifier_disease_cloud_aura:OnCreated()
 	if IsServer() then
-		local particle = ParticleManager:CreateParticle("particles/custom/undead/disease_cloud.vpcf", PATTACH_ABSORIGIN_FOLLOW, self:GetParent())
+		local particle = ParticleManager:CreateParticle("particles/units/heroes/hero_pudge/pudge_rot.vpcf", PATTACH_ABSORIGIN_FOLLOW, self:GetParent())
 		ParticleManager:SetParticleControl(particle, 1, Vector(200, 0, 0))
 		self:AddParticle(particle, false, false, 1, false, false)
 	end
@@ -142,7 +142,7 @@ function modifier_disease_cloud_aura:OnDestroy()
 		local unit = self:GetParent()
 		if unit:GetUnitName() == "undead_abomination" then
 			local disease_cloud_dummy = CreateUnitByName("dummy_unit_disease_cloud", unit:GetAbsOrigin(), false, nil, nil, unit:GetTeamNumber())
-			local explosion = ParticleManager:CreateParticle("particles/custom/undead/rot_recipient.vpcf", PATTACH_ABSORIGIN_FOLLOW, disease_cloud_dummy)
+			local explosion = ParticleManager:CreateParticle("particles/units/heroes/hero_pudge/pudge_rot_recipient.vpcf", PATTACH_ABSORIGIN_FOLLOW, disease_cloud_dummy)
 			Timers:CreateTimer(1, function() ParticleManager:DestroyParticle(explosion, true) end)
 			Timers:CreateTimer(10, function()
 				UTIL_Remove(disease_cloud_dummy)
@@ -207,7 +207,7 @@ function modifier_disease_cloud_debuff:OnCreated()
 end
 
 function modifier_disease_cloud_debuff:GetEffectName()
-	return "particles/custom/undead/disease_debuff.vpcf"
+	return "particles/units/heroes/hero_pudge/pudge_rot_recipient.vpcf"
 end
 
 function modifier_disease_cloud_debuff:GetEffectAttachType()

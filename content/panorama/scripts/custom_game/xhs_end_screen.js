@@ -41,6 +41,7 @@ var XHSEndScreen = (function () {
 	};
 	var endGameSubscription = null;
 	var hasRenderedEndGame = false;
+	var fallbackTimerStarted = false;
 	var shownRewardKeys = {};
 
 	function Panel(id) {
@@ -235,6 +236,29 @@ var XHSEndScreen = (function () {
 		if (Game && Game.FinishGame) {
 			Game.FinishGame();
 		}
+	}
+
+	function ShowEndScreenFallback() {
+		if (hasRenderedEndGame) {
+			return;
+		}
+
+		var root = $.GetContextPanel();
+		if (!root) {
+			return;
+		}
+
+		root.SetHasClass("IsLoading", false);
+		root.SetHasClass("IsFallback", true);
+	}
+
+	function ScheduleEndScreenFallback() {
+		if (fallbackTimerStarted) {
+			return;
+		}
+
+		fallbackTimerStarted = true;
+		$.Schedule(10.0, ShowEndScreenFallback);
 	}
 
 	function ClearPanel(panel) {
@@ -1199,6 +1223,11 @@ var XHSEndScreen = (function () {
 			close.SetPanelEvent("onactivate", FinishGame);
 		}
 
+		var fallbackClose = Panel("XHSEndScreenFallbackClose");
+		if (fallbackClose) {
+			fallbackClose.SetPanelEvent("onactivate", FinishGame);
+		}
+
 		var hall = Panel("XHSEndScreenHallButton");
 		if (hall) {
 			hall.enabled = false;
@@ -1223,15 +1252,24 @@ var XHSEndScreen = (function () {
 			return;
 		}
 
-		hasRenderedEndGame = true;
-		SetLoading(false);
-		var players = BuildPlayerModels(data);
+		try {
+			var players = BuildPlayerModels(data);
 
-		RenderHeader(data);
-		RenderFragmentQuests(data);
-		RenderMvpCards(players);
-		RenderPlayers(players);
-		RenderHallOfFame();
+			RenderHeader(data);
+			RenderFragmentQuests(data);
+			RenderMvpCards(players);
+			RenderPlayers(players);
+			RenderHallOfFame();
+
+			hasRenderedEndGame = true;
+			SetLoading(false);
+			var root = $.GetContextPanel();
+			if (root) {
+				root.SetHasClass("IsFallback", false);
+			}
+		} catch (error) {
+			$.Msg("[XHSEndScreen] Render failed; fallback remains armed: " + error);
+		}
 	}
 
 	function SubscribeEndGameData() {
@@ -1251,6 +1289,7 @@ var XHSEndScreen = (function () {
 		BindButtons();
 		SubscribeEndGameData();
 		SetLoading(true);
+		ScheduleEndScreenFallback();
 		RenderEndGameData(GetEndGameData());
 	}
 

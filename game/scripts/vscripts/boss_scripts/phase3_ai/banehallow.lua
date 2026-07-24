@@ -480,7 +480,7 @@ function modifier_xhs_banehallow_phase3_ai:Raze(target, playImpactSound, delayOv
 
 		local hit_enemies = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, target, nil, radius, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)
 		for _, enemy in pairs(hit_enemies) do
-			local damage_dealt = ApplyDamage({ victim = enemy, attacker = boss, ability = nil, damage = damage, damage_type = DAMAGE_TYPE_PURE })
+			local damage_dealt = ApplyDamage({ victim = enemy, attacker = boss, ability = ability, damage = damage, damage_type = ability:GetAbilityDamageType() })
 			SendOverheadEventMessage(nil, OVERHEAD_ALERT_BONUS_SPELL_DAMAGE, enemy, damage_dealt, nil)
 			self:ApplyNecromastery(1)
 		end
@@ -535,7 +535,7 @@ function modifier_xhs_banehallow_phase3_ai:Meteor(target, radius, damage)
 		boss:EmitSound("Hero_Invoker.ChaosMeteor.Impact")
 		local hit_enemies = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, target, nil, radius, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)
 		for _, enemy in pairs(hit_enemies) do
-			local damage_dealt = ApplyDamage({ victim = enemy, attacker = boss, ability = nil, damage = damage, damage_type = DAMAGE_TYPE_PURE })
+			local damage_dealt = ApplyDamage({ victim = enemy, attacker = boss, ability = ability, damage = damage, damage_type = ability:GetAbilityDamageType() })
 			SendOverheadEventMessage(nil, OVERHEAD_ALERT_BONUS_SPELL_DAMAGE, enemy, damage_dealt, nil)
 			self:ApplyNecromastery(1)
 		end

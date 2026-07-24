@@ -1,3 +1,55 @@
+local function IsBreakableLaneTarget(target)
+	if target == nil or target:IsNull() or target.GetUnitName == nil then return false end
+
+	local unitName = target:GetUnitName()
+	return unitName == "npc_dota_crate" or unitName == "npc_dota_chest" or unitName == "npc_dota_vase"
+end
+
+local function GetBreakableLaneTarget(unit)
+	if unit == nil or unit:IsNull() then return nil end
+
+	local attackTarget = unit:GetAttackTarget()
+	if IsBreakableLaneTarget(attackTarget) then return attackTarget end
+
+	local aggroTarget = unit:GetAggroTarget()
+	if IsBreakableLaneTarget(aggroTarget) then return aggroTarget end
+
+	return nil
+end
+
+local function ClearBreakableLaneTarget(unit, target)
+	if unit == nil or unit:IsNull() or not IsBreakableLaneTarget(target) then return false end
+
+	unit:SetForceAttackTarget(nil)
+	if unit.SetAttacking ~= nil then
+		unit:SetAttacking(nil)
+	end
+	unit:Stop()
+	return true
+end
+
+local function MoveCreepPastBreakable(unit, destination)
+	if unit == nil or unit:IsNull() or destination == nil or destination.GetAbsOrigin == nil then return end
+
+	-- Do not immediately issue ATTACK_MOVE again: that makes the native AI
+	-- reacquire the same crate every frame. Give the creep a short movement-only
+	-- window so it actually clears the breakable's collision/aggro radius.
+	unit.xhs_breakable_ignore_until = GameRules:GetGameTime() + 1.5
+	local origin = unit:GetAbsOrigin()
+	local destinationPosition = destination:GetAbsOrigin()
+	local direction = destinationPosition - origin
+	direction.z = 0
+	if direction:Length2D() > 0 then
+		direction = direction:Normalized()
+		destinationPosition = origin + direction * 500
+	end
+	ExecuteOrderFromTable({
+		UnitIndex = unit:entindex(),
+		OrderType = DOTA_UNIT_ORDER_MOVE_TO_POSITION,
+		Position = destinationPosition,
+	})
+end
+
 local function OrderWaveCreep(unit, waypoint)
 	if unit == nil or unit:IsNull() then return end
 
@@ -20,9 +72,29 @@ local function OrderWaveCreep(unit, waypoint)
 
 	local target = waypoint or BASE_GOOD
 	if target == nil or target.GetAbsOrigin == nil then return end
+	local finalDestination = BASE_GOOD or target
+
+	Timers:CreateTimer(0.25, function()
+		if unit == nil or unit:IsNull() or not unit:IsAlive() then return nil end
+
+		if ClearBreakableLaneTarget(unit, GetBreakableLaneTarget(unit)) then
+			MoveCreepPastBreakable(unit, finalDestination)
+			return 0.25
+		end
+
+		if unit.xhs_breakable_ignore_until ~= nil and GameRules:GetGameTime() < unit.xhs_breakable_ignore_until then
+			return 0.25
+		end
+
+		return 0.25
+	end)
 
 	Timers:CreateTimer(0.1, function()
 		if unit == nil or unit:IsNull() or not unit:IsAlive() then return nil end
+		if ClearBreakableLaneTarget(unit, GetBreakableLaneTarget(unit)) then
+			MoveCreepPastBreakable(unit, finalDestination)
+			return nil
+		end
 		ExecuteOrderFromTable({
 			UnitIndex = unit:entindex(),
 			OrderType = DOTA_UNIT_ORDER_ATTACK_MOVE,
@@ -34,11 +106,12 @@ local function OrderWaveCreep(unit, waypoint)
 
 	Timers:CreateTimer(8.0, function()
 		if unit == nil or unit:IsNull() or not unit:IsAlive() then return nil end
+		if unit.xhs_breakable_ignore_until ~= nil and GameRules:GetGameTime() < unit.xhs_breakable_ignore_until then return nil end
 		if unit:GetAttackTarget() ~= nil then return nil end
 		ExecuteOrderFromTable({
 			UnitIndex = unit:entindex(),
 			OrderType = DOTA_UNIT_ORDER_ATTACK_MOVE,
-			Position = target:GetAbsOrigin(),
+			Position = finalDestination:GetAbsOrigin(),
 		})
 
 		return nil
@@ -60,7 +133,12 @@ function ReissueWaveCreepOrders(delay)
 	Timers:CreateTimer(delay or 0.1, function()
 		local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_1, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER, false)
 		for _, unit in pairs(units) do
-			if unit ~= nil and not unit:IsNull() and unit:IsAlive() and unit:HasMovementCapability() and not unit.Boss and unit:GetAttackTarget() == nil and not unit:HasModifier("modifier_cinematic_pause") then
+			local hasBreakableTarget = unit ~= nil and not unit:IsNull() and ClearBreakableLaneTarget(unit, GetBreakableLaneTarget(unit))
+			if hasBreakableTarget then
+				MoveCreepPastBreakable(unit, target)
+			elseif unit ~= nil and not unit:IsNull() and unit:IsAlive() and unit:HasMovementCapability() and not unit.Boss and unit.xhs_breakable_ignore_until ~= nil and GameRules:GetGameTime() < unit.xhs_breakable_ignore_until then
+				-- Keep the movement-only order until the creep has passed the crate.
+			elseif unit ~= nil and not unit:IsNull() and unit:IsAlive() and unit:HasMovementCapability() and not unit.Boss and unit:GetAttackTarget() == nil and not unit:HasModifier("modifier_cinematic_pause") then
 				ExecuteOrderFromTable({
 					UnitIndex = unit:entindex(),
 					OrderType = DOTA_UNIT_ORDER_ATTACK_MOVE,
@@ -142,35 +220,48 @@ function SpawnCreeps(force)
 		local point = Entities:FindByName(nil, "npc_dota_spawner_" .. c)
 		local waypoint = Entities:FindByName(nil, "creep_path_" .. c)
 
-		if not point.disabled then
+		if point ~= nil and not point.disabled then
 			if CREEP_LANES[c][1] == 1 then -- Lane Activated?
 				if CREEP_LANES[c][3] == 1 then -- Barrack Alive?
+					local meleeCount = 4
+					local rangedCount = 2
+
+					-- The 4-player map keeps two visual lanes per player: the first
+					-- lane carries melee creeps and the second carries ranged creeps.
+					if CREEP_LANES_TYPE == 2 then
+						if c % 2 == 1 then
+							rangedCount = 0
+						else
+							meleeCount = 0
+						end
+					end
+
 					if CREEP_LANES[c][2] == 1 then -- Lane Level
-						for j = 1, 2 do
+						for j = 1, meleeCount do
 							SpawnWaveCreep(melee_1[GameMode.creep_roll["race"]], point, waypoint)
 						end
-						for j = 1, 1 do
+						for j = 1, rangedCount do
 							SpawnWaveCreep(ranged_1[GameMode.creep_roll["race"]], point, waypoint)
 						end
 					elseif CREEP_LANES[c][2] == 2 then
-						for j = 1, 2 do
+						for j = 1, meleeCount do
 							SpawnWaveCreep(melee_2[GameMode.creep_roll["race"]], point, waypoint)
 						end
-						for j = 1, 1 do
+						for j = 1, rangedCount do
 							SpawnWaveCreep(ranged_2[GameMode.creep_roll["race"]], point, waypoint)
 						end
 					elseif CREEP_LANES[c][2] == 3 then
-						for j = 1, 2 do
+						for j = 1, meleeCount do
 							SpawnWaveCreep(melee_3[GameMode.creep_roll["race"]], point, waypoint)
 						end
-						for j = 1, 1 do
+						for j = 1, rangedCount do
 							SpawnWaveCreep(ranged_3[GameMode.creep_roll["race"]], point, waypoint)
 						end
 					elseif CREEP_LANES[c][2] >= 4 then
-						for j = 1, 2 do
+						for j = 1, meleeCount do
 							SpawnWaveCreep(melee_4[GameMode.creep_roll["race"]], point, waypoint)
 						end
-						for j = 1, 1 do
+						for j = 1, rangedCount do
 							SpawnWaveCreep(ranged_4[GameMode.creep_roll["race"]], point, waypoint)
 						end
 					end
@@ -238,7 +329,8 @@ end
 
 function SpawnDragons(dragon)
 	for c = 1, 8 do
-		if CREEP_LANES[c][1] == 1 and CREEP_LANES[c][3] == 1 then
+		local isDragonLane = CREEP_LANES_TYPE ~= 2 or c % 2 == 0
+		if isDragonLane and CREEP_LANES[c][1] == 1 and CREEP_LANES[c][3] == 1 then
 			local point = Entities:FindByName(nil, "npc_dota_spawner_" .. c)
 			local waypoint = Entities:FindByName(nil, "creep_path_" .. c)
 			for j = 1, GameRules:GetCustomGameDifficulty() do
