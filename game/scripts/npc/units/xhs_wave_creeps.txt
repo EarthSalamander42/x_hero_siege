@@ -94,7 +94,7 @@
 
 		// Abilities
 		//----------------------------------------------------------------
-		"Ability1"					"holdout_lunar_glaive"		// Ability 1.
+		"Ability1"					""		// Ability 1.
 		"Ability2"					""		// Ability 2.
 		"Ability3"					""		// Ability 3.
 		"Ability4"					""		// Ability 4.
@@ -259,7 +259,7 @@
 
 		// Abilities
 		//----------------------------------------------------------------
-		"Ability1"					"dragon_knight_dragon_blood"		// Ability 1.
+		"Ability1"					""		// Ability 1.
 		"Ability2"					""		// Ability 2.
 		"Ability3"					""		// Ability 3.
 		"Ability4"					""		// Ability 4.
@@ -347,7 +347,7 @@
 
 		// Abilities
 		//----------------------------------------------------------------
-		"Ability1"					"weaver_geminate_attack"		// Ability 1.
+		"Ability1"					""		// Ability 1.
 		"Ability2"					""		// Ability 2.
 		"Ability3"					""		// Ability 3.
 		"Ability4"					""		// Ability 4.
@@ -435,7 +435,7 @@
 
 		// Abilities
 		//----------------------------------------------------------------
-		"Ability1"					"huskar_berserkers_blood"		// Ability 1.
+		"Ability1"					""		// Ability 1.
 		"Ability2"					""		// Ability 2.
 		"Ability3"					""		// Ability 3.
 		"Ability4"					""		// Ability 4.
@@ -880,7 +880,7 @@
 
 		// Abilities
 		//----------------------------------------------------------------
-		"Ability1"					"ursa_fury_swipes"		// Ability 1.
+		"Ability1"					"xhs_creep_fury_swipes"		// Ability 1.
 		"Ability2"					""		// Ability 2.
 		"Ability3"					""		// Ability 3.
 		"Ability4"					""		// Ability 4.
@@ -1470,7 +1470,7 @@
 
 		// Abilities
 		//----------------------------------------------------------------
-		"Ability1"					"antimage_mana_break"		// Ability 1.
+		"Ability1"					""		// Ability 1.
 		"Ability2"					""		// Ability 2.
 		"Ability3"					""		// Ability 3.
 		"Ability4"					""		// Ability 4.
@@ -1648,7 +1648,7 @@
 
 		// Abilities
 		//----------------------------------------------------------------
-		"Ability1"					"chaos_knight_chaos_strike"		// Ability 1.
+		"Ability1"					""		// Ability 1.
 		"Ability2"					""		// Ability 2.
 		"Ability3"					""		// Ability 3.
 		"Ability4"					""		// Ability 4.
@@ -1737,7 +1737,7 @@
 
 		// Abilities
 		//----------------------------------------------------------------
-		"Ability1"					"nevermore_dark_lord"		// Ability 1.
+		"Ability1"					""		// Ability 1.
 		"Ability2"					""		// Ability 2.
 		"Ability3"					""		// Ability 3.
 		"Ability4"					""		// Ability 4.
@@ -2180,7 +2180,7 @@
 		{
 			"AttachWearables"
 			{
-				"Wearable1" { "ItemDef" "8988" } // Hair of the Blood Moon (head)
+				"Wearable1" { "ItemDef" "207" }  // Lycan's Head (vanilla)
 				"Wearable2" { "ItemDef" "8995" } // Claws of the Blood Moon (weapon)
 			}
 		}
@@ -2193,7 +2193,7 @@
 	{
 		// General
 		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
-		"Model"						"models/creeps/neutral_creeps/n_creep_troll_skeleton/n_creep_troll_skeleton_fx.vmdl"	// Model.
+		"Model"						"models/creeps/neutral_creeps/n_creep_troll_skeleton/n_creep_skeleton_melee.vmdl"	// Animated skeleton model.
 		"ModelScale"				"1.15"
 		"Level"						"1"
 		"SoundSet"					"n_creep_TrollWarlord"
@@ -2454,7 +2454,7 @@
 
 		// Abilities
 		//----------------------------------------------------------------
-		"Ability1"					"viper_corrosive_skin"			// Ability 1.
+		"Ability1"					""			// Ability 1.
 		"Ability2"					""			// Ability 2.
 		"Ability3"					""			// Ability 3.
 		"Ability4"					""			// Ability 4.
@@ -2691,7 +2691,7 @@
 
 		// Abilities
 		//----------------------------------------------------------------
-		"Ability1"					"lich_frost_beast_cold_skin"			// Ability 1.
+		"Ability1"					""			// Ability 1.
 		"Ability2"					""			// Ability 2.
 		"Ability3"					""			// Ability 3.
 		"Ability4"					""			// Ability 4.

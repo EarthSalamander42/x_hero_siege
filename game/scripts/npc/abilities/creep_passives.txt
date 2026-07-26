@@ -152,6 +152,21 @@
 		}
 	}
 
+	"xhs_creep_fury_swipes"
+	{
+		"BaseClass"		"ability_lua"
+		"ScriptFile"		"abilities/creeps/xhs_creep_passives"
+		"MaxLevel"		"5"
+		"AbilityBehavior"		"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityUnitDamageType"		"DAMAGE_TYPE_PHYSICAL"
+		"AbilityTextureName"		"ursa_fury_swipes"
+		"AbilityValues"
+		{
+			"damage_per_stack"		"15 20 25 30 35"
+			"stack_duration"		"20 20 20 20 20"
+		}
+	}
+
 	"xhs_creep_thorns"
 	{
 		"BaseClass"		"ability_lua"
@@ -490,7 +505,7 @@
 		"ScriptFile"		"abilities/creeps/xhs_creep_passives"
 		"MaxLevel"		"5"
 		"AbilityBehavior"		"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-		"AbilityTextureName"		"hood_of_defiance"
+		"AbilityTextureName"		"antimage_spell_shield"
 		"AbilityValues"
 		{
 			"magic_resist"		"6 10 14 18 23"
@@ -534,7 +549,7 @@
 		"ScriptFile"		"abilities/creeps/xhs_creep_passives"
 		"MaxLevel"		"5"
 		"AbilityBehavior"		"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-		"AbilityTextureName"		"item_crimson_guard"
+		"AbilityTextureName"		"mars_bulwark"
 		"AbilityValues"
 		{
 			"physical_block"		"8 12 17 23 30"
@@ -562,7 +577,7 @@
 		"ScriptFile"		"abilities/creeps/xhs_creep_passives"
 		"MaxLevel"		"5"
 		"AbilityBehavior"		"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-		"AbilityTextureName"		"dragon_knight_splash_attack"
+		"AbilityTextureName"		"dragon_knight_breathe_fire"
 		"AbilityValues"
 		{
 			"cleave_pct"		"12 18 24 31 39"
@@ -668,7 +683,7 @@
 		"ScriptFile"		"abilities/creeps/xhs_creep_passives"
 		"MaxLevel"		"5"
 		"AbilityBehavior"		"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-		"AbilityTextureName"		"skeleton_king_vampiric_aura"
+		"AbilityTextureName"		"life_stealer_feast"
 		"AbilityValues"
 		{
 			"lifesteal_pct"		"3 5 7 9 12"
@@ -731,7 +746,7 @@
 		"ScriptFile"		"abilities/creeps/xhs_creep_passives"
 		"MaxLevel"		"5"
 		"AbilityBehavior"		"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-		"AbilityTextureName"		"hood_of_defiance"
+		"AbilityTextureName"		"rubick_null_field"
 		"AbilityValues"
 		{
 			"magic_resist"		"6 10 14 18 23"

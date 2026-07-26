@@ -840,7 +840,7 @@
 
 		// Abilities
 		//----------------------------------------------------------------
-		"Ability1"					""		// Ability 1.
+		"Ability1"					"xhs_creep_blood_hunger"		// Ability 1.
 		"Ability2"					""		// Ability 2.
 		"Ability3"					""		// Ability 3.
 		"Ability4"					""		// Ability 4.
@@ -934,7 +934,7 @@
 
 		// Abilities
 		//----------------------------------------------------------------
-		"Ability1"					""		// Ability 1.
+		"Ability1"					"xhs_creep_evasion"		// Ability 1.
 		"Ability2"					""		// Ability 2.
 		"Ability3"					""		// Ability 3.
 		"Ability4"					""		// Ability 4.
@@ -1177,7 +1177,7 @@
 
 		// Abilities
 		//----------------------------------------------------------------
-		"Ability1"					""		// Ability 1.
+		"Ability1"					"xhs_creep_thorns"		// Ability 1.
 		"Ability2"					""		// Ability 2.
 		"Ability3"					""		// Ability 3.
 		"Ability4"					""		// Ability 4.
@@ -1259,7 +1259,7 @@
 		// Abilities
 		//----------------------------------------------------------------
 		"Ability1"					"creature_war_stomp"	// Ability 1.
-		"Ability2"					"xhs_creeps_phase_2_endurance_aura"		// Ability 2.
+		"Ability2"					""		// Ability 2.
 		"Ability3"					""		// Ability 3.
 		"Ability4"					""		// Ability 4.
 
@@ -1444,7 +1444,7 @@
 
 		// Abilities
 		//----------------------------------------------------------------
-		"Ability1"					""		// Ability 1.
+		"Ability1"					"xhs_creep_crippling_strike"		// Ability 1.
 		"Ability2"					"holdout_blue_effect"		// Ability 2.
 		"Ability3"					""		// Ability 3.
 		"Ability4"					""		// Ability 4.

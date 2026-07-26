@@ -1,6 +1,15 @@
 var XHSDevToolsState = {};
 var XHSDevToolsActiveTab = "scenarios";
 var XHSDevToolsHasServerState = false;
+var XHSDevToolsCurrentTimescale = 1;
+var XHSDevToolsCinematicPreviewId = "";
+
+var XHS_DEVTOOLS_TIMESCALES = [
+	{ value: 0.1, label: "x0.1" },
+	{ value: 1, label: "x1" },
+	{ value: 3, label: "x3" },
+	{ value: 5, label: "x5" }
+];
 
 var XHS_DEVTOOLS_TABS = [
 	{ id: "scenarios", label: "Scenarios" },
@@ -8,6 +17,7 @@ var XHS_DEVTOOLS_TABS = [
 	{ id: "lanes", label: "Lanes/Waves" },
 	{ id: "timers", label: "Timers/Phase" },
 	{ id: "players", label: "Player Tools" },
+	{ id: "ui", label: "UI Preview" },
 	{ id: "cleanup", label: "Cleanup" }
 ];
 
@@ -66,6 +76,10 @@ function XHSDevToolsPanel() {
 	return $("#XHSDevToolsPanel");
 }
 
+function XHSDevToolsIsToolsMode() {
+	return typeof Game.IsInToolsMode === "function" && Game.IsInToolsMode();
+}
+
 function XHSDevToolsSend(action, payload) {
 	if (!XHSDevToolsState.enabled) {
 		XHSDevToolsRenderStatus();
@@ -75,6 +89,38 @@ function XHSDevToolsSend(action, payload) {
 	payload = payload || {};
 	payload.action = action;
 	GameEvents.SendCustomGameEventToServer("xhs_devtools_run_action", payload);
+}
+
+function XHSDevToolsGetCinematicApi() {
+	var config = GameUI.CustomUIConfig();
+	return config && config.XHSCinematics;
+}
+
+function XHSDevToolsBeginClientCinematic(options) {
+	var api = XHSDevToolsGetCinematicApi();
+	if (!api || typeof api.begin !== "function") {
+		$.Msg("[XHS][DevTools][Cinematic] Client API is unavailable. Check custom_ui_manifest.xml and xhs_cinematic.js.");
+		return;
+	}
+
+	options = options || {};
+	XHSDevToolsCinematicPreviewId = String(options.id || "xhs_dev_client");
+	options.id = XHSDevToolsCinematicPreviewId;
+	$.Msg("[XHS][DevTools][Cinematic] Client begin: ", options);
+	api.begin(options);
+}
+
+function XHSDevToolsEndClientCinematic() {
+	var api = XHSDevToolsGetCinematicApi();
+	if (!api || typeof api.end !== "function") {
+		$.Msg("[XHS][DevTools][Cinematic] Client API is unavailable; cannot end preview.");
+		return;
+	}
+
+	var id = XHSDevToolsCinematicPreviewId || "xhs_dev_client";
+	$.Msg("[XHS][DevTools][Cinematic] Client end: ", id);
+	api.end({ id: id });
+	XHSDevToolsCinematicPreviewId = "";
 }
 
 function XHSDevToolsRequestState() {
@@ -146,6 +192,39 @@ function XHSDevToolsMakeSection(parent, title) {
 	section.AddClass("XHSDevToolsSection");
 	XHSDevToolsMakeLabel(section, "XHSDevToolsSectionTitle", title);
 	return section;
+}
+
+function XHSDevToolsRenderTimescale() {
+	var bar = $("#XHSDevToolsTimescale");
+	if (!bar) {
+		return;
+	}
+
+	XHSDevToolsClear(bar);
+	var available = XHSDevToolsIsToolsMode();
+	bar.SetHasClass("Visible", available);
+	if (!available) {
+		return;
+	}
+
+	var serverTimescale = Number(XHSDevToolsState.host_timescale);
+	if (serverTimescale > 0) {
+		XHSDevToolsCurrentTimescale = serverTimescale;
+	}
+
+	for (var i = 0; i < XHS_DEVTOOLS_TIMESCALES.length; i++) {
+		(function(option) {
+			var button = $.CreatePanel("Button", bar, "");
+			button.AddClass("XHSDevToolsTimescaleButton");
+			button.SetHasClass("Active", Math.abs(XHSDevToolsCurrentTimescale - option.value) < 0.001);
+			button.SetPanelEvent("onactivate", function() {
+				XHSDevToolsCurrentTimescale = option.value;
+				XHSDevToolsRenderTimescale();
+				XHSDevToolsSend("set_timescale", { timescale: option.value });
+			});
+			XHSDevToolsMakeLabel(button, "", option.label);
+		})(XHS_DEVTOOLS_TIMESCALES[i]);
+	}
 }
 
 function XHSDevToolsRenderTabs() {
@@ -588,6 +667,80 @@ function XHSDevToolsRenderPlayers(parent) {
 	});
 }
 
+function XHSDevToolsRenderUIPreview(parent) {
+	var dialog = XHSDevToolsMakeSection(parent, "VIP Dialog Preview");
+	XHSDevToolsMakeLabel(dialog, "XHSDevToolsMuted", "Client-only layout fixtures. They do not advance quests or alter campaign state.");
+
+	var grid = $.CreatePanel("Panel", dialog, "");
+	grid.AddClass("XHSDevToolsGrid");
+	XHSDevToolsMakeButton(grid, "NEXT", "", function() {
+		XHSDevToolsSend("preview_vip_dialog", { mode: "next", player_count: 1 });
+	});
+	XHSDevToolsMakeButton(grid, "READY · 1 HERO", "Accent", function() {
+		XHSDevToolsSend("preview_vip_dialog", { mode: "ready", player_count: 1 });
+	});
+	XHSDevToolsMakeButton(grid, "READY · 4 HEROES", "Accent", function() {
+		XHSDevToolsSend("preview_vip_dialog", { mode: "ready", player_count: 4 });
+	});
+	XHSDevToolsMakeButton(grid, "READY · 8 HEROES", "Accent", function() {
+		XHSDevToolsSend("preview_vip_dialog", { mode: "ready", player_count: 8 });
+	});
+	XHSDevToolsMakeButton(grid, "CLOSE PREVIEW", "Warn", function() {
+		XHSDevToolsSend("close_vip_dialog_preview", {});
+	});
+
+	var cinematic = XHSDevToolsMakeSection(parent, "XHS Cinematic Diagnostics");
+	XHSDevToolsMakeLabel(cinematic, "XHSDevToolsMuted", "Client buttons bypass the server event path. Server buttons validate XHSCinematics and custom game event delivery.");
+
+	var clientGrid = $.CreatePanel("Panel", cinematic, "");
+	clientGrid.AddClass("XHSDevToolsGrid");
+	XHSDevToolsMakeButton(clientGrid, "CLIENT BARS", "Accent", function() {
+		XHSDevToolsBeginClientCinematic({
+			id: "xhs_dev_client_bars",
+			hide_hud: 0,
+			letterbox_pct: 10,
+			transition: 0.5
+		});
+	});
+	XHSDevToolsMakeButton(clientGrid, "CLIENT TITLE", "Accent", function() {
+		XHSDevToolsBeginClientCinematic({
+			id: "xhs_dev_client_title",
+			hide_hud: 0,
+			letterbox_pct: 10,
+			transition: 0.5,
+			title: "X HERO SIEGE",
+			subtitle: "Client-side cinematic diagnostic"
+		});
+	});
+	XHSDevToolsMakeButton(clientGrid, "CLIENT FULL 5S", "Warn", function() {
+		XHSDevToolsBeginClientCinematic({
+			id: "xhs_dev_client_full",
+			hide_hud: 1,
+			letterbox_pct: 10,
+			transition: 0.75,
+			duration: 5,
+			title: "FINAL WAVE",
+			subtitle: "HUD restore should occur automatically"
+		});
+	});
+	XHSDevToolsMakeButton(clientGrid, "CLIENT END", "Danger", XHSDevToolsEndClientCinematic);
+	XHSDevToolsMakeButton(clientGrid, "SERVER BARS", "", function() {
+		XHSDevToolsSend("preview_cinematic", { mode: "bars" });
+	});
+	XHSDevToolsMakeButton(clientGrid, "SERVER TITLE", "", function() {
+		XHSDevToolsSend("preview_cinematic", { mode: "title" });
+	});
+	XHSDevToolsMakeButton(clientGrid, "SERVER FULL 5S", "Warn", function() {
+		XHSDevToolsSend("preview_cinematic", { mode: "full" });
+	});
+	XHSDevToolsMakeButton(clientGrid, "FINAL PRESET 8S", "Warn", function() {
+		XHSDevToolsSend("preview_cinematic", { mode: "final_wave" });
+	});
+	XHSDevToolsMakeButton(clientGrid, "SERVER END", "Danger", function() {
+		XHSDevToolsSend("end_cinematic_preview", {});
+	});
+}
+
 function XHSDevToolsRenderCleanup(parent) {
 	var cleanup = XHSDevToolsMakeSection(parent, "Cleanup");
 	XHSDevToolsMakeLabel(cleanup, "XHSDevToolsMuted", "Cleanup removes dev-spawned units, enemy lane creeps, boss counters, and boss health bars.");
@@ -603,8 +756,12 @@ function XHSDevToolsRenderCleanup(parent) {
 
 function XHSDevToolsRender() {
 	var root = $("#XHSDevToolsRoot");
+	var toolsMode = XHSDevToolsIsToolsMode();
 	if (root) {
-		root.style.visibility = "visible";
+		root.style.visibility = toolsMode ? "visible" : "collapse";
+	}
+	if (!toolsMode) {
+		return;
 	}
 
 	var toggle = $("#XHSDevToolsToggle");
@@ -614,6 +771,7 @@ function XHSDevToolsRender() {
 
 	XHSDevToolsRenderStatus();
 	XHSDevToolsRenderSandboxBar();
+	XHSDevToolsRenderTimescale();
 
 	var tabs = $("#XHSDevToolsTabs");
 	var content = $("#XHSDevToolsContent");
@@ -637,6 +795,8 @@ function XHSDevToolsRender() {
 		XHSDevToolsRenderTimers(content);
 	} else if (XHSDevToolsActiveTab === "players") {
 		XHSDevToolsRenderPlayers(content);
+	} else if (XHSDevToolsActiveTab === "ui") {
+		XHSDevToolsRenderUIPreview(content);
 	} else if (XHSDevToolsActiveTab === "cleanup") {
 		XHSDevToolsRenderCleanup(content);
 	}
@@ -653,6 +813,14 @@ function XHSDevToolsOnState(tableName, key, data) {
 }
 
 (function() {
+	if (!XHSDevToolsIsToolsMode()) {
+		var root = $("#XHSDevToolsRoot");
+		if (root) {
+			root.style.visibility = "collapse";
+		}
+		return;
+	}
+
 	CustomNetTables.SubscribeNetTableListener("xhs_devtools", XHSDevToolsOnState);
 	var state = CustomNetTables.GetTableValue("xhs_devtools", "state");
 	if (state) {

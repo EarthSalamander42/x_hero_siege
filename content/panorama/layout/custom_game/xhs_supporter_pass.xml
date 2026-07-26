@@ -6,20 +6,21 @@
 
 	<scripts>
 		<include src="file://{resources}/scripts/custom_game/util.js" />
+		<include src="file://{resources}/scripts/custom_game/xhs_name_display.js" />
+		<include src="file://{resources}/scripts/custom_game/generated/xhs_supporter_couriers.js" />
 		<include src="file://{resources}/scripts/custom_game/xhs_supporter_pass.js" />
 	</scripts>
 
 	<Panel class="XHSSupporterPassRoot" hittest="false">
-		<Button id="XHSSupporterPassButton" class="XHSSupporterPassButton" hittest="false" style="visibility: collapse; opacity: 0;">
+		<Button id="XHSSupporterPassButton" class="XHSSupporterPassButton" hittest="true">
 			<Panel class="XHSSupporterPassButtonGlow" hittest="false" ignore-parent-flow="true" />
 
 			<Panel class="XHSSupporterPassButtonContent" hittest="false">
 				<Panel class="XHSSupporterPassButtonIcon">
-					<Label class="XHSSupporterPassButtonIconText" text="Supporter Pass" />
+					<Label class="XHSSupporterPassButtonIconText" text="#xhs_sp_title" />
 				</Panel>
 
 				<Panel class="XHSSupporterPassButtonCopy">
-					<!-- <Label class="XHSSupporterPassButtonText" text="Supporter Pass" /> -->
 					<Panel id="XHSSupporterFragmentsCounter" class="XHSSupporterFragmentsCounter" hittest="false">
 						<Label class="XHSSupporterFragmentsCounterIcon" text="F" />
 						<Label id="XHSSupporterFragmentsCounterValue" class="XHSSupporterFragmentsCounterValue" text="0" />
@@ -33,27 +34,24 @@
 				<Panel class="XHSPassHeaderMedia" hittest="false" ignore-parent-flow="true" />
 				<Panel class="XHSPassHeaderVeil" hittest="false" ignore-parent-flow="true" />
 				<Panel class="XHSPassHeaderCopy">
-					<Label class="XHSPassEyebrow" text="Supporter Pass" />
+					<Label class="XHSPassEyebrow" text="#xhs_sp_title" />
 				</Panel>
 
 				<Panel class="XHSPassTopBar">
 					<Button id="XHSPassTabOverview" class="XHSPassTab IsActive">
-						<Label text="Overview" />
+						<Label text="#xhs_sp_tab_overview" />
 					</Button>
 					<Button id="XHSPassTabRewards" class="XHSPassTab">
-						<Label text="Rewards" />
+						<Label text="#xhs_sp_tab_rewards" />
 					</Button>
 					<Button id="XHSPassTabShop" class="XHSPassTab">
-						<Label text="Shop" />
+						<Label text="#xhs_sp_tab_shop" />
 					</Button>
 					<Button id="XHSPassTabArmory" class="XHSPassTab">
-						<Label text="Armory" />
-					</Button>
-					<Button id="XHSPassTabLeaderboards" class="XHSPassTab IsDisabled">
-						<Label text="Ranking" />
+						<Label text="#xhs_sp_tab_armory" />
 					</Button>
 					<Button id="XHSPassTabSettings" class="XHSPassTab">
-						<Label text="Settings" />
+						<Label text="#xhs_sp_tab_settings" />
 					</Button>
 				</Panel>
 
@@ -71,13 +69,13 @@
 									<Panel class="XHSPassProfileTop">
 										<DOTAAvatarImage id="XHSPassAvatar" class="XHSPassAvatar" />
 										<Panel class="XHSPassProfileCopy">
-											<Label id="XHSPassPlayerName" class="XHSPassProfileName" text="Player" />
-											<Label id="XHSPassPlayerTier" class="XHSPassProfileTier" text="Free Player" />
+											<Label id="XHSPassPlayerName" class="XHSPassProfileName" text="#xhs_sp_player" />
+											<Label id="XHSPassPlayerTier" class="XHSPassProfileTier" text="#xhs_sp_free_player" />
 										</Panel>
 									</Panel>
 									<Panel class="XHSPassProgressBlock">
 										<Panel class="XHSPassProgressHeader">
-											<Label id="XHSPassLevelLabel" text="Season Level 1" />
+											<Label id="XHSPassLevelLabel" text="#xhs_sp_season_level" />
 											<Label id="XHSPassXpLabel" text="0 / 2000 XP" />
 										</Panel>
 										<Panel class="XHSPassProgressBar">
@@ -89,33 +87,33 @@
 								<Panel class="XHSPassProfileStats">
 									<Panel class="XHSPassStatsRow">
 										<Panel class="XHSPassHeaderStat">
-											<Label class="XHSPassHeaderStatLabel" text="Tier" />
-											<Label id="XHSPassTierValue" class="XHSPassHeaderStatValue" text="Free" />
+											<Label class="XHSPassHeaderStatLabel" text="#xhs_sp_tier" />
+											<Label id="XHSPassTierValue" class="XHSPassHeaderStatValue" text="#xhs_sp_free" />
 										</Panel>
 										<Panel class="XHSPassHeaderStat">
-											<Label class="XHSPassHeaderStatLabel" text="Global XP" />
+											<Label class="XHSPassHeaderStatLabel" text="#xhs_sp_global_xp" />
 											<Label id="XHSPassGlobalXPValue" class="XHSPassHeaderStatValue" text="-" />
 										</Panel>
 										<Panel class="XHSPassHeaderStat">
-											<Label class="XHSPassHeaderStatLabel" text="Supporter XP" />
+											<Label class="XHSPassHeaderStatLabel" text="#xhs_sp_supporter_xp" />
 											<Label id="XHSPassSeasonXPValue" class="XHSPassHeaderStatValue" text="0 / 1000" />
 										</Panel>
 									</Panel>
 									<Panel class="XHSPassStatsRow">
 										<Panel class="XHSPassHeaderStat">
-											<Label class="XHSPassHeaderStatLabel" text="Fragments" />
+											<Label class="XHSPassHeaderStatLabel" text="#xhs_sp_fragments" />
 											<Label id="XHSPassFragmentsValue" class="XHSPassHeaderStatValue" text="0" />
 										</Panel>
 										<Panel class="XHSPassHeaderStat">
-											<Label class="XHSPassHeaderStatLabel" text="Daily Cap" />
+											<Label class="XHSPassHeaderStatLabel" text="#xhs_sp_daily_cap" />
 											<Label id="XHSPassWeeklyCapValue" class="XHSPassHeaderStatValue" text="0 / 100" />
 										</Panel>
 										<Panel class="XHSPassHeaderStat">
-											<Label class="XHSPassHeaderStatLabel" text="XP Boost" />
+											<Label class="XHSPassHeaderStatLabel" text="#xhs_sp_xp_boost" />
 											<Label id="XHSPassXPBoostValue" class="XHSPassHeaderStatValue" text="+0%" />
 										</Panel>
 										<Panel class="XHSPassHeaderStat">
-											<Label class="XHSPassHeaderStatLabel" text="Vote Power" />
+											<Label class="XHSPassHeaderStatLabel" text="#xhs_sp_vote_power" />
 											<Label id="XHSPassVotePowerValue" class="XHSPassHeaderStatValue" text="1 vote" />
 										</Panel>
 									</Panel>
@@ -124,82 +122,75 @@
 
 							<Panel class="XHSPassTiersCard XHSPanel">
 								<Panel class="XHSPassSectionHeader">
-									<Label class="XHSPassSectionTitle" text="Supporter Tiers" />
-									<Label class="XHSPassSectionNote" text="Monthly fragments + identity color + setup vote power" />
+									<Label class="XHSPassSectionTitle" text="#xhs_sp_supporter_tiers" />
+									<Label class="XHSPassSectionNote" text="#xhs_sp_supporter_tiers_note" />
 								</Panel>
 								<Panel id="XHSPassTierRows" class="XHSPassTierRows" />
 							</Panel>
 						</Panel>
 					</Panel>
 
-					<Panel id="XHSPassRewardsPage" class="XHSPassPage IsComingSoon">
+					<Panel id="XHSPassRewardsPage" class="XHSPassPage">
 						<Panel class="XHSPassSectionHeader">
-							<Label class="XHSPassSectionTitle" text="Season Rewards" />
-							<Label class="XHSPassSectionNote" text="Free and supporter tracks" />
+							<Label class="XHSPassSectionTitle" text="#xhs_sp_season_rewards" />
+							<Label class="XHSPassSectionNote" text="#xhs_sp_season_rewards_note" />
 						</Panel>
 						<Panel id="XHSPassRewardTracks" class="XHSPassRewardTracks" />
-						<Panel class="XHSPassComingSoonOverlay" hittest="true" ignore-parent-flow="true">
-							<Panel class="XHSPassComingSoonCard" hittest="false">
-								<Label class="XHSPassComingSoonEyebrow" text="Available in 4.1" />
-								<Label class="XHSPassComingSoonTitle" text="Coming soon" />
-								<Label class="XHSPassComingSoonText" text="Supporter Pass rewards will be available in X Hero Siege 4.1." />
-							</Panel>
-						</Panel>
 					</Panel>
 
-					<Panel id="XHSPassShopPage" class="XHSPassPage IsComingSoon">
+					<Panel id="XHSPassShopPage" class="XHSPassPage">
 						<Panel class="XHSPassSectionHeader HasFilters">
-							<Label class="XHSPassSectionTitle" text="Fragment Shop" />
+							<Label class="XHSPassSectionTitle" text="#xhs_sp_fragment_shop" />
 							<Panel id="XHSPassShopFilters" class="XHSPassSectionFilterTabs" />
-							<Label id="XHSPassShopRefresh" class="XHSPassSectionNote" text="Featured rotation" />
+							<Label id="XHSPassShopRefresh" class="XHSPassSectionNote" text="#xhs_sp_featured_rotation" />
 						</Panel>
+						<Panel id="XHSPassShopPager" class="XHSPassPaginationBar" />
 						<Panel id="XHSPassShopGrid" class="XHSPassShopGrid" />
-						<Panel class="XHSPassComingSoonOverlay" hittest="true" ignore-parent-flow="true">
-							<Panel class="XHSPassComingSoonCard" hittest="false">
-								<Label class="XHSPassComingSoonEyebrow" text="Available in 4.1" />
-								<Label class="XHSPassComingSoonTitle" text="Coming soon" />
-								<Label class="XHSPassComingSoonText" text="The Supporter Pass shop will be available in X Hero Siege 4.1." />
-							</Panel>
-						</Panel>
 					</Panel>
 
-					<Panel id="XHSPassArmoryPage" class="XHSPassPage IsComingSoon">
+					<Panel id="XHSPassArmoryPage" class="XHSPassPage">
 						<Panel class="XHSPassSectionHeader HasFilters">
-							<Label class="XHSPassSectionTitle" text="Armory" />
+							<Label class="XHSPassSectionTitle" text="#xhs_sp_armory" />
 							<Panel id="XHSPassArmoryFilters" class="XHSPassSectionFilterTabs" />
-							<Label class="XHSPassSectionNote" text="Equipped cosmetics" />
+							<Button id="XHSPassCourierRequestOpenButton" class="XHSPassRequestCompanionButton">
+								<Label text="#xhs_sp_request_companion" />
+							</Button>
+							<Label class="XHSPassSectionNote" text="#xhs_sp_armory_note" />
 						</Panel>
+						<Panel id="XHSPassArmoryPager" class="XHSPassPaginationBar" />
 						<Panel id="XHSPassArmoryGrid" class="XHSPassShopGrid XHSPassArmoryGrid" />
-						<Panel class="XHSPassComingSoonOverlay" hittest="true" ignore-parent-flow="true">
-							<Panel class="XHSPassComingSoonCard" hittest="false">
-								<Label class="XHSPassComingSoonEyebrow" text="Available in 4.1" />
-								<Label class="XHSPassComingSoonTitle" text="Coming soon" />
-								<Label class="XHSPassComingSoonText" text="Supporter Pass armory loadouts will be available in X Hero Siege 4.1." />
+						<Panel id="XHSPassCourierRequestOverlay" class="XHSPassCourierRequestOverlay" hittest="false">
+							<Button id="XHSPassCourierRequestBackdrop" class="XHSPassCourierRequestBackdrop" />
+							<Panel class="XHSPassCourierRequestWindow">
+								<Panel class="XHSPassCourierRequestWindowHeader">
+									<Panel class="XHSPassCourierRequestHeaderCopy">
+										<Label class="XHSPassCourierRequestWindowEyebrow" text="#xhs_sp_companion_requests" />
+										<Label class="XHSPassCourierRequestTitle" text="#xhs_sp_courier_request_title" />
+										<Label class="XHSPassCourierRequestBody" text="#xhs_sp_courier_request_body" />
+									</Panel>
+									<Button id="XHSPassCourierRequestCloseButton" class="XHSPassCourierRequestCloseButton">
+										<Label text="×" />
+									</Button>
+								</Panel>
+								<Panel id="XHSPassCourierRequestPager" class="XHSPassPaginationBar" />
+								<Panel id="XHSPassCourierRequestGrid" class="XHSPassShopGrid XHSPassCourierRequestGrid" />
 							</Panel>
 						</Panel>
-					</Panel>
-
-					<Panel id="XHSPassLeaderboardsPage" class="XHSPassPage">
-						<Panel class="XHSPassSectionHeader">
-							<Label class="XHSPassSectionTitle" text="Leaderboards" />
-							<Label class="XHSPassSectionNote" text="XP, winrate, Hall of Fame" />
-						</Panel>
-						<Panel id="XHSPassLeaderboardRows" class="XHSPassLeaderboardRows" />
 					</Panel>
 
 					<Panel id="XHSPassSettingsPage" class="XHSPassPage">
 						<Panel class="XHSPassSectionHeader">
-							<Label class="XHSPassSectionTitle" text="Settings" />
-							<Label class="XHSPassSectionNote" text="Visibility and cosmetics" />
+							<Label class="XHSPassSectionTitle" text="#xhs_sp_settings" />
+							<Label class="XHSPassSectionNote" text="#xhs_sp_settings_note" />
 						</Panel>
 						<Panel id="XHSPassSettingsRows" class="XHSPassSettingsRows" />
 						<Panel id="XHSPassSettingsSaveBar" class="XHSPassSettingsSaveBar">
-							<Label id="XHSPassSettingsSaveText" class="XHSPassSettingsSaveText" text="Unsaved changes" />
+							<Label id="XHSPassSettingsSaveText" class="XHSPassSettingsSaveText" text="#xhs_sp_unsaved_changes" />
 							<Button id="XHSPassSettingsCancelButton" class="XHSPassSecondaryButton">
-								<Label text="Cancel" />
+								<Label text="#xhs_sp_cancel" />
 							</Button>
 							<Button id="XHSPassSettingsSaveButton" class="XHSPassPrimaryButton">
-								<Label text="Save" />
+								<Label text="#xhs_sp_save" />
 							</Button>
 						</Panel>
 					</Panel>

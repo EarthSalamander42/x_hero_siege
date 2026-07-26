@@ -18,6 +18,12 @@ local COMPANION_VANISH_DELAY = 0.18
 local COMPANION_MAX_HIDE_DURATION = 4.5
 local COMPANION_HIDE_COOLDOWN = 6.0
 
+local function CompanionModifierLog(parent, message, ...)
+	local entindex = parent ~= nil and not parent:IsNull() and parent:entindex() or -1
+	local ok, formatted = pcall(string.format, tostring(message), ...)
+	print(string.format("[XHS Companion] modifier ent=%s %s", tostring(entindex), ok and formatted or tostring(message)))
+end
+
 function modifier_companion:IsHidden() return true end
 
 function modifier_companion:GetAbsoluteNoDamagePhysical() return 1 end
@@ -85,6 +91,10 @@ function modifier_companion:OnCreated()
 		self.hidden_by_combat = false
 		self.hidden_since = nil
 		self.combat_hide_cooldown_until = 0
+		self.hidden_by_shared_state = false
+		self.missing_hero_logged = false
+		self:GetParent():RemoveNoDraw()
+		CompanionModifierLog(self:GetParent(), "created model=%s origin=%s", tostring(self:GetParent():GetModelName()), tostring(self:GetParent():GetAbsOrigin()))
 
 		if GetMapName() == "imba_1v1" then
 			self:GetParent():Kill(nil, nil)
@@ -103,8 +113,7 @@ function modifier_companion:OnCreated()
 
 		self:GetParent():SetMoveCapability(DOTA_UNIT_CAP_MOVE_GROUND)
 
-		local additionalInfo = DONATOR_COMPANION_ADDITIONAL_INFO and DONATOR_COMPANION_ADDITIONAL_INFO[self:GetParent():GetModelName()]
-		if string.find(self:GetParent():GetModelName(), "flying") or additionalInfo and additionalInfo[2] == true then
+		if string.find(self:GetParent():GetModelName(), "flying") or self:GetParent().xhs_companion_is_flying == true then
 			self.is_flying = true
 			self:SetStackCount(1)
 		end
@@ -271,6 +280,7 @@ function modifier_companion:HideForCombat()
 	self.companion_state = COMPANION_STATE_HIDDEN
 	self.next_follow_order_time = 0
 	companion:Stop()
+	CompanionModifierLog(companion, "combat hide state=%s origin=%s", tostring(self.companion_state), tostring(companion:GetAbsOrigin()))
 	self:PlayCompanionParticle("particles/items_fx/blink_dagger_start.vpcf")
 
 	Timers:CreateTimer(COMPANION_VANISH_DELAY, function()
@@ -289,6 +299,7 @@ function modifier_companion:ReturnFromCombat(hero)
 	local return_position = hero:GetAbsOrigin() + RandomVector(RandomInt(160, 240))
 	FindClearSpaceForUnit(companion, return_position, false)
 	companion:RemoveNoDraw()
+	CompanionModifierLog(companion, "combat return origin=%s hero_origin=%s", tostring(companion:GetAbsOrigin()), tostring(hero:GetAbsOrigin()))
 	self:PlayCompanionParticle("particles/items_fx/blink_dagger_end.vpcf")
 	self.hidden_by_combat = false
 	self.hidden_since = nil
@@ -355,7 +366,17 @@ function modifier_companion:OnIntervalThink()
 		end
 
 		local hero = self:GetAssignedHero()
-		if hero == nil then return end
+		if hero == nil then
+			if self.missing_hero_logged ~= true then
+				self.missing_hero_logged = true
+				CompanionModifierLog(companion, "waiting for assigned hero/player owner")
+			end
+			return
+		end
+		if self.missing_hero_logged == true then
+			CompanionModifierLog(companion, "assigned hero recovered ent=%s", tostring(hero:entindex()))
+			self.missing_hero_logged = false
+		end
 		hero.companion = companion
 		local fountain_abs = Vector(0, 0, 0)
 		local map_name = GetMapName()
@@ -433,14 +454,31 @@ function modifier_companion:OnIntervalThink()
 			companion:RemoveModifierByNameAndCaster("modifier_invisible", companion)
 		end
 
-		for _, v in ipairs(SHARED_NODRAW_MODIFIERS) do
-			if hero:HasModifier(v) or self:IsOnMountain() then
-				companion:AddNoDraw()
-				return
-			elseif not hero:HasModifier(v) then
-				if self.hidden_by_combat ~= true then
-					companion:RemoveNoDraw()
-				end
+		local sharedHideReason = nil
+		for _, modifierName in ipairs(SHARED_NODRAW_MODIFIERS or {}) do
+			if hero:HasModifier(modifierName) then
+				sharedHideReason = modifierName
+				break
+			end
+		end
+		if sharedHideReason == nil and self:IsSignificantlyAboveGround(hero) then
+			sharedHideReason = "above_ground"
+		end
+
+		if sharedHideReason ~= nil then
+			if self.hidden_by_shared_state ~= true or self.shared_hide_reason ~= sharedHideReason then
+				CompanionModifierLog(companion, "NoDraw on reason=%s hero_origin=%s", tostring(sharedHideReason), tostring(hero:GetAbsOrigin()))
+			end
+			self.hidden_by_shared_state = true
+			self.shared_hide_reason = sharedHideReason
+			companion:AddNoDraw()
+			return
+		elseif self.hidden_by_shared_state == true then
+			self.hidden_by_shared_state = false
+			self.shared_hide_reason = nil
+			if self.hidden_by_combat ~= true then
+				companion:RemoveNoDraw()
+				CompanionModifierLog(companion, "NoDraw off after shared/terrain state")
 			end
 		end
 
@@ -527,14 +565,9 @@ function modifier_companion:OnIntervalThink()
 	end
 end
 
-function modifier_companion:IsOnMountain()
-	local hero = self:GetParent():GetPlayerOwner():GetAssignedHero()
+function modifier_companion:IsSignificantlyAboveGround(hero)
+	if hero == nil or hero:IsNull() then return false end
 	local origin = hero:GetAbsOrigin()
-
-	--	print("cliff:", origin.z, 512)
-	if origin.z > 512 then
-		return true
-	else
-		return false
-	end
+	local groundHeight = GetGroundHeight(origin, hero)
+	return origin.z - groundHeight > 128
 end

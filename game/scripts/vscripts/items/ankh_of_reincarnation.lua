@@ -225,6 +225,9 @@ function modifier_ankh_passives:OnDeath(params)
 	end
 
 	if self:GetParent():IsRealHero() then
+		if self:GetParent().SetTimeUntilRespawn ~= nil then
+			self:GetParent():SetTimeUntilRespawn(reincarnate_time)
+		end
 		self:GetParent():SetRespawnsDisabled(true)
 	else
 		-- Prevent Beastmaster's bear ability to be cast while reincarnating

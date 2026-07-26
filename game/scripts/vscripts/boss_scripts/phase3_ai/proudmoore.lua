@@ -252,6 +252,9 @@ function modifier_xhs_proudmoore_phase3_ai:TryThresholdCommand(now)
 			self.cast_until = now + duration
 			self.recover_until = self.cast_until + XHSPhase3BossAI:ScaleDelay(0.9)
 			self:UpdateBossBarMarkers()
+			if UpdateBossBar ~= nil then
+				UpdateBossBar(boss)
+			end
 			return true
 		end
 	end

@@ -7,6 +7,7 @@
 	</styles>
 
 	<scripts>
+		<include src="file://{resources}/scripts/custom_game/xhs_name_display.js" />
 		<include src="s2r://panorama/scripts/custom_game/xhs_supporter_hover.vjs_c" />
 		<include src="s2r://panorama/scripts/custom_game/xhs_top_hud.vjs_c" />
 		<include src="file://{resources}/scripts/custom_game/util.js" />
@@ -41,6 +42,11 @@
 					<Label id="XHSArenaTimerValue" class="XHSFocusTimerValue" text="--:--" />
 					<Panel id="XHSCurrentEventProgressTrack" class="XHSFocusTimerProgressTrack" hittest="false">
 						<Panel id="XHSCurrentEventProgressFill" class="XHSFocusTimerProgressFill" hittest="false" />
+					</Panel>
+					<Panel id="XHSMuradinFrenzyBanner" class="XHSMuradinFrenzyBanner" hittest="false">
+						<Panel class="XHSMuradinFrenzyLine XHSMuradinFrenzyLineLeft" hittest="false" />
+						<Label class="XHSMuradinFrenzyLabel" text="FRENZY RAGE" />
+						<Panel class="XHSMuradinFrenzyLine XHSMuradinFrenzyLineRight" hittest="false" />
 					</Panel>
 				</Panel>
 

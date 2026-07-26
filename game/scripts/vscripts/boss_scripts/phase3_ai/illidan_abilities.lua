@@ -26,13 +26,14 @@ local ILLIDAN_COLORS = {
 local METAMORPHOSIS_PARTICLE = "particles/units/heroes/hero_terrorblade/terrorblade_metamorphosis_transform.vpcf"
 local METAMORPHOSIS_AMBIENT_PARTICLE = "particles/units/heroes/hero_terrorblade/terrorblade_metamorphosis.vpcf"
 local METAMORPHOSIS_ATTACK_PARTICLE = "particles/units/heroes/hero_terrorblade/terrorblade_metamorphosis_base_attack.vpcf"
+local ILLIDAN_BASE_MODEL = "models/heroes/terrorblade/terrorblade.vmdl"
 local METAMORPHOSIS_MODEL = "models/heroes/terrorblade/demon.vmdl"
 local METAMORPHOSIS_CLEAVE_PARTICLE = "particles/econ/items/faceless_void/faceless_void_weapon_bfury/faceless_void_weapon_bfury_cleave.vpcf"
 local FEL_BEAM_PARTICLE = "particles/units/heroes/hero_lina/lina_spell_dragon_slave.vpcf"
 local FEL_BEAM_IMPACT_PARTICLE = "particles/units/heroes/hero_lina/lina_spell_dragon_slave_impact.vpcf"
 local SHADOW_DASH_START_PARTICLE = "particles/items_fx/blink_dagger_start.vpcf"
 local SHADOW_DASH_END_PARTICLE = "particles/items_fx/blink_dagger_end.vpcf"
-local IMMOLATION_PARTICLE = "particles/units/heroes/hero_ember_spirit/ember_spirit_flameguard.vpcf"
+local IMMOLATION_PULSE_PARTICLE = "particles/units/heroes/hero_phoenix/phoenix_supernova_reborn.vpcf"
 local IMMOLATION_PRECAST_PARTICLE = "particles/econ/events/darkmoon_2017/darkmoon_generic_aoe.vpcf"
 local GLAIVE_STORM_PARTICLE = "particles/econ/items/luna/luna_lucent_ti5/luna_eclipse_impact_moonfall.vpcf"
 local GLAIVE_STORM_CAST_PARTICLE = "particles/units/heroes/hero_luna/luna_eclipse_cast.vpcf"
@@ -56,6 +57,39 @@ local function ClearImmolationPrecast(ability, immediate)
 	ability.xhs_illidan_immolation_precast_particle = nil
 	ParticleManager:DestroyParticle(particle, immediate == true)
 	ParticleManager:ReleaseParticleIndex(particle)
+end
+
+local function GetIllidanBossBarId(parent)
+	if parent == nil or parent:IsNull() then return nil end
+	if GetBossBarId ~= nil then
+		return GetBossBarId(parent)
+	end
+	return parent.xhs_boss_bar_id
+end
+
+local function UpdateMetamorphosisCounter(modifier)
+	if modifier == nil then return end
+	local parent = modifier:GetParent()
+	if parent == nil or parent:IsNull() then return end
+	local remaining = math.max(0, math.ceil(modifier:GetRemainingTime()))
+	if modifier.xhs_last_counter_remaining == remaining then return end
+	modifier.xhs_last_counter_remaining = remaining
+
+	CustomGameEventManager:Send_ServerToAllClients("xhs_boss_counter_update", {
+		boss_count = parent.boss_count or 1,
+		boss_bar_id = GetIllidanBossBarId(parent),
+		label = "Metamorphosis",
+		remaining = remaining,
+		total = math.max(1, math.ceil(modifier:GetDuration())),
+	})
+end
+
+local function HideMetamorphosisCounter(parent)
+	if parent == nil or parent:IsNull() then return end
+	CustomGameEventManager:Send_ServerToAllClients("xhs_boss_counter_hide", {
+		boss_count = parent.boss_count or 1,
+		boss_bar_id = GetIllidanBossBarId(parent),
+	})
 end
 
 local function CreateImmolationPrecast(ability, position, radius, duration)
@@ -283,27 +317,36 @@ function xhs_illidan_metamorphosis:OnAbilityPhaseStart()
 	local radius = self:GetSpecialValueFor("radius")
 	StartBossCastBar(self, "Metamorphosis")
 	XHSBossTelegraphs:Circle(caster:GetAbsOrigin(), radius, self:GetCastPoint(), ILLIDAN_COLORS)
+	CreateImmolationPrecast(self, caster:GetAbsOrigin(), radius, self:GetCastPoint())
 	StartAnimation(caster, { duration = self:GetCastPoint() + 0.25, activity = ACT_DOTA_CAST_ABILITY_4, rate = 0.85 })
 	caster:EmitSound("Hero_Terrorblade.Metamorphosis")
 	return true
 end
 
 function xhs_illidan_metamorphosis:OnAbilityPhaseInterrupted()
-	if IsServer() then HideBossCastBar(self) end
+	if IsServer() then
+		ClearImmolationPrecast(self, true)
+		HideBossCastBar(self)
+	end
 end
 
 function xhs_illidan_metamorphosis:OnSpellStart()
 	if not IsServer() then return end
 
+	ClearImmolationPrecast(self, false)
 	local caster = self:GetCaster()
 	local radius = self:GetSpecialValueFor("radius")
 	local damage = ScaleDamage(self:GetSpecialValueFor("damage"))
 	local duration = self:GetSpecialValueFor("duration")
 
+	-- Apply the transformation first so damage callbacks cannot prevent the
+	-- metamorphosis from completing after its precast.
+	caster:AddNewModifier(caster, self, "modifier_xhs_illidan_metamorphosis", { duration = duration })
 	DamageEnemies(caster, self, caster:GetAbsOrigin(), radius, damage, self:GetAbilityDamageType())
 	CreateRadialImpact(caster:GetAbsOrigin(), radius, METAMORPHOSIS_PARTICLE)
+	CreateRadialImpact(caster:GetAbsOrigin(), radius, IMMOLATION_PULSE_PARTICLE)
 	EmitLocationSound(caster, caster:GetAbsOrigin(), "Hero_Terrorblade.Metamorphosis")
-	caster:AddNewModifier(caster, self, "modifier_xhs_illidan_metamorphosis", { duration = duration })
+	HideBossCastBar(self)
 	ClearContext(self)
 end
 
@@ -428,30 +471,26 @@ function xhs_illidan_immolation_burst:OnSpellStart()
 
 	local caster = self:GetCaster()
 	local radius = self:GetSpecialValueFor("radius")
-	local duration = self:GetSpecialValueFor("duration")
-	local tick = self:GetSpecialValueFor("tick_rate")
-	local damage = ScaleDamage(self:GetSpecialValueFor("damage_per_second")) * tick
-	local elapsed = 0
-
-	local particle = ParticleManager:CreateParticle(IMMOLATION_PARTICLE, PATTACH_ABSORIGIN_FOLLOW, caster)
-	ParticleManager:SetParticleControlEnt(particle, 0, caster, PATTACH_ABSORIGIN_FOLLOW, "attach_hitloc", caster:GetAbsOrigin(), true)
+	local pulseCount = math.max(1, math.floor(self:GetSpecialValueFor("pulse_count")))
+	local pulseInterval = math.max(0.1, self:GetSpecialValueFor("pulse_interval"))
+	local damage = ScaleDamage(self:GetSpecialValueFor("damage_per_pulse"))
+	local pulse = 0
 
 	Timers:CreateTimer(0, function()
-		if not IsValidAlive(caster) then
-			ParticleManager:DestroyParticle(particle, true)
-			ParticleManager:ReleaseParticleIndex(particle)
-			return nil
+		if not IsValidAlive(caster) then return nil end
+
+		pulse = pulse + 1
+		DamageEnemies(caster, self, caster:GetAbsOrigin(), radius, damage, DAMAGE_TYPE_PURE)
+		CreateRadialImpact(caster:GetAbsOrigin(), radius, IMMOLATION_PULSE_PARTICLE)
+		if pulse == 1 then
+			EmitLocationSound(caster, caster:GetAbsOrigin(), "Hero_Phoenix.SuperNova.Explode")
 		end
 
-		DamageEnemies(caster, self, caster:GetAbsOrigin(), radius, damage, self:GetAbilityDamageType())
-		elapsed = elapsed + tick
-		if elapsed < duration then return tick end
-
-		ParticleManager:DestroyParticle(particle, false)
-		ParticleManager:ReleaseParticleIndex(particle)
+		if pulse < pulseCount then return pulseInterval end
 		return nil
 	end)
 
+	HideBossCastBar(self)
 	ClearContext(self)
 end
 
@@ -525,7 +564,25 @@ function modifier_xhs_illidan_metamorphosis:OnCreated()
 
 	local parent = self:GetParent()
 	self.original_attack_capability = parent:GetAttackCapability()
+	self.original_model = ILLIDAN_BASE_MODEL
+	if parent.GetRangedProjectileName ~= nil then
+		self.original_projectile = parent:GetRangedProjectileName()
+	end
+	self.hidden_wearables = {}
 
+	local wearable = parent:FirstMoveChild()
+	while wearable ~= nil do
+		if wearable:GetClassname() == "dota_item_wearable" then
+			wearable:AddEffects(EF_NODRAW)
+			self.hidden_wearables[#self.hidden_wearables + 1] = wearable
+		end
+		wearable = wearable:NextMovePeer()
+	end
+
+	-- A direct model swap is required for creature-based bosses. The modifier
+	-- property alone is not consistently applied to npc_dota_creature units.
+	parent:SetOriginalModel(METAMORPHOSIS_MODEL)
+	parent:SetModel(METAMORPHOSIS_MODEL)
 	parent:SetAttackCapability(DOTA_UNIT_CAP_RANGED_ATTACK)
 	parent:SetRangedProjectileName(METAMORPHOSIS_ATTACK_PARTICLE)
 
@@ -534,10 +591,21 @@ function modifier_xhs_illidan_metamorphosis:OnCreated()
 	self:AddParticle(self.ambient_pfx, false, false, -1, false, false)
 
 	parent:EmitSound("Hero_Terrorblade.Metamorphosis.Scepter")
+	UpdateMetamorphosisCounter(self)
+	self:StartIntervalThink(0.2)
 end
 
 function modifier_xhs_illidan_metamorphosis:OnRefresh()
 	self:RefreshValues()
+	if IsServer() then
+		self.xhs_last_counter_remaining = nil
+		UpdateMetamorphosisCounter(self)
+	end
+end
+
+function modifier_xhs_illidan_metamorphosis:OnIntervalThink()
+	if not IsServer() then return end
+	UpdateMetamorphosisCounter(self)
 end
 
 function modifier_xhs_illidan_metamorphosis:OnDestroy()
@@ -545,9 +613,22 @@ function modifier_xhs_illidan_metamorphosis:OnDestroy()
 
 	local parent = self:GetParent()
 	if parent == nil or parent:IsNull() then return end
+	HideMetamorphosisCounter(parent)
 
 	if self.original_attack_capability ~= nil then
 		parent:SetAttackCapability(self.original_attack_capability)
+	end
+	if self.original_projectile ~= nil then
+		parent:SetRangedProjectileName(self.original_projectile)
+	end
+	if self.original_model ~= nil and self.original_model ~= "" then
+		parent:SetOriginalModel(self.original_model)
+		parent:SetModel(self.original_model)
+	end
+	for _, wearable in pairs(self.hidden_wearables or {}) do
+		if wearable ~= nil and IsValidEntity(wearable) and not wearable:IsNull() then
+			wearable:RemoveEffects(EF_NODRAW)
+		end
 	end
 end
 

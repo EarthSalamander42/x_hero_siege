@@ -323,6 +323,10 @@ function SupporterPass:BuildPlayerTable(playerID)
 	local settings = supporterPass.settings or player.settings or {}
 	local passTierID = tonumber(FirstSupporterValue(supporterPass.tier_id, current.tier_id)) or 0
 	local rawDonatorStatus = api and api.GetDonatorStatus and api:GetDonatorStatus(playerID) or 0
+	local isDeveloper = IsInToolsMode()
+		and api ~= nil
+		and api.IsDeveloper ~= nil
+		and api:IsDeveloper(playerID)
 	local donatorStatus = GetDonatorVisualStatus ~= nil and GetDonatorVisualStatus(rawDonatorStatus) or rawDonatorStatus
 	local rawTierName = FirstSupporterValue(supporterPass.tier_name, current.tier_name)
 	local rawTierColor = FirstSupporterValue(supporterPass.tier_color, current.tier_color)
@@ -392,6 +396,7 @@ function SupporterPass:BuildPlayerTable(playerID)
 		title = "Supporter Pass",
 		donator_level = donatorStatus,
 		raw_donator_level = rawDonatorStatus,
+		is_developer = isDeveloper,
 		tier_id = tierID,
 		tier_name = tierName,
 		tier_color = tierColor,

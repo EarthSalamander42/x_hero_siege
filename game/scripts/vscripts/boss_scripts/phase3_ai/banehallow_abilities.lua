@@ -2,6 +2,7 @@ require("boss_scripts/phase3_ai/core")
 require("boss_scripts/phase3_ai/cast_bar")
 
 frostivus_boss_shadowraze = frostivus_boss_shadowraze or class({})
+frostivus_boss_immolation = frostivus_boss_immolation or class({})
 frostivus_boss_meteorain = frostivus_boss_meteorain or class({})
 frostivus_boss_ragna_blade = frostivus_boss_ragna_blade or class({})
 frostivus_boss_soul_harvest = frostivus_boss_soul_harvest or class({})
@@ -19,11 +20,18 @@ local REQUIEM_PRECAST_PARTICLE = "particles/units/heroes/hero_nevermore/nevermor
 local REQUIEM_LINE_PARTICLE = "particles/units/heroes/hero_nevermore/nevermore_requiemofsouls_line.vpcf"
 local SOUL_HARVEST_PROJECTILE = "particles/econ/items/shadow_fiend/sf_desolation/sf_base_attack_desolation_fire_arcana.vpcf"
 local SCREEN_REQUIEM_PARTICLE = "particles/boss_nevermore/screen_requiem_indicator.vpcf"
+local DARKNESS_SCREEN_LAYERS = 2
 local DARKNESS_CAST_LINES = 8
 local DARKNESS_RELEASE_LINES = 24
 
 local function IsValidAlive(unit)
 	return unit ~= nil and IsValidEntity(unit) and not unit:IsNull() and unit:IsAlive()
+end
+
+local function IsBanehallowActive(unit)
+	return IsValidAlive(unit)
+		and unit.deathStart ~= true
+		and unit.xhs_banehallow_stopped ~= true
 end
 
 local function GetContext(ability)
@@ -66,15 +74,15 @@ local function ApplyNecromastery(caster, amount)
 	end
 end
 
-local function DamageEnemies(caster, ability, position, radius, damage, damageType, overheadType)
+local function DamageEnemies(caster, ability, position, radius, damage, damageType, overheadType, onHit)
 	if not IsValidAlive(caster) then return end
 
 	local units = FindUnitsInRadius(
-		DOTA_TEAM_GOODGUYS,
+		caster:GetTeamNumber(),
 		position,
 		nil,
 		radius,
-		DOTA_UNIT_TARGET_TEAM_FRIENDLY,
+		DOTA_UNIT_TARGET_TEAM_ENEMY,
 		DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC,
 		DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES,
 		FIND_ANY_ORDER,
@@ -83,6 +91,9 @@ local function DamageEnemies(caster, ability, position, radius, damage, damageTy
 
 	for _, enemy in pairs(units) do
 		if IsValidAlive(enemy) then
+			if onHit ~= nil then
+				onHit(enemy)
+			end
 			local damageDealt = ApplyDamage({
 				victim = enemy,
 				attacker = caster,
@@ -133,8 +144,8 @@ local function PickMeteorRainTarget(caster, center, radius, excluded)
 	return candidates[RandomInt(1, #candidates)]
 end
 
-local function CreateMeteor(caster, ability, position, radius, damage, fallDelay)
-	if not IsValidAlive(caster) or caster.xhs_banehallow_stopped == true then return end
+local function CreateMeteor(caster, ability, position, radius, damage, fallDelay, stunDuration)
+	if not IsBanehallowActive(caster) then return end
 
 	fallDelay = math.max(0.2, fallDelay or 1.5)
 	caster:EmitSound("Hero_Invoker.ChaosMeteor.Cast")
@@ -154,7 +165,7 @@ local function CreateMeteor(caster, ability, position, radius, damage, fallDelay
 	local meteorFallTime = math.min(fallDelay, METEOR_PARTICLE_FALL_TIME)
 	local meteorStartDelay = math.max(0, fallDelay - meteorFallTime)
 	local function SpawnFallingMeteor()
-		if not IsValidAlive(caster) or caster.xhs_banehallow_stopped == true then return nil end
+		if not IsBanehallowActive(caster) then return nil end
 
 		local meteor = ParticleManager:CreateParticle(METEOR_IMPACT_PARTICLE, PATTACH_WORLDORIGIN, nil)
 		ParticleManager:SetParticleControl(meteor, 0, position + Vector(300, -300, 1000))
@@ -171,11 +182,26 @@ local function CreateMeteor(caster, ability, position, radius, damage, fallDelay
 	end
 
 	Timers:CreateTimer(fallDelay, function()
-		if not IsValidAlive(caster) or caster.xhs_banehallow_stopped == true then return nil end
+		if not IsBanehallowActive(caster) then return nil end
 		caster:EmitSound("Hero_Invoker.ChaosMeteor.Impact")
-		DamageEnemies(caster, ability, position, radius, damage, ability:GetAbilityDamageType(), OVERHEAD_ALERT_BONUS_SPELL_DAMAGE)
+		DamageEnemies(
+			caster,
+			ability,
+			position,
+			radius,
+			damage,
+			ability:GetAbilityDamageType(),
+			OVERHEAD_ALERT_BONUS_SPELL_DAMAGE,
+			function(enemy)
+				enemy:AddNewModifier(caster, ability, "modifier_stunned", { duration = stunDuration })
+			end
+		)
 		return nil
 	end)
+end
+
+function frostivus_boss_immolation:GetAbilityTextureName()
+	return "custom/xhs_banehallow_immolation"
 end
 
 local function CreateDarknessRequiemPulse(caster, lineCount, durationScale)
@@ -291,6 +317,7 @@ function frostivus_boss_meteorain:OnSpellStart()
 	local radius = self:GetSpecialValueFor("radius")
 	local damage = ScaleDamage(self:GetSpecialValueFor("damage"))
 	local fallDelay = self:GetSpecialValueFor("delay")
+	local stunDuration = self:GetSpecialValueFor("stun_duration")
 	local duration = context.duration or self:GetSpecialValueFor("duration")
 	local spawnDelay = context.spawn_delay or self:GetSpecialValueFor("spawn_delay")
 	local impacts = context.impacts or {}
@@ -304,7 +331,7 @@ function frostivus_boss_meteorain:OnSpellStart()
 		local targetRadius = context.target_radius or 2200
 
 		Timers:CreateTimer(0, function()
-			if not IsValidAlive(caster) or caster.xhs_banehallow_stopped == true or elapsed > duration or spawned >= totalMeteors then return nil end
+			if not IsBanehallowActive(caster) or elapsed > duration or spawned >= totalMeteors then return nil end
 
 			local targeted = {}
 			for _ = 1, batchSize do
@@ -313,7 +340,7 @@ function frostivus_boss_meteorain:OnSpellStart()
 				if target == nil then break end
 				targeted[target:entindex()] = true
 				spawned = spawned + 1
-				CreateMeteor(caster, self, target:GetAbsOrigin(), radius, damage, fallDelay)
+				CreateMeteor(caster, self, target:GetAbsOrigin(), radius, damage, fallDelay, stunDuration)
 			end
 
 			elapsed = elapsed + spawnDelay
@@ -329,12 +356,12 @@ function frostivus_boss_meteorain:OnSpellStart()
 	end
 
 	Timers:CreateTimer(0, function()
-		if not IsValidAlive(caster) or caster.xhs_banehallow_stopped == true or spawned >= #impacts then return nil end
+		if not IsBanehallowActive(caster) or spawned >= #impacts then return nil end
 
 		for _ = 1, context.batch_size or 1 do
 			spawned = spawned + 1
 			if impacts[spawned] == nil then break end
-			CreateMeteor(caster, self, impacts[spawned].position, radius, damage, fallDelay)
+			CreateMeteor(caster, self, impacts[spawned].position, radius, damage, fallDelay, stunDuration)
 		end
 
 		elapsed = elapsed + spawnDelay
@@ -507,12 +534,14 @@ function frostivus_boss_nevermore:OnSpellStart()
 		if player ~= nil and PlayerResource:GetTeam(playerID) == (context.team or DOTA_TEAM_GOODGUYS) then
 			local hero = PlayerResource:GetSelectedHeroEntity(playerID)
 			if IsValidAlive(hero) then
-				local particle = ParticleManager:CreateParticleForPlayer(SCREEN_REQUIEM_PARTICLE, PATTACH_EYES_FOLLOW, hero, player)
-				Timers:CreateTimer(duration, function()
-					ParticleManager:DestroyParticle(particle, true)
-					ParticleManager:ReleaseParticleIndex(particle)
-					return nil
-				end)
+				for _ = 1, DARKNESS_SCREEN_LAYERS do
+					local particle = ParticleManager:CreateParticleForPlayer(SCREEN_REQUIEM_PARTICLE, PATTACH_EYES_FOLLOW, hero, player)
+					Timers:CreateTimer(duration, function()
+						ParticleManager:DestroyParticle(particle, true)
+						ParticleManager:ReleaseParticleIndex(particle)
+						return nil
+					end)
+				end
 			end
 		end
 	end

@@ -179,7 +179,10 @@ function XHSPrecache:PrecacheCompanion(unitName, callback, playerID)
 		unitName = "npc_donator_companion_demi_doom"
 	end
 
-	self:PrecacheUnit(unitName, callback, playerID)
+	-- Companion catalog entries are visual definitions, not instantiable entity
+	-- classes. The runtime always creates this concrete base unit and applies the
+	-- selected model, ambient particle and cosmetics afterward.
+	self:PrecacheUnit("npc_donator_companion", callback, playerID)
 end
 
 function XHSPrecache:PrecacheBattlepassCompanionAssets(context)
@@ -220,10 +223,6 @@ function XHSPrecache:PrecacheBattlepassCompanionAssets(context)
 		addUnique(particles, particleSet, particle)
 	end
 
-	for _, info in pairs(DONATOR_COMPANION_ADDITIONAL_INFO or {}) do
-		addUnique(particles, particleSet, info[1])
-	end
-
 	for _, equipment in pairs(UNIT_EQUIPMENT or {}) do
 		for _, wearable in pairs(equipment) do
 			if type(wearable) == "string" then
@@ -240,6 +239,7 @@ function XHSPrecache:PrecacheBattlepassCompanionAssets(context)
 		for _, definition in pairs(definitions) do
 			if type(definition) == "table" then
 				addUnique(models, modelSet, definition.Model)
+				addUnique(particles, particleSet, definition.AmbientParticle)
 			end
 		end
 	end
@@ -345,6 +345,9 @@ XHSPrecache:RegisterGroup("core", {
 	models = {
 		"models/props_structures/outpost.vmdl",
 	},
+	units = {
+		"npc_dota_dungeon_checkpoint",
+	},
 	soundfiles = {
 		"soundevents/game_sounds_custom.vsndevts",
 		"soundevents/game_sounds_dungeon.vsndevts",
@@ -382,9 +385,22 @@ XHSPrecache:RegisterGroup("hero_abilities", {
 		"particles/units/heroes/hero_zuus/zuus_arc_lightning_head.vpcf",
 		"particles/units/heroes/hero_razor_reduced_flash/razor_rain_storm_reduced_flash.vpcf",
 		"particles/econ/items/mirana/mirana_starstorm_bow/mirana_starstorm_starfall_attack.vpcf",
+		"particles/units/heroes/hero_death_prophet/death_prophet_carrion_swarm.vpcf",
+		"particles/units/heroes/hero_dreadlord/chaos_2_fly.vpcf",
+		"particles/units/heroes/hero_dreadlord/chaos.vpcf",
+		"particles/units/heroes/hero_medusa/medusa_mana_shield.vpcf",
+		"particles/units/heroes/hero_medusa/medusa_mana_shield_impact.vpcf",
+		"particles/custom/human/blood_mage/invoker_sun_strike_team_immortal2.vpcf",
+		"particles/econ/items/crystal_maiden/crystal_maiden_maiden_of_icewrack/maiden_freezing_field_cracks_arcana.vpcf",
+		"particles/econ/items/crystal_maiden/crystal_maiden_maiden_of_icewrack/maiden_freezing_field_darkcore_arcana1.vpcf",
+		"particles/econ/items/crystal_maiden/crystal_maiden_maiden_of_icewrack/maiden_freezing_field_explosion_arcana1.vpcf",
+		"particles/units/heroes/hero_ogre_magi/ogre_magi_bloodlust_cast.vpcf",
+		"particles/units/heroes/hero_ogre_magi/ogre_magi_bloodlust_buff.vpcf",
 	},
 	soundfiles = {
 		"soundevents/game_sounds_heroes/game_sounds_zuus.vsndevts",
+		"soundevents/game_sounds_heroes/game_sounds_medusa.vsndevts",
+		"soundevents/game_sounds_heroes/game_sounds_ogre_magi.vsndevts",
 	},
 })
 
@@ -453,12 +469,15 @@ XHSPrecache:RegisterGroup("bosses", {
 		"particles/units/heroes/hero_bane/bane_nightmare.vpcf",
 		"particles/units/heroes/hero_death_prophet/death_prophet_spirit_glow.vpcf",
 		"particles/units/heroes/hero_death_prophet/death_prophet_carrion_swarm.vpcf",
+		"particles/units/heroes/heroes_underlord/abyssal_underlord_portal_timer.vpcf",
 		"particles/units/heroes/hero_invoker/invoker_chaos_meteor_fly.vpcf",
 		"particles/hero/kunkka/torrent_splash.vpcf",
 		"particles/econ/items/kunkka/kunkka_immortal/kunkka_immortal_ghost_ship_splash.vpcf",
 		"particles/units/heroes/hero_tidehunter/tidehunter_anchor_hero.vpcf",
 		"particles/econ/items/kunkka/kunkka_tidebringer_base/kunkka_spell_tidebringer.vpcf",
 		"particles/units/heroes/hero_terrorblade/terrorblade_metamorphosis_transform.vpcf",
+		"particles/units/heroes/hero_terrorblade/terrorblade_metamorphosis.vpcf",
+		"particles/units/heroes/hero_phoenix/phoenix_supernova_reborn.vpcf",
 		"particles/units/heroes/hero_lina/lina_spell_dragon_slave.vpcf",
 		"particles/units/heroes/hero_lina/lina_spell_dragon_slave_impact.vpcf",
 		"particles/units/heroes/hero_luna/luna_eclipse_cast.vpcf",
@@ -470,6 +489,9 @@ XHSPrecache:RegisterGroup("bosses", {
 		"particles/units/heroes/hero_juggernaut/juggernaut_blade_fury_tgt.vpcf",
 		"particles/units/heroes/hero_ursa/ursa_earthshock.vpcf",
 		"particles/units/heroes/hero_lich/lich_frost_nova.vpcf",
+		"particles/units/heroes/hero_crystalmaiden/maiden_freezing_field_caster.vpcf",
+		"particles/units/heroes/hero_crystalmaiden/maiden_freezing_field_explosion.vpcf",
+		"particles/units/heroes/hero_omniknight/omniknight_purification.vpcf",
 		"particles/units/heroes/hero_abaddon/abaddon_death_coil_explosion.vpcf",
 		"particles/econ/items/crystal_maiden/crystal_maiden_cowl_of_ice/maiden_crystal_nova_cowlofice.vpcf",
 		"particles/units/heroes/hero_abaddon/abaddon_aphotic_shield_explosion.vpcf",
@@ -489,6 +511,9 @@ XHSPrecache:RegisterGroup("bosses", {
 		"particles/units/heroes/hero_lina/lina_spell_light_strike_array.vpcf",
 		"particles/units/heroes/hero_phoenix/phoenix_fire_spirit_ground.vpcf",
 		"particles/items_fx/aura_shivas.vpcf",
+	},
+	models = {
+		"models/heroes/terrorblade/demon.vmdl",
 	},
 	soundfiles = {
 		"soundevents/game_sounds_heroes/game_sounds_abaddon.vsndevts",
@@ -552,11 +577,14 @@ XHSPrecache:RegisterGroup("waves", {
 	particles = {
 		"particles/units/heroes/hero_pudge/pudge_rot.vpcf",
 		"particles/units/heroes/hero_pudge/pudge_rot_recipient.vpcf",
+		"particles/items_fx/skull_basher.vpcf",
+		"particles/generic_gameplay/generic_silenced.vpcf",
 		"particles/darkmoon_last_hit_effect.vpcf",
 		"particles/units/heroes/hero_jakiro/jakiro_base_attack.vpcf",
 		"particles/units/heroes/hero_ancient_apparition/ancient_apparition_base_attack.vpcf",
 		"particles/units/heroes/hero_lion/lion_base_attack.vpcf",
 		"particles/units/heroes/hero_terrorblade/terrorblade_metamorphosis_base_attack.vpcf",
+		"particles/econ/items/necrolyte/necronub_base_attack/necrolyte_base_attack_ka.vpcf",
 	},
 	models = {
 		"models/creeps/neutral_creeps/n_creep_troll_skeleton/n_creep_troll_skeleton_fx.vmdl",
@@ -564,13 +592,18 @@ XHSPrecache:RegisterGroup("waves", {
 		"models/creeps/lane_creeps/creep_bad_melee_diretide/creep_bad_melee_diretide.vmdl",
 		"models/items/warlock/golem/mystery_of_the_lost_ores_golem/mystery_of_the_lost_ores_golem.vmdl",
 		"models/items/warlock/golem/obsidian_golem/obsidian_golem.vmdl",
+		"models/heroes/pudge/pudge.vmdl",
 		"models/heroes/lycan/lycan.vmdl",
 		"models/heroes/witchdoctor/witchdoctor_ward.vmdl",
 	},
 	units = {
+		"npc_abomination_final_wave",
 		"npc_dota_lycan_wolf1",
 		"npc_dota_shadowshaman_serpentward",
 		"npc_dota_furbolg",
+	},
+	soundfiles = {
+		"soundevents/game_sounds_heroes/game_sounds_silencer.vsndevts",
 	},
 })
 
@@ -580,6 +613,8 @@ XHSPrecache:RegisterGroup("items_lua", {
 		"particles/items3_fx/mango_active.vpcf",
 		"particles/items_fx/aegis_respawn.vpcf",
 		"particles/items_fx/aegis_respawn_timer.vpcf",
+		"particles/units/heroes/hero_undying/undying_tombstone.vpcf",
+		"particles/econ/items/undying/fall20_undying_head/fall20_undying_tombstone_ambient.vpcf",
 		"particles/units/heroes/hero_ember_spirit/ember_spirit_flameguard.vpcf",
 		"particles/units/heroes/hero_ursa/ursa_earthshock.vpcf",
 		"particles/units/heroes/hero_invoker/invoker_sun_strike_team.vpcf",

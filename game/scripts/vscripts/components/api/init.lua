@@ -600,7 +600,6 @@ function api:MergeSupporterPassResponse(steamid, data)
 	end
 	if data.equipped ~= nil then
 		supporter_pass.loadout = data.equipped
-		player.armory = data.equipped
 	end
 	if data.claimed_rewards ~= nil then
 		supporter_pass.claimed_rewards = data.claimed_rewards
@@ -826,10 +825,6 @@ function api:EquipSupporterPassItem(player_id, item_id, hero, slot_id, callback)
 
 		if data.armory then
 			api:PublishSupporterPassArmory(player_id, data.armory)
-		end
-
-		if api.players and api.players[steamid] and data.equipped then
-			api.players[steamid].armory = data.equipped
 		end
 
 		callback(true, data)

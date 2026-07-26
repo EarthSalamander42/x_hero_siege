@@ -12,15 +12,17 @@ modifier_xhs_tri_spirit_phase_ai = modifier_xhs_tri_spirit_phase_ai or class({})
 modifier_xhs_tri_spirit_phase_ai.XHS_LINK_CLIENT = true
 modifier_xhs_spirit_dormant = modifier_xhs_spirit_dormant or class({})
 modifier_xhs_spirit_dormant.XHS_LINK_CLIENT = true
+modifier_xhs_spirit_finale = modifier_xhs_spirit_finale or class({})
+modifier_xhs_spirit_finale.XHS_LINK_CLIENT = true
 
 LinkLuaModifier("modifier_xhs_spirit_master_phase_ai", "boss_scripts/phase3_ai/spirit_master.lua", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_xhs_tri_spirit_phase_ai", "boss_scripts/phase3_ai/spirit_master.lua", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_xhs_spirit_dormant", "boss_scripts/phase3_ai/spirit_master.lua", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_xhs_spirit_finale", "boss_scripts/phase3_ai/spirit_master.lua", LUA_MODIFIER_MOTION_NONE)
 
 local MASTER_ABILITIES = {
 	"xhs_spirit_master_palm_of_balance",
 	"xhs_spirit_master_elemental_mandala",
-	"xhs_spirit_master_spirit_call",
 	"xhs_spirit_master_convergence",
 	"xhs_spirit_master_trinity_cycle",
 }
@@ -80,6 +82,8 @@ local SPIRIT_DEFS = {
 }
 
 local THRESHOLDS = { 70, 40, 10 }
+local SPIRIT_ARENA_LEASH_RADIUS = 1850
+local SPIRIT_FINALE_END_DELAY = 10.0
 
 local SPIRIT_ROUNDS = {
 	[1] = { threshold = 70, attack_multiplier = 1.00, ability_count = 1 },
@@ -296,6 +300,7 @@ function XHSSpiritMasterEncounter:Reset()
 	self.next_cast = {}
 	self.return_health = nil
 	self.pending_threshold = nil
+	self.transition_deadline = nil
 	self.final_death_ready = false
 	self.split_round = 0
 	self.finale_started = false
@@ -342,7 +347,7 @@ function XHSSpiritMasterEncounter:UpdateMasterBossBarMarkers()
 	for _, threshold in ipairs(self.thresholds or {}) do
 		table.insert(master.xhs_boss_bar_markers, {
 			percent = threshold,
-			label = "Spirit Call",
+			label = "Trinity Cycle",
 			tooltip = "Splits into Storm, Earth, and Fire. Defeat all three spirits together.",
 			triggered = self.consumed[threshold] == true,
 		})
@@ -391,6 +396,32 @@ function XHSSpiritMasterEncounter:GetRoundForThreshold(threshold)
 	return math.max(1, math.min(3, (self.split_round or 0) + 1))
 end
 
+function XHSSpiritMasterEncounter:ClampArenaPosition(position, radius)
+	local center = self.arena_center
+	if center == nil or position == nil then return position end
+
+	local offset = position - center
+	offset.z = 0
+	local maxRadius = math.max(200, radius or SPIRIT_ARENA_LEASH_RADIUS)
+	if offset:Length2D() <= maxRadius then
+		return GetGroundPosition(position, nil)
+	end
+
+	return GetGroundPosition(center + offset:Normalized() * maxRadius, nil)
+end
+
+function XHSSpiritMasterEncounter:KeepSpiritInArena(spirit)
+	if not IsValidAlive(spirit) or self.arena_center == nil then return false end
+	local position = spirit:GetAbsOrigin()
+	if (position - self.arena_center):Length2D() <= SPIRIT_ARENA_LEASH_RADIUS then return false end
+
+	spirit:InterruptMotionControllers(true)
+	spirit:SetForceAttackTarget(nil)
+	spirit:Stop()
+	FindClearSpaceForUnit(spirit, self:ClampArenaPosition(position), true)
+	return true
+end
+
 function XHSSpiritMasterEncounter:ConfigureSpiritForRound(spirit)
 	if not IsValidAlive(spirit) then return end
 	local config = self:GetRoundConfig()
@@ -409,10 +440,29 @@ function XHSSpiritMasterEncounter:TriggerSplit(master, threshold)
 	self.phase = "transition"
 	self.pending_threshold = threshold
 	self.return_health = math.max(math.floor(master:GetMaxHealth() * math.max(0.03, (threshold - 1.5) / 100)), 1)
-	local ability = CastAbility(master, "xhs_spirit_master_spirit_call", { threshold = threshold }, nil)
+	master:Interrupt()
+	local ability = CastAbility(master, "xhs_spirit_master_trinity_cycle", { threshold = threshold }, nil)
 	if ability == nil then
 		self:BeginSplit(master, threshold)
+	else
+		self.transition_deadline = GameRules:GetGameTime() + math.max(0.5, ability:GetCastPoint() + 0.75)
 	end
+	return true
+end
+
+function XHSSpiritMasterEncounter:ResolveStalledTransition(master)
+	if self.phase ~= "transition" or master ~= self.master then return false end
+	if (self.transition_deadline or 0) > GameRules:GetGameTime() then return false end
+
+	local threshold = self.pending_threshold
+	if threshold == nil then
+		self.phase = "master"
+		self.transition_deadline = nil
+		return false
+	end
+
+	master:Interrupt()
+	self:BeginSplit(master, threshold)
 	return true
 end
 
@@ -422,6 +472,7 @@ function XHSSpiritMasterEncounter:CancelPendingSplit(master, threshold)
 	if threshold ~= nil and self.pending_threshold ~= threshold then return end
 
 	self.pending_threshold = nil
+	self.transition_deadline = nil
 	self.phase = "master"
 end
 
@@ -433,8 +484,12 @@ function XHSSpiritMasterEncounter:BeginSplit(master, threshold)
 		self.consumed[threshold] = true
 	end
 	self.pending_threshold = nil
+	self.transition_deadline = nil
 	self.final_death_ready = self:HasPendingThresholds() ~= true
 	self:UpdateMasterBossBarMarkers()
+	if UpdateBossBar ~= nil then
+		UpdateBossBar(master)
+	end
 	self.phase = "split"
 	self.master = master
 	self.arena_center = GetArenaCenter(master:GetAbsOrigin())
@@ -486,11 +541,16 @@ function XHSSpiritMasterEncounter:HandleSpiritLethal(spirit, attacker)
 	self.dormant[key] = true
 	self.dormant_count = (self.dormant_count or 0) + 1
 	spirit:SetHealth(1)
+	spirit:RemoveModifierByName("modifier_xhs_boss_cast_protection")
+	spirit:Interrupt()
+	spirit:InterruptMotionControllers(true)
+	spirit:SetForceAttackTarget(nil)
 	spirit:AddNewModifier(spirit, nil, "modifier_xhs_spirit_dormant", {})
 	spirit:Stop()
 	if XHSBossCastBar ~= nil then XHSBossCastBar:Hide(spirit) end
 
-	local window = SYNC_WINDOWS[GetDifficulty()] or 20
+	local trinityCycle = self.master ~= nil and self.master:FindAbilityByName("xhs_spirit_master_trinity_cycle") or nil
+	local window = trinityCycle ~= nil and trinityCycle:GetSpecialValueFor("sync_window") or (SYNC_WINDOWS[GetDifficulty()] or 20)
 	self.sync_deadline = GameRules:GetGameTime() + window
 	UpdateDormantCounter()
 	UpdateBossTimer("Spirit Sync", window, window)
@@ -637,10 +697,14 @@ function XHSSpiritMasterEncounter:CompleteFinalSplit(attacker)
 		if spirit ~= nil and IsValidEntity(spirit) and not spirit:IsNull() then
 			if XHSBossCastBar ~= nil then XHSBossCastBar:Hide(spirit) end
 			HideBossBarFor(spirit)
+			spirit:RemoveModifierByName("modifier_xhs_boss_cast_protection")
+			spirit:RemoveModifierByName("modifier_xhs_tri_spirit_phase_ai")
+			spirit:Interrupt()
+			spirit:InterruptMotionControllers(true)
+			spirit:SetForceAttackTarget(nil)
 			spirit:Stop()
 			spirit:RemoveModifierByName("modifier_xhs_spirit_dormant")
-			spirit:AddNewModifier(spirit, nil, "modifier_invulnerable", {})
-			spirit:AddNewModifier(spirit, nil, "modifier_stunned", {})
+			spirit:AddNewModifier(spirit, nil, "modifier_xhs_spirit_finale", {})
 			Timers:CreateTimer((index - 1) * 0.35, function()
 				if spirit == nil or not IsValidEntity(spirit) or spirit:IsNull() then return nil end
 				spirit:FadeGesture(ACT_DOTA_DISABLED)
@@ -674,7 +738,7 @@ function XHSSpiritMasterEncounter:CompleteFinalSplit(attacker)
 		return nil
 	end)
 
-	Timers:CreateTimer(5.0, function()
+	Timers:CreateTimer(SPIRIT_FINALE_END_DELAY, function()
 		if self.phase ~= "finale" then return nil end
 		local bDevSandbox = XHSDevTools ~= nil and XHSDevTools:IsSandboxActive()
 		if bDevSandbox == true then
@@ -728,7 +792,7 @@ end
 
 function XHSSpiritMasterEncounter:PickArenaPoint()
 	local hero = self:PickTarget()
-	if IsValidAlive(hero) then return hero:GetAbsOrigin(), hero end
+	if IsValidAlive(hero) then return self:ClampArenaPosition(hero:GetAbsOrigin()), hero end
 	return self.arena_center, nil
 end
 
@@ -739,6 +803,14 @@ function XHSSpiritMaster_AttachPhase3AI(master)
 	if XHSPhase3BossAI ~= nil then
 		XHSPhase3BossAI:HideVanillaHealthBar(master)
 		XHSPhase3BossAI:SetAbilityLevels(master, MASTER_ABILITIES)
+	end
+	for _, abilityName in ipairs({
+		"xhs_spirit_master_convergence",
+	}) do
+		local ability = master:FindAbilityByName(abilityName)
+		if ability ~= nil then
+			ability:SetHidden(true)
+		end
 	end
 	if not master:HasModifier("modifier_xhs_spirit_master_phase_ai") then
 		master:AddNewModifier(master, nil, "modifier_xhs_spirit_master_phase_ai", {})
@@ -773,7 +845,16 @@ end
 function modifier_xhs_spirit_master_phase_ai:OnIntervalThink()
 	if not IsServer() then return end
 	if not IsValidAlive(self.boss) then return end
+	if XHSSpiritMasterEncounter.phase == "transition" then
+		XHSSpiritMasterEncounter:ResolveStalledTransition(self.boss)
+		return
+	end
 	if XHSSpiritMasterEncounter.phase ~= "master" then return end
+	local threshold = XHSSpiritMasterEncounter:GetNextThreshold(self.boss)
+	if threshold ~= nil then
+		XHSSpiritMasterEncounter:TriggerSplit(self.boss, threshold)
+		return
+	end
 	if XHSPhase3BossAI:IsCastBlocked(self.boss) then return end
 	local now = GameRules:GetGameTime()
 	if now < (self.next_action or 0) then return end
@@ -806,6 +887,10 @@ function modifier_xhs_tri_spirit_phase_ai:OnIntervalThink()
 	if not IsServer() then return end
 	if XHSSpiritMasterEncounter.phase ~= "split" then return end
 	if not IsValidAlive(self.boss) or self.boss:HasModifier("modifier_xhs_spirit_dormant") then return end
+	if XHSSpiritMasterEncounter:KeepSpiritInArena(self.boss) then
+		self.next_action = GameRules:GetGameTime() + 0.5
+		return
+	end
 	if XHSPhase3BossAI:IsCastBlocked(self.boss) then return end
 	local now = GameRules:GetGameTime()
 	if now < (self.next_action or 0) then return end
@@ -865,6 +950,20 @@ function modifier_xhs_spirit_dormant:CheckState()
 	return {
 		[MODIFIER_STATE_INVULNERABLE] = true,
 		[MODIFIER_STATE_STUNNED] = true,
+		[MODIFIER_STATE_DISARMED] = true,
+		[MODIFIER_STATE_SILENCED] = true,
+		[MODIFIER_STATE_NO_HEALTH_BAR] = true,
+	}
+end
+
+function modifier_xhs_spirit_finale:IsHidden() return true end
+function modifier_xhs_spirit_finale:IsPurgable() return false end
+function modifier_xhs_spirit_finale:RemoveOnDeath() return true end
+function modifier_xhs_spirit_finale:CheckState()
+	return {
+		[MODIFIER_STATE_INVULNERABLE] = true,
+		[MODIFIER_STATE_COMMAND_RESTRICTED] = true,
+		[MODIFIER_STATE_ROOTED] = true,
 		[MODIFIER_STATE_DISARMED] = true,
 		[MODIFIER_STATE_SILENCED] = true,
 		[MODIFIER_STATE_NO_HEALTH_BAR] = true,

@@ -26,6 +26,8 @@
 		"xhs_quest_state",
 		"xhs_devtools",
 		"vips",
+		"xhs_tome_purchase",
 		"xhs_lua_modifiers",
+		"xhs_farm_leaderboard",
 	]
 }

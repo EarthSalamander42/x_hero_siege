@@ -745,7 +745,7 @@
 		"ModelScale"				"1.7"
 		"HealthBarOffset"			"300"
 		"LeavesCorpse"				"0"
-		"UseAI"						"1"
+		"UseAI"						"4"
 
 		"Ability1"					"neutral_spell_immunity"
 		"Ability2"					"demonhunter_vampiric_aura"
@@ -810,10 +810,11 @@
 		"HealthBarOffset"			"300"
 		"Level"						"1"
 		"LeavesCorpse"				"0"
-		"UseAI"						"1"
+		"UseAI"						"4"
 		
-//		"Ability1"					"devotion_aura"
-		"Ability2"					"chaos_knight_chaos_strike"
+		"Ability1"					"grom_hellscream_mirror_image"
+		"Ability2"					"grom_hellscream_bladefury"
+		"Ability3"					"chaos_knight_chaos_strike"
 	
 		"ArmorPhysical"				"140"                 // Physical protection.
 		"MagicalResistance"			"40"                 // Magical protection (percentage).
@@ -882,7 +883,7 @@
 		"HealthBarOffset"			"300"
 		"ConsideredHero"			"1"
 		"LeavesCorpse"				"0"
-		"UseAI"						"1"
+		"UseAI"						"4"
 
 		// Abilities
 		//----------------------------------------------------------------
@@ -939,7 +940,7 @@
 		"HealthBarOffset"			"300"
 		"Level"						"1"
 		"LeavesCorpse"				"0"
-		"UseAI"						"1"
+		"UseAI"						"4"
 		
 		// Abilities
 		//----------------------------------------------------------------

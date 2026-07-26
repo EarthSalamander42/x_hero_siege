@@ -153,6 +153,7 @@ local hidden_innate_abilities = {
 	"necronomicon_warrior_sight",
 	"holdout_blue_effect",
 }
+local DUNGEON_CHECKPOINT_MODEL = "models/props_structures/outpost.vmdl"
 
 -- An NPC has spawned somewhere in game. This includes heroes
 ListenToGameEvent('npc_spawned', function(keys)
@@ -182,6 +183,10 @@ ListenToGameEvent('npc_spawned', function(keys)
 		end
 
 		if npc:GetUnitName() == "npc_dota_dungeon_checkpoint" then
+			-- The map-placed checkpoint keeps the model serialized in the VMAP.
+			-- Override both model references before attaching model-dependent PFX.
+			npc:SetOriginalModel(DUNGEON_CHECKPOINT_MODEL)
+			npc:SetModel(DUNGEON_CHECKPOINT_MODEL)
 			npc:SetMaterialGroup("1")
 
 			if npc.xhs_outpost_ambient_particle == nil then
@@ -1207,7 +1212,40 @@ local function IsValidXHSTombstoneEntity(entity)
 	return entity ~= nil and IsValidEntity(entity) and not entity:IsNull()
 end
 
-local function RemoveXHSTombstoneForHero(hero)
+local XHS_TOMBSTONE_SPAWN_PARTICLE = "particles/units/heroes/hero_undying/undying_tombstone.vpcf"
+local XHS_TOMBSTONE_AMBIENT_PARTICLE = "particles/econ/items/undying/fall20_undying_head/fall20_undying_tombstone_ambient.vpcf"
+
+function XHSDestroyTombstoneDropEffects(drop)
+	if not IsValidXHSTombstoneEntity(drop) then return end
+
+	if drop.xhs_tombstone_ambient_particle ~= nil then
+		ParticleManager:DestroyParticle(drop.xhs_tombstone_ambient_particle, false)
+		ParticleManager:ReleaseParticleIndex(drop.xhs_tombstone_ambient_particle)
+		drop.xhs_tombstone_ambient_particle = nil
+	end
+end
+
+function XHSCleanupClaimedTombstoneDrops(hero, delay)
+	if hero == nil or hero.xhs_tombstone_claimed_drops == nil then return end
+
+	local claimedDrops = hero.xhs_tombstone_claimed_drops
+	hero.xhs_tombstone_claimed_drops = nil
+	GameRules:GetGameModeEntity():SetContextThink(DoUniqueString("xhs_tombstone_claimed_drop_cleanup"), function()
+		for dropEntindex, _ in pairs(claimedDrops) do
+			local numericEntindex = tonumber(dropEntindex)
+			if numericEntindex ~= nil and numericEntindex > 0 then
+				local drop = EntIndexToHScript(numericEntindex)
+				if IsValidXHSTombstoneEntity(drop) then
+					XHSDestroyTombstoneDropEffects(drop)
+					UTIL_Remove(drop)
+				end
+			end
+		end
+		return nil
+	end, math.max(0, tonumber(delay) or 0.2))
+end
+
+function XHSRemoveTombstoneGroundForHero(hero, cleanupClaimed)
 	if hero == nil then return end
 
 	local drop = hero.xhs_tombstone_drop
@@ -1215,12 +1253,127 @@ local function RemoveXHSTombstoneForHero(hero)
 	hero.xhs_tombstone_drop = nil
 	hero.xhs_tombstone_item = nil
 
+	if IsValidXHSTombstoneEntity(drop) then
+		XHSDestroyTombstoneDropEffects(drop)
+		UTIL_Remove(drop)
+	end
 	if IsValidXHSTombstoneEntity(item) then
 		UTIL_Remove(item)
 	end
-	if IsValidXHSTombstoneEntity(drop) then
-		UTIL_Remove(drop)
+	if cleanupClaimed == true then
+		XHSCleanupClaimedTombstoneDrops(hero, 0.2)
 	end
+end
+
+function EnsureXHSTombstoneGroundDrop(hero, position)
+	if not IsValidXHSTombstoneEntity(hero) or hero:IsAlive() then return nil, nil end
+	if IsValidXHSTombstoneEntity(hero.xhs_tombstone_drop)
+		and IsValidXHSTombstoneEntity(hero.xhs_tombstone_item) then
+		return hero.xhs_tombstone_item, hero.xhs_tombstone_drop
+	end
+
+	XHSRemoveTombstoneGroundForHero(hero)
+
+	local tombstonePosition = position or hero:GetAbsOrigin()
+	tombstonePosition = Vector(tombstonePosition.x, tombstonePosition.y, tombstonePosition.z)
+	local item = CreateItem("item_tombstone", hero, hero)
+	if not IsValidXHSTombstoneEntity(item) then return nil, nil end
+
+	item:SetPurchaseTime(0)
+	item:SetPurchaser(hero)
+	item.xhs_revive_hero_entindex = hero:entindex()
+	item.xhs_tombstone_position = tombstonePosition
+
+	local drop = SpawnEntityFromTableSynchronous("dota_item_tombstone_drop", {})
+	if not IsValidXHSTombstoneEntity(drop) then
+		UTIL_Remove(item)
+		return nil, nil
+	end
+
+	drop:SetContainedItem(item)
+	drop:SetAngles(0, RandomFloat(0, 360), 0)
+	FindClearSpaceForUnit(drop, tombstonePosition, true)
+	local dropPosition = drop:GetAbsOrigin()
+
+	local spawnParticle = ParticleManager:CreateParticle(XHS_TOMBSTONE_SPAWN_PARTICLE, PATTACH_WORLDORIGIN, nil)
+	ParticleManager:SetParticleControl(spawnParticle, 0, dropPosition)
+	ParticleManager:ReleaseParticleIndex(spawnParticle)
+
+	drop.xhs_tombstone_ambient_particle = ParticleManager:CreateParticle(
+		XHS_TOMBSTONE_AMBIENT_PARTICLE,
+		PATTACH_ABSORIGIN_FOLLOW,
+		drop
+	)
+
+	item.xhs_tombstone_drop_entindex = drop:entindex()
+	hero.xhs_tombstone_item = item
+	hero.xhs_tombstone_drop = drop
+
+	Timers:CreateTimer(0.5, function()
+		if not IsValidXHSTombstoneEntity(hero) then
+			if IsValidXHSTombstoneEntity(drop) then
+				XHSDestroyTombstoneDropEffects(drop)
+				UTIL_Remove(drop)
+			end
+			if IsValidXHSTombstoneEntity(item) then UTIL_Remove(item) end
+			return nil
+		end
+		if hero.xhs_tombstone_item ~= item then return nil end
+		if hero:IsAlive() then
+			XHSRemoveTombstoneGroundForHero(hero)
+			return nil
+		end
+		if not IsValidXHSTombstoneEntity(drop) and not IsValidXHSTombstoneEntity(item) then
+			if hero.xhs_tombstone_item == item then
+				hero.xhs_tombstone_drop = nil
+				hero.xhs_tombstone_item = nil
+			end
+			return nil
+		end
+		return 0.5
+	end)
+
+	return item, drop
+end
+
+function SpawnXHSTombstoneForHero(hero, position)
+	if not IsValidXHSTombstoneEntity(hero) or hero:IsAlive() then return nil, nil end
+
+	XHSRemoveTombstoneGroundForHero(hero, true)
+	if XHSClearTombstoneReviveState ~= nil then
+		XHSClearTombstoneReviveState(hero)
+	end
+	local oldState = hero.xhs_tombstone_state
+	if oldState ~= nil then
+		for _, channelItem in pairs(oldState.channels or {}) do
+			if IsValidXHSTombstoneEntity(channelItem) then
+				channelItem.xhs_finish_handled = true
+				local caster = channelItem:GetCaster()
+				if IsValidXHSTombstoneEntity(caster) and channelItem:IsChanneling() then
+					caster:InterruptChannel()
+				end
+				caster = channelItem:GetCaster()
+				if IsValidXHSTombstoneEntity(caster) then
+					for slot = 0, 14 do
+						if caster:GetItemInSlot(slot) == channelItem then
+							caster:RemoveItem(channelItem)
+							break
+						end
+					end
+				end
+				if IsValidXHSTombstoneEntity(channelItem) then
+					UTIL_Remove(channelItem)
+				end
+			end
+		end
+	end
+
+	hero.xhs_tombstone_state = {
+		channels = {},
+		end_time = nil,
+		completed = false,
+	}
+	return EnsureXHSTombstoneGroundDrop(hero, position)
 end
 
 ListenToGameEvent('entity_killed', function(keys)
@@ -1237,6 +1390,9 @@ ListenToGameEvent('entity_killed', function(keys)
 
 	if FragmentQuests ~= nil then
 		FragmentQuests:OnEntityKilled(killedUnit, killer)
+	end
+	if SpecialEvents ~= nil and SpecialEvents.OnFarmEventCreepKilled ~= nil then
+		SpecialEvents:OnFarmEventCreepKilled(killedUnit)
 	end
 
 	if Zone then
@@ -1299,38 +1455,7 @@ ListenToGameEvent('entity_killed', function(keys)
 		if CustomTimers.game_phase == 3 then
 			if killedUnit.ankh_respawn == true then
 			else
-				RemoveXHSTombstoneForHero(killedUnit)
-				local deathPosition = killedUnit:GetAbsOrigin()
-				local newItem = CreateItem("item_tombstone", killedUnit, killedUnit)
-				newItem:SetPurchaseTime(0)
-				newItem:SetPurchaser(killedUnit)
-				newItem.xhs_revive_hero_entindex = killedUnit:entindex()
-				newItem.xhs_tombstone_position = Vector(deathPosition.x, deathPosition.y, deathPosition.z)
-				local tombstone = SpawnEntityFromTableSynchronous("dota_item_tombstone_drop", {})
-				tombstone:SetContainedItem(newItem)
-				tombstone:SetAngles(0, RandomFloat(0, 360), 0)
-				FindClearSpaceForUnit(tombstone, deathPosition, true)
-				newItem.xhs_tombstone_drop_entindex = tombstone:entindex()
-				killedUnit.xhs_tombstone_item = newItem
-				killedUnit.xhs_tombstone_drop = tombstone
-
-				Timers:CreateTimer(0.5, function()
-					if not IsValidXHSTombstoneEntity(killedUnit) then
-						if IsValidXHSTombstoneEntity(tombstone) then UTIL_Remove(tombstone) end
-						if IsValidXHSTombstoneEntity(newItem) then UTIL_Remove(newItem) end
-						return nil
-					end
-					if killedUnit:IsAlive() then
-						RemoveXHSTombstoneForHero(killedUnit)
-						return nil
-					end
-					if not IsValidXHSTombstoneEntity(tombstone) and not IsValidXHSTombstoneEntity(newItem) then
-						killedUnit.xhs_tombstone_drop = nil
-						killedUnit.xhs_tombstone_item = nil
-						return nil
-					end
-					return 0.5
-				end)
+				SpawnXHSTombstoneForHero(killedUnit, killedUnit:GetAbsOrigin())
 			end
 		end
 
@@ -1502,13 +1627,21 @@ ListenToGameEvent('entity_killed', function(keys)
 		if killedUnit:IsTower() then
 			if killedUnit:GetUnitName() == "xhs_tower_lane_1" then
 				for j = 1, difficulty do
-					CreateUnitByName("xhs_death_revenant", killedUnit:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+					if SpawnReleasedPhaseOneCreep ~= nil then
+						SpawnReleasedPhaseOneCreep("xhs_death_revenant", killedUnit:GetAbsOrigin())
+					else
+						CreateUnitByName("xhs_death_revenant", killedUnit:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+					end
 				end
 				-- CREEP_LANES[lane][2] = CREEP_LANES[lane][2] + 1
 				-- Notifications:TopToAll({text="Creep lane "..lane.." is now level "..CREEP_LANES[lane][2].."!", duration=5.0, style={color="lightgreen"}})
 			elseif killedUnit:GetUnitName() == "xhs_tower_lane_2" then
 				for j = 1, difficulty do
-					CreateUnitByName("xhs_death_revenant_2", killedUnit:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+					if SpawnReleasedPhaseOneCreep ~= nil then
+						SpawnReleasedPhaseOneCreep("xhs_death_revenant_2", killedUnit:GetAbsOrigin())
+					else
+						CreateUnitByName("xhs_death_revenant_2", killedUnit:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+					end
 				end
 				-- CREEP_LANES[lane][2] = CREEP_LANES[lane][2] + 1
 				-- Notifications:TopToAll({text="Creep lane "..lane.." is now level "..CREEP_LANES[lane][2].."!", duration=5.0, style={color="lightgreen"}})
@@ -1582,21 +1715,25 @@ end, nil)
 ---------------------------------------------------------
 
 function GameMode:OnPlayerRevived(event)
-	local hRevivedHero = EntIndexToHScript(event.target)
+	if type(event) ~= "table" then return end
+	local revivedIndex = tonumber(event.target or event.entindex_target or event.revived_entindex)
+	if revivedIndex == nil or revivedIndex <= 0 then return end
+
+	local hRevivedHero = EntIndexToHScript(revivedIndex)
+	if hRevivedHero == nil or hRevivedHero:IsNull() or not hRevivedHero:IsRealHero() then return end
 
 	print("GameMode:OnPlayerRevived")
-	if hRevivedHero ~= nil and hRevivedHero:IsRealHero() then
-		hRevivedHero:AddNewModifier(hRevivedHero, nil, "modifier_invulnerable", { duration = 2.5 })
-		hRevivedHero:AddNewModifier(hRevivedHero, nil, "modifier_omninight_guardian_angel", { duration = 2.5 })
-		EmitSoundOn("Dungeon.HeroRevived", hRevivedHero)
+	hRevivedHero:AddNewModifier(hRevivedHero, nil, "modifier_invulnerable", { duration = 2.5 })
+	hRevivedHero:AddNewModifier(hRevivedHero, nil, "modifier_omninight_guardian_angel", { duration = 2.5 })
+	EmitSoundOn("Dungeon.HeroRevived", hRevivedHero)
 
-		local hReviver = EntIndexToHScript(event.caster)
-		local flChannelTime = event.channel_time
-		if hReviver ~= nil and flChannelTime > 0.0 then
-			for _, Zone in pairs(GameMode.Zones) do
-				if Zone:ContainsUnit(hReviver) then
-					Zone:AddStat(hReviver:GetPlayerID(), ZONE_STAT_REVIVE_TIME, flChannelTime)
-				end
+	local reviverIndex = tonumber(event.caster or event.entindex_caster or event.reviver_entindex)
+	local hReviver = reviverIndex ~= nil and reviverIndex > 0 and EntIndexToHScript(reviverIndex) or nil
+	local flChannelTime = tonumber(event.channel_time) or 0
+	if hReviver ~= nil and not hReviver:IsNull() and flChannelTime > 0.0 then
+		for _, Zone in pairs(GameMode.Zones) do
+			if Zone:ContainsUnit(hReviver) then
+				Zone:AddStat(hReviver:GetPlayerID(), ZONE_STAT_REVIVE_TIME, flChannelTime)
 			end
 		end
 	end
@@ -1820,14 +1957,29 @@ function GameMode:OnQuestFocusRequested(_, event)
 	if player == nil then return end
 	if GameMode:IsQuestActive(questName) ~= true then return end
 
+	local playerHero = PlayerResource:GetSelectedHeroEntity(playerID)
+	local targetUnit = nil
+	local targetDistance = nil
 	for _, unit in pairs(FindXHSQuestTargetUnits(targetName)) do
 		if unit ~= nil and IsValidEntity(unit) and not unit:IsNull() then
-			CustomGameEventManager:Send_ServerToPlayer(player, "set_player_camera", {
-				hPosition = unit:GetAbsOrigin(),
-				iSpeed = 0.55,
-			})
-			return
+			local distance = 0
+			if playerHero ~= nil and IsValidEntity(playerHero) and not playerHero:IsNull() then
+				distance = (unit:GetAbsOrigin() - playerHero:GetAbsOrigin()):Length2D()
+			end
+			if targetUnit == nil or distance < targetDistance then
+				targetUnit = unit
+				targetDistance = distance
+			end
 		end
+	end
+
+	if targetUnit ~= nil then
+		CustomGameEventManager:Send_ServerToPlayer(player, "set_player_camera", {
+			hPosition = targetUnit:GetAbsOrigin(),
+			iSpeed = 0.55,
+			return_to_hero_after = 2.25,
+			return_speed = 0.65,
+		})
 	end
 end
 
@@ -1941,6 +2093,15 @@ function GameMode:OnQuestCompleted(questZone, quest)
 			if CustomTimers ~= nil and CustomTimers.game_phase < 3 then
 				CustomTimers:IncrementGamePhase()
 			end
+
+			if bQuestPreviouslyCompleted == false and Timers ~= nil then
+				Timers:CreateTimer(1.5, function()
+					if XHSFocusPlayersOnShalLightbinder ~= nil then
+						XHSFocusPlayersOnShalLightbinder()
+					end
+					return nil
+				end)
+			end
 		elseif quest.szQuestName == "clear_grom_vanguard" then
 			if OpenGromGate ~= nil then
 				OpenGromGate()
@@ -2002,7 +2163,7 @@ function GameMode:OnDialogBegin(hPlayerHero, hDialogEnt)
 
 	local bShowAdvanceDialogButton = true
 	local NextDialog = self:GetDialogLine(hDialogEnt, hDialogEnt.nCurrentLine + 1)
-	if Dialog.bPlayersConfirm == true or NextDialog == nil or NextDialog.bPlayersConfirm == true or Dialog.bForceBreak == true then
+	if Dialog.bPlayersConfirm == true or NextDialog == nil or Dialog.bForceBreak == true then
 		bShowAdvanceDialogButton = false
 	end
 

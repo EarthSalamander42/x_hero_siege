@@ -32,10 +32,39 @@ local PROUDMOORE_COLORS = {
 local TORRENT_SPLASH_PARTICLE = "particles/hero/kunkka/torrent_splash.vpcf"
 local GHOSTSHIP_SPLASH_PARTICLE = "particles/econ/items/kunkka/kunkka_immortal/kunkka_immortal_ghost_ship_splash.vpcf"
 local ANCHOR_SMASH_PARTICLE = "particles/units/heroes/hero_tidehunter/tidehunter_anchor_hero.vpcf"
+local DARKMOON_AOE_PARTICLE = "particles/econ/events/darkmoon_2017/darkmoon_generic_aoe.vpcf"
 local POWERSHOT_PARTICLE = "particles/units/heroes/hero_windrunner/windrunner_spell_powershot.vpcf"
 
 local function IsValidAlive(unit)
 	return unit ~= nil and IsValidEntity(unit) and not unit:IsNull() and unit:IsAlive()
+end
+
+local function ClearAnchorSmashWarning(ability, immediate)
+	local particle = ability and ability.xhs_anchor_smash_warning
+	if particle == nil then return end
+
+	ability.xhs_anchor_smash_warning = nil
+	ParticleManager:DestroyParticle(particle, immediate == true)
+	ParticleManager:ReleaseParticleIndex(particle)
+end
+
+local function CreateAnchorSmashWarning(ability, position, radius, duration)
+	ClearAnchorSmashWarning(ability, true)
+
+	local particle = ParticleManager:CreateParticle(DARKMOON_AOE_PARTICLE, PATTACH_WORLDORIGIN, nil)
+	ParticleManager:SetParticleControl(particle, 0, position)
+	ParticleManager:SetParticleControl(particle, 1, Vector(radius, 0, 0))
+	ParticleManager:SetParticleControl(particle, 2, Vector(duration or 1.0, 0, 1))
+	ParticleManager:SetParticleControl(particle, 3, PROUDMOORE_COLORS.primary)
+	ParticleManager:SetParticleControl(particle, 4, position)
+	ability.xhs_anchor_smash_warning = particle
+
+	Timers:CreateTimer(math.max(duration or 1.0, 0.03), function()
+		if ability.xhs_anchor_smash_warning == particle then
+			ClearAnchorSmashWarning(ability, false)
+		end
+		return nil
+	end)
 end
 
 local function GetContext(ability)
@@ -316,19 +345,23 @@ function xhs_proudmoore_anchor_smash:OnAbilityPhaseStart()
 
 	local caster = self:GetCaster()
 	StartBossCastBar(self, "Anchor Smash")
-	XHSBossTelegraphs:Circle(caster:GetAbsOrigin(), self:GetSpecialValueFor("radius"), self:GetCastPoint(), PROUDMOORE_COLORS)
+	CreateAnchorSmashWarning(self, caster:GetAbsOrigin(), self:GetSpecialValueFor("radius"), self:GetCastPoint())
 	StartAnimation(caster, { duration = self:GetCastPoint() + 0.2, activity = ACT_DOTA_ATTACK, rate = 0.65 })
 	caster:EmitSound("Hero_Tidehunter.AnchorSmash")
 	return true
 end
 
 function xhs_proudmoore_anchor_smash:OnAbilityPhaseInterrupted()
-	if IsServer() then HideBossCastBar(self) end
+	if IsServer() then
+		ClearAnchorSmashWarning(self, true)
+		HideBossCastBar(self)
+	end
 end
 
 function xhs_proudmoore_anchor_smash:OnSpellStart()
 	if not IsServer() then return end
 
+	ClearAnchorSmashWarning(self, false)
 	local caster = self:GetCaster()
 	local radius = self:GetSpecialValueFor("radius")
 	DamageEnemies(caster, self, caster:GetAbsOrigin(), radius, ScaleDamage(self:GetSpecialValueFor("damage")), self:GetAbilityDamageType(), function(enemy)

@@ -259,6 +259,9 @@ function modifier_xhs_banehallow_phase3_ai:CheckHpThresholds(now)
 			self.force_pattern = "requiem"
 			self.threshold_next_allowed_at = now + XHSPhase3BossAI:ScaleDelay(8.0)
 			self:UpdateBossBarMarkers()
+			if UpdateBossBar ~= nil then
+				UpdateBossBar(boss)
+			end
 			self:SummonThresholdRevenants(threshold)
 			return
 		end

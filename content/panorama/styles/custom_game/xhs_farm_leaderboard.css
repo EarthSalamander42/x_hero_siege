@@ -1,0 +1,418 @@
+.XHSFarmLeaderboardHost
+{
+	width: 100%;
+	height: 100%;
+	overflow: noclip;
+	z-index: 18;
+}
+
+.XHSFarmLeaderboard
+{
+	width: 326px;
+	height: fit-children;
+	horizontal-align: right;
+	vertical-align: center;
+	margin-right: 18px;
+	flow-children: down;
+	overflow: noclip;
+	opacity: 0;
+	transform: translateX( 28px );
+	pre-transform-scale2d: 0.98;
+	transition-property: opacity, transform, pre-transform-scale2d;
+	transition-duration: 0.28s;
+	transition-timing-function: ease-out;
+}
+
+.XHSFarmLeaderboard.IsVisible
+{
+	opacity: 1;
+	transform: translateX( 0px );
+	pre-transform-scale2d: 1;
+}
+
+.XHSFarmLeaderboardHeader
+{
+	width: 100%;
+	height: 62px;
+	flow-children: right;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #081725f8 ), color-stop( 0.62, #0a2034f4 ), to( #07121ff7 ) );
+	border: 1px solid #62d8ff58;
+	border-left: 3px solid #ffbd43;
+	box-shadow: fill #000000a8 0px 5px 14px 0px, inset #bcecff10 0px 1px 0px 0px;
+}
+
+.XHSFarmLeaderboardHeaderAccent
+{
+	width: 4px;
+	height: 38px;
+	vertical-align: center;
+	margin-left: 8px;
+	background-color: gradient( linear, 0% 100%, 0% 0%, from( #ff9e26 ), to( #ffe09b ) );
+	box-shadow: fill #ffae4266 0px 0px 7px 0px;
+}
+
+.XHSFarmLeaderboardHeaderCopy
+{
+	width: 225px;
+	height: 100%;
+	margin-left: 10px;
+	padding-top: 10px;
+	flow-children: down;
+}
+
+.XHSFarmLeaderboardEyebrow
+{
+	color: #ffbe55;
+	font-size: 12px;
+	font-weight: bold;
+	letter-spacing: 2px;
+	text-shadow: 0px 1px 3px #000000;
+}
+
+.XHSFarmLeaderboardTitle
+{
+	margin-top: -1px;
+	color: #edf9ff;
+	font-family: titleFont, Radiance, FZKai-Z03, TH Sarabun New, YDYGO 540;
+	font-size: 20px;
+	font-weight: bold;
+	letter-spacing: 1px;
+	text-shadow: 0px 2px 4px #000000;
+}
+
+.XHSFarmLeaderboardLive
+{
+	width: 66px;
+	height: 100%;
+	flow-children: right;
+	vertical-align: center;
+	padding-top: 23px;
+}
+
+.XHSFarmLeaderboardLiveDot
+{
+	width: 7px;
+	height: 7px;
+	margin-top: 3px;
+	margin-right: 5px;
+	border-radius: 50%;
+	background-color: #ffb33f;
+	box-shadow: fill #ff9b33aa 0px 0px 7px 0px;
+	animation-name: XHSFarmLivePulse;
+	animation-duration: 1.15s;
+	animation-iteration-count: infinite;
+}
+
+.XHSFarmLeaderboardLive Label
+{
+	color: #ffd17d;
+	font-size: 11px;
+	font-weight: bold;
+	letter-spacing: 1px;
+	text-shadow: 0px 1px 3px #000000;
+}
+
+.XHSFarmLeaderboardColumnLabels
+{
+	width: 100%;
+	height: 24px;
+	flow-children: right;
+	padding: 5px 8px 0px 8px;
+	background-color: #030b14e8;
+	border-left: 1px solid #4abfe428;
+	border-right: 1px solid #4abfe428;
+}
+
+.XHSFarmLeaderboardColumnLabels Label
+{
+	color: #6f899d;
+	font-size: 10px;
+	font-weight: bold;
+	letter-spacing: 1px;
+	text-shadow: 0px 1px 2px #000000;
+}
+
+.XHSFarmLeaderboardColumnRank
+{
+	width: 35px;
+	text-align: center;
+}
+
+.XHSFarmLeaderboardColumnPlayer
+{
+	width: 150px;
+	margin-left: 45px;
+}
+
+.XHSFarmLeaderboardColumnProgress
+{
+	width: 58px;
+	text-align: right;
+}
+
+.XHSFarmLeaderboardRows
+{
+	width: 100%;
+	height: 54px;
+	overflow: noclip;
+	background-color: #02070dac;
+	border: 1px solid #4abfe428;
+	border-top: 0px solid transparent;
+	box-shadow: fill #00000094 0px 5px 14px 0px;
+	transition-property: height;
+	transition-duration: 0.24s;
+	transition-timing-function: ease-out;
+}
+
+.XHSFarmLeaderboardWaiting
+{
+	align: center center;
+	color: #7890a3;
+	font-size: 11px;
+	font-weight: bold;
+	letter-spacing: 2px;
+	text-shadow: 0px 1px 3px #000000;
+	opacity: 0;
+	transition-property: opacity;
+	transition-duration: 0.18s;
+}
+
+.XHSFarmLeaderboardRows.IsWaiting .XHSFarmLeaderboardWaiting
+{
+	opacity: 1;
+}
+
+.XHSFarmLeaderboardRow
+{
+	width: 312px;
+	height: 50px;
+	margin-left: 6px;
+	ignore-parent-flow: true;
+	vertical-align: top;
+	flow-children: right;
+	overflow: noclip;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #0a1825f5 ), color-stop( 0.68, #08131ff4 ), to( #050c15f7 ) );
+	border: 1px solid #4ebfe42b;
+	box-shadow: fill #00000080 0px 3px 8px 0px, inset #a8e9ff0b 0px 1px 0px 0px;
+	opacity: 0;
+	pre-transform-scale2d: 0.97;
+	transition-property: transform, opacity, pre-transform-scale2d, brightness, border, box-shadow;
+	transition-duration: 0.42s, 0.18s, 0.18s, 0.18s, 0.18s, 0.18s;
+	transition-timing-function: ease-in-out;
+}
+
+.XHSFarmLeaderboardRow.IsPresent
+{
+	opacity: 1;
+	pre-transform-scale2d: 1;
+}
+
+.XHSFarmLeaderboardRow.IsLocalPlayer
+{
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #0c2538f7 ), color-stop( 0.7, #092034f5 ), to( #071522f8 ) );
+	border: 1px solid #5dd8ff66;
+}
+
+.XHSFarmLeaderboardRow.IsLeader
+{
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #34230cf7 ), color-stop( 0.28, #172334f6 ), to( #08131ff7 ) );
+	border: 1px solid #ffc56080;
+	box-shadow: fill #00000090 0px 4px 10px 0px, inset #ffc96b15 0px 1px 0px 0px, fill #ffb74412 0px 0px 10px 0px;
+}
+
+.XHSFarmLeaderboardRow.IsReordering
+{
+	brightness: 1.35;
+	pre-transform-scale2d: 1.025;
+	border: 1px solid #bcefffaa;
+	box-shadow: fill #000000b0 0px 7px 14px 0px, fill #67d8ff2c 0px 0px 12px 0px;
+}
+
+.XHSFarmLeaderboardRow.IsMovingUp
+{
+	border: 1px solid #ffd171cc;
+	box-shadow: fill #000000b0 0px 7px 14px 0px, fill #ffbd492e 0px 0px 13px 0px;
+}
+
+.XHSFarmRowAccent
+{
+	width: 3px;
+	height: 100%;
+	background-color: #317b9b75;
+}
+
+.XHSFarmLeaderboardRow.IsLeader .XHSFarmRowAccent
+{
+	background-color: gradient( linear, 0% 100%, 0% 0%, from( #ff982b ), to( #ffe29a ) );
+	box-shadow: fill #ffb34855 0px 0px 5px 0px;
+}
+
+.XHSFarmRank
+{
+	width: 34px;
+	height: 100%;
+	padding-top: 12px;
+	color: #a9c0d1;
+	font-size: 20px;
+	font-weight: bold;
+	text-align: center;
+	text-shadow: 0px 2px 4px #000000;
+}
+
+.XHSFarmLeaderboardRow.IsLeader .XHSFarmRank
+{
+	color: #ffd77f;
+	text-shadow: 0px 0px 6px #ffb13c55, 0px 2px 4px #000000;
+}
+
+.XHSFarmHeroFrame
+{
+	width: 42px;
+	height: 42px;
+	vertical-align: center;
+	margin-left: 1px;
+	border: 1px solid #78cce34a;
+	background-color: #030910;
+	box-shadow: fill #000000a0 0px 2px 5px 0px;
+}
+
+.XHSFarmLeaderboardRow.IsLeader .XHSFarmHeroFrame
+{
+	border: 1px solid #ffc9678a;
+}
+
+.XHSFarmHeroImage
+{
+	width: 100%;
+	height: 100%;
+	saturation: 0.92;
+	brightness: 0.92;
+}
+
+.XHSFarmLeaderboardRow.IsDisconnected .XHSFarmHeroImage
+{
+	saturation: 0.15;
+	brightness: 0.38;
+}
+
+.XHSFarmIdentity
+{
+	width: 126px;
+	height: 100%;
+	margin-left: 8px;
+	padding-top: 8px;
+	flow-children: down;
+}
+
+.XHSFarmPlayerName
+{
+	width: 126px;
+	height: 20px;
+	color: #e8f6ff;
+	font-size: 15px;
+	font-weight: semi-bold;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	text-shadow: 0px 1px 3px #000000;
+}
+
+.XHSFarmPlayerStage
+{
+	width: 126px;
+	height: 17px;
+	margin-top: -1px;
+	color: #7fa8c1;
+	font-size: 10px;
+	font-weight: bold;
+	letter-spacing: 0.5px;
+	text-overflow: shrink;
+	white-space: nowrap;
+	text-shadow: 0px 1px 2px #000000;
+}
+
+.XHSFarmLeaderboardRow.IsLeader .XHSFarmPlayerStage
+{
+	color: #ffc766;
+}
+
+.XHSFarmProgress
+{
+	width: 91px;
+	height: 100%;
+	padding-top: 7px;
+	padding-right: 8px;
+	flow-children: down;
+}
+
+.XHSFarmKills
+{
+	width: 100%;
+	height: 23px;
+	color: #f3fbff;
+	font-size: 18px;
+	font-weight: bold;
+	text-align: right;
+	text-shadow: 0px 1px 3px #000000;
+}
+
+.XHSFarmKillsSuffix
+{
+	width: 100%;
+	height: 14px;
+	margin-top: -2px;
+	color: #6f8da2;
+	font-size: 9px;
+	font-weight: bold;
+	letter-spacing: 1px;
+	text-align: right;
+	text-shadow: 0px 1px 2px #000000;
+}
+
+.XHSFarmRankDelta
+{
+	width: 45px;
+	height: 18px;
+	ignore-parent-flow: true;
+	horizontal-align: right;
+	vertical-align: top;
+	margin-top: -9px;
+	margin-right: 5px;
+	color: #8dffbc;
+	font-size: 11px;
+	font-weight: bold;
+	text-align: right;
+	text-shadow: 0px 1px 3px #000000;
+	opacity: 0;
+	transform: translateY( 3px );
+	transition-property: opacity, transform;
+	transition-duration: 0.16s;
+}
+
+.XHSFarmRankDelta.IsVisible
+{
+	opacity: 1;
+	transform: translateY( 0px );
+}
+
+.XHSFarmRankDelta.IsDown
+{
+	color: #ff8d85;
+}
+
+.AspectRatio16x10 .XHSFarmLeaderboard
+{
+	margin-right: 14px;
+	pre-transform-scale2d: 0.94;
+}
+
+.AspectRatio16x10 .XHSFarmLeaderboard.IsVisible
+{
+	pre-transform-scale2d: 0.96;
+}
+
+@keyframes 'XHSFarmLivePulse'
+{
+	0% { opacity: 0.45; pre-transform-scale2d: 0.8; }
+	50% { opacity: 1; pre-transform-scale2d: 1.08; }
+	100% { opacity: 0.45; pre-transform-scale2d: 0.8; }
+}

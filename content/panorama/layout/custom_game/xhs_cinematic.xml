@@ -1,0 +1,18 @@
+<root>
+	<styles>
+		<include src="file://{resources}/styles/custom_game/xhs_cinematic.css" />
+	</styles>
+
+	<scripts>
+		<include src="file://{resources}/scripts/custom_game/xhs_cinematic.js" />
+	</scripts>
+
+	<Panel class="XHSCinematicRoot" hittest="false">
+		<Panel id="XHSCinematicTopBar" class="XHSCinematicBar XHSCinematicTopBar" hittest="false" />
+		<Panel id="XHSCinematicBottomBar" class="XHSCinematicBar XHSCinematicBottomBar" hittest="false" />
+		<Panel id="XHSCinematicTitleCard" class="XHSCinematicTitleCard" hittest="false">
+			<Label id="XHSCinematicTitle" class="XHSCinematicTitle" text="" hittest="false" />
+			<Label id="XHSCinematicSubtitle" class="XHSCinematicSubtitle" text="" hittest="false" />
+		</Panel>
+	</Panel>
+</root>

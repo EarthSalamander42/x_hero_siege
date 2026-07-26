@@ -707,6 +707,7 @@ function FragmentQuests:SendStarNotification(quest, previousStars)
 		threshold_text = self:BuildThresholdText(quest),
 		fragments_preview = quest.fragments_awarded or 0,
 		reward_per_star = quest.reward_per_star or DEFAULT_REWARD_PER_STAR,
+		sound = "Dungeon.Stinger01",
 		duration = 6.0,
 	})
 end

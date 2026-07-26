@@ -244,8 +244,12 @@
 
 .BossThresholdMarker.Triggered
 {
-	opacity: .32;
-	brightness: .55;
+	background-color: gradient( linear, 0% 0%, 0% 100%, from( #c7ced1 ), color-stop( .46, #788186 ), to( #41484c ) );
+	border-color: #aab2b6;
+	box-shadow: fill #000000aa 0px 0px 2px 0px;
+	opacity: .46;
+	brightness: .72;
+	saturation: 0;
 	transform: scaleY( .78 );
 }
 
@@ -923,6 +927,17 @@
 
 .AspectRatio4x3 .MultiBossBars .BossCastLabel {
 	width: 250px;
+}
+
+/* Keep the default boss-bar placement unless a top-HUD focus timer is visible. */
+#DiretidePanel.XHSFocusTimerActive
+{
+	margin-top: 210px;
+}
+
+.AspectRatio16x10 #DiretidePanel.XHSFocusTimerActive
+{
+	margin-top: 186px;
 }
 
 @keyframes 'XHSBossDamageFlash'

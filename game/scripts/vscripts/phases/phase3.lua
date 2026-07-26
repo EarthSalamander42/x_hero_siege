@@ -421,6 +421,29 @@ function OpenGromGate()
 	if state.gate_opened == true then return end
 
 	state.gate_opened = true
+	local cameraPosition = nil
+	local reference = Entities:FindByName(nil, "npc_dota_spawner_magtheridon_arena")
+	if reference ~= nil then
+		local referencePosition = reference:GetAbsOrigin()
+		local closestDistance = nil
+		for _, doorName in ipairs({ "door_grom", "door_grom2" }) do
+			for _, door in ipairs(Entities:FindAllByName(doorName)) do
+				if door ~= nil and IsValidEntity(door) then
+					local distance = (door:GetAbsOrigin() - referencePosition):Length2D()
+					if closestDistance == nil or distance < closestDistance then
+						closestDistance = distance
+						cameraPosition = door:GetAbsOrigin()
+					end
+				end
+			end
+		end
+	end
+	if cameraPosition == nil then
+		local firstDoor = Entities:FindByName(nil, "door_grom")
+		if firstDoor ~= nil and IsValidEntity(firstDoor) then
+			cameraPosition = firstDoor:GetAbsOrigin()
+		end
+	end
 
 	XHSOpenDoorsWithCinematic({ "door_grom", "door_grom2" }, { "obstruction_grom" }, "gate_02_open", function()
 		local grom = GameMode.GromPhase3Boss
@@ -434,6 +457,7 @@ function OpenGromGate()
 			end
 		end
 	end, {
+		camera_position = cameraPosition,
 		move_duration = 1.35,
 		hold_duration = 1.25,
 		return_duration = 1.0,
@@ -594,7 +618,12 @@ function StartLichKingArena()
 
 			for _, hero in pairs(HeroList:GetAllHeroes()) do
 				if hero:IsRealHero() and hero:GetTeam() == DOTA_TEAM_GOODGUYS then
-					CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "set_player_camera", { hPosition = lich_king_boss:GetAbsOrigin() })
+					CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "set_player_camera", {
+						hPosition = lich_king_boss:GetAbsOrigin(),
+						iSpeed = 0.55,
+						return_to_hero_after = 2.75,
+						return_speed = 0.65,
+					})
 				end
 			end
 		end)
@@ -647,7 +676,10 @@ function StartSecretArena(hero)
 			duration = 5.0,
 			segments = {
 				{ hero = hero:GetUnitName() },
-				{ text = PlayerResource:GetPlayerName(hero:GetPlayerID()) .. " " },
+				{
+					identity_player_id = hero:GetPlayerID(),
+					identity_hero_name = hero:GetUnitName(),
+				},
 				{ text = "found the secret arena!!! GOOD LUCK!",                 style = { color = "red" } },
 			},
 		})

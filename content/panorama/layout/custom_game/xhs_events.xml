@@ -68,6 +68,9 @@
 							</Panel>
 							<Label class="XHSEventDescription" text="Hunt the guardian beast for a defensive relic reward." />
 						</Panel>
+						<Panel class="XHSEventLockOverlay">
+							<Label id="Event2LockLabel" text="Already completed" />
+						</Panel>
 					</Button>
 
 					<Button id="Event3" class="XHSEventCard XHSEventCardInfernal" onactivate="FrostInfernal();">
@@ -80,6 +83,9 @@
 								<Label class="XHSEventRewardText" text="#xhs_event_reward_frost_infernal" />
 							</Panel>
 							<Label class="XHSEventDescription" text="Break the frozen infernal before the arena becomes lethal." />
+						</Panel>
+						<Panel class="XHSEventLockOverlay">
+							<Label id="Event3LockLabel" text="Already completed" />
 						</Panel>
 					</Button>
 				</Panel>

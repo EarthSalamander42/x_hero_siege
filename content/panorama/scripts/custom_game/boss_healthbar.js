@@ -433,8 +433,25 @@ function SetBossBarMarkers(panels, markers) {
 		return;
 	}
 
-	panels.markers.RemoveAndDeleteChildren();
 	var normalized = NormalizeBossBarMarkers(markers);
+	var signatureParts = [];
+	for (var signatureIndex = 0; signatureIndex < normalized.length; signatureIndex++) {
+		var signatureMarker = normalized[signatureIndex];
+		signatureParts.push([
+			signatureMarker.pct || signatureMarker.percent || signatureMarker.health_pct || 0,
+			signatureMarker.kind || "",
+			signatureMarker.label || "",
+			signatureMarker.description || signatureMarker.details || signatureMarker.tooltip || "",
+			signatureMarker.triggered === true || signatureMarker.triggered === 1 || signatureMarker.triggered === "1" || signatureMarker.triggered === "true"
+		].join("|"));
+	}
+	var signature = signatureParts.join(";");
+	if (panels.markers._xhsMarkerSignature === signature && panels.markers.GetChildCount() > 0) {
+		return;
+	}
+
+	panels.markers._xhsMarkerSignature = signature;
+	panels.markers.RemoveAndDeleteChildren();
 	for (var i = 0; i < normalized.length; i++) {
 		var marker = normalized[i];
 		var pct = Math.max(0, Math.min(100, Number(marker.pct || marker.percent || marker.health_pct) || 0));
@@ -445,7 +462,11 @@ function SetBossBarMarkers(panels, markers) {
 		var panel = $.CreatePanel("Panel", panels.markers, "BossThresholdMarker" + i);
 		panel.AddClass("BossThresholdMarker");
 		panel.SetHasClass("CompanionMarker", marker.kind === "companion");
-		panel.SetHasClass("Triggered", marker.triggered === true || marker.triggered === 1);
+		var triggered = marker.triggered === true
+			|| marker.triggered === 1
+			|| marker.triggered === "1"
+			|| marker.triggered === "true";
+		panel.SetHasClass("Triggered", triggered);
 		panel.style.position = pct + "% 0px 0px";
 		panel.SetPanelEvent("onmouseover", (function (markerPanel, markerData, markerPct) {
 			return function () {

@@ -1,0 +1,39 @@
+<root>
+	<styles>
+		<include src="s2r://panorama/styles/dotastyles.vcss_c" />
+		<include src="s2r://panorama/styles/custom_game/xhs_theme.vcss_c" />
+		<include src="s2r://panorama/styles/custom_game/xhs_farm_leaderboard.vcss_c" />
+	</styles>
+
+	<scripts>
+		<include src="file://{resources}/scripts/custom_game/util.js" />
+		<include src="file://{resources}/scripts/custom_game/xhs_name_display.js" />
+		<include src="s2r://panorama/scripts/custom_game/xhs_farm_leaderboard.vjs_c" />
+	</scripts>
+
+	<Panel class="XHSFarmLeaderboardHost" hittest="false" hittestchildren="false">
+		<Panel id="XHSFarmLeaderboard" class="XHSFarmLeaderboard" hittest="false" hittestchildren="false">
+			<Panel class="XHSFarmLeaderboardHeader" hittest="false">
+				<Panel class="XHSFarmLeaderboardHeaderAccent" />
+				<Panel class="XHSFarmLeaderboardHeaderCopy">
+					<Label class="XHSFarmLeaderboardEyebrow" text="FARM EVENT" />
+					<Label class="XHSFarmLeaderboardTitle" text="LIVE LEADERBOARD" />
+				</Panel>
+				<Panel class="XHSFarmLeaderboardLive">
+					<Panel class="XHSFarmLeaderboardLiveDot" />
+					<Label text="LIVE" />
+				</Panel>
+			</Panel>
+
+			<Panel class="XHSFarmLeaderboardColumnLabels" hittest="false">
+				<Label class="XHSFarmLeaderboardColumnRank" text="#" />
+				<Label class="XHSFarmLeaderboardColumnPlayer" text="PLAYER" />
+				<Label class="XHSFarmLeaderboardColumnProgress" text="PROGRESS" />
+			</Panel>
+
+			<Panel id="XHSFarmLeaderboardRows" class="XHSFarmLeaderboardRows" hittest="false">
+				<Label id="XHSFarmLeaderboardWaiting" class="XHSFarmLeaderboardWaiting" text="PREPARING ARENAS" />
+			</Panel>
+		</Panel>
+	</Panel>
+</root>

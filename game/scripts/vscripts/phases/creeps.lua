@@ -50,6 +50,49 @@ local function MoveCreepPastBreakable(unit, destination)
 	})
 end
 
+local function StartDestroyerMagnataurAbilityAI(unit)
+	if unit == nil or unit:IsNull() or unit:GetUnitName() ~= "npc_magnataur_destroyer_crypt" then return end
+	if unit.xhs_destroyer_ability_ai_started == true then return end
+
+	unit.xhs_destroyer_ability_ai_started = true
+
+	Timers:CreateTimer(RandomFloat(0.2, 0.6), function()
+		if unit == nil or unit:IsNull() or not unit:IsAlive() then return nil end
+
+		local thunderClap = unit:FindAbilityByName("creature_thunder_clap_low")
+		if thunderClap == nil or thunderClap:GetLevel() <= 0 then return 0.25 end
+		if not thunderClap:IsFullyCastable() or unit:IsStunned() or unit:IsSilenced() or unit:IsChanneling() then
+			return 0.25
+		end
+
+		local radius = thunderClap:GetSpecialValueFor("radius")
+		if radius == nil or radius <= 0 then radius = 350 end
+
+		local enemies = FindUnitsInRadius(
+			unit:GetTeamNumber(),
+			unit:GetAbsOrigin(),
+			nil,
+			radius,
+			DOTA_UNIT_TARGET_TEAM_ENEMY,
+			DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC,
+			DOTA_UNIT_TARGET_FLAG_NONE,
+			FIND_CLOSEST,
+			false
+		)
+
+		if #enemies > 0 then
+			ExecuteOrderFromTable({
+				UnitIndex = unit:entindex(),
+				OrderType = DOTA_UNIT_ORDER_CAST_NO_TARGET,
+				AbilityIndex = thunderClap:entindex(),
+			})
+			return 0.5
+		end
+
+		return 0.25
+	end)
+end
+
 local function OrderWaveCreep(unit, waypoint)
 	if unit == nil or unit:IsNull() then return end
 
@@ -64,6 +107,7 @@ local function OrderWaveCreep(unit, waypoint)
 		if thunderClap ~= nil then
 			thunderClap:StartCooldown(RandomFloat(1.5, 6.0))
 		end
+		StartDestroyerMagnataurAbilityAI(unit)
 	end
 
 	if waypoint ~= nil and unit.SetInitialGoalEntity ~= nil then
@@ -116,6 +160,39 @@ local function OrderWaveCreep(unit, waypoint)
 
 		return nil
 	end)
+end
+
+function SpawnReleasedPhaseOneCreep(unitName, position)
+	local unit = CreateUnitByName(unitName, position, true, nil, nil, DOTA_TEAM_CUSTOM_1)
+	if unit ~= nil then
+		OrderWaveCreep(unit, nil)
+	end
+	return unit
+end
+
+local function DestroyPhaseOneStructure(structure, attacker)
+	if structure == nil or structure:IsNull() or not structure:IsAlive() then return false end
+
+	structure:RemoveModifierByName("modifier_invulnerable")
+	structure:Kill(nil, attacker or structure)
+	return true
+end
+
+function CollapsePhaseOneLane(lane, attacker)
+	lane = tonumber(lane)
+	if lane == nil then return end
+
+	for _, tower in pairs(Entities:FindAllByName("dota_badguys_tower" .. lane)) do
+		DestroyPhaseOneStructure(tower, attacker)
+	end
+
+	for _, rax in pairs(Entities:FindAllByName("dota_badguys_barracks_" .. lane)) do
+		DestroyPhaseOneStructure(rax, attacker)
+	end
+
+	if CREEP_LANES[lane] ~= nil then
+		CREEP_LANES[lane][3] = 0
+	end
 end
 
 local function SpawnWaveCreep(unitName, point, waypoint)
@@ -274,6 +351,9 @@ function SpawnCreeps(force)
 end
 
 function CreepLevels(level)
+	level = tonumber(level)
+	if level == nil or level < 1 or level > 4 then return end
+
 	local dragons = {}
 	dragons[2] = "npc_dota_creature_red_dragon"
 	dragons[3] = "npc_dota_creature_black_dragon"
@@ -321,10 +401,13 @@ function SpawnRevenant(event)
 end
 
 function SpawnMagnataur(hPos)
+	local firstMagnataur = nil
 	for i = 1, GameRules:GetCustomGameDifficulty() do
 		local unit = CreateUnitByName("npc_magnataur_destroyer_crypt", hPos, true, nil, nil, DOTA_TEAM_CUSTOM_1)
 		OrderWaveCreep(unit, nil)
+		firstMagnataur = firstMagnataur or unit
 	end
+	return firstMagnataur
 end
 
 function SpawnDragons(dragon)

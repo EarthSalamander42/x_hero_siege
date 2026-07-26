@@ -253,7 +253,6 @@ end
 function modifier_xhs_grom_phase3_ai:BuildPatternDeck()
 	local now = GameRules:GetGameTime()
 	self.patterns = {
-		{ id = "mirror_trial", weight = 2, cooldown = 24.0, ready_at = now + 6.0, run = function() return self:CastMirrorTrial(nil) end },
 		{ id = "blade_storm", weight = 4, cooldown = 8.0, ready_at = 0, run = function() return self:CastBladeStorm() end },
 		{ id = "mirror_cleave", weight = 4, cooldown = 7.0, ready_at = 0, run = function() return self:CastMirrorCleave() end },
 		{ id = "windwalk_ambush", weight = 3, cooldown = 12.0, ready_at = now + 4.0, run = function() return self:CastWindwalkAmbush() end },
@@ -366,6 +365,9 @@ function modifier_xhs_grom_phase3_ai:TryThresholdMirrorTrial(now)
 			self.cast_until = now + duration
 			self.recover_until = self.cast_until + XHSPhase3BossAI:ScaleDelay(1.0)
 			self:UpdateBossBarMarkers()
+			if UpdateBossBar ~= nil then
+				UpdateBossBar(boss)
+			end
 			return true
 		end
 	end
@@ -605,7 +607,11 @@ function modifier_xhs_grom_phase3_ai:OnFakeCloneKilled(clone, ability, attacker)
 		DamageEnemies(boss, mirrorAbility, position, radius, damage)
 		local particle = ParticleManager:CreateParticle("particles/units/heroes/hero_juggernaut/juggernaut_blade_fury_ground.vpcf", PATTACH_WORLDORIGIN, nil)
 		ParticleManager:SetParticleControl(particle, 0, position)
-		ParticleManager:ReleaseParticleIndex(particle)
+		Timers:CreateTimer(1.25, function()
+			ParticleManager:DestroyParticle(particle, false)
+			ParticleManager:ReleaseParticleIndex(particle)
+			return nil
+		end)
 		return nil
 	end)
 end

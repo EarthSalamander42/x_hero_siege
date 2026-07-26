@@ -11,6 +11,48 @@ local function IsBreakableTarget(target)
 	return unitName == "npc_dota_crate" or unitName == "npc_dota_chest" or unitName == "npc_dota_vase"
 end
 
+local function IsLivingTarget(target)
+	if target == nil or target:IsNull() then return false end
+	if target.IsAlive ~= nil and not target:IsAlive() then return false end
+	return true
+end
+
+local function IsValidGoodGuyHero(target)
+	return target ~= nil
+		and IsValidEntity(target)
+		and not target:IsNull()
+		and target:IsAlive()
+		and target:GetTeamNumber() == DOTA_TEAM_GOODGUYS
+		and target:IsRealHero()
+		and not target:IsIllusion()
+		and not target:IsInvisible()
+		and not target:IsInvulnerable()
+end
+
+local function IsMultiplayerOnlyAbility(abilityName)
+	for _, restrictedAbilityName in pairs(_G.multiplayer_abilities_cast or {}) do
+		if abilityName == restrictedAbilityName then
+			return true
+		end
+	end
+
+	return false
+end
+
+local function GetConnectedGoodGuyPlayerCount()
+	local playerCount = 0
+
+	for playerID = 0, DOTA_MAX_TEAM_PLAYERS - 1 do
+		if PlayerResource:IsValidPlayerID(playerID)
+			and PlayerResource:GetTeam(playerID) == DOTA_TEAM_GOODGUYS
+			and PlayerResource:GetConnectionState(playerID) == DOTA_CONNECTION_STATE_CONNECTED then
+			playerCount = playerCount + 1
+		end
+	end
+
+	return playerCount
+end
+
 function modifier_ai:GetAttributes() return MODIFIER_ATTRIBUTE_IGNORE_INVULNERABLE end
 
 function modifier_ai:IsPurgeException() return false end
@@ -43,7 +85,10 @@ function modifier_ai:OnCreated(params)
 		self.parent = self:GetParent()
 		self.last_movement = 0.0
 		self.find_enemy_distance = 1000
-		self.ai_state = params.state
+		self.ai_state = tonumber(params.state) or 1
+		if self.ai_state == 3 or self.ai_state == 4 then
+			self.find_enemy_distance = 2000
+		end
 		self.isAttacking = false
 
 		self:StartIntervalThink(1.0)
@@ -70,6 +115,74 @@ function modifier_ai:MovePastBreakable()
 	})
 end
 
+function modifier_ai:TryCastFinalWaveIllidanAbility()
+	if self.parent:GetUnitName() ~= "npc_dota_hero_illidan_final_wave" then return false end
+
+	-- Negative Energy is Illidan's first KV slot. The generic loop stops when
+	-- that slot has no target in its reduced (90%) cast range, which starves
+	-- the following Immolation toggle. Give the Final Wave boss an explicit
+	-- priority pass using each spell's real range.
+	local negativeEnergy = self.parent:FindAbilityByName("demonhunter_negative_energy_small")
+	if negativeEnergy ~= nil
+		and negativeEnergy:GetLevel() > 0
+		and negativeEnergy:IsActivated()
+		and negativeEnergy:IsCooldownReady()
+		and not negativeEnergy:IsInAbilityPhase() then
+		local castRange = negativeEnergy:GetCastRange(self.parent:GetAbsOrigin(), nil) or 800
+		if castRange <= 0 then castRange = 800 end
+
+		local targets = FindUnitsInRadius(
+			self.parent:GetTeamNumber(),
+			self.parent:GetAbsOrigin(),
+			nil,
+			castRange,
+			DOTA_UNIT_TARGET_TEAM_ENEMY,
+			DOTA_UNIT_TARGET_HERO,
+			negativeEnergy:GetAbilityTargetFlags(),
+			FIND_CLOSEST,
+			false
+		)
+		for _, target in pairs(targets) do
+			if IsValidGoodGuyHero(target) then
+				self.parent:Stop()
+				self.parent:CastAbilityOnTarget(target, negativeEnergy, -1)
+				return true
+			end
+		end
+	end
+
+	local immolation = self.parent:FindAbilityByName("demonhunter_immolation_small")
+	if immolation ~= nil
+		and immolation:GetLevel() > 0
+		and immolation:IsActivated()
+		and immolation:IsCooldownReady()
+		and not immolation:IsInAbilityPhase()
+		and not immolation:GetToggleState() then
+		local radius = immolation:GetSpecialValueFor("radius")
+		if radius <= 0 then radius = 600 end
+
+		local targets = FindUnitsInRadius(
+			self.parent:GetTeamNumber(),
+			self.parent:GetAbsOrigin(),
+			nil,
+			radius,
+			DOTA_UNIT_TARGET_TEAM_ENEMY,
+			DOTA_UNIT_TARGET_HERO,
+			immolation:GetAbilityTargetFlags(),
+			FIND_CLOSEST,
+			false
+		)
+		for _, target in pairs(targets) do
+			if IsValidGoodGuyHero(target) then
+				immolation:ToggleAbility()
+				return true
+			end
+		end
+	end
+
+	return false
+end
+
 function modifier_ai:OnIntervalThink()
 	if self.parent:IsIllusion() then return end
 	if Entities:FindByName(nil, "dota_goodguys_fort") == nil then return end
@@ -78,6 +191,8 @@ function modifier_ai:OnIntervalThink()
 	local now = GameRules:GetGameTime()
 	local aggroTarget = self.parent:GetAggroTarget()
 	local attackTarget = self.parent:GetAttackTarget()
+	if not IsLivingTarget(aggroTarget) then aggroTarget = nil end
+	if not IsLivingTarget(attackTarget) then attackTarget = nil end
 
 	-- Aggro is assigned before GetAttackTarget is always populated. Handle both
 	-- states before the normal "already has a target" early return, otherwise a
@@ -86,7 +201,9 @@ function modifier_ai:OnIntervalThink()
 		self:MovePastBreakable()
 		return
 	end
-	if aggroTarget ~= nil then return end
+	-- Keep an existing combat order, but continue into the ability loop below.
+	-- Returning here prevented regular wave casters (notably Magnataur
+	-- Destroyers) from ever using no-target abilities while fighting.
 
 	-- Wave creeps temporarily ignore breakable containers while they move past
 	-- them. The wave controller owns that movement window; issuing another
@@ -103,7 +220,12 @@ function modifier_ai:OnIntervalThink()
 	-- print("AI: Ready to work!:", self.parent:GetUnitName())
 
 	-- Move to ancient if no target
-	if self.ai_state == 1 then
+	if self.ai_state == 1 and aggroTarget == nil and attackTarget == nil then
+		-- OnAttackStart can fire without a matching landed/failed event when
+		-- the target dies, is removed, or becomes invalid during the wind-up.
+		-- Never let that stale flag permanently suppress lane movement.
+		self.isAttacking = false
+
 		-- print(self.parent:GetUnitName() .. " is attacking? ", self.isAttacking)
 		-- print(self.parent:GetUnitName() .. " is attacking? ", self.isAttacking)
 		local ancient = Entities:FindByName(nil, "dota_goodguys_fort")
@@ -147,13 +269,19 @@ function modifier_ai:OnIntervalThink()
 				return
 			end
 
-			if not self.isAttacking then
+			-- Refresh a lost attack-move immediately when stationary, and every
+			-- few seconds while travelling so old wave creeps recover from an
+			-- invalidated path/order without spamming orders every AI tick.
+			local shouldRefreshMoveOrder = not self.parent:IsMoving()
+				or now - self.last_movement >= 3.0
+			if shouldRefreshMoveOrder then
 				self.parent:SetForceAttackTarget(nil)
 				ExecuteOrderFromTable({
 					UnitIndex = self.parent:entindex(),
 					OrderType = DOTA_UNIT_ORDER_ATTACK_MOVE,
 					Position = ancient_position,
 				})
+				self.last_movement = now
 			end
 		end
 		-- Muradin AI
@@ -167,14 +295,31 @@ function modifier_ai:OnIntervalThink()
 			})
 			self.last_goal = random_int
 		end
+	elseif self.ai_state == 4 and aggroTarget == nil and attackTarget == nil then
+		local ancient = Entities:FindByName(nil, "dota_goodguys_fort")
+		if ancient ~= nil and not self.parent:IsMoving() then
+			ExecuteOrderFromTable({
+				UnitIndex = self.parent:entindex(),
+				OrderType = DOTA_UNIT_ORDER_ATTACK_MOVE,
+				Position = ancient:GetAbsOrigin(),
+			})
+		end
 	end
+
+	if self:TryCastFinalWaveIllidanAbility() then return end
 
 	-- print(self.parent:GetCurrentActiveAbility())
 	-- print("Caster is not casting an ability")
 	for ability_index = 0, GetUnitAbilityCount(self.parent) - 1 do
 		local ability = GetUnitAbilityBySafeIndex(self.parent, ability_index)
 
-		if ability and not ability:IsInAbilityPhase() and not ability:IsPassive() and ability:IsActivated() and ability:IsCooldownReady() and ability:GetLevel() > 0 then
+		if ability
+			and not ability:IsInAbilityPhase()
+			and not ability:IsPassive()
+			and ability:IsActivated()
+			and ability:IsCooldownReady()
+			and ability:GetLevel() > 0
+			and not (IsMultiplayerOnlyAbility(ability:GetAbilityName()) and GetConnectedGoodGuyPlayerCount() <= 1) then
 			-- print("Ability is castable:", ability:GetAbilityName())
 			local cast_range = ability:GetCastRange(self.parent:GetCursorPosition(), self.parent) or self.find_enemy_distance
 			local target_team = ability:GetAbilityTargetTeam()
@@ -185,8 +330,26 @@ function modifier_ai:OnIntervalThink()
 			if cast_range == 0 then cast_range = self.find_enemy_distance end
 			-- print("Cast Range:", cast_range)
 			cast_range = cast_range * 0.9 -- 90% of the range to allow projectiles hit the target. e.g: Mirana's Starfall
-			local allies = FindUnitsInRadius(self.parent:GetTeamNumber(), self.parent:GetAbsOrigin(), nil, cast_range, self.parent:GetTeamNumber(), target_type, ability:GetAbilityTargetFlags(), FIND_ANY_ORDER, false)
-			local enemies = FindUnitsInRadius(self.parent:GetTeamNumber(), self.parent:GetAbsOrigin(), nil, cast_range, target_team, target_type, ability:GetAbilityTargetFlags(), FIND_ANY_ORDER, false)
+			local searchOrder = (self.ai_state == 3 or self.ai_state == 4) and FIND_CLOSEST or FIND_ANY_ORDER
+			local allies = FindUnitsInRadius(self.parent:GetTeamNumber(), self.parent:GetAbsOrigin(), nil, cast_range, self.parent:GetTeamNumber(), target_type, ability:GetAbilityTargetFlags(), searchOrder, false)
+			local enemies = FindUnitsInRadius(self.parent:GetTeamNumber(), self.parent:GetAbsOrigin(), nil, cast_range, target_team, target_type, ability:GetAbilityTargetFlags(), searchOrder, false)
+
+			if self.ai_state == 3 or self.ai_state == 4 then
+				local goodGuyHeroes = {}
+				for _, enemy in pairs(enemies) do
+					if enemy ~= nil
+						and IsValidEntity(enemy)
+						and enemy:IsAlive()
+						and enemy:GetTeamNumber() == DOTA_TEAM_GOODGUYS
+						and enemy:IsRealHero()
+						and not enemy:IsIllusion() then
+						table.insert(goodGuyHeroes, enemy)
+					end
+				end
+				if #goodGuyHeroes > 0 then
+					enemies = goodGuyHeroes
+				end
+			end
 
 			-- print(#enemies)
 			if #enemies == 0 then
@@ -198,13 +361,6 @@ function modifier_ai:OnIntervalThink()
 				end
 
 				return
-			elseif #enemies == 1 and IsValidEntity(enemies[1]) and not enemies[1]:IsInvisible() then
-				for _, restricted_ab in pairs(_G.multiplayer_abilities_cast) do
-					if ability:GetAbilityName() == restricted_ab then
-						-- print("Casting this ability in solo mode is restricted!!")
-						return
-					end
-				end
 			end
 
 			-- Bug with jugg boss, no behavior after first cast

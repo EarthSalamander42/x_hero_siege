@@ -37,10 +37,12 @@ local DARK_COLORS = {
 }
 
 local FROST_NOVA_PARTICLE = "particles/units/heroes/hero_lich/lich_frost_nova.vpcf"
+local REMORSELESS_WINTER_CAST_PARTICLE = "particles/units/heroes/hero_crystalmaiden/maiden_freezing_field_caster.vpcf"
 local FROSTMOURNE_PARTICLE = "particles/units/heroes/hero_abaddon/abaddon_death_coil_explosion.vpcf"
 local GLACIAL_SPIKE_PARTICLE = "particles/econ/items/crystal_maiden/crystal_maiden_cowl_of_ice/maiden_crystal_nova_cowlofice.vpcf"
 local DEFILE_PARTICLE = "particles/units/heroes/hero_abaddon/abaddon_aphotic_shield_explosion.vpcf"
 local SINDRAGOSA_BREATH_PARTICLE = "particles/custom/bosses/lich_king/sindragosa_dragon_slave.vpcf"
+local SINDRAGOSA_BREATH_LINK_PARTICLE = "particles/custom/bosses/lich_king/sindragosa_breath_link.vpcf"
 local SINDRAGOSA_AURA_PARTICLE = "particles/units/heroes/hero_winter_wyvern/wyvern_ambient_dryice_soft.vpcf"
 local SINDRAGOSA_VISUAL_UNIT = "npc_dota_lich_king_sindragosa"
 
@@ -236,9 +238,17 @@ local function CreateImpact(position, particleName, radius, duration)
 	end)
 end
 
+local function ClearRemorselessWinterCastParticle(ability, immediate)
+	if ability == nil or ability.xhs_remorseless_winter_cast_particle == nil then return end
+
+	ParticleManager:DestroyParticle(ability.xhs_remorseless_winter_cast_particle, immediate == true)
+	ParticleManager:ReleaseParticleIndex(ability.xhs_remorseless_winter_cast_particle)
+	ability.xhs_remorseless_winter_cast_particle = nil
+end
+
 -- Purely visual flyby pass. These units never participate in combat; the
 -- progressive breath projectile is the mechanical source of truth.
-local function SpawnSindragosaFlybyVisual(caster, startPosition, direction, distance, height, travelDuration)
+local function SpawnSindragosaFlybyVisual(caster, startPosition, direction, distance, height, travelDuration, breathHeight, breathSpeed)
 	local spawnPosition = startPosition - direction * 600 + Vector(0, 0, height)
 	local endPosition = startPosition + direction * (distance + 600) + Vector(0, 0, height)
 	local dragon = CreateUnitByName(SINDRAGOSA_VISUAL_UNIT, spawnPosition, false, caster, caster, caster:GetTeamNumber())
@@ -256,20 +266,59 @@ local function SpawnSindragosaFlybyVisual(caster, startPosition, direction, dist
 	local aura = ParticleManager:CreateParticle(SINDRAGOSA_AURA_PARTICLE, PATTACH_ABSORIGIN_FOLLOW, dragon)
 	ParticleManager:SetParticleControl(aura, 1, Vector(1.5, 0, 0))
 
+	local mouthAttachment = "attach_hitloc"
+	for _, attachmentName in ipairs({ "attach_attack1", "attach_mouth", "attach_head" }) do
+		if dragon:ScriptLookupAttachment(attachmentName) > 0 then
+			mouthAttachment = attachmentName
+			break
+		end
+	end
+
+	local breathOrigin = startPosition + Vector(0, 0, breathHeight)
+	local breathLink = ParticleManager:CreateParticle(SINDRAGOSA_BREATH_LINK_PARTICLE, PATTACH_CUSTOMORIGIN, dragon)
+	ParticleManager:SetParticleControlEnt(
+		breathLink,
+		0,
+		dragon,
+		PATTACH_POINT_FOLLOW,
+		mouthAttachment,
+		dragon:GetAbsOrigin(),
+		true
+	)
+	ParticleManager:SetParticleControl(breathLink, 1, breathOrigin)
+
+	local function DestroyBreathLink(immediate)
+		if breathLink == nil then return end
+		ParticleManager:DestroyParticle(breathLink, immediate == true)
+		ParticleManager:ReleaseParticleIndex(breathLink)
+		breathLink = nil
+	end
+
 	local elapsed = 0
 	Timers:CreateTimer(0, function()
 		if not IsValidAlive(dragon) then
 			ParticleManager:DestroyParticle(aura, true)
 			ParticleManager:ReleaseParticleIndex(aura)
+			DestroyBreathLink(true)
 			return nil
 		end
 
 		local progress = math.min(1, elapsed / math.max(0.1, travelDuration))
 		dragon:SetAbsOrigin(spawnPosition + (endPosition - spawnPosition) * progress)
 		dragon:SetForwardVector(direction)
+
+		local breathDistance = elapsed * math.max(1, breathSpeed)
+		if breathDistance <= distance then
+			ParticleManager:SetParticleControl(breathLink, 1, breathOrigin + direction * breathDistance)
+		else
+			-- The link must end on the same frame as the ground breath.
+			DestroyBreathLink(true)
+		end
+
 		if progress >= 1 then
 			ParticleManager:DestroyParticle(aura, false)
 			ParticleManager:ReleaseParticleIndex(aura)
+			DestroyBreathLink(true)
 			UTIL_Remove(dragon)
 			return nil
 		end
@@ -293,22 +342,41 @@ function xhs_lich_king_remorseless_winter:OnAbilityPhaseStart()
 	if not IsServer() then return true end
 	local caster = self:GetCaster()
 	local radius = self:GetSpecialValueFor("radius")
+	ClearRemorselessWinterCastParticle(self, true)
+	self.xhs_remorseless_winter_cast_particle = ParticleManager:CreateParticle(
+		REMORSELESS_WINTER_CAST_PARTICLE,
+		PATTACH_ABSORIGIN_FOLLOW,
+		caster
+	)
+	ParticleManager:SetParticleControlEnt(
+		self.xhs_remorseless_winter_cast_particle,
+		0,
+		caster,
+		PATTACH_ABSORIGIN_FOLLOW,
+		"attach_hitloc",
+		caster:GetAbsOrigin(),
+		true
+	)
+	ParticleManager:SetParticleControl(self.xhs_remorseless_winter_cast_particle, 1, Vector(radius, 0, 0))
 	StartBossCastBar(self, "Remorseless Winter")
 	XHSBossTelegraphs:Circle(caster:GetAbsOrigin(), radius, self:GetCastPoint(), LICH_COLORS)
 	XHSBossTelegraphs:Ring(caster:GetAbsOrigin(), radius * 0.65, 155, 12, self:GetCastPoint(), LICH_COLORS, 15)
 	StartAnimation(caster, { duration = self:GetCastPoint() + 0.25, activity = ACT_DOTA_CAST_ABILITY_4, rate = 0.75 })
-	caster:EmitSound("Hero_Lich.IceAge")
+	caster:EmitSound("Hero_Crystal.FreezingField.Cast")
 	return true
 end
 
 function xhs_lich_king_remorseless_winter:OnAbilityPhaseInterrupted()
-	if IsServer() then HideBossCastBar(self) end
+	if not IsServer() then return end
+	ClearRemorselessWinterCastParticle(self, true)
+	HideBossCastBar(self)
 end
 
 function xhs_lich_king_remorseless_winter:OnSpellStart()
 	if not IsServer() then return end
 	local caster = self:GetCaster()
 	local radius = self:GetSpecialValueFor("radius")
+	ClearRemorselessWinterCastParticle(self, false)
 	DamageEnemies(caster, self, caster:GetAbsOrigin(), radius, ScaleDamage(self:GetSpecialValueFor("damage")), self:GetAbilityDamageType(), 2)
 	SlowEnemies(caster, self, caster:GetAbsOrigin(), radius, self:GetSpecialValueFor("slow_duration"))
 	caster:AddNewModifier(caster, self, "modifier_xhs_lich_king_remorseless", { duration = self:GetSpecialValueFor("buff_duration") })
@@ -511,7 +579,16 @@ function xhs_lich_king_sindragosa_flyby:OnSpellStart()
 		local side = RotatePosition(Vector(0, 0, 0), QAngle(0, 90, 0), normalized)
 		local start = center - normalized * 850 + side * ((index - ((#directions + 1) / 2)) * self:GetSpecialValueFor("lane_offset"))
 		local travelDuration = distance / breathSpeed
-		SpawnSindragosaFlybyVisual(caster, start, normalized, distance, visualHeight, travelDuration + 0.8)
+		SpawnSindragosaFlybyVisual(
+			caster,
+			start,
+			normalized,
+			distance,
+			visualHeight,
+			travelDuration + 0.8,
+			breathHeight,
+			breathSpeed
+		)
 		ProjectileManager:CreateLinearProjectile({
 			Ability = self,
 			EffectName = SINDRAGOSA_BREATH_PARTICLE,

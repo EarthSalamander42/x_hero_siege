@@ -259,6 +259,9 @@ function modifier_xhs_illidan_phase3_ai:TryThresholdMetamorphosis(now)
 			self.cast_until = now + duration
 			self.recover_until = self.cast_until + XHSPhase3BossAI:ScaleDelay(1.0)
 			self:UpdateBossBarMarkers()
+			if UpdateBossBar ~= nil then
+				UpdateBossBar(boss)
+			end
 			return true
 		end
 	end
@@ -348,7 +351,9 @@ function modifier_xhs_illidan_phase3_ai:CastImmolationBurst()
 	local ability = CastPreparedAbility(boss, "xhs_illidan_immolation_burst", {}, boss:GetAbsOrigin() + boss:GetForwardVector() * 100)
 	if ability == nil then return nil end
 
-	return GetAbilityCastPoint(ability) + ability:GetSpecialValueFor("duration")
+	local pulseCount = math.max(1, math.floor(ability:GetSpecialValueFor("pulse_count")))
+	local pulseDuration = math.max(0, pulseCount - 1) * ability:GetSpecialValueFor("pulse_interval")
+	return GetAbilityCastPoint(ability) + pulseDuration + 0.35
 end
 
 function modifier_xhs_illidan_phase3_ai:CastGlaiveStorm()

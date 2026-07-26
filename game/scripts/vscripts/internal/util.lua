@@ -329,6 +329,83 @@ function XHSIsPotionItemName(itemName)
 	return itemName ~= nil and XHS_POTION_ITEM_NAMES[tostring(itemName)] == true
 end
 
+local XHS_TOME_OPTIONAL_EVENT_LOCK_REASONS = {
+	hero_image = "#xhs_tome_lock_hero_image",
+	all_hero_images = "#xhs_tome_lock_all_hero_images",
+	spirit_beast = "#xhs_tome_lock_spirit_beast",
+	frost_infernal = "#xhs_tome_lock_frost_infernal",
+}
+
+function XHSGetTomePurchaseLockReason(playerID)
+	if playerID == nil or playerID < 0 or not PlayerResource:IsValidPlayerID(playerID) then
+		return nil
+	end
+
+	if GameRules:IsGamePaused() then
+		return "#xhs_tome_lock_paused"
+	end
+
+	if IsPlayerXHSReincarnating ~= nil and IsPlayerXHSReincarnating(playerID) then
+		return "#xhs_tome_lock_reincarnating"
+	end
+
+	local player = PlayerResource:GetPlayer(playerID)
+	local hero = PlayerResource:GetSelectedHeroEntity(playerID)
+		or (player ~= nil and player:GetAssignedHero() or nil)
+	if hero ~= nil and not hero:IsNull() and hero.xhs_optional_event_tome_locked == true then
+		return XHS_TOME_OPTIONAL_EVENT_LOCK_REASONS[hero.xhs_optional_event_tome_lock_name]
+			or "#xhs_tome_lock_optional_event"
+	end
+
+	if GameMode ~= nil and GameMode.Muradin_occuring == true then
+		return "#xhs_tome_lock_muradin"
+	end
+
+	if GameMode ~= nil and GameMode.SpecialArena_occuring == true then
+		if SpecialEvents ~= nil and SpecialEvents.Ramero_trigger == 1 then
+			return "#xhs_tome_lock_ramero"
+		elseif SpecialEvents ~= nil and SpecialEvents.Ramero_trigger == 2 then
+			return "#xhs_tome_lock_sogat"
+		end
+		return "#xhs_tome_lock_special_arena"
+	end
+
+	if BT_ENABLED == 0 then
+		return "#xhs_tome_lock_temporarily_disabled"
+	end
+
+	return nil
+end
+
+function XHSPublishTomePurchaseStatus(playerID)
+	if CustomNetTables == nil or playerID == nil or playerID < 0
+		or not PlayerResource:IsValidPlayerID(playerID) then
+		return
+	end
+
+	local reason = XHSGetTomePurchaseLockReason(playerID)
+	local signature = reason or ""
+	_G.XHSTomePurchaseStatusCache = _G.XHSTomePurchaseStatusCache or {}
+	if _G.XHSTomePurchaseStatusCache[playerID] == signature then
+		return
+	end
+
+	_G.XHSTomePurchaseStatusCache[playerID] = signature
+	CustomNetTables:SetTableValue("xhs_tome_purchase", tostring(playerID), {
+		locked = reason ~= nil and 1 or 0,
+		reason = signature,
+	})
+end
+
+function XHSPublishAllTomePurchaseStatuses()
+	local maxPlayers = DOTA_MAX_TEAM_PLAYERS or 24
+	for playerID = 0, maxPlayers - 1 do
+		if PlayerResource:IsValidPlayerID(playerID) then
+			XHSPublishTomePurchaseStatus(playerID)
+		end
+	end
+end
+
 function SetHeroOptionalEventTomeLock(hero, eventName, isLocked)
 	if hero == nil or hero:IsNull() then return end
 
@@ -338,6 +415,11 @@ function SetHeroOptionalEventTomeLock(hero, eventName, isLocked)
 	else
 		hero.xhs_optional_event_tome_locked = nil
 		hero.xhs_optional_event_tome_lock_name = nil
+	end
+
+	local playerID = hero:GetPlayerID()
+	if playerID ~= nil and playerID >= 0 then
+		XHSPublishTomePurchaseStatus(playerID)
 	end
 end
 
@@ -995,6 +1077,11 @@ function TeleportHero(hero, point, delay, iCameraSpeed)
 	local TeleportEffectEnd
 
 	if delay > 0 then
+		-- Reveal the Lua teleport destination only for the duration of the
+		-- teleport. Arena entrances and returns can therefore be understood
+		-- without leaving permanent vision behind.
+		AddFOWViewer(hero:GetTeamNumber(), point, 400, delay, false)
+
 		TeleportEffect = ParticleManager:CreateParticle("particles/items2_fx/teleport_start.vpcf", PATTACH_ABSORIGIN, hero, hero)
 		ParticleManager:SetParticleControlEnt(TeleportEffect, PATTACH_ABSORIGIN, hero, PATTACH_ABSORIGIN, "attach_origin", pos, true)
 		hero:Attribute_SetIntValue("effectsID", TeleportEffect)

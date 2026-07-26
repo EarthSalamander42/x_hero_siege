@@ -11,6 +11,7 @@
 	</styles>
 
 	<scripts>
+		<include src="file://{resources}/scripts/custom_game/xhs_name_display.js" />
 		<include src="s2r://panorama/scripts/custom_game/xhs_supporter_hover.vjs_c" />
 		<include src="s2r://panorama/scripts/custom_game/dungeon_scoreboard.vjs_c" />
 	</scripts>

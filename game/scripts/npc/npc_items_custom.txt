@@ -43,7 +43,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"item_branches"
-		"AbilityTextureName"			"orb_of_passage"
+		"AbilityTextureName"			"blink"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"Model"							"models/gameplay/orb_passage.vmdl"
 
@@ -772,7 +772,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"item_lua"
-		"AbilityTextureName"			"rhyziks_eye"
+		"AbilityTextureName"			"seer_stone"
 		"ScriptFile"					"items/item_rhyziks_eye"
 
 		"Model"							"models/props_gameplay/treasure_chest001.vmdl"
@@ -967,7 +967,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"item_lua"
-		"AbilityTextureName"			"the_caustic_finale"
+		"AbilityTextureName"			"orb_of_corrosion"
 		"ScriptFile"					"items/item_the_caustic_finale"
 
 		"Model"							"models/props_gameplay/treasure_chest001.vmdl"
@@ -1459,7 +1459,7 @@
 		"ID"							"2513"
 		"BaseClass"						"item_lua"
 		"ScriptFile"					"items/item_key_of_the_three_moons.lua"
-		"AbilityTextureName" 			"custom/key_of_the_three_moons"
+		"AbilityTextureName" 			"key_of_the_three_moons"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"AbilityCastRange"				"0"
 		"Model"							"models/props_items/bloodstone.vmdl"
@@ -1499,7 +1499,7 @@
 		"ID"							"2520"
 		"BaseClass"             		"item_datadriven"
 		"Model"							"models/props_gameplay/recipe.vmdl"
-		"AbilityTextureName"			"custom/recipe"
+		"AbilityTextureName"			"recipe"
 		
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
@@ -1531,7 +1531,7 @@
 		"ID"							"2521"
 		"BaseClass"						"item_lua"
 		"ScriptFile"					"items/shield_of_invincibility.lua"
-		"AbilityTextureName" 			"custom/shield_of_invincibility"
+		"AbilityTextureName" 			"shield_of_invincibility"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"AbilityCastRange"				"0"
 		"AbilityCooldown"				"0.0"
@@ -1683,7 +1683,7 @@
 		"ID"							"2553"
 		"BaseClass"             		"item_datadriven"
 		"Model"							"models/props_gameplay/recipe.vmdl"
-		"AbilityTextureName"			"custom/recipe"
+		"AbilityTextureName"			"recipe"
 		"ItemCost"						"10000"
 		"ItemShopTags"					""
 		"ItemRecipe"					"1"
@@ -1739,7 +1739,7 @@
 		"ID"							"2555"
 		"BaseClass"             		"item_datadriven"
 		"Model"							"models/props_gameplay/recipe.vmdl"
-		"AbilityTextureName"			"custom/recipe"
+		"AbilityTextureName"			"recipe"
 		"ItemCost"						"30000"
 		"ItemShopTags"					""
 		"ItemRecipe"					"1"
@@ -1807,7 +1807,7 @@
 		"ID"							"2526"
 		"BaseClass"             		"item_datadriven"
 		"Model"							"models/props_gameplay/recipe.vmdl"
-		"AbilityTextureName"			"custom/recipe"
+		"AbilityTextureName"			"recipe"
 
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
@@ -1839,7 +1839,7 @@
 		"BaseClass"             		"item_lua"
 		"ScriptFile"					"items/item_lightning_sword.lua"
 		"ID"							"2527"
-		"AbilityTextureName"			"custom/lightning_sword"		
+		"AbilityTextureName"			"lightning_sword"		
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"Model"							"models/props_items/blinkdagger.vmdl"
 		"Effect"						"particles/units/heroes/hero_morphling/morphling_ambient_new.vpcf"
@@ -2085,6 +2085,7 @@
 			{
 				"Passive"					"0"
 				"IsHidden"					"0"
+				"TextureName"				"custom/potion_of_antimagic"
 				"EffectName"				"particles/items_fx/black_king_bar_avatar.vpcf"
 				"EffectAttachType"			"PATTACH_ABSORIGIN"
 
@@ -2112,7 +2113,7 @@
 		"BaseClass"             		"item_lua"
 		"ScriptFile"					"items/ring_of_superiority.lua"
 		"ID"							"2532"
-		"AbilityTextureName"			"custom/ring_of_superiority"		
+		"AbilityTextureName"			"ring_of_superiority"		
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"Model"							"models/props_items/ring_health.vmdl"
 		"Effect"						"particles/units/heroes/hero_morphling/morphling_morph_agi.vpcf"
@@ -2209,10 +2210,16 @@
 		//----------------------------------------------------------------------------------------------------
 		"BaseClass"             		"item_datadriven"
 		"ID"							"2546"
-		"AbilityTextureName"			"custom/necklace_of_spell_immunity"		
+		"AbilityTextureName"			"custom/necklace_of_spell_immunity"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"Model"							"models/props_items/staff_wizardry01.vmdl"
 		"Effect"						"particles/units/heroes/hero_doom_bringer/doom_bringer_doom_ring.vpcf"
+
+		"precache"
+		{
+			"particle"	"particles/items_fx/black_king_bar_avatar.vpcf"
+			"particle"	"particles/status_fx/status_effect_avatar.vpcf"
+		}
 
 		// Item Info
 		//----------------------------------------------------------------------------------------------------
@@ -2231,6 +2238,10 @@
 				"Passive"						"1"
 				"IsHidden"						"0"
 				"TextureName"					"modifiers/necklace_of_spell_immunity"
+				"EffectName"						"particles/items_fx/black_king_bar_avatar.vpcf"
+				"EffectAttachType"				"PATTACH_ABSORIGIN_FOLLOW"
+				"StatusEffectName"				"particles/status_fx/status_effect_avatar.vpcf"
+				"StatusEffectPriority"			"10"
 
 				"Properties"
 				{
@@ -2257,8 +2268,8 @@
 		"BaseClass"						"item_lua"
 		"ScriptFile"					"items/item_tombstone.lua"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_CHANNELLED | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK"
-		"Model"							"models/props_gameplay/tombstoneb01.vmdl"
-		"AbilityTextureName"			"undying_tombstone"
+		"Model"							"models/props_gameplay/tombstonea01.vmdl"
+		"AbilityTextureName"			"tombstone"
 		"PingOverrideText"				"DOTA_Chat_Tombstone_Pinged"
 
 		// Stats
@@ -2277,6 +2288,7 @@
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
 		"ItemPermanent"					"0"
 		"ItemInitialCharges"			"1"
+		// Picking the Tombstone is the revive interaction: cast immediately instead of storing it.
 		"ItemCastOnPickup"				"1"
 		"ItemKillable"					"0"
 	}

@@ -103,6 +103,7 @@ function XHSDevTools:Init()
 	self.spawned_units = {}
 	self.invulnerable_players = false
 	self.campaign_flow_active = false
+	self.host_timescale = Convars ~= nil and Convars:GetFloat("host_timescale") or 1
 	self.last_result = {
 		action = "",
 		ok = true,
@@ -203,6 +204,24 @@ function XHSDevTools:RunAction(action, event)
 		local enabled = IsTruthy(event.enabled)
 		self:SetSandboxActive(enabled, "manual toggle")
 		return enabled and "Sandbox enabled" or "Sandbox disabled"
+	elseif action == "set_timescale" then
+		local requested = ToNumber(event.timescale, 1)
+		local canonicalTimescales = { 0.1, 1, 3, 5 }
+		local canonicalRequested = nil
+		for _, value in ipairs(canonicalTimescales) do
+			if math.abs(requested - value) < 0.001 then
+				canonicalRequested = value
+				break
+			end
+		end
+		if canonicalRequested == nil then
+			error("Unsupported host_timescale value")
+		end
+		requested = canonicalRequested
+
+		self.host_timescale = requested
+		SendToServerConsole("host_timescale " .. tostring(requested))
+		return "host_timescale " .. tostring(requested)
 	elseif action == "start_final_wave" then
 		self:ActivateSandbox("final_wave")
 		if FinalWave then
@@ -255,6 +274,14 @@ function XHSDevTools:RunAction(action, event)
 		return self:ToggleInvulnerable()
 	elseif action == "set_temporary_donator_status" then
 		return self:SetTemporaryDonatorStatus(event)
+	elseif action == "preview_vip_dialog" then
+		return self:PreviewVipDialog(event)
+	elseif action == "close_vip_dialog_preview" then
+		return self:CloseVipDialogPreview(event)
+	elseif action == "preview_cinematic" then
+		return self:PreviewCinematic(event)
+	elseif action == "end_cinematic_preview" then
+		return self:EndCinematicPreview(event)
 	elseif action == "fragment_quests_reroll" then
 		if FragmentQuests == nil then return "FragmentQuests is unavailable" end
 		FragmentQuests:DevReroll()
@@ -730,6 +757,114 @@ function XHSDevTools:GetPrimaryGoodHero()
 	return nil
 end
 
+function XHSDevTools:GetActionPlayer(event)
+	local playerID = ToNumber(event and event.PlayerID, -1)
+	if PlayerResource:IsValidPlayerID(playerID) then
+		return PlayerResource:GetPlayer(playerID)
+	end
+
+	local hero = self:GetPrimaryGoodHero()
+	return hero ~= nil and hero:GetPlayerOwner() or nil
+end
+
+function XHSDevTools:PreviewVipDialog(event)
+	local player = self:GetActionPlayer(event)
+	if player == nil then
+		return "No player available for VIP dialog preview"
+	end
+
+	local mode = string.lower(tostring(event.mode or "ready"))
+	local ready = mode ~= "next"
+	local playerCount = math.max(1, math.min(8, ToNumber(event.player_count, 1)))
+	local speakerUnit = event.speaker == "uther" and "npc_xhs_paladin_2" or "npc_xhs_paladin"
+	local speakerName = event.speaker == "uther" and "UTHER LIGHTBRINGER" or "SHAL LIGHTBINDER"
+	local text = ready
+		and "The Light answers. When every hero is prepared, I will begin the teleport."
+		or "While I was bound, I felt the enemy gathering beyond the gates. The siege was only their first test."
+
+	CustomGameEventManager:Send_ServerToPlayer(player, "dialog", {
+		DevPreview = 1,
+		PreviewPlayerCount = playerCount,
+		DialogEntIndex = -1,
+		PlayerHeroEntIndex = -1,
+		DialogText = text,
+		RawDialogText = 1,
+		DialogAdvanceTime = 120,
+		DialogLine = 1,
+		ShowAdvanceButton = not ready,
+		SendToAll = true,
+		DialogPlayerConfirm = ready and 1 or 0,
+		ConfirmToken = "XHSDevPreview",
+		JournalEntry = false,
+		SpeakerUnitName = speakerUnit,
+		SpeakerName = speakerName,
+	})
+
+	return "VIP dialog preview: " .. mode .. " / " .. tostring(playerCount) .. " players"
+end
+
+function XHSDevTools:CloseVipDialogPreview(event)
+	local player = self:GetActionPlayer(event)
+	if player ~= nil then
+		CustomGameEventManager:Send_ServerToPlayer(player, "xhs_dialog_dev_preview_close", {})
+	end
+	return "VIP dialog preview closed"
+end
+
+function XHSDevTools:PreviewCinematic(event)
+	local player = self:GetActionPlayer(event)
+	if player == nil then
+		return "No player available for cinematic preview"
+	end
+	if XHSCinematics == nil then
+		error("XHSCinematics is unavailable")
+	end
+
+	local mode = string.lower(tostring(event.mode or "bars"))
+	local options = {
+		duration = 0,
+		letterbox_pct = 10,
+		transition = 0.5,
+		hide_hud = false,
+	}
+
+	if mode == "title" then
+		options.title = "X HERO SIEGE"
+		options.subtitle = "Server event cinematic diagnostic"
+	elseif mode == "full" then
+		options.duration = 5
+		options.transition = 0.75
+		options.hide_hud = true
+		options.title = "FINAL WAVE"
+		options.subtitle = "HUD restore should occur automatically"
+	elseif mode == "final_wave" then
+		options.duration = 8
+		options.transition = 0.75
+		options.hide_hud = true
+	else
+		mode = "bars"
+	end
+
+	self.dev_cinematic_id = "xhs_dev_server_" .. mode
+	XHSCinematics:BeginForPlayer(player, self.dev_cinematic_id, options)
+	return "Cinematic preview started: " .. mode
+end
+
+function XHSDevTools:EndCinematicPreview(event)
+	local player = self:GetActionPlayer(event)
+	if player == nil then
+		return "No player available for cinematic preview"
+	end
+	if XHSCinematics == nil then
+		error("XHSCinematics is unavailable")
+	end
+
+	local cinematicId = self.dev_cinematic_id or "xhs_dev_server_bars"
+	XHSCinematics:EndForPlayer(player, cinematicId)
+	self.dev_cinematic_id = nil
+	return "Cinematic preview ended"
+end
+
 function XHSDevTools:TriggerEvent(event_name)
 	if event_name == "muradin" then
 		SpecialEvents:MuradinEvent(10)
@@ -1057,6 +1192,7 @@ function XHSDevTools:PushState()
 		creep_level = CustomTimers and CustomTimers.creep_level or 1,
 		special_wave = CustomTimers and CustomTimers.special_wave or 1,
 		invulnerable_players = self.invulnerable_players == true,
+		host_timescale = self.host_timescale or 1,
 		lanes = self.enabled and self:BuildLaneState() or {},
 		quests = self.enabled and self:BuildQuestState() or {},
 		bosses = self.enabled and self:BuildBossState() or {},

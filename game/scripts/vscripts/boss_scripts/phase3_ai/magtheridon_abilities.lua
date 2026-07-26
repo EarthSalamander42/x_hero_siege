@@ -33,7 +33,6 @@ local FEL_STOMP_IMPACT_SOUND = "Hero_Brewmaster.ThunderClap"
 local FIRESTORM_PRECAST_SOUND = "Hero_AbyssalUnderlord.Firestorm.Cast"
 local FIRESTORM_IMPACT_SOUND = "Hero_AbyssalUnderlord.Firestorm.Target"
 local FEL_FISSURE_PRECAST_SOUND = "Hero_ElderTitan.EarthSplitter.Cast"
-local FEL_FISSURE_IMPACT_SOUND = "Hero_ElderTitan.EarthSplitter.Destroy"
 local INFERNAL_RINGS_PRECAST_SOUND = "Hero_AbyssalUnderlord.PitOfMalice.Start"
 local INFERNAL_RINGS_IMPACT_SOUND = "Hero_AbyssalUnderlord.Pit.Target"
 local DEMONIC_HOWL_PRECAST_SOUND = "Hero_Lycan.Howl.Team"
@@ -513,7 +512,6 @@ function xhs_magtheridon_fel_fissure:OnSpellStart()
 		local position = entry.position
 		Timers:CreateTimer(entry.delay or 0, function()
 			if not IsValidAlive(caster) then return nil end
-			EmitLocationSound(caster, position, FEL_FISSURE_IMPACT_SOUND)
 			local hitUnits = DamageEnemies(caster, self, position, radius, damage, self:GetAbilityDamageType())
 			for _, unit in pairs(hitUnits) do
 				ApplySlow(caster, self, unit, slowDuration, movementSlow, attackSlow)
@@ -740,6 +738,7 @@ function modifier_xhs_magtheridon_demonic_howl:DeclareFunctions() return {
 	MODIFIER_PROPERTY_ATTACKSPEED_BONUS_CONSTANT,
 	MODIFIER_PROPERTY_TOTALDAMAGEOUTGOING_PERCENTAGE,
 	MODIFIER_PROPERTY_TOOLTIP,
+	MODIFIER_PROPERTY_TOOLTIP2,
 } end
 
 function modifier_xhs_magtheridon_demonic_howl:GetModifierMoveSpeedBonus_Percentage()
@@ -756,6 +755,10 @@ end
 
 function modifier_xhs_magtheridon_demonic_howl:OnTooltip()
 	return math.abs(self.damage_reduction_pct or 0)
+end
+
+function modifier_xhs_magtheridon_demonic_howl:OnTooltip2()
+	return math.abs(self.movement_slow or 0)
 end
 
 modifier_xhs_magtheridon_infernal_root = modifier_xhs_magtheridon_infernal_root or class({})

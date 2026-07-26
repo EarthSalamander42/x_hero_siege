@@ -8,6 +8,11 @@
 	var activeWaveDuration = 30;
 	var activeWaveMode = null;
 	var WAVE_RING_COUNTDOWN_SECONDS = 30;
+	var renderedWaveRingRatio = 1;
+	var waveRingAnimationVersion = 0;
+	var queuedActiveWaves = [];
+	var queuedWaveWarning = null;
+	var queuedWaveRowCount = 0;
 	var activeRuneRemaining = 0;
 	var activeRuneBatchId = null;
 	var activeRuneVersion = 0;
@@ -15,14 +20,161 @@
 	var activeRuneHideSchedule = null;
 	var activeRuneCompact = false;
 	var activeRuneAltDown = false;
+	var activeRuneMessage = null;
 	var fragmentQuestNotificationQueue = [];
 	var fragmentQuestNotificationActive = false;
 	var FRAGMENT_QUEST_QUEUE_GAP = 0.35;
 	var activeCurrentEventNotificationOffset = false;
+	var activeChannelNotification = null;
+	var activeChannelNotificationVersion = 0;
+
+	function resolvePlayerIdentity(playerID, playerName, heroName) {
+		if (typeof XHSNameDisplay !== "undefined" && XHSNameDisplay.Resolve) {
+			return XHSNameDisplay.Resolve({
+				playerID: Number(playerID),
+				playerName: playerName || "",
+				heroName: heroName || "",
+			});
+		}
+
+		// Privacy-safe fallback: only a hero name may be shown.
+		heroName = String(heroName || "");
+		if (!heroName) {
+			return "";
+		}
+		var localized = $.Localize("#" + heroName);
+		return localized && localized !== ("#" + heroName) ? localized : heroName.replace(/^npc_dota_hero_/, "").replace(/_/g, " ").toUpperCase();
+	}
 
 	function setCurrentEventNotificationOffset(isVisible) {
 		activeCurrentEventNotificationOffset = !!isVisible;
 		$.GetContextPanel().SetHasClass("XHSCurrentEventNotificationOffset", activeCurrentEventNotificationOffset);
+	}
+
+	function getChannelPanelChild(id) {
+		var panel = $(id);
+		return panel && panel.IsValid() ? panel : null;
+	}
+
+	function formatChannelTarget(msg) {
+		var targetName = resolvePlayerIdentity(
+			msg.target_player_id,
+			msg.target_name,
+			msg.target_unit_name
+		);
+		return targetName ? "Reviving " + targetName : "Reviving ally";
+	}
+
+	function updateChannelNotification(version) {
+		if (version !== activeChannelNotificationVersion || !activeChannelNotification) {
+			return;
+		}
+
+		var progress = getChannelPanelChild("#XHSChannelProgress");
+		var time = getChannelPanelChild("#XHSChannelTime");
+		var now = Game.GetGameTime();
+		var remaining = Math.max(0, activeChannelNotification.endTime - now);
+		var elapsedRatio = 1 - Math.min(1, remaining / activeChannelNotification.duration);
+
+		if (progress) {
+			progress.style.width = (elapsedRatio * 100).toFixed(2) + "%";
+		}
+		if (time) {
+			time.text = remaining.toFixed(1) + "s";
+		}
+
+		if (remaining > 0) {
+			$.Schedule(0.03, function () {
+				updateChannelNotification(version);
+			});
+		}
+	}
+
+	function showChannelNotification(msg) {
+		msg = msg || {};
+		var panel = getChannelPanelChild("#XHSChannelNotification");
+		if (!panel) {
+			$.Msg("[XHS][ChannelNotification] Missing XHSChannelNotification panel.");
+			return;
+		}
+
+		var duration = Math.max(0.1, Number(msg.duration) || 0.1);
+		var now = Game.GetGameTime();
+		activeChannelNotificationVersion += 1;
+		activeChannelNotification = {
+			id: String(msg.id || ""),
+			duration: duration,
+			endTime: Number(msg.end_time) || (now + duration),
+			message: msg,
+		};
+
+		panel.RemoveClass("XHSChannelNotificationHidden");
+		panel.RemoveClass("XHSChannelNotificationCompleted");
+		panel.RemoveClass("XHSChannelNotificationCancelled");
+
+		var eyebrow = getChannelPanelChild("#XHSChannelEyebrow");
+		var title = getChannelPanelChild("#XHSChannelTitle");
+		var time = getChannelPanelChild("#XHSChannelTime");
+		var progress = getChannelPanelChild("#XHSChannelProgress");
+		var icon = getChannelPanelChild("#XHSChannelItemIcon");
+
+		if (eyebrow) {
+			eyebrow.text = String(msg.eyebrow || "CHANNELING");
+		}
+		if (title) {
+			title.text = String(msg.title || formatChannelTarget(msg));
+		}
+		if (time) {
+			time.text = duration.toFixed(1) + "s";
+		}
+		if (progress) {
+			progress.style.width = "0%";
+		}
+		if (icon && msg.item_name) {
+			icon.itemname = String(msg.item_name);
+		}
+		if (msg.sound && msg.sound !== "none") {
+			Game.EmitSound(String(msg.sound));
+		}
+
+		updateChannelNotification(activeChannelNotificationVersion);
+	}
+
+	function finishChannelNotification(msg) {
+		msg = msg || {};
+		var panel = getChannelPanelChild("#XHSChannelNotification");
+		if (!panel || !activeChannelNotification) {
+			return;
+		}
+		if (msg.id && String(msg.id) !== activeChannelNotification.id) {
+			return;
+		}
+
+		activeChannelNotificationVersion += 1;
+		var completed = String(msg.result || "") === "completed";
+		var eyebrow = getChannelPanelChild("#XHSChannelEyebrow");
+		var time = getChannelPanelChild("#XHSChannelTime");
+		var progress = getChannelPanelChild("#XHSChannelProgress");
+
+		panel.SetHasClass("XHSChannelNotificationCompleted", completed);
+		panel.SetHasClass("XHSChannelNotificationCancelled", !completed);
+		if (eyebrow) {
+			eyebrow.text = completed ? String(msg.completed_text || "REVIVE COMPLETE") : String(msg.cancelled_text || "CHANNEL INTERRUPTED");
+		}
+		if (time) {
+			time.text = completed ? "READY" : "";
+		}
+		if (progress) {
+			progress.style.width = completed ? "100%" : "0%";
+		}
+
+		var closingVersion = activeChannelNotificationVersion;
+		activeChannelNotification = null;
+		$.Schedule(completed ? 0.9 : 0.55, function () {
+			if (closingVersion === activeChannelNotificationVersion && panel && panel.IsValid()) {
+				panel.AddClass("XHSChannelNotificationHidden");
+			}
+		});
 	}
 
 	function getDuration(msg) {
@@ -208,6 +360,33 @@
 		activeWaveSchedule = null;
 	}
 
+	function startLocalWaveCountdown(duration) {
+		var endTime = Game.GetGameTime() + Math.max(0, duration);
+
+		function tickLocalWaveCountdown() {
+			activeWaveSchedule = null;
+			if (activeWaveTimerName || activeWaveMode !== "warning") {
+				return;
+			}
+
+			var remaining = Math.max(0, Math.ceil(endTime - Game.GetGameTime()));
+			updateWaveCountdown(remaining);
+			if (remaining <= 0) {
+				activeWaveSchedule = $.Schedule(0.35, function () {
+					activeWaveSchedule = null;
+					if (!activeWaveTimerName && activeWaveMode === "warning") {
+						hideWavePanel();
+					}
+				});
+				return;
+			}
+
+			activeWaveSchedule = $.Schedule(0.1, tickLocalWaveCountdown);
+		}
+
+		activeWaveSchedule = $.Schedule(0.1, tickLocalWaveCountdown);
+	}
+
 	function cancelRuneSchedule(schedule) {
 		if (schedule === null) {
 			return null;
@@ -296,6 +475,8 @@
 			toast.AddClass("XHSNotificationWarning");
 		} else if (severity === "success") {
 			toast.AddClass("XHSNotificationSuccess");
+		} else if (severity === "system" || severity === "cosmetic") {
+			toast.AddClass("XHSNotificationSystem");
 		}
 
 		if (msg.rewardType) {
@@ -344,7 +525,21 @@
 			toast.AddClass("XHSNotificationSpecialArena");
 		}
 
-		if (msg.hero != null) {
+		if (msg.identity_player_id != null) {
+			segment = $.CreatePanel("Label", content, "");
+			segment.AddClass("XHSNotificationMessage");
+			segment.AddClass("TitleText");
+			segment.AddClass("XHSNotificationIdentity");
+			var identityPlayerID = Number(msg.identity_player_id);
+			if (isNaN(identityPlayerID)) {
+				identityPlayerID = -1;
+			}
+			segment.SetAttributeInt("xhs_identity_player_id", identityPlayerID);
+			segment.SetAttributeString("xhs_identity_player_name", String(msg.identity_player_name || ""));
+			segment.SetAttributeString("xhs_identity_hero_name", String(msg.identity_hero_name || ""));
+			var identity = resolvePlayerIdentity(msg.identity_player_id, msg.identity_player_name, msg.identity_hero_name);
+			segment.text = identity ? identity + " " : "";
+		} else if (msg.hero != null) {
 			segment = $.CreatePanel("DOTAHeroImage", content, "");
 			segment.heroimagestyle = msg.imagestyle || "icon";
 			segment.heroname = msg.hero;
@@ -645,6 +840,114 @@
 		removeNotification(msg, $(BOTTOM_CONTAINER_ID));
 	}
 
+	function normalizeQueuedWaves(rawWaves) {
+		var waves = [];
+		rawWaves = rawWaves || {};
+		for (var key in rawWaves) {
+			if (!rawWaves[key] || typeof rawWaves[key] !== "object") {
+				continue;
+			}
+			waves.push(rawWaves[key]);
+		}
+		waves.sort(function (left, right) {
+			return Number(left.wave_index || 0) - Number(right.wave_index || 0);
+		});
+		return waves;
+	}
+
+	function queuedWaveMatches(left, right) {
+		if (!left || !right) {
+			return false;
+		}
+		if (left.id && right.id) {
+			return String(left.id) === String(right.id);
+		}
+		return Number(left.wave_index || 0) === Number(right.wave_index || 0);
+	}
+
+	function createQueuedWaveRow(container, wave, warning, index) {
+		var row = $.CreatePanel("Panel", container, "XHSWaveQueueRow" + index);
+		row.AddClass("XHSWaveQueueRow");
+		row.SetHasClass("XHSWaveQueueWarningRow", warning);
+
+		var identity = $.CreatePanel("Label", row, "");
+		identity.AddClass("XHSWaveQueueIdentity");
+		var waveIndex = Math.max(0, Number(wave.wave_index || 0));
+		var direction = String(wave.direction || "").toUpperCase();
+		identity.text = (waveIndex > 0 ? "WAVE " + waveIndex : "NEXT WAVE")
+			+ (direction ? "  ·  " + direction : "");
+
+		var status = $.CreatePanel("Label", row, "");
+		status.AddClass("XHSWaveQueueStatus");
+		status.text = warning ? "INCOMING" : "QUEUED";
+
+		var value = $.CreatePanel("Label", row, "");
+		value.AddClass("XHSWaveQueueValue");
+		if (warning) {
+			var remainingSeconds = Math.max(0, Number(wave.remaining || 0));
+			value.text = remainingSeconds > 0 ? formatWaveTime(remainingSeconds) : "ARRIVING";
+		} else {
+			value.text = Math.max(0, Number(wave.remaining || 0)) + " ALIVE";
+		}
+	}
+
+	function renderWaveQueue() {
+		var container = $("#XHSWaveQueue");
+		if (!container) {
+			return;
+		}
+
+		container.RemoveAndDeleteChildren();
+		var rows = queuedActiveWaves.slice(0);
+		var hasWarningInActiveQueue = false;
+		for (var index = 0; index < rows.length; index++) {
+			if (queuedWaveMatches(rows[index], queuedWaveWarning)) {
+				hasWarningInActiveQueue = true;
+			}
+			createQueuedWaveRow(container, rows[index], false, index);
+		}
+
+		if (queuedWaveWarning && !hasWarningInActiveQueue) {
+			createQueuedWaveRow(container, queuedWaveWarning, true, rows.length);
+		}
+
+		queuedWaveRowCount = rows.length + (queuedWaveWarning && !hasWarningInActiveQueue ? 1 : 0);
+		container.SetHasClass("XHSWaveQueueHidden", queuedWaveRowCount === 0);
+		updateRuneQueueOffset();
+	}
+
+	function updateRuneQueueOffset() {
+		var rune = $("#XHSRuneIndicator");
+		if (!rune) {
+			return;
+		}
+		var compact = activeRuneCompact && !activeRuneAltDown;
+		var baseMargin = compact ? 224 : 218;
+		rune.style.marginTop = (baseMargin + queuedWaveRowCount * 27) + "px";
+	}
+
+	function updateQueuedWaveWarning(msg, remaining) {
+		queuedWaveWarning = {
+			wave_index: Number(msg.wave_index || 0),
+			direction: String(msg.direction || ""),
+			remaining: Math.max(0, Number(remaining) || 0)
+		};
+		renderWaveQueue();
+	}
+
+	function showWaveQueue(msg) {
+		queuedActiveWaves = normalizeQueuedWaves(msg && msg.waves);
+		if (queuedWaveWarning) {
+			for (var index = 0; index < queuedActiveWaves.length; index++) {
+				if (queuedWaveMatches(queuedActiveWaves[index], queuedWaveWarning)) {
+					queuedWaveWarning = null;
+					break;
+				}
+			}
+		}
+		renderWaveQueue();
+	}
+
 	function setWaveVisible(visible) {
 		var panel = $(WAVE_PANEL_ID);
 		if (!panel) {
@@ -667,28 +970,97 @@
 		panel.SetHasClass("XHSWaveCleared", mode === "cleared");
 	}
 
-	function updateWaveRingProgress(ratio) {
+	function renderWaveRingProgress(ratio) {
+		var progressClip = $("#XHSWaveRingProgressClip");
+		var ring = $("#XHSWaveRing");
 		var sweep = $("#XHSWaveRingSweep");
 		var fill = $("#XHSWaveRingFill");
-		if (!sweep) {
+		if (!progressClip && !ring && !sweep && !fill) {
 			return;
 		}
 
 		ratio = Math.max(0, Math.min(1, Number(ratio) || 0));
-		var radialClip = "radial(50% 50%, 0.0deg, " + (ratio * -360).toFixed(2) + "deg)";
-		sweep.style.clip = radialClip;
+		renderedWaveRingRatio = ratio;
+		// Panorama can leave a visible seam/wedge on a nominal -360deg radial
+		// clip. A full ring does not need a mask, so remove the scripted clip
+		// entirely at 100% and only use the radial mask while progressing.
+		var radialClip = ratio >= 0.9999
+			? null
+			: "radial(50% 50%, 0.0deg, " + (ratio * -360).toFixed(2) + "deg)";
+		if (progressClip) {
+			// Mask the container, not just each visual panel. Panorama otherwise
+			// renders a panel's box-shadow before its own clip, leaving a full,
+			// overpowering halo behind the countdown wedge.
+			progressClip.style.clip = radialClip;
+		}
+		if (ring) {
+			ring.style.clip = radialClip;
+		}
+		if (sweep) {
+			sweep.style.clip = radialClip;
+			sweep.style.opacity = ratio > 0 ? String(Math.max(0.72, ratio)) : "0";
+			sweep.SetHasClass("XHSWaveRingSweepWarning", ratio > 0 && ratio <= 0.25);
+		}
 		if (fill) {
 			fill.style.clip = radialClip;
 		}
-		sweep.style.opacity = ratio > 0 ? String(Math.max(0.72, ratio)) : "0";
-		sweep.SetHasClass("XHSWaveRingSweepWarning", ratio > 0 && ratio <= 0.25);
+	}
+
+	function animateWaveRingProgress(targetRatio, duration, linear) {
+		targetRatio = Math.max(0, Math.min(1, Number(targetRatio) || 0));
+		duration = Math.max(0, Number(duration) || 0);
+		waveRingAnimationVersion += 1;
+		var version = waveRingAnimationVersion;
+		var startRatio = renderedWaveRingRatio;
+
+		if (duration <= 0 || Math.abs(targetRatio - startRatio) < 0.0001) {
+			renderWaveRingProgress(targetRatio);
+			return;
+		}
+
+		var startTime = Game.GetGameTime();
+		function tickWaveRingAnimation() {
+			if (version !== waveRingAnimationVersion) {
+				return;
+			}
+
+			var elapsed = Math.max(0, Game.GetGameTime() - startTime);
+			var progress = Math.max(0, Math.min(1, elapsed / duration));
+			var easedProgress = linear ? progress : 1 - Math.pow(1 - progress, 3);
+			renderWaveRingProgress(startRatio + (targetRatio - startRatio) * easedProgress);
+
+			if (progress < 1) {
+				$.Schedule(0.03, tickWaveRingAnimation);
+			}
+		}
+
+		tickWaveRingAnimation();
+	}
+
+	function updateWaveRingProgress(ratio) {
+		// Kill-based wave progress changes in discrete steps; soften each step
+		// without relying on Panorama's clip transition, which flickers.
+		animateWaveRingProgress(ratio, 0.22, false);
+	}
+
+	function animateWaveCountdownProgress(remaining) {
+		var countdownDuration = Math.max(1, Number(activeWaveDuration) || WAVE_RING_COUNTDOWN_SECONDS);
+		var startRatio = Math.max(0, Math.min(1, Math.min(remaining, countdownDuration) / countdownDuration));
+		var nextRatio = Math.max(0, Math.min(1, Math.min(Math.max(0, remaining - 1), countdownDuration) / countdownDuration));
+
+		// Snap only when opening or resynchronizing after a large timer jump.
+		// Normal one-second updates continue from the currently rendered angle.
+		if (Math.abs(renderedWaveRingRatio - startRatio) > (1.5 / countdownDuration)) {
+			waveRingAnimationVersion += 1;
+			renderWaveRingProgress(startRatio);
+		}
+		animateWaveRingProgress(nextRatio, Math.min(1, Math.max(0.08, remaining)), true);
 	}
 
 	function updateWaveCountdown(remaining) {
 		var panel = $(WAVE_PANEL_ID);
 		var label = $("#XHSWaveCountdownValue");
 		var fill = $("#XHSWaveRingFill");
-		var ringRatio = Math.max(0, Math.min(1, Math.min(remaining, WAVE_RING_COUNTDOWN_SECONDS) / WAVE_RING_COUNTDOWN_SECONDS));
 
 		if (label) {
 			label.text = activeWaveMode === "compact" ? formatWaveTime(remaining) : String(Math.max(0, remaining));
@@ -699,7 +1071,7 @@
 			fill.style.opacity = remaining > 0 ? ".68" : ".32";
 		}
 
-		updateWaveRingProgress(ringRatio);
+		animateWaveCountdownProgress(remaining);
 
 		if (panel) {
 			panel.SetHasClass("XHSWaveArrived", remaining <= 0);
@@ -710,7 +1082,8 @@
 		setWaveVisible(false);
 		activeWaveTimerName = null;
 		setWaveMode(null);
-		updateWaveRingProgress(1);
+		waveRingAnimationVersion += 1;
+		renderWaveRingProgress(1);
 	}
 
 	function showWaveCompact(msg, remaining) {
@@ -748,6 +1121,13 @@
 	}
 
 	function countdownTimer(msg) {
+		if (msg && msg.timer_name === "special_wave" && queuedWaveWarning
+			&& (activeWaveMode === "active" || activeWaveMode === "cleared")
+			&& Number(msg.wave_index || 0) === Number(queuedWaveWarning.wave_index || 0)) {
+			queuedWaveWarning.remaining = getTimerSeconds(msg);
+			renderWaveQueue();
+		}
+
 		if (msg && msg.timer_name === "special_wave" && activeWaveMode !== "warning" && activeWaveMode !== "active" && activeWaveMode !== "cleared") {
 			var compactRemaining = getTimerSeconds(msg);
 			if (isTruthy(msg.show_compact) && compactRemaining > 30) {
@@ -793,6 +1173,7 @@
 		msg = msg || {};
 
 		if (msg.timer_name === "special_wave" && (activeWaveMode === "active" || activeWaveMode === "cleared")) {
+			updateQueuedWaveWarning(msg, typeof msg.duration === "number" ? msg.duration : 30);
 			if (msg.sound) {
 				Game.EmitSound(msg.sound);
 			}
@@ -834,15 +1215,16 @@
 		}
 
 		if (!activeWaveTimerName) {
-			activeWaveSchedule = $.Schedule(duration, function () {
-				hideWavePanel();
-				activeWaveSchedule = null;
-			});
+			startLocalWaveCountdown(duration);
 		}
 	}
 
 	function showWaveActive(msg) {
 		msg = msg || {};
+		if (queuedWaveWarning && queuedWaveMatches(msg, queuedWaveWarning)) {
+			queuedWaveWarning = null;
+			renderWaveQueue();
+		}
 		var panel = $(WAVE_PANEL_ID);
 		var title = $("#XHSWaveTitle");
 		var subtitle = $("#XHSWaveSubtitle");
@@ -937,6 +1319,7 @@
 		if (panel) {
 			panel.SetHasClass("XHSRuneCompact", activeRuneCompact && !activeRuneAltDown);
 		}
+		updateRuneQueueOffset();
 	}
 
 	function setRuneCompact(compact) {
@@ -1029,6 +1412,33 @@
 		return heroName;
 	}
 
+	function formatRunePickerIdentity(msg) {
+		msg = msg || {};
+		return resolvePlayerIdentity(
+			msg.picker_player_id,
+			msg.picker_player_name,
+			msg.picker_hero_name
+		);
+	}
+
+	function updateRuneIdentityDetail(msg, remaining, total, state) {
+		var detail = $("#XHSRuneDetail");
+		if (!detail || state !== "picked") {
+			return;
+		}
+
+		var identity = formatRunePickerIdentity(msg);
+		if (remaining > 0) {
+			detail.text = identity
+				? identity + " claimed one - " + String(remaining) + " remaining"
+				: "One was claimed - " + String(remaining) + " remaining";
+		} else {
+			detail.text = identity
+				? identity + " claimed the last rune"
+				: "The last rune was claimed";
+		}
+	}
+
 	function updateRunePips(remaining, total) {
 		for (var i = 0; i < 4; i++) {
 			var pip = $("#XHSRunePip" + i);
@@ -1065,6 +1475,7 @@
 
 	function updateRuneState(msg) {
 		msg = msg || {};
+		activeRuneMessage = msg;
 
 		var panel = $("#XHSRuneIndicator");
 		if (!panel) {
@@ -1109,11 +1520,7 @@
 
 		if (detail) {
 			if (state === "picked") {
-				if (remaining > 0) {
-					detail.text = formatRuneHeroName(msg.picker_hero_name) + " claimed one - " + String(remaining) + " remaining";
-				} else {
-					detail.text = formatRuneHeroName(msg.picker_hero_name) + " claimed the last rune";
-				}
+				updateRuneIdentityDetail(msg, remaining, total, state);
 			} else if (state === "expired" || state === "removed") {
 				detail.text = remaining > 0 ? String(remaining) + " remaining when it faded" : "No runes remaining";
 			} else {
@@ -1349,6 +1756,42 @@
 		});
 	}
 
+	function refreshIdentityDisplays() {
+		var root = $.GetContextPanel();
+		var identitySegments = root && root.FindChildrenWithClassTraverse
+			? root.FindChildrenWithClassTraverse("XHSNotificationIdentity")
+			: [];
+		for (var i = 0; i < identitySegments.length; i++) {
+			var segment = identitySegments[i];
+			if (!segment || (segment.IsValid && !segment.IsValid())) {
+				continue;
+			}
+			var identity = resolvePlayerIdentity(
+				segment.GetAttributeInt("xhs_identity_player_id", -1),
+				segment.GetAttributeString("xhs_identity_player_name", ""),
+				segment.GetAttributeString("xhs_identity_hero_name", "")
+			);
+			segment.text = identity ? identity + " " : "";
+		}
+
+		if (activeChannelNotification && activeChannelNotification.message) {
+			var channelTitle = getChannelPanelChild("#XHSChannelTitle");
+			if (channelTitle) {
+				var channelMessage = activeChannelNotification.message;
+				channelTitle.text = String(channelMessage.title || formatChannelTarget(channelMessage));
+			}
+		}
+
+		if (activeRuneMessage) {
+			updateRuneIdentityDetail(
+				activeRuneMessage,
+				activeRuneRemaining,
+				getRuneTotal(activeRuneMessage),
+				String(activeRuneMessage.state || "spawned")
+			);
+		}
+	}
+
 	GameEvents.Subscribe("top_notification", topNotification);
 	GameEvents.Subscribe("bottom_notification", bottomNotification);
 	GameEvents.Subscribe("top_remove_notification", topRemoveNotification);
@@ -1357,17 +1800,23 @@
 	GameEvents.Subscribe("xhs_wave_timer", showWaveTimer);
 	GameEvents.Subscribe("xhs_wave_active", showWaveActive);
 	GameEvents.Subscribe("xhs_wave_cleared", showWaveCleared);
+	GameEvents.Subscribe("xhs_wave_queue_update", showWaveQueue);
 	GameEvents.Subscribe("xhs_wave_hide", hideWaveTimer);
 	GameEvents.Subscribe("xhs_rune_state_update", updateRuneState);
 	GameEvents.Subscribe("xhs_main_quest_completed", showMainQuestCompleted);
 	GameEvents.Subscribe("xhs_reward_notification", showRewardNotification);
 	GameEvents.Subscribe("xhs_fragment_quest_star", showFragmentQuestStar);
+	GameEvents.Subscribe("xhs_channel_notification_start", showChannelNotification);
+	GameEvents.Subscribe("xhs_channel_notification_finish", finishChannelNotification);
 	GameEvents.Subscribe("show_current_event_timer", function () {
 		setCurrentEventNotificationOffset(true);
 	});
 	GameEvents.Subscribe("hide_current_event_timer", function () {
 		setCurrentEventNotificationOffset(false);
 	});
+	if (typeof XHSNameDisplay !== "undefined" && XHSNameDisplay.Subscribe) {
+		XHSNameDisplay.Subscribe(refreshIdentityDisplays);
+	}
 
 	refreshRuneAltState();
 })();

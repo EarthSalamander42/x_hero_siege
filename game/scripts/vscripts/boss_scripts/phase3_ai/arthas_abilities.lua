@@ -116,13 +116,14 @@ local function DamageEnemies(caster, ability, position, radius, damage, damageTy
 			if enemy:HasModifier("modifier_xhs_arthas_mark") then
 				finalDamage = finalDamage * (1 + (ability:GetSpecialValueFor("marked_bonus_pct") or 0) * 0.01)
 			end
-			ApplyDamage({
+			local damageDealt = ApplyDamage({
 				victim = enemy,
 				attacker = caster,
 				ability = ability,
 				damage = finalDamage,
 				damage_type = damageType or ability:GetAbilityDamageType(),
 			})
+			SendOverheadEventMessage(nil, OVERHEAD_ALERT_DAMAGE, enemy, damageDealt, nil)
 			if onHit ~= nil then onHit(enemy) end
 		end
 	end
@@ -146,7 +147,8 @@ local function DamageLine(caster, ability, startPosition, direction, length, wid
 			if enemy:HasModifier("modifier_xhs_arthas_mark") then
 				finalDamage = finalDamage * (1 + (ability:GetSpecialValueFor("marked_bonus_pct") or 0) * 0.01)
 			end
-			ApplyDamage({ victim = enemy, attacker = caster, ability = ability, damage = finalDamage, damage_type = ability:GetAbilityDamageType() })
+			local damageDealt = ApplyDamage({ victim = enemy, attacker = caster, ability = ability, damage = finalDamage, damage_type = ability:GetAbilityDamageType() })
+			SendOverheadEventMessage(nil, OVERHEAD_ALERT_DAMAGE, enemy, damageDealt, nil)
 			if onHit ~= nil then onHit(enemy) end
 		end
 	end
@@ -305,6 +307,7 @@ function xhs_arthas_judgment_of_lordaeron:OnSpellStart()
 		Timers:CreateTimer(finalTelegraph, function()
 			if not IsValidAlive(caster) or ability == nil or ability:IsNull() then return nil end
 			local damage = ScaleDamage(ability:GetSpecialValueFor("final_damage"))
+			DamageEnemies(caster, ability, center, 320, damage, ability:GetAbilityDamageType())
 			for _, direction in ipairs(directions) do
 				DamageLine(caster, ability, center, direction, lineLength, lineWidth, damage)
 				CreateJudgmentLineImpacts(ability, center, direction, lineLength, ability:GetSpecialValueFor("beam_nodes"))

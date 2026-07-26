@@ -68,6 +68,11 @@ function modifier_xhs_rune_second_wind:OnCreated(kv)
 end
 function modifier_xhs_rune_second_wind:OnRefresh(kv) self:OnCreated(kv) end
 function modifier_xhs_rune_second_wind:GetTexture() return "oracle_false_promise" end
+function modifier_xhs_rune_second_wind:DeclareFunctions()
+	return { MODIFIER_PROPERTY_TOOLTIP, MODIFIER_PROPERTY_TOOLTIP2 }
+end
+function modifier_xhs_rune_second_wind:OnTooltip() return self.threshold_pct or 30 end
+function modifier_xhs_rune_second_wind:OnTooltip2() return self.guard_reduction or 20 end
 function modifier_xhs_rune_second_wind:OnIntervalThink()
 	if self.consumed then return end
 
@@ -164,7 +169,9 @@ end
 function modifier_xhs_rune_barrier:RefreshShieldVisual()
 	if not IsServer() then return end
 	if (self.shield or 0) > 0 and self.shield_particle == nil then
-		self.shield_particle = ParticleManager:CreateParticle("particles/neutral_fx/miniboss_shield.vpcf", PATTACH_ABSORIGIN_FOLLOW, self:GetParent())
+		local parent = self:GetParent()
+		self.shield_particle = ParticleManager:CreateParticle("particles/neutral_fx/miniboss_shield.vpcf", PATTACH_POINT_FOLLOW, parent)
+		ParticleManager:SetParticleControlEnt(self.shield_particle, 0, parent, PATTACH_POINT_FOLLOW, "attach_hitloc", parent:GetAbsOrigin(), true)
 	elseif (self.shield or 0) <= 0 and self.shield_particle ~= nil then
 		ParticleManager:DestroyParticle(self.shield_particle, true)
 		ParticleManager:ReleaseParticleIndex(self.shield_particle)
@@ -216,7 +223,10 @@ function modifier_xhs_rune_retaliation:OnRefresh(kv) self:OnCreated(kv) end
 function modifier_xhs_rune_retaliation:GetTexture() return "blade_mail" end
 function modifier_xhs_rune_retaliation:GetEffectName() return "particles/items_fx/blademail.vpcf" end
 function modifier_xhs_rune_retaliation:GetEffectAttachType() return PATTACH_ABSORIGIN_FOLLOW end
-function modifier_xhs_rune_retaliation:DeclareFunctions() return { MODIFIER_EVENT_ON_TAKEDAMAGE } end
+function modifier_xhs_rune_retaliation:DeclareFunctions()
+	return { MODIFIER_EVENT_ON_TAKEDAMAGE, MODIFIER_PROPERTY_TOOLTIP }
+end
+function modifier_xhs_rune_retaliation:OnTooltip() return self.reflect_pct or 25 end
 function modifier_xhs_rune_retaliation:OnTakeDamage(params)
 	if not IsServer() or _G.XHS_RUNE_REFLECTING == true then return end
 	if params.unit ~= self:GetParent() then return end
@@ -260,9 +270,16 @@ function modifier_xhs_rune_fortitude:OnCreated(kv)
 end
 function modifier_xhs_rune_fortitude:OnRefresh(kv) self:OnCreated(kv) end
 function modifier_xhs_rune_fortitude:GetTexture() return "omniknight_guardian_angel" end
-function modifier_xhs_rune_fortitude:DeclareFunctions() return { MODIFIER_PROPERTY_STATUS_RESISTANCE_STACKING, MODIFIER_PROPERTY_INCOMING_DAMAGE_PERCENTAGE } end
+function modifier_xhs_rune_fortitude:DeclareFunctions()
+	return {
+		MODIFIER_PROPERTY_STATUS_RESISTANCE_STACKING,
+		MODIFIER_PROPERTY_INCOMING_DAMAGE_PERCENTAGE,
+		MODIFIER_PROPERTY_TOOLTIP,
+	}
+end
 function modifier_xhs_rune_fortitude:GetModifierStatusResistanceStacking() return self.status_resist or 0 end
 function modifier_xhs_rune_fortitude:GetModifierIncomingDamage_Percentage() return -(self.damage_reduction or 0) end
+function modifier_xhs_rune_fortitude:OnTooltip() return self.damage_reduction or 0 end
 
 modifier_xhs_rune_titan = modifier_xhs_rune_titan or class({})
 modifier_xhs_rune_titan.XHS_LINK_CLIENT = true
@@ -276,10 +293,18 @@ function modifier_xhs_rune_titan:OnCreated(kv)
 end
 function modifier_xhs_rune_titan:OnRefresh(kv) self:OnCreated(kv) end
 function modifier_xhs_rune_titan:GetTexture() return "tiny_grow" end
-function modifier_xhs_rune_titan:DeclareFunctions() return { MODIFIER_PROPERTY_MODEL_SCALE, MODIFIER_PROPERTY_HEALTH_BONUS, MODIFIER_PROPERTY_DAMAGEOUTGOING_PERCENTAGE } end
+function modifier_xhs_rune_titan:DeclareFunctions()
+	return {
+		MODIFIER_PROPERTY_MODEL_SCALE,
+		MODIFIER_PROPERTY_HEALTH_BONUS,
+		MODIFIER_PROPERTY_DAMAGEOUTGOING_PERCENTAGE,
+		MODIFIER_PROPERTY_TOOLTIP,
+	}
+end
 function modifier_xhs_rune_titan:GetModifierModelScale() return self.model_scale or 0 end
 function modifier_xhs_rune_titan:GetModifierHealthBonus() return self.health_bonus or 0 end
 function modifier_xhs_rune_titan:GetModifierDamageOutgoing_Percentage() return self.outgoing_damage or 0 end
+function modifier_xhs_rune_titan:OnTooltip() return self.max_hp_pct or 30 end
 function modifier_xhs_rune_titan:OnDestroy()
 	if IsServer() then self:GetParent():CalculateStatBonus(true) end
 end
@@ -305,7 +330,10 @@ function modifier_xhs_rune_siegebreaker:OnCreated(kv)
 end
 function modifier_xhs_rune_siegebreaker:OnRefresh(kv) self:OnCreated(kv) end
 function modifier_xhs_rune_siegebreaker:GetTexture() return "sven_gods_strength" end
-function modifier_xhs_rune_siegebreaker:DeclareFunctions() return { MODIFIER_PROPERTY_TOTALDAMAGEOUTGOING_PERCENTAGE } end
+function modifier_xhs_rune_siegebreaker:DeclareFunctions()
+	return { MODIFIER_PROPERTY_TOTALDAMAGEOUTGOING_PERCENTAGE, MODIFIER_PROPERTY_TOOLTIP }
+end
+function modifier_xhs_rune_siegebreaker:OnTooltip() return self.bonus_damage or 45 end
 function modifier_xhs_rune_siegebreaker:GetModifierTotalDamageOutgoing_Percentage(params)
 	local target = params.target
 	if target == nil or target:IsNull() or target:IsBuilding() then return 0 end
@@ -348,6 +376,9 @@ function modifier_xhs_rune_storm:OnIntervalThink()
 	for _, enemy in pairs(enemies) do
 		if enemy ~= nil and not enemy:IsNull() and not enemy:IsBuilding() then
 			count = count + 1
+			if count == 1 then
+				parent:EmitSoundParams("Hero_Zuus.ArcLightning.Cast", 0, 0.7, 0)
+			end
 			local particle = ParticleManager:CreateParticle("particles/units/heroes/hero_zuus/zuus_arc_lightning.vpcf", PATTACH_ABSORIGIN_FOLLOW, parent)
 			ParticleManager:SetParticleControlEnt(particle, 0, parent, PATTACH_POINT_FOLLOW, "attach_hitloc", parent:GetAbsOrigin(), true)
 			ParticleManager:SetParticleControlEnt(particle, 1, enemy, PATTACH_POINT_FOLLOW, "attach_hitloc", enemy:GetAbsOrigin(), true)
@@ -373,6 +404,8 @@ function modifier_xhs_rune_bounty_surge:OnCreated(kv)
 end
 function modifier_xhs_rune_bounty_surge:OnRefresh(kv) self:OnCreated(kv) end
 function modifier_xhs_rune_bounty_surge:GetTexture() return "bounty_hunter_track" end
+function modifier_xhs_rune_bounty_surge:DeclareFunctions() return { MODIFIER_PROPERTY_TOOLTIP } end
+function modifier_xhs_rune_bounty_surge:OnTooltip() return self.bounty_pct or 35 end
 
 modifier_xhs_rune_momentum = modifier_xhs_rune_momentum or class({})
 modifier_xhs_rune_momentum.XHS_LINK_CLIENT = true
@@ -384,8 +417,11 @@ function modifier_xhs_rune_momentum:OnCreated(kv)
 end
 function modifier_xhs_rune_momentum:OnRefresh(kv) self:OnCreated(kv) end
 function modifier_xhs_rune_momentum:GetTexture() return "rune_haste" end
-function modifier_xhs_rune_momentum:DeclareFunctions() return { MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE } end
+function modifier_xhs_rune_momentum:DeclareFunctions()
+	return { MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE, MODIFIER_PROPERTY_TOOLTIP }
+end
 function modifier_xhs_rune_momentum:GetModifierMoveSpeedBonus_Percentage() return self.move_speed or 0 end
+function modifier_xhs_rune_momentum:OnTooltip() return self.gold_pct or 20 end
 
 ApplyVisibleRuneModifierDefaults(modifier_xhs_rune_healing)
 ApplyVisibleRuneModifierDefaults(modifier_xhs_rune_revitalization)

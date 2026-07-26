@@ -5,6 +5,7 @@
 	</styles>
 
 	<scripts>
+		<include src="file://{resources}/scripts/custom_game/xhs_name_display.js"/>
 		<include src="file://{resources}/scripts/custom_game/custom_loading_screen.js"/>
 	</scripts>
 
@@ -319,36 +320,9 @@
 					<Button id="PlayerReadyButton" class="player-ready-button" onactivate="OnCustomSetupReadyPressed();">
 						<Label id="PlayerReadyButtonLabel" text="#loading_screen_mark_ready" />
 					</Button>
-					<Button id="LoadingQaToggleButton" class="loading-qa-toggle-button" onactivate="ToggleLoadingQaPanel();">
-						<Label text="QA" />
-					</Button>
 				</Panel>
 
 				<Panel id="PlayerLoadingList" class="player-loading-list" />
-				<Panel id="LoadingQaPanel" class="loading-qa-panel">
-					<Label class="loading-qa-title" text="#loading_screen_qa_title" />
-					<Panel class="loading-qa-buttons-row">
-						<Button class="loading-qa-button" onactivate="SetToolsQaMode('normal');">
-							<Label text="#loading_screen_qa_mode_normal" />
-						</Button>
-						<Button class="loading-qa-button" onactivate="SetToolsQaMode('all_loading');">
-							<Label text="#loading_screen_qa_mode_all_loading" />
-						</Button>
-					</Panel>
-					<Panel class="loading-qa-buttons-row">
-						<Button class="loading-qa-button" onactivate="SetToolsQaMode('all_loaded');">
-							<Label text="#loading_screen_qa_mode_all_loaded" />
-						</Button>
-						<Button class="loading-qa-button" onactivate="SetToolsQaMode('all_ready');">
-							<Label text="#loading_screen_qa_mode_all_ready" />
-						</Button>
-					</Panel>
-					<Panel class="loading-qa-buttons-row">
-						<Button class="loading-qa-button" onactivate="SetToolsQaMode('one_failed');">
-							<Label text="#loading_screen_qa_mode_one_failed" />
-						</Button>
-					</Panel>
-				</Panel>
 			</Panel>
 		</Panel>
 

@@ -13,6 +13,10 @@ function SetSharedEventsVisible(visible) {
 var EventUsageState = {
 	hero_image_used: false,
 	hero_image_busy: false,
+	spirit_beast_used: false,
+	spirit_beast_busy: false,
+	frost_infernal_used: false,
+	frost_infernal_busy: false,
 	all_hero_images_used: false,
 	all_hero_images_busy: false
 };
@@ -52,6 +56,22 @@ function RefreshEventLocks() {
 	} else {
 		SetEventLocked("Event4", false, "");
 	}
+
+	if (EventUsageState.spirit_beast_used) {
+		SetEventLocked("Event2", true, "Already completed");
+	} else if (EventUsageState.spirit_beast_busy) {
+		SetEventLocked("Event2", true, "Another player is inside");
+	} else {
+		SetEventLocked("Event2", false, "");
+	}
+
+	if (EventUsageState.frost_infernal_used) {
+		SetEventLocked("Event3", true, "Already completed");
+	} else if (EventUsageState.frost_infernal_busy) {
+		SetEventLocked("Event3", true, "Another player is inside");
+	} else {
+		SetEventLocked("Event3", false, "");
+	}
 }
 
 function UpdateEventUsage(data) {
@@ -63,6 +83,22 @@ function UpdateEventUsage(data) {
 
 	if (data.hero_image_busy !== undefined) {
 		EventUsageState.hero_image_busy = IsTruthy(data.hero_image_busy);
+	}
+
+	if (data.spirit_beast_used !== undefined) {
+		EventUsageState.spirit_beast_used = IsTruthy(data.spirit_beast_used);
+	}
+
+	if (data.spirit_beast_busy !== undefined) {
+		EventUsageState.spirit_beast_busy = IsTruthy(data.spirit_beast_busy);
+	}
+
+	if (data.frost_infernal_used !== undefined) {
+		EventUsageState.frost_infernal_used = IsTruthy(data.frost_infernal_used);
+	}
+
+	if (data.frost_infernal_busy !== undefined) {
+		EventUsageState.frost_infernal_busy = IsTruthy(data.frost_infernal_busy);
 	}
 
 	if (data.all_hero_images_used !== undefined) {
@@ -99,6 +135,16 @@ function SelectEvent(eventName) {
 	}
 
 	if (eventName === "event_all_hero_images" && (EventUsageState.all_hero_images_used || EventUsageState.all_hero_images_busy)) {
+		RefreshEventLocks();
+		return;
+	}
+
+	if (eventName === "event_spirit_beast" && (EventUsageState.spirit_beast_used || EventUsageState.spirit_beast_busy)) {
+		RefreshEventLocks();
+		return;
+	}
+
+	if (eventName === "event_frost_infernal" && (EventUsageState.frost_infernal_used || EventUsageState.frost_infernal_busy)) {
 		RefreshEventLocks();
 		return;
 	}

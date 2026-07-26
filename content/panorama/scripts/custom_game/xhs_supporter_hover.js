@@ -97,6 +97,22 @@ var XHSSupporterHover = (function () {
 		}
 	}
 
+	function ResolveHoverIdentity(data) {
+		data = data || {};
+		if (typeof XHSNameDisplay !== "undefined" && XHSNameDisplay.Resolve) {
+			return XHSNameDisplay.Resolve({
+				playerID: data.playerID,
+				entityIndex: data.entIndex,
+				playerName: data.playerName,
+				heroName: data.heroName,
+				heroDisplayName: data.localHeroName,
+			});
+		}
+
+		// Privacy-safe fallback for layouts that failed to load the shared helper.
+		return data.localHeroName || LocalizeHeroName(data.heroName) || "";
+	}
+
 	function SetFillPercent(parent, childID, current, max) {
 		if (!parent) {
 			return;
@@ -253,6 +269,8 @@ var XHSSupporterHover = (function () {
 
 		var accountXPMax = ToNumber(tableData.xhs_xp_max || model.accountXPMax || 0, 0);
 		return {
+			playerID: playerID,
+			entIndex: entIndex,
 			playerName: model.name || options.playerName || (playerInfo && playerInfo.player_name) || ("Player " + (playerID + 1)),
 			heroName: heroName,
 			localHeroName: model.heroLabel || options.localHeroName || LocalizeHeroName(heroName),
@@ -396,8 +414,18 @@ var XHSSupporterHover = (function () {
 			heroImage.heroname = data.heroName;
 		}
 
-		SetChildText(hover, "XHSSupporterHoverPlayerName_" + id, data.playerName);
-		SetChildText(hover, "XHSSupporterHoverHeroName_" + id, data.localHeroName || data.heroName);
+		var identity = ResolveHoverIdentity(data);
+		var identityLabel = hover.FindChildTraverse("XHSSupporterHoverPlayerName_" + id);
+		var secondaryIdentityLabel = hover.FindChildTraverse("XHSSupporterHoverHeroName_" + id);
+		if (identityLabel) {
+			identityLabel.text = identity;
+			identityLabel.style.visibility = identity ? "visible" : "collapse";
+		}
+		if (secondaryIdentityLabel) {
+			// Only one identity type may ever be visible at once.
+			secondaryIdentityLabel.text = "";
+			secondaryIdentityLabel.style.visibility = "collapse";
+		}
 		SetChildText(hover, "XHSSupporterHoverTierValue_" + id, data.tierName);
 		SetChildText(hover, "XHSSupporterHoverStatValue_AccountLevel_" + id, data.accountLevel > 0 ? data.accountLevel : "-");
 		SetChildText(hover, "XHSSupporterHoverStatValue_SeasonLevel_" + id, data.seasonLevel);

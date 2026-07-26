@@ -170,6 +170,7 @@
 			{
 				"var_type"					"FIELD_INTEGER"
 				"damage"					"8 16 24 32 40"
+				"CalculateSpellDamageTooltip"	"1"
 				"LinkedSpecialBonus"		"special_bonus_unique_viper_1"
 			}
 			"05"
@@ -256,6 +257,7 @@
 			{
 				"var_type"						"FIELD_INTEGER"
 				"blade_fury_damage"				"800 1600 2400 3200"
+				"CalculateSpellDamageTooltip"	"1"
 				"LinkedSpecialBonus"			"special_bonus_unique_juggernaut_3"
 			}
 		}
@@ -303,6 +305,7 @@
 			{
 				"var_type"					"FIELD_INTEGER"
 				"damage"					"200 450 950 1850"
+				"CalculateSpellDamageTooltip"	"1"
 			}
 			"04"
 			{
@@ -409,6 +412,7 @@
 			{
 				"var_type"				"FIELD_INTEGER"
 				"damage"				"200 250 300 350 400"
+				"CalculateSpellDamageTooltip"	"1"
 			}
 			"03"
 			{
@@ -519,6 +523,7 @@
 			{
 				"var_type"				"FIELD_INTEGER"
 				"arc_damage"			"110 220 440 880"
+				"CalculateSpellDamageTooltip"	"1"
 				"LinkedSpecialBonus"	"special_bonus_unique_zeus_2"
 			}
 			"02"
@@ -629,6 +634,7 @@
 			{
 				"var_type"				"FIELD_FLOAT"
 				"total_damage"			"500"
+				"CalculateSpellDamageTooltip"	"1"
 			}
 			"03"
 			{
@@ -732,7 +738,15 @@
 	//=================================================================================================================
 	"nyx_assassin_impale"
 	{
+		"BaseClass"					"ability_lua"
+		"ScriptFile"					"abilities/heroes/hero_crypt_lord.lua"
 		"MaxLevel"					"4"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE | DOTA_ABILITY_BEHAVIOR_AUTOCAST"
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
+		"AbilityCastAnimation"			"ACT_DOTA_CAST_ABILITY_1"
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityCastRange"				"1200"
@@ -780,8 +794,14 @@
 			"06"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"impale_damage"			"160 410 660 910"
+				"impale_damage"			"200 400 650 1000"
+				"CalculateSpellDamageTooltip"	"1"
 				"LinkedSpecialBonus"	"special_bonus_unique_nyx_2"
+			}
+			"07"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"infested_duration"		"5.0"
 			}
 		}
 	}
@@ -965,6 +985,7 @@
 			{
 				"var_type"			"FIELD_INTEGER"
 				"damage"			"40"
+				"CalculateSpellDamageTooltip"	"1"
 			}
 			"03"
 			{
@@ -1025,7 +1046,11 @@
 		"DisplayAdditionalHeroes"	"1"
 		"HasScepterUpgrade"			"0"
 		"AbilityTextureName"		"custom/lone_druid_spirit_bear"
+		"AbilityType"				"DOTA_ABILITY_TYPE_BASIC"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"MaxLevel"					"4"
+		"RequiredLevel"				"1"
+		"LevelsBetweenUpgrades"		"2"
 
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
@@ -1162,6 +1187,7 @@
 			{
 				"var_type"					"FIELD_INTEGER"
 				"poof_damage"				"160 250 340 430"
+				"CalculateSpellDamageTooltip"	"1"
 				"LinkedSpecialBonus"		"special_bonus_unique_meepo_2"
 			}
 		}
@@ -1175,7 +1201,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"HasScepterUpgrade"			"0"
-		"MaxLevel"					"4"
+		"MaxLevel"					"1"
 		"RequiredLevel"				"20"
 		"AbilityType"				"DOTA_ABILITY_TYPE_BASIC"
 
@@ -1204,6 +1230,7 @@
 			{
 				"var_type"					"FIELD_INTEGER"
 				"damage"					"2500"
+				"CalculateSpellDamageTooltip"	"1"
 				"LinkedSpecialBonus"		"special_bonus_unique_lion_3"
 			}
 		}
@@ -1214,7 +1241,7 @@
 	//=================================================================================================================
 	"enraged_wildkin_tornado"
 	{
-		"MaxLevel"					"4"
+		"MaxLevel"					"1"
 		// Stats
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityCastRange"				"600"
@@ -1274,11 +1301,13 @@
 			{
 				"var_type"				"FIELD_INTEGER"
 				"near_damage"			"1000"
+				"CalculateSpellDamageTooltip"	"1"
 			}
 			"06"
 			{
 				"var_type"				"FIELD_INTEGER"
 				"far_damage"			"1000"
+				"CalculateSpellDamageTooltip"	"1"
 			}
 			"07"
 			{
@@ -1343,7 +1372,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"HasScepterUpgrade"			"0"
-		"MaxLevel"					"4"
+		"MaxLevel"					"1"
 		"RequiredLevel"				"20"
 
 		// Time		
@@ -1499,6 +1528,7 @@
 			{
 				"var_type"					"FIELD_FLOAT"
 				"damage_pct"				"15"
+				"CalculateSpellDamageTooltip"	"1"
 			}
 			"08"
 			{
@@ -1763,6 +1793,7 @@
 			{
 				"var_type"				"FIELD_INTEGER"
 				"impact_damage"			"225 550 775 1050"
+				"CalculateSpellDamageTooltip"	"1"
 				"LinkedSpecialBonus"	"special_bonus_unique_monkey_king_3"
 			}
 			"02"
@@ -1849,6 +1880,7 @@
 			{
 				"var_type"				"FIELD_INTEGER"
 				"damage"				"60 100 140 180"
+				"CalculateSpellDamageTooltip"	"1"
 				"LinkedSpecialBonus"	"special_bonus_unique_axe_4"
 			}
 			"02"
@@ -1910,6 +1942,7 @@
 			{
 				"var_type"					"FIELD_INTEGER"
 				"axe_damage"				"150 300 450 600"
+				"CalculateSpellDamageTooltip"	"1"
 				"LinkedSpecialBonus"		"special_bonus_unique_troll_warlord_3"
 			}
 			"05"
@@ -1960,6 +1993,7 @@
 			{
 				"var_type"					"FIELD_INTEGER"
 				"damage"					"200 400 600 800"
+				"CalculateSpellDamageTooltip"	"1"
 				"LinkedSpecialBonus"		"special_bonus_unique_troll_warlord_3"
 			}
 			"02"
@@ -2042,6 +2076,7 @@
 			{
 				"var_type"				"FIELD_INTEGER"
 				"damage_per_second"		"40 70 100 130"
+				"CalculateSpellDamageTooltip"	"1"
 				"LinkedSpecialBonus"	"special_bonus_unique_doom_4"				
 			}
 			"02"
@@ -2085,6 +2120,7 @@
 			{
 				"var_type"				"FIELD_INTEGER"
 				"burn_damage"			"100 200 300 400"
+				"CalculateSpellDamageTooltip"	"1"
 			}
 			"02"
 			{
@@ -2138,6 +2174,7 @@
 			{
 				"var_type"				"FIELD_INTEGER"
 				"damage"				"100 200 300"
+				"CalculateSpellDamageTooltip"	"1"
 				"LinkedSpecialBonus"	"special_bonus_unique_doom_5"				
 			}
 		}
@@ -2375,6 +2412,7 @@
 			{
 				"var_type"				"FIELD_INTEGER"
 				"damage"				"100 130 160"
+				"CalculateSpellDamageTooltip"	"1"
 				"LinkedSpecialBonus"	"special_bonus_unique_leshrac_3"
 			}
 			"04"
@@ -2463,11 +2501,13 @@
 			{
 				"var_type"				"FIELD_INTEGER"
 				"quill_base_damage"		"50 100 150 200"
+				"CalculateSpellDamageTooltip"	"1"
 			}
 			"03"
 			{
 				"var_type"				"FIELD_INTEGER"
 				"quill_stack_damage"	"30 50 70 90"
+				"CalculateSpellDamageTooltip"	"1"
 				"LinkedSpecialBonus"	"special_bonus_unique_bristleback_2"
 			}
 			"04"
@@ -2479,6 +2519,7 @@
 			{
 				"var_type"				"FIELD_INTEGER"
 				"max_damage"			"1100.0"
+				"CalculateSpellDamageTooltip"	"1"
 			}
 			"06"
 			{
@@ -2644,6 +2685,7 @@
 			{
 				"var_type"						"FIELD_INTEGER"
 				"damage_per_second"				"150 200 250 300"
+				"CalculateSpellDamageTooltip"	"1"
 			}
 			"04"
 			{
@@ -2851,6 +2893,7 @@
 			{
 				"var_type"						"FIELD_INTEGER"
 				"damage_per_second"				"25 50 75 100"
+				"CalculateSpellDamageTooltip"	"1"
 				"LinkedSpecialBonus"			"special_bonus_unique_ember_spirit_3"
 			}
 		}
@@ -2892,6 +2935,7 @@
 			{
 				"var_type"				"FIELD_INTEGER"
 				"far_damage"			"77777"
+				"CalculateSpellDamageTooltip"	"1"
 			}
 			"02"
 			{
@@ -2917,6 +2961,7 @@
 			{
 				"var_type"				"FIELD_INTEGER"
 				"near_damage"			"20000"
+				"CalculateSpellDamageTooltip"	"1"
 			}
 			"07"
 			{
@@ -3047,6 +3092,7 @@
 			{
 				"var_type"				"FIELD_INTEGER"
 				"snake_damage"			"160 320 480 720"
+				"CalculateSpellDamageTooltip"	"1"
 			}
 			"05"
 			{
@@ -3188,6 +3234,7 @@
 			{
 				"var_type"					"FIELD_INTEGER"
 				"damage"					"80 160 240 320"
+				"CalculateSpellDamageTooltip"	"1"
 			}
 			"04"
 			{
@@ -3270,6 +3317,7 @@
 			{
 				"var_type"					"FIELD_INTEGER"
 				"shock_damage"				"275 550 825 1100"
+				"CalculateSpellDamageTooltip"	"1"
 				"LinkedSpecialBonus"		"special_bonus_unique_magnus_4"
 			}
 			"04"
@@ -3378,6 +3426,7 @@
 			{
 				"var_type"				"FIELD_INTEGER"
 				"skewer_damage"			"100 300 600 1200"
+				"CalculateSpellDamageTooltip"	"1"
 			}			
 			"07"
 			{
@@ -3443,6 +3492,7 @@
 			{
 				"var_type"				"FIELD_INTEGER"
 				"polarity_damage"		"600 1200 2400"
+				"CalculateSpellDamageTooltip"	"1"
 			}
 			"03"
 			{
@@ -3497,6 +3547,7 @@
 			{
 				"var_type"			"FIELD_INTEGER"
 				"gush_damage"		"100 250 550 900"
+				"CalculateSpellDamageTooltip"	"1"
 				"LinkedSpecialBonus"	"special_bonus_unique_tidehunter_2"
 			}
 			"02"
@@ -3791,6 +3842,7 @@
 			{
 				"var_type"					"FIELD_INTEGER"
 				"axe_damage"				"150 300 450 600"
+				"CalculateSpellDamageTooltip"	"1"
 				"LinkedSpecialBonus"		"special_bonus_unique_troll_warlord_3"
 			}
 			"05"
@@ -3841,6 +3893,7 @@
 			{
 				"var_type"					"FIELD_INTEGER"
 				"damage"					"200 400 600 800"
+				"CalculateSpellDamageTooltip"	"1"
 				"LinkedSpecialBonus"		"special_bonus_unique_troll_warlord_3"
 			}
 			"02"
@@ -3943,6 +3996,7 @@
 			{
 				"var_type"				"FIELD_INTEGER"
 				"impact_damage"			"110 250 510 970"
+				"CalculateSpellDamageTooltip"	"1"
 			}
 			"10"
 			{
@@ -4074,6 +4128,7 @@
 			{
 				"var_type"				"FIELD_INTEGER"
 				"damage"				"230 490 800 1090"
+				"CalculateSpellDamageTooltip"	"1"
 				"LinkedSpecialBonus"	"special_bonus_unique_void_spirit_4"
 			}
 			"04"
@@ -4163,6 +4218,7 @@
 			{
 				"var_type"				"FIELD_INTEGER"
 				"pop_damage"			"500 800 1200"
+				"CalculateSpellDamageTooltip"	"1"
 			}
 			"08"
 			{
@@ -4200,6 +4256,7 @@
 			{
 				"var_type"					"FIELD_INTEGER"
 				"damage"					"80 150 220 290"
+				"CalculateSpellDamageTooltip"	"1"
 				"LinkedSpecialBonus"		"special_bonus_unique_snapfire_7"
 			}
 			"02"
@@ -4293,6 +4350,7 @@
 			{
 				"var_type"				"FIELD_INTEGER"
 				"impact_damage"			"110 220 440 880"
+				"CalculateSpellDamageTooltip"	"1"
 			}
 			"10"
 			{
@@ -4333,6 +4391,7 @@
 			{
 				"var_type"					"FIELD_INTEGER"
 				"damage"					"120 240 480 960"
+				"CalculateSpellDamageTooltip"	"1"
 			}
 			"02"
 			{
@@ -4435,6 +4494,7 @@
 			{
 				"var_type"				"FIELD_INTEGER"
 				"damage_per_impact"		"500 1000 2000"
+				"CalculateSpellDamageTooltip"	"1"
 			}
 			"06"
 			{
@@ -4460,6 +4520,7 @@
 			{
 				"var_type"				"FIELD_INTEGER"
 				"burn_damage"			"150 500 1000"
+				"CalculateSpellDamageTooltip"	"1"
 			}
 			"11"
 			{

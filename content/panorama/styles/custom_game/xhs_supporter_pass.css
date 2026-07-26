@@ -284,24 +284,67 @@
 	height: 820px;
 	align: center center;
 	flow-children: down;
+	overflow: clip;
 	background-color: gradient( linear, 0% 0%, 100% 100%, from( #02050bfb ), color-stop( 0.55, #061326f6 ), to( #02050bfb ) );
 	border: 1px solid #5ad0ff42;
 	box-shadow: fill #000000cc 0px 0px 22px 0px;
 	visibility: collapse;
 	opacity: 0;
-	transform: translateY( -12px );
-	pre-transform-scale2d: 0.985;
-	transition-property: opacity, transform, pre-transform-scale2d, brightness;
-	transition-duration: 0.18s;
+	transform: translateY( 26px );
+	pre-transform-scale2d: 0.955;
+	brightness: 0.72;
+	transition-property: opacity, transform, pre-transform-scale2d, brightness, box-shadow;
+	transition-duration: 0.30s;
 	transition-timing-function: ease-out;
 	z-index: 130;
 }
 
+.XHSSupporterPassWindow.IsOpening,
+.XHSSupporterPassWindow.IsClosing,
 .XHSSupporterPassWindow.IsVisible {
 	visibility: visible;
+}
+
+.XHSSupporterPassWindow.IsVisible {
 	opacity: 1;
 	transform: translateY( 0px );
 	pre-transform-scale2d: 1.0;
+	brightness: 1.0;
+	box-shadow: fill #000000e8 0px 0px 34px 0px, fill #5ad0ff1a 0px 0px 20px 0px;
+}
+
+.XHSSupporterPassWindow.IsClosing {
+	opacity: 0;
+	transform: translateY( -18px );
+	pre-transform-scale2d: 0.975;
+	brightness: 0.8;
+}
+
+.XHSPassHeaderMedia,
+.XHSPassBody {
+	transition-property: opacity, transform;
+	transition-duration: 0.36s;
+	transition-timing-function: ease-out;
+}
+
+.XHSSupporterPassWindow.IsOpening .XHSPassHeaderMedia {
+	opacity: 0.12;
+	transform: translateX( -18px );
+}
+
+.XHSSupporterPassWindow.IsOpening .XHSPassBody {
+	opacity: 0;
+	transform: translateY( 12px );
+}
+
+.XHSSupporterPassWindow.IsClosing .XHSPassHeaderMedia {
+	opacity: 0.08;
+	transform: translateX( 14px );
+}
+
+.XHSSupporterPassWindow.IsClosing .XHSPassBody {
+	opacity: 0;
+	transform: translateY( -8px );
 }
 
 .XHSPassHeader {
@@ -501,6 +544,11 @@
 	text-shadow: none;
 }
 
+.XHSPassTab.IsHiddenByData,
+.XHSPassPage.IsHiddenByData {
+	visibility: collapse;
+}
+
 .XHSPassContent {
 	width: 100%;
 	height: 100%;
@@ -518,14 +566,7 @@
 	visibility: visible;
 }
 
-.XHSPassPage.IsComingSoon .XHSPassSectionHeader,
-.XHSPassPage.IsComingSoon .XHSPassRewardTracks,
-.XHSPassPage.IsComingSoon .XHSPassShopGrid,
-.XHSPassPage.IsComingSoon .XHSPassArmoryGrid {
-	brightness: 0.58;
-	saturation: 0.0;
-	wash-color: #7f8a96;
-}
+
 
 .XHSPassComingSoonOverlay {
 	width: 100%;
@@ -892,6 +933,32 @@
 	flow-children: right;
 	overflow: squish scroll;
 	vertical-align: center;
+}
+
+.XHSPassRequestCompanionButton {
+	width: 176px;
+	height: 30px;
+	margin-right: 14px;
+	vertical-align: center;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #392354 ), to( #15243a ) );
+	border: 1px solid #c597ff88;
+	transition-property: brightness, border, box-shadow;
+	transition-duration: 0.12s;
+}
+
+.XHSPassRequestCompanionButton:hover {
+	brightness: 1.25;
+	border-color: #dfc0ff;
+	box-shadow: fill #9b69de28 0px 0px 10px 0px;
+}
+
+.XHSPassRequestCompanionButton Label {
+	align: center center;
+	color: #eadbff;
+	font-size: 12px;
+	font-weight: bold;
+	letter-spacing: 0.7px;
+	text-transform: uppercase;
 }
 
 .XHSPassFilterTab {
@@ -1288,64 +1355,111 @@
 
 .XHSPassRewardTrack {
 	width: 100%;
-	min-height: 278px;
-	margin-bottom: 14px;
-	padding: 14px;
+	min-height: 346px;
+	margin-bottom: 18px;
+	padding: 16px;
 	flow-children: down;
-	background-color: #071827c8;
-	border: 1px solid #58c8ff2e;
+	overflow: clip;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #0b2234f2 ), color-stop( 0.48, #071522f2 ), to( #030912f6 ) );
+	border: 1px solid #58c8ff48;
+	box-shadow: fill #0000008c 0px 5px 18px 0px, inset #8ce5ff12 0px 1px 0px 0px;
+}
+
+.XHSPassRewardTrack.IsPremiumTrack {
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #30230df2 ), color-stop( 0.42, #12161df4 ), to( #060911f6 ) );
+	border: 1px solid #ffcf6660;
+	box-shadow: fill #0000009c 0px 5px 18px 0px, inset #ffdf8c18 0px 1px 0px 0px;
 }
 
 .XHSPassRewardTrackTitle {
 	color: #f3fbff;
-	font-size: 22px;
+	font-size: 23px;
 	font-weight: bold;
+	letter-spacing: 1.5px;
+	text-shadow: 0px 2px 5px 2.0 #000000d0;
 	text-transform: uppercase;
+}
+
+.XHSPassRewardTrack.IsPremiumTrack .XHSPassRewardTrackTitle {
+	color: #ffe8a8;
 }
 
 .XHSPassRewardRow {
 	width: 100%;
-	height: 210px;
-	margin-top: 10px;
+	height: 290px;
+	margin-top: 14px;
 	flow-children: right;
-	overflow: squish scroll;
+	overflow: scroll squish;
 }
 
 .XHSPassRewardCard,
 .XHSPassShopCard,
 .XHSPassSettingRow,
 .XHSPassLeaderboardRow {
-	background-color: #050b14cc;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #091522f4 ), to( #030810f4 ) );
 	border: 1px solid #58c8ff24;
-	transition-property: brightness, border;
-	transition-duration: 0.12s;
+	transition-property: brightness, border, transform, box-shadow;
+	transition-duration: 0.15s;
 }
 
 .XHSPassRewardCard {
-	width: 156px;
-	height: 190px;
-	margin-right: 10px;
+	width: 194px;
+	height: 266px;
+	margin-right: 12px;
 	padding: 8px;
 	flow-children: down;
+	border: 1px solid #6fcdf044;
+	box-shadow: fill #000000a8 0px 4px 10px 0px, inset #b9ecff0d 0px 1px 0px 0px;
 }
 
 .XHSPassRewardCard:hover,
 .XHSPassShopCard:hover,
 .XHSPassSettingRow:hover,
 .XHSPassLeaderboardRow:hover {
-	brightness: 1.12;
+	brightness: 1.18;
 	border: 1px solid #5ad0ff;
+	transform: translateY( -3px );
+	box-shadow: fill #000000c4 0px 7px 16px 0px, fill #5ad0ff20 0px 0px 12px 0px;
 }
 
-.XHSPassRewardImage {
+.XHSPassItemPreview {
 	width: 100%;
-	height: 92px;
+	overflow: clip;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #10283a ), color-stop( 0.55, #071522 ), to( #02060c ) );
+	border: 1px solid #58c8ff38;
+	box-shadow: inset #0000008c 0px 0px 14px 0px;
+}
+
+.XHSPassRewardPreview {
+	height: 128px;
+}
+
+.XHSPassPreviewImage,
+.XHSPassRewardImage,
+.XHSPassShopImage {
+	width: 100%;
+	height: 100%;
 	background-size: contain;
 	background-position: 50% 50%;
 	background-repeat: no-repeat;
-	background-color: gradient( linear, 0% 0%, 100% 100%, from( #071321 ), color-stop( 0.55, #0b2634 ), to( #030811 ) );
-	border: 1px solid #58c8ff24;
-	overflow: clip;
+}
+
+.XHSPassCompanionScene {
+	width: 100%;
+	height: 110%;
+	margin-top: -8px;
+	opacity-mask: url("s2r://panorama/images/masks/hero_model_opacity_mask_png.vtex");
+}
+
+.XHSPassItemPreview.HasAnimatedModel {
+	background-color: gradient( radial, 50% 68%, 0% 0%, 72% 72%, from( #2c668177 ), color-stop( 0.48, #0c2738dd ), to( #02060cf8 ) );
+	box-shadow: inset #5ad0ff20 0px 0px 22px 0px, inset #0000008c 0px -10px 14px 0px;
+}
+
+.XHSPassRewardDetails {
+	width: 100%;
+	height: 69px;
+	flow-children: down;
 }
 
 .XHSPassRewardLevel,
@@ -1357,23 +1471,135 @@
 }
 
 .XHSPassRewardLevel {
-	margin-top: 6px;
-	color: #f2c94c;
+	width: fit-children;
+	min-width: 72px;
+	height: 26px;
+	horizontal-align: center;
+	margin-top: 7px;
+	padding: 4px 10px 0px 10px;
+	color: #fff2c2;
 	font-size: 13px;
+	font-weight: bold;
+	background-color: #02070de8;
+	border: 1px solid #ffcf6680;
+	box-shadow: fill #000000a0 0px 2px 5px 0px;
+	text-shadow: 0px 1px 3px 2.0 #000000;
 	text-transform: uppercase;
+	z-index: 4;
+}
+
+.XHSPassRewardRow HorizontalScrollBar {
+	height: 18px;
+	opacity: 1;
+	background-color: #020712e8;
+	box-shadow: inset #000000aa 0px 1px 3px 0px;
+}
+
+.XHSPassRewardRow HorizontalScrollBar .ScrollThumb {
+	height: 18px;
+	min-width: 96px;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #0a7ca8 ), to( #5ad0ff ) );
+	border: 1px solid #8fdcff80;
+	box-shadow: fill #5ad0ff28 0px 0px 5px 0px;
+	transition-property: brightness;
+	transition-duration: 0.12s;
+}
+
+.XHSPassRewardRow HorizontalScrollBar:hover .ScrollThumb,
+.XHSPassRewardRow HorizontalScrollBar:active .ScrollThumb {
+	brightness: 1.35;
+}
+
+.XHSPassRewardTrack.IsPremiumTrack .XHSPassRewardRow HorizontalScrollBar .ScrollThumb {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #876018 ), to( #ffcf66 ) );
+	border-color: #ffe59a99;
+}
+
+.XHSPassRewardTrack.IsPremiumTrack .XHSPassRewardRow HorizontalScrollBar:hover .ScrollThumb,
+.XHSPassRewardTrack.IsPremiumTrack .XHSPassRewardRow HorizontalScrollBar:active .ScrollThumb {
+	brightness: 1.35;
 }
 
 .XHSPassRewardName {
-	margin-top: 2px;
+	margin-top: 8px;
 	color: #f3fbff;
-	font-size: 14px;
-	height: 32px;
+	font-size: 15px;
+	font-weight: semi-bold;
+	height: 38px;
+	text-shadow: 0px 1px 4px 2.0 #000000;
 }
 
 .XHSPassRewardType {
-	color: #7db9d8;
+	height: 18px;
+	color: #8fd8fa;
 	font-size: 12px;
+	font-weight: bold;
+	letter-spacing: 0.8px;
 	text-transform: uppercase;
+}
+
+.XHSPassRewardCard.IsClaimed {
+	border: 1px solid #67e59a70;
+}
+
+.XHSPassRewardCard.IsClaimed .XHSPassRewardType {
+	color: #70e39a;
+}
+
+.XHSPassRewardCard.IsLocked .XHSPassItemPreview {
+	saturation: 0.2;
+	brightness: 0.42;
+}
+
+.XHSPassRewardCard.IsLocked .XHSPassRewardName {
+	color: #83909e;
+}
+
+.XHSPassRewardCard.IsPremiumTrack {
+	border: 1px solid #ffcf6650;
+}
+
+.ItemTypeTeleport .XHSPassItemPreview {
+	background-color: gradient( radial, 50% 54%, 0% 0%, 70% 70%, from( #256b8f78 ), color-stop( 0.5, #0b2638e8 ), to( #02060cf8 ) );
+}
+
+.ItemTypeTome .XHSPassItemPreview {
+	background-color: gradient( radial, 50% 54%, 0% 0%, 70% 70%, from( #8e5e2570 ), color-stop( 0.5, #33210ee8 ), to( #080502f8 ) );
+}
+
+.ItemTypeKill .XHSPassItemPreview {
+	background-color: gradient( radial, 50% 54%, 0% 0%, 70% 70%, from( #8b294a70 ), color-stop( 0.5, #35101fe8 ), to( #080207f8 ) );
+}
+
+.ItemTypeEmblem .XHSPassItemPreview,
+.ItemTypeEffigy .XHSPassItemPreview {
+	background-color: gradient( radial, 50% 54%, 0% 0%, 70% 70%, from( #6e3f9b70 ), color-stop( 0.5, #231138e8 ), to( #050208f8 ) );
+}
+
+.RarityUncommon .XHSPassItemPreview {
+	border: 1px solid #7fe89d5c;
+}
+
+.RarityRare .XHSPassItemPreview,
+.RaritySeason .XHSPassItemPreview {
+	border: 1px solid #5ad0ff70;
+}
+
+.RarityMythical .XHSPassItemPreview,
+.RaritySupporter .XHSPassItemPreview {
+	border: 1px solid #c99cff78;
+}
+
+.RarityLegendary .XHSPassItemPreview,
+.RarityPremium .XHSPassItemPreview {
+	border: 1px solid #ffcf668c;
+	box-shadow: inset #ffcf6617 0px 0px 18px 0px;
+}
+
+.RarityImmortal .XHSPassItemPreview,
+.RarityArcana .XHSPassItemPreview {
+	border: 1px solid #e7adffa0;
+	box-shadow: inset #c99cff20 0px 0px 20px 0px, fill #c99cff14 0px 0px 8px 0px;
 }
 
 .XHSPassShopGrid {
@@ -1384,24 +1610,739 @@
 	width: 100%;
 }
 
-.XHSPassShopCard {
-	width: 238px;
-	height: 292px;
-	margin-right: 12px;
-	margin-bottom: 12px;
-	padding: 12px;
+.XHSPassPaginationBar {
+	width: 100%;
+	height: 42px;
+	margin-top: 8px;
+	padding: 4px 8px;
+	flow-children: right;
+	overflow: noclip;
+	z-index: 20;
+	background-color: #040b14d8;
+	border: 1px solid #58c8ff22;
+}
+
+.XHSPassPaginationBar.IsEmpty {
+	visibility: collapse;
+}
+
+.XHSPassPaginationCount {
+	width: fill-parent-flow( 1.0 );
+	vertical-align: center;
+	color: #8fcde6;
+	font-size: 13px;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+}
+
+.XHSPassPaginationControls {
+	height: 100%;
+	flow-children: right;
+	vertical-align: center;
+	overflow: noclip;
+}
+
+.XHSPassPaginationButton {
+	min-width: 88px;
+	height: 30px;
+	padding: 0px 12px;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #10374b ), to( #0a637c ) );
+	border: 1px solid #65cff066;
+}
+
+.XHSPassPaginationButton:hover {
+	brightness: 1.25;
+	border-color: #8ce5ff;
+}
+
+.XHSPassPaginationButton.IsDisabled {
+	brightness: 0.45;
+	saturation: 0.3;
+}
+
+.XHSPassPaginationButton Label {
+	align: center center;
+	color: #e4f8ff;
+	font-size: 12px;
+	font-weight: semi-bold;
+	text-transform: uppercase;
+}
+
+.XHSPassPaginationPage {
+	min-width: 96px;
+	margin: 0px 10px;
+	vertical-align: center;
+	text-align: center;
+	color: #d7efff;
+	font-size: 13px;
+}
+
+.XHSPassPaginationPerPageLabel {
+	margin-left: 12px;
+	margin-right: 6px;
+	vertical-align: center;
+	color: #78a8be;
+	font-size: 11px;
+	text-transform: uppercase;
+}
+
+.XHSPassPaginationSelect {
+	width: 68px;
+	height: 30px;
+	vertical-align: center;
+	flow-children: none;
+	overflow: noclip;
+	z-index: 30;
+}
+
+.XHSPassPaginationSelectButton {
+	width: 100%;
+	height: 30px;
+	background-color: #0b1a29;
+	border: 1px solid #65cff066;
+}
+
+.XHSPassPaginationSelectButton:hover {
+	brightness: 1.25;
+	border-color: #8ce5ff;
+}
+
+.XHSPassPaginationSelectedValue {
+	margin-left: 10px;
+	vertical-align: center;
+	color: #e4f8ff;
+	font-size: 13px;
+}
+
+.XHSPassPaginationSelectArrow {
+	margin-right: 8px;
+	horizontal-align: right;
+	vertical-align: center;
+	color: #7fcbe7;
+	font-size: 10px;
+}
+
+.XHSPassPaginationSelectMenu {
+	width: 68px;
+	height: 64px;
+	margin-top: 31px;
+	flow-children: down;
+	visibility: collapse;
+	background-color: #07111df8;
+	border: 1px solid #65cff088;
+	box-shadow: fill #000000b8 0px 5px 10px 0px;
+	z-index: 50;
+}
+
+.XHSPassPaginationSelect.IsOpen .XHSPassPaginationSelectMenu {
+	visibility: visible;
+}
+
+.XHSPassPaginationSelectOption {
+	width: 100%;
+	height: 31px;
+	background-color: #0b1a29;
+}
+
+.XHSPassPaginationSelectOption:hover {
+	brightness: 1.35;
+	background-color: #12334a;
+}
+
+.XHSPassPaginationSelectOption.IsSelected {
+	background-color: #15546b;
+}
+
+.XHSPassPaginationSelectOption Label {
+	align: center center;
+	color: #e4f8ff;
+	font-size: 13px;
+}
+
+.XHSPassCourierRequestTitle {
+	color: #e8d8ff;
+	font-size: 18px;
+	font-weight: bold;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+}
+
+.XHSPassCourierRequestBody {
+	margin-top: 3px;
+	color: #9cc5db;
+	font-size: 13px;
+}
+
+.XHSPassCourierRequestCard {
+	height: 382px;
+	border-color: #9b69de55;
+}
+
+.XHSPassCourierRequestCard:hover {
+	border-color: #c597ff;
+	box-shadow: fill #000000c4 0px 7px 16px 0px, fill #9b69de28 0px 0px 14px 0px;
+}
+
+.XHSPassCourierScene {
+	height: 116%;
+	margin-top: -14px;
+}
+
+.XHSPassCourierModel {
+	width: 100%;
+	height: 24px;
+	margin-top: 4px;
+	color: #638ca0;
+	font-size: 11px;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.XHSPassCourierRequestButton.IsPending {
+	brightness: 0.6;
+}
+
+.XHSPassCourierRequestButton.IsSuccess {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #16452c ), to( #23734b ) );
+	border-color: #70e39a99;
+}
+
+.XHSPassCourierRequestOverlay {
+	width: 100%;
+	height: 100%;
+	position: 0px 0px 0px;
+	z-index: 80;
+	opacity: 0;
+	visibility: collapse;
+	transition-property: opacity;
+	transition-duration: 0.16s;
+}
+
+.XHSPassCourierRequestOverlay.IsVisible {
+	opacity: 1;
+	visibility: visible;
+}
+
+.XHSPassCourierRequestBackdrop {
+	width: 100%;
+	height: 100%;
+	background-color: #01040ad8;
+	border: 0px solid transparent;
+}
+
+.XHSPassCourierRequestWindow {
+	width: 1180px;
+	height: 640px;
+	align: center center;
+	padding: 16px;
+	flow-children: down;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #0d1e35fc ), color-stop( 0.56, #07111ffc ), to( #050912fc ) );
+	border: 1px solid #a66ee4a0;
+	box-shadow: fill #000000d8 0px 12px 28px 0px, #9b69de28 0px 0px 18px 0px;
+}
+
+.XHSPassCourierRequestWindowHeader {
+	width: 100%;
+	height: 84px;
+	flow-children: right;
+	border-bottom: 1px solid #9b69de40;
+}
+
+.XHSPassCourierRequestHeaderCopy {
+	width: fill-parent-flow( 1.0 );
+	height: 100%;
 	flow-children: down;
 }
 
-.XHSPassShopImage {
+.XHSPassCourierRequestWindowEyebrow {
+	color: #b88be8;
+	font-size: 11px;
+	font-weight: bold;
+	letter-spacing: 2px;
+	text-transform: uppercase;
+}
+
+.XHSPassCourierRequestWindow .XHSPassCourierRequestTitle {
+	margin-top: 3px;
+	font-size: 21px;
+}
+
+.XHSPassCourierRequestWindow .XHSPassCourierRequestBody {
+	width: 820px;
+	white-space: normal;
+}
+
+.XHSPassCourierRequestCloseButton {
+	width: 42px;
+	height: 42px;
+	horizontal-align: right;
+	background-color: #071827e8;
+	border: 1px solid #9b69de70;
+}
+
+.XHSPassCourierRequestCloseButton:hover {
+	brightness: 1.3;
+	border-color: #dfc0ff;
+}
+
+.XHSPassCourierRequestCloseButton Label {
+	align: center center;
+	color: #f5ebff;
+	font-size: 26px;
+}
+
+.XHSPassCourierRequestGrid {
 	width: 100%;
-	height: 126px;
-	background-size: contain;
-	background-position: 50% 50%;
-	background-repeat: no-repeat;
-	background-color: gradient( linear, 0% 0%, 100% 100%, from( #071321 ), color-stop( 0.55, #0b2634 ), to( #030811 ) );
-	border: 1px solid #58c8ff30;
+	height: fill-parent-flow( 1.0 );
+	margin-top: 10px;
+	flow-children: right-wrap;
+	overflow: squish scroll;
+}
+
+.XHSPassDevAssetMapper {
+	width: 100%;
+	height: 100%;
+	flow-children: down;
+}
+
+.XHSPassArmoryGrid.IsDevAssetMode {
+	flow-children: down;
 	overflow: clip;
+}
+
+.XHSPassDevAssetToolbar {
+	width: 100%;
+	height: 70px;
+	padding: 10px 12px;
+	flow-children: right;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #15102af2 ), color-stop( 0.55, #092039f2 ), to( #04101cf2 ) );
+	border: 1px solid #c99cff65;
+	box-shadow: inset #ffffff10 0px 1px 0px 0px, fill #0000008c 0px 4px 12px 0px;
+}
+
+.XHSPassDevAssetToolbarCopy {
+	width: fill-parent-flow( 1.0 );
+	flow-children: down;
+}
+
+.XHSPassDevAssetTitle {
+	color: #f1e6ff;
+	font-size: 20px;
+	font-weight: bold;
+	letter-spacing: 1.5px;
+	text-shadow: 0px 0px 8px #c99cff55, 0px 1px 3px #000000;
+}
+
+.XHSPassDevAssetStatus {
+	width: 100%;
+	margin-top: 4px;
+	color: #8fcce8;
+	font-size: 13px;
+	text-overflow: shrink;
+}
+
+.XHSPassDevToolbarButton {
+	width: 110px;
+	height: 38px;
+	margin-left: 10px;
+	vertical-align: center;
+	background-color: #152334;
+	border: 1px solid #5ad0ff58;
+	transition-property: brightness, border;
+	transition-duration: 0.12s;
+}
+
+.XHSPassDevToolbarButton.IsPrimary {
+	width: 190px;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #572069 ), to( #184c71 ) );
+	border: 1px solid #db9dff90;
+}
+
+.XHSPassDevToolbarButton.IsDanger {
+	width: 145px;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #56202b ), to( #842d3d ) );
+	border: 1px solid #ff879775;
+}
+
+.XHSPassDevToolbarButton.IsStopTest {
+	width: 125px;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #153a42 ), to( #236d66 ) );
+	border: 1px solid #70e3c875;
+}
+
+.XHSPassDevToolbarButton.IsLocked {
+	brightness: 0.55;
+	saturation: 0.4;
+}
+
+.XHSPassDevToolbarButton:hover {
+	brightness: 1.3;
+	border: 1px solid #e5c1ff;
+}
+
+.XHSPassDevToolbarButton Label {
+	align: center center;
+	color: #edf8ff;
+	font-size: 13px;
+	font-weight: bold;
+	text-transform: uppercase;
+}
+
+.XHSPassDevAssetColumns {
+	width: 100%;
+	height: fill-parent-flow( 1.0 );
+	margin-top: 10px;
+	flow-children: right;
+}
+
+.XHSPassDevAssetColumn {
+	height: 100%;
+	padding: 10px;
+	flow-children: down;
+	background-color: #030a12e8;
+	border: 1px solid #5ad0ff2e;
+}
+
+.XHSPassDevAssetColumn {
+	width: 43%;
+	margin-right: 10px;
+}
+
+.XHSPassDevTargetColumn {
+	width: fill-parent-flow( 1.0 );
+	height: 100%;
+	flow-children: down;
+	overflow: squish scroll;
+}
+
+.XHSPassDevTargetBucket {
+	width: 100%;
+	height: fit-children;
+	padding: 10px;
+	flow-children: down;
+	background-color: #030a12e8;
+	border: 1px solid #5ad0ff2e;
+}
+
+.XHSPassDevTargetBucket.IsUnassignedBucket {
+	min-height: 100%;
+	border: 1px solid #ff6f6f55;
+}
+
+.XHSPassDevTargetBucket.IsAssignedBucket {
+	margin-top: 10px;
+	border: 1px solid #70e39a55;
+}
+
+.XHSPassDevColumnTitle {
+	width: 100%;
+	height: 25px;
+	color: #9bdfff;
+	font-size: 14px;
+	font-weight: bold;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+}
+
+.XHSPassDevAssetGrid {
+	width: 100%;
+	height: fill-parent-flow( 1.0 );
+	flow-children: right-wrap;
+	overflow: squish scroll;
+}
+
+.XHSPassDevAssetCard {
+	width: 148px;
+	height: 142px;
+	margin-right: 8px;
+	margin-bottom: 8px;
+	padding: 6px;
+	flow-children: down;
+	background-color: #071522f2;
+	border: 1px solid #5ad0ff38;
+	transition-property: brightness, border, box-shadow;
+	transition-duration: 0.12s;
+}
+
+.XHSPassDevAssetCard:hover {
+	brightness: 1.24;
+	border: 1px solid #73d9ff;
+}
+
+.XHSPassDevAssetCard.IsSelected {
+	border: 2px solid #d79cff;
+	box-shadow: fill #c99cff22 0px 0px 12px 0px, inset #c99cff18 0px 0px 10px 0px;
+}
+
+.XHSPassDevAssetPreview {
+	width: 100%;
+	height: 96px;
+}
+
+.XHSPassDevAssetPath {
+	width: 100%;
+	height: 31px;
+	margin-top: 5px;
+	color: #b9d8e8;
+	font-size: 11px;
+	text-overflow: shrink;
+}
+
+.XHSPassDevTargetList {
+	width: 100%;
+	height: fit-children;
+	flow-children: down;
+	overflow: clip;
+}
+
+.XHSPassDevBucketEmpty {
+	width: 100%;
+	margin-top: 24px;
+	color: #758b9b;
+	font-size: 14px;
+	font-style: italic;
+	text-align: center;
+}
+
+.XHSPassDevRewardTarget {
+	width: 100%;
+	height: 182px;
+	margin-bottom: 8px;
+	padding: 8px;
+	flow-children: right;
+	background-color: #071522f2;
+	border: 1px solid #5ad0ff2e;
+}
+
+.XHSPassDevRewardTarget.IsChanged {
+	border: 1px solid #c99cff90;
+	box-shadow: inset #c99cff12 0px 0px 10px 0px;
+}
+
+.XHSPassDevRewardTarget.IsUnassigned {
+	border: 1px solid #ff6f6f90;
+	box-shadow: inset #7b162818 0px 0px 12px 0px;
+}
+
+.XHSPassDevTargetPreview {
+	width: 140px;
+	height: 94px;
+}
+
+.XHSPassDevTargetCopy {
+	width: fill-parent-flow( 1.0 );
+	height: 100%;
+	margin-left: 10px;
+	flow-children: down;
+}
+
+.XHSPassDevTargetTitle {
+	width: 100%;
+	height: 25px;
+	color: #f3fbff;
+	font-size: 15px;
+	font-weight: bold;
+	text-overflow: shrink;
+}
+
+.XHSPassDevTargetMeta {
+	width: 100%;
+	margin-top: 3px;
+	color: #79bddc;
+	font-size: 12px;
+}
+
+.XHSPassDevTargetPath {
+	width: 100%;
+	height: 30px;
+	margin-top: 5px;
+	color: #aebbc8;
+	font-size: 11px;
+	text-overflow: shrink;
+}
+
+.XHSPassDevTargetRuntimeAssets {
+	width: 100%;
+	height: 64px;
+	margin-top: 2px;
+	flow-children: down;
+	overflow: clip;
+}
+
+.XHSPassDevRuntimeAsset {
+	width: 100%;
+	height: 31px;
+	flow-children: down;
+}
+
+.XHSPassDevRuntimeAssetName {
+	width: 100%;
+	height: 17px;
+	color: #92e3ff;
+	font-size: 13px;
+	font-weight: semi-bold;
+	text-shadow: 0px 0px 5px #46bde04a;
+	text-overflow: ellipsis;
+}
+
+.XHSPassDevRuntimeAssetDirectory {
+	width: 100%;
+	height: 14px;
+	color: #8daebe;
+	font-size: 11px;
+	font-family: monospace;
+	text-overflow: shrink;
+}
+
+.XHSPassDevRuntimeUnavailable {
+	width: 100%;
+	margin-top: 4px;
+	color: #7894a7;
+	font-size: 11px;
+	font-style: italic;
+}
+
+.XHSPassDevTestState {
+	width: 100%;
+	height: 20px;
+	margin-top: 2px;
+	color: #7894a7;
+	font-size: 11px;
+	font-weight: semi-bold;
+	text-overflow: shrink;
+	text-transform: uppercase;
+}
+
+.XHSPassDevRewardTarget.IsTestActive {
+	border: 1px solid #70e3c8;
+	box-shadow: inset #1f8f7428 0px 0px 14px 0px, fill #70e3c81a 0px 0px 10px 0px;
+}
+
+.XHSPassDevRewardTarget.IsTestPending {
+	border: 1px solid #ffcf66;
+}
+
+.XHSPassDevRewardTarget.IsTestError {
+	border: 1px solid #ff6f6f;
+}
+
+.XHSPassDevTargetActions {
+	width: 122px;
+	height: 100%;
+	margin-left: 8px;
+	flow-children: down;
+}
+
+.XHSPassDevTestButton {
+	width: 122px;
+	height: 30px;
+	margin-bottom: 7px;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #15475d ), to( #267d72 ) );
+	border: 1px solid #70e3c875;
+	transition-property: brightness, border, box-shadow;
+	transition-duration: 0.12s;
+}
+
+.XHSPassDevTestButton:hover {
+	brightness: 1.3;
+	border: 1px solid #b6fff0;
+}
+
+.XHSPassDevTestButton.IsActive {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #23654f ), to( #35a77e ) );
+	border: 1px solid #9effda;
+	box-shadow: fill #70e3c825 0px 0px 8px 0px;
+}
+
+.XHSPassDevTestButton.IsPending {
+	background-color: #5a4822;
+	border: 1px solid #ffcf66;
+}
+
+.XHSPassDevTestButton.IsLocked {
+	brightness: 0.55;
+	saturation: 0.35;
+}
+
+.XHSPassDevTestButton Label {
+	align: center center;
+	color: #f3fffc;
+	font-size: 11px;
+	font-weight: bold;
+	text-align: center;
+	text-transform: uppercase;
+}
+
+.XHSPassDevAssignButton {
+	width: 122px;
+	height: 36px;
+	margin-bottom: 7px;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #245177 ), to( #6f2d86 ) );
+	border: 1px solid #b582d970;
+	transition-property: brightness, border;
+	transition-duration: 0.12s;
+}
+
+.XHSPassDevAssignButton.IsUnassign {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #54202b ), to( #7b2736 ) );
+	border: 1px solid #ff8c9a70;
+}
+
+.XHSPassDevAssignButton:hover {
+	brightness: 1.3;
+	border: 1px solid #e2b3ff;
+}
+
+.XHSPassDevAssignButton.IsLocked {
+	background-color: #202a36;
+	brightness: 0.7;
+}
+
+.XHSPassDevAssignButton Label {
+	align: center center;
+	color: #f3fbff;
+	font-size: 12px;
+	font-weight: bold;
+	text-align: center;
+	text-transform: uppercase;
+}
+
+.XHSPassDevAssetGrid VerticalScrollBar,
+.XHSPassDevTargetColumn VerticalScrollBar {
+	width: 8px;
+	opacity: 1;
+	background-color: #020712d8;
+}
+
+.XHSPassDevAssetGrid VerticalScrollBar .ScrollThumb,
+.XHSPassDevTargetColumn VerticalScrollBar .ScrollThumb {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #6f2d86 ), to( #5ad0ff ) );
+	border: 1px solid #b79cff80;
+}
+
+.XHSPassShopCard {
+	width: 258px;
+	height: 360px;
+	margin-right: 14px;
+	margin-bottom: 14px;
+	padding: 12px;
+	flow-children: down;
+	border: 1px solid #58c8ff38;
+	box-shadow: fill #000000a8 0px 5px 13px 0px, inset #b9ecff0d 0px 1px 0px 0px;
+}
+
+.XHSPassShopCard.HasAnimatedPreview {
+	width: 278px;
+}
+
+.XHSPassShopPreview {
+	width: 100%;
+	height: 168px;
+}
+
+.XHSPassShopPreview .XHSPassCompanionScene {
+	height: 112%;
+	margin-top: -10px;
 }
 
 .XHSPassShopName {
@@ -1412,6 +2353,7 @@
 	font-size: 18px;
 	font-weight: bold;
 	text-overflow: shrink;
+	text-shadow: 0px 1px 4px 2.0 #000000;
 }
 
 .XHSPassShopMeta {
@@ -1427,14 +2369,23 @@
 	color: #f2c94c;
 	font-size: 22px;
 	font-weight: bold;
+	text-shadow: 0px 1px 4px 2.0 #000000;
 }
 
 .XHSPassShopButton {
 	width: 100%;
 	height: 38px;
 	margin-top: 10px;
-	background-color: #0a7ca8;
-	border: 1px solid #ffffff20;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #075675 ), color-stop( 0.5, #0a8ab8 ), to( #075675 ) );
+	border: 1px solid #8ce5ff4c;
+	box-shadow: fill #00000080 0px 2px 6px 0px, inset #ffffff14 0px 1px 0px 0px;
+	transition-property: brightness, border;
+	transition-duration: 0.12s;
+}
+
+.XHSPassShopButton:hover {
+	brightness: 1.28;
+	border: 1px solid #c6f2ff;
 }
 
 .XHSPassShopButton Label {
@@ -1447,6 +2398,16 @@
 .XHSPassShopButton.IsLocked {
 	background-color: #202a36;
 	brightness: 0.75;
+}
+
+.XHSPassShopCard.IsEquipped {
+	border: 1px solid #70e39a8c;
+	box-shadow: fill #000000a8 0px 5px 13px 0px, fill #70e39a18 0px 0px 10px 0px;
+}
+
+.XHSPassShopCard.IsLocked .XHSPassItemPreview {
+	saturation: 0.25;
+	brightness: 0.46;
 }
 
 .XHSPassSettingRow,

@@ -15,6 +15,8 @@
 -- Editors:
 --     Earth Salamander #42
 
+require('libraries/keyvalues')
+
 LinkLuaModifier("modifier_companion", "components/battlepass/modifiers/modifier_companion.lua", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_patreon_donator", "components/battlepass/modifiers/modifier_patreon_donator.lua", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_donator_statue", "components/battlepass/modifiers/modifier_donator_statue.lua", LUA_MODIFIER_MOTION_NONE)
@@ -33,6 +35,7 @@ CustomGameEventManager:RegisterListener("supporter_pass_equip_item", Dynamic_Wra
 CustomGameEventManager:RegisterListener("supporter_pass_update_settings", Dynamic_Wrap(Battlepass, "SupporterPassUpdateSettings"))
 CustomGameEventManager:RegisterListener("supporter_pass_dev_test_reward", Dynamic_Wrap(Battlepass, "SupporterPassDevTestReward"))
 CustomGameEventManager:RegisterListener("supporter_pass_dev_stop_test", Dynamic_Wrap(Battlepass, "SupporterPassDevStopTest"))
+CustomGameEventManager:RegisterListener("supporter_pass_request_companion", Dynamic_Wrap(Battlepass, "SupporterPassRequestCompanion"))
 CustomGameEventManager:RegisterListener("toggle_ingame_tag", Dynamic_Wrap(Battlepass, 'ToggleDonatorTag'))
 CustomGameEventManager:RegisterListener("change_ingame_tag", Dynamic_Wrap(Battlepass, 'SetDonatorTag'))
 CustomGameEventManager:RegisterListener("change_supporter_pass_rewards", Dynamic_Wrap(Battlepass, 'BattlepassRewards'))
@@ -394,51 +397,6 @@ function Battlepass:ResolveSupporterItem(playerID, itemID, requestedSlot)
 	if item == nil then
 		item = self:BuildLegacySupporterItem(playerID, itemID, requestedSlot)
 	end
-	if item == nil and SupporterPass and SupporterPass:GetTierForPlayer(playerID) > 0 then
-		local slot = NormalizeSupporterSlot(requestedSlot)
-		local catalogs = {
-			companion = api and api.companions or {},
-			emblem = api and api.emblems or {},
-			effigy = api and api.effigies or {},
-		}
-		for _, cosmetic in pairs(catalogs[slot] or {}) do
-			if SupporterItemMatches(cosmetic, itemID) then
-				local requiredTier = RequiredSupporterTier(cosmetic, 1)
-				if SupporterPass:GetTierForPlayer(playerID) >= requiredTier then
-					item = CopySupporterItem(cosmetic)
-					item.id = item.id or tostring(itemID)
-					item.item_id = item.item_id or item.id or tostring(itemID)
-					item.type = slot
-					item.slot_id = slot
-					item.hero = "global"
-					item.legacy = true
-					if slot == "companion" or slot == "effigy" then
-						item.unit = item.unit or item.unit_name or item.file
-					elseif slot == "emblem" then
-						item.particle = item.particle or item.file
-					end
-				end
-				break
-			end
-		end
-		if item == nil and slot == "companion" then
-			local companions = LoadKeyValues("scripts/npc/units/companions.txt") or {}
-			if type(companions[tostring(itemID)]) == "table" then
-				item = {
-					id = tostring(itemID), item_id = tostring(itemID), unit = tostring(itemID),
-					type = "companion", slot_id = "companion", hero = "global", legacy = true,
-				}
-			end
-		elseif item == nil and slot == "effigy" then
-			local statues = LoadKeyValues("scripts/npc/units/statues.txt") or {}
-			if type(statues[tostring(itemID)]) == "table" then
-				item = {
-					id = tostring(itemID), item_id = tostring(itemID), unit = tostring(itemID),
-					type = "effigy", slot_id = "effigy", hero = "global", legacy = true,
-				}
-			end
-		end
-	end
 	if item == nil then return nil end
 
 	item.item_id = item.item_id or item.catalog_item_id or item.reward_item_id or item.id
@@ -592,8 +550,9 @@ end
 
 function Battlepass:GetSupporterCatalogItemID(item)
 	if type(item) ~= "table" or ItemsGame == nil then return nil end
-	local candidates = { item.catalog_item_id, item.reward_item_id, item.item_id, item.id }
-	for _, candidate in ipairs(candidates) do
+	local candidateFields = { "catalog_item_id", "reward_item_id", "item_id", "id" }
+	for _, field in ipairs(candidateFields) do
+		local candidate = item[field]
 		if candidate ~= nil and ItemsGame:GetItemKV(candidate) ~= nil then
 			return tostring(candidate)
 		end
@@ -671,21 +630,49 @@ end
 
 function Battlepass:PlaySupporterKillEffect(hero, victim, item)
 	if hero == nil or victim == nil or item == nil or hero:IsNull() or victim:IsNull() then return false end
-	local played = false
-	local targetParticle = self:GetSupporterItemParticle(item, "particles/kill_effect/default_target.vpcf")
-	if targetParticle then
-		local particle = ParticleManager:CreateParticle(targetParticle, PATTACH_ABSORIGIN_FOLLOW, victim)
-		ParticleManager:SetParticleControl(particle, 0, victim:GetAbsOrigin())
+
+	local function PlayAttachedParticle(particleName, anchor, counterpart)
+		if particleName == nil or particleName == "" or anchor == nil or anchor:IsNull() then return false end
+		local anchorOrigin = anchor:GetAbsOrigin()
+		local particle = ParticleManager:CreateParticle(particleName, PATTACH_ABSORIGIN_FOLLOW, anchor)
+		if particle == nil or particle < 0 then return false end
+
+		ParticleManager:SetParticleControl(particle, 0, anchorOrigin)
+		ParticleManager:SetParticleControlEnt(
+			particle,
+			0,
+			anchor,
+			PATTACH_POINT_FOLLOW,
+			"attach_hitloc",
+			anchorOrigin,
+			true
+		)
+		if counterpart ~= nil and not counterpart:IsNull() then
+			ParticleManager:SetParticleControlEnt(
+				particle,
+				1,
+				counterpart,
+				PATTACH_POINT_FOLLOW,
+				"attach_hitloc",
+				counterpart:GetAbsOrigin(),
+				true
+			)
+		end
 		ParticleManager:ReleaseParticleIndex(particle)
-		played = true
+		if IsInToolsMode() then
+			print("[Supporter Pass] Played kill FX:", particleName, "particle:", particle)
+		end
+		return true
 	end
 
+	local played = false
+	local targetParticle = self:GetSupporterItemParticle(item, "particles/kill_effect/default_target.vpcf")
+	played = PlayAttachedParticle(targetParticle, victim, hero) or played
+
 	local casterParticle = self:GetSupporterItemParticle(item, "particles/kill_effect/default_caster.vpcf")
-	if casterParticle then
-		local particle = ParticleManager:CreateParticle(casterParticle, PATTACH_ABSORIGIN_FOLLOW, hero)
-		ParticleManager:SetParticleControl(particle, 0, hero:GetAbsOrigin())
-		ParticleManager:ReleaseParticleIndex(particle)
-		played = true
+	played = PlayAttachedParticle(casterParticle, hero, victim) or played
+	if IsInToolsMode() and not played then
+		print("[Supporter Pass] No kill FX resolved for item:", tostring(item.item_id or item.id or "?"))
 	end
 	return played
 end
@@ -816,6 +803,9 @@ function Battlepass:CleanupSupporterDevTest(playerID, restoreLoadout)
 		if state.timer ~= nil and Timers ~= nil then
 			Timers:RemoveTimer(state.timer)
 		end
+		if state.hide_target_timer ~= nil and Timers ~= nil then
+			Timers:RemoveTimer(state.hide_target_timer)
+		end
 		if state.target ~= nil and not state.target:IsNull() then
 			UTIL_Remove(state.target)
 		end
@@ -840,6 +830,9 @@ function Battlepass:ApplySupporterDevTestItem(playerID, state, hero, reapply)
 	local slot = state.slot
 
 	if slot == "emblem" then
+		local particle = item.particle or item.file or self:GetSupporterItemParticle(item, "particles/hero_emblem/default.vpcf")
+		if particle == nil or particle == "" then return false, "#xhs_sp_dev_test_error_asset" end
+		item.particle = particle
 		self:ApplySupporterEmblem(hero, item)
 		return true
 	elseif slot == "companion" then
@@ -884,12 +877,20 @@ function Battlepass:ApplySupporterDevTestItem(playerID, state, hero, reapply)
 		target.xhs_supporter_dev_test_target = true
 		target:AddNewModifier(target, nil, "modifier_invulnerable", {})
 		target:AddNewModifier(target, nil, "modifier_command_restricted", {})
+		target:AddNewModifier(target, nil, "modifier_phased", {})
 		state.target = target
 		if not self:PlaySupporterKillEffect(hero, target, item) then
 			UTIL_Remove(target)
 			state.target = nil
 			return false, "#xhs_sp_dev_test_error_asset"
 		end
+		target:StartGesture(ACT_DOTA_DIE)
+		state.hide_target_timer = Timers:CreateTimer(0.45, function()
+			if self.SUPPORTER_DEV_TESTS[playerID] == state and state.target ~= nil and not state.target:IsNull() then
+				state.target:AddNoDraw()
+			end
+			return nil
+		end)
 		return true
 	end
 	return false, "#xhs_sp_dev_test_error_type"
@@ -954,24 +955,35 @@ function Battlepass:SupporterPassDevTestReward(event_source_index, event)
 		transient = not persistent,
 	}
 	self.SUPPORTER_DEV_TESTS[playerID] = state
-	local success, message = self:ApplySupporterDevTestItem(playerID, state, hero, false)
-	if not success then
-		self:CleanupSupporterDevTest(playerID, true)
-		self:SendSupporterDevTestResult(playerID, requestID, itemID, slot, "error", message)
-		return
-	end
-
-	self:SendSupporterDevTestResult(playerID, requestID, itemID, slot, "active", "#xhs_sp_dev_test_active")
-	if not persistent then
-		local duration = slot == "teleport" and 3.6 or 1.8
-		state.timer = Timers:CreateTimer(duration, function()
-			if self.SUPPORTER_DEV_TESTS[playerID] == state then
-				self:CleanupSupporterDevTest(playerID, true)
-				self:SendSupporterDevTestResult(playerID, requestID, itemID, slot, "success", "#xhs_sp_dev_test_success")
-			end
+	state.timer = Timers:CreateTimer(0.5, function()
+		if self.SUPPORTER_DEV_TESTS[playerID] ~= state or state.cancelled == true then return nil end
+		state.timer = nil
+		local currentHero = PlayerResource:GetSelectedHeroEntity(playerID)
+		local success, message = self:ApplySupporterDevTestItem(playerID, state, currentHero, false)
+		if not success then
+			self:CleanupSupporterDevTest(playerID, true)
+			self:SendSupporterDevTestResult(playerID, requestID, itemID, slot, "error", message)
 			return nil
-		end)
-	end
+		end
+
+		self:SendSupporterDevTestResult(playerID, requestID, itemID, slot, "active", "#xhs_sp_dev_test_active")
+		if not persistent then
+			local duration = 1.8
+			if slot == "teleport" then
+				duration = 3.6
+			elseif slot == "kill_effect" then
+				duration = 3.5
+			end
+			state.timer = Timers:CreateTimer(duration, function()
+				if self.SUPPORTER_DEV_TESTS[playerID] == state then
+					self:CleanupSupporterDevTest(playerID, true)
+					self:SendSupporterDevTestResult(playerID, requestID, itemID, slot, "success", "#xhs_sp_dev_test_success")
+				end
+				return nil
+			end)
+		end
+		return nil
+	end)
 end
 
 function Battlepass:SupporterPassDevStopTest(event_source_index, event)
@@ -1081,6 +1093,101 @@ function Battlepass:SendSupporterPassFailure(playerID, eventName, message, paylo
 	payload = payload or {}
 	payload.message = payload.message or message
 	CustomGameEventManager:Send_ServerToPlayer(player, eventName, payload)
+end
+
+function Battlepass:GetSupporterCompanionModelSet()
+	if self.SupporterCompanionModelSet ~= nil then
+		return self.SupporterCompanionModelSet
+	end
+
+	self.SupporterCompanionModelSet = {}
+	local companions = LoadKeyValues("scripts/npc/units/companions.txt") or {}
+	for _, unit in pairs(companions) do
+		if type(unit) == "table" and type(unit.Model) == "string" then
+			self.SupporterCompanionModelSet[string.lower(unit.Model)] = true
+		end
+	end
+	return self.SupporterCompanionModelSet
+end
+
+function Battlepass:GetCourierRequestModel(itemDef)
+	if Wearable == nil or Wearable.items == nil or Wearable.asset_modifier == nil then
+		return nil, nil
+	end
+
+	local key = tostring(itemDef or "")
+	local item = Wearable.items[key]
+	if type(item) ~= "table" or tostring(item.prefab or "") ~= "courier" then
+		return nil, nil
+	end
+
+	local fallback = nil
+	for _, modifier in pairs(Wearable.asset_modifier[key] or {}) do
+		if type(modifier) == "table" and modifier.type == "courier" and type(modifier.modifier) == "string" then
+			fallback = fallback or modifier.modifier
+			if modifier.asset == "radiant" and (modifier.style == nil or tostring(modifier.style) == "0") then
+				return modifier.modifier, item
+			end
+		end
+	end
+	return fallback, item
+end
+
+function Battlepass:SupporterPassRequestCompanion(event_source_index, event)
+	event = self:GetSupporterPassEventPayload(event_source_index, event)
+	local playerID = event.PlayerID
+	local itemDef = tostring(event.item_def or "")
+	local requestID = tostring(event.request_id or "")
+	if playerID == nil or itemDef == "" or not string.match(itemDef, "^%d+$") then
+		self:SendSupporterPassFailure(playerID, "supporter_pass_companion_request_result", "#xhs_sp_request_failed", {
+			item_def = itemDef,
+			request_id = requestID,
+			accepted = false,
+		})
+		return
+	end
+
+	self.SupporterCompanionRequestTimes = self.SupporterCompanionRequestTimes or {}
+	local now = GameRules:GetGameTime()
+	if now - (self.SupporterCompanionRequestTimes[playerID] or -100) < 2 then
+		self:SendSupporterPassFailure(playerID, "supporter_pass_companion_request_result", "#xhs_sp_request_rate_limited", {
+			item_def = itemDef,
+			request_id = requestID,
+			accepted = false,
+		})
+		return
+	end
+	self.SupporterCompanionRequestTimes[playerID] = now
+
+	local model, item = self:GetCourierRequestModel(itemDef)
+	if model == nil or self:GetSupporterCompanionModelSet()[string.lower(model)] then
+		self:SendSupporterPassFailure(playerID, "supporter_pass_companion_request_result", "#xhs_sp_request_invalid_courier", {
+			item_def = itemDef,
+			request_id = requestID,
+			accepted = false,
+		})
+		return
+	end
+
+	local steamID = PlayerResource:GetSteamAccountID(playerID)
+	print(string.format(
+		"[SUPPORTER_COMPANION_REQUEST] player_id=%d steam_id=%s item_def=%s name=%s model=%s",
+		playerID,
+		tostring(steamID or ""),
+		itemDef,
+		tostring(item.name or item.item_name or ""),
+		model
+	))
+
+	local player = PlayerResource:GetPlayer(playerID)
+	if player ~= nil then
+		CustomGameEventManager:Send_ServerToPlayer(player, "supporter_pass_companion_request_result", {
+			item_def = itemDef,
+			request_id = requestID,
+			accepted = true,
+			message = "#xhs_sp_request_recorded",
+		})
+	end
 end
 
 function Battlepass:FindSupporterPassShopItem(itemID)

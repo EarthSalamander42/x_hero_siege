@@ -26,6 +26,11 @@
 	z-index: 20;
 }
 
+#XHSOverheadRoot.XHSPauseOccluded {
+	visibility: collapse;
+	opacity: 0;
+}
+
 #XHSOverheadMockupRoot {
 	width: 940px;
 	height: fit-children;
@@ -1668,8 +1673,9 @@
 	background-color: gradient( linear, 0% 0%, 100% 0%, from( #020914e6 ), color-stop( 0.5, #082033ee ), to( #020914e6 ) );
 	border: 1px solid #65d8ff70;
 	box-shadow: fill #000000a8 0px 0px 8px 0px, inset #d9f8ff1d 0px 1px 0px 0px;
-	transition-property: opacity, transform, brightness;
-	transition-duration: 0.12s;
+	transition-property: opacity, transform, brightness, width, height, pre-transform-scale2d, background-color, border, box-shadow;
+	transition-duration: 0.12s, 0.12s, 0.12s, 0.55s, 0.55s, 0.55s, 0.9s, 0.9s, 0.9s;
+	transition-timing-function: ease-in-out;
 }
 
 .XHSArenaFocusTimer {
@@ -1735,6 +1741,103 @@
 	transition-property: width;
 	transition-duration: 0s;
 	transition-timing-function: linear;
+}
+
+.XHSArenaFocusTimer.XHSMuradinFrenzy {
+	width: 246px;
+	height: 78px;
+	pre-transform-scale2d: 1.04;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #1a0802f2 ), color-stop( 0.5, #522008f5 ), to( #1a0802f2 ) );
+	border: 1px solid #ff9c35e8;
+	box-shadow: fill #000000c8 0px 0px 12px 0px, fill #ff7a244f 0px 0px 16px 0px, inset #ffe3a63b 0px 1px 0px 0px;
+	animation-name: XHSMuradinFrenzyFramePulse;
+	animation-duration: 1.15s;
+	animation-iteration-count: infinite;
+	animation-timing-function: ease-in-out;
+}
+
+.XHSArenaFocusTimer .XHSFocusTimerTitle {
+	transition-property: color, text-shadow;
+	transition-duration: 0.85s;
+	transition-timing-function: ease-in-out;
+}
+
+.XHSArenaFocusTimer.XHSMuradinFrenzy .XHSFocusTimerTitle {
+	color: #ffc16b;
+	text-shadow: 0px 0px 7px #ff702f80, 0px 1px 3px #000000;
+}
+
+.XHSArenaFocusTimer .XHSFocusTimerValue {
+	transition-property: color, text-shadow, pre-transform-scale2d;
+	transition-duration: 1.05s;
+	transition-timing-function: ease-in-out;
+}
+
+.XHSArenaFocusTimer.XHSMuradinFrenzy .XHSFocusTimerValue {
+	color: #ffac42;
+	text-shadow: 0px 0px 11px #ff5c22c8, 0px 1px 4px #000000;
+	pre-transform-scale2d: 1.08;
+}
+
+.XHSArenaFocusTimer.XHSMuradinFrenzy .XHSFocusTimerProgressTrack {
+	background-color: #39130de8;
+}
+
+.XHSArenaFocusTimer.XHSMuradinFrenzy .XHSFocusTimerProgressFill {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #ffd25d ), color-stop( 0.52, #ff7b26 ), to( #d72f19 ) );
+	box-shadow: #ff6329c0 0px 0px 12px 0px;
+}
+
+.XHSMuradinFrenzyBanner {
+	width: 100%;
+	height: 0px;
+	margin-top: 0px;
+	flow-children: right;
+	opacity: 0;
+	overflow: noclip;
+	transform: translateY( -8px );
+	pre-transform-scale2d: 0.72;
+	transition-property: height, margin-top, opacity, transform, pre-transform-scale2d;
+	transition-duration: 0.48s, 0.48s, 0.38s, 0.48s, 0.48s;
+	transition-timing-function: ease-out;
+}
+
+.XHSArenaFocusTimer.XHSMuradinFrenzy .XHSMuradinFrenzyBanner {
+	height: 20px;
+	margin-top: 6px;
+	opacity: 1;
+	transform: translateY( 0px );
+	pre-transform-scale2d: 1;
+}
+
+.XHSMuradinFrenzyLine {
+	width: 43px;
+	height: 1px;
+	margin-top: 9px;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #ff9b3100 ), to( #ffb23cdd ) );
+	box-shadow: #ff6d2980 0px 0px 6px 0px;
+}
+
+.XHSMuradinFrenzyLineRight {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #ffb23cdd ), to( #ff9b3100 ) );
+}
+
+.XHSMuradinFrenzyLabel {
+	width: 112px;
+	height: 20px;
+	margin-left: 7px;
+	margin-right: 7px;
+	color: #ffd07a;
+	font-size: 13px;
+	font-weight: bold;
+	letter-spacing: 2px;
+	text-align: center;
+	text-shadow: 0px 0px 8px #ff542db8, 0px 1px 3px #000000;
+	text-overflow: shrink;
+	animation-name: XHSMuradinFrenzyLabelPulse;
+	animation-duration: 0.82s;
+	animation-iteration-count: infinite;
+	animation-timing-function: ease-in-out;
 }
 
 .XHSPersonalTimerProgressTrack {
@@ -1851,6 +1954,20 @@
 	100% { brightness: 0.95; pre-transform-scale2d: 1.0; }
 }
 
+@keyframes 'XHSMuradinFrenzyFramePulse'
+{
+	0% { brightness: 0.96; }
+	50% { brightness: 1.12; }
+	100% { brightness: 0.96; }
+}
+
+@keyframes 'XHSMuradinFrenzyLabelPulse'
+{
+	0% { brightness: 0.9; pre-transform-scale2d: 0.98; }
+	50% { brightness: 1.28; pre-transform-scale2d: 1.05; }
+	100% { brightness: 0.9; pre-transform-scale2d: 0.98; }
+}
+
 .XHSAllyCard {
 	width: 88px;
 	height: 89px;
@@ -1961,6 +2078,16 @@
 .XHSAllyCard.IsDead .XHSAllyImageWrap {
 	border: 1px solid #8f1d24cc;
 	box-shadow: inset #ffb2a522 0px 1px 0px 0px, fill #7b111a80 0px 0px 8px 0px;
+}
+
+.XHSAllyCard.XHSAllyReincarnating .XHSAllyImageWrap {
+	border: 1px solid #62c7ffdd;
+	box-shadow: inset #d9f5ff2b 0px 1px 0px 0px, fill #279ddd92 0px 0px 9px 0px;
+}
+
+.XHSAllyCard.XHSAllyReviving .XHSAllyImageWrap {
+	border: 1px solid #ffd95cdd;
+	box-shadow: inset #fff4bd32 0px 1px 0px 0px, fill #d8a82192 0px 0px 9px 0px;
 }
 
 .XHSAllyHeroImage,
@@ -2101,6 +2228,18 @@
 	wash-color: #5f1115;
 }
 
+.XHSAllyCard.XHSAllyReincarnating .XHSAllyHeroImage {
+	brightness: 0.66;
+	saturation: 0.42;
+	wash-color: #176ea5;
+}
+
+.XHSAllyCard.XHSAllyReviving .XHSAllyHeroImage {
+	brightness: 0.7;
+	saturation: 0.44;
+	wash-color: #8b6810;
+}
+
 .XHSAllyImageWrap.IsDisconnected .XHSAllyHeroImage {
 	brightness: 0.16;
 	saturation: 0.08;
@@ -2156,15 +2295,53 @@
 	width: 100%;
 	height: 100%;
 	background-color: #00000000;
+	z-index: 5;
 }
 
-.IsDead .XHSAllyStatusOverlay {
+.XHSAllyCard.IsDead .XHSAllyStatusOverlay {
 	background-color: #7a0f1474;
+}
+
+.XHSAllyCard.XHSAllyReincarnating .XHSAllyStatusOverlay {
+	background-color: gradient( radial, 50% 50%, 0% 0%, 75% 75%, from( #45c8ff90 ), to( #083b708c ) );
+}
+
+.XHSAllyCard.XHSAllyReviving .XHSAllyStatusOverlay {
+	background-color: gradient( radial, 50% 50%, 0% 0%, 75% 75%, from( #ffe26b96 ), to( #76520b8f ) );
+}
+
+.XHSAllyRespawnLabel {
+	align: center center;
+	color: #ff746c;
+	font-size: 23px;
+	font-weight: bold;
+	text-align: center;
+	text-shadow: 0px 2px 4px #000000, 0px 0px 5px #8a1010;
+	visibility: collapse;
+	z-index: 7;
+}
+
+.XHSAllyCard.IsDead .XHSAllyRespawnLabel {
+	visibility: visible;
+}
+
+.XHSAllyCard.XHSAllyReincarnating .XHSAllyRespawnLabel {
+	color: #8dddff;
+	text-shadow: 0px 2px 4px #000000, 0px 0px 6px #168ed8;
+}
+
+.XHSAllyCard.XHSAllyReviving .XHSAllyRespawnLabel {
+	color: #ffe477;
+	text-shadow: 0px 2px 4px #000000, 0px 0px 6px #d59d18;
 }
 
 .XHSAllyImageWrap.IsDisconnected .XHSAllyStatusOverlay {
 	background-color: gradient(linear, 0% 0%, 100% 100%, from(#000000dc), color-stop(0.48, #05080ce8), to(#000000ca));
 	border: 1px solid #00000088;
+}
+
+.XHSAllyImageWrap.IsDisconnected .XHSAllyRespawnLabel {
+	visibility: collapse;
 }
 
 .XHSDisconnectIcon {
@@ -2179,7 +2356,7 @@
 	border: 1px solid #d5b87866;
 	box-shadow: fill #000000d8 0px 0px 7px 0px, #5fdcff88 0px 0px 5px 0px;
 	visibility: collapse;
-	z-index: 5;
+	z-index: 8;
 }
 
 .XHSAllyImageWrap.IsDisconnected .XHSDisconnectIcon {
@@ -2507,6 +2684,15 @@
 
 .AspectRatio4x3 .XHSArenaFocusTimer {
 	width: 185px;
+}
+
+.AspectRatio4x3 .XHSArenaFocusTimer.XHSMuradinFrenzy {
+	width: 220px;
+	height: 78px;
+}
+
+.AspectRatio4x3 .XHSMuradinFrenzyLine {
+	width: 30px;
 }
 
 .AspectRatio4x3 .XHSPersonalFocusTimer {

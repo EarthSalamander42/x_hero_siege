@@ -450,7 +450,7 @@
 		"MovementSpeed"				"400"			// Speed.
 		"MovementTurnRate"			"0.6"			// Turning rate.
 
-		"StatusHealth"				"100000"		// Base health.
+		"StatusHealth"				"125000"		// Base health.
 		"StatusHealthRegen"			"30.0"			// Health regeneration rate.
 		"StatusMana"				"5000"			// Base mana.
 		"StatusManaRegen"			"10.0"			// Mana regeneration rate.
@@ -2301,12 +2301,12 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
 		"AttackDamageType"			"DAMAGE_TYPE_ArmorPhysical"
-		"AttackDamageMin"			"85"									// Damage range min.
-		"AttackDamageMax"			"95"									// Damage range max.
-		"AttackRate"				"1.2"									// Speed of attack.
+		"AttackDamageMin"			"95"									// Damage range min.
+		"AttackDamageMax"			"105"									// Damage range max.
+		"AttackRate"				"1.15"									// Speed of attack.
 		"AttackAnimationPoint"		"0.45"									// Normalized time in animation cycle to attack.
-		"AttackAcquisitionRange"	"800"									// Range within a target can be acquired.
-		"AttackRange"				"300"									// Range within a target can be attacked.
+		"AttackAcquisitionRange"	"900"									// Range within a target can be acquired.
+		"AttackRange"				"400"									// Range within a target can be attacked.
 		"ProjectileModel"			"particles/units/heroes/hero_morphling/morphling_base_attack.vpcf"		// Particle system model for projectile.
 		"ProjectileSpeed"			"1250"									// Speed of projectile.
 	
@@ -2324,13 +2324,13 @@
 		// Movement
 		//-------------------------------------------------------------------------------------------------------------
 		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"
-		"MovementSpeed"				"315"
+		"MovementSpeed"				"325"
 		"MovementTurnRate"			"0.6"
 	
 		// Status
 		//----------------------------------------------------------------
-		"StatusHealth"				"850"		// Base health.
-		"StatusHealthRegen"			"0.0"			// Health regeneration rate.
+		"StatusHealth"				"1000"		// Base health.
+		"StatusHealthRegen"			"2.0"			// Health regeneration rate.
 		"StatusMana"				"0.0"		// Base mana.
 		"StatusManaRegen"			"0.0"		// Mana regeneration rate.
 	
@@ -2371,12 +2371,12 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
 		"AttackDamageType"			"DAMAGE_TYPE_ArmorPhysical"
-		"AttackDamageMin"			"185"									// Damage range min.
-		"AttackDamageMax"			"195"									// Damage range max.
-		"AttackRate"				"1.2"									// Speed of attack.
+		"AttackDamageMin"			"205"									// Damage range min.
+		"AttackDamageMax"			"215"									// Damage range max.
+		"AttackRate"				"1.15"									// Speed of attack.
 		"AttackAnimationPoint"		"0.45"									// Normalized time in animation cycle to attack.
-		"AttackAcquisitionRange"	"800"									// Range within a target can be acquired.
-		"AttackRange"				"300"									// Range within a target can be attacked.
+		"AttackAcquisitionRange"	"900"									// Range within a target can be acquired.
+		"AttackRange"				"400"									// Range within a target can be attacked.
 		"ProjectileModel"			"particles/units/heroes/hero_morphling/morphling_base_attack.vpcf"		// Particle system model for projectile.
 		"ProjectileSpeed"			"1250"									// Speed of projectile.
 	
@@ -2394,13 +2394,13 @@
 		// Movement
 		//-------------------------------------------------------------------------------------------------------------
 		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"
-		"MovementSpeed"				"325"
+		"MovementSpeed"				"335"
 		"MovementTurnRate"			"0.6"
 	
 		// Status
 		//----------------------------------------------------------------
-		"StatusHealth"				"2000"		// Base health.
-		"StatusHealthRegen"			"0.1"		// Health regeneration rate.
+		"StatusHealth"				"2200"		// Base health.
+		"StatusHealthRegen"			"4.0"		// Health regeneration rate.
 		"StatusMana"				"0"			// Base mana.
 		"StatusManaRegen"			"0.0"		// Mana regeneration rate.
 	
@@ -2441,12 +2441,12 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
 		"AttackDamageType"			"DAMAGE_TYPE_ArmorPhysical"
-		"AttackDamageMin"			"265"									// Damage range min.
-		"AttackDamageMax"			"275"									// Damage range max.
-		"AttackRate"				"1.2"									// Speed of attack.
+		"AttackDamageMin"			"295"									// Damage range min.
+		"AttackDamageMax"			"305"									// Damage range max.
+		"AttackRate"				"1.15"									// Speed of attack.
 		"AttackAnimationPoint"		"0.45"									// Normalized time in animation cycle to attack.
-		"AttackAcquisitionRange"	"800"									// Range within a target can be acquired.
-		"AttackRange"				"300"									// Range within a target can be attacked.
+		"AttackAcquisitionRange"	"900"									// Range within a target can be acquired.
+		"AttackRange"				"400"									// Range within a target can be attacked.
 		"ProjectileModel"			"particles/units/heroes/hero_morphling/morphling_base_attack.vpcf"		// Particle system model for projectile.
 		"ProjectileSpeed"			"1250"									// Speed of projectile.
 	
@@ -2464,13 +2464,13 @@
 		// Movement
 		//-------------------------------------------------------------------------------------------------------------
 		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"
-		"MovementSpeed"				"335"
+		"MovementSpeed"				"345"
 		"MovementTurnRate"			"0.6"
 
 		// Status
 		//----------------------------------------------------------------
-		"StatusHealth"				"3500"		// Base health.
-		"StatusHealthRegen"			"0.1"			// Health regeneration rate.
+		"StatusHealth"				"3800"		// Base health.
+		"StatusHealthRegen"			"6.0"			// Health regeneration rate.
 		"StatusMana"				"0"		// Base mana.
 		"StatusManaRegen"			"0.0"		// Mana regeneration rate.
 
@@ -2511,12 +2511,12 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
 		"AttackDamageType"			"DAMAGE_TYPE_ArmorPhysical"
-		"AttackDamageMin"			"350"									// Damage range min.
-		"AttackDamageMax"			"370"									// Damage range max.
-		"AttackRate"				"1.2"									// Speed of attack.
+		"AttackDamageMin"			"390"									// Damage range min.
+		"AttackDamageMax"			"410"									// Damage range max.
+		"AttackRate"				"1.15"									// Speed of attack.
 		"AttackAnimationPoint"		"0.45"									// Normalized time in animation cycle to attack.
-		"AttackAcquisitionRange"	"800"									// Range within a target can be acquired.
-		"AttackRange"				"300"									// Range within a target can be attacked.
+		"AttackAcquisitionRange"	"900"									// Range within a target can be acquired.
+		"AttackRange"				"400"									// Range within a target can be attacked.
 		"ProjectileModel"			"particles/units/heroes/hero_morphling/morphling_base_attack.vpcf"		// Particle system model for projectile.
 		"ProjectileSpeed"			"1250"									// Speed of projectile.
 
@@ -2534,13 +2534,13 @@
 		// Movement
 		//-------------------------------------------------------------------------------------------------------------
 		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"
-		"MovementSpeed"				"345"
+		"MovementSpeed"				"355"
 		"MovementTurnRate"			"0.6"
 
 		// Status
 		//----------------------------------------------------------------
-		"StatusHealth"				"5000"		// Base health.
-		"StatusHealthRegen"			"0.1"		// Health regeneration rate.
+		"StatusHealth"				"5400"		// Base health.
+		"StatusHealthRegen"			"8.0"		// Health regeneration rate.
 		"StatusMana"				"0"			// Base mana.
 		"StatusManaRegen"			"0.0"		// Mana regeneration rate.
 
@@ -3098,10 +3098,9 @@
 		"Ability2"					"xhs_spirit_master_elemental_mandala"
 		"Ability3"					"boss_health"
 		"Ability4"					"xhs_spirit_master_trinity_cycle"
-		"Ability5"					"xhs_spirit_master_spirit_call"
-		"Ability6"					"xhs_spirit_master_convergence"
-		"Ability7"					"necronomicon_warrior_sight"
-		"Ability8"					"cant_die_generic"
+		"Ability5"					"xhs_spirit_master_convergence"
+		"Ability6"					"necronomicon_warrior_sight"
+		"Ability7"					"cant_die_generic"
 
 		// Armor
 		//----------------------------------------------------------------

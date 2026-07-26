@@ -9,6 +9,8 @@
 
 	<Panel class="XHSDevToolsRoot" hittest="false" hittestchildren="true">
 		<Panel id="XHSDevToolsRoot" class="XHSDevToolsHost" hittest="false" hittestchildren="true">
+			<Panel id="XHSDevToolsTimescale" class="XHSDevToolsTimescale" />
+
 			<Button id="XHSDevToolsToggle" class="XHSDevToolsToggle" onactivate="XHSDevToolsTogglePanel();">
 				<Label text="DEV" />
 			</Button>

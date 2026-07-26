@@ -15,7 +15,7 @@ local REGISTRY = {
 
 	npc_xhs_undead_creep_melee_2 = "xhs_creep_plague_cloud",
 	npc_xhs_orc_creep_melee_2 = "xhs_creep_endurance",
-	npc_xhs_elf_creep_melee_2 = "xhs_creep_thorns",
+	npc_xhs_elf_creep_melee_2 = "xhs_creep_fury_swipes",
 	npc_xhs_human_creep_melee_2 = "xhs_creep_knights_guard",
 	npc_xhs_undead_creep_ranged_2 = "xhs_creep_death_aura",
 	npc_xhs_orc_creep_ranged_2 = "xhs_creep_shamanic_ward",
@@ -118,7 +118,14 @@ function XHSCreepPassives:Apply(unit, difficulty)
 
 	for _, legacy_name in ipairs(LEGACY_PASSIVES) do
 		if legacy_name ~= passive_name and unit:HasAbility(legacy_name) then
+			local legacy_ability = unit:FindAbilityByName(legacy_name)
+			local intrinsic_name = legacy_ability
+				and legacy_ability.GetIntrinsicModifierName
+				and legacy_ability:GetIntrinsicModifierName()
 			unit:RemoveAbility(legacy_name)
+			if intrinsic_name and intrinsic_name ~= "" and unit:HasModifier(intrinsic_name) then
+				unit:RemoveModifierByName(intrinsic_name)
+			end
 		end
 	end
 

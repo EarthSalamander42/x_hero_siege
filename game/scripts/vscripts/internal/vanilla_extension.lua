@@ -119,26 +119,32 @@ function GetReductionFromArmor(armor)
 	return ((0.052 * armor) / (0.9 + 0.048 * armor))
 end
 
-function CDOTA_BaseNPC:SendLifestealAttack(hTarget)
+function CDOTA_BaseNPC:SendLifestealAttack(hTarget, damage_dealt)
 	local lifesteal = 0
+	local lifesteal_source = nil
 
-	-- useless atm because modifier can't have multiple instances, find a way to call lifefsteal attack once
 	for _, parent_modifier in pairs(self:FindAllModifiers()) do
-		if parent_modifier and parent_modifier.GetModifierLifesteal and parent_modifier:GetModifierLifesteal() and lifesteal then
-			if parent_modifier:GetModifierLifesteal() > lifesteal then
-				lifesteal = parent_modifier:GetModifierLifesteal()
+		if parent_modifier and parent_modifier.GetModifierLifesteal then
+			local modifier_lifesteal = tonumber(parent_modifier:GetModifierLifesteal()) or 0
+			if modifier_lifesteal > lifesteal then
+				lifesteal = modifier_lifesteal
+				lifesteal_source = parent_modifier:GetAbility()
 			end
 		end
 	end
 
-	-- print("Lifesteal is " .. lifesteal .. "%")
-
 	if lifesteal > 0 then
-		local damage = self:GetRealDamageDone(hTarget)
+		-- OnTakeDamage supplies the final damage actually received by the victim.
+		local damage = math.max(0, tonumber(damage_dealt) or 0)
 		local heal = damage * (lifesteal / 100)
+		if heal <= 0 then return end
 
-		self:Heal(heal, self)
-		SendOverheadEventMessage(nil, OVERHEAD_ALERT_HEAL, self, heal, nil)
+		local health_before = self:GetHealth()
+		self:Heal(heal, lifesteal_source)
+		local actual_heal = math.max(0, self:GetHealth() - health_before)
+		if actual_heal <= 0 then return end
+
+		SendOverheadEventMessage(nil, OVERHEAD_ALERT_HEAL, self, actual_heal, nil)
 
 		local lifesteal_pfx = ParticleManager:CreateParticle("particles/generic_gameplay/generic_lifesteal.vpcf", PATTACH_ABSORIGIN_FOLLOW, self)
 		ParticleManager:SetParticleControl(lifesteal_pfx, 0, self:GetAbsOrigin())

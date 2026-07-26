@@ -16,6 +16,7 @@ local PASSIVE_NAMES = {
 	"xhs_creep_fiery_soul", "xhs_creep_frostmourne_hunger", "xhs_creep_unholy_sustain",
 	"xhs_creep_war_leader", "xhs_creep_vengeance_aura", "xhs_creep_command_aura",
 	"xhs_creep_fel_ward", "xhs_creep_crippling_strike",
+	"xhs_creep_fury_swipes",
 }
 
 for _, ability_name in ipairs(PASSIVE_NAMES) do
@@ -30,9 +31,56 @@ LinkLuaModifier("modifier_xhs_creep_passive_slow", "abilities/creeps/xhs_creep_p
 LinkLuaModifier("modifier_xhs_creep_passive_dot", "abilities/creeps/xhs_creep_passives.lua", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_xhs_creep_passive_armor_break", "abilities/creeps/xhs_creep_passives.lua", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_xhs_creep_passive_aura", "abilities/creeps/xhs_creep_passives.lua", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_xhs_creep_fury_swipes", "abilities/creeps/xhs_creep_passives.lua", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_xhs_creep_fury_swipes_debuff", "abilities/creeps/xhs_creep_passives.lua", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_xhs_creep_crushing_armor_sync", "abilities/creeps/xhs_creep_passives.lua", LUA_MODIFIER_MOTION_NONE)
+
+local EFFECT_MODIFIERS = {
+	xhs_creep_frost_arrows = { slow = "modifier_xhs_creep_frost_arrows_debuff" },
+	xhs_creep_plague_cloud = { aura = "modifier_xhs_creep_plague_cloud_aura" },
+	xhs_creep_endurance = { aura = "modifier_xhs_creep_endurance_aura" },
+	xhs_creep_death_aura = { aura = "modifier_xhs_creep_death_aura_debuff" },
+	xhs_creep_restoration = { aura = "modifier_xhs_creep_restoration_aura" },
+	xhs_creep_venom_shot = { dot = "modifier_xhs_creep_venom_shot_debuff" },
+	xhs_creep_scorching_breath = { dot = "modifier_xhs_creep_scorching_breath_debuff" },
+	xhs_creep_pack_leader = { aura = "modifier_xhs_creep_pack_leader_aura" },
+	xhs_creep_cold_skin = { slow = "modifier_xhs_creep_cold_skin_debuff" },
+	xhs_creep_corrosive_scales = { armor = "modifier_xhs_creep_corrosive_scales_debuff" },
+	xhs_creep_untouchable = { slow = "modifier_xhs_creep_untouchable_debuff" },
+	xhs_creep_toxic_flight = {
+		slow = "modifier_xhs_creep_toxic_flight_slow",
+		dot = "modifier_xhs_creep_toxic_flight_dot",
+	},
+	xhs_creep_crushing_armor = { armor = "modifier_xhs_creep_crushing_armor_debuff" },
+	xhs_creep_devotion = { aura = "modifier_xhs_creep_devotion_aura" },
+	xhs_creep_craggy_exterior = { slow = "modifier_xhs_creep_craggy_exterior_debuff" },
+	xhs_creep_dread_aura = { aura = "modifier_xhs_creep_dread_aura_debuff" },
+	xhs_creep_fiery_soul = { dot = "modifier_xhs_creep_fiery_soul_debuff" },
+	xhs_creep_war_leader = { aura = "modifier_xhs_creep_war_leader_aura" },
+	xhs_creep_vengeance_aura = { aura = "modifier_xhs_creep_vengeance_aura" },
+	xhs_creep_command_aura = { aura = "modifier_xhs_creep_command_aura" },
+	xhs_creep_crippling_strike = { slow = "modifier_xhs_creep_crippling_strike_debuff" },
+}
+
+for _, modifier_names in pairs(EFFECT_MODIFIERS) do
+	for _, modifier_name in pairs(modifier_names) do
+		LinkLuaModifier(modifier_name, "abilities/creeps/xhs_creep_passives.lua", LUA_MODIFIER_MOTION_NONE)
+	end
+end
 
 local function Special(ability, name)
 	return ability and ability:GetSpecialValueFor(name) or 0
+end
+
+local function EffectModifierName(ability, effect, fallback)
+	if ability == nil or ability:IsNull() then return fallback end
+	local modifier_names = EFFECT_MODIFIERS[ability:GetAbilityName()]
+	return modifier_names and modifier_names[effect] or fallback
+end
+
+local function AbilityTexture(modifier)
+	local ability = modifier:GetAbility()
+	return ability and not ability:IsNull() and ability:GetAbilityTextureName() or ""
 end
 
 local function PlayProcFeedback(source, target, particle_name, sound_name)
@@ -43,6 +91,131 @@ local function PlayProcFeedback(source, target, particle_name, sound_name)
 	ParticleManager:ReleaseParticleIndex(particle)
 	target:EmitSound(sound_name)
 end
+
+local function ExistingCrushingArmorReduction(modifier)
+	if modifier.GetAppliedArmorReduction then
+		return math.max(0, modifier:GetAppliedArmorReduction())
+	end
+
+	return math.max(0, tonumber(modifier.armor) or Special(modifier:GetAbility(), "armor_reduction"))
+end
+
+local function ApplySharedCrushingArmor(parent, target, ability, armor_per_stack, duration)
+	local modifier_name = "modifier_xhs_creep_crushing_armor_debuff"
+	local modifier = nil
+	local current_reduction = 0
+	local modifiers = target:FindAllModifiersByName(modifier_name)
+
+	-- Reconstruct the target's armor without Crushing Armor before merging any
+	-- legacy per-caster instances. This makes the shared cap exact.
+	for _, existing_modifier in pairs(modifiers) do
+		current_reduction = current_reduction + ExistingCrushingArmorReduction(existing_modifier)
+		if modifier == nil then
+			modifier = existing_modifier
+		end
+	end
+
+	local armor_without_crushing = target:GetPhysicalArmorValue(false) + current_reduction
+	local maximum_reduction = math.max(0, armor_without_crushing)
+	current_reduction = math.min(current_reduction, maximum_reduction)
+
+	for _, existing_modifier in pairs(modifiers) do
+		if existing_modifier ~= modifier then
+			existing_modifier:Destroy()
+		end
+	end
+
+	if maximum_reduction <= 0 then
+		if modifier ~= nil then modifier:Destroy() end
+		return
+	end
+
+	-- The last stack may be partial so Crushing Armor reaches exactly 0 armor
+	-- and can never push the target into negative armor by itself.
+	local new_reduction = math.min(maximum_reduction, current_reduction + armor_per_stack)
+	if modifier == nil then
+		modifier = target:AddNewModifier(parent, ability, modifier_name, {
+			duration = duration,
+			armor = new_reduction,
+			armor_per_stack = armor_per_stack,
+		})
+	else
+		modifier:SetDuration(duration, true)
+		modifier:SetAppliedArmorReduction(new_reduction, armor_per_stack)
+	end
+end
+
+xhs_creep_fury_swipes = xhs_creep_fury_swipes or class({})
+function xhs_creep_fury_swipes:GetIntrinsicModifierName()
+	return "modifier_xhs_creep_fury_swipes"
+end
+
+modifier_xhs_creep_fury_swipes = modifier_xhs_creep_fury_swipes or class({})
+modifier_xhs_creep_fury_swipes.XHS_LINK_CLIENT = true
+function modifier_xhs_creep_fury_swipes:IsHidden() return true end
+function modifier_xhs_creep_fury_swipes:IsPurgable() return false end
+function modifier_xhs_creep_fury_swipes:GetAttributes() return MODIFIER_ATTRIBUTE_PERMANENT end
+function modifier_xhs_creep_fury_swipes:DeclareFunctions()
+	return { MODIFIER_EVENT_ON_ATTACK_LANDED }
+end
+function modifier_xhs_creep_fury_swipes:OnAttackLanded(params)
+	if not IsServer() or params.attacker ~= self:GetParent() or params.target == nil then return end
+
+	local parent = self:GetParent()
+	local target = params.target
+	if parent.PassivesDisabled and parent:PassivesDisabled() then return end
+	if target:GetTeamNumber() == parent:GetTeamNumber() or target:IsBuilding() then return end
+
+	local ability = self:GetAbility()
+	if ability == nil or ability:IsNull() then return end
+
+	local modifier_name = "modifier_xhs_creep_fury_swipes_debuff"
+	local modifier = nil
+	local current_stacks = 0
+
+	-- Fury Swipes belongs to the victim, not to an individual attacker.
+	-- Merge any legacy per-caster instances so the whole wave builds one stack.
+	for _, existing_modifier in pairs(target:FindAllModifiersByName(modifier_name)) do
+		current_stacks = current_stacks + existing_modifier:GetStackCount()
+		if modifier == nil then
+			modifier = existing_modifier
+		else
+			existing_modifier:Destroy()
+		end
+	end
+
+	local bonus_damage = current_stacks * Special(ability, "damage_per_stack")
+
+	if bonus_damage > 0 and target:IsAlive() then
+		ApplyDamage({
+			victim = target,
+			attacker = parent,
+			ability = ability,
+			damage = bonus_damage,
+			damage_type = DAMAGE_TYPE_PHYSICAL,
+		})
+	end
+
+	if not target:IsAlive() then return end
+
+	local duration = Special(ability, "stack_duration")
+	if modifier ~= nil then
+		modifier:SetDuration(duration, true)
+	else
+		modifier = target:AddNewModifier(parent, ability, modifier_name, { duration = duration })
+	end
+
+	if modifier ~= nil then
+		modifier:SetStackCount(current_stacks + 1)
+	end
+end
+
+modifier_xhs_creep_fury_swipes_debuff = modifier_xhs_creep_fury_swipes_debuff or class({})
+modifier_xhs_creep_fury_swipes_debuff.XHS_LINK_CLIENT = true
+function modifier_xhs_creep_fury_swipes_debuff:IsHidden() return false end
+function modifier_xhs_creep_fury_swipes_debuff:IsDebuff() return true end
+function modifier_xhs_creep_fury_swipes_debuff:IsPurgable() return false end
+function modifier_xhs_creep_fury_swipes_debuff:GetTexture() return "ursa_fury_swipes" end
 
 modifier_xhs_creep_passive = modifier_xhs_creep_passive or class({})
 modifier_xhs_creep_passive.XHS_LINK_CLIENT = true
@@ -103,7 +276,9 @@ end
 function modifier_xhs_creep_passive:IsAura()
 	return Special(self:GetAbility(), "aura_mode") > 0
 end
-function modifier_xhs_creep_passive:GetModifierAura() return "modifier_xhs_creep_passive_aura" end
+function modifier_xhs_creep_passive:GetModifierAura()
+	return EffectModifierName(self:GetAbility(), "aura", "modifier_xhs_creep_passive_aura")
+end
 function modifier_xhs_creep_passive:GetAuraRadius() return Special(self:GetAbility(), "aura_radius") end
 function modifier_xhs_creep_passive:GetAuraSearchTeam()
 	return Special(self:GetAbility(), "aura_mode") == 2 and DOTA_UNIT_TARGET_TEAM_ENEMY or DOTA_UNIT_TARGET_TEAM_FRIENDLY
@@ -122,7 +297,7 @@ function modifier_xhs_creep_passive:OnAttackLanded(params)
 	local target = params.target
 	local slow = Special(ability, "slow_pct")
 	if slow > 0 then
-		target:AddNewModifier(parent, ability, "modifier_xhs_creep_passive_slow", {
+		target:AddNewModifier(parent, ability, EffectModifierName(ability, "slow", "modifier_xhs_creep_passive_slow"), {
 			duration = Special(ability, "debuff_duration"),
 			slow = slow,
 			attack_slow = Special(ability, "attack_slow"),
@@ -131,7 +306,7 @@ function modifier_xhs_creep_passive:OnAttackLanded(params)
 
 	local dot = Special(ability, "dot_damage_pct")
 	if dot > 0 then
-		target:AddNewModifier(parent, ability, "modifier_xhs_creep_passive_dot", {
+		target:AddNewModifier(parent, ability, EffectModifierName(ability, "dot", "modifier_xhs_creep_passive_dot"), {
 			duration = Special(ability, "debuff_duration"),
 			damage = parent:GetAverageTrueAttackDamage(target) * dot * 0.01,
 		})
@@ -147,16 +322,26 @@ function modifier_xhs_creep_passive:OnAttackLanded(params)
 	local mana_burn = Special(ability, "mana_burn_pct")
 	if mana_burn > 0 and target.GetMana then
 		local burned = math.min(target:GetMana(), target:GetMaxMana() * mana_burn * 0.01)
-		target:ReduceMana(burned)
-		ApplyDamage({ victim = target, attacker = parent, ability = ability, damage = burned, damage_type = DAMAGE_TYPE_PHYSICAL })
+		if burned > 0 then
+			if target.Script_ReduceMana ~= nil then
+				target:Script_ReduceMana(burned, ability)
+			elseif target.SetMana ~= nil then
+				target:SetMana(math.max(0, target:GetMana() - burned))
+			end
+			ApplyDamage({ victim = target, attacker = parent, ability = ability, damage = burned, damage_type = DAMAGE_TYPE_PHYSICAL })
+		end
 	end
 
 	local armor_break = Special(ability, "armor_reduction")
 	if armor_break > 0 then
-		target:AddNewModifier(parent, ability, "modifier_xhs_creep_passive_armor_break", {
-			duration = Special(ability, "debuff_duration"),
-			armor = armor_break,
-		})
+		if ability:GetAbilityName() == "xhs_creep_crushing_armor" then
+			ApplySharedCrushingArmor(parent, target, ability, armor_break, Special(ability, "debuff_duration"))
+		else
+			target:AddNewModifier(parent, ability, EffectModifierName(ability, "armor", "modifier_xhs_creep_passive_armor_break"), {
+				duration = Special(ability, "debuff_duration"),
+				armor = armor_break,
+			})
+		end
 	end
 
 	local cleave = Special(ability, "cleave_pct")
@@ -181,7 +366,11 @@ function modifier_xhs_creep_passive:OnTakeDamage(params)
 	if not IsServer() then return end
 	local parent = self:GetParent()
 	local ability = self:GetAbility()
-	if params.attacker == parent and params.damage_category == DOTA_DAMAGE_CATEGORY_ATTACK then
+	local is_attack_damage = params.damage_category == DOTA_DAMAGE_CATEGORY_ATTACK
+	if params.damage_category == nil then
+		is_attack_damage = params.inflictor == nil
+	end
+	if params.attacker == parent and params.damage > 0 and is_attack_damage then
 		local lifesteal = Special(ability, "lifesteal_pct")
 		if lifesteal > 0 then
 			parent:Heal(params.damage * lifesteal * 0.01, ability)
@@ -198,7 +387,7 @@ function modifier_xhs_creep_passive:OnTakeDamage(params)
 
 	local cold_slow = Special(ability, "retaliation_slow")
 	if cold_slow > 0 then
-		params.attacker:AddNewModifier(parent, ability, "modifier_xhs_creep_passive_slow", {
+		params.attacker:AddNewModifier(parent, ability, EffectModifierName(ability, "slow", "modifier_xhs_creep_passive_slow"), {
 			duration = Special(ability, "debuff_duration"),
 			slow = cold_slow,
 			attack_slow = cold_slow,
@@ -210,6 +399,7 @@ modifier_xhs_creep_passive_slow = modifier_xhs_creep_passive_slow or class({})
 modifier_xhs_creep_passive_slow.XHS_LINK_CLIENT = true
 function modifier_xhs_creep_passive_slow:IsDebuff() return true end
 function modifier_xhs_creep_passive_slow:IsPurgable() return true end
+function modifier_xhs_creep_passive_slow:GetTexture() return AbilityTexture(self) end
 function modifier_xhs_creep_passive_slow:OnCreated(kv) self.slow = tonumber(kv.slow) or 0 self.attack_slow = tonumber(kv.attack_slow) or 0 end
 function modifier_xhs_creep_passive_slow:OnRefresh(kv) self:OnCreated(kv) end
 function modifier_xhs_creep_passive_slow:DeclareFunctions() return { MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE, MODIFIER_PROPERTY_ATTACKSPEED_BONUS_CONSTANT } end
@@ -220,6 +410,7 @@ modifier_xhs_creep_passive_dot = modifier_xhs_creep_passive_dot or class({})
 modifier_xhs_creep_passive_dot.XHS_LINK_CLIENT = true
 function modifier_xhs_creep_passive_dot:IsDebuff() return true end
 function modifier_xhs_creep_passive_dot:IsPurgable() return true end
+function modifier_xhs_creep_passive_dot:GetTexture() return AbilityTexture(self) end
 function modifier_xhs_creep_passive_dot:OnCreated(kv) self.damage = tonumber(kv.damage) or 0 if IsServer() then self:StartIntervalThink(1) end end
 function modifier_xhs_creep_passive_dot:OnRefresh(kv) self.damage = tonumber(kv.damage) or self.damage end
 function modifier_xhs_creep_passive_dot:OnIntervalThink()
@@ -230,16 +421,122 @@ modifier_xhs_creep_passive_armor_break = modifier_xhs_creep_passive_armor_break 
 modifier_xhs_creep_passive_armor_break.XHS_LINK_CLIENT = true
 function modifier_xhs_creep_passive_armor_break:IsDebuff() return true end
 function modifier_xhs_creep_passive_armor_break:IsPurgable() return true end
+function modifier_xhs_creep_passive_armor_break:GetTexture() return AbilityTexture(self) end
 function modifier_xhs_creep_passive_armor_break:OnCreated(kv) self.armor = tonumber(kv.armor) or 0 end
 function modifier_xhs_creep_passive_armor_break:OnRefresh(kv) self:OnCreated(kv) end
 function modifier_xhs_creep_passive_armor_break:DeclareFunctions() return { MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS } end
 function modifier_xhs_creep_passive_armor_break:GetModifierPhysicalArmorBonus() return -self.armor end
+
+local CRUSHING_ARMOR_SYNC_SCALE = 100
+
+modifier_xhs_creep_crushing_armor_sync = modifier_xhs_creep_crushing_armor_sync or class({})
+modifier_xhs_creep_crushing_armor_sync.XHS_LINK_CLIENT = true
+function modifier_xhs_creep_crushing_armor_sync:IsHidden() return true end
+function modifier_xhs_creep_crushing_armor_sync:IsDebuff() return true end
+function modifier_xhs_creep_crushing_armor_sync:IsPurgable() return false end
+function modifier_xhs_creep_crushing_armor_sync:IsPurgeException() return false end
+function modifier_xhs_creep_crushing_armor_sync:GetAppliedArmorReduction()
+	return math.max(0, self:GetStackCount()) / CRUSHING_ARMOR_SYNC_SCALE
+end
+function modifier_xhs_creep_crushing_armor_sync:DeclareFunctions()
+	return { MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS }
+end
+function modifier_xhs_creep_crushing_armor_sync:GetModifierPhysicalArmorBonus()
+	return -self:GetAppliedArmorReduction()
+end
+
+modifier_xhs_creep_crushing_armor_debuff = modifier_xhs_creep_crushing_armor_debuff or class({})
+modifier_xhs_creep_crushing_armor_debuff.XHS_LINK_CLIENT = true
+function modifier_xhs_creep_crushing_armor_debuff:IsHidden() return false end
+function modifier_xhs_creep_crushing_armor_debuff:IsDebuff() return true end
+function modifier_xhs_creep_crushing_armor_debuff:IsPurgable() return true end
+function modifier_xhs_creep_crushing_armor_debuff:GetTexture() return AbilityTexture(self) end
+function modifier_xhs_creep_crushing_armor_debuff:OnCreated(kv)
+	self.armor_reduction = math.max(0, tonumber(kv.armor) or 0)
+	self.armor_per_stack = math.max(0.01, tonumber(kv.armor_per_stack) or Special(self:GetAbility(), "armor_reduction"))
+	if IsServer() then
+		self:SetHasCustomTransmitterData(true)
+		self:SetAppliedArmorReduction(self.armor_reduction, self.armor_per_stack)
+		self:StartIntervalThink(0.2)
+	end
+end
+function modifier_xhs_creep_crushing_armor_debuff:AddCustomTransmitterData()
+	return {
+		armor_reduction = self.armor_reduction or 0,
+		armor_per_stack = self.armor_per_stack or 0.01,
+	}
+end
+function modifier_xhs_creep_crushing_armor_debuff:HandleCustomTransmitterData(data)
+	self.armor_reduction = tonumber(data.armor_reduction) or 0
+	self.armor_per_stack = tonumber(data.armor_per_stack) or 0.01
+end
+function modifier_xhs_creep_crushing_armor_debuff:GetAppliedArmorReduction()
+	local sync_modifier = self:GetParent():FindModifierByName("modifier_xhs_creep_crushing_armor_sync")
+	if sync_modifier ~= nil then
+		return sync_modifier:GetAppliedArmorReduction()
+	end
+	return math.max(0, tonumber(self.armor_reduction) or tonumber(self.armor) or 0)
+end
+function modifier_xhs_creep_crushing_armor_debuff:SetAppliedArmorReduction(reduction, armor_per_stack)
+	if not IsServer() then return end
+
+	self.armor_reduction = math.max(0, tonumber(reduction) or 0)
+	self.armor_per_stack = math.max(0.01, tonumber(armor_per_stack) or self.armor_per_stack or 0.01)
+
+	local sync_modifier = self:GetParent():FindModifierByName("modifier_xhs_creep_crushing_armor_sync")
+	if sync_modifier == nil then
+		sync_modifier = self:GetParent():AddNewModifier(
+			self:GetCaster(),
+			self:GetAbility(),
+			"modifier_xhs_creep_crushing_armor_sync",
+			{}
+		)
+	end
+	if sync_modifier ~= nil then
+		sync_modifier:SetStackCount(math.floor(self.armor_reduction * CRUSHING_ARMOR_SYNC_SCALE + 0.5))
+	end
+
+	local stacks = 0
+	if self.armor_reduction > 0 then
+		stacks = math.max(1, math.ceil(self.armor_reduction / self.armor_per_stack - 0.0001))
+	end
+	self:SetStackCount(stacks)
+	self:SendBuffRefreshToClients()
+end
+function modifier_xhs_creep_crushing_armor_debuff:OnIntervalThink()
+	local parent = self:GetParent()
+	local current_reduction = self:GetAppliedArmorReduction()
+	local armor_without_crushing = parent:GetPhysicalArmorValue(false) + current_reduction
+	local clamped_reduction = math.min(current_reduction, math.max(0, armor_without_crushing))
+
+	if clamped_reduction <= 0 then
+		self:Destroy()
+	elseif math.abs(clamped_reduction - current_reduction) > 0.001 then
+		self:SetAppliedArmorReduction(clamped_reduction, self.armor_per_stack)
+	end
+end
+function modifier_xhs_creep_crushing_armor_debuff:OnDestroy()
+	if not IsServer() then return end
+
+	for _, sync_modifier in pairs(self:GetParent():FindAllModifiersByName("modifier_xhs_creep_crushing_armor_sync")) do
+		sync_modifier:Destroy()
+	end
+end
+function modifier_xhs_creep_crushing_armor_debuff:DeclareFunctions()
+	return {
+		MODIFIER_PROPERTY_TOOLTIP,
+	}
+end
+function modifier_xhs_creep_crushing_armor_debuff:OnTooltip()
+	return self:GetAppliedArmorReduction()
+end
 
 modifier_xhs_creep_passive_aura = modifier_xhs_creep_passive_aura or class({})
 modifier_xhs_creep_passive_aura.XHS_LINK_CLIENT = true
 function modifier_xhs_creep_passive_aura:IsHidden() return false end
 function modifier_xhs_creep_passive_aura:IsPurgable() return false end
 function modifier_xhs_creep_passive_aura:IsDebuff() return Special(self:GetAbility(), "aura_mode") == 2 end
+function modifier_xhs_creep_passive_aura:GetTexture() return AbilityTexture(self) end
 function modifier_xhs_creep_passive_aura:OnCreated()
 	if IsServer() and Special(self:GetAbility(), "aura_dot_damage_pct") > 0 then
 		self:StartIntervalThink(1)
@@ -257,9 +554,32 @@ function modifier_xhs_creep_passive_aura:OnIntervalThink()
 	})
 end
 function modifier_xhs_creep_passive_aura:DeclareFunctions()
-	return { MODIFIER_PROPERTY_ATTACKSPEED_BONUS_CONSTANT, MODIFIER_PROPERTY_BASEDAMAGEOUTGOING_PERCENTAGE, MODIFIER_PROPERTY_HEALTH_REGEN_PERCENTAGE, MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS }
+	return { MODIFIER_PROPERTY_ATTACKSPEED_BONUS_CONSTANT, MODIFIER_PROPERTY_BASEDAMAGEOUTGOING_PERCENTAGE, MODIFIER_PROPERTY_HEALTH_REGEN_PERCENTAGE, MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS, MODIFIER_PROPERTY_TOOLTIP }
 end
 function modifier_xhs_creep_passive_aura:GetModifierAttackSpeedBonus_Constant() return Special(self:GetAbility(), "aura_attack_speed") end
 function modifier_xhs_creep_passive_aura:GetModifierBaseDamageOutgoing_Percentage() return Special(self:GetAbility(), "aura_damage_pct") end
 function modifier_xhs_creep_passive_aura:GetModifierHealthRegenPercentage() return Special(self:GetAbility(), "aura_regen_pct") end
 function modifier_xhs_creep_passive_aura:GetModifierPhysicalArmorBonus() return -Special(self:GetAbility(), "aura_armor_reduction") end
+function modifier_xhs_creep_passive_aura:OnTooltip()
+	return Special(self:GetAbility(), "aura_damage_pct")
+end
+
+local EFFECT_BASE_CLASSES = {
+	slow = modifier_xhs_creep_passive_slow,
+	dot = modifier_xhs_creep_passive_dot,
+	armor = modifier_xhs_creep_passive_armor_break,
+	aura = modifier_xhs_creep_passive_aura,
+}
+
+for _, modifier_names in pairs(EFFECT_MODIFIERS) do
+	for effect, modifier_name in pairs(modifier_names) do
+		_G[modifier_name] = _G[modifier_name] or class(EFFECT_BASE_CLASSES[effect])
+	end
+end
+
+-- Toxic Flight uses separate slow and damage components internally. Keep the
+-- damage component hidden so the victim sees one debuff instead of two
+-- identical Toxic Flight icons.
+function modifier_xhs_creep_toxic_flight_dot:IsHidden()
+	return true
+end

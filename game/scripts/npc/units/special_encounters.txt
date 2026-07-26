@@ -761,7 +761,7 @@
 		"Ability1"					"lich_frost_armor"	// Ability 1.
 		"Ability2"					"slardar_bash"			// Ability 2.
 		"Ability3"					"xhs_creeps_phase_2_endurance_aura"			// Ability 3.
-		"Ability4"					"nightelf_mountain_giant_model"						// Ability 6 - Extra.
+		"Ability4"					""												// Storegga already owns its model and animation setup.
 		"Ability5"					"frost_infernal_death"						// Ability 7 - Extra.
 
 		// Armor
@@ -775,7 +775,7 @@
 		"AttackDamageMin"			"5500"		// Damage range min.
 		"AttackDamageMax"			"6500"		// Damage range max.
 		"AttackDamageType"			"DAMAGE_TYPE_ArmorPhysical"
-		"AttackRate"				"0.125"			// Speed of attack.
+		"AttackRate"				"1.25"			// Prevent Storegga's boulder effects from being emitted eight times per second.
 		"AttackAnimationPoint"		"1.0"		// Normalized time in animation cycle to attack.
 		"AttackAcquisitionRange"	"600"		// Range within a target can be acquired.
 		"AttackRange"				"700"		// Range within a target can be attacked.

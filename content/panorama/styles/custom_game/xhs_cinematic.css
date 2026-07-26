@@ -1,0 +1,84 @@
+.XHSCinematicRoot
+{
+	width: 100%;
+	height: 100%;
+	horizontal-align: center;
+	vertical-align: center;
+	visibility: visible;
+	z-index: 99999;
+}
+
+.XHSCinematicBar
+{
+	width: 100%;
+	height: 0%;
+	background-color: #000000;
+	opacity: 0;
+	horizontal-align: center;
+	z-index: 2;
+
+	transition-property: height, opacity;
+	transition-duration: 0.7s;
+	transition-timing-function: ease-in-out;
+}
+
+.XHSCinematicTopBar
+{
+	vertical-align: top;
+}
+
+.XHSCinematicBottomBar
+{
+	vertical-align: bottom;
+}
+
+.XHSCinematicRoot.XHSCinematicActive .XHSCinematicBar
+{
+	height: 10%;
+	opacity: 1;
+}
+
+.XHSCinematicTitleCard
+{
+	horizontal-align: center;
+	vertical-align: center;
+	flow-children: down;
+	opacity: 0;
+	margin-top: 22%;
+	z-index: 3;
+
+	transition-property: opacity, transform;
+	transition-duration: 0.45s;
+	transition-timing-function: ease-out;
+	transform: translateY(12px);
+}
+
+.XHSCinematicRoot.XHSCinematicHasTitle .XHSCinematicTitleCard
+{
+	opacity: 1;
+	transform: translateY(0px);
+}
+
+.XHSCinematicTitle,
+.XHSCinematicSubtitle
+{
+	horizontal-align: center;
+	text-align: center;
+	color: #f4e7cd;
+	text-shadow: 0px 2px 6px 3 #000000;
+}
+
+.XHSCinematicTitle
+{
+	font-size: 34px;
+	font-weight: bold;
+	letter-spacing: 3px;
+	text-transform: uppercase;
+}
+
+.XHSCinematicSubtitle
+{
+	font-size: 18px;
+	color: #d1c3aa;
+	margin-top: 4px;
+}

@@ -17,7 +17,7 @@ function modifier_custom_mechanics:DeclareFunctions()
 	return {
 		--	MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS,
 		MODIFIER_PROPERTY_SPELL_AMPLIFY_PERCENTAGE,
-		MODIFIER_EVENT_ON_ATTACK_LANDED,
+		MODIFIER_EVENT_ON_TAKEDAMAGE,
 	}
 end
 
@@ -53,21 +53,30 @@ function modifier_custom_mechanics:GetModifierSpellAmplify_Percentage()
 	return self:GetParent():GetIntellect(true) * (1 / self.required_intellect)
 end
 
-function modifier_custom_mechanics:OnAttackLanded(keys)
+function modifier_custom_mechanics:OnTakeDamage(keys)
 	if not IsServer() then return end
 
 	local attacker = keys.attacker
 
 	if self:GetParent() ~= attacker then return end
 
-	local target = keys.target
+	local target = keys.unit
 
 	if not target or target:IsNull() then return end
 
-	-- If there's no valid target, or lifesteal amount, do nothing
 	if target:IsBuilding() or (target:GetTeam() == attacker:GetTeam()) then
 		return
 	end
 
-	attacker:SendLifestealAttack(target)
+	local is_attack_damage = keys.damage_category == DOTA_DAMAGE_CATEGORY_ATTACK
+	if keys.damage_category == nil then
+		is_attack_damage = keys.inflictor == nil
+	end
+	if not is_attack_damage or (tonumber(keys.damage) or 0) <= 0 then return end
+
+	if bit ~= nil and bit.band(keys.damage_flags or 0, DOTA_DAMAGE_FLAG_REFLECTION) ~= 0 then
+		return
+	end
+
+	attacker:SendLifestealAttack(target, keys.damage)
 end

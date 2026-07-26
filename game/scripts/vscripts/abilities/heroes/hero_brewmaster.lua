@@ -1,32 +1,53 @@
+local XHS_BREWMASTER_HAZE_CAST_PARTICLE = "particles/units/heroes/hero_brewmaster/brewmaster_cinder_brew_cast.vpcf"
+local XHS_BREWMASTER_HAZE_PROJECTILE = "particles/units/heroes/hero_brewmaster/brewmaster_cinder_brew_cast_projectile.vpcf"
+local XHS_BREWMASTER_HAZE_IMPACT_PARTICLE = "particles/units/heroes/hero_brewmaster/brewmaster_cinder_brew_impact.vpcf"
+local XHS_BREWMASTER_HAZE_CAST_SOUND = "Hero_Brewmaster.DrunkenHaze.Cast"
+local XHS_BREWMASTER_HAZE_IMPACT_SOUND = "Hero_Brewmaster.DrunkenHaze.Target"
+
 if xhs_brewmaster_drunken_haze == nil then xhs_brewmaster_drunken_haze = class({}) end
 
 function xhs_brewmaster_drunken_haze:GetAbilityTextureName()
 	return "brewmaster_drunken_haze"
 end
 
-function xhs_brewmaster_drunken_haze:GetBehavior()
-	return DOTA_ABILITY_BEHAVIOR_UNIT_TARGET
-end
-
 function xhs_brewmaster_drunken_haze:OnSpellStart()
+	local caster = self:GetCaster()
+	local target = self:GetCursorTarget()
+	if not target or target:IsNull() then
+		return
+	end
+
+	local cast_particle = ParticleManager:CreateParticle(XHS_BREWMASTER_HAZE_CAST_PARTICLE, PATTACH_ABSORIGIN_FOLLOW, caster)
+	ParticleManager:SetParticleControlEnt(cast_particle, 0, caster, PATTACH_ABSORIGIN_FOLLOW, "attach_hitloc", caster:GetAbsOrigin(), true)
+	ParticleManager:SetParticleControl(cast_particle, 1, target:GetAbsOrigin())
+	ParticleManager:ReleaseParticleIndex(cast_particle)
+
 	local projectile = {
-		Target = self:GetCursorTarget(),
-		Source = self:GetCaster(),
+		Target = target,
+		Source = caster,
 		Ability = self,
-		EffectName = "particles/units/heroes/hero_brewmaster/brewmaster_drunken_haze.vpcf",
+		EffectName = XHS_BREWMASTER_HAZE_PROJECTILE,
 		bDodgable = true,
 		bProvidesVision = false,
 		iMoveSpeed = self:GetSpecialValueFor("projectile_speed"),
 		iSourceAttachment = DOTA_PROJECTILE_ATTACHMENT_HITLOCATION,
 	}
-	EmitSoundOn("Hero_Brewmaster.DrunkenHaze.Cast", self:GetCaster())
+	EmitSoundOn(XHS_BREWMASTER_HAZE_CAST_SOUND, caster)
 	ProjectileManager:CreateTrackingProjectile(projectile)
 end
 
 function xhs_brewmaster_drunken_haze:OnProjectileHit(target, location)
-	if target:TriggerSpellAbsorb(self) then return end
+	if not target or target:IsNull() then
+		return true
+	end
 
-	EmitSoundOn("Hero_Brewmaster.DrunkenHaze.Target", target)
+	local impact_location = location or target:GetAbsOrigin()
+	local impact_particle = ParticleManager:CreateParticle(XHS_BREWMASTER_HAZE_IMPACT_PARTICLE, PATTACH_WORLDORIGIN, target)
+	ParticleManager:SetParticleControl(impact_particle, 0, impact_location)
+	ParticleManager:ReleaseParticleIndex(impact_particle)
+	EmitSoundOn(XHS_BREWMASTER_HAZE_IMPACT_SOUND, target)
+
+	if target:TriggerSpellAbsorb(self) then return true end
 
 	local units = FindUnitsInRadius(self:GetCaster():GetTeamNumber(), target:GetAbsOrigin(), nil, self:GetSpecialValueFor("radius"), DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_ALL, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)
 	for _, unit in pairs(units) do

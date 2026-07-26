@@ -247,4 +247,7 @@ function Timers:RemoveTimers(killAll)
 	Timers.timers = timers
 end
 
-if not Timers.timers then Timers:start() end
+-- Ability Lua files are also loaded in the client VM for prediction/tooltips.
+-- Entity creation is server-only, so the automatic thinker must never start
+-- from a client-side require().
+if IsServer() and not Timers.timers then Timers:start() end

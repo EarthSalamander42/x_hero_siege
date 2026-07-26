@@ -7,6 +7,7 @@
 
 	<scripts>
 		<include src="file://{resources}/scripts/custom_game/util.js" />
+		<include src="file://{resources}/scripts/custom_game/xhs_name_display.js" />
 		<include src="file://{resources}/scripts/custom_game/xhs_supporter_hover.js" />
 		<include src="file://{resources}/scripts/custom_game/xhs_end_screen.js" />
 	</scripts>

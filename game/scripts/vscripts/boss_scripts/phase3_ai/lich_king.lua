@@ -130,6 +130,7 @@ end
 function modifier_xhs_lich_king_phase3_ai:OnIntervalThink()
 	if not IsServer() then return end
 	if not self:IsBossActive() then return end
+	self:ApproachArenaHero()
 	if XHSPhase3BossAI:IsCastBlocked(self.boss) then return end
 
 	self:TrackHeroPositions()
@@ -191,6 +192,34 @@ function modifier_xhs_lich_king_phase3_ai:PickHero(radius)
 	local heroes = XHSPhase3BossAI:GetLivingHeroes(self.arena_center, radius or 2600, true)
 	if #heroes <= 0 then return nil end
 	return heroes[RandomInt(1, #heroes)]
+end
+
+function modifier_xhs_lich_king_phase3_ai:ApproachArenaHero()
+	local now = GameRules:GetGameTime()
+	if now < (self.next_move_order or 0) then return end
+	if self.boss:IsChanneling() or self.boss:GetCurrentActiveAbility() ~= nil then return end
+
+	local heroes = XHSPhase3BossAI:GetLivingHeroes(self.arena_center, 4200, true)
+	local closest = nil
+	local closestDistance = nil
+	for _, hero in pairs(heroes) do
+		if IsValidAlive(hero) then
+			local distance = (hero:GetAbsOrigin() - self.boss:GetAbsOrigin()):Length2D()
+			if closestDistance == nil or distance < closestDistance then
+				closest = hero
+				closestDistance = distance
+			end
+		end
+	end
+
+	if closest == nil or closestDistance <= 650 then return end
+	self.next_move_order = now + 0.8
+	ExecuteOrderFromTable({
+		UnitIndex = self.boss:entindex(),
+		OrderType = DOTA_UNIT_ORDER_ATTACK_TARGET,
+		TargetIndex = closest:entindex(),
+		Queue = false,
+	})
 end
 
 function modifier_xhs_lich_king_phase3_ai:TryThresholdWinter(now)

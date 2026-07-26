@@ -104,7 +104,7 @@ _G.ZonesDefinition =
 				{
 					Type = QUEST_EVENT_ON_DIALOG_ALL_CONFIRMED,
 					szNPCName = "npc_xhs_paladin",
-					nDialogLine = 1,
+					nDialogLine = 4,
 				},
 			},
 			{
@@ -223,7 +223,7 @@ _G.ZonesDefinition =
 				{
 					Type = QUEST_EVENT_ON_DIALOG_ALL_CONFIRMED,
 					szNPCName = "npc_xhs_paladin_2",
-					nDialogLine = 1,
+					nDialogLine = 4,
 				},
 			},
 			{
@@ -301,6 +301,7 @@ _G.ZonesDefinition =
 				szSpawnerName = "xhs_spawner_paladin_vip",
 				nCount = 1,
 				Activity = ACT_DOTA_IDLE,
+				bDeferredSpawn = true,
 			},
 			{
 				szVIPName = "npc_xhs_paladin_2",

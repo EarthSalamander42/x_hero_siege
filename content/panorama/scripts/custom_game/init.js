@@ -21,6 +21,46 @@ GameUI.CustomUIConfig().team_colors[DOTATeam_t.DOTA_TEAM_CUSTOM_4 ] = "#00963c;"
 var hudElements = $.GetContextPanel().GetParent().GetParent().FindChildTraverse("HUDElements");
 var center_block = hudElements.FindChildTraverse("lower_hud").FindChildTraverse("center_with_stats").FindChildTraverse("center_block");
 
+function NormalizeXHSLocalizedText(text) {
+	var value = text === undefined || text === null ? "" : String(text);
+	var hasUtf8MojibakeMarker = value.indexOf("\u00C3") !== -1
+		|| value.indexOf("\u00C2") !== -1
+		|| value.indexOf("\u00E2") !== -1;
+
+	if (!hasUtf8MojibakeMarker) {
+		return value;
+	}
+
+	try {
+		var decoded = decodeURIComponent(escape(value));
+		return decoded.indexOf("\uFFFD") === -1 ? decoded : value;
+	} catch (error) {
+		return value;
+	}
+}
+
+GameUI.CustomUIConfig().NormalizeXHSLocalizedText = NormalizeXHSLocalizedText;
+
+function EnsureXHSBuyTomeDisabledOverlay(button) {
+	if (!button) {
+		return null;
+	}
+
+	var overlay = button.FindChildTraverse("XHSBuyTomeDisabledOverlay");
+	if (!overlay) {
+		overlay = $.CreatePanel("Panel", button, "XHSBuyTomeDisabledOverlay");
+		overlay.AddClass("XHSBuyTomeDisabledOverlay");
+		overlay.hittest = false;
+
+		var mark = $.CreatePanel("Label", overlay, "XHSBuyTomeDisabledMark");
+		mark.AddClass("XHSBuyTomeDisabledMark");
+		mark.text = "!";
+		mark.hittest = false;
+	}
+
+	return overlay;
+}
+
 function ApplyXHSBuyTomeButtonStyle(button, options) {
 	if (!button) {
 		return;
@@ -28,6 +68,7 @@ function ApplyXHSBuyTomeButtonStyle(button, options) {
 
 	options = options || {};
 	var noTomes = options.noTomes !== undefined ? options.noTomes : button.BHasClass("NoTomes");
+	var locked = options.locked !== undefined ? options.locked === true : button.BHasClass("TomePurchaseLocked");
 	var hovered = options.hovered !== undefined ? options.hovered === true : button.BHasClass("XHSBuyTomeHovered");
 
 	button.style.width = "34px";
@@ -38,12 +79,12 @@ function ApplyXHSBuyTomeButtonStyle(button, options) {
 	button.style.marginTop = "0px";
 	button.style.marginBottom = "14px";
 	button.style.backgroundColor = "#0614219a";
-	button.style.border = hovered ? "1px solid #9fe8ff64" : "1px solid #7fd7ff2a";
+	button.style.border = locked ? "1px solid #e06a6aaa" : (hovered ? "1px solid #9fe8ff64" : "1px solid #7fd7ff2a");
 	button.style.borderRadius = "4px";
 	button.style.boxShadow = "fill #0000007a 0px 0px 5px 0px";
-	button.style.opacity = noTomes ? "0.42" : (hovered ? "1" : "0.9");
-	button.style.saturation = noTomes ? "0.35" : "1";
-	button.style.brightness = noTomes ? "0.75" : (hovered ? "1.55" : "1");
+	button.style.opacity = locked ? "0.78" : (noTomes ? "0.42" : (hovered ? "1" : "0.9"));
+	button.style.saturation = locked ? "0.25" : (noTomes ? "0.35" : "1");
+	button.style.brightness = locked ? (hovered ? "0.92" : "0.72") : (noTomes ? "0.75" : (hovered ? "1.55" : "1"));
 	button.style.preTransformScale2d = "1";
 	button.style.tooltipPosition = "top";
 	button.style.zIndex = "1200";
@@ -77,11 +118,37 @@ function ApplyXHSBuyTomeButtonStyle(button, options) {
 		count.style.textShadow = "0px 1px 2px 2 #000000";
 		count.style.textOverflow = "shrink";
 	}
+
+	var overlay = EnsureXHSBuyTomeDisabledOverlay(button);
+	if (overlay) {
+		overlay.style.visibility = locked ? "visible" : "collapse";
+		overlay.style.width = "100%";
+		overlay.style.height = "100%";
+		overlay.style.backgroundColor = "#3b0505b8";
+		overlay.style.borderRadius = "3px";
+		overlay.style.zIndex = "5";
+	}
+
+	var mark = overlay ? overlay.FindChildTraverse("XHSBuyTomeDisabledMark") : null;
+	if (mark) {
+		mark.style.horizontalAlign = "center";
+		mark.style.verticalAlign = "center";
+		mark.style.color = "#ffd6d6";
+		mark.style.fontSize = "24px";
+		mark.style.fontWeight = "bold";
+		mark.style.textShadow = "0px 1px 3px 3 #000000";
+	}
 }
 
 GameUI.CustomUIConfig().ApplyXHSBuyTomeButtonStyle = ApplyXHSBuyTomeButtonStyle;
+GameUI.CustomUIConfig().EnsureXHSBuyTomeDisabledOverlay = EnsureXHSBuyTomeDisabledOverlay;
 
 function OnXHSBuyTomeButtonPressed() {
+	var button = GameUI.CustomUIConfig().XHSBuyTomeButton;
+	if (button && button.BHasClass("TomePurchaseLocked")) {
+		return;
+	}
+
 	GameEvents.SendCustomGameEventToServer("xhs_buy_tomes", {});
 }
 
@@ -90,7 +157,13 @@ function ShowXHSBuyTomeTooltip() {
 	if (button) {
 		button.AddClass("XHSBuyTomeHovered");
 		ApplyXHSBuyTomeButtonStyle(button, { hovered: true });
-		$.DispatchEvent("DOTAShowAbilityTooltip", button, "item_tome_small");
+		if (button.BHasClass("TomePurchaseLocked")) {
+			var reasonToken = GameUI.CustomUIConfig().XHSBuyTomeLockReason || "#xhs_tome_lock_temporarily_disabled";
+			var reason = NormalizeXHSLocalizedText($.Localize(reasonToken));
+			$.DispatchEvent("DOTAShowTextTooltip", button, reason);
+		} else {
+			$.DispatchEvent("DOTAShowAbilityTooltip", button, "item_tome_small");
+		}
 	}
 }
 
@@ -100,6 +173,7 @@ function HideXHSBuyTomeTooltip() {
 		button.RemoveClass("XHSBuyTomeHovered");
 		ApplyXHSBuyTomeButtonStyle(button, { hovered: false });
 		$.DispatchEvent("DOTAHideAbilityTooltip", button);
+		$.DispatchEvent("DOTAHideTextTooltip", button);
 	}
 }
 
@@ -147,6 +221,7 @@ GameUI.CustomUIConfig().CreateXHSBuyTomeButton = function(parent) {
 		}
 
 		GameUI.CustomUIConfig().XHSBuyTomeButton = existing;
+		EnsureXHSBuyTomeDisabledOverlay(existing);
 		ApplyXHSBuyTomeButtonStyle(existing);
 		return existing;
 	}
@@ -170,6 +245,7 @@ GameUI.CustomUIConfig().CreateXHSBuyTomeButton = function(parent) {
 	count.AddClass("XHSBuyTomeCount");
 	count.text = "x0";
 	count.hittest = false;
+	EnsureXHSBuyTomeDisabledOverlay(button);
 	ApplyXHSBuyTomeButtonStyle(button, { noTomes: true });
 
 	if (anchor && targetParent.MoveChildAfter) {
@@ -276,6 +352,21 @@ function ApplyXHSSupporterPassButtonStyle(button) {
 		icon: "file://{images}/items/shield_of_invincibility.png",
 		iconId: "XHSSupporterPassTopBarIcon"
 	});
+
+	var config = GameUI.CustomUIConfig ? GameUI.CustomUIConfig() : null;
+	if (button && config && config.XHSSupporterPassVisible === true) {
+		button.AddClass("XHSSupporterPassActive");
+		button.style.opacity = "1.0";
+		button.style.brightness = "1.32";
+		button.style.preTransformScale2d = "1.04";
+		button.style.backgroundColor = "#14364cf2";
+		button.style.border = "1px solid #70d4ff";
+		button.style.boxShadow = "fill #5ad0ff55 0px 0px 9px 0px";
+	} else if (button) {
+		button.RemoveClass("XHSSupporterPassActive");
+		button.style.brightness = "1.0";
+		button.style.preTransformScale2d = "1.0";
+	}
 
 	if (button && button.BHasClass("XHSSupporterPassAttention")) {
 		button.style.opacity = "1.0";
@@ -471,6 +562,11 @@ function OpenXHSIngameAdvertizeFromButton(retriesLeft) {
 
 function OpenXHSSupporterPassFromButton(retriesLeft) {
 	var config = GameUI.CustomUIConfig ? GameUI.CustomUIConfig() : null;
+	if (config && typeof config.ToggleXHSSupporterPass === "function") {
+		config.ToggleXHSSupporterPass();
+		return;
+	}
+
 	if (config && typeof config.OpenXHSSupporterPass === "function") {
 		config.OpenXHSSupporterPass();
 		return;
@@ -680,6 +776,21 @@ function CreateXHSReportBugButton() {
 	ApplyXHSReportBugButtonStyle(button);
 }
 
+function RegisterXHSSupporterPassButtonStateBridge() {
+	var config = GameUI.CustomUIConfig ? GameUI.CustomUIConfig() : null;
+	if (!config) {
+		return;
+	}
+	config.UpdateXHSSupporterPassButtonState = function(visible) {
+		config.XHSSupporterPassVisible = visible === true;
+		var currentRoot = GetXHSHudRoot();
+		var currentButton = currentRoot && currentRoot.FindChildTraverse("XHSSupporterPassTopBarButton");
+		if (currentButton) {
+			ApplyXHSSupporterPassButtonStyle(currentButton);
+		}
+	};
+}
+
 function CreateXHSSupporterPassButton() {
 	var root = GetXHSHudRoot();
 	if (!root) {
@@ -692,6 +803,7 @@ function CreateXHSSupporterPassButton() {
 		$.Schedule(0.5, CreateXHSSupporterPassButton);
 		return;
 	}
+	RegisterXHSSupporterPassButtonStateBridge();
 
 	var existing = root.FindChildTraverse("XHSSupporterPassTopBarButton");
 	if (existing) {
@@ -788,6 +900,85 @@ HideXHSTpCharges(20);
 
 var g_XHSEnemyAbilityUpdateScheduled = false;
 var g_XHSEnemyAbilityWasActive = false;
+var g_XHSEnemyAbilitySelectionRefreshSerial = 0;
+
+function ScheduleXHSEnemyAbilityTooltipRetry(image) {
+	if (!image || !image._xhsTooltipHovered || image._xhsTooltipRetryScheduled) {
+		return;
+	}
+
+	var retryCount = Number(image._xhsTooltipRetryCount) || 0;
+	if (retryCount >= 10) {
+		return;
+	}
+
+	image._xhsTooltipRetryScheduled = true;
+	image._xhsTooltipRetryCount = retryCount + 1;
+	$.Schedule(0.03, function() {
+		image._xhsTooltipRetryScheduled = false;
+		if (image._xhsTooltipHovered) {
+			ShowXHSEnemyAbilityTooltip(image);
+		}
+	});
+}
+
+function ShowXHSEnemyAbilityTooltip(image) {
+	if (!image) {
+		return;
+	}
+
+	image._xhsTooltipHovered = true;
+	var abilityName = image._xhsAbilityName || image.abilityname;
+	var abilityLevel = Number(image._xhsAbilityLevel) || 0;
+	var abilityEntityIndex = Number(image._xhsAbilityEntityIndex);
+
+	// Read the entity again at hover time. The selection event can arrive one
+	// frame before Valve updates the portrait HUD and its ability bindings.
+	if (abilityEntityIndex >= 0) {
+		var liveAbilityName = Abilities.GetAbilityName(abilityEntityIndex);
+		var liveAbilityLevel = Abilities.GetLevel ?
+			Math.max(0, Number(Abilities.GetLevel(abilityEntityIndex)) || 0) :
+			abilityLevel;
+		if (liveAbilityName) {
+			abilityName = liveAbilityName;
+			image._xhsAbilityName = liveAbilityName;
+		}
+		if (liveAbilityLevel > 0) {
+			abilityLevel = liveAbilityLevel;
+			image._xhsAbilityLevel = liveAbilityLevel;
+		}
+	}
+
+	if (abilityName && abilityLevel > 0) {
+		// Enemy ability levels are already networked through the ability entity.
+		// Passing the level explicitly avoids Valve resolving the same slot on
+		// the local hero, which produced "Level ?" and selected no KV value.
+		image._xhsTooltipRetryCount = 0;
+		image._xhsTooltipShownAbilityName = abilityName;
+		image._xhsTooltipShownAbilityLevel = abilityLevel;
+		image._xhsTooltipShownAbilityEntityIndex = abilityEntityIndex;
+		$.DispatchEvent("DOTAShowAbilityTooltipForLevel", image, abilityName, abilityLevel);
+		return;
+	}
+
+	// Do not let Valve build a partial tooltip with "Level ?". Keep the hover
+	// alive and retry for a few frames while the newly selected unit networks.
+	if (abilityName) {
+		$.DispatchEvent("DOTAHideAbilityTooltip", image);
+		ScheduleXHSEnemyAbilityTooltipRetry(image);
+	}
+}
+
+function HideXHSEnemyAbilityTooltip(image) {
+	if (image) {
+		image._xhsTooltipHovered = false;
+		image._xhsTooltipRetryCount = 0;
+		image._xhsTooltipShownAbilityName = null;
+		image._xhsTooltipShownAbilityLevel = null;
+		image._xhsTooltipShownAbilityEntityIndex = null;
+		$.DispatchEvent("DOTAHideAbilityTooltip", image);
+	}
+}
 
 function GetXHSPortraitUnit() {
 	if (Players.GetLocalPlayerPortraitUnit) {
@@ -875,9 +1066,8 @@ function GetXHSPanelAbility(panel, panelIndex, unit, displayedAbilities) {
 }
 
 function GetXHSAbilityIconHost(panel) {
-	// Valve's AbilityImage is smaller than its surrounding ability-button
-	// container. Parent every XHS visual layer to the stock image so custom
-	// enemy icons keep the exact native size, clipping and HUD scaling.
+	// Use Valve's exact icon geometry. The custom Image itself is neutral and
+	// the owner/level context is supplied separately for its tooltip.
 	return panel.FindChildTraverse("AbilityImage") || panel;
 }
 
@@ -990,18 +1180,52 @@ function GetOrCreateXHSEnemyCooldownOverlay(panel) {
 }
 
 function GetOrCreateXHSEnemyAbilityImage(panel) {
-	var enemyImage = panel.FindChildTraverse("XHSEnemyAbilityImage");
+	var obsoleteVisualHost = panel.FindChildTraverse("XHSEnemyAbilityVisualHost");
+	if (obsoleteVisualHost) {
+		obsoleteVisualHost.visible = false;
+	}
+	var legacyAbilityImage = panel.FindChildTraverse("XHSEnemyAbilityImage");
+	if (legacyAbilityImage) {
+		// DOTAAbilityImage resolves learned/unlearned state against the local
+		// hero's matching slot, so an enemy spell can become incorrectly gray.
+		legacyAbilityImage.visible = false;
+		legacyAbilityImage.hittest = false;
+	}
+
+	var enemyImage = panel.FindChildTraverse("XHSEnemyAbilityIcon");
 	var iconContainer = GetXHSAbilityIconHost(panel);
 	if (enemyImage && enemyImage.GetParent() === iconContainer) {
+		enemyImage.hittest = true;
+		enemyImage.SetPanelEvent("onmouseover", function() {
+			ShowXHSEnemyAbilityTooltip(enemyImage);
+		});
+		enemyImage.SetPanelEvent("onmouseout", function() {
+			HideXHSEnemyAbilityTooltip(enemyImage);
+		});
 		return enemyImage;
 	}
 	if (enemyImage) {
 		enemyImage.SetParent(iconContainer);
+		enemyImage.hittest = true;
+		enemyImage.SetPanelEvent("onmouseover", function() {
+			ShowXHSEnemyAbilityTooltip(enemyImage);
+		});
+		enemyImage.SetPanelEvent("onmouseout", function() {
+			HideXHSEnemyAbilityTooltip(enemyImage);
+		});
 		return enemyImage;
 	}
 
-	enemyImage = $.CreatePanel("DOTAAbilityImage", iconContainer, "XHSEnemyAbilityImage");
-	enemyImage.hittest = false;
+	// A plain Image renders the spell texture verbatim and has no implicit
+	// dependency on the selected local hero or the local ability-bar slot.
+	enemyImage = $.CreatePanel("Image", iconContainer, "XHSEnemyAbilityIcon");
+	enemyImage.hittest = true;
+	enemyImage.SetPanelEvent("onmouseover", function() {
+		ShowXHSEnemyAbilityTooltip(enemyImage);
+	});
+	enemyImage.SetPanelEvent("onmouseout", function() {
+		HideXHSEnemyAbilityTooltip(enemyImage);
+	});
 	enemyImage.style.width = "100%";
 	enemyImage.style.height = "100%";
 	enemyImage.style.horizontalAlign = "center";
@@ -1042,7 +1266,8 @@ function SetXHSEnemyAbilityImageReveal(panel, reveal) {
 
 function HideXHSEnemyAbilityPanel(panel) {
 	SetXHSEnemyAbilityImageReveal(panel, false);
-	var enemyImage = panel.FindChildTraverse("XHSEnemyAbilityImage");
+	var enemyImage = panel.FindChildTraverse("XHSEnemyAbilityIcon");
+	var legacyAbilityImage = panel.FindChildTraverse("XHSEnemyAbilityImage");
 	var manaContainer = panel.FindChildTraverse("XHSEnemyManaCostContainer");
 	var manaLabel = panel.FindChildTraverse("XHSEnemyManaCost");
 	var cooldownLabel = panel.FindChildTraverse("XHSEnemyCooldownTimer");
@@ -1052,6 +1277,10 @@ function HideXHSEnemyAbilityPanel(panel) {
 	}
 	if (enemyImage) {
 		enemyImage.visible = false;
+	}
+	if (legacyAbilityImage) {
+		legacyAbilityImage.visible = false;
+		legacyAbilityImage.hittest = false;
 	}
 	if (manaLabel && (!manaContainer || manaLabel.GetParent() !== manaContainer)) {
 		manaLabel.visible = false;
@@ -1144,19 +1373,37 @@ function UpdateXHSFriendlyCooldownLabels(unit) {
 	}
 }
 
-function UpdateXHSEnemyAbilityPanel(panel, ability) {
+function UpdateXHSEnemyAbilityPanel(panel, ability, ownerUnit) {
 	if (ability === undefined || ability === null || ability < 0) {
 		HideXHSEnemyAbilityPanel(panel);
 		return;
 	}
 
-	// The custom image now lives inside Valve's stock AbilityImage to inherit
-	// its exact geometry. Remove the enemy grayscale filter from that parent
-	// while the replacement is visible, otherwise it also desaturates children.
+	var abilityName = Abilities.GetAbilityName(ability);
+	var abilityLevel = Abilities.GetLevel ? Math.max(0, Number(Abilities.GetLevel(ability)) || 0) : 0;
+
+	// Keep the replacement in Valve's original geometry without mutating the
+	// native DOTAAbilityPanel. Changing its entity/level properties rebuilds
+	// the stock panel and makes it steal hover events from this image.
 	SetXHSEnemyAbilityImageReveal(panel, true);
 	var enemyImage = GetOrCreateXHSEnemyAbilityImage(panel);
-	enemyImage.abilityname = Abilities.GetAbilityName(ability);
+	var textureName = Abilities.GetAbilityTextureName ?
+		Abilities.GetAbilityTextureName(ability) :
+		abilityName;
+	enemyImage.SetImage("s2r://panorama/images/spellicons/" + (textureName || abilityName) + "_png.vtex");
+	enemyImage._xhsAbilityName = abilityName;
+	enemyImage._xhsAbilityLevel = abilityLevel;
+	enemyImage._xhsAbilityOwner = ownerUnit;
+	enemyImage._xhsAbilityEntityIndex = ability;
 	enemyImage.visible = true;
+
+	if (enemyImage._xhsTooltipHovered &&
+		abilityLevel > 0 &&
+		(enemyImage._xhsTooltipShownAbilityName !== abilityName ||
+			enemyImage._xhsTooltipShownAbilityLevel !== abilityLevel ||
+			enemyImage._xhsTooltipShownAbilityEntityIndex !== ability)) {
+		ShowXHSEnemyAbilityTooltip(enemyImage);
+	}
 
 	var cooldown = Abilities.GetCooldownLength ?
 		Abilities.GetCooldownLength(ability) :
@@ -1165,8 +1412,16 @@ function UpdateXHSEnemyAbilityPanel(panel, ability) {
 	var inCooldown = remaining > 0.01;
 	var overlay = GetOrCreateXHSEnemyCooldownOverlay(panel);
 	var timer = GetOrCreateXHSEnemyCooldownLabel(panel);
+	var cooldownPanel = panel.FindChildTraverse("Cooldown");
 	var stockTimer = panel.FindChildTraverse("CooldownTimer");
 
+	if (cooldownPanel) {
+		// Enemy portrait panels can leave Valve's cooldown host collapsed. The
+		// custom numeric timer lives inside it so it must remain renderable.
+		cooldownPanel.visible = true;
+		cooldownPanel.style.visibility = "visible";
+		cooldownPanel.style.opacity = "1";
+	}
 	if (stockTimer) {
 		stockTimer.visible = false;
 	}
@@ -1213,7 +1468,7 @@ function UpdateXHSEnemyAbilityCooldowns() {
 	var displayedAbilities = GetXHSDisplayedAbilities(unit);
 	for (var i = 0; i < panels.length; i++) {
 		var ability = GetXHSPanelAbility(panels[i], i, unit, displayedAbilities);
-		UpdateXHSEnemyAbilityPanel(panels[i], ability);
+		UpdateXHSEnemyAbilityPanel(panels[i], ability, unit);
 	}
 }
 
@@ -1229,8 +1484,27 @@ function ShowEnemyAbilityCooldown() {
 	}
 }
 
-GameEvents.Subscribe("dota_player_update_selected_unit", UpdateXHSEnemyAbilityCooldowns);
-GameEvents.Subscribe("dota_player_update_query_unit", UpdateXHSEnemyAbilityCooldowns);
+function RefreshXHSEnemyAbilitiesAfterSelection() {
+	var refreshSerial = ++g_XHSEnemyAbilitySelectionRefreshSerial;
+	UpdateXHSEnemyAbilityCooldowns();
+
+	// The event is sent before GetLocalPlayerPortraitUnit and the stock ability
+	// panels are guaranteed to point at the new unit. Refresh on the next frame
+	// and once more shortly after so the very first hover has complete data.
+	$.Schedule(0.0, function() {
+		if (refreshSerial === g_XHSEnemyAbilitySelectionRefreshSerial) {
+			UpdateXHSEnemyAbilityCooldowns();
+		}
+	});
+	$.Schedule(0.03, function() {
+		if (refreshSerial === g_XHSEnemyAbilitySelectionRefreshSerial) {
+			UpdateXHSEnemyAbilityCooldowns();
+		}
+	});
+}
+
+GameEvents.Subscribe("dota_player_update_selected_unit", RefreshXHSEnemyAbilitiesAfterSelection);
+GameEvents.Subscribe("dota_player_update_query_unit", RefreshXHSEnemyAbilitiesAfterSelection);
 HideXHSEnemyAbilityLabels();
 RestoreXHSStockAbilityPanels(GetXHSPortraitUnit());
 ShowEnemyAbilityCooldown();

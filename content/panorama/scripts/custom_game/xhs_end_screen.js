@@ -43,6 +43,7 @@ var XHSEndScreen = (function () {
 	var hasRenderedEndGame = false;
 	var fallbackTimerStarted = false;
 	var shownRewardKeys = {};
+	var lastEndGameData = null;
 
 	function Panel(id) {
 		return $("#" + id);
@@ -184,6 +185,35 @@ var XHSEndScreen = (function () {
 
 		var localized = $.Localize(value);
 		return localized === value ? value.replace("#", "") : localized;
+	}
+
+	function ResolvePlayerIdentity(model) {
+		model = model || {};
+		if (typeof XHSNameDisplay !== "undefined" && XHSNameDisplay.Resolve) {
+			return XHSNameDisplay.Resolve({
+				playerID: model.id,
+				playerName: model.name,
+				heroName: model.hero,
+				heroDisplayName: model.heroLabel,
+			});
+		}
+
+		// Privacy-safe fallback: never substitute the persona name.
+		return model.heroLabel || Localize("#" + (model.hero || ""));
+	}
+
+	function ResolveHallIdentity(entry) {
+		entry = entry || {};
+		var rawPlayerName = entry.name || entry.player_name || entry.steam_name || entry.steamid || entry.__key || "";
+		if (typeof XHSNameDisplay !== "undefined" && XHSNameDisplay.Resolve) {
+			return XHSNameDisplay.Resolve({
+				playerID: entry.player_id,
+				playerName: rawPlayerName,
+				heroName: entry.hero || entry.hero_name || entry.unit_name || "",
+			});
+		}
+
+		return entry.hero_label || Localize("#" + (entry.hero || entry.hero_name || entry.unit_name || ""));
 	}
 
 	function GetRootPanel() {
@@ -699,7 +729,7 @@ var XHSEndScreen = (function () {
 
 		var name = $.CreatePanel("Label", copy, "");
 		name.AddClass("XHSMvpName");
-		name.text = model ? model.name : "N/A";
+		name.text = model ? ResolvePlayerIdentity(model) : "";
 
 		var valuePanel = $.CreatePanel("Label", copy, "");
 		valuePanel.AddClass("XHSMvpValue");
@@ -973,7 +1003,8 @@ var XHSEndScreen = (function () {
 
 		var name = $.CreatePanel("Label", text, "");
 		name.AddClass("XHSPlayerName");
-		name.text = model.name;
+		name.text = ResolvePlayerIdentity(model);
+		name.style.visibility = name.text ? "visible" : "collapse";
 		if (hasSupporterTier) {
 			name.style.color = model.supporterTierColor;
 			name.style.textShadow = "0px 1px 2px #000000, 0px 0px 7px " + ColorWithAlpha(model.supporterTierColor, "82");
@@ -981,7 +1012,8 @@ var XHSEndScreen = (function () {
 
 		var heroName = $.CreatePanel("Label", text, "");
 		heroName.AddClass("XHSPlayerHeroName");
-		heroName.text = model.abandon ? model.heroLabel + " - Abandoned" : model.heroLabel;
+		heroName.text = model.abandon ? "Abandoned" : "";
+		heroName.style.visibility = model.abandon ? "visible" : "collapse";
 
 		CreateCell(row, "PlayerColSmall", model.level.toString());
 		CreateCell(row, "PlayerColKda", FormatNumber(model.kills), "XHSPlayerCellKills");
@@ -1106,7 +1138,7 @@ var XHSEndScreen = (function () {
 
 			var name = $.CreatePanel("Label", row, "");
 			name.AddClass("HallColPlayer");
-			name.text = entry.name || entry.player_name || entry.steam_name || entry.steamid || entry.__key || "Unknown";
+			name.text = ResolveHallIdentity(entry);
 
 			var score = $.CreatePanel("Label", row, "");
 			score.AddClass("HallColScore");
@@ -1253,6 +1285,7 @@ var XHSEndScreen = (function () {
 		}
 
 		try {
+			lastEndGameData = data;
 			var players = BuildPlayerModels(data);
 
 			RenderHeader(data);
@@ -1272,6 +1305,21 @@ var XHSEndScreen = (function () {
 		}
 	}
 
+	function RefreshIdentitySurfaces() {
+		if (!hasRenderedEndGame || !lastEndGameData) {
+			return;
+		}
+
+		try {
+			var players = BuildPlayerModels(lastEndGameData);
+			RenderMvpCards(players);
+			RenderPlayers(players);
+			RenderHallOfFame();
+		} catch (error) {
+			$.Msg("[XHSEndScreen] Identity refresh failed: " + error);
+		}
+	}
+
 	function SubscribeEndGameData() {
 		if (endGameSubscription !== null || !CustomNetTables || !CustomNetTables.SubscribeNetTableListener) {
 			return;
@@ -1288,6 +1336,9 @@ var XHSEndScreen = (function () {
 		HideVanillaHud();
 		BindButtons();
 		SubscribeEndGameData();
+		if (typeof XHSNameDisplay !== "undefined" && XHSNameDisplay.Subscribe) {
+			XHSNameDisplay.Subscribe(RefreshIdentitySurfaces);
+		}
 		SetLoading(true);
 		ScheduleEndScreenFallback();
 		RenderEndGameData(GetEndGameData());

@@ -21,7 +21,7 @@ modifier_xhs_magtheridon_cast_lock = modifier_xhs_magtheridon_cast_lock or class
 modifier_xhs_magtheridon_cast_lock.XHS_LINK_CLIENT = true
 
 local INFERNAL_ROOT_MODIFIER = "modifier_xhs_magtheridon_infernal_root"
-local EMPOWER_OVERHEAD_PARTICLE = "particles/units/heroes/hero_abaddon/abaddon_curse_counter_stack.vpcf"
+local EMPOWER_OVERHEAD_PARTICLE = "particles/units/heroes/heroes_underlord/abyssal_underlord_portal_timer.vpcf"
 
 local MAGTHERIDON_ABILITIES = {
 	"xhs_magtheridon_brutal_slam",
@@ -1006,7 +1006,12 @@ end
 
 function modifier_xhs_magtheridon_empower:UpdateOverheadParticle()
 	if self.overhead_particle ~= nil then
-		ParticleManager:SetParticleControl(self.overhead_particle, 1, Vector(0, self:GetStackCount(), 0))
+		local buffCount = math.max(0, self:GetStackCount())
+		if buffCount > 9 then
+			ParticleManager:SetParticleControl(self.overhead_particle, 1, Vector(1, buffCount - 10, 0))
+		else
+			ParticleManager:SetParticleControl(self.overhead_particle, 1, Vector(0, buffCount, 0))
+		end
 	end
 end
 
@@ -1086,6 +1091,8 @@ end
 function modifier_xhs_magtheridon_slow:DeclareFunctions() return {
 	MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE,
 	MODIFIER_PROPERTY_ATTACKSPEED_BONUS_CONSTANT,
+	MODIFIER_PROPERTY_TOOLTIP,
+	MODIFIER_PROPERTY_TOOLTIP2,
 } end
 
 function modifier_xhs_magtheridon_slow:GetModifierMoveSpeedBonus_Percentage()
@@ -1094,6 +1101,14 @@ end
 
 function modifier_xhs_magtheridon_slow:GetModifierAttackSpeedBonus_Constant()
 	return self.attack_slow
+end
+
+function modifier_xhs_magtheridon_slow:OnTooltip()
+	return math.abs(self.movement_slow or 0)
+end
+
+function modifier_xhs_magtheridon_slow:OnTooltip2()
+	return math.abs(self.attack_slow or 0)
 end
 
 function modifier_xhs_magtheridon_slow:GetEffectName()

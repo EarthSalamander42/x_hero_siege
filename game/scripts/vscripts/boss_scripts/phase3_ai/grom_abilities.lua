@@ -288,14 +288,26 @@ function xhs_grom_mirror_cleave:OnAbilityPhaseStart()
 	local width = self:GetSpecialValueFor("width")
 	local spacing = math.max(1, width * 1.45)
 	local count = math.max(1, math.floor(length / spacing))
+	local cleaves = context.cleaves or {}
+	if #cleaves == 0 then
+		cleaves = {
+			{
+				start = caster:GetAbsOrigin(),
+				direction = caster:GetForwardVector(),
+				delay = 0,
+				damage_scale = 1.0,
+			},
+		}
+		context.cleaves = cleaves
+	end
 
 	StartBossCastBar(self, "Mirror Cleave")
-	for _, cleave in pairs(context.cleaves or {}) do
+	for _, cleave in ipairs(cleaves) do
 		XHSBossTelegraphs:Line(cleave.start, cleave.direction, spacing, width, count, self:GetCastPoint() + (cleave.delay or 0), GROM_COLORS, 120)
 	end
 
-	StartAnimation(caster, { duration = self:GetCastPoint() + 0.5, activity = ACT_DOTA_ATTACK, rate = 0.7 })
-	caster:EmitSound("Hero_Juggernaut.Attack")
+	StartAnimation(caster, { duration = self:GetCastPoint() + 0.55, activity = ACT_DOTA_ATTACK_EVENT, rate = 0.75 })
+	caster:EmitSound("Hero_Sven.Attack")
 	return true
 end
 
@@ -311,13 +323,34 @@ function xhs_grom_mirror_cleave:OnSpellStart()
 	local length = self:GetSpecialValueFor("length")
 	local width = self:GetSpecialValueFor("width")
 	local damage = ScaleDamage(self:GetSpecialValueFor("damage"))
+	local cleaves = context.cleaves or {}
+	if #cleaves == 0 then
+		cleaves = {
+			{
+				start = caster:GetAbsOrigin(),
+				direction = caster:GetForwardVector(),
+				delay = 0,
+				damage_scale = 1.0,
+			},
+		}
+	end
 
-	for _, cleave in pairs(context.cleaves or {}) do
+	for index, cleave in ipairs(cleaves) do
 		Timers:CreateTimer(cleave.delay or 0, function()
 			if not IsValidAlive(caster) then return nil end
+			StartAnimation(caster, { duration = 0.6, activity = ACT_DOTA_ATTACK_EVENT, rate = 1.35 })
 			CreateLineParticle(cleave.start, cleave.direction, length, CLEAVE_PARTICLE, 0.65)
-			caster:EmitSound("Hero_Juggernaut.PreAttack")
+			EmitSoundOnLocationWithCaster(cleave.start, "Hero_Sven.GreatCleave", caster)
 			DamageLine(caster, self, cleave.start, cleave.direction, length, width, damage * (cleave.damage_scale or 1.0), self:GetAbilityDamageType())
+			if index == 1 then
+				local direction = cleave.direction
+				direction.z = 0
+				if direction:Length2D() > 0 then
+					local destination = caster:GetAbsOrigin() + direction:Normalized() * math.min(300, length * 0.32)
+					FindClearSpaceForUnit(caster, destination, true)
+					CreateWorldParticle(destination, WARSONG_LEAP_PARTICLE, 0.7)
+				end
+			end
 			return nil
 		end)
 	end

@@ -5,6 +5,11 @@ local XHS_PRIESTESS_ARC_CAST_PARTICLE = "particles/units/heroes/hero_zuus/zuus_a
 local XHS_PRIESTESS_ARC_CAST_SOUND = "Hero_Zuus.ArcLightning.Cast"
 local XHS_PRIESTESS_ARC_TARGET_SOUND = "Hero_Zuus.ArcLightning.Target"
 
+local XHS_HUNTRESS_OWL_CAST_PARTICLE = "particles/units/heroes/hero_luna/luna_lucent_beam_cast.vpcf"
+local XHS_HUNTRESS_OWL_HIT_PARTICLE = "particles/units/heroes/hero_luna/luna_lucent_beam.vpcf"
+local XHS_HUNTRESS_OWL_CAST_SOUND = "Hero_Luna.Eclipse.Cast"
+local XHS_HUNTRESS_OWL_HIT_SOUND = "Hero_Luna.Eclipse.Target"
+
 local function XHSPriestessArcLightningCreateCastParticle(caster, target)
 	local particle = ParticleManager:CreateParticle(XHS_PRIESTESS_ARC_CAST_PARTICLE, PATTACH_POINT_FOLLOW, caster)
 	ParticleManager:SetParticleControlEnt(particle, 0, caster, PATTACH_POINT_FOLLOW, "attach_attack1", caster:GetAbsOrigin(), true)
@@ -111,6 +116,16 @@ function lightning_storm_start(keys)
 	local caster = keys.caster
 	local ability = keys.ability
 
+	if not target or target:IsNull() then
+		return
+	end
+
+	local cast_particle = ParticleManager:CreateParticle(XHS_HUNTRESS_OWL_CAST_PARTICLE, PATTACH_ABSORIGIN_FOLLOW, caster)
+	ParticleManager:SetParticleControlEnt(cast_particle, 0, caster, PATTACH_ABSORIGIN_FOLLOW, "attach_hitloc", caster:GetAbsOrigin(), true)
+	ParticleManager:SetParticleControlEnt(cast_particle, 1, target, PATTACH_ABSORIGIN_FOLLOW, "attach_hitloc", target:GetAbsOrigin(), true)
+	ParticleManager:ReleaseParticleIndex(cast_particle)
+	EmitSoundOn(XHS_HUNTRESS_OWL_CAST_SOUND, caster)
+
 	ability.jump_count = ability:GetLevelSpecialValueFor("jump_count", ability:GetLevel() - 1)
 	ability.radius = ability:GetLevelSpecialValueFor("radius", ability:GetLevel() - 1)
 	ability.jump_delay = ability:GetLevelSpecialValueFor("jump_delay", ability:GetLevel() - 1)
@@ -134,12 +149,13 @@ function lightning_storm_repeat(params)
 	end
 
 	-- hit initial target
-	local lightning = ParticleManager:CreateParticle("particles/econ/items/luna/luna_lucent_ti5_gold/luna_eclipse_impact_moonfall_gold.vpcf", PATTACH_WORLDORIGIN, params.initial_target)
+	local lightning = ParticleManager:CreateParticle(XHS_HUNTRESS_OWL_HIT_PARTICLE, PATTACH_WORLDORIGIN, params.initial_target)
 	local loc = params.initial_target:GetAbsOrigin()
-	ParticleManager:SetParticleControl(lightning, 0, loc + Vector(0, 0, 1000))
+	ParticleManager:SetParticleControl(lightning, 0, loc)
 	ParticleManager:SetParticleControl(lightning, 1, loc)
-	ParticleManager:SetParticleControl(lightning, 2, loc)
-	EmitSoundOn("Hero_Leshrac.Lightning_Storm", params.initial_target)
+	ParticleManager:SetParticleControl(lightning, 5, loc)
+	ParticleManager:ReleaseParticleIndex(lightning)
+	EmitSoundOn(XHS_HUNTRESS_OWL_HIT_SOUND, params.initial_target)
 
 	local damageTable = {
 		attacker = params.caster,

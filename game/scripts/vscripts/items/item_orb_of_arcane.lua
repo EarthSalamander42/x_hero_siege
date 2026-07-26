@@ -21,17 +21,17 @@ local function GetArcaneOrbTexture(caster, active_texture, inactive_texture)
 end
 
 local ARCANE_ACTIVE_MODIFIER_TEXTURES = {
-	item_astral_core = "item_astral_core",
-	item_mystic_gem = "item_mystic_gem",
-	item_orb_of_arcane = "item_orb_of_arcane",
+	item_astral_core = "modifiers/astral_core",
+	item_mystic_gem = "modifiers/mystic_gem",
+	item_orb_of_arcane = "modifiers/orb_of_arcane",
 }
 
 local function GetArcaneActiveModifierTexture(ability)
 	if ability and not ability:IsNull() then
-		return ARCANE_ACTIVE_MODIFIER_TEXTURES[ability:GetName()] or "item_orb_of_arcane"
+		return ARCANE_ACTIVE_MODIFIER_TEXTURES[ability:GetName()] or "modifiers/orb_of_arcane"
 	end
 
-	return "item_orb_of_arcane"
+	return "modifiers/orb_of_arcane"
 end
 
 function item_orb_of_arcane:GetIntrinsicModifierName() return "modifier_orb_of_arcane" end
@@ -140,6 +140,7 @@ modifier_orb_of_arcane_exposure.XHS_LINK_CLIENT = true
 function modifier_orb_of_arcane_exposure:IsHidden() return false end
 function modifier_orb_of_arcane_exposure:IsDebuff() return true end
 function modifier_orb_of_arcane_exposure:IsPurgable() return true end
+function modifier_orb_of_arcane_exposure:GetTexture() return "obsidian_destroyer_arcane_orb" end
 
 function modifier_orb_of_arcane_exposure:OnCreated()
 	self:RefreshSpecialValues()

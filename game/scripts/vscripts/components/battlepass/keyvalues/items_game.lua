@@ -66,6 +66,7 @@ function ItemsGame:Init()
 				reward_table.slot_id = ItemsGame:GetItemSlot(count)
 				reward_table.hero = ItemsGame:GetItemHero(count)
 				reward_table.item_unreleased = ItemsGame:GetItemReleaseState(count)
+				reward_table.runtime_assets = ItemsGame:GetItemRuntimeAssets(count)
 
 				table.insert(bp_reward_table, reward_table)
 			end
@@ -104,6 +105,7 @@ function ItemsGame:Init()
 				reward_table.item_id = tostring(count)
 				reward_table.slot_id = ItemsGame:GetItemSlot(count)
 				reward_table.hero = ItemsGame:GetItemHero(count)
+				reward_table.runtime_assets = ItemsGame:GetItemRuntimeAssets(count)
 
 				table.insert(bp_reward_table2, reward_table)
 			end
@@ -182,6 +184,25 @@ end
 
 function ItemsGame:GetItemVisuals(item_id)
 	return self:GetItemInfo(item_id, "visuals")
+end
+
+function ItemsGame:GetItemRuntimeAssets(item_id)
+	local runtimeAssets = {}
+	for _, visual in pairs(self:GetItemVisuals(item_id) or {}) do
+		if type(visual) == "table" and visual.modifier and visual.modifier ~= "" then
+			table.insert(runtimeAssets, {
+				kind = visual.type or "asset",
+				hook = visual.asset or "",
+				path = visual.modifier,
+			})
+		end
+	end
+	table.sort(runtimeAssets, function(a, b)
+		local aKey = tostring(a.hook or "") .. "\0" .. tostring(a.path or "")
+		local bKey = tostring(b.hook or "") .. "\0" .. tostring(b.path or "")
+		return aKey < bKey
+	end)
+	return runtimeAssets
 end
 
 function ItemsGame:GetItemName(item_id)

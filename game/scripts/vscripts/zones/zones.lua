@@ -963,7 +963,13 @@ function CDungeonZone:Activate()
 
 	if not CDungeonZone.bSpawnedVIPs then
 		--		print(CDungeonZone.VIPs)
-		CDungeonZone:SpawnVIPs(CDungeonZone.VIPs)
+		local immediateVIPs = {}
+		for _, vip in pairs(CDungeonZone.VIPs) do
+			if vip.bDeferredSpawn ~= true then
+				table.insert(immediateVIPs, vip)
+			end
+		end
+		CDungeonZone:SpawnVIPs(immediateVIPs)
 		CDungeonZone:SpawnNeutrals(CDungeonZone.Neutrals)
 		CDungeonZone.bSpawnedVIPs = true
 	end

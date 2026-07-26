@@ -156,10 +156,35 @@ function CustomTimers:BroadcastSpecialWaveActive(wave)
 	if wave == nil then return end
 
 	CustomGameEventManager:Send_ServerToAllClients("xhs_wave_active", {
+		id = wave.id or "",
 		remaining = wave.remaining or 0,
 		total = wave.total or 0,
 		direction = wave.direction or "",
 		wave_index = wave.wave_index or 0,
+	})
+end
+
+function CustomTimers:BroadcastSpecialWaveQueue()
+	local waves = CustomTimers.active_special_waves or {}
+	local queued = {}
+	local firstIndex = 2
+	if waves[1] ~= nil and CustomTimers:IsSpecialWaveDisplayPending(waves[1]) then
+		firstIndex = 1
+	end
+
+	for index = firstIndex, #waves do
+		local wave = waves[index]
+		table.insert(queued, {
+			id = wave.id or "",
+			remaining = wave.remaining or 0,
+			total = wave.total or 0,
+			direction = wave.direction or "",
+			wave_index = wave.wave_index or 0,
+		})
+	end
+
+	CustomGameEventManager:Send_ServerToAllClients("xhs_wave_queue_update", {
+		waves = queued,
 	})
 end
 
@@ -200,6 +225,7 @@ function CustomTimers:ScheduleVisibleSpecialWaveAfterClear()
 
 		CustomTimers.pending_special_wave_display_id = nil
 		CustomTimers:BroadcastVisibleSpecialWave()
+		CustomTimers:BroadcastSpecialWaveQueue()
 		return nil
 	end)
 end
@@ -253,6 +279,8 @@ ListenToGameEvent('entity_killed', function(keys)
 				CustomTimers:ScheduleVisibleSpecialWaveAfterClear()
 			end
 		end
+
+		CustomTimers:BroadcastSpecialWaveQueue()
 	end
 
 	-- The Killing entity
@@ -344,7 +372,7 @@ function CustomTimers:Think()
 
 					if CustomTimers.current_time["special_wave"] == 30 then
 						-- print("Special Wave in 30 seconds:", CustomTimers.special_wave_region[cardinal_point], CustomTimers.special_wave)
-						if cardinal_point ~= 3 then
+						if cardinal_point ~= 3 and cardinal_point ~= 6 then
 							CustomTimers:ShowSpecialWaveCountdown(cardinal_point, 30)
 							if Runes and Runes.OnSpecialWaveWarning then
 								Runes:OnSpecialWaveWarning(cardinal_point, CustomTimers:GetSpecialWavePoint(cardinal_point))
@@ -397,7 +425,7 @@ function CustomTimers:GetSpecialWaveTimerMetadata(t)
 		direction = CustomTimers:GetSpecialWavePoint(wave_index) or ""
 		show_compact = t > 30
 
-		if wave_index == 3 and CustomTimers.enable_special_wave ~= true then
+		if (wave_index == 3 or wave_index == 6) and CustomTimers.enable_special_wave ~= true then
 			show_compact = false
 		end
 	end
@@ -435,6 +463,15 @@ function CustomTimers:BroadcastTimer(timer_name)
 		end
 	end
 
+	if timer_name == "special_event" then
+		local muradin_frenzy = GameMode.Muradin_occuring == true and t <= 60
+		broadcast_gametimer.muradin_frenzy = muradin_frenzy and 1 or 0
+
+		if muradin_frenzy and XHSTriggerMuradinFrenzy ~= nil then
+			XHSTriggerMuradinFrenzy(t)
+		end
+	end
+
 	CustomGameEventManager:Send_ServerToAllClients("countdown_timer", broadcast_gametimer)
 
 	if timer_name == "creep_level" or timer_name == "special_event" then
@@ -463,7 +500,7 @@ end
 function CustomTimers:TickCreepLevel()
 	if CustomTimers.game_phase ~= 1 then return end
 
-	if CustomTimers.creep_level <= 4 then
+	if CustomTimers.creep_level < 4 then
 		CustomTimers:Countdown("creep_level")
 
 		if CustomTimers.current_time["creep_level"] <= 0 then
@@ -521,15 +558,22 @@ function CustomTimers:GetSpecialWavePoint(iCardinalPoint)
 	return point[iCardinalPoint]
 end
 
-function CustomTimers:ShowSpecialWaveCountdown(iCardinalPoint, duration)
+function CustomTimers:ShowSpecialWaveCountdown(iCardinalPoint, duration, trackServerTimer)
 	if GameMode.SpecialArena_occuring == true then return end
 
 	local direction = CustomTimers:GetSpecialWavePoint(iCardinalPoint)
 	if direction == nil then return end
 
+	local timer_name = "special_wave"
+	if trackServerTimer == false then
+		timer_name = nil
+	end
+
 	CustomGameEventManager:Send_ServerToAllClients("xhs_wave_timer", {
 		duration = duration,
-		timer_name = "special_wave",
+		timer_name = timer_name,
+		wave_index = CustomTimers.special_wave or iCardinalPoint,
+		direction = direction,
 		eyebrow = "WAVE INCOMING",
 		title = "Wave of Darkness",
 		subtitle = string.upper(direction) .. " lane",
@@ -562,7 +606,7 @@ function CustomTimers:ResumeSpecialWaveCountdown()
 
 	local remaining = CustomTimers.current_time["special_wave"] or 0
 	if remaining <= 0 or remaining > 30 then return end
-	if CustomTimers.special_wave == 3 then return end
+	if CustomTimers.special_wave == 3 or CustomTimers.special_wave == 6 then return end
 
 	CustomTimers:ShowSpecialWaveCountdown(CustomTimers.special_wave, remaining)
 end
@@ -657,6 +701,7 @@ function SpecialWave(iCardinalPoint, force)
 	if CustomTimers:GetVisibleSpecialWave() == wave then
 		CustomTimers:BroadcastVisibleSpecialWave()
 	end
+	CustomTimers:BroadcastSpecialWaveQueue()
 
 	CustomTimers.special_wave = CustomTimers.special_wave + 1
 

@@ -1,3 +1,60 @@
+holdout_carrion_swarm = holdout_carrion_swarm or class({})
+
+local DREAD_LORD_CARRION_SWARM_PARTICLE = "particles/units/heroes/hero_death_prophet/death_prophet_carrion_swarm.vpcf"
+
+function holdout_carrion_swarm:OnSpellStart()
+	local caster = self:GetCaster()
+	if caster == nil or caster:IsNull() then return end
+
+	local origin = caster:GetAbsOrigin()
+	local cursorPosition = self:GetCursorPosition()
+	local direction = cursorPosition - origin
+	direction.z = 0
+	if direction:Length2D() <= 0.01 then
+		direction = caster:GetForwardVector()
+	else
+		direction = direction:Normalized()
+	end
+
+	local distance = math.max(1, self:GetSpecialValueFor("range"))
+	local speed = math.max(1, self:GetSpecialValueFor("speed"))
+	ProjectileManager:CreateLinearProjectile({
+		Ability = self,
+		EffectName = DREAD_LORD_CARRION_SWARM_PARTICLE,
+		vSpawnOrigin = origin,
+		fDistance = distance,
+		fStartRadius = math.max(1, self:GetSpecialValueFor("start_radius")),
+		fEndRadius = math.max(1, self:GetSpecialValueFor("end_radius")),
+		Source = caster,
+		bHasFrontalCone = true,
+		bReplaceExisting = false,
+		iUnitTargetTeam = DOTA_UNIT_TARGET_TEAM_ENEMY,
+		iUnitTargetFlags = DOTA_UNIT_TARGET_FLAG_NONE,
+		iUnitTargetType = DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC,
+		fExpireTime = GameRules:GetGameTime() + (distance / speed) + 1.0,
+		bDeleteOnHit = false,
+		vVelocity = direction * speed,
+		bProvidesVision = false,
+	})
+
+	caster:EmitSound("Hero_DeathProphet.CarrionSwarm")
+end
+
+function holdout_carrion_swarm:OnProjectileHit(target, location)
+	if target == nil or target:IsNull() or not target:IsAlive() or target:IsInvulnerable() then
+		return false
+	end
+
+	ApplyDamage({
+		victim = target,
+		attacker = self:GetCaster(),
+		ability = self,
+		damage = self:GetAbilityDamage(),
+		damage_type = self:GetAbilityDamageType(),
+	})
+	return false
+end
+
 function invoker_chaos_meteor_datadriven_on_spell_start(keys)
 	local caster = keys.caster
 	local caster_point = caster:GetAbsOrigin()

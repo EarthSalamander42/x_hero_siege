@@ -14,9 +14,11 @@
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/boss_healthbar.xml" />
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/hud_main.xml" />
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/xhs_top_hud.xml" />
+		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/xhs_farm_leaderboard.xml" />
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/xhs_events.xml" />
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/xhs_devtools.xml" />
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/gold.xml" />
+		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/xhs_cinematic.xml" />
 		<CustomUIElement type="EndScreen"			layoutfile="file://{resources}/layout/custom_game/xhs_end_screen.xml" />
 		<CustomUIElement type="FlyoutScoreboard"	layoutfile="file://{resources}/layout/custom_game/dungeon_scoreboard.xml" />
 

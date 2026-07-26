@@ -46,7 +46,6 @@ local CAST_BAR_TEXTURES = {
 	xhs_spirit_master_trinity_cycle = "custom/xhs_spirit_master_trinity_cycle",
 	xhs_spirit_master_palm_of_balance = "custom/xhs_spirit_master_palm_of_balance",
 	xhs_spirit_master_elemental_mandala = "custom/xhs_spirit_master_elemental_mandala",
-	xhs_spirit_master_spirit_call = "custom/xhs_spirit_master_spirit_call",
 	xhs_spirit_master_convergence = "custom/xhs_spirit_master_convergence",
 	xhs_spirit_storm_arc_dash = "custom/xhs_spirit_storm_arc_dash",
 	xhs_spirit_storm_static_orbs = "custom/xhs_spirit_storm_static_orbs",

@@ -102,6 +102,7 @@
 			"delay"                 "1.7"
 			"area_of_effect"        "175"
 			"damage"                "300 400 500 600 700 800 900 1000 1100 1200"
+			"CalculateSpellDamageTooltip"	"1"
 			"levelkey"              "exortlevel"
 			"vision_distance"       "400"
 			"vision_duration"       "4.0"
@@ -146,6 +147,7 @@
 			"radius"                    "400"
 			"proximity_threshold"       "1.6"
 			"damage"                    "400 500 600 700 800 900 1000 1100 1200 1300"
+			"CalculateSpellDamageTooltip"	"1"
 			"burn_duration"             "0.5"
 			"building_damage_pct"       "25"
 			"activation_delay"          "1.75"
@@ -371,6 +373,7 @@
 			"projectile_speed"		"850"
 			"area_of_effect"		"600"
 			"target_damage"			"175 350 700 1200"
+			"CalculateSpellDamageTooltip"	"1"
 			"heal_amount"			"500 1000 2000 4000"
 		}
 
@@ -492,6 +495,7 @@
 		{
 			"ensnare_duration"				"1.0 1.75 2.5 3.25"
 			"ensnare_damage"				"200 450 750 1300"
+			"CalculateSpellDamageTooltip"	"1"
 			"ensnare_chance"				"12"
 		}
 
@@ -557,6 +561,7 @@
 			"mana_cost_per_second"	"25 50 100 250"
 			"radius"				"450 500 550 600"
 			"damage"				"75 150 225 300"
+			"CalculateSpellDamageTooltip"	"1"
 			"nova_tick"				"1.0"
 			"enemy_slow"			"-10 -13 -16 -20"
 			"enemy_slow_duration"	"3.0"
@@ -744,6 +749,7 @@
 		{
 			"aura_radius"				"900"
 			"aura_damage"				"0.9"
+			"CalculateSpellDamageTooltip"	"1"
 			"buff_duration"				"4.5"
 			"move_speed_pct"			"5 8 11 15"
 			"attack_speed"				"10"
@@ -1107,7 +1113,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"tusk_walrus_punch"
-		"MaxLevel"					"4"
+		"MaxLevel"					"1"
 		"AbilityTextureName"			"custom/holdout_lordaeron_smash"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_AUTOCAST | DOTA_ABILITY_BEHAVIOR_ATTACK"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
@@ -1227,6 +1233,7 @@
 			"slow_movement_speed"	"-10 -20 -35 -50"
 			"slow_attack_speed"		"-10 -20 -35 -50"
 			"aoe_damage"			"150 300 500 750"
+			"CalculateSpellDamageTooltip"	"1"
 		}
 	}
 
@@ -1273,10 +1280,13 @@
 			"knockback_duration"		"0.6 0.8 1.0 1.2"
 			"knockback_height"			"0"
 			"damage_per_second"			"25 50 75 100"
+			"CalculateSpellDamageTooltip"	"1"
 			"duration_per_second"		"5"
 			"initial_damage"			"100 150 250 600"
+			"CalculateSpellDamageTooltip"	"1"
 			"breath_slow"				"-5 -10 -15 -20"
 			"total_damage_tooltip"		"175 325 575 1000"
+			"CalculateSpellDamageTooltip"	"1"
 		}
 	
 		"OnSpellStart"
@@ -1697,7 +1707,7 @@
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_PURE"	
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_YES"
 		"AoERadius" 					"550"
-		"MaxLevel"					"4"
+		"MaxLevel"					"1"
 		"RequiredLevel"					"20"
 		"AbilityTextureName"			"custom/holdout_frost_chaos"
 
@@ -1728,6 +1738,7 @@
 		{
 			"radius"					"550"
 			"damage_percent"				"0.7"
+			"CalculateSpellDamageTooltip"	"1"
 			"duration"					"12.0"
 			"tick_rate"					"1.0"
 		}
@@ -1994,6 +2005,7 @@
 			"max_targets"       "8"
 			"tooltip_max_targets"	"8"
 			"damage"            "150 250 550 900"
+			"CalculateSpellDamageTooltip"	"1"
 			"heal_pct"          "5"
 		}
 	
@@ -2413,7 +2425,7 @@
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_YES"
 		"RequiredLevel"					"20"
-		"MaxLevel"					"4"
+		"MaxLevel"					"1"
 		"AbilityTextureName"			"custom/holdout_divine_shield"
 
 		// Casting
@@ -2530,8 +2542,11 @@
 
 		"precache"
 		{
+			"particle"  "particles/units/heroes/hero_brewmaster/brewmaster_cinder_brew_cast.vpcf"
+			"particle"  "particles/units/heroes/hero_brewmaster/brewmaster_cinder_brew_cast_projectile.vpcf"
+			"particle"  "particles/units/heroes/hero_brewmaster/brewmaster_cinder_brew_impact.vpcf"
 			"particle"  "particles/econ/items/wraith_king/wraith_king_ti6_bracer/wraith_king_ti6_hellfireblast_debuff.vpcf"
-			"soundfile" "soundevents/game_sounds_heroes/game_sounds_lina.vsndevts"
+			"soundfile" "soundevents/game_sounds_heroes/game_sounds_brewmaster.vsndevts"
 		}
 
 		// Special
@@ -2544,8 +2559,10 @@
 			"miss_chance"				"20 35 50 65"
 			"projectile_speed"			"1200"
 			"burn_damage"				"50 100 300 400"
+			"CalculateSpellDamageTooltip"	"1"
 			"burn_duration"				"5"
 			"total_damage_tooltip"		"250 500 750 1000"
+			"CalculateSpellDamageTooltip"	"1"
 		}
 	}
 
@@ -2593,6 +2610,7 @@
 			"end_width"			"300"
 			"distance"			"1100"
 			"damage"			"175 350 850 1250"
+			"CalculateSpellDamageTooltip"	"1"
 		}
 
 		"OnSpellStart"
@@ -2678,6 +2696,7 @@
 		{
 			"radius"			"300"
 			"damage_per_tick"	"75 150 225 300"
+			"CalculateSpellDamageTooltip"	"1"
 			"tick_time"			"1.0"
 		}
 
@@ -2762,6 +2781,7 @@
 		{
 			"duration"				"25"
 			"damage_per_sec"		"300 600 900 1200"
+			"CalculateSpellDamageTooltip"	"1"
 			"radius"				"300"
 			"movement_speed_slow_pct"	"-50 -75 -100 -100"
 		}
@@ -2793,10 +2813,12 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"BaseClass"             		"death_prophet_carrion_swarm"
+		"BaseClass"             		"ability_lua"
+		"ScriptFile"					"abilities/heroes/hero_dreadlord.lua"
 		"MaxLevel"					"4"
 		"AbilityTextureName"			"custom/holdout_carrion_swarm"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_POINT"
+		"AbilityCastAnimation"			"ACT_DOTA_CAST_ABILITY_1"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"	
@@ -2868,10 +2890,13 @@
 			"vision_distance"       "500"
 			"end_vision_duration"   "3.0"
 			"main_damage"           "100 200 300 400"
+			"CalculateSpellDamageTooltip"	"1"
 			"burn_duration"         "3.0"
 			"burn_dps"              "25 50 75 100"
+			"CalculateSpellDamageTooltip"	"1"
 			"burn_dps_inverval"     "1.0"
 			"total_damage_tooltip"	"350 700 1050 1400"
+			"CalculateSpellDamageTooltip"	"1"
 		}
 
 		"OnSpellStart"
@@ -3125,6 +3150,7 @@
 			"blast_slow"			"0"
 			"blast_dot_duration"	"0"
 			"blast_dot_damage"		"0"
+			"CalculateSpellDamageTooltip"	"1"
 		}
 	}
 
@@ -3488,7 +3514,7 @@
 		"BaseClass"						"ability_lua"
 		"ScriptFile"					"abilities/heroes/npc_hero_balanar/balanar_rain_of_chaos.lua"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_AOE"
-		"MaxLevel"					"4"
+		"MaxLevel"					"1"
 		"RequiredLevel"					"20"
 
 		// Stats
@@ -3506,6 +3532,7 @@
 		"AbilityValues"
 		{
 			"damage_per_unit"			"850"
+			"CalculateSpellDamageTooltip"	"1"
 			"radius"					"450"
 			"stun_duration"				"0.5"
 			"time_between_meteors"		"1.0"
@@ -3920,9 +3947,12 @@
 			"max_distance"          "2000"
 			"give_up_distance"      "1200"
 			"min_damage"            "150 350 550 750"
+			"CalculateSpellDamageTooltip"	"1"
 			"max_damage"            "150 350 550 750"
+			"CalculateSpellDamageTooltip"	"1"
 			"heal_percent"          "50 75 100 100"
 			"average_damage"        "150 350 550 750"
+			"CalculateSpellDamageTooltip"	"1"
 			// Extra
 			"delay_between_spirits"     "0.1"
 			"min_time_between_attacks"  "1.0"
@@ -4077,8 +4107,6 @@
 		"AbilityValues"
 		{
 			"bonus_evasion"				"8 16 24 32"
-			"transparency_fade"			"0.1"
-			"radius"					"1600"
 		}
 	}
 
@@ -4095,7 +4123,6 @@
 
 		"AbilityValues"
 		{
-			"damage_modifier"			"-40"
 			"damage_modifier_tooltip"	"60"
 			"arrow_count"				"3 4 5 8"
 			"split_shot_bonus_range"	"100"
@@ -4193,6 +4220,7 @@
 		{
 			"duration"					"5.0"
 			"damage"					"50"
+			"CalculateSpellDamageTooltip"	"1"
 		}
 
 		"Modifiers"
@@ -4274,6 +4302,7 @@
 		"AbilityValues"
 		{
 			"damage"					"300 600 900 1200"
+			"CalculateSpellDamageTooltip"	"1"
 			"damage_delay"				"0.1"
 		}
 	}
@@ -4310,6 +4339,7 @@
 		{
 			"radius"			"250 300 350 400"
 			"damage_per_tick"		"25 50 75 100"
+			"CalculateSpellDamageTooltip"	"1"
 			"tick_time"			"1.0"
 		}
 
@@ -4780,6 +4810,7 @@
 			"radius"                        "300 350 400 450"
 			"stun_duration"                 "1.0 1.5 2.0 2.5"
 			"stomp_damage"                  "300 600 900 1200"
+			"CalculateSpellDamageTooltip"	"1"
 		}
 
 		"OnSpellStart"
@@ -4908,6 +4939,7 @@
 			"aftershock_range"			"350 400 450 500"
 			"LinkedSpecialBonus"		"special_bonus_unique_earthshaker_5"
 			"aftershock_damage"			"300 450 600 750"
+			"CalculateSpellDamageTooltip"	"1"
 			"LinkedSpecialBonus"		"special_bonus_unique_earthshaker_6"
 		}
 	}
@@ -5065,7 +5097,7 @@
 		"SpellImmunityType"             "SPELL_IMMUNITY_ENEMIES_NO"
 		"AbilityTextureName"            "custom/holdout_shockwave_20"
 		"AbilityCastAnimation"			"ACT_DOTA_CAST_ABILITY_5"
-		"MaxLevel"					"4"
+		"MaxLevel"					"1"
 
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
@@ -5149,7 +5181,7 @@
 		"AbilityUnitDamageType"         "DAMAGE_TYPE_MAGICAL"
 		"SpellImmunityType"             "SPELL_IMMUNITY_ENEMIES_NO"
 		"AbilityTextureName"            "centaur_hoof_stomp"
-		"MaxLevel"					"4"
+		"MaxLevel"					"1"
 		"AbilityCastAnimation"			"ACT_DOTA_CAST_ABILITY_1"
 		"AnimationPlaybackRate"			"1.25"
 
@@ -5167,6 +5199,7 @@
 			"radius"                        "600"
 			"stun_duration"                 "4.0"
 			"stomp_damage"                  "1850"
+			"CalculateSpellDamageTooltip"	"1"
 		}
 
 		"OnSpellStart"
@@ -5242,7 +5275,7 @@
 		//-------------------------------------------------------------------------------------
 		"BaseClass"					"ability_datadriven"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-		"MaxLevel"					"4"
+		"MaxLevel"					"1"
 
 		// Stats
 		//-------------------------------------------------------------------------------------
@@ -5512,17 +5545,17 @@
 
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCastRange"              "1000"
+		"AbilityCastRange"              "1100"
 		"AbilityCastPoint"              "0.2"
-		"AbilityChannelTime"            "6.0"
+		"AbilityChannelTime"            "5.0"
 
 		// Time     
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCooldown"               "30.0"
+		"AbilityCooldown"               "22.0 20.0 18.0 16.0"
 
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityManaCost"               "150 200 250 300"
+		"AbilityManaCost"               "100 150 200 250"
 
 		// Stats
 		//-------------------------------------------------------------------------------------------------------------
@@ -5532,7 +5565,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityValues"
 		{
-			"health_drain"              "200 350 500 650"
+			"health_drain"              "600 1200 2400 4800"
 			"CalculateSpellDamageTooltip"	"1"
 			"scepter_cooldown"			"0.0 0.0 0.0 0.0"
 			"RequiresScepter"			"1"
@@ -5611,7 +5644,7 @@
 			"splash_radius"         "500"
 			"duration"              "10.0"
 			"speed"                 "500 600 700 800"
-			"machines_per_sec"      "4"
+			"machines_per_sec"      "3"
 			"distance"              "1800"
 		}
 
@@ -5692,7 +5725,7 @@
 		//-------------------------------------------------------------------------------------
 		"BaseClass"					"ability_datadriven"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE"
-		"MaxLevel"					"4"
+		"MaxLevel"					"1"
 		"SpellImmunityType"			"SPELL_IMMUNITY_ENEMIES_YES"
 		"AOERadius"					"%radius"
 
@@ -5710,9 +5743,10 @@
 
 		"AbilityValues"
 		{
-			"damage_per_unit"	"500"
+			"damage_per_unit"	"1000"
+			"CalculateSpellDamageTooltip"	"1"
 			"radius"			"500"
-			"stun_duration"		"6"
+			"stun_duration"		"2"
 			"time_between_explosions"	"0.25"
 			"explosions_per_tick"	"1"
 			"radius_explosion"	"250"
@@ -5720,7 +5754,8 @@
 			"delay"				"1.6"
 			"duration_total"	"3.7"
 			"number_of_unit"	"8"
-			"total_damage_tooltip"	"4000"
+			"total_damage_tooltip"	"8000"
+			"CalculateSpellDamageTooltip"	"1"
 		}
 
 		"OnSpellStart"
@@ -6356,7 +6391,7 @@
 		"BaseClass"					"ability_datadriven"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_AOE |  DOTA_ABILITY_BEHAVIOR_CHANNELLED"
 		"RequiredLevel"				"20"
-		"MaxLevel"					"4"
+		"MaxLevel"					"1"
 		"AbilityType"				"DOTA_ABILITY_TYPE_ULTIMATE"
 
 		// Stats
@@ -6383,6 +6418,7 @@
 		"AbilityValues"
 		{
 			"damage_per_skull"		"600"
+			"CalculateSpellDamageTooltip"	"1"
 			"distance"				"1300"
 			"speed"					"400"
 			"time_between_skulls"	"0.2"
@@ -6583,6 +6619,7 @@
 		"AbilityValues"
 		{
 			"damage_per_burn"		"5.0"
+			"CalculateSpellDamageTooltip"	"1"
 			"mana_per_hit"			"10 20 30 50"
 		}
 	}
@@ -6790,6 +6827,13 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityManaCost"               "90 135 180 225"
 
+		"precache"
+		{
+			"particle"  "particles/units/heroes/hero_luna/luna_lucent_beam_cast.vpcf"
+			"particle"  "particles/units/heroes/hero_luna/luna_lucent_beam.vpcf"
+			"soundfile" "soundevents/game_sounds_heroes/game_sounds_luna.vsndevts"
+		}
+
 		// Damage
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityDamage"                 "175 350 525 700"
@@ -6851,6 +6895,7 @@
 			"end_distance"              "600"
 			"targets"                   "4 6 8 10"
 			"damage"                    "225 450 675 900"
+			"CalculateSpellDamageTooltip"	"1"
 		}
 
 		"OnSpellStart"
@@ -7027,6 +7072,7 @@
 			"hit_count"                 "10 15 20 25"
 			"duration_tooltip"			"4.5 7.0 9.5 12.0"
 			"damage"					"850"
+			"CalculateSpellDamageTooltip"	"1"
 		}
 
 		"OnSpellStart"
@@ -7075,7 +7121,7 @@
 		"AbilityDamage"					"500"
 		"AbilityTextureName"            "custom/holdout_doom"
 		"RequiredLevel"					"20"
-		"MaxLevel"					"4"
+		"MaxLevel"					"1"
 
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
@@ -7547,6 +7593,7 @@
 		{
 			"radius"					"400"
 			"damage"					"150 350 550 750"
+			"CalculateSpellDamageTooltip"	"1"
 			"movement_slow"				"20 30 40 50"
 			"attack_speed_slow"			"20 30 40 50"
 			"duration"					"4.0"
@@ -7570,7 +7617,7 @@
 		"AbilityUnitDamageType"         "DAMAGE_TYPE_MAGICAL"
 		"AbilityCastRange"				"900"
 		"AbilityCastPoint"				"0.25"
-		"MaxLevel"					"4"
+		"MaxLevel"					"1"
 
 		// Time		
 		//-------------------------------------------------------------------------------------------------------------
@@ -7608,7 +7655,7 @@
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
 		"SpellDispellableType"			"SPELL_DISPELLABLE_YES"
-		"MaxLevel"					"4"
+		"MaxLevel"					"1"
 
 		// Time		
 		//-------------------------------------------------------------------------------------------------------------
@@ -7628,6 +7675,7 @@
 		{
 			"radius"					"400"
 			"damage"					"1100"
+			"CalculateSpellDamageTooltip"	"1"
 			"movement_slow"				"-50"
 			"attack_speed_slow"			"-50"
 			"duration"					"4.0"
@@ -7671,6 +7719,7 @@
 		{
 			"heal"				"500 1000 2000 4000"
 			"damage"			"250 500 750 1000"
+			"CalculateSpellDamageTooltip"	"1"
 			"radius"			"550"
 			"blast_speed"		"2000"
 		}
@@ -8067,8 +8116,9 @@
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_PHYSICAL"
 		"AbilityTextureName"			"custom/holdout_spiked_carapace"
+		"AbilityCastAnimation"			"ACT_DOTA_CAST_ABILITY_3"
 		"RequiredLevel"					"20"
-		"MaxLevel"					"4"
+		"MaxLevel"					"1"
 
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
@@ -8236,6 +8286,7 @@
 		{
 			"radius"			"300 325 350 375"
 			"damage_per_tick"	"25 50 100 220"
+			"CalculateSpellDamageTooltip"	"1"
 			"tick_time"			"1.0"
 		}
 
@@ -8426,6 +8477,7 @@
 		"AbilityValues"
 		{
 			"damage_per_skull"		"200 400 600 800"
+			"CalculateSpellDamageTooltip"	"1"
 			"distance"				"1300"
 			"speed"					"400"
 			"time_between_skulls"	"0.2"
@@ -8525,8 +8577,10 @@
 			"wave_duration"					"9.0"
 			"wave_count"					"8"
 			"wave_damage"					"35 75 115 155"
+			"CalculateSpellDamageTooltip"	"1"
 			"wave_interval"					"1.0"
 			"burn_damage"					"0.75"
+			"CalculateSpellDamageTooltip"	"1"
 			"burn_interval"					"1.0"
 			"burn_duration"					"2.0"
 			"first_wave_delay"				"0.0"
@@ -8560,6 +8614,7 @@
 			"stun_duration"					"0.75 1.0 1.25 1.5"
 			"LinkedSpecialBonus"			"special_bonus_unique_centaur_2"
 			"stomp_damage"					"150 350 550 750"
+			"CalculateSpellDamageTooltip"	"1"
 		}
 	}
 
@@ -8673,6 +8728,7 @@
 		"AbilityValues"
 		{
 			"damage_per_unit"			"450 700 950 1200"
+			"CalculateSpellDamageTooltip"	"1"
 			"radius"					"425"
 			"stun_duration"				"0.35 0.4 0.45 0.5"
 			"time_between_meteors"		"1.0"
@@ -9103,8 +9159,10 @@
 			"dagger_speed"          "900"
 			"duration"              "8"
 			"poison_damage"			"25 50 75 100"
+			"CalculateSpellDamageTooltip"	"1"
 			"attack_slow"			"-25"
 			"total_damage_tooltip"	"475 800 1250 1700"
+			"CalculateSpellDamageTooltip"	"1"
 		}
 
 		"OnSpellStart"
@@ -9284,9 +9342,11 @@
 		"AbilityValues"
 		{
 			"health_damage"     	"175 200 250 300"
+			"CalculateSpellDamageTooltip"	"1"
 			"radius"            	"350 400 450 500"
 			"duration"				"2 3 4 5"
 			"total_damage_tooltip"	"350 600 1000 1500"
+			"CalculateSpellDamageTooltip"	"1"
 		}
 
 		"OnSpellStart"
@@ -9457,7 +9517,7 @@
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
 		"AbilityTextureName"			"lion_voodoo"
-		"MaxLevel"					"4"
+		"MaxLevel"					"1"
 		"RequiredLevel"					"20"
 		"AbilityCastRange"				"800"
 		"AbilityCastPoint"				"0.35"
@@ -9913,7 +9973,7 @@
 		//-------------------------------------------------------------------------------------
 		"BaseClass"					"ability_datadriven"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE"
-		"MaxLevel"					"4"
+		"MaxLevel"					"1"
 		"SpellImmunityType"			"SPELL_IMMUNITY_ENEMIES_YES"
 		"AOERadius"					"%radius"
 
@@ -9932,6 +9992,7 @@
 		"AbilityValues"
 		{
 			"damage_per_unit"	"200"
+			"CalculateSpellDamageTooltip"	"1"
 			"radius"			"400"
 			"stun_duration"		"4.0"
 			"time_between_explosions"	"0.1"
@@ -9941,6 +10002,7 @@
 			"delay"				"0.6"
 			"number_of_unit"	"20"
 			"total_damage_tooltip"		"4000"
+			"CalculateSpellDamageTooltip"	"1"
 		}
 	
 		"OnSpellStart"
@@ -10154,6 +10216,7 @@
 			"end_distance"              "800"
 			"targets"                   "8 12 16 20"
 			"damage"                    "400 700 1000 1400"
+			"CalculateSpellDamageTooltip"	"1"
 		}
 
 		"OnSpellStart"
@@ -10304,6 +10367,7 @@
 			"explosion_min_dist"					"200"
 			"explosion_max_dist"					"600"
 			"damage"								"60 120 180 240"
+			"CalculateSpellDamageTooltip"	"1"
 		}
 
 		"OnSpellStart"
@@ -10511,6 +10575,7 @@
 			"explosion_min_dist"					"100 150 200 250"
 			"explosion_max_dist"					"200 250 300 350"
 			"damage"								"40 80 120 160"
+			"CalculateSpellDamageTooltip"	"1"
 		}
 
 		"OnSpellStart"
@@ -10814,6 +10879,7 @@
 		{
 			"radius"			"300"
 			"damage_per_tick"	"90 180 270 360"
+			"CalculateSpellDamageTooltip"	"1"
 			"tick_time"			"1.0"
 		}
 	
@@ -10932,9 +10998,11 @@
 			"first_strike_dps"		"150 300 450 600"
 			"first_strike_duration"	"3.0"
 			"burn_dps"				"20 40 60 80"
+			"CalculateSpellDamageTooltip"	"1"
 			"burn_duration"			"5"
 			"delay"					"1.6"
 			"total_damage"			"250 500 750 1000"
+			"CalculateSpellDamageTooltip"	"1"
 			"radius_tooltip"		"250"
 		}
 
@@ -11181,6 +11249,7 @@
 			"end_width"			"300"
 			"distance"			"1100"
 			"damage"			"175 350 850 1250"
+			"CalculateSpellDamageTooltip"	"1"
 		}
 
 		"OnAbilityPhaseStart"
@@ -11682,7 +11751,7 @@
 		//-------------------------------------------------------------------------------------
 		"BaseClass"					"ability_datadriven"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_AOE"
-		"MaxLevel"					"4"
+		"MaxLevel"					"1"
 		"SpellImmunityType"			"SPELL_IMMUNITY_ENEMIES_YES"
 
 		// Stats
@@ -11700,6 +11769,7 @@
 		"AbilityValues"
 		{
 			"damage_per_unit"	"500"
+			"CalculateSpellDamageTooltip"	"1"
 			"radius"			"650"
 			"stun_duration"		"6"
 			"time_between_explosions"	"0.25"
@@ -11709,6 +11779,7 @@
 			"duration_total"	"3.7"
 			"number_of_unit"	"8"
 			"total_damage_tooltip"	"4000"
+			"CalculateSpellDamageTooltip"	"1"
 		}
 
 		"OnAbilityPhaseStart"
@@ -11783,8 +11854,8 @@
 		"AbilityCastAnimation"		"ACT_DOTA_CAST_ABILITY_5"
 		"AbilityCastRange"			"800"
 		"AbilityCastPoint"			"0.3"
-		"AbilityCooldown"			"19.0"
-		"AbilityManaCost"			"110 170 230 290"
+		"AbilityCooldown"			"18.0"
+		"AbilityManaCost"			"100 150 200 250"
 		"AOERadius"					"%radius"
 		"AbilityChannelTime"		"%wave_duration"
 
@@ -11796,13 +11867,15 @@
 
 		"AbilityValues"
 		{
-			"radius"		"325 350 375 400"
-			"wave_duration"	"5.95"
-			"wave_count"	"6"
-			"wave_damage"	"60 100 140 180"
-			"wave_interval"	"1.0"
-			"total_damage"	"360 600 840 1080"
-			"wps_thinker"	"0.97"			// 0.97*6: 5.82, 0.73*8: 5.84, 0.58*10: 5.8, 0.48*12: 5.76.
+			"radius"		"350 375 400 425"
+			"wave_duration"	"5.25"
+			"wave_count"	"8"
+			"wave_damage"	"55 90 125 160"
+			"CalculateSpellDamageTooltip"	"1"
+			"wave_interval"	"0.7"
+			"total_damage"	"440 720 1000 1280"
+			"CalculateSpellDamageTooltip"	"1"
+			"wps_thinker"	"0.68"
 			"movement_slow"	"-10 -20 -30 -40"
 			"attack_slow"	"-10 -20 -30 -40"
 			"slow_duration"	"3.0"
@@ -11983,8 +12056,8 @@
 		"MaxLevel"					"4"
 		"AbilityTextureName"		"custom/holdout_summon_water_elemental_alt"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-		"AbilityCooldown"			"30.0"
-		"AbilityManaCost"			"150 220 290 360"
+		"AbilityCooldown"			"28.0"
+		"AbilityManaCost"			"120 180 240 300"
 		"AbilityCastPoint"			"0.25"
 
 		"precache"
@@ -11995,8 +12068,8 @@
 		"AbilityValues"
 		{
 			"duration"			"30"
-			"hit_points"		"850 2000 3500 5000"
-			"damage"			"90 190 270 360"
+			"hit_points"		"1000 2200 3800 5400"
+			"damage"			"100 210 300 400"
 		}
 
 		"OnSpellStart"
@@ -12250,7 +12323,7 @@
 		//-------------------------------------------------------------------------------------
 		"BaseClass"					"lich_frost_armor"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_AUTOCAST | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK"
-		"MaxLevel"					"4"
+		"MaxLevel"					"1"
 		"RequiredLevel"				"20"
 
 		// Stats
@@ -12259,11 +12332,17 @@
 		"AbilityCooldown"			"20.0"
 		"AbilityCastRange"			"800"
 		"AbilityManaCost"			"0"
+		"AbilityCastSound"			"Hero_Lich.FrostArmor"
 
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
 		"AbilityUnitTargetType"		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC | DOTA_UNIT_TARGET_BUILDING"
 		"SpellImmunityType"			"SPELL_IMMUNITY_ALLIES_YES"
 		"AbilityDuration"			"60.0"
+
+		"precache"
+		{
+			"soundfile"				"soundevents/game_sounds_heroes/game_sounds_lich.vsndevts"
+		}
 
 		"AbilityValues"
 		{
@@ -12306,13 +12385,17 @@
 			"wolf_index"                "1 2 3 4"
 			"wolf_duration"             "20.0"
 			"wolf_bat"                  "1.25 1.2 1.15 1.1"
-			"wolf_damage"               "30 70 110 150"
-			"wolf_hp"                   "400 800 1200 1600"
+			"wolf_damage"               "40 100 170 250"
+			"wolf_hp"                   "500 1000 1200 2000"
 			"wolf_1_count"              "1 0 0 0"
 			"wolf_2_count"              "0 1 0 0"
 			"wolf_3_count"              "0 0 1 0"
 			"wolf_4_count"              "0 0 0 1"
 			"spawn_distance"            "150"
+			"strength_damage_pct"       "100 130 160 200"
+			"hero_attack_damage_pct"    "35 45 55 70"
+			"infested_bonus_pct"        "50 65 80 100"
+			"priority_radius"           "700"
 		}
 	
 		"OnSpellStart"
@@ -12365,6 +12448,12 @@
 						"ScriptFile"    "scripts/vscripts/abilities/heroes/hero_warlock/spiritual_beast.lua"
 						"Function"      "SetUnitsMoveForward"
 					}
+
+					"RunScript"
+					{
+						"ScriptFile"    "abilities/heroes/hero_crypt_lord.lua"
+						"Function"      "InitializeCarrionBeetle"
+					}
 	
 					"ApplyModifier"
 					{
@@ -12410,6 +12499,12 @@
 					{
 						"ScriptFile"    "scripts/vscripts/abilities/heroes/hero_warlock/spiritual_beast.lua"
 						"Function"      "SetUnitsMoveForward"
+					}
+
+					"RunScript"
+					{
+						"ScriptFile"    "abilities/heroes/hero_crypt_lord.lua"
+						"Function"      "InitializeCarrionBeetle"
 					}
 	
 					"ApplyModifier"
@@ -12457,6 +12552,12 @@
 						"ScriptFile"    "scripts/vscripts/abilities/heroes/hero_warlock/spiritual_beast.lua"
 						"Function"      "SetUnitsMoveForward"
 					}
+
+					"RunScript"
+					{
+						"ScriptFile"    "abilities/heroes/hero_crypt_lord.lua"
+						"Function"      "InitializeCarrionBeetle"
+					}
 	
 					"ApplyModifier"
 					{
@@ -12503,6 +12604,12 @@
 						"ScriptFile"    "scripts/vscripts/abilities/heroes/hero_warlock/spiritual_beast.lua"
 						"Function"      "SetUnitsMoveForward"
 					}
+
+					"RunScript"
+					{
+						"ScriptFile"    "abilities/heroes/hero_crypt_lord.lua"
+						"Function"      "InitializeCarrionBeetle"
+					}
 	
 					"ApplyModifier"
 					{
@@ -12547,9 +12654,8 @@
 	//=========================================================================================
 	"holdout_poison_sting"
 	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"BaseClass"						"ability_datadriven"
+		"BaseClass"						"ability_lua"
+		"ScriptFile"					"abilities/heroes/hero_crypt_lord.lua"
 		"MaxLevel"					"4"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
@@ -12558,74 +12664,19 @@
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
 		"AbilityTextureName"			"custom/holdout_poison_sting"
 		"RequiredLevel"					"5"
-
-		// Casting
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCastPoint"				"0.0"
-	
-		// Time     
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCooldown"				"0.0"
-	
-		// Damage.
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityDamage"					"0"
-	
-		// Cost
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityManaCost"				"0"
-	
-		// Special
-		//-------------------------------------------------------------------------------------------------------------
 		"AbilityValues"
 		{
 			"duration"					"3.0"
-			"damage"					"50 100 150 250"
-			"bonus_movement_speed"		"-10 -20 -30 -40"
-		}
-
-		"Modifiers"
-		{
-			"modifier_viper_poison_attack_datadriven"
-			{
-				"Passive"		"1"
-				"IsHidden"		"1"
-
-				"OnAttackLanded"
-				{
-					"ApplyModifier"
-					{
-						"ModifierName"		"modifier_viper_poison_attack_debuff_datadriven"
-						"Target"			"TARGET"
-					}
-				}
-			}
-
-			"modifier_viper_poison_attack_debuff_datadriven"
-			{
-				"IsDebuff"		"1"
-				"Duration"		"%duration"
-	
-				"EffectName"		"particles/units/heroes/hero_viper/viper_poison_debuff.vpcf"
-				"EffectAttachType"	"follow_origin"
-
-				"ThinkInterval"		"1.0"
-
-				"OnIntervalThink"
-				{
-					"Damage"
-					{
-						"Target"	"TARGET"
-						"Type"		"DAMAGE_TYPE_MAGICAL"
-						"Damage"	"%damage"
-					}
-				}
-
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE"	"%bonus_movement_speed"
-				}
-			}
+			"damage"					"60 120 240 480"
+			"CalculateSpellDamageTooltip"	"1"
+			"bonus_movement_speed"		"-6 -8 -10 -12"
+			"max_stacks"				"3"
+			"death_burst_radius"		"275"
+			"death_burst_damage"		"100 200 400 800"
+			"CalculateSpellDamageTooltip"	"1"
+			"death_heal"				"15 30 60 120"
+			"boss_poison_pct"			"50"
+			"boss_burst_pct"			"25"
 		}
 	}
 
@@ -12634,57 +12685,37 @@
 	//=====================================================================================================
 	"holdout_spiked_carapace"
 	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"BaseClass"						"ability_datadriven"
+		"BaseClass"						"ability_lua"
+		"ScriptFile"					"abilities/heroes/hero_crypt_lord.lua"
 		"MaxLevel"					"4"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_PHYSICAL"
 		"AbilityTextureName"			"custom/holdout_spiked_carapace"
 		"RequiredLevel"					"8"
 		"LevelsBetweenUpgrades"			"3"
-
-		// Special
-		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastPoint"				"0"
+		"AbilityCooldown"				"18"
+		"AbilityManaCost"				"75"
 		"AbilityValues"
 		{
-			"hero_return_percent"		"25"
-			"creep_return_percent"		"35"
+			"bonus_armor"				"6 10 14 18"
+			"hero_return_percent"		"20 25 30 35"
+			"creep_return_percent"		"35 45 55 65"
+			"creep_return_minimum"		"30 60 90 120"
+			"active_duration"			"4"
+			"active_damage_reduction"	"30 35 40 45"
+			"pulse_hits"				"3"
+			"pulse_radius"				"325"
+			"pulse_damage"				"80 160 320 640"
+			"CalculateSpellDamageTooltip"	"1"
 		}
-
 		"precache"
 		{
 			"particle"	"particles/units/heroes/hero_centaur/centaur_return.vpcf"
-		}
-
-		"Modifiers"
-		{
-			"modifier_spiked_carapace"
-			{
-				"Passive"	"1"
-				"OnAttacked"
-				{
-					"RunScript"
-					{
-						"ScriptFile"	"abilities/heroes/hero_crypt_lord.lua"
-						"Function"		"Return"
-					}
-
-					"FireEffect"
-					{
-						"EffectName"		"particles/units/heroes/hero_centaur/centaur_return.vpcf"
-						"EffectAttachType"  "attach_hitloc"
-						"Target" 			"CASTER"
-						"ControlPointEntities"
-						{
-							"CASTER" 		"attach_hitloc"
-							"ATTACKER" 		"attach_hitloc"
-						}
-					}
-				}
-			}
+			"particle"	"particles/items_fx/blademail.vpcf"
+			"particle"	"particles/units/heroes/hero_sandking/sandking_epicenter.vpcf"
 		}
 	}
 
@@ -12756,7 +12787,8 @@
 	//=====================================================================================================
 	"holdout_anubarak_claw"
 	{
-		"BaseClass"						"ability_datadriven"
+		"BaseClass"						"ability_lua"
+		"ScriptFile"					"abilities/heroes/hero_crypt_lord.lua"
 		"AbilityTextureName"			"custom/holdout_berserkers_rage"
 		"MaxLevel"						"1"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IGNORE_CHANNEL"
@@ -12772,44 +12804,10 @@
 		"AbilityValues"
 		{
 			"bonus_attack_speed"	"100"
-			"extra_incoming_damage"	"25"
 			"duration"				"12"
 			"bonus_movement_speed_percentage"	"25"
-		}
-
-		"OnSpellStart"
-		{
-			"ApplyModifier"
-			{
-				"ModifierName"			"modifier_berserkers_rage"
-				"Target" 				"CASTER"
-			}
-
-			"FireSound"
-			{
-				"EffectName"			"DOTA_Item.MaskOfMadness.Activate"
-				"Target"				"CASTER"
-			}
-		}
-
-		"Modifiers"
-		{
-			"modifier_berserkers_rage"
-			{
-				"Duration"			"%duration"
-				"Passive"			"0"
-				"IsHidden"			"0"
-		
-				"EffectName"		"particles/items2_fx/mask_of_madness.vpcf"
-				"EffectAttachType"	"follow_origin"
-
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_ATTACKSPEED_BONUS_CONSTANT"		"%bonus_attack_speed"
-					"MODIFIER_PROPERTY_INCOMING_DAMAGE_PERCENTAGE"		"%extra_incoming_damage"
-					"MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE"		"%bonus_movement_speed_percentage" 
-				}
-			}
+			"kill_extension"		"0.5"
+			"max_extension"			"6"
 		}
 	}
 
@@ -12854,9 +12852,15 @@
 			"max_distance"          "2000"
 			"give_up_distance"      "1200"
 			"min_damage"            "225"
+			"CalculateSpellDamageTooltip"	"1"
 			"max_damage"            "225"
+			"CalculateSpellDamageTooltip"	"1"
 			"heal_percent"          "50 75 100 100"
 			"average_damage"        "250"
+			"CalculateSpellDamageTooltip"	"1"
+			"infested_duration"     "5"
+			"infested_bonus_pct"    "25"
+			"instant_heal_pct"      "20"
 			// Extra
 			"delay_between_spirits"     "0.1"
 			"min_time_between_attacks"  "1.0"
@@ -13003,7 +13007,7 @@
 		//-------------------------------------------------------------------------------------
 		"BaseClass"					"ability_datadriven"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_CHANNELLED | DOTA_ABILITY_BEHAVIOR_AOE"
-		"MaxLevel"					"4"
+		"MaxLevel"					"1"
 		"RequiredLevel"				"20"
 		"SpellImmunityType"			"SPELL_IMMUNITY_ENEMIES_YES"
 
@@ -13022,11 +13026,13 @@
 		"AbilityValues"
 		{
 			"damage"			"175"
+			"CalculateSpellDamageTooltip"	"1"
 			"radius"			"900"
 			"tick_time"			"0.5"
 			"duration"			"10"
 			"total_impales_tooltip"	"20"
 			"total_damage_tooltip"	"3500"
+			"CalculateSpellDamageTooltip"	"1"
 		}
 
 		"OnSpellStart"
@@ -13427,6 +13433,7 @@
 			"total_cast_time_tooltip"	"2"
 			"aim_duration"				"2.0" // does this matter? cast point seems to be what's important
 			"assassinate_damage"		"1500 2250 3000"
+			"CalculateSpellDamageTooltip"	"1"
 			"scatter_range"				"600 800 1000"
 			"scatter_width"				"350 400 450"
 			"stun_duration"				"2"
@@ -14082,6 +14089,7 @@
 			"bonus_movement_speed"		"25 50 75 100"
 			"bonus_attack_range"		"310 410 510 610"
 			"corrosive_breath_damage"	"20"
+			"CalculateSpellDamageTooltip"	"1"
 			"corrosive_breath_duration"	"5.0"
 			"stun_duration"				"0.1"
 			"bash_chance"				"10"
@@ -14493,7 +14501,7 @@
 		"BaseClass"						"ability_datadriven"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"AbilityTextureName"			"abyssal_underlord_dark_rift"
-		"MaxLevel"					"4"
+		"MaxLevel"					"1"
 		"AbilityCastRange"				"600"
 		"AbilityCastPoint"				"1.6"
 
@@ -14627,6 +14635,7 @@
 		{
 			"duration"				"1.5 2.0 2.5 3.0"
 			"damage"				"200 400 600 800"
+			"CalculateSpellDamageTooltip"	"1"
 			"radius"				"300 350 400 450"
 			"delay"					"1.0"
 		}
@@ -14821,6 +14830,7 @@
 		"AbilityValues"
 		{
 			"lizard_damage"		"150 250 350 450"
+			"CalculateSpellDamageTooltip"	"1"
 			"duration"			"10"
 			"speed"				"600"
 			"distance"			"2000"
@@ -14986,7 +14996,9 @@
 		{
 			"duration"				"2 3 4 5"
 			"dmg_per_sec"			"200 300 400 500"
+			"CalculateSpellDamageTooltip"	"1"
 			"total_damage_tooltip"	"400 900 1600 2500"
+			"CalculateSpellDamageTooltip"	"1"
 		}
 	}
 
@@ -15201,6 +15213,7 @@
 		{
 			"radius"		"375"
 			"poof_damage"	"160 250 340 430"
+			"CalculateSpellDamageTooltip"	"1"
 		}
 	}
 
@@ -15324,9 +15337,11 @@
 		{
 			"movement_slow_pct"		"-15 -30 -45 -60"
 			"damage"				"200 250 300 350"
+			"CalculateSpellDamageTooltip"	"1"
 			"duration"				"2 3 4 5"
 			"radius"				"400"
 			"total_damage_tooltip"	"400 750 1200 1850"
+			"CalculateSpellDamageTooltip"	"1"
 		}
 
 		"OnSpellStart"
@@ -15727,6 +15742,7 @@
 			"slow_duration"		"4.0 6.0 8.0 10.0"
 			"speed"				"910"
 			"damage_pct"		"15"
+			"CalculateSpellDamageTooltip"	"1"
 			"vision_width"		"500"
 			"vision_interval"	"0.22"
 			"vision_duration"	"4.0"
@@ -15803,6 +15819,7 @@
 			"stun_chance"			"10 15 20 25"
 			"stun_duration"			"1.0 1.1 1.2 1.3"
 			"damage"				"60 90 120 150"
+			"CalculateSpellDamageTooltip"	"1"
 		}
 	}
 
@@ -15814,7 +15831,7 @@
 		"BaseClass"					"ability_datadriven"
 		"AbilityTextureName"		"treant_living_armor"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-		"MaxLevel"					"4"
+		"MaxLevel"					"1"
 
 		"AbilityValues"
 		{
@@ -16706,6 +16723,7 @@
 			"leap_radius"			"300 400 500"
 			"kill_threshold"		"2500 5000 7500"
 			"damage"				"1500 3000 4500"
+			"CalculateSpellDamageTooltip"	"1"
 			"speed_bonus"			"40"
 			"speed_duration"		"6.0 8.0 10.0"
 			"speed_aoe"				"900"
@@ -17028,6 +17046,7 @@
 			"end_vision_duration"	"1.75"
 			"lift_duration"			"0.9"
 			"base_damage"			"200 400 600 800"
+			"CalculateSpellDamageTooltip"	"1"
 			"cyclone_min_height"		"300"
 			"cyclone_initial_height"	"350"
 			"cyclone_max_height"		"400"
@@ -17179,6 +17198,7 @@
 			"bonus_attack_speed"		"-10 -15 -20 -25"
 			"bonus_magic_resistance"	"5 10 15 20"
 			"damage"					"50 100 150 200"
+			"CalculateSpellDamageTooltip"	"1"
 			"max_range_tooltip"			"1400"
 		}
 
@@ -17392,6 +17412,7 @@
 			"duration"				"6.0"
 			"attack_range_bonus"	"100 150 200 250"
 			"percent_damage"		"1.0"
+			"CalculateSpellDamageTooltip"	"1"
 			"tick_rate"				"1.0"
 			"damage_duration"		"4.0"
 			"move_slow"				"19 26 33 40"
@@ -17449,6 +17470,7 @@
 			"end_width"			"300"
 			"distance"			"1100"
 			"damage"			"175 350 850 1250"
+			"CalculateSpellDamageTooltip"	"1"
 		}
 
 		"OnUpgrade"
@@ -17516,6 +17538,7 @@
 		{
 			"ensnare_duration"				"1.0 1.75 2.5 3.25"
 			"ensnare_damage"				"200 450 750 1300"
+			"CalculateSpellDamageTooltip"	"1"
 			"ensnare_chance"				"12"
 		}
 
@@ -17739,6 +17762,7 @@
 			"shadowraze_range2"		"500"
 			"shadowraze_range3"		"800"
 			"raze_damage"			"200 350 500 650"
+			"CalculateSpellDamageTooltip"	"1"
 		}
 
 		"OnSpellStart"
@@ -17874,6 +17898,7 @@
 		{
 			"radius"			"300 325 350 375"
 			"damage_per_tick"	"25 50 100 220"
+			"CalculateSpellDamageTooltip"	"1"
 			"tick_time"			"1.0"
 			"hero_lifesteal"		"30"
 			"creep_lifesteal"		"10"
@@ -18358,6 +18383,7 @@
 		{
 			"speed"					"1200"
 			"damage"				"1000 1500 2000"
+			"CalculateSpellDamageTooltip"	"1"
 			"duration"				"2.0"
 			"radius"				"325"
 			"vision_radius"			"450"
@@ -18587,6 +18613,7 @@
 		{
 			"radius"					"500 600 700 800 900"
 			"damage"					"25000 50000 75000 100000 125000"
+			"CalculateSpellDamageTooltip"	"1"
 			"movement_slow"				"-20 -35 -50 -65 -80"
 			"attack_speed_slow"			"-450 -750 -1050 -1350 -1650"
 			"duration"					"6.0"
@@ -18733,6 +18760,7 @@
 		{
 			"radius"					"500 575 650 725 800"
 			"damage"					"2000 3000 4000 5000 6000"
+			"CalculateSpellDamageTooltip"	"1"
 			"movement_slow"				"-20 -35 -50 -65 -80"
 			"attack_speed_slow"			"-45 -75 -105 -135 -165"
 			"duration"					"6.0"
@@ -19027,6 +19055,7 @@
 			"blade_fury_damage_tick"	"0.2"
 			"blade_fury_radius"			"300"
 			"blade_fury_damage"			"3000 6000 9000 12000 15000"
+			"CalculateSpellDamageTooltip"	"1"
 			"LinkedSpecialBonus"		"special_bonus_unique_juggernaut"
 		}
 	}
@@ -19051,6 +19080,7 @@
 			"clone_health"				"4500 6500 8500 10500 13000"
 			"fake_punish_radius"		"260"
 			"fake_punish_damage"		"1800 2600 3600 4800 6200"
+			"CalculateSpellDamageTooltip"	"1"
 		}
 	}
 
@@ -19071,6 +19101,7 @@
 			"duration"					"3.2"
 			"tick_rate"					"0.25"
 			"damage_per_second"			"2800 4200 5600 7200 9200"
+			"CalculateSpellDamageTooltip"	"1"
 		}
 	}
 
@@ -19092,6 +19123,7 @@
 			"length"					"950"
 			"width"						"130"
 			"damage"					"3200 4600 6200 8200 10600"
+			"CalculateSpellDamageTooltip"	"1"
 		}
 	}
 
@@ -19114,6 +19146,7 @@
 			"length"					"760"
 			"width"						"150"
 			"damage"					"4200 6200 8200 10800 14000"
+			"CalculateSpellDamageTooltip"	"1"
 		}
 	}
 
@@ -19133,6 +19166,7 @@
 			"radius"					"300"
 			"travel_delay"				"0.45"
 			"damage"					"3600 5400 7200 9500 12200"
+			"CalculateSpellDamageTooltip"	"1"
 			"slow_duration"				"2.5"
 		}
 	}
@@ -20704,6 +20738,7 @@
 			"line_width_end"			"425"
 			"line_speed"				"700"
 			"line_damage"				"140"
+			"CalculateSpellDamageTooltip"	"1"
 		}
 
 		"OnAbilityPhaseStart"
@@ -21220,6 +21255,7 @@
 			"radius"					"550"
 			"heal_percent"				"5.0"
 			"damage_percent"			"0.75"
+			"CalculateSpellDamageTooltip"	"1"
 			"duration"					"10"
 			"tick_rate"					"1.0"
 		}
@@ -21789,6 +21825,7 @@
 			"static_remnant_damage_radius"	"260"
 			"static_remnant_delay"		"1.0"
 			"static_remnant_damage"		"100 200 300 400"
+			"CalculateSpellDamageTooltip"	"1"
 			"number"					"6"
 		}
 		
@@ -21871,6 +21908,7 @@
 		"AbilityValues"
 		{
 			"damage"						"150 250 350 450"
+			"CalculateSpellDamageTooltip"	"1"
 			"aoe"							"300"
 			"move_slow"						"-80"
 			"attack_slow"					"-25 -50 -75 -100"
@@ -22317,6 +22355,7 @@
 			"cast_point"					"2.40 2.25 2.10 2.00 1.90"
 			"radius"						"500 600 700 800 900"
 			"damage"						"25000 50000 75000 100000 125000"
+			"CalculateSpellDamageTooltip"	"1"
 			"damage_pct"					"82"
 			"slow_duration"				"5.00 4.00 3.60 3.28 2.88"
 			"movement_slow"				"-35"
@@ -22346,6 +22385,7 @@
 			"wave_interval"				"0.55"
 			"target_stagger"				"0.18"
 			"wave_damage"					"2000 4000 6000 8000 10000"
+			"CalculateSpellDamageTooltip"	"1"
 			"damage_pct"					"58"
 		}
 	}
@@ -22372,6 +22412,7 @@
 			"spacing"						"150"
 			"impact_stagger"				"0.04"
 			"wave_damage"					"2000 4000 6000 8000 10000"
+			"CalculateSpellDamageTooltip"	"1"
 			"damage_pct"					"72"
 			"slow_duration"				"3.5"
 			"movement_slow"				"-25"
@@ -22402,6 +22443,7 @@
 			"outer_count"					"0 0 0 18 20"
 			"impact_stagger"				"0.12"
 			"wave_damage"					"2000 4000 6000 8000 10000"
+			"CalculateSpellDamageTooltip"	"1"
 			"damage_pct"					"70"
 			"root_duration"				"2.4"
 		}
@@ -22457,6 +22499,7 @@
 			"start_distance"				"0"
 			"node_radius"					"185"
 			"damage"						"13000 26000 39000 52000 65000"
+			"CalculateSpellDamageTooltip"	"1"
 			"slow_duration"				"4.2"
 			"visual_delay"				"0.65"
 			"movement_slow"				"-28"
@@ -22503,8 +22546,10 @@
 			"wave_duration"					"8.0"
 			"wave_count"					"8"
 			"wave_damage"					"2000 4000 6000 8000 10000"
+			"CalculateSpellDamageTooltip"	"1"
 			"wave_interval"					"0.5"
 			"burn_damage"					"1.0 1.5 2.0 2.5 3.0"
+			"CalculateSpellDamageTooltip"	"1"
 			"burn_interval"					"1.0"
 			"burn_duration"					"5.0"
 			"first_wave_delay"				"0.0"
@@ -22673,6 +22718,7 @@
 		{
 			"radius"			"600"
 			"damage_per_tick"		"1000 2500 4000 5500 7000"
+			"CalculateSpellDamageTooltip"	"1"
 			"tick_time"			"1.0"
 		}
 	
@@ -22782,6 +22828,7 @@
 		{
 			"radius"			"600"
 			"damage_per_tick"	"500 1000 1500 2000 2500"
+			"CalculateSpellDamageTooltip"	"1"
 			"tick_time"			"1.0"
 		}
 
@@ -23027,10 +23074,11 @@
 		"AbilityManaCost"			"0"
 		"AbilityValues"
 		{
-			"radius"				"475 500 525 550 575"
+			"radius"				"475 575 650 700 750"
 			"damage"				"18000 28000 42000 56000 76000"
+			"CalculateSpellDamageTooltip"	"1"
 			"duration"				"18 20 22 24 26"
-			"bonus_damage_pct"		"12 16 20 24 30"
+			"bonus_damage_pct"		"25 35 45 55 70"
 			"bonus_attack_speed"	"60 75 90 110 130"
 			"bonus_attack_range"	"775 800 825 850 875"
 			"cleave_radius"			"325 350 375 400 425"
@@ -23056,6 +23104,7 @@
 			"length"				"1250 1350 1450 1550 1650"
 			"width"					"125 135 145 155 165"
 			"damage"				"16000 26000 39000 52000 70000"
+			"CalculateSpellDamageTooltip"	"1"
 			"cast_point"			"1.30 1.20 1.12 1.05 0.95"
 		}
 	}
@@ -23077,6 +23126,7 @@
 			"width"					"135 145 155 165 175"
 			"max_distance"			"950 1050 1150 1250 1350"
 			"damage"				"15000 24000 36000 50000 68000"
+			"CalculateSpellDamageTooltip"	"1"
 			"cast_point"			"1.25 1.15 1.08 1.00 0.92"
 		}
 	}
@@ -23086,7 +23136,7 @@
 		"BaseClass"					"ability_lua"
 		"ScriptFile"				"boss_scripts/phase3_ai/illidan_abilities.lua"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-		"AbilityUnitDamageType"		"DAMAGE_TYPE_MAGICAL"
+		"AbilityUnitDamageType"		"DAMAGE_TYPE_PURE"
 		"AbilityTextureName"		"custom/xhs_illidan_immolation_burst"
 		"MaxLevel"					"5"
 		"AbilityCastPoint"			"1.20 1.12 1.05 1.00 0.95"
@@ -23095,9 +23145,10 @@
 		"AbilityValues"
 		{
 			"radius"				"430 460 490 520 560"
-			"duration"				"3.0 3.2 3.4 3.6 3.8"
-			"tick_rate"				"0.5"
-			"damage_per_second"		"8500 13000 18000 25000 34000"
+			"pulse_count"			"4"
+			"pulse_interval"		"0.42 0.39 0.36 0.33 0.30"
+			"damage_per_pulse"		"7500 11000 16000 23000 33000"
+			"CalculateSpellDamageTooltip"	"1"
 			"cast_point"			"1.20 1.12 1.05 1.00 0.95"
 		}
 	}
@@ -23119,6 +23170,7 @@
 			"point_delay"			"0.22 0.20 0.18 0.16 0.14"
 			"radius"				"210 225 240 255 270"
 			"damage"				"13000 21000 32000 44000 60000"
+			"CalculateSpellDamageTooltip"	"1"
 			"cast_point"			"1.35 1.25 1.15 1.08 1.00"
 		}
 	}
@@ -23385,6 +23437,7 @@
 		"AbilityValues"
 		{
 			"damage_per_unit"		"15000 30000 45000 60000 75000"
+			"CalculateSpellDamageTooltip"	"1"
 			"radius"				"500"
 			"stun_duration"			"0.5"
 			"time_between_meteors"	"1"
@@ -23404,7 +23457,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"					"ability_datadriven"
-		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_HIDDEN"
 		"AbilityTextureName"    	"rubick_empty1"
 		"MaxLevel"					"1"
 		
@@ -23609,6 +23662,7 @@
 		{
 			"radius"			"200"
 			"damage_per_second"	"1 2 3 4"
+			"CalculateSpellDamageTooltip"	"1"
 			"debuff_duration"	"120.0"
 		}
 	}
@@ -23704,6 +23758,7 @@
 		"AbilityValues"
 		{
 			"damage_per_skull"		"2500 5000 7500 10000 12500"
+			"CalculateSpellDamageTooltip"	"1"
 			"distance"			"3000"
 			"speed"				"500"
 			"time_between_skulls"	"0.2"
@@ -23837,6 +23892,7 @@
 			"radius"                        "300 350 400 450"
 			"stun_duration"                 "1.0 1.5 2.0 2.5"
 			"stomp_damage"                  "250 350 450 550"
+			"CalculateSpellDamageTooltip"	"1"
 		}
 
 		"precache"
@@ -23936,6 +23992,7 @@
 		{
 			"ensnare_duration"				"1.0 1.75 2.5 3.25"
 			"ensnare_damage"				"200 450 750 1300"
+			"CalculateSpellDamageTooltip"	"1"
 			"ensnare_chance"				"12"
 		}
 
@@ -24105,6 +24162,7 @@
 			"radius"				"385"
 			"duration"				"3.0"
 			"base_damage"			"350"
+			"CalculateSpellDamageTooltip"	"1"
 			"slow_pct"				"25"
 		}
 	}
@@ -24186,6 +24244,7 @@
 			"duration"								"1.0 2.0 3.0 4.0"
 			"radius"								"350 400 450 500"
 			"damage"								"90 270 450 630"
+			"CalculateSpellDamageTooltip"	"1"
 		}
 
 		"OnSpellStart"
@@ -24273,6 +24332,7 @@
 		"AbilityValues"
 		{
 			"damage"								"1000 2000 3000 4000 6000"
+			"CalculateSpellDamageTooltip"	"1"
 			"radius"								"500 600 700 800 1000"
 			"delay"									"1.0"
 		}
@@ -24329,6 +24389,7 @@
 		"AbilityValues"
 		{
 			"damage"							"10000 20000 30000 40000 60000"
+			"CalculateSpellDamageTooltip"	"1"
 			"radius"							"300 350 400 450 550"
 			"delay"								"3.0 2.5 2.0 1.5 1.0"
 			"duration"							"6 8 10 12 16"
@@ -24360,6 +24421,7 @@
 		"AbilityValues"
 		{
 			"damage"								"5000 10000 15000 20000 30000"
+			"CalculateSpellDamageTooltip"	"1"
 			"radius"								"250 300 350 400 500"
 			"delay"									"1.5 1.45 1.4 1.35 1.25"
 			"spawn_distance"						"600 575 550 525 475"
@@ -24431,6 +24493,7 @@
 		{
 			"delay"									"3.5 3.0 3.5 3.0 2.0"
 			"damage"								"1000 2000 3000 4000 6000"
+			"CalculateSpellDamageTooltip"	"1"
 			"line_amount"							"70"
 			"distance"								"800 1000 1200 1400 1600"
 		}
@@ -24469,6 +24532,7 @@
 		{
 			"stun_duration"				"2.0 2.5 3.0 3.5"
 			"damage"					"350 600 850 1100"
+			"CalculateSpellDamageTooltip"	"1"
 			"projectile_radius"			"120"
 			"projectile_length"			"1600"
 			"projectile_speed"			"1000"
@@ -24549,7 +24613,9 @@
 			"area_of_effect"			"500"
 			"tick"						"1.0"
 			"dmg_per_sec"				"50 100 150 200"
+			"CalculateSpellDamageTooltip"	"1"
 			"dmg_pct_per_sec"			"1"
+			"CalculateSpellDamageTooltip"	"1"
 			"duration"					"10.0"
 		}
 	}
@@ -24575,6 +24641,7 @@
 			"radius"			"400"
 			"tick_time"			"1"
 			"health_as_damage_pct"	"0.5"
+			"CalculateSpellDamageTooltip"	"1"
 		}
 	}
 
@@ -24738,11 +24805,13 @@
 			"slow_duration"				"1.75 2.5 3.25 4.0"
 			"stun_duration"				"1.6"
 			"damage"					"100 300 450 600"
+			"CalculateSpellDamageTooltip"	"1"
 			"tick_count"				"10"
 			"torrent_height"			"400"
 			"tide_low_range"			"300"
 			"tide_red_slow"				"15"
 			"tide_flood_damage"			"80"
+			"CalculateSpellDamageTooltip"	"1"
 			"tide_high_radius"			"125"
 			"launch_delay"				"1.6"
 			"total_delay_tooltip"		"3.0"
@@ -24799,6 +24868,7 @@
 		"AbilityValues"
 		{
 			"damage"						"400 550 700"
+			"CalculateSpellDamageTooltip"	"1"
 			"ghostship_width"				"425"
 			"ghostship_speed"				"650"
 			"start_distance"				"1000"
@@ -24813,6 +24883,7 @@
 			"tide_red_slow"					"25"
 			"tide_red_slow_duration"		"2"
 			"tide_flood_damage"				"100"
+			"CalculateSpellDamageTooltip"	"1"
 			"tide_high_radius"				"125"
 			"tide_wave_speed"				"200"
 			"tsunami_stun"					"0.6"
@@ -24954,6 +25025,7 @@
 		{
 			"radius"				"520 550 580 610 650"
 			"damage"				"15000 23000 34000 47000 65000"
+			"CalculateSpellDamageTooltip"	"1"
 			"duration"				"14 16 18 20 22"
 			"vision_reduction"		"650 750 850 950 1100"
 			"bonus_damage_pct"		"10 14 18 22 28"
@@ -24977,6 +25049,7 @@
 		{
 			"radius"				"420 450 480 510 550"
 			"damage"				"10000 16000 24000 34000 48000"
+			"CalculateSpellDamageTooltip"	"1"
 			"slow_duration"			"2.6"
 			"slow_pct"				"30 34 38 42 48"
 			"damage_reduction_pct"	"15 18 21 24 28"
@@ -24999,6 +25072,7 @@
 		{
 			"radius"				"210 225 240 255 275"
 			"damage"				"12000 19000 28000 39000 54000"
+			"CalculateSpellDamageTooltip"	"1"
 			"nightmare_duration"	"2.0 2.1 2.2 2.3 2.5"
 			"nightmare_slow_pct"	"55 58 61 64 68"
 			"cast_point"			"1.35 1.25 1.15 1.05 1.00"
@@ -25022,6 +25096,7 @@
 			"width"					"135 145 155 165 180"
 			"projectile_speed"		"1100"
 			"damage"				"13000 21000 32000 44000 62000"
+			"CalculateSpellDamageTooltip"	"1"
 			"cast_point"			"1.20 1.12 1.05 1.00 0.92"
 		}
 	}
@@ -25043,6 +25118,7 @@
 		"AbilityValues"
 		{
 			"damage_per_unit"		"15000 30000 45000 60000 75000"
+			"CalculateSpellDamageTooltip"	"1"
 			"radius"				"500"
 			"stun_duration"			"0.5"
 			"time_between_meteors"	"1"
@@ -25083,6 +25159,7 @@
 		{
 			"radius"				"450 480 510 540 580"
 			"damage"				"13000 21000 32000 45000 62000"
+			"CalculateSpellDamageTooltip"	"1"
 			"duration"				"12 14 16 18 20"
 			"bonus_armor"			"20 25 30 38 48"
 			"bonus_damage_pct"		"8 12 16 20 26"
@@ -25090,6 +25167,7 @@
 			"strike_delay"			"0.25 0.23 0.21 0.19 0.17"
 			"strike_radius"			"220 235 250 265 285"
 			"strike_damage"			"12000 19000 29000 42000 59000"
+			"CalculateSpellDamageTooltip"	"1"
 			"cast_point"			"1.45 1.32 1.22 1.12 1.02"
 		}
 	}
@@ -25110,6 +25188,7 @@
 			"length"				"1100 1200 1300 1400 1550"
 			"width"					"145 155 165 175 190"
 			"damage"				"13000 21000 32000 44000 62000"
+			"CalculateSpellDamageTooltip"	"1"
 			"torrent_stun_duration"	"1.15"
 			"torrent_slow_duration"	"2.2"
 			"torrent_slow_pct"		"40"
@@ -25135,6 +25214,7 @@
 			"strike_delay"			"0.22 0.20 0.18 0.16 0.14"
 			"radius"				"225 240 255 270 290"
 			"damage"				"13000 21000 32000 45000 64000"
+			"CalculateSpellDamageTooltip"	"1"
 			"cast_point"			"1.35 1.25 1.15 1.08 1.00"
 		}
 	}
@@ -25154,6 +25234,7 @@
 		{
 			"radius"				"360 390 420 455 500"
 			"damage"				"12000 19000 29000 41000 58000"
+			"CalculateSpellDamageTooltip"	"1"
 			"slow_duration"			"2.4"
 			"slow_pct"				"30 34 38 42 48"
 			"attack_slow"			"45 55 65 80 100"
@@ -25176,6 +25257,7 @@
 		{
 			"radius"				"210 225 240 255 275"
 			"damage"				"15000 24000 36000 50000 70000"
+			"CalculateSpellDamageTooltip"	"1"
 			"cast_point"			"1.30 1.20 1.12 1.05 0.98"
 		}
 	}
@@ -25232,9 +25314,16 @@
 		"AbilityCastPoint"			"1.65 1.50 1.35 1.22 1.10"
 		"AbilityCooldown"			"1.0"
 		"AbilityManaCost"			"0"
+		"precache"
+		{
+			"particle"					"particles/units/heroes/hero_lich/lich_ice_age.vpcf"
+			"particle"					"particles/units/heroes/hero_lich/lich_frost_nova.vpcf"
+			"soundfile"					"soundevents/game_sounds_heroes/game_sounds_lich.vsndevts"
+		}
 		"AbilityValues"
 		{
 			"damage"					"12000 20000 30000 42000 58000"
+			"CalculateSpellDamageTooltip"	"1"
 			"radius"					"850 900 950 1000 1050"
 			"slow_duration"				"2.0"
 			"buff_duration"				"10.0"
@@ -25257,6 +25346,7 @@
 		"AbilityValues"
 		{
 			"damage"					"9000 16000 24000 34000 48000"
+			"CalculateSpellDamageTooltip"	"1"
 			"radius"					"230 245 260 280 300"
 			"heal_pct"					"8"
 			"slow_duration"				"1.4"
@@ -25279,6 +25369,7 @@
 		"AbilityValues"
 		{
 			"damage"					"8000 14000 21000 30000 42000"
+			"CalculateSpellDamageTooltip"	"1"
 			"radius"					"175 190 205 220 235"
 			"spacing"					"190"
 			"nodes"						"8"
@@ -25302,6 +25393,7 @@
 		"AbilityValues"
 		{
 			"damage"					"7000 11000 16500 23500 33000"
+			"CalculateSpellDamageTooltip"	"1"
 			"radius"					"210 225 240 255 275"
 			"slow_duration"				"1.8"
 			"cast_point"				"1.38 1.28 1.18 1.08 1.00"
@@ -25323,6 +25415,7 @@
 		"AbilityValues"
 		{
 			"damage_per_tick"			"1800 3200 4800 6800 9600"
+			"CalculateSpellDamageTooltip"	"1"
 			"radius"					"260 275 295 315 335"
 			"duration"					"4.0"
 			"tick_rate"					"0.5"
@@ -25345,6 +25438,7 @@
 		"AbilityValues"
 		{
 			"damage"					"9000 15000 22500 32000 45000"
+			"CalculateSpellDamageTooltip"	"1"
 			"radius"					"185 200 215 230 245"
 			"spacing"					"205"
 			"nodes"						"10"
@@ -25365,12 +25459,17 @@
 	{
 		"BaseClass"					"ability_lua"
 		"ScriptFile"				"boss_scripts/phase3_ai/spirit_master_abilities.lua"
-		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"AbilityTextureName"		"custom/xhs_spirit_master_trinity_cycle"
 		"MaxLevel"					"5"
+		"AbilityCastPoint"			"1.60 1.45 1.32 1.20 1.10"
+		"AbilityCooldown"			"0"
+		"AbilityManaCost"			"0"
 		"AbilityValues"
 		{
+			"radius"				"900"
 			"sync_window"			"24 22 20 18 16"
+			"cast_point"			"1.60 1.45 1.32 1.20 1.10"
 		}
 	}
 
@@ -25379,7 +25478,7 @@
 		"BaseClass"					"ability_lua"
 		"ScriptFile"				"boss_scripts/phase3_ai/spirit_master_abilities.lua"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE"
-		"AbilityUnitDamageType"		"DAMAGE_TYPE_MAGICAL"
+		"AbilityUnitDamageType"		"DAMAGE_TYPE_PURE"
 		"AbilityTextureName"		"custom/xhs_spirit_master_palm_of_balance"
 		"MaxLevel"					"5"
 		"AbilityCastPoint"			"1.35 1.25 1.15 1.08 1.00"
@@ -25389,6 +25488,7 @@
 		"AbilityValues"
 		{
 			"damage"				"14000 23000 34000 48000 66000"
+			"CalculateSpellDamageTooltip"	"1"
 			"radius"				"190 205 220 235 250"
 			"spacing"				"170"
 			"nodes"					"4"
@@ -25402,7 +25502,7 @@
 		"BaseClass"					"ability_lua"
 		"ScriptFile"				"boss_scripts/phase3_ai/spirit_master_abilities.lua"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE"
-		"AbilityUnitDamageType"		"DAMAGE_TYPE_MAGICAL"
+		"AbilityUnitDamageType"		"DAMAGE_TYPE_PURE"
 		"AbilityTextureName"		"custom/xhs_spirit_master_elemental_mandala"
 		"MaxLevel"					"5"
 		"AbilityCastPoint"			"1.65 1.50 1.38 1.25 1.12"
@@ -25412,11 +25512,13 @@
 		"AbilityValues"
 		{
 			"damage"				"12000 20000 30000 43000 61000"
+			"CalculateSpellDamageTooltip"	"1"
 			"ring_radius"			"760 780 800 825 850"
 			"node_radius"			"175 185 195 205 215"
 			"wave_delay"			"1.15 1.08 1.02 0.96 0.90"
 			"fire_burn_duration"	"4.0"
 			"fire_burn_damage"		"1800 3000 4500 6450 9150"
+			"CalculateSpellDamageTooltip"	"1"
 			"earth_damage_pct"		"60"
 			"earth_slow_duration"	"2.5"
 			"storm_damage_pct"		"145"
@@ -25426,28 +25528,11 @@
 		}
 	}
 
-	"xhs_spirit_master_spirit_call"
-	{
-		"BaseClass"					"ability_lua"
-		"ScriptFile"				"boss_scripts/phase3_ai/spirit_master_abilities.lua"
-		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-		"AbilityTextureName"		"custom/xhs_spirit_master_spirit_call"
-		"MaxLevel"					"5"
-		"AbilityCastPoint"			"1.60 1.45 1.32 1.20 1.10"
-		"AbilityCooldown"			"1.0"
-		"AbilityManaCost"			"0"
-		"AbilityValues"
-		{
-			"radius"				"900"
-			"cast_point"			"1.60 1.45 1.32 1.20 1.10"
-		}
-	}
-
 	"xhs_spirit_master_convergence"
 	{
 		"BaseClass"					"ability_lua"
 		"ScriptFile"				"boss_scripts/phase3_ai/spirit_master_abilities.lua"
-		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_HIDDEN"
 		"AbilityTextureName"		"custom/xhs_spirit_master_convergence"
 		"MaxLevel"					"5"
 		"AbilityCastPoint"			"1.10 1.00 0.92 0.85 0.80"
@@ -25475,6 +25560,7 @@
 		"AbilityValues"
 		{
 			"damage"				"12000 21000 32000 46000 65000"
+			"CalculateSpellDamageTooltip"	"1"
 			"radius"				"170 180 190 205 220"
 			"spacing"				"185"
 			"nodes"					"5"
@@ -25505,6 +25591,7 @@
 		"AbilityValues"
 		{
 			"damage"				"11000 19000 29000 42000 59000"
+			"CalculateSpellDamageTooltip"	"1"
 			"radius"				"180 190 200 215 230"
 			"ring_radius"			"460 500 540 580 620"
 			"orb_count"				"4 5 5 6 6"
@@ -25533,7 +25620,11 @@
 		"AbilityValues"
 		{
 			"damage"				"15000 25000 37000 52000 73000"
+			"CalculateSpellDamageTooltip"	"1"
 			"radius"				"210 220 235 250 265"
+			"line_count"			"2 3 4 8 8"
+			"line_nodes"			"5"
+			"line_spacing"			"180"
 			"slow_duration"			"1.4"
 			"silence_duration"		"2.0"
 			"cast_point"			"1.30 1.20 1.10 1.04 1.00"
@@ -25555,6 +25646,7 @@
 		"AbilityValues"
 		{
 			"damage"				"14000 23000 35000 50000 70000"
+			"CalculateSpellDamageTooltip"	"1"
 			"radius"				"185 200 215 230 245"
 			"spacing"				"190"
 			"nodes"					"6"
@@ -25584,6 +25676,7 @@
 		"AbilityValues"
 		{
 			"damage"				"12000 21000 32000 46000 65000"
+			"CalculateSpellDamageTooltip"	"1"
 			"radius"				"420 450 480 520 560"
 			"slow_duration"			"1.8"
 			"guard_duration"			"5.0"
@@ -25613,6 +25706,7 @@
 		"AbilityValues"
 		{
 			"damage"				"13000 22000 34000 49000 68000"
+			"CalculateSpellDamageTooltip"	"1"
 			"radius"				"210 225 240 255 270"
 			"ring_radius"			"430 470 510 550 590"
 			"stun_duration"			"1.0"
@@ -25638,12 +25732,14 @@
 		"AbilityValues"
 		{
 			"damage"				"12500 21500 32500 47000 66000"
+			"CalculateSpellDamageTooltip"	"1"
 			"radius"				"170 180 190 205 220"
 			"spacing"				"175"
 			"nodes"					"5"
 			"dash_distance"			"560"
 			"burn_duration"			"4.0"
 			"burn_damage"			"1500 2500 3800 5500 7800"
+			"CalculateSpellDamageTooltip"	"1"
 			"round_1_line_count"	"1"
 			"round_1_line_angle"	"0"
 			"round_2_line_count"	"1"
@@ -25669,10 +25765,12 @@
 		"AbilityValues"
 		{
 			"damage"				"15000 25000 38000 54000 76000"
+			"CalculateSpellDamageTooltip"	"1"
 			"radius"				"230 245 260 280 300"
 			"stun_duration"			"1.0"
 			"burn_duration"			"4.0"
 			"burn_damage"			"1800 3000 4500 6500 9200"
+			"CalculateSpellDamageTooltip"	"1"
 			"round_1_impact_count"	"1"
 			"round_2_impact_count"	"1"
 			"round_3_impact_count"	"3"
@@ -25698,11 +25796,13 @@
 		"AbilityValues"
 		{
 			"damage"				"11500 19500 30000 43000 61000"
+			"CalculateSpellDamageTooltip"	"1"
 			"inner_radius"			"360 380 400 420 440"
 			"outer_radius"			"710 730 750 775 800"
 			"node_radius"			"175 185 195 205 215"
 			"burn_duration"			"4.0"
 			"burn_damage"			"1600 2700 4100 5900 8400"
+			"CalculateSpellDamageTooltip"	"1"
 			"round_1_ring_count"	"2"
 			"round_2_ring_count"	"2"
 			"round_3_ring_count"	"3"
@@ -25789,6 +25889,7 @@
 			"wave_telegraph"			"2.6 2.5 2.4 2.3 2.2"
 			"wave_gap"					"0.55"
 			"intercept_damage"			"6500 10500 16000 23000 33000"
+			"CalculateSpellDamageTooltip"	"1"
 			"final_delay"				"0.65"
 			"final_telegraph"			"1.55 1.45 1.35 1.25 1.15"
 			"final_base_lines"			"3"
@@ -25796,6 +25897,7 @@
 			"final_range"				"1200"
 			"final_width"				"145 155 165 175 190"
 			"final_damage"				"15000 24000 36000 51000 72000"
+			"CalculateSpellDamageTooltip"	"1"
 			"cast_point"				"1.75 1.65 1.55 1.45 1.35"
 		}
 	}
@@ -25833,6 +25935,7 @@
 		{
 			"radius"				"230 245 260 280 305"
 			"damage"				"12000 19000 29000 41000 58000"
+			"CalculateSpellDamageTooltip"	"1"
 			"root_duration"			"2.2"
 			"marked_bonus_pct"		"40"
 			"cast_point"			"1.25 1.18 1.1 1.02 0.95"
@@ -25855,6 +25958,7 @@
 			"range"					"900 980 1060 1140 1240"
 			"width"					"150 165 180 195 215"
 			"damage"				"14000 23000 35000 50000 70000"
+			"CalculateSpellDamageTooltip"	"1"
 			"marked_bonus_pct"		"35"
 			"cast_point"			"1.05 1.0 0.95 0.9 0.85"
 		}
@@ -25875,6 +25979,7 @@
 		{
 			"radius"				"260 280 305 330 360"
 			"damage"				"26000 42000 64000 91000 128000"
+			"CalculateSpellDamageTooltip"	"1"
 			"marked_bonus_pct"		"55"
 			"cast_point"			"1.65 1.5 1.38 1.25 1.12"
 		}

@@ -1,4 +1,5 @@
 #base units/companions.txt
+#base units/generated_supporter_courier_previews.txt
 #base units/statues.txt
 #base units/emblems.txt
 #base units/core_dummy_units.txt

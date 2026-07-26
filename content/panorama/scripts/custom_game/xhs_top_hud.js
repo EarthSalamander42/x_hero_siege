@@ -46,8 +46,10 @@ var XHSTopHud = (function () {
 	var overheadUiBlockerRootHeight = 0;
 	var topHudLayerApplied = false;
 	var isSpecialEventPanelVisible = false;
+	var isGamePaused = false;
 	var nightfallVignetteToken = 0;
 	var activeCurrentEventTimerName = null;
+	var isMuradinFrenzyActive = false;
 	var activePersonalTimerName = null;
 	var currentEventTimerMaxRemaining = {};
 	var currentEventTimerProgressRunning = {};
@@ -455,6 +457,19 @@ var XHSTopHud = (function () {
 		fill.style.width = percent + "%";
 	}
 
+	function SetMuradinFrenzyActive(isActive) {
+		isActive = !!isActive;
+		if (isMuradinFrenzyActive === isActive) {
+			return;
+		}
+
+		isMuradinFrenzyActive = isActive;
+		var timer = Panel("XHSArenaTimer");
+		if (timer) {
+			timer.SetHasClass("XHSMuradinFrenzy", isActive);
+		}
+	}
+
 	function ResetPersonalEventProgress(timerName) {
 		if (timerName) {
 			personalTimerMaxRemaining[timerName] = 0;
@@ -772,6 +787,26 @@ var XHSTopHud = (function () {
 		overheadUiBlockerRefreshAt = 0;
 	}
 
+	function SetOverheadPauseOcclusion(paused) {
+		paused = !!paused;
+		if (isGamePaused === paused) {
+			return;
+		}
+
+		isGamePaused = paused;
+		var overheadRoot = Panel("XHSOverheadRoot");
+		if (overheadRoot) {
+			overheadRoot.SetHasClass("XHSPauseOccluded", paused);
+		}
+	}
+
+	function SyncOverheadPauseOcclusion() {
+		var paused = SafeValue(function () {
+			return Game.IsGamePaused();
+		}, isGamePaused);
+		SetOverheadPauseOcclusion(paused);
+	}
+
 	function SetSharedSpecialEventVisible(isVisible) {
 		SafeValue(function () {
 			if (GameUI.CustomUIConfig) {
@@ -782,9 +817,16 @@ var XHSTopHud = (function () {
 	}
 
 	function IsSpecialEventPanelBlockingUi() {
-		return isSpecialEventPanelVisible || SafeValue(function () {
-			return GameUI.CustomUIConfig && GameUI.CustomUIConfig().xhsSpecialEventVisible === true;
-		}, false);
+		return SafeValue(function () {
+			if (GameUI.CustomUIConfig) {
+				var sharedVisibility = GameUI.CustomUIConfig().xhsSpecialEventVisible;
+				if (typeof sharedVisibility === "boolean") {
+					return sharedVisibility;
+				}
+			}
+
+			return isSpecialEventPanelVisible;
+		}, isSpecialEventPanelVisible);
 	}
 
 	function CreateOverheadHeroImage(parent, id) {
@@ -1608,6 +1650,22 @@ var XHSTopHud = (function () {
 		return data.tierName || "DONATOR";
 	}
 
+	function ResolvePlayerIdentity(playerID, entIndex, data) {
+		data = data || {};
+		if (typeof XHSNameDisplay !== "undefined" && XHSNameDisplay.Resolve) {
+			return XHSNameDisplay.Resolve({
+				playerID: playerID,
+				entityIndex: entIndex,
+				playerName: data.playerName,
+				heroName: data.heroName,
+				heroDisplayName: data.localHeroName || data.heroDisplayName,
+			});
+		}
+
+		// Missing helper must remain privacy-safe: never fall back to persona name.
+		return data.localHeroName || data.heroDisplayName || FormatUnitNameFallback(data.heroName) || "";
+	}
+
 	function UpdateOverheadLabelData(playerID, entIndex) {
 		var label = EnsureOverheadLabel(playerID);
 		if (!label || !IsValidEntityIndex(entIndex)) {
@@ -1615,7 +1673,7 @@ var XHSTopHud = (function () {
 		}
 
 		var data = GetSupporterPlayerData(playerID, entIndex);
-		var heroName = data.localHeroName || data.heroDisplayName || FormatUnitNameFallback(data.heroName) || data.playerName || ("Player " + (playerID + 1));
+		var displayName = ResolvePlayerIdentity(playerID, entIndex, data);
 
 		label.SetAttributeInt("ent_index", entIndex);
 		label.SetHasClass("XHSOverheadLocalPlayer", playerID === GetLocalPlayerID());
@@ -1628,9 +1686,9 @@ var XHSTopHud = (function () {
 
 		var tierOverline = FormatOverheadTierOverline(data);
 		label.SetHasClass("XHSOverheadHasTierOverline", tierOverline !== "");
-		label.SetAttributeString("xhs_overhead_hero_label", heroName);
+		label.SetAttributeString("xhs_overhead_hero_label", displayName);
 
-		SetChildText(label, "XHSOverheadName_" + playerID, heroName);
+		SetChildText(label, "XHSOverheadName_" + playerID, displayName);
 		SetChildText(label, "XHSOverheadTierOverline_" + playerID, tierOverline);
 		SetChildText(label, "XHSOverheadGameplayStatus_" + playerID, FormatOverheadGameplayStatus(data));
 		SetChildText(label, "XHSOverheadAltStatus_" + playerID, FormatOverheadAltStatus(data));
@@ -1840,6 +1898,11 @@ var XHSTopHud = (function () {
 		var overlay = $.CreatePanel("Panel", imageWrap, "XHSAllyStatusOverlay_" + playerID);
 		overlay.AddClass("XHSAllyStatusOverlay");
 		overlay.hittest = false;
+
+		var respawnLabel = $.CreatePanel("Label", imageWrap, "XHSAllyRespawnLabel_" + playerID);
+		respawnLabel.AddClass("XHSAllyRespawnLabel");
+		respawnLabel.text = "";
+		respawnLabel.hittest = false;
 
 		var disconnect = $.CreatePanel("Panel", imageWrap, "XHSDisconnectIcon_" + playerID);
 		disconnect.AddClass("XHSDisconnectIcon");
@@ -2167,7 +2230,11 @@ var XHSTopHud = (function () {
 
 		var name = card.FindChildTraverse("XHSAllyName_" + playerID);
 		if (name) {
-			name.text = SafeValue(function () { return $.Localize("#" + heroName); }, heroName || playerName);
+			name.text = ResolvePlayerIdentity(playerID, entIndex, {
+				playerName: playerName,
+				heroName: heroName,
+				localHeroName: LocalizeUnitName(heroName),
+			});
 			name.style.color = playerColor;
 		}
 
@@ -2222,6 +2289,57 @@ var XHSTopHud = (function () {
 		};
 	}
 
+	function GetTombstoneReviveState(entIndex) {
+		var data = CustomNetTables.GetTableValue("player_table", entIndex.toString() + "_revive_channel") || {};
+		var active = ToNumber(data.active, 0) > 0;
+		var endTime = ToNumber(data.end_time, 0);
+		var duration = ToNumber(data.duration, 0);
+		var remaining = active ? Math.max(0, endTime - GetCurrentGameTime()) : 0;
+
+		return {
+			active: active && remaining > 0,
+			duration: duration,
+			endTime: endTime,
+			remaining: remaining,
+			channels: Math.max(0, ToNumber(data.channels, 0)),
+		};
+	}
+
+	function GetPlayerRespawnSeconds(playerID) {
+		return SafeValue(function () {
+			if (typeof Players.GetRespawnSeconds === "function") {
+				return Players.GetRespawnSeconds(playerID);
+			}
+			return -1;
+		}, -1);
+	}
+
+	function UpdateAllyDeathStatus(card, playerID, entIndex, isDead) {
+		var reincarnationState = GetReincarnationState(entIndex);
+		var reviveState = GetTombstoneReviveState(entIndex);
+		var isReviving = isDead && reviveState.active;
+		var isReincarnating = isDead && !isReviving && reincarnationState.active;
+		var label = card.FindChildTraverse("XHSAllyRespawnLabel_" + playerID);
+
+		card.SetHasClass("XHSAllyReviving", isReviving);
+		card.SetHasClass("XHSAllyReincarnating", isReincarnating);
+
+		if (!label) {
+			return;
+		}
+
+		if (isReviving) {
+			label.text = Math.ceil(reviveState.remaining).toString();
+		} else if (isReincarnating) {
+			label.text = Math.ceil(reincarnationState.remaining).toString();
+		} else if (isDead) {
+			var respawnSeconds = GetPlayerRespawnSeconds(playerID);
+			label.text = respawnSeconds > 0 ? Math.ceil(respawnSeconds).toString() : "∞";
+		} else {
+			label.text = "";
+		}
+	}
+
 	function FormatReincarnationStatus(state) {
 		var seconds = Math.ceil(Math.max(0, state.remaining || 0)).toString();
 		var localized = $.Localize("#DOTA_XHS_Overhead_Reincarnation_In");
@@ -2262,6 +2380,9 @@ var XHSTopHud = (function () {
 		var manaFill = card.FindChildTraverse("XHSAllyManaBar_" + playerID + "_Fill");
 		var clampedHealth = Clamp(ToNumber(healthPercent, 0), 0, 100);
 		var clampedMana = Clamp(ToNumber(manaPercent, 0), 0, 100);
+		var isDead = SafeValue(function () {
+			return !Entities.IsAlive(entIndex);
+		}, clampedHealth <= 0);
 
 		if (healthBar) {
 			healthBar.SetAttributeInt("value", Math.floor(clampedHealth));
@@ -2279,8 +2400,9 @@ var XHSTopHud = (function () {
 			manaFill.style.width = clampedMana + "%";
 		}
 
-		card.SetHasClass("IsDead", clampedHealth <= 0);
+		card.SetHasClass("IsDead", isDead);
 		card.SetHasClass("XHSNoMana", !hasMana);
+		UpdateAllyDeathStatus(card, playerID, entIndex, isDead);
 		UpdateOverheadLabelVitals(playerID, entIndex, clampedHealth, clampedMana, health, maxHealth, hasMana);
 
 		if (card.BHasClass("XHSHoverVisible") || PanelHasHover(card)) {
@@ -2484,10 +2606,17 @@ var XHSTopHud = (function () {
 			!!(personalTimer && !personalTimer.BHasClass("XHSOptionalTimer"));
 
 		focusTimers.SetHasClass("XHSHasVisibleFocusTimer", hasVisibleTimer);
+
+		var hud = GetHudAncestor($.GetContextPanel());
+		var bossBars = hud && hud.FindChildTraverse ? hud.FindChildTraverse("DiretidePanel") : null;
+		if (bossBars) {
+			bossBars.SetHasClass("XHSFocusTimerActive", hasVisibleTimer);
+		}
 	}
 
 	function ShowCurrentEventTimer(timerName, title, isVisible, duration) {
 		if (isVisible) {
+			SetMuradinFrenzyActive(false);
 			if (activeCurrentEventTimerName !== timerName) {
 				ResetCurrentEventProgress(timerName);
 			}
@@ -2504,6 +2633,7 @@ var XHSTopHud = (function () {
 		}
 
 		if (activeCurrentEventTimerName === timerName) {
+			SetMuradinFrenzyActive(false);
 			ResetCurrentEventProgress(timerName);
 			activeCurrentEventTimerName = null;
 			SetOptionalPanelVisible("XHSArenaTimer", false);
@@ -2549,6 +2679,7 @@ var XHSTopHud = (function () {
 		}
 
 		if (data.timer_name === activeCurrentEventTimerName) {
+			SetMuradinFrenzyActive(ToNumber(data.muradin_frenzy, 0) > 0);
 			SetText("XHSArenaTimerValue", text);
 			UpdateCurrentEventProgress(data.timer_name, GetTimerSeconds(data));
 			return;
@@ -2602,6 +2733,9 @@ var XHSTopHud = (function () {
 		GameEvents.Subscribe("show_timer_bar", function () {});
 		GameEvents.Subscribe("game_difficulty", SetDifficulty);
 		GameEvents.Subscribe("xhs_nightfall_vignette", ShowNightfallVignette);
+		GameEvents.Subscribe("xhs_game_pause_state", function (data) {
+			SetOverheadPauseOcclusion(!!(data && Number(data.paused) === 1));
+		});
 		GameEvents.Subscribe("update_special_event_label_farm", function () {});
 		GameEvents.Subscribe("update_special_event_label_final", function () {});
 		GameEvents.Subscribe("show_current_event_timer", function (data) {
@@ -2646,6 +2780,10 @@ var XHSTopHud = (function () {
 	}
 
 	function StartOverheadTrackingLoop() {
+		// Poll as well as listening to the server event so a Panorama hot reload
+		// during an existing pause cannot leave the custom world-space bars above
+		// the pause briefing.
+		SyncOverheadPauseOcclusion();
 		RefreshOverheadPositions();
 		$.Schedule(OVERHEAD_REFRESH_SECONDS, StartOverheadTrackingLoop);
 	}
@@ -2688,6 +2826,9 @@ var XHSTopHud = (function () {
 		StartOverheadTrackingLoop();
 		StartSlowRefreshLoop();
 		RefreshAltState();
+		if (typeof XHSNameDisplay !== "undefined" && XHSNameDisplay.Subscribe) {
+			XHSNameDisplay.Subscribe(RefreshAllyRoster);
+		}
 	}
 
 	return {

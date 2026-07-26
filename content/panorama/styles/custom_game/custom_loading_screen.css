@@ -1198,10 +1198,6 @@
 	color: #e8d7b4;
 }
 
-.player-loading-row.PlayerLoadingToolsDebug .player-loading-name {
-	color: #b9c7db;
-}
-
 .player-loading-state {
 	width: 92px;
 	height: 100%;
@@ -4153,99 +4149,6 @@
 	animation-timing-function: ease-in-out;
 }
 
-.loading-qa-toggle-button {
-	ignore-parent-flow: true;
-	width: 38px;
-	height: 20px;
-	align: right top;
-	margin-top: 6px;
-	margin-right: 10px;
-	visibility: collapse;
-	border: 1px solid #7bb4d066;
-	background-color: #121e2fdd;
-	transition-property: brightness, border;
-	transition-duration: 0.1s;
-}
-
-.loading-qa-toggle-button Label {
-	width: 100%;
-	height: 100%;
-	text-align: center center;
-	font-size: 12px;
-	letter-spacing: 1px;
-	color: #9fc6e4;
-	font-family: titleFont;
-}
-
-.loading-qa-toggle-button:hover {
-	brightness: 1.15;
-	border: 1px solid #9fd2ff;
-}
-
-.loading-qa-toggle-button.IsActive {
-	background-color: #233854f0;
-	border: 1px solid #9fd2ff;
-}
-
-.loading-qa-panel {
-	ignore-parent-flow: true;
-	width: 254px;
-	align: right top;
-	margin-top: 154px;
-	margin-right: 10px;
-	padding: 8px;
-	flow-children: down;
-	visibility: collapse;
-	background-color: gradient(linear, 0% 0%, 100% 100%, from(#0f1724f3), to(#09111af4));
-	border: 1px solid #7bb4d066;
-	box-shadow: fill #000000cc 0px 0px 8px 0px;
-	z-index: 12;
-}
-
-.loading-qa-title {
-	width: 100%;
-	font-size: 14px;
-	letter-spacing: 1px;
-	text-transform: uppercase;
-	color: #9fc6e4;
-	text-shadow: 0px 1px 2px #000000;
-	font-family: titleFont;
-}
-
-.loading-qa-buttons-row {
-	width: 100%;
-	height: fit-children;
-	margin-top: 6px;
-	flow-children: right;
-}
-
-.loading-qa-button {
-	width: fill-parent-flow(1.0);
-	height: 28px;
-	margin-right: 4px;
-	border: 1px solid #7bb4d066;
-	background-color: #162335;
-}
-
-.loading-qa-buttons-row .loading-qa-button:last-child {
-	margin-right: 0px;
-}
-
-.loading-qa-button Label {
-	width: 100%;
-	height: 100%;
-	text-align: center center;
-	font-size: 12px;
-	color: #c5d7ee;
-	font-family: Reaver;
-	text-overflow: shrink;
-}
-
-.loading-qa-button:hover {
-	brightness: 1.15;
-	border: 1px solid #9fd2ff;
-}
-
 #ReadyToast {
 	ignore-parent-flow: true;
 	width: fit-children;
@@ -4290,11 +4193,6 @@
 
 .AspectRatio4x3 .bottom-tab-tagline {
 	font-size: 12px;
-}
-
-.AspectRatio4x3 .loading-qa-panel {
-	margin-top: 188px;
-	width: 232px;
 }
 
 /* Profile summary two-column pass */

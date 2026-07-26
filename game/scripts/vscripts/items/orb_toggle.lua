@@ -34,12 +34,18 @@ end
 local function ActivateIfDesired(parent, ability, modifier_name)
 	if not IsAbilityInMainInventory(parent, ability)
 		or not ability.xhs_orb_active
-		or FindActiveModifier(parent, modifier_name) ~= nil
 	then
-		return
+		return false
+	end
+
+	local active_modifier = FindActiveModifier(parent, modifier_name)
+	if active_modifier ~= nil then
+		return active_modifier:GetAbility() == ability
 	end
 
 	parent:AddNewModifier(parent, ability, modifier_name, {})
+	active_modifier = FindActiveModifier(parent, modifier_name)
+	return active_modifier ~= nil and active_modifier:GetAbility() == ability
 end
 
 function XHSOrbToggle.Toggle(caster, ability, modifier_name)
@@ -72,14 +78,33 @@ function XHSOrbToggle.OnIntrinsicCreated(intrinsic_modifier, active_modifier_nam
 		ability.xhs_orb_active = true
 	end
 
-	ActivateIfDesired(parent, ability, active_modifier_name)
+	if ActivateIfDesired(parent, ability, active_modifier_name) then
+		return
+	end
 
 	-- Recipe upgrades can create the new intrinsic before destroying the old one.
-	-- Retry after the inventory transaction so the upgraded orb still becomes active.
+	-- Retry throughout the inventory transaction so level 2/3 recipe results
+	-- reliably inherit the default active state.
 	if Timers ~= nil then
+		local attempts = 0
 		Timers:CreateTimer(0.03, function()
-			ActivateIfDesired(parent, ability, active_modifier_name)
-			return nil
+			if not IsValidEntity(parent)
+				or not IsValidEntity(ability)
+				or not ability.xhs_orb_active
+			then
+				return nil
+			end
+
+			if ActivateIfDesired(parent, ability, active_modifier_name) then
+				return nil
+			end
+
+			attempts = attempts + 1
+			if attempts >= 20 then
+				return nil
+			end
+
+			return 0.05
 		end)
 	end
 end
