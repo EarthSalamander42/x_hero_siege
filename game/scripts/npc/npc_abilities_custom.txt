@@ -1446,13 +1446,16 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"BaseClass"             		"lich_frost_armor"
+		"BaseClass"             		"ability_lua"
+		"ScriptFile"					"abilities/heroes/holdout_frost_shield"
 		"MaxLevel"					"4"
 		"AbilityTextureName"			"custom/holdout_frost_armor"
-		"AbilityCastSound"				"Hero_Lich.FrostArmor"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_AUTOCAST | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK"
+		"AbilityCastAnimation"			"ACT_DOTA_CAST_ABILITY_3"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
-		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC | DOTA_UNIT_TARGET_BUILDING"
+		"AbilityUnitTargetFlags"			"DOTA_UNIT_TARGET_FLAG_INVULNERABLE"
+		"SpellDispellableType"			"SPELL_DISPELLABLE_YES"
 		"SpellImmunityType"				"SPELL_IMMUNITY_ALLIES_YES"
 		"RequiredLevel"					"5"
 
@@ -1464,6 +1467,8 @@
 		"precache"
 		{
 			"soundfile"					"soundevents/game_sounds_heroes/game_sounds_lich.vsndevts"
+			"particle"					"particles/units/heroes/hero_lich/lich_frost_armor.vpcf"
+			"particle"					"particles/status_fx/status_effect_frost_lich.vpcf"
 		}
 
 		// Time		
@@ -1483,7 +1488,9 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityValues"
 		{
+			"duration"				"40.0"
 			"armor_bonus"			"15 25 35 45"
+			"building_armor_bonus_tooltip" "15 25 35 45"
 			"slow_movement_speed"	"-20"
 			"slow_attack_speed"		"-10"
 			"slow_duration"			"2.0"
@@ -12321,8 +12328,11 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------
-		"BaseClass"					"lich_frost_armor"
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"abilities/heroes/holdout_frost_shield"
+		"AbilityTextureName"		"custom/holdout_frost_armor"
 		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_AUTOCAST | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK"
+		"AbilityCastAnimation"		"ACT_DOTA_CAST_ABILITY_3"
 		"MaxLevel"					"1"
 		"RequiredLevel"				"20"
 
@@ -12332,21 +12342,25 @@
 		"AbilityCooldown"			"20.0"
 		"AbilityCastRange"			"800"
 		"AbilityManaCost"			"0"
-		"AbilityCastSound"			"Hero_Lich.FrostArmor"
-
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
 		"AbilityUnitTargetType"		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC | DOTA_UNIT_TARGET_BUILDING"
+		"AbilityUnitTargetFlags"		"DOTA_UNIT_TARGET_FLAG_INVULNERABLE"
+		"SpellDispellableType"		"SPELL_DISPELLABLE_YES"
 		"SpellImmunityType"			"SPELL_IMMUNITY_ALLIES_YES"
 		"AbilityDuration"			"60.0"
 
 		"precache"
 		{
 			"soundfile"				"soundevents/game_sounds_heroes/game_sounds_lich.vsndevts"
+			"particle"				"particles/units/heroes/hero_lich/lich_frost_armor.vpcf"
+			"particle"				"particles/status_fx/status_effect_frost_lich.vpcf"
 		}
 
 		"AbilityValues"
 		{
+			"duration"				"60.0"
 			"armor_bonus"     "200"
+			"building_armor_bonus_tooltip" "200"
 			"slow_movement_speed" "-20"
 			"slow_attack_speed"   "-10"
 			"slow_duration"     "5.0"
