@@ -38,6 +38,7 @@ require('components/timers/init')
 require('components/overhead_status/init')
 require('components/runes/init')
 require('components/fragment_quests/init')
+require('components/cinematics/init')
 
 if GetMapName() == "x_hero_siege_demo" then
 	require('components/hero_selection/init')
@@ -229,8 +230,9 @@ function GameMode:InitGameMode()
 	GameMode.bSeenWaitForPlayers = false
 	GameMode.vUserIds = {}
 	GameMode.VoteTable = {}
-	GameMode.CustomSetupDuration = IsInToolsMode() and 3600 or 20
+	GameMode.CustomSetupAutoReadyDelay = IsInToolsMode() and 10 or 30
 	GameMode.CustomSetupReadyLaunchDelay = 3
+	GameMode.CustomSetupDuration = IsInToolsMode() and 10 or 30
 	GameMode.CustomSetupState = nil
 
 	GameMode:OnFirstPlayerLoaded()
@@ -302,6 +304,10 @@ function GameMode:InitGameMode()
 	if XHSDevTools ~= nil then
 		XHSDevTools:Init()
 	end
+
+	if XHSPublishAllTomePurchaseStatuses ~= nil then
+		XHSPublishAllTomePurchaseStatuses()
+	end
 end
 
 function GameMode:OnDotaPauseEvent(event)
@@ -318,14 +324,25 @@ function GameMode:OnDotaPauseEvent(event)
 		paused = eventPaused == true or value == "1" or value == "true"
 	end
 
+	self:SetPauseHealthBarsHidden(paused)
+
 	CustomGameEventManager:Send_ServerToAllClients("xhs_game_pause_state", {
 		paused = paused and 1 or 0,
 	})
+
+	if XHSPublishAllTomePurchaseStatuses ~= nil then
+		_G.XHSTomePurchaseStatusCache = {}
+		XHSPublishAllTomePurchaseStatuses()
+	end
 end
 
 local CheckTeamDeath = 0
 
 function GameMode:OnThink()
+	if XHSPublishAllTomePurchaseStatuses ~= nil then
+		XHSPublishAllTomePurchaseStatuses()
+	end
+
 	if GameRules:IsGamePaused() == true then return 1 end
 	local newState = GameRules:State_Get()
 
@@ -603,6 +620,60 @@ function GameMode:FilterExecuteOrder(filterTable)
 				--					numUnits = numUnits + 1
 				--				end
 			end
+		end
+	end
+
+	-- holdout_frost_shield inherits the native Frost Armor implementation, so
+	-- there is no Lua OnSpellStart hook where a target impact sound can live.
+	-- Queue it from the cast order and only play it after a successful cast.
+	if order_type == DOTA_UNIT_ORDER_CAST_TARGET then
+		local frostShieldAbility = tonumber(abilityIndex) and EntIndexToHScript(tonumber(abilityIndex)) or nil
+		local frostShieldTarget = tonumber(targetIndex) and EntIndexToHScript(tonumber(targetIndex)) or nil
+		if frostShieldAbility ~= nil
+			and not frostShieldAbility:IsNull()
+			and frostShieldAbility:GetAbilityName() == "holdout_frost_shield"
+			and frostShieldTarget ~= nil
+			and not frostShieldTarget:IsNull()
+			and frostShieldAbility:IsCooldownReady() then
+			local oldModifier = frostShieldTarget:FindModifierByName("modifier_lich_frost_armor")
+			local oldRemaining = oldModifier and oldModifier:GetRemainingTime() or -1
+			local soundDelay = math.max(0.05, frostShieldAbility:GetCastPoint() + 0.05)
+
+			Timers:CreateTimer(soundDelay, function()
+				if frostShieldAbility == nil
+					or frostShieldAbility:IsNull()
+					or frostShieldTarget == nil
+					or frostShieldTarget:IsNull() then
+					return nil
+				end
+
+				local modifier = frostShieldTarget:FindModifierByName("modifier_lich_frost_armor")
+				local modifierRefreshed = modifier ~= nil and modifier:GetRemainingTime() > oldRemaining + 0.5
+				local cooldownStarted = frostShieldAbility:GetCooldownTimeRemaining() > 0
+				if modifierRefreshed or cooldownStarted then
+					frostShieldTarget:EmitSound("Hero_Lich.FrostArmor")
+				end
+				return nil
+			end)
+		end
+	end
+
+	-- Clicking the same Tombstone again while already channeling it is a harmless
+	-- misclick. Reject only that pickup order so the current channel keeps running;
+	-- movement, attacks, spells, and every other order still interrupt normally.
+	if DOTA_UNIT_ORDER_PICKUP_ITEM ~= nil
+		and order_type == DOTA_UNIT_ORDER_PICKUP_ITEM
+		and unit ~= nil
+		and XHSIsTombstonePickupByActiveChanneler ~= nil then
+		local pickupIndex = tonumber(targetIndex)
+		if pickupIndex == nil or pickupIndex <= 0 then
+			pickupIndex = tonumber(abilityIndex)
+		end
+		local pickupTarget = pickupIndex ~= nil and EntIndexToHScript(pickupIndex) or nil
+		if pickupTarget ~= nil
+			and not pickupTarget:IsNull()
+			and XHSIsTombstonePickupByActiveChanneler(unit, pickupTarget) then
+			return false
 		end
 	end
 
@@ -1014,20 +1085,67 @@ function GameMode:OnDotaItemPickedUp(event)
 	if event == nil then return end
 
 	local itemName = event.itemname or event.item_name or event.ItemName
-	if itemName ~= "item_shield_of_invincibility" then return end
-
 	local playerID = self:GetPlayerIDFromEvent(event)
 	local hero = playerID ~= nil and PlayerResource:GetSelectedHeroEntity(playerID) or nil
-	if (hero == nil or not IsValidEntity(hero) or hero:IsNull()) then
+	if hero == nil or not IsValidEntity(hero) or hero:IsNull() then
 		local heroIndex = tonumber(event.HeroEntityIndex or event.HeroEntIndex or event.hero_entindex or event.UnitEntityIndex)
 		if heroIndex ~= nil and heroIndex > 0 then
 			hero = EntIndexToHScript(heroIndex)
 		end
 	end
+
+	if itemName == "item_tombstone" then
+		if hero == nil or not IsValidEntity(hero) or hero:IsNull() or playerID == nil then return end
+		local itemIndex = tonumber(event.ItemEntityIndex or event.item_entindex or event.ItemEntIndex)
+		local item = itemIndex ~= nil and itemIndex > 0 and EntIndexToHScript(itemIndex) or nil
+		if item == nil or item:IsNull() then
+			for slot = 0, 14 do
+				local inventoryItem = hero:GetItemInSlot(slot)
+				if inventoryItem ~= nil
+					and not inventoryItem:IsNull()
+					and inventoryItem:GetAbilityName() == "item_tombstone"
+					and inventoryItem.xhs_channel_started ~= true then
+					item = inventoryItem
+					break
+				end
+			end
+		end
+		if item == nil or item:IsNull() then return end
+
+		item.xhs_reviver_entindex = hero:entindex()
+		GameRules:GetGameModeEntity():SetContextThink(DoUniqueString("xhs_tombstone_cast"), function()
+			if item == nil or item:IsNull() or hero == nil or hero:IsNull() or not hero:IsAlive() then return nil end
+
+			-- ItemCastOnPickup normally starts the channel before this callback.
+			-- Keep the explicit order only as a fallback for engine pickup edge cases.
+			if item.xhs_channel_started ~= true then
+				ExecuteOrderFromTable({
+					UnitIndex = hero:entindex(),
+					OrderType = DOTA_UNIT_ORDER_CAST_NO_TARGET,
+					AbilityIndex = item:entindex(),
+					PlayerID = playerID,
+					Queue = false,
+				})
+			end
+
+			GameRules:GetGameModeEntity():SetContextThink(DoUniqueString("xhs_tombstone_cast_check"), function()
+				if item ~= nil and not item:IsNull() and item.xhs_channel_started ~= true and XHSRearmTombstoneItem ~= nil then
+					XHSRearmTombstoneItem(item)
+				end
+				return nil
+			end, 0.25)
+			return nil
+		end, 0.03)
+		return
+	end
+
+	if itemName ~= "item_shield_of_invincibility" then return end
 	if hero ~= nil and IsValidEntity(hero) and not hero:IsNull() then
 		self:CleanupNearestShieldOfInvincibilityDropEffect(hero:GetAbsOrigin())
 	end
 end
+
+local HERO_IMAGE_INTRO_DURATION = 5.0
 
 function GameMode:HeroImage(event)
 	local PlayerID = event.pID
@@ -1051,6 +1169,7 @@ function GameMode:HeroImage(event)
 	end
 
 	if GameMode:IsHeroImageCompleted(PlayerID, hero) then
+		GameMode:SpecialEventTPQuit(hero)
 		Notifications:Bottom(hero:GetPlayerOwnerID(), { text = "You can do hero image only once!", duration = 5.0 })
 		CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "xhs_event_usage_update", {
 			hero_image_used = true,
@@ -1063,11 +1182,8 @@ function GameMode:HeroImage(event)
 			hero_image_busy = true,
 		})
 		Entities:FindByName(nil, "trigger_special_event_back4"):Enable()
-		CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "show_timer_hero_image", {})
-		CustomTimers.current_time["hero_image"] = SPECIAL_ARENA_DURATION
-		if FragmentQuests ~= nil then
-			FragmentQuests:OnOptionalEventStart("hero_image", SPECIAL_ARENA_DURATION)
-		end
+		CustomTimers.current_time["hero_image"] = 0
+		GameMode.HeroImageTimerStarted = false
 
 		GameMode.HeroImageUnit = CreateUnitByName(hero:GetUnitName(), point_beast, true, nil, nil, DOTA_TEAM_CUSTOM_1)
 		GameMode.HeroImageUnit:SetAngles(0, 210, 0)
@@ -1092,8 +1208,8 @@ function GameMode:HeroImage(event)
 			end
 		end
 
-		GameMode.HeroImageUnit:AddNewModifier(GameMode.HeroImageUnit, nil, "modifier_pause_creeps", { Duration = 5, IsHidden = true })
-		GameMode.HeroImageUnit:AddNewModifier(GameMode.HeroImageUnit, nil, "modifier_invulnerable", { Duration = 5, IsHidden = true })
+		GameMode.HeroImageUnit:AddNewModifier(GameMode.HeroImageUnit, nil, "modifier_pause_creeps", { Duration = HERO_IMAGE_INTRO_DURATION, IsHidden = true })
+		GameMode.HeroImageUnit:AddNewModifier(GameMode.HeroImageUnit, nil, "modifier_invulnerable", { Duration = HERO_IMAGE_INTRO_DURATION, IsHidden = true })
 		GameMode.HeroImageUnit:MakeIllusion()
 		GameMode.HeroImageUnit:AddAbility("hero_image_death")
 		GameMode.HeroImageUnit.Boss = true
@@ -1107,43 +1223,67 @@ function GameMode:HeroImage(event)
 			if hero:GetTeam() == DOTA_TEAM_GOODGUYS then
 				GameMode:SpecialEventTPQuit(hero)
 				SetHeroOptionalEventTomeLock(hero, "hero_image", true)
-				DisableItems(hero, SPECIAL_ARENA_DURATION)
+				DisableItems(hero, SPECIAL_ARENA_DURATION + HERO_IMAGE_INTRO_DURATION)
 				Notifications:Bottom(hero:GetPlayerOwnerID(),
 					{ text = "Special Event: Kill Hero Image for +250 Stats. You have 2 minutes.", duration = 5.0 })
 				TeleportHero(hero, point_hero:GetAbsOrigin())
 			end
 		end
 
-		timers.HeroImage = Timers:CreateTimer(SPECIAL_ARENA_DURATION, function()
-			local durationTrigger = Entities:FindByName(nil, "trigger_hero_image_duration")
-			if durationTrigger ~= nil then
-				durationTrigger:Enable()
+		-- The mirrored hero is invulnerable and paused during its entrance.
+		-- Start both the visible countdown and the authoritative timeout only
+		-- when that five-second introduction has finished.
+		timers.HeroImageIntro = Timers:CreateTimer(HERO_IMAGE_INTRO_DURATION, function()
+			timers.HeroImageIntro = nil
+			if GameMode.HeroImage_occuring ~= true
+				or GameMode.HeroImageUnit == nil
+				or not IsValidEntity(GameMode.HeroImageUnit)
+				or GameMode.HeroImageUnit:IsNull() then
+				return nil
 			end
-			GameMode.HeroImage_occuring = false
-			SetHeroOptionalEventTomeLock(hero, "hero_image", false)
-			local heroImageCompleted = GameMode:IsHeroImageCompleted(PlayerID, hero)
-			if FragmentQuests ~= nil then
-				FragmentQuests:OnOptionalEventEnd("hero_image", heroImageCompleted)
-			end
-			GameMode:ReturnHeroFromOptionalEvent(hero, "hero_image")
-			CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "xhs_event_usage_update", {
-				hero_image_used = heroImageCompleted,
-				hero_image_busy = false,
-			})
-			CustomGameEventManager:Send_ServerToAllClients("xhs_event_usage_update", {
-				hero_image_busy = false,
-			})
 
-			Timers:CreateTimer(5.5, function() --Debug time in case Hero Image kills the player at the very last second
-				local trigger = Entities:FindByName(nil, "trigger_hero_image_duration")
-				if trigger ~= nil then
-					trigger:Disable()
-				end
-			end)
-			if GameMode.HeroImageUnit ~= nil and IsValidEntity(GameMode.HeroImageUnit) and not GameMode.HeroImageUnit:IsNull() then
-				GameMode.HeroImageUnit:RemoveSelf()
+			CustomTimers.current_time["hero_image"] = SPECIAL_ARENA_DURATION
+			CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "show_timer_hero_image", {})
+			if FragmentQuests ~= nil then
+				FragmentQuests:OnOptionalEventStart("hero_image", SPECIAL_ARENA_DURATION)
 			end
-			GameMode.HeroImageUnit = nil
+			GameMode.HeroImageTimerStarted = true
+
+			timers.HeroImage = Timers:CreateTimer(SPECIAL_ARENA_DURATION, function()
+				timers.HeroImage = nil
+				local durationTrigger = Entities:FindByName(nil, "trigger_hero_image_duration")
+				if durationTrigger ~= nil then
+					durationTrigger:Enable()
+				end
+				GameMode.HeroImage_occuring = false
+				SetHeroOptionalEventTomeLock(hero, "hero_image", false)
+				local heroImageCompleted = GameMode:IsHeroImageCompleted(PlayerID, hero)
+				if FragmentQuests ~= nil and GameMode.HeroImageTimerStarted == true then
+					FragmentQuests:OnOptionalEventEnd("hero_image", heroImageCompleted)
+				end
+				GameMode.HeroImageTimerStarted = false
+				GameMode:ReturnHeroFromOptionalEvent(hero, "hero_image")
+				CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "xhs_event_usage_update", {
+					hero_image_used = heroImageCompleted,
+					hero_image_busy = false,
+				})
+				CustomGameEventManager:Send_ServerToAllClients("xhs_event_usage_update", {
+					hero_image_busy = false,
+				})
+
+				Timers:CreateTimer(5.5, function() --Debug time in case Hero Image kills the player at the very last second
+					local trigger = Entities:FindByName(nil, "trigger_hero_image_duration")
+					if trigger ~= nil then
+						trigger:Disable()
+					end
+				end)
+				if GameMode.HeroImageUnit ~= nil and IsValidEntity(GameMode.HeroImageUnit) and not GameMode.HeroImageUnit:IsNull() then
+					GameMode.HeroImageUnit:RemoveSelf()
+				end
+				GameMode.HeroImageUnit = nil
+			end)
+
+			return nil
 		end)
 	end
 end
@@ -1157,10 +1297,16 @@ function GameMode:SpiritBeast(event)
 
 	if GameMode.SpiritBeast_occuring == true then
 		GameMode:SpecialEventTPQuit(hero)
+		CustomGameEventManager:Send_ServerToAllClients("xhs_event_usage_update", {
+			spirit_beast_busy = true,
+		})
 		Notifications:Bottom(hero:GetPlayerOwnerID(),
 			{ text = "Spirit Beast is already occuring, please choose another event.", duration = 7.5 })
 	elseif GameMode.SpiritBeast_killed == false then
 		GameMode.SpiritBeast_occuring = true
+		CustomGameEventManager:Send_ServerToAllClients("xhs_event_usage_update", {
+			spirit_beast_busy = true,
+		})
 		Entities:FindByName(nil, "trigger_special_event_back3"):Enable()
 		CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "show_timer_spirit_beast", {})
 		CustomTimers.current_time["spirit_beast"] = SPECIAL_ARENA_DURATION
@@ -1169,11 +1315,15 @@ function GameMode:SpiritBeast(event)
 		end
 
 		timers.SpiritBeast = Timers:CreateTimer(SPECIAL_ARENA_DURATION, function()
+			timers.SpiritBeast = nil
 			if Entities:FindByName(nil, "trigger_spirit_beast_duration") then
 				Entities:FindByName(nil, "trigger_spirit_beast_duration"):Enable()
 			end
 
 			GameMode.SpiritBeast_occuring = false
+			CustomGameEventManager:Send_ServerToAllClients("xhs_event_usage_update", {
+				spirit_beast_busy = false,
+			})
 			SetHeroOptionalEventTomeLock(hero, "spirit_beast", false)
 			if FragmentQuests ~= nil then
 				FragmentQuests:OnOptionalEventEnd("spirit_beast", false)
@@ -1212,6 +1362,11 @@ function GameMode:SpiritBeast(event)
 
 		DisableItems(hero, SPECIAL_ARENA_DURATION)
 	elseif GameMode.SpiritBeast_killed == true then
+		GameMode:SpecialEventTPQuit(hero)
+		CustomGameEventManager:Send_ServerToAllClients("xhs_event_usage_update", {
+			spirit_beast_used = true,
+			spirit_beast_busy = false,
+		})
 		Notifications:Bottom(hero:GetPlayerOwnerID(), { text = "Spirit Beast has already been killed!", duration = 5.0 })
 	end
 end
@@ -1225,10 +1380,16 @@ function GameMode:FrostInfernal(event)
 
 	if GameMode.FrostInfernal_occuring == true then
 		GameMode:SpecialEventTPQuit(hero)
+		CustomGameEventManager:Send_ServerToAllClients("xhs_event_usage_update", {
+			frost_infernal_busy = true,
+		})
 		Notifications:Bottom(hero:GetPlayerOwnerID(),
 			{ text = "Frost Infernal is already occuring, please choose another event.", duration = 7.5 })
 	elseif GameMode.FrostInfernal_killed == false then
 		GameMode.FrostInfernal_occuring = true
+		CustomGameEventManager:Send_ServerToAllClients("xhs_event_usage_update", {
+			frost_infernal_busy = true,
+		})
 		Entities:FindByName(nil, "trigger_special_event_back2"):Enable()
 		CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "show_timer_frost_infernal", {})
 		CustomTimers.current_time["frost_infernal"] = SPECIAL_ARENA_DURATION
@@ -1237,11 +1398,15 @@ function GameMode:FrostInfernal(event)
 		end
 
 		timers.FrostInfernal = Timers:CreateTimer(SPECIAL_ARENA_DURATION, function()
+			timers.FrostInfernal = nil
 			if Entities:FindByName(nil, "trigger_frost_infernal_duration") then
 				Entities:FindByName(nil, "trigger_frost_infernal_duration"):Enable()
 			end
 
 			GameMode.FrostInfernal_occuring = false
+			CustomGameEventManager:Send_ServerToAllClients("xhs_event_usage_update", {
+				frost_infernal_busy = false,
+			})
 			SetHeroOptionalEventTomeLock(hero, "frost_infernal", false)
 			if FragmentQuests ~= nil then
 				FragmentQuests:OnOptionalEventEnd("frost_infernal", false)
@@ -1280,6 +1445,11 @@ function GameMode:FrostInfernal(event)
 
 		DisableItems(hero, SPECIAL_ARENA_DURATION)
 	else
+		GameMode:SpecialEventTPQuit(hero)
+		CustomGameEventManager:Send_ServerToAllClients("xhs_event_usage_update", {
+			frost_infernal_used = true,
+			frost_infernal_busy = false,
+		})
 		Notifications:Bottom(hero:GetPlayerOwnerID(), { text = "Frost Infernal has already been killed!", duration = 5.0 })
 	end
 end
@@ -1291,7 +1461,8 @@ function GameMode:AllHeroImages(event)
 	local point = Entities:FindByName(nil, "all_hero_image_player")
 
 	if GameMode.AllHeroImagesDead == true then
-		CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "xhs_event_usage_update", {
+		GameMode:SpecialEventTPQuit(hero)
+		CustomGameEventManager:Send_ServerToAllClients("xhs_event_usage_update", {
 			all_hero_images_used = true,
 			all_hero_images_busy = false,
 		})
@@ -1300,7 +1471,8 @@ function GameMode:AllHeroImages(event)
 	end
 
 	if GameMode.AllHeroImages_occuring == true then
-		CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "xhs_event_usage_update", {
+		GameMode:SpecialEventTPQuit(hero)
+		CustomGameEventManager:Send_ServerToAllClients("xhs_event_usage_update", {
 			all_hero_images_busy = true,
 		})
 		Notifications:Bottom(hero:GetPlayerOwnerID(),
@@ -1753,11 +1925,8 @@ function GameMode:IsPlayerEligibleForCustomSetupReady(player_id)
 		return false
 	end
 
-	local player = PlayerResource:GetPlayer(player_id)
-	if player == nil then
-		return false
-	end
-
+	-- Do not require GetPlayer() here: it can remain nil while the client is
+	-- loading, and excluding it would let already-loaded clients bypass it.
 	if PlayerResource:GetTeam(player_id) ~= DOTA_TEAM_GOODGUYS then
 		return false
 	end
@@ -1775,6 +1944,23 @@ function GameMode:GetCustomSetupEligiblePlayers()
 	end
 
 	return players
+end
+
+function GameMode:AreAllCustomSetupPlayersLoaded()
+	local eligible_players = self:GetCustomSetupEligiblePlayers()
+
+	if #eligible_players <= 0 then
+		return false, eligible_players
+	end
+
+	for _, player_id in pairs(eligible_players) do
+		-- DOTA_CONNECTION_STATE_CONNECTED is 2 in both Lua and Panorama.
+		if PlayerResource:GetConnectionState(player_id) ~= 2 then
+			return false, eligible_players
+		end
+	end
+
+	return true, eligible_players
 end
 
 function GameMode:GetCustomSetupSummary()
@@ -1806,17 +1992,34 @@ function GameMode:PushCustomSetupNetTable()
 
 	local ready_players, ready_count, total_players = self:GetCustomSetupSummary()
 	local remaining_time = 0
+	local auto_ready_remaining = 0
+	local auto_ready_active = false
+	local all_players_loaded = false
 
 	if self.CustomSetupState.active then
-		remaining_time = math.max(0, math.ceil(self.CustomSetupState.deadline - GameRules:GetGameTime()))
+		local current_time = GameRules:GetGameTime()
+		remaining_time = math.max(0, math.ceil(self.CustomSetupState.deadline - current_time))
+		all_players_loaded = self:AreAllCustomSetupPlayersLoaded()
+
+		if self.CustomSetupState.all_players_loaded_since ~= nil and ready_count < total_players then
+			auto_ready_active = true
+			auto_ready_remaining = math.max(0, math.ceil(
+				(self.CustomSetupAutoReadyDelay or 30) -
+				(current_time - self.CustomSetupState.all_players_loaded_since)
+			))
+		end
 	end
 
 	CustomNetTables:SetTableValue("game_options", "custom_setup", {
 		active = self.CustomSetupState.active and 1 or 0,
 		launching = self.CustomSetupState.launching and 1 or 0,
 		launch_reason = self.CustomSetupState.launch_reason or "",
-		duration = self.CustomSetupDuration or 20,
+		duration = self.CustomSetupDuration or 60,
 		remaining_time = remaining_time,
+		auto_ready_delay = self.CustomSetupAutoReadyDelay or 30,
+		auto_ready_remaining = auto_ready_remaining,
+		auto_ready_active = auto_ready_active and 1 or 0,
+		all_players_loaded = all_players_loaded and 1 or 0,
 		ready_count = ready_count,
 		total_players = total_players,
 		ready_players = ready_players,
@@ -1833,8 +2036,10 @@ function GameMode:StartCustomSetupFlow()
 		active = true,
 		launching = false,
 		launch_reason = "",
-		deadline = GameRules:GetGameTime() + (self.CustomSetupDuration or 20),
+		deadline = GameRules:GetGameTime() + (self.CustomSetupDuration or 60),
 		all_ready_triggered = false,
+		auto_ready_triggered = false,
+		all_players_loaded_since = nil,
 		ready_players = {},
 	}
 
@@ -1875,8 +2080,38 @@ function GameMode:CustomSetupThink()
 	end
 
 	local ready_launch_delay = self.CustomSetupReadyLaunchDelay or 3
+	local auto_ready_delay = self.CustomSetupAutoReadyDelay or 30
 	local current_time = GameRules:GetGameTime()
 	local _, ready_count, total_players = self:GetCustomSetupSummary()
+	local all_players_loaded, eligible_players = self:AreAllCustomSetupPlayersLoaded()
+
+	if all_players_loaded and ready_count < total_players then
+		if self.CustomSetupState.all_players_loaded_since == nil then
+			self.CustomSetupState.all_players_loaded_since = current_time
+			print(string.format(
+				"[XHS CustomSetup] All %d eligible player(s) loaded; auto-ready starts in %ds.",
+				total_players,
+				auto_ready_delay
+			))
+		end
+
+		if current_time - self.CustomSetupState.all_players_loaded_since >= auto_ready_delay then
+			for _, player_id in pairs(eligible_players) do
+				self.CustomSetupState.ready_players[player_id] = true
+			end
+
+			self.CustomSetupState.auto_ready_triggered = true
+			ready_count = total_players
+			print(string.format(
+				"[XHS CustomSetup] Auto-ready applied to %d player(s) after %ds.",
+				total_players,
+				auto_ready_delay
+			))
+		end
+	elseif self.CustomSetupState.all_players_loaded_since ~= nil and ready_count < total_players then
+		print("[XHS CustomSetup] Auto-ready timer reset because at least one player is no longer loaded.")
+		self.CustomSetupState.all_players_loaded_since = nil
+	end
 
 	if total_players > 0 and ready_count >= total_players then
 		local all_ready_deadline = current_time + ready_launch_delay
@@ -1891,7 +2126,9 @@ function GameMode:CustomSetupThink()
 
 	if current_time >= self.CustomSetupState.deadline then
 		local launch_reason = "timeout"
-		if self.CustomSetupState.all_ready_triggered then
+		if self.CustomSetupState.auto_ready_triggered then
+			launch_reason = "auto_ready"
+		elseif self.CustomSetupState.all_ready_triggered then
 			launch_reason = "all_ready"
 		end
 
