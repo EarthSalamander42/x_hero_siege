@@ -7,6 +7,8 @@ local baseUrl = "https://api.frostrose-studio.com/"
 local endUrlWebsite = "website/"
 local endUrlFrostrose = "imba/"
 local timeout = 5000
+local gameCompleteTimeout = 12000
+local gameCompleteMaxAttempts = 4
 local native_print = print
 
 function api:Init()
@@ -605,7 +607,7 @@ function api:Request(endpoint, okCallback, failCallback, method, payload)
 		return failCallback()
 	end
 
-	request:SetHTTPRequestAbsoluteTimeoutMS(timeout)
+	request:SetHTTPRequestAbsoluteTimeoutMS(endpoint == "game-complete" and gameCompleteTimeout or timeout)
 
 	local header_key = nil
 
@@ -634,13 +636,17 @@ function api:Request(endpoint, okCallback, failCallback, method, payload)
 		-- print(result)
 		local code = result.StatusCode;
 
-		local fail = function(message)
+		local fail = function(message, details)
 			if (code == nil) then
 				code = 0
 			end
 
 			print("Request to " .. endpoint .. " failed with message " .. message .. " (" .. tostring(code) .. ")")
-			failCallback()
+			local failure = details or {}
+			failure.message = failure.message or message
+			failure.status_code = failure.status_code or code
+			failure.retryable = failure.retryable ~= false
+			failCallback(failure)
 		end
 
 		if code == 0 then
@@ -665,7 +671,7 @@ function api:Request(endpoint, okCallback, failCallback, method, payload)
 			if obj.error == nil then
 				return fail("Invalid response from server")
 			elseif obj.error == true and obj.message ~= nil then
-				return fail(obj.message)
+				return fail(obj.message, obj)
 			elseif obj.error == true and obj.message == nil then
 				return fail("Unknown server error. (message is nil)")
 			elseif code >= 200 and code < 400 then
@@ -733,6 +739,12 @@ function api:RegisterGame(callback)
 end
 
 function api:ProcessCompletedGame(data, payload)
+	if self.completion_processed then
+		return
+	end
+	self.completion_processed = true
+	self.completion_in_progress = false
+
 	local full_data = {
 		players = payload.players,
 		data = data,
@@ -748,7 +760,48 @@ function api:ProcessCompletedGame(data, payload)
 	GameRules:SetGameWinner(GAME_WINNER_TEAM, true)
 end
 
+function api:SubmitGameCompletion(payload, attempt)
+	attempt = tonumber(attempt) or 1
+
+	self:Request("game-complete", function(data)
+			print("game-complete: Game complete successful on attempt " .. tostring(attempt) .. "!")
+			api:ProcessCompletedGame(data, payload)
+		end,
+
+		function(failure)
+			local message = failure and failure.message or "Unknown completion error"
+			print("game-complete: Attempt " .. tostring(attempt) .. " failed: " .. tostring(message))
+
+			if attempt < gameCompleteMaxAttempts and (failure == nil or failure.retryable ~= false) then
+				local retryDelay = math.pow(2, attempt - 1)
+				print("game-complete: Retrying in " .. tostring(retryDelay) .. " second(s)")
+				GameRules:GetGameModeEntity():SetContextThink(DoUniqueString("retry_game_complete"), function()
+					api:SubmitGameCompletion(payload, attempt + 1)
+					return nil
+				end, retryDelay)
+				return
+			end
+
+			print("game-complete: All retry attempts failed; ending with an explicit backend error")
+			api:ProcessCompletedGame({
+				players = {},
+				completion = {
+					failed = true,
+					retry_attempts = attempt,
+					error = message,
+				}
+			}, payload)
+		end,
+		"POST", payload
+	)
+end
+
 function api:CompleteGame()
+	if self.completion_in_progress or self.completion_processed then
+		print("CompleteGame ignored: completion is already in progress or processed")
+		return
+	end
+	self.completion_in_progress = true
 	print("CompleteGame")
 	local players = {}
 
@@ -895,18 +948,7 @@ function api:CompleteGame()
 		map = GetMapName(),
 	}
 
-	self:Request("game-complete", function(data)
-			print("game-complete: Game complete successful!")
-			api:ProcessCompletedGame(data, payload)
-		end,
-
-		function(data)
-			print("game-complete: Error on game complete!")
-			print(data)
-			api:ProcessCompletedGame(data, payload)
-		end,
-		"POST", payload
-	)
+	self:SubmitGameCompletion(payload, 1)
 end
 
 function api:DiretideHallOfFame(successCallback, failCallback)
