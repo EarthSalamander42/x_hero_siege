@@ -119,6 +119,290 @@ function GetReductionFromArmor(armor)
 	return ((0.052 * armor) / (0.9 + 0.048 * armor))
 end
 
+local XHS_SUPPORTER_LIFESTEAL_CONFIG = {
+	attack = {
+		slot = "attack_lifesteal",
+		anchor = "particles/custom/supporter_pass/attack_lifesteal_anchor.vpcf",
+		hero_field = "xhs_supporter_attack_lifesteal_particle",
+		cooldown = 0.30,
+	},
+	spell = {
+		slot = "spell_lifesteal",
+		anchor = "particles/custom/supporter_pass/spell_lifesteal_anchor.vpcf",
+		hero_field = "xhs_supporter_spell_lifesteal_particle",
+	},
+}
+
+local XHS_SUPPORTER_LIFESTEAL_PARTICLE_PROFILES = {
+	["particles/econ/items/drow/drow_arcana/drow_arcana_lifesteal.vpcf"] = "hero_cp1",
+	["particles/econ/items/lone_druid/lone_druid_immortal_2021/lone_druid_immortal_2021_lifesteal.vpcf"] = "hero_cp1",
+	["particles/item/lifesteal_mask/lifesteal_particle.vpcf"] = "victim_to_hero",
+}
+
+local XHS_SUPPORTER_LIFESTEAL_BLOCKED_PREFIXES = {
+	"particles/units/heroes/hero_skeletonking/wraith_king_vampiric_aura_lifesteal",
+	"particles/units/heroes/hero_skeletonking/skeletonking_vampiric_aura_lifesteal",
+}
+
+local function XHSIsValidLifestealEntity(entity)
+	if entity == nil then return false end
+	if IsValidEntity ~= nil and not IsValidEntity(entity) then return false end
+	if entity.IsNull ~= nil and entity:IsNull() then return false end
+	return true
+end
+
+local function XHSGetLifestealPlayerID(hero)
+	if not XHSIsValidLifestealEntity(hero) then return nil end
+	if hero.IsRealHero == nil or not hero:IsRealHero() then return nil end
+	if hero.GetPlayerOwnerID == nil then return nil end
+
+	local playerID = hero:GetPlayerOwnerID()
+	if type(playerID) ~= "number" or playerID < 0 then return nil end
+	if PlayerResource ~= nil and PlayerResource.IsValidPlayerID ~= nil
+		and not PlayerResource:IsValidPlayerID(playerID) then
+		return nil
+	end
+
+	return playerID
+end
+
+local function XHSIsValidLifestealParticlePath(path)
+	if type(path) ~= "string" then return false end
+	local normalized = string.lower(path)
+	return string.sub(normalized, 1, 10) == "particles/"
+		and string.sub(normalized, -5) == ".vpcf"
+end
+
+local function XHSIsBlockedLifestealParticle(path)
+	if not XHSIsValidLifestealParticlePath(path) then return false end
+	local normalized = string.lower(path)
+
+	for _, prefix in ipairs(XHS_SUPPORTER_LIFESTEAL_BLOCKED_PREFIXES) do
+		if string.sub(normalized, 1, string.len(prefix)) == prefix then
+			return true
+		end
+	end
+
+	return false
+end
+
+local function XHSGetLifestealOverrideParticle(anchor, playerID)
+	if CustomNetTables == nil or CustomNetTables.GetTableValue == nil then return nil end
+
+	local override = CustomNetTables:GetTableValue(
+		"supporter_pass_player",
+		anchor .. "_" .. tostring(playerID)
+	)
+	if type(override) ~= "table" then return nil end
+	return override[1] or override["1"]
+end
+
+local function XHSResolveSupporterLifestealParticle(hero, playerID, config)
+	if Battlepass ~= nil and Battlepass.AreSupporterRewardsEnabled ~= nil then
+		local success, enabled = pcall(Battlepass.AreSupporterRewardsEnabled, Battlepass, playerID)
+		if success and not enabled then
+			local disabledOverride = XHSGetLifestealOverrideParticle(config.anchor, playerID)
+			if disabledOverride ~= nil and disabledOverride ~= config.anchor then
+				return nil
+			end
+			return config.anchor
+		end
+	end
+
+	local heroParticle = hero[config.hero_field]
+	if XHSIsValidLifestealParticlePath(heroParticle) then
+		if XHSIsBlockedLifestealParticle(heroParticle) then return nil end
+		if heroParticle ~= config.anchor then return heroParticle end
+	end
+
+	local overrideParticle = XHSGetLifestealOverrideParticle(config.anchor, playerID)
+	if XHSIsValidLifestealParticlePath(overrideParticle) then
+		if XHSIsBlockedLifestealParticle(overrideParticle) then return nil end
+		if overrideParticle ~= config.anchor then return overrideParticle end
+	end
+
+	if Battlepass ~= nil and Battlepass.GetEquippedSupporterItem ~= nil then
+		local itemSuccess, item = pcall(
+			Battlepass.GetEquippedSupporterItem,
+			Battlepass,
+			playerID,
+			config.slot
+		)
+		if itemSuccess and type(item) == "table" then
+			local catalogParticle = nil
+			if Battlepass.GetSupporterItemParticle ~= nil then
+				local particleSuccess, resolvedParticle = pcall(
+					Battlepass.GetSupporterItemParticle,
+					Battlepass,
+					item,
+					config.anchor
+				)
+				if particleSuccess then
+					catalogParticle = resolvedParticle
+				end
+			end
+
+			local itemParticle = catalogParticle
+			if not XHSIsValidLifestealParticlePath(itemParticle) then
+				itemParticle = item.particle
+			end
+			if not XHSIsValidLifestealParticlePath(itemParticle) then
+				itemParticle = item.particle_path
+			end
+			if not XHSIsValidLifestealParticlePath(itemParticle) then
+				itemParticle = item.file
+			end
+			if XHSIsValidLifestealParticlePath(itemParticle) then
+				if XHSIsBlockedLifestealParticle(itemParticle) then return nil end
+				if itemParticle ~= config.anchor then return itemParticle end
+			end
+		end
+	end
+
+	return config.anchor
+end
+
+local function XHSSetLifestealParticleControlEntity(particle, controlPoint, entity)
+	if not XHSIsValidLifestealEntity(entity) then return false end
+
+	ParticleManager:SetParticleControl(particle, controlPoint, entity:GetAbsOrigin())
+	ParticleManager:SetParticleControlEnt(
+		particle,
+		controlPoint,
+		entity,
+		PATTACH_POINT_FOLLOW,
+		"attach_hitloc",
+		entity:GetAbsOrigin(),
+		true
+	)
+	return true
+end
+
+local function XHSCreateSupporterLifestealParticle(hero, victim, particleName)
+	if not XHSIsValidLifestealParticlePath(particleName) then return false end
+	if XHSIsBlockedLifestealParticle(particleName) then return false end
+	if ParticleManager == nil or ParticleManager.CreateParticle == nil then return false end
+
+	local profile = XHS_SUPPORTER_LIFESTEAL_PARTICLE_PROFILES[string.lower(particleName)] or "hero"
+	local parent = hero
+	if profile == "victim_to_hero" then
+		if not XHSIsValidLifestealEntity(victim) then return false end
+		parent = victim
+	end
+
+	local particle = ParticleManager:CreateParticle(
+		particleName,
+		PATTACH_ABSORIGIN_FOLLOW,
+		parent,
+		hero
+	)
+	if particle == nil or particle < 0 then return false end
+
+	if profile == "victim_to_hero" then
+		XHSSetLifestealParticleControlEntity(particle, 0, victim)
+		XHSSetLifestealParticleControlEntity(particle, 1, hero)
+	elseif profile == "hero_cp1" then
+		XHSSetLifestealParticleControlEntity(particle, 0, hero)
+		XHSSetLifestealParticleControlEntity(particle, 1, hero)
+	else
+		XHSSetLifestealParticleControlEntity(particle, 0, hero)
+	end
+
+	ParticleManager:ReleaseParticleIndex(particle)
+	return true
+end
+
+local function XHSGetSupporterLifestealState(hero)
+	hero.xhs_supporter_lifesteal_fx_state = hero.xhs_supporter_lifesteal_fx_state or {}
+	return hero.xhs_supporter_lifesteal_fx_state
+end
+
+local function XHSGetSupporterLifestealTime()
+	if GameRules ~= nil and GameRules.GetGameTime ~= nil then
+		return GameRules:GetGameTime()
+	end
+	if Time ~= nil then return Time() end
+	return nil
+end
+
+function XHSPlaySupporterLifestealFX(hero, victim, kind, actualHeal)
+	if IsServer ~= nil and not IsServer() then return false end
+
+	local playerID = XHSGetLifestealPlayerID(hero)
+	local config = XHS_SUPPORTER_LIFESTEAL_CONFIG[kind]
+	local heal = tonumber(actualHeal) or 0
+	if playerID == nil or config == nil or heal <= 0 then return false end
+
+	if config.cooldown ~= nil then
+		local state = XHSGetSupporterLifestealState(hero)
+		local now = XHSGetSupporterLifestealTime()
+		local lastTime = tonumber(state.last_attack_fx_time)
+		if now ~= nil and lastTime ~= nil and now >= lastTime
+			and now - lastTime < config.cooldown then
+			return false
+		end
+		if now ~= nil then
+			state.last_attack_fx_time = now
+		end
+	end
+
+	local particleName = XHSResolveSupporterLifestealParticle(hero, playerID, config)
+	return XHSCreateSupporterLifestealParticle(hero, victim, particleName)
+end
+
+function XHSPlaySupporterAttackLifestealFX(hero, victim, actualHeal)
+	return XHSPlaySupporterLifestealFX(hero, victim, "attack", actualHeal)
+end
+
+function XHSQueueSupporterSpellLifestealFX(hero, victim, actualHeal)
+	if IsServer ~= nil and not IsServer() then return false end
+	if XHSGetLifestealPlayerID(hero) == nil then return false end
+
+	local heal = tonumber(actualHeal) or 0
+	if heal <= 0 then return false end
+
+	local state = XHSGetSupporterLifestealState(hero)
+	state.pending_spell_heal = (tonumber(state.pending_spell_heal) or 0) + heal
+	if XHSIsValidLifestealEntity(victim) then
+		state.pending_spell_victim = victim
+	end
+	if state.spell_fx_scheduled then return true end
+	state.spell_fx_scheduled = true
+
+	local function FlushSupporterSpellLifestealFX()
+		state.spell_fx_scheduled = false
+		local pendingHeal = tonumber(state.pending_spell_heal) or 0
+		local pendingVictim = state.pending_spell_victim
+		state.pending_spell_heal = nil
+		state.pending_spell_victim = nil
+
+		if pendingHeal > 0 then
+			XHSPlaySupporterLifestealFX(hero, pendingVictim, "spell", pendingHeal)
+		end
+		return nil
+	end
+
+	if Timers ~= nil and Timers.CreateTimer ~= nil then
+		Timers:CreateTimer(0.03, FlushSupporterSpellLifestealFX)
+		return true
+	end
+
+	if GameRules ~= nil and GameRules.GetGameModeEntity ~= nil then
+		local gameMode = GameRules:GetGameModeEntity()
+		if gameMode ~= nil then
+			local contextName = "xhs_supporter_spell_lifesteal_" .. tostring(hero:entindex())
+			if DoUniqueString ~= nil then
+				contextName = DoUniqueString(contextName)
+			end
+			gameMode:SetContextThink(contextName, FlushSupporterSpellLifestealFX, 0.03)
+			return true
+		end
+	end
+
+	FlushSupporterSpellLifestealFX()
+	return true
+end
+
 function CDOTA_BaseNPC:SendLifestealAttack(hTarget, damage_dealt)
 	local lifesteal = 0
 	local lifesteal_source = nil
@@ -145,10 +429,7 @@ function CDOTA_BaseNPC:SendLifestealAttack(hTarget, damage_dealt)
 		if actual_heal <= 0 then return end
 
 		SendOverheadEventMessage(nil, OVERHEAD_ALERT_HEAL, self, actual_heal, nil)
-
-		local lifesteal_pfx = ParticleManager:CreateParticle("particles/generic_gameplay/generic_lifesteal.vpcf", PATTACH_ABSORIGIN_FOLLOW, self)
-		ParticleManager:SetParticleControl(lifesteal_pfx, 0, self:GetAbsOrigin())
-		ParticleManager:ReleaseParticleIndex(lifesteal_pfx)
+		XHSPlaySupporterAttackLifestealFX(self, hTarget, actual_heal)
 	end
 end
 

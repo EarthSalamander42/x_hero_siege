@@ -472,3 +472,198 @@
 .XHSDevToolsMuted {
 	color: #8fa5ae;
 }
+
+.XHSDevToolsBotCardGrid {
+	width: 100%;
+	flow-children: right-wrap;
+}
+
+.XHSDevToolsBotCard {
+	width: 49%;
+	min-height: 382px;
+	margin-right: 1%;
+	margin-bottom: 8px;
+	padding: 9px;
+	flow-children: down;
+	background-color: gradient(linear, 0% 0%, 100% 100%, from(#0b2029e8), to(#080f15e8));
+	border: 1px solid #65d8ff38;
+	box-shadow: inset #42d4ff10 0px 0px 10px 0px;
+}
+
+.XHSDevToolsBotCard.HasError {
+	border-color: #ff696980;
+	background-color: gradient(linear, 0% 0%, 100% 100%, from(#2b1518e8), to(#100b10e8));
+}
+
+.XHSDevToolsBotCardHeader {
+	width: 100%;
+	height: 48px;
+	margin-bottom: 6px;
+	flow-children: right;
+}
+
+.XHSDevToolsBotHeaderText {
+	width: fill-parent-flow(1);
+	vertical-align: center;
+	flow-children: down;
+}
+
+.XHSDevToolsBotName {
+	width: 100%;
+	color: #eafaff;
+	font-size: 15px;
+	font-weight: bold;
+	text-shadow: 0px 1px 2px 2 #000000;
+	text-overflow: shrink;
+}
+
+.XHSDevToolsBotMeta {
+	width: 100%;
+	margin-top: 2px;
+	color: #7da9b9;
+	font-size: 10px;
+	text-transform: uppercase;
+	text-shadow: 0px 1px 2px 2 #000000;
+	text-overflow: shrink;
+}
+
+.XHSDevToolsBotStateRow {
+	width: 100%;
+	height: 25px;
+	margin-bottom: 5px;
+	padding: 3px 5px;
+	flow-children: right;
+	background-color: #102d38bb;
+	border: 1px solid #5bd9ff2e;
+}
+
+.XHSDevToolsBotState,
+.XHSDevToolsBotGoal {
+	vertical-align: center;
+	font-size: 11px;
+	text-shadow: 0px 1px 2px 2 #000000;
+	text-overflow: shrink;
+}
+
+.XHSDevToolsBotState {
+	width: 42%;
+	color: #88e5ff;
+	font-weight: bold;
+}
+
+.XHSDevToolsBotGoal {
+	width: 58%;
+	color: #c4d8df;
+	text-align: right center;
+}
+
+.XHSDevToolsBotMetrics {
+	width: 100%;
+	margin-bottom: 5px;
+	flow-children: right-wrap;
+}
+
+.XHSDevToolsBotMetric {
+	width: 49%;
+	height: 27px;
+	margin-right: 1%;
+	margin-bottom: 3px;
+	padding: 2px 4px;
+	flow-children: down;
+	background-color: #070d12a8;
+	border: 1px solid #ffffff0c;
+}
+
+.XHSDevToolsBotMetric.Wide {
+	width: 99%;
+}
+
+.XHSDevToolsBotMetricKey {
+	width: 100%;
+	height: 10px;
+	color: #657f8a;
+	font-size: 8px;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+}
+
+.XHSDevToolsBotMetricValue {
+	width: 100%;
+	height: 14px;
+	color: #d0e4ea;
+	font-size: 10px;
+	text-overflow: shrink;
+}
+
+.XHSDevToolsBotDecisions {
+	width: 100%;
+	margin-bottom: 5px;
+	padding: 4px 5px;
+	flow-children: down;
+	background-color: #070d12a8;
+}
+
+.XHSDevToolsBotDecisionLine,
+.XHSDevToolsBotActionLine {
+	width: 100%;
+	color: #a8c0c9;
+	font-size: 9px;
+	line-height: 12px;
+	text-overflow: shrink;
+	text-shadow: 0px 1px 2px 2 #000000;
+}
+
+.XHSDevToolsBotSubheading {
+	width: 100%;
+	margin-top: 1px;
+	margin-bottom: 2px;
+	color: #659db0;
+	font-size: 9px;
+	font-weight: bold;
+	letter-spacing: 1px;
+}
+
+.XHSDevToolsBotActionsList {
+	width: 100%;
+	min-height: 38px;
+	margin-bottom: 4px;
+	padding: 3px 5px;
+	flow-children: down;
+	background-color: #071117aa;
+	border: 1px solid #4acff51a;
+}
+
+.XHSDevToolsBotEngine {
+	width: 100%;
+	margin-bottom: 5px;
+	color: #75cf9b;
+	font-size: 10px;
+}
+
+.XHSDevToolsBotEngine.Error,
+.XHSDevToolsBotError {
+	color: #ff8e8e;
+}
+
+.XHSDevToolsBotError {
+	width: 100%;
+	margin-bottom: 5px;
+	font-size: 10px;
+	white-space: normal;
+}
+
+.XHSDevToolsBotGoalGrid {
+	width: 100%;
+	flow-children: right-wrap;
+}
+
+.XHSDevToolsBotGoalGrid .XHSDevToolsButton.Tiny {
+	width: 19%;
+	height: 26px;
+	margin-right: 1%;
+	margin-bottom: 0px;
+}
+
+.XHSDevToolsBotGoalGrid .XHSDevToolsButton.Tiny Label {
+	font-size: 10px;
+}

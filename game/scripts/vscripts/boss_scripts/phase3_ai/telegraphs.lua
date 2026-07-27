@@ -13,6 +13,16 @@ end
 local function CreateWarning(position, radius, duration, primary, secondary, style)
 	if not ValidVector(position) then return nil end
 
+	-- The visual telegraph remains authoritative for players. In a Tools bot
+	-- session, mirror it into the AI danger registry so bots react to the exact
+	-- same warning window instead of reading hidden spell state.
+	if XHSBotDangerRegistry ~= nil and XHSBotDangerRegistry.AddCircle ~= nil then
+		XHSBotDangerRegistry:AddCircle(position, radius or 180, duration or 1.0, {
+			severity = 1,
+			label = "phase3_boss_telegraph",
+		})
+	end
+
 	local particle = ParticleManager:CreateParticle(XHSBossTelegraphs.PARTICLE, PATTACH_WORLDORIGIN, nil)
 	ParticleManager:SetParticleControl(particle, 0, position)
 	ParticleManager:SetParticleControl(particle, 1, Vector(radius or 180, 0, 0))

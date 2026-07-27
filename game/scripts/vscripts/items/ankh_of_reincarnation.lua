@@ -3,6 +3,8 @@
 
 require("boss_scripts/phase3_ai/magtheridon")
 
+local SupporterRecoveryEffects = require("components/battlepass/recovery_effects"):Init()
+
 local function RespawnMagtheridon(iBossCount, vPosition, iAnkhCharges)
 	if iAnkhCharges == 0 then return end
 
@@ -45,10 +47,7 @@ end
 
 local function PlayAnkhRespawnParticle(unit)
 	if unit == nil or unit:IsNull() then return end
-
-	local particle = ParticleManager:CreateParticle(ANKH_RESPAWN_PARTICLE, PATTACH_ABSORIGIN_FOLLOW, unit)
-	ParticleManager:SetParticleControl(particle, 0, unit:GetAbsOrigin())
-	ParticleManager:ReleaseParticleIndex(particle)
+	SupporterRecoveryEffects:PlayRebirth(unit, ANKH_RESPAWN_PARTICLE)
 end
 
 local function SetXHSReincarnationNetTable(unit, active, duration)

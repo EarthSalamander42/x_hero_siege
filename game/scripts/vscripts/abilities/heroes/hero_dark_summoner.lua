@@ -63,7 +63,6 @@ local target = keys.unit
 local ability = keys.ability
 local ability_level = ability:GetLevel() - 1
 local damage = keys.damage
-local particle_lifesteal = keys.particle_lifesteal
 local modifier_prevent = keys.modifier_prevent
 local hero_lifesteal = ability:GetLevelSpecialValueFor("hero_lifesteal", ability_level)
 local creep_lifesteal = ability:GetLevelSpecialValueFor("creep_lifesteal", ability_level)
@@ -73,20 +72,21 @@ local creep_lifesteal = ability:GetLevelSpecialValueFor("creep_lifesteal", abili
 		return nil
 	end
 
-	-- Play the particle
-	local lifesteal_fx = ParticleManager:CreateParticle(particle_lifesteal, PATTACH_ABSORIGIN_FOLLOW, caster)
-	ParticleManager:SetParticleControl(lifesteal_fx, 0, caster:GetAbsOrigin())
-	ParticleManager:ReleaseParticleIndex(lifesteal_fx)
-
 	-- Delay the lifesteal for one game tick to prevent blademail/octarine interaction
 	Timers:CreateTimer(0.01, function()
-		
+		local health_before = caster:GetHealth()
+
 		-- If the target is a real hero, heal for the full value
 		if target:IsRealHero() or target:IsConsideredHero() then
 			caster:Heal(damage * hero_lifesteal / 100, caster)
 		-- else, heal for the reduced value
 		else
 			caster:Heal(damage * creep_lifesteal / 100, caster)
+		end
+
+		local actual_heal = math.max(0, caster:GetHealth() - health_before)
+		if actual_heal > 0 and XHSQueueSupporterSpellLifestealFX ~= nil then
+			XHSQueueSupporterSpellLifestealFX(caster, target, actual_heal)
 		end
 	end)
 end

@@ -1,6 +1,20 @@
 -- Copyright (C) 2018  Frostrose Studio
 -- Battlepass System
 
+local function IsPersistentBattlepassPlayer(playerID)
+	playerID = tonumber(playerID)
+	if playerID == nil or playerID < 0 or not PlayerResource:IsValidPlayerID(playerID) then
+		return false
+	end
+	if IsXHSPersistentPlayerID ~= nil then
+		return IsXHSPersistentPlayerID(playerID)
+	end
+	if PlayerResource.IsFakeClient ~= nil then
+		return not PlayerResource:IsFakeClient(playerID)
+	end
+	return true
+end
+
 ListenToGameEvent('game_rules_state_change', function(keys)
 	if GameRules:State_Get() == DOTA_GAMERULES_STATE_CUSTOM_GAME_SETUP then
 		_G.Battlepass = _G.Battlepass or class({})
@@ -36,6 +50,16 @@ end, nil)
 
 ListenToGameEvent("entity_killed", function(event)
 	if Battlepass and Battlepass.OnSupporterPassEntityKilled then
+		local attacker = event.entindex_attacker and EntIndexToHScript(event.entindex_attacker) or nil
+		local playerID = nil
+		if attacker ~= nil and XHSGetPlayerIDFromUnit ~= nil then
+			playerID = XHSGetPlayerIDFromUnit(attacker)
+		elseif attacker ~= nil and attacker.GetPlayerOwnerID ~= nil then
+			playerID = attacker:GetPlayerOwnerID()
+		end
+		if playerID ~= nil and playerID >= 0 and not IsPersistentBattlepassPlayer(playerID) then
+			return
+		end
 		Battlepass:OnSupporterPassEntityKilled(event)
 	end
 end, nil)
@@ -43,6 +67,7 @@ end, nil)
 ListenToGameEvent("player_disconnect", function(event)
 	local playerID = tonumber(event.PlayerID or event.playerid)
 	if playerID == nil or not Battlepass then return end
+	if not IsPersistentBattlepassPlayer(playerID) then return end
 	if Battlepass.CleanupSupporterDevTest then Battlepass:CleanupSupporterDevTest(playerID, false) end
 	if Battlepass.DonatorCompanion then Battlepass:DonatorCompanion(playerID, "", true) end
 	if Battlepass.RemoveDonatorStatue then Battlepass:RemoveDonatorStatue(playerID) end
@@ -63,15 +88,25 @@ ListenToGameEvent('npc_spawned', function(event)
 		CompanionCosmetics(npc, unit_name)
 	end
 
+	local npc_player_id = XHSGetPlayerIDFromUnit ~= nil and XHSGetPlayerIDFromUnit(npc) or nil
+	if npc_player_id == nil or npc_player_id < 0 then
+		if npc.GetPlayerID ~= nil then npc_player_id = npc:GetPlayerID() end
+		if (npc_player_id == nil or npc_player_id < 0) and npc.GetPlayerOwnerID ~= nil then
+			npc_player_id = npc:GetPlayerOwnerID()
+		end
+	end
+	if npc_player_id ~= nil and npc_player_id >= 0 and not IsPersistentBattlepassPlayer(npc_player_id) then
+		return
+	end
+
 	local donator_level = nil
 
-	if npc.GetPlayerID then
-		donator_level = api:GetDonatorStatus(npc:GetPlayerID())
+	if npc_player_id ~= nil and npc_player_id >= 0 then
+		donator_level = api:GetDonatorStatus(npc_player_id)
 	end
 
 	local ply_table = CustomNetTables:GetTableValue("supporter_pass_player", tostring(npc:GetPlayerOwnerID()))
 	if type(ply_table) ~= "table" then ply_table = nil end
-	local npc_player_id = npc.GetPlayerID and npc:GetPlayerID() or npc:GetPlayerOwnerID()
 	if api.GetBotDonatorStatus ~= nil and api:GetBotDonatorStatus(npc_player_id) ~= 0 and SupporterPass and SupporterPass.BuildPlayerTable then
 		local bot_ply_table = CustomNetTables:GetTableValue("supporter_pass_player", tostring(npc_player_id))
 		if type(bot_ply_table) ~= "table" then

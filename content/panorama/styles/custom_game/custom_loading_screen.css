@@ -5821,3 +5821,246 @@
 .AspectRatio4x3 #MainVoteButton {
 	height: 32px;
 }
+
+.xhs-bot-setup-card {
+	width: 100%;
+	min-height: 232px;
+	padding: 8px 10px 9px 10px;
+	flow-children: down;
+	background-color: gradient(linear, 0% 0%, 100% 100%, from(#10202bea), to(#09131cea));
+	border-bottom: 1px solid #62d8ff55;
+	box-shadow: inset #42cfff12 0px 0px 12px 0px;
+}
+
+.xhs-bot-setup-header {
+	width: 100%;
+	height: 25px;
+	margin-bottom: 4px;
+	flow-children: right;
+}
+
+.xhs-bot-setup-title {
+	width: fill-parent-flow(1.0);
+	vertical-align: center;
+	color: #dff8ff;
+	font-size: 17px;
+	font-weight: bold;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+	text-shadow: 0px 1px 3px 2 #000000;
+}
+
+.xhs-bot-setup-dev-badge {
+	vertical-align: center;
+	padding: 2px 5px 1px 5px;
+	color: #77ddff;
+	font-size: 9px;
+	font-weight: bold;
+	letter-spacing: 1px;
+	background-color: #0b3444dd;
+	border: 1px solid #61d9ff55;
+}
+
+.xhs-bot-setup-field-row {
+	width: 100%;
+	height: 29px;
+	margin-bottom: 4px;
+	flow-children: right;
+}
+
+.xhs-bot-setup-field-label,
+.xhs-bot-setup-composition-label {
+	width: 92px;
+	vertical-align: center;
+	color: #8fa9b7;
+	font-size: 11px;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+	text-shadow: 0px 1px 2px 2 #000000;
+}
+
+.xhs-bot-setup-composition-label {
+	width: 100%;
+	height: 15px;
+	margin-top: 1px;
+}
+
+.xhs-bot-setup-inline-controls {
+	width: fill-parent-flow(1.0);
+	height: 29px;
+	horizontal-align: right;
+	flow-children: right;
+}
+
+.xhs-bot-setup-composition-controls {
+	width: 100%;
+	height: 52px;
+	margin-bottom: 2px;
+	flow-children: right-wrap;
+}
+
+.xhs-bot-setup-button {
+	height: 27px;
+	margin-right: 4px;
+	margin-bottom: 3px;
+	background-color: #192a34ee;
+	border: 1px solid #ffffff1c;
+	transition-property: brightness, background-color, border;
+	transition-duration: 0.1s;
+}
+
+.xhs-bot-setup-button:hover {
+	brightness: 1.45;
+	border-color: #75ddff77;
+}
+
+.xhs-bot-setup-button:active {
+	brightness: 0.82;
+}
+
+.xhs-bot-setup-button.Disabled {
+	brightness: 0.48;
+	saturation: 0.35;
+}
+
+.xhs-bot-setup-button.Selected {
+	background-color: #166079ee;
+	border-color: #8ae7ffbb;
+	box-shadow: inset #4fdcff22 0px 0px 7px 0px;
+}
+
+.xhs-bot-setup-button-label {
+	horizontal-align: center;
+	vertical-align: center;
+	color: #c4dbe5;
+	font-size: 11px;
+	font-weight: semi-bold;
+	text-align: center center;
+	text-overflow: shrink;
+	text-shadow: 0px 1px 2px 2 #000000;
+}
+
+.xhs-bot-setup-button.Selected .xhs-bot-setup-button-label {
+	color: #f3fcff;
+}
+
+.xhs-bot-setup-button.CountStep {
+	width: 29px;
+}
+
+.xhs-bot-setup-button.Choice {
+	width: fill-parent-flow(1.0);
+}
+
+.xhs-bot-setup-button.CompositionChoice {
+	width: 24%;
+}
+
+.xhs-bot-setup-count-value {
+	width: fill-parent-flow(1.0);
+	vertical-align: center;
+	color: #e7f8ff;
+	font-size: 14px;
+	font-weight: bold;
+	text-align: center center;
+	text-shadow: 0px 1px 2px 2 #000000;
+}
+
+.xhs-bot-setup-summary,
+.xhs-bot-setup-controller,
+.xhs-bot-setup-status,
+.xhs-bot-setup-error {
+	width: 100%;
+	color: #a9bec8;
+	font-size: 10px;
+	line-height: 13px;
+	text-overflow: shrink;
+	text-shadow: 0px 1px 2px 2 #000000;
+}
+
+.xhs-bot-setup-summary {
+	color: #d8edf5;
+	font-size: 11px;
+}
+
+.xhs-bot-setup-controller {
+	color: #74dfff;
+}
+
+.xhs-bot-setup-status {
+	color: #76919f;
+}
+
+.xhs-bot-setup-error {
+	color: #ff9898;
+	white-space: normal;
+}
+
+.xhs-bot-setup-button.Confirm {
+	width: 100%;
+	height: 29px;
+	margin-top: 4px;
+	margin-right: 0px;
+	background-color: #194b5bee;
+	border-color: #70dcff66;
+}
+
+.xhs-bot-setup-card.IsReadOnly .xhs-bot-setup-controller,
+.xhs-bot-setup-card.IsLocked .xhs-bot-setup-controller {
+	color: #e4bd78;
+}
+
+.xhs-bot-setup-card.IsPending .xhs-bot-setup-controller {
+	color: #8ee9ff;
+	brightness: 1.25;
+}
+
+#PlayerLoadingSection_xhs_bots {
+	color: #72dcff;
+	border-bottom-color: #5ed8ff55;
+}
+
+.player-loading-row.PlayerLoadingBot {
+	background-color: gradient(linear, 0% 0%, 100% 0%, from(#0b2732ee), to(#101c27ee));
+	border-color: #5bd7ff3d;
+	cursor: default;
+}
+
+.player-loading-row.PlayerLoadingBot.PlayerLoadingStatic:hover {
+	brightness: 1.0;
+	background-color: gradient(linear, 0% 0%, 100% 0%, from(#0b2732ee), to(#101c27ee));
+	border-color: #5bd7ff3d;
+}
+
+.player-loading-row.PlayerLoadingBot .player-loading-avatar-fallback {
+	background-color: #0d3544;
+	border-color: #66dcff55;
+}
+
+.player-loading-row.PlayerLoadingBot .player-loading-avatar-fallback Label,
+.player-loading-row.PlayerLoadingBot .player-loading-name {
+	color: #c9f4ff;
+}
+
+.player-loading-row.PlayerLoadingBot .player-loading-state {
+	color: #6edcff;
+}
+
+.player-loading-row.PlayerLoadingBot .player-loading-dot.PlayerLoadingReady {
+	background-color: #57ddff;
+	box-shadow: fill #4cdcff66 0px 0px 5px 0px;
+}
+
+.AspectRatio4x3 .xhs-bot-setup-card {
+	min-height: 218px;
+	padding: 6px 8px 7px 8px;
+}
+
+.AspectRatio4x3 .xhs-bot-setup-field-label {
+	width: 78px;
+	font-size: 10px;
+}
+
+.AspectRatio4x3 .xhs-bot-setup-button-label {
+	font-size: 10px;
+}

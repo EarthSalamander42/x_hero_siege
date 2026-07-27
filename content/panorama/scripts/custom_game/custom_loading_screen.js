@@ -22,6 +22,20 @@ var player_loading_order_signature = "";
 var player_loading_profile_hover = null;
 var player_loading_profile_hover_player_id = -1;
 var selected_profile_player_id = -1;
+var xhs_bot_setup_initialized = false;
+var xhs_bot_setup_config = null;
+var xhs_bot_setup_roster = { count: 0, players: {} };
+var xhs_bot_setup_draft = {
+	bot_count: 0,
+	ai_difficulty: "normal",
+	composition: "balanced",
+};
+var xhs_bot_setup_dirty = false;
+var xhs_bot_setup_pending = false;
+var xhs_bot_setup_synced = false;
+var xhs_bot_setup_expected_revision = -1;
+var xhs_bot_setup_request_token = 0;
+var xhs_bot_setup_ui = {};
 var profile_modal_transition_token = 0;
 var profile_modal_fade_duration = 0.18;
 var LOADING_SCREEN_CONFIG = {
@@ -184,7 +198,31 @@ var XHS_DIFFICULTY_VOTE_STATS = {
 	5: { starting_gold: 2000, ankhs: 0 },
 };
 
-var vote_fallbacks = {};
+var vote_fallbacks = {
+	loading_screen_bot_setup_title: "AI ALLIES",
+	loading_screen_bot_setup_dev_feature: "DEV / TOOLS ONLY",
+	loading_screen_bot_setup_count: "Allies",
+	loading_screen_bot_setup_difficulty: "Difficulty",
+	loading_screen_bot_setup_composition: "Composition",
+	loading_screen_bot_setup_easy: "Easy",
+	loading_screen_bot_setup_normal: "Normal",
+	loading_screen_bot_setup_balanced: "Balanced",
+	loading_screen_bot_setup_damage: "Damage",
+	loading_screen_bot_setup_support: "Support",
+	loading_screen_bot_setup_random: "Random",
+	loading_screen_bot_setup_confirm: "Apply AI setup",
+	loading_screen_bot_setup_waiting: "Waiting for the bot controller...",
+	loading_screen_bot_setup_controller: "You control this setup.",
+	loading_screen_bot_setup_controller_only: "Only the first human player can edit AI allies.",
+	loading_screen_bot_setup_locked: "AI setup is locked for this launch.",
+	loading_screen_bot_setup_pending: "Applying configuration...",
+	loading_screen_bot_setup_summary: "{count} allied bot(s) / {difficulty} / {composition}",
+	loading_screen_bot_setup_server_status: "Server: {status}",
+	loading_screen_ai_allies_section: "AI Allies",
+	loading_screen_ai_ally_status: "AI ALLY / {difficulty}",
+	loading_screen_ai_ready_status: "AI READY / {difficulty}",
+	loading_screen_ai_bot_name: "XHS Bot {number}",
+};
 
 var link_targets = "";
 
@@ -249,6 +287,384 @@ function LocalizeTemplate(token, values) {
 	}
 
 	return localized;
+}
+
+function IsXHSBotSetupAllowed() {
+	return typeof Game !== "undefined" &&
+		typeof Game.IsInToolsMode === "function" &&
+		Game.IsInToolsMode() &&
+		game_options !== undefined &&
+		game_options !== null &&
+		String(game_options.game_type) === "XHS";
+}
+
+function GetXHSBotRosterPlayers() {
+	if (!xhs_bot_setup_roster || !xhs_bot_setup_roster.players) {
+		return {};
+	}
+	return xhs_bot_setup_roster.players;
+}
+
+function GetXHSBotRosterEntry(player_id) {
+	var players = GetXHSBotRosterPlayers();
+	return players[player_id] || players[String(player_id)] || null;
+}
+
+function GetXHSBotDisplayName(player_id, bot_data) {
+	var bot_name = NormalizePlayerDisplayName(bot_data && bot_data.name);
+	if (bot_name) {
+		return bot_name;
+	}
+	return LocalizeTemplate("loading_screen_ai_bot_name", {
+		number: (Math.max(0, Number(player_id) || 0) + 1).toString(),
+	});
+}
+
+function XHSBotSetupMakeLabel(parent, class_name, text) {
+	var label = $.CreatePanel("Label", parent, "");
+	if (class_name) {
+		label.AddClass(class_name);
+	}
+	label.text = text || "";
+	return label;
+}
+
+function XHSBotSetupMakeButton(parent, id, text, class_name, callback) {
+	var button = $.CreatePanel("Button", parent, id || "");
+	button.AddClass("xhs-bot-setup-button");
+	if (class_name) {
+		button.AddClass(class_name);
+	}
+	button.SetPanelEvent("onactivate", callback);
+	XHSBotSetupMakeLabel(button, "xhs-bot-setup-button-label", text);
+	return button;
+}
+
+function XHSBotSetupMaxBots() {
+	if (!xhs_bot_setup_config) {
+		return 7;
+	}
+	var maximum = Math.floor(ToNumber(xhs_bot_setup_config.max_bots, 7));
+	return Math.max(0, Math.min(7, maximum));
+}
+
+function XHSBotSetupSyncDraftFromConfig() {
+	if (!xhs_bot_setup_config) {
+		return;
+	}
+
+	xhs_bot_setup_draft.bot_count = Math.max(
+		0,
+		Math.min(XHSBotSetupMaxBots(), Math.floor(ToNumber(xhs_bot_setup_config.bot_count, 0)))
+	);
+	xhs_bot_setup_draft.ai_difficulty = String(xhs_bot_setup_config.ai_difficulty || "normal").toLowerCase() === "easy"
+		? "easy"
+		: "normal";
+
+	var composition = String(xhs_bot_setup_config.composition || "balanced").toLowerCase();
+	if (["balanced", "damage", "support", "random"].indexOf(composition) < 0) {
+		composition = "balanced";
+	}
+	xhs_bot_setup_draft.composition = composition;
+	xhs_bot_setup_synced = true;
+}
+
+function XHSBotSetupIsController() {
+	if (!xhs_bot_setup_config) {
+		return false;
+	}
+	return GetLocalPlayerIDSafe() === Math.floor(ToNumber(xhs_bot_setup_config.controller_player_id, -1));
+}
+
+function XHSBotSetupCanEdit() {
+	return IsXHSBotSetupAllowed() &&
+		xhs_bot_setup_config !== null &&
+		IsTruthy(xhs_bot_setup_config.available) &&
+		XHSBotSetupIsController() &&
+		!IsTruthy(xhs_bot_setup_config.locked) &&
+		!xhs_bot_setup_pending;
+}
+
+function XHSBotSetupSetButtonEnabled(button, enabled) {
+	if (!button) {
+		return;
+	}
+	button.enabled = enabled;
+	button.SetHasClass("Disabled", !enabled);
+}
+
+function XHSBotSetupChangeCount(delta) {
+	if (!XHSBotSetupCanEdit()) {
+		return;
+	}
+	var next_count = Math.max(0, Math.min(
+		XHSBotSetupMaxBots(),
+		Math.floor(ToNumber(xhs_bot_setup_draft.bot_count, 0)) + delta
+	));
+	if (next_count === xhs_bot_setup_draft.bot_count) {
+		return;
+	}
+	xhs_bot_setup_draft.bot_count = next_count;
+	xhs_bot_setup_dirty = true;
+	XHSBotSetupRender();
+}
+
+function XHSBotSetupSelectDifficulty(difficulty) {
+	if (!XHSBotSetupCanEdit() || (difficulty !== "easy" && difficulty !== "normal")) {
+		return;
+	}
+	if (xhs_bot_setup_draft.ai_difficulty !== difficulty) {
+		xhs_bot_setup_draft.ai_difficulty = difficulty;
+		xhs_bot_setup_dirty = true;
+		XHSBotSetupRender();
+	}
+}
+
+function XHSBotSetupSelectComposition(composition) {
+	if (!XHSBotSetupCanEdit() || ["balanced", "damage", "support", "random"].indexOf(composition) < 0) {
+		return;
+	}
+	if (xhs_bot_setup_draft.composition !== composition) {
+		xhs_bot_setup_draft.composition = composition;
+		xhs_bot_setup_dirty = true;
+		XHSBotSetupRender();
+	}
+}
+
+function XHSBotSetupConfirm() {
+	if (!XHSBotSetupCanEdit() || !xhs_bot_setup_dirty) {
+		return;
+	}
+
+	xhs_bot_setup_pending = true;
+	xhs_bot_setup_expected_revision = Math.floor(ToNumber(xhs_bot_setup_config.revision, 0)) + 1;
+	xhs_bot_setup_request_token = xhs_bot_setup_request_token + 1;
+	var request_token = xhs_bot_setup_request_token;
+	var requested_count = Math.max(0, Math.min(
+		XHSBotSetupMaxBots(),
+		Math.floor(ToNumber(xhs_bot_setup_draft.bot_count, 0))
+	));
+	XHSBotSetupRender();
+	GameEvents.SendCustomGameEventToServer("xhs_bot_setup_configure", {
+		bot_count: requested_count,
+		ai_difficulty: xhs_bot_setup_draft.ai_difficulty,
+		composition: xhs_bot_setup_draft.composition,
+	});
+
+	$.Schedule(4.0, function () {
+		if (xhs_bot_setup_pending && xhs_bot_setup_request_token === request_token) {
+			xhs_bot_setup_pending = false;
+			XHSBotSetupRender();
+		}
+	});
+}
+
+function XHSBotSetupBuildCard() {
+	if (!IsXHSBotSetupAllowed()) {
+		return false;
+	}
+
+	var sidebar = $("#PlayerLoadingSidebar");
+	var player_list = $("#PlayerLoadingList");
+	if (!sidebar || !player_list) {
+		return false;
+	}
+
+	var card = $.CreatePanel("Panel", sidebar, "XHSBotSetupCard");
+	card.AddClass("xhs-bot-setup-card");
+
+	var header = $.CreatePanel("Panel", card, "");
+	header.AddClass("xhs-bot-setup-header");
+	XHSBotSetupMakeLabel(header, "xhs-bot-setup-title", L("loading_screen_bot_setup_title"));
+	XHSBotSetupMakeLabel(header, "xhs-bot-setup-dev-badge", L("loading_screen_bot_setup_dev_feature"));
+
+	var count_row = $.CreatePanel("Panel", card, "");
+	count_row.AddClass("xhs-bot-setup-field-row");
+	XHSBotSetupMakeLabel(count_row, "xhs-bot-setup-field-label", L("loading_screen_bot_setup_count"));
+	var count_controls = $.CreatePanel("Panel", count_row, "");
+	count_controls.AddClass("xhs-bot-setup-inline-controls");
+	xhs_bot_setup_ui.count_minus = XHSBotSetupMakeButton(count_controls, "", "-", "CountStep", function () {
+		XHSBotSetupChangeCount(-1);
+	});
+	xhs_bot_setup_ui.count_value = XHSBotSetupMakeLabel(count_controls, "xhs-bot-setup-count-value", "0 / 7");
+	xhs_bot_setup_ui.count_plus = XHSBotSetupMakeButton(count_controls, "", "+", "CountStep", function () {
+		XHSBotSetupChangeCount(1);
+	});
+
+	var difficulty_row = $.CreatePanel("Panel", card, "");
+	difficulty_row.AddClass("xhs-bot-setup-field-row");
+	XHSBotSetupMakeLabel(difficulty_row, "xhs-bot-setup-field-label", L("loading_screen_bot_setup_difficulty"));
+	var difficulty_controls = $.CreatePanel("Panel", difficulty_row, "");
+	difficulty_controls.AddClass("xhs-bot-setup-inline-controls");
+	xhs_bot_setup_ui.difficulty = {};
+	xhs_bot_setup_ui.difficulty.easy = XHSBotSetupMakeButton(
+		difficulty_controls,
+		"",
+		L("loading_screen_bot_setup_easy"),
+		"Choice",
+		function () { XHSBotSetupSelectDifficulty("easy"); }
+	);
+	xhs_bot_setup_ui.difficulty.normal = XHSBotSetupMakeButton(
+		difficulty_controls,
+		"",
+		L("loading_screen_bot_setup_normal"),
+		"Choice",
+		function () { XHSBotSetupSelectDifficulty("normal"); }
+	);
+
+	XHSBotSetupMakeLabel(card, "xhs-bot-setup-composition-label", L("loading_screen_bot_setup_composition"));
+	var composition_controls = $.CreatePanel("Panel", card, "");
+	composition_controls.AddClass("xhs-bot-setup-composition-controls");
+	xhs_bot_setup_ui.composition = {};
+	var compositions = ["balanced", "damage", "support", "random"];
+	for (var i = 0; i < compositions.length; i++) {
+		(function (composition) {
+			xhs_bot_setup_ui.composition[composition] = XHSBotSetupMakeButton(
+				composition_controls,
+				"",
+				L("loading_screen_bot_setup_" + composition),
+				"CompositionChoice",
+				function () { XHSBotSetupSelectComposition(composition); }
+			);
+		})(compositions[i]);
+	}
+
+	xhs_bot_setup_ui.summary = XHSBotSetupMakeLabel(card, "xhs-bot-setup-summary", "");
+	xhs_bot_setup_ui.controller = XHSBotSetupMakeLabel(card, "xhs-bot-setup-controller", "");
+	xhs_bot_setup_ui.status = XHSBotSetupMakeLabel(card, "xhs-bot-setup-status", "");
+	xhs_bot_setup_ui.error = XHSBotSetupMakeLabel(card, "xhs-bot-setup-error", "");
+	xhs_bot_setup_ui.confirm = XHSBotSetupMakeButton(
+		card,
+		"XHSBotSetupConfirm",
+		L("loading_screen_bot_setup_confirm"),
+		"Confirm",
+		XHSBotSetupConfirm
+	);
+	xhs_bot_setup_ui.card = card;
+
+	if (typeof sidebar.MoveChildBefore === "function") {
+		sidebar.MoveChildBefore(card, player_list);
+	}
+	return true;
+}
+
+function XHSBotSetupRender() {
+	if (!IsXHSBotSetupAllowed() || !xhs_bot_setup_ui.card) {
+		return;
+	}
+
+	var available = xhs_bot_setup_config && IsTruthy(xhs_bot_setup_config.available);
+	var controller = available && XHSBotSetupIsController();
+	var locked = available && IsTruthy(xhs_bot_setup_config.locked);
+	var can_edit = XHSBotSetupCanEdit();
+	var maximum = XHSBotSetupMaxBots();
+	var count = Math.max(0, Math.min(maximum, Math.floor(ToNumber(xhs_bot_setup_draft.bot_count, 0))));
+
+	xhs_bot_setup_ui.card.SetHasClass("IsWaiting", !available);
+	xhs_bot_setup_ui.card.SetHasClass("IsReadOnly", available && !controller);
+	xhs_bot_setup_ui.card.SetHasClass("IsLocked", locked);
+	xhs_bot_setup_ui.card.SetHasClass("IsPending", xhs_bot_setup_pending);
+
+	xhs_bot_setup_ui.count_value.text = count + " / " + maximum;
+	XHSBotSetupSetButtonEnabled(xhs_bot_setup_ui.count_minus, can_edit && count > 0);
+	XHSBotSetupSetButtonEnabled(xhs_bot_setup_ui.count_plus, can_edit && count < maximum);
+
+	for (var difficulty in xhs_bot_setup_ui.difficulty) {
+		var difficulty_button = xhs_bot_setup_ui.difficulty[difficulty];
+		difficulty_button.SetHasClass("Selected", difficulty === xhs_bot_setup_draft.ai_difficulty);
+		XHSBotSetupSetButtonEnabled(difficulty_button, can_edit);
+	}
+	for (var composition in xhs_bot_setup_ui.composition) {
+		var composition_button = xhs_bot_setup_ui.composition[composition];
+		composition_button.SetHasClass("Selected", composition === xhs_bot_setup_draft.composition);
+		XHSBotSetupSetButtonEnabled(composition_button, can_edit);
+	}
+
+	var difficulty_text = L("loading_screen_bot_setup_" + xhs_bot_setup_draft.ai_difficulty);
+	var composition_text = L("loading_screen_bot_setup_" + xhs_bot_setup_draft.composition);
+	xhs_bot_setup_ui.summary.text = LocalizeTemplate("loading_screen_bot_setup_summary", {
+		count: count.toString(),
+		difficulty: difficulty_text,
+		composition: composition_text,
+	});
+
+	if (!available) {
+		xhs_bot_setup_ui.controller.text = L("loading_screen_bot_setup_waiting");
+	} else if (xhs_bot_setup_pending) {
+		xhs_bot_setup_ui.controller.text = L("loading_screen_bot_setup_pending");
+	} else if (locked) {
+		xhs_bot_setup_ui.controller.text = L("loading_screen_bot_setup_locked");
+	} else if (controller) {
+		xhs_bot_setup_ui.controller.text = L("loading_screen_bot_setup_controller");
+	} else {
+		xhs_bot_setup_ui.controller.text = L("loading_screen_bot_setup_controller_only");
+	}
+
+	var server_status = xhs_bot_setup_config ? String(xhs_bot_setup_config.status || "waiting") : "waiting";
+	xhs_bot_setup_ui.status.text = LocalizeTemplate("loading_screen_bot_setup_server_status", {
+		status: server_status,
+	});
+
+	var error_text = xhs_bot_setup_config ? String(xhs_bot_setup_config.error || "") : "";
+	xhs_bot_setup_ui.error.text = error_text;
+	xhs_bot_setup_ui.error.style.visibility = error_text ? "visible" : "collapse";
+	XHSBotSetupSetButtonEnabled(xhs_bot_setup_ui.confirm, can_edit && xhs_bot_setup_dirty);
+}
+
+function XHSBotSetupOnNetTableChanged(table_name, key, data) {
+	if (!IsXHSBotSetupAllowed()) {
+		return;
+	}
+
+	if (key === "config") {
+		var was_pending = xhs_bot_setup_pending;
+		var received_revision = Math.floor(ToNumber(data && data.revision, -1));
+		var acknowledged = was_pending && received_revision >= xhs_bot_setup_expected_revision;
+		xhs_bot_setup_config = data || null;
+
+		if (!xhs_bot_setup_synced || acknowledged || (!xhs_bot_setup_dirty && !was_pending)) {
+			XHSBotSetupSyncDraftFromConfig();
+		}
+		if (acknowledged) {
+			xhs_bot_setup_pending = false;
+			xhs_bot_setup_dirty = false;
+			XHSBotSetupSyncDraftFromConfig();
+		} else if (was_pending && data && data.error) {
+			xhs_bot_setup_pending = false;
+		}
+		XHSBotSetupRender();
+		return;
+	}
+
+	if (key === "roster") {
+		xhs_bot_setup_roster = data || { count: 0, players: {} };
+		XHSBotSetupRender();
+	}
+}
+
+function MaybeInitializeXHSBotSetup() {
+	if (!IsXHSBotSetupAllowed() || xhs_bot_setup_initialized) {
+		return;
+	}
+	if (!XHSBotSetupBuildCard()) {
+		return;
+	}
+
+	xhs_bot_setup_initialized = true;
+	if (typeof CustomNetTables !== "undefined" && CustomNetTables) {
+		CustomNetTables.SubscribeNetTableListener("xhs_bots", XHSBotSetupOnNetTableChanged);
+
+		var initial_config = CustomNetTables.GetTableValue("xhs_bots", "config");
+		if (initial_config) {
+			xhs_bot_setup_config = initial_config;
+			XHSBotSetupSyncDraftFromConfig();
+		}
+		var initial_roster = CustomNetTables.GetTableValue("xhs_bots", "roster");
+		if (initial_roster) {
+			xhs_bot_setup_roster = initial_roster;
+		}
+	}
+	XHSBotSetupRender();
 }
 
 function FormatLoadingScreenNumber(value) {
@@ -2133,6 +2549,14 @@ function UpdatePlayerLoadingSidebar() {
 		player_ids.push(local_player_id);
 	}
 
+	var xhs_bot_roster_players = GetXHSBotRosterPlayers();
+	for (var xhs_bot_player_key in xhs_bot_roster_players) {
+		var xhs_bot_player_id = parseInt(xhs_bot_player_key);
+		if (!isNaN(xhs_bot_player_id) && xhs_bot_player_id >= 0 && player_ids.indexOf(xhs_bot_player_id) < 0) {
+			player_ids.push(xhs_bot_player_id);
+		}
+	}
+
 	player_ids = player_ids.slice(0).sort(function (a, b) { return a - b; });
 
 	var local_player_info = local_player_id >= 0 ? Game.GetPlayerInfo(local_player_id) : null;
@@ -2145,19 +2569,27 @@ function UpdatePlayerLoadingSidebar() {
 
 	for (var i = 0; i < player_ids.length; i++) {
 		const player_id = player_ids[i];
-		const player_info = Game.GetPlayerInfo(player_id);
+		const roster_bot = GetXHSBotRosterEntry(player_id);
+		const raw_player_info = Game.GetPlayerInfo(player_id);
+		const player_info = raw_player_info || (roster_bot ? {
+			player_connection_state: IsTruthy(roster_bot.ready) ? connection_state.CONNECTED : connection_state.LOADING,
+			player_selected_hero: roster_bot.hero || "",
+			player_team_id: GetDefaultFriendlyTeamID(),
+		} : null);
 
 		if (!player_info) {
 			continue;
 		}
 
 		player_entries.push({
-			row_key: player_id.toString(),
+			row_key: roster_bot ? ("bot_" + player_id) : player_id.toString(),
 			player_id: player_id,
 			player_info: player_info,
-			display_name: GetPlayerDisplayName(player_id, player_info),
+			display_name: roster_bot ? GetXHSBotDisplayName(player_id, roster_bot) : GetPlayerDisplayName(player_id, player_info),
 			team_id: GetPlayerTeamIDFromInfo(player_info, local_team_id),
-			can_open_profile: true,
+			can_open_profile: !roster_bot,
+			is_xhs_bot: !!roster_bot,
+			bot_data: roster_bot,
 		});
 	}
 
@@ -2171,14 +2603,16 @@ function UpdatePlayerLoadingSidebar() {
 
 	for (var entry_seed = 0; entry_seed < player_entries.length; entry_seed++) {
 		const seeded_entry = player_entries[entry_seed];
-		const seeded_state = seeded_entry.player_info.player_connection_state;
+		const seeded_state = seeded_entry.is_xhs_bot
+			? (IsTruthy(seeded_entry.bot_data && seeded_entry.bot_data.ready) ? connection_state.CONNECTED : connection_state.LOADING)
+			: seeded_entry.player_info.player_connection_state;
 		const seeded_team_id = seeded_entry.team_id !== undefined ? seeded_entry.team_id : GetPlayerTeamIDFromInfo(seeded_entry.player_info, local_team_id);
-		const seeded_team_key = GetTeamSectionKey(seeded_team_id);
+		const seeded_team_key = seeded_entry.is_xhs_bot ? "xhs_bots" : GetTeamSectionKey(seeded_team_id);
 
 		seeded_entry.connection_state = seeded_state;
 		seeded_entry.team_id = seeded_team_id;
 		seeded_entry.team_key = seeded_team_key;
-		seeded_entry.team_priority = GetTeamSortPriority(seeded_team_id, local_team_id);
+		seeded_entry.team_priority = GetTeamSortPriority(seeded_team_id, local_team_id) + (seeded_entry.is_xhs_bot ? 0.5 : 0);
 
 		section_counts[seeded_team_key] = (section_counts[seeded_team_key] || 0) + 1;
 	}
@@ -2219,7 +2653,8 @@ function UpdatePlayerLoadingSidebar() {
 		var display_rows = [];
 		for (var display_i = 0; display_i < player_entries.length; display_i++) {
 			var display_entry = player_entries[display_i];
-			display_rows.push(display_entry.display_name + ":" + GetConnectionStateDebugName(display_entry.connection_state) + ":" + GetTeamDisplayName(display_entry.team_id));
+			var display_section = display_entry.is_xhs_bot ? L("loading_screen_ai_allies_section") : GetTeamDisplayName(display_entry.team_id);
+			display_rows.push(display_entry.display_name + ":" + GetConnectionStateDebugName(display_entry.connection_state) + ":" + display_section);
 		}
 
 		for (var stale_row_key in player_loading_rows) {
@@ -2247,8 +2682,10 @@ function UpdatePlayerLoadingSidebar() {
 		const state = entry.connection_state;
 		const team_id = entry.team_id;
 		const team_key = entry.team_key;
-		const is_loaded = IsLoadedConnectionState(state);
-		const is_issue = IsIssueConnectionState(state);
+		const is_xhs_bot = entry.is_xhs_bot === true;
+		const bot_data = entry.bot_data || null;
+		const is_loaded = is_xhs_bot ? IsTruthy(bot_data && bot_data.ready) : IsLoadedConnectionState(state);
+		const is_issue = is_xhs_bot ? false : IsIssueConnectionState(state);
 		const is_connecting = !is_loaded && !is_issue;
 
 		if (!active_sections[team_key]) {
@@ -2260,20 +2697,24 @@ function UpdatePlayerLoadingSidebar() {
 				player_loading_section_rows[team_key] = section_row;
 			}
 
-			player_loading_section_rows[team_key].text = GetTeamDisplayName(team_id) + " (" + (section_counts[team_key] || 0) + ")";
+			var section_title = is_xhs_bot ? L("loading_screen_ai_allies_section") : GetTeamDisplayName(team_id);
+			player_loading_section_rows[team_key].text = section_title + " (" + (section_counts[team_key] || 0) + ")";
 		}
 
-		total_players = total_players + 1;
 		active_rows[row_key] = true;
 
-		if (is_loaded) {
-			loaded_players = loaded_players + 1;
-		} else if (is_connecting) {
-			waiting_players = waiting_players + 1;
-		}
+		if (!is_xhs_bot) {
+			total_players = total_players + 1;
 
-		if (is_issue) {
-			issue_players = issue_players + 1;
+			if (is_loaded) {
+				loaded_players = loaded_players + 1;
+			} else if (is_connecting) {
+				waiting_players = waiting_players + 1;
+			}
+
+			if (is_issue) {
+				issue_players = issue_players + 1;
+			}
 		}
 
 		if (!player_loading_rows[row_key]) {
@@ -2316,7 +2757,7 @@ function UpdatePlayerLoadingSidebar() {
 			avatar_fallback.style.visibility = "collapse";
 			avatar_fallback.hittest = false;
 			var avatar_fallback_label = $.CreatePanel("Label", avatar_fallback, "");
-			avatar_fallback_label.text = "?";
+			avatar_fallback_label.text = is_xhs_bot ? "AI" : "?";
 			avatar_fallback_label.style.width = "100%";
 			avatar_fallback_label.style.height = "100%";
 			avatar_fallback_label.style.textAlign = "center center";
@@ -2357,6 +2798,7 @@ function UpdatePlayerLoadingSidebar() {
 				avatar_wrap: avatar_wrap,
 				avatar: avatar,
 				avatar_fallback: avatar_fallback,
+				avatar_fallback_label: avatar_fallback_label,
 				supporter_badge: supporter_badge,
 				supporter_badge_label: supporter_badge_label,
 				name: name,
@@ -2368,9 +2810,10 @@ function UpdatePlayerLoadingSidebar() {
 
 		const player_row = player_loading_rows[row_key];
 		player_row.player_id = player_id;
+		player_row.can_open_profile = entry.can_open_profile;
 		if (player_row.avatar_wrap) {
 			player_row.avatar_wrap.AddClass("player-loading-avatar-wrap");
-			player_row.avatar_wrap.hittest = true;
+			player_row.avatar_wrap.hittest = entry.can_open_profile;
 			player_row.avatar_wrap.hittestchildren = false;
 		}
 		if (player_row.avatar_fallback) {
@@ -2380,8 +2823,10 @@ function UpdatePlayerLoadingSidebar() {
 		if (player_row.avatar) {
 			player_row.avatar.hittest = false;
 		}
-		const is_marked_ready = player_id >= 0 && IsPlayerMarkedReady(setup_status, player_id);
-		const is_selected = player_id >= 0 && player_id == GetSelectedProfilePlayerID();
+		const is_marked_ready = is_xhs_bot
+			? IsTruthy(bot_data && bot_data.ready)
+			: (player_id >= 0 && IsPlayerMarkedReady(setup_status, player_id));
+		const is_selected = !is_xhs_bot && player_id >= 0 && player_id == GetSelectedProfilePlayerID();
 
 		if (!player_row.spinner) {
 			player_row.spinner = $.CreatePanel("Panel", player_row.panel, "");
@@ -2419,7 +2864,7 @@ function UpdatePlayerLoadingSidebar() {
 			player_row.avatar_fallback.hittest = false;
 
 			var fallback_label = $.CreatePanel("Label", player_row.avatar_fallback, "");
-			fallback_label.text = "?";
+			fallback_label.text = is_xhs_bot ? "AI" : "?";
 			fallback_label.style.width = "100%";
 			fallback_label.style.height = "100%";
 			fallback_label.style.textAlign = "center center";
@@ -2428,6 +2873,7 @@ function UpdatePlayerLoadingSidebar() {
 			fallback_label.style.color = "#9eb0c9";
 			fallback_label.style.fontFamily = "Reaver";
 			fallback_label.hittest = false;
+			player_row.avatar_fallback_label = fallback_label;
 		}
 
 		if (!player_row.supporter_badge) {
@@ -2462,25 +2908,38 @@ function UpdatePlayerLoadingSidebar() {
 			});
 		})(player_row.panel, entry.display_name);
 
-		(function (avatar_anchor, target_player_id) {
-			avatar_anchor.SetPanelEvent("onmouseover", function () {
-				$.DispatchEvent("UIHideTextTooltip", avatar_anchor);
-				ShowPlayerLoadingProfileHover(target_player_id, avatar_anchor);
-			});
+		if (entry.can_open_profile) {
+			(function (avatar_anchor, target_player_id) {
+				avatar_anchor.SetPanelEvent("onmouseover", function () {
+					$.DispatchEvent("UIHideTextTooltip", avatar_anchor);
+					ShowPlayerLoadingProfileHover(target_player_id, avatar_anchor);
+				});
 
-			avatar_anchor.SetPanelEvent("onmouseout", function () {
-				HidePlayerLoadingProfileHover();
-			});
-		})(player_row.avatar_wrap, player_id);
+				avatar_anchor.SetPanelEvent("onmouseout", function () {
+					HidePlayerLoadingProfileHover();
+				});
+			})(player_row.avatar_wrap, player_id);
+		} else {
+			player_row.avatar_wrap.SetPanelEvent("onmouseover", function () {});
+			player_row.avatar_wrap.SetPanelEvent("onmouseout", function () {});
+		}
 
-		const profile_data = GetProfileDataForPlayer(player_id);
+		const profile_data = entry.can_open_profile ? GetProfileDataForPlayer(player_id) : {};
 		const supporter_tier_id = GetLoadingSupporterTierID(profile_data);
 		const supporter_tier_color = GetSupporterTierColor(profile_data);
 		const supporter_badge_text = GetLoadingSupporterTierLetter(profile_data);
 
-		const status_text = is_marked_ready ? L("loading_screen_ready") : GetConnectionStateText(state);
+		const bot_difficulty = is_xhs_bot ? String((bot_data && bot_data.difficulty) || "normal").toLowerCase() : "";
+		const bot_difficulty_text = is_xhs_bot ? L("loading_screen_bot_setup_" + bot_difficulty) : "";
+		const status_text = is_xhs_bot
+			? LocalizeTemplate(is_marked_ready ? "loading_screen_ai_ready_status" : "loading_screen_ai_ally_status", {
+				difficulty: bot_difficulty_text,
+			})
+			: (is_marked_ready ? L("loading_screen_ready") : GetConnectionStateText(state));
 		const row_visual_signature = [
 			state,
+			is_xhs_bot ? "bot" : "human",
+			is_xhs_bot && bot_data ? String(bot_data.role || "") : "",
 			is_loaded ? "1" : "0",
 			is_issue ? "1" : "0",
 			is_connecting ? "1" : "0",
@@ -2503,6 +2962,7 @@ function UpdatePlayerLoadingSidebar() {
 			player_row.panel.SetHasClass("PlayerMarkedReady", is_marked_ready);
 			player_row.panel.SetHasClass("PlayerLoadingInteractive", entry.can_open_profile);
 			player_row.panel.SetHasClass("PlayerLoadingStatic", !entry.can_open_profile);
+			player_row.panel.SetHasClass("PlayerLoadingBot", is_xhs_bot);
 			player_row.panel.SetHasClass("PlayerLoadingDonator", supporter_tier_id > 0);
 			player_row.panel.SetHasClass("PlayerLoadingDonatorTier1", supporter_tier_id == 1);
 			player_row.panel.SetHasClass("PlayerLoadingDonatorTier2", supporter_tier_id == 2);
@@ -2538,6 +2998,7 @@ function UpdatePlayerLoadingSidebar() {
 		const row_identity_signature = [
 			entry.display_name || "",
 			avatar_steam_id || "0",
+			is_xhs_bot && bot_data ? String(bot_data.hero || "") : "",
 		].join("|");
 
 		if (player_row.row_identity_signature !== row_identity_signature) {
@@ -2557,6 +3018,9 @@ function UpdatePlayerLoadingSidebar() {
 				}
 			}
 
+			if (player_row.avatar_fallback_label) {
+				player_row.avatar_fallback_label.text = is_xhs_bot ? "AI" : "?";
+			}
 			player_row.name.text = entry.display_name;
 		}
 	}
@@ -3298,6 +3762,10 @@ function fetch() {
 		$.Schedule(0.1, fetch);
 		return;
 	}
+
+	// The authoritative game type is now available. Keep this call before any
+	// API dependency so the Tools-only setup remains usable offline.
+	MaybeInitializeXHSBotSetup();
 
 	if (!IsServerApiAvailable()) {
 		if (loading_screen_last_fetch_stage !== "waiting_server_api") {

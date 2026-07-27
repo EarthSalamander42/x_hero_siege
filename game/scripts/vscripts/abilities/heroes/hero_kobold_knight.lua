@@ -19,12 +19,14 @@ function LifeSteal(keys)
 	if ability:IsCooldownReady() then
 		ability:StartCooldown(cooldown)
 		caster:EmitSound("Hero_LifeStealer.OpenWounds.Cast")
+		local health_before = caster:GetHealth()
 		caster:Heal(caster:GetAttackDamage() * ability:GetSpecialValueFor("lifesteal") / 100, caster)
+		local actual_heal = math.max(0, caster:GetHealth() - health_before)
 		SendOverheadEventMessage(nil, OVERHEAD_ALERT_HEAL, caster, caster:GetAttackDamage() * ability:GetSpecialValueFor("lifesteal") / 100, nil)
 
-		local lifesteal_pfx = ParticleManager:CreateParticle("particles/generic_gameplay/generic_lifesteal.vpcf", PATTACH_ABSORIGIN_FOLLOW, caster)
-		ParticleManager:SetParticleControl(lifesteal_pfx, 0, caster:GetAbsOrigin())
-		ParticleManager:ReleaseParticleIndex(lifesteal_pfx)
+		if actual_heal > 0 and XHSPlaySupporterAttackLifestealFX ~= nil then
+			XHSPlaySupporterAttackLifestealFX(caster, keys.target or keys.unit, actual_heal)
+		end
 	end
 end
 

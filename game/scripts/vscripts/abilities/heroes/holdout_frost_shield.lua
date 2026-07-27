@@ -69,14 +69,17 @@ function modifier_xhs_frost_shield_autocast:OnAttacked(event)
 	local caster = self:GetParent()
 	local ability = self:GetAbility()
 	local target = event and event.target or nil
+	local attacker = event and event.attacker or nil
 	if not caster or caster:IsNull()
 		or not ability or ability:IsNull()
 		or not target or target:IsNull()
+		or not attacker or attacker:IsNull()
 		or not ability:GetAutoCastState()
 		or not ability:IsFullyCastable()
 		or caster:IsChanneling()
 		or not caster:IsAlive()
 		or target:GetTeamNumber() ~= caster:GetTeamNumber()
+		or attacker:GetTeamNumber() == caster:GetTeamNumber()
 		or target:HasModifier("modifier_xhs_frost_shield") then
 		return
 	end

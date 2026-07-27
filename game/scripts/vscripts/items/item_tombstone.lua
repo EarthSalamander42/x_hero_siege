@@ -1,5 +1,7 @@
 item_tombstone = item_tombstone or class({})
 
+local SupporterRecoveryEffects = require("components/battlepass/recovery_effects"):Init()
+
 local BASE_CHANNEL_TIME = 5.0
 local MIN_SHARED_CHANNEL_TIME = 0.1
 local REVIVE_PARTICLE = "particles/items_fx/aegis_respawn.vpcf"
@@ -494,8 +496,7 @@ function item_tombstone:OnChannelFinish(interrupted)
 	hero:SetMana(hero:GetMaxMana())
 	hero:Stop()
 
-	local particle = ParticleManager:CreateParticle(REVIVE_PARTICLE, PATTACH_ABSORIGIN_FOLLOW, hero)
-	ParticleManager:ReleaseParticleIndex(particle)
+	SupporterRecoveryEffects:PlayRebirth(hero, REVIVE_PARTICLE)
 	caster:EmitSound(CHANNEL_COMPLETE_SOUND)
 
 	local gameMode = GameRules.GameMode

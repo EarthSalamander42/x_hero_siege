@@ -28,6 +28,12 @@ require('zones/zones')
 require('units/breakable_container_surprises')
 require('units/treasure_chest_surprises')
 require('triggers')
+if IsInToolsMode() then
+	local loaded, load_error = pcall(require, 'components/xhs_bots/init')
+	if not loaded then
+		print("[XHSBots] Private Tools package is not staged; allied bots remain disabled: " .. tostring(load_error))
+	end
+end
 require('components/api/init')
 require('components/custom_polls/init')
 if IsInToolsMode() then
@@ -61,6 +67,10 @@ end
 function GameMode:OnHeroInGame(hero)
 	local id = hero:GetPlayerID()
 	local point = Entities:FindByName(nil, "hero_selection_" .. id)
+	local is_engine_bot = id ~= nil and id >= 0
+		and PlayerResource ~= nil
+		and PlayerResource.IsFakeClient ~= nil
+		and PlayerResource:IsFakeClient(id)
 
 	if GetMapName() == "x_hero_siege_demo" then
 		point = Entities:FindByName(nil, "npc_dota_spawner_good_mid_staging")
@@ -70,14 +80,19 @@ function GameMode:OnHeroInGame(hero)
 		hero:SetAbilityPoints(0)
 		hero:SetGold(0, false)
 
-		local delay = 2.0
-		hero:AddNewModifier(hero, nil, "modifier_command_restricted", { duration = delay + 0.1 })
+		-- Player bots are replaced by XHSBotProvisioner and do not own one of
+		-- the map's human hero-selection pads. Never dereference a missing pad.
+		if not is_engine_bot and point ~= nil then
+			local delay = 2.0
+			hero:AddNewModifier(hero, nil, "modifier_command_restricted", { duration = delay + 0.1 })
 
-		hero:SetContextThink("delay_to_fix_camera_not_centering_lul", function()
-			TeleportHero(hero, point:GetAbsOrigin(), 3.0)
-
-			return nil
-		end, delay)
+			hero:SetContextThink("delay_to_fix_camera_not_centering_lul", function()
+				if point ~= nil and not point:IsNull() then
+					TeleportHero(hero, point:GetAbsOrigin(), 3.0)
+				end
+				return nil
+			end, delay)
+		end
 	elseif hero:GetUnitName() == "npc_dota_hero_terrorblade" then
 		if IsInToolsMode() then
 			hero:IncrementAttributes(100000)
@@ -230,10 +245,14 @@ function GameMode:InitGameMode()
 	GameMode.bSeenWaitForPlayers = false
 	GameMode.vUserIds = {}
 	GameMode.VoteTable = {}
-	GameMode.CustomSetupAutoReadyDelay = IsInToolsMode() and 10 or 30
+	GameMode.CustomSetupAutoReadyDelay = IsInToolsMode() and 60 or 30
 	GameMode.CustomSetupReadyLaunchDelay = 3
-	GameMode.CustomSetupDuration = IsInToolsMode() and 10 or 30
+	GameMode.CustomSetupDuration = IsInToolsMode() and 60 or 30
 	GameMode.CustomSetupState = nil
+
+	if XHSBots ~= nil then
+		XHSBots:Init()
+	end
 
 	GameMode:OnFirstPlayerLoaded()
 
@@ -1836,32 +1855,33 @@ end
 function GameMode:OnSettingVote(event_source_index, keys)
 	local payload = keys
 
-	-- Dynamic_Wrap + CustomGameEventManager passes (eventSourceIndex, keys)
-	-- Keep compatibility with direct calls that might pass only keys.
-	if type(event_source_index) == "table" and payload == nil then
-		payload = event_source_index
-	end
-
+	-- Dynamic_Wrap supplies the authoritative event source separately. Calls
+	-- without that source deliberately fail closed instead of trusting PlayerID.
 	if not payload then
 		return
 	end
 
 	local category = payload.category
 	local vote = payload.vote
-	local pid = tonumber(payload.PlayerID or -1)
-
-	-- Prefer actual sender when available (prevents spoofing PlayerID from client).
-	if type(event_source_index) == "number" and event_source_index > 0 then
-		local ok, sender = pcall(EntIndexToHScript, event_source_index)
-		if ok and sender ~= nil and sender.GetPlayerID then
-			local sender_player_id = sender:GetPlayerID()
-			if sender_player_id ~= nil and sender_player_id >= 0 then
-				pid = sender_player_id
-			end
+	local pid = nil
+	if api ~= nil and api.GetEventPlayerID ~= nil then
+		local ok, sender_player_id = pcall(function()
+			return api:GetEventPlayerID(event_source_index, nil)
+		end)
+		if ok then
+			pid = tonumber(sender_player_id)
 		end
 	end
 
 	if category == nil or vote == nil then
+		return
+	end
+
+	if pid == nil or pid < 0
+		or (IsXHSPersistentPlayerID ~= nil and not IsXHSPersistentPlayerID(pid))
+		or (IsXHSPersistentPlayerID == nil
+			and PlayerResource.IsFakeClient ~= nil
+			and PlayerResource:IsFakeClient(pid)) then
 		return
 	end
 
@@ -1893,6 +1913,14 @@ function GameMode:IsPlayerEligibleForCustomSetupReady(player_id)
 	-- Do not require GetPlayer() here: it can remain nil while the client is
 	-- loading, and excluding it would let already-loaded clients bypass it.
 	if PlayerResource:GetTeam(player_id) ~= DOTA_TEAM_GOODGUYS then
+		return false
+	end
+
+	if IsXHSPersistentPlayerID ~= nil then
+		return IsXHSPersistentPlayerID(player_id)
+	end
+
+	if PlayerResource.IsFakeClient ~= nil and PlayerResource:IsFakeClient(player_id) then
 		return false
 	end
 
@@ -1988,6 +2016,7 @@ function GameMode:PushCustomSetupNetTable()
 		ready_count = ready_count,
 		total_players = total_players,
 		ready_players = ready_players,
+		bot_provisioning = self.CustomSetupState.bot_provisioning and 1 or 0,
 	})
 end
 
@@ -2006,6 +2035,7 @@ function GameMode:StartCustomSetupFlow()
 		auto_ready_triggered = false,
 		all_players_loaded_since = nil,
 		ready_players = {},
+		bot_provisioning = false,
 	}
 
 	self:PushCustomSetupNetTable()
@@ -2015,11 +2045,12 @@ function GameMode:StartCustomSetupFlow()
 	end, 0.1)
 end
 
-function GameMode:FinishCustomSetup(launch_reason)
+function GameMode:CompleteCustomSetupLaunch(launch_reason)
 	if not self.CustomSetupState or not self.CustomSetupState.active then
 		return
 	end
 
+	self.CustomSetupState.bot_provisioning = false
 	self.CustomSetupState.active = false
 	self.CustomSetupState.launching = true
 	self.CustomSetupState.launch_reason = launch_reason or "timeout"
@@ -2032,6 +2063,32 @@ function GameMode:FinishCustomSetup(launch_reason)
 	end
 end
 
+function GameMode:FinishCustomSetup(launch_reason)
+	if not self.CustomSetupState or not self.CustomSetupState.active then
+		return
+	end
+	if self.CustomSetupState.bot_provisioning then
+		return
+	end
+
+	if XHSBots ~= nil and XHSBots.enabled == true and XHSBots.locked ~= true then
+		local canLaunch = XHSBots:BeforeCustomSetupFinish(launch_reason, function()
+			if GameMode.CustomSetupState ~= nil then
+				GameMode.CustomSetupState.bot_provisioning = false
+			end
+			GameMode:CompleteCustomSetupLaunch(launch_reason)
+		end)
+		if not canLaunch then
+			self.CustomSetupState.bot_provisioning = true
+			self.CustomSetupState.launch_reason = "bot_provisioning"
+			self:PushCustomSetupNetTable()
+			return
+		end
+	end
+
+	self:CompleteCustomSetupLaunch(launch_reason)
+end
+
 function GameMode:CustomSetupThink()
 	if not self.CustomSetupState then
 		return nil
@@ -2042,6 +2099,11 @@ function GameMode:CustomSetupThink()
 		self.CustomSetupState.launching = false
 		self:PushCustomSetupNetTable()
 		return nil
+	end
+
+	if self.CustomSetupState.bot_provisioning then
+		self:PushCustomSetupNetTable()
+		return 0.2
 	end
 
 	local ready_launch_delay = self.CustomSetupReadyLaunchDelay or 3
@@ -2108,12 +2170,8 @@ end
 function GameMode:OnCustomSetupReady(event_source_index, keys)
 	local payload = keys
 
-	-- Dynamic_Wrap + CustomGameEventManager passes (eventSourceIndex, keys)
-	-- Keep compatibility with direct calls that might pass only keys.
-	if type(event_source_index) == "table" and payload == nil then
-		payload = event_source_index
-	end
-
+	-- Ready state is bound to the authoritative event source. Never accept a
+	-- PlayerID supplied by the client payload.
 	if not payload then
 		return
 	end
@@ -2122,20 +2180,17 @@ function GameMode:OnCustomSetupReady(event_source_index, keys)
 		return
 	end
 
-	local player_id = tonumber(payload.PlayerID or -1)
-
-	-- Prefer the actual sender when available (prevents spoofing PlayerID from client).
-	if type(event_source_index) == "number" and event_source_index > 0 then
-		local ok, sender = pcall(EntIndexToHScript, event_source_index)
-		if ok and sender ~= nil and sender.GetPlayerID then
-			local sender_player_id = sender:GetPlayerID()
-			if sender_player_id ~= nil and sender_player_id >= 0 then
-				player_id = sender_player_id
-			end
+	local player_id = nil
+	if api ~= nil and api.GetEventPlayerID ~= nil then
+		local ok, sender_player_id = pcall(function()
+			return api:GetEventPlayerID(event_source_index, nil)
+		end)
+		if ok then
+			player_id = tonumber(sender_player_id)
 		end
 	end
 
-	if player_id < 0 then
+	if player_id == nil or player_id < 0 then
 		return
 	end
 

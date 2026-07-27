@@ -110,7 +110,9 @@ function GetXHSDestroyerMagnataurKillLimit(difficulty)
 	difficulty = tonumber(difficulty) or 1
 
 	local players = 1
-	if PlayerResource ~= nil and PlayerResource.GetPlayerCount ~= nil then
+	if GetXHSCombatParticipantCount ~= nil then
+		players = GetXHSCombatParticipantCount()
+	elseif PlayerResource ~= nil and PlayerResource.GetPlayerCount ~= nil then
 		players = PlayerResource:GetPlayerCount()
 	end
 

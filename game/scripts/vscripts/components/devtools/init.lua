@@ -313,6 +313,34 @@ function XHSDevTools:RunAction(action, event)
 			error("Unknown fragment quest window")
 		end
 		return "Fragment quest window completed"
+	elseif action == "bot_pause" then
+		if XHSBots == nil then return "XHSBots is unavailable" end
+		XHSBots:SetPaused(true)
+		return "Bot AI paused"
+	elseif action == "bot_resume" then
+		if XHSBots == nil then return "XHSBots is unavailable" end
+		XHSBots:SetPaused(false)
+		XHSBots:StartThinker()
+		return "Bot AI resumed"
+	elseif action == "bot_overlay" then
+		if XHSBots == nil then return "XHSBots is unavailable" end
+		XHSBots:SetOverlayEnabled(IsTruthy(event.enabled))
+		return IsTruthy(event.enabled) and "Bot overlay enabled" or "Bot overlay disabled"
+	elseif action == "bot_force_goal" then
+		if XHSBots == nil then return "XHSBots is unavailable" end
+		local ok, result = XHSBots:ForceGoal(ToNumber(event.player_id, -1), event.goal)
+		if not ok then error(result) end
+		return result
+	elseif action == "bot_reset" then
+		if XHSBots == nil then return "XHSBots is unavailable" end
+		XHSBots:ResetForTools()
+		XHSBots:StartThinker()
+		return "Bot AI state reset"
+	elseif action == "bot_run_scenario" then
+		if XHSBots == nil then return "XHSBots is unavailable" end
+		local ok, result = XHSBots:RunScenario(event.scenario)
+		if not ok then error(result) end
+		return result
 	elseif action == "cleanup" then
 		return self:Cleanup()
 	elseif action == "reset_sandbox" then

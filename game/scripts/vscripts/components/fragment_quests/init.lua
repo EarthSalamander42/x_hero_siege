@@ -131,6 +131,20 @@ local function GetPlayerIDFromUnit(unit)
 	return nil
 end
 
+local function IsPersistentFragmentPlayer(playerID)
+	playerID = tonumber(playerID)
+	if playerID == nil or playerID < 0 or not PlayerResource:IsValidPlayerID(playerID) then
+		return false
+	end
+	if IsXHSPersistentPlayerID ~= nil then
+		return IsXHSPersistentPlayerID(playerID)
+	end
+	if PlayerResource.IsFakeClient ~= nil then
+		return not PlayerResource:IsFakeClient(playerID)
+	end
+	return true
+end
+
 local function IsTower(unit)
 	if not IsValidUnit(unit) then return false end
 	if unit.IsTower ~= nil and unit:IsTower() then return true end
@@ -819,6 +833,7 @@ end
 
 function FragmentQuests:AddPlayerContribution(playerID, key, amount)
 	if playerID == nil or not PlayerResource:IsValidPlayerID(playerID) then return end
+	if not IsPersistentFragmentPlayer(playerID) then return end
 	amount = tonumber(amount) or 0
 
 	local id = tostring(playerID)
@@ -902,22 +917,22 @@ function FragmentQuests:OnDamage(filterTable)
 	local victim = nil
 	if filterTable.entindex_attacker_const ~= nil then attacker = EntIndexToHScript(filterTable.entindex_attacker_const) end
 	if filterTable.entindex_victim_const ~= nil then victim = EntIndexToHScript(filterTable.entindex_victim_const) end
+	local attackerPlayerID = GetPlayerIDFromUnit(attacker)
 
 	if IsValidUnit(victim) then
 		local bossID = GetBossID(victim)
-		if bossID ~= nil and IsGoodUnit(attacker) then
+		if bossID ~= nil and IsGoodUnit(attacker) and IsPersistentFragmentPlayer(attackerPlayerID) then
 			self:OnBossFightStart(bossID)
 		end
 	end
 
-	local attackerPlayerID = GetPlayerIDFromUnit(attacker)
-	if attackerPlayerID ~= nil and IsGoodUnit(attacker) and IsValidUnit(victim) and not IsGoodTeam(victim:GetTeamNumber()) then
+	if IsPersistentFragmentPlayer(attackerPlayerID) and IsGoodUnit(attacker) and IsValidUnit(victim) and not IsGoodTeam(victim:GetTeamNumber()) then
 		self.totals.team_damage = self.totals.team_damage + damage
 		self:AddPlayerContribution(attackerPlayerID, "damage", damage)
 	end
 
 	local victimPlayerID = GetPlayerIDFromUnit(victim)
-	if victimPlayerID ~= nil and IsGoodUnit(victim) and IsValidUnit(attacker) and not IsGoodTeam(attacker:GetTeamNumber()) then
+	if IsPersistentFragmentPlayer(victimPlayerID) and IsGoodUnit(victim) and IsValidUnit(attacker) and not IsGoodTeam(attacker:GetTeamNumber()) then
 		self.totals.frontline_damage = self.totals.frontline_damage + damage
 		self:AddPlayerContribution(victimPlayerID, "frontline_damage", damage)
 	end
@@ -928,6 +943,7 @@ end
 
 function FragmentQuests:AddHealing(playerID, amount)
 	if self.initialized ~= true then return end
+	if not IsPersistentFragmentPlayer(playerID) then return end
 	amount = tonumber(amount) or 0
 	if amount <= 0 then return end
 
@@ -941,6 +957,7 @@ function FragmentQuests:OnPotionUsed(caster)
 	if self.initialized ~= true then return end
 
 	local playerID = GetPlayerIDFromUnit(caster)
+	if not IsPersistentFragmentPlayer(playerID) then return end
 	self.totals.team_potions = self.totals.team_potions + 1
 	if playerID ~= nil then
 		self:AddPlayerContribution(playerID, "potions", 1)
@@ -992,6 +1009,9 @@ function FragmentQuests:OnHeroDeath(hero, meta)
 	if hero.IsRealHero == nil or not hero:IsRealHero() then return end
 	if not IsGoodUnit(hero) then return end
 
+	local playerID = GetPlayerIDFromUnit(hero)
+	if not IsPersistentFragmentPlayer(playerID) then return end
+
 	local now = Now()
 	local key = tostring(hero:entindex())
 	if self.last_hero_deaths[key] ~= nil and now - self.last_hero_deaths[key] < 0.35 then
@@ -999,7 +1019,6 @@ function FragmentQuests:OnHeroDeath(hero, meta)
 	end
 	self.last_hero_deaths[key] = now
 
-	local playerID = GetPlayerIDFromUnit(hero)
 	if playerID ~= nil then
 		self:AddPlayerContribution(playerID, "deaths", 1)
 	end
@@ -1031,12 +1050,11 @@ function FragmentQuests:OnEntityKilled(killedUnit, killer)
 
 	local unitName = killedUnit.GetUnitName ~= nil and killedUnit:GetUnitName() or ""
 
-	if self.context.farm_event_active == true and IsFarmEventCreep(killedUnit) then
+	local killerPlayerID = GetPlayerIDFromUnit(killer)
+	if self.context.farm_event_active == true and IsFarmEventCreep(killedUnit)
+		and IsPersistentFragmentPlayer(killerPlayerID) then
 		self.totals.farm_event_kills = self.totals.farm_event_kills + 1
-		local playerID = GetPlayerIDFromUnit(killer)
-		if playerID ~= nil then
-			self:AddPlayerContribution(playerID, "farm_event_kills", 1)
-		end
+		self:AddPlayerContribution(killerPlayerID, "farm_event_kills", 1)
 	end
 
 	if unitName == "npc_magnataur_destroyer_crypt" then
@@ -1303,7 +1321,8 @@ function FragmentQuests:RefreshOrbDiversity()
 
 	if HeroList ~= nil and HeroList.GetAllHeroes ~= nil then
 		for _, hero in pairs(HeroList:GetAllHeroes()) do
-			if IsValidUnit(hero) and hero:IsRealHero() and IsGoodUnit(hero) then
+			local playerID = GetPlayerIDFromUnit(hero)
+			if IsValidUnit(hero) and hero:IsRealHero() and IsGoodUnit(hero) and IsPersistentFragmentPlayer(playerID) then
 				for slot = 0, 8 do
 					local item = hero:GetItemInSlot(slot)
 					if item ~= nil and not item:IsNull() then
@@ -1553,7 +1572,9 @@ end
 function FragmentQuests:BuildPlayersPayload()
 	local players = {}
 	for _, contribution in pairs(self.players or {}) do
-		table.insert(players, contribution)
+		if type(contribution) == "table" and IsPersistentFragmentPlayer(contribution.player_id) then
+			table.insert(players, contribution)
+		end
 	end
 	return players
 end

@@ -29,7 +29,9 @@ ListenToGameEvent('game_rules_state_change', function()
 		require('zones/dialog_xhs')
 		require('zones/zone_tables_xhs')
 	elseif newState == DOTA_GAMERULES_STATE_PRE_GAME then
-		local player_count = PlayerResource:GetPlayerCount()
+		local player_count = GetXHSCombatParticipantCount ~= nil
+			and GetXHSCombatParticipantCount()
+			or PlayerResource:GetPlayerCount()
 		if player_count <= 4 then
 			_G.CREEP_LANES_TYPE = 2
 		else
@@ -108,7 +110,10 @@ ListenToGameEvent('game_rules_state_change', function()
 			end
 		end
 
-		local lane_count = math.min(8, PlayerResource:GetPlayerCount() * CREEP_LANES_TYPE)
+		local combat_participants = GetXHSCombatParticipantCount ~= nil
+			and GetXHSCombatParticipantCount()
+			or PlayerResource:GetPlayerCount()
+		local lane_count = math.min(8, combat_participants * CREEP_LANES_TYPE)
 
 		for NumPlayers = 1, lane_count do
 			CREEP_LANES[NumPlayers][1] = 1
@@ -2447,6 +2452,17 @@ function GameMode:UpdateGameEndTables()
 		signoutTable["trophy_level"] = trophyLevel
 	end
 
+	local hasXHSBotSession = false
+	if api ~= nil and api.HasXHSBotSession ~= nil then
+		hasXHSBotSession = api:HasXHSBotSession()
+	elseif api ~= nil and api.HasXHSBotParticipants ~= nil then
+		hasXHSBotSession = api:HasXHSBotParticipants()
+	end
+	if hasXHSBotSession then
+		print("XHS bots: skipped event metadata/signout persistence for this session.")
+		return
+	end
+
 	GameRules:SetEventMetadataCustomTable(metadataTable)
 	GameRules:SetEventSignoutCustomTable(signoutTable)
 end
@@ -2479,7 +2495,64 @@ end
 
 ---------------------------------------------------------
 
+local function ResolveAuthenticatedPersistentPlayerID(eventSourceIndex)
+	local playerID = nil
+
+	if api ~= nil and api.GetEventPlayerID ~= nil then
+		local ok, resolvedPlayerID = pcall(function()
+			return api:GetEventPlayerID(eventSourceIndex, nil)
+		end)
+		if ok then
+			playerID = tonumber(resolvedPlayerID)
+		end
+	elseif CustomGameEventManager ~= nil
+		and CustomGameEventManager.GetPlayerIDFromEventSourceIndex ~= nil then
+		local ok, resolvedPlayerID = pcall(function()
+			return CustomGameEventManager:GetPlayerIDFromEventSourceIndex(eventSourceIndex)
+		end)
+		if ok then
+			playerID = tonumber(resolvedPlayerID)
+		end
+	elseif tonumber(eventSourceIndex) ~= nil and tonumber(eventSourceIndex) > 0 then
+		-- Compatibility fallback for engine builds without
+		-- GetPlayerIDFromEventSourceIndex. The event source is authoritative;
+		-- payload PlayerID/nPlayerID is deliberately never consulted.
+		local ok, resolvedPlayerID = pcall(function()
+			local sender = EntIndexToHScript(tonumber(eventSourceIndex))
+			return sender ~= nil and sender.GetPlayerID ~= nil and sender:GetPlayerID() or nil
+		end)
+		if ok then
+			playerID = tonumber(resolvedPlayerID)
+		end
+	end
+
+	if playerID == nil or playerID < 0 or not PlayerResource:IsValidPlayerID(playerID) then
+		return nil
+	end
+
+	if api ~= nil and api.IsPersistentPlayerID ~= nil then
+		return api:IsPersistentPlayerID(playerID) and playerID or nil
+	end
+	if IsXHSPersistentPlayerID ~= nil then
+		return IsXHSPersistentPlayerID(playerID) and playerID or nil
+	end
+	if PlayerResource.IsFakeClient ~= nil and PlayerResource:IsFakeClient(playerID) then
+		return nil
+	end
+
+	return playerID
+end
+
 function GameMode:OnDialogConfirm(eventSourceIndex, data)
+	data = data or {}
+	local playerID = ResolveAuthenticatedPersistentPlayerID(eventSourceIndex)
+	if playerID == nil or data.ConfirmToken == nil then return end
+
+	GameMode.DialogConfirmPlayers = GameMode.DialogConfirmPlayers or {}
+	GameMode.DialogConfirmPlayers[data.ConfirmToken] = GameMode.DialogConfirmPlayers[data.ConfirmToken] or {}
+	if GameMode.DialogConfirmPlayers[data.ConfirmToken][playerID] then return end
+	GameMode.DialogConfirmPlayers[data.ConfirmToken][playerID] = true
+
 	if GameMode.DialogConfirmCount[data.ConfirmToken] == nil then
 		GameMode.DialogConfirmCount[data.ConfirmToken] = 1
 	else
@@ -2487,12 +2560,16 @@ function GameMode:OnDialogConfirm(eventSourceIndex, data)
 	end
 
 	local netTable = {}
-	netTable["PlayerID"] = data.nPlayerID
+	netTable["PlayerID"] = playerID
 	CustomGameEventManager:Send_ServerToAllClients("dialog_player_confirm", netTable)
 
 	local nValid = 0;
-	for iPlayer = 0, PlayerResource:GetPlayerCount() - 1 do
-		if PlayerResource:GetSteamAccountID(iPlayer) ~= 0 then
+	for iPlayer = 0, 23 do
+		local eligible = api ~= nil and api.IsPersistentPlayerID ~= nil
+			and api:IsPersistentPlayerID(iPlayer)
+			or api == nil and IsXHSPersistentPlayerID ~= nil
+				and IsXHSPersistentPlayerID(iPlayer)
+		if eligible then
 			nValid = nValid + 1
 		end
 	end
@@ -2513,6 +2590,9 @@ end
 ---------------------------------------------------------
 
 function GameMode:OnDialogConfirmExpired(eventSourceIndex, data)
+	data = data or {}
+	if ResolveAuthenticatedPersistentPlayerID(eventSourceIndex) == nil then return end
+
 	if data.ConfirmToken then
 		GameMode.DialogConfirmCount[data.ConfirmToken] = 4
 	end
@@ -2528,7 +2608,8 @@ end
 ---------------------------------------------------------
 
 function GameMode:OnRelicClaimed(eventSourceIndex, data)
-	local nPlayerID = data["PlayerID"]
+	data = data or {}
+	local nPlayerID = ResolveAuthenticatedPersistentPlayerID(eventSourceIndex)
 	local szClaimedRelicName = data["ClaimedRelicName"]
 	if nPlayerID ~= nil and szClaimedRelicName ~= nil then
 		print("GameMode:OnRelicClaimed - Player " .. nPlayerID .. " is trying to claim relic " .. szClaimedRelicName)

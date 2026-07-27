@@ -25,6 +25,7 @@
 		"custom_polls",
 		"xhs_quest_state",
 		"xhs_devtools",
+		"xhs_bots",
 		"vips",
 		"xhs_tome_purchase",
 		"xhs_lua_modifiers",

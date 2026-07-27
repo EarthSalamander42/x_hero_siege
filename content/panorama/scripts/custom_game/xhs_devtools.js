@@ -3,6 +3,9 @@ var XHSDevToolsActiveTab = "scenarios";
 var XHSDevToolsHasServerState = false;
 var XHSDevToolsCurrentTimescale = 1;
 var XHSDevToolsCinematicPreviewId = "";
+var XHSDevToolsBotConfig = {};
+var XHSDevToolsBotRoster = { count: 0, players: {} };
+var XHSDevToolsBotDebug = {};
 
 var XHS_DEVTOOLS_TIMESCALES = [
 	{ value: 0.1, label: "x0.1" },
@@ -16,6 +19,7 @@ var XHS_DEVTOOLS_TABS = [
 	{ id: "bosses", label: "Bosses" },
 	{ id: "lanes", label: "Lanes/Waves" },
 	{ id: "timers", label: "Timers/Phase" },
+	{ id: "bots", label: "Bots" },
 	{ id: "players", label: "Player Tools" },
 	{ id: "ui", label: "UI Preview" },
 	{ id: "cleanup", label: "Cleanup" }
@@ -144,6 +148,8 @@ function XHSDevToolsTogglePanel() {
 	panel.SetHasClass("Visible", !panel.BHasClass("Visible"));
 	if (panel.BHasClass("Visible")) {
 		XHSDevToolsRequestState();
+		XHSDevToolsReadBotNetTables();
+		XHSDevToolsRender();
 	}
 }
 
@@ -622,6 +628,258 @@ function XHSDevToolsRenderTimers(parent) {
 	}
 }
 
+function XHSDevToolsBotTableValues(table) {
+	var values = [];
+	for (var key in (table || {})) {
+		if (table[key] !== undefined && table[key] !== null) {
+			values.push({ key: key, value: table[key] });
+		}
+	}
+	values.sort(function(a, b) {
+		var aNumber = Number(a.key);
+		var bNumber = Number(b.key);
+		if (!isNaN(aNumber) && !isNaN(bNumber)) {
+			return aNumber - bNumber;
+		}
+		return String(a.key) < String(b.key) ? -1 : 1;
+	});
+	return values;
+}
+
+function XHSDevToolsBotText(value, fallback) {
+	if (value === undefined || value === null || String(value).length === 0) {
+		return fallback || "-";
+	}
+	return String(value);
+}
+
+function XHSDevToolsBotHeroName(heroName) {
+	heroName = XHSDevToolsBotText(heroName, "");
+	if (!heroName) {
+		return "No hero";
+	}
+	var localized = $.Localize("#" + heroName);
+	if (localized && localized !== ("#" + heroName)) {
+		return localized;
+	}
+	return heroName.replace(/^npc_dota_hero_/, "").replace(/_/g, " ").toUpperCase();
+}
+
+function XHSDevToolsBotVector(vector) {
+	if (!vector) {
+		return "-";
+	}
+	return Math.floor(Number(vector.x) || 0) + ", " +
+		Math.floor(Number(vector.y) || 0) + ", " +
+		Math.floor(Number(vector.z) || 0);
+}
+
+function XHSDevToolsMakeBotMetric(parent, key, value, wide) {
+	var metric = $.CreatePanel("Panel", parent, "");
+	metric.AddClass("XHSDevToolsBotMetric");
+	metric.SetHasClass("Wide", wide === true);
+	XHSDevToolsMakeLabel(metric, "XHSDevToolsBotMetricKey", key);
+	XHSDevToolsMakeLabel(metric, "XHSDevToolsBotMetricValue", XHSDevToolsBotText(value, "-"));
+	return metric;
+}
+
+function XHSDevToolsRenderBotTopActions(parent, debug) {
+	var actions = XHSDevToolsBotTableValues(debug.top_actions || {});
+	var actionList = $.CreatePanel("Panel", parent, "");
+	actionList.AddClass("XHSDevToolsBotActionsList");
+	if (actions.length === 0) {
+		XHSDevToolsMakeLabel(actionList, "XHSDevToolsBotActionLine", "No scored action yet.");
+		return;
+	}
+
+	for (var i = 0; i < actions.length && i < 3; i++) {
+		var action = actions[i].value || {};
+		var score = Number(action.score);
+		var scoreText = isNaN(score) ? "-" : score.toFixed(2);
+		XHSDevToolsMakeLabel(
+			actionList,
+			"XHSDevToolsBotActionLine",
+			(i + 1) + ". " + XHSDevToolsBotText(action.id, "unknown") +
+				" [" + scoreText + "] - " + XHSDevToolsBotText(action.reason, "no reason")
+		);
+	}
+}
+
+function XHSDevToolsRenderBotCard(parent, rosterEntry) {
+	var bot = rosterEntry.value || {};
+	var playerID = Number(bot.player_id);
+	if (isNaN(playerID)) {
+		playerID = Number(rosterEntry.key);
+	}
+	var debug = XHSDevToolsBotDebug[String(playerID)] || {};
+
+	var card = $.CreatePanel("Panel", parent, "");
+	card.AddClass("XHSDevToolsBotCard");
+	card.SetHasClass("HasError", !!debug.error);
+
+	var header = $.CreatePanel("Panel", card, "");
+	header.AddClass("XHSDevToolsBotCardHeader");
+	XHSDevToolsMakeHeroIcon(header, bot.hero || debug.hero, "XHSDevToolsBotHero");
+
+	var headerText = $.CreatePanel("Panel", header, "");
+	headerText.AddClass("XHSDevToolsBotHeaderText");
+	XHSDevToolsMakeLabel(headerText, "XHSDevToolsBotName", XHSDevToolsBotText(bot.name, "XHS Bot " + (playerID + 1)));
+	XHSDevToolsMakeLabel(
+		headerText,
+		"XHSDevToolsBotMeta",
+		"#" + playerID + " / " +
+			XHSDevToolsBotHeroName(bot.hero || debug.hero) + " / " +
+			XHSDevToolsBotText(bot.difficulty || debug.difficulty, "normal") + " / " +
+			XHSDevToolsBotText(bot.role || debug.role, "unassigned")
+	);
+
+	var stateRow = $.CreatePanel("Panel", card, "");
+	stateRow.AddClass("XHSDevToolsBotStateRow");
+	XHSDevToolsMakeLabel(stateRow, "XHSDevToolsBotState", XHSDevToolsBotText(debug.state, "INITIALIZING"));
+	XHSDevToolsMakeLabel(stateRow, "XHSDevToolsBotGoal", "Goal: " + XHSDevToolsBotText(debug.goal, "-"));
+
+	var metrics = $.CreatePanel("Panel", card, "");
+	metrics.AddClass("XHSDevToolsBotMetrics");
+	XHSDevToolsMakeBotMetric(metrics, "Target", debug.target || debug.target_entindex, true);
+	XHSDevToolsMakeBotMetric(metrics, "Anchor", XHSDevToolsBotVector(debug.anchor), true);
+	XHSDevToolsMakeBotMetric(metrics, "Lane / side", XHSDevToolsBotText(debug.lane, "0") + " / " + XHSDevToolsBotText(debug.side, "-"), false);
+	XHSDevToolsMakeBotMetric(metrics, "Idle", XHSDevToolsBotText(debug.idle_seconds, "0") + "s", false);
+	XHSDevToolsMakeBotMetric(metrics, "Orders", debug.orders, false);
+	XHSDevToolsMakeBotMetric(metrics, "Targets", debug.target_changes, false);
+	XHSDevToolsMakeBotMetric(metrics, "Unstuck", debug.stuck_recoveries, false);
+	XHSDevToolsMakeBotMetric(metrics, "Danger hits", debug.danger_hits, false);
+	XHSDevToolsMakeBotMetric(metrics, "Tomes", debug.tomes_bought, false);
+	XHSDevToolsMakeBotMetric(metrics, "Connection", debug.connection_state, false);
+
+	var decisions = $.CreatePanel("Panel", card, "");
+	decisions.AddClass("XHSDevToolsBotDecisions");
+	XHSDevToolsMakeLabel(
+		decisions,
+		"XHSDevToolsBotDecisionLine",
+		"Decision: " + XHSDevToolsBotText(debug.last_decision, "-") +
+			" - " + XHSDevToolsBotText(debug.last_decision_reason, "no reason")
+	);
+	XHSDevToolsMakeLabel(
+		decisions,
+		"XHSDevToolsBotDecisionLine",
+		"Order: " + XHSDevToolsBotText(debug.last_order, "-")
+	);
+	XHSDevToolsMakeLabel(
+		decisions,
+		"XHSDevToolsBotDecisionLine",
+		"Ability: " + XHSDevToolsBotText(debug.last_ability, "-") +
+			" - " + XHSDevToolsBotText(debug.last_ability_reason, "no reason")
+	);
+	XHSDevToolsMakeLabel(
+		decisions,
+		"XHSDevToolsBotDecisionLine",
+		"Rejected: " + XHSDevToolsBotText(debug.last_rejected_action, "-")
+	);
+
+	XHSDevToolsMakeLabel(card, "XHSDevToolsBotSubheading", "TOP ACTIONS");
+	XHSDevToolsRenderBotTopActions(card, debug);
+
+	var engineKnown = debug.engine_fake_client !== undefined && debug.engine_fake_client !== null;
+	var teamKnown = debug.engine_team_verified !== undefined && debug.engine_team_verified !== null;
+	var engineOk = engineKnown && (Number(debug.engine_fake_client) === 1 || debug.engine_fake_client === true);
+	var teamOk = teamKnown && (Number(debug.engine_team_verified) === 1 || debug.engine_team_verified === true);
+	var engine = XHSDevToolsMakeLabel(
+		card,
+		"XHSDevToolsBotEngine",
+		"Engine bot: " + (engineKnown ? (engineOk ? "YES" : "NO") : "...") +
+			" / Radiant: " + (teamKnown ? (teamOk ? "YES" : "NO") : "...")
+	);
+	engine.SetHasClass("Error", (engineKnown && !engineOk) || (teamKnown && !teamOk));
+
+	if (debug.error) {
+		XHSDevToolsMakeLabel(card, "XHSDevToolsBotError", String(debug.error));
+	}
+
+	var goalGrid = $.CreatePanel("Panel", card, "");
+	goalGrid.AddClass("XHSDevToolsBotGoalGrid");
+	var goals = [
+		{ id: "auto", label: "Auto" },
+		{ id: "defend_base", label: "Base" },
+		{ id: "regroup", label: "Regroup" },
+		{ id: "fight_boss", label: "Boss" },
+		{ id: "hold", label: "Hold" }
+	];
+	for (var i = 0; i < goals.length; i++) {
+		(function(goal) {
+			XHSDevToolsMakeButton(goalGrid, goal.label, "Tiny", function() {
+				XHSDevToolsSend("bot_force_goal", { player_id: playerID, goal: goal.id });
+			});
+		})(goals[i]);
+	}
+}
+
+function XHSDevToolsRenderBots(parent) {
+	var controls = XHSDevToolsMakeSection(parent, "Allied Bot Control");
+	var configuredCount = Number(XHSDevToolsBotConfig.bot_count || 0);
+	var rosterCount = Number(XHSDevToolsBotRoster.count || 0);
+	XHSDevToolsMakeLabel(
+		controls,
+		"XHSDevToolsMuted",
+		"Config: " + configuredCount + " " +
+			XHSDevToolsBotText(XHSDevToolsBotConfig.ai_difficulty, "normal") + " / " +
+			XHSDevToolsBotText(XHSDevToolsBotConfig.composition, "balanced") +
+			" | roster " + rosterCount +
+			" | server " + XHSDevToolsBotText(XHSDevToolsBotConfig.status, "waiting")
+	);
+	if (XHSDevToolsBotConfig.error) {
+		XHSDevToolsMakeLabel(controls, "XHSDevToolsBotError", String(XHSDevToolsBotConfig.error));
+	}
+
+	var controlGrid = $.CreatePanel("Panel", controls, "");
+	controlGrid.AddClass("XHSDevToolsGrid");
+	XHSDevToolsMakeButton(controlGrid, "Pause AI", "Warn", function() {
+		XHSDevToolsSend("bot_pause", {});
+	});
+	XHSDevToolsMakeButton(controlGrid, "Resume AI", "Accent", function() {
+		XHSDevToolsSend("bot_resume", {});
+	});
+	XHSDevToolsMakeButton(controlGrid, "Overlay ON", "", function() {
+		XHSDevToolsSend("bot_overlay", { enabled: 1 });
+	});
+	XHSDevToolsMakeButton(controlGrid, "Overlay OFF", "", function() {
+		XHSDevToolsSend("bot_overlay", { enabled: 0 });
+	});
+	XHSDevToolsMakeButton(controlGrid, "Reset AI", "Danger", function() {
+		XHSDevToolsSend("bot_reset", {});
+	});
+
+	var scenarios = XHSDevToolsMakeSection(parent, "Bot Scenarios");
+	XHSDevToolsMakeLabel(scenarios, "XHSDevToolsMuted", "Focused test hooks for danger response, assignment rebuild, stuck recovery, and respawn/rebind.");
+	var scenarioGrid = $.CreatePanel("Panel", scenarios, "");
+	scenarioGrid.AddClass("XHSDevToolsGrid");
+	var scenarioOptions = [
+		{ id: "danger", label: "Danger" },
+		{ id: "reassign", label: "Reassign" },
+		{ id: "stuck", label: "Stuck" },
+		{ id: "respawn", label: "Respawn" }
+	];
+	for (var scenarioIndex = 0; scenarioIndex < scenarioOptions.length; scenarioIndex++) {
+		(function(scenario) {
+			XHSDevToolsMakeButton(scenarioGrid, scenario.label, "Small", function() {
+				XHSDevToolsSend("bot_run_scenario", { scenario: scenario.id });
+			});
+		})(scenarioOptions[scenarioIndex]);
+	}
+
+	var telemetry = XHSDevToolsMakeSection(parent, "Live Bot Telemetry");
+	var rosterEntries = XHSDevToolsBotTableValues(XHSDevToolsBotRoster.players || {});
+	if (rosterEntries.length === 0) {
+		XHSDevToolsMakeLabel(telemetry, "XHSDevToolsMuted", "No XHS bot is provisioned. Configure allies from the Tools loading screen, then launch.");
+		return;
+	}
+
+	var cards = $.CreatePanel("Panel", telemetry, "");
+	cards.AddClass("XHSDevToolsBotCardGrid");
+	for (var botIndex = 0; botIndex < rosterEntries.length; botIndex++) {
+		XHSDevToolsRenderBotCard(cards, rosterEntries[botIndex]);
+	}
+}
+
 function XHSDevToolsRenderPlayers(parent) {
 	var players = XHSDevToolsMakeSection(parent, "Player Tools");
 	var grid = $.CreatePanel("Panel", players, "");
@@ -793,6 +1051,8 @@ function XHSDevToolsRender() {
 		XHSDevToolsRenderLanes(content);
 	} else if (XHSDevToolsActiveTab === "timers") {
 		XHSDevToolsRenderTimers(content);
+	} else if (XHSDevToolsActiveTab === "bots") {
+		XHSDevToolsRenderBots(content);
 	} else if (XHSDevToolsActiveTab === "players") {
 		XHSDevToolsRenderPlayers(content);
 	} else if (XHSDevToolsActiveTab === "ui") {
@@ -812,6 +1072,75 @@ function XHSDevToolsOnState(tableName, key, data) {
 	XHSDevToolsRender();
 }
 
+function XHSDevToolsReadBotDebugFromRoster() {
+	var active = {};
+	var rosterEntries = XHSDevToolsBotTableValues(XHSDevToolsBotRoster.players || {});
+	for (var i = 0; i < rosterEntries.length; i++) {
+		var rosterBot = rosterEntries[i].value || {};
+		var playerID = Number(rosterBot.player_id);
+		if (isNaN(playerID)) {
+			playerID = Number(rosterEntries[i].key);
+		}
+		if (isNaN(playerID)) {
+			continue;
+		}
+		active[String(playerID)] = true;
+		var debug = CustomNetTables.GetTableValue("xhs_bots", "debug_" + playerID);
+		if (debug) {
+			XHSDevToolsBotDebug[String(playerID)] = debug;
+		}
+	}
+
+	for (var debugPlayerID in XHSDevToolsBotDebug) {
+		if (!active[debugPlayerID]) {
+			delete XHSDevToolsBotDebug[debugPlayerID];
+		}
+	}
+}
+
+function XHSDevToolsReadBotNetTables() {
+	if (!XHSDevToolsIsToolsMode() || typeof CustomNetTables === "undefined" || !CustomNetTables) {
+		return;
+	}
+	XHSDevToolsBotConfig = CustomNetTables.GetTableValue("xhs_bots", "config") || {};
+	XHSDevToolsBotRoster = CustomNetTables.GetTableValue("xhs_bots", "roster") || { count: 0, players: {} };
+	XHSDevToolsReadBotDebugFromRoster();
+}
+
+function XHSDevToolsShouldRenderBots() {
+	var panel = XHSDevToolsPanel();
+	return XHSDevToolsIsToolsMode() &&
+		XHSDevToolsActiveTab === "bots" &&
+		panel &&
+		panel.BHasClass("Visible");
+}
+
+function XHSDevToolsOnBots(tableName, key, data) {
+	if (!XHSDevToolsIsToolsMode()) {
+		return;
+	}
+
+	if (key === "config") {
+		XHSDevToolsBotConfig = data || {};
+	} else if (key === "roster") {
+		XHSDevToolsBotRoster = data || { count: 0, players: {} };
+		XHSDevToolsReadBotDebugFromRoster();
+	} else if (String(key).indexOf("debug_") === 0) {
+		var playerID = String(key).substring("debug_".length);
+		if (data) {
+			XHSDevToolsBotDebug[playerID] = data;
+		} else {
+			delete XHSDevToolsBotDebug[playerID];
+		}
+	} else {
+		return;
+	}
+
+	if (XHSDevToolsShouldRenderBots()) {
+		XHSDevToolsRender();
+	}
+}
+
 (function() {
 	if (!XHSDevToolsIsToolsMode()) {
 		var root = $("#XHSDevToolsRoot");
@@ -822,11 +1151,13 @@ function XHSDevToolsOnState(tableName, key, data) {
 	}
 
 	CustomNetTables.SubscribeNetTableListener("xhs_devtools", XHSDevToolsOnState);
+	CustomNetTables.SubscribeNetTableListener("xhs_bots", XHSDevToolsOnBots);
 	var state = CustomNetTables.GetTableValue("xhs_devtools", "state");
 	if (state) {
 		XHSDevToolsState = state;
 		XHSDevToolsHasServerState = true;
 	}
+	XHSDevToolsReadBotNetTables();
 	XHSDevToolsRender();
 	XHSDevToolsRequestStateLoop();
 })();

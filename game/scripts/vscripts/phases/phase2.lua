@@ -116,7 +116,10 @@ function StartPhase2()
 	ActivatePhase2CreepTimer()
 	ResetPhase2CreepWaveCounts()
 
-	local multiplayer = PlayerResource:GetPlayerCount() > 1
+	local combatParticipants = GetXHSCombatParticipantCount ~= nil
+		and GetXHSCombatParticipantCount()
+		or PlayerResource:GetPlayerCount()
+	local multiplayer = combatParticipants > 1
 	CustomTimers.phase2_active_ice_towers = multiplayer and { 1, 2 } or { 1 }
 	CustomTimers.shal_lightbinder_released = false
 

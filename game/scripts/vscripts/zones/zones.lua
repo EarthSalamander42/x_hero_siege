@@ -1641,7 +1641,11 @@ function CDungeonZone:CheckForZoneComplete()
 			local nTotalData4 = bit.lshift(nTotalDamage / 1000000, 16) + bit.band(nTotalHealing / 1000000, 0xFFFF)
 			local nTotalData5 = bit.lshift(nTotalPlayerDeaths[0], 24) + bit.lshift(nTotalPlayerDeaths[1], 16) + bit.lshift(nTotalPlayerDeaths[2], 8) + nTotalPlayerDeaths[3]
 
-			GameRules:AddEventMetadataLeaderboardEntry("total", nTotalTime, nTotalStars, nMaxTotalStars, nTotalData1, nTotalData2, nTotalData3, nTotalData4, nTotalData5)
+			if api ~= nil and api.HasXHSBotParticipants ~= nil and api:HasXHSBotParticipants() then
+				print("XHS bots: skipped event leaderboard persistence for this session.")
+			else
+				GameRules:AddEventMetadataLeaderboardEntry("total", nTotalTime, nTotalStars, nMaxTotalStars, nTotalData1, nTotalData2, nTotalData3, nTotalData4, nTotalData5)
+			end
 		end
 
 		GameRules.GameMode:OnZoneCompleted(CDungeonZone)

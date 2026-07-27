@@ -1,6 +1,20 @@
 -- Experience System
 CustomNetTables:SetTableValue("game_options", "game_count", { value = 1 })
 
+local function IsPersistentBattlepassPlayer(playerID)
+	playerID = tonumber(playerID)
+	if playerID == nil or playerID < 0 or not PlayerResource:IsValidPlayerID(playerID) then
+		return false
+	end
+	if IsXHSPersistentPlayerID ~= nil then
+		return IsXHSPersistentPlayerID(playerID)
+	end
+	if PlayerResource.IsFakeClient ~= nil then
+		return not PlayerResource:IsFakeClient(playerID)
+	end
+	return true
+end
+
 function Battlepass:GetTitleColorXP(title)
 	if title == "Rookie" then
 		return { 255, 255, 255 }
@@ -43,7 +57,13 @@ function Battlepass:GetPlayerInfoXP() -- yet it has too much useless loops, form
 
 	print("API ready!")
 
-	for player_id = 0, PlayerResource:GetPlayerCount() - 1 do
+	local persistentPlayerIDs = {}
+	for playerID = 0, 23 do
+		if IsPersistentBattlepassPlayer(playerID) then
+			table.insert(persistentPlayerIDs, playerID)
+		end
+	end
+	for _, player_id in ipairs(persistentPlayerIDs) do
 		local steamid = tostring(PlayerResource:GetSteamID(player_id))
 		local has_backend_player = api.players[steamid] ~= nil
 		local is_bot_donator = api.GetBotDonatorStatus ~= nil and api:GetBotDonatorStatus(player_id) ~= 0
@@ -119,6 +139,7 @@ function Battlepass:GetPlayerInfoXP() -- yet it has too much useless loops, form
 end
 
 function Battlepass:UpdatePlayerTable(player_id, key, value)
+	if not IsPersistentBattlepassPlayer(player_id) then return false end
 	local ply_table = CustomNetTables:GetTableValue("supporter_pass_player", tostring(player_id))
 	if ply_table == nil then
 		ply_table = {}
@@ -127,4 +148,5 @@ function Battlepass:UpdatePlayerTable(player_id, key, value)
 	ply_table[key] = value
 
 	CustomNetTables:SetTableValue("supporter_pass_player", tostring(player_id), ply_table)
+	return true
 end

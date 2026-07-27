@@ -38,7 +38,19 @@ local function GetWispDonatorLevel(parent)
 		return 0
 	end
 
-	local donator_level = tonumber(api:GetDonatorStatus(parent:GetPlayerID())) or 0
+	local playerID = parent:GetPlayerID()
+	if playerID == nil or playerID < 0 or not PlayerResource:IsValidPlayerID(playerID) then
+		return 0
+	end
+	if IsXHSPersistentPlayerID ~= nil and not IsXHSPersistentPlayerID(playerID) then
+		return 0
+	end
+	if IsXHSPersistentPlayerID == nil and PlayerResource.IsFakeClient ~= nil
+		and PlayerResource:IsFakeClient(playerID) then
+		return 0
+	end
+
+	local donator_level = tonumber(api:GetDonatorStatus(playerID)) or 0
 	return NormalizeWispDonatorLevel(donator_level)
 end
 

@@ -18,7 +18,20 @@ local function Record(parent, statName, amount)
 	if not IsServer() or parent == nil or parent:IsNull() or XHSRecordEndScreenStatSource == nil then return end
 	local playerID = XHSGetPlayerIDFromUnit ~= nil and XHSGetPlayerIDFromUnit(parent) or parent:GetPlayerOwnerID()
 	if playerID ~= nil and playerID >= 0 then
-		XHSRecordEndScreenStatSource(playerID, statName, amount, "hero_modifier")
+		local isPersistent = true
+		if IsXHSPersistentPlayerID ~= nil then
+			isPersistent = IsXHSPersistentPlayerID(playerID)
+		elseif PlayerResource.IsFakeClient ~= nil and PlayerResource:IsValidPlayerID(playerID) then
+			isPersistent = not PlayerResource:IsFakeClient(playerID)
+		end
+		local sourceName = "hero_modifier"
+		if not isPersistent then
+			-- Keep bot statistics in the local end-screen snapshot. The API
+			-- serializes only persistent humans to its backend payload.
+			parent.xhs_end_screen_stats_local_only = true
+			sourceName = "hero_modifier_bot_local"
+		end
+		XHSRecordEndScreenStatSource(playerID, statName, amount, sourceName)
 	end
 end
 

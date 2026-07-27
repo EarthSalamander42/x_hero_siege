@@ -877,7 +877,10 @@ function SpecialEvents:EndFarmEvent()
 	end
 
 	-- Start Phase 2
-	for NumPlayers = 1, MAGNATAURS_TO_KILL * PlayerResource:GetPlayerCount() * CREEP_LANES_TYPE do
+	local combatParticipants = GetXHSCombatParticipantCount ~= nil
+		and GetXHSCombatParticipantCount()
+		or PlayerResource:GetPlayerCount()
+	for NumPlayers = 1, MAGNATAURS_TO_KILL * combatParticipants * CREEP_LANES_TYPE do
 		local rax_spawner = Entities:FindByName(nil, "npc_dota_spawner_" .. NumPlayers)
 
 		if rax_spawner then

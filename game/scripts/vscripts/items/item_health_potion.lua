@@ -1,5 +1,8 @@
 item_health_potion = class({})
 
+local SupporterRecoveryEffects = require("components/battlepass/recovery_effects"):Init()
+local HEALTH_POTION_PARTICLE = "particles/items3_fx/fish_bones_active.vpcf"
+
 function item_health_potion:GetAbilityTextureName()
 	return "custom/health_potion"
 end
@@ -14,8 +17,7 @@ function item_health_potion:OnSpellStart()
 
 		XHSRecordPotionUse(self:GetCaster(), self:GetAbilityName())
 
-		local nFXIndex = ParticleManager:CreateParticle("particles/items3_fx/fish_bones_active.vpcf", PATTACH_ABSORIGIN_FOLLOW, self:GetCaster())
-		ParticleManager:ReleaseParticleIndex(nFXIndex)
+		SupporterRecoveryEffects:PlayPotion(self:GetCaster(), "health", HEALTH_POTION_PARTICLE)
 
 		self:SpendCharge(0.0)
 	end

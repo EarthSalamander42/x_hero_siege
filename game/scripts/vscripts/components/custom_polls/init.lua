@@ -1,5 +1,16 @@
 CustomPolls = CustomPolls or class({})
 
+local function IsPersistentPollPlayer(player_id)
+	if player_id == nil or not PlayerResource:IsValidPlayerID(player_id) then return false end
+	if api ~= nil and api.IsPersistentPlayerID ~= nil then
+		return api:IsPersistentPlayerID(player_id)
+	end
+	if IsXHSPersistentPlayerID ~= nil then
+		return IsXHSPersistentPlayerID(player_id)
+	end
+	return PlayerResource.IsFakeClient == nil or not PlayerResource:IsFakeClient(player_id)
+end
+
 function CustomPolls:Init()
 	if self.initialized then return end
 
@@ -86,14 +97,14 @@ end
 
 function CustomPolls:PublishAll()
 	for player_id = 0, PlayerResource:GetPlayerCount() - 1 do
-		if PlayerResource:IsValidPlayerID(player_id) then
+		if IsPersistentPollPlayer(player_id) then
 			self:PublishPlayer(player_id)
 		end
 	end
 end
 
 function CustomPolls:PublishPlayer(player_id)
-	if player_id == nil or not PlayerResource:IsValidPlayerID(player_id) then return end
+	if not IsPersistentPollPlayer(player_id) then return end
 
 	CustomNetTables:SetTableValue("custom_polls", tostring(player_id), self:BuildPlayerState(player_id))
 end
@@ -168,6 +179,8 @@ function CustomPolls:GetPlayerIDFromEvent(event_source_index, event)
 	if player_id == nil or not PlayerResource:IsValidPlayerID(player_id) then
 		return nil
 	end
+
+	if not IsPersistentPollPlayer(player_id) then return nil end
 
 	return player_id
 end
