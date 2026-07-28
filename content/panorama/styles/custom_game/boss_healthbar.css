@@ -87,6 +87,41 @@
 	transition-duration: .18s;
 }
 
+.CastleHealthBar
+{
+	border: 1px solid #d7b65b55;
+	border-left: 3px solid #f2cb64;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #172033f4 ), color-stop( 0.58, #101a2cf0 ), to( #060b16f5 ) );
+	box-shadow: fill #000000a0 0px 0px 12px 0px, #f2cb6428 0px 0px 10px 0px;
+}
+
+.MultiBossBars #CastleHP.CastleHealthBar
+{
+	width: 690px;
+	margin-left: 315px;
+	margin-right: 315px;
+}
+
+.CastleHealthBar .CastleIcon
+{
+	border-color: #f2cb6470;
+	box-shadow: fill #00000090 0px 0px 8px 0px, #f2cb6430 0px 0px 7px 0px;
+}
+
+.CastleMuradinState
+{
+	color: #8ff0b1;
+	text-shadow: 0px 0px 6px #49d88166, 0px 2px 4px #000000;
+}
+
+.CastleMuradinState.Triggered
+{
+	color: #858d92;
+	text-shadow: 0px 2px 4px #000000;
+	saturation: 0;
+	brightness: .72;
+}
+
 .MultiBossBars .HealthBarContainer
 {
 	width: 640px;

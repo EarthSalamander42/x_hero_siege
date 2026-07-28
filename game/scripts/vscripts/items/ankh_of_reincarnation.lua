@@ -149,6 +149,11 @@ function modifier_ankh_passives:OnIntervalThink()
 		self:GetParent():SetRespawnPosition(self.position)
 		self:GetParent():RespawnHero(false, false)
 		self:GetParent():SetRespawnsDisabled(false)
+		if XHSSetPlayerBaseRespawnPosition ~= nil then
+			-- The current reincarnation stays at its death position; only future
+			-- ordinary deaths return to this player's dedicated base slot.
+			XHSSetPlayerBaseRespawnPosition(self:GetParent())
+		end
 		PlayAnkhRespawnParticle(self:GetParent())
 	else
 --		print("Unit name:", self:GetParent():GetUnitName())

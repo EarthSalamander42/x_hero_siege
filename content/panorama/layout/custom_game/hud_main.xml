@@ -58,10 +58,10 @@
 				<Panel id="Player7Confirm" class="PlayerConfirm"><DOTAHeroImage id="Player7ConfirmIcon" class="ConfirmHeroIcon" heroid="8" hittest="false" scaling="stretch-to-fit-y-preserve-aspect"/><Label id="Player7ConfirmName" class="XHSDialogHeroName" text=""/></Panel>
 			</Panel>
 			<Button id="ConfirmButton" class="ButtonBevel XHSButton" onactivate="OnConfirmButtonPressed()"><Panel class="CheckMark"/><Label text="#DOTA_Siltbreaker_ContinueSpeechText"/></Button>
-			<Panel class="DialogButtonContainer LeftRightFlow">
-				<Button id="ContinueDialogButton" class="ButtonBevel XHSDialogNextButton" onactivate="OnAdvanceDialogButtonPressed()" hittest="true"><Label text="#DOTA_Siltbreaker_NextSpeechText"/></Button>
-				<Button id="CloseDialogButton" class="ButtonBevel CloseButton" onactivate="OnCloseDialogButtonPressed()" hittest="true"/>		
-			</Panel>	
+		</Panel>
+		<Panel class="DialogButtonContainer LeftRightFlow">
+			<Button id="ContinueDialogButton" class="ButtonBevel XHSDialogNextButton" onactivate="OnAdvanceDialogButtonPressed()" hittest="true"><Label text="#DOTA_Siltbreaker_NextSpeechText"/></Button>
+			<Button id="CloseDialogButton" class="ButtonBevel CloseButton" onactivate="OnCloseDialogButtonPressed()" hittest="true"/>
 		</Panel>
 	</Panel>
 

@@ -23,11 +23,13 @@ LinkLuaModifier("modifier_xhs_rune_bounty_surge", XHS_RUNE_MODIFIER_SCRIPT, LUA_
 LinkLuaModifier("modifier_xhs_rune_momentum", XHS_RUNE_MODIFIER_SCRIPT, LUA_MODIFIER_MOTION_NONE)
 
 Runes.PICKUP_RADIUS = 170
-Runes.NEAR_RADIUS = 1200
 Runes.VISION_RADIUS = 450
 Runes.VISION_DURATION = 999999
 Runes.FRAGMENT_AMOUNT = 50
 Runes.FRAGMENT_WAVES = { 2, 4, 5, 6, 7, 8 }
+Runes.FINAL_WAVE_INDEX = 9
+Runes.MAX_RUNES_PER_BATCH = 8
+Runes.EXTRA_RUNE_SPACING = 150
 Runes.VISUAL_MODELS = {
 	Recovery = "models/custom_game/runes/xhs_rune_recovery.vmdl",
 	Defense = "models/custom_game/runes/xhs_rune_defense.vmdl",
@@ -65,7 +67,7 @@ Runes.DEFINITIONS = {
 	healing = {
 		name = "Healing Rune",
 		category = "Recovery",
-		scope = "team",
+		scope = "picker",
 		modifier = "modifier_xhs_rune_healing",
 		duration = 30,
 		values = { hp_regen_pct = 5, mana_regen_pct = 8 },
@@ -73,7 +75,7 @@ Runes.DEFINITIONS = {
 	revitalization = {
 		name = "Revitalization Rune",
 		category = "Recovery",
-		scope = "team",
+		scope = "picker",
 		modifier = "modifier_xhs_rune_revitalization",
 		duration = 20,
 		values = { cooldown_reduction_pct = 30 },
@@ -81,14 +83,14 @@ Runes.DEFINITIONS = {
 	restoration = {
 		name = "Restoration Rune",
 		category = "Recovery",
-		scope = "team",
+		scope = "picker",
 		instant = "restoration",
 		values = { missing_pct = 35 },
 	},
 	second_wind = {
 		name = "Second Wind Rune",
 		category = "Recovery",
-		scope = "team",
+		scope = "picker",
 		modifier = "modifier_xhs_rune_second_wind",
 		duration = 30,
 		values = { threshold_pct = 30, heal_pct = 30, mana_pct = 30, recovery_duration = 3, guard_duration = 4, guard_reduction = 20 },
@@ -96,7 +98,7 @@ Runes.DEFINITIONS = {
 	barrier = {
 		name = "Barrier Rune",
 		category = "Defense",
-		scope = "team",
+		scope = "picker",
 		modifier = "modifier_xhs_rune_barrier",
 		duration = 30,
 		values = { shield_pct = 25, health_regen_pct = 4 },
@@ -104,7 +106,7 @@ Runes.DEFINITIONS = {
 	retaliation = {
 		name = "Retaliation Rune",
 		category = "Defense",
-		scope = "near",
+		scope = "picker",
 		modifier = "modifier_xhs_rune_retaliation",
 		duration = 25,
 		values = { reflect_pct = 25 },
@@ -112,7 +114,7 @@ Runes.DEFINITIONS = {
 	bulwark = {
 		name = "Bulwark Rune",
 		category = "Defense",
-		scope = "near",
+		scope = "picker",
 		modifier = "modifier_xhs_rune_bulwark",
 		duration = 35,
 		values = { armor = 35, magic_resist = 25 },
@@ -120,7 +122,7 @@ Runes.DEFINITIONS = {
 	fortitude = {
 		name = "Fortitude Rune",
 		category = "Defense",
-		scope = "near",
+		scope = "picker",
 		modifier = "modifier_xhs_rune_fortitude",
 		duration = 25,
 		values = { status_resist = 35, damage_reduction = 20 },
@@ -128,7 +130,7 @@ Runes.DEFINITIONS = {
 	titan = {
 		name = "Titan Rune",
 		category = "Offense",
-		scope = "near",
+		scope = "picker",
 		modifier = "modifier_xhs_rune_titan",
 		duration = 35,
 		values = { model_scale = 18, max_hp_pct = 30, outgoing_damage = 25 },
@@ -136,7 +138,7 @@ Runes.DEFINITIONS = {
 	fury = {
 		name = "Fury Rune",
 		category = "Offense",
-		scope = "near",
+		scope = "picker",
 		modifier = "modifier_xhs_rune_fury",
 		duration = 30,
 		values = { attack_speed = 160, spell_amp = 25 },
@@ -144,7 +146,7 @@ Runes.DEFINITIONS = {
 	siegebreaker = {
 		name = "Siegebreaker Rune",
 		category = "Offense",
-		scope = "near",
+		scope = "picker",
 		modifier = "modifier_xhs_rune_siegebreaker",
 		duration = 35,
 		values = { bonus_damage = 45 },
@@ -152,7 +154,7 @@ Runes.DEFINITIONS = {
 	storm = {
 		name = "Storm Rune",
 		category = "Offense",
-		scope = "near",
+		scope = "picker",
 		modifier = "modifier_xhs_rune_storm",
 		duration = 30,
 		values = { interval = 1.2, radius = 650, targets = 4, damage = 550 },
@@ -166,22 +168,22 @@ Runes.DEFINITIONS = {
 	tome = {
 		name = "Tome Rune",
 		category = "Misc",
-		scope = "team",
+		scope = "picker",
 		instant = "tome",
 		values = { stats = 50 },
 	},
 	bounty_surge = {
 		name = "Bounty Surge Rune",
 		category = "Misc",
-		scope = "team",
+		scope = "picker",
 		modifier = "modifier_xhs_rune_bounty_surge",
 		duration = 45,
-		values = { bounty_pct = 35, min_total = 15 },
+		values = { bounty_pct = 25 },
 	},
 	momentum = {
 		name = "Momentum Rune",
 		category = "Misc",
-		scope = "team",
+		scope = "picker",
 		modifier = "modifier_xhs_rune_momentum",
 		duration = 45,
 		values = { move_speed = 18, gold_pct = 20, xp_pct = 20 },
@@ -209,7 +211,7 @@ Runes.EFFECT_SUMMARIES = {
 	siegebreaker = "+45% damage against creeps and summons",
 	storm = "Strikes up to 4 nearby enemies every 1.2s",
 	tome = "+50 all stats",
-	bounty_surge = "+35% shared creep bounty bonus",
+	bounty_surge = "+25% creep bounty",
 	momentum = "+18% move speed, +20% creep gold and XP",
 }
 
@@ -225,11 +227,10 @@ function Runes:Init()
 	self.pickupBlockedNotices = {}
 	self.fragmentWaveIndex = self.FRAGMENT_WAVES[RandomInt(1, #self.FRAGMENT_WAVES)]
 	self.fragmentSpawned = false
-	self.fragmentGrantAttempted = false
+	self.fragmentGrantAttempts = {}
 	self.categoryBag = {}
 	self.typeBags = {}
 
-	ListenToGameEvent("entity_killed", Dynamic_Wrap(Runes, "OnEntityKilled"), self)
 end
 
 function Runes:IsReborn()
@@ -247,7 +248,7 @@ function Runes:OnSpecialWaveWarning(waveIndex, direction)
 	self:Init()
 
 	waveIndex = tonumber(waveIndex) or 0
-	if waveIndex < 1 or waveIndex > 8 then return end
+	if waveIndex < 1 or (waveIndex > 8 and waveIndex ~= self.FINAL_WAVE_INDEX) then return end
 	if not self:IsReborn() then return end
 
 	local runeType = self:SelectRuneType(waveIndex)
@@ -255,9 +256,6 @@ function Runes:OnSpecialWaveWarning(waveIndex, direction)
 	if definition == nil then return end
 
 	local spawnCount = self:GetRuneSpawnCount()
-	if runeType == "fragment" then
-		spawnCount = 1
-	end
 
 	local spawnOrigins = self:FindSpawnOrigins(direction, spawnCount)
 	if spawnOrigins == nil or #spawnOrigins == 0 then return end
@@ -290,19 +288,32 @@ function Runes:OnSpecialWaveWarning(waveIndex, direction)
 	self:BroadcastRuneState("spawned")
 end
 
-function Runes:GetRuneSpawnCount()
-	local count = 0
+function Runes:OnFinalWaveTeleport()
+	self:OnSpecialWaveWarning(self.FINAL_WAVE_INDEX, nil)
+end
 
+function Runes:GetRuneSpawnCount()
+	local participantIDs = GetXHSCombatParticipantPlayerIDs ~= nil
+		and GetXHSCombatParticipantPlayerIDs() or {}
+	if #participantIDs > 0 then
+		return math.max(1, math.min(self.MAX_RUNES_PER_BATCH, #participantIDs))
+	end
+
+	local countedPlayers = {}
 	for _, hero in pairs(HeroList:GetAllHeroes()) do
 		if hero ~= nil and not hero:IsNull() and hero:GetTeamNumber() == DOTA_TEAM_GOODGUYS and hero:IsRealHero() and not hero:IsIllusion() then
 			local playerID = hero:GetPlayerID()
-			if playerID ~= nil and playerID >= 0 and PlayerResource:IsValidPlayerID(playerID) then
-				count = count + 1
+			if playerID ~= nil and playerID >= 0 and PlayerResource:IsValidPlayerID(playerID) and countedPlayers[playerID] ~= true then
+				countedPlayers[playerID] = true
 			end
 		end
 	end
 
-	return math.max(1, math.min(4, count))
+	local count = 0
+	for _, _ in pairs(countedPlayers) do
+		count = count + 1
+	end
+	return math.max(1, math.min(self.MAX_RUNES_PER_BATCH, count))
 end
 
 function Runes:SpawnRuneInstance(runeType, definition, waveIndex, direction, spawnOrigin, batchId, batchTotal)
@@ -462,7 +473,7 @@ end
 function Runes:FindSpawnOrigins(direction, count)
 	local runeSpawners = Entities:FindAllByName("dota_item_rune_spawner_custom")
 	if runeSpawners == nil or #runeSpawners == 0 then return nil end
-	count = math.max(1, math.min(4, tonumber(count) or 1, #runeSpawners))
+	count = math.max(1, math.min(self.MAX_RUNES_PER_BATCH, tonumber(count) or 1))
 
 	local laneSpawner = nil
 	if direction ~= nil and direction ~= "" then
@@ -491,14 +502,25 @@ function Runes:FindSpawnOrigins(direction, count)
 			end
 		end
 	end
+	if #sorted == 0 then return nil end
 
 	local origins = {}
-	for _, entry in pairs(sorted) do
-		if entry.spawner ~= nil and not entry.spawner:IsNull() then
-			table.insert(origins, entry.spawner:GetAbsOrigin() + Vector(0, 0, 40))
-			if #origins >= count then
-				break
+	local baseCount = #sorted
+	for slot = 1, count do
+		local baseIndex = ((slot - 1) % baseCount) + 1
+		local entry = sorted[baseIndex]
+		if entry ~= nil and entry.spawner ~= nil and not entry.spawner:IsNull() then
+			local baseOrigin = entry.spawner:GetAbsOrigin()
+			local layer = math.floor((slot - 1) / baseCount)
+			local offset = Vector(0, 0, 0)
+			if layer > 0 then
+				local angle = math.rad(((baseIndex - 1) * (360 / baseCount)) + ((layer - 1) * 60))
+				local radius = self.EXTRA_RUNE_SPACING + (math.floor((layer - 1) / 6) * self.EXTRA_RUNE_SPACING)
+				offset = Vector(math.cos(angle) * radius, math.sin(angle) * radius, 0)
 			end
+
+			local origin = GetGroundPosition(baseOrigin + offset, nil) + Vector(0, 0, 40)
+			table.insert(origins, origin)
 		end
 	end
 
@@ -663,36 +685,34 @@ end
 function Runes:ApplyRune(definition, picker)
 	if definition.instant == "fragment" then
 		self:GrantFragmentRune(picker)
+		self:PlayRunePickupSound(picker)
 		return
 	elseif definition.instant == "tome" then
-		GiveTomeToAllHeroes(definition.values.stats or 50)
-		for _, hero in pairs(self:GetTargets(definition.scope, picker)) do
-			self:NotifyRuneApplied(hero, definition)
+		if GrantTomeStatsToHero(picker, definition.values.stats or 50, nil, nil, { play_sound = false }) ~= nil then
+			self:NotifyRuneApplied(picker, definition)
 		end
+		self:PlayHeroRuneEffect(picker, definition.category, false)
+		self:PlayRunePickupSound(picker)
 		return
 	elseif definition.instant == "restoration" then
-		for _, hero in pairs(self:GetTargets(definition.scope, picker)) do
-			local missingHealth = hero:GetMaxHealth() - hero:GetHealth()
-			local missingMana = hero:GetMaxMana() - hero:GetMana()
-			local restoredPct = definition.values.missing_pct or 35
-			hero:Heal(missingHealth * restoredPct * 0.01, hero)
-			hero:GiveMana(missingMana * restoredPct * 0.01)
-			hero:AddNewModifier(hero, nil, "modifier_xhs_rune_restoration", { duration = 3, restored_pct = restoredPct })
-			self:PlayHeroRuneEffect(hero, definition.category, false)
-			self:NotifyRuneApplied(hero, definition)
-		end
+		local missingHealth = picker:GetMaxHealth() - picker:GetHealth()
+		local missingMana = picker:GetMaxMana() - picker:GetMana()
+		local restoredPct = definition.values.missing_pct or 35
+		picker:Heal(missingHealth * restoredPct * 0.01, picker)
+		picker:GiveMana(missingMana * restoredPct * 0.01)
+		picker:AddNewModifier(picker, nil, "modifier_xhs_rune_restoration", { duration = 3, restored_pct = restoredPct })
+		self:PlayHeroRuneEffect(picker, definition.category, false)
+		self:NotifyRuneApplied(picker, definition)
 		self:PlayRunePickupSound(picker)
 		return
 	end
 
-	for _, hero in pairs(self:GetTargets(definition.scope, picker)) do
-		if definition.values and definition.values.cooldown_pct then
-			self:ReduceCooldowns(hero, definition.values.cooldown_pct, definition.values.cooldown_cap)
-		end
-		hero:AddNewModifier(hero, nil, definition.modifier, self:BuildModifierKv(definition))
-		self:PlayHeroRuneEffect(hero, definition.category, false)
-		self:NotifyRuneApplied(hero, definition)
+	if definition.values and definition.values.cooldown_pct then
+		self:ReduceCooldowns(picker, definition.values.cooldown_pct, definition.values.cooldown_cap)
 	end
+	picker:AddNewModifier(picker, nil, definition.modifier, self:BuildModifierKv(definition))
+	self:PlayHeroRuneEffect(picker, definition.category, false)
+	self:NotifyRuneApplied(picker, definition)
 	self:PlayRunePickupSound(picker)
 end
 
@@ -771,41 +791,39 @@ function Runes:BuildModifierKv(definition)
 	return kv
 end
 
-function Runes:GetTargets(scope, picker)
-	if scope == "picker" then
-		return { picker }
-	end
-
-	local targets = {}
-	for _, hero in pairs(HeroList:GetAllHeroes()) do
-		if hero ~= nil and not hero:IsNull() and hero:GetTeamNumber() == DOTA_TEAM_GOODGUYS and hero:IsRealHero() and not hero:IsIllusion() then
-			if scope == "team" or (picker ~= nil and (hero:GetAbsOrigin() - picker:GetAbsOrigin()):Length2D() <= self.NEAR_RADIUS) then
-				table.insert(targets, hero)
-			end
-		end
-	end
-
-	return targets
-end
-
 function Runes:GrantFragmentRune(hero)
-	if self.fragmentGrantAttempted == true then return end
+	local playerID = self:GetHeroPlayerID(hero)
+	if playerID == nil then return end
+	self.fragmentGrantAttempts = self.fragmentGrantAttempts or {}
+	if self.fragmentGrantAttempts[playerID] == true then return end
+	self.fragmentGrantAttempts[playerID] = true
 
-	self.fragmentGrantAttempted = true
-
-	local playerID = hero:GetPlayerID()
-	local idempotencyKey = "xhs-fragment-rune:" .. tostring(api and api:GetApiGameId() or GameRules:Script_GetMatchID()) .. ":" .. tostring(self.fragmentWaveIndex)
+	local player = hero:GetPlayerOwner()
+	local idempotencyKey = "xhs-fragment-rune:"
+		.. tostring(api and api:GetApiGameId() or GameRules:Script_GetMatchID())
+		.. ":" .. tostring(self.fragmentWaveIndex)
+		.. ":" .. tostring(playerID)
 
 	if api == nil or api.GrantSupporterFragments == nil then
-		Notifications:TopToAll({ text = "Fragment Rune backend is unavailable. Grant was not applied.", duration = 5.0, style = { color = "red" } })
+		if player ~= nil then
+			Notifications:Bottom(player, {
+				text = "Fragment Rune backend is unavailable. Grant was not applied.",
+				duration = 5.0,
+				severity = "warning",
+			})
+		end
 		return
 	end
 
 	api:GrantSupporterFragments(playerID, self.FRAGMENT_AMOUNT, "fragment_rune", idempotencyKey, function(success)
-		if success then
-			Notifications:TopToAll({ text = "Fragment Rune granted +" .. tostring(self.FRAGMENT_AMOUNT) .. " supporter fragments.", duration = 5.0, style = { color = "lightgreen" } })
-		else
-			Notifications:TopToAll({ text = "Fragment Rune grant failed backend validation.", duration = 5.0, style = { color = "red" } })
+		if player ~= nil then
+			Notifications:Bottom(player, {
+				text = success
+					and ("Fragment Rune granted +" .. tostring(self.FRAGMENT_AMOUNT) .. " supporter fragments.")
+					or "Fragment Rune grant failed backend validation.",
+				duration = 5.0,
+				severity = success and "success" or "warning",
+			})
 		end
 	end)
 end
@@ -940,13 +958,23 @@ function Runes:OnGoldFilter(filterTable)
 
 	local playerID = filterTable.player_id_const
 	local hero = playerID ~= nil and PlayerResource:GetSelectedHeroEntity(playerID) or nil
-	if hero == nil or hero:IsNull() or not hero:HasModifier("modifier_xhs_rune_momentum") then return true end
-
+	if hero == nil or hero:IsNull() then return true end
 	if DOTA_ModifyGold_CreepKill ~= nil and filterTable.reason_const ~= DOTA_ModifyGold_CreepKill then return true end
 
-	local modifier = hero:FindModifierByName("modifier_xhs_rune_momentum")
-	local bonusPct = modifier and modifier.gold_pct or 20
-	filterTable.gold = filterTable.gold + math.floor(filterTable.gold * bonusPct * 0.01)
+	local bonusPct = 0
+	local momentum = hero:FindModifierByName("modifier_xhs_rune_momentum")
+	if momentum ~= nil then
+		bonusPct = bonusPct + (momentum.gold_pct or 20)
+	end
+
+	local bountySurge = hero:FindModifierByName("modifier_xhs_rune_bounty_surge")
+	if bountySurge ~= nil then
+		bonusPct = bonusPct + (bountySurge.bounty_pct or 25)
+	end
+
+	if bonusPct > 0 then
+		filterTable.gold = filterTable.gold + math.floor(filterTable.gold * bonusPct * 0.01)
+	end
 	return true
 end
 
@@ -964,58 +992,6 @@ function Runes:OnExperienceFilter(filterTable)
 	local bonusPct = modifier and modifier.xp_pct or 20
 	filterTable.experience = filterTable.experience + math.floor(filterTable.experience * bonusPct * 0.01)
 	return true
-end
-
-function Runes:OnEntityKilled(keys)
-	if keys == nil or keys.entindex_killed == nil then return end
-
-	local victim = EntIndexToHScript(keys.entindex_killed)
-	if not self:IsEligibleBountyVictim(victim) then return end
-
-	local attacker = keys.entindex_attacker and EntIndexToHScript(keys.entindex_attacker) or nil
-	local killerHero = GetPlayerHeroFromUnit(attacker)
-	if killerHero == nil or killerHero:IsNull() then return end
-
-	self:ApplyBountySurge(victim)
-end
-
-function Runes:IsEligibleBountyVictim(victim)
-	if victim == nil or victim:IsNull() then return false end
-	if victim:GetTeamNumber() == DOTA_TEAM_GOODGUYS then return false end
-	if victim:IsRealHero() or victim:IsBuilding() then return false end
-	if victim:GetUnitName() == "dummy_unit_invulnerable" then return false end
-	return victim:IsCreep() or victim:IsConsideredHero() ~= true
-end
-
-function Runes:ApplyBountySurge(victim)
-	local holders = self:GetHeroesWithModifier("modifier_xhs_rune_bounty_surge")
-	if #holders == 0 then return end
-
-	local bounty = 0
-	if victim.GetGoldBounty then
-		bounty = victim:GetGoldBounty() or 0
-	end
-	if bounty <= 0 then return end
-
-	local modifier = holders[1]:FindModifierByName("modifier_xhs_rune_bounty_surge")
-	local totalBonus = math.max(modifier and modifier.min_total or 15, math.floor(bounty * (modifier and modifier.bounty_pct or 35) * 0.01))
-	local targets = self:GetTargets("team", nil)
-	if #targets == 0 then return end
-
-	local perHero = math.max(1, math.floor(totalBonus / #targets))
-	for _, hero in pairs(targets) do
-		PlayerResource:ModifyGold(hero:GetPlayerID(), perHero, false, DOTA_ModifyGold_Unspecified)
-	end
-end
-
-function Runes:GetHeroesWithModifier(modifierName)
-	local heroes = {}
-	for _, hero in pairs(HeroList:GetAllHeroes()) do
-		if hero ~= nil and not hero:IsNull() and hero:HasModifier(modifierName) then
-			table.insert(heroes, hero)
-		end
-	end
-	return heroes
 end
 
 Runes:Init()

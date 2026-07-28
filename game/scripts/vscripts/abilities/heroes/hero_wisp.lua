@@ -89,9 +89,6 @@ function wisp_pick_random_hero:OnSpellStart()
 		UTIL_Remove(IsAvailableHero)
 	end
 
-	local particle = ParticleManager:CreateParticle("particles/generic_hero_status/hero_levelup.vpcf", PATTACH_ABSORIGIN_FOLLOW, self.caster, self.caster)
-	ParticleManager:SetParticleControl(particle, 0, self.caster:GetAbsOrigin())
-
 	EmitSoundOnClient("ui.trophy_levelup", PlayerResource:GetPlayer(self.caster:GetPlayerID()))
 
 	self.caster:AddNewModifier(self.caster, nil, "modifier_command_restricted", {})
@@ -105,9 +102,21 @@ function wisp_pick_random_hero:OnSpellStart()
 		},
 	})
 
-	XHSPrecache:ReplaceHeroWith(self.caster:GetPlayerID(), hero_name, XHS_STARTING_GOLD[difficulty] * 2, 0, self.caster, {
-		startingItems = true,
-	})
+	local playerID = self.caster:GetPlayerID()
+	if XHSBeginHeroSelectionTransition ~= nil then
+		XHSBeginHeroSelectionTransition(
+			playerID,
+			hero_name,
+			self.caster,
+			XHS_STARTING_GOLD[difficulty] * 2,
+			"standard",
+			random
+		)
+	else
+		XHSPrecache:ReplaceHeroWith(playerID, hero_name, XHS_STARTING_GOLD[difficulty] * 2, 0, self.caster, {
+			startingItems = true,
+		})
+	end
 end
 
 wisp_passives = wisp_passives or class({})
@@ -122,13 +131,24 @@ modifier_wisp_passive.XHS_LINK_CLIENT = true
 function modifier_wisp_passive:IsHidden() return true end
 
 function modifier_wisp_passive:CheckState()
-	return {
+	local state = {
 		[MODIFIER_STATE_UNSELECTABLE] = true,
 		[MODIFIER_STATE_NO_TEAM_MOVE_TO] = true,
 		[MODIFIER_STATE_NO_TEAM_SELECT] = true,
 		[MODIFIER_STATE_ATTACK_IMMUNE] = true,
 		[MODIFIER_STATE_MAGIC_IMMUNE] = true,
 	}
+
+	-- The Wisp can acquire nearby breakable containers before OnHeroInGame
+	-- starts its selection-area teleport. Keep it physically locked from the
+	-- first intrinsic-modifier frame until that teleport actually completes.
+	if self:GetStackCount() ~= 1 then
+		state[MODIFIER_STATE_ROOTED] = true
+		state[MODIFIER_STATE_DISARMED] = true
+		state[MODIFIER_STATE_COMMAND_RESTRICTED] = true
+	end
+
+	return state
 end
 
 function modifier_wisp_passive:OnCreated()

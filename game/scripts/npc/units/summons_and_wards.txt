@@ -202,8 +202,8 @@
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
-		"AttackDamageMin"			"65"			// Damage range min.
-		"AttackDamageMax"			"75"		// Damage range max.
+		"AttackDamageMin"			"100"			// Damage range min.
+		"AttackDamageMax"			"110"		// Damage range max.
 		"AttackDamageType"			"DAMAGE_TYPE_ArmorPhysical"
 		"AttackRate"				"0.65"		// Speed of attack.
 		"AttackAnimationPoint"		"0.3"		// Normalized time in animation cycle to attack.
@@ -280,8 +280,8 @@
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
-		"AttackDamageMin"			"105"			// Damage range min.
-		"AttackDamageMax"			"115"		// Damage range max.
+		"AttackDamageMin"			"135"			// Damage range min.
+		"AttackDamageMax"			"145"		// Damage range max.
 		"AttackDamageType"			"DAMAGE_TYPE_ArmorPhysical"
 		"AttackRate"				"0.40"		// Speed of attack.
 		"AttackAnimationPoint"		"0.3"		// Normalized time in animation cycle to attack.
@@ -358,8 +358,8 @@
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
-		"AttackDamageMin"			"225"			// Damage range min.
-		"AttackDamageMax"			"235"		// Damage range max.
+		"AttackDamageMin"			"240"			// Damage range min.
+		"AttackDamageMax"			"250"		// Damage range max.
 		"AttackDamageType"			"DAMAGE_TYPE_ArmorPhysical"
 		"AttackRate"				"0.35"		// Speed of attack.
 		"AttackAnimationPoint"		"0.3"		// Normalized time in animation cycle to attack.

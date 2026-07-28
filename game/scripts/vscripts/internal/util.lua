@@ -15,6 +15,53 @@ function PrintTable(t, indent)
 	end
 end
 
+local XHS_BASE_SPAWN_LOCAL_OFFSETS = {
+	[0] = Vector(-180, -120, 0),
+	[1] = Vector(180, -120, 0),
+	[2] = Vector(-180, 120, 0),
+	[3] = Vector(180, 120, 0),
+	[4] = Vector(-360, -120, 0),
+	[5] = Vector(360, -120, 0),
+	[6] = Vector(-360, 120, 0),
+	[7] = Vector(360, 120, 0),
+}
+
+function XHSGetPlayerBaseSpawnPosition(playerID, base)
+	base = base or BASE_GOOD or Entities:FindByName(nil, "base_spawn")
+	if base == nil or not IsValidEntity(base) or base:IsNull() then return nil end
+
+	playerID = math.max(0, tonumber(playerID) or 0)
+	local localOffset = XHS_BASE_SPAWN_LOCAL_OFFSETS[playerID]
+	if localOffset == nil then
+		local extraIndex = playerID - 8
+		local side = extraIndex % 2 == 0 and -1 or 1
+		local row = math.floor(extraIndex / 2)
+		localOffset = Vector(side * (540 + row * 150), 0, 0)
+	end
+
+	local angles = base:GetAnglesAsVector()
+	local yaw = math.rad(angles.y)
+	local forward = Vector(math.cos(yaw), math.sin(yaw), 0)
+	local right = Vector(-math.sin(yaw), math.cos(yaw), 0)
+	local position = base:GetAbsOrigin() + right * localOffset.x + forward * localOffset.y
+
+	if GetGroundPosition ~= nil then
+		position = GetGroundPosition(position, base)
+	end
+	return position
+end
+
+function XHSSetPlayerBaseRespawnPosition(hero, base)
+	if hero == nil or not IsValidEntity(hero) or hero:IsNull() then return nil end
+
+	local position = XHSGetPlayerBaseSpawnPosition(hero:GetPlayerID(), base)
+	if position == nil then return nil end
+
+	hero:SetRespawnPosition(position)
+	hero.xhs_base_respawn_position = position
+	return position
+end
+
 -- Colors
 COLOR_NONE = '\x06'
 COLOR_GRAY = '\x06'
@@ -142,10 +189,32 @@ function XHSPlayDoorOpeningCinematic(doorNames, onCameraArrived, options)
 
 	_G.XHSDoorCinematicSerial = (_G.XHSDoorCinematicSerial or 0) + 1
 	local serial = _G.XHSDoorCinematicSerial
+	local cinematicId = "xhs_door_camera_" .. tostring(serial)
+	local usingCinematicController = XHSCinematics ~= nil
 
-	for playerID = 0, maxPlayers - 1 do
-		if PlayerResource:IsValidPlayerID(playerID) and PlayerResource:GetPlayer(playerID) ~= nil then
-			SendDoorCameraPosition(playerID, target, moveDuration)
+	if usingCinematicController then
+		if _G.XHSDoorCinematicId ~= nil then
+			XHSCinematics:EndForAll(_G.XHSDoorCinematicId)
+		end
+		_G.XHSDoorCinematicId = cinematicId
+		XHSCinematics:BeginForAll(cinematicId, {
+			duration = moveDuration + holdDuration,
+			hide_hud = false,
+			hide_health_bars = true,
+			lock_orders = false,
+			camera_position = target,
+			camera_speed = moveDuration,
+			return_camera = options.return_camera ~= false,
+			letterbox_pct = 0,
+			transition = 0.1,
+		})
+	end
+
+	if not usingCinematicController then
+		for playerID = 0, maxPlayers - 1 do
+			if PlayerResource:IsValidPlayerID(playerID) and PlayerResource:GetPlayer(playerID) ~= nil then
+				SendDoorCameraPosition(playerID, target, moveDuration)
+			end
 		end
 	end
 
@@ -155,6 +224,13 @@ function XHSPlayDoorOpeningCinematic(doorNames, onCameraArrived, options)
 
 		Timers:CreateTimer(holdDuration, function()
 			if serial ~= _G.XHSDoorCinematicSerial then return end
+			if usingCinematicController then
+				XHSCinematics:EndForAll(cinematicId)
+				if _G.XHSDoorCinematicId == cinematicId then
+					_G.XHSDoorCinematicId = nil
+				end
+			end
+			if options.return_camera == false then return end
 
 			for playerID = 0, maxPlayers - 1 do
 				if PlayerResource:IsValidPlayerID(playerID) and PlayerResource:GetPlayer(playerID) ~= nil then
@@ -384,7 +460,10 @@ function XHSPublishTomePurchaseStatus(playerID)
 	end
 
 	local reason = XHSGetTomePurchaseLockReason(playerID)
-	local signature = reason or ""
+	local autoBuyEnabled = GameMode ~= nil
+		and GameMode.XHSTomeAutoBuyPlayers ~= nil
+		and GameMode.XHSTomeAutoBuyPlayers[playerID] == true
+	local signature = (reason or "") .. "|" .. (autoBuyEnabled and "1" or "0")
 	_G.XHSTomePurchaseStatusCache = _G.XHSTomePurchaseStatusCache or {}
 	if _G.XHSTomePurchaseStatusCache[playerID] == signature then
 		return
@@ -393,8 +472,26 @@ function XHSPublishTomePurchaseStatus(playerID)
 	_G.XHSTomePurchaseStatusCache[playerID] = signature
 	CustomNetTables:SetTableValue("xhs_tome_purchase", tostring(playerID), {
 		locked = reason ~= nil and 1 or 0,
-		reason = signature,
+		reason = reason or "",
+		auto_buy = autoBuyEnabled and 1 or 0,
 	})
+end
+
+function XHSIsTomeAutoBuyEnabled(playerID)
+	return GameMode ~= nil
+		and GameMode.XHSTomeAutoBuyPlayers ~= nil
+		and GameMode.XHSTomeAutoBuyPlayers[playerID] == true
+end
+
+function XHSSetTomeAutoBuyEnabled(playerID, enabled)
+	if playerID == nil or playerID < 0 or not PlayerResource:IsValidPlayerID(playerID) then
+		return false
+	end
+
+	GameMode.XHSTomeAutoBuyPlayers = GameMode.XHSTomeAutoBuyPlayers or {}
+	GameMode.XHSTomeAutoBuyPlayers[playerID] = enabled == true
+	XHSPublishTomePurchaseStatus(playerID)
+	return GameMode.XHSTomeAutoBuyPlayers[playerID]
 end
 
 function XHSPublishAllTomePurchaseStatuses()
@@ -428,19 +525,31 @@ function IsHeroOptionalEventTomeLocked(hero)
 end
 
 function IsTomePurchaseGloballyLocked()
+	if GameMode ~= nil and GameMode.FarmEvent_occuring == true then
+		return false
+	end
 	return BT_ENABLED == 0
 		or GameMode.Muradin_occuring == true
 		or GameMode.SpecialArena_occuring == true
 end
 
-function BuyMaxSmallTomesForPlayer(playerID)
+function BuyMaxSmallTomesForPlayer(playerID, options)
 	if playerID == nil or playerID < 0 or not PlayerResource:IsValidPlayerID(playerID) then return 0 end
+
+	options = options or {}
+	local suppressErrors = options.suppress_errors == true
+	local silent = options.silent == true
+	local function SendPurchaseError(message)
+		if not suppressErrors then
+			SendErrorMessage(playerID, message)
+		end
+	end
 
 	local player = PlayerResource:GetPlayer(playerID)
 	if player == nil then return 0 end
 
 	if GameRules:IsGamePaused() then
-		SendErrorMessage(playerID, "#error_buy_tome_pause")
+		SendPurchaseError("#error_buy_tome_pause")
 		return 0
 	end
 
@@ -448,19 +557,19 @@ function BuyMaxSmallTomesForPlayer(playerID)
 	if hero == nil or hero:IsNull() then return 0 end
 
 	if IsPlayerXHSReincarnating(playerID) then
-		SendErrorMessage(playerID, "#error_reincarnation_inventory_locked")
+		SendPurchaseError("#error_reincarnation_inventory_locked")
 		return 0
 	end
 
 	if IsHeroOptionalEventTomeLocked(hero) or IsTomePurchaseGloballyLocked() then
-		SendErrorMessage(playerID, "#error_buy_tome_disabled")
+		SendPurchaseError("#error_buy_tome_disabled")
 		return 0
 	end
 
 	local cost = 10000
 	local numberOfTomes = math.floor(Gold:GetGold(playerID) / cost)
 	if numberOfTomes < 1 then
-		SendErrorMessage(playerID, "#error_cant_afford_tomes")
+		SendPurchaseError("#error_cant_afford_tomes")
 		return 0
 	end
 
@@ -472,11 +581,13 @@ function BuyMaxSmallTomesForPlayer(playerID)
 	end
 
 	local i = 0
-	GameRules:GetGameModeEntity():SetContextThink("PreGame", function()
+	GameRules:GetGameModeEntity():SetContextThink(DoUniqueString("XHSBuyTomes"), function()
 		if hero == nil or hero:IsNull() then return nil end
 
 		hero:IncrementAttributes(50, { record_stats = false })
-		hero:EmitSound("ui.trophy_levelup")
+		if not silent then
+			hero:EmitSound("ui.trophy_levelup")
+		end
 
 		local pfx = ParticleManager:CreateParticle("particles/generic_hero_status/hero_levelup.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero, hero)
 		ParticleManager:SetParticleControl(pfx, 0, hero:GetAbsOrigin())
@@ -489,6 +600,24 @@ function BuyMaxSmallTomesForPlayer(playerID)
 	end, FrameTime())
 
 	return numberOfTomes
+end
+
+function XHSProcessAutoTomePurchases()
+	if GameMode == nil or GameMode.XHSTomeAutoBuyPlayers == nil or GameRules:IsGamePaused() then
+		return
+	end
+
+	for playerID, enabled in pairs(GameMode.XHSTomeAutoBuyPlayers) do
+		if enabled == true
+			and PlayerResource:IsValidPlayerID(playerID)
+			and XHSGetTomePurchaseLockReason(playerID) == nil
+			and Gold:GetGold(playerID) >= 10000 then
+			BuyMaxSmallTomesForPlayer(playerID, {
+				silent = true,
+				suppress_errors = true,
+			})
+		end
+	end
 end
 
 function DualChoose(hero)
@@ -1066,12 +1195,20 @@ function CreateXHSReturnMarker(hero, position)
 	hero.xhs_return_marker_position = marker_position
 end
 
+local XHS_TELEPORT_MIN_ANIMATION_DURATION = 0.65
+
 function TeleportHero(hero, point, delay, iCameraSpeed)
 	if not hero.GetPlayerID then return end
 	if hero:GetPlayerID() == -1 then return end
 	if delay == nil then delay = 0 end
 	local pos = hero:GetAbsOrigin()
 	--	local pos = hero:GetAbsOrigin() + RandomVector(400)
+
+	StartAnimation(hero, {
+		duration = math.max(delay, XHS_TELEPORT_MIN_ANIMATION_DURATION),
+		activity = ACT_DOTA_TELEPORT,
+		rate = 1.0,
+	})
 
 	local TeleportEffect
 	local TeleportEffectEnd
@@ -1082,14 +1219,13 @@ function TeleportHero(hero, point, delay, iCameraSpeed)
 		-- without leaving permanent vision behind.
 		AddFOWViewer(hero:GetTeamNumber(), point, 400, delay, false)
 
-		TeleportEffect = ParticleManager:CreateParticle("particles/items2_fx/teleport_start.vpcf", PATTACH_ABSORIGIN, hero, hero)
-		ParticleManager:SetParticleControlEnt(TeleportEffect, PATTACH_ABSORIGIN, hero, PATTACH_ABSORIGIN, "attach_origin", pos, true)
+		TeleportEffect = ParticleManager:CreateParticle("particles/items2_fx/teleport_start.vpcf", PATTACH_ABSORIGIN, hero)
+		ParticleManager:SetParticleControlEnt(TeleportEffect, 0, hero, PATTACH_ABSORIGIN, "attach_origin", pos, true)
 		hero:Attribute_SetIntValue("effectsID", TeleportEffect)
 
-		TeleportEffectEnd = ParticleManager:CreateParticle("particles/items2_fx/teleport_end.vpcf", PATTACH_ABSORIGIN, hero, hero)
-		ParticleManager:SetParticleControlEnt(TeleportEffect, PATTACH_ABSORIGIN, hero, PATTACH_ABSORIGIN, "attach_origin", point, true)
+		TeleportEffectEnd = ParticleManager:CreateParticle("particles/items2_fx/teleport_end.vpcf", PATTACH_WORLDORIGIN, nil)
+		ParticleManager:SetParticleControl(TeleportEffectEnd, 0, point)
 		ParticleManager:SetParticleControl(TeleportEffectEnd, 1, point)
-		hero:Attribute_SetIntValue("effectsID", TeleportEffect)
 
 		hero:EmitSound("Portal.Loop_Appear")
 	end
@@ -1115,6 +1251,13 @@ function TeleportHero(hero, point, delay, iCameraSpeed)
 		else
 			FindClearSpaceForUnit(hero, point, true)
 			hero:Stop()
+		end
+
+		if hero:GetUnitName() == "npc_dota_hero_wisp" then
+			local wisp_passive = hero:FindModifierByName("modifier_wisp_passive")
+			if wisp_passive ~= nil then
+				wisp_passive:SetStackCount(1)
+			end
 		end
 
 		local return_position = hero.xhs_return_marker_position or hero.old_pos
@@ -1727,6 +1870,156 @@ function HideBossBar(boss)
 	end
 end
 
+local XHS_CASTLE_BAR_TIMEOUT = 15.0
+local XHS_CASTLE_BAR_POLL_INTERVAL = 0.2
+
+local function IsXHSCastleEntity(castle)
+	return castle ~= nil
+		and IsValidEntity(castle)
+		and not castle:IsNull()
+		and castle:GetClassname() == "npc_dota_fort"
+		and castle:GetTeamNumber() == DOTA_TEAM_GOODGUYS
+end
+
+local function GetXHSCastleMuradinThreshold(castle)
+	if castle.xhs_castle_muradin_threshold ~= nil then
+		return castle.xhs_castle_muradin_threshold
+	end
+
+	local threshold = 40
+	local ability = castle:FindAbilityByName("castle_muradin_defend")
+	if ability ~= nil then
+		threshold = tonumber(ability:GetSpecialValueFor("hp_tooltip")) or threshold
+	end
+	castle.xhs_castle_muradin_threshold = threshold
+	return threshold
+end
+
+local function IsXHSCastleMuradinTriggered(castle)
+	return castle.xhs_castle_muradin_triggered == true
+		or castle:FindAbilityByName("castle_muradin_defend") == nil
+end
+
+local function GetXHSCastleBarPayload(castle)
+	local threshold = GetXHSCastleMuradinThreshold(castle)
+	local triggered = IsXHSCastleMuradinTriggered(castle)
+	return {
+		castle_name = castle:GetUnitName(),
+		castle_icon = "npc_dota_hero_omniknight",
+		castle_health = castle:GetHealth(),
+		castle_max_health = castle:GetMaxHealth(),
+		muradin_threshold = threshold,
+		muradin_triggered = triggered and 1 or 0,
+		light_color = "#70d6ff",
+		dark_color = "#102d55",
+		castle_markers = {
+			{
+				pct = threshold,
+				kind = "companion",
+				label = triggered and "Muradin deployed" or "Muradin arrives",
+				description = triggered
+					and "Muradin has already answered the castle's call."
+					or "Muradin appears when the castle reaches this health threshold.",
+				triggered = triggered,
+			},
+		},
+	}
+end
+
+local function PublishXHSCastleBarState(castle, visible)
+	if CustomNetTables == nil then return end
+
+	if visible == true and IsXHSCastleEntity(castle) then
+		local payload = GetXHSCastleBarPayload(castle)
+		payload.visible = 1
+		CustomNetTables:SetTableValue("xhs_castle_bar", "state", payload)
+		return
+	end
+
+	CustomNetTables:SetTableValue("xhs_castle_bar", "state", { visible = 0 })
+end
+
+local function GetXHSCastleBarSnapshot(castle)
+	return table.concat({
+		tostring(castle:GetHealth()),
+		tostring(castle:GetMaxHealth()),
+		tostring(GetXHSCastleMuradinThreshold(castle)),
+		IsXHSCastleMuradinTriggered(castle) and "1" or "0",
+	}, "|")
+end
+
+function XHSUpdateCastleHealthBar(castle, force)
+	if not IsXHSCastleEntity(castle) or castle.xhs_castle_bar_visible ~= true then return end
+
+	local snapshot = GetXHSCastleBarSnapshot(castle)
+	if force ~= true and castle.xhs_castle_bar_snapshot == snapshot then return end
+
+	castle.xhs_castle_bar_snapshot = snapshot
+	local payload = GetXHSCastleBarPayload(castle)
+	PublishXHSCastleBarState(castle, true)
+	CustomGameEventManager:Send_ServerToAllClients("update_castle_hp", payload)
+end
+
+local function StartXHSCastleHealthBarThink(castle)
+	if not IsXHSCastleEntity(castle) or castle.xhs_castle_bar_think_active == true then return end
+
+	castle.xhs_castle_bar_think_active = true
+	local thinkName = "xhs_castle_health_bar_" .. tostring(castle:entindex())
+	GameRules:GetGameModeEntity():SetContextThink(thinkName, function()
+		if not IsXHSCastleEntity(castle) then
+			return nil
+		end
+
+		local lastDamageTime = tonumber(castle.xhs_castle_last_damage_time) or -999
+		if GameRules:GetGameTime() - lastDamageTime >= XHS_CASTLE_BAR_TIMEOUT then
+			PublishXHSCastleBarState(castle, false)
+			CustomGameEventManager:Send_ServerToAllClients("hide_castle_hp", {})
+			castle.xhs_castle_bar_visible = nil
+			castle.xhs_castle_bar_snapshot = nil
+			castle.xhs_castle_bar_think_active = nil
+			return nil
+		end
+
+		XHSUpdateCastleHealthBar(castle, false)
+		return XHS_CASTLE_BAR_POLL_INTERVAL
+	end, XHS_CASTLE_BAR_POLL_INTERVAL)
+end
+
+function XHSOnCastleDamageFilter(castle, healthBefore)
+	if not IsXHSCastleEntity(castle) then return end
+
+	local expectedHealth = tonumber(healthBefore) or castle:GetHealth()
+	if castle.xhs_castle_bar_visible == true then
+		castle.xhs_castle_last_damage_time = GameRules:GetGameTime()
+		StartXHSCastleHealthBarThink(castle)
+	end
+
+	Timers:CreateTimer(FrameTime(), function()
+		if not IsXHSCastleEntity(castle) or castle:GetHealth() >= expectedHealth then return nil end
+
+		castle.xhs_castle_last_damage_time = GameRules:GetGameTime()
+		if castle.xhs_castle_bar_visible ~= true then
+			castle.xhs_castle_bar_visible = true
+			castle.xhs_castle_bar_snapshot = GetXHSCastleBarSnapshot(castle)
+			local payload = GetXHSCastleBarPayload(castle)
+			PublishXHSCastleBarState(castle, true)
+			CustomGameEventManager:Send_ServerToAllClients("show_castle_hp", payload)
+		else
+			XHSUpdateCastleHealthBar(castle, true)
+		end
+		StartXHSCastleHealthBarThink(castle)
+		return nil
+	end)
+end
+
+function XHSMarkCastleMuradinTriggered(castle, threshold)
+	if not IsXHSCastleEntity(castle) then return end
+
+	castle.xhs_castle_muradin_triggered = true
+	castle.xhs_castle_muradin_threshold = tonumber(threshold) or GetXHSCastleMuradinThreshold(castle)
+	XHSUpdateCastleHealthBar(castle, true)
+end
+
 function IsNearEntity(entity_class, location, distance)
 	local entity = Entities:FindByName(nil, entity_class)
 	if (entity:GetAbsOrigin() - location):Length2D() <= distance then
@@ -2045,7 +2338,8 @@ local function XHSEnsurePermanentTownPortalScroll(hero)
 	end
 end
 
-function StartingItems(hero, newHero)
+function StartingItems(hero, newHero, options)
+	options = options or {}
 	local difficulty = GameRules:GetCustomGameDifficulty()
 
 	XHSEnsurePermanentTownPortalScroll(newHero)
@@ -2065,17 +2359,19 @@ function StartingItems(hero, newHero)
 		end
 	end
 
-	if newHero:GetTeamNumber() == 2 then
+	if newHero:GetTeamNumber() == 2 and options.teleportToBase ~= false then
 		TeleportHero(newHero, BASE_GOOD:GetAbsOrigin(), 3.0)
 		-- elseif newHero:GetTeamNumber() == 3 then
 		-- TeleportHero(newHero, base_bad:GetAbsOrigin(), 3.0)
 	end
 
-	Timers:CreateTimer(0.1, function()
-		if not hero:IsNull() then
-			UTIL_Remove(hero)
-		end
-	end)
+	if options.deferOldHeroCleanup ~= true then
+		Timers:CreateTimer(0.1, function()
+			if not hero:IsNull() then
+				UTIL_Remove(hero)
+			end
+		end)
+	end
 
 	Timers:CreateTimer(1.0, function()
 		for k, v in pairs(HeroList:GetAllHeroes()) do

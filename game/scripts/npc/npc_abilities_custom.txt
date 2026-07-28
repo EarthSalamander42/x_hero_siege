@@ -372,7 +372,7 @@
 		{
 			"projectile_speed"		"850"
 			"area_of_effect"		"600"
-			"target_damage"			"175 350 700 1200"
+			"target_damage"			"275 425 750 1200"
 			"CalculateSpellDamageTooltip"	"1"
 			"heal_amount"			"500 1000 2000 4000"
 		}
@@ -494,7 +494,7 @@
 		"AbilityValues"
 		{
 			"ensnare_duration"				"1.0 1.75 2.5 3.25"
-			"ensnare_damage"				"200 450 750 1300"
+			"ensnare_damage"				"300 550 800 1300"
 			"CalculateSpellDamageTooltip"	"1"
 			"ensnare_chance"				"12"
 		}
@@ -1215,7 +1215,7 @@
 
 		// Damage.
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityDamage"					"200 400 650 1000"
+		"AbilityDamage"					"300 475 700 1000"
 
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
@@ -1232,7 +1232,7 @@
 			"radius"				"450"
 			"slow_movement_speed"	"-10 -20 -35 -50"
 			"slow_attack_speed"		"-10 -20 -35 -50"
-			"aoe_damage"			"150 300 500 750"
+			"aoe_damage"			"225 375 550 750"
 			"CalculateSpellDamageTooltip"	"1"
 		}
 	}
@@ -1279,13 +1279,13 @@
 			"knockback_distance_max"	"350"
 			"knockback_duration"		"0.6 0.8 1.0 1.2"
 			"knockback_height"			"0"
-			"damage_per_second"			"25 50 75 100"
+			"damage_per_second"			"40 60 80 100"
 			"CalculateSpellDamageTooltip"	"1"
 			"duration_per_second"		"5"
-			"initial_damage"			"100 150 250 600"
+			"initial_damage"			"150 200 300 600"
 			"CalculateSpellDamageTooltip"	"1"
 			"breath_slow"				"-5 -10 -15 -20"
-			"total_damage_tooltip"		"175 325 575 1000"
+			"total_damage_tooltip"		"275 400 625 1000"
 			"CalculateSpellDamageTooltip"	"1"
 		}
 	
@@ -2011,7 +2011,7 @@
 			"damage_radius"     "205"
 			"max_targets"       "8"
 			"tooltip_max_targets"	"8"
-			"damage"            "150 250 550 900"
+			"damage"            "225 325 600 900"
 			"CalculateSpellDamageTooltip"	"1"
 			"heal_pct"          "5"
 		}
@@ -2059,7 +2059,7 @@
 
 	// Damage.
 	//-------------------------------------------------------------------------------------------------------------
-	"AbilityDamage"                 "75 200 350 750"
+	"AbilityDamage"                 "120 250 375 750"
 
 	// Cost
 	//-------------------------------------------------------------------------------------------------------------
@@ -2565,10 +2565,10 @@
 			"movement_slow"				"-10 -20 -30 -40"
 			"miss_chance"				"20 35 50 65"
 			"projectile_speed"			"1200"
-			"burn_damage"				"50 100 300 400"
+			"burn_damage"				"75 125 325 400"
 			"CalculateSpellDamageTooltip"	"1"
 			"burn_duration"				"5"
-			"total_damage_tooltip"		"250 500 750 1000"
+			"total_damage_tooltip"		"400 600 800 1000"
 			"CalculateSpellDamageTooltip"	"1"
 		}
 	}
@@ -2616,7 +2616,7 @@
 			"start_width"		"250"
 			"end_width"			"300"
 			"distance"			"1100"
-			"damage"			"175 350 850 1250"
+			"damage"			"275 425 900 1250"
 			"CalculateSpellDamageTooltip"	"1"
 		}
 
@@ -2724,22 +2724,39 @@
 				//-----------------------------------------------------------------------------
 				"OnCreated"
 				{
-					"AttachEffect"
+					"RunScript"
 					{
-						"Target" "CASTER"
-						"EffectName" "particles/units/heroes/hero_brewmaster/brewmaster_fire_immolation_child.vpcf"
-						"EffectAttachType" "follow_origin"
-	
-						"ControlPoints"
-						{
-							"00" "0 0 0"
-							"01" "%radius 1 1"
-						}
+						"ScriptFile"			"components/battlepass/immolation.lua"
+						"Function"			"XHSSupporterImmolationAcquire"
+						"fallback_owner_pfx"	"particles/units/heroes/hero_brewmaster/brewmaster_fire_immolation_child.vpcf"
 					}
 				}
-	
+
+				"OnDestroy"
+				{
+					"RunScript"
+					{
+						"ScriptFile"	"components/battlepass/immolation.lua"
+						"Function"		"XHSSupporterImmolationRelease"
+					}
+				}
+
 				"OnIntervalThink"
 				{
+					"RunScript"
+					{
+						"ScriptFile"			"components/battlepass/immolation.lua"
+						"Function"			"XHSSupporterImmolationBurnTarget"
+						"fallback_owner_pfx"	"particles/units/heroes/hero_brewmaster/brewmaster_fire_immolation_child.vpcf"
+						"Target"
+						{
+							"Center"	"TARGET"
+							"Radius"	"%radius"
+							"Teams"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
+							"Types"		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+						}
+					}
+
 					"Damage"
 					{
 						"Target"
@@ -2842,7 +2859,7 @@
 
 		// Damage.
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityDamage"					"175 425 675 925"
+		"AbilityDamage"					"275 500 725 950"
 
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
@@ -2896,13 +2913,13 @@
 			"damage_interval"       "0.5"  //The main damage and a burn damage modifier is applied by the meteor this often.
 			"vision_distance"       "500"
 			"end_vision_duration"   "3.0"
-			"main_damage"           "100 200 300 400"
+			"main_damage"           "150 250 350 400"
 			"CalculateSpellDamageTooltip"	"1"
 			"burn_duration"         "3.0"
-			"burn_dps"              "25 50 75 100"
+			"burn_dps"              "40 60 80 100"
 			"CalculateSpellDamageTooltip"	"1"
 			"burn_dps_inverval"     "1.0"
-			"total_damage_tooltip"	"350 700 1050 1400"
+			"total_damage_tooltip"	"550 850 1150 1400"
 			"CalculateSpellDamageTooltip"	"1"
 		}
 
@@ -3479,6 +3496,24 @@
 			{
 				"Passive" 			"1"
 				"IsHidden" 			"1"
+
+				"OnCreated"
+				{
+					"RunScript"
+					{
+						"ScriptFile"	"components/battlepass/immolation.lua"
+						"Function"		"XHSSupporterImmolationAcquire"
+					}
+				}
+
+				"OnDestroy"
+				{
+					"RunScript"
+					{
+						"ScriptFile"	"components/battlepass/immolation.lua"
+						"Function"		"XHSSupporterImmolationRelease"
+					}
+				}
 	
 				"States"
 				{
@@ -3498,8 +3533,35 @@
 			"modifier_inferno_immolation_burn"
 			{
 				"ThinkInterval"		"1"
+				"OnCreated"
+				{
+					"RunScript"
+					{
+						"ScriptFile"	"components/battlepass/immolation.lua"
+						"Function"		"XHSSupporterImmolationBurnTarget"
+						"Target"		"TARGET"
+					}
+				}
+
+				"OnDestroy"
+				{
+					"RunScript"
+					{
+						"ScriptFile"	"components/battlepass/immolation.lua"
+						"Function"		"XHSSupporterImmolationReleaseTarget"
+						"Target"		"TARGET"
+					}
+				}
+
 				"OnIntervalThink"    	
 				{
+					"RunScript"
+					{
+						"ScriptFile"	"components/battlepass/immolation.lua"
+						"Function"		"XHSSupporterImmolationBurnTarget"
+						"Target"		"TARGET"
+					}
+
 					"Damage"
 					{		
 						"Type" 		"DAMAGE_TYPE_MAGICAL"
@@ -3583,7 +3645,7 @@
 		{
 			"duration"              "30.0"
 			"ward_hp_tooltip"       "1250 1750 2750 4500"
-			"ward_damage_tooltip"   "50 100 180 420"
+			"ward_damage_tooltip"   "90 130 200 420"
 		}
 	
 		"OnSpellStart"
@@ -3631,7 +3693,7 @@
 			"wolf_index"                "1 2 3 4"
 			"wolf_duration"             "25.0"
 			"wolf_bat"                  "1.25 1.2 1.15 1.1"
-			"wolf_damage"               "28 60 100 180"
+			"wolf_damage"               "45 75 110 180"
 			"wolf_hp"                   "600 1900 3250 5000"
 			"bash_chance"				"15"
 			"bash_duration"				"1.0"
@@ -4308,7 +4370,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityValues"
 		{
-			"damage"					"300 600 900 1200"
+			"damage"					"450 700 950 1200"
 			"CalculateSpellDamageTooltip"	"1"
 			"damage_delay"				"0.1"
 		}
@@ -4345,7 +4407,7 @@
 		"AbilityValues"
 		{
 			"radius"			"250 300 350 400"
-			"damage_per_tick"		"25 50 75 100"
+			"damage_per_tick"		"40 60 80 100"
 			"CalculateSpellDamageTooltip"	"1"
 			"tick_time"			"1.0"
 		}
@@ -4391,22 +4453,39 @@
 				//-----------------------------------------------------------------------------
 				"OnCreated"
 				{
-					"AttachEffect"
+					"RunScript"
 					{
-						"Target" "CASTER"
-						"EffectName" "particles/units/heroes/hero_ember_spirit/ember_spirit_flameguard.vpcf"
-						"EffectAttachType" "follow_origin"
-	
-						"ControlPoints"
-						{
-							"00" "0 0 0"
-							"01" "%radius 1 1"
-						}
+						"ScriptFile"			"components/battlepass/immolation.lua"
+						"Function"			"XHSSupporterImmolationAcquire"
+						"fallback_owner_pfx"	"particles/units/heroes/hero_ember_spirit/ember_spirit_flameguard.vpcf"
+					}
+				}
+
+				"OnDestroy"
+				{
+					"RunScript"
+					{
+						"ScriptFile"	"components/battlepass/immolation.lua"
+						"Function"		"XHSSupporterImmolationRelease"
 					}
 				}
 
 				"OnIntervalThink"
 				{
+					"RunScript"
+					{
+						"ScriptFile"			"components/battlepass/immolation.lua"
+						"Function"			"XHSSupporterImmolationBurnTarget"
+						"fallback_owner_pfx"	"particles/units/heroes/hero_ember_spirit/ember_spirit_flameguard.vpcf"
+						"Target"
+						{
+							"Center"   "TARGET"
+							"Radius"   "%radius"
+							"Teams"   "DOTA_UNIT_TARGET_TEAM_ENEMY"
+							"Types"   "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+						}
+					}
+
 					"Damage"
 					{
 						"Target"
@@ -4721,7 +4800,7 @@
 
 		// Damage
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityDamage"                 "250 500 750 1000"
+		"AbilityDamage"                 "400 600 800 1000"
 
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
@@ -4816,7 +4895,7 @@
 		{
 			"radius"                        "300 350 400 450"
 			"stun_duration"                 "1.0 1.5 2.0 2.5"
-			"stomp_damage"                  "300 600 900 1200"
+			"stomp_damage"                  "450 700 950 1200"
 			"CalculateSpellDamageTooltip"	"1"
 		}
 
@@ -5443,7 +5522,7 @@
 
 		// Damage.
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityDamage"                 "250 450 650 850"
+		"AbilityDamage"                 "400 550 700 850"
 
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
@@ -5832,7 +5911,7 @@
 		{
 			"duration"          "10 15 20 25"
 			"bonus_movespeed"   "20 30 40 50"
-			"bonus_damage"      "100 200 300 400"
+			"bonus_damage"      "150 250 325 400"
 		}
 
 		"OnSpellStart"
@@ -5978,8 +6057,8 @@
 		"AbilityValues"
 		{
 			"illusion_duration"						"60.0"
-			"outgoing_damage"						"0 -20 -40 -60"
-			"outgoing_damage_tooltip"				"100 80 60 40"
+			"outgoing_damage"						"50 15 -20 -55"
+			"outgoing_damage_tooltip"				"150 115 80 45"
 			"incoming_damage"						"125"
 			"tooltip_incoming_damage_total_pct"		"225"
 			"images_count"							"2 3 4 5"
@@ -6228,7 +6307,8 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"BaseClass"						"clinkz_searing_arrows"
+		"BaseClass"						"ability_lua"
+		"ScriptFile"					"abilities/heroes/hero_ranger/searing_arrows.lua"
 		"MaxLevel"					"4"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_AUTOCAST | DOTA_ABILITY_BEHAVIOR_ATTACK"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
@@ -6261,7 +6341,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityValues"
 		{
-			"damage_bonus"			"100 150 225 400"
+			"damage_bonus"			"150 200 275 400"
 		}
 	}
 
@@ -6586,7 +6666,7 @@
 		{
 			"duration"				"40.0"
 			"ward_hp_tooltip"		"1500 4000 12000 20000"
-			"ward_damage_tooltip"	"130 210 410 850"
+			"ward_damage_tooltip"	"200 275 450 850"
 		}
 
 		"OnSpellStart"
@@ -6843,7 +6923,7 @@
 
 		// Damage
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityDamage"                 "175 350 525 700"
+		"AbilityDamage"                 "275 425 575 725"
 			
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
@@ -6901,7 +6981,7 @@
 			"end_radius"                "500"
 			"end_distance"              "600"
 			"targets"                   "4 6 8 10"
-			"damage"                    "225 450 675 900"
+			"damage"                    "350 550 750 950"
 			"CalculateSpellDamageTooltip"	"1"
 		}
 
@@ -7262,6 +7342,30 @@
 	}
 
 	//=================================================================================================================
+	// Mountain King: Bash of the Deep
+	//=================================================================================================================
+	"xhs_mountain_king_bash"
+	{
+		"BaseClass"						"ability_lua"
+		"ScriptFile"					"abilities/heroes/muradin.lua"
+		"AbilityTextureName"			"slardar_bash"
+		"MaxLevel"						"4"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_PHYSICAL"
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_YES"
+		"RequiredLevel"					"8"
+		"LevelsBetweenUpgrades"			"3"
+		"AbilityModifierSupportBonus"	"25"
+
+		"AbilityValues"
+		{
+			"bonus_damage"				"100 250 450 700"
+			"duration"					"0.05"
+			"attack_count"				"6 5 4 3"
+		}
+	}
+
+	//=================================================================================================================
 	// Mountain King: Storm Bolt
 	//=================================================================================================================
 	"holdout_storm_bolt"
@@ -7284,7 +7388,7 @@
 
 		// Damage.
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityDamage"					"250 500 750 1000"
+		"AbilityDamage"					"400 600 800 1000"
 
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
@@ -7429,7 +7533,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"ability_lua"
 		"ScriptFile"					"abilities/heroes/muradin.lua"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_HIDDEN"
 		"AbilityTextureName"			"item_monkey_king_bar"
 		"MaxLevel"						"1"
 	}
@@ -7599,7 +7703,7 @@
 		"AbilityValues"
 		{
 			"radius"					"400"
-			"damage"					"150 350 550 750"
+			"damage"					"225 400 575 750"
 			"CalculateSpellDamageTooltip"	"1"
 			"movement_slow"				"20 30 40 50"
 			"attack_speed_slow"			"20 30 40 50"
@@ -7725,7 +7829,7 @@
 		"AbilityValues"
 		{
 			"heal"				"500 1000 2000 4000"
-			"damage"			"250 500 750 1000"
+			"damage"			"400 600 800 1000"
 			"CalculateSpellDamageTooltip"	"1"
 			"radius"			"550"
 			"blast_speed"		"2000"
@@ -8195,7 +8299,7 @@
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_BOTH"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
-		"AbilityDamage"					"250 500 850 1350"
+		"AbilityDamage"					"375 600 925 1350"
 
 		"precache"
 		{
@@ -8292,7 +8396,7 @@
 		"AbilityValues"
 		{
 			"radius"			"300 325 350 375"
-			"damage_per_tick"	"25 50 100 220"
+			"damage_per_tick"	"40 65 110 220"
 			"CalculateSpellDamageTooltip"	"1"
 			"tick_time"			"1.0"
 		}
@@ -8313,22 +8417,39 @@
 				//-----------------------------------------------------------------------------
 				"OnCreated"
 				{
-					"AttachEffect"
+					"RunScript"
 					{
-						"Target" "CASTER"
-						"EffectName" "particles/units/heroes/hero_brewmaster/brewmaster_fire_immolation_child.vpcf"
-						"EffectAttachType" "follow_origin"
-	
-						"ControlPoints"
-						{
-							"00" "0 0 0"
-							"01" "%radius 1 1"
-						}
+						"ScriptFile"			"components/battlepass/immolation.lua"
+						"Function"			"XHSSupporterImmolationAcquire"
+						"fallback_owner_pfx"	"particles/units/heroes/hero_brewmaster/brewmaster_fire_immolation_child.vpcf"
+					}
+				}
+
+				"OnDestroy"
+				{
+					"RunScript"
+					{
+						"ScriptFile"	"components/battlepass/immolation.lua"
+						"Function"		"XHSSupporterImmolationRelease"
 					}
 				}
 
 				"OnIntervalThink"
 				{
+					"RunScript"
+					{
+						"ScriptFile"			"components/battlepass/immolation.lua"
+						"Function"			"XHSSupporterImmolationBurnTarget"
+						"fallback_owner_pfx"	"particles/units/heroes/hero_brewmaster/brewmaster_fire_immolation_child.vpcf"
+						"Target"
+						{
+							"Center"   "TARGET"
+							"Radius"   "%radius"
+							"Teams"   "DOTA_UNIT_TARGET_TEAM_ENEMY"
+							"Types"   "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+						}
+					}
+
 					"Damage"
 					{
 						"Target"
@@ -8583,7 +8704,7 @@
 			"radius"						"400"
 			"wave_duration"					"9.0"
 			"wave_count"					"8"
-			"wave_damage"					"35 75 115 155"
+			"wave_damage"					"60 100 140 180"
 			"CalculateSpellDamageTooltip"	"1"
 			"wave_interval"					"1.0"
 			"burn_damage"					"0.75"
@@ -8620,7 +8741,7 @@
 			"radius"						"325 350 375 400"
 			"stun_duration"					"0.75 1.0 1.25 1.5"
 			"LinkedSpecialBonus"			"special_bonus_unique_centaur_2"
-			"stomp_damage"					"150 350 550 750"
+			"stomp_damage"					"225 400 575 750"
 			"CalculateSpellDamageTooltip"	"1"
 		}
 	}
@@ -8679,14 +8800,14 @@
 				{
 					"AttachEffect"
 					{
-						"EffectName"			"particles/econ/courier/courier_faceless_rex/cour_rex_ground_a.vpcf"
+						"EffectName"			"particles/custom/supporter_pass/regen_aura_anchor.vpcf"
 						"EffectAttachType"		"follow_origin"
 						"Target"				"TARGET"
 					}
 
 					"AttachEffect"
 					{
-						"EffectName"			"particles/econ/courier/courier_roshan_frost/courier_roshan_frost_steam.vpcf"
+						"EffectName"			"particles/custom/supporter_pass/regen_aura_anchor.vpcf"
 						"EffectAttachType"		"follow_overhead"
 						"Target"				"TARGET"
 					}
@@ -8961,6 +9082,20 @@
 						"EffectAttachType"  "follow_overhead"
 						"Target"            "CASTER"
 					}
+					"RunScript"
+					{
+						"ScriptFile"	"components/battlepass/immolation.lua"
+						"Function"		"XHSSupporterImmolationAcquire"
+					}
+				}
+
+				"OnDestroy"
+				{
+					"RunScript"
+					{
+						"ScriptFile"	"components/battlepass/immolation.lua"
+						"Function"		"XHSSupporterImmolationRelease"
+					}
 				}
 
 				"States"
@@ -8972,8 +9107,35 @@
 			"modifier_inferno_immolation_burn"
 			{
 				"ThinkInterval"		"1"
+				"OnCreated"
+				{
+					"RunScript"
+					{
+						"ScriptFile"	"components/battlepass/immolation.lua"
+						"Function"		"XHSSupporterImmolationBurnTarget"
+						"Target"		"TARGET"
+					}
+				}
+
+				"OnDestroy"
+				{
+					"RunScript"
+					{
+						"ScriptFile"	"components/battlepass/immolation.lua"
+						"Function"		"XHSSupporterImmolationReleaseTarget"
+						"Target"		"TARGET"
+					}
+				}
+
 				"OnIntervalThink"    	
 				{
+					"RunScript"
+					{
+						"ScriptFile"	"components/battlepass/immolation.lua"
+						"Function"		"XHSSupporterImmolationBurnTarget"
+						"Target"		"TARGET"
+					}
+
 					"Damage"
 					{		
 						"Type" 		"DAMAGE_TYPE_MAGICAL"
@@ -9010,7 +9172,7 @@
 		// Time     
 		//------------------------------------------------------------------------------------------------------
 		"AbilityCooldown"               "11.0"
-		"AbilityDamage"					"125 350 575 800"
+		"AbilityDamage"					"200 400 600 800"
 
 		// Cost
 		//------------------------------------------------------------------------------------------------------
@@ -9156,7 +9318,7 @@
 		
 		//Damage
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityDamage"                 "150 400 650 900"
+		"AbilityDamage"                 "225 450 675 900"
 	
 		// Special  
 		//-------------------------------------------------------------------------------------------------------------
@@ -9165,10 +9327,10 @@
 			"move_slow"				"-25"
 			"dagger_speed"          "900"
 			"duration"              "8"
-			"poison_damage"			"25 50 75 100"
+			"poison_damage"			"40 60 80 100"
 			"CalculateSpellDamageTooltip"	"1"
 			"attack_slow"			"-25"
-			"total_damage_tooltip"	"475 800 1250 1700"
+			"total_damage_tooltip"	"725 1000 1350 1700"
 			"CalculateSpellDamageTooltip"	"1"
 		}
 
@@ -9602,7 +9764,7 @@
 
 		// Damage.
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityDamage"                 "300 600 900 1200"
+		"AbilityDamage"                 "450 700 950 1200"
 
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
@@ -9711,7 +9873,7 @@
 		// Time     
 		//------------------------------------------------------------------------------------------------------
 		"AbilityCooldown"               "11.0"
-		"AbilityDamage"					"125 250 450 850"
+		"AbilityDamage"					"200 325 500 850"
 
 		// Cost
 		//------------------------------------------------------------------------------------------------------
@@ -10107,7 +10269,7 @@
 		{
 			"duration"              "60.0"
 			"ward_hp_tooltip"       "1375 2435 4750 9750"
-			"ward_damage_tooltip"   "70 110 230 350"
+			"ward_damage_tooltip"   "110 150 250 350"
 		}
 	
 		"OnSpellStart"
@@ -10311,7 +10473,7 @@
 
 				"Duration"				"%duration"
 
-				"EffectName"			"particles/econ/items/juggernaut/jugg_fortunes_tout/jugg_healing_ward_fortunes_tout_ward_gold.vpcf"
+				"EffectName"			"particles/custom/supporter_pass/regen_aura_anchor.vpcf"
 				"EffectAttachType"		"follow_origin"
 
 				"ThinkInterval"			"%tick_interval"
@@ -10581,7 +10743,7 @@
 			"slow_duration"							"1.0"
 			"explosion_min_dist"					"100 150 200 250"
 			"explosion_max_dist"					"200 250 300 350"
-			"damage"								"40 80 120 160"
+			"damage"								"60 100 140 180"
 			"CalculateSpellDamageTooltip"	"1"
 		}
 
@@ -10907,22 +11069,39 @@
 				//-----------------------------------------------------------------------------
 				"OnCreated"
 				{
-					"AttachEffect"
+					"RunScript"
 					{
-						"Target" "CASTER"
-						"EffectName" "particles/units/heroes/hero_brewmaster/brewmaster_fire_immolation_child.vpcf"
-						"EffectAttachType" "follow_origin"
-	
-						"ControlPoints"
-						{
-							"00" "0 0 0"
-							"01" "%radius 1 1"
-						}
+						"ScriptFile"			"components/battlepass/immolation.lua"
+						"Function"			"XHSSupporterImmolationAcquire"
+						"fallback_owner_pfx"	"particles/units/heroes/hero_brewmaster/brewmaster_fire_immolation_child.vpcf"
 					}
 				}
-	
+
+				"OnDestroy"
+				{
+					"RunScript"
+					{
+						"ScriptFile"	"components/battlepass/immolation.lua"
+						"Function"		"XHSSupporterImmolationRelease"
+					}
+				}
+
 				"OnIntervalThink"
 				{
+					"RunScript"
+					{
+						"ScriptFile"			"components/battlepass/immolation.lua"
+						"Function"			"XHSSupporterImmolationBurnTarget"
+						"fallback_owner_pfx"	"particles/units/heroes/hero_brewmaster/brewmaster_fire_immolation_child.vpcf"
+						"Target"
+						{
+							"Center"	"TARGET"
+							"Radius"	"%radius"
+							"Teams"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
+							"Types"		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+						}
+					}
+
 					"Damage"
 					{
 						"Target"
@@ -11002,13 +11181,13 @@
 		"AbilityValues"
 		{
 			"radius"				"300"
-			"first_strike_dps"		"150 300 450 600"
+			"first_strike_dps"		"225 350 475 600"
 			"first_strike_duration"	"3.0"
-			"burn_dps"				"20 40 60 80"
+			"burn_dps"				"30 50 70 90"
 			"CalculateSpellDamageTooltip"	"1"
 			"burn_duration"			"5"
 			"delay"					"1.6"
-			"total_damage"			"250 500 750 1000"
+			"total_damage"			"375 600 825 1050"
 			"CalculateSpellDamageTooltip"	"1"
 			"radius_tooltip"		"250"
 		}
@@ -11255,7 +11434,7 @@
 			"start_width"		"250"
 			"end_width"			"300"
 			"distance"			"1100"
-			"damage"			"175 350 850 1250"
+			"damage"			"275 425 900 1250"
 			"CalculateSpellDamageTooltip"	"1"
 		}
 
@@ -11877,10 +12056,10 @@
 			"radius"		"350 375 400 425"
 			"wave_duration"	"5.25"
 			"wave_count"	"8"
-			"wave_damage"	"55 90 125 160"
+			"wave_damage"	"90 120 150 180"
 			"CalculateSpellDamageTooltip"	"1"
 			"wave_interval"	"0.7"
-			"total_damage"	"440 720 1000 1280"
+			"total_damage"	"720 960 1200 1440"
 			"CalculateSpellDamageTooltip"	"1"
 			"wps_thinker"	"0.68"
 			"movement_slow"	"-10 -20 -30 -40"
@@ -12076,7 +12255,7 @@
 		{
 			"duration"			"30"
 			"hit_points"		"1000 2200 3800 5400"
-			"damage"			"100 210 300 400"
+			"damage"			"150 250 325 400"
 		}
 
 		"OnSpellStart"
@@ -12399,15 +12578,15 @@
 			"wolf_index"                "1 2 3 4"
 			"wolf_duration"             "20.0"
 			"wolf_bat"                  "1.25 1.2 1.15 1.1"
-			"wolf_damage"               "40 100 170 250"
+			"wolf_damage"               "60 120 180 250"
 			"wolf_hp"                   "500 1000 1200 2000"
 			"wolf_1_count"              "1 0 0 0"
 			"wolf_2_count"              "0 1 0 0"
 			"wolf_3_count"              "0 0 1 0"
 			"wolf_4_count"              "0 0 0 1"
 			"spawn_distance"            "150"
-			"strength_damage_pct"       "100 130 160 200"
-			"hero_attack_damage_pct"    "35 45 55 70"
+			"strength_damage_pct"       "150 165 180 200"
+			"hero_attack_damage_pct"    "55 60 65 70"
 			"infested_bonus_pct"        "50 65 80 100"
 			"priority_radius"           "700"
 		}
@@ -13175,7 +13354,7 @@
 		//-------------------------------------------------------------------------------------
 		"AbilityValues"
 		{
-			"bonus_damage"		"75 100 125 150"
+			"bonus_damage"		"115 130 145 160"
 		}
 
 		"OnToggleOn"
@@ -14648,7 +14827,7 @@
 		"AbilityValues"
 		{
 			"duration"				"1.5 2.0 2.5 3.0"
-			"damage"				"200 400 600 800"
+			"damage"				"300 475 650 825"
 			"CalculateSpellDamageTooltip"	"1"
 			"radius"				"300 350 400 450"
 			"delay"					"1.0"
@@ -15009,9 +15188,9 @@
 		"AbilityValues"
 		{
 			"duration"				"2 3 4 5"
-			"dmg_per_sec"			"200 300 400 500"
+			"dmg_per_sec"			"300 375 450 500"
 			"CalculateSpellDamageTooltip"	"1"
-			"total_damage_tooltip"	"400 900 1600 2500"
+			"total_damage_tooltip"	"600 1125 1800 2500"
 			"CalculateSpellDamageTooltip"	"1"
 		}
 	}
@@ -15226,7 +15405,7 @@
 		"AbilityValues"
 		{
 			"radius"		"375"
-			"poof_damage"	"160 250 340 430"
+			"poof_damage"	"250 310 370 430"
 			"CalculateSpellDamageTooltip"	"1"
 		}
 	}
@@ -15494,7 +15673,7 @@
 					"AttachEffect"
 					{
 						"Target"			"TARGET"
-						"EffectName"		"particles/items_fx/aura_assault.vpcf"
+						"EffectName"		"particles/custom/supporter_pass/regen_aura_anchor.vpcf"
 						"EffectAttachType"	"follow_origin"
 					}
 
@@ -15583,7 +15762,7 @@
 					"AttachEffect"
 					{
 						"Target"			"TARGET"
-						"EffectName"		"particles/items_fx/aura_assault.vpcf"
+						"EffectName"		"particles/custom/supporter_pass/regen_aura_anchor.vpcf"
 						"EffectAttachType"	"follow_origin"
 					}
 
@@ -15832,7 +16011,7 @@
 			"bonus_armor"			"2 3 4 5"
 			"stun_chance"			"10 15 20 25"
 			"stun_duration"			"1.0 1.1 1.2 1.3"
-			"damage"				"60 90 120 150"
+			"damage"				"90 110 130 150"
 			"CalculateSpellDamageTooltip"	"1"
 		}
 	}
@@ -15930,7 +16109,7 @@
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityCastRange"				"900"
-		"AbilityDamage"					"200 400 600 800"
+		"AbilityDamage"					"300 475 650 825"
 
 		// Time		
 		//-------------------------------------------------------------------------------------------------------------
@@ -16442,6 +16621,12 @@
 						"Target"				"ATTACKER"
 						"LifestealPercent"		"%lifesteal"
 					}
+
+					"RunScript"
+					{
+						"ScriptFile"	"abilities/heroes/hero_monkey_king.lua"
+						"Function"		"JinguLifestealFX"
+					}
 				}
 			}
 
@@ -16690,10 +16875,24 @@
 
 				"OnDealDamage"
 				{
+					"RunScript"
+					{
+						"ScriptFile"		"abilities/heroes/hero_axe.lua"
+						"Function"			"AxeBattleRageLifestealBegin"
+						"Target"			"ATTACKER"
+					}
+
 					"Lifesteal"
 					{
 						"Target"			"ATTACKER"
 						"LifestealPercent"	"%heal_multiplier"
+					}
+
+					"RunScript"
+					{
+						"ScriptFile"		"abilities/heroes/hero_axe.lua"
+						"Function"			"AxeBattleRageLifestealEnd"
+						"Target"			"ATTACKER"
 					}
 				}
 			}
@@ -16769,7 +16968,7 @@
 		{
 			"disappear_time"			"0.5"
 			"radius"					"400"
-			"damage_out"				"150 350 550 750"
+			"damage_out"				"225 400 575 750"
 			"stun_duration"				"1.0 1.5 2.0 2.5"
 			"max_duration"				"10"
 		}
@@ -17059,7 +17258,7 @@
 			"vision_distance"		"1200 1500 1800 2100"
 			"end_vision_duration"	"1.75"
 			"lift_duration"			"0.9"
-			"base_damage"			"200 400 600 800"
+			"base_damage"			"300 475 650 825"
 			"CalculateSpellDamageTooltip"	"1"
 			"cyclone_min_height"		"300"
 			"cyclone_initial_height"	"350"
@@ -17629,7 +17828,7 @@
 
 		// Damage.
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityDamage"					"250 500 750 1000"
+		"AbilityDamage"					"400 600 800 1000"
 
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
@@ -17670,6 +17869,13 @@
 		"OnProjectileHitUnit"
 		{
 			"DeleteOnHit"           "1"
+
+			"RunScript"
+			{
+				"ScriptFile"	"abilities/heroes/hero_dark_summoner.lua"
+				"Function"		"DarkSummonerShadowBoltSoulSynergy"
+				"Target"		"TARGET"
+			}
 
 			"FireSound"
 			{
@@ -17775,7 +17981,7 @@
 			"shadowraze_range1"		"200"
 			"shadowraze_range2"		"500"
 			"shadowraze_range3"		"800"
-			"raze_damage"			"200 350 500 650"
+			"raze_damage"			"300 425 550 675"
 			"CalculateSpellDamageTooltip"	"1"
 		}
 
@@ -17934,22 +18140,39 @@
 				//-----------------------------------------------------------------------------
 				"OnCreated"
 				{
-					"AttachEffect"
+					"RunScript"
 					{
-						"Target" "CASTER"
-						"EffectName" "particles/units/heroes/hero_brewmaster/brewmaster_fire_immolation_child.vpcf"
-						"EffectAttachType" "follow_origin"
-	
-						"ControlPoints"
-						{
-							"00" "0 0 0"
-							"01" "%radius 1 1"
-						}
+						"ScriptFile"			"components/battlepass/immolation.lua"
+						"Function"			"XHSSupporterImmolationAcquire"
+						"fallback_owner_pfx"	"particles/units/heroes/hero_brewmaster/brewmaster_fire_immolation_child.vpcf"
+					}
+				}
+
+				"OnDestroy"
+				{
+					"RunScript"
+					{
+						"ScriptFile"	"components/battlepass/immolation.lua"
+						"Function"		"XHSSupporterImmolationRelease"
 					}
 				}
 
 				"OnIntervalThink"
 				{
+					"RunScript"
+					{
+						"ScriptFile"			"components/battlepass/immolation.lua"
+						"Function"			"XHSSupporterImmolationBurnTarget"
+						"fallback_owner_pfx"	"particles/units/heroes/hero_brewmaster/brewmaster_fire_immolation_child.vpcf"
+						"Target"
+						{
+							"Center"   "TARGET"
+							"Radius"   "%radius"
+							"Teams"   "DOTA_UNIT_TARGET_TEAM_ENEMY"
+							"Types"   "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+						}
+					}
+
 					"Damage"
 					{
 						"Target"
@@ -18003,88 +18226,47 @@
 	}
 
 	//=================================================================================================================
-	// Dark Summoner: Stitch
+	// Dark Summoner: Soul Harvest
 	//=================================================================================================================
-	"holdout_stitch"
+	"holdout_soul_harvest"
 	{
-		"BaseClass"						"ability_datadriven"
+		"BaseClass"						"ability_lua"
+		"ScriptFile"					"abilities/heroes/hero_dark_summoner.lua"
 		"AbilityTextureName"			"custom/holdout_stitch"
 		"MaxLevel"						"1"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_BOTH"
-		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_BASIC"
-		"AbilityCastAnimation"			"ACT_DOTA_ATTACK"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING"
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
+		"AbilityCastAnimation"			"ACT_DOTA_CAST_ABILITY_4"
 		"AbilityCastRange"				"900"
-		"AbilityCastPoint"				"0.453"
-		"AbilityCooldown"				"60.0"
-		"AbilityManaCost"				"90"
-		"RequiresCorpsesAround"			"900"
+		"AbilityCastPoint"				"0.4"
+		"AbilityCooldown"				"45.0"
+		"AbilityManaCost"				"150"
+
+		"precache"
+		{
+			"particle"					"particles/units/heroes/hero_skeletonking/wraith_king_reincarnate_explode.vpcf"
+		}
 
 		"AbilityValues"
 		{
-			"duration"                  "40"
-			"radius"                    "900"
-			"max_units_resurrected"     "6"
-		}
-
-		"OnSpellStart"
-		{
-			"FireSound"
-			{
-				"EffectName"        "Hero_Abaddon.AphoticShield.Cast"
-				"Target"            "CASTER"
-			}
-
-			"FireEffect"
-			{
-				"EffectName"        "particles/units/heroes/hero_skeletonking/wraith_king_reincarnate_explode.vpcf"
-				"EffectAttachType"  "follow_origin"
-				"Target"            "CASTER"
-			}
-
-			"RunScript"
-			{
-				"ScriptFile"	"abilities/heroes/hero_dark_summoner.lua"
-				"Function"		"Stitch"
-			}       
-		}
-
-		"Modifiers"
-		{
-			"modifier_animate_dead"
-			{
-				"IsHidden"		"1"
-				"OnCreated"
-				{
-					"AttachEffect"
-					{
-						"EffectName"		"particles/econ/items/abaddon/abaddon_alliance/abaddon_aphotic_shield_alliance_explosion.vpcf"
-						"EffectAttachType"	"follow_origin"
-						"Target"			"TARGET"
-	
-						"ControlPointEntities"
-						{
-							"TARGET"	"attach_origin" // Control Point 0
-							"TARGET"	"attach_origin" // Control Point 1
-						}
-					}
-
-					"ApplyModifier"
-					{
-						"ModifierName"	"modifier_phased"
-						"Target" 		"TARGET"
-						"Duration"		"0.03"
-					}
-				}
-
-				"StatusEffectName"			"particles/status_fx/status_effect_holdout_borrowed_time_3.vpcf"
-				"StatusEffectPriority"		"15"
-
-				"States"
-				{
-					"MODIFIER_STATE_DOMINATED"		"MODIFIER_STATE_VALUE_ENABLED"
-				}
-			}
+			"duration"					"10"
+			"radius"					"900"
+			"move_slow_pct"				"-25"
+			"explosion_radius"			"350"
+			"base_damage"				"300"
+			"max_health_damage_pct"		"10"
+			"max_bonus_damage"			"2500"
+			"soul_stack_cap"				"20"
+			"soul_stack_duration"		"20"
+			"shadow_bolt_damage_per_soul"	"2"
+			"corruption_damage_per_soul"	"2"
+			"corruption_radius_per_soul"	"5"
+			"malefice_reduction_per_soul"	"0.5"
+			"consuming_flame_lifesteal_per_soul"	"0.5"
+			"dark_king_souls_per_extra"	"5"
 		}
 	}
 
@@ -18126,6 +18308,13 @@
 
 		"OnSpellStart"
 		{
+			"RunScript"
+			{
+				"ScriptFile"			"abilities/heroes/hero_dark_summoner.lua"
+				"Function"				"DarkSummonerDarkKingSoulSynergy"
+				"Target"				"POINT"
+			}
+
 			"FireSound"
 			{
 				"EffectName"			"Hero_Warlock.RainOfChaos_buildup"
@@ -19083,11 +19272,11 @@
 		"AbilityTextureName"			"custom/xhs_grom_mirror_trial"
 		"MaxLevel"						"5"
 		"AbilityCastPoint"				"1.45 1.30 1.20 1.10 1.00"
-		"AbilityCooldown"				"0"
+		"AbilityCooldown"				"7.0"
 		"AbilityManaCost"				"0"
 		"AbilityValues"
 		{
-			"clone_count"				"4 8 12 16 24"
+			"clone_count"				"8 12 16 20 24"
 			"trial_duration"			"10.0 10.0 10.0 10.0 10.0"
 			"split_delay"				"0.65"
 			"spawn_radius"				"800"
@@ -19114,7 +19303,7 @@
 			"radius"					"330"
 			"duration"					"3.2"
 			"tick_rate"					"0.25"
-			"damage_per_second"			"2800 4200 5600 7200 9200"
+			"damage_per_second"			"7000 10500 14000 18000 23000"
 			"CalculateSpellDamageTooltip"	"1"
 		}
 	}
@@ -19314,7 +19503,7 @@
 					"AttachEffect"
 					{
 						"Target"			"TARGET"
-						"EffectName"		"particles/items_fx/aura_assault.vpcf"
+						"EffectName"		"particles/custom/supporter_pass/regen_aura_anchor.vpcf"
 						"EffectAttachType"	"follow_origin"
 					}
 				}
@@ -21838,7 +22027,7 @@
 			"static_remnant_radius"		"235"
 			"static_remnant_damage_radius"	"260"
 			"static_remnant_delay"		"1.0"
-			"static_remnant_damage"		"100 200 300 400"
+			"static_remnant_damage"		"150 250 325 400"
 			"CalculateSpellDamageTooltip"	"1"
 			"number"					"6"
 		}
@@ -22451,15 +22640,16 @@
 		{
 			"cast_point"					"1.60 1.45 1.35 1.25 1.15"
 			"radius"						"130"
-			"inner_ring_radius"			"520"
-			"outer_ring_radius"			"850"
-			"inner_count"					"8 9 10 11 12"
-			"outer_count"					"0 0 0 18 20"
+			"inner_ring_radius"			"240"
+			"ring_spacing"					"280"
+			"ring_count"					"2 2 3 3 4"
+			"ring_arc_spacing"				"390 350 325 305 290"
 			"impact_stagger"				"0.12"
 			"wave_damage"					"2000 4000 6000 8000 10000"
 			"CalculateSpellDamageTooltip"	"1"
 			"damage_pct"					"70"
 			"root_duration"				"2.4"
+			"linger_duration"				"1 2 3 4 5"
 		}
 	}
 
@@ -23084,7 +23274,7 @@
 		"AbilityTextureName"		"custom/xhs_illidan_metamorphosis"
 		"MaxLevel"					"5"
 		"AbilityCastPoint"			"1.50 1.35 1.25 1.15 1.05"
-		"AbilityCooldown"			"0"
+		"AbilityCooldown"			"7.0"
 		"AbilityManaCost"			"0"
 		"AbilityValues"
 		{
@@ -24237,7 +24427,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityCastPoint"				"0.3"
 		"AbilityCastRange"				"350 400 450 500"
-		"AbilityDamage"					"90 270 450 630"
+		"AbilityDamage"					"140 300 470 630"
 
 		// Time		
 		//-------------------------------------------------------------------------------------------------------------
@@ -24257,7 +24447,7 @@
 			"electric_vortex_self_slow_duration"	"2.0"
 			"duration"								"1.0 2.0 3.0 4.0"
 			"radius"								"350 400 450 500"
-			"damage"								"90 270 450 630"
+			"damage"								"140 300 470 630"
 			"CalculateSpellDamageTooltip"	"1"
 		}
 
@@ -24545,7 +24735,7 @@
 		"AbilityValues"
 		{
 			"stun_duration"				"2.0 2.5 3.0 3.5"
-			"damage"					"350 600 850 1100"
+			"damage"					"550 750 950 1150"
 			"CalculateSpellDamageTooltip"	"1"
 			"projectile_radius"			"120"
 			"projectile_length"			"1600"
@@ -24720,7 +24910,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityValues"
 		{
-			"bonus_damage_percentage"		"20 30 40 50"
+			"bonus_damage_percentage"		"30 40 45 50"
 			"aura_radius"					"850 900 950 1000"
 			"cleave_pct"					"40"
 			"radius"						"325"
@@ -25064,7 +25254,7 @@
 			"radius"				"420 450 480 510 550"
 			"damage"				"10000 16000 24000 34000 48000"
 			"CalculateSpellDamageTooltip"	"1"
-			"slow_duration"			"2.6"
+			"slow_duration"			"5 8.75 12.5 16.25 20"
 			"slow_pct"				"30 34 38 42 48"
 			"damage_reduction_pct"	"15 18 21 24 28"
 			"cast_point"			"1.25 1.15 1.08 1.00 0.95"
@@ -25167,7 +25357,7 @@
 		"AbilityTextureName"		"custom/xhs_proudmoore_admirals_command"
 		"MaxLevel"					"5"
 		"AbilityCastPoint"			"1.45 1.32 1.22 1.12 1.02"
-		"AbilityCooldown"			"0"
+		"AbilityCooldown"			"7.0"
 		"AbilityManaCost"			"0"
 		"AbilityValues"
 		{
@@ -25456,7 +25646,7 @@
 			"radius"					"185 200 215 230 245"
 			"spacing"					"205"
 			"nodes"						"10"
-			"lane_offset"				"270"
+			"lane_offset"				"500"
 			"breath_speed"				"1200"
 			"breath_start_radius"		"80"
 			"breath_height"				"120"
@@ -25477,12 +25667,12 @@
 		"AbilityTextureName"		"custom/xhs_spirit_master_trinity_cycle"
 		"MaxLevel"					"5"
 		"AbilityCastPoint"			"1.60 1.45 1.32 1.20 1.10"
-		"AbilityCooldown"			"0"
+		"AbilityCooldown"			"7.0"
 		"AbilityManaCost"			"0"
 		"AbilityValues"
 		{
 			"radius"				"900"
-			"sync_window"			"24 22 20 18 16"
+			"sync_window"			"20 17 14 11 8"
 			"cast_point"			"1.60 1.45 1.32 1.20 1.10"
 		}
 	}
@@ -25653,7 +25843,7 @@
 		"AbilityUnitDamageType"		"DAMAGE_TYPE_PURE"
 		"AbilityTextureName"		"custom/xhs_spirit_earth_fault_line"
 		"MaxLevel"					"5"
-		"AbilityCastPoint"			"1.45 1.32 1.20 1.10 1.02"
+		"AbilityCastPoint"			"2.20 1.95 1.70 1.45 1.20"
 		"AbilityCastRange"			"2500"
 		"AbilityCooldown"			"8.0"
 		"AbilityManaCost"			"0"
@@ -25662,8 +25852,8 @@
 			"damage"				"14000 23000 35000 50000 70000"
 			"CalculateSpellDamageTooltip"	"1"
 			"radius"				"185 200 215 230 245"
-			"spacing"				"190"
-			"nodes"					"6"
+			"spacing"				"240"
+			"nodes"					"8"
 			"slow_duration"			"1.6"
 			"stun_duration"			"0.45"
 			"round_1_line_count"	"1"
@@ -25672,7 +25862,7 @@
 			"round_2_line_angle"	"0"
 			"round_3_line_count"	"3"
 			"round_3_line_angle"	"14"
-			"cast_point"			"1.45 1.32 1.20 1.10 1.02"
+			"cast_point"			"2.20 1.95 1.70 1.45 1.20"
 		}
 	}
 
@@ -25908,7 +26098,10 @@
 			"final_telegraph"			"1.55 1.45 1.35 1.25 1.15"
 			"final_base_lines"			"3"
 			"max_extra_lines"			"6"
-			"final_range"				"1200"
+			"final_pulse_radius"			"2600"
+			"final_pulse_damage"			"8000 13000 20000 29000 40000"
+			"missed_beacon_bonus_damage"	"1500 2500 4000 6000 8500"
+			"final_range"				"2200"
 			"final_width"				"145 155 165 175 190"
 			"final_damage"				"15000 24000 36000 51000 72000"
 			"CalculateSpellDamageTooltip"	"1"
@@ -25986,7 +26179,7 @@
 		"AbilityUnitDamageType"		"DAMAGE_TYPE_PURE"
 		"AbilityTextureName"		"custom/arthas_frostmourne"
 		"MaxLevel"					"5"
-		"AbilityCastPoint"			"1.65 1.5 1.38 1.25 1.12"
+		"AbilityCastPoint"			"2.60 2.40 2.20 2.00 1.80"
 		"AbilityCooldown"			"12.0"
 		"AbilityManaCost"			"0"
 		"AbilityValues"
@@ -25995,7 +26188,20 @@
 			"damage"				"26000 42000 64000 91000 128000"
 			"CalculateSpellDamageTooltip"	"1"
 			"marked_bonus_pct"		"55"
-			"cast_point"			"1.65 1.5 1.38 1.25 1.12"
+			"cast_point"			"2.60 2.40 2.20 2.00 1.80"
 		}
+	}
+
+	"xhs_tombstone_revive_channel"
+	{
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"abilities/xhs_tombstone_revive.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_CHANNELLED | DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK"
+		"AbilityTextureName"		"tombstone"
+		"MaxLevel"					"1"
+		"AbilityCastPoint"			"0"
+		"AbilityChannelTime"		"5.0"
+		"AbilityCooldown"			"0"
+		"AbilityManaCost"			"0"
 	}
 } // End

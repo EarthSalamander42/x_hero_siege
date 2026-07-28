@@ -24,6 +24,7 @@ local INFERNAL_RING_PRECAST_PARTICLE = "particles/units/heroes/heroes_underlord/
 local DEMONIC_HOWL_PARTICLE = "particles/units/heroes/hero_lycan/lycan_howl_cast.vpcf"
 local RUPTURE_PARTICLE = "particles/units/heroes/hero_elder_titan/elder_titan_earth_splitter.vpcf"
 local INFERNAL_RING_VISUAL_DURATION = 0.45
+local INFERNAL_RING_THINK_INTERVAL = 0.10
 local EARTH_SPLITTER_RELEASE_BUFFER = 1.35
 
 local BRUTAL_SLAM_PRECAST_SOUND = "Hero_Centaur.Attack"
@@ -559,21 +560,79 @@ function xhs_magtheridon_infernal_rings:OnSpellStart()
 	local radius = self:GetSpecialValueFor("radius")
 	local damage = self:GetSpecialValueFor("wave_damage") * self:GetSpecialValueFor("damage_pct") * 0.01
 	local rootDuration = self:GetSpecialValueFor("root_duration")
+	local lingerDuration = self:GetSpecialValueFor("linger_duration")
+	local castTime = GameRules:GetGameTime()
+	local searchCenter = caster:GetAbsOrigin()
+	local searchRadius = 0
+	local zones = {}
 
 	for _, entry in pairs(context.impacts or {}) do
 		local position = entry.position
-		Timers:CreateTimer(entry.delay or 0, function()
+		local delay = entry.delay or 0
+		searchRadius = math.max(searchRadius, (position - searchCenter):Length2D() + radius)
+		zones[#zones + 1] = {
+			position = position,
+			starts_at = castTime + delay,
+			expires_at = castTime + delay + lingerDuration,
+			rooted_units = {},
+		}
+
+		Timers:CreateTimer(delay, function()
 			if not IsValidAlive(caster) then return nil end
-			CreatePitOfMaliceZone(position, radius, INFERNAL_RING_VISUAL_DURATION)
+			CreatePitOfMaliceZone(position, radius, lingerDuration)
 			EmitLocationSound(caster, position, INFERNAL_RINGS_IMPACT_SOUND)
 			DamageEnemies(caster, self, position, radius, damage, self:GetAbilityDamageType())
-			local units = FindUnitsInRadius(caster:GetTeamNumber(), position, nil, radius, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, FIND_ANY_ORDER, false)
-			for _, unit in pairs(units) do
-				ApplyRoot(caster, self, unit, rootDuration)
-			end
 			return nil
 		end)
 	end
+
+	Timers:CreateTimer(INFERNAL_RING_THINK_INTERVAL, function()
+		if not IsValidAlive(caster) then return nil end
+
+		local now = GameRules:GetGameTime()
+		local hasActiveZone = false
+		local hasPendingZone = false
+		for _, zone in pairs(zones) do
+			if now < zone.starts_at then
+				hasPendingZone = true
+			elseif now <= zone.expires_at then
+				hasActiveZone = true
+			end
+		end
+
+		if hasActiveZone then
+			local units = FindUnitsInRadius(
+				caster:GetTeamNumber(),
+				searchCenter,
+				nil,
+				searchRadius,
+				DOTA_UNIT_TARGET_TEAM_ENEMY,
+				DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC,
+				DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES,
+				FIND_ANY_ORDER,
+				false
+			)
+			for _, unit in pairs(units) do
+				local unitIndex = unit:entindex()
+				local unitPosition = unit:GetAbsOrigin()
+				for _, zone in pairs(zones) do
+					if now >= zone.starts_at
+						and now <= zone.expires_at
+						and zone.rooted_units[unitIndex] ~= true
+						and (unitPosition - zone.position):Length2D() <= radius
+					then
+						zone.rooted_units[unitIndex] = true
+						ApplyRoot(caster, self, unit, rootDuration)
+					end
+				end
+			end
+		end
+
+		if hasActiveZone or hasPendingZone then
+			return INFERNAL_RING_THINK_INTERVAL
+		end
+		return nil
+	end)
 
 	ClearContext(self)
 end

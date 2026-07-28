@@ -4,6 +4,10 @@ require('internal/vanilla_extension')
 require('gamemode')
 
 function Precache(context)
+	-- AddBotPlayerWithEntityScript bootstraps fake clients as Wisp. Keep the
+	-- model resident before any player can trigger bot provisioning.
+	PrecacheResource("model", "models/heroes/wisp/wisp.vmdl", context)
+
 	-- Lua Modifiers
 	LinkLuaModifier("modifier_provides_fow_position", "modifiers/modifier_provides_fow_position", LUA_MODIFIER_MOTION_NONE)
 	LinkLuaModifier("modifier_npc_dialog", "modifiers/modifier_npc_dialog", LUA_MODIFIER_MOTION_NONE)
@@ -15,6 +19,7 @@ function Precache(context)
 	LinkLuaModifier("modifier_cinematic_pause_release", "modifiers/modifier_cinematic_pause.lua", LUA_MODIFIER_MOTION_NONE)
 	LinkLuaModifier("modifier_custom_mechanics", "modifiers/modifier_custom_mechanics", LUA_MODIFIER_MOTION_NONE)
 	LinkLuaModifier("modifier_xhs_growth_overhead", "modifiers/modifier_xhs_growth_overhead.lua", LUA_MODIFIER_MOTION_NONE)
+	LinkLuaModifier("modifier_xhs_end_screen_stat_tracker", "modifiers/modifier_xhs_end_screen_stat_tracker.lua", LUA_MODIFIER_MOTION_NONE)
 
 	XHSPrecache:Run(context)
 
@@ -64,6 +69,7 @@ function Precache(context)
 	PrecacheResource("particle", "particles/units/heroes/hero_jakiro/jakiro_base_attack.vpcf", context)                      -- Jakiro Level 2 creeps
 	PrecacheResource("particle", "particles/units/heroes/hero_ancient_apparition/ancient_apparition_base_attack.vpcf", context) -- Necro Level 2 creeps
 	PrecacheResource("particle", "particles/units/heroes/hero_lion/lion_base_attack.vpcf", context)                          -- Special Wave 2
+	PrecacheResource("particle", "particles/econ/items/razor/razor_ti6/razor_base_attack_ti6.vpcf", context)               -- Rifleman level 20 Laser projectile
 
 	PrecacheResource("model_folder", "models/heroes/skeleton_king", context)                                                 --Lich King Boss
 	PrecacheResource("model_folder", "models/items/warlock/archivist_golem", context)                                        -- Spirit Beast event
@@ -157,6 +163,7 @@ function Precache(context)
 	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_skeletonking.vsndevts", context)
 	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_skywrath_mage.vsndevts", context)
 	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_spectre.vsndevts", context)
+	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_tinker.vsndevts", context)     -- Archmage Elemental Wave
 
 	PrecacheResource("soundfile", "soundevents/game_sounds_custom.vsndevts", context)
 	PrecacheResource("soundfile", "soundevents/game_sounds_dungeon.vsndevts", context)
@@ -169,7 +176,7 @@ function Precache(context)
 	XHSPrecache:PrecacheUnit("npc_dota_creature_muradin_bronzebeard", nil, -1)
 
 	-- Final Wave
-	XHSPrecache:PrecacheItem("item_tombstone", context)
+	XHSPrecache:PrecacheUnit("npc_xhs_hero_tombstone", nil, -1)
 
 	for _, hero in pairs(HEROLIST) do
 		-- local hero_folder_name = "models/heroes/" .. string.gsub(hero, "npc_dota_hero_", "") .. ".vmdl"

@@ -47,6 +47,7 @@ var XHSTopHud = (function () {
 	var topHudLayerApplied = false;
 	var isSpecialEventPanelVisible = false;
 	var isGamePaused = false;
+	var isHeroSelectionTransitionActive = false;
 	var nightfallVignetteToken = 0;
 	var activeCurrentEventTimerName = null;
 	var isMuradinFrenzyActive = false;
@@ -1751,6 +1752,11 @@ var XHSTopHud = (function () {
 
 		var root = Panel("XHSOverheadRoot");
 		var entIndex = label.GetAttributeInt("ent_index", -1);
+		var playerID = label.GetAttributeInt("player_id", -1);
+		if (isHeroSelectionTransitionActive && playerID === GetLocalPlayerID()) {
+			SetOverheadLabelVisible(label, false);
+			return;
+		}
 		if (!root || !IsValidEntityIndex(entIndex) || label.GetAttributeInt("death_hidden", 0) > 0) {
 			SetOverheadLabelVisible(label, false);
 			return;
@@ -2329,7 +2335,7 @@ var XHSTopHud = (function () {
 		}
 
 		if (isReviving) {
-			label.text = Math.ceil(reviveState.remaining).toString();
+			label.text = Math.ceil(reviveState.remaining).toString() + "s";
 		} else if (isReincarnating) {
 			label.text = Math.ceil(reincarnationState.remaining).toString();
 		} else if (isDead) {
@@ -2736,6 +2742,9 @@ var XHSTopHud = (function () {
 		GameEvents.Subscribe("xhs_game_pause_state", function (data) {
 			SetOverheadPauseOcclusion(!!(data && Number(data.paused) === 1));
 		});
+		GameEvents.Subscribe("xhs_hero_selection_transition", function (data) {
+			isHeroSelectionTransitionActive = !!(data && Number(data.active) === 1);
+		});
 		GameEvents.Subscribe("update_special_event_label_farm", function () {});
 		GameEvents.Subscribe("update_special_event_label_final", function () {});
 		GameEvents.Subscribe("show_current_event_timer", function (data) {
@@ -2837,3 +2846,197 @@ var XHSTopHud = (function () {
 })();
 
 XHSTopHud.Initialize();
+
+(function () {
+	var frames = {};
+	var vanillaChannelHidden = false;
+
+	function LocalizeHeroName(heroName) {
+		var localized = $.Localize("#" + String(heroName || ""));
+		if (localized && localized !== ("#" + heroName)) {
+			return localized.toUpperCase();
+		}
+		return String(heroName || "FALLEN HERO").replace(/^npc_dota_hero_/, "").replace(/_/g, " ").toUpperCase();
+	}
+
+	function CreateFrame(key, data) {
+		var root = $("#XHSReviveFrameStack");
+		if (!root) {
+			return null;
+		}
+
+		var frame = $.CreatePanel("Panel", root, "XHSReviveFrame_" + key);
+		frame.AddClass("XHSReviveFrame");
+		var accent = $.CreatePanel("Panel", frame, "");
+		accent.AddClass("XHSReviveFrameAccent");
+
+		var portraitWrap = $.CreatePanel("Panel", frame, "");
+		portraitWrap.AddClass("XHSRevivePortraitWrap");
+		var portrait = $.CreatePanel("DOTAHeroImage", portraitWrap, "");
+		portrait.AddClass("XHSRevivePortrait");
+		portrait.heroname = String(data.hero_name || "");
+		var rune = $.CreatePanel("Label", portraitWrap, "");
+		rune.AddClass("XHSReviveRune");
+		rune.text = "✦";
+
+		var copy = $.CreatePanel("Panel", frame, "");
+		copy.AddClass("XHSReviveCopy");
+		var header = $.CreatePanel("Panel", copy, "");
+		header.AddClass("XHSReviveHeader");
+		var eyebrow = $.CreatePanel("Label", header, "");
+		eyebrow.AddClass("XHSReviveEyebrow");
+		eyebrow.text = "SOUL RECALL";
+		var channelers = $.CreatePanel("Label", header, "");
+		channelers.AddClass("XHSReviveChannelers");
+
+		var title = $.CreatePanel("Label", copy, "");
+		title.AddClass("XHSReviveTitle");
+		title.text = LocalizeHeroName(data.hero_name);
+
+		var progressTrack = $.CreatePanel("Panel", copy, "");
+		progressTrack.AddClass("XHSReviveProgressTrack");
+		var progress = $.CreatePanel("Panel", progressTrack, "");
+		progress.AddClass("XHSReviveProgress");
+		var shine = $.CreatePanel("Panel", progressTrack, "");
+		shine.AddClass("XHSReviveProgressShine");
+
+		var timer = $.CreatePanel("Label", frame, "");
+		timer.AddClass("XHSReviveTimer");
+
+		frame._xhsPortrait = portrait;
+		frame._xhsTitle = title;
+		frame._xhsChannelers = channelers;
+		frame._xhsProgress = progress;
+		frame._xhsTimer = timer;
+		return frame;
+	}
+
+	function UpdateFrame(frame, state) {
+		var remaining = Math.max(0, state.endTime - Game.GetGameTime());
+		var ratio = state.duration > 0 ? 1 - Math.min(1, remaining / state.duration) : 1;
+		frame._xhsProgress.style.width = (ratio * 100).toFixed(2) + "%";
+		frame._xhsTimer.text = remaining.toFixed(1) + "s";
+		frame._xhsChannelers.text = state.channels + (state.channels === 1 ? " CHANNELER" : " CHANNELERS");
+	}
+
+	function RemoveFrame(key, result) {
+		var state = frames[key];
+		if (!state) {
+			return;
+		}
+		delete frames[key];
+		var frame = state.panel;
+		frame.SetHasClass("XHSReviveCompleted", result === "completed");
+		frame.SetHasClass("XHSReviveCancelled", result !== "completed");
+		frame._xhsTimer.text = result === "completed" ? "ALIVE" : "BROKEN";
+		frame._xhsChannelers.text = result === "completed" ? "SOUL RESTORED" : "RITUAL INTERRUPTED";
+		frame._xhsProgress.style.width = result === "completed" ? "100%" : "0%";
+		$.Schedule(result === "completed" ? 0.9 : 0.55, function () {
+			if (frame && frame.IsValid()) {
+				frame.DeleteAsync(0);
+			}
+		});
+	}
+
+	function OnReviveUpdate(data) {
+		data = data || {};
+		var key = String(Number(data.hero_entindex) || -1);
+		if (Number(data.active) <= 0) {
+			RemoveFrame(key, String(data.result || "cancelled"));
+			return;
+		}
+
+		var state = frames[key];
+		if (!state) {
+			var panel = CreateFrame(key, data);
+			if (!panel) {
+				return;
+			}
+			state = { panel: panel };
+			frames[key] = state;
+		}
+
+		state.duration = Math.max(0.1, Number(data.duration) || 0.1);
+		state.endTime = Number(data.end_time) || (Game.GetGameTime() + state.duration);
+		state.channels = Math.max(1, Number(data.channels) || 1);
+		state.panel._xhsPortrait.heroname = String(data.hero_name || "");
+		state.panel._xhsTitle.text = LocalizeHeroName(data.hero_name);
+		state.panel.RemoveClass("XHSReviveCompleted");
+		state.panel.RemoveClass("XHSReviveCancelled");
+		UpdateFrame(state.panel, state);
+	}
+
+	function TickFrames() {
+		for (var key in frames) {
+			if (!frames.hasOwnProperty(key)) {
+				continue;
+			}
+			var state = frames[key];
+			if (state.panel && state.panel.IsValid()) {
+				UpdateFrame(state.panel, state);
+			}
+		}
+		$.Schedule(0.03, TickFrames);
+	}
+
+	function SetVanillaChannelHidden(hidden) {
+		vanillaChannelHidden = !!hidden;
+		var ids = ["ChannelBar", "channel_bar"];
+		for (var i = 0; i < ids.length; i++) {
+			var panel = typeof FindDotaHudElement === "function" ? FindDotaHudElement(ids[i]) : null;
+			if (!panel || !panel.IsValid()) {
+				continue;
+			}
+			if (hidden) {
+				if (panel._xhsOriginalOpacity === undefined) {
+					panel._xhsOriginalOpacity = panel.style.opacity;
+				}
+				panel.style.opacity = "0";
+			} else {
+				panel.style.opacity = panel._xhsOriginalOpacity || "1";
+				panel._xhsOriginalOpacity = undefined;
+			}
+		}
+	}
+
+	function MaintainVanillaChannelVisibility() {
+		if (vanillaChannelHidden) {
+			SetVanillaChannelHidden(true);
+		}
+		$.Schedule(0.1, MaintainVanillaChannelVisibility);
+	}
+
+	function SyncReviveFramesFromNetTables() {
+		var playerIds = typeof Game.GetAllPlayerIDs === "function" ? Game.GetAllPlayerIDs() : [];
+		for (var i = 0; i < playerIds.length; i++) {
+			var heroEntIndex = Players.GetPlayerHeroEntityIndex(playerIds[i]);
+			if (!heroEntIndex || heroEntIndex < 0) {
+				continue;
+			}
+			var key = String(heroEntIndex);
+			var data = CustomNetTables.GetTableValue("player_table", key + "_revive_channel") || {};
+			if (Number(data.active) > 0 && !frames[key]) {
+				OnReviveUpdate({
+					hero_entindex: heroEntIndex,
+					player_id: playerIds[i],
+					hero_name: Entities.GetUnitName(heroEntIndex),
+					active: 1,
+					duration: data.duration,
+					end_time: data.end_time,
+					channels: data.channels,
+				});
+			} else if (Number(data.active) <= 0 && frames[key]) {
+				RemoveFrame(key, "cancelled");
+			}
+		}
+		$.Schedule(0.5, SyncReviveFramesFromNetTables);
+	}
+
+	GameEvents.Subscribe("xhs_tombstone_revive_update", OnReviveUpdate);
+	GameEvents.Subscribe("xhs_tombstone_channel_local", function (data) {
+		SetVanillaChannelHidden(Number((data || {}).active) > 0);
+	});
+	TickFrames();
+	MaintainVanillaChannelVisibility();
+	SyncReviveFramesFromNetTables();
+})();

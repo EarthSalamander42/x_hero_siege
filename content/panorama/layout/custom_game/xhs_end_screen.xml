@@ -67,6 +67,9 @@
 				</Panel>
 
 				<Panel class="XHSEndScreenHeaderActions">
+					<Button id="XHSEndScreenFarmButton" class="XHSEndScreenButton XHSEndScreenButtonSecondary">
+						<Label id="XHSEndScreenFarmButtonLabel" text="Farm Event" />
+					</Button>
 					<Button id="XHSEndScreenHallButton" class="XHSEndScreenButton XHSEndScreenButtonSecondary XHSEndScreenButtonDisabled" enabled="false">
 						<Label text="Hall of Fame" />
 					</Button>
@@ -90,7 +93,7 @@
 						<Label class="PlayerColSmall" text="LVL" />
 						<Label class="PlayerColKda" text="Kills" />
 						<Label class="PlayerColNumber" text="Deaths" />
-						<Label class="PlayerColNumber" text="Networth" />
+						<Label class="PlayerColNumber" text="Gold Earned" />
 						<Label class="PlayerColNumber" text="Tome Stats" />
 						<Label class="PlayerColNumber" text="Potions" />
 						<Label class="PlayerColBattlepass" text="Supporter Pass" />

@@ -8,6 +8,8 @@ end
 
 modifier_xhs_spirit_master_phase_ai = modifier_xhs_spirit_master_phase_ai or class({})
 modifier_xhs_spirit_master_phase_ai.XHS_LINK_CLIENT = true
+modifier_xhs_spirit_master_split_hidden = modifier_xhs_spirit_master_split_hidden or class({})
+modifier_xhs_spirit_master_split_hidden.XHS_LINK_CLIENT = true
 modifier_xhs_tri_spirit_phase_ai = modifier_xhs_tri_spirit_phase_ai or class({})
 modifier_xhs_tri_spirit_phase_ai.XHS_LINK_CLIENT = true
 modifier_xhs_spirit_dormant = modifier_xhs_spirit_dormant or class({})
@@ -16,6 +18,7 @@ modifier_xhs_spirit_finale = modifier_xhs_spirit_finale or class({})
 modifier_xhs_spirit_finale.XHS_LINK_CLIENT = true
 
 LinkLuaModifier("modifier_xhs_spirit_master_phase_ai", "boss_scripts/phase3_ai/spirit_master.lua", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_xhs_spirit_master_split_hidden", "boss_scripts/phase3_ai/spirit_master.lua", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_xhs_tri_spirit_phase_ai", "boss_scripts/phase3_ai/spirit_master.lua", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_xhs_spirit_dormant", "boss_scripts/phase3_ai/spirit_master.lua", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_xhs_spirit_finale", "boss_scripts/phase3_ai/spirit_master.lua", LUA_MODIFIER_MOTION_NONE)
@@ -42,6 +45,21 @@ local SPIRIT_ABILITIES = {
 		"xhs_spirit_fire_cinder_step",
 		"xhs_spirit_fire_solar_flare",
 		"xhs_spirit_fire_wildfire_ring",
+	},
+}
+
+local SPIRIT_AMBIENTS = {
+	storm = {
+		ability = "holdout_blue_effect",
+		modifier = "modifier_blue",
+	},
+	earth = {
+		ability = "holdout_green_effect",
+		modifier = "modifier_green",
+	},
+	fire = {
+		ability = "holdout_red_effect",
+		modifier = "modifier_red",
 	},
 }
 
@@ -86,17 +104,17 @@ local SPIRIT_ARENA_LEASH_RADIUS = 1850
 local SPIRIT_FINALE_END_DELAY = 10.0
 
 local SPIRIT_ROUNDS = {
-	[1] = { threshold = 70, attack_multiplier = 1.00, ability_count = 1 },
-	[2] = { threshold = 40, attack_multiplier = 1.25, ability_count = 2 },
-	[3] = { threshold = 10, attack_multiplier = 1.50, ability_count = 3 },
+	[1] = { threshold = 70, armor = 200, attack_multiplier = 1.00, ability_count = 1 },
+	[2] = { threshold = 40, armor = 250, attack_multiplier = 1.25, ability_count = 2 },
+	[3] = { threshold = 10, armor = 300, attack_multiplier = 1.50, ability_count = 3 },
 }
 
 local SYNC_WINDOWS = {
-	[1] = 24,
-	[2] = 22,
-	[3] = 20,
-	[4] = 18,
-	[5] = 16,
+	[1] = 20,
+	[2] = 17,
+	[3] = 14,
+	[4] = 11,
+	[5] = 8,
 }
 
 local function IsValidAlive(unit)
@@ -106,6 +124,26 @@ end
 local function GetDifficulty()
 	if XHSPhase3BossAI ~= nil then return XHSPhase3BossAI:GetDifficulty() end
 	return math.max(1, math.min(5, GameRules:GetCustomGameDifficulty() or 1))
+end
+
+local function SetSpiritAmbientEnabled(spirit, enabled)
+	if spirit == nil or not IsValidEntity(spirit) or spirit:IsNull() then return end
+	local ambient = SPIRIT_AMBIENTS[spirit.xhs_spirit_key]
+	if ambient == nil then return end
+
+	local ability = spirit:FindAbilityByName(ambient.ability)
+	if ability ~= nil then
+		ability:SetActivated(enabled == true)
+	end
+
+	if enabled ~= true then
+		spirit:RemoveModifierByName(ambient.modifier)
+		return
+	end
+
+	if ability ~= nil and not spirit:HasModifier(ambient.modifier) then
+		ability:ApplyDataDrivenModifier(spirit, spirit, ambient.modifier, {})
+	end
 end
 
 local function GetArenaCenter(fallback)
@@ -128,7 +166,6 @@ local function HideSpiritBossBars()
 	for _, def in pairs(SPIRIT_DEFS) do
 		CustomGameEventManager:Send_ServerToAllClients("hide_boss_hp", {
 			boss_count = def.boss_count,
-			boss_bar_id = def.bar_id,
 		})
 	end
 end
@@ -142,7 +179,9 @@ end
 
 local function ApplyBossBarIdentity(boss, def)
 	boss.boss_count = def.boss_count or 1
-	boss.xhs_boss_bar_id = def.bar_id
+	-- A fresh trio is created at every threshold. Keep delayed events from an
+	-- older trio from taking ownership of the same three Panorama slots.
+	boss.xhs_boss_bar_id = def.bar_id .. "_" .. tostring(boss:entindex())
 	boss.xhs_boss_bar_name = def.name
 	boss.xhs_boss_bar_icon = def.icon
 	boss.xhs_boss_bar_colors = {
@@ -241,11 +280,30 @@ local function PickHero(center, avoidLocks)
 	return best
 end
 
+local function GetActiveSpiritBossBarId(def)
+	local encounter = XHSSpiritMasterEncounter
+	local spirit = encounter ~= nil and encounter.spirits ~= nil and encounter.spirits[def.key] or nil
+	if spirit ~= nil and IsValidEntity(spirit) and not spirit:IsNull() then
+		return GetBossBarId and GetBossBarId(spirit) or spirit.xhs_boss_bar_id
+	end
+	return def.bar_id
+end
+
+local function SetMasterAbilitiesEnabled(master, enabled)
+	if master == nil or not IsValidEntity(master) or master:IsNull() then return end
+	for _, abilityName in ipairs(MASTER_ABILITIES) do
+		local ability = master:FindAbilityByName(abilityName)
+		if ability ~= nil then
+			ability:SetActivated(enabled == true)
+		end
+	end
+end
+
 local function UpdateBossTimer(label, remaining, duration)
 	for _, def in pairs(SPIRIT_DEFS) do
 		CustomGameEventManager:Send_ServerToAllClients("xhs_boss_timer_update", {
 			boss_count = def.boss_count,
-			boss_bar_id = def.bar_id,
+			boss_bar_id = GetActiveSpiritBossBarId(def),
 			label = label,
 			remaining = math.max(0, remaining or 0),
 			duration = math.max(1, duration or 1),
@@ -258,7 +316,7 @@ local function HideBossTimer()
 	for _, def in pairs(SPIRIT_DEFS) do
 		CustomGameEventManager:Send_ServerToAllClients("xhs_boss_timer_hide", {
 			boss_count = def.boss_count,
-			boss_bar_id = def.bar_id,
+			boss_bar_id = GetActiveSpiritBossBarId(def),
 		})
 	end
 end
@@ -267,7 +325,7 @@ local function UpdateDormantCounter()
 	for _, def in pairs(SPIRIT_DEFS) do
 		CustomGameEventManager:Send_ServerToAllClients("xhs_boss_counter_update", {
 			boss_count = def.boss_count,
-			boss_bar_id = def.bar_id,
+			boss_bar_id = GetActiveSpiritBossBarId(def),
 			label = "Dormant Spirits",
 			remaining = XHSSpiritMasterEncounter.dormant_count or 0,
 			total = 3,
@@ -279,12 +337,21 @@ local function HideDormantCounter()
 	for _, def in pairs(SPIRIT_DEFS) do
 		CustomGameEventManager:Send_ServerToAllClients("xhs_boss_counter_hide", {
 			boss_count = def.boss_count,
-			boss_bar_id = def.bar_id,
+			boss_bar_id = GetActiveSpiritBossBarId(def),
 		})
 	end
 end
 
 function XHSSpiritMasterEncounter:Reset()
+	local previousMaster = self.master
+	HideBossTimer()
+	HideDormantCounter()
+	HideSpiritBossBars()
+	if previousMaster ~= nil and IsValidEntity(previousMaster) and not previousMaster:IsNull() then
+		previousMaster:RemoveModifierByName("modifier_xhs_spirit_master_split_hidden")
+		SetMasterAbilitiesEnabled(previousMaster, true)
+	end
+
 	self.phase = "idle"
 	self.master = nil
 	self.arena_center = nil
@@ -306,15 +373,13 @@ function XHSSpiritMasterEncounter:Reset()
 	self.finale_started = false
 	self.final_attacker = nil
 	SPIRIT_MASTER_KILLED_BOSS_COUNT = 0
-	HideBossTimer()
-	HideDormantCounter()
-	HideSpiritBossBars()
 end
 
 function XHSSpiritMasterEncounter:RegisterMaster(master)
 	if not IsValidAlive(master) then return end
 	if self.phase == nil then self:Reset() end
 	self.master = master
+	SetMasterAbilitiesEnabled(master, true)
 	self.arena_center = GetArenaCenter(master:GetAbsOrigin())
 	self.thresholds = THRESHOLDS
 	-- Keep the master on its own fourth slot. Slots 1-3 belong to Storm,
@@ -430,6 +495,7 @@ function XHSSpiritMasterEncounter:ConfigureSpiritForRound(spirit)
 	spirit.xhs_spirit_base_damage_min = baseMin
 	spirit.xhs_spirit_base_damage_max = baseMax
 	spirit.xhs_spirit_round = self:GetSplitRound()
+	spirit:SetPhysicalArmorBaseValue(config.armor)
 	spirit:SetBaseDamageMin(math.floor(baseMin * config.attack_multiplier + 0.5))
 	spirit:SetBaseDamageMax(math.floor(baseMax * config.attack_multiplier + 0.5))
 end
@@ -505,7 +571,11 @@ function XHSSpiritMasterEncounter:BeginSplit(master, threshold)
 	HideBossBarFor(master)
 	HideLegacyMasterBossBar()
 	HideSpiritBossBars()
+	master:Interrupt()
+	master:SetForceAttackTarget(nil)
+	SetMasterAbilitiesEnabled(master, false)
 	master:AddNoDraw()
+	master:AddNewModifier(master, nil, "modifier_xhs_spirit_master_split_hidden", {})
 	master:AddNewModifier(master, nil, "modifier_invulnerable", {})
 	master:AddNewModifier(master, nil, "modifier_stunned", {})
 	master:Stop()
@@ -517,10 +587,14 @@ function XHSSpiritMasterEncounter:BeginSplit(master, threshold)
 		spirit.xhs_spirit_master = master
 		spirit:SetAngles(0, 270, 0)
 		self:ConfigureSpiritForRound(spirit)
+		if ApplyLatePhase3BossDefenseScaling ~= nil then
+			ApplyLatePhase3BossDefenseScaling(spirit)
+		end
 		ConfigureBossBar(spirit, def)
 		if XHSPhase3BossAI ~= nil then
 			XHSPhase3BossAI:SetAbilityLevels(spirit, SPIRIT_ABILITIES[def.key])
 		end
+		SetSpiritAmbientEnabled(spirit, true)
 		spirit:AddNewModifier(spirit, nil, "modifier_xhs_tri_spirit_phase_ai", {})
 		if RegisterXHSDevSpawn ~= nil then
 			RegisterXHSDevSpawn(spirit)
@@ -545,6 +619,7 @@ function XHSSpiritMasterEncounter:HandleSpiritLethal(spirit, attacker)
 	spirit:Interrupt()
 	spirit:InterruptMotionControllers(true)
 	spirit:SetForceAttackTarget(nil)
+	SetSpiritAmbientEnabled(spirit, false)
 	spirit:AddNewModifier(spirit, nil, "modifier_xhs_spirit_dormant", {})
 	spirit:Stop()
 	if XHSBossCastBar ~= nil then XHSBossCastBar:Hide(spirit) end
@@ -596,6 +671,7 @@ function XHSSpiritMasterEncounter:FailSync()
 			if self.dormant[key] == true then
 				spirit:RemoveModifierByName("modifier_xhs_spirit_dormant")
 				spirit:SetHealth(math.max(1, math.floor(spirit:GetMaxHealth() * maxHealthPct)))
+				SetSpiritAmbientEnabled(spirit, true)
 			else
 				local mod = spirit:AddNewModifier(spirit, nil, "modifier_xhs_spirit_discordant_echo", { duration = 20 })
 				if mod ~= nil then mod:SetStackCount((mod:GetStackCount() or 0) + 1) end
@@ -634,9 +710,11 @@ function XHSSpiritMasterEncounter:CompleteSplit()
 
 	local master = self.master
 	if IsValidAlive(master) then
+		master:RemoveModifierByName("modifier_xhs_spirit_master_split_hidden")
 		master:RemoveNoDraw()
 		master:RemoveModifierByName("modifier_stunned")
 		master:RemoveModifierByName("modifier_invulnerable")
+		SetMasterAbilitiesEnabled(master, true)
 		self.final_death_ready = self:HasPendingThresholds() ~= true
 		master:SetHealth(math.min(master:GetMaxHealth(), math.max(1, self.return_health or master:GetHealth())))
 		master.xhs_boss_bar_suppressed = nil
@@ -668,6 +746,8 @@ function XHSSpiritMasterEncounter:CompleteFinalSplit(attacker)
 	local master = self.master
 	if IsValidAlive(master) then
 		master:SetHealth(1)
+		SetMasterAbilitiesEnabled(master, false)
+		master:AddNewModifier(master, nil, "modifier_xhs_spirit_master_split_hidden", {})
 		master.xhs_boss_bar_suppressed = true
 		master:AddNoDraw()
 		if not master:HasModifier("modifier_invulnerable") then
@@ -870,6 +950,68 @@ function modifier_xhs_spirit_master_phase_ai:OnIntervalThink()
 		local ability = CastAbility(self.boss, "xhs_spirit_master_palm_of_balance", { direction = direction }, self.boss:GetAbsOrigin() + direction)
 		if ability ~= nil then self.next_action = now + ability:GetCastPoint() + 3.2 end
 	end
+end
+
+function modifier_xhs_spirit_master_split_hidden:IsHidden() return true end
+function modifier_xhs_spirit_master_split_hidden:IsPurgable() return false end
+function modifier_xhs_spirit_master_split_hidden:RemoveOnDeath() return false end
+
+function modifier_xhs_spirit_master_split_hidden:DeclareFunctions()
+	return {
+		MODIFIER_PROPERTY_DISABLE_HEALING,
+	}
+end
+
+function modifier_xhs_spirit_master_split_hidden:GetDisableHealing()
+	return 1
+end
+
+function modifier_xhs_spirit_master_split_hidden:CheckState()
+	return {
+		[MODIFIER_STATE_OUT_OF_GAME] = true,
+		[MODIFIER_STATE_INVULNERABLE] = true,
+		[MODIFIER_STATE_COMMAND_RESTRICTED] = true,
+		[MODIFIER_STATE_STUNNED] = true,
+		[MODIFIER_STATE_ROOTED] = true,
+		[MODIFIER_STATE_DISARMED] = true,
+		[MODIFIER_STATE_SILENCED] = true,
+		[MODIFIER_STATE_MUTED] = true,
+		[MODIFIER_STATE_UNSELECTABLE] = true,
+		[MODIFIER_STATE_NO_HEALTH_BAR] = true,
+		[MODIFIER_STATE_NOT_ON_MINIMAP] = true,
+	}
+end
+
+function modifier_xhs_spirit_master_split_hidden:OnCreated()
+	if not IsServer() then return end
+	self:FreezeResources()
+	self:StartIntervalThink(0.1)
+end
+
+function modifier_xhs_spirit_master_split_hidden:OnRefresh()
+	if not IsServer() then return end
+	self:FreezeResources()
+end
+
+function modifier_xhs_spirit_master_split_hidden:FreezeResources()
+	local parent = self:GetParent()
+	if parent == nil or parent:IsNull() then return end
+	self.locked_health = math.max(1, parent:GetHealth())
+	self.locked_mana = math.max(0, parent:GetMana())
+	parent:Interrupt()
+	parent:SetForceAttackTarget(nil)
+	parent:Stop()
+end
+
+function modifier_xhs_spirit_master_split_hidden:OnIntervalThink()
+	if not IsServer() then return end
+	local parent = self:GetParent()
+	if parent == nil or parent:IsNull() then return end
+	parent:SetHealth(math.min(parent:GetMaxHealth(), math.max(1, self.locked_health or parent:GetHealth())))
+	parent:SetMana(math.min(parent:GetMaxMana(), math.max(0, self.locked_mana or parent:GetMana())))
+	parent:Interrupt()
+	parent:SetForceAttackTarget(nil)
+	parent:Stop()
 end
 
 function modifier_xhs_tri_spirit_phase_ai:IsHidden() return true end

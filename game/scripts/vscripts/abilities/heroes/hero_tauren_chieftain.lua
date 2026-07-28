@@ -67,7 +67,7 @@ function modifier_holdout_pulverize:TriggerPulverize()
 				damage_type = DAMAGE_TYPE_MAGICAL,
 			})
 			enemy:AddNewModifier(parent, ability, "modifier_stunned", {
-				duration = duration * (1 - enemy:GetStatusResistance()),
+				duration = duration,
 			})
 		end
 	end

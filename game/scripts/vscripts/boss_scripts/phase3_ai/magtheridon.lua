@@ -859,29 +859,36 @@ function modifier_xhs_magtheridon_phase3_ai:CastInfernalRings()
 	if target == nil then return nil end
 
 	local castPoint = GetAbilityCastPoint(ability)
+	local impactRadius = ability:GetSpecialValueFor("radius")
 	local innerRingRadius = ability:GetSpecialValueFor("inner_ring_radius")
-	local outerRingRadius = ability:GetSpecialValueFor("outer_ring_radius")
-	local innerCount = math.max(1, ability:GetSpecialValueFor("inner_count"))
-	local outerCount = math.max(0, ability:GetSpecialValueFor("outer_count"))
+	local ringSpacing = ability:GetSpecialValueFor("ring_spacing")
+	local ringCount = math.max(2, ability:GetSpecialValueFor("ring_count"))
+	local ringArcSpacing = math.max(
+		impactRadius * 2 + 1,
+		ability:GetSpecialValueFor("ring_arc_spacing")
+	)
 	local stagger = XHSPhase3BossAI:ScaleDelay(ability:GetSpecialValueFor("impact_stagger"))
 	local rotationOffset = self.last_pattern == "infernal_rings" and 18 or 0
 	local impacts = {}
 
-	for i = 1, innerCount do
-		local position = PositionOnRing(bossPosition, innerRingRadius, i, innerCount, rotationOffset)
-		impacts[#impacts + 1] = {
-			position = position,
-			delay = ((i - 1) % 2) * stagger,
-		}
-	end
+	for ringIndex = 1, ringCount do
+		local radius = innerRingRadius + ((ringIndex - 1) * ringSpacing)
+		local impactCount = math.max(
+			3,
+			math.floor(((2 * math.pi * radius) / ringArcSpacing) + 0.5)
+		)
+		local offset = rotationOffset
 
-	if outerCount > 0 then
-		local outerOffset = rotationOffset + 180 / outerCount
-		for i = 1, outerCount do
-			local position = PositionOnRing(bossPosition, outerRingRadius, i, outerCount, outerOffset)
+		-- Alternate the angular offset so gaps do not align between circles.
+		if ringIndex % 2 == 0 then
+			offset = offset + (180 / impactCount)
+		end
+
+		for i = 1, impactCount do
+			local position = PositionOnRing(bossPosition, radius, i, impactCount, offset)
 			impacts[#impacts + 1] = {
 				position = position,
-				delay = ((i - 1) % 2) * stagger,
+				delay = ((i + ringIndex) % 2) * stagger,
 			}
 		end
 	end

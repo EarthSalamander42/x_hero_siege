@@ -627,6 +627,152 @@ function api:GetPlayerSupporterFragments(player_id)
 	return tonumber(supporter_pass.fragments or supporter_pass.fragment_balance) or 0
 end
 
+local function IsSupporterClaimedValue(value)
+	if value == true or value == 1 or value == "1" then return true end
+	return string.lower(tostring(value or "")) == "true"
+end
+
+local function CollectSupporterClaimIDs(value, result, depth)
+	result = result or {}
+	depth = depth or 0
+	if type(value) ~= "table" or depth > 5 then return result end
+
+	local rewardID = value.reward_id or value.reward_key
+	if rewardID == nil and value.claimed ~= nil then
+		rewardID = value.id
+	end
+	local isRewardRecord = rewardID ~= nil or value.claimed ~= nil
+	if rewardID ~= nil and IsSupporterClaimedValue(value.claimed) then
+		result[tostring(rewardID)] = true
+	end
+
+	for key, nested in pairs(value) do
+		if type(nested) == "table" then
+			CollectSupporterClaimIDs(nested, result, depth + 1)
+		elseif not isRewardRecord
+		and IsSupporterClaimedValue(nested)
+		and type(key) == "string"
+		then
+			result[tostring(key)] = true
+		elseif tonumber(key) ~= nil and type(nested) == "string" and nested ~= "" then
+			result[nested] = true
+		end
+	end
+	return result
+end
+
+local function MergeSupporterClaimIDs(target, source)
+	target = target or {}
+	for rewardID in pairs(CollectSupporterClaimIDs(source or {})) do
+		target[tostring(rewardID)] = true
+	end
+	return target
+end
+
+local function NormalizeSupporterClaimSeasonKey(value)
+	if type(value) == "table" then
+		value = value.season_id
+			or value.season_key
+			or value.key
+			or value.id
+			or value.name
+			or value.title
+	end
+	if value == nil then return nil end
+
+	local key = string.lower(tostring(value))
+	key = string.gsub(key, "^%s+", "")
+	key = string.gsub(key, "%s+$", "")
+	if key == "" then return nil end
+
+	-- The live backend and the local manifest use different identifiers for
+	-- the same 2026 season. Claims may only be merged after canonicalization.
+	if string.find(key, "2026", 1, true) ~= nil then
+		return "supporter_pass_2026"
+	end
+	return key
+end
+
+local function InferSupporterClaimSeasonKey(claimed)
+	local inferred = nil
+	local found = false
+
+	for rewardID in pairs(CollectSupporterClaimIDs(claimed or {})) do
+		found = true
+		local id = string.lower(tostring(rewardID))
+		local rewardSeason = nil
+		if string.match(id, "^sp26_") ~= nil
+			or string.find(id, "supporter_pass_2026:", 1, true) == 1
+		then
+			rewardSeason = "supporter_pass_2026"
+		end
+
+		-- Unknown or mixed identifiers are deliberately not treated as being
+		-- in the current season. This prevents cross-season monotone unions.
+		if rewardSeason == nil then return nil end
+		if inferred ~= nil and inferred ~= rewardSeason then return nil end
+		inferred = rewardSeason
+	end
+
+	return found and inferred or nil
+end
+
+local function GetSupporterClaimSeasonFromPass(supporter_pass)
+	if type(supporter_pass) ~= "table" then return nil end
+	return NormalizeSupporterClaimSeasonKey(supporter_pass.season)
+		or NormalizeSupporterClaimSeasonKey(supporter_pass.season_id)
+		or NormalizeSupporterClaimSeasonKey(supporter_pass.season_key)
+end
+
+local function GetSupporterClaimSeasonFromResponse(data)
+	if type(data) ~= "table" then return nil end
+	local profile = type(data.profile) == "table" and data.profile
+		or (type(data.supporter_pass) == "table" and data.supporter_pass or {})
+	return NormalizeSupporterClaimSeasonKey(data.season)
+		or NormalizeSupporterClaimSeasonKey(data.season_id)
+		or NormalizeSupporterClaimSeasonKey(data.season_key)
+		or NormalizeSupporterClaimSeasonKey(profile.season)
+		or NormalizeSupporterClaimSeasonKey(profile.season_id)
+		or NormalizeSupporterClaimSeasonKey(profile.season_key)
+end
+
+local function GetSupporterClaimPayload(data, fallback)
+	if type(data) ~= "table" then return fallback or {} end
+	local profile = type(data.profile) == "table" and data.profile
+		or (type(data.supporter_pass) == "table" and data.supporter_pass or {})
+	return data.claimed_rewards
+		or profile.claimed_rewards
+		or fallback
+		or {}
+end
+
+local function GetSupporterClaimSyncState(steamid)
+	api.supporter_claim_sync_state = api.supporter_claim_sync_state or {}
+	local key = tostring(steamid)
+	local state = api.supporter_claim_sync_state[key]
+	if type(state) ~= "table" then
+		state = {
+			mutation_revision = 0,
+			refresh_sequence = 0,
+		}
+		api.supporter_claim_sync_state[key] = state
+	end
+	return state
+end
+
+local function GetSupporterClaimPlayerState(steamid)
+	local player = api.players and api.players[tostring(steamid)] or nil
+	local supporter_pass = player and player.supporter_pass or nil
+	local claimed = CollectSupporterClaimIDs(
+		supporter_pass and supporter_pass.claimed_rewards or {}
+	)
+	return player, supporter_pass, claimed
+end
+
+local function IsSupporterClaimPlayerStillBound(player_id, steamid)
+	return api:GetPersistentPlayerSteamID(player_id) == tostring(steamid)
+end
+
 function api:MergeSupporterPassResponse(steamid, data)
 	if not steamid or not data or not api.players or not api.players[steamid] then
 		return
@@ -637,6 +783,12 @@ function api:MergeSupporterPassResponse(steamid, data)
 	local supporter_pass = player.supporter_pass
 	local profile = data.profile or data.supporter_pass or {}
 	local season = data.season or profile.season or supporter_pass.season or {}
+	local season_id = season.season_id or season.id or season.key
+	if season_id ~= nil and tostring(season_id) ~= "" then
+		supporter_pass.season = supporter_pass.season or {}
+		supporter_pass.season.id = season_id
+		supporter_pass.season.season_id = season_id
+	end
 
 	if profile.fragments ~= nil then
 		supporter_pass.fragments = profile.fragments
@@ -716,6 +868,89 @@ function api:MergeSupporterPassResponse(steamid, data)
 	if data.claimed_rewards ~= nil then
 		supporter_pass.claimed_rewards = data.claimed_rewards
 	end
+end
+
+function api:RefreshSupporterPassClaims(player_id, callback)
+	callback = callback or function() end
+	if self:HasXHSBotSession() then
+		return callback(false, { code = "xhs_bot_session" })
+	end
+
+	local steamid = self:GetPersistentPlayerSteamID(player_id)
+	if steamid == nil then
+		return callback(false, { code = "non_persistent_player" })
+	end
+
+	local syncState = GetSupporterClaimSyncState(steamid)
+	syncState.refresh_sequence = syncState.refresh_sequence + 1
+	local refreshSequence = syncState.refresh_sequence
+	local mutationRevision = syncState.mutation_revision
+	local _, requestPass, requestClaims = GetSupporterClaimPlayerState(steamid)
+	local requestSeason = GetSupporterClaimSeasonFromPass(requestPass)
+		or syncState.season_key
+		or InferSupporterClaimSeasonKey(requestClaims)
+
+	self:Request("supporter-pass/catalog", function(data)
+		data = data or {}
+		local currentState = GetSupporterClaimSyncState(steamid)
+		local _, currentPass, currentClaims = GetSupporterClaimPlayerState(steamid)
+
+		-- A refresh is a replace-like snapshot. Ignore it if a newer refresh
+		-- exists or if any claim POST was confirmed after this GET started.
+		if currentState.refresh_sequence ~= refreshSequence
+			or currentState.mutation_revision ~= mutationRevision
+		then
+			if IsSupporterClaimPlayerStillBound(player_id, steamid)
+			and SupporterPass and SupporterPass.PublishPlayer
+			then
+				SupporterPass:PublishPlayer(player_id)
+			end
+			callback(true, {
+				claimed_rewards = currentClaims,
+				season = currentPass and currentPass.season or nil,
+				stale_ignored = true,
+			})
+			return
+		end
+
+		local remoteClaims = CollectSupporterClaimIDs(data.rewards or {})
+		local currentSeason = GetSupporterClaimSeasonFromPass(currentPass)
+			or currentState.season_key
+			or InferSupporterClaimSeasonKey(currentClaims)
+		local remoteSeason = GetSupporterClaimSeasonFromResponse(data)
+			or InferSupporterClaimSeasonKey(remoteClaims)
+			or requestSeason
+		local claimed = {}
+
+		-- Claims are monotone only inside one positively identified season.
+		-- A real season transition intentionally starts from the remote set.
+		if currentSeason ~= nil
+			and remoteSeason ~= nil
+			and currentSeason == remoteSeason
+		then
+			MergeSupporterClaimIDs(claimed, currentClaims)
+		end
+		MergeSupporterClaimIDs(claimed, remoteClaims)
+
+		api:MergeSupporterPassResponse(steamid, {
+			season = data.season,
+			claimed_rewards = claimed,
+		})
+		currentState.season_key = remoteSeason
+		if IsSupporterClaimPlayerStillBound(player_id, steamid)
+		and SupporterPass and SupporterPass.PublishPlayer
+		then
+			SupporterPass:PublishPlayer(player_id)
+		end
+		callback(true, {
+			claimed_rewards = claimed,
+			season = data.season,
+		})
+	end, function(error)
+		callback(false, error)
+	end, "GET", {
+		steamid = steamid,
+	})
 end
 
 function api:PublishSupporterPassArmory(player_id, armory)
@@ -912,14 +1147,53 @@ function api:ClaimSupporterPassReward(player_id, reward_id, callback)
 		reward_id = reward_id,
 	}
 
-	api:Request("supporter-pass/claim-reward", function(data)
-		api:MergeSupporterPassResponse(steamid, data)
+	local syncState = GetSupporterClaimSyncState(steamid)
+	local _, requestPass, requestClaims = GetSupporterClaimPlayerState(steamid)
+	local requestSeason = GetSupporterClaimSeasonFromPass(requestPass)
+		or syncState.season_key
+		or InferSupporterClaimSeasonKey(requestClaims)
+		or InferSupporterClaimSeasonKey({ [tostring(reward_id)] = true })
 
-		if data.armory then
+	api:Request("supporter-pass/claim-reward", function(data)
+		data = data or {}
+		local currentState = GetSupporterClaimSyncState(steamid)
+		currentState.mutation_revision = currentState.mutation_revision + 1
+
+		local player, currentPass, currentClaims = GetSupporterClaimPlayerState(steamid)
+		local currentSeason = GetSupporterClaimSeasonFromPass(currentPass)
+			or currentState.season_key
+			or InferSupporterClaimSeasonKey(currentClaims)
+		local responseClaims = CollectSupporterClaimIDs(
+			GetSupporterClaimPayload(data, {})
+		)
+		local responseSeason = GetSupporterClaimSeasonFromResponse(data)
+			or InferSupporterClaimSeasonKey(responseClaims)
+			or requestSeason
+			or InferSupporterClaimSeasonKey({ [tostring(reward_id)] = true })
+
+		api:MergeSupporterPassResponse(steamid, data)
+		player = api.players and api.players[steamid] or player
+		if player ~= nil then
+			player.supporter_pass = player.supporter_pass or {}
+			local claimed = {}
+			if currentSeason ~= nil
+			and responseSeason ~= nil
+			and currentSeason == responseSeason
+			then
+				MergeSupporterClaimIDs(claimed, currentClaims)
+			end
+			MergeSupporterClaimIDs(claimed, responseClaims)
+			claimed[tostring(reward_id)] = true
+			player.supporter_pass.claimed_rewards = claimed
+		end
+		currentState.season_key = responseSeason
+
+		local playerStillBound = IsSupporterClaimPlayerStillBound(player_id, steamid)
+		if playerStillBound and data.armory then
 			api:PublishSupporterPassArmory(player_id, data.armory)
 		end
 
-		if SupporterPass and SupporterPass.PublishPlayer then
+		if playerStillBound and SupporterPass and SupporterPass.PublishPlayer then
 			SupporterPass:PublishPlayer(player_id)
 		end
 
@@ -1445,6 +1719,19 @@ function api:Request(endpoint, okCallback, failCallback, method, payload)
 end
 
 function api:RegisterGame(callback)
+	local locked_bot_session = IsInToolsMode()
+		and XHSBots ~= nil
+		and XHSBots.enabled == true
+		and XHSBots.locked == true
+		and self:HasXHSBotSession()
+
+	-- Defense in depth for future/direct callers. The normal deferred flow
+	-- handles local API readiness itself and never reaches this branch.
+	if self.xhs_bot_session_backend_disabled == true or locked_bot_session then
+		print("game-register: rejected for a locked local XHS bot session.")
+		return false, "xhs_bot_session"
+	end
+
 	self:Request("game-register", function(data)
 		api.game_id = tonumber(data.game_id)
 		api.players = data.players
@@ -1474,6 +1761,7 @@ function api:RegisterGame(callback)
 		for player_id = 0, PlayerResource:GetPlayerCount() - 1 do
 			if api:IsPersistentPlayerID(player_id) then
 				api:PublishSupporterPassArmory(player_id)
+				api:RefreshSupporterPassClaims(player_id)
 			end
 		end
 
@@ -1719,6 +2007,7 @@ function api:CompleteGame()
 			local heroEntity = ResolveEndScreenHero(id)
 			local hero = json.null
 			local networth = 0
+			local gold_earned = XHSGetEndScreenStat ~= nil and XHSGetEndScreenStat(id, "gold_earned") or 0
 			local healing = PlayerResource:GetHealing(id)
 			local boss_damage = XHSGetEndScreenStat ~= nil and XHSGetEndScreenStat(id, "boss_damage") or 0
 			local damage_taken = XHSGetEndScreenStat ~= nil and XHSGetEndScreenStat(id, "damage_taken") or 0
@@ -1811,6 +2100,7 @@ function api:CompleteGame()
 				team = tonumber(PlayerResource:GetTeam(id)),
 				items = items,
 				networth = networth,
+				gold_earned = gold_earned,
 				healing = healing,
 				boss_damage = boss_damage,
 				damage_taken = damage_taken,
@@ -1869,6 +2159,9 @@ function api:CompleteGame()
 	end
 
 	local fragment_quests = FragmentQuests ~= nil and FragmentQuests:BuildAnalyticsPayload() or nil
+	local performance_summary = XHSPerformanceTelemetry ~= nil
+		and XHSPerformanceTelemetry:Finalize()
+		or nil
 	local backend_fragment_quests = fragment_quests
 	if type(fragment_quests) == "table" then
 		backend_fragment_quests = {}
@@ -1905,12 +2198,15 @@ function api:CompleteGame()
 		game_time = GameRules:GetDOTATime(false, false),
 		game_type = CUSTOM_GAME_TYPE,
 		gamemode = api:GetCustomGamemode(),
+		difficulty = api:GetCustomDifficulty(),
+		mod_version = tostring(GAME_VERSION or ""),
 		rosh_lvl = rosh_lvl,
 		rosh_hp = rosh_hp,
 		rosh_max_hp = rosh_max_hp,
 		cheat_mode = self:IsCheatGame(),
 		map = GetMapName(),
 		fragment_quests = fragment_quests,
+		performance_summary = performance_summary,
 		contains_xhs_bots = self:HasXHSBotParticipants(),
 		xhs_bot_count = self:GetXHSBotParticipantCount(),
 		persistent_rewards_eligible = not has_xhs_bot_session,

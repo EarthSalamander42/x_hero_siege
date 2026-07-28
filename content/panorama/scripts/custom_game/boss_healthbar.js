@@ -111,7 +111,7 @@ function ShouldAcceptBossBarEvent(index, args) {
 		return true;
 	}
 
-	return BossBarIdentity[index] === identity || index === (Number(args && args.boss_count) || 1);
+	return BossBarIdentity[index] === identity;
 }
 
 function SetBossBarIdentity(index, args) {
@@ -563,6 +563,101 @@ function HideBossBar(args) {
 	}
 }
 
+function GetCastlePanels() {
+	return {
+		container: $("#CastleHP"),
+		label: $("#CastleLabel"),
+		level: $("#CastleMuradinState"),
+		icon: $("#CastleIcon"),
+		iconImage: $("#CastleIconImage"),
+		health: $("#CastleHealth"),
+		bar: $("#CastleProgressBar"),
+		fill: $("#CastleProgressFill"),
+		damageLag: $("#CastleDamageLag"),
+		healPulse: $("#CastleHealPulse"),
+		markers: $("#CastleMarkers"),
+	};
+}
+
+function SetCastleMuradinState(panels, args) {
+	if (!panels || !panels.level) {
+		return;
+	}
+
+	var triggered = args && (
+		args.muradin_triggered === true
+		|| args.muradin_triggered === 1
+		|| args.muradin_triggered === "1"
+		|| args.muradin_triggered === "true"
+	);
+	var threshold = Math.max(0, Math.min(100, Number(args && args.muradin_threshold) || 40));
+	panels.level.text = triggered
+		? "MURADIN DEPLOYED"
+		: "MURADIN AT " + Math.round(threshold) + "%";
+	panels.level.style.visibility = "visible";
+	panels.level.SetHasClass("Triggered", triggered);
+}
+
+function ShowCastleBar(args) {
+	var panels = GetCastlePanels();
+	var health = Number(args && args.castle_health) || 0;
+	var maxHealth = Math.max(1, Number(args && args.castle_max_health) || 1);
+	if (!panels.container || !panels.bar || !panels.fill) {
+		return;
+	}
+
+	ResetBossPanels(0, panels);
+	SetBossIcon(panels, args.castle_icon || "npc_dota_hero_omniknight");
+	panels.container.style.visibility = "visible";
+	panels.label.text = FormatBossName(args.castle_name || "npc_dota_defender_fort");
+	panels.health.text = FormatBossHealth(health) + " / " + FormatBossHealth(maxHealth);
+	SetCastleMuradinState(panels, args);
+	SetBossBarMarkers(panels, args.castle_markers);
+	SetBossHealthFill(0, panels, health, maxHealth, args, true);
+}
+
+function UpdateCastleBar(args) {
+	var panels = GetCastlePanels();
+	var health = Number(args && args.castle_health) || 0;
+	var maxHealth = Math.max(1, Number(args && args.castle_max_health) || 1);
+	if (!panels.container || !panels.health || !panels.fill) {
+		return;
+	}
+	if (panels.container.style.visibility !== "visible") {
+		ShowCastleBar(args);
+		return;
+	}
+
+	panels.health.text = FormatBossHealth(health) + " / " + FormatBossHealth(maxHealth);
+	SetCastleMuradinState(panels, args);
+	SetBossBarMarkers(panels, args.castle_markers);
+	SetBossHealthFill(0, panels, health, maxHealth, args, false);
+}
+
+function HideCastleBar() {
+	var panels = GetCastlePanels();
+	if (!panels.container) {
+		return;
+	}
+
+	ResetBossPanels(0, panels);
+}
+
+function ApplyCastleBarState(args) {
+	if (args && Number(args.visible) === 1) {
+		UpdateCastleBar(args);
+		return;
+	}
+
+	HideCastleBar();
+}
+
+function OnCastleBarNetTableChanged(tableName, key, data) {
+	if (key === "state") {
+		ApplyCastleBarState(data);
+	}
+}
+
 function UpdateBossCounter(args) {
 	var index = GetBossBarIndex(args);
 	var panels = GetBossPanels(index);
@@ -577,7 +672,9 @@ function UpdateBossCounter(args) {
 	var remaining = Math.max(0, Number(args.remaining) || 0);
 	var total = Math.max(1, Number(args.total) || 1);
 	panels.counterLabel.text = args.label || "Ghost Revenants";
-	panels.counterValue.text = remaining + " / " + total;
+	panels.counterValue.text = args.display_mode === "seconds"
+		? remaining + "s"
+		: remaining + " / " + total;
 	panels.container.AddClass("HasBossCounter");
 
 	panels.counter.RemoveClass("BossCounterTick");
@@ -822,6 +919,14 @@ function OnGamePauseState(args) {
 	GameEvents.Subscribe("show_boss_hp", ShowBossBar);
 	GameEvents.Subscribe("update_boss_hp", UpdateBossBar);
 	GameEvents.Subscribe("hide_boss_hp", HideBossBar);
+	GameEvents.Subscribe("show_castle_hp", ShowCastleBar);
+	GameEvents.Subscribe("update_castle_hp", UpdateCastleBar);
+	GameEvents.Subscribe("hide_castle_hp", HideCastleBar);
+	CustomNetTables.SubscribeNetTableListener("xhs_castle_bar", OnCastleBarNetTableChanged);
+	var castleBarState = CustomNetTables.GetTableValue("xhs_castle_bar", "state");
+	if (castleBarState) {
+		ApplyCastleBarState(castleBarState);
+	}
 	GameEvents.Subscribe("xhs_boss_counter_update", UpdateBossCounter);
 	GameEvents.Subscribe("xhs_boss_counter_hide", HideBossCounter);
 	GameEvents.Subscribe("xhs_boss_timer_update", UpdateBossTimer);

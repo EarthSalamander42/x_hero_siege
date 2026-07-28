@@ -406,6 +406,7 @@ function modifier_xhs_balanar_nightfall_vision:GetBonusNightVision()
 	return -(self:GetAbility() and self:GetAbility():GetSpecialValueFor("vision_reduction") or self:GetStackCount() or 0)
 end
 
+function modifier_xhs_balanar_dread:IsDebuff() return true end
 function modifier_xhs_balanar_dread:IsPurgable() return true end
 function modifier_xhs_balanar_dread:DeclareFunctions()
 	return { MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE, MODIFIER_PROPERTY_DAMAGEOUTGOING_PERCENTAGE }

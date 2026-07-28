@@ -148,7 +148,7 @@ function XHSPrecache:ReplaceHeroWith(playerID, heroName, gold, xp, oldHero, opti
 		end
 
 		if options.startingItems == true and oldHero ~= nil and newHero ~= nil then
-			StartingItems(oldHero, newHero)
+			StartingItems(oldHero, newHero, options)
 		end
 
 		if options.cleanupOld ~= false and oldHero ~= nil then
@@ -195,6 +195,8 @@ function XHSPrecache:PrecacheBattlepassCompanionAssets(context)
 	local modelSet = {}
 	local particles = {}
 	local particleSet = {}
+	local units = {}
+	local unitSet = {}
 
 	local roshanModels = {
 		"models/courier/baby_rosh/babyroshan_elemental.vmdl",
@@ -275,12 +277,54 @@ function XHSPrecache:PrecacheBattlepassCompanionAssets(context)
 		end
 	end
 
+	local supporterManifest =
+		LoadKeyValues("scripts/vscripts/components/battlepass/keyvalues/supporter_pass_2026.txt")
+		or {}
+	supporterManifest = supporterManifest.SupporterPass2026 or supporterManifest
+	for _, anchor in ipairs({
+		"particles/custom/supporter_pass/regen_aura_anchor.vpcf",
+		"particles/custom/supporter_pass/attack_lifesteal_anchor.vpcf",
+		"particles/custom/supporter_pass/spell_lifesteal_anchor.vpcf",
+		"particles/custom/supporter_pass/immolation_owner_anchor.vpcf",
+		"particles/custom/supporter_pass/immolation_target_anchor.vpcf",
+		"particles/custom/supporter_pass/rebirth_anchor.vpcf",
+		"particles/custom/supporter_pass/health_potion_anchor.vpcf",
+		"particles/custom/supporter_pass/mana_potion_anchor.vpcf",
+	}) do
+		addUnique(particles, particleSet, anchor)
+	end
+	for _, reward in pairs(supporterManifest.catalog or {}) do
+		if type(reward) == "table" then
+			for _, field in ipairs({
+				"start_pfx",
+				"end_pfx",
+				"pfx",
+				"target_pfx",
+				"caster_pfx",
+				"health_pfx",
+				"mana_pfx",
+				"owner_pfx",
+				"overhead_pfx",
+				"travel_pfx",
+				"impact_pfx",
+			}) do
+				addUnique(particles, particleSet, reward[field])
+			end
+			if reward.item_type == "companion" or reward.item_type == "effigy" then
+				addUnique(units, unitSet, reward.unit)
+			end
+		end
+	end
+
 	for _, model in pairs(models) do
 		self:PrecacheResource("model", model, context)
 	end
 
 	for _, particle in pairs(particles) do
 		self:PrecacheResource("particle", particle, context)
+	end
+	for _, unitName in pairs(units) do
+		self:PrecacheUnitSync(unitName, context)
 	end
 end
 
@@ -397,6 +441,14 @@ XHSPrecache:RegisterGroup("hero_abilities", {
 		"particles/units/heroes/hero_ogre_magi/ogre_magi_bloodlust_cast.vpcf",
 		"particles/units/heroes/hero_ogre_magi/ogre_magi_bloodlust_buff.vpcf",
 	},
+	models = {
+		"models/heroes/doom/doom.vmdl",
+	},
+	units = {
+		"npc_dota_doom_golem_1",
+		"npc_dota_doom_golem_2",
+		"npc_dota_doom_golem_3",
+	},
 	soundfiles = {
 		"soundevents/game_sounds_heroes/game_sounds_zuus.vsndevts",
 		"soundevents/game_sounds_heroes/game_sounds_medusa.vsndevts",
@@ -509,6 +561,8 @@ XHSPrecache:RegisterGroup("bosses", {
 		"particles/units/heroes/hero_earth_spirit/espirit_bouldersmash_caster.vpcf",
 		"particles/units/heroes/hero_earth_spirit/espirit_stoneremnant.vpcf",
 		"particles/units/heroes/hero_lina/lina_spell_light_strike_array.vpcf",
+		"particles/units/heroes/hero_invoker/invoker_sun_strike_team.vpcf",
+		"particles/econ/items/invoker/invoker_apex/invoker_sun_strike_immortal1.vpcf",
 		"particles/units/heroes/hero_phoenix/phoenix_fire_spirit_ground.vpcf",
 		"particles/items_fx/aura_shivas.vpcf",
 	},
@@ -528,6 +582,7 @@ XHSPrecache:RegisterGroup("bosses", {
 		"soundevents/game_sounds_heroes/game_sounds_earthshaker.vsndevts",
 		"soundevents/game_sounds_heroes/game_sounds_elder_titan.vsndevts",
 		"soundevents/game_sounds_heroes/game_sounds_ember_spirit.vsndevts",
+		"soundevents/game_sounds_heroes/game_sounds_invoker.vsndevts",
 		"soundevents/game_sounds_heroes/game_sounds_juggernaut.vsndevts",
 		"soundevents/game_sounds_heroes/game_sounds_kunkka.vsndevts",
 		"soundevents/game_sounds_heroes/game_sounds_lich.vsndevts",
@@ -584,6 +639,9 @@ XHSPrecache:RegisterGroup("waves", {
 		"particles/units/heroes/hero_ancient_apparition/ancient_apparition_base_attack.vpcf",
 		"particles/units/heroes/hero_lion/lion_base_attack.vpcf",
 		"particles/units/heroes/hero_terrorblade/terrorblade_metamorphosis_base_attack.vpcf",
+		"particles/units/heroes/hero_necrolyte/necrolyte_base_attack.vpcf",
+		"particles/units/heroes/hero_luna/luna_moon_glaive_bounce.vpcf",
+		"particles/units/heroes/hero_spirit_breaker/spirit_breaker_charge.vpcf",
 		"particles/econ/items/necrolyte/necronub_base_attack/necrolyte_base_attack_ka.vpcf",
 	},
 	models = {

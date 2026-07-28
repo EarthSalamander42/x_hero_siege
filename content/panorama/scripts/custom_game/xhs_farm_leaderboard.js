@@ -9,6 +9,8 @@
 	var cards = {};
 	var layerApplied = false;
 	var moveToken = 0;
+	var lastPhase = "";
+	var archiveExpanded = false;
 
 	function Panel(id) {
 		return $("#" + id);
@@ -320,6 +322,75 @@
 		});
 	}
 
+	function FindPlayer(players, playerID) {
+		for (var index = 0; index < players.length; index++) {
+			if (ToNumber(players[index].player_id, -1) === playerID) {
+				return players[index];
+			}
+		}
+		return players.length > 0 ? players[0] : null;
+	}
+
+	function SetArchiveExpanded(expanded) {
+		archiveExpanded = expanded === true;
+		var leaderboard = Panel("XHSFarmLeaderboard");
+		var toggle = Panel("XHSFarmLeaderboardToggle");
+		var toggleLabel = Panel("XHSFarmLeaderboardToggleLabel");
+		if (leaderboard) {
+			leaderboard.SetHasClass("IsVisible", archiveExpanded);
+			leaderboard.SetHasClass("IsReopened", archiveExpanded);
+		}
+		if (toggle) {
+			toggle.SetHasClass("IsExpanded", archiveExpanded);
+		}
+		if (toggleLabel) {
+			toggleLabel.text = archiveExpanded ? "\u203A" : "\u2039";
+		}
+	}
+
+	function UpdateCelebration(data, players, phase) {
+		var leaderboard = Panel("XHSFarmLeaderboard");
+		var title = Panel("XHSFarmLeaderboardTitle");
+		var status = Panel("XHSFarmLeaderboardStatus");
+		var winnerName = Panel("XHSFarmWinnerName");
+		var winnerScore = Panel("XHSFarmWinnerScore");
+		var celebrating = phase === "celebration";
+
+		if (leaderboard) {
+			leaderboard.SetHasClass("IsCelebrating", celebrating);
+		}
+		if (title) {
+			title.text = celebrating ? "FINAL RESULTS" : "LIVE LEADERBOARD";
+		}
+		if (status) {
+			status.text = celebrating ? "FINAL" : "LIVE";
+		}
+
+		if (celebrating) {
+			var winner = FindPlayer(players, ToNumber(data.winner_player_id, -1));
+			if (winnerName) {
+				var winnerID = winner ? ToNumber(winner.player_id, -1) : -1;
+				winnerName.text = winnerID >= 0
+					? GetPlayerIdentity(winnerID, GetPlayerHero(winnerID))
+					: "NO WINNER";
+			}
+			if (winnerScore) {
+				winnerScore.text = FormatFarmWinnerScore(winner);
+			}
+			if (lastPhase !== "celebration") {
+				Game.EmitSound("ui.trophy_levelup");
+			}
+		}
+	}
+
+	function FormatFarmWinnerScore(winner) {
+		if (!winner) {
+			return "0 KILLS";
+		}
+		return Math.max(0, ToNumber(winner.kills, 0)) + " KILLS  \u00B7  LEVEL " +
+			Math.max(1, ToNumber(winner.level, 1));
+	}
+
 	function RenderState(data) {
 		data = data || {};
 		var leaderboard = Panel("XHSFarmLeaderboard");
@@ -329,13 +400,30 @@
 		}
 
 		var active = IsTruthy(data.active);
-		leaderboard.SetHasClass("IsVisible", active);
-		if (!active) {
+		var available = IsTruthy(data.available);
+		var phase = (data.phase || (active ? "active" : "archived")).toString();
+		var archived = available && !active;
+		var toggle = Panel("XHSFarmLeaderboardToggle");
+
+		leaderboard.SetHasClass("IsArchived", archived);
+		if (toggle) {
+			toggle.SetHasClass("IsVisible", archived);
+		}
+		if (!active && !available) {
+			leaderboard.SetHasClass("IsVisible", false);
 			return;
+		}
+		if (active) {
+			archiveExpanded = false;
+			leaderboard.SetHasClass("IsVisible", true);
+			leaderboard.SetHasClass("IsReopened", false);
+		} else {
+			SetArchiveExpanded(archiveExpanded);
 		}
 
 		var players = TableToArray(data.players);
 		SortPlayers(players);
+		UpdateCelebration(data, players, phase);
 		var activePlayerIDs = {};
 		var localPlayerID = Players.GetLocalPlayer();
 
@@ -355,6 +443,7 @@
 		RemoveMissingCards(activePlayerIDs);
 		rows.SetHasClass("IsWaiting", players.length === 0);
 		rows.style.height = String(Math.max(54, players.length * ROW_STRIDE)) + "px";
+		lastPhase = phase;
 	}
 
 	function OnNetTableChanged(tableName, key, data) {
@@ -365,6 +454,13 @@
 
 	function Initialize() {
 		EnsureBelowShop();
+		var toggle = Panel("XHSFarmLeaderboardToggle");
+		if (toggle) {
+			toggle.SetPanelEvent("onactivate", function () {
+				SetArchiveExpanded(!archiveExpanded);
+				Game.EmitSound("ui_generic_button_click");
+			});
+		}
 		CustomNetTables.SubscribeNetTableListener(NET_TABLE, OnNetTableChanged);
 		RenderState(CustomNetTables.GetTableValue(NET_TABLE, NET_KEY));
 		if (typeof XHSNameDisplay !== "undefined" && XHSNameDisplay.Subscribe) {

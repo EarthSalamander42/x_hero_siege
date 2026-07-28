@@ -304,7 +304,7 @@
 			"03"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"damage"					"200 450 950 1850"
+				"damage"					"300 550 1050 1850"
 				"CalculateSpellDamageTooltip"	"1"
 			}
 			"04"
@@ -522,7 +522,7 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"arc_damage"			"110 220 440 880"
+				"arc_damage"			"175 275 475 880"
 				"CalculateSpellDamageTooltip"	"1"
 				"LinkedSpecialBonus"	"special_bonus_unique_zeus_2"
 			}
@@ -794,7 +794,7 @@
 			"06"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"impale_damage"			"200 400 650 1000"
+				"impale_damage"			"300 475 700 1000"
 				"CalculateSpellDamageTooltip"	"1"
 				"LinkedSpecialBonus"	"special_bonus_unique_nyx_2"
 			}
@@ -1348,7 +1348,7 @@
 			"02"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"strike_crit_mult"			"250 300 350 400"
+				"strike_crit_mult"			"380 390 400 410"
 				"LinkedSpecialBonus"		"special_bonus_unique_monkey_king"
 			}
 			"03"
@@ -1748,7 +1748,7 @@
 			"12"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"impact_damage_tooltip"		"225 550 775 1050"
+				"impact_damage_tooltip"		"350 625 825 1050"
 				"LinkedSpecialBonus"		"special_bonus_unique_monkey_king_3"
 			}
 			"13"
@@ -1792,7 +1792,7 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"impact_damage"			"225 550 775 1050"
+				"impact_damage"			"350 625 825 1050"
 				"CalculateSpellDamageTooltip"	"1"
 				"LinkedSpecialBonus"	"special_bonus_unique_monkey_king_3"
 			}
@@ -1879,7 +1879,7 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"damage"				"60 100 140 180"
+				"damage"				"90 120 150 180"
 				"CalculateSpellDamageTooltip"	"1"
 				"LinkedSpecialBonus"	"special_bonus_unique_axe_4"
 			}
@@ -1941,7 +1941,7 @@
 			"04"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"axe_damage"				"150 300 450 600"
+				"axe_damage"				"225 350 475 600"
 				"CalculateSpellDamageTooltip"	"1"
 				"LinkedSpecialBonus"		"special_bonus_unique_troll_warlord_3"
 			}
@@ -2075,7 +2075,7 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"damage_per_second"		"40 70 100 130"
+				"damage_per_second"		"60 90 110 130"
 				"CalculateSpellDamageTooltip"	"1"
 				"LinkedSpecialBonus"	"special_bonus_unique_doom_4"				
 			}
@@ -2210,7 +2210,7 @@
 
 		// Damage
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityDamage"					"220 440 660 880"
+		"AbilityDamage"					"350 525 700 900"
 		"AbilityDuration"				"2.0"
 
 		// Special
@@ -2266,7 +2266,7 @@
 
 		// Damage.
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityDamage"					"45 90 135 180"
+		"AbilityDamage"					"70 110 150 190"
 		"AbilityDuration"				"10.0"
 
 		// Special
@@ -2500,13 +2500,13 @@
 			"02"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"quill_base_damage"		"50 100 150 200"
+				"quill_base_damage"		"75 120 160 200"
 				"CalculateSpellDamageTooltip"	"1"
 			}
 			"03"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"quill_stack_damage"	"30 50 70 90"
+				"quill_stack_damage"	"45 60 75 90"
 				"CalculateSpellDamageTooltip"	"1"
 				"LinkedSpecialBonus"	"special_bonus_unique_bristleback_2"
 			}
@@ -2684,7 +2684,7 @@
 			"03"
 			{
 				"var_type"						"FIELD_INTEGER"
-				"damage_per_second"				"150 200 250 300"
+				"damage_per_second"				"225 250 275 300"
 				"CalculateSpellDamageTooltip"	"1"
 			}
 			"04"
@@ -2736,7 +2736,7 @@
 			"02"
 			{
 				"var_type"						"FIELD_INTEGER"
-				"bonus_hero_damage"				"500 100 1500 2000"
+				"bonus_hero_damage"				"750 1200 1600 2000"
 				"LinkedSpecialBonus"			"special_bonus_unique_ember_spirit_6"
 				"CalculateSpellDamageTooltip"	"0"
 			}		
@@ -3050,12 +3050,12 @@
 			"01"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"damage_modifier"			"-70 -55 -40 -25"
+				"damage_modifier"			"-55 -45 -35 -25"
 			}
 			"02"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"damage_modifier_tooltip"	"30 45 60 75"
+				"damage_modifier_tooltip"	"45 55 65 75"
 			}
 			"03"
 			{	
@@ -3091,7 +3091,7 @@
 			"04"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"snake_damage"			"160 320 480 720"
+				"snake_damage"			"250 400 525 720"
 				"CalculateSpellDamageTooltip"	"1"
 			}
 			"05"
@@ -3233,7 +3233,7 @@
 			"03"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"damage"					"80 160 240 320"
+				"damage"					"120 200 280 360"
 				"CalculateSpellDamageTooltip"	"1"
 			}
 			"04"
@@ -3316,7 +3316,7 @@
 			"03"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"shock_damage"				"275 550 825 1100"
+				"shock_damage"				"425 650 875 1100"
 				"CalculateSpellDamageTooltip"	"1"
 				"LinkedSpecialBonus"		"special_bonus_unique_magnus_4"
 			}
@@ -3546,7 +3546,7 @@
 			"01"
 			{
 				"var_type"			"FIELD_INTEGER"
-				"gush_damage"		"100 250 550 900"
+				"gush_damage"		"150 300 575 900"
 				"CalculateSpellDamageTooltip"	"1"
 				"LinkedSpecialBonus"	"special_bonus_unique_tidehunter_2"
 			}
@@ -3628,7 +3628,7 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"attack_damage"			"90 180 360 720"
+				"attack_damage"			"140 225 400 720"
 			}
 			"02"
 			{
@@ -3841,7 +3841,7 @@
 			"04"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"axe_damage"				"150 300 450 600"
+				"axe_damage"				"225 350 475 600"
 				"CalculateSpellDamageTooltip"	"1"
 				"LinkedSpecialBonus"		"special_bonus_unique_troll_warlord_3"
 			}
@@ -3995,7 +3995,7 @@
 			"09"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"impact_damage"			"110 250 510 970"
+				"impact_damage"			"175 300 550 970"
 				"CalculateSpellDamageTooltip"	"1"
 			}
 			"10"
@@ -4039,7 +4039,7 @@
 
 		// Damage
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityDamage"					"220 560 890 1280"
+		"AbilityDamage"					"350 650 950 1300"
 
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
@@ -4255,7 +4255,7 @@
 			"01"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"damage"					"80 150 220 290"
+				"damage"					"120 180 240 300"
 				"CalculateSpellDamageTooltip"	"1"
 				"LinkedSpecialBonus"		"special_bonus_unique_snapfire_7"
 			}
@@ -4349,7 +4349,7 @@
 			"09"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"impact_damage"			"110 220 440 880"
+				"impact_damage"			"175 275 475 880"
 				"CalculateSpellDamageTooltip"	"1"
 			}
 			"10"

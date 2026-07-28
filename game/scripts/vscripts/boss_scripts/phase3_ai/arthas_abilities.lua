@@ -34,17 +34,25 @@ local DARK_COLORS = {
 	style = 6,
 }
 
-local LIGHT_COLORS = {
-	primary = Vector(255, 235, 125),
-	secondary = Vector(255, 255, 245),
-	style = 2,
+local JUDGMENT_SOAK_COLORS = {
+	primary = Vector(65, 255, 145),
+	secondary = Vector(225, 255, 245),
+	style = 5,
 }
 
-local JUDGMENT_BEACON_PARTICLE = "particles/units/heroes/hero_omniknight/omniknight_purification_cast.vpcf"
-local JUDGMENT_IMPACT_PARTICLE = "particles/units/heroes/hero_omniknight/omniknight_purification_hit.vpcf"
+local JUDGMENT_DANGER_COLORS = {
+	primary = Vector(255, 55, 35),
+	secondary = Vector(255, 215, 65),
+	style = 7,
+}
+
+local JUDGMENT_BEACON_PARTICLE = "particles/units/heroes/hero_omniknight/omniknight_purification.vpcf"
+local JUDGMENT_WARNING_PARTICLE = "particles/units/heroes/hero_invoker/invoker_sun_strike_team.vpcf"
+local JUDGMENT_IMPACT_PARTICLE = "particles/econ/items/invoker/invoker_apex/invoker_sun_strike_immortal1.vpcf"
 local MARK_PARTICLE = "particles/units/heroes/hero_abaddon/abaddon_curse_counter_stack.vpcf"
 local CHAINS_PARTICLE = "particles/units/heroes/hero_lich/lich_frost_nova.vpcf"
 local DASH_PARTICLE = "particles/units/heroes/hero_sven/sven_spell_storm_bolt.vpcf"
+local DEATH_ADVANCE_PRECAST_PARTICLE = "particles/units/heroes/hero_spirit_breaker/spirit_breaker_charge.vpcf"
 local EXECUTE_PARTICLE = "particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast_explosion.vpcf"
 
 local function IsValidAlive(unit)
@@ -84,6 +92,14 @@ local function HideBossCastBar(ability)
 	if XHSBossCastBar ~= nil then
 		XHSBossCastBar:Hide(ability:GetCaster())
 	end
+end
+
+local function ClearDeathAdvancePrecast(ability)
+	local particle = ability and ability.xhs_death_advance_precast
+	if particle == nil then return end
+	ability.xhs_death_advance_precast = nil
+	ParticleManager:DestroyParticle(particle, true)
+	ParticleManager:ReleaseParticleIndex(particle)
 end
 
 local function CreateImpact(position, particleName, radius, duration)
@@ -185,7 +201,7 @@ local function GetJudgmentPositions(center, count, ringRadius, offsetDegrees)
 	return positions
 end
 
-local function TelegraphJudgmentLine(ability, center, position, duration)
+local function TelegraphJudgmentLine(ability, center, position, duration, colors)
 	local direction = NormalizeDirection(position - center)
 	local length = (position - center):Length2D()
 	local nodes = math.max(2, ability:GetSpecialValueFor("beam_nodes"))
@@ -196,13 +212,13 @@ local function TelegraphJudgmentLine(ability, center, position, duration)
 		ability:GetSpecialValueFor("beam_width"),
 		nodes,
 		duration,
-		LIGHT_COLORS,
+		colors or JUDGMENT_DANGER_COLORS,
 		0
 	)
 end
 
 local function CreateJudgmentLineImpacts(ability, center, direction, length, count)
-	count = math.max(2, count or 2)
+	count = math.max(2, math.min(count or 2, 5))
 	for index = 1, count do
 		local position = center + direction * (length * ((index - 1) / math.max(1, count - 1)))
 		CreateImpact(position, JUDGMENT_IMPACT_PARTICLE, ability:GetSpecialValueFor("beam_width"), 0.8)
@@ -225,9 +241,10 @@ function xhs_arthas_judgment_of_lordaeron:OnAbilityPhaseStart()
 	local caster = self:GetCaster()
 	local center = GetContext(self).arena_center or caster:GetAbsOrigin()
 	StartBossCastBar(self, "Judgment of Lordaeron")
-	XHSBossTelegraphs:Circle(center, 260, self:GetCastPoint(), LIGHT_COLORS)
+	XHSBossTelegraphs:Circle(center, 300, self:GetCastPoint(), JUDGMENT_DANGER_COLORS)
+	CreateImpact(center, JUDGMENT_WARNING_PARTICLE, 300, self:GetCastPoint())
 	StartAnimation(caster, { duration = self:GetCastPoint() + 0.25, activity = ACT_DOTA_CAST_ABILITY_5, rate = 0.75 })
-	caster:EmitSound("Hero_Omniknight.GuardianAngel.Cast")
+	caster:EmitSound("Hero_Invoker.SunStrike.Charge")
 	return true
 end
 
@@ -253,6 +270,7 @@ function xhs_arthas_judgment_of_lordaeron:OnSpellStart()
 	local waveGap = self:GetSpecialValueFor("wave_gap")
 	local finalDelay = self:GetSpecialValueFor("final_delay")
 	local finalTelegraph = self:GetSpecialValueFor("final_telegraph")
+	local finalPulseRadius = self:GetSpecialValueFor("final_pulse_radius")
 	local waveCount = threshold <= 33
 		and math.max(1, self:GetSpecialValueFor("lower_threshold_waves"))
 		or math.max(1, self:GetSpecialValueFor("upper_threshold_waves"))
@@ -278,8 +296,8 @@ function xhs_arthas_judgment_of_lordaeron:OnSpellStart()
 	caster:AddNewModifier(caster, self, "modifier_xhs_arthas_judgment_lock", { duration = sequenceDuration })
 	local conviction = caster:AddNewModifier(caster, self, "modifier_xhs_arthas_radiant_conviction", { duration = sequenceDuration })
 	if conviction ~= nil then conviction:SetStackCount(0) end
-	CreateImpact(center, JUDGMENT_IMPACT_PARTICLE, 260, 1.0)
-	caster:EmitSound("Hero_Omniknight.Purification")
+	CreateImpact(center, JUDGMENT_BEACON_PARTICLE, 260, 1.0)
+	caster:EmitSound("Hero_Omniknight.GuardianAngel.Cast")
 
 	local StartWave
 	local StartFinalJudgment
@@ -294,26 +312,30 @@ function xhs_arthas_judgment_of_lordaeron:OnSpellStart()
 		local angleOffset = RandomFloat(0, 360 / math.max(1, lineCount))
 		local directions = {}
 
+		XHSBossTelegraphs:Circle(center, finalPulseRadius, finalTelegraph, JUDGMENT_DANGER_COLORS)
+		CreateImpact(center, JUDGMENT_WARNING_PARTICLE, finalPulseRadius, finalTelegraph)
 		for index = 1, lineCount do
 			local angle = angleOffset + ((index - 1) / lineCount) * 360
 			local direction = RotatePosition(Vector(0, 0, 0), QAngle(0, angle, 0), Vector(1, 0, 0))
 			table.insert(directions, direction)
 			local nodes = math.max(3, math.floor(lineLength / math.max(1, lineWidth * 1.2)))
-			XHSBossTelegraphs:Line(center, direction, lineLength / math.max(1, nodes - 1), lineWidth, nodes, finalTelegraph, LIGHT_COLORS, 0)
+			XHSBossTelegraphs:Line(center, direction, lineLength / math.max(1, nodes - 1), lineWidth, nodes, finalTelegraph, JUDGMENT_DANGER_COLORS, 0)
 		end
 
 		StartAnimation(caster, { duration = finalTelegraph + 0.4, activity = ACT_DOTA_CAST_ABILITY_4, rate = 0.75 })
-		caster:EmitSound("Hero_Omniknight.GuardianAngel.Cast")
+		caster:EmitSound("Hero_Invoker.SunStrike.Charge")
 		Timers:CreateTimer(finalTelegraph, function()
 			if not IsValidAlive(caster) or ability == nil or ability:IsNull() then return nil end
-			local damage = ScaleDamage(ability:GetSpecialValueFor("final_damage"))
-			DamageEnemies(caster, ability, center, 320, damage, ability:GetAbilityDamageType())
+			local beamDamage = ScaleDamage(ability:GetSpecialValueFor("final_damage"))
+			local missedBeaconBonus = ability:GetSpecialValueFor("missed_beacon_bonus_damage")
+			local pulseDamage = ScaleDamage(ability:GetSpecialValueFor("final_pulse_damage") + extraLines * missedBeaconBonus)
+			DamageEnemies(caster, ability, center, finalPulseRadius, pulseDamage, ability:GetAbilityDamageType())
 			for _, direction in ipairs(directions) do
-				DamageLine(caster, ability, center, direction, lineLength, lineWidth, damage)
+				DamageLine(caster, ability, center, direction, lineLength, lineWidth, beamDamage)
 				CreateJudgmentLineImpacts(ability, center, direction, lineLength, ability:GetSpecialValueFor("beam_nodes"))
 			end
-			CreateImpact(center, JUDGMENT_IMPACT_PARTICLE, 320, 1.0)
-			caster:EmitSound("Hero_Omniknight.Purification")
+			CreateImpact(center, JUDGMENT_IMPACT_PARTICLE, finalPulseRadius, 1.2)
+			caster:EmitSound("Hero_Invoker.SunStrike.Ignite")
 			caster:RemoveModifierByName("modifier_xhs_arthas_radiant_conviction")
 			caster:RemoveModifierByName("modifier_xhs_arthas_judgment_lock")
 			return nil
@@ -326,8 +348,7 @@ function xhs_arthas_judgment_of_lordaeron:OnSpellStart()
 		local positions = GetJudgmentPositions(center, beaconCount, ringRadius, offset)
 
 		for _, position in ipairs(positions) do
-			XHSBossTelegraphs:Target(position, soakRadius, telegraphDuration, LIGHT_COLORS)
-			TelegraphJudgmentLine(ability, center, position, telegraphDuration)
+			XHSBossTelegraphs:Target(position, soakRadius, telegraphDuration, JUDGMENT_SOAK_COLORS)
 			CreateImpact(position, JUDGMENT_BEACON_PARTICLE, soakRadius, telegraphDuration)
 		end
 
@@ -337,7 +358,7 @@ function xhs_arthas_judgment_of_lordaeron:OnSpellStart()
 				local soakers = GetLivingHeroesAt(caster, position, soakRadius)
 				if #soakers > 0 then
 					DamageEnemies(caster, ability, position, soakRadius, ScaleDamage(ability:GetSpecialValueFor("intercept_damage")), ability:GetAbilityDamageType())
-					CreateImpact(position, JUDGMENT_IMPACT_PARTICLE, soakRadius, 1.0)
+					CreateImpact(position, JUDGMENT_BEACON_PARTICLE, soakRadius, 1.0)
 					EmitSoundOnLocationWithCaster(position, "Hero_Omniknight.Purification", caster)
 				else
 					state.charges = state.charges + 1
@@ -345,8 +366,10 @@ function xhs_arthas_judgment_of_lordaeron:OnSpellStart()
 						conviction:SetStackCount(state.charges)
 					end
 					local direction = NormalizeDirection(position - center)
+					TelegraphJudgmentLine(ability, center, position, math.max(0.45, finalDelay), JUDGMENT_DANGER_COLORS)
 					CreateJudgmentLineImpacts(ability, center, direction, ringRadius, ability:GetSpecialValueFor("beam_nodes"))
 					CreateImpact(center, JUDGMENT_IMPACT_PARTICLE, 180, 0.8)
+					EmitSoundOnLocationWithCaster(position, "Hero_Invoker.SunStrike.Ignite", caster)
 				end
 			end
 
@@ -424,14 +447,23 @@ function xhs_arthas_death_advance:OnAbilityPhaseStart()
 	local length = math.min(self:GetSpecialValueFor("range"), math.max(220, (position - caster:GetAbsOrigin()):Length2D()))
 	StartBossCastBar(self, "Death Advance")
 	XHSBossTelegraphs:Line(caster:GetAbsOrigin(), direction, self:GetSpecialValueFor("width") * 1.25, self:GetSpecialValueFor("width"), math.max(1, math.floor(length / math.max(1, self:GetSpecialValueFor("width") * 1.25))), self:GetCastPoint(), DARK_COLORS, 120)
+	ClearDeathAdvancePrecast(self)
+	self.xhs_death_advance_precast = ParticleManager:CreateParticle(DEATH_ADVANCE_PRECAST_PARTICLE, PATTACH_ABSORIGIN_FOLLOW, caster)
+	ParticleManager:SetParticleControlEnt(self.xhs_death_advance_precast, 0, caster, PATTACH_ABSORIGIN_FOLLOW, "attach_hitloc", caster:GetAbsOrigin(), true)
+	ParticleManager:SetParticleControl(self.xhs_death_advance_precast, 1, position)
 	StartAnimation(caster, { duration = self:GetCastPoint() + 0.2, activity = ACT_DOTA_CAST_ABILITY_3, rate = 1.0 })
 	caster:EmitSound("Hero_Sven.StormBolt")
 	return true
 end
 
-function xhs_arthas_death_advance:OnAbilityPhaseInterrupted() if IsServer() then HideBossCastBar(self) end end
+function xhs_arthas_death_advance:OnAbilityPhaseInterrupted()
+	if not IsServer() then return end
+	ClearDeathAdvancePrecast(self)
+	HideBossCastBar(self)
+end
 function xhs_arthas_death_advance:OnSpellStart()
 	if not IsServer() then return end
+	ClearDeathAdvancePrecast(self)
 	local caster = self:GetCaster()
 	local position = GetContext(self).position or caster:GetAbsOrigin() + caster:GetForwardVector() * 600
 	local direction = NormalizeDirection(position - caster:GetAbsOrigin())
@@ -477,6 +509,14 @@ end
 function modifier_xhs_arthas_mark:IsPurgable() return false end
 function modifier_xhs_arthas_mark:IsDebuff() return true end
 function modifier_xhs_arthas_mark:GetTexture() return "custom/arthas_frostmourne" end
+function modifier_xhs_arthas_mark:DeclareFunctions()
+	return { MODIFIER_PROPERTY_TOOLTIP }
+end
+function modifier_xhs_arthas_mark:OnTooltip()
+	local ability = self:GetAbility()
+	if ability == nil or ability:IsNull() then return 40 end
+	return ability:GetSpecialValueFor("marked_bonus_pct")
+end
 function modifier_xhs_arthas_mark:OnCreated()
 	if not IsServer() then return end
 	local parent = self:GetParent()
@@ -502,6 +542,7 @@ function modifier_xhs_arthas_chains:GetModifierMoveSpeedBonus_Percentage() retur
 function modifier_xhs_arthas_chains:CheckState()
 	return {
 		[MODIFIER_STATE_ROOTED] = true,
+		[MODIFIER_STATE_DISARMED] = true,
 	}
 end
 

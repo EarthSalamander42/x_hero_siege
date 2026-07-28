@@ -191,10 +191,6 @@
 "DOTA_Tooltip_ability_item_orb_of_frost_freeze_cooldown"			"BASH DURATION:"
 "DOTA_Tooltip_ability_item_orb_of_frost_bash_chance"				"%BASH CHANCE:"
 
-"DOTA_Tooltip_modifier_orb_of_frost"							"Orb of Frost"
-"DOTA_Tooltip_modifier_orb_of_frost_Description"				"Grants chance for mini-bash."
-"DOTA_Tooltip_modifier_orb_of_fire"								"Orb of Fire"
-"DOTA_Tooltip_modifier_orb_of_fire_Description"					"Grants cleave to melee attacks."
 "DOTA_Tooltip_modifier_orb_of_darkness"							"Orb of Darkness"
 "DOTA_Tooltip_modifier_orb_of_darkness_Description"				"Raises enemy creeps that you slay."
 "DOTA_Tooltip_modifier_orb_of_lightning"						"Orb of Lightning"

@@ -15,6 +15,88 @@
 				<Label text="DEV" />
 			</Button>
 
+			<Panel id="XHSDevToolsPerformance" class="XHSDevToolsPerformance" hittest="false" hittestchildren="true">
+				<Button id="XHSDevToolsPerformanceHeader" class="XHSDevToolsPerformanceHeader" hittest="true" hittestchildren="false" onactivate="XHSDevToolsTogglePerformance();">
+					<Panel class="XHSDevToolsPerformanceCompactMetric">
+						<Label class="CompactName" text="CLIENT" />
+						<Label id="XHSDevToolsLocalFPS" class="CompactValue" text="--" />
+					</Panel>
+					<Panel class="XHSDevToolsPerformanceCompactMetric">
+						<Label class="CompactName" text="SERVER" />
+						<Label id="XHSDevToolsServerFPS" class="CompactValue" text="--" />
+					</Panel>
+					<Panel class="XHSDevToolsPerformanceCompactMetric">
+						<Label class="CompactName" text="CREEPS" />
+						<Label id="XHSDevToolsCreepCount" class="CompactValue" text="--" />
+					</Panel>
+					<Label class="XHSDevToolsPerformanceArrow CollapsedArrow" text="+" />
+					<Label class="XHSDevToolsPerformanceArrow ExpandedArrow" text="-" />
+				</Button>
+
+				<Panel id="XHSDevToolsPerformanceColumnControls" class="XHSDevToolsPerformanceColumnControls">
+					<Label class="XHSDevToolsPerformanceColumnControlsTitle" text="COLUMNS" />
+					<Button id="XHSPerfColumnToggleClient" class="XHSDevToolsPerformanceColumnToggle Active"><Label text="CLIENT" /></Button>
+					<Button id="XHSPerfColumnToggleServer" class="XHSDevToolsPerformanceColumnToggle Active"><Label text="SERVER" /></Button>
+					<Button id="XHSPerfColumnToggleActivity" class="XHSDevToolsPerformanceColumnToggle Active"><Label text="ACTIVITY" /></Button>
+					<Button id="XHSPerfColumnToggleBots" class="XHSDevToolsPerformanceColumnToggle Active"><Label text="BOTS" /></Button>
+				</Panel>
+
+				<Panel id="XHSDevToolsPerformanceDetails" class="XHSDevToolsPerformanceDetails">
+					<Panel id="XHSPerfColumnClient" class="XHSDevToolsPerformanceClientColumn">
+						<Label class="XHSDevToolsPerformanceColumnTitle" text="CLIENT FPS" />
+						<Panel id="XHSPerfPlayers" class="XHSDevToolsPerformancePlayers" />
+					</Panel>
+
+					<Panel id="XHSPerfColumnServer" class="XHSDevToolsPerformanceServerColumn">
+						<Label class="XHSDevToolsPerformanceColumnTitle" text="SERVER / MOD" />
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Active units" /><Label id="XHSPerfTotalUnits" class="Value" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Wave loops / sec" /><Label id="XHSPerfWaveLoops" class="Value" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="AI ticks / sec" /><Label id="XHSPerfAITicks" class="Value" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Ability loops / sec" /><Label id="XHSPerfAbilityLoops" class="Value" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Thinkers" /><Label id="XHSPerfThinkers" class="Value" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Heroes / bosses" /><Label id="XHSPerfHeroesBosses" class="Value" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Summons" /><Label id="XHSPerfSummons" class="Value" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Breakables / other" /><Label id="XHSPerfOther" class="Value" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Server frame" /><Label id="XHSPerfFrame" class="Value" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Profiler cost" /><Label id="XHSPerfCost" class="Value" text="--" /></Panel>
+					</Panel>
+
+					<Panel id="XHSPerfColumnActivity" class="XHSDevToolsPerformanceActivityColumn">
+						<Label class="XHSDevToolsPerformanceColumnTitle" text="ACTIVITY / SECOND" />
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Zone searches / hits" /><Label id="XHSPerfZoneSearches" class="Value WideValue" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Zone cost / max" /><Label id="XHSPerfZoneCost" class="Value WideValue" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Orders / repeated" /><Label id="XHSPerfOrders" class="Value WideValue" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="AI / wave thinks" /><Label id="XHSPerfThinks" class="Value WideValue" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Ability loops" /><Label id="XHSPerfAbilityThinks" class="Value" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Damage / casts" /><Label id="XHSPerfCombat" class="Value WideValue" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Projectiles L / T" /><Label id="XHSPerfProjectiles" class="Value WideValue" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Spawns / deaths" /><Label id="XHSPerfChurn" class="Value WideValue" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Target changes" /><Label id="XHSPerfTargetChanges" class="Value" text="--" /></Panel>
+						<Label class="XHSDevToolsPerformanceSourceTitle" text="SAMPLED ZONE HOTSPOTS" />
+						<Label id="XHSPerfZoneSource1" class="XHSDevToolsPerformanceSource" text="--" />
+						<Label id="XHSPerfZoneSource2" class="XHSDevToolsPerformanceSource" text="" />
+						<Label id="XHSPerfZoneSource3" class="XHSDevToolsPerformanceSource" text="" />
+						<Label class="XHSDevToolsPerformanceSourceTitle" text="SAMPLED ORDER HOTSPOTS" />
+						<Label id="XHSPerfOrderSource1" class="XHSDevToolsPerformanceSource" text="--" />
+						<Label id="XHSPerfOrderSource2" class="XHSDevToolsPerformanceSource" text="" />
+					</Panel>
+
+					<Panel id="XHSPerfColumnBots" class="XHSDevToolsPerformanceBotColumn">
+						<Label class="XHSDevToolsPerformanceColumnTitle" text="ALLIED BOTS" />
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Live / configured" /><Label id="XHSPerfBotCount" class="Value" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Engine verified" /><Label id="XHSPerfBotEngine" class="Value" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Active / idle" /><Label id="XHSPerfBotActivity" class="Value" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Orders/s / limited" /><Label id="XHSPerfBotOrders" class="Value" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Casts / rejected" /><Label id="XHSPerfBotCasts" class="Value" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Decision avg / max" /><Label id="XHSPerfBotDecision" class="Value" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Think avg / max" /><Label id="XHSPerfBotThink" class="Value" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Base threat / units" /><Label id="XHSPerfBotThreat" class="Value" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Danger / recoveries" /><Label id="XHSPerfBotSafety" class="Value" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Safe errors / streak" /><Label id="XHSPerfBotErrors" class="Value" text="--" /></Panel>
+					</Panel>
+				</Panel>
+			</Panel>
+
 			<Panel id="XHSDevToolsPanel" class="XHSDevToolsPanel">
 				<Panel class="XHSDevToolsHeader">
 					<Panel class="XHSDevToolsHeaderText">

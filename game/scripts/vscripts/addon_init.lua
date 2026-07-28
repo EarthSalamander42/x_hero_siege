@@ -9,7 +9,6 @@ if IsClient() then
 	LinkLuaModifier("modifier_cinematic_pause", "modifiers/modifier_cinematic_pause.lua", LUA_MODIFIER_MOTION_NONE)
 	LinkLuaModifier("modifier_cinematic_pause_release", "modifiers/modifier_cinematic_pause.lua", LUA_MODIFIER_MOTION_NONE)
 	LinkLuaModifier("modifier_custom_mechanics", "modifiers/modifier_custom_mechanics", LUA_MODIFIER_MOTION_NONE)
-	LinkLuaModifier("modifier_corpse", "modifiers/modifier_corpse.lua", LUA_MODIFIER_MOTION_NONE)
 	LinkLuaModifier("modifier_xhs_growth_overhead", "modifiers/modifier_xhs_growth_overhead.lua", LUA_MODIFIER_MOTION_NONE)
 	LinkLuaModifier("modifier_holdout_taunt_debuff", "abilities/heroes/hero_paladin.lua", LUA_MODIFIER_MOTION_NONE)
 	LinkLuaModifier("modifier_orb_of_arcane", "items/item_orb_of_arcane.lua", LUA_MODIFIER_MOTION_NONE)

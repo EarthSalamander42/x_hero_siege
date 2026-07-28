@@ -65,7 +65,7 @@ local function CastPreparedAbility(boss, abilityName, context, facePosition)
 	if not IsValidAlive(boss) then return nil end
 
 	local ability = boss:FindAbilityByName(abilityName)
-	if ability == nil or ability:IsNull() then return nil end
+	if ability == nil or ability:IsNull() or not ability:IsCooldownReady() then return nil end
 	if XHSPhase3BossAI:IsCastBlocked(boss) then return nil end
 
 	ability.xhs_proudmoore_context = context or {}
@@ -195,8 +195,6 @@ function modifier_xhs_proudmoore_phase3_ai:OnIntervalThink()
 		return
 	end
 
-	if self:TryThresholdCommand(now) then return end
-
 	if self.state == "casting" then
 		if now < self.cast_until then return end
 		self.state = "recovery"
@@ -206,6 +204,8 @@ function modifier_xhs_proudmoore_phase3_ai:OnIntervalThink()
 		if now < self.recover_until then return end
 		self.state = "idle"
 	end
+
+	if self:TryThresholdCommand(now) then return end
 
 	local entry = XHSPhase3BossAI:WeightedChoice(self.patterns, now)
 	if entry == nil then

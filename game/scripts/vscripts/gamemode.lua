@@ -16,7 +16,7 @@ require('libraries/playerresource')
 require('libraries/playertables')
 require('libraries/gold')
 require('libraries/rgb_to_hex')
-require('libraries/corpses')
+require('libraries/corpse_cleanup')
 
 -- require('phases/choose_hero') -- this should remain disabled as this is called through hero map triggers
 require('phases/creeps')
@@ -29,12 +29,11 @@ require('units/breakable_container_surprises')
 require('units/treasure_chest_surprises')
 require('triggers')
 if IsInToolsMode() then
-	local loaded, load_error = pcall(require, 'components/xhs_bots/init')
-	if not loaded then
-		print("[XHSBots] Private Tools package is not staged; allied bots remain disabled: " .. tostring(load_error))
-	end
+	pcall(require, 'components/xhs_bots/init')
 end
 require('components/api/init')
+require('components/performance_counters/init')
+require('components/performance_telemetry/init')
 require('components/custom_polls/init')
 if IsInToolsMode() then
 	require('libraries/adv_log')
@@ -64,6 +63,29 @@ function GameMode:OnFirstPlayerLoaded()
 	end
 end
 
+local function ApplyPlayableHeroBaseDamageMultiplier(hero)
+	if hero == nil or hero:IsNull() or not hero:IsRealHero() then return end
+	if hero:GetUnitName() == "npc_dota_hero_wisp" then return end
+	if hero.xhs_base_attack_damage_doubled == true then return end
+
+	hero.xhs_base_attack_damage_doubled = true
+	hero:SetBaseDamageMin(math.floor(hero:GetBaseDamageMin() * 2 + 0.5))
+	hero:SetBaseDamageMax(math.floor(hero:GetBaseDamageMax() * 2 + 0.5))
+end
+
+local function ApplyPlayableHeroBaseHealthMultiplier(hero)
+	if hero == nil or hero:IsNull() or not hero:IsRealHero() then return end
+	if hero:GetUnitName() == "npc_dota_hero_wisp" then return end
+	if hero.xhs_base_health_doubled == true then return end
+
+	local baseMaxHealth = hero.GetBaseMaxHealth ~= nil and hero:GetBaseMaxHealth() or hero:GetMaxHealth()
+	if baseMaxHealth == nil or baseMaxHealth <= 0 then return end
+
+	hero.xhs_base_health_doubled = true
+	hero:SetBaseMaxHealth(math.floor(baseMaxHealth * 2 + 0.5))
+	hero:SetHealth(hero:GetMaxHealth())
+end
+
 function GameMode:OnHeroInGame(hero)
 	local id = hero:GetPlayerID()
 	local point = Entities:FindByName(nil, "hero_selection_" .. id)
@@ -71,6 +93,12 @@ function GameMode:OnHeroInGame(hero)
 		and PlayerResource ~= nil
 		and PlayerResource.IsFakeClient ~= nil
 		and PlayerResource:IsFakeClient(id)
+
+	if hero:GetUnitName() ~= "npc_dota_hero_wisp" and XHSSetPlayerBaseRespawnPosition ~= nil then
+		XHSSetPlayerBaseRespawnPosition(hero)
+	end
+	ApplyPlayableHeroBaseDamageMultiplier(hero)
+	ApplyPlayableHeroBaseHealthMultiplier(hero)
 
 	if GetMapName() == "x_hero_siege_demo" then
 		point = Entities:FindByName(nil, "npc_dota_spawner_good_mid_staging")
@@ -245,9 +273,11 @@ function GameMode:InitGameMode()
 	GameMode.bSeenWaitForPlayers = false
 	GameMode.vUserIds = {}
 	GameMode.VoteTable = {}
-	GameMode.CustomSetupAutoReadyDelay = IsInToolsMode() and 60 or 30
+	GameMode.CustomSetupAutoReadyDelay = 30
 	GameMode.CustomSetupReadyLaunchDelay = 3
-	GameMode.CustomSetupDuration = IsInToolsMode() and 60 or 30
+	GameMode.CustomSetupDuration = 30
+	GameMode.CustomSetupBotDuration = 60
+	GameMode.CustomSetupBotProvisioningTimeout = 15
 	GameMode.CustomSetupState = nil
 
 	if XHSBots ~= nil then
@@ -301,6 +331,7 @@ function GameMode:InitGameMode()
 		function(...) return GameMode:OnDialogConfirmExpired(...) end)
 	CustomGameEventManager:RegisterListener("xhs_quest_focus", function(...) return GameMode:OnQuestFocusRequested(...) end)
 	CustomGameEventManager:RegisterListener("xhs_buy_tomes", function(...) return GameMode:OnBuyTomesRequested(...) end)
+	CustomGameEventManager:RegisterListener("xhs_toggle_auto_buy_tomes", function(...) return GameMode:OnToggleAutoBuyTomesRequested(...) end)
 
 	ListenToGameEvent("dota_holdout_revive_complete", Dynamic_Wrap(GameMode, "OnPlayerRevived"), GameMode)
 	ListenToGameEvent("dota_pause_event", Dynamic_Wrap(GameMode, "OnDotaPauseEvent"), GameMode)
@@ -322,6 +353,14 @@ function GameMode:InitGameMode()
 
 	if XHSDevTools ~= nil then
 		XHSDevTools:Init()
+	end
+
+	if XHSPerformanceCounters ~= nil then
+		XHSPerformanceCounters:Init()
+	end
+
+	if XHSPerformanceTelemetry ~= nil then
+		XHSPerformanceTelemetry:Init()
 	end
 
 	if XHSPublishAllTomePurchaseStatuses ~= nil then
@@ -363,6 +402,9 @@ function GameMode:OnThink()
 	end
 
 	if GameRules:IsGamePaused() == true then return 1 end
+	if XHSProcessAutoTomePurchases ~= nil then
+		XHSProcessAutoTomePurchases()
+	end
 	local newState = GameRules:State_Get()
 
 	if newState >= DOTA_GAMERULES_STATE_PRE_GAME then
@@ -538,6 +580,24 @@ function GameMode:DamageFilter(filterTable)
 		hVictim = EntIndexToHScript(filterTable["entindex_victim_const"])
 	end
 
+	if flDamage > 0 and hVictim ~= nil and XHSOnCastleDamageFilter ~= nil then
+		XHSOnCastleDamageFilter(hVictim, hVictim:GetHealth())
+	end
+
+	-- The Tools-only ally planner consumes a decayed physical/magical/pure
+	-- distribution. Keep this observer fail-closed so bot telemetry can never
+	-- reject or interrupt the authoritative game damage filter.
+	if flDamage > 0 and hVictim ~= nil and XHSBots ~= nil
+		and XHSBots.RecordDamageType ~= nil then
+		pcall(function()
+			XHSBots:RecordDamageType(
+				hVictim,
+				filterTable["damagetype_const"],
+				flDamage
+			)
+		end)
+	end
+
 	if flDamage > 0 and XHSRecordEndScreenStat ~= nil and XHSGetPlayerIDFromUnit ~= nil then
 		local attackerPlayerID = XHSGetPlayerIDFromUnit(hAttackerHero)
 		if attackerPlayerID ~= nil and XHSIsBossDamageTarget ~= nil and XHSIsBossDamageTarget(hVictim) then
@@ -590,6 +650,12 @@ function GameMode:FilterExecuteOrder(filterTable)
 	local queue = filterTable["queue"] == 1
 	local unit
 
+	-- Panorama input suppression is cosmetic; reject every player-issued order
+	-- authoritatively while that player's cinematic lock is active.
+	if XHSCinematics ~= nil and XHSCinematics:IsOrderLocked(issuer) then
+		return false
+	end
+
 	local function IsAnkhReincarnationInventoryOrder(orderType)
 		return orderType == DOTA_UNIT_ORDER_PURCHASE_ITEM
 			or (DOTA_UNIT_ORDER_MOVE_ITEM ~= nil and orderType == DOTA_UNIT_ORDER_MOVE_ITEM)
@@ -640,6 +706,29 @@ function GameMode:FilterExecuteOrder(filterTable)
 				--				end
 			end
 		end
+	end
+
+	-- A phase-3 tombstone is a real allied unit. Right-clicking it replaces the
+	-- move/attack order with a range-aware revive interaction.
+	if unit ~= nil and issuer ~= nil and issuer >= 0 then
+		unit.xhs_pending_tombstone_entindex = nil
+	end
+	local interactionTarget = targetIndex ~= nil and targetIndex > 0 and EntIndexToHScript(targetIndex) or nil
+	local isTombstoneInteractionOrder = order_type == DOTA_UNIT_ORDER_MOVE_TO_TARGET
+		or order_type == DOTA_UNIT_ORDER_ATTACK_TARGET
+	if unit ~= nil
+		and interactionTarget ~= nil
+		and not interactionTarget:IsNull()
+		and isTombstoneInteractionOrder
+		and XHSUnitTombstone ~= nil
+		and XHSUnitTombstone:IsTombstone(interactionTarget) then
+		GameRules:GetGameModeEntity():SetContextThink(DoUniqueString("xhs_tombstone_order"), function()
+			if XHSBeginTombstoneInteraction ~= nil then
+				XHSBeginTombstoneInteraction(unit, interactionTarget)
+			end
+			return nil
+		end, 0)
+		return false
 	end
 
 	-- Clicking the same Tombstone again while already channeling it is a harmless
@@ -856,6 +945,32 @@ function GameMode:MarkHeroImageCompleted(hero)
 end
 
 local XHS_OPTIONAL_EVENT_BOSS_BARS = {
+	ramero = {
+		id = "optional_ramero",
+		name = "npc_ramero",
+		icon = "npc_dota_hero_sven",
+		boss_count = 1,
+		global = true,
+		light_color = "#f6b54a",
+		dark_color = "#38200d",
+	},
+	baristol = {
+		id = "optional_baristol",
+		name = "npc_baristol",
+		icon = "npc_dota_hero_sven",
+		boss_count = 2,
+		global = true,
+		light_color = "#fff0a6",
+		dark_color = "#3b3212",
+	},
+	sogat = {
+		id = "optional_sogat",
+		name = "npc_ramero_2",
+		icon = "npc_dota_hero_sven",
+		boss_count = 1,
+		light_color = "#db82ff",
+		dark_color = "#30133d",
+	},
 	spirit_beast = {
 		id = "optional_spirit_beast",
 		name = "npc_spirit_beast",
@@ -874,13 +989,16 @@ local XHS_OPTIONAL_EVENT_BOSS_BARS = {
 
 function GameMode:ShowOptionalEventBossBar(eventName, boss, hero)
 	if boss == nil or not IsValidEntity(boss) or boss:IsNull() then return end
-	if hero == nil or not IsValidEntity(hero) or hero:IsNull() then return end
-
-	local playerID = hero:GetPlayerID()
-	if playerID == nil or playerID < 0 then return end
 
 	local config = XHS_OPTIONAL_EVENT_BOSS_BARS[eventName] or {}
-	boss.boss_count = 1
+	local playerID = nil
+	if config.global ~= true then
+		if hero == nil or not IsValidEntity(hero) or hero:IsNull() then return end
+		playerID = hero:GetPlayerID()
+		if playerID == nil or playerID < 0 then return end
+	end
+
+	boss.boss_count = config.boss_count or 1
 	boss.xhs_boss_bar_id = config.id or eventName
 	boss.xhs_boss_bar_name = config.name or boss:GetUnitName()
 	boss.xhs_boss_bar_icon = config.icon
@@ -888,8 +1006,6 @@ function GameMode:ShowOptionalEventBossBar(eventName, boss, hero)
 		light_color = config.light_color or "#9be7ff",
 		dark_color = config.dark_color or "#102533",
 	}
-	boss.xhs_optional_event_player_id = playerID
-	boss.xhs_boss_bar_lock_to_registered = true
 	boss.xhs_boss_bar_suppressed = nil
 
 	local noHealthBar = boss:FindAbilityByName("ability_no_health_bar") or boss:AddAbility("ability_no_health_bar")
@@ -897,17 +1013,41 @@ function GameMode:ShowOptionalEventBossBar(eventName, boss, hero)
 		noHealthBar:SetLevel(1)
 	end
 
-	ShowPrivateBossBar(boss, playerID)
+	if config.global == true then
+		boss.xhs_optional_event_player_id = nil
+		boss.xhs_boss_bar_players = nil
+		boss.xhs_boss_bar_lock_to_registered = nil
+		ShowBossBar(boss)
+	else
+		boss.xhs_optional_event_player_id = playerID
+		boss.xhs_boss_bar_lock_to_registered = true
+		ShowPrivateBossBar(boss, playerID)
+	end
 end
 
 function GameMode:HideOptionalEventBossBar(eventName, boss)
-	if boss == nil or not IsValidEntity(boss) or boss:IsNull() then return end
+	local config = XHS_OPTIONAL_EVENT_BOSS_BARS[eventName] or {}
+	local bossIsValid = boss ~= nil and IsValidEntity(boss) and not boss:IsNull()
+	local bossCount = config.boss_count or (bossIsValid and boss.boss_count) or 1
+	local bossBarId = config.id or (bossIsValid and boss.xhs_boss_bar_id) or eventName
 
-	HideBossBar(boss)
-	boss.xhs_boss_bar_suppressed = true
-	boss.xhs_boss_bar_players = nil
-	boss.xhs_optional_event_player_id = nil
-	boss.xhs_boss_bar_lock_to_registered = nil
+	if bossIsValid then
+		boss.xhs_boss_bar_suppressed = true
+		HideBossBar(boss)
+		boss.xhs_boss_bar_players = nil
+		boss.xhs_optional_event_player_id = nil
+		boss.xhs_boss_bar_lock_to_registered = nil
+	end
+
+	-- A dead optional boss can already have an invalid entity handle when the
+	-- arena's other boss triggers the shared cleanup. Send a handle-independent
+	-- hide as a final authority so its last 0 HP Panorama state cannot survive.
+	if config.global == true then
+		CustomGameEventManager:Send_ServerToAllClients("hide_boss_hp", {
+			boss_count = bossCount,
+			boss_bar_id = bossBarId,
+		})
+	end
 end
 
 function GameMode:GetPlayerIDFromEvent(event)
@@ -1978,6 +2118,56 @@ function GameMode:GetCustomSetupSummary()
 	return ready_players, ready_count, #eligible_players
 end
 
+function GameMode:HasConfiguredXHSBots()
+	return IsInToolsMode()
+		and XHSBots ~= nil
+		and XHSBots.enabled == true
+		and type(XHSBots.configuration) == "table"
+		and (tonumber(XHSBots.configuration.count) or 0) > 0
+end
+
+function GameMode:GetCustomSetupConfiguredDuration()
+	if self:HasConfiguredXHSBots() then
+		return self.CustomSetupBotDuration or 60
+	end
+	return self.CustomSetupDuration or 30
+end
+
+function GameMode:UpdateCustomSetupBotWindow()
+	local state = self.CustomSetupState
+	if state == nil or not state.active or state.bot_provisioning then return end
+
+	local current_time = GameRules:GetGameTime()
+	local has_configured_bots = self:HasConfiguredXHSBots()
+	if has_configured_bots and not state.bot_setup_extended then
+		local bot_duration = self.CustomSetupBotDuration or 60
+		state.bot_setup_extended = true
+		state.duration = bot_duration
+		state.auto_ready_delay = bot_duration
+		state.deadline = math.max(state.deadline or current_time, current_time + bot_duration)
+
+		-- Applying a positive bot count is an explicit interaction. Restart the
+		-- auto-ready window so provisioning cannot race an old zero-bot deadline.
+		if state.all_players_loaded_since ~= nil then
+			state.all_players_loaded_since = current_time
+		end
+	elseif not has_configured_bots and state.bot_setup_extended then
+		-- Returning to zero bots restores the ordinary Tools window instead of
+		-- retaining a stale 60-second extension.
+		local base_duration = self.CustomSetupDuration or 30
+		state.bot_setup_extended = false
+		state.duration = base_duration
+		state.auto_ready_delay = self.CustomSetupAutoReadyDelay or base_duration
+		state.deadline = math.min(
+			state.deadline or (current_time + base_duration),
+			current_time + base_duration
+		)
+		if state.all_players_loaded_since ~= nil then
+			state.all_players_loaded_since = current_time
+		end
+	end
+end
+
 function GameMode:PushCustomSetupNetTable()
 	if not self.CustomSetupState then
 		return
@@ -1985,6 +2175,7 @@ function GameMode:PushCustomSetupNetTable()
 
 	local ready_players, ready_count, total_players = self:GetCustomSetupSummary()
 	local remaining_time = 0
+	local bot_provisioning_remaining = 0
 	local auto_ready_remaining = 0
 	local auto_ready_active = false
 	local all_players_loaded = false
@@ -1993,11 +2184,20 @@ function GameMode:PushCustomSetupNetTable()
 		local current_time = GameRules:GetGameTime()
 		remaining_time = math.max(0, math.ceil(self.CustomSetupState.deadline - current_time))
 		all_players_loaded = self:AreAllCustomSetupPlayersLoaded()
+		if self.CustomSetupState.bot_provisioning
+			and self.CustomSetupState.bot_provisioning_deadline ~= nil then
+			bot_provisioning_remaining = math.max(0, math.ceil(
+				self.CustomSetupState.bot_provisioning_deadline - current_time
+			))
+			-- Panorama already renders remaining_time. Keep that legacy field
+			-- meaningful while the separate provisioning watchdog is active.
+			remaining_time = math.max(remaining_time, bot_provisioning_remaining)
+		end
 
 		if self.CustomSetupState.all_players_loaded_since ~= nil and ready_count < total_players then
 			auto_ready_active = true
 			auto_ready_remaining = math.max(0, math.ceil(
-				(self.CustomSetupAutoReadyDelay or 30) -
+				(self.CustomSetupState.auto_ready_delay or self.CustomSetupAutoReadyDelay or 30) -
 				(current_time - self.CustomSetupState.all_players_loaded_since)
 			))
 		end
@@ -2007,9 +2207,9 @@ function GameMode:PushCustomSetupNetTable()
 		active = self.CustomSetupState.active and 1 or 0,
 		launching = self.CustomSetupState.launching and 1 or 0,
 		launch_reason = self.CustomSetupState.launch_reason or "",
-		duration = self.CustomSetupDuration or 60,
+		duration = self.CustomSetupState.duration or self.CustomSetupDuration or 30,
 		remaining_time = remaining_time,
-		auto_ready_delay = self.CustomSetupAutoReadyDelay or 30,
+		auto_ready_delay = self.CustomSetupState.auto_ready_delay or self.CustomSetupAutoReadyDelay or 30,
 		auto_ready_remaining = auto_ready_remaining,
 		auto_ready_active = auto_ready_active and 1 or 0,
 		all_players_loaded = all_players_loaded and 1 or 0,
@@ -2017,6 +2217,9 @@ function GameMode:PushCustomSetupNetTable()
 		total_players = total_players,
 		ready_players = ready_players,
 		bot_provisioning = self.CustomSetupState.bot_provisioning and 1 or 0,
+		bot_provisioning_remaining = bot_provisioning_remaining,
+		bot_provisioning_timed_out = self.CustomSetupState.bot_provisioning_timed_out and 1 or 0,
+		bot_provisioning_error = self.CustomSetupState.bot_provisioning_error or "",
 	})
 end
 
@@ -2026,16 +2229,27 @@ function GameMode:StartCustomSetupFlow()
 		return
 	end
 
+	local current_time = GameRules:GetGameTime()
+	local configured_duration = self:GetCustomSetupConfiguredDuration()
+	local has_configured_bots = self:HasConfiguredXHSBots()
 	self.CustomSetupState = {
 		active = true,
 		launching = false,
 		launch_reason = "",
-		deadline = GameRules:GetGameTime() + (self.CustomSetupDuration or 60),
+		started_at = current_time,
+		duration = configured_duration,
+		auto_ready_delay = has_configured_bots and configured_duration
+			or (self.CustomSetupAutoReadyDelay or 30),
+		deadline = current_time + configured_duration,
 		all_ready_triggered = false,
 		auto_ready_triggered = false,
 		all_players_loaded_since = nil,
 		ready_players = {},
 		bot_provisioning = false,
+		bot_provisioning_generation = 0,
+		bot_provisioning_timed_out = false,
+		bot_provisioning_error = "",
+		bot_setup_extended = has_configured_bots,
 	}
 
 	self:PushCustomSetupNetTable()
@@ -2050,6 +2264,8 @@ function GameMode:CompleteCustomSetupLaunch(launch_reason)
 		return
 	end
 
+	self.CustomSetupState.bot_provisioning_generation =
+		(self.CustomSetupState.bot_provisioning_generation or 0) + 1
 	self.CustomSetupState.bot_provisioning = false
 	self.CustomSetupState.active = false
 	self.CustomSetupState.launching = true
@@ -2072,15 +2288,58 @@ function GameMode:FinishCustomSetup(launch_reason)
 	end
 
 	if XHSBots ~= nil and XHSBots.enabled == true and XHSBots.locked ~= true then
-		local canLaunch = XHSBots:BeforeCustomSetupFinish(launch_reason, function()
-			if GameMode.CustomSetupState ~= nil then
-				GameMode.CustomSetupState.bot_provisioning = false
+		local state = self.CustomSetupState
+		local generation = (state.bot_provisioning_generation or 0) + 1
+		state.bot_provisioning_generation = generation
+		local callback_fired = false
+		local function OnBotProvisioningFinished()
+			callback_fired = true
+			local current_state = GameMode.CustomSetupState
+			if current_state == nil
+				or not current_state.active
+				or current_state.bot_provisioning_generation ~= generation then
+				return
 			end
+			current_state.bot_provisioning = false
+			current_state.bot_provisioning_deadline = nil
 			GameMode:CompleteCustomSetupLaunch(launch_reason)
+		end
+
+		local hook_ok, canLaunch = pcall(function()
+			return XHSBots:BeforeCustomSetupFinish(
+				launch_reason,
+				OnBotProvisioningFinished
+			)
 		end)
+
+		if not hook_ok then
+			local provisioning_error = tostring(canLaunch)
+			state.bot_provisioning_error = provisioning_error
+			state.bot_provisioning_generation = generation + 1
+			if XHSBots ~= nil then
+				XHSBots.status = "error"
+				XHSBots.error = provisioning_error
+				if type(XHSBots.PushConfiguration) == "function" then
+					pcall(function()
+						XHSBots:PushConfiguration()
+					end)
+				end
+			end
+			self:CompleteCustomSetupLaunch("bot_provisioning_error")
+			return
+		end
+
+		if callback_fired or not self.CustomSetupState.active then
+			return
+		end
+
 		if not canLaunch then
-			self.CustomSetupState.bot_provisioning = true
-			self.CustomSetupState.launch_reason = "bot_provisioning"
+			local current_time = GameRules:GetGameTime()
+			state.bot_provisioning = true
+			state.bot_provisioning_started_at = current_time
+			state.bot_provisioning_deadline = current_time
+				+ (self.CustomSetupBotProvisioningTimeout or 15)
+			state.launch_reason = "bot_provisioning"
 			self:PushCustomSetupNetTable()
 			return
 		end
@@ -2090,6 +2349,8 @@ function GameMode:FinishCustomSetup(launch_reason)
 end
 
 function GameMode:CustomSetupThink()
+	self:UpdateCustomSetupBotWindow()
+
 	if not self.CustomSetupState then
 		return nil
 	end
@@ -2102,12 +2363,34 @@ function GameMode:CustomSetupThink()
 	end
 
 	if self.CustomSetupState.bot_provisioning then
+		local current_time = GameRules:GetGameTime()
+		local provisioning_deadline = self.CustomSetupState.bot_provisioning_deadline
+		if provisioning_deadline ~= nil and current_time >= provisioning_deadline then
+			local provisioning_error = "Bot provisioning timed out"
+			self.CustomSetupState.bot_provisioning = false
+			self.CustomSetupState.bot_provisioning_timed_out = true
+			self.CustomSetupState.bot_provisioning_error = provisioning_error
+			self.CustomSetupState.bot_provisioning_generation =
+				(self.CustomSetupState.bot_provisioning_generation or 0) + 1
+			if XHSBots ~= nil then
+				XHSBots.status = "error"
+				XHSBots.error = provisioning_error
+				if type(XHSBots.PushConfiguration) == "function" then
+					pcall(function()
+						XHSBots:PushConfiguration()
+					end)
+				end
+			end
+			self:CompleteCustomSetupLaunch("bot_provisioning_timeout")
+			return nil
+		end
 		self:PushCustomSetupNetTable()
 		return 0.2
 	end
 
 	local ready_launch_delay = self.CustomSetupReadyLaunchDelay or 3
-	local auto_ready_delay = self.CustomSetupAutoReadyDelay or 30
+	local auto_ready_delay = self.CustomSetupState.auto_ready_delay
+		or self.CustomSetupAutoReadyDelay or 30
 	local current_time = GameRules:GetGameTime()
 	local _, ready_count, total_players = self:GetCustomSetupSummary()
 	local all_players_loaded, eligible_players = self:AreAllCustomSetupPlayersLoaded()
@@ -2247,4 +2530,35 @@ function GameMode:OnBuyTomesRequested(event_source_index, keys)
 	self.XHSBuyTomeRequestTimes[player_id] = now
 
 	return BuyMaxSmallTomesForPlayer(player_id)
+end
+
+function GameMode:OnToggleAutoBuyTomesRequested(event_source_index, keys)
+	local payload = keys
+
+	if type(event_source_index) == "table" and payload == nil then
+		payload = event_source_index
+	end
+
+	if not payload then
+		return
+	end
+
+	local player_id = -1
+	if type(event_source_index) == "number" and event_source_index > 0 then
+		local ok, sender = pcall(EntIndexToHScript, event_source_index)
+		if ok and sender ~= nil and sender.GetPlayerID then
+			player_id = tonumber(sender:GetPlayerID()) or -1
+		end
+	end
+
+	if player_id < 0 then
+		player_id = tonumber(payload.PlayerID or -1) or -1
+	end
+
+	if player_id < 0 or not PlayerResource:IsValidPlayerID(player_id) then
+		return
+	end
+
+	local enabled = XHSIsTomeAutoBuyEnabled ~= nil and XHSIsTomeAutoBuyEnabled(player_id)
+	return XHSSetTomeAutoBuyEnabled(player_id, not enabled)
 end

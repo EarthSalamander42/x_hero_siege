@@ -1333,7 +1333,6 @@
 	flow-children: right;
 	background-color: #00000000;
 	border-top: 1px solid #77c8ff26;
-	border-bottom: 1px solid #77c8ff18;
 	box-shadow: none;
 	opacity: 0;
 	transform: translateY( 4px );
@@ -1368,13 +1367,11 @@
 
 .CurrentPlayer .KillEventHint {
 	border-top-color: #9fd7ff42;
-	border-bottom-color: #77c8ff2a;
 	brightness: 1.06;
 }
 
 .KillEventHint.ScoreboardSupporterTier1 {
 	border-top: 1px solid #70e39a70;
-	border-bottom: 1px solid #70e39a44;
 	box-shadow: #70e39a24 0px 0px 8px 0px;
 }
 
@@ -1390,7 +1387,6 @@
 
 .KillEventHint.ScoreboardSupporterTier2 {
 	border-top: 1px solid #ffcf6680;
-	border-bottom: 1px solid #ffcf6652;
 	box-shadow: #ffcf662a 0px 0px 9px 0px;
 }
 
@@ -1406,7 +1402,6 @@
 
 .KillEventHint.ScoreboardSupporterTier3 {
 	border-top: 1px solid #ff5a4382;
-	border-bottom: 1px solid #ff5a4354;
 	box-shadow: #ff5a432a 0px 0px 9px 0px;
 }
 
@@ -1422,7 +1417,6 @@
 
 .KillEventHint.ScoreboardSupporterTier4 {
 	border-top: 1px solid #5ad0ff8c;
-	border-bottom: 1px solid #5ad0ff60;
 	box-shadow: #5ad0ff34 0px 0px 10px 0px;
 }
 
@@ -1438,7 +1432,6 @@
 
 .KillEventHint.ScoreboardSupporterTier5 {
 	border-top: 1px solid #c99cff9c;
-	border-bottom: 1px solid #c99cff68;
 	box-shadow: #c99cff45 0px 0px 11px 0px;
 }
 

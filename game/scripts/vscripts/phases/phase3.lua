@@ -10,6 +10,79 @@ require("boss_scripts/phase3_ai/illidan")
 require("boss_scripts/phase3_ai/balanar")
 require("boss_scripts/phase3_ai/proudmoore")
 
+LinkLuaModifier(
+	"modifier_xhs_late_phase3_physical_resistance",
+	"modifiers/modifier_xhs_late_phase3_defense.lua",
+	LUA_MODIFIER_MOTION_NONE
+)
+LinkLuaModifier(
+	"modifier_xhs_late_phase3_magic_resistance",
+	"modifiers/modifier_xhs_late_phase3_defense.lua",
+	LUA_MODIFIER_MOTION_NONE
+)
+
+-- Arthas and every boss after him must survive the combined damage of a full
+-- party. Solo keeps the KV values; each additional player adds difficulty-
+-- appropriate physical and magical resistance.
+local LATE_PHASE3_DEFENSE_PER_EXTRA_PLAYER = {
+	[1] = { armor = 30, magic_resistance = 6 },
+	[2] = { armor = 34, magic_resistance = 7 },
+	[3] = { armor = 38, magic_resistance = 8 },
+	[4] = { armor = 42, magic_resistance = 9 },
+	[5] = { armor = 46, magic_resistance = 10 },
+}
+
+local function GetLatePhase3PartySize()
+	local playerIds = {}
+	local partySize = 0
+
+	for _, hero in pairs(HeroList:GetAllHeroes()) do
+		if hero:IsRealHero() and hero:GetTeam() == DOTA_TEAM_GOODGUYS then
+			local playerId = hero:GetPlayerOwnerID()
+			if playerId >= 0 and playerIds[playerId] ~= true then
+				playerIds[playerId] = true
+				partySize = partySize + 1
+			end
+		end
+	end
+
+	return math.max(1, math.min(4, partySize))
+end
+
+function ApplyLatePhase3BossDefenseScaling(boss)
+	if boss == nil or not IsValidEntity(boss) or boss:IsNull() then return end
+
+	local difficulty = math.max(1, math.min(5, GameRules:GetCustomGameDifficulty() or 1))
+	local partySize = GetLatePhase3PartySize()
+	local extraPlayers = partySize - 1
+	local defense = LATE_PHASE3_DEFENSE_PER_EXTRA_PLAYER[difficulty]
+	local armorBonus = extraPlayers * defense.armor
+	local magicResistanceBonus = extraPlayers * defense.magic_resistance
+
+	boss.xhs_late_phase3_party_size = partySize
+	boss.xhs_late_phase3_armor_bonus = armorBonus
+	boss.xhs_late_phase3_magic_resistance_bonus = magicResistanceBonus
+
+	local armorModifier = boss:FindModifierByName("modifier_xhs_late_phase3_physical_resistance")
+	local magicModifier = boss:FindModifierByName("modifier_xhs_late_phase3_magic_resistance")
+
+	if extraPlayers <= 0 then
+		if armorModifier ~= nil then armorModifier:Destroy() end
+		if magicModifier ~= nil then magicModifier:Destroy() end
+		return
+	end
+
+	if armorModifier == nil then
+		armorModifier = boss:AddNewModifier(boss, nil, "modifier_xhs_late_phase3_physical_resistance", {})
+	end
+	if magicModifier == nil then
+		magicModifier = boss:AddNewModifier(boss, nil, "modifier_xhs_late_phase3_magic_resistance", {})
+	end
+
+	if armorModifier ~= nil then armorModifier:SetStackCount(armorBonus) end
+	if magicModifier ~= nil then magicModifier:SetStackCount(magicResistanceBonus) end
+end
+
 local function FaceUnitTowardsPosition(unit, position)
 	if unit == nil or not IsValidEntity(unit) or unit:IsNull() or position == nil then return end
 
@@ -19,6 +92,60 @@ local function FaceUnitTowardsPosition(unit, position)
 
 	unit:SetForwardVector(direction:Normalized())
 	unit:FaceTowards(position)
+end
+
+local PHASE3_BOSS_CINEMATIC_DURATION = 3.5
+local PHASE3_BOSS_PREP_DURATION = 2.5
+
+local function EnsureBossIntroModifierDuration(boss, modifierName, minimumDuration)
+	if boss == nil or not IsValidEntity(boss) or boss:IsNull() then return nil end
+
+	local modifier = boss:FindModifierByName(modifierName)
+	if modifier == nil then
+		modifier = boss:AddNewModifier(boss, nil, modifierName, { duration = minimumDuration })
+	elseif modifier:GetRemainingTime() >= 0 and modifier:GetRemainingTime() < minimumDuration then
+		modifier:SetDuration(minimumDuration, true)
+	end
+	return modifier
+end
+
+local function ApplyPostCinematicHeroPrepLock(duration)
+	for _, hero in pairs(HeroList:GetAllHeroes()) do
+		if hero:IsRealHero() and hero:GetTeam() == DOTA_TEAM_GOODGUYS and hero:IsAlive() then
+			local modifier = hero:AddNewModifier(hero, nil, "modifier_pause_creeps", { duration = duration })
+			if modifier ~= nil then
+				modifier:SetStackCount(1)
+			end
+		end
+	end
+end
+
+local function PlayPhase3BossSpawnCinematic(boss, cinematicId, title, subtitle, duration, cameraSpeed)
+	if XHSCinematics == nil or boss == nil or not IsValidEntity(boss) or boss:IsNull() then return end
+
+	local cinematicDuration = duration or PHASE3_BOSS_CINEMATIC_DURATION
+	local minimumBossLockDuration = cinematicDuration + PHASE3_BOSS_PREP_DURATION
+	local pauseModifier = EnsureBossIntroModifierDuration(boss, "modifier_pause_creeps", minimumBossLockDuration)
+	if pauseModifier ~= nil then
+		pauseModifier:SetStackCount(1)
+	end
+	EnsureBossIntroModifierDuration(boss, "modifier_invulnerable", minimumBossLockDuration)
+
+	XHSCinematics:BeginForAll(cinematicId, {
+		duration = cinematicDuration,
+		hide_hud = true,
+		lock_orders = true,
+		camera_entindex = boss:entindex(),
+		camera_speed = cameraSpeed or 0.55,
+		transition = 0.4,
+		letterbox_pct = 11,
+		title = title or "",
+		subtitle = subtitle or "",
+	})
+
+	Timers:CreateTimer(cinematicDuration, function()
+		ApplyPostCinematicHeroPrepLock(PHASE3_BOSS_PREP_DURATION)
+	end)
 end
 
 local function SpawnBanehallowRevenant(spawnerName, banehallow, pauseDuration)
@@ -108,6 +235,14 @@ function StartMagtheridonArena(bConsole)
 		SetupMagtheridonPhase3Boss(magtheridon, 1)
 		magtheridon:AddNewModifier(magtheridon, nil, "modifier_pause_creeps", { Duration = 10, IsHidden = true }):SetStackCount(1)
 		magtheridon:AddNewModifier(magtheridon, nil, "modifier_invulnerable", { Duration = 10, IsHidden = true })
+		PlayPhase3BossSpawnCinematic(
+			magtheridon,
+			"xhs_boss_spawn_magtheridon",
+			"MAGTHERIDON",
+			"THE PIT LORD AWAKENS",
+			nil,
+			0.30
+		)
 	end)
 end
 
@@ -243,24 +378,27 @@ local GROM_VANGUARD_ROUNDS = {
 }
 
 local GROM_VANGUARD_ROUND_TOTALS = {
-	[0] = { 8, 8, 8, 8 },
-	[1] = { 8, 8, 8, 8 },
-	[2] = { 10, 10, 12, 12 },
-	[3] = { 14, 14, 16, 16 },
-	[4] = { 16, 18, 18, 20 },
-	[5] = { 22, 22, 24, 24 },
+	[0] = { 16, 16, 16, 16 },
+	[1] = { 16, 16, 16, 16 },
+	[2] = { 20, 20, 24, 24 },
+	[3] = { 28, 28, 32, 32 },
+	[4] = { 32, 36, 36, 40 },
+	[5] = { 44, 44, 48, 48 },
 }
 
 local GROM_VANGUARD_BOUNTIES = {
-	npc_orc_raider_final_wave = { gold_min = 55, gold_max = 75, xp = 45 },
-	npc_chaos_orc_final_wave = { gold_min = 55, gold_max = 75, xp = 45 },
-	npc_warlock_final_wave = { gold_min = 80, gold_max = 110, xp = 60 },
-	npc_necro_final_wave = { gold_min = 80, gold_max = 110, xp = 60 },
-	npc_banshee_final_wave = { gold_min = 80, gold_max = 110, xp = 60 },
-	npc_abomination_final_wave = { gold_min = 130, gold_max = 170, xp = 85 },
-	npc_tauren_final_wave = { gold_min = 130, gold_max = 170, xp = 85 },
-	npc_magnataur_final_wave = { gold_min = 130, gold_max = 170, xp = 85 },
+	npc_orc_raider_final_wave = { gold_min = 550, gold_max = 750, xp = 45 },
+	npc_chaos_orc_final_wave = { gold_min = 550, gold_max = 750, xp = 45 },
+	npc_warlock_final_wave = { gold_min = 800, gold_max = 1100, xp = 60 },
+	npc_necro_final_wave = { gold_min = 800, gold_max = 1100, xp = 60 },
+	npc_banshee_final_wave = { gold_min = 800, gold_max = 1100, xp = 60 },
+	npc_abomination_final_wave = { gold_min = 1300, gold_max = 1700, xp = 85 },
+	npc_tauren_final_wave = { gold_min = 1300, gold_max = 1700, xp = 85 },
+	npc_magnataur_final_wave = { gold_min = 1300, gold_max = 1700, xp = 85 },
 }
+
+local GROM_VANGUARD_GOLD_MULTIPLIER = 5
+local GROM_VANGUARD_HEALTH_MULTIPLIER = 2
 
 local function GetGromVanguardState()
 	GameMode.GromVanguard = GameMode.GromVanguard or {}
@@ -308,8 +446,8 @@ local function ApplyGromVanguardBounty(unit, unitName)
 	local bounty = GROM_VANGUARD_BOUNTIES[unitName]
 	if unit == nil or bounty == nil then return end
 
-	unit:SetMinimumGoldBounty(bounty.gold_min)
-	unit:SetMaximumGoldBounty(bounty.gold_max)
+	unit:SetMinimumGoldBounty(bounty.gold_min * GROM_VANGUARD_GOLD_MULTIPLIER)
+	unit:SetMaximumGoldBounty(bounty.gold_max * GROM_VANGUARD_GOLD_MULTIPLIER)
 	unit:SetDeathXP(bounty.xp)
 end
 
@@ -320,6 +458,10 @@ local function SpawnGromVanguardUnit(unitName, spawnPosition)
 	local state = GetGromVanguardState()
 	unit.zone = "xhs_holdout"
 	unit.xhs_grom_vanguard_unit = true
+	local maxHealth = math.max(1, math.floor(unit:GetMaxHealth() * GROM_VANGUARD_HEALTH_MULTIPLIER))
+	unit:SetBaseMaxHealth(maxHealth)
+	unit:SetMaxHealth(maxHealth)
+	unit:SetHealth(maxHealth)
 	ApplyGromVanguardBounty(unit, unitName)
 	state.active_units = state.active_units or {}
 	state.active_units[unit:entindex()] = true
@@ -518,12 +660,23 @@ function StartArthasArena(bConsole)
 	arthas:AddNewModifier(arthas, nil, "modifier_pause_creeps", { Duration = 7, IsHidden = true }):SetStackCount(1)
 	arthas:AddNewModifier(arthas, nil, "modifier_invulnerable", { Duration = 7, IsHidden = true })
 	arthas.zone = "xhs_holdout"
+	ApplyLatePhase3BossDefenseScaling(arthas)
 	if XHSArthas_AttachPhase3AI ~= nil then
 		XHSArthas_AttachPhase3AI(arthas)
 	end
 	RegisterXHSDevSpawn(arthas)
 
 	TeleportAllHeroes("point_teleport_boss_", 7.0, 3.0)
+	Timers:CreateTimer(3.0, function()
+		PlayPhase3BossSpawnCinematic(
+			arthas,
+			"xhs_boss_spawn_arthas",
+			"ARTHAS",
+			"THE FALLEN PRINCE",
+			nil,
+			0.20
+		)
+	end)
 end
 
 function StartBanehallowArena()
@@ -540,7 +693,9 @@ function StartBanehallowArena()
 		banehallow:AddNewModifier(banehallow, nil, "modifier_invulnerable", { Duration = 20, IsHidden = true })
 		banehallow:EmitSound("shop_jbrice_01.stinger.radiant_lose")
 		banehallow.zone = "xhs_holdout"
+		ApplyLatePhase3BossDefenseScaling(banehallow)
 		RegisterXHSDevSpawn(banehallow)
+		PlayPhase3BossSpawnCinematic(banehallow, "xhs_boss_spawn_banehallow", "BANEHALLOW", "THE NIGHT HUNGERS")
 		CustomGameEventManager:Send_ServerToAllClients("xhs_boss_counter_update", {
 			boss_count = 1,
 			label = "Ghost Revenants",
@@ -586,6 +741,7 @@ function StartLichKingArena()
 		return
 	end
 
+	ApplyLatePhase3BossDefenseScaling(lich_king_boss)
 	ShowBossBar(lich_king_boss)
 
 	TeleportAllHeroes("point_teleport_boss_", 20.0, 3.0)
@@ -595,10 +751,18 @@ function StartLichKingArena()
 
 		Timers:CreateTimer(5.0, function()
 			lich_king_boss:EmitSound("Hero_SkeletonKing.Reincarnate")
+			PlayPhase3BossSpawnCinematic(
+				lich_king_boss,
+				"xhs_boss_spawn_lich_king",
+				"THE LICH KING",
+				"EVERY SOUL YOU LOST NOW MARCHES AT MY COMMAND.",
+				3.0
+			)
 		end)
 
 		Timers:CreateTimer(reincarnate_time, function()
 			FindClearSpaceForUnit(lich_king_boss, point_boss, true)
+			ApplyLatePhase3BossDefenseScaling(lich_king_boss)
 			local attack_position = Entities:FindByName(nil, "npc_dota_spawner_magtheridon_arena"):GetAbsOrigin()
 			lich_king_boss:RemoveModifierByName("modifier_invulnerable")
 			lich_king_boss:RemoveModifierByName("modifier_stunned")
@@ -629,9 +793,6 @@ function StartLichKingArena()
 		end)
 	end)
 
-	Timers:CreateTimer(14.0, function()
-		Notifications:TopToAll({ text = "From death, i grow stronger!", duration = 5.0 })
-	end)
 end
 
 function StartSpiritMasterArena()
@@ -650,13 +811,13 @@ function StartSpiritMasterArena()
 	spirit_master:AddNewModifier(spirit_master, nil, "modifier_invulnerable", { Duration = start_time, IsHidden = true })
 	spirit_master:EmitSound("SpiritMaster.StartArena")
 	spirit_master.zone = "xhs_holdout"
+	ApplyLatePhase3BossDefenseScaling(spirit_master)
 	RegisterXHSDevSpawn(spirit_master)
 	if XHSSpiritMaster_AttachPhase3AI ~= nil then
 		XHSSpiritMaster_AttachPhase3AI(spirit_master)
 	end
-
-	Timers:CreateTimer(start_time / 2, function()
-		Notifications:TopToAll({ text = "Spirits. Assemble!", duration = 5.0 })
+	Timers:CreateTimer(3.0, function()
+		PlayPhase3BossSpawnCinematic(spirit_master, "xhs_boss_spawn_spirit_master", "SPIRIT MASTER", "SPIRITS, ASSEMBLE")
 	end)
 end
 
@@ -680,7 +841,7 @@ function StartSecretArena(hero)
 					identity_player_id = hero:GetPlayerID(),
 					identity_hero_name = hero:GetUnitName(),
 				},
-				{ text = "found the secret arena!!! GOOD LUCK!",                 style = { color = "red" } },
+				{ text = "found the secret arena!!! GOOD LUCK!", style = { color = "red" } },
 			},
 		})
 
@@ -688,6 +849,7 @@ function StartSecretArena(hero)
 		secret:SetAngles(0, 270, 0)
 		secret:AddNewModifier(secret, nil, "modifier_pause_creeps", { Duration = 10, IsHidden = true }):SetStackCount(1)
 		secret:AddNewModifier(secret, nil, "modifier_invulnerable", { Duration = 9, IsHidden = true })
+		ApplyLatePhase3BossDefenseScaling(secret)
 	end)
 end
 

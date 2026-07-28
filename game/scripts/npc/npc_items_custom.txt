@@ -1631,6 +1631,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityValues"
 		{
+			"bonus_damage"						"50"
 			"bonus_evasion"						"17"
 			"bonus_movement_speed"				"40"
 			"evasion_proc_duration"				"0"
@@ -1666,6 +1667,7 @@
 
 		"AbilityValues"
 		{
+			"bonus_damage"						"100"
 			"bonus_evasion"						"25"
 			"bonus_movement_speed"				"70"
 			"evasion_proc_duration"				"2.0"
@@ -1722,6 +1724,7 @@
 
 		"AbilityValues"
 		{
+			"bonus_damage"						"150"
 			"bonus_evasion"						"35"
 			"bonus_movement_speed"				"100"
 			"evasion_proc_duration"				"2.0"
@@ -2040,9 +2043,9 @@
 		"ID"							"2531"
 		"AbilityTextureName"			"custom/potion_of_antimagic"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
-		"AbilityCooldown"				"30.0"	
+		"AbilityCooldown"				"75.0"
 		"AbilityCastRange"				"0"
-		"ItemCost"						"2500"
+		"ItemCost"						"6000"
 		"ItemPurchasable"				"1"
 		"ItemQuality"					"rare"
 		"ItemStackable"					"1"
@@ -2052,7 +2055,7 @@
 
 		"AbilityValues"
 		{
-			"duration"				"15"
+			"duration"				"6"
 		}
 
 		"OnSpellStart"
@@ -2067,7 +2070,7 @@
 
 			"FireSound"
 			{
-				"EffectName"	"DOTA_Item.ClarityPotion.Activate"
+				"EffectName"	"DOTA_Item.BlackKingBar.Activate"
 				"Target"		"CASTER"
 			}
 

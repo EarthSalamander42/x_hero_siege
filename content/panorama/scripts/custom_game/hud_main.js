@@ -378,6 +378,7 @@ var g_nXHSBuyTomePositionRetries = 0;
 var g_nXHSBuyTomeSelectedPlayerID = -1;
 var g_bXHSBuyTomeLocked = false;
 var g_sXHSBuyTomeLockReason = "";
+var g_bXHSTomeAutoBuyEnabled = false;
 
 function GetXHSDotaHudRoot()
 {
@@ -517,6 +518,17 @@ function EnsureXHSBuyTomeDisabledOverlay( button )
 	{
 		config.EnsureXHSBuyTomeDisabledOverlay( button );
 	}
+}
+
+function EnsureXHSBuyTomeAutoBuyHint( button )
+{
+	var config = GameUI.CustomUIConfig ? GameUI.CustomUIConfig() : null;
+	if ( config && config.EnsureXHSBuyTomeAutoBuyHint )
+	{
+		return config.EnsureXHSBuyTomeAutoBuyHint( button );
+	}
+
+	return null;
 }
 
 function GetXHSActiveCenterBlock()
@@ -698,7 +710,8 @@ function GetXHSBuyTomeLockState( playerID )
 	var state = CustomNetTables.GetTableValue( "xhs_tome_purchase", String( playerID ) );
 	return {
 		locked: !!state && Number( state.locked ) === 1,
-		reason: state && state.reason ? String( state.reason ) : ""
+		reason: state && state.reason ? String( state.reason ) : "",
+		autoBuy: !!state && Number( state.auto_buy ) === 1
 	};
 }
 
@@ -822,6 +835,7 @@ function UpdateBuyTomeButton()
 	var lockState = GetXHSBuyTomeLockState( selectedHero.playerID );
 	g_bXHSBuyTomeLocked = lockState.locked;
 	g_sXHSBuyTomeLockReason = lockState.reason;
+	g_bXHSTomeAutoBuyEnabled = lockState.autoBuy;
 	var config = GameUI.CustomUIConfig ? GameUI.CustomUIConfig() : null;
 	if ( config )
 	{
@@ -834,11 +848,14 @@ function UpdateBuyTomeButton()
 	countLabel.text = "x" + g_nXHSBuyTomeCount;
 	button.SetHasClass( "NoTomes", g_nXHSBuyTomeCount < 1 );
 	button.SetHasClass( "TomePurchaseLocked", g_bXHSBuyTomeLocked );
+	button.SetHasClass( "TomeAutoBuyEnabled", g_bXHSTomeAutoBuyEnabled );
 	button.SetHasClass( "XHSBuyTomeOtherPlayer", selectedHero.playerID !== playerID );
+	EnsureXHSBuyTomeAutoBuyHint( button );
 	EnsureXHSBuyTomeDisabledOverlay( button );
 	ApplyXHSBuyTomeButtonStyle( button, {
 		noTomes: g_nXHSBuyTomeCount < 1,
 		locked: g_bXHSBuyTomeLocked,
+		autoBuy: g_bXHSTomeAutoBuyEnabled,
 		hovered: button.BHasClass( "XHSBuyTomeHovered" )
 	} );
 
@@ -863,24 +880,45 @@ function OnBuyTomeButtonPressed()
 	GameEvents.SendCustomGameEventToServer( "xhs_buy_tomes", {} );
 }
 
+function OnBuyTomeAutoBuyToggle()
+{
+	if ( g_nXHSBuyTomeSelectedPlayerID !== Players.GetLocalPlayer() )
+	{
+		return;
+	}
+
+	GameEvents.SendCustomGameEventToServer( "xhs_toggle_auto_buy_tomes", {} );
+}
+
 function ShowBuyTomeTooltip()
 {
 	var button = GetXHSBuyTomeButton();
 	if ( button )
 	{
 		button.AddClass( "XHSBuyTomeHovered" );
-		ApplyXHSBuyTomeButtonStyle( button, { locked: g_bXHSBuyTomeLocked, hovered: true } );
+		ApplyXHSBuyTomeButtonStyle( button, {
+			locked: g_bXHSBuyTomeLocked,
+			autoBuy: g_bXHSTomeAutoBuyEnabled,
+			hovered: true
+		} );
+		var controlHelp = g_bXHSTomeAutoBuyEnabled
+			? "AUTO-BUY: ON\nRight-click to disable."
+			: "AUTO-BUY: OFF\nRight-click to enable.";
 		if ( g_bXHSBuyTomeLocked )
 		{
 			var reason = g_sXHSBuyTomeLockReason
 				? $.Localize( g_sXHSBuyTomeLockReason )
 				: $.Localize( "#xhs_tome_lock_temporarily_disabled" );
 			reason = NormalizeXHSBuyTomeLocalizedText( reason );
-			$.DispatchEvent( "DOTAShowTextTooltip", button, reason );
+			$.DispatchEvent( "DOTAShowTextTooltip", button, reason + "\n\n" + controlHelp );
 		}
 		else
 		{
-			$.DispatchEvent( "DOTAShowAbilityTooltip", button, "item_tome_small" );
+			$.DispatchEvent(
+				"DOTAShowTextTooltip",
+				button,
+				"Tome of Stats (+50 all attributes)\nLeft-click to buy the maximum affordable.\n\n" + controlHelp
+			);
 		}
 	}
 }
@@ -891,7 +929,11 @@ function HideBuyTomeTooltip()
 	if ( button )
 	{
 		button.RemoveClass( "XHSBuyTomeHovered" );
-		ApplyXHSBuyTomeButtonStyle( button, { locked: g_bXHSBuyTomeLocked, hovered: false } );
+		ApplyXHSBuyTomeButtonStyle( button, {
+			locked: g_bXHSBuyTomeLocked,
+			autoBuy: g_bXHSTomeAutoBuyEnabled,
+			hovered: false
+		} );
 		$.DispatchEvent( "DOTAHideAbilityTooltip", button );
 		$.DispatchEvent( "DOTAHideTextTooltip", button );
 	}
@@ -906,6 +948,89 @@ SetPlayersCameraPosition({
 */
 
 var XHSCameraMoveSequence = 0;
+var XHSHeroSelectionHealthFrameHidden = false;
+var XHSHeroSelectionHealthPanels = [];
+
+function GetXHSHeroSelectionHealthPanel()
+{
+	var hud = GetXHSDotaHudRoot();
+	var hudElements = hud && hud.FindChildTraverse ? hud.FindChildTraverse( "HUDElements" ) : null;
+	var lowerHud = hudElements ? hudElements.FindChildTraverse( "lower_hud" ) : null;
+	var centerWithStats = lowerHud ? lowerHud.FindChildTraverse( "center_with_stats" ) : null;
+	var centerBlock = centerWithStats ? centerWithStats.FindChildTraverse( "center_block" ) : null;
+	return centerBlock ? centerBlock.FindChildTraverse( "HealthContainer" ) : null;
+}
+
+function HideXHSHeroSelectionHealthPanel( panel )
+{
+	if ( !panel || !panel.IsValid || !panel.IsValid() )
+	{
+		return;
+	}
+
+	if ( panel._xhsHeroSelectionHealthRecorded !== true )
+	{
+		panel._xhsHeroSelectionHealthRecorded = true;
+		panel._xhsHeroSelectionHealthOpacity = panel.style.opacity;
+		panel._xhsHeroSelectionHealthHitTest = panel.hittest;
+		XHSHeroSelectionHealthPanels.push( panel );
+	}
+
+	panel.style.opacity = "0";
+	panel.hittest = false;
+}
+
+function RestoreXHSHeroSelectionHealthPanels()
+{
+	for ( var i = 0; i < XHSHeroSelectionHealthPanels.length; i++ )
+	{
+		var panel = XHSHeroSelectionHealthPanels[i];
+		if ( !panel || !panel.IsValid || !panel.IsValid() )
+		{
+			continue;
+		}
+
+		panel.style.opacity = panel._xhsHeroSelectionHealthOpacity || "1";
+		panel.hittest = panel._xhsHeroSelectionHealthHitTest;
+		panel._xhsHeroSelectionHealthRecorded = false;
+	}
+	XHSHeroSelectionHealthPanels = [];
+}
+
+function MaintainXHSHeroSelectionHealthFrame()
+{
+	if ( !XHSHeroSelectionHealthFrameHidden )
+	{
+		return;
+	}
+
+	HideXHSHeroSelectionHealthPanel( GetXHSHeroSelectionHealthPanel() );
+	$.Schedule( 0.03, MaintainXHSHeroSelectionHealthFrame );
+}
+
+function SetXHSHeroSelectionTransition( data )
+{
+	var hidden = !!( data && Number( data.active ) === 1 );
+	if ( XHSHeroSelectionHealthFrameHidden === hidden )
+	{
+		if ( hidden )
+		{
+			HideXHSHeroSelectionHealthPanel( GetXHSHeroSelectionHealthPanel() );
+		}
+		return;
+	}
+
+	XHSHeroSelectionHealthFrameHidden = hidden;
+	if ( hidden )
+	{
+		HideXHSHeroSelectionHealthPanel( GetXHSHeroSelectionHealthPanel() );
+		MaintainXHSHeroSelectionHealthFrame();
+	}
+	else
+	{
+		RestoreXHSHeroSelectionHealthPanels();
+	}
+}
 
 function SetPlayersCameraPosition(keys) {
 	if (!keys.iSpeed)
@@ -922,7 +1047,17 @@ function SetPlayersCameraPosition(keys) {
 //	} else {
 		if (keys && keys.hPosition) {
 			keys.hPosition = keys.hPosition.split(" ");
-			GameUI.SetCameraTargetPosition([keys.hPosition[0], keys.hPosition[1], keys.hPosition[2]], keys.iSpeed);
+			var targetPosition = [keys.hPosition[0], keys.hPosition[1], keys.hPosition[2]];
+			var cinematicConfig = GameUI.CustomUIConfig ? GameUI.CustomUIConfig() : null;
+			var cinematicApi = cinematicConfig && cinematicConfig.XHSCinematics;
+			var cameraHandledByCinematic = cinematicApi
+				&& cinematicApi.isActive
+				&& cinematicApi.isActive()
+				&& cinematicApi.setCameraTarget
+				&& cinematicApi.setCameraTarget(targetPosition, keys.iSpeed);
+			if (!cameraHandledByCinematic) {
+				GameUI.SetCameraTargetPosition(targetPosition, keys.iSpeed);
+			}
 			var sequence = ++XHSCameraMoveSequence;
 			var returnDelay = Number(keys.return_to_hero_after) || 0;
 			if (returnDelay > 0) {
@@ -938,7 +1073,14 @@ function SetPlayersCameraPosition(keys) {
 
 					var heroPosition = Entities.GetAbsOrigin(hero);
 					if (heroPosition) {
-						GameUI.SetCameraTargetPosition(heroPosition, Number(keys.return_speed) || 0.65);
+						var returnHandledByCinematic = cinematicApi
+							&& cinematicApi.isActive
+							&& cinematicApi.isActive()
+							&& cinematicApi.setCameraTarget
+							&& cinematicApi.setCameraTarget(heroPosition, Number(keys.return_speed) || 0.65);
+						if (!returnHandledByCinematic) {
+							GameUI.SetCameraTargetPosition(heroPosition, Number(keys.return_speed) || 0.65);
+						}
 					}
 				});
 			}
@@ -953,11 +1095,13 @@ function SetPlayersCameraPosition(keys) {
 	GameEvents.Subscribe("hide_ui", HideUI);
 	GameEvents.Subscribe("dotacraft_error_message", CreateErrorMessage)
 	GameEvents.Subscribe("set_player_camera", SetPlayersCameraPosition)
+	GameEvents.Subscribe("xhs_hero_selection_transition", SetXHSHeroSelectionTransition)
 	var tomeButton = GetXHSBuyTomeButton();
 	if ( tomeButton )
 	{
 		tomeButton.SetPanelEvent( "onmouseover", ShowBuyTomeTooltip );
 		tomeButton.SetPanelEvent( "onmouseout", HideBuyTomeTooltip );
+		tomeButton.SetPanelEvent( "oncontextmenu", OnBuyTomeAutoBuyToggle );
 	}
 	UpdateBuyTomeButton();
 	UpdateXHSReincarnationPortrait();

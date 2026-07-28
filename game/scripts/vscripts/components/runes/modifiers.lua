@@ -18,13 +18,24 @@ modifier_xhs_rune_healing = modifier_xhs_rune_healing or class({})
 modifier_xhs_rune_healing.XHS_LINK_CLIENT = true
 function modifier_xhs_rune_healing:OnCreated(kv)
 	kv = kv or {}
-	self.hp_regen_pct = tonumber(kv.hp_regen_pct) or 5
-	self.mana_regen_pct = tonumber(kv.mana_regen_pct) or 8
+	self.hp_regen_flat = tonumber(kv.hp_regen_flat) or 300
+	self.hp_regen_pct = tonumber(kv.hp_regen_pct) or 2
+	self.mana_regen_flat = tonumber(kv.mana_regen_flat) or 300
+	self.mana_regen_pct = tonumber(kv.mana_regen_pct) or 5
 end
 function modifier_xhs_rune_healing:OnRefresh(kv) self:OnCreated(kv) end
 function modifier_xhs_rune_healing:GetTexture() return "rune_regen" end
-function modifier_xhs_rune_healing:DeclareFunctions() return { MODIFIER_PROPERTY_HEALTH_REGEN_PERCENTAGE, MODIFIER_PROPERTY_MANA_REGEN_TOTAL_PERCENTAGE } end
+function modifier_xhs_rune_healing:DeclareFunctions()
+	return {
+		MODIFIER_PROPERTY_HEALTH_REGEN_CONSTANT,
+		MODIFIER_PROPERTY_HEALTH_REGEN_PERCENTAGE,
+		MODIFIER_PROPERTY_MANA_REGEN_CONSTANT,
+		MODIFIER_PROPERTY_MANA_REGEN_TOTAL_PERCENTAGE,
+	}
+end
+function modifier_xhs_rune_healing:GetModifierConstantHealthRegen() return self.hp_regen_flat or 0 end
 function modifier_xhs_rune_healing:GetModifierHealthRegenPercentage() return self.hp_regen_pct or 0 end
+function modifier_xhs_rune_healing:GetModifierConstantManaRegen() return self.mana_regen_flat or 0 end
 function modifier_xhs_rune_healing:GetModifierTotalPercentageManaRegen() return self.mana_regen_pct or 0 end
 
 modifier_xhs_rune_revitalization = modifier_xhs_rune_revitalization or class({})
@@ -127,11 +138,15 @@ function modifier_xhs_rune_second_wind_guard:GetTexture() return "abaddon_borrow
 function modifier_xhs_rune_second_wind_guard:DeclareFunctions() return { MODIFIER_PROPERTY_INCOMING_DAMAGE_PERCENTAGE } end
 function modifier_xhs_rune_second_wind_guard:GetModifierIncomingDamage_Percentage() return -(self.guard_reduction or 0) end
 
+local XHS_BARRIER_VANILLA_HUD_MAX = 5000
+
 modifier_xhs_rune_barrier = modifier_xhs_rune_barrier or class({})
 modifier_xhs_rune_barrier.XHS_LINK_CLIENT = true
 function modifier_xhs_rune_barrier:OnCreated(kv)
 	kv = kv or {}
-	self.max_shield = self:GetParent():GetMaxHealth() * ((tonumber(kv.shield_pct) or 25) * 0.01)
+	self.flat_shield = tonumber(kv.flat_shield) or 3000
+	self.shield_pct = tonumber(kv.shield_pct) or 10
+	self.max_shield = self.flat_shield + self:GetParent():GetMaxHealth() * (self.shield_pct * 0.01)
 	self.shield = self.max_shield
 	self.health_regen = self:GetParent():GetMaxHealth() * ((tonumber(kv.health_regen_pct) or tonumber(kv.regen_pct) or 4) * 0.01)
 	if IsServer() then
@@ -158,13 +173,16 @@ function modifier_xhs_rune_barrier:AddCustomTransmitterData()
 	}
 end
 function modifier_xhs_rune_barrier:HandleCustomTransmitterData(data)
-	self.shield = data.shield or 0
-	self.max_shield = data.max_shield or 0
-	self.health_regen = data.health_regen or 0
+	self.shield = tonumber(data.shield) or 0
+	self.max_shield = tonumber(data.max_shield) or 0
+	self.health_regen = tonumber(data.health_regen) or 0
 end
 function modifier_xhs_rune_barrier:UpdateShieldState()
 	self:SetStackCount(math.floor(self.shield or 0))
 	self:SendBuffRefreshToClients()
+	-- Force the built-in constant-block HUD to query the freshly transmitted
+	-- shield value instead of keeping its first snapshot.
+	self:GetParent():CalculateStatBonus(true)
 end
 function modifier_xhs_rune_barrier:RefreshShieldVisual()
 	if not IsServer() then return end
@@ -191,7 +209,21 @@ function modifier_xhs_rune_barrier:PlayShieldImpact()
 	end
 end
 function modifier_xhs_rune_barrier:GetModifierIncomingDamageConstant(event)
-	if not IsServer() then return self.shield or 0 end
+	if not IsServer() then
+		event = event or {}
+		local max_shield = math.max(0, self.max_shield or 0)
+		local hud_max = math.min(max_shield, XHS_BARRIER_VANILLA_HUD_MAX)
+		if event.report_max then
+			return hud_max
+		end
+		-- Stack counts are natively replicated and keep the yellow barrier HUD
+		-- in sync even before custom transmitter data is handled this frame.
+		-- Vanilla clamps this barrier display to 5000, so values above that are
+		-- projected proportionally onto its visual range. Gameplay and tooltips
+		-- continue to use the real, unscaled shield amount.
+		if max_shield <= 0 then return 0 end
+		return math.min(hud_max, self:GetStackCount() * hud_max / max_shield)
+	end
 
 	local damage = tonumber(event.damage) or 0
 	if damage <= 0 or (self.shield or 0) <= 0 then return 0 end
@@ -220,7 +252,7 @@ function modifier_xhs_rune_retaliation:OnCreated(kv)
 	self.reflect_pct = tonumber(kv.reflect_pct) or 25
 end
 function modifier_xhs_rune_retaliation:OnRefresh(kv) self:OnCreated(kv) end
-function modifier_xhs_rune_retaliation:GetTexture() return "blade_mail" end
+function modifier_xhs_rune_retaliation:GetTexture() return "item_blade_mail" end
 function modifier_xhs_rune_retaliation:GetEffectName() return "particles/items_fx/blademail.vpcf" end
 function modifier_xhs_rune_retaliation:GetEffectAttachType() return PATTACH_ABSORIGIN_FOLLOW end
 function modifier_xhs_rune_retaliation:DeclareFunctions()
@@ -238,8 +270,8 @@ function modifier_xhs_rune_retaliation:OnTakeDamage(params)
 		attacker = self:GetParent(),
 		victim = params.attacker,
 		damage = params.damage * self.reflect_pct * 0.01,
-		damage_type = params.damage_type or DAMAGE_TYPE_PURE,
-		damage_flags = DOTA_DAMAGE_FLAG_REFLECTION,
+		damage_type = DAMAGE_TYPE_PURE,
+		damage_flags = DOTA_DAMAGE_FLAG_REFLECTION + DOTA_DAMAGE_FLAG_NO_SPELL_AMPLIFICATION,
 	})
 	local returnFx = ParticleManager:CreateParticle("particles/units/heroes/hero_centaur/centaur_return.vpcf", PATTACH_ABSORIGIN, self:GetParent())
 	ParticleManager:SetParticleControlEnt(returnFx, 0, self:GetParent(), PATTACH_POINT_FOLLOW, "attach_hitloc", self:GetParent():GetAbsOrigin(), true)
@@ -399,13 +431,12 @@ modifier_xhs_rune_bounty_surge = modifier_xhs_rune_bounty_surge or class({})
 modifier_xhs_rune_bounty_surge.XHS_LINK_CLIENT = true
 function modifier_xhs_rune_bounty_surge:OnCreated(kv)
 	kv = kv or {}
-	self.bounty_pct = tonumber(kv.bounty_pct) or 35
-	self.min_total = tonumber(kv.min_total) or 15
+	self.bounty_pct = tonumber(kv.bounty_pct) or 25
 end
 function modifier_xhs_rune_bounty_surge:OnRefresh(kv) self:OnCreated(kv) end
 function modifier_xhs_rune_bounty_surge:GetTexture() return "bounty_hunter_track" end
 function modifier_xhs_rune_bounty_surge:DeclareFunctions() return { MODIFIER_PROPERTY_TOOLTIP } end
-function modifier_xhs_rune_bounty_surge:OnTooltip() return self.bounty_pct or 35 end
+function modifier_xhs_rune_bounty_surge:OnTooltip() return self.bounty_pct or 25 end
 
 modifier_xhs_rune_momentum = modifier_xhs_rune_momentum or class({})
 modifier_xhs_rune_momentum.XHS_LINK_CLIENT = true

@@ -52,8 +52,8 @@
 		// Bounty
 		//----------------------------------------------------------------
 		"BountyXP"					"704"		// Experience earn.
-		"BountyGoldMin"				"10560"		// Gold earned min.
-		"BountyGoldMax"				"11440"		// Gold earned max.
+		"BountyGoldMin"				"8448"		// Gold earned min. Reduced by 20% for creep level 2.
+		"BountyGoldMax"				"9152"		// Gold earned max. Reduced by 20% for creep level 2.
 
 		// Movement
 		//----------------------------------------------------------------
@@ -62,7 +62,7 @@
 
 		// Status
 		//----------------------------------------------------------------
-		"StatusHealth"				"10208"		// Base health.
+		"StatusHealth"				"8166"		// Base health. Reduced by 20% for creep level 2.
 		"StatusHealthRegen"			"44"		// Health regeneration rate.
 		"StatusMana"				"0"			// Base mana.
 		"StatusManaRegen"			"0"			// Mana regeneration rate.		 

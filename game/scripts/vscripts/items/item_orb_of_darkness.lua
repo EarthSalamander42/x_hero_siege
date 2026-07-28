@@ -356,8 +356,6 @@ function modifier_orb_of_darkness_active:ConvertUnit(source_unit)
 	local ability = FindOrbItem(owner) or self:GetAbility()
 	converted_unit:AddNewModifier(owner, ability, ORB_CONTROLLED_MODIFIER, { duration = self.duration })
 	converted_unit:AddNewModifier(owner, ability, "modifier_kill", { duration = self.duration })
-	converted_unit:SetNoCorpse()
-	converted_unit.no_corpse = true
 
 	DisableActiveAbilities(converted_unit)
 

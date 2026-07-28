@@ -226,15 +226,16 @@ function modifier_xhs_lich_king_phase3_ai:TryThresholdWinter(now)
 	local pct = (self.boss:GetHealth() / math.max(1, self.boss:GetMaxHealth())) * 100
 	for _, threshold in ipairs(THRESHOLDS) do
 		if self.thresholds_done[threshold] ~= true and pct <= threshold then
-			self.thresholds_done[threshold] = true
-			self:UpdateBossBarMarkers()
-			if UpdateBossBar ~= nil then
-				UpdateBossBar(self.boss)
-			end
 			if self:CastSindragosaFlyby(0) then
+				self.thresholds_done[threshold] = true
+				self:UpdateBossBarMarkers()
+				if UpdateBossBar ~= nil then
+					UpdateBossBar(self.boss)
+				end
 				self.next_action = now + 4.5
 				return true
 			end
+			return false
 		end
 	end
 	return false

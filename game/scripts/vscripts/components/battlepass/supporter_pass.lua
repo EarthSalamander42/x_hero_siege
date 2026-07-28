@@ -27,6 +27,69 @@ local function CopySupporterTable(source)
 	return copy
 end
 
+local function GetBackendSeasonRecord(supporterPass)
+	local playerSeason = type(supporterPass) == "table"
+		and supporterPass.season
+		or nil
+	if type(playerSeason) == "table" and next(playerSeason) ~= nil then
+		return playerSeason
+	end
+	if playerSeason ~= nil and tostring(playerSeason) ~= "" then
+		return playerSeason
+	end
+
+	local globalSeason = api
+		and api.supporter_pass
+		and api.supporter_pass.season
+		or nil
+	return globalSeason
+end
+
+local function IsBackendSeasonReady(supporterPass)
+	local seasonRecord = GetBackendSeasonRecord(supporterPass)
+	local identity = type(seasonRecord) == "table"
+		and (
+			seasonRecord.season_id
+			or seasonRecord.season_key
+			or seasonRecord.key
+			or seasonRecord.id
+		)
+		or seasonRecord
+	if SupporterPass2026 ~= nil
+	and SupporterPass2026.IsBackendSeason2026 ~= nil then
+		local seasonMatches =
+			SupporterPass2026:IsBackendSeason2026(seasonRecord)
+		local globalSeason = api
+			and api.supporter_pass
+			and api.supporter_pass.season
+			or nil
+		local globalSeasonMatches =
+			SupporterPass2026:IsBackendSeason2026(globalSeason)
+		local seasonPublished =
+			SupporterPass2026.IsBackendSeasonPublished == nil
+			or SupporterPass2026:IsBackendSeasonPublished(
+				seasonRecord
+			) ~= false
+		local globalSeasonPublished =
+			SupporterPass2026.IsBackendSeasonPublished == nil
+			or SupporterPass2026:IsBackendSeasonPublished(
+				globalSeason
+			) ~= false
+		local catalogReady = SupporterPass2026.IsBackendCatalog2026Ready ~= nil
+			and SupporterPass2026:IsBackendCatalog2026Ready(
+				api and api.supporter_pass and api.supporter_pass.rewards
+			)
+			or nil
+		return seasonMatches ~= false
+			and globalSeasonMatches ~= false
+			and seasonPublished
+			and globalSeasonPublished
+			and catalogReady == true,
+			identity
+	end
+	return false, identity
+end
+
 local function RewardIdentity(reward, index, sourceName)
 	if type(reward) ~= "table" then
 		return sourceName .. ":" .. tostring(index)
@@ -102,6 +165,14 @@ local function CollectSupporterRewards(value, forcedTrack, result)
 end
 
 local function MergeRewardTracks(legacyRewards, backendRewards, track)
+	if SupporterPass2026 ~= nil and SupporterPass2026.MergeBackendTrack ~= nil then
+		return SupporterPass2026:MergeBackendTrack(
+			legacyRewards,
+			CollectSupporterRewards(backendRewards),
+			track
+		)
+	end
+
 	local merged = {}
 	local order = {}
 
@@ -318,7 +389,11 @@ function SupporterPass:BuildPlayerTable(playerID)
 	local current = CustomNetTables:GetTableValue("supporter_pass_player", tostring(playerID)) or {}
 	local player = api and api.players and api.players[steamID] or {}
 	local supporterPass = player.supporter_pass or {}
-	local season = supporterPass.season or {}
+	local backendSeasonReady, backendSeasonID = IsBackendSeasonReady(supporterPass)
+	local seasonStateAllowed = backendSeasonReady ~= false
+	local season = seasonStateAllowed and (supporterPass.season or {}) or {}
+	local seasonSupporterPass = seasonStateAllowed and supporterPass or {}
+	local seasonCurrent = seasonStateAllowed and current or {}
 	local account = supporterPass.account or {}
 	local settings = supporterPass.settings or player.settings or {}
 	local passTierID = tonumber(FirstSupporterValue(supporterPass.tier_id, current.tier_id)) or 0
@@ -360,32 +435,52 @@ function SupporterPass:BuildPlayerTable(playerID)
 	local xhsXP = tonumber(FirstSupporterValue(player.xp, current.xhs_xp)) or 0
 	local xhsXPCurrent = tonumber(FirstSupporterValue(player.xp_in_level, current.xhs_xp_current)) or 0
 	local xhsXPMax = tonumber(FirstSupporterValue(player.xp_next_level, current.xhs_xp_max)) or 0
-	local seasonLevel = math.max(tonumber(FirstSupporterValue(season.level, supporterPass.season_level, supporterPass.level, current.season_level, current.Lvl)) or 1, 1)
-	local seasonXP = tonumber(FirstSupporterValue(season.xp, supporterPass.season_xp, supporterPass.current_exp, current.season_xp, current.XP)) or 0
-	local seasonXPMax = tonumber(FirstSupporterValue(season.xp_per_level, supporterPass.season_xp_max, supporterPass.xp_per_level, current.season_xp_max, current.MaxXP)) or self.SEASON_XP_PER_LEVEL
+	local seasonLevel = math.max(tonumber(FirstSupporterValue(season.level, seasonSupporterPass.season_level, seasonSupporterPass.level, seasonCurrent.season_level, seasonCurrent.Lvl)) or 1, 1)
+	local seasonXP = tonumber(FirstSupporterValue(season.xp, seasonSupporterPass.season_xp, seasonSupporterPass.current_exp, seasonCurrent.season_xp, seasonCurrent.XP)) or 0
+	local seasonXPMax = tonumber(FirstSupporterValue(season.xp_per_level, seasonSupporterPass.season_xp_max, seasonSupporterPass.xp_per_level, seasonCurrent.season_xp_max, seasonCurrent.MaxXP)) or self.SEASON_XP_PER_LEVEL
 	local seasonTotalXP = seasonXP
 	seasonLevel, seasonXP, seasonXPMax, seasonTotalXP = NormalizeSeasonProgress(seasonLevel, seasonXP, seasonXPMax)
 	local explicitSeasonXPChange = tonumber(FirstSupporterValue(
 		season.xp_change,
 		season.gained_xp,
-		supporterPass.season_xp_change,
-		supporterPass.xp_change,
-		supporterPass.gained_xp,
-		player.supporter_pass_xp_change,
-		player.supporter_xp_change
+		seasonSupporterPass.season_xp_change,
+		seasonSupporterPass.xp_change,
+		seasonSupporterPass.gained_xp,
+		seasonStateAllowed and player.supporter_pass_xp_change or nil,
+		seasonStateAllowed and player.supporter_xp_change or nil
 	))
 	local seasonXPChange = explicitSeasonXPChange or 0
-	if explicitSeasonXPChange == nil and (current.steamid ~= nil or current.season_xp ~= nil or current.XP ~= nil) then
-		local currentLevel = tonumber(FirstSupporterValue(current.season_level, current.Lvl)) or 1
-		local currentXP = tonumber(FirstSupporterValue(current.season_xp, current.XP)) or 0
-		local currentXPMax = tonumber(FirstSupporterValue(current.season_xp_max, current.MaxXP)) or seasonXPMax
+	if explicitSeasonXPChange == nil and (seasonCurrent.steamid ~= nil or seasonCurrent.season_xp ~= nil or seasonCurrent.XP ~= nil) then
+		local currentLevel = tonumber(FirstSupporterValue(seasonCurrent.season_level, seasonCurrent.Lvl)) or 1
+		local currentXP = tonumber(FirstSupporterValue(seasonCurrent.season_xp, seasonCurrent.XP)) or 0
+		local currentXPMax = tonumber(FirstSupporterValue(seasonCurrent.season_xp_max, seasonCurrent.MaxXP)) or seasonXPMax
 		seasonXPChange = SeasonProgressTotal(seasonLevel, seasonXP, seasonXPMax) - SeasonProgressTotal(currentLevel, currentXP, currentXPMax)
 	end
-	local baseXPChange = tonumber(FirstSupporterValue(season.base_xp_change, supporterPass.base_xp_change, player.base_xp_change, current.base_xp_change)) or 0
-	local xpBonus = tonumber(FirstSupporterValue(season.xp_bonus, supporterPass.xp_bonus, player.xp_bonus, current.xp_bonus)) or 0
+	local baseXPChange = tonumber(FirstSupporterValue(season.base_xp_change, seasonSupporterPass.base_xp_change, seasonStateAllowed and player.base_xp_change or nil, seasonCurrent.base_xp_change)) or 0
+	local xpBonus = tonumber(FirstSupporterValue(season.xp_bonus, seasonSupporterPass.xp_bonus, seasonStateAllowed and player.xp_bonus or nil, seasonCurrent.xp_bonus)) or 0
 	local passRewards = FirstSupporterValue(settings.pass_rewards, player.pass_rewards)
 	if passRewards == nil then
 		passRewards = player.bp_rewards
+	end
+	local loadout = supporterPass.loadout or current.loadout
+	local supporterTitle = FirstSupporterValue(
+		supporterPass.supporter_title,
+		current.supporter_title
+	)
+	if Battlepass ~= nil and Battlepass.GetEquippedSupporterItem ~= nil then
+		local success, titleItem = pcall(
+			Battlepass.GetEquippedSupporterItem,
+			Battlepass,
+			playerID,
+			"title"
+		)
+		if success and type(titleItem) == "table" then
+			supporterTitle = FirstSupporterValue(
+				titleItem.title_text,
+				titleItem.supporter_title,
+				supporterTitle
+			)
+		end
 	end
 
 	return {
@@ -412,6 +507,9 @@ function SupporterPass:BuildPlayerTable(playerID)
 		season_xp = seasonXP,
 		season_xp_max = seasonXPMax,
 		season_total_xp = seasonTotalXP,
+		season_id = SupporterPass2026 ~= nil and SupporterPass2026.SEASON_ID or "2026",
+		backend_season_id = backendSeasonID,
+		backend_season_ready = backendSeasonReady ~= false,
 		season_xp_change = seasonXPChange,
 		XP_change = seasonXPChange,
 		base_xp_change = baseXPChange,
@@ -422,6 +520,7 @@ function SupporterPass:BuildPlayerTable(playerID)
 		xhs_xp_current = xhsXPCurrent,
 		xhs_xp_max = xhsXPMax,
 		account_title = FirstSupporterValue(account.title, current.account_title, "Supporter Pass"),
+		supporter_title = supporterTitle,
 		toggle_tag = FirstSupporterValue(settings.toggle_tag, player.toggle_tag, current.toggle_tag),
 		pass_rewards = passRewards,
 		bp_rewards = passRewards,
@@ -434,8 +533,10 @@ function SupporterPass:BuildPlayerTable(playerID)
 		purchases = supporterPass.purchases or current.purchases,
 		entitlements = supporterPass.entitlements or current.entitlements,
 		armory = supporterPass.armory or current.armory,
-		loadout = supporterPass.loadout or current.loadout,
-		claimed_rewards = supporterPass.claimed_rewards or current.claimed_rewards,
+		loadout = loadout,
+		claimed_rewards = seasonStateAllowed
+			and (supporterPass.claimed_rewards or current.claimed_rewards)
+			or {},
 	}
 end
 
@@ -456,8 +557,15 @@ function SupporterPass:PublishPlayers()
 	local backendRewards = api and api.supporter_pass and api.supporter_pass.rewards or {}
 	local legacyFree = ItemsGame and ItemsGame.battlepass or {}
 	local legacyPremium = ItemsGame and ItemsGame.battlepass2 or {}
-	CustomNetTables:SetTableValue("supporter_pass_rewards_free", "rewards", MergeRewardTracks(legacyFree, backendRewards, "free"))
-	CustomNetTables:SetTableValue("supporter_pass_rewards_premium", "rewards", MergeRewardTracks(legacyPremium, backendRewards, "premium"))
+	local freeRewards = MergeRewardTracks(legacyFree, backendRewards, "free")
+	local premiumRewards = MergeRewardTracks(legacyPremium, backendRewards, "premium")
+	if SupporterPass2026 ~= nil and SupporterPass2026.PublishRewardTrack ~= nil then
+		SupporterPass2026:PublishRewardTrack("supporter_pass_rewards_free", freeRewards)
+		SupporterPass2026:PublishRewardTrack("supporter_pass_rewards_premium", premiumRewards)
+	else
+		CustomNetTables:SetTableValue("supporter_pass_rewards_free", "rewards", freeRewards)
+		CustomNetTables:SetTableValue("supporter_pass_rewards_premium", "rewards", premiumRewards)
+	end
 
 	for playerID = 0, PlayerResource:GetPlayerCount() - 1 do
 		self:PublishPlayer(playerID)

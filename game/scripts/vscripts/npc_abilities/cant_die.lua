@@ -236,6 +236,13 @@ function modifier_cant_die_generic:OnTakeDamage(event)
 			end
 
 			local bossConfig = XHS_BOSSES_TABLE[parent:GetUnitName()]
+			local cameraPosition = nil
+			if bossConfig.camera_focus_door ~= nil then
+				local cameraDoor = Entities:FindByName(nil, bossConfig.camera_focus_door)
+				if cameraDoor ~= nil and IsValidEntity(cameraDoor) then
+					cameraPosition = cameraDoor:GetAbsOrigin()
+				end
+			end
 			local function FinishBossDoorTransition()
 				StartAnimation(parent, XHS_BOSSES_TABLE[parent:GetUnitName()].death_animation)
 				EmitSoundOn("skeleton_king_wraith_death_long_09", parent)
@@ -251,6 +258,7 @@ function modifier_cant_die_generic:OnTakeDamage(event)
 						"gate_02_open",
 						FinishBossDoorTransition,
 						{
+							camera_position = cameraPosition,
 							move_duration = 1.35,
 							hold_duration = 1.25,
 							return_duration = 1.0,

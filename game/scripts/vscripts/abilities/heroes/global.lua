@@ -77,6 +77,10 @@ function CastleMuradin(event)
 	local timerName = "castle_muradin"
 
 	if caster:GetHealthPercent() <= Health then
+		if XHSMarkCastleMuradinTriggered ~= nil then
+			XHSMarkCastleMuradinTriggered(caster, Health)
+		end
+
 		PauseCreeps(PauseTime)
 
 		local Muradin = CreateUnitByName("npc_dota_creature_muradin_bronzebeard", waypoint_pos, false, nil, nil, DOTA_TEAM_GOODGUYS)

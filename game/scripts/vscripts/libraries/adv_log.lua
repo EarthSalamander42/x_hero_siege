@@ -261,23 +261,48 @@ if Log == nil then
 	-- Runs code in safe context: Catches exceptions
 	-- and logs errors
 	---------------------------------------------
-	function Log:ExecuteInSafeContext(fun, args)
+	function Log:ExecuteInSafeContext(fun, args, options)
 		if args == nil then args = {} end
+		options = type(options) == "table" and options or {}
 
 		local status, err = xpcall(fun, function(err)
 			if err == nil then
 				err = "Unknown Error"
 			end
+			local errorText = tostring(err)
+			local prefix = tostring(options.prefix or "")
+			if prefix ~= "" then errorText = prefix .. " " .. errorText end
 
-			-- dont filter errors
-			local levelString = self:_LevelToString(Log.Levels.ERROR)
+			if options.silent ~= true then
+				-- Do not filter safe-context errors, but never let a broken log
+				-- target replace the original exception.
+				local levelString = self:_LevelToString(Log.Levels.ERROR)
+				local trace = self:_GetStackTrace(4)
+				local delivered = false
 
-			for i = 1, #self.targets do
-				self.targets[i]:print(levelString, "Error occured while executing in safe context: " .. err, self:_GetStackTrace(4))
+				for i = 1, #self.targets do
+					local targetStatus = pcall(function()
+						self.targets[i]:print(
+							levelString,
+							"Error occurred while executing in safe context: " .. errorText,
+							trace
+						)
+					end)
+					delivered = delivered or targetStatus
+				end
+				if not delivered and NativePrint ~= nil then
+					NativePrint("[error][adv_log] " .. errorText)
+				end
 			end
 
-			-- ultimate debugging
-			GameRules:SendCustomMessage("Error: " .. err, 0, 0)
+			if options.notify ~= false
+				and GameRules ~= nil
+				and GameRules.SendCustomMessage ~= nil then
+				pcall(function()
+					GameRules:SendCustomMessage("Error: " .. errorText, 0, 0)
+				end)
+			end
+			return errorText
 		end, unpack(args))
 
 		return status, err

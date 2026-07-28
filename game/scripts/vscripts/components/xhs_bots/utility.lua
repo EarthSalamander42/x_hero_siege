@@ -1,0 +1,335 @@
+if XHSBotUtility == nil then
+	XHSBotUtility = {}
+end
+
+local function Clamp(value, minimum, maximum)
+	return math.max(minimum, math.min(maximum, value))
+end
+
+local function AddAction(actions, id, score, data, reason)
+	table.insert(actions, {
+		id = id,
+		score = Clamp(tonumber(score) or 0, 0, 200),
+		data = data or {},
+		reason = reason or "",
+	})
+end
+
+function XHSBotUtility:Sort(actions)
+	table.sort(actions, function(left, right)
+		if left.score == right.score then
+			local leftAbility = left.data and left.data.ability
+			local rightAbility = right.data and right.data.ability
+			local leftName = leftAbility and leftAbility:GetAbilityName() or ""
+			local rightName = rightAbility and rightAbility:GetAbilityName() or ""
+			return (left.id .. ":" .. leftName) < (right.id .. ":" .. rightName)
+		end
+		return left.score > right.score
+	end)
+	return actions
+end
+
+function XHSBotUtility:Build(context)
+	local actions = {}
+	if context.alive ~= true then
+		AddAction(actions, "dead", 200, {}, "hero is dead")
+		return actions
+	end
+
+	if context.disabled == true then
+		AddAction(actions, "wait", 200, {}, "hero cannot currently act")
+		return actions
+	end
+
+	if context.arena_combat == true then
+		-- Ramero/Baristol and Sogat are sealed fights: there is nowhere useful
+		-- to retreat or kite. Keep offensive/defensive spell use, but never let
+		-- generic danger, preferred-range repositioning, or anchor fallback
+		-- pull the bot out of the engagement.
+		for _, abilityAction in ipairs(context.ability_actions or {}) do
+			local score = tonumber(abilityAction.score) or 60
+			if abilityAction.is_heal == true
+				and context.health_ratio <= 0.48 then
+				score = math.max(score, 170)
+			elseif (abilityAction.mode == "self_defensive"
+				or abilityAction.mode == "defensive_toggle")
+				and context.health_ratio <= 0.58 then
+				score = math.max(score, 155)
+			end
+			AddAction(
+				actions,
+				"cast_ability",
+				score,
+				abilityAction,
+				"sealed arena combat; " .. tostring(abilityAction.reason or "profile ability")
+			)
+		end
+
+		if context.target ~= nil then
+			AddAction(
+				actions,
+				"attack_target",
+				135 + (context.target_priority or 0),
+				{
+					target = context.target,
+					maximum_distance = context.max_chase_distance,
+				},
+				"sealed arena: maintain strict boss focus"
+			)
+		else
+			AddAction(
+				actions,
+				"attack_move",
+				130,
+				{ position = context.anchor },
+				"sealed arena: advance and reacquire the priority boss"
+			)
+		end
+		return self:Sort(actions)
+	end
+
+	if context.encounter_mode == "muradin_survival" then
+		for _, abilityAction in ipairs(context.ability_actions or {}) do
+			if abilityAction.no_combat_safe == true then
+				local selfHeal = abilityAction.is_heal == true
+					and abilityAction.heals_self == true
+					and (tonumber(abilityAction.self_effective_heal_ratio) or 0) >= 0.04
+					and context.health_ratio <= math.max(
+						context.retreat_threshold or 0.25,
+						0.42
+					)
+				local allyHeal = abilityAction.is_heal == true
+					and (tonumber(abilityAction.effective_heal_ratio) or 0) >= 0.04
+					and (tonumber(abilityAction.heal_target_health_ratio) or 1) <= 0.32
+				local personalDefense = abilityAction.mode == "self_defensive"
+					or abilityAction.mode == "defensive_toggle"
+				if selfHeal or allyHeal or personalDefense then
+					AddAction(
+						actions,
+						"cast_ability",
+						selfHeal and 200 or allyHeal and 198 or 196,
+						abilityAction,
+						selfHeal and "emergency self-heal while escaping Muradin"
+							or allyHeal and "emergency ally heal without damaging Muradin"
+							or "personal defense without damaging Muradin"
+					)
+				end
+			end
+		end
+		if context.anchor_distance ~= nil
+			and context.anchor_distance > (context.encounter_reached_distance or 180) then
+			AddAction(
+				actions,
+				"move_to_objective",
+				194,
+				{ position = context.anchor },
+				"maximize distance from Muradin without attacking"
+			)
+		else
+			AddAction(actions, "hold", 80, {}, "remain far from Muradin")
+		end
+		return self:Sort(actions)
+	end
+
+	if (context.danger or 0) > 0 then
+		AddAction(
+			actions,
+			"evade_danger",
+			105 + context.danger * 65,
+			{
+				position = context.safe_position,
+				severity = context.danger,
+				interrupt_channel = context.danger >= (context.channel_interrupt_danger or 0.75),
+			},
+			"telegraphed danger"
+		)
+	end
+
+	if context.shopping == true then
+		for _, abilityAction in ipairs(context.ability_actions or {}) do
+			local emergencyShopHeal = abilityAction.is_heal == true
+				and abilityAction.heals_self == true
+				and (tonumber(abilityAction.self_effective_heal_ratio) or 0) >= 0.04
+				and context.health_ratio <= math.max(
+					context.retreat_threshold or 0.25,
+					0.40
+				)
+			if emergencyShopHeal then
+				local healScore = (context.danger or 0) >= 0.75 and 150 or 175
+				AddAction(
+					actions,
+					"cast_ability",
+					healScore,
+					abilityAction,
+					"emergency self-heal while returning to shop"
+				)
+			end
+		end
+		if context.anchor_distance ~= nil and context.anchor_distance > 180 then
+			AddAction(
+				actions,
+				"move_to_objective",
+				context.shopping_urgent == true and 158 or 132,
+				{ position = context.anchor },
+				context.shopping_urgent == true
+					and "emergency health potion restock"
+					or "travel to assigned shop"
+			)
+		else
+			AddAction(actions, "hold", 30, {}, "wait in shop range for purchase")
+		end
+		return self:Sort(actions)
+	end
+
+	local retreatThreshold = context.retreat_threshold or 0.25
+	local combatThreat = tonumber(context.combat_threat) or 0
+	local threatenedRetreat = combatThreat >= 1.05
+		and context.health_ratio <= math.min(0.52, retreatThreshold + 0.08)
+	local shouldRetreat = context.no_retreat ~= true
+		and context.last_stand ~= true
+		and (context.health_ratio <= retreatThreshold or threatenedRetreat)
+	if shouldRetreat then
+		local urgency = Clamp(
+			(retreatThreshold - context.health_ratio) / math.max(0.05, retreatThreshold)
+				+ combatThreat * 0.35
+				+ (tonumber(context.recent_damage_ratio) or 0) * 1.5,
+			0,
+			1.5
+		)
+		AddAction(
+			actions,
+			"retreat",
+			90 + urgency * 38 + math.min(28, combatThreat * 22),
+			{
+				position = context.retreat_position,
+				interrupt_channel = context.health_ratio <= retreatThreshold * 0.78
+					or combatThreat >= 1.05,
+			},
+			"survival threat="
+				.. tostring(math.floor(combatThreat * 100) / 100)
+				.. " cover=" .. tostring(context.retreat_cover or "none")
+		)
+	end
+
+	for _, abilityAction in ipairs(context.ability_actions or {}) do
+		local abilityScore = abilityAction.score
+			+ (context.last_stand == true and 35 or 0)
+		local abilityReason = abilityAction.reason or "profile ability"
+		if abilityAction.is_heal == true then
+			local selfSaveThreshold = math.min(
+				0.62,
+				math.max(retreatThreshold + 0.12, 0.40)
+			)
+			local selfHealUseful = abilityAction.heals_self == true
+				and (tonumber(abilityAction.self_effective_heal_ratio) or 0) >= 0.04
+			local selfEmergency = selfHealUseful
+				and context.health_ratio <= selfSaveThreshold
+			local targetRatio = tonumber(abilityAction.heal_target_health_ratio) or 1
+			local allyEmergency = (tonumber(abilityAction.effective_heal_ratio) or 0) >= 0.04
+				and targetRatio <= math.min(0.58, retreatThreshold + 0.18)
+			if selfEmergency then
+				local missingSeverity = Clamp(
+					(selfSaveThreshold - context.health_ratio) / math.max(0.10, selfSaveThreshold),
+					0,
+					1
+				)
+				abilityScore = math.max(
+					abilityScore,
+					152 + missingSeverity * 25
+						+ math.min(12, combatThreat * 8)
+						+ math.min(10, (tonumber(context.recent_damage_ratio) or 0) * 40)
+				)
+				abilityReason = "emergency self-heal before disengaging; " .. abilityReason
+			elseif allyEmergency then
+				abilityScore = math.max(
+					abilityScore,
+					138 + (0.58 - targetRatio) * 35
+				)
+				abilityReason = "rescue endangered ally; " .. abilityReason
+			end
+			if (context.danger or 0) >= 0.75 then
+				abilityScore = math.min(abilityScore, 150)
+				abilityReason = "evade lethal telegraph before healing; " .. abilityReason
+			end
+		end
+		AddAction(
+			actions,
+			"cast_ability",
+			abilityScore,
+			abilityAction,
+			abilityReason
+		)
+	end
+
+	if context.target ~= nil then
+		if context.too_close == true then
+			AddAction(
+				actions,
+				"reposition",
+				84,
+				{ position = context.reposition_position },
+				"maintain preferred range"
+			)
+		end
+
+		AddAction(
+			actions,
+			"attack_target",
+			66 + (context.target_priority or 0)
+				+ (context.last_stand == true and 45 or 0),
+			{
+				target = context.target,
+				maximum_distance = context.max_chase_distance,
+			},
+			context.last_stand == true
+				and "fight under Ancient or tower cover"
+				or "combat target available"
+		)
+	end
+
+	if context.target == nil and context.last_seen_position ~= nil then
+		AddAction(
+			actions,
+			"move_to_last_seen",
+			58,
+			{ position = context.last_seen_position },
+			"briefly inspect the target's last team-visible position"
+		)
+	end
+
+	if context.anchor_distance ~= nil and context.anchor_distance > 260 then
+		local movementScore = Clamp(
+			42 + context.anchor_distance / 100
+				+ (context.assignment_urgency or 0) * 12
+				+ (context.returning_to_lane == true and context.target == nil and 30 or 0),
+			42,
+			context.returning_to_lane == true and 108 or 78
+		)
+		if context.attack_move == true then
+			AddAction(
+				actions,
+				"attack_move",
+				movementScore,
+				{ position = context.anchor },
+				context.returning_to_lane == true
+					and "return to assigned lane while screening"
+					or "advance while screening the team objective"
+			)
+		else
+			AddAction(
+				actions,
+				"move_to_objective",
+				movementScore,
+				{ position = context.anchor },
+				context.returning_to_lane == true
+					and "return to assigned lane"
+					or "team assignment"
+			)
+		end
+	end
+
+	AddAction(actions, "hold", 8, {}, "no higher utility action")
+	return self:Sort(actions)
+end
+
+return XHSBotUtility

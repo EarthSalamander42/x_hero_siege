@@ -91,7 +91,7 @@ modifier_campfire_effect = class({})
 modifier_campfire_effect.XHS_LINK_CLIENT = true
 
 function modifier_campfire_effect:GetEffectName()
-	return "particles/camp_fire_buff.vpcf"
+	return "particles/custom/supporter_pass/regen_aura_anchor.vpcf"
 end
 
 function modifier_campfire_effect:OnCreated(kv)

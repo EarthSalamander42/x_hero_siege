@@ -6,8 +6,7 @@ local statue_slots = {}
 local COMPANION_SPAWN_UNIT = "npc_donator_companion"
 
 local function CompanionLog(message, ...)
-	local ok, formatted = pcall(string.format, tostring(message), ...)
-	print("[XHS Companion] " .. (ok and formatted or tostring(message)))
+	-- Intentionally silent: companion diagnostics must not spam the server.
 end
 
 local function IsTruthyKV(value)

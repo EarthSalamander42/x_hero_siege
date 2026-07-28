@@ -26,14 +26,16 @@ for _, ability_name in ipairs(PASSIVE_NAMES) do
 	end
 end
 
-LinkLuaModifier("modifier_xhs_creep_passive", "abilities/creeps/xhs_creep_passives.lua", LUA_MODIFIER_MOTION_NONE)
-LinkLuaModifier("modifier_xhs_creep_passive_slow", "abilities/creeps/xhs_creep_passives.lua", LUA_MODIFIER_MOTION_NONE)
-LinkLuaModifier("modifier_xhs_creep_passive_dot", "abilities/creeps/xhs_creep_passives.lua", LUA_MODIFIER_MOTION_NONE)
-LinkLuaModifier("modifier_xhs_creep_passive_armor_break", "abilities/creeps/xhs_creep_passives.lua", LUA_MODIFIER_MOTION_NONE)
-LinkLuaModifier("modifier_xhs_creep_passive_aura", "abilities/creeps/xhs_creep_passives.lua", LUA_MODIFIER_MOTION_NONE)
-LinkLuaModifier("modifier_xhs_creep_fury_swipes", "abilities/creeps/xhs_creep_passives.lua", LUA_MODIFIER_MOTION_NONE)
-LinkLuaModifier("modifier_xhs_creep_fury_swipes_debuff", "abilities/creeps/xhs_creep_passives.lua", LUA_MODIFIER_MOTION_NONE)
-LinkLuaModifier("modifier_xhs_creep_crushing_armor_sync", "abilities/creeps/xhs_creep_passives.lua", LUA_MODIFIER_MOTION_NONE)
+local MODIFIER_SCRIPT = "abilities/creeps/xhs_creep_passives.lua"
+
+LinkLuaModifier("modifier_xhs_creep_passive", MODIFIER_SCRIPT, LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_xhs_creep_passive_slow", MODIFIER_SCRIPT, LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_xhs_creep_passive_dot", MODIFIER_SCRIPT, LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_xhs_creep_passive_armor_break", MODIFIER_SCRIPT, LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_xhs_creep_passive_aura", MODIFIER_SCRIPT, LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_xhs_creep_fury_swipes", MODIFIER_SCRIPT, LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_xhs_creep_fury_swipes_debuff", MODIFIER_SCRIPT, LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_xhs_creep_crushing_armor_sync", MODIFIER_SCRIPT, LUA_MODIFIER_MOTION_NONE)
 
 local EFFECT_MODIFIERS = {
 	xhs_creep_frost_arrows = { slow = "modifier_xhs_creep_frost_arrows_debuff" },
@@ -47,6 +49,7 @@ local EFFECT_MODIFIERS = {
 	xhs_creep_cold_skin = { slow = "modifier_xhs_creep_cold_skin_debuff" },
 	xhs_creep_corrosive_scales = { armor = "modifier_xhs_creep_corrosive_scales_debuff" },
 	xhs_creep_untouchable = { slow = "modifier_xhs_creep_untouchable_debuff" },
+	xhs_creep_silencing_glaive = { silence = "modifier_xhs_creep_silencing_glaive_debuff" },
 	xhs_creep_toxic_flight = {
 		slow = "modifier_xhs_creep_toxic_flight_slow",
 		dot = "modifier_xhs_creep_toxic_flight_dot",
@@ -64,12 +67,159 @@ local EFFECT_MODIFIERS = {
 
 for _, modifier_names in pairs(EFFECT_MODIFIERS) do
 	for _, modifier_name in pairs(modifier_names) do
-		LinkLuaModifier(modifier_name, "abilities/creeps/xhs_creep_passives.lua", LUA_MODIFIER_MOTION_NONE)
+		LinkLuaModifier(modifier_name, MODIFIER_SCRIPT, LUA_MODIFIER_MOTION_NONE)
 	end
 end
 
 local function Special(ability, name)
 	return ability and ability:GetSpecialValueFor(name) or 0
+end
+
+local MOON_GLAIVE_PROJECTILE = "particles/units/heroes/hero_luna/luna_moon_glaive_bounce.vpcf"
+local MOON_GLAIVE_IMPACT_SOUND = "Hero_Luna.MoonGlaive.Impact"
+
+local function IsValidMoonGlaiveTarget(caster, target)
+	return caster ~= nil
+		and not caster:IsNull()
+		and target ~= nil
+		and not target:IsNull()
+		and target:IsAlive()
+		and not target:IsBuilding()
+		and target:GetTeamNumber() ~= caster:GetTeamNumber()
+end
+
+function xhs_creep_moon_glaive:LaunchGlaiveProjectile(source, target, chain_id, damage, bounces_remaining)
+	if not IsServer() or not IsValidMoonGlaiveTarget(self:GetCaster(), target) then
+		if self.xhs_glaive_chains ~= nil then
+			self.xhs_glaive_chains[chain_id] = nil
+		end
+		return
+	end
+	if source == nil or source:IsNull() then
+		source = self:GetCaster()
+	end
+
+	ProjectileManager:CreateTrackingProjectile({
+		Target = target,
+		Source = source,
+		Ability = self,
+		EffectName = MOON_GLAIVE_PROJECTILE,
+		iMoveSpeed = math.max(1, Special(self, "projectile_speed")),
+		iSourceAttachment = DOTA_PROJECTILE_ATTACHMENT_HITLOCATION,
+		vSourceLoc = source:GetAbsOrigin(),
+		bDodgeable = false,
+		bIsAttack = false,
+		bReplaceExisting = false,
+		bProvidesVision = false,
+		flExpireTime = GameRules:GetGameTime() + 5.0,
+		ExtraData = {
+			chain_id = chain_id,
+			damage = damage,
+			bounces_remaining = bounces_remaining,
+		},
+	})
+end
+
+function xhs_creep_moon_glaive:StartGlaiveChain(primary_target, primary_damage)
+	if not IsServer() or not IsValidMoonGlaiveTarget(self:GetCaster(), primary_target) then return end
+
+	local bounce_count = math.max(0, math.floor(Special(self, "bounces")))
+	if bounce_count <= 0 then return end
+
+	local caster = self:GetCaster()
+	local candidates = FindUnitsInRadius(
+		caster:GetTeamNumber(),
+		primary_target:GetAbsOrigin(),
+		nil,
+		Special(self, "bounce_range"),
+		DOTA_UNIT_TARGET_TEAM_ENEMY,
+		DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC,
+		DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES,
+		FIND_CLOSEST,
+		false
+	)
+
+	local first_target = nil
+	for _, candidate in ipairs(candidates) do
+		if candidate ~= primary_target and IsValidMoonGlaiveTarget(caster, candidate) then
+			first_target = candidate
+			break
+		end
+	end
+	if first_target == nil then return end
+
+	self.xhs_glaive_chain_id = (tonumber(self.xhs_glaive_chain_id) or 0) + 1
+	local chain_id = self.xhs_glaive_chain_id
+	self.xhs_glaive_chains = self.xhs_glaive_chains or {}
+	self.xhs_glaive_chains[chain_id] = {
+		hit = {
+			[primary_target:entindex()] = true,
+		},
+	}
+
+	local reduction = math.max(0, math.min(100, Special(self, "damage_reduction_pct"))) * 0.01
+	local first_damage = math.max(0, tonumber(primary_damage) or 0) * (1 - reduction)
+	self:LaunchGlaiveProjectile(primary_target, first_target, chain_id, first_damage, bounce_count)
+end
+
+function xhs_creep_moon_glaive:OnProjectileHit_ExtraData(target, location, extra_data)
+	if not IsServer() then return true end
+
+	extra_data = extra_data or {}
+	local chain_id = tonumber(extra_data.chain_id)
+	local chains = self.xhs_glaive_chains
+	local chain = chains and chain_id and chains[chain_id] or nil
+	local caster = self:GetCaster()
+	if chain == nil or not IsValidMoonGlaiveTarget(caster, target) then
+		if chains and chain_id then chains[chain_id] = nil end
+		return true
+	end
+
+	chain.hit[target:entindex()] = true
+	ApplyDamage({
+		victim = target,
+		attacker = caster,
+		ability = self,
+		damage = math.max(0, tonumber(extra_data.damage) or 0),
+		damage_type = DAMAGE_TYPE_PHYSICAL,
+		damage_flags = DOTA_DAMAGE_FLAG_NO_SPELL_AMPLIFICATION,
+	})
+	EmitSoundOn(MOON_GLAIVE_IMPACT_SOUND, target)
+
+	local bounces_remaining = math.max(0, math.floor(tonumber(extra_data.bounces_remaining) or 0))
+	if bounces_remaining <= 1 then
+		chains[chain_id] = nil
+		return true
+	end
+
+	local candidates = FindUnitsInRadius(
+		caster:GetTeamNumber(),
+		target:GetAbsOrigin(),
+		nil,
+		Special(self, "bounce_range"),
+		DOTA_UNIT_TARGET_TEAM_ENEMY,
+		DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC,
+		DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES,
+		FIND_CLOSEST,
+		false
+	)
+	local next_target = nil
+	for _, candidate in ipairs(candidates) do
+		if chain.hit[candidate:entindex()] ~= true and IsValidMoonGlaiveTarget(caster, candidate) then
+			next_target = candidate
+			break
+		end
+	end
+
+	if next_target == nil then
+		chains[chain_id] = nil
+		return true
+	end
+
+	local reduction = math.max(0, math.min(100, Special(self, "damage_reduction_pct"))) * 0.01
+	local next_damage = math.max(0, tonumber(extra_data.damage) or 0) * (1 - reduction)
+	self:LaunchGlaiveProjectile(target, next_target, chain_id, next_damage, bounces_remaining - 1)
+	return true
 end
 
 local function EffectModifierName(ability, effect, fallback)
@@ -295,6 +445,15 @@ function modifier_xhs_creep_passive:OnAttackLanded(params)
 	local ability = self:GetAbility()
 	local parent = self:GetParent()
 	local target = params.target
+	if ability:GetAbilityName() == "xhs_creep_moon_glaive" then
+		local attack_damage = math.max(0, tonumber(params.damage) or 0)
+		if parent.GetAttackDamage ~= nil then
+			attack_damage = math.max(attack_damage, tonumber(parent:GetAttackDamage()) or 0)
+		end
+		attack_damage = math.max(attack_damage, parent:GetAverageTrueAttackDamage(target))
+		ability:StartGlaiveChain(target, attack_damage)
+	end
+
 	local slow = Special(ability, "slow_pct")
 	if slow > 0 then
 		target:AddNewModifier(parent, ability, EffectModifierName(ability, "slow", "modifier_xhs_creep_passive_slow"), {
@@ -356,9 +515,11 @@ function modifier_xhs_creep_passive:OnAttackLanded(params)
 
 	local silence_chance = Special(ability, "silence_chance")
 	if silence_chance > 0 and ability:IsCooldownReady() and RollPseudoRandomPercentage(silence_chance, 1973, parent) then
-		target:AddNewModifier(parent, ability, "modifier_silence", { duration = Special(ability, "silence_duration") })
+		target:AddNewModifier(parent, ability, EffectModifierName(ability, "silence", "modifier_xhs_creep_silencing_glaive_debuff"), {
+			duration = Special(ability, "silence_duration"),
+		})
 		ability:StartCooldown(Special(ability, "proc_cooldown"))
-		PlayProcFeedback(parent, target, "particles/generic_gameplay/generic_silenced.vpcf", "Hero_Silencer.LastWord.Damage")
+		target:EmitSound("Hero_Silencer.LastWord.Damage")
 	end
 end
 
@@ -405,6 +566,24 @@ function modifier_xhs_creep_passive_slow:OnRefresh(kv) self:OnCreated(kv) end
 function modifier_xhs_creep_passive_slow:DeclareFunctions() return { MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE, MODIFIER_PROPERTY_ATTACKSPEED_BONUS_CONSTANT } end
 function modifier_xhs_creep_passive_slow:GetModifierMoveSpeedBonus_Percentage() return -self.slow end
 function modifier_xhs_creep_passive_slow:GetModifierAttackSpeedBonus_Constant() return -self.attack_slow end
+
+modifier_xhs_creep_silencing_glaive_debuff = modifier_xhs_creep_silencing_glaive_debuff or class({})
+modifier_xhs_creep_silencing_glaive_debuff.XHS_LINK_CLIENT = true
+function modifier_xhs_creep_silencing_glaive_debuff:IsHidden() return true end
+function modifier_xhs_creep_silencing_glaive_debuff:IsDebuff() return true end
+function modifier_xhs_creep_silencing_glaive_debuff:IsPurgable() return true end
+function modifier_xhs_creep_silencing_glaive_debuff:GetTexture() return AbilityTexture(self) end
+function modifier_xhs_creep_silencing_glaive_debuff:GetEffectName()
+	return "particles/generic_gameplay/generic_silenced.vpcf"
+end
+function modifier_xhs_creep_silencing_glaive_debuff:GetEffectAttachType()
+	return PATTACH_OVERHEAD_FOLLOW
+end
+function modifier_xhs_creep_silencing_glaive_debuff:CheckState()
+	return {
+		[MODIFIER_STATE_SILENCED] = true,
+	}
+end
 
 modifier_xhs_creep_passive_dot = modifier_xhs_creep_passive_dot or class({})
 modifier_xhs_creep_passive_dot.XHS_LINK_CLIENT = true
@@ -471,11 +650,29 @@ function modifier_xhs_creep_crushing_armor_debuff:HandleCustomTransmitterData(da
 	self.armor_per_stack = tonumber(data.armor_per_stack) or 0.01
 end
 function modifier_xhs_creep_crushing_armor_debuff:GetAppliedArmorReduction()
-	local sync_modifier = self:GetParent():FindModifierByName("modifier_xhs_creep_crushing_armor_sync")
-	if sync_modifier ~= nil then
-		return sync_modifier:GetAppliedArmorReduction()
+	-- The visible modifier owns the exact transmitted float. A freshly
+	-- replicated hidden sync modifier can temporarily exist with 0 stacks; it
+	-- must not mask the already valid tooltip value.
+	local transmitted_reduction = math.max(0, tonumber(self.armor_reduction) or tonumber(self.armor) or 0)
+	if transmitted_reduction > 0 then
+		return transmitted_reduction
 	end
-	return math.max(0, tonumber(self.armor_reduction) or tonumber(self.armor) or 0)
+
+	local synced_reduction = 0
+	for _, sync_modifier in pairs(self:GetParent():FindAllModifiersByName("modifier_xhs_creep_crushing_armor_sync")) do
+		synced_reduction = math.max(synced_reduction, sync_modifier:GetAppliedArmorReduction())
+	end
+	if synced_reduction > 0 then
+		return synced_reduction
+	end
+
+	-- Last-resort client fallback. The visible stack count is replicated even
+	-- on builds where custom transmitter data arrives a frame late.
+	local armor_per_stack = Special(self:GetAbility(), "armor_reduction")
+	if armor_per_stack <= 0 then
+		armor_per_stack = math.max(0, tonumber(self.armor_per_stack) or 0)
+	end
+	return math.max(0, self:GetStackCount()) * armor_per_stack
 end
 function modifier_xhs_creep_crushing_armor_debuff:SetAppliedArmorReduction(reduction, armor_per_stack)
 	if not IsServer() then return end
@@ -502,6 +699,7 @@ function modifier_xhs_creep_crushing_armor_debuff:SetAppliedArmorReduction(reduc
 	end
 	self:SetStackCount(stacks)
 	self:SendBuffRefreshToClients()
+	self:GetParent():CalculateStatBonus(true)
 end
 function modifier_xhs_creep_crushing_armor_debuff:OnIntervalThink()
 	local parent = self:GetParent()
@@ -566,6 +764,7 @@ end
 
 local EFFECT_BASE_CLASSES = {
 	slow = modifier_xhs_creep_passive_slow,
+	silence = modifier_xhs_creep_silencing_glaive_debuff,
 	dot = modifier_xhs_creep_passive_dot,
 	armor = modifier_xhs_creep_passive_armor_break,
 	aura = modifier_xhs_creep_passive_aura,
@@ -573,7 +772,12 @@ local EFFECT_BASE_CLASSES = {
 
 for _, modifier_names in pairs(EFFECT_MODIFIERS) do
 	for effect, modifier_name in pairs(modifier_names) do
-		_G[modifier_name] = _G[modifier_name] or class(EFFECT_BASE_CLASSES[effect])
+		local base_class = EFFECT_BASE_CLASSES[effect]
+		if _G[modifier_name] == nil then
+			assert(type(base_class) == "table", "Missing creep effect base class: " .. tostring(effect))
+			_G[modifier_name] = class({}, nil, base_class)
+		end
+		_G[modifier_name].XHS_LINK_CLIENT = true
 	end
 end
 

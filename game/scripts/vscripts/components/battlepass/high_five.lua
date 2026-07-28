@@ -401,8 +401,14 @@ function SupporterHighFive:GetEquippedItem(playerID)
 		MergeMissing(item, FindCatalogItem(api.supporter_pass.rewards, itemID, 0))
 	end
 	if CustomNetTables ~= nil then
-		local free = CustomNetTables:GetTableValue("supporter_pass_rewards_free", "rewards")
-		local premium = CustomNetTables:GetTableValue("supporter_pass_rewards_premium", "rewards")
+		local free = SupporterPass2026 ~= nil
+			and SupporterPass2026.GetPublishedTrack ~= nil
+			and SupporterPass2026:GetPublishedTrack("supporter_pass_rewards_free")
+			or CustomNetTables:GetTableValue("supporter_pass_rewards_free", "rewards")
+		local premium = SupporterPass2026 ~= nil
+			and SupporterPass2026.GetPublishedTrack ~= nil
+			and SupporterPass2026:GetPublishedTrack("supporter_pass_rewards_premium")
+			or CustomNetTables:GetTableValue("supporter_pass_rewards_premium", "rewards")
 		MergeMissing(item, FindCatalogItem(free, itemID, 0))
 		MergeMissing(item, FindCatalogItem(premium, itemID, 0))
 	end

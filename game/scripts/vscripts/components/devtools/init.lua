@@ -2,6 +2,8 @@ if XHSDevTools == nil then
 	_G.XHSDevTools = class({})
 end
 
+require("components/devtools/lag_lab")
+
 local QUEST_ORDER = {
 	"defend_castle",
 	"kill_rax",
@@ -91,14 +93,257 @@ local function ToNumber(value, fallback)
 	return number
 end
 
+local PERFORMANCE_UPDATE_INTERVAL = 1.0
+local CLIENT_FPS_TIMEOUT = 5.0
+local PERFORMANCE_BREAKABLES = {
+	npc_dota_crate = true,
+	npc_dota_chest = true,
+	npc_dota_vase = true,
+}
+
+local function IsPerformanceDummy(unit, unitName)
+	return unit.is_fake_hero == true
+		or string.find(unitName or "", "dummy", 1, true) ~= nil
+end
+
+function XHSDevTools:ResolveEventPlayerID(sourceIndex)
+	local playerID = nil
+	if CustomGameEventManager ~= nil
+		and CustomGameEventManager.GetPlayerIDFromEventSourceIndex ~= nil then
+		local ok, resolvedPlayerID = pcall(function()
+			return CustomGameEventManager:GetPlayerIDFromEventSourceIndex(sourceIndex)
+		end)
+		if ok then
+			playerID = tonumber(resolvedPlayerID)
+		end
+	end
+
+	if playerID == nil or not PlayerResource:IsValidPlayerID(playerID) then
+		local numericSourceIndex = tonumber(sourceIndex)
+		if numericSourceIndex ~= nil and numericSourceIndex > 0 then
+			local ok, resolvedPlayerID = pcall(function()
+				local sender = EntIndexToHScript(numericSourceIndex)
+				return sender ~= nil and sender.GetPlayerID ~= nil and sender:GetPlayerID() or nil
+			end)
+			if ok then
+				playerID = tonumber(resolvedPlayerID)
+			end
+		end
+	end
+
+	if playerID == nil or not PlayerResource:IsValidPlayerID(playerID) then return nil end
+	if PlayerResource.IsFakeClient ~= nil and PlayerResource:IsFakeClient(playerID) then return nil end
+	return playerID
+end
+
+function XHSDevTools:IsPerformanceViewer(playerID)
+	if IsInToolsMode() then return true end
+	if playerID == nil
+		or PlayerResource == nil
+		or not PlayerResource:IsValidPlayerID(playerID)
+		or PlayerResource.IsFakeClient ~= nil and PlayerResource:IsFakeClient(playerID)
+		or api == nil
+		or api.GetDonatorStatus == nil then
+		return false
+	end
+
+	local status = tonumber(api:GetDonatorStatus(playerID)) or 0
+	return status == 1 or status == 2
+end
+
+function XHSDevTools:HasPerformanceViewer()
+	if IsInToolsMode() then return true end
+	local maxPlayers = DOTA_MAX_TEAM_PLAYERS or 24
+	for playerID = 0, maxPlayers - 1 do
+		if self:IsPerformanceViewer(playerID) then
+			return true
+		end
+	end
+	return false
+end
+
+function XHSDevTools:OnClientFPS(sourceIndex, event)
+	if not self:HasPerformanceViewer() then return end
+
+	local playerID = self:ResolveEventPlayerID(sourceIndex)
+	local fps = event and tonumber(event.fps) or nil
+	if playerID == nil
+		or fps == nil
+		or fps ~= fps then
+		return
+	end
+
+	self.client_fps = self.client_fps or {}
+	self.client_fps[playerID] = {
+		fps = math.max(0, math.min(500, fps)),
+		updated_at = Time ~= nil and Time() or GameRules:GetGameTime(),
+	}
+end
+
+function XHSDevTools:RegisterPerformanceListeners()
+	if self.client_fps_listener_registered == true then return end
+	if CustomGameEventManager == nil then return end
+
+	self.client_fps_listener_registered = true
+	CustomGameEventManager:RegisterListener("xhs_devtools_client_fps", function(sourceIndex, event)
+		return XHSDevTools:OnClientFPS(sourceIndex, event)
+	end)
+end
+
+function XHSDevTools:BuildClientFPSState()
+	local players = {}
+	local now = Time ~= nil and Time() or GameRules:GetGameTime()
+	local maxPlayers = DOTA_MAX_TEAM_PLAYERS or 24
+
+	for playerID = 0, maxPlayers - 1 do
+		local isValid = PlayerResource:IsValidPlayerID(playerID)
+		local isHuman = isValid
+			and (PlayerResource.IsFakeClient == nil or not PlayerResource:IsFakeClient(playerID))
+		local player = isHuman and PlayerResource:GetPlayer(playerID) or nil
+		local hasPlayerHandle = player ~= nil
+			and (player.IsNull == nil or not player:IsNull())
+		local isPresent = isHuman and (
+			hasPlayerHandle
+			or PlayerResource:GetConnectionState(playerID) == DOTA_CONNECTION_STATE_CONNECTED
+		)
+
+		if isPresent then
+			local record = self.client_fps and self.client_fps[playerID] or nil
+			local isFresh = record ~= nil
+				and now - (tonumber(record.updated_at) or -999) <= CLIENT_FPS_TIMEOUT
+			players[tostring(playerID)] = {
+				player_id = playerID,
+				name = PlayerResource:GetPlayerName(playerID) or ("Player " .. tostring(playerID + 1)),
+				fps = isFresh and math.floor((tonumber(record.fps) or 0) + 0.5) or -1,
+			}
+		end
+	end
+
+	return players
+end
+
+function XHSDevTools:BuildPerformanceState()
+	local startedAt = Time ~= nil and Time() or 0
+	local snapshot = {
+		creeps = 0,
+		total_units = 0,
+		ai_controllers = 0,
+		wave_controllers = 0,
+		ability_controllers = 0,
+		heroes = 0,
+		bosses = 0,
+		summons = 0,
+		breakables = 0,
+		other_units = 0,
+		thinkers = 0,
+		frame_ms = math.max(0, FrameTime() * 1000 / math.max(0.01, self.host_timescale or 1)),
+		scan_ms = 0,
+		players = self:BuildClientFPSState(),
+	}
+
+	local units = XHSPerformanceCounters:FindUnitsInRadiusUntracked(
+		DOTA_TEAM_NEUTRALS,
+		Vector(0, 0, 0),
+		nil,
+		FIND_UNITS_EVERYWHERE,
+		DOTA_UNIT_TARGET_TEAM_BOTH,
+		DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC,
+		DOTA_UNIT_TARGET_FLAG_INVULNERABLE,
+		FIND_ANY_ORDER,
+		false
+	)
+
+	for _, unit in pairs(units) do
+		if unit ~= nil and not unit:IsNull() and unit:IsAlive() then
+			local unitName = unit:GetUnitName() or ""
+			local isDummy = IsPerformanceDummy(unit, unitName)
+			local isRune = IsXHSRuneUnit ~= nil and IsXHSRuneUnit(unit)
+
+			snapshot.total_units = snapshot.total_units + 1
+			if unit:HasModifier("modifier_ai") then
+				snapshot.ai_controllers = snapshot.ai_controllers + 1
+			end
+			if unit.xhs_wave_order_controller == true then
+				snapshot.wave_controllers = snapshot.wave_controllers + 1
+			end
+			if unit.xhs_destroyer_ability_ai_started == true then
+				snapshot.ability_controllers = snapshot.ability_controllers + 1
+			end
+
+			if isDummy or isRune then
+				snapshot.other_units = snapshot.other_units + 1
+			elseif BOSS_UNIT_NAMES[unitName] == true or unit.Boss == true then
+				snapshot.bosses = snapshot.bosses + 1
+			elseif unit:IsRealHero() and not unit:IsIllusion() then
+				snapshot.heroes = snapshot.heroes + 1
+			elseif PERFORMANCE_BREAKABLES[unitName] == true then
+				snapshot.breakables = snapshot.breakables + 1
+			elseif unit.IsSummoned ~= nil and unit:IsSummoned() then
+				snapshot.summons = snapshot.summons + 1
+			elseif unit:GetTeamNumber() ~= DOTA_TEAM_GOODGUYS
+				and ((unit.IsCreep ~= nil and unit:IsCreep()) or (unit.IsCreature ~= nil and unit:IsCreature())) then
+				snapshot.creeps = snapshot.creeps + 1
+			else
+				snapshot.other_units = snapshot.other_units + 1
+			end
+		end
+	end
+
+	local thinkers = Entities:FindAllByClassname("npc_dota_thinker")
+	snapshot.thinkers = thinkers and #thinkers or 0
+	snapshot.ai_ticks_per_second = snapshot.ai_controllers
+	snapshot.wave_checks_per_second = snapshot.wave_controllers * 4
+	snapshot.ability_checks_per_second = snapshot.ability_controllers * 4
+	snapshot.activity = XHSPerformanceCounters ~= nil
+		and XHSPerformanceCounters.GetSnapshot ~= nil
+		and XHSPerformanceCounters:GetSnapshot()
+		or {}
+
+	if Time ~= nil then
+		snapshot.scan_ms = math.max(0, (Time() - startedAt) * 1000)
+	end
+
+	return snapshot
+end
+
+function XHSDevTools:PublishPerformanceState()
+	if CustomNetTables == nil or not self:HasPerformanceViewer() then return end
+	CustomNetTables:SetTableValue("xhs_devtools", "performance", self:BuildPerformanceState())
+end
+
+function XHSDevTools:StartPerformanceMonitor()
+	if self.performance_monitor_started == true then return end
+
+	self.performance_monitor_started = true
+	self.next_performance_update_at = 0
+	GameRules:GetGameModeEntity():SetContextThink("XHSDevToolsPerformanceMonitor", function()
+		if GameRules:State_Get() >= DOTA_GAMERULES_STATE_POST_GAME then
+			self.performance_monitor_started = false
+			return nil
+		end
+
+		local now = Time ~= nil and Time() or GameRules:GetGameTime()
+		if now >= (self.next_performance_update_at or 0) then
+			self.next_performance_update_at = now + PERFORMANCE_UPDATE_INTERVAL
+			self:PublishPerformanceState()
+		end
+		return 0.1
+	end, 0.1)
+end
+
 function XHSDevTools:Init()
+	self.enabled = IsInToolsMode()
+	self.client_fps = self.client_fps or {}
+	self:RegisterPerformanceListeners()
+	XHSLagLab:Init()
+
 	if self.initialized == true then
+		self:StartPerformanceMonitor()
 		self:PushState()
 		return
 	end
 
 	self.initialized = true
-	self.enabled = IsInToolsMode()
 	self.sandbox_active = false
 	self.spawned_units = {}
 	self.invulnerable_players = false
@@ -119,6 +364,7 @@ function XHSDevTools:Init()
 		return XHSDevTools:OnRunAction(...)
 	end)
 
+	self:StartPerformanceMonitor()
 	self:PushState()
 end
 
@@ -341,9 +587,32 @@ function XHSDevTools:RunAction(action, event)
 		local ok, result = XHSBots:RunScenario(event.scenario)
 		if not ok then error(result) end
 		return result
+	elseif action == "lag_lab_ping" then
+		if XHSLagLab == nil or XHSLagLab.Init == nil then
+			error("Lag Lab server module is unavailable; reload scripts or start a new Tools match")
+		end
+		XHSLagLab:Init()
+		return "Lag Lab server OK (" .. tostring(XHSLagLab.state and XHSLagLab.state.stage or "idle") .. ")"
+	elseif action == "lag_lab_start" then
+		if XHSLagLab == nil or XHSLagLab.Init == nil then
+			error("Lag Lab server module is unavailable; reload scripts or start a new Tools match")
+		end
+		XHSLagLab:Init()
+		return XHSLagLab:Start(
+			tostring(event.experiment or ""),
+			event.source,
+			IsTruthy(event.keep_active)
+		)
+	elseif action == "lag_lab_restore" then
+		if XHSLagLab == nil or XHSLagLab.Restore == nil then
+			error("Lag Lab server module is unavailable; reload scripts or start a new Tools match")
+		end
+		return XHSLagLab:Restore("manual")
 	elseif action == "cleanup" then
+		XHSLagLab:Restore("cleanup")
 		return self:Cleanup()
 	elseif action == "reset_sandbox" then
+		XHSLagLab:Restore("reset")
 		self:Cleanup()
 		self:SetSandboxActive(false)
 		return "Sandbox reset"
@@ -804,11 +1073,19 @@ function XHSDevTools:PreviewVipDialog(event)
 	local mode = string.lower(tostring(event.mode or "ready"))
 	local ready = mode ~= "next"
 	local playerCount = math.max(1, math.min(8, ToNumber(event.player_count, 1)))
-	local speakerUnit = event.speaker == "uther" and "npc_xhs_paladin_2" or "npc_xhs_paladin"
-	local speakerName = event.speaker == "uther" and "UTHER LIGHTBRINGER" or "SHAL LIGHTBINDER"
-	local text = ready
-		and "The Light answers. When every hero is prepared, I will begin the teleport."
-		or "While I was bound, I felt the enemy gathering beyond the gates. The siege was only their first test."
+	local isUther = event.speaker == "uther"
+	local speakerUnit = isUther and "npc_xhs_paladin_2" or "npc_xhs_paladin"
+	local speakerName = isUther and "UTHER LIGHTBRINGER" or "SHAL LIGHTBINDER"
+	local text
+	if isUther then
+		text = ready
+			and "Stand together. When every hero is ready, we face Arthas - and end this."
+			or "The road to the Frozen Throne lies open. Beyond this passage, Arthas awaits - and the reckoning I have dreaded since Lordaeron fell."
+	else
+		text = ready
+			and "The way is open. Give the word, and the Light will carry us into their realm - straight to the source of this invasion."
+			or "While I was bound, I felt the enemy gathering beyond the gates. The siege was only their first test."
+	end
 
 	CustomGameEventManager:Send_ServerToPlayer(player, "dialog", {
 		DevPreview = 1,

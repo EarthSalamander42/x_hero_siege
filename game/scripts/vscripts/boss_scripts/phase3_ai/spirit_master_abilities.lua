@@ -557,6 +557,7 @@ function xhs_spirit_storm_static_orbs:OnAbilityPhaseStart()
 	local caster = self:GetCaster()
 	local center = GetContext(self).position or caster:GetAbsOrigin()
 	caster:EmitSound("Hero_StormSpirit.StaticRemnantPlant")
+	XHSBossTelegraphs:Target(center, self:GetSpecialValueFor("radius"), self:GetCastPoint(), COLORS.storm)
 	XHSBossTelegraphs:Ring(center, self:GetSpecialValueFor("ring_radius"), self:GetSpecialValueFor("radius"), self:GetSpecialValueFor("orb_count"), self:GetCastPoint(), COLORS.storm, 15)
 	if GetRoundSpecialValue(self, "ring_count") >= 2 then
 		XHSBossTelegraphs:Ring(center, self:GetSpecialValueFor("ring_radius") * self:GetSpecialValueFor("inner_radius_pct") * 0.01, self:GetSpecialValueFor("radius"), self:GetSpecialValueFor("inner_orb_count"), self:GetCastPoint(), COLORS.storm, 0)
@@ -580,14 +581,19 @@ function xhs_spirit_storm_static_orbs:OnSpellStart()
 			offset = 0,
 		})
 	end
+	local function DetonateOrb(position)
+		DamageEnemies(caster, self, position, self:GetSpecialValueFor("radius"), ScaleDamage(self:GetSpecialValueFor("damage")), self:GetAbilityDamageType(), function(enemy)
+			enemy:AddNewModifier(caster, self, "modifier_stunned", { duration = self:GetSpecialValueFor("stun_duration") })
+		end)
+		CreateStaticRemnantImpact(caster, position, SHORT_IMPACT_DURATION)
+		EmitSoundOnLocationWithCaster(position, "Hero_StormSpirit.StaticRemnantExplode", caster)
+	end
+
+	DetonateOrb(center)
 	for _, ring in ipairs(rings) do
 		for i = 1, ring.count do
 			local pos = RotatePosition(center, QAngle(0, ((i - 1) / ring.count) * 360 + ring.offset, 0), center + Vector(ring.radius, 0, 0))
-			DamageEnemies(caster, self, pos, self:GetSpecialValueFor("radius"), ScaleDamage(self:GetSpecialValueFor("damage")), self:GetAbilityDamageType(), function(enemy)
-				enemy:AddNewModifier(caster, self, "modifier_stunned", { duration = self:GetSpecialValueFor("stun_duration") })
-			end)
-			CreateStaticRemnantImpact(caster, pos, SHORT_IMPACT_DURATION)
-			EmitSoundOnLocationWithCaster(pos, "Hero_StormSpirit.StaticRemnantExplode", caster)
+			DetonateOrb(pos)
 		end
 	end
 	ClearContext(self)

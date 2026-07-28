@@ -121,7 +121,7 @@ function modifier_rejuvenation:OnIntervalThink()
 end
 
 function modifier_rejuvenation:GetEffectName()
-	return "particles/econ/events/ti6/bottle_ti6.vpcf"
+	return "particles/custom/supporter_pass/regen_aura_anchor.vpcf"
 end
 
 function modifier_rejuvenation:GetEffectAttachType()

@@ -1062,6 +1062,7 @@ local function CanQuestCountKilledUnit(quest, killedUnit)
 		return CustomTimers ~= nil
 			and CustomTimers.final_wave_kill_counting == true
 			and killedUnit.xhs_final_wave_unit == true
+			and killedUnit.xhs_final_wave_illusion ~= true
 	end
 
 	if quest.szQuestName == "clear_grom_vanguard" then
@@ -1641,9 +1642,14 @@ function CDungeonZone:CheckForZoneComplete()
 			local nTotalData4 = bit.lshift(nTotalDamage / 1000000, 16) + bit.band(nTotalHealing / 1000000, 0xFFFF)
 			local nTotalData5 = bit.lshift(nTotalPlayerDeaths[0], 24) + bit.lshift(nTotalPlayerDeaths[1], 16) + bit.lshift(nTotalPlayerDeaths[2], 8) + nTotalPlayerDeaths[3]
 
-			if api ~= nil and api.HasXHSBotParticipants ~= nil and api:HasXHSBotParticipants() then
-				print("XHS bots: skipped event leaderboard persistence for this session.")
-			else
+			local hasXHSBotSession = false
+			if api ~= nil and api.HasXHSBotSession ~= nil then
+				hasXHSBotSession = api:HasXHSBotSession()
+			elseif api ~= nil and api.HasXHSBotParticipants ~= nil then
+				hasXHSBotSession = api:HasXHSBotParticipants()
+			end
+
+			if not hasXHSBotSession then
 				GameRules:AddEventMetadataLeaderboardEntry("total", nTotalTime, nTotalStars, nMaxTotalStars, nTotalData1, nTotalData2, nTotalData3, nTotalData4, nTotalData5)
 			end
 		end

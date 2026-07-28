@@ -19,9 +19,7 @@ local COMPANION_MAX_HIDE_DURATION = 4.5
 local COMPANION_HIDE_COOLDOWN = 6.0
 
 local function CompanionModifierLog(parent, message, ...)
-	local entindex = parent ~= nil and not parent:IsNull() and parent:entindex() or -1
-	local ok, formatted = pcall(string.format, tostring(message), ...)
-	print(string.format("[XHS Companion] modifier ent=%s %s", tostring(entindex), ok and formatted or tostring(message)))
+	-- Intentionally silent: companion state changes are expected gameplay.
 end
 
 function modifier_companion:IsHidden() return true end
@@ -105,10 +103,6 @@ function modifier_companion:OnCreated()
 
 		if not self:GetParent().base_model then
 			self:GetParent().base_model = self:GetParent():GetModelName()
-		end
-
-		if not self:GetParent():HasModifier("modifier_bloodseeker_thirst") then
-			self:GetParent():AddNewModifier(self:GetParent(), nil, "modifier_bloodseeker_thirst", {})
 		end
 
 		self:GetParent():SetMoveCapability(DOTA_UNIT_CAP_MOVE_GROUND)

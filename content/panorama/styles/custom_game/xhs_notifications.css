@@ -1344,7 +1344,9 @@
 	background-color: gradient( radial, 50% 50%, 0% 0%, 50% 50%, from( #5ad0ff09 ), color-stop( .38, #12344a14 ), color-stop( .72, #02081166 ), to( #00000000 ) );
 	box-shadow: inset #020914b8 0px 0px 15px 0px, inset #5ad0ff09 0px 0px 16px 0px, #5ad0ff09 0px 0px 9px 0px;
 	transform: scaleX( 1 ) scaleY( 1 );
-	transition-property: clip, transform, opacity, background-color, box-shadow;
+	/* The radial clip is updated continuously in JavaScript. Transitioning it
+	   here restarts interpolation on every update and causes visible resets. */
+	transition-property: transform, opacity, background-color, box-shadow;
 	transition-duration: .18s;
 	transition-timing-function: ease-out;
 }

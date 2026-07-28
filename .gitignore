@@ -23,7 +23,6 @@
 game/scripts/vscripts/components/api/backend_key.kv
 *.vmap
 game/scripts/vscripts/components/api/.gitattributes
-game/scripts/vscripts/components/xhs_bots/
 *.sqlite3-wal
 *.sqlite3
 *.sqlite3-shm
@@ -37,3 +36,7 @@ game/scripts/vscripts/components/xhs_bots/
 tmp/*
 patch_notes/*
 patch_notes_*.txt
+
+# Private XHS documentation and audit exception registry live in ../xhs_ai.
+/docs/
+/exceptions.txt

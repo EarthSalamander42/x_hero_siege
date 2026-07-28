@@ -23,10 +23,19 @@ ListenToGameEvent('game_rules_state_change', function(keys)
 		require('components/battlepass/constants')
 		require('components/battlepass/util')
 		require('components/battlepass/supporter_pass')
+		require('components/battlepass/supporter_pass_2026')
+		require('components/battlepass/regen_aura')
+		require('components/battlepass/recovery_effects')
+		require('components/battlepass/immolation')
+		require('components/battlepass/high_five')
 		require('components/battlepass/donator')
 		require('components/battlepass/experience')
 		require('libraries/wearables') -- this lib before items_game
 		require('components/battlepass/keyvalues/items_game')
+
+		if SupporterPass2026 and SupporterPass2026.Init then
+			SupporterPass2026:Init()
+		end
 
 		if CUSTOM_GAME_TYPE ~= "PLS" then
 			require('components/battlepass/' .. CUSTOM_GAME_TYPE .. '_rewards')

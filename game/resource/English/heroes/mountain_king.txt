@@ -17,6 +17,12 @@
 "DOTA_Tooltip_ability_holdout_muradin_hammer_lifesteal_radius"		"RADIUS:"
 "DOTA_Tooltip_ability_holdout_muradin_hammer_lifesteal_pct"			"%LIFESTEAL:"
 
+"DOTA_Tooltip_ability_xhs_mountain_king_bash"						"Bash of the Deep"
+"DOTA_Tooltip_ability_xhs_mountain_king_bash_Description"			"Every %attack_count% attacks deal %bonus_damage% bonus physical damage. Non-boss enemies are stunned for %duration% seconds; bosses take the bonus damage but cannot be stunned."
+"DOTA_Tooltip_ability_xhs_mountain_king_bash_bonus_damage"			"BONUS DAMAGE:"
+"DOTA_Tooltip_ability_xhs_mountain_king_bash_duration"				"STUN DURATION:"
+"DOTA_Tooltip_ability_xhs_mountain_king_bash_attack_count"			"ATTACKS TO BASH:"
+
 "DOTA_Tooltip_ability_holdout_thunder_spirit"							"Thunder Spirit"
 "DOTA_Tooltip_ability_holdout_thunder_spirit_Description"				"Increases the hero's movement speed to the maximum."
 "DOTA_Tooltip_ability_holdout_thunder_spirit_bonus_movement_speed"		"BONUS MOVEMENT SPEED:"

@@ -1,29 +1,99 @@
+local function PublishAllPlayersBattlepassLoaded()
+	CustomGameEventManager:Send_ServerToAllClients("all_players_battlepass_loaded", {})
+end
+
+local function CompleteApiSetupWithoutBackend(reason)
+	-- A Tools bot session is intentionally local-only. Initializing empty API
+	-- state prevents the battlepass retry loop from waiting forever while
+	-- avoiding a game-register row that would never receive game-complete.
+	api.game_id = nil
+	api.players = {}
+	api.companions = {}
+	api.emblems = {}
+	api.effigies = {}
+	api.disabled_heroes = {}
+	api.supporter_pass = {}
+	api.custom_polls = {}
+	api.xhs_bot_session_backend_disabled = true
+
+	CustomNetTables:SetTableValue("supporter_pass_player", "companions", {})
+	CustomNetTables:SetTableValue("supporter_pass_player", "emblems", {})
+	CustomNetTables:SetTableValue("supporter_pass_player", "effigies", {})
+
+	if SupporterPass and SupporterPass.PublishPlayers then
+		SupporterPass:PublishPlayers()
+	end
+	if CustomPolls and CustomPolls.SetBackendPayload then
+		CustomPolls:SetBackendPayload({})
+	end
+
+	print("game-register: skipped for local XHS bot session (" .. tostring(reason or "bot_configured") .. ").")
+	PublishAllPlayersBattlepassLoaded()
+end
+
+local function RegisterGameAndLoadArmories()
+	api:RegisterGame(function(data)
+		print("Register game...")
+		for k, _ in pairs(data and data.players or {}) do
+			local payload = {
+				steamid = tostring(k),
+			}
+
+			api:Request("armory", function(armoryData)
+				if api.players[k] then
+					api.players[k]["armory"] = armoryData
+				end
+			end, nil, "POST", payload)
+		end
+
+		if CUSTOM_GAME_TYPE == "PLS" then
+			api:GenerateGameModeLeaderboard()
+		end
+
+		print("ALL PLAYERS LOADED IN!")
+		PublishAllPlayersBattlepassLoaded()
+	end)
+end
+
+local function RegisterOrSkipAfterBotConfiguration()
+	-- Production and Tools launches without the private package keep the
+	-- original eager registration behavior.
+	if not IsInToolsMode() or XHSBots == nil or XHSBots.enabled ~= true then
+		RegisterGameAndLoadArmories()
+		return
+	end
+
+	-- The loading-screen choice is still mutable when CUSTOM_GAME_SETUP first
+	-- begins. Wait until XHSBots locks it in BeforeCustomSetupFinish; if an
+	-- external launch bypasses that hook, leaving setup is also a terminal
+	-- decision point.
+	Timers:CreateTimer(0, function()
+		local state = GameRules:State_Get()
+		local configuration_locked = XHSBots ~= nil and XHSBots.locked == true
+		if not configuration_locked and state == DOTA_GAMERULES_STATE_CUSTOM_GAME_SETUP then
+			return 0.1
+		end
+
+		local has_bot_session = api.HasXHSBotSession ~= nil and api:HasXHSBotSession()
+		if not has_bot_session and XHSBots ~= nil and type(XHSBots.configuration) == "table" then
+			has_bot_session = (tonumber(XHSBots.configuration.count) or 0) > 0
+		end
+
+		if has_bot_session then
+			CompleteApiSetupWithoutBackend(configuration_locked and "configuration_locked" or "setup_left")
+		else
+			RegisterGameAndLoadArmories()
+		end
+		return nil
+	end)
+end
+
 ListenToGameEvent('game_rules_state_change', function()
 	if GameRules:State_Get() == DOTA_GAMERULES_STATE_CUSTOM_GAME_SETUP then
 		api:DetectParties()
 		CustomNetTables:SetTableValue("game_options", "game_count", { value = 1 })
 
-		api:RegisterGame(function(data)
-			print("Register game...")
-			for k, v in pairs(data.players) do
-				local payload = {
-					steamid = tostring(k),
-				}
-
-				api:Request("armory", function(data)
-					if api.players[k] then
-						api.players[k]["armory"] = data
-					end
-				end, nil, "POST", payload)
-			end
-
-			if CUSTOM_GAME_TYPE == "PLS" then
-				api:GenerateGameModeLeaderboard()
-			end
-
-			print("ALL PLAYERS LOADED IN!")
-			CustomGameEventManager:Send_ServerToAllClients("all_players_battlepass_loaded", {})
-		end)
+		RegisterOrSkipAfterBotConfiguration()
 
 		CustomGameEventManager:Send_ServerToAllClients("all_players_loaded", {})
 	elseif GameRules:State_Get() == DOTA_GAMERULES_STATE_PRE_GAME then

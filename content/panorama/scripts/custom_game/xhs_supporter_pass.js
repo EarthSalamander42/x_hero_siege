@@ -5,6 +5,7 @@ var XHSSupporterPass = (function () {
 	var DISCORD_URL = "https://discord.frostrose-studio.com/";
 	var DAILY_FRAGMENT_CAP = 100;
 	var WEEKLY_FRAGMENT_CAP = DAILY_FRAGMENT_CAP;
+	var SUPPORTER_PASS_LEVEL_COUNT = 50;
 	var currentShopFilter = "All";
 	var currentArmoryFilter = "All";
 	var paginationState = {
@@ -28,6 +29,7 @@ var XHSSupporterPass = (function () {
 	var supporterLayerRetryScheduled = false;
 	var windowAnimationSerial = 0;
 	var DEV_ASSET_FILTER = "Dev Assets";
+	var devUnlockAllUI = false;
 	var devSelectedAsset = "";
 	var devAssetAssignments = {};
 	var devTestRequestSerial = 0;
@@ -103,52 +105,6 @@ var XHSSupporterPass = (function () {
 			perks: ["#xhs_sp_perk_1800_fragments", "#xhs_sp_perk_40_xp", "#xhs_sp_perk_5_votes", "#xhs_sp_perk_amethyst"],
 		},
 	};
-
-	var DEFAULT_REWARDS_FREE = [
-		{ level: 1, name: "battlepass_teleport2", type: "teleport", rarity: "uncommon", image: "battlepass/teleport2", item_id: "1", slot_id: "teleport", hero: "teleport" },
-		{ level: 2, name: "battlepass_teleport6", type: "teleport", rarity: "uncommon", image: "battlepass/teleport6", item_id: "3", slot_id: "teleport", hero: "teleport" },
-		{ level: 3, name: "battlepass_teleport8", type: "teleport", rarity: "uncommon", image: "battlepass/teleport8", item_id: "5", slot_id: "teleport", hero: "teleport" },
-		{ level: 4, name: "battlepass_teleport10", type: "teleport", rarity: "uncommon", image: "battlepass/teleport10", item_id: "7", slot_id: "teleport", hero: "teleport" },
-		{ level: 5, name: "battlepass_emblem_sunken", type: "emblem", rarity: "immortal", image: "battlepass/emblem_sunken", item_id: "21", slot_id: "emblem", hero: "emblem" },
-		{ level: 6, name: "battlepass_teleport13", type: "teleport", rarity: "uncommon", image: "battlepass/teleport13", item_id: "9", slot_id: "teleport", hero: "teleport" },
-		{ level: 7, name: "battlepass_teleport16", type: "teleport", rarity: "uncommon", image: "battlepass/teleport16", item_id: "11", slot_id: "teleport", hero: "teleport" },
-		{ level: 8, name: "battlepass_teleport19", type: "teleport", rarity: "uncommon", image: "battlepass/teleport19", item_id: "13", slot_id: "teleport", hero: "teleport" },
-		{ level: 9, name: "battlepass_teleport22", type: "teleport", rarity: "uncommon", image: "battlepass/teleport22", item_id: "15", slot_id: "teleport", hero: "teleport" },
-		{ level: 10, name: "battlepass_emblem_overgrown", type: "emblem", rarity: "immortal", image: "battlepass/emblem_overgrown", item_id: "22", slot_id: "emblem", hero: "emblem" },
-		{ level: 11, name: "battlepass_kill_effect_culling_blade", type: "kill_effect", rarity: "uncommon", image: "battlepass/kill_effect_culling_blade", item_id: "27", slot_id: "kill_effect", hero: "kill_effect" },
-		{ level: 12, name: "battlepass_levelup1", type: "levelup", rarity: "legendary", image: "battlepass/levelup", item_id: "17", slot_id: "levelup", hero: "levelup" },
-		{ level: 13, name: "battlepass_kill_effect_radiant_tower", type: "kill_effect", rarity: "uncommon", image: "battlepass/kill_effect_radiant_tower", item_id: "29", slot_id: "kill_effect", hero: "kill_effect" },
-		{ level: 14, name: "battlepass_levelup3", type: "levelup", rarity: "legendary", image: "battlepass/levelup3", item_id: "19", slot_id: "levelup", hero: "levelup" },
-		{ level: 15, name: "battlepass_kill_effect_spectre_free", type: "kill_effect", rarity: "uncommon", image: "battlepass/kill_effect_spectre_free", item_id: "31", slot_id: "kill_effect", hero: "kill_effect" },
-		{ level: 16, name: "battlepass_levelup5", type: "levelup", rarity: "legendary", image: "battlepass/levelup5", item_id: "37", slot_id: "levelup", hero: "levelup" },
-		{ level: 17, name: "battlepass_kill_effect_gyro_free", type: "kill_effect", rarity: "uncommon", image: "battlepass/kill_effect_purple_smoke_free", item_id: "33", slot_id: "kill_effect", hero: "kill_effect" },
-		{ level: 18, name: "battlepass_levelup7", type: "levelup", rarity: "legendary", image: "battlepass/levelup7", item_id: "39", slot_id: "levelup", hero: "levelup" },
-		{ level: 19, name: "battlepass_kill_effect_rubick_free", type: "kill_effect", rarity: "uncommon", image: "battlepass/kill_effect_rubick_free", item_id: "35", slot_id: "kill_effect", hero: "kill_effect" },
-		{ level: 20, name: "battlepass_emblem_divinity", type: "emblem", rarity: "immortal", image: "battlepass/emblem_divinity", item_id: "23", slot_id: "emblem", hero: "emblem" },
-	];
-
-	var DEFAULT_REWARDS_PREMIUM = [
-		{ level: 1, name: "battlepass_teleport5", type: "teleport", rarity: "uncommon", image: "battlepass/teleport5", item_id: "2", slot_id: "teleport", hero: "teleport", track: "premium" },
-		{ level: 2, name: "battlepass_teleport7", type: "teleport", rarity: "uncommon", image: "battlepass/teleport7", item_id: "4", slot_id: "teleport", hero: "teleport", track: "premium" },
-		{ level: 3, name: "battlepass_teleport9", type: "teleport", rarity: "uncommon", image: "battlepass/teleport9", item_id: "6", slot_id: "teleport", hero: "teleport", track: "premium" },
-		{ level: 4, name: "battlepass_teleport12", type: "teleport", rarity: "uncommon", image: "battlepass/teleport12", item_id: "8", slot_id: "teleport", hero: "teleport", track: "premium" },
-		{ level: 5, name: "battlepass_emblem_aghanim", type: "emblem", rarity: "immortal", image: "battlepass/emblem_aghanim", item_id: "24", slot_id: "emblem", hero: "emblem", track: "premium" },
-		{ level: 6, name: "battlepass_teleport15", type: "teleport", rarity: "uncommon", image: "battlepass/teleport15", item_id: "10", slot_id: "teleport", hero: "teleport", track: "premium" },
-		{ level: 7, name: "battlepass_teleport18", type: "teleport", rarity: "uncommon", image: "battlepass/teleport18", item_id: "12", slot_id: "teleport", hero: "teleport", track: "premium" },
-		{ level: 8, name: "battlepass_teleport21", type: "teleport", rarity: "uncommon", image: "battlepass/teleport21", item_id: "14", slot_id: "teleport", hero: "teleport", track: "premium" },
-		{ level: 9, name: "battlepass_teleport24", type: "teleport", rarity: "uncommon", image: "battlepass/teleport24", item_id: "16", slot_id: "teleport", hero: "teleport", track: "premium" },
-		{ level: 10, name: "battlepass_emblem_nemestice", type: "emblem", rarity: "immortal", image: "battlepass/emblem_nemestice", item_id: "25", slot_id: "emblem", hero: "emblem", track: "premium" },
-		{ level: 11, name: "battlepass_kill_effect_faceless_void", type: "kill_effect", rarity: "uncommon", image: "battlepass/kill_effect_faceless_void", item_id: "28", slot_id: "kill_effect", hero: "kill_effect", track: "premium" },
-		{ level: 12, name: "battlepass_levelup2", type: "levelup", rarity: "legendary", image: "battlepass/levelup2", item_id: "18", slot_id: "levelup", hero: "levelup", track: "premium" },
-		{ level: 13, name: "battlepass_kill_effect_razor", type: "kill_effect", rarity: "uncommon", image: "battlepass/kill_effect_razor", item_id: "30", slot_id: "kill_effect", hero: "kill_effect", track: "premium" },
-		{ level: 14, name: "battlepass_levelup4", type: "levelup", rarity: "legendary", image: "battlepass/levelup4", item_id: "20", slot_id: "levelup", hero: "levelup", track: "premium" },
-		{ level: 15, name: "battlepass_kill_effect_spectre", type: "kill_effect", rarity: "uncommon", image: "battlepass/kill_effect_spectre", item_id: "32", slot_id: "kill_effect", hero: "kill_effect", track: "premium" },
-		{ level: 16, name: "battlepass_levelup6", type: "levelup", rarity: "legendary", image: "battlepass/levelup6", item_id: "38", slot_id: "levelup", hero: "levelup", track: "premium" },
-		{ level: 17, name: "battlepass_kill_effect_gyro", type: "kill_effect", rarity: "uncommon", image: "battlepass/kill_effect_purple_smoke", item_id: "34", slot_id: "kill_effect", hero: "kill_effect", track: "premium" },
-		{ level: 18, name: "battlepass_levelup8", type: "levelup", rarity: "legendary", image: "battlepass/levelup8", item_id: "40", slot_id: "levelup", hero: "levelup", track: "premium" },
-		{ level: 19, name: "battlepass_kill_effect_rubick", type: "kill_effect", rarity: "uncommon", image: "battlepass/kill_effect_rubick", item_id: "36", slot_id: "kill_effect", hero: "kill_effect", track: "premium" },
-		{ level: 20, name: "battlepass_emblem_diretide_red", type: "emblem", rarity: "immortal", image: "battlepass/emblem_diretide_red", item_id: "26", slot_id: "emblem", hero: "emblem", track: "premium" },
-	];
 
 	function Panel(id) {
 		return $("#" + id);
@@ -333,15 +289,43 @@ var XHSSupporterPass = (function () {
 		}
 
 		var path = imagePath.toString();
-		path = path.replace(/^custom_game\//, "");
+		path = path.replace(/\\/g, "/");
+		path = path.replace(/^file:\/\/\{images\}\//, "");
+		path = path.replace(/^s2r:\/\/panorama\/images\//, "");
+		path = path.replace(/_png\.vtex$/, "");
 		path = path.replace(/\.png$/, "");
-		return path + ".png";
+		return path;
+	}
+
+	function ResolveImageURL(imagePath) {
+		var rawImagePath = imagePath ? imagePath.toString().replace(/\\/g, "/") : "";
+		if (rawImagePath.indexOf("s2r://panorama/images/") === 0 || rawImagePath.indexOf("file://{images}/") === 0) {
+			return rawImagePath;
+		}
+
+		var normalized = NormalizeImagePath(imagePath);
+		if (!normalized) {
+			return "";
+		}
+
+		if (normalized.indexOf("custom_game/") === 0) {
+			return "file://{images}/" + normalized + ".png";
+		}
+
+		var dotaRoots = ["badges/", "battlepass/", "compendium/", "econ/", "events/", "game_modes/", "heroes/", "items/", "spellicons/", "status_icons/"];
+		for (var i = 0; i < dotaRoots.length; i++) {
+			if (normalized.indexOf(dotaRoots[i]) === 0) {
+				return "s2r://panorama/images/" + normalized + "_png.vtex";
+			}
+		}
+
+		return "file://{images}/custom_game/" + normalized + ".png";
 	}
 
 	function SetCustomGameImage(panel, imagePath) {
-		var normalized = NormalizeImagePath(imagePath);
-		if (panel && normalized) {
-			panel.style.backgroundImage = 'url("file://{images}/custom_game/' + normalized + '")';
+		var imageURL = ResolveImageURL(imagePath);
+		if (panel && imageURL) {
+			panel.style.backgroundImage = 'url("' + imageURL + '")';
 			panel.style.backgroundSize = "contain";
 			panel.style.backgroundPosition = "50% 50%";
 			panel.style.backgroundRepeat = "no-repeat";
@@ -361,6 +345,15 @@ var XHSSupporterPass = (function () {
 			"Emblem": "ItemTypeEmblem",
 			"Companion": "ItemTypeCompanion",
 			"Effigy": "ItemTypeEffigy",
+			"Potion FX": "ItemTypePotion",
+			"Rebirth FX": "ItemTypeRebirth",
+			"Attack Lifesteal": "ItemTypeAttackLifesteal",
+			"Spell Lifesteal": "ItemTypeSpellLifesteal",
+			"Regen Aura": "ItemTypeRegenAura",
+			"Immolation": "ItemTypeImmolation",
+			"High Five": "ItemTypeHighFive",
+			"Title": "ItemTypeTitle",
+			"Fragments": "ItemTypeFragments",
 			"Bundle": "ItemTypeBundle",
 			"Cosmetic": "ItemTypeCosmetic",
 		};
@@ -383,13 +376,31 @@ var XHSSupporterPass = (function () {
 		panel.SetHasClass("IsPremiumTrack", track === "premium" || (item && item.track === "premium") || IsTruthy(item && item.premium, false));
 	}
 
-	function GetCompanionPreviewUnit(item) {
-		if (!item || NormalizeRewardType(item.type || item.item_type) !== "Companion") {
+	function GetScenePreviewUnit(item) {
+		if (!item) {
 			return "";
 		}
 
+		var type = NormalizeRewardType(item.type || item.item_type);
+		if (type !== "Companion" && type !== "Effigy") {
+			return "";
+		}
 		var unit = item.unit || item.unit_name || item.file || item.npc_name || "";
 		return unit && unit.toString().indexOf("npc_") === 0 ? unit.toString() : "";
+	}
+
+	function GetRewardComposition(item) {
+		var type = NormalizeRewardType(item && (item.type || item.item_type || item.slot_id));
+		if (type === "Potion FX") {
+			return Text("xhs_sp_composition_potion", "Health + Mana");
+		}
+		if (type === "Immolation") {
+			return Text("xhs_sp_composition_immolation", "Owner + Targets");
+		}
+		if (type === "High Five") {
+			return Text("xhs_sp_composition_high_five", "Overhead + Travel + Impact");
+		}
+		return "";
 	}
 
 	function CreateItemPreview(parent, item, previewClass, imageClass) {
@@ -397,7 +408,12 @@ var XHSSupporterPass = (function () {
 		preview.AddClass("XHSPassItemPreview");
 		preview.AddClass(previewClass);
 
-		var unit = GetCompanionPreviewUnit(item);
+		var image = $.CreatePanel("Panel", preview, "");
+		image.AddClass("XHSPassPreviewImage");
+		image.AddClass(imageClass);
+		SetCustomGameImage(image, item && (item.image || item.image_inventory || item.icon || item.icon_path));
+
+		var unit = GetScenePreviewUnit(item);
 		if (unit) {
 			preview.AddClass("HasAnimatedModel");
 			parent.AddClass("HasAnimatedPreview");
@@ -409,14 +425,16 @@ var XHSSupporterPass = (function () {
 				unit: unit,
 			});
 			scene.AddClass("XHSPassCompanionScene");
+			scene.SetHasClass("IsEffigyScene", NormalizeRewardType(item.type || item.item_type) === "Effigy");
 			scene.hittest = false;
-			return preview;
 		}
 
-		var image = $.CreatePanel("Panel", preview, "");
-		image.AddClass("XHSPassPreviewImage");
-		image.AddClass(imageClass);
-		SetCustomGameImage(image, item && (item.image || item.image_inventory || item.icon || item.icon_path));
+		var composition = GetRewardComposition(item);
+		if (composition) {
+			var compositionBadge = $.CreatePanel("Label", preview, "");
+			compositionBadge.AddClass("XHSPassCompositionBadge");
+			compositionBadge.text = composition;
+		}
 		return preview;
 	}
 
@@ -668,7 +686,7 @@ var XHSSupporterPass = (function () {
 
 	function NormalizeSeasonProgress(level, xp, maxXp) {
 		var normalizedLevel = Math.max(1, ToNumber(level, 1));
-		var normalizedMax = Math.max(ToNumber(maxXp, 2000), 1);
+		var normalizedMax = Math.max(ToNumber(maxXp, 1000), 1);
 		var normalizedXP = Math.max(0, ToNumber(xp, 0));
 
 		if (normalizedXP >= normalizedMax) {
@@ -686,6 +704,38 @@ var XHSSupporterPass = (function () {
 
 	function GetTable(tableName, keyName, fallbackValue) {
 		return CustomNetTables.GetTableValue(tableName, keyName) || fallbackValue;
+	}
+
+	function GetTrackChunkKey(index, chunkIndex) {
+		var keys = index && index.chunk_keys;
+		if (Object.prototype.toString.call(keys) === "[object Array]") {
+			return keys[chunkIndex - 1] || "";
+		}
+		if (keys && typeof keys === "object") {
+			return keys[chunkIndex] || keys[chunkIndex.toString()] || "";
+		}
+		return "";
+	}
+
+	function GetPublishedRewardArray(tableName) {
+		var index = GetTable(tableName, "rewards", {});
+		var chunkCount = Math.max(0, Math.floor(ToNumber(index && index.chunk_count, 0)));
+		if (chunkCount <= 0) {
+			return AsArray(index);
+		}
+
+		var rewards = [];
+		for (var chunkIndex = 1; chunkIndex <= chunkCount; chunkIndex++) {
+			var key = GetTrackChunkKey(index, chunkIndex);
+			if (!key) {
+				key = "chunk_" + (chunkIndex < 10 ? "0" : "") + chunkIndex;
+			}
+			var chunk = AsArray(GetTable(tableName, key, []));
+			for (var rewardIndex = 0; rewardIndex < chunk.length; rewardIndex++) {
+				rewards.push(chunk[rewardIndex]);
+			}
+		}
+		return rewards;
 	}
 
 	function CopyMissingFields(target, source) {
@@ -806,6 +856,10 @@ var XHSSupporterPass = (function () {
 		return false;
 	}
 
+	function IsDevUnlockAllUIActive(player) {
+		return devUnlockAllUI === true && IsLocalSupporterDeveloper(player);
+	}
+
 	function FormatXHSAccountXPSummary(player) {
 		var level = Math.max(0, ToNumber(player.xhs_account_level, 0));
 		var total = Math.max(0, ToNumber(player.xhs_xp_total, 0));
@@ -885,67 +939,57 @@ var XHSSupporterPass = (function () {
 			tableName = "supporter_pass_rewards_premium";
 		}
 
-		var legacyRewards = track === "premium" ? DEFAULT_REWARDS_PREMIUM : DEFAULT_REWARDS_FREE;
-		var backendRewards = AsArray(GetTable(tableName, "rewards", []));
-		var merged = {};
-		var order = [];
-
-		function rewardKey(reward, index, sourceName) {
-			var itemID = reward.item_id || reward.catalog_item_id;
-			if (itemID !== undefined && itemID !== null && itemID !== "") {
-				return "item:" + itemID.toString();
+		var publishedRewards = GetPublishedRewardArray(tableName);
+		var rewardsByLevel = {};
+		function RewardPriority(reward) {
+			var priority = 0;
+			var seasonID = (reward.season_id || reward.season || "").toString();
+			var rewardID = (reward.reward_id || reward.id || "").toString().toLowerCase();
+			if (seasonID === "2026") {
+				priority += 100;
 			}
-			var rewardID = reward.reward_id || reward.id;
-			if (rewardID !== undefined && rewardID !== null && rewardID !== "") {
-				return "reward:" + rewardID.toString();
+			if (rewardID.indexOf("sp26_") === 0) {
+				priority += 50;
 			}
-			return sourceName + ":" + index;
+			if (!IsTruthy(reward.legacy, false)) {
+				priority += 20;
+			}
+			if (ToNumber(reward.item_id || reward.catalog_item_id, 0) >= 41) {
+				priority += 10;
+			}
+			if (reward.slot_id && (reward.image || reward.image_inventory || reward.icon || reward.icon_path)) {
+				priority += 5;
+			}
+			return priority;
 		}
 
-		for (var i = 0; i < legacyRewards.length; i++) {
-			var legacy = CopyObject(legacyRewards[i]);
-			legacy.legacy = true;
-			legacy.claimable = false;
-			legacy.track = track;
-			var legacyKey = rewardKey(legacy, i, "legacy");
-			merged[legacyKey] = legacy;
-			order.push(legacyKey);
-		}
-
-		for (var j = 0; j < backendRewards.length; j++) {
-			var backend = CopyObject(backendRewards[j]);
-			backend.track = backend.track || track;
-			var backendKey = rewardKey(backend, j, "backend");
-			var previous = merged[backendKey];
-			if (previous) {
-				CopyMissingFields(backend, previous);
-				var previousType = NormalizeRewardType(previous.type || previous.item_type || previous.slot_id);
-				var backendType = NormalizeRewardType(backend.type || backend.item_type || backend.slot_id);
-				if (backendType === "Cosmetic" && previousType !== "Cosmetic") {
-					backend.type = previous.type || previous.item_type;
-					backend.item_type = previous.item_type || previous.type;
-					if (!backend.slot_id || backend.slot_id === "default" || backend.slot_id === "Reward") {
-						backend.slot_id = previous.slot_id;
-					}
-				}
-				if (previous.image || previous.image_inventory || previous.icon || previous.icon_path) {
-					backend.image = previous.image || previous.image_inventory || previous.icon || previous.icon_path;
-				}
-			} else {
-				order.push(backendKey);
+		for (var i = 0; i < publishedRewards.length; i++) {
+			var reward = CopyObject(publishedRewards[i]);
+			var level = Math.floor(ToNumber(reward.level_required || reward.level, 0));
+			if (level < 1 || level > SUPPORTER_PASS_LEVEL_COUNT) {
+				continue;
 			}
-			backend.legacy = false;
-			backend.claimable = IsTruthy(backend.claimable, true);
-			merged[backendKey] = backend;
+
+			reward.level = level;
+			reward.level_required = level;
+			reward.track = track;
+			reward.legacy = IsTruthy(reward.legacy, false);
+			reward.claimable = reward.claimable === undefined
+				? !reward.legacy
+				: IsTruthy(reward.claimable, false);
+
+			var previous = rewardsByLevel[level];
+			if (!previous || RewardPriority(reward) >= RewardPriority(previous)) {
+				rewardsByLevel[level] = reward;
+			}
 		}
 
 		var rewards = [];
-		for (var k = 0; k < order.length; k++) {
-			rewards.push(merged[order[k]]);
+		for (var levelIndex = 1; levelIndex <= SUPPORTER_PASS_LEVEL_COUNT; levelIndex++) {
+			if (rewardsByLevel[levelIndex]) {
+				rewards.push(rewardsByLevel[levelIndex]);
+			}
 		}
-		rewards.sort(function (a, b) {
-			return ToNumber(a.level_required || a.level, 0) - ToNumber(b.level_required || b.level, 0);
-		});
 		return rewards;
 	}
 
@@ -977,10 +1021,6 @@ var XHSSupporterPass = (function () {
 	}
 
 	function IsRewardClaimed(reward, player) {
-		if (reward.claimed === true || reward.claimed === 1 || reward.claimed === "1") {
-			return true;
-		}
-
 		var rewardID = GetRewardID(reward);
 		if (rewardID === "") {
 			return false;
@@ -1041,6 +1081,35 @@ var XHSSupporterPass = (function () {
 		if (normalized === "effigy" || normalized === "statue") {
 			return "Effigy";
 		}
+		if (normalized === "potion" || normalized === "potion_fx" || normalized === "potion fx" ||
+			normalized === "bottle" || normalized === "mekansm") {
+			return "Potion FX";
+		}
+		if (normalized === "rebirth" || normalized === "rebirth_fx" || normalized === "rebirth fx" ||
+			normalized === "ankh") {
+			return "Rebirth FX";
+		}
+		if (normalized === "attack_lifesteal" || normalized === "attack lifesteal") {
+			return "Attack Lifesteal";
+		}
+		if (normalized === "spell_lifesteal" || normalized === "spell lifesteal") {
+			return "Spell Lifesteal";
+		}
+		if (normalized === "regen_aura" || normalized === "regen aura" || normalized === "fountain") {
+			return "Regen Aura";
+		}
+		if (normalized === "immolation" || normalized === "radiance") {
+			return "Immolation";
+		}
+		if (normalized === "high_five" || normalized === "high five" || normalized === "highfive") {
+			return "High Five";
+		}
+		if (normalized === "title" || normalized === "account_title" || normalized === "account title") {
+			return "Title";
+		}
+		if (normalized === "fragment" || normalized === "fragments" || normalized === "currency") {
+			return "Fragments";
+		}
 		if (normalized === "bundle") {
 			return "Bundle";
 		}
@@ -1080,6 +1149,33 @@ var XHSSupporterPass = (function () {
 		}
 		if (slot === "kill_effect" || slot === "kill_fx") {
 			return "Kill FX";
+		}
+		if (slot === "potion" || slot === "potion_fx" || slot === "bottle" || slot === "mekansm") {
+			return "Potion FX";
+		}
+		if (slot === "rebirth" || slot === "rebirth_fx" || slot === "ankh") {
+			return "Rebirth FX";
+		}
+		if (slot === "attack_lifesteal") {
+			return "Attack Lifesteal";
+		}
+		if (slot === "spell_lifesteal") {
+			return "Spell Lifesteal";
+		}
+		if (slot === "regen_aura" || slot === "fountain") {
+			return "Regen Aura";
+		}
+		if (slot === "immolation" || slot === "radiance") {
+			return "Immolation";
+		}
+		if (slot === "high_five" || slot === "highfive") {
+			return "High Five";
+		}
+		if (slot === "title" || slot === "account_title") {
+			return "Title";
+		}
+		if (slot === "fragment" || slot === "fragments") {
+			return "Fragments";
 		}
 		return normalizedType;
 	}
@@ -1126,6 +1222,15 @@ var XHSSupporterPass = (function () {
 			"Emblem": "xhs_sp_type_emblem",
 			"Companion": "xhs_sp_type_companion",
 			"Effigy": "xhs_sp_type_effigy",
+			"Potion FX": "xhs_sp_type_potion",
+			"Rebirth FX": "xhs_sp_type_rebirth",
+			"Attack Lifesteal": "xhs_sp_type_attack_lifesteal",
+			"Spell Lifesteal": "xhs_sp_type_spell_lifesteal",
+			"Regen Aura": "xhs_sp_type_regen_aura",
+			"Immolation": "xhs_sp_type_immolation",
+			"High Five": "xhs_sp_type_high_five",
+			"Title": "xhs_sp_type_title",
+			"Fragments": "xhs_sp_type_fragments",
 			"Bundle": "xhs_sp_type_bundle",
 			"Cosmetic": "xhs_sp_type_cosmetic",
 		};
@@ -1150,36 +1255,155 @@ var XHSSupporterPass = (function () {
 		return "";
 	}
 
+	var SUPPORTER_SLOT_ALIASES = {
+		teleport_fx: "teleport",
+		"teleport fx": "teleport",
+		tome: "levelup",
+		tome_fx: "levelup",
+		"tome fx": "levelup",
+		kill_fx: "kill_effect",
+		"kill fx": "kill_effect",
+		courier: "companion",
+		companions: "companion",
+		statue: "effigy",
+		effigies: "effigy",
+		emblems: "emblem",
+		bottle: "potion",
+		bottles: "potion",
+		mekansm: "potion",
+		mekanism: "potion",
+		potion_effect: "potion",
+		potion_fx: "potion",
+		potions: "potion",
+		ankh: "rebirth",
+		ankhs: "rebirth",
+		reincarnation: "rebirth",
+		revival: "rebirth",
+		respawn: "rebirth",
+		rebirth_fx: "rebirth",
+		lifesteal: "attack_lifesteal",
+		lifesteal_effect: "attack_lifesteal",
+		attack_lifesteal_effect: "attack_lifesteal",
+		spell_lifesteal_effect: "spell_lifesteal",
+		fountain: "regen_aura",
+		fountain_regen: "regen_aura",
+		regen: "regen_aura",
+		radiance: "immolation",
+		cloak_of_flames: "immolation",
+		immolation_effect: "immolation",
+		highfive: "high_five",
+		"high five": "high_five",
+		account_title: "title",
+		supporter_title: "title",
+		fragments: "fragment",
+	};
+
+	function CanonicalSupporterSlot(value) {
+		var normalized = (value || "").toString().toLowerCase();
+		return SUPPORTER_SLOT_ALIASES[normalized] || normalized;
+	}
+
+	function GetCanonicalArmorySlot(item) {
+		var rawSlot = CanonicalSupporterSlot(item && item.slot_id);
+		if (rawSlot && rawSlot !== "default" && rawSlot !== "reward") {
+			return rawSlot;
+		}
+
+		var type = NormalizeRewardType(item && (item.type || item.item_type));
+		var slotsByType = {
+			"Teleport FX": "teleport",
+			"Tome FX": "levelup",
+			"Kill FX": "kill_effect",
+			"Emblem": "emblem",
+			"Companion": "companion",
+			"Effigy": "effigy",
+			"Potion FX": "potion",
+			"Rebirth FX": "rebirth",
+			"Attack Lifesteal": "attack_lifesteal",
+			"Spell Lifesteal": "spell_lifesteal",
+			"Regen Aura": "regen_aura",
+			"Immolation": "immolation",
+			"High Five": "high_five",
+			"Title": "title",
+			"Fragments": "fragment",
+		};
+		return slotsByType[type] || "";
+	}
+
+	function ArmoryValueMatchesItem(value, item) {
+		if (value === undefined || value === null || value === "") {
+			return false;
+		}
+		var normalizedValue = value.toString();
+		var identifiers = [
+			item.item_id,
+			item.catalog_item_id,
+			item.catalog_item_key,
+			item.item_key,
+			item.reward_item_id,
+			item.entitlement_id,
+			item.id,
+			item.item_name,
+			item.name,
+			item.unit,
+			item.unit_name,
+		];
+		for (var i = 0; i < identifiers.length; i++) {
+			if (identifiers[i] !== undefined && identifiers[i] !== null &&
+				identifiers[i].toString() === normalizedValue) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	function IsArmoryItemEquipped(player, item) {
 		var raw = player.raw || {};
 		var loadout = raw.loadout || {};
-		var itemID = item.item_id || item.id || item.entitlement_id || "";
-		var unit = item.unit || "";
-		var type = NormalizeRewardType(item.type || item.item_type);
+		var slot = GetCanonicalArmorySlot(item);
 		var equippedValue = "";
+		var slotAliases = {
+			teleport: ["teleport", "teleport_fx"],
+			levelup: ["levelup", "tome", "tome_fx"],
+			kill_effect: ["kill_effect", "kill_fx"],
+			emblem: ["emblem", "emblems"],
+			companion: ["companion", "companions", "courier"],
+			effigy: ["effigy", "effigies", "statue"],
+			potion: ["potion", "potion_fx", "bottle", "mekansm"],
+			rebirth: ["rebirth", "rebirth_fx", "ankh"],
+			attack_lifesteal: ["attack_lifesteal"],
+			spell_lifesteal: ["spell_lifesteal"],
+			regen_aura: ["regen_aura", "fountain"],
+			immolation: ["immolation", "radiance"],
+			high_five: ["high_five", "highfive"],
+			title: ["title", "supporter_title", "account_title"],
+		};
 
-		if (type === "Companion") {
-			equippedValue = ReadLoadoutValue(loadout, ["companion", "companions"]) || raw.companion || raw.companion_id;
-			return equippedValue && (equippedValue === itemID || equippedValue === unit);
+		if (slot === "fragment") {
+			return false;
 		}
-		if (type === "Emblem") {
-			equippedValue = ReadLoadoutValue(loadout, ["emblem", "emblems"]) || raw.emblem || raw.emblem_id;
-			return equippedValue && equippedValue === itemID;
+		if (slotAliases[slot]) {
+			equippedValue = ReadLoadoutValue(loadout, slotAliases[slot]);
 		}
-		if (type === "Teleport FX") {
-			equippedValue = ReadLoadoutValue(loadout, ["teleport", "teleport_fx"]);
-			return equippedValue && equippedValue === itemID;
+		if (!equippedValue) {
+			for (var rawSlot in loadout) {
+				if (loadout.hasOwnProperty(rawSlot) && CanonicalSupporterSlot(rawSlot) === slot) {
+					equippedValue = ReadLoadoutValue(loadout, [rawSlot]);
+					if (equippedValue) {
+						break;
+					}
+				}
+			}
 		}
-		if (type === "Tome FX") {
-			equippedValue = ReadLoadoutValue(loadout, ["levelup", "tome", "tome_fx"]);
-			return equippedValue && equippedValue === itemID;
-		}
-		if (type === "Kill FX") {
-			equippedValue = ReadLoadoutValue(loadout, ["kill_effect", "kill_fx"]);
-			return equippedValue && equippedValue === itemID;
+		if (!equippedValue && slot === "companion") {
+			equippedValue = raw.companion || raw.companion_id;
+		} else if (!equippedValue && slot === "emblem") {
+			equippedValue = raw.emblem || raw.emblem_id;
+		} else if (!equippedValue && slot === "effigy") {
+			equippedValue = raw.effigy || raw.effigy_id || raw.statue || raw.statue_id;
 		}
 
-		return item.equipped === true;
+		return ArmoryValueMatchesItem(equippedValue, item) || item.equipped === true;
 	}
 
 	function BuildArmoryItemFromReward(reward, player, track) {
@@ -1187,6 +1411,11 @@ var XHSSupporterPass = (function () {
 		var isPremium = track === "premium" || reward.track === "premium" || reward.premium === 1 || reward.premium === "1";
 		var premiumLocked = isPremium && player.tier_id < 1;
 		var levelLocked = player.season_level < requiredLevel;
+		var legacyReward = IsTruthy(reward.legacy, false);
+		var actuallyOwned = legacyReward
+			? IsLegacyRewardUnlocked(reward, player, track)
+			: IsRewardClaimed(reward, player);
+		var devPreviewUnlocked = IsDevUnlockAllUIActive(player);
 		var actualItemID = reward.item_id || reward.catalog_item_id || reward.reward_id || reward.id;
 		var item = {
 			id: actualItemID,
@@ -1194,18 +1423,40 @@ var XHSSupporterPass = (function () {
 			item_id: actualItemID,
 			entitlement_id: reward.entitlement_id,
 			name: reward.name || reward.item_name || reward.id,
+			item_name: reward.item_name || reward.name,
+			item_type: reward.item_type || reward.type,
 			type: NormalizeRewardType(reward.type || reward.item_type),
 			rarity: reward.rarity || reward.item_rarity || (isPremium ? "premium" : "season"),
 			image: reward.image || reward.image_inventory || reward.icon || reward.icon_path,
 			hero: reward.hero || reward.used_by_heroes || reward.type || reward.item_type || "global",
 			slot_id: reward.slot_id || reward.type || reward.item_type || "default",
+			unit: reward.unit || reward.unit_name || reward.npc_name,
+			unit_name: reward.unit_name || reward.unit,
+			runtime_assets: reward.runtime_assets || reward.runtimeAssets,
+			start_pfx: reward.start_pfx,
+			end_pfx: reward.end_pfx,
+			target_pfx: reward.target_pfx,
+			caster_pfx: reward.caster_pfx,
+			health_pfx: reward.health_pfx,
+			mana_pfx: reward.mana_pfx,
+			owner_pfx: reward.owner_pfx,
+			pfx: reward.pfx,
+			overhead_pfx: reward.overhead_pfx,
+			travel_pfx: reward.travel_pfx,
+			impact_pfx: reward.impact_pfx,
+			title_text: reward.title_text,
+			amount: reward.amount,
 			level: requiredLevel,
 			track: Text(isPremium ? "xhs_sp_supporter_track" : "xhs_sp_free_track", isPremium ? "Supporter Track" : "Free Track"),
 		};
 
-		item.locked = premiumLocked || levelLocked;
+		item.locked = devPreviewUnlocked ? false : (premiumLocked || levelLocked);
 		item.lock_reason = premiumLocked ? Text("xhs_sp_supporter_track", "Supporter Track") : Text("xhs_sp_level_value", "Level {level}", { level: requiredLevel });
 		item.equipped = !item.locked && IsArmoryItemEquipped(player, item);
+		item.dev_preview_only = devPreviewUnlocked && !actuallyOwned;
+		if (item.dev_preview_only) {
+			item.equipped = false;
+		}
 		return item;
 	}
 
@@ -1219,22 +1470,23 @@ var XHSSupporterPass = (function () {
 		var items = [];
 		var freeRewards = GetRewards("free");
 		var premiumRewards = GetRewards("premium");
+		var devPreviewUnlocked = IsDevUnlockAllUIActive(player);
 
 		for (var i = 0; i < freeRewards.length; i++) {
-			if (!IsTruthy(freeRewards[i].legacy, false)) {
+			if (!devPreviewUnlocked && !IsTruthy(freeRewards[i].legacy, false)) {
 				continue;
 			}
 			var freeItem = BuildArmoryItemFromReward(freeRewards[i], player, "free");
-			if (!freeItem.locked) {
+			if (!freeItem.locked && GetCanonicalArmorySlot(freeItem) !== "fragment") {
 				items.push(freeItem);
 			}
 		}
 		for (var j = 0; j < premiumRewards.length; j++) {
-			if (!IsTruthy(premiumRewards[j].legacy, false)) {
+			if (!devPreviewUnlocked && !IsTruthy(premiumRewards[j].legacy, false)) {
 				continue;
 			}
 			var premiumItem = BuildArmoryItemFromReward(premiumRewards[j], player, "premium");
-			if (!premiumItem.locked) {
+			if (!premiumItem.locked && GetCanonicalArmorySlot(premiumItem) !== "fragment") {
 				items.push(premiumItem);
 			}
 		}
@@ -1260,6 +1512,8 @@ var XHSSupporterPass = (function () {
 		var itemIdentifiers = [
 			item.item_id,
 			item.catalog_item_id,
+			item.catalog_item_key,
+			item.item_key,
 			item.reward_item_id,
 			item.entitlement_id,
 			item.id,
@@ -1267,6 +1521,8 @@ var XHSSupporterPass = (function () {
 		var entryIdentifiers = [
 			entry.item_id,
 			entry.catalog_item_id,
+			entry.catalog_item_key,
+			entry.item_key,
 			entry.reward_item_id,
 			entry.entitlement_id,
 			entry.id,
@@ -1302,8 +1558,13 @@ var XHSSupporterPass = (function () {
 			var item = EnrichOwnedArmoryItem(CopyObject(items[i]));
 			item.type = NormalizeArmoryItemType(item);
 			item.entitlement_id = item.entitlement_id || item.id;
-			item.item_id = item.item_id || item.catalog_item_id || item.reward_item_id || item.id;
+			item.item_id = item.item_id || item.catalog_item_id || item.catalog_item_key ||
+				item.item_key || item.reward_item_id || item.id;
 			item.image = item.image || item.image_inventory || item.icon || item.icon_path;
+			item.slot_id = GetCanonicalArmorySlot(item) || item.slot_id || "default";
+			if (item.slot_id === "fragment") {
+				continue;
+			}
 			if (item.type === "Companion") {
 				item.unit = item.unit || item.unit_name || item.file || item.npc_name;
 				if (IsDisabledCompanionItem(item)) {
@@ -1405,6 +1666,7 @@ var XHSSupporterPass = (function () {
 			if (existingIndex !== undefined) {
 				if (backendWins) {
 					merged[existingIndex] = mergeBackendItem(merged[existingIndex], item);
+					merged[existingIndex].dev_preview_only = false;
 					var mergedIdentities = identityCandidates(merged[existingIndex]);
 					for (var m = 0; m < mergedIdentities.length; m++) {
 						seen[mergedIdentities[m]] = existingIndex;
@@ -1806,6 +2068,17 @@ var XHSSupporterPass = (function () {
 	function RenderHeader(player) {
 		ApplySupporterTierClasses(Panel("XHSSupporterPassWindow"), player.tier_id);
 		UpdateFragmentsCounter(player);
+		var devUnlockButton = Panel("XHSPassDevUnlockUIButton");
+		var canUseDevUnlock = IsLocalSupporterDeveloper(player);
+		if (devUnlockButton) {
+			devUnlockButton.SetHasClass("IsVisible", canUseDevUnlock);
+			devUnlockButton.SetHasClass("IsActive", canUseDevUnlock && devUnlockAllUI);
+			devUnlockButton.hittest = canUseDevUnlock;
+		}
+		SetText(
+			"XHSPassDevUnlockUILabel",
+			devUnlockAllUI ? "DEV: LOCK UI" : "DEV: UNLOCK UI"
+		);
 
 		var avatar = Panel("XHSPassAvatar");
 		if (avatar && player.steamID) {
@@ -1951,11 +2224,20 @@ var XHSSupporterPass = (function () {
 		var card = $.CreatePanel("Panel", parent, "");
 		card.AddClass("XHSPassRewardCard");
 		ApplyItemVisualClasses(card, reward, track);
-		var legacyReward = IsTruthy(reward.legacy, false) || reward.claimable === false;
-		var legacyUnlocked = legacyReward && IsLegacyRewardUnlocked(reward, player, track);
-		var rewardClaimed = legacyReward ? legacyUnlocked : IsRewardClaimed(reward, player);
+		var devPreviewUnlocked = IsDevUnlockAllUIActive(player);
+		var legacyReward = IsTruthy(reward.legacy, false);
+		var rewardClaimable = reward.claimable === undefined ? !legacyReward : IsTruthy(reward.claimable, false);
+		var legacyUnlocked = legacyReward && (devPreviewUnlocked || IsLegacyRewardUnlocked(reward, player, track));
+		var rewardClaimed = devPreviewUnlocked || (legacyReward ? legacyUnlocked : IsRewardClaimed(reward, player));
+		var requiredLevel = ToNumber(reward.level_required || reward.level, 1);
+		var backendReady = devPreviewUnlocked || IsTruthy(player.raw && player.raw.backend_season_ready, true);
+		var premiumLocked = (track === "premium" || reward.track === "premium" ||
+			reward.premium === 1 || reward.premium === "1") && player.tier_id < 1 && !devPreviewUnlocked;
+		var levelLocked = player.season_level < requiredLevel && !devPreviewUnlocked;
 		card.SetHasClass("IsLegacyReward", legacyReward);
-		card.SetHasClass("IsLocked", legacyReward && !legacyUnlocked);
+		card.SetHasClass("IsDevUIPreview", devPreviewUnlocked);
+		card.SetHasClass("IsLocked", !rewardClaimed && (legacyReward ? !legacyUnlocked : (levelLocked || premiumLocked || !backendReady)));
+		card.SetHasClass("IsPremiumLocked", premiumLocked);
 		card.SetHasClass("IsClaimed", rewardClaimed);
 
 		var preview = CreateItemPreview(card, reward, "XHSPassRewardPreview", "XHSPassRewardImage");
@@ -1972,7 +2254,9 @@ var XHSSupporterPass = (function () {
 
 		var type = $.CreatePanel("Label", details, "");
 		type.AddClass("XHSPassRewardType");
-		type.text = rewardClaimed
+		type.text = devPreviewUnlocked
+			? "DEV UI PREVIEW"
+			: rewardClaimed
 			? Text(legacyReward ? "xhs_sp_unlocked" : "xhs_sp_claimed", legacyReward ? "Unlocked" : "Claimed")
 			: (legacyReward ? Text("xhs_sp_legacy_reward", "Legacy Reward") : DisplayRewardType(reward.type || reward.item_type || "Cosmetic"));
 
@@ -1980,10 +2264,9 @@ var XHSSupporterPass = (function () {
 		if (rewardID) {
 			var button = $.CreatePanel("Button", card, "");
 			button.AddClass("XHSPassShopButton");
-			var requiredLevel = ToNumber(reward.level_required || reward.level, 1);
-			var premiumLocked = (track === "premium" || reward.track === "premium" || reward.premium === 1 || reward.premium === "1") && player.tier_id < 1;
 			var pending = IsActionPending("claim", rewardID);
-			var canClaim = !legacyReward && !rewardClaimed && player.season_level >= requiredLevel && !premiumLocked && !pending;
+			var canClaim = !legacyReward && rewardClaimable && !rewardClaimed &&
+				player.season_level >= requiredLevel && !premiumLocked && backendReady && !pending;
 			button.SetHasClass("IsLocked", !canClaim);
 			button.SetPanelEvent("onactivate", function () {
 				if (!canClaim) {
@@ -1999,7 +2282,9 @@ var XHSSupporterPass = (function () {
 			});
 
 			var label = $.CreatePanel("Label", button, "");
-			label.text = legacyReward
+			label.text = devPreviewUnlocked
+				? "PREVIEW ONLY"
+				: legacyReward
 				? Text(legacyUnlocked ? "xhs_sp_unlocked" : "xhs_sp_locked", legacyUnlocked ? "Unlocked" : "Locked")
 				: Text(pending ? "xhs_sp_pending" : (rewardClaimed ? "xhs_sp_claimed" : (canClaim ? "xhs_sp_claim" : "xhs_sp_locked")), pending ? "Pending..." : (rewardClaimed ? "Claimed" : (canClaim ? "Claim" : "Locked")));
 		}
@@ -2009,10 +2294,15 @@ var XHSSupporterPass = (function () {
 		var trackPanel = $.CreatePanel("Panel", parent, "");
 		trackPanel.AddClass("XHSPassRewardTrack");
 		trackPanel.SetHasClass("IsPremiumTrack", track === "premium");
+		trackPanel.SetHasClass("IsIncompleteTrack", !rewards || rewards.length !== SUPPORTER_PASS_LEVEL_COUNT);
 
 		var titlePanel = $.CreatePanel("Label", trackPanel, "");
 		titlePanel.AddClass("XHSPassRewardTrackTitle");
-		titlePanel.text = title;
+		titlePanel.text = Text("xhs_sp_track_reward_count", "{track} · {count}/{total} rewards", {
+			track: title,
+			count: rewards ? rewards.length : 0,
+			total: SUPPORTER_PASS_LEVEL_COUNT,
+		});
 
 		var row = $.CreatePanel("Panel", trackPanel, "");
 		row.AddClass("XHSPassRewardRow");
@@ -2049,8 +2339,10 @@ var XHSSupporterPass = (function () {
 
 	function CreateShopCard(parent, item, player, mode) {
 		var card = $.CreatePanel("Panel", parent, "");
+		var devPreviewOnly = mode === "armory" && item.dev_preview_only === true;
 		card.AddClass("XHSPassShopCard");
 		card.SetHasClass("IsArmoryCard", mode === "armory");
+		card.SetHasClass("IsDevUIPreview", devPreviewOnly);
 		card.SetHasClass("IsEquipped", item.equipped === true);
 		card.SetHasClass("IsLocked", item.locked === true);
 		ApplyItemVisualClasses(card, item, item.track === "premium" ? "premium" : "");
@@ -2068,7 +2360,9 @@ var XHSSupporterPass = (function () {
 		var price = $.CreatePanel("Label", card, "");
 		price.AddClass("XHSPassShopPrice");
 		if (mode === "armory") {
-			price.text = item.locked ? (item.lock_reason || Text("xhs_sp_locked", "Locked")) : Text(item.equipped ? "xhs_sp_equipped" : "xhs_sp_unlocked", item.equipped ? "Equipped" : "Unlocked");
+			price.text = devPreviewOnly
+				? "DEV UI PREVIEW"
+				: (item.locked ? (item.lock_reason || Text("xhs_sp_locked", "Locked")) : Text(item.equipped ? "xhs_sp_equipped" : "xhs_sp_unlocked", item.equipped ? "Equipped" : "Unlocked"));
 		} else {
 			price.text = FormatNumber(item.price || item.fragment_price || 0) + " " + Text("xhs_sp_fragments_lower", "fragments");
 		}
@@ -2081,10 +2375,15 @@ var XHSSupporterPass = (function () {
 		var actionKind = mode === "armory" ? "equip" : "purchase";
 		var pending = IsActionPending(actionKind, requestID);
 		var canAfford = mode === "armory"
-			? item.locked !== true && item.equipped !== true && !pending
+			? item.locked !== true && item.equipped !== true && !pending && !devPreviewOnly
 			: player.fragments >= ToNumber(item.price || item.fragment_price, 0) && !pending;
 		button.SetHasClass("IsLocked", !canAfford);
 		button.SetPanelEvent("onactivate", function () {
+			if (devPreviewOnly) {
+				ShowActionMessage("UI preview only \u00b7 no server unlock or equip was sent.", true);
+				Game.EmitSound("General.ButtonClick");
+				return;
+			}
 			if (!canAfford) {
 				Game.EmitSound("General.Cancel");
 				return;
@@ -2112,6 +2411,8 @@ var XHSSupporterPass = (function () {
 		var label = $.CreatePanel("Label", button, "");
 		if (pending) {
 			label.text = Text("xhs_sp_pending", "Pending...");
+		} else if (devPreviewOnly) {
+			label.text = "PREVIEW ONLY";
 		} else if (mode === "armory") {
 			label.text = Text(item.locked ? "xhs_sp_locked" : (item.equipped ? "xhs_sp_equipped" : "xhs_sp_equip"), item.locked ? "Locked" : (item.equipped ? "Equipped" : "Equip"));
 		} else {
@@ -2211,6 +2512,14 @@ var XHSSupporterPass = (function () {
 			"Companion",
 			"Emblem",
 			"Effigy",
+			"Potion FX",
+			"Rebirth FX",
+			"Attack Lifesteal",
+			"Spell Lifesteal",
+			"Regen Aura",
+			"Immolation",
+			"High Five",
+			"Title",
 			"Bundle",
 			"Pudge Hook",
 			"Pudge Arcana",
@@ -2401,6 +2710,16 @@ var XHSSupporterPass = (function () {
 			var runtime = published[i] || {};
 			AddRuntimeAsset(runtime.kind || runtime.type, runtime.hook || runtime.asset, runtime.path || runtime.modifier);
 		}
+		AddRuntimeAsset("particle", "teleport_start", reward.start_pfx);
+		AddRuntimeAsset("particle", "teleport_end", reward.end_pfx);
+		AddRuntimeAsset("particle", "target", reward.target_pfx);
+		AddRuntimeAsset("particle", "caster", reward.caster_pfx);
+		AddRuntimeAsset("particle", "health", reward.health_pfx);
+		AddRuntimeAsset("particle", "mana", reward.mana_pfx);
+		AddRuntimeAsset("particle", "owner", reward.owner_pfx);
+		AddRuntimeAsset("particle", "high_five_overhead", reward.overhead_pfx);
+		AddRuntimeAsset("particle", "high_five_travel", reward.travel_pfx);
+		AddRuntimeAsset("particle", "high_five_impact", reward.impact_pfx);
 		AddRuntimeAsset("particle", "", reward.particle || reward.pfx);
 		AddRuntimeAsset("model", "", reward.model || reward.model_path);
 		AddRuntimeAsset("unit", "", reward.unit || reward.unit_name);
@@ -2434,11 +2753,29 @@ var XHSSupporterPass = (function () {
 		if (hook.indexOf("teleport_end") !== -1) {
 			return "TP END";
 		}
-		if (hook.indexOf("default_target") !== -1) {
+		if (hook.indexOf("target") !== -1) {
 			return "TARGET";
 		}
-		if (hook.indexOf("default_caster") !== -1) {
+		if (hook.indexOf("caster") !== -1) {
 			return "CASTER";
+		}
+		if (hook.indexOf("health") !== -1) {
+			return "HEALTH";
+		}
+		if (hook.indexOf("mana") !== -1) {
+			return "MANA";
+		}
+		if (hook.indexOf("owner") !== -1) {
+			return "OWNER";
+		}
+		if (hook.indexOf("overhead") !== -1) {
+			return "OVERHEAD";
+		}
+		if (hook.indexOf("travel") !== -1) {
+			return "TRAVEL";
+		}
+		if (hook.indexOf("impact") !== -1) {
+			return "IMPACT";
 		}
 		if (hook.indexOf("hero_emblem") !== -1) {
 			return "EMBLEM";
@@ -2488,15 +2825,7 @@ var XHSSupporterPass = (function () {
 
 	function GetDevTestSlot(reward) {
 		var value = ((reward && (reward.slot_id || reward.item_type || reward.type)) || "").toString().toLowerCase();
-		var aliases = {
-			"teleport_fx": "teleport",
-			"tome": "levelup",
-			"tome_fx": "levelup",
-			"kill_fx": "kill_effect",
-			"courier": "companion",
-			"statue": "effigy",
-		};
-		return aliases[value] || value;
+		return CanonicalSupporterSlot(value);
 	}
 
 	function GetDevTestItemID(reward) {
@@ -2506,7 +2835,10 @@ var XHSSupporterPass = (function () {
 
 	function IsDevTestSlotSupported(slot) {
 		return slot === "teleport" || slot === "levelup" || slot === "kill_effect" ||
-			slot === "emblem" || slot === "companion" || slot === "effigy";
+			slot === "emblem" || slot === "companion" || slot === "effigy" ||
+			slot === "potion" || slot === "rebirth" || slot === "attack_lifesteal" ||
+			slot === "spell_lifesteal" || slot === "regen_aura" || slot === "immolation" ||
+			slot === "high_five";
 	}
 
 	function IsDevTestPersistentSlot(slot) {
@@ -2530,6 +2862,24 @@ var XHSSupporterPass = (function () {
 		}
 		if (slot === "kill_effect") {
 			return Text("xhs_sp_dev_test_kill", "TEST KILL");
+		}
+		if (slot === "potion") {
+			return Text("xhs_sp_dev_test_potion", "TEST POTION");
+		}
+		if (slot === "rebirth") {
+			return Text("xhs_sp_dev_test_rebirth", "TEST REBIRTH");
+		}
+		if (slot === "attack_lifesteal") {
+			return Text("xhs_sp_dev_test_attack_lifesteal", "TEST ATTACK STEAL");
+		}
+		if (slot === "spell_lifesteal") {
+			return Text("xhs_sp_dev_test_spell_lifesteal", "TEST SPELL STEAL");
+		}
+		if (slot === "regen_aura" || slot === "immolation") {
+			return Text("xhs_sp_dev_test_preview", "PREVIEW");
+		}
+		if (slot === "high_five") {
+			return Text("xhs_sp_dev_test_high_five", "TEST HIGH FIVE");
 		}
 		if (IsDevTestPersistentSlot(slot)) {
 			return Text("xhs_sp_dev_test_preview", "PREVIEW");
@@ -3190,6 +3540,28 @@ var XHSSupporterPass = (function () {
 			});
 		}
 
+		var devUnlockUI = Panel("XHSPassDevUnlockUIButton");
+		if (devUnlockUI) {
+			devUnlockUI.SetPanelEvent("onactivate", function () {
+				var player = GetLocalPlayerData();
+				if (!IsLocalSupporterDeveloper(player)) {
+					Game.EmitSound("General.Cancel");
+					return;
+				}
+
+				devUnlockAllUI = !devUnlockAllUI;
+				ResetPagination("armory");
+				RenderAll();
+				ShowActionMessage(
+					devUnlockAllUI
+						? "DEV UI preview enabled \u00b7 all 50 levels and both tracks are visible."
+						: "DEV UI preview disabled \u00b7 account ownership restored.",
+					true
+				);
+				Game.EmitSound("General.ButtonClick");
+			});
+		}
+
 		var openCourierRequests = Panel("XHSPassCourierRequestOpenButton");
 		if (openCourierRequests) {
 			openCourierRequests.SetPanelEvent("onactivate", function () {
@@ -3399,8 +3771,15 @@ var XHSSupporterPass = (function () {
 			CustomNetTables.SubscribeNetTableListener("supporter_pass_player", RenderAll);
 			CustomNetTables.SubscribeNetTableListener("supporter_pass_shop", RenderAll);
 			CustomNetTables.SubscribeNetTableListener("supporter_pass_meta", RenderAll);
-			CustomNetTables.SubscribeNetTableListener("supporter_pass_rewards_free", RenderAll);
-			CustomNetTables.SubscribeNetTableListener("supporter_pass_rewards_premium", RenderAll);
+			var renderPublishedTrack = function (tableName, key) {
+				// The server publishes all five chunks before switching this
+				// lightweight index, so render only on the atomic index update.
+				if (key === "rewards") {
+					RenderAll();
+				}
+			};
+			CustomNetTables.SubscribeNetTableListener("supporter_pass_rewards_free", renderPublishedTrack);
+			CustomNetTables.SubscribeNetTableListener("supporter_pass_rewards_premium", renderPublishedTrack);
 		}
 	}
 

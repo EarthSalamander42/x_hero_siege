@@ -125,6 +125,10 @@
 					<Panel id="XHSRunePip1" class="XHSRunePip" />
 					<Panel id="XHSRunePip2" class="XHSRunePip" />
 					<Panel id="XHSRunePip3" class="XHSRunePip" />
+					<Panel id="XHSRunePip4" class="XHSRunePip" />
+					<Panel id="XHSRunePip5" class="XHSRunePip" />
+					<Panel id="XHSRunePip6" class="XHSRunePip" />
+					<Panel id="XHSRunePip7" class="XHSRunePip" />
 				</Panel>
 			</Panel>
 		</Panel>

@@ -4,9 +4,13 @@ if not SpecialEvents then
 	SpecialEvents.Ramero_trigger = 0
 end
 
+require("boss_scripts/special_arena_ai")
+
 local SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP = 2.75
 local CINEMATIC_EVENT_PRE_TELEPORT_DELAY = 4.0
 local CINEMATIC_EVENT_POST_TELEPORT_HOLD = 1.5
+local SPECIAL_EVENT_CAMERA_MOVE_DURATION = 1.25
+local SPECIAL_EVENT_CAMERA_RETURN_DURATION = 0.85
 local MURADIN_ENTRY_POST_TELEPORT_HOLD = 3.0
 local MURADIN_EXIT_STUN_DURATION = 5.0
 local MURADIN_TELEPORT_IN_DELAY = CINEMATIC_EVENT_PRE_TELEPORT_DELAY + CINEMATIC_EVENT_POST_TELEPORT_HOLD
@@ -17,6 +21,7 @@ local FARM_LEADERBOARD_NET_TABLE = "xhs_farm_leaderboard"
 local FARM_LEADERBOARD_NET_KEY = "state"
 local FARM_LEADERBOARD_UPDATE_INTERVAL = 0.25
 local FARM_EVENT_CREEPS_PER_WAVE = 10
+local FARM_EVENT_CELEBRATION_DURATION = 7.0
 local FARM_EVENT_ABILITY_THINK_INTERVAL = 0.25
 local FARM_EVENT_ABILITY_BY_UNIT = {
 	npc_dota_creature_murloc = "xhs_creep_blood_hunger",
@@ -194,6 +199,18 @@ local function StartCinematicDelayedTeleport(hero, point, delay)
 	end)
 end
 
+local function FocusAllPlayersOnSpecialArena(point, intro_duration, return_camera)
+	if point == nil or XHSPlayDoorOpeningCinematic == nil then return end
+
+	XHSPlayDoorOpeningCinematic({}, nil, {
+		camera_position = point,
+		move_duration = SPECIAL_EVENT_CAMERA_MOVE_DURATION,
+		hold_duration = math.max(0, intro_duration - SPECIAL_EVENT_CAMERA_MOVE_DURATION),
+		return_duration = SPECIAL_EVENT_CAMERA_RETURN_DURATION,
+		return_camera = return_camera ~= false,
+	})
+end
+
 local function DestroyMuradinTeleportParticle(particle)
 	if particle == nil then return end
 	ParticleManager:DestroyParticle(particle, false)
@@ -281,13 +298,14 @@ local function StartMuradinTeleportOut(unit)
 	end)
 end
 
-local function StartSpecialArenaCinematicIntro(hero, point, creep_watch_name, on_complete)
+local function StartSpecialArenaCinematicIntro(hero, point, creep_watch_name, on_complete, return_camera)
 	local intro_duration = CINEMATIC_EVENT_PRE_TELEPORT_DELAY + CINEMATIC_EVENT_POST_TELEPORT_HOLD
 
 	CinematicPauseCreeps(SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP)
 	CinematicPauseHeroesForDuration(SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP, intro_duration)
 	StartCinematicPauseCreepsWatch(creep_watch_name, SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP)
 
+	FocusAllPlayersOnSpecialArena(point, intro_duration, return_camera)
 	StartCinematicDelayedTeleport(hero, point, CINEMATIC_EVENT_PRE_TELEPORT_DELAY)
 
 	Timers:CreateTimer(intro_duration, function()
@@ -311,35 +329,105 @@ local function StopStormEarthFireSound(entity)
 end
 
 local function StopAllStormEarthFireSounds()
-	if SpecialEvents.stormEarthFireEmitters == nil then return end
+	SpecialEvents.stormEarthFireSoundGeneration = (SpecialEvents.stormEarthFireSoundGeneration or 0) + 1
+	SpecialEvents.stormEarthFirePlaying = false
 
-	for _, info in pairs(SpecialEvents.stormEarthFireEmitters) do
-		if info ~= nil then
-			StopStormEarthFireSound(info.entity)
+	-- Clean up a global instance left by the previous implementation.
+	StopGlobalSound(STORM_EARTH_FIRE_SOUND)
+
+	if SpecialEvents.stormEarthFireEmitters ~= nil then
+		for _, info in pairs(SpecialEvents.stormEarthFireEmitters) do
+			if info ~= nil then
+				StopStormEarthFireSound(info.entity)
+
+				if info.temporary == true
+					and info.entity ~= nil
+					and IsValidEntity(info.entity)
+					and not info.entity:IsNull()
+				then
+					local emitter = info.entity
+					GameRules:GetGameModeEntity():SetContextThink(DoUniqueString("farm_music_emitter_cleanup"), function()
+						if emitter ~= nil and IsValidEntity(emitter) and not emitter:IsNull() then
+							UTIL_Remove(emitter)
+						end
+						return nil
+					end, 5.0)
+				end
+			end
 		end
 	end
 
 	SpecialEvents.stormEarthFireEmitters = {}
 end
 
-local function PlayStormEarthFireSound(entity)
+local function PlayStormEarthFireSound(entity, emitterKey, temporary)
 	if entity == nil or not IsValidEntity(entity) or entity:IsNull() then return end
 
+	emitterKey = emitterKey or "boss"
 	SpecialEvents.stormEarthFireEmitters = SpecialEvents.stormEarthFireEmitters or {}
 
-	local key = tostring(entity:entindex())
-	local now = GameRules:GetGameTime()
-	local previous = SpecialEvents.stormEarthFireEmitters[key]
-	if previous ~= nil and previous.lastPlayed ~= nil and now - previous.lastPlayed < 1.0 then
+	local current = SpecialEvents.stormEarthFireEmitters[emitterKey]
+	if current ~= nil
+		and current.entity ~= nil
+		and IsValidEntity(current.entity)
+		and not current.entity:IsNull()
+	then
 		return
 	end
 
-	StopStormEarthFireSound(entity)
-	EmitSoundOn(STORM_EARTH_FIRE_SOUND, entity)
-	SpecialEvents.stormEarthFireEmitters[key] = {
-		entity = entity,
-		lastPlayed = now,
+	-- Never bind long event music to a boss: if it dies first, Source can keep
+	-- the sound on an entindex that is later recycled by a creep. A dedicated
+	-- invulnerable emitter remains valid until the event cleanup stops it.
+	SpecialEvents.stormEarthFirePlaying = true
+
+	local generation = SpecialEvents.stormEarthFireSoundGeneration
+	local emitter = temporary ~= true and SpecialEvents.stormEarthFireEmitter or nil
+	if emitter == nil or not IsValidEntity(emitter) or emitter:IsNull() then
+		emitter = CreateUnitByName(
+			"dummy_unit_invulnerable",
+			entity:GetAbsOrigin(),
+			false,
+			nil,
+			nil,
+			DOTA_TEAM_GOODGUYS
+		)
+		if emitter == nil then
+			return
+		end
+
+		emitter:AddNewModifier(emitter, nil, "modifier_invulnerable", {})
+		emitter:AddNewModifier(emitter, nil, "modifier_phased", {})
+		emitter:AddNoDraw()
+		if temporary ~= true then
+			SpecialEvents.stormEarthFireEmitter = emitter
+		end
+	else
+		emitter:SetAbsOrigin(entity:GetAbsOrigin())
+	end
+
+	SpecialEvents.stormEarthFireEmitters[emitterKey] = {
+		entity = emitter,
+		temporary = temporary == true,
 	}
+
+	-- StopGlobalSound and replaying the same event in one frame can suppress the
+	-- new instance. Start it on the next frame after the legacy cleanup.
+	GameRules:GetGameModeEntity():SetContextThink(DoUniqueString("storm_earth_fire_play"), function()
+		local registered = SpecialEvents.stormEarthFireEmitters
+			and SpecialEvents.stormEarthFireEmitters[emitterKey]
+		if SpecialEvents.stormEarthFireSoundGeneration ~= generation
+			or registered == nil
+			or registered.entity ~= emitter
+			or emitter == nil
+			or not IsValidEntity(emitter)
+			or emitter:IsNull()
+		then
+			return nil
+		end
+
+		EmitSoundOn(STORM_EARTH_FIRE_SOUND, emitter)
+		return nil
+	end, 0.03)
 end
 
 function SpecialEvents:MuradinEvent(time)
@@ -381,7 +469,7 @@ function SpecialEvents:MuradinEvent(time)
 		duration = stun_duration,
 		segments = {
 			{ hero = "npc_dota_hero_zuus" },
-			{ text = "You can't kill him! Just survive the Countdown. Reward: 15 000 Gold." },
+			{ text = "You can't kill him! Just survive the Countdown. Reward: 20 000 Gold." },
 		},
 	})
 
@@ -589,8 +677,22 @@ function SpecialEvents:PublishFarmLeaderboard(active)
 		player.rank = rank
 	end
 
+	local phase = self.farm_event_leaderboard_phase or (active == true and "active" or "archived")
+	if phase == "active" then
+		self.farm_event_final_players = players
+	elseif self.farm_event_final_players ~= nil then
+		players = self.farm_event_final_players
+	end
+
+	local winner = players[1]
+
 	CustomNetTables:SetTableValue(FARM_LEADERBOARD_NET_TABLE, FARM_LEADERBOARD_NET_KEY, {
 		active = active == true,
+		available = #players > 0,
+		phase = phase,
+		winner_player_id = winner and winner.player_id or -1,
+		winner_kills = winner and winner.kills or 0,
+		celebration_duration = FARM_EVENT_CELEBRATION_DURATION,
 		waves_per_level = wavesPerLevel,
 		creeps_per_wave = FARM_EVENT_CREEPS_PER_WAVE,
 		players = players,
@@ -617,6 +719,9 @@ function SpecialEvents:StartFarmLeaderboardPublisher()
 	local mode = GameRules:GetGameModeEntity()
 	mode:SetContextThink("xhs_farm_leaderboard_publish", function()
 		if GameMode.FarmEvent_occuring ~= true then
+			if self.farm_event_leaderboard_phase == "celebration" then
+				return nil
+			end
 			self:PublishFarmLeaderboard(false)
 			return nil
 		end
@@ -624,6 +729,47 @@ function SpecialEvents:StartFarmLeaderboardPublisher()
 		self:PublishFarmLeaderboard(true)
 		return FARM_LEADERBOARD_UPDATE_INTERVAL
 	end, 0.0)
+end
+
+function SpecialEvents:RemoveFarmEventCreeps()
+	local units = FindUnitsInRadius(
+		DOTA_TEAM_CUSTOM_2,
+		Vector(0, 0, 0),
+		nil,
+		FIND_UNITS_EVERYWHERE,
+		DOTA_UNIT_TARGET_TEAM_FRIENDLY,
+		DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC,
+		DOTA_UNIT_TARGET_FLAG_NONE,
+		FIND_ANY_ORDER,
+		false
+	)
+
+	for _, unit in ipairs(units) do
+		if unit ~= nil and not unit:IsNull() and unit.xhs_farm_event == true then
+			UTIL_Remove(unit)
+		end
+	end
+end
+
+function SpecialEvents:BeginFarmEventCelebration(duration)
+	duration = math.max(0, tonumber(duration) or FARM_EVENT_CELEBRATION_DURATION)
+
+	-- Capture the last combat frame before removing units so remaining-creep
+	-- tie breakers cannot be changed by cleanup.
+	self:PublishFarmLeaderboard(true)
+	self.farm_event_leaderboard_phase = "celebration"
+	GameMode.FarmEvent_occuring = false
+	CustomTimers.timers_paused = 2
+	StopAllStormEarthFireSounds()
+	self:PublishFarmLeaderboard(true)
+	self:RemoveFarmEventCreeps()
+
+	for _, hero in pairs(HeroList:GetAllHeroes()) do
+		if hero:IsRealHero() then
+			hero:Stop()
+			DisableItems(hero, duration)
+		end
+	end
 end
 
 function SpecialEvents:StartFarmEventAbilityAI(unit, playerID, abilityName)
@@ -703,6 +849,11 @@ function SpecialEvents:FarmEvent(time)
 	GameMode.FarmEvent_occuring = true
 	SpecialEvents.hero_farm_event = {}
 	self.farm_event_ability_locks = {}
+	self.farm_event_final_players = nil
+	self.farm_event_leaderboard_phase = "active"
+	self.farm_event_generation = (self.farm_event_generation or 0) + 1
+	self.farm_exit_wave_scheduled = false
+	self.farm_exit_wave_spawned = false
 	self:PublishFarmLeaderboard(true)
 	self:StartFarmLeaderboardPublisher()
 	ShowCurrentEventTimer("FARM EVENT", time)
@@ -740,9 +891,18 @@ function SpecialEvents:FarmEvent(time)
 
 		RestartHeroes()
 
-		for nPlayerID = 0, PlayerResource:GetPlayerCount() - 1 do
-			if PlayerResource:HasSelectedHero(nPlayerID) and PlayerResource:GetSelectedHeroEntity(nPlayerID) ~= "npc_dota_hero_wisp" then
-				local hero = PlayerResource:GetSelectedHeroEntity(nPlayerID)
+		for nPlayerID = 0, (DOTA_MAX_TEAM_PLAYERS or 24) - 1 do
+			local hero = nil
+			if PlayerResource:HasSelectedHero(nPlayerID) then
+				hero = PlayerResource:GetSelectedHeroEntity(nPlayerID)
+			end
+
+			if hero ~= nil
+				and IsValidEntity(hero)
+				and not hero:IsNull()
+				and hero:IsRealHero()
+				and hero:GetUnitName() ~= "npc_dota_hero_wisp"
+			then
 				local point = Entities:FindByName(nil, "farm_event_player_" .. nPlayerID)
 
 				SpecialEvents.hero_farm_event[nPlayerID] = {}
@@ -750,10 +910,12 @@ function SpecialEvents:FarmEvent(time)
 				SpecialEvents.hero_farm_event[nPlayerID]["level"] = 1
 				SpecialEvents.hero_farm_event[nPlayerID]["kills"] = 0
 
+				if point ~= nil then
+					PlayStormEarthFireSound(point, "farm_" .. nPlayerID, true)
+				end
+
 				for j = 1, FARM_EVENT_CREEPS_PER_WAVE do
 					if FarmEvent_Creeps[1] and point then
-						PlayStormEarthFireSound(point)
-
 						local unit = CreateUnitByName(FarmEvent_Creeps[1], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 						unit:SetBaseDamageMin(unit:GetRealDamageDone(unit) + (FARM_EVENT_UPGRADE["damage"][difficulty] * SpecialEvents.hero_farm_event[nPlayerID]["level"]))
 						unit:SetBaseDamageMax(unit:GetRealDamageDone(unit) + (FARM_EVENT_UPGRADE["damage"][difficulty] * SpecialEvents.hero_farm_event[nPlayerID]["level"]) * 1.1)
@@ -787,8 +949,7 @@ function SpecialEvents:FarmEvent(time)
 	end, time - 20)
 
 	GameRules:GetGameModeEntity():SetContextThink(DoUniqueString("muradin_event"), function()
-		BT_ENABLED = 1
-		SpecialEvents:EndFarmEvent()
+		SpecialEvents:BeginFarmEventCelebration(FARM_EVENT_CELEBRATION_DURATION)
 		HideCurrentEventTimer()
 		UpdateGlobalObjective("farm_event", "Completed", "Farm Event completed", nil)
 		CustomGameEventManager:Send_ServerToAllClients("update_special_event_label_final", {})
@@ -796,14 +957,12 @@ function SpecialEvents:FarmEvent(time)
 		return nil
 	end, time)
 
-	GameRules:GetGameModeEntity():SetContextThink(DoUniqueString("muradin_event"), function()
-		RestartCreeps(0.0)
-		if CustomTimers.special_waves_disabled ~= true then
-			SpecialWave(6)
-		end
-
+	GameRules:GetGameModeEntity():SetContextThink(DoUniqueString("farm_event_celebration_end"), function()
+		BT_ENABLED = 1
+		SpecialEvents:EndFarmEvent()
 		return nil
-	end, time + 10)
+	end, time + FARM_EVENT_CELEBRATION_DURATION)
+
 end
 
 function SpecialEvents:FarmEventCreeps(id)
@@ -869,6 +1028,29 @@ function SpecialEvents:EndFarmEvent()
 		end
 	end
 
+	-- The sixth special wave is coupled to the end of the 3-second return TP.
+	-- Keep a single idempotent owner so duplicate Farm callbacks cannot advance
+	-- the global index and spawn wave 7 from the same north lane.
+	if self.farm_exit_wave_scheduled ~= true then
+		self.farm_exit_wave_scheduled = true
+		local farmEventGeneration = self.farm_event_generation
+		Timers:CreateTimer(3.0, function()
+			if self.farm_event_generation ~= farmEventGeneration then return nil end
+
+			RestartCreeps(0.0)
+
+			if CustomTimers.special_waves_disabled ~= true
+				and self.farm_exit_wave_spawned ~= true
+				and CustomTimers.special_wave == 6
+			then
+				self.farm_exit_wave_spawned = true
+				SpecialWave(6)
+			end
+
+			return nil
+		end)
+	end
+
 	local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_2, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)
 	for _, v in pairs(units) do
 		if v:IsCreature() and v:HasMovementCapability() and v:GetUnitName() ~= "npc_dota_boss_lich_king" then
@@ -908,6 +1090,7 @@ function SpecialEvents:EndFarmEvent()
 	CustomTimers:Countdown("special_wave")
 
 	GameMode.FarmEvent_occuring = false
+	self.farm_event_leaderboard_phase = "archived"
 	self:PublishFarmLeaderboard(false)
 end
 
@@ -928,6 +1111,10 @@ function SpecialEvents:StartRameroAndBaristolEvent(hero)
 	NotifySpecialArenaStarted(hero, "Ramero and Baristol")
 
 	SpecialEvents.Ramero_trigger = 1
+	SpecialEvents.active_arena_player_id = hero ~= nil
+		and not hero:IsNull()
+		and hero:GetPlayerID()
+		or nil
 
 	if hero ~= nil and not hero:IsNull() then
 		hero.old_pos = hero:GetAbsOrigin()
@@ -936,7 +1123,7 @@ function SpecialEvents:StartRameroAndBaristolEvent(hero)
 
 	StartSpecialArenaCinematicIntro(hero, point, "xhs_ramero_baristol_creep_pause_watch", function()
 		SpecialEvents:RameroAndBaristolEvent(XHS_RAMERO_BARISTOL_TIME, hero)
-	end)
+	end, false)
 end
 
 function SpecialEvents:RameroAndBaristolEvent(time, hero) -- 500 kills
@@ -963,6 +1150,11 @@ function SpecialEvents:RameroAndBaristolEvent(time, hero) -- 500 kills
 	SpecialEvents.Baristol:AddNewModifier(SpecialEvents.Baristol, nil, "modifier_pause_creeps", { duration = stun_duration, IsHidden = true })
 	SpecialEvents.Baristol:SetAngles(0, 325, 0)
 
+	XHSSpecialArenaAI:Attach(SpecialEvents.Ramero, "ramero")
+	XHSSpecialArenaAI:Attach(SpecialEvents.Baristol, "baristol")
+	GameMode:ShowOptionalEventBossBar("ramero", SpecialEvents.Ramero, hero)
+	GameMode:ShowOptionalEventBossBar("baristol", SpecialEvents.Baristol, hero)
+
 	PlayStormEarthFireSound(SpecialEvents.Ramero)
 
 	NotifySpecialArenaInstructions(hero, "npc_dota_hero_sven", "Kill Ramero and Baristol to get special items! Reward: Lightning Sword and Tome of Stats +250.")
@@ -975,10 +1167,18 @@ function SpecialEvents:RameroAndBaristolEvent(time, hero) -- 500 kills
 end
 
 function SpecialEvents:EndRameroAndBaristolEvent(bWin)
+	-- Always clear both global slots before any idempotency return. Ramero may
+	-- already have an invalid handle when Baristol dies, so the boss-bar helper
+	-- also sends a handle-independent hide using the optional event identity.
+	GameMode:HideOptionalEventBossBar("ramero", SpecialEvents.Ramero)
+	GameMode:HideOptionalEventBossBar("baristol", SpecialEvents.Baristol)
+	StopAllStormEarthFireSounds()
+
 	if _G.RAMERO_ARTIFACT_PICKED == true then return end
 
 	bWin = bWin == true or (SpecialEvents.RameroDead == true and SpecialEvents.BaristolDead == true)
 	_G.RAMERO_ARTIFACT_PICKED = true
+	SpecialEvents.active_arena_player_id = nil
 	if FragmentQuests ~= nil then
 		FragmentQuests:OnArenaEnd("ramero_baristol", bWin)
 	end
@@ -989,16 +1189,19 @@ function SpecialEvents:EndRameroAndBaristolEvent(bWin)
 	mode:SetContextThink("RameroAndBaristol", nil, 0)
 
 	RestartCreeps(teleport_time + 3.0)
-	StopAllStormEarthFireSounds()
 	UTIL_Remove(_G.RAMERO_DUMMY)
 	UTIL_Remove(_G.BARISTOL_DUMMY)
 
 	CustomGameEventManager:Send_ServerToAllClients("hide_timer_special_arena", {})
 
-	if not SpecialEvents.Ramero:IsNull() or not SpecialEvents.Baristol:IsNull() then
-		if not SpecialEvents.Ramero:IsNull() then UTIL_Remove(SpecialEvents.Ramero) end
-		if not SpecialEvents.Baristol:IsNull() then UTIL_Remove(SpecialEvents.Baristol) end
+	if SpecialEvents.Ramero ~= nil and IsValidEntity(SpecialEvents.Ramero) and not SpecialEvents.Ramero:IsNull() then
+		UTIL_Remove(SpecialEvents.Ramero)
 	end
+	if SpecialEvents.Baristol ~= nil and IsValidEntity(SpecialEvents.Baristol) and not SpecialEvents.Baristol:IsNull() then
+		UTIL_Remove(SpecialEvents.Baristol)
+	end
+	SpecialEvents.Ramero = nil
+	SpecialEvents.Baristol = nil
 
 	if bWin then
 		Notifications:TopToAll({ text = "Ramero and Baristol arena has been won!", duration = 5.0 })
@@ -1045,6 +1248,10 @@ function SpecialEvents:StartSogatEvent(hero)
 	NotifySpecialArenaStarted(hero, "Sogat")
 
 	SpecialEvents.Ramero_trigger = 2
+	SpecialEvents.active_arena_player_id = hero ~= nil
+		and not hero:IsNull()
+		and hero:GetPlayerID()
+		or nil
 
 	if hero ~= nil and not hero:IsNull() then
 		hero.old_pos = hero:GetAbsOrigin()
@@ -1074,6 +1281,8 @@ function SpecialEvents:SogatEvent(time, hero) -- 750 kills
 	SpecialEvents.Sogat = CreateUnitByName("npc_ramero_2", Entities:FindByName(nil, "roshan_wp_4"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 	SpecialEvents.Sogat:AddNewModifier(SpecialEvents.Sogat, nil, "modifier_pause_creeps", { duration = stun_duration, IsHidden = true })
 	SpecialEvents.Sogat:SetAngles(0, 45, 0)
+	XHSSpecialArenaAI:Attach(SpecialEvents.Sogat, "sogat")
+	GameMode:ShowOptionalEventBossBar("sogat", SpecialEvents.Sogat, hero)
 	PlayStormEarthFireSound(SpecialEvents.Sogat)
 	NotifySpecialArenaInstructions(hero, "npc_dota_hero_sven", "Kill Sogat to get a special item! Reward: Ring of Superiority.")
 
@@ -1088,6 +1297,7 @@ function SpecialEvents:EndSogatEvent(bWin)
 	-- if _G.SOGAT_ARTIFACT_PICKED == true then return end -- if timer is not removed, uncomment this
 
 	_G.SOGAT_ARTIFACT_PICKED = true
+	SpecialEvents.active_arena_player_id = nil
 	if FragmentQuests ~= nil then
 		FragmentQuests:OnArenaEnd("sogat", bWin == true)
 	end
@@ -1103,7 +1313,8 @@ function SpecialEvents:EndSogatEvent(bWin)
 
 	CustomGameEventManager:Send_ServerToAllClients("hide_timer_special_arena", {})
 
-	if not SpecialEvents.Sogat:IsNull() then
+	if SpecialEvents.Sogat ~= nil and IsValidEntity(SpecialEvents.Sogat) and not SpecialEvents.Sogat:IsNull() then
+		GameMode:HideOptionalEventBossBar("sogat", SpecialEvents.Sogat)
 		UTIL_Remove(SpecialEvents.Sogat)
 	end
 

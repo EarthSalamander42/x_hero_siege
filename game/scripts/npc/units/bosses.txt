@@ -26,7 +26,7 @@
 		"Ability10"					"necronomicon_warrior_sight"
 		"Ability11"					"boss_health"
 
-		"ArmorPhysical"				"200"                 // Physical protection.
+		"ArmorPhysical"				"250"                 // Physical protection.
 		"MagicalResistance"			"40"                 // Magical protection (percentage).
 	
 		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
@@ -94,7 +94,7 @@
 		"Ability10"					"cant_die_generic"
 	
 		"HasInventory"				"0"
-		"ArmorPhysical"				"200"                 // Physical protection.
+		"ArmorPhysical"				"250"                 // Physical protection.
 		"MagicalResistance"			"50"                 // Magical protection (percentage).
 
 		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
@@ -427,7 +427,7 @@
 		"Ability7"					"boss_health"
 		"Ability8"					"cant_die_generic"
 
-		"ArmorPhysical"				"200"			// Physical protection.
+		"ArmorPhysical"				"245"			// Physical protection.
 		"MagicalResistance"			"50"			// Magical protection (percentage).
 	
 		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
@@ -963,8 +963,8 @@
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
-		"AttackDamageMin"			"55"			// Damage range min.
-		"AttackDamageMax"			"65"		// Damage range max.
+		"AttackDamageMin"			"85"			// Damage range min.
+		"AttackDamageMax"			"95"		// Damage range max.
 		"AttackDamageType"			"DAMAGE_TYPE_ArmorPhysical"
 		"AttackRate"				"0.05"		// Speed of attack.
 		"AttackAnimationPoint"		"0.3"		// Normalized time in animation cycle to attack.
@@ -1041,8 +1041,8 @@
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
-		"AttackDamageMin"			"95"			// Damage range min.
-		"AttackDamageMax"			"105"		// Damage range max.
+		"AttackDamageMin"			"122"			// Damage range min.
+		"AttackDamageMax"			"132"		// Damage range max.
 		"AttackDamageType"			"DAMAGE_TYPE_ArmorPhysical"
 		"AttackRate"				"0.05"		// Speed of attack.
 		"AttackAnimationPoint"		"0.3"		// Normalized time in animation cycle to attack.
@@ -1119,8 +1119,8 @@
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
-		"AttackDamageMin"			"175"			// Damage range min.
-		"AttackDamageMax"			"185"		// Damage range max.
+		"AttackDamageMin"			"195"			// Damage range min.
+		"AttackDamageMax"			"205"		// Damage range max.
 		"AttackDamageType"			"DAMAGE_TYPE_ArmorPhysical"
 		"AttackRate"				"0.05"		// Speed of attack.
 		"AttackAnimationPoint"		"0.3"		// Normalized time in animation cycle to attack.
@@ -1275,8 +1275,8 @@
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
-		"AttackDamageMin"			"128"			// Damage range min.
-		"AttackDamageMax"			"132"		// Damage range max.
+		"AttackDamageMin"			"193"			// Damage range min.
+		"AttackDamageMax"			"197"		// Damage range max.
 		"AttackDamageType"			"DAMAGE_TYPE_ArmorPhysical"
 		"AttackRate"				"1.15"		// Speed of attack.
 		"AttackAnimationPoint"		"0.3"		// Normalized time in animation cycle to attack.
@@ -1352,8 +1352,8 @@
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
-		"AttackDamageMin"			"208"			// Damage range min.
-		"AttackDamageMax"			"212"		// Damage range max.
+		"AttackDamageMin"			"266"			// Damage range min.
+		"AttackDamageMax"			"270"		// Damage range max.
 		"AttackDamageType"			"DAMAGE_TYPE_ArmorPhysical"
 		"AttackRate"				"1.05"		// Speed of attack.
 		"AttackAnimationPoint"		"0.3"		// Normalized time in animation cycle to attack.
@@ -1429,8 +1429,8 @@
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
-		"AttackDamageMin"			"408"			// Damage range min.
-		"AttackDamageMax"			"412"		// Damage range max.
+		"AttackDamageMin"			"448"			// Damage range min.
+		"AttackDamageMax"			"452"		// Damage range max.
 		"AttackDamageType"			"DAMAGE_TYPE_ArmorPhysical"
 		"AttackRate"				"0.95"		// Speed of attack.
 		"AttackAnimationPoint"		"0.3"		// Normalized time in animation cycle to attack.
@@ -1735,7 +1735,7 @@
 		"Ability7"					"boss_health"
 		"Ability8"					"cant_die_generic"
 
-		"ArmorPhysical"				"200"                 // Physical protection.
+		"ArmorPhysical"				"255"                 // Physical protection.
 		"MagicalResistance"			"50"                 // Magical protection (percentage).
 
 		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
@@ -1801,7 +1801,7 @@
 		"Ability7"					"boss_health"
 		"Ability8"					"cant_die_generic"
 
-		"ArmorPhysical"				"150"                 // Physical protection.
+		"ArmorPhysical"				"235"                 // Physical protection.
 		"MagicalResistance"			"50"                 // Magical protection (percentage).
 
 		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
@@ -2295,7 +2295,7 @@
 
 		// Armor
 		//-------------------------------------------------------------------------------------------------------------
-		"ArmorPhysical"				"5"								// Physical protection.
+		"ArmorPhysical"				"15"								// Physical protection.
 	
 		// Attack
 		//-------------------------------------------------------------------------------------------------------------
@@ -2365,7 +2365,7 @@
 	
 		// Armor
 		//-------------------------------------------------------------------------------------------------------------
-		"ArmorPhysical"				"10"								// Physical protection.
+		"ArmorPhysical"				"30"								// Physical protection.
 	
 		// Attack
 		//-------------------------------------------------------------------------------------------------------------
@@ -2435,7 +2435,7 @@
 	
 		// Armor
 		//-------------------------------------------------------------------------------------------------------------
-		"ArmorPhysical"				"20"								// Physical protection.
+		"ArmorPhysical"				"50"								// Physical protection.
 	
 		// Attack
 		//-------------------------------------------------------------------------------------------------------------
@@ -2505,7 +2505,7 @@
 	
 		// Armor
 		//-------------------------------------------------------------------------------------------------------------
-		"ArmorPhysical"				"25"								// Physical protection.
+		"ArmorPhysical"				"65"								// Physical protection.
 	
 		// Attack
 		//-------------------------------------------------------------------------------------------------------------
@@ -2668,7 +2668,7 @@
 		"Ability7"					"boss_health"
 		"Ability8"					"cant_die_generic"
 
-		"ArmorPhysical"				"160"                  // Physical protection.
+		"ArmorPhysical"				"260"                  // Physical protection.
 		"MagicalResistance"			"50"                 // Magical protection (percentage).
 
 		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
@@ -2830,7 +2830,7 @@
 
 		// Armor
 		//----------------------------------------------------------------
-		"ArmorPhysical"				"200"		// Physical protection.
+		"ArmorPhysical"				"280"		// Physical protection.
 		"MagicalResistance"			"70"	// Magical protection.
 
 		// Attack
@@ -2943,7 +2943,7 @@
 		"Ability9"					"boss_health"
 		"Ability10"					"cant_die_generic"
 
-		"ArmorPhysical"				"230"                  // Physical protection.
+		"ArmorPhysical"				"275"                  // Physical protection.
 		"MagicalResistance"			"50"                 // Magical protection (percentage).
 
 		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
@@ -3104,7 +3104,7 @@
 
 		// Armor
 		//----------------------------------------------------------------
-		"ArmorPhysical"				"200"		// Physical protection.
+		"ArmorPhysical"				"300"		// Physical protection.
 		"MagicalResistance"			"75"	// Magical protection.
 
 		// Attack
@@ -3198,7 +3198,7 @@
 
 		// Armor
 		//----------------------------------------------------------------
-		"ArmorPhysical"				"200"		// Physical protection.
+		"ArmorPhysical"				"300"		// Physical protection.
 		"MagicalResistance"			"70"	// Magical protection.
 
 		// Attack
@@ -3301,7 +3301,7 @@
 
 		// Armor
 		//----------------------------------------------------------------
-		"ArmorPhysical"				"200"		// Physical protection.
+		"ArmorPhysical"				"300"		// Physical protection.
 		"MagicalResistance"			"70"	// Magical protection.
 
 		// Attack
@@ -3402,7 +3402,7 @@
 
 		// Armor
 		//----------------------------------------------------------------
-		"ArmorPhysical"				"200"		// Physical protection.
+		"ArmorPhysical"				"300"		// Physical protection.
 		"MagicalResistance"			"70"	// Magical protection.
 
 		// Attack

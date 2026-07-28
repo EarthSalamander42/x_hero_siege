@@ -80,7 +80,7 @@ local function UpdateMetamorphosisCounter(modifier)
 		boss_bar_id = GetIllidanBossBarId(parent),
 		label = "Metamorphosis",
 		remaining = remaining,
-		total = math.max(1, math.ceil(modifier:GetDuration())),
+		display_mode = "seconds",
 	})
 end
 

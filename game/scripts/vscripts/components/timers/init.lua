@@ -1,6 +1,7 @@
 -- require("components/timers/events")
 
 local SPECIAL_WAVE_WARNING_SOUND = "Dungeon.Stinger03"
+local SPECIAL_WAVE_WARNING_DURATION = 30
 
 if CustomTimers == nil then
 	CustomTimers = class({})
@@ -563,6 +564,7 @@ function CustomTimers:ShowSpecialWaveCountdown(iCardinalPoint, duration, trackSe
 
 	local direction = CustomTimers:GetSpecialWavePoint(iCardinalPoint)
 	if direction == nil then return end
+	local remaining = math.max(0, tonumber(duration) or SPECIAL_WAVE_WARNING_DURATION)
 
 	local timer_name = "special_wave"
 	if trackServerTimer == false then
@@ -570,17 +572,22 @@ function CustomTimers:ShowSpecialWaveCountdown(iCardinalPoint, duration, trackSe
 	end
 
 	CustomGameEventManager:Send_ServerToAllClients("xhs_wave_timer", {
-		duration = duration,
+		-- Keep the countdown's total duration separate from its current value.
+		-- ResumeSpecialWaveCountdown can reopen this notification below 30s;
+		-- treating that remaining value as the new total resets the radial to 100%.
+		duration = remaining,
+		remaining = remaining,
+		countdown_duration = SPECIAL_WAVE_WARNING_DURATION,
 		timer_name = timer_name,
 		wave_index = CustomTimers.special_wave or iCardinalPoint,
 		direction = direction,
 		eyebrow = "WAVE INCOMING",
 		title = "Wave of Darkness",
 		subtitle = string.upper(direction) .. " lane",
-		sound = duration == 30 and SPECIAL_WAVE_WARNING_SOUND or nil
+		sound = remaining == SPECIAL_WAVE_WARNING_DURATION and SPECIAL_WAVE_WARNING_SOUND or nil
 	})
 
-	CustomTimers:CreateSpecialWaveTimerParticle(direction, duration)
+	CustomTimers:CreateSpecialWaveTimerParticle(direction, remaining)
 end
 
 function CustomTimers:HideSpecialWaveCountdown()
@@ -614,6 +621,8 @@ end
 function CustomTimers:ShowFinalWaveCountdown(duration)
 	CustomGameEventManager:Send_ServerToAllClients("xhs_wave_timer", {
 		duration = duration,
+		remaining = duration,
+		countdown_duration = duration,
 		timer_name = "special_event",
 		eyebrow = "FINAL WAVE",
 		title = "Back to the Castle",

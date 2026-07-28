@@ -58,6 +58,10 @@ local function StartDestroyerMagnataurAbilityAI(unit)
 
 	Timers:CreateTimer(RandomFloat(0.2, 0.6), function()
 		if unit == nil or unit:IsNull() or not unit:IsAlive() then return nil end
+		if XHSPerformanceCounters ~= nil then
+			XHSPerformanceCounters:Increment("ability_loop_thinks", 1)
+		end
+		if XHSLagLabIsActive ~= nil and XHSLagLabIsActive("pause_abilities") then return 0.25 end
 
 		local thunderClap = unit:FindAbilityByName("creature_thunder_clap_low")
 		if thunderClap == nil or thunderClap:GetLevel() <= 0 then return 0.25 end
@@ -95,6 +99,7 @@ end
 
 local function OrderWaveCreep(unit, waypoint)
 	if unit == nil or unit:IsNull() then return end
+	unit.xhs_wave_order_controller = true
 
 	ForEachUnitAbility(unit, function(ability)
 		if ability ~= nil and ability:GetLevel() <= 0 then
@@ -120,6 +125,10 @@ local function OrderWaveCreep(unit, waypoint)
 
 	Timers:CreateTimer(0.25, function()
 		if unit == nil or unit:IsNull() or not unit:IsAlive() then return nil end
+		if XHSPerformanceCounters ~= nil then
+			XHSPerformanceCounters:Increment("wave_thinks", 1)
+		end
+		if XHSLagLabIsActive ~= nil and XHSLagLabIsActive("pause_waves") then return 0.25 end
 
 		if ClearBreakableLaneTarget(unit, GetBreakableLaneTarget(unit)) then
 			MoveCreepPastBreakable(unit, finalDestination)
@@ -411,13 +420,24 @@ function SpawnMagnataur(hPos)
 end
 
 function SpawnDragons(dragon)
+	local difficulty = math.max(1, GameRules:GetCustomGameDifficulty())
+
 	for c = 1, 8 do
 		local isDragonLane = CREEP_LANES_TYPE ~= 2 or c % 2 == 0
 		if isDragonLane and CREEP_LANES[c][1] == 1 and CREEP_LANES[c][3] == 1 then
 			local point = Entities:FindByName(nil, "npc_dota_spawner_" .. c)
 			local waypoint = Entities:FindByName(nil, "creep_path_" .. c)
-			for j = 1, GameRules:GetCustomGameDifficulty() do
-				SpawnWaveCreep(dragon, point, waypoint)
+			for j = 1, difficulty do
+				local spawnedDragon = SpawnWaveCreep(dragon, point, waypoint)
+				if spawnedDragon ~= nil then
+					-- Difficulty increases the number of dragons for combat, not
+					-- the lane's total economy. OnNPCSpawned has already applied
+					-- the difficulty bounty multiplier, so split that resulting
+					-- bounty evenly between every dragon spawned on this lane.
+					local splitBounty = math.max(0, math.floor(spawnedDragon:GetGoldBounty() / difficulty))
+					spawnedDragon:SetMinimumGoldBounty(splitBounty)
+					spawnedDragon:SetMaximumGoldBounty(splitBounty)
+				end
 			end
 		end
 	end

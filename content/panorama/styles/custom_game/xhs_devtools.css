@@ -11,6 +11,16 @@
 	z-index: 9000;
 }
 
+.XHSDevToolsHost.LogOnly .XHSDevToolsToggle,
+.XHSDevToolsHost.LogOnly .XHSDevToolsTimescale,
+.XHSDevToolsHost.LogOnly .XHSDevToolsPanel {
+	visibility: collapse;
+}
+
+.XHSDevToolsHost.LogOnly .XHSDevToolsPerformance {
+	margin-top: 48px;
+}
+
 .XHSDevToolsToggle {
 	width: 52px;
 	height: 30px;
@@ -91,6 +101,339 @@
 
 .XHSDevToolsTimescaleButton.Active Label {
 	color: #f1fcff;
+}
+
+.XHSDevToolsPerformance {
+	width: 342px;
+	horizontal-align: right;
+	vertical-align: top;
+	margin-top: 84px;
+	margin-right: 48px;
+	flow-children: down;
+	background-color: #0b1218ee;
+	border: 1px solid #69d7ff55;
+	box-shadow: fill #000000aa 0px 0px 8px 0px;
+	z-index: 9010;
+}
+
+.XHSDevToolsPerformance.Warning {
+	border-color: #ffbf5f99;
+}
+
+.XHSDevToolsPerformance.Critical {
+	border-color: #ff625fcc;
+	box-shadow: fill #ff3b2433 0px 0px 10px 0px;
+}
+
+.XHSDevToolsPerformance.Expanded {
+	width: 880px;
+}
+
+.XHSDevToolsPerformanceHeader {
+	width: 100%;
+	height: 30px;
+	flow-children: right;
+}
+
+.XHSDevToolsPerformanceCompactMetric {
+	width: fill-parent-flow(1);
+	height: 100%;
+	padding-left: 8px;
+	flow-children: right;
+	border-right: 1px solid #69d7ff18;
+}
+
+.XHSDevToolsPerformanceCompactMetric .CompactName {
+	width: 50px;
+	vertical-align: center;
+	color: #7899a5;
+	font-size: 9px;
+	font-weight: bold;
+	letter-spacing: 1px;
+}
+
+.XHSDevToolsPerformanceCompactMetric .CompactValue {
+	width: fill-parent-flow(1);
+	vertical-align: center;
+	color: #e2f4f8;
+	font-size: 13px;
+	font-weight: bold;
+	text-align: right;
+}
+
+.XHSDevToolsPerformanceCompactMetric .CompactValue.Low {
+	color: #ffd27e;
+}
+
+.XHSDevToolsPerformanceCompactMetric .CompactValue.Critical {
+	color: #ff8d84;
+}
+
+.XHSDevToolsPerformanceHeader:hover {
+	brightness: 1.5;
+}
+
+.XHSDevToolsPerformanceRank {
+	width: 24px;
+	height: 100%;
+	padding-top: 6px;
+	color: #6f8d98;
+	font-size: 11px;
+	text-align: center;
+}
+
+.XHSDevToolsPerformanceName {
+	width: 78px;
+	height: 100%;
+	padding-top: 5px;
+	color: #a8dce9;
+	font-size: 12px;
+	font-weight: bold;
+	letter-spacing: 1px;
+}
+
+.XHSDevToolsPerformancePrimaryValue {
+	width: fill-parent-flow(1);
+	height: 100%;
+	padding-top: 3px;
+	color: #f1fcff;
+	font-size: 16px;
+	font-weight: bold;
+	text-align: right;
+}
+
+.XHSDevToolsPerformance.Warning .XHSDevToolsPerformancePrimaryValue {
+	color: #ffd27e;
+}
+
+.XHSDevToolsPerformance.Critical .XHSDevToolsPerformancePrimaryValue {
+	color: #ff8d84;
+}
+
+.XHSDevToolsPerformanceArrow {
+	width: 25px;
+	height: 100%;
+	padding-top: 4px;
+	color: #75cce4;
+	font-size: 15px;
+	font-weight: bold;
+	text-align: center;
+}
+
+.XHSDevToolsPerformanceArrow.ExpandedArrow {
+	visibility: collapse;
+}
+
+.XHSDevToolsPerformance.Expanded .XHSDevToolsPerformanceArrow.CollapsedArrow {
+	visibility: collapse;
+}
+
+.XHSDevToolsPerformance.Expanded .XHSDevToolsPerformanceArrow.ExpandedArrow {
+	visibility: visible;
+}
+
+.XHSDevToolsPerformanceColumnControls {
+	width: 100%;
+	height: 29px;
+	padding: 4px 7px 3px 7px;
+	flow-children: right;
+	border-top: 1px solid #69d7ff22;
+	visibility: collapse;
+}
+
+.XHSDevToolsPerformance.Expanded .XHSDevToolsPerformanceColumnControls {
+	visibility: visible;
+}
+
+.XHSDevToolsPerformanceColumnControlsTitle {
+	width: fill-parent-flow(1);
+	vertical-align: center;
+	color: #547985;
+	font-size: 9px;
+	font-weight: bold;
+	letter-spacing: 1px;
+}
+
+.XHSDevToolsPerformanceColumnToggle {
+	width: 75px;
+	height: 21px;
+	margin-left: 4px;
+	background-color: #101b22;
+	border: 1px solid #4b6d7855;
+}
+
+.XHSDevToolsPerformanceColumnToggle Label {
+	width: 100%;
+	vertical-align: center;
+	color: #667f88;
+	font-size: 9px;
+	font-weight: bold;
+	text-align: center;
+}
+
+.XHSDevToolsPerformanceColumnToggle:hover {
+	brightness: 1.6;
+}
+
+.XHSDevToolsPerformanceColumnToggle.Active {
+	background-color: #153844;
+	border-color: #69d7ff99;
+}
+
+.XHSDevToolsPerformanceColumnToggle.Active Label {
+	color: #bceef8;
+}
+
+.XHSDevToolsPerformanceDetails {
+	width: 100%;
+	padding: 4px 7px 7px 7px;
+	flow-children: right;
+	border-top: 1px solid #69d7ff22;
+	visibility: collapse;
+}
+
+.XHSDevToolsPerformanceDetails .ColumnHidden {
+	visibility: collapse;
+}
+
+.XHSDevToolsPerformance.Expanded .XHSDevToolsPerformanceDetails {
+	visibility: visible;
+}
+
+.XHSDevToolsPerformanceClientColumn {
+	width: 198px;
+	min-height: 220px;
+	margin-right: 10px;
+	padding-right: 9px;
+	flow-children: down;
+	border-right: 1px solid #69d7ff22;
+}
+
+.XHSDevToolsPerformanceServerColumn {
+	width: 198px;
+	min-height: 220px;
+	margin-right: 10px;
+	padding-right: 9px;
+	flow-children: down;
+	border-right: 1px solid #69d7ff22;
+}
+
+.XHSDevToolsPerformanceActivityColumn {
+	width: 225px;
+	min-height: 220px;
+	margin-right: 10px;
+	padding-right: 9px;
+	flow-children: down;
+	border-right: 1px solid #69d7ff22;
+}
+
+.XHSDevToolsPerformanceBotColumn {
+	width: fill-parent-flow(1);
+	flow-children: down;
+}
+
+.XHSDevToolsPerformanceColumnTitle {
+	width: 100%;
+	height: 22px;
+	padding-top: 3px;
+	color: #6fcde8;
+	font-size: 10px;
+	font-weight: bold;
+	letter-spacing: 1px;
+}
+
+.XHSDevToolsPerformancePlayers {
+	width: 100%;
+	flow-children: down;
+}
+
+.XHSDevToolsPerformancePlayerRow {
+	width: 100%;
+	height: 24px;
+	flow-children: right;
+	border-bottom: 1px solid #ffffff0a;
+}
+
+.XHSDevToolsPerformancePlayerName {
+	width: fill-parent-flow(1);
+	vertical-align: center;
+	color: #a9c1ca;
+	font-size: 11px;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.XHSDevToolsPerformancePlayerFPS {
+	width: 62px;
+	vertical-align: center;
+	color: #8ee6ac;
+	font-size: 12px;
+	font-weight: bold;
+	text-align: right;
+}
+
+.XHSDevToolsPerformancePlayerFPS.Low {
+	color: #ffd27e;
+}
+
+.XHSDevToolsPerformancePlayerFPS.Critical {
+	color: #ff8d84;
+}
+
+.XHSDevToolsPerformancePlayerFPS.Unknown {
+	color: #667e87;
+}
+
+.XHSDevToolsPerformanceRow {
+	width: 100%;
+	height: 20px;
+	flow-children: right;
+}
+
+.XHSDevToolsPerformanceRow Label {
+	width: fill-parent-flow(1);
+	vertical-align: center;
+	color: #78919b;
+	font-size: 10px;
+}
+
+.XHSDevToolsPerformanceRow Label.Value {
+	width: 72px;
+	color: #d8edf3;
+	font-size: 11px;
+	font-weight: semi-bold;
+	text-align: right;
+}
+
+.XHSDevToolsPerformanceRow Label.Value.WideValue {
+	width: 88px;
+}
+
+.XHSDevToolsPerformanceRow Label.Value.Warning {
+	color: #ffd27e;
+}
+
+.XHSDevToolsPerformanceRow Label.Value.Critical {
+	color: #ff8d84;
+}
+
+.XHSDevToolsPerformanceSourceTitle {
+	width: 100%;
+	height: 18px;
+	margin-top: 3px;
+	padding-top: 3px;
+	color: #5f9aaa;
+	font-size: 8px;
+	letter-spacing: 1px;
+}
+
+.XHSDevToolsPerformanceSource {
+	width: 100%;
+	height: 15px;
+	color: #8eabb4;
+	font-size: 8px;
+	text-overflow: shrink;
+	white-space: nowrap;
 }
 
 .XHSDevToolsPanel {
@@ -222,7 +565,7 @@
 }
 
 .XHSDevToolsTab {
-	width: 24%;
+	width: 19%;
 	height: 30px;
 	margin-right: 1%;
 	margin-bottom: 5px;
@@ -666,4 +1009,206 @@
 
 .XHSDevToolsBotGoalGrid .XHSDevToolsButton.Tiny Label {
 	font-size: 10px;
+}
+
+.XHSDevToolsLagLabStatus {
+	width: 100%;
+	min-height: 38px;
+	flow-children: right;
+}
+
+.XHSDevToolsLagLabStage {
+	width: fill-parent-flow(1);
+	vertical-align: center;
+	color: #ffd474;
+	font-size: 14px;
+	font-weight: bold;
+	letter-spacing: 1px;
+}
+
+.XHSDevToolsLagLabFeedback {
+	width: 100%;
+	margin-top: 4px;
+	color: #83dbff;
+	font-size: 11px;
+	white-space: normal;
+}
+
+.XHSDevToolsLagLabFeedback.Error {
+	color: #ff8585;
+}
+
+.XHSDevToolsLagLabGrid {
+	width: 100%;
+	flow-children: right-wrap;
+}
+
+.XHSDevToolsLagLabCard {
+	width: 32%;
+	min-height: 82px;
+	margin-right: 1%;
+	margin-bottom: 7px;
+	padding: 7px;
+	flow-children: down;
+	background-color: #071117aa;
+	border: 1px solid #52d6ff20;
+}
+
+.XHSDevToolsLagLabCard.IsOff {
+	background-color: #071117aa;
+	border-color: #52636a42;
+}
+
+.XHSDevToolsLagLabCard.IsTesting {
+	background-color: gradient(linear, 0% 0%, 100% 100%, from(#48340fdd), to(#171108dd));
+	border-color: #ffd36b99;
+	box-shadow: inset #ffca4b18 0px 0px 12px 0px;
+}
+
+.XHSDevToolsLagLabCard.IsOn {
+	background-color: gradient(linear, 0% 0%, 100% 100%, from(#123d29e8), to(#071811e8));
+	border-color: #72ed9eaa;
+	box-shadow: inset #58f29120 0px 0px 14px 0px;
+}
+
+.XHSDevToolsLagLabCard:hover {
+	brightness: 1.45;
+	border-color: #7fdcff66;
+}
+
+.XHSDevToolsLagLabCard:active {
+	brightness: 0.8;
+}
+
+.XHSDevToolsLagLabCard:disabled {
+	saturation: 0.2;
+	opacity: 0.55;
+}
+
+.XHSDevToolsLagLabCardTitle {
+	width: fill-parent-flow(1);
+	vertical-align: center;
+	color: #eefaff;
+	font-size: 13px;
+	font-weight: semi-bold;
+	text-shadow: 0px 1px 2px 2 #000000;
+}
+
+.XHSDevToolsLagLabCardHeader {
+	width: 100%;
+	height: 25px;
+	margin-bottom: 5px;
+	flow-children: right;
+}
+
+.XHSDevToolsLagLabCheckbox {
+	width: 42px;
+	height: 22px;
+	vertical-align: center;
+	background-color: #111a20ee;
+	border: 1px solid #73838a66;
+}
+
+.XHSDevToolsLagLabCard.IsTesting .XHSDevToolsLagLabCheckbox {
+	background-color: #5b400fee;
+	border-color: #ffd36baa;
+}
+
+.XHSDevToolsLagLabCard.IsOn .XHSDevToolsLagLabCheckbox {
+	background-color: #176738ee;
+	border-color: #7af0a4cc;
+}
+
+.XHSDevToolsLagLabCheckboxLabel {
+	horizontal-align: center;
+	vertical-align: center;
+	color: #9babb1;
+	font-size: 10px;
+	font-weight: bold;
+}
+
+.XHSDevToolsLagLabCard.IsTesting .XHSDevToolsLagLabCheckboxLabel {
+	color: #ffe09a;
+}
+
+.XHSDevToolsLagLabCard.IsOn .XHSDevToolsLagLabCheckboxLabel {
+	color: #d9ffe6;
+}
+
+.XHSDevToolsLagLabHint {
+	width: 100%;
+	color: #849ca6;
+	font-size: 10px;
+	white-space: normal;
+}
+
+.XHSDevToolsLagLabHotspot {
+	width: 100%;
+	min-height: 36px;
+	margin-bottom: 4px;
+	padding: 3px;
+	flow-children: right;
+	background-color: #080d12a8;
+}
+
+.XHSDevToolsLagLabSource {
+	width: fill-parent-flow(1);
+	vertical-align: center;
+	color: #c9e4ed;
+	font-size: 11px;
+	text-overflow: shrink;
+}
+
+.XHSDevToolsLagLabHotspot .XHSDevToolsButton {
+	height: 28px;
+	margin-bottom: 0;
+}
+
+.XHSDevToolsLagLabResultTitle {
+	width: 100%;
+	margin-bottom: 7px;
+	color: #d8f4ff;
+	font-size: 12px;
+	white-space: normal;
+}
+
+.XHSDevToolsLagLabTable {
+	width: 100%;
+	flow-children: down;
+}
+
+.XHSDevToolsLagLabRow {
+	width: 100%;
+	height: 24px;
+	padding: 2px 5px;
+	flow-children: right;
+	background-color: #07111788;
+	border-bottom: 1px solid #ffffff0a;
+}
+
+.XHSDevToolsLagLabRow.Header {
+	background-color: #12303bbb;
+}
+
+.XHSDevToolsLagLabMetric {
+	width: fill-parent-flow(1);
+	vertical-align: center;
+	color: #b9d2da;
+	font-size: 11px;
+}
+
+.XHSDevToolsLagLabValue {
+	width: 105px;
+	vertical-align: center;
+	color: #dcecf1;
+	font-size: 11px;
+	text-align: right center;
+}
+
+.XHSDevToolsLagLabValue.Improved {
+	color: #79e69e;
+}
+
+.XHSDevToolsLagLabValue.Regressed {
+	color: #ff8585;
 }

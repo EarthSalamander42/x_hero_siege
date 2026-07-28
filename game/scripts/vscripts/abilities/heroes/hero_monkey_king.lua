@@ -3,12 +3,38 @@ local caster = keys.caster
 local ability = keys.ability
 local jinguBuff = caster:FindModifierByName("modifier_jingu_mastery_activated")
 
+	-- Keep the DataDriven Lifesteal action as the source of truth for gameplay.
+	-- Its companion RunScript (after the action) only observes the real health
+	-- gained so the equipped Supporter Pass attack-lifesteal cosmetic can play.
+	caster.xhs_supporter_jingu_lifesteal = nil
+	local health_before = caster:GetHealth()
+	if health_before < caster:GetMaxHealth() then
+		caster.xhs_supporter_jingu_lifesteal = {
+			health_before = health_before,
+			victim = keys.target,
+		}
+	end
+
 	if jinguBuff then
 		jinguBuff:DecrementStackCount()
 		if jinguBuff:GetStackCount() <= 0 then
 			jinguBuff:Destroy()
 			caster:RemoveModifierByName("modifier_jingu_mastery_activated_damage")
 		end
+	end
+end
+
+function JinguLifestealFX(keys)
+	local hero = keys.caster
+	local state = hero and hero.xhs_supporter_jingu_lifesteal
+	if hero then
+		hero.xhs_supporter_jingu_lifesteal = nil
+	end
+	if state == nil then return end
+
+	local actual_heal = hero:GetHealth() - (tonumber(state.health_before) or hero:GetHealth())
+	if actual_heal > 0 and XHSPlaySupporterAttackLifestealFX ~= nil then
+		XHSPlaySupporterAttackLifestealFX(hero, state.victim, actual_heal)
 	end
 end
 

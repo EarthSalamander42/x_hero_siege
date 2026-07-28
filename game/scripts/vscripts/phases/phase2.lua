@@ -51,7 +51,12 @@ function OpenPhase2Doors(side, cinematic, callback)
 	end
 
 	if cinematic == true and XHSOpenDoorsWithCinematic ~= nil then
+		-- Both phase-two gates open together, but the reveal must stay on the
+		-- first (left) gate so the camera does not frame the empty midpoint.
+		local first_door = Entities:FindByName(nil, PHASE_2_SIDES.left.door_name)
+		local camera_position = first_door ~= nil and first_door:GetAbsOrigin() or nil
 		XHSOpenDoorsWithCinematic(doors, obstructions, "gate_entrance002_open", callback, {
+			camera_position = camera_position,
 			move_duration = 1.35,
 			hold_duration = 1.25,
 			return_duration = 1.0,
@@ -701,7 +706,7 @@ local function NotifyFinalWaveArrival(config)
 
 	Notifications:TopToAll({
 		text = config.boss_label .. " arrives from the " .. config.direction_label,
-		duration = 4.0,
+		duration = 3.0,
 		style = { color = "#ffdc73", ["font-size"] = "28px", ["font-weight"] = "bold" },
 	})
 end
@@ -756,6 +761,10 @@ function FinalWave(force)
 
 	Timers:CreateTimer(FINAL_WAVE_PLAYER_TELEPORT_DELAY, function()
 		if not IsFinalWaveSequenceActive(finalWaveSequenceId) then return end
+
+		if Runes ~= nil and Runes.OnFinalWaveTeleport ~= nil then
+			Runes:OnFinalWaveTeleport()
+		end
 
 		-- Music must not depend on the Panorama cinematic panel being loaded.
 		-- The custom sound event owns the requested 2x gain and this global

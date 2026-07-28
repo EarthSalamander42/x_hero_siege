@@ -131,5 +131,14 @@ function Phantasm(keys)
 		illusion:RemoveAbility("boss_health")
 		illusion:RemoveAbility("cant_die_generic")
 		illusion:RemoveModifierByName("modifier_cant_die_generic")
+
+		if caster.xhs_final_wave_unit == true then
+			illusion.xhs_final_wave_illusion = true
+			local ancient = Entities:FindByClassname(nil, "npc_dota_fort")
+			if ancient ~= nil and not ancient:IsNull() then
+				illusion:SetInitialGoalEntity(ancient)
+				illusion:MoveToPositionAggressive(ancient:GetAbsOrigin())
+			end
+		end
 	end
 end

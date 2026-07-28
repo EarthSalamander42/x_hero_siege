@@ -59,6 +59,8 @@
 				</Panel>
 			</Panel>
 
+			<Panel id="XHSReviveFrameStack" class="XHSReviveFrameStack" hittest="false" />
+
 			<Panel id="XHSFragmentQuestIntro" class="XHSFragmentQuestIntro" hittest="false">
 				<Panel class="XHSFragmentQuestIntroHeader">
 					<Panel class="XHSFragmentQuestIntroMark">

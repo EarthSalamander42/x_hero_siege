@@ -30,6 +30,56 @@
 	pre-transform-scale2d: 1;
 }
 
+.XHSFarmLeaderboard.IsArchived
+{
+	opacity: 0;
+	transform: translateX( 360px );
+}
+
+.XHSFarmLeaderboard.IsArchived.IsReopened
+{
+	opacity: 1;
+	transform: translateX( 0px );
+}
+
+.XHSFarmLeaderboardToggle
+{
+	width: 30px;
+	height: 68px;
+	horizontal-align: right;
+	vertical-align: center;
+	margin-right: 0px;
+	visibility: collapse;
+	opacity: 0;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #162b3ff5 ), to( #07111df8 ) );
+	border: 1px solid #65d8ff66;
+	border-right: 0px solid transparent;
+	box-shadow: fill #000000aa -4px 4px 10px 0px;
+	transition-property: opacity, brightness, width;
+	transition-duration: 0.2s;
+}
+
+.XHSFarmLeaderboardToggle.IsVisible
+{
+	visibility: visible;
+	opacity: 1;
+}
+
+.XHSFarmLeaderboardToggle:hover
+{
+	brightness: 1.45;
+	width: 36px;
+}
+
+.XHSFarmLeaderboardToggle Label
+{
+	align: center center;
+	color: #ffd77f;
+	font-size: 28px;
+	font-weight: bold;
+	text-shadow: 0px 0px 7px #ffb13c66;
+}
+
 .XHSFarmLeaderboardHeader
 {
 	width: 100%;
@@ -39,6 +89,81 @@
 	border: 1px solid #62d8ff58;
 	border-left: 3px solid #ffbd43;
 	box-shadow: fill #000000a8 0px 5px 14px 0px, inset #bcecff10 0px 1px 0px 0px;
+}
+
+.XHSFarmWinnerCelebration
+{
+	width: 100%;
+	height: 0px;
+	visibility: collapse;
+	opacity: 0;
+	flow-children: right;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #3a240df4 ), color-stop( 0.55, #18253af5 ), to( #08131ff5 ) );
+	border-left: 1px solid #ffc45c66;
+	border-right: 1px solid #ffc45c66;
+	overflow: noclip;
+}
+
+.XHSFarmLeaderboard.IsCelebrating .XHSFarmWinnerCelebration
+{
+	height: 78px;
+	visibility: visible;
+	opacity: 1;
+	animation-name: XHSFarmWinnerGlow;
+	animation-duration: 1.15s;
+	animation-iteration-count: infinite;
+	animation-timing-function: ease-in-out;
+}
+
+.XHSFarmWinnerCrown
+{
+	width: 64px;
+	height: 100%;
+	padding-top: 14px;
+	color: #ffe098;
+	font-size: 38px;
+	text-align: center;
+	text-shadow: 0px 0px 12px #ffad35bb;
+	animation-name: XHSFarmWinnerCrownPulse;
+	animation-duration: 0.8s;
+	animation-iteration-count: infinite;
+	animation-timing-function: ease-in-out;
+}
+
+.XHSFarmWinnerCopy
+{
+	width: fill-parent-flow( 1.0 );
+	height: 100%;
+	padding-top: 10px;
+	flow-children: down;
+}
+
+.XHSFarmWinnerEyebrow
+{
+	color: #ffbf51;
+	font-size: 10px;
+	font-weight: bold;
+	letter-spacing: 1.5px;
+}
+
+.XHSFarmWinnerName
+{
+	width: 100%;
+	height: 27px;
+	color: #fff5d8;
+	font-size: 21px;
+	font-weight: bold;
+	text-overflow: shrink;
+	white-space: nowrap;
+	text-shadow: 0px 1px 4px #000000;
+}
+
+.XHSFarmWinnerScore
+{
+	color: #ffd477;
+	font-size: 12px;
+	font-weight: bold;
+	letter-spacing: 0.5px;
 }
 
 .XHSFarmLeaderboardHeaderAccent
@@ -415,4 +540,18 @@
 	0% { opacity: 0.45; pre-transform-scale2d: 0.8; }
 	50% { opacity: 1; pre-transform-scale2d: 1.08; }
 	100% { opacity: 0.45; pre-transform-scale2d: 0.8; }
+}
+
+@keyframes 'XHSFarmWinnerGlow'
+{
+	0% { brightness: 1; box-shadow: inset #ffbd4715 0px 0px 8px 0px; }
+	50% { brightness: 1.35; box-shadow: inset #ffcf6470 0px 0px 18px 0px; }
+	100% { brightness: 1; box-shadow: inset #ffbd4715 0px 0px 8px 0px; }
+}
+
+@keyframes 'XHSFarmWinnerCrownPulse'
+{
+	0% { pre-transform-scale2d: 0.92; transform: rotateZ( -5deg ); }
+	50% { pre-transform-scale2d: 1.08; transform: rotateZ( 5deg ); }
+	100% { pre-transform-scale2d: 0.92; transform: rotateZ( -5deg ); }
 }

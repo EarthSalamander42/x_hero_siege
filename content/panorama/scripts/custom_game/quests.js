@@ -375,13 +375,6 @@ var XHSStaticQuests = [
 		subquest: true
 	},
 	{
-		id: "final_wave",
-		text: "Final Wave locked",
-		type: "Explore",
-		state: "Inactive",
-		subquest: true
-	},
-	{
 		id: "xhs_phase_3",
 		text: "Phase 3: Defeat the enemy leaders",
 		type: "Holdout",
@@ -407,7 +400,6 @@ var XHSQuestUiOrder = [
 	"farm_event",
 	"kill_dest_mag",
 	"phase2_creeps",
-	"final_wave",
 	"kill_ice_towers",
 	"kill_final_wave",
 	"xhs_phase_3",
@@ -435,7 +427,6 @@ var XHSQuestUiMeta = {
 	muradin_event: { phase: 1, subquest: true },
 	farm_event: { phase: 2, subquest: true },
 	phase2_creeps: { phase: 2, subquest: true },
-	final_wave: { phase: 2, subquest: true },
 	kill_dest_mag: { phase: 2, subquest: true },
 	kill_ice_towers: { phase: 2, subquest: true },
 	kill_final_wave: { phase: 2, subquest: true },
@@ -749,7 +740,9 @@ function RefreshStaticQuests() {
 
 		if (phase > 1 || i <= level) {
 			state = "Completed";
-			text = "Creep level " + i + " completed";
+			// Each row represents reaching the next creep level. Once reached,
+			// the level that was actually survived/completed is the previous one.
+			text = "Creep level " + (i - 1) + " completed";
 		} else if (i === level + 1 && phase === 1) {
 			state = "Active";
 			text = "Creep level " + i + " in " + (nextSeconds === null ? "--:--" : FormatQuestSeconds(nextSeconds));

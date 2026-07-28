@@ -37,6 +37,32 @@ function ItemsGame:Init()
 	ItemsGame.battlepass2 = {}
 	ItemsGame.companions = {}
 
+	local hasSeason2026 = SupporterPass2026 ~= nil
+		and SupporterPass2026.ApplyCatalog ~= nil
+		and SupporterPass2026.BuildTracks ~= nil
+	if hasSeason2026 then
+		SupporterPass2026:ApplyCatalog(ItemsGame.custom_kv)
+		ItemsGame.battlepass, ItemsGame.battlepass2 =
+			SupporterPass2026:BuildTracks(ItemsGame)
+		ItemsGame.companions =
+			SupporterPass2026:BuildCompanionCatalog(ItemsGame)
+
+		SupporterPass2026:PublishRewardTrack(
+			"supporter_pass_rewards_free",
+			ItemsGame.battlepass
+		)
+		SupporterPass2026:PublishRewardTrack(
+			"supporter_pass_rewards_premium",
+			ItemsGame.battlepass2
+		)
+		CustomNetTables:SetTableValue(
+			"supporter_pass_player",
+			"companions",
+			ItemsGame.companions
+		)
+		return
+	end
+
 	local bp_reward_table = {}
 	local bp_reward_table2 = {}
 	local count = 1
@@ -295,7 +321,7 @@ end
 --]]
 
 function ItemsGame:IsPremiumReward(item_id)
-	if self:GetItemInfo(item_id, "premium") == 1 then
+	if tonumber(self:GetItemInfo(item_id, "premium")) == 1 then
 		return true
 	end
 

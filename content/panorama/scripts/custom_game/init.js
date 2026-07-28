@@ -61,6 +61,24 @@ function EnsureXHSBuyTomeDisabledOverlay(button) {
 	return overlay;
 }
 
+function EnsureXHSBuyTomeAutoBuyHint(button) {
+	if (!button) {
+		return null;
+	}
+
+	var hint = button.FindChildTraverse("XHSBuyTomeAutoBuyHint");
+	if (!hint) {
+		hint = $.CreatePanel("Label", button, "XHSBuyTomeAutoBuyHint");
+		hint.AddClass("XHSBuyTomeAutoBuyHint");
+		hint.hittest = false;
+	}
+
+	var enabled = button.BHasClass("TomeAutoBuyEnabled");
+	hint.text = enabled ? "AUTO" : "RMB";
+	hint.SetHasClass("Enabled", enabled);
+	return hint;
+}
+
 function ApplyXHSBuyTomeButtonStyle(button, options) {
 	if (!button) {
 		return;
@@ -70,6 +88,8 @@ function ApplyXHSBuyTomeButtonStyle(button, options) {
 	var noTomes = options.noTomes !== undefined ? options.noTomes : button.BHasClass("NoTomes");
 	var locked = options.locked !== undefined ? options.locked === true : button.BHasClass("TomePurchaseLocked");
 	var hovered = options.hovered !== undefined ? options.hovered === true : button.BHasClass("XHSBuyTomeHovered");
+	var autoBuy = options.autoBuy !== undefined ? options.autoBuy === true : button.BHasClass("TomeAutoBuyEnabled");
+	button.SetHasClass("TomeAutoBuyEnabled", autoBuy);
 
 	button.style.width = "34px";
 	button.style.height = "34px";
@@ -79,12 +99,12 @@ function ApplyXHSBuyTomeButtonStyle(button, options) {
 	button.style.marginTop = "0px";
 	button.style.marginBottom = "14px";
 	button.style.backgroundColor = "#0614219a";
-	button.style.border = locked ? "1px solid #e06a6aaa" : (hovered ? "1px solid #9fe8ff64" : "1px solid #7fd7ff2a");
+	button.style.border = autoBuy ? "2px solid #ffd75e" : (locked ? "1px solid #e06a6aaa" : (hovered ? "1px solid #9fe8ff64" : "1px solid #7fd7ff2a"));
 	button.style.borderRadius = "4px";
-	button.style.boxShadow = "fill #0000007a 0px 0px 5px 0px";
-	button.style.opacity = locked ? "0.78" : (noTomes ? "0.42" : (hovered ? "1" : "0.9"));
-	button.style.saturation = locked ? "0.25" : (noTomes ? "0.35" : "1");
-	button.style.brightness = locked ? (hovered ? "0.92" : "0.72") : (noTomes ? "0.75" : (hovered ? "1.55" : "1"));
+	button.style.boxShadow = autoBuy ? "fill #ffbf3870 0px 0px 9px 1px" : "fill #0000007a 0px 0px 5px 0px";
+	button.style.opacity = autoBuy ? "1" : (locked ? "0.78" : (noTomes ? "0.42" : (hovered ? "1" : "0.9")));
+	button.style.saturation = autoBuy ? "1" : (locked ? "0.25" : (noTomes ? "0.35" : "1"));
+	button.style.brightness = autoBuy ? "1" : (locked ? (hovered ? "0.92" : "0.72") : (noTomes ? "0.75" : (hovered ? "1.55" : "1")));
 	button.style.preTransformScale2d = "1";
 	button.style.tooltipPosition = "top";
 	button.style.zIndex = "1200";
@@ -119,6 +139,12 @@ function ApplyXHSBuyTomeButtonStyle(button, options) {
 		count.style.textOverflow = "shrink";
 	}
 
+	var autoBuyHint = EnsureXHSBuyTomeAutoBuyHint(button);
+	if (autoBuyHint) {
+		autoBuyHint.text = autoBuy ? "AUTO" : "RMB";
+		autoBuyHint.SetHasClass("Enabled", autoBuy);
+	}
+
 	var overlay = EnsureXHSBuyTomeDisabledOverlay(button);
 	if (overlay) {
 		overlay.style.visibility = locked ? "visible" : "collapse";
@@ -142,6 +168,7 @@ function ApplyXHSBuyTomeButtonStyle(button, options) {
 
 GameUI.CustomUIConfig().ApplyXHSBuyTomeButtonStyle = ApplyXHSBuyTomeButtonStyle;
 GameUI.CustomUIConfig().EnsureXHSBuyTomeDisabledOverlay = EnsureXHSBuyTomeDisabledOverlay;
+GameUI.CustomUIConfig().EnsureXHSBuyTomeAutoBuyHint = EnsureXHSBuyTomeAutoBuyHint;
 
 function OnXHSBuyTomeButtonPressed() {
 	var button = GameUI.CustomUIConfig().XHSBuyTomeButton;
@@ -152,17 +179,34 @@ function OnXHSBuyTomeButtonPressed() {
 	GameEvents.SendCustomGameEventToServer("xhs_buy_tomes", {});
 }
 
+function OnXHSBuyTomeAutoBuyToggle() {
+	var button = GameUI.CustomUIConfig().XHSBuyTomeButton;
+	if (button && button.BHasClass("XHSBuyTomeOtherPlayer")) {
+		return;
+	}
+
+	GameEvents.SendCustomGameEventToServer("xhs_toggle_auto_buy_tomes", {});
+}
+
 function ShowXHSBuyTomeTooltip() {
 	var button = GameUI.CustomUIConfig().XHSBuyTomeButton;
 	if (button) {
 		button.AddClass("XHSBuyTomeHovered");
 		ApplyXHSBuyTomeButtonStyle(button, { hovered: true });
+		var autoBuyEnabled = button.BHasClass("TomeAutoBuyEnabled");
+		var controlHelp = autoBuyEnabled
+			? "AUTO-BUY: ON\nRight-click to disable."
+			: "AUTO-BUY: OFF\nRight-click to enable.";
 		if (button.BHasClass("TomePurchaseLocked")) {
 			var reasonToken = GameUI.CustomUIConfig().XHSBuyTomeLockReason || "#xhs_tome_lock_temporarily_disabled";
 			var reason = NormalizeXHSLocalizedText($.Localize(reasonToken));
-			$.DispatchEvent("DOTAShowTextTooltip", button, reason);
+			$.DispatchEvent("DOTAShowTextTooltip", button, reason + "\n\n" + controlHelp);
 		} else {
-			$.DispatchEvent("DOTAShowAbilityTooltip", button, "item_tome_small");
+			$.DispatchEvent(
+				"DOTAShowTextTooltip",
+				button,
+				"Tome of Stats (+50 all attributes)\nLeft-click to buy the maximum affordable.\n\n" + controlHelp
+			);
 		}
 	}
 }
@@ -221,6 +265,11 @@ GameUI.CustomUIConfig().CreateXHSBuyTomeButton = function(parent) {
 		}
 
 		GameUI.CustomUIConfig().XHSBuyTomeButton = existing;
+		existing.SetPanelEvent("onactivate", OnXHSBuyTomeButtonPressed);
+		existing.SetPanelEvent("oncontextmenu", OnXHSBuyTomeAutoBuyToggle);
+		existing.SetPanelEvent("onmouseover", ShowXHSBuyTomeTooltip);
+		existing.SetPanelEvent("onmouseout", HideXHSBuyTomeTooltip);
+		EnsureXHSBuyTomeAutoBuyHint(existing);
 		EnsureXHSBuyTomeDisabledOverlay(existing);
 		ApplyXHSBuyTomeButtonStyle(existing);
 		return existing;
@@ -232,6 +281,7 @@ GameUI.CustomUIConfig().CreateXHSBuyTomeButton = function(parent) {
 	button.AddClass("XHSInjectedIntoCenterBlock");
 	button.hittest = true;
 	button.SetPanelEvent("onactivate", OnXHSBuyTomeButtonPressed);
+	button.SetPanelEvent("oncontextmenu", OnXHSBuyTomeAutoBuyToggle);
 	button.SetPanelEvent("onmouseover", ShowXHSBuyTomeTooltip);
 	button.SetPanelEvent("onmouseout", HideXHSBuyTomeTooltip);
 	button.style.visibility = "collapse";
@@ -245,6 +295,7 @@ GameUI.CustomUIConfig().CreateXHSBuyTomeButton = function(parent) {
 	count.AddClass("XHSBuyTomeCount");
 	count.text = "x0";
 	count.hittest = false;
+	EnsureXHSBuyTomeAutoBuyHint(button);
 	EnsureXHSBuyTomeDisabledOverlay(button);
 	ApplyXHSBuyTomeButtonStyle(button, { noTomes: true });
 

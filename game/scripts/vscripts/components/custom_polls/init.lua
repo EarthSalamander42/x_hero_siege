@@ -168,14 +168,24 @@ end
 function CustomPolls:GetPlayerIDFromEvent(event_source_index, event)
 	local player_id = nil
 
-	if CustomGameEventManager.GetPlayerIDFromEventSourceIndex ~= nil then
-		player_id = CustomGameEventManager:GetPlayerIDFromEventSourceIndex(event_source_index)
+	if api ~= nil and api.GetEventPlayerID ~= nil then
+		local ok, resolved_player_id = pcall(function()
+			return api:GetEventPlayerID(event_source_index, nil)
+		end)
+		if ok then
+			player_id = tonumber(resolved_player_id)
+		end
+	elseif CustomGameEventManager.GetPlayerIDFromEventSourceIndex ~= nil then
+		local ok, resolved_player_id = pcall(function()
+			return CustomGameEventManager:GetPlayerIDFromEventSourceIndex(event_source_index)
+		end)
+		if ok then
+			player_id = tonumber(resolved_player_id)
+		end
 	end
 
-	if player_id == nil or player_id < 0 then
-		player_id = tonumber(event and event.PlayerID)
-	end
-
+	-- Fail closed. event.PlayerID is client-controlled and must never be used as
+	-- an identity fallback, even when it names a persistent human account.
 	if player_id == nil or not PlayerResource:IsValidPlayerID(player_id) then
 		return nil
 	end

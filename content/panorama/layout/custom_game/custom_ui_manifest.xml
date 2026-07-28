@@ -2,6 +2,7 @@
 	<scripts>
     	<include src="s2r://panorama/scripts/custom_game/init.js" />
     	<include src="s2r://panorama/scripts/custom_game/util.js" />
+		<include src="s2r://panorama/scripts/custom_game/xhs_performance_reporter.js" />
 	</scripts>
 
 	<Panel>

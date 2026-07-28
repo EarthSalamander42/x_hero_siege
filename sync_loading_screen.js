@@ -9,7 +9,7 @@ const REPOS = [
 	{ name: "x_hero_siege", root: CURRENT_REPO_ROOT, primary: true },
 	{ name: "PudgeWars", root: path.join(GITHUB_ROOT, "PudgeWars") },
 	{ name: "herolinewars", root: path.join(GITHUB_ROOT, "Shopify", "net-lunettes.fr", "herolinewars") },
-	{ name: "frostrose_battlefield", root: path.join(GITHUB_ROOT, "Shopify", "net-lunettes.fr", "frostrose_battlefield") },
+	// Frostrose Battlefield now owns a standalone Frostforged Crown loading screen.
 	{ name: "dota_imba", root: path.join(GITHUB_ROOT, "Shopify", "net-lunettes.fr", "dota_imba") },
 ];
 

@@ -7,9 +7,11 @@
 	var activeWaveTimerName = null;
 	var activeWaveDuration = 30;
 	var activeWaveMode = null;
+	var activeWaveWarningKey = null;
 	var WAVE_RING_COUNTDOWN_SECONDS = 30;
 	var renderedWaveRingRatio = 1;
 	var waveRingAnimationVersion = 0;
+	var waveRingLegacyClipsCleared = false;
 	var queuedActiveWaves = [];
 	var queuedWaveWarning = null;
 	var queuedWaveRowCount = 0;
@@ -21,6 +23,7 @@
 	var activeRuneCompact = false;
 	var activeRuneAltDown = false;
 	var activeRuneMessage = null;
+	var MAX_RUNE_COUNT = 8;
 	var fragmentQuestNotificationQueue = [];
 	var fragmentQuestNotificationActive = false;
 	var FRAGMENT_QUEST_QUEUE_GAP = 0.35;
@@ -958,12 +961,16 @@
 	}
 
 	function setWaveMode(mode) {
+		activeWaveMode = mode || null;
+		if (mode !== "warning" && mode !== "compact") {
+			cancelWaveCountdownProgress();
+		}
+
 		var panel = $(WAVE_PANEL_ID);
 		if (!panel) {
 			return;
 		}
 
-		activeWaveMode = mode || null;
 		panel.SetHasClass("XHSWaveCompact", mode === "compact");
 		panel.SetHasClass("XHSWaveWarning", mode === "warning");
 		panel.SetHasClass("XHSWaveActive", mode === "active");
@@ -981,28 +988,39 @@
 
 		ratio = Math.max(0, Math.min(1, Number(ratio) || 0));
 		renderedWaveRingRatio = ratio;
-		// Panorama can leave a visible seam/wedge on a nominal -360deg radial
-		// clip. A full ring does not need a mask, so remove the scripted clip
-		// entirely at 100% and only use the radial mask while progressing.
+		// Draw the remaining fraction directly with Panorama's positive radial
+		// range. Negative angles wrap around the zero-degree seam and can be
+		// clamped after the first update, leaving the countdown visually stuck.
 		var radialClip = ratio >= 0.9999
 			? null
-			: "radial(50% 50%, 0.0deg, " + (ratio * -360).toFixed(2) + "deg)";
+			: ratio <= 0.0001
+				? "radial(50% 50%, 0.0deg, 0.0deg)"
+				: "radial(50% 50%, 0.0deg, " + (ratio * 360).toFixed(2) + "deg)";
 		if (progressClip) {
-			// Mask the container, not just each visual panel. Panorama otherwise
-			// renders a panel's box-shadow before its own clip, leaving a full,
-			// overpowering halo behind the countdown wedge.
+			// Use one authoritative mask. Applying the same radial clip to this
+			// panel and all of its children makes Panorama recompose the nested
+			// masks on timer snapshots, briefly drawing a full circle again.
 			progressClip.style.clip = radialClip;
 		}
-		if (ring) {
-			ring.style.clip = radialClip;
+
+		// Clear inline child masks left behind by older hot-reloaded versions.
+		// The parent mask clips the ring, fill, sweep and their shadows together.
+		if (!waveRingLegacyClipsCleared) {
+			if (ring) {
+				ring.style.clip = null;
+			}
+			if (sweep) {
+				sweep.style.clip = null;
+			}
+			if (fill) {
+				fill.style.clip = null;
+			}
+			waveRingLegacyClipsCleared = true;
 		}
+
 		if (sweep) {
-			sweep.style.clip = radialClip;
 			sweep.style.opacity = ratio > 0 ? String(Math.max(0.72, ratio)) : "0";
 			sweep.SetHasClass("XHSWaveRingSweepWarning", ratio > 0 && ratio <= 0.25);
-		}
-		if (fill) {
-			fill.style.clip = radialClip;
 		}
 	}
 
@@ -1043,18 +1061,26 @@
 		animateWaveRingProgress(ratio, 0.22, false);
 	}
 
+	function cancelWaveCountdownProgress() {
+		// Invalidating the current one-second segment is enough. The next
+		// authoritative timer snapshot starts a fresh segment.
+		waveRingAnimationVersion += 1;
+	}
+
 	function animateWaveCountdownProgress(remaining) {
 		var countdownDuration = Math.max(1, Number(activeWaveDuration) || WAVE_RING_COUNTDOWN_SECONDS);
-		var startRatio = Math.max(0, Math.min(1, Math.min(remaining, countdownDuration) / countdownDuration));
-		var nextRatio = Math.max(0, Math.min(1, Math.min(Math.max(0, remaining - 1), countdownDuration) / countdownDuration));
+		var safeRemaining = Math.max(0, Math.min(countdownDuration, Number(remaining) || 0));
+		var startRatio = safeRemaining / countdownDuration;
+		var nextRatio = Math.max(0, safeRemaining - 1) / countdownDuration;
 
-		// Snap only when opening or resynchronizing after a large timer jump.
-		// Normal one-second updates continue from the currently rendered angle.
-		if (Math.abs(renderedWaveRingRatio - startRatio) > (1.5 / countdownDuration)) {
+		// Every server tick owns exactly one linear second of the radial. Snap
+		// down after a real timer jump, but never snap back up during one warning.
+		// A fresh warning explicitly initializes its own ratio in showWaveTimer.
+		if (renderedWaveRingRatio - startRatio > (1.5 / countdownDuration)) {
 			waveRingAnimationVersion += 1;
 			renderWaveRingProgress(startRatio);
 		}
-		animateWaveRingProgress(nextRatio, Math.min(1, Math.max(0.08, remaining)), true);
+		animateWaveRingProgress(nextRatio, safeRemaining > 0 ? 1 : 0, true);
 	}
 
 	function updateWaveCountdown(remaining) {
@@ -1081,8 +1107,8 @@
 	function hideWavePanel() {
 		setWaveVisible(false);
 		activeWaveTimerName = null;
+		activeWaveWarningKey = null;
 		setWaveMode(null);
-		waveRingAnimationVersion += 1;
 		renderWaveRingProgress(1);
 	}
 
@@ -1097,6 +1123,7 @@
 		cancelWaveSchedule();
 		activeWaveTimerName = "special_wave";
 		activeWaveDuration = interval;
+		cancelWaveCountdownProgress();
 		setWaveMode("compact");
 
 		var panel = $(WAVE_PANEL_ID);
@@ -1131,7 +1158,11 @@
 		if (msg && msg.timer_name === "special_wave" && activeWaveMode !== "warning" && activeWaveMode !== "active" && activeWaveMode !== "cleared") {
 			var compactRemaining = getTimerSeconds(msg);
 			if (isTruthy(msg.show_compact) && compactRemaining > 30) {
-				showWaveCompact(msg, compactRemaining);
+				if (activeWaveMode !== "compact") {
+					showWaveCompact(msg, compactRemaining);
+				} else {
+					updateWaveCountdown(compactRemaining);
+				}
 				return;
 			}
 
@@ -1171,9 +1202,25 @@
 
 	function showWaveTimer(msg) {
 		msg = msg || {};
+		var duration = typeof msg.duration === "number" ? msg.duration : WAVE_RING_COUNTDOWN_SECONDS;
+		var remaining = typeof msg.remaining === "number" ? msg.remaining : duration;
+		var countdownDuration = typeof msg.countdown_duration === "number"
+			? msg.countdown_duration
+			: duration;
+		if (msg.timer_name === "special_wave") {
+			// Backward-compatible guard for servers that only send the remaining
+			// time when reopening an interrupted 30-second special-wave warning.
+			countdownDuration = Math.max(WAVE_RING_COUNTDOWN_SECONDS, countdownDuration);
+		}
+		countdownDuration = Math.max(1, remaining, countdownDuration);
+		var warningKey = String(msg.timer_name || "local")
+			+ ":" + String(msg.wave_index || 0)
+			+ ":" + String(msg.title || "Wave of Darkness");
+		var continuingWarning = activeWaveMode === "warning"
+			&& activeWaveWarningKey === warningKey;
 
 		if (msg.timer_name === "special_wave" && (activeWaveMode === "active" || activeWaveMode === "cleared")) {
-			updateQueuedWaveWarning(msg, typeof msg.duration === "number" ? msg.duration : 30);
+			updateQueuedWaveWarning(msg, remaining);
 			if (msg.sound) {
 				Game.EmitSound(msg.sound);
 			}
@@ -1183,9 +1230,15 @@
 		var title = $("#XHSWaveTitle");
 		var subtitle = $("#XHSWaveSubtitle");
 		var eyebrow = $("#XHSWaveEyebrow");
-		var duration = typeof msg.duration === "number" ? msg.duration : 30;
 		activeWaveTimerName = msg.timer_name || null;
-		activeWaveDuration = duration;
+		activeWaveDuration = continuingWarning
+			? Math.max(activeWaveDuration, countdownDuration)
+			: countdownDuration;
+		activeWaveWarningKey = warningKey;
+		cancelWaveCountdownProgress();
+		if (!continuingWarning) {
+			renderWaveRingProgress(Math.max(0, Math.min(1, remaining / activeWaveDuration)));
+		}
 
 		var panel = $(WAVE_PANEL_ID);
 		if (panel) {
@@ -1208,14 +1261,14 @@
 		cancelWaveSchedule();
 
 		setWaveVisible(true);
-		updateWaveCountdown(duration);
+		updateWaveCountdown(remaining);
 
 		if (msg.sound) {
 			Game.EmitSound(msg.sound);
 		}
 
 		if (!activeWaveTimerName) {
-			startLocalWaveCountdown(duration);
+			startLocalWaveCountdown(remaining);
 		}
 	}
 
@@ -1238,6 +1291,7 @@
 
 		cancelWaveSchedule();
 		activeWaveTimerName = null;
+		activeWaveWarningKey = null;
 
 		if (panel) {
 			panel.SetHasClass("XHSWaveArrived", false);
@@ -1383,7 +1437,7 @@
 			total = 1;
 		}
 
-		return clampRuneNumber(total, 1, 4);
+		return clampRuneNumber(total, 1, MAX_RUNE_COUNT);
 	}
 
 	function getRuneRemaining(msg, total) {
@@ -1440,7 +1494,7 @@
 	}
 
 	function updateRunePips(remaining, total) {
-		for (var i = 0; i < 4; i++) {
+		for (var i = 0; i < MAX_RUNE_COUNT; i++) {
 			var pip = $("#XHSRunePip" + i);
 			if (!pip) {
 				continue;

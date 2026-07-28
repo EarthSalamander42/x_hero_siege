@@ -6,6 +6,26 @@ var XHSDevToolsCinematicPreviewId = "";
 var XHSDevToolsBotConfig = {};
 var XHSDevToolsBotRoster = { count: 0, players: {} };
 var XHSDevToolsBotDebug = {};
+var XHSDevToolsPerformance = {};
+var XHSDevToolsLagLab = {};
+var XHSDevToolsLagLabPending = "";
+var XHSDevToolsFPSFrames = 0;
+var XHSDevToolsFPSWindowStartedAt = Date.now();
+var XHSDevToolsFPSLastSentAt = 0;
+var XHSDevToolsLocalFPS = -1;
+var XHSDevToolsPerformanceColumns = {
+	client: true,
+	server: true,
+	activity: true,
+	bots: true
+};
+
+var XHS_DEVTOOLS_PERFORMANCE_COLUMNS = {
+	client: { panel: "#XHSPerfColumnClient", toggle: "#XHSPerfColumnToggleClient", label: "CLIENT", width: 208 },
+	server: { panel: "#XHSPerfColumnServer", toggle: "#XHSPerfColumnToggleServer", label: "SERVER", width: 208 },
+	activity: { panel: "#XHSPerfColumnActivity", toggle: "#XHSPerfColumnToggleActivity", label: "ACTIVITY", width: 235 },
+	bots: { panel: "#XHSPerfColumnBots", toggle: "#XHSPerfColumnToggleBots", label: "BOTS", width: 205 }
+};
 
 var XHS_DEVTOOLS_TIMESCALES = [
 	{ value: 0.1, label: "x0.1" },
@@ -20,6 +40,7 @@ var XHS_DEVTOOLS_TABS = [
 	{ id: "lanes", label: "Lanes/Waves" },
 	{ id: "timers", label: "Timers/Phase" },
 	{ id: "bots", label: "Bots" },
+	{ id: "lag_lab", label: "Lag Lab" },
 	{ id: "players", label: "Player Tools" },
 	{ id: "ui", label: "UI Preview" },
 	{ id: "cleanup", label: "Cleanup" }
@@ -82,6 +103,93 @@ function XHSDevToolsPanel() {
 
 function XHSDevToolsIsToolsMode() {
 	return typeof Game.IsInToolsMode === "function" && Game.IsInToolsMode();
+}
+
+function XHSDevToolsGetLocalDonatorStatus() {
+	if (typeof CustomNetTables === "undefined" || !CustomNetTables) {
+		return 0;
+	}
+
+	var playerInfo = Game.GetPlayerInfo(Game.GetLocalPlayerID());
+	var steamID = playerInfo && playerInfo.player_steamid !== undefined
+		? String(playerInfo.player_steamid)
+		: "";
+	if (!steamID) {
+		return 0;
+	}
+
+	var donators = CustomNetTables.GetTableValue("game_options", "donators") || {};
+	for (var key in donators) {
+		var entry = donators[key];
+		var entrySteamID = String(key);
+		var status = entry;
+		if (entry && typeof entry === "object") {
+			entrySteamID = entry.steamid !== undefined ? String(entry.steamid) : entrySteamID;
+			status = entry.status !== undefined ? entry.status : entry.donator_status;
+		}
+		if (entrySteamID === steamID) {
+			return Math.floor(XHSDevToolsPerformanceNumber(status));
+		}
+	}
+	return 0;
+}
+
+function XHSDevToolsCanViewPerformanceLog() {
+	if (XHSDevToolsIsToolsMode()) {
+		return true;
+	}
+	var status = XHSDevToolsGetLocalDonatorStatus();
+	return status === 1 || status === 2;
+}
+
+function XHSDevToolsMatchHasPerformanceViewer() {
+	if (XHSDevToolsIsToolsMode()) {
+		return true;
+	}
+	if (typeof CustomNetTables === "undefined" || !CustomNetTables) {
+		return false;
+	}
+
+	var donators = CustomNetTables.GetTableValue("game_options", "donators") || {};
+	for (var key in donators) {
+		var entry = donators[key];
+		var status = entry;
+		if (entry && typeof entry === "object") {
+			status = entry.status !== undefined ? entry.status : entry.donator_status;
+		}
+		status = Math.floor(XHSDevToolsPerformanceNumber(status));
+		if (status === 1 || status === 2) {
+			return true;
+		}
+	}
+	return false;
+}
+
+function XHSDevToolsApplyAccess() {
+	var root = $("#XHSDevToolsRoot");
+	if (!root) {
+		return;
+	}
+
+	var toolsMode = XHSDevToolsIsToolsMode();
+	var canViewLog = XHSDevToolsCanViewPerformanceLog();
+	root.style.visibility = canViewLog ? "visible" : "collapse";
+	root.SetHasClass("LogOnly", canViewLog && !toolsMode);
+
+	if (!toolsMode) {
+		var panel = XHSDevToolsPanel();
+		if (panel) {
+			panel.RemoveClass("Visible");
+		}
+		var timescale = $("#XHSDevToolsTimescale");
+		if (timescale) {
+			timescale.RemoveClass("Visible");
+		}
+	}
+
+	if (canViewLog) {
+		XHSDevToolsRenderPerformance();
+	}
 }
 
 function XHSDevToolsSend(action, payload) {
@@ -153,6 +261,475 @@ function XHSDevToolsTogglePanel() {
 	}
 }
 
+function XHSDevToolsTogglePerformance() {
+	var panel = $("#XHSDevToolsPerformance");
+	if (!panel) {
+		$.Msg("[XHS][DevTools][Performance] Panel not found.");
+		return;
+	}
+
+	panel.SetHasClass("Expanded", !panel.BHasClass("Expanded"));
+	XHSDevToolsApplyPerformanceColumns();
+}
+
+function XHSDevToolsApplyPerformanceColumns() {
+	var performancePanel = $("#XHSDevToolsPerformance");
+	if (!performancePanel) {
+		return;
+	}
+
+	var visibleWidth = 14;
+	for (var columnName in XHS_DEVTOOLS_PERFORMANCE_COLUMNS) {
+		var definition = XHS_DEVTOOLS_PERFORMANCE_COLUMNS[columnName];
+		var visible = XHSDevToolsPerformanceColumns[columnName] !== false;
+		var column = $(definition.panel);
+		var toggle = $(definition.toggle);
+		if (column) {
+			column.SetHasClass("ColumnHidden", !visible);
+		}
+		if (toggle) {
+			toggle.SetHasClass("Active", visible);
+			var toggleLabel = toggle.GetChild(0);
+			if (toggleLabel) {
+				toggleLabel.text = visible ? definition.label : ("+ " + definition.label);
+			}
+		}
+		if (visible) {
+			visibleWidth += definition.width;
+		}
+	}
+
+	performancePanel.style.width = performancePanel.BHasClass("Expanded")
+		? (Math.max(420, visibleWidth) + "px")
+		: "342px";
+}
+
+function XHSDevToolsTogglePerformanceColumn(columnName) {
+	if (!XHS_DEVTOOLS_PERFORMANCE_COLUMNS[columnName]) {
+		return;
+	}
+	XHSDevToolsPerformanceColumns[columnName] =
+		XHSDevToolsPerformanceColumns[columnName] === false;
+	XHSDevToolsApplyPerformanceColumns();
+}
+
+function XHSDevToolsBindPerformanceToggle() {
+	var header = $("#XHSDevToolsPerformanceHeader");
+	if (!header) {
+		$.Msg("[XHS][DevTools][Performance] Header not found.");
+	} else {
+		header.SetPanelEvent("onactivate", XHSDevToolsTogglePerformance);
+	}
+
+	for (var columnName in XHS_DEVTOOLS_PERFORMANCE_COLUMNS) {
+		(function(boundColumnName) {
+			var definition = XHS_DEVTOOLS_PERFORMANCE_COLUMNS[boundColumnName];
+			var toggle = definition && $(definition.toggle);
+			if (!toggle) {
+				$.Msg("[XHS][DevTools][Performance] Column toggle not found: " + boundColumnName);
+				return;
+			}
+
+			toggle.SetPanelEvent("onactivate", function() {
+				XHSDevToolsTogglePerformanceColumn(boundColumnName);
+			});
+		})(columnName);
+	}
+}
+
+function XHSDevToolsSetPerformanceText(id, value) {
+	var label = $(id);
+	if (label) {
+		label.text = value;
+	}
+}
+
+function XHSDevToolsPerformanceNumber(value) {
+	var number = Number(value);
+	return isNaN(number) ? 0 : number;
+}
+
+function XHSDevToolsSetPerformanceStatus(id, warning, critical) {
+	var label = $(id);
+	if (!label) {
+		return;
+	}
+	label.SetHasClass("Warning", !!warning && !critical);
+	label.SetHasClass("Critical", !!critical);
+}
+
+function XHSDevToolsPerformanceMilliseconds(value) {
+	var milliseconds = XHSDevToolsPerformanceNumber(value);
+	return milliseconds < 10 ? milliseconds.toFixed(2) : milliseconds.toFixed(1);
+}
+
+function XHSDevToolsSetCompactMetric(id, value, low, critical) {
+	var label = $(id);
+	if (!label) {
+		return;
+	}
+	label.text = value;
+	label.SetHasClass("Low", !!low && !critical);
+	label.SetHasClass("Critical", !!critical);
+}
+
+function XHSDevToolsRenderCompactPerformance(data) {
+	data = data || {};
+	var frameMs = XHSDevToolsPerformanceNumber(data.frame_ms);
+	var serverFPS = frameMs > 0 ? Math.max(0, Math.min(500, Math.round(1000 / frameMs))) : -1;
+	var creeps = XHSDevToolsPerformanceNumber(data.creeps);
+	var localFPS = XHSDevToolsLocalFPS >= 0 ? Math.round(XHSDevToolsLocalFPS) : -1;
+
+	XHSDevToolsSetCompactMetric(
+		"#XHSDevToolsLocalFPS",
+		localFPS >= 0 ? String(localFPS) : "--",
+		localFPS >= 0 && localFPS < 50,
+		localFPS >= 0 && localFPS < 30
+	);
+	XHSDevToolsSetCompactMetric(
+		"#XHSDevToolsServerFPS",
+		serverFPS >= 0 ? String(serverFPS) : "--",
+		serverFPS >= 0 && serverFPS < 28,
+		serverFPS >= 0 && serverFPS < 20
+	);
+	XHSDevToolsSetCompactMetric(
+		"#XHSDevToolsCreepCount",
+		String(creeps),
+		creeps >= 150,
+		creeps >= 300
+	);
+}
+
+function XHSDevToolsRenderBotPerformance() {
+	var configuredCount = XHSDevToolsPerformanceNumber(XHSDevToolsBotConfig.bot_count);
+	var rosterCount = XHSDevToolsPerformanceNumber(XHSDevToolsBotRoster.count);
+	var debugCount = 0;
+	var engineVerified = 0;
+	var activeCount = 0;
+	var idleCount = 0;
+	var ordersPerSecond = 0;
+	var rateLimitedOrders = 0;
+	var castsIssued = 0;
+	var castsRejected = 0;
+	var decisionAverageTotal = 0;
+	var decisionAverageCount = 0;
+	var decisionMaximum = 0;
+	var thinkAverage = 0;
+	var thinkMaximum = 0;
+	var baseThreatScore = 0;
+	var baseThreatCount = 0;
+	var dangerHits = 0;
+	var stuckRecoveries = 0;
+	var safeErrors = 0;
+	var safeErrorStreak = 0;
+
+	for (var playerID in (XHSDevToolsBotDebug || {})) {
+		var debug = XHSDevToolsBotDebug[playerID];
+		if (!debug) {
+			continue;
+		}
+
+		debugCount += 1;
+		if (XHSDevToolsPerformanceNumber(debug.engine_fake_client) === 1 &&
+			XHSDevToolsPerformanceNumber(debug.engine_team_verified) === 1) {
+			engineVerified += 1;
+		}
+
+		var state = String(debug.state || "").toUpperCase();
+		var inactive = state === "DEAD" ||
+			state === "SELECTING_HERO" ||
+			state === "ENGINE_IDENTITY_ERROR" ||
+			state === "UNSUPPORTED_HERO" ||
+			state === "ERROR";
+		if (!inactive) {
+			activeCount += 1;
+		}
+		if (!inactive && XHSDevToolsPerformanceNumber(debug.idle_seconds) >= 3) {
+			idleCount += 1;
+		}
+
+		ordersPerSecond += XHSDevToolsPerformanceNumber(debug.orders_per_second);
+		rateLimitedOrders += XHSDevToolsPerformanceNumber(debug.rate_limited_orders);
+		castsIssued += XHSDevToolsPerformanceNumber(debug.casts_issued);
+		castsRejected += XHSDevToolsPerformanceNumber(debug.casts_rejected);
+
+		var decisionAverage = XHSDevToolsPerformanceNumber(debug.decision_cost_average_ms);
+		if (decisionAverage > 0) {
+			decisionAverageTotal += decisionAverage;
+			decisionAverageCount += 1;
+		}
+		decisionMaximum = Math.max(
+			decisionMaximum,
+			XHSDevToolsPerformanceNumber(debug.decision_cost_max_ms)
+		);
+		thinkAverage = Math.max(
+			thinkAverage,
+			XHSDevToolsPerformanceNumber(debug.think_cost_average_ms)
+		);
+		thinkMaximum = Math.max(
+			thinkMaximum,
+			XHSDevToolsPerformanceNumber(debug.think_cost_max_ms)
+		);
+		baseThreatScore = Math.max(
+			baseThreatScore,
+			XHSDevToolsPerformanceNumber(debug.base_threat_score)
+		);
+		baseThreatCount = Math.max(
+			baseThreatCount,
+			XHSDevToolsPerformanceNumber(debug.base_threat_count)
+		);
+		dangerHits += XHSDevToolsPerformanceNumber(debug.danger_hits);
+		stuckRecoveries += XHSDevToolsPerformanceNumber(debug.stuck_recoveries);
+		safeErrors += XHSDevToolsPerformanceNumber(debug.safe_error_count);
+		safeErrorStreak = Math.max(
+			safeErrorStreak,
+			XHSDevToolsPerformanceNumber(debug.safe_error_consecutive)
+		);
+	}
+
+	if (rosterCount <= 0 && debugCount > 0) {
+		rosterCount = debugCount;
+	}
+	var decisionAverageMs = decisionAverageCount > 0
+		? decisionAverageTotal / decisionAverageCount
+		: 0;
+
+	XHSDevToolsSetPerformanceText("#XHSPerfBotCount", rosterCount + " / " + configuredCount);
+	XHSDevToolsSetPerformanceText("#XHSPerfBotEngine", engineVerified + " / " + rosterCount);
+	XHSDevToolsSetPerformanceText("#XHSPerfBotActivity", activeCount + " / " + idleCount);
+	XHSDevToolsSetPerformanceText(
+		"#XHSPerfBotOrders",
+		ordersPerSecond.toFixed(1) + " / " + rateLimitedOrders
+	);
+	XHSDevToolsSetPerformanceText("#XHSPerfBotCasts", castsIssued + " / " + castsRejected);
+	XHSDevToolsSetPerformanceText(
+		"#XHSPerfBotDecision",
+		XHSDevToolsPerformanceMilliseconds(decisionAverageMs) + " / " +
+			XHSDevToolsPerformanceMilliseconds(decisionMaximum)
+	);
+	XHSDevToolsSetPerformanceText(
+		"#XHSPerfBotThink",
+		XHSDevToolsPerformanceMilliseconds(thinkAverage) + " / " +
+			XHSDevToolsPerformanceMilliseconds(thinkMaximum)
+	);
+	XHSDevToolsSetPerformanceText(
+		"#XHSPerfBotThreat",
+		baseThreatScore.toFixed(1) + " / " + baseThreatCount
+	);
+	XHSDevToolsSetPerformanceText("#XHSPerfBotSafety", dangerHits + " / " + stuckRecoveries);
+	XHSDevToolsSetPerformanceText("#XHSPerfBotErrors", safeErrors + " / " + safeErrorStreak);
+
+	XHSDevToolsSetPerformanceStatus(
+		"#XHSPerfBotEngine",
+		rosterCount > 0 && engineVerified < rosterCount,
+		rosterCount > 0 && engineVerified === 0
+	);
+	XHSDevToolsSetPerformanceStatus("#XHSPerfBotActivity", idleCount > 0, false);
+	XHSDevToolsSetPerformanceStatus("#XHSPerfBotOrders", rateLimitedOrders > 0, false);
+	XHSDevToolsSetPerformanceStatus("#XHSPerfBotCasts", castsRejected > castsIssued, false);
+	XHSDevToolsSetPerformanceStatus("#XHSPerfBotThreat", baseThreatScore > 0, baseThreatScore >= 80);
+	XHSDevToolsSetPerformanceStatus("#XHSPerfBotSafety", stuckRecoveries > 0, false);
+	XHSDevToolsSetPerformanceStatus("#XHSPerfBotErrors", safeErrors > 0, safeErrorStreak > 0);
+}
+
+function XHSDevToolsRenderPlayerFPS(players) {
+	var container = $("#XHSPerfPlayers");
+	if (!container) {
+		return;
+	}
+
+	container.RemoveAndDeleteChildren();
+	var entries = [];
+	for (var key in (players || {})) {
+		var entry = players[key] || {};
+		entries.push({
+			playerID: Number(entry.player_id !== undefined ? entry.player_id : key),
+			name: String(entry.name || ""),
+			fps: Number(entry.fps)
+		});
+	}
+
+	var localPlayerID = Players.GetLocalPlayer();
+	var hasLocalPlayer = false;
+	for (var entryIndex = 0; entryIndex < entries.length; entryIndex++) {
+		if (entries[entryIndex].playerID === localPlayerID) {
+			hasLocalPlayer = true;
+			if ((isNaN(entries[entryIndex].fps) || entries[entryIndex].fps < 0) && XHSDevToolsLocalFPS >= 0) {
+				entries[entryIndex].fps = XHSDevToolsLocalFPS;
+			}
+			if (!entries[entryIndex].name) {
+				entries[entryIndex].name = Players.GetPlayerName(localPlayerID);
+			}
+			break;
+		}
+	}
+	if (!hasLocalPlayer && localPlayerID >= 0) {
+		entries.push({
+			playerID: localPlayerID,
+			name: Players.GetPlayerName(localPlayerID),
+			fps: XHSDevToolsLocalFPS
+		});
+	}
+
+	entries.sort(function(a, b) {
+		return a.playerID - b.playerID;
+	});
+
+	if (entries.length === 0) {
+		XHSDevToolsMakeLabel(container, "XHSDevToolsMuted", "Waiting for clients...");
+		return;
+	}
+
+	for (var i = 0; i < entries.length; i++) {
+		var entry = entries[i];
+		var row = $.CreatePanel("Panel", container, "");
+		row.AddClass("XHSDevToolsPerformancePlayerRow");
+
+		var playerName = entry.name;
+		if (!playerName && !isNaN(entry.playerID)) {
+			playerName = Players.GetPlayerName(entry.playerID);
+		}
+		XHSDevToolsMakeLabel(
+			row,
+			"XHSDevToolsPerformancePlayerName",
+			playerName || ("Player " + (entry.playerID + 1))
+		);
+
+		var hasFPS = !isNaN(entry.fps) && entry.fps >= 0;
+		var fpsLabel = XHSDevToolsMakeLabel(
+			row,
+			"XHSDevToolsPerformancePlayerFPS",
+			hasFPS ? (Math.round(entry.fps) + " FPS") : "--"
+		);
+		fpsLabel.SetHasClass("Critical", hasFPS && entry.fps < 30);
+		fpsLabel.SetHasClass("Low", hasFPS && entry.fps >= 30 && entry.fps < 50);
+		fpsLabel.SetHasClass("Unknown", !hasFPS);
+	}
+}
+
+function XHSDevToolsActivitySource(activity, sourceList, index, includeCost) {
+	var sources = activity[sourceList] || {};
+	var source = sources[index] || sources[String(index)] || {};
+	if (!source.source) {
+		return index === 1 ? "--" : "";
+	}
+	var text = String(source.source) + "  " +
+		XHSDevToolsPerformanceNumber(source.calls_per_second).toFixed(0) + "/s";
+	if (includeCost) {
+		text += "  " + XHSDevToolsPerformanceNumber(source.cost_ms_per_second).toFixed(1) + "ms";
+	}
+	return text;
+}
+
+function XHSDevToolsRenderActivityPerformance(activity) {
+	activity = activity || {};
+	var zoneSearches = XHSDevToolsPerformanceNumber(activity.zone_searches_per_second);
+	var zoneResults = XHSDevToolsPerformanceNumber(activity.zone_results_per_second);
+	var zoneCost = XHSDevToolsPerformanceNumber(activity.zone_search_cost_ms_per_second);
+	var zoneMaximum = XHSDevToolsPerformanceNumber(activity.zone_search_max_ms);
+	var orders = XHSDevToolsPerformanceNumber(activity.orders_per_second);
+	var repeatedOrders = XHSDevToolsPerformanceNumber(activity.repeated_orders_per_second);
+	var aiThinks = XHSDevToolsPerformanceNumber(activity.ai_thinks_per_second);
+	var waveThinks = XHSDevToolsPerformanceNumber(activity.wave_thinks_per_second);
+	var abilityThinks = XHSDevToolsPerformanceNumber(activity.ability_loop_thinks_per_second);
+	var damage = XHSDevToolsPerformanceNumber(activity.damage_events_per_second);
+	var casts = XHSDevToolsPerformanceNumber(activity.ability_casts_per_second);
+	var linearProjectiles = XHSDevToolsPerformanceNumber(activity.linear_projectiles_per_second);
+	var trackingProjectiles = XHSDevToolsPerformanceNumber(activity.tracking_projectiles_per_second);
+	var spawns = XHSDevToolsPerformanceNumber(activity.unit_spawns_per_second);
+	var deaths = XHSDevToolsPerformanceNumber(activity.unit_deaths_per_second);
+	var targetChanges = XHSDevToolsPerformanceNumber(activity.target_changes_per_second);
+
+	XHSDevToolsSetPerformanceText("#XHSPerfZoneSearches", zoneSearches.toFixed(0) + " / " + zoneResults.toFixed(0));
+	XHSDevToolsSetPerformanceText("#XHSPerfZoneCost", zoneCost.toFixed(1) + " / " + zoneMaximum.toFixed(1));
+	XHSDevToolsSetPerformanceText("#XHSPerfOrders", orders.toFixed(0) + " / " + repeatedOrders.toFixed(0));
+	XHSDevToolsSetPerformanceText("#XHSPerfThinks", aiThinks.toFixed(0) + " / " + waveThinks.toFixed(0));
+	XHSDevToolsSetPerformanceText("#XHSPerfAbilityThinks", abilityThinks.toFixed(0));
+	XHSDevToolsSetPerformanceText("#XHSPerfCombat", damage.toFixed(0) + " / " + casts.toFixed(0));
+	XHSDevToolsSetPerformanceText("#XHSPerfProjectiles", linearProjectiles.toFixed(0) + " / " + trackingProjectiles.toFixed(0));
+	XHSDevToolsSetPerformanceText("#XHSPerfChurn", spawns.toFixed(0) + " / " + deaths.toFixed(0));
+	XHSDevToolsSetPerformanceText("#XHSPerfTargetChanges", targetChanges.toFixed(0));
+	for (var sourceIndex = 1; sourceIndex <= 3; sourceIndex++) {
+		XHSDevToolsSetPerformanceText(
+			"#XHSPerfZoneSource" + sourceIndex,
+			XHSDevToolsActivitySource(activity, "top_zone_sources", sourceIndex, true)
+		);
+	}
+	for (var orderSourceIndex = 1; orderSourceIndex <= 2; orderSourceIndex++) {
+		XHSDevToolsSetPerformanceText(
+			"#XHSPerfOrderSource" + orderSourceIndex,
+			XHSDevToolsActivitySource(activity, "top_order_sources", orderSourceIndex, false)
+		);
+	}
+
+	XHSDevToolsSetPerformanceStatus("#XHSPerfZoneSearches", zoneSearches >= 500, zoneSearches >= 1000);
+	XHSDevToolsSetPerformanceStatus("#XHSPerfZoneCost", zoneCost >= 10, zoneCost >= 25);
+	XHSDevToolsSetPerformanceStatus("#XHSPerfOrders", orders >= 200 || repeatedOrders >= 50, repeatedOrders >= 150);
+	XHSDevToolsSetPerformanceStatus("#XHSPerfThinks", waveThinks >= 800 || aiThinks >= 300, waveThinks >= 1600);
+	XHSDevToolsSetPerformanceStatus("#XHSPerfCombat", damage >= 500, damage >= 1000);
+	XHSDevToolsSetPerformanceStatus("#XHSPerfProjectiles", linearProjectiles + trackingProjectiles >= 100, linearProjectiles + trackingProjectiles >= 250);
+}
+
+function XHSDevToolsRenderPerformance() {
+	var panel = $("#XHSDevToolsPerformance");
+	if (!panel) {
+		return;
+	}
+
+	var data = XHSDevToolsPerformance || {};
+	var creeps = XHSDevToolsPerformanceNumber(data.creeps);
+	var frameMs = XHSDevToolsPerformanceNumber(data.frame_ms);
+	panel.SetHasClass("Warning", (creeps >= 150 || frameMs >= 40) && creeps < 300 && frameMs < 60);
+	panel.SetHasClass("Critical", creeps >= 300 || frameMs >= 60);
+
+	XHSDevToolsRenderCompactPerformance(data);
+	XHSDevToolsSetPerformanceText("#XHSPerfTotalUnits", String(XHSDevToolsPerformanceNumber(data.total_units)));
+	XHSDevToolsSetPerformanceText("#XHSPerfWaveLoops", String(XHSDevToolsPerformanceNumber(data.wave_checks_per_second)));
+	XHSDevToolsSetPerformanceText("#XHSPerfAITicks", String(XHSDevToolsPerformanceNumber(data.ai_ticks_per_second)));
+	XHSDevToolsSetPerformanceText("#XHSPerfAbilityLoops", String(XHSDevToolsPerformanceNumber(data.ability_checks_per_second)));
+	XHSDevToolsSetPerformanceText("#XHSPerfThinkers", String(XHSDevToolsPerformanceNumber(data.thinkers)));
+	XHSDevToolsSetPerformanceText(
+		"#XHSPerfHeroesBosses",
+		XHSDevToolsPerformanceNumber(data.heroes) + " / " + XHSDevToolsPerformanceNumber(data.bosses)
+	);
+	XHSDevToolsSetPerformanceText("#XHSPerfSummons", String(XHSDevToolsPerformanceNumber(data.summons)));
+	XHSDevToolsSetPerformanceText(
+		"#XHSPerfOther",
+		XHSDevToolsPerformanceNumber(data.breakables) + " / " + XHSDevToolsPerformanceNumber(data.other_units)
+	);
+	XHSDevToolsSetPerformanceText("#XHSPerfFrame", frameMs.toFixed(1) + " ms");
+	XHSDevToolsSetPerformanceText(
+		"#XHSPerfCost",
+		XHSDevToolsPerformanceNumber(data.scan_ms).toFixed(2) + " ms"
+	);
+	XHSDevToolsRenderPlayerFPS(data.players || {});
+	XHSDevToolsRenderActivityPerformance(data.activity || {});
+	XHSDevToolsRenderBotPerformance();
+}
+
+function XHSDevToolsClientFPSTick() {
+	XHSDevToolsFPSFrames += 1;
+	var now = Date.now();
+	var elapsed = now - XHSDevToolsFPSWindowStartedAt;
+	if (elapsed >= 1000) {
+		var fps = Math.max(0, Math.min(500, XHSDevToolsFPSFrames * 1000 / elapsed));
+		XHSDevToolsLocalFPS = Math.round(fps * 10) / 10;
+		XHSDevToolsRenderCompactPerformance(XHSDevToolsPerformance || {});
+		XHSDevToolsRenderPlayerFPS((XHSDevToolsPerformance || {}).players || {});
+		if (XHSDevToolsMatchHasPerformanceViewer() &&
+			now - XHSDevToolsFPSLastSentAt >= 1900) {
+			GameEvents.SendCustomGameEventToServer("xhs_devtools_client_fps", {
+				fps: XHSDevToolsLocalFPS
+			});
+			XHSDevToolsFPSLastSentAt = now;
+		}
+		XHSDevToolsFPSFrames = 0;
+		XHSDevToolsFPSWindowStartedAt = now;
+	}
+
+	$.Schedule(0.0, XHSDevToolsClientFPSTick);
+}
+
 function XHSDevToolsClear(panel) {
 	if (!panel) {
 		return;
@@ -172,6 +749,8 @@ function XHSDevToolsMakeLabel(parent, className, text) {
 function XHSDevToolsMakeButton(parent, label, className, callback) {
 	var button = $.CreatePanel("Button", parent, "");
 	button.AddClass("XHSDevToolsButton");
+	button.hittest = true;
+	button.hittestchildren = true;
 	if (className) {
 		button.AddClass(className);
 	}
@@ -674,6 +1253,41 @@ function XHSDevToolsBotVector(vector) {
 		Math.floor(Number(vector.z) || 0);
 }
 
+function XHSDevToolsBotItemName(itemName) {
+	itemName = XHSDevToolsBotText(itemName, "");
+	if (!itemName) {
+		return "-";
+	}
+	return itemName
+		.replace(/^item_recipe_/, "")
+		.replace(/^item_xhs_/, "")
+		.replace(/^item_/, "")
+		.replace(/_/g, " ");
+}
+
+function XHSDevToolsBotLoadout(loadout) {
+	var entries = XHSDevToolsBotTableValues(loadout || {});
+	var names = [];
+	for (var i = 0; i < entries.length && i < 6; i++) {
+		names.push(XHSDevToolsBotItemName(entries[i].value));
+	}
+	return names.length > 0 ? names.join(" | ") : "-";
+}
+
+function XHSDevToolsBotItemCandidates(candidates) {
+	var entries = XHSDevToolsBotTableValues(candidates || {});
+	var formatted = [];
+	for (var i = 0; i < entries.length && i < 3; i++) {
+		var candidate = entries[i].value || {};
+		var score = Number(candidate.score);
+		formatted.push(
+			XHSDevToolsBotItemName(candidate.item) +
+				" " + (isNaN(score) ? "-" : score.toFixed(1))
+		);
+	}
+	return formatted.length > 0 ? formatted.join(" > ") : "-";
+}
+
 function XHSDevToolsMakeBotMetric(parent, key, value, wide) {
 	var metric = $.CreatePanel("Panel", parent, "");
 	metric.AddClass("XHSDevToolsBotMetric");
@@ -740,6 +1354,13 @@ function XHSDevToolsRenderBotCard(parent, rosterEntry) {
 
 	var metrics = $.CreatePanel("Panel", card, "");
 	metrics.AddClass("XHSDevToolsBotMetrics");
+	XHSDevToolsMakeBotMetric(
+		metrics,
+		"Encounter",
+		XHSDevToolsBotText(debug.encounter_mode, "none") +
+			" / " + XHSDevToolsBotText(debug.encounter_transitions, "0") + " transitions",
+		true
+	);
 	XHSDevToolsMakeBotMetric(metrics, "Target", debug.target || debug.target_entindex, true);
 	XHSDevToolsMakeBotMetric(metrics, "Anchor", XHSDevToolsBotVector(debug.anchor), true);
 	XHSDevToolsMakeBotMetric(metrics, "Lane / side", XHSDevToolsBotText(debug.lane, "0") + " / " + XHSDevToolsBotText(debug.side, "-"), false);
@@ -748,11 +1369,85 @@ function XHSDevToolsRenderBotCard(parent, rosterEntry) {
 	XHSDevToolsMakeBotMetric(metrics, "Targets", debug.target_changes, false);
 	XHSDevToolsMakeBotMetric(metrics, "Unstuck", debug.stuck_recoveries, false);
 	XHSDevToolsMakeBotMetric(metrics, "Danger hits", debug.danger_hits, false);
-	XHSDevToolsMakeBotMetric(metrics, "Tomes", debug.tomes_bought, false);
+	XHSDevToolsMakeBotMetric(
+		metrics,
+		"Tomes / allowance",
+		XHSDevToolsBotText(debug.tomes_bought, "0") + " / " +
+			XHSDevToolsBotText(debug.tome_allowance, "0"),
+		false
+	);
 	XHSDevToolsMakeBotMetric(metrics, "Connection", debug.connection_state, false);
+	XHSDevToolsMakeBotMetric(
+		metrics,
+		"Economy / reserve",
+		XHSDevToolsBotText(debug.economy_phase, "-") + " / " +
+			XHSDevToolsBotText(debug.economy_reserve_gold, "0") + "g",
+		false
+	);
+	XHSDevToolsMakeBotMetric(
+		metrics,
+		"Slots / stash",
+		XHSDevToolsBotText(debug.active_item_slots, "0") + "/6 active, " +
+			XHSDevToolsBotText(debug.inventory_item_slots, "0") + "/9 carried, " +
+			XHSDevToolsBotText(debug.stash_item_count, "0") + "/6 stash",
+		false
+	);
+	XHSDevToolsMakeBotMetric(
+		metrics,
+		"Next item",
+		XHSDevToolsBotItemName(debug.planned_item) + " [" +
+			XHSDevToolsBotText(debug.planned_item_family, "-") + " / " +
+			XHSDevToolsBotText(debug.planned_item_score, "0") + "]" +
+			(Number(debug.replacement_required || 0) === 1 ? " [replace]" : ""),
+		true
+	);
+	var shopRoute = debug.shopping_item
+		? XHSDevToolsBotItemName(debug.shopping_item) + " @ " +
+			XHSDevToolsBotText(debug.shopping_shop, "home") +
+			(Number(debug.shopping_urgent || 0) === 1 ? " [urgent]" : "")
+		: "idle";
+	var lastShopPurchase = debug.last_purchase_item
+		? XHSDevToolsBotItemName(debug.last_purchase_item) + " @ " +
+			XHSDevToolsBotText(
+				debug.last_purchase_shop_kind,
+				debug.last_purchase_shop || "unknown"
+			) + " (" +
+			XHSDevToolsBotText(debug.last_purchase_shop_distance, "?") + "u)"
+		: "none";
+	XHSDevToolsMakeBotMetric(
+		metrics,
+		"Shop route / last",
+		shopRoute + " | " + lastShopPurchase +
+			(Number(debug.shop_purchase_violation_count || 0) > 0
+				? " | VIOLATIONS " + debug.shop_purchase_violation_count
+				: ""),
+		true
+	);
+	XHSDevToolsMakeBotMetric(
+		metrics,
+		"Stock / targets",
+		"HP " + XHSDevToolsBotText(debug.health_potion_charges, "0") + "/" +
+			XHSDevToolsBotText(debug.health_potion_target, "0") +
+			" | MP " + XHSDevToolsBotText(debug.mana_potion_charges, "0") + "/" +
+			XHSDevToolsBotText(debug.mana_potion_target, "0") +
+			" | Ankh " + XHSDevToolsBotText(debug.ankh_charges, "0") + "/" +
+			XHSDevToolsBotText(debug.ankh_target, "0") +
+			" | Furbolg " + (debug.has_owned_furbolg ? "yes" : "no") +
+			" | Orbs " + XHSDevToolsBotText(debug.orb_active_family_count, "0") + "/" +
+			XHSDevToolsBotText(debug.orb_owned_family_count, "0") +
+			(debug.orb_repair_pending_count > 0
+				? " (repair " + XHSDevToolsBotText(debug.orb_repair_pending_count, "0") + ")"
+				: ""),
+		true
+	);
 
 	var decisions = $.CreatePanel("Panel", card, "");
 	decisions.AddClass("XHSDevToolsBotDecisions");
+	var replacementSummary = Number(debug.items_replaced || 0) > 0
+		? " | replacements " + XHSDevToolsBotText(debug.items_replaced, "0") +
+			" (last " + XHSDevToolsBotItemName(debug.last_replaced_item) +
+			", +" + XHSDevToolsBotText(debug.replacement_gold_recovered, "0") + "g)"
+		: "";
 	XHSDevToolsMakeLabel(
 		decisions,
 		"XHSDevToolsBotDecisionLine",
@@ -774,6 +1469,28 @@ function XHSDevToolsRenderBotCard(parent, rosterEntry) {
 		decisions,
 		"XHSDevToolsBotDecisionLine",
 		"Rejected: " + XHSDevToolsBotText(debug.last_rejected_action, "-")
+	);
+	XHSDevToolsMakeLabel(
+		decisions,
+		"XHSDevToolsBotDecisionLine",
+		"Economy: " + XHSDevToolsBotText(debug.last_item_action, "-") +
+			" / " + XHSDevToolsBotText(debug.last_item_rejection, "accepted") +
+			replacementSummary
+	);
+	XHSDevToolsMakeLabel(
+		decisions,
+		"XHSDevToolsBotDecisionLine",
+		"Why: " + XHSDevToolsBotText(debug.planned_item_reason, "-")
+	);
+	XHSDevToolsMakeLabel(
+		decisions,
+		"XHSDevToolsBotDecisionLine",
+		"Loadout: " + XHSDevToolsBotLoadout(debug.planned_loadout)
+	);
+	XHSDevToolsMakeLabel(
+		decisions,
+		"XHSDevToolsBotDecisionLine",
+		"Candidates: " + XHSDevToolsBotItemCandidates(debug.item_candidates)
 	);
 
 	XHSDevToolsMakeLabel(card, "XHSDevToolsBotSubheading", "TOP ACTIONS");
@@ -1012,6 +1729,239 @@ function XHSDevToolsRenderCleanup(parent) {
 	});
 }
 
+var XHS_DEVTOOLS_LAG_LAB_EXPERIMENTS = [
+	{ id: "base_model", label: "Base models", hint: "Switches current/future waves and permanently removes their cosmetics for this match." },
+	{ id: "hide_creeps", label: "Hide creeps", hint: "Tests rendering cost without deleting units." },
+	{ id: "pause_ai", label: "Pause AI", hint: "Stops modifier_ai decisions." },
+	{ id: "pause_bots", label: "Pause bots", hint: "Stops allied XHS bot decisions during the test window." },
+	{ id: "pause_waves", label: "Pause waves", hint: "Stops lane controller ticks." },
+	{ id: "pause_abilities", label: "Pause abilities", hint: "Stops periodic creep spell checks." },
+	{ id: "suppress_orders", label: "Suppress orders", hint: "Drops new creep engine orders." },
+	{ id: "root_creeps", label: "Root creeps", hint: "Keeps AI alive while removing movement." },
+	{ id: "no_collision", label: "No collision", hint: "Tests pathing/crowd collision cost." },
+	{ id: "disarm_creeps", label: "Disarm creeps", hint: "Tests attack/combat workload." },
+	{ id: "silence_creeps", label: "Silence creeps", hint: "Tests ability workload via engine state." }
+];
+
+var XHS_DEVTOOLS_LAG_LAB_METRICS = [
+	{ id: "client_fps", label: "Client FPS", higher: true },
+	{ id: "server_frame_ms", label: "Server frame ms", higher: false },
+	{ id: "creeps", label: "Creeps", neutral: true },
+	{ id: "total_units", label: "Total units", neutral: true },
+	{ id: "scan_ms", label: "Profiler scan ms", higher: false },
+	{ id: "zone_searches_s", label: "Zone searches/s", higher: false },
+	{ id: "zone_cost_ms_s", label: "Zone cost ms/s", higher: false },
+	{ id: "orders_s", label: "Orders/s", higher: false },
+	{ id: "repeated_orders_s", label: "Repeated orders/s", higher: false },
+	{ id: "ai_thinks_s", label: "AI thinks/s", higher: false },
+	{ id: "wave_thinks_s", label: "Wave thinks/s", higher: false },
+	{ id: "ability_thinks_s", label: "Ability thinks/s", higher: false },
+	{ id: "damage_s", label: "Damage events/s", higher: false },
+	{ id: "projectiles_s", label: "Projectiles/s", higher: false },
+	{ id: "target_changes_s", label: "Target changes/s", higher: false }
+];
+
+function XHSDevToolsLagLabStart(experiment, source) {
+	source = source || "";
+	if (XHSDevToolsLagLabIsActive(experiment, source)) {
+		XHSDevToolsLagLabPending = "Turning OFF: " + String(experiment || "unknown");
+		XHSDevToolsSend("lag_lab_restore", {});
+	} else {
+		XHSDevToolsLagLabPending = "Turning ON: " + String(experiment || "unknown");
+		XHSDevToolsSend("lag_lab_start", {
+			experiment: experiment,
+			source: source,
+			keep_active: 1
+		});
+	}
+	XHSDevToolsRender();
+}
+
+function XHSDevToolsLagLabIsActive(experiment, source) {
+	var stage = String(XHSDevToolsLagLab.stage || "");
+	var active = XHSDevToolsLagLab.running === true ||
+		XHSDevToolsLagLab.effect_active === true ||
+		stage === "latched";
+	if (!active || String(XHSDevToolsLagLab.experiment_id || "") !== String(experiment || "")) {
+		return false;
+	}
+	if (source !== undefined && String(source || "") !== String(XHSDevToolsLagLab.source || "")) {
+		return false;
+	}
+	return true;
+}
+
+function XHSDevToolsLagLabPing() {
+	XHSDevToolsLagLabPending = "Ping sent to server";
+	XHSDevToolsSend("lag_lab_ping", {});
+	XHSDevToolsRender();
+}
+
+function XHSDevToolsLagLabFormat(value) {
+	var number = Number(value);
+	if (isNaN(number)) {
+		return "-";
+	}
+	return Math.abs(number) >= 100 ? number.toFixed(0) : number.toFixed(2);
+}
+
+function XHSDevToolsRenderLagLabResult(parent, result) {
+	if (!result || !result.experiment_id) {
+		XHSDevToolsMakeLabel(parent, "XHSDevToolsMuted", "No completed comparison yet.");
+		return;
+	}
+	XHSDevToolsMakeLabel(
+		parent,
+		"XHSDevToolsLagLabResultTitle",
+		String(result.label || result.experiment_id) +
+			(result.source ? " / " + String(result.source) : "") +
+			" - " + Number(result.baseline_samples || 0) + " baseline samples, " +
+			Number(result.test_samples || 0) + " test samples"
+	);
+
+	var table = $.CreatePanel("Panel", parent, "");
+	table.AddClass("XHSDevToolsLagLabTable");
+	var header = $.CreatePanel("Panel", table, "");
+	header.AddClass("XHSDevToolsLagLabRow Header");
+	XHSDevToolsMakeLabel(header, "XHSDevToolsLagLabMetric", "METRIC");
+	XHSDevToolsMakeLabel(header, "XHSDevToolsLagLabValue", "BASE");
+	XHSDevToolsMakeLabel(header, "XHSDevToolsLagLabValue", "TEST");
+	XHSDevToolsMakeLabel(header, "XHSDevToolsLagLabValue", "DELTA");
+
+	for (var i = 0; i < XHS_DEVTOOLS_LAG_LAB_METRICS.length; i++) {
+		var metric = XHS_DEVTOOLS_LAG_LAB_METRICS[i];
+		var baseline = Number((result.baseline || {})[metric.id] || 0);
+		var test = Number((result.test || {})[metric.id] || 0);
+		var delta = Number((result.delta || {})[metric.id] || 0);
+		var row = $.CreatePanel("Panel", table, "");
+		row.AddClass("XHSDevToolsLagLabRow");
+		XHSDevToolsMakeLabel(row, "XHSDevToolsLagLabMetric", metric.label);
+		XHSDevToolsMakeLabel(row, "XHSDevToolsLagLabValue", XHSDevToolsLagLabFormat(baseline));
+		XHSDevToolsMakeLabel(row, "XHSDevToolsLagLabValue", XHSDevToolsLagLabFormat(test));
+		var deltaLabel = XHSDevToolsMakeLabel(
+			row,
+			"XHSDevToolsLagLabValue Delta",
+			(delta > 0 ? "+" : "") + XHSDevToolsLagLabFormat(delta)
+		);
+		if (!metric.neutral && Math.abs(delta) > 0.01) {
+			var improved = metric.higher ? delta > 0 : delta < 0;
+			deltaLabel.SetHasClass(improved ? "Improved" : "Regressed", true);
+		}
+	}
+}
+
+function XHSDevToolsRenderLagLab(parent) {
+	var running = XHSDevToolsLagLab.running === true;
+	var status = XHSDevToolsMakeSection(parent, "Controlled A/B Runner");
+	XHSDevToolsMakeLabel(
+		status,
+		"XHSDevToolsMuted",
+		"Toggle ON: 10s baseline, 3s warmup, 10s test, then the effect stays active. Toggle OFF or RESTORE ALL to remove it."
+	);
+	var statusRow = $.CreatePanel("Panel", status, "");
+	statusRow.AddClass("XHSDevToolsLagLabStatus");
+	var stage = String(XHSDevToolsLagLab.stage || "idle").toUpperCase();
+	var current = XHSDevToolsLagLab.label ? " / " + String(XHSDevToolsLagLab.label) : "";
+	var affected = Number(XHSDevToolsLagLab.affected_units || 0);
+	var remaining = Number(XHSDevToolsLagLab.remaining || 0);
+	XHSDevToolsMakeLabel(
+		statusRow,
+		"XHSDevToolsLagLabStage",
+		stage + current + (running ? " / " + remaining.toFixed(1) + "s" : "") +
+			(affected > 0 ? " / " + affected + " units" : "")
+	);
+	var restore = XHSDevToolsMakeButton(statusRow, "RESTORE ALL", "Danger", function() {
+		XHSDevToolsLagLabPending = "Restore request sent";
+		XHSDevToolsSend("lag_lab_restore", {});
+		XHSDevToolsRender();
+	});
+	restore.enabled = running || XHSDevToolsLagLab.effect_active === true;
+	XHSDevToolsMakeButton(statusRow, "PING SERVER", "Accent", XHSDevToolsLagLabPing);
+	var actionResult = XHSDevToolsState.last_result || {};
+	var actionName = String(actionResult.action || "");
+	var feedbackText = XHSDevToolsLagLabPending || (actionName.indexOf("lag_lab_") === 0
+		? String(actionResult.message || "Server response received")
+		: "");
+	if (feedbackText) {
+		var feedback = XHSDevToolsMakeLabel(status, "XHSDevToolsLagLabFeedback", feedbackText);
+		feedback.SetHasClass("Error", actionName.indexOf("lag_lab_") === 0 && actionResult.ok === false);
+	}
+
+	var experiments = XHSDevToolsMakeSection(parent, "Isolation Experiments");
+	var experimentGrid = $.CreatePanel("Panel", experiments, "");
+	experimentGrid.AddClass("XHSDevToolsLagLabGrid");
+	for (var i = 0; i < XHS_DEVTOOLS_LAG_LAB_EXPERIMENTS.length; i++) {
+		(function(experiment) {
+			var isActive = XHSDevToolsLagLabIsActive(experiment.id, "");
+			var isTesting = isActive && running;
+			var card = $.CreatePanel("ToggleButton", experimentGrid, "");
+			card.AddClass("XHSDevToolsLagLabCard");
+			card.SetHasClass("IsOn", isActive && !isTesting);
+			card.SetHasClass("IsTesting", isTesting);
+			card.SetHasClass("IsOff", !isActive);
+			card.hittest = true;
+			card.hittestchildren = true;
+			card.checked = isActive;
+			card.SetPanelEvent("onactivate", function() {
+				XHSDevToolsLagLabStart(experiment.id);
+			});
+			card.enabled = true;
+			var header = $.CreatePanel("Panel", card, "");
+			header.AddClass("XHSDevToolsLagLabCardHeader");
+			XHSDevToolsMakeLabel(header, "XHSDevToolsLagLabCardTitle", experiment.label);
+			var toggle = $.CreatePanel("Panel", header, "");
+			toggle.AddClass("XHSDevToolsLagLabCheckbox");
+			XHSDevToolsMakeLabel(
+				toggle,
+				"XHSDevToolsLagLabCheckboxLabel",
+				isTesting ? "..." : (isActive ? "ON" : "OFF")
+			);
+			XHSDevToolsMakeLabel(card, "XHSDevToolsLagLabHint", experiment.hint);
+		})(XHS_DEVTOOLS_LAG_LAB_EXPERIMENTS[i]);
+	}
+
+	var hotspots = XHSDevToolsMakeSection(parent, "Sampled Zone Hotspots");
+	XHSDevToolsMakeLabel(
+		hotspots,
+		"XHSDevToolsMuted",
+		"Only sources observed by the server profiler are accepted. Mute returns an empty search result; 50% and 25% throttle calls."
+	);
+	var sources = XHSDevToolsBotTableValues((XHSDevToolsPerformance.activity || {}).top_zone_sources || {});
+	if (sources.length === 0) {
+		XHSDevToolsMakeLabel(hotspots, "XHSDevToolsMuted", "Waiting for sampled FindUnitsInRadius hotspots...");
+	}
+	for (var sourceIndex = 0; sourceIndex < sources.length; sourceIndex++) {
+		(function(sourceData) {
+			var source = sourceData.value || {};
+			var row = $.CreatePanel("Panel", hotspots, "");
+			row.AddClass("XHSDevToolsLagLabHotspot");
+			XHSDevToolsMakeLabel(
+				row,
+				"XHSDevToolsLagLabSource",
+				String(source.source || "unknown") + " / " +
+					XHSDevToolsLagLabFormat(source.calls_per_second) + " calls/s / " +
+					XHSDevToolsLagLabFormat(source.cost_ms_per_second) + " ms/s"
+			);
+			var mute = XHSDevToolsMakeButton(row, "MUTE", "Small Danger", function() {
+				XHSDevToolsLagLabStart("hotspot_mute", String(source.source || ""));
+			});
+			var half = XHSDevToolsMakeButton(row, "50%", "Small Warn", function() {
+				XHSDevToolsLagLabStart("hotspot_half", String(source.source || ""));
+			});
+			var quarter = XHSDevToolsMakeButton(row, "25%", "Small Warn", function() {
+				XHSDevToolsLagLabStart("hotspot_quarter", String(source.source || ""));
+			});
+			mute.SetHasClass("Active", XHSDevToolsLagLabIsActive("hotspot_mute", String(source.source || "")));
+			half.SetHasClass("Active", XHSDevToolsLagLabIsActive("hotspot_half", String(source.source || "")));
+			quarter.SetHasClass("Active", XHSDevToolsLagLabIsActive("hotspot_quarter", String(source.source || "")));
+			mute.enabled = half.enabled = quarter.enabled = true;
+		})(sources[sourceIndex]);
+	}
+
+	var results = XHSDevToolsMakeSection(parent, "Last Comparison");
+	XHSDevToolsRenderLagLabResult(results, XHSDevToolsLagLab.last_result || {});
+}
+
 function XHSDevToolsRender() {
 	var root = $("#XHSDevToolsRoot");
 	var toolsMode = XHSDevToolsIsToolsMode();
@@ -1030,6 +1980,7 @@ function XHSDevToolsRender() {
 	XHSDevToolsRenderStatus();
 	XHSDevToolsRenderSandboxBar();
 	XHSDevToolsRenderTimescale();
+	XHSDevToolsRenderPerformance();
 
 	var tabs = $("#XHSDevToolsTabs");
 	var content = $("#XHSDevToolsContent");
@@ -1053,6 +2004,8 @@ function XHSDevToolsRender() {
 		XHSDevToolsRenderTimers(content);
 	} else if (XHSDevToolsActiveTab === "bots") {
 		XHSDevToolsRenderBots(content);
+	} else if (XHSDevToolsActiveTab === "lag_lab") {
+		XHSDevToolsRenderLagLab(content);
 	} else if (XHSDevToolsActiveTab === "players") {
 		XHSDevToolsRenderPlayers(content);
 	} else if (XHSDevToolsActiveTab === "ui") {
@@ -1063,11 +2016,31 @@ function XHSDevToolsRender() {
 }
 
 function XHSDevToolsOnState(tableName, key, data) {
-	if (key !== "state") {
+	if (key === "performance") {
+		XHSDevToolsPerformance = data || {};
+		if (XHSDevToolsCanViewPerformanceLog()) {
+			XHSDevToolsRenderPerformance();
+		}
+		return;
+	}
+
+	if (key === "lag_lab") {
+		XHSDevToolsLagLab = data || {};
+		if (XHSDevToolsIsToolsMode() && XHSDevToolsActiveTab === "lag_lab") {
+			XHSDevToolsRender();
+		}
+		return;
+	}
+
+	if (key !== "state" || !XHSDevToolsIsToolsMode()) {
 		return;
 	}
 
 	XHSDevToolsState = data || {};
+	var lastAction = String((XHSDevToolsState.last_result || {}).action || "");
+	if (lastAction.indexOf("lag_lab_") === 0) {
+		XHSDevToolsLagLabPending = "";
+	}
 	XHSDevToolsHasServerState = true;
 	XHSDevToolsRender();
 }
@@ -1136,28 +2109,38 @@ function XHSDevToolsOnBots(tableName, key, data) {
 		return;
 	}
 
+	XHSDevToolsRenderBotPerformance();
 	if (XHSDevToolsShouldRenderBots()) {
 		XHSDevToolsRender();
 	}
 }
 
-(function() {
-	if (!XHSDevToolsIsToolsMode()) {
-		var root = $("#XHSDevToolsRoot");
-		if (root) {
-			root.style.visibility = "collapse";
-		}
+function XHSDevToolsOnGameOptions(tableName, key, data) {
+	if (key !== "donators") {
 		return;
 	}
+	XHSDevToolsApplyAccess();
+}
 
+(function() {
 	CustomNetTables.SubscribeNetTableListener("xhs_devtools", XHSDevToolsOnState);
-	CustomNetTables.SubscribeNetTableListener("xhs_bots", XHSDevToolsOnBots);
-	var state = CustomNetTables.GetTableValue("xhs_devtools", "state");
-	if (state) {
-		XHSDevToolsState = state;
-		XHSDevToolsHasServerState = true;
+	CustomNetTables.SubscribeNetTableListener("game_options", XHSDevToolsOnGameOptions);
+		XHSDevToolsPerformance = CustomNetTables.GetTableValue("xhs_devtools", "performance") || {};
+		XHSDevToolsLagLab = CustomNetTables.GetTableValue("xhs_devtools", "lag_lab") || {};
+	XHSDevToolsBindPerformanceToggle();
+	XHSDevToolsApplyPerformanceColumns();
+	XHSDevToolsApplyAccess();
+	XHSDevToolsClientFPSTick();
+
+	if (XHSDevToolsIsToolsMode()) {
+		CustomNetTables.SubscribeNetTableListener("xhs_bots", XHSDevToolsOnBots);
+		var state = CustomNetTables.GetTableValue("xhs_devtools", "state");
+		if (state) {
+			XHSDevToolsState = state;
+			XHSDevToolsHasServerState = true;
+		}
+		XHSDevToolsReadBotNetTables();
+		XHSDevToolsRender();
+		XHSDevToolsRequestStateLoop();
 	}
-	XHSDevToolsReadBotNetTables();
-	XHSDevToolsRender();
-	XHSDevToolsRequestStateLoop();
 })();

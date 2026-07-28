@@ -55,6 +55,10 @@
 					</Button>
 				</Panel>
 
+				<Button id="XHSPassDevUnlockUIButton" class="XHSPassDevUnlockUIButton">
+					<Label id="XHSPassDevUnlockUILabel" text="DEV: UNLOCK UI" />
+				</Button>
+
 				<Button id="XHSPassCloseButton" class="XHSPassIconButton">
 					<Label text="X" />
 				</Button>

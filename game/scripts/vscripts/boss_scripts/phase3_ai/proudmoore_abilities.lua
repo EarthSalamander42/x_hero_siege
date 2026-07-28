@@ -13,6 +13,8 @@ LinkLuaModifier("modifier_xhs_proudmoore_command", "boss_scripts/phase3_ai/proud
 LinkLuaModifier("modifier_xhs_proudmoore_anchor_slow", "boss_scripts/phase3_ai/proudmoore_abilities.lua", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_xhs_proudmoore_torrent_slow", "boss_scripts/phase3_ai/proudmoore_abilities.lua", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_xhs_proudmoore_command_aura", "boss_scripts/phase3_ai/proudmoore_abilities.lua", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_xhs_proudmoore_command_shock", "boss_scripts/phase3_ai/proudmoore_abilities.lua", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_xhs_proudmoore_broadside_debuff", "boss_scripts/phase3_ai/proudmoore_abilities.lua", LUA_MODIFIER_MOTION_NONE)
 
 modifier_xhs_proudmoore_command = modifier_xhs_proudmoore_command or class({})
 modifier_xhs_proudmoore_command.XHS_LINK_CLIENT = true
@@ -22,6 +24,10 @@ modifier_xhs_proudmoore_torrent_slow = modifier_xhs_proudmoore_torrent_slow or c
 modifier_xhs_proudmoore_torrent_slow.XHS_LINK_CLIENT = true
 modifier_xhs_proudmoore_command_aura = modifier_xhs_proudmoore_command_aura or class({})
 modifier_xhs_proudmoore_command_aura.XHS_LINK_CLIENT = true
+modifier_xhs_proudmoore_command_shock = modifier_xhs_proudmoore_command_shock or class({})
+modifier_xhs_proudmoore_command_shock.XHS_LINK_CLIENT = true
+modifier_xhs_proudmoore_broadside_debuff = modifier_xhs_proudmoore_broadside_debuff or class({})
+modifier_xhs_proudmoore_broadside_debuff.XHS_LINK_CLIENT = true
 
 local PROUDMOORE_COLORS = {
 	primary = Vector(70, 190, 255),
@@ -248,14 +254,20 @@ function xhs_proudmoore_admirals_command:OnSpellStart()
 	local caster = self:GetCaster()
 	local context = GetContext(self)
 	caster:AddNewModifier(caster, self, "modifier_xhs_proudmoore_command", { duration = self:GetSpecialValueFor("duration") })
-	DamageEnemies(caster, self, caster:GetAbsOrigin(), self:GetSpecialValueFor("radius"), ScaleDamage(self:GetSpecialValueFor("damage")), self:GetAbilityDamageType())
+	DamageEnemies(caster, self, caster:GetAbsOrigin(), self:GetSpecialValueFor("radius"), ScaleDamage(self:GetSpecialValueFor("damage")), self:GetAbilityDamageType(), function(enemy)
+		enemy:AddNewModifier(caster, self, "modifier_xhs_proudmoore_command_shock", { duration = 3.5 })
+	end)
+	caster:EmitSound("Hero_Kunkka.XMarksTheSpot.Target")
+	caster:EmitSound("kunkka_kunk_ability_ghostshp_0" .. math.random(1, 3))
 
 	for _, point in pairs(context.points or {}) do
 		Timers:CreateTimer(point.delay or 0, function()
 			if not IsValidAlive(caster) then return nil end
-			DamageEnemies(caster, self, point.position, self:GetSpecialValueFor("strike_radius"), ScaleDamage(self:GetSpecialValueFor("strike_damage")), self:GetAbilityDamageType())
+			DamageEnemies(caster, self, point.position, self:GetSpecialValueFor("strike_radius"), ScaleDamage(self:GetSpecialValueFor("strike_damage")), self:GetAbilityDamageType(), function(enemy)
+				enemy:AddNewModifier(caster, self, "modifier_xhs_proudmoore_command_shock", { duration = 3.5 })
+			end)
 			CreateGhostshipImpact(point.position)
-			EmitLocationSound(caster, point.position, "Hero_Kunkka.Torrent")
+			EmitLocationSound(caster, point.position, "Hero_Kunkka.Ghostship.Crash")
 			return nil
 		end)
 	end
@@ -328,10 +340,13 @@ function xhs_proudmoore_broadside:OnSpellStart()
 
 	local caster = self:GetCaster()
 	local damage = ScaleDamage(self:GetSpecialValueFor("damage"))
+	caster:EmitSound("kunkka_kunk_ability_ghostshp_0" .. math.random(1, 3))
 	for _, point in pairs(GetContext(self).points or {}) do
 		Timers:CreateTimer(point.delay or 0, function()
 			if not IsValidAlive(caster) then return nil end
-			DamageEnemies(caster, self, point.position, self:GetSpecialValueFor("radius"), damage, self:GetAbilityDamageType())
+			DamageEnemies(caster, self, point.position, self:GetSpecialValueFor("radius"), damage, self:GetAbilityDamageType(), function(enemy)
+				enemy:AddNewModifier(caster, self, "modifier_xhs_proudmoore_broadside_debuff", { duration = 4.0 })
+			end)
 			CreateGhostshipImpact(point.position)
 			EmitLocationSound(caster, point.position, "Hero_Kunkka.Ghostship")
 			return nil
@@ -479,3 +494,21 @@ end
 function modifier_xhs_proudmoore_command_aura:GetModifierPhysicalArmorBonus()
 	return self:GetAbility() and self:GetAbility():GetSpecialValueFor("armor") or 0
 end
+
+function modifier_xhs_proudmoore_command_shock:IsPurgable() return true end
+function modifier_xhs_proudmoore_command_shock:IsDebuff() return true end
+function modifier_xhs_proudmoore_command_shock:GetTexture() return "kunkka_x_marks_the_spot" end
+function modifier_xhs_proudmoore_command_shock:DeclareFunctions()
+	return { MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE, MODIFIER_PROPERTY_ATTACKSPEED_BONUS_CONSTANT }
+end
+function modifier_xhs_proudmoore_command_shock:GetModifierMoveSpeedBonus_Percentage() return -30 end
+function modifier_xhs_proudmoore_command_shock:GetModifierAttackSpeedBonus_Constant() return -50 end
+
+function modifier_xhs_proudmoore_broadside_debuff:IsPurgable() return true end
+function modifier_xhs_proudmoore_broadside_debuff:IsDebuff() return true end
+function modifier_xhs_proudmoore_broadside_debuff:GetTexture() return "kunkka_ghostship" end
+function modifier_xhs_proudmoore_broadside_debuff:DeclareFunctions()
+	return { MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE, MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS }
+end
+function modifier_xhs_proudmoore_broadside_debuff:GetModifierMoveSpeedBonus_Percentage() return -35 end
+function modifier_xhs_proudmoore_broadside_debuff:GetModifierPhysicalArmorBonus() return -12 end

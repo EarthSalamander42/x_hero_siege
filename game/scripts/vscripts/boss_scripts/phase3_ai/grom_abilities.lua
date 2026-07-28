@@ -11,11 +11,14 @@ xhs_grom_blood_frenzy = xhs_grom_blood_frenzy or class({})
 
 LinkLuaModifier("modifier_xhs_grom_blood_frenzy", "boss_scripts/phase3_ai/grom_abilities.lua", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_xhs_grom_slow", "boss_scripts/phase3_ai/grom_abilities.lua", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_xhs_grom_blade_storm", "boss_scripts/phase3_ai/grom_abilities.lua", LUA_MODIFIER_MOTION_NONE)
 
 modifier_xhs_grom_blood_frenzy = modifier_xhs_grom_blood_frenzy or class({})
 modifier_xhs_grom_blood_frenzy.XHS_LINK_CLIENT = true
 modifier_xhs_grom_slow = modifier_xhs_grom_slow or class({})
 modifier_xhs_grom_slow.XHS_LINK_CLIENT = true
+modifier_xhs_grom_blade_storm = modifier_xhs_grom_blade_storm or class({})
+modifier_xhs_grom_blade_storm.XHS_LINK_CLIENT = true
 
 local GROM_COLORS = {
 	primary = Vector(255, 62, 34),
@@ -43,6 +46,30 @@ local WARSONG_LEAP_PARTICLE = "particles/units/heroes/hero_ursa/ursa_earthshock.
 
 local function IsValidAlive(unit)
 	return unit ~= nil and IsValidEntity(unit) and not unit:IsNull() and unit:IsAlive()
+end
+
+local function PickClosestGromArenaHero(caster)
+	if not IsValidAlive(caster) then return nil end
+
+	local arenaCenter = caster:GetAbsOrigin()
+	local arenaSpawner = Entities:FindByName(nil, "spawn_grom_hellscream")
+	if arenaSpawner ~= nil then
+		arenaCenter = arenaSpawner:GetAbsOrigin()
+	end
+
+	local closest = nil
+	local closestDistance = nil
+	for _, hero in pairs(XHSPhase3BossAI:GetLivingHeroes(arenaCenter, 2200, true)) do
+		if IsValidAlive(hero) then
+			local distance = (hero:GetAbsOrigin() - caster:GetAbsOrigin()):Length2D()
+			if closestDistance == nil or distance < closestDistance then
+				closest = hero
+				closestDistance = distance
+			end
+		end
+	end
+
+	return closest
 end
 
 local function GetContext(ability)
@@ -226,11 +253,7 @@ function xhs_grom_blade_storm:OnSpellStart()
 	local elapsed = 0
 	local nextImpactFx = 0
 
-	-- Keep Grom in the actual Blade Fury spin translation for the whole damage window.
-	-- The generic cast activity alone only shows the PFX and leaves the model idle.
-	-- Blade Fury uses an override activity while channeling; the cast activity
-	-- only plays the one-shot cast gesture and leaves Grom visually idle.
-	StartAnimation(caster, { duration = duration, activity = ACT_DOTA_OVERRIDE_ABILITY_1, rate = 1.0, translate = "spin" })
+	caster:AddNewModifier(caster, self, "modifier_xhs_grom_blade_storm", { duration = duration })
 	local particle = ParticleManager:CreateParticle(BLADE_STORM_PARTICLE, PATTACH_ABSORIGIN_FOLLOW, caster)
 	ParticleManager:SetParticleControlEnt(particle, 0, caster, PATTACH_ABSORIGIN_FOLLOW, "attach_hitloc", caster:GetAbsOrigin(), true)
 	ParticleManager:SetParticleControl(particle, 5, Vector(radius * 1.2, 0, 0))
@@ -251,6 +274,16 @@ function xhs_grom_blade_storm:OnSpellStart()
 		ParticleManager:SetParticleControl(particle, 5, Vector(radius * 1.2, 0, 0))
 		ParticleManager:SetParticleControl(nullParticle, 1, Vector(radius * 1.2, 0, 0))
 		ParticleManager:SetParticleControl(nullParticle, 5, Vector(radius * 1.2, 0, 0))
+
+		-- Blade Storm is a pursuit window: continuously close the gap with the
+		-- nearest living hero using movement-only orders. The active modifier
+		-- keeps Grom disarmed, so this can never turn into a basic attack.
+		local target = PickClosestGromArenaHero(caster)
+		if IsValidAlive(target) then
+			caster:SetForceAttackTarget(nil)
+			XHSPhase3BossAI:MoveBoss(caster, target:GetAbsOrigin())
+		end
+
 		local now = GameRules:GetGameTime()
 		DamageEnemies(caster, self, caster:GetAbsOrigin(), radius, damagePerSecond * tick, self:GetAbilityDamageType(), function(enemy)
 			if now >= nextImpactFx then
@@ -270,6 +303,9 @@ function xhs_grom_blade_storm:OnSpellStart()
 		ParticleManager:ReleaseParticleIndex(particle)
 		ParticleManager:DestroyParticle(nullParticle, false)
 		ParticleManager:ReleaseParticleIndex(nullParticle)
+		caster:RemoveModifierByName("modifier_xhs_grom_blade_storm")
+		caster:SetForceAttackTarget(nil)
+		caster:Stop()
 		EndAnimation(caster)
 		caster:StopSound("Hero_Juggernaut.BladeFuryStart")
 		caster:EmitSound("Hero_Juggernaut.BladeFuryStop")
@@ -277,6 +313,24 @@ function xhs_grom_blade_storm:OnSpellStart()
 	end)
 
 	ClearContext(self)
+end
+
+function modifier_xhs_grom_blade_storm:IsHidden() return true end
+function modifier_xhs_grom_blade_storm:IsPurgable() return false end
+function modifier_xhs_grom_blade_storm:CheckState()
+	return {
+		[MODIFIER_STATE_DISARMED] = true,
+		[MODIFIER_STATE_SILENCED] = true,
+		[MODIFIER_STATE_MUTED] = true,
+	}
+end
+function modifier_xhs_grom_blade_storm:OnCreated()
+	if not IsServer() then return end
+	self:GetParent():StartGestureWithPlaybackRate(ACT_DOTA_OVERRIDE_ABILITY_1, 1.0)
+end
+function modifier_xhs_grom_blade_storm:OnDestroy()
+	if not IsServer() then return end
+	self:GetParent():FadeGesture(ACT_DOTA_OVERRIDE_ABILITY_1)
 end
 
 function xhs_grom_mirror_cleave:OnAbilityPhaseStart()

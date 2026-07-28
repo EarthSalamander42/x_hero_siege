@@ -184,6 +184,10 @@ function modifier_ai:TryCastFinalWaveIllidanAbility()
 end
 
 function modifier_ai:OnIntervalThink()
+	if XHSPerformanceCounters ~= nil then
+		XHSPerformanceCounters:Increment("ai_thinks", 1)
+	end
+	if XHSLagLabIsActive ~= nil and XHSLagLabIsActive("pause_ai") then return end
 	if self.parent:IsIllusion() then return end
 	if Entities:FindByName(nil, "dota_goodguys_fort") == nil then return end
 	if self.parent:IsStunned() or self.parent:IsSilenced() or self.parent:IsHexed() or self.parent:IsChanneling() or self.parent:GetCurrentActiveAbility() then return end
@@ -193,6 +197,16 @@ function modifier_ai:OnIntervalThink()
 	local attackTarget = self.parent:GetAttackTarget()
 	if not IsLivingTarget(aggroTarget) then aggroTarget = nil end
 	if not IsLivingTarget(attackTarget) then attackTarget = nil end
+	if XHSPerformanceCounters ~= nil then
+		local target = attackTarget or aggroTarget
+		local targetIndex = target ~= nil and target:entindex() or -1
+		if self.xhs_performance_target_index ~= targetIndex then
+			if self.xhs_performance_target_index ~= nil then
+				XHSPerformanceCounters:Increment("target_changes", 1)
+			end
+			self.xhs_performance_target_index = targetIndex
+		end
+	end
 
 	-- Aggro is assigned before GetAttackTarget is always populated. Handle both
 	-- states before the normal "already has a target" early return, otherwise a

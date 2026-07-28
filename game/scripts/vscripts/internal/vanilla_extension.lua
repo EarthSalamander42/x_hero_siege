@@ -1,3 +1,55 @@
+if IsServer() and CDOTA_PlayerResource ~= nil
+	and CDOTA_PlayerResource.HasSelectedHero ~= nil
+	and _G.XHS_NATIVE_HAS_SELECTED_HERO == nil then
+	_G.XHS_NATIVE_HAS_SELECTED_HERO = CDOTA_PlayerResource.HasSelectedHero
+
+	-- ReplaceHeroWith can briefly leave a player slot flagged as selected while
+	-- its new hero entity does not exist yet. Preserve the useful vanilla
+	-- contract globally: a positive result always has a usable hero handle.
+	CDOTA_PlayerResource.HasSelectedHero = function(self, playerID)
+		if not _G.XHS_NATIVE_HAS_SELECTED_HERO(self, playerID) then
+			return false
+		end
+
+		local hero = self:GetSelectedHeroEntity(playerID)
+		if hero == nil then return false end
+		if IsValidEntity ~= nil and not IsValidEntity(hero) then return false end
+		if hero.IsNull ~= nil and hero:IsNull() then return false end
+		return true
+	end
+end
+
+-- Keep projectile instrumentation transparent to gameplay code. Every caller
+-- continues to use ProjectileManager's vanilla API while the extension records
+-- activity before delegating to the original engine function.
+if IsServer() and ProjectileManager ~= nil then
+	if ProjectileManager.CreateLinearProjectile ~= nil
+		and _G.XHS_NATIVE_CREATE_LINEAR_PROJECTILE == nil then
+		_G.XHS_NATIVE_CREATE_LINEAR_PROJECTILE = ProjectileManager.CreateLinearProjectile
+
+		ProjectileManager.CreateLinearProjectile = function(manager, info)
+			local counters = _G.XHSPerformanceCounters
+			if counters ~= nil and counters.Increment ~= nil then
+				counters:Increment("linear_projectiles", 1)
+			end
+			return _G.XHS_NATIVE_CREATE_LINEAR_PROJECTILE(manager, info)
+		end
+	end
+
+	if ProjectileManager.CreateTrackingProjectile ~= nil
+		and _G.XHS_NATIVE_CREATE_TRACKING_PROJECTILE == nil then
+		_G.XHS_NATIVE_CREATE_TRACKING_PROJECTILE = ProjectileManager.CreateTrackingProjectile
+
+		ProjectileManager.CreateTrackingProjectile = function(manager, info)
+			local counters = _G.XHSPerformanceCounters
+			if counters ~= nil and counters.Increment ~= nil then
+				counters:Increment("tracking_projectiles", 1)
+			end
+			return _G.XHS_NATIVE_CREATE_TRACKING_PROJECTILE(manager, info)
+		end
+	end
+end
+
 if IsServer() and LinkLuaModifier ~= nil and _G.XHS_NATIVE_LINK_LUA_MODIFIER == nil then
 	_G.XHS_NATIVE_LINK_LUA_MODIFIER = LinkLuaModifier
 	_G.XHS_LINK_LUA_MODIFIER_REGISTRY = _G.XHS_LINK_LUA_MODIFIER_REGISTRY or {}

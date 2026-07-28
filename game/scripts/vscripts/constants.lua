@@ -91,12 +91,12 @@ function GetXHSGromVanguardKillLimit(difficulty)
 	difficulty = tonumber(difficulty) or 1
 
 	local limits = {
-		[0] = 32,
-		[1] = 32,
-		[2] = 44,
-		[3] = 60,
-		[4] = 72,
-		[5] = 92,
+		[0] = 64,
+		[1] = 64,
+		[2] = 88,
+		[3] = 120,
+		[4] = 144,
+		[5] = 184,
 	}
 
 	return limits[difficulty] or limits[1]
@@ -366,7 +366,7 @@ _G.innate_abilities = {
 	"holdout_giant_form",
 	"holdout_monkey_king_bar",
 	"muradin_true_strike",
-	"holdout_stitch",
+	"holdout_soul_harvest",
 	"troll_warlord_berserkers_rage",
 	"holdout_lich_king_effects",
 	"wisp_pick_random_hero",
@@ -462,6 +462,7 @@ XHS_BOSSES_TABLE = {
 	npc_dota_hero_illidan = {
 		doors_to_open = { "door_balanar", "door_balanar2" },
 		obstructions_to_disable = { "obstruction_balanar" },
+		camera_focus_door = "door_balanar",
 		death_animation = { duration = 6.0, activity = ACT_DOTA_DIE, rate = 0.35 },
 		death_sound = "skeleton_king_wraith_death_long_09",
 		death_no_draw_delay = 12.0,
@@ -470,6 +471,7 @@ XHS_BOSSES_TABLE = {
 	npc_dota_hero_balanar = {
 		doors_to_open = { "door_proudmoore", "door_proudmoore2" },
 		obstructions_to_disable = { "obstruction_proudmoore" },
+		camera_focus_door = "door_proudmoore",
 		death_animation = { duration = 6.0, activity = ACT_DOTA_DIE, rate = 0.3 },
 		death_sound = "skeleton_king_wraith_death_long_09",
 		death_no_draw_delay = 12.0,

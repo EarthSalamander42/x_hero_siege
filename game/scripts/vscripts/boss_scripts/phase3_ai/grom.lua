@@ -32,6 +32,22 @@ local function IsValidAlive(unit)
 	return unit ~= nil and IsValidEntity(unit) and not unit:IsNull() and unit:IsAlive()
 end
 
+local function SyncAbilityCooldowns(source, target)
+	if not IsValidAlive(source) or not IsValidAlive(target) then return end
+
+	for _, abilityName in ipairs(GROM_ABILITIES) do
+		local sourceAbility = source:FindAbilityByName(abilityName)
+		local targetAbility = target:FindAbilityByName(abilityName)
+		if sourceAbility ~= nil and targetAbility ~= nil then
+			targetAbility:EndCooldown()
+			local remaining = sourceAbility:GetCooldownTimeRemaining()
+			if remaining > 0 then
+				targetAbility:StartCooldown(remaining)
+			end
+		end
+	end
+end
+
 local function FindNearestPlayerTarget(unit)
 	if not IsValidAlive(unit) then return nil end
 
@@ -116,7 +132,7 @@ local function CastPreparedAbility(boss, abilityName, context, facePosition)
 	if not IsValidAlive(boss) then return nil end
 
 	local ability = boss:FindAbilityByName(abilityName)
-	if ability == nil or ability:IsNull() then return nil end
+	if ability == nil or ability:IsNull() or not ability:IsCooldownReady() then return nil end
 	if XHSPhase3BossAI:IsCastBlocked(boss) then return nil end
 
 	ability.xhs_grom_context = context or {}
@@ -304,8 +320,6 @@ function modifier_xhs_grom_phase3_ai:OnIntervalThink()
 		return
 	end
 
-	if self:TryThresholdMirrorTrial(now) then return end
-
 	if self.state == "casting" then
 		if now < self.cast_until then return end
 		self.state = "recovery"
@@ -315,6 +329,8 @@ function modifier_xhs_grom_phase3_ai:OnIntervalThink()
 		if now < self.recover_until then return end
 		self.state = "idle"
 	end
+
+	if self:TryThresholdMirrorTrial(now) then return end
 
 	local entry = XHSPhase3BossAI:WeightedChoice(self.patterns, now)
 	if entry == nil then
@@ -605,13 +621,11 @@ function modifier_xhs_grom_phase3_ai:OnFakeCloneKilled(clone, ability, attacker)
 	Timers:CreateTimer(0.7, function()
 		if not self:IsBossActive() then return nil end
 		DamageEnemies(boss, mirrorAbility, position, radius, damage)
-		local particle = ParticleManager:CreateParticle("particles/units/heroes/hero_juggernaut/juggernaut_blade_fury_ground.vpcf", PATTACH_WORLDORIGIN, nil)
+		-- The Blade Fury ground particle owns persistent world emitters and could
+		-- survive the fake-clone punishment. Use the self-terminating hit burst.
+		local particle = ParticleManager:CreateParticle("particles/units/heroes/hero_juggernaut/juggernaut_blade_fury_tgt.vpcf", PATTACH_WORLDORIGIN, nil)
 		ParticleManager:SetParticleControl(particle, 0, position)
-		Timers:CreateTimer(1.25, function()
-			ParticleManager:DestroyParticle(particle, false)
-			ParticleManager:ReleaseParticleIndex(particle)
-			return nil
-		end)
+		ParticleManager:ReleaseParticleIndex(particle)
 		return nil
 	end)
 end
@@ -686,6 +700,7 @@ function modifier_xhs_grom_clone:OnCreated(params)
 	parent:SetBaseDamageMax(math.floor(3200 * XHSPhase3BossAI:GetScale().damage))
 	parent:SetPhysicalArmorBaseValue(80)
 	XHSPhase3BossAI:SetAbilityLevels(parent, GROM_ABILITIES)
+	SyncAbilityCooldowns(source, parent)
 	XHSPhase3BossAI:HideVanillaHealthBar(parent)
 	self:StartIntervalThink(0.75)
 	self:OnIntervalThink()

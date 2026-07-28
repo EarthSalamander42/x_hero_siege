@@ -35,6 +35,9 @@ var xhs_bot_setup_pending = false;
 var xhs_bot_setup_synced = false;
 var xhs_bot_setup_expected_revision = -1;
 var xhs_bot_setup_request_token = 0;
+var xhs_bot_setup_log_sequence = 0;
+var xhs_bot_setup_identity_watch_running = false;
+var xhs_bot_setup_last_local_player_id = -2;
 var xhs_bot_setup_ui = {};
 var profile_modal_transition_token = 0;
 var profile_modal_fade_duration = 0.18;
@@ -298,6 +301,83 @@ function IsXHSBotSetupAllowed() {
 		String(game_options.game_type) === "XHS";
 }
 
+function XHSBotSetupSafeJSON(value) {
+	try {
+		var encoded = JSON.stringify(value);
+		return encoded === undefined ? "null" : encoded;
+	} catch (error) {
+		return "{\"serialization_error\":\"" + String(error) + "\"}";
+	}
+}
+
+function XHSBotSetupGetEditBlockReason() {
+	if (!IsXHSBotSetupAllowed()) {
+		return "setup_not_allowed";
+	}
+	if (!xhs_bot_setup_config) {
+		return "config_missing";
+	}
+	if (!IsTruthy(xhs_bot_setup_config.available)) {
+		return "server_unavailable";
+	}
+	if (!XHSBotSetupIsController()) {
+		return "not_controller";
+	}
+	if (IsTruthy(xhs_bot_setup_config.locked)) {
+		return "setup_locked";
+	}
+	if (xhs_bot_setup_pending) {
+		return "request_pending";
+	}
+	return "";
+}
+
+function XHSBotSetupSnapshot() {
+	var config = xhs_bot_setup_config;
+	var local_player_id = GetLocalPlayerIDSafe();
+	var controller_player_id = config
+		? Math.floor(ToNumber(config.controller_player_id, -1))
+		: -1;
+	var edit_block_reason = XHSBotSetupGetEditBlockReason();
+	return {
+		allowed: IsXHSBotSetupAllowed(),
+		initialized: xhs_bot_setup_initialized,
+		has_card: !!xhs_bot_setup_ui.card,
+		has_config: !!config,
+		local_player_id: local_player_id,
+		controller_player_id: controller_player_id,
+		is_controller: XHSBotSetupIsController(),
+		available: !!(config && IsTruthy(config.available)),
+		locked: !!(config && IsTruthy(config.locked)),
+		pending: xhs_bot_setup_pending,
+		dirty: xhs_bot_setup_dirty,
+		synced: xhs_bot_setup_synced,
+		can_edit: edit_block_reason === "",
+		edit_block_reason: edit_block_reason || "none",
+		expected_revision: xhs_bot_setup_expected_revision,
+		request_token: xhs_bot_setup_request_token,
+		config: config ? {
+			revision: Math.floor(ToNumber(config.revision, -1)),
+			bot_count: Math.floor(ToNumber(config.bot_count, 0)),
+			max_bots: Math.floor(ToNumber(config.max_bots, 0)),
+			ai_difficulty: String(config.ai_difficulty || ""),
+			composition: String(config.composition || ""),
+			status: String(config.status || ""),
+			error: String(config.error || ""),
+		} : null,
+		draft: {
+			bot_count: Math.floor(ToNumber(xhs_bot_setup_draft.bot_count, 0)),
+			ai_difficulty: String(xhs_bot_setup_draft.ai_difficulty || ""),
+			composition: String(xhs_bot_setup_draft.composition || ""),
+		},
+	};
+}
+
+function XHSBotSetupLog(event_name, details) {
+	// Intentionally silent. Setup diagnostics live server-side now that the
+	// Panorama controls and event wiring have been validated.
+}
+
 function GetXHSBotRosterPlayers() {
 	if (!xhs_bot_setup_roster || !xhs_bot_setup_roster.players) {
 		return {};
@@ -330,13 +410,50 @@ function XHSBotSetupMakeLabel(parent, class_name, text) {
 }
 
 function XHSBotSetupMakeButton(parent, id, text, class_name, callback) {
-	var button = $.CreatePanel("Button", parent, id || "");
+	var button_id = id || "XHSBotSetupUnnamedButton";
+	var button = $.CreatePanel("Button", parent, button_id);
 	button.AddClass("xhs-bot-setup-button");
 	if (class_name) {
 		button.AddClass(class_name);
 	}
-	button.SetPanelEvent("onactivate", callback);
+	button.SetPanelEvent("onactivate", function () {
+		XHSBotSetupLog("button_activate", {
+			button: button_id,
+			button_enabled: !!button.enabled,
+			text: String(text || ""),
+			class_name: String(class_name || ""),
+		});
+		try {
+			callback();
+			XHSBotSetupLog("button_callback_complete", {
+				button: button_id,
+			});
+		} catch (error) {
+			XHSBotSetupLog("button_callback_exception", {
+				button: button_id,
+				error: String(error),
+			});
+			throw error;
+		}
+	});
+	button.SetPanelEvent("onmouseover", function () {
+		XHSBotSetupLog("button_pointer_enter", {
+			button: button_id,
+			button_enabled: !!button.enabled,
+		});
+	});
+	button.SetPanelEvent("onmouseout", function () {
+		XHSBotSetupLog("button_pointer_leave", {
+			button: button_id,
+			button_enabled: !!button.enabled,
+		});
+	});
 	XHSBotSetupMakeLabel(button, "xhs-bot-setup-button-label", text);
+	XHSBotSetupLog("button_created", {
+		button: button_id,
+		text: String(text || ""),
+		class_name: String(class_name || ""),
+	});
 	return button;
 }
 
@@ -350,9 +467,17 @@ function XHSBotSetupMaxBots() {
 
 function XHSBotSetupSyncDraftFromConfig() {
 	if (!xhs_bot_setup_config) {
+		XHSBotSetupLog("draft_sync_skipped", {
+			reason: "config_missing",
+		});
 		return;
 	}
 
+	var previous_draft = {
+		bot_count: xhs_bot_setup_draft.bot_count,
+		ai_difficulty: xhs_bot_setup_draft.ai_difficulty,
+		composition: xhs_bot_setup_draft.composition,
+	};
 	xhs_bot_setup_draft.bot_count = Math.max(
 		0,
 		Math.min(XHSBotSetupMaxBots(), Math.floor(ToNumber(xhs_bot_setup_config.bot_count, 0)))
@@ -367,72 +492,208 @@ function XHSBotSetupSyncDraftFromConfig() {
 	}
 	xhs_bot_setup_draft.composition = composition;
 	xhs_bot_setup_synced = true;
+	XHSBotSetupLog("draft_synced_from_config", {
+		previous_draft: previous_draft,
+	});
 }
 
 function XHSBotSetupIsController() {
 	if (!xhs_bot_setup_config) {
 		return false;
 	}
-	return GetLocalPlayerIDSafe() === Math.floor(ToNumber(xhs_bot_setup_config.controller_player_id, -1));
+	var local_player_id = GetLocalPlayerIDSafe();
+	var controller_player_id = Math.floor(ToNumber(xhs_bot_setup_config.controller_player_id, -1));
+	if (local_player_id < 0) {
+		return false;
+	}
+	// The server remains authoritative. This temporary fallback only keeps the
+	// first loaded human interactive until the server republishes its controller.
+	return controller_player_id < 0 || local_player_id === controller_player_id;
+}
+
+function XHSBotSetupWatchIdentity() {
+	if (!xhs_bot_setup_initialized) {
+		xhs_bot_setup_identity_watch_running = false;
+		return;
+	}
+
+	var local_player_id = GetLocalPlayerIDSafe();
+	var controller_player_id = xhs_bot_setup_config
+		? Math.floor(ToNumber(xhs_bot_setup_config.controller_player_id, -1))
+		: -1;
+	if (local_player_id !== xhs_bot_setup_last_local_player_id) {
+		var previous_local_player_id = xhs_bot_setup_last_local_player_id;
+		xhs_bot_setup_last_local_player_id = local_player_id;
+		XHSBotSetupLog("local_player_id_changed", {
+			previous_local_player_id: previous_local_player_id,
+			local_player_id: local_player_id,
+			controller_player_id: controller_player_id,
+		});
+		XHSBotSetupRender("local_player_id_changed");
+	}
+
+	if (local_player_id >= 0 && xhs_bot_setup_config && controller_player_id >= 0) {
+		xhs_bot_setup_identity_watch_running = false;
+		XHSBotSetupLog("identity_watch_completed", {
+			local_player_id: local_player_id,
+			controller_player_id: controller_player_id,
+		});
+		return;
+	}
+	$.Schedule(0.1, XHSBotSetupWatchIdentity);
+}
+
+function XHSBotSetupStartIdentityWatch() {
+	if (xhs_bot_setup_identity_watch_running) {
+		return;
+	}
+	xhs_bot_setup_identity_watch_running = true;
+	XHSBotSetupLog("identity_watch_started", {});
+	$.Schedule(0.0, XHSBotSetupWatchIdentity);
 }
 
 function XHSBotSetupCanEdit() {
-	return IsXHSBotSetupAllowed() &&
-		xhs_bot_setup_config !== null &&
-		IsTruthy(xhs_bot_setup_config.available) &&
-		XHSBotSetupIsController() &&
-		!IsTruthy(xhs_bot_setup_config.locked) &&
-		!xhs_bot_setup_pending;
+	return XHSBotSetupGetEditBlockReason() === "";
 }
 
 function XHSBotSetupSetButtonEnabled(button, enabled) {
 	if (!button) {
 		return;
 	}
+	enabled = !!enabled;
 	button.enabled = enabled;
 	button.SetHasClass("Disabled", !enabled);
 }
 
 function XHSBotSetupChangeCount(delta) {
-	if (!XHSBotSetupCanEdit()) {
+	var edit_block_reason = XHSBotSetupGetEditBlockReason();
+	var previous_count = Math.floor(ToNumber(xhs_bot_setup_draft.bot_count, 0));
+	XHSBotSetupLog("count_change_requested", {
+		delta: delta,
+		previous_count: previous_count,
+		edit_block_reason: edit_block_reason || "none",
+	});
+	if (edit_block_reason) {
+		XHSBotSetupLog("count_change_rejected", {
+			delta: delta,
+			reason: edit_block_reason,
+		});
 		return;
 	}
 	var next_count = Math.max(0, Math.min(
 		XHSBotSetupMaxBots(),
-		Math.floor(ToNumber(xhs_bot_setup_draft.bot_count, 0)) + delta
+		previous_count + delta
 	));
-	if (next_count === xhs_bot_setup_draft.bot_count) {
+	if (next_count === previous_count) {
+		XHSBotSetupLog("count_change_noop", {
+			delta: delta,
+			count: previous_count,
+			reason: delta < 0 ? "minimum_reached" : "maximum_reached",
+		});
 		return;
 	}
 	xhs_bot_setup_draft.bot_count = next_count;
 	xhs_bot_setup_dirty = true;
-	XHSBotSetupRender();
+	XHSBotSetupLog("count_change_applied", {
+		delta: delta,
+		previous_count: previous_count,
+		next_count: next_count,
+	});
+	XHSBotSetupRender("count_change");
 }
 
 function XHSBotSetupSelectDifficulty(difficulty) {
-	if (!XHSBotSetupCanEdit() || (difficulty !== "easy" && difficulty !== "normal")) {
+	var edit_block_reason = XHSBotSetupGetEditBlockReason();
+	XHSBotSetupLog("difficulty_select_requested", {
+		requested: difficulty,
+		previous: xhs_bot_setup_draft.ai_difficulty,
+		edit_block_reason: edit_block_reason || "none",
+	});
+	if (edit_block_reason) {
+		XHSBotSetupLog("difficulty_select_rejected", {
+			requested: difficulty,
+			reason: edit_block_reason,
+		});
+		return;
+	}
+	if (difficulty !== "easy" && difficulty !== "normal") {
+		XHSBotSetupLog("difficulty_select_rejected", {
+			requested: difficulty,
+			reason: "invalid_difficulty",
+		});
 		return;
 	}
 	if (xhs_bot_setup_draft.ai_difficulty !== difficulty) {
+		var previous_difficulty = xhs_bot_setup_draft.ai_difficulty;
 		xhs_bot_setup_draft.ai_difficulty = difficulty;
 		xhs_bot_setup_dirty = true;
-		XHSBotSetupRender();
+		XHSBotSetupLog("difficulty_select_applied", {
+			previous: previous_difficulty,
+			next: difficulty,
+		});
+		XHSBotSetupRender("difficulty_select");
+		return;
 	}
+	XHSBotSetupLog("difficulty_select_noop", {
+		difficulty: difficulty,
+		reason: "already_selected",
+	});
 }
 
 function XHSBotSetupSelectComposition(composition) {
-	if (!XHSBotSetupCanEdit() || ["balanced", "damage", "support", "random"].indexOf(composition) < 0) {
+	var edit_block_reason = XHSBotSetupGetEditBlockReason();
+	XHSBotSetupLog("composition_select_requested", {
+		requested: composition,
+		previous: xhs_bot_setup_draft.composition,
+		edit_block_reason: edit_block_reason || "none",
+	});
+	if (edit_block_reason) {
+		XHSBotSetupLog("composition_select_rejected", {
+			requested: composition,
+			reason: edit_block_reason,
+		});
+		return;
+	}
+	if (["balanced", "damage", "support", "random"].indexOf(composition) < 0) {
+		XHSBotSetupLog("composition_select_rejected", {
+			requested: composition,
+			reason: "invalid_composition",
+		});
 		return;
 	}
 	if (xhs_bot_setup_draft.composition !== composition) {
+		var previous_composition = xhs_bot_setup_draft.composition;
 		xhs_bot_setup_draft.composition = composition;
 		xhs_bot_setup_dirty = true;
-		XHSBotSetupRender();
+		XHSBotSetupLog("composition_select_applied", {
+			previous: previous_composition,
+			next: composition,
+		});
+		XHSBotSetupRender("composition_select");
+		return;
 	}
+	XHSBotSetupLog("composition_select_noop", {
+		composition: composition,
+		reason: "already_selected",
+	});
 }
 
 function XHSBotSetupConfirm() {
-	if (!XHSBotSetupCanEdit() || !xhs_bot_setup_dirty) {
+	var edit_block_reason = XHSBotSetupGetEditBlockReason();
+	XHSBotSetupLog("confirm_requested", {
+		edit_block_reason: edit_block_reason || "none",
+		dirty: xhs_bot_setup_dirty,
+	});
+	if (edit_block_reason) {
+		XHSBotSetupLog("confirm_rejected", {
+			reason: edit_block_reason,
+		});
+		return;
+	}
+	if (!xhs_bot_setup_dirty) {
+		XHSBotSetupLog("confirm_rejected", {
+			reason: "draft_not_dirty",
+		});
 		return;
 	}
 
@@ -444,32 +705,60 @@ function XHSBotSetupConfirm() {
 		XHSBotSetupMaxBots(),
 		Math.floor(ToNumber(xhs_bot_setup_draft.bot_count, 0))
 	));
-	XHSBotSetupRender();
-	GameEvents.SendCustomGameEventToServer("xhs_bot_setup_configure", {
+	var request_payload = {
 		bot_count: requested_count,
 		ai_difficulty: xhs_bot_setup_draft.ai_difficulty,
 		composition: xhs_bot_setup_draft.composition,
+	};
+	XHSBotSetupLog("confirm_sending", {
+		request_token: request_token,
+		expected_revision: xhs_bot_setup_expected_revision,
+		payload: request_payload,
+	});
+	XHSBotSetupRender("confirm_pending");
+	GameEvents.SendCustomGameEventToServer("xhs_bot_setup_configure", request_payload);
+	XHSBotSetupLog("confirm_sent", {
+		request_token: request_token,
+		expected_revision: xhs_bot_setup_expected_revision,
 	});
 
 	$.Schedule(4.0, function () {
+		XHSBotSetupLog("confirm_timeout_check", {
+			request_token: request_token,
+			is_current_token: xhs_bot_setup_request_token === request_token,
+			still_pending: xhs_bot_setup_pending,
+		});
 		if (xhs_bot_setup_pending && xhs_bot_setup_request_token === request_token) {
 			xhs_bot_setup_pending = false;
-			XHSBotSetupRender();
+			XHSBotSetupLog("confirm_timed_out", {
+				request_token: request_token,
+				expected_revision: xhs_bot_setup_expected_revision,
+			});
+			XHSBotSetupRender("confirm_timeout");
 		}
 	});
 }
 
 function XHSBotSetupBuildCard() {
 	if (!IsXHSBotSetupAllowed()) {
+		XHSBotSetupLog("card_build_rejected", {
+			reason: "setup_not_allowed",
+		});
 		return false;
 	}
 
 	var sidebar = $("#PlayerLoadingSidebar");
 	var player_list = $("#PlayerLoadingList");
 	if (!sidebar || !player_list) {
+		XHSBotSetupLog("card_build_rejected", {
+			reason: "loading_sidebar_missing",
+			has_sidebar: !!sidebar,
+			has_player_list: !!player_list,
+		});
 		return false;
 	}
 
+	XHSBotSetupLog("card_build_started", {});
 	var card = $.CreatePanel("Panel", sidebar, "XHSBotSetupCard");
 	card.AddClass("xhs-bot-setup-card");
 
@@ -483,11 +772,11 @@ function XHSBotSetupBuildCard() {
 	XHSBotSetupMakeLabel(count_row, "xhs-bot-setup-field-label", L("loading_screen_bot_setup_count"));
 	var count_controls = $.CreatePanel("Panel", count_row, "");
 	count_controls.AddClass("xhs-bot-setup-inline-controls");
-	xhs_bot_setup_ui.count_minus = XHSBotSetupMakeButton(count_controls, "", "-", "CountStep", function () {
+	xhs_bot_setup_ui.count_minus = XHSBotSetupMakeButton(count_controls, "XHSBotSetupCountMinus", "-", "CountStep", function () {
 		XHSBotSetupChangeCount(-1);
 	});
 	xhs_bot_setup_ui.count_value = XHSBotSetupMakeLabel(count_controls, "xhs-bot-setup-count-value", "0 / 7");
-	xhs_bot_setup_ui.count_plus = XHSBotSetupMakeButton(count_controls, "", "+", "CountStep", function () {
+	xhs_bot_setup_ui.count_plus = XHSBotSetupMakeButton(count_controls, "XHSBotSetupCountPlus", "+", "CountStep", function () {
 		XHSBotSetupChangeCount(1);
 	});
 
@@ -499,14 +788,14 @@ function XHSBotSetupBuildCard() {
 	xhs_bot_setup_ui.difficulty = {};
 	xhs_bot_setup_ui.difficulty.easy = XHSBotSetupMakeButton(
 		difficulty_controls,
-		"",
+		"XHSBotSetupDifficultyEasy",
 		L("loading_screen_bot_setup_easy"),
 		"Choice",
 		function () { XHSBotSetupSelectDifficulty("easy"); }
 	);
 	xhs_bot_setup_ui.difficulty.normal = XHSBotSetupMakeButton(
 		difficulty_controls,
-		"",
+		"XHSBotSetupDifficultyNormal",
 		L("loading_screen_bot_setup_normal"),
 		"Choice",
 		function () { XHSBotSetupSelectDifficulty("normal"); }
@@ -521,7 +810,7 @@ function XHSBotSetupBuildCard() {
 		(function (composition) {
 			xhs_bot_setup_ui.composition[composition] = XHSBotSetupMakeButton(
 				composition_controls,
-				"",
+				"XHSBotSetupComposition" + composition.charAt(0).toUpperCase() + composition.slice(1),
 				L("loading_screen_bot_setup_" + composition),
 				"CompositionChoice",
 				function () { XHSBotSetupSelectComposition(composition); }
@@ -545,20 +834,37 @@ function XHSBotSetupBuildCard() {
 	if (typeof sidebar.MoveChildBefore === "function") {
 		sidebar.MoveChildBefore(card, player_list);
 	}
+	XHSBotSetupLog("card_build_completed", {
+		card_id: "XHSBotSetupCard",
+	});
 	return true;
 }
 
-function XHSBotSetupRender() {
+function XHSBotSetupRender(reason) {
 	if (!IsXHSBotSetupAllowed() || !xhs_bot_setup_ui.card) {
+		XHSBotSetupLog("render_skipped", {
+			reason: String(reason || "unspecified"),
+			setup_allowed: IsXHSBotSetupAllowed(),
+			has_card: !!xhs_bot_setup_ui.card,
+		});
 		return;
 	}
 
-	var available = xhs_bot_setup_config && IsTruthy(xhs_bot_setup_config.available);
+	var available = !!(xhs_bot_setup_config && IsTruthy(xhs_bot_setup_config.available));
 	var controller = available && XHSBotSetupIsController();
 	var locked = available && IsTruthy(xhs_bot_setup_config.locked);
-	var can_edit = XHSBotSetupCanEdit();
+	var can_edit = !!XHSBotSetupCanEdit();
 	var maximum = XHSBotSetupMaxBots();
 	var count = Math.max(0, Math.min(maximum, Math.floor(ToNumber(xhs_bot_setup_draft.bot_count, 0))));
+	XHSBotSetupLog("render_started", {
+		reason: String(reason || "unspecified"),
+		available: available,
+		controller: controller,
+		locked: locked,
+		can_edit: can_edit,
+		count: count,
+		maximum: maximum,
+	});
 
 	xhs_bot_setup_ui.card.SetHasClass("IsWaiting", !available);
 	xhs_bot_setup_ui.card.SetHasClass("IsReadOnly", available && !controller);
@@ -609,10 +915,30 @@ function XHSBotSetupRender() {
 	xhs_bot_setup_ui.error.text = error_text;
 	xhs_bot_setup_ui.error.style.visibility = error_text ? "visible" : "collapse";
 	XHSBotSetupSetButtonEnabled(xhs_bot_setup_ui.confirm, can_edit && xhs_bot_setup_dirty);
+	XHSBotSetupLog("render_completed", {
+		reason: String(reason || "unspecified"),
+		displayed_count: count + " / " + maximum,
+		count_minus_enabled: can_edit && count > 0,
+		count_plus_enabled: can_edit && count < maximum,
+		difficulty_enabled: can_edit,
+		composition_enabled: can_edit,
+		confirm_enabled: can_edit && xhs_bot_setup_dirty,
+		server_status: server_status,
+		error_text: error_text,
+	});
 }
 
 function XHSBotSetupOnNetTableChanged(table_name, key, data) {
+	XHSBotSetupLog("nettable_changed", {
+		table_name: String(table_name || ""),
+		key: String(key || ""),
+		data: data || null,
+	});
 	if (!IsXHSBotSetupAllowed()) {
+		XHSBotSetupLog("nettable_change_ignored", {
+			key: String(key || ""),
+			reason: "setup_not_allowed",
+		});
 		return;
 	}
 
@@ -620,6 +946,13 @@ function XHSBotSetupOnNetTableChanged(table_name, key, data) {
 		var was_pending = xhs_bot_setup_pending;
 		var received_revision = Math.floor(ToNumber(data && data.revision, -1));
 		var acknowledged = was_pending && received_revision >= xhs_bot_setup_expected_revision;
+		XHSBotSetupLog("config_received", {
+			was_pending: was_pending,
+			received_revision: received_revision,
+			expected_revision: xhs_bot_setup_expected_revision,
+			acknowledged: acknowledged,
+			data: data || null,
+		});
 		xhs_bot_setup_config = data || null;
 
 		if (!xhs_bot_setup_synced || acknowledged || (!xhs_bot_setup_dirty && !was_pending)) {
@@ -632,39 +965,82 @@ function XHSBotSetupOnNetTableChanged(table_name, key, data) {
 		} else if (was_pending && data && data.error) {
 			xhs_bot_setup_pending = false;
 		}
-		XHSBotSetupRender();
+		XHSBotSetupLog("config_processed", {
+			acknowledged: acknowledged,
+			was_pending: was_pending,
+			received_revision: received_revision,
+		});
+		XHSBotSetupRender("nettable_config");
 		return;
 	}
 
 	if (key === "roster") {
 		xhs_bot_setup_roster = data || { count: 0, players: {} };
-		XHSBotSetupRender();
+		XHSBotSetupLog("roster_processed", {
+			count: Math.floor(ToNumber(xhs_bot_setup_roster.count, 0)),
+			data: data || null,
+		});
+		XHSBotSetupRender("nettable_roster");
+		return;
 	}
+	XHSBotSetupLog("nettable_change_ignored", {
+		key: String(key || ""),
+		reason: "unhandled_key",
+	});
 }
 
 function MaybeInitializeXHSBotSetup() {
+	XHSBotSetupLog("initialize_called", {});
 	if (!IsXHSBotSetupAllowed() || xhs_bot_setup_initialized) {
+		XHSBotSetupLog("initialize_skipped", {
+			reason: !IsXHSBotSetupAllowed() ? "setup_not_allowed" : "already_initialized",
+		});
 		return;
 	}
+	XHSBotSetupLog("initialize_started", {});
 	if (!XHSBotSetupBuildCard()) {
+		XHSBotSetupLog("initialize_deferred", {
+			reason: "card_build_failed",
+		});
 		return;
 	}
 
 	xhs_bot_setup_initialized = true;
+	XHSBotSetupLog("initialize_card_ready", {});
+	XHSBotSetupStartIdentityWatch();
+
 	if (typeof CustomNetTables !== "undefined" && CustomNetTables) {
+		XHSBotSetupLog("nettable_subscribe_started", {
+			table_name: "xhs_bots",
+		});
 		CustomNetTables.SubscribeNetTableListener("xhs_bots", XHSBotSetupOnNetTableChanged);
+		XHSBotSetupLog("nettable_subscribe_completed", {
+			table_name: "xhs_bots",
+		});
 
 		var initial_config = CustomNetTables.GetTableValue("xhs_bots", "config");
+		XHSBotSetupLog("initial_config_read", {
+			data: initial_config || null,
+			was_undefined: initial_config === undefined,
+		});
 		if (initial_config) {
 			xhs_bot_setup_config = initial_config;
 			XHSBotSetupSyncDraftFromConfig();
 		}
+
 		var initial_roster = CustomNetTables.GetTableValue("xhs_bots", "roster");
+		XHSBotSetupLog("initial_roster_read", {
+			data: initial_roster || null,
+			was_undefined: initial_roster === undefined,
+		});
 		if (initial_roster) {
 			xhs_bot_setup_roster = initial_roster;
 		}
+	} else {
+		XHSBotSetupLog("nettable_unavailable", {});
 	}
-	XHSBotSetupRender();
+	XHSBotSetupRender("initialize");
+	XHSBotSetupLog("initialize_completed", {});
 }
 
 function FormatLoadingScreenNumber(value) {
@@ -2607,12 +2983,12 @@ function UpdatePlayerLoadingSidebar() {
 			? (IsTruthy(seeded_entry.bot_data && seeded_entry.bot_data.ready) ? connection_state.CONNECTED : connection_state.LOADING)
 			: seeded_entry.player_info.player_connection_state;
 		const seeded_team_id = seeded_entry.team_id !== undefined ? seeded_entry.team_id : GetPlayerTeamIDFromInfo(seeded_entry.player_info, local_team_id);
-		const seeded_team_key = seeded_entry.is_xhs_bot ? "xhs_bots" : GetTeamSectionKey(seeded_team_id);
+		const seeded_team_key = GetTeamSectionKey(seeded_team_id);
 
 		seeded_entry.connection_state = seeded_state;
 		seeded_entry.team_id = seeded_team_id;
 		seeded_entry.team_key = seeded_team_key;
-		seeded_entry.team_priority = GetTeamSortPriority(seeded_team_id, local_team_id) + (seeded_entry.is_xhs_bot ? 0.5 : 0);
+		seeded_entry.team_priority = GetTeamSortPriority(seeded_team_id, local_team_id);
 
 		section_counts[seeded_team_key] = (section_counts[seeded_team_key] || 0) + 1;
 	}
@@ -2653,7 +3029,7 @@ function UpdatePlayerLoadingSidebar() {
 		var display_rows = [];
 		for (var display_i = 0; display_i < player_entries.length; display_i++) {
 			var display_entry = player_entries[display_i];
-			var display_section = display_entry.is_xhs_bot ? L("loading_screen_ai_allies_section") : GetTeamDisplayName(display_entry.team_id);
+			var display_section = GetTeamDisplayName(display_entry.team_id);
 			display_rows.push(display_entry.display_name + ":" + GetConnectionStateDebugName(display_entry.connection_state) + ":" + display_section);
 		}
 
@@ -2697,7 +3073,7 @@ function UpdatePlayerLoadingSidebar() {
 				player_loading_section_rows[team_key] = section_row;
 			}
 
-			var section_title = is_xhs_bot ? L("loading_screen_ai_allies_section") : GetTeamDisplayName(team_id);
+			var section_title = GetTeamDisplayName(team_id);
 			player_loading_section_rows[team_key].text = section_title + " (" + (section_counts[team_key] || 0) + ")";
 		}
 
@@ -3754,7 +4130,6 @@ function fetch() {
 	}
 
 	game_options = CustomNetTables.GetTableValue("game_options", "game_version");
-	// $.Msg(game_options.game_type)
 	if (game_options == undefined) {
 		if (loading_screen_last_fetch_stage !== "waiting_game_options") {
 			loading_screen_last_fetch_stage = "waiting_game_options";
@@ -3765,7 +4140,9 @@ function fetch() {
 
 	// The authoritative game type is now available. Keep this call before any
 	// API dependency so the Tools-only setup remains usable offline.
+	XHSBotSetupLog("fetch_initialize_dispatch", {});
 	MaybeInitializeXHSBotSetup();
+	XHSBotSetupLog("fetch_initialize_returned", {});
 
 	if (!IsServerApiAvailable()) {
 		if (loading_screen_last_fetch_stage !== "waiting_server_api") {

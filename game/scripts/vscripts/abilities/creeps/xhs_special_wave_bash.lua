@@ -63,7 +63,6 @@ function modifier_xhs_special_wave_bash:OnAttackLanded(params)
 	self.valid_attack_count = 0
 
 	local stun_duration = ability:GetSpecialValueFor("duration")
-	stun_duration = stun_duration * (1 - target:GetStatusResistance())
 	target:AddNewModifier(params.attacker, ability, "modifier_stunned", {
 		duration = stun_duration,
 	})

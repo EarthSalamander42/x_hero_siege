@@ -1,3 +1,50 @@
+local function GetXHSLaneParticipantCount()
+	local participantCount = GetXHSCombatParticipantCount ~= nil
+		and GetXHSCombatParticipantCount()
+		or PlayerResource:GetPlayerCount()
+	return math.max(1, math.min(8, tonumber(participantCount) or 1))
+end
+
+local function SetXHSLaneDoorState(lane, open)
+	if CREEP_LANES ~= nil and CREEP_LANES[lane] ~= nil then
+		CREEP_LANES[lane][1] = open and 1 or 0
+	end
+
+	for _, obstruction in pairs(Entities:FindAllByName("obstruction_lane" .. lane)) do
+		obstruction:SetEnabled(not open, true)
+	end
+	DoEntFire(
+		"door_lane" .. lane,
+		"SetAnimation",
+		open and "gate_02_open" or "gate_02_close",
+		0,
+		nil,
+		nil
+	)
+
+	for _, tower in pairs(Entities:FindAllByName("dota_badguys_tower" .. lane)) do
+		if open then
+			tower:RemoveModifierByName("modifier_invulnerable")
+		elseif not tower:HasModifier("modifier_invulnerable") then
+			tower:AddNewModifier(tower, nil, "modifier_invulnerable", nil)
+		end
+	end
+end
+
+function RefreshXHSCombatLanes()
+	if GameRules:State_Get() < DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
+		return 0
+	end
+
+	local participantCount = GetXHSLaneParticipantCount()
+	_G.CREEP_LANES_TYPE = participantCount <= 4 and 2 or 1
+	local laneCount = math.min(8, participantCount * CREEP_LANES_TYPE)
+	for lane = 1, 8 do
+		SetXHSLaneDoorState(lane, lane <= laneCount)
+	end
+	return laneCount
+end
+
 ListenToGameEvent('game_rules_state_change', function()
 	local newState = GameRules:State_Get()
 
@@ -29,9 +76,7 @@ ListenToGameEvent('game_rules_state_change', function()
 		require('zones/dialog_xhs')
 		require('zones/zone_tables_xhs')
 	elseif newState == DOTA_GAMERULES_STATE_PRE_GAME then
-		local player_count = GetXHSCombatParticipantCount ~= nil
-			and GetXHSCombatParticipantCount()
-			or PlayerResource:GetPlayerCount()
+		local player_count = GetXHSLaneParticipantCount()
 		if player_count <= 4 then
 			_G.CREEP_LANES_TYPE = 2
 		else
@@ -110,23 +155,7 @@ ListenToGameEvent('game_rules_state_change', function()
 			end
 		end
 
-		local combat_participants = GetXHSCombatParticipantCount ~= nil
-			and GetXHSCombatParticipantCount()
-			or PlayerResource:GetPlayerCount()
-		local lane_count = math.min(8, combat_participants * CREEP_LANES_TYPE)
-
-		for NumPlayers = 1, lane_count do
-			CREEP_LANES[NumPlayers][1] = 1
-			local DoorObs = Entities:FindAllByName("obstruction_lane" .. NumPlayers)
-			for _, obs in pairs(DoorObs) do
-				obs:SetEnabled(false, true)
-			end
-			DoEntFire("door_lane" .. NumPlayers, "SetAnimation", "gate_02_open", 0, nil, nil)
-			local towers = Entities:FindAllByName("dota_badguys_tower" .. NumPlayers)
-			for _, tower in pairs(towers) do
-				tower:RemoveModifierByName("modifier_invulnerable")
-			end
-		end
+		RefreshXHSCombatLanes()
 	end
 end, nil)
 
@@ -160,6 +189,49 @@ local hidden_innate_abilities = {
 }
 local DUNGEON_CHECKPOINT_MODEL = "models/props_structures/outpost.vmdl"
 
+local XHS_CREEP_ARMOR_DIFFICULTY_MULTIPLIERS = {
+	[1] = 0.70, -- Easy
+	[2] = 0.85, -- Normal
+	[3] = 1.00, -- Hard: current KV armor is the reference
+	[4] = 1.20, -- Extreme
+	[5] = 1.40, -- Divine
+}
+
+local XHS_PHASE_TWO_ARMOR_CREEPS = {
+	npc_ghul_II = true,
+	npc_orc_II = true,
+	npc_magnataur_destroyer_crypt = true,
+}
+
+local XHS_DRAGON_ARMOR_CREEPS = {
+	npc_dota_creature_red_dragon = true,
+	npc_dota_creature_black_dragon = true,
+	npc_dota_creature_green_dragon = true,
+}
+
+local function IsXHSPhaseOneArmorCreep(unitName)
+	local race, attackType = string.match(unitName or "", "^npc_xhs_([%a]+)_creep_([%a]+)_[1-4]$")
+	local validRace = race == "undead" or race == "orc" or race == "elf" or race == "human"
+	local validAttackType = attackType == "melee" or attackType == "ranged"
+	return validRace and validAttackType
+end
+
+local function ShouldScaleXHSCreepArmor(unitName)
+	return IsXHSPhaseOneArmorCreep(unitName)
+		or XHS_PHASE_TWO_ARMOR_CREEPS[unitName] == true
+		or XHS_DRAGON_ARMOR_CREEPS[unitName] == true
+end
+
+local function ApplyXHSCreepDifficultyArmor(npc, unitName, difficulty, referenceArmor)
+	if not ShouldScaleXHSCreepArmor(unitName) then return end
+
+	local multiplier = XHS_CREEP_ARMOR_DIFFICULTY_MULTIPLIERS[difficulty] or 1.0
+	local scaledArmor = math.floor((referenceArmor * multiplier) * 10 + 0.5) / 10
+	npc:SetPhysicalArmorBaseValue(scaledArmor)
+	npc.xhs_hard_reference_armor = referenceArmor
+	npc.xhs_difficulty_armor_multiplier = multiplier
+end
+
 -- An NPC has spawned somewhere in game. This includes heroes
 ListenToGameEvent('npc_spawned', function(keys)
 	local difficulty = GameRules:GetCustomGameDifficulty()
@@ -168,6 +240,7 @@ ListenToGameEvent('npc_spawned', function(keys)
 	local normal_xp = npc:GetDeathXP()
 	local normal_min_damage = npc:GetBaseDamageMin()
 	local normal_max_damage = npc:GetBaseDamageMax()
+	local normal_armor = npc:GetPhysicalArmorValue(false)
 	local hero_level = npc:GetLevel()
 
 	if npc and IsValidEntity(npc) then
@@ -357,6 +430,7 @@ ListenToGameEvent('npc_spawned', function(keys)
 			if XHSCreepPassives ~= nil then
 				XHSCreepPassives:Apply(npc, difficulty)
 			end
+			ApplyXHSCreepDifficultyArmor(npc, npc:GetUnitName(), difficulty, normal_armor)
 
 			if difficulty == 1 then
 				npc:SetMinimumGoldBounty(normal_bounty * 1.5)
@@ -1381,6 +1455,12 @@ function SpawnXHSTombstoneForHero(hero, position)
 	return EnsureXHSTombstoneGroundDrop(hero, position)
 end
 
+-- Replace the legacy item-drop implementation above with a real allied unit.
+-- Keeping the old functions in this file makes hot reloads with an already
+-- claimed legacy item safe; the installed unit system owns every new death.
+local XHSUnitTombstone = require("abilities/xhs_tombstone_revive")
+XHSUnitTombstone:Install()
+
 ListenToGameEvent('entity_killed', function(keys)
 	local killedUnit = EntIndexToHScript(keys.entindex_killed)
 	if killedUnit == nil then return end
@@ -1491,6 +1571,7 @@ ListenToGameEvent('entity_killed', function(keys)
 			end
 		elseif killedUnit:GetUnitName() == "npc_baristol" then
 			SpecialEvents.BaristolDead = true
+			GameMode:HideOptionalEventBossBar("baristol", killedUnit)
 			GrantTomeStatsToHero(killer, 250, "Tome Granted", "+250 all stats")
 		elseif killedUnit:GetUnitName() == "npc_ramero_2" then
 			local rewardHero = GetPlayerHeroFromUnit(killer)
@@ -2085,6 +2166,8 @@ function GameMode:OnQuestCompleted(questZone, quest)
 				FragmentQuests:OnFinalWaveEnd()
 			end
 
+			StopGlobalSound("XHS.FinalWaveMusic")
+
 			if XHSSetGlobalObjectiveState ~= nil then
 				XHSSetGlobalObjectiveState("final_wave", "Completed", "Final Wave completed")
 			else
@@ -2194,6 +2277,21 @@ function GameMode:OnDialogBegin(hPlayerHero, hDialogEnt)
 		GameMode.bConfirmPending = true
 	end
 
+	local cinematicId = "xhs_dialog_" .. tostring(hDialogEnt:entindex())
+	local cinematicOptions = {
+		hide_hud = true,
+		allow_dialog_ui = true,
+		lock_orders = true,
+		camera_entindex = hDialogEnt:entindex(),
+		camera_speed = 0.5,
+		transition = 0.35,
+	}
+	if Dialog.bSendToAll == true then
+		XHSCinematics:BeginForAll(cinematicId, cinematicOptions)
+	else
+		XHSCinematics:BeginForPlayer(hPlayerHero:GetPlayerID(), cinematicId, cinematicOptions)
+	end
+
 	if Dialog.bSkipFacePlayer ~= true then
 		hDialogEnt.vOriginalFaceDir = hDialogEnt:GetOrigin() + hDialogEnt:GetForwardVector() * 50
 		hDialogEnt:FaceTowards(hPlayerHero:GetOrigin())
@@ -2287,6 +2385,13 @@ function GameMode:OnDialogEnded(eventSourceIndex, data)
 
 		if bShowNextLine == 1 and hPlayerHero then
 			self:OnDialogBegin(hPlayerHero, hDialogEnt)
+		else
+			local cinematicId = "xhs_dialog_" .. tostring(hDialogEnt:entindex())
+			if Dialog ~= nil and Dialog.bSendToAll == true then
+				XHSCinematics:EndForAll(cinematicId)
+			elseif hPlayerHero ~= nil then
+				XHSCinematics:EndForPlayer(hPlayerHero:GetPlayerID(), cinematicId)
+			end
 		end
 	end
 end
@@ -2459,7 +2564,6 @@ function GameMode:UpdateGameEndTables()
 		hasXHSBotSession = api:HasXHSBotParticipants()
 	end
 	if hasXHSBotSession then
-		print("XHS bots: skipped event metadata/signout persistence for this session.")
 		return
 	end
 

@@ -439,6 +439,44 @@
 	text-overflow: shrink;
 }
 
+.XHSPassDevUnlockUIButton {
+	width: 142px;
+	height: 34px;
+	margin-top: 28px;
+	margin-right: 10px;
+	padding: 0px 10px;
+	visibility: collapse;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #24133ff2 ), to( #0c1424f4 ) );
+	border: 1px solid #c99cff99;
+	box-shadow: fill #000000aa 0px 0px 8px 0px, inset #ffffff12 0px 1px 0px 0px;
+	transition-property: brightness, border, background-color, box-shadow;
+	transition-duration: 0.12s;
+}
+
+.XHSPassDevUnlockUIButton.IsVisible {
+	visibility: visible;
+}
+
+.XHSPassDevUnlockUIButton:hover {
+	brightness: 1.28;
+}
+
+.XHSPassDevUnlockUIButton.IsActive {
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #573482f4 ), to( #20143cf4 ) );
+	border-color: #ead8ffdd;
+	box-shadow: fill #c99cff3a 0px 0px 11px 0px, inset #ffffff1c 0px 1px 0px 0px;
+}
+
+.XHSPassDevUnlockUIButton Label {
+	align: center center;
+	color: #ead8ff;
+	font-size: 11px;
+	font-weight: bold;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+	text-overflow: shrink;
+}
+
 .XHSPassIconButton {
 	width: 42px;
 	height: 42px;
@@ -1439,21 +1477,56 @@
 .XHSPassShopImage {
 	width: 100%;
 	height: 100%;
+	z-index: 1;
 	background-size: contain;
 	background-position: 50% 50%;
 	background-repeat: no-repeat;
+}
+
+.XHSPassItemPreview.HasAnimatedModel .XHSPassPreviewImage {
+	opacity: 0.24;
+	saturation: 0.65;
+	brightness: 0.72;
 }
 
 .XHSPassCompanionScene {
 	width: 100%;
 	height: 110%;
 	margin-top: -8px;
+	z-index: 2;
 	opacity-mask: url("s2r://panorama/images/masks/hero_model_opacity_mask_png.vtex");
+}
+
+.XHSPassCompanionScene.IsEffigyScene {
+	height: 104%;
+	margin-top: -2px;
 }
 
 .XHSPassItemPreview.HasAnimatedModel {
 	background-color: gradient( radial, 50% 68%, 0% 0%, 72% 72%, from( #2c668177 ), color-stop( 0.48, #0c2738dd ), to( #02060cf8 ) );
 	box-shadow: inset #5ad0ff20 0px 0px 22px 0px, inset #0000008c 0px -10px 14px 0px;
+}
+
+.XHSPassCompositionBadge {
+	width: fit-children;
+	max-width: 92%;
+	height: 22px;
+	horizontal-align: center;
+	vertical-align: bottom;
+	margin-bottom: 7px;
+	padding: 3px 8px 0px 8px;
+	z-index: 5;
+	color: #eefaff;
+	font-size: 10px;
+	font-weight: bold;
+	letter-spacing: 0.5px;
+	text-align: center;
+	text-overflow: shrink;
+	text-transform: uppercase;
+	background-color: #02070de8;
+	border: 1px solid #8fdcff72;
+	box-shadow: fill #000000a8 0px 2px 6px 0px;
+	text-shadow: 0px 1px 2px #000000;
 }
 
 .XHSPassRewardDetails {
@@ -1546,6 +1619,19 @@
 	color: #70e39a;
 }
 
+.XHSPassRewardCard.IsDevUIPreview,
+.XHSPassRewardCard.IsClaimed.IsDevUIPreview,
+.XHSPassShopCard.IsDevUIPreview {
+	border-color: #c99cff99;
+	box-shadow: fill #c99cff20 0px 0px 8px 0px, inset #c99cff12 0px 0px 12px 0px;
+}
+
+.XHSPassRewardCard.IsDevUIPreview .XHSPassRewardType,
+.XHSPassRewardCard.IsClaimed.IsDevUIPreview .XHSPassRewardType,
+.XHSPassShopCard.IsDevUIPreview .XHSPassShopPrice {
+	color: #d9bfff;
+}
+
 .XHSPassRewardCard.IsLocked .XHSPassItemPreview {
 	saturation: 0.2;
 	brightness: 0.42;
@@ -1574,6 +1660,36 @@
 .ItemTypeEmblem .XHSPassItemPreview,
 .ItemTypeEffigy .XHSPassItemPreview {
 	background-color: gradient( radial, 50% 54%, 0% 0%, 70% 70%, from( #6e3f9b70 ), color-stop( 0.5, #231138e8 ), to( #050208f8 ) );
+}
+
+.ItemTypePotion .XHSPassItemPreview,
+.ItemTypeRegenAura .XHSPassItemPreview {
+	background-color: gradient( radial, 50% 54%, 0% 0%, 70% 70%, from( #247e7970 ), color-stop( 0.5, #0b3237e8 ), to( #02080af8 ) );
+}
+
+.ItemTypeRebirth .XHSPassItemPreview,
+.ItemTypeTitle .XHSPassItemPreview {
+	background-color: gradient( radial, 50% 54%, 0% 0%, 70% 70%, from( #b78b3670 ), color-stop( 0.5, #3a2910e8 ), to( #090602f8 ) );
+}
+
+.ItemTypeAttackLifesteal .XHSPassItemPreview {
+	background-color: gradient( radial, 50% 54%, 0% 0%, 70% 70%, from( #9b273970 ), color-stop( 0.5, #3b101be8 ), to( #090206f8 ) );
+}
+
+.ItemTypeSpellLifesteal .XHSPassItemPreview {
+	background-color: gradient( radial, 50% 54%, 0% 0%, 70% 70%, from( #416ec070 ), color-stop( 0.5, #142853e8 ), to( #02050bf8 ) );
+}
+
+.ItemTypeImmolation .XHSPassItemPreview {
+	background-color: gradient( radial, 50% 54%, 0% 0%, 70% 70%, from( #d66b2570 ), color-stop( 0.5, #4a210de8 ), to( #0b0402f8 ) );
+}
+
+.ItemTypeHighFive .XHSPassItemPreview {
+	background-color: gradient( radial, 50% 54%, 0% 0%, 70% 70%, from( #8d4bc270 ), color-stop( 0.5, #32194ce8 ), to( #07020bf8 ) );
+}
+
+.ItemTypeFragments .XHSPassItemPreview {
+	background-color: gradient( radial, 50% 54%, 0% 0%, 70% 70%, from( #3f9ec270 ), color-stop( 0.5, #12394ce8 ), to( #02070bf8 ) );
 }
 
 .RarityUncommon .XHSPassItemPreview {

@@ -1,6 +1,10 @@
 -- Editors:
 --     EarthSalamander #42, ??.??.2018
 
+local SupporterPassImmolation = require("components/battlepass/immolation")
+local GHOST_IMMOLATION_OWNER_PFX = "particles/hero/ghost_revenant/ambient_effects.vpcf"
+local GHOST_IMMOLATION_TARGET_PFX = "particles/econ/events/ti8/radiance_owner_ti8.vpcf"
+
 -----------------------------------------------------------------------------------------------------------
 -- Wraith
 -----------------------------------------------------------------------------------------------------------
@@ -371,10 +375,6 @@ LinkLuaModifier("modifier_ghost_revenant_ghost_immolation_debuff", "abilities/he
 modifier_ghost_revenant_ghost_immolation = class({})
 modifier_ghost_revenant_ghost_immolation.XHS_LINK_CLIENT = true
 
-function modifier_ghost_revenant_ghost_immolation:GetEffectName()
-	return "particles/hero/ghost_revenant/ambient_effects.vpcf"
-end
-
 function modifier_ghost_revenant_ghost_immolation:GetStatusEffectName()
 	return "particles/status_fx/status_effect_ghost_revenant.vpcf"
 end
@@ -386,6 +386,15 @@ end
 function modifier_ghost_revenant_ghost_immolation:OnCreated()
 	if IsServer() then
 		self:GetParent():SetRenderColor(128, 255, 0)
+		self.immolation_source = self:GetAbility()
+		self.immolation_caster = self:GetCaster()
+		SupporterPassImmolation:Acquire(
+			self.immolation_source,
+			self.immolation_caster,
+			self.immolation_source,
+			GHOST_IMMOLATION_OWNER_PFX,
+			GHOST_IMMOLATION_TARGET_PFX
+		)
 	end
 end
 
@@ -393,6 +402,15 @@ function modifier_ghost_revenant_ghost_immolation:OnRefresh()
 	if IsServer() then
 		self:OnCreated()
 	end
+end
+
+function modifier_ghost_revenant_ghost_immolation:OnDestroy()
+	if not IsServer() then return end
+	SupporterPassImmolation:Release(
+		self.immolation_source,
+		self.immolation_caster,
+		self.immolation_source
+	)
 end
 
 function modifier_ghost_revenant_ghost_immolation:GetAuraEntityReject(target)
@@ -457,10 +475,6 @@ function modifier_ghost_revenant_ghost_immolation_debuff:IsPurgable()
 	return false
 end
 
-function modifier_ghost_revenant_ghost_immolation_debuff:GetEffectName()
-	return "particles/econ/events/ti8/radiance_owner_ti8.vpcf"
-end
-
 function modifier_ghost_revenant_ghost_immolation_debuff:GetEffectAttachType()
 	return PATTACH_ABSORIGIN_FOLLOW
 end
@@ -469,12 +483,56 @@ end
 function modifier_ghost_revenant_ghost_immolation_debuff:OnCreated()
 	if not IsServer() then return end
 
+	self.immolation_source = self:GetAbility()
+	self.immolation_caster = self:GetCaster()
+	SupporterPassImmolation:AcquireTarget(
+		self.immolation_source,
+		self.immolation_caster,
+		self:GetParent(),
+		self.immolation_source,
+		GHOST_IMMOLATION_OWNER_PFX,
+		GHOST_IMMOLATION_TARGET_PFX
+	)
+
 --	print("Tick time:", self:GetAbility():GetSpecialValueFor("tick_time"))
 	self:StartIntervalThink(self:GetAbility():GetSpecialValueFor("tick_time"))
 end
 
+function modifier_ghost_revenant_ghost_immolation_debuff:OnRefresh()
+	if not IsServer() then return end
+
+	self.immolation_source = self:GetAbility()
+	self.immolation_caster = self:GetCaster()
+	SupporterPassImmolation:AcquireTarget(
+		self.immolation_source,
+		self.immolation_caster,
+		self:GetParent(),
+		self.immolation_source,
+		GHOST_IMMOLATION_OWNER_PFX,
+		GHOST_IMMOLATION_TARGET_PFX
+	)
+end
+
+function modifier_ghost_revenant_ghost_immolation_debuff:OnDestroy()
+	if not IsServer() then return end
+	SupporterPassImmolation:ReleaseTarget(
+		self.immolation_source,
+		self.immolation_caster,
+		self:GetParent(),
+		self.immolation_source
+	)
+end
+
 function modifier_ghost_revenant_ghost_immolation_debuff:OnIntervalThink()
 --	print("Damage:", self:GetParent():GetMaxHealth() / 100 * self:GetAbility():GetSpecialValueFor("health_as_damage_pct"))
+	SupporterPassImmolation:AcquireTarget(
+		self.immolation_source,
+		self.immolation_caster,
+		self:GetParent(),
+		self.immolation_source,
+		GHOST_IMMOLATION_OWNER_PFX,
+		GHOST_IMMOLATION_TARGET_PFX
+	)
 	ApplyDamage({victim = self:GetParent(), attacker = self:GetCaster(), damage = self:GetParent():GetMaxHealth() / 100 * self:GetAbility():GetSpecialValueFor("health_as_damage_pct"), damage_type = DAMAGE_TYPE_MAGICAL})
 end
 

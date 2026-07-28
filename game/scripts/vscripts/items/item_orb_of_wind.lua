@@ -60,6 +60,7 @@ function modifier_orb_of_wind:GetAttributes() return MODIFIER_ATTRIBUTE_MULTIPLE
 
 function modifier_orb_of_wind:DeclareFunctions()
 	return {
+		MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE,
 		MODIFIER_PROPERTY_EVASION_CONSTANT,
 		MODIFIER_PROPERTY_MOVESPEED_BONUS_CONSTANT,
 		MODIFIER_EVENT_ON_ATTACK_FAIL,
@@ -77,6 +78,10 @@ end
 function modifier_orb_of_wind:OnCreated()
 	self.next_proc_time = 0
 	XHSOrbToggle.OnIntrinsicCreated(self, "modifier_orb_of_wind_active")
+end
+
+function modifier_orb_of_wind:GetModifierPreAttack_BonusDamage()
+	return self:GetAbility():GetSpecialValueFor("bonus_damage")
 end
 
 function modifier_orb_of_wind:OnDestroy()
