@@ -266,10 +266,6 @@ function XHSDevTools:BuildPerformanceState()
 			if unit.xhs_wave_order_controller == true then
 				snapshot.wave_controllers = snapshot.wave_controllers + 1
 			end
-			if unit.xhs_destroyer_ability_ai_started == true then
-				snapshot.ability_controllers = snapshot.ability_controllers + 1
-			end
-
 			if isDummy or isRune then
 				snapshot.other_units = snapshot.other_units + 1
 			elseif BOSS_UNIT_NAMES[unitName] == true or unit.Boss == true then
@@ -291,13 +287,22 @@ function XHSDevTools:BuildPerformanceState()
 
 	local thinkers = Entities:FindAllByClassname("npc_dota_thinker")
 	snapshot.thinkers = thinkers and #thinkers or 0
-	snapshot.ai_ticks_per_second = snapshot.ai_controllers
-	snapshot.wave_checks_per_second = snapshot.wave_controllers * 4
-	snapshot.ability_checks_per_second = snapshot.ability_controllers * 4
+	local directorState = XHSCreepAIDirector ~= nil
+		and XHSCreepAIDirector.GetState ~= nil
+		and XHSCreepAIDirector:GetState()
+		or {}
+	snapshot.ai_director = directorState
+	snapshot.ability_controllers = tonumber(directorState.active_ability_agents) or 0
 	snapshot.activity = XHSPerformanceCounters ~= nil
 		and XHSPerformanceCounters.GetSnapshot ~= nil
 		and XHSPerformanceCounters:GetSnapshot()
 		or {}
+	snapshot.ai_ticks_per_second =
+		tonumber(snapshot.activity.ai_thinks_per_second) or 0
+	snapshot.wave_checks_per_second =
+		tonumber(snapshot.activity.wave_thinks_per_second) or 0
+	snapshot.ability_checks_per_second =
+		tonumber(snapshot.activity.ability_loop_thinks_per_second) or 0
 
 	if Time ~= nil then
 		snapshot.scan_ms = math.max(0, (Time() - startedAt) * 1000)

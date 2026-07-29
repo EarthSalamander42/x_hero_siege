@@ -3,18 +3,27 @@ if XHSPerformanceCounters == nil then
 end
 
 local WINDOW_SECONDS = 1.0
-local SOURCE_SAMPLE_EVERY = 8
-local MAX_SOURCE_ROWS = 5
+local SOURCE_SAMPLE_EVERY = 4
+local MAX_SOURCE_ROWS = 8
 
 local COUNTER_NAMES = {
 	"zone_searches",
 	"zone_results",
 	"zone_search_cost_ms",
 	"zone_searches_suppressed",
+	"spatial_cache_hits",
+	"spatial_cache_misses",
 	"orders",
 	"orders_suppressed",
 	"repeated_orders",
 	"ai_thinks",
+	"ai_director_ticks",
+	"ai_agents_registered",
+	"ai_agents_processed",
+	"ai_agents_sleeping",
+	"ai_profile_builds",
+	"ai_profile_cache_hits",
+	"ai_no_active_profiles",
 	"wave_thinks",
 	"ability_loop_thinks",
 	"damage_events",
@@ -137,6 +146,13 @@ function XHSPerformanceCounters:RollWindow(now)
 	for _, name in ipairs(COUNTER_NAMES) do
 		snapshot[name .. "_per_second"] = Round((self.window[name] or 0) / elapsed, 1)
 	end
+	-- Historical "zone_*" keys actually describe every FindUnitsInRadius call
+	-- in the addon. Keep them for compatibility while publishing accurate names.
+	snapshot.spatial_queries_per_second = snapshot.zone_searches_per_second
+	snapshot.spatial_results_per_second = snapshot.zone_results_per_second
+	snapshot.spatial_query_cost_ms_per_second = snapshot.zone_search_cost_ms_per_second
+	snapshot.spatial_query_max_ms = snapshot.zone_search_max_ms
+	snapshot.top_spatial_sources = snapshot.top_zone_sources
 	snapshot.projectiles_per_second = Round(
 		((self.window.tracking_projectiles or 0) + (self.window.linear_projectiles or 0)) / elapsed,
 		1
@@ -163,6 +179,7 @@ function XHSPerformanceCounters:GetAggregateSnapshot(windowCount)
 		host_timescale = 1,
 		real_clock = RealTime ~= nil and 1 or 0,
 		zone_search_max_ms = 0,
+		spatial_query_max_ms = 0,
 	}
 	local included = 0
 	for index = firstIndex, #self.history do
@@ -174,6 +191,10 @@ function XHSPerformanceCounters:GetAggregateSnapshot(windowCount)
 		aggregate.zone_search_max_ms = math.max(
 			aggregate.zone_search_max_ms,
 			snapshot.zone_search_max_ms or 0
+		)
+		aggregate.spatial_query_max_ms = math.max(
+			aggregate.spatial_query_max_ms,
+			snapshot.spatial_query_max_ms or snapshot.zone_search_max_ms or 0
 		)
 		for key, value in pairs(snapshot) do
 			if string.sub(key, -11) == "_per_second" and type(value) == "number" then
@@ -189,6 +210,7 @@ function XHSPerformanceCounters:GetAggregateSnapshot(windowCount)
 	end
 	aggregate.window_seconds = Round(aggregate.window_seconds, 2)
 	aggregate.zone_search_max_ms = Round(aggregate.zone_search_max_ms, 2)
+	aggregate.spatial_query_max_ms = Round(aggregate.spatial_query_max_ms, 2)
 	return aggregate
 end
 

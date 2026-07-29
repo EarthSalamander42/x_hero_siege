@@ -770,4 +770,24 @@
 			"damage_compensation_pct"		"4 4 4 4 4"
 		}
 	}
+
+	"xhs_farm_howling_blast"
+	{
+		"BaseClass"		"ability_lua"
+		"ScriptFile"		"abilities/creeps/xhs_farm_event.lua"
+		"MaxLevel"		"4"
+		"AbilityBehavior"		"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityTextureName"		"custom/holdout_howling_blast"
+		"precache"
+		{
+			"particle"		"particles/units/heroes/heroes_underlord/abyssal_underlord_pitofmalice_stun.vpcf"
+		}
+		"AbilityValues"
+		{
+			"ensnare_duration"		"1.0 1.75 2.5 3.25"
+			"ensnare_damage"		"200 450 750 1300"
+			"ensnare_chance"		"12 12 12 12"
+			"internal_cooldown"		"1.0 1.0 1.0 1.0"
+		}
+	}
 }

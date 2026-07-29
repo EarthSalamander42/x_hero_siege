@@ -170,6 +170,8 @@ function CDungeonZone:PrecacheNPCs(zoneTable)
 		return
 	end
 
+	GameRules.GameMode.PrecachedEnemies = GameRules.GameMode.PrecachedEnemies or {}
+
 	for _, npcTable in pairs(zoneTable) do
 		if npcTable ~= nil then
 			--	print( "CDungeonZone:PrecacheEnemies() - Precaching squad " .. tostring( enemyTable ) )
@@ -203,6 +205,7 @@ function CDungeonZone:PrecacheVIPs(vipTable)
 
 	local nVIPCount = 0
 	CDungeonZone.nPrecacheVIPCount = 0
+	GameRules.GameMode.PrecachedVIPs = GameRules.GameMode.PrecachedVIPs or {}
 
 	--	print( "CDungeonZone:PrecacheVIPs() - Precaching VIPs " .. tostring( vipTable ) )
 	for _, unitTable in pairs(vipTable) do

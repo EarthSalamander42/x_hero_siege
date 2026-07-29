@@ -1846,6 +1846,59 @@
 		}
 	}
 
+	function recoverWaveNotification() {
+		cancelWaveSchedule();
+		hideWavePanel();
+	}
+
+	function recoverWaveQueue() {
+		queuedActiveWaves = [];
+		queuedWaveWarning = null;
+		queuedWaveRowCount = 0;
+		var panel = $("#XHSWaveQueue");
+		if (panel) {
+			panel.AddClass("XHSWaveQueueHidden");
+		}
+		updateRuneQueueOffset();
+	}
+
+	function recoverRuneNotification() {
+		activeRuneVersion += 1;
+		activeRuneMessage = null;
+		activeRuneRemaining = 0;
+		activeRuneBatchId = null;
+		activeRuneCompactSchedule = cancelRuneSchedule(activeRuneCompactSchedule);
+		activeRuneHideSchedule = cancelRuneSchedule(activeRuneHideSchedule);
+		setRuneCompact(false);
+		setRuneVisible(false);
+	}
+
+	function recoverChannelNotification() {
+		activeChannelNotificationVersion += 1;
+		activeChannelNotification = null;
+		var panel = getChannelPanelChild("#XHSChannelNotification");
+		if (panel) {
+			panel.AddClass("XHSChannelNotificationHidden");
+			panel.RemoveClass("XHSChannelNotificationCompleted");
+			panel.RemoveClass("XHSChannelNotificationCancelled");
+		}
+		var progress = getChannelPanelChild("#XHSChannelProgress");
+		var time = getChannelPanelChild("#XHSChannelTime");
+		if (progress) {
+			progress.style.width = "0%";
+		}
+		if (time) {
+			time.text = "";
+		}
+	}
+
+	var recoveryHandlers = GameUI.CustomUIConfig().XHSUIRecoveryHandlers =
+		GameUI.CustomUIConfig().XHSUIRecoveryHandlers || {};
+	recoveryHandlers.XHSWaveCountdown = recoverWaveNotification;
+	recoveryHandlers.XHSWaveQueue = recoverWaveQueue;
+	recoveryHandlers.XHSRuneIndicator = recoverRuneNotification;
+	recoveryHandlers.XHSChannelNotification = recoverChannelNotification;
+
 	GameEvents.Subscribe("top_notification", topNotification);
 	GameEvents.Subscribe("bottom_notification", bottomNotification);
 	GameEvents.Subscribe("top_remove_notification", topRemoveNotification);

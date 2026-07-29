@@ -89,9 +89,15 @@ function modifier_creature_chronosphere_aura:OnCreated()
 		self.parent = self:GetParent()
 		self.base_radius = self.ability:GetSpecialValueFor("base_radius")
 
+		local baseParticle = "particles/units/heroes/hero_faceless_void/faceless_void_chronosphere_red.vpcf"
+		local particlePath = Battlepass ~= nil and Battlepass.GetPlayerParticleOverride ~= nil
+			and Battlepass:GetPlayerParticleOverride(self.caster, baseParticle)
+			or baseParticle
 		local particle = ParticleManager:CreateParticle(
-		"particles/units/heroes/hero_faceless_void/faceless_void_chronosphere_red.vpcf", PATTACH_WORLDORIGIN, self
-		.parent, self.caster)
+			particlePath,
+			PATTACH_WORLDORIGIN,
+			self.parent
+		)
 		ParticleManager:SetParticleControl(particle, 0, self.parent:GetAbsOrigin())
 		ParticleManager:SetParticleControl(particle, 1, Vector(self.base_radius, self.base_radius, self.base_radius))
 		self:AddParticle(particle, false, false, -1, false, false)

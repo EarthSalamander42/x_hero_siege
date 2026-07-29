@@ -16,12 +16,19 @@ XHSBotTeamDirector.base_threat_active = XHSBotTeamDirector.base_threat_active or
 XHSBotTeamDirector.base_threat_hold_until = XHSBotTeamDirector.base_threat_hold_until or 0
 XHSBotTeamDirector.base_threat_last_sample_at = XHSBotTeamDirector.base_threat_last_sample_at or 0
 XHSBotTeamDirector.base_threat_unit_samples = XHSBotTeamDirector.base_threat_unit_samples or {}
+XHSBotTeamDirector.last_structure_emergency_anchor =
+	XHSBotTeamDirector.last_structure_emergency_anchor or nil
+XHSBotTeamDirector.last_structure_emergency_threat_position =
+	XHSBotTeamDirector.last_structure_emergency_threat_position or nil
+XHSBotTeamDirector.structure_emergency_hold_until =
+	XHSBotTeamDirector.structure_emergency_hold_until or 0
 
 local BASE_THREAT_SCAN_RADIUS = 5200
 local BASE_THREAT_ENTER_SCORE = 0.58
 local BASE_THREAT_EXIT_SCORE = 0.28
 local BASE_THREAT_MINIMUM_HOLD = 7
 local BASE_THREAT_DECAY_PER_SECOND = 0.09
+local STRUCTURE_EMERGENCY_HOLD = 3
 local LANE_DOOR_HOLD_DISTANCE = 260
 local PHASE_FOLLOW_RADIUS = 600
 local PHASE_FOLLOW_SECOND_RING_RADIUS = 750
@@ -39,6 +46,16 @@ end
 local function GetFort()
 	return Entities:FindByName(nil, "dota_goodguys_fort")
 		or Entities:FindByName(nil, "base_spawn")
+end
+
+local function IsProtectedStructure(unit)
+	if not IsValidEntityHandle(unit) then return false end
+	if unit == GetFort() then return true end
+	local name = tostring(unit.GetUnitName ~= nil and unit:GetUnitName() or "")
+	return name == "npc_dota_defender_fort"
+		or name == "npc_dota_holdout_tower"
+		or name == "npc_tower_cold"
+		or name == "npc_tower_death"
 end
 
 local function PositionToward(origin, destination, distance)
@@ -60,6 +77,31 @@ end
 
 local function Distance2D(left, right)
 	return (left - right):Length2D()
+end
+
+local function GetUnitAttacksPerSecond(unit)
+	if not IsValidEntityHandle(unit) then return 0 end
+	if unit.GetAttacksPerSecond ~= nil then
+		local ok, value = pcall(function()
+			return unit:GetAttacksPerSecond(false)
+		end)
+		if ok and tonumber(value) ~= nil then
+			return math.max(0, tonumber(value))
+		end
+	end
+	if unit.GetSecondsPerAttack ~= nil then
+		local ok, value = pcall(function() return unit:GetSecondsPerAttack() end)
+		if ok and tonumber(value) ~= nil and tonumber(value) > 0 then
+			return 1 / tonumber(value)
+		end
+	end
+	return 0
+end
+
+local function GetUnitMovementSpeed(unit)
+	if not IsValidEntityHandle(unit) or unit.GetIdealSpeed == nil then return 300 end
+	local ok, value = pcall(function() return unit:GetIdealSpeed() end)
+	return ok and math.max(100, tonumber(value) or 300) or 300
 end
 
 local function GetPlayerHero(playerID)
@@ -335,6 +377,7 @@ end
 
 function XHSBotTeamDirector:GetVisibleThreatPressure(position, radius)
 	if position == nil then return 0, 0 end
+	if GameMode ~= nil and GameMode.FarmEvent_occuring == true then return 0, 0 end
 	local units = FindUnitsInRadius(
 		DOTA_TEAM_GOODGUYS,
 		position,
@@ -368,6 +411,28 @@ end
 
 function XHSBotTeamDirector:CalculateBaseThreat(now)
 	now = tonumber(now) or GameRules:GetGameTime()
+	if GameMode ~= nil and GameMode.FarmEvent_occuring == true then
+		self.base_threat_score = 0
+		self.base_threat_active = false
+		return {
+			active = false,
+			score = 0,
+			anchor = Vector(0, 0, 0),
+			threat_count = 0,
+			special_count = 0,
+			dragon_count = 0,
+			boss_count = 0,
+			approaching_count = 0,
+			immediate_count = 0,
+			fort_target_count = 0,
+			structure_target_count = 0,
+			structure_emergency = false,
+			objective_loss_seconds = -1,
+			objective_incoming_dps = 0,
+			objective_forecast_confidence = 0,
+			fort_damage_ratio = 0,
+		}
+	end
 	local fort = GetFort()
 	if not IsValidEntityHandle(fort) then
 		self.base_threat_score = 0
@@ -383,6 +448,11 @@ function XHSBotTeamDirector:CalculateBaseThreat(now)
 			approaching_count = 0,
 			immediate_count = 0,
 			fort_target_count = 0,
+			structure_target_count = 0,
+			structure_emergency = false,
+			objective_loss_seconds = -1,
+			objective_incoming_dps = 0,
+			objective_forecast_confidence = 0,
 			fort_damage_ratio = 0,
 		}
 	end
@@ -401,6 +471,40 @@ function XHSBotTeamDirector:CalculateBaseThreat(now)
 		FIND_ANY_ORDER,
 		false
 	)
+	local globalUnits = FindUnitsInRadius(
+		DOTA_TEAM_GOODGUYS,
+		fortOrigin,
+		nil,
+		FIND_UNITS_EVERYWHERE,
+		DOTA_UNIT_TARGET_TEAM_ENEMY,
+		DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC,
+		DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES,
+		FIND_ANY_ORDER,
+		false
+	)
+	local structureAttackers = {}
+	local seenUnits = {}
+	for _, unit in pairs(units or {}) do
+		if IsValidEntityHandle(unit) then seenUnits[unit:entindex()] = true end
+	end
+	for _, unit in pairs(globalUnits or {}) do
+		if IsValidEntityHandle(unit) and unit:IsAlive()
+			and unit.GetAttackTarget ~= nil then
+			local ok, attackTarget = pcall(function()
+				return unit:GetAttackTarget()
+			end)
+			if ok and IsProtectedStructure(attackTarget) then
+				structureAttackers[unit:entindex()] = {
+					target = attackTarget,
+					position = CopyPosition(unit:GetAbsOrigin()),
+				}
+				if not seenUnits[unit:entindex()] then
+					table.insert(units, unit)
+					seenUnits[unit:entindex()] = true
+				end
+			end
+		end
+	end
 	local activeSpecialUnits = CustomTimers ~= nil
 		and CustomTimers.active_special_wave_units or {}
 	local previousSamples = self.base_threat_unit_samples or {}
@@ -413,6 +517,9 @@ function XHSBotTeamDirector:CalculateBaseThreat(now)
 	local approachingCount = 0
 	local immediateCount = 0
 	local fortTargetCount = 0
+	local structureTargetCount = 0
+	local structureThreatPosition = Vector(0, 0, 0)
+	local structureForecastGroups = {}
 	local closestDistance = math.huge
 	local weightedPosition = Vector(0, 0, 0)
 	local positionWeight = 0
@@ -464,14 +571,50 @@ function XHSBotTeamDirector:CalculateBaseThreat(now)
 				local ok, attackTarget = pcall(function() return unit:GetAttackTarget() end)
 				targetsFort = ok and attackTarget == fort
 			end
-			if targetsFort then contribution = contribution + 0.30 end
+			local structureAttack = structureAttackers[entindex]
+			local targetsStructure = structureAttack ~= nil
+			if targetsFort or targetsStructure then
+				contribution = contribution + 0.30
+			end
+			if targetsStructure
+				and IsValidEntityHandle(structureAttack.target) then
+				local structure = structureAttack.target
+				local structureIndex = structure:entindex()
+				local group = structureForecastGroups[structureIndex] or {
+					target = structure,
+					attackers = {},
+					threat_position = Vector(0, 0, 0),
+					attacker_count = 0,
+				}
+				local structureDamage = attackDamage
+				if unit.GetAverageTrueAttackDamage ~= nil then
+					local ok, value = pcall(function()
+						return unit:GetAverageTrueAttackDamage(structure)
+					end)
+					if ok then
+						structureDamage = math.max(
+							0,
+							tonumber(value) or structureDamage
+						)
+					end
+				end
+				table.insert(group.attackers, {
+					projected_dps = structureDamage
+						* GetUnitAttacksPerSecond(unit),
+					uptime = 1,
+				})
+				group.threat_position =
+					group.threat_position + unit:GetAbsOrigin()
+				group.attacker_count = group.attacker_count + 1
+				structureForecastGroups[structureIndex] = group
+			end
 
 			-- Ordinary waves spread across eight doors must not add up to a
 			-- permanent castle emergency while they are still safely outside.
 			-- They become actionable once close, clearly approaching, or
 			-- already attacking the fort. Specials, dragons and bosses remain
 			-- strategic threats at the full scan radius.
-			local immediate = distance <= 1800 or targetsFort
+			local immediate = distance <= 1800 or targetsFort or targetsStructure
 			local actionable = immediate
 				or approaching
 				or isSpecial
@@ -494,6 +637,13 @@ function XHSBotTeamDirector:CalculateBaseThreat(now)
 				bossCount = bossCount + (isBoss and 1 or 0)
 				immediateCount = immediateCount + (immediate and 1 or 0)
 				fortTargetCount = fortTargetCount + (targetsFort and 1 or 0)
+				if targetsStructure then
+					structureTargetCount = structureTargetCount + 1
+					structureThreatPosition =
+						structureThreatPosition + unit:GetAbsOrigin()
+					self.last_structure_emergency_anchor =
+						CopyPosition(structureAttack.target:GetAbsOrigin())
+				end
 				closestDistance = math.min(closestDistance, distance)
 				weightedPosition = weightedPosition + position * contribution
 				positionWeight = positionWeight + contribution
@@ -505,6 +655,56 @@ function XHSBotTeamDirector:CalculateBaseThreat(now)
 		end
 	end
 	self.base_threat_unit_samples = nextSamples
+
+	local structureEmergency = structureTargetCount > 0
+	local objectiveForecast = nil
+	local objectiveForecastTarget = nil
+	local objectiveThreatPosition = nil
+	for _, group in pairs(structureForecastGroups) do
+		if IsValidEntityHandle(group.target) and group.attacker_count > 0 then
+			local maximumHealth = group.target.GetMaxHealth ~= nil
+				and math.max(1, group.target:GetMaxHealth()) or 1
+			local currentHealth = group.target.GetHealth ~= nil
+				and math.max(0, group.target:GetHealth()) or maximumHealth
+			local healthRegen = 0
+			if group.target.GetHealthRegen ~= nil then
+				local ok, value = pcall(function()
+					return group.target:GetHealthRegen()
+				end)
+				if ok then healthRegen = math.max(0, tonumber(value) or 0) end
+			end
+			local forecast = XHSBotWorldModel:EstimateObjectiveLoss({
+				maximum_health = maximumHealth,
+				current_health = currentHealth,
+				health_regen = healthRegen,
+				attackers = group.attackers,
+			})
+			if objectiveForecast == nil
+				or forecast.loss_time < objectiveForecast.loss_time then
+				objectiveForecast = forecast
+				objectiveForecastTarget = group.target
+				objectiveThreatPosition =
+					group.threat_position / group.attacker_count
+			end
+		end
+	end
+	if structureEmergency then
+		self.structure_emergency_hold_until = now + STRUCTURE_EMERGENCY_HOLD
+		self.last_structure_emergency_threat_position = CopyPosition(
+			objectiveThreatPosition
+				or structureThreatPosition / structureTargetCount
+		)
+		if IsValidEntityHandle(objectiveForecastTarget) then
+			self.last_structure_emergency_anchor =
+				CopyPosition(objectiveForecastTarget:GetAbsOrigin())
+		end
+	elseif now < (tonumber(self.structure_emergency_hold_until) or 0)
+		and self.last_structure_emergency_anchor ~= nil then
+		structureEmergency = true
+	end
+	if structureEmergency then
+		rawScore = math.max(rawScore, 1.05)
+	end
 
 	local fortHealth = fort.GetHealth ~= nil and fort:GetHealth() or 0
 	local previousFortHealth = tonumber(self.base_threat_fort_health) or fortHealth
@@ -528,7 +728,9 @@ function XHSBotTeamDirector:CalculateBaseThreat(now)
 	end
 
 	local anchor = fortOrigin
-	if positionWeight > 0 then
+	if structureEmergency and self.last_structure_emergency_anchor ~= nil then
+		anchor = CopyPosition(self.last_structure_emergency_anchor)
+	elseif positionWeight > 0 then
 		local pressureCenter = weightedPosition / positionWeight
 		anchor = PositionToward(
 			fortOrigin,
@@ -551,6 +753,18 @@ function XHSBotTeamDirector:CalculateBaseThreat(now)
 		approaching_count = approachingCount,
 		immediate_count = immediateCount,
 		fort_target_count = fortTargetCount,
+		structure_target_count = structureTargetCount,
+		structure_emergency = structureEmergency,
+		objective_loss_seconds = objectiveForecast ~= nil
+			and objectiveForecast.loss_time or -1,
+		objective_incoming_dps = objectiveForecast ~= nil
+			and objectiveForecast.incoming_dps or 0,
+		objective_forecast_confidence = objectiveForecast ~= nil
+			and objectiveForecast.confidence or 0,
+		threat_position = structureEmergency
+			and CopyPosition(self.last_structure_emergency_threat_position)
+			or positionWeight > 0 and CopyPosition(weightedPosition / positionWeight)
+			or nil,
 		closest_distance = closestDistance < math.huge and closestDistance or 0,
 		fort_damage_ratio = fortDamageRatio,
 	}
@@ -587,22 +801,10 @@ function XHSBotTeamDirector:BuildStrategicSnapshot(phase)
 		by_player_id = {},
 		built_at = GameRules:GetGameTime(),
 	}
-	if phase < 3 then
-		snapshot.base_threat = self:CalculateBaseThreat(snapshot.built_at)
-	else
-		snapshot.base_threat = {
-			active = false,
-			score = 0,
-			anchor = Vector(0, 0, 0),
-			threat_count = 0,
-			special_count = 0,
-			dragon_count = 0,
-			boss_count = 0,
-			approaching_count = 0,
-			immediate_count = 0,
-			fort_target_count = 0,
-			fort_damage_ratio = 0,
-		}
+	snapshot.base_threat = self:CalculateBaseThreat(snapshot.built_at)
+	if phase >= 3 and snapshot.base_threat.structure_emergency ~= true then
+		snapshot.base_threat.active = false
+		snapshot.base_threat.score = 0
 	end
 	if phase == 1 then
 		local participants = XHSBotPlayerRegistry:GetCombatParticipantPlayerIDs()
@@ -832,6 +1034,7 @@ function XHSBotTeamDirector:GetRememberedBossPosition(now)
 end
 
 function XHSBotTeamDirector:FindActiveBoss()
+	if GameMode ~= nil and GameMode.FarmEvent_occuring == true then return nil end
 	local fort = GetFort()
 	local origin = IsValidEntityHandle(fort) and fort:GetAbsOrigin() or Vector(0, 0, 0)
 	local units = FindUnitsInRadius(
@@ -860,6 +1063,35 @@ function XHSBotTeamDirector:FindActiveBoss()
 		end
 	end
 	return nil
+end
+
+function XHSBotTeamDirector:CanRespondToStructureEmergency(
+	hero,
+	profile,
+	baseThreat
+)
+	if not IsValidEntityHandle(hero) or not hero:IsAlive()
+		or baseThreat == nil or baseThreat.structure_emergency ~= true then
+		return false
+	end
+	local healthRatio = hero:GetHealth() / math.max(1, hero:GetMaxHealth())
+	local responseThreshold = math.max(
+		0.34,
+		(tonumber(profile and profile.retreat_health) or 0.24) + 0.10
+	)
+	if healthRatio >= responseThreshold then return true end
+	if baseThreat.anchor == nil then return false end
+	local distance = Distance2D(hero:GetAbsOrigin(), baseThreat.anchor)
+	if distance <= 1300 then return true end
+
+	-- A critically weak bot normally finishes its emergency resupply. The only
+	-- forecast exception is a genuine last-chance structure save that it can
+	-- physically reach before the projected loss.
+	local lossTime = tonumber(baseThreat.objective_loss_seconds) or -1
+	local travelTime = distance / GetUnitMovementSpeed(hero)
+	return healthRatio >= 0.18
+		and lossTime > 0 and lossTime <= 8
+		and travelTime <= lossTime + 1.5
 end
 
 function XHSBotTeamDirector:BuildAssignment(playerID, slot, phase, now, snapshot, loads)
@@ -1016,12 +1248,25 @@ function XHSBotTeamDirector:BuildAssignment(playerID, slot, phase, now, snapshot
 	local baseThreat = snapshot and snapshot.base_threat or nil
 	local emergencyHealthShopping = assignment.goal == "shop"
 		and assignment.shopping_emergency_health_resupply == true
-	if phase < 3
-		and IsValidEntityHandle(hero) and hero:IsAlive()
+	local structureEmergency = baseThreat ~= nil
+		and baseThreat.structure_emergency == true
+	local canRespondToStructure = self:CanRespondToStructureEmergency(
+		hero,
+		profile,
+		baseThreat
+	)
+	local structureEmergencyOrCapable =
+		structureEmergency or canRespondToStructure
+	local preserveEmergencyShopping = emergencyHealthShopping
+		and not canRespondToStructure
+	if IsValidEntityHandle(hero) and hero:IsAlive()
 		and baseThreat ~= nil and baseThreat.active == true
-		and not emergencyHealthShopping then
+		and not preserveEmergencyShopping
+		and (not structureEmergency or canRespondToStructure) then
 		assignment.goal = "defend_base"
 		assignment.anchor = CopyPosition(baseThreat.anchor)
+		assignment.threat_position =
+			CopyPosition(baseThreat.threat_position)
 		assignment.target_entindex = nil
 		assignment.urgency = 1
 		assignment.chase_radius = 2200
@@ -1030,7 +1275,13 @@ function XHSBotTeamDirector:BuildAssignment(playerID, slot, phase, now, snapshot
 		assignment.base_threat_count = baseThreat.threat_count
 		assignment.base_special_count = baseThreat.special_count
 		assignment.base_dragon_count = baseThreat.dragon_count
-		assignment.label = string.format("BASE THREAT %.2f", baseThreat.score or 0)
+		assignment.objective_loss_seconds =
+			baseThreat.objective_loss_seconds
+		assignment.objective_incoming_dps =
+			baseThreat.objective_incoming_dps
+		assignment.label = structureEmergencyOrCapable and structureEmergency
+			and "STRUCTURE UNDER ATTACK"
+			or string.format("BASE THREAT %.2f", baseThreat.score or 0)
 	end
 
 	if IsValidEntityHandle(hero) and hero:IsAlive()
@@ -1096,6 +1347,18 @@ function XHSBotTeamDirector:BuildAssignment(playerID, slot, phase, now, snapshot
 		record.base_special_count = baseThreat and baseThreat.special_count or 0
 		record.base_dragon_count = baseThreat and baseThreat.dragon_count or 0
 		record.base_approaching_count = baseThreat and baseThreat.approaching_count or 0
+		record.base_structure_emergency = baseThreat
+			and baseThreat.structure_emergency == true or false
+		record.base_structure_target_count = baseThreat
+			and baseThreat.structure_target_count or 0
+		record.base_objective_loss_seconds = baseThreat
+			and baseThreat.objective_loss_seconds or -1
+		record.base_objective_incoming_dps = baseThreat
+			and math.floor(baseThreat.objective_incoming_dps or 0) or 0
+		record.base_objective_forecast_confidence = baseThreat
+			and math.floor(
+				(baseThreat.objective_forecast_confidence or 0) * 100
+			) / 100 or 0
 	end
 	return assignment
 end
@@ -1118,14 +1381,27 @@ function XHSBotTeamDirector:ShouldReplaceAssignment(existing, phase, now, snapsh
 	end
 	local baseThreatActive = snapshot ~= nil and snapshot.base_threat ~= nil
 		and snapshot.base_threat.active == true
+	local structureEmergency = baseThreatActive
+		and snapshot.base_threat.structure_emergency == true
 	local finalWaveActive = CustomTimers ~= nil and CustomTimers.proc_final_wave == true
 	local forcedGoal = record and record.forced_goal or nil
 	local emergencyShoppingActive = record ~= nil
 		and type(record.shopping_goal) == "table"
 		and record.shopping_goal.emergency_health_resupply == true
 		and self:IsShoppingAssignmentAllowed(record.player_id, record, hero)
+	local profile = IsValidEntityHandle(hero)
+		and XHSBotHeroProfiles:Get(hero:GetUnitName()) or nil
+	local canRespondToStructure = structureEmergency
+		and self:CanRespondToStructureEmergency(
+			hero,
+			profile,
+			snapshot.base_threat
+		)
+	local preserveEmergencyShopping = emergencyShoppingActive
+		and not canRespondToStructure
 	local baseThreatControls = baseThreatActive
-		and not emergencyShoppingActive
+		and not preserveEmergencyShopping
+		and (not structureEmergency or canRespondToStructure)
 		and forcedGoal == nil
 		and IsValidEntityHandle(hero)
 		and hero:IsAlive()
@@ -1153,6 +1429,7 @@ function XHSBotTeamDirector:ShouldReplaceAssignment(existing, phase, now, snapsh
 		self:IsShoppingAssignmentAllowed(record and record.player_id, record, hero)
 	local shoppingActive = not farmEventActive
 		and forcedGoal == nil
+		and not baseThreatControls
 		and shoppingAllowed
 		and (emergencyShoppingActive
 			or not finalWaveActive and not baseThreatActive)
@@ -1226,6 +1503,18 @@ function XHSBotTeamDirector:Update(force)
 			record.base_special_count = snapshot.base_threat.special_count or 0
 			record.base_dragon_count = snapshot.base_threat.dragon_count or 0
 			record.base_approaching_count = snapshot.base_threat.approaching_count or 0
+			record.base_structure_emergency =
+				snapshot.base_threat.structure_emergency == true
+			record.base_structure_target_count =
+				snapshot.base_threat.structure_target_count or 0
+			record.base_objective_loss_seconds =
+				snapshot.base_threat.objective_loss_seconds or -1
+			record.base_objective_incoming_dps = math.floor(
+				snapshot.base_threat.objective_incoming_dps or 0
+			)
+			record.base_objective_forecast_confidence = math.floor(
+				(snapshot.base_threat.objective_forecast_confidence or 0) * 100
+			) / 100
 		end
 	end
 	local loads = {}
@@ -1298,6 +1587,10 @@ function XHSBotTeamDirector:Update(force)
 			existing.base_threat_count = snapshot.base_threat.threat_count
 			existing.base_special_count = snapshot.base_threat.special_count
 			existing.base_dragon_count = snapshot.base_threat.dragon_count
+			existing.objective_loss_seconds =
+				snapshot.base_threat.objective_loss_seconds
+			existing.objective_incoming_dps =
+				snapshot.base_threat.objective_incoming_dps
 		elseif existing.goal == "participate_event" then
 			local eventAnchor = self:GetFarmEventAnchor(playerID)
 			if eventAnchor ~= nil then existing.anchor = eventAnchor end

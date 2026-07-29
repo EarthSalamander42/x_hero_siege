@@ -916,6 +916,23 @@ function OnGamePauseState(args) {
 }
 
 (function () {
+	var recoveryHandlers = GameUI.CustomUIConfig().XHSUIRecoveryHandlers =
+		GameUI.CustomUIConfig().XHSUIRecoveryHandlers || {};
+
+	recoveryHandlers.CastleHP = function () {
+		HideCastleBar();
+		UpdateBossBarLayout();
+	};
+
+	for (var recoveryIndex = 1; recoveryIndex <= MAX_BOSS_BARS; recoveryIndex++) {
+		(function (index) {
+			recoveryHandlers["BossHP" + index] = function () {
+				ResetBossPanels(index, GetBossPanels(index));
+				UpdateBossBarLayout();
+			};
+		})(recoveryIndex);
+	}
+
 	GameEvents.Subscribe("show_boss_hp", ShowBossBar);
 	GameEvents.Subscribe("update_boss_hp", UpdateBossBar);
 	GameEvents.Subscribe("hide_boss_hp", HideBossBar);

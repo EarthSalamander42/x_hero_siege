@@ -3,6 +3,7 @@ require("components/xhs_bots/player_registry")
 require("components/xhs_bots/hero_profiles")
 require("components/xhs_bots/item_catalog")
 require("components/xhs_bots/item_planner")
+require("components/xhs_bots/world_model")
 require("components/xhs_bots/danger_registry")
 require("components/xhs_bots/provisioner")
 require("components/xhs_bots/team_director")
@@ -1013,10 +1014,19 @@ function XHSBots:EvaluateEconomyAudit(emitBotLines)
 			end
 			if familyCount <= 0 then Add(pending, "core_pending") end
 			local tomeDelta = Delta(record, "tomes_bought", baseline)
-			if tomeDelta > 0
+			local openingTomesRemaining = math.max(
+				0,
+				(tonumber(record.opening_tome_target) or 0)
+					- (tonumber(baseline.tomes_bought) or 0)
+			)
+			if tomeDelta > openingTomesRemaining
 				and (record.economy_phase == "sustain"
 					or record.economy_phase == "core_1") then
-				Add(issues, "early_tome_spend:" .. tostring(tomeDelta))
+				Add(
+					issues,
+					"early_tome_spend:" .. tostring(tomeDelta)
+						.. "/" .. tostring(openingTomesRemaining)
+				)
 			end
 		end
 
@@ -1902,6 +1912,7 @@ function XHSBots:ResetBotAfterRespawn(playerID, hero, record, reason)
 	record.state = "INITIALIZING"
 	record.macro_state = "INITIALIZING"
 	record.respawns = (record.respawns or 0) + 1
+	record.last_respawn_at = now
 	record.last_lifecycle_event = "respawn:" .. tostring(reason or "detected")
 	record.pending_decision = nil
 	record.pending_decision_signature = nil
@@ -1934,6 +1945,17 @@ function XHSBots:ResetBotAfterRespawn(playerID, hero, record, reason)
 	record.telemetry_last_health = hero:GetHealth()
 	record.threat_sample_health = hero:GetHealth()
 	record.threat_sample_at = now
+	record.base_last_stand = false
+	record.campfire_inside = false
+	record.campfire_distance = -1
+	record.mobile_safe_zone_entindex = nil
+	record.mobile_safe_zone_strength = 0
+	record.rune_target_id = nil
+	record.rune_target_type = nil
+	record.rune_target_distance = nil
+	record.rune_claim_id = nil
+	record.rune_claim_expires_at = nil
+	record.rune_committed = false
 	record.next_think_at = now + 0.12
 	-- Reincarnation and ordinary respawn can change the persistent Ankh
 	-- modifier without touching carried slots. Refresh it immediately and wake
@@ -2190,6 +2212,13 @@ function XHSBots:PushDebugState()
 			base_special_count = record.base_special_count or 0,
 			base_dragon_count = record.base_dragon_count or 0,
 			base_approaching_count = record.base_approaching_count or 0,
+			rune_target_id = record.rune_target_id or -1,
+			rune_target_type = record.rune_target_type or "",
+			rune_target_distance = record.rune_target_distance or -1,
+			rune_committed = record.rune_committed and 1 or 0,
+			rune_progression_critical =
+				CustomTimers ~= nil and (tonumber(CustomTimers.creep_level) or 1) >= 2
+					and 1 or 0,
 			follow_human_player_id = assignment and assignment.follow_human_player_id or -1,
 			target = GetDebugEntityName(target),
 			target_entindex = record.target_entindex or -1,
@@ -2275,6 +2304,12 @@ function XHSBots:PushDebugState()
 			mana_potion_charges = record.mana_potion_charges or 0,
 			mana_potion_target = record.mana_potion_target or 0,
 			tome_allowance = record.tome_allowance or 0,
+			opening_stage = record.opening_stage or "complete",
+			opening_complete = record.opening_complete == true,
+			opening_mask_first = record.opening_mask_first == true,
+			opening_orb_target = record.opening_orb_target or 0,
+			opening_tome_target = record.opening_tome_target or 0,
+			attack_dps = record.attack_dps or 0,
 			last_death_duration = record.last_death_duration or 0,
 			has_owned_furbolg = record.has_owned_furbolg == true,
 			consumables_used = record.consumables_used or 0,

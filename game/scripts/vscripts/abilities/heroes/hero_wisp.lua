@@ -103,6 +103,13 @@ function wisp_pick_random_hero:OnSpellStart()
 	})
 
 	local playerID = self.caster:GetPlayerID()
+	-- Random can fall back to replacing the Wisp directly when the shared
+	-- selection transition is unavailable. Notify the bot setup before either
+	-- path so deferred allies are provisioned exactly like a manual pick.
+	if XHSBots ~= nil and XHSBots.OnHumanHeroSelected ~= nil then
+		XHSBots:OnHumanHeroSelected(playerID, hero_name)
+	end
+
 	if XHSBeginHeroSelectionTransition ~= nil then
 		XHSBeginHeroSelectionTransition(
 			playerID,
@@ -158,6 +165,7 @@ function modifier_wisp_passive:OnCreated()
 	local donator_level = GetWispDonatorLevel(parent)
 	local particleName = GetWispSupporterParticle(donator_level)
 
+	self.supporterAmbientRefreshAttempts = 0
 	if particleName then
 		self.supporterAmbientParticleName = particleName
 		self.supporterAmbientPfx = ParticleManager:CreateParticle(self.supporterAmbientParticleName, PATTACH_ABSORIGIN_FOLLOW, parent)
@@ -166,19 +174,15 @@ function modifier_wisp_passive:OnCreated()
 		if IsInToolsMode() then
 			print("[XHS Wisp] supporter ambient created, donator status:", donator_level, self.supporterAmbientParticleName)
 		end
-
-		self.supporterAmbientRefreshAttempts = 0
-		self:StartIntervalThink(1.0)
 	end
+
+	-- API profile data can arrive after the selection Wisp is spawned,
+	-- especially in local bot sessions where only donor metadata is loaded.
+	self:StartIntervalThink(1.0)
 end
 
 function modifier_wisp_passive:OnIntervalThink()
 	if not IsServer() then return end
-
-	if not self.supporterAmbientPfx then
-		self:StartIntervalThink(-1)
-		return
-	end
 
 	self.supporterAmbientRefreshAttempts = (self.supporterAmbientRefreshAttempts or 0) + 1
 
@@ -187,15 +191,23 @@ function modifier_wisp_passive:OnIntervalThink()
 	local particleName = GetWispSupporterParticle(donator_level)
 
 	if not particleName then
-		ParticleManager:DestroyParticle(self.supporterAmbientPfx, false)
-		ParticleManager:ReleaseParticleIndex(self.supporterAmbientPfx)
-		self.supporterAmbientPfx = nil
-		self.supporterAmbientParticleName = nil
-		self:StartIntervalThink(-1)
+		if self.supporterAmbientPfx then
+			ParticleManager:DestroyParticle(self.supporterAmbientPfx, false)
+			ParticleManager:ReleaseParticleIndex(self.supporterAmbientPfx)
+			self.supporterAmbientPfx = nil
+			self.supporterAmbientParticleName = nil
+		end
+
+		if self.supporterAmbientRefreshAttempts >= 10 then
+			self:StartIntervalThink(-1)
+		end
 		return
 	end
 
-	if self.supporterAmbientParticleName ~= particleName then
+	if self.supporterAmbientPfx == nil then
+		self.supporterAmbientParticleName = particleName
+		self.supporterAmbientPfx = ParticleManager:CreateParticle(particleName, PATTACH_ABSORIGIN_FOLLOW, parent)
+	elseif self.supporterAmbientParticleName ~= particleName then
 		ParticleManager:DestroyParticle(self.supporterAmbientPfx, false)
 		ParticleManager:ReleaseParticleIndex(self.supporterAmbientPfx)
 		self.supporterAmbientParticleName = particleName

@@ -1,0 +1,8 @@
+xhs_core_graybox
+{
+	material materials/overviews/xhs_core_graybox.vmat
+	pos_x -4432
+	pos_y 4480
+	scale 8.656
+}
+

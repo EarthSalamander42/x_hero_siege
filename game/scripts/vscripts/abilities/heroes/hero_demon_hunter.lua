@@ -73,6 +73,11 @@ function modifier_xhs_vampiric_aura:OnCreated()
 
 	-- Ability specials
 	self.aura_radius = self.ability:GetSpecialValueFor("aura_radius")
+	if self.aura_radius <= 0 then
+		-- Muradin's Hammer historically exposes this special under a
+		-- different name than the shared vampiric-aura implementation.
+		self.aura_radius = self.ability:GetSpecialValueFor("lifesteal_radius")
+	end
 	self.aura_stickyness = self.ability:GetSpecialValueFor("aura_stickyness")
 end
 

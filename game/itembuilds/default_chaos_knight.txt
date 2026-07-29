@@ -1,45 +1,51 @@
-"itembuilds/test_chaos_knight.txt"
+"itembuilds"
 {
 	"author"		"X Hero Siege Official"
 	"hero"			"npc_dota_hero_chaos_knight"
-	"Title"			"Recommended items for Dark Fundamental"
+	"Title"			"XHS Bruiser - Dark Fundamental"
 
 	"Items"
 	{
-		"#DOTA_Item_Build_Title"
-		{
-		}
-
-		"#DOTA_Item_Build_Hero9"
-		{
-		}
-
 		"#DOTA_Item_Build_Starting_Items"
 		{
-			"item"		"item_amulet_of_the_wild"
+			"item"		"item_health_potion"
+			"item"		"item_mana_potion"
+			"item"		"item_orb_of_darkness"
 		}
 
 		"#DOTA_Item_Build_Early_Game"
 		{
+			"item"		"item_orb_of_fire"
 			"item"		"item_tome_small"
-			"item"		"item_ankh_of_reincarnation"
 			"item"		"item_tome_small"
-			"item"		"item_bracer_of_endurance"
 			"item"		"item_lifesteal_mask"
-			"item"		"item_blade_of_attack"
+			"item"		"item_ankh_of_reincarnation"
 		}
 
-		"#DOTA_Item_Build_Core_Items"
+		"#DOTA_Item_Build_Mid_Items"
 		{
-			"item"		"item_bracer_of_protection"
-			"item"		"item_claws_of_attack"
+			"item"		"item_orb_of_darkness2"
+			"item"		"item_orb_of_fire2"
+			"item"		"item_boots_of_speed"
+			"item"		"item_xhs_cloak_of_flames"
+		}
+
+		"#DOTA_Item_Build_Late_Items"
+		{
+			"item"		"item_bracer_of_the_void"
+			"item"		"item_searing_blade"
+			"item"		"item_staff_of_mastery"
 			"item"		"item_tome_big"
 		}
 
-		"#DOTA_Item_Build_Luxury"
+		"#DOTA_Item_Build_Other_Items"
 		{
-			"item"		"item_tome_small"
-			"item"		"item_tome_big"
+			"item"		"item_healing_wards"
+			"item"		"item_potion_full"
+			"item"		"item_potion_of_invulnerability"
+			"item"		"item_potion_of_antimagic"
+			"item"		"item_amulet_of_the_wild"
+			"item"		"item_orb_of_earth"
 		}
 	}
 }

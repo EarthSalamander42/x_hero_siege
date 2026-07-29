@@ -173,15 +173,11 @@ end
 
 local XHS_SUPPORTER_LIFESTEAL_CONFIG = {
 	attack = {
-		slot = "attack_lifesteal",
-		anchor = "particles/custom/supporter_pass/attack_lifesteal_anchor.vpcf",
-		hero_field = "xhs_supporter_attack_lifesteal_particle",
+		player_field = "attack_lifesteal_pfx",
 		cooldown = 0.30,
 	},
 	spell = {
-		slot = "spell_lifesteal",
-		anchor = "particles/custom/supporter_pass/spell_lifesteal_anchor.vpcf",
-		hero_field = "xhs_supporter_spell_lifesteal_particle",
+		player_field = "spell_lifesteal_pfx",
 	},
 }
 
@@ -238,80 +234,17 @@ local function XHSIsBlockedLifestealParticle(path)
 	return false
 end
 
-local function XHSGetLifestealOverrideParticle(anchor, playerID)
-	if CustomNetTables == nil or CustomNetTables.GetTableValue == nil then return nil end
-
-	local override = CustomNetTables:GetTableValue(
-		"supporter_pass_player",
-		anchor .. "_" .. tostring(playerID)
-	)
-	if type(override) ~= "table" then return nil end
-	return override[1] or override["1"]
-end
-
 local function XHSResolveSupporterLifestealParticle(hero, playerID, config)
 	if Battlepass ~= nil and Battlepass.AreSupporterRewardsEnabled ~= nil then
 		local success, enabled = pcall(Battlepass.AreSupporterRewardsEnabled, Battlepass, playerID)
-		if success and not enabled then
-			local disabledOverride = XHSGetLifestealOverrideParticle(config.anchor, playerID)
-			if disabledOverride ~= nil and disabledOverride ~= config.anchor then
-				return nil
-			end
-			return config.anchor
-		end
+		if success and not enabled then return nil end
 	end
 
-	local heroParticle = hero[config.hero_field]
-	if XHSIsValidLifestealParticlePath(heroParticle) then
-		if XHSIsBlockedLifestealParticle(heroParticle) then return nil end
-		if heroParticle ~= config.anchor then return heroParticle end
-	end
-
-	local overrideParticle = XHSGetLifestealOverrideParticle(config.anchor, playerID)
-	if XHSIsValidLifestealParticlePath(overrideParticle) then
-		if XHSIsBlockedLifestealParticle(overrideParticle) then return nil end
-		if overrideParticle ~= config.anchor then return overrideParticle end
-	end
-
-	if Battlepass ~= nil and Battlepass.GetEquippedSupporterItem ~= nil then
-		local itemSuccess, item = pcall(
-			Battlepass.GetEquippedSupporterItem,
-			Battlepass,
-			playerID,
-			config.slot
-		)
-		if itemSuccess and type(item) == "table" then
-			local catalogParticle = nil
-			if Battlepass.GetSupporterItemParticle ~= nil then
-				local particleSuccess, resolvedParticle = pcall(
-					Battlepass.GetSupporterItemParticle,
-					Battlepass,
-					item,
-					config.anchor
-				)
-				if particleSuccess then
-					catalogParticle = resolvedParticle
-				end
-			end
-
-			local itemParticle = catalogParticle
-			if not XHSIsValidLifestealParticlePath(itemParticle) then
-				itemParticle = item.particle
-			end
-			if not XHSIsValidLifestealParticlePath(itemParticle) then
-				itemParticle = item.particle_path
-			end
-			if not XHSIsValidLifestealParticlePath(itemParticle) then
-				itemParticle = item.file
-			end
-			if XHSIsValidLifestealParticlePath(itemParticle) then
-				if XHSIsBlockedLifestealParticle(itemParticle) then return nil end
-				if itemParticle ~= config.anchor then return itemParticle end
-			end
-		end
-	end
-
-	return config.anchor
+	if Battlepass == nil or Battlepass.GetPlayerParticle == nil then return nil end
+	local particle = Battlepass:GetPlayerParticle(hero, config.player_field)
+	if not XHSIsValidLifestealParticlePath(particle) then return nil end
+	if XHSIsBlockedLifestealParticle(particle) then return nil end
+	return particle
 end
 
 local function XHSSetLifestealParticleControlEntity(particle, controlPoint, entity)
@@ -345,8 +278,7 @@ local function XHSCreateSupporterLifestealParticle(hero, victim, particleName)
 	local particle = ParticleManager:CreateParticle(
 		particleName,
 		PATTACH_ABSORIGIN_FOLLOW,
-		parent,
-		hero
+		parent
 	)
 	if particle == nil or particle < 0 then return false end
 
@@ -551,7 +483,10 @@ function CDOTA_BaseNPC:IncrementAttributes(amount, options)
 
 	if not self.GetPlayerID then return end
 
-	local particle1 = ParticleManager:CreateParticle("particles/generic_hero_status/hero_levelup.vpcf", PATTACH_ABSORIGIN_FOLLOW, self, self)
+	local levelupParticle = XHSGetBattlepassParticle ~= nil
+		and XHSGetBattlepassParticle(self, "levelup_pfx", "particles/generic_hero_status/hero_levelup.vpcf")
+		or "particles/generic_hero_status/hero_levelup.vpcf"
+	local particle1 = ParticleManager:CreateParticle(levelupParticle, PATTACH_ABSORIGIN_FOLLOW, self)
 	ParticleManager:SetParticleControl(particle1, 0, self:GetAbsOrigin())
 
 	if playSound == true then
@@ -647,19 +582,9 @@ ignored_pfx_list["particles/econ/events/ti10/emblem/ti10_emblem_effect.vpcf"] = 
 ignored_pfx_list["particles/units/heroes/hero_ember_spirit/ember_spirit_flameguard.vpcf"] = true
 ignored_pfx_list["particles/act_2/campfire_flame.vpcf"] = true
 
--- Call custom functions whenever CreateParticle is being called anywhere
+-- Keep runtime particle accounting centralized without changing particle paths.
 local original_CreateParticle = CScriptParticleManager.CreateParticle
-CScriptParticleManager.CreateParticle = function(self, sParticleName, iAttachType, hParent, hCaster)
-	local override = nil
-
-	if hCaster then
-		override = CustomNetTables:GetTableValue("supporter_pass_player", sParticleName .. '_' .. hCaster:GetPlayerOwnerID())
-	end
-
-	if override then
-		sParticleName = override["1"]
-	end
-
+CScriptParticleManager.CreateParticle = function(self, sParticleName, iAttachType, hParent)
 	if XHSPrecache and XHSPrecache.NoteRuntimeAsset then
 		XHSPrecache:NoteRuntimeAsset("particle", sParticleName, "CreateParticle")
 	end
@@ -670,31 +595,15 @@ CScriptParticleManager.CreateParticle = function(self, sParticleName, iAttachTyp
 	--	print("CreateParticle response:", sParticleName)
 
 	if not ignored_pfx_list[sParticleName] and CScriptParticleManager and CScriptParticleManager.ACTIVE_PARTICLES then
-		if hCaster and not hCaster:IsHero() then
-			table.insert(CScriptParticleManager.ACTIVE_PARTICLES, { response, 0 })
-		else
-			table.insert(CScriptParticleManager.ACTIVE_PARTICLES, { response, 0 })
-		end
+		table.insert(CScriptParticleManager.ACTIVE_PARTICLES, { response, 0 })
 	end
 
 	return response
 end
 
--- Call custom functions whenever CreateParticleForTeam is being called anywhere
+-- Preserve runtime asset accounting for team-scoped particles.
 local original_CreateParticleForTeam = CScriptParticleManager.CreateParticleForTeam
-CScriptParticleManager.CreateParticleForTeam = function(self, sParticleName, iAttachType, hParent, iTeamNumber, hCaster)
-	--	print("Create Particle (override):", sParticleName, iAttachType, hParent, iTeamNumber, hCaster)
-
-	local override = nil
-
-	if hCaster then
-		override = CustomNetTables:GetTableValue("supporter_pass_player", sParticleName .. '_' .. hCaster:GetPlayerOwnerID())
-	end
-
-	if override then
-		sParticleName = override["1"]
-	end
-
+CScriptParticleManager.CreateParticleForTeam = function(self, sParticleName, iAttachType, hParent, iTeamNumber)
 	if XHSPrecache and XHSPrecache.NoteRuntimeAsset then
 		XHSPrecache:NoteRuntimeAsset("particle", sParticleName, "CreateParticleForTeam")
 	end
@@ -705,21 +614,9 @@ CScriptParticleManager.CreateParticleForTeam = function(self, sParticleName, iAt
 	return response
 end
 
--- Call custom functions whenever CreateParticleForPlayer is being called anywhere
+-- Preserve runtime asset accounting for player-scoped particles.
 local original_CreateParticleForPlayer = CScriptParticleManager.CreateParticleForPlayer
-CScriptParticleManager.CreateParticleForPlayer = function(self, sParticleName, iAttachType, hParent, hPlayer, hCaster)
-	--	print("Create Particle (override):", sParticleName, iAttachType, hParent, hPlayer, hCaster)
-
-	local override = nil
-
-	if hCaster then
-		override = CustomNetTables:GetTableValue("supporter_pass_player", sParticleName .. '_' .. hCaster:GetPlayerOwnerID())
-	end
-
-	if override then
-		sParticleName = override["1"]
-	end
-
+CScriptParticleManager.CreateParticleForPlayer = function(self, sParticleName, iAttachType, hParent, hPlayer)
 	if XHSPrecache and XHSPrecache.NoteRuntimeAsset then
 		XHSPrecache:NoteRuntimeAsset("particle", sParticleName, "CreateParticleForPlayer")
 	end

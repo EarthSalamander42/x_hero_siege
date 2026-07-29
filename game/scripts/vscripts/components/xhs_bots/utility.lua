@@ -145,6 +145,68 @@ function XHSBotUtility:Build(context)
 		)
 	end
 
+	if context.base_last_stand == true then
+		-- The Ancient is the hard retreat limit. Once pressure reaches the
+		-- respawn/shop area, recover inside the campfire aura and fight instead
+		-- of repeatedly ordering deeper movement into a corner.
+		for _, abilityAction in ipairs(context.ability_actions or {}) do
+			local score = (tonumber(abilityAction.score) or 60) + 45
+			local reason = "base last stand; "
+				.. tostring(abilityAction.reason or "profile ability")
+			if abilityAction.is_heal == true
+				and abilityAction.heals_self == true
+				and (tonumber(abilityAction.self_effective_heal_ratio) or 0) >= 0.04
+				and context.health_ratio <= 0.72 then
+				score = math.max(score, 195)
+				reason = "base last stand emergency self-heal"
+			elseif (abilityAction.mode == "self_defensive"
+				or abilityAction.mode == "defensive_toggle")
+				and context.health_ratio <= 0.78 then
+				score = math.max(score, 185)
+				reason = "base last stand personal defense"
+			end
+			AddAction(actions, "cast_ability", score, abilityAction, reason)
+		end
+
+		if context.inside_campfire ~= true
+			and context.campfire_position ~= nil then
+			AddAction(
+				actions,
+				"move_to_objective",
+				context.health_ratio <= 0.80 and 188 or 168,
+				{ position = context.campfire_position },
+				"reach campfire regeneration before fighting back"
+			)
+		end
+		if context.target ~= nil then
+			AddAction(
+				actions,
+				"attack_target",
+				160 + (context.target_priority or 0)
+					+ (context.inside_campfire == true and 15 or 0),
+				{
+					target = context.target,
+					maximum_distance = context.max_chase_distance,
+				},
+				context.inside_campfire == true
+					and "back to the wall: fight inside campfire"
+					or "fight while securing the campfire position"
+			)
+		elseif context.campfire_position ~= nil then
+			AddAction(
+				actions,
+				"attack_move",
+				150,
+				{ position = context.campfire_position },
+				"guard the campfire and reacquire base attackers"
+			)
+		end
+		return self:Sort(actions)
+	end
+
+	local retreatThreshold = context.retreat_threshold or 0.25
+	local combatThreat = tonumber(context.combat_threat) or 0
+
 	if context.shopping == true then
 		for _, abilityAction in ipairs(context.ability_actions or {}) do
 			local emergencyShopHeal = abilityAction.is_heal == true
@@ -181,18 +243,41 @@ function XHSBotUtility:Build(context)
 		return self:Sort(actions)
 	end
 
-	local retreatThreshold = context.retreat_threshold or 0.25
-	local combatThreat = tonumber(context.combat_threat) or 0
 	local threatenedRetreat = combatThreat >= 1.05
 		and context.health_ratio <= math.min(0.52, retreatThreshold + 0.08)
+	-- Preemption contract: a confident fatal-before-escape forecast may beat
+	-- ordinary combat, runes and lane movement. Sealed arenas, Muradin,
+	-- shopping and Ancient/campfire last stand have already taken control
+	-- above and therefore remain stronger authorities.
+	local forecastFatal = context.fatal_before_escape == true
+		and (tonumber(context.forecast_confidence) or 0) >= 0.48
+		and (
+			context.health_ratio <= math.min(0.82, retreatThreshold + 0.30)
+			or (tonumber(context.time_to_die) or 9999)
+				<= math.min(
+					3.5,
+					(tonumber(context.escape_time) or 0) + 0.55
+				)
+		)
 	local shouldRetreat = context.no_retreat ~= true
 		and context.last_stand ~= true
-		and (context.health_ratio <= retreatThreshold or threatenedRetreat)
+		and (
+			context.health_ratio <= retreatThreshold
+			or threatenedRetreat
+			or forecastFatal
+		)
 	if shouldRetreat then
+		local forecastMargin = math.max(
+			0,
+			(tonumber(context.escape_time) or 0)
+				- (tonumber(context.time_to_die) or 9999)
+		)
 		local urgency = Clamp(
 			(retreatThreshold - context.health_ratio) / math.max(0.05, retreatThreshold)
 				+ combatThreat * 0.35
-				+ (tonumber(context.recent_damage_ratio) or 0) * 1.5,
+				+ (tonumber(context.recent_damage_ratio) or 0) * 1.5
+				+ math.min(0.65, forecastMargin * 0.22)
+				+ (forecastFatal and 0.35 or 0),
 			0,
 			1.5
 		)
@@ -205,10 +290,96 @@ function XHSBotUtility:Build(context)
 				interrupt_channel = context.health_ratio <= retreatThreshold * 0.78
 					or combatThreat >= 1.05,
 			},
-			"survival threat="
+			(forecastFatal and "fatal forecast " or "survival ")
+				.. "threat="
 				.. tostring(math.floor(combatThreat * 100) / 100)
+				.. " ttd="
+				.. tostring(
+					math.floor((tonumber(context.time_to_die) or 9999) * 10) / 10
+				)
+				.. " escape="
+				.. tostring(
+					math.floor((tonumber(context.escape_time) or 0) * 10) / 10
+				)
 				.. " cover=" .. tostring(context.retreat_cover or "none")
 		)
+	end
+
+	-- A spawned XHS rune is a progression objective, not incidental loot.
+	-- Once a healthy bot has claimed one, ordinary creeps and offensive casts
+	-- must not cancel the route every think tick. Survival, telegraphs, urgent
+	-- shopping, base defense, and sealed encounters have already had the chance
+	-- to take control above.
+	local runeDistance = tonumber(context.rune_distance) or math.huge
+	local runeCritical = context.rune_progression_critical == true
+	local runeHealthMargin = tonumber(context.rune_health_margin)
+		or (runeCritical and 0.03 or 0.08)
+	local runeHealthFloor = math.max(
+		retreatThreshold + runeHealthMargin,
+		runeCritical and 0.34 or 0.44
+	)
+	local runeThreatCeiling = tonumber(context.rune_threat_ceiling) or 0.95
+	if runeCritical then runeThreatCeiling = runeThreatCeiling + 0.22 end
+	local rawDanger = tonumber(context.raw_danger)
+		or tonumber(context.danger) or 0
+	local recentDamage = tonumber(context.recent_damage_ratio) or 0
+	local runeSafe = context.rune_position ~= nil
+		and rawDanger <= 0
+		and recentDamage < (runeCritical and 0.30 or 0.20)
+		and (
+			context.health_ratio > runeHealthFloor
+				and combatThreat < runeThreatCeiling
+			or runeDistance <= 450
+				and context.health_ratio > retreatThreshold - 0.02
+				and combatThreat < 1.15
+		)
+	if runeSafe and not shouldRetreat then
+		for _, abilityAction in ipairs(context.ability_actions or {}) do
+			local selfEmergency = abilityAction.is_heal == true
+				and abilityAction.heals_self == true
+				and (tonumber(abilityAction.self_effective_heal_ratio) or 0) >= 0.04
+				and context.health_ratio <= math.max(retreatThreshold + 0.16, 0.55)
+			local allyEmergency = abilityAction.is_heal == true
+				and (tonumber(abilityAction.effective_heal_ratio) or 0) >= 0.08
+				and (tonumber(abilityAction.heal_target_health_ratio) or 1) <= 0.22
+			local personalDefense = (abilityAction.mode == "self_defensive"
+				or abilityAction.mode == "defensive_toggle")
+				and context.health_ratio <= 0.58
+				and combatThreat >= 0.35
+			if selfEmergency or allyEmergency or personalDefense then
+				AddAction(
+					actions,
+					"cast_ability",
+					selfEmergency and 252 or allyEmergency and 250 or 246,
+					abilityAction,
+					selfEmergency and "emergency self-heal before continuing rune route"
+						or allyEmergency and "critical ally rescue during rune route"
+						or "personal defense while securing rune"
+				)
+			end
+		end
+
+		local runeScore = Clamp(
+			(tonumber(context.rune_priority) or 218)
+				+ (runeCritical and 18 or 0)
+				- math.min(12, runeDistance / 1000)
+				- math.min(10, combatThreat * 4),
+			205,
+			242
+		)
+		AddAction(
+			actions,
+			"move_to_objective",
+			runeScore,
+			{
+				position = context.rune_position,
+				objective = "rune",
+				rune_id = context.rune_id,
+			},
+			(runeCritical and "progression unlock: collect " or "collect central ")
+				.. tostring(context.rune_type or "nearby") .. " rune"
+		)
+		return self:Sort(actions)
 	end
 
 	for _, abilityAction in ipairs(context.ability_actions or {}) do

@@ -63,8 +63,8 @@
 
 					<Panel id="XHSPerfColumnActivity" class="XHSDevToolsPerformanceActivityColumn">
 						<Label class="XHSDevToolsPerformanceColumnTitle" text="ACTIVITY / SECOND" />
-						<Panel class="XHSDevToolsPerformanceRow"><Label text="Zone searches / hits" /><Label id="XHSPerfZoneSearches" class="Value WideValue" text="--" /></Panel>
-						<Panel class="XHSDevToolsPerformanceRow"><Label text="Zone cost / max" /><Label id="XHSPerfZoneCost" class="Value WideValue" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Spatial queries / hits" /><Label id="XHSPerfZoneSearches" class="Value WideValue" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Spatial cost / max" /><Label id="XHSPerfZoneCost" class="Value WideValue" text="--" /></Panel>
 						<Panel class="XHSDevToolsPerformanceRow"><Label text="Orders / repeated" /><Label id="XHSPerfOrders" class="Value WideValue" text="--" /></Panel>
 						<Panel class="XHSDevToolsPerformanceRow"><Label text="AI / wave thinks" /><Label id="XHSPerfThinks" class="Value WideValue" text="--" /></Panel>
 						<Panel class="XHSDevToolsPerformanceRow"><Label text="Ability loops" /><Label id="XHSPerfAbilityThinks" class="Value" text="--" /></Panel>
@@ -72,7 +72,8 @@
 						<Panel class="XHSDevToolsPerformanceRow"><Label text="Projectiles L / T" /><Label id="XHSPerfProjectiles" class="Value WideValue" text="--" /></Panel>
 						<Panel class="XHSDevToolsPerformanceRow"><Label text="Spawns / deaths" /><Label id="XHSPerfChurn" class="Value WideValue" text="--" /></Panel>
 						<Panel class="XHSDevToolsPerformanceRow"><Label text="Target changes" /><Label id="XHSPerfTargetChanges" class="Value" text="--" /></Panel>
-						<Label class="XHSDevToolsPerformanceSourceTitle" text="SAMPLED ZONE HOTSPOTS" />
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Spatial cache H / M" /><Label id="XHSPerfSpatialCache" class="Value WideValue" text="--" /></Panel>
+						<Label class="XHSDevToolsPerformanceSourceTitle" text="SAMPLED SPATIAL HOTSPOTS" />
 						<Label id="XHSPerfZoneSource1" class="XHSDevToolsPerformanceSource" text="--" />
 						<Label id="XHSPerfZoneSource2" class="XHSDevToolsPerformanceSource" text="" />
 						<Label id="XHSPerfZoneSource3" class="XHSDevToolsPerformanceSource" text="" />

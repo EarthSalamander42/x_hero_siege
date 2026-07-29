@@ -1,6 +1,7 @@
 if XHSBotBrain == nil then
 	XHSBotBrain = {}
 end
+XHSBotBrain.rune_claims = XHSBotBrain.rune_claims or {}
 
 local function IsValidEntityHandle(entity)
 	return entity ~= nil and IsValidEntity(entity) and not entity:IsNull()
@@ -42,19 +43,36 @@ local function PositionToward(origin, destination, distance)
 	if origin == nil or destination == nil then return origin end
 	local delta = destination - origin
 	delta.z = 0
-	if delta:Length2D() <= 1 then return origin end
-	return origin + delta:Normalized() * math.max(0, tonumber(distance) or 0)
+	local remaining = delta:Length2D()
+	if remaining <= 1 then return CopyPosition(destination) end
+	return origin + delta:Normalized() * math.min(
+		remaining,
+		math.max(0, tonumber(distance) or 0)
+	)
 end
 
 local function Clamp(value, minimum, maximum)
 	return math.max(minimum, math.min(maximum, tonumber(value) or minimum))
 end
 
-local function GetFortPosition()
+local function GetFortEntity()
 	local fort = Entities:FindByName(nil, "dota_goodguys_fort")
 		or Entities:FindByName(nil, "base_spawn")
-	return IsValidEntityHandle(fort) and fort:GetAbsOrigin() or Vector(0, 0, 0)
+	return IsValidEntityHandle(fort) and fort or nil
 end
+
+local function GetFortPosition()
+	local fort = GetFortEntity()
+	return fort ~= nil and fort:GetAbsOrigin() or Vector(0, 0, 0)
+end
+
+local CAMPFIRE_AURA_RADIUS = 700
+local CAMPFIRE_INNER_BUFFER = 70
+local ANCIENT_RETREAT_LIMIT_RADIUS = 950
+local BASE_LAST_STAND_RADIUS = 1300
+local RUNE_MAX_ROUTE_DISTANCE = 12000
+local RUNE_CLAIM_TTL = 3.0
+local STRATEGIC_SPECIAL_WAVE_RADIUS = 5200
 
 local DEFENSIVE_STRUCTURE_NAMES = {
 	npc_dota_defender_fort = true,
@@ -79,6 +97,23 @@ function XHSBotBrain:IsTeamVisible(hero, unit)
 end
 
 function XHSBotBrain:FindEnemies(hero, radius)
+	if GameMode ~= nil
+		and GameMode.FarmEvent_occuring == true
+		and SpecialEvents ~= nil
+		and SpecialEvents.GetFarmEventActiveUnits ~= nil then
+		local playerID = hero:GetPlayerOwnerID()
+		local enemies = {}
+		for _, unit in ipairs(SpecialEvents:GetFarmEventActiveUnits(playerID)) do
+			if IsValidEntityHandle(unit)
+				and unit:IsAlive()
+				and not unit:IsInvulnerable()
+				and Distance2D(hero:GetAbsOrigin(), unit:GetAbsOrigin()) <= radius then
+				table.insert(enemies, unit)
+			end
+		end
+		return enemies
+	end
+
 	return FindUnitsInRadius(
 		hero:GetTeamNumber(),
 		hero:GetAbsOrigin(),
@@ -143,8 +178,25 @@ function XHSBotBrain:IsTargetAllowedByAssignment(playerID, hero, target, assignm
 	if not self:IsCombatTarget(target) then return false end
 	if assignment == nil or assignment.anchor == nil then return true end
 	if assignment.goal == "hold" or assignment.goal == "selecting_hero"
-		or assignment.goal == "dead" or assignment.goal == "shop" then
+		or assignment.goal == "dead" then
 		return false
+	end
+	if assignment.goal == "shop" then
+		local distance = Distance2D(hero:GetAbsOrigin(), target:GetAbsOrigin())
+		local attacksHero = false
+		if target.GetAttackTarget ~= nil then
+			local ok, attackTarget = pcall(function()
+				return target:GetAttackTarget()
+			end)
+			attacksHero = ok and attackTarget == hero
+		end
+		-- Shop logistics never make the bot pacifist. Threats already inside
+		-- the base/self-defense envelope may be selected immediately.
+		return attacksHero
+			or distance <= math.max(
+				900,
+				tonumber(difficulty.self_defense_radius) or 650
+			)
 	end
 
 	if target.xhs_farm_event == true then
@@ -330,6 +382,157 @@ function XHSBotBrain:GetDefensiveStructureCover(hero, radius)
 	return nil, nil
 end
 
+function XHSBotBrain:GetCampfireState(hero)
+	local marker = Entities:FindByName(nil, "xhs_campfire")
+	if not IsValidEntityHandle(marker) then
+		return {
+			position = nil,
+			radius = CAMPFIRE_AURA_RADIUS,
+			distance = math.huge,
+			inside = false,
+		}
+	end
+
+	local position = marker:GetAbsOrigin()
+	local distance = IsValidEntityHandle(hero)
+		and Distance2D(hero:GetAbsOrigin(), position)
+		or math.huge
+	return {
+		position = CopyPosition(position),
+		radius = CAMPFIRE_AURA_RADIUS,
+		distance = distance,
+		inside = distance <= math.max(
+			100,
+			CAMPFIRE_AURA_RADIUS - CAMPFIRE_INNER_BUFFER
+		),
+	}
+end
+
+function XHSBotBrain:ReleaseRuneClaim(playerID, record)
+	local runeID = record and tonumber(record.rune_claim_id) or nil
+	if runeID ~= nil then
+		local claim = self.rune_claims[runeID]
+		if claim ~= nil and tonumber(claim.player_id) == tonumber(playerID) then
+			self.rune_claims[runeID] = nil
+		end
+	end
+	if record ~= nil then
+		record.rune_claim_id = nil
+		record.rune_claim_expires_at = nil
+		record.rune_committed = false
+	end
+end
+
+function XHSBotBrain:PruneRuneClaims(now)
+	now = tonumber(now) or GameRules:GetGameTime()
+	local activeIDs = {}
+	for id, active in pairs(Runes and Runes.activeRunes or {}) do
+		if active ~= nil then activeIDs[tonumber(active.id) or tonumber(id)] = true end
+	end
+	for id, claim in pairs(self.rune_claims) do
+		if activeIDs[tonumber(id)] ~= true
+			or now >= (tonumber(claim.expires_at) or 0) then
+			self.rune_claims[id] = nil
+		end
+	end
+end
+
+function XHSBotBrain:FindRuneObjective(hero, record, difficulty, now)
+	if not IsValidEntityHandle(hero)
+		or Runes == nil
+		or type(Runes.activeRunes) ~= "table" then
+		self:ReleaseRuneClaim(
+			IsValidEntityHandle(hero) and hero:GetPlayerID() or nil,
+			record
+		)
+		return nil
+	end
+
+	now = tonumber(now) or GameRules:GetGameTime()
+	local playerID = hero:GetPlayerID()
+	local maximumDistance = math.min(
+		RUNE_MAX_ROUTE_DISTANCE,
+		math.max(1000, tonumber(difficulty and difficulty.rune_search_radius)
+			or RUNE_MAX_ROUTE_DISTANCE)
+	)
+	self:PruneRuneClaims(now)
+
+	local function BuildCandidate(active)
+		if active == nil then return nil end
+		local alreadyPicked = false
+		if Runes.HasHeroPickedRuneBatch ~= nil then
+			local ok, result = pcall(function()
+				return Runes:HasHeroPickedRuneBatch(active, hero)
+			end)
+			alreadyPicked = not ok or result == true
+		end
+		if alreadyPicked then return nil end
+
+		local entity = EntityFromIndex(active.entityIndex)
+		if not IsValidEntityHandle(entity) or entity.xhs_is_rune ~= true then
+			return nil
+		end
+		local position = active.baseOrigin or entity:GetAbsOrigin()
+		local distance = Distance2D(hero:GetAbsOrigin(), position)
+		if distance > maximumDistance then return nil end
+		return {
+			id = active.id,
+			batch_id = active.batchId,
+			type = active.type or "unknown",
+			position = CopyPosition(position),
+			distance = distance,
+		}
+	end
+
+	local best = nil
+	local previousRuneID = record and tonumber(record.rune_claim_id) or nil
+	if previousRuneID ~= nil then
+		local previous = Runes.activeRunes[previousRuneID]
+		local previousClaim = self.rune_claims[previousRuneID]
+		if previousClaim == nil
+			or tonumber(previousClaim.player_id) == tonumber(playerID) then
+			best = BuildCandidate(previous)
+		end
+	end
+
+	for _, active in pairs(Runes.activeRunes) do
+		local runeID = tonumber(active and active.id)
+		local claim = runeID ~= nil and self.rune_claims[runeID] or nil
+		local claimedByOther = claim ~= nil
+			and tonumber(claim.player_id) ~= tonumber(playerID)
+		if not claimedByOther
+			and (best == nil or tonumber(best.id) ~= runeID) then
+			local candidate = BuildCandidate(active)
+			if candidate ~= nil
+				and (best == nil or candidate.distance < best.distance) then
+				best = candidate
+			end
+		end
+	end
+
+	if best == nil then
+		self:ReleaseRuneClaim(playerID, record)
+		return nil
+	end
+
+	if previousRuneID ~= nil and previousRuneID ~= tonumber(best.id) then
+		local previousClaim = self.rune_claims[previousRuneID]
+		if previousClaim ~= nil
+			and tonumber(previousClaim.player_id) == tonumber(playerID) then
+			self.rune_claims[previousRuneID] = nil
+		end
+	end
+	self.rune_claims[best.id] = {
+		player_id = playerID,
+		expires_at = now + RUNE_CLAIM_TTL,
+	}
+	if record ~= nil then
+		record.rune_claim_id = best.id
+		record.rune_claim_expires_at = now + RUNE_CLAIM_TTL
+	end
+	return best
+end
+
 function XHSBotBrain:IsOwnedScreenUnit(hero, unit)
 	if not IsValidEntityHandle(unit) or unit == hero or not unit:IsAlive()
 		or unit.IsRealHero ~= nil and unit:IsRealHero() then
@@ -362,7 +565,428 @@ function XHSBotBrain:GetAttackDamageAgainst(enemy, hero)
 	return 0
 end
 
-function XHSBotBrain:ComputeCombatThreat(hero, enemies, record)
+function XHSBotBrain:GetSecondsPerAttack(hero)
+	if not IsValidEntityHandle(hero) then return 1.7 end
+	if hero.GetSecondsPerAttack ~= nil then
+		local ok, value = pcall(function() return hero:GetSecondsPerAttack() end)
+		if ok and tonumber(value) ~= nil then
+			return math.max(0.10, tonumber(value))
+		end
+	end
+	if hero.GetAttacksPerSecond ~= nil then
+		local ok, value = pcall(function()
+			return hero:GetAttacksPerSecond(false)
+		end)
+		if ok and tonumber(value) ~= nil and tonumber(value) > 0 then
+			return 1 / tonumber(value)
+		end
+	end
+	return 1.7
+end
+
+function XHSBotBrain:GetUnitAttacksPerSecond(unit)
+	if not IsValidEntityHandle(unit) then return 0 end
+	if unit.GetAttacksPerSecond ~= nil then
+		local ok, value = pcall(function()
+			return unit:GetAttacksPerSecond(false)
+		end)
+		if ok and tonumber(value) ~= nil then
+			return math.max(0, tonumber(value))
+		end
+	end
+	if unit.GetSecondsPerAttack ~= nil then
+		local ok, value = pcall(function() return unit:GetSecondsPerAttack() end)
+		if ok and tonumber(value) ~= nil and tonumber(value) > 0 then
+			return 1 / tonumber(value)
+		end
+	end
+	return 0
+end
+
+function XHSBotBrain:GetUnitHealthRegen(unit)
+	if not IsValidEntityHandle(unit) or unit.GetHealthRegen == nil then return 0 end
+	local ok, value = pcall(function() return unit:GetHealthRegen() end)
+	return ok and math.max(0, tonumber(value) or 0) or 0
+end
+
+function XHSBotBrain:GetUnitMovementSpeed(unit)
+	if not IsValidEntityHandle(unit) then return 300 end
+	if unit.GetIdealSpeed ~= nil then
+		local ok, value = pcall(function() return unit:GetIdealSpeed() end)
+		if ok and tonumber(value) ~= nil then
+			return math.max(100, tonumber(value))
+		end
+	end
+	return 300
+end
+
+function XHSBotBrain:GetForecastAttackLifesteal(hero, profile)
+	if not IsValidEntityHandle(hero) then return 0, 0 end
+	local bestPercent = 0
+	local bestUptime = 0
+	local sustain = profile and profile.intrinsic_sustain or nil
+	if type(sustain) == "table" and sustain.attack_lifesteal == true then
+		local learned = true
+		if type(sustain.ability) == "string"
+			and hero.FindAbilityByName ~= nil then
+			local ok, ability = pcall(function()
+				return hero:FindAbilityByName(sustain.ability)
+			end)
+			local level = 0
+			if ok and IsValidEntityHandle(ability)
+				and ability.GetLevel ~= nil then
+				local levelOK, value = pcall(function()
+					return ability:GetLevel()
+				end)
+				if levelOK then level = tonumber(value) or 0 end
+			end
+			learned = level > 0
+		end
+		if learned then
+			bestPercent = math.max(
+				bestPercent,
+				tonumber(sustain.lifesteal_pct) or 0
+			)
+			bestUptime = sustain.kind == "active_buff" and 0.30 or 0.72
+		end
+	end
+	if hero.HasItemInInventory ~= nil then
+		local ok, hasMask = pcall(function()
+			return hero:HasItemInInventory("item_lifesteal_mask")
+		end)
+		if ok and hasMask then
+			bestPercent = math.max(bestPercent, 50)
+			bestUptime = math.max(bestUptime, 0.72)
+		end
+	end
+	return bestPercent, bestUptime
+end
+
+function XHSBotBrain:GetHeroAttackDPSAgainst(hero, target)
+	if not IsValidEntityHandle(hero) then return 0 end
+	local damage = 0
+	if IsValidEntityHandle(target) then
+		damage = self:GetAttackDamageAgainst(hero, target)
+	elseif hero.GetAttackDamage ~= nil then
+		local ok, value = pcall(function() return hero:GetAttackDamage() end)
+		if ok then damage = math.max(0, tonumber(value) or 0) end
+	end
+	return damage * self:GetUnitAttacksPerSecond(hero)
+end
+
+function XHSBotBrain:GetAbilityDamageAgainst(hero, ability, target, rule)
+	if not IsValidEntityHandle(hero)
+		or not IsValidEntityHandle(ability)
+		or not IsValidEntityHandle(target) then
+		return 0, 0
+	end
+	local rawDamage = 0
+	if ability.GetAbilityDamage ~= nil then
+		local ok, value = pcall(function() return ability:GetAbilityDamage() end)
+		if ok then rawDamage = math.max(0, tonumber(value) or 0) end
+	end
+	if rawDamage <= 0
+		and type(rule) == "table"
+		and type(rule.damage_key) == "string"
+		and ability.GetSpecialValueFor ~= nil then
+		local ok, value = pcall(function()
+			return ability:GetSpecialValueFor(rule.damage_key)
+		end)
+		if ok then rawDamage = math.max(0, tonumber(value) or 0) end
+	end
+	if rawDamage <= 0 then return 0, 0 end
+
+	local amplification = 0
+	if hero.GetSpellAmplification ~= nil then
+		local ok, value = pcall(function()
+			return hero:GetSpellAmplification(false)
+		end)
+		if ok then amplification = tonumber(value) or 0 end
+	end
+	if math.abs(amplification) > 2 then amplification = amplification / 100 end
+	rawDamage = rawDamage * math.max(0, 1 + amplification)
+
+	local damageType = nil
+	if ability.GetAbilityDamageType ~= nil then
+		local ok, value = pcall(function() return ability:GetAbilityDamageType() end)
+		if ok then damageType = value end
+	end
+	local multiplier = 1
+	if DAMAGE_TYPE_MAGICAL ~= nil and damageType == DAMAGE_TYPE_MAGICAL then
+		if target.IsMagicImmune ~= nil and target:IsMagicImmune() then
+			return rawDamage, 0
+		end
+		if target.GetMagicalArmorValue ~= nil then
+			local ok, resistance = pcall(function()
+				return target:GetMagicalArmorValue()
+			end)
+			if ok then
+				resistance = tonumber(resistance) or 0
+				if math.abs(resistance) > 2 then resistance = resistance / 100 end
+				multiplier = 1 - Clamp(resistance, -1, 0.95)
+			end
+		end
+	elseif DAMAGE_TYPE_PHYSICAL ~= nil and damageType == DAMAGE_TYPE_PHYSICAL then
+		if target.GetPhysicalArmorValue ~= nil then
+			local ok, armor = pcall(function()
+				return target:GetPhysicalArmorValue(false)
+			end)
+			if ok then
+				armor = tonumber(armor) or 0
+				local reduction = 0.06 * armor / (1 + 0.06 * math.abs(armor))
+				multiplier = 1 - reduction
+			end
+		end
+	end
+	return rawDamage, math.max(0, rawDamage * multiplier)
+end
+
+function XHSBotBrain:IsEfficiencyCreepTarget(target)
+	if not self:IsCombatTarget(target) or XHSBotConfig:IsBossTarget(target) then
+		return false
+	end
+	if target.IsHero ~= nil then
+		local ok, isHero = pcall(function() return target:IsHero() end)
+		if ok and isHero then return false end
+	end
+	return true
+end
+
+function XHSBotBrain:EvaluateSingleTargetCreepSpell(
+	hero,
+	ability,
+	target,
+	rule
+)
+	if not self:IsEfficiencyCreepTarget(target) then return nil end
+	local rawSpellDamage, spellDamage =
+		self:GetAbilityDamageAgainst(hero, ability, target, rule)
+	local attackDamage = self:GetAttackDamageAgainst(hero, target)
+	if rawSpellDamage <= 0 or spellDamage <= 0 or attackDamage <= 0 then
+		return {
+			worthwhile = false,
+			reason = "damage model unavailable",
+		}
+	end
+
+	local health = math.max(1, tonumber(target:GetHealth()) or 1)
+	local attackInterval = self:GetSecondsPerAttack(hero)
+	local castPoint = 0
+	if ability.GetCastPoint ~= nil then
+		local ok, value = pcall(function() return ability:GetCastPoint() end)
+		if ok then castPoint = math.max(0, tonumber(value) or 0) end
+	end
+	local channelTime = 0
+	if ability.GetChannelTime ~= nil then
+		local ok, value = pcall(function() return ability:GetChannelTime() end)
+		if ok then channelTime = math.max(0, tonumber(value) or 0) end
+	end
+	local castLock = math.max(0.15, castPoint + channelTime + 0.05)
+	local attackDPS = attackDamage / attackInterval
+	local effectiveSpellDamage = math.min(health, spellDamage)
+	local spellDPS = effectiveSpellDamage / castLock
+	local attacksWithout = math.ceil(health / attackDamage)
+	local healthAfterSpell = math.max(0, health - spellDamage)
+	local attacksAfter = math.ceil(healthAfterSpell / attackDamage)
+	local timeWithoutSpell = attacksWithout * attackInterval
+	local timeWithSpell = castLock + attacksAfter * attackInterval
+	local timeSaved = timeWithoutSpell - timeWithSpell
+	local efficiency = effectiveSpellDamage / math.max(
+		1,
+		math.min(health, attackDamage)
+	)
+
+	local manaCost = 0
+	if ability.GetManaCost ~= nil then
+		local ok, value = pcall(function()
+			return ability:GetManaCost(math.max(0, ability:GetLevel() - 1))
+		end)
+		if ok then manaCost = math.max(0, tonumber(value) or 0) end
+	end
+	local maximumMana = math.max(1, tonumber(hero:GetMaxMana()) or 1)
+	local manaFraction = manaCost / maximumMana
+	local cooldown = 0
+	if ability.GetCooldown ~= nil then
+		local ok, value = pcall(function()
+			return ability:GetCooldown(math.max(0, ability:GetLevel() - 1))
+		end)
+		if ok then cooldown = math.max(0, tonumber(value) or 0) end
+	end
+	local requiredEfficiency =
+		tonumber(rule and rule.minimum_creep_spell_efficiency) or 1.12
+	requiredEfficiency = requiredEfficiency
+		+ math.min(0.45, manaFraction * 0.90)
+		+ math.min(0.35, cooldown / 60)
+	local minimumTimeSaved =
+		tonumber(rule and rule.minimum_creep_spell_time_saved) or 0.15
+	local worthwhile = health > attackDamage * 1.05
+		and efficiency >= requiredEfficiency
+		and spellDPS > attackDPS * 1.05
+		and timeSaved >= minimumTimeSaved
+
+	return {
+		worthwhile = worthwhile,
+		raw_spell_damage = rawSpellDamage,
+		spell_damage = spellDamage,
+		attack_damage = attackDamage,
+		attack_dps = attackDPS,
+		spell_dps = spellDPS,
+		cast_lock = castLock,
+		time_saved = timeSaved,
+		efficiency = efficiency,
+		required_efficiency = requiredEfficiency,
+		mana_cost = manaCost,
+	}
+end
+
+function XHSBotBrain:GetMobileSafeZoneScore(hero, ally, target)
+	if not IsValidEntityHandle(hero)
+		or not IsValidEntityHandle(ally)
+		or ally == hero
+		or not ally:IsAlive()
+		or ally.IsRealHero == nil
+		or not ally:IsRealHero() then
+		return nil
+	end
+
+	local allyHealthRatio = HealthRatio(ally)
+	if allyHealthRatio < 0.50 then return nil end
+
+	local attackTarget = nil
+	if ally.GetAttackTarget ~= nil then
+		local ok, value = pcall(function() return ally:GetAttackTarget() end)
+		if ok and IsValidEntityHandle(value) then attackTarget = value end
+	end
+	local attackRange = 150
+	if ally.Script_GetAttackRange ~= nil then
+		local ok, value = pcall(function() return ally:Script_GetAttackRange() end)
+		if ok then attackRange = math.max(150, tonumber(value) or 150) end
+	end
+	local engaged = attackTarget ~= nil
+		or self:IsCombatTarget(target)
+			and Distance2D(ally:GetAbsOrigin(), target:GetAbsOrigin())
+				<= attackRange + 325
+	if not engaged then return nil end
+
+	local heroDamage = math.max(1, self:GetAttackDamageAgainst(hero, target))
+	local allyDamage = math.max(1, self:GetAttackDamageAgainst(ally, target))
+	local healthPoolRatio = ally:GetMaxHealth() / math.max(1, hero:GetMaxHealth())
+	local damageRatio = allyDamage / heroDamage
+	local levelDelta = 0
+	if ally.GetLevel ~= nil and hero.GetLevel ~= nil then
+		levelDelta = (tonumber(ally:GetLevel()) or 1)
+			- (tonumber(hero:GetLevel()) or 1)
+	end
+	local healthRegen = 0
+	if ally.GetHealthRegen ~= nil then
+		local ok, value = pcall(function() return ally:GetHealthRegen() end)
+		if ok then healthRegen = math.max(0, tonumber(value) or 0) end
+	end
+	local sustain = allyHealthRatio
+		+ math.min(0.35, healthRegen * 10 / math.max(1, ally:GetMaxHealth()))
+	local strength = healthPoolRatio * 0.45
+		+ damageRatio * 0.35
+		+ Clamp(levelDelta / 10, -0.15, 0.35)
+		+ sustain * 0.20
+	if sustain < 0.62 or strength < 1.05 then return nil end
+	return strength, sustain
+end
+
+function XHSBotBrain:GetMobileSafeZone(hero, target, radius)
+	if not self:IsCombatTarget(target) then return nil, nil, nil end
+	local best = nil
+	for _, ally in pairs(self:GetAllies(hero, radius or 1150)) do
+		local strength, sustain = self:GetMobileSafeZoneScore(hero, ally, target)
+		if strength ~= nil then
+			local distance = Distance2D(hero:GetAbsOrigin(), ally:GetAbsOrigin())
+			local score = strength * 100 + sustain * 35 - distance * 0.08
+			if best == nil or score > best.score then
+				best = {
+					ally = ally,
+					strength = strength,
+					sustain = sustain,
+					distance = distance,
+					score = score,
+				}
+			end
+		end
+	end
+	if best == nil then return nil, nil, nil end
+	return best.ally, best.strength, best.distance
+end
+
+function XHSBotBrain:GetStrategicThreatPosition(hero, target, assignment)
+	local heroOrigin = IsValidEntityHandle(hero) and hero:GetAbsOrigin() or nil
+	local groups = {}
+	local activeSpecialUnits = CustomTimers ~= nil
+		and CustomTimers.active_special_wave_units or {}
+	for entindex, wave in pairs(activeSpecialUnits) do
+		local unit = EntityFromIndex(tonumber(entindex))
+		if IsValidEntityHandle(unit)
+			and unit:IsAlive()
+			and heroOrigin ~= nil
+			and Distance2D(heroOrigin, unit:GetAbsOrigin())
+				<= STRATEGIC_SPECIAL_WAVE_RADIUS then
+			local key = wave ~= nil and tostring(wave) or tostring(entindex)
+			local group = groups[key] or {
+				position = Vector(0, 0, 0),
+				count = 0,
+			}
+			group.position = group.position + unit:GetAbsOrigin()
+			group.count = group.count + 1
+			groups[key] = group
+		end
+	end
+
+	local bestPosition = nil
+	local bestDistance = math.huge
+	for _, group in pairs(groups) do
+		if group.count > 0 then
+			local position = group.position / group.count
+			local distance = Distance2D(heroOrigin, position)
+			if distance < bestDistance then
+				bestPosition = position
+				bestDistance = distance
+			end
+		end
+	end
+	if bestPosition ~= nil then
+		return CopyPosition(bestPosition), "active special wave"
+	end
+	if assignment ~= nil and assignment.threat_position ~= nil then
+		return CopyPosition(assignment.threat_position), "team assignment"
+	end
+	if self:IsCombatTarget(target) then
+		return CopyPosition(target:GetAbsOrigin()), "combat target"
+	end
+	return nil, nil
+end
+
+function XHSBotBrain:GetCoverFormationDistance(hero, profile)
+	profile = profile or {}
+	local primaryRole = tostring(profile.primary_role or profile.role or "")
+	local secondaryRole = tostring(profile.secondary_role or "")
+	local preferredRange = tonumber(profile.preferred_range) or 0
+	local attackRange = 0
+	if IsValidEntityHandle(hero) and hero.Script_GetAttackRange ~= nil then
+		local ok, value = pcall(function() return hero:Script_GetAttackRange() end)
+		if ok then attackRange = tonumber(value) or 0 end
+	end
+	local ranged = primaryRole == "ranged_dps"
+		or secondaryRole == "ranged_dps"
+		or preferredRange >= 450
+		or attackRange >= 450
+	return ranged and 650 or 250
+end
+
+function XHSBotBrain:ComputeCombatThreat(
+	hero,
+	enemies,
+	record,
+	profile,
+	difficulty,
+	target
+)
 	local now = GameRules:GetGameTime()
 	local maximumHealth = math.max(1, hero:GetMaxHealth())
 	local currentHealth = hero:GetHealth()
@@ -378,6 +1002,7 @@ function XHSBotBrain:ComputeCombatThreat(hero, enemies, record)
 	local closeEnemies = 0
 	local focusedBy = 0
 	local bossNearby = false
+	local forecastEnemies = {}
 	for _, enemy in pairs(enemies or {}) do
 		if self:IsCombatTarget(enemy) then
 			local distance = Distance2D(hero:GetAbsOrigin(), enemy:GetAbsOrigin())
@@ -400,6 +1025,37 @@ function XHSBotBrain:ComputeCombatThreat(hero, enemies, record)
 					pressure = pressure + 0.14
 				end
 			end
+			local attackRange = 150
+			if enemy.Script_GetAttackRange ~= nil then
+				local ok, value = pcall(function()
+					return enemy:Script_GetAttackRange()
+				end)
+				if ok then attackRange = math.max(0, tonumber(value) or attackRange) end
+			end
+			local focused = false
+			if enemy.GetAttackTarget ~= nil then
+				local ok, attackTarget = pcall(function()
+					return enemy:GetAttackTarget()
+				end)
+				focused = ok and attackTarget == hero
+			end
+			local reachFactor = focused and 1
+				or distance <= attackRange + 175 and 0.82
+				or distance <= attackRange + 550 and 0.38
+				or 0.08
+			local isHero = false
+			if enemy.IsHero ~= nil then
+				local ok, value = pcall(function() return enemy:IsHero() end)
+				isHero = ok and value == true
+			end
+			table.insert(forecastEnemies, {
+				projected_dps = self:GetAttackDamageAgainst(enemy, hero)
+					* self:GetUnitAttacksPerSecond(enemy),
+				reach_factor = reachFactor,
+				focused = focused,
+				disable_risk = XHSBotConfig:IsBossTarget(enemy) and 0.34
+					or isHero and 0.18 or 0.03,
+			})
 		end
 	end
 
@@ -417,11 +1073,43 @@ function XHSBotBrain:ComputeCombatThreat(hero, enemies, record)
 	local supportReduction = math.min(0.22, alliedHeroes * 0.055 + ownedScreens * 0.028)
 	local isolation = closeEnemies >= 2 and alliedHeroes == 0 and ownedScreens == 0
 		and 0.12 or 0
-	local threat = Clamp(
+	local legacyThreat = Clamp(
 		pressure
 			+ math.min(0.55, recentDamageRate * 2.4)
 			+ isolation
 			- supportReduction,
+		0,
+		1.5
+	)
+	local lifestealPercent, lifestealUptime =
+		self:GetForecastAttackLifesteal(hero, profile)
+	local reactionTime = difficulty ~= nil and (
+		(tonumber(difficulty.reaction_min) or 0)
+			+ (tonumber(difficulty.reaction_max) or 0)
+	) / 2 or 0.45
+	local forecast = XHSBotWorldModel:EstimateSurvival({
+		maximum_health = maximumHealth,
+		current_health = currentHealth,
+		recent_damage_rate = recentDamageRate,
+		enemies = forecastEnemies,
+		health_regen = self:GetUnitHealthRegen(hero),
+		attack_dps = self:GetHeroAttackDPSAgainst(hero, target),
+		attack_lifesteal_pct = lifestealPercent,
+		combat_uptime = self:IsCombatTarget(target)
+			and lifestealUptime or math.min(0.18, lifestealUptime),
+		cover_reduction = supportReduction,
+		reaction_time = reactionTime,
+		movement_speed = self:GetUnitMovementSpeed(hero),
+		escape_distance = focusedBy >= 2 and 800 or 600,
+		safety_margin = 0.45,
+	})
+	-- Preserve the proven pressure heuristic as the floor. The forecast may
+	-- raise it only by a bounded amount while runtime telemetry is accumulated.
+	local threat = Clamp(
+		math.max(
+			legacyThreat,
+			math.min(legacyThreat + 0.22, forecast.pressure_score)
+		),
 		0,
 		1.5
 	)
@@ -431,6 +1119,20 @@ function XHSBotBrain:ComputeCombatThreat(hero, enemies, record)
 	record.focused_by_count = focusedBy
 	record.nearby_screen_count = ownedScreens
 	record.boss_threat_nearby = bossNearby
+	record.survival_incoming_dps = math.floor(forecast.incoming_dps)
+	record.survival_net_incoming_dps = math.floor(forecast.net_incoming_dps)
+	record.survival_sustain_per_second =
+		math.floor(forecast.sustain_per_second)
+	record.survival_time_to_die =
+		math.floor(forecast.time_to_die * 10) / 10
+	record.survival_escape_time =
+		math.floor(forecast.escape_time * 10) / 10
+	record.survival_control_risk =
+		math.floor(forecast.control_risk * 100) / 100
+	record.survival_forecast_confidence =
+		math.floor(forecast.confidence * 100) / 100
+	record.survival_fatal_before_escape =
+		forecast.fatal_before_escape == true
 	return {
 		score = threat,
 		recent_damage_ratio = recentDamageRatio,
@@ -440,20 +1142,41 @@ function XHSBotBrain:ComputeCombatThreat(hero, enemies, record)
 		allied_heroes = alliedHeroes,
 		owned_screens = ownedScreens,
 		boss_nearby = bossNearby,
+		incoming_dps = forecast.incoming_dps,
+		net_incoming_dps = forecast.net_incoming_dps,
+		sustain_per_second = forecast.sustain_per_second,
+		time_to_die = forecast.time_to_die,
+		escape_time = forecast.escape_time,
+		health_at_escape_ratio = forecast.health_at_escape_ratio,
+		fatal_before_escape = forecast.fatal_before_escape,
+		control_risk = forecast.control_risk,
+		forecast_confidence = forecast.confidence,
 	}
 end
 
-function XHSBotBrain:GetRetreatPosition(hero, target, assignment, threat)
+function XHSBotBrain:GetRetreatPosition(
+	hero,
+	target,
+	assignment,
+	threat,
+	mobileSafeZone,
+	profile,
+	strategicThreatPosition
+)
 	local heroOrigin = hero:GetAbsOrigin()
+	local fortPosition = GetFortPosition()
+	if Distance2D(heroOrigin, fortPosition) <= ANCIENT_RETREAT_LIMIT_RADIUS then
+		return CopyPosition(fortPosition), "Ancient retreat limit"
+	end
 	if self:IsCombatTarget(target) then
 		local bestUnit = nil
 		local bestScore = -math.huge
 		for _, ally in pairs(self:GetNearbyFriendlyCover(hero, 1050)) do
 			if IsValidEntityHandle(ally) and ally ~= hero and ally:IsAlive() then
 				local isScreen = self:IsOwnedScreenUnit(hero, ally)
-				local isHero = ally.IsRealHero ~= nil and ally:IsRealHero()
-				if isScreen or isHero then
-					local score = (isScreen and 250 or 100)
+				local isMobileSafeZone = ally == mobileSafeZone
+				if isScreen or isMobileSafeZone then
+					local score = (isScreen and 250 or 285)
 						- Distance2D(heroOrigin, ally:GetAbsOrigin()) * 0.12
 					if score > bestScore then
 						bestScore = score
@@ -463,14 +1186,24 @@ function XHSBotBrain:GetRetreatPosition(hero, target, assignment, threat)
 			end
 		end
 		if bestUnit ~= nil then
-			local away = bestUnit:GetAbsOrigin() - target:GetAbsOrigin()
+			local pressurePosition = strategicThreatPosition
+				or select(1, self:GetStrategicThreatPosition(
+					hero,
+					target,
+					assignment
+				))
+				or target:GetAbsOrigin()
+			local away = bestUnit:GetAbsOrigin() - pressurePosition
 			away.z = 0
 			if away:Length2D() > 1 then
-				local behindCover = bestUnit:GetAbsOrigin() + away:Normalized() * 170
+				local behindCover = bestUnit:GetAbsOrigin()
+					+ away:Normalized()
+						* self:GetCoverFormationDistance(hero, profile)
 				if GridNav == nil or GridNav.CanFindPath == nil
 					or GridNav:CanFindPath(heroOrigin, behindCover) then
 					return behindCover, self:IsOwnedScreenUnit(hero, bestUnit)
-						and "owned summon screen" or "ally screen"
+						and "owned summon screen"
+						or "threat-opposite strong ally safe zone"
 				end
 			end
 		end
@@ -483,7 +1216,7 @@ function XHSBotBrain:GetRetreatPosition(hero, target, assignment, threat)
 	end
 	return PositionToward(
 		heroOrigin,
-		GetFortPosition(),
+		fortPosition,
 		threat.score >= 0.85 and 800 or 575
 	), "step toward base"
 end
@@ -816,10 +1549,42 @@ function XHSBotBrain:BuildAbilityAction(hero, ability, rule, target, enemies, di
 		self:RecordAbilityRejection(record, name, "cooldown or mana")
 		return nil
 	end
+	local creepSpellEfficiency = nil
+	if rule.mode == "enemy_unit"
+		and self:IsEfficiencyCreepTarget(target) then
+		creepSpellEfficiency = self:EvaluateSingleTargetCreepSpell(
+			hero,
+			ability,
+			target,
+			rule
+		)
+		record.single_spell_efficiency = creepSpellEfficiency ~= nil
+			and tonumber(creepSpellEfficiency.efficiency) or 0
+		record.single_spell_time_saved = creepSpellEfficiency ~= nil
+			and tonumber(creepSpellEfficiency.time_saved) or 0
+		record.single_spell_target = IsValidEntityHandle(target)
+			and target:entindex() or nil
+		if creepSpellEfficiency == nil
+			or creepSpellEfficiency.worthwhile ~= true then
+			local rejection = creepSpellEfficiency ~= nil
+				and creepSpellEfficiency.reason
+				or "single spell efficiency unavailable"
+			self:RecordAbilityRejection(
+				record,
+				name,
+				rejection or "single spell less efficient than attacks"
+			)
+			return nil
+		end
+	end
 	local emergencySelfHeal = (rule.mode == "ally_heal" or rule.healing == true)
 		and (rule.include_self ~= false or rule.heals_caster == true)
 		and HealthRatio(hero) <= (tonumber(rule.self_save_threshold) or 0.40)
 	if not emergencySelfHeal
+		and not (
+			creepSpellEfficiency ~= nil
+			and creepSpellEfficiency.worthwhile == true
+		)
 		and not self:CanConsiderAbility(record, name, difficulty) then return nil end
 	record.casts_considered = (record.casts_considered or 0) + 1
 	local mode = rule.mode
@@ -842,6 +1607,22 @@ function XHSBotBrain:BuildAbilityAction(hero, ability, rule, target, enemies, di
 		end
 		action.target = target
 		if XHSBotConfig:IsBossTarget(target) and rule.prefer_boss then action.score = action.score + 12 end
+		if creepSpellEfficiency ~= nil then
+			action.score = action.score + math.min(
+				28,
+				math.max(0, creepSpellEfficiency.efficiency - 1) * 9
+					+ math.max(0, creepSpellEfficiency.time_saved) * 3
+			)
+			action.reason = string.format(
+				"creep spell efficient: %.0f post-reduction vs %.0f attack, "
+					.. "%.2fs cast, %.2fs saved, x%.2f",
+				creepSpellEfficiency.spell_damage,
+				creepSpellEfficiency.attack_damage,
+				creepSpellEfficiency.cast_lock,
+				creepSpellEfficiency.time_saved,
+				creepSpellEfficiency.efficiency
+			)
+		end
 	elseif mode == "ally_heal" then
 		local ally, allyScore, ratio, context = self:FindBestAllyAbilityTarget(
 			hero,
@@ -1131,6 +1912,26 @@ function XHSBotBrain:FindFirstLearnedAbility(hero, abilityNames)
 	return nil
 end
 
+function XHSBotBrain:CanSustainRifleMode(hero, ability, rule)
+	if not IsValidEntityHandle(hero) or not IsValidEntityHandle(ability) then
+		return false
+	end
+	local manaCost = 0
+	if ability.GetManaCost ~= nil then
+		local ok, value = pcall(function()
+			return ability:GetManaCost(math.max(0, ability:GetLevel() - 1))
+		end)
+		if ok then manaCost = math.max(0, tonumber(value) or 0) end
+	end
+	if manaCost <= 0 then return true end
+	local maximumMana = math.max(1, tonumber(hero:GetMaxMana()) or 1)
+	local minimumMana = math.max(
+		maximumMana * (tonumber(rule.minimum_mana_ratio) or 0.05),
+		manaCost * math.max(1, tonumber(rule.minimum_mode_attacks) or 2)
+	)
+	return hero:GetMana() >= minimumMana
+end
+
 function XHSBotBrain:BuildRifleAttackModeAction(hero, rule, target, enemies, record)
 	if type(rule) ~= "table" then return nil end
 
@@ -1149,10 +1950,16 @@ function XHSBotBrain:BuildRifleAttackModeAction(hero, rule, target, enemies, rec
 	end
 
 	local targetIsValid = self:IsCombatTarget(target)
-	local manaReady = ManaRatio(hero) >= (tonumber(rule.minimum_mana_ratio) or 0.18)
 	local desiredMode = nil
 	local nearbyTargetCount = 0
-	if targetIsValid and manaReady then
+	local now = GameRules:GetGameTime()
+	local targetIndex = targetIsValid and target:entindex() or nil
+	local previousTargetIndex = record.rifle_attack_mode_target_entindex
+	local targetChanged = targetIndex ~= nil
+		and targetIndex ~= previousTargetIndex
+	if targetIsValid then
+		record.rifle_attack_mode_target_entindex = targetIndex
+		record.rifle_attack_mode_target_seen_at = now
 		nearbyTargetCount = self:CountEnemiesAround(
 			enemies,
 			target:GetAbsOrigin(),
@@ -1172,22 +1979,31 @@ function XHSBotBrain:BuildRifleAttackModeAction(hero, rule, target, enemies, rec
 				desiredMode = nearbyTargetCount >= enterTargets and "cleave" or "single"
 			end
 		end
-	end
-
-	local now = GameRules:GetGameTime()
-	if desiredMode ~= nil
-		and activeMode ~= nil
-		and desiredMode ~= activeMode
-		and not XHSBotConfig:IsBossTarget(target)
-		and now < (record.rifle_attack_mode_hold_until or 0) then
+	elseif activeMode ~= nil
+		and now - (record.rifle_attack_mode_target_seen_at or -math.huge)
+			<= (tonumber(rule.target_loss_grace) or 0.45) then
 		desiredMode = activeMode
 	end
 
 	local desiredAbility = desiredMode == "cleave" and cleaveAbility
 		or desiredMode == "single" and singleAbility
 		or nil
-	if desiredAbility == nil and desiredMode ~= nil then
+	if desiredAbility ~= nil
+		and not self:CanSustainRifleMode(hero, desiredAbility, rule) then
+		desiredAbility = nil
 		desiredMode = nil
+	elseif desiredAbility == nil and desiredMode ~= nil then
+		desiredMode = nil
+	end
+
+	if desiredMode ~= nil
+		and activeMode ~= nil
+		and desiredMode ~= activeMode
+		and not XHSBotConfig:IsBossTarget(target)
+		and now < (record.rifle_attack_mode_hold_until or 0)
+		and not (rule.target_change_override == true and targetChanged) then
+		desiredMode = activeMode
+		desiredAbility = activeAbility
 	end
 
 	if desiredMode == activeMode
@@ -1205,7 +2021,7 @@ function XHSBotBrain:BuildRifleAttackModeAction(hero, rule, target, enemies, rec
 	if desiredMode ~= nil and desiredMode ~= record.rifle_attack_mode then
 		record.rifle_attack_mode = desiredMode
 		record.rifle_attack_mode_hold_until = now
-			+ (tonumber(rule.minimum_mode_duration) or 1.35)
+			+ (tonumber(rule.minimum_mode_duration) or 0.35)
 	end
 
 	local reason = "disable rifle attack mode"
@@ -1267,8 +2083,32 @@ function XHSBotBrain:FilterNoCombatAbilityActions(actions)
 	return safe
 end
 
-function XHSBotBrain:GetRepositionPosition(hero, target, profile, anchor)
+function XHSBotBrain:GetRepositionPosition(
+	hero,
+	target,
+	profile,
+	anchor,
+	mobileSafeZone,
+	strategicThreatPosition
+)
 	if not self:IsCombatTarget(target) then return anchor end
+	if IsValidEntityHandle(mobileSafeZone) then
+		local threatPosition = strategicThreatPosition
+			or select(1, self:GetStrategicThreatPosition(
+				hero,
+				target,
+				nil
+			))
+			or target:GetAbsOrigin()
+		local awayFromThreat =
+			mobileSafeZone:GetAbsOrigin() - threatPosition
+		awayFromThreat.z = 0
+		if awayFromThreat:Length2D() > 1 then
+			return mobileSafeZone:GetAbsOrigin()
+				+ awayFromThreat:Normalized()
+					* self:GetCoverFormationDistance(hero, profile)
+		end
+	end
 	local away = hero:GetAbsOrigin() - target:GetAbsOrigin()
 	away.z = 0
 	if away:Length2D() <= 1 then away = RandomVector(1) end
@@ -1401,11 +2241,12 @@ function XHSBotBrain:BuildContext(playerID, hero, profile, difficulty, record, a
 	local anchor = encounter and encounter.anchor
 		or assignment and assignment.anchor
 		or GetFortPosition()
-	local danger, dangerEntries = XHSBotDangerRegistry:GetDangerAt(
+	local rawDanger, dangerEntries = XHSBotDangerRegistry:GetDangerAt(
 		hero:GetAbsOrigin(),
 		now,
 		difficulty.danger_reaction_lead
 	)
+	local danger = rawDanger
 	self:UpdateDangerTelemetry(hero, record, dangerEntries, now, difficulty.think_interval)
 	if danger > 0 then
 		if now >= (record.next_danger_response_choice or 0) then
@@ -1438,14 +2279,54 @@ function XHSBotBrain:BuildContext(playerID, hero, profile, difficulty, record, a
 		record.next_attack_move_choice = now + 2
 	end
 	local assignmentGoal = assignment and assignment.goal or "regroup"
-	local threat = self:ComputeCombatThreat(hero, enemies, record)
-	local defensiveCover, defensiveCoverDistance = self:GetDefensiveStructureCover(hero, 950)
-	local lastStand = defensiveCover ~= nil and target ~= nil
+	local threat = self:ComputeCombatThreat(
+		hero,
+		enemies,
+		record,
+		profile,
+		difficulty,
+		target
+	)
+	local inFarmEvent = GameMode ~= nil and GameMode.FarmEvent_occuring == true
+	local defensiveCover, defensiveCoverDistance = nil, nil
+	local mobileSafeZone, mobileSafeZoneStrength, mobileSafeZoneDistance = nil, nil, nil
+	if not inFarmEvent then
+		defensiveCover, defensiveCoverDistance = self:GetDefensiveStructureCover(hero, 950)
+		mobileSafeZone, mobileSafeZoneStrength, mobileSafeZoneDistance =
+			self:GetMobileSafeZone(hero, target, 1150)
+	end
+	local fortPosition = GetFortPosition()
+	local fortDistance = Distance2D(hero:GetAbsOrigin(), fortPosition)
+	local campfire = self:GetCampfireState(hero)
+	local baseLastStand = target ~= nil
+		and fortDistance <= BASE_LAST_STAND_RADIUS
+		and (threat.close_enemies > 0
+			or threat.focused_by > 0
+			or threat.score >= 0.18)
+	local mobileLastStand = mobileSafeZone ~= nil
+		and mobileSafeZoneDistance <= 700
+	local lastStand = target ~= nil
+		and (defensiveCover ~= nil or baseLastStand or mobileLastStand)
+	record.base_last_stand = baseLastStand
+	record.campfire_distance = campfire.distance < math.huge
+		and math.floor(campfire.distance) or -1
+	record.campfire_inside = campfire.inside
+	record.mobile_safe_zone_entindex = mobileSafeZone ~= nil
+		and mobileSafeZone:entindex() or nil
+	record.mobile_safe_zone_strength = mobileSafeZoneStrength ~= nil
+		and math.floor(mobileSafeZoneStrength * 100) / 100 or 0
+	local strategicThreatPosition, strategicThreatSource =
+		self:GetStrategicThreatPosition(hero, target, assignment)
+	record.strategic_threat_source = strategicThreatSource
+	record.strategic_threat_position = strategicThreatPosition
 	local retreatPosition, retreatCover = self:GetRetreatPosition(
 		hero,
 		target,
 		assignment,
-		threat
+		threat,
+		mobileSafeZone,
+		profile,
+		strategicThreatPosition
 	)
 	if encounter ~= nil
 		and (encounter.id == "phase_3"
@@ -1463,7 +2344,8 @@ function XHSBotBrain:BuildContext(playerID, hero, profile, difficulty, record, a
 		baseRetreatThreshold
 			+ threat.score * math.min(0.07, difficulty.threat_retreat_weight or 0.07)
 			+ threat.recent_damage_ratio * math.min(0.40, difficulty.damage_spike_retreat_weight or 0.40)
-			+ (threat.focused_by >= 2 and 0.04 or 0),
+			+ (threat.focused_by >= 2 and 0.04 or 0)
+			+ (threat.fatal_before_escape == true and 0.06 or 0),
 		baseRetreatThreshold,
 		math.min(difficulty.maximum_retreat_health or 0.68, baseRetreatThreshold + 0.14)
 	)
@@ -1482,6 +2364,37 @@ function XHSBotBrain:BuildContext(playerID, hero, profile, difficulty, record, a
 	if encounter ~= nil and encounter.no_combat == true then
 		abilityActions = self:FilterNoCombatAbilityActions(abilityActions)
 	end
+	local creepLevel = math.max(
+		1,
+		tonumber(CustomTimers and CustomTimers.creep_level) or 1
+	)
+	local urgentShopping = assignmentGoal == "shop"
+		and assignment ~= nil
+		and assignment.shopping_urgent == true
+	local runeStrategicallyAllowed = encounter == nil
+		and not baseLastStand
+		and (
+			assignmentGoal ~= "shop"
+			or creepLevel >= 2 and not urgentShopping
+		)
+		and assignmentGoal ~= "defend_base"
+		and assignmentGoal ~= "hold"
+		and assignmentGoal ~= "dead"
+		and assignmentGoal ~= "selecting_hero"
+	local runeObjective = runeStrategicallyAllowed
+		and self:FindRuneObjective(hero, record, difficulty, now) or nil
+	if not runeStrategicallyAllowed then
+		self:ReleaseRuneClaim(playerID, record)
+	end
+	if runeObjective ~= nil then
+		record.rune_target_id = runeObjective.id
+		record.rune_target_type = runeObjective.type
+		record.rune_target_distance = math.floor(runeObjective.distance)
+	else
+		record.rune_target_id = nil
+		record.rune_target_type = nil
+		record.rune_target_distance = nil
+	end
 	return {
 		alive = hero:IsAlive(),
 		disabled = hero:IsStunned()
@@ -1492,13 +2405,33 @@ function XHSBotBrain:BuildContext(playerID, hero, profile, difficulty, record, a
 		retreat_position = retreatPosition,
 		retreat_cover = retreatCover,
 		last_stand = lastStand,
+		base_last_stand = baseLastStand,
 		defensive_cover = defensiveCover,
 		defensive_cover_distance = defensiveCoverDistance,
+		mobile_safe_zone = mobileSafeZone,
+		mobile_safe_zone_strength = mobileSafeZoneStrength,
+		mobile_safe_zone_distance = mobileSafeZoneDistance,
+		strategic_threat_position = strategicThreatPosition,
+		strategic_threat_source = strategicThreatSource,
+		campfire_position = campfire.position or fortPosition,
+		campfire_distance = campfire.distance,
+		campfire_radius = campfire.radius,
+		inside_campfire = campfire.inside,
 		combat_threat = threat.score,
 		recent_damage_ratio = threat.recent_damage_ratio,
 		focused_by = threat.focused_by,
 		close_enemies = threat.close_enemies,
+		incoming_dps = threat.incoming_dps,
+		net_incoming_dps = threat.net_incoming_dps,
+		sustain_per_second = threat.sustain_per_second,
+		time_to_die = threat.time_to_die,
+		escape_time = threat.escape_time,
+		health_at_escape_ratio = threat.health_at_escape_ratio,
+		fatal_before_escape = threat.fatal_before_escape,
+		control_risk = threat.control_risk,
+		forecast_confidence = threat.forecast_confidence,
 		danger = danger,
+		raw_danger = rawDanger,
 		danger_entries = dangerEntries,
 		safe_position = safePosition,
 		channel_interrupt_danger = difficulty.channel_interrupt_danger,
@@ -1508,12 +2441,24 @@ function XHSBotBrain:BuildContext(playerID, hero, profile, difficulty, record, a
 			and not lastStand and targetDistance ~= nil
 			and profile.preferred_range >= 450
 			and targetDistance < profile.safety_distance,
-		reposition_position = self:GetRepositionPosition(hero, target, profile, anchor),
+		reposition_position = self:GetRepositionPosition(
+			hero,
+			target,
+			profile,
+			anchor,
+			mobileSafeZone,
+			strategicThreatPosition
+		),
 		ability_actions = abilityActions,
 		anchor = anchor,
 		anchor_distance = Distance2D(hero:GetAbsOrigin(), anchor),
 		assignment_urgency = assignment and assignment.urgency or 0,
-		shopping = assignmentGoal == "shop",
+		shopping = assignmentGoal == "shop"
+			and not (
+				runeObjective ~= nil
+				and creepLevel >= 2
+				and not urgentShopping
+			),
 		shopping_urgent = assignmentGoal == "shop"
 			and assignment.shopping_urgent == true,
 		returning_to_lane = returningToLane,
@@ -1527,6 +2472,15 @@ function XHSBotBrain:BuildContext(playerID, hero, profile, difficulty, record, a
 		encounter_no_combat = encounter and encounter.no_combat == true,
 		encounter_reached_distance = encounter and encounter.reached_distance or 180,
 		no_retreat = encounter and encounter.no_retreat == true,
+		rune_position = runeObjective and runeObjective.position or nil,
+		rune_distance = runeObjective and runeObjective.distance or nil,
+		rune_type = runeObjective and runeObjective.type or nil,
+		rune_id = runeObjective and runeObjective.id or nil,
+		rune_priority = difficulty.rune_priority,
+		rune_threat_ceiling = difficulty.rune_threat_ceiling,
+		rune_health_margin = difficulty.rune_health_margin,
+		rune_progression_critical = creepLevel >= 2,
+		creep_level = creepLevel,
 	}
 end
 
@@ -1575,6 +2529,10 @@ function XHSBotBrain:ActionState(action, assignment, target, encounter)
 	if encounter ~= nil and encounter.farm == true then
 		return "FARM_EVENT"
 	end
+	if action.id == "move_to_objective"
+		and action.data ~= nil and action.data.objective == "rune" then
+		return "COLLECTING_RUNE"
+	end
 	local states = {
 		dead = "DEAD",
 		wait = "DISABLED",
@@ -1622,6 +2580,7 @@ function XHSBotBrain:Think(playerID, hero, record, assignment, difficulty)
 		return
 	end
 	if not hero:IsAlive() then
+		self:ReleaseRuneClaim(playerID, record)
 		record.death_started_at = record.death_started_at or GameRules:GetGameTime()
 		record.alive = false
 		record.state = "DEAD"
@@ -1687,6 +2646,8 @@ function XHSBotBrain:Think(playerID, hero, record, assignment, difficulty)
 	record.state = self:ActionState(best, assignment, context.target, encounter)
 	record.last_decision = best.id
 	record.last_decision_reason = best.reason
+	record.rune_committed = best.data ~= nil
+		and best.data.objective == "rune"
 	record.top_actions = {}
 	for index = 1, math.min(3, #actions) do
 		table.insert(record.top_actions, {

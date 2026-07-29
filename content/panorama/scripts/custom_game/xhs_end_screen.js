@@ -44,6 +44,7 @@ var XHSEndScreen = (function () {
 	var fallbackTimerStarted = false;
 	var shownRewardKeys = {};
 	var lastEndGameData = null;
+	var farmLeaderboardVisible = false;
 
 	function Panel(id) {
 		return $("#" + id);
@@ -185,6 +186,158 @@ var XHSEndScreen = (function () {
 
 		var localized = $.Localize(value);
 		return localized === value ? value.replace("#", "") : localized;
+	}
+
+	function LocalizeMaybeKey(value) {
+		if (!value) {
+			return "";
+		}
+		var token = value.toString();
+		if (token.charAt(0) !== "#") {
+			token = "#" + token;
+		}
+		return Localize(token);
+	}
+
+	function ResolveRewardImageURL(imagePath) {
+		var path = (imagePath || "").toString().replace(/\\/g, "/");
+		path = path.replace(/^file:\/\/\{images\}\//, "");
+		path = path.replace(/^s2r:\/\/panorama\/images\//, "");
+		path = path.replace(/_png\.vtex$/, "");
+		path = path.replace(/\.png$/, "");
+		if (!path) {
+			path = "battlepass/battlepass_new";
+		}
+		if (path.indexOf("custom_game/") === 0) {
+			return "file://{images}/" + path + ".png";
+		}
+		if (path.indexOf("econ/") === 0 || path.indexOf("heroes/") === 0 ||
+			path.indexOf("items/") === 0 || path.indexOf("spellicons/") === 0) {
+			return "s2r://panorama/images/" + path + "_png.vtex";
+		}
+		return "file://{images}/custom_game/" + path + ".png";
+	}
+
+	function DisplaySupporterRewardType(reward) {
+		var type = ((reward && (reward.type || reward.item_type || reward.slot_id)) || "reward").toString().toLowerCase();
+		var aliases = {
+			teleport: "xhs_sp_type_teleport",
+			teleport_fx: "xhs_sp_type_teleport",
+			levelup: "xhs_sp_type_tome",
+			tome: "xhs_sp_type_tome",
+			tome_fx: "xhs_sp_type_tome",
+			kill_effect: "xhs_sp_type_kill",
+			kill_fx: "xhs_sp_type_kill",
+			emblem: "xhs_sp_type_emblem",
+			companion: "xhs_sp_type_companion",
+			courier: "xhs_sp_type_companion",
+			effigy: "xhs_sp_type_effigy",
+			statue: "xhs_sp_type_effigy",
+			potion: "xhs_sp_type_potion",
+			bottle: "xhs_sp_type_potion",
+			mekansm: "xhs_sp_type_potion",
+			rebirth: "xhs_sp_type_rebirth",
+			ankh: "xhs_sp_type_rebirth",
+			attack_lifesteal: "xhs_sp_type_attack_lifesteal",
+			spell_lifesteal: "xhs_sp_type_spell_lifesteal",
+			regen_aura: "xhs_sp_type_regen_aura",
+			fountain: "xhs_sp_type_regen_aura",
+			immolation: "xhs_sp_type_immolation",
+			radiance: "xhs_sp_type_immolation",
+			high_five: "xhs_sp_type_high_five",
+			highfive: "xhs_sp_type_high_five",
+			title: "xhs_sp_type_title",
+			account_title: "xhs_sp_type_title",
+			fragment: "xhs_sp_type_fragments",
+			fragments: "xhs_sp_type_fragments",
+		};
+		if (aliases[type]) {
+			return Localize("#" + aliases[type]);
+		}
+		return type.replace(/_/g, " ").replace(/\b\w/g, function (letter) {
+			return letter.toUpperCase();
+		});
+	}
+
+	function CollectSupporterRewards(value, result, depth) {
+		if (!value || typeof value !== "object" || depth > 4) {
+			return;
+		}
+
+		var hasLevel = value.level !== undefined || value.level_required !== undefined;
+		var hasIdentity = value.reward_id !== undefined || value.item_id !== undefined ||
+			value.catalog_item_id !== undefined || value.name !== undefined || value.item_name !== undefined;
+		if (hasLevel && hasIdentity) {
+			result.push(value);
+			return;
+		}
+
+		for (var key in value) {
+			if (value.hasOwnProperty(key) && value[key] && typeof value[key] === "object") {
+				CollectSupporterRewards(value[key], result, depth + 1);
+			}
+		}
+	}
+
+	function GetTrackChunkKey(index, chunkIndex) {
+		var keys = index && index.chunk_keys;
+		if (Object.prototype.toString.call(keys) === "[object Array]") {
+			return keys[chunkIndex - 1] || "";
+		}
+		if (keys && typeof keys === "object") {
+			return keys[chunkIndex] || keys[chunkIndex.toString()] || "";
+		}
+		return "";
+	}
+
+	function CollectPublishedSupporterRewards(tableName, result) {
+		var index = CustomNetTables.GetTableValue(tableName, "rewards") || {};
+		var chunkCount = Math.max(0, Math.floor(ToNumber(index.chunk_count, 0)));
+		if (chunkCount <= 0) {
+			CollectSupporterRewards(index, result, 0);
+			return;
+		}
+
+		for (var chunkIndex = 1; chunkIndex <= chunkCount; chunkIndex++) {
+			var key = GetTrackChunkKey(index, chunkIndex);
+			if (!key) {
+				key = "chunk_" + (chunkIndex < 10 ? "0" : "") + chunkIndex;
+			}
+			var chunk = CustomNetTables.GetTableValue(tableName, key);
+			CollectSupporterRewards(chunk, result, 0);
+		}
+	}
+
+	function GetSupporterRewardAtLevel(track, level) {
+		var tableName = track === "premium" ? "supporter_pass_rewards_premium" : "supporter_pass_rewards_free";
+		var rewards = [];
+		CollectPublishedSupporterRewards(tableName, rewards);
+		var best = null;
+		var bestPriority = -1;
+		for (var i = 0; i < rewards.length; i++) {
+			var reward = rewards[i] || {};
+			if (Math.floor(ToNumber(reward.level_required || reward.level, 0)) !== level) {
+				continue;
+			}
+			var priority = 0;
+			if ((reward.season_id || reward.season || "").toString() === "2026") {
+				priority += 100;
+			}
+			if ((reward.reward_id || reward.id || "").toString().toLowerCase().indexOf("sp26_") === 0) {
+				priority += 50;
+			}
+			if (reward.legacy !== true && reward.legacy !== 1 && reward.legacy !== "1") {
+				priority += 20;
+			}
+			if (ToNumber(reward.item_id || reward.catalog_item_id, 0) >= 41) {
+				priority += 10;
+			}
+			if (priority >= bestPriority) {
+				best = reward;
+				bestPriority = priority;
+			}
+		}
+		return best;
 	}
 
 	function ResolvePlayerIdentity(model) {
@@ -431,6 +584,39 @@ var XHSEndScreen = (function () {
 		return merged;
 	}
 
+	function GetInventoryItemName(item) {
+		if (!item) {
+			return "";
+		}
+		if (typeof item === "string") {
+			return item;
+		}
+		return (item.item_name || item.itemname || item.ability_name || item.name || "").toString();
+	}
+
+	function GetPlayerMainInventory(server, playerID) {
+		var inventory = ["", "", "", "", "", ""];
+		var liveItems = Safe(function () {
+			return Game.GetPlayerItems(playerID);
+		}, null);
+		var hasLiveInventory = !!(liveItems && liveItems.inventory);
+
+		if (hasLiveInventory) {
+			for (var slot = 0; slot < inventory.length; slot++) {
+				inventory[slot] = GetInventoryItemName(liveItems.inventory[slot]);
+			}
+		}
+
+		if (!hasLiveInventory) {
+			var snapshotItems = TableToArray(server && server.items);
+			for (var inventorySlot = 0; inventorySlot < inventory.length && inventorySlot < snapshotItems.length; inventorySlot++) {
+				inventory[inventorySlot] = GetInventoryItemName(snapshotItems[inventorySlot]);
+			}
+		}
+
+		return inventory;
+	}
+
 	function BuildPlayerModel(data, playerID) {
 		var info = Safe(function () {
 			return Game.GetPlayerInfo(playerID);
@@ -474,6 +660,7 @@ var XHSEndScreen = (function () {
 			name: Safe(function () { return Players.GetPlayerName(playerID); }, info ? info.player_name : "Player " + (playerID + 1)),
 			hero: heroName,
 			heroLabel: Localize("#" + heroName),
+			inventory: GetPlayerMainInventory(server, playerID),
 			team: team,
 			kills: ToNumber(server.kills, info ? info.player_kills : 0),
 			deaths: ToNumber(server.deaths, info ? info.player_deaths : 0),
@@ -765,6 +952,7 @@ var XHSEndScreen = (function () {
 		if (!parent) {
 			return;
 		}
+		parent.RemoveClass("IsFarmLeaderboard");
 
 		var kills = FindMvp(players, "kills");
 		var tomes = FindMvp(players, "tomeStatsBonus");
@@ -783,6 +971,122 @@ var XHSEndScreen = (function () {
 		CreateMvpCard(parent, "Most Self Healing", selfHealing.model, selfHealing.value, FormatNumber, "MvpSustain", "XHSMvpCardLast");
 	}
 
+	function GetFarmLeaderboardState() {
+		return CustomNetTables.GetTableValue("xhs_farm_leaderboard", "state") || {};
+	}
+
+	function GetFarmPlayerModel(playerID) {
+		var hero = Safe(function () { return Players.GetPlayerSelectedHero(playerID); }, "");
+		return {
+			id: playerID,
+			name: Safe(function () { return Players.GetPlayerName(playerID); }, ""),
+			hero: hero,
+			heroLabel: Localize("#" + hero),
+		};
+	}
+
+	function GetFarmLeaderboardPlayers() {
+		var players = TableToArray(GetFarmLeaderboardState().players);
+		players.sort(function (a, b) {
+			var rankA = ToNumber(a.rank, 999);
+			var rankB = ToNumber(b.rank, 999);
+			if (rankA !== rankB) {
+				return rankA - rankB;
+			}
+			return ToNumber(b.kills, 0) - ToNumber(a.kills, 0);
+		});
+		return players;
+	}
+
+	function RenderFarmLeaderboard() {
+		var parent = Panel("XHSEndScreenMvpCards");
+		ClearPanel(parent);
+		if (!parent) {
+			return;
+		}
+		parent.AddClass("IsFarmLeaderboard");
+
+		var heading = $.CreatePanel("Panel", parent, "");
+		heading.AddClass("XHSEndFarmHeader");
+		var headingTitle = $.CreatePanel("Label", heading, "");
+		headingTitle.AddClass("XHSEndFarmTitle");
+		headingTitle.text = "FARM EVENT";
+		var headingNote = $.CreatePanel("Label", heading, "");
+		headingNote.AddClass("XHSEndFarmNote");
+		headingNote.text = "FINAL LEADERBOARD";
+
+		var players = GetFarmLeaderboardPlayers();
+		if (players.length === 0) {
+			var empty = $.CreatePanel("Label", parent, "");
+			empty.AddClass("XHSEndFarmEmpty");
+			empty.text = "No Farm Event results available.";
+			return;
+		}
+
+		for (var index = 0; index < players.length; index++) {
+			var player = players[index];
+			var playerID = ToNumber(player.player_id, -1);
+			var rank = Math.max(1, ToNumber(player.rank, index + 1));
+			var model = GetFarmPlayerModel(playerID);
+			var row = $.CreatePanel("Panel", parent, "");
+			row.AddClass("XHSEndFarmRow");
+			row.SetHasClass("IsWinner", rank === 1);
+
+			var rankLabel = $.CreatePanel("Label", row, "");
+			rankLabel.AddClass("XHSEndFarmRank");
+			rankLabel.text = rank === 1 ? "\u2605" : String(rank);
+
+			var heroImage = $.CreatePanel("DOTAHeroImage", row, "");
+			heroImage.AddClass("XHSEndFarmHero");
+			heroImage.heroimagestyle = "landscape";
+			heroImage.heroname = model.hero;
+
+			var copy = $.CreatePanel("Panel", row, "");
+			copy.AddClass("XHSEndFarmCopy");
+			var name = $.CreatePanel("Label", copy, "");
+			name.AddClass("XHSEndFarmName");
+			name.text = ResolvePlayerIdentity(model);
+			var stage = $.CreatePanel("Label", copy, "");
+			stage.AddClass("XHSEndFarmStage");
+			stage.text = "LEVEL " + Math.max(1, ToNumber(player.level, 1)) +
+				"  \u00B7  WAVE " + Math.max(1, ToNumber(player.wave, 1)) +
+				"/" + Math.max(1, ToNumber(player.waves_per_level, 1));
+
+			var score = $.CreatePanel("Panel", row, "");
+			score.AddClass("XHSEndFarmKills");
+			var scoreValue = $.CreatePanel("Label", score, "");
+			scoreValue.AddClass("XHSEndFarmKillsValue");
+			scoreValue.text = FormatNumber(player.kills);
+			var scoreSuffix = $.CreatePanel("Label", score, "");
+			scoreSuffix.AddClass("XHSEndFarmKillsSuffix");
+			scoreSuffix.text = "KILLS";
+		}
+	}
+
+	function UpdateFarmLeaderboardButton() {
+		var button = Panel("XHSEndScreenFarmButton");
+		var label = Panel("XHSEndScreenFarmButtonLabel");
+		var available = GetFarmLeaderboardPlayers().length > 0;
+		if (button) {
+			button.enabled = available;
+			button.SetHasClass("XHSEndScreenButtonDisabled", !available);
+			button.SetHasClass("IsSelected", farmLeaderboardVisible && available);
+		}
+		if (label) {
+			label.text = farmLeaderboardVisible && available ? "Records" : "Farm Event";
+		}
+	}
+
+	function RenderHighlightPanel(players) {
+		if (farmLeaderboardVisible && GetFarmLeaderboardPlayers().length > 0) {
+			RenderFarmLeaderboard();
+		} else {
+			farmLeaderboardVisible = false;
+			RenderMvpCards(players);
+		}
+		UpdateFarmLeaderboardButton();
+	}
+
 	function CreateCell(parent, className, text, extraClassName) {
 		var cell = $.CreatePanel("Label", parent, "");
 		cell.AddClass("XHSPlayerCell");
@@ -798,7 +1102,7 @@ var XHSEndScreen = (function () {
 
 	function NormalizeSupporterProgress(battlepass) {
 		var xp = Math.max(0, ToNumber(battlepass.season_xp !== undefined ? battlepass.season_xp : battlepass.XP, 0));
-		var max = Math.max(ToNumber(battlepass.season_xp_max !== undefined ? battlepass.season_xp_max : battlepass.MaxXP, 500), 1);
+		var max = Math.max(ToNumber(battlepass.season_xp_max !== undefined ? battlepass.season_xp_max : battlepass.MaxXP, 1000), 1);
 		var level = Math.max(1, ToNumber(battlepass.season_level !== undefined ? battlepass.season_level : battlepass.Lvl, 1));
 
 		if (xp >= max) {
@@ -952,7 +1256,7 @@ var XHSEndScreen = (function () {
 				var rewardKey = model.id + ":" + rewardLevel;
 				if (!shownRewardKeys[rewardKey]) {
 					shownRewardKeys[rewardKey] = true;
-					CreateBattlepassRewardPanel(rewardLevel, i);
+					CreateBattlepassRewardPanels(rewardLevel, i, hasSupporterTier);
 				}
 			}
 		}
@@ -976,7 +1280,10 @@ var XHSEndScreen = (function () {
 		identity.AddClass("XHSPlayerIdentity");
 		identity.hittest = true;
 
-		var heroFrame = $.CreatePanel("Panel", identity, "");
+		var identityTop = $.CreatePanel("Panel", identity, "");
+		identityTop.AddClass("XHSPlayerIdentityTop");
+
+		var heroFrame = $.CreatePanel("Panel", identityTop, "");
 		heroFrame.AddClass("XHSPlayerHeroFrame");
 		heroFrame.style.boxShadow = "fill " + ColorWithAlpha(model.playerColor, "66") + " 0px 0px 8px 0px" + (hasSupporterTier ? ", fill " + ColorWithAlpha(model.supporterTierColor, "70") + " 0px 0px 11px 0px" : "");
 		if (hasSupporterTier) {
@@ -994,11 +1301,11 @@ var XHSEndScreen = (function () {
 			heroImage.heroname = model.hero;
 		}
 
-		var avatar = $.CreatePanel("DOTAAvatarImage", identity, "");
+		var avatar = $.CreatePanel("DOTAAvatarImage", identityTop, "");
 		avatar.AddClass("XHSPlayerAvatar");
 		avatar.steamid = model.steamID;
 
-		var text = $.CreatePanel("Panel", identity, "");
+		var text = $.CreatePanel("Panel", identityTop, "");
 		text.AddClass("XHSPlayerText");
 
 		var name = $.CreatePanel("Label", text, "");
@@ -1014,6 +1321,16 @@ var XHSEndScreen = (function () {
 		heroName.AddClass("XHSPlayerHeroName");
 		heroName.text = model.abandon ? "Abandoned" : "";
 		heroName.style.visibility = model.abandon ? "visible" : "collapse";
+
+		var inventory = $.CreatePanel("Panel", identity, "");
+		inventory.AddClass("XHSPlayerInventory");
+		for (var slot = 0; slot < 6; slot++) {
+			var itemName = model.inventory && model.inventory[slot] ? model.inventory[slot] : "";
+			var item = $.CreatePanel("DOTAItemImage", inventory, "");
+			item.AddClass("XHSPlayerInventoryItem");
+			item.SetHasClass("IsEmpty", !itemName);
+			item.itemname = itemName;
+		}
 
 		CreateCell(row, "PlayerColSmall", model.level.toString());
 		CreateCell(row, "PlayerColKda", FormatNumber(model.kills), "XHSPlayerCellKills");
@@ -1162,37 +1479,33 @@ var XHSEndScreen = (function () {
 		}
 	}
 
-	function CreateBattlepassRewardPanel(level, levelupCount) {
-		var battlepass = CustomNetTables.GetTableValue("supporter_pass_rewards_free", "rewards");
-		if (battlepass && battlepass["1"]) {
-			battlepass = battlepass["1"];
-		}
-
-		if (!battlepass || !battlepass[level]) {
+	function CreateBattlepassRewardCard(level, levelupCount, track, reward) {
+		if (!reward) {
 			return;
 		}
 
-		var reward = battlepass[level];
-		var rewardName = reward.name;
-		var rarity = reward.rarity || "common";
-		var rewardType = reward.type || "Reward";
+		var rewardName = reward.name || reward.item_name || reward.reward_id || "xhs_sp_reward";
+		var rarity = (reward.rarity || reward.item_rarity || "common").toString().toLowerCase();
+		var rewardType = DisplaySupporterRewardType(reward);
 		var container = Panel("XHSEndScreenRewardContainer");
 
 		if (!container) {
 			return;
 		}
 
-		var panel = $.CreatePanel("Panel", container, "XHSEndScreenRewardPanel_" + levelupCount);
+		var panel = $.CreatePanel("Panel", container, "XHSEndScreenRewardPanel_" + levelupCount + "_" + track);
 		panel.AddClass("XHSEndScreenRewardPanel");
 		panel.AddClass("level-" + rarity);
+		panel.SetHasClass("IsPremiumReward", track === "premium");
 
 		var description = $.CreatePanel("Label", panel, "");
 		description.AddClass("XHSRewardDescription");
-		description.text = Localize("#battlepass_reward_description") + " " + level;
+		description.text = Localize(track === "premium" ? "#xhs_sp_supporter_track" : "#xhs_sp_free_track") +
+			" · " + Localize("#xhs_sp_level_value").replace("{level}", level);
 
 		var name = $.CreatePanel("Label", panel, "");
 		name.AddClass("XHSRewardName");
-		name.text = rewardType + ": " + Localize("#" + rewardName);
+		name.text = rewardType + ": " + LocalizeMaybeKey(rewardName);
 
 		var rarityPanel = $.CreatePanel("Label", panel, "");
 		rarityPanel.AddClass("XHSRewardRarity");
@@ -1201,7 +1514,10 @@ var XHSEndScreen = (function () {
 
 		var image = $.CreatePanel("Panel", panel, "");
 		image.AddClass("XHSRewardImage");
-		image.style.backgroundImage = 'url("file://{resources}/images/custom_game/battlepass/' + rewardName + '.png")';
+		image.style.backgroundImage = 'url("' + ResolveRewardImageURL(reward.image || reward.image_inventory || reward.icon || reward.icon_path) + '")';
+		image.style.backgroundSize = "contain";
+		image.style.backgroundPosition = "50% 50%";
+		image.style.backgroundRepeat = "no-repeat";
 
 		var button = $.CreatePanel("Button", panel, "");
 		button.AddClass("XHSRewardButton");
@@ -1210,7 +1526,7 @@ var XHSEndScreen = (function () {
 		});
 
 		var label = $.CreatePanel("Label", button, "");
-		label.text = "Accept";
+		label.text = Localize("#xhs_sp_accept");
 
 		var sounds = {
 			common: "Loot_Drop_Sfx",
@@ -1225,6 +1541,16 @@ var XHSEndScreen = (function () {
 
 		if (sounds[rarity]) {
 			Game.EmitSound(sounds[rarity]);
+		}
+	}
+
+	function CreateBattlepassRewardPanels(level, levelupCount, includePremium) {
+		if (level < 1 || level > 50) {
+			return;
+		}
+		CreateBattlepassRewardCard(level, levelupCount, "free", GetSupporterRewardAtLevel("free", level));
+		if (includePremium) {
+			CreateBattlepassRewardCard(level, levelupCount, "premium", GetSupporterRewardAtLevel("premium", level));
 		}
 	}
 
@@ -1269,6 +1595,18 @@ var XHSEndScreen = (function () {
 		if (hallClose) {
 			hallClose.SetPanelEvent("onactivate", CloseHallOfFame);
 		}
+
+		var farm = Panel("XHSEndScreenFarmButton");
+		if (farm) {
+			farm.SetPanelEvent("onactivate", function () {
+				if (GetFarmLeaderboardPlayers().length === 0 || !lastEndGameData) {
+					return;
+				}
+				farmLeaderboardVisible = !farmLeaderboardVisible;
+				RenderHighlightPanel(BuildPlayerModels(lastEndGameData));
+				Game.EmitSound("ui_generic_button_click");
+			});
+		}
 	}
 
 	function SetLoading(isLoading) {
@@ -1290,7 +1628,7 @@ var XHSEndScreen = (function () {
 
 			RenderHeader(data);
 			RenderFragmentQuests(data);
-			RenderMvpCards(players);
+			RenderHighlightPanel(players);
 			RenderPlayers(players);
 			RenderHallOfFame();
 
@@ -1312,7 +1650,7 @@ var XHSEndScreen = (function () {
 
 		try {
 			var players = BuildPlayerModels(lastEndGameData);
-			RenderMvpCards(players);
+			RenderHighlightPanel(players);
 			RenderPlayers(players);
 			RenderHallOfFame();
 		} catch (error) {

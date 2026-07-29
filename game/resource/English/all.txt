@@ -106,8 +106,6 @@
 "DOTA_Tooltip_modifier_orb_of_lightning_active_Description"	"Attacks can root and disarm enemies when the orb effect triggers."
 "DOTA_Tooltip_modifier_orb_of_lightning_purge"			"Lightning Purge"
 "DOTA_Tooltip_modifier_orb_of_lightning_purge_Description"	"Rooted, disarmed, and purged by Orb of Lightning."
-"DOTA_Tooltip_modifier_orb_of_darkness_active"			"Darkness Orb Active"
-"DOTA_Tooltip_modifier_orb_of_darkness_active_Description"	"Killed enemy creeps can rise under your control."
 "DOTA_Tooltip_modifier_orb_of_earth_active"				"Earth Orb Active"
 "DOTA_Tooltip_modifier_orb_of_earth_active_Description"	"Attacks can stun enemies when the orb effect triggers."
 "DOTA_Tooltip_modifier_orb_of_earth_bash"				"Earth Bash"

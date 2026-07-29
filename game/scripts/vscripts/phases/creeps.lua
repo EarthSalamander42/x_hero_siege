@@ -1,3 +1,9 @@
+LinkLuaModifier(
+	"modifier_xhs_phase_one_wave_scaling",
+	"modifiers/modifier_xhs_phase_one_wave_scaling.lua",
+	LUA_MODIFIER_MOTION_NONE
+)
+
 local function IsBreakableLaneTarget(target)
 	if target == nil or target:IsNull() or target.GetUnitName == nil then return false end
 
@@ -50,53 +56,6 @@ local function MoveCreepPastBreakable(unit, destination)
 	})
 end
 
-local function StartDestroyerMagnataurAbilityAI(unit)
-	if unit == nil or unit:IsNull() or unit:GetUnitName() ~= "npc_magnataur_destroyer_crypt" then return end
-	if unit.xhs_destroyer_ability_ai_started == true then return end
-
-	unit.xhs_destroyer_ability_ai_started = true
-
-	Timers:CreateTimer(RandomFloat(0.2, 0.6), function()
-		if unit == nil or unit:IsNull() or not unit:IsAlive() then return nil end
-		if XHSPerformanceCounters ~= nil then
-			XHSPerformanceCounters:Increment("ability_loop_thinks", 1)
-		end
-		if XHSLagLabIsActive ~= nil and XHSLagLabIsActive("pause_abilities") then return 0.25 end
-
-		local thunderClap = unit:FindAbilityByName("creature_thunder_clap_low")
-		if thunderClap == nil or thunderClap:GetLevel() <= 0 then return 0.25 end
-		if not thunderClap:IsFullyCastable() or unit:IsStunned() or unit:IsSilenced() or unit:IsChanneling() then
-			return 0.25
-		end
-
-		local radius = thunderClap:GetSpecialValueFor("radius")
-		if radius == nil or radius <= 0 then radius = 350 end
-
-		local enemies = FindUnitsInRadius(
-			unit:GetTeamNumber(),
-			unit:GetAbsOrigin(),
-			nil,
-			radius,
-			DOTA_UNIT_TARGET_TEAM_ENEMY,
-			DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC,
-			DOTA_UNIT_TARGET_FLAG_NONE,
-			FIND_CLOSEST,
-			false
-		)
-
-		if #enemies > 0 then
-			ExecuteOrderFromTable({
-				UnitIndex = unit:entindex(),
-				OrderType = DOTA_UNIT_ORDER_CAST_NO_TARGET,
-				AbilityIndex = thunderClap:entindex(),
-			})
-			return 0.5
-		end
-
-		return 0.25
-	end)
-end
-
 local function OrderWaveCreep(unit, waypoint)
 	if unit == nil or unit:IsNull() then return end
 	unit.xhs_wave_order_controller = true
@@ -112,7 +71,6 @@ local function OrderWaveCreep(unit, waypoint)
 		if thunderClap ~= nil then
 			thunderClap:StartCooldown(RandomFloat(1.5, 6.0))
 		end
-		StartDestroyerMagnataurAbilityAI(unit)
 	end
 
 	if waypoint ~= nil and unit.SetInitialGoalEntity ~= nil then
@@ -122,25 +80,6 @@ local function OrderWaveCreep(unit, waypoint)
 	local target = waypoint or BASE_GOOD
 	if target == nil or target.GetAbsOrigin == nil then return end
 	local finalDestination = BASE_GOOD or target
-
-	Timers:CreateTimer(0.25, function()
-		if unit == nil or unit:IsNull() or not unit:IsAlive() then return nil end
-		if XHSPerformanceCounters ~= nil then
-			XHSPerformanceCounters:Increment("wave_thinks", 1)
-		end
-		if XHSLagLabIsActive ~= nil and XHSLagLabIsActive("pause_waves") then return 0.25 end
-
-		if ClearBreakableLaneTarget(unit, GetBreakableLaneTarget(unit)) then
-			MoveCreepPastBreakable(unit, finalDestination)
-			return 0.25
-		end
-
-		if unit.xhs_breakable_ignore_until ~= nil and GameRules:GetGameTime() < unit.xhs_breakable_ignore_until then
-			return 0.25
-		end
-
-		return 0.25
-	end)
 
 	Timers:CreateTimer(0.1, function()
 		if unit == nil or unit:IsNull() or not unit:IsAlive() then return nil end
@@ -204,10 +143,27 @@ function CollapsePhaseOneLane(lane, attacker)
 	end
 end
 
-local function SpawnWaveCreep(unitName, point, waypoint)
+local function ApplyPhaseOneWaveScaling(unit, level, progress)
+	if unit == nil or unit:IsNull() then return end
+
+	level = math.max(1, math.min(4, tonumber(level) or 1))
+	progress = math.max(0, math.min(1, tonumber(progress) or 0))
+
+	unit:AddNewModifier(unit, nil, "modifier_xhs_phase_one_wave_scaling", {
+		level = level,
+		progress = progress,
+	})
+	unit:CalculateStatBonus(true)
+	unit:SetHealth(unit:GetMaxHealth())
+end
+
+local function SpawnWaveCreep(unitName, point, waypoint, level, progress)
 	if point == nil then return nil end
 
 	local unit = CreateUnitByName(unitName, point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+	if level ~= nil then
+		ApplyPhaseOneWaveScaling(unit, level, progress)
+	end
 	OrderWaveCreep(unit, waypoint)
 	return unit
 end
@@ -239,6 +195,17 @@ end
 
 function SpawnCreeps(force)
 	if force ~= true and XHSDevTools ~= nil and XHSDevTools:IsSandboxActive() then return end
+
+	local waveLevel = math.max(1, math.min(4, tonumber(CustomTimers and CustomTimers.creep_level) or 1))
+	if GameMode.phase_one_scaling_level ~= waveLevel then
+		GameMode.phase_one_scaling_level = waveLevel
+		GameMode.phase_one_scaling_wave = 0
+	end
+
+	local wavesPerLevel = math.max(2, math.floor(XHS_CREEPS_UPGRADE_INTERVAL / XHS_CREEPS_INTERVAL) + 1)
+	local waveIndex = math.max(0, tonumber(GameMode.phase_one_scaling_wave) or 0)
+	local waveProgress = math.min(1, waveIndex / (wavesPerLevel - 1))
+	GameMode.phase_one_scaling_progress = waveProgress
 
 	if GameMode.creep_roll["race"] < 4 then
 		GameMode.creep_roll["race"] = GameMode.creep_roll["race"] + 1
@@ -324,31 +291,31 @@ function SpawnCreeps(force)
 
 					if CREEP_LANES[c][2] == 1 then -- Lane Level
 						for j = 1, meleeCount do
-							SpawnWaveCreep(melee_1[GameMode.creep_roll["race"]], point, waypoint)
+							SpawnWaveCreep(melee_1[GameMode.creep_roll["race"]], point, waypoint, 1, waveProgress)
 						end
 						for j = 1, rangedCount do
-							SpawnWaveCreep(ranged_1[GameMode.creep_roll["race"]], point, waypoint)
+							SpawnWaveCreep(ranged_1[GameMode.creep_roll["race"]], point, waypoint, 1, waveProgress)
 						end
 					elseif CREEP_LANES[c][2] == 2 then
 						for j = 1, meleeCount do
-							SpawnWaveCreep(melee_2[GameMode.creep_roll["race"]], point, waypoint)
+							SpawnWaveCreep(melee_2[GameMode.creep_roll["race"]], point, waypoint, 2, waveProgress)
 						end
 						for j = 1, rangedCount do
-							SpawnWaveCreep(ranged_2[GameMode.creep_roll["race"]], point, waypoint)
+							SpawnWaveCreep(ranged_2[GameMode.creep_roll["race"]], point, waypoint, 2, waveProgress)
 						end
 					elseif CREEP_LANES[c][2] == 3 then
 						for j = 1, meleeCount do
-							SpawnWaveCreep(melee_3[GameMode.creep_roll["race"]], point, waypoint)
+							SpawnWaveCreep(melee_3[GameMode.creep_roll["race"]], point, waypoint, 3, waveProgress)
 						end
 						for j = 1, rangedCount do
-							SpawnWaveCreep(ranged_3[GameMode.creep_roll["race"]], point, waypoint)
+							SpawnWaveCreep(ranged_3[GameMode.creep_roll["race"]], point, waypoint, 3, waveProgress)
 						end
 					elseif CREEP_LANES[c][2] >= 4 then
 						for j = 1, meleeCount do
-							SpawnWaveCreep(melee_4[GameMode.creep_roll["race"]], point, waypoint)
+							SpawnWaveCreep(melee_4[GameMode.creep_roll["race"]], point, waypoint, 4, waveProgress)
 						end
 						for j = 1, rangedCount do
-							SpawnWaveCreep(ranged_4[GameMode.creep_roll["race"]], point, waypoint)
+							SpawnWaveCreep(ranged_4[GameMode.creep_roll["race"]], point, waypoint, 4, waveProgress)
 						end
 					end
 				end
@@ -357,6 +324,8 @@ function SpawnCreeps(force)
 			print("Barracks: Spawner " .. c .. " disabled.")
 		end
 	end
+
+	GameMode.phase_one_scaling_wave = waveIndex + 1
 end
 
 function CreepLevels(level)
@@ -382,6 +351,9 @@ function CreepLevels(level)
 	if CustomTimers ~= nil then
 		CustomTimers.creep_level = math.max(CustomTimers.creep_level or level, level)
 	end
+	GameMode.phase_one_scaling_level = level
+	GameMode.phase_one_scaling_wave = 0
+	GameMode.phase_one_scaling_progress = 0
 	if XHSPersistQuestTimingState ~= nil then
 		XHSPersistQuestTimingState()
 	end

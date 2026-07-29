@@ -589,7 +589,10 @@ function BuyMaxSmallTomesForPlayer(playerID, options)
 			hero:EmitSound("ui.trophy_levelup")
 		end
 
-		local pfx = ParticleManager:CreateParticle("particles/generic_hero_status/hero_levelup.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero, hero)
+		local levelupParticle = XHSGetBattlepassParticle ~= nil
+			and XHSGetBattlepassParticle(hero, "levelup_pfx", "particles/generic_hero_status/hero_levelup.vpcf")
+			or "particles/generic_hero_status/hero_levelup.vpcf"
+		local pfx = ParticleManager:CreateParticle(levelupParticle, PATTACH_ABSORIGIN_FOLLOW, hero)
 		ParticleManager:SetParticleControl(pfx, 0, hero:GetAbsOrigin())
 
 		i = i + 1
@@ -697,6 +700,11 @@ function GetItemByID(id)
 end
 
 function OpenLane(lane_number)
+	if IsInToolsMode() then
+		OpenCreepLane(lane_number)
+		return
+	end
+
 	if CustomTimers.game_phase == 1 then
 		if CREEP_LANES_TYPE == 1 then
 			OpenCreepLane(lane_number)
@@ -746,6 +754,11 @@ function OpenCreepLane(lane_number)
 end
 
 function CloseLane(ID, lane_number)
+	if IsInToolsMode() then
+		CloseCreepLane(lane_number)
+		return
+	end
+
 	local player_count = PlayerResource:GetPlayerCount()
 	for i = 0, PlayerResource:GetPlayerCount() - 1 do
 		if PlayerResource:GetConnectionState(i) ~= 2 then
@@ -1219,11 +1232,18 @@ function TeleportHero(hero, point, delay, iCameraSpeed)
 		-- without leaving permanent vision behind.
 		AddFOWViewer(hero:GetTeamNumber(), point, 400, delay, false)
 
-		TeleportEffect = ParticleManager:CreateParticle("particles/items2_fx/teleport_start.vpcf", PATTACH_ABSORIGIN, hero)
+		local teleportStartParticle = XHSGetBattlepassParticle ~= nil
+			and XHSGetBattlepassParticle(hero, "teleport_start_pfx", "particles/items2_fx/teleport_start.vpcf")
+			or "particles/items2_fx/teleport_start.vpcf"
+		local teleportEndParticle = XHSGetBattlepassParticle ~= nil
+			and XHSGetBattlepassParticle(hero, "teleport_end_pfx", "particles/items2_fx/teleport_end.vpcf")
+			or "particles/items2_fx/teleport_end.vpcf"
+
+		TeleportEffect = ParticleManager:CreateParticle(teleportStartParticle, PATTACH_ABSORIGIN, hero)
 		ParticleManager:SetParticleControlEnt(TeleportEffect, 0, hero, PATTACH_ABSORIGIN, "attach_origin", pos, true)
 		hero:Attribute_SetIntValue("effectsID", TeleportEffect)
 
-		TeleportEffectEnd = ParticleManager:CreateParticle("particles/items2_fx/teleport_end.vpcf", PATTACH_WORLDORIGIN, nil)
+		TeleportEffectEnd = ParticleManager:CreateParticle(teleportEndParticle, PATTACH_WORLDORIGIN, nil)
 		ParticleManager:SetParticleControl(TeleportEffectEnd, 0, point)
 		ParticleManager:SetParticleControl(TeleportEffectEnd, 1, point)
 
@@ -1868,156 +1888,6 @@ function HideBossBar(boss)
 		XHS_BOSS_BAR_LAST[key] = nil
 		XHS_PRIVATE_BOSS_BAR_LAST[key] = nil
 	end
-end
-
-local XHS_CASTLE_BAR_TIMEOUT = 15.0
-local XHS_CASTLE_BAR_POLL_INTERVAL = 0.2
-
-local function IsXHSCastleEntity(castle)
-	return castle ~= nil
-		and IsValidEntity(castle)
-		and not castle:IsNull()
-		and castle:GetClassname() == "npc_dota_fort"
-		and castle:GetTeamNumber() == DOTA_TEAM_GOODGUYS
-end
-
-local function GetXHSCastleMuradinThreshold(castle)
-	if castle.xhs_castle_muradin_threshold ~= nil then
-		return castle.xhs_castle_muradin_threshold
-	end
-
-	local threshold = 40
-	local ability = castle:FindAbilityByName("castle_muradin_defend")
-	if ability ~= nil then
-		threshold = tonumber(ability:GetSpecialValueFor("hp_tooltip")) or threshold
-	end
-	castle.xhs_castle_muradin_threshold = threshold
-	return threshold
-end
-
-local function IsXHSCastleMuradinTriggered(castle)
-	return castle.xhs_castle_muradin_triggered == true
-		or castle:FindAbilityByName("castle_muradin_defend") == nil
-end
-
-local function GetXHSCastleBarPayload(castle)
-	local threshold = GetXHSCastleMuradinThreshold(castle)
-	local triggered = IsXHSCastleMuradinTriggered(castle)
-	return {
-		castle_name = castle:GetUnitName(),
-		castle_icon = "npc_dota_hero_omniknight",
-		castle_health = castle:GetHealth(),
-		castle_max_health = castle:GetMaxHealth(),
-		muradin_threshold = threshold,
-		muradin_triggered = triggered and 1 or 0,
-		light_color = "#70d6ff",
-		dark_color = "#102d55",
-		castle_markers = {
-			{
-				pct = threshold,
-				kind = "companion",
-				label = triggered and "Muradin deployed" or "Muradin arrives",
-				description = triggered
-					and "Muradin has already answered the castle's call."
-					or "Muradin appears when the castle reaches this health threshold.",
-				triggered = triggered,
-			},
-		},
-	}
-end
-
-local function PublishXHSCastleBarState(castle, visible)
-	if CustomNetTables == nil then return end
-
-	if visible == true and IsXHSCastleEntity(castle) then
-		local payload = GetXHSCastleBarPayload(castle)
-		payload.visible = 1
-		CustomNetTables:SetTableValue("xhs_castle_bar", "state", payload)
-		return
-	end
-
-	CustomNetTables:SetTableValue("xhs_castle_bar", "state", { visible = 0 })
-end
-
-local function GetXHSCastleBarSnapshot(castle)
-	return table.concat({
-		tostring(castle:GetHealth()),
-		tostring(castle:GetMaxHealth()),
-		tostring(GetXHSCastleMuradinThreshold(castle)),
-		IsXHSCastleMuradinTriggered(castle) and "1" or "0",
-	}, "|")
-end
-
-function XHSUpdateCastleHealthBar(castle, force)
-	if not IsXHSCastleEntity(castle) or castle.xhs_castle_bar_visible ~= true then return end
-
-	local snapshot = GetXHSCastleBarSnapshot(castle)
-	if force ~= true and castle.xhs_castle_bar_snapshot == snapshot then return end
-
-	castle.xhs_castle_bar_snapshot = snapshot
-	local payload = GetXHSCastleBarPayload(castle)
-	PublishXHSCastleBarState(castle, true)
-	CustomGameEventManager:Send_ServerToAllClients("update_castle_hp", payload)
-end
-
-local function StartXHSCastleHealthBarThink(castle)
-	if not IsXHSCastleEntity(castle) or castle.xhs_castle_bar_think_active == true then return end
-
-	castle.xhs_castle_bar_think_active = true
-	local thinkName = "xhs_castle_health_bar_" .. tostring(castle:entindex())
-	GameRules:GetGameModeEntity():SetContextThink(thinkName, function()
-		if not IsXHSCastleEntity(castle) then
-			return nil
-		end
-
-		local lastDamageTime = tonumber(castle.xhs_castle_last_damage_time) or -999
-		if GameRules:GetGameTime() - lastDamageTime >= XHS_CASTLE_BAR_TIMEOUT then
-			PublishXHSCastleBarState(castle, false)
-			CustomGameEventManager:Send_ServerToAllClients("hide_castle_hp", {})
-			castle.xhs_castle_bar_visible = nil
-			castle.xhs_castle_bar_snapshot = nil
-			castle.xhs_castle_bar_think_active = nil
-			return nil
-		end
-
-		XHSUpdateCastleHealthBar(castle, false)
-		return XHS_CASTLE_BAR_POLL_INTERVAL
-	end, XHS_CASTLE_BAR_POLL_INTERVAL)
-end
-
-function XHSOnCastleDamageFilter(castle, healthBefore)
-	if not IsXHSCastleEntity(castle) then return end
-
-	local expectedHealth = tonumber(healthBefore) or castle:GetHealth()
-	if castle.xhs_castle_bar_visible == true then
-		castle.xhs_castle_last_damage_time = GameRules:GetGameTime()
-		StartXHSCastleHealthBarThink(castle)
-	end
-
-	Timers:CreateTimer(FrameTime(), function()
-		if not IsXHSCastleEntity(castle) or castle:GetHealth() >= expectedHealth then return nil end
-
-		castle.xhs_castle_last_damage_time = GameRules:GetGameTime()
-		if castle.xhs_castle_bar_visible ~= true then
-			castle.xhs_castle_bar_visible = true
-			castle.xhs_castle_bar_snapshot = GetXHSCastleBarSnapshot(castle)
-			local payload = GetXHSCastleBarPayload(castle)
-			PublishXHSCastleBarState(castle, true)
-			CustomGameEventManager:Send_ServerToAllClients("show_castle_hp", payload)
-		else
-			XHSUpdateCastleHealthBar(castle, true)
-		end
-		StartXHSCastleHealthBarThink(castle)
-		return nil
-	end)
-end
-
-function XHSMarkCastleMuradinTriggered(castle, threshold)
-	if not IsXHSCastleEntity(castle) then return end
-
-	castle.xhs_castle_muradin_triggered = true
-	castle.xhs_castle_muradin_threshold = tonumber(threshold) or GetXHSCastleMuradinThreshold(castle)
-	XHSUpdateCastleHealthBar(castle, true)
 end
 
 function IsNearEntity(entity_class, location, distance)

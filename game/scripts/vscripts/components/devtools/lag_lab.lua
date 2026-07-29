@@ -25,9 +25,9 @@ local EXPERIMENTS = {
 	no_collision = { label = "Disable creep collision", kind = "modifier", modifier = "modifier_xhs_lag_lab_no_collision" },
 	disarm_creeps = { label = "Disarm creeps", kind = "modifier", modifier = "modifier_xhs_lag_lab_disarm" },
 	silence_creeps = { label = "Silence creeps", kind = "modifier", modifier = "modifier_xhs_lag_lab_silence" },
-	hotspot_mute = { label = "Mute sampled zone hotspot", kind = "hotspot" },
-	hotspot_half = { label = "Run sampled zone hotspot at 50%", kind = "hotspot" },
-	hotspot_quarter = { label = "Run sampled zone hotspot at 25%", kind = "hotspot" },
+	hotspot_mute = { label = "Mute sampled spatial-query hotspot", kind = "hotspot" },
+	hotspot_half = { label = "Run spatial-query hotspot at 50%", kind = "hotspot" },
+	hotspot_quarter = { label = "Run spatial-query hotspot at 25%", kind = "hotspot" },
 }
 
 local METRICS = {
@@ -41,6 +41,8 @@ local METRICS = {
 	"orders_s",
 	"repeated_orders_s",
 	"ai_thinks_s",
+	"director_processed_s",
+	"director_sleeping_s",
 	"wave_thinks_s",
 	"ability_thinks_s",
 	"damage_s",
@@ -313,11 +315,17 @@ function XHSLagLab:CaptureMetrics()
 		creeps = tonumber(snapshot.creeps) or 0,
 		total_units = tonumber(snapshot.total_units) or 0,
 		scan_ms = tonumber(snapshot.scan_ms) or 0,
-		zone_searches_s = tonumber(activity.zone_searches_per_second) or 0,
-		zone_cost_ms_s = tonumber(activity.zone_search_cost_ms_per_second) or 0,
+		zone_searches_s = tonumber(
+			activity.spatial_queries_per_second or activity.zone_searches_per_second
+		) or 0,
+		zone_cost_ms_s = tonumber(
+			activity.spatial_query_cost_ms_per_second or activity.zone_search_cost_ms_per_second
+		) or 0,
 		orders_s = tonumber(activity.orders_per_second) or 0,
 		repeated_orders_s = tonumber(activity.repeated_orders_per_second) or 0,
 		ai_thinks_s = tonumber(activity.ai_thinks_per_second) or 0,
+		director_processed_s = tonumber(activity.ai_agents_processed_per_second) or 0,
+		director_sleeping_s = tonumber(activity.ai_agents_sleeping_per_second) or 0,
 		wave_thinks_s = tonumber(activity.wave_thinks_per_second) or 0,
 		ability_thinks_s = tonumber(activity.ability_loop_thinks_per_second) or 0,
 		damage_s = tonumber(activity.damage_events_per_second) or 0,

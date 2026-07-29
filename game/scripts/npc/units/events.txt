@@ -1096,8 +1096,8 @@
 
 		// Abilities
 		//----------------------------------------------------------------
-		"Ability1"					"command_aura"		// Ability 1.
-		"Ability2"					"holdout_blue_effect"		// Ability 2.
+		"Ability1"					""		// Wave damage is applied once by the Farm Event controller.
+		"Ability2"					""		// Removed legacy blue effect.
 		"Ability3"					""		// Ability 3.
 		"Ability4"					""		// Ability 4.
 
@@ -1351,8 +1351,8 @@
 
 		// Abilities
 		//----------------------------------------------------------------
-		"Ability1"					"creature_howling_blast"		// Ability 1.
-		"Ability2"					"holdout_blue_effect"		// Ability 2.
+		"Ability1"					"xhs_farm_howling_blast"		// Timer-free Farm Event passive.
+		"Ability2"					""		// Removed legacy blue effect.
 		"Ability3"					""		// Ability 3.
 		"Ability4"					""		// Ability 4.
 
@@ -1445,7 +1445,7 @@
 		// Abilities
 		//----------------------------------------------------------------
 		"Ability1"					"xhs_creep_crippling_strike"		// Ability 1.
-		"Ability2"					"holdout_blue_effect"		// Ability 2.
+		"Ability2"					""		// Removed legacy blue effect.
 		"Ability3"					""		// Ability 3.
 		"Ability4"					""		// Ability 4.
 
@@ -1534,7 +1534,7 @@
 		"MinimapIcon"				"minimap_roshancamp"
 		"MinimapIconSize"			"250"
 		"SoundSet"					"Creep_Good_Melee"
-		"UseAI"						"2"
+		"UseAI"						"0"		// Farm Event attaches optimized modifier_ai state 5 on activation.
 		"ConsideredHero"			"1"
 
 		// Abilities

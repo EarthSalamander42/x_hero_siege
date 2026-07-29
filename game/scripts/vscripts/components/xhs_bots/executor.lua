@@ -425,7 +425,14 @@ function XHSBotExecutor:Execute(hero, action, record, difficulty)
 	elseif action.id == "reposition" then
 		return self:Move(hero, action.data.position, record, "reposition", jitter)
 	elseif action.id == "move_to_objective" then
-		return self:Move(hero, action.data.position, record, "move to objective", jitter)
+		local collectingRune = action.data.objective == "rune"
+		return self:Move(
+			hero,
+			action.data.position,
+			record,
+			collectingRune and "collect rune" or "move to objective",
+			collectingRune and math.min(20, jitter) or jitter
+		)
 	elseif action.id == "move_to_last_seen" then
 		return self:Move(hero, action.data.position, record, "move to last seen position", jitter * 0.5)
 	elseif action.id == "attack_move" then

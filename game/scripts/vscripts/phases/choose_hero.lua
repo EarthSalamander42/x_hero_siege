@@ -16,6 +16,7 @@ local HERO_SELECTION_SOURCE_PARTICLE = "particles/items2_fx/teleport_start.vpcf"
 local HERO_SELECTION_DESTINATION_PARTICLE = "particles/items2_fx/teleport_end.vpcf"
 local HERO_SELECTION_ARRIVAL_PARTICLE = "particles/items2_fx/teleport_start.vpcf"
 local HERO_SELECTION_SOURCE_HOLD = 0.90
+local HERO_SELECTION_FOCUS_CAMERA_SPEED = 0.30
 local HERO_SELECTION_CAMERA_SPEED = 1.25
 local HERO_SELECTION_CAMERA_SETTLE = 0.20
 local HERO_SELECTION_TELEPORT_DURATION =
@@ -80,6 +81,27 @@ local function GetSelectionTransform(group, index, pickedHeroName)
 	end
 	primary = primary or displays[1]
 
+	-- Lua can be reloaded after the showcase units have spawned, which clears
+	-- the local registry above. Recover the exact display by classname so the
+	-- selection teleport never falls back to a world-only particle.
+	if not IsValidSelectionUnit(primary) and Entities.FindAllByClassname ~= nil then
+		local nearestDistance = nil
+		for _, unit in pairs(Entities:FindAllByClassname(pickedHeroName) or {}) do
+			if IsValidSelectionUnit(unit) and unit.is_fake_hero == true then
+				local distance = point ~= nil
+					and (unit:GetAbsOrigin() - point:GetAbsOrigin()):Length2D()
+					or 0
+				if nearestDistance == nil or distance < nearestDistance then
+					primary = unit
+					nearestDistance = distance
+				end
+			end
+		end
+		if IsValidSelectionUnit(primary) then
+			table.insert(displays, primary)
+		end
+	end
+
 	if IsValidSelectionUnit(primary) then
 		return {
 			position = primary:GetAbsOrigin(),
@@ -118,9 +140,12 @@ local function GetHeroSelectionBaseTransform(playerID)
 	}
 end
 
-local function StartHeroSelectionSourceTeleport(transform)
+local function StartHeroSelectionSourceTeleport(transform, playerID)
 	local particles = {}
 	local display = transform.display
+	local sourceParticle = XHSGetBattlepassParticle ~= nil
+		and XHSGetBattlepassParticle(playerID, "teleport_start_pfx", HERO_SELECTION_SOURCE_PARTICLE)
+		or HERO_SELECTION_SOURCE_PARTICLE
 	if IsValidSelectionUnit(display) then
 		display:AddNewModifier(display, nil, "modifier_xhs_cinematic_hide_health_bars", {
 			duration = HERO_SELECTION_TELEPORT_DURATION,
@@ -131,9 +156,8 @@ local function StartHeroSelectionSourceTeleport(transform)
 			rate = 1.0,
 		})
 		local particle = ParticleManager:CreateParticle(
-			HERO_SELECTION_SOURCE_PARTICLE,
+			sourceParticle,
 			PATTACH_ABSORIGIN_FOLLOW,
-			display,
 			display
 		)
 		ParticleManager:SetParticleControlEnt(
@@ -151,7 +175,7 @@ local function StartHeroSelectionSourceTeleport(transform)
 
 	if #particles == 0 and transform.position ~= nil then
 		local particle = ParticleManager:CreateParticle(
-			HERO_SELECTION_SOURCE_PARTICLE,
+			sourceParticle,
 			PATTACH_WORLDORIGIN,
 			nil
 		)
@@ -181,9 +205,12 @@ local function SetHeroSelectionHealthFrameHidden(player, hidden)
 	})
 end
 
-local function StartHeroSelectionDestinationTeleport(position)
+local function StartHeroSelectionDestinationTeleport(position, playerID)
+	local destinationParticle = XHSGetBattlepassParticle ~= nil
+		and XHSGetBattlepassParticle(playerID, "teleport_end_pfx", HERO_SELECTION_DESTINATION_PARTICLE)
+		or HERO_SELECTION_DESTINATION_PARTICLE
 	local particle = ParticleManager:CreateParticle(
-		HERO_SELECTION_DESTINATION_PARTICLE,
+		destinationParticle,
 		PATTACH_WORLDORIGIN,
 		nil
 	)
@@ -217,10 +244,12 @@ local function AwakenSelectedHero(newHero, baseTransform, destinationParticle, p
 		rate = 1.0,
 	})
 
+	local arrivalParticlePath = XHSGetBattlepassParticle ~= nil
+		and XHSGetBattlepassParticle(newHero, "teleport_start_pfx", HERO_SELECTION_ARRIVAL_PARTICLE)
+		or HERO_SELECTION_ARRIVAL_PARTICLE
 	local arrivalParticle = ParticleManager:CreateParticle(
-		HERO_SELECTION_ARRIVAL_PARTICLE,
+		arrivalParticlePath,
 		PATTACH_ABSORIGIN_FOLLOW,
-		newHero,
 		newHero
 	)
 	EmitSoundOnLocationWithCaster(basePosition, "Portal.Hero_Appear", newHero)
@@ -259,11 +288,19 @@ function XHSBeginHeroSelectionTransition(id, pickedHeroName, oldHero, startingGo
 
 	local player = PlayerResource:GetPlayer(id)
 	SetHeroSelectionHealthFrameHidden(player, true)
-	local sourceParticles = StartHeroSelectionSourceTeleport(transform)
+	if player ~= nil and transform.position ~= nil then
+		-- First frame of the transition belongs to the selected showcase unit.
+		-- The existing delayed move to the base remains the second camera beat.
+		CustomGameEventManager:Send_ServerToPlayer(player, "set_player_camera", {
+			hPosition = transform.position,
+			iSpeed = HERO_SELECTION_FOCUS_CAMERA_SPEED,
+		})
+	end
+	local sourceParticles = StartHeroSelectionSourceTeleport(transform, id)
 	local destinationParticle = nil
 
 	Timers:CreateTimer(HERO_SELECTION_SOURCE_HOLD, function()
-		destinationParticle = StartHeroSelectionDestinationTeleport(baseTransform.position)
+		destinationParticle = StartHeroSelectionDestinationTeleport(baseTransform.position, id)
 		if player ~= nil then
 			CustomGameEventManager:Send_ServerToPlayer(player, "set_player_camera", {
 				hPosition = baseTransform.position,

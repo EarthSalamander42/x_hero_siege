@@ -85,18 +85,21 @@
 
 "DOTA_Tooltip_modifier_ankh_passives"                                           "Reincarnation"
 
-"DOTA_Tooltip_ability_item_orb_of_wind_Description"				"<h1><font color='#FF7800'>Passive:</font></h1> Wind Orb (Evasion). Grants evasion and movement speed."
+"DOTA_Tooltip_ability_item_orb_of_wind_Description"				"<h1><font color='#FF7800'>Passive:</font></h1> Wind Orb (Evasion). Grants bonus damage, evasion, and movement speed."
+"DOTA_Tooltip_ability_item_orb_of_wind_bonus_damage"				"BONUS DAMAGE:"
 "DOTA_Tooltip_ability_item_orb_of_wind_bonus_evasion"				"%EVASION:"
 "DOTA_Tooltip_ability_item_orb_of_wind_bonus_movement_speed"		"BONUS MOVEMENT SPEED:"
 
-"DOTA_Tooltip_ability_item_zephyr_gem_Description"				"<h1><font color='#FF7800'>Passive:</font></h1> Wind Orb (Evasion). Grants evasion and movement speed. After evading an attack, briefly gains bonus movement speed."
+"DOTA_Tooltip_ability_item_zephyr_gem_Description"				"<h1><font color='#FF7800'>Passive:</font></h1> Wind Orb (Evasion). Grants bonus damage, evasion, and movement speed. After evading an attack, briefly gains bonus movement speed."
+"DOTA_Tooltip_ability_item_zephyr_gem_bonus_damage"				"BONUS DAMAGE:"
 "DOTA_Tooltip_ability_item_zephyr_gem_bonus_evasion"				"%EVASION:"
 "DOTA_Tooltip_ability_item_zephyr_gem_bonus_movement_speed"		"BONUS MOVEMENT SPEED:"
 "DOTA_Tooltip_ability_item_zephyr_gem_evasion_proc_movespeed_pct"	"%EVASION MOVE SPEED:"
 "DOTA_Tooltip_ability_item_zephyr_gem_evasion_proc_duration"		"PROC DURATION:"
 "DOTA_Tooltip_ability_item_zephyr_gem_evasion_proc_cooldown"		"PROC COOLDOWN:"
 
-"DOTA_Tooltip_ability_item_tempest_aegis_Description"				"<h1><font color='#FF7800'>Passive:</font></h1> Wind Orb (Evasion). Grants evasion and movement speed. After evading an attack, briefly gains movement speed and damage reduction."
+"DOTA_Tooltip_ability_item_tempest_aegis_Description"				"<h1><font color='#FF7800'>Passive:</font></h1> Wind Orb (Evasion). Grants bonus damage, evasion, and movement speed. After evading an attack, briefly gains movement speed and damage reduction."
+"DOTA_Tooltip_ability_item_tempest_aegis_bonus_damage"			"BONUS DAMAGE:"
 "DOTA_Tooltip_ability_item_tempest_aegis_bonus_evasion"			"%EVASION:"
 "DOTA_Tooltip_ability_item_tempest_aegis_bonus_movement_speed"		"BONUS MOVEMENT SPEED:"
 "DOTA_Tooltip_ability_item_tempest_aegis_evasion_proc_movespeed_pct"	"%EVASION MOVE SPEED:"

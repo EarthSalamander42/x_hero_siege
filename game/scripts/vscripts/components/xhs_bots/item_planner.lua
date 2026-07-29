@@ -27,6 +27,34 @@ local function AddReason(reasons, condition, text)
 	if condition then table.insert(reasons, text) end
 end
 
+local GetAffinity
+local ROLE_FAMILY_TAG_WEIGHTS = {
+	frontline = {
+		frontline = 1.00, survival = 1.00, armor = 0.80,
+		physical_defense = 0.70,
+	},
+	right_click = {
+		right_click = 1.00, physical = 0.80, attack_speed = 0.70,
+		single_target = 0.50, wave = 0.45, cleave = 0.65,
+	},
+	ranged_dps = {
+		right_click = 0.90, physical = 0.75, attack_speed = 0.60,
+		single_target = 0.55,
+	},
+	support = {
+		team = 1.00, sustain = 0.80, cooldown = 0.45, mana = 0.30,
+	},
+	spellcaster = {
+		caster = 1.00, magical = 1.00, cooldown = 0.80, mana = 0.45,
+	},
+	control = {
+		control = 1.00, cooldown = 0.60, magical = 0.30,
+	},
+	wave_clear = {
+		wave = 1.00, cleave = 0.90, magical = 0.45, physical = 0.45,
+	},
+}
+
 function XHSBotItemPlanner:IsHighThreat(snapshot)
 	return snapshot.base_threat_active == true
 		or (tonumber(snapshot.combat_threat) or 0) >= 0.78
@@ -77,6 +105,210 @@ function XHSBotItemPlanner:GetMinimumCoreScore(profile)
 	return math.max(0, tonumber(profile and profile.minimum_core_score) or 40)
 end
 
+function XHSBotItemPlanner:GetOwnedOrbFamilyCount(snapshot)
+	local count = 0
+	for _, family in pairs(XHSBotItemCatalog:GetFamilies()) do
+		local tier = self:GetFamilyProgress(snapshot, family)
+		if tier >= 1 then count = count + 1 end
+	end
+	return count
+end
+
+function XHSBotItemPlanner:GetFamilyRoleFit(roleName, family)
+	local weights = ROLE_FAMILY_TAG_WEIGHTS[tostring(roleName or "")]
+	if weights == nil then return 0 end
+	local fit = 0
+	for tag, weight in pairs(weights) do
+		fit = fit + (tonumber(family and family.tags and family.tags[tag]) or 0)
+			* weight
+	end
+	return fit
+end
+
+function XHSBotItemPlanner:GetOwnedFamilyOverlap(snapshot, candidateFamilyName, candidate)
+	local maximumOverlap = 0
+	for ownedFamilyName, ownedFamily in pairs(XHSBotItemCatalog:GetFamilies()) do
+		if ownedFamilyName ~= candidateFamilyName
+			and self:GetFamilyProgress(snapshot, ownedFamily) >= 1 then
+			local overlap = 0
+			for tag, weight in pairs(candidate and candidate.tags or {}) do
+				overlap = overlap + math.min(
+					tonumber(weight) or 0,
+					tonumber(ownedFamily.tags and ownedFamily.tags[tag]) or 0
+				)
+			end
+			maximumOverlap = math.max(maximumOverlap, overlap)
+		end
+	end
+	return maximumOverlap
+end
+
+function XHSBotItemPlanner:BuildOpeningOrbCandidates(snapshot, profile)
+	local candidates = {}
+	for familyName, family in pairs(XHSBotItemCatalog:GetFamilies()) do
+		local tier = self:GetFamilyProgress(snapshot, family)
+		if tier <= 0 and self:GetFamilyLimit(profile, familyName) > 0 then
+			local entry = XHSBotItemCatalog:CopyEntry(family.levels[1].name)
+			local score, reasons = self:ScoreFamily(
+				snapshot,
+				profile,
+				familyName,
+				family,
+				entry
+			)
+			table.insert(candidates, {
+				entry = entry,
+				family = familyName,
+				score = math.floor(score * 10) / 10,
+				reason = table.concat(reasons, "+") .. "+opening_t1",
+			})
+		end
+	end
+	table.sort(candidates, function(left, right)
+		if left.score == right.score then
+			return left.entry.name < right.entry.name
+		end
+		return left.score > right.score
+	end)
+	return candidates
+end
+
+function XHSBotItemPlanner:GetLifestealOpeningScore(snapshot, profile)
+	local affinities = profile and profile.item_affinities or {}
+	local rightClick = GetAffinity(
+		affinities,
+		"right_click",
+		"physical",
+		"single_target"
+	)
+	local attackDps = math.max(0, tonumber(snapshot.attack_dps) or 0)
+	local sustainPerSecond = attackDps * 0.50
+	local score = 72
+		+ rightClick * 24
+		+ math.min(55, sustainPerSecond / 8)
+	local entry = XHSBotItemCatalog:CopyEntry("item_lifesteal_mask")
+	if entry ~= nil then
+		score = score - self:GetShopTravelPenalty(snapshot, entry)
+	end
+	return math.floor(score * 10) / 10, rightClick, sustainPerSecond
+end
+
+function XHSBotItemPlanner:IsItemRedundant(profile, itemName)
+	return profile ~= nil
+		and type(profile.redundant_items) == "table"
+		and profile.redundant_items[itemName] == true
+end
+
+function XHSBotItemPlanner:HasIntrinsicLifesteal(profile)
+	local sustain = profile and profile.intrinsic_sustain or nil
+	return type(sustain) == "table"
+		and (sustain.attack_lifesteal == true or sustain.lifesteal_aura == true)
+		and (tonumber(sustain.lifesteal_pct) or 0) > 0
+end
+
+function XHSBotItemPlanner:ShouldOpenWithLifesteal(snapshot, profile)
+	if Count(snapshot, "item_lifesteal_mask") > 0 then return false end
+	if self:IsItemRedundant(profile, "item_lifesteal_mask")
+		or self:HasIntrinsicLifesteal(profile) then
+		return false
+	end
+	if snapshot.secret_shop_available == false then return false end
+	local _, rightClick, sustainPerSecond =
+		self:GetLifestealOpeningScore(snapshot, profile)
+	return sustainPerSecond >= 160
+		or rightClick >= 0.85 and sustainPerSecond >= 115
+end
+
+function XHSBotItemPlanner:GetOpeningPackage(snapshot, profile, minimumCoreScore)
+	local orbCount = self:GetOwnedOrbFamilyCount(snapshot)
+	local tomesBought = math.max(0, tonumber(snapshot.tomes_bought) or 0)
+	local maskOwned = Count(snapshot, "item_lifesteal_mask") > 0
+	local maskRedundant = self:IsItemRedundant(profile, "item_lifesteal_mask")
+		or self:HasIntrinsicLifesteal(profile)
+	local maskAvailable = snapshot.secret_shop_available ~= false
+		and not maskRedundant
+	local orbCandidates = self:BuildOpeningOrbCandidates(snapshot, profile)
+	local qualifying = 0
+	for _, candidate in ipairs(orbCandidates) do
+		if candidate.score >= minimumCoreScore then
+			qualifying = qualifying + 1
+		end
+	end
+	local desiredOrbs = 1
+	if orbCount >= 2
+		or orbCount == 1 and qualifying >= 1
+		or orbCount == 0 and qualifying >= 2 then
+		desiredOrbs = 2
+	end
+	local desiredTomes = desiredOrbs
+	local maskNeeded = not maskOwned and maskAvailable
+	local maskFirst = self:ShouldOpenWithLifesteal(snapshot, profile)
+
+	local function OrbStep(index)
+		local candidate = orbCandidates[index or 1]
+		if candidate == nil then return nil end
+		return {
+			complete = false,
+			stage = orbCount <= 0 and "first_orb_t1" or "second_orb_t1",
+			candidate = candidate,
+			entry = candidate.entry,
+			desired_orbs = desiredOrbs,
+			desired_tomes = desiredTomes,
+			mask_first = maskFirst,
+		}
+	end
+
+	local function MaskStep()
+		local entry = XHSBotItemCatalog:CopyEntry("item_lifesteal_mask")
+		if entry == nil then return nil end
+		local score, _, sustainPerSecond =
+			self:GetLifestealOpeningScore(snapshot, profile)
+		return {
+			complete = false,
+			stage = "lifesteal_mask",
+			candidate = {
+				entry = entry,
+				family = "lifesteal",
+				score = score,
+				reason = "opening cornerstone+sustain_per_second:"
+					.. tostring(math.floor(sustainPerSecond)),
+			},
+			entry = entry,
+			desired_orbs = desiredOrbs,
+			desired_tomes = desiredTomes,
+			mask_first = maskFirst,
+		}
+	end
+
+	local function TomeStep()
+		return {
+			complete = false,
+			stage = tomesBought <= 0 and "first_tome_t1" or "second_tome_t1",
+			tome_due = true,
+			desired_orbs = desiredOrbs,
+			desired_tomes = desiredTomes,
+			mask_first = maskFirst,
+		}
+	end
+
+	if maskFirst and maskNeeded then return MaskStep() end
+	if orbCount < desiredOrbs then
+		local step = OrbStep(1)
+		if step ~= nil then return step end
+	end
+	if tomesBought < desiredTomes then return TomeStep() end
+	if maskNeeded then return MaskStep() end
+	return {
+		complete = true,
+		stage = "complete",
+		desired_orbs = desiredOrbs,
+		desired_tomes = desiredTomes,
+		mask_first = maskFirst,
+		mask_unavailable = not maskOwned and not maskAvailable,
+		mask_redundant = maskRedundant,
+	}
+end
+
 function XHSBotItemPlanner:GetNextFamilyEntry(snapshot, profile, familyName, family)
 	local limit = self:GetFamilyLimit(profile, familyName)
 	if limit <= 0 then return nil end
@@ -93,7 +325,7 @@ function XHSBotItemPlanner:GetNextFamilyEntry(snapshot, profile, familyName, fam
 	return XHSBotItemCatalog:CopyEntry(family.levels[1].name)
 end
 
-local function GetAffinity(affinities, ...)
+GetAffinity = function(affinities, ...)
 	local result = 0
 	for index = 1, select("#", ...) do
 		result = math.max(
@@ -155,6 +387,8 @@ function XHSBotItemPlanner:GetStatPower(snapshot, profile, entry)
 		* survival
 	power = power + Delta("bash_chance") * Delta("bash_duration") / 2
 	power = power + Delta("purge_chance") / 10
+	power = power + Delta("lifesteal_pct") / 5
+		* (0.35 + rightClick * 0.65)
 
 	local valueFactor = math.min(
 		1.25,
@@ -204,6 +438,23 @@ function XHSBotItemPlanner:ScoreFamily(snapshot, profile, familyName, family, en
 		end
 	end
 	AddReason(reasons, strongestTag ~= nil, "kit:" .. tostring(strongestTag))
+
+	local familyTier = self:GetFamilyProgress(snapshot, family)
+	if familyTier <= 0 and self:GetOwnedOrbFamilyCount(snapshot) >= 1 then
+		local secondaryFit =
+			self:GetFamilyRoleFit(profile and profile.secondary_role, family)
+		if secondaryFit > 0 then
+			local secondaryBonus = math.min(26, secondaryFit * 12)
+			score = score + secondaryBonus
+			table.insert(reasons, "secondary_role:"
+				.. tostring(profile.secondary_role))
+		end
+		local overlap = self:GetOwnedFamilyOverlap(snapshot, familyName, family)
+		if overlap > 0 then
+			score = score - math.min(18, overlap * 10)
+			table.insert(reasons, "cross_core_overlap")
+		end
+	end
 
 	local statPower = self:GetStatPower(snapshot, profile, entry)
 	score = score + statPower
@@ -404,6 +655,28 @@ function XHSBotItemPlanner:BuildTargetLoadout(snapshot, profile)
 			end
 		end
 	end
+	local lifestealEntry = XHSBotItemCatalog:CopyEntry("item_lifesteal_mask")
+	if lifestealEntry ~= nil
+		and not self:IsItemRedundant(profile, lifestealEntry.name)
+		and not self:HasIntrinsicLifesteal(profile) then
+		local lifestealScore, rightClick, sustainPerSecond =
+			self:GetLifestealOpeningScore(scoringSnapshot, profile)
+		lifestealScore = math.max(
+			112,
+			lifestealScore + rightClick * 10
+				+ math.min(18, sustainPerSecond / 20)
+		)
+		if Count(snapshot, lifestealEntry.name) > 0 then
+			lifestealScore = lifestealScore + 4
+		end
+		table.insert(slots, {
+			name = lifestealEntry.name,
+			family = "lifesteal",
+			score = math.floor(lifestealScore * 10) / 10,
+			reason = "opening_cornerstone+50pct_lifesteal",
+			owned = Count(snapshot, lifestealEntry.name) > 0,
+		})
+	end
 	table.sort(slots, function(left, right)
 		if left.score == right.score then
 			if left.owned ~= right.owned then return left.owned == true end
@@ -433,16 +706,61 @@ function XHSBotItemPlanner:BuildTargetLoadout(snapshot, profile)
 	return loadout, itemScores, familyScores, details
 end
 
-function XHSBotItemPlanner:GetDesiredPotionCharges(kind, snapshot, profile, difficulty)
+function XHSBotItemPlanner:GetDesiredPotionCharges(
+	kind,
+	snapshot,
+	profile,
+	difficulty,
+	phase,
+	reserve
+)
 	local profileTarget = profile and profile.consumable_targets
 		and tonumber(profile.consumable_targets[kind]) or nil
 	local difficultyTarget = difficulty
 		and tonumber(difficulty["target_" .. tostring(kind) .. "_potion_charges"]) or nil
-	return math.max(0, math.floor(profileTarget or difficultyTarget or 5))
+	local potionName = kind == "mana"
+		and "item_mana_potion" or "item_health_potion"
+	local potion = XHSBotItemCatalog:Get(potionName) or {}
+	local stackCharges = math.max(1, math.floor(tonumber(potion.charges) or 15))
+	local baseTarget = math.max(
+		stackCharges,
+		math.floor(tonumber(profileTarget or difficultyTarget) or stackCharges)
+	)
+	local phaseTarget = stackCharges
+	if phase == "core_2" or phase == "six_slot" then
+		phaseTarget = stackCharges * 2
+	elseif phase == "upgrades" or phase == "luxury" then
+		phaseTarget = stackCharges * 3
+	end
+	local spendable = math.max(
+		0,
+		(tonumber(snapshot and snapshot.gold) or 0)
+			- math.max(0, tonumber(reserve) or 0)
+	)
+	local cost = math.max(1, tonumber(potion.cost) or 1)
+	local affordableStacks = math.floor(spendable / cost)
+	local currentCharges = math.max(
+		0,
+		tonumber(snapshot and snapshot[tostring(kind) .. "_potion_charges"])
+			or 0
+	)
+	local affordableTarget = currentCharges + affordableStacks * stackCharges
+	return math.max(
+		baseTarget,
+		math.min(phaseTarget, affordableTarget)
+	)
 end
 
 function XHSBotItemPlanner:GetPotionRestockThreshold(kind, snapshot, profile, difficulty)
-	return self:GetDesiredPotionCharges(kind, snapshot, profile, difficulty)
+	if kind == "health" then
+		return math.max(
+			0,
+			math.floor(tonumber(
+				difficulty and difficulty.health_resupply_trigger_charges
+			) or 3)
+		)
+	end
+	return 3
 end
 
 function XHSBotItemPlanner:GetDesiredAnkhCharges(snapshot, phase, nextItemReserve)
@@ -573,9 +891,18 @@ function XHSBotItemPlanner:GetTacticalPurchase(snapshot, profile, phase, coreRes
 	return best and best.entry or nil, best and best.reason or nil
 end
 
-function XHSBotItemPlanner:GetTomeAllowance(snapshot, phase, nextItemReserve, difficulty)
+function XHSBotItemPlanner:GetTomeAllowance(
+	snapshot,
+	phase,
+	nextItemReserve,
+	difficulty,
+	opening
+)
 	if snapshot.in_farm_event == true then
 		return math.max(1, math.min(8, tonumber(difficulty.max_tomes_per_think) or 1))
+	end
+	if opening ~= nil and opening.complete ~= true then
+		return opening.tome_due == true and 1 or 0
 	end
 	local bought = math.max(0, tonumber(snapshot.tomes_bought) or 0)
 	local spendable = math.max(
@@ -598,13 +925,20 @@ function XHSBotItemPlanner:Plan(snapshot, profile, difficulty)
 	local candidates = self:BuildCoreCandidates(snapshot, profile, phase)
 	local nextCandidate = candidates[1]
 	local minimumCoreScore = self:GetMinimumCoreScore(profile)
+	local opening = self:GetOpeningPackage(snapshot, profile, minimumCoreScore)
+	if opening ~= nil and opening.complete ~= true then
+		nextCandidate = opening.candidate
+	end
 	if nextCandidate ~= nil
+		and (opening == nil or opening.complete == true)
 		and nextCandidate.entry.tier == 1
 		and nextCandidate.score < minimumCoreScore then
 		nextCandidate = nil
 	end
 	if nextCandidate ~= nil and nextCandidate.score < 0 then nextCandidate = nil end
-	if nextCandidate == nil and phase ~= "sustain" and phase ~= "core_1" then
+	if nextCandidate == nil
+		and (opening == nil or opening.complete == true)
+		and phase ~= "sustain" and phase ~= "core_1" then
 		phase = "luxury"
 	end
 	local reserve = nextCandidate and math.max(0, tonumber(nextCandidate.entry.cost) or 0) or 0
@@ -623,6 +957,8 @@ function XHSBotItemPlanner:Plan(snapshot, profile, difficulty)
 		next_family = nextCandidate and nextCandidate.family or "",
 		next_score = nextCandidate and nextCandidate.score or 0,
 		next_reason = nextCandidate and nextCandidate.reason
+			or opening ~= nil and opening.tome_due == true
+				and "opening small tome"
 			or "no core clears marginal score " .. tostring(minimumCoreScore),
 		minimum_core_score = minimumCoreScore,
 		reserve_gold = reserve,
@@ -636,8 +972,20 @@ function XHSBotItemPlanner:Plan(snapshot, profile, difficulty)
 		replacement_required = nextCandidate ~= nil
 			and nextCandidate.entry.tier == 1
 			and (tonumber(snapshot.inventory_slots) or 0) >= 9,
-		health_potion_target = self:GetDesiredPotionCharges("health", snapshot, profile, difficulty),
-		mana_potion_target = self:GetDesiredPotionCharges("mana", snapshot, profile, difficulty),
+		health_potion_target = self:GetDesiredPotionCharges(
+			"health", snapshot, profile, difficulty, phase, reserve
+		),
+		mana_potion_target = self:GetDesiredPotionCharges(
+			"mana", snapshot, profile, difficulty, phase, reserve
+		),
+		opening_stage = opening and opening.stage or "complete",
+		opening_complete = opening == nil or opening.complete == true,
+		opening_tome_due = opening ~= nil and opening.tome_due == true,
+		opening_mask_first = opening ~= nil and opening.mask_first == true,
+		opening_mask_unavailable = opening ~= nil
+			and opening.mask_unavailable == true,
+		opening_orb_target = opening and opening.desired_orbs or 0,
+		opening_tome_target = opening and opening.desired_tomes or 0,
 	}
 	plan.health_potion_restock = self:GetPotionRestockThreshold(
 		"health", snapshot, profile, difficulty
@@ -646,7 +994,13 @@ function XHSBotItemPlanner:Plan(snapshot, profile, difficulty)
 		"mana", snapshot, profile, difficulty
 	)
 	plan.ankh_target = self:GetDesiredAnkhCharges(snapshot, phase, reserve)
-	plan.tome_allowance = self:GetTomeAllowance(snapshot, phase, reserve, difficulty)
+	plan.tome_allowance = self:GetTomeAllowance(
+		snapshot,
+		phase,
+		reserve,
+		difficulty,
+		opening
+	)
 	return plan
 end
 

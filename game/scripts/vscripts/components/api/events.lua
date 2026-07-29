@@ -3,9 +3,9 @@ local function PublishAllPlayersBattlepassLoaded()
 end
 
 local function CompleteApiSetupWithoutBackend(reason)
-	-- A Tools bot session is intentionally local-only. Initializing empty API
-	-- state prevents the battlepass retry loop from waiting forever while
-	-- avoiding a game-register row that would never receive game-complete.
+	-- A Tools bot session is intentionally local-only. It must never create a
+	-- game-register row or unlock persistent rewards, but humans still need
+	-- their read-only donor identity for loading-screen and in-game visuals.
 	api.game_id = nil
 	api.players = {}
 	api.companions = {}
@@ -20,15 +20,61 @@ local function CompleteApiSetupWithoutBackend(reason)
 	CustomNetTables:SetTableValue("supporter_pass_player", "emblems", {})
 	CustomNetTables:SetTableValue("supporter_pass_player", "effigies", {})
 
-	if SupporterPass and SupporterPass.PublishPlayers then
-		SupporterPass:PublishPlayers()
-	end
 	if CustomPolls and CustomPolls.SetBackendPayload then
 		CustomPolls:SetBackendPayload({})
 	end
 
-	print("game-register: skipped for local XHS bot session (" .. tostring(reason or "bot_configured") .. ").")
-	PublishAllPlayersBattlepassLoaded()
+	local human_steamids = {}
+	for player_id = 0, 23 do
+		if api:IsPersistentPlayerID(player_id) then
+			local steamid = api:GetPersistentPlayerSteamID(player_id)
+			if steamid ~= nil then
+				human_steamids[tostring(steamid)] = true
+			end
+		end
+	end
+
+	local completed = false
+	local function FinishLocalApiSetup(status_source)
+		if completed then return end
+		completed = true
+
+		if SupporterPass and SupporterPass.PublishPlayers then
+			SupporterPass:PublishPlayers()
+		end
+
+		print("game-register: skipped for local XHS bot session ("
+			.. tostring(reason or "bot_configured")
+			.. "); human donor metadata=" .. tostring(status_source or "unavailable") .. ".")
+		PublishAllPlayersBattlepassLoaded()
+	end
+
+	local request_ok = pcall(function()
+		api:Request("meta/donators", function(data)
+			local rows = type(data) == "table" and data.players or nil
+			if type(rows) == "table" then
+				for key, row in pairs(rows) do
+					if type(row) == "table" then
+						local steamid = tostring(row.steamid or row.steam_id or key)
+						local status = tonumber(row.status or row.donator_status)
+						if human_steamids[steamid] == true and status ~= nil then
+							api.players[steamid] = {
+								status = math.max(0, math.min(10, math.floor(status))),
+							}
+						end
+					end
+				end
+			end
+
+			FinishLocalApiSetup("loaded")
+		end, function()
+			FinishLocalApiSetup("unavailable")
+		end)
+	end)
+
+	if not request_ok then
+		FinishLocalApiSetup("unavailable")
+	end
 end
 
 local function RegisterGameAndLoadArmories()

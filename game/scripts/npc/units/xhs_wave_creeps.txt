@@ -595,6 +595,7 @@
 				"Wearable4" { "ItemDef" "78" }		//Legs
 				"Wearable5" { "ItemDef" "79" }		//Misc
 				"Wearable6" { "ItemDef" "80" }		//Shoulder
+				"Wearable7" { "ItemDef" "81" }		//Head
 			} 
 		}
 	}

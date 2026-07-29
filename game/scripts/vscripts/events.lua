@@ -91,12 +91,16 @@ ListenToGameEvent('game_rules_state_change', function()
 			DoEntFire("door_lane" .. i, "SetAnimation", "gate_02_close", 0, nil, nil)
 		end
 
-		if GetMapName() ~= "x_hero_siege_demo" then
-			-- debug
-			--			if IsInToolsMode() then
-			Entities:FindByName(nil, "trigger_special_event_tp_off"):Disable()
-			Entities:FindByName(nil, "trigger_special_event"):Enable()
-			--			end
+		local special_event_tp_off = Entities:FindByName(nil, "trigger_special_event_tp_off")
+
+		if special_event_tp_off then
+			special_event_tp_off:Disable()
+		end
+
+		local trigger_special_event = Entities:FindByName(nil, "trigger_special_event")
+
+		if trigger_special_event then
+			trigger_special_event:Enable()
 		end
 
 		local diff = { "Easy", "Normal", "Hard", "Extreme", "Divine" }
@@ -288,8 +292,9 @@ ListenToGameEvent('npc_spawned', function(keys)
 		if npc:GetTeamNumber() ~= 2 or npc:GetUnitName() == "npc_dota_creature_muradin_bronzebeard" then
 			local unit_kv = GetUnitKeyValuesByName(npc:GetUnitName())
 
-			if unit_kv and unit_kv["UseAI"] then
-				npc:AddNewModifier(npc, nil, "modifier_ai", { state = unit_kv["UseAI"] })
+			local aiState = unit_kv and tonumber(unit_kv["UseAI"]) or 0
+			if aiState > 0 then
+				npc:AddNewModifier(npc, nil, "modifier_ai", { state = aiState })
 			end
 		end
 
@@ -2672,7 +2677,7 @@ function GameMode:OnDialogConfirm(eventSourceIndex, data)
 		local eligible = api ~= nil and api.IsPersistentPlayerID ~= nil
 			and api:IsPersistentPlayerID(iPlayer)
 			or api == nil and IsXHSPersistentPlayerID ~= nil
-				and IsXHSPersistentPlayerID(iPlayer)
+			and IsXHSPersistentPlayerID(iPlayer)
 		if eligible then
 			nValid = nValid + 1
 		end

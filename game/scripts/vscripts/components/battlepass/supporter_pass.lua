@@ -502,7 +502,11 @@ function SupporterPass:BuildPlayerTable(playerID)
 		weekly_cap = tonumber(FirstSupporterValue(supporterPass.daily_cap, supporterPass.weekly_cap, current.daily_cap, current.weekly_cap)) or self.DAILY_FRAGMENT_CAP,
 		monthly_fragments = tonumber(FirstSupporterValue(supporterPass.monthly_fragments, current.monthly_fragments)) or (tier and tier.fragments or 0),
 		xp_boost = tonumber(FirstSupporterValue(supporterPass.xp_boost, current.xp_boost)) or (tier and tier.xp_boost or 0),
-		vote_power = tonumber(FirstSupporterValue(supporterPass.vote_power, current.vote_power)) or (tier and tier.vote_power or math.max(1, math.min(tierID + 1, 5))),
+		vote_power = tonumber(FirstSupporterValue(
+			supporterPass.vote_power,
+			tier and tier.vote_power or nil,
+			current.vote_power
+		)) or math.max(1, math.min(tierID + 1, 5)),
 		season_level = seasonLevel,
 		season_xp = seasonXP,
 		season_xp_max = seasonXPMax,
@@ -544,6 +548,9 @@ function SupporterPass:PublishPlayer(playerID)
 	local playerTable = self:BuildPlayerTable(playerID)
 	if playerTable then
 		CustomNetTables:SetTableValue("supporter_pass_player", tostring(playerID), playerTable)
+		if GameMode ~= nil and GameMode.RefreshSettingVotePower ~= nil then
+			GameMode:RefreshSettingVotePower(playerID)
+		end
 		if api and api.PublishSupporterPassArmory then
 			api:PublishSupporterPassArmory(playerID, playerTable.armory)
 		end

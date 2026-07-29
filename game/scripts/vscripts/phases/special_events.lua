@@ -19,18 +19,20 @@ local MURADIN_TELEPORT_ARRIVAL_EFFECT_DURATION = 0.8
 local MURADIN_TELEPORT_OUT_DURATION = 3.0
 local FARM_LEADERBOARD_NET_TABLE = "xhs_farm_leaderboard"
 local FARM_LEADERBOARD_NET_KEY = "state"
-local FARM_LEADERBOARD_UPDATE_INTERVAL = 0.25
+local FARM_LEADERBOARD_UPDATE_INTERVAL = 0.5
 local FARM_EVENT_CREEPS_PER_WAVE = 10
 local FARM_EVENT_CELEBRATION_DURATION = 7.0
-local FARM_EVENT_ABILITY_THINK_INTERVAL = 0.25
+local FARM_EVENT_PRELOAD_INTERVAL = 0.1
+local FARM_EVENT_SPAWN_RADIUS = 260
+local FARM_EVENT_STAGING_ORIGIN = Vector(-15800, -15800, -2048)
+local FARM_EVENT_WAVE_DAMAGE = { 125, 150, 175, 200, 225 }
 local FARM_EVENT_ABILITY_BY_UNIT = {
 	npc_dota_creature_murloc = "xhs_creep_blood_hunger",
 	npc_dota_creature_wildkin = "xhs_creep_evasion",
 	npc_dota_creature_golem = "neutral_spell_immunity",
-	npc_dota_creature_polar_furbolg = "command_aura",
 	npc_dota_creature_centaur = "xhs_creep_thorns",
 	npc_dota_creature_razormane = "creature_war_stomp",
-	npc_dota_creature_revenant = "creature_howling_blast",
+	npc_dota_creature_revenant = "xhs_farm_howling_blast",
 	npc_dota_creature_tuskarr = "xhs_creep_crippling_strike",
 	npc_dota_creature_satyrr = "ogre_magi_bloodlust",
 }
@@ -47,6 +49,33 @@ local FARM_EVENT_ACTIVE_ABILITIES = {
 		modifier = "modifier_ogre_magi_bloodlust",
 	},
 }
+local FARM_EVENT_REWARDS = {
+	npc_dota_creature_murloc = { gold_min = 550, gold_max = 650, xp = 45 },
+	npc_dota_creature_wildkin = { gold_min = 250, gold_max = 300, xp = 45 },
+	npc_dota_creature_golem = { gold_min = 250, gold_max = 300, xp = 45 },
+	npc_dota_creature_polar_furbolg = { gold_min = 250, gold_max = 300, xp = 45 },
+	npc_dota_creature_centaur = { gold_min = 250, gold_max = 300, xp = 45 },
+	npc_dota_creature_razormane = { gold_min = 250, gold_max = 300, xp = 45 },
+	npc_dota_creature_revenant = { gold_min = 250, gold_max = 300, xp = 45 },
+	npc_dota_creature_tuskarr = { gold_min = 250, gold_max = 300, xp = 45 },
+	npc_dota_creature_satyrr = { gold_min = 250, gold_max = 300, xp = 45 },
+}
+
+LinkLuaModifier(
+	"modifier_xhs_farm_staged",
+	"components/farm_event/modifiers.lua",
+	LUA_MODIFIER_MOTION_NONE
+)
+LinkLuaModifier(
+	"modifier_xhs_farm_suspended",
+	"components/farm_event/modifiers.lua",
+	LUA_MODIFIER_MOTION_NONE
+)
+LinkLuaModifier(
+	"modifier_xhs_farm_wave_damage",
+	"components/farm_event/modifiers.lua",
+	LUA_MODIFIER_MOTION_NONE
+)
 local MURADIN_TELEPORT_START_PARTICLE = "particles/items2_fx/teleport_start.vpcf"
 local MURADIN_TELEPORT_END_PARTICLE = "particles/items2_fx/teleport_end.vpcf"
 
@@ -54,50 +83,11 @@ local function IsValidAliveUnit(unit)
 	return unit ~= nil and not unit:IsNull() and unit:IsAlive()
 end
 
-local function CanFarmEventUnitCast(unit, ability)
-	if not IsValidAliveUnit(unit) or ability == nil or ability:IsNull() then return false end
-	if not ability:IsFullyCastable() then return false end
-	if unit:IsStunned() or unit:IsSilenced() or unit:IsChanneling() then return false end
-	if unit.GetCurrentActiveAbility and unit:GetCurrentActiveAbility() ~= nil then return false end
-	return true
-end
-
 local function GetFarmEventHero(playerID)
 	if playerID == nil or playerID < 0 or not PlayerResource:HasSelectedHero(playerID) then return nil end
 	local hero = PlayerResource:GetSelectedHeroEntity(playerID)
 	if not IsValidAliveUnit(hero) then return nil end
 	return hero
-end
-
-local function FindFarmEventBuffTarget(caster, playerID, config)
-	local candidates = FindUnitsInRadius(
-		caster:GetTeamNumber(),
-		caster:GetAbsOrigin(),
-		nil,
-		config.trigger_range,
-		DOTA_UNIT_TARGET_TEAM_FRIENDLY,
-		DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC,
-		DOTA_UNIT_TARGET_FLAG_NONE,
-		FIND_ANY_ORDER,
-		false
-	)
-	local bestTarget = nil
-	local bestDamage = -1
-
-	for _, candidate in ipairs(candidates) do
-		if IsValidAliveUnit(candidate)
-		and candidate.xhs_farm_event == true
-		and tonumber(candidate.xhs_farm_event_player_id) == playerID
-		and (config.modifier == nil or not candidate:HasModifier(config.modifier)) then
-			local damage = candidate:GetAverageTrueAttackDamage(candidate)
-			if damage > bestDamage then
-				bestTarget = candidate
-				bestDamage = damage
-			end
-		end
-	end
-
-	return bestTarget
 end
 
 local function ShowCurrentEventTimer(title, duration)
@@ -606,35 +596,6 @@ local function GetFarmEventWaveCount()
 	return math.max(1, #(FarmEvent_Creeps or {}))
 end
 
-local function CountFarmEventCreeps(playerID)
-	if playerID == nil then return 0 end
-
-	local point = Entities:FindByName(nil, "farm_event_player_" .. playerID)
-	if point == nil then return 0 end
-
-	local units = FindUnitsInRadius(
-		DOTA_TEAM_CUSTOM_2,
-		point:GetAbsOrigin(),
-		nil,
-		1200,
-		DOTA_UNIT_TARGET_TEAM_FRIENDLY,
-		DOTA_UNIT_TARGET_HERO,
-		DOTA_UNIT_TARGET_FLAG_NONE,
-		FIND_ANY_ORDER,
-		false
-	)
-
-	local count = 0
-	for _, unit in ipairs(units) do
-		if unit.xhs_farm_event == true
-		and tonumber(unit.xhs_farm_event_player_id) == playerID then
-			count = count + 1
-		end
-	end
-
-	return count
-end
-
 function SpecialEvents:PublishFarmLeaderboard(active)
 	local wavesPerLevel = GetFarmEventWaveCount()
 	local players = {}
@@ -644,10 +605,9 @@ function SpecialEvents:PublishFarmLeaderboard(active)
 		if type(progress) == "table" and numericPlayerID ~= nil then
 			local level = math.max(1, tonumber(progress.level) or 1)
 			local round = math.max(0, tonumber(progress.round) or 0) % wavesPerLevel
-			local remaining = CountFarmEventCreeps(numericPlayerID)
-			local completedWaves = ((level - 1) * wavesPerLevel) + round
+			local remaining = math.max(0, tonumber(progress.remaining) or 0)
+			local completedWaves = math.max(0, tonumber(progress.completed_waves) or 0)
 
-			progress.remaining = remaining
 			table.insert(players, {
 				player_id = numericPlayerID,
 				kills = math.max(0, tonumber(progress.kills) or 0),
@@ -656,6 +616,9 @@ function SpecialEvents:PublishFarmLeaderboard(active)
 				waves_per_level = wavesPerLevel,
 				remaining = remaining,
 				completed_waves = completedWaves,
+				last_wave_gold = math.max(0, tonumber(progress.last_wave_gold) or 0),
+				last_wave_xp = math.max(0, tonumber(progress.last_wave_xp) or 0),
+				reward_serial = math.max(0, tonumber(progress.reward_serial) or 0),
 			})
 		end
 	end
@@ -698,21 +661,27 @@ function SpecialEvents:PublishFarmLeaderboard(active)
 		players = players,
 		updated_at = GameRules:GetGameTime(),
 	})
+	self.farm_leaderboard_dirty = false
 end
 
-function SpecialEvents:OnFarmEventCreepKilled(killedUnit)
-	if GameMode.FarmEvent_occuring ~= true
-		or killedUnit == nil
-		or killedUnit:IsNull()
-		or killedUnit.xhs_farm_event ~= true then
-		return
-	end
+function SpecialEvents:GetFarmEventActiveUnits(playerID)
+	local progress = self.hero_farm_event and self.hero_farm_event[tonumber(playerID)] or nil
+	return progress and progress.active_units or {}
+end
 
-	local playerID = tonumber(killedUnit.xhs_farm_event_player_id)
-	local progress = playerID ~= nil and self.hero_farm_event[playerID] or nil
-	if progress == nil then return end
+function SpecialEvents:GetFarmEventAbilityConfig(abilityName)
+	return FARM_EVENT_ACTIVE_ABILITIES[abilityName]
+end
 
-	progress.kills = math.max(0, tonumber(progress.kills) or 0) + 1
+function SpecialEvents:GetFarmEventAbilityLock(playerID, abilityName)
+	local key = tostring(playerID) .. ":" .. tostring(abilityName)
+	return self.farm_event_ability_locks and self.farm_event_ability_locks[key] or 0
+end
+
+function SpecialEvents:SetFarmEventAbilityLock(playerID, abilityName, nextCastTime)
+	self.farm_event_ability_locks = self.farm_event_ability_locks or {}
+	local key = tostring(playerID) .. ":" .. tostring(abilityName)
+	self.farm_event_ability_locks[key] = tonumber(nextCastTime) or 0
 end
 
 function SpecialEvents:StartFarmLeaderboardPublisher()
@@ -726,34 +695,304 @@ function SpecialEvents:StartFarmLeaderboardPublisher()
 			return nil
 		end
 
-		self:PublishFarmLeaderboard(true)
+		if self.farm_leaderboard_dirty == true then
+			self:PublishFarmLeaderboard(true)
+		end
 		return FARM_LEADERBOARD_UPDATE_INTERVAL
 	end, 0.0)
 end
 
 function SpecialEvents:RemoveFarmEventCreeps()
+	for _, progress in pairs(self.hero_farm_event or {}) do
+		progress.prep_token = (progress.prep_token or 0) + 1
+		for _, collection in ipairs({ progress.active_units or {}, progress.prepared_units or {} }) do
+			for _, unit in ipairs(collection) do
+				if unit ~= nil and not unit:IsNull() then
+					UTIL_Remove(unit)
+				end
+			end
+		end
+		progress.active_units = {}
+		progress.prepared_units = {}
+		progress.remaining = 0
+	end
+end
+
+function SpecialEvents:SuspendNonFarmCreeps()
+	self.farm_suspended_units = {}
 	local units = FindUnitsInRadius(
-		DOTA_TEAM_CUSTOM_2,
+		DOTA_TEAM_CUSTOM_1,
 		Vector(0, 0, 0),
 		nil,
 		FIND_UNITS_EVERYWHERE,
 		DOTA_UNIT_TARGET_TEAM_FRIENDLY,
 		DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC,
-		DOTA_UNIT_TARGET_FLAG_NONE,
+		DOTA_UNIT_TARGET_FLAG_INVULNERABLE,
 		FIND_ANY_ORDER,
 		false
 	)
-
 	for _, unit in ipairs(units) do
-		if unit ~= nil and not unit:IsNull() and unit.xhs_farm_event == true then
-			UTIL_Remove(unit)
+		if IsValidAliveUnit(unit)
+			and unit.xhs_farm_event ~= true
+			and unit:HasModifier("modifier_ai") then
+			unit:SetForceAttackTarget(nil)
+			unit:Stop()
+			unit:AddNewModifier(unit, nil, "modifier_xhs_farm_suspended", {})
+			table.insert(self.farm_suspended_units, unit)
 		end
 	end
+end
+
+function SpecialEvents:ResumeNonFarmCreeps()
+	for _, unit in ipairs(self.farm_suspended_units or {}) do
+		if IsValidAliveUnit(unit) then
+			unit:RemoveModifierByName("modifier_xhs_farm_suspended")
+		end
+	end
+	self.farm_suspended_units = {}
+end
+
+local function GetNextFarmWave(round, level)
+	local count = GetFarmEventWaveCount()
+	local nextRound = (math.max(0, tonumber(round) or 0) + 1) % count
+	local nextLevel = math.max(1, tonumber(level) or 1)
+	if nextRound == 0 then nextLevel = nextLevel + 1 end
+	return nextRound, nextLevel
+end
+
+local function GetFarmSpawnPosition(point, index)
+	local angle = ((math.max(1, index) - 1) / FARM_EVENT_CREEPS_PER_WAVE) * math.pi * 2
+	local radius = FARM_EVENT_SPAWN_RADIUS + ((index % 2) * 45)
+	return point:GetAbsOrigin() + Vector(math.cos(angle) * radius, math.sin(angle) * radius, 0)
+end
+
+function SpecialEvents:ConfigureFarmEventUnit(unit, playerID, difficulty, staged)
+	if not IsValidAliveUnit(unit) then return end
+
+	unit.xhs_farm_event = true
+	unit.xhs_farm_event_player_id = playerID
+	unit.xhs_farm_staged = staged == true
+	if unit.SetMinimumGoldBounty ~= nil then unit:SetMinimumGoldBounty(0) end
+	if unit.SetMaximumGoldBounty ~= nil then unit:SetMaximumGoldBounty(0) end
+	if unit.SetDeathXP ~= nil then unit:SetDeathXP(0) end
+	if unit.SetIdleAcquire ~= nil then unit:SetIdleAcquire(false) end
+
+	local reward = FARM_EVENT_REWARDS[unit:GetUnitName()] or {}
+	unit.xhs_farm_reward_gold = RandomInt(
+		tonumber(reward.gold_min) or 0,
+		tonumber(reward.gold_max) or tonumber(reward.gold_min) or 0
+	)
+	unit.xhs_farm_reward_xp = tonumber(reward.xp) or 0
+
+	local abilityName = FARM_EVENT_ABILITY_BY_UNIT[unit:GetUnitName()]
+	if abilityName ~= nil then
+		local ability = unit:FindAbilityByName(abilityName)
+		if ability == nil then ability = unit:AddAbility(abilityName) end
+		if ability ~= nil then
+			local maxLevel = math.max(1, ability:GetMaxLevel())
+			ability:SetLevel(math.min(math.max(1, tonumber(difficulty) or 1), maxLevel))
+		else
+			print("[XHS][FarmEvent] Failed to add " .. abilityName .. " to " .. unit:GetUnitName())
+		end
+	end
+
+	if staged == true then
+		unit:AddNoDraw()
+		unit:AddNewModifier(unit, nil, "modifier_xhs_farm_staged", {})
+	end
+end
+
+function SpecialEvents:CreateFarmEventUnit(playerID, round, level, staged, index)
+	local progress = self.hero_farm_event[playerID]
+	local point = progress and progress.point or nil
+	local unitName = FarmEvent_Creeps[math.max(0, round) + 1]
+	if point == nil or unitName == nil then return nil end
+
+	local position = staged == true
+		and (FARM_EVENT_STAGING_ORIGIN + Vector(playerID * 96, (index or 1) * 32, 0))
+		or GetFarmSpawnPosition(point, index or 1)
+	local unit = CreateUnitByName(unitName, position, true, nil, nil, DOTA_TEAM_CUSTOM_2)
+	if not IsValidAliveUnit(unit) then return nil end
+
+	local difficulty = GameRules:GetCustomGameDifficulty()
+	local damageBonus = FARM_EVENT_UPGRADE.damage[difficulty] * level
+	local healthBonus = FARM_EVENT_UPGRADE.health[difficulty] * level
+	local armorBonus = FARM_EVENT_UPGRADE.armor[difficulty] * level
+	local firstWave = round == 0 and level == 1 and (progress.completed_waves or 0) == 0
+	local minimumFactor = firstWave and 1.0 or 0.95
+	local maximumFactor = firstWave and 1.1 or 1.05
+	unit:SetBaseDamageMin(unit:GetRealDamageDone(unit) + damageBonus * minimumFactor)
+	unit:SetBaseDamageMax(unit:GetRealDamageDone(unit) + damageBonus * maximumFactor)
+	local maxHealth = unit:GetMaxHealth() + healthBonus
+	unit:SetBaseMaxHealth(maxHealth)
+	unit:SetMaxHealth(maxHealth)
+	unit:SetHealth(maxHealth)
+	unit:SetPhysicalArmorBaseValue(unit:GetPhysicalArmorValue(false) + armorBonus)
+	self:ConfigureFarmEventUnit(unit, playerID, difficulty, staged)
+	return unit
+end
+
+function SpecialEvents:PrepareFarmEventWave(playerID, round, level)
+	local progress = self.hero_farm_event[playerID]
+	if progress == nil or progress.point == nil then return end
+
+	progress.prep_token = (progress.prep_token or 0) + 1
+	local token = progress.prep_token
+	local generation = self.farm_event_generation
+	progress.prepared_units = {}
+	progress.prepared_round = round
+	progress.prepared_level = level
+
+	Timers:CreateTimer(0, function()
+		if GameMode.FarmEvent_occuring ~= true
+			or self.farm_event_generation ~= generation
+			or progress.prep_token ~= token then
+			return nil
+		end
+
+		local index = #progress.prepared_units + 1
+		if index > FARM_EVENT_CREEPS_PER_WAVE then return nil end
+		local unit = self:CreateFarmEventUnit(playerID, round, level, true, index)
+		if unit ~= nil then table.insert(progress.prepared_units, unit) end
+		return #progress.prepared_units < FARM_EVENT_CREEPS_PER_WAVE
+			and FARM_EVENT_PRELOAD_INTERVAL or nil
+	end)
+end
+
+function SpecialEvents:ActivateFarmEventWave(playerID, round, level)
+	local progress = self.hero_farm_event[playerID]
+	if progress == nil or progress.point == nil then return end
+	progress.prep_token = (progress.prep_token or 0) + 1
+
+	local prepared = {}
+	if progress.prepared_round == round and progress.prepared_level == level then
+		prepared = progress.prepared_units or {}
+	else
+		for _, unit in ipairs(progress.prepared_units or {}) do
+			if unit ~= nil and not unit:IsNull() then UTIL_Remove(unit) end
+		end
+	end
+
+	progress.round = round
+	progress.level = level
+	progress.active_units = {}
+	progress.prepared_units = {}
+	progress.prepared_round = nil
+	progress.prepared_level = nil
+	progress.transitioning = false
+
+	for index = 1, FARM_EVENT_CREEPS_PER_WAVE do
+		local unit = prepared[index]
+		if not IsValidAliveUnit(unit) then
+			unit = self:CreateFarmEventUnit(playerID, round, level, false, index)
+		else
+			unit.xhs_farm_staged = false
+			unit:SetAbsOrigin(GetFarmSpawnPosition(progress.point, index))
+			unit:RemoveModifierByName("modifier_xhs_farm_staged")
+			unit:RemoveNoDraw()
+			FindClearSpaceForUnit(unit, unit:GetAbsOrigin(), true)
+		end
+
+		if IsValidAliveUnit(unit) then
+			if unit:GetUnitName() == "npc_dota_creature_polar_furbolg" then
+				unit:AddNewModifier(unit, nil, "modifier_xhs_farm_wave_damage", {
+					damage_pct = FARM_EVENT_WAVE_DAMAGE[
+						math.min(#FARM_EVENT_WAVE_DAMAGE, math.max(1, GameRules:GetCustomGameDifficulty()))
+					],
+				})
+			end
+			if not unit:HasModifier("modifier_ai") then
+				unit:AddNewModifier(unit, nil, "modifier_ai", { state = 5 })
+			end
+			local hero = GetFarmEventHero(playerID)
+			if hero ~= nil then unit:SetForceAttackTarget(hero) end
+			table.insert(progress.active_units, unit)
+		end
+	end
+
+	progress.remaining = #progress.active_units
+	self.farm_leaderboard_dirty = true
+	self:PublishFarmLeaderboard(true)
+	local nextRound, nextLevel = GetNextFarmWave(round, level)
+	self:PrepareFarmEventWave(playerID, nextRound, nextLevel)
+end
+
+function SpecialEvents:PayFarmEventWaveRewards(playerID, progress)
+	if progress == nil then return end
+	playerID = tonumber(playerID)
+	local gold = math.max(0, math.floor(tonumber(progress.pending_wave_gold) or 0))
+	local xp = math.max(0, math.floor(tonumber(progress.pending_wave_xp) or 0))
+	if gold <= 0 and xp <= 0 then return end
+
+	local validPlayer = playerID ~= nil and PlayerResource:IsValidPlayerID(playerID)
+	local player = validPlayer and PlayerResource:GetPlayer(playerID) or nil
+	if gold > 0 and validPlayer then
+		PlayerResource:ModifyGold(playerID, gold, false, DOTA_ModifyGold_CreepKill)
+	end
+	-- XP must still be paid if the wave ends while the owning hero is dead.
+	local hero = validPlayer and PlayerResource:GetSelectedHeroEntity(playerID) or nil
+	if xp > 0 and hero ~= nil then
+		hero:AddExperience(xp, DOTA_ModifyXP_CreepKill, false, true)
+	end
+	-- One compact reward burst per completed wave replaces ten kill-time
+	-- overhead messages and their associated client work.
+	if hero ~= nil and player ~= nil then
+		if gold > 0 then
+			SendOverheadEventMessage(player, OVERHEAD_ALERT_GOLD, hero, gold, player)
+		end
+		if xp > 0 then
+			SendOverheadEventMessage(player, OVERHEAD_ALERT_XP, hero, xp, player)
+		end
+	end
+	progress.pending_wave_gold = 0
+	progress.pending_wave_xp = 0
+	progress.last_wave_gold = gold
+	progress.last_wave_xp = xp
+	progress.reward_serial = (progress.reward_serial or 0) + 1
+end
+
+function SpecialEvents:OnFarmEventCreepKilled(killedUnit)
+	if GameMode.FarmEvent_occuring ~= true
+		or killedUnit == nil
+		or killedUnit:IsNull()
+		or killedUnit.xhs_farm_event ~= true
+		or killedUnit.xhs_farm_staged == true
+		or killedUnit.xhs_farm_kill_counted == true then
+		return
+	end
+
+	killedUnit.xhs_farm_kill_counted = true
+	local playerID = tonumber(killedUnit.xhs_farm_event_player_id)
+	local progress = playerID ~= nil and self.hero_farm_event[playerID] or nil
+	if progress == nil then return end
+
+	progress.kills = math.max(0, tonumber(progress.kills) or 0) + 1
+	progress.remaining = math.max(0, (tonumber(progress.remaining) or 0) - 1)
+	progress.pending_wave_gold = (progress.pending_wave_gold or 0)
+		+ math.max(0, tonumber(killedUnit.xhs_farm_reward_gold) or 0)
+	progress.pending_wave_xp = (progress.pending_wave_xp or 0)
+		+ math.max(0, tonumber(killedUnit.xhs_farm_reward_xp) or 0)
+	self.farm_leaderboard_dirty = true
+
+	if progress.remaining > 0 or progress.transitioning == true then return end
+	progress.transitioning = true
+	self:PayFarmEventWaveRewards(playerID, progress)
+	progress.completed_waves = (progress.completed_waves or 0) + 1
+	local nextRound, nextLevel = GetNextFarmWave(progress.round, progress.level)
+	local generation = self.farm_event_generation
+	Timers:CreateTimer(0, function()
+		if GameMode.FarmEvent_occuring == true and self.farm_event_generation == generation then
+			self:ActivateFarmEventWave(playerID, nextRound, nextLevel)
+		end
+	end)
 end
 
 function SpecialEvents:BeginFarmEventCelebration(duration)
 	duration = math.max(0, tonumber(duration) or FARM_EVENT_CELEBRATION_DURATION)
 
+	for playerID, progress in pairs(self.hero_farm_event or {}) do
+		self:PayFarmEventWaveRewards(tonumber(playerID), progress)
+	end
 	-- Capture the last combat frame before removing units so remaining-creep
 	-- tie breakers cannot be changed by cleanup.
 	self:PublishFarmLeaderboard(true)
@@ -770,69 +1009,6 @@ function SpecialEvents:BeginFarmEventCelebration(duration)
 			DisableItems(hero, duration)
 		end
 	end
-end
-
-function SpecialEvents:StartFarmEventAbilityAI(unit, playerID, abilityName)
-	local config = FARM_EVENT_ACTIVE_ABILITIES[abilityName]
-	if config == nil then return end
-
-	local thinkName = DoUniqueString("xhs_farm_event_ability")
-	GameRules:GetGameModeEntity():SetContextThink(thinkName, function()
-		if GameMode.FarmEvent_occuring ~= true or not IsValidAliveUnit(unit) then return nil end
-
-		local ability = unit:FindAbilityByName(abilityName)
-		if not CanFarmEventUnitCast(unit, ability) then return FARM_EVENT_ABILITY_THINK_INTERVAL end
-
-		local now = GameRules:GetGameTime()
-		local lockKey = tostring(playerID) .. ":" .. abilityName
-		local nextCastTime = self.farm_event_ability_locks and self.farm_event_ability_locks[lockKey] or 0
-		if now < nextCastTime then return FARM_EVENT_ABILITY_THINK_INTERVAL end
-
-		local castIssued = false
-		if config.cast_type == "no_target" then
-			local hero = GetFarmEventHero(playerID)
-			if hero ~= nil and (hero:GetAbsOrigin() - unit:GetAbsOrigin()):Length2D() <= config.trigger_range then
-				unit:CastAbilityNoTarget(ability, -1)
-				castIssued = true
-			end
-		elseif config.cast_type == "friendly_target" then
-			local target = FindFarmEventBuffTarget(unit, playerID, config)
-			if target ~= nil then
-				unit:CastAbilityOnTarget(target, ability, -1)
-				castIssued = true
-			end
-		end
-
-		if castIssued then
-			self.farm_event_ability_locks = self.farm_event_ability_locks or {}
-			self.farm_event_ability_locks[lockKey] = now + config.shared_lock
-		end
-
-		return FARM_EVENT_ABILITY_THINK_INTERVAL
-	end, RandomFloat(0.05, 0.25))
-end
-
-function SpecialEvents:ConfigureFarmEventUnit(unit, playerID, difficulty)
-	if not IsValidAliveUnit(unit) then return end
-
-	unit.xhs_farm_event = true
-	unit.xhs_farm_event_player_id = playerID
-
-	local abilityName = FARM_EVENT_ABILITY_BY_UNIT[unit:GetUnitName()]
-	if abilityName == nil then return end
-
-	local ability = unit:FindAbilityByName(abilityName)
-	if ability == nil then
-		ability = unit:AddAbility(abilityName)
-	end
-	if ability == nil then
-		print("[XHS][FarmEvent] Failed to add " .. abilityName .. " to " .. unit:GetUnitName())
-		return
-	end
-
-	local maxLevel = math.max(1, ability:GetMaxLevel())
-	ability:SetLevel(math.min(math.max(1, tonumber(difficulty) or 1), maxLevel))
-	self:StartFarmEventAbilityAI(unit, playerID, abilityName)
 end
 
 function SpecialEvents:FarmEvent(time)
@@ -854,7 +1030,7 @@ function SpecialEvents:FarmEvent(time)
 	self.farm_event_generation = (self.farm_event_generation or 0) + 1
 	self.farm_exit_wave_scheduled = false
 	self.farm_exit_wave_spawned = false
-	self:PublishFarmLeaderboard(true)
+	self:SuspendNonFarmCreeps()
 	self:StartFarmLeaderboardPublisher()
 	ShowCurrentEventTimer("FARM EVENT", time)
 	UpdateGlobalObjective("farm_event", "Active", "Farm Event active", time)
@@ -865,7 +1041,7 @@ function SpecialEvents:FarmEvent(time)
 	StunBuildings(time)
 	CinematicPauseGame(SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP)
 
-	for k, v in pairs(HeroList:GetAllHeroes()) do
+	for _, v in pairs(HeroList:GetAllHeroes()) do
 		if v:IsRealHero() then
 			local nPlayerID = v:GetPlayerID()
 			local point = Entities:FindByName(nil, "farm_event_player_" .. nPlayerID)
@@ -876,9 +1052,28 @@ function SpecialEvents:FarmEvent(time)
 				if point ~= nil then
 					StartCinematicDelayedTeleport(v, point:GetAbsOrigin(), tp_delay)
 				end
+				if point ~= nil and v:GetUnitName() ~= "npc_dota_hero_wisp" then
+					self.hero_farm_event[nPlayerID] = {
+						round = 0,
+						level = 1,
+						kills = 0,
+						completed_waves = 0,
+						remaining = 0,
+						active_units = {},
+						prepared_units = {},
+						pending_wave_gold = 0,
+						pending_wave_xp = 0,
+						reward_serial = 0,
+						point = point,
+						prep_token = 0,
+					}
+					self:PrepareFarmEventWave(nPlayerID, 0, 1)
+				end
 			end
 		end
 	end
+	self.farm_leaderboard_dirty = true
+	self:PublishFarmLeaderboard(true)
 
 	GameRules:GetGameModeEntity():SetContextThink(DoUniqueString("farm_event"), function()
 		Notifications:TopToAll({
@@ -891,46 +1086,12 @@ function SpecialEvents:FarmEvent(time)
 
 		RestartHeroes()
 
-		for nPlayerID = 0, (DOTA_MAX_TEAM_PLAYERS or 24) - 1 do
-			local hero = nil
-			if PlayerResource:HasSelectedHero(nPlayerID) then
-				hero = PlayerResource:GetSelectedHeroEntity(nPlayerID)
-			end
-
-			if hero ~= nil
-				and IsValidEntity(hero)
-				and not hero:IsNull()
-				and hero:IsRealHero()
-				and hero:GetUnitName() ~= "npc_dota_hero_wisp"
-			then
-				local point = Entities:FindByName(nil, "farm_event_player_" .. nPlayerID)
-
-				SpecialEvents.hero_farm_event[nPlayerID] = {}
-				SpecialEvents.hero_farm_event[nPlayerID]["round"] = 0
-				SpecialEvents.hero_farm_event[nPlayerID]["level"] = 1
-				SpecialEvents.hero_farm_event[nPlayerID]["kills"] = 0
-
-				if point ~= nil then
-					PlayStormEarthFireSound(point, "farm_" .. nPlayerID, true)
-				end
-
-				for j = 1, FARM_EVENT_CREEPS_PER_WAVE do
-					if FarmEvent_Creeps[1] and point then
-						local unit = CreateUnitByName(FarmEvent_Creeps[1], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
-						unit:SetBaseDamageMin(unit:GetRealDamageDone(unit) + (FARM_EVENT_UPGRADE["damage"][difficulty] * SpecialEvents.hero_farm_event[nPlayerID]["level"]))
-						unit:SetBaseDamageMax(unit:GetRealDamageDone(unit) + (FARM_EVENT_UPGRADE["damage"][difficulty] * SpecialEvents.hero_farm_event[nPlayerID]["level"]) * 1.1)
-						unit:SetMaxHealth(unit:GetMaxHealth() + (FARM_EVENT_UPGRADE["health"][difficulty] * SpecialEvents.hero_farm_event[nPlayerID]["level"]))
-						unit:SetBaseMaxHealth(unit:GetMaxHealth() + (FARM_EVENT_UPGRADE["health"][difficulty] * SpecialEvents.hero_farm_event[nPlayerID]["level"]))
-						unit:SetHealth(unit:GetMaxHealth())
-						unit:SetPhysicalArmorBaseValue(unit:GetPhysicalArmorValue(false) + (FARM_EVENT_UPGRADE["armor"][difficulty] * SpecialEvents.hero_farm_event[nPlayerID]["level"]))
-						SpecialEvents:ConfigureFarmEventUnit(unit, nPlayerID, difficulty)
-						ApplyGrowthOverheadMarker(unit, SpecialEvents.hero_farm_event[nPlayerID]["level"])
-					end
-				end
-
+		for nPlayerID, progress in pairs(SpecialEvents.hero_farm_event or {}) do
+			local hero = GetFarmEventHero(tonumber(nPlayerID))
+			if hero ~= nil and progress.point ~= nil then
+				PlayStormEarthFireSound(progress.point, "farm_" .. nPlayerID, true)
 				DisableItems(hero, time)
-
-				SpecialEvents:FarmEventCreeps(nPlayerID)
+				SpecialEvents:ActivateFarmEventWave(tonumber(nPlayerID), 0, 1)
 			end
 		end
 	end, start_delay)
@@ -965,46 +1126,10 @@ function SpecialEvents:FarmEvent(time)
 
 end
 
-function SpecialEvents:FarmEventCreeps(id)
-	local point = Entities:FindByName(nil, "farm_event_player_" .. id)
-	local difficulty = GameRules:GetCustomGameDifficulty()
-	local wavesPerLevel = GetFarmEventWaveCount()
-
-	GameRules:GetGameModeEntity():SetContextThink(DoUniqueString("muradin_event"), function()
-		local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_2, point:GetAbsOrigin(), nil, 1200, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)
-
-		if CustomTimers.timers_paused == 1 then
-			if #units <= 1 then
-				SpecialEvents.hero_farm_event[id]["round"] = (SpecialEvents.hero_farm_event[id]["round"] + 1) % wavesPerLevel
-
-				if SpecialEvents.hero_farm_event[id]["round"] == 0 then
-					SpecialEvents.hero_farm_event[id]["level"] = (SpecialEvents.hero_farm_event[id]["level"] + 1)
-				end
-
-				for j = 1, FARM_EVENT_CREEPS_PER_WAVE do
-					local unit = CreateUnitByName(FarmEvent_Creeps[SpecialEvents.hero_farm_event[id]["round"] + 1], point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
-					unit:SetBaseDamageMin(unit:GetRealDamageDone(unit) + (FARM_EVENT_UPGRADE["damage"][difficulty] * SpecialEvents.hero_farm_event[id]["level"]) * 0.95)
-					unit:SetBaseDamageMax(unit:GetRealDamageDone(unit) + (FARM_EVENT_UPGRADE["damage"][difficulty] * SpecialEvents.hero_farm_event[id]["level"]) * 1.05)
-					unit:SetMaxHealth(unit:GetMaxHealth() + (FARM_EVENT_UPGRADE["health"][difficulty] * SpecialEvents.hero_farm_event[id]["level"]))
-					unit:SetBaseMaxHealth(unit:GetMaxHealth() + (FARM_EVENT_UPGRADE["health"][difficulty] * SpecialEvents.hero_farm_event[id]["level"]))
-					unit:SetHealth(unit:GetMaxHealth())
-					unit:SetPhysicalArmorBaseValue(unit:GetPhysicalArmorValue(false) + (FARM_EVENT_UPGRADE["armor"][difficulty] * SpecialEvents.hero_farm_event[id]["level"]))
-
-					SpecialEvents:ConfigureFarmEventUnit(unit, id, difficulty)
-					ApplyGrowthOverheadMarker(unit, SpecialEvents.hero_farm_event[id]["level"])
-				end
-			end
-
-			return 1
-		else
-			return nil
-		end
-	end, 0.0)
-end
-
 function SpecialEvents:EndFarmEvent()
 	CustomTimers.timers_paused = 2
 	StopAllStormEarthFireSounds()
+	self:ResumeNonFarmCreeps()
 	if FragmentQuests ~= nil then
 		FragmentQuests:OnFarmEventEnd()
 		FragmentQuests:OnPhase2Start()

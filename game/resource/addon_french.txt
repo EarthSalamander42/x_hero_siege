@@ -2551,6 +2551,8 @@
 		"DOTA_Tooltip_modifier_xhs_creep_passive_dot_Description"                                      "Takes periodic damage."
 		"DOTA_Tooltip_modifier_xhs_creep_passive_slow"                                                 "Slowed"
 		"DOTA_Tooltip_modifier_xhs_creep_passive_slow_Description"                                     "Movement and attack speed are reduced."
+		"DOTA_Tooltip_modifier_xhs_phase_one_wave_scaling"                                              "Progression de vague"
+		"DOTA_Tooltip_modifier_xhs_phase_one_wave_scaling_Description"                                  "Points de vie maximum : %fMODIFIER_PROPERTY_TOOLTIP%%%. Dégâts d'attaque de base : %fMODIFIER_PROPERTY_TOOLTIP%%%. Armure de base : %fMODIFIER_PROPERTY_TOOLTIP2%%%."
 		"xhs_tome_lock_paused"                                                                         "Tome purchases are disabled while the game is paused."
 		"xhs_tome_lock_reincarnating"                                                                  "Tome purchases are disabled while this hero is reincarnating."
 		"xhs_tome_lock_optional_event"                                                                 "Tome purchases are disabled while this hero is taking part in an optional event."

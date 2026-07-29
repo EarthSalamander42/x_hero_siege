@@ -48,12 +48,80 @@ local ITEM_AFFINITIES = {
 	},
 }
 
+-- Roles are deliberately separate from the legacy combat label. The primary
+-- role describes where a hero stands and what keeps it alive; the secondary
+-- role describes how its kit converts resources into impact. Item affinities
+-- consume both so a frontline right-clicker does not get built like a pure
+-- damage sponge.
+local ROLE_AFFINITY_BONUSES = {
+	frontline = {
+		frontline = 0.18, survival = 0.14, armor = 0.10,
+	},
+	right_click = {
+		right_click = 0.28, physical = 0.22, attack_speed = 0.18,
+		single_target = 0.14, wave = 0.10,
+	},
+	ranged_dps = {
+		right_click = 0.18, physical = 0.14, single_target = 0.10,
+	},
+	support = {
+		team = 0.18, sustain = 0.14, cooldown = 0.08,
+	},
+	spellcaster = {
+		caster = 0.18, magical = 0.18, cooldown = 0.12, mana = 0.08,
+	},
+	control = {
+		control = 0.18, cooldown = 0.08,
+	},
+	wave_clear = {
+		wave = 0.22, cleave = 0.18, physical = 0.08, magical = 0.08,
+	},
+}
+
+-- Source of truth for native attack lifesteal in the playable XHS hero roster.
+-- Spell lifesteal (Leshrac/Dark Summoner) is deliberately excluded: it does not
+-- replace the Mask's sustain on basic attacks.
+local INTRINSIC_ATTACK_LIFESTEAL_BY_HERO = {
+	npc_dota_hero_axe = {
+		ability = "axe_battle_rage",
+		kind = "active_buff",
+		lifesteal_pct = 16,
+	},
+	npc_dota_hero_lone_druid = {
+		ability = "xhs_vampiric_aura",
+		kind = "aura",
+		lifesteal_pct = 50,
+	},
+	npc_dota_hero_meepo = {
+		ability = "holdout_life_steal",
+		kind = "autocast_attack",
+		lifesteal_pct = 250,
+	},
+	npc_dota_hero_monkey_king = {
+		ability = "holdout_jingu_mastery",
+		kind = "conditional_attack",
+		lifesteal_pct = 50,
+	},
+	npc_dota_hero_sven = {
+		ability = "holdout_muradin_hammer",
+		kind = "aura",
+		lifesteal_pct = 50,
+	},
+	npc_dota_hero_terrorblade = {
+		ability = "xhs_vampiric_aura",
+		kind = "aura",
+		lifesteal_pct = 50,
+	},
+}
+
 local PROFILE_BY_HERO = {
 	npc_dota_hero_enchantress = {
 		certified = true,
 		runtime_validated = false,
 		display_name = "Tyrande",
 		role = "ranged_dps",
+		primary_role = "ranged_dps",
+		secondary_role = "right_click",
 		preferred_range = 620,
 		safety_distance = 390,
 		retreat_health = 0.28,
@@ -76,6 +144,8 @@ local PROFILE_BY_HERO = {
 		runtime_validated = false,
 		display_name = "Rifleman",
 		role = "ranged_dps",
+		primary_role = "ranged_dps",
+		secondary_role = "right_click",
 		preferred_range = 720,
 		safety_distance = 430,
 		retreat_health = 0.28,
@@ -101,8 +171,11 @@ local PROFILE_BY_HERO = {
 			cleave_radius = 325,
 			cleave_enter_targets = 3,
 			cleave_exit_targets = 2,
-			minimum_mana_ratio = 0.18,
-			minimum_mode_duration = 1.35,
+			minimum_mana_ratio = 0.05,
+			minimum_mode_attacks = 2,
+			minimum_mode_duration = 0.35,
+			target_loss_grace = 0.45,
+			target_change_override = true,
 			priority = 90,
 		},
 		abilities = {
@@ -122,6 +195,8 @@ local PROFILE_BY_HERO = {
 		runtime_validated = false,
 		display_name = "Mountain King",
 		role = "frontline",
+		primary_role = "frontline",
+		secondary_role = "right_click",
 		preferred_range = 180,
 		safety_distance = 120,
 		retreat_health = 0.22,
@@ -129,7 +204,7 @@ local PROFILE_BY_HERO = {
 		item_affinities = ITEM_AFFINITIES.npc_dota_hero_sven,
 		skill_build = {
 			"holdout_avatar",
-			"slardar_bash",
+			"xhs_mountain_king_bash",
 			"holdout_muradin_hammer",
 			"holdout_storm_bolt",
 			"holdout_thunder_clap",
@@ -155,6 +230,8 @@ local PROFILE_BY_HERO = {
 		runtime_validated = false,
 		display_name = "Paladin",
 		role = "support",
+		primary_role = "support",
+		secondary_role = "frontline",
 		preferred_range = 360,
 		safety_distance = 260,
 		retreat_health = 0.30,
@@ -214,6 +291,8 @@ local PROFILE_BY_HERO = {
 		runtime_validated = false,
 		display_name = "Archmage",
 		role = "ranged_control",
+		primary_role = "spellcaster",
+		secondary_role = "control",
 		preferred_range = 620,
 		safety_distance = 400,
 		retreat_health = 0.30,
@@ -249,6 +328,8 @@ local PROFILE_BY_HERO = {
 		runtime_validated = false,
 		display_name = "Magtheridon",
 		role = "frontline",
+		primary_role = "frontline",
+		secondary_role = "spellcaster",
 		preferred_range = 190,
 		safety_distance = 130,
 		retreat_health = 0.24,
@@ -281,6 +362,8 @@ local PROFILE_BY_HERO = {
 		runtime_validated = false,
 		display_name = "Arthas",
 		role = "frontline_support",
+		primary_role = "frontline",
+		secondary_role = "support",
 		preferred_range = 190,
 		safety_distance = 130,
 		retreat_health = 0.25,
@@ -330,6 +413,8 @@ local PROFILE_BY_HERO = {
 		runtime_validated = false,
 		display_name = "Tauren Chieftain",
 		role = "frontline_control",
+		primary_role = "frontline",
+		secondary_role = "control",
 		preferred_range = 190,
 		safety_distance = 130,
 		retreat_health = 0.24,
@@ -370,6 +455,8 @@ local PROFILE_BY_HERO = {
 		runtime_validated = false,
 		display_name = "Ranger",
 		role = "ranged_dps",
+		primary_role = "ranged_dps",
+		secondary_role = "wave_clear",
 		preferred_range = 620,
 		safety_distance = 390,
 		retreat_health = 0.29,
@@ -409,6 +496,45 @@ local PROFILE_BY_HERO = {
 		},
 	},
 }
+
+local function ApplyRoleAffinities(profile)
+	if type(profile) ~= "table" then return end
+	profile.item_affinities = profile.item_affinities or {}
+	local roles = {
+		{ name = profile.primary_role, weight = 1.00 },
+		{ name = profile.secondary_role, weight = 0.85 },
+	}
+	for _, role in ipairs(roles) do
+		for affinity, bonus in pairs(ROLE_AFFINITY_BONUSES[role.name] or {}) do
+			profile.item_affinities[affinity] = math.min(
+				1.25,
+				math.max(0, tonumber(profile.item_affinities[affinity]) or 0)
+					+ bonus * role.weight
+			)
+		end
+	end
+end
+
+local function ApplyIntrinsicAttackLifesteal(heroName, profile)
+	if type(profile) ~= "table" then return end
+	local source = INTRINSIC_ATTACK_LIFESTEAL_BY_HERO[heroName]
+	if type(source) ~= "table" then return end
+
+	profile.intrinsic_sustain = profile.intrinsic_sustain or {}
+	profile.intrinsic_sustain.attack_lifesteal = true
+	profile.intrinsic_sustain.lifesteal_aura = source.kind == "aura"
+	profile.intrinsic_sustain.lifesteal_pct = tonumber(source.lifesteal_pct) or 0
+	profile.intrinsic_sustain.ability = source.ability
+	profile.intrinsic_sustain.kind = source.kind
+	profile.redundant_items = profile.redundant_items or {}
+	profile.redundant_items.item_lifesteal_mask = true
+end
+
+for heroName, profile in pairs(PROFILE_BY_HERO) do
+	profile.hero_name = heroName
+	ApplyRoleAffinities(profile)
+	ApplyIntrinsicAttackLifesteal(heroName, profile)
+end
 
 local STANDARD_HEROES = {
 	{ hero = "npc_dota_hero_enchantress" },
@@ -555,6 +681,14 @@ end
 
 function XHSBotHeroProfiles:Get(heroName)
 	return PROFILE_BY_HERO[heroName]
+end
+
+function XHSBotHeroProfiles:GetIntrinsicAttackLifesteal(heroName)
+	return INTRINSIC_ATTACK_LIFESTEAL_BY_HERO[heroName]
+end
+
+function XHSBotHeroProfiles:HasIntrinsicAttackLifesteal(heroName)
+	return self:GetIntrinsicAttackLifesteal(heroName) ~= nil
 end
 
 function XHSBotHeroProfiles:IsCertified(heroName)

@@ -92,7 +92,7 @@ Runes.DEFINITIONS = {
 		category = "Recovery",
 		scope = "picker",
 		modifier = "modifier_xhs_rune_second_wind",
-		duration = 30,
+		duration = 60,
 		values = { threshold_pct = 30, heal_pct = 30, mana_pct = 30, recovery_duration = 3, guard_duration = 4, guard_reduction = 20 },
 	},
 	barrier = {
@@ -940,7 +940,10 @@ function Runes:PlayRunePickupSound(hero)
 end
 
 function Runes:PlayHeroRuneEffect(hero, category, playSound)
-	local particle = ParticleManager:CreateParticle("particles/generic_hero_status/hero_levelup.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
+	local levelupParticle = XHSGetBattlepassParticle ~= nil
+		and XHSGetBattlepassParticle(hero, "levelup_pfx", "particles/generic_hero_status/hero_levelup.vpcf")
+		or "particles/generic_hero_status/hero_levelup.vpcf"
+	local particle = ParticleManager:CreateParticle(levelupParticle, PATTACH_ABSORIGIN_FOLLOW, hero)
 	ParticleManager:SetParticleControl(particle, 0, hero:GetAbsOrigin())
 	ParticleManager:ReleaseParticleIndex(particle)
 	if playSound == true then

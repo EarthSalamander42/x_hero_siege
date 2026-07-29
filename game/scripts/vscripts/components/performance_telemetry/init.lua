@@ -12,8 +12,8 @@ local SERVER_FRAME_INCIDENT_MS = 40
 local CLIENT_FPS_INCIDENT = 40
 local INCIDENT_CONTEXT_SAMPLES = 4
 local ACTIVITY_INCIDENT_THRESHOLDS = {
-	zone_searches_per_second = { threshold = 500, reason = "zone_search_pressure" },
-	zone_search_cost_ms_per_second = { threshold = 10, reason = "zone_search_cost" },
+	spatial_queries_per_second = { threshold = 500, reason = "spatial_query_pressure" },
+	spatial_query_cost_ms_per_second = { threshold = 10, reason = "spatial_query_cost" },
 	orders_per_second = { threshold = 200, reason = "order_pressure" },
 	repeated_orders_per_second = { threshold = 50, reason = "repeated_order_pressure" },
 	ai_thinks_per_second = { threshold = 300, reason = "ai_think_pressure" },
@@ -207,10 +207,6 @@ function XHSPerformanceTelemetry:BuildSample()
 			sample.total_units = sample.total_units + 1
 			if unit:HasModifier("modifier_ai") then sample.ai_controllers = sample.ai_controllers + 1 end
 			if unit.xhs_wave_order_controller == true then sample.wave_controllers = sample.wave_controllers + 1 end
-			if unit.xhs_destroyer_ability_ai_started == true then
-				sample.ability_controllers = sample.ability_controllers + 1
-			end
-
 			if isDummy or isRune then
 				sample.other_units = sample.other_units + 1
 			elseif BOSSES[unitName] == true or unit.Boss == true then
@@ -232,6 +228,12 @@ function XHSPerformanceTelemetry:BuildSample()
 
 	local thinkers = Entities:FindAllByClassname("npc_dota_thinker")
 	sample.thinkers = thinkers and #thinkers or 0
+	local directorState = XHSCreepAIDirector ~= nil
+		and XHSCreepAIDirector.GetState ~= nil
+		and XHSCreepAIDirector:GetState()
+		or {}
+	sample.ai_director = directorState
+	sample.ability_controllers = tonumber(directorState.active_ability_agents) or 0
 	if XHSPerformanceCounters ~= nil
 		and XHSPerformanceCounters.GetAggregateSnapshot ~= nil then
 		sample.activity = CopyTable(XHSPerformanceCounters:GetAggregateSnapshot(
@@ -241,9 +243,9 @@ function XHSPerformanceTelemetry:BuildSample()
 	sample.ai_ticks_per_second = sample.activity.ai_thinks_per_second
 		or sample.ai_controllers
 	sample.wave_checks_per_second = sample.activity.wave_thinks_per_second
-		or sample.wave_controllers * 4
+		or sample.wave_controllers
 	sample.ability_checks_per_second = sample.activity.ability_loop_thinks_per_second
-		or sample.ability_controllers * 4
+		or sample.ability_controllers
 	sample.profiler_ms = Round(math.max(0, (Now() - startedAt) * 1000), 2)
 	self.next_sequence = self.next_sequence + 1
 	return sample

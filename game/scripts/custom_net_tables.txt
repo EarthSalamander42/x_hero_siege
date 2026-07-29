@@ -30,5 +30,6 @@
 		"xhs_tome_purchase",
 		"xhs_lua_modifiers",
 		"xhs_farm_leaderboard",
+		"xhs_castle_bar",
 	]
 }

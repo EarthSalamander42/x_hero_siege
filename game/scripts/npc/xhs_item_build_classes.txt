@@ -1,0 +1,349 @@
+"XHSItemBuilds"
+{
+	"version"		"1"
+
+	// Item lists are editorial recommendations for human players. The bot
+	// planner remains adaptive and can reorder, replace, or skip these items.
+	"classes"
+	{
+		"tank"
+		{
+			"display"		"Tank / Frontline"
+			"starting"
+			{
+				"1"		"item_health_potion"
+				"2"		"item_mana_potion"
+				"3"		"item_orb_of_darkness"
+			}
+			"early"
+			{
+				"1"		"item_orb_of_earth"
+				"2"		"item_tome_small"
+				"3"		"item_tome_small"
+				"4"		"item_lifesteal_mask"
+				"5"		"item_ankh_of_reincarnation"
+			}
+			"mid"
+			{
+				"1"		"item_orb_of_darkness2"
+				"2"		"item_orb_of_earth2"
+				"3"		"item_boots_of_speed"
+				"4"		"item_xhs_cloak_of_flames"
+			}
+			"late"
+			{
+				"1"		"item_bracer_of_the_void"
+				"2"		"item_orb_of_earth3"
+				"3"		"item_healing_wards2"
+				"4"		"item_tome_big"
+			}
+			"other"
+			{
+				"1"		"item_healing_wards"
+				"2"		"item_potion_full"
+				"3"		"item_potion_of_invulnerability"
+				"4"		"item_potion_of_antimagic"
+				"5"		"item_amulet_of_the_wild"
+				"6"		"item_staff_of_mastery"
+			}
+		}
+
+		"bruiser"
+		{
+			"display"		"Bruiser"
+			"starting"
+			{
+				"1"		"item_health_potion"
+				"2"		"item_mana_potion"
+				"3"		"item_orb_of_darkness"
+			}
+			"early"
+			{
+				"1"		"item_orb_of_fire"
+				"2"		"item_tome_small"
+				"3"		"item_tome_small"
+				"4"		"item_lifesteal_mask"
+				"5"		"item_ankh_of_reincarnation"
+			}
+			"mid"
+			{
+				"1"		"item_orb_of_darkness2"
+				"2"		"item_orb_of_fire2"
+				"3"		"item_boots_of_speed"
+				"4"		"item_xhs_cloak_of_flames"
+			}
+			"late"
+			{
+				"1"		"item_bracer_of_the_void"
+				"2"		"item_searing_blade"
+				"3"		"item_staff_of_mastery"
+				"4"		"item_tome_big"
+			}
+			"other"
+			{
+				"1"		"item_healing_wards"
+				"2"		"item_potion_full"
+				"3"		"item_potion_of_invulnerability"
+				"4"		"item_potion_of_antimagic"
+				"5"		"item_amulet_of_the_wild"
+				"6"		"item_orb_of_earth"
+			}
+		}
+
+		"physical_dps"
+		{
+			"display"		"Physical DPS"
+			"starting"
+			{
+				"1"		"item_health_potion"
+				"2"		"item_mana_potion"
+				"3"		"item_lifesteal_mask"
+			}
+			"early"
+			{
+				"1"		"item_orb_of_lightning"
+				"2"		"item_xhs_orb_of_venom"
+				"3"		"item_tome_small"
+				"4"		"item_tome_small"
+				"5"		"item_ankh_of_reincarnation"
+			}
+			"mid"
+			{
+				"1"		"item_orb_of_lightning2"
+				"2"		"item_viridian_gem"
+				"3"		"item_boots_of_speed"
+				"4"		"item_potion_full"
+			}
+			"late"
+			{
+				"1"		"item_celestial_claws"
+				"2"		"item_plagueheart"
+				"3"		"item_tome_big"
+			}
+			"other"
+			{
+				"1"		"item_orb_of_wind"
+				"2"		"item_xhs_cloak_of_flames"
+				"3"		"item_healing_wards"
+				"4"		"item_potion_of_invulnerability"
+				"5"		"item_potion_of_antimagic"
+				"6"		"item_amulet_of_the_wild"
+				"7"		"item_staff_of_mastery"
+			}
+		}
+
+		"wave_dps"
+		{
+			"display"		"Wave / Area DPS"
+			"starting"
+			{
+				"1"		"item_health_potion"
+				"2"		"item_mana_potion"
+				"3"		"item_lifesteal_mask"
+			}
+			"early"
+			{
+				"1"		"item_orb_of_fire"
+				"2"		"item_orb_of_lightning"
+				"3"		"item_tome_small"
+				"4"		"item_tome_small"
+				"5"		"item_ankh_of_reincarnation"
+			}
+			"mid"
+			{
+				"1"		"item_orb_of_fire2"
+				"2"		"item_orb_of_lightning2"
+				"3"		"item_boots_of_speed"
+				"4"		"item_xhs_cloak_of_flames"
+			}
+			"late"
+			{
+				"1"		"item_searing_blade"
+				"2"		"item_celestial_claws"
+				"3"		"item_tome_big"
+			}
+			"other"
+			{
+				"1"		"item_xhs_orb_of_venom"
+				"2"		"item_healing_wards"
+				"3"		"item_potion_full"
+				"4"		"item_potion_of_invulnerability"
+				"5"		"item_potion_of_antimagic"
+				"6"		"item_amulet_of_the_wild"
+				"7"		"item_staff_of_mastery"
+			}
+		}
+
+		"magic_dps"
+		{
+			"display"		"Magic DPS / Control"
+			"starting"
+			{
+				"1"		"item_health_potion"
+				"2"		"item_mana_potion"
+				"3"		"item_orb_of_arcane"
+			}
+			"early"
+			{
+				"1"		"item_orb_of_darkness"
+				"2"		"item_tome_small"
+				"3"		"item_tome_small"
+				"4"		"item_lifesteal_mask"
+				"5"		"item_ankh_of_reincarnation"
+			}
+			"mid"
+			{
+				"1"		"item_mystic_gem"
+				"2"		"item_orb_of_darkness2"
+				"3"		"item_staff_of_mastery"
+				"4"		"item_boots_of_speed"
+			}
+			"late"
+			{
+				"1"		"item_astral_core"
+				"2"		"item_bracer_of_the_void"
+				"3"		"item_healing_wards2"
+				"4"		"item_tome_big"
+			}
+			"other"
+			{
+				"1"		"item_healing_wards"
+				"2"		"item_potion_full"
+				"3"		"item_potion_of_invulnerability"
+				"4"		"item_potion_of_antimagic"
+				"5"		"item_xhs_cloak_of_flames"
+				"6"		"item_amulet_of_the_wild"
+			}
+		}
+
+		"support"
+		{
+			"display"		"Support / Healer"
+			"starting"
+			{
+				"1"		"item_health_potion"
+				"2"		"item_mana_potion"
+				"3"		"item_orb_of_darkness"
+			}
+			"early"
+			{
+				"1"		"item_orb_of_arcane"
+				"2"		"item_tome_small"
+				"3"		"item_tome_small"
+				"4"		"item_lifesteal_mask"
+				"5"		"item_ankh_of_reincarnation"
+				"6"		"item_healing_wards"
+			}
+			"mid"
+			{
+				"1"		"item_orb_of_darkness2"
+				"2"		"item_mystic_gem"
+				"3"		"item_potion_full"
+				"4"		"item_boots_of_speed"
+			}
+			"late"
+			{
+				"1"		"item_bracer_of_the_void"
+				"2"		"item_astral_core"
+				"3"		"item_healing_wards2"
+				"4"		"item_tome_big"
+			}
+			"other"
+			{
+				"1"		"item_staff_of_mastery"
+				"2"		"item_potion_of_invulnerability"
+				"3"		"item_potion_of_antimagic"
+				"4"		"item_amulet_of_the_wild"
+				"5"		"item_xhs_cloak_of_flames"
+			}
+		}
+
+		"summoner"
+		{
+			"display"		"Summoner / Army"
+			"starting"
+			{
+				"1"		"item_health_potion"
+				"2"		"item_mana_potion"
+				"3"		"item_orb_of_darkness"
+			}
+			"early"
+			{
+				"1"		"item_orb_of_arcane"
+				"2"		"item_tome_small"
+				"3"		"item_tome_small"
+				"4"		"item_lifesteal_mask"
+				"5"		"item_ankh_of_reincarnation"
+			}
+			"mid"
+			{
+				"1"		"item_orb_of_darkness2"
+				"2"		"item_mystic_gem"
+				"3"		"item_xhs_cloak_of_flames"
+				"4"		"item_boots_of_speed"
+			}
+			"late"
+			{
+				"1"		"item_bracer_of_the_void"
+				"2"		"item_astral_core"
+				"3"		"item_staff_of_mastery"
+				"4"		"item_tome_big"
+			}
+			"other"
+			{
+				"1"		"item_amulet_of_the_wild"
+				"2"		"item_healing_wards"
+				"3"		"item_healing_wards2"
+				"4"		"item_potion_full"
+				"5"		"item_potion_of_invulnerability"
+				"6"		"item_potion_of_antimagic"
+			}
+		}
+	}
+
+	"heroes"
+	{
+		"enchantress"		{ "display" "Dryad" "class" "physical_dps" }
+		"crystal_maiden"	{ "display" "Archmage" "class" "magic_dps" }
+		"luna"				{ "display" "Huntress" "class" "wave_dps" }
+		"lone_druid"		{ "display" "Beastmaster" "class" "summoner" }
+		"pugna"				{ "display" "Dread Lord" "class" "magic_dps" }
+		"lich"				{ "display" "Lich" "class" "magic_dps" }
+		"nyx_assassin"		{ "display" "Crypt Lord" "class" "summoner" }
+		"abyssal_underlord"	{ "display" "Pit Lord" "class" "tank" }
+		"terrorblade"		{ "display" "Demon Hunter" "class" "bruiser" }
+		"phantom_assassin"	{ "display" "Warden" "class" "physical_dps" }
+		"elder_titan"		{ "display" "Tauren Chieftain" "class" "tank" }
+		"mirana"			{ "display" "Priestess of the Moon" "class" "support" }
+		"dragon_knight"		{ "display" "Arthas" "class" "support" }
+		"windrunner"		{ "display" "Ranger" "class" "physical_dps" }
+		"invoker"			{ "display" "Blood Mage" "class" "magic_dps" }
+		"sniper"			{ "display" "Rifleman" "class" "physical_dps" }
+		"shadow_shaman"		{ "display" "Shadow Hunter" "class" "summoner" }
+		"juggernaut"		{ "display" "Blademaster" "class" "physical_dps" }
+		"omniknight"		{ "display" "Paladin" "class" "support" }
+		"rattletrap"		{ "display" "Space Marine" "class" "bruiser" }
+		"chen"				{ "display" "Archimage" "class" "magic_dps" }
+		"lina"				{ "display" "Sorceress" "class" "magic_dps" }
+		"sven"				{ "display" "Mountain King" "class" "tank" }
+		"ursa"				{ "display" "Malfurion" "class" "support" }
+		"nevermore"		{ "display" "Banehallow" "class" "wave_dps" }
+		"brewmaster"		{ "display" "Pandaren Brewmaster" "class" "bruiser" }
+		"warlock"			{ "display" "Archimonde" "class" "summoner" }
+		"razor"				{ "display" "Ghost Revenant" "class" "bruiser" }
+
+		"slardar"			{ "display" "Centurion" "class" "bruiser" }
+		"skeleton_king"		{ "display" "Lich King" "class" "bruiser" }
+		"meepo"				{ "display" "Kobold Knight" "class" "summoner" }
+		"chaos_knight"		{ "display" "Dark Fundamental" "class" "bruiser" }
+		"tiny"				{ "display" "Stone Giant" "class" "tank" }
+		"sand_king"		{ "display" "Desert Wyrm" "class" "bruiser" }
+		"necrolyte"		{ "display" "Dark Summoner" "class" "summoner" }
+		"storm_spirit"		{ "display" "Spirit Master" "class" "magic_dps" }
+
+		// Reachable Spirit Master forms also receive official Dota builds.
+		"earth_spirit"		{ "display" "Spirit Master (Strength)" "class" "tank" }
+		"ember_spirit"		{ "display" "Spirit Master (Agility)" "class" "physical_dps" }
+		"keeper_of_the_light" { "display" "Spirit Master (Intelligence)" "class" "magic_dps" }
+	}
+}

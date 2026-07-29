@@ -6,6 +6,7 @@ require('addon_init')
 require('events')
 require('constants') -- in cause?
 require('components/creep_passives/init')
+require('components/creep_ai_director/init')
 
 require('libraries/notifications')
 require('libraries/animations')
@@ -32,6 +33,7 @@ if IsInToolsMode() then
 	pcall(require, 'components/xhs_bots/init')
 end
 require('components/api/init')
+require('components/item_builds/init')
 require('components/performance_counters/init')
 require('components/performance_telemetry/init')
 require('components/custom_polls/init')
@@ -55,11 +57,22 @@ require('boss_scripts/boss_functions')
 require('components/devtools/init')
 
 LinkLuaModifier("modifier_xhs_end_screen_stat_tracker", "modifiers/modifier_xhs_end_screen_stat_tracker.lua", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_xhs_castle_health_bar", "modifiers/modifier_xhs_castle_health_bar.lua", LUA_MODIFIER_MOTION_NONE)
 
 function GameMode:OnFirstPlayerLoaded()
 	BASE_GOOD = Entities:FindByName(nil, "base_spawn")
-	if BASE_GOOD ~= nil and BASE_GOOD.SetHullRadius ~= nil then
-		BASE_GOOD:SetHullRadius(420)
+	if BASE_GOOD ~= nil then
+		if BASE_GOOD.SetHullRadius ~= nil then
+			BASE_GOOD:SetHullRadius(420)
+		end
+	end
+
+	local castle = Entities:FindByName(nil, "dota_goodguys_fort")
+	if castle ~= nil
+		and castle.HasModifier ~= nil
+		and castle.AddNewModifier ~= nil
+		and not castle:HasModifier("modifier_xhs_castle_health_bar") then
+		castle:AddNewModifier(castle, nil, "modifier_xhs_castle_health_bar", {})
 	end
 end
 
@@ -264,7 +277,6 @@ function GameMode:InitGameMode()
 	LinkLuaModifier("modifier_ankh", "items/ankh_of_reincarnation.lua", LUA_MODIFIER_MOTION_NONE)
 	LinkLuaModifier("modifier_cinematic_pause", "modifiers/modifier_cinematic_pause.lua", LUA_MODIFIER_MOTION_NONE)
 	LinkLuaModifier("modifier_cinematic_pause_release", "modifiers/modifier_cinematic_pause.lua", LUA_MODIFIER_MOTION_NONE)
-	LinkLuaModifier("modifier_xhs_growth_overhead", "modifiers/modifier_xhs_growth_overhead.lua", LUA_MODIFIER_MOTION_NONE)
 
 	CustomGameEventManager:RegisterListener("setting_vote", Dynamic_Wrap(GameMode, "OnSettingVote"))
 	CustomGameEventManager:RegisterListener("custom_setup_ready", Dynamic_Wrap(GameMode, "OnCustomSetupReady"))
@@ -279,6 +291,8 @@ function GameMode:InitGameMode()
 	GameMode.CustomSetupBotDuration = 60
 	GameMode.CustomSetupBotProvisioningTimeout = 15
 	GameMode.CustomSetupState = nil
+	self.PrecachedEnemies = {}
+	self.PrecachedVIPs = {}
 
 	if XHSBots ~= nil then
 		XHSBots:Init()
@@ -339,7 +353,6 @@ function GameMode:InitGameMode()
 	ListenToGameEvent("dota_item_picked_up", Dynamic_Wrap(GameMode, "OnDotaItemPickedUp"), GameMode)
 
 	--Dungeon
-	GameMode.PrecachedVIPs = {}
 	GameMode.CheckpointsActivated = {}
 	GameMode.Zones = {}
 
@@ -357,6 +370,10 @@ function GameMode:InitGameMode()
 
 	if XHSPerformanceCounters ~= nil then
 		XHSPerformanceCounters:Init()
+	end
+
+	if XHSCreepAIDirector ~= nil then
+		XHSCreepAIDirector:Init()
 	end
 
 	if XHSPerformanceTelemetry ~= nil then
@@ -578,10 +595,6 @@ function GameMode:DamageFilter(filterTable)
 	local hVictim = nil
 	if filterTable["entindex_victim_const"] ~= nil then
 		hVictim = EntIndexToHScript(filterTable["entindex_victim_const"])
-	end
-
-	if flDamage > 0 and hVictim ~= nil and XHSOnCastleDamageFilter ~= nil then
-		XHSOnCastleDamageFilter(hVictim, hVictim:GetHealth())
 	end
 
 	-- The Tools-only ally planner consumes a decayed physical/magical/pure
@@ -1976,6 +1989,11 @@ donator_list[9] = 5 -- Legacy Gaben Donator maps to Earthwarden
 local function GetPlayerVotePower(pid)
 	local vote_power = 1
 
+	local supporter_table = CustomNetTables:GetTableValue("supporter_pass_player", tostring(pid))
+	if type(supporter_table) == "table" then
+		vote_power = math.max(vote_power, math.floor(tonumber(supporter_table.vote_power) or 1))
+	end
+
 	if api then
 		if api.GetDonatorStatus then
 			vote_power = math.max(vote_power, donator_list[api:GetDonatorStatus(pid)] or 1)
@@ -1989,7 +2007,25 @@ local function GetPlayerVotePower(pid)
 		end
 	end
 
-	return vote_power
+	return math.max(1, math.min(vote_power, 5))
+end
+
+function GameMode:RefreshSettingVotePower(pid)
+	pid = tonumber(pid)
+	if pid == nil or pid < 0 or type(self.VoteTable) ~= "table" then return end
+
+	local vote_power = GetPlayerVotePower(pid)
+	for category, votes in pairs(self.VoteTable) do
+		local player_vote = type(votes) == "table" and votes[pid] or nil
+		if category ~= "gamemode" and type(player_vote) == "table" and player_vote[2] ~= vote_power then
+			player_vote[2] = vote_power
+			CustomGameEventManager:Send_ServerToAllClients("send_votes", {
+				category = category,
+				vote = player_vote[1],
+				table = votes,
+			})
+		end
+	end
 end
 
 function GameMode:OnSettingVote(event_source_index, keys)

@@ -1050,12 +1050,13 @@ function SetPlayersCameraPosition(keys) {
 			var targetPosition = [keys.hPosition[0], keys.hPosition[1], keys.hPosition[2]];
 			var cinematicConfig = GameUI.CustomUIConfig ? GameUI.CustomUIConfig() : null;
 			var cinematicApi = cinematicConfig && cinematicConfig.XHSCinematics;
-			var cameraHandledByCinematic = cinematicApi
+			var cinematicActive = cinematicApi
 				&& cinematicApi.isActive
-				&& cinematicApi.isActive()
-				&& cinematicApi.setCameraTarget
-				&& cinematicApi.setCameraTarget(targetPosition, keys.iSpeed);
-			if (!cameraHandledByCinematic) {
+				&& cinematicApi.isActive();
+			// A cinematic owns the camera until it ends. Teleports, quest focus
+			// returns and other legacy camera events must not replace its boss
+			// target with the local hero or an arena arrival point.
+			if (!cinematicActive) {
 				GameUI.SetCameraTargetPosition(targetPosition, keys.iSpeed);
 			}
 			var sequence = ++XHSCameraMoveSequence;
@@ -1073,12 +1074,10 @@ function SetPlayersCameraPosition(keys) {
 
 					var heroPosition = Entities.GetAbsOrigin(hero);
 					if (heroPosition) {
-						var returnHandledByCinematic = cinematicApi
+						var cinematicStillActive = cinematicApi
 							&& cinematicApi.isActive
-							&& cinematicApi.isActive()
-							&& cinematicApi.setCameraTarget
-							&& cinematicApi.setCameraTarget(heroPosition, Number(keys.return_speed) || 0.65);
-						if (!returnHandledByCinematic) {
+							&& cinematicApi.isActive();
+						if (!cinematicStillActive) {
 							GameUI.SetCameraTargetPosition(heroPosition, Number(keys.return_speed) || 0.65);
 						}
 					}

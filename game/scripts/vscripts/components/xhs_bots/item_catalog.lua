@@ -55,6 +55,16 @@ local ITEMS = {
 		behavior = "passive_aura", stacking = "unique_aura",
 		stats = { radius = 375, damage_per_tick = 60, tick_time = 1 },
 	},
+	item_lifesteal_mask = {
+		cost = 15000, shop = "secret", kind = "core", purchasable = true,
+		stackable = false, requires_active_slot = true, backpack_usable = false,
+		opening_core = true, equip_priority = 995,
+		script_file = "items/item_lifesteal_mask.lua",
+		tags = { right_click = 1.0, sustain = 1.0, survival = 0.55 },
+		behavior = "passive", stacking = "unique_lifesteal",
+		intrinsic_modifier = "modifier_lifesteal_mask",
+		stats = { lifesteal_pct = 50 },
+	},
 	item_boots_of_speed = {
 		cost = 6250, shop = "secret", kind = "core", purchasable = true,
 		stackable = false, requires_active_slot = true, backpack_usable = false,
@@ -375,7 +385,7 @@ local FAMILIES = {
 			{
 				name = "item_orb_of_wind", cost = 10000, shop = "home",
 				stats = {
-					bonus_damage = 50, bonus_evasion_pct = 17,
+					bonus_damage = 100, bonus_evasion_pct = 17,
 					bonus_movement_speed = 40, evasion_proc_duration = 0,
 					evasion_proc_cooldown = 0, evasion_proc_movespeed_pct = 0,
 					evasion_proc_damage_reduction_pct = 0,
@@ -386,7 +396,7 @@ local FAMILIES = {
 				purchase_name = "item_recipe_zephyr_gem",
 				cost = 10000, shop = "home",
 				stats = {
-					bonus_damage = 100, bonus_evasion_pct = 25,
+					bonus_damage = 300, bonus_evasion_pct = 25,
 					bonus_movement_speed = 70, evasion_proc_duration = 2,
 					evasion_proc_cooldown = 8, evasion_proc_movespeed_pct = 20,
 					evasion_proc_damage_reduction_pct = 0,
@@ -397,7 +407,7 @@ local FAMILIES = {
 				purchase_name = "item_recipe_tempest_aegis",
 				cost = 30000, shop = "secret", no_backpack = true,
 				stats = {
-					bonus_damage = 150, bonus_evasion_pct = 35,
+					bonus_damage = 900, bonus_evasion_pct = 35,
 					bonus_movement_speed = 100, evasion_proc_duration = 2,
 					evasion_proc_cooldown = 8, evasion_proc_movespeed_pct = 20,
 					evasion_proc_damage_reduction_pct = 20,

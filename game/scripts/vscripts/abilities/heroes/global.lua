@@ -77,8 +77,9 @@ function CastleMuradin(event)
 	local timerName = "castle_muradin"
 
 	if caster:GetHealthPercent() <= Health then
-		if XHSMarkCastleMuradinTriggered ~= nil then
-			XHSMarkCastleMuradinTriggered(caster, Health)
+		local castleBar = caster:FindModifierByName("modifier_xhs_castle_health_bar")
+		if castleBar ~= nil and castleBar.MarkMuradinTriggered ~= nil then
+			castleBar:MarkMuradinTriggered(Health)
 		end
 
 		PauseCreeps(PauseTime)

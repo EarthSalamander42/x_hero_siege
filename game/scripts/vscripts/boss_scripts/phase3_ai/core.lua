@@ -10,6 +10,17 @@ modifier_xhs_boss_cast_protection.XHS_LINK_CLIENT = true
 modifier_xhs_phase3_hide_overhead_bar = modifier_xhs_phase3_hide_overhead_bar or class({})
 modifier_xhs_phase3_hide_overhead_bar.XHS_LINK_CLIENT = true
 
+local INTERRUPTING_CONTROL_STATES = {
+	hexed = {
+		label = "Hexed!",
+		texture = "lion_voodoo",
+	},
+	cycloned = {
+		label = "Cycloned!",
+		texture = "item_cyclone",
+	},
+}
+
 local DIFFICULTY_SCALE = {
 	[1] = { damage = 0.70, delay = 1.25, density = 0.65 },
 	[2] = { damage = 1.00, delay = 1.00, density = 1.00 },
@@ -228,6 +239,47 @@ function XHSPhase3BossAI:ProtectCast(boss, ability, extraDuration)
 	})
 end
 
+function XHSPhase3BossAI:ShowControlInterrupt(boss, control, duration)
+	if boss == nil or boss:IsNull() or control == nil then return end
+
+	if boss.Interrupt ~= nil then boss:Interrupt() end
+	if boss.InterruptChannel ~= nil then boss:InterruptChannel() end
+	boss:Stop()
+
+	if XHSBossCastBar ~= nil then
+		XHSBossCastBar:Hide(boss)
+	end
+	CustomGameEventManager:Send_ServerToAllClients("xhs_boss_cast_start", {
+		boss_count = boss.boss_count or 1,
+		boss_bar_id = GetBossBarId and GetBossBarId(boss) or nil,
+		ability_name = "",
+		display_name = control.label,
+		texture = control.texture,
+		duration = math.max(0.25, tonumber(duration) or 1.0),
+		style = "interrupted",
+	})
+end
+
+function XHSPhase3BossAI:GetInterruptingControlState(unit)
+	if unit == nil or not IsValidEntity(unit) or unit:IsNull() then return nil end
+
+	if unit.IsHexed ~= nil and unit:IsHexed() then
+		return INTERRUPTING_CONTROL_STATES.hexed
+	end
+
+	-- Native cyclones expose OUT_OF_GAME. The custom Invoker tornado instead
+	-- combines STUNNED, ROOTED and INVULNERABLE, so recognize both state sets.
+	local isOutOfGame = unit.IsOutOfGame ~= nil and unit:IsOutOfGame()
+	local isCustomCyclone = unit.IsStunned ~= nil and unit:IsStunned()
+		and unit.IsRooted ~= nil and unit:IsRooted()
+		and unit.IsInvulnerable ~= nil and unit:IsInvulnerable()
+	if isOutOfGame or isCustomCyclone then
+		return INTERRUPTING_CONTROL_STATES.cycloned
+	end
+
+	return nil
+end
+
 function XHSPhase3BossAI:IsPlayerControlledAttacker(attacker)
 	if attacker == nil or not IsValidEntity(attacker) or attacker:IsNull() then return false end
 	if attacker:GetTeamNumber() ~= DOTA_TEAM_GOODGUYS then return false end
@@ -306,6 +358,16 @@ function modifier_xhs_boss_cast_protection:OnIntervalThink()
 	if not IsServer() then return end
 	local parent = self:GetParent()
 	if parent == nil or parent:IsNull() or not parent:IsAlive() then return end
+
+	local control = XHSPhase3BossAI:GetInterruptingControlState(parent)
+	if control ~= nil then
+		XHSPhase3BossAI:ShowControlInterrupt(parent, control, 1.0)
+		-- Remove the protection before the next frame so the rare control
+		-- keeps its real duration and can visibly interrupt the precast.
+		self:Destroy()
+		return
+	end
+
 	parent:Purge(false, true, false, true, true)
 end
 

@@ -1,0 +1,389 @@
+.XHSItemBuildRoot {
+	width: 210px;
+	horizontal-align: left;
+	height: 100%;
+	flow-children: down;
+	background-color: gradient(linear, 0% 0%, 0% 100%, from(#182129f7), to(#080b0ef7));
+	border-left: 1px solid #5f6f7860;
+	visibility: collapse;
+}
+
+.XHSItemBuildHeader {
+	width: 100%;
+	min-height: 54px;
+	flow-children: right;
+	padding: 8px 10px 6px 10px;
+	background-color: gradient(linear, 0% 0%, 100% 0%, from(#2b3944), to(#141b21));
+	border-bottom: 1px solid #76869035;
+}
+
+.XHSItemBuildTitleBlock {
+	width: fill-parent-flow(1);
+	flow-children: down;
+}
+
+.XHSItemBuildTitle {
+	color: #e8f1f5;
+	font-size: 17px;
+	font-weight: semi-bold;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+}
+
+.XHSItemBuildHero {
+	color: #8fa6b3;
+	font-size: 12px;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+}
+
+.XHSItemBuildSaveState {
+	vertical-align: center;
+	color: #80919a;
+	font-size: 11px;
+	text-transform: uppercase;
+}
+
+.XHSItemBuildSaveState.Saved {
+	color: #75bf8a;
+}
+
+.XHSItemBuildSaveState.Saving,
+.XHSItemBuildSaveState.Loading {
+	color: #d6b66a;
+}
+
+.XHSItemBuildSaveState.Error {
+	color: #e67575;
+}
+
+.XHSItemBuildToolbar,
+.XHSItemBuildManageToolbar {
+	width: 100%;
+	flow-children: right;
+	padding: 7px 8px 3px 8px;
+}
+
+.XHSItemBuildManageToolbar {
+	padding-top: 2px;
+	visibility: collapse;
+}
+
+.XHSItemBuildRoot.EditMode .XHSItemBuildManageToolbar {
+	visibility: visible;
+}
+
+.XHSItemBuildIconButton,
+.XHSItemBuildActionButton,
+.XHSItemBuildSmallButton,
+.XHSItemBuildSelector {
+	height: 28px;
+	margin-right: 4px;
+	background-color: #293640;
+	border: 1px solid #71818b48;
+	border-radius: 2px;
+}
+
+.XHSItemBuildIconButton:hover,
+.XHSItemBuildActionButton:hover,
+.XHSItemBuildSmallButton:hover,
+.XHSItemBuildSelector:hover {
+	brightness: 1.7;
+}
+
+.XHSItemBuildIconButton:active,
+.XHSItemBuildActionButton:active,
+.XHSItemBuildSmallButton:active,
+.XHSItemBuildSelector:active {
+	brightness: 0.8;
+}
+
+.XHSItemBuildIconButton {
+	width: 25px;
+}
+
+.XHSItemBuildSelector {
+	width: fill-parent-flow(1);
+}
+
+.XHSItemBuildActionButton {
+	min-width: 42px;
+}
+
+.XHSItemBuildSmallButton {
+	width: fill-parent-flow(1);
+}
+
+.XHSItemBuildIconButton Label,
+.XHSItemBuildActionButton Label,
+.XHSItemBuildSmallButton Label,
+.XHSItemBuildSelector Label {
+	horizontal-align: center;
+	vertical-align: center;
+	color: #d5e0e5;
+	font-size: 12px;
+	text-transform: uppercase;
+	text-overflow: shrink;
+}
+
+.XHSItemBuildIconButton Label {
+	font-size: 21px;
+	margin-top: -3px;
+}
+
+.XHSItemBuildSmallButton.Danger {
+	background-color: #48272b;
+}
+
+.XHSItemBuildSmallButton.Primary {
+	background-color: #315541;
+}
+
+.XHSItemBuildSections {
+	width: 100%;
+	height: fill-parent-flow(1);
+	flow-children: down;
+	overflow: squish scroll;
+	padding: 3px 8px 10px 8px;
+}
+
+.XHSItemBuildSection {
+	width: 100%;
+	flow-children: down;
+	margin-top: 5px;
+}
+
+.XHSItemBuildSectionHeader {
+	width: 100%;
+	flow-children: right;
+	border-bottom: 1px solid #61717a35;
+	padding-bottom: 2px;
+}
+
+.XHSItemBuildSectionTitle {
+	width: fill-parent-flow(1);
+	color: #9eb0ba;
+	font-size: 11px;
+	font-weight: semi-bold;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+}
+
+.XHSItemBuildSectionAdd {
+	width: 18px;
+	height: 18px;
+	background-color: #30404a;
+	border-radius: 2px;
+	visibility: collapse;
+}
+
+.XHSItemBuildRoot.EditMode .XHSItemBuildSectionAdd {
+	visibility: visible;
+}
+
+.XHSItemBuildSectionAdd Label {
+	horizontal-align: center;
+	vertical-align: center;
+	color: #b9c7ce;
+	font-size: 16px;
+	margin-top: -2px;
+}
+
+.XHSItemBuildSectionItems {
+	width: 100%;
+	flow-children: right-wrap;
+	padding-top: 4px;
+	min-height: 38px;
+}
+
+.XHSItemBuildEmpty {
+	color: #5f6c73;
+	font-size: 11px;
+	font-style: italic;
+	margin: 4px 0px;
+}
+
+.XHSItemBuildShopItem {
+	width: 45px;
+	height: 33px;
+	margin: 0px 4px 4px 0px;
+}
+
+.XHSItemBuildEditableItem {
+	width: 67px;
+	height: 50px;
+	margin: 0px 4px 5px 0px;
+	background-color: #11181d;
+	border: 1px solid #46545d;
+}
+
+.XHSItemBuildEditableItem DOTAItemImage {
+	width: 45px;
+	height: 33px;
+	horizontal-align: left;
+	vertical-align: top;
+}
+
+.XHSItemBuildItemControls {
+	horizontal-align: right;
+	vertical-align: top;
+	width: 21px;
+	flow-children: down;
+}
+
+.XHSItemBuildItemControl {
+	width: 21px;
+	height: 16px;
+	background-color: #2d3941;
+	margin-bottom: 1px;
+}
+
+.XHSItemBuildItemControl.Delete {
+	background-color: #553037;
+}
+
+.XHSItemBuildItemControl Label {
+	horizontal-align: center;
+	vertical-align: center;
+	color: #ced9de;
+	font-size: 11px;
+}
+
+.XHSItemBuildCatalog {
+	width: 100%;
+	height: 100%;
+	flow-children: down;
+	background-color: #0b1014fc;
+	visibility: collapse;
+}
+
+.XHSItemBuildRoot.CatalogOpen .XHSItemBuildCatalog {
+	visibility: visible;
+}
+
+.XHSItemBuildRoot.CatalogOpen .XHSItemBuildSections,
+.XHSItemBuildRoot.CatalogOpen .XHSItemBuildToolbar,
+.XHSItemBuildRoot.CatalogOpen .XHSItemBuildManageToolbar {
+	visibility: collapse;
+}
+
+.XHSItemBuildCatalogHeader {
+	width: 100%;
+	height: 38px;
+	flow-children: right;
+	padding: 7px 8px;
+	background-color: #26343e;
+}
+
+.XHSItemBuildCatalogHeader > Label {
+	width: fill-parent-flow(1);
+	color: #dce6eb;
+	font-size: 13px;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+}
+
+.XHSItemBuildCatalogClose {
+	width: 22px;
+	height: 22px;
+}
+
+.XHSItemBuildCatalogClose Label {
+	horizontal-align: center;
+	vertical-align: center;
+	color: #c8d4da;
+	font-size: 20px;
+}
+
+.XHSItemBuildSearch,
+.XHSItemBuildNameEntry {
+	width: fill-parent-flow(1);
+	height: 31px;
+	margin: 7px 8px;
+	background-color: #050708;
+	border: 1px solid #5c6a72;
+	color: white;
+	font-size: 14px;
+	padding: 4px 6px;
+}
+
+.XHSItemBuildCatalogItems {
+	width: 100%;
+	height: fill-parent-flow(1);
+	flow-children: right-wrap;
+	overflow: squish scroll;
+	padding: 3px 7px 10px 8px;
+}
+
+.XHSItemBuildCatalogItem {
+	width: 52px;
+	height: 49px;
+	margin: 0px 5px 6px 0px;
+	background-color: #172027;
+	border: 1px solid #485660;
+}
+
+.XHSItemBuildCatalogItem:hover {
+	brightness: 1.7;
+	border-color: #9eaeB8;
+}
+
+.XHSItemBuildCatalogItem DOTAItemImage {
+	width: 48px;
+	height: 35px;
+	horizontal-align: center;
+	vertical-align: center;
+}
+
+.XHSItemBuildNameDialog {
+	width: 100%;
+	height: 100%;
+	background-color: #000000c8;
+	visibility: collapse;
+}
+
+.XHSItemBuildRoot.NameDialogOpen .XHSItemBuildNameDialog {
+	visibility: visible;
+}
+
+.XHSItemBuildNameDialogCard {
+	width: 190px;
+	flow-children: down;
+	horizontal-align: center;
+	vertical-align: center;
+	padding: 10px;
+	background-color: #182229;
+	border: 1px solid #65757e;
+}
+
+.XHSItemBuildNameDialogTitle {
+	color: #dce6eb;
+	font-size: 14px;
+	text-transform: uppercase;
+	horizontal-align: center;
+}
+
+.XHSItemBuildNameEntry {
+	width: 100%;
+	margin: 8px 0px;
+}
+
+.XHSItemBuildNameDialogActions {
+	width: 100%;
+	flow-children: right;
+}
+
+.XHSItemBuildRoot.NoHero .XHSItemBuildToolbar,
+.XHSItemBuildRoot.NoHero .XHSItemBuildManageToolbar,
+.XHSItemBuildRoot.NoHero .XHSItemBuildSections {
+	visibility: collapse;
+}
+
+
+
+
+
+
+.HUDFlipped .XHSItemBuildRoot {
+	horizontal-align: right;
+}

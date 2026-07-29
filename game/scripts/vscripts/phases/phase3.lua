@@ -96,6 +96,7 @@ end
 
 local PHASE3_BOSS_CINEMATIC_DURATION = 3.5
 local PHASE3_BOSS_PREP_DURATION = 2.5
+local PHASE3_BOSS_CAMERA_MOVE_DURATION = 0.20
 
 local function EnsureBossIntroModifierDuration(boss, modifierName, minimumDuration)
 	if boss == nil or not IsValidEntity(boss) or boss:IsNull() then return nil end
@@ -136,7 +137,7 @@ local function PlayPhase3BossSpawnCinematic(boss, cinematicId, title, subtitle, 
 		hide_hud = true,
 		lock_orders = true,
 		camera_entindex = boss:entindex(),
-		camera_speed = cameraSpeed or 0.55,
+		camera_speed = cameraSpeed or PHASE3_BOSS_CAMERA_MOVE_DURATION,
 		transition = 0.4,
 		letterbox_pct = 11,
 		title = title or "",
@@ -743,6 +744,10 @@ function StartLichKingArena()
 
 	ApplyLatePhase3BossDefenseScaling(lich_king_boss)
 	ShowBossBar(lich_king_boss)
+	-- The Lich King is pre-spawned outside his combat position. Move him before
+	-- the reveal so the entity-follow camera starts and remains on the arena,
+	-- instead of travelling to the old spawn and snapping later.
+	FindClearSpaceForUnit(lich_king_boss, point_boss, true)
 
 	TeleportAllHeroes("point_teleport_boss_", 20.0, 3.0)
 
@@ -761,7 +766,6 @@ function StartLichKingArena()
 		end)
 
 		Timers:CreateTimer(reincarnate_time, function()
-			FindClearSpaceForUnit(lich_king_boss, point_boss, true)
 			ApplyLatePhase3BossDefenseScaling(lich_king_boss)
 			local attack_position = Entities:FindByName(nil, "npc_dota_spawner_magtheridon_arena"):GetAbsOrigin()
 			lich_king_boss:RemoveModifierByName("modifier_invulnerable")
@@ -778,17 +782,6 @@ function StartLichKingArena()
 			RegisterXHSDevSpawn(lich_king_boss)
 			if XHSLichKing_AttachPhase3AI ~= nil then
 				XHSLichKing_AttachPhase3AI(lich_king_boss)
-			end
-
-			for _, hero in pairs(HeroList:GetAllHeroes()) do
-				if hero:IsRealHero() and hero:GetTeam() == DOTA_TEAM_GOODGUYS then
-					CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "set_player_camera", {
-						hPosition = lich_king_boss:GetAbsOrigin(),
-						iSpeed = 0.55,
-						return_to_hero_after = 2.75,
-						return_speed = 0.65,
-					})
-				end
 			end
 		end)
 	end)

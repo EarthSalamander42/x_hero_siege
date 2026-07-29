@@ -438,11 +438,6 @@ _G.multiplayer_abilities_cast = {
 }
 
 MODIFIER_ITEMS_WITH_LEVELS = {}
-MODIFIER_ITEMS_WITH_LEVELS["modifier_orb_of_darkness_active"] = {
-	"item_bracer_of_the_void",
-	"item_orb_of_darkness2",
-	"item_orb_of_darkness",
-}
 MODIFIER_ITEMS_WITH_LEVELS["modifier_orb_of_lightning_active"] = {
 	"item_celestial_claws",
 	"item_orb_of_lightning2",

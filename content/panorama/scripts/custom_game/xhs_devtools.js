@@ -623,10 +623,26 @@ function XHSDevToolsActivitySource(activity, sourceList, index, includeCost) {
 
 function XHSDevToolsRenderActivityPerformance(activity) {
 	activity = activity || {};
-	var zoneSearches = XHSDevToolsPerformanceNumber(activity.zone_searches_per_second);
-	var zoneResults = XHSDevToolsPerformanceNumber(activity.zone_results_per_second);
-	var zoneCost = XHSDevToolsPerformanceNumber(activity.zone_search_cost_ms_per_second);
-	var zoneMaximum = XHSDevToolsPerformanceNumber(activity.zone_search_max_ms);
+	var zoneSearches = XHSDevToolsPerformanceNumber(
+		activity.spatial_queries_per_second !== undefined
+			? activity.spatial_queries_per_second
+			: activity.zone_searches_per_second
+	);
+	var zoneResults = XHSDevToolsPerformanceNumber(
+		activity.spatial_results_per_second !== undefined
+			? activity.spatial_results_per_second
+			: activity.zone_results_per_second
+	);
+	var zoneCost = XHSDevToolsPerformanceNumber(
+		activity.spatial_query_cost_ms_per_second !== undefined
+			? activity.spatial_query_cost_ms_per_second
+			: activity.zone_search_cost_ms_per_second
+	);
+	var zoneMaximum = XHSDevToolsPerformanceNumber(
+		activity.spatial_query_max_ms !== undefined
+			? activity.spatial_query_max_ms
+			: activity.zone_search_max_ms
+	);
 	var orders = XHSDevToolsPerformanceNumber(activity.orders_per_second);
 	var repeatedOrders = XHSDevToolsPerformanceNumber(activity.repeated_orders_per_second);
 	var aiThinks = XHSDevToolsPerformanceNumber(activity.ai_thinks_per_second);
@@ -639,6 +655,8 @@ function XHSDevToolsRenderActivityPerformance(activity) {
 	var spawns = XHSDevToolsPerformanceNumber(activity.unit_spawns_per_second);
 	var deaths = XHSDevToolsPerformanceNumber(activity.unit_deaths_per_second);
 	var targetChanges = XHSDevToolsPerformanceNumber(activity.target_changes_per_second);
+	var spatialCacheHits = XHSDevToolsPerformanceNumber(activity.spatial_cache_hits_per_second);
+	var spatialCacheMisses = XHSDevToolsPerformanceNumber(activity.spatial_cache_misses_per_second);
 
 	XHSDevToolsSetPerformanceText("#XHSPerfZoneSearches", zoneSearches.toFixed(0) + " / " + zoneResults.toFixed(0));
 	XHSDevToolsSetPerformanceText("#XHSPerfZoneCost", zoneCost.toFixed(1) + " / " + zoneMaximum.toFixed(1));
@@ -649,10 +667,15 @@ function XHSDevToolsRenderActivityPerformance(activity) {
 	XHSDevToolsSetPerformanceText("#XHSPerfProjectiles", linearProjectiles.toFixed(0) + " / " + trackingProjectiles.toFixed(0));
 	XHSDevToolsSetPerformanceText("#XHSPerfChurn", spawns.toFixed(0) + " / " + deaths.toFixed(0));
 	XHSDevToolsSetPerformanceText("#XHSPerfTargetChanges", targetChanges.toFixed(0));
+	XHSDevToolsSetPerformanceText(
+		"#XHSPerfSpatialCache",
+		spatialCacheHits.toFixed(0) + " / " + spatialCacheMisses.toFixed(0)
+	);
 	for (var sourceIndex = 1; sourceIndex <= 3; sourceIndex++) {
+		var spatialSourceList = activity.top_spatial_sources ? "top_spatial_sources" : "top_zone_sources";
 		XHSDevToolsSetPerformanceText(
 			"#XHSPerfZoneSource" + sourceIndex,
-			XHSDevToolsActivitySource(activity, "top_zone_sources", sourceIndex, true)
+			XHSDevToolsActivitySource(activity, spatialSourceList, sourceIndex, true)
 		);
 	}
 	for (var orderSourceIndex = 1; orderSourceIndex <= 2; orderSourceIndex++) {
@@ -1381,7 +1404,9 @@ function XHSDevToolsRenderBotCard(parent, rosterEntry) {
 		metrics,
 		"Economy / reserve",
 		XHSDevToolsBotText(debug.economy_phase, "-") + " / " +
-			XHSDevToolsBotText(debug.economy_reserve_gold, "0") + "g",
+			XHSDevToolsBotText(debug.opening_stage, "complete") + " / " +
+			XHSDevToolsBotText(debug.economy_reserve_gold, "0") + "g / " +
+			XHSDevToolsBotText(debug.attack_dps, "0") + " DPS",
 		false
 	);
 	XHSDevToolsMakeBotMetric(
@@ -1749,8 +1774,8 @@ var XHS_DEVTOOLS_LAG_LAB_METRICS = [
 	{ id: "creeps", label: "Creeps", neutral: true },
 	{ id: "total_units", label: "Total units", neutral: true },
 	{ id: "scan_ms", label: "Profiler scan ms", higher: false },
-	{ id: "zone_searches_s", label: "Zone searches/s", higher: false },
-	{ id: "zone_cost_ms_s", label: "Zone cost ms/s", higher: false },
+	{ id: "zone_searches_s", label: "Spatial queries/s", higher: false },
+	{ id: "zone_cost_ms_s", label: "Spatial cost ms/s", higher: false },
 	{ id: "orders_s", label: "Orders/s", higher: false },
 	{ id: "repeated_orders_s", label: "Repeated orders/s", higher: false },
 	{ id: "ai_thinks_s", label: "AI thinks/s", higher: false },

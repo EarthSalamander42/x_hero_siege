@@ -1,0 +1,51 @@
+"itembuilds"
+{
+	"author"		"X Hero Siege Official"
+	"hero"			"npc_dota_hero_storm_spirit"
+	"Title"			"XHS Magic DPS / Control - Spirit Master"
+
+	"Items"
+	{
+		"#DOTA_Item_Build_Starting_Items"
+		{
+			"item"		"item_health_potion"
+			"item"		"item_mana_potion"
+			"item"		"item_orb_of_arcane"
+		}
+
+		"#DOTA_Item_Build_Early_Game"
+		{
+			"item"		"item_orb_of_darkness"
+			"item"		"item_tome_small"
+			"item"		"item_tome_small"
+			"item"		"item_lifesteal_mask"
+			"item"		"item_ankh_of_reincarnation"
+		}
+
+		"#DOTA_Item_Build_Mid_Items"
+		{
+			"item"		"item_mystic_gem"
+			"item"		"item_orb_of_darkness2"
+			"item"		"item_staff_of_mastery"
+			"item"		"item_boots_of_speed"
+		}
+
+		"#DOTA_Item_Build_Late_Items"
+		{
+			"item"		"item_astral_core"
+			"item"		"item_bracer_of_the_void"
+			"item"		"item_healing_wards2"
+			"item"		"item_tome_big"
+		}
+
+		"#DOTA_Item_Build_Other_Items"
+		{
+			"item"		"item_healing_wards"
+			"item"		"item_potion_full"
+			"item"		"item_potion_of_invulnerability"
+			"item"		"item_potion_of_antimagic"
+			"item"		"item_xhs_cloak_of_flames"
+			"item"		"item_amulet_of_the_wild"
+		}
+	}
+}
