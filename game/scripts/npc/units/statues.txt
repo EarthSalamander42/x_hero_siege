@@ -1079,4 +1079,134 @@
 		"VisionDaytimeRange"		"900"		// Range of vision during day light.
 		"VisionNighttimeRange"		"600"		// Range of vision at night time.
 	}
+
+	// Fragment Shop Effigies. These deliberately use hero models rather than
+	// any courier selected for the Companion pass or Companion shop.
+	"npc_xhs_shop_effigy_axe"
+	{
+		"BaseClass"					"npc_dota_base_additive"
+		"Model"						"models/heroes/axe/axe.vmdl"
+		"ModelScale"				"0.90"
+		"SoundSet"					"Creep_Good_Melee"
+		"Ability1"					"backdoor_protection_in_base"
+		"AttackCapabilities"		"DOTA_UNIT_CAP_NO_ATTACK"
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_NONE"
+		"MovementSpeed"				"0"
+		"StatusHealth"				"1000"
+		"BoundsHullName"			"DOTA_HULL_SIZE_FILLER"
+		"TeamName"					"DOTA_TEAM_GOODGUYS"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_BUILDING"
+	}
+
+	"npc_xhs_shop_effigy_crystal_maiden"
+	{
+		"BaseClass"					"npc_dota_base_additive"
+		"Model"						"models/heroes/crystal_maiden/crystal_maiden.vmdl"
+		"ModelScale"				"0.95"
+		"SoundSet"					"Creep_Good_Melee"
+		"Ability1"					"backdoor_protection_in_base"
+		"AttackCapabilities"		"DOTA_UNIT_CAP_NO_ATTACK"
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_NONE"
+		"MovementSpeed"				"0"
+		"StatusHealth"				"1000"
+		"BoundsHullName"			"DOTA_HULL_SIZE_FILLER"
+		"TeamName"					"DOTA_TEAM_GOODGUYS"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_BUILDING"
+	}
+
+	"npc_xhs_shop_effigy_juggernaut"
+	{
+		"BaseClass"					"npc_dota_base_additive"
+		"Model"						"models/heroes/juggernaut/juggernaut.vmdl"
+		"ModelScale"				"0.95"
+		"SoundSet"					"Creep_Good_Melee"
+		"Ability1"					"backdoor_protection_in_base"
+		"AttackCapabilities"		"DOTA_UNIT_CAP_NO_ATTACK"
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_NONE"
+		"MovementSpeed"				"0"
+		"StatusHealth"				"1000"
+		"BoundsHullName"			"DOTA_HULL_SIZE_FILLER"
+		"TeamName"					"DOTA_TEAM_GOODGUYS"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_BUILDING"
+	}
+
+	"npc_xhs_shop_effigy_phantom_assassin"
+	{
+		"BaseClass"					"npc_dota_base_additive"
+		"Model"						"models/heroes/phantom_assassin/phantom_assassin.vmdl"
+		"ModelScale"				"0.95"
+		"SoundSet"					"Creep_Good_Melee"
+		"Ability1"					"backdoor_protection_in_base"
+		"AttackCapabilities"		"DOTA_UNIT_CAP_NO_ATTACK"
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_NONE"
+		"MovementSpeed"				"0"
+		"StatusHealth"				"1000"
+		"BoundsHullName"			"DOTA_HULL_SIZE_FILLER"
+		"TeamName"					"DOTA_TEAM_GOODGUYS"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_BUILDING"
+	}
+
+	"npc_xhs_shop_effigy_invoker"
+	{
+		"BaseClass"					"npc_dota_base_additive"
+		"Model"						"models/heroes/invoker/invoker.vmdl"
+		"ModelScale"				"0.95"
+		"SoundSet"					"Creep_Good_Melee"
+		"Ability1"					"backdoor_protection_in_base"
+		"AttackCapabilities"		"DOTA_UNIT_CAP_NO_ATTACK"
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_NONE"
+		"MovementSpeed"				"0"
+		"StatusHealth"				"1000"
+		"BoundsHullName"			"DOTA_HULL_SIZE_FILLER"
+		"TeamName"					"DOTA_TEAM_GOODGUYS"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_BUILDING"
+	}
+
+	"npc_xhs_shop_effigy_pudge"
+	{
+		"BaseClass"					"npc_dota_base_additive"
+		"Model"						"models/heroes/pudge/pudge.vmdl"
+		"ModelScale"				"0.85"
+		"SoundSet"					"Creep_Good_Melee"
+		"Ability1"					"backdoor_protection_in_base"
+		"AttackCapabilities"		"DOTA_UNIT_CAP_NO_ATTACK"
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_NONE"
+		"MovementSpeed"				"0"
+		"StatusHealth"				"1000"
+		"BoundsHullName"			"DOTA_HULL_SIZE_FILLER"
+		"TeamName"					"DOTA_TEAM_GOODGUYS"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_BUILDING"
+	}
+
+	"npc_xhs_shop_effigy_lina"
+	{
+		"BaseClass"					"npc_dota_base_additive"
+		"Model"						"models/heroes/lina/lina.vmdl"
+		"ModelScale"				"0.95"
+		"SoundSet"					"Creep_Good_Melee"
+		"Ability1"					"backdoor_protection_in_base"
+		"AttackCapabilities"		"DOTA_UNIT_CAP_NO_ATTACK"
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_NONE"
+		"MovementSpeed"				"0"
+		"StatusHealth"				"1000"
+		"BoundsHullName"			"DOTA_HULL_SIZE_FILLER"
+		"TeamName"					"DOTA_TEAM_GOODGUYS"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_BUILDING"
+	}
+
+	"npc_xhs_shop_effigy_shadow_fiend"
+	{
+		"BaseClass"					"npc_dota_base_additive"
+		"Model"						"models/heroes/nevermore/nevermore.vmdl"
+		"ModelScale"				"0.90"
+		"SoundSet"					"Creep_Good_Melee"
+		"Ability1"					"backdoor_protection_in_base"
+		"AttackCapabilities"		"DOTA_UNIT_CAP_NO_ATTACK"
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_NONE"
+		"MovementSpeed"				"0"
+		"StatusHealth"				"1000"
+		"BoundsHullName"			"DOTA_HULL_SIZE_FILLER"
+		"TeamName"					"DOTA_TEAM_GOODGUYS"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_BUILDING"
+	}
 }

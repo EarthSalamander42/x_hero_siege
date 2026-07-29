@@ -1,11 +1,9 @@
 -- Supporter Pass Immolation renderer.
 --
 -- Gameplay abilities keep deciding which units are damaged. Their narrowly
--- scoped hooks only report an active source and the units selected by the
--- original damage action. This module owns the cosmetic particle lifecycle.
-
-local OWNER_ANCHOR = "particles/custom/supporter_pass/immolation_owner_anchor.vpcf"
-local TARGET_ANCHOR = "particles/custom/supporter_pass/immolation_target_anchor.vpcf"
+-- scoped hooks report an active source and the units selected by the original
+-- damage action. This module owns only the cosmetic particle lifecycle and
+-- creates the equipped player's final particle paths directly.
 local THINK_INTERVAL = 0.10
 local TARGET_GRACE = 0.15
 local CONTEXT_THINK = "XHSSupporterPassImmolation"
@@ -21,12 +19,41 @@ local SOURCE_ALLOWLIST = {
 	ghost_revenant_ghost_immolation = true,
 }
 
+-- These are not general direct slots. They are accepted only on the exact
+-- player summon units listed here, after recursive owner resolution.
+local OWNED_SUMMON_RULES = {
+	warlock_golem_permanent_immolation = {
+		units = { npc_dota_golem_inferno = true },
+		scan_targets = true,
+	},
+	dread_lord_inferno_immolation = {
+		units = { npc_dota_golem_inferno = true },
+	},
+	doom_golem_hot_skin = {
+		units = {
+			npc_dota_dark_king = true,
+			npc_dota_doom_golem_1 = true,
+			npc_dota_doom_golem_2 = true,
+			npc_dota_doom_golem_3 = true,
+		},
+	},
+}
+
+local FALLBACK_RADIUS_CONTROL = {
+	item_xhs_cloak_of_flames = true,
+	holdout_permanent_immolation = true,
+	holdout_bane_permanent_immolation = true,
+	holdout_permanent_lightning = true,
+	holdout_consuming_flame = true,
+	holdout_active_immolation = true,
+}
+
 SupporterPassImmolation = SupporterPassImmolation or {}
-SupporterPassImmolation.OWNER_ANCHOR = OWNER_ANCHOR
-SupporterPassImmolation.TARGET_ANCHOR = TARGET_ANCHOR
 SupporterPassImmolation.SOURCE_ALLOWLIST = SOURCE_ALLOWLIST
+SupporterPassImmolation.OWNED_SUMMON_RULES = OWNED_SUMMON_RULES
 SupporterPassImmolation.sources = SupporterPassImmolation.sources or {}
 SupporterPassImmolation.targetParticles = SupporterPassImmolation.targetParticles or {}
+SupporterPassImmolation.pendingSummons = SupporterPassImmolation.pendingSummons or {}
 
 local function IsServerRuntime()
 	return IsServer == nil or IsServer()
@@ -98,9 +125,22 @@ local function GetAbilityName(ability)
 	return tostring(value)
 end
 
-local function IsAllowedAbility(ability)
+local function GetAbilityRule(ability, caster)
 	local abilityName = GetAbilityName(ability)
-	return abilityName ~= nil and SOURCE_ALLOWLIST[abilityName] == true
+	if abilityName == nil then return nil end
+	if SOURCE_ALLOWLIST[abilityName] == true then
+		return { direct = true }
+	end
+
+	local summonRule = OWNED_SUMMON_RULES[abilityName]
+	if summonRule == nil or summonRule.units[SafeUnitName(caster)] ~= true then
+		return nil
+	end
+	return summonRule
+end
+
+local function IsAllowedAbility(ability, caster)
+	return GetAbilityRule(ability, caster) ~= nil
 end
 
 local function GetGameTime()
@@ -110,29 +150,12 @@ local function GetGameTime()
 	return 0
 end
 
-local function GetOverride(hero, anchor)
-	if not IsEligibleTrueHero(hero) or CustomNetTables == nil then return nil end
-
-	local playerID = hero:GetPlayerOwnerID()
-	local value = CustomNetTables:GetTableValue(
-		"supporter_pass_player",
-		anchor .. "_" .. tostring(playerID)
-	)
-	if type(value) ~= "table" then return nil end
-
-	local replacement = value["1"] or value[1]
-	if replacement == nil then return nil end
-	replacement = tostring(replacement)
-	if replacement == "" or replacement == anchor then return nil end
-	return replacement
-end
-
 local function GetEquippedPair(hero)
-	local owner = GetOverride(hero, OWNER_ANCHOR)
-	local target = GetOverride(hero, TARGET_ANCHOR)
+	if Battlepass == nil or Battlepass.GetPlayerParticle == nil then return nil end
+	local owner = Battlepass:GetPlayerParticle(hero, "immolation_owner_pfx")
+	local target = Battlepass:GetPlayerParticle(hero, "immolation_target_pfx")
 
-	-- A partial family is never rendered. Catalog validation should prevent
-	-- this, while the runtime guard keeps owner and target atomic.
+	-- A partial family is never rendered.
 	if owner == nil or target == nil then return nil end
 	return {
 		owner = owner,
@@ -147,13 +170,11 @@ local function DestroyParticle(particleIndex)
 	ParticleManager:ReleaseParticleIndex(particleIndex)
 end
 
-local function CreateParticle(path, attachType, parent, hero)
+local function CreateParticle(path, attachType, parent)
 	if path == nil or path == "" or not IsValidEntityHandle(parent) then return nil end
 	if ParticleManager == nil then return nil end
 
-	-- hCaster is intentionally the recursively resolved real hero. XHS's
-	-- ParticleManager wrapper uses it to resolve the player's exact loadout.
-	local particleIndex = ParticleManager:CreateParticle(path, attachType, parent, hero)
+	local particleIndex = ParticleManager:CreateParticle(path, attachType, parent)
 	if particleIndex == nil or particleIndex < 0 then return nil end
 	return particleIndex
 end
@@ -251,13 +272,25 @@ function SupporterPassImmolation:_CreateOwner(source)
 	if source.ownerParticle ~= nil then return end
 	if not IsValidEntityHandle(source.caster) or not source.caster:IsAlive() then return end
 
-	local path = source.pair ~= nil and OWNER_ANCHOR or source.fallbackOwner
+	local path = source.pair ~= nil and source.pair.owner or source.fallbackOwner
 	source.ownerParticle = CreateParticle(
 		path,
 		PATTACH_ABSORIGIN_FOLLOW,
-		source.caster,
-		source.hero
+		source.caster
 	)
+
+	-- Preserve the original Flame Guard / Brewmaster child setup for players
+	-- without the new pair. Modern Supporter pairs keep their authored CPs.
+	if source.ownerParticle ~= nil
+	and source.pair == nil
+	and FALLBACK_RADIUS_CONTROL[source.abilityName] == true
+	and source.ability.GetSpecialValueFor ~= nil then
+		local ok, radius = pcall(source.ability.GetSpecialValueFor, source.ability, "radius")
+		if ok and tonumber(radius) ~= nil then
+			ParticleManager:SetParticleControl(source.ownerParticle, 0, Vector(0, 0, 0))
+			ParticleManager:SetParticleControl(source.ownerParticle, 1, Vector(tonumber(radius), 1, 1))
+		end
+	end
 end
 
 function SupporterPassImmolation:_TargetVisualKey(source, fallbackTarget)
@@ -283,14 +316,16 @@ function SupporterPassImmolation:_AcquireTargetParticle(source, targetState)
 	local group = self.targetParticles[groupKey]
 
 	if group == nil then
-		local path = source.pair ~= nil and TARGET_ANCHOR or targetState.fallbackTarget
+		local path = source.pair ~= nil and source.pair.target or targetState.fallbackTarget
+		local particle = CreateParticle(
+			path,
+			PATTACH_ABSORIGIN_FOLLOW,
+			targetState.target
+		)
+		if particle == nil then return end
+
 		group = {
-			particle = CreateParticle(
-				path,
-				PATTACH_ABSORIGIN_FOLLOW,
-				targetState.target,
-				source.hero
-			),
+			particle = particle,
 			refs = {},
 			target = targetState.target,
 			hero = source.hero,
@@ -352,9 +387,133 @@ function SupporterPassImmolation:_RefreshSource(source)
 	end
 end
 
+function SupporterPassImmolation:_QueueOwnedSummon(unit)
+	if not IsValidEntityHandle(unit) then return end
+	local unitName = SafeUnitName(unit)
+	if OWNED_SUMMON_RULES.warlock_golem_permanent_immolation.units[unitName] ~= true then
+		return
+	end
+
+	local index = SafeEntityIndex(unit)
+	if index ~= nil then self.pendingSummons[index] = unit end
+end
+
+function SupporterPassImmolation:_RegisterPendingSummons()
+	for index, unit in pairs(self.pendingSummons) do
+		if not IsValidEntityHandle(unit) or IsExcludedSource(unit) then
+			self.pendingSummons[index] = nil
+		elseif unit.FindAbilityByName ~= nil then
+			local ability = unit:FindAbilityByName("warlock_golem_permanent_immolation")
+			if IsValidEntityHandle(ability) then
+				local source = self:Acquire(ability, unit, ability)
+				if source ~= nil then
+					source.rule = OWNED_SUMMON_RULES.warlock_golem_permanent_immolation
+					source.nextTargetScan = 0
+					self.pendingSummons[index] = nil
+				end
+			end
+		end
+	end
+end
+
+local function GetScanRadius(ability, caster)
+	if not IsValidEntityHandle(ability) then return 0 end
+
+	local radius = 0
+	if ability.GetCastRange ~= nil then
+		local origin = IsValidEntityHandle(caster) and caster:GetAbsOrigin() or Vector(0, 0, 0)
+		local ok, value = pcall(ability.GetCastRange, ability, origin, nil)
+		if ok then radius = tonumber(value) or 0 end
+	end
+	if ability.GetSpecialValueFor ~= nil then
+		for _, specialName in ipairs({ "radius", "aura_radius" }) do
+			if radius > 0 then break end
+			local ok, value = pcall(ability.GetSpecialValueFor, ability, specialName)
+			if ok then radius = math.max(radius, tonumber(value) or 0) end
+		end
+	end
+	return radius
+end
+
+local function HasSourceBurnModifier(target, source)
+	if target.FindAllModifiers == nil then return false end
+
+	for _, modifier in pairs(target:FindAllModifiers() or {}) do
+		if modifier ~= nil and (modifier.IsNull == nil or not modifier:IsNull()) then
+			local modifierAbility = modifier.GetAbility ~= nil and modifier:GetAbility() or nil
+			local modifierCaster = modifier.GetCaster ~= nil and modifier:GetCaster() or nil
+			if modifierAbility == source.ability and modifierCaster == source.caster then
+				return true
+			end
+		end
+	end
+
+	return false
+end
+
+function SupporterPassImmolation:_ScanOwnedSummonTargets(source, now)
+	if source.rule == nil or source.rule.scan_targets ~= true then return end
+	if now < (source.nextTargetScan or 0) then return end
+	source.nextTargetScan = now + 0.20
+
+	local caster = source.caster
+	local ability = source.ability
+	source.scanRadius = source.scanRadius or GetScanRadius(ability, caster)
+	local radius = source.scanRadius
+	if radius <= 0 or FindUnitsInRadius == nil or caster.GetAbsOrigin == nil then return end
+
+	local targets = {}
+	if caster.PassivesDisabled == nil or not caster:PassivesDisabled() then
+		targets = FindUnitsInRadius(
+			caster:GetTeamNumber(),
+			caster:GetAbsOrigin(),
+			nil,
+			radius,
+			DOTA_UNIT_TARGET_TEAM_ENEMY,
+			DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC,
+			DOTA_UNIT_TARGET_FLAG_NONE,
+			FIND_ANY_ORDER,
+			false
+		)
+	end
+
+	local seen = {}
+	for _, target in pairs(targets or {}) do
+		if IsValidEntityHandle(target)
+		and target:IsAlive()
+		and HasSourceBurnModifier(target, source) then
+			local targetKey = GetTargetKey(target)
+			seen[targetKey] = true
+			self:AcquireTarget(ability, caster, target, ability)
+		end
+	end
+
+	for targetKey, targetState in pairs(source.targets) do
+		if seen[targetKey] ~= true then
+			self:_ReleaseTargetParticle(source, targetState)
+			source.targets[targetKey] = nil
+		end
+	end
+end
+
 function SupporterPassImmolation:Init()
 	if not IsServerRuntime() or self.initialized == true then return self end
 	self.initialized = true
+
+	if ListenToGameEvent ~= nil then
+		ListenToGameEvent("npc_spawned", function(event)
+			local unit = event.entindex ~= nil and EntIndexToHScript(event.entindex) or nil
+			if SupporterPassImmolation ~= nil then
+				SupporterPassImmolation:_QueueOwnedSummon(unit)
+			end
+		end, nil)
+	end
+
+	if Entities ~= nil and Entities.FindAllByName ~= nil then
+		for _, unit in pairs(Entities:FindAllByName("npc_dota_golem_inferno") or {}) do
+			self:_QueueOwnedSummon(unit)
+		end
+	end
 
 	if GameRules ~= nil and GameRules.GetGameModeEntity ~= nil then
 		local gameMode = GameRules:GetGameModeEntity()
@@ -373,7 +532,7 @@ function SupporterPassImmolation:Init()
 end
 
 function SupporterPassImmolation:Acquire(sourceToken, caster, ability, fallbackOwner, fallbackTarget)
-	if not IsServerRuntime() or not IsAllowedAbility(ability) then return nil end
+	if not IsServerRuntime() or not IsAllowedAbility(ability, caster) then return nil end
 	if IsExcludedSource(caster) then return nil end
 
 	local hero = self:ResolveTrueHero(caster)
@@ -401,6 +560,7 @@ function SupporterPassImmolation:Acquire(sourceToken, caster, ability, fallbackO
 		pair = pair,
 		pairKey = pair ~= nil and pair.key or "",
 		targets = {},
+		rule = GetAbilityRule(ability, caster),
 	}
 	self.sources[key] = source
 	self:_CreateOwner(source)
@@ -409,6 +569,7 @@ end
 
 function SupporterPassImmolation:AcquireTarget(sourceToken, caster, target, ability, fallbackOwner, fallbackTarget)
 	if not IsServerRuntime() or not IsValidEntityHandle(target) or not target:IsAlive() then return nil end
+	if not IsValidEntityHandle(caster) then return nil end
 	if target.GetTeamNumber ~= nil and caster.GetTeamNumber ~= nil
 	and target:GetTeamNumber() == caster:GetTeamNumber() then
 		return nil
@@ -489,6 +650,7 @@ end
 
 function SupporterPassImmolation:_Prune()
 	if not IsServerRuntime() then return end
+	self:_RegisterPendingSummons()
 	local now = GetGameTime()
 	local destroySources = {}
 
@@ -496,7 +658,7 @@ function SupporterPassImmolation:_Prune()
 		if not IsValidEntityHandle(source.caster)
 		or not IsValidEntityHandle(source.ability)
 		or not IsEligibleTrueHero(source.hero)
-		or not IsAllowedAbility(source.ability)
+		or not IsAllowedAbility(source.ability, source.caster)
 		or IsExcludedSource(source.caster) then
 			destroySources[#destroySources + 1] = key
 		else
@@ -515,6 +677,7 @@ function SupporterPassImmolation:_Prune()
 				end
 			else
 				self:_CreateOwner(source)
+				self:_ScanOwnedSummonTargets(source, now)
 				for targetKey, targetState in pairs(source.targets) do
 					if not IsValidEntityHandle(targetState.target)
 					or not targetState.target:IsAlive()
@@ -549,16 +712,43 @@ function XHSSupporterImmolationRelease(keys)
 	SupporterPassImmolation:Release(keys.ability, keys.caster, keys.ability)
 end
 
+function XHSSupporterImmolationReleaseTarget(keys)
+	if not IsServerRuntime() then return end
+	local target = keys.target or keys.unit
+	if target ~= nil then
+		SupporterPassImmolation:ReleaseTarget(keys.ability, keys.caster, target, keys.ability)
+	end
+end
+
 function XHSSupporterImmolationBurnTarget(keys)
 	if not IsServerRuntime() then return end
-	SupporterPassImmolation:AcquireTarget(
-		keys.ability,
-		keys.caster,
-		keys.target or keys.unit,
-		keys.ability,
-		keys.fallback_owner_pfx,
-		keys.fallback_target_pfx
-	)
+
+	local targets = keys.target_entities
+	if type(targets) == "table" then
+		for _, target in pairs(targets) do
+			SupporterPassImmolation:AcquireTarget(
+				keys.ability,
+				keys.caster,
+				target,
+				keys.ability,
+				keys.fallback_owner_pfx,
+				keys.fallback_target_pfx
+			)
+		end
+		return
+	end
+
+	local target = keys.target or keys.unit
+	if target ~= nil then
+		SupporterPassImmolation:AcquireTarget(
+			keys.ability,
+			keys.caster,
+			target,
+			keys.ability,
+			keys.fallback_owner_pfx,
+			keys.fallback_target_pfx
+		)
+	end
 end
 
 return SupporterPassImmolation

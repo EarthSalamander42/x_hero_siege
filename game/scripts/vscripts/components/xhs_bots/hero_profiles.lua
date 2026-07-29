@@ -157,7 +157,7 @@ local PROFILE_BY_HERO = {
 			"holdout_distance_aura",
 			"holdout_plasma_rifle",
 			"holdout_rocket_launcher",
-			"ogre_magi_bloodlust",
+			"rifleman_bloodlust",
 		},
 		attack_mode = {
 			single_target = {
@@ -179,12 +179,12 @@ local PROFILE_BY_HERO = {
 			priority = 90,
 		},
 		abilities = {
-			ogre_magi_bloodlust = {
+			rifleman_bloodlust = {
 				mode = "ally_buff",
 				priority = 63,
 				intent = "offense",
 				prefer_roles = { "ranged_dps", "frontline" },
-				active_modifier = "modifier_ogre_magi_bloodlust",
+				active_modifier = "modifier_rifleman_bloodlust",
 				require_combat = true,
 			},
 			rifleman_assassinate = { mode = "enemy_unit", priority = 88, prefer_boss = true },
@@ -197,6 +197,12 @@ local PROFILE_BY_HERO = {
 		role = "frontline",
 		primary_role = "frontline",
 		secondary_role = "right_click",
+		-- The first two cheap cores are deliberate: Darkness lets him stand
+		-- in the wave, then Fire converts his melee attacks into wave clear.
+		-- Once that opening is complete, the adaptive need scorer is free to
+		-- upgrade either family or take Earth as the neutral third option.
+		opening_orb_order = { "darkness", "fire" },
+		orb_fallback_order = { "darkness", "fire", "earth" },
 		preferred_range = 180,
 		safety_distance = 120,
 		retreat_health = 0.22,
@@ -697,14 +703,7 @@ function XHSBotHeroProfiles:IsCertified(heroName)
 end
 
 function XHSBotHeroProfiles:GetCertifiedHeroes(composition)
-	local heroes = CopyArray(COMPOSITION_ORDER[composition] or COMPOSITION_ORDER.balanced)
-	if composition == "random" then
-		for index = #heroes, 2, -1 do
-			local other = RandomInt ~= nil and RandomInt(1, index) or math.random(1, index)
-			heroes[index], heroes[other] = heroes[other], heroes[index]
-		end
-	end
-	return heroes
+	return CopyArray(COMPOSITION_ORDER[composition] or COMPOSITION_ORDER.balanced)
 end
 
 function XHSBotHeroProfiles:GetCertifiedHeroCount()
@@ -734,18 +733,51 @@ function XHSBotHeroProfiles:PickHeroes(count, composition, unavailable)
 	count = math.max(0, math.floor(tonumber(count) or 0))
 	unavailable = unavailable or {}
 	local candidates = self:GetCertifiedHeroes(composition)
+	local candidatePool = {}
+	local candidateSet = {}
 	local selected = {}
 	local selectedSet = {}
 
-	for _, heroName in ipairs(candidates) do
-		if #selected >= count then break end
+	for rank, heroName in ipairs(candidates) do
 		if unavailable[heroName] ~= true
-			and selectedSet[heroName] ~= true
+			and candidateSet[heroName] ~= true
 			and self:IsCertified(heroName) then
-			table.insert(selected, heroName)
-			selectedSet[heroName] = true
-			unavailable[heroName] = true
+			table.insert(candidatePool, {
+				hero = heroName,
+				rank = rank,
+			})
+			candidateSet[heroName] = true
 		end
+	end
+
+	while #selected < count and #candidatePool > 0 do
+		local totalWeight = 0
+		for _, candidate in ipairs(candidatePool) do
+			local weight = composition == "random"
+				and 1
+				or math.max(1, #candidates - candidate.rank + 1)
+			candidate.weight = weight
+			totalWeight = totalWeight + weight
+		end
+
+		local roll = RandomFloat ~= nil
+			and RandomFloat(0, totalWeight)
+			or math.random() * totalWeight
+		local cumulativeWeight = 0
+		local selectedIndex = #candidatePool
+		for index, candidate in ipairs(candidatePool) do
+			cumulativeWeight = cumulativeWeight + candidate.weight
+			if roll < cumulativeWeight then
+				selectedIndex = index
+				break
+			end
+		end
+
+		local heroName = candidatePool[selectedIndex].hero
+		table.remove(candidatePool, selectedIndex)
+		table.insert(selected, heroName)
+		selectedSet[heroName] = true
+		unavailable[heroName] = true
 	end
 
 	return selected

@@ -921,7 +921,7 @@
 		"BaseClass"						"item_lua"
 		"ScriptFile"					"items/item_orb_of_darkness.lua"
 		"AbilityTextureName"			"custom/orb_of_darkness"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 	
 		// Shops
 		"ItemCost"						"10000"
@@ -967,7 +967,7 @@
 		"BaseClass"						"item_lua"
 		"ScriptFile"					"items/item_orb_of_darkness.lua"
 		"AbilityTextureName"			"custom/orb_of_darkness2"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 
 		// Shops
 		"ItemCost"						"20000"
@@ -1046,7 +1046,7 @@
 		"BaseClass"						"item_lua"
 		"ScriptFile"					"items/item_orb_of_darkness.lua"
 		"AbilityTextureName"			"custom/bracer_of_the_void"		
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"Model"							"models/props_gameplay/red_box.vmdl"
 		"Effect"						"particles/generic_gameplay/dropped_item.vpcf"
 
@@ -1079,6 +1079,38 @@
 			"bonus_armor"			"20"
 			"bonus_health_regen"	"20"
 			"max_units"				"10"
+		}
+	}
+
+	//=================================================================================================================
+	// Recipe: Bracer of the Void
+	//=================================================================================================================
+	"item_recipe_bracer_of_the_void"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"ID"							"2520"
+		"BaseClass"             		"item_datadriven"
+		"Model"							"models/props_gameplay/recipe.vmdl"
+		"AbilityTextureName"			"recipe"
+		
+		// Item Info
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemCost"						"30000"	
+		"ItemShopTags"					""
+//		"ItemInitialStockTime"			"1470.0"
+//		"ItemStockMax"					"2" 
+//		"ItemStockTime"					"30.0"
+//		"ItemStockInitial"				"0"
+		
+		// Recipe
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemRecipe"					"1"
+		"SecretShop"					"1"
+		"ItemResult"					"item_bracer_of_the_void"
+		"ItemRequirements"
+		{
+			"01"						"item_orb_of_darkness2"
 		}
 	}
 

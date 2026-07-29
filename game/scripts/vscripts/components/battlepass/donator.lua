@@ -377,7 +377,7 @@ function Battlepass:RemoveDonatorStatue(ID)
 	end
 end
 
-function Battlepass:DonatorStatue(ID, statue_unit, js)
+function Battlepass:DonatorStatue(ID, statue_unit, js, preview_origin)
 	if not PlayerResource:IsValidPlayerID(ID) then return end
 	local player = PlayerResource:GetPlayer(ID)
 	if player == nil or statue_unit == nil or statue_unit == "" then return end
@@ -407,7 +407,10 @@ function Battlepass:DonatorStatue(ID, statue_unit, js)
 	if type(definition) ~= "table" then return end
 	local model_scale = tonumber(definition.ModelScale) or 1.0
 
-	local abs = statue_slots[ID]
+	local abs = preview_origin
+	if abs == nil then
+		abs = statue_slots[ID]
+	end
 	if abs == nil then
 		for _, ent_name in pairs(fillers) do
 			local filler = Entities:FindByName(nil, ent_name)
@@ -420,6 +423,9 @@ function Battlepass:DonatorStatue(ID, statue_unit, js)
 		end
 	end
 	if abs == nil then return end
+	if preview_origin ~= nil then
+		abs = GetGroundPosition(abs, hero)
+	end
 
 	self:RemoveDonatorStatue(ID)
 	local unit = CreateUnitByName(statue_unit, abs, true, nil, nil, player:GetTeam())

@@ -55,6 +55,43 @@ local ROLE_FAMILY_TAG_WEIGHTS = {
 	},
 }
 
+-- Needs describe the current match, while item affinities describe the hero.
+-- Both are required: a caster who lacks damage should not blindly buy a
+-- right-click orb, and a tank under fatal attrition should be allowed to
+-- upgrade Darkness even when another family has a slightly better static fit.
+local FAMILY_NEED_WEIGHTS = {
+	darkness = {
+		sustain = 1.00,
+		raw_survival = 0.85,
+	},
+	lightning = {
+		attack_damage = 1.00,
+		single_target = 0.35,
+	},
+	fire = {
+		attack_aoe = 1.00,
+		attack_damage = 0.12,
+	},
+	earth = {
+		physical_survival = 0.90,
+		control = 0.35,
+		raw_survival = 0.18,
+	},
+	arcane = {
+		spell_power = 1.00,
+		control = 0.20,
+	},
+	wind = {
+		mobility = 0.85,
+		physical_survival = 0.50,
+		raw_survival = 0.20,
+	},
+	venom = {
+		boss_damage = 1.00,
+		single_target = 0.55,
+	},
+}
+
 function XHSBotItemPlanner:IsHighThreat(snapshot)
 	return snapshot.base_threat_active == true
 		or (tonumber(snapshot.combat_threat) or 0) >= 0.78
@@ -143,8 +180,224 @@ function XHSBotItemPlanner:GetOwnedFamilyOverlap(snapshot, candidateFamilyName, 
 	return maximumOverlap
 end
 
+function XHSBotItemPlanner:GetFamilyOrderRank(profile, field, familyName)
+	local order = profile and profile[field] or nil
+	if type(order) ~= "table" then return nil end
+	for index, configuredFamily in ipairs(order) do
+		if tostring(configuredFamily) == tostring(familyName) then return index end
+	end
+	return nil
+end
+
+function XHSBotItemPlanner:BuildNeedScores(snapshot, profile)
+	snapshot = snapshot or {}
+	local affinities = profile and profile.item_affinities or {}
+	local healthRatio = Clamp(snapshot.health_ratio, 0, 1)
+	local threat = Clamp(snapshot.combat_threat, 0, 1.5)
+	local baseThreat = Clamp(snapshot.base_threat_score, 0, 1.5)
+	local assignment = Clamp(snapshot.assignment_urgency, 0, 1.5)
+	local pressure = Clamp(math.max(threat, baseThreat, assignment), 0, 1)
+	local focused = Clamp((tonumber(snapshot.focused_by_count) or 0) / 3, 0, 1)
+	local recentDamage = Clamp((tonumber(snapshot.recent_damage_ratio) or 0) * 5, 0, 1)
+	local healthDeficit = Clamp((0.78 - healthRatio) / 0.58, 0, 1)
+	local maximumHealth = math.max(1, tonumber(snapshot.max_health) or 1)
+	local attackDps = math.max(1, tonumber(snapshot.attack_dps) or 1)
+	local netIncomingDps = math.max(
+		0,
+		tonumber(snapshot.survival_net_incoming_dps) or 0
+	)
+	local attrition = Clamp(netIncomingDps / maximumHealth * 12, 0, 1)
+	local fatalForecast = snapshot.survival_fatal_before_escape == true
+	local sustain = Clamp(
+		healthDeficit * 0.48
+			+ pressure * 0.30
+			+ focused * 0.18
+			+ recentDamage * 0.30
+			+ attrition * 0.55,
+		0,
+		1
+	)
+	if fatalForecast then sustain = 1 end
+
+	-- Damage progression is intentionally only one signal. Direct combat
+	-- attrition and time-to-kill pressure carry more weight than game time,
+	-- so unusually strong/weak custom heroes do not follow a rigid clock.
+	local minutes = math.max(0, tonumber(snapshot.game_time) or 0) / 60
+	local progressionTarget = 180 * ((1 + minutes / 6) ^ 1.55)
+	local progressionDeficit = Clamp(
+		(progressionTarget - attackDps) / math.max(1, progressionTarget),
+		0,
+		1
+	)
+	local attritionRace = Clamp(netIncomingDps / attackDps, 0, 1)
+	local bossActive = snapshot.boss_nearby == true
+		or tostring(snapshot.goal or "") == "fight_boss"
+	local attackDamage = Clamp(
+		progressionDeficit * 0.48
+			+ pressure * 0.18
+			+ attritionRace * 0.42
+			+ (bossActive and 0.22 or 0),
+		0,
+		1
+	)
+
+	local nearby = math.max(0, tonumber(snapshot.nearby_screen_count) or 0)
+	local cluster = Clamp((nearby - 2) / 6, 0, 1)
+	local preferredRange = tonumber(profile and profile.preferred_range) or 999
+	local isMelee = preferredRange <= 250
+	local attackAoe = isMelee and cluster
+		* (0.70 + GetAffinity(affinities, "wave", "cleave") * 0.30) or 0
+	local physicalShare = Clamp(snapshot.physical_threat, 0, 1)
+	local physicalSurvival = Clamp(
+		physicalShare
+			* (pressure * 0.65 + healthDeficit * 0.35 + focused * 0.25),
+		0,
+		1
+	)
+	local casterFit = GetAffinity(affinities, "caster", "magical", "cooldown")
+	local spellPower = Clamp(
+		casterFit
+			* (progressionDeficit * 0.42
+				+ cluster * 0.38
+				+ (bossActive and 0.35 or 0)),
+		0,
+		1
+	)
+	local mobility = Clamp(
+		math.max(
+			(tonumber(snapshot.lane_anchor_distance) or 0) / 5200,
+			(tonumber(snapshot.stuck_recoveries) or 0) / 3
+		) * (0.55 + pressure * 0.45),
+		0,
+		1
+	)
+	local singleTarget = Clamp(
+		(bossActive and 0.85 or 0)
+			+ (nearby == 1 and pressure * 0.35 or 0),
+		0,
+		1
+	)
+	local control = Clamp(
+		(bossActive and 0.35 or 0)
+			+ pressure * 0.30
+			+ focused * 0.25,
+		0,
+		1
+	)
+
+	local scores = {
+		sustain = sustain,
+		raw_survival = Clamp(
+			math.max(sustain * 0.82, healthDeficit, fatalForecast and 1 or 0),
+			0,
+			1
+		),
+		attack_damage = attackDamage,
+		attack_aoe = Clamp(attackAoe, 0, 1),
+		physical_survival = physicalSurvival,
+		spell_power = spellPower,
+		mobility = mobility,
+		single_target = singleTarget,
+		boss_damage = bossActive and 1 or 0,
+		control = control,
+	}
+	local dominantNeed = ""
+	local dominantValue = 0
+	for need, value in pairs(scores) do
+		if value > dominantValue then
+			dominantNeed = need
+			dominantValue = value
+		end
+	end
+	return scores, dominantNeed, dominantValue
+end
+
+function XHSBotItemPlanner:GetDynamicFamilyNeed(
+	snapshot,
+	profile,
+	familyName
+)
+	local needs, dominantNeed, dominantValue =
+		self:BuildNeedScores(snapshot, profile)
+	local weights = FAMILY_NEED_WEIGHTS[tostring(familyName or "")] or {}
+	local weighted = 0
+	local strongestNeed = ""
+	local strongestContribution = 0
+	for need, weight in pairs(weights) do
+		local contribution = (tonumber(needs[need]) or 0)
+			* (tonumber(weight) or 0)
+		weighted = weighted + contribution
+		if contribution > strongestContribution then
+			strongestNeed = need
+			strongestContribution = contribution
+		end
+	end
+
+	local affinities = profile and profile.item_affinities or {}
+	local suitability = 1
+	if familyName == "lightning" then
+		suitability = 0.25 + GetAffinity(
+			affinities,
+			"right_click",
+			"physical",
+			"attack_speed"
+		) * 0.75
+	elseif familyName == "fire" then
+		suitability = (tonumber(profile and profile.preferred_range) or 999) <= 250
+			and 1 or 0.18
+	elseif familyName == "darkness" then
+		suitability = 0.35 + GetAffinity(
+			affinities,
+			"survival",
+			"frontline",
+			"sustain"
+		) * 0.65
+	elseif familyName == "earth" or familyName == "wind" then
+		suitability = 0.30 + GetAffinity(
+			affinities,
+			"frontline",
+			"survival",
+			"mobility",
+			"evasion"
+		) * 0.70
+	elseif familyName == "arcane" then
+		suitability = 0.15 + GetAffinity(
+			affinities,
+			"caster",
+			"magical",
+			"cooldown"
+		) * 0.85
+	elseif familyName == "venom" then
+		suitability = 0.25 + GetAffinity(
+			affinities,
+			"boss",
+			"single_target",
+			"right_click",
+			"damage_over_time"
+		) * 0.75
+	end
+	local score = math.min(44, weighted * suitability * 38)
+
+	-- A configured fallback is only a quiet-game tie breaker. As soon as a
+	-- meaningful need appears, measured game state fully owns the choice.
+	if dominantValue < 0.35 then
+		local rank = self:GetFamilyOrderRank(
+			profile,
+			"orb_fallback_order",
+			familyName
+		)
+		if rank ~= nil then score = score + math.max(0, 4 - rank) end
+	end
+	return score, strongestNeed, strongestContribution, needs,
+		dominantNeed, dominantValue
+end
+
 function XHSBotItemPlanner:BuildOpeningOrbCandidates(snapshot, profile)
 	local candidates = {}
+	local orbCount = self:GetOwnedOrbFamilyCount(snapshot)
+	local openingOrder = profile and profile.opening_orb_order or nil
+	local expectedFamily = type(openingOrder) == "table"
+		and openingOrder[orbCount + 1] or nil
 	for familyName, family in pairs(XHSBotItemCatalog:GetFamilies()) do
 		local tier = self:GetFamilyProgress(snapshot, family)
 		if tier <= 0 and self:GetFamilyLimit(profile, familyName) > 0 then
@@ -156,6 +409,10 @@ function XHSBotItemPlanner:BuildOpeningOrbCandidates(snapshot, profile)
 				family,
 				entry
 			)
+			if tostring(expectedFamily or "") == familyName then
+				score = score + 100
+				table.insert(reasons, "opening_order:" .. familyName)
+			end
 			table.insert(candidates, {
 				entry = entry,
 				family = familyName,
@@ -460,6 +717,16 @@ function XHSBotItemPlanner:ScoreFamily(snapshot, profile, familyName, family, en
 	score = score + statPower
 	if statPower >= 0.5 then
 		table.insert(reasons, "stats:" .. tostring(math.floor(statPower * 10) / 10))
+	end
+	local needScore, strongestNeed, strongestNeedContribution =
+		self:GetDynamicFamilyNeed(snapshot, profile, familyName)
+	score = score + needScore
+	if strongestNeedContribution >= 0.08 then
+		table.insert(
+			reasons,
+			"need:" .. tostring(strongestNeed) .. ":"
+				.. tostring(math.floor(strongestNeedContribution * 100) / 100)
+		)
 	end
 	local meleeCleave = familyName == "fire"
 		and (tonumber(profile and profile.preferred_range) or 999) <= 250
@@ -921,6 +1188,8 @@ end
 
 function XHSBotItemPlanner:Plan(snapshot, profile, difficulty)
 	snapshot = snapshot or {}
+	local needScores, dominantNeed, dominantNeedValue =
+		self:BuildNeedScores(snapshot, profile)
 	local phase = self:GetPhase(snapshot)
 	local candidates = self:BuildCoreCandidates(snapshot, profile, phase)
 	local nextCandidate = candidates[1]
@@ -968,6 +1237,9 @@ function XHSBotItemPlanner:Plan(snapshot, profile, difficulty)
 		target_loadout_scores = targetLoadoutScores,
 		family_loadout_scores = familyLoadoutScores,
 		target_loadout_details = targetLoadoutDetails,
+		need_scores = needScores,
+		dominant_need = dominantNeed,
+		dominant_need_value = math.floor(dominantNeedValue * 100) / 100,
 		inventory_slots = tonumber(snapshot.inventory_slots) or 0,
 		replacement_required = nextCandidate ~= nil
 			and nextCandidate.entry.tier == 1

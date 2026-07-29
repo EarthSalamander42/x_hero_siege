@@ -16,7 +16,7 @@
 			<Panel class="XHSFarmLeaderboardHeader" hittest="false">
 				<Panel class="XHSFarmLeaderboardHeaderAccent" />
 				<Panel class="XHSFarmLeaderboardHeaderCopy">
-					<Label class="XHSFarmLeaderboardEyebrow" text="FARM EVENT" />
+					<Label id="XHSFarmLeaderboardEyebrow" class="XHSFarmLeaderboardEyebrow" text="FARM EVENT" />
 					<Label id="XHSFarmLeaderboardTitle" class="XHSFarmLeaderboardTitle" text="LIVE LEADERBOARD" />
 				</Panel>
 				<Panel class="XHSFarmLeaderboardLive">

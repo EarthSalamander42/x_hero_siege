@@ -40,6 +40,8 @@ XHSBots.qa_human_pick_timeout = 15
 XHSBots.controller_refresh_generation = 0
 XHSBots.controller_refresh_retry_limit = 40
 XHSBots.controller_refresh_retry_interval = 0.25
+XHSBots.spectator_controller_player_id = -1
+XHSBots.spectator_provision_generation = 0
 XHSBots.first_human_pick_seen = false
 XHSBots.unique_hero_count_finalized = false
 XHSBots.safe_error_state = XHSBots.safe_error_state or {}
@@ -59,6 +61,10 @@ XHSBots.qa_economy_audit_watch_context =
 local function IsTruthy(value)
 	return value == true or value == 1 or value == "1" or value == "true"
 end
+
+-- Team 1 is the engine observer slot used by XHS. DOTA_TEAM_NOTEAM (5) keeps
+-- a player out of combat but does not grant the real spectator assignment.
+local XHS_SPECTATOR_TEAM = 1
 
 local function SetupLogValue(value)
 	local text = tostring(value == nil and "nil" or value)
@@ -96,6 +102,16 @@ local function GetDebugEntityName(entity)
 	if type(nameGetter) ~= "function" then return "" end
 
 	local ok, name = pcall(nameGetter, entity)
+	return ok and tostring(name or "") or ""
+end
+
+local function GetDebugAbilityName(ability)
+	if ability == nil or type(ability.GetAbilityName) ~= "function" then return "" end
+	if type(ability.IsNull) == "function" then
+		local ok, isNull = pcall(ability.IsNull, ability)
+		if not ok or isNull == true then return "" end
+	end
+	local ok, name = pcall(ability.GetAbilityName, ability)
 	return ok and tostring(name or "") or ""
 end
 
@@ -253,6 +269,11 @@ function XHSBots:Init()
 			return XHSBots:OnConfigure(sourceIndex, event)
 		end)
 	end)
+	CustomGameEventManager:RegisterListener("xhs_bot_spectator_camera", function(sourceIndex, event)
+		return XHSBots:RunSafeEvent("spectator_camera", function()
+			return XHSBots:OnSpectatorCamera(sourceIndex, event)
+		end)
+	end)
 
 	ListenToGameEvent("game_rules_state_change", function()
 		return XHSBots:RunSafeEvent("game_rules_state_change", function()
@@ -286,8 +307,97 @@ function XHSBots:Init()
 end
 
 function XHSBots:FindControllerPlayerID()
+	local spectatorController = tonumber(self.spectator_controller_player_id) or -1
+	if spectatorController >= 0
+		and PlayerResource ~= nil
+		and PlayerResource.IsValidPlayerID ~= nil
+		and PlayerResource:IsValidPlayerID(spectatorController)
+		and not XHSBotPlayerRegistry:IsXHSBotPlayerID(spectatorController) then
+		return spectatorController
+	end
 	local humans = XHSBotPlayerRegistry:GetHumanPlayerIDs()
 	return humans[1] or -1
+end
+
+function XHSBots:IsAuthorizedSetupSender(playerID)
+	playerID = tonumber(playerID) or -1
+	if playerID < 0 then return false end
+	if XHSBotPlayerRegistry:IsHumanPlayerID(playerID) then return true end
+	return playerID == (tonumber(self.spectator_controller_player_id) or -1)
+		and playerID == (tonumber(self.controller_player_id) or -1)
+		and PlayerResource ~= nil
+		and PlayerResource.IsValidPlayerID ~= nil
+		and PlayerResource:IsValidPlayerID(playerID)
+		and not XHSBotPlayerRegistry:IsXHSBotPlayerID(playerID)
+end
+
+function XHSBots:SetControllerSpectatorMode(playerID, enabled)
+	playerID = tonumber(playerID) or -1
+	enabled = enabled == true
+	if playerID < 0
+		or PlayerResource == nil
+		or PlayerResource.IsValidPlayerID == nil
+		or not PlayerResource:IsValidPlayerID(playerID)
+		or PlayerResource.SetCustomTeamAssignment == nil then
+		return false, "Unable to assign the setup controller team"
+	end
+
+	local targetTeam = enabled and XHS_SPECTATOR_TEAM or DOTA_TEAM_GOODGUYS
+	local currentTeam = PlayerResource.GetTeam ~= nil
+		and PlayerResource:GetTeam(playerID)
+		or nil
+	if not enabled and PlayerResource.SetCameraTarget ~= nil then
+		pcall(function()
+			PlayerResource:SetCameraTarget(playerID, nil)
+		end)
+	end
+	if currentTeam ~= targetTeam then
+		local ok, errorMessage = pcall(function()
+			PlayerResource:SetCustomTeamAssignment(playerID, targetTeam)
+		end)
+		if not ok then
+			return false, "Unable to change observer team: " .. tostring(errorMessage)
+		end
+	end
+
+	self.spectator_controller_player_id = enabled and playerID or -1
+	SetupLog("spectator_controller_team_updated", {
+		enabled = enabled,
+		player_id = playerID,
+		previous_team = currentTeam,
+		target_team = targetTeam,
+	})
+	return true
+end
+
+function XHSBots:OnSpectatorCamera(sourceIndex, event)
+	if not self.enabled or not IsInToolsMode() then return end
+
+	local senderPlayerID = self:ResolveSenderPlayerID(sourceIndex)
+	local spectatorPlayerID = tonumber(self.spectator_controller_player_id) or -1
+	local senderTeam = senderPlayerID >= 0
+		and PlayerResource ~= nil
+		and PlayerResource.GetTeam ~= nil
+		and PlayerResource:GetTeam(senderPlayerID)
+		or -1
+	if senderPlayerID < 0
+		or senderPlayerID ~= spectatorPlayerID
+		or self.configuration.spectator_mode ~= true
+		or senderTeam ~= XHS_SPECTATOR_TEAM
+		or PlayerResource.SetCameraTarget == nil then
+		return
+	end
+
+	local targetPlayerID = math.floor(tonumber(event and event.target_player_id) or -1)
+	if targetPlayerID < 0 then
+		PlayerResource:SetCameraTarget(senderPlayerID, nil)
+		return
+	end
+	if not XHSBotPlayerRegistry:IsXHSBotPlayerID(targetPlayerID) then return end
+
+	local targetHero = XHSBotPlayerRegistry:GetBotHero(targetPlayerID)
+	if not IsValidHero(targetHero) then return end
+	PlayerResource:SetCameraTarget(senderPlayerID, targetHero)
 end
 
 function XHSBots:RefreshController(reason)
@@ -358,7 +468,7 @@ function XHSBots:ResolveSenderPlayerID(sourceIndex)
 			return CustomGameEventManager:GetPlayerIDFromEventSourceIndex(sourceIndex)
 		end)
 		playerID = ok and tonumber(resolvedPlayerID) or -1
-		local accepted = XHSBotPlayerRegistry:IsHumanPlayerID(playerID)
+		local accepted = self:IsAuthorizedSetupSender(playerID)
 		SetupLog("sender_resolution", {
 			accepted = accepted,
 			candidate_player_id = playerID,
@@ -380,7 +490,7 @@ function XHSBots:ResolveSenderPlayerID(sourceIndex)
 			return nil
 		end)
 		playerID = ok and tonumber(resolvedPlayerID) or -1
-		local accepted = XHSBotPlayerRegistry:IsHumanPlayerID(playerID)
+		local accepted = self:IsAuthorizedSetupSender(playerID)
 		SetupLog("sender_resolution", {
 			accepted = accepted,
 			candidate_player_id = playerID,
@@ -1397,6 +1507,7 @@ function XHSBots:ApplyConfiguration(configuration)
 		count = configuration.count,
 		difficulty = configuration.difficulty,
 		composition = configuration.composition,
+		spectator_mode = configuration.spectator_mode,
 		enabled = self.enabled,
 		game_state = GameRules:State_Get(),
 		human_count = XHSBotPlayerRegistry:GetHumanCount(),
@@ -1430,10 +1541,37 @@ function XHSBots:ApplyConfiguration(configuration)
 
 	self.controller_player_id = self:FindControllerPlayerID()
 	self.unique_hero_count_finalized = false
-	self.configuration = XHSBotConfig:Normalize(
+	local wantsSpectator = IsTruthy(configuration.spectator_mode)
+		and math.floor(tonumber(configuration.count) or 0) > 0
+	local currentlySpectating = self.controller_player_id >= 0
+		and self.controller_player_id == (tonumber(self.spectator_controller_player_id) or -1)
+	local prospectiveHumanCount = XHSBotPlayerRegistry:GetHumanCount()
+	if wantsSpectator and not currentlySpectating then
+		prospectiveHumanCount = math.max(0, prospectiveHumanCount - 1)
+	elseif not wantsSpectator and currentlySpectating then
+		prospectiveHumanCount = prospectiveHumanCount + 1
+	end
+	local normalizedConfiguration = XHSBotConfig:Normalize(
 		configuration,
-		XHSBotPlayerRegistry:GetHumanCount()
+		prospectiveHumanCount
 	)
+	if normalizedConfiguration.spectator_mode ~= currentlySpectating then
+		local teamChanged, teamError = self:SetControllerSpectatorMode(
+			self.controller_player_id,
+			normalizedConfiguration.spectator_mode
+		)
+		if not teamChanged then
+			self.error = teamError
+			SetupLog("apply_configuration_rejected", {
+				controller_player_id = self.controller_player_id,
+				reason = "spectator_team_assignment_failed",
+				message = teamError,
+			})
+			self:PushConfiguration()
+			return false, self.error
+		end
+	end
+	self.configuration = normalizedConfiguration
 	self.revision = self.revision + 1
 	self.status = "ready"
 	self.error = ""
@@ -1442,6 +1580,7 @@ function XHSBots:ApplyConfiguration(configuration)
 		count = self.configuration.count,
 		difficulty = self.configuration.difficulty,
 		composition = self.configuration.composition,
+		spectator_mode = self.configuration.spectator_mode,
 		maximum_bots = self.configuration.maximum_bots,
 		revision = self.revision,
 	})
@@ -1451,6 +1590,7 @@ function XHSBots:ApplyConfiguration(configuration)
 		count = self.configuration.count,
 		difficulty = self.configuration.difficulty,
 		composition = self.configuration.composition,
+		spectator_mode = self.configuration.spectator_mode,
 		revision = self.revision,
 	})
 	return true, "Configured " .. tostring(self.configuration.count)
@@ -1466,6 +1606,7 @@ function XHSBots:OnConfigure(sourceIndex, event)
 		payload_bot_count = event and (event.count or event.bot_count),
 		payload_difficulty = event and (event.difficulty or event.ai_difficulty),
 		payload_composition = event and event.composition,
+		payload_spectator_mode = event and event.spectator_mode,
 		payload_player_id = event and event.PlayerID,
 		enabled = self.enabled,
 		locked = self.locked,
@@ -1515,6 +1656,7 @@ function XHSBots:OnConfigure(sourceIndex, event)
 		count = event and (event.count or event.bot_count),
 		difficulty = event and (event.difficulty or event.ai_difficulty),
 		composition = event and event.composition,
+		spectator_mode = event and event.spectator_mode,
 	})
 	SetupLog("configure_event_completed", {
 		applied = applied,
@@ -1532,6 +1674,7 @@ function XHSBots:BuildConfigurationNetTable()
 		max_bots = tonumber(configuration.maximum_bots) or 0,
 		ai_difficulty = configuration.difficulty or "normal",
 		composition = configuration.composition or "balanced",
+		spectator_mode = configuration.spectator_mode and 1 or 0,
 		controller_player_id = tonumber(self.controller_player_id) or -1,
 		revision = self.revision,
 		locked = self.locked and 1 or 0,
@@ -1562,6 +1705,7 @@ function XHSBots:PushConfiguration()
 		max_bots = payload.max_bots,
 		difficulty = payload.ai_difficulty,
 		composition = payload.composition,
+		spectator_mode = payload.spectator_mode,
 		controller_player_id = payload.controller_player_id,
 		revision = payload.revision,
 		locked = payload.locked,
@@ -1578,6 +1722,12 @@ function XHSBots:BuildRosterNetTable()
 
 	for _, playerID in ipairs(XHSBotPlayerRegistry:GetHumanPlayerIDs()) do
 		usedPlayerIDs[playerID] = true
+	end
+	local spectatorController = tonumber(self.spectator_controller_player_id) or -1
+	if spectatorController >= 0 then
+		-- Preview rows use synthetic free IDs. Never let a bot preview borrow
+		-- the real observer's ID after that player leaves Radiant.
+		usedPlayerIDs[spectatorController] = true
 	end
 	for _, playerID in ipairs(XHSBotPlayerRegistry:GetXHSBotPlayerIDs()) do
 		local record = XHSBotPlayerRegistry:GetBot(playerID)
@@ -1652,7 +1802,11 @@ function XHSBots:BeforeCustomSetupFinish(launchReason, callback)
 	)
 	self.locked = true
 	self.unique_hero_count_finalized = false
-	self.status = self.configuration.count > 0 and "waiting_for_human_pick" or "locked"
+	self.status = self.configuration.count > 0
+		and (self.configuration.spectator_mode
+			and "waiting_for_hero_selection"
+			or "waiting_for_human_pick")
+		or "locked"
 	self.error = ""
 	self.revision = self.revision + 1
 	self:PushConfiguration()
@@ -1662,8 +1816,36 @@ function XHSBots:BeforeCustomSetupFinish(launchReason, callback)
 	SetupLog("provisioning_armed", {
 		bot_count = self.configuration.count,
 		launch_reason = launchReason,
-		trigger = "first_human_hero_pick",
+		trigger = self.configuration.spectator_mode
+			and "spectator_hero_selection"
+			or "first_human_hero_pick",
 	})
+	if self.configuration.spectator_mode
+		and Timers ~= nil
+		and Timers.CreateTimer ~= nil then
+		self.spectator_provision_generation =
+			(tonumber(self.spectator_provision_generation) or 0) + 1
+		local generation = self.spectator_provision_generation
+		Timers:CreateTimer(0, function()
+			if generation ~= XHSBots.spectator_provision_generation
+				or XHSBotProvisioner.provisioned
+				or XHSBots.configuration.count <= 0 then
+				return nil
+			end
+			local state = GameRules:State_Get()
+			if state < DOTA_GAMERULES_STATE_HERO_SELECTION then
+				return 0.10
+			end
+			if state > DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
+				return nil
+			end
+			XHSBots:StartHeroSelectionProvisioning(
+				XHSBots.controller_player_id,
+				"spectator_mode_timer"
+			)
+			return nil
+		end)
+	end
 	return true
 end
 
@@ -1854,13 +2036,24 @@ function XHSBots:OnGameRulesStateChange()
 	elseif state == DOTA_GAMERULES_STATE_HERO_SELECTION
 		and self.configuration.count > 0
 		and not XHSBotProvisioner.provisioned then
-		self.status = "waiting_for_human_pick"
-		self.error = ""
-		SetupLog("waiting_for_first_human_hero_pick", {
-			bot_count = self.configuration.count,
-		})
-		self:PushConfiguration()
-		self:PushRoster()
+		if self.configuration.spectator_mode == true then
+			SetupLog("spectator_provisioning_triggered", {
+				bot_count = self.configuration.count,
+				controller_player_id = self.controller_player_id,
+			})
+			self:StartHeroSelectionProvisioning(
+				self.controller_player_id,
+				"spectator_mode"
+			)
+		else
+			self.status = "waiting_for_human_pick"
+			self.error = ""
+			SetupLog("waiting_for_first_human_hero_pick", {
+				bot_count = self.configuration.count,
+			})
+			self:PushConfiguration()
+			self:PushRoster()
+		end
 	elseif state >= DOTA_GAMERULES_STATE_PRE_GAME
 		and state <= DOTA_GAMERULES_STATE_GAME_IN_PROGRESS
 		and self.configuration.count > 0 then
@@ -1926,6 +2119,9 @@ function XHSBots:ResetBotAfterRespawn(playerID, hero, record, reason)
 	record.stuck_sample_position = hero:GetAbsOrigin()
 	record.stuck_sample_at = now
 	record.stuck_since = nil
+	record.last_movement_destination = nil
+	record.last_movement_order_at = nil
+	record.last_movement_kind = nil
 	record.combo_target_entindex = nil
 	record.combo_until = nil
 	record.order_timestamps = {}
@@ -2190,10 +2386,18 @@ function XHSBots:PushDebugState()
 	for _, playerID in ipairs(XHSBotPlayerRegistry:GetXHSBotPlayerIDs()) do
 		local record = XHSBotPlayerRegistry:GetBot(playerID)
 		local assignment = XHSBotTeamDirector:GetAssignment(playerID)
+		local hero = XHSBotPlayerRegistry:GetBotHero(playerID)
 		local target = SafeEntityFromIndex(record.target_entindex)
+		local pendingDecision = type(record.pending_decision) == "table"
+			and record.pending_decision or nil
+		local pendingData = pendingDecision ~= nil
+			and type(pendingDecision.data) == "table"
+			and pendingDecision.data or {}
 		CustomNetTables:SetTableValue("xhs_bots", "debug_" .. tostring(playerID), {
 			player_id = playerID,
 			hero = record.hero_name or record.requested_hero or "",
+			hero_entindex = IsValidHero(hero) and hero:entindex() or -1,
+			gold = math.floor(XHSBotEconomy:GetGold(playerID)),
 			difficulty = record.difficulty or self.configuration.difficulty,
 			role = record.role or "",
 			state = record.state or "INITIALIZING",
@@ -2208,6 +2412,7 @@ function XHSBots:PushDebugState()
 			urgency = assignment and math.floor((assignment.urgency or 0) * 100) / 100 or 0,
 			base_threat_score = math.floor((record.base_threat_score or 0) * 100) / 100,
 			base_threat_active = record.base_threat_active and 1 or 0,
+			base_response_required = record.base_response_required and 1 or 0,
 			base_threat_count = record.base_threat_count or 0,
 			base_special_count = record.base_special_count or 0,
 			base_dragon_count = record.base_dragon_count or 0,
@@ -2227,6 +2432,11 @@ function XHSBots:PushDebugState()
 			top_actions = record.top_actions or {},
 			last_decision = record.last_decision or "",
 			last_decision_reason = record.last_decision_reason or "",
+			decision_ability = GetDebugAbilityName(pendingData.ability),
+			decision_mode = pendingData.mode or "",
+			decision_objective = pendingData.objective or "",
+			decision_target = GetDebugEntityName(pendingData.target),
+			decision_desired_state = pendingData.desired_state == true and 1 or 0,
 			last_order = record.last_order or "",
 			last_ability = record.last_ability or "",
 			last_ability_reason = record.last_ability_reason or "",
@@ -2287,6 +2497,10 @@ function XHSBots:PushDebugState()
 			planned_item_reason = record.planned_item_reason or "",
 			planned_loadout = record.planned_loadout or {},
 			planned_loadout_scores = record.planned_loadout_scores or {},
+			item_need_scores = record.item_need_scores or {},
+			item_dominant_need = record.item_dominant_need or "",
+			item_dominant_need_value =
+				record.item_dominant_need_value or 0,
 			item_candidates = record.item_candidates or {},
 			allied_family_counts = record.allied_family_counts or {},
 			economy_plan_switches = record.economy_plan_switches or 0,
@@ -2331,6 +2545,8 @@ function XHSBots:PushDebugState()
 				and record.shopping_goal.item or "",
 			shopping_shop = type(record.shopping_goal) == "table"
 				and record.shopping_goal.shop or "",
+			shopping_force_home = type(record.shopping_goal) == "table"
+				and record.shopping_goal.force_home == true and 1 or 0,
 			shopping_urgent = type(record.shopping_goal) == "table"
 				and record.shopping_goal.urgent == true and 1 or 0,
 			shopping_reason = type(record.shopping_goal) == "table"
@@ -2363,9 +2579,8 @@ function XHSBots:PushDebugState()
 			error = record.error or "",
 		})
 
-		if self.overlay_enabled and IsValidHero(XHSBotPlayerRegistry:GetBotHero(playerID))
+		if self.overlay_enabled and IsValidHero(hero)
 			and DebugDrawText ~= nil then
-			local hero = XHSBotPlayerRegistry:GetBotHero(playerID)
 			local top = record.top_actions and record.top_actions[1] or nil
 			local overlay = string.format(
 				"%s | %s | TARGET: %s%s",
@@ -2531,6 +2746,9 @@ function XHSBots:ResetForTools()
 			record.stuck_sample_position = nil
 			record.stuck_sample_at = nil
 			record.stuck_since = nil
+			record.last_movement_destination = nil
+			record.last_movement_order_at = nil
+			record.last_movement_kind = nil
 			record.combo_target_entindex = nil
 			record.combo_until = nil
 			record.order_timestamps = {}

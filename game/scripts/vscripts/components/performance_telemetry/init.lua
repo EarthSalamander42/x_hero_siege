@@ -11,6 +11,10 @@ local CLIENT_REPORT_TIMEOUT = 12
 local SERVER_FRAME_INCIDENT_MS = 40
 local CLIENT_FPS_INCIDENT = 40
 local INCIDENT_CONTEXT_SAMPLES = 4
+local LOCAL_REPORT_SCHEMA_VERSION = 1
+local LOCAL_REPORT_MAX_SAMPLES = math.ceil(3 * 60 * 60 / SAMPLE_INTERVAL)
+local LOCAL_REPORT_TOP_SOURCES = 3
+local LOCAL_REPORT_PREFIX = "[XHS_PERF_REPORT"
 local ACTIVITY_INCIDENT_THRESHOLDS = {
 	spatial_queries_per_second = { threshold = 500, reason = "spatial_query_pressure" },
 	spatial_query_cost_ms_per_second = { threshold = 10, reason = "spatial_query_cost" },
@@ -67,6 +71,24 @@ local function CopyTable(source)
 		end
 	end
 	return copy
+end
+
+local function SafeField(value)
+	value = tostring(value == nil and "" or value)
+	value = string.gsub(value, "[\r\n\t|]", "_")
+	return value
+end
+
+local function JoinFields(prefix, fields)
+	local values = { prefix }
+	for _, value in ipairs(fields) do
+		table.insert(values, SafeField(value))
+	end
+	return table.concat(values, "|")
+end
+
+local function ActivityValue(activity, name)
+	return Round(tonumber((activity or {})[name]) or 0, 2)
 end
 
 function XHSPerformanceTelemetry:ResolvePlayerID(sourceIndex)
@@ -150,6 +172,351 @@ function XHSPerformanceTelemetry:BuildSessionPlayers()
 		end
 	end
 	return players
+end
+
+function XHSPerformanceTelemetry:BuildLocalBotSnapshot()
+	local now = Now()
+	local totals = {
+		orders = 0,
+		rejected_orders = 0,
+		casts_issued = 0,
+		casts_rejected = 0,
+		target_changes = 0,
+		decision_ticks = 0,
+		decision_cost_total_ms = 0,
+	}
+	local snapshot = {
+		configured = XHSBots ~= nil
+			and XHSBots.configuration ~= nil
+			and tonumber(XHSBots.configuration.count) or 0,
+		live = 0,
+		active = 0,
+		paused = XHSBots ~= nil and XHSBots.paused == true and 1 or 0,
+		decision_average_ms = 0,
+		decision_max_ms = 0,
+		think_average_ms = XHSBots ~= nil
+			and Round(XHSBots.think_cost_average_ms, 3) or 0,
+		think_max_ms = XHSBots ~= nil
+			and Round(XHSBots.think_cost_max_ms, 3) or 0,
+	}
+
+	if XHSBotPlayerRegistry ~= nil
+		and XHSBotPlayerRegistry.GetXHSBotPlayerIDs ~= nil
+		and XHSBotPlayerRegistry.GetBot ~= nil then
+		for _, playerID in ipairs(XHSBotPlayerRegistry:GetXHSBotPlayerIDs()) do
+			local record = XHSBotPlayerRegistry:GetBot(playerID) or {}
+			snapshot.live = snapshot.live + 1
+			if record.alive ~= false and record.state ~= "DEAD" then
+				snapshot.active = snapshot.active + 1
+			end
+			totals.orders = totals.orders + (tonumber(record.orders) or 0)
+			totals.rejected_orders = totals.rejected_orders
+				+ (tonumber(record.rejected_orders) or 0)
+				+ (tonumber(record.rate_limited_orders) or 0)
+			totals.casts_issued = totals.casts_issued
+				+ (tonumber(record.casts_issued) or 0)
+			totals.casts_rejected = totals.casts_rejected
+				+ (tonumber(record.casts_rejected) or 0)
+			totals.target_changes = totals.target_changes
+				+ (tonumber(record.target_changes) or 0)
+			totals.decision_ticks = totals.decision_ticks
+				+ (tonumber(record.decision_ticks) or 0)
+			totals.decision_cost_total_ms = totals.decision_cost_total_ms
+				+ (tonumber(record.decision_cost_total_ms) or 0)
+			snapshot.decision_max_ms = math.max(
+				snapshot.decision_max_ms,
+				tonumber(record.decision_cost_max_ms) or 0
+			)
+		end
+	end
+
+	if totals.decision_ticks > 0 then
+		snapshot.decision_average_ms = Round(
+			totals.decision_cost_total_ms / totals.decision_ticks,
+			3
+		)
+	end
+	snapshot.decision_max_ms = Round(snapshot.decision_max_ms, 3)
+
+	local previous = self.local_bot_previous
+	local elapsed = previous ~= nil
+		and math.max(0.001, now - (tonumber(previous.at) or now))
+		or SAMPLE_INTERVAL
+	local function Rate(name)
+		if previous == nil then return 0 end
+		return Round(math.max(
+			0,
+			(tonumber(totals[name]) or 0) - (tonumber(previous[name]) or 0)
+		) / elapsed, 2)
+	end
+	snapshot.orders_per_second = Rate("orders")
+	snapshot.rejected_orders_per_second = Rate("rejected_orders")
+	snapshot.casts_per_second = Rate("casts_issued")
+	snapshot.rejected_casts_per_second = Rate("casts_rejected")
+	snapshot.target_changes_per_second = Rate("target_changes")
+	totals.at = now
+	self.local_bot_previous = totals
+	return snapshot
+end
+
+function XHSPerformanceTelemetry:BuildLocalClientSnapshot(players)
+	local snapshot = {
+		count = 0,
+		fps_average = -1,
+		fps_p5 = -1,
+		frame_ms_p95 = -1,
+		detail = "",
+	}
+	local fpsSum = 0
+	local details = {}
+	for _, player in ipairs(players or {}) do
+		snapshot.count = snapshot.count + 1
+		fpsSum = fpsSum + (tonumber(player.fps_average) or 0)
+		local fpsP5 = tonumber(player.fps_p5) or 0
+		local frameP95 = tonumber(player.frame_ms_p95) or 0
+		if snapshot.fps_p5 < 0 or fpsP5 < snapshot.fps_p5 then
+			snapshot.fps_p5 = fpsP5
+		end
+		if snapshot.frame_ms_p95 < 0 or frameP95 > snapshot.frame_ms_p95 then
+			snapshot.frame_ms_p95 = frameP95
+		end
+		table.insert(details, table.concat({
+			tostring(tonumber(player.slot) or -1),
+			tostring(tonumber(player.fps_average) or -1),
+			tostring(fpsP5),
+			tostring(frameP95),
+			SafeField(player.hero or ""),
+		}, ":"))
+	end
+	if snapshot.count > 0 then
+		snapshot.fps_average = Round(fpsSum / snapshot.count, 1)
+	end
+	snapshot.detail = table.concat(details, ",")
+	return snapshot
+end
+
+function XHSPerformanceTelemetry:GetLocalContext()
+	local context = "game"
+	if GameMode ~= nil and GameMode.FarmEvent_occuring == true then
+		context = "farm_event"
+	elseif CustomTimers ~= nil
+		and CustomTimers.current_time ~= nil
+		and (tonumber(CustomTimers.current_time.special_arena) or 0) > 0 then
+		context = "special_arena"
+	end
+	if XHSLagLab ~= nil
+		and XHSLagLab.state ~= nil
+		and (XHSLagLab.state.running == true or XHSLagLab.state.effect_active == true) then
+		context = "lag_lab:"
+			.. SafeField(XHSLagLab.state.experiment_id or "unknown")
+			.. ":" .. SafeField(XHSLagLab.state.stage or "active")
+	end
+	return context
+end
+
+function XHSPerformanceTelemetry:BuildLocalSourceLines(sequence, expanded)
+	local lines = {}
+	local counterSnapshot = XHSPerformanceCounters ~= nil
+		and XHSPerformanceCounters.GetSnapshot ~= nil
+		and XHSPerformanceCounters:GetSnapshot() or {}
+	local buckets = {
+		{ name = "spatial", rows = counterSnapshot.top_spatial_sources
+			or counterSnapshot.top_zone_sources or {} },
+		{ name = "order", rows = counterSnapshot.top_order_sources or {} },
+	}
+	local rowLimit = expanded == true and LOCAL_REPORT_TOP_SOURCES or 1
+	for _, bucket in ipairs(buckets) do
+		for index = 1, math.min(rowLimit, #bucket.rows) do
+			local row = bucket.rows[index] or {}
+			table.insert(lines, JoinFields(LOCAL_REPORT_PREFIX .. "_SOURCE]", {
+				sequence,
+				bucket.name,
+				index,
+				row.source or "",
+				row.calls_per_second or 0,
+				row.results_per_second or 0,
+				row.cost_ms_per_second or 0,
+			}))
+		end
+	end
+	return lines
+end
+
+function XHSPerformanceTelemetry:CaptureLocalReportSample(sample)
+	if not IsInToolsMode() then return end
+	self.local_report_samples = self.local_report_samples or {}
+	local activity = sample.activity or {}
+	local director = sample.ai_director or {}
+	local client = self:BuildLocalClientSnapshot(sample.players)
+	local bots = self:BuildLocalBotSnapshot()
+	local hostTimescale = tonumber(activity.host_timescale)
+		or (Convars ~= nil and Convars:GetFloat("host_timescale")) or 1
+	local paused = GameRules.IsGamePaused ~= nil
+		and GameRules:IsGamePaused() and 1 or 0
+	local expandedSources = sample.incident_id ~= nil
+		or (tonumber(sample.server_frame_ms_p95) or 0) >= 25
+		or (client.fps_p5 >= 0 and client.fps_p5 < 50)
+
+	local record = {
+		data = JoinFields(LOCAL_REPORT_PREFIX .. "_DATA]", {
+			sample.sequence,
+			sample.game_time,
+			GameRules:State_Get(),
+			paused,
+			self:GetLocalContext(),
+			sample.phase,
+			sample.wave,
+			sample.difficulty,
+			Round(hostTimescale, 2),
+			sample.server_frame_ms,
+			sample.server_frame_ms_p95,
+			sample.server_frame_ms_max,
+			client.count,
+			client.fps_average,
+			client.fps_p5,
+			client.frame_ms_p95,
+			client.detail,
+			sample.creeps,
+			sample.total_units,
+			sample.heroes,
+			sample.bosses,
+			sample.summons,
+			sample.breakables,
+			sample.other_units,
+			sample.thinkers,
+			sample.ai_controllers,
+			sample.wave_controllers,
+			sample.ability_controllers,
+			director.active_agents or 0,
+			director.queued_agents or 0,
+			director.cached_profiles or 0,
+			director.profiles_without_actives or 0,
+			director.budget or 0,
+			ActivityValue(activity, "ai_thinks_per_second"),
+			ActivityValue(activity, "ai_agents_processed_per_second"),
+			ActivityValue(activity, "ai_agents_sleeping_per_second"),
+			ActivityValue(activity, "wave_thinks_per_second"),
+			ActivityValue(activity, "ability_loop_thinks_per_second"),
+			ActivityValue(activity, "spatial_queries_per_second"),
+			ActivityValue(activity, "spatial_results_per_second"),
+			ActivityValue(activity, "spatial_query_cost_ms_per_second"),
+			ActivityValue(activity, "spatial_query_max_ms"),
+			ActivityValue(activity, "spatial_cache_hits_per_second"),
+			ActivityValue(activity, "spatial_cache_misses_per_second"),
+			ActivityValue(activity, "orders_per_second"),
+			ActivityValue(activity, "repeated_orders_per_second"),
+			ActivityValue(activity, "damage_events_per_second"),
+			ActivityValue(activity, "ability_casts_per_second"),
+			ActivityValue(activity, "projectiles_per_second"),
+			ActivityValue(activity, "unit_spawns_per_second"),
+			ActivityValue(activity, "unit_deaths_per_second"),
+			ActivityValue(activity, "target_changes_per_second"),
+			bots.configured,
+			bots.live,
+			bots.active,
+			bots.paused,
+			bots.orders_per_second,
+			bots.rejected_orders_per_second,
+			bots.casts_per_second,
+			bots.rejected_casts_per_second,
+			bots.target_changes_per_second,
+			bots.decision_average_ms,
+			bots.decision_max_ms,
+			bots.think_average_ms,
+			bots.think_max_ms,
+			sample.profiler_ms,
+			sample.incident_id or 0,
+		}),
+		sources = self:BuildLocalSourceLines(sample.sequence, expandedSources),
+	}
+	table.insert(self.local_report_samples, record)
+	if #self.local_report_samples > LOCAL_REPORT_MAX_SAMPLES then
+		table.remove(self.local_report_samples, 1)
+		self.local_report_dropped_samples =
+			(self.local_report_dropped_samples or 0) + 1
+	end
+end
+
+function XHSPerformanceTelemetry:PrintLocalReport(reason)
+	if not IsInToolsMode() then
+		print(LOCAL_REPORT_PREFIX .. "_ERROR]|tools_mode_required")
+		return false
+	end
+	local summary = self:BuildSummary()
+	local samples = self.local_report_samples or {}
+	print(JoinFields(LOCAL_REPORT_PREFIX .. "_BEGIN]", {
+		"schema=" .. tostring(LOCAL_REPORT_SCHEMA_VERSION),
+		"reason=" .. SafeField(reason or "manual"),
+		"map=" .. SafeField(GetMapName()),
+		"mod=" .. SafeField(GAME_VERSION or ""),
+		"interval_s=" .. tostring(SAMPLE_INTERVAL),
+		"samples=" .. tostring(#samples),
+		"dropped=" .. tostring(self.local_report_dropped_samples or 0),
+	}))
+	print(JoinFields(LOCAL_REPORT_PREFIX .. "_SUMMARY]", {
+		"sample_count=" .. tostring(summary.sample_count or 0),
+		"incidents=" .. tostring(summary.incident_count or 0),
+		"server_avg_ms=" .. tostring(summary.server_frame_ms_average or 0),
+		"server_max_ms=" .. tostring(summary.server_frame_ms_max or 0),
+		"client_fps_p5_min=" .. tostring(summary.client_fps_p5_min or -1),
+		"creeps_max=" .. tostring(summary.creeps_max or 0),
+		"units_max=" .. tostring(summary.total_units_max or 0),
+	}))
+	print(JoinFields(LOCAL_REPORT_PREFIX .. "_COLUMNS]", {
+		"seq", "game_s", "state", "paused", "context", "phase", "wave",
+		"difficulty", "timescale", "server_avg_ms", "server_p95_ms",
+		"server_max_ms", "clients", "client_fps_avg", "client_fps_p5",
+		"client_frame_p95_ms", "client_detail",
+		"creeps", "units", "heroes", "bosses", "summons", "breakables",
+		"other", "thinkers", "ai_ctrl", "wave_ctrl", "ability_ctrl",
+		"director_active", "director_queued", "profiles", "profiles_passive",
+		"director_budget", "ai_s", "ai_processed_s", "ai_sleeping_s",
+		"wave_s", "ability_s", "spatial_s", "spatial_hits_s",
+		"spatial_cost_ms_s", "spatial_max_ms", "cache_hits_s",
+		"cache_misses_s", "orders_s", "repeat_orders_s", "damage_s",
+		"casts_s", "projectiles_s", "spawns_s", "deaths_s",
+		"target_changes_s", "bots_configured", "bots_live", "bots_active",
+		"bots_paused", "bot_orders_s", "bot_order_reject_s", "bot_casts_s",
+		"bot_cast_reject_s", "bot_target_changes_s", "bot_decision_avg_ms",
+		"bot_decision_max_ms", "bot_think_avg_ms", "bot_think_max_ms",
+		"profiler_ms", "incident",
+	}))
+	for _, record in ipairs(samples) do
+		print(record.data)
+		for _, sourceLine in ipairs(record.sources or {}) do
+			print(sourceLine)
+		end
+	end
+	for _, incident in ipairs(self.incidents or {}) do
+		print(JoinFields(LOCAL_REPORT_PREFIX .. "_INCIDENT]", {
+			incident.incident_id or 0,
+			incident.trigger_sequence or 0,
+			incident.trigger_game_time or 0,
+			incident.start_sequence or 0,
+			incident.end_sequence or 0,
+			table.concat(incident.reasons or {}, ","),
+			incident.peak_server_frame_ms or 0,
+			incident.min_client_fps_p5 or -1,
+		}))
+	end
+	if self.active_incident ~= nil then
+		local incident = self.active_incident
+		print(JoinFields(LOCAL_REPORT_PREFIX .. "_INCIDENT]", {
+			incident.incident_id or 0,
+			incident.trigger_sequence or 0,
+			incident.trigger_game_time or 0,
+			incident.start_sequence or 0,
+			incident.end_sequence or 0,
+			table.concat(incident.reasons or {}, ","),
+			incident.peak_server_frame_ms or 0,
+			incident.min_client_fps_p5 or -1,
+		}))
+	end
+	print(JoinFields(LOCAL_REPORT_PREFIX .. "_END]", {
+		"samples=" .. tostring(#samples),
+		"reason=" .. SafeField(reason or "manual"),
+	}))
+	return true
 end
 
 function XHSPerformanceTelemetry:BuildSample()
@@ -362,6 +729,7 @@ function XHSPerformanceTelemetry:Collect()
 	local sample = self:BuildSample()
 	self:DetectIncident(sample)
 	self:UpdateSummary(sample)
+	self:CaptureLocalReportSample(sample)
 	table.insert(self.current_samples, sample)
 	if #self.current_samples >= SAMPLES_PER_BATCH then self:QueueBatch(false) end
 end
@@ -442,10 +810,18 @@ function XHSPerformanceTelemetry:Finalize()
 	if api == nil or api.game_id == nil or api.xhs_bot_session_backend_disabled == true then
 		self.current_samples = {}
 		self.pending_batches = {}
+		if IsInToolsMode() and self.local_report_auto_printed ~= true then
+			self.local_report_auto_printed = true
+			self:PrintLocalReport("finalize")
+		end
 		return self:BuildSummary()
 	end
 	self:QueueBatch(true)
 	self:TrySend()
+	if IsInToolsMode() and self.local_report_auto_printed ~= true then
+		self.local_report_auto_printed = true
+		self:PrintLocalReport("finalize")
+	end
 	return self:BuildSummary()
 end
 
@@ -468,6 +844,10 @@ function XHSPerformanceTelemetry:Init()
 	self.server_frame_observations = {}
 	self.dropped_batches = 0
 	self.finalized = false
+	self.local_report_samples = {}
+	self.local_report_dropped_samples = 0
+	self.local_report_auto_printed = false
+	self.local_bot_previous = nil
 	self.summary = {
 		schema_version = SCHEMA_VERSION,
 		sample_count = 0,
@@ -484,6 +864,18 @@ function XHSPerformanceTelemetry:Init()
 	CustomGameEventManager:RegisterListener("xhs_performance_client_sample", function(sourceIndex, event)
 		return XHSPerformanceTelemetry:OnClientSample(sourceIndex, event)
 	end)
+	if IsInToolsMode() and Convars ~= nil and Convars.RegisterCommand ~= nil then
+		Convars:RegisterCommand("xhs_perf_dump", function()
+			XHSPerformanceTelemetry:PrintLocalReport("manual")
+		end, "Print the local XHS performance timeline to VConsole.", FCVAR_CHEAT)
+	end
+	ListenToGameEvent("game_rules_state_change", function()
+		if IsInToolsMode()
+			and GameRules:State_Get() >= DOTA_GAMERULES_STATE_POST_GAME
+			and XHSPerformanceTelemetry.finalized ~= true then
+			XHSPerformanceTelemetry:Finalize()
+		end
+	end, nil)
 
 	GameRules:GetGameModeEntity():SetContextThink("XHSPerformanceTelemetry", function()
 		if self.finalized == true then

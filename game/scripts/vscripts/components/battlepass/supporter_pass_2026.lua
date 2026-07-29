@@ -26,6 +26,7 @@ SupporterPass2026.ANCHORS = {
 	rebirth = "particles/custom/supporter_pass/rebirth_anchor.vpcf",
 	health_potion = "particles/custom/supporter_pass/health_potion_anchor.vpcf",
 	mana_potion = "particles/custom/supporter_pass/mana_potion_anchor.vpcf",
+	light_potion = "particles/custom/supporter_pass/light_potion_anchor.vpcf",
 }
 
 local PARTICLE_FIELDS = {
@@ -36,6 +37,7 @@ local PARTICLE_FIELDS = {
 	"caster_pfx",
 	"health_pfx",
 	"mana_pfx",
+	"light_pfx",
 	"owner_pfx",
 	"overhead_pfx",
 	"travel_pfx",
@@ -60,6 +62,7 @@ local VISUAL_CHANNELS = {
 	potion = {
 		{ field = "health_pfx", anchor = SupporterPass2026.ANCHORS.health_potion },
 		{ field = "mana_pfx", anchor = SupporterPass2026.ANCHORS.mana_potion },
+		{ field = "light_pfx", anchor = SupporterPass2026.ANCHORS.light_potion },
 	},
 	rebirth = {
 		{ field = "pfx", anchor = SupporterPass2026.ANCHORS.rebirth },
@@ -325,6 +328,7 @@ function SupporterPass2026:BuildReward(itemsGame, track, level, catalogID)
 		"caster_pfx",
 		"health_pfx",
 		"mana_pfx",
+		"light_pfx",
 		"owner_pfx",
 		"overhead_pfx",
 		"travel_pfx",
@@ -484,6 +488,7 @@ local BACKEND_PROTECTED_FIELDS = {
 	caster_pfx = true,
 	health_pfx = true,
 	mana_pfx = true,
+	light_pfx = true,
 	owner_pfx = true,
 	overhead_pfx = true,
 	travel_pfx = true,

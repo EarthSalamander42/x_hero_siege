@@ -40,6 +40,7 @@ var XHSTopHud = (function () {
 	var allyCards = {};
 	var vipCards = {};
 	var overheadLabels = {};
+	var botActivityStates = {};
 	var overheadUiBlockerRects = [];
 	var overheadUiBlockerRefreshAt = 0;
 	var overheadUiBlockerRootWidth = 0;
@@ -83,6 +84,19 @@ var XHSTopHud = (function () {
 		"XHSStatusDisarmed",
 		"XHSStatusBroken",
 		"XHSStatusInvulnerable",
+	];
+
+	var BOT_ACTIVITY_TONE_CLASSES = [
+		"XHSBotActivityToneCombat",
+		"XHSBotActivityToneDefense",
+		"XHSBotActivityToneDanger",
+		"XHSBotActivityToneMove",
+		"XHSBotActivityToneSupport",
+		"XHSBotActivityToneEconomy",
+		"XHSBotActivityToneSecret",
+		"XHSBotActivityToneEvent",
+		"XHSBotActivityToneIdle",
+		"XHSBotActivityToneUnknown",
 	];
 
 	var DEFAULT_SUPPORTER_TIER_CATALOG = [
@@ -851,6 +865,394 @@ var XHSTopHud = (function () {
 		return portrait;
 	}
 
+	function PrettyBotIdentifier(value) {
+		var text = NormalizeTextValue(value);
+		if (!text) {
+			return "";
+		}
+
+		text = text
+			.replace(/^npc_dota_hero_/, "")
+			.replace(/^npc_dota_/, "")
+			.replace(/^holdout_/, "")
+			.replace(/^xhs_/, "")
+			.replace(/^rifleman_/, "")
+			.replace(/^item_/, "")
+			.replace(/_/g, " ")
+			.replace(/\s+/g, " ")
+			.replace(/^\s+|\s+$/g, "");
+
+		return text.toUpperCase();
+	}
+
+	function FormatBotAbilityName(abilityName) {
+		abilityName = NormalizeTextValue(abilityName);
+		if (!abilityName) {
+			return "";
+		}
+
+		var token = "#DOTA_Tooltip_ability_" + abilityName;
+		var localized = SafeValue(function () {
+			return $.Localize(token);
+		}, "");
+		if (localized && localized !== token) {
+			return localized.toUpperCase();
+		}
+
+		return PrettyBotIdentifier(abilityName);
+	}
+
+	function FormatBotItemName(itemName) {
+		itemName = NormalizeTextValue(itemName);
+		if (!itemName) {
+			return "";
+		}
+
+		var token = "#DOTA_Tooltip_ability_" + itemName;
+		var localized = SafeValue(function () {
+			return $.Localize(token);
+		}, "");
+		if (localized && localized !== token) {
+			return localized.toUpperCase();
+		}
+
+		return PrettyBotIdentifier(itemName);
+	}
+
+	function FormatBotTargetName(targetName) {
+		targetName = NormalizeTextValue(targetName).toLowerCase();
+		if (!targetName) {
+			return "";
+		}
+		if (targetName.indexOf("baristol") >= 0) {
+			return "BARISTOL";
+		}
+		if (targetName.indexOf("ramero") >= 0) {
+			return "RAMERO";
+		}
+		if (targetName.indexOf("sogat") >= 0) {
+			return "SOGAT";
+		}
+		if (targetName.indexOf("muradin") >= 0) {
+			return "MURADIN";
+		}
+		if (targetName.indexOf("dragon") >= 0) {
+			return "DRAGON";
+		}
+		if (targetName.indexOf("boss") >= 0) {
+			return "BOSS";
+		}
+		if (targetName.indexOf("creep") >= 0 || targetName.indexOf("wave") >= 0) {
+			return "WAVE";
+		}
+		return PrettyBotIdentifier(targetName);
+	}
+
+	function BotActivity(label, tone) {
+		return {
+			label: label,
+			tone: tone || "Unknown",
+		};
+	}
+
+	function ResolveBotShopActivity(data, travelling) {
+		var shop = NormalizeTextValue(data.shopping_shop).toLowerCase();
+		var itemName = FormatBotItemName(data.shopping_item || data.planned_item);
+		var isSecret = shop === "secret" || shop.indexOf("secret") >= 0 || shop.indexOf("castle") >= 0;
+		var forceBase = ToNumber(data.shopping_force_home, 0) > 0 || shop === "base";
+		var label = "";
+		var tone = isSecret ? "Secret" : "Economy";
+
+		if (travelling) {
+			label = isSecret ? "TO SECRET SHOP" : forceBase ? "TO BASE SHOP" : "TO NORMAL SHOP";
+		} else {
+			label = isSecret ? "BUYING @ SECRET" : forceBase ? "BUYING @ BASE" : "BUYING ITEM";
+		}
+		if (itemName) {
+			label += ": " + itemName;
+		}
+		return BotActivity(label, tone);
+	}
+
+	function ResolveBotActivity(data) {
+		data = data || {};
+		var state = NormalizeTextValue(data.state).toUpperCase();
+		var macroState = NormalizeTextValue(data.macro_state).toUpperCase();
+		var decision = NormalizeTextValue(data.last_decision).toLowerCase();
+		var goal = NormalizeTextValue(data.goal).toLowerCase();
+		var eventName = NormalizeTextValue(data.event).toLowerCase();
+		var encounter = NormalizeTextValue(data.encounter_mode).toLowerCase();
+		var reason = NormalizeTextValue(data.last_decision_reason).toLowerCase();
+		var lane = Math.max(0, Math.floor(ToNumber(data.lane, 0)));
+		var laneSuffix = lane > 0 ? " " + lane : "";
+		var targetName = FormatBotTargetName(data.decision_target || data.target);
+		var abilityName = FormatBotAbilityName(data.decision_ability || data.last_ability);
+
+		if (state === "SELECTING_HERO" || macroState === "SELECTING_HERO") {
+			return BotActivity("SELECTING HERO", "Idle");
+		}
+		if (state === "DEAD" || macroState === "DEAD" || decision === "dead") {
+			return BotActivity("DEAD", "Idle");
+		}
+		if (state === "UNSUPPORTED_HERO") {
+			return BotActivity("AI PROFILE MISSING", "Danger");
+		}
+		if (state === "STUCK_RECOVERY") {
+			return BotActivity("RECOVERING PATH", "Danger");
+		}
+
+		if (state === "MURADIN_SURVIVAL" || macroState === "MURADIN_SURVIVAL" || encounter === "muradin_survival") {
+			if (decision === "cast_ability") {
+				return BotActivity("EMERGENCY HEAL", "Support");
+			}
+			if (decision === "hold") {
+				return BotActivity("HIDING FROM MURADIN", "Event");
+			}
+			return BotActivity("ESCAPING MURADIN", "Danger");
+		}
+
+		if (state === "COLLECTING_RUNE" || data.decision_objective === "rune") {
+			return BotActivity("GOING TO RUNE", "Move");
+		}
+		if (state === "EVADING_DANGER" || decision === "evade_danger") {
+			return BotActivity("DODGING DANGER", "Danger");
+		}
+		if (state === "RETREATING" || decision === "retreat") {
+			return BotActivity("RETREATING TO SAFETY", "Danger");
+		}
+		if (state === "REPOSITIONING" || decision === "reposition") {
+			return BotActivity("REPOSITIONING", "Move");
+		}
+		if (state === "SEARCHING_LAST_SEEN" || decision === "move_to_last_seen") {
+			return BotActivity("CHECKING LAST SEEN", "Move");
+		}
+
+		switch (decision) {
+			case "cast_ability":
+				if (state === "HEALING" || data.decision_mode === "ally_heal") {
+					return BotActivity(abilityName ? "HEALING: " + abilityName : "HEALING ALLY", "Support");
+				}
+				if (data.decision_mode === "rifle_attack_mode" ||
+					data.decision_mode === "toggle_single" ||
+					data.decision_mode === "toggle_aoe" ||
+					data.decision_mode === "defensive_toggle" ||
+					data.decision_mode === "autocast_attack") {
+					var toggleVerb = ToNumber(data.decision_desired_state, 0) > 0 ? "ENABLING: " : "DISABLING: ";
+					return BotActivity(abilityName ? toggleVerb + abilityName : "SWITCHING MODE", "Combat");
+				}
+				return BotActivity(abilityName ? "CASTING: " + abilityName : "CASTING ABILITY", "Combat");
+
+			case "attack_target":
+				if (state === "ARENA_COMBAT" || macroState === "RAMERO_BARISTOL_ARENA" ||
+					macroState === "SOGAT_ARENA" || encounter === "ramero_baristol" || encounter === "sogat") {
+					return BotActivity(targetName ? "FIGHTING " + targetName : "FIGHTING ARENA BOSS", "Event");
+				}
+				if (state === "FARM_EVENT" || macroState === "FARM_EVENT" || eventName === "farm_event") {
+					return BotActivity("FARMING EVENT", "Event");
+				}
+				if (goal === "defend_base" || state === "DEFENDING_BASE" || macroState === "DEFENDING_BASE") {
+					return BotActivity("DEFENDING ANCIENT", "Defense");
+				}
+				if (state === "FIGHTING_BOSS" || macroState === "FIGHTING_BOSS" || goal === "fight_boss") {
+					return BotActivity(targetName ? "FIGHTING " + targetName : "FIGHTING BOSS", "Combat");
+				}
+				if (goal === "defend_phase2" || macroState === "DEFENDING_SIDE") {
+					return BotActivity("DEFENDING PHASE 2", "Defense");
+				}
+				if (goal === "defend_lane" || macroState === "DEFENDING_LANE") {
+					return BotActivity("DEFENDING LANE" + laneSuffix, "Defense");
+				}
+				return BotActivity(targetName && targetName !== "WAVE" ? "FIGHTING " + targetName : "FIGHTING WAVE", "Combat");
+
+			case "attack_move":
+				if (macroState === "RETURNING_TO_LANE") {
+					return BotActivity("RETURNING TO LANE" + laneSuffix, "Move");
+				}
+				if (goal === "defend_base" || macroState === "DEFENDING_BASE") {
+					return BotActivity("DEFENDING ANCIENT", "Defense");
+				}
+				if (state === "ARENA_COMBAT") {
+					return BotActivity("REACQUIRING ARENA BOSS", "Event");
+				}
+				if (state === "FARM_EVENT" || eventName === "farm_event") {
+					return BotActivity("FARMING EVENT", "Event");
+				}
+				if (goal === "defend_lane" || macroState === "DEFENDING_LANE") {
+					return BotActivity("ADVANCING LANE" + laneSuffix, "Defense");
+				}
+				return BotActivity("ADVANCING TO OBJECTIVE", "Move");
+
+			case "move_to_objective":
+				if (goal === "shop" || macroState === "SHOPPING") {
+					return ResolveBotShopActivity(data, true);
+				}
+				if (reason.indexOf("campfire") >= 0) {
+					return BotActivity("GOING TO CAMPFIRE", "Support");
+				}
+				if (macroState === "RETURNING_TO_LANE") {
+					return BotActivity("RETURNING TO LANE" + laneSuffix, "Move");
+				}
+				if (goal === "defend_base" || macroState === "DEFENDING_BASE") {
+					return BotActivity("RESPONDING TO ANCIENT", "Defense");
+				}
+				if (goal === "defend_phase2" || macroState === "DEFENDING_SIDE") {
+					return BotActivity("MOVING TO PHASE 2", "Move");
+				}
+				if (goal === "regroup" || macroState === "REGROUPING") {
+					return BotActivity("REGROUPING", "Move");
+				}
+				if (goal === "defend_lane" || macroState === "DEFENDING_LANE") {
+					return BotActivity("GOING TO LANE" + laneSuffix, "Move");
+				}
+				return BotActivity("GOING TO OBJECTIVE", "Move");
+
+			case "hold":
+				if (goal === "shop" || macroState === "SHOPPING") {
+					return ResolveBotShopActivity(data, false);
+				}
+				if (goal === "defend_base" || macroState === "DEFENDING_BASE") {
+					return BotActivity("GUARDING ANCIENT", "Defense");
+				}
+				if (goal === "defend_lane" || macroState === "DEFENDING_LANE") {
+					return BotActivity("HOLDING LANE" + laneSuffix, "Defense");
+				}
+				if (state === "FARM_EVENT" || eventName === "farm_event") {
+					return BotActivity("WAITING IN FARM EVENT", "Event");
+				}
+				return BotActivity("HOLDING POSITION", "Idle");
+
+			case "wait":
+				return BotActivity("WAITING — DISABLED", "Idle");
+
+			case "dead":
+				return BotActivity("DEAD", "Idle");
+		}
+
+		if (state === "HEALING") {
+			return BotActivity("HEALING", "Support");
+		}
+		if (state === "ARENA_COMBAT") {
+			return BotActivity("FIGHTING ARENA BOSS", "Event");
+		}
+		if (state === "FARM_EVENT" || macroState === "FARM_EVENT") {
+			return BotActivity("FARMING EVENT", "Event");
+		}
+		if (state === "FIGHTING_BOSS" || macroState === "FIGHTING_BOSS") {
+			return BotActivity("FIGHTING BOSS", "Combat");
+		}
+		if (state === "FIGHTING_WAVE") {
+			return BotActivity("FIGHTING WAVE", "Combat");
+		}
+		if (macroState === "RETURNING_TO_LANE") {
+			return BotActivity("RETURNING TO LANE" + laneSuffix, "Move");
+		}
+		if (macroState === "DEFENDING_BASE") {
+			return BotActivity("DEFENDING ANCIENT", "Defense");
+		}
+		if (macroState === "DEFENDING_LANE") {
+			return BotActivity("DEFENDING LANE" + laneSuffix, "Defense");
+		}
+		if (macroState === "DEFENDING_SIDE") {
+			return BotActivity("DEFENDING PHASE 2", "Defense");
+		}
+		if (macroState === "SHOPPING") {
+			return ResolveBotShopActivity(data, true);
+		}
+		if (macroState === "REGROUPING") {
+			return BotActivity("REGROUPING", "Move");
+		}
+
+		var fallback = PrettyBotIdentifier(decision || state || macroState || "initializing");
+		return BotActivity("AI: " + fallback, "Unknown");
+	}
+
+	function ApplyBotActivityToOverhead(playerID) {
+		var label = overheadLabels[playerID];
+		if (!label) {
+			return;
+		}
+
+		var activityPanel = label.FindChildTraverse("XHSOverheadBotActivity_" + playerID);
+		var activityLabel = label.FindChildTraverse("XHSOverheadBotActivityLabel_" + playerID);
+		var debugState = botActivityStates[playerID];
+		var visible = !!debugState;
+
+		label.SetHasClass("XHSOverheadBotActivityVisible", visible);
+		if (!activityPanel || !activityLabel) {
+			return;
+		}
+
+		for (var i = 0; i < BOT_ACTIVITY_TONE_CLASSES.length; i++) {
+			activityPanel.SetHasClass(BOT_ACTIVITY_TONE_CLASSES[i], false);
+		}
+		if (!visible) {
+			activityLabel.text = "";
+			return;
+		}
+
+		var activity = ResolveBotActivity(debugState);
+		activityLabel.text = activity.label;
+		activityPanel.AddClass("XHSBotActivityTone" + activity.tone);
+	}
+
+	function RefreshBotActivityStates() {
+		var roster = CustomNetTables.GetTableValue("xhs_bots", "roster") || {};
+		var players = roster.players || {};
+		var activeBots = {};
+
+		for (var key in players) {
+			if (!players.hasOwnProperty(key)) {
+				continue;
+			}
+			var rosterEntry = players[key] || {};
+			var playerID = Math.floor(ToNumber(rosterEntry.player_id, ToNumber(key, -1)));
+			if (playerID < 0) {
+				continue;
+			}
+			activeBots[playerID] = true;
+			var debugState = CustomNetTables.GetTableValue("xhs_bots", "debug_" + playerID);
+			botActivityStates[playerID] = debugState || {
+				state: "INITIALIZING",
+				macro_state: "SELECTING_HERO",
+				last_decision: "",
+			};
+			ApplyBotActivityToOverhead(playerID);
+		}
+
+		for (var storedPlayerID in botActivityStates) {
+			if (!botActivityStates.hasOwnProperty(storedPlayerID)) {
+				continue;
+			}
+			var numericPlayerID = Math.floor(ToNumber(storedPlayerID, -1));
+			if (!activeBots[numericPlayerID]) {
+				delete botActivityStates[storedPlayerID];
+				ApplyBotActivityToOverhead(numericPlayerID);
+			}
+		}
+	}
+
+	function OnXHSBotsNetTableChanged(tableName, key, data) {
+		key = NormalizeTextValue(key);
+		if (key === "roster") {
+			RefreshBotActivityStates();
+			return;
+		}
+		if (key.indexOf("debug_") !== 0) {
+			return;
+		}
+
+		var playerID = Math.floor(ToNumber(key.substr(6), -1));
+		if (playerID < 0) {
+			return;
+		}
+		if (data) {
+			botActivityStates[playerID] = data;
+		} else {
+			delete botActivityStates[playerID];
+		}
+		ApplyBotActivityToOverhead(playerID);
+	}
+
 	function GetHeroIconName(heroName) {
 		heroName = NormalizeTextValue(heroName);
 		if (!heroName) {
@@ -937,6 +1339,20 @@ var XHSTopHud = (function () {
 		label.SetAttributeInt("player_id", playerID);
 		label.SetAttributeInt("ent_index", -1);
 		label.hittest = false;
+
+		// Bot intent is a separate world-space caption.  It must never become
+		// a child of XHSOverheadBars: doing so changes the health/mana layout.
+		var botActivity = $.CreatePanel("Panel", label, "XHSOverheadBotActivity_" + playerID);
+		botActivity.AddClass("XHSOverheadBotActivity");
+		botActivity.hittest = false;
+
+		var botActivityNode = $.CreatePanel("Panel", botActivity, "XHSOverheadBotActivityNode_" + playerID);
+		botActivityNode.AddClass("XHSOverheadBotActivityNode");
+		botActivityNode.hittest = false;
+
+		var botActivityLabel = $.CreatePanel("Label", botActivity, "XHSOverheadBotActivityLabel_" + playerID);
+		botActivityLabel.AddClass("XHSOverheadBotActivityLabel");
+		botActivityLabel.hittest = false;
 
 		var frameArt = $.CreatePanel("Panel", label, "XHSOverheadFrameArt_" + playerID);
 		frameArt.AddClass("XHSOverheadFrameArt");
@@ -1049,6 +1465,7 @@ var XHSTopHud = (function () {
 		anchorDot.AddClass("XHSOverheadAnchorDot");
 		anchorDot.hittest = false;
 
+		ApplyBotActivityToOverhead(playerID);
 		return label;
 	}
 
@@ -1695,6 +2112,7 @@ var XHSTopHud = (function () {
 		SetChildText(label, "XHSOverheadAltStatus_" + playerID, FormatOverheadAltStatus(data));
 		SetChildText(label, "XHSOverheadHealthLevel_" + playerID, Math.max(1, ToNumber(data.heroLevel, 1)).toString());
 		ApplyOverheadStatusEffect(label, playerID, GetOverheadStatusEffect(entIndex));
+		ApplyBotActivityToOverhead(playerID);
 
 		var portrait = label.FindChildTraverse("XHSOverheadHeroPortrait_" + playerID);
 		SetOverheadHeroImage(portrait, data.heroName);
@@ -2826,8 +3244,10 @@ var XHSTopHud = (function () {
 		CustomNetTables.SubscribeNetTableListener("supporter_pass_player", function () {
 			RefreshAllyRoster();
 		});
+		CustomNetTables.SubscribeNetTableListener("xhs_bots", OnXHSBotsNetTableChanged);
 
 		UpdateFocusTimersVisibility();
+		RefreshBotActivityStates();
 		EnsureAllyRosterSlots();
 		BuildOverheadMockups();
 		StartHeroRefreshLoop();
@@ -2859,6 +3279,13 @@ XHSTopHud.Initialize();
 		return String(heroName || "FALLEN HERO").replace(/^npc_dota_hero_/, "").replace(/_/g, " ").toUpperCase();
 	}
 
+	function UpdateReviveStackVisibility() {
+		var root = $("#XHSReviveFrameStack");
+		if (root) {
+			root.SetHasClass("XHSHasReviveFrames", root.GetChildCount() > 0);
+		}
+	}
+
 	function CreateFrame(key, data) {
 		var root = $("#XHSReviveFrameStack");
 		if (!root) {
@@ -2867,6 +3294,7 @@ XHSTopHud.Initialize();
 
 		var frame = $.CreatePanel("Panel", root, "XHSReviveFrame_" + key);
 		frame.AddClass("XHSReviveFrame");
+		UpdateReviveStackVisibility();
 		var accent = $.CreatePanel("Panel", frame, "");
 		accent.AddClass("XHSReviveFrameAccent");
 
@@ -2934,6 +3362,7 @@ XHSTopHud.Initialize();
 		$.Schedule(result === "completed" ? 0.9 : 0.55, function () {
 			if (frame && frame.IsValid()) {
 				frame.DeleteAsync(0);
+				$.Schedule(0.03, UpdateReviveStackVisibility);
 			}
 		});
 	}
@@ -3036,6 +3465,7 @@ XHSTopHud.Initialize();
 	GameEvents.Subscribe("xhs_tombstone_channel_local", function (data) {
 		SetVanillaChannelHidden(Number((data || {}).active) > 0);
 	});
+	UpdateReviveStackVisibility();
 	TickFrames();
 	MaintainVanillaChannelVisibility();
 	SyncReviveFramesFromNetTables();

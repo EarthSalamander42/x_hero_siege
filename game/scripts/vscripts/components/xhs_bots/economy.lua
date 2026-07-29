@@ -14,12 +14,6 @@ XHSBotEconomy.STASH_CAPACITY = 6
 XHSBotEconomy.STASH_COLLECTION_THRESHOLD = 4
 XHSBotEconomy.SCAN_LAST_SLOT = XHSBotEconomy.STASH_LAST_SLOT
 XHSBotEconomy.ANKH_ITEM_NAME = "item_ankh_of_reincarnation"
-XHSBotEconomy.DARKNESS_MINIMUM_GAME_TIME = 8 * 60
-XHSBotEconomy.DARKNESS_LOW_THREAT_HOLD = 24
-XHSBotEconomy.DARKNESS_HIGH_THREAT_HOLD = 4
-XHSBotEconomy.DARKNESS_TOGGLE_COOLDOWN = 12
-XHSBotEconomy.DARKNESS_LOW_THREAT = 0.28
-XHSBotEconomy.DARKNESS_HIGH_THREAT = 0.85
 -- Purchases are direct server transactions, so their geometric invariant is
 -- deliberately stricter than the engine's generous shop-volume edge. A bot
 -- must visibly enter the shop area instead of buying from a lane midpoint.
@@ -31,19 +25,6 @@ XHSBotEconomy.SECRET_SHOP_RADIUS = 550
 -- be granted while a bot is entering or leaving the secret shop.
 XHSBotEconomy.SECRET_SHOP_EXCLUSION_RADIUS = 900
 
-local DARKNESS_ITEMS = {
-	item_orb_of_darkness = true,
-	item_orb_of_darkness2 = true,
-	item_bracer_of_the_void = true,
-}
-local DARKNESS_ACTIVE_MODIFIER = "modifier_orb_of_darkness_active"
-local DARKNESS_COMBAT_ENCOUNTERS = {
-	ramero_baristol = true,
-	sogat = true,
-	phase_2 = true,
-	phase_3_vanguard = true,
-	phase_3 = true,
-}
 local GENERAL_SHOP_CLASSNAMES = {
 	"ent_dota_shop",
 	"dota_item_shop",
@@ -68,7 +49,9 @@ end
 
 local function AbilitySpecialValue(ability, key)
 	if not IsValidEntityHandle(ability) or type(key) ~= "string"
-		or key == "" or ability.GetSpecialValueFor == nil then return 0 end
+		or key == "" or ability.GetSpecialValueFor == nil then
+		return 0
+	end
 	local ok, value = pcall(function() return ability:GetSpecialValueFor(key) end)
 	return ok and math.max(0, tonumber(value) or 0) or 0
 end
@@ -143,10 +126,13 @@ end
 
 function XHSBotEconomy:GetOpeningAbilities(hero)
 	local candidates = {}
-	if not IsValidEntityHandle(hero) or hero.GetAbilityByIndex == nil then
+	if not IsValidEntityHandle(hero)
+		or hero.GetAbilityByIndex == nil
+		or hero.GetAbilityCount == nil then
 		return candidates
 	end
-	for abilityIndex = 0, 23 do
+	local abilityCount = math.max(0, tonumber(hero:GetAbilityCount()) or 0)
+	for abilityIndex = 0, abilityCount - 1 do
 		local ability = hero:GetAbilityByIndex(abilityIndex)
 		local priority = self:GetOpeningAbilityPriority(ability)
 		if priority ~= nil then
@@ -209,7 +195,9 @@ function XHSBotEconomy:SpendAbilityPoints(hero, profile)
 
 		-- Unknown replacements and future hero changes retain a safe slot-order
 		-- fallback instead of leaving points permanently unspent.
-		for abilityIndex = 0, 23 do
+		local abilityCount = hero.GetAbilityCount ~= nil
+			and math.max(0, tonumber(hero:GetAbilityCount()) or 0) or 0
+		for abilityIndex = 0, abilityCount - 1 do
 			if upgraded then break end
 			local ability = hero:GetAbilityByIndex(abilityIndex)
 			if self:TryUpgradeAbility(hero, ability) then
@@ -326,12 +314,12 @@ function XHSBotEconomy:UseConsumables(hero, record, difficulty, profile, encount
 				end
 			end
 			if shouldUse and XHSBotExecutor:Cast(hero, {
-				ability = item,
-				mode = "no_target",
-				reason = name == "item_health_potion"
-					and "health potion threshold"
-					or "mana potion threshold",
-			}, record, 0) then
+					ability = item,
+					mode = "no_target",
+					reason = name == "item_health_potion"
+						and "health potion threshold"
+						or "mana potion threshold",
+				}, record, 0) then
 				record.consumables_used = (record.consumables_used or 0) + 1
 				record.preferred_heal_spell = ""
 				record.last_item_action = "use:" .. name
@@ -381,9 +369,9 @@ function XHSBotEconomy:UseEmergencyTacticalItems(hero, record)
 
 	local function Use(name, reason)
 		if self:CastNamedActiveItem(hero, name, {
-			mode = "no_target",
-			reason = reason,
-		}, record) then
+				mode = "no_target",
+				reason = reason,
+			}, record) then
 			record.emergency_item_uses = (record.emergency_item_uses or 0) + 1
 			return true
 		end
@@ -391,9 +379,9 @@ function XHSBotEconomy:UseEmergencyTacticalItems(hero, record)
 	end
 
 	if fatalPressure and Use(
-		"item_potion_of_invulnerability",
-		"fatal pressure immunity before maintenance"
-	) then
+			"item_potion_of_invulnerability",
+			"fatal pressure immunity before maintenance"
+		) then
 		return true
 	end
 	if severePressure
@@ -405,9 +393,9 @@ function XHSBotEconomy:UseEmergencyTacticalItems(hero, record)
 		return true
 	end
 	if magicalCrisis and Use(
-		"item_potion_of_antimagic",
-		"fatal magical pressure before maintenance"
-	) then
+			"item_potion_of_antimagic",
+			"fatal magical pressure before maintenance"
+		) then
 		return true
 	end
 	return false
@@ -431,159 +419,6 @@ function XHSBotEconomy:HasOwnedFurbolg(hero)
 		end
 	end
 	return false
-end
-
-function XHSBotEconomy:FindDarknessOrb(hero)
-	if not IsValidEntityHandle(hero) then return nil end
-	for slot = 0, self.ACTIVE_LAST_SLOT do
-		local item = hero:GetItemInSlot(slot)
-		if DARKNESS_ITEMS[ItemName(item)] then return item end
-	end
-	return nil
-end
-
-function XHSBotEconomy:IsDarknessPowerReady(hero, record, now)
-	if not IsValidEntityHandle(hero) then return false end
-	now = tonumber(now) or GameRules:GetGameTime()
-	local level = hero.GetLevel ~= nil and hero:GetLevel() or 0
-	local maximumHealth = hero.GetMaxHealth ~= nil and hero:GetMaxHealth() or 0
-	local attackDamage = 0
-	if hero.GetAttackDamage ~= nil then
-		local ok, value = pcall(function() return hero:GetAttackDamage() end)
-		if ok then attackDamage = math.max(0, tonumber(value) or 0) end
-	end
-	local itemGold = math.max(0, tonumber(record.item_gold_spent) or 0)
-	local tomes = math.max(0, tonumber(record.tomes_bought) or 0)
-	local hasVoidBracer = false
-	for slot = 0, self.ACTIVE_LAST_SLOT do
-		hasVoidBracer = hasVoidBracer
-			or ItemName(hero:GetItemInSlot(slot)) == "item_bracer_of_the_void"
-	end
-	local progressed = hasVoidBracer or itemGold >= 80000 or tomes >= 4
-	local independentlyStrong = maximumHealth >= 11000 or attackDamage >= 650
-
-	record.darkness_power_level = level
-	record.darkness_power_health = maximumHealth
-	record.darkness_power_damage = math.floor(attackDamage)
-	return now >= self.DARKNESS_MINIMUM_GAME_TIME
-		and level >= 12
-		and progressed
-		and independentlyStrong
-end
-
-function XHSBotEconomy:GetDarknessThreatState(hero, record)
-	local healthRatio = hero:GetHealth() / math.max(1, hero:GetMaxHealth())
-	local combatThreat = math.max(0, tonumber(record.combat_threat) or 0)
-	local baseThreat = math.max(0, tonumber(record.base_threat_score) or 0)
-	local assignmentUrgency = math.max(0, tonumber(record.assignment_urgency) or 0)
-	local recentDamage = math.max(0, tonumber(record.recent_damage_ratio) or 0)
-	local focusedBy = math.max(0, tonumber(record.focused_by_count) or 0)
-	local encounter = tostring(record.encounter_mode or "")
-
-	local high = record.base_threat_active == true
-		or record.boss_threat_nearby == true
-		or DARKNESS_COMBAT_ENCOUNTERS[encounter] == true
-		or combatThreat >= self.DARKNESS_HIGH_THREAT
-		or baseThreat >= 0.58
-		or assignmentUrgency >= 0.85
-		or recentDamage >= 0.10
-		or focusedBy >= 2
-		or healthRatio <= 0.45
-	if high then return "high" end
-
-	local low = combatThreat <= self.DARKNESS_LOW_THREAT
-		and baseThreat <= 0.15
-		and assignmentUrgency <= 0.55
-		and recentDamage <= 0.025
-		and focusedBy == 0
-		and healthRatio >= 0.72
-		and encounter ~= "muradin_survival"
-	if low then return "low" end
-	return "medium"
-end
-
-function XHSBotEconomy:UpdateDarknessOrb(hero, record)
-	local orb = self:FindDarknessOrb(hero)
-	if not IsValidEntityHandle(orb) then
-		record.darkness_orb_active = false
-		record.darkness_policy_state = "unavailable"
-		record.darkness_low_threat_since = nil
-		record.darkness_high_threat_since = nil
-		return false
-	end
-
-	local now = GameRules:GetGameTime()
-	local active = hero:HasModifier(DARKNESS_ACTIVE_MODIFIER)
-	local powerReady = self:IsDarknessPowerReady(hero, record, now)
-	local threatState = self:GetDarknessThreatState(hero, record)
-	local playerID = math.max(0, tonumber(record.player_id)
-		or tonumber(hero:GetPlayerID()) or 0)
-
-	if threatState == "low" then
-		record.darkness_low_threat_since = record.darkness_low_threat_since or now
-		record.darkness_high_threat_since = nil
-	elseif threatState == "high" then
-		record.darkness_high_threat_since = record.darkness_high_threat_since or now
-		record.darkness_low_threat_since = nil
-	else
-		record.darkness_low_threat_since = nil
-		record.darkness_high_threat_since = nil
-	end
-
-	local lowSeconds = record.darkness_low_threat_since ~= nil
-		and math.max(0, now - record.darkness_low_threat_since) or 0
-	local highSeconds = record.darkness_high_threat_since ~= nil
-		and math.max(0, now - record.darkness_high_threat_since) or 0
-	local cooldownReady = now - (tonumber(record.darkness_last_toggle_at) or -math.huge)
-		>= self.DARKNESS_TOGGLE_COOLDOWN
-	local disableHold = self.DARKNESS_LOW_THREAT_HOLD + playerID % 5 * 1.5
-	local enableHold = self.DARKNESS_HIGH_THREAT_HOLD + playerID % 3 * 0.4
-	local desiredActive = active
-
-	if active and powerReady and threatState == "low"
-		and lowSeconds >= disableHold then
-		desiredActive = false
-	elseif not active and (
-		not powerReady
-		or threatState == "high" and highSeconds >= enableHold
-	) then
-		desiredActive = true
-	end
-
-	record.darkness_orb_active = active
-	record.darkness_power_ready = powerReady
-	record.darkness_threat_state = threatState
-	record.darkness_low_threat_seconds = math.floor(lowSeconds * 10) / 10
-	record.darkness_high_threat_seconds = math.floor(highSeconds * 10) / 10
-	record.darkness_policy_state = active and "active" or "suppressed"
-
-	if desiredActive == active or not cooldownReady or not IsCastable(orb) then
-		return false
-	end
-
-	local reason = desiredActive
-		and "reactivate darkness after sustained high threat"
-		or "suppress darkness summons after sustained low threat"
-	if not XHSBotExecutor:Cast(hero, {
-		ability = orb,
-		mode = "no_target",
-		reason = reason,
-	}, record, 0) then
-		return false
-	end
-
-	local activeAfter = hero:HasModifier(DARKNESS_ACTIVE_MODIFIER)
-	if activeAfter ~= desiredActive then
-		record.last_item_rejection = "darkness toggle state did not change"
-		return false
-	end
-	record.darkness_orb_active = activeAfter
-	record.darkness_policy_state = activeAfter and "active" or "suppressed"
-	record.darkness_last_toggle_at = now
-	record.darkness_toggle_count = (record.darkness_toggle_count or 0) + 1
-	record.last_item_action = (activeAfter and "activate:" or "deactivate:")
-		.. tostring(ItemName(orb))
-	return true
 end
 
 function XHSBotEconomy:EnsureCoreOrbStates(hero, record)
@@ -632,10 +467,10 @@ function XHSBotEconomy:EnsureCoreOrbStates(hero, record)
 			and IsCastable(state.item) then
 			record.orb_toggle_retry_after[state.name] = now + 3
 			if XHSBotExecutor:Cast(hero, {
-				ability = state.item,
-				mode = "no_target",
-				reason = "repair inactive " .. state.name .. " orb",
-			}, record, 0) then
+					ability = state.item,
+					mode = "no_target",
+					reason = "repair inactive " .. state.name .. " orb",
+				}, record, 0) then
 				record.orb_toggle_repair_count =
 					(record.orb_toggle_repair_count or 0) + 1
 				record.last_item_action = "repair_orb:" .. state.name
@@ -665,18 +500,22 @@ function XHSBotEconomy:UseTacticalItems(hero, record, encounter)
 		or manaRatio <= 0.12
 		or record.base_last_stand == true and healthRatio <= 0.82 then
 		if self:CastNamedActiveItem(hero, "item_potion_full", {
-			mode = "no_target",
-			reason = record.base_last_stand == true
-				and "full restoration for campfire base last stand"
-				or "high-value instant full restoration",
-		}, record) then return true end
+				mode = "no_target",
+				reason = record.base_last_stand == true
+					and "full restoration for campfire base last stand"
+					or "high-value instant full restoration",
+			}, record) then
+			return true
+		end
 	end
 	if (tonumber(record.magical_threat) or 0) >= 0.68
 		and (threat >= 0.78 or healthRatio <= 0.48) then
 		if self:CastNamedActiveItem(hero, "item_potion_of_antimagic", {
-			mode = "no_target",
-			reason = "measured magical pressure",
-		}, record) then return true end
+				mode = "no_target",
+				reason = "measured magical pressure",
+			}, record) then
+			return true
+		end
 	end
 	if (baseThreat >= 0.55 or threat >= 0.82) and healthRatio <= 0.82 then
 		local hasNearbyWard = false
@@ -693,25 +532,31 @@ function XHSBotEconomy:UseTacticalItems(hero, record, encounter)
 		end
 		if not hasNearbyWard then
 			if self:CastNamedActiveItem(hero, "item_healing_wards2", {
-				mode = "point_aoe",
-				position = hero:GetAbsOrigin(),
-				reason = "greater sustain pressured team position",
-			}, record) then return true end
+					mode = "point_aoe",
+					position = hero:GetAbsOrigin(),
+					reason = "greater sustain pressured team position",
+				}, record) then
+				return true
+			end
 			if self:CastNamedActiveItem(hero, "item_healing_wards", {
-				mode = "point_aoe",
-				position = hero:GetAbsOrigin(),
-				reason = "sustain pressured team position",
-			}, record) then return true end
+					mode = "point_aoe",
+					position = hero:GetAbsOrigin(),
+					reason = "sustain pressured team position",
+				}, record) then
+				return true
+			end
 		end
 	end
 	if IsValidEntityHandle(target)
 		and target:GetTeamNumber() ~= hero:GetTeamNumber()
 		and (record.boss_threat_nearby == true or threat >= 0.82) then
 		if self:CastNamedActiveItem(hero, "item_staff_of_mastery", {
-			mode = "enemy_unit",
-			target = target,
-			reason = "disable dangerous physical target",
-		}, record) then return true end
+				mode = "enemy_unit",
+				target = target,
+				reason = "disable dangerous physical target",
+			}, record) then
+			return true
+		end
 	end
 
 	local hasCombatTarget = record.target_entindex ~= nil
@@ -721,14 +566,16 @@ function XHSBotEconomy:UseTacticalItems(hero, record, encounter)
 		and XHSBotItemPlanner:IsHighThreat(record)
 	if shouldDeployFurbolg then
 		if self:CastNamedActiveItem(hero, "item_amulet_of_the_wild", {
-			mode = "no_target",
-			reason = "deploy furbolg combat screen",
-		}, record) then return true end
+				mode = "no_target",
+				reason = "deploy furbolg combat screen",
+			}, record) then
+			return true
+		end
 	end
 
 	-- Toggle repair is maintenance. It must never delay a fatal potion, a
 	-- team ward, a disable, or the deployment of an already bought screen.
-	if self:UpdateDarknessOrb(hero, record) then return true end
+	-- Darkness is intentionally passive and is therefore excluded here.
 	if self:EnsureCoreOrbStates(hero, record) then return true end
 	return false
 end
@@ -843,7 +690,7 @@ function XHSBotEconomy:GrantPurchasedItem(
 	if shopKind == nil then
 		return false,
 			"shop invariant rejected " .. tostring(entry.name)
-				.. " for " .. requiredShop .. ": " .. tostring(shopRejection),
+			.. " for " .. requiredShop .. ": " .. tostring(shopRejection),
 			nil,
 			shopDistance
 	end
@@ -1143,7 +990,7 @@ function XHSBotEconomy:OptimizeActiveInventory(hero, record, snapshot, plan)
 	end
 	record.inventory_swaps = (record.inventory_swaps or 0) + 1
 	record.last_item_action = (bestBackpackSlot >= self.STASH_FIRST_SLOT
-		and "equip_stash:" or "equip:")
+			and "equip_stash:" or "equip:")
 		.. backpackName .. "<-" .. activeName
 	return true
 end
@@ -1206,11 +1053,11 @@ function XHSBotEconomy:FindReplacementCandidate(hero, entry, snapshot, plan)
 			local incomingCatalog = XHSBotItemCatalog:Get(entry.name) or {}
 			local oldScore = tonumber(
 				plan.family_loadout_scores
-					and plan.family_loadout_scores[catalog.family]
+				and plan.family_loadout_scores[catalog.family]
 			) or 0
 			local newScore = tonumber(
 				plan.family_loadout_scores
-					and plan.family_loadout_scores[incomingCatalog.family]
+				and plan.family_loadout_scores[incomingCatalog.family]
 			) or 0
 			protected = plan.phase ~= "luxury"
 				or incomingCatalog.family == nil
@@ -1426,10 +1273,10 @@ function XHSBotEconomy:BuildPlannerSnapshot(playerID, hero, record)
 		and type(SpecialEvents.hero_farm_event) == "table"
 		and type(
 			SpecialEvents.hero_farm_event[tonumber(playerID)]
-				or SpecialEvents.hero_farm_event[tostring(playerID)]
+			or SpecialEvents.hero_farm_event[tostring(playerID)]
 		) == "table"
 	local alliedItemCounts, alliedFamilyCounts, allyCount,
-		alliedLowHealthCount, alliedHealthDeficit =
+	alliedLowHealthCount, alliedHealthDeficit =
 		self:GetAlliedItemCoverage(hero)
 	local origin = hero:GetAbsOrigin()
 	local function ShopDistance(shop)
@@ -1484,6 +1331,16 @@ function XHSBotEconomy:BuildPlannerSnapshot(playerID, hero, record)
 		assignment_urgency = tonumber(record.assignment_urgency) or 0,
 		recent_damage_ratio = tonumber(record.recent_damage_ratio) or 0,
 		focused_by_count = tonumber(record.focused_by_count) or 0,
+		survival_incoming_dps =
+			tonumber(record.survival_incoming_dps) or 0,
+		survival_net_incoming_dps =
+			tonumber(record.survival_net_incoming_dps) or 0,
+		survival_sustain_per_second =
+			tonumber(record.survival_sustain_per_second) or 0,
+		survival_time_to_die =
+			tonumber(record.survival_time_to_die) or -1,
+		survival_fatal_before_escape =
+			record.survival_fatal_before_escape == true,
 		physical_threat = damageTypeFresh
 			and (tonumber(record.physical_threat) or 0) or 0,
 		magical_threat = damageTypeFresh
@@ -1568,6 +1425,9 @@ function XHSBotEconomy:RecordPlan(record, snapshot, plan)
 	record.planned_item_reason = plan.next_reason or ""
 	record.planned_loadout = plan.target_loadout or {}
 	record.planned_loadout_scores = plan.target_loadout_scores or {}
+	record.item_need_scores = plan.need_scores or {}
+	record.item_dominant_need = plan.dominant_need or ""
+	record.item_dominant_need_value = plan.dominant_need_value or 0
 	record.replacement_required = plan.replacement_required == true
 	record.ankh_target = plan.ankh_target or 0
 	record.health_potion_charges = snapshot.health_potion_charges or 0
@@ -1662,8 +1522,8 @@ function XHSBotEconomy:GetRequiredShop(entry)
 		and XHSBotItemCatalog:Get(entry.name) or nil
 	local declared = tostring(
 		type(catalog) == "table" and catalog.shop
-			or entry.shop
-			or "home"
+		or entry.shop
+		or "home"
 	)
 	if declared == "secret" then return "secret" end
 	if declared == "base" then return "base" end
@@ -1769,7 +1629,7 @@ function XHSBotEconomy:GetCurrentShopKind(hero, shop)
 	local castleShop = Entities:FindByName(nil, "castle_shop")
 	if shop ~= "secret" and IsValidEntityHandle(castleShop)
 		and (origin - castleShop:GetAbsOrigin()):Length2D()
-			<= self.SECRET_SHOP_EXCLUSION_RADIUS then
+		<= self.SECRET_SHOP_EXCLUSION_RADIUS then
 		return nil,
 			(origin - castleShop:GetAbsOrigin()):Length2D(),
 			"inside secret-shop exclusion"
@@ -1948,7 +1808,7 @@ function XHSBotEconomy:RefreshEmergencyHealthResupply(hero, record, difficulty)
 	)
 	local emergencyActive = record.emergency_health_resupply_active == true
 		or type(record.shopping_goal) == "table"
-			and record.shopping_goal.emergency_health_resupply == true
+		and record.shopping_goal.emergency_health_resupply == true
 	if emergencyActive and carriedCharges >= target then
 		self:ClearShoppingGoal(record, "item_health_potion")
 		return false
@@ -1986,7 +1846,7 @@ function XHSBotEconomy:RefreshEmergencyHealthResupply(hero, record, difficulty)
 			record,
 			difficulty,
 			"health potion reserve at " .. tostring(carriedCharges)
-				.. "/" .. tostring(trigger),
+			.. "/" .. tostring(trigger),
 			true
 		)
 	end
@@ -2158,7 +2018,7 @@ function XHSBotEconomy:TryPurchaseBuildEntry(
 			chargesBefore <= healthTrigger
 			or record.emergency_health_resupply_active == true
 			or type(record.shopping_goal) == "table"
-				and record.shopping_goal.emergency_health_resupply == true
+			and record.shopping_goal.emergency_health_resupply == true
 		)
 
 	local canPurchase, reason = self:CanPurchaseNow(playerID, hero)
@@ -2178,7 +2038,7 @@ function XHSBotEconomy:TryPurchaseBuildEntry(
 		self:ClearShoppingGoal(record, entry.name)
 		record.last_item_rejection = preserveGold > 0
 			and "preserving " .. tostring(preserveGold)
-				.. " core gold before " .. entry.name
+			.. " core gold before " .. entry.name
 			or "cannot afford " .. entry.name
 		return "wait"
 	end
@@ -2195,8 +2055,8 @@ function XHSBotEconomy:TryPurchaseBuildEntry(
 				now,
 				continuingHealthRestock,
 				continuingHealthRestock
-					and "health potion reserve reached"
-					or "scheduled build restock"
+				and "health potion reserve reached"
+				or "scheduled build restock"
 			)
 			if continuingHealthRestock then
 				record.shopping_goal.force_home = true
@@ -2228,8 +2088,8 @@ function XHSBotEconomy:TryPurchaseBuildEntry(
 				now,
 				continuingHealthRestock,
 				continuingHealthRestock
-					and "finish health reserve restock"
-					or "finish consumable restock"
+				and "finish health reserve restock"
+				or "finish consumable restock"
 			)
 			if continuingHealthRestock then
 				record.shopping_goal.force_home = true
@@ -2279,13 +2139,13 @@ function XHSBotEconomy:TryPurchaseBuildEntry(
 	end
 	local purchased, purchaseResult, purchaseShopKind, purchaseShopDistance =
 		self:GrantPurchasedItem(
-		playerID,
-		hero,
-		entry,
-		unitsBefore,
-		chargesBefore,
-		requiredShop
-	)
+			playerID,
+			hero,
+			entry,
+			unitsBefore,
+			chargesBefore,
+			requiredShop
+		)
 	record.last_purchase_item = tostring(entry.name)
 	record.last_purchase_shop = requiredShop
 	record.last_purchase_shop_kind = tostring(purchaseShopKind or "")
@@ -2295,11 +2155,11 @@ function XHSBotEconomy:TryPurchaseBuildEntry(
 	record.last_purchase_at = now
 	if not purchased then
 		if string.find(
-			tostring(purchaseResult),
-			"shop invariant rejected",
-			1,
-			true
-		) ~= nil then
+				tostring(purchaseResult),
+				"shop invariant rejected",
+				1,
+				true
+			) ~= nil then
 			record.shop_purchase_violation_count =
 				(record.shop_purchase_violation_count or 0) + 1
 		end
@@ -2341,8 +2201,8 @@ function XHSBotEconomy:TryPurchaseBuildEntry(
 				now,
 				keepEmergency,
 				keepEmergency
-					and "continue health stock to target"
-					or "continue consumable stock to target"
+				and "continue health stock to target"
+				or "continue consumable stock to target"
 			)
 			if keepEmergency then
 				record.shopping_goal.force_home = true
@@ -2439,12 +2299,12 @@ function XHSBotEconomy:Think(playerID, hero, record, profile, difficulty)
 		record.defer_potion_for_spell_now = false
 		if self:UseEmergencyTacticalItems(hero, record) then return "item" end
 		if self:UseConsumables(
-			hero,
-			record,
-			difficulty,
-			profile,
-			encounter
-		) then
+				hero,
+				record,
+				difficulty,
+				profile,
+				encounter
+			) then
 			return "healing"
 		end
 		return nil

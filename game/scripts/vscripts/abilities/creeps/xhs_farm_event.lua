@@ -5,6 +5,11 @@ LinkLuaModifier(
 	"abilities/creeps/xhs_farm_event.lua",
 	LUA_MODIFIER_MOTION_NONE
 )
+LinkLuaModifier(
+	"modifier_xhs_farm_howling_blast_fx",
+	"abilities/creeps/xhs_farm_event.lua",
+	LUA_MODIFIER_MOTION_NONE
+)
 
 local HOWLING_BLAST_PARTICLE =
 	"particles/units/heroes/heroes_underlord/abyssal_underlord_pitofmalice_stun.vpcf"
@@ -14,10 +19,17 @@ function xhs_farm_howling_blast:GetIntrinsicModifierName()
 end
 
 modifier_xhs_farm_howling_blast = modifier_xhs_farm_howling_blast or class({})
+modifier_xhs_farm_howling_blast_fx = modifier_xhs_farm_howling_blast_fx or class({})
 
 function modifier_xhs_farm_howling_blast:IsHidden() return true end
 function modifier_xhs_farm_howling_blast:IsPurgable() return false end
 function modifier_xhs_farm_howling_blast:IsPurgeException() return false end
+
+function modifier_xhs_farm_howling_blast_fx:IsHidden() return true end
+function modifier_xhs_farm_howling_blast_fx:IsPurgable() return false end
+function modifier_xhs_farm_howling_blast_fx:IsPurgeException() return false end
+function modifier_xhs_farm_howling_blast_fx:GetEffectName() return HOWLING_BLAST_PARTICLE end
+function modifier_xhs_farm_howling_blast_fx:GetEffectAttachType() return PATTACH_ABSORIGIN_FOLLOW end
 
 function modifier_xhs_farm_howling_blast:DeclareFunctions()
 	return {
@@ -46,14 +58,7 @@ function modifier_xhs_farm_howling_blast:OnAttacked(keys)
 
 	attacker:AddNewModifier(parent, ability, "modifier_rooted", { duration = duration })
 	attacker:AddNewModifier(parent, ability, "modifier_disarmed", { duration = duration })
-
-	local particle = ParticleManager:CreateParticle(
-		HOWLING_BLAST_PARTICLE,
-		PATTACH_ABSORIGIN_FOLLOW,
-		attacker
-	)
-	ParticleManager:SetParticleControl(particle, 0, attacker:GetAbsOrigin())
-	ParticleManager:ReleaseParticleIndex(particle)
+	attacker:AddNewModifier(parent, ability, "modifier_xhs_farm_howling_blast_fx", { duration = duration })
 	attacker:EmitSound("Hero_AbyssalUnderlord.Pit.TargetHero")
 
 	ApplyDamage({

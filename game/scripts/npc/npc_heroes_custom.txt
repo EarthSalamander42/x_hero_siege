@@ -1654,7 +1654,7 @@
 		"Ability2"						"holdout_plasma_rifle"
 		"Ability3"						"holdout_distance_aura"		
 		"Ability4"						"holdout_shield"
-		"Ability5"						"ogre_magi_bloodlust"
+		"Ability5"						"rifleman_bloodlust"
 		"Ability6"						"rifleman_assassinate"
 		"Ability7"						""
 		"Ability8"						""

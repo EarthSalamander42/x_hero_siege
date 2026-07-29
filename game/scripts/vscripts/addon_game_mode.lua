@@ -58,6 +58,7 @@ function Precache(context)
 	PrecacheResource("particle", "particles/camp_fire_buff.vpcf", context)
 	PrecacheResource("particle", "particles/units/heroes/hero_pudge/pudge_rot.vpcf", context)
 	PrecacheResource("particle", "particles/units/heroes/hero_pudge/pudge_rot_recipient.vpcf", context)
+	PrecacheResource("particle", "particles/items_fx/skull_basher.vpcf", context)                              -- Phase 1 Human ranged creep Headshot
 	PrecacheResource("particle", "particles/darkmoon_last_hit_effect.vpcf", context)
 	PrecacheResource("particle", "particles/custom/xhs_growth_overhead.vpcf", context)                                       -- Farm event/Phase 2 overhead
 	PrecacheResource("particle", "particles/econ/items/shadow_fiend/sf_fire_arcana/sf_fire_arcana_shadowraze.vpcf", context) -- Boss death

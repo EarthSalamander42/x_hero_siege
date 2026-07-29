@@ -66,6 +66,54 @@ local BOSS_UNIT_TO_DEV_ID = {
 
 local DIFFICULTY_LABELS = { "Easy", "Normal", "Hard", "Extreme", "Divine" }
 
+local BATTLEPASS_DEV_FAMILY_ORDER = {
+	"teleport",
+	"levelup",
+	"kill_effect",
+	"emblem",
+	"companion",
+	"effigy",
+	"potion",
+	"rebirth",
+	"attack_lifesteal",
+	"spell_lifesteal",
+	"regen_aura",
+	"immolation",
+	"high_five",
+}
+
+local BATTLEPASS_DEV_FAMILY_LABELS = {
+	teleport = "Teleport",
+	levelup = "Level Up",
+	kill_effect = "Kill Effect",
+	emblem = "Emblem",
+	companion = "Companion",
+	effigy = "Effigy",
+	potion = "Potion",
+	rebirth = "Rebirth",
+	attack_lifesteal = "Attack Lifesteal",
+	spell_lifesteal = "Spell Lifesteal",
+	regen_aura = "Regen Aura",
+	immolation = "Immolation",
+	high_five = "High Five",
+}
+
+local BATTLEPASS_DEV_FAMILY_SET = {}
+for _, family in ipairs(BATTLEPASS_DEV_FAMILY_ORDER) do
+	BATTLEPASS_DEV_FAMILY_SET[family] = true
+end
+
+local BATTLEPASS_DEV_SEQUENCE_DELAY = 5.0
+
+local function FormatBattlepassDevRewardName(name, family)
+	local value = tostring(name or "")
+	value = string.gsub(value, "^#", "")
+	value = string.gsub(value, "^sp26_", "")
+	value = string.gsub(value, "^" .. tostring(family or "") .. "_", "")
+	value = string.gsub(value, "_", " ")
+	return value ~= "" and value or tostring(name or "Unknown")
+end
+
 local BOSS_UNIT_NAMES = {
 	npc_dota_hero_magtheridon = true,
 	npc_dota_hero_grom_hellscream = true,
@@ -417,8 +465,9 @@ function XHSDevTools:OnRequestState()
 	self:PushState()
 end
 
-function XHSDevTools:OnRunAction(_, event)
+function XHSDevTools:OnRunAction(sourceIndex, event)
 	event = event or {}
+	event.xhs_devtools_source_index = sourceIndex
 
 	local action = event.action or ""
 	if not IsInToolsMode() then
@@ -457,7 +506,7 @@ function XHSDevTools:RunAction(action, event)
 		return enabled and "Sandbox enabled" or "Sandbox disabled"
 	elseif action == "set_timescale" then
 		local requested = ToNumber(event.timescale, 1)
-		local canonicalTimescales = { 0.1, 1, 3, 5 }
+		local canonicalTimescales = { 0.1, 0.3, 1, 3, 5 }
 		local canonicalRequested = nil
 		for _, value in ipairs(canonicalTimescales) do
 			if math.abs(requested - value) < 0.001 then
@@ -533,6 +582,12 @@ function XHSDevTools:RunAction(action, event)
 		return self:PreviewCinematic(event)
 	elseif action == "end_cinematic_preview" then
 		return self:EndCinematicPreview(event)
+	elseif action == "battlepass_test_reward" then
+		return self:TestBattlepassReward(event)
+	elseif action == "battlepass_test_family" then
+		return self:TestBattlepassFamily(event)
+	elseif action == "battlepass_stop_test" then
+		return self:StopBattlepassTest(event)
 	elseif action == "fragment_quests_reroll" then
 		if FragmentQuests == nil then return "FragmentQuests is unavailable" end
 		FragmentQuests:DevReroll()
@@ -1299,6 +1354,13 @@ function XHSDevTools:RefreshTemporaryDonatorStatus(playerID)
 end
 
 function XHSDevTools:Cleanup()
+	local battlepassPlayers = {}
+	for playerID, _ in pairs(self.battlepass_dev_sequences or {}) do
+		table.insert(battlepassPlayers, playerID)
+	end
+	for _, playerID in ipairs(battlepassPlayers) do
+		self:CancelBattlepassDevSequence(playerID, true)
+	end
 	self:RemoveDevSpawnedUnits()
 	if ResetPhase2CreepWaveCounts ~= nil then
 		ResetPhase2CreepWaveCounts()
@@ -1400,6 +1462,296 @@ function XHSDevTools:FocusAllPlayers(unit)
 			})
 		end
 	end
+end
+
+function XHSDevTools:BuildBattlepassDevCatalog()
+	local grouped = {}
+	local seen = {}
+	for _, family in ipairs(BATTLEPASS_DEV_FAMILY_ORDER) do
+		grouped[family] = {}
+	end
+
+	if ItemsGame == nil then return {} end
+	for _, trackData in ipairs({
+		{ id = "free", rewards = ItemsGame.battlepass or {} },
+		{ id = "premium", rewards = ItemsGame.battlepass2 or {} },
+	}) do
+		for _, reward in pairs(trackData.rewards) do
+			if type(reward) == "table" then
+				local family = tostring(reward.slot_id or reward.item_type or reward.type or "")
+					:lower()
+				if Battlepass ~= nil and Battlepass.NormalizeSupporterSlot ~= nil then
+					family = Battlepass:NormalizeSupporterSlot(family)
+				end
+
+				local itemID = reward.entitlement_id
+					or reward.item_id
+					or reward.catalog_item_id
+					or reward.reward_item_id
+					or reward.id
+				itemID = itemID ~= nil and tostring(itemID) or ""
+				local identity = family .. ":" .. itemID
+				if BATTLEPASS_DEV_FAMILY_SET[family] == true
+					and itemID ~= ""
+					and not seen[identity] then
+					seen[identity] = true
+					local name = tostring(reward.name or reward.item_name or itemID)
+					table.insert(grouped[family], {
+						item_id = itemID,
+						family = family,
+						name = name,
+						display_name = FormatBattlepassDevRewardName(name, family),
+						rarity = tostring(reward.rarity or reward.item_rarity or ""),
+						track = tostring(reward.track or trackData.id),
+						level = tonumber(reward.level) or 0,
+					})
+				end
+			end
+		end
+	end
+
+	local families = {}
+	for _, family in ipairs(BATTLEPASS_DEV_FAMILY_ORDER) do
+		local rewards = grouped[family]
+		table.sort(rewards, function(a, b)
+			local aID = tonumber(a.item_id)
+			local bID = tonumber(b.item_id)
+			if aID ~= nil and bID ~= nil and aID ~= bID then return aID < bID end
+			if a.level ~= b.level then return a.level < b.level end
+			return a.item_id < b.item_id
+		end)
+		if #rewards > 0 then
+			table.insert(families, {
+				id = family,
+				label = BATTLEPASS_DEV_FAMILY_LABELS[family] or family,
+				count = #rewards,
+				rewards = rewards,
+			})
+		end
+	end
+	return families
+end
+
+function XHSDevTools:PublishBattlepassDevCatalog()
+	if self.battlepass_dev_catalog_index ~= nil then
+		return self.battlepass_dev_catalog_index
+	end
+	if CustomNetTables == nil then return {} end
+
+	local families = self:BuildBattlepassDevCatalog()
+	if #families == 0 then return {} end
+	local index = {}
+	for _, family in ipairs(families) do
+		CustomNetTables:SetTableValue(
+			"xhs_devtools",
+			"battlepass_family_" .. family.id,
+			family
+		)
+		table.insert(index, {
+			id = family.id,
+			label = family.label,
+			count = family.count,
+		})
+	end
+	self.battlepass_dev_catalog_index = index
+	return index
+end
+
+function XHSDevTools:FindBattlepassDevFamily(familyID)
+	familyID = tostring(familyID or ""):lower()
+	for _, family in ipairs(self:BuildBattlepassDevCatalog()) do
+		if family.id == familyID then return family end
+	end
+	return nil
+end
+
+function XHSDevTools:FindBattlepassDevReward(familyID, itemID)
+	local family = self:FindBattlepassDevFamily(familyID)
+	itemID = tostring(itemID or "")
+	if family == nil or itemID == "" then return nil end
+	for _, reward in ipairs(family.rewards) do
+		if reward.item_id == itemID then return reward, family end
+	end
+	return nil
+end
+
+function XHSDevTools:NotifyBattlepassDevTest(playerID, text, duration)
+	local payload = {
+		text = tostring(text or ""),
+		duration = tonumber(duration) or BATTLEPASS_DEV_SEQUENCE_DELAY,
+		severity = "system",
+	}
+	if Notifications ~= nil and Notifications.Bottom ~= nil then
+		Notifications:Bottom(playerID, payload)
+		return
+	end
+	local player = PlayerResource:GetPlayer(playerID)
+	if player ~= nil then
+		CustomGameEventManager:Send_ServerToPlayer(player, "bottom_notification", payload)
+	end
+end
+
+function XHSDevTools:CancelBattlepassDevSequence(playerID, cleanupPreview)
+	self.battlepass_dev_sequences = self.battlepass_dev_sequences or {}
+	local sequence = self.battlepass_dev_sequences[playerID]
+	if sequence ~= nil then
+		sequence.cancelled = true
+		if sequence.timer ~= nil and Timers ~= nil then
+			Timers:RemoveTimer(sequence.timer)
+		end
+		self.battlepass_dev_sequences[playerID] = nil
+	end
+	if cleanupPreview == true and Battlepass ~= nil and Battlepass.CleanupSupporterDevTest ~= nil then
+		Battlepass:CleanupSupporterDevTest(playerID, true)
+	end
+end
+
+function XHSDevTools:RunBattlepassDevReward(sourceIndex, playerID, reward, requestID)
+	if Battlepass == nil or Battlepass.SupporterPassDevTestReward == nil then
+		error("Battle Pass dev reward tester is unavailable")
+	end
+	local player = PlayerResource:GetPlayer(playerID)
+	if player ~= nil and player.entindex ~= nil then
+		sourceIndex = player:entindex()
+	end
+	self:NotifyBattlepassDevTest(
+		playerID,
+		string.format(
+			"[Battle Pass] %s - %s (#%s)",
+			BATTLEPASS_DEV_FAMILY_LABELS[reward.family] or reward.family,
+			reward.display_name,
+			reward.item_id
+		)
+	)
+	Battlepass:SupporterPassDevTestReward(sourceIndex, {
+		item_id = reward.item_id,
+		slot_id = reward.family,
+		action = "test",
+		request_id = requestID,
+		xhs_devtools_trusted = true,
+	})
+end
+
+function XHSDevTools:TestBattlepassReward(event)
+	local sourceIndex = event.xhs_devtools_source_index
+	local playerID = self:ResolveEventPlayerID(sourceIndex)
+	if playerID == nil then error("Unable to resolve the requesting player") end
+	local reward = self:FindBattlepassDevReward(event.family, event.item_id)
+	if reward == nil then error("Unknown Battle Pass reward") end
+
+	self:CancelBattlepassDevSequence(playerID, true)
+	self:RunBattlepassDevReward(
+		sourceIndex,
+		playerID,
+		reward,
+		"xhs-dev-single-" .. tostring(GameRules:GetGameTime())
+	)
+	return string.format("Testing %s (#%s)", reward.name, reward.item_id)
+end
+
+function XHSDevTools:TestBattlepassFamily(event)
+	local sourceIndex = event.xhs_devtools_source_index
+	local playerID = self:ResolveEventPlayerID(sourceIndex)
+	if playerID == nil then error("Unable to resolve the requesting player") end
+	local family = self:FindBattlepassDevFamily(event.family)
+	if family == nil or #family.rewards == 0 then error("Unknown or empty Battle Pass family") end
+	if Timers == nil then error("Timers is unavailable") end
+	local player = PlayerResource:GetPlayer(playerID)
+	if player ~= nil and player.entindex ~= nil then
+		sourceIndex = player:entindex()
+	end
+
+	self:CancelBattlepassDevSequence(playerID, true)
+	self.battlepass_dev_sequences = self.battlepass_dev_sequences or {}
+	local sequence = {
+		family = family.id,
+		label = family.label,
+		rewards = family.rewards,
+		index = 0,
+		count = #family.rewards,
+		source_index = sourceIndex,
+		player_id = playerID,
+		cancelled = false,
+	}
+	self.battlepass_dev_sequences[playerID] = sequence
+
+	local function PlayNext()
+		if sequence.cancelled == true
+			or self.battlepass_dev_sequences[playerID] ~= sequence then
+			return nil
+		end
+		sequence.index = sequence.index + 1
+		if sequence.index > sequence.count then
+			self:CancelBattlepassDevSequence(playerID, true)
+			self:NotifyBattlepassDevTest(
+				playerID,
+				string.format("[Battle Pass] %s complete (%d rewards)", sequence.label, sequence.count),
+				4
+			)
+			self:PushState()
+			return nil
+		end
+
+		if Battlepass ~= nil and Battlepass.CleanupSupporterDevTest ~= nil then
+			Battlepass:CleanupSupporterDevTest(playerID, true)
+		end
+		local reward = sequence.rewards[sequence.index]
+		self:NotifyBattlepassDevTest(
+			playerID,
+			string.format(
+				"[Battle Pass] %s %d/%d - %s (#%s)",
+				sequence.label,
+				sequence.index,
+				sequence.count,
+				reward.display_name,
+				reward.item_id
+			),
+			BATTLEPASS_DEV_SEQUENCE_DELAY
+		)
+		Battlepass:SupporterPassDevTestReward(sequence.source_index, {
+			item_id = reward.item_id,
+			slot_id = reward.family,
+			action = "test",
+			xhs_devtools_trusted = true,
+			request_id = string.format(
+				"xhs-dev-family-%s-%d-%s",
+				sequence.family,
+				sequence.index,
+				tostring(GameRules:GetGameTime())
+			),
+		})
+		self:PushState()
+		sequence.timer = Timers:CreateTimer(BATTLEPASS_DEV_SEQUENCE_DELAY, PlayNext)
+		return nil
+	end
+
+	PlayNext()
+	return string.format("Testing %d %s rewards", sequence.count, sequence.label)
+end
+
+function XHSDevTools:StopBattlepassTest(event)
+	local playerID = self:ResolveEventPlayerID(event.xhs_devtools_source_index)
+	if playerID == nil then error("Unable to resolve the requesting player") end
+	self:CancelBattlepassDevSequence(playerID, true)
+	self:NotifyBattlepassDevTest(playerID, "[Battle Pass] Reward preview stopped", 3)
+	return "Battle Pass reward preview stopped"
+end
+
+function XHSDevTools:BuildBattlepassDevSequenceState()
+	local result = {}
+	for playerID, sequence in pairs(self.battlepass_dev_sequences or {}) do
+		if sequence.cancelled ~= true then
+			result[tostring(playerID)] = {
+				active = true,
+				family = sequence.family,
+				label = sequence.label,
+				index = sequence.index,
+				count = sequence.count,
+				delay = BATTLEPASS_DEV_SEQUENCE_DELAY,
+			}
+		end
+	end
+	return result
 end
 
 function XHSDevTools:BuildQuestState()
@@ -1507,6 +1859,11 @@ function XHSDevTools:PushState()
 		quests = self.enabled and self:BuildQuestState() or {},
 		bosses = self.enabled and self:BuildBossState() or {},
 		donator_statuses = self.enabled and self:BuildDonatorState() or {},
+		battlepass = self.enabled and {
+			families = self:PublishBattlepassDevCatalog(),
+			sequences = self:BuildBattlepassDevSequenceState(),
+			delay = BATTLEPASS_DEV_SEQUENCE_DELAY,
+		} or {},
 		fragment_quests = self.enabled and FragmentQuests ~= nil and FragmentQuests:BuildDevtoolsState() or {},
 		last_result = self.last_result or {},
 	})

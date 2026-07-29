@@ -125,6 +125,9 @@ function XHSBotExecutor:Move(hero, position, record, label, jitter)
 		Queue = false,
 	})
 	self:Record(record, signature, label or "move", 0.18)
+	record.last_movement_destination = position
+	record.last_movement_order_at = GameTime()
+	record.last_movement_kind = "move"
 	return true
 end
 
@@ -143,6 +146,9 @@ function XHSBotExecutor:AttackMove(hero, position, record, label, jitter)
 		Queue = false,
 	})
 	self:Record(record, signature, label or "attack-move", 0.24)
+	record.last_movement_destination = position
+	record.last_movement_order_at = GameTime()
+	record.last_movement_kind = "attack_move"
 	return true
 end
 

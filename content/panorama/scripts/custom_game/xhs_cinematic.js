@@ -212,6 +212,24 @@
 		$.Schedule(0.0, function () { MaintainCamera(serial, state); });
 	}
 
+	function MaintainNativeCamera(serial, state) {
+		if (serial !== cameraSerial || state !== GetTopState()) return;
+		var target = GetStateCameraTarget(state);
+		if (target) GameUI.SetCameraTargetPosition(target, 0.0);
+		$.Schedule(0.0, function () { MaintainNativeCamera(serial, state); });
+	}
+
+	function StartNativeCameraMove(serial, state, target) {
+		var duration = Math.max(0, Number(state.camera_speed) || 0);
+		GameUI.SetCameraTargetPosition(target, duration);
+
+		// Let Dota perform the same native travel used by the arena return.
+		// Once it has arrived, resume the cinematic lock on the destination.
+		$.Schedule(duration, function () {
+			MaintainNativeCamera(serial, state);
+		});
+	}
+
 	function Render(returnCamera) {
 		renderSerial++;
 		cameraSerial++;
@@ -242,8 +260,12 @@
 		root.AddClass("XHSCinematicActive");
 		var cameraTarget = GetStateCameraTarget(state);
 		if (cameraTarget) {
-			StartCameraMove(state, cameraTarget, state.camera_speed);
-			MaintainCamera(cameraSerial, state);
+			if (Number(state.native_camera) !== 0) {
+				StartNativeCameraMove(cameraSerial, state, cameraTarget);
+			} else {
+				StartCameraMove(state, cameraTarget, state.camera_speed);
+				MaintainCamera(cameraSerial, state);
+			}
 		}
 	}
 

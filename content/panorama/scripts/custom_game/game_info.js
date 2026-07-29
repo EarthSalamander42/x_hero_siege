@@ -26,6 +26,33 @@
 		}
 	}
 
+	function RaiseGameInfoShell(shell) {
+		if (!shell) {
+			return;
+		}
+
+		// GameInfoPanel is Valve's wrapper around this custom layout. Keep the
+		// fix local to that wrapper: moving it to the end of its own sibling
+		// list raises the open drawer above lower_hud and the minimap without
+		// changing the stacking order of any other custom or vanilla HUD root.
+		shell.style.zIndex = "1000";
+
+		var parent = shell.GetParent ? shell.GetParent() : null;
+		if (!parent || !parent.GetChildCount || !parent.GetChild || !parent.MoveChildAfter) {
+			return;
+		}
+
+		var childCount = parent.GetChildCount();
+		if (childCount < 2) {
+			return;
+		}
+
+		var lastSibling = parent.GetChild(childCount - 1);
+		if (lastSibling && lastSibling !== shell) {
+			parent.MoveChildAfter(shell, lastSibling);
+		}
+	}
+
 	function StyleGameInfoShell() {
 		var shell = FindAncestorPanel("GameInfoPanel");
 
@@ -42,6 +69,7 @@
 		AddClass(button, "XHSGameInfoButton");
 		AddClass(icon, "XHSGameInfoIcon");
 		AddClass(openClose, "XHSGameInfoOpenClose");
+		RaiseGameInfoShell(shell);
 
 		// Fallback styles for Valve's wrapper, which lives outside this custom layout.
 		shell.style.width = "600px";

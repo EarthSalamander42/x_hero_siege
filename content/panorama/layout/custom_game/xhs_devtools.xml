@@ -9,6 +9,35 @@
 
 	<Panel class="XHSDevToolsRoot" hittest="false" hittestchildren="true">
 		<Panel id="XHSDevToolsRoot" class="XHSDevToolsHost" hittest="false" hittestchildren="true">
+			<Panel id="XHSDevToolsSpectator" class="XHSDevToolsSpectator" hittest="true" hittestchildren="true">
+				<Button id="XHSDevToolsSpectatorPrevious" class="XHSDevToolsSpectatorArrow">
+					<Label text="‹" />
+				</Button>
+
+				<DOTAHeroImage
+					id="XHSDevToolsSpectatorHero"
+					class="XHSDevToolsSpectatorHero"
+					heroname="npc_dota_hero_wisp"
+					heroimagestyle="icon" />
+
+				<Panel id="XHSDevToolsSpectatorIdentity" class="XHSDevToolsSpectatorIdentity" hittest="true">
+					<Label id="XHSDevToolsSpectatorName" class="XHSDevToolsSpectatorName" text="WAITING FOR AI ALLIES" />
+					<Panel class="XHSDevToolsSpectatorMeta">
+						<Label id="XHSDevToolsSpectatorCounter" class="XHSDevToolsSpectatorCounter" text="0 / 0" />
+						<Label class="XHSDevToolsSpectatorSeparator" text="•" />
+						<Label id="XHSDevToolsSpectatorGold" class="XHSDevToolsSpectatorGold" text="0 GOLD" />
+					</Panel>
+				</Panel>
+
+				<Button id="XHSDevToolsSpectatorFollow" class="XHSDevToolsSpectatorFollow">
+					<Label id="XHSDevToolsSpectatorFollowLabel" text="FOLLOW" />
+				</Button>
+
+				<Button id="XHSDevToolsSpectatorNext" class="XHSDevToolsSpectatorArrow">
+					<Label text="›" />
+				</Button>
+			</Panel>
+
 			<Panel id="XHSDevToolsTimescale" class="XHSDevToolsTimescale" />
 
 			<Button id="XHSDevToolsToggle" class="XHSDevToolsToggle" onactivate="XHSDevToolsTogglePanel();">

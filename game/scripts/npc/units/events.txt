@@ -829,13 +829,13 @@
 	{
 		// General
 		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
-		"Model"						"models/heroes/slark/slark.vmdl"	// Model.
-		"ModelScale"				"1.05"
+		"Model"						"models/creeps/neutral_creeps/n_creep_satyr_spawn_a/n_creep_satyr_spawn_a.vmdl"	// Neutral creep model.
+		"ModelScale"				"0.702"
 		"Level"						"1"
 		"LeavesCorpse"				"0"
 		"MinimapIcon"				"minimap_roshancamp"
 		"MinimapIconSize"			"250"
-		"SoundSet"					"Hero_Slark"
+		"SoundSet"					"Creep_Good_Melee"
 		"ConsideredHero"			"1"
 
 		// Abilities
@@ -902,18 +902,6 @@
 		"VisionDaytimeRange"		"1400"		// Range of vision during day light.
 		"VisionNighttimeRange"		"1400"		// Range of vision at night time.
 
-		// Creature Data
-		//----------------------------------------------------------------------------------------------------------------------
-		"Creature"
-		{
-			"AttachWearables"
-			{
-				"Wearable1" { "ItemDef" "336" } //Weapon
-				"Wearable2" { "ItemDef" "354" } //Shoulder Armor
-				"Wearable3" { "ItemDef" "355" } //Cape
-				"Wearable4" { "ItemDef" "356" } //Hood
-			}
-		}
 	}
 
 	//=================================================================================
@@ -1247,13 +1235,13 @@
 	{
 		// General
 		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
-		"Model"						"models/heroes/bristleback/bristleback.vmdl"	// Model.
-		"ModelScale"				"1.05"
+		"Model"						"models/creeps/neutral_creeps/n_creep_troll_dark_a/n_creep_troll_dark_a.vmdl"	// Neutral creep model.
+		"ModelScale"				"1.02"
 		"Level"						"1"
 		"LeavesCorpse"				"0"
 		"MinimapIcon"				"minimap_roshancamp"
 		"MinimapIconSize"			"250"
-		"SoundSet"					"Hero_Bristleback"
+		"SoundSet"					"n_creep_TrollWarlord"
 		"ConsideredHero"			"1"
 
 		// Abilities
@@ -1320,17 +1308,6 @@
 		"VisionDaytimeRange"		"1400"		// Range of vision during day light.
 		"VisionNighttimeRange"		"1400"		// Range of vision at night time.
 
-		"Creature"
-		{
-			"AttachWearables"
-			{
-				"Wearable1" { "ItemDef" "436" }
-				"Wearable2" { "ItemDef" "437" }
-				"Wearable3" { "ItemDef" "438" }
-				"Wearable4" { "ItemDef" "439" }
-				"Wearable5" { "ItemDef" "440" }
-			}
-		}
 	}
 
 	//=================================================================================
@@ -1340,13 +1317,13 @@
 	{
 		// General
 		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
-		"Model"						"models/heroes/razor/razor.vmdl"	// Model.
-		"ModelScale"				"1.05"
+		"Model"						"models/creeps/neutral_creeps/n_creep_ghost_b/n_creep_ghost_red.vmdl"	// Neutral creep model.
+		"ModelScale"				"0.88"
 		"Level"						"1"
 		"LeavesCorpse"				"0"
 		"MinimapIcon"				"minimap_roshancamp"
 		"MinimapIconSize"			"250"
-		"SoundSet"					"Hero_Razor"
+		"SoundSet"					"Creep_Bad_Range"
 		"ConsideredHero"			"1"
 
 		// Abilities
@@ -1413,17 +1390,6 @@
 		"VisionDaytimeRange"		"1400"		// Range of vision during day light.
 		"VisionNighttimeRange"		"1400"		// Range of vision at night time.
 
-		"Creature"
-		{
-			"AttachWearables"
-			{
-				"Wearable1" { "ItemDef" "340" }
-				"Wearable2" { "ItemDef" "341" }
-				"Wearable3" { "ItemDef" "342" }
-				"Wearable4" { "ItemDef" "343" }
-				"Wearable5" { "ItemDef" "344" }
-			}
-		}
 	}
 
 	//=================================================================================
@@ -1433,13 +1399,13 @@
 	{
 		// General
 		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
-		"Model"						"models/heroes/tuskarr/tuskarr.vmdl"	// Model.
-		"ModelScale"				"1.05"
+		"Model"						"models/creeps/neutral_creeps/n_creep_ogre_med/n_creep_ogre_med.vmdl"	// Neutral creep model.
+		"ModelScale"				"0.624"
 		"Level"						"1"
 		"LeavesCorpse"				"0"
 		"MinimapIcon"				"minimap_roshancamp"
 		"MinimapIconSize"			"250"
-		"SoundSet"					"Hero_Tusk"
+		"SoundSet"					"Creep_Bad_Melee"
 		"ConsideredHero"			"1"
 
 		// Abilities
@@ -1506,18 +1472,6 @@
 		"VisionDaytimeRange"		"1400"		// Range of vision during day light.
 		"VisionNighttimeRange"		"1400"		// Range of vision at night time.
 
-		"Creature"
-		{
-			"AttachWearables"
-			{
-				"Wearable1" { "ItemDef" "413" }//Arms
-				"Wearable2" { "ItemDef" "414" }//Shoulder
-				"Wearable3" { "ItemDef" "415" }//Head
-				"Wearable4" { "ItemDef" "416" }//Neck
-				"Wearable5" { "ItemDef" "417" }//Weapon
-				"Wearable6" { "ItemDef" "418" }//Back
-			}
-		}
 	}
 
 	//=================================================================================

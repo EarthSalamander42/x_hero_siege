@@ -5824,7 +5824,7 @@
 
 .xhs-bot-setup-card {
 	width: 100%;
-	min-height: 232px;
+	min-height: 278px;
 	padding: 8px 10px 9px 10px;
 	flow-children: down;
 	background-color: gradient(linear, 0% 0%, 100% 100%, from(#10202bea), to(#09131cea));
@@ -5967,6 +5967,7 @@
 }
 
 .xhs-bot-setup-summary,
+.xhs-bot-setup-spectator-note,
 .xhs-bot-setup-controller,
 .xhs-bot-setup-status,
 .xhs-bot-setup-error {
@@ -5981,6 +5982,12 @@
 .xhs-bot-setup-summary {
 	color: #d8edf5;
 	font-size: 11px;
+}
+
+.xhs-bot-setup-spectator-note {
+	margin-bottom: 2px;
+	color: #8fe6ff;
+	white-space: normal;
 }
 
 .xhs-bot-setup-controller {

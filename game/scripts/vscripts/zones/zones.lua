@@ -487,7 +487,9 @@ function CDungeonZone:SpawnBreakables()
 				local fThreshold = 1 - fSpawnChance
 				local bSpawnBreakable = RandomFloat(0, 1) >= fThreshold
 				if bSpawnBreakable then
-					local hUnit = CreateUnitByName(breakableTable.szNPCName, vSpawnLoc, true, nil, nil, DOTA_TEAM_BADGUYS)
+					-- Breakables share the lane-creep team so native creep
+					-- acquisition never selects them. Players remain hostile.
+					local hUnit = CreateUnitByName(breakableTable.szNPCName, vSpawnLoc, true, nil, nil, DOTA_TEAM_CUSTOM_1)
 					if hUnit ~= nil then
 						local vSpawnerForward = hSpawner:GetForwardVector()
 						hUnit:SetForwardVector(vSpawnerForward)

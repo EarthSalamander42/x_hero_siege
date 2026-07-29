@@ -1,3 +1,6 @@
+local SupporterRecoveryEffects = require("components/battlepass/recovery_effects"):Init()
+local LIGHT_POTION_PARTICLE = "particles/items2_fx/mekanism.vpcf"
+
 function FullRestauration(event)
 local caster = event.caster
 local ability = event.ability
@@ -10,6 +13,7 @@ local Mana = 30000
 	SendOverheadEventMessage(nil, OVERHEAD_ALERT_MANA_ADD, caster, Mana, nil)
 
 	XHSRecordPotionUse(caster, ability and ability:GetAbilityName())
+	SupporterRecoveryEffects:PlayPotion(caster, "light", LIGHT_POTION_PARTICLE)
 end
 
 function Invulnerability(event)

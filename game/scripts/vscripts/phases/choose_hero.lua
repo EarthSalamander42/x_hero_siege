@@ -82,12 +82,15 @@ local function GetSelectionTransform(group, index, pickedHeroName)
 	primary = primary or displays[1]
 
 	-- Lua can be reloaded after the showcase units have spawned, which clears
-	-- the local registry above. Recover the exact display by classname so the
-	-- selection teleport never falls back to a world-only particle.
+	-- the local registry above. All hero displays share the engine classname
+	-- "npc_dota_hero"; GetUnitName is the field that identifies the picked hero.
 	if not IsValidSelectionUnit(primary) and Entities.FindAllByClassname ~= nil then
 		local nearestDistance = nil
-		for _, unit in pairs(Entities:FindAllByClassname(pickedHeroName) or {}) do
-			if IsValidSelectionUnit(unit) and unit.is_fake_hero == true then
+		for _, unit in pairs(Entities:FindAllByClassname("npc_dota_hero") or {}) do
+			if IsValidSelectionUnit(unit)
+				and unit.is_fake_hero == true
+				and unit:GetUnitName() == pickedHeroName
+			then
 				local distance = point ~= nil
 					and (unit:GetAbsOrigin() - point:GetAbsOrigin()):Length2D()
 					or 0
@@ -123,6 +126,33 @@ local function DestroyHeroSelectionParticle(particle, immediate)
 	ParticleManager:ReleaseParticleIndex(particle)
 end
 
+local function StartHeroSelectionDisplayTeleport(display)
+	if not IsValidSelectionUnit(display) then return end
+
+	-- Use a native gesture for showcase units. StartAnimation relies on a Lua
+	-- modifier being linked client-side, which is not guaranteed after a reload.
+	if display.StartGestureWithPlaybackRate ~= nil then
+		display:StartGestureWithPlaybackRate(ACT_DOTA_TELEPORT, 1.0)
+	elseif display.StartGesture ~= nil then
+		display:StartGesture(ACT_DOTA_TELEPORT)
+	else
+		StartAnimation(display, {
+			duration = HERO_SELECTION_TELEPORT_DURATION,
+			activity = ACT_DOTA_TELEPORT,
+			rate = 1.0,
+		})
+	end
+end
+
+local function StopHeroSelectionDisplayTeleport(display)
+	if not IsValidSelectionUnit(display) then return end
+	if display.FadeGesture ~= nil then
+		display:FadeGesture(ACT_DOTA_TELEPORT)
+	elseif display.RemoveGesture ~= nil then
+		display:RemoveGesture(ACT_DOTA_TELEPORT)
+	end
+end
+
 local function GetHeroSelectionBaseTransform(playerID)
 	local base = BASE_GOOD
 	if not IsValidSelectionUnit(base) then
@@ -150,22 +180,18 @@ local function StartHeroSelectionSourceTeleport(transform, playerID)
 		display:AddNewModifier(display, nil, "modifier_xhs_cinematic_hide_health_bars", {
 			duration = HERO_SELECTION_TELEPORT_DURATION,
 		})
-		StartAnimation(display, {
-			duration = HERO_SELECTION_TELEPORT_DURATION,
-			activity = ACT_DOTA_TELEPORT,
-			rate = 1.0,
-		})
+		StartHeroSelectionDisplayTeleport(display)
 		local particle = ParticleManager:CreateParticle(
 			sourceParticle,
-			PATTACH_ABSORIGIN_FOLLOW,
+			PATTACH_ABSORIGIN,
 			display
 		)
 		ParticleManager:SetParticleControlEnt(
 			particle,
 			0,
 			display,
-			PATTACH_ABSORIGIN_FOLLOW,
-			"attach_hitloc",
+			PATTACH_ABSORIGIN,
+			"attach_origin",
 			display:GetAbsOrigin(),
 			true
 		)
@@ -193,6 +219,7 @@ local function FinishHeroSelectionSourceTeleport(transform, particles)
 	local display = transform.display
 	if IsValidSelectionUnit(display) then
 		display:StopSound("Portal.Loop_Appear")
+		StopHeroSelectionDisplayTeleport(display)
 		EmitSoundOnLocationWithCaster(display:GetAbsOrigin(), "Portal.Hero_Disappear", display)
 		UTIL_Remove(display)
 	end

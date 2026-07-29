@@ -1439,6 +1439,7 @@ var XHSSupporterPass = (function () {
 			caster_pfx: reward.caster_pfx,
 			health_pfx: reward.health_pfx,
 			mana_pfx: reward.mana_pfx,
+			light_pfx: reward.light_pfx,
 			owner_pfx: reward.owner_pfx,
 			pfx: reward.pfx,
 			overhead_pfx: reward.overhead_pfx,
@@ -2716,6 +2717,7 @@ var XHSSupporterPass = (function () {
 		AddRuntimeAsset("particle", "caster", reward.caster_pfx);
 		AddRuntimeAsset("particle", "health", reward.health_pfx);
 		AddRuntimeAsset("particle", "mana", reward.mana_pfx);
+		AddRuntimeAsset("particle", "light", reward.light_pfx);
 		AddRuntimeAsset("particle", "owner", reward.owner_pfx);
 		AddRuntimeAsset("particle", "high_five_overhead", reward.overhead_pfx);
 		AddRuntimeAsset("particle", "high_five_travel", reward.travel_pfx);

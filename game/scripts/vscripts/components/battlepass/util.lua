@@ -668,7 +668,144 @@ function Battlepass:GetSupporterCatalogItemID(item)
 	return nil
 end
 
+Battlepass.Player = Battlepass.Player or {}
+
+local SUPPORTER_PLAYER_PARTICLE_CHANNELS = {
+	teleport = {
+		{ key = "teleport_start_pfx", field = "start_pfx", anchor = "particles/items2_fx/teleport_start.vpcf" },
+		{ key = "teleport_end_pfx", field = "end_pfx", anchor = "particles/items2_fx/teleport_end.vpcf" },
+	},
+	levelup = {
+		{ key = "levelup_pfx", field = "pfx", anchor = "particles/generic_hero_status/hero_levelup.vpcf" },
+	},
+	kill_effect = {
+		{ key = "kill_target_pfx", field = "target_pfx", anchor = "particles/kill_effect/default_target.vpcf" },
+		{ key = "kill_caster_pfx", field = "caster_pfx", anchor = "particles/kill_effect/default_caster.vpcf" },
+	},
+	emblem = {
+		{ key = "emblem_pfx", field = "pfx", anchor = "particles/hero_emblem/default.vpcf" },
+	},
+	potion = {
+		{ key = "health_potion_pfx", field = "health_pfx", anchor = "particles/custom/supporter_pass/health_potion_anchor.vpcf" },
+		{ key = "mana_potion_pfx", field = "mana_pfx", anchor = "particles/custom/supporter_pass/mana_potion_anchor.vpcf" },
+		{ key = "light_potion_pfx", field = "light_pfx", anchor = "particles/custom/supporter_pass/light_potion_anchor.vpcf" },
+	},
+	rebirth = {
+		{ key = "rebirth_pfx", field = "pfx", anchor = "particles/custom/supporter_pass/rebirth_anchor.vpcf" },
+	},
+	attack_lifesteal = {
+		{ key = "attack_lifesteal_pfx", field = "pfx", anchor = "particles/custom/supporter_pass/attack_lifesteal_anchor.vpcf" },
+	},
+	spell_lifesteal = {
+		{ key = "spell_lifesteal_pfx", field = "pfx", anchor = "particles/custom/supporter_pass/spell_lifesteal_anchor.vpcf" },
+	},
+	regen_aura = {
+		{ key = "regen_aura_pfx", field = "pfx", anchor = "particles/custom/supporter_pass/regen_aura_anchor.vpcf" },
+	},
+	immolation = {
+		{ key = "immolation_owner_pfx", field = "owner_pfx", anchor = "particles/custom/supporter_pass/immolation_owner_anchor.vpcf" },
+		{ key = "immolation_target_pfx", field = "target_pfx", anchor = "particles/custom/supporter_pass/immolation_target_anchor.vpcf" },
+	},
+	high_five = {
+		{ key = "high_five_overhead_pfx", field = "overhead_pfx" },
+		{ key = "high_five_travel_pfx", field = "travel_pfx" },
+		{ key = "high_five_impact_pfx", field = "impact_pfx" },
+	},
+}
+
+local function IsSupporterParticlePath(path)
+	return type(path) == "string"
+		and string.match(string.lower(path), "^particles/.+%.vpcf$") ~= nil
+end
+
+function Battlepass:ApplySupporterPlayerParticleItem(playerID, slot, item)
+	playerID = tonumber(playerID)
+	if playerID == nil or playerID < 0 then return end
+
+	self.Player[playerID] = self.Player[playerID] or {}
+	local playerParticles = self.Player[playerID]
+	for _, channel in ipairs(SUPPORTER_PLAYER_PARTICLE_CHANNELS[slot] or {}) do
+		playerParticles[channel.key] = nil
+		local particle = type(item) == "table" and item[channel.field] or nil
+		if not IsSupporterParticlePath(particle) and channel.anchor ~= nil then
+			particle = self:GetSupporterItemParticle(item, channel.anchor)
+		end
+		if IsSupporterParticlePath(particle) and particle ~= channel.anchor then
+			playerParticles[channel.key] = particle
+		end
+	end
+end
+
+function Battlepass:BuildSupporterPlayerParticles(playerID)
+	playerID = tonumber(playerID)
+	if playerID == nil or playerID < 0 then return nil end
+
+	local previous = self.Player[playerID]
+	self.Player[playerID] = {
+		ready = true,
+		particle_overrides = type(previous) == "table" and previous.particle_overrides or {},
+	}
+	if not self:AreSupporterRewardsEnabled(playerID) then
+		return self.Player[playerID]
+	end
+
+	for slot, _ in pairs(SUPPORTER_PLAYER_PARTICLE_CHANNELS) do
+		self:ApplySupporterPlayerParticleItem(
+			playerID,
+			slot,
+			self:GetEquippedSupporterItem(playerID, slot)
+		)
+	end
+	return self.Player[playerID]
+end
+
+function Battlepass:GetSupporterPlayerID(subject)
+	if type(subject) == "number" then return subject end
+	if subject == nil or (subject.IsNull ~= nil and subject:IsNull()) then return nil end
+
+	for _, getter in ipairs({ "GetPlayerOwnerID", "GetPlayerID" }) do
+		if subject[getter] ~= nil then
+			local ok, playerID = pcall(subject[getter], subject)
+			if ok and tonumber(playerID) ~= nil and tonumber(playerID) >= 0 then
+				return tonumber(playerID)
+			end
+		end
+	end
+	return nil
+end
+
+function Battlepass:GetPlayerParticle(subject, key, fallback)
+	local playerID = self:GetSupporterPlayerID(subject)
+	if playerID == nil then return fallback end
+
+	local playerParticles = self.Player[playerID]
+	if type(playerParticles) ~= "table" or playerParticles.ready ~= true then
+		playerParticles = self:BuildSupporterPlayerParticles(playerID)
+	end
+	local particle = type(playerParticles) == "table" and playerParticles[key] or nil
+	return IsSupporterParticlePath(particle) and particle or fallback
+end
+
+function Battlepass:GetPlayerParticleOverride(subject, originalParticle)
+	local playerID = self:GetSupporterPlayerID(subject)
+	if playerID == nil then return originalParticle end
+	local playerParticles = self.Player[playerID]
+	local overrides = type(playerParticles) == "table" and playerParticles.particle_overrides or nil
+	local replacement = type(overrides) == "table" and overrides[originalParticle] or nil
+	return IsSupporterParticlePath(replacement) and replacement or originalParticle
+end
+
+function XHSGetBattlepassParticle(subject, key, fallback)
+	if Battlepass ~= nil and Battlepass.GetPlayerParticle ~= nil then
+		return Battlepass:GetPlayerParticle(subject, key, fallback)
+	end
+	return fallback
+end
+
 function Battlepass:ClearSupporterOverrides(playerID)
+	self.Player = self.Player or {}
+	self.Player[playerID] = self.Player[playerID] or {}
+	self.Player[playerID].particle_overrides = {}
 	self.SUPPORTER_OVERRIDE_ASSETS = self.SUPPORTER_OVERRIDE_ASSETS or {}
 	for asset, _ in pairs(self.SUPPORTER_OVERRIDE_ASSETS[playerID] or {}) do
 		CustomNetTables:SetTableValue("supporter_pass_player", asset .. "_" .. tostring(playerID), { asset })
@@ -688,19 +825,9 @@ function Battlepass:ApplySupporterEmblem(hero, item)
 	end
 end
 
-local SUPPORTER_RUNTIME_OVERRIDE_SLOTS = {
-	"teleport",
-	"levelup",
-	"potion",
-	"rebirth",
-	"attack_lifesteal",
-	"spell_lifesteal",
-	"regen_aura",
-	"immolation",
-}
-
 function Battlepass:ApplySupporterLoadout(playerID, hero)
 	if not PlayerResource:IsValidPlayerID(playerID) then return end
+	self:BuildSupporterPlayerParticles(playerID)
 	hero = hero or PlayerResource:GetSelectedHeroEntity(playerID)
 	if hero == nil or hero:IsNull() then return end
 
@@ -727,14 +854,6 @@ function Battlepass:ApplySupporterLoadout(playerID, hero)
 
 	self:RegisterHeroTaunt(hero)
 	self:GetHeroEffect(hero)
-	for _, slot in ipairs(SUPPORTER_RUNTIME_OVERRIDE_SLOTS) do
-		local item = self:GetEquippedSupporterItem(playerID, slot)
-		local catalogItemID = item and self:GetSupporterCatalogItemID(item) or nil
-		local visuals = catalogItemID and ItemsGame:GetItemVisuals(catalogItemID) or nil
-		if type(visuals) == "table" then
-			self:SetOverrideAssets(hero, nil, visuals)
-		end
-	end
 
 	local companion = self:GetEquippedSupporterItem(playerID, "companion")
 	local companionUnit = companion and (
@@ -782,6 +901,10 @@ function Battlepass:PlaySupporterKillEffect(hero, victim, item)
 	local function PlayAttachedParticle(particleName, anchor, counterpart)
 		if particleName == nil or particleName == "" or anchor == nil or anchor:IsNull() then return false end
 		local anchorOrigin = anchor:GetAbsOrigin()
+		local normalizedParticle = string.lower(tostring(particleName))
+		local isDrowRevengeKillEffect =
+			string.find(normalizedParticle, "/drow/drow_arcana/", 1, true) ~= nil
+			and string.find(normalizedParticle, "revenge_kill_effect", 1, true) ~= nil
 		local particle = ParticleManager:CreateParticle(particleName, PATTACH_ABSORIGIN_FOLLOW, anchor)
 		if particle == nil or particle < 0 then return false end
 
@@ -795,7 +918,28 @@ function Battlepass:PlaySupporterKillEffect(hero, victim, item)
 			anchorOrigin,
 			true
 		)
-		if counterpart ~= nil and not counterpart:IsNull() then
+		if isDrowRevengeKillEffect then
+			-- Both Drow Arcana styles author CP1 as the local effect origin.
+			-- Their caster beam then traces CP1 -> CP5; its child source uses
+			-- an authored 600-unit vertical span. Feeding the counterpart into
+			-- CP1 displaced target props/decals and left CP5 at world origin.
+			ParticleManager:SetParticleControlEnt(
+				particle,
+				1,
+				anchor,
+				PATTACH_POINT_FOLLOW,
+				"attach_hitloc",
+				anchorOrigin,
+				true
+			)
+			if string.find(normalizedParticle, "_caster", 1, true) ~= nil then
+				ParticleManager:SetParticleControl(
+					particle,
+					5,
+					anchorOrigin + Vector(0, 0, 600)
+				)
+			end
+		elseif counterpart ~= nil and not counterpart:IsNull() then
 			ParticleManager:SetParticleControlEnt(
 				particle,
 				1,
@@ -1037,7 +1181,15 @@ function Battlepass:ApplySupporterDevTestItem(playerID, state, hero, reapply)
 		local unitName = tostring(item.unit or "")
 		local definitions = LoadKeyValues("scripts/npc/units/statues.txt") or {}
 		if type(definitions[unitName]) ~= "table" then return false, "#xhs_sp_dev_test_error_item" end
-		self:DonatorStatue(playerID, unitName, true)
+		local previewOrigin = hero:GetAbsOrigin() + hero:GetForwardVector() * 280
+		self:DonatorStatue(playerID, unitName, true, previewOrigin)
+		if Notifications ~= nil and Notifications.Bottom ~= nil then
+			Notifications:Bottom(playerID, {
+				text = "[Battle Pass] Effigy preview spawned in front of your hero.",
+				duration = 3.0,
+				severity = "system",
+			})
+		end
 		return true
 	end
 
@@ -1050,10 +1202,7 @@ function Battlepass:ApplySupporterDevTestItem(playerID, state, hero, reapply)
 		or slot == "spell_lifesteal"
 		or slot == "regen_aura"
 		or slot == "immolation" then
-		local catalogItemID = self:GetSupporterCatalogItemID(item)
-		local visuals = catalogItemID and ItemsGame:GetItemVisuals(catalogItemID) or nil
-		if type(visuals) ~= "table" then return false, "#xhs_sp_dev_test_error_asset" end
-		self:SetOverrideAssets(hero, nil, visuals)
+		self:ApplySupporterPlayerParticleItem(playerID, slot, item)
 	end
 
 	local function CreatePreviewTarget(invulnerable)
@@ -1083,6 +1232,28 @@ function Battlepass:ApplySupporterDevTestItem(playerID, state, hero, reapply)
 		return true
 	end
 
+	local function NotifyPotionChannel(channel, index)
+		local payload = {
+			text = string.format(
+				"[Battle Pass] Potion %d/3 - %s - %s (#%s)",
+				index,
+				string.upper(channel),
+				tostring(item.name or item.item_name or "Potion bundle"),
+				tostring(state.item_id or item.item_id or "")
+			),
+			duration = 1.2,
+			severity = "system",
+		}
+		if Notifications ~= nil and Notifications.Bottom ~= nil then
+			Notifications:Bottom(playerID, payload)
+			return
+		end
+		local player = PlayerResource:GetPlayer(playerID)
+		if player ~= nil then
+			CustomGameEventManager:Send_ServerToPlayer(player, "bottom_notification", payload)
+		end
+	end
+
 	if slot == "teleport" then
 		local respawn = BASE_GOOD
 		if respawn == nil or respawn:IsNull() then
@@ -1092,7 +1263,12 @@ function Battlepass:ApplySupporterDevTestItem(playerID, state, hero, reapply)
 		TeleportHero(hero, respawn:GetAbsOrigin(), 3.0, 1.0)
 		return true
 	elseif slot == "levelup" then
-		local particle = ParticleManager:CreateParticle("particles/generic_hero_status/hero_levelup.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero, hero)
+		local particlePath = self:GetPlayerParticle(
+			hero,
+			"levelup_pfx",
+			"particles/generic_hero_status/hero_levelup.vpcf"
+		)
+		local particle = ParticleManager:CreateParticle(particlePath, PATTACH_ABSORIGIN_FOLLOW, hero)
 		ParticleManager:SetParticleControl(particle, 0, hero:GetAbsOrigin())
 		ParticleManager:ReleaseParticleIndex(particle)
 		hero:EmitSound("ui.trophy_levelup")
@@ -1131,14 +1307,23 @@ function Battlepass:ApplySupporterDevTestItem(playerID, state, hero, reapply)
 		return true
 	elseif slot == "potion" then
 		if SupporterRecoveryEffects == nil then return false, "#xhs_sp_dev_test_error_asset" end
+		NotifyPotionChannel("health", 1)
 		local healthPlayed = SupporterRecoveryEffects:PlayPotion(
 			hero,
 			"health",
 			item.health_pfx
 		)
-		Timers:CreateTimer(0.65, function()
+		Timers:CreateTimer(1.25, function()
 			if self.SUPPORTER_DEV_TESTS[playerID] == state and state.cancelled ~= true then
+				NotifyPotionChannel("mana", 2)
 				SupporterRecoveryEffects:PlayPotion(hero, "mana", item.mana_pfx)
+			end
+			return nil
+		end)
+		Timers:CreateTimer(2.50, function()
+			if self.SUPPORTER_DEV_TESTS[playerID] == state and state.cancelled ~= true then
+				NotifyPotionChannel("light", 3)
+				SupporterRecoveryEffects:PlayPotion(hero, "light", item.light_pfx)
 			end
 			return nil
 		end)
@@ -1302,7 +1487,9 @@ end
 function Battlepass:ReapplySupporterDevTest(playerID, hero)
 	self.SUPPORTER_DEV_TESTS = self.SUPPORTER_DEV_TESTS or {}
 	local state = self.SUPPORTER_DEV_TESTS[playerID]
-	if state == nil or state.persistent ~= true or not self:IsSupporterDevTestAllowed(playerID) then return end
+	local allowed = self:IsSupporterDevTestAllowed(playerID)
+		or (state ~= nil and state.trusted_devtools == true and IsInToolsMode())
+	if state == nil or state.persistent ~= true or not allowed then return end
 	self:ApplySupporterDevTestItem(playerID, state, hero, true)
 end
 
@@ -1313,8 +1500,9 @@ function Battlepass:SupporterPassDevTestReward(event_source_index, event)
 	local requestID = tostring(event.request_id or "")
 	local itemID = tostring(event.item_id or "")
 	local slot = NormalizeSupporterSlot(event.slot_id)
+	local trustedDevTools = event.xhs_devtools_trusted == true and IsInToolsMode()
 
-	if not self:IsSupporterDevTestAllowed(playerID) then
+	if not trustedDevTools and not self:IsSupporterDevTestAllowed(playerID) then
 		self:SendSupporterDevTestResult(playerID, requestID, itemID, slot, "error", "#xhs_sp_dev_test_error_forbidden")
 		return
 	end
@@ -1356,6 +1544,7 @@ function Battlepass:SupporterPassDevTestReward(event_source_index, event)
 		request_id = requestID,
 		persistent = persistent,
 		transient = not persistent,
+		trusted_devtools = trustedDevTools,
 	}
 	self.SUPPORTER_DEV_TESTS[playerID] = state
 	state.timer = Timers:CreateTimer(0.5, function()
@@ -1378,8 +1567,9 @@ function Battlepass:SupporterPassDevTestReward(event_source_index, event)
 				duration = 3.5
 			elseif slot == "attack_lifesteal" then
 				duration = 3.25
-			elseif slot == "potion"
-				or slot == "regen_aura"
+			elseif slot == "potion" then
+				duration = 4.2
+			elseif slot == "regen_aura"
 				or slot == "immolation"
 				or slot == "high_five" then
 				duration = 3.0
@@ -1969,14 +2159,11 @@ function Battlepass:SetOverrideAssets(hero, modifier, table_name)
 						--						print("Range attack particle:", j)
 						hero:SetRangedProjectileName(j.modifier)
 					else
-						--						print("Particle:", j)
-						local particle_table = {}
-						particle_table.asset = j.asset
-						particle_table.modifier = j.modifier
-						particle_table.parent = hero
-
-						CustomNetTables:SetTableValue("supporter_pass_player", j.asset .. '_' .. playerID, { j.modifier })
-						self.SUPPORTER_OVERRIDE_ASSETS[playerID][j.asset] = true
+						self.Player = self.Player or {}
+						self.Player[playerID] = self.Player[playerID] or {}
+						self.Player[playerID].particle_overrides =
+							self.Player[playerID].particle_overrides or {}
+						self.Player[playerID].particle_overrides[j.asset] = j.modifier
 					end
 				end
 			elseif j.type == "sound" then

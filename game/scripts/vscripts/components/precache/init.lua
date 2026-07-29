@@ -290,6 +290,7 @@ function XHSPrecache:PrecacheBattlepassCompanionAssets(context)
 		"particles/custom/supporter_pass/rebirth_anchor.vpcf",
 		"particles/custom/supporter_pass/health_potion_anchor.vpcf",
 		"particles/custom/supporter_pass/mana_potion_anchor.vpcf",
+		"particles/custom/supporter_pass/light_potion_anchor.vpcf",
 	}) do
 		addUnique(particles, particleSet, anchor)
 	end
@@ -303,6 +304,7 @@ function XHSPrecache:PrecacheBattlepassCompanionAssets(context)
 				"caster_pfx",
 				"health_pfx",
 				"mana_pfx",
+				"light_pfx",
 				"owner_pfx",
 				"overhead_pfx",
 				"travel_pfx",
@@ -648,6 +650,16 @@ XHSPrecache:RegisterGroup("waves", {
 		"models/creeps/neutral_creeps/n_creep_troll_skeleton/n_creep_troll_skeleton_fx.vmdl",
 		"models/gameplay/breakingcrate_dest.vmdl",
 		"models/creeps/lane_creeps/creep_bad_melee_diretide/creep_bad_melee_diretide.vmdl",
+		"models/creeps/neutral_creeps/n_creep_ghost_b/n_creep_ghost_red.vmdl",
+		"models/creeps/neutral_creeps/n_creep_forest_trolls/n_creep_forest_troll_high_priest.vmdl",
+		"models/creeps/neutral_creeps/n_creep_harpy_b/n_creep_harpy_b.vmdl",
+		"models/creeps/lane_creeps/creep_radiant_ranged/radiant_ranged_mega.vmdl",
+		"models/creeps/lane_creeps/creep_bad_ranged/lane_dire_ranged.vmdl",
+		"models/creeps/neutral_creeps/n_creep_troll_dark_a/n_creep_troll_dark_a.vmdl",
+		"models/creeps/lane_creeps/creep_bird_radiant/creep_bird_radiant_ranged.vmdl",
+		"models/creeps/lane_creeps/creep_dc_radiant/creep_dc_radiant_ranged.vmdl",
+		"models/creeps/lane_creeps/creep_dc_radiant/creep_dc_radiant_ranged_mega.vmdl",
+		"models/items/lone_druid/true_form/form_of_the_atniw/form_of_the_atniw.vmdl",
 		"models/items/warlock/golem/mystery_of_the_lost_ores_golem/mystery_of_the_lost_ores_golem.vmdl",
 		"models/items/warlock/golem/obsidian_golem/obsidian_golem.vmdl",
 		"models/heroes/pudge/pudge.vmdl",
@@ -730,6 +742,14 @@ XHSPrecache:RegisterGroup("supporter_pass", {
 		"particles/units/heroes/hero_abaddon/holdout_borrowed_time_3.vpcf",
 		"particles/units/heroes/hero_abaddon/holdout_borrowed_time_4.vpcf",
 		"particles/units/heroes/hero_abaddon/holdout_borrowed_time_purple.vpcf",
+		"particles/econ/events/seasonal_reward_line_fall_2025/teleport_start_fallrewardline_2025.vpcf",
+		"particles/econ/events/seasonal_reward_line_fall_2025/teleport_end_fallrewardline_2025.vpcf",
+		"particles/econ/events/seasonal_reward_line_spring_2026/teleport_start_springrewardline_2026.vpcf",
+		"particles/econ/events/seasonal_reward_line_spring_2026/teleport_end_springrewardline_2026.vpcf",
+		"particles/econ/events/seasonal_reward_line_winter_2025/teleport_start_winterrewardline_2025.vpcf",
+		"particles/econ/events/seasonal_reward_line_winter_2025/teleport_end_winterrewardline_2025.vpcf",
+		"particles/econ/events/seasonal_reward_line_summer_2026/teleport_start_summerrewardline_2026.vpcf",
+		"particles/econ/events/seasonal_reward_line_summer_2026/teleport_end_summerrewardline_2026.vpcf",
 	},
 })
 

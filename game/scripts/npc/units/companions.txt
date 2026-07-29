@@ -466,4 +466,74 @@
 		"Model"						"models/courier/frog/frog.vmdl"
 		"ModelScale"				"0.75"
 	}
+
+	// Fragment Shop variants. Ground and flying forms are separate products;
+	// golden styles remain separate premium products where Valve ships one.
+	"npc_donator_companion_amphibian_kid_flying"
+	{
+		"BaseClass"					"npc_donator_companion"
+		"Model"						"models/items/courier/amphibian_kid/amphibian_kid_flying.vmdl"
+		"ModelScale"				"0.85"
+		"IsFlying"					"1"
+	}
+
+	"npc_donator_companion_demi_doom_flying"
+	{
+		"BaseClass"					"npc_donator_companion"
+		"Model"						"models/courier/doom_demihero_courier/doom_demihero_courier_flying.vmdl"
+		"ModelScale"				"0.7"
+		"IsFlying"					"1"
+	}
+
+	"npc_donator_companion_devourling_flying"
+	{
+		"BaseClass"					"npc_donator_companion"
+		"Model"						"models/items/courier/devourling/devourling_flying.vmdl"
+		"AmbientParticle"			"particles/econ/courier/courier_devourling/courier_devourling_ambient.vpcf"
+		"ModelScale"				"0.85"
+		"IsFlying"					"1"
+	}
+
+	"npc_donator_companion_golden_devourling"
+	{
+		"BaseClass"					"npc_donator_companion"
+		"Model"						"models/items/courier/golden_devourling/golden_devourling.vmdl"
+		"AmbientParticle"			"particles/econ/courier/courier_devourling_gold/courier_devourling_gold_ambient.vpcf"
+		"ModelScale"				"0.85"
+	}
+
+	"npc_donator_companion_golden_devourling_flying"
+	{
+		"BaseClass"					"npc_donator_companion"
+		"Model"						"models/items/courier/golden_devourling/golden_devourling_flying.vmdl"
+		"AmbientParticle"			"particles/econ/courier/courier_devourling_gold/courier_devourling_gold_ambient.vpcf"
+		"ModelScale"				"0.85"
+		"IsFlying"					"1"
+	}
+
+	"npc_donator_companion_venoling"
+	{
+		"BaseClass"					"npc_donator_companion"
+		"Model"						"models/courier/venoling/venoling.vmdl"
+		"AmbientParticle"			"particles/econ/courier/courier_venoling/courier_venoling_ambient.vpcf"
+		"ModelScale"				"0.75"
+	}
+
+	"npc_donator_companion_venoling_flying"
+	{
+		"BaseClass"					"npc_donator_companion"
+		"Model"						"models/courier/venoling/venoling_flying.vmdl"
+		"AmbientParticle"			"particles/econ/courier/courier_venoling/courier_venoling_ambient.vpcf"
+		"ModelScale"				"0.75"
+		"IsFlying"					"1"
+	}
+
+	"npc_donator_companion_golden_venoling_flying"
+	{
+		"BaseClass"					"npc_donator_companion"
+		"Model"						"models/courier/venoling/venoling_flying.vmdl"
+		"AmbientParticle"			"particles/econ/courier/courier_venoling_gold/courier_venoling_ambient_gold.vpcf"
+		"ModelScale"				"0.75"
+		"IsFlying"					"1"
+	}
 }

@@ -153,7 +153,9 @@ local function ApplyPhaseOneWaveScaling(unit, level, progress)
 		level = level,
 		progress = progress,
 	})
-	unit:CalculateStatBonus(true)
+	if unit.CalculateStatBonus ~= nil then
+		unit:CalculateStatBonus(true)
+	end
 	unit:SetHealth(unit:GetMaxHealth())
 end
 
@@ -383,13 +385,21 @@ end
 
 function SpawnMagnataur(hPos)
 	local firstMagnataur = nil
+	local spawnedMagnataurs = {}
 	for i = 1, GameRules:GetCustomGameDifficulty() do
 		local unit = CreateUnitByName("npc_magnataur_destroyer_crypt", hPos, true, nil, nil, DOTA_TEAM_CUSTOM_1)
 		OrderWaveCreep(unit, nil)
 		firstMagnataur = firstMagnataur or unit
+		table.insert(spawnedMagnataurs, unit)
 	end
-	return firstMagnataur
+	return firstMagnataur, spawnedMagnataurs
 end
+
+local DRAGON_RENDER_COLORS = {
+	npc_dota_creature_red_dragon = { 220, 70, 55 },
+	npc_dota_creature_black_dragon = { 70, 70, 80 },
+	npc_dota_creature_green_dragon = { 80, 180, 95 },
+}
 
 function SpawnDragons(dragon)
 	local difficulty = math.max(1, GameRules:GetCustomGameDifficulty())
@@ -402,6 +412,11 @@ function SpawnDragons(dragon)
 			for j = 1, difficulty do
 				local spawnedDragon = SpawnWaveCreep(dragon, point, waypoint)
 				if spawnedDragon ~= nil then
+					local color = DRAGON_RENDER_COLORS[dragon]
+					if color ~= nil then
+						spawnedDragon:SetRenderColor(color[1], color[2], color[3])
+					end
+
 					-- Difficulty increases the number of dragons for combat, not
 					-- the lane's total economy. OnNPCSpawned has already applied
 					-- the difficulty bounty multiplier, so split that resulting

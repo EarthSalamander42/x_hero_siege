@@ -2086,10 +2086,23 @@ function GameMode:IsPlayerEligibleForCustomSetupReady(player_id)
 		return false
 	end
 
+	local isSpectatorController = IsInToolsMode()
+		and XHSBots ~= nil
+		and XHSBots.enabled == true
+		and type(XHSBots.configuration) == "table"
+		and XHSBots.configuration.spectator_mode == true
+		and tonumber(XHSBots.controller_player_id) == tonumber(player_id)
+
 	-- Do not require GetPlayer() here: it can remain nil while the client is
 	-- loading, and excluding it would let already-loaded clients bypass it.
-	if PlayerResource:GetTeam(player_id) ~= DOTA_TEAM_GOODGUYS then
+	if PlayerResource:GetTeam(player_id) ~= DOTA_TEAM_GOODGUYS
+		and not isSpectatorController then
 		return false
+	end
+
+	if isSpectatorController then
+		return PlayerResource.IsFakeClient == nil
+			or not PlayerResource:IsFakeClient(player_id)
 	end
 
 	if IsXHSPersistentPlayerID ~= nil then

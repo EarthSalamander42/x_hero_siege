@@ -26,6 +26,7 @@ local function BuildPayload(cinematicId, options)
 		camera_entindex = tonumber(options.camera_entindex) or -1,
 		camera_position = options.camera_position or "",
 		camera_speed = tonumber(options.camera_speed) or 0.55,
+		native_camera = options.native_camera == true and 1 or 0,
 		return_camera = options.return_camera == false and 0 or 1,
 		music = tostring(options.music or ""),
 		music_layers = math.max(1, math.floor(tonumber(options.music_layers) or 1)),

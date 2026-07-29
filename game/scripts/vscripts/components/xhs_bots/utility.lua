@@ -145,10 +145,11 @@ function XHSBotUtility:Build(context)
 		)
 	end
 
+	local retreatThreshold = context.retreat_threshold or 0.25
 	if context.base_last_stand == true then
-		-- The Ancient is the hard retreat limit. Once pressure reaches the
-		-- respawn/shop area, recover inside the campfire aura and fight instead
-		-- of repeatedly ordering deeper movement into a corner.
+		-- The Ancient is the hard retreat limit, but the campfire is not a
+		-- generic destination. Fight where contact happens; only a freshly
+		-- respawned bot already surrounded at spawn treats this as a local hold.
 		for _, abilityAction in ipairs(context.ability_actions or {}) do
 			local score = (tonumber(abilityAction.score) or 60) + 45
 			local reason = "base last stand; "
@@ -168,43 +169,44 @@ function XHSBotUtility:Build(context)
 			AddAction(actions, "cast_ability", score, abilityAction, reason)
 		end
 
-		if context.inside_campfire ~= true
-			and context.campfire_position ~= nil then
-			AddAction(
-				actions,
-				"move_to_objective",
-				context.health_ratio <= 0.80 and 188 or 168,
-				{ position = context.campfire_position },
-				"reach campfire regeneration before fighting back"
-			)
-		end
 		if context.target ~= nil then
 			AddAction(
 				actions,
 				"attack_target",
-				160 + (context.target_priority or 0)
-					+ (context.inside_campfire == true and 15 or 0),
+				175 + (context.target_priority or 0)
+					+ (context.spawn_campfire_hold == true and 15 or 0),
 				{
 					target = context.target,
 					maximum_distance = context.max_chase_distance,
 				},
-				context.inside_campfire == true
-					and "back to the wall: fight inside campfire"
-					or "fight while securing the campfire position"
-			)
-		elseif context.campfire_position ~= nil then
-			AddAction(
-				actions,
-				"attack_move",
-				150,
-				{ position = context.campfire_position },
-				"guard the campfire and reacquire base attackers"
+				context.spawn_campfire_hold == true
+					and "fresh respawn surrounded: clear the spawn"
+					or "Ancient retreat limit: stand and fight"
 			)
 		end
 		return self:Sort(actions)
 	end
 
-	local retreatThreshold = context.retreat_threshold or 0.25
+	if context.at_ancient_retreat_limit == true
+		and context.target == nil
+		and context.health_ratio <= retreatThreshold then
+		for _, abilityAction in ipairs(context.ability_actions or {}) do
+			if abilityAction.is_heal == true
+				and abilityAction.heals_self == true
+				and (tonumber(abilityAction.self_effective_heal_ratio) or 0) >= 0.04 then
+				AddAction(
+					actions,
+					"cast_ability",
+					190,
+					abilityAction,
+					"recover at Ancient retreat limit"
+				)
+			end
+		end
+		AddAction(actions, "hold", 120, {}, "recover in place at Ancient")
+		return self:Sort(actions)
+	end
+
 	local combatThreat = tonumber(context.combat_threat) or 0
 
 	if context.shopping == true then
@@ -334,6 +336,7 @@ function XHSBotUtility:Build(context)
 				and combatThreat < 1.15
 		)
 	if runeSafe and not shouldRetreat then
+		local runePreWave = context.rune_pre_wave == true
 		for _, abilityAction in ipairs(context.ability_actions or {}) do
 			local selfEmergency = abilityAction.is_heal == true
 				and abilityAction.heals_self == true
@@ -362,10 +365,11 @@ function XHSBotUtility:Build(context)
 		local runeScore = Clamp(
 			(tonumber(context.rune_priority) or 218)
 				+ (runeCritical and 18 or 0)
+				+ (runePreWave and 12 or 0)
 				- math.min(12, runeDistance / 1000)
 				- math.min(10, combatThreat * 4),
 			205,
-			242
+			runePreWave and 248 or 242
 		)
 		AddAction(
 			actions,
@@ -376,7 +380,9 @@ function XHSBotUtility:Build(context)
 				objective = "rune",
 				rune_id = context.rune_id,
 			},
-			(runeCritical and "progression unlock: collect " or "collect central ")
+			(runePreWave and "pre-wave preparation: collect "
+				or runeCritical and "progression unlock: collect "
+				or "collect central ")
 				.. tostring(context.rune_type or "nearby") .. " rune"
 		)
 		return self:Sort(actions)

@@ -14,6 +14,8 @@ XHSBotTeamDirector.shopping_allowed = XHSBotTeamDirector.shopping_allowed or {}
 XHSBotTeamDirector.base_threat_score = XHSBotTeamDirector.base_threat_score or 0
 XHSBotTeamDirector.base_threat_active = XHSBotTeamDirector.base_threat_active or false
 XHSBotTeamDirector.base_threat_hold_until = XHSBotTeamDirector.base_threat_hold_until or 0
+XHSBotTeamDirector.base_response_hold_until =
+	XHSBotTeamDirector.base_response_hold_until or 0
 XHSBotTeamDirector.base_threat_last_sample_at = XHSBotTeamDirector.base_threat_last_sample_at or 0
 XHSBotTeamDirector.base_threat_unit_samples = XHSBotTeamDirector.base_threat_unit_samples or {}
 XHSBotTeamDirector.last_structure_emergency_anchor =
@@ -27,6 +29,7 @@ local BASE_THREAT_SCAN_RADIUS = 5200
 local BASE_THREAT_ENTER_SCORE = 0.58
 local BASE_THREAT_EXIT_SCORE = 0.28
 local BASE_THREAT_MINIMUM_HOLD = 7
+local BASE_RESPONSE_MINIMUM_HOLD = 5
 local BASE_THREAT_DECAY_PER_SECOND = 0.09
 local STRUCTURE_EMERGENCY_HOLD = 3
 local LANE_DOOR_HOLD_DISTANCE = 260
@@ -414,8 +417,10 @@ function XHSBotTeamDirector:CalculateBaseThreat(now)
 	if GameMode ~= nil and GameMode.FarmEvent_occuring == true then
 		self.base_threat_score = 0
 		self.base_threat_active = false
+		self.base_response_hold_until = 0
 		return {
 			active = false,
+			response_required = false,
 			score = 0,
 			anchor = Vector(0, 0, 0),
 			threat_count = 0,
@@ -437,8 +442,10 @@ function XHSBotTeamDirector:CalculateBaseThreat(now)
 	if not IsValidEntityHandle(fort) then
 		self.base_threat_score = 0
 		self.base_threat_active = false
+		self.base_response_hold_until = 0
 		return {
 			active = false,
+			response_required = false,
 			score = 0,
 			anchor = Vector(0, 0, 0),
 			threat_count = 0,
@@ -718,6 +725,21 @@ function XHSBotTeamDirector:CalculateBaseThreat(now)
 		(tonumber(self.base_threat_score) or 0) - elapsed * BASE_THREAT_DECAY_PER_SECOND
 	)
 	local score = Clamp(math.max(rawScore, rememberedScore), 0, 1.5)
+	-- A far special wave is strategic lane pressure, not permission to pull
+	-- every bot off its own door. Global regrouping starts only when meaningful
+	-- pressure reaches the castle envelope or a protected structure is attacked.
+	local responseRequired = structureEmergency
+		or fortTargetCount > 0
+		or immediateCount > 0
+			and closestDistance <= 1800
+			and rawScore >= BASE_THREAT_ENTER_SCORE
+	if responseRequired then
+		self.base_response_hold_until = now + BASE_RESPONSE_MINIMUM_HOLD
+	elseif now < (tonumber(self.base_response_hold_until) or 0) then
+		-- Do not bounce base -> lane -> base while the last castle contact is
+		-- only briefly outside a scan/visibility boundary.
+		responseRequired = true
+	end
 	local active = self.base_threat_active == true
 	if rawScore >= BASE_THREAT_ENTER_SCORE then
 		active = true
@@ -743,6 +765,7 @@ function XHSBotTeamDirector:CalculateBaseThreat(now)
 	self.base_threat_last_sample_at = now
 	return {
 		active = active,
+		response_required = responseRequired,
 		score = score,
 		raw_score = rawScore,
 		anchor = CopyPosition(anchor),
@@ -804,6 +827,7 @@ function XHSBotTeamDirector:BuildStrategicSnapshot(phase)
 	snapshot.base_threat = self:CalculateBaseThreat(snapshot.built_at)
 	if phase >= 3 and snapshot.base_threat.structure_emergency ~= true then
 		snapshot.base_threat.active = false
+		snapshot.base_threat.response_required = false
 		snapshot.base_threat.score = 0
 	end
 	if phase == 1 then
@@ -978,14 +1002,20 @@ function XHSBotTeamDirector:RefreshShoppingAllowlist(playerIDs)
 	end
 
 	table.sort(candidates, function(left, right)
+		if left.emergency_health ~= right.emergency_health then
+			return left.emergency_health
+		end
 		if left.urgent ~= right.urgent then
 			return left.urgent
 		end
-		if left.already_shopping ~= right.already_shopping then
-			return left.already_shopping
-		end
 		if left.requested_at ~= right.requested_at then
 			return left.requested_at < right.requested_at
+		end
+		-- Preserve a current route only after older requests had their turn.
+		-- Otherwise one bot can buy an item, immediately request the next one,
+		-- remain "already shopping", and starve Enchantress forever.
+		if left.already_shopping ~= right.already_shopping then
+			return left.already_shopping
 		end
 		return left.player_id < right.player_id
 	end)
@@ -1261,6 +1291,7 @@ function XHSBotTeamDirector:BuildAssignment(playerID, slot, phase, now, snapshot
 		and not canRespondToStructure
 	if IsValidEntityHandle(hero) and hero:IsAlive()
 		and baseThreat ~= nil and baseThreat.active == true
+		and baseThreat.response_required == true
 		and not preserveEmergencyShopping
 		and (not structureEmergency or canRespondToStructure) then
 		assignment.goal = "defend_base"
@@ -1275,6 +1306,9 @@ function XHSBotTeamDirector:BuildAssignment(playerID, slot, phase, now, snapshot
 		assignment.base_threat_count = baseThreat.threat_count
 		assignment.base_special_count = baseThreat.special_count
 		assignment.base_dragon_count = baseThreat.dragon_count
+		assignment.base_immediate_count = baseThreat.immediate_count
+		assignment.base_structure_emergency =
+			baseThreat.structure_emergency == true
 		assignment.objective_loss_seconds =
 			baseThreat.objective_loss_seconds
 		assignment.objective_incoming_dps =
@@ -1343,6 +1377,8 @@ function XHSBotTeamDirector:BuildAssignment(playerID, slot, phase, now, snapshot
 		record.follow_human_player_id = assignment.follow_human_player_id
 		record.base_threat_score = baseThreat and baseThreat.score or 0
 		record.base_threat_active = baseThreat and baseThreat.active == true or false
+		record.base_response_required = baseThreat
+			and baseThreat.response_required == true or false
 		record.base_threat_count = baseThreat and baseThreat.threat_count or 0
 		record.base_special_count = baseThreat and baseThreat.special_count or 0
 		record.base_dragon_count = baseThreat and baseThreat.dragon_count or 0
@@ -1381,7 +1417,9 @@ function XHSBotTeamDirector:ShouldReplaceAssignment(existing, phase, now, snapsh
 	end
 	local baseThreatActive = snapshot ~= nil and snapshot.base_threat ~= nil
 		and snapshot.base_threat.active == true
-	local structureEmergency = baseThreatActive
+	local baseResponseRequired = baseThreatActive
+		and snapshot.base_threat.response_required == true
+	local structureEmergency = baseResponseRequired
 		and snapshot.base_threat.structure_emergency == true
 	local finalWaveActive = CustomTimers ~= nil and CustomTimers.proc_final_wave == true
 	local forcedGoal = record and record.forced_goal or nil
@@ -1399,7 +1437,7 @@ function XHSBotTeamDirector:ShouldReplaceAssignment(existing, phase, now, snapsh
 		)
 	local preserveEmergencyShopping = emergencyShoppingActive
 		and not canRespondToStructure
-	local baseThreatControls = baseThreatActive
+	local baseThreatControls = baseResponseRequired
 		and not preserveEmergencyShopping
 		and (not structureEmergency or canRespondToStructure)
 		and forcedGoal == nil
@@ -1432,12 +1470,12 @@ function XHSBotTeamDirector:ShouldReplaceAssignment(existing, phase, now, snapsh
 		and not baseThreatControls
 		and shoppingAllowed
 		and (emergencyShoppingActive
-			or not finalWaveActive and not baseThreatActive)
+			or not finalWaveActive and not baseResponseRequired)
 	if shoppingActive ~= (existing.goal == "shop") then return true end
 	if shoppingActive and existing.shopping_item ~= record.shopping_goal.item then return true end
 
 	if phase == 3 and not farmEventActive and not finalWaveActive
-		and not baseThreatActive and forcedGoal == nil
+		and not baseResponseRequired and forcedGoal == nil
 		and not shoppingActive then
 		local bossVisible = IsValidEntityHandle(self.visible_boss)
 		local expectedBossGoal = bossVisible and "fight_boss"
@@ -1499,6 +1537,8 @@ function XHSBotTeamDirector:Update(force)
 		if record ~= nil then
 			record.base_threat_score = snapshot.base_threat.score or 0
 			record.base_threat_active = snapshot.base_threat.active == true
+			record.base_response_required =
+				snapshot.base_threat.response_required == true
 			record.base_threat_count = snapshot.base_threat.threat_count or 0
 			record.base_special_count = snapshot.base_threat.special_count or 0
 			record.base_dragon_count = snapshot.base_threat.dragon_count or 0
@@ -1581,12 +1621,18 @@ function XHSBotTeamDirector:Update(force)
 				record.follow_human_player_id = followHumanPlayerID
 			end
 		elseif existing.goal == "defend_base"
-			and snapshot.base_threat.active == true then
+			and snapshot.base_threat.active == true
+			and snapshot.base_threat.response_required == true then
 			existing.anchor = CopyPosition(snapshot.base_threat.anchor)
+			existing.threat_position =
+				CopyPosition(snapshot.base_threat.threat_position)
 			existing.base_threat_score = snapshot.base_threat.score
 			existing.base_threat_count = snapshot.base_threat.threat_count
 			existing.base_special_count = snapshot.base_threat.special_count
 			existing.base_dragon_count = snapshot.base_threat.dragon_count
+			existing.base_immediate_count = snapshot.base_threat.immediate_count
+			existing.base_structure_emergency =
+				snapshot.base_threat.structure_emergency == true
 			existing.objective_loss_seconds =
 				snapshot.base_threat.objective_loss_seconds
 			existing.objective_incoming_dps =
@@ -1656,6 +1702,7 @@ function XHSBotTeamDirector:Reset()
 	self.base_threat_score = 0
 	self.base_threat_active = false
 	self.base_threat_hold_until = 0
+	self.base_response_hold_until = 0
 	self.base_threat_last_sample_at = 0
 	self.base_threat_unit_samples = {}
 	self.base_threat_fort_health = nil

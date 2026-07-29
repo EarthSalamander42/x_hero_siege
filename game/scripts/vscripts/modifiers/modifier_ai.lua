@@ -262,7 +262,8 @@ function modifier_ai:MaintainFarmEvent()
 	end
 
 	local attackTarget = self.parent:GetAttackTarget()
-	if not IsLivingTarget(attackTarget) or attackTarget ~= hero then
+	local stalled = not self.parent:IsMoving() and not self.parent:IsAttacking()
+	if not IsLivingTarget(attackTarget) or attackTarget ~= hero or stalled then
 		self.parent:SetForceAttackTarget(hero)
 		ExecuteOrderFromTable({
 			UnitIndex = self.parent:entindex(),
@@ -450,6 +451,13 @@ function modifier_ai:FindAbilityTargets(ability, entry, castRange)
 			searchOrder,
 			false
 		)
+		local validAllies = {}
+		for _, ally in ipairs(allies) do
+			if not IsBreakableTarget(ally) then
+				table.insert(validAllies, ally)
+			end
+		end
+		allies = validAllies
 	end
 
 	if self.ai_state == 3 or self.ai_state == 4 then

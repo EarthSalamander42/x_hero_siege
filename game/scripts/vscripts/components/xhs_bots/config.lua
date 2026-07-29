@@ -9,6 +9,7 @@ XHSBotConfig.DEFAULTS = {
 	count = 0,
 	difficulty = "normal",
 	composition = "balanced",
+	spectator_mode = false,
 }
 
 XHSBotConfig.DIFFICULTIES = {
@@ -138,6 +139,10 @@ local function ClampInteger(value, minimum, maximum)
 	return math.max(minimum, math.min(maximum, value))
 end
 
+local function IsTruthy(value)
+	return value == true or value == 1 or value == "1" or value == "true"
+end
+
 function XHSBotConfig:IsBossTarget(unit)
 	if unit == nil or unit.IsNull == nil or unit:IsNull() then return false end
 
@@ -192,12 +197,14 @@ function XHSBotConfig:Normalize(raw, humanCount)
 		math.max(0, self.MAX_TEAM_SIZE - humanCount)
 	)
 	local count = ClampInteger(raw.count, 0, maximumBots)
+	local spectatorMode = IsTruthy(raw.spectator_mode) and count > 0
 
 	return {
 		enabled = count > 0,
 		count = count,
 		difficulty = difficulty,
 		composition = composition,
+		spectator_mode = spectatorMode,
 		human_count = humanCount,
 		maximum_bots = maximumBots,
 	}

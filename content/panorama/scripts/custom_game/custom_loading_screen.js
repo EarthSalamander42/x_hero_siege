@@ -29,6 +29,7 @@ var xhs_bot_setup_draft = {
 	bot_count: 0,
 	ai_difficulty: "normal",
 	composition: "balanced",
+	spectator_mode: false,
 };
 var xhs_bot_setup_dirty = false;
 var xhs_bot_setup_pending = false;
@@ -213,6 +214,10 @@ var vote_fallbacks = {
 	loading_screen_bot_setup_damage: "Damage",
 	loading_screen_bot_setup_support: "Support",
 	loading_screen_bot_setup_random: "Random",
+	loading_screen_bot_setup_observer: "Observer",
+	loading_screen_bot_setup_spectator_off: "Play",
+	loading_screen_bot_setup_spectator_on: "Spectate",
+	loading_screen_bot_setup_spectator_note: "Spectator mode: AI allies own every active lane while you observe.",
 	loading_screen_bot_setup_confirm: "Apply AI setup",
 	loading_screen_bot_setup_waiting: "Waiting for the bot controller...",
 	loading_screen_bot_setup_controller: "You control this setup.",
@@ -362,6 +367,7 @@ function XHSBotSetupSnapshot() {
 			max_bots: Math.floor(ToNumber(config.max_bots, 0)),
 			ai_difficulty: String(config.ai_difficulty || ""),
 			composition: String(config.composition || ""),
+			spectator_mode: IsTruthy(config.spectator_mode),
 			status: String(config.status || ""),
 			error: String(config.error || ""),
 		} : null,
@@ -369,6 +375,7 @@ function XHSBotSetupSnapshot() {
 			bot_count: Math.floor(ToNumber(xhs_bot_setup_draft.bot_count, 0)),
 			ai_difficulty: String(xhs_bot_setup_draft.ai_difficulty || ""),
 			composition: String(xhs_bot_setup_draft.composition || ""),
+			spectator_mode: !!xhs_bot_setup_draft.spectator_mode,
 		},
 	};
 }
@@ -477,6 +484,7 @@ function XHSBotSetupSyncDraftFromConfig() {
 		bot_count: xhs_bot_setup_draft.bot_count,
 		ai_difficulty: xhs_bot_setup_draft.ai_difficulty,
 		composition: xhs_bot_setup_draft.composition,
+		spectator_mode: xhs_bot_setup_draft.spectator_mode,
 	};
 	xhs_bot_setup_draft.bot_count = Math.max(
 		0,
@@ -491,6 +499,7 @@ function XHSBotSetupSyncDraftFromConfig() {
 		composition = "balanced";
 	}
 	xhs_bot_setup_draft.composition = composition;
+	xhs_bot_setup_draft.spectator_mode = IsTruthy(xhs_bot_setup_config.spectator_mode);
 	xhs_bot_setup_synced = true;
 	XHSBotSetupLog("draft_synced_from_config", {
 		previous_draft: previous_draft,
@@ -593,6 +602,9 @@ function XHSBotSetupChangeCount(delta) {
 		return;
 	}
 	xhs_bot_setup_draft.bot_count = next_count;
+	if (next_count === 0) {
+		xhs_bot_setup_draft.spectator_mode = false;
+	}
 	xhs_bot_setup_dirty = true;
 	XHSBotSetupLog("count_change_applied", {
 		delta: delta,
@@ -678,6 +690,23 @@ function XHSBotSetupSelectComposition(composition) {
 	});
 }
 
+function XHSBotSetupSelectSpectatorMode(enabled) {
+	var edit_block_reason = XHSBotSetupGetEditBlockReason();
+	if (edit_block_reason) {
+		return;
+	}
+	enabled = !!enabled;
+	if (enabled && xhs_bot_setup_draft.bot_count < 1) {
+		xhs_bot_setup_draft.bot_count = Math.min(1, XHSBotSetupMaxBots());
+	}
+	if (xhs_bot_setup_draft.spectator_mode === enabled) {
+		return;
+	}
+	xhs_bot_setup_draft.spectator_mode = enabled;
+	xhs_bot_setup_dirty = true;
+	XHSBotSetupRender("spectator_mode_select");
+}
+
 function XHSBotSetupConfirm() {
 	var edit_block_reason = XHSBotSetupGetEditBlockReason();
 	XHSBotSetupLog("confirm_requested", {
@@ -709,6 +738,7 @@ function XHSBotSetupConfirm() {
 		bot_count: requested_count,
 		ai_difficulty: xhs_bot_setup_draft.ai_difficulty,
 		composition: xhs_bot_setup_draft.composition,
+		spectator_mode: xhs_bot_setup_draft.spectator_mode ? 1 : 0,
 	};
 	XHSBotSetupLog("confirm_sending", {
 		request_token: request_token,
@@ -818,6 +848,32 @@ function XHSBotSetupBuildCard() {
 		})(compositions[i]);
 	}
 
+	var spectator_row = $.CreatePanel("Panel", card, "");
+	spectator_row.AddClass("xhs-bot-setup-field-row");
+	XHSBotSetupMakeLabel(spectator_row, "xhs-bot-setup-field-label", L("loading_screen_bot_setup_observer"));
+	var spectator_controls = $.CreatePanel("Panel", spectator_row, "");
+	spectator_controls.AddClass("xhs-bot-setup-inline-controls");
+	xhs_bot_setup_ui.spectator = {};
+	xhs_bot_setup_ui.spectator.off = XHSBotSetupMakeButton(
+		spectator_controls,
+		"XHSBotSetupSpectatorOff",
+		L("loading_screen_bot_setup_spectator_off"),
+		"Choice",
+		function () { XHSBotSetupSelectSpectatorMode(false); }
+	);
+	xhs_bot_setup_ui.spectator.on = XHSBotSetupMakeButton(
+		spectator_controls,
+		"XHSBotSetupSpectatorOn",
+		L("loading_screen_bot_setup_spectator_on"),
+		"Choice",
+		function () { XHSBotSetupSelectSpectatorMode(true); }
+	);
+	xhs_bot_setup_ui.spectator_note = XHSBotSetupMakeLabel(
+		card,
+		"xhs-bot-setup-spectator-note",
+		L("loading_screen_bot_setup_spectator_note")
+	);
+
 	xhs_bot_setup_ui.summary = XHSBotSetupMakeLabel(card, "xhs-bot-setup-summary", "");
 	xhs_bot_setup_ui.controller = XHSBotSetupMakeLabel(card, "xhs-bot-setup-controller", "");
 	xhs_bot_setup_ui.status = XHSBotSetupMakeLabel(card, "xhs-bot-setup-status", "");
@@ -885,6 +941,13 @@ function XHSBotSetupRender(reason) {
 		composition_button.SetHasClass("Selected", composition === xhs_bot_setup_draft.composition);
 		XHSBotSetupSetButtonEnabled(composition_button, can_edit);
 	}
+	xhs_bot_setup_ui.spectator.off.SetHasClass("Selected", !xhs_bot_setup_draft.spectator_mode);
+	xhs_bot_setup_ui.spectator.on.SetHasClass("Selected", !!xhs_bot_setup_draft.spectator_mode);
+	XHSBotSetupSetButtonEnabled(xhs_bot_setup_ui.spectator.off, can_edit);
+	XHSBotSetupSetButtonEnabled(xhs_bot_setup_ui.spectator.on, can_edit);
+	xhs_bot_setup_ui.spectator_note.style.visibility = xhs_bot_setup_draft.spectator_mode
+		? "visible"
+		: "collapse";
 
 	var difficulty_text = L("loading_screen_bot_setup_" + xhs_bot_setup_draft.ai_difficulty);
 	var composition_text = L("loading_screen_bot_setup_" + xhs_bot_setup_draft.composition);
@@ -922,6 +985,7 @@ function XHSBotSetupRender(reason) {
 		count_plus_enabled: can_edit && count < maximum,
 		difficulty_enabled: can_edit,
 		composition_enabled: can_edit,
+		spectator_enabled: can_edit,
 		confirm_enabled: can_edit && xhs_bot_setup_dirty,
 		server_status: server_status,
 		error_text: error_text,

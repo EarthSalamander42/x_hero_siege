@@ -14,7 +14,7 @@
 		"emblem"			{ "trigger" "hero cosmetic loadout" "owner_rule" "true_player_hero" "required_fields" "pfx" "cp_profile" "parent_origin_follow" }
 		"companion"		{ "trigger" "hero spawn/loadout" "owner_rule" "true_player_hero" "required_fields" "unit" "cp_profile" "npc_unit" }
 		"effigy"			{ "trigger" "effigy placement/loadout" "owner_rule" "true_player_hero" "required_fields" "unit" "cp_profile" "npc_unit" }
-		"potion"			{ "trigger" "XHS health or mana potion consumed" "owner_rule" "true_player_hero_consumer" "required_fields" "health_pfx,mana_pfx" "cp_profile" "cp0_recipient" }
+		"potion"			{ "trigger" "XHS health, mana, or light potion consumed" "owner_rule" "true_player_hero_consumer" "required_fields" "health_pfx,mana_pfx,light_pfx" "cp_profile" "cp0_consumer" }
 		"rebirth"			{ "trigger" "Ankh or Tombstone final revive burst" "owner_rule" "true_player_hero_revived" "required_fields" "pfx" "cp_profile" "cp0_revived_hero" }
 		"attack_lifesteal"	{ "trigger" "positive attack lifesteal heal" "owner_rule" "true_player_hero_beneficiary" "required_fields" "pfx" "cp_profile" "beneficiary_victim_actual_heal" }
 		"spell_lifesteal"	{ "trigger" "positive spell lifesteal heal batch" "owner_rule" "true_player_hero_beneficiary" "required_fields" "pfx" "cp_profile" "beneficiary_aoe_aggregate" }
@@ -28,21 +28,21 @@
 	"catalog"
 	{
 		// Modern teleport pairs
-		"41" { "item_name" "sp26_teleport_fall_2025" "item_type" "teleport" "slot_id" "teleport" "item_rarity" "rare" "image_inventory" "s2r://panorama/images/compendium/fall2016/prestigerewards/teleport_psd.vtex" "start_pfx" "particles/econ/events/seasonal_reward_line_fall_2025/teleport_start_fallrewardline_2025.vpcf" "end_pfx" "particles/econ/events/seasonal_reward_line_fall_2025/teleport_end_fallrewardline_2025.vpcf" }
-		"42" { "item_name" "sp26_teleport_spring_2026" "item_type" "teleport" "slot_id" "teleport" "item_rarity" "mythical" "image_inventory" "s2r://panorama/images/compendium/spring2016/prestigerewards/teleport_psd.vtex" "start_pfx" "particles/econ/events/seasonal_reward_line_spring_2026/teleport_start_springrewardline_2026.vpcf" "end_pfx" "particles/econ/events/seasonal_reward_line_spring_2026/teleport_end_springrewardline_2026.vpcf" }
+		"41" { "item_name" "sp26_teleport_fall_2025" "item_type" "teleport" "slot_id" "teleport" "item_rarity" "rare" "image_inventory" "s2r://panorama/images/compendium/fall2016/prestigerewards/teleport_psd.vtex" "start_pfx" "particles/econ/events/fall_2022/teleport/teleport_fall2022_lvl3.vpcf" "end_pfx" "particles/econ/events/fall_2022/teleport/teleport_fall2022_end_lvl3.vpcf" }
+		"42" { "item_name" "sp26_teleport_spring_2026" "item_type" "teleport" "slot_id" "teleport" "item_rarity" "mythical" "image_inventory" "s2r://panorama/images/compendium/spring2016/prestigerewards/teleport_psd.vtex" "start_pfx" "particles/econ/events/compendium_2023/compendium_2023_teleport_lvl3.vpcf" "end_pfx" "particles/econ/events/compendium_2023/compendium_2023_teleport_lvl3_end.vpcf" }
 		"43" { "item_name" "sp26_teleport_winter_2025" "item_type" "teleport" "slot_id" "teleport" "item_rarity" "mythical" "image_inventory" "s2r://panorama/images/compendium/winter2017/prestigerewards/teleport_psd.vtex" "start_pfx" "particles/econ/events/seasonal_reward_line_winter_2025/teleport_start_winterrewardline_2025.vpcf" "end_pfx" "particles/econ/events/seasonal_reward_line_winter_2025/teleport_end_winterrewardline_2025.vpcf" }
-		"44" { "item_name" "sp26_teleport_summer_2026" "item_type" "teleport" "slot_id" "teleport" "item_rarity" "legendary" "image_inventory" "s2r://panorama/images/compendium/international2020/prestigerewards/teleport_psd.vtex" "start_pfx" "particles/econ/events/seasonal_reward_line_summer_2026/teleport_start_summerrewardline_2026.vpcf" "end_pfx" "particles/econ/events/seasonal_reward_line_summer_2026/teleport_end_summerrewardline_2026.vpcf" }
+		"44" { "item_name" "sp26_teleport_summer_2026" "item_type" "teleport" "slot_id" "teleport" "item_rarity" "legendary" "image_inventory" "s2r://panorama/images/compendium/international2020/prestigerewards/teleport_psd.vtex" "start_pfx" "particles/econ/events/compendium_2024/compendium_2024_teleport_lvl3.vpcf" "end_pfx" "particles/econ/events/compendium_2024/compendium_2024_teleport_lvl3_end.vpcf" }
 
 		// Modern ascension/level-up parents
 		"45" { "item_name" "sp26_ascension_fall_2025" "item_type" "levelup" "slot_id" "levelup" "item_rarity" "rare" "image_inventory" "s2r://panorama/images/compendium/international2018/prestigerewards/levelup_fx_png.vtex" "pfx" "particles/econ/events/seasonal_reward_line_fall_2025/hero_levelup_fallrewardline_2025.vpcf" }
 		"46" { "item_name" "sp26_ascension_spring_2026" "item_type" "levelup" "slot_id" "levelup" "item_rarity" "mythical" "image_inventory" "s2r://panorama/images/compendium/international2019/prestigerewards/levelup_fx_png.vtex" "pfx" "particles/econ/events/seasonal_reward_line_spring_2026/hero_levelup_springrewardline_2026.vpcf" }
-		"47" { "item_name" "sp26_ascension_winter_2025" "item_type" "levelup" "slot_id" "levelup" "item_rarity" "mythical" "image_inventory" "s2r://panorama/images/compendium/international2017/prestigerewards/levelup_fx_png.vtex" "pfx" "particles/econ/events/seasonal_reward_line_winter_2025/hero_levelup_winterrewardline_2025.vpcf" }
+		"47" { "item_name" "sp26_ascension_winter_2025" "item_type" "levelup" "slot_id" "levelup" "item_rarity" "mythical" "image_inventory" "s2r://panorama/images/compendium/international2017/prestigerewards/levelup_fx_png.vtex" "pfx" "particles/econ/events/fall_2022/level_up/hero_levelup_fall2022.vpcf" }
 		"48" { "item_name" "sp26_ascension_summer_2026" "item_type" "levelup" "slot_id" "levelup" "item_rarity" "legendary" "image_inventory" "s2r://panorama/images/compendium/international2020/prestigerewards/levelup_fx_png.vtex" "pfx" "particles/econ/events/seasonal_reward_line_summer_2026/hero_levelup_summerrewardline_2026.vpcf" }
 
 		// Additions to retained Kill Effects and Emblems
 		"49" { "item_name" "sp26_kill_drow_arcana" "item_type" "kill_effect" "slot_id" "kill_effect" "item_rarity" "arcana" "image_inventory" "econ/items/drow/dread_retribution/drow_arcana_weapon" "target_pfx" "particles/econ/items/drow/drow_arcana/drow_arcana_revenge_kill_effect_target.vpcf" "caster_pfx" "particles/econ/items/drow/drow_arcana/drow_arcana_revenge_kill_effect_caster.vpcf" }
 		"50" { "item_name" "sp26_kill_drow_arcana_style2" "item_type" "kill_effect" "slot_id" "kill_effect" "item_rarity" "arcana" "image_inventory" "econ/items/drow/dread_retribution/drow_arcana_weapon_style1" "target_pfx" "particles/econ/items/drow/drow_arcana/drow_v2_arcana_revenge_kill_effect_target.vpcf" "caster_pfx" "particles/econ/items/drow/drow_arcana/drow_v2_arcana_revenge_kill_effect_caster.vpcf" }
-		"51" { "item_name" "sp26_emblem_diretide_violet" "item_type" "emblem" "slot_id" "emblem" "item_rarity" "immortal" "image_inventory" "econ/tools/diretide20_emblem_blue" "pfx" "particles/econ/events/diretide_2020/emblem/fall20_emblem_v3_effect.vpcf" }
+		"51" { "item_name" "sp26_emblem_diretide_violet" "item_type" "emblem" "slot_id" "emblem" "item_rarity" "immortal" "image_inventory" "s2r://panorama/images/compendium/international2018/prestigerewards/hero_effect_png.vtex" "pfx" "particles/econ/events/ti8/ti8_hero_effect.vpcf" }
 
 		// Companions: 8 Free then 8 Premium
 		"52" { "item_name" "sp26_companion_carty" "item_type" "companion" "slot_id" "companion" "item_rarity" "uncommon" "image_inventory" "econ/items/courier/carty/carty" "unit" "npc_donator_companion_carty" }
@@ -52,14 +52,14 @@
 		"56" { "item_name" "sp26_companion_sappling" "item_type" "companion" "slot_id" "companion" "item_rarity" "rare" "image_inventory" "econ/items/courier/little_sappling_style1/little_sappling_style1" "unit" "npc_donator_companion_sappling" }
 		"57" { "item_name" "sp26_companion_vaal" "item_type" "companion" "slot_id" "companion" "item_rarity" "mythical" "image_inventory" "econ/items/courier/vaal_the_animated_constructradiant/vaal_the_animated_constructradiant" "unit" "npc_donator_companion_vaal" }
 		"58" { "item_name" "sp26_companion_raiq" "item_type" "companion" "slot_id" "companion" "item_rarity" "mythical" "image_inventory" "econ/items/courier/raiq/raiq" "unit" "npc_donator_companion_raiq" }
-		"59" { "item_name" "sp26_companion_amphibian_kid" "item_type" "companion" "slot_id" "companion" "item_rarity" "mythical" "image_inventory" "econ/items/courier/amphibian_kid/amphibian_kid" "unit" "npc_donator_companion_amphibian_kid" }
-		"60" { "item_name" "sp26_companion_demi_doom" "item_type" "companion" "slot_id" "companion" "item_rarity" "rare" "image_inventory" "econ/courier/doom_demihero_courier/doom_demihero_courier" "unit" "npc_donator_companion_demi_doom" }
+		"59" { "item_name" "sp26_companion_amphibian_kid" "item_type" "companion" "slot_id" "companion" "item_rarity" "mythical" "image_inventory" "econ/courier/frog/frog" "unit" "npc_donator_companion_frog" }
+		"60" { "item_name" "sp26_companion_demi_doom" "item_type" "companion" "slot_id" "companion" "item_rarity" "rare" "image_inventory" "econ/items/courier/jin_yin_white_fox/jin_yin_white_fox" "unit" "npc_donator_companion_jin" }
 		"61" { "item_name" "sp26_companion_amaterasu" "item_type" "companion" "slot_id" "companion" "item_rarity" "mythical" "image_inventory" "econ/items/courier/amaterasu/amaterasu" "unit" "npc_donator_companion_amaterasu" }
 		"62" { "item_name" "sp26_companion_baekho" "item_type" "companion" "slot_id" "companion" "item_rarity" "mythical" "image_inventory" "econ/items/courier/baekho/baekho" "unit" "npc_donator_companion_baekho" }
-		"63" { "item_name" "sp26_companion_devourling" "item_type" "companion" "slot_id" "companion" "item_rarity" "mythical" "image_inventory" "econ/items/courier/devourling/devourling" "unit" "npc_donator_companion_devourling" }
+		"63" { "item_name" "sp26_companion_devourling" "item_type" "companion" "slot_id" "companion" "item_rarity" "mythical" "image_inventory" "econ/items/courier/chocobo/chocobo" "unit" "npc_donator_companion_chocobo" }
 		"64" { "item_name" "sp26_companion_itsy" "item_type" "companion" "slot_id" "companion" "item_rarity" "legendary" "image_inventory" "econ/items/courier/itsy/itsy" "unit" "npc_donator_companion_itsy" }
 		"65" { "item_name" "sp26_companion_butch" "item_type" "companion" "slot_id" "companion" "item_rarity" "legendary" "image_inventory" "econ/items/courier/butch_pudge_dog/butch_pudge_dog" "unit" "npc_donator_companion_butch" }
-		"66" { "item_name" "sp26_companion_golden_venoling" "item_type" "companion" "slot_id" "companion" "item_rarity" "immortal" "image_inventory" "econ/courier/venoling/venoling_gold" "unit" "npc_donator_companion_golden_venoling" }
+		"66" { "item_name" "sp26_companion_golden_venoling" "item_type" "companion" "slot_id" "companion" "item_rarity" "immortal" "image_inventory" "econ/items/courier/snail/courier_snail" "unit" "npc_donator_companion_snelfret" }
 		"67" { "item_name" "sp26_companion_mega_greevil" "item_type" "companion" "slot_id" "companion" "item_rarity" "immortal" "image_inventory" "econ/courier/mega_greevil_courier/mega_greevil_courier" "unit" "npc_donator_companion_mega_greevil" }
 
 		// Effigies
@@ -70,25 +70,26 @@
 		"72" { "item_name" "sp26_effigy_llama" "item_type" "effigy" "slot_id" "effigy" "item_rarity" "legendary" "image_inventory" "econ/items/courier/livery_llama_courier/livery_llama_courier" "unit" "npc_donator_statue_llama" }
 		"73" { "item_name" "sp26_effigy_captain_bamboo" "item_type" "effigy" "slot_id" "effigy" "item_rarity" "immortal" "image_inventory" "econ/items/courier/captain_bamboo/captain_bamboo" "unit" "npc_xhs_effigy_captain_bamboo" }
 
-		// Potions: each reward is an atomic health/mana pair
-		"74" { "item_name" "sp26_potion_ti6" "item_type" "potion" "slot_id" "potion" "item_rarity" "uncommon" "image_inventory" "s2r://panorama/images/compendium/spring2016/prestigerewards/bottle_fx_psd.vtex" "family" "ti6" "health_pfx" "particles/econ/events/ti6/mekanism_recipient_ti6.vpcf" "mana_pfx" "particles/items3_fx/mango_active.vpcf" }
-		"75" { "item_name" "sp26_potion_ti7" "item_type" "potion" "slot_id" "potion" "item_rarity" "rare" "image_inventory" "s2r://panorama/images/compendium/international2017/prestigerewards/bottle_fx_png.vtex" "family" "ti7" "health_pfx" "particles/econ/events/ti7/mekanism_recipient_ti7.vpcf" "mana_pfx" "particles/items_fx/arcane_boots_recipient.vpcf" }
-		"76" { "item_name" "sp26_potion_ti8" "item_type" "potion" "slot_id" "potion" "item_rarity" "rare" "image_inventory" "s2r://panorama/images/compendium/international2018/prestigerewards/bottle_fx_png.vtex" "family" "ti8" "health_pfx" "particles/econ/events/ti8/mekanism_recipient_ti8.vpcf" "mana_pfx" "particles/units/heroes/hero_keeper_of_the_light/keeper_chakra_magic.vpcf" }
-		"77" { "item_name" "sp26_potion_ti9" "item_type" "potion" "slot_id" "potion" "item_rarity" "mythical" "image_inventory" "s2r://panorama/images/compendium/international2019/prestigerewards/bottle_fx_png.vtex" "family" "ti9" "health_pfx" "particles/econ/events/ti9/mekanism_recipient_ti9.vpcf" "mana_pfx" "particles/units/heroes/hero_obsidian_destroyer/obsidian_destroyer_essence_effect.vpcf" }
-		"78" { "item_name" "sp26_potion_ti10" "item_type" "potion" "slot_id" "potion" "item_rarity" "mythical" "image_inventory" "s2r://panorama/images/compendium/international2020/prestigerewards/bottle_fx_png.vtex" "family" "ti10" "health_pfx" "particles/econ/events/ti10/mekanism_recipient_ti10.vpcf" "mana_pfx" "particles/units/heroes/hero_medusa/medusa_mana_shield_buff_burst.vpcf" }
-		"79" { "item_name" "sp26_potion_fall_2022" "item_type" "potion" "slot_id" "potion" "item_rarity" "legendary" "image_inventory" "s2r://panorama/images/compendium/international2022/prestigerewards/bottle_fx_png.vtex" "family" "fall_2022" "health_pfx" "particles/econ/events/fall_2022/mekanism/mekanism_recipient_fall2022.vpcf" "mana_pfx" "particles/items2_fx/soul_ring.vpcf" }
-		"80" { "item_name" "sp26_potion_fall_2025" "item_type" "potion" "slot_id" "potion" "item_rarity" "legendary" "image_inventory" "s2r://panorama/images/compendium/international2018/prestigerewards/bottle_fx_png.vtex" "family" "fall_2025" "health_pfx" "particles/econ/events/seasonal_reward_line_fall_2025/mekanism_fallrewardline_2025.vpcf" "mana_pfx" "particles/units/heroes/hero_antimage/antimage_manavoid_buff_burst.vpcf" }
-		"81" { "item_name" "sp26_potion_summer_2026" "item_type" "potion" "slot_id" "potion" "item_rarity" "immortal" "image_inventory" "s2r://panorama/images/compendium/international2020/prestigerewards/bottle_fx_png.vtex" "family" "summer_2026" "health_pfx" "particles/econ/events/seasonal_reward_line_summer_2026/mekanism_summerrewardline_2026.vpcf" "mana_pfx" "particles/items_fx/arcane_boots.vpcf" }
+		// Potions: every reward is one atomic Health + Mana + Light bundle.
+		// Light always uses the Mekansm caster/source parent, never its recipient parent.
+		"74" { "item_name" "sp26_potion_ti6" "item_type" "potion" "slot_id" "potion" "item_rarity" "uncommon" "image_inventory" "s2r://panorama/images/compendium/spring2016/prestigerewards/bottle_fx_psd.vtex" "family" "ti6_ti7" "health_pfx" "particles/econ/events/ti7/bottle_ti7.vpcf" "mana_pfx" "particles/econ/events/ti6/bottle_ti6.vpcf" "light_pfx" "particles/econ/events/ti6/mekanism_ti6.vpcf" }
+		"75" { "item_name" "sp26_potion_ti7" "item_type" "potion" "slot_id" "potion" "item_rarity" "rare" "image_inventory" "s2r://panorama/images/compendium/spring2016/prestigerewards/bottle_fx_psd.vtex" "family" "spring_2026" "health_pfx" "particles/items3_fx/fish_bones_active.vpcf" "mana_pfx" "particles/items3_fx/mango_active.vpcf" "light_pfx" "particles/econ/events/seasonal_reward_line_spring_2026/mekanism_springrewardline_2026.vpcf" }
+		"76" { "item_name" "sp26_potion_ti8" "item_type" "potion" "slot_id" "potion" "item_rarity" "rare" "image_inventory" "s2r://panorama/images/compendium/international2018/prestigerewards/bottle_fx_png.vtex" "family" "ti8" "health_pfx" "particles/econ/items/oracle/oracle_ti10_immortal/oracle_ti10_immortal_purifyingflames_heal_ring.vpcf" "mana_pfx" "particles/units/heroes/hero_keeper_of_the_light/keeper_chakra_magic.vpcf" "light_pfx" "particles/econ/events/ti8/mekanism_ti8.vpcf" }
+		"77" { "item_name" "sp26_potion_ti9" "item_type" "potion" "slot_id" "potion" "item_rarity" "mythical" "image_inventory" "s2r://panorama/images/compendium/international2019/prestigerewards/bottle_fx_png.vtex" "family" "ti9" "health_pfx" "particles/econ/items/dazzle/dazzle_ti9/dazzle_shadow_wave_ti9_impact_heal.vpcf" "mana_pfx" "particles/econ/events/ti9/bottle_ti9.vpcf" "light_pfx" "particles/econ/events/ti9/mekanism_ti9.vpcf" }
+		"78" { "item_name" "sp26_potion_ti10" "item_type" "potion" "slot_id" "potion" "item_rarity" "mythical" "image_inventory" "s2r://panorama/images/compendium/international2020/prestigerewards/bottle_fx_png.vtex" "family" "ti10" "health_pfx" "particles/units/heroes/hero_abaddon/abaddon_borrowed_time_heal.vpcf" "mana_pfx" "particles/units/heroes/hero_medusa/medusa_mana_shield_buff_burst.vpcf" "light_pfx" "particles/econ/events/ti10/mekanism_ti10.vpcf" }
+		"79" { "item_name" "sp26_potion_fall_2022" "item_type" "potion" "slot_id" "potion" "item_rarity" "legendary" "image_inventory" "s2r://panorama/images/compendium/international2022/prestigerewards/bottle_fx_png.vtex" "family" "fall_2022" "health_pfx" "particles/items2_fx/urn_of_shadows_heal.vpcf" "mana_pfx" "particles/items3_fx/warmage_mana.vpcf" "light_pfx" "particles/econ/events/fall_2022/mekanism/mekanism_fall2022.vpcf" }
+		"80" { "item_name" "sp26_potion_fall_2025" "item_type" "potion" "slot_id" "potion" "item_rarity" "legendary" "image_inventory" "s2r://panorama/images/compendium/international2018/prestigerewards/bottle_fx_png.vtex" "family" "fall_2025" "health_pfx" "particles/items4_fx/spirit_vessel_heal.vpcf" "mana_pfx" "particles/units/heroes/hero_antimage/antimage_manavoid_buff_burst.vpcf" "light_pfx" "particles/econ/events/seasonal_reward_line_fall_2025/mekanism_fallrewardline_2025.vpcf" }
+		"81" { "item_name" "sp26_potion_summer_2026" "item_type" "potion" "slot_id" "potion" "item_rarity" "immortal" "image_inventory" "s2r://panorama/images/compendium/international2020/prestigerewards/bottle_fx_png.vtex" "family" "summer_2026" "health_pfx" "particles/events/crownfall/survivors/cheese_pickup.vpcf" "mana_pfx" "particles/events/crownfall/minesweeper/use_mana_pot.vpcf" "light_pfx" "particles/econ/events/seasonal_reward_line_summer_2026/mekanism_summerrewardline_2026.vpcf" }
 
 		// Rebirth bursts (timers/channels are intentionally outside these parents)
 		"82" { "item_name" "sp26_rebirth_respawn" "item_type" "rebirth" "slot_id" "rebirth" "item_rarity" "uncommon" "image_inventory" "items/aegis" "pfx" "particles/generic_hero_status/respawn.vpcf" }
 		"83" { "item_name" "sp26_rebirth_wraith_king" "item_type" "rebirth" "slot_id" "rebirth" "item_rarity" "rare" "image_inventory" "spellicons/skeleton_king_reincarnation" "pfx" "particles/units/heroes/hero_skeletonking/wraith_king_reincarnate.vpcf" }
-		"84" { "item_name" "sp26_rebirth_prime_2" "item_type" "rebirth" "slot_id" "rebirth" "item_rarity" "rare" "image_inventory" "items/aegis" "pfx" "particles/prime/hero_spawn_hero_level_2.vpcf" }
-		"85" { "item_name" "sp26_rebirth_prime_3" "item_type" "rebirth" "slot_id" "rebirth" "item_rarity" "mythical" "image_inventory" "items/aegis" "pfx" "particles/prime/hero_spawn_hero_level_3.vpcf" }
-		"86" { "item_name" "sp26_rebirth_crownfall_golem" "item_type" "rebirth" "slot_id" "rebirth" "item_rarity" "mythical" "image_inventory" "events/crownfall/survivors/enemy_thumbnails/golem" "pfx" "particles/events/crownfall/survivors/enemies/golem_respawn.vpcf" }
+		"84" { "item_name" "sp26_rebirth_prime_2" "item_type" "rebirth" "slot_id" "rebirth" "item_rarity" "rare" "image_inventory" "econ/items/dark_willow/dark_willow_immortal_2021/dark_willow_immortal_2021_head" "pfx" "particles/econ/items/dark_willow/ether/ether_spawn.vpcf" }
+		"85" { "item_name" "sp26_rebirth_prime_3" "item_type" "rebirth" "slot_id" "rebirth" "item_rarity" "mythical" "image_inventory" "econ/items/earthshaker/earthshaker_arcana/earthshaker_arcana_head" "pfx" "particles/econ/items/earthshaker/earthshaker_arcana/earthshaker_arcana_spawn.vpcf" }
+		"86" { "item_name" "sp26_rebirth_crownfall_golem" "item_type" "rebirth" "slot_id" "rebirth" "item_rarity" "mythical" "image_inventory" "spellicons/phoenix_supernova" "pfx" "particles/units/heroes/hero_phoenix/phoenix_supernova_reborn.vpcf" }
 		"87" { "item_name" "sp26_rebirth_wraith_arcana" "item_type" "rebirth" "slot_id" "rebirth" "item_rarity" "arcana" "image_inventory" "spellicons/skeleton_king/arcana/skeleton_king_reincarnation_arcana" "pfx" "particles/econ/items/wraith_king/wraith_king_arcana/wk_arc_reincarn.vpcf" }
 		"88" { "item_name" "sp26_rebirth_wraith_arcana_style2" "item_type" "rebirth" "slot_id" "rebirth" "item_rarity" "arcana" "image_inventory" "spellicons/skeleton_king/arcana/skeleton_king_reincarnation_arcana_alt" "pfx" "particles/econ/items/wraith_king/wraith_king_arcana/wk_arc_reincarn_style2.vpcf" }
-		"89" { "item_name" "sp26_rebirth_prime_6" "item_type" "rebirth" "slot_id" "rebirth" "item_rarity" "immortal" "image_inventory" "items/aegis" "pfx" "particles/prime/hero_spawn_hero_level_6.vpcf" }
+		"89" { "item_name" "sp26_rebirth_prime_6" "item_type" "rebirth" "slot_id" "rebirth" "item_rarity" "immortal" "image_inventory" "econ/items/spectre/spectre_arcana/spectre_arcana_head" "pfx" "particles/econ/items/spectre/spectre_arcana/spectre_arcana_loadout_spawn.vpcf" }
 
 		// Attack and spell lifesteal are separate, independently equipable slots.
 		"90" { "item_name" "sp26_attack_lifesteal_blue" "item_type" "attack_lifesteal" "slot_id" "attack_lifesteal" "item_rarity" "rare" "image_inventory" "items/lifesteal" "pfx" "particles/generic_gameplay/generic_lifesteal_blue.vpcf" }
@@ -108,7 +109,7 @@
 		// Immolation: atomic, coherent owner/target families. Targets are never capped.
 		"101" { "item_name" "sp26_immolation_fall_2022" "item_type" "immolation" "slot_id" "immolation" "item_rarity" "rare" "image_inventory" "s2r://panorama/images/compendium/international2022/prestigerewards/radiance_fx_png.vtex" "family" "fall_2022" "owner_pfx" "particles/econ/events/fall_2022/radiance/radiance_owner_fall2022.vpcf" "target_pfx" "particles/econ/events/fall_2022/radiance_target_fall2022.vpcf" }
 		"102" { "item_name" "sp26_immolation_fall_2025" "item_type" "immolation" "slot_id" "immolation" "item_rarity" "mythical" "image_inventory" "s2r://panorama/images/compendium/international2018/prestigerewards/radiance_fx_png.vtex" "family" "fall_2025" "owner_pfx" "particles/econ/events/seasonal_reward_line_fall_2025/radiance_owner_fallrewardline_2025.vpcf" "target_pfx" "particles/econ/events/seasonal_reward_line_fall_2025/radiance_target_fallrewardline_2025.vpcf" }
-		"103" { "item_name" "sp26_immolation_winter_2025" "item_type" "immolation" "slot_id" "immolation" "item_rarity" "legendary" "image_inventory" "s2r://panorama/images/compendium/international2017/prestigerewards/radiance_fx_png.vtex" "family" "winter_2025" "owner_pfx" "particles/econ/events/seasonal_reward_line_winter_2025/radiance_owner_winterrewardline_2025.vpcf" "target_pfx" "particles/econ/events/seasonal_reward_line_winter_2025/radiance_target_winterrewardline_2025.vpcf" }
+		"103" { "item_name" "sp26_immolation_winter_2025" "item_type" "immolation" "slot_id" "immolation" "item_rarity" "legendary" "image_inventory" "s2r://panorama/images/compendium/international2017/prestigerewards/radiance_fx_png.vtex" "family" "ti7" "owner_pfx" "particles/econ/events/ti7/radiance_owner_ti7.vpcf" "target_pfx" "particles/econ/events/ti7/radiance_owner_ti7_ground_splash.vpcf" }
 		"104" { "item_name" "sp26_immolation_spring_2026" "item_type" "immolation" "slot_id" "immolation" "item_rarity" "legendary" "image_inventory" "s2r://panorama/images/compendium/international2019/prestigerewards/radiance_fx_png.vtex" "family" "spring_2026" "owner_pfx" "particles/econ/events/seasonal_reward_line_spring_2026/radiance_owner_springrewardline_2026.vpcf" "target_pfx" "particles/econ/events/seasonal_reward_line_spring_2026/radiance_springrewardline_2026.vpcf" }
 		"105" { "item_name" "sp26_immolation_summer_2026" "item_type" "immolation" "slot_id" "immolation" "item_rarity" "immortal" "image_inventory" "s2r://panorama/images/compendium/international2020/prestigerewards/radiance_fx_png.vtex" "family" "summer_2026" "owner_pfx" "particles/econ/events/seasonal_reward_line_summer_2026/radiance_owner_summerrewardline_2026.vpcf" "target_pfx" "particles/econ/events/seasonal_reward_line_summer_2026/radiance_target_summerrewardline_2026.vpcf" }
 
@@ -144,24 +145,24 @@
 		{
 			"1" "41"  "2" "111" "3" "52"  "4" "90"  "5" "21"
 			"6" "74"  "7" "112" "8" "82"  "9" "53"  "10" "22"
-			"11" "27" "12" "45" "13" "29" "14" "97" "15" "31"
+			"11" "27" "12" "45" "13" "29" "14" "99" "15" "31"
 			"16" "54" "17" "33" "18" "75" "19" "35" "20" "23"
 			"21" "113" "22" "68" "23" "55" "24" "101" "25" "114"
 			"26" "83" "27" "56" "28" "94" "29" "115" "30" "76"
-			"31" "91" "32" "57" "33" "84" "34" "116" "35" "98"
+			"31" "91" "32" "57" "33" "84" "34" "116" "35" "97"
 			"36" "69" "37" "58" "38" "102" "39" "117" "40" "77"
 			"41" "46" "42" "59" "43" "85" "44" "118" "45" "106"
 			"46" "70" "47" "108" "48" "119" "49" "109" "50" "42"
 		}
 		"premium"
 		{
-			"1" "43"  "2" "120" "3" "60"  "4" "92"  "5" "24"
+			"1" "43"  "2" "120" "3" "60"  "4" "93"  "5" "24"
 			"6" "78"  "7" "86"  "8" "61"  "9" "121" "10" "25"
-			"11" "28" "12" "47" "13" "30" "14" "99" "15" "32"
+			"11" "28" "12" "47" "13" "30" "14" "100" "15" "32"
 			"16" "62" "17" "34" "18" "79" "19" "36" "20" "26"
 			"21" "49" "22" "71" "23" "63" "24" "103" "25" "122"
 			"26" "87" "27" "64" "28" "95" "29" "50" "30" "80"
-			"31" "93" "32" "65" "33" "88" "34" "123" "35" "100"
+			"31" "92" "32" "65" "33" "88" "34" "123" "35" "98"
 			"36" "72" "37" "66" "38" "104" "39" "96" "40" "81"
 			"41" "48" "42" "67" "43" "89" "44" "124" "45" "107"
 			"46" "73" "47" "110" "48" "105" "49" "44" "50" "51"

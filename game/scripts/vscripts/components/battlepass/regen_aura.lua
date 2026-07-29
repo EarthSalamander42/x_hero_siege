@@ -1,12 +1,17 @@
 -- Supporter Pass regeneration aura hook.
 --
--- This controller adds one cosmetic particle to the real hero receiving an
--- allowlisted regeneration effect. Gameplay particles are deliberately left
--- untouched: the empty XHS anchor is only an override point for the equipped
--- Supporter Pass cosmetic.
+-- This controller adds exactly one cosmetic particle to the real hero
+-- receiving an allowlisted regeneration effect. Editable persistent recipient
+-- particles from those sources stay suppressed in their definitions; the
+-- equipped final path is created directly here. One-shot pickup bursts,
+-- shields, guards and ambient source particles stay untouched because they
+-- communicate separate gameplay.
+--
+-- `modifier_fountain_aura_buff` is native engine content: we can observe it
+-- here, but cannot safely replace its built-in particle without a global Dota
+-- particle override. The selected cosmetic is therefore additive at fountain.
 
 local MODIFIER_NAME = "modifier_supporter_regen_aura_controller"
-local ANCHOR_PARTICLE = "particles/custom/supporter_pass/regen_aura_anchor.vpcf"
 local THINK_INTERVAL = 0.15
 local SOURCE_LOSS_GRACE = 0.45
 
@@ -14,7 +19,15 @@ LinkLuaModifier(MODIFIER_NAME, "components/battlepass/regen_aura.lua", LUA_MODIF
 
 SupporterRegenAura = SupporterRegenAura or {}
 SupporterRegenAura.MODIFIER_NAME = MODIFIER_NAME
-SupporterRegenAura.ANCHOR_PARTICLE = ANCHOR_PARTICLE
+SupporterRegenAura.SUPPRESSED_SOURCE_PARTICLES = {
+	"particles/units/heroes/hero_juggernaut/juggernaut_healing_ward_variation02.vpcf",
+	"particles/econ/events/ti6/bottle_ti6.vpcf",
+	"particles/econ/items/juggernaut/jugg_fortunes_tout/jugg_healing_ward_fortunes_tout_ward_gold.vpcf",
+	"particles/econ/courier/courier_faceless_rex/cour_rex_ground_a.vpcf",
+	"particles/econ/courier/courier_roshan_frost/courier_roshan_frost_steam.vpcf",
+	"particles/items_fx/aura_assault.vpcf",
+	"particles/camp_fire_buff.vpcf",
+}
 
 -- Rules are recipient modifier + originating ability. The ability filter is
 -- important for modifiers reused by hostile creature/boss abilities.
@@ -122,19 +135,8 @@ end
 
 function SupporterRegenAura:GetReplacement(hero)
 	if not IsEligibleHero(hero) then return nil end
-
-	local playerID = hero:GetPlayerOwnerID()
-	local value = CustomNetTables:GetTableValue(
-		"supporter_pass_player",
-		ANCHOR_PARTICLE .. "_" .. tostring(playerID)
-	)
-	if type(value) ~= "table" then return nil end
-
-	local replacement = value["1"] or value[1]
-	if replacement == nil then return nil end
-	replacement = tostring(replacement)
-	if replacement == "" or replacement == ANCHOR_PARTICLE then return nil end
-	return replacement
+	if Battlepass == nil or Battlepass.GetPlayerParticle == nil then return nil end
+	return Battlepass:GetPlayerParticle(hero, "regen_aura_pfx")
 end
 
 function SupporterRegenAura:Ensure(hero)
@@ -232,12 +234,9 @@ function modifier_supporter_regen_aura_controller:StartParticle(replacement)
 	local parent = self:GetParent()
 	if not IsEligibleHero(parent) or not parent:IsAlive() then return end
 
-	-- The fifth argument is intentionally the recipient hero. XHS's particle
-	-- override wrapper uses it to resolve the owning player's equipped effect.
 	local particleIndex = ParticleManager:CreateParticle(
-		ANCHOR_PARTICLE,
+		replacement,
 		PATTACH_ABSORIGIN_FOLLOW,
-		parent,
 		parent
 	)
 	if particleIndex == nil or particleIndex < 0 then return end

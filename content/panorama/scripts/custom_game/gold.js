@@ -1,4 +1,4 @@
-/* global FindDotaHudElement, Game, PlayerTables, GameEvents, Players, Entities, DOTA_GameState */
+/* global FindDotaHudElement, Game, PlayerTables, GameEvents, Players, Entities, CustomNetTables, DOTA_GameState */
 /*
 	Author:
 		Chronophylos
@@ -28,8 +28,10 @@ function onGoldChange(table, data) {
 	var unit = Players.GetLocalPlayerPortraitUnit();
 	var localPlayerID = Game.GetLocalPlayerID();
 	var playerID = Entities.GetPlayerOwnerID(unit);
+	var localTeam = Players.GetTeam(localPlayerID);
+	var inspectingSpectatorBot = IsSpectatorInspectingXHSBot(localTeam, playerID);
 
-	if (playerID === -1 || Entities.GetTeamNumber(unit) !== Players.GetTeam(localPlayerID)) {
+	if (playerID === -1 || (Entities.GetTeamNumber(unit) !== localTeam && !inspectingSpectatorBot)) {
 		playerID = localPlayerID;
 	}
 
@@ -49,6 +51,30 @@ function onGoldChange(table, data) {
 
 	UpdateGoldHud(gold);
 	UpdateGoldTooltip(gold);
+}
+
+function IsSpectatorInspectingXHSBot(localTeam, playerID) {
+	if (Number(localTeam) !== 1 || Number(playerID) < 0 ||
+		typeof CustomNetTables === 'undefined' || !CustomNetTables) {
+		return false;
+	}
+
+	var roster = CustomNetTables.GetTableValue('xhs_bots', 'roster') || {};
+	var players = roster.players || {};
+	var entry = players[String(playerID)];
+	if (!entry) {
+		for (var key in players) {
+			var candidate = players[key] || {};
+			if (Number(candidate.player_id) === Number(playerID)) {
+				entry = candidate;
+				break;
+			}
+		}
+	}
+
+	return !!entry &&
+		Number(entry.preview || 0) !== 1 &&
+		String(entry.participant_kind || '') === 'xhs_bot';
 }
 
 function UpdateGoldHud (gold) {

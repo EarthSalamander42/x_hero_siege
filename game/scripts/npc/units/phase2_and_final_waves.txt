@@ -31,8 +31,8 @@
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"    // Type of attack - melee, ranged, etc.
-		"AttackDamageMin"			"790"     // Damage range min.
-		"AttackDamageMax"			"810"     // Damage range max.
+		"AttackDamageMin"			"711"     // Base damage range min. Phase 2 balance: -10%.
+		"AttackDamageMax"			"729"     // Base damage range max. Phase 2 balance: -10%.
 		"AttackDamageType"			"DAMAGE_TYPE_ArmorPhysical"
 		"AttackRate"				"0.9"     // Speed of attack.
 		"AttackAnimationPoint"		"0.39"   // Normalized time in animation cycle to attack.
@@ -59,7 +59,7 @@
 
 		// Status
 		//----------------------------------------------------------------
-		"StatusHealth"				"15000"     // Base health.
+		"StatusHealth"				"12000"     // Base health. Phase 2 balance: -20%.
 		"StatusHealthRegen"			"2.0"     // Health regeneration rate.
 		"StatusMana"				"900"     // Base mana.
 		"StatusManaRegen"			"1.0"     // Mana regeneration rate.
@@ -104,8 +104,8 @@
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"    // Type of attack - melee, ranged, etc.
-		"AttackDamageMin"			"790"     // Damage range min.
-		"AttackDamageMax"			"810"     // Damage range max.
+		"AttackDamageMin"			"711"     // Base damage range min. Phase 2 balance: -10%.
+		"AttackDamageMax"			"729"     // Base damage range max. Phase 2 balance: -10%.
 		"AttackDamageType"			"DAMAGE_TYPE_ArmorPhysical"
 		"AttackRate"				"0.9"     // Speed of attack.
 		"AttackAnimationPoint"		"0.39"   // Normalized time in animation cycle to attack.
@@ -132,7 +132,7 @@
 
 		// Status
 		//----------------------------------------------------------------
-		"StatusHealth"				"15000"     // Base health.
+		"StatusHealth"				"12000"     // Base health. Phase 2 balance: -20%.
 		"StatusHealthRegen"			"10.0"     // Health regeneration rate.
 		"StatusMana"				"900"     // Base mana.
 		"StatusManaRegen"			"1.0"     // Mana regeneration rate.

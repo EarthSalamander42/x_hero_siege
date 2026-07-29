@@ -112,6 +112,10 @@
 		"MaxLevel"		"5"
 		"AbilityBehavior"		"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"AbilityTextureName"		"sniper_headshot"
+		"precache"
+		{
+			"particle"		"particles/items_fx/skull_basher.vpcf"
+		}
 		"AbilityValues"
 		{
 			"proc_chance"		"8 11 14 17 21"

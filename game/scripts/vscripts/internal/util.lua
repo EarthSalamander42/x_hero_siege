@@ -204,6 +204,7 @@ function XHSPlayDoorOpeningCinematic(doorNames, onCameraArrived, options)
 			lock_orders = false,
 			camera_position = target,
 			camera_speed = moveDuration,
+			native_camera = options.native_camera == true,
 			return_camera = options.return_camera ~= false,
 			letterbox_pct = 0,
 			transition = 0.1,

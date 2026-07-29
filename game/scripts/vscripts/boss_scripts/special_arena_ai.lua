@@ -11,9 +11,8 @@ modifier_xhs_special_arena_last_stand = modifier_xhs_special_arena_last_stand or
 
 local PROFILES = {
 	ramero = {
-		{ name = "roshan_stormbolt", cast = "enemy", label = "Storm Bolt", range = 900 },
 		{ name = "sven_warcry", cast = "no_target", label = "Warcry" },
-		{ name = "sven_gods_strength", cast = "no_target", label = "God's Strength" },
+		{ name = "sven_gods_strength", cast = "no_target", label = "God's Strength", partner_death_only = true },
 	},
 	baristol = {
 		{ name = "baristol_holy_light", cast = "friendly", label = "Holy Light", range = 900, ally_health_below = 95 },
@@ -78,8 +77,12 @@ local LAST_STAND_PARTNER = {
 }
 
 local LAST_STAND_SPELLS = {
-	ramero = { "sven_warcry", "sven_gods_strength" },
+	ramero = { "sven_gods_strength" },
 	baristol = { "omniknight_guardian_angel" },
+}
+
+local REMOVED_PROFILE_ABILITIES = {
+	ramero = { "roshan_stormbolt" },
 }
 
 local function CopySpellList(source)
@@ -112,6 +115,12 @@ function XHSSpecialArenaAI:Attach(boss, profileName)
 	boss:RemoveModifierByName("modifier_ai")
 	boss:RemoveModifierByName("modifier_creature_ai")
 	boss.xhs_special_arena_profile = profileName
+
+	for _, abilityName in ipairs(REMOVED_PROFILE_ABILITIES[profileName] or {}) do
+		if boss:FindAbilityByName(abilityName) ~= nil then
+			boss:RemoveAbility(abilityName)
+		end
+	end
 
 	for _, spell in ipairs(PROFILES[profileName]) do
 		local ability = boss:FindAbilityByName(spell.name) or boss:AddAbility(spell.name)
@@ -186,7 +195,7 @@ function modifier_xhs_special_arena_ai:OnIntervalThink()
 		local index = ((self.next_spell_index + offset - 1) % #profile) + 1
 		local spell = profile[index]
 		local ability = boss:FindAbilityByName(spell.name)
-		if ability ~= nil and ability:IsFullyCastable() then
+		if spell.partner_death_only ~= true and ability ~= nil and ability:IsFullyCastable() then
 			local castTarget = target
 			local canCast = spell.range == nil or (target:GetAbsOrigin() - boss:GetAbsOrigin()):Length2D() <= spell.range
 			if spell.cast == "friendly" then

@@ -964,7 +964,7 @@
 
 	// Kill Effects
 
-	"27" // Culling Blade kill effect
+	"27" // Earthshaker Arcana target death
 	{
 		"item_id"					"16315"
 		"item_name"					"battlepass_kill_effect_culling_blade"
@@ -980,7 +980,7 @@
 			{
 				"type"			"particle"
 				"asset"			"particles/kill_effect/default_target.vpcf"
-				"modifier"		"particles/econ/items/axe/ti9_jungle_axe/ti9_jungle_axe_culling_blade_kill.vpcf"
+				"modifier"		"particles/econ/items/earthshaker/earthshaker_arcana/earthshaker_arcana_target_death.vpcf"
 			}
 		}
 	}
@@ -1014,7 +1014,7 @@
 		}
 	}
 
-	"29" // Radiant tower kill effect
+	"29" // Techies Arcana blast
 	{
 		"item_id"					"16315"
 		"item_name"					"battlepass_kill_effect_radiant_tower"
@@ -1030,7 +1030,7 @@
 			{
 				"type"			"particle"
 				"asset"			"particles/kill_effect/default_target.vpcf"
-				"modifier"		"particles/base_attacks/ranged_tower_good_explosion.vpcf"
+				"modifier"		"particles/econ/items/techies/techies_arcana/techies_suicide_kills_arcana.vpcf"
 			}
 		}
 	}
@@ -1107,7 +1107,7 @@
 		}
 	}
 
-	"33" // Gyro TI 10 (free version)
+	"33" // Zeus Arcana kill
 	{
 		"item_id"					"16315"
 		"item_name"					"battlepass_kill_effect_gyro_free"
@@ -1123,7 +1123,7 @@
 			{
 				"type"				"particle"
 				"asset"				"particles/kill_effect/default_target.vpcf"
-				"modifier"			"particles/econ/items/gyrocopter/gyro_ti10_immortal_missile/gyro_ti10_immortal_missle_explosion_fire.vpcf"
+				"modifier"			"particles/econ/items/zeus/arcana_chariot/zeus_arcana_kill_real.vpcf"
 			}
 		}
 	}
@@ -1150,7 +1150,7 @@
 		}
 	}
 
-	"35" // Rubick Arcana (free version)
+	"35" // Skywrath Arcana kill
 	{
 		"item_id"					"16315"
 		"item_name"					"battlepass_kill_effect_rubick_free"
@@ -1166,12 +1166,12 @@
 			{
 				"type"				"particle"
 				"asset"				"particles/kill_effect/default_target.vpcf"
-				"modifier"			"particles/econ/items/rubick/rubick_arcana/rbck_arc_skeletonking_hellfireblast_explosion_d.vpcf"
+				"modifier"			"particles/econ/items/skywrath_mage/skywrath_arcana/skywrath_arcana_kill_target.vpcf"
 			}
 		}
 	}
 
-	"36" // Rubick Arcana
+	"36" // Vengeful Spirit Arcana kill
 	{
 		"item_id"					"16315"
 		"item_name"					"battlepass_kill_effect_rubick"
@@ -1188,7 +1188,14 @@
 			{
 				"type"				"particle"
 				"asset"				"particles/kill_effect/default_target.vpcf"
-				"modifier"			"particles/econ/items/rubick/rubick_arcana/rbck_arc_skeletonking_hellfireblast_explosion.vpcf"
+				"modifier"			"particles/econ/items/vengeful/vengeful_arcana/vengeful_arcana_kill_target.vpcf"
+			}
+
+			"asset_modifier1"
+			{
+				"type"				"particle"
+				"asset"				"particles/kill_effect/default_caster.vpcf"
+				"modifier"			"particles/econ/items/vengeful/vengeful_arcana/vengeful_arcana_kill_caster.vpcf"
 			}
 		}
 	}

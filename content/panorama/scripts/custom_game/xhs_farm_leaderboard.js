@@ -253,12 +253,13 @@
 		}
 	}
 
-	function UpdateCard(card, player, rank, localPlayerID) {
+	function UpdateCard(card, player, rank, localPlayerID, mode, targetKills) {
 		var playerID = ToNumber(player.player_id, -1);
 		var level = Math.max(1, ToNumber(player.level, 1));
 		var wave = Math.max(1, ToNumber(player.wave, 1));
 		var wavesPerLevel = Math.max(1, ToNumber(player.waves_per_level, 1));
 		var kills = Math.max(0, ToNumber(player.kills, 0));
+		var remaining = Math.max(0, ToNumber(player.remaining, targetKills - kills));
 
 		var rankLabel = Panel("XHSFarmRank_" + playerID);
 		var heroImage = Panel("XHSFarmHero_" + playerID);
@@ -277,7 +278,9 @@
 			nameLabel.text = GetPlayerIdentity(playerID, heroName);
 		}
 		if (stageLabel) {
-			stageLabel.text = "LEVEL " + level + "  \u00B7  WAVE " + wave + "/" + wavesPerLevel;
+			stageLabel.text = mode === "ramero_kill_race"
+				? (remaining > 0 ? "+" + remaining + " KILLS REMAINING" : "ARENA READY")
+				: "LEVEL " + level + "  \u00B7  WAVE " + wave + "/" + wavesPerLevel;
 		}
 		if (killsLabel) {
 			killsLabel.text = String(kills);
@@ -350,20 +353,27 @@
 
 	function UpdateCelebration(data, players, phase) {
 		var leaderboard = Panel("XHSFarmLeaderboard");
+		var eyebrow = Panel("XHSFarmLeaderboardEyebrow");
 		var title = Panel("XHSFarmLeaderboardTitle");
 		var status = Panel("XHSFarmLeaderboardStatus");
 		var winnerName = Panel("XHSFarmWinnerName");
 		var winnerScore = Panel("XHSFarmWinnerScore");
 		var celebrating = phase === "celebration";
+		var killRace = (data.mode || "").toString() === "ramero_kill_race";
+		var targetKills = Math.max(1, ToNumber(data.target_kills, 300));
 
 		if (leaderboard) {
 			leaderboard.SetHasClass("IsCelebrating", celebrating);
+			leaderboard.SetHasClass("IsKillRace", killRace);
+		}
+		if (eyebrow) {
+			eyebrow.text = killRace ? "RAMERO & BARISTOL" : "FARM EVENT";
 		}
 		if (title) {
-			title.text = celebrating ? "FINAL RESULTS" : "LIVE LEADERBOARD";
+			title.text = killRace ? "KILL RACE" : (celebrating ? "FINAL RESULTS" : "LIVE LEADERBOARD");
 		}
 		if (status) {
-			status.text = celebrating ? "FINAL" : "LIVE";
+			status.text = killRace ? "TO " + targetKills : (celebrating ? "FINAL" : "LIVE");
 		}
 
 		if (celebrating) {
@@ -424,6 +434,8 @@
 		var players = TableToArray(data.players);
 		SortPlayers(players);
 		UpdateCelebration(data, players, phase);
+		var mode = (data.mode || "farm_event").toString();
+		var targetKills = Math.max(1, ToNumber(data.target_kills, 300));
 		var activePlayerIDs = {};
 		var localPlayerID = Players.GetLocalPlayer();
 
@@ -437,7 +449,7 @@
 			var rank = index + 1;
 			activePlayerIDs[playerID.toString()] = true;
 			var card = cards[playerID] || CreateCard(playerID);
-			UpdateCard(card, player, rank, localPlayerID);
+			UpdateCard(card, player, rank, localPlayerID, mode, targetKills);
 		}
 
 		RemoveMissingCards(activePlayerIDs);

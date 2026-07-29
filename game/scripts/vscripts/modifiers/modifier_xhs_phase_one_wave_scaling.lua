@@ -28,8 +28,9 @@ function modifier_xhs_phase_one_wave_scaling:OnCreated(kv)
 	self.level = math.max(1, math.min(4, tonumber(kv.level) or self.level or 1))
 	self.progress = math.max(0, math.min(1, tonumber(kv.progress) or self.progress or 0))
 
-	local healthAndDamageStart = self.level == 1 and 1.0 or 0.80
-	self.healthDamagePct = (healthAndDamageStart + WAVE_STAT_BONUS * self.progress - 1.0) * 100
+	-- Tier balancing lives in the unit KV. This modifier only represents the
+	-- positive wave-by-wave growth visible to players.
+	self.healthDamagePct = WAVE_STAT_BONUS * self.progress * 100
 	self.armorPct = WAVE_STAT_BONUS * self.progress * 100
 
 	local parent = self:GetParent()

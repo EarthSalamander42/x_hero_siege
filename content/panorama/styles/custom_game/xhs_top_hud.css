@@ -500,6 +500,180 @@
 	transition-duration: 0.12s;
 }
 
+.XHSOverheadBotActivity {
+	width: 130px;
+	height: 13px;
+	ignore-parent-flow: true;
+	horizontal-align: center;
+	margin-top: 1px;
+	flow-children: right;
+	padding: 0px 5px;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #07111be8 ), color-stop( 0.5, #102235f5 ), to( #07111be8 ) );
+	border: 1px solid #6a8da36b;
+	box-shadow: fill #000000aa 0px 1px 4px 0px, fill #5ad0ff1f 0px 0px 5px 0px;
+	visibility: collapse;
+	opacity: 0;
+	z-index: 20;
+}
+
+.XHSOverheadBotActivityNode {
+	width: 4px;
+	height: 4px;
+	vertical-align: center;
+	margin-right: 4px;
+	background-color: #a9d2e6;
+	box-shadow: fill #a9d2e677 0px 0px 4px 0px;
+}
+
+.XHSOverheadBotActivityLabel {
+	width: fill-parent-flow( 1 );
+	height: 12px;
+	color: #d8edf7;
+	font-size: 9px;
+	font-weight: bold;
+	letter-spacing: 0.4px;
+	text-align: center center;
+	text-overflow: shrink;
+	text-transform: uppercase;
+	text-shadow: 0px 1px 2px #000000, 0px 0px 4px #000000;
+}
+
+.XHSOverheadLabel.XHSOverheadBotActivityVisible .XHSOverheadBotActivity {
+	visibility: visible;
+	opacity: 1;
+}
+
+.XHSOverheadBotActivity.XHSBotActivityToneCombat {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #1a0909ed ), color-stop( 0.5, #3b1512f5 ), to( #1a0909ed ) );
+	border-color: #ff725f78;
+	box-shadow: fill #000000aa 0px 1px 4px 0px, fill #ff5a432b 0px 0px 6px 0px;
+}
+
+.XHSOverheadBotActivity.XHSBotActivityToneCombat .XHSOverheadBotActivityNode {
+	background-color: #ff765f;
+	box-shadow: fill #ff5a43aa 0px 0px 5px 0px;
+}
+
+.XHSOverheadBotActivity.XHSBotActivityToneCombat .XHSOverheadBotActivityLabel {
+	color: #ffd4c7;
+}
+
+.XHSOverheadBotActivity.XHSBotActivityToneDefense {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #1b1005ed ), color-stop( 0.5, #3c260af5 ), to( #1b1005ed ) );
+	border-color: #ffc45b78;
+	box-shadow: fill #000000aa 0px 1px 4px 0px, fill #ffb13d2b 0px 0px 6px 0px;
+}
+
+.XHSOverheadBotActivity.XHSBotActivityToneDefense .XHSOverheadBotActivityNode {
+	background-color: #ffc45b;
+	box-shadow: fill #ffb13daa 0px 0px 5px 0px;
+}
+
+.XHSOverheadBotActivity.XHSBotActivityToneDefense .XHSOverheadBotActivityLabel {
+	color: #ffe4a6;
+}
+
+.XHSOverheadBotActivity.XHSBotActivityToneDanger {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #21070aed ), color-stop( 0.5, #4b1019f5 ), to( #21070aed ) );
+	border-color: #ff486b88;
+	box-shadow: fill #000000aa 0px 1px 4px 0px, fill #ff365f38 0px 0px 7px 0px;
+}
+
+.XHSOverheadBotActivity.XHSBotActivityToneDanger .XHSOverheadBotActivityNode {
+	background-color: #ff486b;
+	box-shadow: fill #ff365fcc 0px 0px 6px 0px;
+}
+
+.XHSOverheadBotActivity.XHSBotActivityToneDanger .XHSOverheadBotActivityLabel {
+	color: #ffd0d9;
+}
+
+.XHSOverheadBotActivity.XHSBotActivityToneMove {
+	border-color: #5ad0ff78;
+	box-shadow: fill #000000aa 0px 1px 4px 0px, fill #5ad0ff2b 0px 0px 6px 0px;
+}
+
+.XHSOverheadBotActivity.XHSBotActivityToneMove .XHSOverheadBotActivityNode {
+	background-color: #5ad0ff;
+	box-shadow: fill #5ad0ffaa 0px 0px 5px 0px;
+}
+
+.XHSOverheadBotActivity.XHSBotActivityToneMove .XHSOverheadBotActivityLabel {
+	color: #ccefff;
+}
+
+.XHSOverheadBotActivity.XHSBotActivityToneSupport {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #07180eed ), color-stop( 0.5, #113921f5 ), to( #07180eed ) );
+	border-color: #5ee58a78;
+	box-shadow: fill #000000aa 0px 1px 4px 0px, fill #45c46b2b 0px 0px 6px 0px;
+}
+
+.XHSOverheadBotActivity.XHSBotActivityToneSupport .XHSOverheadBotActivityNode {
+	background-color: #5ee58a;
+	box-shadow: fill #45c46baa 0px 0px 5px 0px;
+}
+
+.XHSOverheadBotActivity.XHSBotActivityToneSupport .XHSOverheadBotActivityLabel {
+	color: #caffd8;
+}
+
+.XHSOverheadBotActivity.XHSBotActivityToneEconomy {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #181405ed ), color-stop( 0.5, #39300cf5 ), to( #181405ed ) );
+	border-color: #f2c94c78;
+	box-shadow: fill #000000aa 0px 1px 4px 0px, fill #f2c94c2b 0px 0px 6px 0px;
+}
+
+.XHSOverheadBotActivity.XHSBotActivityToneEconomy .XHSOverheadBotActivityNode {
+	background-color: #f2c94c;
+	box-shadow: fill #f2c94caa 0px 0px 5px 0px;
+}
+
+.XHSOverheadBotActivity.XHSBotActivityToneEconomy .XHSOverheadBotActivityLabel {
+	color: #fff1a9;
+}
+
+.XHSOverheadBotActivity.XHSBotActivityToneSecret {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #180719ed ), color-stop( 0.5, #3f1045f5 ), to( #180719ed ) );
+	border-color: #ed74ff88;
+	box-shadow: fill #000000aa 0px 1px 4px 0px, fill #dc58ef38 0px 0px 7px 0px;
+}
+
+.XHSOverheadBotActivity.XHSBotActivityToneSecret .XHSOverheadBotActivityNode {
+	background-color: #ed74ff;
+	box-shadow: fill #dc58efcc 0px 0px 6px 0px;
+}
+
+.XHSOverheadBotActivity.XHSBotActivityToneSecret .XHSOverheadBotActivityLabel {
+	color: #f7d1ff;
+}
+
+.XHSOverheadBotActivity.XHSBotActivityToneEvent {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #13091bed ), color-stop( 0.5, #301544f5 ), to( #13091bed ) );
+	border-color: #c99cff78;
+	box-shadow: fill #000000aa 0px 1px 4px 0px, fill #c99cff2b 0px 0px 6px 0px;
+}
+
+.XHSOverheadBotActivity.XHSBotActivityToneEvent .XHSOverheadBotActivityNode {
+	background-color: #c99cff;
+	box-shadow: fill #c99cffaa 0px 0px 5px 0px;
+}
+
+.XHSOverheadBotActivity.XHSBotActivityToneEvent .XHSOverheadBotActivityLabel {
+	color: #ead8ff;
+}
+
+.XHSOverheadBotActivity.XHSBotActivityToneIdle,
+.XHSOverheadBotActivity.XHSBotActivityToneUnknown {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #0b1014ed ), color-stop( 0.5, #1b252df5 ), to( #0b1014ed ) );
+	border-color: #8ca6b56b;
+}
+
+.XHSOverheadBotActivity.XHSBotActivityToneIdle .XHSOverheadBotActivityNode,
+.XHSOverheadBotActivity.XHSBotActivityToneUnknown .XHSOverheadBotActivityNode {
+	background-color: #a6bac6;
+	box-shadow: fill #a6bac688 0px 0px 4px 0px;
+}
+
 .XHSOverheadVitalsFrame {
 	visibility: collapse;
 	opacity: 0;
@@ -2900,7 +3074,13 @@
 	horizontal-align: center;
 	margin-top: 268px;
 	flow-children: down;
+	visibility: collapse;
 	z-index: 72;
+}
+
+.XHSReviveFrameStack.XHSHasReviveFrames
+{
+	visibility: visible;
 }
 
 .XHSReviveFrame

@@ -538,9 +538,7 @@ function XHSBotBrain:IsOwnedScreenUnit(hero, unit)
 		or unit.IsRealHero ~= nil and unit:IsRealHero() then
 		return false
 	end
-	if unit.furbolg_parent == hero
-		or unit.HasModifier ~= nil
-			and unit:HasModifier("modifier_orb_of_darkness_controlled") then
+	if unit.furbolg_parent == hero then
 		return true
 	end
 	if unit.GetPlayerOwnerID ~= nil then
@@ -2132,6 +2130,19 @@ function XHSBotBrain:UpdateStuck(hero, record, assignment)
 		record.stuck_since = nil
 		return false
 	end
+	local movementDestination = record.last_movement_destination
+	local movementOrderAt = tonumber(record.last_movement_order_at) or -math.huge
+	local destinationDistance = movementDestination ~= nil
+		and Distance2D(position, movementDestination) or 0
+	local movementStillRelevant = movementDestination ~= nil
+		and destinationDistance > 140
+		and now - movementOrderAt <= 8
+	if not movementStillRelevant or hero:IsAttacking() then
+		record.stuck_sample_position = position
+		record.stuck_sample_at = now
+		record.stuck_since = nil
+		return false
+	end
 	if record.stuck_sample_position == nil then
 		record.stuck_sample_position = position
 		record.stuck_sample_at = now
@@ -2140,12 +2151,10 @@ function XHSBotBrain:UpdateStuck(hero, record, assignment)
 	if now - (record.stuck_sample_at or 0) < 1.5 then return false end
 
 	local moved = Distance2D(position, record.stuck_sample_position)
-	local anchor = assignment and assignment.anchor
-	local needsMovement = anchor ~= nil and Distance2D(position, anchor) > 450
 	record.stuck_sample_position = position
 	record.stuck_sample_at = now
 
-	if moved >= 55 or not needsMovement or hero:IsAttacking() then
+	if moved >= 55 then
 		record.stuck_since = nil
 		return false
 	end
@@ -2153,10 +2162,28 @@ function XHSBotBrain:UpdateStuck(hero, record, assignment)
 	record.stuck_since = record.stuck_since or now
 	if now - record.stuck_since < 3 then return false end
 
-	record.stuck_since = now
+	local recoveryGoal = movementDestination
+	local defendingBase = assignment ~= nil and assignment.goal == "defend_base"
+	if defendingBase then
+		recoveryGoal = assignment.threat_position or assignment.anchor or recoveryGoal
+	end
+	local recoveryStep = 320 + math.min(240, (record.stuck_recoveries or 0) * 45)
+	local recovery = PositionToward(position, recoveryGoal, recoveryStep)
+	local issued = defendingBase
+		and XHSBotExecutor:AttackMove(
+			hero,
+			recovery,
+			record,
+			"defense path recovery",
+			0
+		)
+		or XHSBotExecutor:Move(hero, recovery, record, "stuck recovery", 0)
+	if not issued then return false end
+
+	record.stuck_since = nil
 	record.stuck_recoveries = (record.stuck_recoveries or 0) + 1
-	local recovery = position + RandomVector(220 + math.min(300, record.stuck_recoveries * 40))
-	XHSBotExecutor:Move(hero, recovery, record, "stuck recovery", 0)
+	record.stuck_sample_position = position
+	record.stuck_sample_at = now
 	return true
 end
 
@@ -2189,6 +2216,7 @@ end
 
 function XHSBotBrain:BuildContext(playerID, hero, profile, difficulty, record, assignment, encounter)
 	local now = GameRules:GetGameTime()
+	local assignmentGoal = assignment and assignment.goal or "regroup"
 	local returningToLane = self:UpdateLaneReturnState(hero, assignment, record)
 	if encounter ~= nil then
 		returningToLane = false
@@ -2241,6 +2269,15 @@ function XHSBotBrain:BuildContext(playerID, hero, profile, difficulty, record, a
 	local anchor = encounter and encounter.anchor
 		or assignment and assignment.anchor
 		or GetFortPosition()
+	if encounter == nil
+		and assignmentGoal == "defend_base"
+		and assignment ~= nil
+		and assignment.threat_position ~= nil then
+		-- The threatened structure is the fallback/retreat anchor; the pressure
+		-- centre is the combat destination. Otherwise a bot can arrive beside a
+		-- tower, see no target, and hold while the wave attacks from its far side.
+		anchor = CopyPosition(assignment.threat_position)
+	end
 	local rawDanger, dangerEntries = XHSBotDangerRegistry:GetDangerAt(
 		hero:GetAbsOrigin(),
 		now,
@@ -2278,7 +2315,6 @@ function XHSBotBrain:BuildContext(playerID, hero, profile, difficulty, record, a
 		record.use_attack_move = RandomFloat(0, 1) <= (difficulty.attack_move_chance or 0)
 		record.next_attack_move_choice = now + 2
 	end
-	local assignmentGoal = assignment and assignment.goal or "regroup"
 	local threat = self:ComputeCombatThreat(
 		hero,
 		enemies,
@@ -2295,9 +2331,21 @@ function XHSBotBrain:BuildContext(playerID, hero, profile, difficulty, record, a
 		mobileSafeZone, mobileSafeZoneStrength, mobileSafeZoneDistance =
 			self:GetMobileSafeZone(hero, target, 1150)
 	end
+	local strategicThreatPosition, strategicThreatSource =
+		self:GetStrategicThreatPosition(hero, target, assignment)
 	local fortPosition = GetFortPosition()
 	local fortDistance = Distance2D(hero:GetAbsOrigin(), fortPosition)
 	local campfire = self:GetCampfireState(hero)
+	local recentlyRespawned = now - (tonumber(record.last_respawn_at) or -math.huge)
+		<= 12
+	local spawnCampfireHold = recentlyRespawned
+		and fortDistance <= BASE_LAST_STAND_RADIUS
+		and target ~= nil
+		and (threat.close_enemies >= 3 or threat.focused_by >= 2)
+		and (
+			strategicThreatPosition == nil
+			or Distance2D(strategicThreatPosition, fortPosition) <= 1800
+		)
 	local baseLastStand = target ~= nil
 		and fortDistance <= BASE_LAST_STAND_RADIUS
 		and (threat.close_enemies > 0
@@ -2315,8 +2363,6 @@ function XHSBotBrain:BuildContext(playerID, hero, profile, difficulty, record, a
 		and mobileSafeZone:entindex() or nil
 	record.mobile_safe_zone_strength = mobileSafeZoneStrength ~= nil
 		and math.floor(mobileSafeZoneStrength * 100) / 100 or 0
-	local strategicThreatPosition, strategicThreatSource =
-		self:GetStrategicThreatPosition(hero, target, assignment)
 	record.strategic_threat_source = strategicThreatSource
 	record.strategic_threat_position = strategicThreatPosition
 	local retreatPosition, retreatCover = self:GetRetreatPosition(
@@ -2371,18 +2417,42 @@ function XHSBotBrain:BuildContext(playerID, hero, profile, difficulty, record, a
 	local urgentShopping = assignmentGoal == "shop"
 		and assignment ~= nil
 		and assignment.shopping_urgent == true
+	local activeSpecialCount = CustomTimers ~= nil
+		and tonumber(CustomTimers.active_special_wave_count) or 0
+	local baseDefenseIdle = assignmentGoal == "defend_base"
+		and assignment ~= nil
+		and (tonumber(assignment.base_threat_count) or 0) <= 0
+		and assignment.base_structure_emergency ~= true
+		and activeSpecialCount <= 0
+	local specialWaveETA = CustomTimers ~= nil
+		and CustomTimers.enable_special_wave == true
+		and tonumber(CustomTimers.current_time
+			and CustomTimers.current_time["special_wave"]) or nil
 	local runeStrategicallyAllowed = encounter == nil
 		and not baseLastStand
 		and (
 			assignmentGoal ~= "shop"
 			or creepLevel >= 2 and not urgentShopping
 		)
-		and assignmentGoal ~= "defend_base"
+		and (assignmentGoal ~= "defend_base" or baseDefenseIdle)
 		and assignmentGoal ~= "hold"
 		and assignmentGoal ~= "dead"
 		and assignmentGoal ~= "selecting_hero"
 	local runeObjective = runeStrategicallyAllowed
 		and self:FindRuneObjective(hero, record, difficulty, now) or nil
+	local preWaveRune = runeObjective ~= nil
+		and baseDefenseIdle
+		and specialWaveETA ~= nil
+		and specialWaveETA > 0
+	if preWaveRune then
+		local travelSeconds = runeObjective.distance
+			/ math.max(100, self:GetUnitMovementSpeed(hero))
+		if travelSeconds > specialWaveETA + 2 then
+			self:ReleaseRuneClaim(playerID, record)
+			runeObjective = nil
+			preWaveRune = false
+		end
+	end
 	if not runeStrategicallyAllowed then
 		self:ReleaseRuneClaim(playerID, record)
 	end
@@ -2406,6 +2476,9 @@ function XHSBotBrain:BuildContext(playerID, hero, profile, difficulty, record, a
 		retreat_cover = retreatCover,
 		last_stand = lastStand,
 		base_last_stand = baseLastStand,
+		spawn_campfire_hold = spawnCampfireHold,
+		at_ancient_retreat_limit =
+			fortDistance <= ANCIENT_RETREAT_LIMIT_RADIUS,
 		defensive_cover = defensiveCover,
 		defensive_cover_distance = defensiveCoverDistance,
 		mobile_safe_zone = mobileSafeZone,
@@ -2461,12 +2534,16 @@ function XHSBotBrain:BuildContext(playerID, hero, profile, difficulty, record, a
 			),
 		shopping_urgent = assignmentGoal == "shop"
 			and assignment.shopping_urgent == true,
+		base_defense_active = assignmentGoal == "defend_base",
+		base_defense_idle = baseDefenseIdle,
 		returning_to_lane = returningToLane,
 		max_chase_distance = encounter and encounter.max_chase_distance
 			or assignment and assignment.chase_radius
 			or difficulty.max_chase_distance,
 		last_seen_position = target == nil and record.last_seen_position or nil,
-		attack_move = target == nil and mayAttackMove and record.use_attack_move == true,
+		attack_move = target == nil and mayAttackMove
+			and (assignmentGoal == "defend_base"
+				or record.use_attack_move == true),
 		encounter_mode = encounter and encounter.id or nil,
 		arena_combat = encounter and encounter.arena_combat == true,
 		encounter_no_combat = encounter and encounter.no_combat == true,
@@ -2480,6 +2557,8 @@ function XHSBotBrain:BuildContext(playerID, hero, profile, difficulty, record, a
 		rune_threat_ceiling = difficulty.rune_threat_ceiling,
 		rune_health_margin = difficulty.rune_health_margin,
 		rune_progression_critical = creepLevel >= 2,
+		rune_pre_wave = preWaveRune,
+		special_wave_eta = specialWaveETA,
 		creep_level = creepLevel,
 	}
 end
@@ -2643,11 +2722,9 @@ function XHSBotBrain:Think(playerID, hero, record, assignment, difficulty)
 	end
 
 	record.macro_state = self:MacroState(assignment, encounter)
-	record.state = self:ActionState(best, assignment, context.target, encounter)
-	record.last_decision = best.id
-	record.last_decision_reason = best.reason
-	record.rune_committed = best.data ~= nil
-		and best.data.objective == "rune"
+	record.planned_state = self:ActionState(best, assignment, context.target, encounter)
+	record.planned_decision = best.id
+	record.planned_decision_reason = best.reason
 	record.top_actions = {}
 	for index = 1, math.min(3, #actions) do
 		table.insert(record.top_actions, {
@@ -2690,6 +2767,11 @@ function XHSBotBrain:Think(playerID, hero, record, assignment, difficulty)
 	end
 
 	if XHSBotExecutor:Execute(hero, record.pending_decision, record, difficulty) then
+		record.state = record.planned_state
+		record.last_decision = best.id
+		record.last_decision_reason = best.reason
+		record.rune_committed = best.data ~= nil
+			and best.data.objective == "rune"
 		if best.id == "hold" then
 			record.idle_seconds = (record.idle_seconds or 0) + difficulty.think_interval
 		end

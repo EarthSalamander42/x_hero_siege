@@ -1490,38 +1490,6 @@
 	}
 
 	//=================================================================================================================
-	// Recipe: Bracer of the Void
-	//=================================================================================================================
-	"item_recipe_bracer_of_the_void"
-	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"ID"							"2520"
-		"BaseClass"             		"item_datadriven"
-		"Model"							"models/props_gameplay/recipe.vmdl"
-		"AbilityTextureName"			"recipe"
-		
-		// Item Info
-		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"						"30000"	
-		"ItemShopTags"					""
-//		"ItemInitialStockTime"			"1470.0"
-//		"ItemStockMax"					"2" 
-//		"ItemStockTime"					"30.0"
-//		"ItemStockInitial"				"0"
-		
-		// Recipe
-		//-------------------------------------------------------------------------------------------------------------
-		"ItemRecipe"					"1"
-		"SecretShop"					"1"
-		"ItemResult"					"item_bracer_of_the_void"
-		"ItemRequirements"
-		{
-			"01"						"item_orb_of_darkness2"
-		}
-	}
-
-	//=================================================================================================================
 	// Shield of Invincibility (Spirit Beast Event)
 	//=================================================================================================================
 	"item_shield_of_invincibility"
@@ -1954,7 +1922,7 @@
 
 		"precache"
 		{
-			"particle"		"particles/units/heroes/hero_abaddon/abaddon_borrowed_time_heal.vpcf"
+			"particle"		"particles/items2_fx/mekanism.vpcf"
 		}
 
 		"AbilityValues"
@@ -1969,13 +1937,6 @@
 			{
 				"ScriptFile"			"items/potion.lua"
 				"Function"				"FullRestauration"
-			}
-
-			"FireEffect"
-			{
-				"EffectName"			"particles/units/heroes/hero_abaddon/abaddon_borrowed_time_heal.vpcf"
-				"EffectAttachType"		"follow_origin"
-				"Target"				"CASTER"
 			}
 
 			"FireSound"

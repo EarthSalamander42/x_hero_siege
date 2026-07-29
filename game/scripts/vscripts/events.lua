@@ -1469,7 +1469,14 @@ XHSUnitTombstone:Install()
 ListenToGameEvent('entity_killed', function(keys)
 	local killedUnit = EntIndexToHScript(keys.entindex_killed)
 	if killedUnit == nil then return end
-	if killedUnit:FindModifierByName("modifier_breakable_container") then return end
+	local killedUnitName = killedUnit.GetUnitName ~= nil and killedUnit:GetUnitName() or ""
+	if killedUnit:FindModifierByName("modifier_breakable_container")
+		or killedUnitName == "npc_dota_crate"
+		or killedUnitName == "npc_dota_vase" then
+		-- Breakables award their own loot, but never progress hero kill rewards,
+		-- zone kill quests, Fragment Quests or event-unlock thresholds.
+		return
+	end
 	local killerAbility = nil
 	local killer = nil
 	if keys.entindex_attacker ~= nil then killer = EntIndexToHScript(keys.entindex_attacker) end
@@ -1638,6 +1645,12 @@ ListenToGameEvent('entity_killed', function(keys)
 						killer = PlayerResource:GetSelectedHeroEntity(killer:GetPlayerOwnerID())
 
 						killer:IncrementKills(1)
+						SpecialEvents:RefreshRameroKillRace()
+						if killer:GetKills() >= XHS_RAMERO_BARISTOL_KILLS_REQUIRED
+							and SpecialEvents.Ramero_trigger == 0
+							and not (XHSDevTools ~= nil and XHSDevTools:IsSandboxActive()) then
+							SpecialEvents:StartRameroAndBaristolEvent(killer)
+						end
 
 						for _, Zone in pairs(GameMode.Zones) do
 							if Zone:ContainsUnit(killer) then
@@ -1656,6 +1669,7 @@ ListenToGameEvent('entity_killed', function(keys)
 						ParticleManager:ReleaseParticleIndex(ParticleManager:CreateParticleForPlayer("particles/darkmoon_last_hit_effect.vpcf", PATTACH_ABSORIGIN_FOLLOW, killedUnit, killer:GetPlayerOwner()))
 
 						killer:IncrementKills(1)
+						SpecialEvents:RefreshRameroKillRace()
 
 						for _, Zone in pairs(GameMode.Zones) do
 							if Zone:ContainsUnit(killer) then
@@ -1673,9 +1687,9 @@ ListenToGameEvent('entity_killed', function(keys)
 						elseif killer:GetKills() == 200 then
 							SendXHSRewardNotification(killer:GetPlayerOwnerID(), "gold", 50000, "Kill Reward", "+50,000 gold")
 							PlayerResource:ModifyGold(killer:GetPlayerOwnerID(), 50000, false, DOTA_ModifyGold_Unspecified)
-						elseif killer:GetKills() >= 250 and SpecialEvents.Ramero_trigger == 0 and not (XHSDevTools ~= nil and XHSDevTools:IsSandboxActive()) then
+						elseif killer:GetKills() >= XHS_RAMERO_BARISTOL_KILLS_REQUIRED and SpecialEvents.Ramero_trigger == 0 and not (XHSDevTools ~= nil and XHSDevTools:IsSandboxActive()) then
 							SpecialEvents:StartRameroAndBaristolEvent(killer)
-						elseif killer:GetKills() >= 400 and SpecialEvents.Ramero_trigger == 1 and not (XHSDevTools ~= nil and XHSDevTools:IsSandboxActive()) then
+						elseif killer:GetKills() >= XHS_SOGAT_KILLS_REQUIRED and SpecialEvents.Ramero_trigger == 1 and not (XHSDevTools ~= nil and XHSDevTools:IsSandboxActive()) then
 							SpecialEvents:StartSogatEvent(killer)
 						end
 					end

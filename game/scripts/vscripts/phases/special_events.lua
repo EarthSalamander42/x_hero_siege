@@ -20,6 +20,11 @@ local MURADIN_TELEPORT_OUT_DURATION = 3.0
 local FARM_LEADERBOARD_NET_TABLE = "xhs_farm_leaderboard"
 local FARM_LEADERBOARD_NET_KEY = "state"
 local FARM_LEADERBOARD_UPDATE_INTERVAL = 0.5
+local RAMERO_KILL_RACE_START = 250
+local RAMERO_KILL_RACE_UPDATE_INTERVAL = 0.25
+local FARM_EVENT_RETURN_TELEPORT_DURATION = 3.0
+local FARM_EVENT_RETURN_GRACE_DURATION = 3.0
+local FARM_EVENT_RETURN_TOTAL_DELAY = FARM_EVENT_RETURN_TELEPORT_DURATION + FARM_EVENT_RETURN_GRACE_DURATION
 local FARM_EVENT_CREEPS_PER_WAVE = 10
 local FARM_EVENT_CELEBRATION_DURATION = 7.0
 local FARM_EVENT_PRELOAD_INTERVAL = 0.1
@@ -189,6 +194,50 @@ local function StartCinematicDelayedTeleport(hero, point, delay)
 	end)
 end
 
+local function ForceRespawnHeroForSpecialArena(hero)
+	if hero == nil or hero:IsNull() or hero:IsAlive() then return true end
+
+	-- Ankh disables normal respawns and owns an interval think which would
+	-- otherwise fire later and move the hero back to the original death spot.
+	if hero.ankh_respawn == true then
+		local ankh = hero:FindModifierByName("modifier_ankh_passives")
+		if ankh ~= nil then
+			ankh:StartIntervalThink(-1)
+		end
+
+		hero.ankh_respawn = false
+		if hero:IsOwnedByAnyPlayer() then
+			local playerID = hero:GetPlayerID()
+			_G.XHS_REINCARNATING_PLAYERS = _G.XHS_REINCARNATING_PLAYERS or {}
+			_G.XHS_REINCARNATING_PLAYERS[playerID] = nil
+			CustomNetTables:SetTableValue("player_table", tostring(hero:entindex()) .. "_reincarnation", {
+				active = 0,
+				duration = 0,
+				end_time = 0,
+			})
+			if StopXHSReincarnationInventoryLock ~= nil then
+				StopXHSReincarnationInventoryLock(hero)
+			end
+		end
+	end
+
+	hero:SetRespawnsDisabled(false)
+	if hero.SetTimeUntilRespawn ~= nil then
+		hero:SetTimeUntilRespawn(0)
+	end
+	hero:RespawnHero(false, false)
+
+	if not hero:IsAlive() then
+		print("[XHS] Failed to force-respawn hero for special arena: " .. hero:GetUnitName())
+		return false
+	end
+
+	-- The global cinematic pause was applied while this hero was dead. Reapply
+	-- it after respawning so this player enters with the same timing as everyone.
+	CinematicPauseHero(hero, SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP)
+	return true
+end
+
 local function FocusAllPlayersOnSpecialArena(point, intro_duration, return_camera)
 	if point == nil or XHSPlayDoorOpeningCinematic == nil then return end
 
@@ -197,6 +246,7 @@ local function FocusAllPlayersOnSpecialArena(point, intro_duration, return_camer
 		move_duration = SPECIAL_EVENT_CAMERA_MOVE_DURATION,
 		hold_duration = math.max(0, intro_duration - SPECIAL_EVENT_CAMERA_MOVE_DURATION),
 		return_duration = SPECIAL_EVENT_CAMERA_RETURN_DURATION,
+		native_camera = true,
 		return_camera = return_camera ~= false,
 	})
 end
@@ -465,18 +515,19 @@ function SpecialEvents:MuradinEvent(time)
 
 	-- EmitSoundOn("SantaClaus.StartArena", Muradin) -- todo: add a variable in game-register endpoint to enable/disable this sound during december
 
-	for nPlayerID = 0, PlayerResource:GetPlayerCount() - 1 do
-		if PlayerResource:HasSelectedHero(nPlayerID) and PlayerResource:GetSelectedHeroEntity(nPlayerID) ~= "npc_dota_hero_wisp" then
+	for nPlayerID = 0, DOTA_MAX_TEAM_PLAYERS - 1 do
+		if PlayerResource:IsValidPlayerID(nPlayerID) and PlayerResource:HasSelectedHero(nPlayerID) then
 			local hero = PlayerResource:GetSelectedHeroEntity(nPlayerID)
 
-			if hero and not hero:IsNull() and hero:IsRealHero() and not hero:HasModifier("modifier_fountain_invulnerability") then
+			if hero and not hero:IsNull() and hero:IsRealHero() and hero:GetUnitName() ~= "npc_dota_hero_wisp" then
 				hero.old_pos = hero:GetAbsOrigin()
 				CreateXHSReturnMarker(hero, hero.old_pos)
-				local id = hero:GetPlayerID()
-				local point = Entities:FindByName(nil, "npc_dota_muradin_player_" .. id)
+				local point = Entities:FindByName(nil, "npc_dota_muradin_player_" .. nPlayerID)
 
-				DisableItems(hero, event_end_delay)
-				if point ~= nil then
+				if ForceRespawnHeroForSpecialArena(hero) then
+					DisableItems(hero, event_end_delay)
+				end
+				if hero:IsAlive() and point ~= nil then
 					StartCinematicDelayedTeleport(hero, point:GetAbsOrigin(), CINEMATIC_EVENT_PRE_TELEPORT_DELAY)
 				end
 			end
@@ -664,6 +715,112 @@ function SpecialEvents:PublishFarmLeaderboard(active)
 	self.farm_leaderboard_dirty = false
 end
 
+function SpecialEvents:GetRameroKillRacePlayers()
+	local players = {}
+
+	for _, hero in ipairs(HeroList:GetAllHeroes()) do
+		if hero ~= nil
+			and IsValidEntity(hero)
+			and not hero:IsNull()
+			and hero:IsRealHero()
+			and not hero:IsIllusion()
+			and hero:GetTeamNumber() == DOTA_TEAM_GOODGUYS then
+			local playerID = hero:GetPlayerOwnerID()
+			local selectedHero = playerID >= 0 and PlayerResource:GetSelectedHeroEntity(playerID) or nil
+			if selectedHero == hero then
+				local kills = math.max(0, tonumber(hero:GetKills()) or 0)
+				table.insert(players, {
+					player_id = playerID,
+					kills = kills,
+					remaining = math.max(0, XHS_RAMERO_BARISTOL_KILLS_REQUIRED - kills),
+				})
+			end
+		end
+	end
+
+	table.sort(players, function(a, b)
+		if a.kills ~= b.kills then
+			return a.kills > b.kills
+		end
+		return a.player_id < b.player_id
+	end)
+
+	for rank, player in ipairs(players) do
+		player.rank = rank
+	end
+
+	return players, players[1] and players[1].kills or 0
+end
+
+function SpecialEvents:PublishRameroKillRace(active, players)
+	players = players or self:GetRameroKillRacePlayers()
+	CustomNetTables:SetTableValue(FARM_LEADERBOARD_NET_TABLE, FARM_LEADERBOARD_NET_KEY, {
+		active = active == true,
+		available = active == true and #players > 0,
+		phase = active == true and "ramero_countdown" or "hidden",
+		mode = "ramero_kill_race",
+		target_kills = XHS_RAMERO_BARISTOL_KILLS_REQUIRED,
+		players = players,
+		updated_at = GameRules:GetGameTime(),
+	})
+end
+
+function SpecialEvents:RefreshRameroKillRace()
+	if GameMode.FarmEvent_occuring == true then
+		self.ramero_kill_race_active = false
+		return
+	end
+
+	if SpecialEvents.Ramero_trigger ~= 0 then
+		if self.ramero_kill_race_active == true then
+			self.ramero_kill_race_active = false
+			self:PublishRameroKillRace(false, {})
+		end
+		return
+	end
+
+	local players, leaderKills = self:GetRameroKillRacePlayers()
+	if leaderKills < RAMERO_KILL_RACE_START then return end
+
+	if leaderKills >= XHS_RAMERO_BARISTOL_KILLS_REQUIRED then
+		if self.ramero_kill_race_active == true then
+			self.ramero_kill_race_active = false
+			self:PublishRameroKillRace(false, {})
+		end
+		return
+	end
+
+	self.ramero_kill_race_active = true
+	self:PublishRameroKillRace(true, players)
+	if self.ramero_kill_race_publisher_running == true then return end
+
+	self.ramero_kill_race_publisher_running = true
+	GameRules:GetGameModeEntity():SetContextThink("xhs_ramero_kill_race_publish", function()
+		if GameMode.FarmEvent_occuring == true then
+			self.ramero_kill_race_active = false
+			self.ramero_kill_race_publisher_running = false
+			return nil
+		end
+
+		if self.ramero_kill_race_active ~= true then
+			self.ramero_kill_race_publisher_running = false
+			return nil
+		end
+
+		local currentPlayers, currentLeaderKills = self:GetRameroKillRacePlayers()
+		if SpecialEvents.Ramero_trigger ~= 0
+			or currentLeaderKills >= XHS_RAMERO_BARISTOL_KILLS_REQUIRED then
+			self.ramero_kill_race_active = false
+			self.ramero_kill_race_publisher_running = false
+			self:PublishRameroKillRace(false, {})
+			return nil
+		end
+
+		self:PublishRameroKillRace(true, currentPlayers)
+		return RAMERO_KILL_RACE_UPDATE_INTERVAL
+	end, RAMERO_KILL_RACE_UPDATE_INTERVAL)
+end
+
 function SpecialEvents:GetFarmEventActiveUnits(playerID)
 	local progress = self.hero_farm_event and self.hero_farm_event[tonumber(playerID)] or nil
 	return progress and progress.active_units or {}
@@ -735,12 +892,28 @@ function SpecialEvents:SuspendNonFarmCreeps()
 		if IsValidAliveUnit(unit)
 			and unit.xhs_farm_event ~= true
 			and unit:HasModifier("modifier_ai") then
-			unit:SetForceAttackTarget(nil)
-			unit:Stop()
-			unit:AddNewModifier(unit, nil, "modifier_xhs_farm_suspended", {})
-			table.insert(self.farm_suspended_units, unit)
+			self:SuspendNonFarmUnit(unit)
 		end
 	end
+end
+
+function SpecialEvents:SuspendNonFarmUnit(unit)
+	if not IsValidAliveUnit(unit)
+		or unit.xhs_farm_event == true then
+		return
+	end
+
+	self.farm_suspended_units = self.farm_suspended_units or {}
+	for _, suspendedUnit in ipairs(self.farm_suspended_units) do
+		if suspendedUnit == unit then return end
+	end
+
+	if not unit:HasModifier("modifier_xhs_farm_suspended") then
+		unit:SetForceAttackTarget(nil)
+		unit:Stop()
+		unit:AddNewModifier(unit, nil, "modifier_xhs_farm_suspended", {})
+	end
+	table.insert(self.farm_suspended_units, unit)
 end
 
 function SpecialEvents:ResumeNonFarmCreeps()
@@ -905,7 +1078,14 @@ function SpecialEvents:ActivateFarmEventWave(playerID, round, level)
 				unit:AddNewModifier(unit, nil, "modifier_ai", { state = 5 })
 			end
 			local hero = GetFarmEventHero(playerID)
-			if hero ~= nil then unit:SetForceAttackTarget(hero) end
+			if hero ~= nil then
+				unit:SetForceAttackTarget(hero)
+				ExecuteOrderFromTable({
+					UnitIndex = unit:entindex(),
+					OrderType = DOTA_UNIT_ORDER_ATTACK_TARGET,
+					TargetIndex = hero:entindex(),
+				})
+			end
 			table.insert(progress.active_units, unit)
 		end
 	end
@@ -1129,7 +1309,6 @@ end
 function SpecialEvents:EndFarmEvent()
 	CustomTimers.timers_paused = 2
 	StopAllStormEarthFireSounds()
-	self:ResumeNonFarmCreeps()
 	if FragmentQuests ~= nil then
 		FragmentQuests:OnFarmEventEnd()
 		FragmentQuests:OnPhase2Start()
@@ -1140,10 +1319,10 @@ function SpecialEvents:EndFarmEvent()
 
 		if hero:IsRealHero() then
 			if hero.old_pos then
-				TeleportHero(hero, hero.old_pos, 3.0)
+				TeleportHero(hero, hero.old_pos, FARM_EVENT_RETURN_TELEPORT_DURATION)
 			else
 				if hero:GetTeamNumber() == 2 then
-					TeleportHero(hero, BASE_GOOD:GetAbsOrigin(), 3.0)
+					TeleportHero(hero, BASE_GOOD:GetAbsOrigin(), FARM_EVENT_RETURN_TELEPORT_DURATION)
 					-- elseif hero:GetTeamNumber() == 3 then
 					-- TeleportHero(hero, base_bad:GetAbsOrigin(), 3.0)
 				end
@@ -1153,15 +1332,17 @@ function SpecialEvents:EndFarmEvent()
 		end
 	end
 
-	-- The sixth special wave is coupled to the end of the 3-second return TP.
+	-- Keep every lane creep suspended through the return TP, then give players
+	-- a short positioning window before combat and special wave 6 resume.
 	-- Keep a single idempotent owner so duplicate Farm callbacks cannot advance
 	-- the global index and spawn wave 7 from the same north lane.
 	if self.farm_exit_wave_scheduled ~= true then
 		self.farm_exit_wave_scheduled = true
 		local farmEventGeneration = self.farm_event_generation
-		Timers:CreateTimer(3.0, function()
+		Timers:CreateTimer(FARM_EVENT_RETURN_TOTAL_DELAY, function()
 			if self.farm_event_generation ~= farmEventGeneration then return nil end
 
+			self:ResumeNonFarmCreeps()
 			RestartCreeps(0.0)
 
 			if CustomTimers.special_waves_disabled ~= true
@@ -1191,7 +1372,10 @@ function SpecialEvents:EndFarmEvent()
 		local rax_spawner = Entities:FindByName(nil, "npc_dota_spawner_" .. NumPlayers)
 
 		if rax_spawner then
-			local magnataur = SpawnMagnataur(rax_spawner:GetAbsOrigin())
+			local magnataur, magnataurs = SpawnMagnataur(rax_spawner:GetAbsOrigin())
+			for _, unit in ipairs(magnataurs or {}) do
+				self:SuspendNonFarmUnit(unit)
+			end
 			CollapsePhaseOneLane(NumPlayers, magnataur)
 			print("npc_dota_spawner_" .. NumPlayers .. " removed.")
 			rax_spawner.disabled = true
@@ -1251,7 +1435,7 @@ function SpecialEvents:StartRameroAndBaristolEvent(hero)
 	end, false)
 end
 
-function SpecialEvents:RameroAndBaristolEvent(time, hero) -- 500 kills
+function SpecialEvents:RameroAndBaristolEvent(time, hero) -- 300 kills
 	local stun_duration = 5.0
 	CustomTimers.current_time["special_arena"] = time
 	BT_ENABLED = 0
@@ -1388,7 +1572,7 @@ function SpecialEvents:StartSogatEvent(hero)
 	end)
 end
 
-function SpecialEvents:SogatEvent(time, hero) -- 750 kills
+function SpecialEvents:SogatEvent(time, hero) -- 500 kills
 	local stun_duration = 5.0
 	CustomTimers.timers_paused = 2
 	CustomTimers.current_time["special_arena"] = time

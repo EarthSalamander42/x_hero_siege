@@ -6,6 +6,7 @@ LinkLuaModifier("modifier_xhs_lag_lab_root", "components/devtools/lag_lab", LUA_
 LinkLuaModifier("modifier_xhs_lag_lab_no_collision", "components/devtools/lag_lab", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_xhs_lag_lab_disarm", "components/devtools/lag_lab", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_xhs_lag_lab_silence", "components/devtools/lag_lab", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_xhs_lag_lab_hidden", "components/devtools/lag_lab", LUA_MODIFIER_MOTION_NONE)
 
 local BASELINE_SECONDS = 10
 local WARMUP_SECONDS = 3
@@ -104,6 +105,78 @@ local function RemoveUnitCosmetics(unit)
 	end
 
 	unit.Slots = {}
+end
+
+function XHSLagLab:HideRenderEntity(entity)
+	if not IsValidEntity(entity) or entity.entindex == nil then return end
+	local entindex = entity:entindex()
+
+	local alphaRecord = self.changed_alpha[entindex]
+	if alphaRecord == nil or alphaRecord.unit ~= entity then
+		local alpha = 255
+		if entity.GetRenderAlpha ~= nil then
+			local ok, value = pcall(function() return entity:GetRenderAlpha() end)
+			if ok and value ~= nil then alpha = value end
+		end
+		self.changed_alpha[entindex] = { unit = entity, alpha = alpha }
+	end
+	if entity.SetRenderAlpha ~= nil then entity:SetRenderAlpha(0) end
+
+	local noDrawRecord = self.changed_no_draw[entindex]
+	if noDrawRecord == nil or noDrawRecord.unit ~= entity then
+		local wasNoDraw = entity.xhs_farm_staged == true
+			or (entity.HasModifier ~= nil and entity:HasModifier("modifier_xhs_farm_staged"))
+		if entity.IsNoDraw ~= nil then
+			local ok, value = pcall(function() return entity:IsNoDraw() end)
+			if ok then wasNoDraw = value == true end
+		end
+		self.changed_no_draw[entindex] = {
+			unit = entity,
+			remove_on_restore = not wasNoDraw,
+		}
+	end
+	if entity.AddNoDraw ~= nil then entity:AddNoDraw() end
+	local effectRecord = self.changed_no_draw_effect[entindex]
+	if effectRecord == nil or effectRecord.unit ~= entity then
+		local hadNoDrawEffect = false
+		if entity.IsEffectActive ~= nil and EF_NODRAW ~= nil then
+			local ok, value = pcall(function() return entity:IsEffectActive(EF_NODRAW) end)
+			if ok then hadNoDrawEffect = value == true end
+		end
+		self.changed_no_draw_effect[entindex] = {
+			unit = entity,
+			remove_on_restore = not hadNoDrawEffect,
+		}
+	end
+	if entity.AddEffects ~= nil and EF_NODRAW ~= nil then
+		entity:AddEffects(EF_NODRAW)
+	end
+end
+
+function XHSLagLab:HideUnitRendering(unit)
+	if not IsValidEntity(unit) then return end
+	local unitIndex = unit:entindex()
+	if self.changed_wearables[unitIndex] == nil
+		and Wearable ~= nil
+		and Wearable.HideWearables ~= nil
+		and type(unit.Slots) == "table"
+		and next(unit.Slots) ~= nil then
+		self.changed_wearables[unitIndex] = { unit = unit }
+		pcall(function() Wearable:HideWearables(unit) end)
+	end
+	local visited = {}
+	local function HideTree(entity, depth)
+		if not IsValidEntity(entity) or entity.entindex == nil then return end
+		local entindex = entity:entindex()
+		if visited[entindex] == true then return end
+		visited[entindex] = true
+		self:HideRenderEntity(entity)
+		if depth >= 2 or entity.GetChildren == nil then return end
+		for _, child in ipairs(entity:GetChildren() or {}) do
+			HideTree(child, depth + 1)
+		end
+	end
+	HideTree(unit, 0)
 end
 
 function XHSLagLab:IsActive(experimentID)
@@ -223,15 +296,21 @@ function XHSLagLab:ApplyToUnit(unit)
 			end)
 		end
 	elseif self.state.experiment_id == "hide_creeps" then
-		if self.changed_alpha[entindex] == nil then
-			local alpha = 255
-			if unit.GetRenderAlpha ~= nil then
-				local ok, value = pcall(function() return unit:GetRenderAlpha() end)
-				if ok and value ~= nil then alpha = value end
+		local firstApplication = self.changed_no_draw[entindex] == nil
+		unit:AddNewModifier(unit, nil, "modifier_xhs_lag_lab_hidden", {})
+		self:HideUnitRendering(unit)
+		-- Hero-model creep cosmetics can be attached shortly after npc_spawned.
+		-- Revisit this unit twice without adding a global scan to the A/B test.
+		if firstApplication and Timers ~= nil then
+			for _, delay in ipairs({ 0.15, 0.75 }) do
+				Timers:CreateTimer(delay, function()
+					if self:IsActive("hide_creeps") and self:IsTargetCreep(unit) then
+						self:HideUnitRendering(unit)
+					end
+					return nil
+				end)
 			end
-			self.changed_alpha[entindex] = { unit = unit, alpha = alpha }
 		end
-		unit:SetRenderAlpha(0)
 	end
 end
 
@@ -266,6 +345,7 @@ function XHSLagLab:RestoreEffects()
 		"modifier_xhs_lag_lab_no_collision",
 		"modifier_xhs_lag_lab_disarm",
 		"modifier_xhs_lag_lab_silence",
+		"modifier_xhs_lag_lab_hidden",
 	}) do
 		for _, unit in pairs(self:GetTargetCreeps()) do
 			unit:RemoveModifierByName(modifierName)
@@ -283,8 +363,33 @@ function XHSLagLab:RestoreEffects()
 			record.unit:SetRenderAlpha(tonumber(record.alpha) or 255)
 		end
 	end
+	for _, record in pairs(self.changed_no_draw or {}) do
+		if IsValidEntity(record.unit)
+			and record.remove_on_restore == true
+			and record.unit.RemoveNoDraw ~= nil then
+			record.unit:RemoveNoDraw()
+		end
+	end
+	for _, record in pairs(self.changed_no_draw_effect or {}) do
+		if IsValidEntity(record.unit)
+			and record.remove_on_restore == true
+			and record.unit.RemoveEffects ~= nil
+			and EF_NODRAW ~= nil then
+			record.unit:RemoveEffects(EF_NODRAW)
+		end
+	end
+	for _, record in pairs(self.changed_wearables or {}) do
+		if IsValidEntity(record.unit)
+			and Wearable ~= nil
+			and Wearable.ShowWearables ~= nil then
+			pcall(function() Wearable:ShowWearables(record.unit) end)
+		end
+	end
 	self.changed_models = {}
 	self.changed_alpha = {}
+	self.changed_no_draw = {}
+	self.changed_no_draw_effect = {}
+	self.changed_wearables = {}
 	self.hotspot_sequence = 0
 end
 
@@ -500,6 +605,9 @@ function XHSLagLab:Init()
 		self.state = self.state or { running = false, effect_active = false, stage = "idle" }
 		self.changed_models = self.changed_models or {}
 		self.changed_alpha = self.changed_alpha or {}
+		self.changed_no_draw = self.changed_no_draw or {}
+		self.changed_no_draw_effect = self.changed_no_draw_effect or {}
+		self.changed_wearables = self.changed_wearables or {}
 		self:Publish()
 		return
 	end
@@ -507,6 +615,9 @@ function XHSLagLab:Init()
 	self.state = { running = false, effect_active = false, stage = "idle" }
 	self.changed_models = {}
 	self.changed_alpha = {}
+	self.changed_no_draw = {}
+	self.changed_no_draw_effect = {}
+	self.changed_wearables = {}
 	ListenToGameEvent("npc_spawned", function(event)
 		if XHSLagLab.state == nil or XHSLagLab.state.effect_active ~= true then return end
 		local unitIndex = event and tonumber(event.entindex) or nil
@@ -552,6 +663,11 @@ end
 modifier_xhs_lag_lab_silence = class(XHSLagLabModifierBase())
 function modifier_xhs_lag_lab_silence:CheckState()
 	return { [MODIFIER_STATE_SILENCED] = true }
+end
+
+modifier_xhs_lag_lab_hidden = class(XHSLagLabModifierBase())
+function modifier_xhs_lag_lab_hidden:CheckState()
+	return { [MODIFIER_STATE_NO_HEALTH_BAR] = true }
 end
 
 function XHSLagLabIsActive(experimentID)

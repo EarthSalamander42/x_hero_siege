@@ -93,10 +93,6 @@ ListenToGameEvent('npc_spawned', function(event)
 
 	local unit_name = npc:GetUnitName()
 
-	if unit_name == "npc_xhs_elf_creep_ranged_4" and CompanionCosmetics then
-		CompanionCosmetics(npc, unit_name)
-	end
-
 	local npc_player_id = XHSGetPlayerIDFromUnit ~= nil and XHSGetPlayerIDFromUnit(npc) or nil
 	if npc_player_id == nil or npc_player_id < 0 then
 		if npc.GetPlayerID ~= nil then npc_player_id = npc:GetPlayerID() end

@@ -10,6 +10,27 @@
 
 	<Panel class="Diretide" hittest="false">
 		<Panel id="DiretidePanel">
+			<Panel id="CastleHP" class="HealthBarContainer CastleHealthBar" hittest="false">
+				<Panel class="BossHeader" hittest="false">
+					<Label id="CastleLabel" class="HoldoutLabelSmall" hittest="false" text=""/>
+					<Label id="CastleMuradinState" class="HoldoutLabelSmall_alt CastleMuradinState" hittest="false" text=""/>
+				</Panel>
+				<Panel class="BossProgressBarContainer" hittest="false">
+					<Panel id="CastleIcon" class="BossIcon CastleIcon" hittest="false">
+						<Image id="CastleIconImage" class="BossIconImage" hittest="false" scaling="stretch-to-cover-preserve-aspect"/>
+					</Panel>
+					<Panel class="BossBarMain" hittest="false">
+						<Panel id="CastleProgressBar" class="BossProgressBar" hittest="false">
+							<Panel id="CastleDamageLag" class="BossDamageLag" hittest="false"/>
+							<Panel id="CastleProgressFill" class="BossProgressFill" hittest="false"/>
+							<Panel id="CastleHealPulse" class="BossHealPulse" hittest="false"/>
+							<Panel id="CastleMarkers" class="BossMarkers" hittest="false"/>
+							<Label id="CastleHealth" class="HoldoutLabelSmall BossHealthLabel" hittest="false" text=""/>
+						</Panel>
+					</Panel>
+				</Panel>
+			</Panel>
+
 			<Panel id="BossHP1" class="HealthBarContainer" hittest="false">
 				<Panel class="BossHeader" hittest="false">
 					<Label id="BossLabel1" class="HoldoutLabelSmall" hittest="false" text=""/>
